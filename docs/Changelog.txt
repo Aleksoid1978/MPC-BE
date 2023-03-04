@@ -7,10 +7,14 @@ Windows Vista is no longer supported.
 MpaSplitter
 Avoid accidental connection to .wtv files (Windows Television).
 
+YouTube
+Added the ability to choose in advance only sound in the built-in parser.
+
 Player
 Added display of a single audio track in the OSD when trying to switch to the next or previous one.
 Added display of audio track number in OSD.
 The history window no longer blocks interaction with the main player window.
+Fixed launching bookmarks from the menu.
 Various interface fixes.
 
 Updated German translation (by Klaus1189).
@@ -20,6 +24,7 @@ Updated Hungarian translation (by mickey).
 Updated Turkish translation (by cmhrky).
 Updated Ukrainian translation (by arestarh).
 Updated Italian translation (by mapi68).
+Updated Spanish translation (by IPeluchito).
 
 Updated libraries:
 	dav1d git-1.0.0-115-g9b4b244;
