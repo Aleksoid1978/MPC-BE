@@ -210,7 +210,7 @@ struct item_info
 {
     const char* Name;
     const char* ID_Begin;
-    enum flags : int8u {
+    enum flags {
         Flags_ID_W,
         Flags_ID_YX,
         Flags_ID_Z1, // Z width x2
