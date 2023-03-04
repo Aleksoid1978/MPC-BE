@@ -3473,7 +3473,7 @@ BEGIN
     IDS_AUDIO_STREAM        "Audió %u/%u: %s"
     IDS_AG_REOPEN           "Fájl újranyitása"
     IDS_PROPERTIESFOR       "Tulajdonságai '%s'"
-    IDS_AUDIO_ONLY          "audio only"
+    IDS_AUDIO_ONLY          "csak hang"
 END
 
 STRINGTABLE
