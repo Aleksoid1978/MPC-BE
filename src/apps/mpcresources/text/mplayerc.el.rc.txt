@@ -534,12 +534,12 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 31		"Οι αλλαγές θα ενεργοποιηθούν μετά το κλείσιμο κι επανεκκίνηση της αναπαραγωγής."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 5		"Απόδοση βίντεο"
 7		"Properties"
 8		"EVR-CP and EVR Sync settings"
 9		"Επιλογή συσκευής απόδοσης D3D9"
-11		"Αποκλειστική πλήρης οθόνη"
+11		"Exclusive full screen on an additional window"
 13		"10-bit RGB έξοδος"
 14		"Αρχικοποίηση ξανά όταν αλλάζει η οθόνη"
 15		"Προσωρινές μνήμες EVR:"
@@ -547,13 +547,14 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
 20		"Αλλαγή μεγέθους:"
 22		"Συρρίκνωση <50%:"
 24		"Εύρος εξόδου:"
-26		"Use ID3DFullscreenControl for MPC VR (experimental)"
-28		"Framing"
-29		"Προεπιλεγμένη λειτουργία:"
-31		"Μη γίνεται κλιμάκωση σε μικρή αύξηση μεγέθους πλαισίου"
-33		"Μη γίνεται κλιμάκωση σε μικρή μείωσηη μεγέθους πλαισίου"
-35		"Προεπιλογή"
-36		"Λειτουργία παρουσίασης:"
+26		"MPC Video Renderer settings"
+27		"Use additional window for full screen (experimental)"
+29		"Framing"
+30		"Προεπιλεγμένη λειτουργία:"
+32		"Μη γίνεται κλιμάκωση σε μικρή αύξηση μεγέθους πλαισίου"
+34		"Μη γίνεται κλιμάκωση σε μικρή μείωσηη μεγέθους πλαισίου"
+36		"Προεπιλογή"
+37		"Λειτουργία παρουσίασης:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25

@@ -534,12 +534,12 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 31		"현재 파일을 닫고 다시 시작해야만 설정이 적용됩니다."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 5		"비디오 렌더러"
 7		"등록 정보"
 8		"EVR-CP 및 EVR 싱크 설정"
 9		"D3D9 렌더러를 선택"
-11		"배타적 전체 화면"
+11		"Exclusive full screen on an additional window"
 13		"10비트 RGB 출력"
 14		"디스플레이 바꾸면 초기화"
 15		"EVR 버퍼 :"
@@ -547,13 +547,14 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
 20		"크기 조정 :"
 22		"축소 <50% :"
 24		"출력 범위 :"
-26		"MPC VR용 ID3D 전체 화면 제어 사용(실험적)"
-28		"플레이밍"
-29		"기본 모드 :"
-31		"살짝 확대하면 크기 조정 안 함"
-33		"살짝 축소하면 크기 조정 안 함"
-35		"기본값"
-36		"프레젠테이션 모드 :"
+26		"MPC Video Renderer settings"
+27		"Use additional window for full screen (experimental)"
+29		"플레이밍"
+30		"기본 모드 :"
+32		"살짝 확대하면 크기 조정 안 함"
+34		"살짝 축소하면 크기 조정 안 함"
+36		"기본값"
+37		"프레젠테이션 모드 :"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25

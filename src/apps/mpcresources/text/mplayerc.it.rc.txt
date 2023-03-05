@@ -534,12 +534,12 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 31		"Le modifiche diventano effettive dopo che la riproduzione è stata chiusa e riavviata."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 5		"Renderer video"
 7		"Proprietà"
 8		"Impostazioni di sincronizzazione EVR-CP e EVR"
 9		"Dispositivo di rendering D3D9"
-11		"Schermo intero esclusivo"
+11		"Exclusive full screen on an additional window"
 13		"Uscita RGB a 10 bit"
 14		"Ripristina quando si cambia visualizzazione"
 15		"Buffer EVR:"
@@ -547,13 +547,14 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
 20		"Ridimensionatore:"
 22		"Ridimensiona <50%:"
 24		"Gamma di uscita:"
-26		"Usa ID3DFullscreenControl per MPC VR (sperimentale)"
-28		"Fotogrammi"
-29		"Modalità predefinita:"
-31		"Non incrementare la dimensione del fotogramma"
-33		"Non diminuire la dimensione del fotogramma"
-35		"Predefinito"
-36		"Modalità presentazione:"
+26		"MPC Video Renderer settings"
+27		"Use additional window for full screen (experimental)"
+29		"Fotogrammi"
+30		"Modalità predefinita:"
+32		"Non incrementare la dimensione del fotogramma"
+34		"Non diminuire la dimensione del fotogramma"
+36		"Predefinito"
+37		"Modalità presentazione:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25

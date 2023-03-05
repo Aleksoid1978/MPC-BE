@@ -534,12 +534,12 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 31		"A módosítások akkor lépnek érvénybe, ha a lejátszót bezárta és újraindította."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 5		"Videó megjelenítő"
 7		"Tulajdonságok"
 8		"EVR-CP és EVR Sync beállítások"
 9		"Válassza a D3D9 megjelenítő eszközt"
-11		"Exkluzív teljesképernyő"
+11		"Exclusive full screen on an additional window"
 13		"10-bit RGB kimenet"
 14		"Visszaállítás a kijelző megváltoztatásakor"
 15		"EVR Pufferek:"
@@ -547,13 +547,14 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
 20		"Átméretező:"
 22		"Leméretezni <50%:"
 24		"Kimeneti tartomány:"
-26		"ID3DFullscreenControl használata MPC VR-hez (kísérleti)"
-28		"Keretező"
-29		"Alapértelmezett mód:"
-31		"Ne méretezze, ha a kis méret növekszik"
-33		"Ne méretezze, ha a kis méret csökken"
-35		"Alapértelmezett"
-36		"Bemutató mód:"
+26		"MPC Video Renderer settings"
+27		"Use additional window for full screen (experimental)"
+29		"Keretező"
+30		"Alapértelmezett mód:"
+32		"Ne méretezze, ha a kis méret növekszik"
+34		"Ne méretezze, ha a kis méret csökken"
+36		"Alapértelmezett"
+37		"Bemutató mód:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25

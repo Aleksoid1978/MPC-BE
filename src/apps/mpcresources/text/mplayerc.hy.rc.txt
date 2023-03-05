@@ -534,12 +534,12 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 31		"Ցուցադրել մոտագույն vsync-ի հետ"
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 5		"Video renderer"
 7		"Properties"
 8		"EVR-CP and EVR Sync settings"
 9		"Select D3D9 Render Device"
-11		"Exclusive fullscreen"
+11		"Exclusive full screen on an additional window"
 13		"10-bit RGB output"
 14		"Reset when changing display"
 15		"EVR Buffers:"
@@ -547,13 +547,14 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
 20		"Resizer:"
 22		"Downscaling <50%:"
 24		"Output range:"
-26		"Use ID3DFullscreenControl for MPC VR (experimental)"
-28		"Framing"
-29		"Default mode:"
-31		"Do not scale at small frame size increases"
-33		"Do not scale at small frame size decreases"
-35		"Default"
-36		"Presentation mode:"
+26		"MPC Video Renderer settings"
+27		"Use additional window for full screen (experimental)"
+29		"Framing"
+30		"Default mode:"
+32		"Do not scale at small frame size increases"
+34		"Do not scale at small frame size decreases"
+36		"Default"
+37		"Presentation mode:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25

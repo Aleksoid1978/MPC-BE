@@ -534,12 +534,12 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 31		"Zmiany zostaną wprowadzone po ponownym uruchomieniu programu."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 5		"Renderer wideo"
 7		"Properties"
 8		"EVR-CP and EVR Sync settings"
 9		"Wybór urzadzenia renderującego D3D9"
-11		"Ekskluzywny pełny ekran"
+11		"Exclusive full screen on an additional window"
 13		"Wyjście RGB 10-bitowe"
 14		"Ponowne inicjowanie \npo zmianie wyświelacza"
 15		"Bufor EVR:"
@@ -547,13 +547,14 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
 20		"Skalowanie:"
 22		"Downscaling <50%:"
 24		"Zakres wyjścia:"
-26		"Use ID3DFullscreenControl for MPC VR (experimental)"
-28		"Kadrowanie"
-29		"Domyślny tryb:"
-31		"Do not scale at small frame size increases"
-33		"Do not scale at small frame size decreases"
-35		"Domyślne"
-36		"Tryb prezentacji:"
+26		"MPC Video Renderer settings"
+27		"Use additional window for full screen (experimental)"
+29		"Kadrowanie"
+30		"Domyślny tryb:"
+32		"Do not scale at small frame size increases"
+34		"Do not scale at small frame size decreases"
+36		"Domyślne"
+37		"Tryb prezentacji:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25

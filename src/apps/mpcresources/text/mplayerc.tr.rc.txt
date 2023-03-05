@@ -534,12 +534,12 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 31		"Değişiklikler oynatma kapatıldıktan ve uygulama yeniden başlatıldıktan sonra uygulanacaktır."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 5		"Video işleyici"
 7		"Özellikler"
 8		"GVİ-ÖS ve GVİ Eşzamanlama ayarları"
 9		"D3D9 Karıştırıcı aygıtı seçimi"
-11		"Özel tam ekran"
+11		"Exclusive full screen on an additional window"
 13		"10-bit RGB çıkış"
 14		"Görüntüyü değiştirirken sıfırla"
 15		"GVİ Ara belleği:"
@@ -547,13 +547,14 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
 20		"Boyutlandırıcı:"
 22		"Boyut küçültme <50%:"
 24		"Çıkış aralığı:"
-26		"MPC Video İşleyici için ID3DFullscreenControl kullan (deneysel)"
-28		"Çerçeveleme"
-29		"Varsayılan mod:"
-31		"Küçük kare boyut artışlarında ölçeklendirme yapma"
-33		"Küçük kare boyut azalmalarında ölçeklendirme yapma"
-35		"Varsayılan"
-36		"Sunum modu:"
+26		"MPC Video Renderer settings"
+27		"Use additional window for full screen (experimental)"
+29		"Çerçeveleme"
+30		"Varsayılan mod:"
+32		"Küçük kare boyut artışlarında ölçeklendirme yapma"
+34		"Küçük kare boyut azalmalarında ölçeklendirme yapma"
+36		"Varsayılan"
+37		"Sunum modu:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25

@@ -534,12 +534,12 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 31		"Зміни набудуть чинності після перезапуску плеєра."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 5		"Відеорендерер"
 7		"Налаштування"
 8		"Параметри EVR-CP і EVR Sync"
 9		"Вибір пристрою рендерингу D3D9"
-11		"Ексклюзивний повний екран"
+11		"Exclusive full screen on an additional window"
 13		"10-ти бітний RGB на виході"
 14		"Реініціалізація при зміні дисплею"
 15		"Буфери EVR:"
@@ -547,13 +547,14 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 38
 20		"Інтерполяція:"
 22		"Зменшення <50%:"
 24		"Вихідний діапазон:"
-26		"Використовувати ID3DFullscreenControl для MPC VR (експериментально)"
-28		"Кадрування"
-29		"Типовий режим:"
-31		"Не масштабувати кадр при малому збільшенні"
-33		"Не масштабувати кадр при малому зменшенні"
-35		"Типово"
-36		"Режим виводу:"
+26		"MPC Video Renderer settings"
+27		"Use additional window for full screen (experimental)"
+29		"Кадрування"
+30		"Типовий режим:"
+32		"Не масштабувати кадр при малому збільшенні"
+34		"Не масштабувати кадр при малому зменшенні"
+36		"Типово"
+37		"Режим виводу:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25

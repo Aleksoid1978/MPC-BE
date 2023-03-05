@@ -1768,11 +1768,11 @@
 #define IDS_SUB_SAVE_EXTERNAL_STYLE_FILE 44104
 
 // Next default values for new objects
-//
+// 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        44105
-#define _APS_NEXT_COMMAND_VALUE          1204
+#define _APS_NEXT_COMMAND_VALUE         1204
 #define _APS_NEXT_CONTROL_VALUE         22054
 #define _APS_NEXT_SYMED_VALUE           24044
 #endif
