@@ -372,7 +372,6 @@ STDMETHODIMP CMPCVRAllocatorPresenter::ClearPixelShaders(int target)
 	HRESULT hr = E_FAIL;
 
 	if (TARGET_SCREEN == target) {
-		// experimental
 		if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 			hr = pIExFilterConfig->SetBool("cmd_clearPostScaleShaders", true);
 		}
@@ -408,7 +407,6 @@ STDMETHODIMP CMPCVRAllocatorPresenter::AddPixelShader(int target, LPCWSTR name, 
 	}
 
 	if (codesize && TARGET_SCREEN == target) {
-		// experimental
 		if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 			int rtype = 0;
 			hr = pIExFilterConfig->GetInt("renderType", &rtype);
