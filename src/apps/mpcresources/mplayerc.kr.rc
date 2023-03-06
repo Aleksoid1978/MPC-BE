@@ -2903,7 +2903,7 @@ BEGIN
     IDS_AG_DVD_MENU_ACTIVATE "DVD 메뉴 활성화"
     IDS_AG_DVD_MENU_BACK    "DVD 메뉴 뒤로"
     IDS_AG_DVD_MENU_LEAVE   "DVD 메뉴 끝내기"
-    IDS_AG_BOSS_KEY         "Boss 키"
+    IDS_AG_BOSS_KEY         "엄마 왔다! (재생정지, 최소화)"
     IDS_AG_MENU_PLAYER_S    "재생기 메뉴 (짧게)"
     IDS_AG_MENU_PLAYER_L    "재생기 메뉴 (길게)"
     IDS_AG_MENU_FILTERS     "필터 메뉴"

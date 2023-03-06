@@ -860,7 +860,7 @@ BEGIN
     GROUPBOX        "Einstellungen für EVR (custom presenter) und EVR Sync",IDC_STATIC,5,37,285,137
     CONTROL         "Rendergerät verwenden:",IDC_D3D9DEVICE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,120,10
     COMBOBOX        IDC_D3D9DEVICE_COMBO,144,49,142,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Exclusive full screen on an additional window",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
+    CONTROL         "Vollbild (Exclusive Mode) in einem zusätzlichen Fenster",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,79,224,10
     CONTROL         "10-Bit RGB-Ausgabe",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,92,92,10
     CONTROL         "Bei Anzeigewechsel neu initialisieren",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_TOP | WS_TABSTOP,10,65,164,9
@@ -875,8 +875,8 @@ BEGIN
     COMBOBOX        IDC_COMBO7,188,156,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Ausgabebereich:",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "MPC Video Renderer settings",IDC_STATIC,5,177,285,27
-    CONTROL         "Use additional window for full screen (experimental)",IDC_CHECK2,
+    GROUPBOX        "Einstellungen für MPC Video Renderer",IDC_STATIC,5,177,285,27
+    CONTROL         "Zusätzliches Fenster für Vollbild verwenden (experimentell)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
     GROUPBOX        "Videobild",IDC_STATIC,5,208,210,53
     LTEXT           "Standardmodus:",IDC_STATIC,10,220,74,8
