@@ -860,7 +860,7 @@ BEGIN
     GROUPBOX        "Ajustes EVR-CP y EVR Sync",IDC_STATIC,5,37,285,137
     CONTROL         "Seleccionar Dispositivo de Renderizado D3D9",IDC_D3D9DEVICE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,120,10
     COMBOBOX        IDC_D3D9DEVICE_COMBO,144,49,142,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Exclusive full screen on an additional window",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
+    CONTROL         "Pantalla Completa Exclusiva en una ventana adicional",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,79,224,10
     CONTROL         "Salida RGB de 10 bits",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,92,92,10
     CONTROL         "Reiniciar al cambiar de pantalla",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_TOP | WS_TABSTOP,10,65,164,9
@@ -875,8 +875,8 @@ BEGIN
     COMBOBOX        IDC_COMBO7,188,156,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Rango de salida:",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "MPC Video Renderer settings",IDC_STATIC,5,177,285,27
-    CONTROL         "Use additional window for full screen (experimental)",IDC_CHECK2,
+    GROUPBOX        "Ajustes del Renderizador de Video MPC",IDC_STATIC,5,177,285,27
+    CONTROL         "Usar ventana adicional para Pantalla Completa (experimental)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
     GROUPBOX        "Enmarcado",IDC_STATIC,5,208,210,53
     LTEXT           "Modo predeterminado:",IDC_STATIC,10,220,74,8
@@ -3248,7 +3248,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AVISPLITTER_NON_INTERLEAVED "Admitir ""Malos"" Archivos intercalados"
+    IDS_AVISPLITTER_NON_INTERLEAVED "Admitir Archivos intercalados ""Malos"""
     IDS_AVISPLITTER_REINDEX_BROKEN "Reindexar archivos dañados"
 END
 
@@ -3377,7 +3377,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Cargar Fuentes Incorporadas"
-    IDS_MKVSPLT_CALC_DURATION "Calcula la duración basado en los datos del video"
+    IDS_MKVSPLT_CALC_DURATION "Calcular duración basado en los datos del video"
 END
 
 STRINGTABLE

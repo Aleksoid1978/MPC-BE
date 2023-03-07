@@ -875,8 +875,8 @@ BEGIN
     COMBOBOX        IDC_COMBO7,188,156,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Gamma di uscita:",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "MPC Video Renderer settings",IDC_STATIC,5,177,285,27
-    CONTROL         "Use additional window for full screen (experimental)",IDC_CHECK2,
+    GROUPBOX        "Impostazioni renderer video MPC",IDC_STATIC,5,177,285,27
+    CONTROL         "Usa finestra aggiuntiva per lo schermo intero (sperimentale)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
     GROUPBOX        "Fotogrammi",IDC_STATIC,5,208,210,53
     LTEXT           "Modalità predefinita:",IDC_STATIC,10,220,74,8
@@ -3474,7 +3474,7 @@ BEGIN
     IDS_AUDIO_STREAM        "Audio %u/%u: %s"
     IDS_AG_REOPEN           "Riapri file"
     IDS_PROPERTIESFOR       "Proprietà per '%s'"
-    IDS_AUDIO_ONLY          "audio only"
+    IDS_AUDIO_ONLY          "solo audio"
 END
 
 STRINGTABLE
