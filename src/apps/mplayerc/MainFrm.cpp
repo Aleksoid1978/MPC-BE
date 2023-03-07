@@ -7549,7 +7549,7 @@ bool CMainFrame::CanSwitchD3DFS()
 
 	const CAppSettings& s = AfxGetAppSettings();
 	if (m_eMediaLoadState == MLS_LOADED) {
-		bool optOn = s.m_VRSettings.bExclusiveFullscreen || (s.nCLSwitches & CLSW_D3DFULLSCREEN);
+		bool optOn = s.ExclusiveFSAllowed();
 		return optOn && m_pD3DFS && !m_bFullScreen;
 	} else {
 		return s.ExclusiveFSAllowed();
