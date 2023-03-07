@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Informazioni"
 7		"MPC-BE"
 8		"Copyright © 2002-2023 vedi Authors.txt"
@@ -547,8 +547,8 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 20		"Ridimensionatore:"
 22		"Ridimensiona <50%:"
 24		"Gamma di uscita:"
-26		"MPC Video Renderer settings"
-27		"Use additional window for full screen (experimental)"
+26		"Impostazioni renderer video MPC"
+27		"Usa finestra aggiuntiva per lo schermo intero (sperimentale)"
 29		"Fotogrammi"
 30		"Modalità predefinita:"
 32		"Non incrementare la dimensione del fotogramma"
