@@ -548,7 +548,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 22		"Neerschaling <50%:"
 24		"Uitvoerbereik:"
 26		"MPC Video Renderer settings"
-27		"Use additional window for full screen (experimental)"
+27		"Exclusive full screen on an additional window (experimental)"
 29		"Frameformaat"
 30		"Standaardmodus:"
 32		"Herschaal de beeld niet bij het iets vergroten v/d kader"

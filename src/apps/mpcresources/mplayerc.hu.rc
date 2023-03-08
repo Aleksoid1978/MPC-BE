@@ -876,7 +876,7 @@ BEGIN
     LTEXT           "Kimeneti tartomány:",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "MPC Video Renderer beállítások",IDC_STATIC,5,177,285,27
-    CONTROL         "További ablak használata teljes képernyőhöz (kísérleti)",IDC_CHECK2,
+    CONTROL         "Exkluzív teljes képernyő egy további ablakban (kísérleti)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
     GROUPBOX        "Keretező",IDC_STATIC,5,208,210,53
     LTEXT           "Alapértelmezett mód:",IDC_STATIC,10,220,74,8

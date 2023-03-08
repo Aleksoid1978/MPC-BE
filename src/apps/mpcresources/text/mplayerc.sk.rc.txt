@@ -548,7 +548,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 22		"Downscaling <50%:"
 24		"Output range:"
 26		"MPC Video Renderer settings"
-27		"Use additional window for full screen (experimental)"
+27		"Exclusive full screen on an additional window (experimental)"
 29		"Framing"
 30		"Default mode:"
 32		"Do not scale at small frame size increases"

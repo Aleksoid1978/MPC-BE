@@ -548,7 +548,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 22		"Ridimensiona <50%:"
 24		"Gamma di uscita:"
 26		"Impostazioni renderer video MPC"
-27		"Usa finestra aggiuntiva per lo schermo intero (sperimentale)"
+27		"Exclusive full screen on an additional window (sperimentale)"
 29		"Fotogrammi"
 30		"Modalità predefinita:"
 32		"Non incrementare la dimensione del fotogramma"

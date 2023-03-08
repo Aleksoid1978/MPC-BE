@@ -548,7 +548,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 22		"Skalierung:"
 24		"Ausgabebereich:"
 26		"Einstellungen für MPC Video Renderer"
-27		"Zusätzliches Fenster für Vollbild verwenden (experimentell)"
+27		"Vollbild (Exclusive Mode) in einem zusätzlichen Fenster (experimentell)"
 29		"Videobild"
 30		"Standardmodus:"
 32		"Bei kleiner Erhöhung der Bildgröße nicht skalieren"

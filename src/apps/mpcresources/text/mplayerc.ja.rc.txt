@@ -548,7 +548,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 22		"ダウンスケーリング <50%:"
 24		"出力範囲:"
 26		"MPC Video Renderer settings"
-27		"Use additional window for full screen (experimental)"
+27		"Exclusive full screen on an additional window (experimental)"
 29		"ビデオ フレーム"
 30		"既定のモード:"
 32		"わずかに拡大される場合は映像をリサイズしない"

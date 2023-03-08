@@ -548,7 +548,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 22		"影像降階 <50%："
 24		"輸出範圍："
 26		"MPC Video Renderer settings"
-27		"Use additional window for full screen (experimental)"
+27		"Exclusive full screen on an additional window (experimental)"
 29		"影格佈置"
 30		"預設模式："
 32		"影格框輕微放大時不變更影片畫面大小"

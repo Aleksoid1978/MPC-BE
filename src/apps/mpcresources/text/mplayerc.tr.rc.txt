@@ -548,7 +548,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 22		"Boyut küçültme <50%:"
 24		"Çıkış aralığı:"
 26		"MPC Video İşleyici ayarları"
-27		"Tam ekran için ek pencere kullan (deneysel)"
+27		"Ek bir pencerede özel tam ekran (deneysel)"
 29		"Çerçeveleme"
 30		"Varsayılan mod:"
 32		"Küçük kare boyut artışlarında ölçeklendirme yapma"

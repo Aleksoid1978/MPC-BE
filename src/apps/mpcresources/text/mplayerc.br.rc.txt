@@ -548,7 +548,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 22		"Red.de escala <50%:"
 24		"Faixa de saída:"
 26		"MPC Video Renderer settings"
-27		"Use additional window for full screen (experimental)"
+27		"Exclusive full screen on an additional window (experimental)"
 29		"Enquadramento"
 30		"Modo padrão:"
 32		"Não dimensione ao aumentar tamanho de quadro"

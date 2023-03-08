@@ -876,7 +876,7 @@ BEGIN
     LTEXT           "Rango de salida:",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Ajustes del Renderizador de Video MPC",IDC_STATIC,5,177,285,27
-    CONTROL         "Usar ventana adicional para Pantalla Completa (experimental)",IDC_CHECK2,
+    CONTROL         "Pantalla Completa Exclusiva en una ventana adicional (experimental)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
     GROUPBOX        "Enmarcado",IDC_STATIC,5,208,210,53
     LTEXT           "Modo predeterminado:",IDC_STATIC,10,220,74,8

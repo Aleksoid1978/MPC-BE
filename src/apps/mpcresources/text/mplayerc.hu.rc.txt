@@ -548,7 +548,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 22		"Leméretezni <50%:"
 24		"Kimeneti tartomány:"
 26		"MPC Video Renderer beállítások"
-27		"További ablak használata teljes képernyőhöz (kísérleti)"
+27		"Exkluzív teljes képernyő egy további ablakban (kísérleti)"
 29		"Keretező"
 30		"Alapértelmezett mód:"
 32		"Ne méretezze, ha a kis méret növekszik"

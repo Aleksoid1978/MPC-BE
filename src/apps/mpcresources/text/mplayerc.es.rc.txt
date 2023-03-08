@@ -548,7 +548,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 22		"Reducir escala <50%:"
 24		"Rango de salida:"
 26		"Ajustes del Renderizador de Video MPC"
-27		"Usar ventana adicional para Pantalla Completa (experimental)"
+27		"Pantalla Completa Exclusiva en una ventana adicional (experimental)"
 29		"Enmarcado"
 30		"Modo predeterminado:"
 32		"No escalar al aumentar tamaño de fotograma pequeño"

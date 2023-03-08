@@ -548,7 +548,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 22		"축소 <50% :"
 24		"출력 범위 :"
 26		"MPC Video Renderer settings"
-27		"Use additional window for full screen (experimental)"
+27		"Exclusive full screen on an additional window (experimental)"
 29		"플레이밍"
 30		"기본 모드 :"
 32		"살짝 확대하면 크기 조정 안 함"
