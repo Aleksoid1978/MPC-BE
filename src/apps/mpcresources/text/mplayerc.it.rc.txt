@@ -554,7 +554,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 32		"Non incrementare la dimensione del fotogramma"
 34		"Non diminuire la dimensione del fotogramma"
 36		"Predefinito"
-37		"Modalità presentazione:"
+37		"Modo presentazione:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25
