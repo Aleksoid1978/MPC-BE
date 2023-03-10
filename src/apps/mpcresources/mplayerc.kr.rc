@@ -377,7 +377,7 @@ BEGIN
     CONTROL         "대기열 지연 시, 일부 서브픽처 삭제 허용",IDC_CHECK_ALLOW_DROPPING_SUBPIC,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,93,277,9
     GROUPBOX        "경고",IDC_STATIC,5,108,286,43
-    LTEXT           "만약 비디오카드 설정에서 위치 설정 및 전체 화면 안티앨리어싱을 설정했다면 자막이 표현이 올바르지 않을 수도 있습니다.",IDC_STATIC,10,120,267,27
+    LTEXT           "만약 비디오카드 설정에서 위치 설정 및 전체 화면 위신호 제거를 설정했다면 자막이 표현이 올바르지 않을 수도 있습니다.",IDC_STATIC,10,120,267,27
 END
 
 IDD_PPAGEFORMATS DIALOGEX 0, 0, 296, 264
@@ -455,7 +455,7 @@ BEGIN
     EDITTEXT        IDC_EDIT4,152,226,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN10,"msctls_updown32",UDS_WRAP | UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,166,226,12,13
     CONTROL         "그림자",IDC_CHECK_SHADOW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,224,194,46,9
-    CONTROL         "안티알라이싱",IDC_CHECK_AA,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,224,206,61,18
+    CONTROL         "위신호 제거",IDC_CHECK_AA,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,224,206,61,18
     CONTROL         "(윈도7 이상) 작업표시줄 기능 사용",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,246,270,11
 END
@@ -860,7 +860,7 @@ BEGIN
     GROUPBOX        "EVR-CP 및 EVR 싱크 설정",IDC_STATIC,5,37,285,137
     CONTROL         "D3D9 렌더러를 선택",IDC_D3D9DEVICE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,120,10
     COMBOBOX        IDC_D3D9DEVICE_COMBO,144,49,142,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Exclusive full screen on an additional window",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
+    CONTROL         "추가 창에서 배타적 전체 화면 보기",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,79,224,10
     CONTROL         "10비트 RGB 출력",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,92,92,10
     CONTROL         "디스플레이 바꾸면 초기화",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_TOP | WS_TABSTOP,10,65,164,9
@@ -875,8 +875,8 @@ BEGIN
     COMBOBOX        IDC_COMBO7,188,156,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "출력 범위 :",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "MPC Video Renderer settings",IDC_STATIC,5,177,285,27
-    CONTROL         "Exclusive full screen on an additional window (experimental)",IDC_CHECK2,
+    GROUPBOX        "MPC 비디오 렌더러 정",IDC_STATIC,5,177,285,27
+    CONTROL         "추가 창에서 배타적 전체 화면(실험)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
     GROUPBOX        "플레이밍",IDC_STATIC,5,208,210,53
     LTEXT           "기본 모드 :",IDC_STATIC,10,220,74,8
@@ -1626,8 +1626,8 @@ BEGIN
         MENUITEM "정보(&I)",                ID_VIEW_INFORMATION
         MENUITEM "통계(&T)",                ID_VIEW_STATISTICS
         MENUITEM "상태 표시줄(&A)",             ID_VIEW_STATUS
-        MENUITEM "자막싱크조절",                ID_VIEW_SUBRESYNC
-        MENUITEM "재생목록",                  ID_VIEW_PLAYLIST
+        MENUITEM "자막 싱크 조절",                ID_VIEW_SUBRESYNC
+        MENUITEM "재생 목록",                  ID_VIEW_PLAYLIST
         MENUITEM "캡처",                    ID_VIEW_CAPTURE
         MENUITEM "셰이더 편집기",               ID_VIEW_SHADEREDITOR
         MENUITEM "내비게이션",                       ID_VIEW_NAVIGATION
@@ -2903,7 +2903,7 @@ BEGIN
     IDS_AG_DVD_MENU_ACTIVATE "DVD 메뉴 활성화"
     IDS_AG_DVD_MENU_BACK    "DVD 메뉴 뒤로"
     IDS_AG_DVD_MENU_LEAVE   "DVD 메뉴 끝내기"
-    IDS_AG_BOSS_KEY         "엄마 왔다! (재생정지, 최소화)"
+    IDS_AG_BOSS_KEY         "엄마 왔다! (일시 정지, 최소화)"
     IDS_AG_MENU_PLAYER_S    "재생기 메뉴 (짧게)"
     IDS_AG_MENU_PLAYER_L    "재생기 메뉴 (길게)"
     IDS_AG_MENU_FILTERS     "필터 메뉴"

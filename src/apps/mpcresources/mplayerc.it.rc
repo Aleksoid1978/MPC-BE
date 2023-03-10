@@ -886,7 +886,7 @@ BEGIN
     CONTROL         "Non diminuire la dimensione del fotogramma",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,247,195,10
     PUSHBUTTON      "Predefinito",IDC_BUTTON3,234,246,56,14
-    LTEXT           "Modalità presentazione:",IDC_STATIC6,115,107,72,8
+    LTEXT           "Modo presentazione:",IDC_STATIC6,115,107,72,8
     COMBOBOX        IDC_COMBO3,188,105,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
 END
 
