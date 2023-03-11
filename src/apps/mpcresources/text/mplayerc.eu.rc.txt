@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"Azterketa"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"EVR (custom presenter) settings"
 6		"VSync"
 7		"Internal VSync"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"Itxaron jalgipenak"
 12		"EVR Aldiberetze Ezarpenak"
 13		"Aldiberetu bideoa erakuspenera"
-14		"Aldiberetu erakuspena bideora"
-15		"Hurbileneko ZAlb"
-16		"Maiztasun zehaztapena:"
-18		"Maiztasun zehaztapena:"
-20		"lerro"
-22		"zutabe"
-24		"Xede aldiberetze oreka::"
-26		"sm"
-27		"Aginte mugak:"
-30		"sm"
-31		"Aldaketek eragina dute irakurketa itxi eta berrabiarazi ondoren."
+14		"Hurbileneko ZAlb"
+15		"Maiztasun zehaztapena:"
+18		"Xede aldiberetze oreka::"
+20		"sm"
+21		"Aginte mugak:"
+24		"sm"
+25		"Aldaketek eragina dute irakurketa itxi eta berrabiarazi ondoren."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39

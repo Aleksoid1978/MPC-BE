@@ -1,5 +1,5 @@
 /*
- * (C) 2022 see Authors.txt
+ * (C) 2022-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -90,7 +90,6 @@ enum ColorRenderingIntent {
 enum {
 	SYNCHRONIZE_NEAREST = 0,
 	SYNCHRONIZE_VIDEO,
-	SYNCHRONIZE_DISPLAY,
 };
 
 struct SubpicSettings {
@@ -139,8 +138,6 @@ struct ExtraRendererSettings {
 
 	// SyncRenderer settings
 	int       iSynchronizeMode  = SYNCHRONIZE_NEAREST;
-	int       iLineDelta        = 0;
-	int       iColumnDelta      = 0;
 	double    dCycleDelta       = 0.0012;
 	double    dTargetSyncOffset = 12.0;
 	double    dControlLimit     = 2.0;

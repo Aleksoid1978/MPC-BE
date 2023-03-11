@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"בדוק"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"EVR (custom presenter) settings"
 6		"VSync"
 7		"Internal VSync"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"Wait for flushes"
 12		"EVR Sync settings"
 13		"סנכרן וידאו למסך"
-14		"סנכרן מסך לוידאו"
-15		"הצג בסנכרון האנכי הקרוב ביותר"
-16		"כיוונון תדירות:"
-18		"כיוונון תדירות:"
-20		"שורות"
-22		"טורים"
-24		"יעד פיצוי סנכרון:"
-26		"מילישניות"
-27		"מגבלת שליטה:"
-30		"מילישניות"
-31		"השינויים נכנסים לתוקף רק לאחר שהניגון הופסק והופעל מחדש."
+14		"הצג בסנכרון האנכי הקרוב ביותר"
+15		"כיוונון תדירות:"
+18		"יעד פיצוי סנכרון:"
+20		"מילישניות"
+21		"מגבלת שליטה:"
+24		"מילישניות"
+25		"השינויים נכנסים לתוקף רק לאחר שהניגון הופסק והופעל מחדש."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39

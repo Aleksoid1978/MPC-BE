@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"Тэст"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"EVR (custom presenter) settings"
 6		"VSync"
 7		"Internal VSync"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"Wait for flushes"
 12		"EVR Sync settings"
 13		"Сінхр. відэа да дысплэя"
-14		"Сінхр. дысплэй да відэа"
-15		"Перадаць на бліжэйшы vsync"
-16		"Карэкцыя частаты:"
-18		"Карэкцыя частаты:"
-20		"радкі"
-22		"слупкі"
-24		"Зрух сінхранізацыі:"
-26		"мс"
-27		"Ліміты кіравання:"
-30		"мс"
-31		"Змены ўступяць у моц пасля перазагрузкі відэа."
+14		"Перадаць на бліжэйшы vsync"
+15		"Карэкцыя частаты:"
+18		"Зрух сінхранізацыі:"
+20		"мс"
+21		"Ліміты кіравання:"
+24		"мс"
+25		"Змены ўступяць у моц пасля перазагрузкі відэа."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39

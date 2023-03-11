@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"Testen"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"Instellingen voor EVR-CP"
 6		"VSync"
 7		"Interne VSync"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"Wacht tot GPU leeg"
 12		"Instellingen voor EVR Sync"
 13		"Synchroniseer video aan monitor"
-14		"Synchroniseer monitor aan video"
-15		"Toon bij de dichtstbijzijnde VSync"
-16		"Frequentieaanpassing:"
-18		"Frequentieaanpassing:"
-20		"regels"
-22		"kolommen"
-24		"Gerichte synchronisatie-offset:"
-26		"ms"
-27		"Beperkt tot:"
-30		"ms"
-31		"Vereist heropenen van de video."
+14		"Toon bij de dichtstbijzijnde VSync"
+15		"Frequentieaanpassing:"
+18		"Gerichte synchronisatie-offset:"
+20		"ms"
+21		"Beperkt tot:"
+24		"ms"
+25		"Vereist heropenen van de video."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39

@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"Testar"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"Configurar EVR (personalizar apresentador)"
 6		"Sincronia vertical"
 7		"Sincronia vertical interna"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"Aguardar por flushes"
 12		"Configurar sincronia EVR"
 13		"Sincronizar vídeo com exibição"
-14		"Sincronizar exibição com vídeo"
-15		"Presente na sincronia vertical mais próxima"
-16		"Ajuste de frequência:"
-18		"Ajuste de frequência:"
-20		"linhas"
-22		"Colunas"
-24		"Compensar sincronia-destino:"
-26		"ms"
-27		"Limites de controle:"
-30		"ms"
-31		"As mudanças tem efeito após fechar e reiniciar a reprodução."
+14		"Presente na sincronia vertical mais próxima"
+15		"Ajuste de frequência:"
+18		"Compensar sincronia-destino:"
+20		"ms"
+21		"Limites de controle:"
+24		"ms"
+25		"As mudanças tem efeito após fechar e reiniciar a reprodução."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39

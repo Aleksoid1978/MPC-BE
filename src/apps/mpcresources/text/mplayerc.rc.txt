@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"Test"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"EVR (custom presenter) settings"
 6		"VSync"
 7		"Internal VSync"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"Wait for flushes"
 12		"EVR Sync settings"
 13		"Sync video to display"
-14		"Sync display to video"
-15		"Present at nearest VSync"
-16		"Frequency adjustment:"
-18		"Frequency adjustment:"
-20		"lines"
-22		"columns"
-24		"Target sync offset:"
-26		"ms"
-27		"Control limits:"
-30		"ms"
-31		"Changes take effect after the playback has been closed and restarted."
+14		"Present at nearest VSync"
+15		"Frequency adjustment:"
+18		"Target sync offset:"
+20		"ms"
+21		"Control limits:"
+24		"ms"
+25		"Changes take effect after the playback has been closed and restarted."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39

@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"Test"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"Postavke EVR (prilagođenog prezentera)"
 6		"VSync"
 7		"Interni VSync"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"Čekaj za čišćenja"
 12		"EVR Sync Postavke"
 13		"Sinkroniziraj video prema zaslonu"
-14		"Sinkroniziraj zaslon prema videu"
-15		"Prisutan uz najbliži VSync"
-16		"Podešenje frekvencije:"
-18		"Podešenje frekvencije:"
-20		"linija"
-22		"stupaca"
-24		"Ciljani sync pomak:"
-26		"ms"
-27		"Kontroliraj limite:"
-30		"ms"
-31		"Promjene se primjenjuju nakon zatvaranja i restarta reprodukcije."
+14		"Prisutan uz najbliži VSync"
+15		"Podešenje frekvencije:"
+18		"Ciljani sync pomak:"
+20		"ms"
+21		"Kontroliraj limite:"
+24		"ms"
+25		"Promjene se primjenjuju nakon zatvaranja i restarta reprodukcije."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39

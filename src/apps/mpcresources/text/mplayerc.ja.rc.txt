@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"テスト"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"EVR (カスタム プレゼンター) 設定"
 6		"垂直同期"
 7		"内蔵の垂直同期"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"フラッシュを待機する"
 12		"EVR 同期設定"
 13		"ビデオをディスプレイに同期させる"
-14		"ディスプレイをビデオに同期させる"
-15		"最も近い垂直同期で表示する"
-16		"周波数調整:"
-18		"周波数調整:"
-20		"行"
-22		"列"
-24		"目標同期オフセット:"
-26		"ミリ秒"
-27		"調整制限:"
-30		"ミリ秒"
-31		"ファイルを開き直すと変更が有効になります。"
+14		"最も近い垂直同期で表示する"
+15		"周波数調整:"
+18		"目標同期オフセット:"
+20		"ミリ秒"
+21		"調整制限:"
+24		"ミリ秒"
+25		"ファイルを開き直すと変更が有効になります。"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39

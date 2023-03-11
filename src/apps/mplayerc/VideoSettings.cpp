@@ -1,5 +1,5 @@
 /*
- * (C) 2022 see Authors.txt
+ * (C) 2022-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -53,8 +53,6 @@
 #define IDS_RS_MPCVR_FSCONTROL		L"MPCVRFullscreenControl"
 
 #define IDS_RS_SYNC_MODE			L"SyncMode"
-#define IDS_RS_SYNC_LINEDELTA		L"SyncLineDelta"
-#define IDS_RS_SYNC_COLUMNDELTA		L"SyncColumnDelta"
 #define IDS_RS_SYNC_CYCLEDELTA		L"SyncCycleDelta"
 #define IDS_RS_SYNC_TARGETOFFSET	L"SyncTargetOffset"
 #define IDS_RS_SYNC_CONTROLLIMIT	L"SyncControlLimit"
@@ -131,8 +129,6 @@ void CRenderersSettings::Load()
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_MPCVR_FSCONTROL, ExtraSets.bMPCVRFullscreenControl);
 
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SYNC_MODE, ExtraSets.iSynchronizeMode);
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SYNC_LINEDELTA, ExtraSets.iLineDelta);
-	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SYNC_COLUMNDELTA, ExtraSets.iColumnDelta);
 	profile.ReadDouble(IDS_R_VIDEO, IDS_RS_SYNC_CYCLEDELTA, ExtraSets.dCycleDelta);
 	profile.ReadDouble(IDS_R_VIDEO, IDS_RS_SYNC_TARGETOFFSET, ExtraSets.dTargetSyncOffset);
 	profile.ReadDouble(IDS_R_VIDEO, IDS_RS_SYNC_CONTROLLIMIT, ExtraSets.dControlLimit);
@@ -185,8 +181,6 @@ void CRenderersSettings::Save()
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_MPCVR_FSCONTROL, ExtraSets.bMPCVRFullscreenControl);
 
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SYNC_MODE, ExtraSets.iSynchronizeMode);
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SYNC_LINEDELTA, ExtraSets.iLineDelta);
-	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SYNC_COLUMNDELTA, ExtraSets.iColumnDelta);
 	profile.WriteDouble(IDS_R_VIDEO, IDS_RS_SYNC_CYCLEDELTA, ExtraSets.dCycleDelta);
 	profile.WriteDouble(IDS_R_VIDEO, IDS_RS_SYNC_TARGETOFFSET, ExtraSets.dTargetSyncOffset);
 	profile.WriteDouble(IDS_R_VIDEO, IDS_RS_SYNC_CONTROLLIMIT, ExtraSets.dControlLimit);

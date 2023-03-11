@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"Թեստ"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"EVR (custom presenter) settings"
 6		"VSync"
 7		"Internal VSync"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"Wait for flushes"
 12		"EVR Sync settings"
 13		"Համաժեցնել տեսանյութը էկրանի հետ"
-14		"Համաժեցնել էկրանը տեսանյութը հետ"
-15		"Ցուցադրել մոտագույն vsync-ի հետ"
-16		"Հաճախականության ուղղում."
-18		"Հաճախականության ուղղում."
-20		"գծեր"
-22		"սյուներ"
-24		"Համաժեցման նպ. փոփ."
-26		"մվ"
-27		"Սահմանափակումներ."
-30		"մվ"
-31		"Ցուցադրել մոտագույն vsync-ի հետ"
+14		"Ցուցադրել մոտագույն vsync-ի հետ"
+15		"Հաճախականության ուղղում."
+18		"Համաժեցման նպ. փոփ."
+20		"մվ"
+21		"Սահմանափակումներ."
+24		"մվ"
+25		"Ցուցադրել մոտագույն vsync-ի հետ"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39

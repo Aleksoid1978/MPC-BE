@@ -47,6 +47,9 @@ using namespace GothSync;
 //#undef DLog
 //#define DLog(...) Log2File(__VA_ARGS__)
 
+// Guid to tag IMFSample with DirectX surface index
+static const GUID GUID_SURFACE_INDEX = { 0x30c8e9f6, 0x415, 0x4b81, { 0xa3, 0x15, 0x1, 0xa, 0xc6, 0xa9, 0xda, 0x19 } };
+
 //
 // CBaseAP
 //
@@ -1413,8 +1416,6 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 
 	if (m_ExtraSets.iSynchronizeMode == SYNCHRONIZE_VIDEO) {
 		m_pGenlock->ControlClock(dSyncOffset, frameCycle);
-	} else if (m_ExtraSets.iSynchronizeMode == SYNCHRONIZE_DISPLAY) {
-		m_pGenlock->ControlDisplay(dSyncOffset, frameCycle);
 	} else {
 		m_pGenlock->UpdateStats(dSyncOffset, frameCycle);    // No sync or sync to nearest neighbor
 	}
@@ -1504,7 +1505,6 @@ STDMETHODIMP_(bool) CBaseAP::ResetDevice()
 		return false;
 	}
 	m_pGenlock->SetMonitor(D3D9Helper::GetAdapter(m_pD3D9Ex, m_hWnd));
-	m_pGenlock->GetTiming();
 	OnResetDevice();
 	m_bDeviceResetRequested = false;
 	m_bPendingResetDevice = false;
@@ -1618,10 +1618,6 @@ void CBaseAP::DrawStats()
 
 			strText.AppendFormat(L"\nDisplay      : %d x %d, %u Hz  Cycle %.3f ms", m_ScreenSize.cx, m_ScreenSize.cy, m_refreshRate, m_dD3DRefreshCycle);
 
-			if (m_pGenlock->powerstripTimingExists) {
-				strText.AppendFormat(L"\nPowerstrip   : Display cycle %.3f ms    Display refresh rate %.3f Hz", 1000.0 / m_pGenlock->curDisplayFreq, m_pGenlock->curDisplayFreq);
-			}
-
 			if ((m_Caps.Caps & D3DCAPS_READ_SCANLINE) == 0) {
 				strText.Append(L"\nScan line err: Graphics device does not support scan line access. No sync is possible");
 			}
@@ -1659,11 +1655,7 @@ void CBaseAP::DrawStats()
 			}
 
 			if (m_ExtraSets.iSynchronizeMode != SYNCHRONIZE_NEAREST) {
-				if (m_ExtraSets.iSynchronizeMode == SYNCHRONIZE_DISPLAY && !m_pGenlock->PowerstripRunning()) {
-					strText.Append(L"\nSync error   : PowerStrip is not running. No display sync is possible.");
-				} else {
-					strText.AppendFormat(L"\nSync adjust  : %d | # of adjustments: %d", m_pGenlock->adjDelta, (m_pGenlock->clockAdjustmentsMade + m_pGenlock->displayAdjustmentsMade) / 2);
-				}
+				strText.AppendFormat(L"\nSync adjust  : %d | # of adjustments: %d", m_pGenlock->adjDelta, m_pGenlock->clockAdjustmentsMade);
 			}
 		}
 
@@ -1692,8 +1684,6 @@ void CBaseAP::DrawStats()
 			}
 			if (m_ExtraSets.iSynchronizeMode == SYNCHRONIZE_VIDEO) {
 				strText += L"SyncVideo ";
-			} else if (m_ExtraSets.iSynchronizeMode == SYNCHRONIZE_DISPLAY) {
-				strText += L"SyncDisplay ";
 			} else if (m_ExtraSets.iSynchronizeMode == SYNCHRONIZE_NEAREST) {
 				strText += L"SyncNearest ";
 			}
@@ -1783,20 +1773,12 @@ void CBaseAP::DrawStats()
 
 double CBaseAP::GetRefreshRate()
 {
-	if (m_pGenlock->powerstripTimingExists) {
-		return m_pGenlock->curDisplayFreq;
-	} else {
-		return (double)m_refreshRate;
-	}
+	return (double)m_refreshRate;
 }
 
 double CBaseAP::GetDisplayCycle()
 {
-	if (m_pGenlock->powerstripTimingExists) {
-		return 1000.0 / m_pGenlock->curDisplayFreq;
-	} else {
-		return (double)m_dD3DRefreshCycle;
-	}
+	return (double)m_dD3DRefreshCycle;
 }
 
 double CBaseAP::GetCycleDifference()
@@ -2214,7 +2196,6 @@ STDMETHODIMP CSyncAP::CreateRenderer(IUnknown** ppRenderer)
 
 	m_pGenlock = DNew CGenlock(
 		m_ExtraSets.dTargetSyncOffset, m_ExtraSets.dControlLimit,
-		m_ExtraSets.iLineDelta, m_ExtraSets.iColumnDelta,
 		m_ExtraSets.dCycleDelta, 0); // Must be done before CreateDXDevice
 
 	hr = CreateDXDevice(_Error);
@@ -2540,7 +2521,6 @@ STDMETHODIMP CSyncAP::ProcessMessage(MFVP_MESSAGE_TYPE eMessage, ULONG_PTR ulPar
 			break;
 
 		case MFVP_MESSAGE_ENDSTREAMING:
-			m_pGenlock->ResetTiming();
 			m_pRefClock.Release();
 			break;
 
@@ -3696,7 +3676,6 @@ HRESULT CSyncAP::BeginStreaming()
 		filterInfo.pGraph->Release();
 	}
 	m_pGenlock->SetMonitor(D3D9Helper::GetAdapter(m_pD3D9Ex, m_hWnd));
-	m_pGenlock->GetTiming();
 
 	ResetStats();
 	EstimateRefreshTimings();
@@ -3872,13 +3851,11 @@ STDMETHODIMP CSyncAP::Stop()
 // CGenlock
 //
 
-CGenlock::CGenlock(double target, double limit, int lineD, int colD, double clockD, UINT mon)
+CGenlock::CGenlock(double target, double limit, double clockD, UINT mon)
 	: targetSyncOffset(target) // Target sync offset, typically around 10 ms
 	, controlLimit(limit)      // How much sync offset is allowed to drift from target sync offset before control kicks in
 	, lowSyncOffset(target - limit)
 	, highSyncOffset(target + limit)
-	, lineDelta(lineD)         // Number of rows used in display frequency adjustment, typically 1 (one)
-	, columnDelta(colD)        // Number of columns used in display frequency adjustment, typically 1 - 2
 	, cycleDelta(clockD)       // Delta used in clock speed adjustment. In fractions of 1.0. Typically around 0.001
 	, monitor(mon)             // The monitor to be adjusted if the display refresh rate is the controlled parameter
 {
@@ -3886,132 +3863,8 @@ CGenlock::CGenlock(double target, double limit, int lineD, int colD, double cloc
 
 CGenlock::~CGenlock()
 {
-	ResetTiming();
 	syncClock.Release();
 };
-
-BOOL CGenlock::PowerstripRunning()
-{
-	psWnd = FindWindow(L"TPShidden", nullptr);
-	if (!psWnd) {
-		return FALSE;    // Powerstrip is not running
-	} else {
-		return TRUE;
-	}
-}
-
-// Get the display timing parameters through PowerStrip (if running).
-HRESULT CGenlock::GetTiming()
-{
-	ATOM getTiming;
-	LPARAM lParam = 0;
-	WPARAM wParam = monitor;
-	int i = 0;
-	int j = 0;
-	int params = 0;
-	WCHAR tmpStr[MAX_LOADSTRING];
-
-	CAutoLock lock(&csGenlockLock);
-	if (!PowerstripRunning()) {
-		return E_FAIL;
-	}
-
-	getTiming = static_cast<ATOM>(SendMessageW(psWnd, UM_GETTIMING, wParam, lParam));
-	GlobalGetAtomNameW(getTiming, savedTiming, MAX_LOADSTRING);
-
-	while (params < TIMING_PARAM_CNT) {
-		while (savedTiming[i] != ',' && savedTiming[i] != '\0') {
-			tmpStr[j++] = savedTiming[i];
-			tmpStr[j] = '\0';
-			i++;
-		}
-		i++; // Skip trailing comma
-		j = 0;
-		displayTiming[params] = _wtoi(tmpStr);
-		displayTimingSave[params] = displayTiming[params];
-		params++;
-	}
-
-	// The display update frequency is controlled by adding and subtracting pixels form the
-	// image. This is done by either subtracting columns or rows or both. Some displays like
-	// row adjustments and some column adjustments. One should probably not do both.
-	StringCchPrintfW(faster, MAX_LOADSTRING, L"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\0",
-					displayTiming[0],
-					displayTiming[HFRONTPORCH] - columnDelta,
-					displayTiming[2],
-					displayTiming[3],
-					displayTiming[4],
-					displayTiming[VFRONTPORCH] - lineDelta,
-					displayTiming[6],
-					displayTiming[7],
-					displayTiming[PIXELCLOCK],
-					displayTiming[9]
-				   );
-
-	// Nominal update frequency
-	StringCchPrintfW(cruise, MAX_LOADSTRING, L"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\0",
-					displayTiming[0],
-					displayTiming[HFRONTPORCH],
-					displayTiming[2],
-					displayTiming[3],
-					displayTiming[4],
-					displayTiming[VFRONTPORCH],
-					displayTiming[6],
-					displayTiming[7],
-					displayTiming[PIXELCLOCK],
-					displayTiming[9]
-				   );
-
-	// Lower than nominal update frequency
-	StringCchPrintfW(slower, MAX_LOADSTRING, L"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\0",
-					displayTiming[0],
-					displayTiming[HFRONTPORCH] + columnDelta,
-					displayTiming[2],
-					displayTiming[3],
-					displayTiming[4],
-					displayTiming[VFRONTPORCH] + lineDelta,
-					displayTiming[6],
-					displayTiming[7],
-					displayTiming[PIXELCLOCK],
-					displayTiming[9]
-				   );
-
-	totalColumns = displayTiming[HACTIVE] + displayTiming[HFRONTPORCH] + displayTiming[HSYNCWIDTH] + displayTiming[HBACKPORCH];
-	totalLines = displayTiming[VACTIVE] + displayTiming[VFRONTPORCH] + displayTiming[VSYNCWIDTH] + displayTiming[VBACKPORCH];
-	pixelClock = 1000 * displayTiming[PIXELCLOCK]; // Pixels/s
-	displayFreqCruise = (double)pixelClock / (totalLines * totalColumns); // Frames/s
-	displayFreqSlower = (double)pixelClock / ((totalLines + lineDelta) * (totalColumns + columnDelta));
-	displayFreqFaster = (double)pixelClock / ((totalLines - lineDelta) * (totalColumns - columnDelta));
-	curDisplayFreq = displayFreqCruise;
-	GlobalDeleteAtom(getTiming);
-	adjDelta = 0;
-	powerstripTimingExists = TRUE;
-	return S_OK;
-}
-
-// Reset display timing parameters to nominal.
-HRESULT CGenlock::ResetTiming()
-{
-	LPARAM lParam = 0;
-	WPARAM wParam = monitor;
-	ATOM setTiming;
-	LRESULT ret;
-	CAutoLock lock(&csGenlockLock);
-
-	if (!PowerstripRunning()) {
-		return E_FAIL;
-	}
-
-	if (displayAdjustmentsMade > 0) {
-		setTiming = GlobalAddAtomW(cruise);
-		lParam = setTiming;
-		ret = SendMessageW(psWnd, UM_SETCUSTOMTIMINGFAST, wParam, lParam);
-		GlobalDeleteAtom(setTiming);
-		curDisplayFreq = displayFreqCruise;
-	}
-	adjDelta = 0;
-	return S_OK;
-}
 
 // Reset reference clock speed to nominal.
 HRESULT CGenlock::ResetClock()
@@ -4087,67 +3940,7 @@ HRESULT CGenlock::ResetStats()
 	maxSyncOffset = -1000000.0;
 	minFrameCycle = 1000000.0;
 	maxFrameCycle = -1000000.0;
-	displayAdjustmentsMade = 0;
 	clockAdjustmentsMade = 0;
-	return S_OK;
-}
-
-// Synchronize by adjusting display refresh rate
-HRESULT CGenlock::ControlDisplay(double syncOffset, double frameCycle)
-{
-	LPARAM lParam = 0;
-	WPARAM wParam = monitor;
-	ATOM setTiming;
-
-	syncOffsetAvg = syncOffsetFifo.Average(syncOffset);
-	expand_range(syncOffset, minSyncOffset, maxSyncOffset);
-
-	frameCycleAvg = frameCycleFifo.Average(frameCycle);
-	expand_range(frameCycle, minFrameCycle, maxFrameCycle);
-
-	if (!PowerstripRunning() || !powerstripTimingExists) {
-		return E_FAIL;
-	}
-	// Adjust as seldom as possible by checking the current controlState before changing it.
-	if ((syncOffsetAvg > highSyncOffset) && (adjDelta != 1))
-		// Speed up display refresh rate by subtracting pixels from the image.
-	{
-		adjDelta = 1; // Increase refresh rate
-		curDisplayFreq = displayFreqFaster;
-		setTiming = GlobalAddAtomW(faster);
-		lParam = setTiming;
-		SendMessageW(psWnd, UM_SETCUSTOMTIMINGFAST, wParam, lParam);
-		GlobalDeleteAtom(setTiming);
-		displayAdjustmentsMade++;
-	} else
-		// Slow down display refresh rate by adding pixels to the image.
-		if ((syncOffsetAvg < lowSyncOffset) && (adjDelta != -1)) {
-			adjDelta = -1;
-			curDisplayFreq = displayFreqSlower;
-			setTiming = GlobalAddAtomW(slower);
-			lParam = setTiming;
-			SendMessageW(psWnd, UM_SETCUSTOMTIMINGFAST, wParam, lParam);
-			GlobalDeleteAtom(setTiming);
-			displayAdjustmentsMade++;
-		} else
-			// Cruise.
-			if ((syncOffsetAvg < targetSyncOffset) && (adjDelta == 1)) {
-				adjDelta = 0;
-				curDisplayFreq = displayFreqCruise;
-				setTiming = GlobalAddAtomW(cruise);
-				lParam = setTiming;
-				SendMessageW(psWnd, UM_SETCUSTOMTIMINGFAST, wParam, lParam);
-				GlobalDeleteAtom(setTiming);
-				displayAdjustmentsMade++;
-			} else if ((syncOffsetAvg > targetSyncOffset) && (adjDelta == -1)) {
-				adjDelta = 0;
-				curDisplayFreq = displayFreqCruise;
-				setTiming = GlobalAddAtomW(cruise);
-				lParam = setTiming;
-				SendMessageW(psWnd, UM_SETCUSTOMTIMINGFAST, wParam, lParam);
-				GlobalDeleteAtom(setTiming);
-				displayAdjustmentsMade++;
-			}
 	return S_OK;
 }
 

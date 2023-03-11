@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"Tesztelés"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"EVR (custom presenter) beállítások"
 6		"VSync"
 7		"Belső VSync"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"Várj a kiürítésre"
 12		"EVR Szinkronizálási beállítások"
 13		"Videó képernyőhöz illesztése"
-14		"Képernyő videóhoz illesztése"
-15		"Megjelenítés a legközelebbi VSync-nél"
-16		"Frekvencia hangolás:"
-18		"Frekvencia hangolás:"
-20		"sor"
-22		"oszlop"
-24		"Cél szink. eltolás:"
-26		"tizedmp"
-27		"Vezérlési határok:"
-30		"tizedmp"
-31		"A módosítások akkor lépnek érvénybe, ha a lejátszót bezárta és újraindította."
+14		"Megjelenítés a legközelebbi VSync-nél"
+15		"Frekvencia hangolás:"
+18		"Cél szink. eltolás:"
+20		"tizedmp"
+21		"Vezérlési határok:"
+24		"tizedmp"
+25		"A módosítások akkor lépnek érvénybe, ha a lejátszót bezárta és újraindította."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39

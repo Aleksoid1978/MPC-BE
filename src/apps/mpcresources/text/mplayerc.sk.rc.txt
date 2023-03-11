@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"Otestovať"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"EVR (custom presenter) settings"
 6		"VSync"
 7		"Internal VSync"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"Wait for flushes"
 12		"EVR Sync settings"
 13		"Synchronizovať video s displejom"
-14		"Synchronizovať displej s videom"
-15		"Prezentovať pri najbližšej vsync"
-16		"Prispôsobenie frekvencie o:"
-18		"Prispôsobenie frekvencie o:"
-20		"riadkov"
-22		"stĺpcov"
-24		"Cieľový synch. offset:"
-26		"ms"
-27		"Obmedzenia:"
-30		"ms"
-31		"Zmeny sa uplatnia až po zastavení aktuálneho prehrávania a po reštartovaní."
+14		"Prezentovať pri najbližšej vsync"
+15		"Prispôsobenie frekvencie o:"
+18		"Cieľový synch. offset:"
+20		"ms"
+21		"Obmedzenia:"
+24		"ms"
+25		"Zmeny sa uplatnia až po zastavení aktuálneho prehrávania a po reštartovaní."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39

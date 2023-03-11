@@ -1146,26 +1146,20 @@ BEGIN
     CONTROL         "Jalgi GPU-a VSync aurretik",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,14,140,10
     CONTROL         "Jalgi GPU-a Aurkeztu ondoren",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,140,10
     CONTROL         "Itxaron jalgipenak",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,38,100,10
-    GROUPBOX        "EVR Aldiberetze Ezarpenak",IDC_STATIC2,5,67,286,146
+    GROUPBOX        "EVR Aldiberetze Ezarpenak",IDC_STATIC2,5,67,286,117
     CONTROL         "Aldiberetu bideoa erakuspenera",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,140,8
-    CONTROL         "Aldiberetu erakuspena bideora",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,108,140,8
-    CONTROL         "Hurbileneko ZAlb",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,10,137,170,8
+    CONTROL         "Hurbileneko ZAlb",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,170,8
     LTEXT           "Maiztasun zehaztapena:",IDC_STATIC5,20,93,85,8
     EDITTEXT        IDC_CYCLEDELTA,109,91,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
-    LTEXT           "Maiztasun zehaztapena:",IDC_STATIC6,20,122,85,8
-    EDITTEXT        IDC_LINEDELTA,109,120,40,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
-    LTEXT           "lerro",IDC_STATIC7,153,122,30,8
-    EDITTEXT        IDC_COLUMNDELTA,187,120,40,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
-    LTEXT           "zutabe",IDC_STATIC8,231,122,30,8
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,151,278,1
-    LTEXT           "Xede aldiberetze oreka::",IDC_STATIC3,10,157,100,8
-    EDITTEXT        IDC_TARGETSYNCOFFSET,114,155,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
-    LTEXT           "sm",IDC_STATIC4,158,157,24,8
-    LTEXT           "Aginte mugak:",IDC_STATIC9,10,171,86,8
-    LTEXT           "+/-",IDC_STATIC11,100,171,10,8
-    EDITTEXT        IDC_CONTROLLIMIT,114,169,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
-    LTEXT           "sm",IDC_STATIC10,158,171,24,8
-    LTEXT           "Aldaketek eragina dute irakurketa itxi eta berrabiarazi ondoren.",IDC_STATIC12,10,190,276,18
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,123,278,1
+    LTEXT           "Xede aldiberetze oreka::",IDC_STATIC3,10,129,100,8
+    EDITTEXT        IDC_TARGETSYNCOFFSET,114,127,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
+    LTEXT           "sm",IDC_STATIC4,158,129,24,8
+    LTEXT           "Aginte mugak:",IDC_STATIC9,10,143,86,8
+    LTEXT           "+/-",IDC_STATIC11,100,143,10,8
+    EDITTEXT        IDC_CONTROLLIMIT,114,141,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
+    LTEXT           "sm",IDC_STATIC10,158,143,24,8
+    LTEXT           "Aldaketek eragina dute irakurketa itxi eta berrabiarazi ondoren.",IDC_STATIC12,10,162,276,18
 END
 
 IDD_PPAGEFULLSCREEN DIALOGEX 0, 0, 296, 264

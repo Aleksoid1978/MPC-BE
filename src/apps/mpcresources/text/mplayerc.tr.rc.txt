@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"Dene"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"GVİ (özel sunucu) ayarları"
 6		"Dikey Eşzamanlama"
 7		"Dahili Dikey Eşzamanlama"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"Sıfırlama için bekle"
 12		"GVİ Eşzamanlama Ayarları"
 13		"Videoyu ekrana eşzamanla"
-14		"Ekranı videoya eşzamanla"
-15		"En yakın dikey eşzamanlama"
-16		"Frekans düzeltmesi:"
-18		"Frekans düzeltmesi:"
-20		"satır"
-22		"sütun"
-24		"Hedef uyum dengesi:"
-26		"ms"
-27		"Kontrol sınırı:"
-30		"ms"
-31		"Değişiklikler oynatma kapatıldıktan ve uygulama yeniden başlatıldıktan sonra uygulanacaktır."
+14		"En yakın dikey eşzamanlama"
+15		"Frekans düzeltmesi:"
+18		"Hedef uyum dengesi:"
+20		"ms"
+21		"Kontrol sınırı:"
+24		"ms"
+25		"Değişiklikler oynatma kapatıldıktan ve uygulama yeniden başlatıldıktan sonra uygulanacaktır."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39

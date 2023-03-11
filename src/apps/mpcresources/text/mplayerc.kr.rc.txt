@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"시험"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"EVR (맞춤 프레젠터) 설정"
 6		"수직 동기화"
 7		"내부 수직 동기화"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"플러시 대기"
 12		"EVR 동기화 설정"
 13		"비디오에서 디스플레이로 싱크"
-14		"디스클레이에서 비디오로 싱크"
-15		"가장 근접한 수직 동기화에 맞추기"
-16		"주파수 조정 :"
-18		"주파수 조정 :"
-20		"가로"
-22		"세로"
-24		"목표 싱크 오프셋 :"
-26		"밀리 초"
-27		"한계 :"
-30		"밀리 초"
-31		"현재 파일을 닫고 다시 시작해야만 설정이 적용됩니다."
+14		"가장 근접한 수직 동기화에 맞추기"
+15		"주파수 조정 :"
+18		"목표 싱크 오프셋 :"
+20		"밀리 초"
+21		"한계 :"
+24		"밀리 초"
+25		"현재 파일을 닫고 다시 시작해야만 설정이 적용됩니다."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39

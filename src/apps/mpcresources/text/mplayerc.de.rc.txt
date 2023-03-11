@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"Testen"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"Einstellungen von EVR (custom presenter)"
 6		"VSync"
 7		"Interne VSync"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"Auf geleerte GPU warten"
 12		"Einstellungen von EVR Sync"
 13		"Videowiedergabe an Anzeige anpassen"
-14		"Anzeige an Videowiedergabe anpassen"
-15		"Videobilder mit nächstgelegener VSync darstellen"
-16		"Frequenzabstimmung:"
-18		"Frequenzabstimmung:"
-20		"Zeilen"
-22		"Spalten"
-24		"Ziel-Sync-Offset:"
-26		"ms"
-27		"Regelgrenze:"
-30		"ms"
-31		"Änderungen werden erst nach Neustart der Wiedergabe wirksam."
+14		"Videobilder mit nächstgelegener VSync darstellen"
+15		"Frequenzabstimmung:"
+18		"Ziel-Sync-Offset:"
+20		"ms"
+21		"Regelgrenze:"
+24		"ms"
+25		"Änderungen werden erst nach Neustart der Wiedergabe wirksam."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39

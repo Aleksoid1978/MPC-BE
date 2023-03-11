@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Informazioni"
 7		"MPC-BE"
 8		"Copyright © 2002-2023 vedi Authors.txt"
@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"Prova"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"Impostazioni EVR (presentatore personalizzato)."
 6		"VSync"
 7		"VSync interno"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"Attendi svuotamento"
 12		"Impostazioni di sincronizzazione EVR"
 13		"Sincronizza video con schermo"
-14		"Sincronizza schermo con video"
-15		"Presenta al VSync più vicino"
-16		"Regolazione frequenza:"
-18		"Regolazione frequenza:"
-20		"linee"
-22		"colonne"
-24		"Obiettivo compensazione di sincronizzazione:"
-26		"ms"
-27		"Limiti di controllo:"
-30		"ms"
-31		"Le modifiche diventano effettive dopo che la riproduzione è stata chiusa e riavviata."
+14		"Presenta al VSync più vicino"
+15		"Regolazione frequenza:"
+18		"Obiettivo compensazione di sincronizzazione:"
+20		"ms"
+21		"Limiti di controllo:"
+24		"ms"
+25		"Le modifiche diventano effettive dopo che la riproduzione è stata chiusa e riavviata."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39

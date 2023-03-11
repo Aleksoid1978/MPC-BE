@@ -930,8 +930,6 @@
 #define IDC_SYNCVIDEO                   22032
 #define IDC_SYNCDISPLAY                 22033
 #define IDC_CYCLEDELTA                  22034
-#define IDC_LINEDELTA                   22035
-#define IDC_COLUMNDELTA                 22036
 #define IDC_TARGETSYNCOFFSET            22037
 #define IDC_CONTROLLIMIT                22038
 #define IDC_SYNCDISPLAY2                22039

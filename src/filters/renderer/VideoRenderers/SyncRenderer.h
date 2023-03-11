@@ -28,42 +28,7 @@
 #include "D3DUtil/D3D9Font.h"
 #include "../SyncClock/ISyncClock.h"
 
-#define MFVBITMAP_DISABLE 0x40000000 // TODO remake without it
-#define MFVBITMAP_UPDATE  0x80000000
 #define NB_JITTER 126
-
-// Possible messages to the PowerStrip API. PowerStrip is used to control
-// the display frequency in one of the video - display synchronization modes.
-// Powerstrip can also through a CGenlock object give very accurate timing data
-// (given) that the gfx board is supported by PS.
-#define UM_SETCUSTOMTIMING		(WM_USER+200)
-#define UM_SETREFRESHRATE		(WM_USER+201)
-#define UM_SETPOLARITY			(WM_USER+202)
-#define UM_REMOTECONTROL		(WM_USER+210)
-#define UM_SETGAMMARAMP			(WM_USER+203)
-#define UM_CREATERESOLUTION		(WM_USER+204)
-#define UM_GETTIMING			(WM_USER+205)
-#define UM_SETCUSTOMTIMINGFAST	(WM_USER+211) // Sets timing without writing to file. Faster
-
-#define PositiveHorizontalPolarity	0x00
-#define PositiveVerticalPolarity	0x00
-#define NegativeHorizontalPolarity	0x02
-#define NegativeVerticalPolarity	0x04
-#define HideTrayIcon				0x00
-#define ShowTrayIcon				0x01
-#define ClosePowerStrip				0x63
-
-#define HACTIVE		0
-#define HFRONTPORCH	1
-#define HSYNCWIDTH	2
-#define HBACKPORCH	3
-#define VACTIVE		4
-#define VFRONTPORCH	5
-#define VSYNCWIDTH	6
-#define VBACKPORCH	7
-#define PIXELCLOCK	8
-#define UNKNOWN		9
-
 #define MAX_FIFO_SIZE 1024
 
 #undef DrawText // disable conflicting define
@@ -92,8 +57,6 @@ enum {
 
 class CFocusThread;
 
-// Guid to tag IMFSample with DirectX surface index
-static const GUID GUID_SURFACE_INDEX = { 0x30c8e9f6, 0x415, 0x4b81, { 0xa3, 0x15, 0x1, 0xa, 0xc6, 0xa9, 0xda, 0x19 } };
 
 namespace GothSync
 {
@@ -151,8 +114,6 @@ namespace GothSync
 
 		CComPtr<IDirect3DTexture9>	m_pVideoTextures[MAX_PICTURE_SLOTS];
 		CComPtr<IDirect3DSurface9>	m_pVideoSurfaces[MAX_PICTURE_SLOTS];
-		CComPtr<IDirect3DTexture9>	m_pOSDTexture;
-		CComPtr<IDirect3DSurface9>	m_pOSDSurface;
 		CComPtr<IDirect3DTexture9>	m_pScreenSizeTextures[2];
 		CComPtr<IDirect3DTexture9>	m_pResizeTexture;
 		CComPtr<ID3DXLine>			m_pLine;
@@ -266,7 +227,6 @@ namespace GothSync
 		LONGLONG m_pllSyncOffset[NB_JITTER] = {}; // Sync offset time stats
 		int m_nNextJitter = 0;
 		int m_nNextSyncOffset = 0;
-		LONGLONG m_JitterStdDev;
 
 		LONGLONG m_llLastSyncTime = 0;
 
@@ -277,8 +237,6 @@ namespace GothSync
 		unsigned m_uSyncGlitches = 0;
 
 		LONGLONG m_llSampleTime, m_llLastSampleTime; // Present time for the current sample
-		long m_lSampleLatency, m_lLastSampleLatency; // Time between intended and actual presentation time
-		long m_lMinSampleLatency, m_lLastMinSampleLatency;
 		LONGLONG m_llHysteresis = 0;
 		long m_lShiftToNearest = -1; // Illegal value to start with
 		long m_lShiftToNearestPrev;
@@ -459,7 +417,6 @@ namespace GothSync
 
 	protected:
 		void OnResetDevice();
-		MFCLOCK_STATE m_LastClockState = MFCLOCK_STATE_INVALID;
 
 	private:
 		// dxva.dll
@@ -616,12 +573,9 @@ namespace GothSync
 		};
 
 	public:
-		CGenlock(double target, double limit, int rowD, int colD, double clockD, UINT mon);
+		CGenlock(double target, double limit, double clockD, UINT mon);
 		~CGenlock();
 
-		BOOL PowerstripRunning(); // TRUE if PowerStrip is running
-		HRESULT GetTiming(); // Get the string representing the display's current timing parameters
-		HRESULT ResetTiming(); // Reset timing to what was last registered by GetTiming()
 		HRESULT ResetClock(); // Reset reference clock speed to nominal
 		HRESULT SetTargetSyncOffset(double targetD);
 		HRESULT GetTargetSyncOffset(double *targetD);
@@ -632,14 +586,11 @@ namespace GothSync
 		HRESULT SetMonitor(UINT mon); // Set the number of the monitor to synchronize
 		HRESULT ResetStats(); // Reset timing statistics
 
-		HRESULT ControlDisplay(double syncOffset, double frameCycle); // Adjust the frequency of the display if needed
 		HRESULT ControlClock(double syncOffset, double frameCycle); // Adjust the frequency of the clock if needed
 		HRESULT UpdateStats(double syncOffset, double frameCycle); // Don't adjust anything, just update the syncOffset stats
 
 	public:
-		BOOL   powerstripTimingExists = FALSE; // TRUE if display timing has been got through Powerstrip
 		int    adjDelta               = 0; // -1 for display slower in relation to video, 0 for keep, 1 for faster
-		UINT   displayAdjustmentsMade = 0; // The number of adjustments made to display refresh rate
 		UINT   clockAdjustmentsMade   = 0; // The number of adjustments made to clock frequency
 		double minSyncOffset;
 		double maxSyncOffset;
@@ -647,37 +598,19 @@ namespace GothSync
 		double minFrameCycle;
 		double maxFrameCycle;
 		double frameCycleAvg;
-		double curDisplayFreq = 0; // Current (adjusted) display frequency
 
 	private:
 		BOOL liveSource = FALSE; // TRUE if live source -> display sync is the only option
-		int lineDelta; // The number of rows added or subtracted when adjusting display fps
-		int columnDelta; // The number of colums added or subtracted when adjusting display fps
 		double cycleDelta; // Adjustment factor for cycle time as fraction of nominal value
 
-		UINT totalLines, totalColumns; // Including the porches and sync widths
 		UINT visibleLines, visibleColumns; // The nominal resolution
 		MovingAverage syncOffsetFifo{ 64 };
 		MovingAverage frameCycleFifo{ 4 };
-
-		UINT pixelClock; // In pixels/s
-		double displayFreqCruise = 0;  // Nominal display frequency in frames/s
-		double displayFreqSlower = 0;
-		double displayFreqFaster = 0;
 
 		double controlLimit; // How much the sync offset is allowed to drift from target sync offset
 		UINT monitor; // The monitor to be controlled. 0-based.
 		CComPtr<ISyncClock> syncClock; // Interface to an adjustable reference clock
 
-		HWND psWnd = nullptr; // PowerStrip window
-		const static int TIMING_PARAM_CNT = 10;
-		const static int MAX_LOADSTRING = 100;
-		UINT displayTiming[TIMING_PARAM_CNT]; // Display timing parameters
-		UINT displayTimingSave[TIMING_PARAM_CNT]; // So that we can reset the display at exit
-		WCHAR faster[MAX_LOADSTRING]; // String corresponding to faster display frequency
-		WCHAR cruise[MAX_LOADSTRING]; // String corresponding to nominal display frequency
-		WCHAR slower[MAX_LOADSTRING]; // String corresponding to slower display frequency
-		WCHAR savedTiming[MAX_LOADSTRING]; // String version of saved timing (to be restored upon exit)
 		double lowSyncOffset; // The closest we want to let the scheduled render time to get to the next vsync. In % of the frame time
 		double targetSyncOffset; // Where we want the scheduled render time to be in relation to the next vsync
 		double highSyncOffset; // The furthers we want to let the scheduled render time to get to the next vsync

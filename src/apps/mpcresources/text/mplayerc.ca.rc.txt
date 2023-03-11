@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"Provar"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"EVR (custom presenter) settings"
 6		"VSync"
 7		"Internal VSync"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"Wait for flushes"
 12		"EVR Sync settings"
 13		"Sync el vídeo a la pantalla"
-14		"Sync la pantalla al vídeo"
-15		"Presentar al vsync més proper"
-16		"Ajustar freqüència:"
-18		"Ajustar freqüència:"
-20		"línies"
-22		"columnes"
-24		"Diana d'òfset sync:"
-26		"ms"
-27		"Límits de control:"
-30		"ms"
-31		"Els canvis tindran efecte després de tencar i reiniciar la reproducció."
+14		"Presentar al vsync més proper"
+15		"Ajustar freqüència:"
+18		"Diana d'òfset sync:"
+20		"ms"
+21		"Límits de control:"
+24		"ms"
+25		"Els canvis tindran efecte després de tencar i reiniciar la reproducció."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39

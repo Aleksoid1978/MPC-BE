@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,8 +30,6 @@ IMPLEMENT_DYNAMIC(CPPageSync, CPPageBase)
 CPPageSync::CPPageSync()
 	: CPPageBase(CPPageSync::IDD, CPPageSync::IDD)
 	, m_iSyncMode(0)
-	, m_iLineDelta(0)
-	, m_iColumnDelta(0)
 {
 }
 
@@ -52,8 +50,6 @@ void CPPageSync::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Radio(pDX, IDC_RADIO1, m_iSyncMode);
 	DDX_Control(pDX, IDC_CYCLEDELTA, m_edtCycleDelta);
-	DDX_Text(pDX, IDC_LINEDELTA, m_iLineDelta);
-	DDX_Text(pDX, IDC_COLUMNDELTA, m_iColumnDelta);
 	DDX_Control(pDX, IDC_TARGETSYNCOFFSET, m_edtTargetSyncOffset);
 	DDX_Control(pDX, IDC_CONTROLLIMIT, m_edtControlLimit);
 }
@@ -90,11 +86,7 @@ void CPPageSync::InitDialogPrivate()
 	m_chkFlushGPUAfterPresent.SetCheck(rs.ExtraSets.bFlushGPUAfterPresent);
 	m_chkFlushGPUWait.SetCheck(rs.ExtraSets.bFlushGPUWait);
 
-	m_iSyncMode = rs.ExtraSets.iSynchronizeMode == SYNCHRONIZE_VIDEO ? 0
-				: rs.ExtraSets.iSynchronizeMode == SYNCHRONIZE_DISPLAY ? 1
-				: 2;
-	m_iLineDelta          = rs.ExtraSets.iLineDelta;
-	m_iColumnDelta        = rs.ExtraSets.iColumnDelta;
+	m_iSyncMode = (rs.ExtraSets.iSynchronizeMode == SYNCHRONIZE_VIDEO) ? 0 : 1;
 	m_edtCycleDelta       = rs.ExtraSets.dCycleDelta;
 	m_edtTargetSyncOffset = rs.ExtraSets.dTargetSyncOffset;
 	m_edtControlLimit     = rs.ExtraSets.dControlLimit;
@@ -102,7 +94,6 @@ void CPPageSync::InitDialogPrivate()
 	if (pFrame->m_clsidCAP != CLSID_SyncAllocatorPresenter) {
 		GetDlgItem(IDC_RADIO1)->EnableWindow(TRUE);
 		GetDlgItem(IDC_RADIO2)->EnableWindow(TRUE);
-		GetDlgItem(IDC_RADIO3)->EnableWindow(TRUE);
 		GetDlgItem(IDC_TARGETSYNCOFFSET)->EnableWindow(TRUE);
 		GetDlgItem(IDC_CONTROLLIMIT)->EnableWindow(TRUE);
 		GetDlgItem(IDC_STATIC2)->EnableWindow(TRUE);
@@ -113,23 +104,17 @@ void CPPageSync::InitDialogPrivate()
 		GetDlgItem(IDC_STATIC11)->EnableWindow(TRUE);
 		GetDlgItem(IDC_STATIC12)->EnableWindow(TRUE);
 
-		OnSyncModeClicked(m_iSyncMode == 0 ? IDC_RADIO1 : m_iSyncMode == 1 ? IDC_RADIO2 : IDC_RADIO3);
+		OnSyncModeClicked(m_iSyncMode == 0 ? IDC_RADIO1 : IDC_RADIO2);
 	} else {
 		GetDlgItem(IDC_RADIO1)->EnableWindow(FALSE);
 		GetDlgItem(IDC_RADIO2)->EnableWindow(FALSE);
-		GetDlgItem(IDC_RADIO3)->EnableWindow(FALSE);
 		GetDlgItem(IDC_TARGETSYNCOFFSET)->EnableWindow(FALSE);
 		GetDlgItem(IDC_CYCLEDELTA)->EnableWindow(FALSE);
-		GetDlgItem(IDC_LINEDELTA)->EnableWindow(FALSE);
-		GetDlgItem(IDC_COLUMNDELTA)->EnableWindow(FALSE);
 		GetDlgItem(IDC_CONTROLLIMIT)->EnableWindow(FALSE);
 		GetDlgItem(IDC_STATIC2)->EnableWindow(FALSE);
 		GetDlgItem(IDC_STATIC3)->EnableWindow(FALSE);
 		GetDlgItem(IDC_STATIC4)->EnableWindow(FALSE);
 		GetDlgItem(IDC_STATIC5)->EnableWindow(FALSE);
-		GetDlgItem(IDC_STATIC6)->EnableWindow(FALSE);
-		GetDlgItem(IDC_STATIC7)->EnableWindow(FALSE);
-		GetDlgItem(IDC_STATIC8)->EnableWindow(FALSE);
 		GetDlgItem(IDC_STATIC9)->EnableWindow(FALSE);
 		GetDlgItem(IDC_STATIC10)->EnableWindow(FALSE);
 		GetDlgItem(IDC_STATIC11)->EnableWindow(FALSE);
@@ -152,12 +137,7 @@ BOOL CPPageSync::OnApply()
 	rs.ExtraSets.bFlushGPUAfterPresent		= !!m_chkFlushGPUAfterPresent.GetCheck();
 	rs.ExtraSets.bFlushGPUWait				= !!m_chkFlushGPUWait.GetCheck();
 
-	rs.ExtraSets.iSynchronizeMode	=
-		m_iSyncMode == 0 ? SYNCHRONIZE_VIDEO
-		: m_iSyncMode == 1 ? SYNCHRONIZE_DISPLAY
-		: SYNCHRONIZE_NEAREST;
-	rs.ExtraSets.iLineDelta			= m_iLineDelta;
-	rs.ExtraSets.iColumnDelta		= m_iColumnDelta;
+	rs.ExtraSets.iSynchronizeMode	= (m_iSyncMode == 0) ? SYNCHRONIZE_VIDEO : SYNCHRONIZE_NEAREST;
 	rs.ExtraSets.dCycleDelta		= m_edtCycleDelta;
 	rs.ExtraSets.dTargetSyncOffset	= m_edtTargetSyncOffset;
 	rs.ExtraSets.dControlLimit		= m_edtControlLimit;
@@ -168,7 +148,7 @@ BOOL CPPageSync::OnApply()
 }
 
 BEGIN_MESSAGE_MAP(CPPageSync, CPPageBase)
-	ON_CONTROL_RANGE(BN_CLICKED, IDC_RADIO1, IDC_RADIO3, OnSyncModeClicked)
+	ON_CONTROL_RANGE(BN_CLICKED, IDC_RADIO1, IDC_RADIO2, OnSyncModeClicked)
 END_MESSAGE_MAP()
 
 void CPPageSync::OnSyncModeClicked(UINT nID)
@@ -184,19 +164,5 @@ void CPPageSync::OnSyncModeClicked(UINT nID)
 	} else {
 		GetDlgItem(IDC_STATIC5)->EnableWindow(FALSE);
 		GetDlgItem(IDC_CYCLEDELTA)->EnableWindow(FALSE);
-	}
-
-	if (nID == IDC_RADIO2) {
-		GetDlgItem(IDC_STATIC6)->EnableWindow(TRUE);
-		GetDlgItem(IDC_LINEDELTA)->EnableWindow(TRUE);
-		GetDlgItem(IDC_STATIC7)->EnableWindow(TRUE);
-		GetDlgItem(IDC_COLUMNDELTA)->EnableWindow(TRUE);
-		GetDlgItem(IDC_STATIC8)->EnableWindow(TRUE);
-	} else {
-		GetDlgItem(IDC_STATIC6)->EnableWindow(FALSE);
-		GetDlgItem(IDC_LINEDELTA)->EnableWindow(FALSE);
-		GetDlgItem(IDC_STATIC7)->EnableWindow(FALSE);
-		GetDlgItem(IDC_COLUMNDELTA)->EnableWindow(FALSE);
-		GetDlgItem(IDC_STATIC8)->EnableWindow(FALSE);
 	}
 }

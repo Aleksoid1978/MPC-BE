@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"Testa"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"EVR (custom presenter) settings"
 6		"VSync"
 7		"Internal VSync"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"Wait for flushes"
 12		"EVR Sync settings"
 13		"Synka video till skärm"
-14		"Synka skärm till video"
-15		"Visa vid närmaste vertikalsynk"
-16		"Frekvensjustering:"
-18		"Frekvensjustering:"
-20		"rader"
-22		"kolumner"
-24		"Önskad synkoffset:"
-26		"ms"
-27		"Styrgränser:"
-30		"ms"
-31		"Ändring slår igenom efter omstart av uppspelning."
+14		"Visa vid närmaste vertikalsynk"
+15		"Frekvensjustering:"
+18		"Önskad synkoffset:"
+20		"ms"
+21		"Styrgränser:"
+24		"ms"
+25		"Ändring slår igenom efter omstart av uppspelning."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39

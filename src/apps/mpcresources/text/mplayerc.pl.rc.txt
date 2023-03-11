@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"Przetestuj"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"EVR (custom presenter) settings"
 6		"VSync"
 7		"Internal VSync"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"Czekaj na opróżnienie bufora"
 12		"Ustawienia EVR Sync"
 13		"Synchronizowanie wideo z ekranem"
-14		"Synchronizowanie ekranu z wideo"
-15		"Wyświetlanie najbliższej synchronizacji pionowej"
-16		"Regulacja częstotliwości:"
-18		"Regulacja częstotliwości:"
-20		"wierszy"
-22		"kolumn"
-24		"Przesunięcie synchronizacji:"
-26		"ms"
-27		"Kontrola limitów:"
-30		"ms"
-31		"Zmiany zostaną wprowadzone po ponownym uruchomieniu programu."
+14		"Wyświetlanie najbliższej synchronizacji pionowej"
+15		"Regulacja częstotliwości:"
+18		"Przesunięcie synchronizacji:"
+20		"ms"
+21		"Kontrola limitów:"
+24		"ms"
+25		"Zmiany zostaną wprowadzone po ponownym uruchomieniu programu."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39

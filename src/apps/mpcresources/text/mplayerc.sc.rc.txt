@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"测试"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"EVR (自定义) 渲染器设置"
 6		"垂直同步"
 7		"内置垂直同步"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"等待刷新"
 12		"EVR 同步设置"
 13		"将视频同步到显示器"
-14		"将显示器同步到视频"
-15		"使用显示器刷新率与视频帧率最接近的同步方式"
-16		"频率调整: "
-18		"频率调整: "
-20		"行"
-22		"列"
-24		"目标同步偏移: "
-26		"毫秒"
-27		"控制限制: "
-30		"毫秒"
-31		"设置在关闭并重新启动后生效。"
+14		"使用显示器刷新率与视频帧率最接近的同步方式"
+15		"频率调整: "
+18		"目标同步偏移: "
+20		"毫秒"
+21		"控制限制: "
+24		"毫秒"
+25		"设置在关闭并重新启动后生效。"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39

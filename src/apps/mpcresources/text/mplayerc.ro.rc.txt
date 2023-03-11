@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"Testează"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"EVR (custom presenter) settings"
 6		"VSync"
 7		"Internal VSync"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"Wait for flushes"
 12		"EVR Sync settings"
 13		"Sincronizează video cu afișarea"
-14		"Sincronizează afișarea cu video"
-15		"Prezintă la cel mai apropiat VSync (Sincronizare Verticală)"
-16		"Ajustare frecvență:"
-18		"Ajustare frecvență:"
-20		"linii"
-22		"coloane"
-24		"Decalaj de sincronizare:"
-26		"ms"
-27		"Limite de control:"
-30		"ms"
-31		"Modificările vor avea efect după ce redarea a fost închisă și repornită."
+14		"Prezintă la cel mai apropiat VSync (Sincronizare Verticală)"
+15		"Ajustare frecvență:"
+18		"Decalaj de sincronizare:"
+20		"ms"
+21		"Limite de control:"
+24		"ms"
+25		"Modificările vor avea efect după ce redarea a fost închisă și repornită."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39

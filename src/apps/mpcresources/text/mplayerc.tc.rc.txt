@@ -511,7 +511,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 20		"測試"
 END
 
-BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
+BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 5		"EVR 自訂呈現 設定"
 6		"垂直同步"
 7		"內置垂直同步"
@@ -521,17 +521,13 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 11		"等待排空"
 12		"EVR 同步繪製 設定"
 13		"同步視訊至顯示"
-14		"同步顯示至視訊"
-15		"於最近的垂直同步呈現"
-16		"頻率調整："
-18		"頻率調整："
-20		"列 (Ln)"
-22		"欄 (Col)"
-24		"目標同步偏移量："
-26		"毫秒"
-27		"控制限制："
-30		"毫秒"
-31		"要關閉或是重新啟動播放後，變更方會生效。"
+14		"於最近的垂直同步呈現"
+15		"頻率調整："
+18		"目標同步偏移量："
+20		"毫秒"
+21		"控制限制："
+24		"毫秒"
+25		"要關閉或是重新啟動播放後，變更方會生效。"
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
