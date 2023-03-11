@@ -1639,7 +1639,7 @@ void CBaseAP::DrawStats()
 						LARGE_INTEGER Freq;
 						QueryPerformanceFrequency (&Freq);
 						Freq.QuadPart /= 1000;
-						strText.AppendFormat(L"\n    SyncQPCTime %dms SyncGPUTime %dms",
+						strText.AppendFormat(L"\n    SyncQPCTime %I64dms SyncGPUTime %I64dms",
 									   stats.SyncQPCTime.QuadPart / Freq.QuadPart, stats.SyncGPUTime.QuadPart / Freq.QuadPart);
 					} else {
 						strText.Append(L"\nGraphics device does not support present stats");

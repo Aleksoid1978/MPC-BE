@@ -178,7 +178,7 @@ namespace GothSync
 			_Out_ LPD3DXLINE        *ppLine
 		) = nullptr;
 
-		long m_nTearingPos;
+		long m_nTearingPos = 0;
 
 		bool                       m_bAlphaBitmapEnable = false;
 		CComPtr<IDirect3DTexture9> m_pAlphaBitmapTexture;
@@ -207,7 +207,7 @@ namespace GothSync
 		double m_fSyncOffsetAvr    = 0.0; // Mean time between the call of Paint() and vsync. To avoid tearing this should be several ms at least
 		double m_fSyncOffsetStdDev = 0.0; // The std dev of the above
 
-		bool m_b10BitOutput;
+		bool m_b10BitOutput = false;
 		bool m_bIsFullscreen;
 		BOOL m_bCompositionEnabled; // DWM composition before creating a D3D9 device
 
@@ -592,18 +592,19 @@ namespace GothSync
 	public:
 		int    adjDelta               = 0; // -1 for display slower in relation to video, 0 for keep, 1 for faster
 		UINT   clockAdjustmentsMade   = 0; // The number of adjustments made to clock frequency
-		double minSyncOffset;
-		double maxSyncOffset;
-		double syncOffsetAvg; // Average of the above
-		double minFrameCycle;
-		double maxFrameCycle;
-		double frameCycleAvg;
+		double minSyncOffset = 0.0;
+		double maxSyncOffset = 0.0;
+		double syncOffsetAvg = 0.0; // Average of the above
+		double minFrameCycle = 0.0;
+		double maxFrameCycle = 0.0;
+		double frameCycleAvg = 0.0;
 
 	private:
 		BOOL liveSource = FALSE; // TRUE if live source -> display sync is the only option
 		double cycleDelta; // Adjustment factor for cycle time as fraction of nominal value
 
-		UINT visibleLines, visibleColumns; // The nominal resolution
+		UINT visibleLines = 0; // The nominal resolution
+		UINT visibleColumns = 0;
 		MovingAverage syncOffsetFifo{ 64 };
 		MovingAverage frameCycleFifo{ 4 };
 
