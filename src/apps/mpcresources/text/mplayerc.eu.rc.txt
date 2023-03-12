@@ -434,7 +434,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 40		"sec."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 5		"Bide Nahastzailea"
 6		"Nahastu bideak:"
 8		"Eskatu estereoa dekodeatzailetik"
@@ -443,13 +443,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
 17		"Berez irabazi agintea"
 18		"Audioa bultzada"
 24		"FFmpeg filters"
-27		"Irteera lagin heuskarria:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Gain"
-32		"Audio denbora aldaketa (sm):"
-35		"Berezkoa"
+25		"Presets"
+28		"Irteera lagin heuskarria:"
+29		"Int16"
+30		"Int24"
+31		"Int32"
+32		"Gain"
+33		"Audio denbora aldaketa (sm):"
+36		"Berezkoa"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -1328,6 +1329,7 @@ STRING IDS_ARS_WASAPI_MODE		"WASAPI modua:"
 STRING IDS_AUDIOWINDOW_COVER		"erakutsi bilduma argazki/azal irudiak"
 STRING IDS_AUDIOWINDOW_HIDE		"ezkutatu bideo eremua"
 STRING IDS_AUDIOWINDOW_NONE		"ez aldatu leihoaren neurria"
+STRING IDS_AUDIO_FILTER_PRESET_1		"For audio with whisper and explosion parts"
 STRING IDS_AUDIO_GAIN		"Irabazia (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"Maila (%d):"
 STRING IDS_AUDIO_ONLY		"audio only"

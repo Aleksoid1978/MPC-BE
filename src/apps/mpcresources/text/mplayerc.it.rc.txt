@@ -434,7 +434,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 40		"sec."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 5		"Mixer canali"
 6		"Miscela i canali in:"
 8		"Richiedi stereo dal decodificatore"
@@ -443,13 +443,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
 17		"Controllo volume automatico"
 18		"Potenzia l'audio"
 24		"Filtri FFmpeg"
-27		"Formato di uscita del campione:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
-32		"Spostamento audio (ms):"
-35		"Predefinito"
+25		"Presets"
+28		"Formato di uscita del campione:"
+29		"Int16"
+30		"Int24"
+31		"Int32"
+32		"Float"
+33		"Spostamento audio (ms):"
+36		"Predefinito"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -1328,6 +1329,7 @@ STRING IDS_ARS_WASAPI_MODE		"Modalità WASAPI:"
 STRING IDS_AUDIOWINDOW_COVER		"visualizza copertine degli album"
 STRING IDS_AUDIOWINDOW_HIDE		"nascondi l'area video"
 STRING IDS_AUDIOWINDOW_NONE		"non modificare le dimensioni della finestra"
+STRING IDS_AUDIO_FILTER_PRESET_1		"For audio with whisper and explosion parts"
 STRING IDS_AUDIO_GAIN		"Guadagno (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"Livello (%d):"
 STRING IDS_AUDIO_ONLY		"solo audio"

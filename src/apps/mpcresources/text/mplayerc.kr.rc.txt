@@ -434,7 +434,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 40		"초"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 5		"채널 믹서"
 6		"채널 혼합 :"
 8		"디코어에서 스테레오 요청"
@@ -443,13 +443,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
 17		"자동 음량 제어"
 18		"음량 증폭"
 24		"FFmpeg 필터"
-27		"출력 샘플 형식 :"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
-32		"오디오 시간 조절 (밀리 초) :"
-35		"기본값"
+25		"Presets"
+28		"출력 샘플 형식 :"
+29		"Int16"
+30		"Int24"
+31		"Int32"
+32		"Float"
+33		"오디오 시간 조절 (밀리 초) :"
+36		"기본값"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -1328,6 +1329,7 @@ STRING IDS_ARS_WASAPI_MODE		"WASAPI 모드 :"
 STRING IDS_AUDIOWINDOW_COVER		"앨범 아트/표지 사진 표시"
 STRING IDS_AUDIOWINDOW_HIDE		"비디오 영역 숨기기"
 STRING IDS_AUDIOWINDOW_NONE		"창 크기 변경 안 함"
+STRING IDS_AUDIO_FILTER_PRESET_1		"For audio with whisper and explosion parts"
 STRING IDS_AUDIO_GAIN		"증폭(%+.1f dB) :"
 STRING IDS_AUDIO_LEVEL		"레벨(%d) :"
 STRING IDS_AUDIO_ONLY		"audio only"

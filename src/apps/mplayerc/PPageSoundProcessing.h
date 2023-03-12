@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2018 see Authors.txt
+ * (C) 2017-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -93,6 +93,7 @@ public:
 	afx_msg void OnInt32Check();
 	afx_msg void OnFloatCheck();
 	afx_msg void OnTimeShiftCheck();
+	afx_msg void OnBnClickedPresets();
 	afx_msg void OnBnClickedDefault();
 
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);

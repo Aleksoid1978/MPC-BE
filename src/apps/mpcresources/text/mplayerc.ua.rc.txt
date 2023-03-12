@@ -434,7 +434,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 40		"сек."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 5		"Мікшер каналів"
 6		"Мікшування каналів:"
 8		"Запит стерео у декодера"
@@ -443,13 +443,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
 17		"Автоматичне регулювання гучності"
 18		"Підсилення аудіо"
 24		"Фільтри FFmpeg"
-27		"Формат виводу:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
-32		"Затримка звуку (мс):"
-35		"Типово"
+25		"Presets"
+28		"Формат виводу:"
+29		"Int16"
+30		"Int24"
+31		"Int32"
+32		"Float"
+33		"Затримка звуку (мс):"
+36		"Типово"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -1328,6 +1329,7 @@ STRING IDS_ARS_WASAPI_MODE		"Режим WASAPI:"
 STRING IDS_AUDIOWINDOW_COVER		"Відображати обкладинку альбома"
 STRING IDS_AUDIOWINDOW_HIDE		"Приховати область відео"
 STRING IDS_AUDIOWINDOW_NONE		"Не змінювати розмір вікна"
+STRING IDS_AUDIO_FILTER_PRESET_1		"For audio with whisper and explosion parts"
 STRING IDS_AUDIO_GAIN		"Підсилення (%+.1f дБ):"
 STRING IDS_AUDIO_LEVEL		"Рівень (%d):"
 STRING IDS_AUDIO_ONLY		"лише аудіо"

@@ -434,7 +434,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 40		"秒"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 5		"チャンネル ミキサー"
 6		"チャンネルをミックス:"
 8		"デコーダーからステレオを要求する"
@@ -443,13 +443,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
 17		"自動音量コントロール"
 18		"音声のブースト"
 24		"FFmpeg フィルター"
-27		"出力サンプル形式:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
-32		"音声のタイム シフト (ミリ秒):"
-35		"既定"
+25		"Presets"
+28		"出力サンプル形式:"
+29		"Int16"
+30		"Int24"
+31		"Int32"
+32		"Float"
+33		"音声のタイム シフト (ミリ秒):"
+36		"既定"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -1328,6 +1329,7 @@ STRING IDS_ARS_WASAPI_MODE		"WASAPI モード:"
 STRING IDS_AUDIOWINDOW_COVER		"アルバムの アート/カバー 画像を表示する"
 STRING IDS_AUDIOWINDOW_HIDE		"映像領域を隠す"
 STRING IDS_AUDIOWINDOW_NONE		"ウィンドウ サイズを変更しない"
+STRING IDS_AUDIO_FILTER_PRESET_1		"For audio with whisper and explosion parts"
 STRING IDS_AUDIO_GAIN		"ゲイン (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"レベル (%d):"
 STRING IDS_AUDIO_ONLY		"audio only"

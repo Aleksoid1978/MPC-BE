@@ -434,7 +434,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 40		"sek."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 5		"Mikser Kanałów"
 6		"Miksuj kanały do:"
 8		"Żądaj stereo od dekodera"
@@ -443,13 +443,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
 17		"Automatyczna regulacja głośności"
 18		"Wzmocnienie dźwięku"
 24		"FFmpeg filters"
-27		"Format próbki wyjściowej:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
-32		"Opóźnienie dźwięku (ms):"
-35		"Domyślne"
+25		"Presets"
+28		"Format próbki wyjściowej:"
+29		"Int16"
+30		"Int24"
+31		"Int32"
+32		"Float"
+33		"Opóźnienie dźwięku (ms):"
+36		"Domyślne"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -1325,6 +1326,7 @@ STRING IDS_ARS_WASAPI_MODE		"Tryb WASAPI:"
 STRING IDS_AUDIOWINDOW_COVER		"wyświetl zdjęcie lub okładkę"
 STRING IDS_AUDIOWINDOW_HIDE		"ukryj obszar wideo"
 STRING IDS_AUDIOWINDOW_NONE		"nie zmieniaj rozmiaru okna"
+STRING IDS_AUDIO_FILTER_PRESET_1		"For audio with whisper and explosion parts"
 STRING IDS_AUDIO_GAIN		"Wzmocnienie (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"Poziom (%d):"
 STRING IDS_AUDIO_ONLY		"audio only"

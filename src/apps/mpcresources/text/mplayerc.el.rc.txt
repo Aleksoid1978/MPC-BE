@@ -434,7 +434,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 40		"δευτ."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 5		"Μείκτης καναλιών"
 6		"Μίξη καναλιών σε:"
 8		"Αίτηση στερεοφωνικού από τον αποκωδικοποιητή"
@@ -443,13 +443,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
 17		"Αυτόματος έλεγχος έντασης"
 18		"Ώθηση ήχου"
 24		"FFmpeg filters"
-27		"Μορφή δείγμ. εξόδου:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
-32		"Χρονική μετατόπιση ήχου (ms):"
-35		"Προεπιλογή"
+25		"Presets"
+28		"Μορφή δείγμ. εξόδου:"
+29		"Int16"
+30		"Int24"
+31		"Int32"
+32		"Float"
+33		"Χρονική μετατόπιση ήχου (ms):"
+36		"Προεπιλογή"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -1328,6 +1329,7 @@ STRING IDS_ARS_WASAPI_MODE		"Λειτουργία WASAPI:"
 STRING IDS_AUDIOWINDOW_COVER		"εμφάνιση εικόνων γραφικών/εξωφύλλου άλμπουμ"
 STRING IDS_AUDIOWINDOW_HIDE		"απόκρυψη της περιοχής βίντεο"
 STRING IDS_AUDIOWINDOW_NONE		"μην αλλάξει το μέγεθος του παραθύρου"
+STRING IDS_AUDIO_FILTER_PRESET_1		"For audio with whisper and explosion parts"
 STRING IDS_AUDIO_GAIN		"Αύξηση (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"Επίπεδο (%d):"
 STRING IDS_AUDIO_ONLY		"audio only"

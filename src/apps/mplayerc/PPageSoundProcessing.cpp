@@ -145,6 +145,7 @@ BEGIN_MESSAGE_MAP(CPPageSoundProcessing, CPPageBase)
 	ON_BN_CLICKED(IDC_CHECK11, OnInt32Check)
 	ON_BN_CLICKED(IDC_CHECK12, OnFloatCheck)
 	ON_BN_CLICKED(IDC_CHECK4, OnTimeShiftCheck)
+	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedPresets)
 	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedDefault)
 	ON_WM_HSCROLL()
 END_MESSAGE_MAP()
@@ -405,6 +406,33 @@ void CPPageSoundProcessing::OnTimeShiftCheck()
 	}
 
 	SetModified();
+}
+
+void CPPageSoundProcessing::OnBnClickedPresets()
+{
+	enum {
+		M_PRESET_1 = 1,
+	};
+
+	CMenu menu;
+	menu.CreatePopupMenu();
+	menu.AppendMenuW(MF_STRING | MF_ENABLED, M_PRESET_1, ResStr(IDS_AUDIO_FILTER_PRESET_1));
+
+	CRect wrect;
+	GetDlgItem(IDC_BUTTON1)->GetWindowRect(&wrect);
+
+	int id = menu.TrackPopupMenu(TPM_LEFTBUTTON | TPM_RETURNCMD, wrect.left, wrect.bottom, this);
+
+	if (id == M_PRESET_1) {
+		// https://ffmpeg.org/ffmpeg-filters.html#compand
+		// "Another example for audio with whisper and explosion parts:"
+		// "compand=0|0:1|1:-90/-900|-70/-70|-30/-9|0/-3:6:0:0:0"
+		const int idx = m_cmbFilter1Name.FindStringExact(1, L"compand");
+		if (idx != CB_ERR) {
+			m_cmbFilter1Name.SetCurSel(idx);
+			m_edtFilter1Args.SetWindowText(L"0|0:1|1:-90/-900|-70/-70|-30/-9|0/-3:6:0:0:0");
+		}
+	}
 }
 
 void CPPageSoundProcessing::OnBnClickedDefault()

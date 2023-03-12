@@ -434,7 +434,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 40		"sn."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 5		"Kanal karıştırıcı"
 6		"Kanalları karıştır:"
 8		"Çözücüden stereo iste"
@@ -443,13 +443,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
 17		"Oto ses kontrolü"
 18		"Sesi güçlendir"
 24		"FFmpeg filtreleri"
-27		"Çıktı örnekleme biçimi:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
-32		"Ses zaman kaydırma (ms):"
-35		"Varsayılan"
+25		"Presets"
+28		"Çıktı örnekleme biçimi:"
+29		"Int16"
+30		"Int24"
+31		"Int32"
+32		"Float"
+33		"Ses zaman kaydırma (ms):"
+36		"Varsayılan"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -1328,6 +1329,7 @@ STRING IDS_ARS_WASAPI_MODE		"WASAPI modu:"
 STRING IDS_AUDIOWINDOW_COVER		"albüm kapak resmini göster."
 STRING IDS_AUDIOWINDOW_HIDE		"video alanını gizle."
 STRING IDS_AUDIOWINDOW_NONE		"pencere boyutunu değiştirme."
+STRING IDS_AUDIO_FILTER_PRESET_1		"For audio with whisper and explosion parts"
 STRING IDS_AUDIO_GAIN		"Kazanç (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"Seviye (%d):"
 STRING IDS_AUDIO_ONLY		"sadece ses"

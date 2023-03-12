@@ -434,7 +434,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 40		"sec."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 5		"Channel Mixer"
 6		"Mix channels to:"
 8		"Request stereo from the decoder"
@@ -443,13 +443,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
 17		"Auto volume control"
 18		"Boost audio"
 24		"FFmpeg filters"
-27		"Výstupný vzorkovací formát:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
-32		"Čas. posun zvuku (ms):"
-35		"Default"
+25		"Presets"
+28		"Výstupný vzorkovací formát:"
+29		"Int16"
+30		"Int24"
+31		"Int32"
+32		"Float"
+33		"Čas. posun zvuku (ms):"
+36		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -1328,6 +1329,7 @@ STRING IDS_ARS_WASAPI_MODE		"WASAPI mode:"
 STRING IDS_AUDIOWINDOW_COVER		"display album art/cover pictures"
 STRING IDS_AUDIOWINDOW_HIDE		"hide the video area"
 STRING IDS_AUDIOWINDOW_NONE		"do not change the window size"
+STRING IDS_AUDIO_FILTER_PRESET_1		"For audio with whisper and explosion parts"
 STRING IDS_AUDIO_GAIN		"Gain (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"Level (%d):"
 STRING IDS_AUDIO_ONLY		"audio only"

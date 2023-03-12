@@ -434,7 +434,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 40		"sek."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 5		"Mikseta kanala"
 6		"Miksaj kanale prema:"
 8		"Uputi zahtjev za stereo od dekodera"
@@ -443,13 +443,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 36
 17		"Automatska kontrola glasnoće"
 18		"Podizanje zvuka"
 24		"FFmpeg filteri"
-27		"Format izlaznog uzorka:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
-32		"Pomak vremena za audio (ms):"
-35		"Default"
+25		"Presets"
+28		"Format izlaznog uzorka:"
+29		"Int16"
+30		"Int24"
+31		"Int32"
+32		"Float"
+33		"Pomak vremena za audio (ms):"
+36		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -1328,6 +1329,7 @@ STRING IDS_ARS_WASAPI_MODE		"WASAPI mod:"
 STRING IDS_AUDIOWINDOW_COVER		"prikaz slika s poleđine albuma"
 STRING IDS_AUDIOWINDOW_HIDE		"sakrij video područje"
 STRING IDS_AUDIOWINDOW_NONE		"ne mijenjaj veličinu prozora"
+STRING IDS_AUDIO_FILTER_PRESET_1		"For audio with whisper and explosion parts"
 STRING IDS_AUDIO_GAIN		"Dobitak (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"Razina (%d):"
 STRING IDS_AUDIO_ONLY		"audio only"
