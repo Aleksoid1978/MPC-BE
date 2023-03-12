@@ -1666,9 +1666,9 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 		hr = SetupAudioFilter();
 
 		if (SUCCEEDED(hr)) {
-			hr = m_Filter.Push(p);
+			hr = m_AudioFilter.Push(p);
 			if (SUCCEEDED(hr)) {
-				while (SUCCEEDED(m_Filter.Pull(p))) {
+				while (SUCCEEDED(m_AudioFilter.Pull(p))) {
 					PushToQueue(p);
 				}
 			}
@@ -1723,12 +1723,12 @@ HRESULT CMpcAudioRenderer::PushToQueue(std::unique_ptr<CPacket>& p)
 
 HRESULT CMpcAudioRenderer::SetupAudioFilter()
 {
-	if (m_Filter.IsInitialized()) {
+	if (m_AudioFilter.IsInitialized()) {
 		return S_FALSE;
 	}
 
 	if (m_dRate == 1.0 || m_dRate < 0.25 || m_dRate > 100.0) {
-		m_Filter.Flush();
+		m_AudioFilter.Flush();
 		return E_INVALIDARG;
 	}
 
@@ -1736,7 +1736,7 @@ HRESULT CMpcAudioRenderer::SetupAudioFilter()
 	CStringA flt_args;
 	if (m_dRate < 0.5) {
 		flt_args.Format("tempo=%f", sqrt(m_dRate));
-		hr = m_Filter.Initialize(
+		hr = m_AudioFilter.Initialize(
 			m_output_params.sf, m_output_params.layout, m_output_params.samplerate,
 			m_output_params.sf, m_output_params.layout, m_output_params.samplerate,
 			false,
@@ -1745,7 +1745,7 @@ HRESULT CMpcAudioRenderer::SetupAudioFilter()
 	}
 	else {
 		flt_args.Format("tempo=%f", m_dRate);
-		hr = m_Filter.Initialize(
+		hr = m_AudioFilter.Initialize(
 			m_output_params.sf, m_output_params.layout, m_output_params.samplerate,
 			m_output_params.sf, m_output_params.layout, m_output_params.samplerate,
 			false, { {"atempo", flt_args} }
@@ -2206,7 +2206,7 @@ again:
 	}
 
 	if (SUCCEEDED(hr)) {
-		m_Filter.Flush();
+		m_AudioFilter.Flush();
 	}
 
 	m_bs2b_active = false;
@@ -2942,7 +2942,7 @@ void CMpcAudioRenderer::WasapiFlush()
 HRESULT CMpcAudioRenderer::EndFlush()
 {
 	WasapiFlush();
-	m_Filter.Flush();
+	m_AudioFilter.Flush();
 
 	HRESULT hr = CBaseRenderer::EndFlush();
 
@@ -2999,9 +2999,9 @@ void CMpcAudioRenderer::WaitFinish()
 						HRESULT hr = SetupAudioFilter();
 
 						if (SUCCEEDED(hr)) {
-							hr = m_Filter.Push(p);
+							hr = m_AudioFilter.Push(p);
 							if (SUCCEEDED(hr)) {
-								while (SUCCEEDED(m_Filter.Pull(p))) {
+								while (SUCCEEDED(m_AudioFilter.Pull(p))) {
 									PushToQueue(p);
 								}
 							}
@@ -3026,9 +3026,9 @@ void CMpcAudioRenderer::WaitFinish()
 		HRESULT hr = SetupAudioFilter();
 
 		if (SUCCEEDED(hr)) {
-			m_Filter.PushEnd();
+			m_AudioFilter.PushEnd();
 			std::unique_ptr<CPacket> p;
-			while (SUCCEEDED(m_Filter.Pull(p))) {
+			while (SUCCEEDED(m_AudioFilter.Pull(p))) {
 				PushToQueue(p);
 			}
 		}

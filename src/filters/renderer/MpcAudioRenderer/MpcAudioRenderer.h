@@ -205,7 +205,7 @@ private:
 	void SetBalanceMask(const DWORD output_layout);
 	void ApplyVolumeBalance(BYTE* pData, UINT32 size);
 
-	CAudioFilter m_Filter;
+	CAudioFilter m_AudioFilter;
 	HRESULT SetupAudioFilter();
 
 	CDitherInt16 m_DitherInt16;
