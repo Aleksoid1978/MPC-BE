@@ -431,6 +431,7 @@ void CPPageSoundProcessing::OnBnClickedPresets()
 		if (idx != CB_ERR) {
 			m_cmbFilter1Name.SetCurSel(idx);
 			m_edtFilter1Args.SetWindowText(L"0|0:1|1:-90/-900|-70/-70|-30/-9|0/-3:6:0:0:0");
+			OnFilter1NameChange();
 		}
 	}
 }
