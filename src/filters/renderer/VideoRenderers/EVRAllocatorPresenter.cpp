@@ -1877,22 +1877,22 @@ void CEVRAllocatorPresenter::OnVBlankFinished(bool fAll, LONGLONG PerformanceCou
 		m_nNextSyncOffset = (m_nNextSyncOffset+1) % NB_JITTER;
 		LONGLONG SyncOffset = nsSampleTime - llClockTime;
 
-		m_pllSyncOffset[m_nNextSyncOffset] = SyncOffset;
+		m_llSyncOffsets[m_nNextSyncOffset] = SyncOffset;
 		//TRACE_EVR("EVR: SyncOffset(%u, %d): %8I64d     %8I64d     %8I64d \n", m_iCurSurface, m_VSyncMode, m_LastPredictedSync, -SyncOffset, m_LastPredictedSync - (-SyncOffset));
 
 		m_MaxSyncOffset = MINLONG64;
 		m_MinSyncOffset = MAXLONG64;
 
 		LONGLONG AvrageSum = 0;
-		for (int i=0; i<NB_JITTER; i++) {
-			LONGLONG Offset = m_pllSyncOffset[i];
-			AvrageSum += Offset;
-			expand_range(Offset, m_MinSyncOffset, m_MaxSyncOffset);
+		for (const auto& offset : m_llSyncOffsets) {
+			AvrageSum += offset;
+			expand_range(offset, m_MinSyncOffset, m_MaxSyncOffset);
 		}
 		double MeanOffset = double(AvrageSum)/NB_JITTER;
+
 		double DeviationSum = 0;
-		for (int i=0; i<NB_JITTER; i++) {
-			double Deviation = double(m_pllSyncOffset[i]) - MeanOffset;
+		for (const auto& offset : m_llSyncOffsets) {
+			double Deviation = double(offset) - MeanOffset;
 			DeviationSum += Deviation*Deviation;
 		}
 		double StdDev = sqrt(DeviationSum/NB_JITTER);

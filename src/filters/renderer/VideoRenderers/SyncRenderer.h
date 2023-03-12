@@ -223,8 +223,8 @@ namespace GothSync
 		unsigned m_pcFramesDropped;
 		unsigned m_pcFramesDrawn;
 
-		LONGLONG m_pllJitter[NB_JITTER] = {}; // Vertical sync time stats
-		LONGLONG m_pllSyncOffset[NB_JITTER] = {}; // Sync offset time stats
+		LONGLONG m_llJitters[NB_JITTER] = {};     // Vertical sync time stats
+		LONGLONG m_llSyncOffsets[NB_JITTER] = {}; // Sync offset time stats
 		int m_nNextJitter = 0;
 		int m_nNextSyncOffset = 0;
 
@@ -603,8 +603,7 @@ namespace GothSync
 		BOOL liveSource = FALSE; // TRUE if live source -> display sync is the only option
 		double cycleDelta; // Adjustment factor for cycle time as fraction of nominal value
 
-		UINT visibleLines = 0; // The nominal resolution
-		UINT visibleColumns = 0;
+		UINT visibleLines = 0, visibleColumns = 0; // The nominal resolution
 		MovingAverage syncOffsetFifo{ 64 };
 		MovingAverage frameCycleFifo{ 4 };
 
