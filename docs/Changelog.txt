@@ -7,6 +7,15 @@ Windows Vista is no longer supported.
 MpaSplitter
 Avoid accidental connection to .wtv files (Windows Television).
 
+AudioSwitcher
+Added "For audio with whisper and explosion parts" preset for FFmpeg filters.
+
+VideoRenderers
+Removed support for PowerStrip and "Sync display to video" mode for Sync Renderer.
+
+Subtitles
+Fixed style change for simple text subtitles (SubRip, etc.).
+
 YouTube
 Added the ability to choose in advance only sound in the built-in parser.
 
@@ -15,11 +24,12 @@ Added display of a single audio track in the OSD when trying to switch to the ne
 Added display of audio track number in OSD.
 The history window no longer blocks interaction with the main player window.
 Fixed launching bookmarks from the menu.
+Improved opening of URLs requiring authorization.
 Various interface fixes.
 
 Updated German translation (by Klaus1189).
 Updated Chinese (Simplified) translation (by wushantao).
-Updated Korean translation (by Hackjjang).
+Updated Korean translation (by Hackjjang and Potmarigold).
 Updated Hungarian translation (by mickey).
 Updated Turkish translation (by cmhrky).
 Updated Ukrainian translation (by arestarh).
