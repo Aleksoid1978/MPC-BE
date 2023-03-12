@@ -241,8 +241,8 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	m_pPSC.reset();
 	m_pDevice9Ex.Release();
 
-	for (unsigned i = 0; i < std::size(m_pResizerPixelShaders); i++) {
-		m_pResizerPixelShaders[i].Release();
+	for (auto& resizerShader : m_pResizerPixelShaders) {
+		resizerShader.Release();
 	}
 
 	for (auto& Shader : m_pPixelShadersScreenSpace) {
@@ -704,9 +704,9 @@ HRESULT CBaseAP::TextureCopy(IDirect3DTexture9* pTexture)
 		{0, h, 0.5f, 2.0f, 0, 1},
 		{w, h, 0.5f, 2.0f, 1, 1},
 	};
-	for (unsigned i = 0; i < std::size(v); i++) {
-		v[i].x -= 0.5;
-		v[i].y -= 0.5;
+	for (auto& item : v) {
+		item.x -= 0.5;
+		item.y -= 0.5;
 	}
 	hr = m_pDevice9Ex->SetTexture(0, pTexture);
 	return TextureBlt(m_pDevice9Ex, v, D3DTEXF_POINT);
@@ -784,9 +784,9 @@ HRESULT CBaseAP::DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_Rect)
 		{float(_Rect.left), float(_Rect.bottom), 0.5f, 2.0f, Color},
 		{float(_Rect.right), float(_Rect.bottom), 0.5f, 2.0f, Color},
 	};
-	for (unsigned i = 0; i < std::size(v); i++) {
-		v[i].x -= 0.5;
-		v[i].y -= 0.5;
+	for (auto& item : v) {
+		item.x -= 0.5;
+		item.y -= 0.5;
 	}
 	return DrawRectBase(m_pDevice9Ex, v);
 }
@@ -1053,29 +1053,26 @@ HRESULT CBaseAP::AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9* pTexture)
 	return E_FAIL;
 }
 
-// Update the array m_pllJitter with a new vsync period. Calculate min, max and stddev.
+// Update the array m_llJitters with a new vsync period. Calculate min, max and stddev.
 void CBaseAP::SyncStats(LONGLONG syncTime)
 {
 	m_nNextJitter = (m_nNextJitter+1) % NB_JITTER;
 	LONGLONG jitter = syncTime - m_llLastSyncTime;
-	m_pllJitter[m_nNextJitter] = jitter;
-	double syncDeviation = (m_pllJitter[m_nNextJitter] - m_fJitterMean) / 10000.0;
+	m_llJitters[m_nNextJitter] = jitter;
+	double syncDeviation = (m_llJitters[m_nNextJitter] - m_fJitterMean) / 10000.0;
 	if (abs(syncDeviation) > (GetDisplayCycle() / 2)) {
 		m_uSyncGlitches++;
 	}
 
 	LONGLONG llJitterSum = 0;
-	LONGLONG llJitterSumAvg = 0;
-	for (int i=0; i<NB_JITTER; i++) {
-		LONGLONG Jitter = m_pllJitter[i];
-		llJitterSum += Jitter;
-		llJitterSumAvg += Jitter;
+	for (const auto& jitter : m_llJitters) {
+		llJitterSum += jitter;
 	}
-	m_fJitterMean = double(llJitterSumAvg) / NB_JITTER;
-	double DeviationSum = 0;
+	m_fJitterMean = double(llJitterSum) / NB_JITTER;
 
-	for (int i=0; i<NB_JITTER; i++) {
-		double deviation = m_pllJitter[i] - m_fJitterMean;
+	double DeviationSum = 0;
+	for (const auto& jitter : m_llJitters) {
+		double deviation = jitter - m_fJitterMean;
 		DeviationSum += deviation * deviation;
 		LONGLONG deviationInt = std::llround(deviation);
 		expand_range(deviationInt, m_MinJitter, m_MaxJitter);
@@ -1090,18 +1087,18 @@ void CBaseAP::SyncStats(LONGLONG syncTime)
 void CBaseAP::SyncOffsetStats(LONGLONG syncOffset)
 {
 	m_nNextSyncOffset = (m_nNextSyncOffset+1) % NB_JITTER;
-	m_pllSyncOffset[m_nNextSyncOffset] = syncOffset;
+	m_llSyncOffsets[m_nNextSyncOffset] = syncOffset;
 
 	LONGLONG AvrageSum = 0;
-	for (int i=0; i<NB_JITTER; i++) {
-		LONGLONG Offset = m_pllSyncOffset[i];
-		AvrageSum += Offset;
-		expand_range(Offset, m_MinSyncOffset, m_MaxSyncOffset);
+	for (const auto& offset : m_llSyncOffsets) {
+		AvrageSum += offset;
+		expand_range(offset, m_MinSyncOffset, m_MaxSyncOffset);
 	}
 	double MeanOffset = double(AvrageSum)/NB_JITTER;
+
 	double DeviationSum = 0;
-	for (int i=0; i<NB_JITTER; i++) {
-		double Deviation = double(m_pllSyncOffset[i]) - MeanOffset;
+	for (const auto& offset : m_llSyncOffsets) {
+		double Deviation = double(offset) - MeanOffset;
 		DeviationSum += Deviation*Deviation;
 	}
 	double StdDev = sqrt(DeviationSum/NB_JITTER);
@@ -1750,7 +1747,7 @@ void CBaseAP::DrawStats()
 			if (nIndex < 0) {
 				nIndex += NB_JITTER;
 			}
-			double Jitter = m_pllJitter[nIndex] - m_fJitterMean;
+			double Jitter = m_llJitters[nIndex] - m_fJitterMean;
 			Points[i].x  = (FLOAT)(StartX + (i * 5));
 			Points[i].y  = (FLOAT)(StartY + (Jitter / 2000.0 + 125.0));
 		}
@@ -1763,7 +1760,7 @@ void CBaseAP::DrawStats()
 					nIndex += NB_JITTER;
 				}
 				Points[i].x  = (FLOAT)(StartX + (i * 5));
-				Points[i].y  = (FLOAT)(StartY + ((m_pllSyncOffset[nIndex]) / 2000 + 125));
+				Points[i].y  = (FLOAT)(StartY + ((m_llSyncOffsets[nIndex]) / 2000 + 125));
 			}
 			m_pLine->Draw(Points, NB_JITTER, D3DCOLOR_XRGB(100, 200, 100));
 		}

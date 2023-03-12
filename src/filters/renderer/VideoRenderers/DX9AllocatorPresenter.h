@@ -134,8 +134,8 @@ namespace DSObjects
 		double					m_ldDetectedScanlineRateList[100];
 		unsigned				m_DetectedRefreshRatePos;
 		bool					m_bSyncStatsAvailable;
-		int						m_pJitter [NB_JITTER];			// Jitter buffer for stats
-		LONGLONG				m_pllSyncOffset [NB_JITTER];	// Sync offset time stats
+		int						m_Jitters[NB_JITTER];       // Jitter buffer for stats
+		LONGLONG				m_llSyncOffsets[NB_JITTER]; // Sync offset time stats
 		LONGLONG				m_llLastPerf;
 		LONGLONG				m_JitterStdDev;
 		LONGLONG				m_MaxJitter;

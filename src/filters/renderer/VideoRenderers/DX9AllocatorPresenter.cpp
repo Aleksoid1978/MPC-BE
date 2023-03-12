@@ -413,8 +413,8 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	ZeroMemory(m_ldDetectedRefreshRateList, sizeof(m_ldDetectedRefreshRateList));
 	ZeroMemory(m_ldDetectedScanlineRateList, sizeof(m_ldDetectedScanlineRateList));
 
-	ZeroMemory(m_pJitter, sizeof(m_pJitter));
-	ZeroMemory(m_pllSyncOffset, sizeof(m_pllSyncOffset));
+	ZeroMemory(m_Jitters, sizeof(m_Jitters));
+	ZeroMemory(m_llSyncOffsets, sizeof(m_llSyncOffsets));
 
 	ZeroMemory(m_TimeChangeHistory, sizeof(m_TimeChangeHistory));
 	ZeroMemory(m_ClockChangeHistory, sizeof(m_ClockChangeHistory));
@@ -941,7 +941,7 @@ void CDX9AllocatorPresenter::CalculateJitter(LONGLONG PerfCounter)
 	LONGLONG curJitter = PerfCounter - m_llLastPerf;
 	if (llabs(curJitter) <= (INT_MAX / NB_JITTER)) { // filter out very large jetter values
 		m_nNextJitter = (m_nNextJitter + 1) % NB_JITTER;
-		m_pJitter[m_nNextJitter] = (int)curJitter;
+		m_Jitters[m_nNextJitter] = (int)curJitter;
 
 		m_MaxJitter = MINLONG64;
 		m_MinJitter = MAXLONG64;
@@ -951,18 +951,18 @@ void CDX9AllocatorPresenter::CalculateJitter(LONGLONG PerfCounter)
 		int OneSecSum = 0;
 		int OneSecCount = 0;
 		for (unsigned i = 0; i < NB_JITTER; i++) {
-			JitterSum += m_pJitter[i];
+			JitterSum += m_Jitters[i];
 			if (OneSecSum < 10000000) {
 				unsigned index = (NB_JITTER + m_nNextJitter - i) % NB_JITTER;
-				OneSecSum += m_pJitter[index];
+				OneSecSum += m_Jitters[index];
 				OneSecCount++;
 			}
 		}
 
 		int FrameTimeMean = JitterSum / NB_JITTER;
 		__int64 DeviationSum = 0;
-		for (int i = 0; i < NB_JITTER; i++) {
-			int Deviation = m_pJitter[i] - FrameTimeMean;
+		for (const auto& jitter : m_Jitters) {
+			int Deviation = jitter - FrameTimeMean;
 			DeviationSum += (__int64)Deviation * Deviation;
 			if (m_MaxJitter < Deviation) m_MaxJitter = Deviation;
 			if (m_MinJitter > Deviation) m_MinJitter = Deviation;
@@ -2132,7 +2132,7 @@ void CDX9AllocatorPresenter::DrawStats()
 		if (m_rtTimePerFrame) {
 			for (unsigned i = 0; i < NB_JITTER; i++) {
 				unsigned index = (m_nNextJitter + 1 + i) % NB_JITTER;
-				float jitter = float(m_pJitter[index] - m_iJitterMean);
+				float jitter = float(m_Jitters[index] - m_iJitterMean);
 
 				Points[i].x = StartX + i * StepX;
 				Points[i].y = StartY + (jitter * ScaleY / 5000.0f + DrawHeight / 2.0f);
@@ -2144,7 +2144,7 @@ void CDX9AllocatorPresenter::DrawStats()
 				for (unsigned i = 0; i < NB_JITTER; i++) {
 					unsigned index = (m_nNextSyncOffset + 1 + i) % NB_JITTER;
 					Points[i].x = StartX + i * StepX;
-					Points[i].y = StartY + (m_pllSyncOffset[index] * ScaleY / 5000.0f + DrawHeight / 2.0f);
+					Points[i].y = StartY + (m_llSyncOffsets[index] * ScaleY / 5000.0f + DrawHeight / 2.0f);
 				}
 				m_pLine->Draw(Points, NB_JITTER, D3DCOLOR_XRGB(100, 200, 100));
 			}
