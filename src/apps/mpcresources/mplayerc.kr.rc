@@ -152,7 +152,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,178,133,109,12
     GROUPBOX        "",IDC_STATIC,5,154,285,49
     CONTROL         "FFmpeg 필터",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,153,61,10
-    PUSHBUTTON      "Presets",IDC_BUTTON1,9,166,59,14
+    PUSHBUTTON      "프리셋",IDC_BUTTON1,9,166,59,14
     COMBOBOX        IDC_COMBO1,10,184,58,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_EDIT1,72,184,214,14,ES_AUTOHSCROLL
     GROUPBOX        "출력 샘플 형식 :",IDC_STATIC,5,206,286,29
@@ -861,7 +861,7 @@ BEGIN
     GROUPBOX        "EVR-CP 및 EVR 싱크 설정",IDC_STATIC,5,37,285,137
     CONTROL         "D3D9 렌더러를 선택",IDC_D3D9DEVICE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,120,10
     COMBOBOX        IDC_D3D9DEVICE_COMBO,144,49,142,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "추가 창에서 배타적 전체 화면 보기",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
+    CONTROL         "추가 창에서 전체 화면 전용으로 보기",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,79,224,10
     CONTROL         "10비트 RGB 출력",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,92,92,10
     CONTROL         "디스플레이 바꾸면 초기화",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_TOP | WS_TABSTOP,10,65,164,9
@@ -877,9 +877,9 @@ BEGIN
     LTEXT           "출력 범위 :",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "MPC 비디오 렌더러 정",IDC_STATIC,5,177,285,27
-    CONTROL         "추가 창에서 배타적 전체 화면(실험)",IDC_CHECK2,
+    CONTROL         "추가 창에서 전체 화면 전용(실험)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
-    GROUPBOX        "플레이밍",IDC_STATIC,5,208,210,53
+    GROUPBOX        "비디오 프레임",IDC_STATIC,5,208,210,53
     LTEXT           "기본 모드 :",IDC_STATIC,10,220,74,8
     COMBOBOX        IDC_COMBO8,88,218,124,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "살짝 확대하면 크기 조정 안 함",IDC_CHECK7,
@@ -1651,7 +1651,7 @@ BEGIN
             MENUITEM SEPARATOR
             POPUP "프레젠테이션"
             BEGIN
-                MENUITEM "배타적 전체 화면",        ID_VIEW_EXCLUSIVE_FULLSCREEN
+                MENUITEM "전체 화면 전용",        ID_VIEW_EXCLUSIVE_FULLSCREEN
                 MENUITEM "프레임 시간수정 사용",                 ID_VIEW_ENABLEFRAMETIMECORRECTION
             END
             MENUITEM "기본값으로 초기화", ID_VIEW_RESET_DEFAULT
@@ -1838,7 +1838,7 @@ BEGIN
             MENUITEM SEPARATOR
             POPUP "프레젠테이션"
             BEGIN
-                MENUITEM "배타적 전체 화면",        ID_VIEW_EXCLUSIVE_FULLSCREEN
+                MENUITEM "전체 화면 전용",        ID_VIEW_EXCLUSIVE_FULLSCREEN
                 MENUITEM "프레임 시간 수정 사용",                 ID_VIEW_ENABLEFRAMETIMECORRECTION
             END
             MENUITEM "기본값으로 초기화", ID_VIEW_RESET_DEFAULT
@@ -1930,7 +1930,7 @@ BEGIN
                 MENUITEM SEPARATOR
                 POPUP "프레젠테이션"
                 BEGIN
-                    MENUITEM "배타적 전체 화면",        ID_VIEW_EXCLUSIVE_FULLSCREEN
+                    MENUITEM "전체 화면 전용",        ID_VIEW_EXCLUSIVE_FULLSCREEN
                     MENUITEM "프레임 시간 수정 사용",                 ID_VIEW_ENABLEFRAMETIMECORRECTION
                 END
                 MENUITEM "기본값으로 초기화", ID_VIEW_RESET_DEFAULT
@@ -2010,7 +2010,7 @@ BEGIN
             MENUITEM SEPARATOR
             POPUP "프레젠테이션"
             BEGIN
-                MENUITEM "배타적 전체 화면",        ID_VIEW_EXCLUSIVE_FULLSCREEN
+                MENUITEM "전체 화면 전용",        ID_VIEW_EXCLUSIVE_FULLSCREEN
                 MENUITEM "프레임 시간 수정 사용",                 ID_VIEW_ENABLEFRAMETIMECORRECTION
             END
             MENUITEM "기본값으로 초기화", ID_VIEW_RESET_DEFAULT
@@ -2363,7 +2363,7 @@ BEGIN
     IDS_PLAYLOOPMODE_AB_MARK_A "A-B 반복 : A 위치 지정"
     IDS_PLAYLOOPMODE_AB_MARK_B "A-B 반복 : B 위치 지정"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "클립보드에서 재생목록에 추가"
-    IDS_AUDIO_FILTER_PRESET_1 "For audio with whisper and explosion parts"
+    IDS_AUDIO_FILTER_PRESET_1 "위스퍼 및 폭발음이 포함된 오디오인 경우"
 END
 
 STRINGTABLE
@@ -2501,7 +2501,7 @@ END
 STRINGTABLE
 BEGIN
     IDC_REGULARSURF         "재생할 비디오 표면을 표준 오프스크린으로 위치시킵니다."
-    IDC_DX9RESIZER_COMBO    "그래픽카드에서 필셀셰이더 2.0을 지원하지 않으면 단순 쌍선형이 자동으로 선택됩니다."
+    IDC_DX9RESIZER_COMBO    "그래픽카드에서 픽셀셰이더 2.0을 지원하지 않으면 단순 쌍선형이 자동으로 선택됩니다."
 END
 
 STRINGTABLE
@@ -2556,7 +2556,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_SHADERS_SELECT   "셰이더 선택"
-    IDS_AG_SHADERS_1_ENABLE "필셀 셰이더 토글"
+    IDS_AG_SHADERS_1_ENABLE "픽셀 셰이더 토글"
     IDS_AG_SHADERS_2_ENABLE "화면 픽셀셰이더 토글"
     IDS_OSD_SHADERS_1_ON    "선처리 크기 변경 픽셀 셰이더 : 켜기"
     IDS_OSD_SHADERS_1_OFF   "선처리 크기 변경 픽셀 셰이더 : 끄기"
@@ -2693,8 +2693,8 @@ BEGIN
     IDS_AG_MEDIAFILES       "미디어 파일 (모든 형식)|"
     IDS_AG_ALLFILES         "모든 파일 (*.*)|*.*|"
     IDS_AG_AUDIOFILES       "오디오 파일 (모든 형식)|"
-    IDS_PIXELSHADERCOMPILER_0  "D3DX9_xx.DLL을 불러올 수 없습니다, 필셀셰이더를 사용할 수 없습니다."
-    IDS_PIXELSHADERCOMPILER_1  "D3DX9_xx.DLL의 필수 시작 지점을 찾을 수 없습니다, 필셀셰이더를 사용할 수 없습니다."
+    IDS_PIXELSHADERCOMPILER_0  "D3DX9_xx.DLL을 불러올 수 없습니다, 픽셀셰이더를 사용할 수 없습니다."
+    IDS_PIXELSHADERCOMPILER_1  "D3DX9_xx.DLL의 필수 시작 지점을 찾을 수 없습니다, 픽셀셰이더를 사용할 수 없습니다."
     IDS_AG_NOT_KNOWN        "알려지지 않음"
     IDS_AG_OPEN_FILE        "빠른 파일 열기"
     IDS_AG_OPEN_FILEURL     "파일 열기"
@@ -2930,7 +2930,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_MPLAYERC_99         "배타적 전체 화면 전환"
+    IDS_MPLAYERC_99         "전체 화면 전용으로 전환"
     IDS_MPLAYERC_100        "이전 자막으로"
     IDS_MPLAYERC_101        "다음 자막으로"
     IDS_MPLAYERC_102        "자막 왼쪽으로"
@@ -3150,7 +3150,7 @@ BEGIN
     IDS_AG_REMOVING         "제거 : "
     IDS_MAINFRM_134         "경고 : CMainFrame::CloseMedia() 두 번 이상 호출됨\n"
     IDS_MAINFRM_135         "치명적 에러 : !!! MPC-BE를 종료 !!!"
-    IDS_MAINFRM_136         "MPC-BE 배타적 전체 화면"
+    IDS_MAINFRM_136         "MPC-BE 전체 화면 전용"
     IDS_MAINFRM_137         "알려지지 않은 형식"
     IDS_MAINFRM_138         "자막 싱크 : %ld"
     IDS_VOLUME_GAIN_INC     "음량 증폭 증가"
@@ -3343,7 +3343,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_ARS_WASAPI_MODE     "WASAPI 모드 :"
-    IDS_ARS_EXCLUSIVE       "독점"
+    IDS_ARS_EXCLUSIVE       "전용"
     IDS_ARS_SHARED          "공유"
     IDS_ARS_BITEXACT_OUTPUT "정확한 비트 출력 허용"
     IDS_ARS_SYSTEM_LAYOUT_CHANNELS "시스템 레이아웃 채널 사용"
@@ -3470,7 +3470,7 @@ BEGIN
     IDS_AUDIO_STREAM        "오디오  %u/%u: %s"
     IDS_AG_REOPEN           "파일 다시열기"
     IDS_PROPERTIESFOR       "'%s'에 대한 속성"
-    IDS_AUDIO_ONLY          "audio only"
+    IDS_AUDIO_ONLY          "오디오 강제"
 END
 
 STRINGTABLE
@@ -3593,8 +3593,8 @@ BEGIN
     IDS_OSD_RS_FLUSH_AFT_PRES_OFF "출력 후 GPU 플러싱 : 끄기"
     IDS_OSD_RS_WAIT_ON      "GPU 플러싱 대기 : 켜기"
     IDS_OSD_RS_WAIT_OFF     "GPU 플러싱 대기 : 끄기"
-    IDS_OSD_RS_EXCLUSIVE_FSCREEN_ON "배타적 전체 화면 : 켜기"
-    IDS_OSD_RS_EXCLUSIVE_FSCREEN_OFF "배타적 전체 화면 : 끄기"
+    IDS_OSD_RS_EXCLUSIVE_FSCREEN_ON "전체 화면 전용 : 켜기"
+    IDS_OSD_RS_EXCLUSIVE_FSCREEN_OFF "전체 화면 전용 : 끄기"
 END
 
 STRINGTABLE
