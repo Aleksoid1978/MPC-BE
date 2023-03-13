@@ -78,6 +78,7 @@
 #include "DiskImage.h"
 #include <filters/renderer/VideoRenderers/AllocatorCommon.h>
 #include "MediaControls.h"
+#include <limits>
 
 #define USE_MEDIAINFO_STATIC
 #include <MediaInfo/MediaInfo.h>
@@ -383,13 +384,15 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 		CString Name;
 	};
 
-	BOOL SelectMatchTrack(const std::vector<Stream>& Tracks, CString pattern, const BOOL bExtPrior, size_t& nIdx);
+	BOOL SelectMatchTrack(const std::vector<Stream>& Tracks, CString pattern, const BOOL bExtPrior, size_t& nIdx, bool bAddForcedAndDefault = true);
 
 	std::vector<Stream> m_SubtitlesStreams;
 	void SubFlags(CString strname, bool& forced, bool& def);
 	size_t GetSubSelIdx();
 	int m_nInternalSubsCount;
 	int m_nSelSub2;
+
+	static constexpr size_t NO_SUBTITLES_INDEX = std::numeric_limits<UINT>::max();
 
 	// chapters (file mode)
 	CComPtr<IDSMChapterBag> m_pCB;

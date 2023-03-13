@@ -9885,13 +9885,15 @@ void CMainFrame::SelectSubtilesAMStream(UINT id)
 	}
 
 	if (GetPlaybackMode() == PM_FILE && !m_pDVS) {
-		size_t subStreamCount = 0;
-		for (const auto& pSubStream : m_pSubStreams) {
-			subStreamCount += pSubStream->GetStreamCount();
-		}
+		if (id != NO_SUBTITLES_INDEX) {
+			size_t subStreamCount = 0;
+			for (const auto& pSubStream : m_pSubStreams) {
+				subStreamCount += pSubStream->GetStreamCount();
+			}
 
-		if (id >= (subStreamCount + streamCount)) {
-			id = 0;
+			if (id >= (subStreamCount + streamCount)) {
+				id = 0;
+			}
 		}
 	}
 
@@ -13454,16 +13456,18 @@ void CMainFrame::UpdateWindowTitle()
 	}
 }
 
-BOOL CMainFrame::SelectMatchTrack(const std::vector<Stream>& Tracks, CString pattern, const BOOL bExtPrior, size_t& nIdx)
+BOOL CMainFrame::SelectMatchTrack(const std::vector<Stream>& Tracks, CString pattern, const BOOL bExtPrior, size_t& nIdx, bool bAddForcedAndDefault/* = true*/)
 {
 	CharLowerW(pattern.GetBuffer());
 	pattern.Replace(L"[fc]", L"forced");
 	pattern.Replace(L"[def]", L"default");
-	if (pattern.Find(L"forced") == -1) {
-		pattern.Append(L" forced");
-	}
-	if (pattern.Find(L"default") == -1) {
-		pattern.Append(L" default");
+	if (bAddForcedAndDefault) {
+		if (pattern.Find(L"forced") == -1) {
+			pattern.Append(L" forced");
+		}
+		if (pattern.Find(L"default") == -1) {
+			pattern.Append(L" default");
+		}
 	}
 	pattern.Trim();
 
@@ -13689,13 +13693,18 @@ size_t CMainFrame::GetSubSelIdx()
 		CAppSettings& s = AfxGetAppSettings();
 		CString pattern = s.strSubtitlesLanguageOrder;
 
+		const bool bSubtitlesOffIfPatternNotMatch = EndsWith(pattern, L"[off]");
+		if (bSubtitlesOffIfPatternNotMatch) {
+			pattern.Replace(L"[off]", L"");
+		}
+
 		if (s.fPrioritizeExternalSubtitles) { // try external sub ...
 			size_t nIdx	= 0;
-			BOOL bMatch = SelectMatchTrack(m_SubtitlesStreams, pattern, TRUE, nIdx);
+			BOOL bMatch = SelectMatchTrack(m_SubtitlesStreams, pattern, TRUE, nIdx, !bSubtitlesOffIfPatternNotMatch);
 
 			if (bMatch) {
 				return nIdx;
-			} else {
+			} else if (!bSubtitlesOffIfPatternNotMatch) {
 				for (size_t iIndex = 0; iIndex < m_SubtitlesStreams.size(); iIndex++) {
 					if (m_SubtitlesStreams[iIndex].Ext) {
 						return iIndex;
@@ -13705,10 +13714,14 @@ size_t CMainFrame::GetSubSelIdx()
 		}
 
 		size_t nIdx = 0;
-		BOOL bMatch = SelectMatchTrack(m_SubtitlesStreams, pattern, FALSE, nIdx);
+		BOOL bMatch = SelectMatchTrack(m_SubtitlesStreams, pattern, FALSE, nIdx, !bSubtitlesOffIfPatternNotMatch);
 
 		if (bMatch) {
 			return nIdx;
+		}
+
+		if (bSubtitlesOffIfPatternNotMatch) {
+			return NO_SUBTITLES_INDEX;
 		}
 	}
 
