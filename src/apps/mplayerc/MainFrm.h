@@ -385,10 +385,10 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	BOOL SelectMatchTrack(const std::vector<Stream>& Tracks, CString pattern, const BOOL bExtPrior, size_t& nIdx);
 
-	std::vector<Stream> subarray;
+	std::vector<Stream> m_SubtitlesStreams;
 	void SubFlags(CString strname, bool& forced, bool& def);
 	size_t GetSubSelIdx();
-	int cntintsub;
+	int m_nInternalSubsCount;
 	int m_nSelSub2;
 
 	// chapters (file mode)

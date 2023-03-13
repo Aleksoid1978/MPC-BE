@@ -13685,19 +13685,19 @@ void CMainFrame::SubFlags(CString strname, bool& forced, bool& def)
 
 size_t CMainFrame::GetSubSelIdx()
 {
-	CAppSettings& s	= AfxGetAppSettings();
-	CString pattern	= s.strSubtitlesLanguageOrder;
+	if (m_SubtitlesStreams.size()) {
+		CAppSettings& s = AfxGetAppSettings();
+		CString pattern = s.strSubtitlesLanguageOrder;
 
-	if (subarray.size()) {
 		if (s.fPrioritizeExternalSubtitles) { // try external sub ...
 			size_t nIdx	= 0;
-			BOOL bMatch = SelectMatchTrack(subarray, pattern, TRUE, nIdx);
+			BOOL bMatch = SelectMatchTrack(m_SubtitlesStreams, pattern, TRUE, nIdx);
 
 			if (bMatch) {
 				return nIdx;
 			} else {
-				for (size_t iIndex = 0; iIndex < subarray.size(); iIndex++) {
-					if (subarray[iIndex].Ext) {
+				for (size_t iIndex = 0; iIndex < m_SubtitlesStreams.size(); iIndex++) {
+					if (m_SubtitlesStreams[iIndex].Ext) {
 						return iIndex;
 					}
 				}
@@ -13705,7 +13705,7 @@ size_t CMainFrame::GetSubSelIdx()
 		}
 
 		size_t nIdx = 0;
-		BOOL bMatch = SelectMatchTrack(subarray, pattern, FALSE, nIdx);
+		BOOL bMatch = SelectMatchTrack(m_SubtitlesStreams, pattern, FALSE, nIdx);
 
 		if (bMatch) {
 			return nIdx;
@@ -13729,7 +13729,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 	if (m_pDVS) {
 		int nLangs;
 		if (SUCCEEDED(m_pDVS->get_LanguageCount(&nLangs)) && nLangs) {
-			subarray.clear();
+			m_SubtitlesStreams.clear();
 
 			int subcount = GetStreamCount(2);
 			CComQIPtr<IAMStreamSelect> pSS	= m_pMainSourceFilter.p;
@@ -13743,7 +13743,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 						substream.Index		= i;
 						substream.Ext		= true;
 						substream.Name		= pName;
-						subarray.push_back(substream);
+						m_SubtitlesStreams.push_back(substream);
 
 						CoTaskMemFree(pName);
 					}
@@ -13768,9 +13768,9 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 						substream.Index++;
 						substream.Name = pszName;
 						if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
-							substream.Sel = subarray.size();
+							substream.Sel = m_SubtitlesStreams.size();
 						}
-						subarray.push_back(substream);
+						m_SubtitlesStreams.push_back(substream);
 
 						CoTaskMemFree(pszName);
 					}
@@ -13791,7 +13791,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 							substream.Ext = !!nType;
 						}
 
-						subarray.push_back(substream);
+						m_SubtitlesStreams.push_back(substream);
 
 						CoTaskMemFree(pName);
 					}
@@ -13810,11 +13810,11 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 
 	if (m_pCAP && !m_bAudioOnly) {
 		Stream substream;
-		subarray.clear();
-		int checkedsplsub	= 0;
-		int subIndex		= -1;
-		int iNum			= 0;
-		cntintsub			= 0;
+		m_SubtitlesStreams.clear();
+		int checkedsplsub    = 0;
+		int subIndex         = -1;
+		int iNum             = 0;
+		m_nInternalSubsCount = 0;
 
 		CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter.p;
 		if (!pSS) {
@@ -13849,7 +13849,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 						if (dwFlags) {
 							checkedsplsub = subIndex;
 						}
-						cntintsub++;
+						m_nInternalSubsCount++;
 						substream.Ext		= false;
 						substream.Filter	= 1;
 						substream.Num		= iNum++;
@@ -13862,7 +13862,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 						substream.forced	= Forced;
 						substream.def		= Def;
 
-						subarray.push_back(substream);
+						m_SubtitlesStreams.push_back(substream);
 					}
 
 					if (pName) {
@@ -13876,9 +13876,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			m_pSubStreams.clear();
 		}
 
-		int splsubcnt = subarray.size();
-
-		if (splsubcnt < 1) {
+		if (m_SubtitlesStreams.empty()) {
 			auto it = m_pSubStreams.cbegin();
 			int tPos = -1;
 			while (it != m_pSubStreams.cend()) {
@@ -13888,7 +13886,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 				WCHAR* pName = nullptr;
 				LCID lcid;
 				if (SUCCEEDED(pSubStream->GetStreamInfo(i, &pName, &lcid))) {
-					cntintsub++;
+					m_nInternalSubsCount++;
 
 					substream.Ext		= false;
 					substream.Filter	= 2;
@@ -13902,7 +13900,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 					substream.forced	= Forced;
 					substream.def		= Def;
 
-					subarray.push_back(substream);
+					m_SubtitlesStreams.push_back(substream);
 
 					if (pName) {
 						CoTaskMemFree(pName);
@@ -13926,8 +13924,8 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 		CComPtr<ISubStream> pSubStream;
 		int tPos = -1;
 		int extcnt = -1;
-		for (size_t i = 0; i < subarray.size(); i++) {
-			if (subarray[i].Filter == 2) extcnt++;
+		for (size_t i = 0; i < m_SubtitlesStreams.size(); i++) {
+			if (m_SubtitlesStreams[i].Filter == 2) extcnt++;
 		}
 
 		for (const auto& pSubStream : m_pSubStreams) {
@@ -13950,7 +13948,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 					substream.forced	= Forced;
 					substream.def		= Def;
 
-					subarray.push_back(substream);
+					m_SubtitlesStreams.push_back(substream);
 
 					if (pName) {
 						CoTaskMemFree(pName);
@@ -13977,9 +13975,9 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 
 		if (!s.fUseInternalSelectTrackLogic) {
 			if (s.fPrioritizeExternalSubtitles) {
-				size_t cnt = subarray.size();
+				size_t cnt = m_SubtitlesStreams.size();
 				for (size_t i = 0; i < cnt; i++) {
-					if (subarray[i].Ext)	{
+					if (m_SubtitlesStreams[i].Ext)	{
 						checkedsplsub = i;
 						break;
 					}
@@ -13987,14 +13985,13 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			}
 			SelectSubtilesAMStream(checkedsplsub);
 		} else {
-			int cnt = subarray.size();
 			size_t defsub = GetSubSelIdx();
 
 			if (m_pMainSourceFilter && s.fDisableInternalSubtitles) {
 				defsub++;
 			}
 
-			if (cnt > 0) {
+			if (!m_SubtitlesStreams.empty()) {
 				SelectSubtilesAMStream(defsub);
 			}
 		}
@@ -15411,7 +15408,7 @@ void CMainFrame::SetupSubtilesAMStreamSubMenu(CMenu& submenu, UINT id)
 					CString name(pName);
 					name.Replace(L"&", L"&&");
 
-					if ((splcnt > 0 || (cntintsub == intsub && cntintsub != 0)) && !sep) {
+					if ((splcnt > 0 || (m_nInternalSubsCount == intsub && m_nInternalSubsCount != 0)) && !sep) {
 						submenu.AppendMenu(MF_SEPARATOR);
 						sep = true;
 					}
@@ -15421,7 +15418,7 @@ void CMainFrame::SetupSubtilesAMStreamSubMenu(CMenu& submenu, UINT id)
 					if (m_iSubtitleSel == tPos) {
 						flags |= MF_CHECKED | MFT_RADIOCHECK;
 					}
-					if (cntintsub <= intsub) {
+					if (m_nInternalSubsCount <= intsub) {
 						name = L"* " + name;
 					}
 					submenu.AppendMenu(flags, id++, name);
@@ -15434,7 +15431,7 @@ void CMainFrame::SetupSubtilesAMStreamSubMenu(CMenu& submenu, UINT id)
 						flags |= MF_CHECKED | MFT_RADIOCHECK;
 					}
 					CString sname;
-					if (cntintsub <= intsub) {
+					if (m_nInternalSubsCount <= intsub) {
 						sname = L"* " + ResStr(IDS_AG_UNKNOWN);
 					}
 					submenu.AppendMenu(flags, id++, sname);
