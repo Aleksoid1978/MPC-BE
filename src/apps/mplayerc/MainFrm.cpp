@@ -13470,9 +13470,8 @@ BOOL CMainFrame::SelectMatchTrack(const std::vector<Stream>& Tracks, CString pat
 	auto random_string = [](const int length) {
 		constexpr wchar_t characters[] = L"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-		std::random_device random_device;
-		std::mt19937 generator(random_device());
-		std::uniform_int_distribution<> distribution(0, std::size(characters) - 2);
+		static std::mt19937 generator(std::random_device{}());
+		static std::uniform_int_distribution<> distribution(0, std::size(characters) - 2);
 
 		CString random_string; random_string.Preallocate(length);
 		for (int i = 0; i < length; i++) {
