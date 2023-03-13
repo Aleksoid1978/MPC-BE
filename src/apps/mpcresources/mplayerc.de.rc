@@ -152,7 +152,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,178,133,109,12
     GROUPBOX        "",IDC_STATIC,5,154,285,49
     CONTROL         "FFmpeg Filter",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,153,61,10
-    PUSHBUTTON      "Presets",IDC_BUTTON1,9,166,59,14
+    PUSHBUTTON      "Voreinstellungen",IDC_BUTTON1,9,166,59,14
     COMBOBOX        IDC_COMBO1,10,184,58,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_EDIT1,72,184,214,14,ES_AUTOHSCROLL
     GROUPBOX        "Ausgabe-Sampleformat",IDC_STATIC,5,206,286,29
@@ -2363,7 +2363,7 @@ BEGIN
     IDS_PLAYLOOPMODE_AB_MARK_A "A-B Wiederholung: Marker A setzen"
     IDS_PLAYLOOPMODE_AB_MARK_B "A-B Wiederholung: Marker B setzen"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Aus der Zwischenablage zur Wiedergabeliste hinzufügen"
-    IDS_AUDIO_FILTER_PRESET_1 "For audio with whisper and explosion parts"
+    IDS_AUDIO_FILTER_PRESET_1 "Für Audio mit Flüster- und Explosionsabschnitten"
 END
 
 STRINGTABLE
@@ -2432,8 +2432,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_SUBDELAY_DEC     "Untertitel verzögern"
-    IDS_AG_SUBDELAY_INC     "Untertitel beschleunigen"
+    IDS_AG_SUBDELAY_DEC     "Untertitelverzögerung -"
+    IDS_AG_SUBDELAY_INC     "Untertitelverzögerung +"
     IDS_FILE_SAVE_THUMBNAILS "Vorschaubilder speichern"
     IDS_OSD_TEST            "OSD Test"
 END
@@ -3072,7 +3072,7 @@ STRINGTABLE
 BEGIN
     IDS_MAINFRM_68          "Seitenverhältnis: %d:%d"
     IDS_MAINFRM_69          "Seitenverhältnis: Standard"
-    IDS_MAINFRM_70          "Audio Verzögerung: %I64dms"
+    IDS_MAINFRM_70          "Audioverzögerung: %I64dms"
     IDS_AG_CHAPTER          "Kapitel %d"
     IDS_MAINFRM_73          "Kann Shader nicht laden: "
     IDS_AG_SHADER           "Shader: "
@@ -3255,7 +3255,7 @@ BEGIN
     IDS_MPEGSPLITTER_SUB_ORDER "Untertitelspuren Reihenfolge:"
     IDS_MPEGSPLITTER_TRUEHD_OUTPUT "Ausgabe von TrueHD und AC-3"
     IDS_MPEGSPLITTER_SUB_EMPTY_PIN "Leeren Untertitel-Pin ausgeben"
-    IDS_MPEGSPLITTER_SUPPORT_MVC "Support 3D MVC Extension"
+    IDS_MPEGSPLITTER_SUPPORT_MVC "Unterstützung der MVC-Erweiterung (3D)"
 END
 
 STRINGTABLE
@@ -3304,7 +3304,7 @@ BEGIN
     IDS_VDF_SCANTYPE_PROGRESSIVE "Progressiv"
     IDS_VDF_COLOR_FMT_CONVERSION "Formatkonvertierung"
     IDS_VDF_COLOR_OUTPUT_FORMATS "Ausgabeformate:"
-    IDS_VDF_COLOR_PRESET    "Preset:"
+    IDS_VDF_COLOR_PRESET    "Voreinstellung:"
     IDS_VDF_COLOR_STANDARD  "Standard:"
     IDS_VDF_COLOR_RGB_LEVELS "RGB-Ausgabebereich:"
 END

@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Informazioni"
 7		"MPC-BE"
 8		"Copyright © 2002-2023 vedi Authors.txt"
@@ -443,7 +443,7 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 17		"Controllo volume automatico"
 18		"Potenzia l'audio"
 24		"Filtri FFmpeg"
-25		"Presets"
+25		"Preimpostazioni"
 28		"Formato di uscita del campione:"
 29		"Int16"
 30		"Int24"
@@ -1329,7 +1329,7 @@ STRING IDS_ARS_WASAPI_MODE		"Modalità WASAPI:"
 STRING IDS_AUDIOWINDOW_COVER		"visualizza copertine degli album"
 STRING IDS_AUDIOWINDOW_HIDE		"nascondi l'area video"
 STRING IDS_AUDIOWINDOW_NONE		"non modificare le dimensioni della finestra"
-STRING IDS_AUDIO_FILTER_PRESET_1		"For audio with whisper and explosion parts"
+STRING IDS_AUDIO_FILTER_PRESET_1		"Per audio con parti sussurrate ed esplosive"
 STRING IDS_AUDIO_GAIN		"Guadagno (%+.1f dB):"
 STRING IDS_AUDIO_LEVEL		"Livello (%d):"
 STRING IDS_AUDIO_ONLY		"solo audio"
