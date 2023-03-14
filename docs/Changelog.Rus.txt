@@ -39,6 +39,7 @@ YouTube
 Обновлены библиотеки:
 	dav1d git-1.0.0-115-g9b4b244;
 	ffmpeg git-n5.2-dev-2610-ga6e9d01f88;
+	Little-CMS git-lcms2.15-19-gef21b76;
 	MediaInfo git-v22.12-120-gaad98a4e1;
 	zlib 1.2.13;
 

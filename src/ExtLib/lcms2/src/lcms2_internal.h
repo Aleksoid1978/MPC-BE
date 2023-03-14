@@ -1,7 +1,7 @@
 
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2022 Marti Maria Saguer
+//  Copyright (c) 1998-2023 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -811,6 +811,9 @@ typedef struct _cms_iccprofile_struct {
     // Creation time
     struct tm                Created;
 
+    // Color management module identification
+    cmsUInt32Number          CMM;
+
     // Only most important items found in ICC profiles
     cmsUInt32Number          Version;
     cmsProfileClassSignature DeviceClass;
@@ -818,6 +821,7 @@ typedef struct _cms_iccprofile_struct {
     cmsColorSpaceSignature   PCS;
     cmsUInt32Number          RenderingIntent;
 
+    cmsPlatformSignature     platform;
     cmsUInt32Number          flags;
     cmsUInt32Number          manufacturer, model;
     cmsUInt64Number          attributes;
