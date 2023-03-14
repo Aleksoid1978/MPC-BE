@@ -690,7 +690,8 @@ static int hls_slice_header(HEVCContext *s)
                    sh->slice_type);
             return AVERROR_INVALIDDATA;
         }
-        if (IS_IRAP(s) && sh->slice_type != HEVC_SLICE_I) {
+        if (IS_IRAP(s) && sh->slice_type != HEVC_SLICE_I &&
+            !s->ps.pps->pps_curr_pic_ref_enabled_flag) {
             av_log(s->avctx, AV_LOG_ERROR, "Inter slices in an IRAP frame.\n");
             return AVERROR_INVALIDDATA;
         }
@@ -861,6 +862,14 @@ static int hls_slice_header(HEVCContext *s)
                        sh->max_num_merge_cand);
                 return AVERROR_INVALIDDATA;
             }
+
+            // Syntax in 7.3.6.1
+            if (s->ps.sps->motion_vector_resolution_control_idc == 2)
+                sh->use_integer_mv_flag = get_bits1(gb);
+            else
+                // Inferred to be equal to motion_vector_resolution_control_idc if not present
+                sh->use_integer_mv_flag = s->ps.sps->motion_vector_resolution_control_idc;
+
         }
 
         sh->slice_qp_delta = get_se_golomb(gb);
@@ -876,6 +885,12 @@ static int hls_slice_header(HEVCContext *s)
         } else {
             sh->slice_cb_qp_offset = 0;
             sh->slice_cr_qp_offset = 0;
+        }
+
+        if (s->ps.pps->pps_slice_act_qp_offsets_present_flag) {
+            sh->slice_act_y_qp_offset  = get_se_golomb(gb);
+            sh->slice_act_cb_qp_offset = get_se_golomb(gb);
+            sh->slice_act_cr_qp_offset = get_se_golomb(gb);
         }
 
         if (s->ps.pps->chroma_qp_offset_list_enabled_flag)
@@ -3139,6 +3154,13 @@ static int decode_nal_unit(HEVCContext *s, const H2645NAL *nal)
             if (ret < 0)
                 goto fail;
         } else {
+            if (s->avctx->profile == FF_PROFILE_HEVC_SCC) {
+                av_log(s->avctx, AV_LOG_ERROR,
+                       "SCC profile is not yet implemented in hevc native decoder.\n");
+                ret = AVERROR_PATCHWELCOME;
+                goto fail;
+            }
+
             if (s->threads_number > 1 && s->sh.num_entry_point_offsets > 0)
                 ctb_addr_ts = hls_slice_data_wpp(s, nal);
             else

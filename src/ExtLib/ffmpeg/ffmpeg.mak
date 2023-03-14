@@ -665,6 +665,7 @@ SRCS_LU = \
 	libavutil/channel_layout.c \
 	libavutil/cpu.c \
 	libavutil/crc.c \
+	libavutil/csp.c \
 	libavutil/dict.c \
 	libavutil/display.c \
 	libavutil/dovi_meta.c \
