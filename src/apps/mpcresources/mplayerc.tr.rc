@@ -152,7 +152,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,178,133,109,12
     GROUPBOX        "",IDC_STATIC,5,154,285,49
     CONTROL         "FFmpeg filtreleri",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,153,61,10
-    PUSHBUTTON      "Presets",IDC_BUTTON1,9,166,59,14
+    PUSHBUTTON      "Ön ayarlar",IDC_BUTTON1,9,166,59,14
     COMBOBOX        IDC_COMBO1,10,184,58,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_EDIT1,72,184,214,14,ES_AUTOHSCROLL
     GROUPBOX        "Çıktı örnekleme biçimi:",IDC_STATIC,5,206,286,29
@@ -2363,7 +2363,7 @@ BEGIN
     IDS_PLAYLOOPMODE_AB_MARK_A "A-B Tekrarla: A Konumunu İşaretle"
     IDS_PLAYLOOPMODE_AB_MARK_B "A-B Tekrarla: B Konumunu İşaretle"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Panodan Oynatma Listesine Ekle"
-    IDS_AUDIO_FILTER_PRESET_1 "For audio with whisper and explosion parts"
+    IDS_AUDIO_FILTER_PRESET_1 "Hışırtı ve patlama bölümleri olan ses için"
 END
 
 STRINGTABLE
