@@ -405,35 +405,29 @@ Ztring Export_PBCore2::Transform(MediaInfo_Internal &MI, version Version)
     }
 
     //dateFileModified
-    if (!MI.Get(Stream_General, 0, General_File_Modified_Date).empty())
+    Ztring dateModified=MI.Get(Stream_General, 0, General_File_Modified_Date);
+    if (!dateModified.empty())
     {
-        Ztring dateModified=MI.Get(Stream_General, 0, General_File_Modified_Date);
-        dateModified.FindAndReplace(__T("UTC "), __T(""));
+        dateModified.FindAndReplace(__T(" UTC"), __T("Z"));
         dateModified.FindAndReplace(__T(" "), __T("T"));
-        if (dateModified.size()>=13)
-            dateModified+=__T('Z');
         Node_Main.Add_Child("instantiationDate", dateModified, "dateType", "file modification");
     }
 
     //dateEncoder
-    if (!MI.Get(Stream_General, 0, General_Encoded_Date).empty())
+    Ztring dateEncoded=MI.Get(Stream_General, 0, General_Encoded_Date);
+    if (!dateEncoded.empty())
     {
-        Ztring dateEncoded=MI.Get(Stream_General, 0, General_Encoded_Date);
-        dateEncoded.FindAndReplace(__T("UTC "), __T(""));
+        dateEncoded.FindAndReplace(__T(" UTC"), __T("Z"));
         dateEncoded.FindAndReplace(__T(" "), __T("T"));
-        if (dateEncoded.size()>=13)
-            dateEncoded+=__T('Z');
         Node_Main.Add_Child("instantiationDate", dateEncoded, "dateType", "encoded");
     }
 
     //dateTagged
-    if (!MI.Get(Stream_General, 0, General_Tagged_Date).empty())
+    Ztring dateTagged=MI.Get(Stream_General, 0, General_Tagged_Date);
+    if (!dateTagged.empty())
     {
-        Ztring dateTagged=MI.Get(Stream_General, 0, General_Tagged_Date);
-        dateTagged.FindAndReplace(__T("UTC "), __T(""));
+        dateTagged.FindAndReplace(__T(" UTC"), __T("Z"));
         dateTagged.FindAndReplace(__T(" "), __T("T"));
-        if (dateTagged.size()>=13)
-            dateTagged+=__T('Z');
         Node_Main.Add_Child("instantiationDate", dateTagged, "dateType", "tagged");
     }
 

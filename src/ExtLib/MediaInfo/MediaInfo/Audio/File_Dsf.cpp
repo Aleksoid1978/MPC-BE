@@ -56,7 +56,7 @@ static const char*  DSF_ChannelType[DSF_ChannelType_Size]=
 static const char*  DSF_ChannelType_ChannelLayout[DSF_ChannelType_Size] =
 {
     "",
-    "C",
+    "M",
     "L R",
     "L R C",
     "L R C LFE",

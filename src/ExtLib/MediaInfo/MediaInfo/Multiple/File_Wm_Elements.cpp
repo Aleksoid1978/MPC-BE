@@ -1189,7 +1189,10 @@ void File_Wm::Header_ExtendedContentDescription()
             else if (Name==__T("WM/OriginalAlbumTitle"))
                 Fill(Stream_General, 0, "Original/Album", Value);
             else if (Name==__T("WM/OriginalReleaseTime"))
-                Fill(Stream_General, 0, "Original/Released_Date", Value);
+            {
+                 if (Value.size()<10 || Value.rfind(__T("0001-01-01"), 0)==string::npos)
+                     Fill(Stream_General, 0, "Original/Released_Date", Value);
+            }
             else if (Name==__T("WM/ParentalRating"))
                 Fill(Stream_General, 0, General_LawRating, Value);
             else if (Name==__T("WM/ParentalRatingReason"))

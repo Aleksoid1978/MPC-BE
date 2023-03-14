@@ -1428,13 +1428,11 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version, acquis
     //Current date/time is ISO format
     time_t Seconds=time(NULL);
     Ztring DateTime; DateTime.Date_From_Seconds_1970((int32u)Seconds);
-    if (DateTime.size()>=4 && DateTime[0]==__T('U') && DateTime[1]==__T('T') && DateTime[2]==__T('C') && DateTime[3]==__T(' '))
+    if (!DateTime.empty())
     {
-        DateTime.erase(0, 4);
-        DateTime+=__T('Z');
+        DateTime.FindAndReplace(__T("UTC "), __T(""));
+        DateTime.FindAndReplace(__T(" "), __T("T"));
     }
-    Ztring Date=DateTime.substr(0, 10);
-    Ztring Time=DateTime.substr(11);
 
     size_t As11_Core_Pos=(size_t)-1;
     size_t As11_Segmentation_Pos=(size_t)-1;
@@ -1478,7 +1476,9 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version, acquis
         Node_CoreMain->Add_Attribute("writingLibraryName", "MediaInfoLib");
         Node_CoreMain->Add_Attribute("writingLibraryVersion", MediaInfoLib::Config.Info_Version_Get().SubString(__T(" - v"), Ztring()));
     }
+    Ztring Date=DateTime.substr(0, 10);
     Node_CoreMain->Add_Attribute("dateLastModified", Date);
+    Ztring Time=DateTime.substr(11);
     Node_CoreMain->Add_Attribute("timeLastModified", Time);
 
     //coreMetadata
@@ -1780,34 +1780,32 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version, acquis
     if (!MI.Get(Stream_General, 0, General_Encoded_Date).empty())
     {
         Ztring DateTime=MI.Get(Stream_General, 0, General_Encoded_Date);
-        if (DateTime.size()>=4 && DateTime[0]==__T('U') && DateTime[1]==__T('T') && DateTime[2]==__T('C') && DateTime[3]==__T(' '))
-        {
-            DateTime.erase(0, 4);
-            DateTime+=__T('Z');
-        }
-        Ztring Date=DateTime.substr(0, 10);
-        Ztring Time=DateTime.substr(11);
-
+        if (DateTime.size()>=4 && DateTime.find(__T(" UTC"), DateTime.size()-4)!=string::npos)
+            DateTime.erase(DateTime.size()-4);
         Node* Child=Node_Format->Add_Child("ebucore:dateCreated", true);
+        Ztring Date=DateTime.substr(0, 10);
         Child->Add_Attribute("startDate", Date);
-        Child->Add_Attribute("startTime", Time);
+        if (DateTime.size()>11)
+        {
+            Ztring Time=DateTime.substr(11);
+            Child->Add_Attribute("startTime", Time);
+        }
     }
 
     //format - dateModified
     if (!MI.Get(Stream_General, 0, General_Tagged_Date).empty())
     {
         Ztring DateTime=MI.Get(Stream_General, 0, General_Tagged_Date);
-        if (DateTime.size()>=4 && DateTime[0]==__T('U') && DateTime[1]==__T('T') && DateTime[2]==__T('C') && DateTime[3]==__T(' '))
-        {
-            DateTime.erase(0, 4);
-            DateTime+=__T('Z');
-        }
-        Ztring Date=DateTime.substr(0, 10);
-        Ztring Time=DateTime.substr(11);
-
+        if (DateTime.size()>=4 && DateTime.find(__T(" UTC"), DateTime.size()-4)!=string::npos)
+            DateTime.erase(DateTime.size()-4);
         Node* Child=Node_Format->Add_Child("ebucore:dateModified", true);
+        Ztring Date=DateTime.substr(0, 10);
         Child->Add_Attribute("startDate", Date);
-        Child->Add_Attribute("startTime", Time);
+        if (DateTime.size()>11)
+        {
+            Ztring Time=DateTime.substr(11);
+            Child->Add_Attribute("startTime", Time);
+        }
     }
 
     if (!UseExternalMetaData)

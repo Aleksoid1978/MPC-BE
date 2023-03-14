@@ -10,8 +10,9 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "MediaInfo/File__Analyze.h"
-#include <cstring>
+#include "ZenLib/Conf.h"
+#include <string>
+using namespace ZenLib;
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -143,7 +144,7 @@ public:
     TimeCode (int64s Frames, int32u FramesMax, bool DropFrame, bool MustUseSecondField=false, bool IsSecondField_=false);
     TimeCode(const char* Value, size_t Length); // return false if all fine
     TimeCode(const char* Value) { *this = TimeCode(Value, strlen(Value)); }
-    TimeCode(const string& Value) { *this = TimeCode(Value.c_str(), Value.size()); }
+    TimeCode(const std::string& Value) { *this = TimeCode(Value.c_str(), Value.size()); }
 
     //Operators
     TimeCode& operator +=(const TimeCode& b)
@@ -168,18 +169,18 @@ public:
         Flags.set(IsTime, IsTimeSav);
         return *this;
     }
-    TimeCode& operator +=(const int64s Frames)
+    TimeCode& operator +=(const int64s TotalFrames)
     {
-        FromFrames(ToFrames()+Frames);
+        FromFrames(ToFrames()+TotalFrames);
         return *this;
     }
     TimeCode& operator -=(const TimeCode& b)
     {
         return operator-=(b.ToFrames());
     }
-    TimeCode& operator -=(const int64s)
+    TimeCode& operator -=(const int64s TotalFrames)
     {
-        FromFrames(ToFrames()-Frames);
+        FromFrames(ToFrames()-TotalFrames);
         return *this;
     }
     TimeCode &operator ++()
@@ -279,9 +280,9 @@ public:
     void MinusOne();
     bool FromString(const char* Value, size_t Length); // return false if all fine
     bool FromString(const char* Value) {return FromString(Value, strlen(Value));}
-    bool FromString(const string& Value) {return FromString(Value.c_str(), Value.size());}
+    bool FromString(const std::string& Value) {return FromString(Value.c_str(), Value.size());}
     bool FromFrames(int64s Value);
-    string ToString() const;
+    std::string ToString() const;
     int64s ToFrames() const;
     int64s ToMilliseconds() const;
 
@@ -330,8 +331,8 @@ private:
     bitset8 Flags;
 };
 
-Ztring Date_MJD(int16u Date);
-Ztring Time_BCD(int32u Time);
+std::string Date_MJD(uint16_t Date);
+std::string Time_BCD(uint32_t Time);
 
 } //NameSpace
 

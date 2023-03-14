@@ -37,13 +37,17 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-extern const size_t Aac_sampling_frequency_Size=13;
-extern const size_t Aac_sampling_frequency_Size_Usac=31; // USAC expands Aac_sampling_frequency[]
-extern const int32u Aac_sampling_frequency[Aac_sampling_frequency_Size_Usac]=
-{96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050,
- 16000, 12000, 11025,  8000,  7350,     0,     0, 57600,
- 51200, 40000, 38400, 34150, 28800, 25600, 20000, 19200,
- 17075, 14400, 12800,  9600,     0,     0,     0};
+extern const int32u Aac_sampling_frequency[]=
+{
+     96000, 88200, 64000, 48000,
+     44100, 32000, 24000, 22050,
+     16000, 12000, 11025,  8000,
+      7350,     0,     0, 57600,
+     51200, 40000, 38400, 34150,
+     28800, 25600, 20000, 19200,
+     17075, 14400, 12800,  9600,
+         0,     0,     0,
+};
 
 //---------------------------------------------------------------------------
 static const char* Aac_Adts_ID[]=
@@ -162,8 +166,6 @@ const char* Aac_audioObjectType(int8u audioObjectType)
 }
 
 //---------------------------------------------------------------------------
-extern const int8u Aac_Channels_Size_Usac=14;
-extern const int8u Aac_Channels_Size=21;
 extern const int8u Aac_Channels[Aac_Channels_Size]=
 {
     0,
@@ -374,8 +376,6 @@ static const char* const Aac_OutputChannelPosition[Aac_OutputChannelPosition_Siz
 };
 extern string Aac_OutputChannelPosition_GetString(int8u OutputChannelPosition)
 {
-    if (!OutputChannelPosition)
-        return string();
     if (OutputChannelPosition>=Aac_OutputChannelPosition_Size)
         return "OutputChannelPosition"+Ztring::ToZtring(OutputChannelPosition).To_UTF8();
 
@@ -401,12 +401,18 @@ extern string Aac_ChannelLayout_GetString(const Aac_OutputChannel* const OutputC
     Value.resize(Value.size()-1);
     return Value;
 }
-extern string Aac_ChannelLayout_GetString(int8u ChannelLayout, bool IsMpegh3da=false)
+string Aac_ChannelLayout_GetString(int8u ChannelLayout, bool IsMpegh3da=false, bool IsTip=false)
 {
     if (!ChannelLayout)
         return string();
+    if (ChannelLayout==1)
+        return IsTip?" (M)":"M";
     if (ChannelLayout>=(IsMpegh3da?Aac_Channels_Size:Aac_Channels_Size_Usac))
+    {
+        if (IsTip)
+            return {};
         return "ChannelLayout"+Ztring::ToZtring(ChannelLayout).To_UTF8();
+    }
 
     // Compute start/end in Aac_ChannelLayout array
     int Aac_ChannelLayout_Start=0;
@@ -415,7 +421,10 @@ extern string Aac_ChannelLayout_GetString(int8u ChannelLayout, bool IsMpegh3da=f
     int Aac_ChannelLayout_End=Aac_ChannelLayout_Start+Aac_Channels[ChannelLayout];
 
     // Build the string
-    return Aac_ChannelLayout_GetString((IsMpegh3da?Aac_ChannelLayout_MpegH:Aac_ChannelLayout)+Aac_ChannelLayout_Start, Aac_ChannelLayout_End-Aac_ChannelLayout_Start);
+    auto V=Aac_ChannelLayout_GetString((IsMpegh3da?Aac_ChannelLayout_MpegH:Aac_ChannelLayout)+Aac_ChannelLayout_Start, Aac_ChannelLayout_End-Aac_ChannelLayout_Start);
+    if (IsTip)
+        return " ("+V+')';
+    return V;
 }
 extern string Aac_ChannelLayout_GetString(const vector<Aac_OutputChannel>& OutputChannels)
 {
@@ -516,6 +525,8 @@ extern string Aac_ChannelMode_GetString(int8u ChannelLayout, bool IsMpegh3da=fal
 {
     if (!ChannelLayout)
         return string();
+    if (ChannelLayout==1)
+        return "M";
     if (ChannelLayout>=(IsMpegh3da?Aac_Channels_Size:Aac_Channels_Size_Usac))
         return "ChannelLayout"+Ztring::ToZtring(ChannelLayout).To_UTF8();
 
@@ -773,7 +784,7 @@ void File_Aac::AudioSpecificConfig (size_t End)
         Skip_BS(Data_BS_Remain()-End,                           LastByte?"Unknown":"Padding");
     }
 
-    FILLING_BEGIN();
+    //FILLING_BEGIN();
         AudioSpecificConfig_OutOfBand (Frequency_b, audioObjectType, sbrData, psData, sbrPresentFlag, psPresentFlag);
         if (Frame_Count==(size_t)-1)
         {
@@ -782,7 +793,7 @@ void File_Aac::AudioSpecificConfig (size_t End)
             else
                 File__Analyze::Finish();
         }
-    FILLING_END()
+    //FILLING_END()
 }
 
 //---------------------------------------------------------------------------

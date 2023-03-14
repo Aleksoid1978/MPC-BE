@@ -1368,7 +1368,7 @@ void File_Adm::Streams_Fill()
         FILL_COUNT(audioTrackFormat);
         FILL_COUNT(audioStreamFormat);
     }
-    #if MEDIAINFO_ADVANCED
+    #if MEDIAINFO_CONFORMANCE
     vector<string> Errors_Field[error_Type_Max];
     vector<string> Errors_Value[error_Type_Max];
     MediaInfo_Config::adm_profile Config_AdmProfile=MediaInfoLib::Config.AdmProfile();
@@ -1403,7 +1403,7 @@ void File_Adm::Streams_Fill()
             Fill(StreamKind_Last, StreamPos_Last, P.c_str(), Summary, true);
         }
 
-        #if MEDIAINFO_ADVANCED
+        #if MEDIAINFO_CONFORMANCE
         //TODO: expand this proof of concept
         if (Config_AdmProfile.Ebu3392==1)
         {
@@ -1414,7 +1414,7 @@ void File_Adm::Streams_Fill()
                 Errors_Value[Error].push_back("audioProgrammeName length is more than EBU Tech 3392 constraint");
             }
         }
-        #endif // MEDIAINFO_ADVANCED
+        #endif // MEDIAINFO_CONFORMANCE
     }
 
     FILL_START(audioContent, audioContentName)
@@ -1547,7 +1547,7 @@ void File_Adm::Streams_Fill()
         Fill(Stream_Audio, 0, "PartialDisplay", "Yes");
 
     // Errors
-    #if MEDIAINFO_ADVANCED
+    #if MEDIAINFO_CONFORMANCE
     CheckErrors(File_Adm_Private);
     for (size_t t = 0; t < item_Max; t++) {
         for (size_t i = 0; i < File_Adm_Private->Items[t].Items.size(); i++) {
@@ -1584,7 +1584,7 @@ void File_Adm::Streams_Fill()
             }
         }
     }
-   #endif // MEDIAINFO_ADVANCED
+   #endif // MEDIAINFO_CONFORMANCE
 
     Element_Offset=File_Size;
 }

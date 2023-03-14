@@ -11,6 +11,7 @@
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 // Pre-compilation
 #include "MediaInfo/PreComp.h"
 #ifdef __BORLANDC__
@@ -314,16 +315,15 @@ void MediaInfo_Config_Library_VorbisCom       (InfoMap &Info);
 //---------------------------------------------------------------------------
 // Output formats
 
-static const size_t output_formats_item_size = 3;
-static const char* OutputFormats_JSONFields[output_formats_item_size] =
+static const char* OutputFormats_JSONFields[] =
 {
     "name",
     "desc",
     "mime",
 };
+static const size_t output_formats_item_size = sizeof(OutputFormats_JSONFields) / sizeof(decltype(*OutputFormats_JSONFields));
 typedef const char* output_formats_item[output_formats_item_size];
-static const size_t output_formats_size = 15;
-static output_formats_item OutputFormats[output_formats_size] =
+static output_formats_item OutputFormats[] =
 {
     { "Text",                   "Text",                                                         "text/plain",       },
     { "HTML",                   "HTML",                                                         "text/html",        },
@@ -335,12 +335,15 @@ static output_formats_item OutputFormats[output_formats_size] =
     { "EBUCore_1.8_sp_JSON",    "EBUCore 1.8 (JSON; acq. metadata: segment then parameter)",    "text/json",        },
     { "EBUCore_1.6",            "EBUCore 1.6",                                                  "text/xml",         },
     { "FIMS_1.3",               "FIMS 1.3",                                                     "text/xml",         },
-    { "MPEG-7",                 "MPEG-7",                                                       "text/xml",         },
+    { "MPEG-7_Strict",          "MPEG-7 (Strict)",                                              "text/xml",         },
+    { "MPEG-7_Relaxed",         "MPEG-7 (Relaxed)",                                             "text/xml",         },
+    { "MPEG-7_Extended",        "MPEG-7 (Extended)",                                            "text/xml",         },
     { "PBCore_2.1",             "PBCore 2.1",                                                   "text/xml",         },
     { "PBCore_2.0",             "PBCore 2.0",                                                   "text/xml",         },
     { "PBCore_1.2",             "PBCore 1.2",                                                   "text/xml",         },
     { "NISO_Z39.87",            "NISO Z39.87",                                                  "text/xml",         },
 };
+static const size_t output_formats_size = sizeof(OutputFormats) / sizeof(decltype(*OutputFormats));
 
 //---------------------------------------------------------------------------
 
@@ -483,9 +486,10 @@ void MediaInfo_Config::Init(bool Force)
         Event_CallBackFunction=NULL;
         Event_UserHandler=NULL;
     #endif //MEDIAINFO_EVENTS
-    #if MEDIAINFO_ADVANCED
+    #if MEDIAINFO_CONFORMANCE
+        Usac_Profile=(int8u)-1;
         Warning_Error=false;
-    #endif //MEDIAINFO_EVENTS
+    #endif //MEDIAINFO_CONFORMANCE
     #if defined(MEDIAINFO_LIBCURL_YES)
         URLEncode=URLEncode_Guess;
         Ssh_IgnoreSecurity=false;
@@ -1568,25 +1572,73 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
 
     if (Option_Lower==__T("admprofile"))
     {
-        #if MEDIAINFO_ADVANCED
-            String Value_Lower(Value);
-            transform(Value_Lower.begin(), Value_Lower.end(), Value_Lower.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
-            return AdmProfile(Value_Lower);
-        #else // MEDIAINFO_ADVANCED
-            return __T("advanced features are disabled due to compilation options");
-        #endif // MEDIAINFO_ADVANCED
+        #if MEDIAINFO_CONFORMANCE
+            return Ztring().From_UTF8(AdmProfile(Value));
+        #else // MEDIAINFO_CONFORMANCE
+            return __T("conformance features are disabled due to compilation options");
+        #endif // MEDIAINFO_CONFORMANCE
+    }
+    if (Option_Lower==__T("admprofile_list"))
+    {
+        #if MEDIAINFO_CONFORMANCE
+            return Ztring().From_UTF8(AdmProfile_List());
+        #else // MEDIAINFO_CONFORMANCE
+            return Ztring();
+        #endif // MEDIAINFO_CONFORMANCE
     }
 
+    if (Option_Lower==__T("mp4profile"))
+    {
+        #if MEDIAINFO_CONFORMANCE
+            return Ztring().From_UTF8(Mp4Profile(Value));
+        #else // MEDIAINFO_CONFORMANCE
+            return __T("conformance features are disabled due to compilation options");
+        #endif // MEDIAINFO_CONFORMANCE
+    }
+    if (Option_Lower==__T("mp4profile_list"))
+    {
+        #if MEDIAINFO_CONFORMANCE
+            return Ztring().From_UTF8(Mp4Profile_List());
+        #else // MEDIAINFO_CONFORMANCE
+            return Ztring();
+        #endif // MEDIAINFO_CONFORMANCE
+    }
+
+    if (Option_Lower==__T("usacprofile"))
+    {
+        #if MEDIAINFO_CONFORMANCE
+            return Ztring().From_UTF8(UsacProfile(Value));
+        #else // MEDIAINFO_CONFORMANCE
+            return __T("conformance features are disabled due to compilation options");
+        #endif // MEDIAINFO_CONFORMANCE
+    }
+    if (Option_Lower==__T("usacprofile_list"))
+    {
+        #if MEDIAINFO_CONFORMANCE
+            return Ztring().From_UTF8(UsacProfile_List());
+        #else // MEDIAINFO_CONFORMANCE
+            return Ztring();
+        #endif // MEDIAINFO_CONFORMANCE
+    }
+
+    if (Option_Lower==__T("profile_list"))
+    {
+        #if MEDIAINFO_CONFORMANCE
+            return Ztring().From_UTF8(Profile_List());
+        #else // MEDIAINFO_CONFORMANCE
+            return __T("conformance features are disabled due to compilation options");
+        #endif // MEDIAINFO_CONFORMANCE
+    }
     if (Option_Lower==__T("warning"))
     {
-        #if MEDIAINFO_ADVANCED
+        #if MEDIAINFO_CONFORMANCE
             String Value_Lower(Value);
             transform(Value_Lower.begin(), Value_Lower.end(), Value_Lower.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
             WarningError(Value_Lower==__T("error"));
             return Ztring();
-        #else // MEDIAINFO_ADVANCED
-            return __T("advanced features are disabled due to compilation options");
-        #endif // MEDIAINFO_ADVANCED
+        #else // MEDIAINFO_CONFORMANCE
+            return __T("conformance features are disabled due to compilation options");
+        #endif // MEDIAINFO_CONFORMANCE
     }
 
     if (Option_Lower==__T("info_canhandleurls"))
@@ -3670,64 +3722,198 @@ bool MediaInfo_Config::GraphSvgPluginState()
 #endif //defined(MEDIAINFO_GRAPHVIZ_YES)
 
 //***************************************************************************
-// ADM
+// Default profiles
 //***************************************************************************
 
-#if MEDIAINFO_ADVANCED
-Ztring MediaInfo_Config::AdmProfile(const Ztring& Value)
+#if MEDIAINFO_CONFORMANCE
+string MediaInfo_Config::AdmProfile(const Ztring& Value2)
 {
-    CriticalSectionLocker CSL(CS);
+    Ztring Value(Value2);
+    transform(Value.begin(), Value.end(), Value.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
     ZtringList List;
     List.Separator_Set(0, __T(","));
     List.Write(Value);
-    Adm_Profile=adm_profile();
-    for (size_t i=0; i<List.size(); i++)
+    adm_profile Result;
+    for (const auto& ItemZ : List)
     {
-        if (List[i]==__T("auto"))
-            Adm_Profile.Auto=true;
-        else if (List[i]==__T("itu-r_bs.2076-0"))
-            Adm_Profile.BS2076=0;
-        else if (List[i]==__T("itu-r_bs.2076-1"))
-            Adm_Profile.BS2076=1;
-        else if (List[i]==__T("itu-r_bs.2076-2"))
-            Adm_Profile.BS2076=2;
-        else if (List[i].rfind(__T("urn:ebu:tech:3392:1.0:"))==0)
+        const auto Item = ItemZ.To_UTF8();
+        if (Item == "auto")
+            Adm_Profile.Auto = true;
+        else if (Item == "itu-r_bs.2076-0")
+            Adm_Profile.BS2076 = 0;
+        else if (Item == "itu-r_bs.2076-1")
+            Adm_Profile.BS2076 = 1;
+        else if (Item == "itu-r_bs.2076-2")
+            Adm_Profile.BS2076 = 2;
+        else if (Item.rfind("urn:ebu:tech:3392:1.0:", 0) == 0)
         {
-            if (List[i].size()>22 && List[i][22]>=__T('1') && List[i][22]<=__T('4'))
-                Adm_Profile.Ebu3392=List[i][22]-__T('0');
+            if (Item.size() > 22 && Item[22] >= '1' && Item[22] <= '4')
+                Adm_Profile.Ebu3392 = Item[22] - '0';
             else
-                return __T("Unknown ADM profile ")+Value;
+                return "Unknown ADM profile " + Item;
         }
         else
-            return __T("Unknown ADM profile ")+Value;
+            return "Unknown ADM profile " + Item;
     }
-    return Ztring();
-}
-#endif //MEDIAINFO_ADVANCED
 
-#if MEDIAINFO_ADVANCED
+    CriticalSectionLocker CSL(CS);
+    Adm_Profile = Result;
+    return {};
+}
+#endif //MEDIAINFO_CONFORMANCE
+
+#if MEDIAINFO_CONFORMANCE
+string MediaInfo_Config::AdmProfile_List()
+{
+    string Result;
+    string LineSep = LineSeparator_Get().To_UTF8();
+    for (int8u i = 1; i <= 4; i++)
+    {
+        Result += "urn:ebu:tech:3392:1.0:" + to_string(i);
+        Result += LineSep;
+    }
+    Result.erase(Result.size() - LineSep.size());
+    return Result;
+}
+#endif //MEDIAINFO_CONFORMANCE
+
+#if MEDIAINFO_CONFORMANCE
 MediaInfo_Config::adm_profile MediaInfo_Config::AdmProfile()
 {
     CriticalSectionLocker CSL(CS);
     return Adm_Profile;
 }
+#endif //MEDIAINFO_CONFORMANCE
+
+#if MEDIAINFO_CONFORMANCE
+string MediaInfo_Config::Mp4Profile(const Ztring& Value)
+{
+    ZtringList List;
+    List.Separator_Set(0, __T(","));
+    List.Write(Value);
+    string Temp;
+    for (const auto& ItemZ : List)
+    {
+        const auto Item = ItemZ.To_UTF8();
+        if (false)
+            ;
+        else if (Item == "cmfc" || Item == "cmff" || Item == "cmfl" || Item == "cmfs" || Item == "cmaf")
+            Temp += "cmfc";
+        else
+            return "Unknown MP4 profile " + Item;
+    }
+
+    CriticalSectionLocker CSL(CS);
+    Mp4_Profile = Temp;
+    return {};
+}
+#endif //MEDIAINFO_CONFORMANCE
+
+#if MEDIAINFO_CONFORMANCE
+string MediaInfo_Config::Mp4Profile()
+{
+    CriticalSectionLocker CSL(CS);
+    return Mp4_Profile;
+}
 #endif //MEDIAINFO_ADVANCED
 
-#if MEDIAINFO_ADVANCED
+#if MEDIAINFO_CONFORMANCE
+string MediaInfo_Config::Mp4Profile_List()
+{
+    return "CMAF";
+}
+#endif //MEDIAINFO_CONFORMANCE
+
+#if MEDIAINFO_CONFORMANCE
+extern string Mpeg4_Descriptors_AudioProfileLevelString(int8u AudioProfileLevelIndication);
+string MediaInfo_Config::UsacProfile(const Ztring& ValueZ)
+{
+    auto Value = ValueZ.To_UTF8();
+    if (Value.empty())
+    {
+        CriticalSectionLocker CSL(CS);
+        Usac_Profile = (int8u)-1;
+        return {};
+    }
+    transform(Value.begin(), Value.end(), Value.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+
+    for (int8u AudioProfileLevelIndication = 0; AudioProfileLevelIndication < 0xFF; AudioProfileLevelIndication++)
+    {
+        string Test;
+        switch (AudioProfileLevelIndication)
+        {
+            case 0x00 : Test = "No Profile"; break;
+            case 0xFE : Test = "Unspecified"; break;
+            case 0xFF : Test = "No Audio"; break;
+            default   : Test = Mpeg4_Descriptors_AudioProfileLevelString(AudioProfileLevelIndication);
+        }
+        transform(Test.begin(), Test.end(), Test.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+        if (Test == Value)
+        {
+            CriticalSectionLocker CSL(CS);
+            Usac_Profile = AudioProfileLevelIndication;
+            return {};
+        }
+    }
+
+    return "Unknown USAC profile " + Value;
+}
+#endif //MEDIAINFO_ADVANCED
+
+#if MEDIAINFO_CONFORMANCE
+int8u MediaInfo_Config::UsacProfile()
+{
+    CriticalSectionLocker CSL(CS);
+    return Usac_Profile;
+}
+#endif //MEDIAINFO_CONFORMANCE
+
+#if MEDIAINFO_CONFORMANCE
+string MediaInfo_Config::UsacProfile_List()
+{
+    string LineSep = LineSeparator_Get().To_UTF8();
+    string Result;
+    Result += "No Profile";
+    Result += LineSep;
+    for (int8u AudioProfileLevelIndication = 1; AudioProfileLevelIndication < 0xFE; AudioProfileLevelIndication++)
+    {
+        auto Temp = Mpeg4_Descriptors_AudioProfileLevelString(AudioProfileLevelIndication);
+        if (!Temp.empty())
+        {
+            Result += LineSep;
+            Result += Temp;
+        }
+    }
+    Result += "Unspecified";
+    Result += LineSep;
+    Result += "No Audio";
+    return Result;
+}
+#endif //MEDIAINFO_CONFORMANCE
+
+#if MEDIAINFO_CONFORMANCE
+string MediaInfo_Config::Profile_List()
+{
+    auto LineSep = LineSeparator_Get().To_UTF8();
+    return "ADM" + LineSep + "MP4" + LineSep + "USAC";
+}
+#endif //MEDIAINFO_CONFORMANCE
+
+#if MEDIAINFO_CONFORMANCE
 void MediaInfo_Config::WarningError(bool Value)
 {
     CriticalSectionLocker CSL(CS);
     Warning_Error=Value;
 }
-#endif //MEDIAINFO_ADVANCED
+#endif //MEDIAINFO_CONFORMANCE
 
-#if MEDIAINFO_ADVANCED
+#if MEDIAINFO_CONFORMANCE
 bool MediaInfo_Config::WarningError()
 {
     CriticalSectionLocker CSL(CS);
     return Warning_Error;
 }
-#endif //MEDIAINFO_ADVANCED
+#endif //MEDIAINFO_CONFORMANCE
 
 //***************************************************************************
 // Curl

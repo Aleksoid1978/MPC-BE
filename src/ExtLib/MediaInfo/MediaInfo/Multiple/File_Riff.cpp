@@ -80,6 +80,24 @@ namespace Elements
     const int32u WAVE_ds64=0x64733634;
 }
 
+//---------------------------------------------------------------------------
+const char* Format_Settings_Names_Video[]=
+{
+    "BitmapInfoHeader",                 // BITMAPINFOHEADER, https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapinfoheader
+};
+const char* Format_Settings_Names_Audio[]=
+{
+    "WaveFormat",                       // WAVEFORMAT, https://learn.microsoft.com/en-us/windows/win32/api/mmreg/ns-mmreg-waveformat
+    "PcmWaveformat",                    // PCMWAVEFORMAT, https://learn.microsoft.com/en-us/windows/win32/api/mmreg/ns-mmreg-pcmwaveformat
+    "WaveFormatEx",                     // WAVEFORMATEX, https://learn.microsoft.com/en-us/windows/win32/api/mmreg/ns-mmreg-waveformatex
+    "WaveFormatExtensible",             // WAVEFORMATEXTENSIBLE, https://learn.microsoft.com/en-us/windows/win32/api/mmreg/ns-mmreg-waveformatextensible
+};
+const char** Format_Settings_Names[] =
+{
+    Format_Settings_Names_Video,
+    Format_Settings_Names_Audio,
+};
+
 //***************************************************************************
 // Format
 //***************************************************************************
@@ -130,6 +148,8 @@ File_Riff::File_Riff()
     SMV_BlockSize=0;
     SamplesPerSec=0;
     stream_Count=0;
+    Format_Settings[0]=0;
+    Format_Settings[1]=0;
     BlockAlign=0;
     rec__Present=false;
     NeedOldIndex=true;
@@ -604,6 +624,11 @@ void File_Riff::Streams_Finish ()
     if (Interleaved0_1 && Interleaved0_10 && Interleaved1_1 && Interleaved1_10)
         Fill(Stream_General, 0, General_Interleaved, ((Interleaved0_1<Interleaved1_1 && Interleaved0_10>Interleaved1_1)
                                                    || (Interleaved1_1<Interleaved0_1 && Interleaved1_10>Interleaved0_1))?"Yes":"No");
+
+    //Settings
+    for (size_t i=0; i<2; i++)
+        if (Format_Settings[i])
+            Fill(Stream_General, 0, General_Format_Settings, Format_Settings_Names[i][Format_Settings[i]-1]);
 
     //MD5
     size_t Pos=0;

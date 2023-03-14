@@ -596,8 +596,8 @@ static const char* AC4_nonstd_bed_channel_assignment_mask_ChannelLayout_List[17+
     "Rb",
     "Tfl",
     "Tfr",
-    "Tl",
-    "Tr",
+    "Tsl", //Tl
+    "Tsr", //Tr
     "Tbl",
     "Tbr",
     "Lw",
@@ -647,10 +647,10 @@ static int8s AC4_nonstd_bed_channel_assignment_mask_ChannelLayout_Reordering[17+
     0,
     0,
 };
-static Ztring AC4_nonstd_bed_channel_assignment_mask_ChannelLayout(int32u nonstd_bed_channel_assignment_mask)
+static Ztring AC4_nonstd_bed_channel_assignment_mask_ChannelLayout(int32u nonstd_bed_channel_assignment_mask, size_t Groups_Size=0)
 {
     if (!nonstd_bed_channel_assignment_mask)
-        return __T("C");
+        return Groups_Size==1?__T("M"):__T("C");
     
     Ztring ToReturn;
 
@@ -1709,7 +1709,7 @@ void File_Ac4::Streams_Fill()
                         //    de_max_gain=D.Config.de_max_gain;
                         //    de_channel_config=D.Config.de_channel_config;
                         //}
-                        Fill_Dup(Stream_Audio, 0, (S + " ChannelLayout").c_str(), AC4_nonstd_bed_channel_assignment_mask_ChannelLayout(Ac4_ch_mode_2_nonstd(GroupInfo.ch_mode, GroupInfo.b_4_back_channels_present, GroupInfo.b_centre_present, GroupInfo.top_channels_present)));
+                        Fill_Dup(Stream_Audio, 0, (S + " ChannelLayout").c_str(), AC4_nonstd_bed_channel_assignment_mask_ChannelLayout(Ac4_ch_mode_2_nonstd(GroupInfo.ch_mode, GroupInfo.b_4_back_channels_present, GroupInfo.b_centre_present, GroupInfo.top_channels_present), Groups.size()));
                     }
                     else if (GroupInfo.b_ajoc || GroupInfo.n_objects_code!=(int8u)-1)
                     {
@@ -1728,7 +1728,7 @@ void File_Ac4::Streams_Fill()
                         }
                         if (GroupInfo.nonstd_bed_channel_assignment_mask!=(int32u)-1)
                         {
-                            Ztring BedChannelConfiguration=AC4_nonstd_bed_channel_assignment_mask_ChannelLayout(GroupInfo.nonstd_bed_channel_assignment_mask);
+                            Ztring BedChannelConfiguration=AC4_nonstd_bed_channel_assignment_mask_ChannelLayout(GroupInfo.nonstd_bed_channel_assignment_mask, Groups.size());
                             int8u num_channels_in_bed=AC4_nonstd_bed_channel_assignment_mask_2_num_channels_in_bed(GroupInfo.nonstd_bed_channel_assignment_mask);
                             if (!GroupInfo.b_ajoc && n_objects>num_channels_in_bed)
                                 Fill_Dup(Stream_Audio, 0, (S+" NumberOfDynamicObjects").c_str(), Ztring::ToZtring(n_objects-num_channels_in_bed));

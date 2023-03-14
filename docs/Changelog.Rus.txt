@@ -38,6 +38,7 @@ YouTube
 
 Обновлены библиотеки:
 	dav1d git-1.0.0-115-g9b4b244;
+	MediaInfo git-v22.12-120-gaad98a4e1;
 	zlib 1.2.13;
 
 1.6.6

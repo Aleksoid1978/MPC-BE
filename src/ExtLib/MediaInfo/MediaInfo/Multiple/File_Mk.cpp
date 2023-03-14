@@ -801,7 +801,7 @@ void File_Mk::Streams_Finish()
                     bool Tags_Verified=false;
                     {
                         Ztring Hutc = Retrieve(Stream_General, 0, "Encoded_Date");
-                        Hutc.FindAndReplace(__T("UTC "), Ztring());
+                        Hutc.FindAndReplace(__T(" UTC"), Ztring());
                         Hutc = Hutc.substr(0, Hutc.find(__T(" / "), 0)); // leave only the first date in a "UTC date1 / UTC date2" field
                         Ztring App, Utc;
                         Item2=Item->second.find(__T("_STATISTICS_WRITING_APP"));
@@ -3194,8 +3194,8 @@ void File_Mk::Segment_Tags_Tag_SimpleTag_TagString()
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("COMPATIBLE_BRANDS")) return; //QuickTime techinical info, useless
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("CONTENT_TYPE")) Segment_Tag_SimpleTag_TagNames[0]=__T("ContentType");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("COPYRIGHT")) Segment_Tag_SimpleTag_TagNames[0]=__T("Copyright");
-    if (Segment_Tag_SimpleTag_TagNames[0]==__T("CREATION_TIME")) {Segment_Tag_SimpleTag_TagNames[0]=__T("Encoded_Date"); TagString.insert(0, __T("UTC "));}
-    if (Segment_Tag_SimpleTag_TagNames[0]==__T("DATE_DIGITIZED")) {Segment_Tag_SimpleTag_TagNames[0]=__T("Mastered_Date"); TagString.insert(0, __T("UTC "));}
+    if (Segment_Tag_SimpleTag_TagNames[0]==__T("CREATION_TIME")) {Segment_Tag_SimpleTag_TagNames[0]=__T("Encoded_Date"); TagString+=__T(" UTC");}
+    if (Segment_Tag_SimpleTag_TagNames[0]==__T("DATE_DIGITIZED")) {Segment_Tag_SimpleTag_TagNames[0]=__T("Mastered_Date"); TagString+=__T(" UTC");}
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("DATE_ENCODED")) Segment_Tag_SimpleTag_TagNames[0]=__T("Encoded_Date");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("DATE_RECORDED")) Segment_Tag_SimpleTag_TagNames[0]=__T("Recorded_Date");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("DATE_RELEASE")) Segment_Tag_SimpleTag_TagNames[0]=__T("Released_Date");

@@ -25,6 +25,8 @@
 #include "MediaInfo/File__Analyse_Automatic.h"
 #include "MediaInfo/OutputHelpers.h"
 #include <ctime>
+#include <algorithm>
+
 using namespace std;
 //---------------------------------------------------------------------------
 
@@ -42,9 +44,22 @@ extern MediaInfo_Config Config;
 //---------------------------------------------------------------------------
 static Ztring Mpeg7_TimeToISO(Ztring Value)
 {
-    if (Value.size()>=3 && Value[0]==__T('U') && Value[1]==__T('T') && Value[2]==__T('C') && Value[3]==__T(' '))
+    if (Value.find(__T(" - ")) != string::npos)
     {
-        Value.erase(0, 4);
+        ZtringList List;
+        List.Separator_Set(0, __T(" - "));
+        List.Write(Value);
+        Value = List[0];
+        for (size_t i = 1; i < List.size(); i++)
+        {
+            if (Value > List[i])
+                Value = List[i];
+        }
+    }
+
+    if (Value.size()>=4 && Value.find(__T(" UTC"), Value.size()-4)!=string::npos)
+    {
+        Value.erase(Value.size()-4);
         Value+=__T("+00:00");
     }
     if (Value.size()>11 && Value[10]==__T(' '))
@@ -55,7 +70,7 @@ static Ztring Mpeg7_TimeToISO(Ztring Value)
 }
 
 //---------------------------------------------------------------------------
-static bool Mpeg7_TimeToISO_Isvalid(Ztring& TimePoint)
+static bool Mpeg7_TimeToISO_Isvalid(const Ztring& TimePoint)
 {
     if (TimePoint.size()<=3)
        return false;
@@ -106,12 +121,7 @@ static bool Mpeg7_TimeToISO_Isvalid(Ztring& TimePoint)
                            return false;
                         else if (TimePoint.size()>19)
                         {
-                            if (TimePoint.size()==20 && TimePoint[19]==__T('Z'))
-                            {
-                                TimePoint[19]=__T('+');
-                                TimePoint+=__T("00:00");
-                            }
-                            else if (TimePoint.size()<=24)
+                            if (TimePoint.size()<=24)
                                return false;
                             else if (!((TimePoint[19]==__T('+') || TimePoint[19]==__T('-'))
                                     && TimePoint[20]>=__T('0') && TimePoint[20]<=__T('9')
@@ -179,6 +189,8 @@ int32u Mpeg7_ContentCS_termID(MediaInfo_Internal &MI, size_t)
     }
     else if (MI.Count_Get(Stream_Audio))
         return 10000;
+    else if (MI.Count_Get(Stream_Text))
+        return 500000;
 
     //Not known
     const Ztring &Format=MI.Get(Stream_General, 0, General_Format);
@@ -204,6 +216,7 @@ Ztring Mpeg7_ContentCS_Name(int32u termID, MediaInfo_Internal &MI, size_t) //xxy
                         case 2 : return __T("Video");
                         case 3 : return __T("Graphics");
                     }
+        case 50: return __T("Text");
         default : return MI.Get(Stream_General, 0, General_FileExtension);
     }
 }
@@ -213,6 +226,50 @@ int32u Mpeg7_FileFormatCS_termID_MediaInfo(MediaInfo_Internal &MI)
 {
     const Ztring &Format=MI.Get(Stream_General, 0, General_Format);
 
+    if (Format==__T("MPEG-4"))
+    {
+        const Ztring &Format_Profile=MI.Get(Stream_General, 0, General_Format_Profile);
+        int32u termID;
+        if (Format_Profile==__T("QuickTime"))
+            termID=160000;
+        else
+            termID=50000;
+        Ztring CodecID=MI.Get(Stream_General, 0, General_CodecID);
+        CodecID+=__T('/')+MI.Get(Stream_General, 0, General_CodecID_Compatible);
+        if (false)
+            ;
+        else if (CodecID.find(__T("isom"))!=string::npos)
+            termID+=100;
+        else if (CodecID.find(__T("avc1"))!=string::npos)
+            termID+=200;
+        else if (CodecID.find(__T("iso2"))!=string::npos)
+            termID+=300;
+        else if (CodecID.find(__T("iso3"))!=string::npos)
+            termID+=400;
+        else if (CodecID.find(__T("iso4"))!=string::npos)
+            termID+=500;
+        else if (CodecID.find(__T("iso5"))!=string::npos)
+            termID+=600;
+        else if (CodecID.find(__T("iso6"))!=string::npos)
+            termID+=700;
+        else if (CodecID.find(__T("iso7"))!=string::npos)
+            termID+=800;
+        else if (CodecID.find(__T("iso8"))!=string::npos)
+            termID+=900;
+        else if (CodecID.find(__T("iso9"))!=string::npos)
+            termID+=1000;
+        else if (CodecID.find(__T("isoa"))!=string::npos)
+            termID+=1100;
+        else if (CodecID.find(__T("isob"))!=string::npos)
+            termID+=1200;
+        else if (CodecID.find(__T("isoc"))!=string::npos)
+            termID+=1300;
+        else if (CodecID.find(__T("mp41"))!=string::npos)
+            termID+=100;
+        else if (CodecID.find(__T("mp42"))!=string::npos)
+            termID+=100;
+        return termID;
+    }
     if (Format==__T("MPEG Audio"))
     {
         if (MI.Get(Stream_Audio, 0, Audio_Format_Profile).find(__T('2'))!=string::npos)
@@ -221,19 +278,30 @@ int32u Mpeg7_FileFormatCS_termID_MediaInfo(MediaInfo_Internal &MI)
             return 510000; //mp1
         return 0;
     }
-    if (Format==__T("Wave"))
+    if (Format==__T("Wave") || Format==__T("Wave64"))
     {
-        if (MI.Get(Stream_General, 0, General_Format_Profile)==__T("RF64"))
-        {
-            if (!MI.Get(Stream_General, 0, __T("bext_Present")).empty())
-                return 520100; // Wav (RF64) with bext
-            return 520000; //Wav (RF64)
-        }
-        else if (!MI.Get(Stream_General, 0, __T("bext_Present")).empty())
-            return 90100;
+        int32u termid;
+        if (Format==__T("Wave64"))
+            termid=530000;
+        else if (MI.Get(Stream_General, 0, General_Format_Profile)==__T("RF64"))
+            termid=520000; //Wav (RF64)
+        else
+            termid=90000;
+        if (!MI.Get(Stream_General, 0, __T("bext_Present")).empty())
+            termid+=100;
+        Ztring Format_Settings=MI.Get(Stream_General, 0, General_Format_Settings);
+        if (false)
+            ;
+        else if (Format_Settings.find(__T("WaveFormatExtensible"))!=string::npos)
+            termid+=4;
+        else if (Format_Settings.find(__T("WaveFormatEx"))!=string::npos)
+            termid+=3;
+        else if (Format_Settings.find(__T("PcmWaveformat"))!=string::npos)
+            termid+=2;
+        else if (Format_Settings.find(__T("WaveFormat"))!=string::npos)
+            termid+=1;
+        return termid;
     }
-    if (Format==__T("Wave64"))
-        return 530000;
     if (Format==__T("DSF"))
         return 540000;
     if (Format==__T("DSDIFF"))
@@ -242,6 +310,12 @@ int32u Mpeg7_FileFormatCS_termID_MediaInfo(MediaInfo_Internal &MI)
         return 560000;
     if (Format==__T("AIFF"))
         return 570000;
+    if (Format==__T("N19"))
+        return 580000;
+    if (Format==__T("SubRip"))
+        return 590000;
+    if (Format==__T("TTML"))
+        return 600000;
     return 0;
 }
 
@@ -264,8 +338,6 @@ int32u Mpeg7_FileFormatCS_termID(MediaInfo_Internal &MI, size_t)
         return 20000;
     if (Format==__T("MPEG Audio"))
         return (MI.Get(Stream_Audio, 0, Audio_Format_Profile).find(__T('3'))!=string::npos)?40000:0;
-    if (Format==__T("MPEG-4"))
-        return 50000;
     if (Format==__T("MPEG-PS"))
         return 30100;
     if (Format==__T("MPEG-TS"))
@@ -276,13 +348,6 @@ int32u Mpeg7_FileFormatCS_termID(MediaInfo_Internal &MI, size_t)
         return 160000;
     if (Format==__T("TIFF"))
         return 180000;
-    if (Format==__T("Wave"))
-    {
-        if (!MI.Get(Stream_General, 0, General_Format_Profile).empty() || !MI.Get(Stream_General, 0, __T("bext_Present")).empty())
-            return Mpeg7_FileFormatCS_termID_MediaInfo(MI); //Out of specs
-        else
-            return 90000;
-    }
     if (Format==__T("Windows Media"))
         return 190000;
     if (Format==__T("ZIP"))
@@ -292,6 +357,20 @@ int32u Mpeg7_FileFormatCS_termID(MediaInfo_Internal &MI, size_t)
     return Mpeg7_FileFormatCS_termID_MediaInfo(MI);
 }
 
+const char* Mpeg7_Wav_Extra_List[]=
+{
+    "WAVEFORMAT",
+    "PCMWAVEFORMAT",
+    "WAVEFORMATEX",
+    "WAVEFORMATEXTENSIBLE",
+};
+size_t Mpeg7_Wav_Extra_List_Size=sizeof(Mpeg7_Wav_Extra_List)/sizeof(decltype(*Mpeg7_Wav_Extra_List));
+static string Mpeg7_Wav_Extra(int32u Value)
+{
+    if (!Value || Value>Mpeg7_Wav_Extra_List_Size)
+        return string();
+    return string(1, ' ')+Mpeg7_Wav_Extra_List[Value-1];
+}
 Ztring Mpeg7_FileFormatCS_Name(int32u termID, MediaInfo_Internal &MI, size_t) //xxyyzz: xx=main number, yy=sub-number, zz=sub-sub-number
 {
     switch (termID/10000)
@@ -305,14 +384,36 @@ Ztring Mpeg7_FileFormatCS_Name(int32u termID, MediaInfo_Internal &MI, size_t) //
                         default: return __T("mpeg");
                     }
         case  4 : return __T("mp3");
-        case  5 : return __T("mp4");
+        case  5 :   switch ((termID%10000)/100)
+                    {
+                        case  1 : return __T("mp4 isom");
+                        case  2 : return __T("mp4 avc1");
+                        case  3 : return __T("mp4 iso2");
+                        case  4 : return __T("mp4 iso3");
+                        case  5 : return __T("mp4 iso4");
+                        case  6 : return __T("mp4 iso5");
+                        case  7 : return __T("mp4 iso6");
+                        case  8 : return __T("mp4 iso7");
+                        case  9 : return __T("mp4 iso8");
+                        case 10 : return __T("mp4 iso9");
+                        case 11 : return __T("mp4 isoa");
+                        case 12 : return __T("mp4 isob");
+                        case 13 : return __T("mp4 isoc");
+                        default : return __T("mp4");
+                    }
         case  6 : return __T("dv");
         case  7 : return __T("avi");
         case  8 : return __T("bdf");
-        case  9 :   switch ((termID%10000)/100)
+        case  9 :
                     {
-                        case 1 : return __T("bwf");
-                        default: return __T("wav");
+                    const char* Core;
+                    switch ((termID%10000)/100)
+                    {
+                        case 1 :    Core="bwf"; break;
+                        default:    Core="wav"; break;
+                    }
+                    string Extra=Mpeg7_Wav_Extra(termID%100);
+                    return Ztring().From_UTF8(Core+Extra);
                     }
         case 10 : return __T("zip");
         case 11 : return __T("bmp");
@@ -330,27 +431,51 @@ Ztring Mpeg7_FileFormatCS_Name(int32u termID, MediaInfo_Internal &MI, size_t) //
         //Out of specs --> MediaInfo CS
         case 50 : return __T("mp1");
         case 51 : return __T("mp2");
-        case 52:   switch ((termID%10000)/100)
+        case 52 :
                     {
-                        case 1 : return __T("mbwf");
-                        default: return __T("wav-rf64");
+                    const char* Core;
+                    switch ((termID%10000)/100)
+                    {
+                        case 1 :    Core="mbwf"; break;
+                        default:    Core="wav-rf64"; break;
                     }
-        case 53 : return __T("wave64");
+                    string Extra=Mpeg7_Wav_Extra(termID%100);
+                    return Ztring().From_UTF8(Core+Extra);
+                    }
+        case 53 :
+                    {
+                    const char* Core="wave64";
+                    string Extra=Mpeg7_Wav_Extra(termID%100);
+                    return Ztring().From_UTF8(Core+Extra);
+                    }
         case 54 : return __T("dsf");
         case 55 : return __T("dsdiff");
         case 56 : return __T("flac");
         case 57 : return __T("aiff");
+        case 58 : return __T("stl");
+        case 59 : return __T("srt");
+        case 60 : return __T("ttml");
         default : return MI.Get(Stream_General, 0, General_Format);
     }
 }
 
 //---------------------------------------------------------------------------
-int32u Mpeg7_VisualCodingFormatCS_termID_MediaInfo(MediaInfo_Internal &MI, size_t StreamPos)
+extern size_t Avc_profile_level_Indexes(const string& ProfileLevelS);
+extern size_t ProRes_Profile_Index(const string& ProfileS);
+int32u Mpeg7_VisualCodingFormatCS_termID_MediaInfo(MediaInfo_Internal& MI, size_t StreamPos)
 {
     const Ztring &Format=MI.Get(Stream_Video, StreamPos, Video_Format);
+    const Ztring &Profile=MI.Get(Stream_Video, StreamPos, Video_Format_Profile);
 
     if (Format==__T("AVC"))
-        return 500000;
+    {
+        auto ProfileLevelS=Profile.To_UTF8();
+        auto ProfileLevel=Avc_profile_level_Indexes(ProfileLevelS);
+        int32u ToReturn=500000;
+        ToReturn+=(ProfileLevel>>8)*100; //Profile
+        ToReturn+=ProfileLevel&0xFF; //Level
+        return ToReturn;
+    }
     if (Format==__T("HEVC"))
         return 510000;
     if (Format==__T("WMV"))
@@ -358,7 +483,13 @@ int32u Mpeg7_VisualCodingFormatCS_termID_MediaInfo(MediaInfo_Internal &MI, size_
     if (Format==__T("WMV2"))
         return 530000;
     if (Format==__T("ProRes"))
-        return 540000;
+    {
+        auto ProfileLevelS=Profile.To_UTF8();
+        auto Profile=ProRes_Profile_Index(ProfileLevelS);
+        int32u ToReturn=540000;
+        ToReturn+=Profile*100; //Profile
+        return ToReturn;
+    }
     return 0;
 }
 
@@ -793,31 +924,411 @@ Ztring Mpeg7_AudioCodingFormatCS_Name(int32u termID, MediaInfo_Internal &MI, siz
 }
 
 //---------------------------------------------------------------------------
+struct Mpeg7_AudioPresentationCS_Extra_Struct 
+{
+    size_t Index;
+    int64u ChannelLayout;
+    const char* Name;
+};
+
+enum ChannelIndex
+{
+    //Middle
+    CI_M_000,
+    CI_M_180,
+    CI_M_L022,
+    CI_M_R022,
+    CI_M_L030,
+    CI_M_R030,
+    CI_M_L060,
+    CI_M_R060,
+    CI_M_L090,
+    CI_M_R090,
+    CI_M_L110,
+    CI_M_R110,
+    CI_M_L135,
+    CI_M_R135,
+    CI_M_LSCR,
+    CI_M_RSCR,
+    CI_M_LSD,
+    CI_M_RSD,
+    //Upper
+    CI_U_000,
+    CI_U_180,
+    CI_U_L030,
+    CI_U_R030,
+    CI_U_L090,
+    CI_U_R090,
+    CI_U_L110,
+    CI_U_R110,
+    CI_U_L135,
+    CI_U_R135,
+    CI_T_000,
+    //Lower
+    CI_L_000,
+    CI_L_L030,
+    CI_L_R030,
+    //LFE
+    CI_LFE,
+    CI_LFE2,
+    CI_LFE3,
+    //Misc
+    CI_M_M,
+    CI_M_M2,
+    CI_M_LT,
+    CI_M_RT,
+    CI_MAX
+};
+const char* ChannelIndexMap[]=
+{
+    //Middle
+    "C",
+    "Cb",
+    "Lc",
+    "Rc",
+    "L",
+    "R",
+    "Lw",
+    "Rw",
+    "Lss",
+    "Rss",
+    "Ls",
+    "Rs",
+    "Lb",
+    "Rb",
+    "Lscr",
+    "Rscr",
+    "Lsd",
+    "Rsd",
+    //Upper
+    "Tfc",
+    "Tbc",
+    "Tfl",
+    "Tfr",
+    "Tsl",
+    "Tsr",
+    "Rvs",
+    "Lvs",
+    "Tbl",
+    "Tbr",
+    "Tc",
+    //Lower
+    "Bfc",
+    "Bfl",
+    "Bfr",
+    //LFE
+    "LFE",
+    "LFE2",
+    "LFE3",
+    //Misc
+    "M",
+    "M",
+    "Lt",
+    "Rt",
+};
+static_assert(sizeof(ChannelIndexMap)/sizeof(decltype(*ChannelIndexMap))==CI_MAX, "");
+enum ChannelMask : int64u
+{
+    //Middle
+    MASK_M_000  = ((uint64_t)1)<<CI_M_000,
+    MASK_M_180  = ((uint64_t)1)<<CI_M_180,
+    MASK_M_L022 = ((uint64_t)1)<<CI_M_L022,
+    MASK_M_R022 = ((uint64_t)1)<<CI_M_R022,
+    MASK_M_022  = MASK_M_L022 | MASK_M_R022,
+    MASK_M_L030 = ((uint64_t)1)<<CI_M_L030,
+    MASK_M_R030 = ((uint64_t)1)<<CI_M_R030,
+    MASK_M_030  = MASK_M_L030 | MASK_M_R030,
+    MASK_M_L060 = ((uint64_t)1)<<CI_M_L060,
+    MASK_M_R060 = ((uint64_t)1)<<CI_M_R060,
+    MASK_M_060  = MASK_M_L060 | MASK_M_R060,
+    MASK_M_L090 = ((uint64_t)1)<<CI_M_L090,
+    MASK_M_R090 = ((uint64_t)1)<<CI_M_R090,
+    MASK_M_090  = MASK_M_L090 | MASK_M_R090,
+    MASK_M_L110 = ((uint64_t)1)<<CI_M_L110,
+    MASK_M_R110 = ((uint64_t)1)<<CI_M_R110,
+    MASK_M_110  = MASK_M_L110 | MASK_M_R110,
+    MASK_M_L135 = ((uint64_t)1)<<CI_M_L135,
+    MASK_M_R135 = ((uint64_t)1)<<CI_M_R135,
+    MASK_M_135  = MASK_M_L135 | MASK_M_R135,
+    MASK_M_LSCR = ((uint64_t)1)<<CI_M_LSCR,
+    MASK_M_RSCR = ((uint64_t)1)<<CI_M_RSCR,
+    MASK_M_SCR  = MASK_M_LSCR | MASK_M_RSCR,
+    MASK_M_LSD  = ((uint64_t)1)<<CI_M_LSD,
+    MASK_M_RSD  = ((uint64_t)1)<<CI_M_RSD,
+    MASK_M_SD   = MASK_M_LSD | MASK_M_RSD,
+    MASK_M_M    = ((uint64_t)1)<<CI_M_M,
+    MASK_M_M2   = ((uint64_t)1)<<CI_M_M2,
+    MASK_M_MM   = MASK_M_M    | MASK_M_M2,
+    MASK_M_LT   = ((uint64_t)1)<<CI_M_LT,
+    MASK_M_RT   = ((uint64_t)1)<<CI_M_RT,
+    MASK_M_T    = MASK_M_LT   | MASK_M_RT,
+    //Upper
+    MASK_U_000  = ((uint64_t)1)<<CI_U_000,
+    MASK_U_180  = ((uint64_t)1)<<CI_U_180,
+    MASK_U_L030 = ((uint64_t)1)<<CI_U_L030,
+    MASK_U_R030 = ((uint64_t)1)<<CI_U_R030,
+    MASK_U_030  = MASK_U_L030 | MASK_U_R030,
+    MASK_U_L090 = ((uint64_t)1)<<CI_U_L090,
+    MASK_U_R090 = ((uint64_t)1)<<CI_U_R090,
+    MASK_U_090  = MASK_U_L090 | MASK_U_R090,
+    MASK_U_L110 = ((uint64_t)1)<<CI_U_L110,
+    MASK_U_R110 = ((uint64_t)1)<<CI_U_R110,
+    MASK_U_110  = MASK_U_L110 | MASK_U_R110,
+    MASK_U_L135 = ((uint64_t)1)<<CI_U_L135,
+    MASK_U_R135 = ((uint64_t)1)<<CI_U_R135,
+    MASK_U_135  = MASK_U_L135 | MASK_U_R135,
+    MASK_T_000  = ((uint64_t)1)<<CI_T_000,
+    //Lower
+    MASK_L_000  = ((uint64_t)1)<<CI_L_000,
+    MASK_L_L030 = ((uint64_t)1)<<CI_L_L030,
+    MASK_L_R030 = ((uint64_t)1)<<CI_L_R030,
+    MASK_L_030  = MASK_L_L030 | MASK_L_R030,
+    //LFE
+    MASK_LFE    = ((uint64_t)1)<<CI_LFE,
+    MASK_LFE2   = ((uint64_t)1)<<CI_LFE2,
+    MASK_LFE3   = ((uint64_t)1)<<CI_LFE3,
+};
+
+#define ID(_A,_B) _A*100+_B
+static const Mpeg7_AudioPresentationCS_Extra_Struct Mpeg7_AudioPresentationCS_Extra[] =
+{
+    // 1.0
+    { ID(  2, 0), MASK_M_M    , "mono" },
+    // 2.0
+    { ID(  3, 0), MASK_M_030  , "stereo" },
+    { ID(  3, 0), MASK_M_T    , "stereo" }, // stereo-matrix
+    { ID(  3, 0), MASK_M_MM   , "stereo" }, // dual-mono
+    // 2.1
+    { ID( 50, 3), MASK_M_030 | MASK_LFE   , "2.1"},
+    // 3.0
+    { ID( 51, 1), MASK_M_030 | MASK_M_000 , "3.0 with 3 front speakers"},
+    { ID( 51, 2), MASK_M_030 | MASK_M_180 , "3.0 with 2 front, 1 back speakers" },
+    // 3.1
+    { ID( 52, 1), MASK_M_030 | MASK_M_000 | MASK_LFE   , "3.1 with 3 front speakers"},
+    { ID( 52, 2), MASK_M_030 | MASK_M_180 | MASK_LFE   , "3.1 with 2 front, 1 back speakers" },
+    // 4.0
+    { ID( 54, 1), MASK_M_030 | MASK_M_110              , "4.0 with 2 front, 2 surround speakers" },
+    { ID( 54, 2), MASK_M_030 | MASK_M_135              , "4.0 with 2 front, 2 back speakers"},
+    { ID( 54, 3), MASK_M_030 | MASK_M_000 | MASK_M_180 , "4.0 with 3 front, 1 back speakers" },
+    // 4.1
+    { ID( 54, 1), MASK_M_030 | MASK_M_110              | MASK_LFE    , "4.1 with 2 front, 2 surround speakers" },
+    { ID( 54, 2), MASK_M_030 | MASK_M_135              | MASK_LFE    , "4.1 with 2 front, 2 back speakers"},
+    { ID( 54, 3), MASK_M_030 | MASK_M_000 | MASK_M_180 | MASK_LFE    , "4.1 with 3 front, 1 back speakers" },
+    // 5.0
+    { ID( 55, 1), MASK_M_030 | MASK_M_000 | MASK_M_090 , "5.0 with 3 front, 2 side speakers" },
+    { ID( 55, 2), MASK_M_030 | MASK_M_000 | MASK_M_110 , "5.0 with 3 front, 2 surround speakers" },
+    { ID( 55, 3), MASK_M_030 | MASK_M_000 | MASK_M_135 , "5.0 with 3 front, 2 back speakers" },
+    // 5.1
+    { ID(  5, 1), MASK_M_030 | MASK_M_000 | MASK_M_090 | MASK_LFE   , "Home theater 5.1 with 3 front, 2 side speakers" },
+    { ID(  5, 2), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_LFE   , "Home theater 5.1 with 3 front, 2 surround speakers" },
+    { ID(  5, 3), MASK_M_030 | MASK_M_000 | MASK_M_135 | MASK_LFE   , "Home theater 5.1 with 3 front, 2 back speakers" },
+    // 6.0
+    { ID( 58, 4), MASK_M_030 | MASK_M_090 | MASK_M_135              , "6.0 with 2 front, 2 side, 2 back speakers" },
+    { ID( 58, 5), MASK_M_030 | MASK_M_110 | MASK_M_135              , "6.0 with 2 front, 2 surround, 2 back speakers" },
+    { ID( 58, 1), MASK_M_030 | MASK_M_000 | MASK_M_090 | MASK_M_180 , "6.0 with 3 front, 2 side, 1 back speakers" },
+    { ID( 58, 2), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_M_180 , "6.0 with 3 front, 2 surround, 1 back speakers" },
+    { ID( 58, 3), MASK_M_030 | MASK_M_000 | MASK_M_135 | MASK_M_180 , "6.0 with 3 front, 3 back speakers" },
+    { ID( 58, 6), MASK_M_030 | MASK_M_022 | MASK_M_090              , "6.0 with 4 front, 2 side speakers" },
+    { ID( 58, 7), MASK_M_030 | MASK_M_022 | MASK_M_110              , "6.0 with 4 front, 2 surround speakers" },
+    { ID( 58, 8), MASK_M_030 | MASK_M_022 | MASK_M_135              , "6.0 with 4 front, 2 back speakers" },
+    // 6.1
+    { ID( 58, 4), MASK_M_030 | MASK_M_090 | MASK_M_135              | MASK_LFE   , "6.1 with 2 front, 2 side, 2 back speakers" },
+    { ID( 58, 5), MASK_M_030 | MASK_M_110 | MASK_M_135              | MASK_LFE   , "6.1 with 2 front, 2 surround, 2 back speakers" },
+    { ID( 58, 1), MASK_M_030 | MASK_M_000 | MASK_M_090 | MASK_M_180 | MASK_LFE   , "6.1 with 3 front, 2 side, 1 back speakers" },
+    { ID( 58, 2), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_M_180 | MASK_LFE   , "6.1 with 3 front, 2 surround, 1 back speakers" },
+    { ID( 58, 3), MASK_M_030 | MASK_M_000 | MASK_M_135 | MASK_M_180 | MASK_LFE   , "6.1 with 3 front, 3 back speakers" },
+    { ID( 58, 6), MASK_M_030 | MASK_M_022 | MASK_M_090              | MASK_LFE   , "6.1 with 4 front, 2 side speakers" },
+    { ID( 58, 7), MASK_M_030 | MASK_M_022 | MASK_M_110              | MASK_LFE   , "6.1 with 4 front, 2 surround speakers" },
+    { ID( 58, 8), MASK_M_030 | MASK_M_022 | MASK_M_135              | MASK_LFE   , "6.1 with 4 front, 2 back speakers" },
+    // 6.2
+    { ID( 58, 4), MASK_M_030 | MASK_M_090 | MASK_M_135              | MASK_LFE   | MASK_LFE2   , "6.2 with 2 front, 2 side, 2 back speakers" },
+    { ID( 58, 5), MASK_M_030 | MASK_M_110 | MASK_M_135              | MASK_LFE   | MASK_LFE2   , "6.2 with 2 front, 2 surround, 2 back speakers" },
+    { ID( 58, 1), MASK_M_030 | MASK_M_000 | MASK_M_090 | MASK_M_180 | MASK_LFE   | MASK_LFE2   , "6.2 with 3 front, 2 side, 1 back speakers" },
+    { ID( 58, 2), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_M_180 | MASK_LFE   | MASK_LFE2   , "6.2 with 3 front, 2 surround, 1 back speakers" },
+    { ID( 58, 3), MASK_M_030 | MASK_M_000 | MASK_M_135 | MASK_M_180 | MASK_LFE   | MASK_LFE2   , "6.2 with 3 front, 3 back speakers" },
+    { ID( 58, 6), MASK_M_030 | MASK_M_022 | MASK_M_090              | MASK_LFE   | MASK_LFE2   , "6.2 with 4 front, 2 side speakers" },
+    { ID( 58, 7), MASK_M_030 | MASK_M_022 | MASK_M_110              | MASK_LFE   | MASK_LFE2   , "6.2 with 4 front, 2 surround speakers" },
+    { ID( 58, 8), MASK_M_030 | MASK_M_022 | MASK_M_135              | MASK_LFE   | MASK_LFE2   , "6.2 with 4 front, 2 back speakers" },
+    // 7.0
+    { ID( 59, 3), MASK_M_030 | MASK_M_090 | MASK_M_135 | MASK_M_180 , "7.0 with 2 front, 2 side, 3 back speakers" },
+    { ID( 59, 4), MASK_M_030 | MASK_M_110 | MASK_M_135 | MASK_M_180 , "7.0 with 2 front, 2 surround, 3 back speakers" },
+    { ID( 59, 1), MASK_M_030 | MASK_M_000 | MASK_M_090 | MASK_M_135 , "7.0 with 3 front, 2 side, 2 back speakers" },
+    { ID( 59, 2), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_M_135 , "7.0 with 3 front, 2 surround, 2 back speakers" },
+    { ID( 59, 5), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_090 , "7.0 with 5 front, 2 side speakers" },
+    { ID( 59, 6), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_110 , "7.0 with 5 front, 2 surround speakers" },
+    { ID( 59, 7), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_135 , "7.0 with 5 front, 2 back speakers" },
+    // 7.1
+    { ID(  6, 3), MASK_M_030 | MASK_M_090 | MASK_M_135 | MASK_M_180 | MASK_LFE   , "Movie theater with 2 front, 2 side, 3 back speakers" },
+    { ID(  6, 4), MASK_M_030 | MASK_M_110 | MASK_M_135 | MASK_M_180 | MASK_LFE   , "Movie theater with 2 front, 2 surround, 3 back speakers" },
+    { ID(  6, 1), MASK_M_030 | MASK_M_000 | MASK_M_060 | MASK_M_110 | MASK_LFE   , "Movie theater with 3 front, 2 wide, 2 surround speakers" },
+    { ID(  6, 1), MASK_M_030 | MASK_M_000 | MASK_M_090 | MASK_M_135 | MASK_LFE   , "Movie theater with 3 front, 2 side, 2 back speakers" },
+    { ID(  6, 2), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_M_135 | MASK_LFE   , "Movie theater with 3 front, 2 surround, 2 back speakers" },
+    { ID(  6, 5), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_090 | MASK_LFE   , "Movie theater with 5 front, 2 side speakers" },
+    { ID(  6, 6), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_110 | MASK_LFE   , "Movie theater with 5 front, 2 surround speakers" },
+    { ID(  6, 7), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_135 | MASK_LFE   , "Movie theater with 5 front, 2 back speakers" },
+    // 7.2
+    { ID( 60, 3), MASK_M_030 | MASK_M_090 | MASK_M_135 | MASK_M_180 | MASK_LFE   | MASK_LFE2   , "7.2 with 2 front, 2 side, 3 back speakers" },
+    { ID( 60, 4), MASK_M_030 | MASK_M_110 | MASK_M_135 | MASK_M_180 | MASK_LFE   | MASK_LFE2   , "7.2 with 2 front, 2 surround, 3 back speakers" },
+    { ID( 60, 1), MASK_M_030 | MASK_M_000 | MASK_M_090 | MASK_M_135 | MASK_LFE   | MASK_LFE2   , "7.2 with 3 front, 2 side, 2 back speakers" },
+    { ID( 60, 2), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_M_135 | MASK_LFE   | MASK_LFE2   , "7.2 with 3 front, 2 surround, 2 back speakers" },
+    { ID( 60, 5), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_110 | MASK_LFE   | MASK_LFE2   , "7.2 with 5 front, 2 side speakers" },
+    { ID( 60, 6), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_110 | MASK_LFE   | MASK_LFE2   , "7.2 with 5 front, 2 surround speakers" },
+    { ID( 60, 7), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_135 | MASK_LFE   | MASK_LFE2   , "7.2 with 5 front, 2 back speakers" },
+    // 8.0
+    { ID( 61, 1), MASK_M_030 | MASK_M_000 | MASK_M_090 | MASK_M_135 | MASK_M_180 , "8.0 with 3 front, 2 side, 3 back speakers" },
+    { ID( 61, 2), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_M_135 | MASK_M_180 , "8.0 with 3 front, 2 surround, 3 back speakers" },
+    { ID( 61, 3), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_090 | MASK_M_180 , "8.0 with 5 front, 2 side, 1 back speakers" },
+    { ID( 61, 4), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_110 | MASK_M_180 , "8.0 with 5 front, 2 surround, 1 back speakers" },
+    { ID( 61, 5), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_135 | MASK_M_180 , "8.0 with 5 front, 3 back speakers" },
+    // 8.1
+    { ID( 62, 1), MASK_M_030 | MASK_M_000 | MASK_M_090 | MASK_M_135 | MASK_M_180 | MASK_LFE   , "8.1 with 3 front, 2 side, 3 back speakers" },
+    { ID( 62, 2), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_M_135 | MASK_M_180 | MASK_LFE   , "8.1 with 3 front, 2 surround, 3 back speakers" },
+    { ID( 62, 3), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_110 | MASK_M_180 | MASK_LFE   , "8.1 with 5 front, 2 side, 1 back speakers" },
+    { ID( 62, 4), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_110 | MASK_M_180 | MASK_LFE   , "8.1 with 5 front, 2 surround, 1 back speakers" },
+    { ID( 62, 5), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_135 | MASK_M_180 | MASK_LFE   , "8.1 with 5 front, 3 back speakers" },
+    // 8.2
+    { ID( 63, 1), MASK_M_030 | MASK_M_000 | MASK_M_090 | MASK_M_135 | MASK_LFE | MASK_LFE2   , "8.2 with 3 front, 2 side, 3 back speakers" },
+    { ID( 63, 2), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_M_135 | MASK_LFE | MASK_LFE2   , "8.2 with 3 front, 2 surround, 3 back speakers" },
+    { ID( 63, 3), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_110 | MASK_LFE | MASK_LFE2   , "8.2 with 5 front, 2 side, 1 back speakers" },
+    { ID( 63, 4), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_110 | MASK_LFE | MASK_LFE2   , "8.2 with 5 front, 2 surround, 1 back speakers" },
+    { ID( 63, 5), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_135 | MASK_LFE | MASK_LFE2   , "8.2 with 5 front, 3 back speakers" },
+    // 22.2 (10.2.9.3)
+    { ID(100, 0), MASK_M_030 | MASK_M_000 | MASK_M_060 | MASK_M_090 | MASK_M_135 | MASK_M_180 | MASK_U_030 | MASK_U_000 | MASK_U_090 | MASK_T_000 | MASK_U_135 | MASK_U_180 | MASK_L_030 | MASK_L_000 | MASK_LFE   | MASK_LFE2  , "Hamasaki 22.2" },
+    { ID(100, 0), MASK_M_030 | MASK_M_000 | MASK_M_060 | MASK_M_110 | MASK_M_135 | MASK_M_180 | MASK_U_030 | MASK_U_000 | MASK_U_090 | MASK_T_000 | MASK_U_135 | MASK_U_180 | MASK_L_030 | MASK_L_000 | MASK_LFE   | MASK_LFE2  , "Hamasaki 22.2" },
+    // 2.0.2
+    { ID(101, 1), MASK_M_030 | MASK_U_030 , "2.0.2 with 2 front, 2 topfront speakers" },
+    // 2.1.2
+    { ID(102, 1), MASK_M_030 | MASK_U_030 | MASK_LFE   , "2.1.2 with 2 front, 2 topfront speakers" },
+    // 3.0.2
+    { ID(103, 1), MASK_M_030 | MASK_M_000 | MASK_U_030 , "3.0.2 with 3 front, 2 topfront speakers" },
+    // 3.1.2
+    { ID(104, 1), MASK_M_030 | MASK_M_000 | MASK_U_030 | MASK_LFE   , "3.1.2 with 3 front, 2 topfront speakers" },
+    // 5.1.2
+    { ID(105, 1), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_U_030 | MASK_LFE   , "5.1.2 with 3 front, 2 surround, 2 topfront speakers" },
+    { ID(105, 2), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_U_090 | MASK_LFE   , "5.1.2 with 3 front, 2 surround, 2 topside speakers" },
+    { ID(105, 3), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_U_110 | MASK_LFE   , "5.1.2 with 3 front, 2 surround, 2 topsurround speakers" },
+    { ID(105, 4), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_U_135 | MASK_LFE   , "5.1.2 with 3 front, 2 surround, 2 topback speakers" },
+    // 5.1.4
+    { ID(106, 1), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_U_030 | MASK_U_090 | MASK_LFE   , "5.1.4 with 3 front, 2 surround, 2 topfront, 2 topside speakers" },
+    { ID(106, 2), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_U_030 | MASK_U_110 | MASK_LFE   , "5.1.4 with 3 front, 2 surround, 2 topfront, 2 topsurround speakers" },
+    { ID(106, 3), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_U_030 | MASK_U_135 | MASK_LFE   , "5.1.4 with 3 front, 2 surround, 2 topfront, 2 topback speakers" },
+    // 5.1.6
+    { ID(107, 1), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_U_030 | MASK_U_000 | MASK_U_110 | MASK_T_000 | MASK_LFE   , "5.1.6 with 3 front, 2 surround, 3 topfront, 1 top, 2 topsurround speakers" },
+    // 7.1.4
+    { ID(108, 1), MASK_M_030 | MASK_M_000 | MASK_M_090 | MASK_M_135 | MASK_U_030 | MASK_U_135 | MASK_LFE   , "7.1.4 with 3 front, 2 side, 2 back, 2 topfront, 2 topback speakers" },
+    { ID(108, 2), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_M_135 | MASK_U_030 | MASK_U_135 | MASK_LFE   , "7.1.4 with 3 front, 2 surround, 2 back, 2 topfront, 2 topback speakers" },
+    // 7.2.3
+    { ID(109, 1), MASK_M_030 | MASK_M_000 | MASK_M_090 | MASK_M_180 | MASK_U_030 | MASK_T_000 | MASK_LFE   | MASK_LFE2  , "7.2.3 with 3 front, 2 side, 2 back, 2 topfront, 1 top speakers" },
+    { ID(109, 2), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_M_180 | MASK_U_030 | MASK_T_000 | MASK_LFE   | MASK_LFE2  , "7.2.3 with 3 front, 2 surround, 2 back, 2 topfront, 1 top speakers" },
+    // 7.1.6
+    { ID(110, 1), MASK_M_030 | MASK_M_000 | MASK_M_090 | MASK_M_135 | MASK_U_030 | MASK_U_000 | MASK_T_000 | MASK_U_090 | MASK_LFE   , "7.1.6 with 3 front, 2 side, 2 back, 3 topfront, 1 top, 2 topside speakers" },
+    { ID(110, 2), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_M_135 | MASK_U_030 | MASK_U_000 | MASK_T_000 | MASK_U_110 | MASK_LFE   , "7.1.6 with 3 front, 2 surround, 2 back, 3 topfront, 1 top, 2 topsurround speakers" },
+    { ID(110, 3), MASK_M_030 | MASK_M_000 | MASK_M_090 | MASK_M_135 | MASK_U_030 | MASK_U_090 | MASK_U_135 | MASK_LFE   , "7.1.6 with 3 front, 2 side, 2 back, 2 topfront, 2 topside, 2 topback speakers" },
+    { ID(110, 4), MASK_M_030 | MASK_M_000 | MASK_M_110 | MASK_M_135 | MASK_U_030 | MASK_U_110 | MASK_U_135 | MASK_LFE   , "7.1.6 with 3 front, 2 surround, 2 back, 2 topfront, 2 topsurround, 2 topback speakers" },
+    // 9.1.4
+    { ID(111, 1), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_090 | MASK_M_135 | MASK_U_030 | MASK_U_135 | MASK_LFE   , "9.1.6 with 5 front, 2 side, 2 back, 2 topfront, 2 topback speakers" },
+    { ID(111, 2), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_110 | MASK_M_135 | MASK_U_030 | MASK_U_135 | MASK_LFE   , "9.1.6 with 5 front, 2 surround, 2 back, 2 topfront, 2 topback speakers" },
+    // 9.1.6
+    { ID(112, 1), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_090 | MASK_M_135 | MASK_U_030 | MASK_U_090 | MASK_U_135 | MASK_LFE   , "9.1.6 with 5 front, 2 side, 2 back, 2 topfront, 2 topside, 2 topback speakers" },
+    { ID(112, 2), MASK_M_030 | MASK_M_000 | MASK_M_022 | MASK_M_110 | MASK_M_135 | MASK_U_030 | MASK_U_110 | MASK_U_135 | MASK_LFE   , "9.1.6 with 5 front, 2 surround, 2 back, 2 topfront, 2 topsurround, 2 topback speakers" },
+    { ID(112, 3), MASK_M_030 | MASK_M_000 | MASK_M_060 | MASK_M_110 | MASK_M_135 | MASK_U_030 | MASK_U_090 | MASK_U_135 | MASK_LFE   , "9.1.6 with 3 front, 2 side, 2 surround, 2 back, 2 topfront, 2 topside, 2 topback speakers" },
+    // 10.0.6
+    { ID(113, 1), MASK_M_030 | MASK_M_000 | MASK_M_060 | MASK_M_110 | MASK_M_135 | MASK_M_180 | MASK_U_030 | MASK_U_090 | MASK_U_135 , "10.0.6 with 3 front, 2 wide, 2 surround, 3 back, 2 topfront, 2 topside, 2 topback speakers" },
+    { ID(113, 2), MASK_M_030 | MASK_M_000 | MASK_M_060 | MASK_M_110 | MASK_M_135 | MASK_M_180 | MASK_U_030 | MASK_U_000 | MASK_U_135 | MASK_U_180 , "10.0.6 with 3 front, 2 wide, 2 surround, 3 back, 3 topfront, 3 topback speakers" },
+};
+
 int32u Mpeg7_AudioPresentationCS_termID(MediaInfo_Internal &MI, size_t StreamPos)
 {
-    const Ztring &Channels=MI.Get(Stream_Audio, StreamPos, Audio_Channel_s_);
-    const Ztring &ChannelPositions2=MI.Get(Stream_Audio, StreamPos, Audio_ChannelPositions_String2);
-    if (Channels==__T("6") && ChannelPositions2==__T("3/2.1"))
-        return 50000;
-    if (Channels==__T("8") && ChannelPositions2==__T("3/2/2.1"))
-        return 60000;
-    if (Channels==__T("2"))
-        return 30000;
-    if (Channels==__T("1"))
-        return 20000;
+    //Get ChannelLayout and remove disabled channels e.g. from Dolby E
+    ZtringList ChannelLayout;
+    ChannelLayout.Separator_Set(0, __T(" "));
+    Ztring ChannelLayoutZ=MI.Get(Stream_Audio, StreamPos, Audio_ChannelLayout);
+    if (ChannelLayoutZ.empty())
+        ChannelLayoutZ=MI.Get(Stream_Audio, StreamPos, __T("Substream0 ChannelLayout"));
+    ChannelLayout.Write(ChannelLayoutZ);
+    int64u ChannelLayoutI=0;
+    for (const auto& Item : ChannelLayout)
+    {
+        string ItemS=Item.To_UTF8();
+        if (ItemS=="X")
+            continue; //Ignore masked channels
+        if (ItemS=="M" && (ChannelLayoutI&MASK_M_M))
+        {
+            ChannelLayoutI|=MASK_M_M2;
+            continue;
+        }
+        if (ChannelLayout.size()==1 && ItemS=="C" && MI.Count_Get(Stream_Audio)==1)
+        {
+            ChannelLayoutI|=MASK_M_M;
+            continue;
+        }
+        if (ItemS=="Lscr")
+            ItemS="Lc";
+        if (ItemS=="Rscr")
+            ItemS="Rc";
+        size_t i=0;
+        for (; i<CI_MAX; i++)
+            if (ChannelIndexMap[i]==ItemS)
+            {
+                ChannelLayoutI|=((uint64_t)1)<<i;
+                break;
+            }
+        if (i==CI_MAX)
+            return 0;
+    }
+
+    //Not ins specs
+    for (auto Pos=begin(Mpeg7_AudioPresentationCS_Extra); Pos!=end(Mpeg7_AudioPresentationCS_Extra); ++Pos)
+    {
+        if (Pos->ChannelLayout==ChannelLayoutI)
+            return Pos->Index*100;
+
+    }
+
+    const auto Channels=MI.Get(Stream_Audio, StreamPos, Audio_Channel_s_).To_int32u();
+    switch (Channels)
+    {
+        case 1: return 20000;
+        case 2: return 30000;
+    }
     return 0;
 }
 
 Ztring Mpeg7_AudioPresentationCS_Name(int32u termID, MediaInfo_Internal &MI, size_t StreamPos)
 {
-    switch (termID/10000)
+    int32u termID0=termID/10000;
+    int32u termID1=termID%10000;
+    termID1/=100;
+    termID/=100;
+    if (!termID1)
     {
-        case 2 : return __T("mono");
-        case 3 : return __T("stereo");
-        case 5 : return __T("Home theater 5.1");
-        case 6 : return __T("Movie theater");
-        default: return MI.Get(Stream_Audio, StreamPos, Audio_ChannelLayout);
+        switch (termID0)
+        {
+            case   2:
+            case   3:
+            case 100:
+                break;
+            default:
+                termID+=1; //Using the first available then trim
+        }
     }
+    for (const auto& Mpeg7_AudioPresentationCS_Extra_Item : Mpeg7_AudioPresentationCS_Extra)
+    {
+        if (Mpeg7_AudioPresentationCS_Extra_Item.Index==termID)
+        {
+            Ztring Result;
+            Result.From_UTF8(Mpeg7_AudioPresentationCS_Extra_Item.Name);
+            if (!termID1)
+            {
+                auto With=Result.find(__T(" with"));
+                if (With!=string::npos)
+                    Result.resize(With);
+            }
+            return Result;
+        }
+    }
+
+    return MI.Get(Stream_Audio, StreamPos, Audio_ChannelLayout);
 }
 
 //---------------------------------------------------------------------------
@@ -833,6 +1344,39 @@ Ztring Mpeg7_AudioEmphasis(MediaInfo_Internal &MI, size_t StreamPos)
     return __T("none");
 }
 
+//---------------------------------------------------------------------------
+int32u Mpeg7_TextualCodingFormatCS_termID(MediaInfo_Internal &MI, size_t StreamPos)
+{
+    const Ztring &Format=MI.Get(Stream_Text, StreamPos, Text_Format);
+
+    if (Format==__T("N19"))
+        return 500000;
+    if (Format==__T("EIA-608"))
+        return 510000;
+    if (Format==__T("EIA-708"))
+        return 520000;
+    if (Format==__T("SubRip"))
+        return 530000;
+    if (Format==__T("Timed Text"))
+        return 540000;
+    if (Format==__T("TTML"))
+        return 550000;
+
+    return 0;
+}
+
+Ztring Mpeg7_TextualCodingFormatCS_Name(int32u termID, MediaInfo_Internal& MI, size_t StreamPos) //xxyyzz: xx=main number, yy=sub-number, zz=sub-sub-number
+{
+    switch (termID/10000)
+    {
+        case  50 : return __T("STL");
+        case  53 : return __T("SRT");
+        case  54 : return __T("MPEG-4 Part 17 Timed Text");
+        case  55 : return __T("TTML");
+        default  : return MI.Get(Stream_Text, StreamPos, Text_Format);
+    }
+}
+    
 //---------------------------------------------------------------------------
 Ztring Mpeg7_MediaTimePoint(MediaInfo_Internal &MI)
 {
@@ -1102,7 +1646,7 @@ Export_Mpeg7::~Export_Mpeg7 ()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void Mpeg7_Transform_Visual(Node* Parent, MediaInfo_Internal &MI, size_t StreamPos)
+void Mpeg7_Transform_Visual(Node* Parent, MediaInfo_Internal &MI, size_t StreamPos, size_t& Version)
 {
     Node* Node_VisualCoding=Parent->Add_Child("mpeg7:VisualCoding");
 
@@ -1131,6 +1675,7 @@ void Mpeg7_Transform_Visual(Node* Parent, MediaInfo_Internal &MI, size_t StreamP
      || !MI.Get(Stream_Video, 0, Video_Height).empty()
      || !MI.Get(Stream_Video, 0, Video_Width).empty()
      || !MI.Get(Stream_Video, 0, Video_FrameRate).empty()
+     || !MI.Get(Stream_Video, 0, Video_FrameRate_Mode).empty()
      || !MI.Get(Stream_Video, 0, Video_ScanType).empty())
     {
         Node* Node_Frame=Node_VisualCoding->Add_Child("mpeg7:Frame");
@@ -1153,6 +1698,17 @@ void Mpeg7_Transform_Visual(Node* Parent, MediaInfo_Internal &MI, size_t StreamP
                 Node_Frame->Add_Attribute("structure", "interlaced");
             else if (Value==__T("progressive"))
                 Node_Frame->Add_Attribute("structure", "progressive");
+        }
+
+        if (MI.Get(Stream_Video, 0, Video_FrameRate_Mode)==__T("VFR"))
+        {
+            if (Version>1)
+            {
+                Node_Frame->Add_Attribute("variableRate", "true");
+                Version=3;
+            }
+            else
+                Node_Frame->XmlComment="variableRate: true";
         }
     }
 
@@ -1243,10 +1799,110 @@ void Mpeg7_Transform_Visual(Node* Parent, MediaInfo_Internal &MI, size_t StreamP
             }
         }
     }
+    if (MI.Get(Stream_Video, StreamPos, Video_ChromaSubsampling).find(__T("4:2:2"))!=string::npos)
+    {
+        Node* Node_ColorSampling=Node_VisualCoding->Add_Child("mpeg7:ColorSampling");
+        Node_ColorSampling->XmlComment="YUV 4:2:2 Interlaced";
+        Node* Node_Lattice=Node_ColorSampling->Add_Child("mpeg7:Lattice");
+        Node_Lattice->Add_Attribute("height", "720");
+        Node_Lattice->Add_Attribute("width", "486");
+
+        {
+            Node* Node_Field=Node_ColorSampling->Add_Child("mpeg7:Field");
+            Node_Field->Add_Attribute("temporalOrder", "0");
+            Node_Field->Add_Attribute("positionalOrder", "0");
+
+            {
+                Node* Node_Component=Node_Field->Add_Child("mpeg7:Component");
+                Node_Component->Add_Child("mpeg7:Name", std::string("Luminance"));
+                Node* Node_Offset=Node_Component->Add_Child("mpeg7:Offset");
+                Node_Offset->Add_Attribute("horizontal", "0.0");
+                Node_Offset->Add_Attribute("vertical", "0.0");
+                Node* Node_Period=Node_Component->Add_Child("mpeg7:Period");
+                Node_Period->Add_Attribute("horizontal", "1.0");
+                Node_Period->Add_Attribute("vertical", "2.0");
+            }
+
+            {
+                Node* Node_Component=Node_Field->Add_Child("mpeg7:Component");
+                Node_Component->Add_Child("mpeg7:Name", std::string("ChrominanceBlueDifference"));
+                Node* Node_Offset=Node_Component->Add_Child("mpeg7:Offset");
+                Node_Offset->Add_Attribute("horizontal", "0.0");
+                Node_Offset->Add_Attribute("vertical", "0.5");
+                Node* Node_Period=Node_Component->Add_Child("mpeg7:Period");
+                Node_Period->Add_Attribute("horizontal", "2.0");
+                Node_Period->Add_Attribute("vertical", "4.0");
+            }
+
+            {
+                Node* Node_Component=Node_Field->Add_Child("mpeg7:Component");
+                Node_Component->Add_Child("mpeg7:Name", std::string("ChrominanceRedDifference"));
+                Node* Node_Offset=Node_Component->Add_Child("mpeg7:Offset");
+                Node_Offset->Add_Attribute("horizontal", "0.0");
+                Node_Offset->Add_Attribute("vertical", "0.5");
+                Node* Node_Period=Node_Component->Add_Child("mpeg7:Period");
+                Node_Period->Add_Attribute("horizontal", "2.0");
+                Node_Period->Add_Attribute("vertical", "4.0");
+            }
+        }
+
+        {
+            Node* Node_Field=Node_ColorSampling->Add_Child("mpeg7:Field");
+            Node_Field->Add_Attribute("temporalOrder", "1");
+            Node_Field->Add_Attribute("positionalOrder", "1");
+
+            {
+                Node* Node_Component=Node_Field->Add_Child("mpeg7:Component");
+                Node_Component->Add_Child("mpeg7:Name", std::string("Luminance"));
+                Node* Node_Offset=Node_Component->Add_Child("mpeg7:Offset");
+                Node_Offset->Add_Attribute("horizontal", "0.0");
+                Node_Offset->Add_Attribute("vertical", "1.0");
+                Node* Node_Period=Node_Component->Add_Child("mpeg7:Period");
+                Node_Period->Add_Attribute("horizontal", "1.0");
+                Node_Period->Add_Attribute("vertical", "2.0");
+            }
+
+            {
+                Node* Node_Component=Node_Field->Add_Child("mpeg7:Component");
+                Node_Component->Add_Child("mpeg7:Name", std::string("ChrominanceBlueDifference"));
+                Node* Node_Offset=Node_Component->Add_Child("mpeg7:Offset");
+                Node_Offset->Add_Attribute("horizontal", "0.0");
+                Node_Offset->Add_Attribute("vertical", "2.5");
+                Node* Node_Period=Node_Component->Add_Child("mpeg7:Period");
+                Node_Period->Add_Attribute("horizontal", "2.0");
+                Node_Period->Add_Attribute("vertical", "4.0");
+            }
+
+            {
+                Node* Node_Component=Node_Field->Add_Child("mpeg7:Component");
+                Node_Component->Add_Child("mpeg7:Name", std::string("ChrominanceRedDifference"));
+                Node* Node_Offset=Node_Component->Add_Child("mpeg7:Offset");
+                Node_Offset->Add_Attribute("horizontal", "0.0");
+                Node_Offset->Add_Attribute("vertical", "2.5");
+                Node* Node_Period=Node_Component->Add_Child("mpeg7:Period");
+                Node_Period->Add_Attribute("horizontal", "4.0");
+                Node_Period->Add_Attribute("vertical", "2.0");
+            }
+        }
+    }
+  
+    //Encryption
+    Ztring Encryption=MI.Get(Stream_Audio, StreamPos, Audio_Encryption);
+    if (!Encryption.empty())
+    {
+        if (Version || (StreamPos && !Version))
+        {
+            Node_VisualCoding->Add_Child("mpeg7:Encryption", Encryption);
+            if (Version)
+                Version=3;
+        }
+        else
+            Node_VisualCoding->Add_Child("")->XmlCommentOut="Encryption: "+Encryption.To_UTF8();
+    }
 }
 
 //---------------------------------------------------------------------------
-void Mpeg7_Transform_Audio(Node* Parent, MediaInfo_Internal &MI, size_t StreamPos)
+void Mpeg7_Transform_Audio(Node* Parent, MediaInfo_Internal &MI, size_t StreamPos, size_t& Version)
 {
     Node* Node_AudioCoding=Parent->Add_Child("mpeg7:AudioCoding");
 
@@ -1254,9 +1910,32 @@ void Mpeg7_Transform_Audio(Node* Parent, MediaInfo_Internal &MI, size_t StreamPo
     Mpeg7_CS(Node_AudioCoding, "mpeg7:Format", "AudioCodingFormatCS", Mpeg7_AudioCodingFormatCS_termID, Mpeg7_AudioCodingFormatCS_Name, MI, StreamPos);
 
     //AudioChannels
+    auto termID=Mpeg7_AudioPresentationCS_termID(MI, StreamPos);
+    Ztring termID_Name=Mpeg7_AudioPresentationCS_Name(termID, MI, StreamPos);
     Ztring Channels=Mpeg7_StripExtraValues(MI.Get(Stream_Audio, StreamPos, Audio_Channel_s_));
     if (!Channels.empty() && Channels.To_int32s())
-        Node_AudioCoding->Add_Child("mpeg7:AudioChannels", Channels);
+    {
+        size_t frontP=termID_Name.find(__T(" front"));
+        size_t front=frontP==string::npos?0:termID_Name[frontP-1]-'0';
+        size_t sideP=termID_Name.find(__T(" side"));
+        size_t side=sideP==string::npos?0:termID_Name[sideP-1]-'0';
+        size_t surroundP=termID_Name.find(__T(" surround"));
+        size_t surround=surroundP==string::npos?0:termID_Name[surroundP-1]-'0';
+        size_t rearP=termID_Name.find(__T(" back"));
+        size_t rear=rearP==string::npos?0:termID_Name[rearP-1]-'0';
+        size_t lfeP=termID_Name.find(__T("."));
+        size_t lfe=lfeP==string::npos?0:termID_Name[lfeP+1]-'0';
+        side+=surround; //No surround
+        Node* AudioChannels=Node_AudioCoding->Add_Child("mpeg7:AudioChannels", Channels);
+        if (front)
+            AudioChannels->Add_Attribute("front", to_string(front));
+        if (side)
+            AudioChannels->Add_Attribute("side", to_string(side));
+        if (rear)
+            AudioChannels->Add_Attribute("rear", to_string(rear));
+        if (lfe)
+            AudioChannels->Add_Attribute("lfe", to_string(lfe));
+    }
 
     //Sample
     Node* Node_Sample=Node_AudioCoding->Add_Child("mpeg7:Sample");
@@ -1275,10 +1954,87 @@ void Mpeg7_Transform_Audio(Node* Parent, MediaInfo_Internal &MI, size_t StreamPo
 
     //Presentation
     Mpeg7_CS(Node_AudioCoding, "mpeg7:Presentation", "AudioPresentationCS", Mpeg7_AudioPresentationCS_termID, Mpeg7_AudioPresentationCS_Name, MI, StreamPos);
+
+    //ChannelPositions
+    Ztring ChannelLayout=MI.Get(Stream_Audio, StreamPos, Audio_ChannelLayout);
+    if (!ChannelLayout.empty() && !termID)
+    {
+        if (Version>1 || (StreamPos && !Version))
+        {
+            Node_AudioCoding->Add_Child("mpeg7:ChannelLayout", ChannelLayout);
+            if (Version)
+                Version=3;
+        }
+        else
+            Node_AudioCoding->Add_Child("")->XmlCommentOut="ChannelLayout: "+ChannelLayout.To_UTF8();
+    }
+   
+    //Language
+    Ztring Language=MI.Get(Stream_Audio, StreamPos, Audio_Language);
+    if (!Language.empty())
+    {
+        if (StreamPos && Version<=2)
+        {
+            Node_AudioCoding->Add_Child("mpeg7:Language", Language);
+        }
+        else
+            Node_AudioCoding->Add_Child("")->XmlCommentOut="Language: "+Language.To_UTF8();
+    }
+   
+    //Encryption
+    Ztring Encryption=MI.Get(Stream_Audio, StreamPos, Audio_Encryption);
+    if (!Encryption.empty())
+    {
+        if (Version || (StreamPos && !Version))
+        {
+            Node_AudioCoding->Add_Child("mpeg7:Encryption", Encryption);
+            if (Version)
+                Version=3;
+        }
+        else
+            Node_AudioCoding->Add_Child("")->XmlCommentOut="Encryption: "+Encryption.To_UTF8();
+    }
+
+    if (StreamPos && !Version)
+        Node_AudioCoding->XmlCommentOut = "More than 1 track";
 }
 
 //---------------------------------------------------------------------------
-Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
+void Mpeg7_Transform_Text(Node* Parent, MediaInfo_Internal &MI, size_t StreamPos, size_t& Version)
+{
+    Node* Node_AudioCoding=Parent->Add_Child("mpeg7:TextualCoding");
+
+    //Format
+    Mpeg7_CS(Node_AudioCoding, "mpeg7:Format", "TextualCodingFormatCS", Mpeg7_TextualCodingFormatCS_termID, Mpeg7_TextualCodingFormatCS_Name, MI, StreamPos);
+   
+    //Language
+    Ztring Language=MI.Get(Stream_Text, StreamPos, Text_Language);
+    if (!Language.empty())
+    {
+        bool Forced=MI.Get(Stream_Text, StreamPos, Text_Forced).empty();
+        if (!Version)
+        {
+            Node* Node_Language=Node_AudioCoding->Add_Child("mpeg7:Language", Language);
+            if (Forced)
+                Node_Language->Add_Attribute("closed", "false");
+        }
+        else
+            Node_AudioCoding->Add_Child("")->XmlCommentOut="Language: "+Language.To_UTF8()+(Forced?", open":"");
+    }
+  
+    //Encryption
+    Ztring Encryption=MI.Get(Stream_Text, StreamPos, Text_Encryption);
+    if (!Encryption.empty())
+    {
+        Node_AudioCoding->Add_Child("mpeg7:Encryption", Encryption);
+    }
+
+    if (!Version)
+        Node_AudioCoding->XmlCommentOut = "No Textual track in strict MPEG-7";
+}
+
+//---------------------------------------------------------------------------
+Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI, size_t Version)
 {
     Ztring Value;
 
@@ -1287,12 +2043,20 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
     Node_Mpeg7->Add_Attribute("xmlns", "urn:mpeg:mpeg7:schema:2004");
     Node_Mpeg7->Add_Attribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
     Node_Mpeg7->Add_Attribute("xmlns:mpeg7", "urn:mpeg:mpeg7:schema:2004");
-    Node_Mpeg7->Add_Attribute("xsi:schemaLocation", "urn:mpeg:mpeg7:schema:2004 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-7_schema_files/mpeg7-v2.xsd");
 
     //Description - DescriptionMetadata
     Node* Node_DescriptionMetadata=Node_Mpeg7->Add_Child("mpeg7:DescriptionMetadata");
 
+    Node_DescriptionMetadata->Add_Child_IfNotEmpty(MI, Stream_General, 0, "ISAN", "mpeg7:PublicIdentifier", "type", std::string("ISAN"));
     Node_DescriptionMetadata->Add_Child_IfNotEmpty(MI, Stream_General, 0, General_ISRC, "mpeg7:PublicIdentifier", "type", std::string("ISRC"));
+    Node_DescriptionMetadata->Add_Child_IfNotEmpty(MI, Stream_General, 0, "Producer_Reference", "mpeg7:PublicIdentifier", "type", std::string("OriginatorReference"));
+    Ztring UMID=MI.Get(Stream_General, 0, __T("UMID"));
+    if (!UMID.empty())
+    {
+        if (UMID.size()>1 && UMID[0]==__T('0') && UMID[1]==__T('x'))
+            UMID.erase(0, 2);
+        Node_DescriptionMetadata->Add_Child("mpeg7:PublicIdentifier", UMID, "type", std::string("UMID"));
+    }
 
     Ztring FileName=MI.Get(Stream_General, 0, General_FileName);
     Ztring Extension=MI.Get(Stream_General, 0, General_FileExtension);
@@ -1304,10 +2068,13 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
     //Current date/time is ISO format
     time_t Time=time(NULL);
     Ztring TimeS; TimeS.Date_From_Seconds_1970((int32u)Time);
-    TimeS.FindAndReplace(__T("UTC "), __T(""));
-    TimeS.FindAndReplace(__T(" "), __T("T"));
-    TimeS+=__T("+00:00");
-    Node_DescriptionMetadata->Add_Child("mpeg7:CreationTime", TimeS);
+    if (!TimeS.empty())
+    {
+        TimeS.FindAndReplace(__T("UTC "), __T(""));
+        TimeS.FindAndReplace(__T(" "), __T("T"));
+        TimeS+=__T("+00:00");
+        Node_DescriptionMetadata->Add_Child("mpeg7:CreationTime", TimeS);
+    }
 
     Node* Node_Instrument=Node_DescriptionMetadata->Add_Child("mpeg7:Instrument");
     Node_Instrument->Add_Child("mpeg7:Tool")->Add_Child("mpeg7:Name", MediaInfoLib::Config.Info_Version_Get());
@@ -1336,7 +2103,15 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
     //FileSize
     Node* FileSize=Node_MediaFormat->Add_Child_IfNotEmpty(MI, Stream_General, 0, General_FileSize, "mpeg7:FileSize");
     if (FileSize && !MI.Get(Stream_General, 0, __T("IsTruncated")).empty())
-        FileSize->XmlComment="Malformed file: truncated";
+    {
+        if (Version>1)
+        {
+            FileSize->Add_Attribute("truncated", "true");
+            Version=3;
+        }
+        else
+            FileSize->XmlComment="Malformed file: truncated";
+    }
 
     //System
     Mpeg7_CS(Node_MediaFormat, "mpeg7:System", "SystemCS", Mpeg7_SystemCS_termID, Mpeg7_SystemCS_Name, MI, 0);
@@ -1346,45 +2121,80 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
     if (!BitRate.empty())
     {
         Node* Node_BitRate=Node_MediaFormat->Add_Child("mpeg7:BitRate", BitRate);
-        bool IsCBR=true;
-        bool IsVBR=true;
+        bool IsVBR=false;
         for (size_t StreamKind=Stream_Video; StreamKind<=Stream_Audio; StreamKind++)
             for (size_t StreamPos=0; StreamPos<MI.Count_Get((stream_t)StreamKind); StreamPos++)
             {
-                if (IsCBR && MI.Get((stream_t)StreamKind, StreamPos, __T("BitRate_Mode"))==__T("VBR"))
-                    IsCBR=false;
-                if (IsVBR && MI.Get((stream_t)StreamKind, StreamPos, __T("BitRate_Mode"))==__T("CBR"))
-                    IsVBR=false;
+                Ztring BitRate_Mode=MI.Get((stream_t)StreamKind, StreamPos, __T("BitRate_Mode"));
+                if (BitRate_Mode==__T("VBR"))
+                {
+                    IsVBR=true;
+                    break;
+                }
             }
-        if (IsCBR && IsVBR)
-        {
-            IsCBR=false;
-            IsVBR=false;
-        }
-        if (IsCBR)
-            Node_BitRate->Add_Attribute("variable", "false");
         if (IsVBR)
             Node_BitRate->Add_Attribute("variable", "true");
     }
 
     //xxxCoding
-    for (size_t Pos=0; Pos<MI.Count_Get(Stream_Video); Pos++)
-        Mpeg7_Transform_Visual(Node_MediaFormat, MI, Pos);
-    for (size_t Pos=0; Pos<MI.Count_Get(Stream_Audio); Pos++)
-        Mpeg7_Transform_Audio(Node_MediaFormat, MI, Pos);
+    size_t Video_Count=MI.Count_Get(Stream_Video);
+    size_t Audio_Count=MI.Count_Get(Stream_Audio);
+    size_t Text_Count=MI.Count_Get(Stream_Text);
+    if (Version && (Video_Count>1 || Audio_Count>1 || Text_Count))
+        Version=3;
+    for (size_t Pos=0; Pos<Video_Count; Pos++)
+        Mpeg7_Transform_Visual(Node_MediaFormat, MI, Pos, Version);
+    for (size_t Pos=0; Pos<Audio_Count; Pos++)
+        Mpeg7_Transform_Audio(Node_MediaFormat, MI, Pos, Version);
+    for (size_t Pos=0; Pos<Text_Count; Pos++)
+        Mpeg7_Transform_Text(Node_MediaFormat, MI, Pos, Version);
 
     //MediaTranscodingHints, intraFrameDistance and anchorFrameDistance
-    if (!MI.Get(Stream_Video, 0, Video_Format_Settings_GOP).empty())
+    if (!MI.Get(Stream_Video, 0, Video_Format_Settings_GOP).empty()
+     || !MI.Get(Stream_Video, 0, Video_Gop_OpenClosed).empty())
     {
         Ztring M=MI.Get(Stream_Video, 0, Video_Format_Settings_GOP).SubString(__T("M="), __T(","));
         Ztring N=MI.Get(Stream_Video, 0, Video_Format_Settings_GOP).SubString(__T("N="), __T(""));
+        Ztring OpenClosed=MI.Get(Stream_Video, 0, Video_Gop_OpenClosed);
 
         Node* Node_CodingHints=Node_MediaProfile->Add_Child("mpeg7:MediaTranscodingHints")->Add_Child("mpeg7:CodingHints");
         if (!N.empty())
             Node_CodingHints->Add_Attribute("intraFrameDistance", N);
         if (!M.empty())
             Node_CodingHints->Add_Attribute("anchorFrameDistance", M);
+        if (OpenClosed==__T("Open") || OpenClosed==__T("Closed"))
+        {
+            if (OpenClosed==__T("Open"))
+            {
+                bool Gop_OpenClosed_FirstFrame=MI.Get(Stream_Video, 0, Video_Gop_OpenClosed_FirstFrame)==__T("Closed");
+                if (Version>1)
+                {
+                    Node_CodingHints->Add_Attribute("openGOP", "true");
+                    if (Gop_OpenClosed_FirstFrame)
+                        Node_CodingHints->Add_Attribute("openFirstGOP", "false");
+                    Version=3;
+                }
+                else
+                {
+                    Node_CodingHints->XmlComment="openGOP: true";
+                    if (Gop_OpenClosed_FirstFrame)
+                        Node_CodingHints->XmlComment+=", openFirstGOP: false";
+                }
+            }
+            else //Closed
+            {
+                if (Version>1)
+                {
+                    Node_CodingHints->Add_Attribute("openGOP", "false");
+                    Version=3;
+                }
+                else
+                    Node_CodingHints->XmlComment="openGOP: false";
+            }
+        }
     }
+
+    Node* Node_CreationInformation=nullptr;
 
     if (!MI.Get(Stream_General, 0, General_Movie).empty()
      || !MI.Get(Stream_General, 0, General_Part).empty()
@@ -1399,7 +2209,9 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
      || !MI.Get(Stream_General, 0, General_Producer).empty()
      || !MI.Get(Stream_General, 0, General_Performer).empty())
     {
-        Node* Node_Creation=Node_Type->Add_Child("mpeg7:CreationInformation")->Add_Child("mpeg7:Creation");
+        if (!Node_CreationInformation)
+            Node_CreationInformation=Node_Type->Add_Child("mpeg7:CreationInformation");
+        Node* Node_Creation=Node_CreationInformation->Add_Child("mpeg7:Creation");
 
         if (!MI.Get(Stream_General, 0, General_Movie).empty()
          || !MI.Get(Stream_General, 0, General_Track).empty()
@@ -1512,8 +2324,13 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
         if (!MI.Get(Stream_General, 0, General_Recorded_Date).empty())
         {
             Node* Node_Date=Node_Creation->Add_Child("mpeg7:CreationCoordinates")->Add_Child("mpeg7:Date");
-            Node_Date->Add_Child("")->XmlCommentOut="Recorded date";
-            Node_Date->Add_Child("mpeg7:TimePoint", Mpeg7_TimeToISO(MI.Get(Stream_General, 0, General_Recorded_Date)));
+            Ztring TimePoint=Mpeg7_TimeToISO(MI.Get(Stream_General, 0, General_Recorded_Date));
+            bool TimePoint_Isvalid=Mpeg7_TimeToISO_Isvalid(TimePoint);
+            if (TimePoint_Isvalid)
+                Node_Date->Add_Child("")->XmlCommentOut="Recorded date";
+            Node_Date->Add_Child("mpeg7:TimePoint", TimePoint);
+            if (!TimePoint_Isvalid)
+                Node_Date->XmlCommentOut="Recorded date, invalid input";
         }
         if (!MI.Get(Stream_General, 0, General_Encoded_Date).empty())
         {
@@ -1546,6 +2363,53 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
         }
     }
 
+    //Language
+    ZtringList AudioLanguages, TextLanguages;
+    bool AudioLanguages_HasContent=false, TextLanguages_HasContent=false;
+    for (size_t StreamPos=0; StreamPos<Audio_Count; StreamPos++)
+    {
+        Ztring Language=MI.Get(Stream_Audio, StreamPos, Audio_Language);
+        if (Language.empty())
+            Language=__T("und");
+        else
+            AudioLanguages_HasContent=true;
+        AudioLanguages.push_back(Language);
+    }
+    for (size_t StreamPos=0; StreamPos<Text_Count; StreamPos++)
+    {
+        Ztring Language=MI.Get(Stream_Text, StreamPos, Text_Language);
+        if (Language.empty())
+            Language=__T("und");
+        else
+            TextLanguages_HasContent=true;
+        TextLanguages.push_back(Language);
+    }
+
+    if (AudioLanguages_HasContent
+     || TextLanguages_HasContent
+    )
+    {
+        if (!Node_CreationInformation)
+            Node_CreationInformation=Node_Type->Add_Child("mpeg7:CreationInformation");
+        Node* Node_Classification=Node_CreationInformation->Add_Child("mpeg7:Classification");
+
+        if (AudioLanguages_HasContent)
+        {
+            for (const auto& Language : AudioLanguages)
+                Node_Classification->Add_Child("mpeg7:Language", Language);
+        }
+        if (TextLanguages_HasContent)
+        {
+            for (size_t StreamPos=0; StreamPos<TextLanguages.size(); StreamPos++)
+            {
+                const auto& Language=TextLanguages[StreamPos];
+                Node* Node_CaptionLanguage=Node_Classification->Add_Child("mpeg7:CaptionLanguage", Language);
+                if (!MI.Get(Stream_Text, StreamPos, Text_Forced).empty())
+                    Node_CaptionLanguage->Add_Attribute("closed", "false");
+            }
+        }
+    }
+
     if (MI.Count_Get(Stream_Video)==1 || MI.Count_Get(Stream_Audio)==1)
     {
         Node* Node_MediaTime=Node_Type->Add_Child("mpeg7:MediaTime");
@@ -1558,6 +2422,11 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
         if (!Value.empty())
             Node_MediaTime->Add_Child("mpeg7:MediaDuration", Value);
     }
+
+    if (Version>2)
+        Node_Mpeg7->Add_Attribute("xsi:schemaLocation", "urn:mpeg:mpeg7:schema:2004 https://mediaarea.net/xsd/mpeg7-v2-extended.xsd");
+    else
+        Node_Mpeg7->Add_Attribute("xsi:schemaLocation", "urn:mpeg:mpeg7:schema:2004 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-7_schema_files/mpeg7-v2.xsd");
 
     Ztring ToReturn=Ztring().From_UTF8(To_XML(*Node_Mpeg7, 0, true, true).c_str());
 

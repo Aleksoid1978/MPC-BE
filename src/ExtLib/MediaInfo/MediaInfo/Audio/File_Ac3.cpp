@@ -170,7 +170,7 @@ const char*  AC3_ChannelPositions2[]=
 const char*  AC3_ChannelLayout_lfeoff[]=
 {
     "M M",
-    "C",
+    "M",
     "L R",
     "L R C",
     "L R S",
@@ -741,6 +741,9 @@ const char* AC3_TrueHD_ChannelLayoutNames2[AC3_TrueHD_ChannelLayoutNames2_Size]=
 };
 std::string AC3_TrueHD_Channels_ChannelLayout(int16u ChannelsMap, bool Bit11=false)
 {
+    if (ChannelsMap==2)
+        return "M";
+
     std::string Text;
 
     for (size_t i=0; i<16; i++)
@@ -1008,7 +1011,7 @@ File_Ac3::File_Ac3()
             chanmape_Max[Pos][Pos2]=false;
             chanmap_Max[Pos][Pos2]=0;
         }
-    numblkscod=0;
+    numblkscod=(int8u)-1;
     dsurexmod=0;
     dheadphonmod=0;
     substreamid_Independant_Current=0;
@@ -1241,22 +1244,26 @@ void File_Ac3::Streams_Fill()
                     Fill(Stream_Audio, 0, Audio_ID, 1+Pos);
 
                 Fill(Stream_Audio, 0, Audio_BitRate_Mode, "CBR");
-                int8u numblks=numblkscod==3?6:numblkscod+1;
-                int32u frmsiz_Total=0;
-                for (size_t Pos2=0; Pos2<8; Pos2++)
-                    frmsiz_Total+=frmsizplus1_Max[Pos][Pos2];
                 int32u SamplingRate;
                 if (fscod!=3)
                     SamplingRate=AC3_SamplingRate[fscod];
                 else
                     SamplingRate=AC3_SamplingRate2[fscod2];
-                int32u TimeStamp_Size=0;
-                if (TimeStamp_Count==Frame_Count || TimeStamp_Count>Frame_Count/2) // In case of corrupted stream, check that there is a minimal count of timestamps 
-                    TimeStamp_Size=16;
                 Fill(Stream_Audio, 0, Audio_SamplingRate, SamplingRate);
-                Fill(Stream_Audio, 0, Audio_BitRate, ((int64u)frmsiz_Total)*SamplingRate/32/numblks);
-                if (TimeStamp_Size)
-                    Fill(Stream_Audio, 0, Audio_BitRate_Encoded, ((int64u)frmsiz_Total+TimeStamp_Size)*SamplingRate/32/numblks);
+                if (numblkscod!=(int8u)-1)
+                {
+                    int8u numblks=numblkscod==3?6:numblkscod+1;
+                    int32u frmsiz_Total=0;
+                    for (size_t Pos2=0; Pos2<8; Pos2++)
+                        frmsiz_Total+=frmsizplus1_Max[Pos][Pos2];
+                    int32u TimeStamp_Size=0;
+                    if (TimeStamp_Count==Frame_Count || TimeStamp_Count>Frame_Count/2) // In case of corrupted stream, check that there is a minimal count of timestamps 
+                        TimeStamp_Size=16;
+                    if (frmsiz_Total)
+                        Fill(Stream_Audio, 0, Audio_BitRate, ((int64u)frmsiz_Total)*SamplingRate/32/numblks);
+                    if (TimeStamp_Size)
+                        Fill(Stream_Audio, 0, Audio_BitRate_Encoded, ((int64u)frmsiz_Total+TimeStamp_Size)*SamplingRate/32/numblks);
+                }
 
                 if (acmod_Max[Pos][1]!=(int8u)-1)
                 {
@@ -1416,7 +1423,7 @@ void File_Ac3::Streams_Fill()
         SamplesPerFrame=1536;
     else if (bsid_Max<=0x09)
         SamplesPerFrame=768; // Unofficial hack for low sample rate (e.g. 22.05 kHz)
-    else if (bsid_Max>0x0A && bsid_Max<=0x10)
+    else if (bsid_Max>0x0A && bsid_Max<=0x10 && numblkscod!=(int8u)-1)
         SamplesPerFrame=256*(numblkscod==3?6:(numblkscod+1));
     else if (HD_MajorSync_Parsed && (HD_StreamType==0xBA || HD_StreamType==0xBB)) // TrueHD or MLP
     {
@@ -2223,8 +2230,8 @@ void File_Ac3::Core_Frame()
     bsid=CC1(Buffer+Buffer_Offset+Element_Offset+5)>>3;
     if (bsid<=0x09)
     {
-        fscod     =(Buffer[(size_t)(Buffer_Offset+4)]&0xC0)>>6;
-        frmsizecod= Buffer[(size_t)(Buffer_Offset+4)]&0x3F;
+        int8u fscod     =(Buffer[(size_t)(Buffer_Offset+4)]&0xC0)>>6;
+        int8u frmsizecod= Buffer[(size_t)(Buffer_Offset+4)]&0x3F;
 
         //Filling
         fscods[fscod]++;
@@ -4607,6 +4614,8 @@ void File_Ac3::dec3()
         int8u num_dep_sub;
         Get_S1 (2, fscod,                                       "fscod");
         Get_S1 (5, bsid,                                        "bsid");
+        if (bsid_Max<bsid || bsid_Max==(int8u)-1)
+            bsid_Max=bsid;
         Skip_SB(                                                "reserved");
         Skip_SB(                                                "asvc");
         Get_S1 (3, bsmod_Max[Pos][0],                           "bsmod");
@@ -4633,6 +4642,10 @@ void File_Ac3::dec3()
 
     MustParse_dec3=false;
     dxc3_Parsed=true;
+
+    FILLING_BEGIN()
+        Accept();
+    FILLING_END()
 }
 
 //---------------------------------------------------------------------------
@@ -4835,8 +4848,8 @@ size_t File_Ac3::Core_Size_Get()
     bsid=(Buffer[(size_t)(Buffer_Offset+5-IsLE)]&0xF8)>>3;
     if (bsid<=0x09)
     {
-        fscod     =(Buffer[(size_t)(Buffer_Offset+4+IsLE)]&0xC0)>>6;
-        frmsizecod= Buffer[(size_t)(Buffer_Offset+4+IsLE)]&0x3F;
+        int8u fscod     =(Buffer[(size_t)(Buffer_Offset+4+IsLE)]&0xC0)>>6;
+        int8u frmsizecod= Buffer[(size_t)(Buffer_Offset+4+IsLE)]&0x3F;
 
         //Filling
         fscods[fscod]++;

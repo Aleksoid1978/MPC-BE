@@ -19,6 +19,7 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/TimeCode.h"
 #include <limits>
+#include <sstream>
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -658,7 +659,8 @@ int64s TimeCode::ToMilliseconds() const
     if (!HasValue())
         return 0;
 
-    int64s MS=float64_int64s(ToFrames()*1000*(FramesMax && (Flags.test(DropFrame) || Flags.test(FramesPerSecond_Is1001))?1.001:1.000)/((((int64u)FramesMax)+1)*(Flags.test(MustUseSecondField)?2:1)));
+    int64s Den=((((uint64_t)FramesMax)+1)*(Flags.test(MustUseSecondField)?2:1));
+    int64s MS=(ToFrames()*1000*(FramesMax && (Flags.test(DropFrame) || Flags.test(FramesPerSecond_Is1001))?1.001:1.000)+Den/2)/Den;
 
     if (Flags.test(IsNegative))
         MS=-MS;
@@ -672,10 +674,10 @@ int64s TimeCode::ToMilliseconds() const
 
 //---------------------------------------------------------------------------
 //Modified Julian Date
-Ztring Date_MJD(int16u Date_)
+std::string Date_MJD(uint16_t Date_)
 {
     //Calculating
-    float64 Date=Date_;
+    double Date=Date_;
     int Y2=(int)((Date-15078.2)/365.25);
     int M2=(int)(((Date-14956.1) - ((int)(Y2*365.25))) /30.6001);
     int D =(int)(Date-14956 - ((int)(Y2*365.25)) - ((int)(M2*30.6001)));
@@ -686,18 +688,23 @@ Ztring Date_MJD(int16u Date_)
     int M =M2-1-K*12;
 
     //Formatting
-    return                       Ztring::ToZtring(1900+Y)+__T("-")
-         + (M<10?__T("0"):__T(""))+Ztring::ToZtring(     M)+__T("-")
-         + (D<10?__T("0"):__T(""))+Ztring::ToZtring(     D);
+    return               to_string(1900+Y)+'-'
+         + (M<10?"0":"")+to_string(     M)+'-'
+         + (D<10?"0":"")+to_string(     D);
 }
 
 //---------------------------------------------------------------------------
 //Form: HHMMSS, BCD
-Ztring Time_BCD(int32u Time)
+std::string Time_BCD(uint32_t Time)
 {
-    return (((Time>>16)&0xFF)<10?__T("0"):__T("")) + Ztring::ToZtring((Time>>16)&0xFF, 16)+__T(":") //BCD
-         + (((Time>> 8)&0xFF)<10?__T("0"):__T("")) + Ztring::ToZtring((Time>> 8)&0xFF, 16)+__T(":") //BCD
-         + (((Time    )&0xFF)<10?__T("0"):__T("")) + Ztring::ToZtring((Time    )&0xFF, 16);        //BCD
+    string V("00:00:00");
+    V[0]+=(uint8_t)(Time>>20)&0x0F;
+    V[1]+=(uint8_t)(Time>>16)&0x0F;
+    V[3]+=(uint8_t)(Time>>12)&0x0F;
+    V[4]+=(uint8_t)(Time>> 8)&0x0F;
+    V[6]+=(uint8_t)(Time>> 4)&0x0F;
+    V[7]+=(uint8_t)(Time    )&0x0F;
+    return V;
 }
 
 

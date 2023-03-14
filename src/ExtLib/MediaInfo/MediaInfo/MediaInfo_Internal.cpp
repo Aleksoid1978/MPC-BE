@@ -302,8 +302,7 @@ extern const Char* MediaInfo_Version;
 //***************************************************************************
 // Modifiers - ChannelLayout_2018
 //***************************************************************************
-static const size_t ChannelLayout_2018_Size=64;
-static const char* ChannelLayout_2018[ChannelLayout_2018_Size][2] =
+static const char* ChannelLayout_2018[][2] =
 {
     { "BC", "Cb" },
     { "BL", "Lb" },
@@ -320,11 +319,10 @@ static const char* ChannelLayout_2018[ChannelLayout_2018_Size][2] =
     { "Cvr", "Tbc" },
     { "FC", "C" },
     { "FL", "L" },
-    { "FLC", "Lscr" },
+    { "FLC", "Lc" },
     { "FR", "R" },
-    { "FRC", "Rscr" },
+    { "FRC", "Rc" },
     { "LI", "Bfl" },
-    { "Lc", "Lscr" },
     { "Lfh", "Tfl" },
     { "Lh", "Vhl" },
     { "Lhr", "Tbl" },
@@ -340,7 +338,6 @@ static const char* ChannelLayout_2018[ChannelLayout_2018_Size][2] =
     { "Lvr", "Tbl" },
     { "Lvss", "Tsl" },
     { "Oh", "Tc" },
-    { "Rc", "Rscr" },
     { "Rfh", "Tfrr" },
     { "Rh", "Vhr" },
     { "Rhr", "Tbr" },
@@ -370,6 +367,7 @@ static const char* ChannelLayout_2018[ChannelLayout_2018_Size][2] =
     { "Ts", "Tc" },
     { "Vhc", "Tfc" },
 };
+static const size_t ChannelLayout_2018_Size=sizeof(ChannelLayout_2018)/sizeof(decltype(*ChannelLayout_2018));
 static const size_t ChannelLayout_2018_Aac_Size=3;
 static const char* ChannelLayout_2018_Aac[ChannelLayout_2018_Aac_Size][2] =
 {
@@ -384,7 +382,7 @@ Ztring ChannelLayout_2018_Rename(const Ztring& Channels, const Ztring& Format)
     List.Write(Channels);
     size_t LfePos[3];
     memset(LfePos, -1, sizeof(LfePos));
-    bool IsAac=(Format==__T("USAC") || Format==__T("MPEG-H 3D Audio"));
+    bool IsAac=(Format==__T("AAC") || Format==__T("USAC") || Format==__T("MPEG-H 3D Audio"));
     for (size_t i=0; i<List.size(); i++)
     {
         Ztring& ChannelName=List[i];
@@ -568,12 +566,16 @@ Ztring HighestFormat(stream_t StreamKind, size_t Parameter, const ZtringList& In
     static const Char* Express=__T("Express");
     static const Char* HEAACv2 = __T("HE-AACv2");
     static const Char* HEAAC = __T("HE-AAC");
+    static const Char* HEAAC_ESBR = __T("HE-AAC+eSBR");
     static const Char* HRA=__T("HRA");
     static const Char* JOC=__T("JOC");
     static const Char* LC=__T("LC");
     static const Char* LCSBR=__T("LC SBR");
     static const Char* LCSBRPS=__T("LC SBR PS");
+    static const Char* LCESBR=__T("LC SBR eSBR");
     static const Char* LTP=__T("LTP");
+    static const Char* X=__T("X");
+    static const Char* IMAX=__T("IMAX");
     static const Char* MA=__T("MA");
     static const Char* Main=__T("Main");
     static const Char* MLP=__T("MLP");
@@ -648,6 +650,8 @@ Ztring HighestFormat(stream_t StreamKind, size_t Parameter, const ZtringList& In
                 const Ztring& Profile=Info[Parameter_Format_Profile];
                 if (Profile.find(HEAACv2)!=string::npos)
                     return LCSBRPS;
+                if (Profile.find(HEAAC_ESBR)!=string::npos)
+                    return LCESBR;
                 if (Profile.find(HEAAC)!=string::npos)
                     return LCSBR;
                 if (Profile.find(LC)!=string::npos)
@@ -751,7 +755,12 @@ Ztring HighestFormat(stream_t StreamKind, size_t Parameter, const ZtringList& In
                 if (Profile.find(HEAACv2)!=string::npos)
                     return "Advanced Audio Codec Low Complexity with Spectral Band Replication and Parametric Stereo";
                 if (Profile.find(HEAAC)!=string::npos)
-                    return "Advanced Audio Codec Low Complexity with Spectral Band Replication";
+                {
+                    if (Profile.find(__T("eSBR"))!=string::npos)
+                        return "Advanced Audio Codec Low Complexity with Enhanced Spectral Band Replication";
+                    else
+                        return "Advanced Audio Codec Low Complexity with Spectral Band Replication";
+                }
                 if (Profile.find(LC)!=string::npos)
                     return "Advanced Audio Codec Low Complexity";
             }
@@ -790,6 +799,8 @@ Ztring HighestFormat(stream_t StreamKind, size_t Parameter, const ZtringList& In
             if (Info[Parameter_Format]==AAC)
             {
                 const Ztring& Profile=Info[Parameter_Format_Profile];
+                if (Profile.find(HEAAC_ESBR)!=string::npos)
+                    return "HE-AAC eSBR";
                 if (Profile.find(HEAACv2)!=string::npos)
                     return "HE-AACv2";
                 if (Profile.find(HEAAC)!=string::npos)
@@ -798,7 +809,11 @@ Ztring HighestFormat(stream_t StreamKind, size_t Parameter, const ZtringList& In
             if (Info[Parameter_Format]==DTS)
             {
                 const Ztring& Profile=Info[Parameter_Format_Profile];
-                if (Profile.find(MA)!=string::npos)
+                if (Profile.find(IMAX)!=string::npos)
+                    return "IMAX Enhanced";
+                else if (Profile.find(X)!=string::npos)
+                    return "DTS:X";
+                else if (Profile.find(MA)!=string::npos)
                     return "DTS-HD Master Audio";
                 if (Profile.find(HRA)!=string::npos)
                     return "DTS-HD High Resolution Audio";
@@ -1404,13 +1419,13 @@ void MediaInfo_Internal::Entry()
             {
                 int8u* Buffer_New;
                 size_t Buffer_Size_New;
-                Cin.Current(Buffer_New, Buffer_Size_New);
                 if (Cin.IsExited())
                     break;
+                Cin.Current(Buffer_New, Buffer_Size_New);
                 if (Buffer_Size_New)
                 {
                     if (Open_Buffer_Continue(Buffer_New, Buffer_Size_New)[File__Analyze::IsFinished])
-                        break;
+                        Reader_Cin_ForceTerminate(&Cin);
                     if (Config.RequestTerminate)
                         Cin.RequestTerminate();
                     Cin.IsManaged();
@@ -2595,6 +2610,32 @@ Ztring MediaInfo_Internal::Inform(std::vector<MediaInfo_Internal*>& Info)
         }
 
         Result+=__T("</MicroMediaTrace>");
+    }
+
+    else if (MediaInfoLib::Config.Inform_Get().MakeLowerCase()==__T("timecodexml"))
+    {
+        Result+=__T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")+MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T('<');
+        Result+=__T("MediaTimecode");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("    xmlns=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediatimecode\"");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("    xsi:schemaLocation=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediatimecode http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/xsd/mediatimecode.xsd\"");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("    version=\"0.0\"");
+        Result+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("<creatingLibrary version=\"")+Ztring(MediaInfo_Version).SubString(__T(" - v"), Ztring())+__T("\" url=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+
+        for (size_t FilePos=0; FilePos<Info.size(); FilePos++)
+            Result+=Info[FilePos]->Inform();
+
+        if (!Result.empty() && Result[Result.size()-1]!=__T('\r') && Result[Result.size()-1]!=__T('\n'))
+            Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("</MediaTimecode");
+        Result+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
     }
 
     else if (MediaInfoLib::Config.Inform_Get()==__T("XML") || MediaInfoLib::Config.Inform_Get()==__T("MIXML"))

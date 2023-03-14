@@ -161,7 +161,6 @@ void File_VorbisCom::FileHeader_Parse()
             {
                 Library_Date.insert(6, 1, __T('-'));
                 Library_Date.insert(4, 1, __T('-'));
-                Library_Date.insert(0, __T("UTC "));
             }
         }
         if (vendor_string.find(__T("libFLAC"))!=std::string::npos) Library_Name="libFLAC";
@@ -211,6 +210,7 @@ void File_VorbisCom::Data_Parse()
         Ztring Key=comment.SubString(__T(""), __T("="));
         Key.MakeUpperCase();
         Ztring Value=comment.SubString(__T("="), __T(""));
+        Ztring Encoded_Date, Encoded_Time, TimeReference_High, TimeReference_Low;
 
              if (Key==__T("ADDED_TIMESTAMP"))        Fill(StreamKind_Common,   0, "Added_Date", Ztring().Date_From_Milliseconds_1601(Value.To_int64u()/1000));
         else if (Key==__T("ALBUM ARTIST"))           AlbumArtists.push_back(Value);
@@ -220,7 +220,15 @@ void File_VorbisCom::Data_Parse()
         else if (Key==__T("ARTIST"))                 Artists.push_back(Value);
         else if (Key==__T("AUTHOR"))                 Fill(StreamKind_Common,   0, "WrittenBy", Value);
         else if (Key==__T("BUYCDURL"))               {}
+        else if (Key==__T("BWFVERSION"))             // bext
+        {
+            Fill(Stream_General, 0, "bext_Present", "Yes");
+            Fill_SetOptions(Stream_General, 0, "bext_Present", "N NT");
+            Fill(Stream_General, 0, "bext_Version", Value);
+            Fill_SetOptions(Stream_General, 0, "bext_Version", "N NIY");
+        }
         else if (Key==__T("CLASS"))                  Fill(StreamKind_Common,   0, "ContentType", Value);
+        else if (Key==__T("CODINGHISTORY"))          Fill(StreamKind_Common,   0, "Encoded_Library_Settings", Value); // bext
         else if (Key==__T("COMPOSER"))               Fill(StreamKind_Common,   0, "Composer", Value);
         else if (Key==__T("COMMENT"))                Fill(StreamKind_Common,   0, "Comment", Value);
         else if (Key==__T("COMMENTS"))               Fill(StreamKind_Common,   0, "Comment", Value);
@@ -228,6 +236,13 @@ void File_VorbisCom::Data_Parse()
         else if (Key==__T("CONTACT"))                Fill(StreamKind_Common,   0, "Publisher", Value);
         else if (Key==__T("COPYRIGHT"))              Fill(StreamKind_Common,   0, "Copyright", Value);
         else if (Key==__T("DATE"))                   Fill(StreamKind_Common,   0, "Recorded_Date", Value, true);
+        else if (Key==__T("DATE-EXT"))               // bext
+        {
+            if (Encoded_Time.empty())
+                Encoded_Date=Value;
+            else
+                Fill(StreamKind_Common, 0, "Encoded_Date", Encoded_Date+__T(' ')+Encoded_Time);
+        }
         else if (Key==__T("DESCRIPTION"))            Fill(StreamKind_Common,   0, "Description", Value);
         else if (Key==__T("DISC"))                   Fill(StreamKind_Common,   0, "Part", Value, true);
         else if (Key==__T("DISCNUMBER"))             Fill(StreamKind_Common,   0, "Part", Value, true);
@@ -255,21 +270,66 @@ void File_VorbisCom::Data_Parse()
         else if (Key==__T("MUSICBRAINZ_TRACKID"))    {}
         else if (Key==__T("MUSICBRAINZ_SORTNAME"))   Fill(StreamKind_Common,   0, "Performer/Sort", Value);
         else if (Key==__T("MUSICBRAINZ_DISCID"))     {}
+        else if (Key==__T("NULL"))                   {}
         else if (Key==__T("ORGANIZATION"))           Fill(StreamKind_Common,   0, "Producer", Value);
+        else if (Key==__T("ORIGINATOR"))             Fill(StreamKind_Common,   0, "Producer", Value);
         else if (Key==__T("PERFORMER"))              Performers.push_back(Value);
         else if (Key==__T("PLAY_COUNT"))             Fill(StreamKind_Multiple, 0, "Played_Count", Value.To_int64u());
+        else if (Key==__T("PUBLISHER"))              Fill(StreamKind_Common,   0, "Publisher", Value);
         else if (Key==__T("RATING"))                 Fill(StreamKind_Multiple, 0, "Rating", Value);
         else if (Key==__T("REPLAYGAIN_ALBUM_GAIN"))  Fill(StreamKind_Common,   0, "Album_ReplayGain_Gain", Value.To_float64(), 2);
         else if (Key==__T("REPLAYGAIN_ALBUM_PEAK"))  Fill(StreamKind_Common,   0, "Album_ReplayGain_Peak", Value.To_float64(), 6);
         else if (Key==__T("REPLAYGAIN_REFERENCE_LOUDNESS")) {}
         else if (Key==__T("REPLAYGAIN_TRACK_GAIN"))  Fill(StreamKind_Specific, 0, "ReplayGain_Gain",       Value.To_float64(), 2);
         else if (Key==__T("REPLAYGAIN_TRACK_PEAK"))  Fill(StreamKind_Specific, 0, "ReplayGain_Peak",       Value.To_float64(), 6);
+        else if (Key==__T("REFERENCE"))              Fill(StreamKind_Common,   0, "Producer_Reference", Value);
         else if (Key==__T("TITLE"))                  Fill(StreamKind_Common,   0, "Title", Value);
+        else if (Key==__T("TIME"))                   // bext
+        {
+            if (Encoded_Date.empty())
+                Encoded_Time=Value;
+            else
+                Fill(StreamKind_Common, 0, "Encoded_Date", Encoded_Date+__T(' ')+Encoded_Time);
+        }
+        else if (Key==__T("TIMEREFHIGH"))            // bext
+        {
+            if (TimeReference_Low.empty())
+                TimeReference_High=Value;
+            else
+            {
+                Fill(StreamKind_Specific, 0, "Delay", TimeReference_High.To_int64u()*0x100000000LL+TimeReference_High.To_int64u());
+                Fill(StreamKind_Specific, 0, "Delay_Source", "Container (bext)");
+            }
+        }
+        else if (Key==__T("TIMEREFLOW"))             // bext
+        {
+            if (TimeReference_High.empty())
+                TimeReference_Low=Value;
+            else
+            {
+                Fill(StreamKind_Specific, 0, "Delay", TimeReference_High.To_int64u()*0x100000000LL+TimeReference_High.To_int64u());
+                Fill(StreamKind_Specific, 0, "Delay_Source", "Container (bext)");
+            }
+        }
         else if (Key==__T("TOTALTRACKS"))            {if (Value!=Retrieve(StreamKind_Common, 0, "Track/Position_Total")) Fill(StreamKind_Common,   0, "Track/Position_Total", Value);}
         else if (Key==__T("TOTALDISCS"))             {if (Value!=Retrieve(StreamKind_Common, 0, "Part/Position_Total")) Fill(StreamKind_Common,   0, "Part/Position_Total", Value);}
         else if (Key==__T("TRACK_COMMENT"))          Fill(StreamKind_Multiple, 0, "Comment", Value);
         else if (Key==__T("TRACKNUMBER"))            Fill(StreamKind_Multiple, 0, "Track/Position", Value);
         else if (Key==__T("TRACKTOTAL"))             {if (Value!=Retrieve(StreamKind_Common, 0, "Track/Position_Total")) Fill(StreamKind_Multiple, 0, "Track/Position_Total", Value);}
+        else if (Key==__T("UMID"))                   // bext
+        {
+            ZtringList UMID;
+            UMID.Separator_Set(0, __T(","));
+            UMID.Write(Value);
+            if (UMID.size()==32 || UMID.size()==64)
+            {
+                Value.clear();
+                for (const auto& V : UMID)
+                    Value+=Ztring().From_CC2(V.To_int64s());
+                if (Value.find_first_not_of(__T('0'))!=string::npos)
+                    Fill(StreamKind_Common, 0, "UMID", __T("0x")+Value);
+            }
+        }
         else if (Key==__T("VERSION"))                Fill(StreamKind_Common,   0, "Track_More", Value);
         else if (Key==__T("BPM"))                    Fill(StreamKind_Common,   0, "BPM", Value);
         else if (Key==__T("WAVEFORMATEXTENSIBLE_CHANNEL_MASK"))

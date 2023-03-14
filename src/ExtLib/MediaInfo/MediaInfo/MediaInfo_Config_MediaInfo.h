@@ -31,6 +31,9 @@
 #include "ZenLib/CriticalSection.h"
 #include "ZenLib/Translation.h"
 #include "ZenLib/InfoMap.h"
+#if MEDIAINFO_ADVANCED
+    #include "MediaInfo/TimeCode.h"
+#endif //MEDIAINFO_ADVANCED
 using namespace ZenLib;
 using std::string;
 //---------------------------------------------------------------------------
@@ -431,6 +434,20 @@ public :
     #if MEDIAINFO_SEEK
     bool      File_GoTo_IsFrameOffset;
     #endif //MEDIAINFO_SEEK
+
+    //Logs
+    #if MEDIAINFO_ADVANCED
+        struct timecode_dump
+        {
+            std::string List;
+            TimeCode LastTC;
+            int32u FramesMax=0;
+            int64u FrameCount=0;
+            string Attributes_First;
+            string Attributes_Last;
+        };
+        std::map<std::string, timecode_dump>* TimeCode_Dumps;
+    #endif //MEDIAINFO_ADVANCED
 
 private :
     bool                    FileIsSeekable;

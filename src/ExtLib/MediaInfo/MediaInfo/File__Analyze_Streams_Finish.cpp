@@ -40,6 +40,7 @@
     #include <fstream>
     #endif //WINDOWS
 #endif //MEDIAINFO_FIXITY
+#include <algorithm>
 using namespace ZenLib;
 //---------------------------------------------------------------------------
 
@@ -1209,6 +1210,51 @@ void File__Analyze::Streams_Finish_StreamOnly_Audio(size_t Pos)
             else
                 SamplesPerFrame.From_Number(SamplesPerFrameF, 0);
             Fill(Stream_Audio, Pos, Audio_SamplesPerFrame, SamplesPerFrame);
+        }
+    }
+
+    //ChannelLayout
+    if (Retrieve_Const(Stream_Audio, Pos, Audio_ChannelLayout).empty())
+    {
+        ZtringList ChannelLayout_List;
+        ChannelLayout_List.Separator_Set(0, __T(" "));
+        ChannelLayout_List.Write(Retrieve_Const(Stream_Audio, Pos, Audio_ChannelLayout));
+        size_t ChannelLayout_List_SizeBefore=ChannelLayout_List.size();
+        
+        size_t NumberOfSubstreams=(size_t)Retrieve_Const(Stream_Audio, Pos, "NumberOfSubstreams").To_int64u();
+        for (size_t i=0; i<NumberOfSubstreams; i++)
+        {
+            static const char* const Places[]={ "ChannelLayout", "BedChannelConfiguration" };
+            static constexpr size_t Places_Size=sizeof(Places)/sizeof(decltype(*Places));
+            for (const auto Place : Places)
+            {
+                ZtringList AdditionaChannelLayout_List;
+                AdditionaChannelLayout_List.Separator_Set(0, __T(" "));
+                AdditionaChannelLayout_List.Write(Retrieve_Const(Stream_Audio, Pos, ("Substream"+std::to_string(i)+' '+Place).c_str()));
+                for (auto& AdditionaChannelLayout_Item: AdditionaChannelLayout_List)
+                {
+                    if (std::find(ChannelLayout_List.cbegin(), ChannelLayout_List.cend(), AdditionaChannelLayout_Item)==ChannelLayout_List.cend())
+                        ChannelLayout_List.push_back(std::move(AdditionaChannelLayout_Item));
+                }
+            }
+        }
+        if (ChannelLayout_List.size()!=ChannelLayout_List_SizeBefore)
+        {
+            Fill(Stream_Audio, Pos, Audio_Channel_s_, ChannelLayout_List.size(), 10, true);
+            Clear(Stream_Audio, Pos, Audio_ChannelPositions);
+            Fill(Stream_Audio, Pos, Audio_ChannelLayout, ChannelLayout_List.Read(), true);
+        }
+    }
+
+    //Channel(s)
+    if (Retrieve_Const(Stream_Audio, Pos, Audio_Channel_s_).empty())
+    {
+        size_t NumberOfSubstreams=(size_t)Retrieve_Const(Stream_Audio, Pos, "NumberOfSubstreams").To_int64u();
+        if (NumberOfSubstreams==1)
+        {
+            auto Channels=Retrieve_Const(Stream_Audio, Pos, "Substream0 Channel(s)").To_int32u();
+            if (Channels)
+                Fill(Stream_Audio, Pos, Audio_Channel_s_, Channels);
         }
     }
 

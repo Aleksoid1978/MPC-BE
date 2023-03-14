@@ -21,6 +21,7 @@
 #endif
 #include "MediaInfo/Tag/File__Tags.h"
 #include "MediaInfo/Audio/File_Usac.h"
+#include "MediaInfo/Audio/File_Aac_GeneralAudio_Sbr.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -80,41 +81,6 @@ enum Aac_OutputChannel
 //***************************************************************************
 // Class File_Aac
 //***************************************************************************
-
-struct sbr_handler
-{
-    //sbr_header
-    int8u  bs_amp_res[2];
-    int8u  bs_amp_res_FromHeader;
-    int8u  bs_start_freq;
-    int8u  bs_stop_freq;
-    int8u  bs_xover_band;
-    int8u  bs_freq_scale;
-    int8u  bs_alter_scale;
-    int8u  bs_noise_bands;
-
-    //sbr_grid
-    int8u   bs_num_env[2];
-    bool    bs_freq_res[2][8];
-    int8u   bs_num_noise[2];
-
-    //sbr_dtdf
-    int8u   bs_df_env[2][4];
-    int8u   bs_df_noise[2][2];
-
-    //Computed values
-    int8u  num_noise_bands;
-    int8u  num_env_bands[2];
-};
-
-struct ps_handler
-{
-    bool   enable_iid;
-    bool   enable_icc;
-    bool   enable_ext;
-    int8u  iid_mode;
-    int8u  icc_mode;
-};
 
 typedef const int8s (*sbr_huffman)[2];
 
@@ -318,8 +284,9 @@ protected :
     void sbr_sinusoidal_coding              (bool ch);
     int16u sbr_huff_dec                     (const sbr_huffman& Table, const char* Name);
 
-    //Elements - SBR - PS
+    //Elements - SBR - Extensions
     void ps_data                            (size_t End);
+    void esbr_data                          (size_t End);
 
     //Elements - Perceptual noise substitution (PNS)
     bool is_noise                           (size_t group, size_t sfb);

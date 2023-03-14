@@ -47,12 +47,15 @@ private :
     void Data_Parse();
 
     //Temp
-    int64u FirstFrame_TCI;
-    int64u DFC;
-    int16u CCT;
+    int32u TCI_FirstFrame;
+    int16u LineCount;
+    int16u LineCount_Max;
+    int8u  FrameRate;
+    int8u  CharSet;
+    bool   Line_HasContent;
+    size_t TotalLines;
     #if MEDIAINFO_DEMUX
-        int64u TCP_Offset;
-        int64u TCO_Latest;
+        int32u TCO_Previous;
         int8u  Row_Max;
         int8u  Column_Max;
         bool   IsTeletext;

@@ -235,7 +235,9 @@ std::string To_JSON (Node& Cur_Node, const int& Level, bool Print_Header=false, 
 
 bool ExternalMetadata(const ZenLib::Ztring& FileName, const ZenLib::Ztring& ExternalMetadata, const ZenLib::Ztring& ExternalMetaDataConfig, const ZenLib::ZtringList& Parents, const  ZenLib::Ztring& PlaceHolder, Node* Main, Node* MI_Info);
 
+#if defined(MEDIAINFO_EBUCORE_YES) || defined(MEDIAINFO_FIMS_YES) || defined(MEDIAINFO_MPEG7_YES)
 Ztring VideoCompressionCodeCS_Name(int32u termID, MediaInfo_Internal &MI, size_t StreamPos);
+#endif
 
 } //NameSpace
 

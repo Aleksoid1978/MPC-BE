@@ -101,6 +101,9 @@
 #include "ZenLib/Format/Http/Http_Utils.h"
 #include <cfloat>
 #include <cmath>
+#if MEDIAINFO_ADVANCED
+    #include <limits>
+#endif //MEDIAINFO_ADVANCED
 #if MEDIAINFO_SEEK
     #include <algorithm>
 #endif //MEDIAINFO_SEEK
@@ -526,7 +529,7 @@ namespace Elements
 extern const char* Mpegv_profile_and_level_indication_profile[];
 extern const char* Mpegv_profile_and_level_indication_level[];
 extern const char* Mpeg4v_Profile_Level(int32u Profile_Level);
-extern const char* Avc_profile_idc(int8u profile_idc);
+extern string Avc_profile_level_string(int8u profile_idc, int8u level_idc=0, int8u constraint_set_flags=0);
 extern string Jpeg2000_Rsiz(int16u Rsiz);
 
 //---------------------------------------------------------------------------
@@ -4027,26 +4030,37 @@ void File_Mxf::Streams_Finish_Descriptor(const int128u DescriptorUID, const int1
                     }
 
                     //Special cases
-                    std::map<std::string, Ztring>::iterator Info_Level=SubDescriptor->second.Infos.find("Temp_AVC_Format_Level");
-                    std::map<std::string, Ztring>::iterator Info_constraint=SubDescriptor->second.Infos.find("Temp_AVC_constraint_set3_flag");
-                    if (Info_Level!=SubDescriptor->second.Infos.end() || Info_constraint!=SubDescriptor->second.Infos.end())
+                    std::map<std::string, Ztring>::iterator Info_AvcProfile=SubDescriptor->second.Infos.find("Temp_AVC_Profile");
+                    std::map<std::string, Ztring>::iterator Info_AvcLevel=SubDescriptor->second.Infos.find("Temp_AVC_Level");
+                    std::map<std::string, Ztring>::iterator Info_AvcConstraintSet=SubDescriptor->second.Infos.find("Temp_AVC_constraint_set");
+                    if (Info_AvcProfile!=SubDescriptor->second.Infos.end() || Info_AvcLevel!=SubDescriptor->second.Infos.end() || Info_AvcConstraintSet!=SubDescriptor->second.Infos.end())
                     {
                         //AVC Descriptor creates that, adapting
-                        std::map<std::string, Ztring>::iterator Info_Profile=SubDescriptor->second.Infos.find("Format_Profile");
-                        if (Info_Profile!=SubDescriptor->second.Infos.end())
+                        int8u profile_idc;
+                        if (Info_AvcProfile!=SubDescriptor->second.Infos.end())
                         {
-                            if (Info_constraint!=SubDescriptor->second.Infos.end())
-                            {
-                                if (Info_constraint->second==__T("1"))
-                                    Info_Profile->second+=__T(" Intra");
-                                SubDescriptor->second.Infos.erase(Info_constraint);
-                            }
-                            if (Info_Level!=SubDescriptor->second.Infos.end())
-                            {
-                                Info_Profile->second+=__T("@L")+Info_Level->second;
-                                SubDescriptor->second.Infos.erase(Info_Level);
-                            }
+                            profile_idc=Info_AvcProfile->second.To_int8u();
+                            SubDescriptor->second.Infos.erase(Info_AvcProfile);
                         }
+                        else
+                            profile_idc=0;
+                        int8u level_idc;
+                        if (Info_AvcLevel!=SubDescriptor->second.Infos.end())
+                        {
+                            level_idc=Info_AvcLevel->second.To_int8u();
+                            SubDescriptor->second.Infos.erase(Info_AvcLevel);
+                        }
+                        else
+                            level_idc=0;
+                        int8u constraint_set_flags;
+                        if (Info_AvcConstraintSet!=SubDescriptor->second.Infos.end())
+                        {
+                            constraint_set_flags=Info_AvcConstraintSet->second.To_int8u();
+                            SubDescriptor->second.Infos.erase(Info_AvcConstraintSet);
+                        }
+                        else
+                            constraint_set_flags=0;
+                        SubDescriptor->second.Infos["Format_Profile"].From_UTF8(Avc_profile_level_string(profile_idc, level_idc, constraint_set_flags));
                     }
                     
                     for (std::map<std::string, Ztring>::iterator Info=SubDescriptor->second.Infos.begin(); Info!=SubDescriptor->second.Infos.end(); ++Info)
@@ -4294,6 +4308,24 @@ void File_Mxf::Streams_Finish_Component_ForTimeCode(const int128u ComponentUID, 
             Fill(Stream_Other, StreamPos_Last, Other_ID, Ztring::ToZtring(TrackID)+(IsSourcePackage?__T("-Source"):__T("-Material")));
             Fill(Stream_Other, StreamPos_Last, Other_Type, "Time code");
             Fill(Stream_Other, StreamPos_Last, Other_Format, "MXF TC");
+
+            #if MEDIAINFO_ADVANCED
+                if (Config->TimeCode_Dumps)
+                {
+                    auto id=Ztring(Ztring::ToZtring(TrackID)+(IsSourcePackage?__T("-Source"):__T("-Material"))).To_UTF8();
+                    auto& TimeCode_Dump=(*Config->TimeCode_Dumps)[id];
+                    if (TimeCode_Dump.Attributes_First.empty())
+                    {
+                        TimeCode_Dump.Attributes_First+=" id=\""+id+"\" format=\"smpte-st377\" frame_rate=\""+to_string(Component2->second.MxfTimeCode.RoundedTimecodeBase);
+                        if (Component2->second.MxfTimeCode.DropFrame)
+                            TimeCode_Dump.Attributes_First+=+"000/1001";
+                        TimeCode_Dump.Attributes_First+='\"';
+                        TimeCode_Dump.FrameCount=Component2->second.Duration;
+                        TimeCode_Dump.Attributes_Last+=" start_tc=\""+TimeCode(Component2->second.MxfTimeCode.StartTimecode, Component2->second.MxfTimeCode.RoundedTimecodeBase-1, Component2->second.MxfTimeCode.DropFrame).ToString()+'\"';
+                    }
+                }
+            #endif //MEDIAINFO_ADVANCED
+
             if (Component2->second.MxfTimeCode.RoundedTimecodeBase<=(int8u)-1) // Found files with RoundedTimecodeBase of 0x8000
                 Fill(Stream_Other, StreamPos_Last, Other_FrameRate, Component2->second.MxfTimeCode.RoundedTimecodeBase/(Component2->second.MxfTimeCode.DropFrame?1.001:1.000));
             Fill(Stream_Other, StreamPos_Last, Other_TimeCode_FirstFrame, TC.ToString().c_str());
@@ -8922,7 +8954,7 @@ void File_Mxf::SDTI_SystemMetadataPack() //SMPTE 385M + 326M
 
     //Parsing
     int8u SMB, CPR_Rate, Format;
-    bool SMB_UL_Present, SMB_CreationTimeStamp, SMB_UserTimeStamp, CPR_DropFrame;
+    bool SMB_UL_Present, SMB_CreationTimeStamp, SMB_UserTimeStamp, CPR_1_1001;
     Get_B1 (SMB,                                                "System Metadata Bitmap");
         Skip_Flags(SMB, 7,                                      "FEC Active");
         Get_Flags (SMB, 6, SMB_UL_Present,                      "SMPTE Label");
@@ -8936,7 +8968,7 @@ void File_Mxf::SDTI_SystemMetadataPack() //SMPTE 385M + 326M
     Element_Begin1("Content Package Rate");
     Skip_S1(2,                                                  "Reserved");
     Get_S1 (5, CPR_Rate,                                        "Package Rate"); //See SMPTE 326M
-    Get_SB (   CPR_DropFrame,                                   "1.001 Flag");
+    Get_SB (   CPR_1_1001,                                      "1.001 Flag");
     Element_End0();
     Element_Begin1("Content Package Type");
     Skip_S1(3,                                                  "Stream Status");
@@ -8950,17 +8982,17 @@ void File_Mxf::SDTI_SystemMetadataPack() //SMPTE 385M + 326M
 
     //Some computing
     static int8u FrameRates_List[3] = { 24, 25, 30 };
-    int8u  FramesMax;
+    int8u  FrameRate;
     int8u  RepetitionMaxCount;
     if (CPR_Rate && CPR_Rate<=0x0C) //See SMPTE 326M)
     {
         CPR_Rate--;
         RepetitionMaxCount=CPR_Rate/3;
-        FramesMax=FrameRates_List[CPR_Rate%3]*(RepetitionMaxCount+1)-1;
+        FrameRate=FrameRates_List[CPR_Rate%3]*(RepetitionMaxCount+1);
     }
     else
     {
-        FramesMax=0;
+        FrameRate=0;
         RepetitionMaxCount=0;
     }
 
@@ -8983,44 +9015,47 @@ void File_Mxf::SDTI_SystemMetadataPack() //SMPTE 385M + 326M
         bool  DropFrame;
         BS_Begin();
 
-        Skip_SB(                                                "CF - Color fame");
+        #if MEDIAINFO_ADVANCED
+            int32u BG;
+            bool ColorFrame, FieldPhaseBgf0, Bgf0Bgf2, Bgf1, Bgf2FieldPhase;
+            #define Get_TCB(_1,_2)      Get_SB(_1,_2)
+            #define Get_TC4(_1,_2)      Get_L4(_1,_2)
+        #else
+            #define Get_TCB(_1,_2)      Skip_SB(_2)
+            #define Get_TC4(_1,_2)      Skip_L4(_2)
+        #endif
+
+        Get_TCB(   ColorFrame,                                  "CF - Color fame");
         Get_SB (   DropFrame,                                   "DP - Drop frame");
         Get_S1 (2, Frames_Tens,                                 "Frames (Tens)");
         Get_S1 (4, Frames_Units,                                "Frames (Units)");
 
-        Skip_SB(                                                "FP - Field Phase / BGF0");
+        Get_TCB(   FieldPhaseBgf0,                              "FP - Field Phase / BGF0");
         Get_S1 (3, Seconds_Tens,                                "Seconds (Tens)");
         Get_S1 (4, Seconds_Units,                               "Seconds (Units)");
 
-        Skip_SB(                                                "BGF0 / BGF2");
+        Get_TCB(   Bgf0Bgf2,                                    "BGF0 / BGF2");
         Get_S1 (3, Minutes_Tens,                                "Minutes (Tens)");
         Get_S1 (4, Minutes_Units,                               "Minutes (Units)");
 
-        Skip_SB(                                                "BGF2 / Field Phase");
-        Skip_SB(                                                "BGF1");
+        Get_TCB(   Bgf2FieldPhase,                              "BGF2 / Field Phase");
+        Get_TCB(   Bgf1,                                        "BGF1");
         Get_S1 (2, Hours_Tens,                                  "Hours (Tens)");
         Get_S1 (4, Hours_Units,                                 "Hours (Units)");
 
-        Skip_S1(4,                                              "BG2");
-        Skip_S1(4,                                              "BG1");
-
-        Skip_S1(4,                                              "BG4");
-        Skip_S1(4,                                              "BG3");
-
-        Skip_S1(4,                                              "BG6");
-        Skip_S1(4,                                              "BG5");
-
-        Skip_S1(4,                                              "BG8");
-        Skip_S1(4,                                              "BG7");
-
         BS_End();
+
+        Get_TC4(   BG,                                          "BG");
+
+        #undef Get_TCB
+        #undef Get_TC4
 
         //TimeCode
         TimeCode TimeCode_Current(  Hours_Tens  *10+Hours_Units,
                                     Minutes_Tens*10+Minutes_Units,
                                     Seconds_Tens*10+Seconds_Units,
                                     (Frames_Tens *10+Frames_Units)*(RepetitionMaxCount+1),
-                                    FramesMax,
+                                    FrameRate?(FrameRate-1):0,
                                     DropFrame);
         if (RepetitionMaxCount)
         {
@@ -9053,6 +9088,39 @@ void File_Mxf::SDTI_SystemMetadataPack() //SMPTE 385M + 326M
         Element_Level--;
         Element_Info1(Ztring().From_UTF8(TimeCode_Current.ToString().c_str()));
         Element_Level++;
+
+        #if MEDIAINFO_ADVANCED
+            if (Config->TimeCode_Dumps)
+            {
+                auto id=string("SDTI");
+                auto& TimeCode_Dump=(*Config->TimeCode_Dumps)[id];
+                if (TimeCode_Dump.List.empty())
+                {
+                    TimeCode_Dump.Attributes_First+=" id=\""+id+"\" format=\"smpte-st326\"";
+                    if (FrameRate)
+                    {
+                        TimeCode_Dump.Attributes_First+=" frame_rate=\""+to_string(FrameRate);
+                        if (CPR_1_1001)
+                            TimeCode_Dump.Attributes_First+="000/1001";
+                        TimeCode_Dump.Attributes_First+='\"';
+                    }
+                    TimeCode_Dump.Attributes_Last+=" fp=\"0\" bgf=\"0\" bg=\"0\"";
+                }
+                TimeCode CurrentTC(Hours_Tens*10+Hours_Units, Minutes_Tens*10+Minutes_Units, Seconds_Tens*10+Seconds_Units, Frames_Tens*10+Frames_Units, TimeCode_Dump.FramesMax, DropFrame);
+                TimeCode_Dump.List+="    <tc v=\""+CurrentTC.ToString()+'\"';
+                if (FieldPhaseBgf0)
+                    TimeCode_Dump.List+=" fp=\"1\"";
+                if (Bgf0Bgf2 || Bgf1 || Bgf2FieldPhase)
+                    TimeCode_Dump.List+=" bgf=\""+to_string((Bgf2FieldPhase<<2)|(Bgf1<<1)|(Bgf2FieldPhase<<0))+"\"";
+                if (BG)
+                    TimeCode_Dump.List+=" bgf=\""+to_string(BG)+"\"";
+                if (TimeCode_Dump.LastTC.GetIsValid() && TimeCode_Dump.LastTC.GetFramesMax() && CurrentTC!=TimeCode_Dump.LastTC+1)
+                    TimeCode_Dump.List+=" nc=\"1\"";
+                TimeCode_Dump.LastTC=CurrentTC;
+                TimeCode_Dump.List+="/>\n";
+                TimeCode_Dump.FrameCount++;
+            }
+        #endif //MEDIAINFO_ADVANCED
 
         Element_End0();
 
@@ -11115,11 +11183,11 @@ void File_Mxf::AVCDescriptor_Profile()
 {
     //Parsing
     int8u profile_idc;
-    Get_B1 (profile_idc,                                        "profile_idc"); Element_Info1(Avc_profile_idc(profile_idc));
+    Get_B1 (profile_idc,                                        "profile_idc"); Element_Info1(Avc_profile_level_string(profile_idc));
 
     FILLING_BEGIN();
         if (profile_idc)
-            Descriptor_Fill("Format_Profile", Avc_profile_idc(profile_idc));
+            Descriptor_Fill("Temp_AVC_Profile", Ztring().From_Number(profile_idc));
     FILLING_END();
 }
 
@@ -11154,21 +11222,20 @@ void File_Mxf::AVCDescriptor_MaximumBitRate()
 void File_Mxf::AVCDescriptor_ProfileConstraint()
 {
     //Parsing
-    BS_Begin();
-    bool constraint_set3_flag;
-    Element_Begin1("constraints");
-        Skip_SB(                                                "constraint_set0_flag");
-        Skip_SB(                                                "constraint_set1_flag");
-        Skip_SB(                                                "constraint_set2_flag");
-        Get_SB (constraint_set3_flag,                           "constraint_set3_flag");
-        Skip_SB(                                                "constraint_set4_flag");
-        Skip_SB(                                                "constraint_set5_flag");
-        Skip_BS(2,                                              "reserved_zero_2bits");
-    Element_End0();
-    BS_End();
+    int8u constraint_set_flags;
+    Get_B1 (constraint_set_flags,                               "constraint_sett_flags");
+        Skip_Flags(constraint_set_flags, 7,                     "constraint_sett0_flag");
+        Skip_Flags(constraint_set_flags, 6,                     "constraint_sett1_flag");
+        Skip_Flags(constraint_set_flags, 5,                     "constraint_sett2_flag");
+        Skip_Flags(constraint_set_flags, 4,                     "constraint_sett3_flag");
+        Skip_Flags(constraint_set_flags, 3,                     "constraint_sett4_flag");
+        Skip_Flags(constraint_set_flags, 2,                     "constraint_sett5_flag");
+        Skip_Flags(constraint_set_flags, 1,                     "constraint_sett6_flag");
+        Skip_Flags(constraint_set_flags, 0,                     "constraint_sett7_flag");
 
     FILLING_BEGIN();
-        Descriptor_Fill("Temp_AVC_constraint_set3_flag", Ztring::ToZtring(constraint_set3_flag?1:0));
+        if (constraint_set_flags)
+            Descriptor_Fill("Temp_AVC_constraint_set", Ztring::ToZtring(constraint_set_flags));
     FILLING_END();
 }
 
@@ -11178,11 +11245,11 @@ void File_Mxf::AVCDescriptor_Level()
 {
     //Parsing
     int8u level_idc;
-    Get_B1 (level_idc,                                          "level_idc"); Element_Info1(Ztring().From_Number(((float)level_idc)/10, (level_idc%10)?1:0));
+    Get_B1 (level_idc,                                          "level_idc");  Element_Info1(Avc_profile_level_string(0, level_idc));
 
     FILLING_BEGIN();
         if (level_idc)
-            Descriptor_Fill("Temp_AVC_Format_Level", Ztring().From_Number(((float)level_idc)/10, (level_idc%10)?1:0));
+            Descriptor_Fill("Temp_AVC_Level", Ztring().From_Number(level_idc));
     FILLING_END();
 }
 
@@ -11725,6 +11792,7 @@ void File_Mxf::SystemScheme1_TimeCodeArray()
     //Parsing
     if (Vector(8)==(int32u)-1)
         return;
+    int i=0;
     while (Element_Offset<Element_Size)
     {
         Element_Begin1("TimeCode");
@@ -11732,37 +11800,40 @@ void File_Mxf::SystemScheme1_TimeCodeArray()
         bool  DropFrame;
         BS_Begin();
 
-        Skip_SB(                                                "CF - Color fame");
+        #if MEDIAINFO_ADVANCED
+            int32u BG;
+            bool ColorFrame, FieldPhaseBgf0, Bgf0Bgf2, Bgf1, Bgf2FieldPhase;
+            #define Get_TCB(_1,_2)      Get_SB(_1,_2)
+            #define Get_TC4(_1,_2)      Get_L4(_1,_2)
+        #else
+            #define Get_TCB(_1,_2)      Skip_SB(_2)
+            #define Get_TC4(_1,_2)      Skip_L4(_2)
+        #endif
+
+        Get_TCB(   ColorFrame,                                  "CF - Color fame");
         Get_SB (   DropFrame,                                   "DP - Drop frame");
         Get_S1 (2, Frames_Tens,                                 "Frames (Tens)");
         Get_S1 (4, Frames_Units,                                "Frames (Units)");
 
-        Skip_SB(                                                "FP - Field Phase / BGF0");
+        Get_TCB(   FieldPhaseBgf0,                              "FP - Field Phase / BGF0");
         Get_S1 (3, Seconds_Tens,                                "Seconds (Tens)");
         Get_S1 (4, Seconds_Units,                               "Seconds (Units)");
 
-        Skip_SB(                                                "BGF0 / BGF2");
+        Get_TCB(   Bgf0Bgf2,                                    "BGF0 / BGF2");
         Get_S1 (3, Minutes_Tens,                                "Minutes (Tens)");
         Get_S1 (4, Minutes_Units,                               "Minutes (Units)");
 
-        Skip_SB(                                                "BGF2 / Field Phase");
-        Skip_SB(                                                "BGF1");
+        Get_TCB(   Bgf2FieldPhase,                              "BGF2 / Field Phase");
+        Get_TCB(   Bgf1,                                        "BGF1");
         Get_S1 (2, Hours_Tens,                                  "Hours (Tens)");
         Get_S1 (4, Hours_Units,                                 "Hours (Units)");
 
-        Skip_S1(4,                                              "BG2");
-        Skip_S1(4,                                              "BG1");
-
-        Skip_S1(4,                                              "BG4");
-        Skip_S1(4,                                              "BG3");
-
-        Skip_S1(4,                                              "BG6");
-        Skip_S1(4,                                              "BG5");
-
-        Skip_S1(4,                                              "BG8");
-        Skip_S1(4,                                              "BG7");
-
         BS_End();
+
+        Get_TC4(   BG,                                          "BG");
+
+        #undef Get_TCB
+        #undef Get_TC4
 
         Element_Info1(TimeCode(Hours_Tens*10+Hours_Units, Minutes_Tens*10+Minutes_Units, Seconds_Tens*10+Seconds_Units, Frames_Tens*10+Frames_Units, 0, DropFrame).ToString());
         Element_End0();
@@ -11772,6 +11843,69 @@ void File_Mxf::SystemScheme1_TimeCodeArray()
         {
             SystemScheme1_TimeCodeArray_StartTimecode=TimeCode(Hours_Tens*10+Hours_Units, Minutes_Tens*10+Minutes_Units, Seconds_Tens*10+Seconds_Units, Frames_Tens*10+Frames_Units, 0, DropFrame);
         }
+
+        #if MEDIAINFO_ADVANCED
+            if (Config->TimeCode_Dumps)
+            {
+                auto id="SystemScheme1-0-"+to_string(i);
+                auto& TimeCode_Dump=(*Config->TimeCode_Dumps)[id];
+                if (TimeCode_Dump.List.empty())
+                {
+                    TimeCode_Dump.Attributes_First+=" id=\""+id+"\" format=\"smpte-st331\"";
+
+                    //No clear frame rate, looking for the common frame rate
+                    float64 FrameRate=0;
+                    for (const auto& Track : Tracks)
+                    {
+                        if (Track.second.EditRate)
+                        {
+                            auto NewFrameRate=Track.second.EditRate;
+                            if (!FrameRate)
+                                FrameRate=NewFrameRate;
+                            else if (NewFrameRate!=FrameRate)
+                            {
+                                FrameRate=0;
+                                break;
+                            }
+                        }
+                    }
+                    if (FrameRate>0)
+                    {
+                        TimeCode_Dump.Attributes_First+=" frame_rate=\"";
+                        auto FrameRateInt=(int64u)ceil(FrameRate);
+                        if (FrameRateInt==FrameRate)
+                            TimeCode_Dump.Attributes_First+=to_string(FrameRateInt);
+                        else
+                        {
+                            auto Test_1_1001=FrameRateInt/FrameRate;
+                            if (Test_1_1001>=1.00005 && Test_1_1001<1.001005)
+                                TimeCode_Dump.Attributes_First+=to_string(FrameRateInt)+"000/1001";
+                            else
+                                TimeCode_Dump.Attributes_First+=to_string(FrameRate);
+                        }
+                        TimeCode_Dump.Attributes_First+='\"';
+                        FrameRateInt--;
+                        if (FrameRateInt<=numeric_limits<int32u>::max())
+                            (*Config->TimeCode_Dumps)[id].FramesMax=(int32u)(FrameRateInt);
+                    }
+                    TimeCode_Dump.Attributes_Last+=" fp=\"0\" bgf=\"0\" bg=\"0\"";
+                }
+                TimeCode CurrentTC(Hours_Tens*10+Hours_Units, Minutes_Tens*10+Minutes_Units, Seconds_Tens*10+Seconds_Units, Frames_Tens*10+Frames_Units, TimeCode_Dump.FramesMax, DropFrame);
+                TimeCode_Dump.List+="    <tc v=\""+CurrentTC.ToString()+'\"';
+                if (FieldPhaseBgf0)
+                    TimeCode_Dump.List+=" fp=\"1\"";
+                if (Bgf0Bgf2 || Bgf1 || Bgf2FieldPhase)
+                    TimeCode_Dump.List+=" bgf=\""+to_string((Bgf2FieldPhase<<2)|(Bgf1<<1)|(Bgf2FieldPhase<<0))+"\"";
+                if (BG)
+                    TimeCode_Dump.List+=" bgf=\""+to_string(BG)+"\"";
+                if (TimeCode_Dump.LastTC.GetIsValid() && TimeCode_Dump.LastTC.GetFramesMax() && CurrentTC!=TimeCode_Dump.LastTC+1)
+                    TimeCode_Dump.List+=" nc=\"1\"";
+                TimeCode_Dump.LastTC=CurrentTC;
+                TimeCode_Dump.List+="/>\n";
+                TimeCode_Dump.FrameCount++;
+                i++;
+            }
+        #endif //MEDIAINFO_ADVANCED
     }
 
     SystemSchemes[Element_Code&0xFFFF].IsTimeCode=true;

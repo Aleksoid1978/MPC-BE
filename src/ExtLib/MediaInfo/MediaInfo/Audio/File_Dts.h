@@ -90,7 +90,9 @@ private :
     int8u  bits_per_sample;
     int8u  ExtensionAudioDescriptor;
     int8u  HD_BitResolution;
+    int8u  HD_BitResolution_Real;
     int8u  HD_MaximumSampleRate;
+    int8u  HD_MaximumSampleRate_Real;
     int8u  HD_TotalNumberChannels;
     int8u  HD_ExSSFrameDurationCode;
     bool   ExtendedCoding;
@@ -98,6 +100,7 @@ private :
     bool   BigEndian;
     bool   ES;
     bool   Core_Exists;
+    bool   One2OneMapChannels2Speakers;
     enum   presence
     {
         presence_Core_Core,
@@ -111,6 +114,7 @@ private :
         presence_Extended_LBR,
         presence_Extended_XLL,
         presence_Extended_XLL_X,
+        presence_Extended_XLL_IMAX,
         presence_Max
     };
     std::bitset<presence_Max> Presence;
@@ -135,6 +139,8 @@ private :
     int8u  Core_XXCh_nuNumChSetsInXXCh;
     size_t Extension_XLL_X_No;
     size_t Extension_XLL_X_Yes;
+    size_t Extension_XLL_IMAXX_No;
+    size_t Extension_XLL_IMAXX_Yes;
 
     //Helpers
     float64 BitRate_Get(bool WithHD=false);

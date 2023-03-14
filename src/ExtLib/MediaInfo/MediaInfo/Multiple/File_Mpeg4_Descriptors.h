@@ -22,7 +22,7 @@
 namespace MediaInfoLib
 {
 
-enum audio_profile
+enum audio_profile : int8u
 {
     NoProfile,
     Main_Audio,
@@ -37,22 +37,31 @@ enum audio_profile
     High_Efficiency_AAC,
     High_Efficiency_AAC_v2,
     Low_Delay_AAC,
+    Low_Delay_AAC_v2,
     Baseline_MPEG_Surround,
     High_Definition_AAC,
     ALS_Simple,
     Baseline_USAC,
     Extended_HE_AAC,
+    UnspecifiedAudio,
+    NoAudio,
     AudioProfile_Max,
-    #if MEDIAINFO_CONFORMANCE
-    AudioProfile_Unspecified,
-    AudioProfile_NoAudio,
-#endif
+    UnknownAudio = (int8u)-1,
 };
 struct profilelevel_struct
 {
     audio_profile profile;
     int8u level;
 };
+inline bool operator == (const profilelevel_struct& a, const profilelevel_struct& b)
+{
+    static_assert(sizeof(profilelevel_struct) == 2, "");
+    return *((int16u*)&a) == *((int16u*)&b);
+}
+
+struct stts_struct;
+struct sgpd_prol_struct;
+struct sbgp_struct;
 
 //***************************************************************************
 // Class File_Mpeg4_Descriptors
@@ -86,7 +95,15 @@ public :
 
     // Conformance
     #if MEDIAINFO_CONFORMANCE
-        int16u SamplingRate;
+        int16u                  SamplingRate;
+        const std::vector<int64u>* stss;
+        const bool*             stss_IsPresent;
+        const bool*             IsCmaf;
+        const std::vector<stts_struct>* stts;
+        const size_t*           FirstOutputtedDecodedSample;
+        const std::vector<sgpd_prol_struct>* sgpd_prol;
+        const std::vector<sbgp_struct>* sbgp;
+        const int16s*           sgpd_prol_roll_distance;
     #endif
 
     struct slconfig

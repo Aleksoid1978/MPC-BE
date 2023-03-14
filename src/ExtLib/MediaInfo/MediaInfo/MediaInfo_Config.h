@@ -345,23 +345,31 @@ public :
         bool GraphSvgPluginState();
     #endif //defined(MEDIAINFO_GRAPH_YES)
 
-    #if MEDIAINFO_ADVANCED
-          Ztring    AdmProfile (const Ztring& Value);
+    #if MEDIAINFO_CONFORMANCE
+          string        AdmProfile (const Ztring& Value);
           struct adm_profile
           {
               bool Auto;
-              int BS2076;
-              int Ebu3392;
+              int8u BS2076;
+              int8u Ebu3392;
 
               adm_profile() :
                   Auto(false),
-                  BS2076(-1),
-                  Ebu3392(-1)
+                  BS2076((int8u)-1),
+                  Ebu3392((int8u)-1)
               {}
           };
-          adm_profile      AdmProfile();
-          void        WarningError(bool Value);
-          bool        WarningError();
+          adm_profile   AdmProfile();
+          string        AdmProfile_List();
+          string        Mp4Profile(const Ztring& Value);
+          string        Mp4Profile();
+          string        Mp4Profile_List();
+          string        UsacProfile(const Ztring& Value);
+          int8u         UsacProfile();
+          string        UsacProfile_List();
+          string        Profile_List();
+          void          WarningError(bool Value);
+          bool          WarningError();
     #endif
 
     #if defined(MEDIAINFO_LIBCURL_YES)
@@ -513,9 +521,11 @@ private :
     void*           Event_UserHandler;
     #endif //MEDIAINFO_EVENTS
 
-    #if MEDIAINFO_ADVANCED
-    adm_profile Adm_Profile;
-    bool Warning_Error;
+    #if MEDIAINFO_CONFORMANCE
+    adm_profile     Adm_Profile;
+    string          Mp4_Profile;
+    int8u           Usac_Profile;
+    bool            Warning_Error;
     #endif
 
     #if defined(MEDIAINFO_LIBCURL_YES)

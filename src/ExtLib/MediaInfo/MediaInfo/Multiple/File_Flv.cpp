@@ -512,6 +512,9 @@ void File_Flv::Streams_Fill()
 //---------------------------------------------------------------------------
 void File_Flv::Streams_Finish()
 {
+    if (File_Offset+Buffer_Offset!=File_Size)
+        Read_Buffer_Unsynched();
+
     //Duration
     //if (meta_duration)
     //    Fill(Stream_General, 0, General_Duration, meta_duration, 10, true);
@@ -1589,7 +1592,7 @@ void File_Flv::meta_SCRIPTDATAVALUE(const std::string &StringData)
                     else if (StringDataModified=="Encoded_By") {ToFill=General_Encoded_Application;}
                     else if (StringDataModified=="metadatacreator") {ToFill=General_Tagged_Application;}
                     else if (StringDataModified=="title") {ToFill=General_Title;}
-                    else if (StringDataModified=="creation_time") {ToFill=General_Encoded_Date; Value.insert(0, __T("UTC "));}
+                    else if (StringDataModified=="creation_time") {ToFill=General_Encoded_Date; Value+=__T(" UTC");}
                     else if (StringDataModified=="sourcedata") {}
                     else if (StringDataModified=="audiocodecid") {}
                     else if (StringDataModified=="videocodecid") {}

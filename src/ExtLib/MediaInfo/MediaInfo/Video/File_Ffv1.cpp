@@ -719,6 +719,9 @@ void File_Ffv1::Skip_Frame()
 //---------------------------------------------------------------------------
 void File_Ffv1::Read_Buffer_Continue()
 {
+    if (!Buffer_Size)
+        return;
+
     if (ConfigurationRecord_IsPresent && !Parameters_IsValid)
     {
         Skip_Frame();

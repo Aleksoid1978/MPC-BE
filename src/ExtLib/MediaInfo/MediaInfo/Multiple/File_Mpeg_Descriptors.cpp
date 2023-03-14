@@ -77,7 +77,7 @@ namespace Elements
 
 //---------------------------------------------------------------------------
 //Extern
-extern const char* Avc_profile_idc(int8u profile_idc);
+extern string Avc_profile_level_string(int8u profile_idc, int8u level_idc=0, int8u constraint_set_flags=0);
 
 //---------------------------------------------------------------------------
 const char* Mpeg_Descriptors_audio_type(int8u ID)
@@ -887,7 +887,7 @@ extern int8u Aac_Channels_Get(int8u ChannelLayout);
 extern string Aac_Channels_GetString(int8u ChannelLayout);
 extern string Aac_ChannelConfiguration_GetString(int8u ChannelLayout);
 extern string Aac_ChannelConfiguration2_GetString(int8u ChannelLayout);
-extern string Aac_ChannelLayout_GetString(int8u ChannelLayout, bool IsMpegh3da=false);
+extern string Aac_ChannelLayout_GetString(int8u ChannelLayout, bool IsMpegh3da=false, bool IsTip=false);
 extern string Aac_ChannelMode_GetString(int8u ChannelLayout, bool IsMpegh3da=false);
 
 //---------------------------------------------------------------------------
@@ -1997,21 +1997,18 @@ void File_Mpeg_Descriptors::Descriptor_1F()
 void File_Mpeg_Descriptors::Descriptor_28()
 {
     //Parsing
-    int8u profile_idc, level_idc;
-    Get_B1 (profile_idc,                                        "profile_idc"); Param_Info1(Avc_profile_idc(profile_idc));
-    BS_Begin();
-    Element_Begin1("constraints");
-        Skip_SB(                                                "constraint_set0_flag");
-        Skip_SB(                                                "constraint_set1_flag");
-        Skip_SB(                                                "constraint_set2_flag");
-        Skip_SB(                                                "constraint_set3_flag");
-        Skip_SB(                                                "reserved_zero_4bits");
-        Skip_SB(                                                "reserved_zero_4bits");
-        Skip_SB(                                                "reserved_zero_4bits");
-        Skip_SB(                                                "reserved_zero_4bits");
-    Element_End0();
-    BS_End();
-    Get_B1 (level_idc,                                          "level_idc");
+    int8u profile_idc, constraint_set_flags, level_idc;
+    Get_B1 (profile_idc,                                        "profile_idc"); Param_Info1(Avc_profile_level_string(profile_idc));
+    Get_B1 (constraint_set_flags,                               "constraint_sett_flags");
+        Skip_Flags(constraint_set_flags, 7,                     "constraint_sett0_flag");
+        Skip_Flags(constraint_set_flags, 6,                     "constraint_sett1_flag");
+        Skip_Flags(constraint_set_flags, 5,                     "constraint_sett2_flag");
+        Skip_Flags(constraint_set_flags, 4,                     "constraint_sett3_flag");
+        Skip_Flags(constraint_set_flags, 3,                     "constraint_sett4_flag");
+        Skip_Flags(constraint_set_flags, 2,                     "constraint_sett5_flag");
+        Skip_Flags(constraint_set_flags, 1,                     "constraint_sett6_flag");
+        Skip_Flags(constraint_set_flags, 0,                     "constraint_sett7_flag");
+    Get_B1 (level_idc,                                          "level_idc"); Param_Info1(Avc_profile_level_string(0, level_idc));
     BS_Begin();
     Skip_SB(                                                    "AVC_still_present");
     Skip_SB(                                                    "AVC_24_hour_picture_flag");
@@ -2025,7 +2022,7 @@ void File_Mpeg_Descriptors::Descriptor_28()
                         if (elementary_PID_IsValid)
                         {
                             Complete_Stream->Streams[elementary_PID]->Infos["Format"]=__T("AVC");
-                            Complete_Stream->Streams[elementary_PID]->Infos["Format_Profile"]=Ztring().From_UTF8(Avc_profile_idc(profile_idc))+__T("@L")+Ztring().From_Number(((float)level_idc)/10, (level_idc%10)?1:0);
+                            Complete_Stream->Streams[elementary_PID]->Infos["Format_Profile"]=Ztring().From_UTF8(Avc_profile_level_string(profile_idc, level_idc, constraint_set_flags));
                         }
                         break;
             default    : ;

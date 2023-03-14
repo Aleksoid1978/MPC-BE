@@ -20,6 +20,24 @@ class File_MpegPs;
 namespace MediaInfoLib
 {
 
+struct stts_struct
+{
+    int32u                      SampleCount;
+    int32u                      SampleDuration;
+};
+
+struct sgpd_prol_struct
+{
+    int16s                      roll_distance;
+};
+
+struct sbgp_struct
+{
+    int64u                      FirstSample;
+    int64u                      LastSample;
+    int32u                      group_description_index;
+};
+
 //***************************************************************************
 // Class File_Mpeg4
 //***************************************************************************
@@ -103,6 +121,7 @@ private :
     void moof_traf_sbgp() { moov_trak_mdia_minf_stbl_sbgp(); }
     void moof_traf_sgpd() { moov_trak_mdia_minf_stbl_sgpd(); }
     void moof_traf_sdtp();
+    void moof_traf_subs() { moov_trak_mdia_minf_stbl_subs(); }
     void moof_traf_tfdt();
     void moof_traf_tfhd();
     void moof_traf_trun();
@@ -254,6 +273,7 @@ private :
     void moov_trak_mdia_minf_stbl_stss();
     void moov_trak_mdia_minf_stbl_stsz();
     void moov_trak_mdia_minf_stbl_stts();
+    void moov_trak_mdia_minf_stbl_subs();
     void moov_trak_mdia_minf_stbl_stz2() {moov_trak_mdia_minf_stbl_stsz();}
     void moov_trak_meta() {moov_meta();}
     void moov_trak_meta_hdlr() {moov_meta_hdlr();}
@@ -386,6 +406,7 @@ private :
     int32u                                  moov_meta_hdlr_Type;
     std::string                             moov_meta_ilst_xxxx_name_Name;
     size_t                                  moov_trak_mdia_minf_stbl_stsd_Pos;
+    size_t                                  moov_trak_mdia_minf_stbl_stsz_Pos;
     int32u                                  moov_trak_tkhd_TrackID;
     float32                                 moov_trak_tkhd_Width;
     float32                                 moov_trak_tkhd_Height;
@@ -456,15 +477,12 @@ private :
         };
         std::vector<stsc_struct> stsc;
         std::vector<int64u>     stsz;
+        std::vector<int32u>     stsz_FirstSubSampleSize;
         std::vector<int64u>     stsz_Total; //TODO: merge with stsz
         int64u                  stsz_StreamSize; //TODO: merge with stsz
+        int64u                  stsz_MoreThan2_Count;
         std::vector<int64u>     stss; //Sync Sample, base=0
         int64u                  FramePos_Offset;
-        struct stts_struct
-        {
-            int32u SampleCount;
-            int32u SampleDuration;
-        };
         std::vector<stts_struct> stts;
         int64u                  stsz_Sample_Size;
         int64u                  stsz_Sample_Multiplier;
@@ -539,6 +557,13 @@ private :
             int32u          CodecID;
             void            SplitAudio(File_Mpeg4::stream& Video, int32u moov_mvhd_TimeScale);
         #endif //MEDIAINFO_DEMUX
+        #if MEDIAINFO_CONFORMANCE
+            bool                stss_IsPresent;
+            std::vector<sgpd_prol_struct> sgpd_prol;
+            std::vector<sbgp_struct> sbgp;
+            int8u               default_sample_is_non_sync_sample_PresenceAndValue;
+            size_t              FirstOutputtedDecodedSample;
+        #endif
 
         stream()
         {
@@ -551,6 +576,7 @@ private :
             hdlr_Manufacturer=0x00000000;
             FramePos_Offset=0;
             stsz_StreamSize=0;
+            stsz_MoreThan2_Count=0;
             stsz_Sample_Size=0;
             stsz_Sample_Multiplier=1;
             stsz_Sample_Count=0;
@@ -598,6 +624,11 @@ private :
                 Demux_EventWasSent=false;
                 CodecID=0x00000000;
             #endif //MEDIAINFO_DEMUX
+            #if MEDIAINFO_CONFORMANCE
+                stss_IsPresent=false;
+                default_sample_is_non_sync_sample_PresenceAndValue=0;
+                FirstOutputtedDecodedSample=0;
+            #endif
         }
 
         ~stream()
@@ -660,6 +691,9 @@ private :
         int64u          TimeCode_DtsOffset;
         std::map<int64u, int64u> StreamOffset_Jump; //Key is the current position, value is the jump position
     #endif //MEDIAINFO_DEMUX
+    #if MEDIAINFO_CONFORMANCE
+        bool            IsCmaf;
+    #endif
 };
 
 } //NameSpace

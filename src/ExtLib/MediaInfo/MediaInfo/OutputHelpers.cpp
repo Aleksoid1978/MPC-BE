@@ -92,14 +92,20 @@ string To_XML (Node& Cur_Node, const int& Level, bool Print_Header, bool Indent)
     if (Print_Header)
     {
         Result+="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-        //Current date/time is ISO format
+        Result+="<!-- Generated";
         time_t Time=time(NULL);
         Ztring TimeS; TimeS.Date_From_Seconds_1970((int32u)Time);
-        TimeS.FindAndReplace(__T("UTC "), __T(""));
-        TimeS.FindAndReplace(__T(" "), __T("T"));
-        TimeS+=__T('Z');
-
-        Result+=string("<!-- Generated at "+TimeS.To_UTF8()+" by "+MediaInfoLib::Config.Info_Version_Get().To_UTF8()+" -->\n");
+        if (!TimeS.empty())
+        {
+            TimeS.FindAndReplace(__T("UTC "), __T(""));
+            TimeS.FindAndReplace(__T(" "), __T("T"));
+            TimeS+=__T('Z');
+            Result+=" at ";
+            Result+=TimeS.To_UTF8();
+        }
+        Result+=" by ";
+        Result+=MediaInfoLib::Config.Info_Version_Get().To_UTF8();
+        Result+=" -->\n";
     }
 
     if (Cur_Node.Name.empty() && Cur_Node.XmlCommentOut.empty())
@@ -450,7 +456,11 @@ bool ExternalMetadata(const Ztring& FileName, const Ztring& ExternalMetadata, co
 }
 
 //---------------------------------------------------------------------------
-Ztring VideoCompressionCodeCS_Name(int32u termID, MediaInfo_Internal &MI, size_t StreamPos) //xxyyzz: xx=main number, yy=sub-number, zz=sub-sub-number
+#if defined(MEDIAINFO_EBUCORE_YES) || defined(MEDIAINFO_FIMS_YES) || defined(MEDIAINFO_MPEG7_YES)
+extern const char* Avc_profile_idc_Name(size_t Index);
+extern string Avc_level_idc_Name(size_t Index);
+extern const char* ProRes_Profile_Name(size_t Index);
+Ztring VideoCompressionCodeCS_Name(int32u termID, MediaInfo_Internal& MI, size_t StreamPos) //xxyyzz: xx=main number, yy=sub-number, zz=sub-sub-number
 {
     switch (termID/10000)
     {
@@ -644,9 +654,33 @@ Ztring VideoCompressionCodeCS_Name(int32u termID, MediaInfo_Internal &MI, size_t
         case 6 :    return __T("JPEG2000");
         case 7 :    return __T("H261");
         case 8 :    return __T("H263");
-        default: return MI.Get(Stream_Video, StreamPos, Video_Format);
+        default:
+                    {
+                    auto Result=MI.Get(Stream_Video, StreamPos, Video_Format);
+                    auto Profile=((termID%10000)/100);
+                    if (Profile)
+                    {
+                        Profile--;
+                        Result+=__T(' ');
+                        switch (termID/10000)
+                        {
+                            case 50:    
+                                        Result+=Ztring().From_UTF8(Avc_profile_idc_Name(Profile));
+                                        if (auto Level=termID%100)
+                                        {
+                                            Level--;
+                                            Result+=Ztring().From_UTF8(" @ Level "+Avc_level_idc_Name(Level));
+                                        }
+                                        break;
+                            case 54:
+                                        Result+=Ztring().From_UTF8(ProRes_Profile_Name(Profile));
+                                        break;
+                        }
+                    }
+                    return Result;
+                    }
     }
 }
-
+#endif
 
 } //NameSpace

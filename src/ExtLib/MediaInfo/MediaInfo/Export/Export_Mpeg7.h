@@ -28,7 +28,8 @@ public :
     ~Export_Mpeg7 ();
 
     //Input
-    Ztring Transform(MediaInfo_Internal &MI);
+    //Version: 0=strict, 1=relaxed (strict best effort), 2=extended
+    Ztring Transform(MediaInfo_Internal &MI, size_t Version=1);
 };
 
 } //NameSpace

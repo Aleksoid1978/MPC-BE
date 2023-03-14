@@ -163,6 +163,7 @@ private :
     int32u SamplesPerSec;   //For bext
     int16u BitsPerSample;   //For PCM only
     int8u  stream_Count;    //How many stream we have to parse
+    int8u  Format_Settings[2];
     bool   rec__Present;    //True if synchro element is present
     bool   NeedOldIndex;
     bool   IsBigEndian;

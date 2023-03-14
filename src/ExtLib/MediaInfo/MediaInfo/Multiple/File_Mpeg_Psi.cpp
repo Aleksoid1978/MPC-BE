@@ -1570,8 +1570,8 @@ void File_Mpeg_Psi::Table_4E()
         FILLING_BEGIN();
             complete_stream::transport_stream::program& progItem = Complete_Stream->Transport_Streams[transport_stream_id].Programs[table_id_extension];
             complete_stream::transport_stream::program::dvb_epg_block::event& eventItem = progItem.DVB_EPG_Blocks[table_id].Events[event_id];
-            eventItem.start_time=__T("UTC ")+Date_MJD(date)+__T(" ")+Time_BCD(time);
-            eventItem.duration=Time_BCD(duration);
+            eventItem.start_time.From_UTF8(Date_MJD(date)+' '+Time_BCD(time)+" UTC");
+            eventItem.duration.From_UTF8(Time_BCD(duration));
             if (running_status)
                 eventItem.running_status=Mpeg_Psi_running_status[running_status];
         FILLING_END();
@@ -1607,8 +1607,8 @@ void File_Mpeg_Psi::Table_70()
 
     FILLING_BEGIN();
         if (Complete_Stream->Duration_Start.empty())
-            Complete_Stream->Duration_Start=__T("UTC ")+Date_MJD(date)+__T(" ")+Time_BCD(time);
-        Complete_Stream->Duration_End=__T("UTC ")+Date_MJD(date)+__T(" ")+Time_BCD(time);
+            Complete_Stream->Duration_Start.From_UTF8(Date_MJD(date)+' '+Time_BCD(time)+" UTC");
+        Complete_Stream->Duration_End.From_UTF8(Date_MJD(date)+' '+Time_BCD(time)+" UTC");
         Complete_Stream->Duration_End_IsUpdated=true;
     FILLING_END();
 }
@@ -1634,8 +1634,8 @@ void File_Mpeg_Psi::Table_73()
 
     FILLING_BEGIN();
         if (Complete_Stream->Duration_Start.empty())
-            Complete_Stream->Duration_Start=__T("UTC ")+Date_MJD(date)+__T(" ")+Time_BCD(time);
-        Complete_Stream->Duration_End=__T("UTC ")+Date_MJD(date)+__T(" ")+Time_BCD(time);
+            Complete_Stream->Duration_Start.From_UTF8(Date_MJD(date)+' '+Time_BCD(time)+" UTC");
+        Complete_Stream->Duration_End.From_UTF8(Date_MJD(date)+' '+Time_BCD(time)+" UTC");
         Complete_Stream->Duration_End_IsUpdated=true;
     FILLING_END();
 }

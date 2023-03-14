@@ -352,6 +352,9 @@ File_Mpeg4::File_Mpeg4()
         TimeCode_FrameOffset=0;
         TimeCode_DtsOffset=0;
     #endif //MEDIAINFO_DEMUX
+    #if MEDIAINFO_CONFORMANCE
+        IsCmaf=false;
+    #endif
 }
 
 //---------------------------------------------------------------------------
@@ -751,6 +754,8 @@ void File_Mpeg4::Streams_Finish()
             if (Temp->second.mdhd_TimeScale)
                 Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Duration), Temp->second.stts_Duration/((float)Temp->second.mdhd_TimeScale)*1000, 0, true);
             Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_FrameCount), Temp->second.stts_FrameCount, 10, true);
+            if (Temp->second.StreamKind==Stream_Text && Retrieve_Const(Stream_Text, StreamPos_Last, Text_Format)==__T("Timed Text"))
+                Fill(Stream_Text, StreamPos_Last, Text_Events_Total, Temp->second.stsz_MoreThan2_Count, 10, true);
         }
 
         //Duration/StreamSize
@@ -1987,6 +1992,10 @@ void File_Mpeg4::Read_Buffer_Init()
         FrameCount_MaxPerStream=128;
     else
         FrameCount_MaxPerStream=512;
+
+    #if MEDIAINFO_CONFORMANCE
+        IsCmaf=MediaInfoLib::Config.Mp4Profile().find("cmfc")!=string::npos;
+    #endif
 }
 
 //***************************************************************************
@@ -2496,7 +2505,9 @@ bool File_Mpeg4::BookMark_Needed()
                     int64u* stco_Current = &Temp->second.stco[0];
                     int64u* stco_Max = stco_Current + Temp->second.stco.size();
                     int64u* stsz_Current = Temp->second.stsz.empty()?NULL:&Temp->second.stsz[0];
+                    int32u* stsz_Current2 = Temp->second.stsz_FirstSubSampleSize.empty()?NULL:&Temp->second.stsz_FirstSubSampleSize[0];
                     int64u* stsz_Max = stsz_Current + Temp->second.stsz.size();
+                    int32u* stsz_Max2 = stsz_Current2 + Temp->second.stsz_FirstSubSampleSize.size();
                     stream::stsc_struct* stsc_Current = &Temp->second.stsc[0];
                     stream::stsc_struct* stsc_Max = stsc_Current + Temp->second.stsc.size();
                     #if MEDIAINFO_DEMUX
@@ -2525,10 +2536,15 @@ bool File_Mpeg4::BookMark_Needed()
                                     mdat_Pos_Type mdat_Pos_Temp2;
                                     mdat_Pos_Temp2.Offset = *stco_Current + Chunk_Offset;
                                     mdat_Pos_Temp2.StreamID = Temp->first;
-                                    mdat_Pos_Temp2.Size = *stsz_Current;
+                                    if (stsz_Current2 && stsz_Current2 <= stsz_Max2 && *stsz_Current2)
+                                        mdat_Pos_Temp2.Size = *stsz_Current2;
+                                    else
+                                        mdat_Pos_Temp2.Size = *stsz_Current;
                                     mdat_Pos.push_back(mdat_Pos_Temp2);
                                     Chunk_Offset += *stsz_Current;
                                     stsz_Current++;
+                                    if (stsz_Current2)
+                                        stsz_Current2++;
                                     if (stsz_Current >= stsz_Max)
                                         break;
                                 }
@@ -2809,6 +2825,8 @@ bool File_Mpeg4::BookMark_Needed()
         {
             mdat_Pos_Type* Temp=&mdat_Pos[0];
             int64u stco_ToFind=Streams[mdat_Pos_ToParseInPriority_StreamIDs[0]].FirstUsedOffset;
+            if (stco_ToFind==(int64u)-1)
+                stco_ToFind=Streams[mdat_Pos_ToParseInPriority_StreamIDs[0]].stco.front();
             while (Temp<mdat_Pos_Max && Temp->Offset!=stco_ToFind)
                 Temp++;
             if (Temp<mdat_Pos_Max && Temp->Offset<File_Size) //Skipping data not in a truncated file
@@ -2889,7 +2907,7 @@ Ztring File_Mpeg4::Language_Get(int16u Language)
     if (Language==0x7FFF || Language==0xFFFF)
         return Ztring();
 
-    if (Language<0x100)
+    if (Language<0x400)
         return Mpeg4_Language_Apple(Language);
 
     Ztring ToReturn;
@@ -3074,7 +3092,16 @@ void File_Mpeg4::Descriptors()
     MI.Parser_DoNotFreeIt=true;
     MI.ES_ID_Infos=ES_ID_Infos;
     #if MEDIAINFO_CONFORMANCE
+        const auto& Stream=Streams[moov_trak_tkhd_TrackID];
         MI.SamplingRate=Retrieve_Const(Stream_Audio, 0, Audio_SamplingRate).To_int16u();
+        MI.stss=&Stream.stss;
+        MI.stss_IsPresent=&Stream.stss_IsPresent;
+        MI.IsCmaf=&IsCmaf;
+        MI.sbgp=&Stream.sbgp;
+        MI.stts=&Stream.stts;
+        MI.FirstOutputtedDecodedSample=&Stream.FirstOutputtedDecodedSample;
+        MI.sgpd_prol=&Stream.sgpd_prol;
+        MI.sbgp=&Stream.sbgp;
     #endif
 
     int64u Elemen_Code_Save=Element_Code;

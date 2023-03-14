@@ -63,13 +63,6 @@ void File_P2_Clip::FillContentDate(XMLElement* Access,const char* Node, general 
     if (ChildElement)
     {
         Ztring Content = ChildElement->GetText();
-        if (Content.size() >= 11 && Content[10] == __T('T'))
-            Content[10] = __T(' ');
-        if (Content.find(__T("+00:00")) != string::npos)
-        {
-            Content.resize(10 + 1 + 8);
-            Content.insert(0, __T("UTC "));
-        }
         Fill(Stream_General, 0, Parameter, Content);
     }
 }

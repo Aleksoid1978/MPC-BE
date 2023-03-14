@@ -26,10 +26,13 @@
 #endif //defined(MEDIAINFO_REFERENCES_YES)
 #include "ZenLib/FileName.h"
 #include "ZenLib/BitStream_LE.h"
+#include <algorithm>
 #include <cassert>
 #include <cfloat>
 #include <cmath>
 #include <cstdlib>
+#include <iomanip>
+#include <limits>
 using namespace std;
 //---------------------------------------------------------------------------
 
@@ -67,6 +70,240 @@ inline void add_dec_2chars(string& In, uint8_t Value)
     }
     In.append(add_dec_cache+(Value<<1), 2);
 }
+
+//---------------------------------------------------------------------------
+bool DateTime_Adapt_Finalize(string& Value_, string& Value, bool IsUtc)
+{
+    if (IsUtc)
+        Value += " UTC";
+    if (Value == Value_)
+        return false;
+    Value_ = Value;
+    return true;
+}
+bool DateTime_Adapt(string& Value_)
+{
+    if (Value_.size() < 4)
+        return false;
+    string Value(Value_);
+
+    // UTC prefix
+    bool IsUtc;
+    if (Value.rfind("UTC ", 4) != string::npos)
+    {
+        Value.erase(0, 4);
+        IsUtc = true;
+    }
+    else
+        IsUtc = false;
+    
+    // Unix style
+    if (Value.size() < 4)
+        return false;
+    if (Value[4]!='-')
+    {
+        if (Value == "unknown")
+        {
+            Value_.clear();
+            return true;
+        }
+
+        #if defined(_MSC_VER)
+        try
+        #endif
+        #if !defined(__GNUC__) || __GNUC__>=5
+        {
+            tm t;
+            string ValueT(Value);
+            ValueT.erase(std::find_if(ValueT.rbegin(), ValueT.rend(), [](unsigned char ch) {return !std::isspace(ch); }).base(), ValueT.end()); // Trim from end
+            stringstream Value2;
+            Value2.imbue(locale("C"));
+            int HasDateTime = 0;
+            if (!HasDateTime)
+            {
+                t = {};
+                Value2.str(Value);
+                Value2.clear();
+                Value2 >> get_time(&t, "%a %b %d %T %Y");
+                if (!Value2.fail() && t.tm_year && t.tm_mday)
+                    HasDateTime = 2; // Date and Time
+            }
+            if (!HasDateTime)
+            {
+                t = {};
+                Value2.str(Value);
+                Value2.clear();
+                Value2 >> get_time(&t, "%a, %b %d, %Y %r");
+                if (!Value2.fail() && t.tm_year && t.tm_mday)
+                    HasDateTime = 2; // Date and Time
+            }
+            if (!HasDateTime)
+            {
+                t = {};
+                Value2.str(Value);
+                Value2.clear();
+                Value2 >> get_time(&t, "%a, %b %d, %Y");
+                if (!Value2.fail() && t.tm_year && t.tm_mday)
+                    HasDateTime = 1; // Date only
+            }
+            if (!HasDateTime && Value.find_first_not_of("0123456789/") == string::npos)
+            {
+                size_t Slash0 = Value.find('/');
+                if (Slash0 != string::npos)
+                {
+                    Slash0++;
+                    size_t Slash1 = Value.find('/', Slash0);
+                    if (Slash1 != string::npos)
+                    {
+                        Slash1++;
+                        size_t Slash2 = Value.find('/', Slash1);
+                        if (Slash2 == string::npos)
+                        {
+                            int YY = atoi(Value.c_str() + Slash1);
+                            if (YY > 1900)
+                                YY -= 1900;
+                            if (YY <= numeric_limits<decltype(t.tm_year)>::max())
+                            {
+                                int DD = atoi(Value.c_str());
+                                int MM = atoi(Value.c_str() + Slash0);
+                                if (MM >= 12 && DD <= 31)
+                                    swap(MM, DD);
+                                if (DD && DD <= 31 && MM && MM < 12)
+                                {
+                                    t.tm_year = YY;
+                                    t.tm_mon = MM - 1;
+                                    t.tm_mday = DD;
+                                    HasDateTime = 1; // Date only
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (HasDateTime)
+            {
+                Value2.str(string());
+                Value2.clear();
+                Value2 << put_time(&t, (HasDateTime - 1) ? "%F %T" : "%F");
+                if (!Value2.fail() && !Value2.str().empty())
+                {
+                    Value_ = Value2.str();
+                    return true;
+                }
+            }
+        }
+        #endif
+        #if defined(_MSC_VER)
+        catch (...)
+        {
+            return false;
+        }
+        #endif
+    }
+    
+    // Year
+    if (Value[0] < '0' || Value[0] > '9'
+     || Value[1] < '0' || Value[1] > '9'
+     || Value[2] < '0' || Value[2] > '9'
+     || Value[3] < '0' || Value[3] > '9')
+        return false;
+    if (Value.size() == 4)
+        return DateTime_Adapt_Finalize(Value_, Value, IsUtc);
+    
+    // Month
+    if (Value.size() <= 6)
+        return false;
+    if (Value[4] != '-'
+     || Value[5] < '0' || Value[5] > '9'
+     || Value[6] < '0' || Value[6] > '9')
+        return false;
+    if (Value.size() == 7)
+        return DateTime_Adapt_Finalize(Value_, Value, IsUtc);
+
+    // Day
+    if (Value.size() <= 9)
+        return false;
+    if (Value[7] != '-'
+     || Value[8] < '0' || Value[8] > '9'
+     || Value[9] < '0' || Value[9] > '9')
+        return false;
+    if (Value.size() == 10)
+        return DateTime_Adapt_Finalize(Value_, Value, IsUtc);
+
+    // Separator
+    if (Value.size() <= 11)
+        return false;
+    if (Value[10] == 'T')
+        Value[10] = ' ';
+    if (Value[10] == ',' && Value[11] == ' ')
+        Value.erase(10, 1);
+
+    // Time
+    if (Value.size() <= 18)
+        return false;
+    if (Value[11] < '0' || Value[11] > '9'
+     || Value[12] < '0' || Value[12] > '9'
+     || Value[13] != ':'
+     || Value[14] < '0' || Value[14] > '9'
+     || Value[15] < '0' || Value[15] > '9'
+     || Value[16] != ':'
+     || Value[17] < '0' || Value[17] > '9'
+     || Value[18] < '0' || Value[18] > '9')
+        return false;
+    if (Value.size() == 19)
+        return DateTime_Adapt_Finalize(Value_, Value, IsUtc);
+
+    // Fraction
+    size_t i = 19;
+    if (Value[i] == '.')
+    {
+        i++;
+        while (i < Value.size() && Value[i] >= '0' && Value[i] <= '9')
+            i++;
+    }
+    if (Value.size() == i)
+        return DateTime_Adapt_Finalize(Value_, Value, IsUtc);
+
+    // Time zone
+    if (Value[i] == 'Z')
+    {
+        if (Value.size() != i + 1)
+            return false;
+        Value.pop_back();
+        return DateTime_Adapt_Finalize(Value_, Value, true);
+    }
+    if (Value.size() <= i + 2)
+        return false;
+    if ((Value[i] != '+' && Value[i] != '-')
+     || Value[i + 1] < '0' || Value[i + 1] > '9'
+     || Value[i + 2] < '0' || Value[i + 2] > '9')
+        return false;
+    if (Value.size() == i + 3)
+    {
+        return DateTime_Adapt_Finalize(Value_, Value, IsUtc);
+    }
+    if (Value.size() <= i + 5)
+        return false;
+    if (Value[i + 3] != ':'
+     || Value[i + 4] < '0' || Value[i + 4] > '9'
+     || Value[i + 5] < '0' || Value[i + 5] > '9')
+        return false;
+    if (Value.size() == i + 6)
+    {
+        if (Value[i + 1] == '0'
+         && Value[i + 2] == '0'
+         && Value[i + 4] == '0'
+         && Value[i + 5] == '0')
+        {
+            Value.resize(i);
+            IsUtc = true;
+        }
+        return DateTime_Adapt_Finalize(Value_, Value, IsUtc);
+    }
+
+    return false;
+}
+
 
 //---------------------------------------------------------------------------
 #if defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES)
@@ -634,6 +871,44 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
 
         if (Value_NotBOM_Pos)
             return Fill(StreamKind, StreamPos, Parameter, Value.substr(Value_NotBOM_Pos), Replace);
+    }
+
+    // Analysis of some metadata
+    if (StreamKind==Stream_General)
+    {
+        switch (Parameter)
+        {
+            case General_Description:
+                if (Value.size()==38 && Value.rfind(__T("ISAN "), 0)==0)
+                    return Fill(Stream_General, StreamPos, General_ISAN, Value.substr(5), Replace);
+                break;
+            case General_Duration_Start:
+            case General_Duration_End:
+            case General_Released_Date :
+            case General_Original_Released_Date :
+            case General_Recorded_Date :
+            case General_Encoded_Date :
+            case General_Tagged_Date :
+            case General_Written_Date :
+            case General_Mastered_Date:
+            case General_Encoded_Library_Date :
+            case General_File_Created_Date:
+            case General_File_Created_Date_Local:
+            case General_File_Modified_Date :
+            case General_File_Modified_Date_Local:
+            case General_Added_Date:
+            case General_Played_First_Date:
+            case General_Played_Last_Date:
+            {
+                    string Value2(Value.To_UTF8());
+                    if (DateTime_Adapt(Value2))
+                    {
+                        if (Value2.empty())
+                            return;
+                        return Fill(Stream_General, StreamPos, Parameter, Value2, Replace);
+                    }
+                }
+        }
     }
 
     //MergedStreams
@@ -2440,6 +2715,11 @@ void File__Analyze::Duration_Duration123(stream_t StreamKind, size_t StreamPos, 
         int32s MM, Sec;
         Ztring DurationString1, DurationString2, DurationString3;
         bool Negative=false;
+        if (List[Pos].find_first_not_of(__T("0123456789.+-"))!=string::npos)
+        {
+            Fill(StreamKind, StreamPos, Parameter+1, List[Pos]); // /String
+            continue;
+        }
         MS=List[Pos].To_int64s(); //in ms
         if (MS<0)
         {

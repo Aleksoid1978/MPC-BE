@@ -19,17 +19,30 @@
 #ifdef MEDIAINFO_MPEG4_YES
     #include "MediaInfo/Multiple/File_Mpeg4_Descriptors.h"
 #endif
+#include "MediaInfo/Audio/File_Aac_GeneralAudio_Sbr.h"
 #include "MediaInfo/File__Analyze.h"
 #include "MediaInfo/TimeCode.h"
+#include <cstring>
+//---------------------------------------------------------------------------
+
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
 {
 
+constexpr int8u Aac_Channels_Size_Usac = 14; // USAC expands Aac_Channels[]
+constexpr int8u Aac_Channels_Size = 21; //MPEG-H 3D Audio expands Aac_Channels[]
+constexpr int8u Aac_sampling_frequency_Size = 13;
+constexpr int8u Aac_sampling_frequency_Size_Usac = 31; // USAC expands Aac_sampling_frequency[]
+
+struct stts_struct;
+struct edts_struct;
+struct sgpd_prol_struct;
+struct sbgp_struct;
+
 //***************************************************************************
 // Class File_Usac
 //***************************************************************************
-
 
 class File_Usac : public File__Analyze
 {
@@ -37,6 +50,11 @@ public :
     //Constructor/Destructor
     File_Usac();
     ~File_Usac();
+
+    // Temp
+    void   hcod_sf(const char* Name);
+    int32u arith_decode(int16u& low, int16u& high, int16u& value, const int16u* cf, int32u cfl, size_t* TooMuch);
+    int16u sbr_huff_dec(const int8s(*Table)[2], const char* Name);
 
     #if MEDIAINFO_CONFORMANCE
     enum conformance_level
@@ -86,7 +104,7 @@ public :
     bool                            BS_Bookmark(bs_bookmark& B, const string& ConformanceFieldName);
     #else
     bool                            BS_Bookmark(bs_bookmark& B);
-    inline bool                     BS_Bookmark(bs_bookmark& B, const string& ConformanceFieldName) {return BS_Bookmark(B);}
+    inline bool                     BS_Bookmark(bs_bookmark& B, const string&) {return BS_Bookmark(B);}
     #endif
 
     //Fill
@@ -113,6 +131,7 @@ public :
     bool drcInstructionsUniDrc              (bool V1=false, bool NoV0=false);
     void channelLayout                      ();
     void UsacConfigExtension                ();
+    void fill_bytes                         (size_t usacConfigExtLength);
     void loudnessInfoSet                    (bool V1=false);
     bool loudnessInfo                       (bool FromAlbum, bool V1=false);
     void loudnessInfoSetExtension           ();
@@ -121,8 +140,18 @@ public :
     //Elements - USAC - Frame
     #if MEDIAINFO_TRACE || MEDIAINFO_CONFORMANCE
     void UsacFrame                          (size_t BitsNotIncluded=(size_t)-1);
-    void UsacSingleChannelElement           ();
-    void UsacChannelPairElement             ();
+    void UsacSingleChannelElement           (bool usacIndependencyFlag);
+    void UsacChannelPairElement             (bool usacIndependencyFlag);
+    void twData                             ();
+    void icsInfo                            ();
+    void scaleFactorData                    ();
+    void arithData                          (size_t ch, int16u N, int16u lg, int16u lg_max, bool arith_reset_flag);
+    void acSpectralData                     (size_t ch, bool usacIndependencyFlag);
+    void tnsData                            ();
+    void fdChannelStream                    (size_t ch, bool commonWindow, bool commonTw, bool tnsDataPresent, bool usacIndependencyFlag);
+    void cplxPredData                       (int8u max_sfb_ste, bool usacIndependencyFlag);
+    void StereoCoreToolInfo                 (bool& tns_data_present0, bool& tns_data_present1, bool core_mode0, bool core_mode1, bool usacIndependencyFlag);
+    void UsacCoreCoderData                  (size_t nrChannels, bool usacIndependencyFlag);
     void UsacLfeElement                     ();
     void UsacExtElement                     (size_t elemIdx, bool usacIndependencyFlag);
     void AudioPreRoll                       ();
@@ -138,6 +167,10 @@ public :
     int8u   channelConfiguration;
     int8u   sampling_frequency_index;
     int8u   extension_sampling_frequency_index;
+    int8u   num_window_groups;
+    int8u   num_windows;
+    int8u   max_sfb;
+    int8u   max_sfb1;
 
     //***********************************************************************
     // Conformance
@@ -146,7 +179,6 @@ public :
     #if MEDIAINFO_CONFORMANCE
     enum conformance_flags
     {
-        None,
         Usac,
         BaselineUsac,
         xHEAAC,
@@ -156,8 +188,18 @@ public :
     bitset8                         ConformanceFlags;
     vector<field_value>             ConformanceErrors_Total[ConformanceLevel_Max];
     vector<field_value>             ConformanceErrors[ConformanceLevel_Max];
-    audio_profile                   Format_Profile;
-    bool CheckIf(const bitset8 Flags) { return !ConformanceFlags || !Flags || (ConformanceFlags & Flags); }
+    bool                            Warning_Error;
+    profilelevel_struct             ProfileLevel;
+    set<int8u>                      usacExtElementType_Present;
+    const std::vector<int64u>*      Immediate_FramePos;
+    const bool*                     Immediate_FramePos_IsPresent;
+    const bool*                     IsCmaf;
+    const std::vector<stts_struct>* outputFrameLength;
+    const size_t*                   FirstOutputtedDecodedSample;
+    const std::vector<sgpd_prol_struct>* roll_distance_Values;
+    const std::vector<sbgp_struct>* roll_distance_FramePos;
+    bool CheckIf(const bitset8 Flags) { return !Flags || (ConformanceFlags & Flags); }
+    void SetProfileLevel(int8u AudioProfileLevelIndication);
     void Fill_Conformance(const char* Field, const char* Value, bitset8 Flags={}, conformance_level Level=Error);
     void Fill_Conformance(const char* Field, const string Value, bitset8 Flags={}, conformance_level Level=Error) { Fill_Conformance(Field, Value.c_str(), Flags, Level); }
     void Fill_Conformance(const char* Field, const char* Value, conformance_flags Flag, conformance_level Level=Error) { Fill_Conformance(Field, Value, bitset8().set(Flag)); }
@@ -165,6 +207,10 @@ public :
     void Clear_Conformance();
     void Merge_Conformance(bool FromConfig=false);
     void Streams_Finish_Conformance();
+    struct usac_config;
+    struct usac_frame;
+    void Streams_Finish_Conformance_Profile(usac_config& CurrentConf);
+    void numPreRollFrames_Check(usac_config& CurrentConf, int32u numPreRollFrames, const string numPreRollFramesConchString);
     #else
     inline void Streams_Finish_Conformance() {}
     #endif
@@ -251,6 +297,28 @@ public :
     {
         int8u                       bandCount;
     };
+
+    struct arith_context
+    {
+        int16u                      previous_window_size;
+        int8u                       q[2][512];
+
+        arith_context() :           previous_window_size((int16u)-1)
+        {
+            memset(&q, NULL, sizeof(q));
+        }
+    };
+
+    struct usac_dlft_handler
+    {
+        int8u  dflt_start_freq;
+        int8u  dflt_stop_freq;
+        bool   dflt_header_extra1;
+        int8u  dflt_freq_scale;
+        bool   dflt_alter_scale;
+        int8u  dflt_noise_bands;
+    };
+
     typedef std::vector<gain_set> gain_sets;
     struct usac_config
     {
@@ -261,6 +329,7 @@ public :
         gain_sets                   gainSets;
         #if MEDIAINFO_CONFORMANCE
         size_t                      loudnessInfoSet_Present[2];
+        vector<size_t>              numOutChannels_Lfe;
         #endif
         int32u                      numOutChannels;
         int32u                      sampling_frequency;
@@ -268,13 +337,27 @@ public :
         int8u                       sampling_frequency_index;
         int8u                       coreSbrFrameLengthIndex;
         int8u                       baseChannelCount;
+        int8u                       stereoConfigIndex;
+        #if MEDIAINFO_CONFORMANCE
+        int8u                       drcRequired_Present;
+        bool                        LoudnessInfoIsNotValid;
+        #endif
         bool                        IsNotValid;
-        bool                        loudnessInfoSet_IsNotValid;
         bool                        harmonicSBR;
+        bool                        bs_interTes;
+        bool                        bs_pvc;
+        bool                        noiseFilling;
+        bool                        common_window;
+        bool                        common_tw;
+        bool                        tw_mdct;
+        arith_context               arithContext[2];
+        sbr_handler                 sbrHandler;
+        usac_dlft_handler           dlftHandler;
     };
     struct usac_frame
     {
         int32u                      numPreRollFrames;
+        bool                        NotImplemented;
     };
     usac_config                     Conf; //Main conf
     usac_config                     C; //Current conf

@@ -1443,13 +1443,13 @@ void File_Mpegv::Streams_Fill()
         {
             if (group_start_closed_gop_Open)
             {
-                Fill(Stream_Video, 0, "Gop_OpenClosed", "Open");
+                Fill(Stream_Video, 0, Video_Gop_OpenClosed, "Open");
                 if (group_start_closed_gop)
-                    Fill(Stream_Video, 0, "Gop_OpenClosed_FirstFrame", "Closed");
+                    Fill(Stream_Video, 0, Video_Gop_OpenClosed_FirstFrame, "Closed");
             }
             else
             {
-                Fill(Stream_Video, 0, "Gop_OpenClosed", "Closed");
+                Fill(Stream_Video, 0, Video_Gop_OpenClosed, "Closed");
             }
         }
 

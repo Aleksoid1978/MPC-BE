@@ -1299,6 +1299,8 @@ void File_Riff::AVI__hdlr_strl_strf_auds()
     Get_L2 (BlockAlign,                                         "BlockAlign");
     if (Element_Offset+2<=Element_Size)
         Get_L2 (BitsPerSample,                                  "BitsPerSample");
+    if (Format_Settings[1]<1 && Element_Offset==Element_Size)
+        Format_Settings[1]=1; // WAVEFORMAT
 
     if (FormatTag==1) //Only for PCM
     {
@@ -1411,6 +1413,8 @@ void File_Riff::AVI__hdlr_strl_strf_auds()
     }
     #endif
     Open_Buffer_Init_All();
+    if (Format_Settings[1]<2 && Element_Offset==Element_Size)
+        Format_Settings[1]=2; // PCMWAVEFORMAT
 
     //Options
     if (Element_Offset+2>Element_Size)
@@ -1419,6 +1423,8 @@ void File_Riff::AVI__hdlr_strl_strf_auds()
     //Parsing
     int16u Option_Size;
     Get_L2 (Option_Size,                                        "cbSize");
+    if (Format_Settings[1]<3 && Option_Size==Element_Size-Element_Offset)
+        Format_Settings[1]=3;
 
     //Filling
     if (Option_Size>0)
@@ -1568,6 +1574,8 @@ void File_Riff::AVI__hdlr_strl_strf_auds_ExtensibleWave(int16u BitsPerSample)
     Get_GUID(SubFormat,                                         "SubFormat");
 
     FILLING_BEGIN();
+        if (Format_Settings[1]<4)
+            Format_Settings[1]=4; // WAVEFORMATEXTENSIBLE
         if ((SubFormat.hi&0x0000FFFFFFFFFFFFLL)==0x0000000000001000LL && SubFormat.lo==0x800000AA00389B71LL)
         {
             int16u LegacyCodecID=(int16u)((((SubFormat.hi>>48)&0xFF)<<8) | (SubFormat.hi>>56)); // It is Little Endian
@@ -1754,6 +1762,9 @@ void File_Riff::AVI__hdlr_strl_strf_vids()
     Skip_L4(                                                    "YPelsPerMeter");
     Skip_L4(                                                    "ClrUsed");
     Skip_L4(                                                    "ClrImportant");
+
+    if (Format_Settings[0]<1 && Element_Offset==Element_Size)
+        Format_Settings[0]=1;
 
     //Filling
     Stream[Stream_ID].Compression=Compression;

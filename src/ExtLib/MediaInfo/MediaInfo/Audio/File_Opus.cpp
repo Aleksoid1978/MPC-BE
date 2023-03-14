@@ -66,7 +66,7 @@ static const char*  Opus_ChannelPositions2[Opus_ChannelLayout_Max]=
 //---------------------------------------------------------------------------
 static const char*  Opus_ChannelLayout[Opus_ChannelLayout_Max]=
 {
-    "C",
+    "M",
     "L R",
     "L R C",
     "L R BL BR",

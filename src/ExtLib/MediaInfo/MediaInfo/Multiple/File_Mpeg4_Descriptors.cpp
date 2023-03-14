@@ -69,6 +69,7 @@
     #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
     #include "ThirdParty/base64/base64.h"
 #endif //MEDIAINFO_DEMUX
+using namespace std;
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -199,9 +200,9 @@ static const char* Mpeg4_Descriptors_SceneProfileLevelIndication(int8u ID)
 }
 
 //---------------------------------------------------------------------------
-const char* Mpeg4_Descriptors_AudioProfileLevelIndication_Profile[]=
+static const char* Mpeg4_Descriptors_AudioProfileLevelIndication_Profile[]=
 {
-    "",
+    nullptr,
     "Main Audio",
     "Scalable Audio",
     "Speech Audio",
@@ -214,21 +215,18 @@ const char* Mpeg4_Descriptors_AudioProfileLevelIndication_Profile[]=
     "High Efficiency AAC",
     "High Efficiency AAC v2",
     "Low Delay AAC",
+    "Low Delay AAC v2",
     "Baseline MPEG Surround",
     "High Definition AAC",
     "ALS Simple",
     "Baseline USAC",
     "Extended HE AAC",
-    #if MEDIAINFO_CONFORMANCE
     nullptr,
     nullptr,
-    "No audio capability required",
-    #endif
 };
-static const size_t Mpeg4_Descriptors_AudioProfileLevelIndication_Size=0x58;
-const profilelevel_struct Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping[Mpeg4_Descriptors_AudioProfileLevelIndication_Size]=
+extern const profilelevel_struct Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping[]=
 {
-    { NoProfile, 0 },
+    { UnknownAudio, 0 },
     { Main_Audio, 1 },
     { Main_Audio, 2 },
     { Main_Audio, 3 },
@@ -289,13 +287,13 @@ const profilelevel_struct Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping[
     { Baseline_MPEG_Surround, 6 },
     { High_Definition_AAC, 1 },
     { ALS_Simple, 1 },
-    { NoProfile, 0 },
-    { NoProfile, 0 },
-    { NoProfile, 0 },
-    { NoProfile, 0 },
-    { NoProfile, 0 },
-    { NoProfile, 0 },
-    { NoProfile, 0 },
+    { UnknownAudio, 0 },
+    { UnknownAudio, 0 },
+    { UnknownAudio, 0 },
+    { UnknownAudio, 0 },
+    { UnknownAudio, 0 },
+    { UnknownAudio, 0 },
+    { UnknownAudio, 0 },
     { Baseline_USAC, 1 },
     { Baseline_USAC, 2 },
     { Baseline_USAC, 3 },
@@ -304,10 +302,10 @@ const profilelevel_struct Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping[
     { Extended_HE_AAC, 2 },
     { Extended_HE_AAC, 3 },
     { Extended_HE_AAC, 4 },
-    { NoProfile, 0 },
-    { NoProfile, 0 },
-    { NoProfile, 0 },
-    { NoProfile, 0 },
+    { Low_Delay_AAC_v2, 1 },
+    { UnknownAudio, 0 },
+    { UnknownAudio, 0 },
+    { UnknownAudio, 0 },
     { AAC, 6 },
     { AAC, 7 },
     { High_Efficiency_AAC, 6 },
@@ -316,17 +314,64 @@ const profilelevel_struct Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping[
     { High_Efficiency_AAC_v2, 7 },
     { Extended_HE_AAC, 6 },
     { Extended_HE_AAC, 7 },
+    // No more in sequence
+    { UnspecifiedAudio, 0 },
+    { NoAudio, 0 },
 };
-static const Ztring Mpeg4_Descriptors_AudioProfileLevelIndication(int8u AudioProfileLevelIndication)
+static constexpr size_t Mpeg4_Descriptors_AudioProfileLevelIndication_Size=sizeof(Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping)/sizeof(profilelevel_struct) - 2;
+const profilelevel_struct& Mpeg4_Descriptors_ToProfileLevel(int8u AudioProfileLevelIndication)
 {
-    if (AudioProfileLevelIndication>=Mpeg4_Descriptors_AudioProfileLevelIndication_Size || Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping[AudioProfileLevelIndication].profile==NoProfile)
-        return Ztring();
-    Ztring ToReturn;
-    ToReturn.From_UTF8(Mpeg4_Descriptors_AudioProfileLevelIndication_Profile[Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping[AudioProfileLevelIndication].profile]);
-    ToReturn+=__T("@L");
-    ToReturn+=Ztring().From_Number(Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping[AudioProfileLevelIndication].level);
+    if (AudioProfileLevelIndication >= 0xFE)
+        AudioProfileLevelIndication -= 0x100 - (Mpeg4_Descriptors_AudioProfileLevelIndication_Size  + 2);
+    else if (AudioProfileLevelIndication >= Mpeg4_Descriptors_AudioProfileLevelIndication_Size)
+        AudioProfileLevelIndication = 0;
+    return Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping[AudioProfileLevelIndication];
+};
+int8u Mpeg4_Descriptors_ToAudioProfileLevelIndication(const profilelevel_struct& ToMatch)
+{
+    switch (ToMatch.profile)
+    {
+        case UnspecifiedAudio             : return 0xFE;
+        case NoAudio                      : return 0xFF;
+    }
+    for (size_t i = 0; i < Mpeg4_Descriptors_AudioProfileLevelIndication_Size; i++)
+        if (ToMatch == Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping[i])
+            return i;
+    return 0;
+}
+string Mpeg4_Descriptors_AudioProfileLevelString(const profilelevel_struct& ProfileLevel)
+{
+    const auto ProfileString = Mpeg4_Descriptors_AudioProfileLevelIndication_Profile[ProfileLevel.profile];
+    if (!ProfileString)
+        return {};
+    string ToReturn(ProfileString);
+    if (ProfileLevel.level)
+    {
+        ToReturn += "@L";
+        ToReturn += to_string(ProfileLevel.level);
+    }
     return ToReturn;
 }
+string Mpeg4_Descriptors_AudioProfileLevelString(int8u AudioProfileLevelIndication)
+{
+    return Mpeg4_Descriptors_AudioProfileLevelString(Mpeg4_Descriptors_ToProfileLevel(AudioProfileLevelIndication));
+}
+#if MEDIAINFO_CONFORMANCE
+string Mpeg4_Descriptors_AudioProfileLevelIndicationString(const profilelevel_struct& ProfileLevel)
+{
+    auto AudioProfileLevelIndication = Mpeg4_Descriptors_ToAudioProfileLevelIndication(ProfileLevel);
+    string ProfileLevelString;
+    ProfileLevelString = to_string(AudioProfileLevelIndication);
+    auto Extra = Mpeg4_Descriptors_AudioProfileLevelString(ProfileLevel);
+    if (!Extra.empty())
+    {
+        ProfileLevelString += " (";
+        ProfileLevelString += Extra;
+        ProfileLevelString += ')';
+    }
+    return ProfileLevelString;
+}
+#endif
 
 //---------------------------------------------------------------------------
 extern const char* Mpeg4v_Profile_Level(int32u Profile_Level);
@@ -381,6 +426,8 @@ File_Mpeg4_Descriptors::File_Mpeg4_Descriptors()
     //Conformance
     #if MEDIAINFO_CONFORMANCE
         SamplingRate=0;
+        stss=nullptr;
+        sbgp=nullptr;
     #endif
 }
 
@@ -516,7 +563,7 @@ void File_Mpeg4_Descriptors::Descriptor_01()
     {
         Get_B1 (ProfileLevel[0],                                "ODProfileLevelIndication"); Param_Info1(Mpeg4_Descriptors_ODProfileLevelIndication(ProfileLevel[0]));
         Get_B1 (ProfileLevel[1],                                "sceneProfileLevelIndication"); Param_Info1(Mpeg4_Descriptors_SceneProfileLevelIndication(ProfileLevel[1]));
-        Get_B1 (ProfileLevel[2],                                "audioProfileLevelIndication"); Param_Info1(Mpeg4_Descriptors_AudioProfileLevelIndication(ProfileLevel[2]));
+        Get_B1 (ProfileLevel[2],                                "audioProfileLevelIndication"); Param_Info1(Mpeg4_Descriptors_AudioProfileLevelString(ProfileLevel[2]));
         Get_B1 (ProfileLevel[3],                                "visualProfileLevelIndication"); Param_Info1(Mpeg4v_Profile_Level(ProfileLevel[3]));
         Get_B1 (ProfileLevel[4],                                "graphicsProfileLevelIndication"); Param_Info1(Mpeg4_Descriptors_GraphicsProfileLevelIndication(ProfileLevel[4]));
     }
@@ -542,7 +589,7 @@ void File_Mpeg4_Descriptors::Descriptor_01()
                         switch (i)
                         {
                             case  2 :   ES_ID_Info.StreamKind=Stream_Audio; 
-                                        ES_ID_Info.ProfileLevelString=Mpeg4_Descriptors_AudioProfileLevelIndication(ProfileLevel[i]);
+                                        ES_ID_Info.ProfileLevelString.From_UTF8(Mpeg4_Descriptors_AudioProfileLevelString(ProfileLevel[i]));
                                         break;
                             case  3 :
                                         ES_ID_Info.StreamKind=Stream_Video;
@@ -793,35 +840,18 @@ void File_Mpeg4_Descriptors::Descriptor_04()
                             ((File_Aac*)Parser)->Mode=File_Aac::Mode_AudioSpecificConfig;
                             ((File_Aac*)Parser)->FrameIsAlwaysComplete=true;
                             #if MEDIAINFO_CONFORMANCE
+                                ((File_Aac*)Parser)->Immediate_FramePos=stss;
+                                ((File_Aac*)Parser)->Immediate_FramePos_IsPresent=stss_IsPresent;
+                                ((File_Aac*)Parser)->IsCmaf=IsCmaf;
+                                ((File_Aac*)Parser)->outputFrameLength=stts;
+                                ((File_Aac*)Parser)->FirstOutputtedDecodedSample=FirstOutputtedDecodedSample;
+                                ((File_Aac*)Parser)->roll_distance_Values=sgpd_prol;
+                                ((File_Aac*)Parser)->roll_distance_FramePos=sbgp;
                                 ((File_Aac*)Parser)->SamplingRate=SamplingRate;
                                 {
                                     auto const ES_ID_Info=ES_ID_Infos.find(TrackID!=(int32u)-1?TrackID:ES_ID);
                                     if (ES_ID_Info!=ES_ID_Infos.end())
-                                    {
-                                        auto AudioProfileLevelIndication=ES_ID_Info->second.ProfileLevel[2];
-                                        audio_profile AudioProfile;
-                                        if (AudioProfileLevelIndication==0xFE)
-                                            AudioProfile=AudioProfile_Unspecified;
-                                        else if (AudioProfileLevelIndication==0xFF)
-                                            AudioProfile=AudioProfile_NoAudio;
-                                        else if (AudioProfileLevelIndication<Mpeg4_Descriptors_AudioProfileLevelIndication_Size)
-                                        {
-                                            const auto& ProfileLevel=Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping[AudioProfileLevelIndication];
-                                            AudioProfile=ProfileLevel.profile;
-                                        }
-                                        else
-                                            AudioProfile=NoProfile;
-                                        ((File_Aac*)Parser)->Format_Profile=AudioProfile;
-                                        File_Aac::conformance_flags Profile;
-                                        switch (AudioProfile)
-                                        {
-                                            case Baseline_USAC: Profile=File_Aac::BaselineUsac; break;
-                                            case Extended_HE_AAC: Profile=File_Aac::xHEAAC; break;
-                                            default: Profile=File_Aac::Conformance_Max;
-                                        }
-                                        if (Profile!=File_Aac::Conformance_Max)
-                                            ((File_Aac*)Parser)->ConformanceFlags.set(Profile);
-                                    }
+                                        ((File_Aac*)Parser)->SetProfileLevel(ES_ID_Info->second.ProfileLevel[2]);
                                 }
                             #endif
                         #endif
@@ -916,6 +946,16 @@ void File_Mpeg4_Descriptors::Descriptor_05()
                                 #if defined(MEDIAINFO_AAC_YES)
                                     delete Parser; Parser=new File_Aac;
                                     ((File_Aac*)Parser)->Mode=File_Aac::Mode_AudioSpecificConfig;
+                                    #if MEDIAINFO_CONFORMANCE
+                                        ((File_Aac*)Parser)->Immediate_FramePos=stss;
+                                        ((File_Aac*)Parser)->Immediate_FramePos_IsPresent=stss_IsPresent;
+                                        ((File_Aac*)Parser)->IsCmaf=IsCmaf;
+                                        ((File_Aac*)Parser)->outputFrameLength=stts;
+                                        ((File_Aac*)Parser)->FirstOutputtedDecodedSample=FirstOutputtedDecodedSample;
+                                        ((File_Aac*)Parser)->roll_distance_Values=sgpd_prol;
+                                        ((File_Aac*)Parser)->roll_distance_FramePos=sbgp;
+                                        ((File_Aac*)Parser)->SamplingRate=SamplingRate;
+                                    #endif
                                 #endif
                                 break;
             default: ;

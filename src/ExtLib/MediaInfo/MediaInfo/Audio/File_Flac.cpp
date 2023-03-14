@@ -188,7 +188,7 @@ void File_Flac::Data_Parse()
         if (t) {
             Fill(Stream_Audio, 0, Audio_ChannelPositions, ExtensibleWave_ChannelMask(t));
             Fill(Stream_Audio, 0, Audio_ChannelPositions_String2, ExtensibleWave_ChannelMask2(t));
-            Fill(Stream_Audio, 0, Audio_ChannelLayout, ExtensibleWave_ChannelMask_ChannelLayout(t));
+            Fill(Stream_Audio, 0, Audio_ChannelLayout, t==4?"M":ExtensibleWave_ChannelMask_ChannelLayout(t));
         }
     }
 
@@ -237,8 +237,8 @@ void File_Flac::STREAMINFO()
         Fill(Stream_Audio, 0, Audio_SamplingRate, SampleRate);
         Fill(Stream_Audio, 0, Audio_Channel_s_, Channels+1);
         Fill(Stream_Audio, 0, Audio_BitDepth, BitPerSample+1);
-        if (!IsSub)
-            Fill(Stream_Audio, 0, Audio_Duration, Samples*1000/SampleRate);
+        if (!IsSub && Samples)
+            Fill(Stream_Audio, 0, Audio_SamplingCount, Samples);
         Ztring MD5_PerItem;
         MD5_PerItem.From_UTF8(uint128toString(MD5Stored, 16));
         while (MD5_PerItem.size()<32)

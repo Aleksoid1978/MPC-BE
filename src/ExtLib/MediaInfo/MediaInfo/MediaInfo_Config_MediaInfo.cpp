@@ -298,6 +298,9 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
     #if MEDIAINFO_FIXITY
         TryToFix=false;
     #endif //MEDIAINFO_SEEK
+    #if MEDIAINFO_ADVANCED
+        TimeCode_Dumps=nullptr;
+    #endif //MEDIAINFO_ADVANCED
 }
 
 MediaInfo_Config_MediaInfo::~MediaInfo_Config_MediaInfo()
@@ -310,6 +313,9 @@ MediaInfo_Config_MediaInfo::~MediaInfo_Config_MediaInfo()
             for (size_t Pos=0; Pos<Event->second.size(); Pos++)
                 delete Event->second[Pos]; //Event->second[Pos]=NULL;
     #endif //MEDIAINFO_EVENTS
+    #if MEDIAINFO_ADVANCED
+        delete TimeCode_Dumps;
+    #endif //MEDIAINFO_ADVANCED
 }
 
 //***************************************************************************

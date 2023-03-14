@@ -95,7 +95,7 @@ const char* Pcm_VOB_ChannelLayout(int8u channel_assignment)
 {
     switch (channel_assignment)
     {
-        case  1 : return "C";                                           //1 channel
+        case  1 : return "M";                                           //1 channel
         case  3 : return "L R";                                         //2 channels
         case  4 : return "L R C";                                       //3 channels
         case  5 : return "L R LFE";                                     //3 channels
