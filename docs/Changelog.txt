@@ -18,6 +18,7 @@ Fixed style change for simple text subtitles (SubRip, etc.).
 
 YouTube
 Added the ability to choose in advance only sound in the built-in parser.
+Added support for links "youtube.com/@".
 
 Player
 Added display of a single audio track in the OSD when trying to switch to the next or previous one.

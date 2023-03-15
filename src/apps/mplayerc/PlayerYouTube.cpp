@@ -36,6 +36,7 @@
 #define YOUTUBE_URL_EMBED           L"youtube.com/embed/"
 #define YOUTUBE_URL_SHORTS          L"youtube.com/shorts/"
 #define YOUTUBE_URL_CLIP            L"youtube.com/clip/"
+#define YOUTUBE_URL_LIBRARY         L"youtube.com/@"
 #define YOUTU_BE_URL                L"youtu.be/"
 
 #define MATCH_STREAM_MAP_START      "\"url_encoded_fmt_stream_map\":\""
@@ -180,6 +181,7 @@ namespace Youtube
 				|| url.Find(YOUTUBE_USER_URL) != -1
 				|| url.Find(YOUTUBE_CHANNEL_URL) != -1
 				|| url.Find(YOUTUBE_USER_SHORT_URL) != -1
+				|| url.Find(YOUTUBE_URL_LIBRARY) != -1
 				|| (url.Find(YOUTUBE_URL) != -1 && url.Find(L"&list=") != -1)
 				|| (url.Find(YOUTUBE_URL_A) != -1 && url.Find(L"/watch_videos?video_ids") != -1)
 				|| ((url.Find(YOUTUBE_URL_V) != -1 || url.Find(YOUTUBE_URL_EMBED) != -1
@@ -1488,7 +1490,7 @@ namespace Youtube
 #if !USE_GOOGLE_API
 			HandleURL(url);
 
-			auto channelId = RegExpParse(url.GetString(), L"www.youtube.com(?:/channel|/c|/user)/([^/]+)");
+			auto channelId = RegExpParse(url.GetString(), L"www.youtube.com/(?:channel/|c/|user/|@)([^/?&#]+)");
 			if (!channelId.IsEmpty()) {
 				if (url.Find(L"/live") != -1) {
 					urlData data;
