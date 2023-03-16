@@ -549,7 +549,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		if (mts.empty()) {
-			DLog(L"CAviSourceFilter: Unsupported stream (%d)", i);
+			DLog(L"CAviSourceFilter: Unsupported stream (%u)", (unsigned)i);
 			continue;
 		}
 

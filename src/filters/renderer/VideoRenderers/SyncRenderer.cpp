@@ -936,7 +936,7 @@ HRESULT CBaseAP::ResizeShaderPass(
 				D3DPOOL_DEFAULT, &m_pResizeTexture, nullptr);
 			if (FAILED(hr) || FAILED(m_pResizeTexture->GetLevelDesc(0, &desc))) {
 				m_pResizeTexture.Release();
-				DLog(L"CDX9VideoProcessor::ProcessTex() : m_TexResize.Create() failed with error {}", HR2Str(hr));
+				DLog(L"CDX9VideoProcessor::ProcessTex() : m_TexResize.Create() failed with error %s", HR2Str(hr));
 				return TextureCopyRect(pTexture, srcRect, dstRect, D3DTEXF_LINEAR, m_iRotation, m_bFlip);
 			}
 		}
@@ -971,7 +971,7 @@ HRESULT CBaseAP::ResizeShaderPass(
 		}
 	}
 
-	DLogIf(FAILED(hr), L"CDX9VideoProcessor::ResizeShaderPass() : failed with error {}", HR2Str(hr));
+	DLogIf(FAILED(hr), L"CDX9VideoProcessor::ResizeShaderPass() : failed with error %s", HR2Str(hr));
 
 	return hr;
 }

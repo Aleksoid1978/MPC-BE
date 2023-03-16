@@ -5657,7 +5657,7 @@ void CMainFrame::cmdLineThreadFunction()
 
 					std::unique_lock<std::mutex> lock(m_mutex_cmdLineQueue);
 					if (!m_cmdLineQueue.empty()) {
-						DLog(L"CMainFrame::cmdLineThreadFunction() : command line queue size - %u", m_cmdLineQueue.size());
+						DLog(L"CMainFrame::cmdLineThreadFunction() : command line queue size - %zu", m_cmdLineQueue.size());
 						const std::vector<BYTE>& pData = m_cmdLineQueue.front();
 						const BYTE* p = pData.data();
 						DWORD cnt = GETU32(p);

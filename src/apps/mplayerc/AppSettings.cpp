@@ -1152,7 +1152,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		UINT mouse, mouseFS, appcmd;
 		WCHAR buff[128];
 		int n;
-		if (5 > (n = swscanf_s(str, L"%d %x %x %s %d %u %u %u", &cmd, &fVirt, &key, buff, std::size(buff), &repcnt, &mouse, &appcmd, &mouseFS))) {
+		if (5 > (n = swscanf_s(str, L"%d %x %x %s %d %u %u %u", &cmd, &fVirt, &key, buff, (unsigned)std::size(buff), &repcnt, &mouse, &appcmd, &mouseFS))) {
 			break;
 		}
 
@@ -1273,7 +1273,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_RS_FULLSCREENRES, IDS_RS_FULLSCREENRES_ENABLE, fullScreenModes.bEnabled);
 	profile.ReadBool(IDS_RS_FULLSCREENRES, IDS_RS_FULLSCREENRES_APPLY_DEF, fullScreenModes.bApplyDefault);
 	fullScreenModes.res.clear();
-	for (size_t cnt = 0; cnt < MaxMonitorId; cnt++) {
+	for (unsigned cnt = 0; cnt < MaxMonitorId; cnt++) {
 		fullScreenRes item;
 
 		CString entry;

@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2020 see Authors.txt
+ * (C) 2014-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -192,7 +192,7 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 		return E_FAIL;
 	}
 	if (ape.seektablelength / sizeof(*ape.seektable) < ape.totalframes) {
-		DLog(L"CAPEFile::Open() : Number of seek entries is less than number of frames: %u vs. %u", ape.seektablelength / sizeof(*ape.seektable), ape.totalframes);
+		DLog(L"CAPEFile::Open() : Number of seek entries is less than number of frames: %u vs. %u", ape.seektablelength / (uint32_t)sizeof(*ape.seektable), ape.totalframes);
 		return E_FAIL;
 	}
 
