@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -42,8 +42,9 @@ public:
 	CMFCMaskedEdit m_timeedit;
 	CEdit m_frameedit;
 
+	const bool m_showHours;
 	REFERENCE_TIME m_time;
-	REFERENCE_TIME m_maxTime;
+	const REFERENCE_TIME m_maxTime;
 	double m_fps;
 
 	enum { IDD = IDD_GOTO_DLG };

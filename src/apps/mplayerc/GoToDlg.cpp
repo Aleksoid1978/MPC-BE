@@ -30,6 +30,7 @@ CGoToDlg::CGoToDlg(REFERENCE_TIME time, REFERENCE_TIME maxTime, double fps, CWnd
 	, m_time(time)
 	, m_maxTime(maxTime)
 	, m_fps(fps)
+	, m_showHours(maxTime >= 3600 * 1000 * 10000i64)
 {
 	if (m_fps == 0) {
 		CString str = L"0";
@@ -59,9 +60,7 @@ BOOL CGoToDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	bool showHours = (m_maxTime >= 3600*1000*10000i64);
-
-	if (showHours) {
+	if (m_showHours) {
 		m_timeedit.EnableMask(L"DD DD DD DDD", L"__:__:__.___", L'0', L"0123456789");
 	} else {
 		m_timeedit.EnableMask(L"DD DD DDD", L"__:__.___", L'0', L"0123456789");
@@ -73,7 +72,7 @@ BOOL CGoToDlg::OnInitDialog()
 	int time = (int) (m_time / 10000);
 
 	if (time >= 0) {
-		if (showHours) {
+		if (m_showHours) {
 			m_timestr.Format(L"%02d:%02d:%02d.%03d",
 							 (time/(1000*60*60))%60, (time/(1000*60))%60, (time/1000)%60, time%1000);
 		} else {
@@ -118,17 +117,13 @@ void CGoToDlg::OnBnClickedOk1()
 
 	AfxGetProfile().WriteInt(IDS_R_DLG_GOTO, IDS_RS_DLG_GOTO_LASTTIMEFMT, TYPE_TIME);
 
-	unsigned int hh = 0;
-	unsigned int mm = 0;
+	unsigned hh = 0;
+	unsigned mm = 0;
 	float ss = 0.0;
-	wchar_t c1 = L':'; // delimiter character
-	wchar_t c2 = L':'; // delimiter character
-	wchar_t c3[2]; // unnecessary character
 
-	if (((swscanf_s(m_timestr, L"%f%1s", &ss, &c3, std::size(c3)) == 1 || // sss[.ms]
-			swscanf_s(m_timestr, L"%u%c%f%1s", &mm, &c2, sizeof(wchar_t), &ss, &c3, std::size(c3)) == 3 && ss < 60 || // mmm:ss[.ms]
-			(swscanf_s(m_timestr, L"%u%c%u%c%f%1s", &hh, &c1, sizeof(wchar_t), &mm, &c2, sizeof(wchar_t), &ss, &c3, std::size(c3)) == 5 && mm < 60  && ss < 60)) && // hhh:mm:ss[.ms]
-			c1 == L':' && c2 == L':' && ss >= 0)) {
+	if ((m_showHours && swscanf_s(m_timestr, L"%u:%u:%f", &hh, &mm, &ss) == 3 // hhh:mm:ss[.ms]
+			|| swscanf_s(m_timestr, L"%u:%f", &mm, &ss) == 2) // mmm:ss[.ms]
+			&& mm < 60 && ss < 60) {
 
 		int time = (int)(1000*((hh*60+mm)*60+ss)+0.5);
 		m_time = time * 10000i64;
