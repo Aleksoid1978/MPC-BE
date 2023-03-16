@@ -876,7 +876,7 @@ BEGIN
     COMBOBOX        IDC_COMBO7,188,156,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "출력 범위 :",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "MPC 비디오 렌더러 정",IDC_STATIC,5,177,285,27
+    GROUPBOX        "MPC 비디오 렌더러 정보",IDC_STATIC,5,177,285,27
     CONTROL         "추가 창에서 전체 화면 전용(실험)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
     GROUPBOX        "비디오 프레임",IDC_STATIC,5,208,210,53
@@ -3169,7 +3169,7 @@ STRINGTABLE
 BEGIN
     IDS_DESC_NULLVR_ANY     "모든 비디오 형식의 샘플을 출력하지 않습니다. 비디오를 출력하지 않으면서 CPU가 작동하도록 할 때 사용합니다."
     IDS_DESC_NULLVR_UNCOMP  "일반적인 Null 렌더러와 같지만 압축되지 않은 형식만을 연결합니다."
-    IDS_DESC_EVR            "하드웨어 디코딩을 지원하는 비디오 렌더러."
+    IDS_DESC_EVR            "하드웨어 디코딩을 지원하는 비디오 렌더러입니다."
     IDS_DESC_EVR_CP         "EVR과 같지만, 자막 및 후처리를 위해 할당자-발표자를 사용합니다."
     IDS_DESC_MADVR          "고품질 렌더러, D3D9 이상을 지원하는 GPU 필요."
     IDS_DESC_EVR_SYNC       "EVR (CP)와 같지만, 스킵되거나 중복된 영상 프레임을 제거하기 위한 디스플레이 주사율과 비디오 프레임율을 동기화해주는 여러 옵션 제공"
@@ -3470,7 +3470,7 @@ BEGIN
     IDS_AUDIO_STREAM        "오디오  %u/%u: %s"
     IDS_AG_REOPEN           "파일 다시열기"
     IDS_PROPERTIESFOR       "'%s'에 대한 속성"
-    IDS_AUDIO_ONLY          "오디오 강제"
+    IDS_AUDIO_ONLY          "오디오만"
 END
 
 STRINGTABLE
