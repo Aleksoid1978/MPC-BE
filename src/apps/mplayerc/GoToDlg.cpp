@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -145,17 +145,18 @@ void CGoToDlg::OnBnClickedOk2()
 
 	AfxGetProfile().WriteInt(IDS_R_DLG_GOTO, IDS_RS_DLG_GOTO_LASTTIMEFMT, TYPE_FRAME);
 
-	unsigned int frame;
+	unsigned frame;
 	float fps;
 	wchar_t c1[2]; // delimiter character
-	wchar_t c2[2]; // unnecessary character
+	// use reading the delimiter character into a string
+	// so that the swscanf_s function ignores spaces before the delimiter character
 
-	int result = swscanf_s(m_framestr, L"%u%1s%f%1s", &frame, &c1, std::size(c1), &fps, &c2, std::size(c2));
+	int result = swscanf_s(m_framestr, L"%u%1s%f", &frame, &c1, (unsigned)std::size(c1), &fps);
 
-	if (result == 1) {
+	if (result == 1 || (result == 2 && c1[0] == L',')) { // frame number only
 		m_time = (REFERENCE_TIME)ceil(10000000.0*frame/m_fps);
 		OnOK();
-	} else if (result == 3 && c1[0] == L',') {
+	} else if (result == 3 && c1[0] == L',' && fps > 0) { // frame number and fps
 		m_time = (REFERENCE_TIME)ceil(10000000.0*frame/fps);
 		OnOK();
 	} else if (result == 0 || c1[0] != L',') {
