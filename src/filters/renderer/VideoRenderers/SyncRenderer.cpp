@@ -290,6 +290,29 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	CSize backBufferSize;
 	GetMaxResolution(m_pD3D9Ex, backBufferSize);
 
+	m_b10BitOutput = m_ExtraSets.b10BitOutput;
+
+	{
+		HMONITOR hMonitor = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
+		MONITORINFOEXW mi = { sizeof(mi) };
+		GetMonitorInfoW(hMonitor, (MONITORINFO*)&mi);
+		DisplayConfig_t dc = {};
+		bool ret = GetDisplayConfig(mi.szDevice, dc);
+
+		if (dc.refreshRate.Numerator && dc.refreshRate.Denominator) {
+			m_dRefreshRate = (double)dc.refreshRate.Numerator / (double)dc.refreshRate.Denominator;
+		} else {
+			m_dRefreshRate = d3ddm.RefreshRate;
+		}
+
+		if (m_b10BitOutput) {
+			m_b10BitOutput = (dc.bitsPerChannel >= 10);
+			if (!m_b10BitOutput) {
+				m_strMsgError = L"10 bit RGB is not enabled on this display or is not supported.";
+			}
+		}
+	}
+
 	ZeroMemory(&m_pp, sizeof(m_pp));
 	if (m_bIsFullscreen) { // Exclusive mode fullscreen
 		m_pp.Windowed = FALSE;
@@ -301,7 +324,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		m_pp.SwapEffect = D3DSWAPEFFECT_DISCARD;
 		m_pp.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 		m_pp.Flags = D3DPRESENTFLAG_VIDEO;
-		m_b10BitOutput = m_ExtraSets.b10BitOutput;
+
 		if (m_b10BitOutput) {
 			if (FAILED(m_pD3D9Ex->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_A2R10G10B10, D3DFMT_A2R10G10B10, false))) {
 				m_strMsgError = L"10 bit RGB is not supported by this graphics device in this resolution.";
@@ -352,10 +375,10 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		m_pp.BackBufferHeight = backBufferSize.cy;
 		m_BackbufferFmt = d3ddm.Format;
 		m_DisplayFmt = d3ddm.Format;
-		m_b10BitOutput = m_ExtraSets.b10BitOutput;
+
 		if (m_b10BitOutput) {
 			if (FAILED(m_pD3D9Ex->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_A2R10G10B10, D3DFMT_A2R10G10B10, true))) {
-				m_strMsgError = L"10 bit RGB is not supported by this graphics device in this resolution.";
+				m_strMsgError = L"10 bit RGB is not supported by this graphics device in windowed mode.";
 				m_b10BitOutput = false;
 			}
 		}
@@ -1613,7 +1636,7 @@ void CBaseAP::DrawStats()
 
 			strText.AppendFormat(L"\nFrame rate   : %.3f fps   Actual frame rate: %.3f fps", m_fps, 10000000.0 / m_fJitterMean);
 
-			strText.AppendFormat(L"\nDisplay      : %d x %d, %u Hz  Cycle %.3f ms", m_ScreenSize.cx, m_ScreenSize.cy, m_refreshRate, m_dD3DRefreshCycle);
+			strText.AppendFormat(L"\nDisplay      : %d x %d, %.3f Hz  Cycle %.3f ms", m_ScreenSize.cx, m_ScreenSize.cy, m_dRefreshRate, m_dD3DRefreshCycle);
 
 			if ((m_Caps.Caps & D3DCAPS_READ_SCANLINE) == 0) {
 				strText.Append(L"\nScan line err: Graphics device does not support scan line access. No sync is possible");

@@ -45,7 +45,8 @@ protected:
 
 	REFERENCE_TIME m_rtNow = 0;
 	double m_fps           = 25.0;
-	UINT m_refreshRate     = 0;
+	UINT   m_refreshRate   = 0;
+	double m_dRefreshRate  = 0.0;
 
 	SubpicSettings m_SubpicSets;
 	Stereo3DSettings m_Stereo3DSets;
