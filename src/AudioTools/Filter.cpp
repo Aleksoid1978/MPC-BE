@@ -260,7 +260,7 @@ HRESULT CAudioFilter::Push(const REFERENCE_TIME time_start, BYTE* pData, const s
 	}
 
 	if (m_inSampleFmt == SAMPLE_FMT_S24 && m_inAvSampleFmt == AV_SAMPLE_FMT_S32) {
-		convert_int24_to_int32((int32_t*)m_pFrame->data[0], pData, static_cast<size_t>(nSamples) * m_inChannels);
+		convert_int24_to_int32((int32_t*)m_pFrame->data[0], pData, nSamples * m_inChannels);
 	} else {
 		memcpy(m_pFrame->data[0], pData, size);
 	}
@@ -300,7 +300,7 @@ HRESULT CAudioFilter::Pull(std::unique_ptr<CPacket>& p)
 		p->rtStop  = p->rtStart + llMulDiv(UNITS, m_pFrame->nb_samples, m_pFrame->sample_rate, 0);
 
 		if (m_outSampleFmt == SAMPLE_FMT_S24 && m_outAvSampleFmt == AV_SAMPLE_FMT_S32) {
-			const auto samples = static_cast<size_t>(m_pFrame->nb_samples) * m_pFrame->ch_layout.nb_channels;
+			const size_t samples = m_pFrame->nb_samples * m_pFrame->ch_layout.nb_channels;
 			p->resize(samples * 3);
 			convert_int32_to_int24(p->data(), (int32_t*)m_pFrame->data[0], samples);
 		} else {
