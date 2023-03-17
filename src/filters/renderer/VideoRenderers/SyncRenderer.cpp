@@ -303,7 +303,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		m_pp.Flags = D3DPRESENTFLAG_VIDEO;
 		m_b10BitOutput = m_ExtraSets.b10BitOutput;
 		if (m_b10BitOutput) {
-			if (FAILED(m_pD3D9Ex->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3ddm.Format, D3DFMT_A2R10G10B10, false))) {
+			if (FAILED(m_pD3D9Ex->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_A2R10G10B10, D3DFMT_A2R10G10B10, false))) {
 				m_strMsgError = L"10 bit RGB is not supported by this graphics device in this resolution.";
 				m_b10BitOutput = false;
 			}
@@ -354,7 +354,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		m_DisplayFmt = d3ddm.Format;
 		m_b10BitOutput = m_ExtraSets.b10BitOutput;
 		if (m_b10BitOutput) {
-			if (FAILED(m_pD3D9Ex->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3ddm.Format, D3DFMT_A2R10G10B10, false))) {
+			if (FAILED(m_pD3D9Ex->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_A2R10G10B10, D3DFMT_A2R10G10B10, true))) {
 				m_strMsgError = L"10 bit RGB is not supported by this graphics device in this resolution.";
 				m_b10BitOutput = false;
 			}
