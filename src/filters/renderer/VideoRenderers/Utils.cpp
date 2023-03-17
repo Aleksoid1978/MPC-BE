@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2018 see Authors.txt
+ * (C) 2016-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,6 +22,72 @@
 #include <memory>
 
 #include "Utils.h"
+
+double get_refresh_rate(const DISPLAYCONFIG_PATH_INFO& path, DISPLAYCONFIG_MODE_INFO* modes)
+{
+	double freq = 0.0;
+
+	if (path.targetInfo.modeInfoIdx != DISPLAYCONFIG_PATH_MODE_IDX_INVALID) {
+		DISPLAYCONFIG_MODE_INFO* mode = &modes[path.targetInfo.modeInfoIdx];
+		if (mode->infoType == DISPLAYCONFIG_MODE_INFO_TYPE_TARGET) {
+			DISPLAYCONFIG_RATIONAL* vSyncFreq = &mode->targetMode.targetVideoSignalInfo.vSyncFreq;
+			if (vSyncFreq->Denominator != 0 && vSyncFreq->Numerator / vSyncFreq->Denominator > 1) {
+				freq = (double)vSyncFreq->Numerator / (double)vSyncFreq->Denominator;
+			}
+		}
+	}
+
+	if (freq == 0.0) {
+		const DISPLAYCONFIG_RATIONAL* refreshRate = &path.targetInfo.refreshRate;
+		if (refreshRate->Denominator != 0 && refreshRate->Numerator / refreshRate->Denominator > 1) {
+			freq = (double)refreshRate->Numerator / (double)refreshRate->Denominator;
+		}
+	}
+
+	return freq;
+};
+
+
+double GetRefreshRate(const wchar_t* displayName)
+{
+	UINT32 num_paths;
+	UINT32 num_modes;
+	std::vector<DISPLAYCONFIG_PATH_INFO> paths;
+	std::vector<DISPLAYCONFIG_MODE_INFO> modes;
+	LONG res;
+
+	// The display configuration could change between the call to
+	// GetDisplayConfigBufferSizes and the call to QueryDisplayConfig, so call
+	// them in a loop until the correct buffer size is chosen
+	do {
+		res = GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, &num_paths, &num_modes);
+		if (res == ERROR_SUCCESS) {
+			paths.resize(num_paths);
+			modes.resize(num_modes);
+			res = QueryDisplayConfig(QDC_ONLY_ACTIVE_PATHS, &num_paths, paths.data(), &num_modes, modes.data(), nullptr);
+		}
+	} while (res == ERROR_INSUFFICIENT_BUFFER);
+
+	if (res == ERROR_SUCCESS) {
+		// num_paths and num_modes could decrease in a loop
+		paths.resize(num_paths);
+		modes.resize(num_modes);
+
+		for (const auto& path : paths) {
+			// Send a GET_SOURCE_NAME request
+			DISPLAYCONFIG_SOURCE_DEVICE_NAME source = {
+				{DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME, sizeof(source), path.sourceInfo.adapterId, path.sourceInfo.id}, {},
+			};
+			if (DisplayConfigGetDeviceInfo(&source.header) == ERROR_SUCCESS) {
+				if (wcscmp(displayName, source.viewGdiDeviceName) == 0) {
+					return get_refresh_rate(path, modes.data());
+				}
+			}
+		}
+	}
+
+	return 0.0;
+}
 
 bool RetrieveBitmapData(unsigned w, unsigned h, unsigned bpp, BYTE* dst, BYTE* src, int srcpitch)
 {
@@ -204,4 +270,103 @@ HRESULT SaveRAWVideoAsBMP(BYTE* data, DWORD format, unsigned pitch, unsigned wid
 	}
 
 	return S_OK;
+}
+
+// DisplayConfig
+
+static bool is_valid_refresh_rate(const DISPLAYCONFIG_RATIONAL& rr)
+{
+	// DisplayConfig sometimes reports a rate of 1 when the rate is not known
+	return rr.Denominator != 0 && rr.Numerator / rr.Denominator > 1;
+}
+
+bool GetDisplayConfig(const wchar_t* displayName, DisplayConfig_t& displayConfig)
+{
+	UINT32 num_paths;
+	UINT32 num_modes;
+	std::vector<DISPLAYCONFIG_PATH_INFO> paths;
+	std::vector<DISPLAYCONFIG_MODE_INFO> modes;
+	LONG res;
+
+	// The display configuration could change between the call to
+	// GetDisplayConfigBufferSizes and the call to QueryDisplayConfig, so call
+	// them in a loop until the correct buffer size is chosen
+	do {
+		res = GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, &num_paths, &num_modes);
+		if (ERROR_SUCCESS == res) {
+			paths.resize(num_paths);
+			modes.resize(num_modes);
+			res = QueryDisplayConfig(QDC_ONLY_ACTIVE_PATHS, &num_paths, paths.data(), &num_modes, modes.data(), nullptr);
+		}
+	} while (ERROR_INSUFFICIENT_BUFFER == res);
+
+	if (res == ERROR_SUCCESS) {
+		// num_paths and num_modes could decrease in a loop
+		paths.resize(num_paths);
+		modes.resize(num_modes);
+
+		for (const auto& path : paths) {
+			// Send a GET_SOURCE_NAME request
+			DISPLAYCONFIG_SOURCE_DEVICE_NAME source = {
+				{DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME, sizeof(source), path.sourceInfo.adapterId, path.sourceInfo.id}, {},
+			};
+			res = DisplayConfigGetDeviceInfo(&source.header);
+			if (ERROR_SUCCESS == res) {
+				if (wcscmp(displayName, source.viewGdiDeviceName) == 0) {
+					displayConfig = {};
+
+					if (path.sourceInfo.modeInfoIdx != DISPLAYCONFIG_PATH_MODE_IDX_INVALID) {
+						const auto& mode = modes[path.sourceInfo.modeInfoIdx];
+						if (mode.infoType == DISPLAYCONFIG_MODE_INFO_TYPE_SOURCE) {
+							displayConfig.width  = mode.sourceMode.width;;
+							displayConfig.height = mode.sourceMode.height;
+						}
+					}
+					if (path.targetInfo.modeInfoIdx != DISPLAYCONFIG_PATH_MODE_IDX_INVALID) {
+						const auto& mode = modes[path.targetInfo.modeInfoIdx];
+						if (mode.infoType == DISPLAYCONFIG_MODE_INFO_TYPE_TARGET) {
+							displayConfig.refreshRate      = mode.targetMode.targetVideoSignalInfo.vSyncFreq;
+							displayConfig.scanLineOrdering = mode.targetMode.targetVideoSignalInfo.scanLineOrdering;
+						}
+						displayConfig.modeTarget = mode;
+
+						DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO color_info = {
+							{DISPLAYCONFIG_DEVICE_INFO_GET_ADVANCED_COLOR_INFO, sizeof(color_info), mode.adapterId, mode.id}, {}
+						};
+						res = DisplayConfigGetDeviceInfo(&color_info.header);
+						if (ERROR_SUCCESS == res) {
+							displayConfig.colorEncoding = color_info.colorEncoding;
+							displayConfig.bitsPerChannel = color_info.bitsPerColorChannel;
+							displayConfig.advancedColor.value = color_info.value;
+						}
+					}
+
+					if (!is_valid_refresh_rate(displayConfig.refreshRate)) {
+						displayConfig.refreshRate = path.targetInfo.refreshRate;
+						displayConfig.scanLineOrdering = path.targetInfo.scanLineOrdering;
+						if (!is_valid_refresh_rate(displayConfig.refreshRate)) {
+							displayConfig.refreshRate = { 0, 1 };
+						}
+					}
+
+					displayConfig.outputTechnology = path.targetInfo.outputTechnology;
+					memcpy(displayConfig.displayName, source.viewGdiDeviceName, sizeof(displayConfig.displayName));
+
+					DISPLAYCONFIG_TARGET_DEVICE_NAME name= {
+						{DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_NAME, sizeof(name), path.sourceInfo.adapterId, path.targetInfo.id}, {},
+					};
+					res = DisplayConfigGetDeviceInfo(&name.header);
+					if (ERROR_SUCCESS == res) {
+						memcpy(displayConfig.monitorName, name.monitorFriendlyDeviceName, sizeof(displayConfig.monitorName));
+					} else {
+						ZeroMemory(displayConfig.monitorName, sizeof(displayConfig.monitorName));
+					}
+
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
 }

@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2018 see Authors.txt
+ * (C) 2016-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,3 +29,30 @@ HRESULT DumpDX9Texture(IDirect3DDevice9* pD3DDev, IDirect3DTexture9* pTexture, w
 HRESULT DumpDX9RenderTarget(IDirect3DDevice9* pD3DDev, wchar_t* filename);
 
 HRESULT SaveRAWVideoAsBMP(BYTE* data, DWORD format, unsigned pitch, unsigned width, unsigned height, wchar_t* filename);
+
+struct DisplayConfig_t {
+	UINT32 width;
+	UINT32 height;
+	UINT32 bitsPerChannel;
+	DISPLAYCONFIG_COLOR_ENCODING colorEncoding;
+	union {
+		struct {
+			UINT32 advancedColorSupported : 1;    // A type of advanced color is supported
+			UINT32 advancedColorEnabled : 1;    // A type of advanced color is enabled
+			UINT32 wideColorEnforced : 1;    // Wide color gamut is enabled
+			UINT32 advancedColorForceDisabled : 1;    // Advanced color is force disabled due to system/OS policy
+			UINT32 reserved : 28;
+		};
+		UINT32 value;
+	} advancedColor;
+	DISPLAYCONFIG_RATIONAL                refreshRate;
+	DISPLAYCONFIG_SCANLINE_ORDERING       scanLineOrdering;
+	DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY outputTechnology;
+	WCHAR displayName[CCHDEVICENAME];
+	WCHAR monitorName[64];
+	DISPLAYCONFIG_MODE_INFO modeTarget;
+};
+
+// DisplayConfig
+
+bool GetDisplayConfig(const wchar_t* displayName, DisplayConfig_t& displayConfig);
