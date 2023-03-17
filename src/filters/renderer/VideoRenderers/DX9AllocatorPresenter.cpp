@@ -566,6 +566,26 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	CSize backBufferSize;
 	GetMaxResolution(m_pD3D9Ex, backBufferSize);
 
+	bool b10BitOutput = m_ExtraSets.b10BitOutput;
+
+	{
+		HMONITOR hMonitor = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
+		MONITORINFOEXW mi = { sizeof(mi) };
+		GetMonitorInfoW(hMonitor, (MONITORINFO*)&mi);
+		DisplayConfig_t dc = {};
+		bool ret = GetDisplayConfig(mi.szDevice, dc);
+
+		if (dc.refreshRate.Numerator && dc.refreshRate.Denominator) {
+			m_dRefreshRate = (double)dc.refreshRate.Numerator / (double)dc.refreshRate.Denominator;
+		} else {
+			m_dRefreshRate = d3ddmEx.RefreshRate;
+		}
+
+		if (b10BitOutput) {
+			b10BitOutput = (dc.bitsPerChannel >= 10);
+		}
+	}
+
 	ZeroMemory(&m_d3dpp, sizeof(m_d3dpp));
 
 	if (SysVersion::IsWin8orLater()) {
@@ -573,10 +593,11 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	}
 
 	if (m_bIsFullscreen) {
-		// detect 10-bit device support
-		bool b10BitOutputSupport = SUCCEEDED(m_pD3D9Ex->CheckDeviceType(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_A2R10G10B10, D3DFMT_A2R10G10B10, FALSE));
+		if (b10BitOutput) {
+			b10BitOutput = SUCCEEDED(m_pD3D9Ex->CheckDeviceType(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_A2R10G10B10, D3DFMT_A2R10G10B10, FALSE));
+		}
 
-		if (b10BitOutputSupport && m_ExtraSets.b10BitOutput) {
+		if (b10BitOutput) {
 			m_d3dpp.BackBufferFormat = D3DFMT_A2R10G10B10;
 		} else {
 			m_d3dpp.BackBufferFormat = D3DFMT_X8R8G8B8;
@@ -1904,9 +1925,9 @@ void CDX9AllocatorPresenter::DrawStats()
 				, m_strProcessingFmt
 				, m_strBackbufferFmt);
 
-			strText.AppendFormat(L"\nRefresh rate : %.05f Hz (%u Hz)    SL: %4d    Last Duration: %8.4f    Corrected Frame Time: %s",
+			strText.AppendFormat(L"\nRefresh rate : %.05f Hz (%.3f Hz)    SL: %4d    Last Duration: %8.4f    Corrected Frame Time: %s",
 				m_DetectedRefreshRate,
-				m_refreshRate,
+				m_dRefreshRate,
 				int(m_DetectedScanlinesPerFrame + 0.5),
 				double(m_LastFrameDuration) / 10000.0,
 				m_bCorrectedFrameTime ? L"Yes" : L"No");
