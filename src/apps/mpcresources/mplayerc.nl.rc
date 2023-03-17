@@ -152,7 +152,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,178,133,109,12
     GROUPBOX        "",IDC_STATIC,5,154,285,49
     CONTROL         "FFmpeg-filters",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,153,61,10
-    PUSHBUTTON      "Presets",IDC_BUTTON1,9,166,59,14
+    PUSHBUTTON      "Profielen",IDC_BUTTON1,9,166,59,14
     COMBOBOX        IDC_COMBO1,10,184,58,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_EDIT1,72,184,214,14,ES_AUTOHSCROLL
     GROUPBOX        "Audio-uitvoerformaat:",IDC_STATIC,5,206,286,29
@@ -861,7 +861,7 @@ BEGIN
     GROUPBOX        "Instellingen van EVR-CP en EVR Sync",IDC_STATIC,5,37,285,137
     CONTROL         "Kies D3D9-renderapparaat",IDC_D3D9DEVICE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,120,10
     COMBOBOX        IDC_D3D9DEVICE_COMBO,144,49,142,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Exclusive full screen on an additional window",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
+    CONTROL         "Exclusieve volledigschermmodus op een bijkomend venster",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,79,224,10
     CONTROL         "10-bits RGB-uitvoer",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,92,92,10
     CONTROL         "Herinitialisatie bij verandering van monitor",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_TOP | WS_TABSTOP,10,65,164,9
@@ -876,8 +876,8 @@ BEGIN
     COMBOBOX        IDC_COMBO7,188,156,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Uitvoerbereik:",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "MPC Video Renderer settings",IDC_STATIC,5,177,285,27
-    CONTROL         "Exclusive full screen on an additional window (experimental)",IDC_CHECK2,
+    GROUPBOX        "Instellingen voor MPC Video Renderer",IDC_STATIC,5,177,285,27
+    CONTROL         "Exclusieve volledigschermmodus op een bijkomend venster (experimenteel)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
     GROUPBOX        "Frameformaat",IDC_STATIC,5,208,210,53
     LTEXT           "Standaardmodus:",IDC_STATIC,10,220,74,8
@@ -2363,7 +2363,7 @@ BEGIN
     IDS_PLAYLOOPMODE_AB_MARK_A "A-B Herhalen: Positie A markeren"
     IDS_PLAYLOOPMODE_AB_MARK_B "A-B Herhalen: Positie B markeren"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Aan afspeellijst toevoegen vanaf klembord"
-    IDS_AUDIO_FILTER_PRESET_1 "For audio with whisper and explosion parts"
+    IDS_AUDIO_FILTER_PRESET_1 "Voor audio met fluisteren en explosies"
 END
 
 STRINGTABLE
@@ -3470,7 +3470,7 @@ BEGIN
     IDS_AUDIO_STREAM        "Audio %u/%u: %s"
     IDS_AG_REOPEN           "Bestand heropenen"
     IDS_PROPERTIESFOR       "Eigenschappen voor ""%s"""
-    IDS_AUDIO_ONLY          "audio only"
+    IDS_AUDIO_ONLY          "Alleen audio"
 END
 
 STRINGTABLE
@@ -3623,7 +3623,7 @@ BEGIN
     IDS_SATURATION_DEC      "Verzadiging verminderen"
     IDS_RESET_COLOR         "Kleurinstellingen resetten"
     IDS_AFTERPLAYBACK_CLOSE_FILE "Na weergave: Altijd bestand sluiten"
-    IDS_UPDATE_ERROR_DATA   "The update server gives the wrong data.\n\nPlease try later."
+    IDS_UPDATE_ERROR_DATA   "De updateserver geeft verkeerde gegevens.\n\nProbeer het later."
     IDS_USING_NEWER_VERSION "U bent al de laatste versie %s aan het gebruiken."
     IDS_NEW_UPDATE_AVAILABLE  "Een nieuw %s is beschikbaar.\n\nWilt u MPC-BE's website bezoeken om te downloaden?"
     IDS_UPDATE_ERROR_CONNECT  "Updateserver niet gevonden.\n\nControleer uw internetverbinding of probeer later opnieuw a.u.b."

@@ -152,7 +152,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,178,133,109,12
     GROUPBOX        "",IDC_STATIC,5,154,285,49
     CONTROL         "FFmpeg 濾波器",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,153,61,10
-    PUSHBUTTON      "Presets",IDC_BUTTON1,9,166,59,14
+    PUSHBUTTON      "預設集",IDC_BUTTON1,9,166,59,14
     COMBOBOX        IDC_COMBO1,10,184,58,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_EDIT1,72,184,214,14,ES_AUTOHSCROLL
     GROUPBOX        "輸出取樣格式：",IDC_STATIC,5,206,286,29
@@ -593,7 +593,7 @@ END
 
 IDD_PNSPRESET_DLG DIALOGEX 0, 0, 210, 120
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "平移掃描先期設定"
+CAPTION "平移掃描預設集"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LISTBOX         IDC_LIST1,5,5,125,50,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
@@ -861,7 +861,7 @@ BEGIN
     GROUPBOX        "EVR 自訂呈現及 EVR 同步繪製設定",IDC_STATIC,5,37,285,137
     CONTROL         "選擇 D3D9 繪製裝置",IDC_D3D9DEVICE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,120,10
     COMBOBOX        IDC_D3D9DEVICE_COMBO,144,49,142,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Exclusive full screen on an additional window",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
+    CONTROL         "於額外視窗使用獨佔全螢幕模式",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,79,224,10
     CONTROL         "10-bit RGB 輸出",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,92,92,10
     CONTROL         "變更螢幕時重新初始化",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_TOP | WS_TABSTOP,10,65,164,9
@@ -876,8 +876,8 @@ BEGIN
     COMBOBOX        IDC_COMBO7,188,156,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "輸出範圍：",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "MPC Video Renderer settings",IDC_STATIC,5,177,285,27
-    CONTROL         "Exclusive full screen on an additional window (experimental)",IDC_CHECK2,
+    GROUPBOX        "MPC 視訊繪製器設定",IDC_STATIC,5,177,285,27
+    CONTROL         "於額外視窗使用獨佔全螢幕模式（測試中）",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
     GROUPBOX        "影格佈置",IDC_STATIC,5,208,210,53
     LTEXT           "預設模式：",IDC_STATIC,10,220,74,8
@@ -1626,7 +1626,7 @@ BEGIN
         MENUITEM "擷取",                    ID_VIEW_CAPTURE
         MENUITEM "編輯着色器",            ID_VIEW_SHADEREDITOR
         MENUITEM "導覽",                          ID_VIEW_NAVIGATION
-        POPUP "先期設定(&P)..."
+        POPUP "範例介面(&P)..."
         BEGIN
             MENUITEM "最小(&M)",                          ID_VIEW_PRESETS_MINIMAL
             MENUITEM "輕巧(&C)",                          ID_VIEW_PRESETS_COMPACT
@@ -1823,7 +1823,7 @@ BEGIN
             MENUITEM "編輯着色器",                  ID_VIEW_SHADEREDITOR
             MENUITEM "導覽",                          ID_VIEW_NAVIGATION
             MENUITEM "語言 Language(&L)",                   ID_SUBMENU_LANGUAGE
-            POPUP "先期設定(&P)..."
+            POPUP "範例介面(&P)..."
             BEGIN
                 MENUITEM "最小(&M)",                          ID_VIEW_PRESETS_MINIMAL
                 MENUITEM "輕巧(&C)",                          ID_VIEW_PRESETS_COMPACT
@@ -1907,7 +1907,7 @@ BEGIN
             MENUITEM "編輯着色器",            ID_VIEW_SHADEREDITOR
             MENUITEM "導覽",                          ID_VIEW_NAVIGATION
             MENUITEM "語言 Language(&L)",                   ID_SUBMENU_LANGUAGE
-            POPUP "先期設定(&P)..."
+            POPUP "範例介面(&P)..."
             BEGIN
                 MENUITEM "最小(&M)",                          ID_VIEW_PRESETS_MINIMAL
                 MENUITEM "輕巧(&C)",                          ID_VIEW_PRESETS_COMPACT
@@ -2363,7 +2363,7 @@ BEGIN
     IDS_PLAYLOOPMODE_AB_MARK_A "A-B 重複：設定標記 A 位置"
     IDS_PLAYLOOPMODE_AB_MARK_B "A-B 重複：設定標記 B 位置"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "從剪貼簿加入播放清單"
-    IDS_AUDIO_FILTER_PRESET_1 "For audio with whisper and explosion parts"
+    IDS_AUDIO_FILTER_PRESET_1 "適用於含耳語及爆炸音效的音訊"
 END
 
 STRINGTABLE
@@ -3398,7 +3398,7 @@ BEGIN
     IDS_AG_ZOOM_50          "縮放 50%"
     IDS_AG_ZOOM_100         "縮放 100%"
     IDS_AG_ZOOM_200         "縮放 200%"
-    IDS_AG_NEXT_AR_PRESET   "次一長寬比先期設定"
+    IDS_AG_NEXT_AR_PRESET   "次一先期設定長寬比"
     IDS_AG_VIDFRM_STRETCH   "視訊畫面 - 伸展"
     IDS_AG_VIDFRM_INSIDE    "視訊畫面 - 由內貼齊"
     IDS_AG_VIDFRM_OUTSIDE   "視訊畫面 - 由外貼齊"
@@ -3470,7 +3470,7 @@ BEGIN
     IDS_AUDIO_STREAM        "音訊串流%u/%u：%s"
     IDS_AG_REOPEN           "重新開啟檔案"
     IDS_PROPERTIESFOR       "「%s」 - 內容"
-    IDS_AUDIO_ONLY          "audio only"
+    IDS_AUDIO_ONLY          "只限音訊"
 END
 
 STRINGTABLE
@@ -3623,7 +3623,7 @@ BEGIN
     IDS_SATURATION_DEC      "減少飽和度"
     IDS_RESET_COLOR         "重設色彩設定"
     IDS_AFTERPLAYBACK_CLOSE_FILE "播放完後：總是關閉檔案"
-    IDS_UPDATE_ERROR_DATA   "The update server gives the wrong data.\n\nPlease try later."
+    IDS_UPDATE_ERROR_DATA   "更新伺服器資料錯誤。\n\n請稍後再試。"
     IDS_USING_NEWER_VERSION "您已經使用最新的穩定版本 %s"
     IDS_NEW_UPDATE_AVAILABLE  "新版本 %s 已經發佈。\n\n您要前往 MPC-BE 網站下載嗎？"
     IDS_UPDATE_ERROR_CONNECT  "找不到更新伺服器。\n\n請檢查您的連線狀態或稍後再嘗試。"
