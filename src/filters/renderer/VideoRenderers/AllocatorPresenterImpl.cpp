@@ -1,5 +1,5 @@
 /*
- * (C) 2022 see Authors.txt
+ * (C) 2022-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -312,7 +312,8 @@ STDMETHODIMP CAllocatorPresenterImpl::GetDouble(LPCSTR field, double* value)
 {
 	CheckPointer(value, E_POINTER);
 	if (!strcmp(field, "refreshRate")) {
-		*value = 1000.0 / m_refreshRate;
+		*value = 1000.0 / m_dRefreshRate;
+		// hmm, calculate Refresh Time in milliseconds (not Refresh Rate)
 		return S_OK;
 	}
 
