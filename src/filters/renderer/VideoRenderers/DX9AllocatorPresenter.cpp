@@ -566,7 +566,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	CSize backBufferSize;
 	GetMaxResolution(m_pD3D9Ex, backBufferSize);
 
-	if (SysVersion::IsWin8orLater() && !SysVersion::IsWin11orLater()) {
+	if (m_bIsFullscreen && SysVersion::IsWin8orLater() && !SysVersion::IsWin11orLater()) {
 		D3DHook::Hook(m_D3D9Device, d3ddmEx.RefreshRate);
 	}
 
