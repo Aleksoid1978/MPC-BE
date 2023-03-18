@@ -89,8 +89,8 @@ namespace SysVersion
 		return bIsWin10RS4orLater;
 	}
 	inline const bool IsWin10v1809orLater() { // LTSC
-		const static bool bIsWin10RS4orLater = IsWindowsVersionOrGreaterBuild(HIBYTE(_WIN32_WINNT_WINTHRESHOLD), LOBYTE(_WIN32_WINNT_WINTHRESHOLD), 17763);
-		return bIsWin10RS4orLater;
+		const static bool bIsWin10v1809orLater = IsWindowsVersionOrGreaterBuild(HIBYTE(_WIN32_WINNT_WINTHRESHOLD), LOBYTE(_WIN32_WINNT_WINTHRESHOLD), 17763);
+		return bIsWin10v1809orLater;
 	}
 	inline const bool IsWin11orLater()
 	{
