@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -841,7 +841,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 				key.SetStringValue (nullptr, extOldIcon);
 			*/
 
-			if (SysVersion::IsWin10RS4orLater()) {
+			if (SysVersion::IsWin10v1803orLater()) {
 				const auto keyName = L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\" + strExt + L"\\UserChoice";
 				if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, keyName.GetString(), KEY_READ)) {
 					// generate UserChoice Hash

@@ -84,11 +84,11 @@ namespace SysVersion
 		const static bool bIsWin10orLater = IsWindows10OrGreater();
 		return bIsWin10orLater;
 	}
-	inline const bool IsWin10RS4orLater() {
-		const static bool bIsWin10RS4orLater = IsWindowsVersionOrGreaterBuild(HIBYTE(_WIN32_WINNT_WINTHRESHOLD), LOBYTE(_WIN32_WINNT_WINTHRESHOLD), 17134);
-		return bIsWin10RS4orLater;
+	inline const bool IsWin10v1803orLater() {
+		const static bool bIsWin10v1803orLater = IsWindowsVersionOrGreaterBuild(HIBYTE(_WIN32_WINNT_WINTHRESHOLD), LOBYTE(_WIN32_WINNT_WINTHRESHOLD), 17134);
+		return bIsWin10v1803orLater;
 	}
-	inline const bool IsWin10v1809orLater() { // LTSC
+	inline const bool IsWin10v1809orLater() { // LTSC 2019
 		const static bool bIsWin10v1809orLater = IsWindowsVersionOrGreaterBuild(HIBYTE(_WIN32_WINNT_WINTHRESHOLD), LOBYTE(_WIN32_WINNT_WINTHRESHOLD), 17763);
 		return bIsWin10v1809orLater;
 	}
