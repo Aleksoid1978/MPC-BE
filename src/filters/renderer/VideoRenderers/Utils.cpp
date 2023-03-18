@@ -48,7 +48,7 @@ double get_refresh_rate(const DISPLAYCONFIG_PATH_INFO& path, DISPLAYCONFIG_MODE_
 };
 
 
-double GetRefreshRate(const wchar_t* displayName)
+static double GetRefreshRate(const wchar_t* displayName)
 {
 	UINT32 num_paths;
 	UINT32 num_modes;

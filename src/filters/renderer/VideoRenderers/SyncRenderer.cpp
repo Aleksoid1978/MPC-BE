@@ -281,7 +281,6 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	}
 
 	m_refreshRate = d3ddm.RefreshRate;
-	m_dD3DRefreshCycle = 1000.0 / m_refreshRate; // In ms
 	m_ScreenSize.SetSize(d3ddm.Width, d3ddm.Height);
 	m_pGenlock->SetDisplayResolution(d3ddm.Width, d3ddm.Height);
 
@@ -304,6 +303,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		} else {
 			m_dRefreshRate = d3ddm.RefreshRate;
 		}
+		m_dD3DRefreshCycle = 1000.0 / m_dRefreshRate; // In ms
 
 		if (m_b10BitOutput) {
 			m_b10BitOutput = (dc.bitsPerChannel >= 10);
@@ -1793,7 +1793,7 @@ void CBaseAP::DrawStats()
 
 double CBaseAP::GetRefreshRate()
 {
-	return (double)m_refreshRate;
+	return m_dRefreshRate;
 }
 
 double CBaseAP::GetDisplayCycle()

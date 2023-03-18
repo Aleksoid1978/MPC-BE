@@ -127,7 +127,7 @@ namespace DSObjects
 		double					m_DetectedScanlineTimePrim;
 		double					m_DetectedScanlinesPerFrame = 0.0;
 
-		double GetRefreshRate() const { return m_DetectedRefreshRate ? m_DetectedRefreshRate : m_refreshRate; }
+		double GetRefreshRate() const { return m_DetectedRefreshRate ? m_DetectedRefreshRate : m_dRefreshRate; }
 		LONG GetScanLines() const { return m_DetectedRefreshRate ? m_DetectedScanlinesPerFrame : m_ScreenSize.cy; }
 
 		double					m_ldDetectedRefreshRateList[100];

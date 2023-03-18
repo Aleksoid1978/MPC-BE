@@ -2064,7 +2064,7 @@ void CEVRAllocatorPresenter::RenderThread()
 								}
 
 								if (DetectedRefreshRatePos < 20 || !DetectedRefreshTime || !DetectedScanlinesPerFrame) {
-									DetectedRefreshTime = 1.0/m_refreshRate;
+									DetectedRefreshTime = 1.0/m_dRefreshRate;
 									DetectedScanlinesPerFrame = m_ScreenSize.cy;
 									DetectedScanlineTime = DetectedRefreshTime / double(m_ScreenSize.cy);
 								}
@@ -2308,7 +2308,7 @@ void CEVRAllocatorPresenter::VSyncThread()
 					if (m_nRenderState == Started) {
 						int VSyncPos = GetVBlackPos();
 						int WaitRange = std::max(m_ScreenSize.cy / 40, 5L);
-						int MinRange = std::clamp(long(0.003 * double(m_ScreenSize.cy) * double(m_refreshRate) + 0.5), 5L, m_ScreenSize.cy/3); // 1.8  ms or max 33 % of Time
+						int MinRange = std::clamp(long(0.003 * double(m_ScreenSize.cy) * m_dRefreshRate + 0.5), 5L, m_ScreenSize.cy/3); // 1.8  ms or max 33 % of Time
 
 						VSyncPos += MinRange + WaitRange;
 
