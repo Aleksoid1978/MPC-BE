@@ -150,46 +150,36 @@ BOOL CPPageFullscreen::OnInitDialog()
 	std::map<CString, CString> monitors;
 
 	{
-		typedef LONG(WINAPI* PFN_GetDisplayConfigBufferSizes)(UINT32, UINT32*, UINT32*);
-		static auto pGetDisplayConfigBufferSizes = reinterpret_cast<PFN_GetDisplayConfigBufferSizes>(GetProcAddress(GetModuleHandleW(L"User32.dll"), "GetDisplayConfigBufferSizes"));
+		UINT32 num_paths;
+		UINT32 num_modes;
+		std::vector<DISPLAYCONFIG_PATH_INFO> paths;
+		std::vector<DISPLAYCONFIG_MODE_INFO> modes;
+		LONG res;
 
-		typedef LONG(WINAPI* PFN_QueryDisplayConfig)(UINT32, UINT32*, DISPLAYCONFIG_PATH_INFO*, UINT32*, DISPLAYCONFIG_MODE_INFO*, DISPLAYCONFIG_TOPOLOGY_ID*);
-		static auto pQueryDisplayConfig = reinterpret_cast<PFN_QueryDisplayConfig>(GetProcAddress(GetModuleHandleW(L"User32.dll"), "QueryDisplayConfig"));
-
-		typedef LONG(WINAPI* PFN_DisplayConfigGetDeviceInfo)(DISPLAYCONFIG_DEVICE_INFO_HEADER*);
-		static auto pDisplayConfigGetDeviceInfo = reinterpret_cast<PFN_DisplayConfigGetDeviceInfo>(GetProcAddress(GetModuleHandleW(L"User32.dll"), "DisplayConfigGetDeviceInfo"));
-		if (pGetDisplayConfigBufferSizes && pQueryDisplayConfig && pDisplayConfigGetDeviceInfo) {
-			UINT32 num_paths;
-			UINT32 num_modes;
-			std::vector<DISPLAYCONFIG_PATH_INFO> paths;
-			std::vector<DISPLAYCONFIG_MODE_INFO> modes;
-			LONG res;
-
-			do {
-				res = pGetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, &num_paths, &num_modes);
-				if (ERROR_SUCCESS == res) {
-					paths.resize(num_paths);
-					modes.resize(num_modes);
-					res = pQueryDisplayConfig(QDC_ONLY_ACTIVE_PATHS, &num_paths, paths.data(), &num_modes, modes.data(), nullptr);
-				}
-			} while (ERROR_INSUFFICIENT_BUFFER == res);
-
-			if (res == ERROR_SUCCESS) {
+		do {
+			res = GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, &num_paths, &num_modes);
+			if (ERROR_SUCCESS == res) {
 				paths.resize(num_paths);
+				modes.resize(num_modes);
+				res = QueryDisplayConfig(QDC_ONLY_ACTIVE_PATHS, &num_paths, paths.data(), &num_modes, modes.data(), nullptr);
+			}
+		} while (ERROR_INSUFFICIENT_BUFFER == res);
 
-				for (const auto& path : paths) {
-					DISPLAYCONFIG_SOURCE_DEVICE_NAME source = {
-						{DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME, sizeof(source), path.sourceInfo.adapterId, path.sourceInfo.id}, {},
+		if (res == ERROR_SUCCESS) {
+			paths.resize(num_paths);
+
+			for (const auto& path : paths) {
+				DISPLAYCONFIG_SOURCE_DEVICE_NAME source = {
+					{DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME, sizeof(source), path.sourceInfo.adapterId, path.sourceInfo.id}, {},
+				};
+				res = DisplayConfigGetDeviceInfo(&source.header);
+				if (ERROR_SUCCESS == res) {
+					DISPLAYCONFIG_TARGET_DEVICE_NAME name = {
+						{DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_NAME, sizeof(name), path.sourceInfo.adapterId, path.targetInfo.id}, {},
 					};
-					res = pDisplayConfigGetDeviceInfo(&source.header);
+					res = DisplayConfigGetDeviceInfo(&name.header);
 					if (ERROR_SUCCESS == res) {
-						DISPLAYCONFIG_TARGET_DEVICE_NAME name = {
-							{DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_NAME, sizeof(name), path.sourceInfo.adapterId, path.targetInfo.id}, {},
-						};
-						res = pDisplayConfigGetDeviceInfo(&name.header);
-						if (ERROR_SUCCESS == res) {
-							monitors[source.viewGdiDeviceName] = name.monitorFriendlyDeviceName;
-						}
+						monitors[source.viewGdiDeviceName] = name.monitorFriendlyDeviceName;
 					}
 				}
 			}
