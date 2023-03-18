@@ -566,6 +566,10 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	CSize backBufferSize;
 	GetMaxResolution(m_pD3D9Ex, backBufferSize);
 
+	if (SysVersion::IsWin8orLater()) {
+		D3DHook::Hook(m_D3D9Device, d3ddmEx.RefreshRate);
+	}
+
 	bool b10BitOutput = m_ExtraSets.b10BitOutput;
 
 	{
@@ -587,10 +591,6 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	}
 
 	ZeroMemory(&m_d3dpp, sizeof(m_d3dpp));
-
-	if (SysVersion::IsWin8orLater()) {
-		D3DHook::Hook(m_D3D9Device, d3ddmEx.RefreshRate);
-	}
 
 	if (m_bIsFullscreen) {
 		if (b10BitOutput) {
