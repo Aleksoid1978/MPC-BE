@@ -281,8 +281,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_FILE_CLOSEMEDIA, OnUpdateFileClose)
 	ON_COMMAND(ID_REPEAT_FOREVER, OnRepeatForever)
 	ON_UPDATE_COMMAND_UI(ID_REPEAT_FOREVER, OnUpdateRepeatForever)
-	ON_COMMAND_RANGE(ID_PLAY_REPEAT_AB, ID_PLAY_REPEAT_AB_MARK_B, OnABRepeat)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_PLAY_REPEAT_AB, ID_PLAY_REPEAT_AB_MARK_B, OnUpdateABRepeat)
+	ON_COMMAND_RANGE(ID_PLAY_REPEAT_AB, ID_PLAY_REPEAT_AB_CLEAR_B, OnABRepeat)
+	ON_UPDATE_COMMAND_UI_RANGE(ID_PLAY_REPEAT_AB, ID_PLAY_REPEAT_AB_CLEAR_B, OnUpdateABRepeat)
 
 	ON_COMMAND(ID_VIEW_CAPTIONMENU, OnViewCaptionmenu)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_CAPTIONMENU, OnUpdateViewCaptionmenu)
@@ -20740,6 +20740,18 @@ void CMainFrame::OnUpdateABRepeat(CCmdUI* pCmdUI)
 		}
 		pCmdUI->Enable(canABRepeat);
 		break;
+	case ID_PLAY_REPEAT_AB_CLEAR_A:
+		if (pCmdUI->m_pMenu) {
+			pCmdUI->m_pMenu->CheckMenuItem(ID_PLAY_REPEAT_AB_MARK_A, MF_BYCOMMAND | MF_UNCHECKED);
+		}
+		pCmdUI->Enable(canABRepeat);
+		break;
+	case ID_PLAY_REPEAT_AB_CLEAR_B:
+		if (pCmdUI->m_pMenu) {
+			pCmdUI->m_pMenu->CheckMenuItem(ID_PLAY_REPEAT_AB_MARK_B, MF_BYCOMMAND | MF_UNCHECKED);
+		}
+		pCmdUI->Enable(canABRepeat);
+		break;
 	default:
 		ASSERT(FALSE);
 		return;
@@ -20760,6 +20772,8 @@ void CMainFrame::OnABRepeat(UINT nID)
 		break;
 	case ID_PLAY_REPEAT_AB_MARK_A:
 	case ID_PLAY_REPEAT_AB_MARK_B:
+	case ID_PLAY_REPEAT_AB_CLEAR_A:
+	case ID_PLAY_REPEAT_AB_CLEAR_B:
 		REFERENCE_TIME rtDur = 0;
 		int playmode = GetPlaybackMode();
 
@@ -20785,11 +20799,7 @@ void CMainFrame::OnABRepeat(UINT nID)
 		}
 
 		if (nID == ID_PLAY_REPEAT_AB_MARK_A) {
-			if (m_abRepeatPositionAEnabled) {
-				m_abRepeatPositionAEnabled = false;
-				m_abRepeatPositionA = 0;
-			}
-			else if (SUCCEEDED(m_pMS->GetCurrentPosition(&m_abRepeatPositionA))) {
+			if (SUCCEEDED(m_pMS->GetCurrentPosition(&m_abRepeatPositionA))) {
 				if (m_abRepeatPositionA < rtDur) {
 					m_abRepeatPositionAEnabled = true;
 					if (m_abRepeatPositionBEnabled && m_abRepeatPositionA >= m_abRepeatPositionB) {
@@ -20803,13 +20813,13 @@ void CMainFrame::OnABRepeat(UINT nID)
 			}
 		}
 		else if (nID == ID_PLAY_REPEAT_AB_MARK_B) {
-			if (m_abRepeatPositionBEnabled) {
-				m_abRepeatPositionBEnabled = false;
-				m_abRepeatPositionB = 0;
-			}
-			else if (SUCCEEDED(m_pMS->GetCurrentPosition(&m_abRepeatPositionB))) {
+			if (SUCCEEDED(m_pMS->GetCurrentPosition(&m_abRepeatPositionB))) {
 				if (m_abRepeatPositionB > 0 && m_abRepeatPositionB > m_abRepeatPositionA && rtDur >= m_abRepeatPositionB) {
 					m_abRepeatPositionBEnabled = true;
+					if (m_abRepeatPositionAEnabled && m_abRepeatPositionA >= m_abRepeatPositionB) {
+						m_abRepeatPositionAEnabled = false;
+						m_abRepeatPositionA = 0;
+					}
 					if (GetMediaState() == State_Running) {
 						PerformABRepeat(); //we just set loop point B, so we need to repeat right now
 					}
@@ -20817,6 +20827,18 @@ void CMainFrame::OnABRepeat(UINT nID)
 				else {
 					m_abRepeatPositionB = 0;
 				}
+			}
+		}
+		else if (nID == ID_PLAY_REPEAT_AB_CLEAR_A) {
+			if (m_abRepeatPositionAEnabled) {
+				m_abRepeatPositionAEnabled = false;
+				m_abRepeatPositionA = 0;
+			}
+		}
+		else if (nID == ID_PLAY_REPEAT_AB_CLEAR_B) {
+			if (m_abRepeatPositionBEnabled) {
+				m_abRepeatPositionBEnabled = false;
+				m_abRepeatPositionB = 0;
 			}
 		}
 

@@ -2360,6 +2360,8 @@ BEGIN
     IDS_PLAYLOOPMODE_AB     "A-B Repeat: Reset Positions"
     IDS_PLAYLOOPMODE_AB_MARK_A "A-B Repeat: Mark A Position"
     IDS_PLAYLOOPMODE_AB_MARK_B "A-B Repeat: Mark B Position"
+    IDS_PLAYLOOPMODE_AB_CLEAR_A "A-B Repeat: Clear A Position"
+    IDS_PLAYLOOPMODE_AB_CLEAR_B "A-B Repeat: Clear B Position"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Add to playlist from clipboard"
     IDS_AUDIO_FILTER_PRESET_1 "For audio with whisper and explosion parts"
 END
