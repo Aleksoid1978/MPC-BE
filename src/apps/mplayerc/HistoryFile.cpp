@@ -303,7 +303,7 @@ bool CHistoryFile::WriteFile()
 						str.AppendFormat(L"AudioPath=%s\n", sesInfo.AudioPath);
 					}
 					if (sesInfo.SubtitlePath.GetLength()) {
-						str.AppendFormat(L"SubtitlePath=%d\n", sesInfo.SubtitlePath);
+						str.AppendFormat(L"SubtitlePath=%s\n", sesInfo.SubtitlePath);
 					}
 				}
 				file.WriteString(str);
@@ -550,7 +550,7 @@ bool CFavoritesFile::WriteFile()
 					str.AppendFormat(L"AudioPath=%s\n", sesInfo.AudioPath);
 				}
 				if (sesInfo.SubtitlePath.GetLength()) {
-					str.AppendFormat(L"SubtitlePath=%d\n", sesInfo.SubtitlePath);
+					str.AppendFormat(L"SubtitlePath=%s\n", sesInfo.SubtitlePath);
 				}
 
 				file.WriteString(str);
