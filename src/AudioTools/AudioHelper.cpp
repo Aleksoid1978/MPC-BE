@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt.
+ * (C) 2014-2023 see Authors.txt.
  *
  * This file is part of MPC-BE.
  *
@@ -225,7 +225,7 @@ SampleFormat GetSampleFormat(const WAVEFORMATEX* wfe)
 	return sample_format;
 }
 
-HRESULT convert_to_int16(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, BYTE* pIn, int16_t* pOut)
+HRESULT convert_to_int16(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, BYTE* pIn, int16_t* pOut)
 {
 	size_t allsamples = nSamples * nChannels;
 
@@ -298,7 +298,7 @@ HRESULT convert_to_int16(const SampleFormat sfmt, const WORD nChannels, const DW
 	return S_OK;
 }
 
-HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, BYTE* pIn, BYTE* pOut)
+HRESULT convert_to_int24(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, BYTE* pIn, BYTE* pOut)
 {
 	size_t allsamples = nSamples * nChannels;
 
@@ -400,7 +400,7 @@ HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DW
 	return S_OK;
 }
 
-HRESULT convert_to_int32(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, BYTE* pIn, int32_t* pOut)
+HRESULT convert_to_int32(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, BYTE* pIn, int32_t* pOut)
 {
 	size_t allsamples = nSamples * nChannels;
 
@@ -470,7 +470,7 @@ HRESULT convert_to_int32(const SampleFormat sfmt, const WORD nChannels, const DW
 	return S_OK;
 }
 
-HRESULT convert_to_float(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, BYTE* pIn, float* pOut)
+HRESULT convert_to_float(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, BYTE* pIn, float* pOut)
 {
 	size_t allsamples = nSamples * nChannels;
 
@@ -540,7 +540,7 @@ HRESULT convert_to_float(const SampleFormat sfmt, const WORD nChannels, const DW
 	return S_OK;
 }
 
-HRESULT convert_to_planar_float(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, BYTE* pIn, float* pOut)
+HRESULT convert_to_planar_float(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, BYTE* pIn, float* pOut)
 {
 	size_t allsamples = nSamples * nChannels;
 
@@ -607,7 +607,7 @@ HRESULT convert_to_planar_float(const SampleFormat sfmt, const WORD nChannels, c
 	return S_OK;
 }
 
-HRESULT convert_float_to(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, float* pIn, BYTE* pOut)
+HRESULT convert_float_to(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, float* pIn, BYTE* pOut)
 {
 	size_t allsamples = nSamples * nChannels;
 
