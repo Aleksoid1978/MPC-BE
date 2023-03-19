@@ -2095,7 +2095,7 @@ void CDX9AllocatorPresenter::DrawStats()
 				}
 
 				if (const size_t mem_usage = m_MemUsage.GetUsage()) {
-					strText.AppendFormat(L", Memory:%4u MB", mem_usage);
+					strText.AppendFormat(L", Memory:%4zu MB", mem_usage);
 				}
 			}
 		}

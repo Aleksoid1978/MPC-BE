@@ -1357,7 +1357,7 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 
 				hr = pMediaSideData->SetSideData(IID_MediaSideDataHDR, (const BYTE*)&hdr, sizeof(hdr));
 			} else {
-				DLog(L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR data of an unexpected size (%d)", sd->size);
+				DLog(L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR data of an unexpected size (%zu)", sd->size);
 			}
 		} else if (m_FilterInfo.masterDataHDR) {
 			hr = pMediaSideData->SetSideData(IID_MediaSideDataHDR, (const BYTE*)m_FilterInfo.masterDataHDR, sizeof(MediaSideDataHDR));
@@ -1368,7 +1368,7 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 			if (sd->size == sizeof(AVContentLightMetadata)) {
 				hr = pMediaSideData->SetSideData(IID_MediaSideDataHDRContentLightLevel, (const BYTE*)sd->data, sd->size);
 			} else {
-				DLog(L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR Light Level data of an unexpected size (%d)", sd->size);
+				DLog(L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR Light Level data of an unexpected size (%zu)", sd->size);
 			}
 		} else if (m_FilterInfo.HDRContentLightLevel) {
 			hr = pMediaSideData->SetSideData(IID_MediaSideDataHDRContentLightLevel, (const BYTE*)m_FilterInfo.HDRContentLightLevel, sizeof(MediaSideDataHDRContentLightLevel));
