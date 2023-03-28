@@ -1807,6 +1807,7 @@ STRING IDS_PLAYLIST_DETERMINEDURATION		"Определять длительно�
 STRING IDS_PLAYLIST_EXPLORER_NAME		"Проводник"
 STRING IDS_PLAYLIST_EXPLORER_REFRESH		"Обновить"
 STRING IDS_PLAYLIST_HIDEFS		"Скрывать на полном экране"
+STRING IDS_PLAYLIST_INVALID		"Ошибка"
 STRING IDS_PLAYLIST_MAIN_NAME		"Основной"
 STRING IDS_PLAYLIST_NAME		"Плейлист"
 STRING IDS_PLAYLIST_NEXTONERROR		"Перейти к следующему при ошибке"

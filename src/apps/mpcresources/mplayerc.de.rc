@@ -2352,6 +2352,7 @@ BEGIN
     IDS_PLAYLIST_NEXTONERROR "Fehler überspringen"
     IDS_PLAYLIST_DETERMINEDURATION "Dauer beim Hinzufügen bestimmen"
     IDS_PLAYLIST_SKIPINVALID "Skip invalid elements"
+    IDS_PLAYLIST_INVALID "Invalid"
 END
 
 STRINGTABLE

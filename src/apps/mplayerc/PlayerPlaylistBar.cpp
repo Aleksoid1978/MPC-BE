@@ -265,7 +265,7 @@ CString CPlaylistItem::GetLabel(int i)
 		}
 	} else if (i == 1) {
 		if (m_bInvalid) {
-			return L"Invalid";
+			return ResStr(IDS_PLAYLIST_INVALID);
 		}
 
 		if (m_type == file) {
@@ -2847,7 +2847,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 
 	CString time;
 	if (pli.m_bInvalid) {
-		time = L"Invalid";
+		time = ResStr(IDS_PLAYLIST_INVALID);
 	} else {
 		time = m_list.GetItemText(nItem, COL_TIME);
 	}

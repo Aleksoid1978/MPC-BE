@@ -2350,6 +2350,7 @@ BEGIN
     IDS_PLAYLIST_NEXTONERROR "Idi na sljedeće prilikom greške"
     IDS_PLAYLIST_DETERMINEDURATION "Utvrdi trajanje u dodavanju"
     IDS_PLAYLIST_SKIPINVALID "Skip invalid elements"
+    IDS_PLAYLIST_INVALID "Invalid"
 END
 
 STRINGTABLE
