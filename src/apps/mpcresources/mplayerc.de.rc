@@ -2351,8 +2351,8 @@ BEGIN
     IDS_PLAYLIST_HIDEFS     "Im &Vollbild nicht anzeigen"
     IDS_PLAYLIST_NEXTONERROR "Fehler überspringen"
     IDS_PLAYLIST_DETERMINEDURATION "Dauer beim Hinzufügen bestimmen"
-    IDS_PLAYLIST_SKIPINVALID "Skip invalid elements"
-    IDS_PLAYLIST_INVALID "Invalid"
+    IDS_PLAYLIST_SKIPINVALID "Ungültige Elemente überspringen"
+    IDS_PLAYLIST_INVALID "Ungültig"
 END
 
 STRINGTABLE
@@ -2434,8 +2434,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_SUBDELAY_DEC     "Untertitelverzögerung -"
-    IDS_AG_SUBDELAY_INC     "Untertitelverzögerung +"
+    IDS_AG_SUBDELAY_DEC     "Untertitelverzögerung verringern"
+    IDS_AG_SUBDELAY_INC     "Untertitelverzögerung erhöhen"
     IDS_FILE_SAVE_THUMBNAILS "Vorschaubilder speichern"
     IDS_OSD_TEST            "OSD Test"
 END
