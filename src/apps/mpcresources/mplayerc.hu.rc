@@ -2351,6 +2351,7 @@ BEGIN
     IDS_PLAYLIST_HIDEFS     "Elrejtés Teljes képernyős módban"
     IDS_PLAYLIST_NEXTONERROR "Lépjen a következőre hiba esetén"
     IDS_PLAYLIST_DETERMINEDURATION "Hozzáadáskor határozza meg az időtartamot"
+    IDS_PLAYLIST_SKIPINVALID "Skip invalid elements"
 END
 
 STRINGTABLE

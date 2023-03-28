@@ -2351,6 +2351,7 @@ BEGIN
     IDS_PLAYLIST_HIDEFS     "Nascondi a schermo intero"
     IDS_PLAYLIST_NEXTONERROR "Vai al successivo in caso di errore"
     IDS_PLAYLIST_DETERMINEDURATION "Determina la durata durante l'aggiunta"
+    IDS_PLAYLIST_SKIPINVALID "Skip invalid elements"
 END
 
 STRINGTABLE

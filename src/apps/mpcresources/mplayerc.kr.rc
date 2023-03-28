@@ -2351,6 +2351,7 @@ BEGIN
     IDS_PLAYLIST_HIDEFS     "전체 화면에서 숨기기"
     IDS_PLAYLIST_NEXTONERROR "오류 시, 다음으로 이동"
     IDS_PLAYLIST_DETERMINEDURATION "추가할 기간 설정"
+    IDS_PLAYLIST_SKIPINVALID "Skip invalid elements"
 END
 
 STRINGTABLE

@@ -855,6 +855,7 @@ public:
 	bool			bShowPlaylistTooltip;
 	bool			bShowPlaylistSearchBar;
 	bool			bPlaylistNextOnError;
+	bool			bPlaylistSkipInvalid;
 	bool			bPlaylistDetermineDuration;
 
 	// OTHER STATES

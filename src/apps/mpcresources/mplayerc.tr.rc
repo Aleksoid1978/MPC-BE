@@ -2351,6 +2351,7 @@ BEGIN
     IDS_PLAYLIST_HIDEFS     "Tam Ekranda Gizle"
     IDS_PLAYLIST_NEXTONERROR "Hata Durumunda Sonrakine Git"
     IDS_PLAYLIST_DETERMINEDURATION "Eklerken Süreyi Belirle"
+    IDS_PLAYLIST_SKIPINVALID "Skip invalid elements"
 END
 
 STRINGTABLE

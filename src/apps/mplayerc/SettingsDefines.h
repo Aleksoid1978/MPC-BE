@@ -223,6 +223,7 @@
 #define IDS_RS_PLAYLIST_SHOWPTOOLTIP		L"ShowTooltip"
 #define IDS_RS_PLAYLIST_SHOWSEARCHBAR		L"ShowSearchBar"
 #define IDS_RS_PLAYLIST_NEXTONERROR			L"NextOnError"
+#define IDS_RS_PLAYLIST_SKIP_INVALID		L"SkipInvalid"
 #define IDS_RS_PLAYLIST_DETERMINEDURATION	L"DetermineDuration"
 
 #define IDS_RS_PLAYLISTFONTPERCENT			L"PlaylistFontPercent"

@@ -580,6 +580,7 @@ void CAppSettings::ResetSettings()
 	bShowPlaylistTooltip = true;
 	bShowPlaylistSearchBar = true;
 	bPlaylistNextOnError = true;
+	bPlaylistSkipInvalid = true;
 	bPlaylistDetermineDuration = false;
 
 	bFavRememberPos = true;
@@ -969,6 +970,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHOWPTOOLTIP, bShowPlaylistTooltip);
 	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHOWSEARCHBAR, bShowPlaylistSearchBar);
 	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_NEXTONERROR, bPlaylistNextOnError);
+	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SKIP_INVALID, bPlaylistSkipInvalid);
 	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_DETERMINEDURATION, bPlaylistDetermineDuration);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FAV_REMEMBERPOS, bFavRememberPos);
@@ -1618,6 +1620,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHOWPTOOLTIP, bShowPlaylistTooltip);
 	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHOWSEARCHBAR, bShowPlaylistSearchBar);
 	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_NEXTONERROR, bPlaylistNextOnError);
+	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SKIP_INVALID, bPlaylistSkipInvalid);
 	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_DETERMINEDURATION, bPlaylistDetermineDuration);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_FAV_REMEMBERPOS, bFavRememberPos);

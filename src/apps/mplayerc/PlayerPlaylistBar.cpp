@@ -2263,9 +2263,9 @@ bool CPlayerPlaylistBar::IsAtEnd()
 	bool isAtEnd = (pos && pos == tail);
 
 	if (!isAtEnd && pos) {
-		isAtEnd = curPlayList.GetNextWrap(pos).m_bInvalid;
+		isAtEnd = curPlayList.GetNextWrap(pos).NeedSkip();
 		while (isAtEnd && pos && pos != tail) {
-			isAtEnd = curPlayList.GetNextWrap(pos).m_bInvalid;
+			isAtEnd = curPlayList.GetNextWrap(pos).NeedSkip();
 		}
 	}
 
@@ -2305,7 +2305,7 @@ bool CPlayerPlaylistBar::SetNext()
 
 	for (;;) {
 		const auto& playlist = curPlayList.GetNextWrap(pos);
-		if ((playlist.m_bInvalid || playlist.m_bDirectory) && pos != org) {
+		if ((playlist.NeedSkip() || playlist.m_bDirectory) && pos != org) {
 			continue;
 		}
 		break;
@@ -2326,7 +2326,7 @@ bool CPlayerPlaylistBar::SetPrev()
 
 	for (;;) {
 		const auto& playlist = curPlayList.GetPrevWrap(pos);
-		if ((playlist.m_bInvalid || playlist.m_bDirectory) && pos != org) {
+		if ((playlist.NeedSkip() || playlist.m_bDirectory) && pos != org) {
 			continue;
 		}
 		break;
@@ -2348,7 +2348,7 @@ void CPlayerPlaylistBar::SetFirstSelected()
 		POSITION org = pos;
 		for (;;) {
 			const auto& playlist = curPlayList.GetNextWrap(pos);
-			if ((playlist.m_bInvalid || playlist.m_bDirectory) && pos != org) {
+			if ((playlist.NeedSkip() || playlist.m_bDirectory) && pos != org) {
 				continue;
 			}
 			break;
@@ -2364,7 +2364,7 @@ void CPlayerPlaylistBar::SetFirst()
 	POSITION pos = curPlayList.GetTailPosition(), org = pos;
 	for (;;) {
 		const auto& playlist = curPlayList.GetNextWrap(pos);
-		if ((playlist.m_bInvalid || playlist.m_bDirectory) && pos != org) {
+		if ((playlist.NeedSkip() || playlist.m_bDirectory) && pos != org) {
 			continue;
 		}
 		break;
@@ -2379,7 +2379,7 @@ void CPlayerPlaylistBar::SetLast()
 	POSITION pos = curPlayList.GetHeadPosition(), org = pos;
 	for (;;) {
 		const auto& playlist = curPlayList.GetPrevWrap(pos);
-		if ((playlist.m_bInvalid || playlist.m_bDirectory) && pos != org) {
+		if ((playlist.NeedSkip() || playlist.m_bDirectory) && pos != org) {
 			continue;
 		}
 		break;
@@ -3369,6 +3369,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		M_SHOWSEARCHBAR,
 		M_HIDEFULLSCREEN,
 		M_NEXTONERROR,
+		M_SKIPINVALID,
 		M_DURATION
 	};
 
@@ -3433,6 +3434,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bHidePlaylistFullScreen ? MF_CHECKED : MF_UNCHECKED), M_HIDEFULLSCREEN, ResStr(IDS_PLAYLIST_HIDEFS));
 	m.AppendMenu(MF_SEPARATOR);
 	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bPlaylistNextOnError ? MF_CHECKED : MF_UNCHECKED), M_NEXTONERROR, ResStr(IDS_PLAYLIST_NEXTONERROR));
+	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bPlaylistSkipInvalid ? MF_CHECKED : MF_UNCHECKED), M_SKIPINVALID, ResStr(IDS_PLAYLIST_SKIPINVALID));
 
 	if (curTab.type == PL_BASIC) {
 		m.AppendMenu(MF_SEPARATOR);
@@ -3811,6 +3813,9 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			break;
 		case M_NEXTONERROR:
 			s.bPlaylistNextOnError = !s.bPlaylistNextOnError;
+			break;
+		case M_SKIPINVALID:
+			s.bPlaylistSkipInvalid = !s.bPlaylistSkipInvalid;
 			break;
 		case M_DURATION:
 			s.bPlaylistDetermineDuration = !s.bPlaylistDetermineDuration;

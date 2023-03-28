@@ -142,6 +142,11 @@ public:
 	void AutoLoadFiles();
 
 	CString GetLabel(int i = 0);
+
+	const bool NeedSkip() const {
+		const auto& s = AfxGetAppSettings();
+		return m_bInvalid && s.bPlaylistSkipInvalid;
+	}
 };
 
 class CPlaylist : public CList<CPlaylistItem>
