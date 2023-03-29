@@ -77,10 +77,10 @@
   #define mpcvr_ax     = "MpcVideoRenderer64.ax"
 #endif
 #define intel_msdk_url = "http://mpc-be.org/Intel_MSDK/" + intel_msdk_zip
-#define mpcvr_desc     = "MPC Video Renderer 0.6.5"
-#define mpcvr_zip      = "MpcVideoRenderer-0.6.5.1995.zip"
-#define mpcvr_zip_sha1 = "a998895fe0bf083ecd3b110044c2c775b870c5c0"
-#define mpcvr_url      = "https://github.com/Aleksoid1978/VideoRenderer/releases/download/0.6.5/" + mpcvr_zip
+#define mpcvr_desc     = "MPC Video Renderer 0.6.7"
+#define mpcvr_zip      = "MpcVideoRenderer-0.6.7.2013.zip"
+#define mpcvr_zip_sha1 = "4719747a2c4cffaf51d23291770fdf2b6e0b458e"
+#define mpcvr_url      = "https://github.com/Aleksoid1978/VideoRenderer/releases/download/0.6.7/" + mpcvr_zip
 
 [Setup]
 #ifdef Win32Build
