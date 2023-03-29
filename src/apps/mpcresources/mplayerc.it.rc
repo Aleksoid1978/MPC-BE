@@ -2301,7 +2301,7 @@ BEGIN
     IDS_PLAYLIST_CAPTION    "Playlist"
     IDS_PLAYLIST_MAIN_NAME  "Principale"
     IDS_PLAYLIST_ADD_NEW    "Aggiungi playlist"
-    IDS_PLAYLIST_ADD_PLAYLIST "Tipo di playlist"
+    IDS_PLAYLIST_ADD_PLAYLIST "Tipo playlist"
 END
 
 STRINGTABLE
@@ -2351,8 +2351,8 @@ BEGIN
     IDS_PLAYLIST_HIDEFS     "Nascondi a schermo intero"
     IDS_PLAYLIST_NEXTONERROR "Vai al successivo in caso di errore"
     IDS_PLAYLIST_DETERMINEDURATION "Determina la durata durante l'aggiunta"
-    IDS_PLAYLIST_SKIPINVALID "Skip invalid elements"
-    IDS_PLAYLIST_INVALID "Invalid"
+    IDS_PLAYLIST_SKIPINVALID "Salta elementi non validi"
+    IDS_PLAYLIST_INVALID "Non valido"
 END
 
 STRINGTABLE
