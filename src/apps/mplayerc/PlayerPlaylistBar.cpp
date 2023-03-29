@@ -2263,9 +2263,9 @@ bool CPlayerPlaylistBar::IsAtEnd()
 	bool isAtEnd = (pos && pos == tail);
 
 	if (!isAtEnd && pos) {
-		isAtEnd = curPlayList.GetNextWrap(pos).NeedSkip();
+		isAtEnd = curPlayList.GetNextWrap(pos).MustBeSkipped();
 		while (isAtEnd && pos && pos != tail) {
-			isAtEnd = curPlayList.GetNextWrap(pos).NeedSkip();
+			isAtEnd = curPlayList.GetNextWrap(pos).MustBeSkipped();
 		}
 	}
 
@@ -2305,7 +2305,7 @@ bool CPlayerPlaylistBar::SetNext()
 
 	for (;;) {
 		const auto& playlist = curPlayList.GetNextWrap(pos);
-		if ((playlist.NeedSkip() || playlist.m_bDirectory) && pos != org) {
+		if ((playlist.MustBeSkipped() || playlist.m_bDirectory) && pos != org) {
 			continue;
 		}
 		break;
@@ -2326,7 +2326,7 @@ bool CPlayerPlaylistBar::SetPrev()
 
 	for (;;) {
 		const auto& playlist = curPlayList.GetPrevWrap(pos);
-		if ((playlist.NeedSkip() || playlist.m_bDirectory) && pos != org) {
+		if ((playlist.MustBeSkipped() || playlist.m_bDirectory) && pos != org) {
 			continue;
 		}
 		break;
@@ -2348,7 +2348,7 @@ void CPlayerPlaylistBar::SetFirstSelected()
 		POSITION org = pos;
 		for (;;) {
 			const auto& playlist = curPlayList.GetNextWrap(pos);
-			if ((playlist.NeedSkip() || playlist.m_bDirectory) && pos != org) {
+			if ((playlist.MustBeSkipped() || playlist.m_bDirectory) && pos != org) {
 				continue;
 			}
 			break;
@@ -2364,7 +2364,7 @@ void CPlayerPlaylistBar::SetFirst()
 	POSITION pos = curPlayList.GetTailPosition(), org = pos;
 	for (;;) {
 		const auto& playlist = curPlayList.GetNextWrap(pos);
-		if ((playlist.NeedSkip() || playlist.m_bDirectory) && pos != org) {
+		if ((playlist.MustBeSkipped() || playlist.m_bDirectory) && pos != org) {
 			continue;
 		}
 		break;
@@ -2379,7 +2379,7 @@ void CPlayerPlaylistBar::SetLast()
 	POSITION pos = curPlayList.GetHeadPosition(), org = pos;
 	for (;;) {
 		const auto& playlist = curPlayList.GetPrevWrap(pos);
-		if ((playlist.NeedSkip() || playlist.m_bDirectory) && pos != org) {
+		if ((playlist.MustBeSkipped() || playlist.m_bDirectory) && pos != org) {
 			continue;
 		}
 		break;

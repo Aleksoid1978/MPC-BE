@@ -143,9 +143,12 @@ public:
 
 	CString GetLabel(int i = 0);
 
-	const bool NeedSkip() const {
-		const auto& s = AfxGetAppSettings();
-		return m_bInvalid && s.bPlaylistSkipInvalid;
+	const bool MustBeSkipped() const {
+		if (m_bInvalid) {
+			return AfxGetAppSettings().bPlaylistSkipInvalid;
+		}
+
+		return false;
 	}
 };
 
