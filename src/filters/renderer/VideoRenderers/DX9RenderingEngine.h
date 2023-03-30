@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -122,7 +122,7 @@ namespace DSObjects
 		HRESULT RenderVideo(IDirect3DSurface9* pRenderTarget, const CRect& srcRect, const CRect& destRect);
 		HRESULT Stereo3DTransform(IDirect3DSurface9* pRenderTarget, const CRect& destRect);
 
-		HRESULT DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_Rect);
+		HRESULT DrawRect(const D3DCOLOR _Color, const CRect &_Rect);
 		HRESULT AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9* pTexture);
 
 		HRESULT ClearCustomPixelShaders(int target);

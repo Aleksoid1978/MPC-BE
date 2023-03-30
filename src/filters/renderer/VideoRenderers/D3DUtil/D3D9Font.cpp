@@ -1,5 +1,5 @@
 /*
- * (C) 2019-2021 see Authors.txt
+ * (C) 2019-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,7 +27,7 @@
 
 struct Font9Vertex {
 	DirectX::XMFLOAT4 pos;
-	DWORD color;
+	D3DCOLOR color;
 	DirectX::XMFLOAT2 tex;
 };
 
