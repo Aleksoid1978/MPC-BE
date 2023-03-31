@@ -43,6 +43,7 @@
 
 #pragma warning(push)
 #pragma warning(disable: 4005)
+#pragma warning(disable: 4996)
 #pragma warning(disable: 5033)
 extern "C" {
 	#include <ExtLib/ffmpeg/libavcodec/avcodec.h>
