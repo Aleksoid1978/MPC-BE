@@ -861,7 +861,7 @@ BEGIN
     GROUPBOX        "Instellingen van EVR-CP en EVR Sync",IDC_STATIC,5,37,285,137
     CONTROL         "Kies D3D9-renderapparaat",IDC_D3D9DEVICE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,120,10
     COMBOBOX        IDC_D3D9DEVICE_COMBO,144,49,142,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Exclusieve volledigschermmodus op een bijkomend venster",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
+    CONTROL         "Exclusieve volledigschermmodus in een bijkomend venster",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,79,224,10
     CONTROL         "10-bits RGB-uitvoer",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,92,92,10
     CONTROL         "Herinitialisatie bij verandering van monitor",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_TOP | WS_TABSTOP,10,65,164,9
@@ -877,7 +877,7 @@ BEGIN
     LTEXT           "Uitvoerbereik:",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Instellingen voor MPC Video Renderer",IDC_STATIC,5,177,285,27
-    CONTROL         "Exclusieve volledigschermmodus op een bijkomend venster (experimenteel)",IDC_CHECK2,
+    CONTROL         "Exclusieve volledigschermmodus in een bijkomend venster (experimenteel)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
     GROUPBOX        "Frameformaat",IDC_STATIC,5,208,210,53
     LTEXT           "Standaardmodus:",IDC_STATIC,10,220,74,8
@@ -2300,7 +2300,7 @@ STRINGTABLE
 BEGIN
     IDS_PLAYLIST_CAPTION    "Afspeellijst"
     IDS_PLAYLIST_MAIN_NAME  "Hoofdtabblad"
-    IDS_PLAYLIST_ADD_NEW    "Add playlist"
+    IDS_PLAYLIST_ADD_NEW    "Afspeellijst toevoegen"
     IDS_PLAYLIST_ADD_PLAYLIST "Afspeellijst"
 END
 
@@ -2308,7 +2308,7 @@ STRINGTABLE
 BEGIN
     IDS_PLAYLIST_ADD_EXPLORER "Verkenner"
     IDS_PLAYLIST_RENAME_CURRENT "Afspeellijst hernoemen"
-    IDS_PLAYLIST_DELETE_CURRENT "Delete playlist"
+    IDS_PLAYLIST_DELETE_CURRENT "Afspeellijst verwijderen"
     IDS_PLAYLIST_NAME       "Afspeellijst"
     IDS_PLAYLIST_EXPLORER_NAME "Verkenner"
     IDS_PLAYLIST_OPEN       "&Openen"
@@ -2351,8 +2351,8 @@ BEGIN
     IDS_PLAYLIST_HIDEFS     "Bij volledig scherm verbergen"
     IDS_PLAYLIST_NEXTONERROR "Ga naar de volgende bij foutmelding"
     IDS_PLAYLIST_DETERMINEDURATION "Bepaal de duur bij het toevoegen"
-    IDS_PLAYLIST_SKIPINVALID "Skip invalid elements"
-    IDS_PLAYLIST_INVALID "Invalid"
+    IDS_PLAYLIST_SKIPINVALID "Sla ongeldige elementen over"
+    IDS_PLAYLIST_INVALID "Ongeldig"
 END
 
 STRINGTABLE
