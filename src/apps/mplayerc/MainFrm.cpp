@@ -1489,7 +1489,7 @@ BOOL CMainFrame::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTO
 						} else {
 							auto peekMouseMessage = [&]() {
 								MSG msg;
-								while (PeekMessage(&msg, m_hWnd, WM_LBUTTONDOWN, WM_LBUTTONDBLCLK, PM_REMOVE));
+								while (PeekMessageW(&msg, m_hWnd, WM_LBUTTONDOWN, WM_LBUTTONDBLCLK, PM_REMOVE));
 							};
 
 							CRect rc;
@@ -3669,7 +3669,7 @@ LRESULT CMainFrame::OnPostOpen(WPARAM wParam, LPARAM lParam)
 void CMainFrame::SaveAppSettings()
 {
 	MSG msg;
-	if (!PeekMessage(&msg, m_hWnd, WM_SAVESETTINGS, WM_SAVESETTINGS, PM_NOREMOVE | PM_NOYIELD)) {
+	if (!PeekMessageW(&msg, m_hWnd, WM_SAVESETTINGS, WM_SAVESETTINGS, PM_NOREMOVE | PM_NOYIELD)) {
 		AfxGetAppSettings().SaveSettings();
 	}
 }
@@ -4291,7 +4291,7 @@ void CMainFrame::OnUnInitMenuPopup(CMenu* pPopupMenu, UINT nFlags)
 	__super::OnUnInitMenuPopup(pPopupMenu, nFlags);
 
 	MSG msg;
-	PeekMessage(&msg, m_hWnd, WM_LBUTTONDOWN, WM_LBUTTONDOWN, PM_REMOVE);
+	PeekMessageW(&msg, m_hWnd, WM_LBUTTONDOWN, WM_LBUTTONDOWN, PM_REMOVE);
 
 	m_bLeftMouseDown = FALSE;
 }
@@ -17696,7 +17696,7 @@ void CMainFrame::CloseMedia(BOOL bNextIsOpened/* = FALSE*/)
 			EndWaitCursor();
 
 			MSG msg;
-			if (PeekMessage(&msg, m_hWnd, WM_POSTOPEN, WM_POSTOPEN, PM_REMOVE | PM_NOYIELD)) {
+			if (PeekMessageW(&msg, m_hWnd, WM_POSTOPEN, WM_POSTOPEN, PM_REMOVE | PM_NOYIELD)) {
 				delete ((OpenMediaData*)msg.wParam);
 			}
 		}
@@ -17722,7 +17722,7 @@ void CMainFrame::CloseMedia(BOOL bNextIsOpened/* = FALSE*/)
 			if (dwWait == WAIT_OBJECT_0 + 1) {
 				// and we make sure it is handled before resuming waiting
 				MSG msg;
-				PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE);
+				PeekMessageW(&msg, nullptr, 0, 0, PM_NOREMOVE);
 			} else {
 				ASSERT(FALSE);
 			}
