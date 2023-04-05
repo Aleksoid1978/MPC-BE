@@ -188,72 +188,83 @@ void CHTTPAsync::Close()
 
 HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPCWSTR lpszCustomHeader/* = L""*/)
 {
-	Close();
+	for (;;) {
+		Close();
 
-	CUrlParser urlParser;
-	if (!urlParser.Parse(lpszURL)) {
-		return E_INVALIDARG;
-	}
-	if (urlParser.GetScheme() != INTERNET_SCHEME_HTTP && urlParser.GetScheme() != INTERNET_SCHEME_HTTPS) {
-		return E_FAIL;
-	}
+		auto url = !m_url_redirect_str.IsEmpty() ? m_url_redirect_str.GetString() : lpszURL;
 
-	m_url_str = lpszURL;
-	m_host    = urlParser.GetHostName();
-	m_path    = CString(urlParser.GetUrlPath()) + CString(urlParser.GetExtraInfo());
-	m_nPort   = urlParser.GetPortNumber();
-	m_nScheme = urlParser.GetScheme();
-
-	m_hInstance = InternetOpenW(http::userAgent.GetString(),
-							    INTERNET_OPEN_TYPE_PRECONFIG,
-							    nullptr,
-							    nullptr,
-							    INTERNET_FLAG_ASYNC);
-	CheckPointer(m_hInstance, E_FAIL);
-
-	if (InternetSetStatusCallbackW(m_hInstance, (INTERNET_STATUS_CALLBACK)&Callback) == INTERNET_INVALID_STATUS_CALLBACK) {
-		return E_FAIL;
-	}
-
-	static bool bSetMaxConnections = false;
-	if (!bSetMaxConnections) {
-		bSetMaxConnections = true;
-
-		DWORD value = 0;
-		DWORD size = sizeof(DWORD);
-		if (InternetQueryOptionW(nullptr, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &value, &size) && value < 10) {
-			value = 10;
-			InternetSetOptionW(nullptr, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &value, size);
+		CUrlParser urlParser;
+		if (!urlParser.Parse(url)) {
+			return E_INVALIDARG;
 		}
-
-		if (InternetQueryOptionW(nullptr, INTERNET_OPTION_MAX_CONNS_PER_1_0_SERVER, &value, &size) && value < 10) {
-			value = 10;
-			InternetSetOptionW(nullptr, INTERNET_OPTION_MAX_CONNS_PER_1_0_SERVER, &value, size);
-		}
-	}
-
-	m_context = Context::CONTEXT_CONNECT;
-
-	m_hConnect = InternetConnectW(m_hInstance,
-								  m_host,
-								  m_nPort,
-								  urlParser.GetUserName(),
-								  urlParser.GetPassword(),
-								  INTERNET_SERVICE_HTTP,
-								  INTERNET_FLAG_KEEP_CONNECTION | INTERNET_FLAG_NO_CACHE_WRITE,
-								  (DWORD_PTR)this);
-	if (m_hConnect == nullptr) {
-		CheckLastError(L"InternetConnectW()", E_FAIL);
-
-		if (WaitForSingleObject(m_hConnectedEvent, dwTimeOut) == WAIT_TIMEOUT) {
+		if (urlParser.GetScheme() != INTERNET_SCHEME_HTTP && urlParser.GetScheme() != INTERNET_SCHEME_HTTPS) {
 			return E_FAIL;
 		}
-	}
 
-	CheckPointer(m_hConnect, E_FAIL);
+		m_url_str = url;
+		m_host = urlParser.GetHostName();
+		m_path = CString(urlParser.GetUrlPath()) + CString(urlParser.GetExtraInfo());
+		m_nPort = urlParser.GetPortNumber();
+		m_nScheme = urlParser.GetScheme();
 
-	if (SendRequest(lpszCustomHeader, dwTimeOut) != S_OK) {
-		return E_FAIL;
+		m_hInstance = InternetOpenW(http::userAgent.GetString(),
+									INTERNET_OPEN_TYPE_PRECONFIG,
+									nullptr,
+									nullptr,
+									INTERNET_FLAG_ASYNC);
+		CheckPointer(m_hInstance, E_FAIL);
+
+		if (InternetSetStatusCallbackW(m_hInstance, (INTERNET_STATUS_CALLBACK)&Callback) == INTERNET_INVALID_STATUS_CALLBACK) {
+			return E_FAIL;
+		}
+
+		static bool bSetMaxConnections = false;
+		if (!bSetMaxConnections) {
+			bSetMaxConnections = true;
+
+			DWORD value = 0;
+			DWORD size = sizeof(DWORD);
+			if (InternetQueryOptionW(nullptr, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &value, &size) && value < 10) {
+				value = 10;
+				InternetSetOptionW(nullptr, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &value, size);
+			}
+
+			if (InternetQueryOptionW(nullptr, INTERNET_OPTION_MAX_CONNS_PER_1_0_SERVER, &value, &size) && value < 10) {
+				value = 10;
+				InternetSetOptionW(nullptr, INTERNET_OPTION_MAX_CONNS_PER_1_0_SERVER, &value, size);
+			}
+		}
+
+		m_context = Context::CONTEXT_CONNECT;
+
+		m_hConnect = InternetConnectW(m_hInstance,
+									  m_host,
+									  m_nPort,
+									  urlParser.GetUserName(),
+									  urlParser.GetPassword(),
+									  INTERNET_SERVICE_HTTP,
+									  INTERNET_FLAG_KEEP_CONNECTION | INTERNET_FLAG_NO_CACHE_WRITE,
+									  (DWORD_PTR)this);
+		if (m_hConnect == nullptr) {
+			CheckLastError(L"InternetConnectW()", E_FAIL);
+
+			if (WaitForSingleObject(m_hConnectedEvent, dwTimeOut) == WAIT_TIMEOUT) {
+				return E_FAIL;
+			}
+		}
+
+		CheckPointer(m_hConnect, E_FAIL);
+
+		auto hr = SendRequest(lpszCustomHeader, dwTimeOut, true);
+		if (hr != S_OK) {
+			if (hr == E_CHANGED_STATE && !m_url_redirect_str.IsEmpty()) {
+				continue;
+			}
+
+			return E_FAIL;
+		}
+
+		break;
 	}
 
 	m_header = QueryInfoStr(HTTP_QUERY_RAW_HEADERS_CRLF);
@@ -289,7 +300,7 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	return S_OK;
 }
 
-HRESULT CHTTPAsync::SendRequest(LPCWSTR lpszCustomHeader/* = L""*/, DWORD dwTimeOut/* = INFINITE*/)
+HRESULT CHTTPAsync::SendRequest(LPCWSTR lpszCustomHeader/* = L""*/, DWORD dwTimeOut/* = INFINITE*/, bool bNoAutoRedirect/* = false*/)
 {
 	CheckPointer(m_hConnect, E_FAIL);
 
@@ -308,6 +319,9 @@ HRESULT CHTTPAsync::SendRequest(LPCWSTR lpszCustomHeader/* = L""*/, DWORD dwTime
 	m_context = Context::CONTEXT_REQUEST;
 
 	DWORD dwFlags = INTERNET_FLAG_RELOAD | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_KEEP_CONNECTION;
+	if (bNoAutoRedirect) {
+		dwFlags |= INTERNET_FLAG_NO_AUTO_REDIRECT;
+	}
 	if (m_nScheme == INTERNET_SCHEME_HTTPS) {
 		dwFlags |= (INTERNET_FLAG_SECURE | SECURITY_IGNORE_ERROR_MASK);
 	}
@@ -363,6 +377,13 @@ HRESULT CHTTPAsync::SendRequest(LPCWSTR lpszCustomHeader/* = L""*/, DWORD dwTime
 
 			return E_FAIL;
 		} else if (dwStatusCode != HTTP_STATUS_OK && dwStatusCode != HTTP_STATUS_PARTIAL_CONTENT) {
+			if (dwStatusCode == HTTP_STATUS_REDIRECT) {
+				m_url_redirect_str = QueryInfoStr(HTTP_QUERY_LOCATION);
+				if (!m_url_redirect_str.IsEmpty()) {
+					return E_CHANGED_STATE;
+				}
+			}
+
 			return E_FAIL;
 		}
 
