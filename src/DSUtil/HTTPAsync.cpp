@@ -381,17 +381,10 @@ HRESULT CHTTPAsync::SendRequest(LPCWSTR lpszCustomHeader/* = L""*/, DWORD dwTime
 			if (dwStatusCode == HTTP_STATUS_REDIRECT || dwStatusCode == HTTP_STATUS_MOVED) {
 				m_url_redirect_str = QueryInfoStr(HTTP_QUERY_LOCATION);
 				if (!m_url_redirect_str.IsEmpty()) {
-					auto CombinePath = [](const CString& base, const CString& relative) {
-						CUrlParser urlParser(relative.GetString());
-						if (urlParser.IsValid()) {
-							return relative;
-						}
-
-						return CUrlParser::CombineUrl(base, relative);
-					};
-
-					const auto base = m_schemeName + L"://" + m_host;
-					m_url_redirect_str = CombinePath(base, m_url_redirect_str);
+					CUrlParser urlParser(m_url_redirect_str.GetString());
+					if (!urlParser.IsValid()) {
+						m_url_redirect_str = CUrlParser::CombineUrl(m_schemeName + L"://" + m_host, m_url_redirect_str);
+					}
 
 					return E_CHANGED_STATE;
 				}
