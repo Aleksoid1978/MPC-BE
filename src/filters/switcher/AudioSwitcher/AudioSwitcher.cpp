@@ -552,58 +552,6 @@ HRESULT CAudioSwitcherFilter::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE
 
 void CAudioSwitcherFilter::CheckSupportedOutputMediaType()
 {
-	auto CreateMediaType = [](SampleFormat sampleformat, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask) {
-		CMediaType mt;
-
-		mt.majortype = MEDIATYPE_Audio;
-		mt.subtype = sampleformat == SAMPLE_FMT_FLT ? MEDIASUBTYPE_IEEE_FLOAT : MEDIASUBTYPE_PCM;
-		mt.formattype = FORMAT_WaveFormatEx;
-
-		WAVEFORMATEXTENSIBLE wfex = {};
-
-		WAVEFORMATEX& wfe = wfex.Format;
-		wfe.nChannels = nChannels;
-		wfe.nSamplesPerSec = nSamplesPerSec;
-		switch (sampleformat) {
-			default:
-			case SAMPLE_FMT_S16:
-				wfe.wBitsPerSample = 16;
-				break;
-			case SAMPLE_FMT_S24:
-				wfe.wBitsPerSample = 24;
-				break;
-			case SAMPLE_FMT_S32:
-			case SAMPLE_FMT_FLT:
-				wfe.wBitsPerSample = 32;
-				break;
-		}
-		wfe.nBlockAlign = nChannels * wfe.wBitsPerSample / 8;
-		wfe.nAvgBytesPerSec = nSamplesPerSec * wfe.nBlockAlign;
-
-		if (nChannels <= 2 && dwChannelMask <= 0x4 && (sampleformat == SAMPLE_FMT_S16 || sampleformat == SAMPLE_FMT_FLT)) {
-			// WAVEFORMATEX
-			wfe.wFormatTag = (sampleformat == SAMPLE_FMT_FLT) ? WAVE_FORMAT_IEEE_FLOAT : WAVE_FORMAT_PCM;
-			wfe.cbSize = 0;
-
-			mt.SetFormat((BYTE*)&wfe, sizeof(wfe));
-		} else {
-			// WAVEFORMATEXTENSIBLE
-			wfex.Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
-			wfex.Format.cbSize = sizeof(wfex) - sizeof(wfex.Format);
-			wfex.Samples.wValidBitsPerSample = wfex.Format.wBitsPerSample;
-			if (dwChannelMask == 0) {
-				dwChannelMask = GetDefChannelMask(nChannels);
-			}
-			wfex.dwChannelMask = dwChannelMask;
-			wfex.SubFormat = mt.subtype;
-
-			mt.SetFormat((BYTE*)&wfex, sizeof(wfex));
-		}
-		mt.SetSampleSize(wfex.Format.nBlockAlign);
-
-		return mt;
-	};
-
 	m_bInt24Support = m_bInt32Support = m_bFloatSupport = true;
 	m_bOutputFormatChanged = true;
 
@@ -611,13 +559,44 @@ void CAudioSwitcherFilter::CheckSupportedOutputMediaType()
 	if (SUCCEEDED(GetOutputPin()->ConnectedTo(&pPinTo)) && pPinTo) {
 		CMediaType mtOutput;
 		if (SUCCEEDED(pPinTo->ConnectionMediaType(&mtOutput)) && mtOutput.pbFormat) {
-			CMediaType mtCheck = CreateMediaType(SAMPLE_FMT_S24, 44100, 2, SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT);
+			auto ModifyMediaType = [](CMediaType& mt, SampleFormat sampleformat) {
+				mt.subtype = sampleformat == SAMPLE_FMT_FLT ? MEDIASUBTYPE_IEEE_FLOAT : MEDIASUBTYPE_PCM;
+				auto wfe = reinterpret_cast<WAVEFORMATEX*>(mt.Format());
+
+				switch (sampleformat) {
+					default:
+					case SAMPLE_FMT_S16:
+						wfe->wBitsPerSample = 16;
+						break;
+					case SAMPLE_FMT_S24:
+						wfe->wBitsPerSample = 24;
+						break;
+					case SAMPLE_FMT_S32:
+					case SAMPLE_FMT_FLT:
+						wfe->wBitsPerSample = 32;
+						break;
+				}
+				wfe->nBlockAlign = wfe->nChannels * wfe->wBitsPerSample / 8;
+				wfe->nAvgBytesPerSec = wfe->nSamplesPerSec * wfe->nBlockAlign;
+
+				if (IsWaveFormatExtensible(wfe)) {
+					auto wfex = reinterpret_cast<WAVEFORMATEXTENSIBLE*>(wfe);
+					wfex->Samples.wValidBitsPerSample = wfex->Format.wBitsPerSample;
+					wfex->SubFormat = mt.subtype;
+				} else {
+					wfe->wFormatTag = (sampleformat == SAMPLE_FMT_FLT) ? WAVE_FORMAT_IEEE_FLOAT : WAVE_FORMAT_PCM;
+				}
+			};
+
+			CMediaType mtCheck(mtOutput);
+
+			ModifyMediaType(mtCheck, SAMPLE_FMT_S24);
 			m_bInt24Support = pPinTo->QueryAccept(&mtCheck) == S_OK;
 
-			mtCheck = CreateMediaType(SAMPLE_FMT_S32, 44100, 2, SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT);
+			ModifyMediaType(mtCheck, SAMPLE_FMT_S32);
 			m_bInt32Support = pPinTo->QueryAccept(&mtCheck) == S_OK;
 
-			mtCheck = CreateMediaType(SAMPLE_FMT_FLT, 44100, 2, SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT);
+			ModifyMediaType(mtCheck, SAMPLE_FMT_FLT);
 			m_bFloatSupport = pPinTo->QueryAccept(&mtCheck) == S_OK;
 
 			pPinTo->QueryAccept(&mtOutput);
