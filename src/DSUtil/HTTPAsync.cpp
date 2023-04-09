@@ -206,6 +206,7 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 		m_path = CString(urlParser.GetUrlPath()) + CString(urlParser.GetExtraInfo());
 		m_nPort = urlParser.GetPortNumber();
 		m_nScheme = urlParser.GetScheme();
+		m_schemeName = urlParser.GetSchemeName();
 
 		m_hInstance = InternetOpenW(http::userAgent.GetString(),
 									INTERNET_OPEN_TYPE_PRECONFIG,
@@ -380,6 +381,18 @@ HRESULT CHTTPAsync::SendRequest(LPCWSTR lpszCustomHeader/* = L""*/, DWORD dwTime
 			if (dwStatusCode == HTTP_STATUS_REDIRECT || dwStatusCode == HTTP_STATUS_MOVED) {
 				m_url_redirect_str = QueryInfoStr(HTTP_QUERY_LOCATION);
 				if (!m_url_redirect_str.IsEmpty()) {
+					auto CombinePath = [](const CString& base, const CString& relative) {
+						CUrlParser urlParser(relative.GetString());
+						if (urlParser.IsValid()) {
+							return relative;
+						}
+
+						return CUrlParser::CombineUrl(base, relative);
+					};
+
+					const auto base = m_schemeName + L"://" + m_host;
+					m_url_redirect_str = CombinePath(base, m_url_redirect_str);
+
 					return E_CHANGED_STATE;
 				}
 			}

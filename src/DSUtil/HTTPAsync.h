@@ -53,6 +53,7 @@ protected:
 	CString m_url_str;
 	CString m_host;
 	CString m_path;
+	CString m_schemeName;
 
 	CString m_url_redirect_str;
 
