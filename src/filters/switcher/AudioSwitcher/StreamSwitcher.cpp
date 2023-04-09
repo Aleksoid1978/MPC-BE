@@ -1436,7 +1436,7 @@ HRESULT CStreamSwitcherFilter::CompleteConnect(PIN_DIRECTION dir, CBasePin* pPin
 			m_pInputs.push_back(pInputPin);
 		}
 	} else if (dir == PINDIR_OUTPUT) {
-		CheckSupportedOutputMediaType();
+		//CheckSupportedOutputMediaType();
 	}
 
 	return S_OK;
