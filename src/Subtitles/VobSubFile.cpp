@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1108,7 +1108,7 @@ bool CVobSubFile::WriteSub(CString fn)
 
 //
 
-BYTE* CVobSubFile::GetPacket(int idx, int& packetsize, int& datasize, int nLang)
+BYTE* CVobSubFile::GetPacket(size_t idx, int& packetsize, int& datasize, int nLang)
 {
 	BYTE* ret = nullptr;
 
@@ -1118,7 +1118,7 @@ BYTE* CVobSubFile::GetPacket(int idx, int& packetsize, int& datasize, int nLang)
 	std::vector<SubPos>& sp = m_langs[nLang].subpos;
 
 	do {
-		if (idx < 0 || (size_t)idx >= sp.size()) {
+		if (idx >= sp.size()) {
 			break;
 		}
 
@@ -1172,14 +1172,14 @@ BYTE* CVobSubFile::GetPacket(int idx, int& packetsize, int& datasize, int nLang)
 	return ret;
 }
 
-const CVobSubFile::SubPos* CVobSubFile::GetFrameInfo(int idx, int iLang /*= -1*/) const
+const CVobSubFile::SubPos* CVobSubFile::GetFrameInfo(size_t idx, int iLang /*= -1*/) const
 {
 	if (iLang < 0 || iLang >= (int)std::size(m_langs)) {
 		iLang = m_nLang;
 	}
 	const std::vector<SubPos>& sp = m_langs[iLang].subpos;
 
-	if (idx < 0 || (size_t)idx >= sp.size()
+	if (idx >= sp.size()
 			|| !sp[idx].bValid
 			|| ((m_bOnlyShowForcedSubs || g_bForcedSubtitle) && !sp[idx].bForced)) {
 		return nullptr;
@@ -1188,14 +1188,14 @@ const CVobSubFile::SubPos* CVobSubFile::GetFrameInfo(int idx, int iLang /*= -1*/
 	return &sp[idx];
 }
 
-bool CVobSubFile::GetFrame(int idx, int iLang /*= -1*/, REFERENCE_TIME rt /*= -1*/)
+bool CVobSubFile::GetFrame(size_t idx, int iLang /*= -1*/, REFERENCE_TIME rt /*= -1*/)
 {
 	if (iLang < 0 || iLang >= (int)std::size(m_langs)) {
 		iLang = m_nLang;
 	}
 	std::vector<SubPos>& sp = m_langs[iLang].subpos;
 
-	if (idx < 0 || (size_t)idx >= sp.size()) {
+	if (idx >= sp.size()) {
 		return false;
 	}
 
@@ -1304,32 +1304,32 @@ STDMETHODIMP_(POSITION) CVobSubFile::GetStartPosition(REFERENCE_TIME rt, double 
 		}
 	}
 
-	return (POSITION)(i + 1);
+	return (POSITION)(INT_PTR)(i + 1);
 }
 
 STDMETHODIMP_(POSITION) CVobSubFile::GetNext(POSITION pos)
 {
-	int i = (int)pos;
+	size_t i = (size_t)pos;
 	return (GetFrameInfo(i) ? (POSITION)(i + 1) : nullptr);
 }
 
 STDMETHODIMP_(REFERENCE_TIME) CVobSubFile::GetStart(POSITION pos, double fps)
 {
-	int i = (int)pos-1;
+	size_t i = (size_t)pos - 1;
 	const SubPos* sp = GetFrameInfo(i);
 	return (sp ? 10000i64 * sp->start : 0);
 }
 
 STDMETHODIMP_(REFERENCE_TIME) CVobSubFile::GetStop(POSITION pos, double fps)
 {
-	int i = (int)pos - 1;
+	size_t i = (size_t)pos - 1;
 	const SubPos* sp = GetFrameInfo(i);
 	return (sp ? 10000i64 * sp->stop : 0);
 }
 
 STDMETHODIMP_(bool) CVobSubFile::IsAnimated(POSITION pos)
 {
-	int i = (int)pos - 1;
+	size_t i = (size_t)pos - 1;
 	const SubPos* sp = GetFrameInfo(i);
 	return (sp ? sp->bAnimated : false);
 }
@@ -2555,12 +2555,12 @@ STDMETHODIMP CVobSubStream::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fp
 	for (; pos; m_subpics.GetPrev(pos)) {
 		SubPic* sp = m_subpics.GetAt(pos);
 		if (sp->tStart <= rt && rt < sp->tStop) {
-			if (m_img.nIdx != (int)pos || (sp->bAnimated && sp->tStart + m_img.tCurrent * 10000i64 <= rt)) {
+			if (m_img.nIdx != (size_t)pos || (sp->bAnimated && sp->tStart + m_img.tCurrent * 10000i64 <= rt)) {
 				BYTE* pData = sp->pData.GetData();
 				m_img.Decode(
 					pData, (pData[0] << 8) | pData[1], (pData[2] << 8) | pData[3], int((rt - sp->tStart) / 10000i64),
 					m_bCustomPal, m_tridx, m_orgpal, m_cuspal, true);
-				m_img.nIdx = (int)pos;
+				m_img.nIdx = (size_t)pos;
 			}
 
 			return __super::Render(spd, bbox);

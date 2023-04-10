@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -107,9 +107,9 @@ protected:
 
 	CMemFile m_sub;
 
-	BYTE* GetPacket(int idx, int& packetsize, int& datasize, int nLang = -1);
-	const SubPos* GetFrameInfo(int idx, int iLang = -1) const;
-	bool GetFrame(int idx, int iLang = -1, REFERENCE_TIME rt = -1);
+	BYTE* GetPacket(size_t idx, int& packetsize, int& datasize, int nLang = -1);
+	const SubPos* GetFrameInfo(size_t idx, int iLang = -1) const;
+	bool GetFrame(size_t idx, int iLang = -1, REFERENCE_TIME rt = -1);
 	bool GetFrameByTimeStamp(__int64 time);
 	int GetFrameIdxByTimeStamp(__int64 time);
 

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -59,7 +59,8 @@ private:
 	void TrimSubImage();
 
 public:
-	int nLang, nIdx;
+	int nLang;
+	size_t nIdx;
 	bool bForced, bAnimated;
 	int tCurrent;
 	__int64 start, delay;
