@@ -2227,9 +2227,9 @@ bool CMP4SplitterFilter::DemuxLoop()
 	m_pFile->Seek(0);
 	AP4_Movie* movie = m_pFile->GetMovie();
 
-	while (SUCCEEDED(hr) && !CheckRequest(nullptr)) {
+	const auto rtDiffMaximum = MILLISECONDS_TO_100NS_UNITS(m_iQueueDuration);
 
-start:
+	while (SUCCEEDED(hr) && !CheckRequest(nullptr)) {
 		std::pair<const DWORD, trackpos>* pNext = nullptr;
 		REFERENCE_TIME rtNext = _I64_MAX;
 		ULONGLONG nextOffset = 0;
@@ -2242,12 +2242,12 @@ start:
 				continue;
 			}
 
-			const REFERENCE_TIME rt = RescaleI64x32(tp.second.ts, UNITS, track->GetMediaTimeScale());
-
 			if (tp.second.index < track->GetSampleCount()) {
+				const REFERENCE_TIME rt = RescaleI64x32(tp.second.ts, UNITS, track->GetMediaTimeScale());
+				auto const rtDiff = llabs(rtNext - rt);
 				if (!pNext
-						|| (llabs(rtNext - rt) <= UNITS && tp.second.offset < nextOffset)
-						|| (llabs(rtNext - rt) > UNITS && rt < rtNext)) {
+						|| (rtDiff <= rtDiffMaximum && tp.second.offset < nextOffset)
+						|| (rtDiff > rtDiffMaximum && rt < rtNext)) {
 					pNext = &tp;
 					nextOffset = tp.second.offset;
 					rtNext = rt;
@@ -2259,7 +2259,7 @@ start:
 			if (movie->HasFragmentsIndex()
 					&& (AP4_SUCCEEDED(movie->SwitchNextMoof()))) {
 				DemuxInit();
-				goto start;
+				continue;
 			} else {
 				break;
 			}
