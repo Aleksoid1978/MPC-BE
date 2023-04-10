@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -85,7 +85,7 @@ END_MESSAGE_MAP()
 
 BOOL CPPageBase::OnSetActive()
 {
-	AfxGetAppSettings().nLastUsedPage = (UINT)m_pPSP->pszTemplate;
+	AfxGetAppSettings().nLastUsedPage = (UINT)(ULONG_PTR)m_pPSP->pszTemplate;
 
 	return __super::OnSetActive();
 }
