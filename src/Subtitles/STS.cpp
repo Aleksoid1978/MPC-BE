@@ -243,7 +243,7 @@ int CharSetLen = std::size(CharSetList);
 static DWORD CharSetToCodePage(DWORD dwCharSet)
 {
 	CHARSETINFO cs = {0};
-	::TranslateCharsetInfo((DWORD *)dwCharSet, &cs, TCI_SRCCHARSET);
+	::TranslateCharsetInfo((DWORD*)(DWORD_PTR)dwCharSet, &cs, TCI_SRCCHARSET);
 	return cs.ciACP;
 }
 

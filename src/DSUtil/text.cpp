@@ -32,10 +32,7 @@ DWORD CharSetToCodePage(DWORD dwCharSet)
 		return CP_UTF7;
 	}
 	CHARSETINFO cs= {0};
-#pragma warning(push)
-#pragma warning(disable: 4312)
-	::TranslateCharsetInfo((DWORD *)dwCharSet, &cs, TCI_SRCCHARSET);
-#pragma warning(pop)
+	::TranslateCharsetInfo((DWORD*)(DWORD_PTR)dwCharSet, &cs, TCI_SRCCHARSET);
 	return cs.ciACP;
 }
 
