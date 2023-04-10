@@ -581,7 +581,7 @@ void CSizingControlBar::OnNcPaint()
         if (!m_hBrush) {
             m_hBrush = ::CreateSolidBrush(dwBrushColor);
 		}
-        ::SetClassLongPtrW(m_hWnd, GCLP_HBRBACKGROUND, (LONG)m_hBrush);
+        ::SetClassLongPtrW(m_hWnd, GCLP_HBRBACKGROUND, (LONG_PTR)m_hBrush); //MPC-BE patch
 
         mdc.FrameRect(rcDraw, CBrush::FromHandle(m_hBrushFrame)); // Draw Black Frame
 
@@ -592,7 +592,7 @@ void CSizingControlBar::OnNcPaint()
         r.DeflateRect(1, 1, 1, 1);
         mdc.FillRect(r, CBrush::FromHandle(m_hBrush)); // Fill backround
     } else {
-        ::SetClassLongPtrW(m_hWnd, GCLP_HBRBACKGROUND, (LONG)m_hBrush_orig);
+        ::SetClassLongPtrW(m_hWnd, GCLP_HBRBACKGROUND, (LONG_PTR)m_hBrush_orig); //MPC-BE patch
         mdc.FillRect(rcDraw, CBrush::FromHandle(m_hBrush_orig));
     }
     //MPC-BE custom code end
