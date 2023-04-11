@@ -612,10 +612,10 @@ bool CVobSubFile::ReadIdx(CString fn, int& ver)
 			}
 		} else if (entry == L"palette") {
 			if (swscanf_s(str, L"%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x",
-						   &m_orgpal[0], &m_orgpal[1], &m_orgpal[2], &m_orgpal[3],
-						   &m_orgpal[4], &m_orgpal[5], &m_orgpal[6], &m_orgpal[7],
-						   &m_orgpal[8], &m_orgpal[9], &m_orgpal[10], &m_orgpal[11],
-						   &m_orgpal[12], &m_orgpal[13], &m_orgpal[14], &m_orgpal[15]
+						   (uint32_t*)&m_orgpal[0],  (uint32_t*)&m_orgpal[1],  (uint32_t*)&m_orgpal[2],  (uint32_t*)&m_orgpal[3],
+						   (uint32_t*)&m_orgpal[4],  (uint32_t*)&m_orgpal[5],  (uint32_t*)&m_orgpal[6],  (uint32_t*)&m_orgpal[7],
+						   (uint32_t*)&m_orgpal[8],  (uint32_t*)&m_orgpal[9],  (uint32_t*)&m_orgpal[10], (uint32_t*)&m_orgpal[11],
+						   (uint32_t*)&m_orgpal[12], (uint32_t*)&m_orgpal[13], (uint32_t*)&m_orgpal[14], (uint32_t*)&m_orgpal[15]
 						  ) != 16) {
 				bError = true;
 			}
@@ -652,7 +652,7 @@ bool CVobSubFile::ReadIdx(CString fn, int& ver)
 			str = str.Mid(i + (int)wcslen(L"colors:"));
 
 			RGBQUAD pal[4];
-			if (swscanf_s(str, L"%x,%x,%x,%x", &pal[0], &pal[1], &pal[2], &pal[3]) != 4) {
+			if (swscanf_s(str, L"%x,%x,%x,%x", (uint32_t*)&pal[0], (uint32_t*)&pal[1], (uint32_t*)&pal[2], (uint32_t*)&pal[3]) != 4) {
 				bError = true;
 				continue;
 			}

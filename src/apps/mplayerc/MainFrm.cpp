@@ -14983,7 +14983,7 @@ void CMainFrame::SetupFiltersSubMenu()
 						CStringW stream(ResStr(IDS_AG_UNKNOWN_STREAM));
 						size_t count = stream.GetLength() + 3 + 1;
 						wname = (WCHAR*)CoTaskMemAlloc(count * sizeof(WCHAR));
-						swprintf_s(wname, count, L"%s %d", stream, std::min(i + 1, 999uL));
+						swprintf_s(wname, count, L"%s %d", stream.GetString(), std::min(i + 1, 999uL));
 					}
 
 					CString name(wname);

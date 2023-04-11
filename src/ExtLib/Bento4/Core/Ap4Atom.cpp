@@ -181,7 +181,7 @@ AP4_Atom::InspectHeader(AP4_AtomInspector& inspector)
     name[5] = ']';
     name[6] = '\0';
     char size[64];
-    AP4_StringFormat(size, sizeof(size), "size=%ld+%ld", GetHeaderSize(), 
+    AP4_StringFormat(size, sizeof(size), "size=%llu+%llu", GetHeaderSize(), 
         m_Size-GetHeaderSize());
     inspector.StartElement(name, size);
 
