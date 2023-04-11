@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -190,11 +190,11 @@ BOOL CMiniDump::PreventSetUnhandledExceptionFilter()
 		void *pOrgEntry = GetProcAddress(hKernel32, "SetUnhandledExceptionFilter");
 		if (pOrgEntry) {
 			unsigned char newJump[100];
-			DWORD dwOrgEntryAddr = (DWORD)pOrgEntry;
-			dwOrgEntryAddr += 5; // add 5 for 5 op-codes for jmp far
+			ptrdiff_t dwOrgEntryAddr = (ptrdiff_t)pOrgEntry;
+			dwOrgEntryAddr += 5; // add 5 for 5 op-codes for jmp far // x86. What about x64?
 			void *pNewFunc = &MyDummySetUnhandledExceptionFilter;
-			DWORD dwNewEntryAddr = (DWORD)pNewFunc;
-			DWORD dwRelativeAddr = dwNewEntryAddr - dwOrgEntryAddr;
+			ptrdiff_t dwNewEntryAddr = (ptrdiff_t)pNewFunc;
+			ptrdiff_t dwRelativeAddr = dwNewEntryAddr - dwOrgEntryAddr;
 
 			newJump[0] = 0xE9;  // JMP absolute
 			memcpy(&newJump[1], &dwRelativeAddr, sizeof(pNewFunc));
