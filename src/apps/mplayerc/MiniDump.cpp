@@ -168,44 +168,12 @@ CMiniDump::CMiniDump()
 {
 #ifndef _DEBUG
 	SetUnhandledExceptionFilter(UnhandledExceptionFilter);
-
-#ifndef _WIN64
-	// Enable catching in CRT (http://blog.kalmbachnet.de/?postid=75)
-	// PreventSetUnhandledExceptionFilter();
-#endif
 #endif
 }
 
 LPTOP_LEVEL_EXCEPTION_FILTER WINAPI MyDummySetUnhandledExceptionFilter(LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter)
 {
 	return nullptr;
-}
-
-BOOL CMiniDump::PreventSetUnhandledExceptionFilter()
-{
-	BOOL bRet = FALSE;
-
-	HMODULE hKernel32 = LoadLibraryW(L"kernel32.dll");
-	if (hKernel32) {
-		void *pOrgEntry = GetProcAddress(hKernel32, "SetUnhandledExceptionFilter");
-		if (pOrgEntry) {
-			unsigned char newJump[100];
-			ptrdiff_t dwOrgEntryAddr = (ptrdiff_t)pOrgEntry;
-			dwOrgEntryAddr += 5; // add 5 for 5 op-codes for jmp far // x86. What about x64?
-			void *pNewFunc = &MyDummySetUnhandledExceptionFilter;
-			ptrdiff_t dwNewEntryAddr = (ptrdiff_t)pNewFunc;
-			ptrdiff_t dwRelativeAddr = dwNewEntryAddr - dwOrgEntryAddr;
-
-			newJump[0] = 0xE9;  // JMP absolute
-			memcpy(&newJump[1], &dwRelativeAddr, sizeof(pNewFunc));
-			SIZE_T bytesWritten;
-			bRet = WriteProcessMemory(GetCurrentProcess(), pOrgEntry, newJump, sizeof(pNewFunc) + 1, &bytesWritten);
-		}
-
-		FreeLibrary(hKernel32);
-	}
-
-	return bRet;
 }
 
 LONG WINAPI CMiniDump::UnhandledExceptionFilter( _EXCEPTION_POINTERS *lpTopLevelExceptionFilter )
