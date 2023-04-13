@@ -480,8 +480,10 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						&& (n = strtol(key.Mid(7), nullptr, 10)) > 0) {
 					int h, m, s, ms;
 					char c;
-					if (7 != sscanf_s(value, "%d%c%d%c%d%c%d", &h, &c, sizeof(CHAR),
-									  &m, &c, sizeof(CHAR), &s, &c, sizeof(CHAR), &ms)) {
+					if (7 != sscanf_s(value, "%d%c%d%c%d%c%d",
+							&h, &c, (unsigned)sizeof(CHAR),
+							&m, &c, (unsigned)sizeof(CHAR),
+							&s, &c, (unsigned)sizeof(CHAR), &ms)) {
 						continue;
 					}
 

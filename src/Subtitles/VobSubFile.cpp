@@ -2408,8 +2408,11 @@ void CVobSubStream::Open(CString name, BYTE* pData, int len)
 				int _tridx = 1;
 				if (tridx.RemoveHead() == L"tridx") {
 					WCHAR tr[4];
-					swscanf_s(tridx.RemoveHead(), L"%c%c%c%c", &tr[0], sizeof(WCHAR),
-							   &tr[1], sizeof(WCHAR), &tr[2], sizeof(WCHAR), &tr[3], sizeof(WCHAR));
+					swscanf_s(tridx.RemoveHead(), L"%c%c%c%c",
+						&tr[0], (unsigned)sizeof(WCHAR),
+						&tr[1], (unsigned)sizeof(WCHAR),
+						&tr[2], (unsigned)sizeof(WCHAR),
+						&tr[3], (unsigned)sizeof(WCHAR));
 					for (size_t i = 0; i < 4; i++) {
 						_tridx |= ((tr[i]=='1')?1:0)<<i;
 					}
