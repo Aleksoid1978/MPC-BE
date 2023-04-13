@@ -537,9 +537,9 @@ start:
 				int h, m, s, ms;
 				WCHAR c;
 				if (7 != swscanf_s(time, L"%d%c%d%c%d%c%d",
-						&h, &c, (unsigned)sizeof(WCHAR),
-						&m, &c, (unsigned)sizeof(WCHAR),
-						&s, &c, (unsigned)sizeof(WCHAR), &ms)) {
+						&h, &c, 1,
+						&m, &c, 1,
+						&s, &c, 1, &ms)) {
 					break;
 				}
 				const REFERENCE_TIME rt = ((((REFERENCE_TIME)h * 60 + m) * 60 + s) * 1000 + ms) * 10000;
