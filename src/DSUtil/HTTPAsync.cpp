@@ -188,6 +188,8 @@ void CHTTPAsync::Close()
 
 HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPCWSTR lpszCustomHeader/* = L""*/)
 {
+	m_url_redirect_str.Empty();
+
 	for (;;) {
 		Close();
 
