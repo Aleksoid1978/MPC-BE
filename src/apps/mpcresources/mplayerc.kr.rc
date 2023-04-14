@@ -2748,7 +2748,7 @@ BEGIN
     IDS_AG_OPEN_DEVICE      "장치 열기"
     IDS_AG_SAVE_AS          "다른 이름으로저장"
     IDS_AG_SAVE_IMAGE       "이미지 저장"
-    IDS_AG_AUTOSAVE_IMAGE   " (자동)"
+    IDS_AG_AUTOSAVE_IMAGE   "이미지 저장 (자동)"
     IDS_OSD_IMAGE_SAVED     "이미지가 성공적으로 저장되었습니다."
     IDS_AG_LOAD_SUBTITLE    "자막 열기..."
     IDS_AG_SAVE_SUBTITLE    "자막 저장"
@@ -2804,7 +2804,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_DECREASE_RATE    "속도감소"
+    IDS_AG_DECREASE_RATE    "속도 감소"
     IDS_AG_RESET_RATE       "초기화"
     IDS_AG_AUDIODELAY_PLUS  "오디오 딜레이 +10밀리 초"
     IDS_AG_AUDIODELAY_MINUS "오디오 지연 -10밀리 초"
@@ -2901,7 +2901,7 @@ BEGIN
     IDS_AG_DVD_MENU_ACTIVATE "DVD 메뉴 활성화"
     IDS_AG_DVD_MENU_BACK    "DVD 메뉴 뒤로"
     IDS_AG_DVD_MENU_LEAVE   "DVD 메뉴 끝내기"
-    IDS_AG_BOSS_KEY         "엄마 왔다! (일시 정지, 최소화)"
+    IDS_AG_BOSS_KEY         "엄마 왔다! (감추기)"
     IDS_AG_MENU_PLAYER_S    "재생기 메뉴 (짧게)"
     IDS_AG_MENU_PLAYER_L    "재생기 메뉴 (길게)"
     IDS_AG_MENU_FILTERS     "필터 메뉴"
