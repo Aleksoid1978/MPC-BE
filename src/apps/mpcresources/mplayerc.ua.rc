@@ -2351,8 +2351,8 @@ BEGIN
     IDS_PLAYLIST_HIDEFS     "Приховувати якщо 'На весь екран'"
     IDS_PLAYLIST_NEXTONERROR "Перейти до наступного при помилці"
     IDS_PLAYLIST_DETERMINEDURATION "Визначати тривалість при додаванні"
-    IDS_PLAYLIST_SKIPINVALID "Skip invalid elements"
-    IDS_PLAYLIST_INVALID "Invalid"
+    IDS_PLAYLIST_SKIPINVALID "Пропускати помилкові елементи"
+    IDS_PLAYLIST_INVALID "Помилка"
 END
 
 STRINGTABLE
