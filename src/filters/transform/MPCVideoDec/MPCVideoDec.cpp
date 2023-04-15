@@ -1070,7 +1070,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_dwSYNC(0)
 	, m_dwSYNC2(0)
 	, m_bDecodingStart(FALSE)
-	, m_bHighBitdepth(FALSE)
 	, m_dRate(1.0)
 	, m_pMSDKDecoder(nullptr)
 	, m_iMvcOutputMode(MVC_OUTPUT_Auto)
@@ -3937,7 +3936,7 @@ BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID& decoderGUID)
 					if (mode.pixFormat == pix_fmt) {
 						return TRUE;
 					}
-				} else if (mode.bHighBitdepth == !!m_bHighBitdepth) {
+				} else if (mode.bHighBitdepth == m_bHighBitdepth) {
 					return TRUE;
 				}
 			}
@@ -4788,10 +4787,10 @@ HRESULT CMPCVideoDecFilter::CheckDXVA2Decoder(AVCodecContext *c)
 		if ((m_nSurfaceWidth != FFALIGN(c->coded_width, m_nAlign) || m_nSurfaceHeight != FFALIGN(c->coded_height, m_nAlign))
 				|| ((m_CodecId == AV_CODEC_ID_HEVC || m_CodecId == AV_CODEC_ID_VP9) && m_dxva_pix_fmt != m_pAVCtx->sw_pix_fmt)) {
 			const int depth = GetLumaBits(m_pAVCtx->sw_pix_fmt);
-			const BOOL bHighBitdepth = (depth == 10) && ((m_CodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10)
+			const bool bHighBitdepth = (depth == 10) && ((m_CodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10)
 														  || (m_CodecId == AV_CODEC_ID_VP9 && m_pAVCtx->profile == FF_PROFILE_VP9_2));
 
-			const auto bBitdepthChanged = (m_bHighBitdepth != bHighBitdepth);
+			const bool bBitdepthChanged = (m_bHighBitdepth != bHighBitdepth);
 
 			m_nSurfaceWidth = FFALIGN(c->coded_width, m_nAlign);
 			m_nSurfaceHeight = FFALIGN(c->coded_height, m_nAlign);
