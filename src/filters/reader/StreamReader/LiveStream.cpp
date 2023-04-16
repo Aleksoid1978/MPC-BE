@@ -839,8 +839,19 @@ DWORD CLiveStream::ThreadProc()
 	SetThreadPriority(m_hThread, THREAD_PRIORITY_TIME_CRITICAL);
 
 #if ENABLE_DUMP
-	const CString fname = m_protocol == protocol::PR_HTTP ? L"http.dump" : m_protocol == protocol::PR_UDP ? L"udp.dump" : L"stdin.dump";
-	FILE* dump = _wfopen(fname, L"wb");
+	const auto prefix = m_protocol == protocol::PR_HLS ? L"hls" :
+		m_protocol == protocol::PR_HTTP ? L"http" :
+		m_protocol == protocol::PR_UDP ? L"udp" :
+		L"stdin";
+
+	SYSTEMTIME st;
+	::GetLocalTime(&st);
+
+	CString dump_filename;
+	dump_filename.Format(L"%s__%04u_%02u_%02u__%02u_%02u_%02u.dump", prefix, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+
+	FILE* dump_file = nullptr;
+	_wfopen_s(&dump_file, dump_filename.GetString(), L"wb");
 #endif
 
 	auto buff = std::make_unique<BYTE[]>(MAXBUFSIZE * 2);
@@ -857,8 +868,8 @@ DWORD CLiveStream::ThreadProc()
 			case CMD::CMD_EXIT:
 				Reply(S_OK);
 #if ENABLE_DUMP
-				if (dump) {
-					fclose(dump);
+				if (dump_file) {
+					fclose(dump_file);
 				}
 #endif
 				m_bEndOfStream = TRUE;
@@ -1010,8 +1021,8 @@ DWORD CLiveStream::ThreadProc()
 					buffsize += len;
 					if (buffsize >= MAXBUFSIZE) {
 #if ENABLE_DUMP
-						if (dump) {
-							fwrite(buff, buffsize, 1, dump);
+						if (dump_file) {
+							fwrite(buff.get(), static_cast<size_t>(buffsize), 1, dump_file);
 						}
 #endif
 						Append(buff.get(), (UINT)buffsize);
