@@ -833,7 +833,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(const REFERENCE_TIME rtStartOffset)
 				const __int64 pos = m_pFile->GetPos();
 				CMpegSplitterFile::peshdr peshdr;
 				if (h.payloadstart
-						&& (!m_pFile->NextMpegStartCode(b, 4) || !m_pFile->ReadPES(peshdr, b))) {
+						&& (!m_pFile->NextMpegStartCode(b, 4) || !m_pFile->ReadPES(peshdr, b, h.pid))) {
 					m_pFile->Seek(h.next);
 					return S_FALSE;
 				}
