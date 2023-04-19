@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "DSUtil/Filehandle.h"
+#include "DSUtil/text.h"
 #include "PlayerYouTubeDL.h"
 
 #include "rapidjsonHelper.h"
@@ -191,7 +192,7 @@ namespace YoutubeDL
 					for (const auto& format : formats->GetArray()) {
 						CStringA protocol;
 						if (!getJsonValue(format, "protocol", protocol)
-								|| (protocol != "http" && protocol != "https" && protocol.Left(4) != "m3u8")) {
+								|| (!StartsWith(protocol, "http") && !EndsWith(protocol, "m3u8"))) {
 							continue;
 						}
 						CStringA url;
