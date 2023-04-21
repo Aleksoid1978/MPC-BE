@@ -11,6 +11,9 @@ Mp4Splitter
 Fixed a rare crash when working with DASH streams.
 File navigation has been optimized.
 
+MPegSplitter
+Fixed audio track detection for some HLS streams.
+
 AudioSwitcher
 Added "For audio with whisper and explosion parts" preset for FFmpeg filters.
 Added the ability to connect to the "Resampler DMO" system filter.
@@ -31,6 +34,7 @@ Added loading of subtitles from subfolder ".\Subs\FILENAME_WITHOUT_EXT\".
 YouTube
 Added the ability to choose in advance only sound in the built-in parser.
 Added support for links "youtube.com/@".
+Fixed support for new versions of yt-dlp.
 
 Player
 Added display of a single audio track in the OSD when trying to switch to the next or previous one.
