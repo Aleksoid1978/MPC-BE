@@ -104,22 +104,8 @@ BOOL CPPageYoutube::OnInitDialog()
 	m_chkHdr.SetCheck(s.YoutubeFormat.hdr ? BST_CHECKED : BST_UNCHECKED);
 
 	bool was_added = false;
-	LPCWSTR langcodes[] = {
-		L"ar",
-		L"en",
-		L"es",
-		L"fr",
-		L"hi",
-		L"id",
-		L"ko",
-		L"pt-BR",
-		L"ru",
-		L"th",
-		L"tr",
-		L"vi",
-	};
 	m_cbAudioLang.AddString(ResStr(IDS_AG_DEFAULT_L));
-	for (auto& langcode : langcodes) {
+	for (auto [langcode, _] : m_langcodes) {
 		m_cbAudioLang.AddString(langcode);
 		if (!was_added && s.strYoutubeAudioLang.CompareNoCase(langcode) == 0) {
 			was_added = true;
@@ -267,4 +253,18 @@ void CPPageYoutube::OnCheckYDLEnable()
 	}
 
 	SetModified();
+}
+
+CStringW CPPageYoutube::GetDefaultLanguageCode()
+{
+	auto lcid = MAKELCID(GetUserDefaultUILanguage(), SORT_DEFAULT);
+	auto it = std::find_if(std::cbegin(m_langcodes), std::cend(m_langcodes), [&](const auto& item) {
+		return item.second == lcid;
+	});
+	if (it != std::cend(m_langcodes)) {
+		return it->first;
+	}
+
+	// default language
+	return L"en";
 }

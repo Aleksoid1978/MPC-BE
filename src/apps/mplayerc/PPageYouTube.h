@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2021 see Authors.txt
+ * (C) 2012-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -46,6 +46,21 @@ private:
 	CEdit m_edTorrServerAddress;
 	CEdit m_edUserAgent;
 
+	static constexpr std::pair<LPCWSTR, LCID> m_langcodes[] = {
+		{ L"ar",    MAKELCID(MAKELANGID(LANG_ARABIC,     SUBLANG_DEFAULT), SORT_DEFAULT) },
+		{ L"en",    MAKELCID(MAKELANGID(LANG_ENGLISH,    SUBLANG_DEFAULT), SORT_DEFAULT) },
+		{ L"es",    MAKELCID(MAKELANGID(LANG_SPANISH,    SUBLANG_DEFAULT), SORT_DEFAULT) },
+		{ L"fr",    MAKELCID(MAKELANGID(LANG_FRENCH,     SUBLANG_DEFAULT), SORT_DEFAULT) },
+		{ L"hi",    MAKELCID(MAKELANGID(LANG_HINDI,      SUBLANG_DEFAULT), SORT_DEFAULT) },
+		{ L"id",    MAKELCID(MAKELANGID(LANG_INDONESIAN, SUBLANG_DEFAULT), SORT_DEFAULT) },
+		{ L"ko",    MAKELCID(MAKELANGID(LANG_KOREAN,     SUBLANG_DEFAULT), SORT_DEFAULT) },
+		{ L"pt-BR", MAKELCID(MAKELANGID(LANG_PORTUGUESE, SUBLANG_PORTUGUESE_BRAZILIAN), SORT_DEFAULT) },
+		{ L"ru",    MAKELCID(MAKELANGID(LANG_RUSSIAN,    SUBLANG_DEFAULT), SORT_DEFAULT) },
+		{ L"th",    MAKELCID(MAKELANGID(LANG_THAI,       SUBLANG_DEFAULT), SORT_DEFAULT) },
+		{ L"tr",    MAKELCID(MAKELANGID(LANG_TURKISH,    SUBLANG_DEFAULT), SORT_DEFAULT) },
+		{ L"vi",    MAKELCID(MAKELANGID(LANG_VIETNAMESE, SUBLANG_DEFAULT), SORT_DEFAULT)}
+	};
+
 public:
 	CPPageYoutube();
 	virtual ~CPPageYoutube();
@@ -55,6 +70,8 @@ public:
 	afx_msg void OnCheckPageParser();
 	afx_msg void OnCheck60fps();
 	afx_msg void OnCheckYDLEnable();
+
+	static CStringW GetDefaultLanguageCode();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

@@ -24,6 +24,7 @@
 #include "MiniDump.h"
 #include "Misc.h"
 #include "PlayerYouTube.h"
+#include "PPageYoutube.h"
 #include "PPageFormats.h"
 #include "DSUtil/FileHandle.h"
 #include "DSUtil/SysVersion.h"
@@ -792,7 +793,7 @@ void CAppSettings::ResetSettings()
 	YoutubeFormat.res = 720;
 	YoutubeFormat.fps60 = false;
 	YoutubeFormat.hdr = false;
-	strYoutubeAudioLang.Empty();
+	strYoutubeAudioLang = CPPageYoutube::GetDefaultLanguageCode();
 	bYoutubeLoadPlaylist = false;
 
 	bYDLEnable = true;
