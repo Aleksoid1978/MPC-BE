@@ -588,20 +588,21 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"An Desktoprand andocken"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
 5		"YouTube"
 6		"Integrierten Webseiten-Parser verwenden"
 7		"Bevorzugtes Format:"
 10		"HFR"
 11		"HDR"
-12		"Wiedergabeliste laden"
-14		"youtube-dl, yt-dlp"
-15		"Ausführbare Datei:"
-17		"Maximale vertikale Auflösung:"
-19		"Maximale Bildrate oder Bitrate wählen"
-20		"AceStream Adresse:"
-22		"MatriX (TorrServer) Adresse:"
-25		"User Agent:"
+12		"Preferred audio track language:"
+14		"Wiedergabeliste laden"
+16		"youtube-dl, yt-dlp"
+17		"Ausführbare Datei:"
+19		"Maximale vertikale Auflösung:"
+21		"Maximale Bildrate oder Bitrate wählen"
+22		"AceStream Adresse:"
+24		"MatriX (TorrServer) Adresse:"
+27		"User Agent:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

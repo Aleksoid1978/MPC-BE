@@ -34,6 +34,7 @@ private:
 	CComboBox m_cbResolution;
 	CButton m_chk60fps;
 	CButton m_chkHdr;
+	CComboBox m_cbAudioLang;
 	CButton m_chkLoadPlaylist;
 
 	CButton   m_chkYDLEnable;

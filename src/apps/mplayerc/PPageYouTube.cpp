@@ -45,6 +45,7 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO2, m_cbResolution);
 	DDX_Control(pDX, IDC_CHECK3, m_chk60fps);
 	DDX_Control(pDX, IDC_CHECK4, m_chkHdr);
+	DDX_Control(pDX, IDC_COMBO5, m_cbAudioLang);
 	DDX_Control(pDX, IDC_CHECK1, m_chkLoadPlaylist);
 	DDX_Control(pDX, IDC_CHECK6, m_chkYDLEnable);
 	DDX_Control(pDX, IDC_COMBO4, m_cbYDLExePath);
@@ -101,6 +102,9 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	m_chk60fps.SetCheck(s.YoutubeFormat.fps60 ? BST_CHECKED : BST_UNCHECKED);
 	m_chkHdr.SetCheck(s.YoutubeFormat.hdr ? BST_CHECKED : BST_UNCHECKED);
+
+	GetDlgItem(IDC_STATIC4)->ShowWindow(SW_HIDE);
+	m_cbAudioLang.ShowWindow(SW_HIDE);
 
 	m_chkLoadPlaylist.SetCheck(s.bYoutubeLoadPlaylist);
 

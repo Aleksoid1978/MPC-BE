@@ -588,20 +588,21 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Aan de bureaubladrand vastmaken"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
 5		"YouTube"
 6		"Ingebouwde webpaginaparser gebruiken"
 7		"Voorkeursformaat:"
 10		"60 fps"
 11		"HDR"
-12		"Afspeellijst laden"
-14		"youtube-dl, yt-dlp"
-15		"Executable:"
-17		"Maximale videohoogte:"
-19		"Maximale fps of bitrate selecteren"
-20		"Adres AceStream:"
-22		"Adres MatriX (TorrServer):"
-25		"Useragent:"
+12		"Preferred audio track language:"
+14		"Afspeellijst laden"
+16		"youtube-dl, yt-dlp"
+17		"Executable:"
+19		"Maximale videohoogte:"
+21		"Maximale fps of bitrate selecteren"
+22		"Adres AceStream:"
+24		"Adres MatriX (TorrServer):"
+27		"Useragent:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
