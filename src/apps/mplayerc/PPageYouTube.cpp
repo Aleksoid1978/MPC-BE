@@ -103,8 +103,37 @@ BOOL CPPageYoutube::OnInitDialog()
 	m_chk60fps.SetCheck(s.YoutubeFormat.fps60 ? BST_CHECKED : BST_UNCHECKED);
 	m_chkHdr.SetCheck(s.YoutubeFormat.hdr ? BST_CHECKED : BST_UNCHECKED);
 
+	bool was_added = false;
+	LPCWSTR langcodes[] = {
+		L"ar",
+		L"en",
+		L"es",
+		L"fr",
+		L"hi",
+		L"id",
+		L"ko",
+		L"pt-BR",
+		L"ru",
+		L"th",
+		L"tr",
+		L"vi",
+	};
+	m_cbAudioLang.AddString(ResStr(IDS_AG_DEFAULT_L));
+	for (auto& langcode : langcodes) {
+		m_cbAudioLang.AddString(langcode);
+		if (!was_added && s.strYoutubeAudioLang.CompareNoCase(langcode) == 0) {
+			was_added = true;
+			m_cbAudioLang.SelectString(0, s.strYoutubeAudioLang);
+		}
+	}
+	if (!was_added) {
+		m_cbAudioLang.SelectString(0, ResStr(IDS_AG_DEFAULT_L));
+	}
+
+#ifndef _DEBUG
 	GetDlgItem(IDC_STATIC4)->ShowWindow(SW_HIDE);
 	m_cbAudioLang.ShowWindow(SW_HIDE);
+#endif
 
 	m_chkLoadPlaylist.SetCheck(s.bYoutubeLoadPlaylist);
 
@@ -115,7 +144,7 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	m_chkYDLEnable.SetCheck(s.bYDLEnable ? BST_CHECKED : BST_UNCHECKED);
 
-	bool was_added = false;
+	was_added = false;
 	LPCWSTR ydl_filenames[] = {
 			L"yt-dlp.exe",
 			L"yt-dlp_min.exe",
@@ -164,6 +193,12 @@ BOOL CPPageYoutube::OnApply()
 	s.YoutubeFormat.res		= GetCurItemData(m_cbResolution);
 	s.YoutubeFormat.fps60	= !!m_chk60fps.GetCheck();
 	s.YoutubeFormat.hdr		= !!m_chkHdr.GetCheck();
+	if (m_cbAudioLang.GetCurSel() > 0) {
+		m_cbAudioLang.GetWindowTextW(s.strYoutubeAudioLang);
+	} else {
+		s.strYoutubeAudioLang.Empty();
+	}
+
 	s.bYoutubeLoadPlaylist	= !!m_chkLoadPlaylist.GetCheck();
 
 	s.bYDLEnable = !!m_chkYDLEnable.GetCheck();
@@ -202,6 +237,9 @@ void CPPageYoutube::OnCheckPageParser()
 	if (bEnable) {
 		OnCheck60fps();
 	}
+
+	GetDlgItem(IDC_STATIC4)->EnableWindow(bEnable);
+	m_cbAudioLang.EnableWindow(bEnable);
 
 	SetModified();
 }

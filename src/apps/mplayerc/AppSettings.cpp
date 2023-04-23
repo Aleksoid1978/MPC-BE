@@ -792,6 +792,7 @@ void CAppSettings::ResetSettings()
 	YoutubeFormat.res = 720;
 	YoutubeFormat.fps60 = false;
 	YoutubeFormat.hdr = false;
+	strYoutubeAudioLang.Empty();
 	bYoutubeLoadPlaylist = false;
 
 	bYDLEnable = true;
@@ -1476,6 +1477,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	} else {
 		YoutubeFormat.hdr = false;
 	}
+	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_AUDIOLANGUAGE, strYoutubeAudioLang);
+	strYoutubeAudioLang.Trim();
 	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
 	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YDL_ENABLE, bYDLEnable);
 	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_YDL_EXEPATH, strYDLExePath);
@@ -1963,6 +1966,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_RESOLUTION, YoutubeFormat.res);
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_60FPS, YoutubeFormat.fps60);
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_HDR, YoutubeFormat.hdr);
+	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_AUDIOLANGUAGE, strYoutubeAudioLang);
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YDL_ENABLE, bYDLEnable);
 	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_YDL_EXEPATH, strYDLExePath);
