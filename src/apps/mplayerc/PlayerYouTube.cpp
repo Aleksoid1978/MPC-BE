@@ -774,6 +774,7 @@ namespace Youtube
 
 		using streamingDataFormat = std::tuple<int, CStringA, CStringA, CStringA>;
 		std::list<streamingDataFormat> streamingDataFormatList;
+		std::map<CStringA, std::list<streamingDataFormat>> streamingDataFormatListAudioWithLanguages;
 		if (!player_response_jsonDocument.IsNull()) {
 			if (auto playabilityStatus = GetJsonObject(player_response_jsonDocument, "playabilityStatus")) {
 				CStringA status;
@@ -841,15 +842,46 @@ namespace Youtube
 
 						getJsonValue(adaptiveFormat, "itag", std::get<0>(element));
 						getJsonValue(adaptiveFormat, "qualityLabel", std::get<3>(element));
-						if (getJsonValue(adaptiveFormat, "url", std::get<1>(element))) {
-							streamingDataFormatList.emplace_back(element);
-						} else if (getJsonValue(adaptiveFormat, "cipher", std::get<2>(element)) || getJsonValue(adaptiveFormat, "signatureCipher", std::get<2>(element))) {
-							streamingDataFormatList.emplace_back(element);
+						if (getJsonValue(adaptiveFormat, "url", std::get<1>(element))
+								|| getJsonValue(adaptiveFormat, "cipher", std::get<2>(element)) || getJsonValue(adaptiveFormat, "signatureCipher", std::get<2>(element))) {
+
+							CStringA lang_id;
+							if (auto audioTrack = GetJsonObject(adaptiveFormat, "audioTrack")) {
+								if (getJsonValue(*audioTrack, "id", lang_id)) {
+									auto pos = lang_id.Find('.');
+									if (pos != -1) {
+										lang_id = lang_id.Left(pos);
+									}
+								}
+							}
+
+							if (lang_id.IsEmpty()) {
+								streamingDataFormatList.emplace_back(element);
+							} else {
+								streamingDataFormatListAudioWithLanguages[lang_id].emplace_back(element);
+							}
 						}
 					}
 				}
 			}
 		}
+
+		const auto& s = AfxGetAppSettings();
+		if (!streamingDataFormatListAudioWithLanguages.empty()) {
+			auto it = streamingDataFormatListAudioWithLanguages.find("en");
+			if (!s.strYoutubeAudioLang.IsEmpty()) {
+				it = streamingDataFormatListAudioWithLanguages.find(WStrToUTF8(s.strYoutubeAudioLang.GetString()));
+				if (it == streamingDataFormatListAudioWithLanguages.end()) {
+					it = streamingDataFormatListAudioWithLanguages.find("en");
+				}
+			}
+
+			if (it == streamingDataFormatListAudioWithLanguages.end()) {
+				it = streamingDataFormatListAudioWithLanguages.begin();
+			}
+
+			streamingDataFormatList.splice(streamingDataFormatList.end(), it->second);
+		};
 
 		if (!JSUrl.IsEmpty()) {
 			JSUrl.Replace(L"\\/", L"/");
@@ -1351,8 +1383,6 @@ namespace Youtube
 			}
 		}
 #endif
-
-		const CAppSettings& s = AfxGetAppSettings();
 
 		const YoutubeUrllistItem* final_item = nullptr;
 		CStringW final_video_url;

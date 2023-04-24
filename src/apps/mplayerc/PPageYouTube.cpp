@@ -111,7 +111,7 @@ BOOL CPPageYoutube::OnInitDialog()
 		langNames.resize(std::size(m_langcodes));
 		for (size_t i = 0; i < std::size(m_langcodes); i++) {
 			auto langcode = m_langcodes[i].first;
-			if (GetLocaleInfoEx(langcode, LOCALE_SLOCALIZEDLANGUAGENAME, buffer, size)) {
+			if (GetLocaleInfoEx(langcode, LOCALE_SLOCALIZEDDISPLAYNAME, buffer, size)) {
 				langNames[i] = buffer;
 			}
 		}
