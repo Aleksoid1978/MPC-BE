@@ -129,11 +129,6 @@ BOOL CPPageYoutube::OnInitDialog()
 		m_cbAudioLang.SetCurSel(0);
 	}
 
-#ifndef _DEBUG
-	GetDlgItem(IDC_STATIC4)->ShowWindow(SW_HIDE);
-	m_cbAudioLang.ShowWindow(SW_HIDE);
-#endif
-
 	m_chkLoadPlaylist.SetCheck(s.bYoutubeLoadPlaylist);
 
 	CorrectCWndWidth(GetDlgItem(IDC_CHECK2));
