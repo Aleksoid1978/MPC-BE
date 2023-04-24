@@ -594,7 +594,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
 7		"Bevorzugtes Format:"
 10		"HFR"
 11		"HDR"
-12		"Preferred audio track language:"
+12		"Bevorzugte Sprache der Audiospur:"
 14		"Wiedergabeliste laden"
 16		"youtube-dl, yt-dlp"
 17		"Ausführbare Datei:"

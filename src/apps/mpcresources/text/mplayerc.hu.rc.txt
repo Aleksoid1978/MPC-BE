@@ -594,7 +594,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
 7		"Előnyben részesített formátum:"
 10		"60 fps"
 11		"HDR"
-12		"Preferred audio track language:"
+12		"Előnyben részesített hangsáv nyelve:"
 14		"Lejátszási lista betöltése"
 16		"youtube-dl, yt-dlp"
 17		"Futtatható fájl:"
