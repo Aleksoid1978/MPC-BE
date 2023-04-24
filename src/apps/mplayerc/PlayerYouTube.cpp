@@ -230,20 +230,20 @@ namespace Youtube
 
 	static bool URLPostData(LPCWSTR videoId, urlData& pData, bool bAgeGate)
 	{
-		if (auto hInet = InternetOpenW(L"Mozilla/5.0 (Windows NT 6.1))", INTERNET_OPEN_TYPE_PRECONFIG, nullptr, nullptr, 0)) {
+		if (auto hInet = InternetOpenW(L"com.google.android.youtube/17.31.35 (Linux; U; Android 11) gzip", INTERNET_OPEN_TYPE_PRECONFIG, nullptr, nullptr, 0)) {
 			if (auto hSession = InternetConnectW(hInet, L"www.youtube.com", 443, nullptr, nullptr, INTERNET_SERVICE_HTTP, 0, 1)) {
 				if (auto hRequest = HttpOpenRequestW(hSession,
 													 L"POST",
-													 L"youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8", nullptr, nullptr, nullptr,
+													 L"youtubei/v1/player?key=AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w", nullptr, nullptr, nullptr,
 													 INTERNET_FLAG_SECURE | INTERNET_FLAG_RELOAD, 1)) {
 					CStringA requestData;
 					constexpr const char* str[] = {
 						// android player API JSON
-						R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "16.20", "hl": "en"}}, )"
+						R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "17.31.35", "hl": "en"}}, )"
 						R"("videoId": "%S", "playbackContext": {"contentPlaybackContext": {"html5Preference": "HTML5_PREF_WANTS"}}, )"
 						R"("contentCheckOk": true, "racyCheckOk": true})",
 						// android agegate player API JSON
-						R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "16.20", "clientScreen": "EMBED"}, )"
+						R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "17.31.35", "clientScreen": "EMBED"}, )"
 						R"("thirdParty": {"embedUrl": "https://google.com"}}, "videoId": "%S", )"
 						R"("contentCheckOk": true, "racyCheckOk": true})"
 					};
@@ -251,7 +251,7 @@ namespace Youtube
 					requestData.Format(str[bAgeGate ? 1 : 0], videoId);
 
 					static const CStringW lpszHeaders = LR"(X-YouTube-Client-Name: 3\r\n)"
-														LR"(X-YouTube-Client-Version: 16.20\r\n)"
+														LR"(X-YouTube-Client-Version: 17.31.35\r\n)"
 														LR"(Origin: https://www.youtube.com\r\n)"
 														LR"(content-type: application/json\r\n)";
 
