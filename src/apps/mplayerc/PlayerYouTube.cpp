@@ -1424,7 +1424,12 @@ namespace Youtube
 		if (!bParseMetadata) {
 			ParseMetadata(videoId, y_fields);
 		}
-		y_fields.fname.Format(L"%s.%dp.%s", y_fields.title, final_item->profile->quality, final_item->profile->ext);
+
+		if (final_item->profile->type == Youtube::y_audio) {
+			y_fields.fname.Format(L"%s.%s", y_fields.title, final_item->profile->ext);
+		} else {
+			y_fields.fname.Format(L"%s.%dp.%s", y_fields.title, final_item->profile->quality, final_item->profile->ext);
+		}
 		FixFilename(y_fields.fname);
 
 		// subtitles
