@@ -942,9 +942,12 @@ namespace Youtube
 				item.url = url;
 
 				switch (audioprofile->format) {
-				case y_mp4_aac:  item.title = L"MP4/AAC";   break;
-				case y_webm_aud: item.title = L"WebM/Opus"; break;
-				default:         item.title = L"unknown";  break;
+				case y_mp4_aac:  item.title = L"MP4/AAC";         break;
+				case y_webm_aud: item.title = L"WebM/Opus";       break;
+				case y_mp4_ac3:  item.title = L"MP4/AC3";         break;
+				case y_mp4_eac3: item.title = L"MP4/E-AC3";       break;
+				case y_mp4_dtse: item.title = L"MP4/DTS-Express"; break;
+				default:         item.title = L"unknown";         break;
 				}
 				item.title.AppendFormat(L" %dkbit/s", audioprofile->quality);
 
@@ -1496,6 +1499,24 @@ namespace Youtube
 			}
 			for (const auto& item : youtubeAudioUrllist) {
 				if (item.profile->format == Youtube::y_webm_aud) {
+					youtubeUrllist.emplace_back(item);
+					break;
+				}
+			}
+			for (const auto& item : youtubeAudioUrllist) {
+				if (item.profile->format == Youtube::y_mp4_ac3) {
+					youtubeUrllist.emplace_back(item);
+					break;
+				}
+			}
+			for (const auto& item : youtubeAudioUrllist) {
+				if (item.profile->format == Youtube::y_mp4_eac3) {
+					youtubeUrllist.emplace_back(item);
+					break;
+				}
+			}
+			for (const auto& item : youtubeAudioUrllist) {
+				if (item.profile->format == Youtube::y_mp4_dtse) {
 					youtubeUrllist.emplace_back(item);
 					break;
 				}
