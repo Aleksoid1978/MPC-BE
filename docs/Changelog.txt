@@ -67,6 +67,7 @@ Updated libraries:
 	Little-CMS git-lcms2.15-19-gef21b76;
 	MediaInfo git-v22.12-120-gaad98a4e1;
 	zlib 1.2.13;
+	rapidjson git-v1.1.0-727-g949c771b;
 
 1.6.6
 =============================
