@@ -1113,7 +1113,17 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 		if (type == stream_type::unknown && (stream_type & AC3_AUDIO)) {
 			Seek(start);
 			ac3hdr h;
-			if (Read(h, len, &s.mt) && h.frame_type == EAC3_FRAME_TYPE_INDEPENDENT) {
+			if (pes_stream_type == AUDIO_STREAM_AC3_TRUE_HD) {
+				if (m_AC3CoreOnly) {
+					if (Read(h, len, &s.mt)) { // AC3 sub-stream
+						type = stream_type::audio;
+					}
+				} else {
+					if (Read(h, len, &s.mt, false, false)) { // TrueHD core
+						type = stream_type::audio;
+					}
+				}
+			} else if (Read(h, len, &s.mt) && h.frame_type == EAC3_FRAME_TYPE_INDEPENDENT) {
 				m_ac3Valid[s].Handle(h);
 				if (m_ac3Valid[s].IsValid()) {
 					type = stream_type::audio;
@@ -1197,11 +1207,11 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 					ac3hdr h;
 					if (pes_stream_type == AUDIO_STREAM_AC3_TRUE_HD) {
 						if (m_AC3CoreOnly) {
-							if (ext_id == 0x76 && Read(h, len, &s.mt)) { // AC3 sub-stream
+							if (Read(h, len, &s.mt)) { // AC3 sub-stream
 								type = stream_type::audio;
 							}
 						} else {
-							if (ext_id == 0x72 && Read(h, len, &s.mt, false, false)) { // TrueHD core
+							if (Read(h, len, &s.mt, false, false)) { // TrueHD core
 								type = stream_type::audio;
 							}
 						}
