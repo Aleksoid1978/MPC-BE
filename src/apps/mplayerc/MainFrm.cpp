@@ -6915,7 +6915,8 @@ void CMainFrame::OnFileISDBSearch()
 
 void CMainFrame::OnUpdateFileISDBSearch(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(TRUE);
+	//pCmdUI->Enable(TRUE);
+	pCmdUI->Enable(FALSE); // turn it off because it doesn't work
 }
 
 void CMainFrame::OnFileISDBDownload()
@@ -6950,7 +6951,8 @@ void CMainFrame::OnFileISDBDownload()
 
 void CMainFrame::OnUpdateFileISDBDownload(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(m_eMediaLoadState == MLS_LOADED && GetPlaybackMode() != PM_CAPTURE && (m_pCAP || m_pDVS) && !m_bAudioOnly);
+	//pCmdUI->Enable(m_eMediaLoadState == MLS_LOADED && GetPlaybackMode() != PM_CAPTURE && (m_pCAP || m_pDVS) && !m_bAudioOnly);
+	pCmdUI->Enable(FALSE); // turn it off because it doesn't work
 }
 
 void CMainFrame::OnFileProperties()
