@@ -594,7 +594,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
 7		"formato preferito:"
 10		"60 fps"
 11		"HDR"
-12		"Preferred audio track language:"
+12		"Lingua preferita per la traccia audio:"
 14		"Carica playlist"
 16		"youtube-dl, yt-dlp"
 17		"File eseguibile:"
