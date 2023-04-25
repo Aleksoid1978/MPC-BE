@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -595,13 +595,15 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 
 	// Parse TrueHD and MLP header
 	if (!AC3CoreOnly) {
-		BYTE buf[20];
+		if (len < 22) {
+			return false;
+		}
 
-		int fsize = 0;
-		ByteRead(buf, 20);
+		BYTE buf[22];
+		ByteRead(buf, sizeof(buf));
 
 		audioframe_t aframe;
-		fsize = ParseMLPHeader(buf, &aframe);
+		auto fsize = ParseMLPHeader(buf, &aframe);
 		if (fsize) {
 			if (pmt) {
 				const int bitrate = (int)(fsize * 8i64 * aframe.samplerate / aframe.samples); // inaccurate, because fsize is not constant
@@ -621,6 +623,7 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 
 				pmt->SetSampleSize(0);
 			}
+
 			return true;
 		}
 
@@ -898,19 +901,19 @@ bool CBaseSplitterFileEx::Read(dtslbr_hdr& h, int len, CMediaType* pmt)
 bool CBaseSplitterFileEx::Read(mlphdr& h, int len, CMediaType* pmt, bool find_sync)
 {
 	memset(&h, 0, sizeof(h));
-	if (len < 20) return false;
+	if (len < 22) return false;
 
 	__int64 startpos = GetPos();
 
 	audioframe_t aframe;
 	int fsize = 0;
 
-	BYTE buf[20];
-	int k = find_sync ? len - 20 : 1;
+	BYTE buf[22];
+	int k = find_sync ? len - 22 : 1;
 	int i = 0;
 	while (i < k) {
 		Seek(startpos+i);
-		ByteRead(buf, 20);
+		ByteRead(buf, sizeof(buf));
 		fsize = ParseMLPHeader(buf, &aframe);
 		if (fsize) {
 			break;

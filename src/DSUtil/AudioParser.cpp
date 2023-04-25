@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2022 see Authors.txt
+ * (C) 2011-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "AudioParser.h"
+#include "GolombBuffer.h"
 #include <mpc_defines.h>
 #include "Utils.h"
 #include "MP4AudioDecoderConfig.h"
@@ -468,12 +469,10 @@ int ParseMLPHeader(const BYTE* buf, audioframe_t* audioframe)
 	};
 
 	DWORD sync = GETU32(buf+4);
-	bool isTrueHD;
+	bool isTrueHD = false;;
 	if (sync == TRUEHD_SYNCWORD) {
 		isTrueHD = true;
-	} else if (sync == MLP_SYNCWORD) {
-		isTrueHD = false;
-	} else {
+	} else if (sync != MLP_SYNCWORD) {
 		return 0;
 	}
 
@@ -481,6 +480,7 @@ int ParseMLPHeader(const BYTE* buf, audioframe_t* audioframe)
 
 	if (audioframe) {
 		audioframe->size = frame_size;
+		audioframe->param3 = 0;
 		if (isTrueHD) {
 			audioframe->param1     = 24; // bitdepth
 			audioframe->samplerate = mlp_samplerates[buf[8] >> 4];
@@ -494,6 +494,12 @@ int ParseMLPHeader(const BYTE* buf, audioframe_t* audioframe)
 				audioframe->channels += thd_channel_count[i] * ((channel_map >> i) & 1);
 			}
 			audioframe->param2 = 1; // TrueHD flag
+
+			BYTE num_substreams = buf[20] >> 4;
+			BYTE substream_info = buf[21];
+			if (num_substreams == 4 && substream_info >> 7 == 1) {
+				audioframe->param3 = 1; // TrueHD Atmos flag
+			}
 		} else {
 			audioframe->param1     = mlp_bitdepth[buf[8] >> 4]; // bitdepth
 			audioframe->samplerate = mlp_samplerates[buf[9] >> 4];

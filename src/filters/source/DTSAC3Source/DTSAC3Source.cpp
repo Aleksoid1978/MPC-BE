@@ -231,7 +231,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			audioframe_t aframe = { 0 };
 			m_streamtype = unknown;
 			UINT i;
-			for (i = 0; i + 12 < buflen; i++) { // looking for DTS or AC3 sync
+			for (i = 0; i + 22 < buflen; i++) { // looking for DTS/AC3/MLP sync
 				if (ParseDTSHeader(buffer + i)) {
 					m_streamtype = DTS;
 					break;

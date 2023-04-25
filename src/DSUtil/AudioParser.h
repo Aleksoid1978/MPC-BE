@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2022 see Authors.txt
+ * (C) 2011-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,6 @@
 #pragma once
 
 #include <MMReg.h>
-#include "GolombBuffer.h"
 
 #define AC3_SYNCWORD                 0x770B
 #define AC3_SYNCWORD_LE              0x0B77
@@ -73,7 +72,6 @@ enum {
 	IEC61937_TRUEHD             = 0x16,          ///< TrueHD data
 };
 
-
 DWORD GetDefChannelMask(WORD nChannels);
 DWORD GetVorbisChannelMask(WORD nChannels);
 
@@ -84,6 +82,7 @@ struct audioframe_t {
 	int samples;
 	int param1;
 	int param2;
+	int param3;
 
 	void Empty() {
 		memset(this, 0, sizeof(*this));
@@ -110,7 +109,7 @@ int ParseAC3Header         (const BYTE* buf, audioframe_t* audioframe = nullptr)
 // need >= 6 bytes, param1 = eac3 frame type
 int ParseEAC3Header        (const BYTE* buf, audioframe_t* audioframe = nullptr);
 
-// need >= 12 bytes, param1 = bitdepth, param2 = TrueHD flag
+// need >= 22 bytes, param1 = bitdepth, param2 = TrueHD flag, param3 = TrueHD Atmos flag
 int ParseMLPHeader         (const BYTE* buf, audioframe_t* audioframe = nullptr);
 
 // need >= 10 bytes, param2 = x96k extension flag
