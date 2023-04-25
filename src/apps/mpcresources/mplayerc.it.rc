@@ -902,7 +902,7 @@ BEGIN
     COMBOBOX        IDC_COMBO2,64,40,50,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "60 fps",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,118,42,48,10
     CONTROL         "HDR",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,170,42,30,10
-    LTEXT           "Preferred audio track language:",IDC_STATIC4,10,59,140,8
+    LTEXT           "Lingua preferita per la traccia audio:",IDC_STATIC4,10,59,140,8
     COMBOBOX        IDC_COMBO5,10,70,130,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Carica playlist",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,87,100,10
     GROUPBOX        "",IDC_STATIC,6,105,285,57
@@ -2981,7 +2981,7 @@ BEGIN
     IDS_MAINFRM_4           "Impossibile salvare i sottotitoli"
     IDS_AG_FRAMERATE        "Frequenza fotogrammi"
     IDS_MAINFRM_6           "disegnati: %d, saltati: %d"
-    IDS_AG_FRAMES           "Fotogramma"
+    IDS_AG_FRAMES           "Fotogrammi"
     IDS_AG_BUFFERS          "Buffer"
     IDS_MAINFRM_9           "Volume: %02d/%02d, Titolo: %02d/%02d, Capitolo: %02d/%02d"
     IDS_MAINFRM_10          "Angolo: %02d/%02d, %dx%d %dHz %d:%d"
