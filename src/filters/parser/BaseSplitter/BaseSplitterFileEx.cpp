@@ -612,7 +612,7 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 				pmt->subtype         = aframe.param2 ? MEDIASUBTYPE_DOLBY_TRUEHD : MEDIASUBTYPE_MLP;
 				pmt->formattype      = FORMAT_WaveFormatEx;
 
-				WAVEFORMATEX* wfe    = (WAVEFORMATEX*)pmt->AllocFormatBuffer(sizeof(WAVEFORMATEX));
+				WAVEFORMATEX* wfe    = (WAVEFORMATEX*)pmt->AllocFormatBuffer(sizeof(WAVEFORMATEX) + aframe.param3);
 				memset(wfe, 0, sizeof(WAVEFORMATEX));
 				wfe->wFormatTag      = WAVE_FORMAT_UNKNOWN;
 				wfe->nChannels       = aframe.channels;
@@ -620,6 +620,11 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 				wfe->nAvgBytesPerSec = (bitrate + 4) / 8;
 				wfe->nBlockAlign     = fsize < WORD_MAX ? fsize : WORD_MAX;
 				wfe->wBitsPerSample  = aframe.param1;
+				wfe->cbSize          = aframe.param3;
+
+				if (aframe.param3) {
+					(reinterpret_cast<BYTE*>(wfe + 1))[0] = static_cast<BYTE>(aframe.param3);
+				}
 
 				pmt->SetSampleSize(0);
 			}

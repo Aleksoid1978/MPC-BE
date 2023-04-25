@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -224,7 +224,7 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 					CString codecName = CMediaTypeEx::GetAudioCodecName(pmt->subtype, pInfo->wFormatTag);
 					if (!codecName.IsEmpty()) {
 						if (codecName == L"DTS" && pInfo->cbSize == 1) {
-							const auto profile = ((BYTE *)(pInfo + 1))[0];
+							const auto profile = (reinterpret_cast<const BYTE *>(pInfo + 1))[0];
 							switch (profile) {
 								case DCA_PROFILE_HD_HRA:
 									codecName = L"DTS-HD HRA";
@@ -236,7 +236,13 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 									codecName = L"DTS Express";
 									break;
 							}
+						} else if (codecName == "TrueHD" && pInfo->cbSize == 1) {
+							const auto flag = (reinterpret_cast<const BYTE*>(pInfo + 1))[0];
+							if (flag == 1) {
+								codecName.Append(L" - Atmos");
+							}
 						}
+
 						Infos.emplace_back(codecName);
 					}
 				}

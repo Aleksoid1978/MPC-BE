@@ -1611,9 +1611,18 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							mt.subtype = MEDIASUBTYPE_DOLBY_DDPLUS;
 						} else if (type == AP4_ATOM_TYPE_mlpa) {
 							mt.subtype = MEDIASUBTYPE_DOLBY_TRUEHD;
-						}
 
-						if (type == AP4_ATOM_TYPE('m', 's', 0x00, 0x02)) {
+							m_pFile->Seek(sample.GetOffset());
+							AP4_DataBuffer data;
+							if (AP4_SUCCEEDED(sample.ReadData(data)) && data.GetDataSize() >= 22) {
+								audioframe_t aframe;
+								if (ParseMLPHeader(data.GetData(), &aframe) && aframe.param3) {
+									wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 1);
+									wfe->cbSize = 1;
+									(reinterpret_cast<BYTE*>(wfe + 1))[0] = 1;
+								}
+							}
+						} else if (type == AP4_ATOM_TYPE('m', 's', 0x00, 0x02)) {
 							const WORD numcoef = 7;
 							static ADPCMCOEFSET coef[] = { {256, 0}, {512, -256}, {0,0}, {192,64}, {240,0}, {460, -208}, {392,-232} };
 							const ULONG size = sizeof(ADPCMWAVEFORMAT) + (numcoef * sizeof(ADPCMCOEFSET));

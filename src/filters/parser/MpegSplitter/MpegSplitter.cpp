@@ -347,7 +347,15 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 			if (pMediaType->subtype == MEDIASUBTYPE_DOLBY_DDPLUS) {
 				Infos.emplace_back(L"Dolby Digital Plus");
 			} else if (pMediaType->subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
-				Infos.emplace_back(L"Dolby TrueHD");
+				CString codecName(L"Dolby TrueHD");
+				if (pInfo->cbSize == 1) {
+					const auto flag = (reinterpret_cast<const BYTE*>(pInfo + 1))[0];
+					if (flag == 1) {
+						codecName.Append(L" - Atmos");
+					}
+				}
+
+				Infos.emplace_back(codecName);
 			} else if (pMediaType->subtype == MEDIASUBTYPE_MLP) {
 				Infos.emplace_back(L"MLP");
 			} else if (pMediaType->subtype == MEDIASUBTYPE_AES3) {

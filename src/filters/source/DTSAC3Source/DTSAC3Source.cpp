@@ -418,6 +418,8 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 			m_bitrate = (int)(aframe.size * 8i64 * m_samplerate / m_framelength); // inaccurate, because framesize is not constant
 
+			m_atmos_flag = aframe.param3 == 1;
+
 			m_wFormatTag = WAVE_FORMAT_UNKNOWN;
 		} else {
 			break;
@@ -509,10 +511,14 @@ HRESULT CDTSAC3Stream::GetMediaType(int iPosition, CMediaType* pmt)
 		wfe->wBitsPerSample  = m_bitdepth;
 		wfe->cbSize = 0;
 
-		if (m_dts_hd_profile) {
+		if (m_dts_hd_profile || m_atmos_flag) {
 			wfe = (WAVEFORMATEX*)pmt->ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 1);
 			wfe->cbSize = 1;
-			((BYTE *)(wfe + 1))[0] = m_dts_hd_profile;
+			if (m_dts_hd_profile) {
+				(reinterpret_cast<BYTE*>(wfe + 1))[0] = m_dts_hd_profile;
+			} else {
+				(reinterpret_cast<BYTE*>(wfe + 1))[0] = 1;
+			}
 		}
 
 		if (m_streamtype == MLP || m_streamtype == TrueHD) {
