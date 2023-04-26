@@ -262,7 +262,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 		m_file.Seek(m_dataStart, CFile::begin);
 		BYTE buf[40] = { 0 };
-		if (m_file.Read(&buf, 40) != 40) {
+		if (m_file.Read(&buf, std::size(buf)) != std::size(buf)) {
 			break;
 		}
 		audioframe_t aframe;
