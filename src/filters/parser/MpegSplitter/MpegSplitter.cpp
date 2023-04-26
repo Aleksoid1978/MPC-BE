@@ -351,7 +351,7 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 				if (pInfo->cbSize == 1) {
 					const auto flag = (reinterpret_cast<const BYTE*>(pInfo + 1))[0];
 					if (flag == 1) {
-						codecName.Append(L" - Atmos");
+						codecName.Append(L" + Atmos");
 					}
 				}
 

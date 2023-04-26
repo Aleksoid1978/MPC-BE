@@ -245,7 +245,7 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 						} else if (codecName == "TrueHD" && pInfo->cbSize == 1) {
 							const auto flag = (reinterpret_cast<const BYTE*>(pInfo + 1))[0];
 							if (flag == 1) {
-								codecName.Append(L" - Atmos");
+								codecName.Append(L" + Atmos");
 							}
 						}
 
