@@ -769,11 +769,13 @@ const char* CFFAudioDecoder::GetCodecName()
 {
 	if (m_pAVCtx->codec_id == AV_CODEC_ID_DTS) {
 		switch (m_pAVCtx->profile) {
-			case FF_PROFILE_DTS_ES		: return "dts-es";
-			case FF_PROFILE_DTS_96_24	: return "dts 96/24";
-			case FF_PROFILE_DTS_HD_HRA	: return "dts-hd hra";
-			case FF_PROFILE_DTS_HD_MA	: return "dts-hd ma";
-			case FF_PROFILE_DTS_EXPRESS	: return "dts express";
+			case FF_PROFILE_DTS_ES           : return "dts-es";
+			case FF_PROFILE_DTS_96_24        : return "dts 96/24";
+			case FF_PROFILE_DTS_HD_HRA       : return "dts-hd hra";
+			case FF_PROFILE_DTS_HD_MA        : return "dts-hd ma";
+			case FF_PROFILE_DTS_HD_MA_X      : return "dts-hd ma + dts:x";
+			case FF_PROFILE_DTS_HD_MA_X_IMAX : return "dts-hd ma + dts:x imax";
+			case FF_PROFILE_DTS_EXPRESS      : return "dts express";
 		}
 	}
 	return (m_pAVCtx->codec_descriptor)->name;

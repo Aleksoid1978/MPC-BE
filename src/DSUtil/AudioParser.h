@@ -45,9 +45,11 @@
 #define EAC3_FRAME_TYPE_AC3_CONVERT 2
 #define EAC3_FRAME_TYPE_RESERVED    3
 
-#define DCA_PROFILE_HD_HRA  0x01 // High Resolution Audio
-#define DCA_PROFILE_HD_MA   0x02 // Master Audio
-#define DCA_PROFILE_EXPRESS 0x03 // Express
+#define DCA_PROFILE_HD_HRA       0x01 // High Resolution Audio
+#define DCA_PROFILE_HD_MA        0x02 // Master Audio
+#define DCA_PROFILE_EXPRESS      0x03 // Express
+#define DCA_PROFILE_HD_MA_X      0x04 // Master Audio + DTS:X
+#define DCA_PROFILE_HD_MA_X_IMAX 0x05 // Master Audio + DTS:X IMAX
 
 enum {
 	IEC61937_AC3                = 0x01,          ///< AC-3 data

@@ -232,6 +232,12 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 								case DCA_PROFILE_HD_MA:
 									codecName = L"DTS-HD MA";
 									break;
+								case DCA_PROFILE_HD_MA_X:
+									codecName = L"DTS-HD MA + DTS:X";
+									break;
+								case DCA_PROFILE_HD_MA_X_IMAX:
+									codecName = L"DTS-HD MA + DTS:X IMAX";
+									break;
 								case DCA_PROFILE_EXPRESS:
 									codecName = L"DTS Express";
 									break;

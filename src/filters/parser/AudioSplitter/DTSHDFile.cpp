@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2021 see Authors.txt
+ * (C) 2016-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -220,6 +220,12 @@ CString CDTSHDFile::GetName() const {
 				break;
 			case DCA_PROFILE_HD_MA:
 				name = L"DTS-HD MA";
+				break;
+			case DCA_PROFILE_HD_MA_X:
+				name = L"DTS-HD MA + DTS:X";
+				break;
+			case DCA_PROFILE_HD_MA_X_IMAX:
+				name = L"DTS-HD MA + DTS:X IMAX";
 				break;
 			case DCA_PROFILE_EXPRESS:
 				name = L"DTS Express";

@@ -950,6 +950,21 @@ int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t*
 	}
 
 	if (audioframe->samplerate && audioframe->channels) {
+		if (audioframe->param2 == DCA_PROFILE_HD_MA && gb.RemainingSize() > 4) {
+			auto start = gb.GetBufferPos();
+			auto end = start + gb.RemainingSize();
+			while (end - start >= 4) {
+				auto sync = GETU32(start++);
+				if (sync == 0x50080002 || sync == 0xD10040F1) {
+					audioframe->param2 = DCA_PROFILE_HD_MA_X;
+					break;
+				} else if (sync == 0xD00040F1) {
+					audioframe->param2 = DCA_PROFILE_HD_MA_X_IMAX;
+					break;
+				}
+			}
+		}
+
 		return hd_frame_size;
 	}
 
