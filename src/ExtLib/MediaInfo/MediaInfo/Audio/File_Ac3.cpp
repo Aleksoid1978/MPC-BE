@@ -2275,7 +2275,7 @@ void File_Ac3::Core_Frame()
     int8u  strmtyp=0, substreamid=0, acmod=0, bsmod=0, dsurmod=0;
     bool   compre=false, compr2e=false, dynrnge=false, dynrng2e=false;
     bool   lfeon=false, chanmape=false;
-    bool   addbsie;
+    bool   addbsie=false;
 
     if (bsid<=0x09)
     {

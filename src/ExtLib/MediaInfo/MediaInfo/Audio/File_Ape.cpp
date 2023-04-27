@@ -106,7 +106,7 @@ bool File_Ape::FileHeader_Begin()
     if (Buffer[Buffer_Offset  ]!=0x4D //"MAC "
      || Buffer[Buffer_Offset+1]!=0x41
      || Buffer[Buffer_Offset+2]!=0x43
-     || Buffer[Buffer_Offset+3]!=0x20)
+     || (Buffer[Buffer_Offset+3]!=0x20 && Buffer[Buffer_Offset+3]!='F'))
     {
         File__Tags_Helper::Reject("APE");
         return false;
@@ -119,9 +119,9 @@ bool File_Ape::FileHeader_Begin()
 void File_Ape::FileHeader_Parse()
 {
     //Parsing
-    int32u SampleRate=0, TotalFrames=0, FinalFrameSamples=0, SamplesPerFrame=0, SeekElements;
+    int32u Identifier, SampleRate=0, TotalFrames=0, FinalFrameSamples=0, SamplesPerFrame=0, SeekElements;
     int16u Version, CompressionLevel=0, Flags=0, Channels=0, Resolution=0;
-    Skip_C4(                                                    "Identifier");
+    Get_C4 (Identifier,                                         "Identifier");
     Get_L2 (Version,                                            "Version");
     if (Version<3980) //<3.98
     {
@@ -192,6 +192,11 @@ void File_Ape::FileHeader_Parse()
 
         File__Tags_Helper::Stream_Prepare(Stream_Audio);
         Fill(Stream_Audio, 0, Audio_Format, "Monkey's Audio");
+        auto VersionS = Ztring::ToZtring(Version/1000.0, 3);
+        Fill(Stream_General, 0, General_Format_Version, VersionS);
+        Fill(Stream_Audio, 0, Audio_Format_Version, VersionS);
+        if (Identifier==0x4D414346)
+            Fill(Stream_Audio, 0, Audio_Format_Profile, "Float");
         Fill(Stream_Audio, 0, Audio_Encoded_Library_Settings, Ape_Codec_Settings(CompressionLevel));
         Fill(Stream_Audio, 0, Audio_Codec, "APE");
         Fill(Stream_Audio, 0, Audio_BitDepth, Resolution);

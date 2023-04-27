@@ -373,6 +373,9 @@ private :
     void sei_message_user_data_registered_itu_t_t35_B5_003C();
     void sei_message_user_data_registered_itu_t_t35_B5_003C_0001();
     void sei_message_user_data_registered_itu_t_t35_B5_003C_0001_04();
+    void sei_message_user_data_registered_itu_t_t35_26();
+    void sei_message_user_data_registered_itu_t_t35_26_0004();
+    void sei_message_user_data_registered_itu_t_t35_26_0004_0005();
     void sei_message_user_data_unregistered(int32u payloadSize);
     void sei_message_user_data_unregistered_Ateme(int32u payloadSize);
     void sei_message_user_data_unregistered_x265(int32u payloadSize);

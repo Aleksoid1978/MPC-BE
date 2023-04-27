@@ -97,6 +97,8 @@ void File__Tags_Helper::Streams_Fill()
             Parser_Streams_Fill[Pos]->Read_Buffer_Finalize();
             Base->Merge(*(Parser_Streams_Fill[Pos]), Stream_General, 0, 0, Priority);
             Base->Merge(*(Parser_Streams_Fill[Pos]), Stream_Audio  , 0, 0, Priority);
+            if (Parser_Streams_Fill[Pos]->Count_Get(Stream_Image))
+                Base->Merge(*(Parser_Streams_Fill[Pos]), Stream_Image, 0, 0);
         }
         delete Parser_Streams_Fill[Pos]; //Parser_Streams_Fill[Pos]=NULL;
     }

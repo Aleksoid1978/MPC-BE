@@ -755,6 +755,12 @@
     <ClInclude Include="MediaInfo\Multiple\File_Nsv.h">
       <Filter>Header Files\Multiple</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Video\File_Vp9.h">
+      <Filter>Header Files\Video</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Audio\File_Aptx100.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1452,6 +1458,12 @@
     </ClCompile>
     <ClCompile Include="MediaInfo\Multiple\File_Nsv.cpp">
       <Filter>Source Files\Multiple</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Audio\File_Aptx100.cpp">
+      <Filter>Source Files\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Video\File_Vp9.cpp">
+      <Filter>Source Files\Video</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

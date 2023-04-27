@@ -1,7 +1,7 @@
   Language_ISO639;it
   Author_Email;dr4k0@altervista.org  - bovirus@live.it
-  Author_Name;v. 03.04.2022 di Dr4k0/bovirus
-  Author_OldNames;Dr4k0 & bovirus
+  Author_Name;v. 03.04.2023 di Dr4k0/bovirus
+  Author_OldNames;Dr4k0 & R.B.
   Language_Name;Italiano
   Config_Text_ColumnSize;40
   Config_Text_Separator;: 
@@ -67,9 +67,9 @@
  hour2; ore
  hour3; ore
  Hz; Hz
- image stream1; flusso immagine
- image stream2; flusso immagini
- image stream3; flusso immagini
+ image stream1; stream immagine
+ image stream2; stream immagini
+ image stream3; stream immagini
  KB; KB
  Kb; Kb
  KBps; kb/s
@@ -150,12 +150,12 @@
 : ;: 
 3D; 3D
 3DType; Tipo 3D
-5.1.2ch;
-5.1.4ch;
-5.1ch;
+5.1.2ch; 5.1.1 can
+5.1.4ch;5.1.4 can
+5.1ch;5.1 can
 608_Mode; Modalità conversione EIA-608
-7.1.2ch;
-7.1ch;
+7.1.2ch;7.1.2 can
+7.1ch;7.1 can
 About;Info programma
 About_Hint;Contatta l'autore e ottieni la versione del programma più recente
 Accompaniment;Accompagnamento
@@ -168,14 +168,14 @@ Add version to text output; Aggiungi versione all'output del testo
 Added_Date;Data
 Address;Indirizzo
 AdID; Identificatore ID annuncio
-ADM: Show ChannelFormats; ADM: Visualizza formati canale
-ADM: Show TrackUIDs; ADM: Visualizza TRACKUID
+ADM: Show ChannelFormats; ADM: visualizza formati canale
+ADM: Show TrackUIDs; ADM: visualizza UID traccia
 AdmProfile; Profilo ADM
 Advanced;Modalità avanzata
 Advanced mode;Modalità avanzata
 Album;Album
-Album_ReplayGain_Gain;Album replay gain
-Album_ReplayGain_Peak;Picco album replay gain
+Album_ReplayGain_Gain;Album Replay Gain
+Album_ReplayGain_Peak;Picco album Replay Gain
 Alignment;Allineamento
 Alignment_Aligned;Audio allineato 
 Alignment_Split;Audio suddiviso
@@ -205,9 +205,9 @@ AudioRenderingIndication;Indicazione rendering audio
 AudioSceneInfoID;ID informazioni scena audio
 AudioTrackLayout;Layout traccia audio
 Author;Autore
-Back4ToBack2;
-Balance_FrontBackListener;
-Balance_FrontBackOverheadFloor;
+Back4ToBack2;Posteriore 4 a posteriore 2
+Balance_FrontBackListener;Bilancia ascolto frontale posteriore
+Balance_FrontBackOverheadFloor;Bilancia frontale piano sopraelevato
 BarCode;Codice a barre
 Basic;Semplice
 Basic_Note;Nota: per maggiori informazioni seleziona Scheda, Struttura....
@@ -232,8 +232,8 @@ CaptionServiceName;Titolo nome servizio
 Channel(s);Canali
 ChannelCoded;Canale codificato
 ChannelConfiguration;Configurazione canale
-ChannelFormat;
-ChannelLayout;Layout canale
+ChannelFormat;Formato canale
+ChannelLayout;Disposizione canale
 ChannelMode;Modo canale
 ChannelPositions;Posizione canali
 Chapter(s);Capitoli
@@ -252,7 +252,7 @@ Choose filename;Inserire il nome del file
 Choose language;Scegli la lingua
 Choreographer;Coreografo
 Chroma;Croma
-ChromaSubsampling;Croma subsampling
+ChromaSubsampling;Sottocampionamento croma
 Classifier;Classificatore contenuto
 ClearList;Azzera elenco
 Close;Chiudi
@@ -280,7 +280,7 @@ Codec_Settings_Sign;Impostazioni codec, Sign
 Codec_Url;Sito dove scaricare il codec richiesto
 CodecConfigurationBox;Casella configurazione codec
 CodecID;ID codec
-CodecID_Description;Descrizione del codec
+CodecID_Description;Descrizione codec
 CoDirector;Codirettore
 Collection;Collezione
 Colorimetry;Colorimetria
@@ -290,7 +290,7 @@ colour_range;Intervallo colore
 Comment;Commento
 CommissionedBy;Commissionato da
 Compilation;Compilation
-ComplementaryObject;
+ComplementaryObject;Oggetto complementare
 CompleteName;Nome completo
 CompletionDate;Data completamento
 ComplexityIndex;Indice complessità
@@ -301,17 +301,17 @@ Compression_Mode_Lossy;Con perdita
 Compression_Ratio; Rapporto compressione
 Conductor;Direttore d'orchestra 
 ConformanceCheck;Controllo di conformità
-ConformanceErrors;
-ConformanceInfos;
-ConformanceWarnings;
+ConformanceErrors;Errore conformità
+ConformanceInfos;Inbfo conformità
+ConformanceWarnings;Avviso conformità
 ContactEmail;Email contatto
 ContactTelephoneNumber;Telefono contatto
 Container and general information;Tipo di file e informazioni generali
-Content;
-ContentType;Contenuto
+Content;Contenuto
+ContentType;Tipo contenuto
 CoProducer;Coproduttore
 Copyright;Copyright
-CopyrightYear;Anno opyright
+CopyrightYear;Anno copyright
 CostumeDesigner;Costumista
 Count;Contatore
 Country;Stato
@@ -322,7 +322,7 @@ Cover_Mime;Copertina MIME
 Cover_Type;Tipo di copertina
 Cropped;Dimensioni ritaglio
 Custom;Vista personalizzata
-CustomDownmixTargets;
+CustomDownmixTargets;Livello downmix personalizzato
 Customize;Personalizza
 DarkMode;Modo scuro
 Date;Data
@@ -365,14 +365,14 @@ Duration_End_Command;Fine (comando)
 Duration_Start;Inizio
 Duration_Start_Command;Inizio (comando)
 Duration_Start2End;Durata contenuto visibile
-DynamicObject;
+DynamicObject;Oggetto dinamico
 DynamicRangeControl;Controllo gamma dinamica
 Eac3DrcProfile;Profilo DRC E-AC-3
 Edit;Modifica
 EditedBy;Modificato da
 EditorialClassification;Classificazione editoriale
-ElementaryStream;
-ElementCount;umero elementi
+ElementaryStream;Stream elementare
+ElementCount;N. elementi
 EMail;Email
 Encoded_Application;Creato con
 Encoded_Date;Data codifica
@@ -411,7 +411,7 @@ FileNameExtension;Estensione nome file
 FileSize;Dimensione file
 FirstDisplay_Delay_Frames;N. fotogrammi prima del primo evento
 FirstDisplay_Type;Tipo del primo evento
-FirstFrameOfAction;
+FirstFrameOfAction;Primo fotogramma azione
 FlatPanelTv;TV a schermo piatto
 FlowID;ID flusso
 Folder;Cartella
@@ -457,7 +457,7 @@ Format_Settings_Wrapping;Impostazioni formato, modo a capo automatico
 Format_Tier;Livello formato
 Format_Url;Sito web formato
 Format_Version;Versione formato
-FormatDefinition;
+FormatDefinition;Definizione formato
 FpaManufacturer;Produttore FPA
 FpaPass;Pass FPA
 FpaVersion;Versione FPA
@@ -484,7 +484,7 @@ Genre_007;Hip - Hop
 Genre_008;Jazz
 Genre_009;Metal
 Genre_010;New Age
-Genre_011;Intramontabili
+Genre_011;Industriale
 Genre_012;Altri
 Genre_013;Pop
 Genre_014;R&B
@@ -519,8 +519,8 @@ Genre_042;Soul
 Genre_043;Punk
 Genre_044;Space
 Genre_045;Meditativa
-Genre_046;Strumentale POP
-Genre_047;Strumentale Rock
+Genre_046;Strumentale pop
+Genre_047;Strumentale rock
 Genre_048;Etnica
 Genre_049;Gothica
 Genre_050;Darkwave
@@ -698,7 +698,7 @@ ImageCount;N. flussi immagine
 ImmersiveStereo;Stereo coinvolgente
 Info;Informazioni
 Instruments;Strumenti
-IntegratedLoudness;
+IntegratedLoudness;Loudness integrato
 IntegratedLoudness_Level;Loudness integrato (livello gated)
 IntegratedLoudness_Speech;Loudness integrato livello parlato)
 InteractivityEnabled;Interattività abilitata
@@ -838,7 +838,7 @@ Language_mo;Moldavo
 Language_More;Info aggiuntive lingua
 Language_mr;Marathi
 Language_ms;Malese
-Language_ms-bn;
+Language_ms-bn;Malese (Birmania)
 Language_mt;Maltese
 Language_mul;Multilingua
 Language_my;Burmese
@@ -933,13 +933,13 @@ Lines_MaxCountPerEvent;N. max linee per evento
 LineUpStart;Avvio lineup
 LinkedTo_Bed_Pos;Letto #s
 LinkedTo_ChannelFormat_Pos;Formato canale #s
-LinkedTo_ComplementaryObject_Pos;
+LinkedTo_ComplementaryObject_Pos;Posizione oggetto complementare
 LinkedTo_Content_Pos;Contenuto #s
 LinkedTo_Group_Pos;Gruppo #s
 LinkedTo_Object_Pos;Oggetto #s
 LinkedTo_PackFormat_Pos;Formato pacchetto #s
 LinkedTo_SignalGroup_Pos;Gruppo segnale #s
-LinkedTo_StreamFormat_Pos;
+LinkedTo_StreamFormat_Pos;Posizione formato stream
 LinkedTo_Substream_Pos;Sottoflusso #s
 LinkedTo_TrackFormat_Pos;Formato traccia #s
 LinkedTo_TrackUID_Pos;UID traccia #s
@@ -972,7 +972,7 @@ Mastered_Date;Data incisione
 MasteredBy;Inciso da
 MasteringDisplay_ColorPrimaries;Colori primari display mastering
 MasteringDisplay_Luminance;Luminanza display mastering
-Matrix_Channel(s);Codica a matrice, Canale/i
+Matrix_Channel(s);Codifica a matrice, Canale/i
 Matrix_ChannelPositions;Codifica a matrice, posizione canali
 matrix_coefficients;Coefficienti matrici
 Matrix_Format;Codifica a matrice, formato
@@ -1011,7 +1011,7 @@ NetworkName;Nome rete
 New;Nuova
 Newest version;Controlla aggiornamenti (richiede una connessione a internet)
 NewVersion_Menu;È disponibile una nuova versione
-NewVersion_Question_Content;È disponibile una nuova versione (v%Version%). Vuoi scaricarla ora?
+NewVersion_Question_Content;È disponibile una nuova versione (v. %Version%). \r\nVuoi scaricarla ora?
 NewVersion_Question_Title;È stata rilasciata una nuova versione!
 No;No
 Not yet;Non ancora
@@ -1028,7 +1028,7 @@ NumberOfSubstreams;N. sotto flussi
 NumberOfTrackFormats;N. formati tracce
 NumberOfTrackUIDs;N. UID traccia
 NumColors;Numero colori
-Object;
+Object;Oggetto
 ObjectCount;N. oggetti
 OK;OK
 One output file per input file;Un file destinazione per ogni file sorgente
@@ -1037,9 +1037,9 @@ OpenCandy_01;Download ________
 OpenCandy_02;__% completato
 OpenCandy_03;Connessione internet interrotta
 OpenCandy_04;________ download completato
-OpenCandy_05;Fai clic per installare ________
-OpenCandy_06;Annullare l'installazione?\r\nSe vuoi postporre l'installazione, seleziona <No>.\r\nNota: puoi selezionare <Esci> dal menu per annullare l'installazione sino al nuovo riavvio.
-OpenCandy_07;Il download di ________ è stato messo in pausa.\r\nFai clic sull'icona nella barra di sistema per riprendere.
+OpenCandy_05;Per installare seleziona ________
+OpenCandy_06;Vuoi annullare l'installazione?\r\nSe vuoi posporre l'installazione, seleziona 'No'.\r\nNota: puoi selezionare 'Esci' dal menu per annullare l'installazione sino al nuovo riavvio.
+OpenCandy_07;Il download di ________ è stato messo in pausa.\r\nPer riprendere seleziona l'icona nella barra di sistema .
 OpenCandy_08;ERRORE CRITICO. L'installazione di _________ è stata annullata.
 OpenCandy_09;Pausa
 OpenCandy_10;Annulla installazione
@@ -1049,15 +1049,15 @@ OpenCandy_13;___________ - Raccomandato da ____________
 OpenCandy_14;Download di _________
 OpenCandy_15;___________, programma raccomandato da ___________, è in download Verrai avvisato quando sarà pronto per l'installazione.
 OpenCandy_16;___________ è pronto per l'installazione
-OpenCandy_17;___________ è stato scaricato. Fai clic su <Installa> per procedere.
+OpenCandy_17;___________ è stato scaricato. Per procedere seleziona 'Installa' per procedere.
 OpenCandy_18;___________ di ___________ scaricati
 OpenCandy_19;Realizzato da OpenCandy
 OpenCandy_20;Maggiori informazioni su OpenCandy.com
 OpenCandy_21;Installa
 OpenCandy_22;Installazione di ___________
-OpenCandy_23;Questo annullerà l'installazione di ___________\r\nAnnullare l'installazione?
+OpenCandy_23;Questo annullerà l'installazione di ___________\r\nVuoi annullare l'installazione?
 OpenCandy_24;Pausa
-OpenCandy_25;Il download è stato messo in pausa. Fai clic su <Riprendi> per continuare.
+OpenCandy_25;Il download è stato messo in pausa. Per continuare seleziona 'Riprendi' .
 OpenCandy_26;Riprendi
 OpenCandy_27;Installa ora
 OpenCandy_28;Pausa
@@ -1091,7 +1091,7 @@ OverallBitRate_Minimum;Bitrate minimo generale
 OverallBitRate_Mode;Modo bitrate generale
 OverallBitRate_Nominal;BitRate nominale generale
 PackageName;Nome pacchetto
-PackFormat;
+PackFormat;Formato pacchetto
 Part;Parte
 Part_Count;Totale
 PartNumber;Numero parte
@@ -1134,7 +1134,7 @@ ProductionDesigner;Designer produzione
 ProductionNumber;N. prodotto
 ProductionStudio;Studio di registrazione
 ProductPlacement;Posizionamento prodotto
-Programme;
+Programme;Programma
 ProgrammeHasText;Il programma ha testo
 ProgrammeTextLanguage;Lingua testo programma
 ProgrammeTitle;Titolo programma
@@ -1171,8 +1171,8 @@ ScanType;Tipo scansione
 ScanType_Original;Tipo scansione originale
 ScanType_StoreMethod;Tipo scansione, metodo memorizzazione
 ScreenplayBy;Sceneggiatura
-ScreenToCenter;
-ScreenToFront;
+ScreenToCenter;Schermo al centro
+ScreenToFront;Schermo in primo piano
 Season;N. stagione
 SecondaryAudioLanguage;Seconda lingua audio
 see below;vedi sotto
@@ -1193,20 +1193,20 @@ Sheet;Scheda
 Sheet (Complete);Scheda (completa)
 Shell extension;Aggiungi 'Apri con MediaInfo' al menu contestuale
 Shell extension, folder;Anche per le cartelle
-Shell InfoTip;Informazioni in Explorer (in Explorer, spostarsi sul file e verrà visualizzate le informazioni)
+Shell InfoTip;Informazioni in Explorer (in Explorer, spostati sul file e verranno visualizzate le informazioni)
 ShimName;Nome shim
 ShimVersion;Versione shim
 Show menu;Visualizza menu
 Show toolbar;Visualizza barra strumenti
-SignalGroup;gruppos egnale
+SignalGroup;Gruppo segnale
 SigningPresent;Firma presente
 SignLanguage;Lingua firma
 Sort;Ordinato per
-SoundCategory;Catagoria suono
+SoundCategory;Categoria suono
 SoundEngineer;Tecnico del suono
 Source;Sorgente
 Source_Duration;Durata sorgente
-Source_FrameCount;N. fotgramma sorgente
+Source_FrameCount;N. fotogramma sorgente
 Source_SamplingCount;N. campioni sorgente
 Source_StreamSize;Dim. flusso sorgente
 Source_StreamSize_Encoded;Dim. traccia codificata sorgente
@@ -1219,7 +1219,7 @@ StoreMethod_SeparatedFields_2;Campi separati (2 campi per blocco)
 Stream;Traccia
 Stream_MoreInfo;Altre informazioni sulla traccia
 StreamCount;Numero tracce
-StreamFormat;
+StreamFormat;Formato stream
 StreamID;ID traccia
 streamIdentifier;Identificatore traccia
 StreamKind;Tipo traccia
@@ -1250,8 +1250,8 @@ SubtstreamIdChannel;ID sotto flusso iniziale e indice canale
 Summary;Riassunto
 Supported formats;Formati supportati
 Supported?;Supportato?
-SupportUs;Supportaci. Otterai il tema scuro e in futuro maggiori funzioni.
-SurroundAttenuationKnown;Attenuazione surround nota
+SupportUs;Supportaci. Otterrai il tema scuro e in futuro maggiori funzioni.
+SurroundAttenuationKnown;Attenuazione nota surround
 SwitchGroup;Gruppo switch
 Synopsis;Sommario
 SystemId;ID sistema
@@ -1277,7 +1277,7 @@ ThanksTo;Ringraziamenti
 Thousands separator;Separatore centinaia
 TimeCode;Timecode
 TimeCode_FirstFrame;Timecode primo fotogramma
-TimeCode_LastFrame;
+TimeCode_LastFrame;Timecode ultimo fotogramma
 TimeCode_MaxFrameNumber;N. max di fotogrammi nel timecode
 TimeCode_MaxFrameNumber_Theory;N. max fotogrammi reali nel timecode
 TimeCode_Settings;Impostazioni timecode
@@ -1287,18 +1287,18 @@ TimeStamp;Data/ora
 TimeZone;Fuso orario
 Title;Titolo
 Title_More;Titolo, altre info
-Top4ToTop2;
-TopBackToFront;
-TopBackToSide;
-TopFrontToBack;
-TopFrontToFront;
-TopFrontToSide;
+Top4ToTop2;Alto 4 a alto 2
+TopBackToFront;Alto in avanti
+TopBackToSide;Alto a lato
+TopFrontToBack;Alto da avanti a dietro
+TopFrontToFront;Alto avanti a avanti
+TopFrontToSide;Alto avanti a lato
 Total;Totale
 TotalNumberOfParts;Numero totale parti
 TotalProgrammeDuration;Durata totale programma
 Track;Traccia
 Track_Count;N. traccia
-TrackFormat;
+TrackFormat;Formato traccia
 TrackIndex;Indice traccia
 TrackUID;UID traccia
 transfer_characteristics;Caratteristiche trasferimento
@@ -1307,19 +1307,19 @@ Translator;Traduzione
 Transport;Trasporto
 Tree;Struttura
 Tree & Text;Struttura e testo
-Trim_Center;
-Trim_Height;
-Trim_Surround;
-TrimMode;
-TrimMode0i;
-TrimMode1i;
-TrimMode2i;
-TrimMode3i;
-TrimMode4i;
-TrimMode5i;
-TrimMode6i;
-TrimMode7i;
-TrimMode8i;
+Trim_Center;Ritaglia centro
+Trim_Height;Altezza taglio
+Trim_Surround;Taglio surround
+TrimMode;Modo taglio
+TrimMode0i;Modo taglio 0i
+TrimMode1i;Modo taglio 1i
+TrimMode2i;Modo taglio 2i
+TrimMode3i;Modo taglio 3i
+TrimMode4i;Modo taglio 4i
+TrimMode5i;Modo taglio 5i
+TrimMode6i;Modo taglio 6i
+TrimMode7i;Modo taglio 7i
+TrimMode8i;Modo taglio 8i
 TruePeakLevel;Livello di picco reale
 TruePeakLevel_Album;Livello di picco reale (album)
 Type;Tipo
@@ -1346,16 +1346,16 @@ Warning : more streams in the files;Attenzione: ci sono diverse tracce nei file
 Web;Web
 WebSite;Sito web
 WebSite_Audio;Vai al sito web di questo codec audio
-WebSite_Audio_More;Vai al sito web (%Url%) per info su questo codec audio
-WebSite_General;Vai al sito web del player per questo file
-WebSite_General_More;Vai al sito web del player per questo file
-WebSite_Text;Vai al sito web per questo sottotitolo
+WebSite_Audio_More;Per info su questo codec audio vai al sito web (%Url%) 
+WebSite_General;Per questo file vai al sito web del riproduttore 
+WebSite_General_More;Per questo file vai al sito web del riproduttore 
+WebSite_Text;Per questo sottotitolo vai al sito web 
 WebSite_Text_More;Vai al sito web (%Url%) per info su questo sottotitolo
 WebSite_Url;http://MediaArea.net/MediaInfo
 WebSite_Video;Vai al sito web per info su questo codec video
-WebSite_Video_More;Vai al sito web (%Url%) per info su questo video
+WebSite_Video_More;Per info su questo video vai al sito web (%Url%) 
 Width;Larghezza
-Width_CleanAperture;larghezza apertura
+Width_CleanAperture;Larghezza apertura
 Width_Original;Larghezza originale
 WriteMe;Invia email all'autore
 WriteToTranslator;Invia email al traduttore
@@ -1364,5 +1364,5 @@ Written_Location;Realizzato in
 WrittenBy;Realizzato da
 Yes;Si
 Your system;Info sul sistema
-ZZ_Automatic_Percent;96
-ZZ_AutomaticLanguage_Percent;96
+ZZ_Automatic_Percent;100
+ZZ_AutomaticLanguage_Percent;100

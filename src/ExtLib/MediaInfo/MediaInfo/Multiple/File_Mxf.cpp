@@ -803,6 +803,9 @@ static const char* Mxf_EssenceContainer(const int128u EssenceContainer)
                                                                                         case 0x10 : return "AVC";
                                                                                         case 0x11 : return "VC-3";
                                                                                         case 0x13 : return "Timed Text";
+                                                                                        case 0x16 : return "AAC (ADIF)";
+                                                                                        case 0x17 : return "AAC (ADTS)";
+                                                                                        case 0x18 : return "AAC (LATM/LOAS)";
                                                                                         case 0x1C : return "ProRes";
                                                                                         case 0x1D : return "IAB";
                                                                                         case 0x23 : return "FFV1";
@@ -949,6 +952,16 @@ static const char* Mxf_EssenceContainer_Mapping(int8u Code6, int8u Code7, int8u 
                     }
         case 0x13 : //Timed Text
                     return "Clip";
+        case 0x16 : //AAC, SMPTE ST 381-4
+        case 0x17 :
+        case 0x18 :
+                    switch (Code7)
+                    {
+                        case 0x01 : return "Frame";
+                        case 0x02 : return "Clip";
+                        case 0x03 : return "Custom";
+                        default   : return "";
+                    }
         case 0x1C : //ProRes
                     switch (Code7)
                     {
@@ -1110,7 +1123,26 @@ static const char* Mxf_EssenceCompression(const int128u EssenceCompression)
                                                                                                     }
                                                                                         default   : return "";
                                                                                     }
-                                                                         default   : return "";
+                                                                        case 0x04 : //MPEG Audio Compression (SMPTE ST 381-4)
+                                                                                    switch (Code6) {
+                                                                                        case 0x03 : //MPEG-2 AAC
+                                                                                                    switch (Code7)
+                                                                                                    {
+                                                                                                        case 0x01 : return "Low Complexity Profile MPEG-2 AAC";
+                                                                                                        case 0x02 : return "Low Complexity Profile MPEG-2 AAC LC+SBR";
+                                                                                                        default   : return ""; //Unknown
+                                                                                                    }
+                                                                                        case 0x04 : //MPEG-4 AAC
+                                                                                                    switch (Code7)
+                                                                                                    {
+                                                                                                        case 0x01 : return "MPEG-4 AAC Profile";
+                                                                                                        case 0x02 : return "MPEG-4 High Efficiency AAC Profile";
+                                                                                                        case 0x03 : return "MPEG-4 High Efficiency AAC v2 Profile";
+                                                                                                        default   : return ""; //Unknown
+                                                                                                    }
+                                                                                        default   : return "";
+                                                                                    }
+                                                                        default   : return "";
                                                                     }
                                                          default   : return "";
                                                     }
@@ -1310,6 +1342,27 @@ static const char* Mxf_EssenceCompression_Version(const int128u& EssenceCompress
                                                                                         case 0x04 : return "Version 1"; //Layer 1
                                                                                         case 0x05 : return "Version 1"; //Layer 2 or 3
                                                                                         case 0x06 : return "Version 2"; //Layer 1
+                                                                                        default   : return ""; //Unknown
+                                                                                    }
+                                                                        default   : return "";
+                                                                    }
+
+                                                        case 0x04 : //MPEG Audio Compression (SMPTE ST 381-4)
+                                                                    switch (Code6)
+                                                                    {
+                                                                        case 0x03 : //MPEG-2 AAC
+                                                                                    switch (Code7)
+                                                                                    {
+                                                                                        case 0x01 : return "Version 4";
+                                                                                        case 0x02 : return "Version 4";
+                                                                                        default   : return ""; //Unknown
+                                                                                    }
+                                                                        case 0x04 : //MPEG-4 AAC
+                                                                                    switch (Code7)
+                                                                                    {
+                                                                                        case 0x01 : return "Version 4";
+                                                                                        case 0x02 : return "Version 4";
+                                                                                        case 0x03 : return "Version 4";
                                                                                         default   : return ""; //Unknown
                                                                                     }
                                                                         default   : return "";
@@ -8276,10 +8329,10 @@ void File_Mxf::MpegAudioDescriptor()
         }
     }
 
-    //switch(Code2)
-    //{
-    //    default: GenericSoundEssenceDescriptor();
-    //}
+    switch(Code2)
+    {
+        default: GenericSoundEssenceDescriptor();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -17044,6 +17097,15 @@ void File_Mxf::ChooseParser(const essences::iterator &Essence, const descriptors
                                                                                     }
                                                                         default   : return;
                                                                     }
+
+                                                        case 0x04 : //MPEG Compressed Audio (SMPTE ST 381-4)
+                                                                    switch (Code6)
+                                                                    {
+                                                                        case 0x03 :
+                                                                        case 0x04 : return ChooseParser_Aac(Essence, Descriptor);
+                                                                        default   : return;
+                                                                    }
+
                                                          default   : return;
                                                     }
                                          default   : return;
@@ -17103,6 +17165,9 @@ void File_Mxf::ChooseParser__FromEssenceContainer(const essences::iterator &Esse
                                                                                         case 0x10 : return ChooseParser_Avc(Essence, Descriptor);
                                                                                         case 0x11 : return ChooseParser_Vc3(Essence, Descriptor);
                                                                                         case 0x13 : return ChooseParser_TimedText(Essence, Descriptor);
+                                                                                        case 0x16 : return ChooseParser_Adif(Essence, Descriptor); //AAC with ADIF (SMPTE ST 381-4)
+                                                                                        case 0x17 : return ChooseParser_Adts(Essence, Descriptor); //AAC with ADTS ADTS (SMPTE ST 381-4)
+                                                                                        case 0x18 : return ChooseParser_Latm(Essence, Descriptor); //AAC with LATM/LOAS (SMPTE ST 381-4)
                                                                                         default   : return;
                                                                                     }
                                                                         default   : return;
@@ -17380,8 +17445,20 @@ void File_Mxf::ChooseParser__Aaf_GC_Sound(const essences::iterator &Essence, con
         case 0x04 : //P2 Audio (PCM)
                     ChooseParser_Pcm(Essence, Descriptor);
                     break;
-        case 0x05 : //MPEG Audio
+        case 0x05 : //MPEG Audio, Frame wrapped
+                    ChooseParser_Aac(Essence, Descriptor);
                     ChooseParser_Mpega(Essence, Descriptor);
+                    Essences[Code_Compare4].Infos["Format_Settings_Wrapping"]=__T("Frame");
+                    break;
+        case 0x06 : //MPEG Audio, Clip wrapped
+                    ChooseParser_Aac(Essence, Descriptor);
+                    ChooseParser_Mpega(Essence, Descriptor);
+                    Essences[Code_Compare4].Infos["Format_Settings_Wrapping"]=__T("Clip");
+                    break;
+        case 0x07 : //MPEG Audio, Custom wrapped
+                    ChooseParser_Aac(Essence, Descriptor);
+                    ChooseParser_Mpega(Essence, Descriptor);
+                    Essences[Code_Compare4].Infos["Format_Settings_Wrapping"]=__T("Custom");
                     break;
         case 0x08 : //A-law, Frame wrapped
                     ChooseParser_Alaw(Essence, Descriptor);
@@ -17667,6 +17744,66 @@ void File_Mxf::ChooseParser_Aac(const essences::iterator &Essence, const descrip
         Open_Buffer_Init(Parser);
         Parser->Stream_Prepare(Stream_Audio);
         Parser->Fill(Stream_Audio, 0, Audio_Format, "AAC");
+    #endif
+    Essence->second.Parsers.push_back(Parser);
+}
+
+//---------------------------------------------------------------------------
+void File_Mxf::ChooseParser_Adif(const essences::iterator &Essence, const descriptors::iterator &Descriptor)
+{
+    Essence->second.StreamKind=Stream_Audio;
+
+    //Filling
+    #if defined(MEDIAINFO_AAC_YES)
+        File_Aac* Parser=new File_Aac;
+        Parser->Mode=File_Aac::Mode_ADIF;
+    #else
+        //Filling
+        File__Analyze* Parser=new File_Unknown();
+        Open_Buffer_Init(Parser);
+        Parser->Stream_Prepare(Stream_Audio);
+        Parser->Fill(Stream_Audio, 0, Audio_Format, "AAC");
+        Parser->Fill(Stream_Audio, 0, Audio_MuxingMode, "ADIF");
+    #endif
+    Essence->second.Parsers.push_back(Parser);
+}
+
+//---------------------------------------------------------------------------
+void File_Mxf::ChooseParser_Adts(const essences::iterator &Essence, const descriptors::iterator &Descriptor)
+{
+    Essence->second.StreamKind=Stream_Audio;
+
+    //Filling
+    #if defined(MEDIAINFO_AAC_YES)
+        File_Aac* Parser=new File_Aac;
+        Parser->Mode=File_Aac::Mode_ADTS;
+    #else
+        //Filling
+        File__Analyze* Parser=new File_Unknown();
+        Open_Buffer_Init(Parser);
+        Parser->Stream_Prepare(Stream_Audio);
+        Parser->Fill(Stream_Audio, 0, Audio_Format, "AAC");
+        Parser->Fill(Stream_Audio, 0, Audio_MuxingMode, "ADTS");
+    #endif
+    Essence->second.Parsers.push_back(Parser);
+}
+
+//---------------------------------------------------------------------------
+void File_Mxf::ChooseParser_Latm(const essences::iterator &Essence, const descriptors::iterator &Descriptor)
+{
+    Essence->second.StreamKind=Stream_Audio;
+
+    //Filling
+    #if defined(MEDIAINFO_AAC_YES)
+        File_Aac* Parser=new File_Aac;
+        Parser->Mode=File_Aac::Mode_LATM;
+    #else
+        //Filling
+        File__Analyze* Parser=new File_Unknown();
+        Open_Buffer_Init(Parser);
+        Parser->Stream_Prepare(Stream_Audio);
+        Parser->Fill(Stream_Audio, 0, Audio_Format, "AAC");
+        Parser->Fill(Stream_Audio, 0, Audio_MuxingMode, "LATM");
     #endif
     Essence->second.Parsers.push_back(Parser);
 }
