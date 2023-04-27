@@ -4430,8 +4430,8 @@ void *Type_MPEclut_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, 
     if (!_cmsReadUInt16Number(io, &InputChans)) return NULL;
     if (!_cmsReadUInt16Number(io, &OutputChans)) return NULL;
 
-    if (InputChans == 0) goto Error;
-    if (OutputChans == 0) goto Error;
+    if (InputChans == 0 || InputChans >= cmsMAXCHANNELS) goto Error;
+    if (OutputChans == 0 || OutputChans >= cmsMAXCHANNELS) goto Error;
 
     if (io ->Read(io, Dimensions8, sizeof(cmsUInt8Number), 16) != 16)
         goto Error;
