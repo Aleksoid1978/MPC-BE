@@ -4,6 +4,9 @@
 =============================
 Windows Vista is no longer supported.
 
+Splitters
+Added identify of Atmos in EAC3 and TrueHD, as well as DTS:X and DTS:X IMAX in audio tracks.
+
 MpaSplitter
 Avoid accidental connection to .wtv files (Windows Television).
 
