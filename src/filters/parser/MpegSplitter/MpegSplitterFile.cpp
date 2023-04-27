@@ -1364,6 +1364,13 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 
 								wfe->nChannels += wfeEAC3->nChannels - 2;
 								wfe->nAvgBytesPerSec += wfeEAC3->nAvgBytesPerSec;
+
+								// Atmos flag
+								if (mt.cbFormat == sizeof(WAVEFORMATEX) + 1) {
+									wfe = (WAVEFORMATEX*)source->mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 1);
+									wfe->cbSize = 1;
+									(reinterpret_cast<BYTE*>(wfe + 1))[0] = (reinterpret_cast<const BYTE*>(wfeEAC3 + 1))[0];
+								}
 							}
 						}
 					}

@@ -213,7 +213,15 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 				Infos.emplace_back(L"HDMV LPCM");
 			}
 			if (pmt->subtype == MEDIASUBTYPE_DOLBY_DDPLUS) {
-				Infos.emplace_back(L"Dolby Digital Plus");
+				CStringW codecName(L"Dolby Digital Plus");
+				if (pInfo->cbSize == 1) {
+					const auto flag = (reinterpret_cast<const BYTE*>(pInfo + 1))[0];
+					if (flag == 1) {
+						codecName.Append(L" + Atmos");
+					}
+				}
+
+				Infos.emplace_back(codecName);
 			} else {
 				if (pInfo->wFormatTag == WAVE_FORMAT_MPEG && pmt->cbFormat >= sizeof(MPEG1WAVEFORMAT)) {
 					const MPEG1WAVEFORMAT* pInfoMPEG1 = GetFormatHelper(pInfoMPEG1, pmt);

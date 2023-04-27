@@ -1609,6 +1609,17 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mt.subtype = FOURCCMap(fourcc);
 						if (type == AP4_ATOM_TYPE_EAC3) {
 							mt.subtype = MEDIASUBTYPE_DOLBY_DDPLUS;
+
+							m_pFile->Seek(sample.GetOffset());
+							AP4_DataBuffer data;
+							if (AP4_SUCCEEDED(sample.ReadData(data)) && data.GetDataSize() >= 12) {
+								audioframe_t aframe;
+								if (ParseEAC3Header(data.GetData(), &aframe, static_cast<int>(data.GetDataSize())) && aframe.param2) {
+									wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 1);
+									wfe->cbSize = 1;
+									(reinterpret_cast<BYTE*>(wfe + 1))[0] = 1;
+								}
+							}
 						} else if (type == AP4_ATOM_TYPE_mlpa) {
 							mt.subtype = MEDIASUBTYPE_DOLBY_TRUEHD;
 

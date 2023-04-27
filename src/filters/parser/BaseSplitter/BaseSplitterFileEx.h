@@ -181,6 +181,7 @@ public:
 		BYTE substreamid;
 		BYTE sr_code;
 		BYTE num_blocks;
+		BYTE atmos_flag;
 		// the rest is unimportant for us
 
 		bool operator == (const struct ac3hdr& h) const {

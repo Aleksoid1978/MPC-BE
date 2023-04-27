@@ -1096,11 +1096,17 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					std::vector<BYTE> pData;
 					if (ReadFirtsBlock(pData, pTE.get())) {
 						audioframe_t aframe;
-						int size = ParseEAC3Header(pData.data(), &aframe);
+						int size = ParseEAC3Header(pData.data(), &aframe, static_cast<int>(pData.size()));
 						if (!size || aframe.param1 == EAC3_FRAME_TYPE_DEPENDENT) {
 							size = ParseAC3Header(pData.data(), &aframe);
 						}
 						if (size) {
+							if (aframe.param2) {
+								wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 1);
+								wfe->cbSize = 1;
+								(reinterpret_cast<BYTE*>(wfe + 1))[0] = 1;
+							}
+
 							wfe->nChannels = aframe.channels;
 							wfe->nAvgBytesPerSec = size * aframe.samplerate / aframe.samples;
 							if (size + 8 <= (int)pData.size()) {

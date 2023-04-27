@@ -345,7 +345,15 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 				Infos.emplace_back(L"HDMV LPCM");
 			}
 			if (pMediaType->subtype == MEDIASUBTYPE_DOLBY_DDPLUS) {
-				Infos.emplace_back(L"Dolby Digital Plus");
+				CString codecName(L"Dolby Digital Plus");
+				if (pInfo->cbSize == 1) {
+					const auto flag = (reinterpret_cast<const BYTE*>(pInfo + 1))[0];
+					if (flag == 1) {
+						codecName.Append(L" + Atmos");
+					}
+				}
+
+				Infos.emplace_back(codecName);
 			} else if (pMediaType->subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
 				CString codecName(L"Dolby TrueHD");
 				if (pInfo->cbSize == 1) {

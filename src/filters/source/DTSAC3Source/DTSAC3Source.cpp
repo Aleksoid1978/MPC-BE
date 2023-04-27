@@ -354,8 +354,8 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 			bool bAC3 = true;
 			m_file.Seek(m_dataStart + fsize, CFile::begin);
-			if (m_file.Read(&buf, 8) == 8) {
-				int fsize2 = ParseEAC3Header(buf, &aframe);
+			if (m_file.Read(&buf, 16) == 16) {
+				int fsize2 = ParseEAC3Header(buf, &aframe, 16);
 				if (fsize2 > 0 && aframe.param1 == EAC3_FRAME_TYPE_DEPENDENT) {
 					fsize += fsize2;
 					m_channels += aframe.channels - 2;
@@ -374,16 +374,20 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 			m_wFormatTag = WAVE_FORMAT_UNKNOWN;
 			m_subtype = bAC3 ? MEDIASUBTYPE_DOLBY_AC3 : MEDIASUBTYPE_DOLBY_DDPLUS;
+
+			m_atmos_flag = aframe.param2 == 1;
 		}
 		// E-AC3
-		else if (m_streamtype == EAC3 && ParseEAC3Header(buf, &aframe)) {
+		else if (m_streamtype == EAC3 && ParseEAC3Header(buf, &aframe, std::size(buf))) {
 			int fsize     = aframe.size;
 			m_samplerate  = aframe.samplerate;
 			m_channels    = aframe.channels;
 			m_framelength = aframe.samples;
 
+			m_atmos_flag = aframe.param2 == 1;
+
 			m_file.Seek(m_dataStart + fsize, CFile::begin);
-			if (m_file.Read(&buf, 8) == 8) {
+			if (m_file.Read(&buf, 16) == 16) {
 				int fsize2 = ParseEAC3Header(buf, &aframe);
 				if (fsize2 > 0 && aframe.param1 == EAC3_FRAME_TYPE_DEPENDENT) {
 					fsize += fsize2;

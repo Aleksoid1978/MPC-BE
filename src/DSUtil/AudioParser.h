@@ -78,13 +78,13 @@ DWORD GetDefChannelMask(WORD nChannels);
 DWORD GetVorbisChannelMask(WORD nChannels);
 
 struct audioframe_t {
-	int size;
-	int samplerate;
-	int channels;
-	int samples;
-	int param1;
-	int param2;
-	int param3;
+	int size       = {};
+	int samplerate = {};
+	int channels   = {};
+	int samples    = {};
+	int param1     = {};
+	int param2     = {};
+	int param3     = {};
 
 	void Empty() {
 		memset(this, 0, sizeof(*this));
@@ -108,8 +108,12 @@ int ParseMP3Header         (const BYTE* buf, MPEGLAYER3WAVEFORMAT* mp3wf);
 // need >= 7 bytes, param1 = bitrate
 int ParseAC3Header         (const BYTE* buf, audioframe_t* audioframe = nullptr);
 
-// need >= 6 bytes, param1 = eac3 frame type
-int ParseEAC3Header        (const BYTE* buf, audioframe_t* audioframe = nullptr);
+// need >= 6 bytes, param1 = eac3 frame type, param2 = Atmos flag
+int ParseEAC3Header        (const BYTE* buf, audioframe_t* audioframe = nullptr, const int buffsize = 0);
+
+void ParseEAC3HeaderForAtmosDetect(const BYTE* buf, const int buffsize,
+								   int frame_type, int fscod, int num_blocks, int acmod, int lfeon,
+								   bool& atmos_flag);
 
 // need >= 22 bytes, param1 = bitdepth, param2 = TrueHD flag, param3 = TrueHD Atmos flag
 int ParseMLPHeader         (const BYTE* buf, audioframe_t* audioframe = nullptr);

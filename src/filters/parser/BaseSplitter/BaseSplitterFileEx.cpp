@@ -686,6 +686,9 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 		/* Enhanced AC-3 */
 		e_ac3 = true;
 		Seek(pos);
+
+		h.num_blocks = 6;
+
 		h.frame_type = (BYTE)BitRead(2);
 		h.substreamid = (BYTE)BitRead(3);
 		/*
@@ -713,26 +716,44 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 		}
 		h.acmod = BitRead(3);
 		h.lfeon = BitRead(1);
+
+		if (!h.substreamid && h.frame_type != EAC3_FRAME_TYPE_RESERVED) {
+			std::vector<BYTE> buffer(len - 5);
+			ByteRead(buffer.data(), static_cast<__int64>(buffer.size()));
+			bool atmos_flag = {};
+			ParseEAC3HeaderForAtmosDetect(buffer.data(), static_cast<int>(buffer.size()),
+										  h.frame_type, h.sr_code, h.num_blocks, h.acmod, h.lfeon,
+										  atmos_flag);
+			if (atmos_flag) {
+				h.atmos_flag = 1;
+			}
+		}
 	}
 
 	if (pmt) {
-		WAVEFORMATEX wfe;
-		memset(&wfe, 0, sizeof(wfe));
-		wfe.wFormatTag = WAVE_FORMAT_DOLBY_AC3;
+		size_t size = sizeof(WAVEFORMATEX) + h.atmos_flag;
+		WAVEFORMATEX* wfe = (WAVEFORMATEX*)DNew BYTE[size];
+		ZeroMemory(wfe, size);
+		wfe->wFormatTag = WAVE_FORMAT_DOLBY_AC3;
 
 		static int channels[] = { 2, 1, 2, 3, 3, 4, 4, 5 };
-		wfe.nChannels = channels[h.acmod] + h.lfeon;
+		wfe->nChannels = channels[h.acmod] + h.lfeon;
 
 		if (e_ac3) {
-			wfe.nSamplesPerSec = h.sample_rate;
-			wfe.nAvgBytesPerSec = h.frame_size * h.sample_rate / (h.sr_code == 3 ? 1536 : h.num_blocks * 256);
+			wfe->nSamplesPerSec = h.sample_rate;
+			wfe->nAvgBytesPerSec = h.frame_size * h.sample_rate / (h.sr_code == 3 ? 1536 : h.num_blocks * 256);
 		} else {
-			wfe.nSamplesPerSec = freq[h.fscod] >> h.sr_shift;
+			wfe->nSamplesPerSec = freq[h.fscod] >> h.sr_shift;
 			static int rate[] = { 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 448, 512, 576, 640, 768, 896, 1024, 1152, 1280 };
-			wfe.nAvgBytesPerSec = ((rate[h.frmsizecod >> 1] * 1000) >> h.sr_shift) / 8;
+			wfe->nAvgBytesPerSec = ((rate[h.frmsizecod >> 1] * 1000) >> h.sr_shift) / 8;
 		}
 
-		wfe.nBlockAlign = (WORD)(1536 * wfe.nAvgBytesPerSec / wfe.nSamplesPerSec);
+		wfe->nBlockAlign = (WORD)(1536 * wfe->nAvgBytesPerSec / wfe->nSamplesPerSec);
+
+		if (h.atmos_flag) {
+			wfe->cbSize = 1;
+			(reinterpret_cast<BYTE*>(wfe + 1))[0] = 1;
+		}
 
 		pmt->majortype = MEDIATYPE_Audio;
 		if (e_ac3) {
@@ -741,7 +762,7 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 			pmt->subtype = MEDIASUBTYPE_DOLBY_AC3;
 		}
 		pmt->formattype = FORMAT_WaveFormatEx;
-		pmt->SetFormat((BYTE*)&wfe, sizeof(wfe));
+		pmt->SetFormat(reinterpret_cast<BYTE*>(wfe), size);
 	}
 
 	return true;
