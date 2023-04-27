@@ -777,7 +777,12 @@ const char* CFFAudioDecoder::GetCodecName()
 			case FF_PROFILE_DTS_HD_MA_X_IMAX : return "dts-hd ma + dts:x imax";
 			case FF_PROFILE_DTS_EXPRESS      : return "dts express";
 		}
+	} else if (m_pAVCtx->codec_id == AV_CODEC_ID_EAC3 && m_pAVCtx->profile == FF_PROFILE_EAC3_DDP_ATMOS) {
+		return "eac3 + atmos";
+	} else if (m_pAVCtx->codec_id == AV_CODEC_ID_TRUEHD && m_pAVCtx->profile == FF_PROFILE_TRUEHD_ATMOS) {
+		return "truehd + atmos";
 	}
+
 	return (m_pAVCtx->codec_descriptor)->name;
 }
 
