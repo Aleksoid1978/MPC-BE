@@ -1,6 +1,5 @@
 BIN_DIR       = ../../../_bin
 ZLIB_DIR      = ../zlib
-OPENJPEG_DIR  = ../openjpeg
 SPEEX_DIR     = ../speex
 SOXR_DIR      = ../soxr
 DAV1_DIR      = ../dav1d
@@ -31,7 +30,7 @@ TARGET_LIB        = $(TARGET_LIB_DIR)/ffmpeg.lib
 ARSCRIPT          = $(OBJ_DIR)script.ar
 
 # Compiler and yasm flags
-CFLAGS = -I. -I.. -I compat/atomics/win32 -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) -I$(SPEEX_DIR) -I$(SOXR_DIR) -I$(DAV1_DIR) -I$(FFNVCODEC_DIR) -I$(UAVS3D_DIR) \
+CFLAGS = -I. -I.. -I compat/atomics/win32 -I$(ZLIB_DIR) -I$(SPEEX_DIR) -I$(SOXR_DIR) -I$(DAV1_DIR) -I$(FFNVCODEC_DIR) -I$(UAVS3D_DIR) \
 	   -DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
 	   -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DOPJ_STATIC \
 	   -D_WIN32_WINNT=0x0600 -DWINVER=0x0600 \
@@ -217,7 +216,6 @@ SRCS_LC = \
 	libavcodec/dxva2_vc1.c \
 	libavcodec/dxva2_vp9.c \
 	libavcodec/dynamic_hdr_vivid.c \
-	libavcodec/dynamic_hdr10_plus.c \
 	libavcodec/eac3_data.c \
 	libavcodec/eac3dec.c \
 	libavcodec/elsdec.c \
@@ -319,6 +317,12 @@ SRCS_LC = \
 	libavcodec/ituh263dec.c \
 	libavcodec/ivi.c \
 	libavcodec/ivi_dsp.c \
+	libavcodec/jpeg2000.c \
+	libavcodec/jpeg2000_parser.c \
+	libavcodec/jpeg2000dec.c \
+	libavcodec/jpeg2000dsp.c \
+	libavcodec/jpeg2000dwt.c \
+	libavcodec/jpeg2000htdec.c \
 	libavcodec/jpegls.c \
 	libavcodec/jpeglsdec.c \
 	libavcodec/jpegquanttables.c \
@@ -329,7 +333,6 @@ SRCS_LC = \
 	libavcodec/lagarithrac.c \
 	libavcodec/latm_parser.c \
 	libavcodec/libdav1d.c \
-	libavcodec/libopenjpegdec.c \
 	libavcodec/libspeexdec.c \
 	libavcodec/libuavs3d.c \
 	libavcodec/lossless_audiodsp.c \
@@ -393,6 +396,8 @@ SRCS_LC = \
 	libavcodec/mpegvideo_parser.c \
 	libavcodec/mpegvideodata.c \
 	libavcodec/mpegvideoencdsp.c \
+	libavcodec/mqc.c \
+	libavcodec/mqcdec.c \
 	libavcodec/msmpeg4.c \
 	libavcodec/msmpeg4_vc1_data.c \
 	libavcodec/msmpeg4data.c \
@@ -601,6 +606,7 @@ SRCS_LC_B = \
 	libavcodec/x86/hpeldsp_vp3_init.c \
 	libavcodec/x86/huffyuvdsp_init.c \
 	libavcodec/x86/idctdsp_init.c \
+	libavcodec/x86/jpeg2000dsp_init.c \
 	libavcodec/x86/lossless_audiodsp_init.c \
 	libavcodec/x86/lossless_videodsp_init.c \
 	libavcodec/x86/me_cmp_init.c \
@@ -807,6 +813,7 @@ SRCS_YASM_LC = \
 	libavcodec/x86/huffyuvdsp.asm \
 	libavcodec/x86/idctdsp.asm \
 	libavcodec/x86/imdct36.asm \
+	libavcodec/x86/jpeg2000dsp.asm \
 	libavcodec/x86/lossless_audiodsp.asm \
 	libavcodec/x86/lossless_videodsp.asm \
 	libavcodec/x86/me_cmp.asm \

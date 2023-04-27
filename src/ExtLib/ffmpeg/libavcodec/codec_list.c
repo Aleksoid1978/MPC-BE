@@ -31,6 +31,7 @@ static const FFCodec * const codec_list[] = {
     &ff_indeo3_decoder,
     &ff_indeo4_decoder,
     &ff_indeo5_decoder,
+    &ff_jpeg2000_decoder,
     &ff_lagarith_decoder,
     &ff_magicyuv_decoder,
     &ff_mjpeg_decoder,
@@ -81,8 +82,6 @@ static const FFCodec * const codec_list[] = {
     &ff_wmv2_decoder,
     &ff_wmv3_decoder,
     &ff_wmv3image_decoder,
-
-    &ff_libopenjpeg_decoder,
 
     &ff_aac_decoder,
     &ff_aac_latm_decoder,
