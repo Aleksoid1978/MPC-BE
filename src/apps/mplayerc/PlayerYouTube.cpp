@@ -868,6 +868,16 @@ namespace Youtube
 
 		const auto& s = AfxGetAppSettings();
 		if (!streamingDataFormatListAudioWithLanguages.empty()) {
+			// Removing existing audio formats without "language" tag.
+			for (auto it = streamingDataFormatList.begin(); it != streamingDataFormatList.end();) {
+				auto itag = std::get<0>(*it);
+				if (auto audioprofile = GetAudioProfile(itag)) {
+					it = streamingDataFormatList.erase(it);
+				} else {
+					++it;
+				}
+			}
+
 			auto it = streamingDataFormatListAudioWithLanguages.find("en");
 			if (!s.strYoutubeAudioLang.IsEmpty()) {
 				it = streamingDataFormatListAudioWithLanguages.find(WStrToUTF8(s.strYoutubeAudioLang.GetString()));
