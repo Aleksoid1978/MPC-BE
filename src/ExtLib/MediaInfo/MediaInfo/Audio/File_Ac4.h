@@ -93,7 +93,7 @@ public :
         int8u drc_attack_threshold;
         int8u drc_release_threshold;
 
-        bool operator==(const drc_decoder_config_curve& C)
+        bool operator==(const drc_decoder_config_curve& C) const
         {
             return !memcmp(this, &C, sizeof(drc_decoder_config_curve));
         }

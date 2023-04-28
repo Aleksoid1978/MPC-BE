@@ -754,8 +754,13 @@ static int hls_slice_header(HEVCContext *s)
             else
                 sh->slice_temporal_mvp_enabled_flag = 0;
         } else {
-            s->sh.short_term_rps = NULL;
-            s->poc               = 0;
+            s->poc                              = 0;
+            sh->pic_order_cnt_lsb               = 0;
+            sh->short_term_ref_pic_set_sps_flag = 0;
+            sh->short_term_ref_pic_set_size     = 0;
+            sh->short_term_rps                  = NULL;
+            sh->long_term_ref_pic_set_size      = 0;
+            sh->slice_temporal_mvp_enabled_flag = 0;
         }
 
         /* 8.3.1 */
@@ -790,11 +795,11 @@ static int hls_slice_header(HEVCContext *s)
                 sh->nb_refs[L1] = s->ps.pps->num_ref_idx_l1_default_active;
 
             if (get_bits1(gb)) { // num_ref_idx_active_override_flag
-                sh->nb_refs[L0] = get_ue_golomb_long(gb) + 1;
+                sh->nb_refs[L0] = get_ue_golomb_31(gb) + 1;
                 if (sh->slice_type == HEVC_SLICE_B)
-                    sh->nb_refs[L1] = get_ue_golomb_long(gb) + 1;
+                    sh->nb_refs[L1] = get_ue_golomb_31(gb) + 1;
             }
-            if (sh->nb_refs[L0] > HEVC_MAX_REFS || sh->nb_refs[L1] > HEVC_MAX_REFS) {
+            if (sh->nb_refs[L0] >= HEVC_MAX_REFS || sh->nb_refs[L1] >= HEVC_MAX_REFS) {
                 av_log(s->avctx, AV_LOG_ERROR, "Too many refs: %d/%d.\n",
                        sh->nb_refs[L0], sh->nb_refs[L1]);
                 return AVERROR_INVALIDDATA;

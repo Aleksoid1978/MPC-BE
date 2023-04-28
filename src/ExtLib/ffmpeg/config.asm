@@ -371,6 +371,7 @@
 %define HAVE_TEXI2HTML 0
 %define HAVE_THREADS 1
 %define HAVE_VAAPI_X11 0
+%define HAVE_VAAPI_WIN32 0
 %define HAVE_TRUNC 1
 %define HAVE_TRUNCF 1
 %define HAVE_UNISTD_H 1

@@ -305,7 +305,7 @@ public :
 
         arith_context() :           previous_window_size((int16u)-1)
         {
-            memset(&q, NULL, sizeof(q));
+            memset(&q, 0, sizeof(q));
         }
     };
 
@@ -329,6 +329,7 @@ public :
         gain_sets                   gainSets;
         #if MEDIAINFO_CONFORMANCE
         size_t                      loudnessInfoSet_Present[2];
+        bool                        loudnessInfoSet_HasContent[2];
         vector<size_t>              numOutChannels_Lfe;
         #endif
         int32u                      numOutChannels;
@@ -353,6 +354,16 @@ public :
         arith_context               arithContext[2];
         sbr_handler                 sbrHandler;
         usac_dlft_handler           dlftHandler;
+   
+        void Reset(bool V0=false, bool V1=false)
+        {
+            #if MEDIAINFO_CONFORMANCE
+            loudnessInfoSet_HasContent[0]=V0;
+            loudnessInfoSet_HasContent[1]=V1;
+            loudnessInfoSet_Present[0]=V0;
+            loudnessInfoSet_Present[1]=V1;
+            #endif
+        }
     };
     struct usac_frame
     {

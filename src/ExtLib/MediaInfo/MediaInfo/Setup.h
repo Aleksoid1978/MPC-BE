@@ -687,6 +687,9 @@
 #if !defined(MEDIAINFO_VIDEO_NO) && !defined(MEDIAINFO_VP8_NO) && !defined(MEDIAINFO_VP8_YES)
     #define MEDIAINFO_VP8_YES
 #endif
+#if !defined(MEDIAINFO_VIDEO_NO) && !defined(MEDIAINFO_VP9_NO) && !defined(MEDIAINFO_VP9_YES)
+    #define MEDIAINFO_VP9_YES
+#endif
 #if !defined(MEDIAINFO_VIDEO_NO) && !defined(MEDIAINFO_Y4M_NO) && !defined(MEDIAINFO_Y4M_YES)
     #define MEDIAINFO_Y4M_YES
 #endif
@@ -719,6 +722,9 @@
 #endif
 #if !defined(MEDIAINFO_AUDIO_NO) && !defined(MEDIAINFO_APE_NO) && !defined(MEDIAINFO_APE_YES)
     #define MEDIAINFO_APE_YES
+#endif
+#if !defined(MEDIAINFO_APTX100_NO) && !defined(MEDIAINFO_APTX100_NO) && !defined(MEDIAINFO_APTX100_YES)
+    #define MEDIAINFO_APTX100_YES
 #endif
 #if !defined(MEDIAINFO_AUDIO_NO) && !defined(MEDIAINFO_AU_NO) && !defined(MEDIAINFO_AU_YES)
     #define MEDIAINFO_AU_YES

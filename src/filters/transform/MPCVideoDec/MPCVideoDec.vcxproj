@@ -150,9 +150,6 @@
     <ProjectReference Include="$(SolutionDir)src\DSUtil\DSUtil.vcxproj">
       <Project>{fc70988b-1ae5-4381-866d-4f405e28ac42}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)src\ExtLib\openjpeg\openjpeg.vcxproj">
-      <Project>{1557aa86-976c-4315-8fe8-a138e33f6580}</Project>
-    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)src\ExtLib\soxr\soxr.vcxproj">
       <Project>{88240767-4b7a-49e9-9e83-2f9e283d4f26}</Project>
     </ProjectReference>

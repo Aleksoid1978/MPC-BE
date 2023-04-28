@@ -335,9 +335,9 @@ void File_VorbisCom::Data_Parse()
         else if (Key==__T("WAVEFORMATEXTENSIBLE_CHANNEL_MASK"))
         {
             //This is an hexadecimal value
-            if (Value.size()>2 && Value[0]==__T('0') && (Value[1]==__T('x') || Value[1]==__T('X')))
+            if (Value.size()>2 && Value.size()<10 && Value[0]==__T('0') && (Value[1]==__T('x') || Value[1]==__T('X')))
             {
-                int16u ValueI=0;
+                int32u ValueI=0;
                 for (size_t Pos=2; Pos<Value.size(); Pos++)
                 {
                     ValueI*=16;

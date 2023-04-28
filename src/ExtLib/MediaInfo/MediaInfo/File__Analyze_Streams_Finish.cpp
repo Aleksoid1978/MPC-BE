@@ -1755,17 +1755,17 @@ void File__Analyze::Streams_Finish_HumanReadable_PerStream(stream_t StreamKind, 
     //Format_Settings_Matrix
     if (StreamKind==Stream_Video && Parameter==Video_Format_Settings_Matrix)
     {
-        Fill(Stream_Video, StreamPos, Video_Format_Settings_Matrix_String, MediaInfoLib::Config.Language_Get_Translate(__T("Format_Settings_Matrix_"), Value));
+        Fill(Stream_Video, StreamPos, Video_Format_Settings_Matrix_String, MediaInfoLib::Config.Language_Get_Translate(__T("Format_Settings_Matrix_"), Value), true);
     }
 
     //Scan type
     if (StreamKind==Stream_Video && Parameter==Video_ScanType)
     {
-        Fill(Stream_Video, StreamPos, Video_ScanType_String, MediaInfoLib::Config.Language_Get_Translate(__T("Interlaced_"), Value));
+        Fill(Stream_Video, StreamPos, Video_ScanType_String, MediaInfoLib::Config.Language_Get_Translate(__T("Interlaced_"), Value), true);
     }
     if (StreamKind==Stream_Video && Parameter==Video_ScanType_Original)
     {
-        Fill(Stream_Video, StreamPos, Video_ScanType_Original_String, MediaInfoLib::Config.Language_Get_Translate(__T("Interlaced_"), Value));
+        Fill(Stream_Video, StreamPos, Video_ScanType_Original_String, MediaInfoLib::Config.Language_Get_Translate(__T("Interlaced_"), Value), true);
     }
     if (StreamKind==Stream_Video && Parameter==Video_ScanType_StoreMethod)
     {
@@ -1773,21 +1773,21 @@ void File__Analyze::Streams_Finish_HumanReadable_PerStream(stream_t StreamKind, 
         if (!Retrieve(Stream_Video, StreamPos, Video_ScanType_StoreMethod_FieldsPerBlock).empty())
             ToTranslate+=__T('_')+Retrieve(Stream_Video, StreamPos, Video_ScanType_StoreMethod_FieldsPerBlock);
         Ztring Translated=MediaInfoLib::Config.Language_Get(ToTranslate);
-        Fill(Stream_Video, StreamPos, Video_ScanType_StoreMethod_String, Translated.find(__T("StoreMethod_"))?Translated:Value);
+        Fill(Stream_Video, StreamPos, Video_ScanType_StoreMethod_String, Translated.find(__T("StoreMethod_"))?Translated:Value, true);
     }
 
     //Scan order
     if (StreamKind==Stream_Video && Parameter==Video_ScanOrder)
     {
-        Fill(Stream_Video, StreamPos, Video_ScanOrder_String, MediaInfoLib::Config.Language_Get_Translate(__T("Interlaced_"), Value));
+        Fill(Stream_Video, StreamPos, Video_ScanOrder_String, MediaInfoLib::Config.Language_Get_Translate(__T("Interlaced_"), Value), true);
     }
     if (StreamKind==Stream_Video && Parameter==Video_ScanOrder_Stored)
     {
-        Fill(Stream_Video, StreamPos, Video_ScanOrder_Stored_String, MediaInfoLib::Config.Language_Get_Translate(__T("Interlaced_"), Value));
+        Fill(Stream_Video, StreamPos, Video_ScanOrder_Stored_String, MediaInfoLib::Config.Language_Get_Translate(__T("Interlaced_"), Value), true);
     }
     if (StreamKind==Stream_Video && Parameter==Video_ScanOrder_Original)
     {
-        Fill(Stream_Video, StreamPos, Video_ScanOrder_Original_String, MediaInfoLib::Config.Language_Get_Translate(__T("Interlaced_"), Value));
+        Fill(Stream_Video, StreamPos, Video_ScanOrder_Original_String, MediaInfoLib::Config.Language_Get_Translate(__T("Interlaced_"), Value), true);
     }
 
     //Interlacement
@@ -1805,19 +1805,19 @@ void File__Analyze::Streams_Finish_HumanReadable_PerStream(stream_t StreamKind, 
     //FrameRate_Mode
     if (StreamKind==Stream_Video && Parameter==Video_FrameRate_Mode)
     {
-        Fill(Stream_Video, StreamPos, Video_FrameRate_Mode_String, MediaInfoLib::Config.Language_Get_Translate(__T("FrameRate_Mode_"), Value));
+        Fill(Stream_Video, StreamPos, Video_FrameRate_Mode_String, MediaInfoLib::Config.Language_Get_Translate(__T("FrameRate_Mode_"), Value), true);
     }
 
     //Compression_Mode
     if (Parameter==Fill_Parameter(StreamKind, Generic_Compression_Mode))
     {
-        Fill(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_Compression_Mode_String), MediaInfoLib::Config.Language_Get_Translate(__T("Compression_Mode_"), Value));
+        Fill(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_Compression_Mode_String), MediaInfoLib::Config.Language_Get_Translate(__T("Compression_Mode_"), Value), true);
     }
 
     //Delay_Source
     if (Parameter==Fill_Parameter(StreamKind, Generic_Delay_Source))
     {
-        Fill(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_Delay_Source_String), MediaInfoLib::Config.Language_Get_Translate(__T("Delay_Source_"), Value));
+        Fill(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_Delay_Source_String), MediaInfoLib::Config.Language_Get_Translate(__T("Delay_Source_"), Value), true);
     }
 
     //Gop_OpenClosed

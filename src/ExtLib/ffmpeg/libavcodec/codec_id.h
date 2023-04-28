@@ -320,6 +320,7 @@ enum AVCodecID {
     AV_CODEC_ID_WBMP,
     AV_CODEC_ID_MEDIA100,
     AV_CODEC_ID_VQC,
+    AV_CODEC_ID_PDV,
 
     /* various PCM "codecs" */
     AV_CODEC_ID_FIRST_AUDIO = 0x10000,     ///< A dummy id pointing at the start of audio codecs
@@ -582,6 +583,7 @@ enum AVCodecID {
     AV_CODEC_ID_DVD_NAV,
     AV_CODEC_ID_TIMED_ID3,
     AV_CODEC_ID_BIN_DATA,
+    AV_CODEC_ID_SMPTE_2038,
 
 
     AV_CODEC_ID_PROBE = 0x19000, ///< codec_id is not known (like AV_CODEC_ID_NONE) but lavf should attempt to identify it

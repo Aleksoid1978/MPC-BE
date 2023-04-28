@@ -1326,7 +1326,7 @@ static void colour_mapping_octants(GetBitContext *gb, HEVCPPS *pps, int inp_dept
                                    int idx_y, int idx_cb, int idx_cr, int inp_length)
 {
     unsigned int split_octant_flag, part_num_y, coded_res_flag, res_coeff_q, res_coeff_r;
-    int bit_depth_cm_input_y, bit_depth_cm_output_y, cm_res_bits;
+    int cm_res_bits;
 
     part_num_y = 1 << pps->cm_y_part_num_log2;
 
@@ -1348,10 +1348,9 @@ static void colour_mapping_octants(GetBitContext *gb, HEVCPPS *pps, int inp_dept
                 if (coded_res_flag)
                     for (int c = 0; c < 3; c++) {
                         res_coeff_q = get_ue_golomb_long(gb);
-                        bit_depth_cm_input_y = 8 + pps->luma_bit_depth_cm_input_minus8;
-                        bit_depth_cm_output_y = 8 + pps->luma_bit_depth_cm_output_minus8;
-                        cm_res_bits = FFMAX(0, 10 + bit_depth_cm_input_y - bit_depth_cm_output_y -
-                                            pps->cm_res_quant_bits - (pps->cm_delta_flc_bits_minus1 + 1));
+                        cm_res_bits = FFMAX(0, 10 + pps->luma_bit_depth_cm_input -
+                                            pps->luma_bit_depth_cm_output -
+                                            pps->cm_res_quant_bits - pps->cm_delta_flc_bits);
                         res_coeff_r = cm_res_bits ? get_bits(gb, cm_res_bits) : 0;
                         if (res_coeff_q || res_coeff_r)
                             skip_bits1(gb);
@@ -1369,13 +1368,13 @@ static void colour_mapping_table(GetBitContext *gb, HEVCPPS *pps)
     pps->cm_octant_depth = get_bits(gb, 2);
     pps->cm_y_part_num_log2 = get_bits(gb, 2);
 
-    pps->luma_bit_depth_cm_input_minus8    = get_ue_golomb_long(gb);
-    pps->chroma_bit_depth_cm_input_minus8  = get_ue_golomb_long(gb);
-    pps->luma_bit_depth_cm_output_minus8   = get_ue_golomb_long(gb);
-    pps->chroma_bit_depth_cm_output_minus8 = get_ue_golomb_long(gb);
+    pps->luma_bit_depth_cm_input    = get_ue_golomb(gb) + 8;
+    pps->chroma_bit_depth_cm_input  = get_ue_golomb(gb) + 8;
+    pps->luma_bit_depth_cm_output   = get_ue_golomb(gb) + 8;
+    pps->chroma_bit_depth_cm_output = get_ue_golomb(gb) + 8;
 
     pps->cm_res_quant_bits = get_bits(gb, 2);
-    pps->cm_delta_flc_bits_minus1 = get_bits(gb, 2);
+    pps->cm_delta_flc_bits = get_bits(gb, 2) + 1;
 
     if (pps->cm_octant_depth == 1) {
         pps->cm_adapt_threshold_u_delta = get_se_golomb_long(gb);
@@ -1386,14 +1385,17 @@ static void colour_mapping_table(GetBitContext *gb, HEVCPPS *pps)
 }
 
 static int pps_multilayer_extension(GetBitContext *gb, AVCodecContext *avctx,
-                                    HEVCPPS *pps, HEVCSPS *sps)
+                                    HEVCPPS *pps, HEVCSPS *sps, HEVCVPS *vps)
 {
     pps->poc_reset_info_present_flag = get_bits1(gb);
     pps->pps_infer_scaling_list_flag = get_bits1(gb);
     if (pps->pps_infer_scaling_list_flag)
         pps->pps_scaling_list_ref_layer_id = get_bits(gb, 6);
 
-    pps->num_ref_loc_offsets = get_ue_golomb_long(gb);
+    pps->num_ref_loc_offsets = get_ue_golomb(gb);
+    if (pps->num_ref_loc_offsets > vps->vps_max_layers - 1)
+        return AVERROR_INVALIDDATA;
+
     for (int i = 0; i < pps->num_ref_loc_offsets; i++) {
         pps->ref_loc_offset_layer_id[i] = get_bits(gb, 6);
         pps->scaled_ref_layer_offset_present_flag[i] = get_bits1(gb);
@@ -1414,10 +1416,10 @@ static int pps_multilayer_extension(GetBitContext *gb, AVCodecContext *avctx,
 
         pps->resample_phase_set_present_flag[i] = get_bits1(gb);
         if (pps->resample_phase_set_present_flag[i]) {
-            pps->phase_hor_luma[pps->ref_loc_offset_layer_id[i]]         = get_ue_golomb_long(gb);
-            pps->phase_ver_luma[pps->ref_loc_offset_layer_id[i]]         = get_ue_golomb_long(gb);
-            pps->phase_hor_chroma_plus8[pps->ref_loc_offset_layer_id[i]] = get_ue_golomb_long(gb);
-            pps->phase_ver_chroma_plus8[pps->ref_loc_offset_layer_id[i]] = get_ue_golomb_long(gb);
+            pps->phase_hor_luma[pps->ref_loc_offset_layer_id[i]]   = get_ue_golomb_31(gb);
+            pps->phase_ver_luma[pps->ref_loc_offset_layer_id[i]]   = get_ue_golomb_31(gb);
+            pps->phase_hor_chroma[pps->ref_loc_offset_layer_id[i]] = get_ue_golomb(gb) - 8;
+            pps->phase_ver_chroma[pps->ref_loc_offset_layer_id[i]] = get_ue_golomb(gb) - 8;
         }
     }
 
@@ -1691,6 +1693,7 @@ int ff_hevc_decode_nal_pps(GetBitContext *gb, AVCodecContext *avctx,
                            HEVCParamSets *ps)
 {
     HEVCSPS      *sps = NULL;
+    HEVCVPS      *vps = NULL;
     int i, ret = 0;
     unsigned int pps_id = 0;
     ptrdiff_t nal_size;
@@ -1751,6 +1754,7 @@ int ff_hevc_decode_nal_pps(GetBitContext *gb, AVCodecContext *avctx,
         goto err;
     }
     sps = (HEVCSPS *)ps->sps_list[pps->sps_id]->data;
+    vps = (HEVCVPS *)ps->vps_list[sps->vps_id]->data;
 
     pps->dependent_slice_segments_enabled_flag = get_bits1(gb);
     pps->output_flag_present_flag              = get_bits1(gb);
@@ -1760,8 +1764,14 @@ int ff_hevc_decode_nal_pps(GetBitContext *gb, AVCodecContext *avctx,
 
     pps->cabac_init_present_flag = get_bits1(gb);
 
-    pps->num_ref_idx_l0_default_active = get_ue_golomb_long(gb) + 1;
-    pps->num_ref_idx_l1_default_active = get_ue_golomb_long(gb) + 1;
+    pps->num_ref_idx_l0_default_active = get_ue_golomb_31(gb) + 1;
+    pps->num_ref_idx_l1_default_active = get_ue_golomb_31(gb) + 1;
+    if (pps->num_ref_idx_l0_default_active >= HEVC_MAX_REFS ||
+        pps->num_ref_idx_l1_default_active >= HEVC_MAX_REFS) {
+        av_log(avctx, AV_LOG_ERROR, "Too many default refs in PPS: %d/%d.\n",
+               pps->num_ref_idx_l0_default_active, pps->num_ref_idx_l1_default_active);
+        goto err;
+    }
 
     pps->pic_init_qp_minus26 = get_se_golomb(gb);
 
@@ -1919,7 +1929,7 @@ int ff_hevc_decode_nal_pps(GetBitContext *gb, AVCodecContext *avctx,
         }
 
         if (pps->pps_multilayer_extension_flag) {
-            if ((ret = pps_multilayer_extension(gb, avctx, pps, sps)) < 0)
+            if ((ret = pps_multilayer_extension(gb, avctx, pps, sps, vps)) < 0)
                 goto err;
         }
 

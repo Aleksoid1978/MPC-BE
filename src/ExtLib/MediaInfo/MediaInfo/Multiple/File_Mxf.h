@@ -1188,6 +1188,9 @@ protected :
     void           ChooseParser_Vc3(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
     void           ChooseParser_TimedText(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
     void           ChooseParser_Aac(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
+    void           ChooseParser_Adif(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
+    void           ChooseParser_Adts(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
+    void           ChooseParser_Latm(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
     void           ChooseParser_Ac3(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
     void           ChooseParser_Alaw(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
     void           ChooseParser_ChannelGrouping(const essences::iterator &Essence, const descriptors::iterator &Descriptor);

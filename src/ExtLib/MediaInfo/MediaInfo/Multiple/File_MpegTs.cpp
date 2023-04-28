@@ -1110,7 +1110,13 @@ void File_MpegTs::Streams_Update_EPG()
                         Texts+=text->second+__T(" - ");
                     if (!Texts.empty())
                         Texts.resize(Texts.size()-3);
-                    EPGs[Ztring().Date_From_Seconds_1970(Event->second.start_time+315964800-Complete_Stream->GPS_UTC_offset)]=Event->second.title+__T(" / ")+Texts+__T(" /  /  / ")+Event->second.duration+__T(" / ");
+                    Ztring Time=Ztring().Date_From_Seconds_1970(Event->second.start_time+315964800-Complete_Stream->GPS_UTC_offset);
+                    if (!Time.empty())
+                    {
+                        Time.FindAndReplace(__T("UTC "), __T(""));
+                        Time+=__T(" UTC");
+                    }
+                    EPGs[Time]=Event->second.title+__T(" / ")+Texts+__T(" /  /  / ")+Event->second.duration+__T(" / ");
                 }
             if (!EPGs.empty())
             {
@@ -1187,7 +1193,13 @@ void File_MpegTs::Streams_Update_EPG()
                                             Texts+=text->second+__T(" - ");
                                         if (!Texts.empty())
                                             Texts.resize(Texts.size()-3);
-                                        EPGs[Ztring().Date_From_Seconds_1970(Event->second.start_time+315964800-Complete_Stream->GPS_UTC_offset)]=Event->second.title+__T(" / ")+Texts+__T(" /  /  / ")+Event->second.duration+__T(" / ");
+                                        Ztring Time=Ztring().Date_From_Seconds_1970(Event->second.start_time+315964800-Complete_Stream->GPS_UTC_offset);
+                                        if (!Time.empty())
+                                        {
+                                            Time.FindAndReplace(__T("UTC "), __T(""));
+                                            Time+=__T(" UTC");
+                                        }
+                                        EPGs[Time]=Event->second.title+__T(" / ")+Texts+__T(" /  /  / ")+Event->second.duration+__T(" / ");
                                     }
                             Source->second.ATSC_EPG_Blocks_IsUpdated=false;
                             EPGs_IsUpdated=true;
@@ -3455,7 +3467,13 @@ void File_MpegTs::transport_private_data(int8u transport_private_data_length)
                                                     int32u Seconds, Fraction;
                                                     Get_B4 (Seconds, "Seconds");  Param_Info1(Ztring().Date_From_Seconds_1970((int32u)(Seconds-2208988800))); //Param_Info1(Ztring().Date_From_Seconds_1900(Seconds)); //Temp for old ZenLib
                                                     Get_B4 (Fraction, "Fraction"); Param_Info1(Ztring::ToZtring(((float64)Fraction)/0x100000000LL, 9));
-                                                    Complete_Stream->Streams[pid]->Infos["EBP_AcquisitionTime"]=Ztring().Date_From_Seconds_1970((int32u)(Seconds-2208988800))+__T('.')+Ztring::ToZtring(((float64)Fraction)/0x100000000LL, 9).substr(2); //.Date_From_Seconds_1900(Seconds)); //Temp for old ZenLib
+                                                    Ztring Time=Ztring().Date_From_Seconds_1970((int32u)(Seconds-2208988800))+__T('.')+Ztring::ToZtring(((float64)Fraction)/0x100000000LL, 9).substr(2); //.Date_From_Seconds_1900(Seconds)); //Temp for old ZenLib
+                                                    if (!Time.empty())
+                                                    {
+                                                        Time.FindAndReplace(__T("UTC "), __T(""));
+                                                        Time+=__T(" UTC");
+                                                    }
+                                                    Complete_Stream->Streams[pid]->Infos["EBP_AcquisitionTime"]=Time;
                                                     Complete_Stream->Streams[pid]->EBP_Marker_Detected=true;
                                                 }
                                                 else

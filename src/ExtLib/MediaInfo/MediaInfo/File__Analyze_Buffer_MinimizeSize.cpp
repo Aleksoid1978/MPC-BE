@@ -688,25 +688,14 @@ void File__Analyze::Get_EB(int64u &Info)
         Size++;
         Peek_S1(Size, Size_Mark);
     }
+    BS_End();
 
     //Integrity
-    if (!BS->Remain() || Size>8)
+    if (!Size_Mark || Size>8)
     {
-        if (Size>8)
-        {
-            //Element[Element_Level].IsComplete=true; //If it is in a header
-            Trusted_IsNot("EBML integer parsing error");
-        }
+        Trusted_IsNot("EBML integer parsing error");
         Info=0;
         return;
-    }
-    BS_End();
-    if (File_Offset+Buffer_Offset+Element_Offset>=Element[Element_Level].Next)
-    {
-        //Element[Element_Level].IsComplete=true; //If it is in a header
-        Trusted_IsNot("Not enough place to have an EBML");
-        Info=0;
-        return; //Not enough space
     }
     INTEGRITY_SIZE_ATLEAST_INT(Size);
 
@@ -779,25 +768,14 @@ void File__Analyze::Get_ES(int64s &Info)
         Size++;
         Peek_S1(Size, Size_Mark);
     }
+    BS_End();
 
     //Integrity
-    if (!BS->Remain() || Size>8)
+    if (!Size_Mark || Size>8)
     {
-        if (Size>8)
-        {
-            //Element[Element_Level].IsComplete=true; //If it is in a header
-            Trusted_IsNot("EBML integer parsing error");
-        }
+        Trusted_IsNot("EBML integer parsing error");
         Info=0;
         return;
-    }
-    BS_End();
-    if (File_Offset+Buffer_Offset+Element_Offset>=Element[Element_Level].Next)
-    {
-        //Element[Element_Level].IsComplete=true; //If it is in a header
-        Trusted_IsNot("Not enough place to have an EBML");
-        Info=0;
-        return; //Not enough space
     }
     INTEGRITY_SIZE_ATLEAST_INT(Size);
 
@@ -880,17 +858,11 @@ void File__Analyze::Get_VS(int64u &Info)
     BS_End();
 
     //Integrity
-    if (Size>8)
+    if (more_data || Size>8)
     {
         Trusted_IsNot("Variable Length Value parsing error");
         Info=0;
         return;
-    }
-    if (File_Offset+Buffer_Offset+Element_Offset>=Element[Element_Level].Next)
-    {
-        Trusted_IsNot("Not enough place to have a Variable Length Value");
-        Info=0;
-        return; //Not enough space
     }
 }
 
@@ -913,17 +885,11 @@ void File__Analyze::Skip_VS()
     BS_End();
 
     //Integrity
-    if (Size>8)
+    if (more_data || Size>8)
     {
         Trusted_IsNot("Variable Size Value parsing error");
         Info=0;
         return;
-    }
-    if (File_Offset+Buffer_Offset+Element_Offset>=Element[Element_Level].Next)
-    {
-        Trusted_IsNot("Not enough place to have a Variable Size Value");
-        Info=0;
-        return; //Not enough space
     }
 }
 

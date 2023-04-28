@@ -72,15 +72,22 @@ private :
     void Rawcooked_AfterData(bool HasMask, bool UseMask=false);
     void Rawcooked_FileName();
     void Rawcooked_FileName(bool HasMask, bool UseMask=false);
+    void Rawcooked_InData();
+    void Rawcooked_InData(bool HasMask, bool UseMask=false);
     void RawcookedBlock();
     void RawcookedBlock_BeforeData() { Rawcooked_BeforeData(false); }
     void RawcookedBlock_AfterData() { Rawcooked_AfterData(false); }
     void RawcookedBlock_FileHash();
     void RawcookedBlock_FileName() { Rawcooked_FileName(false); }
+    void RawcookedBlock_InData() { Rawcooked_InData(false); }
     void RawcookedBlock_MaskAdditionBeforeData() { Rawcooked_BeforeData(true, true); }
     void RawcookedBlock_MaskAdditionAfterData() { Rawcooked_AfterData(true, true); }
     void RawcookedBlock_MaskAdditionFileName() { Rawcooked_FileName(true, true); }
+    void RawcookedBlock_MaskAdditionInData() { Rawcooked_InData(true, true); }
     void RawcookedSegment();
+    void RawcookedSegment_FileHash() { RawcookedBlock_FileHash(); }
+    void RawcookedSegment_FileName() { Rawcooked_FileName(false); }
+    void RawcookedSegment_InData() { Rawcooked_BeforeData(false, false); }
     void RawcookedSegment_LibraryName();
     void RawcookedSegment_LibraryVersion();
     void RawcookedTrack();
@@ -88,9 +95,11 @@ private :
     void RawcookedTrack_AfterData() { RawcookedBlock_AfterData(); }
     void RawcookedTrack_FileHash() { RawcookedBlock_FileHash(); }
     void RawcookedTrack_FileName() { RawcookedBlock_FileName(); }
+    void RawcookedTrack_InData() { RawcookedBlock_InData(); }
     void RawcookedTrack_MaskBaseBeforeData() { Rawcooked_BeforeData(true, false); }
     void RawcookedTrack_MaskBaseAfterData() { Rawcooked_AfterData(true, false); }
     void RawcookedTrack_MaskBaseFileName() { Rawcooked_FileName(true, false); }
+    void RawcookedTrack_MaskBaseInData() { Rawcooked_InData(true, false); }
     void Segment();
     void Segment_SeekHead();
     void Segment_SeekHead_Seek();
@@ -126,9 +135,9 @@ private :
     void Segment_Cluster_BlockGroup_Block_Lace();
     void Segment_Cluster_BlockGroup_BlockVirtual(){Skip_XX(Element_Size, "Data");};
     void Segment_Cluster_BlockGroup_BlockAdditions(){};
-    void Segment_Cluster_BlockGroup_BlockAdditions_BlockMore(){};
-    void Segment_Cluster_BlockGroup_BlockAdditions_BlockMore_BlockAddID(){UInteger_Info();};
-    void Segment_Cluster_BlockGroup_BlockAdditions_BlockMore_BlockAdditional(){Skip_XX(Element_Size, "Data");};
+    void Segment_Cluster_BlockGroup_BlockAdditions_BlockMore();
+    void Segment_Cluster_BlockGroup_BlockAdditions_BlockMore_BlockAddID();
+    void Segment_Cluster_BlockGroup_BlockAdditions_BlockMore_BlockAdditional();
     void Segment_Cluster_BlockGroup_BlockDuration();
     void Segment_Cluster_BlockGroup_ReferencePriority(){UInteger_Info();};
     void Segment_Cluster_BlockGroup_ReferenceBlock(){UInteger_Info();};
@@ -339,6 +348,21 @@ private :
     void Segment_Tags_Tag_SimpleTag_TagString();
     void Segment_Tags_Tag_SimpleTag_TagBinary(){Skip_XX(Element_Size, "Data");};
 
+    // Extra
+    enum hdr_format
+    {
+        HdrFormat_SmpteSt209440,
+        HdrFormat_SmpteSt2086,
+        HdrFormat_Max,
+    };
+    typedef std::map<video, Ztring[HdrFormat_Max]> hdr;
+    hdr                                 HDR;
+    void sei_message_user_data_registered_itu_t_t35();
+    void sei_message_user_data_registered_itu_t_t35_B5();
+    void sei_message_user_data_registered_itu_t_t35_B5_003C();
+    void sei_message_user_data_registered_itu_t_t35_B5_003C_0001();
+    void sei_message_user_data_registered_itu_t_t35_B5_003C_0001_04();
+
     struct stream
     {
         std::vector<int64u>     TimeCodes;
@@ -434,6 +458,9 @@ private :
     void     CodecID_Manage();
     int64u   TrackType;
     int64u   AudioBitDepth;
+
+    //Temp - BlockAddition
+    int64u   BlockAddID;
 
     //Temp
     int8u   InvalidByteMax;

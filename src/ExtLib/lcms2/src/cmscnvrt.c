@@ -715,6 +715,16 @@ int BlackPreservingGrayOnlySampler(CMSREGISTER const cmsUInt16Number In[], CMSRE
     return TRUE;
 }
 
+
+// Check whatever the profile is a CMYK->CMYK devicelink
+static
+cmsBool is_cmyk_devicelink(cmsHPROFILE hProfile)
+{
+    return cmsGetDeviceClass(hProfile) == cmsSigLinkClass &&
+            cmsGetColorSpace(hProfile) == cmsSigCmykData &&
+            cmsGetColorSpace(hProfile) == cmsSigCmykData;
+}
+
 // This is the entry for black-preserving K-only intents, which are non-ICC
 static
 cmsPipeline*  BlackPreservingKOnlyIntents(cmsContext     ContextID,
@@ -747,13 +757,15 @@ cmsPipeline*  BlackPreservingKOnlyIntents(cmsContext     ContextID,
     lastProfilePos = nProfiles - 1;
     hLastProfile = hProfiles[lastProfilePos];
 
-    while (lastProfilePos > 1)
+    // Skip CMYK->CMYK devicelinks on ending
+    while (is_cmyk_devicelink(hLastProfile))
     {
-        hLastProfile = hProfiles[--lastProfilePos];
-        if (cmsGetColorSpace(hLastProfile) != cmsSigCmykData ||
-            cmsGetDeviceClass(hLastProfile) != cmsSigLinkClass)
+        if (lastProfilePos < 2)
             break;
+
+        hLastProfile = hProfiles[--lastProfilePos];
     }
+
 
     preservationProfilesCount = lastProfilePos + 1;
 
@@ -973,13 +985,14 @@ cmsPipeline* BlackPreservingKPlaneIntents(cmsContext     ContextID,
     lastProfilePos = nProfiles - 1;
     hLastProfile = hProfiles[lastProfilePos];
 
-    while (lastProfilePos > 1)
-    {   
+    // Skip CMYK->CMYK devicelinks on ending
+    while (is_cmyk_devicelink(hLastProfile))
+    {
+        if (lastProfilePos < 2)
+            break;
+
         hLastProfile = hProfiles[--lastProfilePos];
-        if (cmsGetColorSpace(hLastProfile) != cmsSigCmykData ||
-            cmsGetDeviceClass(hLastProfile) != cmsSigLinkClass)
-            break;        
-    } 
+    }
 
     preservationProfilesCount = lastProfilePos + 1;
 

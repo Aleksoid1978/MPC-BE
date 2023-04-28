@@ -85,6 +85,11 @@ File_Pcm::File_Pcm()
     Channels=0;
     SamplingRate=0;
     Sign='\0';
+
+    //Temp
+    #if MEDIAINFO_CONFORMANCE
+    IsNotSilence=false;
+    #endif
 }
 
 //***************************************************************************
@@ -251,6 +256,14 @@ void File_Pcm::Streams_Finish()
     //No frames in PCM!
     Frame_Count=(int64u)-1;
     Frame_Count_NotParsedIncluded=(int64u)-1;
+
+    #if MEDIAINFO_CONFORMANCE
+    if (Config->ParseSpeed>=1 && !IsNotSilence)
+    {
+        Fill(Stream_Audio, 0, "ConformanceInfos", "1");
+        Fill(Stream_Audio, 0, "ConformanceInfos Content", "Content is silence");
+    }
+    #endif
 }
 
 //***************************************************************************
@@ -436,6 +449,36 @@ void File_Pcm::Data_Parse()
         Accept();
         Fill();
     }
+    #if MEDIAINFO_CONFORMANCE
+    if (Config->ParseSpeed>=1 && !IsNotSilence)
+    {
+        size_t Mask=0;
+        const int8u* Current=Buffer+Buffer_Offset;
+        const size_t* Current8=(const size_t*)(((size_t)Current)&(~(sizeof(size_t)-1)));
+        if ((int8u*)Current8!=Current)
+            Current8++;
+        auto End=Buffer+Buffer_Offset+(size_t)Element_Size;
+        const size_t* End8=(const size_t*)(((size_t)End)&(~(sizeof(size_t)-1)));
+        while (Current<(int8u*)Current8)
+        {
+            Mask|=*Current;
+            Current++;
+        }
+        while (Current8<End8)
+        {
+            Mask|=*Current8;
+            Current8++;
+        }
+        Current=(int8u*)Current8;
+        while (Current<End)
+        {
+            Mask|=*Current;
+            Current++;
+        }
+        if (Mask)
+            IsNotSilence=true;
+    }
+    #endif
 }
 
 //***************************************************************************

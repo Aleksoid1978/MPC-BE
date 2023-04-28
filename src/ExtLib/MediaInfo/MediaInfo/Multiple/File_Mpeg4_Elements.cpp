@@ -623,6 +623,7 @@ namespace Elements
     const int64u ftyp_cmff=0x636D6666;
     const int64u ftyp_cmfl=0x636D666C;
     const int64u ftyp_cmfs=0x636D6673;
+    const int64u ftyp_dash=0x64617368;
     const int64u ftyp_isom=0x69736F6D;
     const int64u ftyp_caqv=0x63617176;
     const int64u idat=0x69646174;
@@ -803,6 +804,7 @@ namespace Elements
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclc=0x6E636C63;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclx=0x6E636C78;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_colr_prof=0x70726F66;
+    const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_cuvv=0x63757676;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_d263=0x64323633;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_dac3=0x64616333;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_dac4=0x64616334;
@@ -943,6 +945,7 @@ namespace Elements
     const int64u moov_udta_tags_tseg=0x74736567;
     const int64u moov_udta_tags_tseg_tshd=0x74736864;
     const int64u moov_udta_WLOC=0x574C4F43;
+    const int64u moov_udta_thmb=0x74686D62;
     const int64u moov_udta_XMP_=0x584D505F;
     const int64u moov_udta_Xtra=0x58747261;
     const int64u moov_udta_yrrc=0x79727263;
@@ -1219,6 +1222,7 @@ void File_Mpeg4::Data_Parse()
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_mdcv)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_mhaC)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_colr)
+                                ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_cuvv)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_d263)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_dac3)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_dac4)
@@ -1391,6 +1395,7 @@ void File_Mpeg4::Data_Parse()
                     ATOM_END
                 ATOM_END
             ATOM(moov_udta_WLOC)
+            ATOM(moov_udta_thmb)
             LIST_SKIP(moov_udta_XMP_)
             ATOM(moov_udta_Xtra)
             ATOM(moov_udta_yrrc)
@@ -1624,11 +1629,13 @@ void File_Mpeg4::ftyp()
                 case Elements::ftyp_cmff :
                 case Elements::ftyp_cmfl :
                 case Elements::ftyp_cmfs :
-                                           if (Config->File_Names.size()==1)
-                                               TestContinuousFileNames(1, __T("m4s"));
                                            #if MEDIAINFO_CONFORMANCE
                                                IsCmaf=true;
                                            #endif
+                                           //fall through
+                case Elements::ftyp_dash :
+                                           if (Config->File_Names.size()==1)
+                                               TestContinuousFileNames(1, __T("m4s"));
                 default : ;
             }
         CodecID_Fill(Ztring().From_CC4(MajorBrand), Stream_General, 0, InfoCodecID_Format_Mpeg4);
@@ -6929,6 +6936,30 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_colr_prof()
 }
 
 //---------------------------------------------------------------------------
+void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_cuvv()
+{
+    Element_Name("CUVVConfigurationBox");
+
+    //Parsing
+    int16u cuva_version_map;
+    Get_B2 (cuva_version_map,                                   "cuva_version_map");
+    Skip_B2(                                                    "terminal_provide_code");
+    Skip_B2(                                                    "terminal_provide_oriented_code");
+    for (int i=0; i<4; i++)
+        Skip_B4(                                                "reserved");
+
+    FILLING_BEGIN();
+        Fill(Stream_Video, StreamPos_Last, Video_HDR_Format, "HDR Vivid");
+        for (int i=15; i>=0; i--)
+            if (cuva_version_map>>i)
+            {
+                Fill(Stream_Video, StreamPos_Last, Video_HDR_Format_Version, i+1);
+                break;
+            }
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
 void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_d263()
 {
     Element_Name("H263SpecificBox");
@@ -8851,6 +8882,36 @@ void File_Mpeg4::moov_udta_ID32()
 //---------------------------------------------------------------------------
 void File_Mpeg4::moov_udta_kywd()
 {
+    // Autodetect style
+    bool Is3Gpp=false;
+    if (Element_Size>3)
+    {
+        size_t Offset=2;
+        int8u KeywordCnt=Buffer[Buffer_Offset+Offset];
+        int8u Pos=0;
+        for (; Pos<KeywordCnt; Pos++)
+        {
+            if (Offset==Element_Size)
+                break;
+            auto Size=Buffer[Buffer_Offset+Offset];
+            Offset++;
+            if (Element_Size-Offset<Size)
+                break;
+            Offset+=Size;
+        }
+        if (Pos==KeywordCnt)
+            Is3Gpp=true;
+    }
+
+    if (!Is3Gpp)
+    {
+        Element_Name("Keywords"); //ISO
+        Ztring KeywordInfo;
+        Get_UTF8(Element_Size, KeywordInfo,                     "Data");
+        Fill(Stream_General, 0, "Keywords", KeywordInfo);
+        return;
+    }
+
     NAME_VERSION_FLAG("Keywords"); //3GP
 
     //Parsing
@@ -9109,6 +9170,40 @@ void File_Mpeg4::moov_udta_WLOC()
 
     //Parsing
     Skip_XX(Element_Size,                                       "Data");
+}
+
+//---------------------------------------------------------------------------
+void File_Mpeg4::moov_udta_thmb()
+{
+    NAME_VERSION_FLAG("Thumbnail");
+
+    //Parsing
+    if (Version)
+    {
+        Skip_XX(Element_Size-Element_Offset,                    "Data");
+        return;
+    }
+    int32u Format;
+    Get_C4 (Format,                                             "Format");
+    Fill(Stream_General, 0, General_Cover_Type, "Thumbnail");
+    MediaInfo_Internal MI;
+    Ztring Demux_Save = MI.Option(__T("Demux_Get"), __T(""));
+    MI.Option(__T("Demux"), Ztring());
+    size_t MiOpenResult = MI.Open(Buffer + (size_t)(Buffer_Offset + Element_Offset), (size_t)(Element_Size - Element_Offset), nullptr, 0, (size_t)(Element_Size - Element_Offset));
+    MI.Option(__T("Demux"), Demux_Save); //This is a global value, need to reset it. TODO: local value
+    if (MI.Count_Get(Stream_Image))
+    {
+        Stream_Prepare(Stream_Image);
+        Merge(MI, Stream_Image, 0, StreamPos_Last);
+    }
+    #if MEDIAINFO_ADVANCED
+        if (MediaInfoLib::Config.Flags1_Get(Flags_Cover_Data_base64))
+        {
+            std::string Data_Raw((const char*)(Buffer+(size_t)(Buffer_Offset+Element_Offset)), (size_t)(Element_Size-Element_Offset));
+            std::string Data_Base64(Base64::encode(Data_Raw));
+            Fill(Stream_General, 0, General_Cover_Data, Data_Base64);
+        }
+    #endif //MEDIAINFO_ADVANCED
 }
 
 //---------------------------------------------------------------------------

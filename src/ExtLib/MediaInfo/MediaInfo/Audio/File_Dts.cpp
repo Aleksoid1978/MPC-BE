@@ -423,6 +423,75 @@ static int32u DTS_HD_MaximumSampleRate[]=
     384000,
 };
 
+//---------------------------------------------------------------------------
+static int8u DTS_HD_SamplePerFrames_Factor[]=
+{
+    0,
+    1,
+    2,
+    3,
+    4,
+    1,
+    2,
+    3,
+    4,
+    5,
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+};
+
+//---------------------------------------------------------------------------
+enum extension
+{
+    Ext_Padding4,
+    Ext_Core,
+    Ext_LBR,
+    Ext_X96,
+    Ext_XLL,
+    Ext_XXCH,
+    Ext_XCh,
+    Ext_XBR,
+    Ext_Aux,
+    Ext_Max
+};
+static int32u DTS_Extension_Mapping[]=
+{
+    0x00000000,
+    0x02b09261,
+    0x0A801921,
+    0x1D95F262,
+    0x41A29547,
+    0x47004A03,
+    0x5A5A5A5A,
+    0x655E315E,
+    0x9A1105A0,
+};
+static_assert(sizeof(DTS_Extension_Mapping)/sizeof(decltype(*DTS_Extension_Mapping))==Ext_Max, "");
+static const char* DTS_Extension_Names[]=
+{
+    "Padding",
+    "Core",
+    "LBR (Low Bit Rate)",
+    "X96 (96 kHz / 24-bit)",
+    "XLL (LossLess)",
+    "XXCH (More Than 5.1 Channels)",
+    "XCh (6.1 Channels)",
+    "XBR (Extended Bit Rate)",
+    "Aux",
+};
+static_assert(sizeof(DTS_Extension_Names)/sizeof(decltype(*DTS_Extension_Names))==Ext_Max, "");
+static size_t DTS_Extension_Index_Get(int32u SyncWord)
+{
+    for (size_t i=0; i<Ext_Max; i++)
+        if (SyncWord==DTS_Extension_Mapping[i])
+            return i+1;
+    return 0;
+}
+
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -456,9 +525,7 @@ File_Dts::File_Dts()
     Primary_Frame_Byte_Size=0;
     HD_SpeakerActivityMask=(int16u)-1;
     channel_arrangement=(int8u)-1;
-    channel_arrangement_XCh=(int8u)-1;
     sample_frequency=(int8u)-1;
-    sample_frequency_X96k=(int8u)-1;
     bit_rate=(int8u)-1;
     lfe_effects=(int8u)-1;
     bits_per_sample=(int8u)-1;
@@ -469,6 +536,7 @@ File_Dts::File_Dts()
     HD_MaximumSampleRate_Real=(int8u)-1;
     HD_TotalNumberChannels=(int8u)-1;
     HD_ExSSFrameDurationCode=(int8u)-1;
+    AuxiliaryData=false;
     ExtendedCoding=false;
     ES=false;
     Core_Exists=false;
@@ -492,16 +560,16 @@ void File_Dts::Streams_Fill_Extension()
         if (Presence[presence_Core_Core] && Core_Core_LFF)
             Core_Core_Channels++;
 
-        if (Presence[presence_Core_XXCh] && i<Core_Core_Channels+Core_XXCh_nuNumChSetsInXXCh)
+        if (Presence[presence_Core_XXCH] && i<Core_Core_Channels+Core_XXCH_nuNumChSetsInXXCH)
         {
-            //switch (Core_XXCh_nuNumChSetsInXXCh)
+            //switch (Core_XXCH_nuNumChSetsInXXCH)
             //{
             //    case 1: AddCs=true; break;
             //    case 2: AddLrsRrs=true; break;
             //    default: AddX=true;
             //}
 
-            //i=Core_Core_Channels+Core_XXCh_nuNumChSetsInXXCh;
+            //i=Core_Core_Channels+Core_XXCH_nuNumChSetsInXXCH;
         }
         if (Presence[presence_Core_XCh] && i<Core_Core_Channels+Core_XCh_AMODE)
         {
@@ -549,14 +617,17 @@ void File_Dts::Streams_Fill_Extension()
     if (HD_MaximumSampleRate_Real!=(int8u)-1)
     {
         Data[SamplingRate].push_back(Ztring::ToZtring(DTS_HD_MaximumSampleRate[HD_MaximumSampleRate_Real]));
+        Data[SamplesPerFrame].push_back(Ztring::ToZtring(HD_ExSSFrameDurationCode<<(7+DTS_HD_SamplePerFrames_Factor[HD_MaximumSampleRate_Real])));
     }
     else if (HD_MaximumSampleRate!=(int8u)-1)
     {
         Data[SamplingRate].push_back(Ztring::ToZtring(DTS_HD_MaximumSampleRate[HD_MaximumSampleRate]));
+        Data[SamplesPerFrame].push_back(Ztring::ToZtring(HD_ExSSFrameDurationCode<<(7+DTS_HD_SamplePerFrames_Factor[HD_MaximumSampleRate])));
     }
     else
     {
         Data[SamplingRate].push_back(Ztring());
+        Data[SamplesPerFrame].push_back(Ztring());
     }
     Data[BitRate].push_back(Ztring::ToZtring(BitRate_Get(true), 0));
     Data[BitRate_Mode].push_back(__T("CBR"));
@@ -603,7 +674,7 @@ void File_Dts::Streams_Fill_Core_ES()
 }
 
 //---------------------------------------------------------------------------
-void File_Dts::Streams_Fill_Core()
+void File_Dts::Streams_Fill_Core(bool With96k)
 {
     Ztring Core_BitRate;
     if (bit_rate<25)
@@ -628,7 +699,8 @@ void File_Dts::Streams_Fill_Core()
         Data[ChannelLayout].push_back(Ztring(__T("User Defined"))+(Core_Core_LFF?__T(" LFE"):__T("")));
     }
     Data[BitDepth].push_back(Ztring::ToZtring(DTS_Resolution[bits_per_sample]));
-    Data[SamplingRate].push_back(Ztring::ToZtring(DTS_SamplingRate[sample_frequency]));
+    Data[SamplingRate].push_back(Ztring::ToZtring(DTS_SamplingRate[sample_frequency]*(1+With96k)));
+    Data[SamplesPerFrame].push_back(Ztring::ToZtring(Number_Of_PCM_Sample_Blocks*32*(1+With96k)));
     Data[BitRate].push_back(Core_BitRate);
     Data[BitRate_Mode].push_back(__T("CBR"));
     Data[Compression_Mode].push_back(__T("Lossy"));
@@ -643,108 +715,116 @@ void File_Dts::Streams_Fill()
     Fill(Stream_Audio, 0, Audio_Format, "DTS");
 
     // IMAX DTS:X
-    if (Extension_XLL_IMAXX_Yes>Extension_XLL_IMAXX_No*4)
-    {
-        Presence.set(presence_Extended_XLL_IMAX);
-        Presence.set(presence_Extended_XLL_X);
-    }
-    if (Presence[presence_Extended_XLL_IMAX])
+    if (Presence[presence_Extended_IMAX])
     {
         Data[Profiles].push_back(__T("IMAX"));
-
         Streams_Fill_Extension();
-        Data[BitRate].back().clear();
-        Data[BitRate_Mode].back()=__T("VBR");
-        Data[Compression_Mode].back().clear();
+        Data[ChannelPositions].back()+=__T(", Objects");
+        Data[ChannelPositions2].back()+=__T(".?");
+        Data[ChannelLayout].back()+=__T(" Objects");
+        Data[BitRate].pop_back();
+        Data[BitRate_Mode].pop_back();
+        Data[BitRate].push_back(__T("Unknown"));
+        Data[BitRate_Mode].push_back(__T("VBR"));
+        if (Presence[presence_Extended_XLL])
+        {
+            Data[Compression_Mode].pop_back();
+            Data[Compression_Mode].push_back(__T("Lossless"));
+        }
     }
 
     // DTS:X
-    if (Extension_XLL_X_Yes>Extension_XLL_X_No*4)
-        Presence.set(presence_Extended_XLL_X);
-    if (Presence[presence_Extended_XLL_X])
+    if (Presence[presence_Extended_X])
     {
         Data[Profiles].push_back(__T("X"));
-
         Streams_Fill_Extension();
-        Data[BitRate].back().clear();
-        Data[BitRate_Mode].back()=__T("VBR");
-        Data[Compression_Mode].back().clear();
-    }
-
-    // DTS-HD MA
-    if (Presence[presence_Extended_XLL])
-    {
-        Data[Profiles].push_back(__T("MA"));
-
-        Streams_Fill_Extension();
+        Data[ChannelPositions].back()+=__T(", Objects");
+        Data[ChannelPositions2].back()+=__T(".?");
+        Data[ChannelLayout].back()+=__T(" Objects");
         Data[BitRate].pop_back();
         Data[BitRate_Mode].pop_back();
-        Data[Compression_Mode].pop_back();
-
         Data[BitRate].push_back(__T("Unknown"));
         Data[BitRate_Mode].push_back(__T("VBR"));
-        Data[Compression_Mode].push_back(__T("Lossless"));
+        if (Presence[presence_Extended_XLL])
+        {
+            Data[Compression_Mode].pop_back();
+            Data[Compression_Mode].push_back(__T("Lossless"));
+        }
     }
 
     // DTS Express
     if (Presence[presence_Extended_LBR])
     {
         Data[Profiles].push_back(__T("Express"));
-
         Streams_Fill_Extension();
     }
 
-    // DTS-HD HRA
-    if (Presence[presence_Extended_XBR]
-     || Presence[presence_Extended_X96]
-     || Presence[presence_Extended_XXCh]
-     || Presence[presence_Core_XXCh])
+    // DTS-HD MA
+    if (Presence[presence_Extended_XLL])
     {
-        Data[Profiles].push_back(__T("HRA"));
+        Data[Profiles].push_back(__T("MA"));
+        Streams_Fill_Extension();
+        Data[BitRate].pop_back();
+        Data[BitRate_Mode].pop_back();
+        Data[Compression_Mode].pop_back();
+        Data[BitRate].push_back(__T("Unknown"));
+        Data[BitRate_Mode].push_back(__T("VBR"));
+        Data[Compression_Mode].push_back(__T("Lossless"));
+    }
 
-        if (Presence[presence_Extended_XBR]
-         || Presence[presence_Extended_X96]
-         || Presence[presence_Extended_XXCh])
-            Streams_Fill_Extension();
-        else
-        {
-            Streams_Fill_Core_ES();
+    // DTS-HD XXCH
+    if (Presence[presence_Extended_XXCH])
+    {
+        Data[Profiles].push_back(__T("XXCH"));
+        Streams_Fill_Extension();
+    }
 
-            if (Presence[presence_Extended_X96])
-            {
-                Data[SamplingRate].pop_back();
+    // DTS-HD XCh
+    if (Presence[presence_Extended_XCh])
+    {
+        Data[Profiles].push_back(__T("XCH"));
+        Streams_Fill_Extension();
+    }
 
-                Data[SamplingRate].push_back(Ztring::ToZtring(96000));
-            }
-        }
+    // DTS-HD XBR
+    if (Presence[presence_Extended_XBR])
+    {
+        Data[Profiles].push_back(__T("XBR"));
+        Streams_Fill_Extension();
     }
 
     // DTS-HD 96/24
-    else
-    if (Presence[presence_Core_X96])
+    if (Presence[presence_Extended_X96])
     {
-        Data[Profiles].push_back(__T("96/24"));
-
-        if (Presence[presence_Extended_X96])
-            Streams_Fill_Extension();
-        else
-        {
-            Streams_Fill_Core_ES();
-            Data[SamplingRate].pop_back();
-
-            Data[SamplingRate].push_back(Ztring::ToZtring(96000));
-        }
+        Data[Profiles].push_back(__T("X96"));
+        Streams_Fill_Extension();
     }
 
-    // DTS-ES
-    if (ES || Presence[presence_Core_XCh])
+    // DTS XXCH
+    if (Presence[presence_Core_XXCH])
     {
-        if (!ES)
-            Data[Profiles].push_back(__T("ES Discrete without ES Matrix"));
-        else if (Presence[presence_Core_XCh])
-            Data[Profiles].push_back(__T("ES Discrete"));
-        else
-            Data[Profiles].push_back(__T("ES Matrix"));
+        Data[Profiles].push_back(__T("XXCh"));
+        Streams_Fill_Core();
+    }
+
+    // DTS 96/24
+    if (Presence[presence_Core_X96])
+    {
+        Data[Profiles].push_back(__T("x96"));
+        Streams_Fill_Core(true);
+    }
+
+    // DTS XCh
+    if (Presence[presence_Core_XCh])
+    {
+        Data[Profiles].push_back(__T("ES Discrete"));
+        Streams_Fill_Core_ES();
+    }
+
+    // ES
+    if (ES)
+    {
+        Data[Profiles].push_back(__T("ES Matrix"));
         Streams_Fill_Core_ES();
     }
 
@@ -756,17 +836,17 @@ void File_Dts::Streams_Fill()
     }
 
     // Cleanup up
-    for (size_t Pos=0; Pos<10; ++Pos)
+    for (auto& Item : Data)
     {
-        Data[Pos].Separator_Set(0, __T(" / "));
-        if (Data[Pos].size()>1)
+        Item.Separator_Set(0, __T(" / "));
+        if (Item.size()>1)
         {
             bool IsNotSame=false;
-            for (size_t i=1; i<Data[Pos].size(); ++i)
-                if (Data[Pos][i]!=Data[Pos][0])
+            for (size_t i=1; i<Item.size(); ++i)
+                if (Item[i]!=Item[0])
                     IsNotSame=true;
             if (!IsNotSame)
-                Data[Pos].resize(1);
+                Item.resize(1);
         }
     }
     if (Data[Profiles].size()==1 && Data[Profiles][0]==__T("Core"))
@@ -783,6 +863,7 @@ void File_Dts::Streams_Fill()
     Fill(Stream_Audio, 0, Audio_ChannelLayout, LegacyStreamDisplay?Data[ChannelLayout].Read():Data[ChannelLayout].Read(0));
     Fill(Stream_Audio, 0, Audio_BitDepth, LegacyStreamDisplay?Data[BitDepth].Read():Data[BitDepth].Read(0));
     Fill(Stream_Audio, 0, Audio_SamplingRate, LegacyStreamDisplay?Data[SamplingRate].Read():Data[SamplingRate].Read(0));
+    Fill(Stream_Audio, 0, Audio_SamplesPerFrame, LegacyStreamDisplay?Data[SamplesPerFrame].Read():Data[SamplesPerFrame].Read(0));
     Fill(Stream_Audio, 0, Audio_BitRate, LegacyStreamDisplay?Data[BitRate].Read():(Data[BitRate].Read(0)==__T("Unknown")?Ztring():Data[BitRate].Read(0)));
     Fill(Stream_Audio, 0, Audio_BitRate_Mode, LegacyStreamDisplay?Data[BitRate_Mode].Read():Data[BitRate_Mode].Read(0));
     Fill(Stream_General, 0, General_OverallBitRate_Mode, Retrieve(Stream_Audio, 0, Audio_BitRate_Mode));
@@ -791,10 +872,6 @@ void File_Dts::Streams_Fill()
     // Cleanup up
     for (size_t Pos=0; Pos<10; ++Pos)
         Data[Pos].clear();
-
-    //Samples per frame (to be done after SamplingRate filling because it is used during Fill())
-    if (Presence[presence_Core_Core])
-        Fill(Stream_Audio, 0, Audio_SamplesPerFrame, Number_Of_PCM_Sample_Blocks*32); // Samples per Core frames. TODO: samples per HD frames (interesting?)
 }
 
 //---------------------------------------------------------------------------
@@ -997,29 +1074,40 @@ void File_Dts::Data_Parse()
 
     //Parsing
     int32u Sync;
-    Get_B4 (Sync,                                               "Sync");
+    Peek_B4 (Sync);
     if (Sync==0x64582025)
     {
         //HD
         Element_Name("HD");
+        Element_Info1(Ztring::ToZtring(Frame_Count-(Core_Exists?1:0)));
         Element_Code=1;
 
-        int16u header_size;
+        Element_Begin1("Header");
+        int16u ExtSSHeaderSize;
         int8u  SubStreamIndex, NumAssets, NumAudioPresent;
         bool isBlownUpHeader, StaticFieldsPresent;
+        Skip_B4(                                                "Sync");
         Skip_B1(                                                "UserDefinedBits");
         BS_Begin();
+        int64u EndBS=Data_BS_Remain();
         Get_S1 (2, SubStreamIndex,                              "ExtSSIndex");
         Get_SB (isBlownUpHeader,                                "HeaderSizeType");
         int8u ExtraSize=((int8u)isBlownUpHeader)<<2;
-        Get_S2 ( 8+ExtraSize, header_size,                      "Bits4Header"); header_size++; Param_Info2(header_size, " bytes");
-        Get_S3 (16+ExtraSize, HD_size,                          "Bits4ExSSFsize"); HD_size++; Param_Info2(HD_size, " bytes");
-        auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, header_size-5);
+        Get_S2 ( 8+ExtraSize, ExtSSHeaderSize,                  "ExtSSHeaderSize");
+        if (ExtSSHeaderSize<4)
+        {
+            Element_End0();
+            return;
+        }
+        auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, ExtSSHeaderSize-4);
         if (CRC)
         {
             Element_Info1("CRC NOK");
+            Element_End0();
             return;
         }
+        Param_Info2(ExtSSHeaderSize+1, " bytes");
+        Get_S3 (16+ExtraSize, HD_size,                          "ExtSSFsize"); HD_size++; Param_Info2(HD_size, " bytes");
         TESTELSE_SB_GET(StaticFieldsPresent,                    "StaticFieldsPresent");
             std::vector<int32u> ActiveExSSMasks;
             Info_S1(2, RefClockCode,                            "RefClockCode"); Param_Info1(DTS_HD_RefClockCode[RefClockCode]);
@@ -1051,19 +1139,11 @@ void File_Dts::Data_Parse()
             NumAudioPresent=1;
             NumAssets=1;
         TESTELSE_SB_END();
-        Asset_Sizes.clear();
         Element_Begin1("Sizes");
         for (int8u Pos=0; Pos<NumAssets; Pos++)
         {
             int32u Size;
-            if (isBlownUpHeader)
-            {
-                Get_S3 (20, Size,                               "AssetFsize"); Size++; Param_Info2(Size, " bytes");
-            }
-            else
-            {
-                Get_S3 (16, Size,                               "AssetFsize"); Size++; Param_Info2(Size, " bytes");
-            }
+            Get_S3 (16+ExtraSize, Size,                         "AssetFsize"); Size++; Param_Info2(Size, " bytes");
             Asset_Sizes.push_back(Size);
         }
         Element_End0();
@@ -1111,23 +1191,34 @@ void File_Dts::Data_Parse()
                     {
                         int8u NumDecCh4Remap;
                         Get_S1(5, NumDecCh4Remap,               "NumDecCh4Remap");
-                        //Not finnished!
+                        break; //Not finnished!
                     }
                 TEST_SB_END();
                 Element_End0();
             }
         }
+        auto RemainingBits=(ExtSSHeaderSize-6)*8-(EndBS-Data_BS_Remain());
+        if (RemainingBits)
+        {
+            int8u Padding=1;
+            if (RemainingBits<8)
+                Peek_S1(RemainingBits, Padding);
+            Skip_BS(RemainingBits,                              Padding?"(Not parsed)":"Padding");
+        }
         BS_End();
-        Skip_XX(header_size-Element_Offset,                   "Unknown");
+        Skip_B2(                                                "CRC16ExtSSHeader");
+        Element_End0();
     }
     else
     {
         //Frame
         Element_Name("Frame");
+        Element_Info1(Ztring::ToZtring(Frame_Count));
         Element_Code=0;
 
         int8u  EncoderSoftwareRevision;
         bool   crc_present;
+        Skip_B4(                                                    "Sync");
         BS_Begin();
         Info_SB(    FrameType,                                      "Frame Type"); Param_Info1(DTS_FrameType[FrameType]);
         Skip_S1( 5,                                                 "Deficit Sample Count");
@@ -1146,7 +1237,7 @@ void File_Dts::Data_Parse()
         Skip_SB(                                                    "Embedded Down Mix Enabled");
         Skip_SB(                                                    "Embedded Dynamic Range");
         Skip_SB(                                                    "Embedded Time Stamp");
-        Skip_SB(                                                    "Auxiliary Data");
+        Get_SB (    AuxiliaryData,                                  "Auxiliary Data");
         Skip_SB(                                                    "HDCD");
         Get_S1 ( 3, ExtensionAudioDescriptor,                       "Extension Audio Descriptor"); Param_Info1(DTS_ExtensionAudioDescriptor[ExtensionAudioDescriptor]);
         Get_SB (    ExtendedCoding,                                 "Extended Coding");
@@ -1178,9 +1269,6 @@ void File_Dts::Data_Parse()
         }
         BS_End();
     }
-
-    //Name
-    Element_Info1(Ztring::ToZtring(Frame_Count));
 
     //PTS
     Element_Info1C((FrameInfo.PTS!=(int64u)-1), __T("PTS ")+Ztring().Duration_From_Milliseconds(float64_int64s(((float64)FrameInfo.PTS)/1000000)));
@@ -1228,7 +1316,7 @@ void File_Dts::Data_Parse()
     switch(Element_Code)
     {
         case 0  : Core(); break;
-        case 1  : HD(); break;
+        case 1  : Extensions(); break;
         default : Skip_XX(Element_Size,                         "Data");
     }
 
@@ -1258,59 +1346,12 @@ void File_Dts::Core()
     Core_Exists=true;
     Presence.set(presence_Core_Core);
 
-    //Looking for extensions
-    int64u Core_Size=Element_Size, XCh_Sync=Element_Size, XXCh_Sync=Element_Size, X96k_Sync=Element_Size;
-    if (ExtendedCoding)
-    {
-        //XCh
-        if (ExtensionAudioDescriptor==0 || ExtensionAudioDescriptor==3)
-            for (size_t Pos=0; Pos+4<=Element_Size; Pos++)
-                if (CC4(Buffer+Buffer_Offset+Pos)==0x5A5A5A5A)
-                    XCh_Sync=Pos;
-
-        //XXCh
-        if (ExtensionAudioDescriptor==6)
-            for (size_t Pos=0; Pos+4<=Element_Size; Pos++)
-                if (CC4(Buffer+Buffer_Offset+Pos)==0x47004A03)
-                    XXCh_Sync=Pos;
-
-        //X96k
-        if (ExtensionAudioDescriptor==2 || ExtensionAudioDescriptor==3)
-            for (size_t Pos=0; Pos+4<=Element_Size; Pos++)
-                if (CC4(Buffer+Buffer_Offset+Pos)==0x1D95F262)
-                    X96k_Sync=Pos;
-
-        //Finding core size
-        if (XCh_Sync<Core_Size)
-            Core_Size=XCh_Sync;
-        if (XXCh_Sync<Core_Size)
-            Core_Size=XXCh_Sync;
-        if (X96k_Sync<Core_Size)
-            Core_Size=X96k_Sync;
-    }
-
     //Parsing
-    Skip_XX(Core_Size-Element_Offset,                           "Core data");
-    if (ExtendedCoding && (ExtensionAudioDescriptor==2 || ExtensionAudioDescriptor==3))
+    if (AuxiliaryData || ExtendedCoding)
     {
-        Element_Begin0();
-        Skip_B4(                                                "Magic");
-        Core_X96k(XCh_Sync-Element_Offset);
-        Element_End0();
-    }
-    if (ExtendedCoding && (ExtensionAudioDescriptor==0 || ExtensionAudioDescriptor==3))
-    {
-        Element_Begin0();
-        Skip_B4(                                                "Magic");
-        Core_XCh(Element_Size-Element_Offset);
-        Element_End0();
-    }
-    if (ExtendedCoding && ExtensionAudioDescriptor==6)
-    {
-        Element_Begin0();
-        Skip_B4(                                                "Magic");
-        Core_XXCh(Element_Size-Element_Offset);
-        Element_End0();
+        Extensions_Resynch();
+        Asset_Sizes.push_back(Element_Size-Element_Offset);
+        Extensions();
     }
 
     //Filling
@@ -1328,114 +1369,49 @@ void File_Dts::Core()
 }
 
 //---------------------------------------------------------------------------
-void File_Dts::Core_XCh(int64u Size)
+void File_Dts::Extensions()
 {
     //Parsing
-    Element_Name("XCh (6.1 channels)");
-    int16u XChFSIZE;
-    int8u  AMODE;
-    BS_Begin();
-    Get_S2 (10, XChFSIZE,                                       "Primary Frame Byte Size");
-    Get_S1 ( 4, AMODE,                                          "Extension Channel Arrangement");
-    BS_End();
-    if (XChFSIZE==Element_Size-(Element_Offset-6))
-        XChFSIZE--; //Compatibility reason (from specs)
-    if ((int64u)XChFSIZE+1-6<=Size-2)
-        Skip_XX(XChFSIZE+1-6,                                   "XCh data");
-    else
-        Skip_XX(Size-2,                                         "XCh data (with problem)");
-
-    FILLING_BEGIN();
-        channel_arrangement_XCh=AMODE;
-        Presence.set(presence_Core_XCh);
-        Core_XCh_AMODE=AMODE;
-    FILLING_END();
-}
-
-//---------------------------------------------------------------------------
-void File_Dts::Core_XXCh(int64u Size)
-{
-    Element_Name("XXCh (6.1 or 7.1 channels)");
-    int8u ChannelsAdded;
-    BS_Begin();
-    Skip_S1 (6,                                                 "nuHeaderSizeXXCh minus 1");
-    Skip_S1 (1,                                                 "bCRCPresent4ChSetHeaderXXCh minus 1");
-    Skip_S1 (5,                                                 "nuBits4SpkrMaskXXCh minus 1");
-    Get_S1  (2, ChannelsAdded,                                  "nuNumChSetsInXXCh minus 1");
-    Skip_S1 (2,                                                 "?");
-    BS_End();
-    Skip_XX(Size-2,                                             "Data");
-
-    FILLING_BEGIN();
-        channel_arrangement_XCh=ChannelsAdded+1;
-        Core_XXCh_nuNumChSetsInXXCh=ChannelsAdded+1;
-        Presence.set(presence_Core_XXCh);
-    FILLING_END();
-}
-
-//---------------------------------------------------------------------------
-void File_Dts::Core_X96k(int64u Size)
-{
-    //Parsing
-    Element_Name("X96k (96 KHz)");
-    int16u FSIZE96;
-    int8u  REVNO;
-    BS_Begin();
-    Get_S2 (12, FSIZE96,                                        "96 kHz Extension Frame Byte Data Size");
-    Get_S1 ( 4, REVNO,                                          "Revision Number");
-    BS_End();
-    Skip_XX(Size-2,                                             "X96k data"); //FSIZE96 is until end, not X96k size
-
-    FILLING_BEGIN();
-        sample_frequency_X96k=14; //96KHz
-        Profile="96/24";
-        Presence.set(presence_Core_X96);
-    FILLING_END();
-}
-
-//---------------------------------------------------------------------------
-void File_Dts::HD()
-{
-    //Parsing
-    while (Element_Offset<Element_Size)
-
+    for (auto Size : Asset_Sizes)
     {
-        //Looking for size
-        int64u Next=Element_Offset+4;
-        while (Next+4<=Element_Size)
+        if (Element_Code)
+            Element_Begin1("Asset");
+        if (Size<4)
         {
-            int32u CC=CC4(Buffer+Buffer_Offset+(size_t)Next);
-            if (CC==0x0A801921
-             || CC==0x1D95F262
-             || CC==0x41A29547
-             || CC==0x47004A03
-             || CC==0x5A5A5A5A
-             || CC==0x655E315E)
-                break;
-            Next++;
+            Skip_XX(Size,                                       "?");
+            continue;
         }
-        if (Next+4>Element_Size)
-            Next=Element_Size;
-
-        Element_Begin0();
-        int32u Magic;
-        Get_B4 (Magic,                                          "Magic");
-        switch (Magic)
+        auto Element_Size_Save=Element_Size;
+        Element_Size=Element_Offset+Size;
+        while (Element_Size-Element_Offset>=4)
         {
-            case 0x0A801921 : HD_XSA(Next-Element_Offset);  break;
-            case 0x1D95F262 : HD_X96k(Next-Element_Offset); break;
-            case 0x41A29547 : HD_XLL(Next-Element_Offset);  break;
-            case 0x47004A03 : HD_XXCh(Next-Element_Offset); break;
-            case 0x5A5A5A5A : HD_XCh(Next-Element_Offset);  break;
-            case 0x655E315E : HD_XBR(Next-Element_Offset);  break;
-            default :
-                        //Magic value is unknown
-                        if (Profile.empty())
-                            Profile="HD";
-                        Skip_XX(Next-Element_Offset,            "Data");
+            Element_Begin0();
+            int32u SyncWord;
+            Get_B4(SyncWord,                                    "Sync Word");
+            auto Index=DTS_Extension_Index_Get(SyncWord);
+            Element_Name(Index?Ztring().From_UTF8(DTS_Extension_Names[Index-1]):Ztring::ToZtring(SyncWord, 16));
+            switch (Index-1)
+            {
+                #define CASE(EXT) case Ext_##EXT : EXT(); break;
+                CASE(Padding4);
+                CASE(LBR);
+                CASE(X96);
+                CASE(XLL);
+                CASE(XXCH);
+                CASE(XCh);
+                CASE(XBR);
+                CASE(Aux);
+                #undef CASE
+                default:
+                    Extensions_Resynch();
+            }
+            Element_End0();
         }
-        Element_End0();
+        Element_Size=Element_Size_Save;
+        if (Element_Code)
+            Element_End0();
     }
+    Asset_Sizes.clear();
 
     //Filling
     FILLING_BEGIN();
@@ -1449,84 +1425,229 @@ void File_Dts::HD()
                 Finish("DTS");
         }
     FILLING_END();
-}
 
-//---------------------------------------------------------------------------
-void File_Dts::HD_XCh(int64u Size)
-{
-    //Parsing
-    Element_Name("XCh (6.1 channels)");
-    Skip_XX(Size,                                               "Data");
-
-    FILLING_BEGIN();
-        channel_arrangement_XCh=1;
-        if (Profile.empty())
-            Profile="HRA";
-    FILLING_END();
-}
-
-//---------------------------------------------------------------------------
-void File_Dts::HD_XXCh(int64u Size)
-{
-    Element_Name("XXCh (6.1 or 7.1 channels)");
-    int8u ChannelsAdded;
-    BS_Begin();
-    Skip_S1 (8,                                                 "?");
-    Get_S1  (2, ChannelsAdded,                                  "Channels added?");
-    Skip_S1 (6,                                                 "?");
-    BS_End();
-    Skip_XX(Size-2,                                             "Data");
-
-    FILLING_BEGIN();
-        channel_arrangement_XCh=ChannelsAdded;
-        if (Profile.empty())
-            Profile="HRA";
-        Presence.set(presence_Extended_XXCh);
-    FILLING_END();
-}
-
-//---------------------------------------------------------------------------
-void File_Dts::HD_X96k(int64u Size)
-{
-    //Parsing
-    Element_Name("X96k (96 KHz)");
-    Skip_XX(Size,                                               "Data");
-
-    FILLING_BEGIN();
-        sample_frequency=14; //96KHz
-        Profile="HRA";
-        Presence.set(presence_Extended_X96);
-    FILLING_END();
-}
-
-//---------------------------------------------------------------------------
-void File_Dts::HD_XLL(int64u Size)
-{
-    Element_Name("XLL (LossLess)");
-
-    // Quick and dirty search of DTS:X pattern
-    if (!Presence[presence_Extended_XLL])
+    if (Element_Size-Element_Offset>=6)
     {
-        Extension_XLL_X_No=0;
-        Extension_XLL_X_Yes=0;
-        Extension_XLL_IMAXX_No=0;
-        Extension_XLL_IMAXX_Yes=0;
+        int64u SyncWord;
+        Peek_B6(SyncWord);
+        if (SyncWord==0x3A429B0A0011)
+        {
+            Element_Begin1("After assets?");
+            Element_Begin1("Header");
+            Skip_B6(                                            "SyncWord");
+            Element_End0();
+            Extensions2();
+            Element_End0();
+        }
+    }
+    if (Element_Size>Element_Offset)
+        Skip_XX(Element_Size-Element_Offset,                    "(Unknown)");
+}
+
+//---------------------------------------------------------------------------
+void File_Dts::Extensions_Resynch()
+{
+    if (Element_Size-Element_Offset<4)
+        return;
+    auto Element_Offset_Sav=Element_Offset;
+    auto Element_Offset_Max=Element_Size-3;
+    auto Base=Buffer+Buffer_Offset;
+    auto AlignmentBytes=Element_Offset%4;
+    if (AlignmentBytes)
+        Element_Offset+=4-AlignmentBytes;
+    while (Element_Offset<Element_Offset_Max)
+    {
+        auto SuncWord=BigEndian2int32u(Base+(size_t)Element_Offset);
+        auto Index=DTS_Extension_Index_Get(SuncWord);
+        if (Index>1)
+        {
+            bool IsNok=false;
+            if (Element_Code)
+            {
+                // HD
+                switch (Index-1)
+                {
+                    case Ext_X96:
+                    case Ext_XLL:
+                    case Ext_XXCH:
+                        break;
+                    default:
+                        IsNok=true;
+                }
+            }
+            else
+            {
+                // Core
+                switch (Index-1)
+                {
+                    case Ext_XCh:
+                        IsNok=!ExtendedCoding || (ExtensionAudioDescriptor!=0 && ExtensionAudioDescriptor!=3);
+                        break;
+                    case Ext_XXCH:
+                        IsNok=!ExtendedCoding || (ExtensionAudioDescriptor!=6);
+                        break;
+                    case Ext_X96:
+                        IsNok=!ExtendedCoding || (ExtensionAudioDescriptor!=2 && ExtensionAudioDescriptor!=3);
+                        break;
+                    case Ext_Aux:
+                        IsNok=!AuxiliaryData;
+                        break;
+                    default:
+                        IsNok=true;
+                }
+            }
+            if (!IsNok)
+                break;
+        }
+        Element_Offset+=4;
+    }
+    if (Element_Offset!=Element_Offset_Sav)
+    {
+        swap(Element_Offset, Element_Offset_Sav);
+        if (Element_Size-Element_Offset_Sav<=3)
+            Element_Offset_Sav=Element_Size;
+        Skip_XX(Element_Offset_Sav-Element_Offset,              "(Not parsed)");
+    }
+}
+
+//---------------------------------------------------------------------------
+void File_Dts::Extensions_Padding()
+{
+    auto Begin=Buffer+Buffer_Offset+(size_t)Element_Offset;
+    auto Current=Begin;
+    auto Size=Element_Size-Element_Offset;
+    auto PaddingBytes=4-(Element_Offset%4);
+    if (PaddingBytes!=4 && PaddingBytes<=Size)
+    {
+        int32u Padding;
+        switch (PaddingBytes)
+        {
+            case 1 : Padding=BigEndian2int8u(Current); break;
+            case 2 : Padding=BigEndian2int16u(Current); break;
+            default: Padding=BigEndian2int24u(Current);
+        }
+        if (Padding)
+        {
+            Skip_XX(PaddingBytes,                               "(Unknown)");
+            return;
+        }
+        Current+=PaddingBytes;
+    }
+    
+    auto End=decltype(Begin)((((size_t)Current+Size)>>2)<<2);
+    while (Current<End)
+    {
+        if (BigEndian2int32u(Current))
+            break;
+        Current+=4;
     }
 
+    Skip_XX(Current-Begin,                                      "Padding");
+}
+
+//---------------------------------------------------------------------------
+void File_Dts::LBR()
+{
+    Extensions_Resynch();
+
+    FILLING_BEGIN();
+        Presence.set(presence_Extended_LBR);
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Dts::X96()
+{
+    //Coherency check
+    auto MaxSize=Element_Size-Element_Offset+3;
+    if (Element_Code)
+    {
+        // HD
+        int8u Begin;
+        Peek_B1(Begin);
+        int8u HeaderSize=Begin>>2;
+        if (HeaderSize<=3)
+            return;
+        auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, HeaderSize-3);
+        if (CRC)
+            return;
+    }
+    else
+    {
+        // Core
+        auto MaxSize=Element_Size-Element_Offset+3;
+        if (MaxSize<95)
+            return;
+        int16u Begin;
+        Peek_B2(Begin);
+        int16u Size=Begin>>4;
+        if (Size<95 || Size!=MaxSize)
+            return;
+        Skip_XX(Size-3,                                         "(Not parsed)");
+    }
+
+    FILLING_BEGIN();
+        Presence.set(Element_Code?presence_Extended_X96:presence_Core_X96);
+    FILLING_END();
+
+    Extensions_Resynch();
+}
+
+//---------------------------------------------------------------------------
+void File_Dts::AfterAssets()
+{
+    // Found in DTS:X content when after assets, no idea about what it is
+    auto MaxSize=Element_Size-Element_Offset;
+    if (MaxSize<2)
+        return;
+    int16u Begin;
+    Peek_B2(Begin);
+    if (Begin!=0x0011)
+        return;
+    Skip_B2(                                                    "?");
+}
+
+//---------------------------------------------------------------------------
+void File_Dts::XLL()
+{
+    //Coherency check
+    auto MaxSize=Element_Size-Element_Offset+3;
+    if (MaxSize<8)
+        return;
+    int16u Begin;
+    Peek_B2(Begin);
+    int8u Version=Begin>>12;
+    if (Version)
+        return;
+    int8u HeaderSize=Begin>>4;
+    if (HeaderSize<8)
+        return;
+    auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, HeaderSize-3);
+    if (CRC)
+        return;
+
     // Parsing
-    int64u End=Element_Offset+Size;
-    int64u LLFrameSize;
+    int32u LLFrameSize;
     int16u ChSetHeaderSize;
-    int8u HeaderSize, Bits4FrameFsize, NumChSetsInFrame, SegmentsInFrame, Bits4SSize, Bits4ChMask;
+    int8u Bits4FrameFsize, NumChSetsInFrame, SegmentsInFrame, Bits4SSize, Bits4ChMask;
     bool ScalableLSBs;
-    Element_Begin1("Common");
+    Element_Begin1("Header");
+    auto Element_Offset_Start=Element_Offset;
     BS_Begin();
     int64u EndBS=Data_BS_Remain();
     Skip_S1(4,                                                  "Version");
-    Get_S1 (8, HeaderSize,                                      "HeaderSize"); Param_Info1(HeaderSize-3);
-    auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, HeaderSize-3);
+    Skip_S1(8,                                                  "HeaderSize"); Param_Info1(HeaderSize);
     Get_S1 (5, Bits4FrameFsize,                                 "Bits4FrameFsize"); Param_Info1(Bits4FrameFsize+1);
-    Get_S8 (Bits4FrameFsize+1, LLFrameSize,                     "LLFrameSize"); Param_Info1(LLFrameSize+1);
+    Get_S4 (Bits4FrameFsize+1, LLFrameSize,                     "LLFrameSize minus 1");
+    if (LLFrameSize<6)
+    {
+        BS_End();
+        Element_End0();
+        Element_Offset=Element_Offset_Start;
+        return;
+    }
+    auto Element_Size_Save=Element_Size;
+    Element_Size=Element_Offset_Start-3+LLFrameSize;
     Get_S1 (4, NumChSetsInFrame,                                "NumChSetsInFrame");
     NumChSetsInFrame++; Param_Info1(NumChSetsInFrame);
     Get_S1 (4, SegmentsInFrame,                                 "SegmentsInFrame"); Param_Info1(1<<SegmentsInFrame);
@@ -1545,35 +1666,41 @@ void File_Dts::HD_XLL(int64u Size)
         int8u Padding=(int8u)-1;
         if (RemainingBitHeader<8)
             Peek_S1(RemainingBitHeader, Padding);
-        Skip_BS(RemainingBitHeader,                             Padding?"(Unknown)":"Padding");;
+        Skip_BS(RemainingBitHeader,                             Padding?"(Unknown)":"Padding");
     }
     BS_End();
     Skip_B2 (                                                   "CRC16Header"); Param_Info1(CRC?"NOK":"OK");
     Element_End0();
     for (int8u i=0; i<NumChSetsInFrame; i++)
     {
+        int16u Begin;
+        Peek_B2(Begin);
+        int8u ChSetHeaderSize=Begin>>6;
+        auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, ChSetHeaderSize+1);
+        if (CRC)
+        {
+            Element_Offset=Element_Offset_Start;
+            return;
+        }
         Element_Begin1("Channel Set");
         BS_Begin();
         int64u EndBS=Data_BS_Remain();
         int8u ChSetLLChannel, BitResolution, FreqIndex, ReplacementSet;
-        Get_S2 (10, ChSetHeaderSize,                            "ChSetHeaderSize");
-        CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, ChSetHeaderSize+1);
+        Skip_S2(10,                                             "ChSetHeaderSize");
         Get_S1 (4, ChSetLLChannel,                              "ChSetLLChannel");
         ChSetLLChannel+=1;
         Skip_BS(ChSetLLChannel,                                 "ResidualChEncode");
         Get_S1 (5, BitResolution,                               "BitResolution"); BitResolution++;
-        if (((int8s)HD_BitResolution_Real)<((int8s)BitResolution) && !CRC)
+        if (((int8s)HD_BitResolution_Real)<((int8s)BitResolution))
             HD_BitResolution_Real=BitResolution;
         Skip_S1(5,                                              "BitWidth");
         Get_S1 (4, FreqIndex,                                   "FreqIndex"); Param_Info1(DTS_HD_MaximumSampleRate[FreqIndex]);
-        if (((int8s)HD_MaximumSampleRate_Real)<((int8s)FreqIndex) && !CRC)
+        if (((int8s)HD_MaximumSampleRate_Real)<((int8s)FreqIndex))
             HD_MaximumSampleRate_Real=FreqIndex;
         Skip_S1(2,                                              "FsInterpolate");
         Get_S1 (2, ReplacementSet,                              "ReplacementSet");
         if (ReplacementSet)
-        {
             Skip_SB(                                            "ActiveReplaceSet");
-        }
         if (One2OneMapChannels2Speakers)
         {
             bool PrimaryChSet, DownmixCoeffCodeEmbedded, ChMaskEnabled;
@@ -1590,19 +1717,18 @@ void File_Dts::HD_XLL(int64u Size)
             }
             else
             {
-            Get_SB (    ChMaskEnabled,                           "ChMaskEnabled");
-            if (ChMaskEnabled)
-            {
-                Info_S4(Bits4ChMask, ChMask,                     "hMask"); Param_Info1(DTS_HD_SpeakerActivityMask(ChMask).c_str());
-            }
+                Get_SB (    ChMaskEnabled,                      "ChMaskEnabled");
+                if (ChMaskEnabled)
+                {
+                    Info_S4(Bits4ChMask, ChMask,                "Mask"); Param_Info1(DTS_HD_SpeakerActivityMask(ChMask).c_str());
+                }
             }
         }
         Skip_BS((ChSetHeaderSize-1)*8-(EndBS-Data_BS_Remain()), "(Not parsed)");
         BS_End();
-        Skip_B2 (                                               "CRC16SubHeader"); Param_Info1(CRC?"NOK":"OK");
+        Skip_B2 (                                               "CRC16SubHeader"); Param_Info1("OK");
         Element_End0();
     }
-    size_t Sizes_Total=0;
     size_t Count=(1<<SegmentsInFrame)*NumChSetsInFrame;
     if (DTS_HD_MaximumSampleRate[HD_MaximumSampleRate_Real]>DTS_SamplingRate[sample_frequency])
     {
@@ -1611,30 +1737,34 @@ void File_Dts::HD_XLL(int64u Size)
             Count*=2;
     }
     size_t NaviByteCount=(Count*Bits4SSize+7)/8+2;
-    bool NaviIsfine=false;
     CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, NaviByteCount);
     if (CRC)
     {
-        while (CRC)
+        auto Buffer_Temp=Buffer+Buffer_Offset+Element_Offset+NaviByteCount;
+        auto Buffer_End=Buffer+Buffer_Offset+(size_t)Element_Size;
+        while (CRC && Buffer_Temp<Buffer_End)
+            CRC=(CRC>>8)^CRC_CCIT_Table[((uint8_t)CRC)^*Buffer_Temp++];
+        if (CRC)
         {
-            auto Buffer_Temp=Buffer+Buffer_Offset+Element_Offset+NaviByteCount;
-            auto Buffer_End=Buffer+Buffer_Offset+End;
-            while (CRC && Buffer_Temp<Buffer_End)
-                CRC=(CRC>>8)^CRC_CCIT_Table[((uint8_t)CRC)^*Buffer_Temp++];
-            if (!CRC)
-            {
-                NaviIsfine=true;
-                Count=(Buffer_Temp-(Buffer+Buffer_Offset+Element_Offset)-2)*8/Bits4SSize;
-            }
+            Element_Offset=Element_Offset_Start;
+            return;
         }
+        Count=(Buffer_Temp-(Buffer+Buffer_Offset+Element_Offset)-2)*8/Bits4SSize;
     }
-    else
-        NaviIsfine=true;
-    if (!NaviIsfine)
+    auto SegmentSize_Size=2+(Count*Bits4SSize+7)/8;
+    if (Element_Size-Element_Offset<SegmentSize_Size)
     {
+        Element_Offset=Element_Offset_Start;
+        return;
+    }
+    CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, SegmentSize_Size);
+    if (CRC)
+    {
+        Element_Offset=Element_Offset_Start;
         return;
     }
     Element_Begin1("NAVI");
+    size_t Sizes_Total=0;
     BS_Begin();
     for (size_t j=0; j<Count; j++)
     {
@@ -1644,72 +1774,257 @@ void File_Dts::HD_XLL(int64u Size)
         //TODO: Better management of HD sampling rate > base sampling rate
     }
     BS_End();
-    Skip_B2(                                                    "CRC16");
+    Skip_B2(                                                    "CRC16"); Param_Info1("OK");
     Element_End0();
 
+    if (Element_Size-Element_Offset<Sizes_Total+Count)
+    {
+        Element_Offset=Element_Offset_Start;
+        return;
+    }
     Skip_XX(Sizes_Total,                                        "Segments");
-    Skip_XX(Count,                                              "1 byte per set?");
-    if (End>Element_Offset)
-    {
-        auto Remainingbytes=Element_Offset%4;
-        if (Remainingbytes)
-            Remainingbytes=4-Remainingbytes;
-        if (Remainingbytes)
-            Skip_XX(Remainingbytes,                             "Padding?");
-    }
-    if (End>Element_Offset)
-    {
-        auto Remainingbytes=End-Element_Offset;
-        if (Remainingbytes>3 && BigEndian2int32u(Buffer+Buffer_Offset+Element_Offset)==0x02000850)
-        {
-            Skip_XX(Remainingbytes,                             "DTS:X?");
-            Extension_XLL_X_Yes++;
-        }
-        else
-        {
-            Extension_XLL_X_No++;
-        }
-        if (Remainingbytes>3 && (BigEndian2int32u(Buffer+Buffer_Offset+Element_Offset)>>1)==(0xF14000D0>>1))
-        {
-            Skip_XX(Remainingbytes,                             "IMAX?");
-            Extension_XLL_IMAXX_Yes++;
-        }
-        else
-        {
-            Extension_XLL_IMAXX_No++;
-        }
-    }
-    if (End>Element_Offset)
-        Skip_XX(End-Element_Offset,                             "(Not parsed)");
+    Skip_XX(Count,                                              "1 byte per segment?");
 
     FILLING_BEGIN();
-        Profile="MA";
         Presence.set(presence_Extended_XLL);
     FILLING_END();
+
+    Extensions_Padding();
+    if (Element_Offset<Element_Size)
+        Extensions2();
+    Element_Size=Element_Size_Save;
 }
 
 //---------------------------------------------------------------------------
-void File_Dts::HD_XBR(int64u Size)
+void File_Dts::XXCH()
 {
-    Element_Name("XBR (BitRate extension)");
-    Skip_XX(Size,                                               "Data");
+    //Coherency check
+    auto MaxSize=Element_Size-Element_Offset+3;
+    if (MaxSize<8)
+        return;
+    int8u Begin;
+    Peek_B1(Begin);
+    int8u HeaderSize=Begin>>2;
+    if (HeaderSize<8)
+        return;
+    auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, HeaderSize-3);
+    if (CRC)
+        return;
+
+    // Parsing
+    Element_Begin1("Header");
+    vector<int16u> ChSetFsizeXXCHs;
+    int16u CoreSpkrActivityMask;
+    int8u HeaderSizeXXCH, Bits4SpkrMaskXXCH, NumChSetsInXXCH;
+    bool bCRCPresent4ChSetHeaderXXCH;
+    auto Element_Offset_Start=Element_Offset;
+    BS_Begin();
+    int64u EndBS=Data_BS_Remain();
+    Skip_S1(6,                                                  "HeaderSizeXXCH minus 1");
+    Get_SB (   bCRCPresent4ChSetHeaderXXCH,                     "CRCPresent4ChSetHeaderXXCH");
+    Get_S1 (5, Bits4SpkrMaskXXCH,                               "Bits4SpkrMaskXXCH minus 1");
+    Bits4SpkrMaskXXCH++;
+    Get_S1 (2, NumChSetsInXXCH,                                 "NumChSetsInXXCH minus 1");
+    for (int8u nChSet=0; nChSet<=NumChSetsInXXCH; nChSet++)
+    {
+        int16u ChSetFsizeXXCH;
+        Get_S2 (14, ChSetFsizeXXCH,                             "ChSetFsizeXXCH minus 1");
+        if (bCRCPresent4ChSetHeaderXXCH && ChSetFsizeXXCH<=1)
+        {
+            BS_End();
+            Element_End0();
+            Element_Offset=Element_Offset_Start;
+            return;
+        }
+        ChSetFsizeXXCHs.push_back(ChSetFsizeXXCH);
+    }
+    Get_S2 (Bits4SpkrMaskXXCH, CoreSpkrActivityMask,            "CoreSpkrActivityMask");
+    auto RemainingBits=(HeaderSize-5)*8-(EndBS-Data_BS_Remain());
+    if (RemainingBits)
+    {
+        int8u Padding=(int8u)-1;
+        if (RemainingBits<8)
+            Peek_S1(RemainingBits, Padding);
+        Skip_BS(RemainingBits,                                  Padding?"(Unknown)":"Padding");;
+    }
+    BS_End();
+    Skip_B2 (                                                   "CRC16Header"); Param_Info1("OK");
+    Element_End0();
+    int32u ChSetFsizeXXCHs_Total=0;
+    for (auto ChSetFsizeXXCH : ChSetFsizeXXCHs)
+        ChSetFsizeXXCHs_Total+=ChSetFsizeXXCH;
+    if (Element_Size-Element_Offset<ChSetFsizeXXCHs_Total+ChSetFsizeXXCHs.size())
+    {
+        Element_Offset=Element_Offset_Start;
+        return;
+    }
+    for (int8u i=0; i<ChSetFsizeXXCHs.size(); i++)
+    {
+        int8u Begin;
+        Peek_B1(Begin);
+        int8u XXCHChSetHeaderSize=Begin>>1;
+        if (bCRCPresent4ChSetHeaderXXCH)
+        {
+            auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, XXCHChSetHeaderSize+1);
+            if (CRC)
+            {
+                Element_Offset=Element_Offset_Start;
+                return;
+            }
+            XXCHChSetHeaderSize-=2;
+        }
+        Element_Begin1("Channel Set");
+        Element_Begin1("Header");
+            BS_Begin();
+            Skip_S1(7,                                          "XXCHChSetHeaderSize minus 1");
+            Skip_BS(XXCHChSetHeaderSize*8+1,                    "(Not parsed)");
+            BS_End();
+            if (bCRCPresent4ChSetHeaderXXCH)
+            {
+                Skip_B2 (                                       "CRC16HeaderChSet"); Param_Info1("OK");
+                XXCHChSetHeaderSize+=2;
+            }
+        Element_End0();
+        Skip_XX(ChSetFsizeXXCHs[i]-XXCHChSetHeaderSize,         "(Not parsed)");
+        Element_End0();
+    }
 
     FILLING_BEGIN();
-        Profile="HRA";
+        Presence.set(Element_Code?presence_Extended_XXCH:presence_Core_XXCH);
+    FILLING_END();
+
+    Extensions_Padding();
+}
+
+//---------------------------------------------------------------------------
+void File_Dts::XCh()
+{
+    //Coherency check
+    auto MaxSize=Element_Size-Element_Offset+3;
+    if (MaxSize<95)
+        return;
+    int16u Begin;
+    Peek_B2(Begin);
+    int16u Size=Begin>>6;
+    if (Size<95 || (Size!=MaxSize && Size-1!=MaxSize)) // Is last item and manage legacy bitstreams
+        return;
+
+    //Parsing
+    int16u XChFSIZE;
+    int8u  AMODE;
+    BS_Begin();
+    Get_S2 (10, XChFSIZE,                                       "Primary Frame Byte Size");
+    Get_S1 ( 4, AMODE,                                          "Extension Channel Arrangement");
+    Skip_BS(Data_BS_Remain(),                                   "(Not parsed)");
+    BS_End();
+
+    FILLING_BEGIN();
+        if (Element_Code)
+        {
+            Presence.set(presence_Extended_XCh);
+        }
+        else
+        {
+            Presence.set(presence_Core_XCh);
+            Core_XCh_AMODE=AMODE;
+        }
+    FILLING_END();
+
+    Extensions_Padding();
+}
+
+//---------------------------------------------------------------------------
+void File_Dts::XBR()
+{
+    //Coherency check
+    auto MaxSize=Element_Size-Element_Offset+3;
+    if (MaxSize<8)
+        return;
+    int8u Begin;
+    Peek_B1(Begin);
+    int8u HeaderSize=Begin>>2;
+    if (HeaderSize<8)
+        return;
+    auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, HeaderSize-3);
+    if (CRC)
+        return;
+
+    // Parsing
+    Element_Begin1("Header");
+    vector<int16u> ChSetFsizes;
+    int8u NumChSetsInXBR;
+    auto Element_Offset_Start=Element_Offset;
+    BS_Begin();
+    int64u EndBS=Data_BS_Remain();
+    Skip_S1(6,                                                  "HeaderSizeXBR minus 1");
+    Get_S1 (2, NumChSetsInXBR,                                  "NumChSetsInXBR minus 1");
+    for (int8u nChSet=0; nChSet<=NumChSetsInXBR; nChSet++)
+    {
+        int16u ChSetFsize;
+        Get_S2 (14, ChSetFsize,                                 "ChSetFsize minus 1");
+        ChSetFsizes.push_back(ChSetFsize);
+    }
+    int32u ChSetFsizes_Total=0;
+    auto RemainingBits=(HeaderSize-5)*8-(EndBS-Data_BS_Remain());
+    if (RemainingBits)
+    {
+        int8u Padding=(int8u)-1;
+        if (RemainingBits<8)
+            Peek_S1(RemainingBits, Padding);
+        Skip_BS(RemainingBits,                                  Padding?"(Unknown)":"Padding");;
+    }
+    BS_End();
+    Skip_B2 (                                                   "CRC16Header"); Param_Info1("OK");
+    Element_End0();
+    int32u ChSetFsizeXXCHs_Total=0;
+    for (auto ChSetFsize : ChSetFsizes)
+        ChSetFsizes_Total+=ChSetFsize;
+    if (Element_Size-Element_Offset<ChSetFsizes_Total+ChSetFsizes.size())
+    {
+        Element_Offset=Element_Offset_Start;
+        return;
+    }
+    for (auto ChSetFsize : ChSetFsizes)
+    {
+        Element_Begin1("Channel Set");
+        Skip_XX(ChSetFsize+1,                                   "(Not parsed)");
+        Element_End0();
+    }
+
+    FILLING_BEGIN();
         Presence.set(presence_Extended_XBR);
     FILLING_END();
+
+    Extensions_Padding();
 }
 
-//---------------------------------------------------------------------------
-void File_Dts::HD_XSA(int64u Size)
-{
-    Element_Name("LBR (low bitrate)");
-    Skip_XX(Size,                                               "Data");
 
-    FILLING_BEGIN();
-        Profile="Express";
-        Presence.set(presence_Extended_LBR);
-    FILLING_END();
+//---------------------------------------------------------------------------
+void File_Dts::Extensions2()
+{
+    if (Element_Size-Element_Offset<4)
+        return;
+
+    Element_Begin0();
+    int32u SyncWord;
+    Get_B4(SyncWord,                                            "Sync Word");
+    switch (SyncWord)
+    {
+        case 0x02000850:
+        case 0xF14000D1:
+            Element_Name("X?");
+            Presence.set(presence_Extended_X);
+            break;
+        case 0xF14000D0:
+            Element_Name("X IMAX?");
+            Presence.set(presence_Extended_X); // It was reported that IMAX is detected as X on legacy X decoders
+            Presence.set(presence_Extended_IMAX);
+            break;
+        default:
+            Element_Name(Ztring::ToZtring(SyncWord, 16));
+    }
+    Skip_XX(Element_Size-Element_Offset,                        "(Unknown)");
+    Element_End0();
 }
 
 //***************************************************************************
@@ -1719,10 +2034,10 @@ void File_Dts::HD_XSA(int64u Size)
 //---------------------------------------------------------------------------
 float64 File_Dts::BitRate_Get(bool WithHD)
 {
-    if (bit_rate<29 || Profile==__T("Express"))
+    if (bit_rate<29 || Presence[presence_Extended_LBR])
     {
         float64 BitRate;
-        if (Profile==__T("Express"))
+        if (Presence[presence_Extended_LBR])
             BitRate=0; //No core bitrate
         else if (DTS_SamplingRate[sample_frequency])
             BitRate=((float64)Primary_Frame_Byte_Size)*8/(Number_Of_PCM_Sample_Blocks*32)*DTS_SamplingRate[sample_frequency]; //(float64)DTS_BitRate[bit_rate];
@@ -1730,35 +2045,8 @@ float64 File_Dts::BitRate_Get(bool WithHD)
             BitRate=0; //Problem
         if (WithHD && HD_ExSSFrameDurationCode!=(int8u)-1)
         {
-            int32u SamplePerFrames=HD_ExSSFrameDurationCode;
-            switch (HD_MaximumSampleRate)
-            {
-                case  0 : //  8000
-                case 10 : // 12000
-                                SamplePerFrames*= 128; break;
-                case  1 : // 16000
-                case  5 : // 22050
-                case 11 : // 24000
-                                SamplePerFrames*= 256; break;
-                case  2 : // 32000
-                case  6 : // 44100
-                case 12 : // 48000
-                                SamplePerFrames*= 512; break;
-                case  3 : // 64000
-                case  7 : // 88200
-                case 13 : // 96000
-                                SamplePerFrames*=1024; break;
-                case  4 : //128000
-                case  8 : //176400
-                case 14 : //192000
-                                SamplePerFrames*=2048; break;
-                case  9 : //352800
-                case 15 : //384000
-                                SamplePerFrames*=4096; break;
-                default     :   SamplePerFrames=    0; break; //Can never happen (4 bits)
-            }
-            if (SamplePerFrames)
-                BitRate+=((float64)HD_size)*8*DTS_HD_MaximumSampleRate[HD_MaximumSampleRate]/SamplePerFrames;
+            int32u SamplesPerFrame_Temp=HD_ExSSFrameDurationCode<<(7+DTS_HD_SamplePerFrames_Factor[HD_MaximumSampleRate]);
+            BitRate+=((float64)HD_size)*8*DTS_HD_MaximumSampleRate[HD_MaximumSampleRate]/SamplesPerFrame_Temp;
         }
         //if (Primary_Frame_Byte_Size && Profile==__T("HRA"))
         //    BitRate*=1+((float64)HD_size)/Primary_Frame_Byte_Size; //HD block are not in the nominal bitrate
