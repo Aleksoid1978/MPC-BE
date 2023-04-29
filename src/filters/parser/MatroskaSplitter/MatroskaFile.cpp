@@ -406,6 +406,25 @@ HRESULT Track::Parse(CMatroskaNode* pMN0)
 	EndChunk
 }
 
+
+HRESULT BlockAdditionMapping::Parse(CMatroskaNode* pMN0)
+{
+	BeginChunk
+	case 0x41F0:
+		Value.Parse(pMN);
+		break;
+	case 0x41A4:
+		Name.Parse(pMN);
+		break;
+	case 0x41E7:
+		Type.Parse(pMN);
+		break;
+	case 0x41ED:
+		ExtraData.Parse(pMN);
+		break;
+	EndChunk
+}
+
 HRESULT TrackEntry::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
@@ -485,6 +504,9 @@ HRESULT TrackEntry::Parse(CMatroskaNode* pMN0)
 		break;
 	case 0x6D80:
 		ces.Parse(pMN);
+		break;
+	case 0x41E4:
+		BlockAdditionMappings.Parse(pMN);
 		break;
 	EndChunk
 }
