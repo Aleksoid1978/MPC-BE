@@ -383,7 +383,7 @@ HRESULT CHTTPAsync::SendRequest(LPCWSTR lpszCustomHeader/* = L""*/, DWORD dwTime
 
 				return E_FAIL;
 			} else if (dwStatusCode != HTTP_STATUS_OK && dwStatusCode != HTTP_STATUS_PARTIAL_CONTENT) {
-				if (dwStatusCode == HTTP_STATUS_REDIRECT || dwStatusCode == HTTP_STATUS_MOVED) {
+				if (dwStatusCode == HTTP_STATUS_MOVED || dwStatusCode == HTTP_STATUS_REDIRECT || dwStatusCode == HTTP_STATUS_REDIRECT_METHOD) {
 					m_url_redirect_str = QueryInfoStr(HTTP_QUERY_LOCATION);
 					if (!m_url_redirect_str.IsEmpty()) {
 						CUrlParser urlParser(m_url_redirect_str.GetString());
