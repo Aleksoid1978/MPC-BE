@@ -435,6 +435,17 @@ namespace MatroskaReader
 		HRESULT Parse(CMatroskaNode* pMN);
 	};
 
+	class BlockAdditionMapping
+	{
+	public:
+		CUInt Value;
+		CANSI Name;
+		CUInt Type;
+		CBinary ExtraData;
+
+		HRESULT Parse(CMatroskaNode* pMN);
+	};
+
 	class TrackEntry
 	{
 	public:
@@ -467,6 +478,8 @@ namespace MatroskaReader
 		Video v;
 		Audio a;
 		ContentEncodings ces;
+		CNode<BlockAdditionMapping> BlockAdditionMappings;
+
 		TrackEntry() {
 			DescType = NoDesc;
 			FlagEnabled.Set(1);

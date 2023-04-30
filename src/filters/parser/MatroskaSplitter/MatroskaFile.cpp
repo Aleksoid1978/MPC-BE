@@ -406,6 +406,25 @@ HRESULT Track::Parse(CMatroskaNode* pMN0)
 	EndChunk
 }
 
+
+HRESULT BlockAdditionMapping::Parse(CMatroskaNode* pMN0)
+{
+	BeginChunk
+	case 0x41F0:
+		Value.Parse(pMN);
+		break;
+	case 0x41A4:
+		Name.Parse(pMN);
+		break;
+	case 0x41E7:
+		Type.Parse(pMN);
+		break;
+	case 0x41ED:
+		ExtraData.Parse(pMN);
+		break;
+	EndChunk
+}
+
 HRESULT TrackEntry::Parse(CMatroskaNode* pMN0)
 {
 	BeginChunk
@@ -486,15 +505,10 @@ HRESULT TrackEntry::Parse(CMatroskaNode* pMN0)
 	case 0x6D80:
 		ces.Parse(pMN);
 		break;
+	case 0x41E4:
+		BlockAdditionMappings.Parse(pMN);
+		break;
 	EndChunk
-}
-
-static int cesort(const void* a, const void* b)
-{
-	UINT64 ce1 = (static_cast<ContentEncoding*>(const_cast<void *>(a)))->ContentEncodingOrder;
-	UINT64 ce2 = (static_cast<ContentEncoding*>(const_cast<void *>(b)))->ContentEncodingOrder;
-
-	return (int)ce1 - (int)ce2;
 }
 
 bool TrackEntry::Expand(CBinary& data, UINT64 Scope)
@@ -507,10 +521,12 @@ bool TrackEntry::Expand(CBinary& data, UINT64 Scope)
 	for (const auto& ce : ces.ce) {
 		cearray.push_back(ce.get());
 	}
-	qsort(cearray.data(), cearray.size(), sizeof(ContentEncoding*), cesort);
 
-	for (auto it = cearray.crbegin(); it != cearray.crend(); it++) {
-		const auto ce = *it;
+	std::sort(cearray.begin(), cearray.end(), [&](const ContentEncoding* left, const ContentEncoding* right) {
+		return left->ContentEncodingOrder < right->ContentEncodingOrder;
+	});
+
+	for (const auto ce : cearray) {
 		if (!(ce->ContentEncodingScope & Scope)) {
 			continue;
 		}
