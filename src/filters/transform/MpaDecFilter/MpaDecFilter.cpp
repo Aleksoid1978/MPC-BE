@@ -254,6 +254,7 @@ STDAPI DllUnregisterServer()
 //
 
 #include "filters/filters/Filters.h"
+#include "filters/ffmpeg_link_fix.h"
 
 CFilterApp theApp;
 
