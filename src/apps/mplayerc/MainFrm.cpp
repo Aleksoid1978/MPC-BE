@@ -68,6 +68,7 @@
 #include "filters/transform/MPCVideoDec/MPCVideoDec.h"
 #include "filters/filters/InternalPropertyPage.h"
 #include <filters/renderer/VideoRenderers/IPinHook.h>
+#include "filters/ffmpeg_link_fix.h"
 #include "ComPropertySheet.h"
 #include <comdef.h>
 #include <dwmapi.h>
