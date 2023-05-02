@@ -1667,8 +1667,12 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 	}
 
 	CPath base(fn);
+	if (!f.GetRedirectURL().IsEmpty()) {
+		base = (CPath)f.GetRedirectURL();
+	}
+
 	if (fn.Find(L"://") > 0) {
-		CString tmp(fn);
+		CString tmp(base);
 		tmp.Truncate(tmp.ReverseFind('/'));
 		base = (CPath)tmp;
 	} else {
