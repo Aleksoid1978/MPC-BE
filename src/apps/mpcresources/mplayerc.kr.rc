@@ -895,28 +895,30 @@ IDD_PPAGEYOUTUBE DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "유튜브",IDC_STATIC,6,5,285,66
+    GROUPBOX        "유튜브",IDC_STATIC,6,5,285,96
     CONTROL         "내장된 웹 페이지 파서 사용",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,16,120,10
     LTEXT           "우선 형식 :",IDC_STATIC2,10,30,104,8
     COMBOBOX        IDC_COMBO1,10,40,50,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO2,64,40,50,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "60 fps",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,118,42,48,10
     CONTROL         "HDR",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,170,42,30,10
-    CONTROL         "재생목록 열기",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,56,100,10
-    GROUPBOX        "",IDC_STATIC,6,77,285,57
-    CONTROL         "youtube-dl, yt-dlp",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,77,74,10
-    LTEXT           "실행 파일 :",IDC_STATIC,10,90,104,8
-    COMBOBOX        IDC_COMBO4,116,88,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "최대 영상 높이 :",IDC_STATIC,10,106,104,8
-    COMBOBOX        IDC_COMBO3,116,104,43,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "최대 fps 또는 비트 전송률 선택",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,120,196,10
-    LTEXT           "AceStream 주소 :",IDC_STATIC,10,141,77,8
-    EDITTEXT        IDC_EDIT1,91,139,195,13,ES_AUTOHSCROLL
-    LTEXT           "MatriX (TorrServer) 주소 :",IDC_STATIC,10,158,103,8
-    EDITTEXT        IDC_EDIT2,10,170,276,13,ES_AUTOHSCROLL
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,197,283,1
-    LTEXT           "사용자 에이전트 :",IDC_STATIC,10,206,77,8
-    EDITTEXT        IDC_EDIT3,91,204,195,13,ES_AUTOHSCROLL
+    LTEXT           "Preferred audio track language:",IDC_STATIC4,10,59,140,8
+    COMBOBOX        IDC_COMBO5,10,70,130,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "재생목록 열기",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,87,100,10
+    GROUPBOX        "",IDC_STATIC,6,105,285,57
+    CONTROL         "youtube-dl, yt-dlp",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,105,74,10
+    LTEXT           "실행 파일 :",IDC_STATIC,10,118,104,8
+    COMBOBOX        IDC_COMBO4,116,116,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "최대 영상 높이 :",IDC_STATIC,10,134,104,8
+    COMBOBOX        IDC_COMBO3,116,132,43,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "최대 fps 또는 비트 전송률 선택",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,148,196,10
+    LTEXT           "AceStream 주소 :",IDC_STATIC,10,169,77,8
+    EDITTEXT        IDC_EDIT1,91,167,195,13,ES_AUTOHSCROLL
+    LTEXT           "MatriX (TorrServer) 주소 :",IDC_STATIC,10,186,103,8
+    EDITTEXT        IDC_EDIT2,10,198,276,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,225,283,1
+    LTEXT           "사용자 에이전트 :",IDC_STATIC,10,234,77,8
+    EDITTEXT        IDC_EDIT3,91,232,195,13,ES_AUTOHSCROLL
 END
 
 IDD_AUTH_DLG DIALOGEX 0, 0, 213, 127
@@ -1218,10 +1220,10 @@ BEGIN
     GROUPBOX        "자동 불러오기 경로",IDC_STATIC,5,20,286,31
     EDITTEXT        IDC_EDIT1,10,33,224,13,ES_AUTOHSCROLL
     PUSHBUTTON      "초기화",IDC_BUTTON1,237,33,50,13
-    CONTROL         "항상 외부 자막 보기(사용 가능한 경우)",IDC_CHECK1,
+    CONTROL         "외부 자막 우선",IDC_CHECK1,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,55,285,9
     CONTROL         "내장 자막 불러오지 않음",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,67,285,9
-    CONTROL         "변경사항 탐지후 자막 파일 자동 다시 불러오기",IDC_CHECK3,
+    CONTROL         "수정 감지 후 자막 자동 다시 불러오기",IDC_CHECK3,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,79,285,9
     CONTROL         "하위 동기화 사용",IDC_CHECK_SUBRESYNC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,91,285,9
     GROUPBOX        "온라인 DB",IDC_STATIC,5,105,286,45
@@ -2351,6 +2353,8 @@ BEGIN
     IDS_PLAYLIST_HIDEFS     "전체 화면에서 숨기기"
     IDS_PLAYLIST_NEXTONERROR "오류 시, 다음으로 이동"
     IDS_PLAYLIST_DETERMINEDURATION "추가할 기간 설정"
+    IDS_PLAYLIST_SKIPINVALID "Skip invalid elements"
+    IDS_PLAYLIST_INVALID    "Invalid"
 END
 
 STRINGTABLE
@@ -2558,10 +2562,10 @@ BEGIN
     IDS_AG_SHADERS_SELECT   "셰이더 선택"
     IDS_AG_SHADERS_1_ENABLE "픽셀 셰이더 토글"
     IDS_AG_SHADERS_2_ENABLE "화면 픽셀셰이더 토글"
-    IDS_OSD_SHADERS_1_ON    "선처리 크기 변경 픽셀 셰이더 : 켜기"
-    IDS_OSD_SHADERS_1_OFF   "선처리 크기 변경 픽셀 셰이더 : 끄기"
-    IDS_OSD_SHADERS_2_ON    "후처리 크기 변경 픽셀 셰이더 : 켜기"
-    IDS_OSD_SHADERS_2_OFF   "후처리 크기 변경 픽셀 셰이더 : 끄기"
+    IDS_OSD_SHADERS_1_ON    "선처리 크기 변경 픽셀 셰이더 : 켬"
+    IDS_OSD_SHADERS_1_OFF   "선처리 크기 변경 픽셀 셰이더 : 끔"
+    IDS_OSD_SHADERS_2_ON    "후처리 크기 변경 픽셀 셰이더 : 켬"
+    IDS_OSD_SHADERS_2_OFF   "후처리 크기 변경 픽셀 셰이더 : 끔"
     IDS_AG_VSYNCINTERNAL    "내부 수직 동기화"
 END
 
@@ -2725,14 +2729,14 @@ STRINGTABLE
 BEGIN
     IDS_OSD_ZOOM_AUTO       "확대/축소 : 자동"
     IDS_CUSTOM_CHANNEL_MAPPING "사용자 정의 채널/스피커 배치 토글"
-    IDS_OSD_CUSTOM_CH_MAPPING_ON "사용자 정의 채널/스피커 배치 : 켜기"
-    IDS_OSD_CUSTOM_CH_MAPPING_OFF "사용자 정의 채널/스피커 배치 : 끄기"
+    IDS_OSD_CUSTOM_CH_MAPPING_ON "사용자 정의 채널/스피커 배치 : 켬"
+    IDS_OSD_CUSTOM_CH_MAPPING_OFF "사용자 정의 채널/스피커 배치 : 끔"
     IDS_TOGGLE_AUTOVOLUMECONTROL "자동 음량 조절 전환"
-    IDS_OSD_AUTOVOLUMECONTROL_ON "자동 음량 조절 : 켜기"
-    IDS_OSD_AUTOVOLUMECONTROL_OFF "자동 음량 조절 : 끄기"
+    IDS_OSD_AUTOVOLUMECONTROL_ON "자동 음량 조절 : 켬"
+    IDS_OSD_AUTOVOLUMECONTROL_OFF "자동 음량 조절 : 끔"
     IDS_REGAIN_VOLUME       "음량 복원 토글"
-    IDS_OSD_REGAIN_VOLUME_ON "음량 복원 : 켜기"
-    IDS_OSD_REGAIN_VOLUME_OFF "음량 복원 : 끄기"
+    IDS_OSD_REGAIN_VOLUME_ON "음량 복원 : 켬"
+    IDS_OSD_REGAIN_VOLUME_OFF "음량 복원 : 끔"
     IDS_UNDETERMINED        "미정의"
     IDS_SIZE_UNIT_K         "KB"
     IDS_SIZE_UNIT_M         "MB"
@@ -2746,7 +2750,7 @@ BEGIN
     IDS_AG_OPEN_DEVICE      "장치 열기"
     IDS_AG_SAVE_AS          "다른 이름으로저장"
     IDS_AG_SAVE_IMAGE       "이미지 저장"
-    IDS_AG_AUTOSAVE_IMAGE   " (자동)"
+    IDS_AG_AUTOSAVE_IMAGE   "이미지 저장 (자동)"
     IDS_OSD_IMAGE_SAVED     "이미지가 성공적으로 저장되었습니다."
     IDS_AG_LOAD_SUBTITLE    "자막 열기..."
     IDS_AG_SAVE_SUBTITLE    "자막 저장"
@@ -2763,8 +2767,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_OSD_RS_FT_CORRECTION_ON "프레임 시간 수정 : 켜기"
-    IDS_OSD_RS_FT_CORRECTION_OFF "프레임 시간 수정 : 끄기"
+    IDS_OSD_RS_FT_CORRECTION_ON "프레임 시간 수정 : 켬"
+    IDS_OSD_RS_FT_CORRECTION_OFF "프레임 시간 수정 : 끔"
     IDS_OSD_RS_TARGET_VSYNC_OFFSET "목표 수직 동기화 오프셋 : %.1f"
     IDS_OSD_RS_VSYNC_OFFSET "수직 동기화 오프셋 : %d"
     IDS_OSD_SPEED           "속도 : %sx"
@@ -2802,7 +2806,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_DECREASE_RATE    "속도감소"
+    IDS_AG_DECREASE_RATE    "속도 감소"
     IDS_AG_RESET_RATE       "초기화"
     IDS_AG_AUDIODELAY_PLUS  "오디오 딜레이 +10밀리 초"
     IDS_AG_AUDIODELAY_MINUS "오디오 지연 -10밀리 초"
@@ -2899,7 +2903,7 @@ BEGIN
     IDS_AG_DVD_MENU_ACTIVATE "DVD 메뉴 활성화"
     IDS_AG_DVD_MENU_BACK    "DVD 메뉴 뒤로"
     IDS_AG_DVD_MENU_LEAVE   "DVD 메뉴 끝내기"
-    IDS_AG_BOSS_KEY         "엄마 왔다! (일시 정지, 최소화)"
+    IDS_AG_BOSS_KEY         "엄마 왔다! (감추기)"
     IDS_AG_MENU_PLAYER_S    "재생기 메뉴 (짧게)"
     IDS_AG_MENU_PLAYER_L    "재생기 메뉴 (길게)"
     IDS_AG_MENU_FILTERS     "필터 메뉴"
@@ -2917,8 +2921,8 @@ BEGIN
     IDS_AG_NEXT_VIDEO       "다음 비디오/DVD 앵글"
     IDS_AG_PREV_VIDEO       "이전 비디오/DVD 앵글"
     IDS_REPEAT_FOREVER      "무한 반복"
-    IDS_REPEAT_FOREVER_OFF  "무한 반복 : 끄기"
-    IDS_REPEAT_FOREVER_ON   "무한 반복 : 켜기"
+    IDS_REPEAT_FOREVER_OFF  "무한 반복 : 끔"
+    IDS_REPEAT_FOREVER_ON   "무한 반복 : 켬"
     IDS_MPLAYERC_98         "OSD : 남은 시간"
 END
 
@@ -2936,7 +2940,7 @@ BEGIN
     IDS_MPLAYERC_102        "자막 왼쪽으로"
     IDS_MPLAYERC_103        "자막 오른쪽으로"
     IDS_AG_DISPLAY_STATS    "디스플레이 상태"
-    IDS_AG_AUDIODELAY_ONOFF "오디오 지연 끄기/켜기"
+    IDS_AG_AUDIODELAY_ONOFF "오디오 지연 켬/끔"
     IDS_AG_AUTOSAVE_DISPLAY "표시된 이미지 저장 (자동)"
     IDS_AG_OPEN_ISO         "ISO 이미지 열기"
     IDS_AG_OPEN_DIR         "디렉토리 열기"
@@ -3045,7 +3049,7 @@ BEGIN
     IDS_MAINFRM_41          ", 여유 : %I64dMB"
     IDS_MAINFRM_42          ", 여유 V/A 버퍼 : %03d/%03d"
     IDS_AG_ERROR            "에러"
-    IDS_SUBTITLE_STREAM_OFF "자막 : 끄기"
+    IDS_SUBTITLE_STREAM_OFF "자막 : 끔"
     IDS_SUBTITLE_STREAM     "자막 : %s"
     IDS_MAINFRM_46          "DVD 경로를 선택 :"
 END
@@ -3155,7 +3159,7 @@ BEGIN
     IDS_MAINFRM_138         "자막 싱크 : %ld"
     IDS_VOLUME_GAIN_INC     "음량 증폭 증가"
     IDS_VOLUME_GAIN_DEC     "음량 증폭 감소"
-    IDS_VOLUME_GAIN_OFF     "음량 증폭 끄기"
+    IDS_VOLUME_GAIN_OFF     "음량 증폭 끔"
     IDS_VOLUME_GAIN_MAX     "음량 증폭 최대"
     IDS_UNKNOWN_SWITCH      "인식 불가한 스위치가 사용됨 : \n\n"
 END
@@ -3559,18 +3563,18 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_OSD_RS_VSYNC_ON     "수직 동기화 : 켜기"
-    IDS_OSD_RS_VSYNC_OFF    "수직 동기화 : 끄기"
-    IDS_OSD_RS_INTERNAL_VSYNC_ON "내부 수직 동기화 : 켜기"
-    IDS_OSD_RS_INTERNAL_VSYNC_OFF "내부 수직 동기화 : 끄기"
-    IDS_OSD_RS_SYNC_TO_DISPLAY_ON "비디오를 디스플레이에 싱크 : 켜기"
-    IDS_OSD_RS_SYNC_TO_DISPLAY_OFF "비디오를 디스플레이에 싱크 : 끄기"
-    IDS_OSD_RS_SYNC_TO_VIDEO_ON "디스플레이를 비디오에 싱크 : 켜기"
-    IDS_OSD_RS_SYNC_TO_VIDEO_OFF "디스플레이를 비디오에 싱크 : 끄기"
-    IDS_OSD_RS_PRESENT_NEAREST_ON "근접한 수직 동기화 출력 : 켜기"
-    IDS_OSD_RS_PRESENT_NEAREST_OFF "근접한 수직 동기화 출력 : 끄기"
-    IDS_OSD_RS_COLOR_MANAGEMENT_ON "색 관리 : 켜기"
-    IDS_OSD_RS_COLOR_MANAGEMENT_OFF "색 관리 : 끄기"
+    IDS_OSD_RS_VSYNC_ON     "수직 동기화 : 켬"
+    IDS_OSD_RS_VSYNC_OFF    "수직 동기화 : 끔"
+    IDS_OSD_RS_INTERNAL_VSYNC_ON "내부 수직 동기화 : 켬"
+    IDS_OSD_RS_INTERNAL_VSYNC_OFF "내부 수직 동기화 : 끔"
+    IDS_OSD_RS_SYNC_TO_DISPLAY_ON "비디오를 디스플레이에 싱크 : 켬"
+    IDS_OSD_RS_SYNC_TO_DISPLAY_OFF "비디오를 디스플레이에 싱크 : 끔"
+    IDS_OSD_RS_SYNC_TO_VIDEO_ON "디스플레이를 비디오에 싱크 : 켬"
+    IDS_OSD_RS_SYNC_TO_VIDEO_OFF "디스플레이를 비디오에 싱크 : 끔"
+    IDS_OSD_RS_PRESENT_NEAREST_ON "근접한 수직 동기화 출력 : 켬"
+    IDS_OSD_RS_PRESENT_NEAREST_OFF "근접한 수직 동기화 출력 : 끔"
+    IDS_OSD_RS_COLOR_MANAGEMENT_ON "색 관리 : 켬"
+    IDS_OSD_RS_COLOR_MANAGEMENT_OFF "색 관리 : 끔"
     IDS_OSD_RS_INPUT_TYPE_AUTO "입력 형식 : 자동 감지"
     IDS_OSD_RS_INPUT_TYPE_HDTV "입력 형식 : HDTV"
     IDS_OSD_RS_INPUT_TYPE_SD_NTSC "입력 형식 : SDTV NTSC"
@@ -3587,29 +3591,29 @@ BEGIN
     IDS_OSD_RS_REND_INTENT_SATUR "렌더링 의도 : 채도"
     IDS_OSD_RS_REND_INTENT_ABSOLUTE "렌더링 의도 : 절대 색도계"
     IDS_OSD_RS_OUTPUT_RANGE "출력 범위 : %s"
-    IDS_OSD_RS_FLUSH_BEF_VSYNC_ON "수직 동기화 전에 GPU 플러싱 : 켜기"
-    IDS_OSD_RS_FLUSH_BEF_VSYNC_OFF "수직 동기화 전에 GPU 플러싱 : 끄기"
-    IDS_OSD_RS_FLUSH_AFT_PRES_ON "출력 후 GPU 플러싱 : 켜기"
-    IDS_OSD_RS_FLUSH_AFT_PRES_OFF "출력 후 GPU 플러싱 : 끄기"
-    IDS_OSD_RS_WAIT_ON      "GPU 플러싱 대기 : 켜기"
-    IDS_OSD_RS_WAIT_OFF     "GPU 플러싱 대기 : 끄기"
-    IDS_OSD_RS_EXCLUSIVE_FSCREEN_ON "전체 화면 전용 : 켜기"
-    IDS_OSD_RS_EXCLUSIVE_FSCREEN_OFF "전체 화면 전용 : 끄기"
+    IDS_OSD_RS_FLUSH_BEF_VSYNC_ON "수직 동기화 전에 GPU 플러싱 : 켬"
+    IDS_OSD_RS_FLUSH_BEF_VSYNC_OFF "수직 동기화 전에 GPU 플러싱 : 끔"
+    IDS_OSD_RS_FLUSH_AFT_PRES_ON "출력 후 GPU 플러싱 : 켬"
+    IDS_OSD_RS_FLUSH_AFT_PRES_OFF "출력 후 GPU 플러싱 : 끔"
+    IDS_OSD_RS_WAIT_ON      "GPU 플러싱 대기 : 켬"
+    IDS_OSD_RS_WAIT_OFF     "GPU 플러싱 대기 : 끔"
+    IDS_OSD_RS_EXCLUSIVE_FSCREEN_ON "전체 화면 전용 : 켬"
+    IDS_OSD_RS_EXCLUSIVE_FSCREEN_OFF "전체 화면 전용 : 끔"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_OSD_RS_NO_DESKTOP_COMP_ON "데스크톱 합성 사용 안 함 : 켜기"
-    IDS_OSD_RS_NO_DESKTOP_COMP_OFF "데스크톱 합성 사용 안 함 : 끄기"
+    IDS_OSD_RS_NO_DESKTOP_COMP_ON "데스크톱 합성 사용 안 함 : 켬"
+    IDS_OSD_RS_NO_DESKTOP_COMP_OFF "데스크톱 합성 사용 안 함 : 끔"
     IDS_OSD_RS_RESET_DEFAULT "렌더러 설정 기본값으로"
-    IDS_OSD_RS_10BIT_RBG_OUT_ON "10비트 RGB 출력 : 켜기"
-    IDS_OSD_RS_10BIT_RBG_OUT_OFF "10비트 RGB 출력 : 끄기"
-    IDS_OSD_RS_10BIT_RBG_IN_ON "강제 10비트 RGB 입력 : 켜기"
-    IDS_OSD_RS_10BIT_RBG_IN_OFF "강제 10비트 RGB 입력 : 끄기"
-    IDS_OSD_RS_FULL_FP_PROCESS_ON "전체 부동소수점 연산 : 켜기"
-    IDS_OSD_RS_FULL_FP_PROCESS_OFF "전체 부동소수점 연산 : 끄기"
-    IDS_OSD_RS_HALF_FP_PROCESS_ON "절반 부동소수점 연산 : 켜기"
-    IDS_OSD_RS_HALF_FP_PROCESS_OFF "절반 부동소수점 연산 : 끄기"
+    IDS_OSD_RS_10BIT_RBG_OUT_ON "10비트 RGB 출력 : 켬"
+    IDS_OSD_RS_10BIT_RBG_OUT_OFF "10비트 RGB 출력 : 끔"
+    IDS_OSD_RS_10BIT_RBG_IN_ON "강제 10비트 RGB 입력 : 켬"
+    IDS_OSD_RS_10BIT_RBG_IN_OFF "강제 10비트 RGB 입력 : 끔"
+    IDS_OSD_RS_FULL_FP_PROCESS_ON "전체 부동소수점 연산 : 켬"
+    IDS_OSD_RS_FULL_FP_PROCESS_OFF "전체 부동소수점 연산 : 끔"
+    IDS_OSD_RS_HALF_FP_PROCESS_ON "절반 부동소수점 연산 : 켬"
+    IDS_OSD_RS_HALF_FP_PROCESS_OFF "절반 부동소수점 연산 : 끔"
 END
 
 STRINGTABLE

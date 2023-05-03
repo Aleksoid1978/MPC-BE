@@ -77,6 +77,11 @@ private :
     //Buffer - Per element
     void Header_Parse();
     void Data_Parse();
+
+    //Temp
+    #if MEDIAINFO_CONFORMANCE
+    bool IsNotSilence;
+    #endif
 };
 
 } //NameSpace

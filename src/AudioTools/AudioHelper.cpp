@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt.
+ * (C) 2014-2023 see Authors.txt.
  *
  * This file is part of MPC-BE.
  *
@@ -225,7 +225,7 @@ SampleFormat GetSampleFormat(const WAVEFORMATEX* wfe)
 	return sample_format;
 }
 
-HRESULT convert_to_int16(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, BYTE* pIn, int16_t* pOut)
+HRESULT convert_to_int16(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, BYTE* pIn, int16_t* pOut)
 {
 	size_t allsamples = nSamples * nChannels;
 
@@ -255,7 +255,7 @@ HRESULT convert_to_int16(const SampleFormat sfmt, const WORD nChannels, const DW
 		case SAMPLE_FMT_U8P:
 			for (size_t i = 0; i < nSamples; ++i) {
 				uint8_t* p = (uint8_t*)pIn + i;
-				for (int ch = 0; ch < nChannels; ++ch) {
+				for (unsigned ch = 0; ch < nChannels; ++ch) {
 					*pOut++ = SAMPLE_uint8_to_int16(p[nSamples * ch]);
 				}
 			}
@@ -263,7 +263,7 @@ HRESULT convert_to_int16(const SampleFormat sfmt, const WORD nChannels, const DW
 		case SAMPLE_FMT_S16P:
 			for (size_t i = 0; i < nSamples; ++i) {
 				int16_t* p = (int16_t*)pIn + i;
-				for (int ch = 0; ch < nChannels; ++ch) {
+				for (unsigned ch = 0; ch < nChannels; ++ch) {
 					*pOut++ = p[nSamples * ch];
 				}
 			}
@@ -271,7 +271,7 @@ HRESULT convert_to_int16(const SampleFormat sfmt, const WORD nChannels, const DW
 		case SAMPLE_FMT_S32P:
 			for (size_t i = 0; i < nSamples; ++i) {
 				int32_t* p = (int32_t*)pIn + i;
-				for (int ch = 0; ch < nChannels; ++ch) {
+				for (unsigned ch = 0; ch < nChannels; ++ch) {
 					*pOut++ = SAMPLE_int32_to_int16(p[nSamples * ch]);
 				}
 			}
@@ -279,7 +279,7 @@ HRESULT convert_to_int16(const SampleFormat sfmt, const WORD nChannels, const DW
 		case SAMPLE_FMT_FLTP:
 			for (size_t i = 0; i < nSamples; ++i) {
 				float* p = (float*)pIn + i;
-				for (int ch = 0; ch < nChannels; ++ch) {
+				for (unsigned ch = 0; ch < nChannels; ++ch) {
 					*pOut++ = SAMPLE_float_to_int16(p[nSamples * ch]);
 				}
 			}
@@ -287,7 +287,7 @@ HRESULT convert_to_int16(const SampleFormat sfmt, const WORD nChannels, const DW
 		case SAMPLE_FMT_DBLP:
 			for (size_t i = 0; i < nSamples; ++i) {
 				double* p = (double*)pIn + i;
-				for (int ch = 0; ch < nChannels; ++ch) {
+				for (unsigned ch = 0; ch < nChannels; ++ch) {
 					*pOut++ = SAMPLE_double_to_int16(p[nSamples * ch]);
 				}
 			}
@@ -298,7 +298,7 @@ HRESULT convert_to_int16(const SampleFormat sfmt, const WORD nChannels, const DW
 	return S_OK;
 }
 
-HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, BYTE* pIn, BYTE* pOut)
+HRESULT convert_to_int24(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, BYTE* pIn, BYTE* pOut)
 {
 	size_t allsamples = nSamples * nChannels;
 
@@ -349,7 +349,7 @@ HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DW
 		// planar
 		case SAMPLE_FMT_U8P:
 			for (size_t i = 0; i < nSamples; ++i) {
-				for (int ch = 0; ch < nChannels; ++ch) {
+				for (unsigned ch = 0; ch < nChannels; ++ch) {
 					*pOut++ = 0;
 					*pOut++ = 0;
 					*pOut++ = pIn[nSamples * ch + i] ^ 0x80;
@@ -358,7 +358,7 @@ HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DW
 			break;
 		case SAMPLE_FMT_S16P:
 			for (size_t i = 0; i < nSamples; ++i) {
-				for (int ch = 0; ch < nChannels; ++ch) {
+				for (unsigned ch = 0; ch < nChannels; ++ch) {
 					uint16_t u16 = ((uint16_t*)pIn)[nSamples * ch + i];
 					*pOut++ = 0;
 					*pOut++ = (BYTE)(u16);
@@ -368,7 +368,7 @@ HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DW
 			break;
 		case SAMPLE_FMT_S32P:
 			for (size_t i = 0; i < nSamples; ++i) {
-				for (int ch = 0; ch < nChannels; ++ch) {
+				for (unsigned ch = 0; ch < nChannels; ++ch) {
 					uint32_t u32 = ((uint32_t*)pIn)[nSamples * ch + i];
 					INT32_TO_INT24(u32, pOut);
 				}
@@ -376,7 +376,7 @@ HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DW
 			break;
 		case SAMPLE_FMT_FLTP:
 			for (size_t i = 0; i < nSamples; ++i) {
-				for (int ch = 0; ch < nChannels; ++ch) {
+				for (unsigned ch = 0; ch < nChannels; ++ch) {
 					double d = (double)((float*)pIn)[nSamples * ch + i];
 					limit(-1, d, D32MAX);
 					uint32_t u32 = (uint32_t)(int32_t)round_d(d * INT32_PEAK);
@@ -386,7 +386,7 @@ HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DW
 			break;
 		case SAMPLE_FMT_DBLP:
 			for (size_t i = 0; i < nSamples; ++i) {
-				for (int ch = 0; ch < nChannels; ++ch) {
+				for (unsigned ch = 0; ch < nChannels; ++ch) {
 					double d = ((double*)pIn)[nSamples * ch + i];
 					limit(-1, d, D32MAX);
 					uint32_t u32 = (uint32_t)(int32_t)round_d(d * INT32_PEAK);
@@ -400,7 +400,7 @@ HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DW
 	return S_OK;
 }
 
-HRESULT convert_to_int32(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, BYTE* pIn, int32_t* pOut)
+HRESULT convert_to_int32(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, BYTE* pIn, int32_t* pOut)
 {
 	size_t allsamples = nSamples * nChannels;
 
@@ -427,7 +427,7 @@ HRESULT convert_to_int32(const SampleFormat sfmt, const WORD nChannels, const DW
 		case SAMPLE_FMT_U8P:
 			for (size_t i = 0; i < nSamples; ++i) {
 				uint8_t* p = (uint8_t*)pIn + i;
-				for (int ch = 0; ch < nChannels; ++ch) {
+				for (unsigned ch = 0; ch < nChannels; ++ch) {
 					*pOut++ = SAMPLE_uint8_to_int32(p[nSamples * ch]);
 				}
 			}
@@ -435,7 +435,7 @@ HRESULT convert_to_int32(const SampleFormat sfmt, const WORD nChannels, const DW
 		case SAMPLE_FMT_S16P:
 			for (size_t i = 0; i < nSamples; ++i) {
 				int16_t* p = (int16_t*)pIn + i;
-				for (int ch = 0; ch < nChannels; ++ch) {
+				for (unsigned ch = 0; ch < nChannels; ++ch) {
 					*pOut++ = SAMPLE_int16_to_int32(p[nSamples * ch]);
 				}
 			}
@@ -443,7 +443,7 @@ HRESULT convert_to_int32(const SampleFormat sfmt, const WORD nChannels, const DW
 		case SAMPLE_FMT_S32P:
 			for (size_t i = 0; i < nSamples; ++i) {
 				int32_t* p = (int32_t*)pIn + i;
-				for (int ch = 0; ch < nChannels; ++ch) {
+				for (unsigned ch = 0; ch < nChannels; ++ch) {
 					*pOut++ = p[nSamples * ch];
 				}
 			}
@@ -451,7 +451,7 @@ HRESULT convert_to_int32(const SampleFormat sfmt, const WORD nChannels, const DW
 		case SAMPLE_FMT_FLTP:
 			for (size_t i = 0; i < nSamples; ++i) {
 				float* p = (float*)pIn + i;
-				for (int ch = 0; ch < nChannels; ++ch) {
+				for (unsigned ch = 0; ch < nChannels; ++ch) {
 					*pOut++ = SAMPLE_float_to_int32(p[nSamples * ch]);
 				}
 			}
@@ -459,7 +459,7 @@ HRESULT convert_to_int32(const SampleFormat sfmt, const WORD nChannels, const DW
 		case SAMPLE_FMT_DBLP:
 			for (size_t i = 0; i < nSamples; ++i) {
 				double* p = (double*)pIn + i;
-				for (int ch = 0; ch < nChannels; ++ch) {
+				for (unsigned ch = 0; ch < nChannels; ++ch) {
 					*pOut++ = SAMPLE_double_to_int32(p[nSamples * ch]);
 				}
 			}
@@ -470,7 +470,7 @@ HRESULT convert_to_int32(const SampleFormat sfmt, const WORD nChannels, const DW
 	return S_OK;
 }
 
-HRESULT convert_to_float(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, BYTE* pIn, float* pOut)
+HRESULT convert_to_float(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, BYTE* pIn, float* pOut)
 {
 	size_t allsamples = nSamples * nChannels;
 
@@ -497,7 +497,7 @@ HRESULT convert_to_float(const SampleFormat sfmt, const WORD nChannels, const DW
 		case SAMPLE_FMT_U8P:
 			for (size_t i = 0; i < nSamples; ++i) {
 				uint8_t* p = (uint8_t*)pIn + i;
-				for (int ch = 0; ch < nChannels; ++ch) {
+				for (unsigned ch = 0; ch < nChannels; ++ch) {
 					*pOut++ = SAMPLE_uint8_to_float(p[nSamples * ch]);
 				}
 			}
@@ -505,7 +505,7 @@ HRESULT convert_to_float(const SampleFormat sfmt, const WORD nChannels, const DW
 		case SAMPLE_FMT_S16P:
 			for (size_t i = 0; i < nSamples; ++i) {
 				int16_t* p = (int16_t*)pIn + i;
-				for (int ch = 0; ch < nChannels; ++ch) {
+				for (unsigned ch = 0; ch < nChannels; ++ch) {
 					*pOut++ = SAMPLE_int16_to_float(p[nSamples * ch]);
 				}
 			}
@@ -513,7 +513,7 @@ HRESULT convert_to_float(const SampleFormat sfmt, const WORD nChannels, const DW
 		case SAMPLE_FMT_S32P:
 			for (size_t i = 0; i < nSamples; ++i) {
 				int32_t* p = (int32_t*)pIn + i;
-				for (int ch = 0; ch < nChannels; ++ch) {
+				for (unsigned ch = 0; ch < nChannels; ++ch) {
 					*pOut++ = SAMPLE_int32_to_float(p[nSamples * ch]);
 				}
 			}
@@ -521,7 +521,7 @@ HRESULT convert_to_float(const SampleFormat sfmt, const WORD nChannels, const DW
 		case SAMPLE_FMT_FLTP:
 			for (size_t i = 0; i < nSamples; ++i) {
 				float* p = (float*)pIn + i;
-				for (int ch = 0; ch < nChannels; ++ch) {
+				for (unsigned ch = 0; ch < nChannels; ++ch) {
 					*pOut++ = p[nSamples * ch];
 				}
 			}
@@ -529,7 +529,7 @@ HRESULT convert_to_float(const SampleFormat sfmt, const WORD nChannels, const DW
 		case SAMPLE_FMT_DBLP:
 			for (size_t i = 0; i < nSamples; ++i) {
 				double* p = (double*)pIn + i;
-				for (int ch = 0; ch < nChannels; ++ch) {
+				for (unsigned ch = 0; ch < nChannels; ++ch) {
 					*pOut++ = (float)p[nSamples * ch];
 				}
 			}
@@ -540,13 +540,13 @@ HRESULT convert_to_float(const SampleFormat sfmt, const WORD nChannels, const DW
 	return S_OK;
 }
 
-HRESULT convert_to_planar_float(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, BYTE* pIn, float* pOut)
+HRESULT convert_to_planar_float(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, BYTE* pIn, float* pOut)
 {
 	size_t allsamples = nSamples * nChannels;
 
 	switch (sfmt) {
 		case SAMPLE_FMT_U8:
-			for (int ch = 0; ch < nChannels; ++ch) {
+			for (unsigned ch = 0; ch < nChannels; ++ch) {
 				uint8_t* p = (uint8_t*)pIn + ch;
 				for (size_t i = 0; i < nSamples; ++i) {
 					*pOut++ = SAMPLE_uint8_to_float(p[nChannels * i]);
@@ -554,7 +554,7 @@ HRESULT convert_to_planar_float(const SampleFormat sfmt, const WORD nChannels, c
 			}
 			break;
 		case SAMPLE_FMT_S16:
-			for (int ch = 0; ch < nChannels; ++ch) {
+			for (unsigned ch = 0; ch < nChannels; ++ch) {
 				int16_t* p = (int16_t*)pIn + ch;
 				for (size_t i = 0; i < nSamples; ++i) {
 					*pOut++ = SAMPLE_int16_to_float(p[nChannels * i]);
@@ -562,7 +562,7 @@ HRESULT convert_to_planar_float(const SampleFormat sfmt, const WORD nChannels, c
 			}
 			break;
 		case SAMPLE_FMT_S32:
-			for (int ch = 0; ch < nChannels; ++ch) {
+			for (unsigned ch = 0; ch < nChannels; ++ch) {
 				int32_t* p = (int32_t*)pIn + ch;
 				for (size_t i = 0; i < nSamples; ++i) {
 					*pOut++ = SAMPLE_int32_to_float(p[nChannels * i]);
@@ -570,7 +570,7 @@ HRESULT convert_to_planar_float(const SampleFormat sfmt, const WORD nChannels, c
 			}
 			break;
 		case SAMPLE_FMT_FLT:
-			for (int ch = 0; ch < nChannels; ++ch) {
+			for (unsigned ch = 0; ch < nChannels; ++ch) {
 				float* p = (float*)pIn + ch;
 				for (size_t i = 0; i < nSamples; ++i) {
 					*pOut++ = p[nChannels * i];
@@ -578,7 +578,7 @@ HRESULT convert_to_planar_float(const SampleFormat sfmt, const WORD nChannels, c
 			}
 			break;
 		case SAMPLE_FMT_DBL:
-			for (int ch = 0; ch < nChannels; ++ch) {
+			for (unsigned ch = 0; ch < nChannels; ++ch) {
 				double* p = (double*)pIn + ch;
 				for (size_t i = 0; i < nSamples; ++i) {
 					*pOut++ = (float)p[nChannels * i];
@@ -607,7 +607,7 @@ HRESULT convert_to_planar_float(const SampleFormat sfmt, const WORD nChannels, c
 	return S_OK;
 }
 
-HRESULT convert_float_to(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, float* pIn, BYTE* pOut)
+HRESULT convert_float_to(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, float* pIn, BYTE* pOut)
 {
 	size_t allsamples = nSamples * nChannels;
 

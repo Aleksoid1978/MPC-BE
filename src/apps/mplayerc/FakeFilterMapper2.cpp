@@ -326,7 +326,8 @@ LONG WINAPI Mine_RegCreateKeyExW(HKEY a0, LPCWSTR a1, DWORD a2, LPWSTR a3, DWORD
 
 LONG WINAPI Mine_RegDeleteKeyA(HKEY a0, LPCSTR a1)
 {
-	if (CFilterMapper2::m_pFilterMapper2 && (a0 == FAKEHKEY || (int)a0 < 0)) {
+	// (ULONG_PTR)a0 >= 0x80000000 will catch all attempts to use a predefined HKEY directly
+	if (CFilterMapper2::m_pFilterMapper2 && (a0 == FAKEHKEY || (ULONG_PTR)a0 >= 0x80000000)) {
 		return ERROR_SUCCESS;
 	}
 	return Real_RegDeleteKeyA(a0, a1);
@@ -334,7 +335,8 @@ LONG WINAPI Mine_RegDeleteKeyA(HKEY a0, LPCSTR a1)
 
 LONG WINAPI Mine_RegDeleteKeyW(HKEY a0, LPCWSTR a1)
 {
-	if (CFilterMapper2::m_pFilterMapper2 && (a0 == FAKEHKEY || (int)a0 < 0)) {
+	// (ULONG_PTR)a0 >= 0x80000000 will catch all attempts to use a predefined HKEY directly
+	if (CFilterMapper2::m_pFilterMapper2 && (a0 == FAKEHKEY || (ULONG_PTR)a0 >= 0x80000000)) {
 		return ERROR_SUCCESS;
 	}
 	return Real_RegDeleteKeyW(a0, a1);
@@ -342,7 +344,8 @@ LONG WINAPI Mine_RegDeleteKeyW(HKEY a0, LPCWSTR a1)
 
 LONG WINAPI Mine_RegDeleteValueA(HKEY a0, LPCSTR a1)
 {
-	if (CFilterMapper2::m_pFilterMapper2 && (a0 == FAKEHKEY || (int)a0 < 0)) {
+	// (ULONG_PTR)a0 >= 0x80000000 will catch all attempts to use a predefined HKEY directly
+	if (CFilterMapper2::m_pFilterMapper2 && (a0 == FAKEHKEY || (ULONG_PTR)a0 >= 0x80000000)) {
 		return ERROR_SUCCESS;
 	}
 	return Real_RegDeleteValueA(a0, a1);
@@ -350,7 +353,8 @@ LONG WINAPI Mine_RegDeleteValueA(HKEY a0, LPCSTR a1)
 
 LONG WINAPI Mine_RegDeleteValueW(HKEY a0, LPCWSTR a1)
 {
-	if (CFilterMapper2::m_pFilterMapper2 && (a0 == FAKEHKEY || (int)a0 < 0)) {
+	// (ULONG_PTR)a0 >= 0x80000000 will catch all attempts to use a predefined HKEY directly
+	if (CFilterMapper2::m_pFilterMapper2 && (a0 == FAKEHKEY || (ULONG_PTR)a0 >= 0x80000000)) {
 		return ERROR_SUCCESS;
 	}
 	return Real_RegDeleteValueW(a0, a1);
@@ -478,7 +482,8 @@ LONG WINAPI Mine_RegQueryValueExW(HKEY a0, LPCWSTR a1, LPDWORD a2, LPDWORD a3, L
 
 LONG WINAPI Mine_RegSetValueA(HKEY a0, LPCSTR a1, DWORD a2, LPCSTR a3, DWORD a4)
 {
-	if (CFilterMapper2::m_pFilterMapper2 && (a0 == FAKEHKEY || (int)a0 < 0)) {
+	// (ULONG_PTR)a0 >= 0x80000000 will catch all attempts to use a predefined HKEY directly
+	if (CFilterMapper2::m_pFilterMapper2 && (a0 == FAKEHKEY || (ULONG_PTR)a0 >= 0x80000000)) {
 		return ERROR_SUCCESS;
 	}
 	return Real_RegSetValueA(a0, a1, a2, a3, a4);
@@ -486,23 +491,26 @@ LONG WINAPI Mine_RegSetValueA(HKEY a0, LPCSTR a1, DWORD a2, LPCSTR a3, DWORD a4)
 
 LONG WINAPI Mine_RegSetValueW(HKEY a0, LPCWSTR a1, DWORD a2, LPCWSTR a3, DWORD a4)
 {
-	if (CFilterMapper2::m_pFilterMapper2 && (a0 == FAKEHKEY || (int)a0 < 0)) {
+	// (ULONG_PTR)a0 >= 0x80000000 will catch all attempts to use a predefined HKEY directly
+	if (CFilterMapper2::m_pFilterMapper2 && (a0 == FAKEHKEY || (ULONG_PTR)a0 >= 0x80000000)) {
 		return ERROR_SUCCESS;
 	}
 	return Real_RegSetValueW(a0, a1, a2, a3, a4);
 }
 
-LONG WINAPI Mine_RegSetValueExA(HKEY a0, LPCSTR a1, DWORD a2, DWORD a3, BYTE* a4, DWORD a5)
+LONG WINAPI Mine_RegSetValueExA(HKEY a0, LPCSTR a1, DWORD a2, DWORD a3, const BYTE* a4, DWORD a5)
 {
-	if (CFilterMapper2::m_pFilterMapper2 && (a0 == FAKEHKEY || (int)a0 < 0)) {
+	// (ULONG_PTR)a0 >= 0x80000000 will catch all attempts to use a predefined HKEY directly
+	if (CFilterMapper2::m_pFilterMapper2 && (a0 == FAKEHKEY || (ULONG_PTR)a0 >= 0x80000000)) {
 		return ERROR_SUCCESS;
 	}
 	return Real_RegSetValueExA(a0, a1, a2, a3, a4, a5);
 }
 
-LONG WINAPI Mine_RegSetValueExW(HKEY a0, LPCWSTR a1, DWORD a2, DWORD a3, BYTE* a4, DWORD a5)
+LONG WINAPI Mine_RegSetValueExW(HKEY a0, LPCWSTR a1, DWORD a2, DWORD a3, const BYTE* a4, DWORD a5)
 {
-	if (CFilterMapper2::m_pFilterMapper2 && (a0 == FAKEHKEY || (int)a0 < 0)) {
+	// (ULONG_PTR)a0 >= 0x80000000 will catch all attempts to use a predefined HKEY directly
+	if (CFilterMapper2::m_pFilterMapper2 && (a0 == FAKEHKEY || (ULONG_PTR)a0 >= 0x80000000)) {
 		return ERROR_SUCCESS;
 	}
 	return Real_RegSetValueExW(a0, a1, a2, a3, a4, a5);

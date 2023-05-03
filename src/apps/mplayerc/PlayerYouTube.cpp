@@ -230,28 +230,28 @@ namespace Youtube
 
 	static bool URLPostData(LPCWSTR videoId, urlData& pData, bool bAgeGate)
 	{
-		if (auto hInet = InternetOpenW(L"Mozilla/5.0 (Windows NT 6.1))", INTERNET_OPEN_TYPE_PRECONFIG, nullptr, nullptr, 0)) {
+		if (auto hInet = InternetOpenW(L"com.google.android.youtube/17.31.35 (Linux; U; Android 11) gzip", INTERNET_OPEN_TYPE_PRECONFIG, nullptr, nullptr, 0)) {
 			if (auto hSession = InternetConnectW(hInet, L"www.youtube.com", 443, nullptr, nullptr, INTERNET_SERVICE_HTTP, 0, 1)) {
 				if (auto hRequest = HttpOpenRequestW(hSession,
 													 L"POST",
-													 L"youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8", nullptr, nullptr, nullptr,
+													 L"youtubei/v1/player?key=AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w", nullptr, nullptr, nullptr,
 													 INTERNET_FLAG_SECURE | INTERNET_FLAG_RELOAD, 1)) {
 					CStringA requestData;
 					constexpr const char* str[] = {
 						// android player API JSON
-						R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "16.20", "hl": "en"}}, )"
-						R"("videoId": "%S", "playbackContext": {"contentPlaybackContext": {"html5Preference": "HTML5_PREF_WANTS"}}, )"
+						R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "17.31.35", "hl": "en"}}, )"
+						R"("videoId": "%S", "params": "8AEB", "playbackContext": {"contentPlaybackContext": {"html5Preference": "HTML5_PREF_WANTS"}}, )"
 						R"("contentCheckOk": true, "racyCheckOk": true})",
 						// android agegate player API JSON
-						R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "16.20", "clientScreen": "EMBED"}, )"
-						R"("thirdParty": {"embedUrl": "https://google.com"}}, "videoId": "%S", )"
+						R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "17.31.35", "clientScreen": "EMBED"}, )"
+						R"("thirdParty": {"embedUrl": "https://google.com"}}, "videoId": "%S", "params": "8AEB", )"
 						R"("contentCheckOk": true, "racyCheckOk": true})"
 					};
 
 					requestData.Format(str[bAgeGate ? 1 : 0], videoId);
 
 					static const CStringW lpszHeaders = LR"(X-YouTube-Client-Name: 3\r\n)"
-														LR"(X-YouTube-Client-Version: 16.20\r\n)"
+														LR"(X-YouTube-Client-Version: 17.31.35\r\n)"
 														LR"(Origin: https://www.youtube.com\r\n)"
 														LR"(content-type: application/json\r\n)";
 
@@ -774,6 +774,7 @@ namespace Youtube
 
 		using streamingDataFormat = std::tuple<int, CStringA, CStringA, CStringA>;
 		std::list<streamingDataFormat> streamingDataFormatList;
+		std::map<CStringA, std::list<streamingDataFormat>> streamingDataFormatListAudioWithLanguages;
 		if (!player_response_jsonDocument.IsNull()) {
 			if (auto playabilityStatus = GetJsonObject(player_response_jsonDocument, "playabilityStatus")) {
 				CStringA status;
@@ -841,15 +842,56 @@ namespace Youtube
 
 						getJsonValue(adaptiveFormat, "itag", std::get<0>(element));
 						getJsonValue(adaptiveFormat, "qualityLabel", std::get<3>(element));
-						if (getJsonValue(adaptiveFormat, "url", std::get<1>(element))) {
-							streamingDataFormatList.emplace_back(element);
-						} else if (getJsonValue(adaptiveFormat, "cipher", std::get<2>(element)) || getJsonValue(adaptiveFormat, "signatureCipher", std::get<2>(element))) {
-							streamingDataFormatList.emplace_back(element);
+						if (getJsonValue(adaptiveFormat, "url", std::get<1>(element))
+								|| getJsonValue(adaptiveFormat, "cipher", std::get<2>(element)) || getJsonValue(adaptiveFormat, "signatureCipher", std::get<2>(element))) {
+
+							CStringA lang_id;
+							if (auto audioTrack = GetJsonObject(adaptiveFormat, "audioTrack")) {
+								if (getJsonValue(*audioTrack, "id", lang_id)) {
+									auto pos = lang_id.Find('.');
+									if (pos != -1) {
+										lang_id = lang_id.Left(pos);
+									}
+								}
+							}
+
+							if (lang_id.IsEmpty()) {
+								streamingDataFormatList.emplace_back(element);
+							} else {
+								streamingDataFormatListAudioWithLanguages[lang_id].emplace_back(element);
+							}
 						}
 					}
 				}
 			}
 		}
+
+		const auto& s = AfxGetAppSettings();
+		if (!streamingDataFormatListAudioWithLanguages.empty()) {
+			// Removing existing audio formats without "language" tag.
+			for (auto it = streamingDataFormatList.begin(); it != streamingDataFormatList.end();) {
+				auto itag = std::get<0>(*it);
+				if (auto audioprofile = GetAudioProfile(itag)) {
+					it = streamingDataFormatList.erase(it);
+				} else {
+					++it;
+				}
+			}
+
+			auto it = streamingDataFormatListAudioWithLanguages.find("en");
+			if (!s.strYoutubeAudioLang.IsEmpty()) {
+				it = streamingDataFormatListAudioWithLanguages.find(WStrToUTF8(s.strYoutubeAudioLang.GetString()));
+				if (it == streamingDataFormatListAudioWithLanguages.end()) {
+					it = streamingDataFormatListAudioWithLanguages.find("en");
+				}
+			}
+
+			if (it == streamingDataFormatListAudioWithLanguages.end()) {
+				it = streamingDataFormatListAudioWithLanguages.begin();
+			}
+
+			streamingDataFormatList.splice(streamingDataFormatList.end(), it->second);
+		};
 
 		if (!JSUrl.IsEmpty()) {
 			JSUrl.Replace(L"\\/", L"/");
@@ -910,9 +952,12 @@ namespace Youtube
 				item.url = url;
 
 				switch (audioprofile->format) {
-				case y_mp4_aac:  item.title = L"MP4/AAC";   break;
-				case y_webm_aud: item.title = L"WebM/Opus"; break;
-				default:         item.title = L"unknown";  break;
+				case y_mp4_aac:  item.title = L"MP4/AAC";         break;
+				case y_webm_aud: item.title = L"WebM/Opus";       break;
+				case y_mp4_ac3:  item.title = L"MP4/AC3";         break;
+				case y_mp4_eac3: item.title = L"MP4/E-AC3";       break;
+				case y_mp4_dtse: item.title = L"MP4/DTS-Express"; break;
+				default:         item.title = L"unknown";         break;
 				}
 				item.title.AppendFormat(L" %dkbit/s", audioprofile->quality);
 
@@ -1352,8 +1397,6 @@ namespace Youtube
 		}
 #endif
 
-		const CAppSettings& s = AfxGetAppSettings();
-
 		const YoutubeUrllistItem* final_item = nullptr;
 		CStringW final_video_url;
 		CStringW final_audio_url;
@@ -1391,7 +1434,12 @@ namespace Youtube
 		if (!bParseMetadata) {
 			ParseMetadata(videoId, y_fields);
 		}
-		y_fields.fname.Format(L"%s.%dp.%s", y_fields.title, final_item->profile->quality, final_item->profile->ext);
+
+		if (final_item->profile->type == Youtube::y_audio) {
+			y_fields.fname.Format(L"%s.%s", y_fields.title, final_item->profile->ext);
+		} else {
+			y_fields.fname.Format(L"%s.%dp.%s", y_fields.title, final_item->profile->quality, final_item->profile->ext);
+		}
 		FixFilename(y_fields.fname);
 
 		// subtitles
@@ -1466,6 +1514,24 @@ namespace Youtube
 			}
 			for (const auto& item : youtubeAudioUrllist) {
 				if (item.profile->format == Youtube::y_webm_aud) {
+					youtubeUrllist.emplace_back(item);
+					break;
+				}
+			}
+			for (const auto& item : youtubeAudioUrllist) {
+				if (item.profile->format == Youtube::y_mp4_ac3) {
+					youtubeUrllist.emplace_back(item);
+					break;
+				}
+			}
+			for (const auto& item : youtubeAudioUrllist) {
+				if (item.profile->format == Youtube::y_mp4_eac3) {
+					youtubeUrllist.emplace_back(item);
+					break;
+				}
+			}
+			for (const auto& item : youtubeAudioUrllist) {
+				if (item.profile->format == Youtube::y_mp4_dtse) {
 					youtubeUrllist.emplace_back(item);
 					break;
 				}

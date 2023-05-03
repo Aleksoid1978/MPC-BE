@@ -357,12 +357,9 @@ void File_Mpegh3da::Streams_Fill()
     bool NoLoudnesConch;
     if (!Mpegh3da_loudnessInfo_Data[0].empty())
     {
+        C.Reset(false, true);
         C.loudnessInfo_Data[0]=Mpegh3da_loudnessInfo_Data[0].begin()->second.Data[0];
         C.loudnessInfo_Data[1]=Mpegh3da_loudnessInfo_Data[0].begin()->second.Data[1];
-        #if MEDIAINFO_CONFORMANCE
-            C.loudnessInfoSet_Present[0]=0;
-            C.loudnessInfoSet_Present[1]=1;
-        #endif
         Fill_Loudness(NULL);
         C.loudnessInfo_Data[0].clear();
         C.loudnessInfo_Data[1].clear();
@@ -410,11 +407,8 @@ void File_Mpegh3da::Streams_Fill()
             std::map<int8u, loudness_info_data>::iterator Loudness=Mpegh3da_loudnessInfo_Data[3].find(P.ID);
             if (Loudness!=Mpegh3da_loudnessInfo_Data[3].end())
             {
+                C.Reset(false, true);
                 C.loudnessInfo_Data[0]=Loudness->second.Data[0];
-                #if MEDIAINFO_CONFORMANCE
-                    C.loudnessInfoSet_Present[0]=0;
-                    C.loudnessInfoSet_Present[1]=1;
-                #endif
                 Fill_Loudness(p.c_str(), NoLoudnesConch);
                 C.loudnessInfo_Data[0].clear();
             }
@@ -544,11 +538,8 @@ void File_Mpegh3da::Streams_Fill()
             std::map<int8u, loudness_info_data>::iterator Loudness=Mpegh3da_loudnessInfo_Data[1].find(G.ID);
             if (Loudness!=Mpegh3da_loudnessInfo_Data[1].end())
             {
+                C.Reset(false, true);
                 C.loudnessInfo_Data[0]=Loudness->second.Data[0];
-                #if MEDIAINFO_CONFORMANCE
-                    C.loudnessInfoSet_Present[0]=0;
-                    C.loudnessInfoSet_Present[1]=1;
-                #endif
                 Fill_Loudness(g.c_str(), NoLoudnesConch);
                 C.loudnessInfo_Data[0].clear();
             }
@@ -568,11 +559,8 @@ void File_Mpegh3da::Streams_Fill()
             std::map<int8u, loudness_info_data>::iterator Loudness=Mpegh3da_loudnessInfo_Data[2].find(G.ID);
             if (Loudness!=Mpegh3da_loudnessInfo_Data[2].end())
             {
+                C.Reset(false, true);
                 C.loudnessInfo_Data[0]=Loudness->second.Data[0];
-                #if MEDIAINFO_CONFORMANCE
-                    C.loudnessInfoSet_Present[0]=0;
-                    C.loudnessInfoSet_Present[1]=1;
-                #endif
                 Fill_Loudness(g.c_str(), NoLoudnesConch);
                 C.loudnessInfo_Data[0].clear();
             }

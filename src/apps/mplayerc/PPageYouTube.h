@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2021 see Authors.txt
+ * (C) 2012-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,6 +34,7 @@ private:
 	CComboBox m_cbResolution;
 	CButton m_chk60fps;
 	CButton m_chkHdr;
+	CComboBox m_cbAudioLang;
 	CButton m_chkLoadPlaylist;
 
 	CButton   m_chkYDLEnable;
@@ -45,6 +46,26 @@ private:
 	CEdit m_edTorrServerAddress;
 	CEdit m_edUserAgent;
 
+	static constexpr LPCWSTR m_langcodes[] = {
+		L"en",
+		L"ru",
+		L"ar",
+		L"de",
+		L"es",
+		L"fr",
+		L"hi",
+		L"id",
+		L"ko",
+		L"pt",
+		L"pt-BR",
+		L"th",
+		L"tr",
+		L"vi",
+		L"it",
+		L"ja",
+		L"zh",
+	};
+
 public:
 	CPPageYoutube();
 	virtual ~CPPageYoutube();
@@ -54,6 +75,8 @@ public:
 	afx_msg void OnCheckPageParser();
 	afx_msg void OnCheck60fps();
 	afx_msg void OnCheckYDLEnable();
+
+	static CStringW GetDefaultLanguageCode();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

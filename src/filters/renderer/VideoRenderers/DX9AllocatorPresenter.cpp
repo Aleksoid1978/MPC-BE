@@ -2095,7 +2095,7 @@ void CDX9AllocatorPresenter::DrawStats()
 				}
 
 				if (const size_t mem_usage = m_MemUsage.GetUsage()) {
-					strText.AppendFormat(L", Memory:%4u MB", mem_usage);
+					strText.AppendFormat(L", Memory:%4zu MB", mem_usage);
 				}
 			}
 		}
@@ -2123,9 +2123,9 @@ void CDX9AllocatorPresenter::DrawStats()
 		const float StartY = m_windowRect.Height() - (DrawHeight + 20 * ScaleX);
 		const float StepX = DrawWidth / NB_JITTER;
 		const float StepY = DrawHeight / 24.0f;
+		const D3DCOLOR rectColor = D3DCOLOR_ARGB(80, 0, 0, 0);
 
-		const DWORD Alpha = 80;
-		DrawRect(RGB(0, 0, 0), Alpha, CRect(StartX, StartY, StartX + DrawWidth, StartY + DrawHeight));
+		DrawRect(rectColor, CRect(StartX, StartY, StartX + DrawWidth, StartY + DrawHeight));
 
 		m_pLine->SetWidth(2.5f * ScaleX);
 		m_pLine->SetAntialias(TRUE);

@@ -37,6 +37,9 @@ namespace Youtube
 		// audiofile
 		y_mp4_aac,
 		y_webm_aud,
+		y_mp4_ac3,
+		y_mp4_eac3,
+		y_mp4_dtse
 
 		// flv, 3gp are not used.
 	};
@@ -134,6 +137,12 @@ namespace Youtube
 		{249, y_webm_aud, y_audio,  50, L"webm"},
 		// Vorbis
 		//{249, y_webm_aud, y_audio, 128, L"webm", false, false},
+		// AC3
+		{380, y_mp4_ac3,  y_audio, 384, L"m4a"},
+		// E-AC3
+		{328, y_mp4_eac3, y_audio, 384, L"m4a"},
+		// DTS-Express
+		{325, y_mp4_dtse, y_audio, 384, L"m4a"},
 	};
 
 	struct YoutubeFields {

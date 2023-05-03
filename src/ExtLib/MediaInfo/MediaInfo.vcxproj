@@ -63,6 +63,7 @@
     <ClInclude Include="MediaInfo\Audio\File_Amr.h" />
     <ClInclude Include="MediaInfo\Audio\File_Amv.h" />
     <ClInclude Include="MediaInfo\Audio\File_Ape.h" />
+    <ClInclude Include="MediaInfo\Audio\File_Aptx100.h" />
     <ClInclude Include="MediaInfo\Audio\File_Au.h" />
     <ClInclude Include="MediaInfo\Audio\File_Caf.h" />
     <ClInclude Include="MediaInfo\Audio\File_Celt.h" />
@@ -146,6 +147,7 @@
     <ClInclude Include="MediaInfo\Video\File_Hevc.h" />
     <ClInclude Include="MediaInfo\Video\File_HuffYuv.h" />
     <ClInclude Include="MediaInfo\Video\File_ProRes.h" />
+    <ClInclude Include="MediaInfo\Video\File_Vp9.h" />
     <ClInclude Include="MediaInfo\XmlUtils.h" />
     <ClInclude Include="ThirdParty\base64\base64.h" />
     <ClInclude Include="ThirdParty\md5\md5.h" />
@@ -304,6 +306,7 @@
     <ClCompile Include="MediaInfo\Audio\File_Amr.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Amv.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Ape.cpp" />
+    <ClCompile Include="MediaInfo\Audio\File_Aptx100.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Au.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Caf.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Celt.cpp" />
@@ -509,6 +512,7 @@
     <ClCompile Include="MediaInfo\Video\File_Vc1.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Vc3.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Vp8.cpp" />
+    <ClCompile Include="MediaInfo\Video\File_Vp9.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Y4m.cpp" />
     <ClCompile Include="MediaInfo\XmlUtils.cpp" />
     <ClCompile Include="ThirdParty\md5\md5.c">

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,7 +32,7 @@ DWORD CharSetToCodePage(DWORD dwCharSet)
 		return CP_UTF7;
 	}
 	CHARSETINFO cs= {0};
-	::TranslateCharsetInfo((DWORD *)dwCharSet, &cs, TCI_SRCCHARSET);
+	::TranslateCharsetInfo((DWORD*)(DWORD_PTR)dwCharSet, &cs, TCI_SRCCHARSET);
 	return cs.ciACP;
 }
 

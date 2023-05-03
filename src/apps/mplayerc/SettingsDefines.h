@@ -128,6 +128,7 @@
 #define IDS_RS_YOUTUBE_RESOLUTION			L"YoutubeResolution"
 #define IDS_RS_YOUTUBE_60FPS				L"Youtube60fps"
 #define IDS_RS_YOUTUBE_HDR					L"YoutubeHDR"
+#define IDS_RS_YOUTUBE_AUDIOLANGUAGE		L"YoutubeAudioLanguage"
 #define IDS_RS_YOUTUBE_LOAD_PLAYLIST		L"YoutubeLoadPlaylist"
 #define IDS_RS_YDL_ENABLE					L"YDLEnable"
 #define IDS_RS_YDL_EXEPATH					L"YDLExePath"
@@ -223,6 +224,7 @@
 #define IDS_RS_PLAYLIST_SHOWPTOOLTIP		L"ShowTooltip"
 #define IDS_RS_PLAYLIST_SHOWSEARCHBAR		L"ShowSearchBar"
 #define IDS_RS_PLAYLIST_NEXTONERROR			L"NextOnError"
+#define IDS_RS_PLAYLIST_SKIP_INVALID		L"SkipInvalid"
 #define IDS_RS_PLAYLIST_DETERMINEDURATION	L"DetermineDuration"
 
 #define IDS_RS_PLAYLISTFONTPERCENT			L"PlaylistFontPercent"

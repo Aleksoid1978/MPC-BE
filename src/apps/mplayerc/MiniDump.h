@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,5 +33,4 @@ private :
 	static inline bool m_bMiniDumpEnabled = true;
 
 	static LONG WINAPI UnhandledExceptionFilter(_EXCEPTION_POINTERS *lpTopLevelExceptionFilter);
-	static BOOL        PreventSetUnhandledExceptionFilter();
 };

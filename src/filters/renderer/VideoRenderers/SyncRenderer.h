@@ -149,7 +149,7 @@ namespace GothSync
 		bool ClipToSurface(IDirect3DSurface9* pSurface, CRect& s, CRect& d);
 
 		HRESULT DrawRectBase(IDirect3DDevice9* pD3DDev, MYD3DVERTEX<0> v[4]);
-		HRESULT DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_Rect);
+		HRESULT DrawRect(const D3DCOLOR _Color, const CRect &_Rect);
 
 		HRESULT TextureCopy(IDirect3DTexture9* pTexture);
 		HRESULT TextureCopyRect(

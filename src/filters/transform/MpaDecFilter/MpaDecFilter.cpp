@@ -254,6 +254,7 @@ STDAPI DllUnregisterServer()
 //
 
 #include "filters/filters/Filters.h"
+#include "filters/ffmpeg_link_fix.h"
 
 CFilterApp theApp;
 
@@ -2697,13 +2698,19 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 
 			if (codecId == AV_CODEC_ID_DTS && m_DTSHDProfile != 0) {
 				switch (m_DTSHDProfile) {
-					case DCA_PROFILE_HD_HRA :
+					case DCA_PROFILE_HD_HRA:
 						codecName = "dts-hd hra";
 						break;
-					case DCA_PROFILE_HD_MA :
+					case DCA_PROFILE_HD_MA:
 						codecName = "dts-hd ma";
 						break;
-					case DCA_PROFILE_EXPRESS :
+					case DCA_PROFILE_HD_MA_X:
+						codecName = "dts-hd ma + dts:x";
+						break;
+					case DCA_PROFILE_HD_MA_X_IMAX:
+						codecName = "dts-hd ma + dts:x imax";
+						break;
+					case DCA_PROFILE_EXPRESS:
 						codecName = "dts express";
 						break;
 				}

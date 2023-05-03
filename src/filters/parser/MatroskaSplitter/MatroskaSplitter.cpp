@@ -1096,11 +1096,17 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					std::vector<BYTE> pData;
 					if (ReadFirtsBlock(pData, pTE.get())) {
 						audioframe_t aframe;
-						int size = ParseEAC3Header(pData.data(), &aframe);
+						int size = ParseEAC3Header(pData.data(), &aframe, static_cast<int>(pData.size()));
 						if (!size || aframe.param1 == EAC3_FRAME_TYPE_DEPENDENT) {
 							size = ParseAC3Header(pData.data(), &aframe);
 						}
 						if (size) {
+							if (aframe.param2) {
+								wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 1);
+								wfe->cbSize = 1;
+								(reinterpret_cast<BYTE*>(wfe + 1))[0] = 1;
+							}
+
 							wfe->nChannels = aframe.channels;
 							wfe->nAvgBytesPerSec = size * aframe.samplerate / aframe.samples;
 							if (size + 8 <= (int)pData.size()) {
@@ -1116,6 +1122,62 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mts.push_back(mt);
 				} else if (CodecID == "A_TRUEHD") {
 					mt.subtype = MEDIASUBTYPE_DOLBY_TRUEHD;
+
+					__int64 pos = m_pFile->GetPos();
+
+					CMatroskaNode Root(m_pFile.get());
+					m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
+					m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
+
+					Cluster c;
+					c.ParseTimeCode(m_pCluster.get());
+
+					if (!m_pBlock) {
+						m_pBlock = m_pCluster->GetFirstBlock();
+					}
+
+					BOOL bIsParse = FALSE;
+					do {
+						CBlockGroupNode bgn;
+
+						if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
+							bgn.Parse(m_pBlock.get(), true);
+						} else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
+							std::unique_ptr<BlockGroup> bg(DNew BlockGroup());
+							bg->Block.Parse(m_pBlock.get(), true);
+							bgn.emplace_back(std::move(bg));
+						}
+
+						for (const auto& bg : bgn) {
+							if (bg->Block.TrackNumber != pTE->TrackNumber) {
+								continue;
+							}
+
+							if (!bg->Block.BlockData.empty()) {
+								const auto& pb = bg->Block.BlockData.front();
+								pTE->Expand(*pb, ContentEncoding::AllFrameContents);
+
+								if (pb->size() >= 22) {
+									audioframe_t aframe;
+									if (ParseMLPHeader(pb->data(), &aframe)) {
+										if (aframe.param3) {
+											wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 1);
+											wfe->cbSize = 1;
+											(reinterpret_cast<BYTE*>(wfe + 1))[0] = 1;
+										}
+										bIsParse = TRUE;
+										break;
+									}
+								}
+							}
+						}
+					} while (m_pBlock->NextBlock() && SUCCEEDED(hr) && !CheckRequest(nullptr) && !bIsParse);
+
+					m_pBlock.reset();
+					m_pCluster.reset();
+
+					m_pFile->Seek(pos);
+
 					mts.push_back(mt);
 				} else if (CodecID == "A_MLP") {
 					mt.subtype = MEDIASUBTYPE_MLP;

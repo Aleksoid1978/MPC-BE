@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1061,7 +1061,7 @@ INT_PTR CPlayerListCtrl::OnToolHitTest(CPoint point, TOOLINFO* pTI) const
 	}
 
 	pTI->hwnd = m_hWnd;
-	pTI->uId = (UINT)((row<<10)+(col&0x3ff)+1);
+	pTI->uId = (UINT_PTR)((row<<10)+(col&0x3ff)+1);
 	pTI->lpszText = LPSTR_TEXTCALLBACKW;
 	pTI->rect = rect;
 

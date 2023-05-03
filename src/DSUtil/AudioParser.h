@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2022 see Authors.txt
+ * (C) 2011-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,6 @@
 #pragma once
 
 #include <MMReg.h>
-#include "GolombBuffer.h"
 
 #define AC3_SYNCWORD                 0x770B
 #define AC3_SYNCWORD_LE              0x0B77
@@ -46,9 +45,11 @@
 #define EAC3_FRAME_TYPE_AC3_CONVERT 2
 #define EAC3_FRAME_TYPE_RESERVED    3
 
-#define DCA_PROFILE_HD_HRA  0x01 // High Resolution Audio
-#define DCA_PROFILE_HD_MA   0x02 // Master Audio
-#define DCA_PROFILE_EXPRESS 0x03 // Express
+#define DCA_PROFILE_HD_HRA       0x01 // High Resolution Audio
+#define DCA_PROFILE_HD_MA        0x02 // Master Audio
+#define DCA_PROFILE_EXPRESS      0x03 // Express
+#define DCA_PROFILE_HD_MA_X      0x04 // Master Audio + DTS:X
+#define DCA_PROFILE_HD_MA_X_IMAX 0x05 // Master Audio + DTS:X IMAX
 
 enum {
 	IEC61937_AC3                = 0x01,          ///< AC-3 data
@@ -73,17 +74,17 @@ enum {
 	IEC61937_TRUEHD             = 0x16,          ///< TrueHD data
 };
 
-
 DWORD GetDefChannelMask(WORD nChannels);
 DWORD GetVorbisChannelMask(WORD nChannels);
 
 struct audioframe_t {
-	int size;
-	int samplerate;
-	int channels;
-	int samples;
-	int param1;
-	int param2;
+	int size       = {};
+	int samplerate = {};
+	int channels   = {};
+	int samples    = {};
+	int param1     = {};
+	int param2     = {};
+	int param3     = {};
 
 	void Empty() {
 		memset(this, 0, sizeof(*this));
@@ -107,10 +108,14 @@ int ParseMP3Header         (const BYTE* buf, MPEGLAYER3WAVEFORMAT* mp3wf);
 // need >= 7 bytes, param1 = bitrate
 int ParseAC3Header         (const BYTE* buf, audioframe_t* audioframe = nullptr);
 
-// need >= 6 bytes, param1 = eac3 frame type
-int ParseEAC3Header        (const BYTE* buf, audioframe_t* audioframe = nullptr);
+// need >= 6 bytes, param1 = eac3 frame type, param2 = Atmos flag
+int ParseEAC3Header        (const BYTE* buf, audioframe_t* audioframe = nullptr, const int buffsize = 0);
 
-// need >= 12 bytes, param1 = bitdepth, param2 = TrueHD flag
+void ParseEAC3HeaderForAtmosDetect(const BYTE* buf, const int buffsize,
+								   int frame_type, int fscod, int num_blocks, int acmod, int lfeon,
+								   bool& atmos_flag);
+
+// need >= 22 bytes, param1 = bitdepth, param2 = TrueHD flag, param3 = TrueHD Atmos flag
 int ParseMLPHeader         (const BYTE* buf, audioframe_t* audioframe = nullptr);
 
 // need >= 10 bytes, param2 = x96k extension flag

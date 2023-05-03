@@ -68,6 +68,7 @@
 #include "filters/transform/MPCVideoDec/MPCVideoDec.h"
 #include "filters/filters/InternalPropertyPage.h"
 #include <filters/renderer/VideoRenderers/IPinHook.h>
+#include "filters/ffmpeg_link_fix.h"
 #include "ComPropertySheet.h"
 #include <comdef.h>
 #include <dwmapi.h>
@@ -1489,7 +1490,7 @@ BOOL CMainFrame::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTO
 						} else {
 							auto peekMouseMessage = [&]() {
 								MSG msg;
-								while (PeekMessage(&msg, m_hWnd, WM_LBUTTONDOWN, WM_LBUTTONDBLCLK, PM_REMOVE));
+								while (PeekMessageW(&msg, m_hWnd, WM_LBUTTONDOWN, WM_LBUTTONDBLCLK, PM_REMOVE));
 							};
 
 							CRect rc;
@@ -3669,7 +3670,7 @@ LRESULT CMainFrame::OnPostOpen(WPARAM wParam, LPARAM lParam)
 void CMainFrame::SaveAppSettings()
 {
 	MSG msg;
-	if (!PeekMessage(&msg, m_hWnd, WM_SAVESETTINGS, WM_SAVESETTINGS, PM_NOREMOVE | PM_NOYIELD)) {
+	if (!PeekMessageW(&msg, m_hWnd, WM_SAVESETTINGS, WM_SAVESETTINGS, PM_NOREMOVE | PM_NOYIELD)) {
 		AfxGetAppSettings().SaveSettings();
 	}
 }
@@ -4291,7 +4292,7 @@ void CMainFrame::OnUnInitMenuPopup(CMenu* pPopupMenu, UINT nFlags)
 	__super::OnUnInitMenuPopup(pPopupMenu, nFlags);
 
 	MSG msg;
-	PeekMessage(&msg, m_hWnd, WM_LBUTTONDOWN, WM_LBUTTONDOWN, PM_REMOVE);
+	PeekMessageW(&msg, m_hWnd, WM_LBUTTONDOWN, WM_LBUTTONDOWN, PM_REMOVE);
 
 	m_bLeftMouseDown = FALSE;
 }
@@ -6915,7 +6916,8 @@ void CMainFrame::OnFileISDBSearch()
 
 void CMainFrame::OnUpdateFileISDBSearch(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(TRUE);
+	//pCmdUI->Enable(TRUE);
+	pCmdUI->Enable(FALSE); // turn it off because it doesn't work
 }
 
 void CMainFrame::OnFileISDBDownload()
@@ -6950,7 +6952,8 @@ void CMainFrame::OnFileISDBDownload()
 
 void CMainFrame::OnUpdateFileISDBDownload(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(m_eMediaLoadState == MLS_LOADED && GetPlaybackMode() != PM_CAPTURE && (m_pCAP || m_pDVS) && !m_bAudioOnly);
+	//pCmdUI->Enable(m_eMediaLoadState == MLS_LOADED && GetPlaybackMode() != PM_CAPTURE && (m_pCAP || m_pDVS) && !m_bAudioOnly);
+	pCmdUI->Enable(FALSE); // turn it off because it doesn't work
 }
 
 void CMainFrame::OnFileProperties()
@@ -8845,8 +8848,8 @@ void CMainFrame::OnUpdatePlayChangeAudDelay(CCmdUI* pCmdUI)
 void CMainFrame::OnPlayFiltersCopyToClipboard()
 {
 	// Don't translate that output since it's mostly for debugging purpose
-	CStringW filtersList;
-	filtersList.Format(L"%s %s\r\nFilters currently loaded:\r\n", MPC_WND_CLASS_NAMEW, MPC_VERSION_FULL_WSTR);
+	CStringW filtersList = s_strPlayerTitle;
+	filtersList.Append(L"\r\nFilters currently loaded:\r\n");
 	// Skip the first two entries since they are the "Copy to clipboard" menu entry and a separator
 	for (int i = 2, count = m_filtersMenu.GetMenuItemCount(); i < count; i++) {
 		CStringW filterName;
@@ -12320,7 +12323,11 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 			pOFD->subs = m_lastOMD->subs;
 
-			m_youtubeFields.fname.Format(L"%s.%dp.%s", m_youtubeFields.title, it->profile->quality, it->profile->ext);
+			if (it->profile->type == Youtube::y_audio) {
+				m_youtubeFields.fname.Format(L"%s.%s", m_youtubeFields.title, it->profile->ext);
+			} else {
+				m_youtubeFields.fname.Format(L"%s.%dp.%s", m_youtubeFields.title, it->profile->quality, it->profile->ext);
+			}
 			FixFilename(m_youtubeFields.fname);
 		}
 
@@ -14983,7 +14990,7 @@ void CMainFrame::SetupFiltersSubMenu()
 						CStringW stream(ResStr(IDS_AG_UNKNOWN_STREAM));
 						size_t count = stream.GetLength() + 3 + 1;
 						wname = (WCHAR*)CoTaskMemAlloc(count * sizeof(WCHAR));
-						swprintf_s(wname, count, L"%s %d", stream, std::min(i + 1, 999uL));
+						swprintf_s(wname, count, L"%s %d", stream.GetString(), std::min(i + 1, 999uL));
 					}
 
 					CString name(wname);
@@ -16210,7 +16217,7 @@ void CMainFrame::AddTextPassThruFilter()
 
 			CComQIPtr<IBaseFilter> pTPTF = DNew CTextPassThruFilter(this);
 			CStringW name;
-			name.Format(L"TextPassThru%08x", pTPTF);
+			name.Format(L"TextPassThru%08zx", pTPTF.p);
 			if (FAILED(m_pGB->AddFilter(pTPTF, name))) {
 				continue;
 			}
@@ -17696,7 +17703,7 @@ void CMainFrame::CloseMedia(BOOL bNextIsOpened/* = FALSE*/)
 			EndWaitCursor();
 
 			MSG msg;
-			if (PeekMessage(&msg, m_hWnd, WM_POSTOPEN, WM_POSTOPEN, PM_REMOVE | PM_NOYIELD)) {
+			if (PeekMessageW(&msg, m_hWnd, WM_POSTOPEN, WM_POSTOPEN, PM_REMOVE | PM_NOYIELD)) {
 				delete ((OpenMediaData*)msg.wParam);
 			}
 		}
@@ -17722,7 +17729,7 @@ void CMainFrame::CloseMedia(BOOL bNextIsOpened/* = FALSE*/)
 			if (dwWait == WAIT_OBJECT_0 + 1) {
 				// and we make sure it is handled before resuming waiting
 				MSG msg;
-				PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE);
+				PeekMessageW(&msg, nullptr, 0, 0, PM_NOREMOVE);
 			} else {
 				ASSERT(FALSE);
 			}

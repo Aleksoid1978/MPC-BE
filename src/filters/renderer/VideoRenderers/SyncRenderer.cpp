@@ -798,14 +798,13 @@ HRESULT CBaseAP::TextureCopyRect(
 	return hr;
 }
 
-HRESULT CBaseAP::DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_Rect)
+HRESULT CBaseAP::DrawRect(const D3DCOLOR _Color, const CRect &_Rect)
 {
-	DWORD Color = D3DCOLOR_ARGB(_Alpha, GetRValue(_Color), GetGValue(_Color), GetBValue(_Color));
 	MYD3DVERTEX<0> v[] = {
-		{float(_Rect.left), float(_Rect.top), 0.5f, 2.0f, Color},
-		{float(_Rect.right), float(_Rect.top), 0.5f, 2.0f, Color},
-		{float(_Rect.left), float(_Rect.bottom), 0.5f, 2.0f, Color},
-		{float(_Rect.right), float(_Rect.bottom), 0.5f, 2.0f, Color},
+		{float(_Rect.left), float(_Rect.top), 0.5f, 2.0f, _Color},
+		{float(_Rect.right), float(_Rect.top), 0.5f, 2.0f, _Color},
+		{float(_Rect.left), float(_Rect.bottom), 0.5f, 2.0f, _Color},
+		{float(_Rect.right), float(_Rect.bottom), 0.5f, 2.0f, _Color},
 	};
 	for (auto& item : v) {
 		item.x -= 0.5;
@@ -1740,11 +1739,11 @@ void CBaseAP::DrawStats()
 
 		int DrawWidth = 625;
 		int DrawHeight = 250;
-		int Alpha = 80;
 		int StartX = m_windowRect.Width() - (DrawWidth + 20);
 		int StartY = m_windowRect.Height() - (DrawHeight + 20);
+		const D3DCOLOR rectColor = D3DCOLOR_ARGB(80, 0, 0, 0);
 
-		DrawRect(RGB(0, 0, 0), Alpha, CRect(StartX, StartY, StartX + DrawWidth, StartY + DrawHeight));
+		DrawRect(rectColor, CRect(StartX, StartY, StartX + DrawWidth, StartY + DrawHeight));
 		m_pLine->SetWidth(2.5);
 		m_pLine->SetAntialias(1);
 		m_pLine->Begin();

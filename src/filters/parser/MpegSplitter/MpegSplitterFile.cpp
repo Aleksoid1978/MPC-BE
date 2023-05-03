@@ -542,7 +542,7 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(const DWORD TrackNum, const stream_cod
 
 			if (h.pid == TrackNum && h.payloadstart && NextMpegStartCode(b, 4)) {
 				peshdr h2;
-				if (ReadPES(h2, b) && h2.fpts) {
+				if (ReadPES(h2, b, h.pid) && h2.fpts) {
 					if (rtLimit != _I64_MAX && (h2.pts - rtMin) > rtLimit) {
 						Seek(pos);
 						return INVALID_TIME;
@@ -576,7 +576,7 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(const DWORD TrackNum, const stream_cod
 											packet_pos = GetPos();
 											peshdr peshdr_2;
 											if (trhdr_2.payloadstart &&
-													(!NextMpegStartCode(b, 4) || !ReadPES(peshdr_2, b))) {
+													(!NextMpegStartCode(b, 4) || !ReadPES(peshdr_2, b, trhdr_2.pid))) {
 												Seek(trhdr_2.next);
 												continue;
 											}
@@ -751,7 +751,7 @@ void CMpegSplitterFile::SearchStreams(const __int64 start, const __int64 stop, c
 				const __int64 pos = GetPos();
 				peshdr h2;
 				if (h.payloadstart
-						&& (!NextMpegStartCode(b, 4) || !ReadPES(h2, b))) {
+						&& (!NextMpegStartCode(b, 4) || !ReadPES(h2, b, h.pid))) {
 					Seek(h.next);
 					continue;
 				}
@@ -1067,7 +1067,7 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 	}
 
 	if (!m_streams[stream_type::audio].Find(s)
-			&& ((!pesid && pes_stream_type != INVALID)
+			&& ((pes_stream_type != INVALID)
 				|| pesid >= 0xc0 && pesid < 0xe0)) { // mpeg audio
 		// AAC_LATM
 		if (type == stream_type::unknown && (stream_type & AAC_AUDIO) && m_type == MPEG_TYPES::mpeg_ts) {
@@ -1113,7 +1113,17 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 		if (type == stream_type::unknown && (stream_type & AC3_AUDIO)) {
 			Seek(start);
 			ac3hdr h;
-			if (Read(h, len, &s.mt) && h.frame_type == EAC3_FRAME_TYPE_INDEPENDENT) {
+			if (pes_stream_type == AUDIO_STREAM_AC3_TRUE_HD) {
+				if (m_AC3CoreOnly) {
+					if (Read(h, len, &s.mt)) { // AC3 sub-stream
+						type = stream_type::audio;
+					}
+				} else {
+					if (Read(h, len, &s.mt, false, false)) { // TrueHD core
+						type = stream_type::audio;
+					}
+				}
+			} else if (Read(h, len, &s.mt) && h.frame_type == EAC3_FRAME_TYPE_INDEPENDENT) {
 				m_ac3Valid[s].Handle(h);
 				if (m_ac3Valid[s].IsValid()) {
 					type = stream_type::audio;
@@ -1197,11 +1207,11 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 					ac3hdr h;
 					if (pes_stream_type == AUDIO_STREAM_AC3_TRUE_HD) {
 						if (m_AC3CoreOnly) {
-							if (ext_id == 0x76 && Read(h, len, &s.mt)) { // AC3 sub-stream
+							if (Read(h, len, &s.mt)) { // AC3 sub-stream
 								type = stream_type::audio;
 							}
 						} else {
-							if (ext_id == 0x72 && Read(h, len, &s.mt, false, false)) { // TrueHD core
+							if (Read(h, len, &s.mt, false, false)) { // TrueHD core
 								type = stream_type::audio;
 							}
 						}
@@ -1354,6 +1364,13 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 
 								wfe->nChannels += wfeEAC3->nChannels - 2;
 								wfe->nAvgBytesPerSec += wfeEAC3->nAvgBytesPerSec;
+
+								// Atmos flag
+								if (mt.cbFormat == sizeof(WAVEFORMATEX) + 1) {
+									wfe = (WAVEFORMATEX*)source->mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 1);
+									wfe->cbSize = 1;
+									(reinterpret_cast<BYTE*>(wfe + 1))[0] = (reinterpret_cast<const BYTE*>(wfeEAC3 + 1))[0];
+								}
 							}
 						}
 					}
@@ -2769,12 +2786,19 @@ bool CMpegSplitterFile::ReadPSS(pssyshdr& h)
 }
 
 #define PTS(pts) (llMulDiv(pts, 10000, 90, 0) + m_rtPTSOffset)
-bool CMpegSplitterFile::ReadPES(peshdr& h, BYTE code)
+bool CMpegSplitterFile::ReadPES(peshdr& h, BYTE code, WORD pid)
 {
 	memset(&h, 0, sizeof(h));
 
 	if (!((code >= 0xbd && code < 0xf0) || (code >= 0xfa && code <= 0xfe))) { // 0xfd => blu-ray (.m2ts)
-		return false;
+		PES_STREAM_TYPE pes_stream_type = INVALID;
+		if (pid) {
+			GetStreamType(pid, pes_stream_type);
+		}
+
+		if (pes_stream_type == INVALID) {
+			return false;
+		}
 	}
 
 	h.len = (WORD)BitRead(16);

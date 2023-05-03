@@ -855,6 +855,7 @@ public:
 	bool			bShowPlaylistTooltip;
 	bool			bShowPlaylistSearchBar;
 	bool			bPlaylistNextOnError;
+	bool			bPlaylistSkipInvalid;
 	bool			bPlaylistDetermineDuration;
 
 	// OTHER STATES
@@ -889,6 +890,7 @@ public:
 		bool	fps60;
 		bool	hdr;
 	} YoutubeFormat;
+	CStringW		strYoutubeAudioLang;
 	bool			bYoutubeLoadPlaylist;
 	int				iYoutubeTagSelected = 0; // not saved
 	std::map<CString, CString> youtubeSignatureCache;

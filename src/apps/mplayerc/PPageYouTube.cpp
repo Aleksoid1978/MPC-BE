@@ -45,6 +45,7 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO2, m_cbResolution);
 	DDX_Control(pDX, IDC_CHECK3, m_chk60fps);
 	DDX_Control(pDX, IDC_CHECK4, m_chkHdr);
+	DDX_Control(pDX, IDC_COMBO5, m_cbAudioLang);
 	DDX_Control(pDX, IDC_CHECK1, m_chkLoadPlaylist);
 	DDX_Control(pDX, IDC_CHECK6, m_chkYDLEnable);
 	DDX_Control(pDX, IDC_COMBO4, m_cbYDLExePath);
@@ -102,6 +103,33 @@ BOOL CPPageYoutube::OnInitDialog()
 	m_chk60fps.SetCheck(s.YoutubeFormat.fps60 ? BST_CHECKED : BST_UNCHECKED);
 	m_chkHdr.SetCheck(s.YoutubeFormat.hdr ? BST_CHECKED : BST_UNCHECKED);
 
+	static std::vector<CStringW> langNames;
+	if (langNames.empty()) {
+		constexpr auto size = 256;
+		wchar_t buffer[size] = {};
+
+		langNames.resize(std::size(m_langcodes));
+		for (size_t i = 0; i < std::size(m_langcodes); i++) {
+			if (GetLocaleInfoEx(m_langcodes[i], LOCALE_SLOCALIZEDDISPLAYNAME, buffer, size)) {
+				langNames[i] = buffer;
+			} else {
+				langNames[i] = m_langcodes[i];
+			}
+		}
+	}
+
+	bool was_added = false;
+	for (size_t i = 0; i < std::size(m_langcodes); i++) {
+		m_cbAudioLang.AddString(langNames[i].GetString());
+		if (!was_added && s.strYoutubeAudioLang.CompareNoCase(m_langcodes[i]) == 0) {
+			was_added = true;
+			m_cbAudioLang.SetCurSel(i);
+		}
+	}
+	if (!was_added) {
+		m_cbAudioLang.SetCurSel(0);
+	}
+
 	m_chkLoadPlaylist.SetCheck(s.bYoutubeLoadPlaylist);
 
 	CorrectCWndWidth(GetDlgItem(IDC_CHECK2));
@@ -111,7 +139,7 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	m_chkYDLEnable.SetCheck(s.bYDLEnable ? BST_CHECKED : BST_UNCHECKED);
 
-	bool was_added = false;
+	was_added = false;
 	LPCWSTR ydl_filenames[] = {
 			L"yt-dlp.exe",
 			L"yt-dlp_min.exe",
@@ -160,6 +188,12 @@ BOOL CPPageYoutube::OnApply()
 	s.YoutubeFormat.res		= GetCurItemData(m_cbResolution);
 	s.YoutubeFormat.fps60	= !!m_chk60fps.GetCheck();
 	s.YoutubeFormat.hdr		= !!m_chkHdr.GetCheck();
+	if (m_cbAudioLang.GetCurSel() >= 0) {
+		s.strYoutubeAudioLang = m_langcodes[m_cbAudioLang.GetCurSel()];
+	} else {
+		s.strYoutubeAudioLang.Empty();
+	}
+
 	s.bYoutubeLoadPlaylist	= !!m_chkLoadPlaylist.GetCheck();
 
 	s.bYDLEnable = !!m_chkYDLEnable.GetCheck();
@@ -199,6 +233,9 @@ void CPPageYoutube::OnCheckPageParser()
 		OnCheck60fps();
 	}
 
+	GetDlgItem(IDC_STATIC4)->EnableWindow(bEnable);
+	m_cbAudioLang.EnableWindow(bEnable);
+
 	SetModified();
 }
 
@@ -225,4 +262,18 @@ void CPPageYoutube::OnCheckYDLEnable()
 	}
 
 	SetModified();
+}
+
+CStringW CPPageYoutube::GetDefaultLanguageCode()
+{
+	auto defaultUIlcid = MAKELCID(GetUserDefaultUILanguage(), SORT_DEFAULT);
+	for (auto code : m_langcodes) {
+		auto lcid = LocaleNameToLCID(code, 0);
+		if (lcid == defaultUIlcid) {
+			return code;
+		}
+	}
+
+	// default language
+	return L"en";
 }

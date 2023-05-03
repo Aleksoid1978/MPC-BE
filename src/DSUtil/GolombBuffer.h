@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,11 +20,13 @@
 
 #pragma once
 
+#include <memory>
+
 class CGolombBuffer
 {
 public:
 	CGolombBuffer(const BYTE* pBuffer, int nSize, const bool bRemoveMpegEscapes = false);
-	~CGolombBuffer();
+	~CGolombBuffer() = default;
 
 	UINT64       BitRead(const int nBits, const bool bPeek = false);
 	UINT64       UExpGolombRead();
@@ -63,6 +65,6 @@ private :
 	int          m_bitlen;
 	INT64        m_bitbuff;
 
-	BYTE*        m_pTmpBuffer;
+	std::unique_ptr<BYTE[]> m_pTmpBuffer;
 	bool         m_bRemoveMpegEscapes;
 };

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -349,6 +349,12 @@ CString CMediaTypeEx::ToString(IPin* pPin)
 							break;
 						case DCA_PROFILE_HD_MA:
 							codec = L"DTS-HD MA";
+							break;
+						case DCA_PROFILE_HD_MA_X:
+							codec = L"DTS-HD MA + DTS:X";
+							break;
+						case DCA_PROFILE_HD_MA_X_IMAX:
+							codec = L"DTS-HD MA + DTS:X IMAX";
 							break;
 						case DCA_PROFILE_EXPRESS:
 							codec = L"DTS Express";

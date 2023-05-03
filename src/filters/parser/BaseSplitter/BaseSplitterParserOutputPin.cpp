@@ -810,7 +810,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseTrueHD(std::unique_ptr<CPacket>& p, B
 
 	BEGINDATA;
 
-	while (start + 16 <= end) {
+	while (start + 22 <= end) {
 		audioframe_t aframe;
 		int size = ParseMLPHeader(start, &aframe);
 		if (size > 0) {

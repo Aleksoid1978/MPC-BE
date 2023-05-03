@@ -2480,14 +2480,14 @@ CString GetDXVAMode(const GUID& guidDecoder)
 }
 
 // hour, minute, second, millisec
-CString ReftimeToString(const REFERENCE_TIME& rtVal)
+CString ReftimeToString(REFERENCE_TIME rt)
 {
-	if (rtVal == INVALID_TIME) {
+	if (rt == INVALID_TIME) {
 		return L"INVALID TIME";
 	}
 
 	CString		strTemp;
-	LONGLONG	llTotalMs = ConvertToMilliseconds(rtVal);
+	LONGLONG	llTotalMs = ConvertToMilliseconds(rt);
 	int			lHour     = (int)(llTotalMs  / (1000 * 60 * 60));
 	int			lMinute   = (llTotalMs / (1000 * 60)) % 60;
 	int			lSecond   = (llTotalMs /  1000) % 60;
@@ -2498,14 +2498,14 @@ CString ReftimeToString(const REFERENCE_TIME& rtVal)
 }
 
 // hour, minute, second (round)
-CString ReftimeToString2(const REFERENCE_TIME& rtVal)
+CString ReftimeToString2(REFERENCE_TIME rt)
 {
-	if (rtVal == INVALID_TIME) {
+	if (rt == INVALID_TIME) {
 		return L"INVALID TIME";
 	}
 
 	CString		strTemp;
-	LONGLONG	seconds = (rtVal + 5000000) / 10000000;
+	LONGLONG	seconds = (rt + 5000000) / 10000000;
 	int			lHour   = (int)(seconds / 3600);
 	int			lMinute = (int)(seconds / 60 % 60);
 	int			lSecond = (int)(seconds % 60);

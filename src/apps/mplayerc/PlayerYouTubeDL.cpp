@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "DSUtil/Filehandle.h"
+#include "DSUtil/text.h"
 #include "PlayerYouTubeDL.h"
 
 #include "rapidjsonHelper.h"
@@ -188,10 +189,18 @@ namespace YoutubeDL
 					CStringA bestUrl;
 					getJsonValue(d, "url", bestUrl);
 
+					auto GetAndCheckProtocol = [](const auto& json, CStringA& protocol) {
+						if (!getJsonValue(json, "protocol", protocol)
+								|| (!StartsWith(protocol, "http") && !EndsWith(protocol, "m3u8"))) {
+							return false;
+						}
+
+						return true;
+					};
+
 					for (const auto& format : formats->GetArray()) {
 						CStringA protocol;
-						if (!getJsonValue(format, "protocol", protocol)
-								|| (protocol != "http" && protocol != "https" && protocol.Left(4) != "m3u8")) {
+						if (!GetAndCheckProtocol(format, protocol)) {
 							continue;
 						}
 						CStringA url;
@@ -275,8 +284,7 @@ namespace YoutubeDL
 
 					for (const auto& format : formats->GetArray()) {
 						CStringA protocol;
-						if (!getJsonValue(format, "protocol", protocol)
-							|| (protocol != "http" && protocol != "https" && protocol.Left(4) != "m3u8")) {
+						if (!GetAndCheckProtocol(format, protocol)) {
 							continue;
 						}
 						CStringA url;
@@ -316,8 +324,7 @@ namespace YoutubeDL
 
 							for (const auto& format : formats->GetArray()) {
 								CStringA protocol;
-								if (!getJsonValue(format, "protocol", protocol)
-										|| (protocol != "http" && protocol != "https" && protocol.Left(4) != "m3u8")) {
+								if (!GetAndCheckProtocol(format, protocol)) {
 									continue;
 								}
 

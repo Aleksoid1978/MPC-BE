@@ -1408,8 +1408,8 @@ HRESULT CDX9RenderingEngine::Resize(IDirect3DTexture9* pTexture, const CRect& sr
 		// two pass resize
 
 		// check intermediate texture
-		UINT texWidth = std::min((DWORD)w2, m_Caps.MaxTextureWidth);
-		UINT texHeight = std::min((DWORD)m_nativeVideoSize.cy, m_Caps.MaxTextureHeight);
+		UINT texWidth = std::min<UINT>(w2, m_Caps.MaxTextureWidth);
+		UINT texHeight = std::min<UINT>(m_nativeVideoSize.cy, m_Caps.MaxTextureHeight);
 		D3DSURFACE_DESC desc;
 
 		if (m_pResizeTexture && m_pResizeTexture->GetLevelDesc(0, &desc) == D3D_OK) {
@@ -2015,18 +2015,17 @@ bool CDX9RenderingEngine::ClipToSurface(IDirect3DSurface9* pSurface, CRect& s, C
 	return true;
 }
 
-HRESULT CDX9RenderingEngine::DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_Rect)
+HRESULT CDX9RenderingEngine::DrawRect(const D3DCOLOR _Color, const CRect &_Rect)
 {
 	if (!m_pDevice9Ex) {
 		return E_POINTER;
 	}
 
-	DWORD Color = D3DCOLOR_ARGB(_Alpha, GetRValue(_Color), GetGValue(_Color), GetBValue(_Color));
 	MYD3DVERTEX<0> v[] = {
-		{float(_Rect.left), float(_Rect.top), 0.5f, 2.0f, Color},
-		{float(_Rect.right), float(_Rect.top), 0.5f, 2.0f, Color},
-		{float(_Rect.left), float(_Rect.bottom), 0.5f, 2.0f, Color},
-		{float(_Rect.right), float(_Rect.bottom), 0.5f, 2.0f, Color},
+		{float(_Rect.left), float(_Rect.top), 0.5f, 2.0f, _Color},
+		{float(_Rect.right), float(_Rect.top), 0.5f, 2.0f, _Color},
+		{float(_Rect.left), float(_Rect.bottom), 0.5f, 2.0f, _Color},
+		{float(_Rect.right), float(_Rect.bottom), 0.5f, 2.0f, _Color},
 	};
 
 	for (unsigned i = 0; i < std::size(v); i++) {

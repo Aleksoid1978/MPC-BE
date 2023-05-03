@@ -153,7 +153,15 @@ void File_Mz::Read_Buffer_Continue()
             Fill(Stream_General, 0, General_Format_Profile, "Executable");
         Fill(Stream_General, 0, General_Format_Profile, Mz_Machine(Machine));
         if (TimeDateStamp)
-            Fill(Stream_General, 0, General_Encoded_Date, Ztring().Date_From_Seconds_1970(TimeDateStamp));
+        {
+            Ztring Time=Ztring().Date_From_Seconds_1970(TimeDateStamp);
+            if (!Time.empty())
+            {
+                Time.FindAndReplace(__T("UTC "), __T(""));
+                Time+=__T(" UTC");
+            }
+            Fill(Stream_General, 0, General_Encoded_Date, Time);
+        }
 
         //No more need data
         Finish("MZ");

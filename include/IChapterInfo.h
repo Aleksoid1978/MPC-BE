@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 
 #pragma once
 
-typedef enum ChapterType {
+enum ChapterType {
 	AtomicChapter	= 0, // only contain one element
 	SubChapter		= 1, // contain a list of elements
 };

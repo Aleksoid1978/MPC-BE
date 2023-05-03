@@ -861,7 +861,7 @@ BEGIN
     GROUPBOX        "Instellingen van EVR-CP en EVR Sync",IDC_STATIC,5,37,285,137
     CONTROL         "Kies D3D9-renderapparaat",IDC_D3D9DEVICE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,120,10
     COMBOBOX        IDC_D3D9DEVICE_COMBO,144,49,142,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Exclusieve volledigschermmodus op een bijkomend venster",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
+    CONTROL         "Exclusieve volledigschermmodus in een bijkomend venster",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,79,224,10
     CONTROL         "10-bits RGB-uitvoer",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,92,92,10
     CONTROL         "Herinitialisatie bij verandering van monitor",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_TOP | WS_TABSTOP,10,65,164,9
@@ -877,7 +877,7 @@ BEGIN
     LTEXT           "Uitvoerbereik:",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Instellingen voor MPC Video Renderer",IDC_STATIC,5,177,285,27
-    CONTROL         "Exclusieve volledigschermmodus op een bijkomend venster (experimenteel)",IDC_CHECK2,
+    CONTROL         "Exclusieve volledigschermmodus in een bijkomend venster (experimenteel)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
     GROUPBOX        "Frameformaat",IDC_STATIC,5,208,210,53
     LTEXT           "Standaardmodus:",IDC_STATIC,10,220,74,8
@@ -895,28 +895,30 @@ IDD_PPAGEYOUTUBE DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "YouTube",IDC_STATIC,6,5,285,66
+    GROUPBOX        "YouTube",IDC_STATIC,6,5,285,96
     CONTROL         "Ingebouwde webpaginaparser gebruiken",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,16,120,10
     LTEXT           "Voorkeursformaat:",IDC_STATIC2,10,30,104,8
     COMBOBOX        IDC_COMBO1,10,40,50,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO2,64,40,50,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "60 fps",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,118,42,48,10
     CONTROL         "HDR",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,170,42,30,10
-    CONTROL         "Afspeellijst laden",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,56,100,10
-    GROUPBOX        "",IDC_STATIC,6,77,285,57
-    CONTROL         "youtube-dl, yt-dlp",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,77,74,10
-    LTEXT           "Executable:",IDC_STATIC,10,90,104,8
-    COMBOBOX        IDC_COMBO4,116,88,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Maximale videohoogte:",IDC_STATIC,10,106,104,8
-    COMBOBOX        IDC_COMBO3,116,104,43,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Maximale fps of bitrate selecteren",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,120,196,10
-    LTEXT           "Adres AceStream:",IDC_STATIC,10,141,77,8
-    EDITTEXT        IDC_EDIT1,91,139,195,13,ES_AUTOHSCROLL
-    LTEXT           "Adres MatriX (TorrServer):",IDC_STATIC,10,158,103,8
-    EDITTEXT        IDC_EDIT2,10,170,276,13,ES_AUTOHSCROLL
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,197,283,1
-    LTEXT           "Useragent:",IDC_STATIC,10,206,77,8
-    EDITTEXT        IDC_EDIT3,91,204,195,13,ES_AUTOHSCROLL
+    LTEXT           "Preferred audio track language:",IDC_STATIC4,10,59,140,8
+    COMBOBOX        IDC_COMBO5,10,70,130,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Afspeellijst laden",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,87,100,10
+    GROUPBOX        "",IDC_STATIC,6,105,285,57
+    CONTROL         "youtube-dl, yt-dlp",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,105,74,10
+    LTEXT           "Executable:",IDC_STATIC,10,118,104,8
+    COMBOBOX        IDC_COMBO4,116,116,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Maximale videohoogte:",IDC_STATIC,10,134,104,8
+    COMBOBOX        IDC_COMBO3,116,132,43,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Maximale fps of bitrate selecteren",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,148,196,10
+    LTEXT           "Adres AceStream:",IDC_STATIC,10,169,77,8
+    EDITTEXT        IDC_EDIT1,91,167,195,13,ES_AUTOHSCROLL
+    LTEXT           "Adres MatriX (TorrServer):",IDC_STATIC,10,186,103,8
+    EDITTEXT        IDC_EDIT2,10,198,276,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,225,283,1
+    LTEXT           "Useragent:",IDC_STATIC,10,234,77,8
+    EDITTEXT        IDC_EDIT3,91,232,195,13,ES_AUTOHSCROLL
 END
 
 IDD_AUTH_DLG DIALOGEX 0, 0, 213, 127
@@ -2300,7 +2302,7 @@ STRINGTABLE
 BEGIN
     IDS_PLAYLIST_CAPTION    "Afspeellijst"
     IDS_PLAYLIST_MAIN_NAME  "Hoofdtabblad"
-    IDS_PLAYLIST_ADD_NEW    "Add playlist"
+    IDS_PLAYLIST_ADD_NEW    "Afspeellijst toevoegen"
     IDS_PLAYLIST_ADD_PLAYLIST "Afspeellijst"
 END
 
@@ -2308,7 +2310,7 @@ STRINGTABLE
 BEGIN
     IDS_PLAYLIST_ADD_EXPLORER "Verkenner"
     IDS_PLAYLIST_RENAME_CURRENT "Afspeellijst hernoemen"
-    IDS_PLAYLIST_DELETE_CURRENT "Delete playlist"
+    IDS_PLAYLIST_DELETE_CURRENT "Afspeellijst verwijderen"
     IDS_PLAYLIST_NAME       "Afspeellijst"
     IDS_PLAYLIST_EXPLORER_NAME "Verkenner"
     IDS_PLAYLIST_OPEN       "&Openen"
@@ -2351,6 +2353,8 @@ BEGIN
     IDS_PLAYLIST_HIDEFS     "Bij volledig scherm verbergen"
     IDS_PLAYLIST_NEXTONERROR "Ga naar de volgende bij foutmelding"
     IDS_PLAYLIST_DETERMINEDURATION "Bepaal de duur bij het toevoegen"
+    IDS_PLAYLIST_SKIPINVALID "Sla ongeldige elementen over"
+    IDS_PLAYLIST_INVALID    "Ongeldig"
 END
 
 STRINGTABLE

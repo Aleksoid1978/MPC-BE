@@ -152,7 +152,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,178,133,109,12
     GROUPBOX        "",IDC_STATIC,5,154,285,49
     CONTROL         "Фільтри FFmpeg",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,153,61,10
-    PUSHBUTTON      "Presets",IDC_BUTTON1,9,166,59,14
+    PUSHBUTTON      "Пресети",IDC_BUTTON1,9,166,59,14
     COMBOBOX        IDC_COMBO1,10,184,58,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_EDIT1,72,184,214,14,ES_AUTOHSCROLL
     GROUPBOX        "Формат виводу:",IDC_STATIC,5,206,286,29
@@ -895,28 +895,30 @@ IDD_PPAGEYOUTUBE DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "YouTube",IDC_STATIC,6,5,285,66
+    GROUPBOX        "YouTube",IDC_STATIC,6,5,285,96
     CONTROL         "Використовувати вбудований парсер веб-сторінок",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,16,120,10
-    LTEXT           "Вибір формату перегляду:",IDC_STATIC2,10,30,104,8
+    LTEXT           "Віддавати перевагу формату перегляду:",IDC_STATIC2,10,30,104,8
     COMBOBOX        IDC_COMBO1,10,40,50,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO2,64,40,50,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "60 кадрів\с",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,118,42,48,10
     CONTROL         "HDR",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,170,42,30,10
-    CONTROL         "Завантажити список відтворення",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,56,100,10
-    GROUPBOX        "",IDC_STATIC,6,77,285,57
-    CONTROL         "youtube-dl, yt-dlp",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,77,74,10
-    LTEXT           "Виконуваний файл:",IDC_STATIC,10,90,104,8
-    COMBOBOX        IDC_COMBO4,116,88,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Максимальна висота відео:",IDC_STATIC,10,106,104,8
-    COMBOBOX        IDC_COMBO3,116,104,43,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Обрати макс. кількість кадрів\с або бітрейт",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,120,196,10
-    LTEXT           "Адреса AceStream:",IDC_STATIC,10,141,77,8
-    EDITTEXT        IDC_EDIT1,91,139,195,13,ES_AUTOHSCROLL
-    LTEXT           "Адреса MatriX (TorrServer):",IDC_STATIC,10,158,103,8
-    EDITTEXT        IDC_EDIT2,10,170,276,13,ES_AUTOHSCROLL
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,197,283,1
-    LTEXT           "User agent:",IDC_STATIC,10,206,77,8
-    EDITTEXT        IDC_EDIT3,91,204,195,13,ES_AUTOHSCROLL
+    LTEXT           "Віддавати перевагу мові аудіодоріжки:",IDC_STATIC4,10,59,140,8
+    COMBOBOX        IDC_COMBO5,10,70,130,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Завантажити список відтворення",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,87,100,10
+    GROUPBOX        "",IDC_STATIC,6,105,285,57
+    CONTROL         "youtube-dl, yt-dlp",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,105,74,10
+    LTEXT           "Виконуваний файл:",IDC_STATIC,10,118,104,8
+    COMBOBOX        IDC_COMBO4,116,116,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Максимальна висота відео:",IDC_STATIC,10,134,104,8
+    COMBOBOX        IDC_COMBO3,116,132,43,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Обрати макс. кількість кадрів\с або бітрейт",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,148,196,10
+    LTEXT           "Адреса AceStream:",IDC_STATIC,10,169,77,8
+    EDITTEXT        IDC_EDIT1,91,167,195,13,ES_AUTOHSCROLL
+    LTEXT           "Адреса MatriX (TorrServer):",IDC_STATIC,10,186,103,8
+    EDITTEXT        IDC_EDIT2,10,198,276,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,225,283,1
+    LTEXT           "User agent:",IDC_STATIC,10,234,77,8
+    EDITTEXT        IDC_EDIT3,91,232,195,13,ES_AUTOHSCROLL
 END
 
 IDD_AUTH_DLG DIALOGEX 0, 0, 213, 127
@@ -2351,6 +2353,8 @@ BEGIN
     IDS_PLAYLIST_HIDEFS     "Приховувати якщо 'На весь екран'"
     IDS_PLAYLIST_NEXTONERROR "Перейти до наступного при помилці"
     IDS_PLAYLIST_DETERMINEDURATION "Визначати тривалість при додаванні"
+    IDS_PLAYLIST_SKIPINVALID "Пропускати помилкові елементи"
+    IDS_PLAYLIST_INVALID    "Помилка"
 END
 
 STRINGTABLE
@@ -2363,7 +2367,7 @@ BEGIN
     IDS_PLAYLOOPMODE_AB_MARK_A "Повтор A-B: Позиція мітки A"
     IDS_PLAYLOOPMODE_AB_MARK_B "Повтор A-B: Позиція мітки B"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Додати в список відтворення з буферу обміну"
-    IDS_AUDIO_FILTER_PRESET_1 "For audio with whisper and explosion parts"
+    IDS_AUDIO_FILTER_PRESET_1 "Для аудіо з шепотом і вибухами"
 END
 
 STRINGTABLE

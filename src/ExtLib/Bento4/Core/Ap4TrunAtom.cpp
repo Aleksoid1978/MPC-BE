@@ -95,13 +95,15 @@ AP4_TrunAtom::AP4_TrunAtom(AP4_Size         size,
     }
 
     int record_fields_count = (int)ComputeRecordFieldsCount(m_Flags);
+    if (record_fields_count > 0 && (bytes_left / (record_fields_count * 4) < sample_count)) {
+        return;
+    }
+
+    m_Entries.SetItemCount(sample_count);
     if (record_fields_count == 0) {
         return;
     }
-    if (bytes_left / (record_fields_count*4) < sample_count) {
-        return;
-    }
-    m_Entries.SetItemCount(sample_count);
+
     for (AP4_UI32 i = 0; i < sample_count; i++) {
         if (m_Flags & AP4_TRUN_FLAG_SAMPLE_DURATION_PRESENT) {
             if (bytes_left < 4 || AP4_FAILED(stream.ReadUI32(m_Entries[i].sample_duration))) {

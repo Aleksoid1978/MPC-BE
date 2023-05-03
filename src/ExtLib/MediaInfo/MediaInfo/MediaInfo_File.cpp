@@ -219,6 +219,9 @@
 #if defined(MEDIAINFO_APE_YES)
     #include "MediaInfo/Audio/File_Ape.h"
 #endif
+#if defined(MEDIAINFO_APTX100_YES)
+    #include "MediaInfo/Audio/File_Aptx100.h"
+#endif
 #if defined(MEDIAINFO_AU_YES)
     #include "MediaInfo/Audio/File_Au.h"
 #endif
@@ -616,6 +619,9 @@ bool MediaInfo_Internal::SelectFromExtension (const String &Parser)
     #if defined(MEDIAINFO_APE_YES)
         else if (Parser==__T("Ape"))         Info=new File_Ape();
     #endif
+    #if defined(MEDIAINFO_APTX100_YES)
+        else if (Parser==__T("Aptx100"))     Info=new File_Aptx100();
+    #endif
     #if defined(MEDIAINFO_AU_YES)
         else if (Parser==__T("Au"))          Info=new File_Au();
     #endif
@@ -999,6 +1005,9 @@ int MediaInfo_Internal::ListFormats(const String &File_Name)
     #endif
     #if defined(MEDIAINFO_APE_YES)
         delete Info; Info=new File_Ape();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+    #endif
+    #if defined(MEDIAINFO_APTX100_YES)
+        delete Info; Info=new File_Aptx100();            if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_AU_YES)
         delete Info; Info=new File_Au();                 if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;

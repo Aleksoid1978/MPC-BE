@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2978,12 +2978,12 @@ STDMETHODIMP_(POSITION) CRenderedTextSubtitle::GetStartPosition(REFERENCE_TIME r
 		iSegment = 0;
 	}
 
-	return GetNext((POSITION)iSegment);
+	return GetNext((POSITION)(INT_PTR)iSegment);
 }
 
 STDMETHODIMP_(POSITION) CRenderedTextSubtitle::GetNext(POSITION pos)
 {
-	int iSegment = (int)pos;
+	int iSegment = (int)(INT_PTR)pos;
 
 	const STSSegment* stss = GetSegment(iSegment);
 	while (stss && stss->subs.IsEmpty()) {
@@ -2991,22 +2991,22 @@ STDMETHODIMP_(POSITION) CRenderedTextSubtitle::GetNext(POSITION pos)
 		stss = GetSegment(iSegment);
 	}
 
-	return (stss ? (POSITION)(iSegment + 1) : NULL);
+	return (stss ? (POSITION)(INT_PTR)(iSegment + 1) : NULL);
 }
 
 STDMETHODIMP_(REFERENCE_TIME) CRenderedTextSubtitle::GetStart(POSITION pos, double fps)
 {
-	return (10000i64 * TranslateSegmentStart((int)pos-1, fps));
+	return (10000i64 * TranslateSegmentStart((int)(INT_PTR)pos-1, fps));
 }
 
 STDMETHODIMP_(REFERENCE_TIME) CRenderedTextSubtitle::GetStop(POSITION pos, double fps)
 {
-	return (10000i64 * TranslateSegmentEnd((int)pos-1, fps));
+	return (10000i64 * TranslateSegmentEnd((int)(INT_PTR)pos-1, fps));
 }
 
 STDMETHODIMP_(bool) CRenderedTextSubtitle::IsAnimated(POSITION pos)
 {
-	int iSegment = (int)pos - 1;
+	int iSegment = (int)(INT_PTR)pos - 1;
 
 	const STSSegment* stss = GetSegment(iSegment);
 	if (stss) {

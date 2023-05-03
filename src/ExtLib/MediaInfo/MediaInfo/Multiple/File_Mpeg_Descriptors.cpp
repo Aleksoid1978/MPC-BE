@@ -2163,21 +2163,26 @@ void File_Mpeg_Descriptors::Descriptor_3F_03()
     bool picture_and_timing_info_present_flag, x90kHz_flag=false;
     BS_Begin();
     Skip_SB(                                                "hrd_management_valid_flag");
-    Skip_S1(6,                                              "reserved");
+    Skip_SB(                                                "target_schedule_idx_not_present_flag");
+    Skip_S1(5,                                              "target_schedule_idx");
     Get_SB (   picture_and_timing_info_present_flag,        "picture_and_timing_info_present_flag");
+    BS_End();
     if (picture_and_timing_info_present_flag)
     {
+        BS_Begin();
         Get_SB (   x90kHz_flag,                             "90kHz_flag");
         Skip_S1(7,                                          "reserved");
-        if (x90kHz_flag)
+        BS_End();
+        if (!x90kHz_flag)
         {
-            Info_S4(32, N,                                  "N");
-            Info_S4(32, K,                                  "K");
-            Param_Info1(N*27000000.0/K);
+            Element_Begin1("frequency");
+            Info_B4(N,                                      "N");
+            Info_B4(K,                                      "K");
+            Element_Info1C(K, Ztring::ToZtring(N*27000000.0/K, 0)+__T(" Hz"));
+            Element_End0();
         }
-        Skip_S4(32,                                         "num_units_in_tick");
+        Skip_B4(                                            "num_units_in_tick");
     }
-    BS_End();
 }
 
 //---------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 ﻿/*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -53,14 +53,8 @@ static void RemoveMpegEscapeCode(BYTE* dst, const BYTE* src, int& length)
 
 CGolombBuffer::CGolombBuffer(const BYTE* pBuffer, int nSize, const bool bRemoveMpegEscapes/* = false*/)
 	: m_bRemoveMpegEscapes(bRemoveMpegEscapes)
-	, m_pTmpBuffer(nullptr)
 {
 	Reset(pBuffer, nSize);
-}
-
-CGolombBuffer::~CGolombBuffer()
-{
-	SAFE_DELETE_ARRAY(m_pTmpBuffer);
 }
 
 UINT64 CGolombBuffer::BitRead(const int nBits, const bool bPeek/* = false*/)
@@ -161,11 +155,10 @@ void CGolombBuffer::Reset()
 void CGolombBuffer::Reset(const BYTE* pNewBuffer, int nNewSize)
 {
 	if (m_bRemoveMpegEscapes) {
-		SAFE_DELETE_ARRAY(m_pTmpBuffer);
-		m_pTmpBuffer = DNew BYTE[nNewSize];
+		m_pTmpBuffer.reset(new BYTE[nNewSize]);
 
-		RemoveMpegEscapeCode(m_pTmpBuffer, pNewBuffer, nNewSize);
-		m_pBuffer = m_pTmpBuffer;
+		RemoveMpegEscapeCode(m_pTmpBuffer.get(), pNewBuffer, nNewSize);
+		m_pBuffer = m_pTmpBuffer.get();
 		m_nSize   = nNewSize;
 	} else {
 		m_pBuffer = pNewBuffer;

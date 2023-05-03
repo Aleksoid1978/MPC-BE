@@ -1009,6 +1009,8 @@ bool File_Usac::BS_Bookmark(File_Usac::bs_bookmark& B)
 #if MEDIAINFO_CONFORMANCE
 void File_Usac::Fill_Conformance(const char* Field, const char* Value, bitset8 Flags, conformance_level Level)
 {
+    if (strncmp(Field, "UsacConfig loudnessInfoSet", 26) && strncmp(Field, "mpegh3daConfig loudnessInfoSet", 30))
+        return; // TODO: remove when all tests are active in production
     if (Level == Warning && Warning_Error)
         Level = Error;
     field_value FieldValue(Field, Value, Flags, (int64u)-1);
@@ -1248,8 +1250,7 @@ void File_Usac::UsacConfig(size_t BitsNotIncluded)
     C = usac_config();
     #if MEDIAINFO_CONFORMANCE
         Warning_Error=MediaInfoLib::Config.WarningError();
-        C.loudnessInfoSet_Present[0] = 0;
-        C.loudnessInfoSet_Present[1] = 0;
+        C.Reset();
     #endif
 
     Element_Begin1("UsacConfig");
@@ -1413,6 +1414,9 @@ void File_Usac::UsacConfig(size_t BitsNotIncluded)
     }
     else
     {
+        if (!IsParsingRaw)
+            Fill_Loudness(); // TODO: remove when all tests are active in production
+
         #if MEDIAINFO_CONFORMANCE
             if (!IsParsingRaw)
             {
@@ -1521,7 +1525,7 @@ void File_Usac::Fill_Loudness(const char* Prefix, bool NoConCh)
         if (NoConCh || C.IsNotValid)
             return;
         auto loudnessInfoSet_Present_Total=C.loudnessInfoSet_Present[0]+C.loudnessInfoSet_Present[1];
-        if (C.loudnessInfoSet_Present[0] && C.loudnessInfoSet_Present[1])
+        if (C.loudnessInfoSet_HasContent[0] && C.loudnessInfoSet_HasContent[1])
             Fill_Conformance("loudnessInfoSet Coherency", "Mix of v0 and v1");
         if (C.loudnessInfoSet_Present[0]>1)
             Fill_Conformance("loudnessInfoSet Coherency", "loudnessInfoSet is present " + to_string(C.loudnessInfoSet_Present[0]) + " times but only 1 instance is allowed");
@@ -1531,7 +1535,7 @@ void File_Usac::Fill_Loudness(const char* Prefix, bool NoConCh)
         }
         else if (!loudnessInfoSet_Present_Total)
         {
-            Fill_Conformance("loudnessInfoSet Coherency", "loudnessInfoSet is missing", CheckFlags);
+            Fill_Conformance((string(C.usacElements.empty() ? "mpegh3daConfig " : "UsacConfig ") + "loudnessInfoSet Coherency").c_str(), "loudnessInfoSet is missing", CheckFlags);
             if (ConformanceFlags & CheckFlags)
             {
                 Fill(Stream_Audio, 0, (FieldPrefix + "ConformanceCheck").c_str(), "Invalid: loudnessInfoSet is missing");
@@ -1540,7 +1544,7 @@ void File_Usac::Fill_Loudness(const char* Prefix, bool NoConCh)
         }
         else if (C.loudnessInfo_Data[0].empty())
         {
-            Fill_Conformance("loudnessInfoSet loudnessInfoCount", "loudnessInfoCount is 0", CheckFlags);
+            Fill_Conformance((string(C.usacElements.empty() ? "mpegh3daConfig " : "UsacConfig ") + "loudnessInfoSet loudnessInfoCount").c_str(), "Is 0", CheckFlags);
             if (ConformanceFlags & CheckFlags)
             {
                 Fill(Stream_Audio, 0, (FieldPrefix + "ConformanceCheck").c_str(), "Invalid: loudnessInfoSet is empty");
@@ -1549,16 +1553,16 @@ void File_Usac::Fill_Loudness(const char* Prefix, bool NoConCh)
         }
         else if (!DefaultIdPresent)
         {
-            Fill_Conformance("loudnessInfoSet Coherency", "Default loudnessInfo is missing", CheckFlags);
+            Fill_Conformance((string(C.usacElements.empty() ? "mpegh3daConfig " : "UsacConfig ") + "loudnessInfoSet Coherency").c_str(), "Default loudnessInfo is missing", CheckFlags);
             if (ConformanceFlags & CheckFlags)
             {
                 Fill(Stream_Audio, 0, (FieldPrefix + "ConformanceCheck").c_str(), "Invalid: Default loudnessInfo is missing");
                 Fill(Stream_Audio, 0, "ConformanceCheck/Short", "Invalid: Default loudnessInfo missing");
             }
         }
-        else if (!C.LoudnessInfoIsNotValid && C.loudnessInfo_Data[0].begin()->second.Measurements.Values[1].empty() && C.loudnessInfo_Data[0].begin()->second.Measurements.Values[2].empty())
+        else if (C.loudnessInfo_Data[0].begin()->second.Measurements.Values[1].empty() && C.loudnessInfo_Data[0].begin()->second.Measurements.Values[2].empty()) // TODO: add !C.LoudnessInfoIsNotValid check when all tests are active in production
         {
-            Fill_Conformance("loudnessInfoSet Coherency", "None of program loudness or anchor loudness is present in default loudnessInfo", CheckFlags);
+            Fill_Conformance((string(C.usacElements.empty() ? "mpegh3daConfig " : "UsacConfig ") + "loudnessInfoSet Coherency").c_str(), "None of program loudness or anchor loudness is present in default loudnessInfo", CheckFlags);
             if (ConformanceFlags & CheckFlags)
             {
                 Fill(Stream_Audio, 0, (FieldPrefix + "ConformanceCheck").c_str(), "Invalid: None of program loudness or anchor loudness is present in default loudnessInfo");
@@ -2600,8 +2604,7 @@ void File_Usac::loudnessInfoSet(bool V1)
     Element_Begin1(V1?"loudnessInfoSetV1":"loudnessInfoSet");
 
     #if MEDIAINFO_CONFORMANCE
-        if (V1)
-            C.loudnessInfoSet_Present[V1]++;
+        C.loudnessInfoSet_Present[V1]++;
     #endif
 
     int8u loudnessInfoAlbumCount, loudnessInfoCount;
@@ -2609,9 +2612,10 @@ void File_Usac::loudnessInfoSet(bool V1)
     Get_S1 (6, loudnessInfoAlbumCount,                          "loudnessInfoAlbumCount");
     Get_S1 (6, loudnessInfoCount,                               "loudnessInfoCount");
     #if MEDIAINFO_CONFORMANCE
-        if (!V1 && (loudnessInfoAlbumCount || loudnessInfoCount))
-            C.loudnessInfoSet_Present[V1]++;
+        if (loudnessInfoAlbumCount || loudnessInfoCount)
+            C.loudnessInfoSet_HasContent[V1]=true;
     #endif
+
     for (int8u i=0; i<loudnessInfoAlbumCount; i++)
         loudnessInfo(true, V1);
     for (int8u i=0; i<loudnessInfoCount; i++)
@@ -3154,7 +3158,7 @@ void File_Usac::arithData(size_t ch, int16u N, int16u lg, int16u lg_max, bool ar
     // arith_map_context
     {
         if (arith_reset_flag || C.arithContext[ch].previous_window_size==(int16u)-1)
-            memset(&C.arithContext[ch].q, NULL, sizeof(C.arithContext[ch].q));
+            memset(&C.arithContext[ch].q, 0, sizeof(C.arithContext[ch].q));
         else if (N != C.arithContext[ch].previous_window_size)
         {
             if (!N)

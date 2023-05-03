@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -595,13 +595,15 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 
 	// Parse TrueHD and MLP header
 	if (!AC3CoreOnly) {
-		BYTE buf[20];
+		if (len < 22) {
+			return false;
+		}
 
-		int fsize = 0;
-		ByteRead(buf, 20);
+		BYTE buf[22];
+		ByteRead(buf, sizeof(buf));
 
 		audioframe_t aframe;
-		fsize = ParseMLPHeader(buf, &aframe);
+		auto fsize = ParseMLPHeader(buf, &aframe);
 		if (fsize) {
 			if (pmt) {
 				const int bitrate = (int)(fsize * 8i64 * aframe.samplerate / aframe.samples); // inaccurate, because fsize is not constant
@@ -610,7 +612,7 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 				pmt->subtype         = aframe.param2 ? MEDIASUBTYPE_DOLBY_TRUEHD : MEDIASUBTYPE_MLP;
 				pmt->formattype      = FORMAT_WaveFormatEx;
 
-				WAVEFORMATEX* wfe    = (WAVEFORMATEX*)pmt->AllocFormatBuffer(sizeof(WAVEFORMATEX));
+				WAVEFORMATEX* wfe    = (WAVEFORMATEX*)pmt->AllocFormatBuffer(sizeof(WAVEFORMATEX) + aframe.param3);
 				memset(wfe, 0, sizeof(WAVEFORMATEX));
 				wfe->wFormatTag      = WAVE_FORMAT_UNKNOWN;
 				wfe->nChannels       = aframe.channels;
@@ -618,9 +620,15 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 				wfe->nAvgBytesPerSec = (bitrate + 4) / 8;
 				wfe->nBlockAlign     = fsize < WORD_MAX ? fsize : WORD_MAX;
 				wfe->wBitsPerSample  = aframe.param1;
+				wfe->cbSize          = aframe.param3;
+
+				if (aframe.param3) {
+					(reinterpret_cast<BYTE*>(wfe + 1))[0] = static_cast<BYTE>(aframe.param3);
+				}
 
 				pmt->SetSampleSize(0);
 			}
+
 			return true;
 		}
 
@@ -678,6 +686,9 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 		/* Enhanced AC-3 */
 		e_ac3 = true;
 		Seek(pos);
+
+		h.num_blocks = 6;
+
 		h.frame_type = (BYTE)BitRead(2);
 		h.substreamid = (BYTE)BitRead(3);
 		/*
@@ -705,26 +716,44 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 		}
 		h.acmod = BitRead(3);
 		h.lfeon = BitRead(1);
+
+		if (!h.substreamid && h.frame_type != EAC3_FRAME_TYPE_RESERVED) {
+			std::vector<BYTE> buffer(len - 5);
+			ByteRead(buffer.data(), static_cast<__int64>(buffer.size()));
+			bool atmos_flag = {};
+			ParseEAC3HeaderForAtmosDetect(buffer.data(), static_cast<int>(buffer.size()),
+										  h.frame_type, h.sr_code, h.num_blocks, h.acmod, h.lfeon,
+										  atmos_flag);
+			if (atmos_flag) {
+				h.atmos_flag = 1;
+			}
+		}
 	}
 
 	if (pmt) {
-		WAVEFORMATEX wfe;
-		memset(&wfe, 0, sizeof(wfe));
-		wfe.wFormatTag = WAVE_FORMAT_DOLBY_AC3;
+		size_t size = sizeof(WAVEFORMATEX) + h.atmos_flag;
+		WAVEFORMATEX* wfe = (WAVEFORMATEX*)DNew BYTE[size];
+		ZeroMemory(wfe, size);
+		wfe->wFormatTag = WAVE_FORMAT_DOLBY_AC3;
 
 		static int channels[] = { 2, 1, 2, 3, 3, 4, 4, 5 };
-		wfe.nChannels = channels[h.acmod] + h.lfeon;
+		wfe->nChannels = channels[h.acmod] + h.lfeon;
 
 		if (e_ac3) {
-			wfe.nSamplesPerSec = h.sample_rate;
-			wfe.nAvgBytesPerSec = h.frame_size * h.sample_rate / (h.sr_code == 3 ? 1536 : h.num_blocks * 256);
+			wfe->nSamplesPerSec = h.sample_rate;
+			wfe->nAvgBytesPerSec = h.frame_size * h.sample_rate / (h.sr_code == 3 ? 1536 : h.num_blocks * 256);
 		} else {
-			wfe.nSamplesPerSec = freq[h.fscod] >> h.sr_shift;
+			wfe->nSamplesPerSec = freq[h.fscod] >> h.sr_shift;
 			static int rate[] = { 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 448, 512, 576, 640, 768, 896, 1024, 1152, 1280 };
-			wfe.nAvgBytesPerSec = ((rate[h.frmsizecod >> 1] * 1000) >> h.sr_shift) / 8;
+			wfe->nAvgBytesPerSec = ((rate[h.frmsizecod >> 1] * 1000) >> h.sr_shift) / 8;
 		}
 
-		wfe.nBlockAlign = (WORD)(1536 * wfe.nAvgBytesPerSec / wfe.nSamplesPerSec);
+		wfe->nBlockAlign = (WORD)(1536 * wfe->nAvgBytesPerSec / wfe->nSamplesPerSec);
+
+		if (h.atmos_flag) {
+			wfe->cbSize = 1;
+			(reinterpret_cast<BYTE*>(wfe + 1))[0] = 1;
+		}
 
 		pmt->majortype = MEDIATYPE_Audio;
 		if (e_ac3) {
@@ -733,7 +762,7 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 			pmt->subtype = MEDIASUBTYPE_DOLBY_AC3;
 		}
 		pmt->formattype = FORMAT_WaveFormatEx;
-		pmt->SetFormat((BYTE*)&wfe, sizeof(wfe));
+		pmt->SetFormat(reinterpret_cast<BYTE*>(wfe), size);
 	}
 
 	return true;
@@ -898,19 +927,19 @@ bool CBaseSplitterFileEx::Read(dtslbr_hdr& h, int len, CMediaType* pmt)
 bool CBaseSplitterFileEx::Read(mlphdr& h, int len, CMediaType* pmt, bool find_sync)
 {
 	memset(&h, 0, sizeof(h));
-	if (len < 20) return false;
+	if (len < 22) return false;
 
 	__int64 startpos = GetPos();
 
 	audioframe_t aframe;
 	int fsize = 0;
 
-	BYTE buf[20];
-	int k = find_sync ? len - 20 : 1;
+	BYTE buf[22];
+	int k = find_sync ? len - 22 : 1;
 	int i = 0;
 	while (i < k) {
 		Seek(startpos+i);
-		ByteRead(buf, 20);
+		ByteRead(buf, sizeof(buf));
 		fsize = ParseMLPHeader(buf, &aframe);
 		if (fsize) {
 			break;

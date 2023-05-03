@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2022 see Authors.txt
+ * (C) 2011-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "AudioParser.h"
+#include "GolombBuffer.h"
 #include <mpc_defines.h>
 #include "Utils.h"
 #include "MP4AudioDecoderConfig.h"
@@ -412,7 +413,7 @@ int ParseAC3Header(const BYTE* buf, audioframe_t* audioframe)
 
 // E-AC3
 
-int ParseEAC3Header(const BYTE* buf, audioframe_t* audioframe)
+int ParseEAC3Header(const BYTE* buf, audioframe_t* audioframe, const int buffsize)
 {
 	static const int   eac3_samplerates[6] = { 48000, 44100, 32000, 24000, 22050, 16000 };
 	static const BYTE  eac3_channels[8]    = { 2, 1, 2, 3, 3, 4, 4, 5 };
@@ -429,27 +430,180 @@ int ParseEAC3Header(const BYTE* buf, audioframe_t* audioframe)
 
 	int frame_size = (((buf[2] & 0x07) << 8) + buf[3] + 1) * 2;
 
-	int fscod     =  buf[4] >> 6;
-	int fscod2    = (buf[4] >> 4) & 0x03;
-	int frametype = (buf[2] >> 6) & 0x03;
+	int fscod      =  buf[4] >> 6;
+	int fscod2     = (buf[4] >> 4) & 0x03;
+	int frame_type = (buf[2] >> 6) & 0x03;
 
-	if ((fscod == 0x03 && fscod2 == 0x03) || frametype == EAC3_FRAME_TYPE_RESERVED) {
+	if ((fscod == 0x03 && fscod2 == 0x03) || frame_type == EAC3_FRAME_TYPE_RESERVED) {
 		return 0;
 	}
-	//int sub_stream_id = (buf[2] >> 3) & 0x07;
+
+	if (!audioframe) {
+		return frame_size;
+	}
+
+	int sub_stream_id = (buf[2] >> 3) & 0x07;
+	int acmod         = (buf[4] >> 1) & 0x07;
+	int lfeon         =  buf[4] & 0x01;
 
 	if (audioframe) {
 		audioframe->size       = frame_size;
 		audioframe->samplerate = eac3_samplerates[fscod == 0x03 ? 3 + fscod2 : fscod];
-		int acmod = (buf[4] >> 1) & 0x07;
-		int lfeon =  buf[4] & 0x01;
 		audioframe->channels   = eac3_channels[acmod] + lfeon;
 		audioframe->samples    = (fscod == 0x03) ? 1536 : eac3_samples_tbl[fscod2];
-		audioframe->param1     = frametype;
+		audioframe->param1     = frame_type;
 		audioframe->param2     = 0;
+
+		if (buffsize >= 16 && !sub_stream_id && frame_type != EAC3_FRAME_TYPE_RESERVED) {
+			int num_blocks = 6;
+			if (fscod != 0x03) {
+				static int eac3_blocks[] = { 1, 2, 3, 6 };
+				num_blocks = eac3_blocks[fscod2];
+			}
+
+			// skip AC3 header - 5 bytes
+			bool atmos_flag = {};
+			ParseEAC3HeaderForAtmosDetect(buf + 5, buffsize - 5,
+										  frame_type, fscod, num_blocks, acmod, lfeon,
+										  atmos_flag);
+			if (atmos_flag) {
+				audioframe->param2 = 1;
+			}
+		}
 	}
 
 	return frame_size;
+}
+
+void ParseEAC3HeaderForAtmosDetect(const BYTE* buf, const int buffsize,
+								   int frame_type, int fscod, int num_blocks, int acmod, int lfeon,
+								   bool& atmos_flag)
+{
+	atmos_flag = false;
+
+	CGolombBuffer gb(buf, buffsize);
+
+	gb.BitRead(5); // bitstream id
+	for (int i = 0; i < (acmod ? 1 : 2); i++) {
+		gb.BitRead(5); // dialog normalization
+
+		if (gb.BitRead(1)) {
+			gb.BitRead(8); // heavy dynamic range
+		}
+	}
+
+	if (frame_type == EAC3_FRAME_TYPE_DEPENDENT) {
+		if (gb.BitRead(1)) {
+			gb.BitRead(16); // channel map
+		}
+	}
+
+	/* mixing metadata */
+	if (gb.BitRead(1)) {
+		/* center and surround mix levels */
+		if (acmod > AC3_STEREO) {
+			gb.BitRead(2); // preferred downmix
+			if (acmod & 1) {
+				gb.BitRead(3); // center mix level ltrt
+				gb.BitRead(3); // center mix level
+			}
+			if (acmod & 4) {
+				gb.BitRead(3); // surround mix level ltrt
+				gb.BitRead(3); // surround mix level
+			}
+		}
+
+		/* lfe mix level */
+		if (lfeon && gb.BitRead(1)) {
+			gb.BitRead(5); // lfe mix level
+		}
+
+		/* info for mixing with other streams and substreams */
+		if (frame_type == EAC3_FRAME_TYPE_INDEPENDENT) {
+			for (int i = 0; i < (acmod ? 1 : 2); i++) {
+				if (gb.BitRead(1)) {
+					gb.BitRead(6); // program scale factor
+				}
+			}
+			if (gb.BitRead(1)) {
+				gb.BitRead(6); // external program scale factor
+			}
+
+			/* mixing parameter data */
+			switch (gb.BitRead(2)) {
+				case 1: gb.BitRead(5);  break;
+				case 2: gb.BitRead(12); break;
+				case 3: {
+					int mix_data_size = (gb.BitRead(5) + 2) << 3;
+					gb.BitRead(mix_data_size);
+					break;
+				}
+			}
+
+			/* pan information for mono or dual mono source */
+			if (acmod < AC3_STEREO) {
+				for (int i = 0; i < (acmod ? 1 : 2); i++) {
+					if (gb.BitRead(1)) {
+						gb.BitRead(8);  // pan mean direction index
+						gb.BitRead(6);  // reserved paninfo bits
+					}
+				}
+			}
+
+			/* mixing configuration information */
+			if (gb.BitRead(1)) {
+				for (int blk = 0; blk < num_blocks; blk++) {
+					if (num_blocks == 1 || gb.BitRead(1)) {
+						gb.BitRead(5);
+					}
+				}
+			}
+		}
+	}
+
+	/* informational metadata */
+	if (gb.BitRead(1)) {
+		gb.BitRead(3); // bitstream mode
+		gb.BitRead(2); // copyright bit and original bitstream bit
+		if (acmod == AC3_STEREO) {
+			gb.BitRead(2); // dolby surround mode
+			gb.BitRead(2); // dolby headphone mode
+		}
+		if (acmod >= AC3_2F2R) {
+			gb.BitRead(2); // dolby surround ex mode
+		}
+		for (int i = 0; i < (acmod ? 1 : 2); i++) {
+			if (gb.BitRead(1)) {
+				gb.BitRead(8); // mix level, room type, and A/D converter type
+			}
+		}
+		if (fscod != 3) {
+			gb.BitRead(1); // source sample rate code
+		}
+	}
+
+	/* converter synchronization flag */
+	if (frame_type == EAC3_FRAME_TYPE_INDEPENDENT && num_blocks != 6) {
+		gb.BitRead(1); // converter synchronization flag
+	}
+
+	/* original frame size code if this stream was converted from AC-3 */
+	if (frame_type == EAC3_FRAME_TYPE_AC3_CONVERT &&
+			(num_blocks == 6 || gb.BitRead(1))) {
+		gb.BitRead(6); // frame size code
+	}
+
+	/* additional bitstream info */
+	if (gb.BitRead(1)) {
+		gb.BitRead(6); // addbsil
+
+		/* In this 8 bit chunk, the LSB is equal to flag_ec3_extension_type_a
+			which can be used to detect Atmos presence */
+		gb.BitRead(7);
+		if (gb.BitRead(1)) {
+			atmos_flag = true;
+		}
+	}
 }
 
 // MLP and TrueHD
@@ -468,12 +622,10 @@ int ParseMLPHeader(const BYTE* buf, audioframe_t* audioframe)
 	};
 
 	DWORD sync = GETU32(buf+4);
-	bool isTrueHD;
+	bool isTrueHD = false;;
 	if (sync == TRUEHD_SYNCWORD) {
 		isTrueHD = true;
-	} else if (sync == MLP_SYNCWORD) {
-		isTrueHD = false;
-	} else {
+	} else if (sync != MLP_SYNCWORD) {
 		return 0;
 	}
 
@@ -481,6 +633,7 @@ int ParseMLPHeader(const BYTE* buf, audioframe_t* audioframe)
 
 	if (audioframe) {
 		audioframe->size = frame_size;
+		audioframe->param3 = 0;
 		if (isTrueHD) {
 			audioframe->param1     = 24; // bitdepth
 			audioframe->samplerate = mlp_samplerates[buf[8] >> 4];
@@ -494,6 +647,12 @@ int ParseMLPHeader(const BYTE* buf, audioframe_t* audioframe)
 				audioframe->channels += thd_channel_count[i] * ((channel_map >> i) & 1);
 			}
 			audioframe->param2 = 1; // TrueHD flag
+
+			BYTE num_substreams = buf[20] >> 4;
+			BYTE substream_info = buf[21];
+			if (num_substreams == 4 && substream_info >> 7 == 1) {
+				audioframe->param3 = 1; // TrueHD Atmos flag
+			}
 		} else {
 			audioframe->param1     = mlp_bitdepth[buf[8] >> 4]; // bitdepth
 			audioframe->samplerate = mlp_samplerates[buf[9] >> 4];
@@ -944,6 +1103,21 @@ int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t*
 	}
 
 	if (audioframe->samplerate && audioframe->channels) {
+		if (audioframe->param2 == DCA_PROFILE_HD_MA && gb.RemainingSize() > 4) {
+			auto start = gb.GetBufferPos();
+			auto end = start + gb.RemainingSize();
+			while (end - start >= 4) {
+				auto sync = GETU32(start++);
+				if (sync == 0x50080002 || sync == 0xD10040F1) {
+					audioframe->param2 = DCA_PROFILE_HD_MA_X;
+					break;
+				} else if (sync == 0xD00040F1) {
+					audioframe->param2 = DCA_PROFILE_HD_MA_X_IMAX;
+					break;
+				}
+			}
+		}
+
 		return hd_frame_size;
 	}
 

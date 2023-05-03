@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,6 +24,7 @@
 #include <regex>
 #include "TextFile.h"
 #include "SubtitleHelpers.h"
+#include "DSUtil/Filehandle.h"
 
 static LPCWSTR separators = L".\\-_";
 static LPCWSTR extListVid = L"(avi)|(mkv)|(mp4)|((m2)?ts)";
@@ -125,6 +126,25 @@ void Subtitle::GetSubFileNames(CString fn, const std::vector<CString>& paths, st
 					ret.push_back(sub);
 				}
 			}
+		}
+
+		// // Load all subs from folder .\Subs\FILENAME_WITHOUT_EXT
+		CString path = orgpath + L"Subs\\" + title + L"\\";
+		HANDLE hFile = FindFirstFileW(path + L"*", &wfd);
+		if (hFile != INVALID_HANDLE_VALUE) {
+			do {
+				if (!(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+					CString fname = path + wfd.cFileName;
+					const CString ext = GetFileExt(wfd.cFileName).Mid(1).MakeLower();
+					const bool validate_ext = std::any_of(std::cbegin(s_SubFileExts), std::cend(s_SubFileExts), [&](LPCWSTR subExt) {
+						return ext == subExt;
+					});
+					if (validate_ext) {
+						ret.push_back(fname);
+					}
+				}
+			} while (FindNextFileW(hFile, &wfd));
+			FindClose(hFile);
 		}
 	} else if (l > 7) {
 		CWebTextFile wtf; // :)

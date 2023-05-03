@@ -907,20 +907,6 @@ typedef struct {
 extern "C"
 {
 
-#if defined (_WIN32) || defined (WIN32)
-    #ifdef _UNICODE
-        #define MEDIAINFODLL_NAME  L"libcurl.dll"
-    #else //_UNICODE
-        #define MEDIAINFODLL_NAME  "libcurl.dll"
-    #endif //_UNICODE
-#elif defined(__APPLE__) && defined(__MACH__)
-    #define MEDIAINFODLL_NAME  "libcurl.4.dylib"
-    #define __stdcall
-#else
-    #define MEDIAINFODLL_NAME  "libcurl.so.4"
-    #define __stdcall
-#endif //!defined(_WIN32) || defined (WIN32)
-
 #ifdef MEDIAINFO_GLIBC
     #include <gmodule.h>
     static GModule* libcurl_Module=NULL;

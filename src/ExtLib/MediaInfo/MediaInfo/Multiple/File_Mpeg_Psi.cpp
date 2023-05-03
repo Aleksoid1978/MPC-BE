@@ -2084,8 +2084,20 @@ void File_Mpeg_Psi::Table_CD()
 
     FILLING_BEGIN();
         if (Complete_Stream->Duration_Start.empty())
+        {
             Complete_Stream->Duration_Start=Ztring().Date_From_Seconds_1970(system_time+315964800-GPS_UTC_offset);
+            if (!Complete_Stream->Duration_Start.empty())
+            {
+                Complete_Stream->Duration_Start.FindAndReplace(__T("UTC "), __T(""));
+                Complete_Stream->Duration_Start +=__T(" UTC");
+            }
+        }
         Complete_Stream->Duration_End=Ztring().Date_From_Seconds_1970(system_time+315964800-GPS_UTC_offset);
+        if (!Complete_Stream->Duration_End.empty())
+        {
+            Complete_Stream->Duration_End.FindAndReplace(__T("UTC "), __T(""));
+            Complete_Stream->Duration_End +=__T(" UTC");
+        }
         Complete_Stream->Duration_End_IsUpdated=true;
         Complete_Stream->GPS_UTC_offset=GPS_UTC_offset;
     FILLING_END();

@@ -588,20 +588,21 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Illesztés az asztal széleihez"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
 5		"YouTube"
 6		"Használja a beépített weboldal elemzőt"
 7		"Előnyben részesített formátum:"
 10		"60 fps"
 11		"HDR"
-12		"Lejátszási lista betöltése"
-14		"youtube-dl, yt-dlp"
-15		"Futtatható fájl:"
-17		"Maximális videómagasság:"
-19		"Válassza ki a max fps vagy bitrátát"
-20		"AceStream cím:"
-22		"MatriX (TorrServer) cím:"
-25		"Hálózati kliens:"
+12		"Előnyben részesített hangsáv nyelve:"
+14		"Lejátszási lista betöltése"
+16		"youtube-dl, yt-dlp"
+17		"Futtatható fájl:"
+19		"Maximális videómagasság:"
+21		"Válassza ki a max fps vagy bitrátát"
+22		"AceStream cím:"
+24		"MatriX (TorrServer) cím:"
+27		"Hálózati kliens:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
@@ -1807,6 +1808,7 @@ STRING IDS_PLAYLIST_DETERMINEDURATION		"Hozzáadáskor határozza meg az időtar
 STRING IDS_PLAYLIST_EXPLORER_NAME		"Explorer"
 STRING IDS_PLAYLIST_EXPLORER_REFRESH		"Felfrissít"
 STRING IDS_PLAYLIST_HIDEFS		"Elrejtés Teljes képernyős módban"
+STRING IDS_PLAYLIST_INVALID		"Érvénytelen"
 STRING IDS_PLAYLIST_MAIN_NAME		"Fő"
 STRING IDS_PLAYLIST_NAME		"Lejátszási lista"
 STRING IDS_PLAYLIST_NEXTONERROR		"Lépjen a következőre hiba esetén"
@@ -1822,6 +1824,7 @@ STRING IDS_PLAYLIST_SAVEAS		"Menté&s másként..."
 STRING IDS_PLAYLIST_SHOWSEARCHBAR		"Keresősáv megjelenítése"
 STRING IDS_PLAYLIST_SHOWTOOLTIP		"Helyi súgó megjelenítése"
 STRING IDS_PLAYLIST_SHUFFLE		"Keverés"
+STRING IDS_PLAYLIST_SKIPINVALID		"Érvénytelen elemek kihagyása"
 STRING IDS_PLAYLIST_SORT		"Rendezés"
 STRING IDS_PLAYLIST_SORTBYDATE		"módosítás dátuma szerint"
 STRING IDS_PLAYLIST_SORTBYDATECREATED		"létrehozás dátuma szerint"

@@ -172,7 +172,7 @@ INT_PTR CPPageInternalFiltersListBox::OnToolHitTest(CPoint point, TOOLINFO* pTI)
 	GetItemRect(row, r);
 	pTI->rect = r;
 	pTI->hwnd = m_hWnd;
-	pTI->uId = (UINT)row;
+	pTI->uId  = (UINT_PTR)row;
 	pTI->lpszText = LPSTR_TEXTCALLBACKW;
 	pTI->uFlags |= TTF_ALWAYSTIP;
 

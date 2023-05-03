@@ -243,7 +243,7 @@ int CharSetLen = std::size(CharSetList);
 static DWORD CharSetToCodePage(DWORD dwCharSet)
 {
 	CHARSETINFO cs = {0};
-	::TranslateCharsetInfo((DWORD *)dwCharSet, &cs, TCI_SRCCHARSET);
+	::TranslateCharsetInfo((DWORD*)(DWORD_PTR)dwCharSet, &cs, TCI_SRCCHARSET);
 	return cs.ciACP;
 }
 
@@ -486,8 +486,8 @@ static bool OpenSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 		int hh1, mm1, ss1, ms1, hh2, mm2, ss2, ms2;
 		WCHAR msStr1[5] = {0}, msStr2[5] = {0};
 		int c = swscanf_s(buff, L"%d%c%d%c%d%4[^-] --> %d%c%d%c%d%4s\n",
-						  &hh1, &sep, 1, &mm1, &sep, 1, &ss1, msStr1, std::size(msStr1),
-						  &hh2, &sep, 1, &mm2, &sep, 1, &ss2, msStr2, std::size(msStr2));
+						  &hh1, &sep, 1, &mm1, &sep, 1, &ss1, msStr1, (unsigned)std::size(msStr1),
+						  &hh2, &sep, 1, &mm2, &sep, 1, &ss2, msStr2, (unsigned)std::size(msStr2));
 
 		if (c == 1) { // numbering
 			num = hh1;
@@ -973,8 +973,8 @@ static bool OpenSubViewer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 		WCHAR sep;
 		int hh1, mm1, ss1, hs1, hh2, mm2, ss2, hs2;
 		int c = swscanf_s(buff, L"%d:%d:%d%c%d,%d:%d:%d%c%d\n",
-						  &hh1, &mm1, &ss1, &sep, sizeof(WCHAR),
-						  &hs1, &hh2, &mm2, &ss2, &sep, sizeof(WCHAR), &hs2);
+			&hh1, &mm1, &ss1, &sep, 1, &hs1,
+			&hh2, &mm2, &ss2, &sep, 1, &hs2);
 
 		if (c == 10) {
 			CStringW str;

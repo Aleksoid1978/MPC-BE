@@ -230,6 +230,7 @@ private :
     void moov_trak_mdia_minf_stbl_stsd_xxxx_colr();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclc(bool LittleEndian=false, bool HasFlags=false);
     void moov_trak_mdia_minf_stbl_stsd_xxxx_colr_prof();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_cuvv();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_d263();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_dac3();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_dac4();
@@ -356,6 +357,7 @@ private :
     void moov_udta_tags_meta();
     void moov_udta_tags_tseg();
     void moov_udta_tags_tseg_tshd();
+    void moov_udta_thmb();
     void moov_udta_WLOC();
     void moov_udta_XMP_();
     void moov_udta_Xtra();

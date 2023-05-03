@@ -164,7 +164,7 @@ AP4_Result
 AP4_EsDescriptor::Inspect(AP4_AtomInspector& inspector)
 {
     char info[64];
-    AP4_StringFormat(info, sizeof(info), "size=%ld+%ld", 
+    AP4_StringFormat(info, sizeof(info), "size=%llu+%llu", 
                      GetHeaderSize(),m_PayloadSize);
     inspector.StartElement("#[ES]", info);
     inspector.AddField("es_id", m_EsId);

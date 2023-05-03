@@ -55,6 +55,7 @@ class CDTSAC3Stream : public CBaseStream
 	WORD m_bitdepth;       // bits per sample
 	int  m_streamtype;
 	BYTE m_dts_hd_profile;
+	bool m_atmos_flag = false;
 
 public:
 	CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr);

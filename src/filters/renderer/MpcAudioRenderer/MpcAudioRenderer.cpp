@@ -85,13 +85,9 @@ STDAPI DllUnregisterServer()
 }
 
 #include "filters/filters/Filters.h"
+#include "filters/ffmpeg_link_fix.h"
 
 CFilterApp theApp;
-
-// stupid hack for ffmpeg linking
-void *__imp__aligned_malloc  = _aligned_malloc;
-void *__imp__aligned_realloc = _aligned_realloc;
-void *__imp__aligned_free    = _aligned_free;
 
 #else
 

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -151,7 +151,7 @@ private:
 	BOOL									m_bDecodingStart;
 	BOOL									m_bDecoderAcceptFormat = FALSE;
 
-	BOOL									m_bHighBitdepth;
+	bool									m_bHighBitdepth = false;
 
 	CMSDKDecoder*							m_pMSDKDecoder;
 	int										m_iMvcOutputMode;

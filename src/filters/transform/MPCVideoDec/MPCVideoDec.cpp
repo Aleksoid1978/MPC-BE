@@ -43,6 +43,7 @@
 
 #pragma warning(push)
 #pragma warning(disable: 4005)
+#pragma warning(disable: 4996)
 #pragma warning(disable: 5033)
 extern "C" {
 	#include <ExtLib/ffmpeg/libavcodec/avcodec.h>
@@ -1069,7 +1070,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_dwSYNC(0)
 	, m_dwSYNC2(0)
 	, m_bDecodingStart(FALSE)
-	, m_bHighBitdepth(FALSE)
 	, m_dRate(1.0)
 	, m_pMSDKDecoder(nullptr)
 	, m_iMvcOutputMode(MVC_OUTPUT_Auto)
@@ -1357,7 +1357,7 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 
 				hr = pMediaSideData->SetSideData(IID_MediaSideDataHDR, (const BYTE*)&hdr, sizeof(hdr));
 			} else {
-				DLog(L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR data of an unexpected size (%d)", sd->size);
+				DLog(L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR data of an unexpected size (%zu)", sd->size);
 			}
 		} else if (m_FilterInfo.masterDataHDR) {
 			hr = pMediaSideData->SetSideData(IID_MediaSideDataHDR, (const BYTE*)m_FilterInfo.masterDataHDR, sizeof(MediaSideDataHDR));
@@ -1368,7 +1368,7 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 			if (sd->size == sizeof(AVContentLightMetadata)) {
 				hr = pMediaSideData->SetSideData(IID_MediaSideDataHDRContentLightLevel, (const BYTE*)sd->data, sd->size);
 			} else {
-				DLog(L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR Light Level data of an unexpected size (%d)", sd->size);
+				DLog(L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR Light Level data of an unexpected size (%zu)", sd->size);
 			}
 		} else if (m_FilterInfo.HDRContentLightLevel) {
 			hr = pMediaSideData->SetSideData(IID_MediaSideDataHDRContentLightLevel, (const BYTE*)m_FilterInfo.HDRContentLightLevel, sizeof(MediaSideDataHDRContentLightLevel));
@@ -3426,7 +3426,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 				if (frames_ctx->format == AV_PIX_FMT_CUDA) {
 					auto device_hwctx = reinterpret_cast<AVHWDeviceContext*>(frames_ctx->device_ctx);
 					auto cuda_hwctx = reinterpret_cast<AVCUDADeviceContext*>(device_hwctx->hwctx);
-					auto cuda_fns = reinterpret_cast<CudaFunctions*>(cuda_hwctx->internal->cuda_dl);
+					auto cuda_fns = cuda_hwctx->internal->cuda_dl;
 
 					char name[256] = {};
 					auto cuStatus = cuda_fns->cuDeviceGetName(name, 256, 0);
@@ -3550,7 +3550,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			else if (frames_ctx->format == AV_PIX_FMT_CUDA && m_FormatConverter.DirectCopyPossible(frames_ctx->sw_format)) {
 				auto device_hwctx = reinterpret_cast<AVHWDeviceContext*>(frames_ctx->device_ctx);
 				auto cuda_hwctx = reinterpret_cast<AVCUDADeviceContext*>(device_hwctx->hwctx);
-				auto cuda_fns = reinterpret_cast<CudaFunctions*>(cuda_hwctx->internal->cuda_dl);
+				auto cuda_fns = cuda_hwctx->internal->cuda_dl;
 
 				auto cuStatus = cuda_fns->cuCtxPushCurrent(cuda_hwctx->cuda_ctx);
 				if (cuStatus != CUDA_SUCCESS) {
@@ -3936,7 +3936,7 @@ BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID& decoderGUID)
 					if (mode.pixFormat == pix_fmt) {
 						return TRUE;
 					}
-				} else if (mode.bHighBitdepth == !!m_bHighBitdepth) {
+				} else if (mode.bHighBitdepth == m_bHighBitdepth) {
 					return TRUE;
 				}
 			}
@@ -4787,10 +4787,10 @@ HRESULT CMPCVideoDecFilter::CheckDXVA2Decoder(AVCodecContext *c)
 		if ((m_nSurfaceWidth != FFALIGN(c->coded_width, m_nAlign) || m_nSurfaceHeight != FFALIGN(c->coded_height, m_nAlign))
 				|| ((m_CodecId == AV_CODEC_ID_HEVC || m_CodecId == AV_CODEC_ID_VP9) && m_dxva_pix_fmt != m_pAVCtx->sw_pix_fmt)) {
 			const int depth = GetLumaBits(m_pAVCtx->sw_pix_fmt);
-			const BOOL bHighBitdepth = (depth == 10) && ((m_CodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10)
+			const bool bHighBitdepth = (depth == 10) && ((m_CodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10)
 														  || (m_CodecId == AV_CODEC_ID_VP9 && m_pAVCtx->profile == FF_PROFILE_VP9_2));
 
-			const auto bBitdepthChanged = (m_bHighBitdepth != bHighBitdepth);
+			const bool bBitdepthChanged = (m_bHighBitdepth != bHighBitdepth);
 
 			m_nSurfaceWidth = FFALIGN(c->coded_width, m_nAlign);
 			m_nSurfaceHeight = FFALIGN(c->coded_height, m_nAlign);

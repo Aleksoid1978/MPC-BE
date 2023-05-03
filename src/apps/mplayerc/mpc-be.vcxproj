@@ -472,9 +472,6 @@
     <ProjectReference Include="$(SolutionDir)src\ExtLib\Bento4\Bento4.vcxproj">
       <Project>{40177920-a66c-4647-b119-332a10224c83}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)src\ExtLib\openjpeg\openjpeg.vcxproj">
-      <Project>{1557aa86-976c-4315-8fe8-a138e33f6580}</Project>
-    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)src\filters\parser\RawVideoSplitter\RawVideoSplitter.vcxproj">
       <Project>{e73d2ff6-5738-4e17-b895-7d206fba9de2}</Project>
     </ProjectReference>

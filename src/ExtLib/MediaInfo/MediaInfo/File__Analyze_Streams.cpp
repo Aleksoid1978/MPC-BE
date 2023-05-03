@@ -930,7 +930,7 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
     if (!MediaInfoLib::Config.Legacy_Get())
     {
         const Ztring& Info=MediaInfoLib::Config.Info_Get(StreamKind, Parameter, Info_Info);
-        if (Info.size()>9 && Info[0]==__T('D') && Info[1]==__T('e') && Info[2]==__T('p') && Info[3]==__T('r') && Info[4]==__T('e') && Info[5]==__T('c') && Info[6]==__T('a') && Info[7]==__T('t') && Info[8]==__T('e') && Info[9]==__T('d'))
+        if (Info==__T("Deprecated"))
             return;
     }
 
@@ -1080,7 +1080,22 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
                                 case Audio_SamplingRate:
                                     if (Retrieve(Stream_Audio, StreamPos, Audio_FrameRate).empty())
                                     {
-                                        float64 SamplesPerFrame=Retrieve(Stream_Audio, StreamPos, Audio_SamplesPerFrame).To_float64();
+                                        float64 SamplesPerFrame=DBL_MAX;
+                                        ZtringList SamplesPerFrames;
+                                        SamplesPerFrames.Separator_Set(0, " / ");
+                                        SamplesPerFrames.Write(Retrieve(Stream_Audio, StreamPos, Audio_SamplesPerFrame));
+                                        if (!SamplesPerFrames.empty())
+                                        {
+                                            size_t i=SamplesPerFrames.size();
+                                            do
+                                            {
+                                                --i;
+                                                float64 SamplesPerFrameTemp = SamplesPerFrames[i].To_float64();
+                                                if (SamplesPerFrameTemp && SamplesPerFrameTemp<SamplesPerFrame)
+                                                    SamplesPerFrame=SamplesPerFrameTemp; // Using the lowest valid one (e.g. AAC doubles sampling rate but the legacy sampling rate is the real frame)
+                                            }
+                                            while (i);
+                                        }
                                         float64 SamplingRate=DBL_MAX;
                                         ZtringList SamplingRates;
                                         SamplingRates.Separator_Set(0, " / ");
@@ -1097,7 +1112,7 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
                                             }
                                             while (i);
                                         }
-                                        if (SamplesPerFrame && SamplingRate && SamplingRate!=DBL_MAX && SamplesPerFrame!=SamplingRate)
+                                        if (SamplesPerFrame && SamplesPerFrame!=DBL_MAX && SamplingRate && SamplingRate!=DBL_MAX && SamplesPerFrame!=SamplingRate)
                                         {
                                             float64 FrameRate=SamplingRate/SamplesPerFrame;
                                             Fill(Stream_Audio, StreamPos, Audio_FrameRate, FrameRate);
@@ -3284,9 +3299,20 @@ void File__Analyze::Value_Value123(stream_t StreamKind, size_t StreamPos, size_t
             const Ztring &SamplesPerFrame = Retrieve(Stream_Audio, StreamPos, Audio_SamplesPerFrame);
             if (!SamplesPerFrame.empty())
             {
-                List2[List2.size()-1]+=__T(" (");
-                List2[List2.size()-1]+=SamplesPerFrame;
-                List2[List2.size()-1]+=__T(" SPF)");
+                ZtringList SamplesPerFrame_List;
+                SamplesPerFrame_List.Separator_Set(0, __T(" / "));
+                SamplesPerFrame_List.Write(SamplesPerFrame);
+                size_t i=List2.size()-1;
+                while (List2.size()<SamplesPerFrame_List.size())
+                    List2.push_back(List2[List2.size()-1]);
+                while (SamplesPerFrame_List.size()<List2.size())
+                    SamplesPerFrame_List.push_back(SamplesPerFrame_List[SamplesPerFrame_List.size()-1]);
+                for (; i<List2.size(); i++)
+                {
+                    List2[i]+=__T(" (");
+                    List2[i]+=SamplesPerFrame_List[i];
+                    List2[i]+=__T(" SPF)");
+                }
             }
         }
     }

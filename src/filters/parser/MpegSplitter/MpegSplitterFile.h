@@ -175,7 +175,7 @@ public:
 	bool ReadPS(pshdr& h);              // program stream header
 	bool ReadPSS(pssyshdr& h);          // program stream system header
 
-	bool ReadPES(peshdr& h, BYTE code); // packetized elementary stream
+	bool ReadPES(peshdr& h, BYTE code, WORD pid = 0); // packetized elementary stream
 
 	bool ReadPVA(pvahdr& h, bool fSync = true);
 

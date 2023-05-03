@@ -24,6 +24,7 @@
 #include "MiniDump.h"
 #include "Misc.h"
 #include "PlayerYouTube.h"
+#include "PPageYoutube.h"
 #include "PPageFormats.h"
 #include "DSUtil/FileHandle.h"
 #include "DSUtil/SysVersion.h"
@@ -341,6 +342,9 @@ void CAppSettings::CreateCommands()
 	ADDCMD((ID_MENU_PLAYER_SHORT,		IDS_AG_MENU_PLAYER_S));
 	ADDCMD((ID_MENU_FILTERS,			IDS_AG_MENU_FILTERS));
 	ADDCMD((ID_VIEW_OPTIONS,			IDS_AG_OPTIONS,				'O'));
+
+	ADDCMD((ID_STREAM_VIDEO_NEXT,		IDS_AG_NEXT_VIDEO));
+	ADDCMD((ID_STREAM_VIDEO_PREV,		IDS_AG_PREV_VIDEO));
 	ADDCMD((ID_STREAM_AUDIO_NEXT,		IDS_AG_NEXT_AUDIO,			'A'));
 	ADDCMD((ID_STREAM_AUDIO_PREV,		IDS_AG_PREV_AUDIO,			'A', FSHIFT));
 	ADDCMD((ID_STREAM_SUB_NEXT,			IDS_AG_NEXT_SUBTITLE,		'S'));
@@ -360,8 +364,6 @@ void CAppSettings::CreateCommands()
 	ADDCMD((ID_SUB_COPYTOCLIPBOARD,		IDS_SUB_COPYTOCLIPBOARD));
 	ADDCMD((ID_FILE_ISDB_DOWNLOAD,		IDS_DOWNLOAD_SUBS,			'D'));
 
-	ADDCMD((ID_STREAM_VIDEO_NEXT,		IDS_AG_NEXT_VIDEO));
-	ADDCMD((ID_STREAM_VIDEO_PREV,		IDS_AG_PREV_VIDEO));
 	ADDCMD((ID_VIEW_TEARING_TEST,		IDS_AG_TEARING_TEST,		'T', FCONTROL));
 	ADDCMD((ID_VIEW_REMAINING_TIME,		IDS_MPLAYERC_98,			'I', FCONTROL));
 	ADDCMD((ID_OSD_LOCAL_TIME,			IDS_AG_OSD_LOCAL_TIME,		'I'));
@@ -582,6 +584,7 @@ void CAppSettings::ResetSettings()
 	bShowPlaylistTooltip = true;
 	bShowPlaylistSearchBar = true;
 	bPlaylistNextOnError = true;
+	bPlaylistSkipInvalid = true;
 	bPlaylistDetermineDuration = false;
 
 	bFavRememberPos = true;
@@ -793,6 +796,7 @@ void CAppSettings::ResetSettings()
 	YoutubeFormat.res = 720;
 	YoutubeFormat.fps60 = false;
 	YoutubeFormat.hdr = false;
+	strYoutubeAudioLang = CPPageYoutube::GetDefaultLanguageCode();
 	bYoutubeLoadPlaylist = false;
 
 	bYDLEnable = true;
@@ -971,6 +975,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHOWPTOOLTIP, bShowPlaylistTooltip);
 	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHOWSEARCHBAR, bShowPlaylistSearchBar);
 	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_NEXTONERROR, bPlaylistNextOnError);
+	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SKIP_INVALID, bPlaylistSkipInvalid);
 	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_DETERMINEDURATION, bPlaylistDetermineDuration);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FAV_REMEMBERPOS, bFavRememberPos);
@@ -1476,6 +1481,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	} else {
 		YoutubeFormat.hdr = false;
 	}
+	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_AUDIOLANGUAGE, strYoutubeAudioLang);
+	strYoutubeAudioLang.Trim();
 	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
 	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YDL_ENABLE, bYDLEnable);
 	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_YDL_EXEPATH, strYDLExePath);
@@ -1620,6 +1627,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHOWPTOOLTIP, bShowPlaylistTooltip);
 	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHOWSEARCHBAR, bShowPlaylistSearchBar);
 	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_NEXTONERROR, bPlaylistNextOnError);
+	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SKIP_INVALID, bPlaylistSkipInvalid);
 	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_DETERMINEDURATION, bPlaylistDetermineDuration);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_FAV_REMEMBERPOS, bFavRememberPos);
@@ -1962,6 +1970,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_RESOLUTION, YoutubeFormat.res);
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_60FPS, YoutubeFormat.fps60);
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_HDR, YoutubeFormat.hdr);
+	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_AUDIOLANGUAGE, strYoutubeAudioLang);
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YDL_ENABLE, bYDLEnable);
 	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_YDL_EXEPATH, strYDLExePath);
@@ -2159,7 +2168,7 @@ void CAppSettings::ExtractDVDStartPos(CString& strParam)
 				break;
 			case 1 :
 				if (token.Find(':') > 0) {
-					swscanf_s(token, L"%02d:%02d:%02d.%03d", &DVDPosition.bHours, &DVDPosition.bMinutes, &DVDPosition.bSeconds, &DVDPosition.bFrames);
+					swscanf_s(token, L"%02hhu:%02hhu:%02hhu.%03hhu", &DVDPosition.bHours, &DVDPosition.bMinutes, &DVDPosition.bSeconds, &DVDPosition.bFrames);
 					/* Hack by Ron.  If bFrames >= 30, PlayTime commands fail due to invalid arg */
 					DVDPosition.bFrames = 0;
 				} else {

@@ -345,9 +345,25 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 				Infos.emplace_back(L"HDMV LPCM");
 			}
 			if (pMediaType->subtype == MEDIASUBTYPE_DOLBY_DDPLUS) {
-				Infos.emplace_back(L"Dolby Digital Plus");
+				CString codecName(L"Dolby Digital Plus");
+				if (pInfo->cbSize == 1) {
+					const auto flag = (reinterpret_cast<const BYTE*>(pInfo + 1))[0];
+					if (flag == 1) {
+						codecName.Append(L" + Atmos");
+					}
+				}
+
+				Infos.emplace_back(codecName);
 			} else if (pMediaType->subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
-				Infos.emplace_back(L"Dolby TrueHD");
+				CString codecName(L"Dolby TrueHD");
+				if (pInfo->cbSize == 1) {
+					const auto flag = (reinterpret_cast<const BYTE*>(pInfo + 1))[0];
+					if (flag == 1) {
+						codecName.Append(L" + Atmos");
+					}
+				}
+
+				Infos.emplace_back(codecName);
 			} else if (pMediaType->subtype == MEDIASUBTYPE_MLP) {
 				Infos.emplace_back(L"MLP");
 			} else if (pMediaType->subtype == MEDIASUBTYPE_AES3) {
@@ -833,7 +849,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(const REFERENCE_TIME rtStartOffset)
 				const __int64 pos = m_pFile->GetPos();
 				CMpegSplitterFile::peshdr peshdr;
 				if (h.payloadstart
-						&& (!m_pFile->NextMpegStartCode(b, 4) || !m_pFile->ReadPES(peshdr, b))) {
+						&& (!m_pFile->NextMpegStartCode(b, 4) || !m_pFile->ReadPES(peshdr, b, h.pid))) {
 					m_pFile->Seek(h.next);
 					return S_FALSE;
 				}

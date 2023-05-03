@@ -1697,6 +1697,11 @@ void File_Flv::meta_SCRIPTDATAVALUE(const std::string &StringData)
                      if (StringData=="metadatadate") {ToFill="Tagged_Date";}
                 else {ToFill=StringData;}
                 Element_Info1(ValueS);
+                if (!ValueS.empty())
+                {
+                    ValueS.FindAndReplace(__T("UTC "), __T(""));
+                    ValueS +=__T(" UTC");
+                }
                 Fill(Stream_General, 0, ToFill.c_str(), ValueS, true);
             }
             break;

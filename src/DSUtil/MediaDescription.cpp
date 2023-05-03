@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -213,7 +213,15 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 				Infos.emplace_back(L"HDMV LPCM");
 			}
 			if (pmt->subtype == MEDIASUBTYPE_DOLBY_DDPLUS) {
-				Infos.emplace_back(L"Dolby Digital Plus");
+				CStringW codecName(L"Dolby Digital Plus");
+				if (pInfo->cbSize == 1) {
+					const auto flag = (reinterpret_cast<const BYTE*>(pInfo + 1))[0];
+					if (flag == 1) {
+						codecName.Append(L" + Atmos");
+					}
+				}
+
+				Infos.emplace_back(codecName);
 			} else {
 				if (pInfo->wFormatTag == WAVE_FORMAT_MPEG && pmt->cbFormat >= sizeof(MPEG1WAVEFORMAT)) {
 					const MPEG1WAVEFORMAT* pInfoMPEG1 = GetFormatHelper(pInfoMPEG1, pmt);
@@ -224,7 +232,7 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 					CString codecName = CMediaTypeEx::GetAudioCodecName(pmt->subtype, pInfo->wFormatTag);
 					if (!codecName.IsEmpty()) {
 						if (codecName == L"DTS" && pInfo->cbSize == 1) {
-							const auto profile = ((BYTE *)(pInfo + 1))[0];
+							const auto profile = (reinterpret_cast<const BYTE *>(pInfo + 1))[0];
 							switch (profile) {
 								case DCA_PROFILE_HD_HRA:
 									codecName = L"DTS-HD HRA";
@@ -232,11 +240,23 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 								case DCA_PROFILE_HD_MA:
 									codecName = L"DTS-HD MA";
 									break;
+								case DCA_PROFILE_HD_MA_X:
+									codecName = L"DTS-HD MA + DTS:X";
+									break;
+								case DCA_PROFILE_HD_MA_X_IMAX:
+									codecName = L"DTS-HD MA + DTS:X IMAX";
+									break;
 								case DCA_PROFILE_EXPRESS:
 									codecName = L"DTS Express";
 									break;
 							}
+						} else if (codecName == "TrueHD" && pInfo->cbSize == 1) {
+							const auto flag = (reinterpret_cast<const BYTE*>(pInfo + 1))[0];
+							if (flag == 1) {
+								codecName.Append(L" + Atmos");
+							}
 						}
+
 						Infos.emplace_back(codecName);
 					}
 				}

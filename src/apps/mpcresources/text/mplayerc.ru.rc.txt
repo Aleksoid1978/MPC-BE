@@ -588,20 +588,21 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Прилипать к границам экрана"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
 5		"YouTube"
 6		"Использовать встроенный парсер веб-страниц"
 7		"Предпочитаемый формат просмотра:"
 10		"60 fps"
 11		"HDR"
-12		"Загружать плейлист"
-14		"youtube-dl, yt-dlp"
-15		"Исполняемый файл:"
-17		"Максимальная высота видео:"
-19		"Выбрать максимальную частоту кадров или битрейт"
-20		"AceStream address:"
-22		"MatriX (TorrServer) address:"
-25		"User agent:"
+12		"Предпочитаемый язык аудиодорожки:"
+14		"Загружать плейлист"
+16		"youtube-dl, yt-dlp"
+17		"Исполняемый файл:"
+19		"Максимальная высота видео:"
+21		"Выбрать максимальную частоту кадров или битрейт"
+22		"AceStream address:"
+24		"MatriX (TorrServer) address:"
+27		"User agent:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
@@ -1807,6 +1808,7 @@ STRING IDS_PLAYLIST_DETERMINEDURATION		"Определять длительно�
 STRING IDS_PLAYLIST_EXPLORER_NAME		"Проводник"
 STRING IDS_PLAYLIST_EXPLORER_REFRESH		"Обновить"
 STRING IDS_PLAYLIST_HIDEFS		"Скрывать на полном экране"
+STRING IDS_PLAYLIST_INVALID		"Ошибка"
 STRING IDS_PLAYLIST_MAIN_NAME		"Основной"
 STRING IDS_PLAYLIST_NAME		"Плейлист"
 STRING IDS_PLAYLIST_NEXTONERROR		"Перейти к следующему при ошибке"
@@ -1822,6 +1824,7 @@ STRING IDS_PLAYLIST_SAVEAS		"&Сохранить как..."
 STRING IDS_PLAYLIST_SHOWSEARCHBAR		"Отображать полосу поиска"
 STRING IDS_PLAYLIST_SHOWTOOLTIP		"Отображать подсказки"
 STRING IDS_PLAYLIST_SHUFFLE		"В случайном порядке"
+STRING IDS_PLAYLIST_SKIPINVALID		"Пропускать ошибочные элементы"
 STRING IDS_PLAYLIST_SORT		"Сортировать"
 STRING IDS_PLAYLIST_SORTBYDATE		"по &дате изменения"
 STRING IDS_PLAYLIST_SORTBYDATECREATED		"по дате &создания"

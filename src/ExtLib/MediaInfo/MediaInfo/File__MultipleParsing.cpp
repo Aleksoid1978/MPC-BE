@@ -203,6 +203,9 @@
 #if defined(MEDIAINFO_APE_YES)
     #include "MediaInfo/Audio/File_Ape.h"
 #endif
+#if defined(MEDIAINFO_APTX100_YES)
+    #include "MediaInfo/Audio/File_Aptx100.h"
+#endif
 #if defined(MEDIAINFO_AU_YES)
     #include "MediaInfo/Audio/File_Au.h"
 #endif
@@ -606,6 +609,9 @@ File__MultipleParsing::File__MultipleParsing()
     #endif
     #if defined(MEDIAINFO_APE_YES)
         Parser.push_back(new File_Ape());
+    #endif
+    #if defined(MEDIAINFO_APTX100_YES)
+        Parser.push_back(new File_Aptx100());
     #endif
     #if defined(MEDIAINFO_AU_YES)
         Parser.push_back(new File_Au());
