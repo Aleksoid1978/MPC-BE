@@ -1,6 +1,6 @@
 ﻿This file includes only a short list of the changes between Media Player Classic - BE's versions.
 
-1.6.6.x dev
+1.6.7
 =============================
 Windows Vista is no longer supported.
 
@@ -16,6 +16,9 @@ File navigation has been optimized.
 
 MPegSplitter
 Fixed audio track detection for some HLS streams.
+
+MPCVideoDec
+Fixed playback for VC-1.
 
 AudioSwitcher
 Added "For audio with whisper and explosion parts" preset for FFmpeg filters.
