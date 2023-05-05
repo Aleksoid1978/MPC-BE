@@ -2050,6 +2050,10 @@ redo:
 							|| clsidInput == __uuidof(CAviSourceFilter) || clsidInput == __uuidof(CAviSplitterFilter)
 							|| clsidInput == __uuidof(COggSourceFilter) || clsidInput == __uuidof(COggSplitterFilter)
 							|| IsAVI() || IsOGG();
+		if (!m_bReorderBFrame && m_CodecId == AV_CODEC_ID_VC1
+				&& !(clsidInput == __uuidof(CMpegSourceFilter) || clsidInput == __uuidof(CMpegSplitterFilter))) {
+			m_bReorderBFrame = true;
+		}
 	}
 
 	m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
