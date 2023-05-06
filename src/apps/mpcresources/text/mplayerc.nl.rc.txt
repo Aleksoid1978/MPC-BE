@@ -594,7 +594,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
 7		"Voorkeursformaat:"
 10		"60 fps"
 11		"HDR"
-12		"Preferred audio track language:"
+12		"Voorkeurstaal audiospoor:"
 14		"Afspeellijst laden"
 16		"youtube-dl, yt-dlp"
 17		"Executable:"
