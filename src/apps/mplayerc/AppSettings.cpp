@@ -1890,7 +1890,7 @@ void CAppSettings::SaveSettings()
 		profile.DeleteSection(IDS_RS_FULLSCREENRES);
 		profile.WriteInt(IDS_RS_FULLSCREENRES, IDS_RS_FULLSCREENRES_ENABLE, fullScreenModes.bEnabled);
 		profile.WriteBool(IDS_RS_FULLSCREENRES, IDS_RS_FULLSCREENRES_APPLY_DEF, fullScreenModes.bApplyDefault);
-		size_t cnt = 0;
+		unsigned cnt = 0;
 		std::vector<BYTE> value;
 		for (const auto& item : fullScreenModes.res) {
 			if (!item.monitorId.IsEmpty()) {
