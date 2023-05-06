@@ -1354,6 +1354,22 @@ namespace Youtube
 			}
 		}
 
+		if (streamingDataFormatListAudioWithLanguages.size()) {
+			// remove non-DASH formats from the list
+			auto it = std::find_if(youtubeUrllist.begin(), youtubeUrllist.end(), [](const Youtube::YoutubeUrllistItem& item) {
+				return item.profile->iTag == 18;
+				});
+			if (it != youtubeUrllist.end()) {
+				youtubeUrllist.erase(it);
+			}
+			it = std::find_if(youtubeUrllist.begin(), youtubeUrllist.end(), [](const Youtube::YoutubeUrllistItem& item) {
+				return item.profile->iTag == 22;
+				});
+			if (it != youtubeUrllist.end()) {
+				youtubeUrllist.erase(it);
+			}
+		}
+
 		if (youtubeUrllist.empty()) {
 			DLog(L"Youtube::Parse_URL() : no output video format found");
 
