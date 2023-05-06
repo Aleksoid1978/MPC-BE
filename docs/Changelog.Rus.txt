@@ -75,11 +75,11 @@ YouTube
 
 Обновлены библиотеки:
 	dav1d git-1.1.0-33-g922bd82;
-	ffmpeg git-n5.2-dev-2610-ga6e9d01f88;
+	ffmpeg git-n6.1-dev-518-ge3143703e9;
 	Little-CMS git-lcms2.15-44-g2dec684;
-	MediaInfo git-v22.12-120-gaad98a4e1;
+	MediaInfo git-v23.04-gdd350156;
 	zlib 1.2.13;
-	rapidjson git-v1.1.0-727-g949c771b;
+	rapidjson git-v1.1.0-727-g949c771b.
 
 1.6.6
 =============================
