@@ -1356,18 +1356,11 @@ namespace Youtube
 
 		if (streamingDataFormatListAudioWithLanguages.size()) {
 			// remove non-DASH formats from the list
-			auto it = std::find_if(youtubeUrllist.begin(), youtubeUrllist.end(), [](const Youtube::YoutubeUrllistItem& item) {
-				return item.profile->iTag == 18;
-				});
-			if (it != youtubeUrllist.end()) {
-				youtubeUrllist.erase(it);
-			}
-			it = std::find_if(youtubeUrllist.begin(), youtubeUrllist.end(), [](const Youtube::YoutubeUrllistItem& item) {
-				return item.profile->iTag == 22;
-				});
-			if (it != youtubeUrllist.end()) {
-				youtubeUrllist.erase(it);
-			}
+			youtubeUrllist.erase(
+				std::remove_if(youtubeUrllist.begin(), youtubeUrllist.end(),
+					[](const Youtube::YoutubeUrllistItem& item) {
+						return item.profile->type == y_media; }),
+				youtubeUrllist.end());
 		}
 
 		if (youtubeUrllist.empty()) {
