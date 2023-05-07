@@ -72,7 +72,7 @@ public:
 	bool OnApply();
 
 	static LPCWSTR GetWindowTitle() { return MAKEINTRESOURCEW(IDS_FILTER_SETTINGS_CAPTION); }
-	static CSize GetWindowSize() { return CSize(355, 296); }
+	static CSize GetWindowSize() { return CSize(340, 251); }
 
 	DECLARE_MESSAGE_MAP()
 
