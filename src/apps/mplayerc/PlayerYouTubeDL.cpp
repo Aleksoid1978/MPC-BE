@@ -191,7 +191,7 @@ namespace YoutubeDL
 
 					auto GetAndCheckProtocol = [](const auto& json, CStringA& protocol) {
 						if (!getJsonValue(json, "protocol", protocol)
-								|| (!StartsWith(protocol, "http") && !EndsWith(protocol, "m3u8"))) {
+								|| (!StartsWith(protocol, "http") && !EndsWith(protocol, "m3u8") && !EndsWith(protocol, "m3u8_native"))) {
 							return false;
 						}
 
@@ -227,7 +227,9 @@ namespace YoutubeDL
 							getJsonValue(format, "format", fmt);
 
 							profile->format = Youtube::yformat::y_mp4_other;
-							if (ext == L"mp4") {
+							if (EndsWith(protocol, "m3u8") || EndsWith(protocol, "m3u8_native")) {
+								profile->format = Youtube::yformat::y_stream;
+							} else if (ext == L"mp4") {
 								if (StartsWith(vcodec, "avc1")) {
 									profile->format = Youtube::yformat::y_mp4_avc;
 								}
@@ -299,9 +301,9 @@ namespace YoutubeDL
 						float tbr = 0.0f;
 						if (getJsonValue(format, "tbr", tbr)) {
 							if (aud_bitrate == 0.0f
-								||(vid_height > 360 && tbr > aud_bitrate)
-								|| (vid_height <= 360 && tbr < aud_bitrate)
-								|| (tbr == aud_bitrate && StartsWith(protocol, "http"))) {
+									|| (vid_height > 360 && tbr > aud_bitrate)
+									|| (vid_height <= 360 && tbr < aud_bitrate)
+									|| (tbr == aud_bitrate && StartsWith(protocol, "http"))) {
 								aud_bitrate = tbr;
 								bestAudioUrl = url;
 							}
