@@ -1226,9 +1226,9 @@ BEGIN
     CONTROL         "Auto-reload subtitle files after detecting modification",IDC_CHECK3,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,79,285,9
     CONTROL         "Use Subresync",IDC_CHECK_SUBRESYNC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,91,285,9
-    GROUPBOX        "Bază de date online",IDC_STATIC,5,105,286,45
-    LTEXT           "URL de bază pentru baza de date cu subtitrări online:",IDC_STATIC,10,116,222,8
-    LTEXT           "http://",IDC_STATIC,10,130,22,8
+    GROUPBOX        "Bază de date online",IDC_STATIC1,5,105,286,45
+    LTEXT           "URL de bază pentru baza de date cu subtitrări online:",IDC_STATIC2,10,116,222,8
+    LTEXT           "http://",IDC_STATIC3,10,130,22,8
     COMBOBOX        IDC_COMBO1,35,128,199,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Testează",IDC_BUTTON2,237,127,50,14
 END
@@ -1605,11 +1605,6 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Încarcă subtitrare...",     ID_FILE_LOAD_SUBTITLE
         MENUITEM "Salvează s&ubtitrare...",     ID_FILE_SAVE_SUBTITLE
-        POPUP "&Bază de date a subtitrărilor"
-        BEGIN
-            MENUITEM "&Caută...",                  ID_FILE_ISDB_SEARCH
-            MENUITEM "&Descarcă...",                ID_FILE_ISDB_DOWNLOAD
-        END
         MENUITEM SEPARATOR
         MENUITEM "P&roprietăți",                 ID_FILE_PROPERTIES
         MENUITEM SEPARATOR
@@ -1727,6 +1722,7 @@ BEGIN
     END
 END
 
+
 IDR_POPUP MENU
 BEGIN
     POPUP ""
@@ -1750,11 +1746,6 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "&Încarcă subtitrare...",     ID_FILE_LOAD_SUBTITLE
             MENUITEM "Salvează s&ubtitrare...",     ID_FILE_SAVE_SUBTITLE
-            POPUP "&Bază de date a subtitrărilor"
-            BEGIN
-                MENUITEM "&Caută...",                  ID_FILE_ISDB_SEARCH
-                MENUITEM "&Descarcă...",                ID_FILE_ISDB_DOWNLOAD
-            END
             MENUITEM SEPARATOR
             MENUITEM "P&roprietăți",                 ID_FILE_PROPERTIES
             MENUITEM SEPARATOR
@@ -1886,11 +1877,6 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "&Încarcă subtitrare...",     ID_FILE_LOAD_SUBTITLE
             MENUITEM "Salvează s&ubtitrare...",     ID_FILE_SAVE_SUBTITLE
-            POPUP "&Bază de date a subtitrărilor"
-            BEGIN
-                MENUITEM "&Caută...",                  ID_FILE_ISDB_SEARCH
-                MENUITEM "&Descarcă...",                ID_FILE_ISDB_DOWNLOAD
-            END
             MENUITEM SEPARATOR
             MENUITEM "Prop&rietăți",                 ID_FILE_PROPERTIES
         END

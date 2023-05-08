@@ -1226,9 +1226,9 @@ BEGIN
     CONTROL         "Αυτόματη επαναφόρτωση αρχείων υποτίτλων μετά από ανίχνευση τροποποίησης",IDC_CHECK3,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,79,285,9
     CONTROL         "Χρήση Subresync",IDC_CHECK_SUBRESYNC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,91,285,9
-    GROUPBOX        "Βάση δεδομένων σε σύνδεση",IDC_STATIC,5,105,286,45
-    LTEXT           "Βασική διεύθυνση URL της βάσης δεδομένων υποτίτλων:",IDC_STATIC,10,116,222,8
-    LTEXT           "http://",IDC_STATIC,10,130,22,8
+    GROUPBOX        "Βάση δεδομένων σε σύνδεση",IDC_STATIC1,5,105,286,45
+    LTEXT           "Βασική διεύθυνση URL της βάσης δεδομένων υποτίτλων:",IDC_STATIC2,10,116,222,8
+    LTEXT           "http://",IDC_STATIC3,10,130,22,8
     COMBOBOX        IDC_COMBO1,35,128,199,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Έλεγχος",IDC_BUTTON2,237,127,50,14
 END
@@ -1605,11 +1605,6 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Φόρτωση &υποτίτλων...",   ID_FILE_LOAD_SUBTITLE
         MENUITEM "Αποθήκευση υπο&τίτλων...",   ID_FILE_SAVE_SUBTITLE
-        POPUP "&Βάση δεδομένων υποτίτλων"
-        BEGIN
-            MENUITEM "Ανα&ζήτηση...",               ID_FILE_ISDB_SEARCH
-            MENUITEM "&Λήψη...",              ID_FILE_ISDB_DOWNLOAD
-        END
         MENUITEM SEPARATOR
         MENUITEM "&Ιδιότητες",                 ID_FILE_PROPERTIES
         MENUITEM SEPARATOR
@@ -1751,11 +1746,6 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "Φόρτωση &υποτίτλων...",   ID_FILE_LOAD_SUBTITLE
             MENUITEM "Αποθήκευση υπο&τίτλων...",   ID_FILE_SAVE_SUBTITLE
-            POPUP "&Βάση δεδομένων υποτίτλων"
-            BEGIN
-                MENUITEM "Ανα&ζήτηση...",               ID_FILE_ISDB_SEARCH
-                MENUITEM "&Λήψη...",              ID_FILE_ISDB_DOWNLOAD
-            END
             MENUITEM SEPARATOR
             MENUITEM "&Ιδιότητες",                 ID_FILE_PROPERTIES
             MENUITEM SEPARATOR
@@ -1887,11 +1877,6 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "Φόρτωση &υποτίτλων...",   ID_FILE_LOAD_SUBTITLE
             MENUITEM "Αποθήκευση υπο&τίτλων...",   ID_FILE_SAVE_SUBTITLE
-            POPUP "&Βάση δεδομένων υποτίτλων"
-            BEGIN
-                MENUITEM "Ανα&ζήτηση...",               ID_FILE_ISDB_SEARCH
-                MENUITEM "&Λήψη...",              ID_FILE_ISDB_DOWNLOAD
-            END
             MENUITEM SEPARATOR
             MENUITEM "&Ιδιότητες",                 ID_FILE_PROPERTIES
         END

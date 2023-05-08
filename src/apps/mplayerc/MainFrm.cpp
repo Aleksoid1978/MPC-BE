@@ -270,10 +270,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_FILE_SAVE_SUBTITLE, OnUpdateFileSaveSubtitle)
 	ON_COMMAND(ID_FILE_LOAD_AUDIO, OnFileLoadAudio)
 	ON_UPDATE_COMMAND_UI(ID_FILE_LOAD_AUDIO, OnUpdateFileLoadAudio)
-	ON_COMMAND(ID_FILE_ISDB_SEARCH, OnFileISDBSearch)
-	ON_UPDATE_COMMAND_UI(ID_FILE_ISDB_SEARCH, OnUpdateFileISDBSearch)
-	ON_COMMAND(ID_FILE_ISDB_DOWNLOAD, OnFileISDBDownload)
-	ON_UPDATE_COMMAND_UI(ID_FILE_ISDB_DOWNLOAD, OnUpdateFileISDBDownload)
 	ON_COMMAND(ID_FILE_PROPERTIES, OnFileProperties)
 	ON_UPDATE_COMMAND_UI(ID_FILE_PROPERTIES, OnUpdateFileProperties)
 	ON_COMMAND(ID_FILE_CLOSEPLAYLIST, OnFileClosePlaylist)
@@ -6905,55 +6901,6 @@ void CMainFrame::OnUpdateFileSaveSubtitle(CCmdUI* pCmdUI)
 	}
 
 	pCmdUI->Enable(bEnable);
-}
-
-void CMainFrame::OnFileISDBSearch()
-{
-	CStringA url = "http://" + CStringA(AfxGetAppSettings().strISDb) + "/index.php?";
-	CStringA args = makeargs(m_wndPlaylistBar.curPlayList);
-	ShellExecuteW(m_hWnd, L"open", CString(url+args), nullptr, nullptr, SW_SHOWDEFAULT);
-}
-
-void CMainFrame::OnUpdateFileISDBSearch(CCmdUI *pCmdUI)
-{
-	//pCmdUI->Enable(TRUE);
-	pCmdUI->Enable(FALSE); // turn it off because it doesn't work
-}
-
-void CMainFrame::OnFileISDBDownload()
-{
-	if (!CanShowDialog()) {
-		return;
-	}
-
-	CAppSettings& s = AfxGetAppSettings();
-	filehash fh;
-	if (!::mpc_filehash(GetCurFileName(), fh)) {
-		MessageBeep(UINT_MAX);
-		return;
-	}
-
-	try {
-		CStringA url = "http://" + CStringA(s.strISDb) + "/index.php?";
-		CStringA args;
-		args.Format("player=mpc&name[0]=%s&size[0]=%016I64x&hash[0]=%016I64x",
-					UrlEncode(CStringA(fh.name), true), fh.size, fh.mpc_filehash);
-		url.Append(args);
-
-		CSubtitleDlDlg dlg(GetModalParent(), url, fh.name);
-		dlg.DoModal();
-
-		SetToolBarSubtitleButton();
-	} catch (CInternetException* ie) {
-		ie->Delete();
-		return;
-	}
-}
-
-void CMainFrame::OnUpdateFileISDBDownload(CCmdUI *pCmdUI)
-{
-	//pCmdUI->Enable(m_eMediaLoadState == MLS_LOADED && GetPlaybackMode() != PM_CAPTURE && (m_pCAP || m_pDVS) && !m_bAudioOnly);
-	pCmdUI->Enable(FALSE); // turn it off because it doesn't work
 }
 
 void CMainFrame::OnFileProperties()

@@ -79,6 +79,12 @@ BOOL CPPageSubtitles::OnInitDialog()
 		m_ISDbCombo.AddString(L"www.opensubtitles.org/isdb");
 	}
 
+	GetDlgItem(IDC_STATIC1)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATIC2)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATIC3)->ShowWindow(SW_HIDE);
+	m_ISDbCombo.ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_BUTTON2)->ShowWindow(SW_HIDE);
+
 	UpdateData(FALSE);
 
 	CreateToolTip();

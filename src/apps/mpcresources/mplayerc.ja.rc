@@ -1226,9 +1226,9 @@ BEGIN
     CONTROL         "修正検知後に字幕ファイルを自動で再読み込みする",IDC_CHECK3,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,79,285,9
     CONTROL         "Subresync を使用する",IDC_CHECK_SUBRESYNC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,91,285,9
-    GROUPBOX        "オンライン データベース",IDC_STATIC,5,105,286,45
-    LTEXT           "オンライン字幕データベースの基本 URL:",IDC_STATIC,10,116,222,8
-    LTEXT           "http://",IDC_STATIC,10,130,22,8
+    GROUPBOX        "オンライン データベース",IDC_STATIC1,5,105,286,45
+    LTEXT           "オンライン字幕データベースの基本 URL:",IDC_STATIC2,10,116,222,8
+    LTEXT           "http://",IDC_STATIC3,10,130,22,8
     COMBOBOX        IDC_COMBO1,35,128,199,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "テスト",IDC_BUTTON2,237,127,50,14
 END
@@ -1605,11 +1605,6 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "字幕を読み込む(&L)...",        ID_FILE_LOAD_SUBTITLE
         MENUITEM "字幕を保存(&U)...",              ID_FILE_SAVE_SUBTITLE
-        POPUP "字幕データベース(&B)"
-        BEGIN
-            MENUITEM "検索(&S)...",                       ID_FILE_ISDB_SEARCH
-            MENUITEM "ダウンロード(&D)...",                   ID_FILE_ISDB_DOWNLOAD
-        END
         MENUITEM SEPARATOR
         MENUITEM "プロパティ(&R)",                   ID_FILE_PROPERTIES
         MENUITEM SEPARATOR
@@ -1751,11 +1746,6 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "字幕を読み込む(&L)...",        ID_FILE_LOAD_SUBTITLE
             MENUITEM "字幕を保存...",              ID_FILE_SAVE_SUBTITLE
-            POPUP "字幕データベース(&B)"
-            BEGIN
-                MENUITEM "検索(&S)...",                       ID_FILE_ISDB_SEARCH
-                MENUITEM "ダウンロード(&D)...",                   ID_FILE_ISDB_DOWNLOAD
-            END
             MENUITEM SEPARATOR
             MENUITEM "プロパティ(&R)",                   ID_FILE_PROPERTIES
             MENUITEM SEPARATOR
@@ -1887,11 +1877,6 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "字幕を読み込む(&L)...",        ID_FILE_LOAD_SUBTITLE
             MENUITEM "字幕を保存...",              ID_FILE_SAVE_SUBTITLE
-            POPUP "字幕データベース(&B)"
-            BEGIN
-                MENUITEM "検索(&S)...",                       ID_FILE_ISDB_SEARCH
-                MENUITEM "ダウンロード(&D)...",                   ID_FILE_ISDB_DOWNLOAD
-            END
             MENUITEM SEPARATOR
             MENUITEM "プロパティ(&R)",                   ID_FILE_PROPERTIES
         END

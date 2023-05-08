@@ -1226,9 +1226,9 @@ BEGIN
     CONTROL         "수정 감지 후 자막 자동 다시 불러오기",IDC_CHECK3,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,79,285,9
     CONTROL         "하위 동기화 사용",IDC_CHECK_SUBRESYNC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,91,285,9
-    GROUPBOX        "온라인 DB",IDC_STATIC,5,105,286,45
-    LTEXT           "온라인 자막 DB URL :",IDC_STATIC,10,116,222,8
-    LTEXT           "http://",IDC_STATIC,10,130,22,8
+    GROUPBOX        "온라인 DB",IDC_STATIC1,5,105,286,45
+    LTEXT           "온라인 자막 DB URL :",IDC_STATIC2,10,116,222,8
+    LTEXT           "http://",IDC_STATIC3,10,130,22,8
     COMBOBOX        IDC_COMBO1,35,128,199,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "시험",IDC_BUTTON2,237,127,50,14
 END
@@ -1605,11 +1605,6 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "자막 불러오기(&L)...",        ID_FILE_LOAD_SUBTITLE
         MENUITEM "자막 저장하기(&S)...",        ID_FILE_SAVE_SUBTITLE
-        POPUP "자막 데이터베이스"
-        BEGIN
-            MENUITEM "검색...",                       ID_FILE_ISDB_SEARCH
-            MENUITEM "다운로드...",                     ID_FILE_ISDB_DOWNLOAD
-        END
         MENUITEM SEPARATOR
         MENUITEM "등록정보(&R)",                    ID_FILE_PROPERTIES
         MENUITEM SEPARATOR
@@ -1751,11 +1746,6 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "자막 불러오기(&L)...",        ID_FILE_LOAD_SUBTITLE
             MENUITEM "자막 저장하기(&S)...",        ID_FILE_SAVE_SUBTITLE
-            POPUP "자막 데이터베이스"
-            BEGIN
-                MENUITEM "검색...",                       ID_FILE_ISDB_SEARCH
-                MENUITEM "다운로드...",                     ID_FILE_ISDB_DOWNLOAD
-            END
             MENUITEM SEPARATOR
             MENUITEM "등록정보(&R)",                    ID_FILE_PROPERTIES
             MENUITEM SEPARATOR
@@ -1887,11 +1877,6 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "자막 불러오기(&L)..",         ID_FILE_LOAD_SUBTITLE
             MENUITEM "자막 저장하기...",            ID_FILE_SAVE_SUBTITLE
-            POPUP "자막 데이터베이스"
-            BEGIN
-                MENUITEM "검색...",                       ID_FILE_ISDB_SEARCH
-                MENUITEM "다운로드...",                     ID_FILE_ISDB_DOWNLOAD
-            END
             MENUITEM SEPARATOR
             MENUITEM "등록정보(&R)",                    ID_FILE_PROPERTIES
         END
