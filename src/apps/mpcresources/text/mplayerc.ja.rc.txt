@@ -594,7 +594,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
 7		"お好みの形式:"
 10		"60 fps"
 11		"HDR"
-12		"Preferred audio track language:"
+12		"お好みの音声トラック言語:"
 14		"プレイリストを読み込む"
 16		"youtube-dl, yt-dlp"
 17		"実行可能ファイル:"
