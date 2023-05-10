@@ -796,7 +796,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndSubresyncBar.SetHeight(200);
 	m_dockingbars.push_back(&m_wndSubresyncBar);
 
-	m_wndPlaylistBar.Create(this, AFX_IDW_DOCKBAR_BOTTOM);
+	m_wndPlaylistBar.Create(this, AFX_IDW_DOCKBAR_RIGHT);
 	m_wndPlaylistBar.SetBarStyle(m_wndPlaylistBar.GetBarStyle() | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC);
 	m_wndPlaylistBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_wndPlaylistBar.SetHeight(100);
