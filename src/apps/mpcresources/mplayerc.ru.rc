@@ -2344,6 +2344,16 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_PLAYLIST_POSITION "Расположение"
+    IDS_PLAYLIST_POSITION_LEFT "Слева"
+    IDS_PLAYLIST_POSITION_TOP "Сверху"
+    IDS_PLAYLIST_POSITION_RIGHT "Справа"
+    IDS_PLAYLIST_POSITION_BOTTOM "Снизу"
+    IDS_PLAYLIST_POSITION_FLOAT "Открепленное"
+END
+
+STRINGTABLE
+BEGIN
     IDS_RECORD_START        "Запись"
     IDS_RECORD_STOP         "Стоп"
     IDS_FILTERS_COPY_TO_CLIPBOARD "&Копировать список фильтров в буфер"
