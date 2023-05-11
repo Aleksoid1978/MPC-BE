@@ -4317,9 +4317,32 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 				if (dockBarID != AFX_IDW_DOCKBAR_FLOAT) {
 					auto pMainFrame = AfxGetMainFrame();
 
-					CRect r;
-					pMainFrame->GetWindowRect(r);
-					CPoint p(r.right, r.top);
+					CRect rectMain;
+					pMainFrame->GetWindowRect(rectMain);
+					CPoint p(rectMain.right, rectMain.top);
+
+					CRect rectDesktop;
+					GetDesktopWindow()->GetWindowRect(&rectDesktop);
+
+					CRect rect;
+					GetWindowRect(rect);
+
+					if (p.x < rectDesktop.left) {
+						p.x = rectDesktop.left;
+					}
+
+					if (p.y < rectDesktop.top) {
+						p.y = rectDesktop.top;
+					}
+
+					if (p.x + rect.Width() > rectDesktop.right) {
+						p.x = rectDesktop.left;
+					}
+
+					if (p.y + rect.Height() > rectDesktop.bottom) {
+						p.y = rectDesktop.top;
+					}
+
 					pMainFrame->m_wndToolBar.m_pDockSite->FloatControlBar(this, p);
 				}
 				break;
