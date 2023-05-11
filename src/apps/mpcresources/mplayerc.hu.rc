@@ -2344,12 +2344,12 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PLAYLIST_POSITION "Position"
-    IDS_PLAYLIST_POSITION_LEFT "Left"
-    IDS_PLAYLIST_POSITION_TOP "Top"
-    IDS_PLAYLIST_POSITION_RIGHT "Right"
-    IDS_PLAYLIST_POSITION_BOTTOM "Bottom"
-    IDS_PLAYLIST_POSITION_FLOAT "Float"
+    IDS_PLAYLIST_POSITION "Pozíció"
+    IDS_PLAYLIST_POSITION_LEFT "Bal"
+    IDS_PLAYLIST_POSITION_TOP "Felső"
+    IDS_PLAYLIST_POSITION_RIGHT "Jobb"
+    IDS_PLAYLIST_POSITION_BOTTOM "Alsó"
+    IDS_PLAYLIST_POSITION_FLOAT "Lebegő"
 END
 
 STRINGTABLE
@@ -3445,13 +3445,13 @@ BEGIN
     IDS_BACK_CENTER         "Hátsó Középső"
     IDS_SIDE_LEFT           "Bal Oldalsó"
     IDS_SIDE_RIGHT          "Jobb Oldalsó"
-    IDS_TOP_CENTER          "Top Középső"
-    IDS_TOP_FRONT_LEFT      "Top Elülső "
-    IDS_TOP_FRONT_CENTER    "Top Elülső Középső"
-    IDS_TOP_FRONT_RIGHT     "Top Elülső Jobb"
-    IDS_TOP_BACK_LEFT       "Top Hátsó Bal"
-    IDS_TOP_BACK_CENTER     "Top Hátsó Középső"
-    IDS_TOP_BACK_RIGHT      "Top Hátsó Jobb"
+    IDS_TOP_CENTER          "Felső Középső"
+    IDS_TOP_FRONT_LEFT      "Felső Elülső "
+    IDS_TOP_FRONT_CENTER    "Felső Elülső Középső"
+    IDS_TOP_FRONT_RIGHT     "Felső Elülső Jobb"
+    IDS_TOP_BACK_LEFT       "Felső Hátsó Bal"
+    IDS_TOP_BACK_CENTER     "Felső Hátsó Középső"
+    IDS_TOP_BACK_RIGHT      "Felső Hátsó Jobb"
 END
 
 STRINGTABLE
