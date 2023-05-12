@@ -120,15 +120,19 @@ public:
 
 class CShoutcastStream : public CSourceStream
 {
-	class CShoutCastPacket : public std::vector<NoInitByte>
+	class CShoutCastPacket
 	{
 	public:
+		std::unique_ptr<BYTE[]> data;
+		size_t size = 0;
 		CString title;
 		REFERENCE_TIME rtStart = INVALID_TIME;
 		REFERENCE_TIME rtStop = INVALID_TIME;
-		void SetData(const void* ptr, DWORD len) {
-			resize(len);
-			memcpy(data(), ptr, len);
+		void SetData(const void* ptr, int len) {
+			ASSERT(len >= 0);
+			size = len;
+			data.reset(new BYTE[size]);
+			memcpy(data.get(), ptr, size);
 		}
 	};
 

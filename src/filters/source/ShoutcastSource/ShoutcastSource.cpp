@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -401,8 +401,8 @@ HRESULT CShoutcastStream::FillBuffer(IMediaSample* pSample)
 		if (!m_queue.empty()) {
 			std::unique_ptr<CShoutCastPacket> p = std::move(m_queue.front());
 			m_queue.pop_front();
-			long len = std::min(pSample->GetSize(), (long)p->size());
-			memcpy(pData, p->data(), len);
+			long len = std::min(pSample->GetSize(), (long)p->size);
+			memcpy(pData, p->data.get(), len);
 			pSample->SetActualDataLength(len);
 			pSample->SetTime(&p->rtStart, &p->rtStop);
 			m_title = p->title;
