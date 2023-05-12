@@ -578,8 +578,7 @@ UINT CShoutcastStream::SocketThreadProc()
 					}
 				}
 
-				std::unique_ptr<CShoutCastPacket> p2(DNew CShoutCastPacket());
-				p2->SetData(pos, size);
+				std::unique_ptr<CShoutCastPacket> p2(DNew CShoutCastPacket(pos, size));
 				p2->rtStart = m_rtSampleTime;
 				p2->rtStop  = m_rtSampleTime + (10000000i64 * size * 8/soc.m_bitrate);
 				m_rtSampleTime = p2->rtStop;
@@ -621,8 +620,7 @@ UINT CShoutcastStream::SocketThreadProc()
 					}
 				}
 
-				std::unique_ptr<CShoutCastPacket> p2(DNew CShoutCastPacket());
-				p2->SetData(pos + aframe.param1, size - aframe.param1);
+				std::unique_ptr<CShoutCastPacket> p2(DNew CShoutCastPacket(pos + aframe.param1, size - aframe.param1));
 				p2->rtStart = m_rtSampleTime;
 				p2->rtStop  = m_rtSampleTime + (10000000i64 * size * 8/soc.m_bitrate);
 				m_rtSampleTime = p2->rtStop;

@@ -128,9 +128,10 @@ class CShoutcastStream : public CSourceStream
 		CString title;
 		REFERENCE_TIME rtStart = INVALID_TIME;
 		REFERENCE_TIME rtStop = INVALID_TIME;
-		void SetData(const void* ptr, int len) {
+		CShoutCastPacket(const void* ptr, int len)
+			: size(len)
+		{
 			ASSERT(len >= 0);
-			size = len;
 			data.reset(new BYTE[size]);
 			memcpy(data.get(), ptr, size);
 		}
