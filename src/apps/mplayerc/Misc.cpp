@@ -487,12 +487,13 @@ bool IsFontInstalled(LPCWSTR lpszFont)
 
 UINT CMPCGradient::Size()
 {
-	return (UINT)m_data.size();
+	return m_size;
 }
 
 void CMPCGradient::Clear()
 {
-	m_data.clear();
+	m_pData.reset();
+	m_size = 0;
 	m_width = 0;
 	m_height = 0;
 }
@@ -515,9 +516,13 @@ HRESULT CMPCGradient::Create(IWICBitmapSource* pBitmapSource)
 	}
 
 	if (SUCCEEDED(hr)) {
-		UINT size = m_width * m_height * 4;
-		m_data.resize(size);
-		hr = pBitmapSource->CopyPixels(nullptr, m_width * 4, size, (BYTE*)m_data.data());
+		m_size = m_width * m_height * 4;
+		m_pData.reset(new(std::nothrow) BYTE[m_size]);
+		if (m_pData) {
+			hr = pBitmapSource->CopyPixels(nullptr, m_width * 4, m_size, m_pData.get());
+		} else {
+			hr = E_OUTOFMEMORY;
+		}
 
 	}
 
@@ -530,8 +535,8 @@ HRESULT CMPCGradient::Create(IWICBitmapSource* pBitmapSource)
 
 bool CMPCGradient::Paint(CDC* dc, CRect r, int ptop, int br/* = -1*/, int rc/* = -1*/, int gc/* = -1*/, int bc/* = -1*/)
 {
-	if (m_data.size()) {
-		BYTE* pData = (BYTE*)m_data.data();
+	if (m_size) {
+		BYTE* pData = m_pData.get();
 
 		// code from removed CMPCPngImage::PaintExternalGradient
 		GRADIENT_RECT gr = {0, 1};
