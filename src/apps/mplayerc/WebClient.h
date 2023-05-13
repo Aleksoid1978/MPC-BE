@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "DSUtil/SimpleBuffer.h"
-
 class CWebServer;
 
 class CWebClientSocket : public CAsyncSocket
