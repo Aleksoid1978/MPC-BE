@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2021 see Authors.txt
+ * (C) 2012-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,7 +27,7 @@ static bool PNGDIB(LPCWSTR filename, BYTE* pData, int level)
 {
 	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
 	if (bih->biCompression != BI_RGB
-			|| bih->biWidth <= 0 || abs(bih->biHeight) == 0
+			|| bih->biWidth <= 0 || bih->biHeight == 0
 			|| (bih->biBitCount != 32 && bih->biBitCount != 64)) {
 		return false;
 	}
@@ -93,7 +93,7 @@ static bool PNGDIB(LPCWSTR filename, BYTE* pData, int level)
 static bool WICDIB(LPCWSTR filename, BYTE* pData, int quality, BYTE* output, size_t& outLen)
 {
 	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
-	if (bih->biCompression != BI_RGB || bih->biWidth <= 0 || abs(bih->biHeight) == 0) {
+	if (bih->biCompression != BI_RGB || bih->biWidth <= 0 || bih->biHeight == 0) {
 		return false;
 	}
 
