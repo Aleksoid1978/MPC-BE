@@ -1,5 +1,5 @@
 /*
- * (C) 2017 see Authors.txt
+ * (C) 2017-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,60 +20,50 @@
 
 #pragma once
 
-// CSimpleBuffer - fast and simple container
-// PS: When resizing the old data will be lost.
-
 template <typename T>
-class CSimpleBuffer
+class CSimpleBlock
 {
-	T* m_data = nullptr;
+protected:
+	std::unique_ptr<T[]> m_data;
 	size_t m_size = 0;
 
 public:
-	CSimpleBuffer() {};
-	~CSimpleBuffer()
-	{
-		if (m_data) {
-			delete[] m_data;
-		}
-	}
-
 	// Returns pointer to the data.
-	T* Data() { return m_data; }
+	auto* Data() { return m_data.get(); }
 
 	// Returns the number of elements.
-	size_t Size() { return m_size; }
+	auto Size() { return m_size; }
 
 	// Returns allocated size in bytes.
 	size_t Bytes() { return m_size * sizeof(T); }
 
-	// Set new size. Old data will be lost. The size will be rounded up to a multiple of 256 bytes.
-	void SetSize(size_t size)
+	// Set new size. Old data will be lost.
+	void SetSize(const size_t size)
 	{
-		size = ((size * sizeof(T) + 255) & ~(size_t)255) / sizeof(T); // rounded up a multiple of 256 bytes.
-
-		if (size == m_size) {
-			return;
+		if (size != m_size) {
+			m_data.reset(size ? new T[size] : nullptr);
+			m_size = size;
 		}
-
-		if (m_data) {
-			delete[] m_data;
-		}
-
-		if (size) {
-			m_data = DNew T[size];
-		} else {
-			m_data = nullptr;
-		}
-
-		m_size = size;
 	}
 
-	// Increase the size if necessary. Old data may be lost.
+	auto const& operator[](size_t i) const noexcept { return m_data[i]; }
+	auto& operator[](size_t i) noexcept { return m_data[i]; }
+};
+
+// CSimpleBuffer - fast and simple container
+// PS: When resizing the old data will be lost.
+
+template <typename T>
+class CSimpleBuffer : public CSimpleBlock<T>
+{
+public:
+	// Increase the size if necessary. Old data may be lost. The size will be rounded up to a multiple of 256 bytes.
 	void ExpandSize(const size_t size)
 	{
-		if (size > m_size) {
-			SetSize(size);
+		size_t newsize = ((size * sizeof(T) + 255) & ~(size_t)255) / sizeof(T); // rounded up a multiple of 256 bytes.
+
+		if (newsize > m_size) {
+			SetSize(newsize);
 		}
 	}
 
@@ -83,13 +73,12 @@ public:
 		size_t required_size = pos + size;
 
 		if (required_size > m_size) {
-			T* new_data = DNew T[required_size];
-			memcpy(new_data, m_data, pos * sizeof(T));
-			delete[] m_data;
-			m_data = new_data;
+			std::unique_ptr<T[]> new_data = std::make_unique<T[]>(required_size);
+			memcpy(new_data.get(), m_data.get(), pos * sizeof(T));
+			m_data = std::move(new_data);
 			m_size = required_size;
 		}
 
-		memcpy(m_data + pos, data, size * sizeof(T));
+		memcpy(m_data.get() + pos, data, size * sizeof(T));
 	}
 };
