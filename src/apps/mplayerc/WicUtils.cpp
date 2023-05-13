@@ -571,9 +571,10 @@ HRESULT WicSaveImage(
 		hr = pEncoder->Commit();
 	}
 	if (SUCCEEDED(hr)) {
+		// get the real size of data for IWICStream, which can be placed in memory
 		LARGE_INTEGER li = {};
 		ULARGE_INTEGER uli = {};
-		hr = pStream->Seek(li, STREAM_SEEK_END, &uli);
+		hr = pStream->Seek(li, STREAM_SEEK_CUR, &uli); // look at the current position, not the end
 		outLen = (size_t)uli.QuadPart;
 	}
 
