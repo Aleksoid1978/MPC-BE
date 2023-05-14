@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -197,8 +197,8 @@ void CBaseMuxerRawOutputPin::MuxPacket(const CMediaType& mt, const MuxerPacket* 
 		return;
 	}
 
-	const BYTE* pData = (BYTE*)pPacket->pData.data();
-	const int DataSize = (int)pPacket->pData.size();
+	const BYTE* pData = (BYTE*)pPacket->data.get();
+	const int DataSize = (int)pPacket->size;
 
 	if (mt.subtype == MEDIASUBTYPE_RAW_AAC1 && mt.formattype == FORMAT_WaveFormatEx) {
 		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.Format();

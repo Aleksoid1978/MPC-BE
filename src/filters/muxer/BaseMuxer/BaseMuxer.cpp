@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -221,7 +221,7 @@ void CBaseMuxerFilter::MuxPacketInternal(const MuxerPacket* pPacket)
 {
 	TRACE(L"MuxPacket pPin=%x, size=%d, s%d e%d b%d, rt=(%I64d-%I64d)\n",
 		  pPacket->pPin->GetID(),
-		  pPacket->pData.size(),
+		  pPacket->size,
 		  !!(pPacket->flags & MuxerPacket::syncpoint),
 		  !!(pPacket->flags & MuxerPacket::eos),
 		  !!(pPacket->flags & MuxerPacket::bogus),

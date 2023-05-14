@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -221,8 +221,6 @@ STDMETHODIMP CBaseMuxerInputPin::Receive(IMediaSample* pSample)
 		return hr;
 	}
 
-	std::unique_ptr<MuxerPacket> pPacket(DNew MuxerPacket(this));
-
 	long len = pSample->GetActualDataLength();
 
 	BYTE* pData = nullptr;
@@ -230,8 +228,7 @@ STDMETHODIMP CBaseMuxerInputPin::Receive(IMediaSample* pSample)
 		return S_OK;
 	}
 
-	pPacket->pData.resize(len);
-	memcpy(pPacket->pData.data(), pData, len);
+	std::unique_ptr<MuxerPacket> pPacket(DNew MuxerPacket(this, pData, len));
 
 	if (S_OK == pSample->IsSyncPoint() || m_mt.majortype == MEDIATYPE_Audio && !m_mt.bTemporalCompression) {
 		pPacket->flags |= MuxerPacket::syncpoint;
@@ -276,7 +273,7 @@ STDMETHODIMP CBaseMuxerInputPin::EndOfStream()
 
 	ASSERT(!m_fEOS);
 
-	std::unique_ptr<MuxerPacket> pPacket(DNew MuxerPacket(this));
+	std::unique_ptr<MuxerPacket> pPacket(DNew MuxerPacket(this, nullptr, 0));
 	pPacket->flags |= MuxerPacket::eos;
 	PushPacket(pPacket);
 
