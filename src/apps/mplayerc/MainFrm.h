@@ -47,6 +47,7 @@
 
 #include "DSUtil/DSMPropertyBag.h"
 #include "DSUtil/FontInstaller.h"
+#include "DSUtil/SimpleBuffer.h"
 #include "SubPic/ISubPic.h"
 
 #include "BaseGraph.h"
@@ -437,9 +438,9 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	void ShowOptions(int idPage = 0);
 
-	HRESULT GetDisplayedImage(std::vector<BYTE>& dib, CString& errmsg);
-	HRESULT GetCurrentFrame(std::vector<BYTE>& dib, CString& errmsg);
-	HRESULT GetOriginalFrame(std::vector<BYTE>& dib, CString& errmsg);
+	HRESULT GetDisplayedImage(CSimpleBlock<BYTE>& dib, CString& errmsg);
+	HRESULT GetCurrentFrame(CSimpleBlock<BYTE>& dib, CString& errmsg);
+	HRESULT GetOriginalFrame(CSimpleBlock<BYTE>& dib, CString& errmsg);
 	HRESULT RenderCurrentSubtitles(BYTE* pData);
 	bool SaveDIB(LPCWSTR fn, BYTE* pData, long size);
 	bool IsRendererCompatibleWithSaveImage();

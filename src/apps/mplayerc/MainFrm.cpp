@@ -6114,7 +6114,7 @@ void CMainFrame::OnUpdateFileSaveAs(CCmdUI* pCmdUI)
 	pCmdUI->Enable(TRUE);
 }
 
-HRESULT GetBasicVideoFrame(IBasicVideo* pBasicVideo, std::vector<BYTE>& dib)
+HRESULT GetBasicVideoFrame(IBasicVideo* pBasicVideo, CSimpleBlock<BYTE>& dib)
 {
 	// IBasicVideo::GetCurrentImage() gives the original frame
 
@@ -6128,17 +6128,17 @@ HRESULT GetBasicVideoFrame(IBasicVideo* pBasicVideo, std::vector<BYTE>& dib)
 		return E_ABORT;
 	}
 
-	dib.resize(size);
+	dib.SetSize(size);
 
-	hr = pBasicVideo->GetCurrentImage(&size, (long*)dib.data());
+	hr = pBasicVideo->GetCurrentImage(&size, (long*)dib.Data());
 	if (FAILED(hr)) {
-		dib.clear();
+		dib.SetSize(0);
 	}
 
 	return hr;
 }
 
-HRESULT GetVideoDisplayControlFrame(IMFVideoDisplayControl* pVideoDisplayControl, std::vector<BYTE>& dib)
+HRESULT GetVideoDisplayControlFrame(IMFVideoDisplayControl* pVideoDisplayControl, CSimpleBlock<BYTE>& dib)
 {
 	// IMFVideoDisplayControl::GetCurrentImage() gives the displayed frame
 
@@ -6155,16 +6155,16 @@ HRESULT GetVideoDisplayControlFrame(IMFVideoDisplayControl* pVideoDisplayControl
 		return E_ABORT;
 	}
 
-	dib.resize(sizeof(BITMAPINFOHEADER) + size);
+	dib.SetSize(sizeof(BITMAPINFOHEADER) + size);
 
-	memcpy(dib.data(), &bih, sizeof(BITMAPINFOHEADER));
-	memcpy(dib.data() + sizeof(BITMAPINFOHEADER), pDib, size);
+	memcpy(dib.Data(), &bih, sizeof(BITMAPINFOHEADER));
+	memcpy(dib.Data() + sizeof(BITMAPINFOHEADER), pDib, size);
 	CoTaskMemFree(pDib);
 
 	return hr;
 }
 
-HRESULT GetMadVRFrameGrabberFrame(IMadVRFrameGrabber* pMadVRFrameGrabber, std::vector<BYTE>& dib, bool displayed)
+HRESULT GetMadVRFrameGrabberFrame(IMadVRFrameGrabber* pMadVRFrameGrabber, CSimpleBlock<BYTE>& dib, bool displayed)
 {
 	LPVOID dibImage = nullptr;
 	HRESULT hr;
@@ -6184,14 +6184,14 @@ HRESULT GetMadVRFrameGrabberFrame(IMadVRFrameGrabber* pMadVRFrameGrabber, std::v
 
 	const BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)dibImage;
 
-	dib.resize(sizeof(BITMAPINFOHEADER) + bih->biSizeImage);
-	memcpy(dib.data(), dibImage, sizeof(BITMAPINFOHEADER) + bih->biSizeImage);
+	dib.SetSize(sizeof(BITMAPINFOHEADER) + bih->biSizeImage);
+	memcpy(dib.Data(), dibImage, sizeof(BITMAPINFOHEADER) + bih->biSizeImage);
 	LocalFree(dibImage);
 
 	return hr;
 }
 
-HRESULT CMainFrame::GetDisplayedImage(std::vector<BYTE>& dib, CString& errmsg)
+HRESULT CMainFrame::GetDisplayedImage(CSimpleBlock<BYTE>& dib, CString& errmsg)
 {
 	errmsg.Empty();
 	HRESULT hr;
@@ -6202,8 +6202,8 @@ HRESULT CMainFrame::GetDisplayedImage(std::vector<BYTE>& dib, CString& errmsg)
 
 		if (S_OK == hr && dibImage) {
 			const BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)dibImage;
-			dib.resize(sizeof(BITMAPINFOHEADER) + bih->biSizeImage);
-			memcpy(dib.data(), dibImage, sizeof(BITMAPINFOHEADER) + bih->biSizeImage);
+			dib.SetSize(sizeof(BITMAPINFOHEADER) + bih->biSizeImage);
+			memcpy(dib.Data(), dibImage, sizeof(BITMAPINFOHEADER) + bih->biSizeImage);
 			LocalFree(dibImage);
 		}
 	}
@@ -6220,7 +6220,7 @@ HRESULT CMainFrame::GetDisplayedImage(std::vector<BYTE>& dib, CString& errmsg)
 	return hr;
 }
 
-HRESULT CMainFrame::GetCurrentFrame(std::vector<BYTE>& dib, CString& errmsg)
+HRESULT CMainFrame::GetCurrentFrame(CSimpleBlock<BYTE>& dib, CString& errmsg)
 {
 	HRESULT hr = S_OK;
 	errmsg.Empty();
@@ -6240,8 +6240,8 @@ HRESULT CMainFrame::GetCurrentFrame(std::vector<BYTE>& dib, CString& errmsg)
 		hr = m_pCAP->GetDIB(nullptr, &size);
 
 		if (S_OK == hr) {
-			dib.resize(size);
-			hr = m_pCAP->GetDIB(dib.data(), &size);
+			dib.SetSize(size);
+			hr = m_pCAP->GetDIB(dib.Data(), &size);
 		}
 
 		if (FAILED(hr)) {
@@ -6271,7 +6271,7 @@ HRESULT CMainFrame::GetCurrentFrame(std::vector<BYTE>& dib, CString& errmsg)
 	return hr;
 }
 
-HRESULT CMainFrame::GetOriginalFrame(std::vector<BYTE>& dib, CString& errmsg)
+HRESULT CMainFrame::GetOriginalFrame(CSimpleBlock<BYTE>& dib, CString& errmsg)
 {
 	HRESULT hr = S_OK;
 	errmsg.Empty();
@@ -6352,7 +6352,7 @@ bool CMainFrame::SaveDIB(LPCWSTR fn, BYTE* pData, long size)
 
 void CMainFrame::SaveImage(LPCWSTR fn, bool displayed)
 {
-	std::vector<BYTE> dib;
+	CSimpleBlock<BYTE> dib;
 	CString errmsg;
 	HRESULT hr;
 	if (displayed) {
@@ -6360,25 +6360,25 @@ void CMainFrame::SaveImage(LPCWSTR fn, bool displayed)
 	} else {
 		hr = GetCurrentFrame(dib, errmsg);
 		if (hr == S_OK) {
-			RenderCurrentSubtitles(dib.data());
+			RenderCurrentSubtitles(dib.Data());
 		}
 	}
 
-	if (hr == S_OK && dib.size()) {
+	if (hr == S_OK && dib.Size()) {
 		if (fn) {
-			bool ok = SaveDIB(fn, dib.data(), dib.size());
+			bool ok = SaveDIB(fn, dib.Data(), dib.Size());
 			if (ok) {
 				SendStatusCompactPath(fn);
 				m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_OSD_IMAGE_SAVED), 3000);
 			}
 		} else {
 			// Allocate a global memory object for the DIB
-			HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, dib.size());
+			HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, dib.Size());
 			if (hGlob) {
 				// Lock the handle and copy the DIB to the buffer
 				LPVOID pData = GlobalLock(hGlob);
 				if (pData) {
-					memcpy(pData, dib.data(), dib.size());
+					memcpy(pData, dib.Data(), dib.Size());
 					GlobalUnlock(hGlob);
 
 					if (OpenClipboard()) {

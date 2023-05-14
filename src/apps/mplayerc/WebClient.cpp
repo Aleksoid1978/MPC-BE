@@ -857,16 +857,16 @@ bool CWebClientSocket::OnSnapShotJpeg(CStringA& hdr, CStringA& body, CStringA& m
 		return true;
 	}
 
-	std::vector<BYTE> dib;
+	CSimpleBlock<BYTE> dib;
 	CString errmsg;
 
 	if (S_OK == m_pMainFrame->GetDisplayedImage(dib, errmsg) || S_OK == m_pMainFrame->GetCurrentFrame(dib, errmsg)) {
-		if (body.GetAllocLength() < dib.size()) {
-			body.Preallocate(dib.size());
+		if (body.GetAllocLength() < dib.Size()) {
+			body.Preallocate(dib.Size());
 		}
 		size_t dstLen = body.GetAllocLength();
 
-		if (WICDIB(L".jpg", dib.data(), AfxGetAppSettings().nWebServerQuality, (BYTE*)body.GetBuffer(), dstLen)) {
+		if (WICDIB(L".jpg", dib.Data(), AfxGetAppSettings().nWebServerQuality, (BYTE*)body.GetBuffer(), dstLen)) {
 			std::ignore = body.GetBufferSetLength(dstLen);
 
 			hdr +=
