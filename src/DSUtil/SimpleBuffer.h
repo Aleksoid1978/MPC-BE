@@ -66,4 +66,19 @@ public:
 			SetSize(newsize);
 		}
 	}
+
+	// Increase the size if necessary. Old data will be intact. The size will be rounded up to a multiple of 256 bytes.
+	void ExtendSizeNoDiscard(const size_t size)
+	{
+		size_t newsize = ((size * sizeof(T) + 255) & ~(size_t)255) / sizeof(T); // rounded up a multiple of 256 bytes.
+
+		if (newsize > m_size) {
+			size_t old_bytes = Bytes();
+			std::unique_ptr<T[]> old_data = std::move(m_data);
+			m_size = 0;
+
+			SetSize(newsize);
+			memcpy(m_data.get(), old_data.get(), old_bytes);
+		}
+	}
 };
