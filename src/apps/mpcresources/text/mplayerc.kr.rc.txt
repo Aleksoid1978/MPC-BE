@@ -594,7 +594,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
 7		"우선 형식 :"
 10		"60 fps"
 11		"HDR"
-12		"Preferred audio track language:"
+12		"선호하는 오디오 트랙 언어 :"
 14		"재생목록 열기"
 16		"youtube-dl, yt-dlp"
 17		"실행 파일 :"
