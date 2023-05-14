@@ -29,7 +29,6 @@
 #include "BaseSplitterFileEx.h"
 #include "BaseSplitterInputPin.h"
 #include "BaseSplitterOutputPin.h"
-#include "BaseSplitterParserOutputPin.h"
 #include "AsyncReader.h"
 #include "DSUtil/DSMPropertyBag.h"
 #include "DSUtil/FontInstaller.h"

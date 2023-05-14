@@ -22,6 +22,7 @@
 #pragma once
 
 #include "../BaseSplitter/BaseSplitter.h"
+#include "../BaseSplitter/BaseSplitterParserOutputPin.h"
 #include "MpegSplitterFile.h"
 #include "MpegSplitterSettingsWnd.h"
 #include "DSUtil/AudioParser.h"

@@ -22,6 +22,7 @@
 #include <MMReg.h>
 #include <moreuuids.h>
 #include "RawVideoSplitter.h"
+#include "../BaseSplitter/BaseSplitterParserOutputPin.h"
 #include "DSUtil/BitsWriter.h"
 #include "dxva2api.h"
 
