@@ -328,7 +328,8 @@ HRESULT CAudioFilter::Pull(REFERENCE_TIME& time_start, CSimpleBuffer<float>& sim
 
 		time_start = av_rescale(m_pFrame->pts, m_time_base.num * UNITS, m_time_base.den);
 		allsamples = m_pFrame->nb_samples * m_pFrame->ch_layout.nb_channels;
-		simpleBuffer.WriteData(0, (float*)m_pFrame->data[0], allsamples);
+		simpleBuffer.ExtendSize(allsamples);
+		memcpy(simpleBuffer.Data(), m_pFrame->data[0], allsamples * sizeof(float));
 	}
 	av_frame_unref(m_pFrame);
 

@@ -20,6 +20,7 @@
 
 #pragma once
 
+// CSimpleBlock - simple container
 template <typename T>
 class CSimpleBlock
 {
@@ -50,35 +51,19 @@ public:
 	auto& operator[](size_t i) noexcept { return m_data[i]; }
 };
 
-// CSimpleBuffer - fast and simple container
-// PS: When resizing the old data will be lost.
-
+// CSimpleBuffer - simple container for buffers.
+// Use the ExtendSize method to have a buffer of sufficient size.
 template <typename T>
 class CSimpleBuffer : public CSimpleBlock<T>
 {
 public:
 	// Increase the size if necessary. Old data may be lost. The size will be rounded up to a multiple of 256 bytes.
-	void ExpandSize(const size_t size)
+	void ExtendSize(const size_t size)
 	{
 		size_t newsize = ((size * sizeof(T) + 255) & ~(size_t)255) / sizeof(T); // rounded up a multiple of 256 bytes.
 
 		if (newsize > m_size) {
 			SetSize(newsize);
 		}
-	}
-
-	// Write to the buffer from the specified position. The data before the specified position will be saved.
-	void WriteData(size_t pos, const T* data, const size_t size)
-	{
-		size_t required_size = pos + size;
-
-		if (required_size > m_size) {
-			std::unique_ptr<T[]> new_data = std::make_unique<T[]>(required_size);
-			memcpy(new_data.get(), m_data.get(), pos * sizeof(T));
-			m_data = std::move(new_data);
-			m_size = required_size;
-		}
-
-		memcpy(m_data.get() + pos, data, size * sizeof(T));
 	}
 };

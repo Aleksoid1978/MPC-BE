@@ -1486,7 +1486,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt/* = nullptr*/
 bool CBaseSplitterFileEx::Read(avchdr& h, int len, std::vector<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
 {
 	if (pData.empty()) {
-		m_tmpBuffer.ExpandSize(len);
+		m_tmpBuffer.ExtendSize(len);
 		ByteRead(m_tmpBuffer.Data(), len);
 
 		NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
@@ -1642,7 +1642,7 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt/* = nullptr*
 bool CBaseSplitterFileEx::Read(hevchdr& h, int len, std::vector<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
 {
 	if (pData.empty()) {
-		m_tmpBuffer.ExpandSize(len);
+		m_tmpBuffer.ExtendSize(len);
 		ByteRead(m_tmpBuffer.Data(), len);
 
 		NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;

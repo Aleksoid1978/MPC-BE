@@ -281,7 +281,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 			}
 			mix_data = pDataOut;
 		} else {
-			m_buffer.ExpandSize(mix_samples * output_channels);
+			m_buffer.ExtendSize(mix_samples * output_channels);
 			mix_data = (BYTE*)m_buffer.Data();
 		}
 
@@ -312,7 +312,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	// Auto volume control (works in place, requires float)
 	if (m_bAutoVolumeControl) {
 		if (audio_sampleformat != SAMPLE_FMT_FLT) {
-			m_buffer.ExpandSize(audio_allsamples);
+			m_buffer.ExtendSize(audio_allsamples);
 			convert_to_float(audio_sampleformat, audio_channels, audio_samples, audio_data, m_buffer.Data());
 
 			audio_data = (BYTE*)m_buffer.Data();
@@ -353,7 +353,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		}
 		if (SUCCEEDED(hr)) {
 			if (audio_sampleformat != SAMPLE_FMT_FLT) {
-				m_buffer.ExpandSize(audio_allsamples);
+				m_buffer.ExtendSize(audio_allsamples);
 				convert_to_float(audio_sampleformat, audio_channels, audio_samples, audio_data, m_buffer.Data());
 
 				audio_data = (BYTE*)m_buffer.Data();

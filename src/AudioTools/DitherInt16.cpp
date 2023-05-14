@@ -1,5 +1,5 @@
 /*
- * (C) 2021 see Authors.txt
+ * (C) 2021-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -89,7 +89,7 @@ void CDitherInt16::Process(int16_t* pDst, BYTE* pSrc, const int samples)
 	case SAMPLE_FMT_S64:
 	case SAMPLE_FMT_S64P:
 	case SAMPLE_FMT_S24:
-		m_simpleBuffer.ExpandSize(samples * m_chanels);
+		m_simpleBuffer.ExtendSize(samples * m_chanels);
 		convert_to_float(m_sf, m_chanels, samples, pSrc, m_simpleBuffer.Data());
 		ProcessFloat(pDst, m_simpleBuffer.Data(), samples);
 		break;
