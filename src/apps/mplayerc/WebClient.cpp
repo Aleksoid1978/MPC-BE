@@ -861,8 +861,9 @@ bool CWebClientSocket::OnSnapShotJpeg(CStringA& hdr, CStringA& body, CStringA& m
 	CString errmsg;
 
 	if (S_OK == m_pMainFrame->GetDisplayedImage(dib, errmsg) || S_OK == m_pMainFrame->GetCurrentFrame(dib, errmsg)) {
-		if (body.GetAllocLength() < dib.Size()) {
-			body.Preallocate(dib.Size());
+		const int maxJpegSize = std::max<int>(32*KILOBYTE, dib.Size());
+		if (body.GetAllocLength() < maxJpegSize) {
+			body.Preallocate(maxJpegSize);
 		}
 		size_t dstLen = body.GetAllocLength();
 
