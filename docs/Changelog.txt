@@ -2,10 +2,29 @@
 
 1.6.7.x dev
 =============================
+ShoutcastSource
+Optimized work with the internal buffer.
+
+Subtitles
+Removed broken subtitle download from Online Subtitle Database.
+
 YouTube
 Fixed selection of the preferred audio track language for the built-in YouTube parser for MP4 720p and MP4 360p formats. When there are several languages, only DASH streams will be used.
+Updated yt-dlp support.
+
+Player
+Added the ability to choose the location of the playlist window in the playlist menu.
+The playlist is now on the right side by default.
+Fixed and accelerated the return of screenshots when using the Web-interface.
 
 Updated Dutch and Chinese (Traditional) translation (by beter).
+Updated Japanese translation (by tsubasanouta).
+Updated German translation (by Klaus1189).
+Updated Hungarian translation (by mickey).
+Updated Turkish translation (by cmhrky).
+Updated Chinese (Simplified) translation (by wushantao).
+Updated Italian translation (by mapi68).
+Updated Korean translation (by Hackjjang and Potmarigold).
 
 1.6.7
 =============================
