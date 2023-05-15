@@ -26,6 +26,7 @@ Updated Chinese (Simplified) translation (by wushantao).
 Updated Italian translation (by mapi68).
 Updated Korean translation (by Hackjjang and Potmarigold).
 
+
 1.6.7 - 2023-05-05
 =============================
 Windows Vista is no longer supported.
@@ -103,6 +104,7 @@ Updated libraries:
 	zlib 1.2.13;
 	rapidjson git-v1.1.0-727-g949c771b.
 
+
 1.6.6 - 2023-02-10
 =============================
 MPCStreamReader
@@ -173,9 +175,11 @@ Updated libraries:
 	MediaInfo git-v22.12-17-gaa0dc68a2;
 	nanosvg git-9da543e.
 
+
 1.6.5.3 - 2022-11-14
 =============================
 Fixed crash when playing AVS3 video on CPU without AVX instructions.
+
 
 1.6.5 - 2022-11-11
 =============================
@@ -238,6 +242,7 @@ Updated libraries:
 	Little-CMS git-lcms2.14rc1-3-g496293a;
 	MediaInfo git-v22.09-8-gb4863b677.
 
+
 1.6.4 - 2022-09-07
 =============================
 MPCStreamReader (MPC UDP/HTTP Reader)
@@ -295,6 +300,7 @@ Updated libraries:
 	MediaInfo git-v22.06-34-g90e59c5ed;
 	ZenLib git-v0.4.39-12-gde2787a;
 	nanosvg git-bd16c4e.
+
 
 1.6.3 - 2022-06-15
 =============================
@@ -407,6 +413,7 @@ Updated libraries:
 	ffmpeg git-n5.1-dev-188-gdcc9454ab9;
 	Little-CMS git-lcms2.13rc1-6-ge090fcf;
 	MediaInfo git-v21.09-72-ge481a58e7.
+
 
 1.6.0 - 2021-12-27
 =============================
@@ -559,6 +566,7 @@ Updated libraries:
 	rapidjson git-v1.1.0-630-gb557259f;
 	ZenLib git-v0.4.39-g13b9d3db.
 
+
 1.5.7 - 2021-04-15
 =============================
 VSFilter is excluded from the project.
@@ -635,6 +643,7 @@ Updated libraries:
 	rapidjson git-v1.1.0-588-g13dfc96c;
 	ZenLib git-v0.4.38-37-gd0c6f5b.
 
+
 1.5.6 - 2021-02-02
 =============================
 Splitters
@@ -656,7 +665,7 @@ Added basic support for AIFF format.
 
 AviSplitter
 Added support for AV1 video.
-Improved compatibility with some external H.264 video decoders. 
+Improved compatibility with some external H.264 video decoders.
 
 DVRSplitter
 Added support for Chinese KKmoon CCTV camera file format.
@@ -667,7 +676,7 @@ Added support for AV1 OBU files.
 MatroskaSplitter
 Fixed playback of some VFW type videos.
 Fixed reading HDR data for VP9.
-Added support for the "ProjectionPoseRoll" element, in which the frame rotation angle is recorded. 
+Added support for the "ProjectionPoseRoll" element, in which the frame rotation angle is recorded.
 
 MP4Splitter
 Added pixel format detection for DNxHD.
@@ -735,7 +744,7 @@ Fixed display of chapters in the search bar for some DVD-Videos.
 Various fixes in the player interface.
 
 Installer
-Added path to the player to the "App Paths" registry key. 
+Added path to the player to the "App Paths" registry key.
 
 Shell Extension
 Fixed freeze when opening files from qBittorrent.
@@ -757,6 +766,7 @@ Updated libraries:
 	MediaInfo git-v20.09-66-gacf041ac;
 	openjpeg git-v2.3.1-59-g0f169867;
 	ZenLib git-v0.4.38-25-g11a96d5.
+
 
 1.5.5 - 2020-08-23
 =============================
@@ -913,10 +923,10 @@ Updated libraries:
 	rapidjson git-v1.1.0-549-g8f4c021f;
 	ZenLib git-v0.4.38-13-g54d2f0d.
 
+
 1.5.4 - 2019-12-27
 =============================
-
-Splitters:
+Splitters
 Instead of the IBufferControl interface, the more universal IExFilterConfig interface is now used.
 
 ShoutcastSource
@@ -1073,9 +1083,9 @@ Updated libraries:
 	rapidjson git-v1.1.0-508-gd67a69a9;
 	ZenLib git-v0.4.37-50-gfef7392.
 
+
 1.5.3 - 2019-04-01
 =============================
-
 ShoutcastSource
 Added support for metadata written in json format.
 
@@ -1185,6 +1195,7 @@ Updated libraries:
 	rapidjson git-v1.1.0-461-gbfdcf491;
 	ZenLib git-v0.4.37-34-g641e243.
 
+
 1.5.2 - 2018-10-29
 ==============================
 Build in Visual Studio 2015 is no longer supported.
@@ -1266,7 +1277,6 @@ Fixed opening of some small files.
 Audiosplitter
 Added support for ID3v2 in the header of APE files.
 Updated ID3v2 support in WAV files.
-
 
 MpaDecFilter
 Fixed 16bit BD LPCM decoding.
@@ -1437,6 +1447,7 @@ Updated libraries:
 	soxr git-0.1.3-0-g945b592;
 	ZenLib git-v0.4.37-23-g4255a20;
 	ResizableLib v1.5.1.
+
 
 1.5.1 - 2017-10-10
 ==============================
@@ -1623,6 +1634,7 @@ Updated libraries:
 	ZenLib git-v0.4.36-10-g6f187cb;
 	zlib 1.2.11.
 
+
 1.5.0 - 2016-12-05
 ==============================
 Windows XP is no longer supported.
@@ -1794,6 +1806,7 @@ Updated libraries:
 	openjpeg 2.1.2 git-7113c4e;
 	soxr git-0.1.2-22-g5fa7eeb;
 	ZenLib git-v0.4.33-50-g586a518.
+
 
 1.4.6 - 2016-06-13
 ==============================
@@ -1994,6 +2007,7 @@ Updated libraries:
 	MediaInfo git-v0.7.85-25-g993690e;
 	Speex-1.2rc2-9-g9172c7e;
 	ZenLib git-v0.4.33-11-g4bdc103.
+
 
 1.4.5 - 2015-09-24
 ==============================
@@ -2280,9 +2294,9 @@ Updated libraries:
 	MediaInfo 0.7.72+ svn rev.6720;
 	ffmpeg git-g399e314.
 
+
 1.4.3 - 2015-01-17
 ==============================
-
 Removed AMRSplitter.
 Removed WVSplitter;
 
@@ -2495,18 +2509,12 @@ Updated libraries:
 	ZenLib 0.4.29+ svn rev.489;
 	jsoncpp 1.0.0.
 
-Legend:
-+ Added
-* Changed
-! Fixed
 
 1.4.2 - 2014-04-02
 ==============================
-
 Added (+):
 	+ MPCVideoDec - added support for decoding 'VP7';
 	 ... and many more.
-
 
 Changes (*):
 	* MPCVideoDec - add support MP4 H264 files with avcC atoms without any SPS/PPS (use code from LAV);
@@ -2518,7 +2526,6 @@ Changes (*):
 	* MediaInfo 0.7.67+ svn rev.6177;
 	 ... and many more.
 
-
 Fixes (!):
 	! Fixed parser .ass subtitles, leading to hang when loading subtitle;
 	! OSD is displayed on top of all windows;
@@ -2527,13 +2534,11 @@ Fixes (!):
 
 1.4.1 - 2014-03-26
 ==============================
-
 Changes (*):
 	* Renumbered versions - now it consists of three digits (MAJOR.MINOR.PATCH);
 	* MPCVideoDec - disable DXVA for WMV3 Complex profile;
 	* libpng 1.7.0 b35 git-3ac960f1;
 	 ... and many more.
-
 
 Fixes (!):
 	! Fixed crash when closing a window settings file associations when called from a UAC;
@@ -2544,7 +2549,6 @@ Fixes (!):
 
 1.4.0.3 - 2014-03-24
 ==============================
-
 Added (+):
 	+ added support for opening *.CUE;
 	+ added completely reengineered DXVA2 decoder;
@@ -2574,7 +2578,6 @@ Added (+):
 	+ added the 'Use Subresync' option;
 	+ video renderer statistics - added the 'GPU Load' indicator;
 	 ... and many more.
-
 
 Changes (*):
 	* AudioParser - minimal sound frequency for AAC-LATM is 8000 Hz (according to English Wikipedia);
@@ -2741,7 +2744,6 @@ Fixes (!):
 
 1.3.0.3 - 2013-11-03
 ==============================
-
 Added (+):
 	+ Added .ini file validity check before use (opening);
 	+ Added remembering of the active tab in the file properties' window;
@@ -2904,7 +2906,6 @@ Fixes (!):
 
 1.2.0.3 - 2013-06-18
 ==============================
-
 Added (+):
 	+ SPEEX decoder (Speex Audio);
 	+ MPC Audio Renderer - completely rewritten, now it fully supports WASAPI Exclusive/Shared modes. Uses event mode for rendering. Added internal volume control. Sound mute is also possible for Bitstream;
@@ -3070,7 +3071,6 @@ Changes (*):
 	* zlib 1.2.8;
 	 ... and many more.
 
-
 Fixes (!):
 	! Software video decoder: changed the method of transferring active codecs list to the decoder;
 	! Tracking AR changes not only in the stream, but also according to video size;
@@ -3162,7 +3162,6 @@ Added (+):
 	+ Possibility for opening images: bmp, jpeg, gif, png, psd, tiff, emf, ico, webp and webpll;
 	+ Youtube clip title is now shown in main window's title, seekbar and OSD;
 	 ... and many more.
-
 
 Changes (*):
 	* Improved Vorbis parser;
