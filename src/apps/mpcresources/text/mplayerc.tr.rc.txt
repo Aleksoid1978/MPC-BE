@@ -423,7 +423,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 27		"Dosya yerleşimini hatırla"
 28		"Son büyütme ayarlarını hatırla"
 29		"Ana oynatma listesini hatırla"
-31		"Display title for URL in recent files"
+31		"Son dosyalarda URL için başlığı göster"
 33		"Diğer"
 34		"Bildirim alanı simgesi göster"
 35		"OSD göster"
