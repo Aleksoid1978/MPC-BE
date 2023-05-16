@@ -15868,6 +15868,10 @@ void CMainFrame::SetupRecentFilesSubMenu()
 					str.SetString(L"YouTube - " + session.Title);
 					EllipsisText(str, 100);
 				}
+				else if (session.Title.GetLength()) {
+					str.SetString(L"URL - " + session.Title);
+					EllipsisText(str, 100);
+				}
 				else {
 					EllipsisURL(str, 100);
 				}

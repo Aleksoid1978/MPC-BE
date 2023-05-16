@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"プレイリストで選択されたトラックを記憶する"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 5		"開くオプション"
 6		"複数起動を禁止する"
 7		"同じプレーヤーで開く"
@@ -423,15 +423,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 27		"ファイルの再生位置を記憶する"
 28		"終了時の PnS 拡大率を記憶する"
 29		"メイン プレイリストを記憶する"
-30		"その他"
-31		"タスクトレイ アイコン"
-32		"OSD を表示する"
-33		"メディア ファイル名を表示する"
-34		"シーク タイムを表示する"
-35		"「ディスクを開く」のメニューを無効にする"
-36		"プロセスの優先度を 通常以上 にする"
-37		"ネットワーク タイムアウト:"
-40		"秒"
+31		"Display title for URL in recent files"
+33		"その他"
+34		"タスクトレイ アイコン"
+35		"OSD を表示する"
+36		"メディア ファイル名を表示する"
+37		"シーク タイムを表示する"
+38		"「ディスクを開く」のメニューを無効にする"
+39		"プロセスの優先度を 通常以上 にする"
+40		"ネットワーク タイムアウト:"
+43		"秒"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37

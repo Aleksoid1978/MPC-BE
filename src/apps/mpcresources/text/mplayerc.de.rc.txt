@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Ausgewählte Titel in der Wiedergabeliste merken"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 5		"Öffnen von Medien"
 6		"Einzelnen Prozess des Players erzwingen"
 7		"Mediendateien mit dem aktuellen Player öffnen"
@@ -423,15 +423,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 27		"Datei-Wiedergabeposition merken"
 28		"Letzten Pan&&Scan-Zoom merken"
 29		"Hauptwiedergabeliste speichern"
-30		"Weitere Einstellungen"
-31		"&Taskleistensymbol anzeigen"
-32		"OSD anzeigen (Neustart notwendig)"
-33		"Dateiname (bzw. Titel)"
-34		"Verstrichene/Verbleibende Zeit / Gesamtzeit"
-35		"Disc-Wiedergabe deaktivieren"
-36		"&Prozesspriorität höher als normal"
-37		"Netzwerk-Zeitüberschreitung:"
-40		"Sek."
+31		"Display title for URL in recent files"
+33		"Weitere Einstellungen"
+34		"&Taskleistensymbol anzeigen"
+35		"OSD anzeigen (Neustart notwendig)"
+36		"Dateiname (bzw. Titel)"
+37		"Verstrichene/Verbleibende Zeit / Gesamtzeit"
+38		"Disc-Wiedergabe deaktivieren"
+39		"&Prozesspriorität höher als normal"
+40		"Netzwerk-Zeitüberschreitung:"
+43		"Sek."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37

@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Remember selected tracks in playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 5		"Opțiuni pentru deschidere"
 6		"Force a single process"
 7		"Folosește același player pentru fiecare fișier media"
@@ -423,15 +423,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 27		"Ține minte poziția în fișier"
 28		"Ține minte ultima focalizare a Pan-n-Scan"
 29		"Remember main playlist"
-30		"Altele"
-31		"Pictogramă în zona de notificare"
-32		"Arată OSD (necesită repornire player)"
-33		"Show name of media file"
-34		"Show seek time"
-35		"Dezactivează meniul ""Deschide Disc"""
-36		"Prioritatea procesării peste normal"
-37		"Network timeout:"
-40		"sec."
+31		"Display title for URL in recent files"
+33		"Altele"
+34		"Pictogramă în zona de notificare"
+35		"Arată OSD (necesită repornire player)"
+36		"Show name of media file"
+37		"Show seek time"
+38		"Dezactivează meniul ""Deschide Disc"""
+39		"Prioritatea procesării peste normal"
+40		"Network timeout:"
+43		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37

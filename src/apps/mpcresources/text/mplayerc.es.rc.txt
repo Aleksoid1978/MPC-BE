@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Recordar pistas seleccionadas en la Lista de Reproducción"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 5		"Opciones de apertura"
 6		"Forzar un solo proceso"
 7		"Usar el mismo proceso para cada archivo"
@@ -423,15 +423,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 27		"Recordar posición del Archivo"
 28		"Recordar última ampliación Pan&&Scan"
 29		"Recordar Lista de Reproducción principal"
-30		"Otros"
-31		"Icono de bandeja"
-32		"Mostrar OSD (requiere reinicio)"
-33		"Mostrar nombre de archivo multimedia"
-34		"Mostrar tiempo de búsqueda"
-35		"Deshabilitar menú 'Abrir Disco'"
-36		"Mayor prioridad para el proceso"
-37		"Tiempo de espera de red:"
-40		"seg."
+31		"Display title for URL in recent files"
+33		"Otros"
+34		"Icono de bandeja"
+35		"Mostrar OSD (requiere reinicio)"
+36		"Mostrar nombre de archivo multimedia"
+37		"Mostrar tiempo de búsqueda"
+38		"Deshabilitar menú 'Abrir Disco'"
+39		"Mayor prioridad para el proceso"
+40		"Tiempo de espera de red:"
+43		"seg."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37

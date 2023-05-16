@@ -43,6 +43,7 @@ public:
 	BOOL m_bRememberFilePos;
 	BOOL m_bSavePnSZoom;
 	BOOL m_bRememberPlaylistItems;
+	BOOL m_bRecentFilesShowUrlTitle;
 	BOOL m_bTrayIcon;
 	BOOL m_bShowOSD;
 	BOOL m_bOSDFileName;

@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Ricorda brani selezionati nella playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 5		"Opzioni di apertura"
 6		"Forza un unico processo"
 7		"Usa la stessa procedura per ogni file"
@@ -423,15 +423,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 27		"Ricorda posizione File"
 28		"Ricorda ultimo zoom Pan&&Scan"
 29		"Ricorda playlist principale"
-30		"Altro"
-31		"Icona nell'area di notifica"
-32		"Mostra OSD"
-33		"Mostra nome del file multimediale"
-34		"Mostra tempo di ricerca"
-35		"Disabilita il menu ""Apri disco"""
-36		"Priorità del processo superiore al normale"
-37		"Timeout rete:"
-40		"sec."
+31		"Display title for URL in recent files"
+33		"Altro"
+34		"Icona nell'area di notifica"
+35		"Mostra OSD"
+36		"Mostra nome del file multimediale"
+37		"Mostra tempo di ricerca"
+38		"Disabilita il menu ""Apri disco"""
+39		"Priorità del processo superiore al normale"
+40		"Timeout rete:"
+43		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37

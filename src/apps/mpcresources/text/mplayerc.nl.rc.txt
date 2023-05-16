@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Onthoud geselecteerde items in de afspeellijst"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 5		"Opties voor openen"
 6		"Forceer een enkel proces"
 7		"Gebruik hetzelfde proces voor elk bestand"
@@ -423,15 +423,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 27		"Bestandspositie bewaren"
 28		"Laatste Pan&&Scan-zoom onthouden"
 29		"Hoofdafspeellijst onthouden"
-30		"Overige"
-31		"Pictogram in systeemvak"
-32		"Toon OSD (vereist herstart)"
-33		"Toon naam van mediabestand"
-34		"Toon gezochte tijd"
-35		"Menu ""Schijf openen"" uitschakelen"
-36		"Procesprioriteit ""hoger dan normaal"""
-37		"Netwerk time-out:"
-40		"sec."
+31		"Display title for URL in recent files"
+33		"Overige"
+34		"Pictogram in systeemvak"
+35		"Toon OSD (vereist herstart)"
+36		"Toon naam van mediabestand"
+37		"Toon gezochte tijd"
+38		"Menu ""Schijf openen"" uitschakelen"
+39		"Procesprioriteit ""hoger dan normaal"""
+40		"Netwerk time-out:"
+43		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37

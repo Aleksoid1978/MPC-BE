@@ -560,6 +560,7 @@ void CAppSettings::ResetSettings()
 
 	bKeepHistory = true;
 	bRecentFilesMenuEllipsis = true;
+	bRecentFilesShowUrlTitle = false;
 	nHistoryEntriesMax = 200;
 	bRememberDVDPos = false;
 	bRememberFilePos = false;
@@ -967,6 +968,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, bKeepHistory);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, iRecentFilesNumber, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_MENU_ELLIPSIS, bRecentFilesMenuEllipsis);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_SHOW_URL_TITLE, bRecentFilesShowUrlTitle);
 	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_HISTORY_ENTRIES_MAX, nHistoryEntriesMax, 100, 900);
 
 	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHUFFLE, bShufflePlaylistItems);
@@ -1602,6 +1604,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, bKeepHistory);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, iRecentFilesNumber);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_MENU_ELLIPSIS, bRecentFilesMenuEllipsis);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_SHOW_URL_TITLE, bRecentFilesShowUrlTitle);
 	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_HISTORY_ENTRIES_MAX, nHistoryEntriesMax);
 
 	// Window size

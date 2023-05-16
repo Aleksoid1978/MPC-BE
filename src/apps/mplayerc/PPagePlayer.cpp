@@ -35,6 +35,7 @@ CPPagePlayer::CPPagePlayer()
 	, m_bRememberFilePos(FALSE)
 	, m_bSavePnSZoom(FALSE)
 	, m_bRememberPlaylistItems(FALSE)
+	, m_bRecentFilesShowUrlTitle(FALSE)
 	, m_bTrayIcon(FALSE)
 	, m_bShowOSD(FALSE)
 	, m_bOSDFileName(FALSE)
@@ -63,6 +64,7 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_DVD_POS,  m_bRememberDVDPos);
 	DDX_Check(pDX, IDC_FILE_POS, m_bRememberFilePos);
 	DDX_Check(pDX, IDC_CHECK2,   m_bRememberPlaylistItems);
+	DDX_Check(pDX, IDC_CHECK4,   m_bRecentFilesShowUrlTitle);
 	DDX_Control(pDX, IDC_EDIT3,  m_edtHistoryEntriesMax);
 	DDX_Control(pDX, IDC_SPIN3,  m_spnHistoryEntriesMax);
 	DDX_Control(pDX, IDC_EDIT1,  m_edtRecentFiles);
@@ -122,6 +124,7 @@ BOOL CPPagePlayer::OnInitDialog()
 	m_bRememberDVDPos			= s.bRememberDVDPos;
 	m_bRememberFilePos			= s.bRememberFilePos;
 	m_bRememberPlaylistItems	= s.bRememberPlaylistItems;
+	m_bRecentFilesShowUrlTitle	= s.bRecentFilesShowUrlTitle;
 
 	UDACCEL acc;
 	m_edtHistoryEntriesMax.SetRange(100, 900);
@@ -222,9 +225,10 @@ BOOL CPPagePlayer::OnApply()
 			pFrame->m_OSD.Stop();
 		}
 	}
-	s.bRememberDVDPos = !!m_bRememberDVDPos;
-	s.bRememberFilePos = !!m_bRememberFilePos;
-	s.bRememberPlaylistItems = !!m_bRememberPlaylistItems;
+	s.bRememberDVDPos          = !!m_bRememberDVDPos;
+	s.bRememberFilePos         = !!m_bRememberFilePos;
+	s.bRememberPlaylistItems   = !!m_bRememberPlaylistItems;
+	s.bRecentFilesShowUrlTitle = !!m_bRecentFilesShowUrlTitle;
 
 	if (!m_bKeepHistory) {
 		// Empty the "Recent" jump list

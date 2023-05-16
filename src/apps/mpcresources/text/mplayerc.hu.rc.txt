@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Emlékezzen a kiválasztott zeneszámokra a lejátszási listában"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 5		"Megnyitási lehetőségek"
 6		"Kényszerítsen egyetlen folyamatot"
 7		"Használja ugyanazt a folyamatot minden fájlhoz"
@@ -423,15 +423,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 27		"Fájlpozíció megjegyzése"
 28		"Emlékezzen az utolsó Pan-n-Scan Zoomra"
 29		"Emlékezzen a fő lejátszási listára"
-30		"Egyéb"
-31		"Legyen tálca ikon"
-32		"OSD megjelenítése (újraindítást igényel)"
-33		"Médiafájl nevének megjelenítése"
-34		"Keresési idő megjelenítése"
-35		"Kikapcsolja az 'Open Disc' menüt"
-36		"A lejátszó prioritása normál érték felett"
-37		"Hálózat időtúllépése:"
-40		"mp."
+31		"Display title for URL in recent files"
+33		"Egyéb"
+34		"Legyen tálca ikon"
+35		"OSD megjelenítése (újraindítást igényel)"
+36		"Médiafájl nevének megjelenítése"
+37		"Keresési idő megjelenítése"
+38		"Kikapcsolja az 'Open Disc' menüt"
+39		"A lejátszó prioritása normál érték felett"
+40		"Hálózat időtúllépése:"
+43		"mp."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37

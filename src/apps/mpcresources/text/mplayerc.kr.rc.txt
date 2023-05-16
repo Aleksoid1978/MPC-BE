@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"재생 목록에서 선택한 트랙 기억"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 5		"열기 옵션"
 6		"프로세스 하나만 사용"
 7		"파일을 열 때마다 같은 재생기창 사용"
@@ -423,15 +423,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 27		"파일 위치 기억"
 28		"종료 시, 팬&스캔 확대율 기억"
 29		"메인 재생목록 기억"
-30		"기타"
-31		"트레이에 아이콘 보이기"
-32		"OSD 보이기 (다시 시작 필요)"
-33		"미디어 파일명 표기"
-34		"검색 시간 표기"
-35		"'디스크 열기' 메뉴 사용 안 함"
-36		"프로세스 우선순위 높이기"
-37		"네트워크 경과 시간 :"
-40		"초"
+31		"Display title for URL in recent files"
+33		"기타"
+34		"트레이에 아이콘 보이기"
+35		"OSD 보이기 (다시 시작 필요)"
+36		"미디어 파일명 표기"
+37		"검색 시간 표기"
+38		"'디스크 열기' 메뉴 사용 안 함"
+39		"프로세스 우선순위 높이기"
+40		"네트워크 경과 시간 :"
+43		"초"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37

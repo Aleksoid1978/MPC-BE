@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Zapamiętaj wybrane ścieżki na liście odtwarzania"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 5		"Otwieranie"
 6		"Wymuś pojedyńcze okno"
 7		"Użyj tego samego okna dla każdego pliku"
@@ -423,15 +423,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 27		"Pamiętaj położenie nagrania pliku"
 28		"Pamiętaj ustawienia skalowania i kadrowania"
 29		"Pamiętaj główną listę odtwarzania"
-30		"Inne"
-31		"Ikona obszaru powiadomień"
-32		"Menu ekranowe - OSD (wymagany restart)"
-33		"Pokaż nazwę pliku"
-34		"Pokaż czas postępu"
-35		"Ukrywaj menu „Otwórz płytę”"
-36		"Priorytet programu powyżej normalnego"
-37		"Limit czasu sieci:"
-40		"sek."
+31		"Display title for URL in recent files"
+33		"Inne"
+34		"Ikona obszaru powiadomień"
+35		"Menu ekranowe - OSD (wymagany restart)"
+36		"Pokaż nazwę pliku"
+37		"Pokaż czas postępu"
+38		"Ukrywaj menu „Otwórz płytę”"
+39		"Priorytet programu powyżej normalnego"
+40		"Limit czasu sieci:"
+43		"sek."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37

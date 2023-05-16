@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Remember selected tracks in playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 5		"Բացելու ընտրանքներ"
 6		"Force a single process"
 7		"Use same process for every file"
@@ -423,15 +423,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 27		"Հիշել ֆայլի դիրքը"
 28		"Հիշել վերջին Pan-n-Scan չափը"
 29		"Remember main playlist"
-30		"Այլ"
-31		"Պատկերակը առաջադրանքների վահանակ."
-32		"Ցուցադրել OSD-ն (պահ.է վերամեկնարկում)"
-33		"Show name of media file"
-34		"Show seek time"
-35		"Անջատել 'Բացել սկավառակը' ընտրացանկը"
-36		"Գործողության բարձր առաջնայնություն"
-37		"Network timeout:"
-40		"sec."
+31		"Display title for URL in recent files"
+33		"Այլ"
+34		"Պատկերակը առաջադրանքների վահանակ."
+35		"Ցուցադրել OSD-ն (պահ.է վերամեկնարկում)"
+36		"Show name of media file"
+37		"Show seek time"
+38		"Անջատել 'Բացել սկավառակը' ընտրացանկը"
+39		"Գործողության բարձր առաջնայնություն"
+40		"Network timeout:"
+43		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37

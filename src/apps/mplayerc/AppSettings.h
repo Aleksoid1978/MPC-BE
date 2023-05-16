@@ -540,6 +540,7 @@ public:
 	bool			bKeepHistory;
 	int				iRecentFilesNumber;
 	bool			bRecentFilesMenuEllipsis;
+	bool			bRecentFilesShowUrlTitle;
 	unsigned		nHistoryEntriesMax;
 	bool			bRememberDVDPos;
 	bool			bRememberFilePos;

@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Oynatma listesindeki seçili parçaları hatırla"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 5		"Açılış ayarları"
 6		"Tek oynatıcı için zorla"
 7		"Her dosya için benzer oynatıcı"
@@ -423,15 +423,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 27		"Dosya yerleşimini hatırla"
 28		"Son büyütme ayarlarını hatırla"
 29		"Ana oynatma listesini hatırla"
-30		"Diğer"
-31		"Bildirim alanı simgesi göster"
-32		"OSD göster"
-33		"Dosya adını göster"
-34		"Atlama zamanını göster"
-35		"Disk Açma özelliğini devre dışı bırak"
-36		"İşlem önceliğini normalden yüksek tut"
-37		"Ağ zaman aşımı:"
-40		"sn."
+31		"Display title for URL in recent files"
+33		"Diğer"
+34		"Bildirim alanı simgesi göster"
+35		"OSD göster"
+36		"Dosya adını göster"
+37		"Atlama zamanını göster"
+38		"Disk Açma özelliğini devre dışı bırak"
+39		"İşlem önceliğini normalden yüksek tut"
+40		"Ağ zaman aşımı:"
+43		"sn."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37

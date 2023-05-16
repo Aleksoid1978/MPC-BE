@@ -261,7 +261,7 @@ BEGIN
     CONTROL         "Windows-Registry",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | BS_TOP | WS_GROUP,10,153,106,10
     CONTROL         "Benutzerprofil",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,166,106,10
     CONTROL         "Programm-Ordner",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,180,106,10
-    GROUPBOX        "Chronik und Position",IDC_STATIC,124,5,167,103,WS_GROUP
+    GROUPBOX        "Chronik und Position",IDC_STATIC,124,5,167,121,WS_GROUP
     CONTROL         "&Chronik anlegen",IDC_CHECK1,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,17,156,9
     LTEXT           "Maximale Anzahl an Einträgen:",IDC_STATIC,129,31,110,8
@@ -274,17 +274,20 @@ BEGIN
     CONTROL         "Datei-Wiedergabeposition merken",IDC_FILE_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,72,158,9
     CONTROL         "Letzten Pan&&Scan-Zoom merken",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,84,156,9
     CONTROL         "Hauptwiedergabeliste speichern",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,96,156,9
-    GROUPBOX        "Weitere Einstellungen",IDC_STATIC,124,112,167,101,WS_GROUP
-    CONTROL         "&Taskleistensymbol anzeigen",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,124,156,9
-    CONTROL         "OSD anzeigen (Neustart notwendig)",IDC_SHOW_OSD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,136,156,9
-    CONTROL         "Dateiname (bzw. Titel)",IDC_CHECK14,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,138,148,148,9
-    CONTROL         "Verstrichene/Verbleibende Zeit / Gesamtzeit",IDC_CHECK15,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,138,160,148,9
-    CONTROL         "Disc-Wiedergabe deaktivieren",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,173,156,9
-    CONTROL         "&Prozesspriorität höher als normal",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,185,156,9
-    LTEXT           "Netzwerk-Zeitüberschreitung:",IDC_STATIC,129,199,96,8
-    EDITTEXT        IDC_EDIT2,230,197,29,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,248,197,11,13
-    LTEXT           "Sek.",IDC_STATIC,263,199,26,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,129,108,158,1
+    CONTROL         "Display title for URL in recent files",IDC_CHECK4,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,112,156,9
+    GROUPBOX        "Weitere Einstellungen",IDC_STATIC,124,130,167,101,WS_GROUP
+    CONTROL         "&Taskleistensymbol anzeigen",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,142,156,9
+    CONTROL         "OSD anzeigen (Neustart notwendig)",IDC_SHOW_OSD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,154,156,9
+    CONTROL         "Dateiname (bzw. Titel)",IDC_CHECK14,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,138,166,148,9
+    CONTROL         "Verstrichene/Verbleibende Zeit / Gesamtzeit",IDC_CHECK15,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,138,178,148,9
+    CONTROL         "Disc-Wiedergabe deaktivieren",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,191,156,9
+    CONTROL         "&Prozesspriorität höher als normal",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,203,156,9
+    LTEXT           "Netzwerk-Zeitüberschreitung:",IDC_STATIC,129,217,96,8
+    EDITTEXT        IDC_EDIT2,230,215,29,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,248,215,11,13
+    LTEXT           "Sek.",IDC_STATIC,263,217,26,8
 END
 
 IDD_PPAGEDVD DIALOGEX 0, 0, 296, 264
@@ -2344,10 +2347,14 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PLAYLIST_POSITION "Position"
+    IDS_PLAYLIST_POSITION   "Position"
     IDS_PLAYLIST_POSITION_LEFT "Links"
     IDS_PLAYLIST_POSITION_TOP "Oben"
     IDS_PLAYLIST_POSITION_RIGHT "Rechts"
+END
+
+STRINGTABLE
+BEGIN
     IDS_PLAYLIST_POSITION_BOTTOM "Unten"
     IDS_PLAYLIST_POSITION_FLOAT "Frei"
 END

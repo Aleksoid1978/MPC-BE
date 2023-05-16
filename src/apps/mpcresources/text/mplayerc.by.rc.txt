@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Remember selected tracks in playlist"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 5		"Адкрываць файлы выкарыст."
 6		"Force a single process"
 7		"Use same process for every file"
@@ -423,15 +423,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 27		"Пры выхадзе запомніць пазіцыю ў файле"
 28		"Remember last Pan-n-Scan Zoom"
 29		"Remember main playlist"
-30		"Іншае"
-31		"Значок у панэлі задач"
-32		"Паказаць OSD (патрабуецца перазапуск)"
-33		"Show name of media file"
-34		"Show seek time"
-35		"Disable 'Open Disc' menu"
-36		"Падвышаны прыярытэт працэсу"
-37		"Network timeout:"
-40		"sec."
+31		"Display title for URL in recent files"
+33		"Іншае"
+34		"Значок у панэлі задач"
+35		"Паказаць OSD (патрабуецца перазапуск)"
+36		"Show name of media file"
+37		"Show seek time"
+38		"Disable 'Open Disc' menu"
+39		"Падвышаны прыярытэт працэсу"
+40		"Network timeout:"
+43		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37

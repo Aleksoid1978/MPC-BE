@@ -282,6 +282,7 @@
 #define IDS_RS_KEEPHISTORY					L"KeepHistory"
 #define IDS_RS_RECENT_FILES_NUMBER			L"RecentFilesNumber"
 #define IDS_RS_RECENT_FILES_MENU_ELLIPSIS	L"RecentFilesMenuEllipsis"
+#define IDS_RS_RECENT_FILES_SHOW_URL_TITLE	L"RecentFilesShowUrlTitle"
 #define IDS_RS_HISTORY_ENTRIES_MAX			L"HistoryEntriesMax"
 #define IDS_RS_LOGOID						L"LogoID2"
 #define IDS_RS_LOGOEXT						L"LogoExt"

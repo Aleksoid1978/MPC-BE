@@ -404,7 +404,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
 41		"Zapamti izabrane zapise iz playliste"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 5		"Mogućnosti Otvaranja"
 6		"Forsiraj kao jedan proces"
 7		"UKoristi isti proces za svaku datoteku"
@@ -423,15 +423,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 41
 27		"Zapamti poziciju datoteke"
 28		"Zapamti zadnji Pan-n-Scan Zoom"
 29		"Zapamti glavnu playlistu"
-30		"Ostalo"
-31		"Tray ikona"
-32		"Pokaži OSD"
-33		"Pokaži ime medijske datoteke"
-34		"Pokaži vrijeme pretrage"
-35		"Onesposobi izbornik 'Otvori Disk'"
-36		"Procesiraj prioritet iznad normalnog"
-37		"Mrežna stanka:"
-40		"sek."
+31		"Display title for URL in recent files"
+33		"Ostalo"
+34		"Tray ikona"
+35		"Pokaži OSD"
+36		"Pokaži ime medijske datoteke"
+37		"Pokaži vrijeme pretrage"
+38		"Onesposobi izbornik 'Otvori Disk'"
+39		"Procesiraj prioritet iznad normalnog"
+40		"Mrežna stanka:"
+43		"sek."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
