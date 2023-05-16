@@ -263,7 +263,7 @@ CString CPlaylistItem::GetLabel(int i)
 						str = str.Right(str.GetLength() - pos - 1);
 					}
 				}
-				m_label = str.TrimRight(L'/');
+				//m_label = str.TrimRight(L'/');
 			}
 			else {
 				str = GetFileOnly(fn);
