@@ -15863,16 +15863,15 @@ void CMainFrame::SetupRecentFilesSubMenu()
 			CString str(session.Path);
 
 			if (PathIsURLW(str)) {
-				if (session.Title.GetLength()
-						&& (Youtube::CheckURL(str))) {
-					str.SetString(L"YouTube - " + session.Title);
+				if (s.bRecentFilesShowUrlTitle && session.Title.GetLength()) {
+					if (Youtube::CheckURL(str)) {
+						str.SetString(L"YouTube - " + session.Title);
+					} else {
+						str.SetString(L"URL - " + session.Title);
+					}
+
 					EllipsisText(str, 100);
-				}
-				else if (session.Title.GetLength()) {
-					str.SetString(L"URL - " + session.Title);
-					EllipsisText(str, 100);
-				}
-				else {
+				} else {
 					EllipsisURL(str, 100);
 				}
 			}
