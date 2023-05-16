@@ -831,34 +831,34 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 		m.CreatePopupMenu();
 
 		if (m_mode == VOBSUB || m_mode == TEXTSUB) {
-			m.AppendMenu(MF_STRING | MF_ENABLED, TOGSEP, ResStr(IDS_SUBRESYNC_SEPARATOR));
-			m.AppendMenu(MF_SEPARATOR);
+			m.AppendMenuW(MF_STRING | MF_ENABLED, TOGSEP, ResStr(IDS_SUBRESYNC_SEPARATOR));
+			m.AppendMenuW(MF_SEPARATOR);
 			if (m_mode == TEXTSUB) {
-				m.AppendMenu(MF_STRING | MF_ENABLED, DUPITEM, ResStr(IDS_SUBRESYNC_DUPLICATE));
+				m.AppendMenuW(MF_STRING | MF_ENABLED, DUPITEM, ResStr(IDS_SUBRESYNC_DUPLICATE));
 			}
-			m.AppendMenu(MF_STRING | MF_ENABLED, DELITEM, ResStr(IDS_SUBRESYNC_DELETE));
+			m.AppendMenuW(MF_STRING | MF_ENABLED, DELITEM, ResStr(IDS_SUBRESYNC_DELETE));
 		}
 
 		switch (lpnmlv->iSubItem) {
 			case COL_START:
 				if (m_mode == VOBSUB || m_mode == TEXTSUB) {
-					m.AppendMenu(MF_SEPARATOR);
-					m.AppendMenu(MF_STRING | MF_ENABLED, RESETS, ResStr(IDS_SUBRESYNC_RESET) + L"\tF1");
-					m.AppendMenu(MF_STRING | MF_ENABLED, SETOS, ResStr(IDS_SUBRESYNC_ORIGINAL) + L"\tF3");
-					m.AppendMenu(MF_STRING | MF_ENABLED, SETCS, ResStr(IDS_SUBRESYNC_CURRENT) + L"\tF5");
+					m.AppendMenuW(MF_SEPARATOR);
+					m.AppendMenuW(MF_STRING | MF_ENABLED, RESETS, ResStr(IDS_SUBRESYNC_RESET) + L"\tF1");
+					m.AppendMenuW(MF_STRING | MF_ENABLED, SETOS, ResStr(IDS_SUBRESYNC_ORIGINAL) + L"\tF3");
+					m.AppendMenuW(MF_STRING | MF_ENABLED, SETCS, ResStr(IDS_SUBRESYNC_CURRENT) + L"\tF5");
 				}
 				break;
 			case COL_END:
 				if (m_mode == TEXTSUB) {
-					m.AppendMenu(MF_SEPARATOR);
-					m.AppendMenu(MF_STRING | MF_ENABLED, RESETE, ResStr(IDS_SUBRESYNC_RESET) + L"\tF2");
-					m.AppendMenu(MF_STRING | MF_ENABLED, SETOE, ResStr(IDS_SUBRESYNC_ORIGINAL) + L"\tF4");
-					m.AppendMenu(MF_STRING | MF_ENABLED, SETCE, ResStr(IDS_SUBRESYNC_CURRENT) + L"\tF6");
+					m.AppendMenuW(MF_SEPARATOR);
+					m.AppendMenuW(MF_STRING | MF_ENABLED, RESETE, ResStr(IDS_SUBRESYNC_RESET) + L"\tF2");
+					m.AppendMenuW(MF_STRING | MF_ENABLED, SETOE, ResStr(IDS_SUBRESYNC_ORIGINAL) + L"\tF4");
+					m.AppendMenuW(MF_STRING | MF_ENABLED, SETCE, ResStr(IDS_SUBRESYNC_CURRENT) + L"\tF6");
 				}
 				break;
 			case COL_STYLE:
 				if (m_mode == TEXTSUB) {
-					m.AppendMenu(MF_SEPARATOR);
+					m.AppendMenuW(MF_SEPARATOR);
 
 					int id = STYLEFIRST;
 
@@ -868,27 +868,27 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 						STSStyle* val;
 						m_sts.m_styles.GetNextAssoc(pos, key, val);
 						styles.Add(key);
-						m.AppendMenu(MF_STRING | MF_ENABLED, id++, key);
+						m.AppendMenuW(MF_STRING | MF_ENABLED, id++, key);
 					}
 
 					if (id > STYLEFIRST && m_list.GetSelectedCount() == 1) {
-						m.AppendMenu(MF_SEPARATOR);
-						m.AppendMenu(MF_STRING | MF_ENABLED, STYLEEDIT, ResStr(IDS_SUBRESYNC_EDIT));
+						m.AppendMenuW(MF_SEPARATOR);
+						m.AppendMenuW(MF_STRING | MF_ENABLED, STYLEEDIT, ResStr(IDS_SUBRESYNC_EDIT));
 					}
 				}
 				break;
 			case COL_UNICODE:
 				if (m_mode == TEXTSUB) {
-					m.AppendMenu(MF_SEPARATOR);
-					m.AppendMenu(MF_STRING | MF_ENABLED, UNICODEYES, ResStr(IDS_SUBRESYNC_YES));
-					m.AppendMenu(MF_STRING | MF_ENABLED, UNICODENO, ResStr(IDS_SUBRESYNC_NO));
+					m.AppendMenuW(MF_SEPARATOR);
+					m.AppendMenuW(MF_STRING | MF_ENABLED, UNICODEYES, ResStr(IDS_SUBRESYNC_YES));
+					m.AppendMenuW(MF_STRING | MF_ENABLED, UNICODENO, ResStr(IDS_SUBRESYNC_NO));
 				}
 				break;
 			case COL_LAYER:
 				if (m_mode == TEXTSUB) {
-					m.AppendMenu(MF_SEPARATOR);
-					m.AppendMenu(MF_STRING | MF_ENABLED, LAYERDEC, ResStr(IDS_SUBRESYNC_DECREASE));
-					m.AppendMenu(MF_STRING | MF_ENABLED, LAYERINC, ResStr(IDS_SUBRESYNC_INCREASE));
+					m.AppendMenuW(MF_SEPARATOR);
+					m.AppendMenuW(MF_STRING | MF_ENABLED, LAYERDEC, ResStr(IDS_SUBRESYNC_DECREASE));
+					m.AppendMenuW(MF_STRING | MF_ENABLED, LAYERINC, ResStr(IDS_SUBRESYNC_INCREASE));
 				}
 				break;
 			case COL_ACTOR:
@@ -902,7 +902,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 					actormap.RemoveKey(L"");
 
 					if (!actormap.IsEmpty()) {
-						m.AppendMenu(MF_SEPARATOR);
+						m.AppendMenuW(MF_SEPARATOR);
 
 						int id = ACTORFIRST;
 
@@ -914,7 +914,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 
 							actors.Add(key);
 
-							m.AppendMenu(MF_STRING | MF_ENABLED, id++, key);
+							m.AppendMenuW(MF_STRING | MF_ENABLED, id++, key);
 						}
 					}
 				}
@@ -930,7 +930,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 					effectmap.RemoveKey(L"");
 
 					if (!effectmap.IsEmpty()) {
-						m.AppendMenu(MF_SEPARATOR);
+						m.AppendMenuW(MF_SEPARATOR);
 
 						int id = EFFECTFIRST;
 
@@ -942,7 +942,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 
 							effects.Add(key);
 
-							m.AppendMenu(MF_STRING | MF_ENABLED, id++, key);
+							m.AppendMenuW(MF_STRING | MF_ENABLED, id++, key);
 						}
 					}
 				}

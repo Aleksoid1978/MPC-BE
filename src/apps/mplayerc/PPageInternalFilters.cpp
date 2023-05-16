@@ -254,9 +254,9 @@ void CPPageInternalFiltersListBox::OnRButtonDown(UINT nFlags, CPoint point)
 	}
 
 	UINT state = (totalChecked != totalFilters) ? MF_ENABLED : MF_GRAYED;
-	m.AppendMenu(MF_STRING | state, ENABLE_ALL, ResStr(IDS_ENABLE_ALL_FILTERS));
+	m.AppendMenuW(MF_STRING | state, ENABLE_ALL, ResStr(IDS_ENABLE_ALL_FILTERS));
 	state = (totalChecked != 0) ? MF_ENABLED : MF_GRAYED;
-	m.AppendMenu(MF_STRING | state, DISABLE_ALL, ResStr(IDS_DISABLE_ALL_FILTERS));
+	m.AppendMenuW(MF_STRING | state, DISABLE_ALL, ResStr(IDS_DISABLE_ALL_FILTERS));
 
 	CPoint p = point;
 	::MapWindowPoints(m_hWnd, HWND_DESKTOP, &p, 1);

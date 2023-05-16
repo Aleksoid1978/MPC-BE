@@ -80,7 +80,7 @@ void CPlayerStatusBar::SetMenu()
 	m_TimeMenu.DestroyMenu();
 
 	m_TimeMenu.CreatePopupMenu();
-	m_TimeMenu.AppendMenu(MF_STRING | MF_UNCHECKED, ID_SHOW_MILLISECONDS, ResStr(ID_SHOW_MILLISECONDS));
+	m_TimeMenu.AppendMenuW(MF_STRING | MF_UNCHECKED, ID_SHOW_MILLISECONDS, ResStr(ID_SHOW_MILLISECONDS));
 
 	m_pMainFrame->SetColorMenu(m_TimeMenu);
 }
