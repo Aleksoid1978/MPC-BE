@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2022 see Authors.txt
+ * (C) 2014-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,71 +20,100 @@
 
 #pragma once
 
-#include <basestruct.h>
+#include <mpc_defines.h>
 
 // A dynamic buffer with a guaranteed padded block at the end and no member initialization.
 class CPaddedBuffer
 {
 private:
-	std::vector<NoInitByte> m_data;
+	uint8_t* m_data = nullptr;
+	size_t   m_size = 0;
+	size_t   m_capacity = 0;
 	const size_t m_padsize;
+	const size_t m_alignment;
 
 public:
-	CPaddedBuffer(size_t padsize)
+	CPaddedBuffer(size_t padsize, size_t alignment = 16)
 		: m_padsize(padsize)
+		, m_alignment(alignment)
 	{
 	}
+	~CPaddedBuffer()
+	{
+		Clear();
+	}
 
+private:
+	bool Reallocate(const size_t size)
+	{
+		size_t capacity = size + m_padsize;
+
+		if (capacity <= m_capacity) {
+			return true;
+		}
+
+		uint8_t* ptr = (uint8_t*)_aligned_realloc(m_data, capacity, m_alignment);
+		if (ptr) {
+			m_data = ptr;
+			m_capacity = capacity;
+			return true;
+		}
+
+		return false;
+	}
+
+public:
 	uint8_t* Data()
 	{
-		return (uint8_t*)m_data.data(); // don't use "&front().value" here, because it does not work for an empty array
+		return m_data;
 	}
 
 	size_t Size()
 	{
-		const size_t count = m_data.size();
-		return (count > m_padsize) ? count - m_padsize : 0;
+		return m_size;
 	}
 
-	bool Resize(const size_t count)
+	bool Resize(const size_t size)
 	{
-		try {
-			m_data.resize(count + m_padsize);
+		bool ok = Reallocate(size);
+		if (ok) {
+			m_size = size;
+			memset(m_data + m_size, 0, m_padsize);
 		}
-		catch (...) {
-			return false;
-		}
-		memset(Data() + count, 0, m_padsize);
-		return true;
+
+		return ok;
 	}
 
 	void Clear()
 	{
-		m_data.clear();
+		_aligned_free(m_data);
+		m_data = nullptr;
+		m_size = 0;
+		m_capacity = 0;
 	}
 
 	bool Append(uint8_t* p, const size_t count)
 	{
-		const size_t oldsize = Size();
-		const size_t newsize = oldsize + count;
-		if (Resize(newsize)) {
-			memcpy(Data() + oldsize, p, count);
-			memset(Data() + newsize, 0, m_padsize);
-			return true;
+		const size_t newsize = m_size + count;
+		bool ok = Reallocate(newsize);
+		if (ok) {
+			memcpy(m_data + m_size, p, count);
+			m_size = newsize;
+			memset(m_data + m_size, 0, m_padsize);
 		}
-		return false;
+		return ok;
 	}
 
 	void RemoveHead(const size_t count)
 	{
-		const size_t oldsize = Size();
-		if (count >= oldsize) {
-			Clear();
-		} else {
-			const size_t newsize = oldsize - count;
-			memmove(Data(), Data() + count, newsize);
-			memset(Data() + newsize, 0, m_padsize);
-			m_data.resize(newsize + m_padsize);
+		if (count < m_size) {
+			const size_t newsize = m_size - count;
+			memmove(m_data, m_data + count, newsize);
+			m_size = newsize;
+			memset(m_data + m_size, 0, m_padsize);
+		} 
+		else {
+			m_size = 0;
 		}
 	}
 };

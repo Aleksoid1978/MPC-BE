@@ -53,16 +53,6 @@
 #define OPTION_SPDIF_dtshd  L"HDMI_dtshd"
 #define OPTION_SPDIF_ac3enc L"SPDIF_ac3enc"
 
-#define PADDING_SIZE        AV_INPUT_BUFFER_PADDING_SIZE
-/** ffmpeg\libavcodec\avcodec.h - AV_INPUT_BUFFER_PADDING_SIZE
-* @ingroup lavc_decoding
-* Required number of additionally allocated bytes at the end of the input bitstream for decoding.
-* This is mainly needed because some optimized bitstream readers read
-* 32 or 64 bit at once and could read over the end.
-* Note: If the first 23 bits of the additional bytes are not 0, then damaged
-* MPEG bitstreams could cause overread and segfault.
-*/
-
 #define BS_HEADER_SIZE          8
 #define BS_AC3_SIZE          6144
 #define BS_DTS_SIZE          2048
@@ -291,7 +281,7 @@ static const SampleFormat MPCtoSamplefmt[sfcount] = {
 CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CTransformFilter(L"CMpaDecFilter", lpunk, __uuidof(this))
 	, m_CodecId(AV_CODEC_ID_NONE)
-	, m_buff(PADDING_SIZE)
+	, m_buff(AV_INPUT_BUFFER_PADDING_SIZE)
 	, m_JitterLimit(MAX_JITTER)
 	, m_rtStartInput(INVALID_TIME)
 	, m_rtStopInput(INVALID_TIME)
