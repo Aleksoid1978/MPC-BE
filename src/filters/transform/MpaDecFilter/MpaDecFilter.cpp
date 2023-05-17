@@ -281,7 +281,8 @@ static const SampleFormat MPCtoSamplefmt[sfcount] = {
 CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CTransformFilter(L"CMpaDecFilter", lpunk, __uuidof(this))
 	, m_CodecId(AV_CODEC_ID_NONE)
-	, m_buff(AV_INPUT_BUFFER_PADDING_SIZE)
+	, m_buff(AV_INPUT_BUFFER_PADDING_SIZE, 32)
+	, m_buffRA(AV_INPUT_BUFFER_PADDING_SIZE, 32)
 	, m_JitterLimit(MAX_JITTER)
 	, m_rtStartInput(INVALID_TIME)
 	, m_rtStopInput(INVALID_TIME)
@@ -804,13 +805,12 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 	BYTE* p = base;
 
 	// RealAudio
-	CPaddedBuffer buffRA(AV_INPUT_BUFFER_PADDING_SIZE);
 	bool isRA = false;
 	if (nCodecId == AV_CODEC_ID_ATRAC3 || nCodecId == AV_CODEC_ID_COOK || nCodecId == AV_CODEC_ID_SIPR) {
-		hr = m_FFAudioDec.RealPrepare(p, int(end - p), buffRA);
+		hr = m_FFAudioDec.RealPrepare(p, int(end - p), m_buffRA);
 		if (hr == S_OK) {
-			p = buffRA.Data();
-			end = p + buffRA.Size();
+			p = m_buffRA.Data();
+			end = p + m_buffRA.Size();
 			isRA = true;
 
 			m_rtStartInput = m_rtStartInputCache;
@@ -852,7 +852,7 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 	}
 
 	if (isRA) { // RealAudio
-		p = base + buffRA.Size();
+		p = base + m_buffRA.Size();
 		end = base + m_buff.Size();
 	}
 

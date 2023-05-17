@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -70,6 +70,7 @@ class __declspec(uuid("3D446B6F-71DE-4437-BE15-8CE47174340F"))
 
 	CCritSec        m_csReceive;
 	CPaddedBuffer   m_buff;
+	CPaddedBuffer   m_buffRA;
 
 	REFERENCE_TIME  m_rtStart = 0;
 	double          m_dStartOffset = 0.0;

@@ -47,6 +47,7 @@ private:
 	bool Reallocate(const size_t size)
 	{
 		size_t capacity = size + m_padsize;
+		capacity = ALIGN(capacity, 256);
 
 		if (capacity <= m_capacity) {
 			return true;
