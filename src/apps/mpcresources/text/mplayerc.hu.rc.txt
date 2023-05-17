@@ -423,7 +423,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 27		"Fájlpozíció megjegyzése"
 28		"Emlékezzen az utolsó Pan-n-Scan Zoomra"
 29		"Emlékezzen a fő lejátszási listára"
-31		"Display title for URL in recent files"
+31		"Az URL címének megjelenítése a legutóbbi fájlokban"
 33		"Egyéb"
 34		"Legyen tálca ikon"
 35		"OSD megjelenítése (újraindítást igényel)"

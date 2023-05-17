@@ -275,7 +275,7 @@ BEGIN
     CONTROL         "Emlékezzen az utolsó Pan-n-Scan Zoomra",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,84,156,9
     CONTROL         "Emlékezzen a fő lejátszási listára",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,96,156,9
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,129,108,158,1
-    CONTROL         "Display title for URL in recent files",IDC_CHECK4,
+    CONTROL         "Az URL címének megjelenítése a legutóbbi fájlokban",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,112,156,9
     GROUPBOX        "Egyéb",IDC_STATIC,124,130,167,101,WS_GROUP
     CONTROL         "Legyen tálca ikon",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,142,156,9
