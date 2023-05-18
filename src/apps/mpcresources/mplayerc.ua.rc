@@ -275,7 +275,7 @@ BEGIN
     CONTROL         "Запам'ятов. останнє значення Pan-n-Scan",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,84,156,9
     CONTROL         "Запам'ятов. основний список відтворення",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,96,156,9
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,129,108,158,1
-    CONTROL         "Display title for URL in recent files",IDC_CHECK4,
+    CONTROL         "Показувати заголовок для URL у останніх відкр. файлах",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,112,156,9
     GROUPBOX        "Інше",IDC_STATIC,124,130,167,101,WS_GROUP
     CONTROL         "Значок у панелі задач",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,142,156,9
@@ -1817,7 +1817,7 @@ BEGIN
             MENUITEM "&Запис",                ID_VIEW_CAPTURE
             MENUITEM "Редактор &шейдерів",    ID_VIEW_SHADEREDITOR
             MENUITEM "Навігація",                   ID_VIEW_NAVIGATION
-            MENUITEM "&Мова (&Language)",                   ID_SUBMENU_LANGUAGE
+            MENUITEM "Мова (&Language)",                   ID_SUBMENU_LANGUAGE
             POPUP "&Компоновка"
             BEGIN
                 MENUITEM "&Мінімальна",                 ID_VIEW_PRESETS_MINIMAL
@@ -1896,7 +1896,7 @@ BEGIN
             MENUITEM "&Запис",                ID_VIEW_CAPTURE
             MENUITEM "Редактор &шейдерів",    ID_VIEW_SHADEREDITOR
             MENUITEM "Навігація",                   ID_VIEW_NAVIGATION
-            MENUITEM "&Language",                   ID_SUBMENU_LANGUAGE
+            MENUITEM "Мова (&Language)",                   ID_SUBMENU_LANGUAGE
             POPUP "&Компоновка"
             BEGIN
                 MENUITEM "&Мінімальна",                 ID_VIEW_PRESETS_MINIMAL
@@ -2347,16 +2347,16 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PLAYLIST_POSITION   "Position"
-    IDS_PLAYLIST_POSITION_LEFT "Left"
-    IDS_PLAYLIST_POSITION_TOP "Top"
-    IDS_PLAYLIST_POSITION_RIGHT "Right"
+    IDS_PLAYLIST_POSITION   "Розташування"
+    IDS_PLAYLIST_POSITION_LEFT "Зліва"
+    IDS_PLAYLIST_POSITION_TOP "Зверху"
+    IDS_PLAYLIST_POSITION_RIGHT "Справа"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_PLAYLIST_POSITION_BOTTOM "Bottom"
-    IDS_PLAYLIST_POSITION_FLOAT "Float"
+    IDS_PLAYLIST_POSITION_BOTTOM "Знизу"
+    IDS_PLAYLIST_POSITION_FLOAT "Плаваюче"
 END
 
 STRINGTABLE
