@@ -26,6 +26,9 @@ Updated Chinese (Simplified) translation (by wushantao).
 Updated Italian translation (by mapi68).
 Updated Korean translation (by Hackjjang and Potmarigold).
 
+Updated libraries:
+	dav1d git-1.2.0-9-gf8ae94e;
+
 
 1.6.7 - 2023-05-05
 =============================
