@@ -222,7 +222,7 @@ BEGIN
                     "SysLink",WS_TABSTOP,30,114,200,8
     CONTROL         "<a>https://github.com/Aleksoid1978/MPC-BE</a>",IDC_GITHUB_LINK,
                     "SysLink",WS_TABSTOP,30,126,200,8
-    LTEXT           "Dieses Programm ist Freeware und steht\nunter der GNU General Public License.",IDC_STATIC,30,138,200,18
+    LTEXT           "MPC-BE ist Freeware und steht\nunter der GNU General Public License.",IDC_STATIC,30,138,200,18
     LTEXT           "Deutsche Übersetzung von Markus Gaugg,\nLuan und Klaus Luppert",IDC_STATIC,30,161,200,18
     DEFPUSHBUTTON   "&OK",IDOK,185,183,50,14,WS_GROUP
 END
@@ -275,7 +275,7 @@ BEGIN
     CONTROL         "Letzten Pan&&Scan-Zoom merken",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,84,156,9
     CONTROL         "Hauptwiedergabeliste speichern",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,96,156,9
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,129,108,158,1
-    CONTROL         "Titel für URL in Chronik anzeigen",IDC_CHECK4,
+    CONTROL         "Titel für URL in 'Neueste Chronik' anzeigen",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,112,156,9
     GROUPBOX        "Weitere Einstellungen",IDC_STATIC,124,130,167,101,WS_GROUP
     CONTROL         "&Taskleistensymbol anzeigen",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,142,156,9
@@ -468,7 +468,7 @@ IDD_PPAGEWINDOWSIZE DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Bei Programmstart",IDC_STATIC,5,5,286,67
+    GROUPBOX        "Bei Start der App",IDC_STATIC,5,5,286,67
     CONTROL         "Standardfenstergröße",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,16,106,10
     CONTROL         "Letzte Fenstergröße merken",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,30,127,10
     CONTROL         "Fenstergröße festlegen",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,10,44,118,10
@@ -996,9 +996,9 @@ BEGIN
     COMBOBOX        IDC_COMBO1,41,4,114,120,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "&Hinzufügen",IDC_BUTTON2,162,3,50,14
     CONTROL         "",IDC_STATIC1,"Static",SS_ETCHEDHORZ,4,21,208,1
-    CONTROL         "Pre-Resize Pixel Shader aktivieren",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,26,150,10
+    CONTROL         "Pre-Resize Pixel-Shader aktivieren",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,26,150,10
     LISTBOX         IDC_LIST1,5,39,150,65,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Post-Resize Pixel Shader aktivieren",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,109,150,10
+    CONTROL         "Post-Resize Pixel-Shader aktivieren",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,109,150,10
     LISTBOX         IDC_LIST2,5,122,150,65,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "&Löschen",IDC_BUTTON3,162,25,50,14
     PUSHBUTTON      "&Höher",IDC_BUTTON1,162,90,50,14
@@ -1081,12 +1081,12 @@ BEGIN
     CONTROL         "LCD-Unterstützung für Logitech-Tastaturen aktivieren",IDC_CHECK_LCD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,126,264,9
     CONTROL         "Desktop-Overlay bei Verwendung von Medientasten anzeigen",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,138,220,9
     CONTROL         "MiniDumps aktivieren",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,150,184,9
-    GROUPBOX        "Programm-Update",IDC_STATIC,5,163,286,40
-    CONTROL         "Automatische Update-Prüfung",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,175,250,9
-    LTEXT           "Nach Programm-Update alle",IDC_STATIC5,10,188,110,8
+    GROUPBOX        "Updates",IDC_STATIC,5,163,286,40
+    CONTROL         "Automatisch nach Updates suchen",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,175,250,9
+    LTEXT           "Intervall zwischen Update-Prüfungen:",IDC_STATIC5,10,188,110,8
     EDITTEXT        IDC_EDIT4,120,186,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,140,186,13,14
-    LTEXT           "Tag(e) suchen",IDC_STATIC6,155,188,50,8
+    LTEXT           "Tag(e)",IDC_STATIC6,155,188,50,8
     GROUPBOX        "Programmeinstellungen verwalten",IDC_STATIC,5,205,286,28
     PUSHBUTTON      "Zurücksetzen",IDC_RESET_SETTINGS,10,216,55,14
     PUSHBUTTON      "Exportieren...",IDC_EXPORT_SETTINGS,73,216,55,14
@@ -1199,7 +1199,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,217,271,9
     CONTROL         "Standard-Anzeigemodus nach Beenden des Vollbilds verwenden",IDC_CHECK3,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,228,270,9
-    CONTROL         "Ursprüngliche Bildschirmauflösung bei Programmende wiederherstellen",IDC_RESTORERESCHECK,
+    CONTROL         "Ursprüngliche Auflösung beim Schließen der App wiederherstellen",IDC_RESTORERESCHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,239,270,9
 END
 
@@ -1238,7 +1238,7 @@ END
 
 IDD_UPDATE_DIALOG DIALOGEX 0, 0, 238, 60
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Nach Aktualisierungen suchen"
+CAPTION "Nach Updates suchen"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Ja",IDOK,129,40,50,14
@@ -2081,7 +2081,7 @@ BEGIN
     POPUP ""
     BEGIN
         MENUITEM "---------------- Einmalige Aktion ---------------",    ID_AFTERPLAYBACK_ONCE
-        MENUITEM "Programm &beenden",                        ID_AFTERPLAYBACK_CLOSE
+        MENUITEM "App &beenden",                        ID_AFTERPLAYBACK_CLOSE
         MENUITEM "&Standby-Modus",                    ID_AFTERPLAYBACK_STANDBY
         MENUITEM "R&uhezustand",                   ID_AFTERPLAYBACK_HIBERNATE
         MENUITEM "Computer &herunterfahren",                    ID_AFTERPLAYBACK_SHUTDOWN
@@ -2089,7 +2089,7 @@ BEGIN
         MENUITEM "Computer spe&rren",                        ID_AFTERPLAYBACK_LOCK
         MENUITEM "&Keine Aktion",                  ID_AFTERPLAYBACK_DONOTHING
         MENUITEM "---------------- Standard-Aktion ----------------",    ID_AFTERPLAYBACK_EVERYTIME
-        MENUITEM "Programm &beenden",                        ID_AFTERPLAYBACK_EXIT
+        MENUITEM "App &beenden",                        ID_AFTERPLAYBACK_EXIT
         MENUITEM "&Datei schließen",                  ID_AFTERPLAYBACK_CLOSE_FILE
         MENUITEM "N&ächste Datei im Ordner wiedergeben",     ID_AFTERPLAYBACK_NEXT
         MENUITEM "Nächste Datei im Ordner wiedergeben (Schle&ife)", ID_AFTERPLAYBACK_NEXT_LOOPED
@@ -2118,8 +2118,8 @@ IDR_POPUP_SHADERS MENU
 BEGIN
     POPUP ""
     BEGIN
-        MENUITEM "P&re-Resize Pixel Shader aktivieren", ID_SHADERS_1_ENABLE
-        MENUITEM "P&ost-Resize Pixel Shader aktivieren", ID_SHADERS_2_ENABLE
+        MENUITEM "P&re-Resize Pixel-Shader aktivieren", ID_SHADERS_1_ENABLE
+        MENUITEM "P&ost-Resize Pixel-Shader aktivieren", ID_SHADERS_2_ENABLE
         MENUITEM "Shader ausw&ählen...",          ID_SHADERS_SELECT
         MENUITEM SEPARATOR
         MENUITEM "S&hader bearbeiten...",            ID_VIEW_SHADEREDITOR
@@ -2507,7 +2507,7 @@ END
 STRINGTABLE
 BEGIN
     IDC_REGULARSURF         "Die Video-Oberfläche wird als reguläre Offscreen-Oberfläche zugewiesen."
-    IDC_DX9RESIZER_COMBO    "Wenn Pixel Shader 2.0 nicht unterstützt wird, wird automatisch Simple Bilinear benutzt."
+    IDC_DX9RESIZER_COMBO    "Wenn Pixel-Shader 2.0 nicht unterstützt wird, wird automatisch Simple Bilinear benutzt."
 END
 
 STRINGTABLE
@@ -2562,12 +2562,12 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_SHADERS_SELECT   "Shader auswählen"
-    IDS_AG_SHADERS_1_ENABLE "Pre-Resize Pixel Shader (ein/aus)"
-    IDS_AG_SHADERS_2_ENABLE "Post-Resize Pixel Shader (ein/aus)"
-    IDS_OSD_SHADERS_1_ON    "Pre-Resize Pixel Shader: ein"
-    IDS_OSD_SHADERS_1_OFF   "Pre-Resize Pixel Shader: aus"
-    IDS_OSD_SHADERS_2_ON    "Post-Resize Pixel Shader: ein"
-    IDS_OSD_SHADERS_2_OFF   "Post-Resize Pixel Shader: aus"
+    IDS_AG_SHADERS_1_ENABLE "Pre-Resize Pixel-Shader (ein/aus)"
+    IDS_AG_SHADERS_2_ENABLE "Post-Resize Pixel-Shader (ein/aus)"
+    IDS_OSD_SHADERS_1_ON    "Pre-Resize Pixel-Shader: ein"
+    IDS_OSD_SHADERS_1_OFF   "Pre-Resize Pixel-Shader: aus"
+    IDS_OSD_SHADERS_2_ON    "Post-Resize Pixel-Shader: ein"
+    IDS_OSD_SHADERS_2_OFF   "Post-Resize Pixel-Shader: aus"
     IDS_AG_VSYNCINTERNAL    "Interne VSync"
 END
 
@@ -2699,8 +2699,8 @@ BEGIN
     IDS_AG_MEDIAFILES       "Mediendateien (alle Formate)|"
     IDS_AG_ALLFILES         "Alle Dateien (*.*)|*.*|"
     IDS_AG_AUDIOFILES       "Audiodateien (alle Formate)|"
-    IDS_PIXELSHADERCOMPILER_0  "Kann D3DX9_xx.dll nicht laden, Pixel Shader bleiben inaktiv."
-    IDS_PIXELSHADERCOMPILER_1  "Kann benötigte Funktionen in der D3DX9_xx.dll Library nicht\nfinden (evtl. falsche Version), Pixel Shader bleiben inaktiv."
+    IDS_PIXELSHADERCOMPILER_0  "Kann D3DX9_xx.dll nicht laden, Pixel-Shader bleiben inaktiv."
+    IDS_PIXELSHADERCOMPILER_1  "Kann benötigte Funktionen in der D3DX9_xx.dll Library nicht\nfinden (evtl. falsche Version), Pixel-Shader bleiben inaktiv."
     IDS_AG_NOT_KNOWN        "Unbekannt"
     IDS_AG_OPEN_FILE        "Mediendatei öffnen..."
     IDS_AG_OPEN_FILEURL     "Medien öffnen"
@@ -3033,7 +3033,7 @@ BEGIN
     IDS_THUMB_COLNUMBER     "Spalten:"
     IDS_THUMB_IMAGE_WIDTH   "Bildbreite"
     IDS_PPSDB_URLCORRECT    "URL erfolgreich verifiziert!"
-    IDS_PPSDB_PROTOCOLERR   "Protokollversion stimmt nicht überein, bitte den Player aktualisieren oder einen anderen Server angeben!"
+    IDS_PPSDB_PROTOCOLERR   "Protokollversion stimmt nicht überein, bitte MPC-BE updaten oder einen anderen Server angeben!"
 END
 
 STRINGTABLE
@@ -3695,13 +3695,13 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AFTERPLAYBACK_CLOSE "Nach Wiedergabe: Programm beenden"
+    IDS_AFTERPLAYBACK_CLOSE "Nach Wiedergabe: App beenden"
     IDS_AFTERPLAYBACK_STANDBY "Nach Wiedergabe: Standby-Modus"
     IDS_AFTERPLAYBACK_HIBERNATE "Nach Wiedergabe: Ruhezustand"
     IDS_AFTERPLAYBACK_SHUTDOWN "Nach Wiedergabe: Computer herunterfahren"
     IDS_AFTERPLAYBACK_LOGOFF "Nach Wiedergabe: Benutzer abmelden"
     IDS_AFTERPLAYBACK_LOCK  "Nach Wiedergabe: Computer sperren"
-    IDS_AFTERPLAYBACK_EXIT  "Nach Wiedergabe: Immer Programm beenden"
+    IDS_AFTERPLAYBACK_EXIT  "Nach Wiedergabe: Immer App beenden"
     IDS_AFTERPLAYBACK_DONOTHING "Nach Wiedergabe: Keine Aktion"
     IDS_AFTERPLAYBACK_NEXT  "Nach Wiedergabe: Nächste Datei im Ordner wiedergeben"
     IDS_OSD_BRIGHTNESS      "Helligkeit: %s"

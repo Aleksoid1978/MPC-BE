@@ -423,7 +423,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 27		"记住文件位置"
 28		"记住上次的平移和扫描缩放"
 29		"记住主播放列表"
-31		"Display title for URL in recent files"
+31		"在最近的文件中显示链接页面的标题"
 33		"其它"
 34		"托盘图标"
 35		"显示 OSD (需要重新启动播放器)"
