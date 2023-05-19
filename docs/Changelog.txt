@@ -5,6 +5,9 @@
 ShoutcastSource
 Optimized work with the internal buffer.
 
+MpaDecFilter
+Optimized work with the internal buffer.
+
 Subtitles
 Removed broken subtitle download from Online Subtitle Database.
 
@@ -16,6 +19,7 @@ Player
 Added the ability to choose the location of the playlist window in the playlist menu.
 The playlist is now on the right side by default.
 Fixed and accelerated the return of screenshots when using the Web-interface.
+Added option "Display title for URL in recent files".
 
 Updated Dutch and Chinese (Traditional) translation (by beter).
 Updated Japanese translation (by tsubasanouta).
@@ -25,6 +29,7 @@ Updated Turkish translation (by cmhrky).
 Updated Chinese (Simplified) translation (by wushantao).
 Updated Italian translation (by mapi68).
 Updated Korean translation (by Hackjjang and Potmarigold).
+Updated Ukrainian translation (by arestarh).
 
 Updated libraries:
 	dav1d git-1.2.0-9-gf8ae94e;
