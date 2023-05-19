@@ -6,7 +6,7 @@
 11		"MPC-BE Compiler:"
 12		"FFmpeg Compiler:"
 13		"Libavcodec / Libavutil:"
-23		"MPC-BE ist Freeware und steht\nunter der GNU General Public License."
+23		"MPC-BE ist Freeware und steht unter\nder GNU General Public License."
 24		"Deutsche Übersetzung von Markus Gaugg,\nLuan und Klaus Luppert"
 25		"&OK"
 END
@@ -358,7 +358,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 25		"MiniDumps aktivieren"
 26		"Updates"
 27		"Automatisch nach Updates suchen"
-28		"Intervall zwischen Update-Prüfungen:"
+28		"Suchintervall von Updates:"
 31		"Tag(e)"
 32		"Programmeinstellungen verwalten"
 33		"Zurücksetzen"
