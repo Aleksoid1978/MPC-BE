@@ -24,7 +24,7 @@
 #include <ExtLib/AsyncReader/asyncio.h>
 #include <ExtLib/AsyncReader/asyncrdr.h>
 
-#include <ITrackInfo.h>
+#include "filters/parser/BaseSplitter/TrackInfoImpl.h"
 #include "VTSReaderSettingsWnd.h"
 #include "DSUtil/DSMPropertyBag.h"
 
@@ -70,7 +70,7 @@ class __declspec(uuid("773EAEDE-D5EE-4fce-9C8F-C4F53D0A2F73"))
 	CVTSReader
 	: public CAsyncReader
 	, public IFileSourceFilter
-	, public ITrackInfo
+	, public CTrackInfoImpl
 	, public IDSMChapterBagImpl
 	, public IVTSReader
 	, public ISpecifyPropertyPages2
@@ -97,14 +97,7 @@ public:
 	STDMETHODIMP GetCurFile(LPOLESTR* ppszFileName, AM_MEDIA_TYPE* pmt);
 
 	// ITrackInfo
-	STDMETHODIMP_(UINT) GetTrackCount();
-	STDMETHODIMP_(BOOL) GetTrackInfo(UINT aTrackIdx, struct TrackElement* pStructureToFill);
-	STDMETHODIMP_(BOOL) GetTrackExtendedInfo(UINT aTrackIdx, void* pStructureToFill);
 	STDMETHODIMP_(BSTR) GetTrackName(UINT aTrackIdx);
-	STDMETHODIMP_(BSTR) GetTrackCodecID(UINT aTrackIdx);
-	STDMETHODIMP_(BSTR) GetTrackCodecName(UINT aTrackIdx);
-	STDMETHODIMP_(BSTR) GetTrackCodecInfoURL(UINT aTrackIdx);
-	STDMETHODIMP_(BSTR) GetTrackCodecDownloadURL(UINT aTrackIdx);
 
 	// ISpecifyPropertyPages2
 	STDMETHODIMP GetPages(CAUUID* pPages);

@@ -24,6 +24,7 @@
 #include "MatroskaFile.h"
 #include "MatroskaSplitterSettingsWnd.h"
 #include "../BaseSplitter/BaseSplitter.h"
+#include "../BaseSplitter/TrackInfoImpl.h"
 #include <basestruct.h>
 #include <IMediaSideData.h>
 #include <ITrackInfo.h>
@@ -50,7 +51,7 @@ public:
 class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 	CMatroskaSplitterFilter
 	: public CBaseSplitterFilter
-	, public ITrackInfo
+	, public CTrackInfoImpl
 	, public CExFilterInfoImpl
 	, public IMatroskaSplitterFilter
 	, public ISpecifyPropertyPages2

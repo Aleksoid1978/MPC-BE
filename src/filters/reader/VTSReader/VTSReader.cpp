@@ -181,44 +181,9 @@ STDMETHODIMP CVTSReader::GetCurFile(LPOLESTR* ppszFileName, AM_MEDIA_TYPE* pmt)
 
 // ITrackInfo
 
-STDMETHODIMP_(UINT) CVTSReader::GetTrackCount()
-{
-	return 0; // Not implemented yet
-}
-
-STDMETHODIMP_(BOOL) CVTSReader::GetTrackInfo(UINT aTrackIdx, struct TrackElement* pStructureToFill)
-{
-	return FALSE; // Not implemented yet
-}
-
-STDMETHODIMP_(BOOL) CVTSReader::GetTrackExtendedInfo(UINT aTrackIdx, void* pStructureToFill)
-{
-	return FALSE; // Not implemented yet
-}
-
 STDMETHODIMP_(BSTR) CVTSReader::GetTrackName(UINT aTrackIdx)
 {
 	return m_stream.GetTrackName(aTrackIdx); // return stream's language
-}
-
-STDMETHODIMP_(BSTR) CVTSReader::GetTrackCodecID(UINT aTrackIdx)
-{
-	return nullptr; // Not implemented yet
-}
-
-STDMETHODIMP_(BSTR) CVTSReader::GetTrackCodecName(UINT aTrackIdx)
-{
-	return nullptr; // Not implemented yet
-}
-
-STDMETHODIMP_(BSTR) CVTSReader::GetTrackCodecInfoURL(UINT aTrackIdx)
-{
-	return nullptr; // Not implemented yet
-}
-
-STDMETHODIMP_(BSTR) CVTSReader::GetTrackCodecDownloadURL(UINT aTrackIdx)
-{
-	return nullptr; // Not implemented yet
 }
 
 // ISpecifyPropertyPages2

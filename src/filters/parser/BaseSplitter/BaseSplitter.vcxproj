@@ -89,6 +89,7 @@
     <ClInclude Include="MultiFiles.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Teletext.h" />
+    <ClInclude Include="TrackInfoImpl.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)src\ExtLib\BaseClasses.vcxproj">
