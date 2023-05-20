@@ -2050,7 +2050,7 @@ redo:
 							|| clsidInput == __uuidof(CAviSourceFilter) || clsidInput == __uuidof(CAviSplitterFilter)
 							|| clsidInput == __uuidof(COggSourceFilter) || clsidInput == __uuidof(COggSplitterFilter)
 							|| IsAVI() || IsOGG();
-		if (!m_bReorderBFrame && m_CodecId == AV_CODEC_ID_VC1
+		if (!m_bReorderBFrame && (m_CodecId == AV_CODEC_ID_VC1 || m_CodecId == AV_CODEC_ID_WMV3)
 				&& !(clsidInput == __uuidof(CMpegSourceFilter) || clsidInput == __uuidof(CMpegSplitterFilter))) {
 			m_bReorderBFrame = true;
 		}
