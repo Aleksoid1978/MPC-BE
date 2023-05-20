@@ -275,7 +275,7 @@ BEGIN
     CONTROL         "Ricorda ultimo zoom Pan&&Scan",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,84,156,9
     CONTROL         "Ricorda playlist principale",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,96,156,9
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,129,108,158,1
-    CONTROL         "Display title for URL in recent files",IDC_CHECK4,
+    CONTROL         "Visualizza titolo per l'URL nei file recenti",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,112,156,9
     GROUPBOX        "Altro",IDC_STATIC,124,130,167,101,WS_GROUP
     CONTROL         "Icona nell'area di notifica",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,142,156,9
