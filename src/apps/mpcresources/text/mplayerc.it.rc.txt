@@ -423,7 +423,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 27		"Ricorda posizione File"
 28		"Ricorda ultimo zoom Pan&&Scan"
 29		"Ricorda playlist principale"
-31		"Display title for URL in recent files"
+31		"Visualizza titolo per l'URL nei file recenti"
 33		"Altro"
 34		"Icona nell'area di notifica"
 35		"Mostra OSD"
