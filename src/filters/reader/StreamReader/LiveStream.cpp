@@ -368,6 +368,25 @@ bool CLiveStream::ParseM3U8(const CString& url, CString& realUrl)
 			}
 
 			continue;
+		} else if (StartsWith(str, L"#EXT-X-MAP:")) {
+			if (!m_hlsData.bInit) {
+				DeleteLeft(11, str);
+				std::list<CString> attributes;
+				Explode(str, attributes, L',');
+				for (const auto& attribute : attributes) {
+					const auto pos = attribute.Find(L'=');
+					if (pos > 0) {
+						const auto key = attribute.Left(pos);
+						auto value = attribute.Mid(pos + 1);
+						if (key == L"URI") {
+							value.Trim(LR"(")");
+							m_hlsData.Segments.emplace_back(CombinePath(base, value));
+							break;
+						}
+					}
+				}
+			}
+			continue;
 		} else if (str.GetAt(0) == L'#') {
 			continue;
 		}
