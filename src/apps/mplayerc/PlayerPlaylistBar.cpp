@@ -1128,6 +1128,12 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 				case VK_DELETE:
 				case VK_APPS: // "Menu key"
 					break;
+				case VK_F2:
+					if (m_list.GetSelectedCount() == 1) {
+						const auto nItem = m_list.GetNextItem(-1, LVNI_SELECTED);
+						m_list.EditLabel(nItem);
+					}
+					break;
 				default:
 					m_pMainFrame->PostMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
 					return TRUE;
