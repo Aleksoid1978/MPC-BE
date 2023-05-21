@@ -1532,11 +1532,14 @@ HRESULT GUIDFromCString(CString str, GUID& guid)
 
 CStringW CStringFromGUID(const GUID& guid)
 {
-	WCHAR buff[40] = {};
-	if (StringFromGUID2(guid, buff, 39) <= 0) {
-		StringFromGUID2(GUID_NULL, buff, 39);
+	CStringW str;
+	int ret = StringFromGUID2(guid, str.GetBuffer(39), 39);
+	if (ret) {
+		str.ReleaseBufferSetLength(ret - 1);
+	} else {
+		str.Empty();
 	}
-	return CStringW(buff);
+	return str;
 }
 
 static struct {

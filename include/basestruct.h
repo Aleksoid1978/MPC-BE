@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -124,14 +124,18 @@ struct ColorSpace {
 };
 
 // A byte that is not initialized to std::vector when using the resize method.
+// Note: can be slow in debug mode.
 struct NoInitByte
 {
 	uint8_t value;
+#pragma warning(push)
+#pragma warning(disable:26495)
 	NoInitByte() {
 		// do nothing
 		static_assert(sizeof(*this) == sizeof (value), "invalid size");
 		//static_assert(__alignof(*this) == __alignof(value), "invalid alignment");
 	}
+#pragma warning(pop)
 };
 
 struct PinType {
