@@ -1083,7 +1083,7 @@ BEGIN
     CONTROL         "MiniDumps aktivieren",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,150,184,9
     GROUPBOX        "Updates",IDC_STATIC,5,163,286,40
     CONTROL         "Automatisch nach Updates suchen",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,175,250,9
-    LTEXT           "Suchintervall von Updates:",IDC_STATIC5,10,188,110,8
+    LTEXT           "Suchintervall nach Updates:",IDC_STATIC5,10,188,110,8
     EDITTEXT        IDC_EDIT4,120,186,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,140,186,13,14
     LTEXT           "Tag(e)",IDC_STATIC6,155,188,50,8

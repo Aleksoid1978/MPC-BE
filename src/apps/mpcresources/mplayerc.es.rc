@@ -275,7 +275,7 @@ BEGIN
     CONTROL         "Recordar última ampliación Pan&&Scan",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,84,156,9
     CONTROL         "Recordar Lista de Reproducción principal",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,96,156,9
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,129,108,158,1
-    CONTROL         "Display title for URL in recent files",IDC_CHECK4,
+    CONTROL         "Mostrar título para URL en archivos recientes",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,112,156,9
     GROUPBOX        "Otros",IDC_STATIC,124,130,167,101,WS_GROUP
     CONTROL         "Icono de bandeja",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,142,156,9
@@ -2347,16 +2347,16 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PLAYLIST_POSITION   "Position"
-    IDS_PLAYLIST_POSITION_LEFT "Left"
-    IDS_PLAYLIST_POSITION_TOP "Top"
-    IDS_PLAYLIST_POSITION_RIGHT "Right"
+    IDS_PLAYLIST_POSITION   "Posición"
+    IDS_PLAYLIST_POSITION_LEFT "Izquierda"
+    IDS_PLAYLIST_POSITION_TOP "Superior"
+    IDS_PLAYLIST_POSITION_RIGHT "Derecha"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_PLAYLIST_POSITION_BOTTOM "Bottom"
-    IDS_PLAYLIST_POSITION_FLOAT "Float"
+    IDS_PLAYLIST_POSITION_BOTTOM "Inferior"
+    IDS_PLAYLIST_POSITION_FLOAT "Flotante"
 END
 
 STRINGTABLE

@@ -358,7 +358,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 25		"MiniDumps aktivieren"
 26		"Updates"
 27		"Automatisch nach Updates suchen"
-28		"Suchintervall von Updates:"
+28		"Suchintervall nach Updates:"
 31		"Tag(e)"
 32		"Programmeinstellungen verwalten"
 33		"Zurücksetzen"
