@@ -613,8 +613,8 @@ BEGIN
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,93,188,1
     PUSHBUTTON      "取消(&C)",IDCANCEL,49,100,50,14
     PUSHBUTTON      "保存(&S)",IDOK,105,100,50,14
-    LTEXT           "位置: 0.1 -> 0.9",IDC_STATIC,134,5,70,8
-    LTEXT           "缩放: 0.2 -> 5.0",IDC_STATIC,134,32,70,8
+    LTEXT           "位置: 0.1 → 0.9",IDC_STATIC,134,5,70,8
+    LTEXT           "缩放: 0.2 → 5.0",IDC_STATIC,134,32,70,8
 END
 
 IDD_PPAGEACCELTBL DIALOGEX 0, 0, 296, 264
@@ -2356,7 +2356,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_PLAYLIST_POSITION_BOTTOM "底部"
-    IDS_PLAYLIST_POSITION_FLOAT "浮动"
+    IDS_PLAYLIST_POSITION_FLOAT "脱离"
 END
 
 STRINGTABLE
@@ -3324,8 +3324,8 @@ BEGIN
     IDS_VDF_STATUS_ADAPTER  "显卡:"
     IDS_VDF_TT_AR           "检测 - 使用流预置的高宽比。\n不检测 - 使用封装容器预置的高宽比。\n模糊处理 - 在封装格式指定画面比例时不使用视频流比例 。(推荐)"
     IDS_VDF_TT_PRESET       "改变速度与品质的关系"
-    IDS_VDF_TT_STANDARD     "滤镜做 YCbCr<->RGB 转换时，此选项可用。"
-    IDS_VDF_TT_RGB_LEVELS   "滤镜做 YCbCr ->RGB 转换时，此选项可用。"
+    IDS_VDF_TT_STANDARD     "滤镜做 YCbCr↔RGB 转换时，此选项可用。"
+    IDS_VDF_TT_RGB_LEVELS   "滤镜做 YCbCr →RGB 转换时，此选项可用。"
 END
 
 STRINGTABLE

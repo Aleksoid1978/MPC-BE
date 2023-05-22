@@ -613,8 +613,8 @@ BEGIN
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,93,188,1
     PUSHBUTTON      "取消(&C)",IDCANCEL,49,100,50,14
     PUSHBUTTON      "儲存(&S)",IDOK,105,100,50,14
-    LTEXT           "位置：0.1 -> 0.9",IDC_STATIC,134,5,70,8
-    LTEXT           "縮放：0.2 -> 5.0",IDC_STATIC,134,32,70,8
+    LTEXT           "位置：0.1 → 0.9",IDC_STATIC,134,5,70,8
+    LTEXT           "縮放：0.2 → 5.0",IDC_STATIC,134,32,70,8
 END
 
 IDD_PPAGEACCELTBL DIALOGEX 0, 0, 296, 264
@@ -2347,16 +2347,16 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PLAYLIST_POSITION   "Position"
-    IDS_PLAYLIST_POSITION_LEFT "Left"
-    IDS_PLAYLIST_POSITION_TOP "Top"
-    IDS_PLAYLIST_POSITION_RIGHT "Right"
+    IDS_PLAYLIST_POSITION   "位置"
+    IDS_PLAYLIST_POSITION_LEFT "左側"
+    IDS_PLAYLIST_POSITION_TOP "上排"
+    IDS_PLAYLIST_POSITION_RIGHT "右側"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_PLAYLIST_POSITION_BOTTOM "Bottom"
-    IDS_PLAYLIST_POSITION_FLOAT "Float"
+    IDS_PLAYLIST_POSITION_BOTTOM "下排"
+    IDS_PLAYLIST_POSITION_FLOAT "分離"
 END
 
 STRINGTABLE
@@ -3324,7 +3324,7 @@ BEGIN
     IDS_VDF_STATUS_ADAPTER  "顯示卡："
     IDS_VDF_TT_AR           "選取：將使用視訊串流的畫面比例。\n不選取：將使用封裝格式設定的畫面比例\n不定：在封裝格式指定畫面比例時不使用視訊串流比例（建議選項）。"
     IDS_VDF_TT_PRESET       "變更速度與品質之間的平衡。"
-    IDS_VDF_TT_STANDARD     "此選項只會在篩選器進行 YCbCr<->RGB 轉換時使用。"
+    IDS_VDF_TT_STANDARD     "此選項只會在篩選器進行 YCbCr↔RGB 轉換時使用。"
     IDS_VDF_TT_RGB_LEVELS   "此選項只會在篩選器進行 YCbCr 到 RGB 轉換時使用。"
 END
 
