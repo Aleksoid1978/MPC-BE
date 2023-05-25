@@ -409,6 +409,10 @@ AP4_AudioSampleEntry::AP4_AudioSampleEntry(AP4_Atom::Type   format,
         if (di->GetDataSize() == 6) {
             const auto data = di->GetData();
             m_Endian = data[4];
+            auto sampleSize = data[5];
+            if (sampleSize == 16 || sampleSize == 24 || sampleSize == 32) {
+                m_SampleSize = sampleSize;
+            }
         }
     }
 }

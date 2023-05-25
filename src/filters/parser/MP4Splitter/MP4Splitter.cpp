@@ -1559,9 +1559,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							fourcc = type = WAVE_FORMAT_IEEE_FLOAT;
 						} else if (type == AP4_ATOM_TYPE_LPCM || type == AP4_ATOM_TYPE_IPCM) {
 							DWORD flags = ase->GetFormatSpecificFlags();
+							const bool floating = (type == AP4_ATOM_TYPE_LPCM) && (flags & 1); // floating point
 							const bool bBigEndian = (flags & 2) || (type == AP4_ATOM_TYPE_IPCM && ase->GetEndian() != ENDIAN_LITTLE);
 							if (bBigEndian) {
-								if (flags & 1) { // floating point
+								if (floating) {
 									if      (bitspersample == 32) type = AP4_ATOM_TYPE_FL32;
 									else if (bitspersample == 64) type = AP4_ATOM_TYPE_FL64;
 								} else {
@@ -1574,7 +1575,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										 ((type <<  8) & 0x00ff0000) |
 										 ((type << 24) & 0xff000000);
 							} else {
-								if (flags & 1) { // floating point
+								if (floating) {
 									fourcc = type = WAVE_FORMAT_IEEE_FLOAT;
 								} else {
 									fourcc = type = WAVE_FORMAT_PCM;
