@@ -85,7 +85,7 @@ AP4_MdhdAtom::AP4_MdhdAtom(AP4_Size size, AP4_ByteStream& stream) :
     m_TimeScale(0),
     m_Duration(0)
 {
-    memset(m_Language, sizeof(m_Language), 0);
+    memset(m_Language, 0, sizeof(m_Language));
 
     if (m_Version == 0) {
         AP4_UI32 tmp = 0;
@@ -102,23 +102,25 @@ AP4_MdhdAtom::AP4_MdhdAtom(AP4_Size size, AP4_ByteStream& stream) :
 
     AP4_UI16 lang;
     stream.ReadUI16(lang);
-    if (lang < _countof(mdhd_language_map)) {
+    if (lang < std::size(mdhd_language_map)) {
         if (mdhd_language_map[lang][0]) {
             memcpy(m_Language, mdhd_language_map[lang], 3);
         }
     } else {
-        char l0 = (lang >> 10 & 0x1F);
-        char l1 = (lang >> 5  & 0x1F);
-        char l2 = (lang >> 0  & 0x1F);
+        if (lang >= 0x400 && lang != 0x7fff) {
+            char l0 = (lang >> 10 & 0x1F);
+            char l1 = (lang >> 5 & 0x1F);
+            char l2 = (lang >> 0 & 0x1F);
 
-        if (l0) {
-            m_Language[0] = l0 + 0x60;
-        }
-        if (l1) {
-            m_Language[1] = l1 + 0x60;
-        }
-        if (l2) {
-            m_Language[2] = l2 + 0x60;
+            if (l0) {
+                m_Language[0] = l0 + 0x60;
+            }
+            if (l1) {
+                m_Language[1] = l1 + 0x60;
+            }
+            if (l2) {
+                m_Language[2] = l2 + 0x60;
+            }
         }
     }
 }
