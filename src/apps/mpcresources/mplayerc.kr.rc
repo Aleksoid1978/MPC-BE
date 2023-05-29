@@ -1154,7 +1154,7 @@ BEGIN
     CONTROL         "플러시 대기",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,38,100,10
     GROUPBOX        "EVR 동기화 설정",IDC_STATIC2,5,67,286,117
     CONTROL         "비디오에서 디스플레이로 싱크",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,140,8
-    CONTROL         "가장 근접한 수직 동기화에 맞추기",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,170,8
+    CONTROL         "가장 근사치 수직 동기화 적용",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,170,8
     LTEXT           "주파수 조정 :",IDC_STATIC5,20,93,85,8
     EDITTEXT        IDC_CYCLEDELTA,109,91,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,123,278,1
@@ -3573,8 +3573,8 @@ BEGIN
     IDS_OSD_RS_SYNC_TO_DISPLAY_OFF "비디오를 디스플레이에 싱크 : 끔"
     IDS_OSD_RS_SYNC_TO_VIDEO_ON "디스플레이를 비디오에 싱크 : 켬"
     IDS_OSD_RS_SYNC_TO_VIDEO_OFF "디스플레이를 비디오에 싱크 : 끔"
-    IDS_OSD_RS_PRESENT_NEAREST_ON "근접한 수직 동기화 출력 : 켬"
-    IDS_OSD_RS_PRESENT_NEAREST_OFF "근접한 수직 동기화 출력 : 끔"
+    IDS_OSD_RS_PRESENT_NEAREST_ON "근사치 수직 동기화 출력 : 켬"
+    IDS_OSD_RS_PRESENT_NEAREST_OFF "근사치 수직 동기화 출력 : 끔"
     IDS_OSD_RS_COLOR_MANAGEMENT_ON "색 관리 : 켬"
     IDS_OSD_RS_COLOR_MANAGEMENT_OFF "색 관리 : 끔"
     IDS_OSD_RS_INPUT_TYPE_AUTO "입력 형식 : 자동 감지"
