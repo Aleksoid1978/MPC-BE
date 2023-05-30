@@ -12,6 +12,7 @@ static const FFCodec * const codec_list[] = {
     &ff_dirac_decoder,
     &ff_dnxhd_decoder,
     &ff_dvvideo_decoder,
+    &ff_dxtory_decoder,
     &ff_eightbps_decoder,
     &ff_ffv1_decoder,
     &ff_ffvhuff_decoder,

@@ -315,6 +315,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, BITMAPINFOHEADER* pBMI)
 		case AV_CODEC_ID_FLASHSV2:
 		case AV_CODEC_ID_MSS1:
 		case AV_CODEC_ID_G2M:
+		case AV_CODEC_ID_DXTORY:
 			pAVCtx->pix_fmt = AV_PIX_FMT_RGB24; // and other RGB formats, but it is not important here
 			break;
 		}

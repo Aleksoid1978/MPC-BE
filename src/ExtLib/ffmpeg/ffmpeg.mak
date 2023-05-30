@@ -208,6 +208,7 @@ SRCS_LC = \
 	libavcodec/dv_profile.c \
 	libavcodec/dvdata.c \
 	libavcodec/dvdec.c \
+	libavcodec/dxtory.c \
 	libavcodec/dxva2.c \
 	libavcodec/dxva2_av1.c \
 	libavcodec/dxva2_h264.c \
