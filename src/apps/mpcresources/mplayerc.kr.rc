@@ -196,7 +196,7 @@ BEGIN
     PUSHBUTTON      "찾아보기...",IDC_BUTTON2,200,67,50,14
     DEFPUSHBUTTON   "확인",IDOK,148,94,50,14,WS_GROUP
     PUSHBUTTON      "취소",IDCANCEL,200,94,50,14
-    CONTROL         "열지 않고 재생목록에만 추가",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,84,188,9
+    CONTROL         "열지 않고 재생 목록에만 추가",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,84,188,9
     CONTROL         "클립보드에서 URL 붙여 넣기",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,96,134,9
 END
 
@@ -273,7 +273,7 @@ BEGIN
     CONTROL         "DVD 위치 기억",IDC_DVD_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,60,156,9
     CONTROL         "파일 위치 기억",IDC_FILE_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,72,158,9
     CONTROL         "종료 시, 팬&스캔 확대율 기억",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,84,156,9
-    CONTROL         "메인 재생목록 기억",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,96,156,9
+    CONTROL         "메인 재생 목록 기억",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,96,156,9
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,129,108,158,1
     CONTROL         "최근 열람한 파일 경로를 제목 표시줄에 표기",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,112,156,9
@@ -442,7 +442,7 @@ BEGIN
     COMBOBOX        IDC_COMBO4,209,125,76,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "챕터 구분 표기 사용",IDC_CHECK_CHM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,139,182,9
     CONTROL         "플라이바 사용",IDC_CHECK_FLYBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,152,182,9
-    LTEXT           "재생목록 글자 크기 :",IDC_STATIC,13,165,110,8
+    LTEXT           "재생 목록 글자 크기 :",IDC_STATIC,13,165,110,8
     EDITTEXT        IDC_EDIT2,127,163,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,165,10,8
     GROUPBOX        "OSD",IDC_STATIC,7,183,282,60
@@ -460,7 +460,7 @@ BEGIN
     CONTROL         "",IDC_SPIN10,"msctls_updown32",UDS_WRAP | UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,166,226,12,13
     CONTROL         "그림자",IDC_CHECK_SHADOW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,224,194,46,9
     CONTROL         "위신호 제거",IDC_CHECK_AA,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,224,206,61,18
-    CONTROL         "(윈도7 이상) 작업표시줄 기능 사용",IDC_CHECK_WIN7,
+    CONTROL         "(윈도7 이상) 작업 표시줄 기능 사용",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,246,270,11
 END
 
@@ -907,7 +907,7 @@ BEGIN
     CONTROL         "HDR",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,170,42,30,10
     LTEXT           "선호하는 오디오 트랙 언어 :",IDC_STATIC4,10,59,140,8
     COMBOBOX        IDC_COMBO5,10,70,130,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "재생목록 열기",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,87,100,10
+    CONTROL         "재생 목록 열기",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,87,100,10
     GROUPBOX        "",IDC_STATIC,6,105,285,57
     CONTROL         "youtube-dl, yt-dlp",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,105,74,10
     LTEXT           "실행 파일 :",IDC_STATIC,10,118,104,8
@@ -1066,7 +1066,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "기본값",IDC_BUTTON1,158,17,56,14
     CONTROL         "빠른 탐색 (키 프레임)",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,45,264,9
-    CONTROL         "재생목록에 파일 하나만 있다면 '앞/뒤 탐색' 시에 '폴더 내에서 찾기' 사용 안 함",IDC_CHECK7,
+    CONTROL         "재생 목록에 파일 하나만 있다면 '앞/뒤 탐색' 시에 '폴더 내에서 찾기' 사용 안 함",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,55,280,18
     CONTROL         "전체 화면 시, 최소화 방지",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,280,9
@@ -1282,7 +1282,7 @@ END
 
 IDD_PLAYLISTNAME DIALOGEX 0, 0, 261, 63
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "재생목록 이름 대화 상자"
+CAPTION "재생 목록 이름 대화 상자"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "확인",IDOK,150,42,50,14
@@ -1615,7 +1615,7 @@ BEGIN
     END
     POPUP "보기(&V)"
     BEGIN
-        MENUITEM "제목표시줄&&메뉴",             ID_VIEW_CAPTIONMENU
+        MENUITEM "제목 표시줄&&메뉴",             ID_VIEW_CAPTIONMENU
         MENUITEM "검색 슬라이더(&S)",           ID_VIEW_SEEKER
         MENUITEM "제어(&R)",               ID_VIEW_CONTROLS
         MENUITEM "정보(&I)",                ID_VIEW_INFORMATION
@@ -1813,7 +1813,7 @@ BEGIN
             MENUITEM "통계(&A)",                      ID_VIEW_STATISTICS
             MENUITEM "상태(&T)",                      ID_VIEW_STATUS
             MENUITEM "자막 싱크 조절",                      ID_VIEW_SUBRESYNC
-            MENUITEM "재생목록",                        ID_VIEW_PLAYLIST
+            MENUITEM "재생 목록",                        ID_VIEW_PLAYLIST
             MENUITEM "캡처",                          ID_VIEW_CAPTURE
             MENUITEM "셰이더 편집기",                     ID_VIEW_SHADEREDITOR
             MENUITEM "내비게이션",                       ID_VIEW_NAVIGATION
@@ -1885,14 +1885,14 @@ BEGIN
         END
         POPUP "보기(&V)"
         BEGIN
-            MENUITEM "제목표시줄&&메뉴",             ID_VIEW_CAPTIONMENU
+            MENUITEM "제목 표시줄&&메뉴",             ID_VIEW_CAPTIONMENU
             MENUITEM "검색 슬라이더(&S)",           ID_VIEW_SEEKER
             MENUITEM "제어(&R)",               ID_VIEW_CONTROLS
             MENUITEM "정보(&I)",                ID_VIEW_INFORMATION
             MENUITEM "통계(&T)",                ID_VIEW_STATISTICS
             MENUITEM "상태 표시줄(&A)",             ID_VIEW_STATUS
             MENUITEM "자막싱크조절",                ID_VIEW_SUBRESYNC
-            MENUITEM "재생목록",                  ID_VIEW_PLAYLIST
+            MENUITEM "재생 목록",                  ID_VIEW_PLAYLIST
             MENUITEM "캡처",                    ID_VIEW_CAPTURE
             MENUITEM "셰이더 편집기",               ID_VIEW_SHADEREDITOR
             MENUITEM "내비게이션",                       ID_VIEW_NAVIGATION
@@ -2288,18 +2288,18 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PLAYLIST_CAPTION    "재생목록"
+    IDS_PLAYLIST_CAPTION    "재생 목록"
     IDS_PLAYLIST_MAIN_NAME  "메인"
-    IDS_PLAYLIST_ADD_NEW    "재생목록 생성"
-    IDS_PLAYLIST_ADD_PLAYLIST "재생목록 형식"
+    IDS_PLAYLIST_ADD_NEW    "재생 목록 생성"
+    IDS_PLAYLIST_ADD_PLAYLIST "재생 목록 형식"
 END
 
 STRINGTABLE
 BEGIN
     IDS_PLAYLIST_ADD_EXPLORER "탐색기 유형"
-    IDS_PLAYLIST_RENAME_CURRENT "재생목록 이름 바꾸기"
-    IDS_PLAYLIST_DELETE_CURRENT "재생목록 삭제"
-    IDS_PLAYLIST_NAME       "재생목록"
+    IDS_PLAYLIST_RENAME_CURRENT "재생 목록 이름 바꾸기"
+    IDS_PLAYLIST_DELETE_CURRENT "재생 목록 삭제"
+    IDS_PLAYLIST_NAME       "재생 목록"
     IDS_PLAYLIST_EXPLORER_NAME "탐색기"
     IDS_PLAYLIST_OPEN       "열기(&O)"
     IDS_PLAYLIST_ADD        "추가(&D)"
@@ -2368,7 +2368,7 @@ BEGIN
     IDS_PLAYLOOPMODE_AB     "A-B 반복 :  위치 초기화"
     IDS_PLAYLOOPMODE_AB_MARK_A "A-B 반복 : A 위치 지정"
     IDS_PLAYLOOPMODE_AB_MARK_B "A-B 반복 : B 위치 지정"
-    IDS_ADDTOPLAYLISTROMCLIPBOARD "클립보드에서 재생목록에 추가"
+    IDS_ADDTOPLAYLISTROMCLIPBOARD "클립보드에서 재생 목록에 추가"
     IDS_AUDIO_FILTER_PRESET_1 "위스퍼 및 폭발음이 포함된 오디오인 경우"
 END
 
@@ -2438,8 +2438,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_SUBDELAY_DEC     "자막 싱크 당기기 -"
-    IDS_AG_SUBDELAY_INC     "자막 싱크 밀기 +"
+    IDS_AG_SUBDELAY_DEC     "자막 싱크 빠르게"
+    IDS_AG_SUBDELAY_INC     "자막 싱크 느리게"
     IDS_FILE_SAVE_THUMBNAILS "썸네일 저장"
     IDS_OSD_TEST            "OSD 시험"
 END
@@ -2694,7 +2694,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_AUDIO_FILE       "오디오 파일"
-    IDS_AG_PLAYLIST_FILE    "재생목록"
+    IDS_AG_PLAYLIST_FILE    "재생 목록"
     IDS_AG_OTHER            "기타"
     IDS_AG_MEDIAFILES       "미디어 파일 (모든 형식)|"
     IDS_AG_ALLFILES         "모든 파일 (*.*)|*.*|"
@@ -2802,7 +2802,7 @@ BEGIN
     IDS_AG_RESET_STATS      "EVR 싱크 리셋상태"
     IDS_VIEW_BORDERLESS     "외곽선 숨기기\tCtrl+0"
     IDS_VIEW_FRAMEONLY      "창 프레임만\tCtrl+0"
-    IDS_VIEW_CAPTIONMENU    "제목표시줄과 메뉴 보이기\tCtrl+0"
+    IDS_VIEW_CAPTIONMENU    "제목 표시줄과 메뉴 보이기\tCtrl+0"
     IDS_VIEW_HIDEMENU       "메뉴 숨기기\tCtrl+0"
 END
 
@@ -2810,8 +2810,8 @@ STRINGTABLE
 BEGIN
     IDS_AG_DECREASE_RATE    "속도 감소"
     IDS_AG_RESET_RATE       "초기화"
-    IDS_AG_AUDIODELAY_PLUS  "오디오 딜레이 +10밀리 초"
-    IDS_AG_AUDIODELAY_MINUS "오디오 지연 -10밀리 초"
+    IDS_AG_AUDIODELAY_PLUS  "오디오 10밀리 초 느리게"
+    IDS_AG_AUDIODELAY_MINUS "오디오 10밀리 초 빠르게"
     IDS_AG_JUMP_FORWARD_1   "앞으로 이동 (조금)"
     IDS_AG_JUMP_BACKWARD_1  "뒤로 이동 (조금)"
     IDS_AG_JUMP_FORWARD_2   "앞으로 이동 (중간)"
@@ -2994,7 +2994,7 @@ STRINGTABLE
 BEGIN
     IDS_ZOOM_AUTOFIT        "자동 맞춤"
     IDS_ZOOM_AUTOFITLARGE   "자동 맞춤 (크게만)"
-    IDS_ADD_TO_PLAYLIST     "MPC-BE 재생목록에 추가"
+    IDS_ADD_TO_PLAYLIST     "MPC-BE 재생 목록에 추가"
     IDS_OPEN_WITH_MPC       "MPC-BE로 재생"
     IDS_CANNOT_CHANGE_FORMAT  "미디어 재생기 클래식 파일 형식을 바꿀 권한이 없습니다. ""수정"" 버튼을 눌러서 관리자 권한을 얻으십시오."
     IDS_APP_DESCRIPTION     "원래 헝가리 개발자 Gabest가 만든, 윈도를 위한 강력하고 설정이 자유로운 멀티미디어 재생기. 이 버전은 추가적인기능과 다이렉트 3차원 전체 화면 모드와 비스타를 지원합니다."
@@ -3103,7 +3103,7 @@ BEGIN
     IDS_MAINFRM_DIR_TITLE   "디렉토리 선택"
     IDS_MAINFRM_DIR_CHECK   "하위 폴더 포함"
     IDS_AG_PAUSE            "일시 중지"
-    IDS_AG_TOGGLE_CAPTION   "제목 표시줄&메뉴 토글"
+    IDS_AG_TOGGLE_CAPTION   "제목 표시줄 & 메뉴 토글"
     IDS_AG_TOGGLE_SEEKER    "탐색 바 토글"
     IDS_AG_TOGGLE_CONTROLS  "제어 토글"
 END
@@ -3144,7 +3144,7 @@ BEGIN
     IDS_MAINFRM_121         " (음성 해설 1)"
     IDS_MAINFRM_122         " (음성 해설 2)"
     IDS_AG_ENABLED          "사용"
-    IDS_AG_ANGLE            "앵글 %d"
+    IDS_AG_ANGLE            "기울기 %d"
     IDS_AG_VSYNCOFFSET_INCREASE "수직 동기화 오프셋 증가"
 END
 
@@ -3168,17 +3168,17 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_HAALI_VR       "VMR-9과 거의 같지만 제대로 바이큐빅 리사이저를 사용합니다.."
+    IDS_DESC_HAALI_VR       "VMR-9과 다름없지만, 고등 차수 보간을 사용합니다."
 END
 
 STRINGTABLE
 BEGIN
     IDS_DESC_NULLVR_ANY     "모든 비디오 형식의 샘플을 출력하지 않습니다. 비디오를 출력하지 않으면서 CPU가 작동하도록 할 때 사용합니다."
-    IDS_DESC_NULLVR_UNCOMP  "일반적인 Null 렌더러와 같지만 압축되지 않은 형식만을 연결합니다."
+    IDS_DESC_NULLVR_UNCOMP  "일반적인 Null 렌더러와 다름없지만 압축되지 않은 형식만을 연결합니다."
     IDS_DESC_EVR            "하드웨어 디코딩을 지원하는 비디오 렌더러입니다."
-    IDS_DESC_EVR_CP         "EVR과 같지만, 자막 및 후처리를 위해 할당자-발표자를 사용합니다."
+    IDS_DESC_EVR_CP         "EVR과 다름없지만, 자막 및 후처리를 위해 할당자-발표자를 사용합니다."
     IDS_DESC_MADVR          "고품질 렌더러, D3D9 이상을 지원하는 GPU 필요."
-    IDS_DESC_EVR_SYNC       "EVR (CP)와 같지만, 스킵되거나 중복된 영상 프레임을 제거하기 위한 디스플레이 주사율과 비디오 프레임율을 동기화해주는 여러 옵션 제공"
+    IDS_DESC_EVR_SYNC       "EVR (CP)와 다름없지만, 스킵되거나 중복된 영상 프레임을 제거하기 위한 디스플레이 주사율과 비디오 프레임율을 동기화해주는 여러 옵션 제공"
 END
 
 STRINGTABLE
@@ -3205,15 +3205,15 @@ BEGIN
     IDS_CMD_FULLSCREEN      "/fullscreen\t전체 화면 모드로 재생 시작"
     IDS_CMD_MINIMIZED       "/minimized\t최소화 모드로 재생 시작"
     IDS_CMD_NEW             "/new\t\t재생기 창을 하나 더 생성"
-    IDS_CMD_ADD             "/add\t\t재생목록에 지정한 ""경로 이름""을 추가,\n\t\t/open 과 /play 스위치와 같이 사용 가능"
-    IDS_CMD_RANDOMIZE       "/randomize\t재생목록 무작위화"
+    IDS_CMD_ADD             "/add\t\t재생 목록에 지정한 ""경로 이름""을 추가,\n\t\t/open 과 /play 스위치와 같이 사용 가능"
+    IDS_CMD_RANDOMIZE       "/randomize\t재생 목록 무작위화"
 END
 
 STRINGTABLE
 BEGIN
     IDS_CMD_REGVID          "/regvid\t\t비디오 파일 확장명을 MPC-BE로 연결"
     IDS_CMD_REGAUD          "/regaud\t\t오디오 파일 확장명을 MPC-BE로 연결"
-    IDS_CMD_REGPL           "/regpl\t\t재생목록 파일을 MPC-BE로 연결"
+    IDS_CMD_REGPL           "/regpl\t\t재생 목록 파일을 MPC-BE로 연결"
     IDS_CMD_REGALL          "/regall\t\t지원가능한 모든 파일을 MPC-BE로 연결"
     IDS_CMD_UNREGALL        "/unregall\t\tMPC-BE로 연결했던 확장명 해제"
     IDS_CMD_START           "/start ms\t\t지정한 ""ms"" (= 밀리 초)위치에서 재생 시작"
@@ -3398,7 +3398,7 @@ BEGIN
     IDS_AG_TOGGLE_STATS     "통계 토글"
     IDS_AG_TOGGLE_STATUS    "상태 표시줄 토글"
     IDS_AG_TOGGLE_SUBRESYNC "자막 싱크 조절 토글"
-    IDS_AG_TOGGLE_PLAYLIST  "재생목록 토글"
+    IDS_AG_TOGGLE_PLAYLIST  "재생 목록 토글"
     IDS_AG_TOGGLE_CAPTURE   "캡처 토글"
     IDS_AG_TOGGLE_SHADER    "셰이더 편집 토글"
     IDS_AG_ZOOM_50          "50% 축소"
@@ -3558,8 +3558,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_MFMT_PLS            "재생목록"
-    IDS_MFMT_BDPLS          "블루레이 재생목록"
+    IDS_MFMT_PLS            "재생 목록"
+    IDS_MFMT_BDPLS          "블루레이 재생 목록"
     IDS_MFMT_CUE            "큐 시트"
 END
 
