@@ -13658,7 +13658,7 @@ size_t CMainFrame::GetSubSelIdx()
 
 			if (bMatch) {
 				return nIdx;
-			} else if (!bSubtitlesOffIfPatternNotMatch) {
+			} else {
 				for (size_t iIndex = 0; iIndex < m_SubtitlesStreams.size(); iIndex++) {
 					if (m_SubtitlesStreams[iIndex].Ext) {
 						return iIndex;
