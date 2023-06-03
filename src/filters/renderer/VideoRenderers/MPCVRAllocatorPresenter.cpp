@@ -393,11 +393,6 @@ BYTE* WriteChunk(BYTE* dst, const uint32_t code, const int32_t size, BYTE* data)
 
 STDMETHODIMP CMPCVRAllocatorPresenter::AddPixelShader(int target, LPCWSTR name, LPCSTR profile, LPCSTR sourceCode)
 {
-	HRESULT hr = E_FAIL;
-
-	const int namesize = wcslen(name) * sizeof(wchar_t);
-	const int codesize = strlen(sourceCode);
-
 	int iProfile = 0;
 	if (!strcmp(profile, "ps_2_0") || !strcmp(profile, "ps_2_a") || !strcmp(profile, "ps_2_b") || !strcmp(profile, "ps_3_0")) {
 		iProfile = 3;
@@ -405,6 +400,13 @@ STDMETHODIMP CMPCVRAllocatorPresenter::AddPixelShader(int target, LPCWSTR name, 
 	else if (!strcmp(profile, "ps_4_0")) {
 		iProfile = 4;
 	}
+	else {
+		return E_INVALIDARG;
+	}
+
+	HRESULT hr = E_ABORT;
+	const int namesize = wcslen(name) * sizeof(wchar_t);
+	const int codesize = strlen(sourceCode);
 
 	if (codesize && TARGET_SCREEN == target) {
 		if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {

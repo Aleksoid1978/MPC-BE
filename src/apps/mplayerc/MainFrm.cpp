@@ -11796,14 +11796,8 @@ ShaderC* CMainFrame::GetShader(LPCWSTR label, bool bD3D11)
 					if (bD3D11) {
 						shader.profile = L"ps_4_0";
 					}
-					else if (shader.profile == L"ps_3_sw") {
+					else {
 						shader.profile = L"ps_3_0";
-					}
-					else if (shader.profile != L"ps_2_0"
-							&& shader.profile != L"ps_2_a"
-							&& shader.profile != L"ps_2_b"
-							&& shader.profile != L"ps_3_0") {
-						shader.profile = L"ps_2_0";
 					}
 
 					while (file.ReadString(str)) {
