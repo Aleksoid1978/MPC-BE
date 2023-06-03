@@ -214,23 +214,7 @@ CString CDTSHDFile::GetName() const {
 
 	if (m_extrasize == 1) {
 		const auto profile = m_extradata[0];
-		switch (profile) {
-			case DCA_PROFILE_HD_HRA:
-				name = L"DTS-HD HRA";
-				break;
-			case DCA_PROFILE_HD_MA:
-				name = L"DTS-HD MA";
-				break;
-			case DCA_PROFILE_HD_MA_X:
-				name = L"DTS-HD MA + DTS:X";
-				break;
-			case DCA_PROFILE_HD_MA_X_IMAX:
-				name = L"DTS-HD MA + DTS:X IMAX";
-				break;
-			case DCA_PROFILE_EXPRESS:
-				name = L"DTS Express";
-				break;
-		}
+		GetDTSHDDescription(profile, name);
 	}
 
 	return name;

@@ -2687,14 +2687,20 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 					case DCA_PROFILE_HD_MA:
 						codecName = "dts-hd ma";
 						break;
+					case DCA_PROFILE_EXPRESS:
+						codecName = "dts express";
+						break;
 					case DCA_PROFILE_HD_MA_X:
 						codecName = "dts-hd ma + dts:x";
 						break;
 					case DCA_PROFILE_HD_MA_X_IMAX:
 						codecName = "dts-hd ma + dts:x imax";
 						break;
-					case DCA_PROFILE_EXPRESS:
-						codecName = "dts express";
+					case DCA_PROFILE_HD_HRA_X:
+						codecName = "dts-hd hra + dts:x";
+						break;
+					case DCA_PROFILE_HD_HRA_X_IMAX:
+						codecName = "dts-hd hra + dts:x imax";
 						break;
 				}
 			}

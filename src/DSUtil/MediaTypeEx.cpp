@@ -342,24 +342,8 @@ CString CMediaTypeEx::ToString(IPin* pPin)
 					|| subtype != GUID_NULL) {
 				codec = GetAudioCodecName(subtype, wfe->wFormatTag);
 				if (codec == L"DTS" && wfe->cbSize == 1) {
-					const auto profile = ((BYTE *)(wfe + 1))[0];
-					switch (profile) {
-						case DCA_PROFILE_HD_HRA:
-							codec = L"DTS-HD HRA";
-							break;
-						case DCA_PROFILE_HD_MA:
-							codec = L"DTS-HD MA";
-							break;
-						case DCA_PROFILE_HD_MA_X:
-							codec = L"DTS-HD MA + DTS:X";
-							break;
-						case DCA_PROFILE_HD_MA_X_IMAX:
-							codec = L"DTS-HD MA + DTS:X IMAX";
-							break;
-						case DCA_PROFILE_EXPRESS:
-							codec = L"DTS Express";
-							break;
-					}
+					const auto profile = (reinterpret_cast<const BYTE*>(wfe + 1))[0];
+					GetDTSHDDescription(profile, codec);
 				}
 				dim.Format(L"%uHz", wfe->nSamplesPerSec);
 				if (wfe->nChannels) {

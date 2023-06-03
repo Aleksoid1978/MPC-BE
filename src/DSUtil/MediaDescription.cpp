@@ -233,23 +233,7 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 					if (!codecName.IsEmpty()) {
 						if (codecName == L"DTS" && pInfo->cbSize == 1) {
 							const auto profile = (reinterpret_cast<const BYTE *>(pInfo + 1))[0];
-							switch (profile) {
-								case DCA_PROFILE_HD_HRA:
-									codecName = L"DTS-HD HRA";
-									break;
-								case DCA_PROFILE_HD_MA:
-									codecName = L"DTS-HD MA";
-									break;
-								case DCA_PROFILE_HD_MA_X:
-									codecName = L"DTS-HD MA + DTS:X";
-									break;
-								case DCA_PROFILE_HD_MA_X_IMAX:
-									codecName = L"DTS-HD MA + DTS:X IMAX";
-									break;
-								case DCA_PROFILE_EXPRESS:
-									codecName = L"DTS Express";
-									break;
-							}
+							GetDTSHDDescription(profile, codecName);
 						} else if (codecName == "TrueHD" && pInfo->cbSize == 1) {
 							const auto flag = (reinterpret_cast<const BYTE*>(pInfo + 1))[0];
 							if (flag == 1) {

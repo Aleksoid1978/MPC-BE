@@ -1103,16 +1103,16 @@ int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t*
 	}
 
 	if (audioframe->samplerate && audioframe->channels) {
-		if (audioframe->param2 == DCA_PROFILE_HD_MA && gb.RemainingSize() > 4) {
+		if ((audioframe->param2 == DCA_PROFILE_HD_MA || audioframe->param2 == DCA_PROFILE_HD_HRA) && gb.RemainingSize() > 4) {
 			auto start = gb.GetBufferPos();
 			auto end = start + gb.RemainingSize();
 			while (end - start >= 4) {
 				auto sync = GETU32(start++);
 				if (sync == 0x50080002 || sync == 0xD10040F1) {
-					audioframe->param2 = DCA_PROFILE_HD_MA_X;
+					audioframe->param2 = audioframe->param2 == DCA_PROFILE_HD_MA ? DCA_PROFILE_HD_MA_X : DCA_PROFILE_HD_HRA_X;
 					break;
 				} else if (sync == 0xD00040F1) {
-					audioframe->param2 = DCA_PROFILE_HD_MA_X_IMAX;
+					audioframe->param2 = audioframe->param2 == DCA_PROFILE_HD_MA ? DCA_PROFILE_HD_MA_X_IMAX : DCA_PROFILE_HD_HRA_X_IMAX ;
 					break;
 				}
 			}
@@ -1122,6 +1122,33 @@ int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t*
 	}
 
 	return 0;
+}
+
+void GetDTSHDDescription(BYTE profile, CString& description)
+{
+	switch (profile) {
+		case DCA_PROFILE_HD_HRA:
+			description = L"DTS-HD HRA";
+			break;
+		case DCA_PROFILE_HD_MA:
+			description = L"DTS-HD MA";
+			break;
+		case DCA_PROFILE_EXPRESS:
+			description = L"DTS Express";
+			break;
+		case DCA_PROFILE_HD_MA_X:
+			description = L"DTS-HD MA + DTS:X";
+			break;
+		case DCA_PROFILE_HD_MA_X_IMAX:
+			description = L"DTS-HD MA + DTS:X IMAX";
+			break;
+		case DCA_PROFILE_HD_HRA_X:
+			description = L"DTS-HD HRA + DTS:X";
+			break;
+		case DCA_PROFILE_HD_HRA_X_IMAX:
+			description = L"DTS-HD HRA + DTS:X IMAX";
+			break;
+	}
 }
 
 // HDMV LPCM

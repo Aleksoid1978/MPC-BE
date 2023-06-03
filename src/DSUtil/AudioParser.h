@@ -45,11 +45,13 @@
 #define EAC3_FRAME_TYPE_AC3_CONVERT 2
 #define EAC3_FRAME_TYPE_RESERVED    3
 
-#define DCA_PROFILE_HD_HRA       0x01 // High Resolution Audio
-#define DCA_PROFILE_HD_MA        0x02 // Master Audio
-#define DCA_PROFILE_EXPRESS      0x03 // Express
-#define DCA_PROFILE_HD_MA_X      0x04 // Master Audio + DTS:X
-#define DCA_PROFILE_HD_MA_X_IMAX 0x05 // Master Audio + DTS:X IMAX
+#define DCA_PROFILE_HD_HRA        0x01 // High Resolution Audio
+#define DCA_PROFILE_HD_MA         0x02 // Master Audio
+#define DCA_PROFILE_EXPRESS       0x03 // Express
+#define DCA_PROFILE_HD_MA_X       0x04 // Master Audio + DTS:X
+#define DCA_PROFILE_HD_MA_X_IMAX  0x05 // Master Audio + DTS:X IMAX
+#define DCA_PROFILE_HD_HRA_X      0x06 // High Resolution Audio + DTS:X
+#define DCA_PROFILE_HD_HRA_X_IMAX 0x07 // High Resolution Audio + DTS:X IMAX
 
 enum {
 	IEC61937_AC3                = 0x01,          ///< AC-3 data
@@ -126,6 +128,7 @@ int ParseDTSHDHeader       (const BYTE* buf, const int buffsize = 0, audioframe_
 
 // need >= 4 bytes, param1 = bitdepth, param2 = bytes per frame
 int ParseHdmvLPCMHeader    (const BYTE* buf, audioframe_t* audioframe = nullptr);
+void GetDTSHDDescription   (BYTE profile, CString& description);
 
 // need >= 7 bytes, param1 = header size, param2 = MPEG-4 Audio Object Type
 int ParseADTSAACHeader     (const BYTE* buf, audioframe_t* audioframe = nullptr);
