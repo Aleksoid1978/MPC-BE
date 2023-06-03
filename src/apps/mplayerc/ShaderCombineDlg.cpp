@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -93,7 +93,12 @@ BOOL CShaderCombineDlg::OnInitDialog()
 	m_cbDXNum.AddString(L"DX9");
 	m_cbDXNum.AddString(L"DX11");
 
-	m_cbDXNum.SetCurSel(0);
+	if (s.m_VRSettings.iVideoRenderer == VIDRNDT_MPCVR && IsWindows8OrGreater()) {
+		m_cbDXNum.SetCurSel(1);
+	}
+	else {
+		m_cbDXNum.SetCurSel(0);
+	}
 	OnSelChangeDXNum();
 
 	UpdateData(FALSE);
