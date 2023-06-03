@@ -1689,9 +1689,9 @@ BEGIN
         BEGIN
             MENUITEM "지속(&o)", ID_REPEAT_FOREVER
             MENUITEM SEPARATOR
-            MENUITEM "A-B (초기화(&R))", ID_PLAY_REPEAT_AB
-            MENUITEM "A-B (표기 &A)", ID_PLAY_REPEAT_AB_MARK_A
-            MENUITEM "A-B (표기 &B)", ID_PLAY_REPEAT_AB_MARK_B
+            MENUITEM "구간 : 초기화(&R)", ID_PLAY_REPEAT_AB
+            MENUITEM "구간 : 시작(&A) 지점 지정", ID_PLAY_REPEAT_AB_MARK_A
+            MENUITEM "구간 : 끝(&B) 지점 지정", ID_PLAY_REPEAT_AB_MARK_B
         END
         MENUITEM SEPARATOR
         MENUITEM "재생속도 증가(&I)",          ID_PLAY_INCRATE
@@ -1761,9 +1761,9 @@ BEGIN
         BEGIN
             MENUITEM "지속(&o)", ID_REPEAT_FOREVER
             MENUITEM SEPARATOR
-            MENUITEM "A-B (초기화(&R))", ID_PLAY_REPEAT_AB
-            MENUITEM "A-B (표기 &A)", ID_PLAY_REPEAT_AB_MARK_A
-            MENUITEM "A-B (표기 &B)", ID_PLAY_REPEAT_AB_MARK_B
+            MENUITEM "구간 : 초기화(&R)", ID_PLAY_REPEAT_AB
+            MENUITEM "구간 : 시작(&A) 지점 지정", ID_PLAY_REPEAT_AB_MARK_A
+            MENUITEM "구간 : 끝(&B) 지점 지정", ID_PLAY_REPEAT_AB_MARK_B
         END
         MENUITEM SEPARATOR
         MENUITEM "전체 화면(&L)",                    ID_VIEW_FULLSCREEN
@@ -1958,9 +1958,9 @@ BEGIN
             BEGIN
                 MENUITEM "지속(&o)", ID_REPEAT_FOREVER
                 MENUITEM SEPARATOR
-                MENUITEM "A-B (초기화(&R))", ID_PLAY_REPEAT_AB
-                MENUITEM "A-B (&A 표시)", ID_PLAY_REPEAT_AB_MARK_A
-                MENUITEM "A-B (&B 표시)", ID_PLAY_REPEAT_AB_MARK_B
+                MENUITEM "구간 : 초기화(&R)", ID_PLAY_REPEAT_AB
+                MENUITEM "구간 : 시작(&A) 지점 지정", ID_PLAY_REPEAT_AB_MARK_A
+                MENUITEM "구간 : 끝(&B) 지점 지정", ID_PLAY_REPEAT_AB_MARK_B
             END
             MENUITEM SEPARATOR
             MENUITEM "재생 속도 증가(&I)",          ID_PLAY_INCRATE
@@ -2365,9 +2365,9 @@ BEGIN
     IDS_RECORD_STOP         "정지"
     IDS_FILTERS_COPY_TO_CLIPBOARD "클립보드에 필터 목록 복사(&C)"
     IDS_AG_COPY_IMAGE       "클립보드에 이미지 복사"
-    IDS_PLAYLOOPMODE_AB     "A-B 반복 :  위치 초기화"
-    IDS_PLAYLOOPMODE_AB_MARK_A "A-B 반복 : A 위치 지정"
-    IDS_PLAYLOOPMODE_AB_MARK_B "A-B 반복 : B 위치 지정"
+    IDS_PLAYLOOPMODE_AB     "구간 반복 :  지점 초기화"
+    IDS_PLAYLOOPMODE_AB_MARK_A "구간 반복 : 시작 지점 지정"
+    IDS_PLAYLOOPMODE_AB_MARK_B "구간 반복 : 끝 지점 지정"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "클립보드에서 재생 목록에 추가"
     IDS_AUDIO_FILTER_PRESET_1 "위스퍼 및 폭발음이 포함된 오디오인 경우"
 END
