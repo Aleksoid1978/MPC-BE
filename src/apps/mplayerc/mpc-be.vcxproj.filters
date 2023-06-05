@@ -1009,6 +1009,9 @@
     <None Include="res\empty.hlsl">
       <Filter>Resource Files\shaders</Filter>
     </None>
+    <None Include="res\empty11.hlsl">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="mplayerc.rc">

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -87,6 +87,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
+	afx_msg void OnCbnSelchangeCombo3();
 	afx_msg void OnCbnSelchangeCombo1();
 	afx_msg void OnBnClickedSave();
 	afx_msg void OnBnClickedMenu();

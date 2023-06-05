@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -216,35 +216,26 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 	m_cbDXNum.AddString(L"DX9");
 	m_cbDXNum.AddString(L"DX11");
 
+	m_cbProfile.AddString(L"ps_3_0");
+	m_cbProfile.AddString(L"ps_4_0");
+
 	return TRUE;
 }
 
 void CShaderEditorDlg::UpdateShaderList()
 {
-	m_cbDXNum.EnableWindow(FALSE);
+	m_cbProfile.EnableWindow(FALSE);
 	if (m_bD3D11) {
 		m_cbDXNum.SetCurSel(1);
+		m_cbProfile.SetCurSel(1);
 	} else {
 		m_cbDXNum.SetCurSel(0);
+		m_cbProfile.SetCurSel(0);
 	}
 
 	m_cbLabels.ResetContent();
 	m_edSrcdata.SetWindowTextW(L"");
 	m_edOutput.SetWindowTextW(L"");
-
-	m_cbProfile.ResetContent();
-	if (m_bD3D11) {
-		m_cbProfile.AddString(L"ps_4_0");
-		m_cbProfile.SetCurSel(0);
-		m_cbProfile.EnableWindow(FALSE);
-	}
-	else {
-		m_cbProfile.AddString(L"ps_2_0");
-		m_cbProfile.AddString(L"ps_2_a");
-		m_cbProfile.AddString(L"ps_2_b");
-		m_cbProfile.AddString(L"ps_3_0");
-		m_cbProfile.EnableWindow(TRUE);
-	}
 
 	CString path;
 	if (AfxGetMyApp()->GetAppSavePath(path)) {
@@ -310,7 +301,7 @@ void CShaderEditorDlg::NewShader()
 	}
 
 	CStringA srcdata;
-	if (!LoadResource(IDF_SHADER_EMPTY, srcdata, L"FILE")) {
+	if (!LoadResource(m_bD3D11 ? IDF_SHADER11_EMPTY : IDF_SHADER_EMPTY, srcdata, L"FILE")) {
 		return;
 	}
 
@@ -361,6 +352,7 @@ void CShaderEditorDlg::DeleteShader()
 }
 
 BEGIN_MESSAGE_MAP(CShaderEditorDlg, CResizableDialog)
+	ON_CBN_SELCHANGE(IDC_COMBO3, OnCbnSelchangeCombo3)
 	ON_CBN_SELCHANGE(IDC_COMBO1, OnCbnSelchangeCombo1)
 	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedSave)
 	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedMenu)
@@ -388,6 +380,16 @@ BOOL CShaderEditorDlg::PreTranslateMessage(MSG* pMsg)
 	}
 
 	return __super::PreTranslateMessage(pMsg);
+}
+
+void CShaderEditorDlg::OnCbnSelchangeCombo3()
+{
+	bool bD3D11 = (m_cbDXNum.GetCurSel() == 1);
+
+	if (m_bD3D11 != bD3D11) {
+		m_bD3D11 = bD3D11;
+		UpdateShaderList();
+	}
 }
 
 void CShaderEditorDlg::OnCbnSelchangeCombo1()
@@ -509,7 +511,7 @@ void CShaderEditorDlg::OnBnClickedApply()
 				errmsg += disasm;
 
 				if (pFrame->m_pCAP) {
-					hr = pFrame->m_pCAP->AddPixelShader(TARGET_FRAME, label, profile, srcdata); // and add shader to the end of list
+					hr = pFrame->m_pCAP->AddPixelShader(TARGET_SCREEN, label, profile, srcdata); // and add shader to the end of list
 				}
 			}
 

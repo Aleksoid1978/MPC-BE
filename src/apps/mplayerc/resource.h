@@ -74,7 +74,8 @@
 #define IDF_FAVICON                     539
 
 #define IDF_SHADER_EMPTY                700
-#define IDF_SHADER_FINAL                701
+#define IDF_SHADER11_EMPTY              701
+#define IDF_SHADER_FINAL                702
 
 #define IDF_SHADER_RESIZER_BSPLINE4_X   710
 #define IDF_SHADER_RESIZER_BSPLINE4_Y   711
