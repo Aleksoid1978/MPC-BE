@@ -219,6 +219,8 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 	m_cbProfile.AddString(L"ps_3_0");
 	m_cbProfile.AddString(L"ps_4_0");
 
+	m_bD3D11 = (AfxGetAppSettings().m_VRSettings.iVideoRenderer == VIDRNDT_MPCVR && IsWindows8OrGreater());
+
 	return TRUE;
 }
 
