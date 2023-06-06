@@ -5,8 +5,19 @@
 ShoutcastSource
 Optimized work with the internal buffer.
 
+StreamReader
+Improved HLS M3U8 parsing.
+
+MP4Splitter
+Improved PCM audio support.
+Fixed getting track language.
+
 MpaDecFilter
 Optimized work with the internal buffer.
+
+MPCVideoDec
+Fixed playback for WMV3.
+Added support for "Dxtory" codec.
 
 Subtitles
 Removed broken subtitle download from Online Subtitle Database.
@@ -14,12 +25,15 @@ Removed broken subtitle download from Online Subtitle Database.
 YouTube
 Fixed selection of the preferred audio track language for the built-in YouTube parser for MP4 720p and MP4 360p formats. When there are several languages, only DASH streams will be used.
 Updated yt-dlp support.
+Added support for links like "youtube.com/live/".
 
 Player
 Added the ability to choose the location of the playlist window in the playlist menu.
 The playlist is now on the right side by default.
 Fixed and accelerated the return of screenshots when using the Web-interface.
 Added option "Display title for URL in recent files".
+Added the ability to edit a playlist item by pressing the F2 button.
+In the shader selection and editing windows, DX11 will initially be selected if MPC VR is selected in the settings and Windows 8 or later is used.
 
 Updated Dutch and Chinese (Traditional) translation (by beter).
 Updated Japanese translation (by tsubasanouta).
@@ -30,6 +44,7 @@ Updated Chinese (Simplified) translation (by wushantao).
 Updated Italian translation (by mapi68).
 Updated Korean translation (by Hackjjang and Potmarigold).
 Updated Ukrainian translation (by arestarh).
+Updated Spanish translation (by IPeluchito).
 
 Updated libraries:
 	dav1d git-1.2.1-8-g8b419c1;
