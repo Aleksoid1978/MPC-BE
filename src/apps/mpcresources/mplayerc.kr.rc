@@ -802,7 +802,7 @@ BEGIN
     LISTBOX         IDC_LIST3,5,41,210,200,LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "AVI 분배기\n설정",IDC_BUTTON5,220,41,70,30,BS_MULTILINE
     PUSHBUTTON      "MPEG 분배기\n설정",IDC_BUTTON1,220,76,70,30,BS_MULTILINE
-    PUSHBUTTON      "Matroska 분배기\n설정",IDC_BUTTON6,220,111,70,30,BS_MULTILINE
+    PUSHBUTTON      "마트로스카 분배기\n설정",IDC_BUTTON6,220,111,70,30,BS_MULTILINE
     PUSHBUTTON      "CDDA 리더\n설정",IDC_BUTTON8,220,146,70,30,BS_MULTILINE
     PUSHBUTTON      "VTS(IFO) 리더\n설정",IDC_BUTTON7,220,181,70,30,BS_MULTILINE
     PUSHBUTTON      "비디오 디코더\n설정",IDC_BUTTON2,220,41,70,30,BS_MULTILINE
@@ -1147,7 +1147,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "EVR (맞춤 프레젠터) 설정",IDC_STATIC,5,3,286,61
     CONTROL         "수직 동기화",IDC_VSYNC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,14,121,10
-    CONTROL         "내부 수직 동기화",IDC_VSYNC_INTERNAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,26,121,10
+    CONTROL         "내장 수직 동기화",IDC_VSYNC_INTERNAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,26,121,10
     CONTROL         "프레임 시간 수정 활성화",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,170,10
     CONTROL         "수직 동기화 전에 GPU 플러시",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,14,140,10
     CONTROL         "발표 후 GPU 플러시",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,140,10
@@ -1663,14 +1663,14 @@ BEGIN
             MENUITEM "자동",                        ID_STEREO3D_AUTO
             MENUITEM "모노",                        ID_STEREO3D_MONO
             MENUITEM "로우 인터리버",             ID_STEREO3D_ROW_INTERLEAVED
-            MENUITEM "로우 인터리버 (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
+            MENUITEM "로우 인터리버(2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
             MENUITEM "하프 오버언더",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "오버언더",                   ID_STEREO3D_OVERUNDER
             MENUITEM SEPARATOR
             MENUITEM "좌/우 바꾸기",             ID_STEREO3D_SWAP_LEFTRIGHT
         END
         MENUITEM SEPARATOR
-        POPUP "항상 위"
+        POPUP "항상 위에 유지"
         BEGIN
             MENUITEM "사용 안 함",                        ID_ONTOP_NEVER
             MENUITEM "사용",                          ID_ONTOP_ALWAYS
@@ -1798,7 +1798,7 @@ BEGIN
         MENUITEM SEPARATOR
         POPUP "보기(&E)"
         BEGIN
-            POPUP "항상 위"
+            POPUP "항상 위에 유지"
             BEGIN
                 MENUITEM "사용 안 함",                        ID_ONTOP_NEVER
                 MENUITEM "사용",                          ID_ONTOP_ALWAYS
@@ -1939,7 +1939,7 @@ BEGIN
                 MENUITEM "좌/우 바꾸기",             ID_STEREO3D_SWAP_LEFTRIGHT
             END
             MENUITEM SEPARATOR
-            POPUP "항상 위"
+            POPUP "항상 위에 유지"
             BEGIN
                 MENUITEM "사용 안 함",                        ID_ONTOP_NEVER
                 MENUITEM "사용",                          ID_ONTOP_ALWAYS
@@ -2278,11 +2278,11 @@ BEGIN
     IDS_STATSBAR_SYNC_OFFSET_FORMAT "avg : %d ms, dev : %d ms"
     IDS_STATSBAR_JITTER     "지터"
     IDS_STATSBAR_BITRATE    "비트레이트"
-    IDS_STATSBAR_BITRATE_AVG_CUR " (avg/cur)"
+    IDS_STATSBAR_BITRATE_AVG_CUR "(avg/cur)"
     IDS_AUTOPLAY_PLAYBDMOVIE "블루레이 재생"
     IDS_TEXTBAR_NOTHING     "없음"
-    IDS_TEXTBAR_FILENANE    "파일명 (혹은 제목이나 URL)"
-    IDS_TEXTBAR_TITLE       "제목 (혹은 파일명이나 URL)"
+    IDS_TEXTBAR_FILENANE    "파일명(혹은 제목이나 URL)"
+    IDS_TEXTBAR_TITLE       "제목(혹은 파일명이나 URL)"
     IDS_TEXTBAR_FULLPATH    "전체 경로"
 END
 
@@ -2402,7 +2402,7 @@ BEGIN
     IDS_PPAGE_FS_CLN_ON_OFF "온/오프"
     IDS_PPAGE_FS_CLN_FROM_FPS "fps부터"
     IDS_PPAGE_FS_CLN_TO_FPS "fps까지"
-    IDS_PPAGE_FS_CLN_DISPLAY_MODE "출력 모드 (Hz)"
+    IDS_PPAGE_FS_CLN_DISPLAY_MODE "출력 모드(Hz)"
     IDS_PPAGE_FS_DEFAULT    "기본값"
     IDS_PPAGE_FS_OTHER      "그 외"
     IDS_PPAGE_OUTPUT_SYS_DEF "시스템 기본값"
@@ -2462,7 +2462,7 @@ BEGIN
     IDD_PPAGEACCELTBL       "재생기::단축키"
     IDD_PPAGESUBSTYLE       "자막::스타일"
     IDD_PPAGEMOUSE          "재생기::마우스"
-    IDD_PPAGEINTERNALFILTERS "내부 필터"
+    IDD_PPAGEINTERNALFILTERS "내장 필터"
     IDD_PPAGELOGO           "재생기::로고"
     IDD_PPAGEVIDEO          "비디오"
     IDD_PPAGEWEBSERVER      "재생기::웹 인터페이스"
@@ -2514,10 +2514,10 @@ STRINGTABLE
 BEGIN
     IDS_PPAGE_OUTPUT_MPCVR  "MPC 비디오 렌더러"
     IDS_PPAGE_OUTPUT_EVR    "향상된 비디오 렌더러"
-    IDS_PPAGE_OUTPUT_EVR_CUSTOM "향상된 비디오 렌더러 (맞춤 프레젠터)"
+    IDS_PPAGE_OUTPUT_EVR_CUSTOM "향상된 비디오 렌더러(맞춤 프레젠터)"
     IDS_PPAGE_OUTPUT_DXR    "Haali 비디오 렌더러"
-    IDS_PPAGE_OUTPUT_NULL_ANY "Null (전부)"
-    IDS_PPAGE_OUTPUT_NULL_UNCOMP "Null (무압축)"
+    IDS_PPAGE_OUTPUT_NULL_ANY "Null(전부)"
+    IDS_PPAGE_OUTPUT_NULL_UNCOMP "Null(무압축)"
     IDS_PPAGE_OUTPUT_MADVR  "madVR"
     IDS_PPAGE_OUTPUT_SYNC   "비디오 렌더러 동기화"
     IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "선택한 렌더러는 설치되어 있지 않습니다."
@@ -2529,16 +2529,16 @@ BEGIN
     IDS_REND_NOT_INSTALLED  "**미설치**"
     IDS_PPAGE_OUTPUT_SURF_OFFSCREEN "일반 오프스크린 일반 표면"
     IDS_PPAGE_OUTPUT_SURF_2D "2D 서페이스"
-    IDS_PPAGE_OUTPUT_SURF_3D "3D 서페이스 (추천)"
+    IDS_PPAGE_OUTPUT_SURF_3D "3D 서페이스(추천)"
     IDS_DOWNLOAD_SUBS       "자막 받기"
     IDS_CM_INPUT_AUTO       "자동 감지"
-    IDS_CM_AMBIENTLIGHT_BRIGHT "밝게 (2.2 감마)"
-    IDS_CM_AMBIENTLIGHT_DIM "조금 어둡게 (2.35 감마)"
-    IDS_CM_AMBIENTLIGHT_DARK "어둡게 (2.4 감마)"
+    IDS_CM_AMBIENTLIGHT_BRIGHT "밝게(2.2 감마)"
+    IDS_CM_AMBIENTLIGHT_DIM "조금 어둡게(2.35 감마)"
+    IDS_CM_AMBIENTLIGHT_DARK "어둡게(2.4 감마)"
     IDS_CM_INTENT_PERCEPTUAL "지각적"
-    IDS_CM_INTENT_RELATIVECM "상대 컬러 메트릭스"
+    IDS_CM_INTENT_RELATIVECM "상대 색상 행렬"
     IDS_CM_INTENT_SATURATION "포화"
-    IDS_CM_INTENT_ABSOLUTECM "절대 컬러 메트릭스"
+    IDS_CM_INTENT_ABSOLUTECM "절대 색상 행렬"
     IDS_WEBUI_DISABLED_PREVIEW_MSG  "현재 미리 보기가 비활성화되어 있습니다. MPC-BE의 옵션에서 활성화할 수 있습니다."
 END
 
@@ -2568,7 +2568,7 @@ BEGIN
     IDS_OSD_SHADERS_1_OFF   "선처리 크기 변경 픽셀 셰이더 : 끔"
     IDS_OSD_SHADERS_2_ON    "후처리 크기 변경 픽셀 셰이더 : 켬"
     IDS_OSD_SHADERS_2_OFF   "후처리 크기 변경 픽셀 셰이더 : 끔"
-    IDS_AG_VSYNCINTERNAL    "내부 수직 동기화"
+    IDS_AG_VSYNCINTERNAL    "내장 수직 동기화"
 END
 
 STRINGTABLE
@@ -2656,7 +2656,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_CONTROLS_STOPPED    "중지"
-    IDS_CONTROLS_BUFFERING  "버퍼링... (%d%%)"
+    IDS_CONTROLS_BUFFERING  "버퍼링...(%d%%)"
     IDS_CONTROLS_CAPTURING  "캡처 중..."
     IDS_CONTROLS_OPENING    "여는 중..."
     IDS_CONTROLS_CLOSED     "닫음"
@@ -2842,9 +2842,9 @@ BEGIN
     IDS_FRAME_FROMOUTSIDE   "바깥쪽 윈도 창 크기/모양대로 조절"
     IDS_CENTER_LEVEL_INC    "센터 레벨 증가"
     IDS_CENTER_LEVEL_DEC    "센터 레벨 감소"
-    IDS_CENTER_LEVEL        "센터 레벨 (%+.1f dB)"
+    IDS_CENTER_LEVEL        "센터 레벨(%+.1f dB)"
     IDS_CENTER_LEVEL_OSD    "센터 레벨 : %+.1f dB"
-    IDS_SURROUND_LEVEL      "서라운드 레벨 (%+.1f dB)"
+    IDS_SURROUND_LEVEL      "서라운드 레벨(%+.1f dB)"
 END
 
 STRINGTABLE
@@ -2858,7 +2858,7 @@ BEGIN
     IDS_AG_VIDFRM_HALF      "비디오폼 : 1/2"
     IDS_AG_VIDFRM_NORMAL    "비디오폼 : 표준"
     IDS_AG_VIDFRM_DOUBLE    "비디오폼 : 2배"
-    IDS_AG_ALWAYS_ON_TOP    "항상 위에"
+    IDS_AG_ALWAYS_ON_TOP    "항상 위에 유지"
     IDS_AG_PNS_INC_SIZE     "팬&스캔 - 크기 확대"
     IDS_AG_PNS_INC_WIDTH    "팬&스캔 - 폭 확대"
     IDS_AG_PNS_INC_HEIGHT   "팬&스캔 - 높이 확대"
@@ -2973,7 +2973,7 @@ BEGIN
     IDS_DVB_CHANNEL_STOP_SCAN "중지"
     IDS_DVB_TVNAV_SEERADIO  "라디오 방송국"
     IDS_DVB_TVNAV_SEETV     "TV 방송국"
-    IDS_CAPTURE_CHANNEL_FREQ "채널 %d (%.1f MHz)"
+    IDS_CAPTURE_CHANNEL_FREQ "채널 %d(%.1f MHz)"
 END
 
 STRINGTABLE
@@ -2993,11 +2993,11 @@ END
 STRINGTABLE
 BEGIN
     IDS_ZOOM_AUTOFIT        "자동 맞춤"
-    IDS_ZOOM_AUTOFITLARGE   "자동 맞춤 (크게만)"
+    IDS_ZOOM_AUTOFITLARGE   "자동 맞춤(확대)"
     IDS_ADD_TO_PLAYLIST     "MPC-BE 재생 목록에 추가"
     IDS_OPEN_WITH_MPC       "MPC-BE로 재생"
     IDS_CANNOT_CHANGE_FORMAT  "미디어 재생기 클래식 파일 형식을 바꿀 권한이 없습니다. ""수정"" 버튼을 눌러서 관리자 권한을 얻으십시오."
-    IDS_APP_DESCRIPTION     "원래 헝가리 개발자 Gabest가 만든, 윈도를 위한 강력하고 설정이 자유로운 멀티미디어 재생기. 이 버전은 추가적인기능과 다이렉트 3차원 전체 화면 모드와 비스타를 지원합니다."
+    IDS_APP_DESCRIPTION     "헝가리의 가베스트라는 개발자가 만든 강력한 구성의 윈도용 멀티미디어 재생기이다."
     IDS_MAINFRM_12          "채널"
     IDS_MAINFRM_13          "채널"
 END
@@ -3059,7 +3059,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_MAINFRM_47          " 성공적으로 불러옴"
-    IDS_MAINFRM_48          "모든 파일 (*.*)|*.*||"
+    IDS_MAINFRM_48          "모든 파일(*.*)|*.*||"
     IDS_MAINFRM_49          "DIB 얻기 실패, hr = %08x"
     IDS_MAINFRM_51          "현재 이미지 얻기 실패, hr = %08x"
     IDS_MAINFRM_53          "파일을 만들 수 없음"
@@ -3067,7 +3067,7 @@ BEGIN
     IDS_MAINFRM_55          "비디오 프레임 사이즈 얻기 실패"
     IDS_MAINFRM_56          "메모리 부족!"
     IDS_MAINFRM_57          "사용할 수 없는 이미지 포맷, %d bpp dibs 썸네일을 만들 수 없음."
-    IDS_MAINFRM_58          "파일 크기 : %s (%s 바이트)\\N"
+    IDS_MAINFRM_58          "파일 크기 : %s(%s 바이트)\\N"
     IDS_MAINFRM_59          "{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}파일 이름 : %s\\N%s해상도 : %dx%d %s\\N기간 : %02d:%02d:%02d"
     IDS_MAINFRM_60          "자막을 보기 위해서는 다음 비디오 렌더러로 변경한 후 파일을 다시 열어야 합니다.\n"
     IDS_MAINFRM_61          "- 다이렉트쇼 : EVR-CP, EVR Sync, Haali, madVR or MPC VR.\n"
@@ -3099,7 +3099,7 @@ BEGIN
     IDS_BALANCE_OSD         "균형 : %s"
     IDS_FULLSCREENMONITOR_CURRENT "현재"
     IDS_MPC_CRASH           "MPC-BE가 갑자기 멈춤. 문제 해결을 위해, '%s' 이 파일을 bug tracker에 보내주세요.\n\n미니 덤프 파일이 있는 폴더를 열고 지금 bug tracker로 가시겠습니까?"
-    IDS_MPC_MINIDUMP_FAIL   "덤프 파일을 만드는 데 실패 '%s' (error %d)"
+    IDS_MPC_MINIDUMP_FAIL   "덤프 파일을 만드는 데 실패 '%s'(error %d)"
     IDS_MAINFRM_DIR_TITLE   "디렉토리 선택"
     IDS_MAINFRM_DIR_CHECK   "하위 폴더 포함"
     IDS_AG_PAUSE            "일시 중지"
@@ -3137,12 +3137,12 @@ BEGIN
     IDS_MAINFRM_114         "%s 은(는) 찾을 수 없습니다, 이 파일을 포함한 미디어를 삽입하세요."
     IDS_AG_ABORTED          "취소됨"
     IDS_MAINFRM_116         "속성(&P)..."
-    IDS_MAINFRM_117         " (핀) 속성..."
+    IDS_MAINFRM_117         "(핀) 속성..."
     IDS_AG_UNKNOWN_STREAM   "알려지지 않은 스트림"
     IDS_AG_UNKNOWN          "알려지지 않은 %d"
     IDS_AG_VSYNC            "수직 동기화"
-    IDS_MAINFRM_121         " (음성 해설 1)"
-    IDS_MAINFRM_122         " (음성 해설 2)"
+    IDS_MAINFRM_121         "(음성 해설 1)"
+    IDS_MAINFRM_122         "(음성 해설 2)"
     IDS_AG_ENABLED          "사용"
     IDS_AG_ANGLE            "기울기 %d"
     IDS_AG_VSYNCOFFSET_INCREASE "수직 동기화 오프셋 증가"
@@ -3152,7 +3152,7 @@ STRINGTABLE
 BEGIN
     IDS_AG_DISABLED         "사용하지 않음"
     IDS_AG_VSYNCOFFSET_DECREASE "수직 동기화 오프셋 감소"
-    IDS_MAINFRM_132         "경고 (CMainFrame::SeekTo) : 캡처모드에서 탐색"
+    IDS_MAINFRM_132         "경고(CMainFrame::SeekTo) : 캡처모드에서 탐색"
     IDS_AG_REMOVING         "제거 : "
     IDS_MAINFRM_134         "경고 : CMainFrame::CloseMedia() 두 번 이상 호출됨\n"
     IDS_MAINFRM_135         "치명적 에러 : !!! MPC-BE를 종료 !!!"
@@ -3178,29 +3178,29 @@ BEGIN
     IDS_DESC_EVR            "하드웨어 디코딩을 지원하는 비디오 렌더러입니다."
     IDS_DESC_EVR_CP         "EVR과 다름없지만, 자막 및 후처리를 위해 할당자-발표자를 사용합니다."
     IDS_DESC_MADVR          "고품질 렌더러, D3D9 이상을 지원하는 GPU 필요."
-    IDS_DESC_EVR_SYNC       "EVR (CP)와 다름없지만, 스킵되거나 중복된 영상 프레임을 제거하기 위한 디스플레이 주사율과 비디오 프레임율을 동기화해주는 여러 옵션 제공"
+    IDS_DESC_EVR_SYNC       "EVR(CP)와 다름없지만, 스킵되거나 중복된 영상 프레임을 제거하기 위한 디스플레이 주사율과 비디오 프레임율을 동기화해주는 여러 옵션 제공"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "사용법 : mpc-be.exe ""경로명"" [스위치]\n\n""경로명""\t불러올 파일이나 디렉토리. (와일드 카드\n\t\t사용 가능)"
+    IDS_CMD_USAGE           "사용법 : mpc-be.exe ""경로명"" [스위치]\n\n""경로명""\t불러올 파일이나 디렉토리.(와일드 카드\n\t\t사용 가능)"
     IDS_CMD_HELP            "/help /h /?\t명령입력 스위치 옵션을 출력"
     IDS_CMD_DUB             "/dub ""더빙파일""\t추가적인 오디오 파일"
-    IDS_CMD_DUBDELAY        "/dubdelay ""파일""\tXXms 딜레이된 추가적인 오디오 파일 (\n\t\t파일이 다음을 포함 ""...DELAY XXms..."")"
+    IDS_CMD_DUBDELAY        "/dubdelay ""파일""\tXXms 딜레이된 추가적인 오디오 파일(\n\t\t파일이 다음을 포함 ""...DELAY XXms..."")"
 END
 
 STRINGTABLE
 BEGIN
     IDS_CMD_D3DFS           "/d3dfs\t\tD3D 전체 화면 모드에서 렌더링"
     IDS_CMD_SUB             "/sub ""자막 파일""\t추가적인 자막 파일"
-    IDS_CMD_FILTER          "/filter ""필터파일""\tDLL파일에서 다이렉트쇼 필터를 불러옴 (와일드카드사용 가능)"
-    IDS_CMD_DVD             "/dvd\t\tdvd재생모드, ""경로 이름"" 을 지정했을 때, DVD 폴더를 의미함 (옵션)"
+    IDS_CMD_FILTER          "/filter ""필터파일""\tDLL파일에서 다이렉트쇼 필터를 불러옴(와일드카드사용 가능)"
+    IDS_CMD_DVD             "/dvd\t\tdvd재생모드, ""경로 이름"" 을 지정했을 때, DVD 폴더를 의미함(옵션)"
     IDS_CMD_DVDPOS1         "/dvdpos T#C\t타이틀 T, 챕터 C에서 재생 시작"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\t타이틀 T, 위치 hh:mm:ss에서 재생 시작"
     IDS_CMD_CD              "/cd\t\t오디오 CD 또는 (S)VCD의 모든 트랙을 불러옴,\n\t\t""경로 이름"" 을 지정했을 때 드라이브를 의미함 (옵션)"
     IDS_CMD_OPEN            "/open\t\t파일을 열지만, 재생을 시작하지는 않음"
     IDS_CMD_PLAY            "/play\t\t파일을 열고 재생을 시작함"
-    IDS_CMD_CLOSE           "/close\t\t재생이 끝나면 재생기 종료 (/play 스위치를 같이 써야 함)"
+    IDS_CMD_CLOSE           "/close\t\t재생이 끝나면 재생기 종료(/play 스위치를 같이 써야 함)"
     IDS_CMD_SHUTDOWN        "/shutdown\t재생이 끝나면 시스템 종료"
     IDS_CMD_FULLSCREEN      "/fullscreen\t전체 화면 모드로 재생 시작"
     IDS_CMD_MINIMIZED       "/minimized\t최소화 모드로 재생 시작"
@@ -3272,7 +3272,7 @@ BEGIN
     IDS_MPADEC_MIX_SPEAKERS "출력 스피커 :"
     IDS_MPADEC_MONO         "모노"
     IDS_MPADEC_STEREO       "스테레오"
-    IDS_MPADEC_SPDIF        "출력 (S/PDIF, HDMI)"
+    IDS_MPADEC_SPDIF        "출력(S/PDIF, HDMI)"
     IDS_MPADEC_AC3ENCODE    "AC-3로 인코딩"
     IDS_MPADEC_AV_SYNC      "A/V 동기화 수정"
     IDS_MPADEC_STATUS       "상태"
@@ -3322,7 +3322,7 @@ BEGIN
     IDS_VDF_STATUS_FRAMESIZE "프레임 크기 :"
     IDS_VDF_STATUS_OUTPUT   "출력 형식 :"
     IDS_VDF_STATUS_ADAPTER  "그래픽 어댑터 :"
-    IDS_VDF_TT_AR           "체크 - 스트림으로부터 AR 사용.\n체크 해제 - 컨테이너로부터 AR 사용.\n미정 - 스트림으로부터의 AR은 컨테이너 AR을 가진 파일에는 사용 안 함 (추천)."
+    IDS_VDF_TT_AR           "체크 - 스트림으로부터 AR 사용.\n체크 해제 - 컨테이너로부터 AR 사용.\n미정 - 스트림으로부터의 AR은 컨테이너 AR을 가진 파일에는 사용 안 함(추천)."
     IDS_VDF_TT_PRESET       "속도와 품질 간의 관계를 바꾼다."
     IDS_VDF_TT_STANDARD     "이 설정은 필터가 YCbCr ↔ RGB 변환을 할 때만 사용합니다"
     IDS_VDF_TT_RGB_LEVELS   "이 설정은 필터가 YCbCr → RGB 변환을 할 때만 사용합니다."
@@ -3339,7 +3339,7 @@ STRINGTABLE
 BEGIN
     IDS_MPEG2_BRIGHTNESS    "밝기"
     IDS_MPEG2_RESET         "초기화"
-    IDS_MPEG2_NOTE1         "알림 : 비평면 출력 형식, Bob 인터레이스 제거 또는 컬러 속성을 변경하면 성능이 저하될 수 있습니다. 필요하면 ""자동"" 인터레이스 삭제는 ""블렌드"" 로 바뀝니다."
+    IDS_MPEG2_NOTE1         "알림 : 비평면 출력 형식, Bob 인터레이스 제거 또는 색 속성을 변경하면 성능이 저하될 수 있습니다. 필요하면 ""자동"" 인터레이스 삭제는 ""블렌드"" 로 바뀝니다."
     IDS_MPEG2_CONTRAST      "명암"
     IDS_MPEG2_HUE           "색조"
     IDS_MPEG2_SATURATION    "채도"
@@ -3567,8 +3567,8 @@ STRINGTABLE
 BEGIN
     IDS_OSD_RS_VSYNC_ON     "수직 동기화 : 켬"
     IDS_OSD_RS_VSYNC_OFF    "수직 동기화 : 끔"
-    IDS_OSD_RS_INTERNAL_VSYNC_ON "내부 수직 동기화 : 켬"
-    IDS_OSD_RS_INTERNAL_VSYNC_OFF "내부 수직 동기화 : 끔"
+    IDS_OSD_RS_INTERNAL_VSYNC_ON "내장 수직 동기화 : 켬"
+    IDS_OSD_RS_INTERNAL_VSYNC_OFF "내장 수직 동기화 : 끔"
     IDS_OSD_RS_SYNC_TO_DISPLAY_ON "비디오를 디스플레이에 싱크 : 켬"
     IDS_OSD_RS_SYNC_TO_DISPLAY_OFF "비디오를 디스플레이에 싱크 : 끔"
     IDS_OSD_RS_SYNC_TO_VIDEO_ON "디스플레이를 비디오에 싱크 : 켬"
@@ -3585,9 +3585,9 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_OSD_RS_AMBIENT_LIGHT_BRIGHT "주변광 : 밝게 (2.2 감마)"
-    IDS_OSD_RS_AMBIENT_LIGHT_DIM "주변광 : 조금 어둡게 (2.35 감마)"
-    IDS_OSD_RS_AMBIENT_LIGHT_DARK "주변광 : 어둡게 (2.4 감마)"
+    IDS_OSD_RS_AMBIENT_LIGHT_BRIGHT "주변광 : 밝게(2.2 감마)"
+    IDS_OSD_RS_AMBIENT_LIGHT_DIM "주변광 : 조금 어둡게(2.35 감마)"
+    IDS_OSD_RS_AMBIENT_LIGHT_DARK "주변광 : 어둡게(2.4 감마)"
     IDS_OSD_RS_REND_INTENT_PERCEPT "렌더링 의도 : 가시 범위"
     IDS_OSD_RS_REND_INTENT_RELATIVE "렌더링 의도 : 상대 색도계"
     IDS_OSD_RS_REND_INTENT_SATUR "렌더링 의도 : 채도"
@@ -3688,7 +3688,7 @@ BEGIN
     IDS_CAPTURE_ERROR_AUD_CAPT_PIN "오디오 캡처 핀을 찾을 수 없습니다."
     IDS_CAPTURE_ERROR_OUT_FILE "출력파일을 초기화하는데 에러가 발생했습니다."
     IDS_CAPTURE_ERROR_AUD_OUT_FILE "오디오 출력 파일을 초기화하는데 에러가 발생했습니다."
-    IDS_SUBRESYNC_TIME_FORMAT  "올바른 시간 형식은 다음과 같습니다 : [-]hh:mm:ss.ms (예 : 01 :23 :45.678)."
+    IDS_SUBRESYNC_TIME_FORMAT  "올바른 시간 형식은 다음과 같습니다 : [-]hh:mm:ss.ms(예 : 01 :23 :45.678)."
     IDS_EXTERNAL_FILTERS_ERROR_MT "이 형식은 이미 목록에 있습니다!"
     IDS_WEBSERVER_ERROR_TEST  "설정들을 테스트해 보려면 설정들을 적용해야 합니다."
 END
@@ -3733,10 +3733,10 @@ END
 STRINGTABLE
 BEGIN
     IDS_THUMB_IMAGE_QUALITY "품질"
-    IDS_THUMB_QUALITY       "품질 (%) :"
+    IDS_THUMB_QUALITY       "품질(%) :"
     IDS_THUMB_THUMBNAILS    "배치"
     IDS_THUMB_PIXELS        "픽셀 :"
-    IDS_THUMB_LEVEL         "압축 (1-9) :"
+    IDS_THUMB_LEVEL         "압축(1-9) :"
     IDS_SNAPSHOT_SUBTITLES  "자막 포함"
     IDS_REND_UNAVAILABLEMSG "%s을(를) 사용할 수 없습니다. %s을(를) 사용하겠습니다."
     IDS_REMOVEFROMLISTQUESTION  "목록에서 %d개의 항목이 삭제됩니다. 진행하시겠습니까?"
@@ -3794,7 +3794,7 @@ BEGIN
     IDS_SUB_SIZE_INC        "자막 글자 크기 확대"
     IDS_SUB_SIZE            "자막 글자 크기 : %d"
     IDS_SUB_NOT_USE         "자막을 표시하지 않음"
-    IDS_SUB_USE_INTERNAL    "내부 자막 렌더러"
+    IDS_SUB_USE_INTERNAL    "내장 자막 렌더러"
 END
 
 STRINGTABLE
