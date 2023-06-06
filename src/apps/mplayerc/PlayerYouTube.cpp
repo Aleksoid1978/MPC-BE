@@ -37,6 +37,7 @@
 #define YOUTUBE_URL_SHORTS          L"youtube.com/shorts/"
 #define YOUTUBE_URL_CLIP            L"youtube.com/clip/"
 #define YOUTUBE_URL_LIBRARY         L"youtube.com/@"
+#define YOUTUBE_URL_LIVE            L"youtube.com/live/"
 #define YOUTU_BE_URL                L"youtu.be/"
 
 #define MATCH_STREAM_MAP_START      "\"url_encoded_fmt_stream_map\":\""
@@ -166,6 +167,7 @@ namespace Youtube
 				|| url.Find(YOUTUBE_URL_EMBED) != -1
 				|| url.Find(YOUTUBE_URL_SHORTS) != -1
 				|| url.Find(YOUTUBE_URL_CLIP) != -1
+				|| url.Find(YOUTUBE_URL_LIVE) != -1
 				|| url.Find(YOUTU_BE_URL) != -1) {
 			return true;
 		}
@@ -375,6 +377,8 @@ namespace Youtube
 			} else if (url.Find(YOUTUBE_URL_SHORTS) != -1) {
 				url.Replace(L"shorts/", L"watch?v=");
 				url.Replace(L"?list=", L"&list=");
+			} else if (url.Find(YOUTUBE_URL_LIVE) != -1) {
+				url.Replace(L"live/", L"watch?v=");
 			}
 		}
 	}
