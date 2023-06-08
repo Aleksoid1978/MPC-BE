@@ -33,14 +33,13 @@ CMPCPropertySheet::CMPCPropertySheet(LPCWSTR pszCaption, CWnd* pParentWnd, UINT 
 // CPPageFileInfoSheet
 
 IMPLEMENT_DYNAMIC(CPPageFileInfoSheet, CMPCPropertySheet)
-CPPageFileInfoSheet::CPPageFileInfoSheet(const CString& fn, CMainFrame* pMainFrame, CWnd* pParentWnd, const bool bOnlyMI/* = false*/)
+CPPageFileInfoSheet::CPPageFileInfoSheet(const std::list<CString>& files, CMainFrame* pMainFrame, CWnd* pParentWnd, const bool bOnlyMI/* = false*/)
 	: CMPCPropertySheet(ResStr(IDS_PROPSHEET_PROPERTIES), pParentWnd, 0)
-	, m_clip(fn, pMainFrame->m_pGB)
-	, m_details(fn, pMainFrame->m_pGB, pMainFrame->m_pCAP, pMainFrame->m_pDVDI)
-	, m_res(fn, pMainFrame->m_pGB)
-	, m_mi(fn, pMainFrame)
+	, m_clip(files.front(), pMainFrame->m_pGB)
+	, m_details(files.front(), pMainFrame->m_pGB, pMainFrame->m_pCAP, pMainFrame->m_pDVDI)
+	, m_res(files.front(), pMainFrame->m_pGB)
+	, m_mi(files, pMainFrame)
 	, m_pMainFrame(pMainFrame)
-	, m_fn(fn)
 	, m_bNeedInit(TRUE)
 	, m_nMinCX(0)
 	, m_nMinCY(0)
@@ -59,7 +58,7 @@ CPPageFileInfoSheet::CPPageFileInfoSheet(const CString& fn, CMainFrame* pMainFra
 		EndEnumFilters;
 	}
 
-	if (!::PathIsURLW(fn)) {
+	if (!::PathIsURLW(files.front())) {
 		AddPage(&m_mi);
 	}
 }
@@ -87,15 +86,6 @@ BOOL CPPageFileInfoSheet::OnInitDialog()
 	BOOL bResult = CPropertySheet::OnInitDialog();
 
 	const CAppSettings& s = AfxGetAppSettings();
-
-	m_fn.TrimRight('/');
-	int i = std::max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
-
-	if (i >= 0 && i < m_fn.GetLength()-1) {
-		m_fn = m_fn.Mid(i+1);
-	}
-
-	m_fn = m_fn + L".MediaInfo.txt";
 
 	GetDlgItem(IDCANCEL)->ShowWindow(SW_HIDE);
 	GetDlgItem(ID_APPLY_NOW)->ShowWindow(SW_HIDE);
@@ -150,7 +140,17 @@ BOOL CPPageFileInfoSheet::OnInitDialog()
 
 void CPPageFileInfoSheet::OnSaveAs()
 {
-	CFileDialog filedlg (FALSE, L"*.txt", m_fn,
+	CString file = m_mi.MI_File;
+	file.TrimRight('/');
+	int i = std::max(file.ReverseFind('\\'), file.ReverseFind('/'));
+
+	if (i >= 0 && i < file.GetLength() - 1) {
+		file = file.Mid(i + 1);
+	}
+
+	file += L".MediaInfo.txt";
+
+	CFileDialog filedlg (FALSE, L"*.txt", file,
 						 OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 						 L"Text Files (*.txt)|*.txt|All Files (*.*)|*.*||", nullptr);
 

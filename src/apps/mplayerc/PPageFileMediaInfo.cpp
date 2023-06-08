@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PPageFileMediaInfo.h"
+#include "DSUtil/FileHandle.h"
 
 static String mi_get_lang_file()
 {
@@ -69,9 +70,9 @@ static String mi_get_lang_file()
 // CPPageFileMediaInfo dialog
 
 IMPLEMENT_DYNAMIC(CPPageFileMediaInfo, CPropertyPage)
-CPPageFileMediaInfo::CPPageFileMediaInfo(const CString& fn, CMainFrame* pMainFrame)
+CPPageFileMediaInfo::CPPageFileMediaInfo(const std::list<CString>& files, CMainFrame* pMainFrame)
 	: CPropertyPage(CPPageFileMediaInfo::IDD, CPPageFileMediaInfo::IDD)
-	, m_fn(fn)
+	, m_files(files)
 	, m_pMainFrame(pMainFrame)
 {
 }
@@ -80,15 +81,16 @@ void CPPageFileMediaInfo::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
-	DDX_Control(pDX, IDC_MIEDIT, m_mediainfo);
+	DDX_Control(pDX, IDC_COMBO1, m_cbFilename);
+	DDX_Control(pDX, IDC_MIEDIT, m_edMediainfo);
 }
 
 BOOL CPPageFileMediaInfo::PreTranslateMessage(MSG* pMsg)
 {
-	if (pMsg->message == WM_KEYDOWN && pMsg->hwnd == m_mediainfo.m_hWnd) {
+	if (pMsg->message == WM_KEYDOWN && pMsg->hwnd == m_edMediainfo.m_hWnd) {
 		if ((LOWORD(pMsg->wParam) == 'A' || LOWORD(pMsg->wParam) == 'a')
 				&& GetKeyState(VK_CONTROL) < 0) {
-			m_mediainfo.SetSel(0, -1, TRUE);
+			m_edMediainfo.SetSel(0, -1, TRUE);
 			return TRUE;
 		}
 	}
@@ -99,6 +101,7 @@ BOOL CPPageFileMediaInfo::PreTranslateMessage(MSG* pMsg)
 BEGIN_MESSAGE_MAP(CPPageFileMediaInfo, CPropertyPage)
 	ON_WM_SIZE()
 	ON_WM_SHOWWINDOW()
+	ON_CBN_SELCHANGE(IDC_COMBO1, OnComboFileChange)
 END_MESSAGE_MAP()
 
 // CPPageFileMediaInfo message handlers
@@ -107,20 +110,6 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	MediaInfo MI;
-
-	MI.Option(L"ParseSpeed", L"0.5");
-	MI.Option(L"Language", mi_get_lang_file());
-	MI.Option(L"LegacyStreamDisplay", L"1");
-	MI.Option(L"Complete");
-	MI.Open(m_fn.GetString());
-	MI_Text = MI.Inform().c_str();
-	MI.Close();
-
-	if (!MI_Text.Find(L"Unable to load")) {
-		MI_Text.Empty();
-	}
-
 	LOGFONT lf = {};
 	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
 	lf.lfHeight = -m_pMainFrame->PointsToPixels(8);
@@ -128,19 +117,22 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 	UINT i = 0;
 	BOOL success;
 
-	PAINTSTRUCT ps;
-	CDC* cDC = m_mediainfo.BeginPaint(&ps);
-
 	do {
 		wcscpy_s(lf.lfFaceName, LF_FACESIZE, MonospaceFonts[i]);
 		success = IsFontInstalled(MonospaceFonts[i]) && m_font.CreateFontIndirectW(&lf);
 		i++;
 	} while (!success && i < std::size(MonospaceFonts));
 
-	m_mediainfo.SetFont(&m_font);
-	m_mediainfo.SetWindowTextW(MI_Text);
+	m_edMediainfo.SetFont(&m_font);
 
-	m_mediainfo.EndPaint(&ps);
+	for (const auto& fn : m_files) {
+		m_cbFilename.AddString(GetFileOnly(fn));
+	}
+	m_cbFilename.SetCurSel(0);
+	if (m_cbFilename.GetCount() <= 1) {
+		m_cbFilename.EnableWindow(FALSE);
+	}
+	OnComboFileChange();
 
 	return TRUE;
 }
@@ -171,12 +163,54 @@ void CPPageFileMediaInfo::OnSize(UINT nType, int cx, int cy)
 	int dy = cy - m_rCrt.Height();
 	GetClientRect(&m_rCrt);
 
-	if (::IsWindow(m_mediainfo.GetSafeHwnd())) {
+	if (::IsWindow(m_cbFilename.GetSafeHwnd())) {
 		CRect r;
-		m_mediainfo.GetWindowRect(&r);
+		m_cbFilename.GetWindowRect(&r);
 		r.right += dx;
 		r.bottom += dy;
 
-		m_mediainfo.SetWindowPos(nullptr, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+		m_cbFilename.SetWindowPos(nullptr, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOZORDER);
 	}
+
+	if (::IsWindow(m_edMediainfo.GetSafeHwnd())) {
+		CRect r;
+		m_edMediainfo.GetWindowRect(&r);
+		r.right += dx;
+		r.bottom += dy;
+
+		m_edMediainfo.SetWindowPos(nullptr, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+	}
+}
+
+void CPPageFileMediaInfo::OnComboFileChange()
+{
+	const int sel = m_cbFilename.GetCurSel();
+	if (sel == m_fileindex || sel < 0 || sel >= (int)m_files.size()) {
+		return;
+	}
+
+	m_fileindex = sel;
+	auto it = m_files.cbegin();
+	std::advance(it, m_fileindex);
+
+	MediaInfo MI;
+
+	MI.Option(L"ParseSpeed", L"0.5");
+	MI.Option(L"Language", mi_get_lang_file());
+	MI.Option(L"LegacyStreamDisplay", L"1");
+	MI.Option(L"Complete");
+
+	MI_File = (*it);
+	MI.Open(MI_File.GetString());
+	MI_Text = MI.Inform().c_str();
+	MI.Close();
+
+	if (!MI_Text.Find(L"Unable to load")) {
+		MI_Text.Empty();
+	}
+
+	PAINTSTRUCT ps;
+	CDC* cDC = m_edMediainfo.BeginPaint(&ps);
+	m_edMediainfo.SetWindowTextW(MI_Text);
+	m_edMediainfo.EndPaint(&ps);
 }

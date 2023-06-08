@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -76,7 +76,6 @@ private:
 	CButton m_Button_MI_SaveAs;
 	CButton m_Button_MI_Clipboard;
 
-	CString m_fn;
 	BOOL    m_bNeedInit;
 	CRect   m_rCrt;
 	CRect   m_rWnd;
@@ -84,7 +83,7 @@ private:
 	int     m_nMinCY;
 
 public:
-	CPPageFileInfoSheet(const CString& fn, CMainFrame* pMainFrame, CWnd* pParentWnd, const bool bOnlyMI = false);
+	CPPageFileInfoSheet(const std::list<CString>& files, CMainFrame* pMainFrame, CWnd* pParentWnd, const bool bOnlyMI = false);
 	virtual ~CPPageFileInfoSheet();
 
 	afx_msg void OnSaveAs();

@@ -6909,7 +6909,34 @@ void CMainFrame::OnFileProperties()
 		return;
 	}
 
-	CPPageFileInfoSheet fileInfo(GetPlaybackMode() == PM_FILE ? GetCurFileName() : GetCurDVDPath(TRUE), this, GetModalParent());
+	std::list<CString> files;
+	if (GetPlaybackMode() == PM_FILE) {
+		if (m_youtubeFields.fname.GetLength()) {
+			files.emplace_back(m_wndPlaylistBar.GetCurFileName());
+		}
+		else {
+			BeginEnumFilters(m_pGB, pEF, pBF)
+			{
+				if (CComQIPtr<IFileSourceFilter>pFSF = pBF) {
+					LPOLESTR pFN = nullptr;
+					if (SUCCEEDED(pFSF->GetCurFile(&pFN, nullptr)) && pFN && *pFN) {
+						files.emplace_front(pFN);
+					}
+				}
+			}
+			EndEnumFilters;
+
+			if (files.empty()) {
+				ASSERT(0);
+				files.emplace_back(m_strPlaybackRenderedPath);
+			}
+		}
+	}
+	else {
+		files.emplace_back(GetCurDVDPath(TRUE));
+	}
+
+	CPPageFileInfoSheet fileInfo(files, this, GetModalParent());
 	fileInfo.DoModal();
 }
 

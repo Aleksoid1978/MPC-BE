@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2019 see Authors.txt
+ * (C) 2012-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,17 +27,21 @@ class CPPageFileMediaInfo : public CPropertyPage
 	DECLARE_DYNAMIC(CPPageFileMediaInfo)
 
 private:
-	CString m_fn;
-	CEdit m_mediainfo;
+	CComboBox m_cbFilename;
+	CEdit m_edMediainfo;
 	CFont m_font;
 
-    CMainFrame* m_pMainFrame;
+	CMainFrame* m_pMainFrame;
+
+	std::list<CStringW> m_files;
+	int m_fileindex = -1;
 
 public:
-	CPPageFileMediaInfo(const CString& fn, CMainFrame* pMainFrame);
+	CPPageFileMediaInfo(const std::list<CString>& files, CMainFrame* pMainFrame);
 	virtual ~CPPageFileMediaInfo() = default;
 
 	enum { IDD = IDD_FILEMEDIAINFO };
+	CString MI_File;
 	CString MI_Text;
 
 protected:
@@ -53,4 +57,5 @@ protected:
 public:
 	afx_msg BOOL OnSetActive();
 	afx_msg BOOL OnKillActive();
+	afx_msg void OnComboFileChange();
 };
