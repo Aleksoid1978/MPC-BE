@@ -6917,7 +6917,7 @@ void CMainFrame::OnFileProperties()
 		else {
 			BeginEnumFilters(m_pGB, pEF, pBF)
 			{
-				if (CComQIPtr<IFileSourceFilter>pFSF = pBF) {
+				if (CComQIPtr<IFileSourceFilter>pFSF = pBF.p) {
 					LPOLESTR pFN = nullptr;
 					if (SUCCEEDED(pFSF->GetCurFile(&pFN, nullptr)) && pFN && *pFN) {
 						files.emplace_front(pFN);
