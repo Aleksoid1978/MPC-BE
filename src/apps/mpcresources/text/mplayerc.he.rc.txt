@@ -290,7 +290,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"שחזר רזולוצייה ביציאה מהתוכנה"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 53
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 54
 6		"Use the ""dark"" theme (default)"
 7		"Brightness :"
 9		"Setting the color of the indicator of sound:"
@@ -312,15 +312,15 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 53
 33		"Playlist font size:"
 36		"OSD"
 37		"Font:"
-40		"F"
-41		"Background:"
-42		"G1"
-43		"G2"
-44		"Transparent:"
-46		"Border Size:"
-49		"Shadow"
-50		"Anti-aliasing"
-51		"Use Windows 7 (and above) Taskbar features"
+41		"F"
+42		"Background:"
+43		"G1"
+44		"G2"
+45		"Transparent:"
+47		"Border Size:"
+50		"Shadow"
+51		"Anti-aliasing"
+52		"Use Windows 7 (and above) Taskbar features"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

@@ -45,7 +45,6 @@ public:
 	BOOL m_fSmartSeek;
 	BOOL m_fChapterMarker;
 	BOOL m_fFlybar;
-	int  m_OSD_Size;
 	BOOL m_fFontShadow;
 	BOOL m_fFontAA;
 	int  m_nOSDTransparent;
@@ -62,11 +61,12 @@ public:
 	CButton     m_chkDarkTitle;
 	CIntEdit    m_edSmartSeekSize;
 	CIntEdit    m_edPlsFontPercent;
+	CIntEdit    m_edOSDFontSize;
 	CSliderCtrl m_OSDTransparentCtrl;
 	CComboBox m_TimeTooltipPosition;
 	CComboBox m_FontType;
-	CComboBox m_FontSize;
 	CComboBox m_SmartSeekVR;
+	CSpinButtonCtrl m_spOSDFontSize;
 	CSpinButtonCtrl m_OSDBorderCtrl;
 
 	COLORREF m_clrFaceABGR;
@@ -114,7 +114,7 @@ public:
 	afx_msg void OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnUseTimeTooltipClicked();
 	afx_msg void OnUsePreview();
-	afx_msg void OnChngOSDCombo();
+	afx_msg void OnChangeOSD();
 	afx_msg void OnUseWin7TaskBar();
 	afx_msg void OnUpdateThemeBrightness(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateThemeRed(CCmdUI* pCmdUI);

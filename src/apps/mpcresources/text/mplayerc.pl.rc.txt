@@ -290,7 +290,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Przywróć domyślny trybu po zakończeniu programu"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 53
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 54
 6		"Użyj ""ciemnego"" motywu (domyślne)"
 7		"Jasność:"
 9		"Ustawianie koloru wskaźnika dźwięku:"
@@ -312,15 +312,15 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 53
 33		"Rozmiar czcionki listy odtwarzania:"
 36		"OSD"
 37		"Czcionka:"
-40		"F"
-41		"Tło:"
-42		"G1"
-43		"G2"
-44		"Przezroczystość:"
-46		"Rozmiar obramowania:"
-49		"Cień"
-50		"Wygładzanie krawędzi"
-51		"Użyj funkcji paska zadań (Windows 7 i nowsze)"
+41		"F"
+42		"Tło:"
+43		"G1"
+44		"G2"
+45		"Przezroczystość:"
+47		"Rozmiar obramowania:"
+50		"Cień"
+51		"Wygładzanie krawędzi"
+52		"Użyj funkcji paska zadań (Windows 7 i nowsze)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

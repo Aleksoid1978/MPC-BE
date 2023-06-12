@@ -447,9 +447,10 @@ BEGIN
     LTEXT           "%",IDC_STATIC,154,165,10,8
     GROUPBOX        "OSD",IDC_STATIC,7,183,282,60
     RTEXT           "OSD 글꼴 :",IDC_STATIC,13,194,43,8
-    COMBOBOX        IDC_COMBO1,61,191,106,64,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_COMBO2,171,191,25,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "F",IDC_BUTTON_CLRFONT,200,190,20,15
+    COMBOBOX        IDC_COMBO1,61,191,104,64,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT3,169,191,29,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN3,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,188,191,11,13
+    PUSHBUTTON      "F",IDC_BUTTON_CLRFONT,201,190,20,15
     RTEXT           "배경 :",IDC_STATIC,13,211,43,8
     PUSHBUTTON      "G1",IDC_BUTTON_CLRGRAD1,62,208,20,14
     PUSHBUTTON      "G2",IDC_BUTTON_CLRGRAD2,62,226,20,14
@@ -1631,7 +1632,7 @@ BEGIN
         BEGIN
             MENUITEM "최소",                          ID_VIEW_PRESETS_MINIMAL
             MENUITEM "간단히",                         ID_VIEW_PRESETS_COMPACT
-            MENUITEM "표준",                          ID_VIEW_PRESETS_NORMAL
+            MENUITEM "기본",                          ID_VIEW_PRESETS_NORMAL
         END
         MENUITEM SEPARATOR
         MENUITEM "전체 화면(&L)",           ID_VIEW_FULLSCREEN
@@ -1823,7 +1824,7 @@ BEGIN
             BEGIN
                 MENUITEM "최소",                          ID_VIEW_PRESETS_MINIMAL
                 MENUITEM "간단히",                         ID_VIEW_PRESETS_COMPACT
-                MENUITEM "표준",                          ID_VIEW_PRESETS_NORMAL
+                MENUITEM "기본",                          ID_VIEW_PRESETS_NORMAL
             END
         END
         MENUITEM SEPARATOR
@@ -1902,7 +1903,7 @@ BEGIN
             BEGIN
                 MENUITEM "최소",                          ID_VIEW_PRESETS_MINIMAL
                 MENUITEM "간단히",                         ID_VIEW_PRESETS_COMPACT
-                MENUITEM "표준",                          ID_VIEW_PRESETS_NORMAL
+                MENUITEM "기본",                          ID_VIEW_PRESETS_NORMAL
             END
             MENUITEM SEPARATOR
             MENUITEM "전체 화면(&L)",           ID_VIEW_FULLSCREEN
@@ -2507,7 +2508,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_REGULARSURF         "재생할 비디오 표면을 표준 오프스크린으로 위치시킵니다."
+    IDC_REGULARSURF         "재생할 비디오 표면을 기본 오프스크린으로 위치시킵니다."
     IDC_DX9RESIZER_COMBO    "그래픽카드에서 픽셀셰이더 2.0을 지원하지 않으면 단순 쌍선형이 자동으로 선택됩니다."
 END
 
@@ -2852,12 +2853,12 @@ STRINGTABLE
 BEGIN
     IDS_AG_VIEW_MINIMAL     "최소 보기"
     IDS_AG_VIEW_COMPACT     "간단히 보기"
-    IDS_AG_VIEW_NORMAL      "표준 보기"
+    IDS_AG_VIEW_NORMAL      "기본 보기"
     IDS_AG_FULLSCREEN       "전체 화면"
     IDS_AG_FULLSCREEN_2     "전체 화면(해상도 변경)"
     IDS_AG_ZOOM_AUTO_FIT    "자동 맞춤 확대"
     IDS_AG_VIDFRM_HALF      "비디오폼 : 1/2"
-    IDS_AG_VIDFRM_NORMAL    "비디오폼 : 표준"
+    IDS_AG_VIDFRM_NORMAL    "비디오폼 : 기본"
     IDS_AG_VIDFRM_DOUBLE    "비디오폼 : 2배"
     IDS_AG_ALWAYS_ON_TOP    "항상 위에 유지"
     IDS_AG_PNS_INC_SIZE     "팬&스캔 - 크기 확대"

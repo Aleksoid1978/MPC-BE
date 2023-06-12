@@ -1241,7 +1241,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	// OSD
 	profile.ReadUInt(IDS_R_OSD, IDS_RS_SHOWOSD, ShowOSD.value);
-	profile.ReadInt(IDS_R_OSD, IDS_RS_OSD_SIZE, nOSDSize, 8, 26);
+	profile.ReadInt(IDS_R_OSD, IDS_RS_OSD_SIZE, nOSDSize, 8, 40);
 	profile.ReadString(IDS_R_OSD, IDS_RS_OSD_FONT, strOSDFont);
 	profile.ReadBool(IDS_R_OSD, IDS_RS_OSD_FONTSHADOW, fFontShadow);
 	profile.ReadBool(IDS_R_OSD, IDS_RS_OSD_FONTAA, fFontAA);
