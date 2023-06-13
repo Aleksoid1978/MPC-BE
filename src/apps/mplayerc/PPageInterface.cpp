@@ -364,6 +364,7 @@ BEGIN_MESSAGE_MAP(CPPageInterface, CPPageBase)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_BUTTON_CLRFONT, OnCustomDrawBtns)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_BUTTON_CLRGRAD1, OnCustomDrawBtns)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_BUTTON_CLRGRAD2, OnCustomDrawBtns)
+	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN3, OnDeltaposSpin3)
 	ON_BN_CLICKED(IDC_BUTTON_CLRFACE, OnClickClrFace)
 	ON_BN_CLICKED(IDC_BUTTON_CLRFONT, OnClickClrFont)
 	ON_BN_CLICKED(IDC_BUTTON_CLRGRAD1, OnClickClrGrad1)
@@ -616,6 +617,19 @@ void CPPageInterface::OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult)
 			*pResult = CDRF_SKIPDEFAULT;
 		}
 	}
+}
+
+void CPPageInterface::OnDeltaposSpin3(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+
+	if (pNMUpDown != nullptr) {
+		if (pNMUpDown->iDelta != 0) {
+			OnChangeOSD();
+		}
+	}
+
+	*pResult = 0;
 }
 
 void CPPageInterface::OnChangeOSD()

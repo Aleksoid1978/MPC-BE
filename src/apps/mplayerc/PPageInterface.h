@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -112,6 +112,7 @@ public:
 	afx_msg void OnClickClrGrad1();
 	afx_msg void OnClickClrGrad2();
 	afx_msg void OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnDeltaposSpin3(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnUseTimeTooltipClicked();
 	afx_msg void OnUsePreview();
 	afx_msg void OnChangeOSD();
