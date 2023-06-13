@@ -65,7 +65,7 @@ END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 3		"Organizza Preferiti"
-8		"Edit"
+8		"Modifica"
 9		"Sposta su"
 10		"Sposta giù"
 11		"Elimina"
