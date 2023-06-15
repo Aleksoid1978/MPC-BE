@@ -1631,7 +1631,7 @@ BEGIN
         POPUP "사전 설정..."
         BEGIN
             MENUITEM "최소",                          ID_VIEW_PRESETS_MINIMAL
-            MENUITEM "간단히",                         ID_VIEW_PRESETS_COMPACT
+            MENUITEM "단순",                         ID_VIEW_PRESETS_COMPACT
             MENUITEM "기본",                          ID_VIEW_PRESETS_NORMAL
         END
         MENUITEM SEPARATOR
@@ -1823,7 +1823,7 @@ BEGIN
             POPUP "사전 설정..."
             BEGIN
                 MENUITEM "최소",                          ID_VIEW_PRESETS_MINIMAL
-                MENUITEM "간단히",                         ID_VIEW_PRESETS_COMPACT
+                MENUITEM "단순",                         ID_VIEW_PRESETS_COMPACT
                 MENUITEM "기본",                          ID_VIEW_PRESETS_NORMAL
             END
         END
@@ -1902,7 +1902,7 @@ BEGIN
             POPUP "사전 설정..."
             BEGIN
                 MENUITEM "최소",                          ID_VIEW_PRESETS_MINIMAL
-                MENUITEM "간단히",                         ID_VIEW_PRESETS_COMPACT
+                MENUITEM "단순",                         ID_VIEW_PRESETS_COMPACT
                 MENUITEM "기본",                          ID_VIEW_PRESETS_NORMAL
             END
             MENUITEM SEPARATOR
