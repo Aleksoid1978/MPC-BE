@@ -1786,7 +1786,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		SetProperty(L"TITL", Title);
 	}
 
-	if (!m_pOutputs.empty() && !m_pFile->m_segment.Cues.empty()) {
+	if (bHasVideo && !m_pOutputs.empty() && !m_pFile->m_segment.Cues.empty()) {
 		auto& s = m_pFile->m_segment;
 		const UINT64 TrackNumber = s.GetMasterTrack();
 		UINT64 lastCueClusterPosition = ULONGLONG_MAX;
