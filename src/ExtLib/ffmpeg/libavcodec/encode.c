@@ -192,6 +192,21 @@ int ff_encode_get_frame(AVCodecContext *avctx, AVFrame *frame)
 
     av_frame_move_ref(frame, avci->buffer_frame);
 
+#if FF_API_FRAME_KEY
+FF_DISABLE_DEPRECATION_WARNINGS
+    if (frame->key_frame)
+        frame->flags |= AV_FRAME_FLAG_KEY;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
+#if FF_API_INTERLACED_FRAME
+FF_DISABLE_DEPRECATION_WARNINGS
+    if (frame->interlaced_frame)
+        frame->flags |= AV_FRAME_FLAG_INTERLACED;
+    if (frame->top_field_first)
+        frame->flags |= AV_FRAME_FLAG_TOP_FIELD_FIRST;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
+
     return 0;
 }
 
@@ -567,6 +582,8 @@ static int encode_preinit_video(AVCodecContext *avctx)
         return AVERROR(EINVAL);
     }
 
+#if FF_API_TICKS_PER_FRAME
+FF_DISABLE_DEPRECATION_WARNINGS
     if (avctx->ticks_per_frame && avctx->time_base.num &&
         avctx->ticks_per_frame > INT_MAX / avctx->time_base.num) {
         av_log(avctx, AV_LOG_ERROR,
@@ -576,6 +593,8 @@ static int encode_preinit_video(AVCodecContext *avctx)
                avctx->time_base.den);
         return AVERROR(EINVAL);
     }
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
 
     if (avctx->hw_frames_ctx) {
         AVHWFramesContext *frames_ctx = (AVHWFramesContext*)avctx->hw_frames_ctx->data;

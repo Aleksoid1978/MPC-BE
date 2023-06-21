@@ -423,13 +423,6 @@ FF_ENABLE_DEPRECATION_WARNINGS
         }
     }
 
-    if (avctx->codec->type == AVMEDIA_TYPE_AUDIO &&
-        !avci->showed_multi_packet_warning &&
-        ret >= 0 && ret != pkt->size && !(avctx->codec->capabilities & AV_CODEC_CAP_SUBFRAMES)) {
-        av_log(avctx, AV_LOG_WARNING, "Multiple frames in a packet.\n");
-        avci->showed_multi_packet_warning = 1;
-    }
-
     if (!got_frame)
         av_frame_unref(frame);
 
@@ -570,6 +563,19 @@ static int decode_receive_frame_internal(AVCodecContext *avctx, AVFrame *frame)
     }
 
     if (!ret) {
+        if (avctx->codec_type != AVMEDIA_TYPE_VIDEO)
+            frame->flags |= AV_FRAME_FLAG_KEY;
+#if FF_API_FRAME_KEY
+FF_DISABLE_DEPRECATION_WARNINGS
+        frame->key_frame = !!(frame->flags & AV_FRAME_FLAG_KEY);
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
+#if FF_API_INTERLACED_FRAME
+FF_DISABLE_DEPRECATION_WARNINGS
+        frame->interlaced_frame = !!(frame->flags & AV_FRAME_FLAG_INTERLACED);
+        frame->top_field_first =  !!(frame->flags & AV_FRAME_FLAG_TOP_FIELD_FIRST);
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
         frame->best_effort_timestamp = guess_correct_pts(avctx,
                                                          frame->pts,
                                                          frame->pkt_dts);
@@ -1081,6 +1087,15 @@ int avcodec_get_hw_frames_parameters(AVCodecContext *avctx,
     if (!frames_ref)
         return AVERROR(ENOMEM);
 
+    if (!avctx->internal->hwaccel_priv_data) {
+        avctx->internal->hwaccel_priv_data =
+            av_mallocz(hwa->priv_data_size);
+        if (!avctx->internal->hwaccel_priv_data) {
+            av_buffer_unref(&frames_ref);
+            return AVERROR(ENOMEM);
+        }
+    }
+
     ret = hwa->frame_params(avctx, frames_ref);
     if (ret >= 0) {
         AVHWFramesContext *frames_ctx = (AVHWFramesContext*)frames_ref->data;
@@ -1105,12 +1120,10 @@ int avcodec_get_hw_frames_parameters(AVCodecContext *avctx,
 }
 
 static int hwaccel_init(AVCodecContext *avctx,
-                        const AVCodecHWConfigInternal *hw_config)
+                        const AVHWAccel *hwaccel)
 {
-    const AVHWAccel *hwaccel;
     int err;
 
-    hwaccel = hw_config->hwaccel;
     if (hwaccel->capabilities & AV_HWACCEL_CODEC_CAP_EXPERIMENTAL &&
         avctx->strict_std_compliance > FF_COMPLIANCE_EXPERIMENTAL) {
         av_log(avctx, AV_LOG_WARNING, "Ignoring experimental hwaccel: %s\n",
@@ -1118,7 +1131,7 @@ static int hwaccel_init(AVCodecContext *avctx,
         return AVERROR_PATCHWELCOME;
     }
 
-    if (hwaccel->priv_data_size) {
+    if (!avctx->internal->hwaccel_priv_data && hwaccel->priv_data_size) {
         avctx->internal->hwaccel_priv_data =
             av_mallocz(hwaccel->priv_data_size);
         if (!avctx->internal->hwaccel_priv_data)
@@ -1131,7 +1144,7 @@ static int hwaccel_init(AVCodecContext *avctx,
         if (err < 0) {
             av_log(avctx, AV_LOG_ERROR, "Failed setup for format %s: "
                    "hwaccel initialisation returned error.\n",
-                   av_get_pix_fmt_name(hw_config->public.pix_fmt));
+                   av_get_pix_fmt_name(hwaccel->pix_fmt));
             av_freep(&avctx->internal->hwaccel_priv_data);
             avctx->hwaccel = NULL;
             return err;
@@ -1141,7 +1154,7 @@ static int hwaccel_init(AVCodecContext *avctx,
     return 0;
 }
 
-static void hwaccel_uninit(AVCodecContext *avctx)
+void ff_hwaccel_uninit(AVCodecContext *avctx)
 {
     if (avctx->hwaccel && avctx->hwaccel->uninit)
         avctx->hwaccel->uninit(avctx);
@@ -1180,7 +1193,7 @@ int ff_get_format(AVCodecContext *avctx, const enum AVPixelFormat *fmt)
 
     for (;;) {
         // Remove the previous hwaccel, if there was one.
-        hwaccel_uninit(avctx);
+        ff_hwaccel_uninit(avctx);
 
         user_choice = avctx->get_format(avctx, choices);
         if (user_choice == AV_PIX_FMT_NONE) {
@@ -1265,7 +1278,7 @@ int ff_get_format(AVCodecContext *avctx, const enum AVPixelFormat *fmt)
         if (hw_config->hwaccel) {
             av_log(avctx, AV_LOG_DEBUG, "Format %s requires hwaccel "
                    "initialisation.\n", desc->name);
-            err = hwaccel_init(avctx, hw_config);
+            err = hwaccel_init(avctx, hw_config->hwaccel);
             if (err < 0)
                 goto try_again;
         }
@@ -1283,6 +1296,9 @@ int ff_get_format(AVCodecContext *avctx, const enum AVPixelFormat *fmt)
             choices[i] = choices[i + 1];
         --n;
     }
+
+    if (ret < 0)
+        ff_hwaccel_uninit(avctx);
 
     av_freep(&choices);
     return ret;
@@ -1701,4 +1717,30 @@ int ff_copy_palette(void *dst, const AVPacket *src, void *logctx)
                "Palette size %"SIZE_SPECIFIER" is wrong\n", size);
     }
     return 0;
+}
+
+AVBufferRef *ff_hwaccel_frame_priv_alloc(AVCodecContext *avctx,
+                                         const AVHWAccel *hwaccel)
+{
+// ==> Start patch MPC
+    AVBufferRef *ref;
+    if (avctx->hw_frames_ctx) {
+    AVHWFramesContext *frames_ctx = (AVHWFramesContext *)avctx->hw_frames_ctx->data;
+    uint8_t *data = av_mallocz(hwaccel->frame_priv_data_size);
+    if (!data)
+        return NULL;
+
+    ref = av_buffer_create(data, hwaccel->frame_priv_data_size,
+                           hwaccel->free_frame_priv,
+                           frames_ctx->device_ctx, 0);
+    if (!ref) {
+        av_free(data);
+        return NULL;
+    }
+    } else {
+        ref = av_buffer_allocz(hwaccel->frame_priv_data_size);
+    }
+
+    return ref;
+// ==> End patch MPC
 }

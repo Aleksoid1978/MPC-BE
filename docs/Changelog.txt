@@ -48,6 +48,7 @@ Updated Spanish translation (by IPeluchito).
 
 Updated libraries:
 	dav1d git-1.2.1-8-g8b419c1;
+	ffmpeg git-n6.1-dev-1348-g468615f204;
 
 
 1.6.7 - 2023-05-05

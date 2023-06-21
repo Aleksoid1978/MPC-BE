@@ -142,7 +142,6 @@ SRCS_LC = \
 	libavcodec/avdct.c \
 	libavcodec/avfft.c \
 	libavcodec/avpacket.c \
-	libavcodec/avpicture.c \
 	libavcodec/avs3_parser.c \
 	libavcodec/bgmc.c \
 	libavcodec/bink.c \
@@ -489,7 +488,6 @@ SRCS_LC_B = \
 	libavcodec/speedhqdec.c \
 	libavcodec/startcode.c \
 	libavcodec/svq1.c \
-	libavcodec/svq13.c \
 	libavcodec/svq1dec.c \
 	libavcodec/svq3.c \
 	libavcodec/synth_filter.c \
@@ -543,6 +541,7 @@ SRCS_LC_B = \
 	libavcodec/vp6dsp.c \
 	libavcodec/vp8.c \
 	libavcodec/vp8_parser.c \
+	libavcodec/vp8data.c \
 	libavcodec/vp8dsp.c \
 	libavcodec/vp9.c \
 	libavcodec/vp9_parser.c \

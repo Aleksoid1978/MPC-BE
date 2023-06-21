@@ -1069,7 +1069,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_hDevice(INVALID_HANDLE_VALUE)
 	, m_bWaitingForKeyFrame(TRUE)
 	, m_bRVDropBFrameTimings(FALSE)
-	, m_bInterlaced(FALSE)
 	, m_dwSYNC(0)
 	, m_dwSYNC2(0)
 	, m_bDecodingStart(FALSE)
@@ -1285,7 +1284,7 @@ REFERENCE_TIME CMPCVideoDecFilter::GetFrameDuration()
 {
 	if (m_CodecId == AV_CODEC_ID_MPEG2VIDEO || m_CodecId == AV_CODEC_ID_MPEG1VIDEO) {
 		if (m_pAVCtx->time_base.num && m_pAVCtx->time_base.den) {
-			REFERENCE_TIME frame_duration = (UNITS * m_pAVCtx->time_base.num / m_pAVCtx->time_base.den) * m_pAVCtx->ticks_per_frame;
+			REFERENCE_TIME frame_duration = (UNITS * m_pAVCtx->time_base.num / m_pAVCtx->time_base.den) * (m_CodecId == AV_CODEC_ID_MPEG2VIDEO ? 2 : 1);
 			return frame_duration;
 		}
 	}
@@ -3049,10 +3048,10 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 								break;
 						}
 					} else {
-						if (!m_pFrame->interlaced_frame) {
+						if (!(m_pFrame->flags & AV_FRAME_FLAG_INTERLACED)) {
 							props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
 						}
-						if (m_pFrame->top_field_first) {
+						if (m_pFrame->flags & AV_FRAME_FLAG_TOP_FIELD_FIRST) {
 							props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_FIELD1FIRST;
 						}
 						if (m_pFrame->repeat_pict) {
@@ -3085,8 +3084,6 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 			pMS2->SetProperties(sizeof(props), (BYTE*)&props);
 		}
 	}
-
-	m_bInterlaced = m_pFrame->interlaced_frame;
 }
 
 // from LAVVideo
@@ -3370,7 +3367,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 		if (m_bWaitKeyFrame) {
 			if (m_bWaitingForKeyFrame && ret >= 0) {
-				if (m_pFrame->key_frame) {
+				if (m_pFrame->flags & AV_FRAME_FLAG_KEY) {
 					DLog(L"CMPCVideoDecFilter::DecodeInternal(): Found key-frame, resuming decoding");
 					m_bWaitingForKeyFrame = FALSE;
 				} else {

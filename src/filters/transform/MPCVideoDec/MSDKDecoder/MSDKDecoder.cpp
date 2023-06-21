@@ -484,7 +484,6 @@ void CMSDKDecoder::GetOffsetSideData(IMediaSample* pSample, mfxU64 timestamp, co
 
 void CMSDKDecoder::SetTypeSpecificFlags(IMediaSample* pSample)
 {
-  m_pFilter->m_bInterlaced = TRUE;
   if (CComQIPtr<IMediaSample2> pMS2 = pSample) {
     AM_SAMPLE2_PROPERTIES props;
     if (SUCCEEDED(pMS2->GetProperties(sizeof(props), (BYTE*)&props))) {

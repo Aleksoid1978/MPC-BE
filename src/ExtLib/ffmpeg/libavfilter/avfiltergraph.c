@@ -441,7 +441,7 @@ static int query_formats(AVFilterGraph *graph, void *log_ctx)
 
             neg = ff_filter_get_negotiation(link);
             av_assert0(neg);
-            for (neg_step = 1; neg_step < neg->nb_mergers; neg_step++) {
+            for (neg_step = 0; neg_step < neg->nb_mergers; neg_step++) {
                 const AVFilterFormatsMerger *m = &neg->mergers[neg_step];
                 void *a = FF_FIELD_AT(void *, m->offset, link->incfg);
                 void *b = FF_FIELD_AT(void *, m->offset, link->outcfg);
@@ -748,8 +748,10 @@ static int reduce_formats_on_filter(AVFilterContext *filter)
                 (KNOWN(fmt) || fmts->all_counts)) {
                 /* Turn the infinite list into a singleton */
                 fmts->all_layouts = fmts->all_counts  = 0;
-                if (ff_add_channel_layout(&outlink->incfg.channel_layouts, fmt) < 0)
-                    ret = 1;
+                ret = ff_add_channel_layout(&outlink->incfg.channel_layouts, fmt);
+                if (ret < 0)
+                    return ret;
+                ret = 1;
                 break;
             }
 
@@ -1301,7 +1303,6 @@ int avfilter_graph_request_oldest(AVFilterGraph *graph)
     while (graph->sink_links_count) {
         oldest = graph->sink_links[0];
         if (oldest->dst->filter->activate) {
-            /* For now, buffersink is the only filter implementing activate. */
             r = av_buffersink_get_frame_flags(oldest->dst, NULL,
                                               AV_BUFFERSINK_FLAG_PEEK);
             if (r != AVERROR_EOF)

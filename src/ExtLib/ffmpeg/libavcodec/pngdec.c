@@ -734,6 +734,8 @@ static int decode_idat_chunk(AVCodecContext *avctx, PNGDecContext *s,
     int ret;
     size_t byte_depth = s->bit_depth > 8 ? 2 : 1;
 
+    if (!p)
+        return AVERROR_INVALIDDATA;
     if (!(s->hdr_state & PNG_IHDR)) {
         av_log(avctx, AV_LOG_ERROR, "IDAT without IHDR\n");
         return AVERROR_INVALIDDATA;
@@ -840,8 +842,8 @@ static int decode_idat_chunk(AVCodecContext *avctx, PNGDecContext *s,
         }
 
         p->pict_type        = AV_PICTURE_TYPE_I;
-        p->key_frame        = 1;
-        p->interlaced_frame = !!s->interlace_type;
+        p->flags           |= AV_FRAME_FLAG_KEY;
+        p->flags |= AV_FRAME_FLAG_INTERLACED * !!s->interlace_type;
 
         if ((ret = populate_avctx_color_fields(avctx, p)) < 0)
             return ret;
@@ -972,7 +974,7 @@ static int decode_trns_chunk(AVCodecContext *avctx, PNGDecContext *s,
     return 0;
 }
 
-static int decode_iccp_chunk(PNGDecContext *s, GetByteContext *gb, AVFrame *f)
+static int decode_iccp_chunk(PNGDecContext *s, GetByteContext *gb)
 {
     int ret, cnt = 0;
     AVBPrint bp;
@@ -1466,7 +1468,7 @@ static int decode_frame_common(AVCodecContext *avctx, PNGDecContext *s,
             s->have_srgb = 1;
             break;
         case MKTAG('i', 'C', 'C', 'P'): {
-            if ((ret = decode_iccp_chunk(s, &gb_chunk, p)) < 0)
+            if ((ret = decode_iccp_chunk(s, &gb_chunk)) < 0)
                 goto fail;
             break;
         }
@@ -1514,6 +1516,9 @@ static int decode_frame_common(AVCodecContext *avctx, PNGDecContext *s,
         }
     }
 exit_loop:
+
+    if (!p)
+        return AVERROR_INVALIDDATA;
 
     if (avctx->codec_id == AV_CODEC_ID_PNG &&
         avctx->skip_frame == AVDISCARD_ALL) {
@@ -1727,7 +1732,7 @@ static int decode_frame_apng(AVCodecContext *avctx, AVFrame *p,
         if ((ret = inflateReset(&s->zstream.zstream)) != Z_OK)
             return AVERROR_EXTERNAL;
         bytestream2_init(&s->gb, avctx->extradata, avctx->extradata_size);
-        if ((ret = decode_frame_common(avctx, s, p, avpkt)) < 0)
+        if ((ret = decode_frame_common(avctx, s, NULL, avpkt)) < 0)
             return ret;
     }
 

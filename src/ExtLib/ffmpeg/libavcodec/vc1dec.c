@@ -1060,7 +1060,10 @@ static int vc1_decode_frame(AVCodecContext *avctx, AVFrame *pict,
 
     // for skipping the frame
     s->current_picture.f->pict_type = s->pict_type;
-    s->current_picture.f->key_frame = s->pict_type == AV_PICTURE_TYPE_I;
+    if (s->pict_type == AV_PICTURE_TYPE_I)
+        s->current_picture.f->flags |= AV_FRAME_FLAG_KEY;
+    else
+        s->current_picture.f->flags &= ~AV_FRAME_FLAG_KEY;
 
     // ==> Start patch MPC
     if (!v->recovered && !(avctx->flags2 & AV_CODEC_FLAG2_SHOW_ALL)) {
@@ -1089,13 +1092,12 @@ static int vc1_decode_frame(AVCodecContext *avctx, AVFrame *pict,
     }
 
     v->s.current_picture_ptr->field_picture = v->field_mode;
-    v->s.current_picture_ptr->f->interlaced_frame = (v->fcm != PROGRESSIVE);
-    v->s.current_picture_ptr->f->top_field_first  = v->tff;
+    v->s.current_picture_ptr->f->flags |= AV_FRAME_FLAG_INTERLACED * (v->fcm != PROGRESSIVE);
+    v->s.current_picture_ptr->f->flags |= AV_FRAME_FLAG_TOP_FIELD_FIRST * !!v->tff;
 
     // process pulldown flags
     s->current_picture_ptr->f->repeat_pict = 0;
     // Pulldown flags are only valid when 'broadcast' has been set.
-    // So ticks_per_frame will be 2
     if (v->rff) {
         // repeat field
         s->current_picture_ptr->f->repeat_pict = 1;

@@ -74,7 +74,6 @@ private:
 	bool									m_bEnableHwDecoding  = true; // internal (not saved)
 	bool									m_bDXVACompatible;
 	unsigned __int64						m_nActiveCodecs;
-	BOOL									m_bInterlaced;
 
 	// === FFMpeg variables
 	const AVCodec*							m_pAVCodec;
