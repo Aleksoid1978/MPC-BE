@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -118,6 +118,7 @@ BOOL CPPagePlayback::OnInitDialog()
 	m_nVolumeStep = s.nVolumeStep - 1;
 
 	AddStringData(m_nSpeedStepCtrl, ResStr(IDS_AG_AUTO), 0);
+	AddStringData(m_nSpeedStepCtrl, L"0.05",  5);
 	AddStringData(m_nSpeedStepCtrl, L"0.1",  10);
 	AddStringData(m_nSpeedStepCtrl, L"0.2",  20);
 	AddStringData(m_nSpeedStepCtrl, L"0.25", 25);
