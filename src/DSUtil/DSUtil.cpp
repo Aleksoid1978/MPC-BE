@@ -1611,7 +1611,7 @@ static struct {
 	{"Bini",                        "bin", ""},
 	{"Bislama",                     "bis", "bi"},
 	{"Blin",                        "byn", ""},
-	{"Norwegian Bokmål",            "nob", "nb"},
+	{"Norwegian Bokmal",            "nob", "nb"},
 	{"Bosnian",                     "bos", "bs"},
 	{"Braj",                        "bra", ""},
 	// unofficial codes for Brazilian Portuguese language
@@ -1905,7 +1905,7 @@ static struct {
 	{"Northern Sami",               "sme", "se"},
 	{"North Ndebele",               "nde", "nd"},
 	{"Norwegian",                   "nor", "no", MAKELCID( MAKELANGID(LANG_NORWEGIAN, SUBLANG_DEFAULT), SORT_DEFAULT)},
-	{"Norwegian Bokmål; Bokmål, Norwegian", "nob", "nb", MAKELCID( MAKELANGID(LANG_NORWEGIAN, SUBLANG_DEFAULT), SORT_DEFAULT)},
+	{"Norwegian Bokmal; Bokmal, Norwegian", "nob", "nb", MAKELCID( MAKELANGID(LANG_NORWEGIAN, SUBLANG_DEFAULT), SORT_DEFAULT)},
 	{"Norwegian Nynorsk; Nynorsk, Norwegian", "nno", "nn", MAKELCID( MAKELANGID(LANG_NORWEGIAN, SUBLANG_DEFAULT), SORT_DEFAULT)},
 	{"Nubian languages",            "nub", ""},
 	{"Nyamwezi",                    "nym", ""},
