@@ -3365,9 +3365,11 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			return S_FALSE;
 		}
 
+		auto frame = (m_HWPixFmt == AV_PIX_FMT_NONE) ? m_pFrame : hw_frame;
+
 		if (m_bWaitKeyFrame) {
 			if (m_bWaitingForKeyFrame && ret >= 0) {
-				if (m_pFrame->flags & AV_FRAME_FLAG_KEY) {
+				if (frame->flags & AV_FRAME_FLAG_KEY) {
 					DLog(L"CMPCVideoDecFilter::DecodeInternal(): Found key-frame, resuming decoding");
 					m_bWaitingForKeyFrame = FALSE;
 				} else {
@@ -3375,8 +3377,6 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 				}
 			}
 		}
-
-		auto frame = (m_HWPixFmt == AV_PIX_FMT_NONE) ? m_pFrame : hw_frame;
 
 		if (ret < 0 || !frame->data[0]) {
 			av_frame_unref(m_pFrame);
