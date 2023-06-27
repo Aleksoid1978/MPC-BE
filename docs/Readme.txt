@@ -1,4 +1,4 @@
-﻿MPC-BE – универсальный проигрыватель аудио и видеофайлов для операционной системы Windows.
+﻿MPC-BE (Media Player Classic - Black Edition) – универсальный проигрыватель аудио и видеофайлов для операционной системы Windows.
 Этот проект имеет свою независимую разработку на базе оригинального кода «Media Player Classic» (Gabest) и «Media Player Classic - Home Cinema» (Casimir666). 
 
 
