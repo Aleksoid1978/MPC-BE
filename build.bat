@@ -1,5 +1,5 @@
 @ECHO OFF
-REM (C) 2009-2022 see Authors.txt
+REM (C) 2009-2023 see Authors.txt
 REM
 REM This file is part of MPC-BE.
 REM
@@ -430,7 +430,7 @@ COPY /Y /V "..\docs\Authors.txt"             "%PCKG_NAME%" >NUL
 COPY /Y /V "..\docs\Authors mpc-hc team.txt" "%PCKG_NAME%" >NUL
 COPY /Y /V "..\docs\Changelog.txt"           "%PCKG_NAME%" >NUL
 COPY /Y /V "..\docs\Changelog.Rus.txt"       "%PCKG_NAME%" >NUL
-COPY /Y /V "..\docs\Readme.txt"              "%PCKG_NAME%" >NUL
+COPY /Y /V "..\docs\Readme.md"               "%PCKG_NAME%" >NUL
 
 IF /I "%NAME%" == "MPC-BE" (
   IF /I "%INSTALLER%" == "True" (
