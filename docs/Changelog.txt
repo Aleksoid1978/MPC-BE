@@ -12,6 +12,9 @@ MP4Splitter
 Improved PCM audio support.
 Fixed getting track language.
 
+MatroskaSplitter
+Use the index list only if there is a video track.
+
 MpaDecFilter
 Optimized work with the internal buffer.
 
@@ -34,6 +37,9 @@ Fixed and accelerated the return of screenshots when using the Web-interface.
 Added option "Display title for URL in recent files".
 Added the ability to edit a playlist item by pressing the F2 button.
 In the shader selection and editing windows, DX11 will initially be selected if MPC VR is selected in the settings and Windows 8 or later is used.
+Added the ability to view the MediaInfo report for connected external audio tracks.
+Increased maximum OSD font size to 40.
+Added step 0.05 to change playback speed.
 
 Updated Dutch and Chinese (Traditional) translation (by beter).
 Updated Japanese translation (by tsubasanouta).
