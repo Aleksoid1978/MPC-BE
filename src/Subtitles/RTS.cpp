@@ -23,6 +23,8 @@
 #include <intrin.h>
 #include "RTS.h"
 
+#define MAXGDIFONTSIZE 15087
+
 // WARNING: this isn't very thread safe, use only one RTS a time. We should use TLS in future.
 static HDC g_hDC;
 static int g_hDC_refcnt = 0;
@@ -93,6 +95,14 @@ CWord::CWord(const STSStyle& style, CStringW str, int ktype, int kstart, int ken
 {
 	if (str.IsEmpty()) {
 		m_fWhiteSpaceChar = m_fLineBreak = true;
+	}
+
+	if (m_style.fontSize > MAXGDIFONTSIZE) {
+		// HACK: constraints for GetTextMetrics
+		double fact = m_style.fontSize / MAXGDIFONTSIZE;
+		m_style.fontSize = MAXGDIFONTSIZE;
+		m_style.fontScaleX *= fact;
+		m_style.fontScaleY *= fact;
 	}
 }
 
@@ -2832,13 +2842,6 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 		STSStyle tmp = stss;
 
 		tmp.fontSize      *= sub->m_scaley * 64.0;
-		if (const double FontHeightRestriction = 15087; tmp.fontSize > FontHeightRestriction) {
-			// HACK: constraints for GetTextMetrics
-			double f = FontHeightRestriction / tmp.fontSize;
-			sub->m_scalex *= f;
-			sub->m_scaley *= f;
-			tmp.fontSize = FontHeightRestriction;
-		}
 		tmp.fontSpacing   *= sub->m_scalex * 64.0;
 		tmp.outlineWidthX *= (m_fScaledBAS ? sub->m_scalex : 1.0) * 8.0;
 		tmp.outlineWidthY *= (m_fScaledBAS ? sub->m_scaley : 1.0) * 8.0;
