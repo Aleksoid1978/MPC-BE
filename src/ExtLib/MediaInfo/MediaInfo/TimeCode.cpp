@@ -703,7 +703,7 @@ int TimeCode::FromSeconds(double Seconds, bool Truncate, bool TimeIsDropFrame)
     int64_t FrameCountI = (int64_t)FrameCountF;
 
     // Manage rounding errors, that makes FromSeconds(ToSeconds()) neutral (symetry)
-    if (FrameCountF - FrameCountI > (double)0.999999999)
+    if (FrameCountF / (FrameCountI + 1) > (double)0.999999999999999)
         FrameCountI++;
 
     // Compute time code from frames, managing the need to consider time with also drop frames

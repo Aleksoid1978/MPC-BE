@@ -24,6 +24,7 @@
 #include "MediaInfo/Audio/File_Dts.h"
 #include "ZenLib/Utils.h"
 #include "ZenLib/BitStream.h"
+#include "MediaInfo/TimeCode.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #if MEDIAINFO_EVENTS
     #include "MediaInfo/MediaInfo_Events.h"
@@ -39,6 +40,46 @@ namespace MediaInfoLib
 //***************************************************************************
 // Infos
 //***************************************************************************
+
+//---------------------------------------------------------------------------
+static constexpr int64u CHUNK_AUPR_HDR=0x415550522D484452LL;
+static constexpr int64u CHUNK_BUILDVER=0x4255494C44564552LL;
+static constexpr int64u CHUNK_CORESSMD=0x434F524553534D44LL;
+static constexpr int64u CHUNK_DTSHDHDR=0x4454534844484452LL;
+static constexpr int64u CHUNK_EXTSS_MD=0x45585453535F4D44LL;
+static constexpr int64u CHUNK_FILEINFO=0x46494C45494E464FLL;
+static constexpr int64u CHUNK_TIMECODE=0x54494D45434F4445LL;
+static constexpr int64u CHUNK_STRMDATA=0x5354524D44415441LL;
+
+//---------------------------------------------------------------------------
+void Merge_FillTimeCode(File__Analyze& In, const string& Prefix, const TimeCode& TC_Time, float FramesPerSecondF, bool DropFrame, bool Negative, int32u Frequency);
+
+//---------------------------------------------------------------------------
+static const float TC_Frame_Rate_Table[]=
+{
+    // Value 0 means "not indicated"
+    24/1.001,
+    24,
+    25,
+    30/1.001, // Drop
+    30/1.001,
+    30, // Drop
+    30,
+};
+static constexpr size_t TC_Frame_Rate_Table_Size=sizeof(TC_Frame_Rate_Table)/sizeof(*TC_Frame_Rate_Table);
+static bool TC_Frame_Rate_IsDrop(int8u Value)
+{
+    return Value==4 || Value==6;
+}
+
+//---------------------------------------------------------------------------
+static const int16u DTS_HD_RefClockCode[]=
+{
+    32000,
+    44100,
+    48000,
+};
+static constexpr size_t DTS_HD_RefClockCode_Size=sizeof(DTS_HD_RefClockCode)/sizeof(*DTS_HD_RefClockCode);
 
 //---------------------------------------------------------------------------
 static const int16u CRC_CCIT_Table[256]=
@@ -194,15 +235,6 @@ static const char* DTS_ExtensionAudioDescriptor[]=
     "",
     "",
     "",
-    "",
-};
-
-//---------------------------------------------------------------------------
-static const char* DTS_HD_RefClockCode[]=
-{
-    "1/32000",
-    "1/44100",
-    "1/48000",
     "",
 };
 
@@ -498,7 +530,7 @@ static size_t DTS_Extension_Index_Get(int32u SyncWord)
 
 //---------------------------------------------------------------------------
 File_Dts::File_Dts()
-:File__Analyze()
+:File_Dts_Common()
 {
     //Configuration
     ParserName="Dts";
@@ -865,7 +897,7 @@ void File_Dts::Streams_Fill()
     Fill(Stream_Audio, 0, Audio_SamplingRate, LegacyStreamDisplay?Data[SamplingRate].Read():Data[SamplingRate].Read(0));
     Fill(Stream_Audio, 0, Audio_SamplesPerFrame, LegacyStreamDisplay?Data[SamplesPerFrame].Read():Data[SamplesPerFrame].Read(0));
     Fill(Stream_Audio, 0, Audio_BitRate, LegacyStreamDisplay?Data[BitRate].Read():(Data[BitRate].Read(0)==__T("Unknown")?Ztring():Data[BitRate].Read(0)));
-    Fill(Stream_Audio, 0, Audio_BitRate_Mode, LegacyStreamDisplay?Data[BitRate_Mode].Read():Data[BitRate_Mode].Read(0));
+    Fill(Stream_Audio, 0, Audio_BitRate_Mode, LegacyStreamDisplay?Data[BitRate_Mode].Read():Data[BitRate_Mode].Read(0), true);
     Fill(Stream_General, 0, General_OverallBitRate_Mode, Retrieve(Stream_Audio, 0, Audio_BitRate_Mode));
     Fill(Stream_Audio, 0, Audio_Compression_Mode, LegacyStreamDisplay?Data[Compression_Mode].Read():Data[Compression_Mode].Read(0), true);
 
@@ -895,7 +927,7 @@ void File_Dts::Streams_Finish()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-bool File_Dts::FileHeader_Begin()
+bool File_Dts_Common::FileHeader_Begin()
 {
     //Must have enough buffer for having header
     if (Buffer_Size<4)
@@ -915,6 +947,246 @@ bool File_Dts::FileHeader_Begin()
     if (!Frame_Count_Valid)
         Frame_Count_Valid=Config->ParseSpeed>=0.3?32:(IsSub?1:2);
     return true;
+}
+
+//---------------------------------------------------------------------------
+void File_Dts_Common::FileHeader_Parse()
+{
+    //DTSHDHDR header
+    //https://www.atsc.org/wp-content/uploads/2015/03/Non-Real-Time-Content-Delivery.pdf
+    if (IsSub || CC8(Buffer)!=CHUNK_DTSHDHDR || CC4(Buffer+8))
+        return;
+    int64u StreamSize=-1;
+    int16u Bitw_Stream_Metadata;
+    bool Header_Parsed=false;
+    int64u Num_Samples_Orig_Audio_At_Max_Fs=0;
+    int32u Num_Frames_Total, TimeStamp, Max_Sample_Rate_Hz=0, Ext_Ss_Avg_Bit_Rate_Kbps=0, Ext_Ss_Peak_Bit_Rate_Kbps=0;
+    int16u Core_Ss_Bit_Rate_Kbps=0, Samples_Per_Frame_At_Max_Fs=0, Codec_Delay_At_Max_Fs=0;
+    int8u RefClockCode, TC_Frame_Rate=-1;
+    while (StreamSize==-1 && Element_Size-Element_Offset>=16)
+    {
+        int64u Name, Size;
+        Element_Begin1("Element");
+        Element_Begin1("Header");
+        Get_C8 (Name,                                           "Name");
+        Get_B8 (Size,                                           "Size");
+        Element_End0();
+        Ztring ToShow;
+        for (int i=0; i<8; i++)
+            ToShow.append(1, (ZenLib::Char)((Name>>(56-i*8)))&0xFF);
+        Element_Name(ToShow);
+        if (Name!=CHUNK_STRMDATA && Size>Element_Size-Element_Offset)
+        {
+            Element_End0();
+            Element_WaitForMoreData();
+            return;
+        }
+        auto End=Element_Offset+Size;
+        switch (Name)
+        {
+            case CHUNK_AUPR_HDR:
+            {
+                int16u Bitw_Aupres_Metadata;
+                Skip_B1(                                        "Audio_Pres_Index");
+                Get_B2 (Bitw_Aupres_Metadata,                   "Bitw_Aupres_Metadata");
+                Skip_Flags(Bitw_Aupres_Metadata, 3,             "Presence of a LBR coding componen");
+                Skip_Flags(Bitw_Aupres_Metadata, 2,             "Presence of a lossless coding component");
+                Skip_Flags(Bitw_Aupres_Metadata, 1,             "Location of a backward compatible core coding component");
+                Skip_Flags(Bitw_Aupres_Metadata, 0,             "Presence of a backward compatible core coding component");
+                Get_B3 (Max_Sample_Rate_Hz,                     "Max_Sample_Rate_Hz");
+                Get_B4 (Num_Frames_Total,                       "Num_Frames_Total");
+                Get_B2 (Samples_Per_Frame_At_Max_Fs,            "Samples_Per_Frame_At_Max_Fs");
+                Get_B5 (Num_Samples_Orig_Audio_At_Max_Fs,       "Num_Samples_Orig_Audio_At_Max_Fs");
+                Skip_B2(                                        "Channel_Mask");
+                Get_B2 (Codec_Delay_At_Max_Fs,                  "Codec_Delay_At_Max_Fs");
+                if ((Bitw_Aupres_Metadata&3)==3)
+                {
+                    Skip_B3(                                    "BC_Core_Max_Sample_Rate_Hz");
+                    Skip_B2(                                    "BC_Core_Bit_Rate_Kbps");
+                    Skip_B2(                                    "BC_Core_Channel_Mask");
+                }
+                if (Bitw_Aupres_Metadata&4)
+                {
+                    Skip_B1(                                    "LSB_Trim_Percent");
+                }
+                break;
+            }
+            case CHUNK_CORESSMD:
+            {
+                Skip_B3(                                        "Core_Ss_Max_Sample_Rate_Hz");
+                Get_B2 (Core_Ss_Bit_Rate_Kbps,                  "Core_Ss_Bit_Rate_Kbps");
+                Skip_B2(                                        "Core_Ss_Channel_Mask");
+                Skip_B4(                                        "Core_Ss_Frame_Payload_In_Bytes");
+                break;
+            }
+            case CHUNK_DTSHDHDR:
+            {
+                Skip_B4(                                        "Hdr_Version");
+                Get_B1 (RefClockCode,                           "Time_Code RefClockCode");
+                RefClockCode>>=6;
+                Param_Info1C(RefClockCode<DTS_HD_RefClockCode_Size, DTS_HD_RefClockCode[RefClockCode]);
+                Get_B4 (TimeStamp,                              "Time_Code TimeStamp");
+                Get_B1 (TC_Frame_Rate,                          "TC_Frame_Rate"); Param_Info1C(TC_Frame_Rate && TC_Frame_Rate<TC_Frame_Rate_Table_Size-1, TC_Frame_Rate_Table[TC_Frame_Rate-1]);
+                Get_B2 (Bitw_Stream_Metadata,                   "Bitw_Stream_Metadata");
+                Skip_Flags(Bitw_Stream_Metadata, 4,             "Presence of an extension sub-stream(s)");
+                Skip_Flags(Bitw_Stream_Metadata, 3,             "Presence of a core sub-stream");
+                Skip_Flags(Bitw_Stream_Metadata, 2,             "Navigation table");
+                Skip_Flags(Bitw_Stream_Metadata, 1,             "Peak bit rate smoothing");
+                Skip_Flags(Bitw_Stream_Metadata, 0,             "Variable bit-rate");
+                Skip_B1(                                        "Num_Audio_Presentations");
+                Skip_B1(                                        "Number_Of_Ext_Sub_Streams");
+                break;
+            }
+            case CHUNK_EXTSS_MD:
+            {
+                Get_B3 (Ext_Ss_Avg_Bit_Rate_Kbps,               "Ext_Ss_Avg_Bit_Rate_Kbps");
+                if (Bitw_Stream_Metadata&1)
+                {
+                    Get_B3 (Ext_Ss_Peak_Bit_Rate_Kbps,          "Ext_Ss_Peak_Bit_Rate_Kbps");
+                    Skip_B2(                                    "Pbr_Smooth_Buff_Size_Kb");
+                }
+                else
+                {
+                    Skip_B4(                                    "Ext_Ss_Frame_Payload_In_Bytes");
+
+                }
+                break;
+            }
+            case CHUNK_STRMDATA:
+                StreamSize=Size;
+                break;
+        }
+        if (Name!=CHUNK_STRMDATA)
+        {
+            Skip_XX(End-Element_Offset,                         End-Element_Offset<=3?"Dword_Align":"(Unknown)");
+            Element_Offset=End;
+        }
+        Element_End0();
+    }
+    if (StreamSize==-1)
+    {
+        Element_WaitForMoreData();
+        return;
+    }
+
+    FILLING_BEGIN()
+        Fill(Stream_Audio, 0, Audio_BitRate_Mode, (Bitw_Stream_Metadata&1)?"VBR":"CBR");
+        if (RefClockCode<DTS_HD_RefClockCode_Size && TC_Frame_Rate)
+        {
+            auto RefClock=DTS_HD_RefClockCode[RefClockCode];
+            TimeCode TC(((double)TimeStamp+0.5)/RefClock, RefClock-1);
+            Fill(Stream_Audio, 0, Audio_Delay, TC.ToSeconds()*1000, 3);
+            if (TC_Frame_Rate<TC_Frame_Rate_Table_Size-1)
+                Merge_FillTimeCode(*this, "TimeCode", TC, TC_Frame_Rate_Table[TC_Frame_Rate-1], TC_Frame_Rate_IsDrop(TC_Frame_Rate), false, RefClock);
+        }
+        if (Num_Frames_Total)
+            Fill(Stream_Audio, 0, Audio_FrameCount, Num_Frames_Total);
+        if (Max_Sample_Rate_Hz && Samples_Per_Frame_At_Max_Fs && Num_Samples_Orig_Audio_At_Max_Fs)
+        {
+            int64u SamplingCount=Num_Samples_Orig_Audio_At_Max_Fs;
+            if (Codec_Delay_At_Max_Fs>=Samples_Per_Frame_At_Max_Fs)
+                SamplingCount+=Codec_Delay_At_Max_Fs; // If less, we guess it is a delay inside the frame and first samples should be discarded, else it is complete frames, so need to add to sample count as the frames are decoded
+            Fill(Stream_Audio, 0, Audio_SamplingCount, SamplingCount);
+        }
+        int32u BitRate_Nominal=Core_Ss_Bit_Rate_Kbps+Ext_Ss_Avg_Bit_Rate_Kbps;
+        if (BitRate_Nominal)
+        {
+            BitRate_Nominal*=1000;
+            Fill(Stream_General, 0, General_OverallBitRate, BitRate_Nominal);
+            Fill(Stream_Audio, 0, Audio_BitRate_Nominal, BitRate_Nominal);
+        }
+        if (Ext_Ss_Peak_Bit_Rate_Kbps)
+        {
+            int32u BitRate_Maximum=Core_Ss_Bit_Rate_Kbps+Ext_Ss_Peak_Bit_Rate_Kbps;
+            BitRate_Maximum*=1000;
+            Fill(Stream_General, 0, General_OverallBitRate_Maximum, BitRate_Maximum);
+            Fill(Stream_Audio, 0, Audio_BitRate_Maximum, BitRate_Maximum);
+        }
+        Fill(Stream_Audio, 0, Audio_StreamSize, StreamSize);
+
+        Stream_Offset_Max=File_Offset+Element_Offset+StreamSize;
+    FILLING_END()
+}
+
+
+//***************************************************************************
+// Buffer - Gobal
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+bool File_Dts_Common::Header_Begin()
+{
+    if (Stream_Offset_Max==-1 || File_Offset+Buffer_Offset!=Stream_Offset_Max || File_Size==-1)
+        return true;
+
+    //Handling DTSHDHDR footer
+    if (File_Offset+Buffer_Size<File_Size)
+    {
+        return false; //Wait for more data
+    }
+    Element_Begin1("File Footer");
+    while (Element_Size-Element_Offset>=16)
+    {
+        int64u Name, Size;
+        Element_Begin1("Element");
+        Element_Begin1("Header");
+        Get_C8 (Name,                                           "Name");
+        Get_B8 (Size,                                           "Size");
+        Element_End0();
+        Ztring ToShow;
+        for (int i=0; i<8; i++)
+            ToShow.append(1, (ZenLib::Char)((Name>>(56-i*8)))&0xFF);
+        Element_Name(ToShow);
+        auto End=Element_Offset+Size;
+        switch (Name)
+        {
+            case CHUNK_BUILDVER:
+            {
+                size_t Element_Offset_End=(size_t)Element_Offset;
+                while (Element_Offset_End<End && Buffer[Buffer_Offset+Element_Offset_End])
+                    Element_Offset_End++;
+                Skip_UTF8(Element_Offset_End-Element_Offset,    "Description");
+                if (Element_Offset<End)
+                    Element_Offset++; //Null termination
+                break;
+            }
+            case CHUNK_FILEINFO:
+            {
+                if (!Size)
+                    break;
+                int8u FILEINFO_Text_Byte_Size;
+                Get_B1 (FILEINFO_Text_Byte_Size,                "FILEINFO_Text_Byte_Size");
+                if (FILEINFO_Text_Byte_Size && FILEINFO_Text_Byte_Size<Size-1)
+                {
+                    Skip_UTF8(FILEINFO_Text_Byte_Size-1,        "Description");
+                    Element_Offset++; //Null termination
+                }
+                else
+                    Skip_XX(End-Element_Offset,                 "(Unknown)");
+                break;
+            }
+            case CHUNK_TIMECODE:
+            {
+                int64u Start_Sample, Reference_Sample;
+                int32u Timecode_Clock, Start_Residual, Reference_Residual;
+                int8u Timecode_Frame_Rate;
+                Get_B4 (Timecode_Clock,                         "Timecode Clock");
+                Get_B1 (Timecode_Frame_Rate,                    "Timecode Frame Rate"); Param_Info1C(Timecode_Frame_Rate && Timecode_Frame_Rate<TC_Frame_Rate_Table_Size-1, TC_Frame_Rate_Table[Timecode_Frame_Rate-1]);
+                Get_B8 (Start_Sample,                           "Start samples since midnight");
+                Get_B4 (Start_Residual,                         "Start Residual");
+                Get_B8 (Reference_Sample,                       "Reference samples since midnight");
+                Get_B4 (Reference_Residual,                     "Reference Residual");
+                break;
+            }
+        }
+        Skip_XX(End-Element_Offset,                             End-Element_Offset<=3?"Dword_Align":"(Unknown)");
+        Element_Offset=End;
+        Element_End0();
+    }
+    Element_End0();
+
+    Buffer_Offset=Buffer_Size;
+    return false;
 }
 
 //***************************************************************************
@@ -1009,7 +1281,11 @@ bool File_Dts::Synched_Test()
     if (!FrameSynchPoint_Test())
         return false; //Need more data
     if (!Synched)
+    {
+        if (Stream_Offset_Max!=-1 && File_Offset+Buffer_Offset==Stream_Offset_Max && File_Size!=-1)
+            Synched=true; // It is the file footer
         return true;
+    }
 
     //We continue
     return true;
@@ -1110,7 +1386,7 @@ void File_Dts::Data_Parse()
         Get_S3 (16+ExtraSize, HD_size,                          "ExtSSFsize"); HD_size++; Param_Info2(HD_size, " bytes");
         TESTELSE_SB_GET(StaticFieldsPresent,                    "StaticFieldsPresent");
             std::vector<int32u> ActiveExSSMasks;
-            Info_S1(2, RefClockCode,                            "RefClockCode"); Param_Info1(DTS_HD_RefClockCode[RefClockCode]);
+            Info_S1(2, RefClockCode,                            "RefClockCode"); Param_Info1C(RefClockCode<DTS_HD_RefClockCode_Size, DTS_HD_RefClockCode[RefClockCode]);
             Get_S1 (3, HD_ExSSFrameDurationCode,                "ExSSFrameDurationCode"); HD_ExSSFrameDurationCode++; Param_Info1(HD_ExSSFrameDurationCode);
             TEST_SB_SKIP(                                       "TimeStampFlag");
                 Skip_S5(36,                                     "TimeStamp");
@@ -1363,7 +1639,12 @@ void File_Dts::Core()
 
             //No more need data
             if (!IsSub && Config->ParseSpeed<1.0)
-                Finish("DTS");
+            {
+                if (Stream_Offset_Max!=-1)
+                    GoTo(Stream_Offset_Max);
+                else
+                    Finish("DTS");
+            }
         }
     FILLING_END();
 }

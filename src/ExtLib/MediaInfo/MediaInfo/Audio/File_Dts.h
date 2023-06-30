@@ -23,12 +23,30 @@ namespace MediaInfoLib
 // Class File_Dts
 //***************************************************************************
 
-class File_Dts : public File__Analyze
+class File_Dts_Common : public File__Analyze
 {
 public :
     //In
     int64u Frame_Count_Valid;
 
+    //Buffer - File header
+    bool FileHeader_Begin();
+    void FileHeader_Parse();
+
+    //Buffer - Per element
+    bool Header_Begin();
+
+protected :
+    int64u Stream_Offset_Max=-1;
+};
+
+//***************************************************************************
+// Class File_Dts
+//***************************************************************************
+
+class File_Dts : public File_Dts_Common
+{
+public :
     //Constructor/Destructor
     File_Dts();
 
@@ -36,9 +54,6 @@ private :
     //Streams management
     void Streams_Fill();
     void Streams_Finish();
-
-    //Buffer - File header
-    bool FileHeader_Begin();
 
     //Buffer - Synchro
     bool Synchronize();

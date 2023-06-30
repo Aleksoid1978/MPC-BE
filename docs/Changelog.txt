@@ -55,7 +55,8 @@ Updated Spanish translation (by IPeluchito).
 Updated libraries:
 	dav1d git-1.2.1-8-g8b419c1;
 	ffmpeg git-n6.1-dev-1426-g96d6990517;
-	MediaInfo 23.06.
+	MediaInfo git-v23.06-4-gbeaba12f3;
+	ZenLib git-v0.4.41-2-g4f10e1b.
 
 
 1.6.7 - 2023-05-05

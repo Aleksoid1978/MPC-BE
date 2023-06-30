@@ -204,10 +204,39 @@ std::wstring URL_Encoded_Decode (const std::wstring& URL)
     {
         if (URL[Pos]==L'%' && Pos+2<URL.size()) //At least 3 chars
         {
-            const wchar_t Char1 = Char2Hex(URL[Pos+1]);
-            const wchar_t Char2 = Char2Hex(URL[Pos+2]);
-            const wchar_t Char = (Char1<<4) | Char2;
-            Result+=Char;
+            int32u Char1 = Char2Hex(URL[Pos+1]);
+            int32u Char2 = Char2Hex(URL[Pos+2]);
+            int32u Char  = (Char1<<4) | Char2;
+            if (Char>=0xC2 && Char<=0xF4)
+            {
+                //Handle as UTF-8
+                auto AdditionalBytes_Real=0;
+                auto AdditionalBytes_Theory=Char>=0xF0?3:(Char>=0xE0?2:1);
+                Char&=AdditionalBytes_Theory>0xF0?0x1F:0x0F;
+                if (Pos+(AdditionalBytes_Theory+1)*3<=URL.size())
+                {
+                    for (auto i=0; i<AdditionalBytes_Theory; i++)
+                        if (URL[Pos+3*i]!=L'%' )
+                            AdditionalBytes_Theory=0;
+                    for (auto i=0; i<AdditionalBytes_Theory; i++)
+                    {
+                        auto Base=Pos+(i+1)*3+1;
+                        Char1 = Char2Hex(URL[Base]);
+                        Char2 = Char2Hex(URL[Base+1]);
+                        Char  = (Char<<6) | ((Char1&0x3)<<4) | Char2;
+                    }
+                    Pos+=3*AdditionalBytes_Theory; //3 additional chars per extra are used
+                }
+            }
+            if (sizeof(wchar_t)==4 || Char<=0xD800)
+                Result+=(wchar_t)Char;
+            else
+            {
+                //Output as UTF-16
+                Char-=0x10000;
+                Result+=0xD800|((wchar_t)(Char>>10));
+                Result+=0xDC00|((wchar_t)(Char&((1<<10)-1)));
+            }
             Pos+=2; //3 chars are used
         }
         else if (URL[Pos]==L'+')
