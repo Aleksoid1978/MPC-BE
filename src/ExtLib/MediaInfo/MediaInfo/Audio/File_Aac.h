@@ -128,6 +128,7 @@ protected :
     void Read_Buffer_Continue ();
     void Read_Buffer_Continue_AudioSpecificConfig();
     void Read_Buffer_Continue_payload();
+    void Read_Buffer_Unsynched();
 
     //Buffer - Synchro
     bool Synchronize();
@@ -247,7 +248,7 @@ protected :
     void program_config_element             ();
 
     //Elements - GA bitstream
-    void payload                            ();
+    void payload                            (size_t BitsNotIncluded=(size_t)-1);
     void raw_data_block                     ();
     void single_channel_element             ();
     void channel_pair_element               ();

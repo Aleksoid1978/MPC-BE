@@ -218,8 +218,8 @@ void File_Scc::FileHeader_Parse()
             size_t Space=Begin;
             while (Space<End && Buffer[Space]!=' ' && Buffer[Space]!='\t')
                 Space++;
-            TimeCode Temp((const char*)Buffer+Begin, Space-Begin);
-            if (Temp.HasValue())
+            TimeCode Temp(TimeCode::string_view((const char*)Buffer+Begin, Space-Begin), -1);
+            if (Temp.IsSet())
             {
                 if (HighestFrame<Temp.GetFrames())
                     HighestFrame=Temp.GetFrames();
@@ -241,7 +241,9 @@ void File_Scc::FileHeader_Parse()
                 {
                     for (size_t i=0; i<TimeCodes.size(); i++)
                     {
-                        if (Temp<TimeCodes[i])
+                        auto Temp2(Temp);
+                        Temp2.SetFramesMax(TimeCodes[i].GetFramesMax());
+                        if (Temp2<TimeCodes[i])
                             {
                                 int8u NewHighestFrame=TimeCodes[i].GetFramesMax();
                                 TimeCodes[i]--; // Time code of the last frame
@@ -303,8 +305,8 @@ void File_Scc::FileHeader_Parse()
         FrameRate=0;
     Fill(Stream_Text, 0, Text_FrameRate, FrameRate_F);
     TimeCode_FirstFrame.SetFramesMax(FrameRate-1);
-    TimeCode_FirstFrame.Set1001(FrameRate_Is1001);
-    Fill(Stream_Text, 0, Text_Delay, TimeCode_FirstFrame.ToMilliseconds());
+    TimeCode_FirstFrame.Set1001fps(FrameRate_Is1001);
+    Fill(Stream_Text, 0, Text_Delay, (int64s)TimeCode_FirstFrame.ToMilliseconds());
 }
 
 //***************************************************************************
@@ -348,9 +350,7 @@ void File_Scc::Data_Parse()
     //Parsing
     string TimeStamp;
     Get_String(11, TimeStamp,                                   "TimeStamp");
-    TimeCode Temp(TimeStamp);
-    Temp.SetFramesMax(FrameRate-1);
-    Temp.Set1001(FrameRate_Is1001);
+    TimeCode Temp(TimeStamp, FrameRate-1, TimeCode::FPS1001(FrameRate_Is1001));
     Frame_Count_NotParsedIncluded=Temp.ToFrames()-TimeCode_FirstFrame.ToFrames();
     Parser->FrameInfo.DTS=Temp.ToMilliseconds()*1000000;
     Parser->FrameInfo.DUR=FrameDurationNanoSeconds;

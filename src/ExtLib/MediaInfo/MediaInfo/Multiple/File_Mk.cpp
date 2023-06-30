@@ -25,6 +25,9 @@
 #if defined(MEDIAINFO_OGG_YES)
     #include "MediaInfo/Multiple/File_Ogg.h"
 #endif
+#if defined(MEDIAINFO_TIMECODE_YES)
+    #include "MediaInfo/Multiple/File_Gxf_TimeCode.h"
+#endif
 #if defined(MEDIAINFO_RM_YES)
     #include "MediaInfo/Multiple/File_Rm.h"
 #endif
@@ -1201,21 +1204,8 @@ void File_Mk::Streams_Finish()
                                 break;
                         }
                     }
-                    if (i==HdrFormat_Max)
+                    if (i==HdrFormat_Max && HDR_FirstFieldNonEmpty!=(size_t)-1)
                         Fill(Stream_Video, 0, HDR_Item.first, HDR_Item.second[HDR_FirstFieldNonEmpty]);
-                    else if (!LegacyStreamDisplay)
-                    {
-                        for (i=HDR_FirstFormatPos; i<HdrFormat_Max; i++)
-                        {
-                            if (!HDR_Present[i])
-                                continue;
-                            if (HDR_Item.first<=Video_HDR_Format_Compatibility || !HDR_Item.second[i].empty())
-                            {
-                                Fill(Stream_Video, 0, HDR_Item.first, HDR_Item.second[i]);
-                                break;
-                            }
-                        }
-                    }
                     else
                     {
                         ZtringList Value;
@@ -1223,11 +1213,15 @@ void File_Mk::Streams_Finish()
                         if (i!=HdrFormat_Max)
                             for (i=HDR_FirstFormatPos; i<HdrFormat_Max; i++)
                             {
+                                if (!LegacyStreamDisplay && HDR_FirstFormatPos != HdrFormat_SmpteSt2086 && i >= HdrFormat_SmpteSt2086)
+                                    break;
                                 if (!HDR_Present[i])
                                     continue;
                                 Value.push_back(HDR_Item.second[i]);
                             }
-                        Fill(Stream_Video, 0, HDR_Item.first, Value.Read());
+                        auto Value_Flat = Value.Read();
+                        if (!Value.empty() && Value_Flat.size() > (Value.size() - 1) * 3)
+                            Fill(Stream_Video, 0, HDR_Item.first, Value.Read());
                     }
                 }
             }
@@ -1361,6 +1355,11 @@ void File_Mk::Streams_Finish()
                 Fill(Stream_Video, StreamPos_Last, Video_Height, Retrieve(Stream_Video, StreamPos_Last, Video_Height).To_int64u()-Temp->second.PixelCropTop-Temp->second.PixelCropBottom, 10, true);
                 Fill(Stream_Video, StreamPos_Last, Video_Height_Offset, Temp->second.PixelCropTop, 10, true);
             }
+        }
+        for (auto BlockAddition : Temp->second.BlockAdditions)
+        {
+            Finish(BlockAddition.second);
+            Merge(*BlockAddition.second, StreamKind_Last, 0, StreamPos_Last);
         }
 
         if (Temp->second.FrameRate!=0 && Retrieve(Stream_Video, StreamPos_Last, Video_FrameRate).empty())
@@ -3030,7 +3029,7 @@ void File_Mk::Segment_Cluster_BlockGroup_Block_Lace()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Cluster_BlockGroup_BlockAdditions_BlockMore()
 {
-    BlockAddID=(int64u)-1;
+    BlockAddIDValue=(int64u)-1;
 }
 
 //---------------------------------------------------------------------------
@@ -3040,14 +3039,29 @@ void File_Mk::Segment_Cluster_BlockGroup_BlockAdditions_BlockMore_BlockAddID()
     int64u Temp=UInteger_Get();
 
     FILLING_BEGIN();
-        BlockAddID=Temp;
+        BlockAddIDValue=Temp;
     FILLING_END();
 }
 
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Cluster_BlockGroup_BlockAdditions_BlockMore_BlockAdditional()
 {
-    switch (BlockAddID)
+    if (BlockAddIDValue==(int64u)-1)
+    {
+        Skip_XX(Element_Size,                                   "Data");
+        return;
+    }
+
+    const auto& streamItem=Stream[TrackNumber];
+    const auto& BlockAdditions=streamItem.BlockAdditions;
+    auto Parser=BlockAdditions.find(BlockAddIDValue);
+    if (Parser!=BlockAdditions.end())
+    {
+        Open_Buffer_Continue(Parser->second);
+        return;
+    }
+
+    switch (BlockAddIDValue)
     {
         case 4 : sei_message_user_data_registered_itu_t_t35(); break;
         default: {Skip_XX(Element_Size, "Data"); }
@@ -3537,14 +3551,63 @@ void File_Mk::Segment_Tracks_TrackEntry_CodecID()
 }
 
 //---------------------------------------------------------------------------
+void File_Mk::Segment_Tracks_TrackEntry_BlockAdditionMapping()
+{
+    BlockAddIDType=(int64u)-1;
+    BlockAddIDValue=(int64u)-1;
+}
+
+void File_Mk::Segment_Tracks_TrackEntry_BlockAdditionMapping_Manage()
+{
+    if (BlockAddIDType==(int64u)-1 || BlockAddIDValue==(int64u)-1)
+        return;
+
+    File__Analyze* Parser;
+    switch (BlockAddIDType)
+    {
+        #if defined(MEDIAINFO_TIMECODE_YES)
+        case 0x79:      //121
+        case 0x313231:  //121
+            {
+            auto Temp=new File_Gxf_TimeCode();
+            Temp->IsBigEndian=true;
+            Parser=Temp;
+            }
+            #endif
+        break;
+        default:
+            Parser=nullptr;
+    }
+
+    if (Parser)
+    {
+        Open_Buffer_Init(Parser);
+        stream& streamItem=Stream[TrackNumber];
+        streamItem.BlockAdditions[BlockAddIDValue]=Parser;
+    }
+}
+
+//---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDType()
 {
     //Parsing
-    int32u Value;
-    Get_C4(Value,                                               "Value");
+    #if MEDIAINFO_TRACE
+        int64u Value;
+        if (Element_Size==4)
+        {
+            int32u Value32;
+            Get_C4(Value32,                                     "Value");
+            Value=Value32;
+        }
+        else
+            Value=UInteger_Get();
+    #else //MEDIAINFO_TRACE
+        int64u Value=UInteger_Get();
+    #endif //MEDIAINFO_TRACE
 
     FILLING_BEGIN();
         BlockAddIDType=Value;
+        Segment_Tracks_TrackEntry_BlockAdditionMapping_Manage();
     FILLING_END();
 }
 
@@ -3597,6 +3660,18 @@ void File_Mk::Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDExtraData
                 break;
         default:;
     }
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDValue()
+{
+    //Parsing
+    int64u Value=UInteger_Get();
+
+    FILLING_BEGIN();
+        BlockAddIDValue=Value;
+        Segment_Tracks_TrackEntry_BlockAdditionMapping_Manage();
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------

@@ -225,6 +225,10 @@ protected :
     void Omneon_010201010100();
     void Omneon_010201020100();
     void FFV1PictureSubDescriptor();
+    void MGASoundEssenceDescriptor();
+    void MGAAudioMetadataSubDescriptor();
+    void MGASoundfieldGroupLabelSubDescriptor();
+    void SADMAudioMetadataSubDescriptor();
 
     //Common
     void GenerationInterchangeObject();
@@ -360,6 +364,16 @@ protected :
     void FFV1PictureSubDescriptor_MaximumBitRate();             //
     void FFV1PictureSubDescriptor_Version();                    //
     void FFV1PictureSubDescriptor_MicroVersion();               //
+    void MGASoundEssenceBlockAlign() {WaveAudioDescriptor_BlockAlign();};
+    void MGASoundEssenceAverageBytesPerSecond() {WaveAudioDescriptor_AvgBps();}
+    void MGASoundEssenceSequenceOffset() {WaveAudioDescriptor_SequenceOffset();};
+    void MGALinkID();                                           //
+    void MGAAudioMetadataIndex();                               //
+    void MGAAudioMetadataIdentifier();                          //
+    void MGAAudioMetadataPayloadULArray();                      //
+    void MGAMetadataSectionLinkID();                            //
+    void SADMMetadataSectionLinkID();                           //
+    void SADMProfileLevelULBatch();                             //
     void MpegAudioDescriptor_BitRate();                         //
     void MultipleDescriptor_FileDescriptors();                  //3F01
     void PrimaryExtendedSpokenLanguage();                       //
@@ -656,6 +670,7 @@ protected :
     bool   FooterPartitionAddress_Jumped;
     bool   PartitionPack_Parsed;
     bool   HeaderPartition_IsOpen;
+    bool   Is1001;
     size_t IdIsAlwaysSame_Offset;
 
     //Primer
@@ -1204,6 +1219,7 @@ protected :
     void           ChooseParser_Ffv1(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
     void           ChooseParser_DolbyVisionFrameData(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
     void           ChooseParser_Iab(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
+    void           ChooseParser_Mga(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
 
     //Helpers
     int32u Vector(int32u ExpectedLength=(int32u)-1);

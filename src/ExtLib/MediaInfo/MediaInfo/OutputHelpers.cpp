@@ -212,7 +212,7 @@ string JSON_Encode (const string& Data)
 }
 
 //---------------------------------------------------------------------------
-string To_JSON_Attributes(Node& Cur_Node, const int& Level, bool Indent)
+string To_JSON_Attributes(Node& Cur_Node, const int& Level, bool Indent, bool Carriage_Returns)
 {
     string Result;
     for (size_t Pos=0; Pos<Cur_Node.Attrs.size(); Pos++)
@@ -220,7 +220,7 @@ string To_JSON_Attributes(Node& Cur_Node, const int& Level, bool Indent)
         if (Cur_Node.Attrs[Pos].first.empty() || Cur_Node.Attrs[Pos].first.substr(0, 5)=="xmlns" || Cur_Node.Attrs[Pos].first.substr(0, 3)=="xsi")
             continue;
 
-        Result+="\n"+(Indent?string(Level, '\t'):string())+"\"@"+Cur_Node.Attrs[Pos].first+"\": \""
+        Result+=(Carriage_Returns?("\n"+(Indent?string(Level, '\t'):string())):string())+"\"@"+Cur_Node.Attrs[Pos].first+(Carriage_Returns?"\": \"":"\":\"")
                +JSON_Encode(Cur_Node.Attrs[Pos].second)+"\"";
 
         if (Pos<Cur_Node.Attrs.size()-1 || Cur_Node.Value.size() || Cur_Node.Childs.size())
@@ -232,7 +232,7 @@ string To_JSON_Attributes(Node& Cur_Node, const int& Level, bool Indent)
 }
 
 //---------------------------------------------------------------------------
-string To_JSON_Elements(Node& Cur_Node, const int& Level, bool Indent)
+string To_JSON_Elements(Node& Cur_Node, const int& Level, bool Indent, bool Carriage_Returns)
 {
     string Result;
 
@@ -243,8 +243,8 @@ string To_JSON_Elements(Node& Cur_Node, const int& Level, bool Indent)
 
         if (!Cur_Node.Childs[Pos]->RawContent.empty())
         {
-            if (Level)
-                Result+="\n";
+            if (Level && Carriage_Returns)
+                Result+='\n';
             Result+=Cur_Node.Childs[Pos]->RawContent;
 
             delete Cur_Node.Childs[Pos];
@@ -256,11 +256,15 @@ string To_JSON_Elements(Node& Cur_Node, const int& Level, bool Indent)
         if (Cur_Node.Name.empty())
             continue;
 
-        Result+="\n"+(Indent?string(Level, '\t'):string())+"\""+Cur_Node.Childs[Pos]->Name+"\": ";
+        Result+=(Carriage_Returns?("\n"+(Indent?string(Level, '\t'):string())):string())+"\""+Cur_Node.Childs[Pos]->Name+(Carriage_Returns?"\": ":"\":");
 
         bool Multiple=Cur_Node.Childs[Pos]->Multiple;
         if (Multiple)
-            Result+="[\n";
+        {
+            Result+='[';
+            if (Carriage_Returns)
+                Result+='\n';
+        }
 
         string Name=Cur_Node.Childs[Pos]->Name;
         for (size_t Pos2=Pos; Pos2<Cur_Node.Childs.size() && Cur_Node.Childs[Pos2]->Name==Name; Pos2++)
@@ -278,19 +282,24 @@ string To_JSON_Elements(Node& Cur_Node, const int& Level, bool Indent)
             else
             {
                 Result+=(Indent?string(Level+1, '\t'):string())+"{";
-                Result+=To_JSON_Attributes(*Cur_Node.Childs[Pos2], Level+2, Indent);
-                Result+=To_JSON_Elements(*Cur_Node.Childs[Pos2], Level+2, Indent);
-                Result+="\n";
+                Result+=To_JSON_Attributes(*Cur_Node.Childs[Pos2], Level+2, Indent, Carriage_Returns);
+                Result+=To_JSON_Elements(*Cur_Node.Childs[Pos2], Level+2, Indent, Carriage_Returns);
+                if (Carriage_Returns)
+                    Result+='\n';
 
                 if(!Cur_Node.Childs[Pos2]->Value.empty())
-                    Result+=(Indent?string(Level+2, '\t'):string())+"\"#value\": \""+JSON_Encode(Cur_Node.Childs[Pos2]->Value)+"\"\n";
+                {
+                    Result+=(Indent?string(Level+2, '\t'):string())+(Carriage_Returns?"\"#value\": \"":"\"#value\":\"")+JSON_Encode(Cur_Node.Childs[Pos2]->Value)+'\"';
+                    if (Carriage_Returns)
+                        Result+='\n';
+                }
                 Result+=(Indent?string(Level+1, '\t'):string())+"}";
             }
             if (Pos2<Cur_Node.Childs.size()-1 && Cur_Node.Childs[Pos2]->Name==Cur_Node.Childs[Pos2+1]->Name)
                 Result+=",";
 
-            if (Multiple)
-                Result+="\n";
+            if (Multiple && Carriage_Returns)
+                Result+='\n';
 
             delete Cur_Node.Childs[Pos2];
             Cur_Node.Childs[Pos2]=NULL;
@@ -308,14 +317,14 @@ string To_JSON_Elements(Node& Cur_Node, const int& Level, bool Indent)
 }
 
 //---------------------------------------------------------------------------
-string To_JSON (Node& Cur_Node, const int& Level, bool Print_Header, bool Indent)
+string To_JSON (Node& Cur_Node, const int& Level, bool Print_Header, bool Indent, bool Carriage_Returns)
 {
     string Result;
 
     if (!Cur_Node.RawContent.empty())
     {
-        if (Level)
-            Result+="\n";
+        if (Level && Carriage_Returns)
+            Result+='\n';
         Result+=Cur_Node.RawContent;
         return Result;
     }
@@ -326,7 +335,7 @@ string To_JSON (Node& Cur_Node, const int& Level, bool Print_Header, bool Indent
     if (Print_Header)
         Result+="{\n";
 
-    Result+=(Indent?string(Level+1, '\t'):string())+"\""+Cur_Node.Name+"\": ";
+    Result+=(Indent?string(Level+1, '\t'):string())+"\""+Cur_Node.Name+(Carriage_Returns?"\": ":"\":");
 
     if (Cur_Node.Attrs.empty() && Cur_Node.Childs.empty() && !Cur_Node.Multiple)
     {
@@ -340,12 +349,12 @@ string To_JSON (Node& Cur_Node, const int& Level, bool Print_Header, bool Indent
     }
 
     Result+="{";
-    Result+=To_JSON_Attributes(Cur_Node, Level+2, Indent);
-    Result+=To_JSON_Elements(Cur_Node, Level+2, Indent);
+    Result+=To_JSON_Attributes(Cur_Node, Level+2, Indent, Carriage_Returns);
+    Result+=To_JSON_Elements(Cur_Node, Level+2, Indent, Carriage_Returns);
     if (!Cur_Node.Value.empty())
-        Result+="\n"+(Indent?string(Level+2, '\t'):string())+"\"#value\": \""+JSON_Encode(Cur_Node.Value)+"\"";
+        Result+=(Carriage_Returns?("\n"+(Indent?string(Level+2, '\t'):string())):string())+"\"#value\": \""+JSON_Encode(Cur_Node.Value)+"\"";
 
-    Result+="\n"+(Indent?string(Level+1, '\t'):string())+"}";
+    Result+=(Carriage_Returns?"\n":string())+(Indent?string(Level+1, '\t'):string())+"}";
 
     if (Print_Header)
         Result+="\n}\n";

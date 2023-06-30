@@ -675,6 +675,44 @@ void File__Analyze::Streams_Finish_StreamOnly(stream_t StreamKind, size_t Pos)
         if (Retrieve(StreamKind, Pos, Fill_Parameter(StreamKind, Generic_BitRate_Mode)).empty())
             Fill(StreamKind, Pos, Fill_Parameter(StreamKind, Generic_BitRate_Mode), "CBR");
     }
+
+    //ServiceKind
+    auto ServiceKind = Retrieve(StreamKind, Pos, "ServiceKind");
+    if (!ServiceKind.empty())
+    {
+        ZtringList List;
+        List.Separator_Set(0, __T(" / "));
+        List.Write(ServiceKind);
+        if (List.size()>1)
+        {
+            size_t HI_ME_Pos=(size_t)-1;
+            size_t HI_D_Pos=(size_t)-1;
+            static const auto HI_ME_Text=__T("HI-ME");
+            static const auto HI_D_Text=__T("HI-D");
+            static const auto VI_ME_Text=__T("VI-ME");
+            static const auto VI_D_Text=__T("VI-D");
+            for (size_t i=0; i<List.size(); i++)
+            {
+                const auto& Item=List[i];
+                if (HI_ME_Pos==(size_t)-1 && (Item==HI_ME_Text || Item==VI_ME_Text))
+                    HI_ME_Pos=i;
+                if (HI_D_Pos==(size_t)-1 && (Item==HI_D_Text || Item==HI_D_Text))
+                    HI_D_Pos=i;
+            }
+            if (HI_ME_Pos!=(size_t)-1 && HI_D_Pos!=(size_t)-1)
+            {
+                if (HI_ME_Pos>HI_D_Pos)
+                    std::swap(HI_ME_Pos, HI_D_Pos);
+                List[HI_ME_Pos]=__T("HI");
+                List.erase(List.begin()+HI_D_Pos);
+                Fill(StreamKind, Pos, "ServiceKind", List.Read(), true);
+                List.Write(Retrieve(StreamKind, Pos, "ServiceKind/String"));
+                List[HI_ME_Pos].From_UTF8("Hearing Impaired");
+                List.erase(List.begin()+HI_D_Pos);
+                Fill(StreamKind, Pos, "ServiceKind/String", List.Read(), true);
+            }
+        }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -698,6 +736,25 @@ void File__Analyze::Streams_Finish_StreamOnly_General(size_t StreamPos)
                     Fill(Stream_General, StreamPos, "FileExtension_Invalid", ValidExtensions.Read());
             }
         }
+    }
+
+    //Audio_Channels_Total
+    if (Retrieve_Const(Stream_General, StreamPos, General_Audio_Channels_Total).empty())
+    {
+        auto Audio_Count = Count_Get(Stream_Audio);
+        int64u Channels_Total=0;
+        for (size_t i=0; i<Audio_Count; i++)
+        {
+            int64u Channels=Retrieve_Const(Stream_Audio, i, Audio_Channel_s_).To_int64u();
+            if (!Channels)
+            {
+                Channels_Total=0;
+                break;
+            }
+            Channels_Total+=Channels;
+        }
+        if (Channels_Total)
+            Fill(Stream_General, StreamPos, General_Audio_Channels_Total, Channels_Total);
     }
 }
 
@@ -856,7 +913,15 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
                 if (!HDR_Format_Compatibility[j].empty())
                 {
                     Summary[j]+=__T(", ")+HDR_Format_Compatibility[j]+__T(" compatible");
-                    Commercial[j]=HDR_Format_Compatibility[j].substr(0, HDR_Format_Compatibility[j].find(__T(' ')));
+                    Commercial[j]=HDR_Format_Compatibility[j];
+                    if (!Commercial[j].empty())
+                    {
+                        auto Commercial_Reduce=Commercial[j].find(__T(' '));
+                        if (Commercial_Reduce<Commercial[j].size()-1 && Commercial[j][Commercial_Reduce+1]>='0' && Commercial[j][Commercial_Reduce+1]<='9')
+                            Commercial_Reduce=Commercial[j].find(__T(' '), Commercial_Reduce+1);
+                        if (Commercial_Reduce!=string::npos)
+                            Commercial[j].resize(Commercial_Reduce);
+                    }
                 }
             Fill(Stream_Video, Pos, Video_HDR_Format_String, Summary.Read());
             Fill(Stream_Video, Pos, Video_HDR_Format_Commercial, Commercial.Read());
@@ -1391,7 +1456,7 @@ void File__Analyze::Streams_Finish_InterStreams()
         }
 
         //Filling
-        if (IsOK && StreamSize_Total>0 && StreamSize_Total<File_Size)
+        if (IsOK && StreamSize_Total>0 && StreamSize_Total<File_Size && (File_Size==StreamSize_Total || File_Size-StreamSize_Total>8)) //to avoid strange behavior due to rounding, TODO: avoid rounding
             Fill(Stream_General, 0, General_StreamSize, File_Size-StreamSize_Total);
     }
 
@@ -1581,7 +1646,7 @@ void File__Analyze::Streams_Finish_InterStreams()
                 else
                     StreamSizeIsValid=false;
             }
-        if (StreamSizeIsValid && StreamSize>=0) //to avoid strange behavior
+        if (StreamSizeIsValid && (!StreamSize || StreamSize>8)) //to avoid strange behavior due to rounding, TODO: avoid rounding
             Fill(Stream_General, 0, General_StreamSize, StreamSize);
     }
 

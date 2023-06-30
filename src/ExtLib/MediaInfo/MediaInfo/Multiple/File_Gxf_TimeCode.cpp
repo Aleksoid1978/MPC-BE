@@ -87,6 +87,7 @@ File_Gxf_TimeCode::File_Gxf_TimeCode()
     FrameRate_Code=(int32u)-1;
     FieldsPerFrame_Code=(int32u)-1;
     IsAtc=false;
+    IsBigEndian=false;
 
     //Out
     TimeCode_FirstFrame_ms=(int64u)-1;
@@ -130,7 +131,7 @@ void File_Gxf_TimeCode::Read_Buffer_Continue()
 {
     int8u Validity[504];
 
-    if (!IsAtc)
+    if (!IsAtc && !IsBigEndian) // TODO: enum of timecode "formats"
     {
         if (Element_Size!=4096)
         {
@@ -155,9 +156,9 @@ void File_Gxf_TimeCode::Read_Buffer_Continue()
 
     //Parsing
     Element_Offset=0;
-    for (size_t Pos=0; Pos<(IsAtc?(size_t)1:(size_t)504); Pos++)
+    for (size_t Pos=0; Pos<((IsAtc || IsBigEndian)?(size_t)1:(size_t)504); Pos++)
     {
-        if (IsAtc || Validity[Pos])
+        if (IsAtc || IsBigEndian || Validity[Pos])
         {
             Element_Begin1("TimeCode");
             int8u Frames_Units, Frames_Tens, Seconds_Units, Seconds_Tens, Minutes_Units, Minutes_Tens, Hours_Units, Hours_Tens;
@@ -237,6 +238,42 @@ void File_Gxf_TimeCode::Read_Buffer_Continue()
                 Skip_S1(4,                                          "BG8");
                 Get_SB (   Temp,                                    "DBB2_7"); if (Temp) DBB2|=(1<<7);
                 Skip_S1(3,                                          "Zero");
+
+                BS_End();
+            }
+            else if (IsBigEndian)
+            {
+                BS_Begin();
+
+                Skip_S1(4,                                          "BG8");
+                Skip_SB(                                            "BGF2");
+                Skip_SB(                                            "BGF1");
+                Get_S1 (2, Hours_Tens,                              "Hours (Tens)");
+
+                Skip_S1(4,                                          "BG7");
+                Get_S1 (4, Hours_Units,                             "Hours (Units)");
+
+                Skip_S1(4,                                          "BG6");
+                Skip_SB(                                            "BGF0");
+                Get_S1 (3, Minutes_Tens,                            "Minutes (Tens)");
+
+                Skip_S1(4,                                          "BG5");
+                Get_S1 (4, Minutes_Units,                           "Minutes (Units)");
+
+                Skip_S1(4,                                          "BG4");
+                Skip_SB(                                            "FM - Frame Mark");
+                Get_S1 (3, Seconds_Tens,                            "Seconds (Tens)");
+
+                Skip_S1(4,                                          "BG3");
+                Get_S1 (4, Seconds_Units,                           "Seconds (Units)");
+
+                Skip_S1(4,                                          "BG2");
+                Skip_SB(                                            "CF - Color fame");
+                Get_SB (   DropFrame,                               "DP - Drop frame");
+                Get_S1 (2, Frames_Tens,                             "Frames (Tens)");
+
+                Skip_S1(4,                                          "BG1");
+                Get_S1 (4, Frames_Units,                            "Frames (Units)");
 
                 BS_End();
             }
@@ -332,17 +369,14 @@ void File_Gxf_TimeCode::Read_Buffer_Continue()
             Skip_XX(8,                                              "Junk");
     }
 
-    //bitmap, already parsed
-    Element_Offset+=64;
+    if (!IsAtc && !IsBigEndian)
+        Element_Offset+=64; //bitmap, already parsed
 
     FILLING_BEGIN();
     if (!Status[IsFilled] && TimeCode_FirstFrame_ms!=(int64u)-1)
     {
         Accept();
         Fill();
-
-        if (Config->ParseSpeed<1.0)
-            Finish();
     }
 
     FILLING_END();

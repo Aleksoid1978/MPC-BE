@@ -547,17 +547,19 @@ extern string Aac_ChannelMode_GetString(const vector<Aac_OutputChannel>& OutputC
 }
 
 //---------------------------------------------------------------------------
-int8u Aac_AudioSpecificConfig_sampling_frequency_index(const int64s sampling_frequency)
+int8u Aac_AudioSpecificConfig_sampling_frequency_index(const int64s sampling_frequency, bool usac=false)
 {
     if (sampling_frequency>=92017) return 0;
     if (sampling_frequency>=75132) return 1;
     if (sampling_frequency>=55426) return 2;
     if (sampling_frequency>=46009) return 3;
-    if (sampling_frequency>=37566) return 4;
+    if (sampling_frequency>=37566 && !usac) return 4;
+    if (sampling_frequency>=42000 && usac) return 4;
+    if (sampling_frequency>=35777 && usac) return 17;
     if (sampling_frequency>=27713) return 5;
     if (sampling_frequency>=23004) return 6;
     if (sampling_frequency>=18783) return 7;
-    if (sampling_frequency>=13856) return 8;
+    if (sampling_frequency>=13856 || usac) return 8;
     if (sampling_frequency>=11502) return 9;
     if (sampling_frequency>=9391) return 10;
     return 11;
@@ -585,7 +587,7 @@ void File_Aac::AudioSpecificConfig (size_t End)
         Frequency_b=0;
     #if MEDIAINFO_CONFORMANCE
         if (ConformanceFlags && SamplingRate && Frequency_b!=SamplingRate) //TODO: handling of AAC implicit SBR
-            Fill_Conformance("Crosscheck Container+AudioSpecificConfig SamplingRate+samplingFrequency", (to_string(SamplingRate) + " vs " + to_string(Frequency_b) + " are not coherent").c_str());
+            Fill_Conformance("Crosscheck AudioSampleEntry samplerate", ("MP4 AudioSampleEntry samplerate " + to_string(SamplingRate) + " does not match MP4 AudioSpecificConfig samplingFrequency " + to_string(Frequency_b)).c_str());
     #endif
     Get_S1 (4, channelConfiguration,                            "channelConfiguration"); Param_Info1(Aac_ChannelConfiguration[channelConfiguration]);
     if (audioObjectType==5 || audioObjectType==29)
@@ -847,7 +849,7 @@ void File_Aac::AudioSpecificConfig_OutOfBand (int64s sampling_frequency_, int8u 
         Infos["ChannelPositions/String2"].From_UTF8(Aac_ChannelConfiguration2_GetString(channelConfiguration));
         Infos["ChannelLayout"].From_UTF8(Aac_ChannelLayout_GetString(channelConfiguration));
     }
-    else if (audioObjectType_==42 && !Conf.IsNotValid && Conf.numOutChannels)
+    else if (audioObjectType_==42 && !Conf.WaitForNextIndependantFrame && Conf.numOutChannels)
     {
         Infos["Channel(s)"].From_Number(Conf.numOutChannels);
     }
@@ -1163,7 +1165,7 @@ void File_Aac::PayloadMux()
                                 Frame_Count_Valid=0;
                             }
                             else
-                                payload();
+                                payload(Data_BS_Remain()-8*MuxSlotLengthBytes[streamID[prog][lay]]);
                             break;
                     case 1 :
                             Skip_BS(8 * (frameLength[streamID[prog][lay]] + 20),"payload[streamID[prog][lay]]");
@@ -1306,7 +1308,7 @@ void File_Aac::adif_header()
 
     FILLING_BEGIN();
         Fill(Stream_General, 0, General_Format, "ADIF", Unlimited, true, true);
-        Fill(Stream_General, 0, General_HeaderSize, Element_Size);
+        Fill(Stream_General, 0, General_HeaderSize, Element_Offset);
         Fill(Stream_General, 0, General_OverallBitRate_Mode, bitstream_type?"VBR":"CBR");
 
         for (size_t StreamPos=0; StreamPos<Count_Get(Stream_Audio); StreamPos++)
@@ -1317,9 +1319,6 @@ void File_Aac::adif_header()
             if (bitrate>0)
                 Infos[bitstream_type?"BitRate_Maximum":"BitRate"].From_Number(bitrate);
         }
-
-        //No more need data
-        File__Tags_Helper::Finish("ADIF");
     FILLING_END();
 }
 

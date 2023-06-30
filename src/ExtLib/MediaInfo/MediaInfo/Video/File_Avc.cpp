@@ -134,7 +134,7 @@ string Avc_level_idc_Name(size_t Index)
 string Avc_profile_level_string(int8u profile_idc, int8u level_idc=0, int8u constraint_set_flags=0)
 {
     string Profile;
-    MediaInfoLib::bitset8 constraint_setsB(constraint_set_flags);
+    bitset8 constraint_setsB(constraint_set_flags);
 
     //Profile
     if (profile_idc)
@@ -291,6 +291,9 @@ size_t Avc_profile_level_Indexes(const string& ProfileLevelS) // Note: 1-based, 
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Video/File_Avc.h"
+#if defined(MEDIAINFO_AFDBARDATA_YES)
+    #include "MediaInfo/Video/File_AfdBarData.h"
+#endif //defined(MEDIAINFO_AFDBARDATA_YES)
 #if defined(MEDIAINFO_DTVCCTRANSPORT_YES)
     #include "MediaInfo/Text/File_DtvccTransport.h"
 #endif //defined(MEDIAINFO_DTVCCTRANSPORT_YES)
@@ -444,28 +447,6 @@ static const int8u Avc_SubHeightC[]=
     2,
     1,
     1,
-};
-
-//---------------------------------------------------------------------------
-const char* Avc_user_data_DTG1_active_format[]=
-{
-    //1st value is for 4:3, 2nd is for 16:9
-    "", //Undefined
-    "Reserved",
-    "Not recommended",
-    "Not recommended",
-    "Aspect ratio greater than 16:9", //Use GA94
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "4:3 full frame image / 16:9 full frame image",
-    "4:3 full frame image / 4:3 pillarbox image",
-    "16:9 letterbox image / 16:9 full frame image",
-    "14:9 letterbox image / 14:9 pillarbox image",
-    "Reserved",
-    "4:3 full frame image, alternative 14:9 center / 4:3 pillarbox image, alternative 14:9 center",
-    "16:9 letterbox image, alternative 14:9 center / 16:9 full frame image, alternative 14:9 center",
-    "16:9 letterbox image, alternative 4:3 center / 16:9 full frame image, alternative 4:3 center",
 };
 
 //---------------------------------------------------------------------------
@@ -911,9 +892,10 @@ void File_Avc::Streams_Fill()
 //---------------------------------------------------------------------------
 void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq_parameter_set_Item)
 {
-    if (Count_Get(Stream_Video))
+    if (Count_Get(Stream_Video) && !Retrieve_Const(Stream_Video, 0, Video_Format).empty())
         return;
-    Stream_Prepare(Stream_Video);
+    if (!Count_Get(Stream_Video))
+        Stream_Prepare(Stream_Video);
     Fill(Stream_Video, 0, Video_Format, "AVC");
     Fill(Stream_Video, 0, Video_Codec, "AVC");
 
@@ -3206,26 +3188,44 @@ void File_Avc::sei_message_user_data_registered_itu_t_t35_DTG1()
     Element_Info1("Active Format Description");
 
     //Parsing
-    bool active_format_flag;
     Skip_C4(                                                    "afd_identifier");
-    BS_Begin();
-    Mark_0();
-    Get_SB (active_format_flag,                                 "active_format_flag");
-    Mark_0_NoTrustError();
-    Mark_0_NoTrustError();
-    Mark_0_NoTrustError();
-    Mark_0_NoTrustError();
-    Mark_0_NoTrustError();
-    Mark_1_NoTrustError();
-    if (active_format_flag)
+    if (Element_Offset<Element_Size)
     {
-        Mark_1_NoTrustError();
-        Mark_1_NoTrustError();
-        Mark_1_NoTrustError();
-        Mark_1_NoTrustError();
-        Info_S1(4, active_format,                               "active_format"); Param_Info1(Avc_user_data_DTG1_active_format[active_format]);
+        File_AfdBarData DTG1_Parser;
+        for (auto seq_parameter_set_Item : seq_parameter_sets)
+        {
+            if (seq_parameter_set_Item && seq_parameter_set_Item->vui_parameters && seq_parameter_set_Item->vui_parameters->aspect_ratio_info_present_flag)
+            {
+                //TODO: avoid duplicated code
+                int32u Width =(seq_parameter_set_Item->pic_width_in_mbs_minus1       +1)*16;
+                int32u Height=(seq_parameter_set_Item->pic_height_in_map_units_minus1+1)*16*(2-seq_parameter_set_Item->frame_mbs_only_flag);
+                int8u chromaArrayType = seq_parameter_set_Item->ChromaArrayType();
+                if (chromaArrayType >= 4)
+                    chromaArrayType = 0;
+                int32u CropUnitX=Avc_SubWidthC [chromaArrayType];
+                int32u CropUnitY=Avc_SubHeightC[chromaArrayType]*(2-seq_parameter_set_Item->frame_mbs_only_flag);
+                Width -=(seq_parameter_set_Item->frame_crop_left_offset+seq_parameter_set_Item->frame_crop_right_offset )*CropUnitX;
+                Height-=(seq_parameter_set_Item->frame_crop_top_offset +seq_parameter_set_Item->frame_crop_bottom_offset)*CropUnitY;
+                if (Height)
+                {
+                    float64 PixelAspectRatio = 1;
+                    if (seq_parameter_set_Item->vui_parameters->aspect_ratio_idc<Avc_PixelAspectRatio_Size)
+                            PixelAspectRatio = Avc_PixelAspectRatio[seq_parameter_set_Item->vui_parameters->aspect_ratio_idc];
+                    else if (seq_parameter_set_Item->vui_parameters->aspect_ratio_idc == 0xFF && seq_parameter_set_Item->vui_parameters->sar_height)
+                            PixelAspectRatio = ((float64) seq_parameter_set_Item->vui_parameters->sar_width) / seq_parameter_set_Item->vui_parameters->sar_height;
+                    auto DAR=Width*PixelAspectRatio/Height;
+                    if (DAR>=4.0/3.0*0.95 && DAR<4.0/3.0*1.05) DTG1_Parser.aspect_ratio_FromContainer=0; //4/3
+                    if (DAR>=16.0/9.0*0.95 && DAR<16.0/9.0*1.05) DTG1_Parser.aspect_ratio_FromContainer=1; //16/9
+                }
+                break;
+            }
+        }
+        Open_Buffer_Init(&DTG1_Parser);
+        DTG1_Parser.Format=File_AfdBarData::Format_A53_4_DTG1;
+        Open_Buffer_Continue(&DTG1_Parser, Buffer+Buffer_Offset+(size_t)Element_Offset, Element_Size-Element_Offset);
+        Merge(DTG1_Parser, Stream_Video, 0, 0);
+        Element_Offset=Element_Size;
     }
-    BS_End();
 }
 
 //---------------------------------------------------------------------------

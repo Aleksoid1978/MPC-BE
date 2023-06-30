@@ -137,7 +137,7 @@ static const char* Mpeg4_Descriptors_ObjectTypeIndication(int8u ID)
         case 0xA5 : return "AC-3";
         case 0xA6 : return "E-AC-3";
         case 0xA9 : return "DTS";
-        case 0xAA : return "DTS-HD High Resolution";
+        case 0xAA : return "DTS-HD High Resolution Audio";
         case 0xAB : return "DTS-HD Master Audio";
         case 0xAC : return "DTS-HD Express";
         case 0xD1 : return "Private - EVRC";
@@ -847,6 +847,7 @@ void File_Mpeg4_Descriptors::Descriptor_04()
                                 ((File_Aac*)Parser)->FirstOutputtedDecodedSample=FirstOutputtedDecodedSample;
                                 ((File_Aac*)Parser)->roll_distance_Values=sgpd_prol;
                                 ((File_Aac*)Parser)->roll_distance_FramePos=sbgp;
+                                ((File_Aac*)Parser)->roll_distance_FramePos_IsPresent=sbgp_IsPresent;
                                 ((File_Aac*)Parser)->SamplingRate=SamplingRate;
                                 {
                                     auto const ES_ID_Info=ES_ID_Infos.find(TrackID!=(int32u)-1?TrackID:ES_ID);
@@ -954,6 +955,7 @@ void File_Mpeg4_Descriptors::Descriptor_05()
                                         ((File_Aac*)Parser)->FirstOutputtedDecodedSample=FirstOutputtedDecodedSample;
                                         ((File_Aac*)Parser)->roll_distance_Values=sgpd_prol;
                                         ((File_Aac*)Parser)->roll_distance_FramePos=sbgp;
+                                        ((File_Aac*)Parser)->roll_distance_FramePos_IsPresent=sbgp_IsPresent;
                                         ((File_Aac*)Parser)->SamplingRate=SamplingRate;
                                     #endif
                                 #endif

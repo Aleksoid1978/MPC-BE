@@ -57,16 +57,16 @@ private :
     //Elements
     void Core();
     void Extensions();
-    void Extensions_Resynch();
+    void Extensions_Resynch(bool Known);
     void Extensions_Padding();
-    void Padding4() { Extensions_Resynch(); }
+    void Padding4() { Extensions_Resynch(true); }
     void LBR();
     void X96();
     void XLL();
     void XCh();
     void XXCH();
     void XBR();
-    void Aux() { Extensions_Resynch(); }
+    void Aux() { Extensions_Resynch(true); }
     void AfterAssets();
     void Extensions2();
 

@@ -95,7 +95,8 @@ void File_ChannelSplitting::Streams_Fill()
             if (Parsers[0]->Count_Get(Stream_Audio))
             {
                 PcmChannelsCount--;
-                if (Parsers[0]->Get(Stream_Audio, 0, "Metadata_Format").find(__T("ADM"))==0)
+                auto Metadata_Format=Parsers[0]->Get(Stream_Audio, 0, "Metadata_Format");
+                if (Metadata_Format.rfind(__T("ADM"), 0)==0 || Metadata_Format.rfind(__T("S-ADM"), 0)==0)
                     AdmChannelsCount++;
             }
         }

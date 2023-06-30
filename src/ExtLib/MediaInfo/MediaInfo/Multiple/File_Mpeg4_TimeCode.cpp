@@ -129,12 +129,12 @@ void File_Mpeg4_TimeCode::Streams_Finish()
 
         }
 
-        TimeCode TC(Pos, NumberOfFrames-1, DropFrame);
+        TimeCode TC((int64_t)Pos, NumberOfFrames-1, TimeCode::DropFrame(DropFrame));
         if (FrameMultiplier>1)
         {
             int64s Frames=TC.GetFrames();
             TC-=TC.GetFrames();
-            TC=TimeCode(TC.ToFrames()*FrameMultiplier, NumberOfFrames*FrameMultiplier-1, DropFrame);
+            TC=TimeCode((int64_t)(TC.ToFrames()*FrameMultiplier), NumberOfFrames*FrameMultiplier-1, TimeCode::DropFrame(DropFrame));
             TC+=Frames*FrameMultiplier;
         }
         Fill(Stream_Other, StreamPos_Last, Other_TimeCode_FirstFrame, TC.ToString().c_str());
@@ -168,12 +168,12 @@ void File_Mpeg4_TimeCode::Streams_Finish()
         else
         {
             Fill(Stream_Other, StreamPos_Last, Other_TimeCode_Stripped, "No");
-            TimeCode TC_Last(Pos_Last, NumberOfFrames-1, DropFrame);
+            TimeCode TC_Last((int64_t)Pos_Last, NumberOfFrames-1, TimeCode::DropFrame(DropFrame));
             if (FrameMultiplier>1)
             {
                 int64s Frames=TC_Last.GetFrames();
                 TC_Last-=TC_Last.GetFrames();
-                TC_Last=TimeCode(TC_Last.ToFrames()*FrameMultiplier, NumberOfFrames*FrameMultiplier-1, DropFrame);
+                TC_Last=TimeCode((int64_t)(TC_Last.ToFrames()*FrameMultiplier), NumberOfFrames*FrameMultiplier-1, TimeCode::DropFrame(DropFrame));
                 TC_Last+=Frames*FrameMultiplier+(Config->ParseSpeed<=0.5?(FrameMultiplier-1):FrameMultiplier_Pos);
             }
             Fill(Stream_Other, StreamPos_Last, Other_TimeCode_LastFrame, TC_Last.ToString().c_str());
@@ -236,21 +236,21 @@ void File_Mpeg4_TimeCode::Read_Buffer_Continue()
                 else
                 {
                     Pos_Last--;
-                    TimeCode TC_Last1(Pos_Last, NumberOfFrames-1, DropFrame);
+                    TimeCode TC_Last1((int64_t)Pos_Last, NumberOfFrames-1, TimeCode::DropFrame(DropFrame));
                     if (FrameMultiplier>1)
                     {
                         int64s Frames=TC_Last1.GetFrames();
                         TC_Last1-=TC_Last1.GetFrames();
-                        TC_Last1=TimeCode(TC_Last1.ToFrames()*FrameMultiplier, NumberOfFrames*FrameMultiplier-1, DropFrame);
+                        TC_Last1=TimeCode((int64_t)(TC_Last1.ToFrames()*FrameMultiplier), NumberOfFrames*FrameMultiplier-1, TimeCode::DropFrame(DropFrame));
                         TC_Last1+=Frames*FrameMultiplier;
                     }
                     string Discontinuity=TC_Last1.ToString();
-                    TimeCode TC_Last2(Pos_Last_Temp, NumberOfFrames-1, DropFrame);
+                    TimeCode TC_Last2((int64_t)Pos_Last_Temp, NumberOfFrames-1, TimeCode::DropFrame(DropFrame));
                     if (FrameMultiplier>1)
                     {
                         int64s Frames=TC_Last2.GetFrames();
                         TC_Last2-=TC_Last2.GetFrames();
-                        TC_Last2=TimeCode(TC_Last2.ToFrames()*FrameMultiplier, NumberOfFrames*FrameMultiplier-1, DropFrame);
+                        TC_Last2=TimeCode((int64_t)(TC_Last2.ToFrames()*FrameMultiplier), NumberOfFrames*FrameMultiplier-1, TimeCode::DropFrame(DropFrame));
                         TC_Last2+=(Frames+1)*FrameMultiplier-1;
                     }
                     Discontinuity+='-';

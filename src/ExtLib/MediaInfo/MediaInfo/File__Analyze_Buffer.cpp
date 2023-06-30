@@ -2263,6 +2263,8 @@ void File__Analyze::Peek_S8(int8u Bits, int64u &Info)
 //---------------------------------------------------------------------------
 void File__Analyze::Skip_BS(size_t Bits, const char* Name)
 {
+    if (!Bits)
+        return;
     INTEGRITY(Bits<=BS->Remain(), "Size is wrong", BS->Offset_Get())
     if (Trace_Activated)
     {

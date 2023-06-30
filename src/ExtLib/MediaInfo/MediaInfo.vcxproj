@@ -79,6 +79,7 @@
     <ClInclude Include="MediaInfo\Audio\File_Iab.h" />
     <ClInclude Include="MediaInfo\Audio\File_ImpulseTracker.h" />
     <ClInclude Include="MediaInfo\Audio\File_La.h" />
+    <ClInclude Include="MediaInfo\Audio\File_Mga.h" />
     <ClInclude Include="MediaInfo\Audio\File_Midi.h" />
     <ClInclude Include="MediaInfo\Audio\File_Module.h" />
     <ClInclude Include="MediaInfo\Audio\File_Mpc.h" />
@@ -322,6 +323,7 @@
     <ClCompile Include="MediaInfo\Audio\File_Iab.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_ImpulseTracker.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_La.cpp" />
+    <ClCompile Include="MediaInfo\Audio\File_Mga.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Midi.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Module.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Mpc.cpp" />

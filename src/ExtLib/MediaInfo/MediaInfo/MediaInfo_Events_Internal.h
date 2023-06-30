@@ -145,23 +145,23 @@ namespace MediaInfoLib
 
     inline void Events_TimeCode(const TimeCode &Tc, MediaInfo_time_code &Event_TimeCode, char* Event_TimeCode_HR)
     {
-        if (Tc.HasValue())
+        if (Tc.IsSet())
         {
             Event_TimeCode.Hours=Tc.GetHours();
             Event_TimeCode.Minutes=Tc.GetMinutes();
             Event_TimeCode.Seconds=Tc.GetSeconds();
             Event_TimeCode.Frames=Tc.GetFrames();
             Event_TimeCode.FramesPerSecond=Tc.GetFramesMax()+1;
-            Event_TimeCode.DropFrame=Tc.GetDropFrame();
+            Event_TimeCode.DropFrame=Tc.IsDropFrame();
             Event_TimeCode_HR[ 0]='0'+Tc.GetHours()/10;
-            Event_TimeCode_HR[ 1]='0'+Tc.GetHours() %10;
+            Event_TimeCode_HR[ 1]='0'+Tc.GetHours()%10;
             Event_TimeCode_HR[ 2]=':';
             Event_TimeCode_HR[ 3]='0'+Tc.GetMinutes()/10;
             Event_TimeCode_HR[ 4]='0'+Tc.GetMinutes()%10;
             Event_TimeCode_HR[ 5]=':';
             Event_TimeCode_HR[ 6]='0'+Tc.GetSeconds()/10;
             Event_TimeCode_HR[ 7]='0'+Tc.GetSeconds()%10;
-            Event_TimeCode_HR[ 8]=Tc.GetFramesMax()?';':':';
+            Event_TimeCode_HR[ 8]=Tc.IsDropFrame()?';':':';
             Event_TimeCode_HR[ 9]='0'+Tc.GetFrames()/10;
             Event_TimeCode_HR[10]='0'+Tc.GetFrames()%10;
             Event_TimeCode_HR[11]='\0';

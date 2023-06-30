@@ -764,6 +764,10 @@ private :
     void Descriptor_3F_0E() {Skip_XX(Element_Size-Element_Offset, "Data");};
     void Descriptor_3F_0F() {Skip_XX(Element_Size-Element_Offset, "Data");};
     void Descriptor_3F_10() {Skip_XX(Element_Size-Element_Offset, "Data");};
+    void Descriptor_3F_11() {Skip_XX(Element_Size-Element_Offset, "Data");};
+    void Descriptor_3F_12() {Skip_XX(Element_Size-Element_Offset, "Data");};
+    void Descriptor_3F_13() {Skip_XX(Element_Size-Element_Offset, "Data");};
+    void Descriptor_3F_14();
     void Descriptor_40();
     void Descriptor_41();
     void Descriptor_42() {Skip_XX(Element_Size, "Data");};

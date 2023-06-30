@@ -39,8 +39,17 @@ public :
     float64 AspectRatio;
     float64 FrameRate;
     int32u  LineNumber;
+    enum format
+    {
+        None,
+        Smpte2038,
+    };
+    format Format;
 
     //In/Out
+    #if defined(MEDIAINFO_EIA608_YES)
+        File__Analyze*  Eia608_Parser;
+    #endif //defined(MEDIAINFO_CDP_YES)
     #if defined(MEDIAINFO_CDP_YES)
         std::vector<buffer_data*> Cdp_Data;
         File__Analyze*  Cdp_Parser;

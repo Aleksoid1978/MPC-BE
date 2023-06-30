@@ -103,6 +103,7 @@ public :
         const size_t*           FirstOutputtedDecodedSample;
         const std::vector<sgpd_prol_struct>* sgpd_prol;
         const std::vector<sbgp_struct>* sbgp;
+        const bool*             sbgp_IsPresent;
         const int16s*           sgpd_prol_roll_distance;
     #endif
 

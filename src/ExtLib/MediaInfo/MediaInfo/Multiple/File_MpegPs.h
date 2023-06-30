@@ -276,6 +276,7 @@ private :
     bool Header_Parser_QuickSearch();
 
     //Parsers
+    File__Analyze* ChooseParser_Ancillary();
     File__Analyze* ChooseParser_Mpegv();
     File__Analyze* ChooseParser_Mpeg4v();
     File__Analyze* ChooseParser_Avc();

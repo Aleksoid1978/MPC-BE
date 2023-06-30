@@ -488,8 +488,8 @@ static size_t DTS_Extension_Index_Get(int32u SyncWord)
 {
     for (size_t i=0; i<Ext_Max; i++)
         if (SyncWord==DTS_Extension_Mapping[i])
-            return i+1;
-    return 0;
+            return i;
+    return (size_t)-1;
 }
 
 //***************************************************************************
@@ -1349,7 +1349,7 @@ void File_Dts::Core()
     //Parsing
     if (AuxiliaryData || ExtendedCoding)
     {
-        Extensions_Resynch();
+        Extensions_Resynch(true);
         Asset_Sizes.push_back(Element_Size-Element_Offset);
         Extensions();
     }
@@ -1389,8 +1389,8 @@ void File_Dts::Extensions()
             int32u SyncWord;
             Get_B4(SyncWord,                                    "Sync Word");
             auto Index=DTS_Extension_Index_Get(SyncWord);
-            Element_Name(Index?Ztring().From_UTF8(DTS_Extension_Names[Index-1]):Ztring::ToZtring(SyncWord, 16));
-            switch (Index-1)
+            Element_Name(Index!=(size_t)-1?Ztring().From_UTF8(DTS_Extension_Names[Index]):Ztring::ToZtring(SyncWord, 16));
+            switch (Index)
             {
                 #define CASE(EXT) case Ext_##EXT : EXT(); break;
                 CASE(Padding4);
@@ -1403,7 +1403,7 @@ void File_Dts::Extensions()
                 CASE(Aux);
                 #undef CASE
                 default:
-                    Extensions_Resynch();
+                    Extensions_Resynch(false);
             }
             Element_End0();
         }
@@ -1445,7 +1445,7 @@ void File_Dts::Extensions()
 }
 
 //---------------------------------------------------------------------------
-void File_Dts::Extensions_Resynch()
+void File_Dts::Extensions_Resynch(bool Known)
 {
     if (Element_Size-Element_Offset<4)
         return;
@@ -1459,13 +1459,13 @@ void File_Dts::Extensions_Resynch()
     {
         auto SuncWord=BigEndian2int32u(Base+(size_t)Element_Offset);
         auto Index=DTS_Extension_Index_Get(SuncWord);
-        if (Index>1)
+        if (Index!=(size_t)-1 && Index>1)
         {
             bool IsNok=false;
             if (Element_Code)
             {
                 // HD
-                switch (Index-1)
+                switch (Index)
                 {
                     case Ext_X96:
                     case Ext_XLL:
@@ -1478,7 +1478,7 @@ void File_Dts::Extensions_Resynch()
             else
             {
                 // Core
-                switch (Index-1)
+                switch (Index)
                 {
                     case Ext_XCh:
                         IsNok=!ExtendedCoding || (ExtensionAudioDescriptor!=0 && ExtensionAudioDescriptor!=3);
@@ -1506,7 +1506,7 @@ void File_Dts::Extensions_Resynch()
         swap(Element_Offset, Element_Offset_Sav);
         if (Element_Size-Element_Offset_Sav<=3)
             Element_Offset_Sav=Element_Size;
-        Skip_XX(Element_Offset_Sav-Element_Offset,              "(Not parsed)");
+        Skip_XX(Element_Offset_Sav-Element_Offset,              Known?"(Not parsed)":"(Unknown)");
     }
 }
 
@@ -1548,11 +1548,11 @@ void File_Dts::Extensions_Padding()
 //---------------------------------------------------------------------------
 void File_Dts::LBR()
 {
-    Extensions_Resynch();
-
     FILLING_BEGIN();
         Presence.set(presence_Extended_LBR);
     FILLING_END();
+
+    Extensions_Resynch(true);
 }
 
 //---------------------------------------------------------------------------
@@ -1570,19 +1570,24 @@ void File_Dts::X96()
             return;
         auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, HeaderSize-3);
         if (CRC)
+        {
+            Element_Info1("CRC NOK");
+            Extensions_Resynch(false);
             return;
+        }
     }
     else
     {
         // Core
         auto MaxSize=Element_Size-Element_Offset+3;
-        if (MaxSize<95)
-            return;
         int16u Begin;
         Peek_B2(Begin);
         int16u Size=Begin>>4;
-        if (Size<95 || Size!=MaxSize)
+        if (MaxSize<95 || Size<95 || Size!=MaxSize)
+        {
+            Extensions_Resynch(false);
             return;
+        }
         Skip_XX(Size-3,                                         "(Not parsed)");
     }
 
@@ -1590,7 +1595,7 @@ void File_Dts::X96()
         Presence.set(Element_Code?presence_Extended_X96:presence_Core_X96);
     FILLING_END();
 
-    Extensions_Resynch();
+    Extensions_Resynch(true);
 }
 
 //---------------------------------------------------------------------------
@@ -1624,7 +1629,15 @@ void File_Dts::XLL()
         return;
     auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, HeaderSize-3);
     if (CRC)
+    {
+        Element_Info1("CRC NOK");
+        Extensions_Resynch(false);
         return;
+    }
+
+    FILLING_BEGIN();
+        Presence.set(presence_Extended_XLL);
+    FILLING_END();
 
     // Parsing
     int32u LLFrameSize;
@@ -1643,7 +1656,7 @@ void File_Dts::XLL()
     {
         BS_End();
         Element_End0();
-        Element_Offset=Element_Offset_Start;
+        Skip_XX(Element_Size-Element_Offset,                    "(Unknown)");
         return;
     }
     auto Element_Size_Save=Element_Size;
@@ -1679,7 +1692,8 @@ void File_Dts::XLL()
         auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, ChSetHeaderSize+1);
         if (CRC)
         {
-            Element_Offset=Element_Offset_Start;
+            Skip_XX(Element_Size-Element_Offset,                "(Unknown)");
+            Element_Size=Element_Size_Save;
             return;
         }
         Element_Begin1("Channel Set");
@@ -1746,7 +1760,8 @@ void File_Dts::XLL()
             CRC=(CRC>>8)^CRC_CCIT_Table[((uint8_t)CRC)^*Buffer_Temp++];
         if (CRC)
         {
-            Element_Offset=Element_Offset_Start;
+            Skip_XX(Element_Size-Element_Offset,                "(Unknown)");
+            Element_Size=Element_Size_Save;
             return;
         }
         Count=(Buffer_Temp-(Buffer+Buffer_Offset+Element_Offset)-2)*8/Bits4SSize;
@@ -1754,13 +1769,15 @@ void File_Dts::XLL()
     auto SegmentSize_Size=2+(Count*Bits4SSize+7)/8;
     if (Element_Size-Element_Offset<SegmentSize_Size)
     {
-        Element_Offset=Element_Offset_Start;
+        Skip_XX(Element_Size-Element_Offset,                    "(Unknown)");
+        Element_Size=Element_Size_Save;
         return;
     }
     CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, SegmentSize_Size);
     if (CRC)
     {
-        Element_Offset=Element_Offset_Start;
+        Skip_XX(Element_Size-Element_Offset,                    "(Unknown)");
+        Element_Size=Element_Size_Save;
         return;
     }
     Element_Begin1("NAVI");
@@ -1779,15 +1796,12 @@ void File_Dts::XLL()
 
     if (Element_Size-Element_Offset<Sizes_Total+Count)
     {
-        Element_Offset=Element_Offset_Start;
+        Skip_XX(Element_Size-Element_Offset,                    "(Unknown)");
+        Element_Size=Element_Size_Save;
         return;
     }
     Skip_XX(Sizes_Total,                                        "Segments");
     Skip_XX(Count,                                              "1 byte per segment?");
-
-    FILLING_BEGIN();
-        Presence.set(presence_Extended_XLL);
-    FILLING_END();
 
     Extensions_Padding();
     if (Element_Offset<Element_Size)
@@ -1809,7 +1823,15 @@ void File_Dts::XXCH()
         return;
     auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, HeaderSize-3);
     if (CRC)
+    {
+        Element_Info1("CRC NOK");
+        Extensions_Resynch(false);
         return;
+    }
+
+    FILLING_BEGIN();
+        Presence.set(Element_Code?presence_Extended_XXCH:presence_Core_XXCH);
+    FILLING_END();
 
     // Parsing
     Element_Begin1("Header");
@@ -1833,7 +1855,7 @@ void File_Dts::XXCH()
         {
             BS_End();
             Element_End0();
-            Element_Offset=Element_Offset_Start;
+            Skip_XX(Element_Size-Element_Offset,                "(Unknown)");
             return;
         }
         ChSetFsizeXXCHs.push_back(ChSetFsizeXXCH);
@@ -1868,7 +1890,7 @@ void File_Dts::XXCH()
             auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, XXCHChSetHeaderSize+1);
             if (CRC)
             {
-                Element_Offset=Element_Offset_Start;
+                Skip_XX(Element_Size-Element_Offset,            "(Unknown)");
                 return;
             }
             XXCHChSetHeaderSize-=2;
@@ -1889,10 +1911,6 @@ void File_Dts::XXCH()
         Element_End0();
     }
 
-    FILLING_BEGIN();
-        Presence.set(Element_Code?presence_Extended_XXCH:presence_Core_XXCH);
-    FILLING_END();
-
     Extensions_Padding();
 }
 
@@ -1909,6 +1927,10 @@ void File_Dts::XCh()
     if (Size<95 || (Size!=MaxSize && Size-1!=MaxSize)) // Is last item and manage legacy bitstreams
         return;
 
+    FILLING_BEGIN();
+        Presence.set(Element_Code?presence_Extended_XCh:presence_Core_XCh);
+    FILLING_END();
+
     //Parsing
     int16u XChFSIZE;
     int8u  AMODE;
@@ -1919,15 +1941,8 @@ void File_Dts::XCh()
     BS_End();
 
     FILLING_BEGIN();
-        if (Element_Code)
-        {
-            Presence.set(presence_Extended_XCh);
-        }
-        else
-        {
-            Presence.set(presence_Core_XCh);
+        if (!Element_Code)
             Core_XCh_AMODE=AMODE;
-        }
     FILLING_END();
 
     Extensions_Padding();
@@ -1947,7 +1962,15 @@ void File_Dts::XBR()
         return;
     auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, HeaderSize-3);
     if (CRC)
+    {
+        Element_Info1("CRC NOK");
+        Extensions_Resynch(false);
         return;
+    }
+
+    FILLING_BEGIN();
+        Presence.set(presence_Extended_XBR);
+    FILLING_END();
 
     // Parsing
     Element_Begin1("Header");
@@ -1990,10 +2013,6 @@ void File_Dts::XBR()
         Skip_XX(ChSetFsize+1,                                   "(Not parsed)");
         Element_End0();
     }
-
-    FILLING_BEGIN();
-        Presence.set(presence_Extended_XBR);
-    FILLING_END();
 
     Extensions_Padding();
 }

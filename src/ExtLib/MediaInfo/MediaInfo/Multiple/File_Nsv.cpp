@@ -1366,10 +1366,7 @@ void File_StarDiva::Read_Buffer_Continue()
             if (!SeqAgendas[i].empty())
             {
                 int32s Offset=Offsets[i];
-                TimeCode TC;
-                TC.SetFramesMax(999);
-                TC.SetIsTime(true);
-                TC.FromFrames(Offset);
+                TimeCode TC(Offset, 999, TimeCode::Timed());
                 string Time=TC.ToString();
                 string Content;
                 Content+=Times[i];
@@ -1400,10 +1397,7 @@ void File_StarDiva::Read_Buffer_Continue()
             if (!Speakers[i].empty())
             {
                 int32s Offset=Offsets[i];
-                TimeCode TC;
-                TC.SetFramesMax(999);
-                TC.SetIsTime(true);
-                TC.FromFrames(Offset);
+                TimeCode TC(Offset, 999, TimeCode::Timed());
                 string Time=TC.ToString();
                 string Content;
                 Content += Times[i];

@@ -110,9 +110,11 @@ const char* Mpeg_Psi_stream_type_Format(int8u stream_type, int32u format_identif
         case 0x1F : return "AVC";
         case 0x20 : return "AVC";
         case 0x24 :
+        case 0x21 : return "JPEG 2000";
         case 0x27 : return "HEVC";
         case 0x2D : return "MPEG-H 3D Audio";
         case 0x2E : return "MPEG-H 3D Audio";
+        case 0x32 : return "JPEG XS";
         default :
             switch (format_identifier)
             {
@@ -240,8 +242,10 @@ stream_t Mpeg_Psi_stream_type_StreamKind(int32u stream_type, int32u format_ident
         case 0x1E :
         case 0x1F :
         case 0x20 :
+        case 0x21 :
         case 0x24 :
         case 0x27 :
+        case 0x32 :
                     return Stream_Video;
         case 0x03 :
         case 0x04 :
@@ -310,50 +314,74 @@ stream_t Mpeg_Psi_stream_type_StreamKind(int32u stream_type, int32u format_ident
 }
 
 //---------------------------------------------------------------------------
+const char* Mpeg_Psi_stream_type_Info_Table[] =
+{
+    "ITU-T | ISO/IEC Reserved",
+    "ISO/IEC 11172 Video",
+    "ITU-T Rec. H.262 | ISO/IEC 13818-2 Video or ISO/IEC 11172-2 constrained parameter video stream",
+    "ISO/IEC 11172 Audio",
+    "ISO/IEC 13818-3 Audio",
+    "ITU-T Rec. H.222.0 | ISO/IEC 13818-1 private_sections",
+    "ITU-T Rec. H.222.0 | ISO/IEC 13818-1 PES packets containing private data",
+    "ISO/IEC 13522 MHEG",
+    "ITU-T Rec. H.222.0 | ISO/IEC 13818-1 Annex A DSM-CC",
+    "ITU-T Rec. H.222.1",
+    "ISO/IEC 13818-6 type A",
+    "ISO/IEC 13818-6 type B",
+    "ISO/IEC 13818-6 type C",
+    "ISO/IEC 13818-6 type D",
+    "ITU-T Rec. H.222.0 | ISO/IEC 13818-1 auxiliary",
+    "ISO/IEC 13818-7 Audio with ADTS transport syntax",
+    "ISO/IEC 14496-2 Visual",
+    "ISO/IEC 14496-3 Audio with the LATM transport syntax as defined in ISO/IEC 14496-3 / AMD 1",
+    "ISO/IEC 14496-1 SL-packetized stream or FlexMux stream carried in PES packets",
+    "ISO/IEC 14496-1 SL-packetized stream or FlexMux stream carried in ISO/IEC14496_sections.",
+    "ISO/IEC 13818-6 Synchronized Download Protocol",
+    "Metadata carried in PES packets",
+    "Metadata carried in metadata_sections",
+    "Metadata carried in ISO/IEC 13818-6 Data Carousel",
+    "Metadata carried in ISO/IEC 13818-6 Object Carousel",
+    "Metadata carried in ISO/IEC 13818-6 Synchronized Download Protocol",
+    "IPMP stream (defined in ISO/IEC 13818-11, MPEG-2 IPMP)",
+    "AVC video stream as defined in ITU-T Rec. H.264 | ISO/IEC 14496-10 Video",
+    "ISO/IEC 14496-3 Audio, without using any additional transport syntax",
+    "ISO/IEC 14496-17 Text",
+    "Auxiliary video data stream as defined in ISO/IEC 23002-3",
+    "SVC video sub-bitstream of an AVC video stream conforming to one or more profiles defined in Annex G of ITU-T Rec. H.264 | ISO/IEC 14496-10",
+    "MVC video sub-bitstream of an AVC video stream conforming to one or more profiles defined in Annex H of ITU-T Rec. H.264 | ISO/IEC 14496-10",
+    "Video stream conforming to one or more profiles as defined in Rec. ITU-T T.800 | ISO/IEC 15444-1",
+    "Additional view Rec. ITU-T H.262 | ISO/IEC 13818-2 video stream for service-compatible stereoscopic 3D services",
+    "Additional view Rec. ITU-T H.264 | ISO/IEC 14496-10 video stream conforming to one or more profiles defined in Annex A for service - compatible stereoscopic 3D services",
+    "Rec. ITU-T H.265 | ISO/IEC 23008-2 video stream or an HEVC temporal video sub-bitstream",
+    "HEVC temporal video subset of an HEVC video stream conforming to one or more profiles defined in Annex A of Rec.ITU - T H.265 | ISO / IEC 23008 - 2",
+    "MVCD video sub-bitstream of an AVC video stream conforming to one or more profiles defined in Annex I of Rec. ITU-T H.264 | ISO/IEC 14496-10",
+    "Timeline and External Media Information Stream",
+    "HEVC enhancement sub-partition which includes TemporalId 0 of an HEVC video stream where all NALs units contained in the stream conform to one or more profiles defined in Annex G of Rec. ITU - T H.265 | ISO / IEC 23008 - 2",
+    "HEVC temporal enhancement sub-partition of an HEVC video stream where all NAL units contained in the stream conform to one or more profiles defined in Annex G of Rec.ITU - T H.265 | ISO / IEC 23008 - 2",
+    "HEVC enhancement sub-partition which includes TemporalId 0 of an HEVC video stream where all NAL units contained in the stream conform to one or more profiles defined in Annex H of Rec.ITU - T H.265 | ISO / IEC 23008 - 2",
+    "HEVC temporal enhancement sub-partition of an HEVC video stream where all NAL units contained in the stream conform to one or more profiles defined in Annex H of Rec.ITU - T H.265 | ISO / IEC 23008 - 2",
+    "Green access units carried in MPEG-2 sections",
+    "ISO/IEC 23008-3 Audio with MHAS transport syntax - main stream",
+    "ISO/IEC 23008-3 Audio with MHAS transport syntax – auxiliary stream",
+    "Quality access units carried in sections",
+    "Media Orchestration Access Units carried in sections",
+    "Substream of a Rec. ITU-T H.265 | ISO/IEC 23008 2 video stream that contains a Motion Constrained Tile Set, parameter sets, slice headers or a combination thereof",
+    "JPEG XS video stream conforming to one or more profiles as defined in ISO/IEC 21122-2",
+};
+const size_t Mpeg_Psi_stream_type_Info_Table_Size=sizeof(Mpeg_Psi_stream_type_Info_Table)/sizeof(*Mpeg_Psi_stream_type_Info_Table);
 const char* Mpeg_Psi_stream_type_Info(int8u stream_type, int32u format_identifier)
 {
-    switch (stream_type)
+    if (stream_type<Mpeg_Psi_stream_type_Info_Table_Size)
+        return Mpeg_Psi_stream_type_Info_Table[stream_type];
+    else if (stream_type<=0x7F)
     {
-        case 0x00 : return "ITU-T | ISO/IEC Reserved";
-        case 0x01 : return "ISO/IEC 11172 Video";
-        case 0x02 : return "ITU-T Rec. H.262 | ISO/IEC 13818-2 Video or ISO/IEC 11172-2 constrained parameter video stream";
-        case 0x03 : return "ISO/IEC 11172 Audio";
-        case 0x04 : return "ISO/IEC 13818-3 Audio";
-        case 0x05 : return "ITU-T Rec. H.222.0 | ISO/IEC 13818-1 private_sections";
-        case 0x06 : return "ITU-T Rec. H.222.0 | ISO/IEC 13818-1 PES packets containing private data";
-        case 0x07 : return "ISO/IEC 13522 MHEG";
-        case 0x08 : return "ITU-T Rec. H.222.0 | ISO/IEC 13818-1 Annex A DSM-CC";
-        case 0x09 : return "ITU-T Rec. H.222.1";
-        case 0x0A : return "ISO/IEC 13818-6 type A";
-        case 0x0B : return "ISO/IEC 13818-6 type B";
-        case 0x0C : return "ISO/IEC 13818-6 type C";
-        case 0x0D : return "ISO/IEC 13818-6 type D";
-        case 0x0E : return "ITU-T Rec. H.222.0 | ISO/IEC 13818-1 auxiliary";
-        case 0x0F : return "ISO/IEC 13818-7 Audio with ADTS transport syntax";
-        case 0x10 : return "ISO/IEC 14496-2 Visual";
-        case 0x11 : return "ISO/IEC 14496-3 Audio with the LATM transport syntax as defined in ISO/IEC 14496-3 / AMD 1";
-        case 0x12 : return "ISO/IEC 14496-1 SL-packetized stream or FlexMux stream carried in PES packets";
-        case 0x13 : return "ISO/IEC 14496-1 SL-packetized stream or FlexMux stream carried in ISO/IEC14496_sections.";
-        case 0x14 : return "ISO/IEC 13818-6 Synchronized Download Protocol";
-        case 0x15 : return "Metadata carried in PES packets";
-        case 0x16 : return "Metadata carried in metadata_sections";
-        case 0x17 : return "Metadata carried in ISO/IEC 13818-6 Data Carousel";
-        case 0x18 : return "Metadata carried in ISO/IEC 13818-6 Object Carousel";
-        case 0x19 : return "Metadata carried in ISO/IEC 13818-6 Synchronized Download Protocol";
-        case 0x1A : return "IPMP stream (defined in ISO/IEC 13818-11, MPEG-2 IPMP)";
-        case 0x1B : return "AVC video stream as defined in ITU-T Rec. H.264 | ISO/IEC 14496-10 Video";
-        case 0x1C : return "ISO/IEC 14496-3 Audio, without using any additional transport syntax";
-        case 0x1D : return "ISO/IEC 14496-17 Text";
-        case 0x1E : return "Auxiliary video data stream as defined in ISO/IEC 23002-3";
-        case 0x1F : return "SVC video sub-bitstream of an AVC video stream conforming to one or more profiles defined in Annex G of ITU-T Rec. H.264 | ISO/IEC 14496-10";
-        case 0x20 : return "MVC video sub-bitstream of an AVC video stream conforming to one or more profiles defined in Annex H of ITU-T Rec. H.264 | ISO/IEC 14496-10";
-        case 0x24 :
-        case 0x27 : return "ITU-T Rec. H.265 | ISO/IEC 23008-2 MPEG-H Part 2 / HEVC video stream";
-        case 0x2D : return "MPEG-H 3D Audio (main)";
-        case 0x2E : return "MPEG-H 3D Audio (auxilary)";
-        case 0x7F : return "IPMP stream";
-        default :
-            if (stream_type<=0x7F) return "ITU-T Rec. H.222.0 | ISO/IEC 13818-1 reserved";
+        if (stream_type==0x7F)
+            return "IPMP stream";
+        else
+            return "ITU-T Rec. H.222.0 | ISO/IEC 13818-1 reserved";
+    }
+    else
+    {
             switch (format_identifier)
             {
                 case Elements::CUEI :

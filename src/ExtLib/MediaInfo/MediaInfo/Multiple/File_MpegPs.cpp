@@ -23,6 +23,9 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Multiple/File_MpegPs.h"
 #include "MediaInfo/Multiple/File_Mpeg_Psi.h"
+#if defined(MEDIAINFO_ANCILLARY_YES)
+    #include "MediaInfo/Multiple/File_Ancillary.h"
+#endif
 #if defined(MEDIAINFO_AVC_YES)
     #include "MediaInfo/Video/File_Avc.h"
 #endif
@@ -591,7 +594,7 @@ void File_MpegPs::Streams_Finish_PerStream(size_t StreamID, ps_stream &Temp, kin
         Streams_Fill_PerStream(StreamID, Temp, KindOfStream);
 
     //Init
-    if (Temp.StreamKind==Stream_Max)
+    if (Temp.StreamKind==Stream_Max && (FromTS?FromTS_format_identifier:Streams[stream_id].format_identifier)!=0x56414E43)
         return;
     StreamKind_Last=Temp.StreamKind;
     StreamPos_Last=Temp.StreamPos;
@@ -615,6 +618,27 @@ void File_MpegPs::Streams_Finish_PerStream(size_t StreamID, ps_stream &Temp, kin
                     return;
             #endif //MEDIAINFO_DEMUX
         }
+        if (StreamKind_Last==Stream_Max)
+        {
+            for (size_t StreamKind=Stream_General+1; StreamKind<Stream_Max; StreamKind++)
+            {
+                size_t Count=Temp.Parsers[0]->Count_Get((stream_t)StreamKind);
+                if (Count && Temp.StreamKind==Stream_Max)
+                {
+                    //TODO: quick and ugly, adapt for multiple stream kinds in one stream
+                    Temp.StreamKind=(stream_t)StreamKind;
+                    Temp.StreamPos=Count_Get((stream_t)StreamKind);
+                    Temp.Count=Count;
+                }
+                for (size_t StreamPos=0; StreamPos<Count; StreamPos++)
+                {
+                    Stream_Prepare((stream_t)StreamKind);
+                    Merge(*Temp.Parsers[0], StreamKind_Last, StreamPos, StreamPos_Last);
+                }
+            }
+        }
+        else
+        {
         for (size_t Pos=0; Pos<Temp.Count; Pos++)
         {
             Ztring ID=Retrieve(StreamKind_Last, Temp.StreamPos+Pos, General_ID);
@@ -622,6 +646,7 @@ void File_MpegPs::Streams_Finish_PerStream(size_t StreamID, ps_stream &Temp, kin
             Merge(*Temp.Parsers[0], StreamKind_Last, Pos, Temp.StreamPos+Pos);
             Fill(StreamKind_Last, Temp.StreamPos+Pos, General_ID, ID, true);
             Fill(StreamKind_Last, Temp.StreamPos+Pos, General_ID_String, ID_String, true);
+        }
         }
         if (!IsSub)
         {
@@ -2966,9 +2991,10 @@ File__Analyze* File_MpegPs::private_stream_1_ChooseParser()
     if (FromTS || Streams[stream_id].program_format_identifier || Streams[stream_id].format_identifier || Streams[stream_id].descriptor_tag)
     {
         int32u format_identifier=FromTS?FromTS_format_identifier:Streams[stream_id].format_identifier;
-        if (format_identifier==0x42535344) //"BSSD"
+        switch (format_identifier)
         {
-            return ChooseParser_SmpteSt0302(); //AES3 (SMPTE 302M)
+            case 0x42535344: return ChooseParser_SmpteSt0302(); //"BSSD" AES3 (SMPTE 302M) 
+            case 0x56414E43: return ChooseParser_Ancillary(); //"VANC" AES3 (SMPTE ST 2038) 
         }
         int32u stream_type=FromTS?FromTS_stream_type:Streams[stream_id].stream_type;
         switch (stream_type)
@@ -4335,6 +4361,23 @@ bool File_MpegPs::Header_Parser_QuickSearch()
 // Parsers
 //***************************************************************************
 
+
+//---------------------------------------------------------------------------
+File__Analyze* File_MpegPs::ChooseParser_Ancillary()
+{
+    //Filling
+    #if defined(MEDIAINFO_ANCILLARY_YES)
+        auto Parser=new File_Ancillary;
+        Parser->WithTenBit=true;
+        Parser->WithChecksum=true;
+        Parser->Format=File_Ancillary::Smpte2038;
+        Parser->InDecodingOrder=true;
+    #else
+        //Filling
+        auto Parser=new File_Unknown();
+    #endif
+    return Parser;
+}
 //---------------------------------------------------------------------------
 File__Analyze* File_MpegPs::ChooseParser_Mpegv()
 {

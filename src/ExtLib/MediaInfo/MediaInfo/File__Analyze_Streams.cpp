@@ -306,7 +306,7 @@ bool DateTime_Adapt(string& Value_)
 
 
 //---------------------------------------------------------------------------
-#if defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES)
+#if defined(MEDIAINFO_AV1_YES) || defined(MEDIAINFO_AVC_YES) || defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MPEGTS_YES)
 void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_ColorPrimaries, Ztring &MasteringDisplay_Luminance, bool FromAV1)
 {
     //Parsing
@@ -699,7 +699,10 @@ size_t File__Analyze::Stream_Prepare (stream_t KindOfStream, size_t StreamPos)
             if (Begin!=string::npos && End!=string::npos && Begin<End)
                 FileName_Modified.erase(Begin, End-Begin);
             Fill (Stream_General, 0, General_CompleteName, FileName_Modified);
-            size_t FileName_Modified_PathSeparatorOffset=FileName_Modified.find_last_of(__T('/'));
+            size_t Query=FileName_Modified.find(__T('?'));
+            if (Query!=string::npos)
+                FileName_Modified.erase(Query);
+            size_t FileName_Modified_PathSeparatorOffset=FileName_Modified.find_last_of(__T("/\\"));
             if (FileName_Modified_PathSeparatorOffset!=string::npos)
             {
                 Fill (Stream_General, 0, General_FolderName, FileName_Modified.substr(0, FileName_Modified_PathSeparatorOffset));
@@ -1154,7 +1157,7 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
         {
             case __T(':'):
             case __T(';'):
-                Fill(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_TimeCode_DropFrame), (C==__T(';'))?__T("Yes"):__T("No"));
+                Fill(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_TimeCode_DropFrame), (C==__T(';'))?__T("Yes"):__T("No"), Unlimited, Replace);
                 break;
         }
     }
@@ -1735,7 +1738,7 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, const char* Par
     }
     else
     {
-        size_t Space=Parameter_ISO.find(__T(' '));
+        size_t Space=Parameter_ISO.rfind(__T(' '));
         size_t LastFound=(size_t)-1;
         if (Space!=string::npos)
         {
@@ -3019,8 +3022,7 @@ void File__Analyze::Duration_Duration123(stream_t StreamKind, size_t StreamPos, 
                     }
                 }
 
-                TimeCode TC(FrameCountS.To_int64s(), (int32u)float32_int32s(FrameRateS.To_float32()-1), DropFrame && FrameRateI!=FrameRateF);
-                TC.SetDropFrame(DropFrame);
+                TimeCode TC((int64_t)FrameCountS.To_int64s(), (uint32_t)float32_int32s(FrameRateS.To_float32()-1), TimeCode::DropFrame(DropFrame).FPS1001(FrameRateI!=FrameRateF));
                 DurationString4.From_UTF8(TC.ToString());
 
                 Fill(StreamKind, StreamPos, Parameter+5, DurationString4); // /String4

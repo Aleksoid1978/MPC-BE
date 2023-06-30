@@ -327,7 +327,7 @@ static const char* ChannelLayout_2018[][2] =
     { "LI", "Bfl" },
     { "LS", "Ls" },
     { "Lfh", "Tfl" },
-    { "Lh", "Vhl" },
+    { "Lh", "Tfl" },
     { "Lhr", "Tbl" },
     { "Lhs", "Tfl" },
     { "Lrh", "Tbl" },
@@ -342,7 +342,7 @@ static const char* ChannelLayout_2018[][2] =
     { "Lvss", "Tsl" },
     { "Oh", "Tc" },
     { "Rfh", "Tfrr" },
-    { "Rh", "Vhr" },
+    { "Rh", "Tfr" },
     { "Rhr", "Tbr" },
     { "Rhs", "Tfr" },
     { "RC", "Rc" },
@@ -374,13 +374,18 @@ static const char* ChannelLayout_2018[][2] =
     { "Vhc", "Tfc" },
 };
 static const size_t ChannelLayout_2018_Size=sizeof(ChannelLayout_2018)/sizeof(decltype(*ChannelLayout_2018));
-static const size_t ChannelLayout_2018_Aac_Size=3;
-static const char* ChannelLayout_2018_Aac[ChannelLayout_2018_Aac_Size][2] =
+static const char* ChannelLayout_2018_Aac[][2] =
 {
     { "Cb", "Bfc" },
     { "Lb", "Bfl" },
     { "Rb", "Bfr" },
+    // Found in DTS-UHD, similar to AAC for channels above + theses additions
+    { "Ltf", "Tfl" }, // Merged with Lh ("top" vs "high")
+    { "Rtf", "Tfr" }, // Merged with Rh ("top" vs "high")
+    { "Ltr", "Tbl" }, // Merged with Lhr ("top" vs "high")
+    { "Rtr", "Tbr" }, // Merged with Rhr ("top" vs "high")
 };
+static const size_t ChannelLayout_2018_Aac_Size=sizeof(ChannelLayout_2018_Aac)/sizeof(decltype(*ChannelLayout_2018_Aac));
 Ztring ChannelLayout_2018_Rename(const Ztring& Channels, const Ztring& Format)
 {
     ZtringList List;
@@ -388,7 +393,7 @@ Ztring ChannelLayout_2018_Rename(const Ztring& Channels, const Ztring& Format)
     List.Write(Channels);
     size_t LfePos[3];
     memset(LfePos, -1, sizeof(LfePos));
-    bool IsAac=(Format==__T("AAC") || Format==__T("USAC") || Format==__T("MPEG-H 3D Audio"));
+    bool IsAac=(Format==__T("AAC") || Format==__T("USAC") || Format==__T("MPEG-H 3D Audio") || Format==__T("DTS-UHD"));
     for (size_t i=0; i<List.size(); i++)
     {
         Ztring& ChannelName=List[i];

@@ -170,7 +170,10 @@ void File_Eia608::Streams_Finish()
         {
             Fill(Stream_Text, i, Text_Duration, Retrieve_Const(Stream_General, 0, General_Duration));
             if (!Streams[StreamPos])
+            {
+                i++;
                 continue;
+            }
             stream& Stream=*Streams[StreamPos];
             if (Stream.Duration_Start!=FLT_MAX && Stream.Duration_End!=FLT_MAX)
                 Fill(Stream_Text, i, Text_Duration_Start2End, Stream.Duration_End-Stream.Duration_Start);

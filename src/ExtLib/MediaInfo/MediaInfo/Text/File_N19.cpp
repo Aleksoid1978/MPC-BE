@@ -303,7 +303,7 @@ static TimeCode N19_HHMMSSFF_TC(int32u V, int8u FrameRate)
     auto FrameMax=FrameRate;
     if (!DropFrame)
         FrameMax--;
-    TimeCode TC(HH, MM, SS, FF, FrameMax, DropFrame);
+    TimeCode TC(HH, MM, SS, FF, FrameMax, TimeCode::DropFrame(DropFrame));
     return TC;
 }
 
@@ -336,7 +336,7 @@ static TimeCode N19_HHMMSSFF_TC(int64u V, int8u FrameRate)
                 (V4-'0')*10+V5-'0',
                 (V6-'0')*10+V7-'0',
                 FrameMax,
-                DropFrame);
+                TimeCode::DropFrame(DropFrame));
     return TC;
 }
 
@@ -549,7 +549,7 @@ void File_N19::FileHeader_Parse()
             Fill(Stream_General, 0, General_FrameRate, N19_DiskFormatCode_FrameRate_FromRounded(FrameRate));
             Fill(Stream_Text, 0, Text_FrameRate, N19_DiskFormatCode_FrameRate_FromRounded(FrameRate));
             if (TCS==0x31)
-                Fill(Stream_General, 0, General_Duration_Start, N19_HHMMSSFF_TC(TCP, FrameRate).ToMilliseconds());
+                Fill(Stream_General, 0, General_Duration_Start, (int64s)N19_HHMMSSFF_TC(TCP, FrameRate).ToMilliseconds());
         }
         CC2_Adapt(MNC);
         CC2_Adapt(MNR);
@@ -848,16 +848,16 @@ void File_N19::Data_Parse()
         {
             TCI_FirstFrame=TCI;
             auto Begin=N19_HHMMSSFF_TC(TCI, FrameRate);
-            Fill(Stream_Text, 0, Text_Duration_Start, Begin.ToMilliseconds());
+            Fill(Stream_Text, 0, Text_Duration_Start, (int64s)Begin.ToMilliseconds());
             Fill(Stream_Text, 0, Text_TimeCode_FirstFrame, Begin.ToString());
-            Fill(Stream_Text, 0, Text_Delay, Begin.ToMilliseconds());
+            Fill(Stream_Text, 0, Text_Delay, (int64s)Begin.ToMilliseconds());
             Fill(Stream_Text, 0, Text_Delay_Source, "Container");
         }
         if (File_Offset+Buffer_Offset+Element_Size+128>File_Size)
         {
             auto End=N19_HHMMSSFF_TC(TCO, FrameRate);
-            Fill(Stream_Text, 0, Text_Duration, (End-N19_HHMMSSFF_TC(TCI_FirstFrame, FrameRate)).ToMilliseconds());
-            Fill(Stream_Text, 0, Text_Duration_End, End.ToMilliseconds());
+            Fill(Stream_Text, 0, Text_Duration, (int64s)(End-N19_HHMMSSFF_TC(TCI_FirstFrame, FrameRate)).ToMilliseconds());
+            Fill(Stream_Text, 0, Text_Duration_End, (int64s)End.ToMilliseconds());
             Fill(Stream_Text, 0, Text_TimeCode_LastFrame, (End-1).ToString());
             Fill(Stream_Text, 0, Text_Lines_Count, TotalLines);
             Fill(Stream_Text, 0, Text_Lines_MaxCountPerEvent, LineCount_Max);

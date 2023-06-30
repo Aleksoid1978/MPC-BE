@@ -1,22 +1,22 @@
-/*  Copyright (c) MediaArea.net SARL. All Rights Reserved.
- *
- *  Use of this source code is governed by a BSD-style license that can
- *  be found in the License.html file in the root of the source tree.
- */
+/* MIT License
+Copyright MediaArea.net SARL
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 
 //---------------------------------------------------------------------------
-#ifndef MediaInfo_TimeCodeH
-#define MediaInfo_TimeCodeH
+#ifndef ZenLib_TimeCodeH
+#define ZenLib_TimeCodeH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "ZenLib/Conf.h"
 #include <cstdint>
+#include <cstring>
 #include <string>
-using namespace ZenLib;
 //---------------------------------------------------------------------------
 
-namespace MediaInfoLib
+namespace ZenLib
 {
 
 //***************************************************************************
@@ -66,7 +66,7 @@ public:
     };
 
     constexpr14 bitset8() : stored(0) {}
-    constexpr14 bitset8(int8u val) : stored(val) {}
+    constexpr14 bitset8(uint8_t val) : stored(val) {}
 
     constexpr14 bitset8& reset() noexcept
     {
@@ -106,7 +106,7 @@ public:
         return test(pos);
     }
 
-    constexpr14 int8u to_int8u() const noexcept
+    constexpr14 uint8_t to_int8u() const noexcept
     {
         return stored;
     }
@@ -117,15 +117,15 @@ public:
     }
 
 private:
-    int8u stored=0;
+    uint8_t stored=0;
 };
 
-inline int8u operator | (const bitset8 a, const bitset8 b) noexcept
+inline uint8_t operator | (const bitset8 a, const bitset8 b) noexcept
 {
     return a.to_int8u() | b.to_int8u();
 }
 
-inline int8u operator & (const bitset8 a, const bitset8 b) noexcept
+inline uint8_t operator & (const bitset8 a, const bitset8 b) noexcept
 {
     return a.to_int8u() & b.to_int8u();
 }
@@ -139,197 +139,268 @@ inline int8u operator & (const bitset8 a, const bitset8 b) noexcept
 class TimeCode
 {
 public:
+    typedef bitset8 flags_type;
+    class flags : public flags_type
+    {
+    public:
+        flags() : flags_type() {}
+        flags& DropFrame(bool Value = true) { set(IsDrop_, Value); return *this; }
+        flags& FPS1001(bool Value = true) { set(Is1001_, Value); return *this; }
+        flags& Field(bool Value = true) { set(IsField_, Value); return *this; }
+        flags& Wrapped24Hours(bool Value = true) { set(IsWrapped24Hours_, Value); return *this; }
+        flags& Negative(bool Value = true) { set(IsNegative_, Value); return *this; }
+        flags& Timed(bool Value = true) { set(IsTimed_, Value); return *this; }
+
+    private:
+        enum flag
+        {
+            IsDrop_,
+            Is1001_,
+            IsField_,
+            IsWrapped24Hours_,
+            IsNegative_,
+            IsTimed_,
+            IsValid_,
+            IsUndefined_,
+        };
+        bool IsDropFrame() const { return test(IsDrop_); }
+        bool Is1001fps() const { return test(Is1001_); }
+        bool IsField() const { return test(IsField_); }
+        bool IsWrapped24Hours() const { return test(IsWrapped24Hours_); }
+        bool IsNegative() const { return test(IsNegative_); }
+        bool IsTimed() const { return test(IsTimed_); }
+        flags& SetValid(bool Value = true) { set(IsValid_, Value); return *this; }
+        bool IsValid() const { return test(IsValid_); }
+        flags& SetUndefined(bool Value = true) { set(IsUndefined_, Value); return *this; }
+        bool IsUndefined() const { return test(IsUndefined_); }
+        flags(uint8_t);
+        friend class TimeCode;
+    };
+
+    class string_view
+    {
+    public:
+        constexpr string_view(const char* s, size_t count) : s_(s), count_(count) {}
+        constexpr const char* data() const noexcept { return s_; }
+        constexpr size_t size() const noexcept { return count_; }
+    private:
+        const char* s_;
+        size_t count_;
+    };
+
     //constructor/Destructor
-    TimeCode ();
-    TimeCode (int32u Hours, int8u Minutes, int8u Seconds, int32u Frames, int32u FramesMax, bool DropFrame, bool MustUseSecondField=false, bool IsSecondField=false);
-    TimeCode (int64s Frames, int32u FramesMax, bool DropFrame, bool MustUseSecondField=false, bool IsSecondField_=false);
-    TimeCode(const char* Value, size_t Length); // return false if all fine
-    TimeCode(const char* Value) { *this = TimeCode(Value, strlen(Value)); }
-    TimeCode(const std::string& Value) { *this = TimeCode(Value.c_str(), Value.size()); }
+    TimeCode();
+    TimeCode(uint32_t Hours, uint8_t Minutes, uint8_t Seconds, uint32_t Frames = 0, uint32_t FramesMax = 0, flags Flags = {});
+    TimeCode(uint64_t FrameCount, uint32_t FramesMax = 0, flags Flags = {});
+    TimeCode(int64_t FrameCount, uint32_t FramesMax = 0, flags Flags = {});
+    TimeCode(uint32_t FrameCount, uint32_t FramesMax = 0, flags Flags = {}) : TimeCode((uint64_t)FrameCount, FramesMax, Flags) {}
+    TimeCode(int32_t FrameCount, uint32_t FramesMax = 0, flags Flags = {}) : TimeCode((int64_t)FrameCount, FramesMax, Flags) {}
+    TimeCode(double Seconds, uint32_t FramesMax = 0, flags Flags = {}, bool Truncate = false, bool TimeIsDropFrame = false);
+    TimeCode(float Seconds, uint32_t FramesMax = 0, flags Flags = {}, bool Truncate = false, bool TimeIsDropFrame = false) : TimeCode((double)Seconds, FramesMax, Flags, Truncate, TimeIsDropFrame) {}
+    TimeCode(const string_view& Value, uint32_t FramesMax = 0, flags Flags = {}, bool Ignore1001FromDropFrame = false);
+    TimeCode(const char* Value, uint32_t FramesMax = 0, flags Flags = {}, bool Ignore1001FromDropFrame = false) : TimeCode(string_view(Value, std::strlen(Value)), FramesMax, Flags, Ignore1001FromDropFrame) {}
+    TimeCode(const std::string& Value, uint32_t FramesMax = 0, flags Flags = {}, bool Ignore1001FromDropFrame = false) : TimeCode(string_view(Value.c_str(), Value.size()), FramesMax, Flags, Ignore1001FromDropFrame) {}
 
     //Operators
-    TimeCode& operator +=(const TimeCode& b)
+    TimeCode& operator +=(const TimeCode& b);
+    TimeCode& operator +=(const int64_t FrameCount)
     {
-        int64u FrameRate1=GetFramesMax();
-        int64u FrameRate2=b.GetFramesMax();
-        if (FrameRate1==FrameRate2)
-        {
-            bool IsTimeSav=Flags.test(IsTime);
-            *this+=b.ToFrames();
-            Flags.set(IsTime, IsTimeSav);
-            return *this;
-        }
-        FrameRate1++;
-        FrameRate2++;
-        int64u Frames1=ToFrames();
-        int64u Frames2=b.ToFrames();
-        int64u Result=Frames1*FrameRate2+Frames2*FrameRate1;
-        Result=(Result+FrameRate2/2)/FrameRate2;
-        bool IsTimeSav=Flags.test(IsTime);
-        FromFrames(Result);
-        Flags.set(IsTime, IsTimeSav);
+        FromFrames(ToFrames() + FrameCount);
         return *this;
     }
-    TimeCode& operator +=(const int64s TotalFrames)
+    TimeCode& operator -=(const TimeCode& b);
+    TimeCode& operator -=(const int64_t FrameCount)
     {
-        FromFrames(ToFrames()+TotalFrames);
+        FromFrames(ToFrames() - FrameCount);
         return *this;
     }
-    TimeCode& operator -=(const TimeCode& b)
+    TimeCode& operator ++()
     {
-        return operator-=(b.ToFrames());
-    }
-    TimeCode& operator -=(const int64s TotalFrames)
-    {
-        FromFrames(ToFrames()-TotalFrames);
-        return *this;
-    }
-    TimeCode &operator ++()
-    {
-        PlusOne();
+        IsNegative() ? MinusOne() : PlusOne();
         return *this;
     }
     TimeCode operator ++(int)
     {
-        PlusOne();
+        IsNegative() ? MinusOne() : PlusOne();
         return *this;
     }
-    TimeCode &operator --()
+    TimeCode& operator --()
     {
-        MinusOne();
+        IsNegative() ? PlusOne() : MinusOne();
         return *this;
     }
     TimeCode operator --(int)
     {
-        MinusOne();
+        IsNegative() ? PlusOne() : MinusOne();
         return *this;
     }
     friend TimeCode operator +(TimeCode a, const TimeCode& b)
     {
-        a+=b;
+        a += b;
         return a;
     }
-    friend TimeCode operator +(TimeCode a, const int64s b)
+    friend TimeCode operator +(TimeCode a, const int64_t b)
     {
-        a+=b;
+        a += b;
         return a;
     }
     friend TimeCode operator -(TimeCode a, const TimeCode& b)
     {
-        a-=b;
+        a -= b;
         return a;
     }
-    friend TimeCode operator -(TimeCode a, const int64s b)
+    friend TimeCode operator -(TimeCode a, const int64_t b)
     {
-        a-=b;
+        a -= b;
         return a;
     }
-    bool operator== (const TimeCode &tc) const
+    bool operator== (const TimeCode& tc) const
     {
-        return Hours==tc.Hours
-            && Minutes==tc.Minutes
-            && Seconds==tc.Seconds
-            && Frames==tc.Frames;
+        if (!IsSet() && !tc.IsSet())
+            return true;
+        return GetHours() == tc.GetHours()
+            && GetMinutes() == tc.GetMinutes()
+            && GetSeconds() == tc.GetSeconds()
+            && GetFrames() == tc.GetFrames();
     }
-    bool operator!= (const TimeCode &tc) const
+    bool operator!= (const TimeCode& tc) const
     {
         return !(*this == tc);
     }
     bool operator< (const TimeCode& tc) const
     {
-        int64u Total1=((int64u)Hours)  <<16
-                    | ((int64u)Minutes)<< 8
-                    | ((int64u)Seconds);
-        int64u Total2=((int64u)tc.Hours)  <<16
-                    | ((int64u)tc.Minutes)<< 8
-                    | ((int64u)tc.Seconds);
-        if (Total1==Total2)
+        uint64_t Total1 = ((uint64_t)GetHours()) << 16
+            | ((uint64_t)GetMinutes()) << 8
+            | ((uint64_t)GetSeconds());
+        uint64_t Total2 = ((uint64_t)tc.GetHours()) << 16
+            | ((uint64_t)tc.GetMinutes()) << 8
+            | ((uint64_t)tc.GetSeconds());
+        if (Total1 == Total2)
         {
-            if (FramesMax==tc.FramesMax)
-                return Frames<tc.Frames;
-            int64u Mix1=((int64s)Frames)*(((int64s)tc.FramesMax)+1);
-            int64u Mix2=((int64s)tc.Frames)*(((int64s)FramesMax)+1);
-            return Mix1<Mix2;
+            if (GetFramesMax() == tc.GetFramesMax())
+                return GetFrames() < tc.GetFrames();
+            uint64_t Mix1 = ((int64_t)GetFrames()) * (((int64_t)tc.GetFramesMax()) + 1);
+            uint64_t Mix2 = ((int64_t)tc.GetFrames()) * (((int64_t)GetFramesMax()) + 1);
+            return Mix1 < Mix2;
         }
-        return Total1<Total2;
+        return Total1 < Total2;
     }
     bool operator> (const TimeCode& tc) const
     {
-        int64u Total1 = ((int64u)Hours) << 16
-                    | ((int64u)Minutes)<< 8
-                    | ((int64u)Seconds);
-        int64u Total2=((int64u)tc.Hours)  <<16
-                    | ((int64u)tc.Minutes)<< 8
-                    | ((int64u)tc.Seconds);
-        if (Total1==Total2)
+        uint64_t Total1 = ((uint64_t)GetHours()) << 16
+            | ((uint64_t)GetMinutes()) << 8
+            | ((uint64_t)GetSeconds());
+        uint64_t Total2 = ((uint64_t)tc.GetHours()) << 16
+            | ((uint64_t)tc.GetMinutes()) << 8
+            | ((uint64_t)tc.GetSeconds());
+        if (Total1 == Total2)
         {
-            if (FramesMax==tc.FramesMax)
-                return Frames>tc.Frames;
-            int64u Mix1=((int64s)Frames)*(((int64s)tc.FramesMax)+1);
-            int64u Mix2=((int64s)tc.Frames)*(((int64s)FramesMax)+1);
-            return Mix1>Mix2;
+            if (GetFramesMax() == tc.GetFramesMax())
+                return GetFrames() > tc.GetFrames();
+            uint64_t Mix1 = ((int64_t)GetFrames()) * (((int64_t)tc.GetFramesMax()) + 1);
+            uint64_t Mix2 = ((int64_t)tc.GetFrames()) * (((int64_t)GetFramesMax()) + 1);
+            return Mix1 > Mix2;
         }
-        return Total1>Total2;
+        return Total1 > Total2;
     }
-
-    //Helpers
-    bool HasValue() const
+    bool operator<= (const TimeCode& tc) const
     {
-        return Flags.test(IsValid);
+        uint64_t Total1 = ((uint64_t)GetHours()) << 16
+            | ((uint64_t)GetMinutes()) << 8
+            | ((uint64_t)GetSeconds());
+        uint64_t Total2 = ((uint64_t)tc.GetHours()) << 16
+            | ((uint64_t)tc.GetMinutes()) << 8
+            | ((uint64_t)tc.GetSeconds());
+        if (Total1 == Total2)
+        {
+            if (GetFramesMax() == tc.GetFramesMax())
+                return GetFrames() <= tc.GetFrames();
+            uint64_t Mix1 = ((int64_t)GetFrames()) * (((int64_t)tc.GetFramesMax()) + 1);
+            uint64_t Mix2 = ((int64_t)tc.GetFrames()) * (((int64_t)GetFramesMax()) + 1);
+            return Mix1 <= Mix2;
+        }
+        return Total1 < Total2;
     }
-    void PlusOne();
-    void MinusOne();
-    bool FromString(const char* Value, size_t Length); // return false if all fine
-    bool FromString(const char* Value) {return FromString(Value, strlen(Value));}
-    bool FromString(const std::string& Value) {return FromString(Value.c_str(), Value.size());}
-    bool FromFrames(int64s Value);
-    std::string ToString() const;
-    int64s ToFrames() const;
-    int64s ToMilliseconds() const;
+    bool operator>= (const TimeCode& tc) const
+    {
+        uint64_t Total1 = ((uint64_t)GetHours()) << 16
+            | ((uint64_t)GetMinutes()) << 8
+            | ((uint64_t)GetSeconds());
+        uint64_t Total2 = ((uint64_t)tc.GetHours()) << 16
+            | ((uint64_t)tc.GetMinutes()) << 8
+            | ((uint64_t)tc.GetSeconds());
+        if (Total1 == Total2)
+        {
+            if (GetFramesMax() == tc.GetFramesMax())
+                return GetFrames() >= tc.GetFrames();
+            uint64_t Mix1 = ((int64_t)GetFrames()) * (((int64_t)tc.GetFramesMax()) + 1);
+            uint64_t Mix2 = ((int64_t)tc.GetFrames()) * (((int64_t)GetFramesMax()) + 1);
+            return Mix1 >= Mix2;
+        }
+        return Total1 > Total2;
+    }
 
-    int32u GetHours() const { return Hours; }
-    void SetHours(int32u Value) { Hours=Value; }
-    int8u GetMinutes() const { return Minutes; }
-    void SetMinutes(int8u Value) { Minutes=Value; }
-    int8u GetSeconds() const { return Seconds; }
-    void SetSeconds(int8u Value) { Seconds=Value; }
-    int32u GetFrames() const { return Frames; }
-    void SetFrames(int32u Value) { Frames=Value; }
-    int32u GetFramesMax() const { return FramesMax; }
-    void SetFramesMax(int32u Value=0) { FramesMax=Value; }
-    bool GetDropFrame() const { return Flags.test(DropFrame); }
-    void SetDropFrame(bool Value=true) { Flags.set(DropFrame, Value); }
-    bool GetNegative() const { return Flags.test(IsNegative); }
-    void SetNegative(bool Value=true) { Flags.set(IsNegative, Value); }
-    bool Get1001() const { return Flags.test(FramesPerSecond_Is1001); }
-    void Set1001(bool Value=true) { Flags.set(FramesPerSecond_Is1001, Value); }
-    bool GetMustUseSecondField() const { return Flags.test(MustUseSecondField); }
-    void SetMustUseSecondField(bool Value=true) { Flags.set(MustUseSecondField, Value); }
-    bool GetIsTime() const { return Flags.test(IsTime); }
-    void SetIsTime(bool Value=true) { Flags.set(IsTime, Value); }
-    bool GetIsValid() const { return Flags.test(IsValid); }
-    void SetIsValid(bool Value=true) { Flags.set(IsValid, Value); }
-    float GetFrameRate() { return (FramesMax+1)/((Flags.test(DropFrame) || Flags.test(FramesPerSecond_Is1001))?1.001:1.000);}
+    int FromString(const string_view& Value, bool Ignore1001FromDropFrame = false);
+    int FromString(const char* Value, bool Ignore1001FromDropFrame = false) { return FromString(string_view(Value, strlen(Value)), Ignore1001FromDropFrame); }
+    int FromString(const std::string& Value, bool Ignore1001FromDropFrame = false) { return FromString(string_view(Value.c_str(), Value.size()), Ignore1001FromDropFrame); }
+    int FromFrames(uint64_t Value);
+    int FromFrames(int64_t Value);
+    int FromSeconds(double Value, bool Truncate = false, bool TimeIsDropFrame = false);
+
+    std::string ToString() const;
+    int64_t ToFrames() const;
+    int64_t ToMilliseconds() const;
+    double ToSeconds(bool TimeIsDropFrame = false) const;
+
+    uint32_t GetHours() const { return Hours_; }
+    void SetHours(int32_t Value) { Hours_ = Value; }
+    uint8_t GetMinutes() const { return Minutes_; }
+    void SetMinutes(uint8_t Value) { Minutes_ = Value; }
+    uint8_t GetSeconds() const { return Seconds_; }
+    void SetSeconds(uint8_t Value) { Seconds_ = Value; }
+    uint32_t GetFrames() const { return Frames_; }
+    void SetFrames(int64_t Value) { Frames_ = Value; }
+
+    uint32_t GetFramesMax() const { return FramesMax_; }
+    void SetFramesMax(uint32_t Value = 0) { FramesMax_ = Value; }
+    float GetFrameRate() { return ((uint64_t)GetFramesMax() + 1) / (Is1001fps() ? 1.001 : 1.000); }
+
+    TimeCode& SetDropFrame(bool Value = true) { Flags_.DropFrame(Value); return *this; }
+    bool IsDropFrame() const { return Flags_.IsDropFrame(); }
+    TimeCode& Set1001fps(bool Value = true) { Flags_.FPS1001(Value); return *this; }
+    bool Is1001fps() const { return Flags_.Is1001fps(); }
+    TimeCode& SetField(bool Value = true) { Flags_.Field(Value); return *this; }
+    bool IsField() const { return Flags_.IsField(); }
+    TimeCode& SetWrapped24Hours(bool Value = true) { Flags_.Wrapped24Hours(Value); return *this; }
+    bool IsWrapped24Hours() const { return Flags_.IsWrapped24Hours(); }
+    TimeCode& SetTimed(bool Value = true) { Flags_.Timed(Value); return *this; }
+    bool IsTimed() const { return Flags_.IsTimed(); }
+    TimeCode& SetNegative(bool Value = true) { Flags_.Negative(Value); return *this; }
+    bool IsNegative() const { return Flags_.IsNegative(); }
+    bool IsValid() const { return Flags_.IsValid(); }
+    bool IsUndefined() const { return Flags_.IsUndefined(); }
+    bool IsSet() const { return IsValid() && !IsUndefined(); }
+
+    static flags DropFrame(bool Value = true) { return flags().DropFrame(Value); }
+    static flags FPS1001(bool Value = true) { return flags().FPS1001(Value); }
+    static flags Field(bool Value = true) { return flags().Field(Value); }
+    static flags Wrapped24Hours(bool Value = true) { return flags().Wrapped24Hours(Value); }
+    static flags Negative(bool Value = true) { return flags().Negative(Value); }
+    static flags Timed(bool Value = true) { return flags().Timed(Value); }
 
 private:
-    int32u Frames;
-    int32u FramesMax;
-    int32u Hours;
-    int8u Minutes;
-    int8u Seconds;
-    enum flag
-    {
-        DropFrame,
-        FramesPerSecond_Is1001,
-        MustUseSecondField,
-        IsSecondField,
-        IsNegative,
-        HasNoFramesInfo,
-        IsTime,
-        IsValid,
-        Flag_Max
-    };
-    bitset8 Flags;
+    uint32_t Frames_;
+    uint32_t FramesMax_;
+    int32_t Hours_;
+    uint8_t Minutes_;
+    uint8_t Seconds_;
+    flags Flags_;
+
+    TimeCode& SetValid(bool Value = true) { Flags_.set(flags::IsValid_, Value); return *this; }
+    TimeCode& SetUndefined(bool Value = true) { Flags_.set(flags::IsUndefined_, Value); return *this; }
+
+    void PlusOne();
+    void MinusOne();
 };
 
 std::string Date_MJD(uint16_t Date);

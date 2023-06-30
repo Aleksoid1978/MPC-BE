@@ -364,9 +364,11 @@ private :
     void sei_message_user_data_registered_itu_t_t35();
     void sei_message_user_data_registered_itu_t_t35_B5();
     void sei_message_user_data_registered_itu_t_t35_B5_0031();
+    void sei_message_user_data_registered_itu_t_t35_B5_0031_DTG1();
     void sei_message_user_data_registered_itu_t_t35_B5_0031_GA94();
     void sei_message_user_data_registered_itu_t_t35_B5_0031_GA94_03();
     void sei_message_user_data_registered_itu_t_t35_B5_0031_GA94_03_Delayed(int32u seq_parameter_set_id);
+    void sei_message_user_data_registered_itu_t_t35_B5_0031_GA94_09();
     void sei_message_user_data_registered_itu_t_t35_B5_003A();
     void sei_message_user_data_registered_itu_t_t35_B5_003A_00();
     void sei_message_user_data_registered_itu_t_t35_B5_003A_02();
@@ -381,6 +383,7 @@ private :
     void sei_message_user_data_unregistered_x265(int32u payloadSize);
     void sei_message_recovery_point();
     void sei_message_active_parameter_sets();
+    void sei_time_code();
     void sei_message_decoded_picture_hash(int32u payloadSize);
     void sei_message_mastering_display_colour_volume();
     void sei_message_light_level();
@@ -476,9 +479,10 @@ private :
     Ztring                              Encoded_Library_Settings;
     enum hdr_format
     {
+        HdrFormat_SmpteSt209410,
+        HdrFormat_SmpteSt209440,
         HdrFormat_EtsiTs103433,
         HdrFormat_HdrVivid,
-        HdrFormat_SmpteSt209440,
         HdrFormat_SmpteSt2086,
         HdrFormat_Max,
     };

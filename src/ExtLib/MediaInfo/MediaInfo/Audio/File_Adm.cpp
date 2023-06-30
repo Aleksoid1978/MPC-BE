@@ -49,6 +49,24 @@ namespace MediaInfoLib
 #define IncoherencyMessage "Incoherency between enums and message strings"
     
 //---------------------------------------------------------------------------
+static int32u pow10(int i)
+{
+    static int pow10[10] =
+    {
+        1,
+        10,
+        100,
+        1000,
+        10000, 
+        100000,
+        1000000,
+        10000000,
+        100000000,
+        1000000000,
+    };
+    return pow10[i];
+}
+
 static float32 TimeCodeToFloat(string v)
 {
     if (v.size() < 8 || v[2] != ':' || v[5] != ':')
@@ -67,7 +85,7 @@ static float32 TimeCodeToFloat(string v)
                 return 0;
         }
     }
-    float32 Value = (v[0] - '0') * 10 * 6 * 10 * 6 * 10
+    int32u  Value = (v[0] - '0') * 10 * 6 * 10 * 6 * 10
                   + (v[1] - '0')      * 6 * 10 * 6 * 10
                   + (v[3] - '0')          * 10 * 6 * 10
                   + (v[4] - '0')               * 6 * 10
@@ -76,14 +94,43 @@ static float32 TimeCodeToFloat(string v)
     if (v.size() < 9 || v[8] != '.')
         return Value;
     int i = 9;
-    float32 Divider = 1;
+    int32u ValueF = 0;
+    int ValueF_Exponent = 0;
+    const int Exponent_Max = 9;
     while (i < v.size() && v[i] >= '0' && v[i] <= '9')
     {
-        Divider *= 10;
-        Value += ((float32)(v[i] - '0')) / Divider;
+        ValueF_Exponent++;
+        if (ValueF_Exponent <= Exponent_Max)
+        {
+            ValueF *= 10;
+            ValueF += v[i] - '0';
+        }
         i++;
     }
-    return Value;
+    if (i >= v.size() || v[i] != 'S')
+        return Value + (float32)ValueF / pow10(ValueF_Exponent <= Exponent_Max ? ValueF_Exponent : Exponent_Max);
+    int32u SampleRate = 0;
+    int SampleRate_Exponent = 0;
+    i++;
+    while (i < v.size() && v[i] >= '0' && v[i] <= '9')
+    {
+        SampleRate_Exponent++;
+        if (SampleRate_Exponent <= Exponent_Max)
+        {
+            SampleRate *= 10;
+            SampleRate += v[i] - '0';
+        }
+        i++;
+    }
+    while (SampleRate_Exponent > Exponent_Max)
+    {
+        if (ValueF_Exponent < Exponent_Max)
+            ValueF_Exponent /= 10;
+        if (ValueF_Exponent)
+            ValueF_Exponent--;
+        SampleRate_Exponent--;
+    }
+    return Value + (float32)ValueF / SampleRate;
 }
 
 //---------------------------------------------------------------------------
@@ -536,19 +583,21 @@ public:
 
     // Out
     Items_Struct Items[item_Max];
-    int Version;
-    bool DolbyProfileCanNotBeVersion1;
+    int Version = 0;
+    int Version_S = -1; // S-ADM
+    bool DolbyProfileCanNotBeVersion1 = false;
     vector<profile_info> profileInfos;
     map<string, string> More;
+    float32 FrameRate_Sum = 0;
+    float32 FrameRate_Den = 0;
 
-    // Constructor / Destructor
-    file_adm_private() {
-        Version = 0;
-        DolbyProfileCanNotBeVersion1 = false;
-    };
+    file_adm_private()
+    {
+    }
 
     // Actions
     void parse();
+    void clear();
 
     // Helpers
     void chna_Add(int32u Index, const string& TrackUID)
@@ -683,6 +732,17 @@ void file_adm_private::parse()
         }
         if (!tfsxml_strcmp_charp(b, "frame"))
         {
+            Version_S = 0;
+            while (!tfsxml_attr(&p, &b, &v)) {
+                if (!tfsxml_strcmp_charp(b, "version")) {
+                    if (!tfsxml_strcmp_charp(v, "ITU-R_BS.2125-1")) {
+                        Version_S = 1;
+                    }
+                    if (!tfsxml_strcmp_charp(v, "ITU-R_BS.2125-2")) {
+                        Version_S = 2;
+                    }
+                }
+            }
             format();
         }
         if (!tfsxml_strcmp_charp(b, "format"))
@@ -690,6 +750,14 @@ void file_adm_private::parse()
             format();
         }
     }
+}
+
+
+void file_adm_private::clear()
+{
+    for (auto& Item : Items)
+        Item = Items_Struct();
+    profileInfos.clear();
 }
 
 void file_adm_private::coreMetadata()
@@ -736,8 +804,6 @@ void file_adm_private::format()
                                                     profileInfo.Strings[0].resize(profileInfo.Strings[0].size() - 12);
                                             }
                                         }
-                                    }
-                                    while (!tfsxml_next(&p, &b)) {
                                     }
                                 }
                             }
@@ -1067,15 +1133,22 @@ void file_adm_private::frameHeader()
         if (!tfsxml_strcmp_charp(v, "frameFormat")) {
             while (!tfsxml_attr(&p, &a, &v)) {
                 if (!tfsxml_strcmp_charp(a, "duration")) {
+                    auto Duration = TimeCodeToFloat(tfsxml_decode(v));
+                    if (FrameRate_Den < 5) // Handling of 1.001 frames rates
+                    {
+                        FrameRate_Sum += Duration;
+                        FrameRate_Den++;
+                    }
+                    Duration = FrameRate_Sum / FrameRate_Den;
                     if (IsSub)
-                        More["FrameRate"] = Ztring().From_Number(1 / TimeCodeToFloat(tfsxml_decode(v))).To_UTF8();
+                        More["FrameRate"] = Ztring().From_Number(1 / Duration).To_UTF8();
                     else
-                        More["Duration"] = Ztring().From_Number(TimeCodeToFloat(tfsxml_decode(v)) * 1000, 0).To_UTF8();
+                        More["Duration"] = Ztring().From_Number(Duration * 1000, 0).To_UTF8();
                 }
                 if (!tfsxml_strcmp_charp(a, "flowID")) {
                     More["FlowID"] = tfsxml_decode(v);
                 }
-                if (!tfsxml_strcmp_charp(a, "start")) {
+                if (!tfsxml_strcmp_charp(a, "start") && More["TimeCode_FirstFrame"].empty()) {
                     More["TimeCode_FirstFrame"] = tfsxml_decode(v);
                 }
                 if (!tfsxml_strcmp_charp(a, "type")) {
@@ -1306,6 +1379,8 @@ void File_Adm::Streams_Fill()
     if (!IsSub)
         Fill(Stream_Audio, StreamPos_Last, Audio_Format, "ADM");
 
+    if (File_Adm_Private->Version_S >= 0)
+        Fill(Stream_Audio, StreamPos_Last, "Metadata_Format", "S-ADM, Version " + Ztring::ToZtring(File_Adm_Private->Version_S).To_UTF8());
     Fill(Stream_Audio, StreamPos_Last, "Metadata_Format", "ADM, Version " + Ztring::ToZtring(File_Adm_Private->Version).To_UTF8() + File_Adm_Private->More["Metadata_Format"]);
     if (!MuxingMode.empty())
         Fill(Stream_Audio, StreamPos_Last, "Metadata_MuxingMode", MuxingMode);
@@ -1390,7 +1465,15 @@ void File_Adm::Streams_Fill()
         FILL_E(audioProgramme, audioProgrammeLabel, "Label");
         FILL_A(audioProgramme, audioProgrammeLanguage, "Language");
         FILL_A(audioProgramme, start, "Start");
+        FILL_A(audioProgramme, start, "Start/String");
+        FILL_A(audioProgramme, start, "Start_TimeCode");
+        FILL_A(audioProgramme, start, "Start_TimeCodeSubFrames");
+        FILL_A(audioProgramme, start, "Start_TimeCodeSamples");
         FILL_A(audioProgramme, end, "End");
+        FILL_A(audioProgramme, end, "End/String");
+        FILL_A(audioProgramme, end, "End_TimeCode");
+        FILL_A(audioProgramme, end, "End_TimeCodeSubFrames");
+        FILL_A(audioProgramme, end, "End_TimeCodeSamples");
         FILL_E(audioProgramme, loudnessMetadata_integratedLoudness, "IntegratedLoudness");
         LINK(audioProgramme, "Content", audioContentIDRef, audioContent);
         LINK(audioProgramme, "PackFormat", authoringInformation_referenceLayout_audioPackFormatIDRef, audioPackFormat);
@@ -1609,20 +1692,34 @@ bool File_Adm::FileHeader_Begin()
         return false; //Must wait for more data
     }
 
+    return true;
+}
+
+//***************************************************************************
+// Buffer - File header
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void File_Adm::Read_Buffer_Continue()
+{
     if (tfsxml_init(&File_Adm_Private->p, (void*)(Buffer), Buffer_Size))
-        return true;
+        return;
     File_Adm_Private->IsSub = IsSub;
+    File_Adm_Private->clear();
     File_Adm_Private->parse();
     if (File_Adm_Private->Items[item_audioContent].Items.empty())
     {
         Reject();
-        return false;
+        return;
     }
 
-    //All should be OK...
-    Accept("ADM");
-    return true;
+    if (!Status[IsAccepted])
+        Accept("ADM");
 }
+
+//***************************************************************************
+// In
+//***************************************************************************
 
 void File_Adm::chna_Add(int32u Index, const string& TrackUID)
 {

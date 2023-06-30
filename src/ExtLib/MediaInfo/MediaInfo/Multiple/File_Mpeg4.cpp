@@ -121,6 +121,7 @@ namespace Elements
     const int64u moov_meta__grup=0x67727570;
     const int64u moov_meta__hdvd=0x68647664;
     const int64u moov_meta__itnu=0x69746E75;
+    const int64u moov_meta__kind=0x6B696E64;
     const int64u moov_meta__keyw=0x6B657977;
     const int64u moov_meta__ldes=0x6C646573;
     const int64u moov_meta__name=0x6E616D65;
@@ -143,6 +144,7 @@ namespace Elements
     const int64u moov_meta__sonm=0x736F6E6D;
     const int64u moov_meta__sosn=0x736F736E;
     const int64u moov_meta__stik=0x7374696B;
+    const int64u moov_meta__tagc=0x74616763;
     const int64u moov_meta__titl=0x7469746C;
     const int64u moov_meta__tool=0x746F6F6C;
     const int64u moov_meta__trkn=0x74726B6E;
@@ -477,10 +479,23 @@ void File_Mpeg4::Streams_Finish()
             ++Temp;
             continue;
         }
-        if (StreamKind_Last==Stream_Max && Temp->second.hdlr_SubType)
+        if (Temp->second.hdlr_SubType && (StreamPos_Last==(size_t)-1 || Retrieve_Const(Stream_Other, StreamPos_Last, Other_Type).empty()))
         {
-            Stream_Prepare(Stream_Other);
-            Fill(Stream_Other, StreamPos_Last, Other_Type, Ztring().From_CC4(Temp->second.hdlr_SubType));
+            bool ShowSubType=false;
+            if (StreamKind_Last==Stream_Other)
+            {
+                const auto& Format=Retrieve_Const(Stream_Other, StreamPos_Last, Other_Format);
+                const auto& CodecID=Retrieve_Const(Stream_Other, StreamPos_Last, Other_CodecID);
+                if (Format.empty() || Format==CodecID)
+                    ShowSubType=true;
+            }
+            if (StreamPos_Last==(size_t)-1)
+            {
+                Stream_Prepare(Stream_Other);
+                ShowSubType=true;
+            }
+            if (ShowSubType)
+                Fill(Stream_Other, StreamPos_Last, Other_Type, Ztring().From_CC4(Temp->second.hdlr_SubType));
         }
         if (StreamKind_Last == Stream_Video && !DisplayAspectRatio.empty() && Retrieve_Const(Stream_Video, StreamPos_Last, Video_DisplayAspectRatio).empty())
         {
@@ -567,7 +582,10 @@ void File_Mpeg4::Streams_Finish()
                 if (Temp->second.HasForcedSamples)
                 {
                     if (Temp->second.AllForcedSamples)
-                        Fill(StreamKind_Last, StreamPos_Last, "Forced", "Yes");
+                    {
+                        if (Retrieve_Const(StreamKind_Last, StreamPos_Last, "Forced")!=__T("Yes"))
+                            Fill(StreamKind_Last, StreamPos_Last, "Forced", "Yes");
+                    }
                     else
                         Fill(StreamKind_Last, StreamPos_Last, "Forced", "Mixed");
                     if (Temp->second.ForcedFor.size())
@@ -1436,6 +1454,31 @@ void File_Mpeg4::Streams_Finish()
                     Fill(StreamKind_Last, StreamPos_Last, Name.To_UTF8().c_str(), Value, true);
                     const Ztring& Options=Retrieve_Const(Source_StreamKind, Source_StreamPos, i, Info_Options);
                     Fill_SetOptions(StreamKind_Last, StreamPos_Last, Name.To_UTF8().c_str(), Options.To_UTF8().c_str());
+                }
+            }
+        }
+
+        // Adapting from fake ID
+        if (Temp->second.tkhd_Found && Temp->second.TrackID!=Temp->first)
+        {
+            Ztring CurrentID=Ztring::ToZtring(Temp->first);
+            Ztring RealID=Ztring::ToZtring(Temp->second.TrackID);
+            ZtringList IDs;
+            IDs.Separator_Set(0, "-");
+            for (size_t i=Stream_General+1; i<Stream_Max; i++)
+            {
+                size_t Count=Count_Get((stream_t)i);
+                for (size_t j=0; j<Count; j++)
+                {
+                    IDs.Write(Retrieve_Const((stream_t)i, j, General_ID));
+                    if (!IDs.empty() && IDs[0]==CurrentID)
+                    {
+                        IDs[0]=RealID;
+                        Fill((stream_t)i, j, General_ID, IDs.Read(), true);
+                        Fill((stream_t)i, j, "ConformanceErrors", "Yes", Unlimited, true, true);
+                        Fill((stream_t)i, j, "ConformanceErrors tkhd", "Yes", Unlimited, true, true);
+                        Fill((stream_t)i, j, "ConformanceErrors tkhd track_ID", ("track_ID "+RealID.To_UTF8()+" is already used by another track"));
+                    }
                 }
             }
         }
@@ -2659,8 +2702,16 @@ bool File_Mpeg4::BookMark_Needed()
             #endif //MEDIAINFO_DEMUX
         }
         std::sort(mdat_Pos.begin(), mdat_Pos.end(), &mdat_pos_sort);
-        mdat_Pos_Temp=mdat_Pos.empty()?NULL:&mdat_Pos[0];
-        mdat_Pos_Max=mdat_Pos_Temp+mdat_Pos.size();
+        if (mdat_Pos.empty())
+        {
+            mdat_Pos_Temp=nullptr;
+            mdat_Pos_Max=nullptr;
+        }
+        else
+        {
+            mdat_Pos_Temp=&mdat_Pos[0];
+            mdat_Pos_Max=mdat_Pos_Temp+mdat_Pos.size();
+        }
 
         #if MEDIAINFO_DEMUX
             if (!stco_IsDifferent && Muxing.size()==2)
@@ -2853,8 +2904,21 @@ bool File_Mpeg4::BookMark_Needed()
                     {
                         auto StreamID=Temp->StreamID;
                         for (int j=mdat_Pos.size()-1; j>=0; j--)
-                            if (StreamID==mdat_Pos[j].StreamID && mdat_Pos[j].Offset!=StreamTemp.FirstUsedOffset && mdat_Pos[j].Offset!=StreamTemp.LastUsedOffset)
+                            if (StreamID==mdat_Pos[j].StreamID && mdat_Pos[j].Offset!=stco_ToFind && mdat_Pos[j].Offset!=StreamTemp.FirstUsedOffset && mdat_Pos[j].Offset!=StreamTemp.LastUsedOffset)
                                 mdat_Pos.erase(mdat_Pos.begin()+j);
+                        if (mdat_Pos.empty())
+                        {
+                            mdat_Pos_Temp=nullptr;
+                            mdat_Pos_Max=nullptr;
+                        }
+                        else
+                        {
+                            Temp=&mdat_Pos[0];
+                            mdat_Pos_Max=Temp+mdat_Pos.size();
+                            while (Temp<mdat_Pos_Max && Temp->Offset!=stco_ToFind)
+                                Temp++;
+                            mdat_Pos_Temp=Temp<mdat_Pos_Max?Temp:nullptr;
+                        }
                     }
                 }
             }
@@ -2884,7 +2948,12 @@ bool File_Mpeg4::BookMark_Needed()
             mdat_Pos_ToParseInPriority_StreamIDs_ToRemove.clear();
         }
 
-        if (!mdat_Pos.empty())
+        if (mdat_Pos.empty())
+        {
+            mdat_Pos_Temp=nullptr;
+            mdat_Pos_Max=nullptr;
+        }
+        else
         {
             mdat_Pos_Temp=mdat_Pos_Temp_ToJump?mdat_Pos_Temp_ToJump:&mdat_Pos[0];
             mdat_Pos_Max=&mdat_Pos[0]+mdat_Pos.size();
@@ -2999,6 +3068,7 @@ File_Mpeg4::method File_Mpeg4::Metadata_Get(std::string &Parameter, int64u Meta)
         case Elements::moov_meta__grup : Parameter="Grouping"; Method=Method_String; break;
         case Elements::moov_meta__hdvd : Parameter="HDVideo"; Method=Method_Binary; break;
         case Elements::moov_meta__itnu : Parameter="iTunesU"; Method=Method_Binary; break;
+        case Elements::moov_meta__kind : Parameter="ServiceKind"; Method= Method_Binary; break;
         case Elements::moov_meta__keyw : Parameter="Keyword"; Method=Method_String; break;
         case Elements::moov_meta__ldes : Parameter="LongDescription"; Method=Method_String; break;
         case Elements::moov_meta__name : Parameter="Title"; Method=Method_String; break;
@@ -3019,6 +3089,7 @@ File_Mpeg4::method File_Mpeg4::Metadata_Get(std::string &Parameter, int64u Meta)
         case Elements::moov_meta__sonm : Parameter="Title/Sort"; Method=Method_String; break; //SortName
         case Elements::moov_meta__sosn : Parameter="Title/Sort"; Method=Method_String; break; //SortShow
         case Elements::moov_meta__stik : Parameter="ContentType"; Method=Method_Binary; break;
+        case Elements::moov_meta__tagc : Parameter="ServiceKind"; Method=Method_String3; break;
         case Elements::moov_meta__titl : Parameter="Title"; Method=Method_String2; break;
         case Elements::moov_meta__tool : Parameter="Encoded_Application"; Method=Method_String3; break;
         case Elements::moov_meta__tmpo : Parameter="BPM"; Method=Method_Binary; break;
@@ -3030,7 +3101,6 @@ File_Mpeg4::method File_Mpeg4::Metadata_Get(std::string &Parameter, int64u Meta)
         case Elements::moov_meta__tvsn : Parameter="Season"; Method=Method_String; break; //TVSeason
         case Elements::moov_meta__xid_ : Parameter="Vendor"; Method=Method_String; break;
         case Elements::moov_meta__year : Parameter="Recorded_Date"; Method=Method_String2; break;
-        case Elements::moov_meta__yyrc : Parameter="Recorded_Date"; Method=Method_String2; break;
         default :
             {
                 Parameter.clear();
@@ -3098,10 +3168,10 @@ void File_Mpeg4::Descriptors()
         MI.stss_IsPresent=&Stream.stss_IsPresent;
         MI.IsCmaf=&IsCmaf;
         MI.sbgp=&Stream.sbgp;
+        MI.sbgp_IsPresent=&Stream.sbgp_IsPresent;
+        MI.sgpd_prol=&Stream.sgpd_prol;
         MI.stts=&Stream.stts;
         MI.FirstOutputtedDecodedSample=&Stream.FirstOutputtedDecodedSample;
-        MI.sgpd_prol=&Stream.sgpd_prol;
-        MI.sbgp=&Stream.sbgp;
     #endif
 
     int64u Elemen_Code_Save=Element_Code;
@@ -3261,13 +3331,7 @@ void File_Mpeg4::IsParsing_mdat_Set()
             Parser->DropFrame = tc->DropFrame;
             Parser->NegativeTimes = tc->NegativeTimes;
 
-            int32u TimeCode_Value = TimeCode((TimeCode_String[ 0]-'0') * 10 + (TimeCode_String[ 1]-'0'),
-                                             (TimeCode_String[ 3]-'0') * 10 + (TimeCode_String[ 4]-'0'),
-                                             (TimeCode_String[ 6]-'0') * 10 + (TimeCode_String[ 7]-'0'),
-                                             (TimeCode_String[ 9]-'0') * 10 + (TimeCode_String[10]-'0'),
-                                             tc->NumberOfFrames-1,
-                                              TimeCode_String[ 8]==';').ToFrames();
-
+            int32u TimeCode_Value = TimeCode(TimeCode_String, tc->NumberOfFrames-1).ToFrames();
             
             int8u Buffer[4];
             int32u2BigEndian(Buffer, TimeCode_Value);

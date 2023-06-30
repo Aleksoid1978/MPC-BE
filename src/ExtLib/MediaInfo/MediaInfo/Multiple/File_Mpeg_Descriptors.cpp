@@ -80,6 +80,12 @@ namespace Elements
 extern string Avc_profile_level_string(int8u profile_idc, int8u level_idc=0, int8u constraint_set_flags=0);
 
 //---------------------------------------------------------------------------
+const char* Mpegv_colour_primaries(int8u colour_primaries);
+const char* Mpegv_transfer_characteristics(int8u transfer_characteristics);
+const char* Mpegv_matrix_coefficients(int8u matrix_coefficients);
+const char* Mpegv_matrix_coefficients_ColorSpace(int8u matrix_coefficients);
+
+//---------------------------------------------------------------------------
 const char* Mpeg_Descriptors_audio_type(int8u ID)
 {
     switch (ID)
@@ -1220,6 +1226,92 @@ static bool Mpeg_Descriptors_CA_system_ID_MustSkipSlices(int16u CA_system_ID)
 }
 
 //---------------------------------------------------------------------------
+static const char* JpegXs_ColorSpace[]=
+{
+    "YUV",
+    "YUV",
+    "RGB",
+    "YUV",
+    "YUVA",
+    "YUVA",
+    "RGBA",
+};
+static const size_t JpegXs_ColorSpace_Size=sizeof(JpegXs_ColorSpace)/sizeof(*JpegXs_ColorSpace);
+
+//---------------------------------------------------------------------------
+static const char* JpegXs_ChromaSubsampling[]=
+{
+    "4:2:2",
+    nullptr,
+    nullptr,
+    "4:2:0",
+    "4:2:2",
+    nullptr,
+    nullptr,
+};
+static const size_t JpegXs_ChromaSubsampling_Size=sizeof(JpegXs_ChromaSubsampling)/sizeof(*JpegXs_ChromaSubsampling);
+static_assert(JpegXs_ColorSpace_Size==JpegXs_ChromaSubsampling_Size, "");
+
+//---------------------------------------------------------------------------
+static string JpegXs_Ppih(int16u Value)
+{
+    switch (Value)
+    {
+        case 0x0000 : return {};
+        case 0x1500 : return "Light 422.10";
+        case 0x1A00 : return "Light 444.12";
+        case 0x2500 : return "Light-Subline 422.10";
+        case 0x3240 : return "Main 420.12";
+        case 0x3540 : return "Main 422.10";
+        case 0x3A40 : return "Main 444.12";
+        case 0x3E40 : return "Main 4444.12";
+        case 0x4A40 : return "High 444.12";
+        case 0x4E40 : return "High 4444.12";
+        case 0x6EC0 : return "MLS.12";
+        case 0x9300 : return "LightBayer";
+        case 0xB340 : return "MainBayer";
+        case 0xC340 : return "HighBayer";
+        default     : return to_string(Value);
+    }
+};
+
+//---------------------------------------------------------------------------
+static string JpegXs_Plev(int16u Value, bool Bayer=false)
+{
+    string Result;
+    auto Level=Value>>8;
+    auto SubLevel=Value&0xFF;
+    switch (Level)
+    {
+        case 0b00000000 : return {};
+        case 0b00000100 : Result=Bayer?"bayer2k-1":"1k-1"; break;
+        case 0b00010000 : Result=Bayer?"bayer4k-1":"2k-1"; break;
+        case 0b00100000 : Result=Bayer?"bayer8k-1":"4k-1"; break;
+        case 0b00100100 : Result=Bayer?"bayer8k-2":"4k-2"; break;
+        case 0b00101000 : Result=Bayer?"bayer8k-3":"4k-3"; break;
+        case 0b00110000 : Result=Bayer?"bayer16k-1":"8k-1"; break;
+        case 0b00110100 : Result=Bayer?"bayer16k-2":"8k-2"; break;
+        case 0b00111000 : Result=Bayer?"bayer16k-3":"8k-3"; break;
+        case 0b01000000 : Result=Bayer?"bayer20k-1":"10k-1"; break;
+        default         : Result=to_string(Level);
+    }
+    if (!SubLevel)
+        return Result;
+    Result+='.';
+    switch (SubLevel)
+    {
+        case 0b10000000 : Result+="Full"; break;
+        case 0b00010000 : Result+="Sublev12bpp"; break;
+        case 0b00001100 : Result+="Sublev9bpp"; break;
+        case 0b00001000 : Result+="Sublev6bpp"; break;
+        case 0b00000100 : Result+="Sublev3bpp"; break;
+        case 0b00000011 : Result+="Sublev2bpp"; break;
+        default         : Result+=to_string(SubLevel);
+    }
+    return Result;
+};
+
+//---------------------------------------------------------------------------
 extern const size_t DolbyVision_Compatibility_Size;
 extern const char* DolbyVision_Compatibility[];
 
@@ -2151,8 +2243,13 @@ void File_Mpeg_Descriptors::Descriptor_3F()
             ELEMENT_CASE(0E, "MPEG-H_3dAudio_command");
             ELEMENT_CASE(0F, "Quality_extension");
             ELEMENT_CASE(10, "Virtual_segmentation");
+            ELEMENT_CASE(11, "timed_metadata_extension_descriptor");
+            ELEMENT_CASE(12, "HEVC_tile_substream_descriptor");
+            ELEMENT_CASE(13, "HEVC_subregion_descriptor");
+            ELEMENT_CASE(14, "JXS_video_descriptor");
             default: Element_Info1("Unknown");
-                     Skip_XX(Element_Size,                          "Data");
+                     Skip_XX(Element_Size-Element_Offset,       "Data");
+                     Skip_XX(Element_Size-Element_Offset,       "Data");
     }
 }
 
@@ -2212,6 +2309,129 @@ void File_Mpeg_Descriptors::Descriptor_3F_08()
                 Complete_Stream->Streams[elementary_PID]->Infos["ChannelLayout"].From_UTF8(Aac_ChannelLayout_GetString(referenceChannelLayout, true));
                 Complete_Stream->Streams[elementary_PID]->Infos["ChannelMode"].From_UTF8(Aac_ChannelMode_GetString(referenceChannelLayout, true));
             }
+        }
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Mpeg_Descriptors::Descriptor_3F_14()
+{
+    //Parsing
+    int32u brat, max_buffer_size;
+    int16u horizontal_size, vertical_size, Framerate_Numerator, Ppih, Plev, MaxCLL, MaxFALL;
+    int8u Interlace_Mode, Framerate_Denominator, Sample_Bitdepth, Sampling_Structure, descriptor_version, colour_primaries, transfer_characteristics, matrix_coefficients;
+    bool schar_Valid_Flag, video_full_range_flag, mdm_flag;
+    Get_B1 (descriptor_version,                                 "descriptor_version");
+    if (descriptor_version)
+    {
+        Skip_XX(Element_Size-Element_Offset,                    "(Unknown)");
+        return;
+    }
+    Get_B2 (horizontal_size,                                    "horizontal_size");
+    Get_B2 (vertical_size,                                      "vertical_size");
+    Get_B4 (brat,                                               "brat");
+    Element_Begin1("frat");
+        BS_Begin();
+        Get_S1 (2, Interlace_Mode,                              "Interlace_Mode");
+        Get_S1 (6, Framerate_Denominator,                       "Framerate_Denominator");
+        BS_End();
+        Skip_B1(                                                "Framerate_Reserved");
+        Get_B2 (Framerate_Numerator,                            "Framerate_Numerator");
+    Element_End0();
+    Element_Begin1("schar");
+        BS_Begin();
+        Get_SB (   schar_Valid_Flag,                            "Valid_Flag");
+        Skip_S1 (7,                                             "Sample_Reserved");
+        Get_S1 (4, Sample_Bitdepth,                             "Sample_Bitdepth");
+        Get_S1 (4, Sampling_Structure,                          "Sampling_Structure");
+        BS_End();
+    Element_End0();
+    Get_B2 (Ppih,                                               "Ppih");
+    Get_B2 (Plev,                                               "Plev");
+    Get_B4 (max_buffer_size,                                    "max_buffer_size");
+    Skip_B1(                                                    "buffer_model_type");
+    Get_B1 (colour_primaries,                                   "colour_primaries");
+    Get_B1 (transfer_characteristics,                           "transfer_characteristics");
+    Get_B1 (matrix_coefficients,                                "matrix_coefficients");
+    BS_Begin();
+    Get_SB (video_full_range_flag,                              "video_full_range_flag");
+    Skip_S1(7,                                                  "reserved");
+    Skip_SB(                                                    "still_mode");
+    Get_SB (mdm_flag,                                           "mdm_flag");
+    Skip_S1(6,                                                  "zero_bits");
+    BS_End();
+    if (mdm_flag)
+    {
+        Ztring MasteringDisplay_ColorPrimaries, MasteringDisplay_Luminance, MaxCLL, MaxFALL;
+        Get_MasteringDisplayColorVolume(MasteringDisplay_ColorPrimaries, MasteringDisplay_Luminance);
+        Get_LightLevel(MaxCLL, MaxFALL);
+
+        FILLING_BEGIN();
+            if (elementary_PID_IsValid)
+            {
+                Complete_Stream->Streams[elementary_PID]->Infos["MasteringDisplay_ColorPrimaries"]=MasteringDisplay_ColorPrimaries;
+                Complete_Stream->Streams[elementary_PID]->Infos["MasteringDisplay_Luminance"]=MasteringDisplay_Luminance;
+                Complete_Stream->Streams[elementary_PID]->Infos["MaxCLL"]= MaxCLL;
+                Complete_Stream->Streams[elementary_PID]->Infos["MaxFALL"]= MaxFALL;
+            }
+        FILLING_END();
+    }
+
+    FILLING_BEGIN();
+        if (elementary_PID_IsValid)
+        {
+            Complete_Stream->Streams[elementary_PID]->StreamKind_FromDescriptor=Stream_Video;
+            Complete_Stream->Streams[elementary_PID]->Infos["Format"]=__T("JPEG-XS");
+            Complete_Stream->Streams[elementary_PID]->Infos["Width"].From_Number(horizontal_size);
+            Complete_Stream->Streams[elementary_PID]->Infos["Height"].From_Number(vertical_size);
+            if (brat)
+                Complete_Stream->Streams[elementary_PID]->Infos["BitRate_Maximum"].From_Number(brat*1000000);
+            if (Framerate_Numerator && Framerate_Denominator && Framerate_Denominator<=2)
+            {
+                if (Framerate_Denominator==2)
+                {
+                    Framerate_Numerator*=1000;
+                    Framerate_Denominator=1001;
+                }
+                Complete_Stream->Streams[elementary_PID]->Infos["FrameRate_Num"].From_Number(Framerate_Numerator);
+                Complete_Stream->Streams[elementary_PID]->Infos["FrameRate_Den"].From_Number(Framerate_Denominator);
+            }
+            if (Interlace_Mode!=3)
+            {
+                Complete_Stream->Streams[elementary_PID]->Infos["ScanType"].From_UTF8(Interlace_Mode?"Interlaced":"Progressive");
+                if (Interlace_Mode)
+                    Complete_Stream->Streams[elementary_PID]->Infos["ScanType"].From_UTF8(Interlace_Mode==1?"TFF":"BFF");
+            }
+            if (schar_Valid_Flag)
+            {
+                Complete_Stream->Streams[elementary_PID]->Infos["BitDepth"].From_Number(Sample_Bitdepth+1);
+                if (Sampling_Structure<JpegXs_ColorSpace_Size)
+                {
+                    Complete_Stream->Streams[elementary_PID]->Infos["ColorSpace"].From_UTF8(JpegXs_ColorSpace[Sampling_Structure]);
+                    if (JpegXs_ChromaSubsampling[Sampling_Structure])
+                        Complete_Stream->Streams[elementary_PID]->Infos["ChromaSubsampling"].From_UTF8(JpegXs_ChromaSubsampling[Sampling_Structure]);
+                }
+            }
+            string Profile=JpegXs_Ppih(Ppih);
+            if (!Profile.empty())
+            {
+                string Level=JpegXs_Plev(Plev, Profile.find("Bayer")!=string::npos);
+                if (!Level.empty())
+                {
+                    Profile+='@';
+                    Profile+=Level;
+                }
+                Complete_Stream->Streams[elementary_PID]->Infos["Format_Profile"].From_UTF8(Profile.c_str());
+            }
+            if (max_buffer_size)
+                Complete_Stream->Streams[elementary_PID]->Infos["BufferSize"].From_Number(max_buffer_size*1000000);
+            Complete_Stream->Streams[elementary_PID]->Infos["colour_description_present"]=__T("Yes");
+            Complete_Stream->Streams[elementary_PID]->Infos["colour_primaries"].From_UTF8(Mpegv_colour_primaries((int8u)colour_primaries));
+            Complete_Stream->Streams[elementary_PID]->Infos["transfer_characteristics"].From_UTF8(Mpegv_transfer_characteristics((int8u)transfer_characteristics));
+            Complete_Stream->Streams[elementary_PID]->Infos["matrix_coefficients"].From_UTF8(Mpegv_matrix_coefficients((int8u)matrix_coefficients));
+            //if (matrix_coefficients!=2)
+            //    Complete_Stream->Streams[elementary_PID]->Infos["ColorSpace"].From_UTF8(Mpegv_matrix_coefficients_ColorSpace((int8u)matrix_coefficients));
+            Complete_Stream->Streams[elementary_PID]->Infos["colour_range"].From_UTF8(video_full_range_flag?"Full":"Limited");
         }
     FILLING_END();
 }

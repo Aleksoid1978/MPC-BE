@@ -193,6 +193,7 @@ enum general
     General_Audio_Format_WithHint_List,
     General_Audio_Codec_List,
     General_Audio_Language_List,
+    General_Audio_Channels_Total,
     General_Text_Format_List,
     General_Text_Format_WithHint_List,
     General_Text_Codec_List,

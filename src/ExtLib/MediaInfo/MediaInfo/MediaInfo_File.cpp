@@ -297,6 +297,9 @@
 #if defined(MEDIAINFO_EIA608_YES)
     #include "MediaInfo/Text/File_Eia608.h"
 #endif
+#if defined(MEDIAINFO_CDP_YES)
+    #include "MediaInfo/Text/File_Cdp.h"
+#endif
 #if defined(MEDIAINFO_N19_YES)
     #include "MediaInfo/Text/File_N19.h"
 #endif
@@ -693,6 +696,9 @@ bool MediaInfo_Internal::SelectFromExtension (const String &Parser)
     #if defined(MEDIAINFO_EIA608_YES)
         else if (Parser==__T("CEA-608"))     Info=new File_Eia608();
         else if (Parser==__T("EIA-608"))     Info=new File_Eia608();
+    #endif
+    #if defined(MEDIAINFO_CDP_YES)
+        else if (Parser==__T("CDP"))         Info=new File_Cdp();
     #endif
     #if defined(MEDIAINFO_N19_YES)
         else if (Parser==__T("N19"))         Info=new File_N19();

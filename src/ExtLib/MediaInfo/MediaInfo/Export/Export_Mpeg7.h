@@ -28,8 +28,14 @@ public :
     ~Export_Mpeg7 ();
 
     //Input
-    //Version: 0=strict, 1=relaxed (strict best effort), 2=extended
-    Ztring Transform(MediaInfo_Internal &MI, size_t Version=1);
+    enum version
+    {
+        Version_Strict,
+        Version_BestEffort_Strict,
+        Version_BestEffort_Extended,
+        Version_Extended,
+    };
+    Ztring Transform(MediaInfo_Internal &MI, size_t Version=Version_BestEffort_Strict);
 };
 
 } //NameSpace

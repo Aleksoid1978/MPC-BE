@@ -55,6 +55,28 @@ public :
     void   hcod_sf(const char* Name);
     int32u arith_decode(int16u& low, int16u& high, int16u& value, const int16u* cf, int32u cfl, size_t* TooMuch);
     int16u sbr_huff_dec(const int8s(*Table)[2], const char* Name);
+    int16s huff_dec_1D(const int16s (*Table)[2], const char* Name);
+    bool   huff_dec_2D(const int16s (*Table)[2], int8s (&aTmp)[2], const char* Name);
+    enum ec_data_type
+    {
+        CLD,
+        ICC,
+        IPD
+    };
+    enum frame_class
+    {
+        FIXFIX,
+        FIXVAR,
+        VARFIX,
+        VARVAR
+    };
+    enum sequence_type
+    {
+        ONLY_LONG_SEQUENCE,
+        LONG_START_SEQUENCE,
+        EIGHT_SHORT_SEQUENCE,
+        LONG_STOP_SEQUENCE
+    };
 
     #if MEDIAINFO_CONFORMANCE
     enum conformance_level
@@ -69,14 +91,19 @@ public :
         string Field;
         string Value;
         bitset8 Flags;
-        vector<int64u> FramePoss;
+        struct frame_pos
+        {
+            int64u Main;
+            int64u Sub;
+        };
+        vector<frame_pos> FramePoss;
 
-        field_value(string&& Field, string&& Value, bitset8 Flags, int64u FramePos)
+        field_value(string&& Field, string&& Value, bitset8 Flags, int64u FramePos, int64u SubFramePos)
             : Field(Field)
             , Value(Value)
             , Flags(Flags)
         {
-            FramePoss.push_back(FramePos);
+            FramePoss.push_back({FramePos, SubFramePos});
         }
 
         friend bool operator==(const field_value& l, const field_value& r)
@@ -90,6 +117,7 @@ public :
     struct bs_bookmark
     {
         int64u                      Element_Offset;
+        int64u                      Element_Size;
         size_t                      Trusted;
         size_t                      NewSize;
         size_t                      End;
@@ -144,7 +172,7 @@ public :
     void UsacChannelPairElement             (bool usacIndependencyFlag);
     void twData                             ();
     void icsInfo                            ();
-    void scaleFactorData                    ();
+    void scaleFactorData                    (size_t ch);
     void arithData                          (size_t ch, int16u N, int16u lg, int16u lg_max, bool arith_reset_flag);
     void acSpectralData                     (size_t ch, bool usacIndependencyFlag);
     void tnsData                            ();
@@ -152,7 +180,36 @@ public :
     void cplxPredData                       (int8u max_sfb_ste, bool usacIndependencyFlag);
     void StereoCoreToolInfo                 (bool& tns_data_present0, bool& tns_data_present1, bool core_mode0, bool core_mode1, bool usacIndependencyFlag);
     void UsacCoreCoderData                  (size_t nrChannels, bool usacIndependencyFlag);
-    void UsacLfeElement                     ();
+    void sbrInfo                            ();
+    void sbrHeader                          ();
+    void sbrGrid                            (size_t chan);
+    void sbrDtdf                            (size_t chan, bool usacIndependencyFlag);
+    void sbrInvf                            (size_t chan);
+    void pvcEnvelope                        (bool usacIndependencyFlag);
+    void sbrEnvelope                        (bool ch, bool bs_coupling);
+    void sbrNoise                           (bool ch, bool bs_coupling);
+    void sbrSinusoidalCoding                (bool ch, int8u bs_pvc_mode);
+    void sbrSingleChannelElement            (bool usacIndependencyFlag);
+    void sbrChannelPairElement              (bool usacIndependencyFlag);
+    void sbrData                            (size_t nrSbrChannels, bool usacIndependencyFlag);
+    void UsacSbrData                        (size_t nrSbrChannels, bool usacIndependencyFlag);
+    void FramingInfo                        ();
+    void EcData                             (ec_data_type dataType, int8u paramIdx, int8u startBand, int8u stopBand, bool usacIndependencyFlag);
+    void GroupedPcmData                     (ec_data_type dataType, bool pairFlag, int8u numQuantSteps, int8u dataBands);
+    void HuffData1D                         (ec_data_type dataType, int8u diffType, int8u dataBands);
+    void HuffData2DFreqPair                 (ec_data_type dataType, int8u diffType, int8u dataBands);
+    void HuffData2DTimePair                 (ec_data_type dataType, int8u* aDiffType, int8u dataBands);
+    void DiffHuffData                       (ec_data_type dataType, bool bsDataPairXXX, bool allowDiffTimeBackFlag, int8u dataBands);
+    void LsbData                            (ec_data_type dataType, bool bsQuantCoarseXXX, int8u dataBands);
+    void EcDataPair                         (ec_data_type dataType, int8u paramIdx, int8u setIdx, int8u dataBands, bool bsDataPairXXX, bool bsQuantCoarseXXX, bool usacIndependencyFlag);
+    void SymmetryData                       (ec_data_type dataType, int8s (&aTmp)[2], int8u lav);
+    void EnvelopeReshapeHuff                (bool (&bsTempShapeEnableChannel)[2]);
+    void TempShapeData                      (bool& bsTsdEnable);
+    void SmgData                            ();
+    void TsdData                            ();
+    void OttData                            (bool usacIndependencyFlag);
+    void Mps212Data                         (bool usacIndependencyFlag);
+    void UsacLfeElement                     (bool usacIndependencyFlag);
     void UsacExtElement                     (size_t elemIdx, bool usacIndependencyFlag);
     void AudioPreRoll                       ();
     #endif //MEDIAINFO_TRACE || MEDIAINFO_CONFORMANCE
@@ -198,6 +255,7 @@ public :
     const size_t*                   FirstOutputtedDecodedSample;
     const std::vector<sgpd_prol_struct>* roll_distance_Values;
     const std::vector<sbgp_struct>* roll_distance_FramePos;
+    const bool*                     roll_distance_FramePos_IsPresent;
     bool CheckIf(const bitset8 Flags) { return !Flags || (ConformanceFlags & Flags); }
     void SetProfileLevel(int8u AudioProfileLevelIndication);
     void Fill_Conformance(const char* Field, const char* Value, bitset8 Flags={}, conformance_level Level=Error);
@@ -319,6 +377,20 @@ public :
         int8u  dflt_noise_bands;
     };
 
+    struct mps212_handler
+    {
+        //Mps212Config
+        bool  bsHighRatelMode;
+        bool  bsPhaseCoding;
+        int8u bsOttBandsPhase;
+        int8u bsTempShapeConfig;
+        //FramingInfo
+        int8u numParamSets;
+        //Computed
+        int8u numSlots;
+        int8u numBands;
+    };
+
     typedef std::vector<gain_set> gain_sets;
     struct usac_config
     {
@@ -334,7 +406,7 @@ public :
         #endif
         int32u                      numOutChannels;
         int32u                      sampling_frequency;
-        int8u                       channelConfiguration;
+        int8u                       channelConfigurationIndex;
         int8u                       sampling_frequency_index;
         int8u                       coreSbrFrameLengthIndex;
         int8u                       baseChannelCount;
@@ -343,7 +415,7 @@ public :
         int8u                       drcRequired_Present;
         bool                        LoudnessInfoIsNotValid;
         #endif
-        bool                        IsNotValid;
+        bool                        WaitForNextIndependantFrame;
         bool                        harmonicSBR;
         bool                        bs_interTes;
         bool                        bs_pvc;
@@ -354,7 +426,8 @@ public :
         arith_context               arithContext[2];
         sbr_handler                 sbrHandler;
         usac_dlft_handler           dlftHandler;
-   
+        mps212_handler              mps212Handler;
+
         void Reset(bool V0=false, bool V1=false)
         {
             #if MEDIAINFO_CONFORMANCE
@@ -368,7 +441,6 @@ public :
     struct usac_frame
     {
         int32u                      numPreRollFrames;
-        bool                        NotImplemented;
     };
     usac_config                     Conf; //Main conf
     usac_config                     C; //Current conf

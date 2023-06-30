@@ -33,19 +33,19 @@ namespace MediaInfoLib
 const char* AfdBarData_active_format[]=
 {
     //1st value is for 4:3, 2nd is for 16:9
-    "", //Undefined
-    "Reserved",
+    nullptr, //Undefined
+    nullptr,
     "Not recommended",
     "Not recommended",
     "Aspect ratio greater than 16:9", //Use GA94
-    "Reserved",
-    "Reserved",
-    "Reserved",
+    nullptr,
+    nullptr,
+    nullptr,
     "4:3 full frame image / 16:9 full frame image",
     "4:3 full frame image / 4:3 pillarbox image",
     "16:9 letterbox image / 16:9 full frame image",
     "14:9 letterbox image / 14:9 pillarbox image",
-    "Reserved",
+    nullptr,
     "4:3 full frame image, alternative 14:9 center / 4:3 pillarbox image, alternative 14:9 center",
     "16:9 letterbox image, alternative 14:9 center / 16:9 full frame image, alternative 14:9 center",
     "16:9 letterbox image, alternative 4:3 center / 16:9 full frame image, alternative 4:3 center",
@@ -54,19 +54,19 @@ const char* AfdBarData_active_format[]=
 //---------------------------------------------------------------------------
 const char* AfdBarData_active_format_4_3[]=
 {
-    "", //Undefined
-    "Reserved",
+    nullptr, //Undefined
+    nullptr,
     "Letterbox 16:9 image (top)",
     "Letterbox 14:9 image (top)",
     "Letterbox image with an aspect ratio greater than 16:9",
-    "Reserved",
-    "Reserved",
-    "Reserved",
+    nullptr,
+    nullptr,
+    nullptr,
     "Full frame 4:3 image",
     "Full frame 4:3 image",
     "Letterbox 16:9 image",
     "Letterbox 14:9 image",
-    "Reserved",
+    nullptr,
     "Full frame 4:3 image, with alternative 14:9 center",
     "Letterbox 16:9 image, with alternative 14:9 center",
     "Letterbox 16:9 image, with alternative 4:3 center",
@@ -75,19 +75,19 @@ const char* AfdBarData_active_format_4_3[]=
 //---------------------------------------------------------------------------
 const char* AfdBarData_active_format_16_9[]=
 {
-    "", //Undefined
-    "Reserved",
+    nullptr, //Undefined
+    nullptr,
     "Letterbox 16:9 image (top)",
     "Pillarbox 14:9 image (top)",
     "Letterbox image with an aspect ratio greater than 16:9",
-    "Reserved",
-    "Reserved",
-    "Reserved",
+    nullptr,
+    nullptr,
+    nullptr,
     "Full frame 16:9 image",
     "Pillarbox 4:3 image",
     "Letterbox 16:9 image",
     "Pillarbox 14:9 image",
-    "Reserved",
+    nullptr,
     "Full frame 4:3 image, with alternative 14:9 center",
     "Letterbox 16:9 image, with alternative 14:9 center",
     "Letterbox 16:9 image, with alternative 4:3 center",
@@ -151,14 +151,15 @@ void File_AfdBarData::Streams_Fill()
 {
     //Filling
     Stream_Prepare(Stream_Video);
-    if (active_format!=(int8u)-1)
+    if (Stream.active_format!=(int8u)-1)
     {
         Fill(Stream_Video, 0, Video_ActiveFormatDescription, Stream.active_format);
-        if (aspect_ratio==(int8u)-1)
-            aspect_ratio=aspect_ratio_FromContainer;
-        if (aspect_ratio!=(int8u)-1)
+        if (Stream.aspect_ratio==(int8u)-1)
+            Stream.aspect_ratio=aspect_ratio_FromContainer;
+        if (Stream.aspect_ratio!=(int8u)-1)
         {
-            Fill(Stream_Video, 0, Video_ActiveFormatDescription_String, Stream.aspect_ratio?AfdBarData_active_format_16_9[Stream.active_format]:AfdBarData_active_format_4_3[Stream.active_format]);
+            if (Stream.active_format && AfdBarData_active_format_16_9[Stream.active_format])
+                Fill(Stream_Video, 0, Video_ActiveFormatDescription_String, Stream.aspect_ratio?AfdBarData_active_format_16_9[Stream.active_format]:AfdBarData_active_format_4_3[Stream.active_format]);
             switch (Format)
             {
                 case Format_A53_4_DTG1    : Fill(Stream_Video, 0, Video_ActiveFormatDescription_MuxingMode, "A/53"); break;

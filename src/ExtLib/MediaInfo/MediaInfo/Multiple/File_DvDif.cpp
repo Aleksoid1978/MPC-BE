@@ -513,8 +513,11 @@ void File_DvDif::Streams_Fill()
     //Delay
     TimeCode_FirstFrame.SetFramesMax(system?24:29);
     if (FrameRate_Multiplicator>=2)
-        TimeCode_FirstFrame.SetMustUseSecondField();
-    if (TimeCode_FirstFrame.HasValue())
+    {
+        TimeCode_FirstFrame.SetFrames(TimeCode_FirstFrame.GetFrames()*2);
+        TimeCode_FirstFrame.SetFramesMax(TimeCode_FirstFrame.GetFramesMax()*2+1);
+    }
+    if (TimeCode_FirstFrame.IsSet())
     {
         string TimeCode_FirstFrame_String=TimeCode_FirstFrame.ToString();
         int64u TimeCode_FirstFrame_ms=TimeCode_FirstFrame.ToMilliseconds();
@@ -1429,12 +1432,10 @@ void File_DvDif::timecode()
                              MM,
                              SS,
                              (DSF_IsValid && FF!=45)?FF:0, //if all bits are set to 1, this is not a valid frame number
-                             0, //Unknown
-                             DropFrame,
-                             false, //Unknown
-                             false);
+                             -1, //Unknown
+                             TimeCode::DropFrame(DropFrame));
             Element_Info1(TC.ToString());
-            if (!TimeCode_FirstFrame.HasValue())
+            if (!TimeCode_FirstFrame.IsSet())
                 TimeCode_FirstFrame=TC;
         }
 

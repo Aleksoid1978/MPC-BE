@@ -257,11 +257,12 @@ private :
     void Segment_Tracks_TrackEntry_TrickTrackFlag(){UInteger_Info();};
     void Segment_Tracks_TrackEntry_TrickMasterTrackUID(){UInteger_Info();};
     void Segment_Tracks_TrackEntry_TrickMasterTrackSegmentUID(){UInteger_Info();};
-    void Segment_Tracks_TrackEntry_BlockAdditionMapping(){};
+    void Segment_Tracks_TrackEntry_BlockAdditionMapping();
+    void Segment_Tracks_TrackEntry_BlockAdditionMapping_Manage();
     void Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDName(){UTF8_Info();};
     void Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDType();
     void Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDExtraData();
-    void Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDValue(){UInteger_Info();};
+    void Segment_Tracks_TrackEntry_BlockAdditionMapping_BlockAddIDValue();
     void Segment_Tracks_TrackEntry_ContentEncodings(){};
     void Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding(){};
     void Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncodingOrder(){UInteger_Info();};
@@ -391,6 +392,7 @@ private :
         int64u                  PixelCropRight;
         int64u                  PixelCropTop;
         mastering_metadata_2086      MasteringMetadata;
+        std::map<int64u, File__Analyze*> BlockAdditions;
         #if MEDIAINFO_TRACE
             size_t Trace_Segment_Cluster_Block_Count;
         #endif // MEDIAINFO_TRACE
@@ -429,6 +431,8 @@ private :
         {
             delete Parser; //Parser=NULL;
             delete[] ContentCompSettings_Buffer; //ContentCompSettings_Buffer=NULL;
+            for (auto BlockAddition : BlockAdditions)
+                delete BlockAddition.second;
         }
     };
     std::map<int64u, stream> Stream;
@@ -460,7 +464,8 @@ private :
     int64u   AudioBitDepth;
 
     //Temp - BlockAddition
-    int64u   BlockAddID;
+    int64u  BlockAddIDType;
+    int64u  BlockAddIDValue;
 
     //Temp
     int8u   InvalidByteMax;
@@ -484,7 +489,6 @@ private :
     string  AttachedFile_FileName;
     string  AttachedFile_FileMimeType;
     string  AttachedFile_FileDescription;
-    int64u  BlockAddIDType;
     struct crc32
     {
         int64u  Pos;

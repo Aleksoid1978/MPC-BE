@@ -227,12 +227,11 @@ void File_Aptx100::FileHeader_Parse()
         IsNok=true;
     if (End_FF>99 || End_SS>59 || End_MM>59 || End_HH>23)
         IsNok=true;
-    auto Start=TimeCode(Start_HH, Start_MM, Start_SS, Start_FF, 99, false);
-    Start.SetIsTime();
-    auto End=TimeCode(End_HH, End_MM, End_SS, End_FF, 99, false);
+    auto Start=TimeCode(Start_HH, Start_MM, Start_SS, Start_FF, 99, TimeCode::Timed());
+    auto End=TimeCode(End_HH, End_MM, End_SS, End_FF, 99, TimeCode::Timed());
     auto Start_ms=Start.ToMilliseconds();
     auto End_ms=End.ToMilliseconds();
-    if (Start_ms>=End_ms)
+    if (!Start.IsSet() || !End.IsSet() || Start_ms>=End_ms)
         IsNok=true;
     if (IsNok)
     {
@@ -240,8 +239,7 @@ void File_Aptx100::FileHeader_Parse()
         return;
     }
     End--;
-    End.SetIsTime();
-    auto Duration_ms=End_ms-Start_ms;
+    int64s Duration_ms=End_ms-Start_ms;
 
 
     //Filling

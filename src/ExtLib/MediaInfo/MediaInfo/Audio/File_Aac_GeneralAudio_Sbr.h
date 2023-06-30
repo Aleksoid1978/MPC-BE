@@ -13,9 +13,15 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
+enum sbr_ratio
+{
+    DUAL,
+    QUAD,
+};
 struct sbr_handler
 {
     //sbr_header
+    bool   present=false;
     int8u  bs_amp_res[2];
     int8u  bs_pvc_mode; //For USAC parsing
     int8u  bs_amp_res_FromHeader;
@@ -33,10 +39,11 @@ struct sbr_handler
     int8u   bs_num_noise[2];
 
     //sbr_dtdf
-    int8u   bs_df_env[2][4];
+    int8u   bs_df_env[2][8];
     int8u   bs_df_noise[2][2];
 
     //Computed values
+    sbr_ratio ratio=DUAL;
     int8u  num_noise_bands;
     int8u  num_env_bands[2];
 };
@@ -67,20 +74,14 @@ extern const int8s t_huffman_noise_bal_3_0dB[][2];
 //---------------------------------------------------------------------------
 // Master frequency band table
 // k0 = lower frequency boundary
-extern const int8s Aac_k0_offset_16[];
-extern const int8s Aac_k0_offset_22[];
-extern const int8s Aac_k0_offset_24[];
-extern const int8s Aac_k0_offset_32[];
-extern const int8s Aac_k0_offset_64[];
-extern const int8s Aac_k0_offset_96[];
-extern const int8s* Aac_k0_offset[];
 extern const int8u Aac_k0_startMin[];
+extern const int8s Aac_k0_offset[][2][16];
 
 //---------------------------------------------------------------------------
 // Master frequency band table
 // k2 = upper frequency boundary
 extern const int8u Aac_k2_stopMin[];
-extern const int8s Aac_k2_offset[][14];
+extern const int8s Aac_k2_offset[][2][14];
 
 } //NameSpace
 

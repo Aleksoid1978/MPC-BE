@@ -3114,16 +3114,16 @@ void File_Aac::program_config_element()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void File_Aac::payload()
+void File_Aac::payload(size_t BitsNotIncluded)
 {
     //Parsing
     switch (audioObjectType)
     {
         case   2: raw_data_block(); break;
         #if MEDIAINFO_TRACE || MEDIAINFO_CONFORMANCE
-        case  42: UsacFrame(); break;
+        case  42: UsacFrame(BitsNotIncluded); break;
         #endif //MEDIAINFO_TRACE || MEDIAINFO_CONFORMANCE
-        default: Skip_BS(Data_BS_Remain(),                      "payload");
+        default: Skip_BS(Data_BS_Remain()-BitsNotIncluded,      "payload");
     }
 }
 

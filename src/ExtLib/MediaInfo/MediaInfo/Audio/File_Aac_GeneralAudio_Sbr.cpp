@@ -683,65 +683,53 @@ const int8s t_huffman_noise_bal_3_0dB[24][2]=
 //---------------------------------------------------------------------------
 // Master frequency band table
 // k0 = lower frequency boundary
-const int8s Aac_k0_offset_16[16]=
+const int8s Aac_k0_offset[][2][16]=
 {
-     -8, -7, -6, -5, -4, -3, -2, -1,  0,  1,  2,  3,  4,  5,  6,  7,
-};
-const int8s Aac_k0_offset_22[16]=
-{
-     -5, -4, -3, -2, -1,  0,  1,  2,  3,  4,  5,  6,  7,  9, 11, 13,
-};
-const int8s Aac_k0_offset_24[16]=
-{
-     -5, -3, -2, -1,  0,  1,  2,  3,  4,  5,  6,  7,  9, 11, 13, 16,
-};
-const int8s Aac_k0_offset_32[16]=
-{
-     -6, -4, -2, -1,  0,  1,  2,  3,  4,  5,  6,  7,  9, 11, 13, 16,
-};
-const int8s Aac_k0_offset_64[16]=
-{
-     -4, -2, -1,  0,  1,  2,  3,  4,  5,  6,  7,  9, 11, 13, 16, 20,
-};
-const int8s Aac_k0_offset_96[16]=
-{
-     -2, -1,  0,  1,  2,  3,  4,  5,  6,  7,  9, 11, 13, 16, 20, 24,
-};
-const int8s* Aac_k0_offset[9]=
-{
-    Aac_k0_offset_96,       //96000
-    Aac_k0_offset_96,       //88200
-    Aac_k0_offset_64,       //64000
-    Aac_k0_offset_64,       //48000
-    Aac_k0_offset_64,       //44100
-    Aac_k0_offset_32,       //32000
-    Aac_k0_offset_24,       //24000
-    Aac_k0_offset_22,       //22050
-    Aac_k0_offset_16,       //16000
-};
-const int8u Aac_k0_startMin[9]=
-{
-     7,  7, 10, 11, 12, 16, 16, 17, 24, //32, 35, 48,  0,  0,  0,  0,
-};
+    { //96000
+        { -2, -1,  0,  1,  2, 3, 4, 5, 6, 7, 9, 11, 13, 16, 20, 24, },
+        { -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 6,  8, 10, 13, 17, 21, },
+    },
+    { //88200
+        { -2, -1,  0,  1,  2, 3, 4, 5, 6, 7, 9, 11, 13, 16, 20, 24, },
+        { -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 6,  8, 10, 13, 17, 21, },
+    },
+    { //64000
+        { -4, -2, -1,  0,  1,  2,  3,  4,  5, 6, 7, 9, 11, 13, 16, 20, },
+        { -9, -7, -6, -5, -4, -3, -2, -1, -0, 1, 2, 4,  6,  8, 11, 15, },
+    },
+    { //48000
+        {  -4, -2, -1,  0,  1,  2,  3,  4,  5, 6, 7, 9, 11, 13, 16, 20, },
+        { -10, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 3,  5,  7, 10, 14, },
+    },
+    { //44100
+        {  -4, -2, -1,  0,  1,  2,  3,  4,  5, 6, 7, 9, 11, 13, 16, 20, },
+        { -10, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 3,  5,  7, 10, 14, },
+    },
+    { //32000
+        {  -6,  -4,  -2, -1,   0,  1,  2,  3,  4,  5,  6,  7, 9, 11, 13, 16, },
+        { -14, -12, -10, -9,  -8, -7, -6, -5, -4, -3, -2, -1, 1,  3,  5,  8, },
+    },
+    { //24000
+        {  -5,  -3,  -2, -1,   0,  1,  2,  3,  4,  5,  6,  7, 9, 11, 13, 16, },
+        { -13, -11, -10, -9,  -8, -7, -6, -5, -4, -3, -2, -1, 1,  3,  5,  8, },
+    },
+    { //22050
+        {  -5,  -4,  -3, -2, -1,  0,  1,  2,  3,  4,  5,  6, 7, 9, 11, 13, },
+        { -13, -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 1, 3, 5, },
+    },
+    { //16000
+        {  -8,  -7,  -6,  -5,  -4,  -3,  -2,  -1,   0,   1,   2,  3,  4,  5,  6,  7, },
+        { -20, -19, -18, -17, -16, -15, -14, -13, -12, -11, -10, -9, -8, -7, -6, -5, },
+    },
+    { //40000
+        { -20, -19, -18, -17, -16, -15, -14, -13, -12, -11, -10,  -8,  -6,  -4, -2,  0, },
+        { -27, -26, -25, -24, -23, -22, -21, -20, -19, -18, -17, -15, -13, -11, -9, -7, },
+    },
 
-//---------------------------------------------------------------------------
-// Master frequency band table
-// k2 = upper frequency boundary
-const int8u Aac_k2_stopMin[9]=
-{
-    13, 15, 20, 21, 23, 32, 32, 35, 48, //64, 70, 96,  0,  0,  0,  0,
 };
-const int8s Aac_k2_offset[9][14]=
+const int8u Aac_k0_startMin[10]=
 {
-    { 0,  2,  4,  6,  8, 11, 14, 18, 22, 26, 31, 37, 44, 51 },
-    { 0,  2,  4,  6,  8, 11, 14, 18, 22, 26, 31, 36, 42, 49 },
-    { 0,  2,  4,  6,  8, 11, 14, 17, 21, 25, 29, 34, 39, 44 },
-    { 0,  2,  4,  6,  8, 11, 14, 17, 20, 24, 28, 33, 38, 43 },
-    { 0,  2,  4,  6,  8, 11, 14, 17, 20, 24, 28, 32, 36, 41 },
-    { 0,  2,  4,  6,  8, 10, 12, 14, 17, 20, 23, 26, 29, 32 },
-    { 0,  2,  4,  6,  8, 10, 12, 14, 17, 20, 23, 26, 29, 32 },
-    { 0,  1,  3,  5,  7,  9, 11, 13, 15, 17, 20, 23, 26, 29 },
-    { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 12, 14, 16 },
+     7,  7, 10, 11, 12, 16, 16, 17, 24, 32,// 35, 48,  0,  0,  0,  0,
 };
 
 //***************************************************************************
@@ -752,20 +740,20 @@ const int8s Aac_k2_offset[9][14]=
 extern const char* Aac_audioObjectType(int8u audioObjectType);
 
 //---------------------------------------------------------------------------
-int8u Aac_AudioSpecificConfig_sampling_frequency_index(const int64s sampling_frequency);
+int8u Aac_AudioSpecificConfig_sampling_frequency_index(const int64s sampling_frequency, bool usac=false);
 
 //---------------------------------------------------------------------------
 // Master frequency band table
 // k0 = lower frequency boundary
-int8u Aac_k0_Compute(int8u bs_start_freq, int8u extension_sampling_frequency_index)
+int8u Aac_k0_Compute(int8u bs_start_freq, int8u extension_sampling_frequency_index, sbr_ratio ratio)
 {
-    return Aac_k0_startMin[extension_sampling_frequency_index]+Aac_k0_offset[extension_sampling_frequency_index][bs_start_freq];
+    return Aac_k0_startMin[extension_sampling_frequency_index]+Aac_k0_offset[extension_sampling_frequency_index][(int)ratio][bs_start_freq];
 }
 
 //---------------------------------------------------------------------------
 // Master frequency band table
 // k2 = upper frequency boundary
-int8u Aac_k2_Compute(int8u bs_stop_freq, int8u extension_sampling_frequency_index, int8u  k0)
+int8u Aac_k2_Compute(int8u bs_stop_freq, int64s sampling_frequency, int8u k0, sbr_ratio ratio)
 {
     switch (bs_stop_freq)
     {
@@ -774,18 +762,46 @@ int8u Aac_k2_Compute(int8u bs_stop_freq, int8u extension_sampling_frequency_inde
         default : ;
     }
 
-    return (int8u)min(64, Aac_k2_stopMin[extension_sampling_frequency_index]+Aac_k2_offset[extension_sampling_frequency_index][bs_stop_freq]);
+    int stopMin;
+    if (sampling_frequency<32000)
+        stopMin=(((2*6000*(ratio==DUAL?128:64))/sampling_frequency)+1)>>1;
+    else if (sampling_frequency<64000)
+        stopMin=(((2*8000*(ratio==DUAL?128:64))/sampling_frequency)+1)>>1;
+    else
+        stopMin=(((2*10000*(ratio==DUAL?128:64))/sampling_frequency)+1)>>1;
+
+    stopMin=min(stopMin, 64);
+
+    int8u Diff0[13];
+    int8u Diff1[14];
+    float Power=pow((float)64/(float)stopMin, (float)1/(float)13);
+    float Power2=(float)stopMin;
+    int8s Temp1=(int8s)(Power2+0.5);
+    for (int8u k=0; k<13; k++)
+    {
+        int8s Temp0=Temp1;
+        Power2*=Power;
+        Temp1=(int8s)(Power2+0.5);
+        Diff0[k]=Temp1-Temp0;
+    }
+    sort(Diff0, Diff0+13);
+
+    Diff1[0]=stopMin;
+    for (int8u Pos=1; Pos<14; Pos++)
+        Diff1[Pos]=Diff1[Pos-1]+Diff0[Pos-1];
+
+    return (int8u)min((int8u)64, Diff1[bs_stop_freq]);
 }
 
 //---------------------------------------------------------------------------
 //Helper
-int8u Aac_bands_Compute(bool warp, int8u bands, int8u a0, int8u a1)
+int8u Aac_bands_Compute(bool warp, int8u bands, int8u a0, int8u a1, float quad=1.0)
 {
     float div=(float)log(2.0);
     if (warp)
         div*=(float)1.3;
 
-    return (int8u)(bands*log((float)a1/(float)a0)/div+0.5);
+    return (int8u)((bands*log((float)a1/(float)a0)/div+0.5)/quad);
 }
 
 //---------------------------------------------------------------------------
@@ -850,12 +866,19 @@ bool Aac_f_master_Compute_0(int8u &num_env_bands_Master, int8u* f_Master, sbr_ha
 // Computing for bs_freq_scale != 0
 int int8u_cmp(const void *a, const void *b)
 {
-    return ((int8u)(*(int8u*)a - *(int8u*)b));
+    return *(int8u*)a - *(int8u*)b;
 }
 bool Aac_f_master_Compute(int8u &num_env_bands_Master, int8u* f_Master, sbr_handler *sbr, int8u  k0, int8u  k2)
 {
     int8u temp1[]={6, 5, 4 };
     int8u bands=temp1[sbr->bs_freq_scale-1];
+    if (sbr->ratio==QUAD && k0<bands)
+        bands=floor((float)k0/2);
+    float divisor;
+    if (sbr->ratio==QUAD && k0<bands*2)
+        divisor=1.2;
+    else
+        divisor=1.0;
 
     int8u twoRegions, k1;
     if ((float)k2/(float)k0>2.2449)
@@ -869,7 +892,7 @@ bool Aac_f_master_Compute(int8u &num_env_bands_Master, int8u* f_Master, sbr_hand
         k1=k2;
     }
 
-    int8u numBands0=2*Aac_bands_Compute(false, bands, k0, k1);
+    int8u numBands0=2*Aac_bands_Compute(false, bands, k0, k1, divisor);
     if (numBands0 == 0 || numBands0 >= 64)
         return false;
 
@@ -906,7 +929,7 @@ bool Aac_f_master_Compute(int8u &num_env_bands_Master, int8u* f_Master, sbr_hand
     int8u numBands1;
     int8u vDk1[64] = { 0 };
     int8u vk1[64];
-    numBands1=2*Aac_bands_Compute(true, bands, k1, k2);
+    numBands1=2*Aac_bands_Compute(sbr->bs_alter_scale, bands, k1, k2, divisor);
     if (numBands1 == 0 || numBands0 + numBands1 >= 64)
         return false;
 
@@ -923,7 +946,7 @@ bool Aac_f_master_Compute(int8u &num_env_bands_Master, int8u* f_Master, sbr_hand
 
     if (vDk1[0]<vDk0[numBands0-1])
     {
-        qsort(vDk1, numBands1+1, sizeof(int8u), int8u_cmp);
+        qsort(vDk1, numBands1, sizeof(int8u), int8u_cmp);
         int8u change=vDk0[numBands0-1]-vDk1[0];
         vDk1[0]=vDk0[numBands0-1];
         vDk1[numBands1 - 1] = vDk1[numBands1 - 1] - change;
@@ -962,33 +985,44 @@ bool Aac_bands_Compute(const int8u &num_env_bands_Master, int8u* f_Master, sbr_h
     else
     {
         sbr->num_noise_bands=Aac_bands_Compute(false, sbr->bs_noise_bands, f_Master[sbr->bs_xover_band], k2);
-        if (sbr->num_noise_bands<1 || sbr->num_noise_bands>5)
+        if (sbr->num_noise_bands>5)
             return false;
+        if (!sbr->num_noise_bands)
+            sbr->num_noise_bands++; //Never 0
     }
 
     return true;
 }
 
 //---------------------------------------------------------------------------
-bool Aac_Sbr_Compute(sbr_handler *sbr, int8u extension_sampling_frequency_index)
+bool Aac_Sbr_Compute(sbr_handler *sbr, const int64s sampling_frequency, bool usac)
 {
-    if (extension_sampling_frequency_index>=9)
-        return 0; //Not supported
-    int8u k0=Aac_k0_Compute(sbr->bs_start_freq, extension_sampling_frequency_index);
-    int8u k2=Aac_k2_Compute(sbr->bs_stop_freq, extension_sampling_frequency_index, k0);
-    if (k2<=k0) return false;
-    switch (extension_sampling_frequency_index)
+    int8u extension_sampling_frequency_index=Aac_AudioSpecificConfig_sampling_frequency_index((int32u)sampling_frequency, usac);
+    if (extension_sampling_frequency_index==17)
+        extension_sampling_frequency_index=9; // arrays have 40000 Hz item right after 16000 Hz item
+    else if (extension_sampling_frequency_index>9)
+        return false; //Not supported
+
+    int8u k0=Aac_k0_Compute(sbr->bs_start_freq, extension_sampling_frequency_index, sbr->ratio);
+    int8u k2=Aac_k2_Compute(sbr->bs_stop_freq, sampling_frequency, k0, sbr->ratio);
+    if (k2<=k0)
+        return false;
+    if (sbr->ratio==QUAD)
     {
-        case  0 :
-        case  1 :
-        case  2 :
-        case  3 : if ((k2-k0)>32) return false; break;
-        case  4 : if ((k2-k0)>35) return false; break;
-        case  5 :
-        case  6 :
-        case  7 :
-        case  8 : if ((k2-k0)>48) return false; break;
-        default : ;
+        if (k2-k0>56)
+            return false;
+    }
+    else
+    {
+        switch (extension_sampling_frequency_index)
+        {
+            case  0 :
+            case  1 :
+            case  2 :
+            case  3 : if ((k2-k0)>32) return false; break;
+            case  4 : if ((k2-k0)>35) return false; break;
+            default : if ((k2-k0)>48) return false; break;
+        }
     }
 
     int8u  num_env_bands_Master;
@@ -1070,7 +1104,7 @@ void File_Aac::sbr_extension_data(size_t End, int8u id_aac, bool crc_flag)
             if (extension_sampling_frequency_index==(int8u)-1)
             {
                 extension_sampling_frequency=(int32u)(Frequency_b*2);
-                extension_sampling_frequency_index=Aac_AudioSpecificConfig_sampling_frequency_index(extension_sampling_frequency);
+                extension_sampling_frequency_index=Aac_AudioSpecificConfig_sampling_frequency_index(extension_sampling_frequency, false);
             }
 
             delete sbrs[raw_data_block_Pos];
@@ -1079,7 +1113,7 @@ void File_Aac::sbr_extension_data(size_t End, int8u id_aac, bool crc_flag)
 
             sbr_header();
 
-            if (!Aac_Sbr_Compute(sbr, extension_sampling_frequency_index))
+            if (!Aac_Sbr_Compute(sbr, Frequency_b*2, false))
             {
                 delete sbrs[raw_data_block_Pos]; sbr=sbrs[raw_data_block_Pos]=NULL;
             }

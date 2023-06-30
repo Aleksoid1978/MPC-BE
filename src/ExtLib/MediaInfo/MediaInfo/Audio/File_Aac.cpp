@@ -128,6 +128,8 @@ void File_Aac::Streams_Accept()
                             TestContinuousFileNames();
         default : ;
     }
+    if (Frame_Count_NotParsedIncluded==(int64u)-1)
+        Frame_Count_NotParsedIncluded=0;
 }
 
 //---------------------------------------------------------------------------
@@ -239,7 +241,7 @@ void File_Aac::Streams_Finish()
                 audioObjectTypeString += audioObjectTypeTemp;
                 audioObjectTypeString += ')';
             }
-            Fill_Conformance("Crosscheck InitialObjectDescriptor+AudioSpecificConfig audioProfileLevelIndication+audioObjectType", ("InitialObjectDescriptor audioProfileLevelIndication " + ProfileLevelString + " does not permit AudioSpecificConfig audioObjectType " + audioObjectTypeString).c_str(), bitset8().set(Usac).set(BaselineUsac).set(xHEAAC));
+            Fill_Conformance("Crosscheck InitialObjectDescriptor audioProfileLevelIndication", ("MP4 InitialObjectDescriptor audioProfileLevelIndication " + ProfileLevelString + " does not permit MP4 AudioSpecificConfig audioObjectType " + audioObjectTypeString).c_str(), bitset8().set(Usac).set(BaselineUsac).set(xHEAAC));
         }
         Streams_Finish_Conformance();
         }
@@ -307,13 +309,7 @@ void File_Aac::FileHeader_Parse()
 void File_Aac::FileHeader_Parse_ADIF()
 {
     adif_header();
-    BS_Begin();
-    payload();
-    BS_End();
-
-    FILLING_BEGIN();
-        File__Tags_Helper::Finish();
-    FILLING_END();
+    Mode=Mode_payload;
 }
 
 //***************************************************************************
@@ -339,8 +335,10 @@ void File_Aac::Read_Buffer_Continue()
         case Mode_AudioSpecificConfig : Read_Buffer_Continue_AudioSpecificConfig(); break;
         case Mode_payload             : Read_Buffer_Continue_payload(); break;
         case Mode_ADIF                :
+        case Mode_LATM:
         case Mode_ADTS                : File__Tags_Helper::Read_Buffer_Continue(); break;
-        default                       : ;
+        default                       : if (Frame_Count)
+                                            File__Tags_Helper::Finish();
     }
 }
 
@@ -383,11 +381,26 @@ void File_Aac::Read_Buffer_Continue_payload()
                 File__Analyze::Accept();
             File__Analyze::Fill();
             if (Config->ParseSpeed<1.0)
-                File__Analyze::Finish();
+            {
+                Open_Buffer_Unsynch();
+                if (!IsSub && Mode!=Mode_LATM) //Mainly for knowinf it is ADIF, which has sometimes tags at the end
+                {
+                    Mode=Mode_Unknown;
+                    File__Tags_Helper::Finish();
+                }
+                else
+                    File__Analyze::Finish();
+            }
         }
     FILLING_ELSE();
         Infos=Infos_AudioSpecificConfig;
     FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Aac::Read_Buffer_Unsynched()
+{
+    FrameInfo=frame_info();
 }
 
 //***************************************************************************
@@ -794,6 +807,7 @@ void File_Aac::Data_Parse()
             File__Analyze::Accept();
 
         //Filling
+        TS_Add(frame_length);
         if (Frame_Count>=Frame_Count_Valid && Config->ParseSpeed<1.0)
         {
             //No more need data
@@ -804,6 +818,8 @@ void File_Aac::Data_Parse()
                                         if (!Status[IsFilled])
                                         {
                                             Fill();
+                                            if (File_Offset+Buffer_Offset+Element_Size!=File_Size)
+                                                Open_Buffer_Unsynch();
                                             if (!IsSub)
                                                 File__Tags_Helper::Finish();
                                         }
@@ -812,8 +828,6 @@ void File_Aac::Data_Parse()
             }
 
         }
-
-        TS_Add(frame_length);
     FILLING_END();
 }
 

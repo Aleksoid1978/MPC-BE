@@ -21,7 +21,7 @@
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-#if defined(MEDIAINFO_AC3_YES) || defined(MEDIAINFO_DVDV_YES) || defined(MEDIAINFO_MPEGPS_YES) || defined(MEDIAINFO_MPEGTS_YES) || defined(MEDIAINFO_MIXML_YES)
+#if defined(MEDIAINFO_AC3_YES) || defined(MEDIAINFO_DVDV_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MPEGPS_YES) || defined(MEDIAINFO_MPEGTS_YES) || defined(MEDIAINFO_MIXML_YES)
 //---------------------------------------------------------------------------
 
 #include "ZenLib/Conf.h"
@@ -1392,7 +1392,7 @@ void File_Ac3::Streams_Fill()
     {
         Ztring TimeCode_FrameRate=Ztring::ToZtring(TimeStamp_FirstFrame.GetFrameRate(), 3);
         auto TimeStamp_FirstFrame_String=TimeStamp_FirstFrame.ToString();
-        auto TimeStamp_FirstFrame_Milliseconds=TimeStamp_FirstFrame.ToMilliseconds();
+        int64s TimeStamp_FirstFrame_Milliseconds=TimeStamp_FirstFrame.ToMilliseconds();
         if (TimeStamp_FirstFrame_SampleNumber)
         {
             TimeStamp_FirstFrame_String+='-'+to_string(TimeStamp_FirstFrame_SampleNumber);
@@ -1414,7 +1414,7 @@ void File_Ac3::Streams_Fill()
         Fill_SetOptions(Stream_Audio, 0, "TimeCode_Source", "N YTY");
         Fill(Stream_Audio, 0, Audio_Delay, TimeStamp_FirstFrame_Milliseconds);
         Fill(Stream_Audio, 0, Audio_Delay_Source, "Stream");
-        Fill(Stream_Audio, 0, Audio_Delay_Settings, TimeStamp_FirstFrame.GetDropFrame()?"drop_frame_flag=1":"drop_frame_flag=0");
+        Fill(Stream_Audio, 0, Audio_Delay_Settings, TimeStamp_FirstFrame.IsDropFrame()?"drop_frame_flag=1":"drop_frame_flag=0");
     }
 
     //Samples per frame
@@ -4560,9 +4560,7 @@ void File_Ac3::TimeStamp()
     Skip_B2(                                                    "User private");
 
     FILLING_BEGIN();
-        TimeCode Temp(H1*10+H2, M1*10+M2, S1*10+S2, F1*10+F2, (int32u)(float64_int64s(Mpegv_frame_rate[FrameRate])-1), DropFrame);
-        if (float64_int64s(Mpegv_frame_rate[FrameRate])!=Mpegv_frame_rate[FrameRate])
-            Temp.Set1001();
+        TimeCode Temp(H1*10+H2, M1*10+M2, S1*10+S2, F1*10+F2, (int32u)(float64_int64s(Mpegv_frame_rate[FrameRate])-1), TimeCode::DropFrame(DropFrame).FPS1001(float64_int64s(Mpegv_frame_rate[FrameRate])!=Mpegv_frame_rate[FrameRate]));
         #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {

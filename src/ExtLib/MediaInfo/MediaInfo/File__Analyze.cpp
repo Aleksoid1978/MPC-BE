@@ -528,7 +528,8 @@ void File__Analyze::Open_Buffer_OutOfBand (File__Analyze* Sub, size_t Size)
     #endif //MEDIAINFO_DEMUX
 
     #if MEDIAINFO_TRACE
-        Trace_Details_Handling(Sub);
+        if (Size)
+            Trace_Details_Handling(Sub);
     #endif // MEDIAINFO_TRACE
 }
 #if MEDIAINFO_TRACE
@@ -1073,7 +1074,8 @@ void File__Analyze::Open_Buffer_Continue (File__Analyze* Sub, const int8u* ToAdd
     }
 
     #if MEDIAINFO_TRACE
-        Trace_Details_Handling(Sub);
+        if (ToAdd_Size)
+            Trace_Details_Handling(Sub);
     #endif //MEDIAINFO_TRACE
 }
 
@@ -1583,6 +1585,8 @@ void File__Analyze::Buffer_Clear()
     Buffer_Offset=0;
     Buffer_Offset_Temp=0;
     Buffer_MinimumSize=0;
+    Element_Offset=0;
+    Element_Size=0;
 
     OriginalBuffer_Size=0;
     Offsets_Stream.clear();
@@ -2806,8 +2810,8 @@ void File__Analyze::Element_End_Common_Flush()
 {
     #if MEDIAINFO_TRACE
     //Size if not filled
-    if (File_Offset+Buffer_Offset+Element_Offset+BS->Offset_Get()<Element[Element_Level].Next)
-        Element[Element_Level].TraceNode.Size=File_Offset+Buffer_Offset+Element_Offset+BS->Offset_Get()-Element[Element_Level].TraceNode.Pos;
+    if (File_Offset+Buffer_Offset+Element_Offset+(BS_Size-BS->Remain())/8<Element[Element_Level].Next)
+        Element[Element_Level].TraceNode.Size=File_Offset+Buffer_Offset+Element_Offset+(BS_Size-BS->Remain())/8-Element[Element_Level].TraceNode.Pos;
     #endif //MEDIAINFO_TRACE
 
     //Level
@@ -3272,7 +3276,7 @@ void File__Analyze::GoTo (int64u GoTo, const char* ParserName)
     {
         BookMark_Get();
         if (File_GoTo==(int64u)-1)
-            Finish();
+            ForceFinish();
         return;
     }
 

@@ -49,6 +49,9 @@ private :
     //Buffer - File header
     bool FileHeader_Begin();
 
+    //Buffer - Global
+    void Read_Buffer_Continue();
+
     //Temp
     file_adm_private* File_Adm_Private;
 };

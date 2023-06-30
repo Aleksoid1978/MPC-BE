@@ -25,6 +25,9 @@
 #if defined(MEDIAINFO_CDP_YES)
     #include "MediaInfo/Text/File_Cdp.h"
 #endif
+#if defined(MEDIAINFO_EIA608_YES)
+    #include "MediaInfo/Text/File_Eia608.h"
+#endif
 #if MEDIAINFO_EVENTS
     #include "MediaInfo/MediaInfo_Events.h"
 #endif //MEDIAINFO_EVENTS
@@ -235,6 +238,10 @@ File_Ancillary::File_Ancillary()
     AspectRatio=0;
     FrameRate=0;
     LineNumber=(int32u)-1;
+    Format=None;
+    #if defined(MEDIAINFO_EIA608_YES)
+        Eia608_Parser=NULL;
+    #endif //defined(MEDIAINFO_EIA608_YES)
     #if defined(MEDIAINFO_CDP_YES)
         Cdp_Parser=NULL;
     #endif //defined(MEDIAINFO_CDP_YES)
@@ -252,6 +259,9 @@ File_Ancillary::File_Ancillary()
 //---------------------------------------------------------------------------
 File_Ancillary::~File_Ancillary()
 {
+    #if defined(MEDIAINFO_EIA608_YES)
+        delete Eia608_Parser; //Eia608_Parser=NULL;
+    #endif //defined(MEDIAINFO_EIA608_YES)
     #if defined(MEDIAINFO_CDP_YES)
         delete Cdp_Parser; //Cdp_Parser=NULL;
         for (size_t Pos=0; Pos<Cdp_Data.size(); Pos++)
@@ -299,6 +309,26 @@ void File_Ancillary::Streams_Finish()
                 Fill(Stream_General, 0, General_Title, Title);
         }
     #endif //defined(MEDIAINFO_CDP_YES)
+
+    #if defined(MEDIAINFO_EIA608_YES)
+        if (Eia608_Parser && Eia608_Parser->Status[IsAccepted])
+        {
+            size_t StreamPos_Base=Count_Get(Stream_Text);
+            Finish(Eia608_Parser);
+            for (size_t StreamPos=0; StreamPos<Eia608_Parser->Count_Get(Stream_Text); StreamPos++)
+            {
+                Merge(*Eia608_Parser, Stream_Text, StreamPos, StreamPos_Base+StreamPos);
+                Fill(Stream_Text, StreamPos_Last, "MuxingMode", "Ancillary data / SMPTE ST 334", Unlimited, true, true);
+            }
+
+            Ztring LawRating=Eia608_Parser->Retrieve(Stream_General, 0, General_LawRating);
+            if (!LawRating.empty())
+                Fill(Stream_General, 0, General_LawRating, LawRating, true);
+            Ztring Title=Eia608_Parser->Retrieve(Stream_General, 0, General_Title);
+            if (!Title.empty() && Retrieve(Stream_General, 0, General_Title).empty())
+                Fill(Stream_General, 0, General_Title, Title);
+        }
+    #endif //defined(MEDIAINFO_EIA608_YES)
 
     #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
         if (AribStdB34B37_Parser && !AribStdB34B37_Parser->Status[IsFinished] && AribStdB34B37_Parser->Status[IsAccepted])
@@ -499,6 +529,30 @@ void File_Ancillary::Read_Buffer_Unsynched()
 //---------------------------------------------------------------------------
 void File_Ancillary::Header_Parse()
 {
+    switch (Format)
+    {
+    case Smpte2038:
+        BS_Begin();
+        Skip_S1(6,                                              "000000");
+        Skip_SB(                                                "c_not_y_channel_flag");
+        Get_S4 (11, LineNumber,                                 "line_number");
+        Skip_S1(12,                                             "horizontal_offset");
+        Skip_S1( 2,                                             "parity");
+        Get_S1 ( 8, DataID,                                     "DID");
+        Skip_S1( 2,                                             "parity");
+        Get_S1 ( 8, SecondaryDataID,                            "SDID");
+        Skip_S1( 2,                                             "parity");
+        Get_S1 ( 8, DataCount,                                  "data_count");
+
+        //Filling
+        Header_Fill_Code((((int16u)DataID)<<8)|SecondaryDataID, Ztring().From_CC1(DataID)+__T('-')+Ztring().From_CC1(SecondaryDataID));
+        auto Offset=(((unsigned)DataCount+7)*10+7)/8;
+        while (Offset<Element_Size && Buffer[Buffer_Offset+Offset]==0xFF)
+            Offset++;
+        Header_Fill_Size(Offset);
+        return;
+    }
+
     //Parsing
     if (MustSynchronize)
     {
@@ -543,20 +597,36 @@ void File_Ancillary::Data_Parse()
     //Buffer
     int8u* Payload=new int8u[DataCount];
     Element_Begin1("Raw data");
-    for(int8u Pos=0; Pos<DataCount; Pos++)
+    switch (Format)
     {
-        Get_L1 (Payload[Pos],                                   "Data");
-        if (WithTenBit)
-            Skip_L1(                                            "Parity+Unused"); //even:1, odd:2
+    case Smpte2038:
+        for(int8u Pos=0; Pos<DataCount; Pos++)
+        {
+            Skip_S1( 2,                                         "parity");
+            Get_S1 ( 8, Payload[Pos],                           "user_data_word");
+        }
+        Skip_S1( 2,                                             "parity");
+        Skip_S1( 8,                                             "checksum_word");
+        BS_End();
+        Skip_XX(Element_Size-Element_Offset,                    "stuffing_bytes");
+        break;
+    default:
+        for(int8u Pos=0; Pos<DataCount; Pos++)
+        {
+            Get_L1 (Payload[Pos],                               "Data");
+            if (WithTenBit)
+                Skip_L1(                                        "Parity+Unused"); //even:1, odd:2
+        }
+        if (WithChecksum)
+        {
+            Skip_L1(                                            "Checksum");
+            if (WithTenBit)
+                Skip_L1(                                        "Parity+Unused"); //even:1, odd:2
+        }
     }
-
-    //Parsing
-    if (WithChecksum)
-        Skip_L1(                                                "Checksum");
-    if (WithTenBit)
-        Skip_L1(                                                "Parity+Unused"); //even:1, odd:2
     Element_End0();
 
+    //Parsing
     FILLING_BEGIN();
         switch (DataID)
         {
@@ -853,9 +923,24 @@ void File_Ancillary::Data_Parse()
                             case 0x02 : //CEA-608 (from SMPTE 334-1)
                                         if (TestAndPrepare())
                                         {
-                                            Unknown[DataID][SecondaryDataID][string()].StreamKind=Stream_Text;
-                                            Unknown[DataID][SecondaryDataID][string()].Infos["Format"]="CEA-608";
-                                            Unknown[DataID][SecondaryDataID][string()].Infos["MuxingMode"]="Ancillary data / SMPTE 334";
+                                            if (Eia608_Parser==NULL)
+                                            {
+                                                Eia608_Parser=new File_Eia608;
+                                                Open_Buffer_Init(Eia608_Parser);
+                                            }
+                                            Demux(Payload, (size_t)DataCount, ContentType_MainStream);
+                                            if (InDecodingOrder || (!HasBFrames && AspectRatio && FrameRate))
+                                            {
+                                                if (!Eia608_Parser->Status[IsFinished])
+                                                {
+                                                    if (Eia608_Parser->PTS_DTS_Needed)
+                                                        Eia608_Parser->FrameInfo.DTS=FrameInfo.DTS;
+                                                    Open_Buffer_Continue(Eia608_Parser, Payload, (size_t)DataCount);
+                                                }
+                                            }
+                                            else
+                                            {
+                                            }
                                         }
                                         break;
                             default   :

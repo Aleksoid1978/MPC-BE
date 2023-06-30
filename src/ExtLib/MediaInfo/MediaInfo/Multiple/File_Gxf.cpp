@@ -1254,14 +1254,14 @@ void File_Gxf::map()
             //Test on TimeCode
             if (TimeCode_Parsed && !Invalid)
             {
-                std::map<int8u, tc>::iterator TimeCode=TimeCodes.find(TrackID);
-                if (TimeCode==TimeCodes.end() || TimeCode->second.Milliseconds==(int64u)-1)
+                std::map<int8u, tc>::iterator TimeCode_Item=TimeCodes.find(TrackID);
+                if (TimeCode_Item==TimeCodes.end() || TimeCode_Item->second.Milliseconds==(int64u)-1)
                 {
                     float64 FrameRate=Gxf_FrameRate(Streams[TrackID].FrameRate_Code);
                     TimeCodes[TrackID].Milliseconds=Hours  *60*60*1000
                                                    +Minutes   *60*1000
                                                    +Seconds      *1000;
-                    TimeCodes[TrackID].String= MediaInfoLib::TimeCode(Hours, Minutes, Seconds, Fields/2, 0, DropFrame, false, Fields%2).ToString();
+                    TimeCodes[TrackID].String=TimeCode(Hours, Minutes, Seconds, Fields/2, 99, TimeCode::DropFrame(DropFrame).Field(Fields%2)).ToString();
 
                     if (!FrameRate)
                     {

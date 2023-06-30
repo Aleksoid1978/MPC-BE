@@ -759,6 +759,9 @@
 #if !defined(MEDIAINFO_AUDIO_NO) && !defined(MEDIAINFO_LA_NO) && !defined(MEDIAINFO_LA_YES)
     #define MEDIAINFO_LA_YES
 #endif
+#if !defined(MEDIAINFO_AUDIO_NO) && !defined(MEDIAINFO_MGA_NO) && !defined(MEDIAINFO_MGA_YES)
+    #define MEDIAINFO_MGA_YES
+#endif
 #if !defined(MEDIAINFO_AUDIO_NO) && !defined(MEDIAINFO_MIDI_NO) && !defined(MEDIAINFO_MIDI_YES)
     #define MEDIAINFO_MIDI_YES
 #endif
