@@ -23,7 +23,7 @@
 //
 //---------------------------------------------------------------------------------
 //
-// Version 2.15 
+// Version 2.16 alpha 
 //
 
 #ifndef _lcms2_H
@@ -81,7 +81,7 @@ extern "C" {
 #endif
 
 // Version/release
-#define LCMS_VERSION        2150
+#define LCMS_VERSION        2160
 
 // I will give the chance of redefining basic types for compilers that are not fully C99 compliant
 #ifndef CMS_BASIC_TYPES_ALREADY_DEFINED
@@ -325,7 +325,8 @@ typedef enum {
     cmsSigUInt8ArrayType                    = 0x75693038,  // 'ui08'
     cmsSigVcgtType                          = 0x76636774,  // 'vcgt'
     cmsSigViewingConditionsType             = 0x76696577,  // 'view'
-    cmsSigXYZType                           = 0x58595A20   // 'XYZ '
+    cmsSigXYZType                           = 0x58595A20,  // 'XYZ '
+    cmsSigMHC2Type                          = 0x4D484332   // 'MHC2'
 
 
 } cmsTagTypeSignature;
@@ -403,7 +404,8 @@ typedef enum {
     cmsSigVcgtTag                           = 0x76636774,  // 'vcgt'
     cmsSigMetaTag                           = 0x6D657461,  // 'meta'
     cmsSigcicpTag                           = 0x63696370,  // 'cicp'
-    cmsSigArgyllArtsTag                     = 0x61727473   // 'arts'
+    cmsSigArgyllArtsTag                     = 0x61727473,  // 'arts'
+    cmsSigMHC2Tag                           = 0x4D484332   // 'MHC2'
 
 } cmsTagSignature;
 
@@ -1048,6 +1050,19 @@ typedef struct {
 
 } cmsVideoSignalType;
 
+typedef struct {
+    cmsUInt32Number   CurveEntries;
+    cmsFloat64Number* RedCurve;
+    cmsFloat64Number* GreenCurve;
+    cmsFloat64Number* BlueCurve;
+
+    cmsFloat64Number  MinLuminance;         // ST.2086 min luminance in nits
+    cmsFloat64Number  PeakLuminance;        // ST.2086 peak luminance in nits
+
+    cmsFloat64Number XYZ2XYZmatrix[3][4];
+
+} cmsMHC2Type;
+
 
 
 // Get LittleCMS version (for shared objects) -----------------------------------------------------------------------------
@@ -1633,6 +1648,8 @@ CMSAPI cmsHPROFILE      CMSEXPORT cmsCreateXYZProfile(void);
 
 CMSAPI cmsHPROFILE      CMSEXPORT cmsCreate_sRGBProfileTHR(cmsContext ContextID);
 CMSAPI cmsHPROFILE      CMSEXPORT cmsCreate_sRGBProfile(void);
+
+CMSAPI cmsHPROFILE      CMSEXPORT cmsCreate_OkLabProfile(cmsContext ctx);
 
 CMSAPI cmsHPROFILE      CMSEXPORT cmsCreateBCHSWabstractProfileTHR(cmsContext ContextID,
                                                              cmsUInt32Number nLUTPoints,

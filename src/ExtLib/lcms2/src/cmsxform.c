@@ -989,6 +989,19 @@ _cmsTRANSFORM* AllocEmptyTransform(cmsContext ContextID, cmsPipeline* lut,
         }
     }
 
+    /**
+    * Check consistency for alpha channel copy
+    */
+    if (*dwFlags & cmsFLAGS_COPY_ALPHA)
+    {
+        if (T_EXTRA(*InputFormat) != T_EXTRA(*OutputFormat))
+        {
+            cmsSignalError(ContextID, cmsERROR_NOT_SUITABLE, "Mismatched alpha channels");
+            cmsDeleteTransform(p);
+            return NULL;
+        }
+    }
+
     p ->InputFormat     = *InputFormat;
     p ->OutputFormat    = *OutputFormat;
     p ->dwOriginalFlags = *dwFlags;
