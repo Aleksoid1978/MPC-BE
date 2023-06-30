@@ -54,7 +54,7 @@ YouTube
 
 Обновлены библиотеки:
 	dav1d git-1.2.1-8-g8b419c1;
-	ffmpeg git-n6.1-dev-1348-g468615f204;
+	ffmpeg git-n6.1-dev-1426-g96d6990517;
 	MediaInfo 23.06.
 
 
