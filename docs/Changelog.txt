@@ -8,6 +8,9 @@ Optimized work with the internal buffer.
 StreamReader
 Improved HLS M3U8 parsing.
 
+MpegSplitter
+Fixed playback of some MPEG-PS.
+
 MP4Splitter
 Improved PCM audio support.
 Fixed getting track language.
@@ -40,6 +43,7 @@ In the shader selection and editing windows, DX11 will initially be selected if 
 Added the ability to view the MediaInfo report for connected external audio tracks.
 Increased maximum OSD font size to 40.
 Added step 0.05 to change playback speed.
+Improved display of subtitles with a large font size.
 
 Updated Dutch and Chinese (Traditional) translation (by beter).
 Updated Japanese translation (by tsubasanouta).
