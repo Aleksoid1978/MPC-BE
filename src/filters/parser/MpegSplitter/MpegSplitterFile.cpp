@@ -1066,7 +1066,8 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 		}
 	}
 
-	if (!m_streams[stream_type::audio].Find(s)
+	if (type == stream_type::unknown
+			&& !m_streams[stream_type::audio].Find(s) && !m_streams[stream_type::video].Find(s)
 			&& ((pes_stream_type != INVALID)
 				|| pesid >= 0xc0 && pesid < 0xe0)) { // mpeg audio
 		// AAC_LATM
@@ -1159,7 +1160,8 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 		}
 	}
 
-	if (pesid == 0xbd || pesid == 0xfd) { // private stream 1
+	if (type == stream_type::unknown
+			&& (pesid == 0xbd || pesid == 0xfd)) { // private stream 1
 		if (s.pid) {
 			if (!m_streams[stream_type::video].Find(s) && !m_streams[stream_type::audio].Find(s) && !m_streams[stream_type::subpic].Find(s)) {
 				// AC-4
