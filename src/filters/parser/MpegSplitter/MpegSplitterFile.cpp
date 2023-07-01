@@ -887,6 +887,7 @@ static const struct {
 	{ 'VC-1', CMpegSplitterFile::stream_codec::VC1,   VC1_VIDEO   },
 	{ 'Opus', CMpegSplitterFile::stream_codec::OPUS,  OPUS_AUDIO  },
 	{ 'BSSD', CMpegSplitterFile::stream_codec::AES3,  AES3_AUDIO  },
+	{ 'AC-4', CMpegSplitterFile::stream_codec::AC4,   AC4_AUDIO   }
 };
 
 DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id, const DWORD len, const BOOL bAddStream/* = TRUE*/)
