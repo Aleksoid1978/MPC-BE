@@ -1349,6 +1349,15 @@ namespace Youtube
 					}
 				}
 			}
+
+			if (streamingDataFormatListAudioWithLanguages.size()) {
+				// remove non-DASH formats from the list
+				youtubeUrllist.erase(
+					std::remove_if(youtubeUrllist.begin(), youtubeUrllist.end(),
+								   [](const Youtube::YoutubeUrllistItem& item) {
+									   return item.profile->type == y_media; }),
+									youtubeUrllist.end());
+			}
 		} else {
 			for (const auto& urlLive : strUrlsLive) {
 				CStringA itag = RegExpParse(urlLive.GetString(), "/itag/(\\d+)");
@@ -1356,15 +1365,6 @@ namespace Youtube
 					AddUrl(youtubeUrllist, youtubeAudioUrllist, CString(urlLive), atoi(itag));
 				}
 			}
-		}
-
-		if (streamingDataFormatListAudioWithLanguages.size()) {
-			// remove non-DASH formats from the list
-			youtubeUrllist.erase(
-				std::remove_if(youtubeUrllist.begin(), youtubeUrllist.end(),
-					[](const Youtube::YoutubeUrllistItem& item) {
-						return item.profile->type == y_media; }),
-				youtubeUrllist.end());
 		}
 
 		if (youtubeUrllist.empty()) {
