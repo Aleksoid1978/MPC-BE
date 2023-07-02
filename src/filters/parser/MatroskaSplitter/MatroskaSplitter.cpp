@@ -1584,7 +1584,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	bool bHasVideo = (VideoTrackPins.size() > 0);
+	m_bHasVideo = (VideoTrackPins.size() > 0);
 
 	std::list<std::pair<CMatroskaSplitterOutputPin*, TrackEntry*>> TrackPins;
 	TrackPins.splice(TrackPins.end(), VideoTrackPins);
@@ -1607,7 +1607,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	Info& info = m_pFile->m_segment.SegmentInfo;
 	m_rtDuration = (REFERENCE_TIME)(info.Duration * info.TimeCodeScale / 100);
 
-	if (m_bCalcDuration && bHasVideo && !m_pFile->m_segment.Cues.empty()) {
+	if (m_bCalcDuration && m_bHasVideo && !m_pFile->m_segment.Cues.empty()) {
 		// calculate duration from video track;
 		m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
 		m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
@@ -1786,7 +1786,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		SetProperty(L"TITL", Title);
 	}
 
-	if (bHasVideo && !m_pOutputs.empty() && !m_pFile->m_segment.Cues.empty()) {
+	if (!m_pOutputs.empty() && !m_pFile->m_segment.Cues.empty()) {
 		auto& s = m_pFile->m_segment;
 		const UINT64 TrackNumber = s.GetMasterTrack();
 		UINT64 lastCueClusterPosition = ULONGLONG_MAX;
@@ -2645,7 +2645,7 @@ HRESULT CMatroskaSplitterFilter::DeliverMatroskaPacket(std::unique_ptr<CMatroska
 STDMETHODIMP CMatroskaSplitterFilter::GetKeyFrameCount(UINT& nKFs)
 {
 	CheckPointer(m_pFile, E_UNEXPECTED);
-	nKFs = m_sps.size();
+	nKFs = m_bHasVideo ? m_sps.size() : 0;
 
 	return S_OK;
 }
@@ -2661,8 +2661,10 @@ STDMETHODIMP CMatroskaSplitterFilter::GetKeyFrames(const GUID* pFormat, REFERENC
 	}
 
 	nKFs = 0;
-	for (const auto& sps : m_sps) {
-		pKFs[nKFs++] = sps.rt;
+	if (m_bHasVideo) {
+		for (const auto& sps : m_sps) {
+			pKFs[nKFs++] = sps.rt;
+		}
 	}
 
 	return S_OK;

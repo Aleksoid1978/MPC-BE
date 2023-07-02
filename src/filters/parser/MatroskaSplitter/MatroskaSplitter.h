@@ -85,6 +85,7 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 	int m_interlaced;
 	int m_dtsonly = 0; // 0 - no, 1 - yes
 
+	bool m_bHasVideo = false;
 	std::vector<SyncPoint> m_sps;
 
 	std::map<DWORD, REFERENCE_TIME> m_lastDuration;
