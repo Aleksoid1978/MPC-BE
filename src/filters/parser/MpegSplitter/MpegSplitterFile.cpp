@@ -1295,7 +1295,7 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 				}
 
 				// AES3
-				if (type == stream_type::unknown && stream_type & AES3_AUDIO) {
+				if (type == stream_type::unknown && stream_type == AES3_AUDIO) {
 					Seek(start);
 					aes3_ts_hdr h;
 					if (Read(h, len, &s.mt)) {
