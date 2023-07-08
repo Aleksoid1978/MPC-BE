@@ -487,7 +487,7 @@ void CPPageExternalFilters::OnAddMajorType()
 				AfxMessageBox(ResStr(IDS_EXTERNAL_FILTERS_ERROR_MT), MB_ICONEXCLAMATION | MB_OK);
 				return;
 			}
-			it++;
+			++it;
 		}
 
 		f->guids.push_back(dlg.m_guid);
@@ -536,7 +536,7 @@ void CPPageExternalFilters::OnAddSubType()
 	if (dlg.DoModal() == IDOK) {
 		for (child = m_tree.GetChildItem(node); child; child = m_tree.GetNextSiblingItem(child)) {
 			it = FindInListByPointer(f->guids, (GUID*)m_tree.GetItemData(child));
-			it++;
+			++it;
 			if (*it == dlg.m_guid) {
 				AfxMessageBox(ResStr(IDS_EXTERNAL_FILTERS_ERROR_MT), MB_ICONEXCLAMATION | MB_OK);
 				return;
@@ -725,7 +725,7 @@ void CPPageExternalFilters::OnNMDblclkTree2(NMHDR *pNMHDR, LRESULT *pResult)
 			return;
 		}
 
-		it++;
+		++it;
 		if (it == f->guids.end()) {
 			return;
 		}

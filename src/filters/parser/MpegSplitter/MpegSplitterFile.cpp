@@ -281,7 +281,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 				if (!p.streamCount(m_streams)) {
 					m_programs.erase(it++);
 				} else {
-					it++;
+					++it;
 				}
 			}
 
@@ -297,7 +297,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 						if (p.program_number != main_program_number && p.streamFind(pid)) {
 							m_programs.erase(it++);
 						} else {
-							it++;
+							++it;
 						}
 					}
 				}

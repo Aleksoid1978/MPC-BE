@@ -505,7 +505,7 @@ DWORD CMatroskaMuxerFilter::ThreadProc()
 							pActivePins.erase(it++);
 							continue;
 						} else {
-							it++;
+							++it;
 						}
 
 						if (pTmp->GetTrackEntry()->TrackType != TrackEntry::TypeSubtitle) {

@@ -9744,12 +9744,12 @@ void CMainFrame::OnNavigateSkipFile(UINT nID)
 					return;
 				}
 
-				it--;
+				--it;
 			} else if (nID == ID_NAVIGATE_SKIPFORWARDFILE) {
 				if (it == std::prev(m_BDPlaylists.cend())) {
 					return;
 				}
-				it++;
+				++it;
 			}
 
 			const CString fileName(it->m_strFileName);
@@ -11934,7 +11934,7 @@ void CMainFrame::TidyShaderCashe()
 			file.Close();
 
 			if ((*it).length == length && CompareFileTime(&(*it).ftwrite, &ftWrite) == 0) {
-				it++;
+				++it;
 				continue; // actual shader
 			}
 		}
@@ -14697,7 +14697,7 @@ int CMainFrame::SearchInDir(const bool bForward)
 				return 0;
 			}
 		} else {
-			it++;
+			++it;
 		}
 	} else {
 		if (it == sl.cbegin()) {
@@ -14707,7 +14707,7 @@ int CMainFrame::SearchInDir(const bool bForward)
 				return 0;
 			}
 		} else {
-			it--;
+			--it;
 		}
 	}
 
@@ -20389,8 +20389,8 @@ BOOL CMainFrame::AddSimilarFiles(std::list<CString>& fns)
 
 		auto it = std::find(files.cbegin(), files.cend(), fname);
 		if (it != files.cend()) {
-			it++;
-			for (auto it_cur = it; it_cur < files.cend(); it_cur++) {
+			++it;
+			for (auto it_cur = it; it_cur < files.cend(); ++it_cur) {
 				fns.push_back(path + (*it_cur));
 			}
 		}
