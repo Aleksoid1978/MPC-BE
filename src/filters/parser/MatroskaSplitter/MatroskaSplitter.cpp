@@ -1618,13 +1618,13 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		REFERENCE_TIME rtDur = INVALID_TIME;
 
-		for (auto it = s.Cues.crbegin(); it != s.Cues.crend() && rtDur == INVALID_TIME; it++) {
+		for (auto it = s.Cues.crbegin(); it != s.Cues.crend() && rtDur == INVALID_TIME; ++it) {
 			const auto& pCue = *it;
 
-			for (auto it2 = pCue->CuePoints.crbegin(); it2 != pCue->CuePoints.crend() && rtDur == INVALID_TIME; it2++) {
+			for (auto it2 = pCue->CuePoints.crbegin(); it2 != pCue->CuePoints.crend() && rtDur == INVALID_TIME; ++it2) {
 				const auto& pCuePoint = *it2;
 
-				for (auto it3 = pCuePoint->CueTrackPositions.crbegin(); it3 != pCuePoint->CueTrackPositions.crend() && rtDur == INVALID_TIME; it3++) {
+				for (auto it3 = pCuePoint->CueTrackPositions.crbegin(); it3 != pCuePoint->CueTrackPositions.crend() && rtDur == INVALID_TIME; ++it3) {
 					const auto& pCueTrackPositions = *it3;
 
 					if (TrackNumber != pCueTrackPositions->CueTrack) {
@@ -1760,7 +1760,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		pg_offsets.sort();
 		pg_offsets.unique();
-		for (auto it = pg_offsets.begin(); it != pg_offsets.end(); it++) {
+		for (auto it = pg_offsets.begin(); it != pg_offsets.end(); ++it) {
 			if (offsets.IsEmpty()) {
 				offsets.Format(L"%d", *it);
 			} else {
@@ -2240,7 +2240,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 			bool bBreak = false;
 			UINT64 lastCueRelativePosition = ULONGLONG_MAX;
 			for (const auto& pCue : s.Cues) {
-				for (auto it = pCue->CuePoints.crbegin(); it != pCue->CuePoints.crend(); it++) {
+				for (auto it = pCue->CuePoints.crbegin(); it != pCue->CuePoints.crend(); ++it) {
 					const auto& pCuePoint = *it;
 					REFERENCE_TIME cueTime = s.GetRefTime(pCuePoint->CueTime);
 					if (cueTime > m_Cluster_seek_rt) {

@@ -1342,7 +1342,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 			std::unique_lock<std::mutex> lock(m_mutexOffsetQueue);
 			if (!m_mediaOffsetQueue.empty()) {
 				auto selected = m_mediaOffsetQueue.begin();
-				for (auto it = m_mediaOffsetQueue.begin(); it != m_mediaOffsetQueue.end(); it++) {
+				for (auto it = m_mediaOffsetQueue.begin(); it != m_mediaOffsetQueue.end(); ++it) {
 					if (it->timestamp > m_rtNow) {
 						break;
 					}

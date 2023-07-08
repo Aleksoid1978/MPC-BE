@@ -1302,7 +1302,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			const auto& Item = m_Items.begin();
 			if (Item->m_pg_offset_sequence_id.size()) {
 				std::list<BYTE> pg_offsets;
-				for (auto it = Item->m_pg_offset_sequence_id.begin(); it != Item->m_pg_offset_sequence_id.end(); it++) {
+				for (auto it = Item->m_pg_offset_sequence_id.begin(); it != Item->m_pg_offset_sequence_id.end(); ++it) {
 					if (*it != 0xff) {
 						pg_offsets.push_back(*it);
 
@@ -1315,7 +1315,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					pg_offsets.sort();
 					pg_offsets.unique();
-					for (auto it = pg_offsets.begin(); it != pg_offsets.end(); it++) {
+					for (auto it = pg_offsets.begin(); it != pg_offsets.end(); ++it) {
 						if (offsets.IsEmpty()) {
 							offsets.Format(L"%u", *it);
 						} else {
@@ -1330,7 +1330,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			// IG offsets
 			if (Item->m_ig_offset_sequence_id.size()) {
 				std::list<BYTE> ig_offsets;
-				for (auto it = Item->m_ig_offset_sequence_id.begin(); it != Item->m_ig_offset_sequence_id.end(); it++) {
+				for (auto it = Item->m_ig_offset_sequence_id.begin(); it != Item->m_ig_offset_sequence_id.end(); ++it) {
 					if (*it != 0xff) {
 						ig_offsets.push_back(*it);
 					}
@@ -1340,7 +1340,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					ig_offsets.sort();
 					ig_offsets.unique();
-					for (auto it = ig_offsets.begin(); it != ig_offsets.end(); it++) {
+					for (auto it = ig_offsets.begin(); it != ig_offsets.end(); ++it) {
 						if (offsets.IsEmpty()) {
 							offsets.Format(L"%u", *it);
 						} else {
