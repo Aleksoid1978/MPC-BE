@@ -572,22 +572,39 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 	bool b10BitOutput = m_ExtraSets.b10BitOutput;
 
-	{
+	// set the display settings from D3DDISPLAYMODEEX
+	m_MonitorName.Empty();
+	m_nMonitorHorRes = d3ddmEx.Width;
+	m_nMonitorVerRes = d3ddmEx.Height;
+	m_rcMonitor.SetRect(0, 0, d3ddmEx.Width, d3ddmEx.Height);
+	m_dRefreshRate = d3ddmEx.RefreshRate;
+
+	{ // get more accurate and expanded display parameters
+		int monitorBitsPerChannel = 0;
+
 		HMONITOR hMonitor = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
 		MONITORINFOEXW mi = { sizeof(mi) };
-		GetMonitorInfoW(hMonitor, (MONITORINFO*)&mi);
-		DisplayConfig_t dc = {};
-		bool ret = GetDisplayConfig(mi.szDevice, dc);
+		if (GetMonitorInfoW(hMonitor, (MONITORINFO*)&mi)) {
+			m_rcMonitor = mi.rcMonitor;
 
-		if (dc.refreshRate.Numerator && dc.refreshRate.Denominator) {
-			m_dRefreshRate = (double)dc.refreshRate.Numerator / (double)dc.refreshRate.Denominator;
-		} else {
-			m_dRefreshRate = d3ddmEx.RefreshRate;
+			DisplayConfig_t dc = {};
+			if (GetDisplayConfig(mi.szDevice, dc)) {
+				m_MonitorName = dc.monitorName;
+				m_nMonitorHorRes = dc.width;
+				m_nMonitorVerRes = dc.height;
+
+				if (dc.refreshRate.Numerator && dc.refreshRate.Denominator) {
+					m_dRefreshRate = (double)dc.refreshRate.Numerator / (double)dc.refreshRate.Denominator;
+				}
+				monitorBitsPerChannel = dc.bitsPerChannel;
+			}
 		}
 
 		if (b10BitOutput) {
-			b10BitOutput = (dc.bitsPerChannel >= 10);
+			b10BitOutput = (monitorBitsPerChannel >= 10);
 		}
+
+		DLogIf(m_MonitorName.IsEmpty(), "    => ERROR: failed to get expanded display parameters!");
 	}
 
 	ZeroMemory(&m_d3dpp, sizeof(m_d3dpp));
@@ -731,18 +748,6 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	}
 
 	m_LastAdapterCheck = GetPerfCounter();
-
-	m_MonitorName.Empty();
-	m_nMonitorHorRes = m_nMonitorVerRes = 0;
-
-	HMONITOR hMonitor = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
-	MONITORINFOEXW mi;
-	ZeroMemory(&mi, sizeof(mi));
-	mi.cbSize = sizeof(mi);
-	if (GetMonitorInfoW(hMonitor, &mi)) {
-		ReadDisplay(mi.szDevice, &m_MonitorName, &m_nMonitorHorRes, &m_nMonitorVerRes);
-		m_rcMonitor = mi.rcMonitor;
-	}
 
 	m_strProcessingFmt = GetD3DFormatStr(m_SurfaceFmt);
 	m_strBackbufferFmt = GetD3DFormatStr(m_BackbufferFmt);
