@@ -27,7 +27,6 @@
 #include "SubPic/SubPicQueueImpl.h"
 #include "IPinHook.h"
 #include "DSUtil/SysVersion.h"
-#include "DSUtil/WinAPIUtils.h"
 #include "DSUtil/D3D9Helper.h"
 #include "DSUtil/DXVAState.h"
 #include "IDirectVobSub.h"
