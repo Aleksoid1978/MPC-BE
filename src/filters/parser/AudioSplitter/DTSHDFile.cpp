@@ -53,7 +53,6 @@ typedef union {
 
 CDTSHDFile::CDTSHDFile()
 	: CAudioFile()
-	, m_length(0)
 {
 	m_subtype = MEDIASUBTYPE_DTS2;
 	m_wFormatTag = WAVE_FORMAT_DTS2;

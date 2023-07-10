@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2021 see Authors.txt
+ * (C) 2014-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -42,7 +42,7 @@ protected:
 	GUID  m_subtype = GUID_NULL;
 	WORD  m_wFormatTag = 0;
 
-	REFERENCE_TIME m_rtduration;
+	REFERENCE_TIME m_rtduration = 0;
 
 	BYTE* m_extradata = nullptr;
 	int   m_extrasize = 0;

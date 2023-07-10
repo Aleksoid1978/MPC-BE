@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,9 +30,6 @@ static const uint8_t AMRWB_packed_size[16] = { 18, 24, 33, 37, 41, 47, 51, 59, 6
 
 CAMRFile::CAMRFile()
 	: CAudioFile()
-	, m_framelen(0)
-	, m_isAMRWB(false)
-	, m_currentframe(0)
 {
 }
 

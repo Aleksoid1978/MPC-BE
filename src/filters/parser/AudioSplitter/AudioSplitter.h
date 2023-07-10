@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2021 see Authors.txt
+ * (C) 2013-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,8 +30,8 @@
 class __declspec(uuid("AA77A669-E10F-4C70-BBD7-77923DF34BF3"))
 	CAudioSplitterFilter : public CBaseSplitterFilter
 {
-	CAudioFile* m_pAudioFile;
-	REFERENCE_TIME m_rtime;
+	CAudioFile* m_pAudioFile = nullptr;
+	REFERENCE_TIME m_rtime = 0;
 
 protected:
 	std::unique_ptr<CBaseSplitterFile> m_pFile;

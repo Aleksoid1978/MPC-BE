@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,9 +31,9 @@ class CAMRFile : public CAudioFile
 		UINT64 size : 8, pos : 54;
 	};
 
-	int                  m_framelen;
-	bool                 m_isAMRWB;
-	unsigned             m_currentframe;
+	int      m_framelen     = 0;
+	bool     m_isAMRWB      = false;
+	unsigned m_currentframe = 0;
 	std::vector<frame_t> m_seek_table;
 
 public:

@@ -1,5 +1,5 @@
 /*
- * (C) 2016 see Authors.txt
+ * (C) 2016-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,7 +26,7 @@ const uint8_t chk_DTSHDHDR[8] = {'D', 'T', 'S', 'H', 'D', 'H', 'D', 'R'};
 
 class CDTSHDFile : public CAudioFile
 {
-	__int64 m_length;
+	__int64 m_length = 0;
 public:
 	CDTSHDFile();
 
