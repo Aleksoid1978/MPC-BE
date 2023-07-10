@@ -1076,9 +1076,7 @@ BOOL CMPlayerCApp::InitInstance()
 		m_s.UIceClient.Connect(m_s.strUIceAddr);
 	}
 
-	bool start_fullscreen = m_s.slFiles.size() && m_s.fLaunchfullscreen;
-
-	if (!start_fullscreen && m_s.bUpdaterAutoCheck) {
+	if (m_s.bUpdaterAutoCheck && m_s.slFiles.empty() && !m_s.fLaunchfullscreen) {
 		if (UpdateChecker::IsTimeToAutoUpdate(m_s.nUpdaterDelay, m_s.tUpdaterLastCheck)) {
 			UpdateChecker::CheckForUpdate(true);
 		}
