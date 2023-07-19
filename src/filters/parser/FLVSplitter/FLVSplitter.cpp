@@ -28,6 +28,8 @@
 
 #include <moreuuids.h>
 
+#include <libavutil/intreadwrite.h>
+
 #define FLV_AUDIODATA     8
 #define FLV_VIDEODATA     9
 #define FLV_SCRIPTDATA    18
@@ -59,7 +61,9 @@
 #define FLV_VIDEO_HM10    13 // HM10.0
 #define FLV_VIDEO_HEVC    14 // HEVC (HM version write to MetaData "HM compatibility")
 
+// These identifiers are not from the specification, they are just made up and can be anything.
 #define FLV_VIDEO_AV1     20 // AV1
+#define FLV_VIDEO_VP9     21 // VP9
 
 #define AMF_END_OF_OBJECT			0x09
 
@@ -373,11 +377,12 @@ bool CFLVSplitterFilter::ReadTag(VideoTag& vt)
 	if (vt.ExHeader) {
 		vt.FrameType = vt.FrameType & 0x7;
 		vt.AVCPacketType = vt.CodecID; vt.CodecID = 0;
+
 		const auto CodecID = _byteswap_ulong(m_pFile->BitRead(32));
-		if (CodecID == FCC('hvc1')) {
-			vt.CodecID = FLV_VIDEO_HEVC;
-		} else if (CodecID == FCC('av01')) {
-			vt.CodecID = FLV_VIDEO_AV1;
+		switch (CodecID) {
+			case FCC('hvc1'): vt.CodecID = FLV_VIDEO_HEVC; break;
+			case FCC('av01'): vt.CodecID = FLV_VIDEO_AV1;  break;
+			case FCC('vp09'): vt.CodecID = FLV_VIDEO_VP9;  break;
 		}
 
 		if (vt.CodecID == FLV_VIDEO_HEVC && vt.AVCPacketType == 1) {
@@ -414,8 +419,6 @@ bool CFLVSplitterFilter::ReadTag(VideoTweak& vt)
 #endif
 
 #define RESYNC_BUFFER_SIZE (1 << 20)
-#define AV_RB24(p) ((((BYTE*)(p))[0] << 16) | (((BYTE*)(p))[1] << 8)  | ((BYTE*)(p))[2])
-#define AV_RB32(p) ((((BYTE*)(p))[0] << 24) | (((BYTE*)(p))[1] << 16) | (((BYTE*)(p))[2] <<  8) | ((BYTE*)(p))[3])
 
 bool CFLVSplitterFilter::Sync(__int64& pos)
 {
@@ -1163,6 +1166,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						if (vWidth && vHeight) {
 							if (headerSize) {
 								vih = reinterpret_cast<VIDEOINFOHEADER*>(mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + headerSize));
+								bih = &vih->bmiHeader;
 							}
 
 							bih->biSize = sizeof(vih->bmiHeader);
@@ -1179,6 +1183,52 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 							mt.subtype = FOURCCMap(bih->biCompression = FCC('AV01'));
 							name += L" AV1";
+
+							break;
+						}
+
+						fTypeFlagsVideo = true;
+						break;
+					}
+					case FLV_VIDEO_VP9:
+					{
+						if (dataSize < 4 || vt.AVCPacketType != 0) {
+							fTypeFlagsVideo = true;
+							break;
+						}
+
+						UINT32 headerSize = dataSize - 4;
+						std::unique_ptr<BYTE[]> headerData;
+
+						if (headerSize == 8) {
+							headerData = std::make_unique<BYTE[]>(headerSize);
+							m_pFile->ByteRead(headerData.get(), headerSize);
+						}
+
+						if (vWidth && vHeight) {
+							if (headerSize == 8) {
+								vih = reinterpret_cast<VIDEOINFOHEADER*>(mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + headerSize + 8));
+								bih = &vih->bmiHeader;
+							}
+
+							bih->biSize = sizeof(vih->bmiHeader);
+							bih->biWidth = vWidth;
+							bih->biHeight = vHeight;
+							bih->biPlanes = 1;
+							bih->biBitCount = 24;
+							bih->biSizeImage = DIBSIZE(*bih);
+
+							if (headerSize == 8) {
+								auto extra = reinterpret_cast<BYTE*>(vih + 1);
+								memcpy(extra, "vpcC", 4);
+								// use code from LAV
+								AV_WB8(extra + 4, 1);  // version
+								AV_WB24(extra + 5, 0); // flags
+								memcpy(extra + 8, headerData.get(), headerSize);
+							}
+
+							mt.subtype = FOURCCMap(bih->biCompression = FCC('VP90'));
+							name += L" VP9";
 
 							break;
 						}

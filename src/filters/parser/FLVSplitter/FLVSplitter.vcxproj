@@ -22,13 +22,13 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)src;$(SolutionDir)src\ExtLib\ffmpeg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug Filter' or '$(Configuration)'=='Release Filter'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)src;$(SolutionDir)src\ExtLib\ffmpeg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
