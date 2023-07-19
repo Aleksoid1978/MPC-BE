@@ -1033,44 +1033,47 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 					case FLV_VIDEO_HM91:   // HEVC HM9.1
 					case FLV_VIDEO_HM10:   // HEVC HM10.0
-					case FLV_VIDEO_HEVC: { // HEVC HM11.0 & HM12.0 ...
+					case FLV_VIDEO_HEVC: { // HEVC HM11.0 & HM12.0 & HEVC in Enhanced FLV
 						if (dataSize < 4 || vt.AVCPacketType != 0) {
 							fTypeFlagsVideo = true;
 							break;
 						}
 
 						UINT32 headerSize = dataSize - 4;
-						BYTE* headerData = DNew BYTE[headerSize]; // this is AVCDecoderConfigurationRecord struct
+						std::unique_ptr<BYTE[]> headerData;
+						vc_params_t params = {};
 
-						m_pFile->ByteRead(headerData, headerSize);
+						if (headerSize) {
+							headerData = std::make_unique<BYTE[]>(headerSize);
+							m_pFile->ByteRead(headerData.get(), headerSize);
 
-						vc_params_t params;
-						if (HEVCParser::ParseHEVCDecoderConfigurationRecord(headerData, headerSize, params, true)) {
-							BITMAPINFOHEADER pbmi = { sizeof(pbmi) };
-							pbmi.biWidth = params.width;
-							pbmi.biHeight = params.height;
-							pbmi.biCompression = FCC('HVC1');
-							pbmi.biPlanes = 1;
-							pbmi.biBitCount = 24;
-							pbmi.biSizeImage = DIBSIZE(pbmi);
+							if (HEVCParser::ParseHEVCDecoderConfigurationRecord(headerData.get(), headerSize, params, true)) {
+								BITMAPINFOHEADER pbmi = { sizeof(pbmi) };
+								pbmi.biWidth = params.width;
+								pbmi.biHeight = params.height;
+								pbmi.biCompression = FCC('HVC1');
+								pbmi.biPlanes = 1;
+								pbmi.biBitCount = 24;
+								pbmi.biSizeImage = DIBSIZE(pbmi);
 
-							if (!bAvgTimePerFrameSet) {
-								if (params.vps_timing.num_units_in_tick && params.vps_timing.time_scale) {
-									AvgTimePerFrame = llMulDiv(UNITS, params.vps_timing.num_units_in_tick, params.vps_timing.time_scale, 0);
-								} else if (params.vui_timing.num_units_in_tick && params.vui_timing.time_scale) {
-									AvgTimePerFrame = llMulDiv(UNITS, params.vui_timing.num_units_in_tick, params.vui_timing.time_scale, 0);
+								if (!bAvgTimePerFrameSet) {
+									if (params.vps_timing.num_units_in_tick && params.vps_timing.time_scale) {
+										AvgTimePerFrame = llMulDiv(UNITS, params.vps_timing.num_units_in_tick, params.vps_timing.time_scale, 0);
+									} else if (params.vui_timing.num_units_in_tick && params.vui_timing.time_scale) {
+										AvgTimePerFrame = llMulDiv(UNITS, params.vui_timing.num_units_in_tick, params.vui_timing.time_scale, 0);
+									}
 								}
+
+								CSize aspect(params.width * params.sar.num, params.height * params.sar.den);
+								ReduceDim(aspect);
+
+								mt.InitMediaType();
+								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, aspect, headerData.get(), headerSize,
+													params.profile, params.level, params.nal_length_size);
+
+								fTypeFlagsVideo = true;
+								break;
 							}
-
-							CSize aspect(params.width * params.sar.num, params.height * params.sar.den);
-							ReduceDim(aspect);
-
-							mt.InitMediaType();
-							CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, aspect, headerData, headerSize,
-												params.profile, params.level, params.nal_length_size);
-
-							fTypeFlagsVideo = true;
-							break;
 						}
 
 						DWORD fourcc = MAKEFOURCC('H','E','V','C');
@@ -1096,7 +1099,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								break;
 						}
 
-						if (!HEVCParser::ParseAVCDecoderConfigurationRecord(headerData, headerSize, params, metaHM_compatibility)) {
+						if (headerSize && !HEVCParser::ParseAVCDecoderConfigurationRecord(headerData.get(), headerSize, params, metaHM_compatibility)) {
 							fTypeFlagsVideo = true;
 							break;
 						}
@@ -1121,8 +1124,9 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vih->dwProfile					= params.profile;
 						vih->dwLevel					= params.level;
 
-						HEVCParser::CreateSequenceHeaderAVC(headerData, headerSize, vih->dwSequenceHeader, vih->cbSequenceHeader);
-						delete [] headerData;
+						if (headerSize) {
+							HEVCParser::CreateSequenceHeaderAVC(headerData.get(), headerSize, vih->dwSequenceHeader, vih->cbSequenceHeader);
+						}
 
 						mt.subtype = FOURCCMap(vih->hdr.bmiHeader.biCompression = fourcc);
 
