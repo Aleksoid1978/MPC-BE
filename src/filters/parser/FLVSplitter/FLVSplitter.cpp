@@ -59,6 +59,8 @@
 #define FLV_VIDEO_HM10    13 // HM10.0
 #define FLV_VIDEO_HEVC    14 // HEVC (HM version write to MetaData "HM compatibility")
 
+#define FLV_VIDEO_AV1     20 // AV1
+
 #define AMF_END_OF_OBJECT			0x09
 
 #define KEYFRAMES_TAG				L"keyframes"
@@ -66,10 +68,13 @@
 #define KEYFRAMES_BYTEOFFSET_TAG	L"filepositions"
 
 #define IsValidTag(TagType)			(TagType == FLV_AUDIODATA || TagType == FLV_VIDEODATA || TagType == FLV_SCRIPTDATA)
-#define IsAVCCodec(CodecID)			(CodecID == FLV_VIDEO_AVC || CodecID == FLV_VIDEO_HM91 || CodecID == FLV_VIDEO_HM10 || CodecID == FLV_VIDEO_HEVC)
+#define IsAVCCodec(VideoTag)		(!VideoTag.ExHeader && (VideoTag.CodecID == FLV_VIDEO_AVC || VideoTag.CodecID == FLV_VIDEO_HM91 || VideoTag.CodecID == FLV_VIDEO_HM10 || VideoTag.CodecID == FLV_VIDEO_HEVC))
 
 #define ValidateTag(t)				(t.DataSize || t.PreviousTagSize)
 
+enum FrameType {
+	CodedFrames = 1
+};
 
 #ifdef REGISTER_FILTER
 
@@ -363,8 +368,25 @@ bool CFLVSplitterFilter::ReadTag(VideoTag& vt)
 	vt.CodecID			= (BYTE)m_pFile->BitRead(4);
 	vt.AVCPacketType	= 0;
 	vt.tsOffset			= 0;
+	vt.ExHeader = (vt.FrameType >> 3) & 1;
 
-	if (IsAVCCodec(vt.CodecID)) {
+	if (vt.ExHeader) {
+		vt.FrameType = vt.FrameType & 0x7;
+		vt.AVCPacketType = vt.CodecID; vt.CodecID = 0;
+		const auto CodecID = _byteswap_ulong(m_pFile->BitRead(32));
+		if (CodecID == FCC('hvc1')) {
+			vt.CodecID = FLV_VIDEO_HEVC;
+		} else if (CodecID == FCC('av01')) {
+			vt.CodecID = FLV_VIDEO_AV1;
+		}
+
+		if (vt.CodecID == FLV_VIDEO_HEVC && vt.AVCPacketType == 1) {
+			vt.tsOffset = (UINT32)m_pFile->BitRead(24);
+			vt.tsOffset = (vt.tsOffset + 0xff800000) ^ 0xff800000;
+		}
+	}
+
+	if (IsAVCCodec(vt)) {
 		if (!m_pFile->IsStreaming() && m_pFile->GetRemaining() < 3) {
 			return false;
 		}
@@ -519,8 +541,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 
 	Tag t;
-	AudioTag at;
-	VideoTag vt;
 
 	m_pFile->Seek(m_DataOffset);
 
@@ -646,7 +666,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 		} else if (t.TagType == FLV_AUDIODATA && fTypeFlagsAudio) {
-			UNREFERENCED_PARAMETER(at);
 			AudioTag at;
 			name = L"Audio";
 
@@ -759,9 +778,8 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 		} else if (t.TagType == FLV_VIDEODATA && fTypeFlagsVideo) {
-			UNREFERENCED_PARAMETER(vt);
 			VideoTag vt;
-			if (ReadTag(vt) && vt.FrameType == 1) {
+			if (ReadTag(vt) && vt.FrameType == FrameType::CodedFrames) {
 				int dataSize = t.DataSize - 1;
 
 				if (bVideoMetadataExists) {
@@ -896,7 +914,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							break;
 						}
 
-						__int64 headerOffset = m_pFile->GetPos();
 						UINT32 headerSize = dataSize - 4;
 
 						BOOL bIsAVC = FALSE;
@@ -1022,7 +1039,6 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							break;
 						}
 
-						__int64 headerOffset = m_pFile->GetPos();
 						UINT32 headerSize = dataSize - 4;
 						BYTE* headerData = DNew BYTE[headerSize]; // this is AVCDecoderConfigurationRecord struct
 
@@ -1118,6 +1134,54 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 						break;
 					}
+					case FLV_VIDEO_AV1:
+					{
+						if (dataSize < 4 || vt.AVCPacketType != 0) {
+							fTypeFlagsVideo = true;
+							break;
+						}
+
+						UINT32 headerSize = dataSize - 4;
+						std::unique_ptr<BYTE[]> headerData;
+
+						if (headerSize) {
+							headerData = std::make_unique<BYTE[]>(headerSize);
+							m_pFile->ByteRead(headerData.get(), headerSize);
+
+							if (headerSize > 4) {
+								AV1Parser::AV1SequenceParameters seq_params;
+								std::vector<uint8_t> obu_sequence_header;
+								auto ret = AV1Parser::ParseOBU(headerData.get() + 4, headerSize - 4, seq_params, obu_sequence_header);
+								// TODO - need samples
+							}
+						}
+
+						if (vWidth && vHeight) {
+							if (headerSize) {
+								vih = reinterpret_cast<VIDEOINFOHEADER*>(mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + headerSize));
+							}
+
+							bih->biSize = sizeof(vih->bmiHeader);
+							bih->biWidth = vWidth;
+							bih->biHeight = vHeight;
+							bih->biPlanes = 1;
+							bih->biBitCount = 24;
+							bih->biSizeImage = DIBSIZE(*bih);
+
+							if (headerSize) {
+								auto extra = reinterpret_cast<BYTE*>(vih + 1);
+								memcpy(extra, headerData.get(), headerSize);
+							}
+
+							mt.subtype = FOURCCMap(bih->biCompression = FCC('AV01'));
+							name += L" AV1";
+
+							break;
+						}
+
+						fTypeFlagsVideo = true;
+						break;
+					}
 					default:
 						fTypeFlagsVideo = true;
 				}
@@ -1140,7 +1204,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							while (ReadTag(tag) && !CheckRequest(nullptr) && m_pFile->GetRemaining()) {
 								__int64 _next = m_pFile->GetPos() + tag.DataSize;
 								if ((tag.DataSize > 0) && (tag.TagType == FLV_VIDEODATA && ReadTag(vtag) && tag.TimeStamp > 0)) {
-									if (IsAVCCodec(vtag.CodecID)) {
+									if (IsAVCCodec(vtag)) {
 										if (vtag.AVCPacketType != 1) {
 											continue;
 										}
@@ -1332,7 +1396,7 @@ void CFLVSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 				AudioTag at;
 				VideoTag vt;
 				if ((t.TagType == FLV_AUDIODATA && ReadTag(at))
-						|| (t.TagType == FLV_VIDEODATA && ReadTag(vt) && vt.FrameType == 1)) {
+						|| (t.TagType == FLV_VIDEODATA && ReadTag(vt) && vt.FrameType == FrameType::CodedFrames)) {
 					bestPos = cur;
 				}
 			}
@@ -1401,7 +1465,7 @@ bool CFLVSplitterFilter::DemuxLoop()
 					m_pFile->BitRead(8);
 				} else if (vt.CodecID == FLV_VIDEO_VP6A) {
 					m_pFile->BitRead(32);
-				} else if (IsAVCCodec(vt.CodecID)) {
+				} else if (IsAVCCodec(vt)) {
 					if (vt.AVCPacketType != 1) {
 						goto NextTag;
 					}
@@ -1423,7 +1487,7 @@ bool CFLVSplitterFilter::DemuxLoop()
 			p->TrackNumber	= t.TagType;
 			p->rtStart		= 10000i64 * t.TimeStamp;
 			p->rtStop		= p->rtStart + 1;
-			p->bSyncPoint	= t.TagType == FLV_VIDEODATA ? vt.FrameType == 1 : true;
+			p->bSyncPoint	= t.TagType == FLV_VIDEODATA ? vt.FrameType == FrameType::CodedFrames : true;
 
 			p->resize((size_t)dataSize);
 			if (S_OK != (hr = m_pFile->ByteRead(p->data(), p->size()))) {

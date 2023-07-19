@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -68,6 +68,7 @@ class __declspec(uuid("47E792CF-0BBE-4F7A-859C-194B0768650A"))
 		BYTE   CodecID = 0;
 		BYTE   AVCPacketType = 0;
 		UINT32 tsOffset = 0;
+		bool   ExHeader = false;
 	};
 
 	bool ReadTag(VideoTag& vt);
