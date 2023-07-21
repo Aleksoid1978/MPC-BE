@@ -70,7 +70,7 @@ FOR %%A IN (%ARG%) DO (
 
 REM pre-build checks
 
-IF NOT EXIST "revision.h" CALL "update_revision.cmd"
+CALL "update_revision.cmd"
 
 IF EXIST "environments.bat" CALL "environments.bat"
 
