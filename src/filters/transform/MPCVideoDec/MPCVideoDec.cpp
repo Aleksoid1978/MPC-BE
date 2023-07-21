@@ -35,6 +35,7 @@
 #include "filters/parser/AviSplitter/AviSplitter.h"
 #include "filters/parser/OggSplitter/OggSplitter.h"
 #include "filters/parser/MpegSplitter/MpegSplitter.h"
+#include "filters/parser/FLVSplitter/FLVSplitter.h"
 #include "filters/Lock.h"
 #include <moreuuids.h>
 #include <FilterInterfaces.h>
@@ -2050,7 +2051,8 @@ redo:
 							|| (m_CodecId == AV_CODEC_ID_MPEG4 && pmt->formattype != FORMAT_MPEG2Video)
 							|| clsidInput == __uuidof(CAviSourceFilter) || clsidInput == __uuidof(CAviSplitterFilter)
 							|| clsidInput == __uuidof(COggSourceFilter) || clsidInput == __uuidof(COggSplitterFilter)
-							|| IsAVI() || IsOGG();
+							|| (m_CodecId == AV_CODEC_ID_HEVC && (clsidInput == __uuidof(CFLVSourceFilter) || clsidInput == __uuidof(CFLVSplitterFilter))
+							|| IsAVI() || IsOGG());
 		if (!m_bReorderBFrame && (m_CodecId == AV_CODEC_ID_VC1 || m_CodecId == AV_CODEC_ID_WMV3)
 				&& !(clsidInput == __uuidof(CMpegSourceFilter) || clsidInput == __uuidof(CMpegSplitterFilter))) {
 			m_bReorderBFrame = true;
