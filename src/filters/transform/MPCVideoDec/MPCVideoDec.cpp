@@ -52,6 +52,7 @@ extern "C" {
 	#include <ExtLib/ffmpeg/libavutil/intreadwrite.h>
 	#include <ExtLib/ffmpeg/libavutil/imgutils.h>
 	#include <ExtLib/ffmpeg/libavutil/mastering_display_metadata.h>
+	#include <ExtLib/ffmpeg/libavutil/dovi_meta.h>
 	#include <ExtLib/ffmpeg/libavutil/opt.h>
 	#include <ExtLib/ffmpeg/libavutil/pixdesc.h>
 	#include <ExtLib/ffmpeg/libavutil/hwcontext_cuda_internal.h>
@@ -1376,6 +1377,105 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 		} else if (m_FilterInfo.HDRContentLightLevel) {
 			hr = pMediaSideData->SetSideData(IID_MediaSideDataHDRContentLightLevel, (const BYTE*)m_FilterInfo.HDRContentLightLevel, sizeof(MediaSideDataHDRContentLightLevel));
 			SAFE_DELETE(m_FilterInfo.HDRContentLightLevel);
+		}
+
+		if (AVFrameSideData* sd = av_frame_get_side_data(pFrame, AV_FRAME_DATA_DOVI_METADATA)) {
+			auto metadata = reinterpret_cast<AVDOVIMetadata*>(sd->data);
+			MediaSideDataDOVIMetadata hdr = {};
+
+			const auto header  = av_dovi_get_header(metadata);
+			const auto mapping = av_dovi_get_mapping(metadata);
+			const auto color   = av_dovi_get_color(metadata);
+
+#define RPU_HDR(name)   hdr.Header.##name = header->##name;
+#define RPU_MAP(name)   hdr.Mapping.##name = mapping->##name;
+#define RPU_COLOR(name) hdr.ColorMetadata.##name = color->##name;
+
+			RPU_HDR(rpu_type);
+			RPU_HDR(rpu_format);
+			RPU_HDR(vdr_rpu_profile);
+			RPU_HDR(vdr_rpu_level);
+			RPU_HDR(chroma_resampling_explicit_filter_flag);
+			RPU_HDR(coef_data_type);
+			RPU_HDR(coef_log2_denom);
+			RPU_HDR(vdr_rpu_normalized_idc);
+			RPU_HDR(bl_video_full_range_flag);
+			RPU_HDR(bl_bit_depth);
+			RPU_HDR(el_bit_depth);
+			RPU_HDR(vdr_bit_depth);
+			RPU_HDR(spatial_resampling_filter_flag);
+			RPU_HDR(el_spatial_resampling_filter_flag);
+			RPU_HDR(disable_residual_flag);
+
+			RPU_MAP(vdr_rpu_id);
+			RPU_MAP(mapping_color_space);
+			RPU_MAP(mapping_chroma_format_idc);
+
+			for (int i = 0; i < 3; i++) {
+				hdr.Mapping.curves[i].num_pivots = mapping->curves[i].num_pivots;
+				for (int j = 0; j < AV_DOVI_MAX_PIECES + 1; j++) {
+					hdr.Mapping.curves[i].pivots[j] = mapping->curves[i].pivots[j];
+				}
+				for (int j = 0; j < AV_DOVI_MAX_PIECES; j++) {
+					hdr.Mapping.curves[i].mapping_idc[j] = mapping->curves[i].mapping_idc[j];
+
+					// poly
+					hdr.Mapping.curves[i].poly_order[j] = mapping->curves[i].poly_order[j];
+					hdr.Mapping.curves[i].poly_coef[j][0] = mapping->curves[i].poly_coef[j][0];
+					hdr.Mapping.curves[i].poly_coef[j][1] = mapping->curves[i].poly_coef[j][1];
+					hdr.Mapping.curves[i].poly_coef[j][2] = mapping->curves[i].poly_coef[j][2];
+
+					// mmr
+					hdr.Mapping.curves[i].mmr_order[j] = mapping->curves[i].mmr_order[j];
+					hdr.Mapping.curves[i].mmr_constant[j] = mapping->curves[i].mmr_constant[j];
+					for (int k = 0; k < 3; k++) {
+						for (int l = 0; l < 7; l++) {
+							hdr.Mapping.curves[i].mmr_coef[j][k][l] = mapping->curves[i].mmr_coef[j][k][l];
+						}
+					}
+				}
+			}
+
+			RPU_MAP(nlq_method_idc);
+			RPU_MAP(num_x_partitions);
+			RPU_MAP(num_y_partitions);
+
+			for (int i = 0; i < 3; i++) {
+				hdr.Mapping.nlq[i].nlq_offset = mapping->nlq[i].nlq_offset;
+				hdr.Mapping.nlq[i].vdr_in_max = mapping->nlq[i].vdr_in_max;
+				hdr.Mapping.nlq[i].linear_deadzone_slope = mapping->nlq[i].linear_deadzone_slope;
+				hdr.Mapping.nlq[i].linear_deadzone_threshold = mapping->nlq[i].linear_deadzone_threshold;
+			}
+
+			RPU_COLOR(dm_metadata_id);
+			RPU_COLOR(scene_refresh_flag);
+
+			for (int i = 0; i < 9; i++) {
+				hdr.ColorMetadata.ycc_to_rgb_matrix[i] = av_q2d(color->ycc_to_rgb_matrix[i]);
+				hdr.ColorMetadata.rgb_to_lms_matrix[i] = av_q2d(color->rgb_to_lms_matrix[i]);
+			}
+
+			for (int i = 0; i < 3; i++) {
+				hdr.ColorMetadata.ycc_to_rgb_offset[i] = av_q2d(color->ycc_to_rgb_offset[i]);
+			}
+
+			RPU_COLOR(signal_eotf);
+			RPU_COLOR(signal_eotf_param0);
+			RPU_COLOR(signal_eotf_param1);
+			RPU_COLOR(signal_eotf_param2);
+			RPU_COLOR(signal_bit_depth);
+			RPU_COLOR(signal_color_space);
+			RPU_COLOR(signal_chroma_format);
+			RPU_COLOR(signal_full_range_flag);
+			RPU_COLOR(source_min_pq);
+			RPU_COLOR(source_max_pq);
+			RPU_COLOR(source_diagonal);
+
+#undef RPU_HDR
+#undef RPU_MAP
+#undef RPU_COLOR
+
+			hr = pMediaSideData->SetSideData(IID_MediaSideDataDOVIMetadata, (const BYTE*)&hdr, sizeof(hdr));
 		}
 
 		return (hr == S_OK);
