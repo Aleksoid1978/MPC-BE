@@ -3922,7 +3922,7 @@ HRESULT CMPCVideoDecFilter::ChangeOutputMediaFormat(int nType)
 void CMPCVideoDecFilter::SetThreadCount()
 {
 	if (m_pAVCtx) {
-		if (m_CodecId == AV_CODEC_ID_MPEG4 || IsDXVASupported(m_bUseDXVA || m_bUseD3D11)) {
+		if (m_bUseNVDEC || m_CodecId == AV_CODEC_ID_MPEG4 || IsDXVASupported(m_bUseDXVA || m_bUseD3D11)) {
 			m_pAVCtx->thread_count = 1;
 			m_pAVCtx->thread_type  = 0;
 		} else {
