@@ -1268,6 +1268,8 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 											continue;
 										}
 										tag.TimeStamp += vtag.tsOffset;
+									} else if (vtag.CodecID == FLV_VIDEO_HEVC && vtag.AVCPacketType == PacketType::CodedFrames) {
+										tag.TimeStamp += vtag.tsOffset;
 									}
 
 									timecodes.push_back(tag.TimeStamp);
@@ -1529,6 +1531,8 @@ bool CFLVSplitterFilter::DemuxLoop()
 						goto NextTag;
 					}
 
+					t.TimeStamp += vt.tsOffset;
+				} else if (vt.CodecID == FLV_VIDEO_HEVC && vt.AVCPacketType == PacketType::CodedFrames) {
 					t.TimeStamp += vt.tsOffset;
 				}
 			}
