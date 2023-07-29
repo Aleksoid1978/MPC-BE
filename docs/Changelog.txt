@@ -2,6 +2,18 @@
 
 1.6.8.x dev
 =============================
+FLVSplitter
+Added support for HEVC, VP9, AV1.
+
+MPCVideoDec
+Added export of Dolby Vision metadata via the IMediaSideData interface.
+Fixed D3D11 copyback hardware decoding on some Intel graphics cards.
+Fixed output format selection when decoding some 10-bit HEVC.
+
+Player
+Checking for updates will not be performed if the player is launched with files open.
+
+Updated Korean translation (by Hackjjang).
 
 
 1.6.8.5 - 2023-07-05
