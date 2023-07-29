@@ -32,6 +32,7 @@
 #include "DSUtil/GolombBuffer.h"
 #include "DSUtil/SysVersion.h"
 #include "DSUtil/DXVAState.h"
+#include "DSUtil/VideoParser.h"
 #include "filters/parser/AviSplitter/AviSplitter.h"
 #include "filters/parser/OggSplitter/OggSplitter.h"
 #include "filters/parser/MpegSplitter/MpegSplitter.h"
@@ -2285,6 +2286,18 @@ redo:
 
 	if (ret < 0) {
 		return VFW_E_INVALIDMEDIATYPE;
+	}
+
+	if (m_CodecId == AV_CODEC_ID_HEVC && m_pAVCtx->pix_fmt == AV_PIX_FMT_NONE && m_pAVCtx->extradata_size > 0) {
+		vc_params_t params;
+		if (HEVCParser::ParseHEVCDecoderConfigurationRecord(m_pAVCtx->extradata, m_pAVCtx->extradata_size, params, false)) {
+			m_pAVCtx->profile = params.profile;
+			if (m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10) {
+				m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P10LE;
+			} else if (m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN) {
+				m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
+			}
+		}
 	}
 
 	FillAVCodecProps(m_pAVCtx, pBMI);
