@@ -3,7 +3,7 @@
 1.6.8.x dev
 =============================
 FLVSplitter
-Added support for HEVC, VP9, AV1.
+Added support for HEVC, VP9, AV1 in "Enhanced flv".
 
 MPCVideoDec
 Added export of Dolby Vision metadata via the IMediaSideData interface.
