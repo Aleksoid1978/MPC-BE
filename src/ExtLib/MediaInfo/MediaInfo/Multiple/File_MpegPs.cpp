@@ -264,6 +264,13 @@ File_MpegPs::~File_MpegPs()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+void File_MpegPs::Streams_Accept()
+{
+    if (!IsSub && !Config->File_IsReferenced_Get() && File_Name.size()>=5 && File_Name.find(__T("1.VOB"), File_Name.size()-5)!=string::npos && File_Size>=0x3F000000 && File_Size<0x40000000)
+        TestContinuousFileNames(1, Ztring(), true);
+}
+
+//---------------------------------------------------------------------------
 void File_MpegPs::Streams_Fill()
 {
     //For each Streams

@@ -221,6 +221,9 @@
 #if defined(MEDIAINFO_DTS_YES)
     #include "MediaInfo/Audio/File_Dts.h"
 #endif
+#if defined(MEDIAINFO_DTSUHD_YES)
+    #include "MediaInfo/Audio/File_DtsUhd.h"
+#endif
 #if defined(MEDIAINFO_DOLBYE_YES)
     #include "MediaInfo/Audio/File_DolbyE.h"
 #endif
@@ -627,6 +630,9 @@ File__MultipleParsing::File__MultipleParsing()
     #endif
     #if defined(MEDIAINFO_DTS_YES)
         Parser.push_back(new File_Dts());
+    #endif
+    #if defined(MEDIAINFO_DTSUHD_YES)
+        Parser.push_back(new File_DtsUhd());
     #endif
 //    Too many false-positives
 //    #if defined(MEDIAINFO_DOLBYE_YES)

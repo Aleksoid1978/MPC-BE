@@ -229,6 +229,7 @@ Bits-(Pixel*Frame);Біт/(Пікселі*Кадры)
 BufferSize;Памер буфера
 Cancel;Адмена
 CaptionServiceName;
+CatalogNumber;
 Channel(s);Канал(ы)
 ChannelCoded;
 ChannelConfiguration;
@@ -242,6 +243,7 @@ Chapters stream(s);Струмень(і) падзелаў
 Chapters_Codec_List;Кодэкі падзелаў
 Chapters_No;Няма падзелаў
 ChaptersCount;Коль-ць падзелаў
+CharacterSet;
 CheckNewVersion;Праверыць новую версію
 Choose custom;Абраць
 Choose custom sheet;Абраць табліцу
@@ -328,6 +330,7 @@ DarkMode;
 Date;Дата
 Debug;Адладка
 Decimal point;Дзесятковая кропка
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;Затрымка
@@ -336,6 +339,7 @@ Delay_Source_Container;Кантэйнер
 Delay_Source_Stream;'Сыры' струмень
 Delete;Выдаліць
 Description;Апісанне
+Details;
 dialnorm;
 DialogueCorrected;
 DialogueEnhancement;
@@ -357,6 +361,7 @@ DotsPerInch;Кропак на дзюйм
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Працягласць
@@ -384,6 +389,7 @@ EPG_Positions;EPG пазіцыіі (унутр)
 EpisodeTitleNumber;
 Error_File;Памылка ў файле
 Error_File_Write;
+Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
 Events_RollUp;
@@ -420,6 +426,7 @@ Folder (R)_Hint;Абярыце тэчку для апрацоўкі (са ўсі
 Folder (Recursively);Тэчка (рэкурсіўна)...
 Folder_Hint;Аперацыі з тэчкамі
 FolderName;Імя тэчкі
+Forced;
 Format;Фармат
 Format_Commercial;Камерцыйная назва
 Format_Commercial_IfAny;
@@ -463,6 +470,7 @@ FpaPass;
 FpaVersion;
 FrameCount;Лічыльнік кадраў
 FrameRate;Частата кадраў
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Максімальная частата кадраў
 FrameRate_Minimum;Мінімальная частата кадраў
 FrameRate_Mode;Рэжым частаты кадраў
@@ -471,7 +479,9 @@ FrameRate_Mode_VFR;Пераменны
 FrameRate_Nominal;Намінальная частата кадраў
 FrameRate_Original;Першасная частата кадраў
 FrameRate_Real;
+FullParsing;
 General;Агульнае
+GeneralCompliance;
 Genre;Жанр
 Genre_000;Blues
 Genre_001;Classic Rock
@@ -716,6 +726,21 @@ InternetMediaType;Інтэрнэт-тып носьбіта
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Ключавыя словы
 Known codecs;Вядомыя кодэкі
 Known formats;Вядомыя фарматы
@@ -747,6 +772,7 @@ Language_bs;Bosnian
 Language_ca;Catalan
 Language_ce;Chechen
 Language_ch;Chamorro
+Language_cmn;
 Language_co;Corsican
 Language_cr;Cree
 Language_cs;Czech
@@ -916,10 +942,17 @@ Language_wo;Wolof
 Language_xh;Xhosa
 Language_yi;Yiddish
 Language_yo;Yoruba
+Language_yue;
 Language_za;Zhuang
 Language_zh;Chinese
+Language_zh-cmn;
 Language_zh-cn;Chinese (China)
+Language_zh-CN;
+Language_zh-Hans;
+Language_zh-Hant;
 Language_zh-tw;Chinese (Taiwan)
+Language_zh-TW;
+Language_zh-yue;
 Language_zu;Zulu
 LawRating;Абмежаванне правоў
 LCCN;LCCN
@@ -944,6 +977,7 @@ LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Спіс
+LongTermLoudness;
 LoRoCenterMixGain;
 LoRoSurroundMixGain;
 Loudness_Anchor;
@@ -981,6 +1015,8 @@ MaxFALL;
 MaxGain;
 MaximumMomentaryLoudness;
 MaxTruePeak;
+MD5;
+MD5_Unencoded;
 MediaInfo_About;Адлюстроўвае дэталёвую інфармацыю\r\nпра мультымедыя-файлы Matroska, OGG (уключаючы OGM)\r\nMPEG1 (уключаючы VCD), MPEG2 (уключаючы DVD і SVCD), MPEG4 (уключаючы iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (уключаючы WMV, WMA)\r\nMicrosoft RIFF (уключаючы AVI, WAV, DivX)\r\nгукавыя фарматы (AC3, DTS, SSC, AU, AIFF)
 MediaInfo_About_About;
 Menu;Меню
@@ -1033,42 +1069,6 @@ ObjectCount;
 OK;Добра
 One output file per input file;Адзін файл на кожны зыходны
 Open;Адкрыць
-OpenCandy_01;Загружаецца ________
-OpenCandy_02;__% выканана
-OpenCandy_03;Выхад у інтэрнэт немагчымы
-OpenCandy_04;________ запампавана
-OpenCandy_05;Пстрыкніце для ўсталёўкі ________
-OpenCandy_06;Вы сапраўды жадаеце перапыніць усталёўку?\r\nКалі вы жадаеце адкласці ўсталёўку, абярыце 'Не'.\r\nПрым.: Вы можаце абраць Выйсці з меню, каб адкласці ўсталёўку да наступнай перазагрузкі.
-OpenCandy_07;Загрузка ________ была прыпыненая.\r\nКлікніце па значку ў трэі для аднаўлення загрузкі.
-OpenCandy_08;Выяўленая крытычная памылка. Усталёўка _________ будзе перапынена.
-OpenCandy_09;Прыпыніць загрузку
-OpenCandy_10;Адмяніць усталёўку
-OpenCandy_11;Працягнуць загрузку
-OpenCandy_12;Выйсці з усталёўкі
-OpenCandy_13;___________ - рэкамендавана ____________
-OpenCandy_14;Загружаецца _________
-OpenCandy_15;___________, праграма, рэкамендаваная ___________, цяпер загружаецца па Вашым запыце. Мы дамо шляхту, калі яна будзе гатовая для ўсталёўкі.
-OpenCandy_16;___________ гатовая для ўсталёўкі
-OpenCandy_17;___________ цалкам загружаная. Націсніце 'Усталёўка' для пачатку працэсу.
-OpenCandy_18;___________ з ___________ загружана
-OpenCandy_19;Распрацавана OpenCandy
-OpenCandy_20;Дадатковая інфармацыя на OpenCandy.com
-OpenCandy_21;Усталёўка
-OpenCandy_22;Усталёўка ___________
-OpenCandy_23;Гэта перапыніць усталёўку ___________\r\nВы сапраўды жадаеце выйсці?
-OpenCandy_24;Паўза
-OpenCandy_25;Загрузка была прыпыненая. Націсніце 'Працягнуць' для аднаўлення.
-OpenCandy_26;Працягнуць
-OpenCandy_27;Усталёўка
-OpenCandy_28;Прыпыніць загрузку
-OpenCandy_29;Працягнуць загрузку
-OpenCandy_30;Адмяніць усталёўку
-OpenCandy_31;Абярыце параметры ўсталёўкі
-OpenCandy_32;Усталёўка ___________
-OpenCandy_33;Не ўсталёўваць
-OpenCandy_34;Абярыце параметры ўсталёўкі
-OpenCandy_35;______ рэкамендуюць гэтую праграму
-OpenCandy_36;Ваша бягучая ўсталеўка не будзе перапынена
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
@@ -1146,6 +1146,7 @@ Rating;Рэйтынг
 RealtimeLoudnessCorrected;
 Recorded_Date;Дата запісу
 Recorded_Location;Месца запісу
+Reel;
 Released_Date;Дата выпуску
 RemixedBy;Рэмікс ад
 RenderMode;
@@ -1364,5 +1365,5 @@ Written_Location;Месца напісання
 WrittenBy;Напісаў
 Yes;Так
 Your system;Ваша сістэма
-ZZ_Automatic_Percent;70
-ZZ_AutomaticLanguage_Percent;73
+ZZ_Automatic_Percent;67
+ZZ_AutomaticLanguage_Percent;71

@@ -229,6 +229,7 @@ Bits-(Pixel*Frame);bity/(piksele*ramki)
 BufferSize;
 Cancel;Anuluj
 CaptionServiceName;
+CatalogNumber;
 Channel(s);Kanały
 ChannelCoded;
 ChannelConfiguration;
@@ -242,6 +243,7 @@ Chapters stream(s);Strumień rozdziałów
 Chapters_Codec_List;Kodeki rozdziałów
 Chapters_No;Brak rozdziałów
 ChaptersCount;Strumieni rozdziału
+CharacterSet;
 CheckNewVersion;Sprawdź nową wersję
 Choose custom;Wybierz własne
 Choose custom sheet;Dostosuj preferowaną własną kartę
@@ -328,6 +330,7 @@ DarkMode;
 Date;Data
 Debug;Odpluskwianie
 Decimal point;Punkt dziesiętny
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;Opóźnienie
@@ -336,6 +339,7 @@ Delay_Source_Container;
 Delay_Source_Stream;
 Delete;Usuń
 Description;Opis
+Details;
 dialnorm;
 DialogueCorrected;
 DialogueEnhancement;
@@ -357,6 +361,7 @@ DotsPerInch;punktów na cal
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Czas trwania
@@ -384,6 +389,7 @@ EPG_Positions;Pozycje EPG (wewnętrzne)
 EpisodeTitleNumber;
 Error_File;Błąd przy odczycie pliku
 Error_File_Write;
+Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
 Events_RollUp;
@@ -420,6 +426,7 @@ Folder (R)_Hint;Wybierz foldery do przeanalizowania (wraz z rekurencyjnymi)
 Folder (Recursively);Folder (rekurencyjny)
 Folder_Hint;Wybierz folder do przeanalizowania
 FolderName;Nazwa folderu
+Forced;
 Format;Format
 Format_Commercial;
 Format_Commercial_IfAny;
@@ -463,6 +470,7 @@ FpaPass;
 FpaVersion;
 FrameCount;Liczba klatek
 FrameRate;Szybkość wyświetlania klatek
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Maksymalna szybkość wyświetlania klatek
 FrameRate_Minimum;Minimalna szybkość wyświetlania klatek
 FrameRate_Mode;Tryb wyświetlania klatek
@@ -471,7 +479,9 @@ FrameRate_Mode_VFR;Zmienny
 FrameRate_Nominal;Nominalna szybkość wyświetlania klatek
 FrameRate_Original;Oryginalna szybkość wyświetlania klatek
 FrameRate_Real;
+FullParsing;
 General;Ogólne
+GeneralCompliance;
 Genre;Rodzaj
 Genre_000;Blues
 Genre_001;Klasyczny rock
@@ -716,6 +726,21 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Słowa kluczowa
 Known codecs;Znane kodeki
 Known formats;Znane formaty
@@ -747,6 +772,7 @@ Language_bs;Bośniacki
 Language_ca;Kataloński
 Language_ce;Czeczeński
 Language_ch;
+Language_cmn;
 Language_co;Korsykański
 Language_cr;
 Language_cs;Czeski
@@ -916,10 +942,17 @@ Language_wo;
 Language_xh;
 Language_yi;Jidisz
 Language_yo;
+Language_yue;
 Language_za;
 Language_zh;Chiński
+Language_zh-cmn;
 Language_zh-cn;Chiński (Chiny)
+Language_zh-CN;
+Language_zh-Hans;
+Language_zh-Hant;
 Language_zh-tw;Chiński (Tajwan)
+Language_zh-TW;
+Language_zh-yue;
 Language_zu;Zuluski
 LawRating;Nisko oceniany
 LCCN;LCCN
@@ -944,6 +977,7 @@ LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Lista
+LongTermLoudness;
 LoRoCenterMixGain;
 LoRoSurroundMixGain;
 Loudness_Anchor;
@@ -981,6 +1015,8 @@ MaxFALL;
 MaxGain;
 MaximumMomentaryLoudness;
 MaxTruePeak;
+MD5;
+MD5_Unencoded;
 MediaInfo_About;Dostarcza bardzo szczegółowe informacje\r\no pliku multimedialnym:\r\nMatroska, OGG (wraz z OGM)\r\nMPEG1 (wraz z VCD)\r\nMPEG2 (wraz z DVD i SVCD)\r\nMPEG4 (wraz z iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (wraz z  WMV, WMA)\r\nMicrosoft RIFF (wraz z AVI, WAV)\r\nFormaty dźwiekowe (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
 Menu;Menu
@@ -1033,42 +1069,6 @@ ObjectCount;
 OK;Ok
 One output file per input file;Jeden plik wyjściowy na wejściowy
 Open;Otwórz
-OpenCandy_01;Pobieranie
-OpenCandy_02;      % pobrano
-OpenCandy_03;Utracono połączenie
-OpenCandy_04;            pobieranie zakończone
-OpenCandy_05;Wybierz aby zainstalować
-OpenCandy_06;Na pewno chcesz przerwać instalację?\r\nJeśli chcesz przełożyć instalację na później wybierz 'Nie'.\r\nUwaga: Z menu możesz wybrać 'Wyjście' by odłożyć instalację do ponownego uruchomienia komputera.
-OpenCandy_07;Pobieranie           zostało zapauzowane.\r\nKliknij ikonę w zasobniku, by je wznowić.
-OpenCandy_08;Wystąpił krytyczny błąd. Instalacja          została przerwana.
-OpenCandy_09;Zapauzuj pobieranie
-OpenCandy_10;Anuluj instalację
-OpenCandy_11;Wznów pobieranie
-OpenCandy_12;Opuść instalatora
-OpenCandy_13;        - Polecane przez
-OpenCandy_14;Pobieranie
-OpenCandy_15;           , oprogramowanie polecane przez                 jest pobierane zgodnie z życzeniem. Gdy będzie gotowe do instalacji zostaniesz powiadomiony.
-OpenCandy_16;           mozna już zainstalować.
-OpenCandy_17;           zostało już pobrane. Proszę wybrać 'Instaluj', aby rozpocząć.
-OpenCandy_18;           z           pobrano
-OpenCandy_19;Przygotowany przez OpenCandy
-OpenCandy_20;Dowiedz się więcej na OpenCandy.com
-OpenCandy_21;Instaluj
-OpenCandy_22;Instalacja
-OpenCandy_23;Instalacja                                 zostanie anulowana.\r\nJesteś pewny, że chcesz przerwać?
-OpenCandy_24;Pauza
-OpenCandy_25;Pobieranie zostało zapauzowane. Wybierz 'Wznów' gdy będziesz chciał kontynuować.
-OpenCandy_26;Wznów
-OpenCandy_27;Zainstaluj
-OpenCandy_28;Pauzuje pobieranie
-OpenCandy_29;Wznawia pobieranie
-OpenCandy_30;Anuluje instalację
-OpenCandy_31;Proszę wybrać opcje instalacji
-OpenCandy_32;Instaluj
-OpenCandy_33;Nie instaluj
-OpenCandy_34;Proszę określić opcje instalacji
-OpenCandy_35;               poleca to oprogramowanie
-OpenCandy_36;Bieżąca instalacja nie będzie przerwana
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
@@ -1146,6 +1146,7 @@ Rating;Ocena
 RealtimeLoudnessCorrected;
 Recorded_Date;Data nagrania
 Recorded_Location;Miejsce nagrania
+Reel;
 Released_Date;Rok wydania
 RemixedBy;Remiksował
 RenderMode;
@@ -1364,5 +1365,5 @@ Written_Location;Lokalizacja
 WrittenBy;Napisał
 Yes;Tak
 Your system;System
-ZZ_Automatic_Percent;61
-ZZ_AutomaticLanguage_Percent;72
+ZZ_Automatic_Percent;58
+ZZ_AutomaticLanguage_Percent;70

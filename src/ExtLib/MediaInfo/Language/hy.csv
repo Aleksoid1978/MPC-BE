@@ -229,6 +229,7 @@ Bits-(Pixel*Frame);Բիթ/(Փիքսել*Կադր)
 BufferSize;Պահոցի չափը
 Cancel;Մերժել
 CaptionServiceName;
+CatalogNumber;
 Channel(s);Ալիք(ներ)
 ChannelCoded;
 ChannelConfiguration;
@@ -242,6 +243,7 @@ Chapters stream(s);Բաժինների հոսքերը
 Chapters_Codec_List;Բաժինների կոդ-ները
 Chapters_No;Չկան բաժիններ
 ChaptersCount;Բաժինների ք-ը
+CharacterSet;
 CheckNewVersion;Ստուգել նոր տարբերակը
 Choose custom;Ընտրել
 Choose custom sheet;Ընտրել աղյուսակը
@@ -328,6 +330,7 @@ DarkMode;
 Date;Ամսաթիվը
 Debug;Փոխադրիչ
 Decimal point;Տասնորդական կետ
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;Հապաղում
@@ -336,6 +339,7 @@ Delay_Source_Container;Փաթեթը
 Delay_Source_Stream;'Աղբյուր' հոսքը
 Delete;Ջնջել
 Description;Նկարագրությունը
+Details;
 dialnorm;
 DialogueCorrected;
 DialogueEnhancement;
@@ -357,6 +361,7 @@ DotsPerInch;Կետեր դյույմի վրա
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Տևողությունը
@@ -384,6 +389,7 @@ EPG_Positions;EPG-ի դիրքը (ներքին)
 EpisodeTitleNumber;
 Error_File;Սխալ ֆայլում
 Error_File_Write;
+Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
 Events_RollUp;
@@ -420,6 +426,7 @@ Folder (R)_Hint;Ընտրեք թղթապանակը (բոլոր ենթաթղթապ
 Folder (Recursively);Թղթապանակը (նվազմամբ)...
 Folder_Hint;Գործողություն թղթ-երի հետ
 FolderName;Թղթապանակի անունը
+Forced;
 Format;Տեսակը
 Format_Commercial;Կոմերցիոն անվանումը
 Format_Commercial_IfAny;
@@ -463,6 +470,7 @@ FpaPass;
 FpaVersion;
 FrameCount;Կադրերի հաշվիչ
 FrameRate;Կադրերի հաճախականությունը
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Կադրերի առավելագույն հաճախ-ը
 FrameRate_Minimum;Կադրերի նվազագույն հաճախ-ը
 FrameRate_Mode;Կադրերի հաճախականության եղանակը
@@ -471,7 +479,9 @@ FrameRate_Mode_VFR;Փոփոխական
 FrameRate_Nominal;Կադրերի պայմանական հաճախ-ը
 FrameRate_Original;Կադրերի հաճախ-ը օրիգինալում
 FrameRate_Real;
+FullParsing;
 General;Ընդհանուր
+GeneralCompliance;
 Genre;Ժանրը
 Genre_000;Blues
 Genre_001;Classic Rock
@@ -716,6 +726,21 @@ InternetMediaType;Կրիչի ինտերնետային տեսակ
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Հիմնաբառերը
 Known codecs;Հայտնի կոդավորիչները
 Known formats;Հայտնի տեսակները
@@ -747,6 +772,7 @@ Language_bs;Bosnian
 Language_ca;Catalan
 Language_ce;Chechen
 Language_ch;Chamorro
+Language_cmn;
 Language_co;Corsican
 Language_cr;Cree
 Language_cs;Czech
@@ -916,10 +942,17 @@ Language_wo;Wolof
 Language_xh;Xhosa
 Language_yi;Yiddish
 Language_yo;Yoruba
+Language_yue;
 Language_za;Zhuang
 Language_zh;Chinese
+Language_zh-cmn;
 Language_zh-cn;Chinese (China)
+Language_zh-CN;
+Language_zh-Hans;
+Language_zh-Hant;
 Language_zh-tw;Chinese (Taiwan)
+Language_zh-TW;
+Language_zh-yue;
 Language_zu;Zulu
 LawRating;Իրավունքների սահ-ում
 LCCN;LCCN
@@ -944,6 +977,7 @@ LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Ցանկը
+LongTermLoudness;
 LoRoCenterMixGain;
 LoRoSurroundMixGain;
 Loudness_Anchor;
@@ -981,6 +1015,8 @@ MaxFALL;
 MaxGain;
 MaximumMomentaryLoudness;
 MaxTruePeak;
+MD5;
+MD5_Unencoded;
 MediaInfo_About;Ցուցադրում է մանրամասն տեղեկություններ\r\nմուլտիմեդիային ֆայլեր Matroska-ի, OGG-ի (ներառյալ OGM)\r\nMPEG1-ի (ներառյալ VCD), MPEG2-ի (ներառյալ DVD և SVCD), MPEG4-ի (ներառյալ iTunes M4A)\r\nQuicktime-ի\r\nRealMedia-ի\r\nWindowsMedia-ի (ներառյալ WMV, WMA)\r\nMicrosoft RIFF-ի (ներառյալ AVI, WAV, DivX)\r\nձայնային ֆայլերի (AC3, DTS, SSC, AU, AIFF) վերաբերյալ
 MediaInfo_About_About;
 Menu;Ընտրացանկը
@@ -1033,42 +1069,6 @@ ObjectCount;
 OK;ԼԱՎ
 One output file per input file;Նոր ֆայլ յուրաքանչյուրի համար
 Open;Բացել
-OpenCandy_01;Բացվում է ________
-OpenCandy_02;__% կատարվել է
-OpenCandy_03;Մուտքը ինտերնետ հնարավոր չէ
-OpenCandy_04;________ բեռնվել է
-OpenCandy_05;Սեղմեք տեղադրման համար ________
-OpenCandy_06;Կանգնեցնե՞լ տեղակայումը։\r\nԵթե ցանկանում եք հետաձգել տեղակայումը սեղմեք, 'Ոչ'։\r\nՈւշադր. Կարող եք դուրս գալ ընտրացանկից՝ տեղակայումը հետաձգելու համար։
-OpenCandy_07;________-ի բեռնումը կանգնեցված է։\r\nՍեղմեք էկրանի ներքևի մասում գտնվող պատկերի վրա՝ բեռնումը վերսկսելու համար։
-OpenCandy_08;Կրիտիկական սխալ։ _________-ի տեղակայումը ընդհատված է։
-OpenCandy_09;Կանգնեցնել բեռնումը
-OpenCandy_10;Ետարկել տեղակայումը
-OpenCandy_11;Շարունակել բեռնումը
-OpenCandy_12;Ելք տեղակայումից
-OpenCandy_13;___________ - խորհուրդ է տրվում ____________
-OpenCandy_14;_________-ը բեռնվում է
-OpenCandy_15;___________, ծրագիրը, երաշխավորված ___________-ի կողմից, այժմ բեռնվում է։
-OpenCandy_16;___________-ը պատրաստ է տեղակայման
-OpenCandy_17;___________-ը բեռնվել է։ Սեղմեք 'Տեղակայել'՝ սկսելու համար։
-OpenCandy_18;___________-ը ___________-ից բեռնվել է
-OpenCandy_19;Ստեղծված է OpenCandy-ի կողմից
-OpenCandy_20;Լրացուցիչ տեղեկությունները OpenCandy.com-ում
-OpenCandy_21;Տեղակայում
-OpenCandy_22;___________-ի տեղակայում
-OpenCandy_23;Սա կընդհատի ___________-ի տեղակայումը\r\nԴուրս գա՞լ։
-OpenCandy_24;Դադար
-OpenCandy_25;Բեռնումը ընդհատվել է։ Սեղմեք 'Շարունակել'՝ վերսկսելու համար։
-OpenCandy_26;Շարունակել
-OpenCandy_27;Տեղակայում
-OpenCandy_28;Կանգնեցնել բեռնումը
-OpenCandy_29;Շարունակել բեռնումը
-OpenCandy_30;Կանգնեցնել բեռնումը
-OpenCandy_31;Ընտրեք տեղակայման ցուցիչները
-OpenCandy_32;___________-ի տեղակայում
-OpenCandy_33;Չտեղակայել
-OpenCandy_34;Ընտրեք տեղակայման ցուցիչները
-OpenCandy_35;______-ի երաշխավորած ծրագիրը
-OpenCandy_36;Ընթացիկ տեղակայումը չի ընդհատվի
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
@@ -1146,6 +1146,7 @@ Rating;Վարկանիշը
 RealtimeLoudnessCorrected;
 Recorded_Date;Գրելու ամսաթիվը
 Recorded_Location;Գրելու տեղը
+Reel;
 Released_Date;Թողարկման ամսաթիվը
 RemixedBy;Ռեմիքսը՝
 RenderMode;
@@ -1364,5 +1365,5 @@ Written_Location;Գրելու տեղը
 WrittenBy;Գրվել է՝
 Yes;Այո
 Your system;Ձեր համակարգը
-ZZ_Automatic_Percent;70
-ZZ_AutomaticLanguage_Percent;74
+ZZ_Automatic_Percent;67
+ZZ_AutomaticLanguage_Percent;72

@@ -384,7 +384,7 @@ bool File_SubRip::FileHeader_Begin()
                     item Item;
                     Item.PTS_Begin=Time_Begin_New;
                     Item.PTS_End=Time_End_New;
-                    Item.Content=move(Content);
+                    Item.Content=std::move(Content);
                     Items.push_back(Item);
                 #endif //MEDIAINFO_DEMUX
             }

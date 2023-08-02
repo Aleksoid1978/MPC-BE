@@ -229,6 +229,7 @@ Bits-(Pixel*Frame);Bits/(Pixel*Image)
 BufferSize;Taille du buffer
 Cancel;Annuler
 CaptionServiceName;
+CatalogNumber;
 Channel(s);Canaux
 ChannelCoded;
 ChannelConfiguration;
@@ -242,6 +243,7 @@ Chapters stream(s);Piste(s) chapitre
 Chapters_Codec_List;Codecs Chapitres
 Chapters_No;Pas de chapitres
 ChaptersCount;Nombre de pistes chapitre
+CharacterSet;
 CheckNewVersion;Vérifier si nouvelle version
 Choose custom;Choisissez le texte personnalisé
 Choose custom sheet;Choisissez le tableau personnalisé
@@ -328,6 +330,7 @@ DarkMode;Mode sombre
 Date;Date
 Debug;Debug
 Decimal point;Point décimal
+Default;
 Default_Setting;Par défaut
 DefaultTargetDeviceConfig;
 Delay;Délai
@@ -336,6 +339,7 @@ Delay_Source_Container;Conteneur
 Delay_Source_Stream;Flux brut
 Delete;Supprimer
 Description;Description
+Details;
 dialnorm;
 DialogueCorrected;
 DialogueEnhancement;
@@ -357,6 +361,7 @@ DotsPerInch;Point par pouce
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Durée
@@ -384,6 +389,7 @@ EPG_Positions;Positions de l'EPG (interne)
 EpisodeTitleNumber;
 Error_File;Erreur lors de la lecture du fichier
 Error_File_Write;Erreur lors de l'écriture du fichier
+Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
 Events_RollUp;
@@ -420,6 +426,7 @@ Folder (R)_Hint;Sélectionne un dossier à étudier (avec tous ses sous-dossiers
 Folder (Recursively);Dossier (Récursif)
 Folder_Hint;Sélectionne un dossier à étudier
 FolderName;Nom du dossier
+Forced;
 Format;Format
 Format_Commercial;Nom commercial
 Format_Commercial_IfAny;Nom commercial
@@ -463,6 +470,7 @@ FpaPass;
 FpaVersion;
 FrameCount;Nombre d'images
 FrameRate;Images par seconde
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Images/s maxi
 FrameRate_Minimum;Images/s mini
 FrameRate_Mode;Type d'images/s
@@ -471,7 +479,9 @@ FrameRate_Mode_VFR;Variable
 FrameRate_Nominal;Images/s nominal
 FrameRate_Original;Images/s d'origine
 FrameRate_Real;
+FullParsing;
 General;Général
+GeneralCompliance;
 Genre;Genre
 Genre_000;Blues
 Genre_001;Rock classique
@@ -716,6 +726,21 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Mots clé
 Known codecs;Codecs connus
 Known formats;Formats connus
@@ -747,6 +772,7 @@ Language_bs;Bosniaque
 Language_ca;Catalan
 Language_ce;Tchétchène
 Language_ch;Chamorro
+Language_cmn;
 Language_co;Corse
 Language_cr;Cree
 Language_cs;Tchèque
@@ -916,10 +942,17 @@ Language_wo;Wolof
 Language_xh;Xhosa
 Language_yi;Yiddish
 Language_yo;Yoruba
+Language_yue;
 Language_za;Zhuang
 Language_zh;Chinois
+Language_zh-cmn;
 Language_zh-cn;Chinois (Chine)
+Language_zh-CN;
+Language_zh-Hans;
+Language_zh-Hant;
 Language_zh-tw;Chinois (Taiwan)
+Language_zh-TW;
+Language_zh-yue;
 Language_zu;Zoulou
 LawRating;Classé
 LCCN;LCCN
@@ -944,6 +977,7 @@ LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Liste
+LongTermLoudness;
 LoRoCenterMixGain;
 LoRoSurroundMixGain;
 Loudness_Anchor;
@@ -981,6 +1015,8 @@ MaxFALL;
 MaxGain;
 MaximumMomentaryLoudness;
 MaxTruePeak;
+MD5;
+MD5_Unencoded;
 MediaInfo_About;MediaInfo fournit des informations techniques et les tags à propos de vos fichiers video et audio.\r\nExcepté l'interface graphique du Mac App Store, c'est un logiciel libre, ce qui signifie qu'il est gratuit pour l'utilisateur final et que les développeurs on la liberté de l'étudier, l'améliorer et le redistribuer (licence BSD)
 MediaInfo_About_About;MediaInfo v%MI_VERSION% basé sur MediaInfoLib v%MIL_VERSION%
 Menu;Menu
@@ -1033,42 +1069,6 @@ ObjectCount;
 OK;OK
 One output file per input file;Erreur de lecture du fichier
 Open;Ouvrir
-OpenCandy_01;Téléchargement de _____
-OpenCandy_02;____% Terminé
-OpenCandy_03;Connexion Internet interrompue
-OpenCandy_04;Téléchargement de ____ terminé.
-OpenCandy_05;Cliquez ici pour installer ______
-OpenCandy_06;Êtes-vous sûr de vouloir annuler l'installation?\r\nSi vous souhaitez reporter l'installation à plus tard, sélectionnez 'Non'.\r\nRemarque: Vous pouvez choisir 'Quitter' depuis le menu pour reporter l'installation au prochain redémarrage.
-OpenCandy_07;Le téléchargement de ______ a été mis en pause.\r\nCliquez sur l'icône dans la barre d'état pour reprendre le téléchargement.
-OpenCandy_08;Une erreur critique est survenue. L'installation de ______ va être annulée.
-OpenCandy_09;Mettre le téléchargement en pause.
-OpenCandy_10;Annuler l'installation
-OpenCandy_11;Reprendre le téléchargement
-OpenCandy_12;Quitter l'installation
-OpenCandy_13;________ - recommandé par __________
-OpenCandy_14;Téléchargement de _____
-OpenCandy_15;_________, le logiciel recommandé par _______, est en cours de téléchargement selon votre demande. Nous vous ferons savoir quand il sera prêt à être installé.
-OpenCandy_16;_______ est prêt à être installé.
-OpenCandy_17;_______ est maintenant entièrement téléchargé. Cliquez sur 'Installer' pour continuer.
-OpenCandy_18;_______ sur _______ téléchargé
-OpenCandy_19;Un service de OpenCandy
-OpenCandy_20;En savoir plus : OpenCandy.com
-OpenCandy_21;Installer
-OpenCandy_22;Installation de _______
-OpenCandy_23;Ceci va annuler l'installation de _______.\r\Êtes-vous sûr de vouloir quitter?
-OpenCandy_24;Interrompre
-OpenCandy_25;Votre téléchargement a été interrompu. Cliquez sur 'Reprendre' lorsque vous êtes prêts à continuer.
-OpenCandy_26;Reprendre
-OpenCandy_27;Installer Maintenant
-OpenCandy_28;Interrompre le Téléchargement
-OpenCandy_29;Reprendre le Téléchargement
-OpenCandy_30;Annuler l'installation
-OpenCandy_31;Veuillez choisir une option d'installation
-OpenCandy_32;Installer _______
-OpenCandy_33;Ne pas installer
-OpenCandy_34;Veuillez sélectionner une option d'installation
-OpenCandy_35;______ recommande ce logiciel
-OpenCandy_36;Votre installation en cours ne sera pas interrompue
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
@@ -1146,6 +1146,7 @@ Rating;Note
 RealtimeLoudnessCorrected;
 Recorded_Date;Date d'enregistrement
 Recorded_Location;Lieu d'enregistrement
+Reel;
 Released_Date;Date de première diffusion
 RemixedBy;Remixé par
 RenderMode;
@@ -1364,5 +1365,5 @@ Written_Location;Lieu d'écriture
 WrittenBy;Écrit par
 Yes;Oui
 Your system;Votre système
-ZZ_Automatic_Percent;75
-ZZ_AutomaticLanguage_Percent;79
+ZZ_Automatic_Percent;73
+ZZ_AutomaticLanguage_Percent;77

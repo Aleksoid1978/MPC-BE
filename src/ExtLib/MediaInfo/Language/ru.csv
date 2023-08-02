@@ -229,6 +229,7 @@ Bits-(Pixel*Frame);Бит/(Пиксели*Кадры)
 BufferSize;Размер буфера
 Cancel;Отмена
 CaptionServiceName;
+CatalogNumber;
 Channel(s);Каналы
 ChannelCoded;
 ChannelConfiguration;
@@ -242,6 +243,7 @@ Chapters stream(s);Потоки разделов
 Chapters_Codec_List;Кодеки разделов
 Chapters_No;Нет разделов
 ChaptersCount;Количество разделов
+CharacterSet;
 CheckNewVersion;Проверить наличие новой версии
 Choose custom;Выбрать
 Choose custom sheet;Выбрать таблицу
@@ -328,6 +330,7 @@ DarkMode;
 Date;Дата
 Debug;Отладка
 Decimal point;Десятичная точка
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;Задержка
@@ -336,6 +339,7 @@ Delay_Source_Container;Контейнер
 Delay_Source_Stream;'Сырой' поток
 Delete;Удалить
 Description;Описание
+Details;
 dialnorm;
 DialogueCorrected;
 DialogueEnhancement;
@@ -357,6 +361,7 @@ DotsPerInch;Точек на дюйм
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Продолжительность
@@ -384,6 +389,7 @@ EPG_Positions;Позиции EPG (внутренние)
 EpisodeTitleNumber;Номер заголовка эпизода
 Error_File;Ошибка в файле
 Error_File_Write;
+Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
 Events_RollUp;
@@ -420,6 +426,7 @@ Folder (R)_Hint;Выберите папку для обработки (со вс
 Folder (Recursively);Папка (рекурсивно)
 Folder_Hint;Операции с папками
 FolderName;Имя папки
+Forced;
 Format;Формат
 Format_Commercial;Коммерческое название
 Format_Commercial_IfAny;Коммерческое название
@@ -463,6 +470,7 @@ FpaPass;Пароль FPA
 FpaVersion;Версия FPA
 FrameCount;Счётчик кадров
 FrameRate;Частота кадров
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Максимальная частота кадров
 FrameRate_Minimum;Минимальная частота кадров
 FrameRate_Mode;Режим частоты кадров
@@ -471,7 +479,9 @@ FrameRate_Mode_VFR;Переменный
 FrameRate_Nominal;Номинальная частота кадров
 FrameRate_Original;Частота кадров в оригинале
 FrameRate_Real;
+FullParsing;
 General;Общее
+GeneralCompliance;
 Genre;Жанр
 Genre_000;
 Genre_001;
@@ -716,6 +726,21 @@ InternetMediaType;Интернет-тип носителя
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Ключевые слова
 Known codecs;Известные кодеки
 Known formats;Известные форматы
@@ -747,6 +772,7 @@ Language_bs;
 Language_ca;
 Language_ce;
 Language_ch;
+Language_cmn;
 Language_co;
 Language_cr;
 Language_cs;
@@ -916,10 +942,17 @@ Language_wo;
 Language_xh;
 Language_yi;
 Language_yo;
+Language_yue;
 Language_za;
 Language_zh;
+Language_zh-cmn;
 Language_zh-cn;
+Language_zh-CN;
+Language_zh-Hans;
+Language_zh-Hant;
 Language_zh-tw;
+Language_zh-TW;
+Language_zh-yue;
 Language_zu;
 LawRating;Ограничение по возрасту
 LCCN;LCCN
@@ -944,6 +977,7 @@ LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Список
+LongTermLoudness;
 LoRoCenterMixGain;
 LoRoSurroundMixGain;
 Loudness_Anchor;
@@ -981,6 +1015,8 @@ MaxFALL;
 MaxGain;
 MaximumMomentaryLoudness;
 MaxTruePeak;
+MD5;
+MD5_Unencoded;
 MediaInfo_About;Отображает детальную информацию\r\nо мультимедиа-файлах Matroska, OGG (включая OGM)\r\nMPEG1 (включая VCD), MPEG2 (включая DVD и SVCD), MPEG4 (включая iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (включая WMV, WMA)\r\nMicrosoft RIFF (включая AVI, WAV, DivX)\r\nзвуковых форматах (AC3, DTS, SSC, AU, AIFF)
 MediaInfo_About_About;
 Menu;Меню
@@ -1033,42 +1069,6 @@ ObjectCount;
 OK;OK
 One output file per input file;Новый файл для каждого исходного
 Open;Открыть
-OpenCandy_01;Загружается ________
-OpenCandy_02;__% выполнено
-OpenCandy_03;Выход в интернет невозможен
-OpenCandy_04;________ скачано
-OpenCandy_05;Щёлкните для установки ________
-OpenCandy_06;Вы действительно хотите прервать установку?\r\nЕсли вы хотите отложить установку, выберите 'Нет'.\r\nПрим.: Вы можете выбрать Выйти из меню, чтобы отложить установку до следующей перезагрузки.
-OpenCandy_07;Загрузка ________ была приостановлена.\r\nЩёлкните по значку в трее для возобновления загрузки.
-OpenCandy_08;Обнаружена критическая ошибка. Установка _________ будет прервана.
-OpenCandy_09;Приостановить загрузку
-OpenCandy_10;Отменить установку
-OpenCandy_11;Продолжить загрузку
-OpenCandy_12;Выйти из установки
-OpenCandy_13;___________ - рекомендовано ____________
-OpenCandy_14;Загружается _________
-OpenCandy_15;___________, программа, рекомендованная ___________, сейчас загружается по Вашему запросу. Мы дадим знать, когда она будет готова для установки.
-OpenCandy_16;___________ готова для установки
-OpenCandy_17;___________ полностью загружена. Нажмите 'Установка' для начала процесса.
-OpenCandy_18;___________ из ___________ загружено
-OpenCandy_19;При содействии OpenCandy
-OpenCandy_20;Дополнительная информация на OpenCandy.com
-OpenCandy_21;Установка
-OpenCandy_22;Установка ___________
-OpenCandy_23;Это прервёт установку ___________\r\nВы действительно хотите выйти?
-OpenCandy_24;Пауза
-OpenCandy_25;Загрузка была приостановлена. Нажмите 'Продолжить' для возобновления.
-OpenCandy_26;Продолжить
-OpenCandy_27;Установка
-OpenCandy_28;Приостановить загрузку
-OpenCandy_29;Продолжить загрузку
-OpenCandy_30;Отменить установку
-OpenCandy_31;Выберите параметры установки
-OpenCandy_32;Установка ___________
-OpenCandy_33;Не устанавливать
-OpenCandy_34;Выберите параметры установки
-OpenCandy_35;______ рекомендуемая программа
-OpenCandy_36;Ваша текущая установка не будет прерываться
 OpenCaptionsLanguage;Язык титров
 OpenCaptionsPresent;Наличие титров
 OpenCaptionsType;Тип титров
@@ -1146,6 +1146,7 @@ Rating;Оценка
 RealtimeLoudnessCorrected;
 Recorded_Date;Дата записи
 Recorded_Location;Место записи
+Reel;
 Released_Date;Дата выпуска
 RemixedBy;Ремикс выполнил
 RenderMode;
@@ -1364,5 +1365,5 @@ Written_Location;Место записи
 WrittenBy;Запись произвёл
 Yes;Да
 Your system;Ваша система
-ZZ_Automatic_Percent;52
-ZZ_AutomaticLanguage_Percent;81
+ZZ_Automatic_Percent;50
+ZZ_AutomaticLanguage_Percent;79

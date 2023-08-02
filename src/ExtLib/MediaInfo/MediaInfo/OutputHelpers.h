@@ -150,7 +150,6 @@ struct Node
         {
             Node* Child=Add_Child(Name, std::string(), Multiple);
             return Child->Add_Child(Name2, Value.To_UTF8(), Multiple2);
-            return Child;
         }
         return NULL;
     }

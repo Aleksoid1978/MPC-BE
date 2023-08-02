@@ -259,16 +259,16 @@ public :
     bool CheckIf(const bitset8 Flags) { return !Flags || (ConformanceFlags & Flags); }
     void SetProfileLevel(int8u AudioProfileLevelIndication);
     void Fill_Conformance(const char* Field, const char* Value, bitset8 Flags={}, conformance_level Level=Error);
-    void Fill_Conformance(const char* Field, const string Value, bitset8 Flags={}, conformance_level Level=Error) { Fill_Conformance(Field, Value.c_str(), Flags, Level); }
+    void Fill_Conformance(const char* Field, const string& Value, bitset8 Flags={}, conformance_level Level=Error) { Fill_Conformance(Field, Value.c_str(), Flags, Level); }
     void Fill_Conformance(const char* Field, const char* Value, conformance_flags Flag, conformance_level Level=Error) { Fill_Conformance(Field, Value, bitset8().set(Flag)); }
-    void Fill_Conformance(const char* Field, const string Value, conformance_flags Flag, conformance_level Level=Error) { Fill_Conformance(Field, Value.c_str(), Flag, Level); }
+    void Fill_Conformance(const char* Field, const string& Value, conformance_flags Flag, conformance_level Level=Error) { Fill_Conformance(Field, Value.c_str(), Flag, Level); }
     void Clear_Conformance();
     void Merge_Conformance(bool FromConfig=false);
     void Streams_Finish_Conformance();
     struct usac_config;
     struct usac_frame;
     void Streams_Finish_Conformance_Profile(usac_config& CurrentConf);
-    void numPreRollFrames_Check(usac_config& CurrentConf, int32u numPreRollFrames, const string numPreRollFramesConchString);
+    void numPreRollFrames_Check(usac_config& CurrentConf, int32u numPreRollFrames, const string& numPreRollFramesConchString);
     #else
     inline void Streams_Finish_Conformance() {}
     #endif
@@ -412,7 +412,7 @@ public :
         int8u                       baseChannelCount;
         int8u                       stereoConfigIndex;
         #if MEDIAINFO_CONFORMANCE
-        int8u                       drcRequired_Present;
+        int8u                       drcSetEffect;
         bool                        LoudnessInfoIsNotValid;
         #endif
         bool                        WaitForNextIndependantFrame;

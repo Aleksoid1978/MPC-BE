@@ -362,7 +362,7 @@ const char* Mpeg_Psi_stream_type_Info_Table[] =
     "HEVC temporal enhancement sub-partition of an HEVC video stream where all NAL units contained in the stream conform to one or more profiles defined in Annex H of Rec.ITU - T H.265 | ISO / IEC 23008 - 2",
     "Green access units carried in MPEG-2 sections",
     "ISO/IEC 23008-3 Audio with MHAS transport syntax - main stream",
-    "ISO/IEC 23008-3 Audio with MHAS transport syntax – auxiliary stream",
+    "ISO/IEC 23008-3 Audio with MHAS transport syntax - auxiliary stream",
     "Quality access units carried in sections",
     "Media Orchestration Access Units carried in sections",
     "Substream of a Rec. ITU-T H.265 | ISO/IEC 23008 2 video stream that contains a Motion Constrained Tile Set, parameter sets, slice headers or a combination thereof",

@@ -229,6 +229,7 @@ Bits-(Pixel*Frame);Bits/(Pixel*Frame)
 BufferSize;
 Cancel;Annuleren
 CaptionServiceName;
+CatalogNumber;
 Channel(s);Kanaal(en)
 ChannelCoded;
 ChannelConfiguration;
@@ -242,6 +243,7 @@ Chapters stream(s);Hoofdstukkenstroom(en)
 Chapters_Codec_List;Hoofdstukkencodecs
 Chapters_No;Geen hoofdstukken
 ChaptersCount;Telling van hoofdstukkenstromen
+CharacterSet;
 CheckNewVersion;Controleer op versie
 Choose custom;Kies aangepast
 Choose custom sheet;Kies uw gewenste aangepaste blad
@@ -328,6 +330,7 @@ DarkMode;
 Date;Datum
 Debug;Debug
 Decimal point;Decimale punt
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;Vertraging
@@ -336,6 +339,7 @@ Delay_Source_Container;
 Delay_Source_Stream;
 Delete;Verwijderen
 Description;Beschrijving
+Details;
 dialnorm;
 DialogueCorrected;
 DialogueEnhancement;
@@ -357,6 +361,7 @@ DotsPerInch;Punten per inch
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Duur
@@ -384,6 +389,7 @@ EPG_Positions;
 EpisodeTitleNumber;
 Error_File;Fout tijdens lezen bestand
 Error_File_Write;
+Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
 Events_RollUp;
@@ -420,6 +426,7 @@ Folder (R)_Hint;Kies een te onderzoeken map (inclusief onderliggende mappen)
 Folder (Recursively);Map (Recursief)
 Folder_Hint;Kies een te onderzoeken map
 FolderName;Mapnaam
+Forced;
 Format;Formaat
 Format_Commercial;
 Format_Commercial_IfAny;
@@ -463,6 +470,7 @@ FpaPass;
 FpaVersion;
 FrameCount;Framecount
 FrameRate;Framerate
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Maximale framrate
 FrameRate_Minimum;Minimale framrate
 FrameRate_Mode;Frameratemodus
@@ -471,7 +479,9 @@ FrameRate_Mode_VFR;Variabel
 FrameRate_Nominal;Nominale framrate
 FrameRate_Original;Originele framerate
 FrameRate_Real;
+FullParsing;
 General;Algemeen
+GeneralCompliance;
 Genre;Muziekstijl
 Genre_000;Blues
 Genre_001;Classic Rock
@@ -716,6 +726,21 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Sleutelwoorden
 Known codecs;Bekende codecs
 Known formats;Bekende formaten
@@ -747,6 +772,7 @@ Language_bs;Bosnisch
 Language_ca;Catalaans
 Language_ce;Tsjetsjeens
 Language_ch;Chamorro
+Language_cmn;
 Language_co;Corsicaans
 Language_cr;Cree
 Language_cs;Tsjechisch
@@ -916,10 +942,17 @@ Language_wo;Wolof
 Language_xh;Xhosa
 Language_yi;Jiddisch
 Language_yo;Yoruba
+Language_yue;
 Language_za;Zhuang
 Language_zh;Chinees
+Language_zh-cmn;
 Language_zh-cn;Chinees (China)
+Language_zh-CN;
+Language_zh-Hans;
+Language_zh-Hant;
 Language_zh-tw;Chinees (Taiwan)
+Language_zh-TW;
+Language_zh-yue;
 Language_zu;Zoeloe
 LawRating;Wettelijke rating
 LCCN;LCCN
@@ -944,6 +977,7 @@ LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Lijst
+LongTermLoudness;
 LoRoCenterMixGain;
 LoRoSurroundMixGain;
 Loudness_Anchor;
@@ -981,6 +1015,8 @@ MaxFALL;
 MaxGain;
 MaximumMomentaryLoudness;
 MaxTruePeak;
+MD5;
+MD5_Unencoded;
 MediaInfo_About;Levert zeer gedetailleerde informatie\r\nover multimediabestanden:\r\nMatroska, OGG (inclusief OGM)\r\nMPEG1 (inclusief VCD)\r\nMPEG2 (inclusief DVD en SVCD)\r\nMPEG4 (inclusief Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (inclusief WMV, WMA)\r\nMicrosoft RIFF (inclusief AVI, WAV)\r\nGeluidsformaten (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
 Menu;Menu
@@ -1033,42 +1069,6 @@ ObjectCount;
 OK;OK
 One output file per input file;Eén exportbestand per invoerbestand
 Open;Open
-OpenCandy_01;Downloaden ________
-OpenCandy_02;__% Voltooid
-OpenCandy_03;Internetverbinding onderbroken
-OpenCandy_04;________ download voltooid
-OpenCandy_05;Klik om te installeren ________
-OpenCandy_06;Wilt u de installatie afbreken?\r\nAls u de installatie tot later wilt uitstellen, kies 'Nee'.\r\nLet op: U kunt Afsluiten uit het menu kiezen om de installatie tot na de volgende herstart van de computer uit te stellen.
-OpenCandy_07;Download van ________ is onderbroken.\r\nKlik op pictogram in het systeemvak om downloaden te hervatten.
-OpenCandy_08;Kritische fout opgetreden. Installatie van _________ wordt afgebroken.
-OpenCandy_09;Downloaden onderbreken
-OpenCandy_10;Installatie afbreken
-OpenCandy_11;Downloaden hervatten
-OpenCandy_12;Installer afsluiten
-OpenCandy_13;___________ - Aanbevolen door ____________
-OpenCandy_14;Downloaden _________
-OpenCandy_15;___________, de software die wordt aanbevolen door ___________, downloadt nu op uw verzoek. We zullen u laten weten wanneer het gereed is om te worden geïnstalleerd.
-OpenCandy_16;___________ is gereed voor installatie
-OpenCandy_17;___________ is nu volledig gedownload. Klik op 'Installeren' om door te gaan.
-OpenCandy_18;___________ van ___________ gedownload
-OpenCandy_19;Powered by OpenCandy
-OpenCandy_20;Kom meer te weten op OpenCandy.com
-OpenCandy_21;Installeren
-OpenCandy_22;Installatie van ___________
-OpenCandy_23;Dit zal de installatie van ___________ afbreken\r\nWeet u zeker dat u wilt afsluiten?
-OpenCandy_24;Pauze
-OpenCandy_25;Uw download is onderbroken. Klik 'Hervatten' wanneer u door wilt gaan.
-OpenCandy_26;Hervatten
-OpenCandy_27;Nu Installeren
-OpenCandy_28;Download Onderbreken
-OpenCandy_29;Download Hervatten
-OpenCandy_30;Installatie Afbreken
-OpenCandy_31;Kies een installatieoptie
-OpenCandy_32;Installeer ___________
-OpenCandy_33;Niet Installeren
-OpenCandy_34;Kies een installatieoptie
-OpenCandy_35;______ beveelt deze software aan
-OpenCandy_36;Uw huidige installatie zal niet worden onderbroken
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
@@ -1146,6 +1146,7 @@ Rating;Waardering
 RealtimeLoudnessCorrected;
 Recorded_Date;Opnamedatum
 Recorded_Location;Opnamelocatie
+Reel;
 Released_Date;Releasedatum
 RemixedBy;Geremixed door
 RenderMode;
@@ -1364,5 +1365,5 @@ Written_Location;Locatie van schrijven
 WrittenBy;Geschreven door
 Yes;Ja
 Your system;Uw systeem
-ZZ_Automatic_Percent;67
-ZZ_AutomaticLanguage_Percent;71
+ZZ_Automatic_Percent;65
+ZZ_AutomaticLanguage_Percent;69

@@ -236,7 +236,7 @@ public :
     const Ztring   &Iso639_1_Get (const Ztring &Value);
     const Ztring   &Iso639_2_Get (const Ztring &Value);
     const Ztring    Iso639_Find (const Ztring &Value);
-    const Ztring    Iso639_Translate (const Ztring Value);
+    const Ztring    Iso639_Translate (const Ztring &Value);
 
     const Ztring   &Info_Get (stream_t KindOfStream, const Ztring &Value, info_t KindOfInfo=Info_Text);
     const Ztring   &Info_Get (stream_t KindOfStream, size_t Pos, info_t KindOfInfo=Info_Text);
@@ -320,6 +320,11 @@ public :
     #endif //MEDIAINFO_EBUCORE_YES || defined(MEDIAINFO_NISO_YES) || MEDIAINFO_ADVANCED
 
     ZtringListList  SubFile_Config_Get ();
+
+    #if MEDIAINFO_ADVANCED
+          void        Collection_Trigger_Set (const Ztring& Value);
+          int64s      Collection_Trigger_Get();
+    #endif //MEDIAINFO_ADVANCED
 
     void            CustomMapping_Set (const Ztring &Value);
     Ztring          CustomMapping_Get (const Ztring &Format, const Ztring &Field);
@@ -503,6 +508,10 @@ private :
     ZtringListList  Info[Stream_Max]; //General info
 
     ZtringListList  SubFile_Config;
+
+    #if MEDIAINFO_ADVANCED
+        int64s      Collection_Trigger;
+    #endif //MEDIAINFO_ADVANCED
 
     std::map<Ztring, std::map<Ztring, Ztring> > CustomMapping;
 

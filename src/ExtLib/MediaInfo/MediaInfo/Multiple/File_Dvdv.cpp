@@ -38,6 +38,8 @@ using namespace std;
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Multiple/File_Dvdv.h"
+#include "MediaInfo/MediaInfo_Config.h"
+#include "MediaInfo/MediaInfo_Internal.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -280,6 +282,69 @@ File_Dvdv::File_Dvdv()
 //---------------------------------------------------------------------------
 void File_Dvdv::Streams_Finish()
 {
+    //Manage related VOB files
+    if (!IsSub && !Config->File_IsReferenced_Get() && File_Name.size()>=5 && File_Name.find(__T("0.IFO"), File_Name.size()-5)!=string::npos)
+    {
+        Ztring VOB_File=File_Name.substr(0, File_Name.size()-5)+__T("1.VOB");
+
+        MediaInfo_Internal MI;
+        MI.Option(__T("File_IsReferenced"), __T("1"));
+        if (MI.Open(VOB_File))
+        {
+            Merge(MI);
+            auto SeparatorPos=VOB_File.find_last_of(__T("/\\"));
+            if (SeparatorPos!=string::npos)
+            {
+                auto FileSize=Retrieve_Const(Stream_General, 0, General_FileSize).To_int64u();
+                FileSize+=MI.Get(Stream_General, 0, General_FileSize).To_int64u();
+                Fill(Stream_General, 0, General_FileSize, FileSize, 10, true);
+                VOB_File.erase(0, SeparatorPos+1);
+                for (size_t StreamKind=Stream_General+1; StreamKind<Stream_Max; StreamKind++)
+                    for (size_t StreamPos=0; StreamPos<Count_Get((stream_t)StreamKind); StreamPos++)
+                        Fill((stream_t)StreamKind, StreamPos, "Source", VOB_File);
+            }
+        }
+    }
+
+    //Remove menus with short duration
+    #if MEDIAINFO_ADVANCED
+        auto Trigger=MediaInfoLib::Config.Collection_Trigger_Get();
+    #else
+        auto const Trigger=-2;
+    #endif
+    int64u MaxDuration;
+    if (Trigger>=0)
+        MaxDuration=(int64u)Trigger;
+    else
+    {
+        MaxDuration=0;
+        for (size_t Pos=0; Pos<Count_Get(Stream_Menu); Pos++)
+        {
+            int64u Duration=Retrieve_Const(Stream_Menu, Pos, Menu_Duration).To_int64u();
+            if (MaxDuration<Duration)
+                MaxDuration=Duration;
+        }
+        MaxDuration/=(int64u)(-Trigger);
+    }
+    for (size_t Pos=0; Pos<Count_Get(Stream_Menu);)
+    {
+        int64u Duration=Retrieve_Const(Stream_Menu, Pos, Menu_Duration).To_int64u();
+        if (Duration>=MaxDuration)
+            Pos++;
+        else
+            Stream_Erase(Stream_Menu, Pos);
+    }
+
+    //Fill stream duration
+    Ztring Duration=Retrieve_Const(Stream_Menu, 0, Menu_Duration);
+    for (size_t StreamKind=Stream_General+1; StreamKind<Stream_Max; StreamKind++)
+    {
+        if (StreamKind==Stream_Menu)
+            continue;
+        for (size_t Pos=0; Pos<Count_Get((stream_t)StreamKind); Pos++)
+            Fill((stream_t)StreamKind, Pos, Fill_Parameter((stream_t)StreamKind, Generic_Duration), Duration);
+    }
+
     //Purge what is not needed anymore
     if (!File_Name.empty()) //Only if this is not a buffer, with buffer we can have more data
         Sectors.clear();

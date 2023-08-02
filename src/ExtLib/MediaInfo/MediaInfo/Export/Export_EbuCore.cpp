@@ -42,13 +42,13 @@ extern MediaInfo_Config Config;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void Add_TechnicalAttributeString(Node* _Node, Ztring _Value, string _TypeLabel, Export_EbuCore::version Version=Export_EbuCore::Version_Max)
+void Add_TechnicalAttributeString(Node* _Node, const Ztring& _Value, const string& _TypeLabel, Export_EbuCore::version Version=Export_EbuCore::Version_Max)
 {
     _Node->Add_Child(string("ebucore:")+(Version>=Export_EbuCore::Version_1_6?"technicalAttributeString":"comment"), _Value.To_UTF8(), "typeLabel", _TypeLabel, true);
 };
 
 //---------------------------------------------------------------------------
-void Add_TechnicalAttributeString_IfNotEmpty(MediaInfo_Internal &MI, stream_t StreamKind, size_t StreamPos, size_t FieldName, Node* _Node, string _TypeLabel, Export_EbuCore::version Version=Export_EbuCore::Version_Max)
+void Add_TechnicalAttributeString_IfNotEmpty(MediaInfo_Internal &MI, stream_t StreamKind, size_t StreamPos, size_t FieldName, Node* _Node, const string& _TypeLabel, Export_EbuCore::version Version=Export_EbuCore::Version_Max)
 {
     if (StreamKind==Stream_Max || StreamPos==(size_t)-1)
         return;
@@ -58,7 +58,7 @@ void Add_TechnicalAttributeString_IfNotEmpty(MediaInfo_Internal &MI, stream_t St
 };
 
 //---------------------------------------------------------------------------
-void Add_TechnicalAttributeString_IfNotEmpty(MediaInfo_Internal &MI, stream_t StreamKind, size_t StreamPos, const char* FieldName, Node* _Node, string _TypeLabel, Export_EbuCore::version Version=Export_EbuCore::Version_Max)
+void Add_TechnicalAttributeString_IfNotEmpty(MediaInfo_Internal &MI, stream_t StreamKind, size_t StreamPos, const char* FieldName, Node* _Node, const string& _TypeLabel, Export_EbuCore::version Version=Export_EbuCore::Version_Max)
 {
     if (StreamKind==Stream_Max || StreamPos==(size_t)-1)
         return;
@@ -68,13 +68,13 @@ void Add_TechnicalAttributeString_IfNotEmpty(MediaInfo_Internal &MI, stream_t St
 };
 
 //---------------------------------------------------------------------------
-void Add_TechnicalAttributeBoolean(Node* _Node, Ztring _Value, string _TypeLabel, Export_EbuCore::version Version=Export_EbuCore::Version_Max)
+void Add_TechnicalAttributeBoolean(Node* _Node, const Ztring& _Value, const string& _TypeLabel, Export_EbuCore::version Version=Export_EbuCore::Version_Max)
 {
     _Node->Add_Child(string("ebucore:")+(Version>=Export_EbuCore::Version_1_6?"technicalAttributeBoolean":"comment"), string(_Value==__T("Yes")?"true":"false"), "typeLabel", _TypeLabel, true);
 };
 
 //---------------------------------------------------------------------------
-void Add_TechnicalAttributeBoolean_IfNotEmpty(MediaInfo_Internal &MI, stream_t StreamKind, size_t StreamPos, size_t FieldName, Node* _Node, string _TypeLabel, Export_EbuCore::version Version=Export_EbuCore::Version_Max)
+void Add_TechnicalAttributeBoolean_IfNotEmpty(MediaInfo_Internal &MI, stream_t StreamKind, size_t StreamPos, size_t FieldName, Node* _Node, const string& _TypeLabel, Export_EbuCore::version Version=Export_EbuCore::Version_Max)
 {
     if (StreamKind==Stream_Max || StreamPos==(size_t)-1)
         return;
@@ -84,7 +84,7 @@ void Add_TechnicalAttributeBoolean_IfNotEmpty(MediaInfo_Internal &MI, stream_t S
 };
 
 //---------------------------------------------------------------------------
-void Add_TechnicalAttributeBoolean_IfNotEmpty(MediaInfo_Internal &MI, stream_t StreamKind, size_t StreamPos, const char* FieldName, Node* _Node, string _TypeLabel, Export_EbuCore::version Version=Export_EbuCore::Version_Max)
+void Add_TechnicalAttributeBoolean_IfNotEmpty(MediaInfo_Internal &MI, stream_t StreamKind, size_t StreamPos, const char* FieldName, Node* _Node, const string& _TypeLabel, Export_EbuCore::version Version=Export_EbuCore::Version_Max)
 {
     if (StreamKind==Stream_Max || StreamPos==(size_t)-1)
         return;
@@ -94,7 +94,7 @@ void Add_TechnicalAttributeBoolean_IfNotEmpty(MediaInfo_Internal &MI, stream_t S
 };
 
 //---------------------------------------------------------------------------
-void Add_TechnicalAttributeInteger(Node* _Node, Ztring _Value, string _TypeLabel, Export_EbuCore::version Version=Export_EbuCore::Version_Max, const char* Unit=NULL)
+void Add_TechnicalAttributeInteger(Node* _Node, const Ztring& _Value, const string& _TypeLabel, Export_EbuCore::version Version=Export_EbuCore::Version_Max, const char* Unit=NULL)
 {
     _Node->Add_Child("ebucore:"+string(Version>=Export_EbuCore::Version_1_6?"technicalAttributeInteger":"comment"), _Value.To_UTF8(), "typeLabel", _TypeLabel, true);
     if (Unit && Version>=Export_EbuCore::Version_1_6)
@@ -102,7 +102,7 @@ void Add_TechnicalAttributeInteger(Node* _Node, Ztring _Value, string _TypeLabel
 };
 
 //---------------------------------------------------------------------------
-void Add_TechnicalAttributeInteger_IfNotEmpty(MediaInfo_Internal &MI, stream_t StreamKind, size_t StreamPos, size_t FieldName, Node* _Node, string _TypeLabel, Export_EbuCore::version Version=Export_EbuCore::Version_Max, const char* Unit=NULL)
+void Add_TechnicalAttributeInteger_IfNotEmpty(MediaInfo_Internal &MI, stream_t StreamKind, size_t StreamPos, size_t FieldName, Node* _Node, const string& _TypeLabel, Export_EbuCore::version Version=Export_EbuCore::Version_Max, const char* Unit=NULL)
 {
     if (StreamKind==Stream_Max || StreamPos==(size_t)-1)
         return;
@@ -112,7 +112,7 @@ void Add_TechnicalAttributeInteger_IfNotEmpty(MediaInfo_Internal &MI, stream_t S
 };
 
 //---------------------------------------------------------------------------
-void Add_TechnicalAttributeInteger_IfNotEmpty(MediaInfo_Internal &MI, stream_t StreamKind, size_t StreamPos, const char* FieldName, Node* _Node, string _TypeLabel, Export_EbuCore::version Version=Export_EbuCore::Version_Max, const char* Unit=NULL)
+void Add_TechnicalAttributeInteger_IfNotEmpty(MediaInfo_Internal &MI, stream_t StreamKind, size_t StreamPos, const char* FieldName, Node* _Node, const string& _TypeLabel, Export_EbuCore::version Version=Export_EbuCore::Version_Max, const char* Unit=NULL)
 {
     if (StreamKind==Stream_Max || StreamPos==(size_t)-1)
         return;
@@ -1421,7 +1421,7 @@ void EbuCore_Transform_Metadata(Node* Parent, MediaInfo_Internal &MI, size_t Str
 }
 
 //---------------------------------------------------------------------------
-Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version, acquisitiondataoutputmode AcquisitionDataOutputMode, format Format, Ztring ExternalMetadataValues, Ztring ExternalMetaDataConfig)
+Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version, acquisitiondataoutputmode AcquisitionDataOutputMode, format Format, const Ztring& ExternalMetadataValues, const Ztring& ExternalMetaDataConfig)
 {
     bool UseExternalMetaData=(!ExternalMetaDataConfig.empty() && !ExternalMetadataValues.empty());
 

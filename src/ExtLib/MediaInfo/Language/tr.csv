@@ -229,6 +229,7 @@ Bits-(Pixel*Frame);Bit/(Piksel*Kare)
 BufferSize;Arabellek boyutu
 Cancel;İptal
 CaptionServiceName;
+CatalogNumber;
 Channel(s);Kanal
 ChannelCoded;
 ChannelConfiguration;
@@ -242,6 +243,7 @@ Chapters stream(s);Bölüm akışı
 Chapters_Codec_List;Bölüm Kodekleri
 Chapters_No;Bölüm yok
 ChaptersCount;Bölüm sayısı
+CharacterSet;
 CheckNewVersion;Yeni sürümü denetle
 Choose custom;Özel seçin
 Choose custom sheet;İstediğiniz özel sayfayı seçin
@@ -328,6 +330,7 @@ DarkMode;
 Date;Tarih
 Debug;Hata Ayıklama
 Decimal point;Ondalık ayırıcı
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;Gecikme
@@ -336,6 +339,7 @@ Delay_Source_Container;Kapsayıcı
 Delay_Source_Stream;Ham akış
 Delete;Sil
 Description;Açıklama
+Details;
 dialnorm;
 DialogueCorrected;
 DialogueEnhancement;
@@ -357,6 +361,7 @@ DotsPerInch;İnç başına nokta
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Süre
@@ -384,6 +389,7 @@ EPG_Positions;EPG konumları (dahili)
 EpisodeTitleNumber;Bölüm Başlık Numarası
 Error_File;Dosya okunurken hata
 Error_File_Write;
+Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
 Events_RollUp;
@@ -420,6 +426,7 @@ Folder (R)_Hint;Çalışmak için klasör seç (yinelemeli tüm klasörler ile)
 Folder (Recursively);Klasör (Yinelemeli)
 Folder_Hint;Çalışmak için klasör seç
 FolderName;Klasör adı
+Forced;
 Format;Biçim
 Format_Commercial;Ticari adı
 Format_Commercial_IfAny;Ticari adı
@@ -463,6 +470,7 @@ FpaPass;FPA Pass
 FpaVersion;FPA Sürümü
 FrameCount;Kare sayısı
 FrameRate;Kare hızı
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;En fazla kare hızı
 FrameRate_Minimum;En az kare hızı
 FrameRate_Mode;Kare hızı kipi
@@ -471,7 +479,9 @@ FrameRate_Mode_VFR;Değişken
 FrameRate_Nominal;Düşük kare hızı
 FrameRate_Original;Orijinal kare hızı
 FrameRate_Real;
+FullParsing;
 General;Genel
+GeneralCompliance;
 Genre;Tarz
 Genre_000;Blues
 Genre_001;Classic Rock
@@ -716,6 +726,21 @@ InternetMediaType;Internet medya türü
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Anahtar kelime
 Known codecs;Bilinen kodekler
 Known formats;Bilinen biçimler
@@ -747,6 +772,7 @@ Language_bs;Boşnakça
 Language_ca;Katalanca
 Language_ce;Chechen
 Language_ch;Chamorro
+Language_cmn;
 Language_co;Corsican
 Language_cr;Cree
 Language_cs;Çekçe
@@ -916,10 +942,17 @@ Language_wo;Wolof
 Language_xh;Xhosa
 Language_yi;Yiddish
 Language_yo;Yoruba
+Language_yue;
 Language_za;Zhuang
 Language_zh;Çince
+Language_zh-cmn;
 Language_zh-cn;Çince (Çin)
+Language_zh-CN;
+Language_zh-Hans;
+Language_zh-Hant;
 Language_zh-tw;Çince (Tayvan)
+Language_zh-TW;
+Language_zh-yue;
 Language_zu;Zulu
 LawRating;Kanun oranı
 LCCN;LCCN
@@ -944,6 +977,7 @@ LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Liste
+LongTermLoudness;
 LoRoCenterMixGain;
 LoRoSurroundMixGain;
 Loudness_Anchor;
@@ -981,6 +1015,8 @@ MaxFALL;En Fazla Kare-Ortalama Işık Seviyesi
 MaxGain;
 MaximumMomentaryLoudness;
 MaxTruePeak;
+MD5;
+MD5_Unencoded;
 MediaInfo_About;MediaInfo, görüntü ve ses dosyaları hakkında teknik ve etiket bilgilerine kolay erişim sağlar.\r\nMac App Store grafik kullanıcı arayüzü dışında, açık kaynak kodlu yazılımdır, bu da çalışma özgürlüğüne sahip, geliştirmek ve programı yeniden dağıtmak için (BSD lisansı) son kullanıcıya ve geliştiricilere ücretsiz olduğu anlamına gelir.
 MediaInfo_About_About;
 Menu;Menü
@@ -1033,42 +1069,6 @@ ObjectCount;
 OK;TAMAM
 One output file per input file;Girdi dosyası başına bir çıktı dosyası
 Open;Aç
-OpenCandy_01;İndirilen ________
-OpenCandy_02;__% Tamamlandı
-OpenCandy_03;Internet bağlantısı kopmuş
-OpenCandy_04;________ indirme tamamlandı
-OpenCandy_05;Yüklemek için tıklayın ________
-OpenCandy_06;Kur'u iptal etmek istediğinize emin misiniz?\r\nEğer kurmayı sonraya ertelemek isterseniz, 'Hayır'ı seçin.\r\nNot: Bir dahaki seferden sonra yeniden başlatana kadar kurulumu ertelemek için menüden Çıkış'ı seçebilirsiniz.
-OpenCandy_07;Download of ________ has been paused.\r\nClick on the tray icon to resume downloading.
-OpenCandy_08;A critical error has occurred. Installation of _________ will be aborted.
-OpenCandy_09;İndirmeyi duraklat
-OpenCandy_10;Yüklemeyi iptal et
-OpenCandy_11;İndirmeye devam et
-OpenCandy_12;Yükleyiciden çık
-OpenCandy_13;___________ - Recommended by ____________
-OpenCandy_14;Downloading _________
-OpenCandy_15;___________, the software recommended to you by ___________, is now downloading at your requestWe will let you know when it is ready to be installed.
-OpenCandy_16;___________ is ready for installation
-OpenCandy_17;___________ is now fully downloaded. Please click on 'Install' to proceed.
-OpenCandy_18;___________ of ___________ downloaded
-OpenCandy_19;OpenCandy tarafından desteklenir
-OpenCandy_20;OpenCandy.com 'dan daha fazlasını öğrenin
-OpenCandy_21;Yükle
-OpenCandy_22;Installation of ___________
-OpenCandy_23;This will cancel the installation of ___________\r\nAre you sure you wish to exit?
-OpenCandy_24;Duraklat
-OpenCandy_25;Your download has been paused. Click 'Resume' when you are ready to continue.
-OpenCandy_26;Devam
-OpenCandy_27;Hemen Yükle
-OpenCandy_28;İndirmeyi duraklat
-OpenCandy_29;İndirmeye devam et
-OpenCandy_30;Yüklemeyi İptalEet
-OpenCandy_31;Lütfen kurulum seçeneği seçin
-OpenCandy_32;Yükle ___________
-OpenCandy_33;Yükleme
-OpenCandy_34;Lütfen yükleme seçeneği seçin
-OpenCandy_35;______ recommends this software
-OpenCandy_36;Your current installation will not be interrupted
 OpenCaptionsLanguage;Açık Açıklamalı Alt Yazı Dili
 OpenCaptionsPresent;Açık Açıklamalı Alt Yazı Sunumu
 OpenCaptionsType;Açık Açıklamalı Alt Yazı Türü
@@ -1146,6 +1146,7 @@ Rating;İzlenme oranı
 RealtimeLoudnessCorrected;
 Recorded_Date;Kaydedildiği tarih
 Recorded_Location;Kaydedildiği yer
+Reel;
 Released_Date;Yayım tarihi
 RemixedBy;Remiksleyen
 RenderMode;
@@ -1364,5 +1365,5 @@ Written_Location;Yazıldığı yer
 WrittenBy;Yazan
 Yes;Evet
 Your system;Sisteminiz
-ZZ_Automatic_Percent;82
-ZZ_AutomaticLanguage_Percent;83
+ZZ_Automatic_Percent;80
+ZZ_AutomaticLanguage_Percent;81

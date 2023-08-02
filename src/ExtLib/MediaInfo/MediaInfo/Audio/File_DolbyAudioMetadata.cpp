@@ -110,62 +110,7 @@ static const char* phaseshift_90deg_5to2_Values[] =
 static size_t phaseshift_90deg_5to2_Size=sizeof(phaseshift_90deg_5to2_Values)/sizeof(const char*);
 
 //---------------------------------------------------------------------------
-void Merge_FillTimeCode(File__Analyze& In, const string& Prefix, const TimeCode& TC_Time, float FramesPerSecondF, bool DropFrame, bool Negative, int32u Frequency)
-{
-    if (!TC_Time.IsSet())
-        return;
-    auto FramesPerSecondI=float32_int32s(FramesPerSecondF);
-    TimeCode TC_Frames(TC_Time.ToSeconds(), FramesPerSecondI-1, TimeCode::DropFrame(DropFrame).FPS1001(FramesPerSecondI!=FramesPerSecondF), true);
-    string TC_ExtraSubFrames_String=TC_Frames.ToString();
-    auto Diff=TC_Time.ToSeconds()-TC_Frames.ToSeconds();
-    TimeCode TC_ExtraSubFrames(Diff, FramesPerSecondI*100-1, TimeCode::flags(), true);
-    auto SubFrames=TC_ExtraSubFrames.ToFrames();
-    auto Diff_Back=TC_ExtraSubFrames.ToSeconds();
-    if (Diff-Diff_Back>=1.0/Frequency)
-        SubFrames++; // ceil rounding
-    if (SubFrames)
-    {
-        TC_ExtraSubFrames_String+='.';
-        auto Temp=to_string(SubFrames);
-        if (Temp.size()==1)
-            Temp.insert(0, 1, '0');
-        TC_ExtraSubFrames_String+=Temp;
-    }
-    if (Negative)
-    {
-        if (Diff>=1.0/Frequency)
-        {
-            TC_Frames++;
-            Diff=1/FramesPerSecondF-Diff;
-        }
-        else
-            Diff=0;
-    }
-    TimeCode TC_ExtraSamples(Diff, Frequency, TimeCode::flags(), true);
-    string TC_ExtraSamples_String=TC_Frames.ToString();
-    auto Samples=TC_ExtraSamples.ToFrames();
-    if (Samples)
-    {
-        TC_ExtraSamples_String+=Negative?'-':'+';
-        TC_ExtraSamples_String+=to_string(Samples);
-        TC_ExtraSamples_String+="samples";
-    }
-    if (Prefix.find("TimeCode")!=string::npos)
-    {
-        In.Fill(Stream_Audio, 0, Prefix.c_str(), TC_ExtraSamples_String, true, true);
-        return;
-    }
-    In.Fill(Stream_Audio, 0, Prefix.c_str(), TC_Time.ToString(), true, true);
-    In.Fill_SetOptions(Stream_Audio, 0, Prefix.c_str(), "N NTY");
-    In.Fill(Stream_Audio, 0, (Prefix+"/String").c_str(), TC_Time.ToString()+" ("+TC_ExtraSamples_String+')', true, true);
-    In.Fill_SetOptions(Stream_Audio, 0, (Prefix+"/String").c_str(), "Y NTN");
-    In.Fill(Stream_Audio, 0, (Prefix+"_TimeCode").c_str(), TC_Frames.ToString(), true, true);
-    In.Fill_SetOptions(Stream_Audio, 0, (Prefix+"_TimeCode").c_str(), "N NTY");
-    In.Fill(Stream_Audio, 0, (Prefix+"_TimeCodeSubFrames").c_str(), TC_ExtraSubFrames_String, true, true);
-    In.Fill_SetOptions(Stream_Audio, 0, (Prefix+"_TimeCodeSubFrames").c_str(), "N NTY");
-    In.Fill(Stream_Audio, 0, (Prefix+"_TimeCodeSamples").c_str(), TC_ExtraSamples_String, true, true);
-    In.Fill_SetOptions(Stream_Audio, 0, (Prefix+"_TimeCodeSamples").c_str(), "N NTY");
-}
+void Merge_FillTimeCode(File__Analyze& In, const string& Prefix, const TimeCode& TC_Time, float FramesPerSecondF, bool DropFrame, TimeCode::rounding Rounding=TimeCode::Nearest, int32u Frequency=0);
 
 //***************************************************************************
 // Constructor/Destructor
@@ -380,7 +325,7 @@ void File_DolbyAudioMetadata::Dolby_Atmos_Metadata_Segment()
                 first_action_time_HH=(int8u)((-((int8s)first_action_time_HH)));
             const int32u FrameRate = 100000;
             TimeCode TC(first_action_time_HH, first_action_time_MM, first_action_time_SS/FrameRate, first_action_time_SS%FrameRate, FrameRate-1, TimeCode::Timed().Negative(IsNegative));
-            Merge_FillTimeCode(*this, "Dolby_Atmos_Metadata FirstFrameOfAction", TC, frames_per_second_Values[frames_per_second], frames_per_second==4, false, 48000);
+            Merge_FillTimeCode(*this, "Dolby_Atmos_Metadata FirstFrameOfAction", TC, frames_per_second_Values[frames_per_second], frames_per_second==4, TimeCode::Ceil, 48000);
         }
         FILLING_END()
 }
@@ -549,29 +494,13 @@ void File_DolbyAudioMetadata::Merge(File__Analyze& In, size_t StreamPos)
     const auto& FirstFrameOfAction=In.Retrieve_Const(Stream_Audio, 0, "Dolby_Atmos_Metadata FirstFrameOfAction");
     if (!FirstFrameOfAction.empty())
     {
-        TimeCode TC(FirstFrameOfAction.To_UTF8());
         const auto& Start=In.Retrieve_Const(Stream_Audio, 0, "Programme0 Start");
-        TimeCode TC_Start_Time;
         if (!Start.empty())
         {
-            TC_Start_Time=TimeCode(Start.To_UTF8());
-            TC+=TC_Start_Time;
-        }
-        auto FramesPerSecondF=In.Retrieve_Const(Stream_Audio, 0, "Dolby_Atmos_Metadata AssociatedVideo_FrameRate").To_float32();
-        if (FramesPerSecondF)
-        {
-            auto DropFrame=In.Retrieve_Const(Stream_Audio, 0, "Dolby_Atmos_Metadata AssociatedVideo_FrameRate_DropFrame")==__T("Yes");
-            auto SamplingRate=In.Retrieve_Const(Stream_Audio, 0, Audio_SamplingRate).To_int32u();
-            if (!SamplingRate)
-                SamplingRate=48000;
-            Merge_FillTimeCode(In, "Programme0 Start", TC_Start_Time, FramesPerSecondF, DropFrame, false, SamplingRate);
-            const auto& End=In.Retrieve_Const(Stream_Audio, 0, "Programme0 End");
-            if (!End.empty())
-            {
-                auto TC_End_Time=TimeCode(End.To_UTF8());
-                Merge_FillTimeCode(In, "Programme0 End", TC_End_Time, FramesPerSecondF, DropFrame, true, SamplingRate);
-            }
-            Merge_FillTimeCode(In, "Dolby_Atmos_Metadata FirstFrameOfAction", TC, FramesPerSecondF, DropFrame, true, SamplingRate);
+            TimeCode TC_FirstFrameOfAction(FirstFrameOfAction.To_UTF8());
+            TimeCode TC_Start_Time(Start.To_UTF8());
+            auto TC=TC_FirstFrameOfAction+TC_Start_Time;
+            In.Fill(Stream_Audio, 0, "Dolby_Atmos_Metadata FirstFrameOfAction", TC.ToString(), true, true);
         }
     }
 

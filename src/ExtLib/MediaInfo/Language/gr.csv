@@ -229,6 +229,7 @@ Bits-(Pixel*Frame);Bits/(Εικονοστοιχείο*Πλαίσιο)
 BufferSize;
 Cancel;Άκυρο
 CaptionServiceName;
+CatalogNumber;
 Channel(s);Κανάλι(α)
 ChannelCoded;
 ChannelConfiguration;
@@ -242,6 +243,7 @@ Chapters stream(s);Ροές κεφαλαίων
 Chapters_Codec_List;Συμπιεστές κεφαλαίων
 Chapters_No;Χωρίς κεφάλαια
 ChaptersCount;Αριθμός των κεφαλαίων
+CharacterSet;
 CheckNewVersion; Έλεγχoς για ενημερωμένες εκδώσεις
 Choose custom;Επιλέξτε προσαρμοσμένο:
 Choose custom sheet;Επιλέξτε το επιθυμητό προσαρμοσμένο φύλλο
@@ -328,6 +330,7 @@ DarkMode;
 Date;Ημερομηνία
 Debug;Αποσφαλμάτωση
 Decimal point;Decimal point
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;Καθυστέρηση
@@ -336,6 +339,7 @@ Delay_Source_Container;
 Delay_Source_Stream;
 Delete;Διαγραφή
 Description;Περιγραφή
+Details;
 dialnorm;
 DialogueCorrected;
 DialogueEnhancement;
@@ -357,6 +361,7 @@ DotsPerInch;
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;
@@ -384,6 +389,7 @@ EPG_Positions;
 EpisodeTitleNumber;
 Error_File;Παρουσιάστηκε σφάλμα κατά το διάβασμα του αρχείου
 Error_File_Write;
+Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
 Events_RollUp;
@@ -420,6 +426,7 @@ Folder (R)_Hint;Επιλέξτε έναν φάκελο για εξέταση (μ
 Folder (Recursively);Φάκελος (Αναδρομικά)
 Folder_Hint;Επιλέξτε έναν φάκελο για εξέταση
 FolderName;Όνομα φακέλου
+Forced;
 Format;Μορφοποίηση
 Format_Commercial;
 Format_Commercial_IfAny;
@@ -463,6 +470,7 @@ FpaPass;
 FpaVersion;
 FrameCount;
 FrameRate;Ρυθμός ανανέωσης πλαισίου
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Μέγιστος ρυθμός ανανέωσης πλαισίου
 FrameRate_Minimum;Ελάχιστος ρυθμός ανανέωσης πλαισίου
 FrameRate_Mode;
@@ -471,7 +479,9 @@ FrameRate_Mode_VFR;
 FrameRate_Nominal;
 FrameRate_Original;
 FrameRate_Real;
+FullParsing;
 General;Γενικά
+GeneralCompliance;
 Genre;Genre
 Genre_000;Blues
 Genre_001;Classic Rock
@@ -716,6 +726,21 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Λέξεις κλειδιά
 Known codecs;Γνωστοί συμπιεστές
 Known formats;Γνωστές μορφοποιήσεις
@@ -747,6 +772,7 @@ Language_bs;Bosnian
 Language_ca;Catalan
 Language_ce;Chechen
 Language_ch;Chamorro
+Language_cmn;
 Language_co;Corsican
 Language_cr;Cree
 Language_cs;Czech
@@ -916,10 +942,17 @@ Language_wo;Wolof
 Language_xh;Xhosa
 Language_yi;Yiddish
 Language_yo;Yoruba
+Language_yue;
 Language_za;Zhuang
 Language_zh;Chinese
+Language_zh-cmn;
 Language_zh-cn;
+Language_zh-CN;
+Language_zh-Hans;
+Language_zh-Hant;
 Language_zh-tw;
+Language_zh-TW;
+Language_zh-yue;
 Language_zu;Zulu
 LawRating;Law rating
 LCCN;LCCN
@@ -944,6 +977,7 @@ LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;
+LongTermLoudness;
 LoRoCenterMixGain;
 LoRoSurroundMixGain;
 Loudness_Anchor;
@@ -981,6 +1015,8 @@ MaxFALL;
 MaxGain;
 MaximumMomentaryLoudness;
 MaxTruePeak;
+MD5;
+MD5_Unencoded;
 MediaInfo_About;Παρέχει λεπτομερείς πληροφορίες\r\nγια αρχεία πολυμέσων:\r\nMatroska, OGG (συμπεριλαμβάνεται OGM)\r\nMPEG1 (συμπεριλαμβάνεται VCD)\r\nMPEG2 (συμπεριλαμβάνεται DVD και SVCD)\r\nMPEG4 (συμπεριλαμβάνεται Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (συμπεριλαμβάνεται WMV, WMA)\r\nMicrosoft RIFF (συμπεριλαμβάνεται AVI, WAV)\r\nΜορφοποιήσεις ήχου (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
 Menu;Μενού
@@ -1033,42 +1069,6 @@ ObjectCount;
 OK;OK
 One output file per input file;Ένα αρχείο εξόδου για κάθε αρχείο εισόδου
 Open;Άνοιγμα
-OpenCandy_01;
-OpenCandy_02;
-OpenCandy_03;
-OpenCandy_04;
-OpenCandy_05;
-OpenCandy_06;
-OpenCandy_07;
-OpenCandy_08;
-OpenCandy_09;
-OpenCandy_10;
-OpenCandy_11;
-OpenCandy_12;
-OpenCandy_13;
-OpenCandy_14;
-OpenCandy_15;
-OpenCandy_16;
-OpenCandy_17;
-OpenCandy_18;
-OpenCandy_19;
-OpenCandy_20;
-OpenCandy_21;
-OpenCandy_22;
-OpenCandy_23;
-OpenCandy_24;
-OpenCandy_25;
-OpenCandy_26;
-OpenCandy_27;
-OpenCandy_28;
-OpenCandy_29;
-OpenCandy_30;
-OpenCandy_31;
-OpenCandy_32;
-OpenCandy_33;
-OpenCandy_34;
-OpenCandy_35;
-OpenCandy_36;
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
@@ -1146,6 +1146,7 @@ Rating;Αξιολόγηση
 RealtimeLoudnessCorrected;
 Recorded_Date;Ημερομηνία εγγραφής
 Recorded_Location;Τοποθεσία εγγραφής
+Reel;
 Released_Date;Ημερομηνία Έκδοσης
 RemixedBy;Remixed by
 RenderMode;
@@ -1365,4 +1366,4 @@ WrittenBy;Γραμμένο από
 Yes;Ναι
 Your system;Το σύστημά σας
 ZZ_Automatic_Percent;55
-ZZ_AutomaticLanguage_Percent;62
+ZZ_AutomaticLanguage_Percent;60

@@ -717,6 +717,38 @@ int TimeCode::FromSeconds(double Seconds, bool Truncate, bool TimeIsDropFrame)
 }
 
 //---------------------------------------------------------------------------
+TimeCode TimeCode::ToRescaled(uint32_t FramesMax, flags Flags, rounding Rounding) const
+{
+    auto Result = ToFrames();
+    auto FrameRate = (uint64_t)GetFramesMax() + 1;
+    if (Is1001fps() != Flags.Is1001fps())
+    {
+        Result *= int64_t(1000 + Is1001fps());
+        FrameRate *= int64_t(1000 + Flags.Is1001fps());
+    }
+    Result *= (uint64_t)FramesMax + 1;
+    switch (Rounding)
+    {
+    case Nearest:
+        Result += FrameRate / 2;
+        //fall through
+    case Floor:
+        Result /= FrameRate;
+        break;
+    case Ceil:
+    {
+        auto NewResult = Result / FrameRate;
+        auto NewRemain = Result % FrameRate;
+        if (NewRemain)
+            NewResult++;
+        Result = NewResult;
+        break;
+    }
+    }
+    return TimeCode(Result, FramesMax, Flags);
+}
+
+//---------------------------------------------------------------------------
 string TimeCode::ToString() const
 {
     if (!IsValid())

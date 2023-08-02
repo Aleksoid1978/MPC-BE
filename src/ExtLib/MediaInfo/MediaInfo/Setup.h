@@ -747,6 +747,9 @@
 #if !defined(MEDIAINFO_AUDIO_NO) && !defined(MEDIAINFO_DTS_NO) && !defined(MEDIAINFO_DTS_YES)
     #define MEDIAINFO_DTS_YES
 #endif
+#if !defined(MEDIAINFO_AUDIO_NO) && !defined(MEDIAINFO_DTSUHD_NO) && !defined(MEDIAINFO_DTSUHD_YES)
+    #define MEDIAINFO_DTSUHD_YES
+#endif
 #if !defined(MEDIAINFO_AUDIO_NO) && !defined(MEDIAINFO_FLAC_NO) && !defined(MEDIAINFO_FLAC_YES)
     #define MEDIAINFO_FLAC_YES
 #endif

@@ -1542,17 +1542,17 @@ int32u File_Usac::arith_decode(int16u& low, int16u& high, int16u& value, const i
     int32u cm=((((int)(value32-low+1))<<14)-((int)1))/range;
     const int16u* p=cf-1;
 
-     do
-     {
-         const int16u* q=p+(cfl>>1);
-         if (*q>cm)
-         {
-             p=q;
-             cfl++;
-         }
-         cfl>>=1;
-     }
-     while (cfl>1);
+    do
+    {
+        const int16u* q=p+(cfl>>1);
+        if (*q>cm)
+        {
+            p=q;
+            cfl++;
+        }
+        cfl>>=1;
+    }
+    while (cfl>1);
 
     int32u symbol=(int32u)(p-cf+1);
     if (symbol)
@@ -1705,7 +1705,17 @@ bool File_Usac::BS_Bookmark(File_Usac::bs_bookmark& B)
         else
         {
             #if MEDIAINFO_CONFORMANCE
-                Fill_Conformance((ConformanceFieldName+" GeneralCompliance").c_str(), "Extra bytes after the end of the syntax was reached", bitset8(), Warning);
+                bool IsZeroed=false;
+                if (BitsRemaining<=32) //TODO: more than 32 bits
+                {
+                    int32u Probe;
+                    Peek_S4(BitsRemaining, Probe);
+                    IsZeroed=!Probe;
+                }
+                if (IsZeroed)
+                    Fill_Conformance((ConformanceFieldName+" GeneralCompliance").c_str(), "Extra zero bytes after the end of the syntax was reached", bitset8(), Warning);
+                else
+                    Fill_Conformance((ConformanceFieldName+" GeneralCompliance").c_str(), "Extra bytes after the end of the syntax was reached", bitset8(), Warning);
             #endif
             LastByte=1;
         }
@@ -1936,7 +1946,7 @@ void File_Usac::Streams_Finish_Conformance()
 
 //---------------------------------------------------------------------------
 #if MEDIAINFO_CONFORMANCE
-void File_Usac::numPreRollFrames_Check(usac_config& CurrentConf, int32u numPreRollFrames, const string numPreRollFramesConchString)
+void File_Usac::numPreRollFrames_Check(usac_config& CurrentConf, int32u numPreRollFrames, const string& numPreRollFramesConchString)
 {
     string FieldName = numPreRollFramesConchString.substr(numPreRollFramesConchString.rfind(' ') + 1);
     int numPreRollFrames_Max;
@@ -2136,7 +2146,17 @@ void File_Usac::UsacConfig(size_t BitsNotIncluded)
             else
             {
                 #if MEDIAINFO_CONFORMANCE
-                    Fill_Conformance("UsacConfig GeneralCompliance", "Extra bytes after the end of the syntax was reached", bitset8(), Warning);
+                    bool IsZeroed=false;
+                    if (BitsRemaining<=32) //TODO: more than 32 bits
+                    {
+                        int32u Probe;
+                        Peek_S4(BitsRemaining, Probe);
+                        IsZeroed=!Probe;
+                    }
+                    if (IsZeroed)
+                        Fill_Conformance("UsacConfig GeneralCompliance", "Extra zero bytes after the end of the syntax was reached", bitset8(), Warning);
+                    else
+                        Fill_Conformance("UsacConfig GeneralCompliance", "Extra bytes after the end of the syntax was reached", bitset8(), Warning);
                 #endif
                 LastByte=1;
             }
@@ -2828,17 +2848,17 @@ void File_Usac::uniDrcConfigExtension()
                     int8u drcInstructionsUniDrcV1Count;
                     Get_S1 (6, drcInstructionsUniDrcV1Count,    "drcInstructionsUniDrcV1Count");
                     #if MEDIAINFO_CONFORMANCE
-                        C.drcRequired_Present = 0;
+                        C.drcSetEffect = 0;
                     #endif
                     for (int8u i=0; i<drcInstructionsUniDrcV1Count; i++)
                         drcInstructionsUniDrc(true);
                     #if MEDIAINFO_CONFORMANCE
-                        if (C.drcRequired_Present != 0x27)
+                        if (C.drcSetEffect && (C.drcSetEffect & 0x27) != 0x27) // If one of the 8 first bits is set, bits (1 is LSB) 1, 2, 3, 6 must be set
                         {
                             string Value;
                             for (int8u i = 0; i < 6; i++)
                             {
-                                if (!(C.drcRequired_Present & (1 << i)))
+                                if (!(C.drcSetEffect & (1 << i)))
                                     Fill_Conformance("drcInstructions drcSetEffect", (string(drcSetEffect_List[i]) + " isn't in at least one DRC").c_str());
                                 if (i == 2)
                                     i += 2;
@@ -3157,7 +3177,7 @@ bool File_Usac::drcInstructionsUniDrc(bool V1, bool NoV0)
         downmixId=0; // 0 is default
     Get_S2 (16, drcSetEffect,                                   "drcSetEffect");
     #if MEDIAINFO_CONFORMANCE
-        C.drcRequired_Present |= (drcSetEffect & 0x27); //Bits (1 is LSB) 1, 2, 3, 6;
+        C.drcSetEffect |= (int8u)drcSetEffect; // We need only the 8 first bits
     #endif
     bool IsNOK=false;
     if ((drcSetEffect & (3<<10)) == 0)
@@ -3693,7 +3713,17 @@ void File_Usac::UsacFrame(size_t BitsNotIncluded)
             else
             {
                 #if MEDIAINFO_CONFORMANCE
-                    Fill_Conformance(IsParsingRaw > 1 ? "UsacFrame GeneralCompliance" : "UsacFrame GeneralCompliance", "Extra bytes after the end of the syntax was reached", bitset8(), Warning);
+                    bool IsZeroed=false;
+                    if (BitsRemaining<=32) //TODO: more than 32 bits
+                    {
+                        int32u Probe;
+                        Peek_S4(BitsRemaining, Probe);
+                        IsZeroed=!Probe;
+                    }
+                    if (IsZeroed)
+                        Fill_Conformance("UsacFrame GeneralCompliance", "Extra zero bytes after the end of the syntax was reached", bitset8(), Warning);
+                    else
+                        Fill_Conformance("UsacFrame GeneralCompliance", "Extra bytes after the end of the syntax was reached", bitset8(), Warning);
                 #endif
                 LastByte=1;
             }
@@ -3949,19 +3979,16 @@ void File_Usac::arithData(size_t ch, int16u N, int16u lg, int16u lg_max, bool ar
         return;
     }
 
-    if (lg==0)
-    {
-        memset(&C.arithContext[ch].q[1], 1, sizeof(C.arithContext[ch].q[1]));
-        return;
-    }
+    if (!arith_reset_flag && C.arithContext[ch].previous_window_size==(int16u)-1)
+        return; //TODO: conformance error?
 
     // arith_map_context
     {
-        if (arith_reset_flag || C.arithContext[ch].previous_window_size==(int16u)-1)
-            memset(&C.arithContext[ch].q, 0, sizeof(C.arithContext[ch].q));
-        else if (N != C.arithContext[ch].previous_window_size)
+        if (arith_reset_flag)
+            memset(&C.arithContext[ch].q[0], 0, sizeof(C.arithContext[ch].q[0]));
+        else
         {
-            if (!N)
+            if (!N && lg)
             {
                 #if MEDIAINFO_CONFORMANCE
                     Fill_Conformance("arithData GeneralCompliance", "N is 0");
@@ -3974,16 +4001,22 @@ void File_Usac::arithData(size_t ch, int16u N, int16u lg, int16u lg_max, bool ar
             if (ratio>1)
             {
                 for (int pos=0; pos<N/4; pos++)
-                    C.arithContext[ch].q[1][pos]=C.arithContext[ch].q[1][(int)((float)pos*ratio)];
+                    C.arithContext[ch].q[0][pos]=C.arithContext[ch].q[1][(int)((float)pos*ratio)];
             }
             else
             {
                 for (int pos=N/4-1; pos>=0; pos--)
-                    C.arithContext[ch].q[1][pos]=C.arithContext[ch].q[1][(int)((float)pos*ratio)];
+                    C.arithContext[ch].q[0][pos]=C.arithContext[ch].q[1][(int)((float)pos*ratio)];
             }
 
         }
         C.arithContext[ch].previous_window_size=N;
+    }
+
+    if (lg==0)
+    {
+        memset(&C.arithContext[ch].q[1], 1, sizeof(C.arithContext[ch].q[1]));
+        return;
     }
 
     Element_Begin1("arithData");
@@ -4000,7 +4033,7 @@ void File_Usac::arithData(size_t ch, int16u N, int16u lg, int16u lg_max, bool ar
         value<<=TooMuch;
     }
 
-    int16u context=C.arithContext[ch].q[1][0] << 12;
+    int16u context=C.arithContext[ch].q[0][0] << 12;
     int32u state=0;
     vector<int32s> x_ac_dec(lg);
 
@@ -4010,7 +4043,7 @@ void File_Usac::arithData(size_t ch, int16u N, int16u lg, int16u lg_max, bool ar
         // arith_get_context
         {
             state=context>>8;
-            state=state+((offset>=lg_max/2-1?0:C.arithContext[ch].q[1][offset+1])<<8);
+            state=state+((offset>=lg_max/2-1?0:C.arithContext[ch].q[0][offset+1])<<8);
             state=(state<<4)+(offset?C.arithContext[ch].q[1][offset-1]:0);
 
             context=state;
@@ -4242,12 +4275,12 @@ void File_Usac::tnsData()
 
             if (num_windows==1)
             {
-                Skip_S1(6,                                       "lenght[w][filt]");
+                Skip_S1(6,                                       "length[w][filt]");
                 Get_S1 (4, order,                                "order[w][filt]");
             }
             else
             {
-                Skip_S1(4,                                       "lenght[w][filt]");
+                Skip_S1(4,                                       "length[w][filt]");
                 Get_S1 (3, order,                                "order[w][filt]");
             }
 
@@ -5901,6 +5934,15 @@ void File_Usac::UsacExtElement(size_t elemIdx, bool usacIndependencyFlag)
             }
             BS_Bookmark(B, usacExtElementType<ID_EXT_ELE_Max?string(usacExtElementType_Names[usacExtElementType]):("usacExtElementType"+to_string(usacExtElementType)));
         }
+    }
+    else
+    {
+        #if MEDIAINFO_CONFORMANCE
+            if (usacIndependencyFlag && usacExtElementType == ID_EXT_ELE_AUDIOPREROLL && IsParsingRaw == 1 && roll_distance_FramePos_IsPresent && !*roll_distance_FramePos_IsPresent)
+            {
+                Fill_Conformance("Crosscheck sbgp roll_distance", "MP4 sbgp is not present and this is an independent frame (IF), seeking is not optimal", bitset8(), Info);
+            }
+        #endif
     }
     Element_End0();
 }

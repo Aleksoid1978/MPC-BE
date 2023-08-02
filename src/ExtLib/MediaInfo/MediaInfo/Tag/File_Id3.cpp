@@ -111,7 +111,7 @@ void File_Id3::Read_Buffer_Continue()
         Fill(Stream_General, 0, General_Recorded_Date, Year);
         if (GenreAddition.empty())
             Fill(Stream_General, 0, General_Genre, GenreAddition);
-        if (Genre && Genre!=(int8u)-1)
+        if (Genre!=(int8u)-1)
             Fill(Stream_General, 0, General_Genre, Genre);
         if (Track)
             Fill(Stream_General, 0, General_Track_Position, Track);

@@ -291,6 +291,8 @@ bool File_Aac::FileHeader_Begin()
         File__Tags_Helper::Accept("ADIF");
         MustSynchronize=false;
     }
+    else if (Mode==Mode_ADIF)
+        File__Tags_Helper::Reject("ADIF");
 
     return true;
 }

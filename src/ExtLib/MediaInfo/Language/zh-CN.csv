@@ -229,6 +229,7 @@ Bits-(Pixel*Frame);数据密度 [码率/(像素*帧率)]
 BufferSize;缓冲大小
 Cancel;取消
 CaptionServiceName;字幕服务名称
+CatalogNumber;
 Channel(s);声道数
 ChannelCoded;声道是否编码
 ChannelConfiguration;声道配置
@@ -242,6 +243,7 @@ Chapters stream(s);章节流
 Chapters_Codec_List;章节解码器
 Chapters_No;无章节
 ChaptersCount;章节流总数
+CharacterSet;
 CheckNewVersion;检查新版本
 Choose custom;自定义
 Choose custom sheet;选择自定义表格
@@ -328,6 +330,7 @@ DarkMode;深色模式
 Date;日期
 Debug;调试
 Decimal point;小数点
+Default;
 Default_Setting;系统默认
 DefaultTargetDeviceConfig;默认目标设备配置
 Delay;延迟
@@ -336,6 +339,7 @@ Delay_Source_Container;容器
 Delay_Source_Stream;媒体流
 Delete;删除
 Description;说明
+Details;
 dialnorm;对白归一化
 DialogueCorrected;对白校正
 DialogueEnhancement;对白增强
@@ -357,6 +361,7 @@ DotsPerInch;DPI
 Downmix;Downmix
 Downmix_5.1.x;5.1 and 5.1.x downmix
 Downmix_5to2;5.1 to 2.0 downmix
+Downmix_5to2_90deg;
 DrcSets_Count;DRC 组数
 DrcSets_Effects;DRC 效果类型
 Duration;时长
@@ -384,6 +389,7 @@ EPG_Positions;EPG 位置 (内部)
 EpisodeTitleNumber;集数标题
 Error_File;读取文件出错
 Error_File_Write;写入文件出错
+Events_MinDuration;
 Events_PaintOn;PaintOn 事件数
 Events_PopOn;PopOn 事件数
 Events_RollUp;RollUp 事件数
@@ -420,6 +426,7 @@ Folder (R)_Hint;选择一个文件夹 (包含所有子文件夹)
 Folder (Recursively);文件夹 (包含子文件夹)
 Folder_Hint;选择文件夹
 FolderName;文件夹名称
+Forced;
 Format;格式
 Format_Commercial;传播名
 Format_Commercial_IfAny;传播名
@@ -463,6 +470,7 @@ FpaPass;FPA 通过
 FpaVersion;FPA 版本
 FrameCount;总帧数
 FrameRate;帧率
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;最高帧率
 FrameRate_Minimum;最低帧率
 FrameRate_Mode;帧率模式
@@ -471,7 +479,9 @@ FrameRate_Mode_VFR;动态帧率 (VFR)
 FrameRate_Nominal;额定帧率
 FrameRate_Original;原始帧率
 FrameRate_Real;真实帧率
+FullParsing;
 General;概览
+GeneralCompliance;
 Genre;流派
 Genre_000;Blues
 Genre_001;Classic Rock
@@ -716,6 +726,21 @@ InternetMediaType;网络媒体类型
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;关键词
 Known codecs;已知解码器
 Known formats;已知格式
@@ -747,6 +772,7 @@ Language_bs;波斯尼亚语 (Bosnian)
 Language_ca;加泰罗尼亚语 (Catalan)
 Language_ce;车臣语 (Chechen)
 Language_ch;查莫罗语 (Chamorro)
+Language_cmn;
 Language_co;科西嘉语 (Corsican)
 Language_cr;克里语 (Cree)
 Language_cs;捷克语 (Czech)
@@ -916,10 +942,17 @@ Language_wo;沃洛夫语 (Wolof)
 Language_xh;科萨语 (Xhosa)
 Language_yi;意第绪语 (Yiddish)
 Language_yo;约鲁巴语 (Yoruba)
+Language_yue;
 Language_za;壮语 (Zhuang)
 Language_zh;中文 (Chinese)
+Language_zh-cmn;
 Language_zh-cn;简体中文 (Chinese, China)
+Language_zh-CN;
+Language_zh-Hans;
+Language_zh-Hant;
 Language_zh-tw;繁体中文 (Chinese, Taiwan)
+Language_zh-TW;
+Language_zh-yue;
 Language_zu;祖鲁语 (Zulu)
 LawRating;分级
 LCCN;LCCN
@@ -944,6 +977,7 @@ LinkedTo_Substream_Pos;子流 #s
 LinkedTo_TrackFormat_Pos;轨道格式 #s
 LinkedTo_TrackUID_Pos;轨道 UID #s
 List;列表
+LongTermLoudness;
 LoRoCenterMixGain;LoRo 中央混音增益
 LoRoSurroundMixGain;LoRo 环绕混音增益
 Loudness_Anchor;锚点响度
@@ -981,6 +1015,8 @@ MaxFALL;最大帧平均亮度 (FALL)
 MaxGain;最大增益
 MaximumMomentaryLoudness;最大瞬时响度
 MaxTruePeak;最大真实峰值
+MD5;
+MD5_Unencoded;
 MediaInfo_About;使用 MediaInfo 可以轻松读取音视频文件的编码和标签信息。\r\n本软件按 BSD 授权协议开源，用户可以免费使用，开发者也可以自由地学习、修改、重新发布本软件。（Mac App Store 图形界面除外）
 MediaInfo_About_About;MediaInfo v%MI_VERSION%，内置 MediaInfoLib v%MIL_VERSION%
 Menu;菜单
@@ -1033,42 +1069,6 @@ ObjectCount;对象数量
 OK;确定
 One output file per input file;一个输入文件对应一个输出文件
 Open;打开
-OpenCandy_01;正在下载 ________
-OpenCandy_02;已完成 __%
-OpenCandy_03;网络连接中断
-OpenCandy_04;________ 下载完成
-OpenCandy_05;点击开始安装 ________
-OpenCandy_06;确定要取消安装吗？\r\n如果要继续安装，请点击“否”。\r\n提示：你可以点击菜单中的“退出”，当下次启动电脑的时候再安装。
-OpenCandy_07;已暂停下载 ________。\r\n请点击任务栏图标继续下载。
-OpenCandy_08;发生了严重的错误。将中止安装 _________。
-OpenCandy_09;暂停下载
-OpenCandy_10;取消安装
-OpenCandy_11;继续下载
-OpenCandy_12;退出安装程序
-OpenCandy_13;___________ - 来自 ____________ 的推荐
-OpenCandy_14;正在下载 _________
-OpenCandy_15;正在下载 ___________（由 ___________ 推荐）。下载完成后我们会通知您。
-OpenCandy_16;___________ 可以开始安装了。
-OpenCandy_17;___________ 已下载完成，请点击“安装”继续。
-OpenCandy_18;已下载 ___________ 个（共 ___________ 个）
-OpenCandy_19;由 OpenCandy 提供
-OpenCandy_20;访问 OpenCandy.com 了解更多信息
-OpenCandy_21;安装
-OpenCandy_22;安装 ___________
-OpenCandy_23;将取消安装 ___________。\r\n确定要退出吗？
-OpenCandy_24;暂停
-OpenCandy_25;下载已暂停。点击“继续”可以继续下载。
-OpenCandy_26;继续
-OpenCandy_27;立即安装
-OpenCandy_28;暂停下载
-OpenCandy_29;继续下载
-OpenCandy_30;取消下载
-OpenCandy_31;请选择安装选项
-OpenCandy_32;安装 ___________
-OpenCandy_33;不安装
-OpenCandy_34;请选择安装选项
-OpenCandy_35;______ 推荐此软件
-OpenCandy_36;您当前的安装不会被中断
 OpenCaptionsLanguage;显式字幕语言
 OpenCaptionsPresent;含有显式字幕
 OpenCaptionsType;显式字幕格式
@@ -1146,6 +1146,7 @@ Rating;分级
 RealtimeLoudnessCorrected;实时响度校正
 Recorded_Date;录制日期
 Recorded_Location;录制地点
+Reel;
 Released_Date;发行日期
 RemixedBy;混音者
 RenderMode;渲染模式
@@ -1364,5 +1365,5 @@ Written_Location;写入地点
 WrittenBy;作者
 Yes;是
 Your system;您的系统
-ZZ_Automatic_Percent;87
-ZZ_AutomaticLanguage_Percent;87
+ZZ_Automatic_Percent;97
+ZZ_AutomaticLanguage_Percent;97

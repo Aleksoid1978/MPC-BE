@@ -229,6 +229,7 @@ Bits-(Pixel*Frame);비트/(픽셀*프레임)
 BufferSize;
 Cancel;취소
 CaptionServiceName;
+CatalogNumber;
 Channel(s);채널
 ChannelCoded;
 ChannelConfiguration;
@@ -242,6 +243,7 @@ Chapters stream(s);챕터 스트림
 Chapters_Codec_List;챕터 코덱
 Chapters_No;챕터 없음
 ChaptersCount;챕터 스트림 개수
+CharacterSet;
 CheckNewVersion;최신 버전 확인
 Choose custom;커스텀 선택
 Choose custom sheet;원하는 커스텀 시트를 선택하세요
@@ -328,6 +330,7 @@ DarkMode;
 Date;날짜
 Debug;디버그
 Decimal point;소수점
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;딜레이
@@ -336,6 +339,7 @@ Delay_Source_Container;
 Delay_Source_Stream;
 Delete;삭제
 Description;설명
+Details;
 dialnorm;
 DialogueCorrected;
 DialogueEnhancement;
@@ -357,6 +361,7 @@ DotsPerInch;인치당 도트
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;길이
@@ -384,6 +389,7 @@ EPG_Positions;EPG 포지션 (내부)
 EpisodeTitleNumber;
 Error_File;파일을 읽는 중 에러
 Error_File_Write;
+Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
 Events_RollUp;
@@ -420,6 +426,7 @@ Folder (R)_Hint;조사할 폴더를 선택 (모든 하위 폴더를 포함)
 Folder (Recursively);폴더 (하위 포함)
 Folder_Hint;조사할 폴더를 선택
 FolderName;폴더명
+Forced;
 Format;포맷
 Format_Commercial;
 Format_Commercial_IfAny;
@@ -463,6 +470,7 @@ FpaPass;
 FpaVersion;
 FrameCount;포맷 개수
 FrameRate;프레임레이트
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;최대 프레임레이트
 FrameRate_Minimum;최소 프레임레이트
 FrameRate_Mode;프레임레이트 모드
@@ -471,7 +479,9 @@ FrameRate_Mode_VFR;변동
 FrameRate_Nominal;명목상의 프레임레이트
 FrameRate_Original;원본 프레임레이트
 FrameRate_Real;
+FullParsing;
 General;일반
+GeneralCompliance;
 Genre;장르
 Genre_000;Blues
 Genre_001;Classic Rock
@@ -716,6 +726,21 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;키워드
 Known codecs;알고 있는 코덱
 Known formats;알고 있는 포맷
@@ -747,6 +772,7 @@ Language_bs;Bosnian
 Language_ca;Catalan
 Language_ce;Chechen
 Language_ch;Chamorro
+Language_cmn;
 Language_co;Corsican
 Language_cr;Cree
 Language_cs;Czech
@@ -916,10 +942,17 @@ Language_wo;Wolof
 Language_xh;Xhosa
 Language_yi;Yiddish
 Language_yo;Yoruba
+Language_yue;
 Language_za;Zhuang
 Language_zh;Chinese
+Language_zh-cmn;
 Language_zh-cn;Chinese (China)
+Language_zh-CN;
+Language_zh-Hans;
+Language_zh-Hant;
 Language_zh-tw;Chinese (Taiwan)
+Language_zh-TW;
+Language_zh-yue;
 Language_zu;Zulu
 LawRating;법률 등급
 LCCN;LCCN
@@ -944,6 +977,7 @@ LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;목록
+LongTermLoudness;
 LoRoCenterMixGain;
 LoRoSurroundMixGain;
 Loudness_Anchor;
@@ -981,6 +1015,8 @@ MaxFALL;
 MaxGain;
 MaximumMomentaryLoudness;
 MaxTruePeak;
+MD5;
+MD5_Unencoded;
 MediaInfo_About;미디어 파일에 대한\r\n상세한 정보를 제공:\r\nMatroska, OGG (OGM 포함)\r\nMPEG1 (VCD 포함)\r\nMPEG2 (DVD와 SVCD 포함)\r\nMPEG4 (Itunes M4A 포함)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (WMV, WMA 포함)\r\nMicrosoft RIFF (AVI, WAV 포함)\r\n음악 포맷 (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
 Menu;메뉴
@@ -1033,42 +1069,6 @@ ObjectCount;
 OK;확인
 One output file per input file;입력 파일 마다 하나의 출력 파일
 Open;열기
-OpenCandy_01;________ 다운로드 중
-OpenCandy_02;__% 완료
-OpenCandy_03;인터넷 연결 중단
-OpenCandy_04;________ 다운로드 완료
-OpenCandy_05;클릭하면 ________ 설치를 시작합니다
-OpenCandy_06;설치를 중단하시겠습니까?\r\n설치를 다음에 하시려면 '아니오'를 선택해주십시오.\r\n주: 시스템 재시작 시에 다시 설치하려면 메뉴에서 종료를 선택할 수 있습니다.
-OpenCandy_07;________ 다운로드를 일시정지했습니다.\r\n다운로드를 다시 시작하려면 트레이 아이콘을 클릭해주십시오.
-OpenCandy_08;심각한 오류가 발생했습니다. _________ 설치가 중단됩니다.
-OpenCandy_09;다운로드 일시정지
-OpenCandy_10;설치 중단
-OpenCandy_11;다운로드 재시작
-OpenCandy_12;설치 종료
-OpenCandy_13;___________ - ____________ 추천
-OpenCandy_14;_________ 다운로드 중
-OpenCandy_15;요청하신 ___________, ___________가 추천한 소프트웨어,가 다운로드 중입니다. 설치 준비가 완료되면 알려드리겠습니다.
-OpenCandy_16;___________ 설치가 준비되었습니다.
-OpenCandy_17;___________가 다운로드되었습니다. 설치를 진행하시려면 '설치'를 눌러주십시오.
-OpenCandy_18;___________ / ___________ 다운로드
-OpenCandy_19;Powered by OpenCandy
-OpenCandy_20;Learn more at OpenCandy.com
-OpenCandy_21;설치
-OpenCandy_22;___________ 설치
-OpenCandy_23;___________ 설치를 중단합니다.\r\n종료하시겠습니까?
-OpenCandy_24;일시정지
-OpenCandy_25;다운로드를 일시정지했습니다. 다시 시작하려면 '재시작'를 눌러주십시오.
-OpenCandy_26;재시작
-OpenCandy_27;지금 설치
-OpenCandy_28;다운로드 일시정지
-OpenCandy_29;다운로드 재시작
-OpenCandy_30;설치 중단
-OpenCandy_31;설치 옵션을 선택해주십시오.
-OpenCandy_32;___________ 설치
-OpenCandy_33;설치하지 않음
-OpenCandy_34;설치 옵션을 선택해주십시오.
-OpenCandy_35;______에서 이 소프트웨어를 추천합니다.
-OpenCandy_36;현재 설치 과정은 중단되지 않습니다.
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
@@ -1146,6 +1146,7 @@ Rating;등급
 RealtimeLoudnessCorrected;
 Recorded_Date;기록일
 Recorded_Location;기록 장소
+Reel;
 Released_Date;개봉일
 RemixedBy;리믹스
 RenderMode;
@@ -1364,5 +1365,5 @@ Written_Location;제작 장소
 WrittenBy;제작자
 Yes;예
 Your system;이 시스템
-ZZ_Automatic_Percent;68
-ZZ_AutomaticLanguage_Percent;72
+ZZ_Automatic_Percent;66
+ZZ_AutomaticLanguage_Percent;70

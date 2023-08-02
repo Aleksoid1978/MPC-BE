@@ -137,7 +137,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const Char*  MediaInfo_Version=__T("MediaInfoLib - v23.06");
+const Char*  MediaInfo_Version=__T("MediaInfoLib - v23.07");
 const Char*  MediaInfo_Url=__T("http://MediaArea.net/MediaInfo");
       Ztring EmptyZtring;       //Use it when we can't return a reference to a true Ztring
 const Ztring EmptyZtring_Const; //Use it when we can't return a reference to a true Ztring, const version
@@ -482,6 +482,9 @@ void MediaInfo_Config::Init(bool Force)
     DecimalPoint=__T(".");
     ThousandsPoint=Ztring();
     CarriageReturnReplace=__T(" / ");
+    #if MEDIAINFO_ADVANCED
+        Collection_Trigger=-2;
+    #endif
     #if MEDIAINFO_EVENTS
         Event_CallBackFunction=NULL;
         Event_UserHandler=NULL;
@@ -1441,6 +1444,15 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
         CustomMapping_Set(Value);
         return Ztring();
     }
+    if (Option_Lower==__T("collection_trigger"))
+    {
+        #if MEDIAINFO_ADVANCED
+            Collection_Trigger_Set(Value);
+            return Ztring();
+        #else // MEDIAINFO_ADVANCED
+            return __T("advanced features are disabled due to compilation options");
+        #endif // MEDIAINFO_ADVANCED
+    }
     if (Option_Lower==__T("format_profile_split"))
     {
         #if MEDIAINFO_ADVANCED
@@ -1898,7 +1910,7 @@ set<Ztring> MediaInfo_Config::ParseOnlyKnownExtensions_GetList_Set()
     if (DefaultList)
     {
         InfoMap &FormatList=MediaInfoLib::Config.Format_Get();
-        for (InfoMap::iterator Format=FormatList.begin(); Format!=FormatList.end(); Format++)
+        for (InfoMap::iterator Format=FormatList.begin(); Format!=FormatList.end(); ++Format)
             if (InfoFormat_Extensions<Format->second.size())
             {
                 if (!StreamKinds.empty() && Format->second[InfoFormat_KindofFormat].find_first_of(StreamKinds)==string::npos)
@@ -1920,7 +1932,7 @@ Ztring MediaInfo_Config::ParseOnlyKnownExtensions_GetList_String()
 {
     set<Ztring> Extensions=ParseOnlyKnownExtensions_GetList_Set();
     Ztring List;
-    for (set<Ztring>::iterator Extension=Extensions.begin(); Extension!=Extensions.end(); Extension++)
+    for (set<Ztring>::iterator Extension=Extensions.begin(); Extension!=Extensions.end(); ++Extension)
     {
         List+=*Extension;
         List+=__T(',');
@@ -2952,7 +2964,7 @@ const Ztring MediaInfo_Config::Iso639_Find (const Ztring &Value)
 }
 
 //---------------------------------------------------------------------------
-const Ztring MediaInfo_Config::Iso639_Translate (const Ztring Value)
+const Ztring MediaInfo_Config::Iso639_Translate (const Ztring &Value)
 {
     Ztring Code(Value);
     if (Code.size()==3 && !MediaInfoLib::Config.Iso639_1_Get(Code).empty())
@@ -3474,6 +3486,33 @@ ZtringListList MediaInfo_Config::SubFile_Config_Get ()
 
     return SubFile_Config;
 }
+
+//***************************************************************************
+// Collections
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_ADVANCED
+void MediaInfo_Config::Collection_Trigger_Set(const Ztring& Value)
+{
+    int64s ValueI;
+    if (!Value.empty() && Value.back()==__T('x'))
+        ValueI=-Value.To_int64s();
+    else
+        ValueI=(int64s)(Value.To_float32()*1000);
+
+    CriticalSectionLocker CSL(CS);
+
+    Collection_Trigger=ValueI;
+}
+
+int64s MediaInfo_Config::Collection_Trigger_Get()
+{
+    CriticalSectionLocker CSL(CS);
+
+    return Collection_Trigger;
+}
+#endif // MEDIAINFO_ADVANCED
 
 //***************************************************************************
 // Custom mapping

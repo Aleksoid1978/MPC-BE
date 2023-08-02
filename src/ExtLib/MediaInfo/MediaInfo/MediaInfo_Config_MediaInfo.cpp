@@ -510,7 +510,6 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
     {
         #if MEDIAINFO_ADVANCED
             return File_DefaultTimeCodeDropFrame_Set(Value);
-            return Ztring();
         #else //MEDIAINFO_ADVANCED
             return __T("File_DefaultTimeCodeDropFrame is disabled due to compilation options");
         #endif //MEDIAINFO_ADVANCED
@@ -1548,8 +1547,6 @@ void MediaInfo_Config_MediaInfo::File_ExpandSubs_Update(void** Source)
         *Backup=*Stream_More;
 
         //Sub-elements
-        const Char* UpSuffix=__T("_Pos");
-        const Char* HideSuffix=__T("_Pos/String");
         //for (set<string>::iterator File_ExpandSubs_Item=File_ExpandSubs_Items.begin(); File_ExpandSubs_Item!=File_ExpandSubs_Items.end(); ++File_ExpandSubs_Item)
         for (size_t i=0; i<6; i++)
         {
@@ -1569,7 +1566,7 @@ void MediaInfo_Config_MediaInfo::File_ExpandSubs_Update(void** Source)
 
                             // Tree
                             size_t Up_Pos=Name.find(__T(" LinkedTo_"));
-                            size_t Up_Pos_End;
+                            size_t Up_Pos_End=string::npos;
                             if (Up_Pos!=string::npos)
                                 Up_Pos_End=Name.find(__T("_Pos"), Name.size()-4);
                             if (Up_Pos!=string::npos && Up_Pos_End==Name.size()-4)

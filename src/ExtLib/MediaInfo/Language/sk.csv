@@ -229,6 +229,7 @@ Bits-(Pixel*Frame);Bitov/(Bod*Snímka)
 BufferSize;
 Cancel;Zrušiť
 CaptionServiceName;
+CatalogNumber;
 Channel(s);Kanál(y)
 ChannelCoded;
 ChannelConfiguration;
@@ -242,6 +243,7 @@ Chapters stream(s);Chapters stream(s)
 Chapters_Codec_List;Chapters Codecs
 Chapters_No;No chapters
 ChaptersCount;Count of chapter streams
+CharacterSet;
 CheckNewVersion;Skontrolovať novú verziu
 Choose custom;Výber užívateľa
 Choose custom sheet;Vyberte požadovaný formát zobrazení
@@ -328,6 +330,7 @@ DarkMode;
 Date;Dátum
 Debug;Pokročilé
 Decimal point;Decimal point
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;Delay
@@ -336,6 +339,7 @@ Delay_Source_Container;
 Delay_Source_Stream;
 Delete;Odstrániť
 Description;Popis
+Details;
 dialnorm;
 DialogueCorrected;
 DialogueEnhancement;
@@ -357,6 +361,7 @@ DotsPerInch;Bodov na palec
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Trvanie
@@ -384,6 +389,7 @@ EPG_Positions;
 EpisodeTitleNumber;
 Error_File;Zlyhalo načítavanie súboru
 Error_File_Write;
+Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
 Events_RollUp;
@@ -420,6 +426,7 @@ Folder (R)_Hint;Select a folder to study (with all folders recursively)
 Folder (Recursively);Adresár (Recursively)
 Folder_Hint;Otvoriť všetko v adresári
 FolderName;Názov adresára
+Forced;
 Format;Formát
 Format_Commercial;
 Format_Commercial_IfAny;
@@ -463,6 +470,7 @@ FpaPass;
 FpaVersion;
 FrameCount;
 FrameRate;Frekvencia snímok
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Maximálna frekvencia snímok
 FrameRate_Minimum;Minimálna frekvencia snímok
 FrameRate_Mode;Režim frekvencie snímok
@@ -471,7 +479,9 @@ FrameRate_Mode_VFR;Variabilný
 FrameRate_Nominal;Nominálna frekvencia snímok
 FrameRate_Original;Pôvodná frekvencia snímok
 FrameRate_Real;
+FullParsing;
 General;Hlavné parametre
+GeneralCompliance;
 Genre;žáner
 Genre_000;Blues
 Genre_001;Classic Rock
@@ -716,6 +726,21 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Identifikujúce slová
 Known codecs;Známe kodeky
 Known formats;Známe formáty
@@ -747,6 +772,7 @@ Language_bs;Bosansky
 Language_ca;Catalan
 Language_ce;Chechen
 Language_ch;Chamorro
+Language_cmn;
 Language_co;Corsican
 Language_cr;Cree
 Language_cs;Česky
@@ -916,10 +942,17 @@ Language_wo;Wolof
 Language_xh;Xhosa
 Language_yi;Yiddish
 Language_yo;Yoruba
+Language_yue;
 Language_za;Zhuang
 Language_zh;Čínsky
+Language_zh-cmn;
 Language_zh-cn;Čínsky (Čína)
+Language_zh-CN;
+Language_zh-Hans;
+Language_zh-Hant;
 Language_zh-tw;Čínsky (Taiwan)
+Language_zh-TW;
+Language_zh-yue;
 Language_zu;Zulu
 LawRating;Law rating
 LCCN;LCCN
@@ -944,6 +977,7 @@ LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Zoznam
+LongTermLoudness;
 LoRoCenterMixGain;
 LoRoSurroundMixGain;
 Loudness_Anchor;
@@ -981,6 +1015,8 @@ MaxFALL;
 MaxGain;
 MaximumMomentaryLoudness;
 MaxTruePeak;
+MD5;
+MD5_Unencoded;
 MediaInfo_About;Supply very detailled information\r\nabout a multimedia file:\r\nMatroska, OGG (including OGM)\r\nMPEG1 (including VCD)\r\nMPEG2 (including DVD and SVCD)\r\nMPEG4 (including Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (including WMV, WMA)\r\nMicrosoft RIFF (including AVI, WAV)\r\nSound-only formats (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
 Menu;Menu
@@ -1033,42 +1069,6 @@ ObjectCount;
 OK;OK
 One output file per input file;One output file per input file
 Open;Otvoriť
-OpenCandy_01;Sťahovanie
-OpenCandy_02;Dokončené:    %
-OpenCandy_03;Internetové spojenie prerušené!
-OpenCandy_04;Sťahovanie ukončené.
-OpenCandy_05;Kliknutím nainštalujte.
-OpenCandy_06;
-OpenCandy_07;
-OpenCandy_08;
-OpenCandy_09;
-OpenCandy_10;Zrušiť inštaláciu
-OpenCandy_11;
-OpenCandy_12;Ukončiť inštalátor
-OpenCandy_13;
-OpenCandy_14;Sťahovanie
-OpenCandy_15;
-OpenCandy_16;
-OpenCandy_17;
-OpenCandy_18;
-OpenCandy_19;
-OpenCandy_20;
-OpenCandy_21;Inštalácia
-OpenCandy_22;Inštalácia
-OpenCandy_23;
-OpenCandy_24;Prerušenie
-OpenCandy_25;
-OpenCandy_26;
-OpenCandy_27;Inštalujte teraz
-OpenCandy_28;
-OpenCandy_29;
-OpenCandy_30;Zrušenie inštalácie
-OpenCandy_31;Vyberte inštalačné nastavenia
-OpenCandy_32;Inštalujte
-OpenCandy_33;Neinštalujte
-OpenCandy_34;Vyberte inštalačné nastavenia
-OpenCandy_35;
-OpenCandy_36;
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
@@ -1146,6 +1146,7 @@ Rating;Hodnotenie
 RealtimeLoudnessCorrected;
 Recorded_Date;Dátum nahrávania
 Recorded_Location;Lokalita nahrávania
+Reel;
 Released_Date;Dátum vydania
 RemixedBy;Remixoval/-a
 RenderMode;
@@ -1364,5 +1365,5 @@ Written_Location;Written location
 WrittenBy;Napísal
 Yes;Áno
 Your system;Váš systém
-ZZ_Automatic_Percent;60
-ZZ_AutomaticLanguage_Percent;66
+ZZ_Automatic_Percent;59
+ZZ_AutomaticLanguage_Percent;63

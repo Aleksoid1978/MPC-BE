@@ -3123,7 +3123,9 @@ void File_Aac::payload(size_t BitsNotIncluded)
         #if MEDIAINFO_TRACE || MEDIAINFO_CONFORMANCE
         case  42: UsacFrame(BitsNotIncluded); break;
         #endif //MEDIAINFO_TRACE || MEDIAINFO_CONFORMANCE
-        default: Skip_BS(Data_BS_Remain()-BitsNotIncluded,      "payload");
+        default:
+            Skip_BS(Data_BS_Remain()-(BitsNotIncluded!=-1?BitsNotIncluded:0), "payload");
+            Frame_Count_Valid=Frame_Count;
     }
 }
 

@@ -229,6 +229,7 @@ Bits-(Pixel*Frame);Bitar/(Pixlar*bildruta)
 BufferSize;Buffertstorlek
 Cancel;Avbryt
 CaptionServiceName;
+CatalogNumber;
 Channel(s);Kanal(er)
 ChannelCoded;
 ChannelConfiguration;
@@ -242,6 +243,7 @@ Chapters stream(s);Kapitelströmm(ar)
 Chapters_Codec_List;Kapitelkodekar
 Chapters_No;Inga kapitel
 ChaptersCount;Antal kapitelströmmar
+CharacterSet;
 CheckNewVersion;Sök efter ny version
 Choose custom;Anpassa
 Choose custom sheet;Välj en anpassad formatmall
@@ -328,6 +330,7 @@ DarkMode;
 Date;Datum
 Debug;Felsök
 Decimal point;Decimalpunkt
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;Fördröjning
@@ -336,6 +339,7 @@ Delay_Source_Container;Behållare
 Delay_Source_Stream;Raw ström
 Delete;Tabort
 Description;Beskrivning
+Details;
 dialnorm;
 DialogueCorrected;
 DialogueEnhancement;
@@ -357,6 +361,7 @@ DotsPerInch;Punkter per inch
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Varaktighet
@@ -384,6 +389,7 @@ EPG_Positions;EPG-positioner (interna)
 EpisodeTitleNumber;Episodnummer
 Error_File;Fel vid inläsning av fil
 Error_File_Write;
+Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
 Events_RollUp;
@@ -420,6 +426,7 @@ Folder (R)_Hint;Välj en mapp (med alla undermappar rekursivt)
 Folder (Recursively);Mapp (rekursivt)
 Folder_Hint;Välj en mapp
 FolderName;Mappnamn
+Forced;
 Format;Format
 Format_Commercial;Kommersiellt namn
 Format_Commercial_IfAny;Kommersiellt namn
@@ -463,6 +470,7 @@ FpaPass;FPA Pass
 FpaVersion;FPA Version
 FrameCount;Antal bildrutor
 FrameRate;Bildfrekvens
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Max. bildfrekvens
 FrameRate_Minimum;Min. bildfrekvens
 FrameRate_Mode;Bildfrekvensläge
@@ -471,7 +479,9 @@ FrameRate_Mode_VFR;Variabelt
 FrameRate_Nominal;Nominell bildfrekvens
 FrameRate_Original;Ursprunglig bildfrekvens
 FrameRate_Real;
+FullParsing;
 General;Allmänt
+GeneralCompliance;
 Genre;Genre
 Genre_000;Blues
 Genre_001;Klassisk rock
@@ -716,6 +726,21 @@ InternetMediaType;Internetmediatyp
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Nyckelord
 Known codecs;Kända kodekar
 Known formats;Kända format
@@ -747,6 +772,7 @@ Language_bs;Bosniska
 Language_ca;Catalan
 Language_ce;Chechen
 Language_ch;Chamorro
+Language_cmn;
 Language_co;Corsican
 Language_cr;Cree
 Language_cs;Tjeckiska
@@ -916,10 +942,17 @@ Language_wo;Wolof
 Language_xh;Xhosa
 Language_yi;Yiddish
 Language_yo;Yoruba
+Language_yue;
 Language_za;Zhuang
 Language_zh;Kinesiska
+Language_zh-cmn;
 Language_zh-cn;Kinesiska (Kina)
+Language_zh-CN;
+Language_zh-Hans;
+Language_zh-Hant;
 Language_zh-tw;Kinesiska (Taiwan)
+Language_zh-TW;
+Language_zh-yue;
 Language_zu;Zulu
 LawRating;Åldersgräns
 LCCN;LCCN
@@ -944,6 +977,7 @@ LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Lista
+LongTermLoudness;
 LoRoCenterMixGain;
 LoRoSurroundMixGain;
 Loudness_Anchor;
@@ -981,6 +1015,8 @@ MaxFALL;
 MaxGain;
 MaximumMomentaryLoudness;
 MaxTruePeak;
+MD5;
+MD5_Unencoded;
 MediaInfo_About;MediaInfo tillhandahåller enkel tillgång till teknisk information, och tagginformation, om video- och ljudfiler.\r\nFörutom Mac App Stores grafiska användargränsnitt, är mjukvaran öppen källkod. Det innebär att den är kostnadsfri för slutanvändaren och att andra utvecklare tillåts studera, förbättra och återdistribuera programmet (BSD-licens).
 MediaInfo_About_About;
 Menu;Meny
@@ -1033,42 +1069,6 @@ ObjectCount;
 OK;OK
 One output file per input file;En utdatafil per indatafil
 Open;Öppna
-OpenCandy_01;Laddar ner________
-OpenCandy_02;__% klart
-OpenCandy_03;Internetanslutningen bröts
-OpenCandy_04;________ nedladdning klar
-OpenCandy_05;Klicka för att installera ________
-OpenCandy_06;"Vill du verkligen avbryta installationen?\r\nVälj ""Nej"" om du vill skjuta upp installationen till senare.\r\nNotera: Du kan välja ""Avsluta"", om du vill fördröja installationen till efter nästa omstart."
-OpenCandy_07;Nedladdningen av _________ har pausats.\r\nKlicka på meddelandefältsikonen för att fortsätta.
-OpenCandy_08;Ett allvarligt fel har uppstått. Installationen av _________ kommer att avbrytas.
-OpenCandy_09;Pausa nedladdningen
-OpenCandy_10;Avbryt installationen
-OpenCandy_11;Återuppta nedladdningen
-OpenCandy_12;Avsluta installeraren
-OpenCandy_13;___________ - Rekommenderas av ___________
-OpenCandy_14;Laddar ner ___________
-OpenCandy_15;___________, programmet som rekommenderas av ___________, laddas nu ner på din begäran. Vi meddelar när det är klart att installeras.
-OpenCandy_16;___________ är klart för installation
-OpenCandy_17;"___________ är nu nerladdat. Klicka på ""Installera"" för att fortsätta."
-OpenCandy_18;___________ av ___________ nedladdat
-OpenCandy_19;Levererat av OpenCandy
-OpenCandy_20;Läs mer på OpenCandy.com
-OpenCandy_21;Installera
-OpenCandy_22;Installation av ___________
-OpenCandy_23;Detta kommer att avbryta installationen av ___________\r\nVill du verkligen avbryta?
-OpenCandy_24;Pausa
-OpenCandy_25;"Nedladdningen har pausats. Klicka på ""Fortsätt"" när du är färdig att fortsätta."
-OpenCandy_26;Fortsätt
-OpenCandy_27;Installera nu
-OpenCandy_28;Pausa nedladdningen
-OpenCandy_29;Återuppta nedladdningen
-OpenCandy_30;Avbryt installationen
-OpenCandy_31;Välj ett installationsalternativ
-OpenCandy_32;Installera 
-OpenCandy_33;Installera inte
-OpenCandy_34;Välj en installation
-OpenCandy_35;______ rekommenderar detta program
-OpenCandy_36;Din nuvarande installation kommer inte att störas.
 OpenCaptionsLanguage;Öppet textspråk
 OpenCaptionsPresent;Aktuella öppna texter
 OpenCaptionsType;Öppen texttyp
@@ -1146,6 +1146,7 @@ Rating;Betyg
 RealtimeLoudnessCorrected;
 Recorded_Date;Inspelningsdatum
 Recorded_Location;Inspelningsort
+Reel;
 Released_Date;Publiceringsdatum
 RemixedBy;Remix av
 RenderMode;
@@ -1364,5 +1365,5 @@ Written_Location;Ort
 WrittenBy;Skrivet av
 Yes;Ja
 Your system;Ditt system
-ZZ_Automatic_Percent;80
-ZZ_AutomaticLanguage_Percent;80
+ZZ_Automatic_Percent;77
+ZZ_AutomaticLanguage_Percent;78

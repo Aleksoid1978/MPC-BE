@@ -55,7 +55,7 @@ namespace ZenLib
 
 // IMPLEMENTATION
 
-const char * uint128::toString (unsigned int radix) const throw () {
+const char * uint128::toString (unsigned int radix) const noexcept {
     if (!*this) return "0";
     if (radix < 2 || radix > 37) return "(invalid radix)";
 
@@ -74,7 +74,7 @@ const char * uint128::toString (unsigned int radix) const throw () {
     return &sz [i];
 }
 
-uint128::uint128 (const char * sz) throw ()
+uint128::uint128 (const char * sz) noexcept
     : lo (0u), hi (0u) {
 
     if (!sz) return;
@@ -119,7 +119,7 @@ uint128::uint128 (const char * sz) throw ()
     return;
 }
 
-uint128::uint128 (const float a) throw ()
+uint128::uint128 (const float a) noexcept
     #if defined (__mips__)       || defined (__mipsel__)
     : lo ((int64u) fmod ((const double)a, 18446744073709551616.0)),
     #else
@@ -127,11 +127,11 @@ uint128::uint128 (const float a) throw ()
     #endif
       hi ((int64u) (a / 18446744073709551616.0f)) {}
 
-uint128::uint128 (const double & a) throw ()
+uint128::uint128 (const double & a) noexcept
     : lo ((int64u) fmod (a, 18446744073709551616.0)),
       hi ((int64u) (a / 18446744073709551616.0)) {}
 
-uint128::uint128 (const long double & a) throw ()
+uint128::uint128 (const long double & a) noexcept
     #if defined (__mips__)       || defined (__mipsel__)
     : lo ((int64u) fmod ((const double)a, 18446744073709551616.0)),
     #else
@@ -139,22 +139,22 @@ uint128::uint128 (const long double & a) throw ()
     #endif
       hi ((int64u) (a / 18446744073709551616.0l)) {}
 
-float uint128::toFloat () const throw () {
+float uint128::toFloat () const noexcept {
     return (float) this->hi * 18446744073709551616.0f
          + (float) this->lo;
 }
 
-double uint128::toDouble () const throw () {
+double uint128::toDouble () const noexcept {
     return (double) this->hi * 18446744073709551616.0
          + (double) this->lo;
 }
 
-long double uint128::toLongDouble () const throw () {
+long double uint128::toLongDouble () const noexcept {
     return (long double) this->hi * 18446744073709551616.0l
          + (long double) this->lo;
 }
 
-uint128 uint128::operator - () const throw () {
+uint128 uint128::operator - () const noexcept {
     if (!this->hi && !this->lo)
         // number is 0, just return 0
         return *this;
@@ -163,7 +163,7 @@ uint128 uint128::operator - () const throw () {
         return uint128 (0-this->lo, ~this->hi);
 }
 
-uint128 uint128::operator ~ () const throw () {
+uint128 uint128::operator ~ () const noexcept {
     return uint128 (~this->lo, ~this->hi);
 }
 
@@ -197,7 +197,7 @@ uint128 uint128::operator -- (int) {
     return b;
 }
 
-uint128 & uint128::operator += (const uint128 & b) throw () {
+uint128 & uint128::operator += (const uint128 & b) noexcept {
     int64u old_lo = this->lo;
 
     this->lo += b.lo;
@@ -206,7 +206,7 @@ uint128 & uint128::operator += (const uint128 & b) throw () {
     return *this;
 }
 
-uint128 & uint128::operator *= (const uint128 & b) throw () {
+uint128 & uint128::operator *= (const uint128 & b) noexcept {
     if (!b)
         return *this = 0u;
     if (b == 1u)
@@ -229,7 +229,7 @@ uint128 & uint128::operator *= (const uint128 & b) throw () {
 }
 
 
-uint128 uint128::div (const uint128 & ds, uint128 & remainder) const throw () {
+uint128 uint128::div (const uint128 & ds, uint128 & remainder) const noexcept {
     if (!ds)
         return 1u / (unsigned int) ds.lo;
 
@@ -270,7 +270,7 @@ uint128 uint128::div (const uint128 & ds, uint128 & remainder) const throw () {
     return q;
 }
 
-bool uint128::bit (unsigned int n) const throw () {
+bool uint128::bit (unsigned int n) const noexcept {
     n &= 0x7F;
 
     if (n < 64)
@@ -279,7 +279,7 @@ bool uint128::bit (unsigned int n) const throw () {
         return (this->hi & (1ull << (n - 64)))?true:false;
 }
 
-void uint128::bit (unsigned int n, bool val) throw () {
+void uint128::bit (unsigned int n, bool val) noexcept {
     n &= 0x7F;
 
     if (val) {
@@ -292,7 +292,7 @@ void uint128::bit (unsigned int n, bool val) throw () {
 }
 
 
-uint128 & uint128::operator >>= (unsigned int n) throw () {
+uint128 & uint128::operator >>= (unsigned int n) noexcept {
     n &= 0x7F;
 
     if (n > 63) {
@@ -319,7 +319,7 @@ uint128 & uint128::operator >>= (unsigned int n) throw () {
     return *this;
 }
 
-uint128 & uint128::operator <<= (unsigned int n) throw () {
+uint128 & uint128::operator <<= (unsigned int n) noexcept {
     n &= 0x7F;
 
     if (n > 63) {
@@ -346,42 +346,42 @@ uint128 & uint128::operator <<= (unsigned int n) throw () {
     return *this;
 }
 
-bool uint128::operator ! () const throw () {
+bool uint128::operator ! () const noexcept {
     return !(this->hi || this->lo);
 }
 
-uint128 & uint128::operator |= (const uint128 & b) throw () {
+uint128 & uint128::operator |= (const uint128 & b) noexcept {
     this->hi |= b.hi;
     this->lo |= b.lo;
 
     return *this;
 }
 
-uint128 & uint128::operator &= (const uint128 & b) throw () {
+uint128 & uint128::operator &= (const uint128 & b) noexcept {
     this->hi &= b.hi;
     this->lo &= b.lo;
 
     return *this;
 }
 
-uint128 & uint128::operator ^= (const uint128 & b) throw () {
+uint128 & uint128::operator ^= (const uint128 & b) noexcept {
     this->hi ^= b.hi;
     this->lo ^= b.lo;
 
     return *this;
 }
 
-bool operator <  (const uint128 & a, const uint128 & b) throw () {
+bool operator <  (const uint128 & a, const uint128 & b) noexcept {
     return (a.hi == b.hi) ? (a.lo < b.lo) : (a.hi < b.hi);
 }
 
-bool operator == (const uint128 & a, const uint128 & b) throw () {
+bool operator == (const uint128 & a, const uint128 & b) noexcept {
     return a.hi == b.hi && a.lo == b.lo;
 }
-bool operator && (const uint128 & a, const uint128 & b) throw () {
+bool operator && (const uint128 & a, const uint128 & b) noexcept {
     return (a.hi || a.lo) && (b.hi || b.lo);
 }
-bool operator || (const uint128 & a, const uint128 & b) throw () {
+bool operator || (const uint128 & a, const uint128 & b) noexcept {
     return (a.hi || a.lo) || (b.hi || b.lo);
 }
 

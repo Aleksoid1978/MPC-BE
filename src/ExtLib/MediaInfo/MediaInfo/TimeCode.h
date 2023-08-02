@@ -177,6 +177,13 @@ public:
         friend class TimeCode;
     };
 
+    enum rounding : uint8_t
+    {
+        Nearest,
+        Floor,
+        Ceil,
+    };
+
     class string_view
     {
     public:
@@ -351,6 +358,7 @@ public:
     int64_t ToFrames() const;
     int64_t ToMilliseconds() const;
     double ToSeconds(bool TimeIsDropFrame = false) const;
+    TimeCode ToRescaled(uint32_t FramesMax = 0, flags Flags = {}, rounding Rounding = Nearest) const;
 
     uint32_t GetHours() const { return Hours_; }
     void SetHours(int32_t Value) { Hours_ = Value; }

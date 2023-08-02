@@ -1471,5 +1471,8 @@
     <ClCompile Include="MediaInfo\Audio\File_Mga.cpp">
       <Filter>Source Files\Audio</Filter>
     </ClCompile>
+    <ClCompile Include="MediaInfo\Audio\File_DtsUhd.cpp">
+      <Filter>Header Files\Audio</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

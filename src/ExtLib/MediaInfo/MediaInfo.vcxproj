@@ -318,6 +318,7 @@
     <ClCompile Include="MediaInfo\Audio\File_Dsdiff.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Dsf.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Dts.cpp" />
+    <ClCompile Include="MediaInfo\Audio\File_DtsUhd.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_ExtendedModule.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Flac.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Iab.cpp" />

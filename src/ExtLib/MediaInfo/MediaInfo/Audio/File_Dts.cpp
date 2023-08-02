@@ -52,7 +52,7 @@ static constexpr int64u CHUNK_TIMECODE=0x54494D45434F4445LL;
 static constexpr int64u CHUNK_STRMDATA=0x5354524D44415441LL;
 
 //---------------------------------------------------------------------------
-void Merge_FillTimeCode(File__Analyze& In, const string& Prefix, const TimeCode& TC_Time, float FramesPerSecondF, bool DropFrame, bool Negative, int32u Frequency);
+void Merge_FillTimeCode(File__Analyze& In, const string& Prefix, const TimeCode& TC_Time, float FramesPerSecondF, bool DropFrame, TimeCode::rounding Rounding=TimeCode::Nearest, int32u Frequency=0);
 
 //---------------------------------------------------------------------------
 static const float TC_Frame_Rate_Table[]=
@@ -1074,10 +1074,9 @@ void File_Dts_Common::FileHeader_Parse()
         if (RefClockCode<DTS_HD_RefClockCode_Size && TC_Frame_Rate)
         {
             auto RefClock=DTS_HD_RefClockCode[RefClockCode];
-            TimeCode TC(((double)TimeStamp+0.5)/RefClock, RefClock-1);
+            TimeCode TC(TimeStamp, RefClock-1, TimeCode::Timed());
             Fill(Stream_Audio, 0, Audio_Delay, TC.ToSeconds()*1000, 3);
-            if (TC_Frame_Rate<TC_Frame_Rate_Table_Size-1)
-                Merge_FillTimeCode(*this, "TimeCode", TC, TC_Frame_Rate_Table[TC_Frame_Rate-1], TC_Frame_Rate_IsDrop(TC_Frame_Rate), false, RefClock);
+            Merge_FillTimeCode(*this, "TimeCode", TC, (TC_Frame_Rate<TC_Frame_Rate_Table_Size-1)?TC_Frame_Rate_Table[TC_Frame_Rate-1]:0, TC_Frame_Rate_IsDrop(TC_Frame_Rate), TimeCode::Floor, RefClock);
         }
         if (Num_Frames_Total)
             Fill(Stream_Audio, 0, Audio_FrameCount, Num_Frames_Total);

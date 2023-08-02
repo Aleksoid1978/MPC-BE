@@ -42,6 +42,10 @@ extern MediaInfo_Config Config;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+const size_t FieldsToOffset_Size=5;
+extern const char* FieldsToOffset[FieldsToOffset_Size];
+
+//---------------------------------------------------------------------------
 static Ztring Mpeg7_TimeToISO(Ztring Value)
 {
     if (Value.find(__T(" - ")) != string::npos)
@@ -2119,91 +2123,8 @@ void Mpeg7_Transform_Text(Node* Parent, MediaInfo_Internal &MI, size_t StreamPos
 }
 
 //---------------------------------------------------------------------------
-Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI, size_t Version)
+void Mpeg7_Transform(Node* Node_MultimediaContent, MediaInfo_Internal& MI, size_t& Extended, size_t Menu_Pos=(size_t)-1)
 {
-    Ztring Value;
-
-    //Version upgrade if needed
-    size_t Video_Count=MI.Count_Get(Stream_Video);
-    size_t Audio_Count=MI.Count_Get(Stream_Audio);
-    size_t Text_Count=MI.Count_Get(Stream_Text);
-    size_t Extended=0;
-    switch (Version)
-    {
-        case Export_Mpeg7::Version_BestEffort_Extended:
-            if (MI.Get(Stream_Video, 0, Video_FrameRate_Mode)==__T("VFR")
-             || MI.Get(Stream_Video, 0, Video_Gop_OpenClosed).empty()
-             || !MI.Get(Stream_Video, 0, Video_Language).empty()
-             || (!Mpeg7_AudioPresentationCS_termID(MI, 0) && !MI.Get(Stream_Audio, 0, Audio_ChannelLayout).empty()))
-                Extended=1;
-            //fall through
-        case Export_Mpeg7::Version_BestEffort_Strict:
-            if (Video_Count>1
-             || Audio_Count>1
-             || Text_Count
-             || !MI.Get(Stream_Video, 0, Video_Encryption).empty()
-             || !MI.Get(Stream_Audio, 0, Audio_Encryption).empty()
-             || !MI.Get(Stream_General, 0, __T("IsTruncated")).empty())
-                Extended=1;
-    }
-
-    //ebuCoreMain
-    Node* Node_Mpeg7 = new Node("mpeg7:Mpeg7");
-    Node_Mpeg7->Add_Attribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-    if (Extended)
-    {
-        Node_Mpeg7->Add_Attribute("xmlns", "urn:mpeg:mpeg7-extended:schema:2023");
-        Node_Mpeg7->Add_Attribute("xmlns:mpeg7", "urn:mpeg:mpeg7-extended:schema:2023");
-        Node_Mpeg7->Add_Attribute("xsi:schemaLocation", "urn:mpeg:mpeg7-extended:schema:2023 https://mediaarea.net/xsd/mpeg7-v2-extended.xsd");
-    }
-    else
-    {
-        Node_Mpeg7->Add_Attribute("xmlns", "urn:mpeg:mpeg7:schema:2004");
-        Node_Mpeg7->Add_Attribute("xmlns:mpeg7", "urn:mpeg:mpeg7:schema:2004");
-        Node_Mpeg7->Add_Attribute("xsi:schemaLocation", "urn:mpeg:mpeg7:schema:2004 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-7_schema_files/mpeg7-v2.xsd");
-    }
-
-    //Description - DescriptionMetadata
-    Node* Node_DescriptionMetadata=Node_Mpeg7->Add_Child("mpeg7:DescriptionMetadata");
-
-    Node_DescriptionMetadata->Add_Child_IfNotEmpty(MI, Stream_General, 0, "ISAN", "mpeg7:PublicIdentifier", "type", std::string("ISAN"));
-    Node_DescriptionMetadata->Add_Child_IfNotEmpty(MI, Stream_General, 0, General_ISRC, "mpeg7:PublicIdentifier", "type", std::string("ISRC"));
-    Node_DescriptionMetadata->Add_Child_IfNotEmpty(MI, Stream_General, 0, "Producer_Reference", "mpeg7:PublicIdentifier", "type", std::string("OriginatorReference"));
-    Ztring UMID=MI.Get(Stream_General, 0, __T("UMID"));
-    if (!UMID.empty())
-    {
-        if (UMID.size()>1 && UMID[0]==__T('0') && UMID[1]==__T('x'))
-            UMID.erase(0, 2);
-        Node_DescriptionMetadata->Add_Child("mpeg7:PublicIdentifier", UMID, "type", std::string("UMID"));
-    }
-
-    Ztring FileName=MI.Get(Stream_General, 0, General_FileName);
-    Ztring Extension=MI.Get(Stream_General, 0, General_FileExtension);
-    if (!Extension.empty())
-        FileName+=__T('.')+Extension;
-    if (!FileName.empty())
-       Node_DescriptionMetadata->Add_Child("mpeg7:PrivateIdentifier", FileName);
-
-    //Current date/time is ISO format
-    time_t Time=time(NULL);
-    Ztring TimeS; TimeS.Date_From_Seconds_1970((int32u)Time);
-    if (!TimeS.empty())
-    {
-        TimeS.FindAndReplace(__T("UTC "), __T(""));
-        TimeS.FindAndReplace(__T(" "), __T("T"));
-        TimeS+=__T("+00:00");
-        Node_DescriptionMetadata->Add_Child("mpeg7:CreationTime", TimeS);
-    }
-
-    Node* Node_Instrument=Node_DescriptionMetadata->Add_Child("mpeg7:Instrument");
-    Node_Instrument->Add_Child("mpeg7:Tool")->Add_Child("mpeg7:Name", MediaInfoLib::Config.Info_Version_Get());
-
-    //Description - CreationDescription
-    Node* Node_Description=Node_Mpeg7->Add_Child("mpeg7:Description", "", "xsi:type", "ContentEntityType");
-
-    //MultimediaContent
-    Node* Node_MultimediaContent=Node_Description->Add_Child("mpeg7:MultimediaContent", std::string(""), "xsi:type", Ztring(Ztring(Mpeg7_Type(MI))+__T("Type")).To_UTF8());
-
     //(Type)
     Node* Node_Type=Node_MultimediaContent->Add_Child(Ztring(Ztring(__T("mpeg7:"))+Ztring(Mpeg7_Type(MI))).To_UTF8());
 
@@ -2217,7 +2138,8 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI, size_t Version)
     Mpeg7_CS(Node_MediaFormat, "mpeg7:Content", "ContentCS", Mpeg7_ContentCS_termID, Mpeg7_ContentCS_Name, MI, 0, true, true);
 
     //FileFormat
-    Mpeg7_CS(Node_MediaFormat, "mpeg7:FileFormat", "FileFormatCS", Mpeg7_FileFormatCS_termID, Mpeg7_FileFormatCS_Name, MI, 0);
+    if (Menu_Pos==(size_t)-1)
+        Mpeg7_CS(Node_MediaFormat, "mpeg7:FileFormat", "FileFormatCS", Mpeg7_FileFormatCS_termID, Mpeg7_FileFormatCS_Name, MI, 0);
 
     //FileSize
     Node* FileSize=Node_MediaFormat->Add_Child_IfNotEmpty(MI, Stream_General, 0, General_FileSize, "mpeg7:FileSize");
@@ -2252,13 +2174,51 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI, size_t Version)
             Node_BitRate->Add_Attribute("variable", "true");
     }
 
+    //Filter in case of collections
+    set<int64u> Set_Audio;
+    set<int64u> Set_Text;
+    if (Menu_Pos!=(size_t)-1)
+    {
+        for (auto& Field : FieldsToOffset)
+        {
+            auto FielFullName=string("List (")+Field+')';
+            ZtringList List;
+            List.Separator_Set(0, __T(" / "));
+            List.Write(MI.Get(Stream_Menu, Menu_Pos, Ztring().From_UTF8(FielFullName.c_str())));
+            for (auto& Item : List)
+            {
+                if (!Item.empty())
+                {
+                    auto Value=Item.To_int64u();
+                    auto& Set=Field[0]=='A'?Set_Audio:Set_Text;
+                    Set.insert(Value);
+                }
+            }
+        }
+    }
+
     //xxxCoding
+    size_t Video_Count=MI.Count_Get(Stream_Video);
+    size_t Audio_Count=MI.Count_Get(Stream_Audio);
+    size_t Text_Count=MI.Count_Get(Stream_Text);
     for (size_t Pos=0; Pos<Video_Count; Pos++)
+    {
+        if (Menu_Pos!=(size_t)-1 && Pos!=Menu_Pos)
+            continue;
         Mpeg7_Transform_Visual(Node_MediaFormat, MI, Pos, Extended);
+    }
     for (size_t Pos=0; Pos<Audio_Count; Pos++)
+    {
+        if (Menu_Pos!=(size_t)-1 && Set_Audio.find(Pos)==Set_Audio.end())
+            continue;
         Mpeg7_Transform_Audio(Node_MediaFormat, MI, Pos, Extended);
+    }
     for (size_t Pos=0; Pos<Text_Count; Pos++)
+    {
+        if (Menu_Pos!=(size_t)-1 && Set_Text.find(Pos)==Set_Text.end())
+            continue;
         Mpeg7_Transform_Text(Node_MediaFormat, MI, Pos, Extended);
+    }
 
     //MediaTranscodingHints, intraFrameDistance and anchorFrameDistance
     if (!MI.Get(Stream_Video, 0, Video_Format_Settings_GOP).empty()
@@ -2325,21 +2285,58 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI, size_t Version)
          || !MI.Get(Stream_General, 0, General_Track_Position).empty()
          || !MI.Get(Stream_General, 0, General_Part).empty()
          || !MI.Get(Stream_General, 0, General_Part_Position).empty()
-         || !MI.Get(Stream_General, 0, General_Album).empty())
+         || !MI.Get(Stream_General, 0, General_Album).empty()
+         || Menu_Pos!=(size_t)-1)
         {
-            Node_Creation->Add_Child_IfNotEmpty(MI, Stream_General, 0, General_Movie, "mpeg7:Title", "type", std::string("main"));
+            if (Menu_Pos!=(size_t)-1)
+            {
+                auto Title=std::to_string(Menu_Pos+1);
+                if (Title.size()==1)
+                    Title.insert(0, 1, '0');
+                auto Source=MI.Get(Stream_Menu, Menu_Pos, __T("Source"));
+                auto Part=Source.SubString(__T("VTS_"), __T("_0.IFO"));
+                if (Part.size()==2 && Part[0]==__T('0'))
+                    Part.erase(0, 1);
+                Node_Creation->Add_Child("mpeg7:Title", "Title "+Title, "type", std::string("main"));
+                if (!Part.empty())
+                {
+                    size_t Menu_Count=MI.Count_Get(Stream_Menu);
+                    auto Source_Last=MI.Get(Stream_Menu, Menu_Count-1, __T("Source"));
+                    auto Part_Last=Source_Last.SubString(__T("VTS_"), __T("_0.IFO"));
+                    if (Part_Last.size()==2 && Part_Last[0]==__T('0'))
+                        Part_Last.erase(0, 1);
+                    if (!Part_Last.empty())
+                    {
+                        Part+=__T('/');
+                        Part+=Part_Last;
+                    }
+                    Node_Creation->Add_Child("mpeg7:Title", Part.To_UTF8(), "type", std::string("urn:x-mpeg7-mediainfo:cs:TitleTypeCS:2009:PART"));
+                    size_t Track=0;
+                    size_t Track_Total=0;
+                    for (size_t Pos=0; Pos<Menu_Count; Pos++)
+                        if (MI.Get(Stream_Menu, Pos, __T("Source"))==Source)
+                        {
+                            if (Pos<=Menu_Pos)
+                                Track++;
+                            Track_Total++;
+                        }
+                    Node_Creation->Add_Child("mpeg7:Title", std::to_string(Track)+'/'+std::to_string(Track_Total), "type", std::string("urn:x-mpeg7-mediainfo:cs:TitleTypeCS:2009:TRACK"));
+                }
+            }
+            else
+                Node_Creation->Add_Child_IfNotEmpty(MI, Stream_General, 0, General_Movie, "mpeg7:Title", "type", std::string("main"));
             Node_Creation->Add_Child_IfNotEmpty(MI, Stream_General, 0, General_Track, "mpeg7:Title", "type", std::string("songTitle"));
             if (!MI.Get(Stream_General, 0, General_Part_Position).empty())
             {
                 Ztring Total=MI.Get(Stream_General, 0, General_Part_Position_Total);
-                Value=MI.Get(Stream_General, 0, General_Part_Position)+(Total.empty()?Ztring():(__T("/")+Total));
+                Ztring Value=MI.Get(Stream_General, 0, General_Part_Position)+(Total.empty()?Ztring():(__T("/")+Total));
 
                 Node_Creation->Add_Child("mpeg7:Title", Value, "type", std::string("urn:x-mpeg7-mediainfo:cs:TitleTypeCS:2009:PART"));
             }
             if (!MI.Get(Stream_General, 0, General_Track_Position).empty())
             {
                  Ztring Total=MI.Get(Stream_General, 0, General_Track_Position_Total);
-                 Value=MI.Get(Stream_General, 0, General_Track_Position)+(Total.empty()?Ztring():(__T("/")+Total));
+                 Ztring Value=MI.Get(Stream_General, 0, General_Track_Position)+(Total.empty()?Ztring():(__T("/")+Total));
 
                  Node_Creation->Add_Child("mpeg7:Title", Value, "type", std::string("urn:x-mpeg7-mediainfo:cs:TitleTypeCS:2009:TRACK"));
             }
@@ -2347,6 +2344,10 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI, size_t Version)
         }
         else
         {
+            Ztring FileName=MI.Get(Stream_General, 0, General_FileName);
+            Ztring Extension=MI.Get(Stream_General, 0, General_FileExtension);
+            if (!Extension.empty())
+                FileName+=__T('.')+Extension;
               Node_Creation->Add_Child("mpeg7:Title", FileName);
         }
 
@@ -2450,19 +2451,19 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI, size_t Version)
             if (!TimePoint_Isvalid)
                 Node_Date->XmlCommentOut="Encoded date, invalid input";
         }
-        if (!MI.Get(Stream_General, 0, General_Producer).empty())
+        if (!MI.Get(Stream_General, 0, General_Producer).empty() && Menu_Pos==(size_t)-1)
         {
             Node* Node_Tool=Node_Creation->Add_Child("mpeg7:CreationTool")->Add_Child("mpeg7:Tool");
             Node_Tool->Add_Child("")->XmlCommentOut="Producer";
             Node_Tool->Add_Child("mpeg7:Name", MI.Get(Stream_General, 0, General_Producer));
         }
-        if (!MI.Get(Stream_General, 0, General_Encoded_Application).empty())
+        if (!MI.Get(Stream_General, 0, General_Encoded_Application).empty() && Menu_Pos==(size_t)-1)
         {
             Node* Node_Tool=Node_Creation->Add_Child("mpeg7:CreationTool")->Add_Child("mpeg7:Tool");
             Node_Tool->Add_Child("")->XmlCommentOut="Writing application";
             Node_Tool->Add_Child("mpeg7:Name", MI.Get(Stream_General, 0, General_Encoded_Application));
         }
-        else if (!MI.Get(Stream_General, 0, General_Encoded_Library).empty())
+        else if (!MI.Get(Stream_General, 0, General_Encoded_Library).empty() && Menu_Pos==(size_t)-1)
         {
             Node* Node_Tool=Node_Creation->Add_Child("mpeg7:CreationTool")->Add_Child("mpeg7:Tool");
             Node_Tool->Add_Child("")->XmlCommentOut="Writing library";
@@ -2532,6 +2533,8 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI, size_t Version)
         {
             for (size_t StreamPos=0; StreamPos<VideoLanguages.size(); StreamPos++)
             {
+                if (Menu_Pos!=(size_t)-1 && StreamPos!=Menu_Pos)
+                    continue;
                 const auto& Language=VideoLanguages[StreamPos];
                 if (Extended)
                 {
@@ -2546,6 +2549,8 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI, size_t Version)
         {
             for (size_t StreamPos=0; StreamPos< AudioLanguages.size(); StreamPos++)
             {
+                if (Menu_Pos!=(size_t)-1 && Set_Audio.find(StreamPos)==Set_Audio.end())
+                    continue;
                 const auto& Language=AudioLanguages[StreamPos];
                 if (!Extended && (VideoLanguages_HasContent || AudioLanguages.size()>1))
                     Node_Classification->Add_Child("")->XmlCommentOut="below is audio languages with same order as in MediaFormat";
@@ -2563,6 +2568,8 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI, size_t Version)
         {
             for (size_t StreamPos=0; StreamPos<TextLanguages.size(); StreamPos++)
             {
+                if (Menu_Pos!=(size_t)-1 && Set_Text.find(StreamPos)==Set_Text.end())
+                    continue;
                 const auto& Language=TextLanguages[StreamPos];
                 Node* Node_CaptionLanguage=Node_Classification->Add_Child("mpeg7:CaptionLanguage", Language);
                 if (!MI.Get(Stream_Text, StreamPos, Text_Forced).empty())
@@ -2591,7 +2598,128 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI, size_t Version)
         if (!MediaDuration_Value.empty())
             Node_MediaTime->Add_Child("mpeg7:MediaDuration", MediaDuration_Value);
     }
+}
 
+//---------------------------------------------------------------------------
+Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI, size_t Version)
+{
+    Ztring Value;
+
+    //Version upgrade if needed
+    size_t Video_Count=MI.Count_Get(Stream_Video);
+    size_t Audio_Count=MI.Count_Get(Stream_Audio);
+    size_t Text_Count=MI.Count_Get(Stream_Text);
+    size_t Extended=0;
+    switch (Version)
+    {
+        case Export_Mpeg7::Version_BestEffort_Extended:
+            if (MI.Get(Stream_Video, 0, Video_FrameRate_Mode)==__T("VFR")
+             || MI.Get(Stream_Video, 0, Video_Gop_OpenClosed).empty()
+             || !MI.Get(Stream_Video, 0, Video_Language).empty()
+             || (!Mpeg7_AudioPresentationCS_termID(MI, 0) && !MI.Get(Stream_Audio, 0, Audio_ChannelLayout).empty()))
+                Extended=1;
+            //fall through
+        case Export_Mpeg7::Version_BestEffort_Strict:
+            if (Video_Count>1
+             || Audio_Count>1
+             || Text_Count
+             || !MI.Get(Stream_Video, 0, Video_Encryption).empty()
+             || !MI.Get(Stream_Audio, 0, Audio_Encryption).empty()
+             || !MI.Get(Stream_General, 0, __T("IsTruncated")).empty())
+                Extended=1;
+    }
+
+    //ebuCoreMain
+    Node* Node_Mpeg7 = new Node("mpeg7:Mpeg7");
+    Node_Mpeg7->Add_Attribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+    if (Extended)
+    {
+        Node_Mpeg7->Add_Attribute("xmlns", "urn:mpeg:mpeg7-extended:schema:2023");
+        Node_Mpeg7->Add_Attribute("xmlns:mpeg7", "urn:mpeg:mpeg7-extended:schema:2023");
+        Node_Mpeg7->Add_Attribute("xsi:schemaLocation", "urn:mpeg:mpeg7-extended:schema:2023 https://mediaarea.net/xsd/mpeg7-v2-extended.xsd");
+    }
+    else
+    {
+        Node_Mpeg7->Add_Attribute("xmlns", "urn:mpeg:mpeg7:schema:2004");
+        Node_Mpeg7->Add_Attribute("xmlns:mpeg7", "urn:mpeg:mpeg7:schema:2004");
+        Node_Mpeg7->Add_Attribute("xsi:schemaLocation", "urn:mpeg:mpeg7:schema:2004 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-7_schema_files/mpeg7-v2.xsd");
+    }
+
+    //Description - DescriptionMetadata
+    Node* Node_DescriptionMetadata=Node_Mpeg7->Add_Child("mpeg7:DescriptionMetadata");
+
+    Node_DescriptionMetadata->Add_Child_IfNotEmpty(MI, Stream_General, 0, "ISAN", "mpeg7:PublicIdentifier", "type", std::string("ISAN"));
+    Node_DescriptionMetadata->Add_Child_IfNotEmpty(MI, Stream_General, 0, General_ISRC, "mpeg7:PublicIdentifier", "type", std::string("ISRC"));
+    Node_DescriptionMetadata->Add_Child_IfNotEmpty(MI, Stream_General, 0, "Producer_Reference", "mpeg7:PublicIdentifier", "type", std::string("OriginatorReference"));
+    Ztring UMID=MI.Get(Stream_General, 0, __T("UMID"));
+    if (!UMID.empty())
+    {
+        if (UMID.size()>1 && UMID[0]==__T('0') && UMID[1]==__T('x'))
+            UMID.erase(0, 2);
+        Node_DescriptionMetadata->Add_Child("mpeg7:PublicIdentifier", UMID, "type", std::string("UMID"));
+    }
+
+    Ztring FileName=MI.Get(Stream_General, 0, General_FileName);
+    Ztring Extension=MI.Get(Stream_General, 0, General_FileExtension);
+    if (!Extension.empty())
+        FileName+=__T('.')+Extension;
+    if (!FileName.empty())
+       Node_DescriptionMetadata->Add_Child("mpeg7:PrivateIdentifier", FileName);
+
+    //Current date/time is ISO format
+    time_t Time=time(NULL);
+    Ztring TimeS; TimeS.Date_From_Seconds_1970((int32u)Time);
+    if (!TimeS.empty())
+    {
+        TimeS.FindAndReplace(__T("UTC "), __T(""));
+        TimeS.FindAndReplace(__T(" "), __T("T"));
+        TimeS+=__T("+00:00");
+        Node_DescriptionMetadata->Add_Child("mpeg7:CreationTime", TimeS);
+    }
+
+    Node* Node_Instrument=Node_DescriptionMetadata->Add_Child("mpeg7:Instrument");
+    Node_Instrument->Add_Child("mpeg7:Tool")->Add_Child("mpeg7:Name", MediaInfoLib::Config.Info_Version_Get());
+
+    //Description - CreationDescription
+    Node* Node_Description=Node_Mpeg7->Add_Child("mpeg7:Description", "", "xsi:type", "ContentEntityType");
+
+    //MultimediaContent
+    Node* Node_MultimediaContent;
+    Node* Node_Type;
+    if (MI.Get(Stream_General, 0, General_Format).find(__T("DVD Video"))!=string::npos && MI.Count_Get(Stream_Menu)>1)
+    {
+        Node_MultimediaContent=Node_Description->Add_Child("mpeg7:MultimediaContent", std::string(), "xsi:type", "MultimediaCollectionType");
+        auto Node_Collection=Node_MultimediaContent->Add_Child("mpeg7:Collection", std::string(), "xsi:type", "ContentCollectionType");
+        auto Node_CreationInformation=Node_Collection->Add_Child("mpeg7:CreationInformation");
+        auto Node_Creation=Node_CreationInformation->Add_Child("mpeg7:Creation");
+        Node_Creation->Add_Child_IfNotEmpty(MI, Stream_General, 0, General_Movie, "mpeg7:Title", "type", std::string("main"));
+        if (!MI.Get(Stream_General, 0, General_Encoded_Application).empty())
+        {
+            Node* Node_Tool=Node_Creation->Add_Child("mpeg7:CreationTool")->Add_Child("mpeg7:Tool");
+            Node_Tool->Add_Child("mpeg7:Name", MI.Get(Stream_General, 0, General_Encoded_Application));
+        }
+        auto Node_TextAnnotation=Node_Collection->Add_Child("mpeg7:TextAnnotation");
+        auto Node_KeywordAnnotation=Node_TextAnnotation->Add_Child("mpeg7:KeywordAnnotation");
+        Node_KeywordAnnotation->Add_Child("mpeg7:Keyword", MI.Get(Stream_General, 0, General_Format), "type", "main");
+
+        //Main parsing
+        size_t Menu_Count=MI.Count_Get(Stream_Menu);
+        for (size_t Menu_Pos=0; Menu_Pos<Menu_Count; Menu_Pos++)
+        {
+            auto Node_Collection_Content=Node_Collection->Add_Child("mpeg7:Content", std::string(), "xsi:type", Ztring(Ztring(Mpeg7_Type(MI))+__T("Type")).To_UTF8());
+            Node_Collection_Content->Add_Attribute("id", "content"+to_string(1+Menu_Pos));
+            Mpeg7_Transform(Node_Collection_Content, MI, Extended, Menu_Pos);
+        }
+    }
+    else
+    {
+        Node_MultimediaContent=Node_Description->Add_Child("mpeg7:MultimediaContent", std::string(), "xsi:type", Ztring(Ztring(Mpeg7_Type(MI))+__T("Type")).To_UTF8());
+
+        //Main parsing
+        Mpeg7_Transform(Node_MultimediaContent, MI, Extended);
+    }
+
+    //Transform
     Ztring ToReturn=Ztring().From_UTF8(To_XML(*Node_Mpeg7, 0, true, true).c_str());
 
     //Find and replace

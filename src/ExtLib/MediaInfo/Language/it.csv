@@ -1,7 +1,7 @@
   Language_ISO639;it
   Author_Email;dr4k0@altervista.org  - bovirus@live.it
-  Author_Name;v. 03.04.2023 di Dr4k0/bovirus
-  Author_OldNames;Dr4k0 & R.B.
+  Author_Name;Dr4k0 & Bovirus
+  Author_OldNames;
   Language_Name;Italiano
   Config_Text_ColumnSize;40
   Config_Text_Separator;: 
@@ -67,9 +67,9 @@
  hour2; ore
  hour3; ore
  Hz; Hz
- image stream1; stream immagine
- image stream2; stream immagini
- image stream3; stream immagini
+ image stream1; flusso immagine
+ image stream2; flusso immagini
+ image stream3; flusso immagini
  KB; KB
  Kb; Kb
  KBps; kb/s
@@ -156,8 +156,8 @@
 608_Mode; Modalità conversione EIA-608
 7.1.2ch;7.1.2 can
 7.1ch;7.1 can
-About;Info programma
-About_Hint;Contatta l'autore e ottieni la versione del programma più recente
+About;Informazioni
+About_Hint;Come contattare l'autore e ottenere versione più recente
 Accompaniment;Accompagnamento
 ActiveFormatDescription;Descrizione formato attivo
 ActiveFormatDescription_MuxingMode;Descrizione formato attivo, modo muxing
@@ -168,14 +168,14 @@ Add version to text output; Aggiungi versione all'output del testo
 Added_Date;Data
 Address;Indirizzo
 AdID; Identificatore ID annuncio
-ADM: Show ChannelFormats; ADM: visualizza formati canale
-ADM: Show TrackUIDs; ADM: visualizza UID traccia
+ADM: Show ChannelFormats; ADM: Visualizza formati canale
+ADM: Show TrackUIDs; ADM: Visualizza TRACKUID
 AdmProfile; Profilo ADM
 Advanced;Modalità avanzata
 Advanced mode;Modalità avanzata
 Album;Album
-Album_ReplayGain_Gain;Album Replay Gain
-Album_ReplayGain_Peak;Picco album Replay Gain
+Album_ReplayGain_Gain;Album replay gain
+Album_ReplayGain_Peak;Picco album replay gain
 Alignment;Allineamento
 Alignment_Aligned;Audio allineato 
 Alignment_Split;Audio suddiviso
@@ -188,7 +188,7 @@ AspectRatio;Rapporto d'aspetto
 AssistantDirector;Assistente regista
 AssociatedVideo_FrameRate; Frequenza fotogrammi video associata
 at;a
-At least one file;(Apri almeno un file)
+At least one file;(Devi aprire almeno un file)
 Audio;Audio
 Audio stream(s);Tracce audio
 Audio_Codec_List;Codec audio
@@ -229,11 +229,12 @@ Bits-(Pixel*Frame);Bit/(pixel*frame)
 BufferSize; Dim. buffer
 Cancel;Annulla
 CaptionServiceName;Titolo nome servizio
+CatalogNumber;
 Channel(s);Canali
 ChannelCoded;Canale codificato
 ChannelConfiguration;Configurazione canale
 ChannelFormat;Formato canale
-ChannelLayout;Disposizione canale
+ChannelLayout;Layout canale
 ChannelMode;Modo canale
 ChannelPositions;Posizione canali
 Chapter(s);Capitoli
@@ -242,7 +243,8 @@ Chapters stream(s);Capitoli
 Chapters_Codec_List;Codec capitoli
 Chapters_No;Nessun capitolo
 ChaptersCount;Numero dei capitoli
-CheckNewVersion;Controlla disponibilità nuova versione
+CharacterSet;
+CheckNewVersion;Controlla aggiornamenti programma
 Choose custom;Vista personalizzata
 Choose custom sheet;Personalizza modalità scheda
 Choose custom text;Personalizza modalità testo
@@ -328,6 +330,7 @@ DarkMode;Modo scuro
 Date;Data
 Debug;Debug
 Decimal point;Separatore decimale
+Default;
 Default_Setting;Predefinito sistema
 DefaultTargetDeviceConfig;Configurazione predefinita dispositivo destinazione
 Delay;Ritardo
@@ -336,6 +339,7 @@ Delay_Source_Container;Contenitore
 Delay_Source_Stream;Flusso RAW
 Delete;Elimina
 Description;Descrizione
+Details;
 dialnorm;Finestra normalizzazione
 DialogueCorrected;Dialogo corretto
 DialogueEnhancement;Miglioramento del dialogo
@@ -357,6 +361,7 @@ DotsPerInch;Punti per pollice
 Downmix;DownMix
 Downmix_5.1.x;Downmix 5.1 e 5.1.x
 Downmix_5to2;Downmix 5.1 a 2.0 (stereo)
+Downmix_5to2_90deg;Downmix da 5.1 a 2.0 (stereo), sfasamento 90 gradi
 DrcSets_Count;Numero set RDC
 DrcSets_Effects;Tipi effetti DRC
 Duration;Durata
@@ -372,7 +377,7 @@ Edit;Modifica
 EditedBy;Modificato da
 EditorialClassification;Classificazione editoriale
 ElementaryStream;Stream elementare
-ElementCount;N. elementi
+ElementCount;Numero elementi
 EMail;Email
 Encoded_Application;Creato con
 Encoded_Date;Data codifica
@@ -384,6 +389,7 @@ EPG_Positions;Posizioni EPG (interne)
 EpisodeTitleNumber;Numero titolo episodio
 Error_File;Errore nella lettura del file
 Error_File_Write;Errore durante la scrittura del file
+Events_MinDuration;
 Events_PaintOn;N. eventi PaintOn
 Events_PopOn;N. eventi PopOn
 Events_RollUp;N. eventi RollUp
@@ -402,7 +408,7 @@ File size;Dimensione file
 File_Append;Aggiungi a un file esistente (attenzione: assicurarsi che abbiano caratteristiche uguali)
 File_Created_Date;Data creazione
 File_Created_Date_Local;Data creazione (locale)
-File_Hint;Seleziona altro file da analizzare
+File_Hint;Seleziona più file da aprire
 File_Modified_Date;Data ultima modifica
 File_Modified_Date_Local;Data ultima modifica (locale)
 FileExtension;Estensione file
@@ -418,8 +424,9 @@ Folder;Cartella
 Folder (R);Cartella (D)
 Folder (R)_Hint;Seleziona cartella da analizzare (e le sue sottocartelle)
 Folder (Recursively);Cartella (e sottocartelle)
-Folder_Hint;Seleziona cartella con file da analizzare
+Folder_Hint;Seleziona cartella da analizzare
 FolderName;Cartella
+Forced;
 Format;Formato
 Format_Commercial;Nome commerciale
 Format_Commercial_IfAny;Nome commerciale
@@ -463,6 +470,7 @@ FpaPass;Pass FPA
 FpaVersion;Versione FPA
 FrameCount;Numero fotogrammi
 FrameRate;Frequenza fotogrammi
+FrameRate_MaxFrameNumber;Frame max frame rate
 FrameRate_Maximum;Frame rate massimo
 FrameRate_Minimum;Frame rate minimo
 FrameRate_Mode;Modalità frame rate
@@ -471,7 +479,9 @@ FrameRate_Mode_VFR;Variabile
 FrameRate_Nominal;Frequenza fotogrammi nominale
 FrameRate_Original;Frequenza fotogrammi originale
 FrameRate_Real;Frequenza fotogrammi reale
+FullParsing;
 General;Generale
+GeneralCompliance;
 Genre;Genere
 Genre_000;Blues
 Genre_001;Rock Classico
@@ -484,7 +494,7 @@ Genre_007;Hip - Hop
 Genre_008;Jazz
 Genre_009;Metal
 Genre_010;New Age
-Genre_011;Industriale
+Genre_011;Intramontabili
 Genre_012;Altri
 Genre_013;Pop
 Genre_014;R&B
@@ -665,7 +675,7 @@ Genre_188;G-Funk
 Genre_189;Dubstep
 Genre_190;Garage Rock
 Genre_191;Psybient
-Go to WebSite;Sito web MedaInfo
+Go to WebSite;Sito web MediaInfo
 Gop_OpenClosed;GOP, Apri/chiudi
 Gop_OpenClosed_Closed;Chiudi
 Gop_OpenClosed_FirstFrame;GOP, Apertura/chiusura primo fotogramma
@@ -716,6 +726,21 @@ InternetMediaType;Tipo supporto internet
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;Bilanciamento ascoltatore anteriore/posteriore
+JocBalance_FrontBackOverheadFloor;Bilanciamento overhead anteriore/posteriore pavimento
+JocTrim_Center;Ritaglio centrale
+JocTrim_Height;Ritaglio in altezza
+JocTrim_Surround;Ritaglio surround
+JocTrimMode;Modo ritaglio
+JocTrimMode0i;Modo ritaglio per 2.0 (stereo)
+JocTrimMode1i;Modo ritaglio per 5.1
+JocTrimMode2i;Modo ritaglio per 7.1
+JocTrimMode3i;Modo ritaglio per 2.1.2
+JocTrimMode4i;Modo ritaglio per 5.1.2
+JocTrimMode5i;Modo ritaglio per 7.1.2
+JocTrimMode6i;Modo ritaglio per 2.1.4
+JocTrimMode7i;Modo ritaglio per 5.1.4
+JocTrimMode8i;Modo ritaglio per 7.1.4
 Keywords;Parole chiavi
 Known codecs;Codec conosciuti
 Known formats;Formati conosciuti
@@ -747,6 +772,7 @@ Language_bs;Bosniaco
 Language_ca;Catalano
 Language_ce;Ceceno
 Language_ch;Chamorro
+Language_cmn;
 Language_co;Corso
 Language_cr;Cree
 Language_cs;Ceco
@@ -838,7 +864,7 @@ Language_mo;Moldavo
 Language_More;Info aggiuntive lingua
 Language_mr;Marathi
 Language_ms;Malese
-Language_ms-bn;Malese (Birmania)
+Language_ms-bn;Malese (Brunei)
 Language_mt;Maltese
 Language_mul;Multilingua
 Language_my;Burmese
@@ -916,10 +942,17 @@ Language_wo;Wolof
 Language_xh;Xhosa
 Language_yi;Yiddish
 Language_yo;Yoruba
+Language_yue;
 Language_za;Zhuang
 Language_zh;Cinese
+Language_zh-cmn;
 Language_zh-cn;Cinese (Cina)
+Language_zh-CN;
+Language_zh-Hans;
+Language_zh-Hant;
 Language_zh-tw;Cinese (Taiwan)
+Language_zh-TW;
+Language_zh-yue;
 Language_zu;Zulu
 LawRating;Classificazione legale
 LCCN;LCCN
@@ -944,6 +977,7 @@ LinkedTo_Substream_Pos;Sottoflusso #s
 LinkedTo_TrackFormat_Pos;Formato traccia #s
 LinkedTo_TrackUID_Pos;UID traccia #s
 List;Elenco
+LongTermLoudness;
 LoRoCenterMixGain;Guadagno mix LoRo
 LoRoSurroundMixGain;Guadagno mix surround LoRo
 Loudness_Anchor;Ancoraggio loudness
@@ -981,6 +1015,8 @@ MaxFALL;Livello luce media fotogramma max
 MaxGain;Guadagno max
 MaximumMomentaryLoudness;Loudness momentaneo max
 MaxTruePeak;Picco reale max
+MD5;
+MD5_Unencoded;
 MediaInfo_About;MediaInfo fornisce un accesso veloce alle informazioni tecniche ed alle etichette dei file audio e video.\r\nAd eccezione dell'interfaccia grafica Mac App Store, è un software open source, che significa che è gratuito per l'utente finale e lo sviluppatore è libero di studiare e migliorare e ridistribuire il programma (licenza LGPL)
 MediaInfo_About_About;MediaInfo v% MI_VERSION % usando MediaInfoLib v % MIL_VERSION%
 Menu;Menu
@@ -1008,10 +1044,10 @@ MuxingMode_PackedBitstream;Packet Bitstream
 Name;Nome
 Nationality;Nazionalità
 NetworkName;Nome rete
-New;Nuova
+New;Nuovo
 Newest version;Controlla aggiornamenti (richiede una connessione a internet)
 NewVersion_Menu;È disponibile una nuova versione
-NewVersion_Question_Content;È disponibile una nuova versione (v. %Version%). \r\nVuoi scaricarla ora?
+NewVersion_Question_Content;È disponibile una nuova versione (v. %Version%).\r\nVuoi scaricarla ora?
 NewVersion_Question_Title;È stata rilasciata una nuova versione!
 No;No
 Not yet;Non ancora
@@ -1033,42 +1069,6 @@ ObjectCount;N. oggetti
 OK;OK
 One output file per input file;Un file destinazione per ogni file sorgente
 Open;Apri
-OpenCandy_01;Download ________
-OpenCandy_02;__% completato
-OpenCandy_03;Connessione internet interrotta
-OpenCandy_04;________ download completato
-OpenCandy_05;Per installare seleziona ________
-OpenCandy_06;Vuoi annullare l'installazione?\r\nSe vuoi posporre l'installazione, seleziona 'No'.\r\nNota: puoi selezionare 'Esci' dal menu per annullare l'installazione sino al nuovo riavvio.
-OpenCandy_07;Il download di ________ è stato messo in pausa.\r\nPer riprendere seleziona l'icona nella barra di sistema .
-OpenCandy_08;ERRORE CRITICO. L'installazione di _________ è stata annullata.
-OpenCandy_09;Pausa
-OpenCandy_10;Annulla installazione
-OpenCandy_11;Riprendi download
-OpenCandy_12;Esci dall'installazione
-OpenCandy_13;___________ - Raccomandato da ____________
-OpenCandy_14;Download di _________
-OpenCandy_15;___________, programma raccomandato da ___________, è in download Verrai avvisato quando sarà pronto per l'installazione.
-OpenCandy_16;___________ è pronto per l'installazione
-OpenCandy_17;___________ è stato scaricato. Per procedere seleziona 'Installa' per procedere.
-OpenCandy_18;___________ di ___________ scaricati
-OpenCandy_19;Realizzato da OpenCandy
-OpenCandy_20;Maggiori informazioni su OpenCandy.com
-OpenCandy_21;Installa
-OpenCandy_22;Installazione di ___________
-OpenCandy_23;Questo annullerà l'installazione di ___________\r\nVuoi annullare l'installazione?
-OpenCandy_24;Pausa
-OpenCandy_25;Il download è stato messo in pausa. Per continuare seleziona 'Riprendi' .
-OpenCandy_26;Riprendi
-OpenCandy_27;Installa ora
-OpenCandy_28;Pausa
-OpenCandy_29;Riprendi
-OpenCandy_30;Annulla installazione
-OpenCandy_31;Seleziona opzioni installazione
-OpenCandy_32;Installa
-OpenCandy_33;Non installare
-OpenCandy_34;Seleziona opzioni installazione
-OpenCandy_35;______ consiglia questo programma
-OpenCandy_36;L'attuale installazione non verrà interrotta
 OpenCaptionsLanguage;Lingua finestre apertura
 OpenCaptionsPresent;Presenti finestre di apertura
 OpenCaptionsType;Tipo finestre di apertura
@@ -1146,6 +1146,7 @@ Rating;Posizione
 RealtimeLoudnessCorrected;Volume corretto in tempo reale
 Recorded_Date;Data registrazione
 Recorded_Location;Luogo registrazione
+Reel;
 Released_Date;Data distribuzione
 RemixedBy;Remixato da
 RenderMode;Modo render
@@ -1305,7 +1306,7 @@ transfer_characteristics;Caratteristiche trasferimento
 Translate_Reports;Rapporti traduzione
 Translator;Traduzione
 Transport;Trasporto
-Tree;Struttura
+Tree;struttura
 Tree & Text;Struttura e testo
 Trim_Center;Ritaglia centro
 Trim_Height;Altezza taglio
@@ -1355,7 +1356,7 @@ WebSite_Url;http://MediaArea.net/MediaInfo
 WebSite_Video;Vai al sito web per info su questo codec video
 WebSite_Video_More;Per info su questo video vai al sito web (%Url%) 
 Width;Larghezza
-Width_CleanAperture;Larghezza apertura
+Width_CleanAperture;larghezza apertura
 Width_Original;Larghezza originale
 WriteMe;Invia email all'autore
 WriteToTranslator;Invia email al traduttore
@@ -1364,5 +1365,5 @@ Written_Location;Realizzato in
 WrittenBy;Realizzato da
 Yes;Si
 Your system;Info sul sistema
-ZZ_Automatic_Percent;100
-ZZ_AutomaticLanguage_Percent;100
+ZZ_Automatic_Percent;98
+ZZ_AutomaticLanguage_Percent;99

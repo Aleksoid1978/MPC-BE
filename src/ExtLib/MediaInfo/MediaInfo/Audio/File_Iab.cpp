@@ -537,7 +537,7 @@ void File_Iab::Data_Parse()
 
     if ((Element_Code!=0x00000008 || Element_Offset==Element_Size) && Element_Size>=Element_TotalSize_Get(Element_Level-1))
     {
-        Frame.Objects=move(F.Objects);
+        Frame.Objects=std::move(F.Objects);
         Frame_Count++;
         if (!Status[IsFilled] && Frame_Count>=Frame_Count_Valid)
             Finish();
@@ -560,7 +560,7 @@ void File_Iab::IAFrame()
         Get_Plex8 (MaxRendered,                                     "MaxRendered");
         Get_Plex8 (SubElementCount,                                 "SubElementCount");
         Element_ThisIsAList();
-        Frame.Objects=move(F.Objects);
+        Frame.Objects=std::move(F.Objects);
     }
     else
         Skip_XX(Element_Size-Element_Offset,                        "Unknown");

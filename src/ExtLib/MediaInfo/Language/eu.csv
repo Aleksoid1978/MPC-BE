@@ -229,6 +229,7 @@ Bits-(Pixel*Frame);Bit/(Pixel*Frame)
 BufferSize;Buffer neurria
 Cancel;Ezeztatu
 CaptionServiceName;
+CatalogNumber;
 Channel(s);Bide
 ChannelCoded;
 ChannelConfiguration;
@@ -242,6 +243,7 @@ Chapters stream(s);Atal jarioa(k)
 Chapters_Codec_List;Atal kodekak
 Chapters_No;Atalik ez
 ChaptersCount;Atal jario zenbatekoa
+CharacterSet;
 CheckNewVersion;Egiaztatu bertsio berririk dagoen
 Choose custom;Hautatu egilea
 Choose custom sheet;Hautatu gogoko duzun egile orria
@@ -328,6 +330,7 @@ DarkMode;
 Date;Eguna
 Debug;Garbiketa
 Decimal point;Hamarren puntua
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;Atzerapena
@@ -336,6 +339,7 @@ Delay_Source_Container;Edukiontzia
 Delay_Source_Stream;Raw jarioa
 Delete;Ezabatu
 Description;Azalpena
+Details;
 dialnorm;
 DialogueCorrected;
 DialogueEnhancement;
@@ -357,6 +361,7 @@ DotsPerInch;Puntu hatzbeteko
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
+Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Iraupena
@@ -384,6 +389,7 @@ EPG_Positions;EPG kokapenak (barnean)
 EpisodeTitleNumber;
 Error_File;Akatsa agiria irakurtzerakoan
 Error_File_Write;
+Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
 Events_RollUp;
@@ -420,6 +426,7 @@ Folder (R)_Hint;Hautatu aztertzeko agiritegi bat (agiritegi guztiak jarraian)
 Folder (Recursively);Agiritegia (Jarrian)
 Folder_Hint;Hautatu aztertzeko agiritegi bat
 FolderName;Agiritegi izena
+Forced;
 Format;Heuskarria
 Format_Commercial;Merkatal izena
 Format_Commercial_IfAny;Merkatal izena
@@ -463,6 +470,7 @@ FpaPass;
 FpaVersion;
 FrameCount;Frame zenbatekoa
 FrameRate;Frame neurria
+FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Gehienezko frame neurria
 FrameRate_Minimum;Gutxienezko frame neurria
 FrameRate_Mode;Frame neurri modua
@@ -471,7 +479,9 @@ FrameRate_Mode_VFR;Aldakorra
 FrameRate_Nominal;Frame neurria izendatua
 FrameRate_Original;Jatorrizko frame neurria
 FrameRate_Real;
+FullParsing;
 General;Orokorra
+GeneralCompliance;
 Genre;Mota
 Genre_000;Bluesa
 Genre_001;Rock Klasikoa
@@ -716,6 +726,21 @@ InternetMediaType;Internet multimedia mota
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+JocBalance_FrontBackListener;
+JocBalance_FrontBackOverheadFloor;
+JocTrim_Center;
+JocTrim_Height;
+JocTrim_Surround;
+JocTrimMode;
+JocTrimMode0i;
+JocTrimMode1i;
+JocTrimMode2i;
+JocTrimMode3i;
+JocTrimMode4i;
+JocTrimMode5i;
+JocTrimMode6i;
+JocTrimMode7i;
+JocTrimMode8i;
 Keywords;Laterteklak
 Known codecs;Ezagutu kodekak
 Known formats;Ezagutu heuskarriak
@@ -747,6 +772,7 @@ Language_bs;Bosniera
 Language_ca;Kataluniera
 Language_ce;Txetxeniera
 Language_ch;Chamorroera
+Language_cmn;
 Language_co;Korsikera
 Language_cr;Creeera
 Language_cs;Txekiera
@@ -916,10 +942,17 @@ Language_wo;Wolofera
 Language_xh;Xhosaera
 Language_yi;Yiddiera
 Language_yo;Yorubera
+Language_yue;
 Language_za;Zhuangera
 Language_zh;Txinera
+Language_zh-cmn;
 Language_zh-cn;Txinera (Txina)
+Language_zh-CN;
+Language_zh-Hans;
+Language_zh-Hant;
 Language_zh-tw;Txinera (Taiwan)
+Language_zh-TW;
+Language_zh-yue;
 Language_zu;Zuluera
 LawRating;Lege maila
 LCCN;LCCN
@@ -944,6 +977,7 @@ LinkedTo_Substream_Pos;
 LinkedTo_TrackFormat_Pos;
 LinkedTo_TrackUID_Pos;
 List;Zerrenda
+LongTermLoudness;
 LoRoCenterMixGain;
 LoRoSurroundMixGain;
 Loudness_Anchor;
@@ -981,6 +1015,8 @@ MaxFALL;
 MaxGain;
 MaximumMomentaryLoudness;
 MaxTruePeak;
+MD5;
+MD5_Unencoded;
 MediaInfo_About;MediaInfo-k sarbide erraza eskaintzen du bideo eta audio agirien argibide teknikoetara eta etiketara.\r\nSoftware askea da, honek esanahi du dohainekoa dela erabiltzaileentzat eta garatzaileek askatasuna dutela ikertzeko, hobetzeko eta programa birbanatzeko (BSD baimena)
 MediaInfo_About_About;
 Menu;Menua
@@ -1033,42 +1069,6 @@ ObjectCount;
 OK;Ongi
 One output file per input file;Irteera agiri bat sarrera agiriko
 Open;Ireki
-OpenCandy_01;Jeisten ________
-OpenCandy_02;__% Osatuta
-OpenCandy_03;Internet elkarketa etenda
-OpenCandy_04;________ jeisketa osatatuta
-OpenCandy_05;Klikatu ezartzeko ________
-OpenCandy_06;Zihur zaude ezarpena ezeztatzea nahi duzula?\r\nEzarpen geroagorako uztea nahi baduzu, hautatu 'Ez'.\r\nOharra: Irten hautatu dezakezu menutik ezarpena geroagoratzeko hurrengo aldian berrabiarazi arte.
-OpenCandy_07;________ jeisketa pausatuta dago.\r\nKlikatu erretilu ikurrean jeisketari berrekiteko.
-OpenCandy_08;Akats larri bat gertatu da. _________-ren ezarpena utzi egin da.
-OpenCandy_09;Pausatu jeisketa
-OpenCandy_10;Ezarpena ezeztatu
-OpenCandy_11;Berrekin jeisketa
-OpenCandy_12;Irten Ezartzailetik
-OpenCandy_13;___________ - Gomendatzailea: ____________
-OpenCandy_14;_________ Jeisten
-OpenCandy_15;___________, ___________-k gomendatzen dizun softwarea jeisten ari da. Ezartzeko gertu dagoenean jakinaraziko dizugu.
-OpenCandy_16;___________ gertu dago ezartzeko
-OpenCandy_17;___________ osorik jeitsita dago. Mesedez klikatu 'Ezarri' jarraitzeko.
-OpenCandy_18;___________ -> ___________ jeitsita
-OpenCandy_19;OpenCandy-ek garatuta
-OpenCandy_20;Gehiago jakiteko: OpenCandy.com
-OpenCandy_21;Ezarri
-OpenCandy_22;___________-ren ezarpena
-OpenCandy_23;Honek ___________-ren ezarpena ezeztatuko du\r\nZihur zaude irtetzea nahi duzula?
-OpenCandy_24;Pausatu
-OpenCandy_25;Zure jeisketa pausatuta dago. Klikatu 'Berrekin' jarraitzeko gertu zaudenean.
-OpenCandy_26;Berrekin
-OpenCandy_27;Ezarri Orain
-OpenCandy_28;Pausatu Jeisketa
-OpenCandy_29;Berrekin Jeisketa
-OpenCandy_30;Ezeztatu Ezarpena
-OpenCandy_31;Mesedez hautatu ezarpen aukera
-OpenCandy_32;Ezarri ___________
-OpenCandy_33;Ez Ezarri
-OpenCandy_34;Mesedez hautatu ezarpen aukera
-OpenCandy_35;______ software hau gomendatzen du
-OpenCandy_36;Zure uneko ezarpena ez da etengo
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
@@ -1146,6 +1146,7 @@ Rating;Mailaketa
 RealtimeLoudnessCorrected;
 Recorded_Date;Grabaketa eguna
 Recorded_Location;Grabaketa helbidea
+Reel;
 Released_Date;Argitaratze eguna
 RemixedBy;Bernahastzailea
 RenderMode;
@@ -1364,5 +1365,5 @@ Written_Location;Idazte helbidea
 WrittenBy;Idazlea
 Yes;Bai
 Your system;Zure sistema
-ZZ_Automatic_Percent;75
-ZZ_AutomaticLanguage_Percent;75
+ZZ_Automatic_Percent;72
+ZZ_AutomaticLanguage_Percent;73
