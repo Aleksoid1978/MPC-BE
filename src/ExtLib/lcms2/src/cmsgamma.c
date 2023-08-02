@@ -593,10 +593,16 @@ cmsFloat64Number DefaultEvalParametricFn(cmsInt32Number Type, const cmsFloat64Nu
     case 6:
         e = Params[1]*R + Params[2];
 
-        if (e < 0)
-            Val = Params[3];
-        else
-            Val = pow(e, Params[0]) + Params[3];
+        // On gamma 1.0, don't clamp
+        if (Params[0] == 1.0) {
+            Val = e + Params[3];
+        }
+        else {
+            if (e < 0)
+                Val = Params[3];
+            else
+                Val = pow(e, Params[0]) + Params[3];
+        }
         break;
 
     // ((Y - c) ^1/Gamma - b) / a

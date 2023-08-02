@@ -717,7 +717,7 @@ cmsHPROFILE cmsCreate_OkLabProfile(cmsContext ctx)
     cmsStage* LMStoD65 = cmsStageAllocMatrix(ctx, 3, 3, M_LMS_D65, NULL);
 
     cmsToneCurve* CubeRoot = cmsBuildGamma(ctx, 1.0 / 3.0);
-    cmsToneCurve* Cube    = cmsBuildGamma(ctx,  3.0);
+    cmsToneCurve* Cube     = cmsBuildGamma(ctx,  3.0);
 
     cmsToneCurve* Roots[3] = { CubeRoot, CubeRoot, CubeRoot };
     cmsToneCurve* Cubes[3] = { Cube, Cube, Cube };
@@ -758,21 +758,21 @@ cmsHPROFILE cmsCreate_OkLabProfile(cmsContext ctx)
     /**
     * Conversion PCS (XYZ/D50) to OkLab 
     */
-    cmsPipelineInsertStage(BToA, cmsAT_END, PCSXYZ);
-    cmsPipelineInsertStage(BToA, cmsAT_END, D50toD65);
-    cmsPipelineInsertStage(BToA, cmsAT_END, D65toLMS);
-    cmsPipelineInsertStage(BToA, cmsAT_END, NonLinearityFw);
-    cmsPipelineInsertStage(BToA, cmsAT_END, LMSprime_OkLab);
+    if (!cmsPipelineInsertStage(BToA, cmsAT_END, PCSXYZ)) goto error;
+    if (!cmsPipelineInsertStage(BToA, cmsAT_END, D50toD65)) goto error;
+    if (!cmsPipelineInsertStage(BToA, cmsAT_END, D65toLMS)) goto error;
+    if (!cmsPipelineInsertStage(BToA, cmsAT_END, NonLinearityFw)) goto error;
+    if (!cmsPipelineInsertStage(BToA, cmsAT_END, LMSprime_OkLab)) goto error;
 
-    cmsWriteTag(hProfile, cmsSigBToA0Tag, BToA);
+    if (!cmsWriteTag(hProfile, cmsSigBToA0Tag, BToA)) goto error;
     
-    cmsPipelineInsertStage(AToB, cmsAT_END, OkLab_LMSprime);
-    cmsPipelineInsertStage(AToB, cmsAT_END, NonLinearityRv);
-    cmsPipelineInsertStage(AToB, cmsAT_END, LMStoD65);
-    cmsPipelineInsertStage(AToB, cmsAT_END, D65toD50);
-    cmsPipelineInsertStage(AToB, cmsAT_END, XYZPCS);
+    if (!cmsPipelineInsertStage(AToB, cmsAT_END, OkLab_LMSprime)) goto error;
+    if (!cmsPipelineInsertStage(AToB, cmsAT_END, NonLinearityRv)) goto error;
+    if (!cmsPipelineInsertStage(AToB, cmsAT_END, LMStoD65)) goto error;
+    if (!cmsPipelineInsertStage(AToB, cmsAT_END, D65toD50)) goto error;
+    if (!cmsPipelineInsertStage(AToB, cmsAT_END, XYZPCS)) goto error;
 
-    cmsWriteTag(hProfile, cmsSigAToB0Tag, AToB);
+    if (!cmsWriteTag(hProfile, cmsSigAToB0Tag, AToB)) goto error;
 
     cmsPipelineFree(BToA);
     cmsPipelineFree(AToB);
@@ -781,8 +781,18 @@ cmsHPROFILE cmsCreate_OkLabProfile(cmsContext ctx)
     cmsFreeToneCurve(Cube);
 
     return hProfile;
-}
 
+error:
+    cmsPipelineFree(BToA);
+    cmsPipelineFree(AToB);
+
+    cmsFreeToneCurve(CubeRoot);
+    cmsFreeToneCurve(Cube);
+    cmsCloseProfile(hProfile);
+
+    return NULL;
+
+}
 
 
 typedef struct {

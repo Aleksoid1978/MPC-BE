@@ -783,7 +783,7 @@ cmsPipeline*  BlackPreservingKOnlyIntents(cmsContext     ContextID,
 
     // Create a LUT holding normal ICC transform
     bp.cmyk2cmyk = DefaultICCintents(ContextID,
-                                     preservationProfilesCount,
+        preservationProfilesCount,
         ICCIntents,
         hProfiles,
         BPC,
@@ -795,7 +795,7 @@ cmsPipeline*  BlackPreservingKOnlyIntents(cmsContext     ContextID,
     // Now, compute the tone curve
     bp.KTone = _cmsBuildKToneCurve(ContextID,
         4096,
-                                    preservationProfilesCount,
+        preservationProfilesCount,
         ICCIntents,
         hProfiles,
         BPC,
