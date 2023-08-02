@@ -725,7 +725,8 @@ static void set_default_scaling_list_data(ScalingList *sl)
     memcpy(sl->sl[3][5], default_scaling_list_inter, 64);
 }
 
-static int scaling_list_data(GetBitContext *gb, AVCodecContext *avctx, ScalingList *sl, HEVCSPS *sps)
+static int scaling_list_data(GetBitContext *gb, AVCodecContext *avctx,
+                             ScalingList *sl, const HEVCSPS *sps)
 {
     uint8_t scaling_list_pred_mode_flag;
     uint8_t scaling_list_dc_coef[2][6];
@@ -1414,7 +1415,7 @@ static int colour_mapping_table(GetBitContext *gb, AVCodecContext *avctx, HEVCPP
 }
 
 static int pps_multilayer_extension(GetBitContext *gb, AVCodecContext *avctx,
-                                    HEVCPPS *pps, HEVCSPS *sps, HEVCVPS *vps)
+                                    HEVCPPS *pps, const HEVCSPS *sps, const HEVCVPS *vps)
 {
     pps->poc_reset_info_present_flag = get_bits1(gb);
     pps->pps_infer_scaling_list_flag = get_bits1(gb);
@@ -1485,7 +1486,7 @@ static void delta_dlt(GetBitContext *gb, HEVCPPS *pps)
 }
 
 static int pps_3d_extension(GetBitContext *gb, AVCodecContext *avctx,
-                            HEVCPPS *pps, HEVCSPS *sps)
+                            HEVCPPS *pps, const HEVCSPS *sps)
 {
     unsigned int pps_depth_layers_minus1;
 
@@ -1509,7 +1510,7 @@ static int pps_3d_extension(GetBitContext *gb, AVCodecContext *avctx,
 }
 
 static int pps_range_extensions(GetBitContext *gb, AVCodecContext *avctx,
-                                HEVCPPS *pps, HEVCSPS *sps)
+                                HEVCPPS *pps, const HEVCSPS *sps)
 {
     if (pps->transform_skip_enabled_flag) {
         pps->log2_max_transform_skip_block_size = get_ue_golomb_31(gb) + 2;
@@ -1549,7 +1550,7 @@ static int pps_range_extensions(GetBitContext *gb, AVCodecContext *avctx,
 }
 
 static int pps_scc_extension(GetBitContext *gb, AVCodecContext *avctx,
-                             HEVCPPS *pps, HEVCSPS *sps)
+                             HEVCPPS *pps, const HEVCSPS *sps)
 {
     int num_comps, ret;
 
@@ -1582,11 +1583,13 @@ static int pps_scc_extension(GetBitContext *gb, AVCodecContext *avctx,
             }
             pps->monochrome_palette_flag = get_bits1(gb);
             pps->luma_bit_depth_entry = get_ue_golomb_31(gb) + 8;
-            if (!pps->monochrome_palette_flag)
-                pps->chroma_bit_depth_entry = get_ue_golomb_31(gb) + 8;
-
-            if (pps->chroma_bit_depth_entry > 16 || pps->chroma_bit_depth_entry > 16)
+            if (pps->luma_bit_depth_entry != sps->bit_depth)
                 return AVERROR_INVALIDDATA;
+            if (!pps->monochrome_palette_flag) {
+                pps->chroma_bit_depth_entry = get_ue_golomb_31(gb) + 8;
+                if (pps->chroma_bit_depth_entry != sps->bit_depth_chroma)
+                    return AVERROR_INVALIDDATA;
+            }
 
             num_comps = pps->monochrome_palette_flag ? 1 : 3;
             for (int comp = 0; comp < num_comps; comp++) {
@@ -1601,7 +1604,7 @@ static int pps_scc_extension(GetBitContext *gb, AVCodecContext *avctx,
 }
 
 static inline int setup_pps(AVCodecContext *avctx, GetBitContext *gb,
-                            HEVCPPS *pps, HEVCSPS *sps)
+                            HEVCPPS *pps, const HEVCSPS *sps)
 {
     int log2_diff;
     int pic_area_in_ctbs;
@@ -1735,8 +1738,8 @@ static inline int setup_pps(AVCodecContext *avctx, GetBitContext *gb,
 int ff_hevc_decode_nal_pps(GetBitContext *gb, AVCodecContext *avctx,
                            HEVCParamSets *ps)
 {
-    HEVCSPS      *sps = NULL;
-    HEVCVPS      *vps = NULL;
+    const HEVCSPS *sps = NULL;
+    const HEVCVPS *vps = NULL;
     int i, ret = 0;
     unsigned int pps_id = 0;
     ptrdiff_t nal_size;

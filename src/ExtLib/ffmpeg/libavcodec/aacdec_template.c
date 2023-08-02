@@ -1159,8 +1159,8 @@ static av_cold void aac_static_table_init(void)
                     352);
 
     // window initialization
-    AAC_RENAME(ff_kbd_window_init)(AAC_RENAME(aac_kbd_long_960), 4.0, 960);
-    AAC_RENAME(ff_kbd_window_init)(AAC_RENAME(aac_kbd_short_120), 6.0, 120);
+    AAC_RENAME(avpriv_kbd_window_init)(AAC_RENAME(aac_kbd_long_960), 4.0, 960);
+    AAC_RENAME(avpriv_kbd_window_init)(AAC_RENAME(aac_kbd_short_120), 6.0, 120);
 
 #if !USE_FIXED
     AAC_RENAME(ff_sine_window_init)(AAC_RENAME(sine_960), 960);
@@ -1168,8 +1168,8 @@ static av_cold void aac_static_table_init(void)
     AAC_RENAME(ff_init_ff_sine_windows)(9);
     ff_aac_float_common_init();
 #else
-    AAC_RENAME(ff_kbd_window_init)(AAC_RENAME2(aac_kbd_long_1024), 4.0, 1024);
-    AAC_RENAME(ff_kbd_window_init)(AAC_RENAME2(aac_kbd_short_128), 6.0, 128);
+    AAC_RENAME(avpriv_kbd_window_init)(AAC_RENAME2(aac_kbd_long_1024), 4.0, 1024);
+    AAC_RENAME(avpriv_kbd_window_init)(AAC_RENAME2(aac_kbd_short_128), 6.0, 128);
     init_sine_windows_fixed();
 #endif
 
@@ -2856,8 +2856,8 @@ static void imdct_and_windowing_eld(AACContext *ac, SingleChannelElement *sce)
         ac->mdct512_fn(ac->mdct512, buf, in, sizeof(INTFLOAT));
 
     for (i = 0; i < n; i+=2) {
-        buf[i + 0] = -(USE_FIXED + 1)*buf[i + 0];
-        buf[i + 1] =  (USE_FIXED + 1)*buf[i + 1];
+        buf[i + 0] = -(int)(USE_FIXED + 1U)*buf[i + 0];
+        buf[i + 1] =  (int)(USE_FIXED + 1U)*buf[i + 1];
     }
     // Like with the regular IMDCT at this point we still have the middle half
     // of a transform but with even symmetry on the left and odd symmetry on

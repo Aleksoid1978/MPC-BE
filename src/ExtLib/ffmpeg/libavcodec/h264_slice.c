@@ -439,6 +439,8 @@ int ff_h264_update_thread_context(AVCodecContext *dst,
         return ret;
 
     h->sei.common.unregistered.x264_build = h1->sei.common.unregistered.x264_build;
+    h->sei.common.mastering_display = h1->sei.common.mastering_display;
+    h->sei.common.content_light = h1->sei.common.content_light;
 
     if (!h->cur_pic_ptr)
         return 0;
@@ -787,8 +789,6 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
                      CONFIG_H264_VDPAU_HWACCEL + \
                      CONFIG_H264_VULKAN_HWACCEL)
     enum AVPixelFormat pix_fmts[HWACCEL_MAX + 2], *fmt = pix_fmts;
-    const enum AVPixelFormat *choices = pix_fmts;
-    int i;
 
     switch (h->ps.sps->bit_depth_luma) {
     case 9:
@@ -889,9 +889,7 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
 #if CONFIG_H264_VAAPI_HWACCEL
             *fmt++ = AV_PIX_FMT_VAAPI;
 #endif
-            if (h->avctx->codec->pix_fmts)
-                choices = h->avctx->codec->pix_fmts;
-            else if (h->avctx->color_range == AVCOL_RANGE_JPEG)
+            if (h->avctx->color_range == AVCOL_RANGE_JPEG)
                 *fmt++ = AV_PIX_FMT_YUVJ420P;
             else
                 *fmt++ = AV_PIX_FMT_YUV420P;
@@ -905,10 +903,10 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
 
     *fmt = AV_PIX_FMT_NONE;
 
-    for (i=0; choices[i] != AV_PIX_FMT_NONE; i++)
-        if (choices[i] == h->avctx->pix_fmt && !force_callback)
-            return choices[i];
-    return ff_thread_get_format(h->avctx, choices);
+    for (int i = 0; pix_fmts[i] != AV_PIX_FMT_NONE; i++)
+        if (pix_fmts[i] == h->avctx->pix_fmt && !force_callback)
+            return pix_fmts[i];
+    return ff_thread_get_format(h->avctx, pix_fmts);
 }
 
 // ==> Start patch MPC

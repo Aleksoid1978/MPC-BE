@@ -34,6 +34,7 @@
 #include "libavutil/opt.h"
 #include "libavutil/thread.h"
 #include "avcodec.h"
+#include "avcodec_internal.h"
 #include "bsf.h"
 #include "codec_internal.h"
 #include "decode.h"
@@ -149,7 +150,9 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
     if (avctx->extradata_size < 0 || avctx->extradata_size >= FF_MAX_EXTRADATA_SIZE)
         return AVERROR(EINVAL);
 
-    avci = av_mallocz(sizeof(*avci));
+    avci = av_codec_is_decoder(codec) ?
+        ff_decode_internal_alloc()    :
+        ff_encode_internal_alloc();
     if (!avci) {
         ret = AVERROR(ENOMEM);
         goto end;
@@ -382,23 +385,12 @@ void avcodec_flush_buffers(AVCodecContext *avctx)
                    "that doesn't support it\n");
             return;
         }
-        if (avci->in_frame)
-            av_frame_unref(avci->in_frame);
-        if (avci->recon_frame)
-            av_frame_unref(avci->recon_frame);
-    } else {
-        av_packet_unref(avci->last_pkt_props);
-        av_packet_unref(avci->in_pkt);
-
-        avctx->pts_correction_last_pts =
-        avctx->pts_correction_last_dts = INT64_MIN;
-
-        av_bsf_flush(avci->bsf);
-    }
+        ff_encode_flush_buffers(avctx);
+    } else
+        ff_decode_flush_buffers(avctx);
 
     avci->draining      = 0;
     avci->draining_done = 0;
-    avci->nb_draining_errors = 0;
     av_frame_unref(avci->buffer_frame);
     av_packet_unref(avci->buffer_pkt);
 
@@ -464,7 +456,9 @@ av_cold int avcodec_close(AVCodecContext *avctx)
 
         av_bsf_free(&avci->bsf);
 
+#if FF_API_DROPCHANGED
         av_channel_layout_uninit(&avci->initial_ch_layout);
+#endif
 
 #if CONFIG_LCMS2
         ff_icc_context_uninit(&avci->icc);
