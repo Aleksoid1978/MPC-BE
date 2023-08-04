@@ -533,15 +533,28 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					ReduceDim(aspect);
 					CreateMPEG2VISimple(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 
-					if (pTE->CodecPrivate.size() > 21) {
-						MPEG2VIDEOINFO* pm2vi	= (MPEG2VIDEOINFO*)mt.pbFormat;
-						BYTE * extradata		= pTE->CodecPrivate.data();
-						size_t size				= pTE->CodecPrivate.size();
+					if (pTE->CodecPrivate.size() >= 23) {
+						MPEG2VIDEOINFO* pm2vi = (MPEG2VIDEOINFO*)mt.pbFormat;
+						const BYTE* extradata = pTE->CodecPrivate.data();
+						size_t size           = pTE->CodecPrivate.size();
 						vc_params_t params;
 						if (HEVCParser::ParseHEVCDecoderConfigurationRecord(extradata, size, params, false)) {
-							pm2vi->dwProfile	= params.profile;
-							pm2vi->dwLevel		= params.level;
-							pm2vi->dwFlags		= params.nal_length_size;
+							pm2vi->dwProfile = params.profile;
+							pm2vi->dwLevel   = params.level;
+							pm2vi->dwFlags   = params.nal_length_size;
+
+							if (pTE->CodecPrivate.size() == 23) {
+								std::vector<BYTE> pData;
+								if (ReadFirtsBlock(pData, pTE.get())) {
+									std::vector<uint8_t> new_record;
+									if (HEVCParser::ReconstructHEVCDecoderConfigurationRecord(pData.data(), pData.size(), params.nal_length_size,
+																							  extradata, size,
+																							  new_record)) {
+										CreateMPEG2VISimple(&mt, &pbmi, 0, aspect, new_record.data(), new_record.size(),
+															params.profile, params.level, params.nal_length_size);
+									}
+								}
+							}
 						}
 
 						if (!pm2vi->dwFlags

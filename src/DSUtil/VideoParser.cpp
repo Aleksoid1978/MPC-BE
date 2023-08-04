@@ -1177,6 +1177,74 @@ namespace HEVCParser {
 
 		return true;
 	}
+
+	bool ReconstructHEVCDecoderConfigurationRecord(const BYTE* raw_data, const size_t raw_size, const int nal_length_size,
+												   const BYTE* record_data, const size_t record_size,
+												   std::vector<BYTE>& new_record)
+	{
+		std::vector<uint8_t> vps;
+		std::vector<uint8_t> sps;
+		std::vector<uint8_t> pps;
+
+		CH265Nalu Nalu;
+		Nalu.SetBuffer(raw_data, raw_size, nal_length_size);
+		while (!(!vps.empty() && !pps.empty() && !sps.empty())
+			   && Nalu.ReadNext()) {
+			const auto nalu_type = Nalu.GetType();
+			switch (nalu_type) {
+			case NALU_TYPE_HEVC_VPS:
+				if (!vps.empty()) continue;
+				vps.assign(Nalu.GetDataBuffer(), Nalu.GetDataBuffer() + Nalu.GetDataLength());
+				break;
+			case NALU_TYPE_HEVC_SPS:
+				if (!sps.empty()) continue;
+				sps.assign(Nalu.GetDataBuffer(), Nalu.GetDataBuffer() + Nalu.GetDataLength());
+				break;
+			case NALU_TYPE_HEVC_PPS:
+				if (!pps.empty()) continue;
+				pps.assign(Nalu.GetDataBuffer(), Nalu.GetDataBuffer() + Nalu.GetDataLength());
+				break;
+			}
+		}
+
+		if (!vps.empty() && !sps.empty() && !pps.empty()) {
+			size_t new_record_size = record_size + 3 * 5 + vps.size() + sps.size() + pps.size();
+			new_record.resize(new_record_size);
+			memcpy(new_record.data(), record_data, record_size);
+			new_record[22] = 3; // num_of_arrays
+			size_t write_pos = 23;
+
+			uint8_t array_completeness = 1;
+
+			auto WriteNalUnits = [&](NALU_TYPE nalu_type, std::vector<uint8_t>& nal_unit) {
+				/*
+				 * bit(1) array_completeness;
+				 * unsigned int(1) reserved = 0;
+				 * unsigned int(6) nal_unit_type;
+				 */
+				new_record[write_pos] = array_completeness << 7 | nalu_type & 0x3f;
+				write_pos++;
+
+				new_record[write_pos + 1] = 1; // num_nalus
+				write_pos += 2;
+
+				const auto nal_unit_size = _byteswap_ushort(nal_unit.size());
+				memcpy(&new_record[write_pos], &nal_unit_size, 2); // nal_unit_length
+				write_pos += 2;
+
+				memcpy(&new_record[write_pos], nal_unit.data(), nal_unit.size());
+				write_pos += nal_unit.size();
+			};
+
+			WriteNalUnits(NALU_TYPE_HEVC_VPS, vps);
+			WriteNalUnits(NALU_TYPE_HEVC_SPS, sps);
+			WriteNalUnits(NALU_TYPE_HEVC_PPS, pps);
+
+			return true;
+		}
+
+		return false;
+	}
 } // namespace HEVCParser
 
 

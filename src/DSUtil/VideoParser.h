@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2022 see Authors.txt
+ * (C) 2012-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -81,6 +81,10 @@ namespace HEVCParser {
 
 	bool ParseAVCDecoderConfigurationRecord(const BYTE* data, const int size, vc_params_t& params, const int flv_hm = 0);
 	bool ParseHEVCDecoderConfigurationRecord(const BYTE* data, const int size, vc_params_t& params, const bool parseSPS);
+
+	bool ReconstructHEVCDecoderConfigurationRecord(const BYTE* raw_data, const size_t raw_size, const int nal_length_size,
+												   const BYTE* record_data, const size_t record_size,
+												   std::vector<BYTE>& new_record);
 } // namespace HEVCParser
 
 namespace AV1Parser {

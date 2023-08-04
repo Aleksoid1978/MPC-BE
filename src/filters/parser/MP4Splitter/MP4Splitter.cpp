@@ -1302,6 +1302,20 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										if (m_pFile->Read(h, sample.GetSize(), &mt2)) {
 											mts.insert(mts.cbegin(), mt2);
 										}
+									} else if (di->GetDataSize() == 23) {
+										m_pFile->Seek(sample.GetOffset());
+										AP4_DataBuffer data;
+										if (AP4_SUCCEEDED(sample.ReadData(data))) {
+											std::vector<uint8_t> new_record;
+											if (HEVCParser::ReconstructHEVCDecoderConfigurationRecord(data.GetData(), data.GetDataSize(), params.nal_length_size,
+																									  di->GetData(), di->GetDataSize(),
+																									  new_record)) {
+												CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, PictAR, new_record.data(), new_record.size(),
+																	params.profile, params.level, params.nal_length_size);
+												mts.clear();
+												mts.push_back(mt);
+											}
+										}
 									}
 								}
 								break;
