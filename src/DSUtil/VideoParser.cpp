@@ -1228,7 +1228,7 @@ namespace HEVCParser {
 				new_record[write_pos + 1] = 1; // num_nalus
 				write_pos += 2;
 
-				const auto nal_unit_size = _byteswap_ushort(nal_unit.size());
+				const auto nal_unit_size = _byteswap_ushort(static_cast<unsigned short>(nal_unit.size()));
 				memcpy(&new_record[write_pos], &nal_unit_size, 2); // nal_unit_length
 				write_pos += 2;
 
