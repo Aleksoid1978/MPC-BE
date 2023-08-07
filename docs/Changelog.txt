@@ -13,6 +13,9 @@ Fixed output format selection when decoding some 10-bit HEVC.
 Player
 Checking for updates will not be performed if the player is launched with files open.
 
+Installer
+Added the ability to install "MPC Video Renderer 0.6.9".
+
 Updated Korean translation (by Hackjjang).
 
 Updated libraries:
