@@ -242,11 +242,11 @@ namespace Youtube
 					constexpr const char* str[] = {
 						// android player API JSON
 						R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "17.31.35", "hl": "en"}}, )"
-						R"("videoId": "%S", "params": "8AEB", "playbackContext": {"contentPlaybackContext": {"html5Preference": "HTML5_PREF_WANTS"}}, )"
+						R"("videoId": "%S", "params": "CgIQBg==", "playbackContext": {"contentPlaybackContext": {"html5Preference": "HTML5_PREF_WANTS"}}, )"
 						R"("contentCheckOk": true, "racyCheckOk": true})",
 						// android agegate player API JSON
 						R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "17.31.35", "clientScreen": "EMBED"}, )"
-						R"("thirdParty": {"embedUrl": "https://google.com"}}, "videoId": "%S", "params": "8AEB", )"
+						R"("thirdParty": {"embedUrl": "https://google.com"}}, "videoId": "%S", "params": "CgIQBg==", )"
 						R"("contentCheckOk": true, "racyCheckOk": true})"
 					};
 
