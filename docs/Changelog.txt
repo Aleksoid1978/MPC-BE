@@ -10,6 +10,9 @@ Added export of Dolby Vision metadata via the IMediaSideData interface.
 Fixed D3D11 copyback hardware decoding on some Intel graphics cards.
 Fixed output format selection when decoding some 10-bit HEVC.
 
+YouTube
+Improved support for YouTube in the built-in parser.
+
 Player
 Checking for updates will not be performed if the player is launched with files open.
 
