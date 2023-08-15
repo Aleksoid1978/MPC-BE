@@ -26,7 +26,8 @@ Updated libraries:
 	Little-CMS git-lcms2.15-72-g6cabbce;
 	MediaInfo git-v23.07-14-g993216d0d;
 	ZenLib git-v0.4.41-5-g36c8e41;
-	Detours git-v4.0.1-109-g4b8c659.
+	Detours git-v4.0.1-109-g4b8c659;
+	rapidjson git-v1.1.0-737-g956063db.
 
 
 1.6.8.5 - 2023-07-05
