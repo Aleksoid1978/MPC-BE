@@ -1,6 +1,6 @@
 ﻿This file includes only a short list of the changes between Media Player Classic - BE's versions.
 
-1.6.8.x dev
+1.6.9 - 2023-08-16
 =============================
 FLVSplitter
 Added support for HEVC, VP9, AV1 in "Enhanced flv".
