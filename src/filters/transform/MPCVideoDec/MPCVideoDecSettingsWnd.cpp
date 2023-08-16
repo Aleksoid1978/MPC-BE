@@ -152,11 +152,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	CalcRect(rect, x2-24, y, control_w+24, 200); rect.top -= 4;
 	m_cbHWDecoder.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, rect, this, IDC_PP_HW_DECODER);
 	m_cbHWDecoder.AddString(L"DXVA2");
-	str = L"D3D11";
-	if (!SysVersion::IsWin8orLater()) {
-		str.Append(L" (not available)");
-	}
-	m_cbHWDecoder.AddString(str);
+	m_cbHWDecoder.AddString(L"D3D11, DXVA2");
 	str = L"D3D11cb";
 	if (!SysVersion::IsWin8orLater()) {
 		str.Append(L" (not available)");
