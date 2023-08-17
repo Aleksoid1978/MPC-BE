@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2022 see Authors.txt
+ * (C) 2014-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -187,14 +187,14 @@ bool CMixer::Init()
 		const double rematrix_maxval    = INT_MAX; // matrix coefficients will not be normalized
 		const double rematrix_volume    = 0.0; // not to do a rematrix.
 
-		swr_build_matrix2(
+		ret = swr_build_matrix2(
 			&in_ch_layout, &out_ch_layout,
 			center_mix_level, surround_mix_level, lfe_mix_level,
 			rematrix_maxval, rematrix_volume,
 			m_matrix_dbl, in_ch,
 			AV_MATRIX_ENCODING_NONE, nullptr);
 		if (ret < 0) {
-			DLog(L"CMixer::Init() : swr_build_matrix failed");
+			DLog(L"CMixer::Init() : swr_build_matrix2 failed");
 			av_freep(&m_matrix_dbl);
 			return false;
 		}

@@ -891,7 +891,8 @@ bool CShoutcastStream::CShoutcastSocket::Connect(const CUrlParser& urlParser, CS
 				redirectUrl = value;
 			}
 			else if (param == "content-disposition") {
-				if (int pos = value.Find("filename=") >= 0) {
+				int pos = value.Find("filename=");
+				if (pos >= 0) {
 					redirectUrl = L"/" + CString(value.Mid(pos + 9).Trim());
 				}
 			}

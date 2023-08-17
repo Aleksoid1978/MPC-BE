@@ -1,5 +1,5 @@
 /*
- * (C) 2021 see Authors.txt
+ * (C) 2021-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,7 +40,7 @@ private:
 	};
 
 	WORD m_selectedID = 0;
-	UINT_PTR m_nFilterTimerID;
+	UINT_PTR m_nFilterTimerID = 0;
 
 	void FillList();
 	void FilterList();

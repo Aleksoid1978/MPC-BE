@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2022 see Authors.txt
+ * (C) 2012-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -197,7 +197,7 @@ pID3TagItem CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size
 		} else if (mimeStrLower == L"png") {
 			mime = L"image/png";
 		} else if (!StartsWith(mimeStrLower, L"image/")) {
-			mime.Format(L"image/%s", mime);
+			mime.Insert(0, L"image/");
 		}
 
 		std::vector<BYTE> data;
