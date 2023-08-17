@@ -62,7 +62,7 @@ private:
 	CExListCtrl m_list;
 	std::vector<SessionInfo> m_recentSessions;
 
-	UINT_PTR m_nFilterTimerID;
+	UINT_PTR m_nFilterTimerID = 0;
 	CEdit m_FilterEdit;
 	CButton m_DelSelButton;
 

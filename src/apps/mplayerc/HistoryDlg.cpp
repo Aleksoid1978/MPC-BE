@@ -377,7 +377,7 @@ void CHistoryDlg::OnKeydownList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NMLVKEYDOWN* pLVKeyDow = (NMLVKEYDOWN*)pNMHDR;
 
-	if ((pLVKeyDow->flags && KF_EXTENDED) && pLVKeyDow->wVKey == VK_DELETE) {
+	if ((pLVKeyDow->flags & KF_EXTENDED) && pLVKeyDow->wVKey == VK_DELETE) {
 		CString str;
 		str.Format(ResStr(IDS_REMOVEFROMLISTQUESTION), (int)m_list.GetSelectedCount());
 		if (IDYES == AfxMessageBox(str, MB_ICONQUESTION | MB_YESNO)) {
