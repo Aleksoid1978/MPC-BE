@@ -776,7 +776,7 @@ bool CBaseSplitterFileEx::Read(ac4hdr& h, int len, CMediaType* pmt)
 	if (!(h.sync == 0xAC40 || h.sync == 0xAC41)) {
 		return false;
 	}
-	const int16_t frame_size = BitRead(16);
+	const int frame_size = BitRead(16);
 	if (frame_size == 0xFFFF) {
 		Skip(3);
 	}
