@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2021 see Authors.txt
+ * (C) 2014-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -63,22 +63,23 @@ bool CWAVFile::ProcessWAVEFORMATEX()
 			|| wfe->wFormatTag == WAVE_FORMAT_IEEE_FLOAT && wfe->nChannels > 2) {
 		// convert incorrect WAVEFORMATEX to WAVEFORMATEXTENSIBLE
 
-		WAVEFORMATEXTENSIBLE* wfex = DNew WAVEFORMATEXTENSIBLE;
-		wfex->Format.wFormatTag				= WAVE_FORMAT_EXTENSIBLE;
-		wfex->Format.nChannels				= wfe->nChannels;
-		wfex->Format.nSamplesPerSec			= wfe->nSamplesPerSec;
-		wfex->Format.wBitsPerSample			= (wfe->wBitsPerSample + 7) & ~7;
-		wfex->Format.nBlockAlign			= wfex->Format.nChannels * wfex->Format.wBitsPerSample / 8;
-		wfex->Format.nAvgBytesPerSec		= wfex->Format.nSamplesPerSec * wfex->Format.nBlockAlign;
-		wfex->Format.cbSize					= 22;
-		wfex->Samples.wValidBitsPerSample	= wfe->wBitsPerSample;
-		wfex->dwChannelMask					= GetDefChannelMask(wfe->nChannels);
-		wfex->SubFormat						= m_subtype;
+		WAVEFORMATEXTENSIBLE wfex;
+		wfex.Format.wFormatTag           = WAVE_FORMAT_EXTENSIBLE;
+		wfex.Format.nChannels            = wfe->nChannels;
+		wfex.Format.nSamplesPerSec       = wfe->nSamplesPerSec;
+		wfex.Format.wBitsPerSample       = (wfe->wBitsPerSample + 7) & ~7;
+		wfex.Format.nBlockAlign          = wfex.Format.nChannels * wfex.Format.wBitsPerSample / 8;
+		wfex.Format.nAvgBytesPerSec      = wfex.Format.nSamplesPerSec * wfex.Format.nBlockAlign;
+		wfex.Format.cbSize               = 22;
+		wfex.Samples.wValidBitsPerSample = wfe->wBitsPerSample;
+		wfex.dwChannelMask               = GetDefChannelMask(wfe->nChannels);
+		wfex.SubFormat                   = m_subtype;
 
 		delete[] m_fmtdata;
-
-		m_fmtdata = (BYTE*)wfex;
 		m_fmtsize = sizeof(WAVEFORMATEXTENSIBLE);
+		m_fmtdata = DNew BYTE[m_fmtsize];
+		memcpy(m_fmtdata, &wfex, m_fmtsize);
+
 		wfe = (WAVEFORMATEX*)m_fmtdata;
 	}
 
