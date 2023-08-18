@@ -732,7 +732,8 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 
 	if (pmt) {
 		size_t size = sizeof(WAVEFORMATEX) + h.atmos_flag;
-		WAVEFORMATEX* wfe = (WAVEFORMATEX*)DNew BYTE[size];
+		std::unique_ptr<BYTE[]> fmtbuf = std::make_unique<BYTE[]>(size);
+		WAVEFORMATEX* wfe = (WAVEFORMATEX*)fmtbuf.get();
 		ZeroMemory(wfe, size);
 		wfe->wFormatTag = WAVE_FORMAT_DOLBY_AC3;
 
