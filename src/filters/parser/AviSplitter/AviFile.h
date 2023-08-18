@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -85,7 +85,7 @@ public:
 	};
 	std::vector<std::unique_ptr<strm_t>> m_strms;
 	std::map<DWORD, CStringA> m_info;
-	std::unique_ptr<AVIOLDINDEX> m_idx1;
+	std::unique_ptr<BYTE[]> m_idx1;
 
 	std::list<UINT64> m_movis;
 	bool m_isamv;

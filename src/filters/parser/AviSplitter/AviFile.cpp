@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -304,10 +304,13 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 					break;
 				case FCC('idx1'):
 					ASSERT(m_idx1 == nullptr);
-					m_idx1.reset((AVIOLDINDEX*)DNew BYTE[size + 8]);
-					m_idx1->fcc = FCC('idx1');
-					m_idx1->cb = size;
-					if (S_OK != ByteRead((BYTE*)m_idx1.get() + 8, size)) {
+					m_idx1.reset(DNew BYTE[size + 8]);
+					{
+						AVIOLDINDEX* idx = (AVIOLDINDEX*)m_idx1.get();
+						idx->fcc = FCC('idx1');
+						idx->cb = size;
+					}
+					if (S_OK != ByteRead(m_idx1.get() + 8, size)) {
 						return E_FAIL;
 					}
 					break;
@@ -450,7 +453,7 @@ HRESULT CAviFile::BuildIndex()
 
 			s->totalsize = size;
 		}
-	} else if (AVIOLDINDEX* idx = m_idx1.get()) {
+	} else if (AVIOLDINDEX* idx = (AVIOLDINDEX*)m_idx1.get()) {
 		size_t len    = idx->cb / sizeof(idx->aIndex[0]);
 
 		UINT64 offset = m_movis.front() + 8;
