@@ -423,30 +423,26 @@ int ParseEAC3Header(const BYTE* buf, audioframe_t* audioframe, const int buffsiz
 		return 0;
 	}
 
-	BYTE bsid = buf[5] >> 3; // bsid
+	const int bsid = buf[5] >> 3; // bsid
 	if (bsid < 11 || bsid > 16) {
 		return 0;
 	}
 
-	int frame_size = (((buf[2] & 0x07) << 8) + buf[3] + 1) * 2;
+	const int frame_size = (((buf[2] & 0x07) << 8) + buf[3] + 1) * 2;
 
-	int fscod      =  buf[4] >> 6;
-	int fscod2     = (buf[4] >> 4) & 0x03;
-	int frame_type = (buf[2] >> 6) & 0x03;
+	const int fscod      =  buf[4] >> 6;
+	const int fscod2     = (buf[4] >> 4) & 0x03;
+	const int frame_type = (buf[2] >> 6) & 0x03;
 
 	if ((fscod == 0x03 && fscod2 == 0x03) || frame_type == EAC3_FRAME_TYPE_RESERVED) {
 		return 0;
 	}
 
-	if (!audioframe) {
-		return frame_size;
-	}
-
-	int sub_stream_id = (buf[2] >> 3) & 0x07;
-	int acmod         = (buf[4] >> 1) & 0x07;
-	int lfeon         =  buf[4] & 0x01;
-
 	if (audioframe) {
+		const int sub_stream_id = (buf[2] >> 3) & 0x07;
+		const int acmod         = (buf[4] >> 1) & 0x07;
+		const int lfeon         =  buf[4] & 0x01;
+
 		audioframe->size       = frame_size;
 		audioframe->samplerate = eac3_samplerates[fscod == 0x03 ? 3 + fscod2 : fscod];
 		audioframe->channels   = eac3_channels[acmod] + lfeon;
@@ -454,7 +450,7 @@ int ParseEAC3Header(const BYTE* buf, audioframe_t* audioframe, const int buffsiz
 		audioframe->param1     = frame_type;
 		audioframe->param2     = 0;
 
-		if (buffsize >= 16 && !sub_stream_id && frame_type != EAC3_FRAME_TYPE_RESERVED) {
+		if (buffsize >= 16 && !sub_stream_id) {
 			int num_blocks = 6;
 			if (fscod != 0x03) {
 				static int eac3_blocks[] = { 1, 2, 3, 6 };
