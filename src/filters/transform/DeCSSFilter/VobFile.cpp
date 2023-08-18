@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -216,25 +216,24 @@ static void Reverse(BYTE* d, BYTE* s, int len)
 
 bool CDVDSession::SendKey(DVD_KEY_TYPE KeyType, BYTE* pKeyData)
 {
-	std::unique_ptr<DVD_COPY_PROTECT_KEY> key;
+	std::unique_ptr<BYTE[]> buf;
+	DVD_COPY_PROTECT_KEY* key = nullptr;
 
 	switch(KeyType) {
 		case DvdChallengeKey:
-			key.reset((DVD_COPY_PROTECT_KEY*)DNew BYTE[DVD_CHALLENGE_KEY_LENGTH]);
+			buf.reset(DNew BYTE[DVD_CHALLENGE_KEY_LENGTH]);
+			key = (DVD_COPY_PROTECT_KEY*)buf.get();
 			key->KeyLength = DVD_CHALLENGE_KEY_LENGTH;
 			Reverse(key->KeyData, pKeyData, 10);
 			break;
 		case DvdBusKey2:
-			key.reset((DVD_COPY_PROTECT_KEY*)DNew BYTE[DVD_BUS_KEY_LENGTH]);
+			buf.reset(DNew BYTE[DVD_BUS_KEY_LENGTH]);
+			key = (DVD_COPY_PROTECT_KEY*)buf.get();
 			key->KeyLength = DVD_BUS_KEY_LENGTH;
 			Reverse(key->KeyData, pKeyData, 5);
 			break;
 		default:
-			break;
-	}
-
-	if (!key) {
-		return false;
+			return false;
 	}
 
 	key->SessionId = m_session;
@@ -242,48 +241,46 @@ bool CDVDSession::SendKey(DVD_KEY_TYPE KeyType, BYTE* pKeyData)
 	key->KeyFlags = 0;
 
 	DWORD BytesReturned;
-	return(!!DeviceIoControl(m_hDrive, IOCTL_DVD_SEND_KEY, key.get(), key->KeyLength, nullptr, 0, &BytesReturned, nullptr));
+	return(!!DeviceIoControl(m_hDrive, IOCTL_DVD_SEND_KEY, key, key->KeyLength, nullptr, 0, &BytesReturned, nullptr));
 }
 
 bool CDVDSession::ReadKey(DVD_KEY_TYPE KeyType, BYTE* pKeyData, int lba)
 {
-	std::unique_ptr<DVD_COPY_PROTECT_KEY> key;
+	ULONG keyLength;
 
-	switch(KeyType) {
-		case DvdChallengeKey:
-			key.reset((DVD_COPY_PROTECT_KEY*)DNew BYTE[DVD_CHALLENGE_KEY_LENGTH]);
-			key->KeyLength = DVD_CHALLENGE_KEY_LENGTH;
-			key->Parameters.TitleOffset.QuadPart = 0;
-			break;
-		case DvdBusKey1:
-			key.reset((DVD_COPY_PROTECT_KEY*)DNew BYTE[DVD_BUS_KEY_LENGTH]);
-			key->KeyLength = DVD_BUS_KEY_LENGTH;
-			key->Parameters.TitleOffset.QuadPart = 0;
-			break;
-		case DvdDiskKey:
-			key.reset((DVD_COPY_PROTECT_KEY*)DNew BYTE[DVD_DISK_KEY_LENGTH]);
-			key->KeyLength = DVD_DISK_KEY_LENGTH;
-			key->Parameters.TitleOffset.QuadPart = 0;
-			break;
-		case DvdTitleKey:
-			key.reset((DVD_COPY_PROTECT_KEY*)DNew BYTE[DVD_TITLE_KEY_LENGTH]);
-			key->KeyLength = DVD_TITLE_KEY_LENGTH;
-			key->Parameters.TitleOffset.QuadPart = 2048i64*lba;
-			break;
-		default:
-			break;
-	}
-
-	if (!key) {
+	switch (KeyType) {
+	case DvdChallengeKey:
+		keyLength = DVD_CHALLENGE_KEY_LENGTH;
+		break;
+	case DvdBusKey1:
+		keyLength = DVD_BUS_KEY_LENGTH;
+		break;
+	case DvdDiskKey:
+		keyLength = DVD_DISK_KEY_LENGTH;
+		break;
+	case DvdTitleKey:
+		keyLength = DVD_TITLE_KEY_LENGTH;
+		break;
+	default:
 		return false;
 	}
 
+	std::unique_ptr<BYTE[]> buf = std::make_unique<BYTE[]>(keyLength);
+	
+	DVD_COPY_PROTECT_KEY* key = (DVD_COPY_PROTECT_KEY*)buf.get();
+
+	key->KeyLength = keyLength;
 	key->SessionId = m_session;
 	key->KeyType = KeyType;
 	key->KeyFlags = 0;
+	if (KeyType == DvdTitleKey) {
+		key->Parameters.TitleOffset.QuadPart = 2048i64 * lba;
+	} else {
+		key->Parameters.TitleOffset.QuadPart = 0;
+	}
 
 	DWORD BytesReturned;
-	if (!DeviceIoControl(m_hDrive, IOCTL_DVD_READ_KEY, key.get(), key->KeyLength, key.get(), key->KeyLength, &BytesReturned, nullptr)) {
+	if (!DeviceIoControl(m_hDrive, IOCTL_DVD_READ_KEY, key, key->KeyLength, key, key->KeyLength, &BytesReturned, nullptr)) {
 		DWORD err = GetLastError();
 		UNREFERENCED_PARAMETER(err);
 		return false;
@@ -307,8 +304,6 @@ bool CDVDSession::ReadKey(DVD_KEY_TYPE KeyType, BYTE* pKeyData, int lba)
 			for(int i = 0; i < 5; i++) {
 				pKeyData[i] ^= m_SessionKey[4-(i%5)];
 			}
-			break;
-		default:
 			break;
 	}
 
