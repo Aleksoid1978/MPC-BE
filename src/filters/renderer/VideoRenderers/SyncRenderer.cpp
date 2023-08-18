@@ -1160,7 +1160,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 
 	if (m_windowRect.right <= m_windowRect.left || m_windowRect.bottom <= m_windowRect.top
 			|| m_nativeVideoSize.cx <= 0 || m_nativeVideoSize.cy <= 0
-			|| !m_pVideoSurfaces) {
+			|| !m_pVideoSurfaces[0]) {
 		return false;
 	}
 
@@ -1652,7 +1652,7 @@ void CBaseAP::DrawStats()
 					if (SUCCEEDED(hr)) {
 						strText.Append(L"\nGraphics device present stats:");
 
-						strText.AppendFormat(L"\n    PresentCount %d PresentRefreshCount %d SyncRefreshCount %d",
+						strText.AppendFormat(L"\n    PresentCount %u PresentRefreshCount %u SyncRefreshCount %u",
 									   stats.PresentCount, stats.PresentRefreshCount, stats.SyncRefreshCount);
 
 						LARGE_INTEGER Freq;
@@ -1674,7 +1674,7 @@ void CBaseAP::DrawStats()
 			}
 
 			if (m_ExtraSets.iSynchronizeMode != SYNCHRONIZE_NEAREST) {
-				strText.AppendFormat(L"\nSync adjust  : %d | # of adjustments: %d", m_pGenlock->adjDelta, m_pGenlock->clockAdjustmentsMade);
+				strText.AppendFormat(L"\nSync adjust  : %d | # of adjustments: %u", m_pGenlock->adjDelta, m_pGenlock->clockAdjustmentsMade);
 			}
 		}
 
@@ -2454,14 +2454,13 @@ STDMETHODIMP CSyncAP::IsRateSupported(BOOL fThin, float flRate, float *pflNeares
 	// pfNearestSupportedRate can be nullptr.
 	CAutoLock lock(this);
 	HRESULT hr = S_OK;
-	float   fMaxRate = 0.0f;
-	float   fNearestRate = flRate;   // Default.
 
 	CheckPointer (pflNearestSupportedRate, E_POINTER);
 	CHECK_HR(CheckShutdown());
 
 	// Find the maximum forward rate.
-	fMaxRate = GetMaxRate(fThin);
+	const float fMaxRate = GetMaxRate(fThin);
+	float fNearestRate = flRate; // Default.
 
 	if (fabsf(flRate) > fMaxRate) {
 		// The (absolute) requested rate exceeds the maximum rate.
@@ -2474,10 +2473,10 @@ STDMETHODIMP CSyncAP::IsRateSupported(BOOL fThin, float flRate, float *pflNeares
 			fNearestRate = -fNearestRate;
 		}
 	}
+
 	// Return the nearest supported rate if the caller requested it.
-	if (pflNearestSupportedRate != nullptr) {
-		*pflNearestSupportedRate = fNearestRate;
-	}
+	*pflNearestSupportedRate = fNearestRate;
+
 	return hr;
 }
 
@@ -3022,12 +3021,12 @@ STDMETHODIMP CSyncAP::GetCurrentImage(BITMAPINFOHEADER *pBih, BYTE **pDib, DWORD
 		|| FAILED(hr = m_pDevice9Ex->CreateRenderTarget(width, height, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pDestSurface, nullptr))
 		|| (FAILED(hr = m_pDevice9Ex->StretchRect(pBackBuffer, m_windowRect, pDestSurface, nullptr, D3DTEXF_NONE)))
 		|| (FAILED(hr = pDestSurface->LockRect(&r, nullptr, D3DLOCK_READONLY)))) {
-		DLog(L"CSyncAP::GetCurrentImage filed : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9).GetString());
+		DLog(L"CSyncAP::GetCurrentImage filed : %s", GetWindowsErrorMessage(hr, m_hD3D9).GetString());
 		CoTaskMemFree(p);
 		return hr;
 	}
 
-	RetrieveBitmapData(width, height, 32, p ? (BYTE*)p : (BYTE*)(pBih + 1), (BYTE*)r.pBits, r.Pitch);
+	RetrieveBitmapData(width, height, 32, p, (BYTE*)r.pBits, r.Pitch);
 
 	pDestSurface->UnlockRect();
 

@@ -89,7 +89,7 @@ namespace GothSync
 	protected:
 		static const int MAX_PICTURE_SLOTS = RS_EVRBUFFERS_MAX + 2; // Last 2 for pixels shader!
 
-		HMODULE m_hD3D9;
+		HMODULE m_hD3D9 = nullptr;
 		HRESULT (__stdcall * m_pfDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**) = nullptr;
 
 		CCritSec m_allocatorLock;
