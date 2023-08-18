@@ -38,11 +38,11 @@ class CBaseSplitterFile
 	__int64 m_available       = 0;
 	bool    m_bConnectionLost = false;
 
-	std::unique_ptr<BYTE> m_pCache;
+	std::unique_ptr<BYTE[]> m_pCache;
 	__int64 m_cachepos        = 0;
 	int     m_cachelen        = 0;
 	int     m_cachetotal      = 0;
-	std::unique_ptr<BYTE> m_pCachePrevious;
+	std::unique_ptr<BYTE[]> m_pCachePrevious;
 	__int64 m_cacheposPrevious   = 0;
 	int     m_cachelenPrevious   = 0;
 	int     m_cachetotalPrevious = 0;
