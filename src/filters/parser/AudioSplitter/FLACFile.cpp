@@ -247,7 +247,11 @@ void CFLACFile::UpdateFromMetadata(void* pBuffer)
 			CString VorbisTag = AltUTF8ToWStr((LPCSTR)vc.comments[i].entry);
 			if (VorbisTag.GetLength() > 0) {
 				if (ParseVorbisTag(L"artist", VorbisTag, TagValue)) {
-					m_info.artist = TagValue;
+					if (m_info.artist.IsEmpty()) {
+						m_info.artist = TagValue;
+					} else {
+						m_info.artist += L" / " + TagValue;
+					}
 				} else if (ParseVorbisTag(L"title", VorbisTag, TagValue)) {
 					m_info.title = TagValue;
 				} else if (ParseVorbisTag(L"description", VorbisTag, TagValue)) {
