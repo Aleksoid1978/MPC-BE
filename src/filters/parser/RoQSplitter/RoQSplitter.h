@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -62,8 +62,6 @@ public:
 class __declspec(uuid("FBEFC5EC-ABA0-4E6C-ACA3-D05FDFEFB853"))
 CRoQVideoDecoder : public CTransformFilter
 {
-	CCritSec m_csReceive;
-
 	REFERENCE_TIME m_rtStart = 0;
 
 	BYTE* m_y[2] = { 0 };

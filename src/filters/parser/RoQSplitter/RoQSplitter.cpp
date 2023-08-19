@@ -284,7 +284,7 @@ void CRoQSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	else
 	{
 		m_indexpos = m_index.cend();
-		while(m_indexpos != m_index.cbegin() && (*m_indexpos--).rtv > rt);
+		while(m_indexpos != m_index.cbegin() && (--m_indexpos)->rtv > rt);
 	}
 }
 
