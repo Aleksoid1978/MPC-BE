@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -68,8 +68,6 @@ protected:
 	bool m_bSendMediaType = false;
 
 	long m_cBuffers;
-
-	CCritSec m_csReceive;
 
 	HRESULT Receive(IMediaSample* pIn);
 	HRESULT GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, REFERENCE_TIME AvgTimePerFrame = 0, DXVA2_ExtendedFormat* dxvaExtFormat = nullptr);
