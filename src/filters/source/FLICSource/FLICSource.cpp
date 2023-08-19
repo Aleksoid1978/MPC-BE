@@ -155,7 +155,6 @@ STDMETHODIMP CFLICSource::QueryFilterInfo(FILTER_INFO* pInfo)
 CFLICStream::CFLICStream(const WCHAR* wfn, CFLICSource* pParent, HRESULT* phr)
 	: CSourceStream(L"FLICStream", phr, pParent, L"Output")
 	, CSourceSeeking(L"FLICStream", (IPin*)this, phr, &m_cSharedState)
-	, m_bDiscontinuity(FALSE), m_bFlushing(FALSE)
 {
 	CAutoLock cAutoLock(&m_cSharedState);
 

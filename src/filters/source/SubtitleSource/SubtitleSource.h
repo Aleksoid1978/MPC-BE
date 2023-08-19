@@ -59,9 +59,10 @@ class CSubtitleStream
 {
 	CCritSec m_cSharedState;
 
-	int m_nPosition;
+	int m_nPosition = 0;
 
-	BOOL m_bDiscontinuity, m_bFlushing;
+	BOOL m_bDiscontinuity = FALSE;
+	BOOL m_bFlushing = FALSE;
 
 	HRESULT OnThreadStartPlay();
 	HRESULT OnThreadCreate();

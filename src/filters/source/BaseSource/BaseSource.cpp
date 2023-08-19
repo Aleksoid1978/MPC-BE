@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,7 +33,6 @@
 CBaseStream::CBaseStream(LPCWSTR name, CSource* pParent, HRESULT* phr)
 	: CSourceStream(name, phr, pParent, L"Output")
 	, CSourceSeeking(name, (IPin*)this, phr, &m_cSharedState)
-	, m_bDiscontinuity(FALSE), m_bFlushing(FALSE)
 {
 	CAutoLock cAutoLock(&m_cSharedState);
 

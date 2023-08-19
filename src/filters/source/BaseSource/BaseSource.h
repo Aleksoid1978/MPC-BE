@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -100,7 +100,8 @@ protected:
 	REFERENCE_TIME m_AvgTimePerFrame;
 	REFERENCE_TIME m_rtSampleTime, m_rtPosition;
 
-	BOOL m_bDiscontinuity, m_bFlushing;
+	BOOL m_bDiscontinuity = FALSE;
+	BOOL m_bFlushing = FALSE;
 
 	HRESULT OnThreadStartPlay();
 	HRESULT OnThreadCreate();

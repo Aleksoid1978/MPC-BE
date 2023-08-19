@@ -222,8 +222,6 @@ STDMETHODIMP CSubtitleSource::QueryFilterInfo(FILTER_INFO* pInfo)
 CSubtitleStream::CSubtitleStream(const WCHAR* wfn, CSubtitleSource* pParent, HRESULT* phr)
 	: CSourceStream(L"SubtitleStream", phr, pParent, L"Output")
 	, CSourceSeeking(L"SubtitleStream", (IPin*)this, phr, &m_cSharedState)
-	, m_bDiscontinuity(FALSE), m_bFlushing(FALSE)
-	, m_nPosition(0)
 	, m_rts(nullptr)
 {
 	CAutoLock cAutoLock(&m_cSharedState);
