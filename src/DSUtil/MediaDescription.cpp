@@ -57,17 +57,17 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 		BOOL bAdd = FALSE;
 
 		if (pmt->formattype == FORMAT_VideoInfo) {
-			pVideoInfo = GetFormatHelper(pVideoInfo, pmt);
+			pVideoInfo = GetFormatHelper<VIDEOINFOHEADER>(pmt);
 
 		} else if (pmt->formattype == FORMAT_MPEGVideo) {
 			Infos.emplace_back(L"MPEG");
 
-			const MPEG1VIDEOINFO *pInfo = GetFormatHelper(pInfo, pmt);
+			const MPEG1VIDEOINFO *pInfo = GetFormatHelper<MPEG1VIDEOINFO>(pmt);
 			pVideoInfo = &pInfo->hdr;
 
 			bAdd = TRUE;
 		} else if (pmt->formattype == FORMAT_MPEG2_VIDEO) {
-			const MPEG2VIDEOINFO *pInfo = GetFormatHelper(pInfo, pmt);
+			const MPEG2VIDEOINFO *pInfo = GetFormatHelper<MPEG2VIDEOINFO>(pmt);
 			pVideoInfo2 = &pInfo->hdr;
 
 			bool bIsAVC		= false;
@@ -164,8 +164,7 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 				}
 			}
 		} else if (pmt->formattype == FORMAT_VIDEOINFO2) {
-			const VIDEOINFOHEADER2 *pInfo = GetFormatHelper(pInfo, pmt);
-			pVideoInfo2 = pInfo;
+			pVideoInfo2 = GetFormatHelper<VIDEOINFOHEADER2>(pmt);
 		}
 
 		if (!bAdd) {
@@ -203,12 +202,12 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 	}
 	else if (pmt->majortype == MEDIATYPE_Audio) {
 		if (pmt->formattype == FORMAT_WaveFormatEx) {
-			const WAVEFORMATEX *pInfo = GetFormatHelper(pInfo, pmt);
+			const WAVEFORMATEX *pInfo = GetFormatHelper<WAVEFORMATEX>(pmt);
 
 			if (pmt->subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
 				Infos.emplace_back(L"DVD LPCM");
 			} else if (pmt->subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
-				const WAVEFORMATEX_HDMV_LPCM *pInfoHDMV = GetFormatHelper(pInfoHDMV, pmt);
+				const WAVEFORMATEX_HDMV_LPCM *pInfoHDMV = GetFormatHelper<WAVEFORMATEX_HDMV_LPCM>(pmt);
 				UNREFERENCED_PARAMETER(pInfoHDMV);
 				Infos.emplace_back(L"HDMV LPCM");
 			}
@@ -224,7 +223,7 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 				Infos.emplace_back(codecName);
 			} else {
 				if (pInfo->wFormatTag == WAVE_FORMAT_MPEG && pmt->cbFormat >= sizeof(MPEG1WAVEFORMAT)) {
-					const MPEG1WAVEFORMAT* pInfoMPEG1 = GetFormatHelper(pInfoMPEG1, pmt);
+					const MPEG1WAVEFORMAT* pInfoMPEG1 = GetFormatHelper<MPEG1WAVEFORMAT>(pmt);
 
 					int layer = GetHighestBitSet32(pInfoMPEG1->fwHeadLayer) + 1;
 					Infos.emplace_back(FormatString(L"MPEG1 - Layer %d", layer));
@@ -272,7 +271,7 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 				Infos.emplace_back(FormatBitrate(pInfo->nAvgBytesPerSec * 8));
 			}
 		} else if (pmt->formattype == FORMAT_VorbisFormat) {
-			const VORBISFORMAT *pInfo = GetFormatHelper(pInfo, pmt);
+			const VORBISFORMAT *pInfo = GetFormatHelper<VORBISFORMAT>(pmt);
 
 			Infos.emplace_back(CMediaTypeEx::GetAudioCodecName(pmt->subtype, 0));
 
@@ -288,7 +287,7 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 				Infos.emplace_back(FormatBitrate(pInfo->nAvgBitsPerSec * 8));
 			}
 		} else if (pmt->formattype == FORMAT_VorbisFormat2) {
-			const VORBISFORMAT2 *pInfo = GetFormatHelper(pInfo, pmt);
+			const VORBISFORMAT2 *pInfo = GetFormatHelper<VORBISFORMAT2>(pmt);
 
 			Infos.emplace_back(CMediaTypeEx::GetAudioCodecName(pmt->subtype, 0));
 

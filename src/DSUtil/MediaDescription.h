@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -54,11 +54,10 @@ static const WCHAR* MPEG2_Level[] =
 
 //
 template <typename T>
-static T GetFormatHelper(T &_pInfo, const CMediaType *_pFormat)
+static T* GetFormatHelper(const CMediaType* _pFormat)
 {
-	ASSERT(_pFormat->cbFormat >= sizeof(*_pInfo));
-	_pInfo = (T)_pFormat->pbFormat;
-	return _pInfo;
+	ASSERT(_pFormat->cbFormat >= sizeof(T));
+	return reinterpret_cast <T*>(_pFormat->pbFormat);
 }
 
 static int GetHighestBitSet32(unsigned long _Value)

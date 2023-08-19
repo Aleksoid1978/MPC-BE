@@ -66,7 +66,7 @@ HRESULT CBaseSplitterParserOutputPin::Flush()
 	m_ParseContext.state64          = 0;
 
 	if (m_mt.majortype == MEDIATYPE_Audio && m_mt.pbFormat) {
-		const WAVEFORMATEX *wfe = GetFormatHelper(wfe, &m_mt);
+		const WAVEFORMATEX *wfe = GetFormatHelper<WAVEFORMATEX>(&m_mt);
 		m_nChannels             = wfe->nChannels;
 		m_nSamplesPerSec        = wfe->nSamplesPerSec;
 		m_wBitsPerSample        = wfe->wBitsPerSample;

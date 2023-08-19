@@ -166,7 +166,7 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 		const VIDEOINFOHEADER2 *pVideoInfo2 = nullptr;
 
 		if (pMediaType->formattype == FORMAT_VideoInfo) {
-			pVideoInfo = GetFormatHelper(pVideoInfo, pMediaType);
+			pVideoInfo = GetFormatHelper<VIDEOINFOHEADER>(pMediaType);
 
 			if (pVideoInfo->bmiHeader.biCompression == FCC('drac')) {
 				Infos.emplace_back(L"DIRAC");
@@ -175,12 +175,12 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 		} else if (pMediaType->formattype == FORMAT_MPEGVideo) {
 			Infos.emplace_back(L"MPEG");
 
-			const MPEG1VIDEOINFO *pInfo = GetFormatHelper(pInfo, pMediaType);
+			const MPEG1VIDEOINFO *pInfo = GetFormatHelper<MPEG1VIDEOINFO>(pMediaType);
 
 			pVideoInfo = &pInfo->hdr;
 
 		} else if (pMediaType->formattype == FORMAT_MPEG2_VIDEO) {
-			const MPEG2VIDEOINFO *pInfo = GetFormatHelper(pInfo, pMediaType);
+			const MPEG2VIDEOINFO *pInfo = GetFormatHelper<MPEG2VIDEOINFO>(pMediaType);
 
 			pVideoInfo2 = &pInfo->hdr;
 
@@ -281,10 +281,9 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 				}
 			}
 		} else if (pMediaType->formattype == FORMAT_VIDEOINFO2) {
-			const VIDEOINFOHEADER2 *pInfo = GetFormatHelper(pInfo, pMediaType);
-			pVideoInfo2 = pInfo;
+			pVideoInfo2 = GetFormatHelper<VIDEOINFOHEADER2>(pMediaType);
 
-			DWORD CodecType = pInfo->bmiHeader.biCompression;
+			DWORD CodecType = pVideoInfo2->bmiHeader.biCompression;
 			if (CodecType == FCC('WVC1')) {
 				Infos.emplace_back(L"VC-1");
 			} else if (CodecType) {
@@ -335,12 +334,12 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 		}
 
 		if (pMediaType->formattype == FORMAT_WaveFormatEx) {
-			const WAVEFORMATEX *pInfo = GetFormatHelper(pInfo, pMediaType);
+			const WAVEFORMATEX *pInfo = GetFormatHelper<WAVEFORMATEX>(pMediaType);
 
 			if (pMediaType->subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
 				Infos.emplace_back(L"DVD LPCM");
 			} else if (pMediaType->subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
-				const WAVEFORMATEX_HDMV_LPCM *pInfoHDMV = GetFormatHelper(pInfoHDMV, pMediaType);
+				const WAVEFORMATEX_HDMV_LPCM *pInfoHDMV = GetFormatHelper<WAVEFORMATEX_HDMV_LPCM>(pMediaType);
 				UNREFERENCED_PARAMETER(pInfoHDMV);
 				Infos.emplace_back(L"HDMV LPCM");
 			}
@@ -407,7 +406,7 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 					}
 					break;
 					case WAVE_FORMAT_MPEG: {
-						const MPEG1WAVEFORMAT* pInfoMPEG1 = GetFormatHelper(pInfoMPEG1, pMediaType);
+						const MPEG1WAVEFORMAT* pInfoMPEG1 = GetFormatHelper<MPEG1WAVEFORMAT>(pMediaType);
 
 						int layer = GetHighestBitSet32(pInfoMPEG1->fwHeadLayer) + 1;
 						Infos.emplace_back(FormatString(L"MPEG1 - Layer %d", layer));
@@ -483,7 +482,7 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 		if (!language.IsEmpty()) {
 			Infos.emplace_front(language);
 		} else if (pMediaType->cbFormat == sizeof(SUBTITLEINFO)) {
-			const SUBTITLEINFO *pInfo = GetFormatHelper(pInfo, pMediaType);
+			const SUBTITLEINFO *pInfo = GetFormatHelper<SUBTITLEINFO>(pMediaType);
 			const CString language = ISO_639_codes_to_language(pInfo->IsoLang);
 			if (!language.IsEmpty()) {
 				Infos.emplace_front(language);
