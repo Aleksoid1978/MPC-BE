@@ -1,5 +1,5 @@
 /*
- * (C) 2020 see Authors.txt
+ * (C) 2020-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,7 +39,6 @@ CMPC7File::CMPC7File()
 
 CMPC7File::~CMPC7File()
 {
-	SAFE_DELETE(m_pID3Tag);
 }
 
 void CMPC7File::SetProperties(IBaseFilter* pBF)

@@ -1,5 +1,5 @@
 /*
- * (C) 2020 see Authors.txt
+ * (C) 2020-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,8 +33,6 @@ class CMPC7File : public CAudioFile
 
 	uint32_t m_frames_cnt = 0;
 	uint32_t m_currentframe = 0;
-
-	CID3Tag* m_pID3Tag = nullptr;
 
 public:
 	CMPC7File();
