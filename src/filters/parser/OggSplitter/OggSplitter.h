@@ -34,7 +34,7 @@ class COggSplitterOutputPin : public CBaseSplitterOutputPin
 protected:
 	std::map<CStringW, CStringW> m_pComments;
 
-	CPacketQueue m_queue;
+	CPacketQueue m_packetQueue;
 	std::vector<BYTE> m_lastPacketData;
 	DWORD m_lastseqnum;
 	REFERENCE_TIME m_rtLast;

@@ -798,7 +798,7 @@ CStringW COggSplitterOutputPin::GetComment(CStringW key)
 
 void COggSplitterOutputPin::ResetState(DWORD seqnum/* = DWORD_MAX*/)
 {
-	m_queue.RemoveAll();
+	m_packetQueue.RemoveAll();
 	m_lastPacketData.clear();
 	m_lastseqnum = seqnum;
 }
@@ -811,7 +811,7 @@ void COggSplitterOutputPin::HandlePacket(DWORD TrackNumber, BYTE* pData, int len
 		if (S_OK == UnpackPacket(p, pData, len)) {
 			m_rtLast = p->rtStop;
 
-			m_queue.Add(p);
+			m_packetQueue.Add(p);
 		}
 	}
 }
@@ -876,7 +876,7 @@ std::unique_ptr<CPacket> COggSplitterOutputPin::GetPacket()
 {
 	std::unique_ptr<CPacket> p;
 	size_t count;
-	m_queue.RemoveSafe(p, count);
+	m_packetQueue.RemoveSafe(p, count);
 	return p;
 }
 
@@ -955,8 +955,8 @@ HRESULT COggVorbisOutputPin::UnpackInitPage(OggPage& page)
 {
 	HRESULT hr = __super::UnpackPage(page);
 
-	while (m_queue.GetCount()) {
-		std::unique_ptr<CPacket> p = m_queue.Remove();
+	while (m_packetQueue.GetCount()) {
+		std::unique_ptr<CPacket> p = m_packetQueue.Remove();
 
 		if (p->size() >= 6 && p->at(0) == 0x05) {
 			// yeah, right, we are going to be parsing this backwards! :P
@@ -1489,8 +1489,8 @@ HRESULT COggTheoraOutputPin::UnpackInitPage(OggPage& page)
 {
 	HRESULT hr = __super::UnpackPage(page);
 
-	while (m_queue.GetCount()) {
-		std::unique_ptr<CPacket> p = m_queue.Remove();
+	while (m_packetQueue.GetCount()) {
+		std::unique_ptr<CPacket> p = m_packetQueue.Remove();
 
 		if (p->size() == 0) {
 			continue;
@@ -1585,8 +1585,8 @@ HRESULT COggDiracOutputPin::UnpackInitPage(OggPage& page)
 {
 	HRESULT hr = __super::UnpackPage(page);
 
-	while (m_queue.GetCount() && !m_IsInitialized) {
-		std::unique_ptr<CPacket> p = m_queue.Remove();
+	while (m_packetQueue.GetCount() && !m_IsInitialized) {
+		std::unique_ptr<CPacket> p = m_packetQueue.Remove();
 		if (p->size() > 13) {
 			BYTE* buf = p->data();
 
@@ -1595,7 +1595,7 @@ HRESULT COggDiracOutputPin::UnpackInitPage(OggPage& page)
 			}
 		}
 	}
-	m_queue.RemoveAll();
+	m_packetQueue.RemoveAll();
 
 	return hr;
 }
