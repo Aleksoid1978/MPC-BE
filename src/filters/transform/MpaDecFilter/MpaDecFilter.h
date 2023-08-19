@@ -68,7 +68,6 @@ class __declspec(uuid("3D446B6F-71DE-4437-BE15-8CE47174340F"))
 
 	bool            m_bSPDIF[etcount] = {};
 
-	CCritSec        m_csReceive;
 	CPaddedBuffer   m_buff;
 	CPaddedBuffer   m_buffRA;
 
