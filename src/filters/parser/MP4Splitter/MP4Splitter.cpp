@@ -2152,17 +2152,17 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			AP4_Sample sample;
 			if (AP4_SUCCEEDED(track->GetSample(0, sample))) {
 				const auto rt = RescaleI64x32(sample.GetCts(), UNITS, track->GetMediaTimeScale());
-				m_rtOffset = std::min(m_rtOffset, std::max(rt, 0i64));
+				m_rtMovieOffset = std::min(m_rtMovieOffset, std::max(rt, 0i64));
 			}
 		}
-		if (m_rtOffset == MAXLONGLONG) {
-			m_rtOffset = 0;
+		if (m_rtMovieOffset == MAXLONGLONG) {
+			m_rtMovieOffset = 0;
 		}
 
 		if (movie->HasFragmentsIndex()) {
 			const AP4_Array<AP4_IndexTableEntry>& entries = movie->GetFragmentsIndexEntries();
 			for (AP4_Cardinal i = 0; i < entries.ItemCount(); ++i) {
-				const SyncPoint sp = { entries[i].m_rt - m_rtOffset, __int64(entries[i].m_offset) };
+				const SyncPoint sp = { entries[i].m_rt - m_rtMovieOffset, __int64(entries[i].m_offset) };
 				m_sps.push_back(sp);
 			}
 		} else {
@@ -2175,7 +2175,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				const AP4_Array<AP4_IndexTableEntry>& entries = track->GetIndexEntries();
 				for (AP4_Cardinal i = 0; i < entries.ItemCount(); ++i) {
-					const SyncPoint sp = { entries[i].m_rt - m_rtOffset, __int64(entries[i].m_offset) };
+					const SyncPoint sp = { entries[i].m_rt - m_rtMovieOffset, __int64(entries[i].m_offset) };
 					m_sps.push_back(sp);
 				}
 
@@ -2234,7 +2234,7 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		AP4_Track* track = movie->GetTrack(id);
 
 		if (track->HasIndex() && track->GetIndexEntries().ItemCount()) {
-			if (AP4_FAILED(track->GetIndexForRefTime(rt + m_rtOffset, tp.index, tp.ts, tp.offset))) {
+			if (AP4_FAILED(track->GetIndexForRefTime(rt + m_rtMovieOffset, tp.index, tp.ts, tp.offset))) {
 				continue;
 			}
 		} else {
@@ -2373,8 +2373,8 @@ bool CMP4SplitterFilter::DemuxLoop()
 				p->SetData(data.GetData(), data.GetDataSize());
 			}
 
-			p->rtStart -= m_rtOffset;
-			p->rtStop -= m_rtOffset;
+			p->rtStart -= m_rtMovieOffset;
+			p->rtStop -= m_rtMovieOffset;
 			hr = DeliverPacket(std::move(p));
 		}
 

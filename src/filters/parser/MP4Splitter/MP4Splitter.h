@@ -58,7 +58,7 @@ class __declspec(uuid("61F47056-E400-43d3-AF1E-AB7DFFD4C4AD"))
 
 	int m_pix_fmt = -1;
 
-	REFERENCE_TIME m_rtOffset = MAXLONGLONG;
+	REFERENCE_TIME m_rtMovieOffset = MAXLONGLONG;
 
 protected:
 	std::unique_ptr<CMP4SplitterFile> m_pFile;
