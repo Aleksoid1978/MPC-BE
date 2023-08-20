@@ -1324,17 +1324,11 @@ STDMETHODIMP CMpeg2DecInputPin::QuerySupported(REFGUID PropSet, ULONG Id, ULONG*
 				*pTypeSupport = KSPROPERTY_SUPPORT_GET | KSPROPERTY_SUPPORT_SET;
 				break;
 			case AM_RATE_MaxFullDataRate:
-				*pTypeSupport = KSPROPERTY_SUPPORT_GET;
-				break;
-			case AM_RATE_UseRateVersion:
-				*pTypeSupport = KSPROPERTY_SUPPORT_SET;
-				break;
 			case AM_RATE_QueryFullFrameRate:
-				*pTypeSupport = KSPROPERTY_SUPPORT_GET;
-				break;
 			case AM_RATE_QueryLastRateSegPTS:
 				*pTypeSupport = KSPROPERTY_SUPPORT_GET;
 				break;
+			case AM_RATE_UseRateVersion:
 			case AM_RATE_CorrectTS:
 				*pTypeSupport = KSPROPERTY_SUPPORT_SET;
 				break;
@@ -1349,14 +1343,8 @@ STDMETHODIMP CMpeg2DecInputPin::QuerySupported(REFGUID PropSet, ULONG Id, ULONG*
 			*pTypeSupport = KSPROPERTY_SUPPORT_SET;
 			break;
 		case AM_RATE_FullDataRateMax:
-			*pTypeSupport = KSPROPERTY_SUPPORT_GET;
-			break;
 		case AM_RATE_ReverseDecode:
-			*pTypeSupport = KSPROPERTY_SUPPORT_GET;
-			break;
 		case AM_RATE_DecoderPosition:
-			*pTypeSupport = KSPROPERTY_SUPPORT_GET;
-			break;
 		case AM_RATE_DecoderVersion:
 			*pTypeSupport = KSPROPERTY_SUPPORT_GET;
 			break;
@@ -1621,11 +1609,7 @@ STDMETHODIMP CSubpicInputPin::QuerySupported(REFGUID PropSet, ULONG Id, ULONG* p
 
 	switch (Id) {
 		case AM_PROPERTY_DVDSUBPIC_PALETTE:
-			*pTypeSupport = KSPROPERTY_SUPPORT_SET;
-			break;
 		case AM_PROPERTY_DVDSUBPIC_HLI:
-			*pTypeSupport = KSPROPERTY_SUPPORT_SET;
-			break;
 		case AM_PROPERTY_DVDSUBPIC_COMPOSIT_ON:
 			*pTypeSupport = KSPROPERTY_SUPPORT_SET;
 			break;
