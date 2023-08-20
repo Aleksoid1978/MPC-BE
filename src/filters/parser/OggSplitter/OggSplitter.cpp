@@ -436,7 +436,7 @@ start:
 		m_rtDuration -= rtMin;
 		m_rtDuration = std::max(0LL, m_rtDuration);
 
-		m_rtOffset = rtMin;
+		m_rtOggOffset = rtMin;
 	}
 
 	m_pFile->Seek(start_pos);
@@ -605,7 +605,7 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	if (rt <= 0) {
 		m_pFile->Seek(0);
 	} else if (m_rtDuration > 0) {
-		rt += m_rtOffset;
+		rt += m_rtOggOffset;
 
 		const __int64 len = m_pFile->GetLength();
 		__int64 seekpos   = CalcPos(rt);
@@ -841,7 +841,7 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 
 		if (len < 255) {
 			if (last_segment == segment && page.m_hdr.granule_position != -1) {
-				const REFERENCE_TIME rt = GetRefTime(page.m_hdr.granule_position) - m_pFilter->m_rtOffset;
+				const REFERENCE_TIME rt = GetRefTime(page.m_hdr.granule_position) - m_pFilter->m_rtOggOffset;
 				if (rt >= 0) {
 					m_rtLast = rt;
 				}

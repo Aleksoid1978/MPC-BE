@@ -234,7 +234,7 @@ protected:
 	DWORD m_bitstream_serial_number_Video = DWORD_MAX;
 
 public:
-	REFERENCE_TIME m_rtOffset = 0;
+	REFERENCE_TIME m_rtOggOffset = 0;
 
 	COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
 	virtual ~COggSplitterFilter();
