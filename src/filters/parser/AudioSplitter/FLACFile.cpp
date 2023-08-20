@@ -250,7 +250,7 @@ void CFLACFile::UpdateFromMetadata(void* pBuffer)
 					if (m_info.artist.IsEmpty()) {
 						m_info.artist = TagValue;
 					} else {
-						m_info.artist += L" / " + TagValue;
+						m_info.artist += L", " + TagValue;
 					}
 				} else if (ParseVorbisTag(L"title", VorbisTag, TagValue)) {
 					m_info.title = TagValue;
