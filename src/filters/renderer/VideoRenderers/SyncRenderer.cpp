@@ -2644,7 +2644,6 @@ HRESULT CSyncAP::SetMediaType(IMFMediaType* pType)
 {
 	HRESULT hr;
 	AM_MEDIA_TYPE* pAMMedia = nullptr;
-	CString strTemp;
 
 	CheckPointer(pType, E_POINTER);
 	CHECK_HR(pType->GetRepresentation(FORMAT_VideoInfo2, (void**)&pAMMedia));

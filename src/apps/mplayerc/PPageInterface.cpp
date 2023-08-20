@@ -176,8 +176,6 @@ BOOL CPPageInterface::OnInitDialog()
 	}
 	m_FontType.SetCurSel(iSel);
 
-	CString str;
-
 	m_edOSDFontSize.SetRange(8, 40);
 	m_spOSDFontSize.SetRange(8, 40);
 	m_edOSDFontSize = s.nOSDSize;

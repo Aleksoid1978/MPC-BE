@@ -289,7 +289,6 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 
 		DHAVHeader hdr;
-		std::vector<BYTE> pData;
 		while (DHAVReadHeader(hdr, true) && m_pFile->GetPos() <= MEGABYTE) {
 			if (hdr.type == 0xfd) {
 				if (hdr.video.codec && !bVideoFound) {

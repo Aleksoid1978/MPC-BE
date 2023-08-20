@@ -2023,7 +2023,6 @@ void CPlayerPlaylistBar::Remove(const std::vector<int>& items, const bool bDelet
 			fns.sort();
 			fns.unique();
 
-			CString filesToDelete;
 			for (const auto& fn : fns) {
 				FileOperationDelete(fn);
 			}
@@ -4677,7 +4676,6 @@ void CPlayerPlaylistBar::TSaveSettings()
 		const auto last = m_tabs.size() - 1;
 		for (size_t i = 0; i <= last; i++) {
 			const auto& tab = m_tabs[i];
-			CString s;
 			str.AppendFormat(L"%d;%s;%u%s%s", tab.type, RemoveFileExt(tab.mpcpl_fn.GetString()).GetString(), tab.sort, i > 0 ? CString(L";" + tab.name).GetString() : L"", i < last ? L"|" : L"");
 		}
 	}

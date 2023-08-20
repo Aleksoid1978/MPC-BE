@@ -749,7 +749,7 @@ BOOL CPPageFormats::OnInitDialog()
 
 BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool bRegister)
 {
-	CString extoldreg, extOldIcon;
+	CString extoldreg;
 	CRegKey key;
 	HRESULT hr = S_OK;
 	WCHAR   buff[MAX_PATH] = {};

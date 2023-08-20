@@ -103,7 +103,6 @@ bool CMpaDecSettingsWnd::OnActivate()
 	const int h25 = ScaleY(25);
 	DWORD dwStyle = WS_VISIBLE|WS_CHILD|WS_TABSTOP;
 	CPoint p(10, 10);
-	CRect r;
 
 #ifdef REGISTER_FILTER
 	m_outfmt_group.Create(ResStr(IDS_MPADEC_SAMPLE_FMT), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(ScaleX(230), h20 + h20)), this, (UINT)IDC_STATIC);
