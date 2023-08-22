@@ -246,7 +246,7 @@ HRESULT WicDecodeImage(IWICImagingFactory* pWICFactory, IWICBitmap** ppBitmap, c
 	return hr;
 }
 
-HRESULT WicLoadImage(IWICBitmap** ppBitmap, const bool pma, const std::wstring_view& filename)
+HRESULT WicLoadImage(IWICBitmap** ppBitmap, const bool pma, const std::wstring_view filename)
 {
 	IWICImagingFactory* pWICFactory = CWICImagingFactory::GetInstance().GetFactory();
 	if (!pWICFactory) {
@@ -435,7 +435,7 @@ HRESULT WicSaveImage(
 	const UINT width, const UINT height,
 	const WICPixelFormatGUID pixelFormat,
 	const int quality,
-	const std::wstring_view& filename,
+	const std::wstring_view filename,
 	BYTE* output, size_t& outLen)
 {
 	IWICImagingFactory* pWICFactory = CWICImagingFactory::GetInstance().GetFactory();

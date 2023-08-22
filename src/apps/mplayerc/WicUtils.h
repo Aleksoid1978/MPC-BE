@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2022 see Authors.txt
+ * (C) 2020-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -64,7 +64,7 @@ HRESULT WicGetCodecs(std::vector<WICCodecInfo_t>& codecs, bool bEncoder);
 
 HRESULT WicCheckComponent(const GUID guid);
 
-HRESULT WicLoadImage(IWICBitmap** ppBitmap, const bool pma, const std::wstring_view& filename);
+HRESULT WicLoadImage(IWICBitmap** ppBitmap, const bool pma, const std::wstring_view filename);
 HRESULT WicLoadImage(IWICBitmap** ppBitmap, const bool pma, BYTE* input, const size_t size);
 HRESULT WicLoadImage(IWICBitmap** ppBitmap, const bool pma, IStream* pIStream);
 
@@ -80,6 +80,6 @@ HRESULT WicSaveImage(
 	const UINT width, const UINT height,
 	const WICPixelFormatGUID pixelFormat,
 	const int quality, // for JPEG
-	const std::wstring_view& filename,
+	const std::wstring_view filename,
 	BYTE* output, size_t& outLen
 );
