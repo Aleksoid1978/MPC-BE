@@ -160,7 +160,7 @@ BEGIN
     CONTROL         "Int24",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,52,218,32,9
     CONTROL         "Int32",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,94,218,32,9
     CONTROL         "Float",IDC_CHECK12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,137,218,32,9
-    CONTROL         "오디오 시간 조절(밀리 초) :",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,240,115,9
+    CONTROL         "오디오 시간 조절(밀리초) :",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,240,115,9
     EDITTEXT        IDC_EDIT2,129,238,46,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,174,238,12,13
     PUSHBUTTON      "기본값",IDC_BUTTON3,230,237,56,14
@@ -223,7 +223,7 @@ BEGIN
     CONTROL         "<a>https://github.com/Aleksoid1978/MPC-BE</a>",IDC_GITHUB_LINK,
                     "SysLink",WS_TABSTOP,30,126,200,8
     LTEXT           "이 프로그램은 프리웨어이며 GNU GPL 라이선스로 배포됩니다.",IDC_STATIC,30,138,200,18
-    LTEXT           "한글화 : Hack茶ん (https://blog.naver.com/jhacker)",IDC_STATIC,30,161,200,18
+    LTEXT           "한글화 : Hack茶ん <https://blog.naver.com/jhacker>",IDC_STATIC,30,161,200,18
     DEFPUSHBUTTON   "확인",IDOK,185,183,50,14,WS_GROUP
 END
 
@@ -369,7 +369,7 @@ BEGIN
     LTEXT           "%",IDC_STATIC4,196,19,8,8
     GROUPBOX        "딜레이 설정",IDC_STATIC,212,5,79,28
     EDITTEXT        IDC_EDIT4,217,17,40,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "밀리 초",IDC_STATIC,261,19,25,11
+    LTEXT           "밀리초",IDC_STATIC,261,19,25,11
     GROUPBOX        "텍스쳐 설정(파일을 다시 열어야 함)",IDC_STATIC,5,37,286,68
     LTEXT           "버퍼로 읽어올 서브화면 갯 수 :",IDC_STATIC,10,51,125,8
     EDITTEXT        IDC_EDIT1,139,49,32,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
@@ -905,7 +905,7 @@ BEGIN
     LTEXT           "우선 형식 :",IDC_STATIC2,10,30,104,8
     COMBOBOX        IDC_COMBO1,10,40,50,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO2,64,40,50,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "60 fps",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,118,42,48,10
+    CONTROL         "60fps",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,118,42,48,10
     CONTROL         "HDR",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,170,42,30,10
     LTEXT           "선호하는 오디오 트랙 언어 :",IDC_STATIC4,10,59,140,8
     COMBOBOX        IDC_COMBO5,10,70,130,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -1062,7 +1062,7 @@ IDD_PPAGEMISC DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "이동 간격(최소/중간/최대 간격을 밀리 초 단위로 입력)",IDC_STATIC,7,5,220,34
+    GROUPBOX        "이동 간격(최소/중간/최대 간격을 밀리초 단위로 입력)",IDC_STATIC,7,5,220,34
     EDITTEXT        IDC_EDIT1,15,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT2,64,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
@@ -1162,11 +1162,11 @@ BEGIN
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,123,278,1
     LTEXT           "목표 싱크 오프셋 :",IDC_STATIC3,10,129,100,8
     EDITTEXT        IDC_TARGETSYNCOFFSET,114,127,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
-    LTEXT           "밀리 초",IDC_STATIC4,158,129,24,8
+    LTEXT           "밀리초",IDC_STATIC4,158,129,24,8
     LTEXT           "한계 :",IDC_STATIC9,10,143,86,8
     LTEXT           "+/-",IDC_STATIC11,100,143,10,8
     EDITTEXT        IDC_CONTROLLIMIT,114,141,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
-    LTEXT           "밀리 초",IDC_STATIC10,158,143,24,8
+    LTEXT           "밀리초",IDC_STATIC10,158,143,24,8
     LTEXT           "현재 파일을 닫고 다시 시작해야만 설정이 적용됩니다.",IDC_STATIC12,10,162,276,18
 END
 
@@ -2615,7 +2615,7 @@ END
 
 STRINGTABLE
 BEGIN
-    ID_SHOW_MILLISECONDS    "밀리 초 표기"
+    ID_SHOW_MILLISECONDS    "밀리초 표기"
 END
 
 STRINGTABLE
@@ -2812,8 +2812,8 @@ STRINGTABLE
 BEGIN
     IDS_AG_DECREASE_RATE    "속도 감소"
     IDS_AG_RESET_RATE       "초기화"
-    IDS_AG_AUDIODELAY_PLUS  "오디오 10밀리 초 느리게"
-    IDS_AG_AUDIODELAY_MINUS "오디오 10밀리 초 빠르게"
+    IDS_AG_AUDIODELAY_PLUS  "오디오 10밀리초 느리게"
+    IDS_AG_AUDIODELAY_MINUS "오디오 10밀리초 빠르게"
     IDS_AG_JUMP_FORWARD_1   "앞으로 이동(조금)"
     IDS_AG_JUMP_BACKWARD_1  "뒤로 이동(조금)"
     IDS_AG_JUMP_FORWARD_2   "앞으로 이동(중간)"
@@ -3029,7 +3029,7 @@ BEGIN
     IDS_ADDTOPLS_FROMDIR_SIMILAR "폴더 내 유사 파일"
     IDS_ADDTOPLS_FROMDIR_ALL "폴더 내 모든 파일"
     IDS_EXCLUSIVE_FS_WARNING  "이 옵션은 티어링을 피하고자 고안되었습니다. 하지만 재생하는 동안 재생기의 메뉴나 대화 상자가 표시되는데 문제가 발생할 수 있습니다.\n\nDirect3D 전체 화면을 종료하고 재생을 멈추려면, Ctrl + C를 누르십시오.\n\n이 옵션을 활성화하시겠습니까?"
-    IDS_MAINFRM_139         "자막 지연 : %ld 밀리 초"
+    IDS_MAINFRM_139         "자막 지연 : %ld밀리초"
     IDS_AG_TITLE2           "타이틀 : %02d/%02d"
     IDS_THUMB_ROWNUMBER     "열 :"
     IDS_THUMB_COLNUMBER     "행 :"
