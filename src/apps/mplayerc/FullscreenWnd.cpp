@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,8 +30,6 @@ IMPLEMENT_DYNAMIC(CFullscreenWnd, CWnd)
 CFullscreenWnd::CFullscreenWnd(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
 	, m_hCursor(::LoadCursorW(nullptr, IDC_ARROW))
-	, m_bCursorVisible(false)
-	, m_bTrackingMouseLeave(false)
 {
 }
 

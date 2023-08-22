@@ -141,7 +141,7 @@ class CFGFilterFile : public CFGFilter
 {
 protected:
 	CString m_path;
-	HINSTANCE m_hInst;
+	HINSTANCE m_hInst = nullptr;
 
 public:
 	CFGFilterFile(const CLSID& clsid, CString path, CStringW name = L"", UINT64 merit = MERIT64_DO_USE);

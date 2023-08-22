@@ -1344,8 +1344,6 @@ void CMPlayerCApp::OnFileExit()
 // CRemoteCtrlClient
 
 CRemoteCtrlClient::CRemoteCtrlClient()
-	: m_pWnd(nullptr)
-	, m_nStatus(DISCONNECTED)
 {
 }
 

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -106,9 +106,9 @@ class CBaseGraph
 	, public IBasicAudio
 	, public IAMOpenProgress
 {
-	OAHWND m_hNotifyWnd;
-	long m_lNotifyMsg;
-	LONG_PTR m_lNotifyInstData;
+	OAHWND m_hNotifyWnd = NULL;
+	long m_lNotifyMsg = 0;
+	LONG_PTR m_lNotifyInstData = NULL;
 
 	struct GMSG {
 		long m_lEventCode;

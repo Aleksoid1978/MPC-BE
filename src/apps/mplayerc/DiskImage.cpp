@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2021 see Authors.txt
+ * (C) 2014-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,16 +30,6 @@
 #define ENABLE_WIN8VIRTUALDISK 1
 
 CDiskImage::CDiskImage()
-	: m_DriveType(NONE)
-	, m_DriveLetter(0)
-	// Windows 8 VirtualDisk
-	, m_hVirtualDiskModule(nullptr)
-	, m_OpenVirtualDiskFunc(nullptr)
-	, m_AttachVirtualDiskFunc(nullptr)
-	, m_GetVirtualDiskPhysicalPathFunc(nullptr)
-	, m_VHDHandle(INVALID_HANDLE_VALUE)
-	// DAEMON Tools Lite
-	, m_dtdrive(dt_none)
 {
 }
 

@@ -406,7 +406,6 @@ void CFGFilterRegistry::ExtractFilterData(BYTE* p, UINT len)
 CFGFilterFile::CFGFilterFile(const CLSID& clsid, CString path, CStringW name, UINT64 merit)
 	: CFGFilter(clsid, name, merit)
 	, m_path(path)
-	, m_hInst(nullptr)
 {
 }
 

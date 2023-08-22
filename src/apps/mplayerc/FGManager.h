@@ -55,7 +55,7 @@ public:
 
 private:
 	CComPtr<IUnknown> m_pUnkInner;
-	DWORD m_dwRegister;
+	DWORD m_dwRegister = 0;
 
 	CStreamPath m_streampath;
 	std::vector<std::unique_ptr<CStreamDeadEnd>> m_deadends;
@@ -122,8 +122,8 @@ protected:
 	// IGraphBuilderAudio
 	STDMETHODIMP RenderAudioFile(LPCWSTR lpcwstrFile);
 
-	BOOL m_bOnlySub;
-	BOOL m_bOnlyAudio;
+	BOOL m_bOnlySub = FALSE;
+	BOOL m_bOnlyAudio = FALSE;
 
 	//
 	HWND m_hWnd;

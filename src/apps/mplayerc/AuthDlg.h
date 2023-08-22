@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,7 +41,7 @@ public:
 	CComboBox m_usernamectrl;
 	CString m_username;
 	CString m_password;
-	BOOL m_remember;
+	BOOL m_remember = FALSE;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

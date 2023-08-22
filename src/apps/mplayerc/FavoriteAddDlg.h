@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,8 +41,8 @@ public:
 
 	CComboBox m_namectrl;
 	CString m_name;
-	BOOL m_bRememberPos;
-	BOOL m_bRelativeDrive;
+	BOOL m_bRememberPos = TRUE;
+	BOOL m_bRelativeDrive = FALSE;
 
 	BOOL m_bShowRelativeDrive;
 

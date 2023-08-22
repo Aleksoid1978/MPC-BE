@@ -138,11 +138,8 @@ public:
 
 CFGManager::CFGManager(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
 	: CUnknown(pName, pUnk)
-	, m_dwRegister(0)
 	, m_hWnd(hWnd)
 	, m_bIsPreview(IsPreview)
-	, m_bOnlySub(FALSE)
-	, m_bOnlyAudio(FALSE)
 {
 	m_pUnkInner.CoCreateInstance(CLSID_FilterGraph, GetOwner());
 	m_pFM.CoCreateInstance(CLSID_FilterMapper2);

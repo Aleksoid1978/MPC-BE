@@ -27,7 +27,6 @@
 IMPLEMENT_DYNAMIC(CAuthDlg, CDialog)
 CAuthDlg::CAuthDlg(CWnd* pParent)
 	: CDialog(CAuthDlg::IDD, pParent)
-	, m_remember(FALSE)
 {
 }
 

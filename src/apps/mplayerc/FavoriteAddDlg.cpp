@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,8 +28,6 @@ IMPLEMENT_DYNAMIC(CFavoriteAddDlg, CCmdUIDialog)
 CFavoriteAddDlg::CFavoriteAddDlg(std::list<CString>& shortnames, CString fullname, BOOL bShowRelativeDrive/* = TRUE*/, CWnd* pParent/* = nullptr*/)
 	: CCmdUIDialog(CFavoriteAddDlg::IDD, pParent)
 	, m_fullname(fullname)
-	, m_bRememberPos(TRUE)
-	, m_bRelativeDrive(FALSE)
 	, m_bShowRelativeDrive(bShowRelativeDrive)
 	, m_shortnames(shortnames)
 {

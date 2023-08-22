@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -54,17 +54,17 @@ protected:
 	virtual int CalculateButtonWidth() PURE;
 
 private:
-	int m_TopBorder;
-	int m_BottomBorder;
-	int m_LeftBorder;
-	int m_RightBorder;
+	int m_TopBorder    = 0;
+	int m_BottomBorder = 0;
+	int m_LeftBorder   = 0;
+	int m_RightBorder  = 0;
 
-	int m_ButtonWidth;
+	int m_ButtonWidth  = 1;
 
-	bool m_IsButtonPressed;
-	bool m_IsMouseActive;
+	bool m_IsButtonPressed = false;
+	bool m_IsMouseActive = false;
 
-	bool m_IsButtonHot;
+	bool m_IsButtonHot = false;
 };
 
 // CEditWithButton

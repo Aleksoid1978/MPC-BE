@@ -56,6 +56,6 @@ protected:
 
 	CMainFrame*	m_pMainFrame;
 	HCURSOR		m_hCursor;
-	bool		m_bCursorVisible;
-	bool		m_bTrackingMouseLeave;
+	bool		m_bCursorVisible = false;
+	bool		m_bTrackingMouseLeave = false;
 };

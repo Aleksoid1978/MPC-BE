@@ -32,8 +32,6 @@
 
 COpenDlg::COpenDlg(CWnd* pParent /*=nullptr*/)
 	: CResizableDialog(COpenDlg::IDD, pParent)
-	, m_bMultipleFiles(false)
-	, m_bAppendPlaylist(FALSE)
 {
 	m_hIcon = (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 }

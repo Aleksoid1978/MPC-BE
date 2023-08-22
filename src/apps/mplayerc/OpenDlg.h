@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,7 +34,7 @@ public:
 	COpenDlg(CWnd* pParent = nullptr);
 	virtual ~COpenDlg();
 
-	bool m_bMultipleFiles;
+	bool m_bMultipleFiles = false;
 	std::list<CString> m_fns;
 
 	enum { IDD = IDD_OPEN_DLG };
@@ -43,7 +43,7 @@ public:
 	CString m_path;
 	CComboBox m_mrucombo2;
 	CString m_path2;
-	BOOL m_bAppendPlaylist;
+	BOOL m_bAppendPlaylist = FALSE;
 
 	HICON m_hIcon;
 

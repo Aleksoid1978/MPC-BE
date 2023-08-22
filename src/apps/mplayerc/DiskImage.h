@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,38 +27,38 @@ class CDiskImage
 private:
 	enum DriveType {NONE, WIN8, DTLITE, VCD};
 
-	DriveType	m_DriveType;
-	WCHAR		m_DriveLetter;
+	DriveType	m_DriveType = NONE;
+	WCHAR		m_DriveLetter = 0;
 
 	// Windows 8 VirtualDisk
-	HMODULE		m_hVirtualDiskModule;
+	HMODULE		m_hVirtualDiskModule = nullptr;
 	HRESULT		(__stdcall * m_OpenVirtualDiskFunc)(
 				__in     PVIRTUAL_STORAGE_TYPE         VirtualStorageType,
 				__in     PCWSTR                        Path,
 				__in     VIRTUAL_DISK_ACCESS_MASK      VirtualDiskAccessMask,
 				__in     OPEN_VIRTUAL_DISK_FLAG        Flags,
 				__in_opt POPEN_VIRTUAL_DISK_PARAMETERS Parameters,
-				__out    PHANDLE                       Handle);
+				__out    PHANDLE                       Handle) = nullptr;
 	HRESULT		(__stdcall * m_AttachVirtualDiskFunc)(
 				__in     HANDLE                          VirtualDiskHandle,
 				__in_opt PSECURITY_DESCRIPTOR            SecurityDescriptor,
 				__in     ATTACH_VIRTUAL_DISK_FLAG        Flags,
 				__in     ULONG                           ProviderSpecificFlags,
 				__in_opt PATTACH_VIRTUAL_DISK_PARAMETERS Parameters,
-				__in_opt LPOVERLAPPED                    Overlapped);
+				__in_opt LPOVERLAPPED                    Overlapped) = nullptr;
 	HRESULT		(__stdcall * m_GetVirtualDiskPhysicalPathFunc)(
 				__in                              HANDLE VirtualDiskHandle,
 				__inout                           PULONG DiskPathSizeInBytes,
-				__out_bcount(DiskPathSizeInBytes) PWSTR  DiskPath);
-	HANDLE		m_VHDHandle;
+				__out_bcount(DiskPathSizeInBytes) PWSTR  DiskPath) = nullptr;
+	HANDLE		m_VHDHandle = INVALID_HANDLE_VALUE;
 
 	// DAEMON Tools Lite
 	enum dtdrive {dt_none, dt_dt, dt_scsi};
-	dtdrive		m_dtdrive;
-	CString		m_dtlite_path;
+	dtdrive		m_dtdrive = dt_none;
+	CStringW	m_dtlite_path;
 
 	// Virtual CloneDrive
-	CString		m_vcd_path;
+	CStringW	m_vcd_path;
 
 public:
 	CDiskImage();
