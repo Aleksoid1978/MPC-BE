@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,10 +37,10 @@ private:
 	CStatic m_type;
 	CStatusLabel m_time;
 	CBitmap m_bm;
-	UINT m_bmid;
+	UINT m_bmid = 0;
 
-	CRect m_time_rect;
-	CRect m_time_rect2;
+	CRect m_time_rect  = { -1, -1, -1, -1 };
+	CRect m_time_rect2 = { -1, -1, -1, -1 };
 
 	CFont m_font;
 

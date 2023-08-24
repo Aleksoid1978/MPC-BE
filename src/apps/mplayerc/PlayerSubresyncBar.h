@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,12 +41,12 @@ private:
 	CPlayerListCtrl m_list;
 	CFont m_font;
 
-	CCritSec* m_pSubLock;
+	CCritSec* m_pSubLock = nullptr;
 	CComPtr<ISubStream> m_pSubStream;
-	double m_fps;
+	double m_fps = 0.0;
 
-	int m_lastSegment;
-	REFERENCE_TIME m_rt;
+	int m_lastSegment = -1;
+	REFERENCE_TIME m_rt = 0;
 
 	enum {
 		// TEXTSUB
@@ -73,9 +73,9 @@ private:
 		VOBSUB,
 		TEXTSUB
 	};
-	int m_mode;
+	int m_mode = 0;
 
-	bool m_fUnlink;
+	bool m_fUnlink = false;
 
 	struct SubTime {
 		int orgstart, newstart, orgend, newend;

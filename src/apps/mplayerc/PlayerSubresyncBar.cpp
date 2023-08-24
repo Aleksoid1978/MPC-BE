@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,12 +30,6 @@ IMPLEMENT_DYNAMIC(CPlayerSubresyncBar, CPlayerBar)
 
 CPlayerSubresyncBar::CPlayerSubresyncBar(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
-	, m_pSubLock(nullptr)
-	, m_fps(0.0)
-	, m_mode(0)
-	, m_rt(0)
-	, m_fUnlink(false)
-	, m_lastSegment(-1)
 {
 }
 

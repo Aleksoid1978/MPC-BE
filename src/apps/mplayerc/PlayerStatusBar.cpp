@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,9 +33,6 @@ CPlayerStatusBar::CPlayerStatusBar(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
 	, m_status(false, false)
 	, m_time(true, false)
-	, m_bmid(0)
-	, m_time_rect(-1, -1, -1, -1)
-	, m_time_rect2(-1, -1, -1, -1)
 {
 }
 

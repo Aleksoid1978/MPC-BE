@@ -331,7 +331,7 @@ class CPlayerCaptureDialog : public CResizableDialog
 
 private:
 	CMainFrame* m_pMainFrame;
-	bool m_bInitialized;
+	bool m_bInitialized = false;
 
 	CComboBox m_vidinput;
 	CComboBox m_vidtype;
@@ -341,7 +341,7 @@ private:
 	CEdit m_vidhoredit;
 	CEdit m_vidveredit;
 	CFloatEdit m_vidfpsedit;
-	float m_vidfps;
+	float m_vidfps = 0;
 	CButton m_vidsetres;
 	CComboBox m_audinput;
 	CComboBox m_audtype;
@@ -356,12 +356,12 @@ private:
 	CComboBox m_audcodecdimension;
 	CButton m_audoutput;
 	CButton m_audpreview;
-	int m_nVidBuffers;
-	int m_nAudBuffers;
+	int m_nVidBuffers = 50;
+	int m_nAudBuffers = 50;
 	CButton m_recordbtn;
-	UINT_PTR m_nRecordTimerID;
-	BOOL m_fSepAudio;
-	int m_muxtype;
+	UINT_PTR m_nRecordTimerID = 0;
+	BOOL m_fSepAudio = FALSE;
+	int m_muxtype = 0;
 	CComboBox m_muxctrl;
 
 	// video input
@@ -405,10 +405,10 @@ private:
 
 public:
 	CString m_file;
-	BOOL m_fVidOutput;
-	int m_fVidPreview;
-	BOOL m_fAudOutput;
-	int m_fAudPreview;
+	BOOL m_fVidOutput = TRUE;
+	int m_fVidPreview = TRUE;
+	BOOL m_fAudOutput = TRUE;
+	int m_fAudPreview = TRUE;
 
 	CMediaType m_mtv, m_mta, m_mtcv, m_mtca;
 	CComPtr<IBaseFilter> m_pVidEnc, m_pAudEnc, m_pMux, m_pDst, m_pAudMux, m_pAudDst;

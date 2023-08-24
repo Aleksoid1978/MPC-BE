@@ -528,19 +528,6 @@ static int ShowPPage(std::vector<Codec>& codecs, const CComboBox& box, HWND hWnd
 CPlayerCaptureDialog::CPlayerCaptureDialog(CMainFrame* pMainFrame)
 	: CResizableDialog(CPlayerCaptureDialog::IDD, nullptr)
 	, m_pMainFrame(pMainFrame)
-	, m_bInitialized(false)
-	, m_vidfps(0)
-	, m_nVidBuffers(50)
-	, m_nAudBuffers(50)
-	, m_nRecordTimerID(0)
-	, m_fSepAudio(FALSE)
-	, m_muxtype(0)
-	, m_fVidOutput(TRUE)
-	, m_fVidPreview(TRUE)
-	, m_fAudOutput(TRUE)
-	, m_fAudPreview(TRUE)
-	, m_pVidBuffer(nullptr)
-	, m_pAudBuffer(nullptr)
 {
 	EmptyVideo();
 	EmptyAudio();
