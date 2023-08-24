@@ -425,7 +425,7 @@ IF /I "%NAME%" == "MPC-BE" (
   COPY /Y /V "%~1_%ARCH%\*.ax"           "%PCKG_NAME%\*.ax" >NUL
 )
 
-COPY /Y /V "..\docs\COPYING.txt"             "%PCKG_NAME%" >NUL
+COPY /Y /V "..\docs\LICENSE"                 "%PCKG_NAME%" >NUL
 COPY /Y /V "..\docs\Authors.txt"             "%PCKG_NAME%" >NUL
 COPY /Y /V "..\docs\Authors mpc-hc team.txt" "%PCKG_NAME%" >NUL
 COPY /Y /V "..\docs\Changelog.txt"           "%PCKG_NAME%" >NUL

@@ -28,7 +28,7 @@ MPC-BE is based on the original Guliverkli project and "Media Player Classic Hom
 ---
  
 For the people involved in the development, see Authors.txt.
-MPC-BE's code is licensed under GPL v3 (see COPYING.txt).
+MPC-BE's code is licensed under GPL v3 (see LICENSE).
 
 Translations are done by various translators (see Authors.txt).
 
