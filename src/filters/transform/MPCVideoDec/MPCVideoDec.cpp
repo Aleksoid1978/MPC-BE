@@ -1087,12 +1087,19 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		*phr = S_OK;
 	}
 
-	if (m_pOutput) {
-		delete m_pOutput;
+	m_pInput = DNew CBaseVideoInputPin(L"CBaseVideoInputPin", this, phr, L"Video");
+	if (!m_pInput) {
+		*phr = E_OUTOFMEMORY;
 	}
+	if (FAILED(*phr)) {
+		return;
+	}
+
 	m_pOutput = DNew CVideoDecOutputPin(L"CVideoDecOutputPin", this, phr, L"Output");
 	if (!m_pOutput) {
 		*phr = E_OUTOFMEMORY;
+	}
+	if (FAILED(*phr)) {
 		return;
 	}
 

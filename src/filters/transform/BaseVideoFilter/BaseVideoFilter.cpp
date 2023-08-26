@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,30 +38,6 @@ CBaseVideoFilter::CBaseVideoFilter(LPCWSTR pName, LPUNKNOWN lpunk, HRESULT* phr,
 	if (phr) {
 		*phr = S_OK;
 	}
-
-	m_pInput = DNew CBaseVideoInputPin(L"CBaseVideoInputPin", this, phr, L"Video");
-	if (!m_pInput) {
-		*phr = E_OUTOFMEMORY;
-	}
-	if (FAILED(*phr)) {
-		return;
-	}
-
-	m_pOutput = DNew CBaseVideoOutputPin(L"CBaseVideoOutputPin", this, phr, L"Output");
-	if (!m_pOutput) {
-		*phr = E_OUTOFMEMORY;
-	}
-	if (FAILED(*phr))  {
-		delete m_pInput, m_pInput = nullptr;
-		return;
-	}
-
-	m_wout = m_win = 0;
-	m_hout = m_hin = 0;
-	m_arxout = m_arxin = m_arx = 0;
-	m_aryout = m_aryin = m_ary = 0;
-
-	m_dxvaExtFormat.value = 0;
 }
 
 CBaseVideoFilter::~CBaseVideoFilter()

@@ -281,7 +281,6 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		return;
 	}
 
-	delete m_pInput;
 	m_pInput = DNew CMpeg2DecInputPin(this, phr, L"Video");
 	if (!m_pInput) {
 		*phr = E_OUTOFMEMORY;
@@ -292,6 +291,14 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 	m_pSubpicInput = DNew CSubpicInputPin(this, phr);
 	if (!m_pSubpicInput) {
+		*phr = E_OUTOFMEMORY;
+	}
+	if (FAILED(*phr)) {
+		return;
+	}
+
+	m_pOutput = DNew CBaseVideoOutputPin(L"CBaseVideoOutputPin", this, phr, L"Output");
+	if (!m_pOutput) {
 		*phr = E_OUTOFMEMORY;
 	}
 	if (FAILED(*phr)) {
