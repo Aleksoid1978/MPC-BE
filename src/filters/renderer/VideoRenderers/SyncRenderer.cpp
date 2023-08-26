@@ -1261,7 +1261,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				}
 			}
 
-			CComPtr<IDirect3DSurface9> pRT(pBackBuffer);
+			CComPtr<IDirect3DSurface9> pRT;
 
 			if (bScreenSpacePixelShaders) {
 				hr = m_pScreenSizeTextures[1]->GetSurfaceLevel(0, &pRT);
@@ -1275,6 +1275,9 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 					}
 					hr = m_pDevice9Ex->Clear(0, nullptr, D3DCLEAR_TARGET, 0, 1.0f, 0);
 				}
+			}
+			if (!pRT) {
+				pRT = pBackBuffer;
 			}
 
 			// resize
