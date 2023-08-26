@@ -3402,9 +3402,10 @@ void CSyncAP::RenderThread()
 								SetEvent(m_hEvtSkip);
 								m_bEvtSkip = true;
 							}
-							REFERENCE_TIME rtRefClockTimeNow;
+
+							REFERENCE_TIME rtRefClockTimeNow = m_llEstVBlankTime;
 							if (m_pRefClock) {
-								m_pRefClock->GetTime(&rtRefClockTimeNow);    // Reference clock time now
+								m_pRefClock->GetTime(&rtRefClockTimeNow); // Reference clock time now
 							}
 							LONG lLastVsyncTime = (LONG)((m_llEstVBlankTime - rtRefClockTimeNow) / 10000); // Last vsync time relative to now
 							if (abs(lLastVsyncTime) > lDisplayCycle) {
