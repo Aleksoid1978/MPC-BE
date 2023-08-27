@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2021 see Authors.txt
+ * (C) 2012-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -80,7 +80,7 @@ public:
 
 	HRESULT Create(CWnd* pWnd);
 
-	int iw;
+	int iw = 0;
 
 	void CalcButtonsRect();
 	void Scale();

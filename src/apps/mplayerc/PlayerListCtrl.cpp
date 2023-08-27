@@ -485,10 +485,6 @@ void CInPlaceListBox::OnNcDestroy()
 IMPLEMENT_DYNAMIC(CPlayerListCtrl, CListCtrl)
 CPlayerListCtrl::CPlayerListCtrl(int tStartEditingDelay)
 	: m_tStartEditingDelay(tStartEditingDelay)
-	, m_nItemClicked(-1)
-	, m_nTimerID(0)
-	, m_nSubItemClicked(-1)
-	, m_fInPlaceDirty(false)
 {
 }
 

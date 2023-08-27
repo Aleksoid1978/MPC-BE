@@ -70,7 +70,7 @@ class COSD : public CWnd, public CDPI
 
 	CCritSec			m_Lock;
 	CDC					m_MemDC;
-	MFVideoAlphaBitmap	m_MFVAlphaBitmap;
+	MFVideoAlphaBitmap	m_MFVAlphaBitmap = {};
 	BITMAP				m_BitmapInfo;
 
 	CString	m_OSD_Font;
@@ -93,7 +93,7 @@ class COSD : public CWnd, public CDPI
 	CRect	m_rectExitButton;
 
 	CImageList *m_pButtonImages = nullptr;
-	int		m_nButtonHeight;
+	int		m_nButtonHeight = 0;
 	int		m_externalFlyBarHeight = 0;
 
 	bool	m_bCursorMoving   = false;

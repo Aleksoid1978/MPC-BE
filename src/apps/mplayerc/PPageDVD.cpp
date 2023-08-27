@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -177,10 +177,6 @@ LCIDNameList[] = {
 IMPLEMENT_DYNAMIC(CPPageDVD, CPPageBase)
 CPPageDVD::CPPageDVD()
 	: CPPageBase(CPPageDVD::IDD, CPPageDVD::IDD)
-	, m_iDVDLocation(0)
-	, m_iDVDLangType(0)
-	, m_bClosedCaptions(FALSE)
-	, m_bStartMainTitle(FALSE)
 {
 }
 

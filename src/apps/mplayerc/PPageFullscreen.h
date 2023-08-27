@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,13 +41,13 @@ private:
 	};
 	std::vector<monitor_t> m_monitors;
 
-	BOOL m_bLaunchFullScreen;
+	BOOL m_bLaunchFullScreen = FALSE;
 
-	BOOL m_bEnableAutoMode;
-	BOOL m_bBeforePlayback; // change display mode before starting playback
-	BOOL m_bSetDefault;
+	BOOL m_bEnableAutoMode = FALSE;
+	BOOL m_bBeforePlayback = FALSE; // change display mode before starting playback
+	BOOL m_bSetDefault     = FALSE;
 
-	CAppSettings::t_fullScreenModes m_fullScreenModes;
+	CAppSettings::t_fullScreenModes m_fullScreenModes = {};
 	CString m_strFullScreenMonitor;
 	CString m_strFullScreenMonitorID;
 
@@ -59,17 +59,18 @@ private:
 		COL_SRR
 	};
 
-	int m_iMonitorType;
+	int m_iMonitorType = 0;
 	CComboBox m_iMonitorTypeCtrl;
 
-	BOOL m_bShowBarsWhenFullScreen;
-	BOOL m_bExitFullScreenAtTheEnd, m_bExitFullScreenAtFocusLost;
+	BOOL m_bShowBarsWhenFullScreen    = FALSE;
+	BOOL m_bExitFullScreenAtTheEnd    = FALSE;
+	BOOL m_bExitFullScreenAtFocusLost = FALSE;
 	CIntEdit m_edtTimeOut;
 	CSpinButtonCtrl m_nTimeOutCtrl;
 	CIntEdit m_edDMChangeDelay;
 	CSpinButtonCtrl m_spnDMChangeDelay;
 
-	BOOL m_bRestoreResAfterExit;
+	BOOL m_bRestoreResAfterExit = TRUE;
 
 	void ReindexList();
 	void GetCurDispModeString(CString& strMode);

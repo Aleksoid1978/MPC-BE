@@ -28,17 +28,6 @@
 IMPLEMENT_DYNAMIC(CPPagePlayback, CPPageBase)
 CPPagePlayback::CPPagePlayback()
 	: CPPageBase(CPPagePlayback::IDD, CPPagePlayback::IDD)
-	, m_iLoopForever(0)
-	, m_nLoops(0)
-	, m_fRewind(FALSE)
-	, m_nVolume(0)
-	, m_nBalance(0)
-	, m_fEnableWorkerThreadForOpening(FALSE)
-	, m_fReportFailedPins(FALSE)
-	, m_nVolumeStep(1)
-	, m_bSpeedNotReset(FALSE)
-	, m_fUseInternalSelectTrackLogic(TRUE)
-	, m_bRememberSelectedTracks(FALSE)
 {
 }
 

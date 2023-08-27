@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -144,9 +144,10 @@ class CPlayerListCtrl : public CListCtrl
 	DECLARE_DYNAMIC(CPlayerListCtrl)
 
 private:
-	int m_nItemClicked, m_nSubItemClicked;
+	int m_nItemClicked = -1;
+	int m_nSubItemClicked = -1;
 	int m_tStartEditingDelay;
-	UINT_PTR m_nTimerID;
+	UINT_PTR m_nTimerID = 0;
 
 	bool PrepareInPlaceControl(int nRow, int nCol, CRect& rect);
 
@@ -165,7 +166,7 @@ public:
 	CComboBox* ShowInPlaceComboBox(int nItem, int nCol, std::list<CString>& lstItems, int nSel, bool bShowDropDown=false);
 	CListBox* ShowInPlaceListBox(int nItem, int nCol, std::list<CString>& lstItems, int nSel);
 
-	bool m_fInPlaceDirty;
+	bool m_fInPlaceDirty = false;
 
 protected:
 	virtual void PreSubclassWindow();

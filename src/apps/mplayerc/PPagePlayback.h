@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,37 +31,37 @@ class CPPagePlayback : public CPPageBase
 	DECLARE_DYNAMIC(CPPagePlayback)
 
 	// private:
-	int m_oldVolume; //not very nice solution
+	int m_oldVolume = 0; //not very nice solution
 
 public:
 	CPPagePlayback();
 	virtual ~CPPagePlayback();
 
-	int			m_nVolume;
+	int			m_nVolume      = 0;
 	CSliderCtrl	m_volumectrl;
-	int			m_nBalance;
+	int			m_nBalance     = 0;
 	CSliderCtrl	m_balancectrl;
 
-	int			m_iLoopForever;
+	int			m_iLoopForever = 0;
 	CEdit		m_loopnumctrl;
-	int			m_nLoops;
-	BOOL		m_fRewind;
+	int			m_nLoops       = 0;
+	BOOL		m_fRewind      = FALSE;
 
-	int			m_nVolumeStep;
+	int			m_nVolumeStep  = 1;
 	CComboBox	m_nVolumeStepCtrl;
 	CComboBox	m_nSpeedStepCtrl;
-	BOOL		m_bSpeedNotReset;
+	BOOL		m_bSpeedNotReset = FALSE;
 
-	BOOL		m_fUseInternalSelectTrackLogic;
+	BOOL		m_fUseInternalSelectTrackLogic = TRUE;
 	CString		m_subtitlesLanguageOrder;
 	CString		m_audiosLanguageOrder;
 
-	BOOL		m_bRememberSelectedTracks;
+	BOOL		m_bRememberSelectedTracks = FALSE;
 
 	CComboBox	m_cbAudioWindowMode;
 	CComboBox	m_cbAddSimilarFiles;
-	BOOL		m_fEnableWorkerThreadForOpening;
-	BOOL		m_fReportFailedPins;
+	BOOL		m_fEnableWorkerThreadForOpening = FALSE;
+	BOOL		m_fReportFailedPins = FALSE;
 
 	enum { IDD = IDD_PPAGEPLAYBACK };
 

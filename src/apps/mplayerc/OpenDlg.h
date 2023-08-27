@@ -38,7 +38,7 @@ public:
 	std::list<CString> m_fns;
 
 	enum { IDD = IDD_OPEN_DLG };
-	BOOL m_bPasteClipboardURL;
+	BOOL m_bPasteClipboardURL = FALSE;
 	CComboBox m_mrucombo;
 	CString m_path;
 	CComboBox m_mrucombo2;

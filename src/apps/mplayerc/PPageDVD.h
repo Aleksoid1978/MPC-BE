@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,15 +41,15 @@ public:
 	CString m_dvdpath;
 	CEdit m_dvdpathctrl;
 	CButton m_dvdpathselctrl;
-	int m_iDVDLocation;
-	int m_iDVDLangType;
+	int m_iDVDLocation = 0;
+	int m_iDVDLangType = 0;
 
-	LCID m_idMenuLang;
-	LCID m_idAudioLang;
-	LCID m_idSubtitlesLang;
+	LCID m_idMenuLang      = 0;
+	LCID m_idAudioLang     = 0;
+	LCID m_idSubtitlesLang = 0;
 
-	BOOL m_bClosedCaptions;
-	BOOL m_bStartMainTitle;
+	BOOL m_bClosedCaptions = FALSE;
+	BOOL m_bStartMainTitle = FALSE;
 
 	enum { IDD = IDD_PPAGEDVD};
 

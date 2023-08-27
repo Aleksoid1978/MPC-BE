@@ -40,16 +40,7 @@ static CString FormatModeString(const dispmode& dmod)
 IMPLEMENT_DYNAMIC(CPPageFullscreen, CPPageBase)
 CPPageFullscreen::CPPageFullscreen()
 	: CPPageBase(CPPageFullscreen::IDD, CPPageFullscreen::IDD)
-	, m_bLaunchFullScreen(FALSE)
-	, m_bEnableAutoMode(FALSE)
-	, m_bBeforePlayback(FALSE)
-	, m_bSetDefault(FALSE)
-	, m_bShowBarsWhenFullScreen(FALSE)
-	, m_bExitFullScreenAtTheEnd(FALSE)
-	, m_bExitFullScreenAtFocusLost(FALSE)
-	, m_bRestoreResAfterExit(TRUE)
 	, m_list(0)
-	, m_iMonitorType(0)
 {
 }
 

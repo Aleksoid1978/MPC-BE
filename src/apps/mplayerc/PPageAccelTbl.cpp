@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -120,12 +120,8 @@ IMPLEMENT_DYNAMIC(CPPageAccelTbl, CPPageBase)
 CPPageAccelTbl::CPPageAccelTbl()
 	: CPPageBase(CPPageAccelTbl::IDD, CPPageAccelTbl::IDD)
 	, m_list(0)
-	, m_counter(0)
-	, m_bWinLirc(FALSE)
 	, m_WinLircLink(L"http://winlirc.sourceforge.net/")
-	, m_bUIce(FALSE)
 	, m_UIceLink(L"https://web.archive.org/web/20160609195532/http://www.mediatexx.com/") // home site no longer works
-	, m_bGlobalMedia(FALSE)
 {
 }
 

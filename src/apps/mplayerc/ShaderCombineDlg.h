@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -45,8 +45,8 @@ class CShaderCombineDlg : public CCmdUIDialog
 	CListBox  m_cbList1;
 	CListBox  m_cbList2;
 
-	bool m_oldcheck1;
-	bool m_oldcheck2;
+	bool m_oldcheck1 = false;
+	bool m_oldcheck2 = false;
 	std::list<CString> m_oldlabels1;
 	std::list<CString> m_oldlabels2;
 	std::list<CString> m_oldlabels11_2;

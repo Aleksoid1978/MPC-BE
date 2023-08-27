@@ -53,7 +53,7 @@ private:
 	void UpdateRmcmdDupFlags();
 	void UpdateAllDupFlags();
 
-	int m_counter;
+	int m_counter = 0;
 
 	struct ITEMDATA
 	{
@@ -75,17 +75,18 @@ public:
 
 	enum { IDD = IDD_PPAGEACCELTBL };
 	CPlayerListCtrl m_list;
-	BOOL m_bWinLirc;
+	BOOL m_bWinLirc = FALSE;
 	CString m_WinLircAddr;
 	CEdit m_WinLircEdit;
 	CStaticLink m_WinLircLink;
-	BOOL m_bUIce;
+	BOOL m_bUIce = FALSE;
 	CString m_UIceAddr;
 	CEdit m_UIceEdit;
 	CStaticLink m_UIceLink;
-	BOOL m_bGlobalMedia;
+	BOOL m_bGlobalMedia = FALSE;
 
-	UINT_PTR m_nStatusTimerID, m_nFilterTimerID;
+	UINT_PTR m_nStatusTimerID = 0;
+	UINT_PTR m_nFilterTimerID = 0;
 
 	CEdit m_FilterEdit;
 
