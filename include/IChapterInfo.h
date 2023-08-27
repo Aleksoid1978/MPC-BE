@@ -22,25 +22,25 @@
 #pragma once
 
 enum ChapterType {
-	AtomicChapter	= 0, // only contain one element
-	SubChapter		= 1, // contain a list of elements
+	AtomicChapter = 0, // only contain one element
+	SubChapter    = 1, // contain a list of elements
 };
 
 #pragma pack(push, 1)
 struct ChapterElement {
-	WORD Size;				// size of this structure
-	BYTE Type;				// see ChapterType
-	UINT ChapterId;			// unique identifier for this element
-	REFERENCE_TIME rtStart;	// REFERENCE_TIME in 100ns
-	REFERENCE_TIME rtStop;	// REFERENCE_TIME in 100ns
-	struct ChapterElement() {
-		Size = sizeof(*this);
-	}
+	WORD Size;                  // size of this structure
+	BYTE Type              = 0; // see ChapterType
+	UINT ChapterId         = 0; // unique identifier for this element
+	REFERENCE_TIME rtStart = 0; // REFERENCE_TIME in 100ns
+	REFERENCE_TIME rtStop  = 0; // REFERENCE_TIME in 100ns
+	ChapterElement()
+		: Size(sizeof(ChapterElement))
+	{}
 };
 struct ChapterElement2 : ChapterElement {
-	BOOL bDisabled;
-	struct ChapterElement2() {
-		Size = sizeof(*this);
+	BOOL bDisabled = FALSE;
+	ChapterElement2() {
+		Size = sizeof(ChapterElement2);
 	}
 };
 #pragma pack(pop)
@@ -48,8 +48,8 @@ struct ChapterElement2 : ChapterElement {
 interface __declspec(uuid("8E128709-3DC8-4e49-B632-380FCF496B6D"))
 IChapterInfo :
 public IUnknown {
-#define CHAPTER_BAD_ID		0xFFFFFFFF
-#define CHAPTER_ROOT_ID		0
+#define CHAPTER_BAD_ID  0xFFFFFFFF
+#define CHAPTER_ROOT_ID 0
 
 	//	\param aChapterID is 0 for the top level one
 	STDMETHOD_(UINT, GetChapterCount) (UINT aChapterID) PURE;
