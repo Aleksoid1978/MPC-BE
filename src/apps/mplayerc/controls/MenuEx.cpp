@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2022 see Authors.txt
+ * (C) 2018-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -284,7 +284,7 @@ void CMenuEx::ChangeStyle(CMenu *pMenu, const bool bMainMenu/* = false*/)
 		} else {
 			auto itemPtr = std::make_unique<MENUITEM>();
 			lpItem = itemPtr.get();
-			m_pMenuItems.push_back(std::move(itemPtr));
+			m_pMenuItems.emplace_back(std::move(itemPtr));
 		}
 
 		lpItem->uID = uID;
@@ -458,7 +458,7 @@ LRESULT CALLBACK CMenuEx::MenuWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM
 					::GetMenuItemInfoW(m_hMenuLast, i, TRUE, &mii);
 
 					if (mii.fType & MF_MENUBREAK) {
-						menuBreaks.push_back(i);
+						menuBreaks.emplace_back(i);
 					}
 				}
 

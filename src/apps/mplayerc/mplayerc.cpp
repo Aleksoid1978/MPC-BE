@@ -505,7 +505,7 @@ void CMPlayerCApp::PreProcessCommandLine()
 	m_cmdln.clear();
 
 	for (int i = 1; i < __argc; i++) {
-		m_cmdln.push_back(CString(__wargv[i]).Trim(L" \""));
+		m_cmdln.emplace_back(CString(__wargv[i]).Trim(L" \""));
 	}
 }
 
@@ -669,7 +669,7 @@ HANDLE WINAPI Mine_CreateFileW(LPCWSTR p1, DWORD p2, DWORD p3, LPSECURITY_ATTRIB
 				CString tmpFile = CString(strFakeFile).MakeUpper();
 
 				if (std::find(s.slTMPFilesList.cbegin(), s.slTMPFilesList.cend(), tmpFile) == s.slTMPFilesList.cend()) {
-					s.slTMPFilesList.push_back(tmpFile);
+					s.slTMPFilesList.emplace_back(tmpFile);
 				}
 			}
 		}

@@ -490,9 +490,9 @@ void CPPageExternalFilters::OnAddMajorType()
 			++it;
 		}
 
-		f->guids.push_back(dlg.m_guid);
+		f->guids.emplace_back(dlg.m_guid);
 		it = --f->guids.end();
-		f->guids.push_back(GUID_NULL);
+		f->guids.emplace_back(GUID_NULL);
 
 		CString major = GetMediaTypeName(dlg.m_guid);
 		CString sub = GetMediaTypeName(GUID_NULL);
@@ -543,9 +543,9 @@ void CPPageExternalFilters::OnAddSubType()
 			}
 		}
 
-		f->guids.push_back(major);
+		f->guids.emplace_back(major);
 		it = --f->guids.end(); // iterator for major
-		f->guids.push_back(dlg.m_guid);
+		f->guids.emplace_back(dlg.m_guid);
 
 		CString sub = GetMediaTypeName(dlg.m_guid);
 

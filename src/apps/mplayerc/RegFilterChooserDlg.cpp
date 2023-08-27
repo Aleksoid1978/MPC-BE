@@ -133,7 +133,7 @@ void CRegFilterChooserDlg::OnBnClickedOk()
 		f->guids     = fgf.GetTypes();
 		f->dwMerit   = fgf.GetMeritForDirectShow();
 		f->iLoadType = FilterOverride::MERIT;
-		m_filters.push_back(f);
+		m_filters.emplace_back(f);
 	}
 
 	__super::OnOK();

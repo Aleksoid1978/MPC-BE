@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,8 +32,8 @@ CPPageLogo::CPPageLogo()
 	, m_intext(0)
 	, m_logoidpos(0)
 {
-	m_logoids.push_back(IDF_LOGO0);
-	m_logoids.push_back(IDF_LOGO1);
+	m_logoids.emplace_back(IDF_LOGO0);
+	m_logoids.emplace_back(IDF_LOGO1);
 }
 
 CPPageLogo::~CPPageLogo()

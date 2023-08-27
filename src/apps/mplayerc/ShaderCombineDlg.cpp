@@ -356,7 +356,7 @@ void CShaderCombineDlg::UpdateShaders(unsigned type)
 		for (int i = 0, j = m_cbList1.GetCount()-1; i < j; i++) {
 			CString label;
 			m_cbList1.GetText(i, label);
-			s.ShaderList.push_back(label);
+			s.ShaderList.emplace_back(label);
 		}
 
 		pFrame->EnableShaders1(!!m_chEnable1.GetCheck());
@@ -368,7 +368,7 @@ void CShaderCombineDlg::UpdateShaders(unsigned type)
 		for (int m = 0, n = m_cbList2.GetCount()-1; m < n; m++) {
 			CString label;
 			m_cbList2.GetText(m, label);
-			s.ShaderListScreenSpace.push_back(label);
+			s.ShaderListScreenSpace.emplace_back(label);
 		}
 
 		pFrame->EnableShaders2(!!m_chEnable2.GetCheck());
@@ -380,7 +380,7 @@ void CShaderCombineDlg::UpdateShaders(unsigned type)
 		for (int m = 0, n = m_cbList2.GetCount() - 1; m < n; m++) {
 			CString label;
 			m_cbList2.GetText(m, label);
-			s.Shaders11PostScale.push_back(label);
+			s.Shaders11PostScale.emplace_back(label);
 		}
 
 		pFrame->EnableShaders2(!!m_chEnable2.GetCheck());

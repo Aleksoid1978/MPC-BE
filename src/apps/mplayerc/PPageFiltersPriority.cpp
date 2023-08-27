@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -189,11 +189,11 @@ void CPPageFiltersPriority::Init()
 
 				if (major == MEDIATYPE_Stream) {
 					bIsSplitter = true;
-					CLSID_List.push_front(sub);
+					CLSID_List.emplace_front(sub);
 				}
 			}
 		} else {
-			CLSID_List.push_front(MEDIASUBTYPE_NULL);
+			CLSID_List.emplace_front(MEDIASUBTYPE_NULL);
 		}
 
 		if (!bIsSource && !bIsSplitter) {

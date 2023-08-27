@@ -453,7 +453,7 @@ void CPPageFullscreen::ModesUpdate()
 			continue; // skip low resolution and non 32bpp mode
 		}
 		if (std::find(m_dms.cbegin(), m_dms.cend(), dm) == m_dms.cend()) {
-			m_dms.push_back(dm);
+			m_dms.emplace_back(dm);
 		}
 	}
 
@@ -468,7 +468,7 @@ void CPPageFullscreen::ModesUpdate()
 
 	int curModeIdx = m_dms.size() - 1;
 	for (size_t i = 0; i < m_dms.size(); i++) {
-		m_displayModesString.push_back(FormatModeString(m_dms[i]));
+		m_displayModesString.emplace_back(FormatModeString(m_dms[i]));
 		if (dCurMod == m_dms[i]) {
 			curModeIdx = i;
 		}

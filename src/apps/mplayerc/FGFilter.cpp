@@ -60,8 +60,8 @@ void CFGFilter::SetName(CString name)
 
 void CFGFilter::AddType(const GUID& majortype, const GUID& subtype)
 {
-	m_types.push_back(majortype);
-	m_types.push_back(subtype);
+	m_types.emplace_back(majortype);
+	m_types.emplace_back(subtype);
 }
 
 bool CFGFilter::CheckTypes(const std::vector<GUID>& types, bool fExactMatch)
@@ -641,7 +641,7 @@ unsigned CFGFilterList::GetSortedSize()
 
 		m_sortedfilters.reserve(flts.size());
 		for (const auto& flt : flts) {
-			m_sortedfilters.push_back(flt.pFGF);
+			m_sortedfilters.emplace_back(flt.pFGF);
 		}
 
 #ifdef DEBUG_OR_LOG

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -94,7 +94,7 @@ void CFavoriteOrganizeDlg::SaveList()
 				ASSERT(0);
 				break;
 			}
-			newfavlist.push_back(*it);
+			newfavlist.emplace_back(*it);
 		}
 		favlist = newfavlist;
 	};
@@ -436,7 +436,7 @@ void CFavoriteOrganizeDlg::OnDownBnClicked()
 			return;
 		}
 
-		selectedItems.push_back(nItem);
+		selectedItems.emplace_back(nItem);
 	}
 
 	for (int i = selectedItems.size() - 1; i >= 0; i--) {

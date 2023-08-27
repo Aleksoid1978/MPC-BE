@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -55,10 +55,10 @@ void CPlayerInfoBar::SetLine(const CString& label, const CString& info)
 		}
 	}
 
-	m_labels.push_back(std::make_unique<CStatusLabel>(true, false));
+	m_labels.emplace_back(std::make_unique<CStatusLabel>(true, false));
 	m_labels.back()->Create(label, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | SS_OWNERDRAW, RECT{ 0, 0, 0, 0 }, this);
 
-	m_infos.push_back(std::make_unique<CStatusLabel>(false, true));
+	m_infos.emplace_back(std::make_unique<CStatusLabel>(false, true));
 	m_infos.back()->Create(info, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | SS_OWNERDRAW, RECT{ 0, 0, 0, 0 }, this);
 
 	Relayout();

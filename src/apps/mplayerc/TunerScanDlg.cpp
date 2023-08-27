@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -114,7 +114,7 @@ void CTunerScanDlg::OnBnClickedSave()
 		CDVBChannel		Channel;
 		Channel.FromString (m_ChannelList.GetItemText (i, TSCC_CHANNEL));
 		Channel.SetPrefNumber(i);
-		s.m_DVBChannels.push_back(Channel);
+		s.m_DVBChannels.emplace_back(Channel);
 	}
 
 	OnOK();

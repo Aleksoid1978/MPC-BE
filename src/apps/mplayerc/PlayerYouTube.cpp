@@ -223,7 +223,7 @@ namespace Youtube
 		}
 
 		if (!pData.empty()) {
-			pData.push_back('\0');
+			pData.emplace_back('\0');
 			return true;
 		}
 
@@ -271,7 +271,7 @@ namespace Youtube
 						}
 
 						if (!pData.empty()) {
-							pData.push_back('\0');
+							pData.emplace_back('\0');
 							return true;
 						}
 					}
@@ -756,7 +756,7 @@ namespace Youtube
 			}
 
 			if (strUrlsLive.empty()) {
-				urls.push_front(url);
+				urls.emplace_front(url);
 				return true;
 			}
 		} else {
@@ -1037,7 +1037,7 @@ namespace Youtube
 											continue;
 										}
 
-										funcList.push_back(line);
+										funcList.emplace_back(line);
 
 										if (funcGroup.IsEmpty()) {
 											const int k = line.Find('.');
@@ -1552,10 +1552,10 @@ namespace Youtube
 		}
 
 		if (final_video_url.GetLength()) {
-			urls.push_front(final_video_url);
+			urls.emplace_front(final_video_url);
 		}
 		if (final_audio_url.GetLength()) {
-			urls.push_back(final_audio_url);
+			urls.emplace_back(final_audio_url);
 		}
 
 		return !urls.empty();

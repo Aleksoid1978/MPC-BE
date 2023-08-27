@@ -1,5 +1,5 @@
 /*
- * (C) 2019 see Authors.txt
+ * (C) 2019-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -133,7 +133,7 @@ const std::wstring CTorrentInfo::Magnet() const
 		std::list<std::string> list;
 
 		if (auto announce = Search("announce", m_root); announce && announce->type == bt_node::dt_string) {
-			list.push_back(announce->val.string);
+			list.emplace_back(announce->val.string);
 		}
 
 		if (auto announceList = Search("announce-list", m_root); announceList && announceList->type == bt_node::dt_list) {
@@ -187,7 +187,7 @@ bt_node* CTorrentInfo::Decode()
 		++m_offset;
 		while (m_offset < m_data.size() && m_data[m_offset] != 'e') {
 			auto val = Decode();
-			ret->val.list->push_back(val);
+			ret->val.list->emplace_back(val);
 		}
 		++m_offset;
 		ret->length = m_offset - ret->offset;
@@ -311,7 +311,7 @@ void CTorrentInfo::GetAnnounceList(const bt_node* nodeAnnounce, std::list<std::s
 
 	for (auto& item : *nodeAnnounce->val.list) {
 		if (item->type == bt_node::dt_string) {
-			list.push_back(item->val.string);
+			list.emplace_back(item->val.string);
 		} else if (item->type == bt_node::dt_list) {
 			GetAnnounceList(item, list);
 		}

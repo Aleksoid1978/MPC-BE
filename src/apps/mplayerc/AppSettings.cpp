@@ -1386,7 +1386,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 			curPos = 0;
 			token = str.Tokenize(L"|", curPos);
 			while (token.GetLength()) {
-				ShaderList.push_back(token);
+				ShaderList.emplace_back(token);
 				token = str.Tokenize(L"|", curPos);
 			}
 		}
@@ -1395,7 +1395,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 			curPos = 0;
 			token = str.Tokenize(L"|", curPos);
 			while (token.GetLength()) {
-				ShaderListScreenSpace.push_back(token);
+				ShaderListScreenSpace.emplace_back(token);
 				token = str.Tokenize(L"|", curPos);
 			}
 		}
@@ -1404,7 +1404,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 			curPos = 0;
 			token = str.Tokenize(L"|", curPos);
 			while (token.GetLength()) {
-				Shaders11PostScale.push_back(token);
+				Shaders11PostScale.emplace_back(token);
 				token = str.Tokenize(L"|", curPos);
 			}
 		}
@@ -1457,7 +1457,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 			break;
 		}
 		Channel.FromString(strChannel);
-		m_DVBChannels.push_back(Channel);
+		m_DVBChannels.emplace_back(Channel);
 	}
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_DVDPOS, bRememberDVDPos);
@@ -2260,7 +2260,7 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 				nCLSwitches |= CLSW_HELP;
 			}
 			else if (sw == L"dub" && next_available) {
-				slDubs.push_back(ParseFileName(*it++));
+				slDubs.emplace_back(ParseFileName(*it++));
 			}
 			else if (sw == L"dubdelay" && next_available) {
 				CString strFile = ParseFileName(*it++);
@@ -2268,13 +2268,13 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 				if (nPos != -1) {
 					rtShift = 10000 * _wtol(strFile.Mid(nPos + 6));
 				}
-				slDubs.push_back(strFile);
+				slDubs.emplace_back(strFile);
 			}
 			else if (sw == L"sub" && next_available) {
-				slSubs.push_back(ParseFileName(*it++));
+				slSubs.emplace_back(ParseFileName(*it++));
 			}
 			else if (sw == L"filter" && next_available) {
-				slFilters.push_back(*it++);
+				slFilters.emplace_back(*it++);
 			}
 			else if (sw == L"dvd") {
 				nCLSwitches |= CLSW_DVD;
@@ -2395,9 +2395,9 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 			}
 		}
 		else if (param == L"-") { // Special case: standard input
-			slFiles.push_back(L"pipe://stdin");
+			slFiles.emplace_back(L"pipe://stdin");
 		} else {
-			slFiles.push_back(ParseFileName(param));
+			slFiles.emplace_back(ParseFileName(param));
 		}
 	}
 }

@@ -466,7 +466,7 @@ static void InitCodecList(std::vector<Codec>& codecs, CComboBox& box, const GUID
 		}
 		c.friendlyName.AppendFormat(L" %s", var.bstrVal);
 
-		codecs.push_back(c);
+		codecs.emplace_back(c);
 		AddStringData(box, c.friendlyName, (int)codecs.size()-1);
 	}
 	EndEnumSysDev;

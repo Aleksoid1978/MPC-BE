@@ -71,7 +71,7 @@ void mpc_filehash(CPlaylist& pl, std::list<filehash>& fhs)
 			continue;
 		}
 
-		fhs.push_back(fh);
+		fhs.emplace_back(fh);
 	}
 }
 
@@ -90,7 +90,7 @@ CStringA makeargs(CPlaylist& pl)
 				   i, fh.size,
 				   i, fh.mpc_filehash);
 
-		args.push_back(str);
+		args.emplace_back(str);
 		i++;
 	}
 

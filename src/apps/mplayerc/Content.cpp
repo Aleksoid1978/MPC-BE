@@ -298,7 +298,7 @@ namespace Content {
 			if (_wcsicmp(src.GetSchemeName(), dst.GetSchemeName())
 					|| _wcsicmp(src.GetHostName(), dst.GetHostName())
 					|| _wcsicmp(src.GetUrlPath(), dst.GetUrlPath())) {
-				urls.push_back(url);
+				urls.emplace_back(url);
 			} else {
 				// recursive
 				urls.clear();
@@ -358,7 +358,7 @@ namespace Content {
 				continue;
 			}
 
-			fns.push_back(fn2);
+			fns.emplace_back(fn2);
 		}
 
 		return fns.size() > 0;

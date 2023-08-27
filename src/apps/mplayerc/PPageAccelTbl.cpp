@@ -606,7 +606,7 @@ BOOL CPPageAccelTbl::OnInitDialog()
 			auto itemData = std::make_unique<ITEMDATA>();
 			itemData->index = i;
 			m_list.SetItemData(row, (DWORD_PTR)itemData.get());
-			m_pItemsData.push_back(std::move(itemData));
+			m_pItemsData.emplace_back(std::move(itemData));
 		}
 
 		SetupList();
@@ -751,7 +751,7 @@ void CPPageAccelTbl::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 		}
 		case COL_APPCMD:
 			for (unsigned i = 0; i < std::size(g_CommandList); i++) {
-				sl.push_back(g_CommandList[i].cmdname);
+				sl.emplace_back(g_CommandList[i].cmdname);
 				if (wc.appcmd == g_CommandList[i].appcmd) {
 					nSel = i;
 				}
@@ -1014,7 +1014,7 @@ void CPPageAccelTbl::FilterList()
 			auto itemData = std::make_unique<ITEMDATA>();
 			itemData->index = i;
 			m_list.SetItemData(row, (DWORD_PTR)itemData.get());
-			m_pItemsData.push_back(std::move(itemData));
+			m_pItemsData.emplace_back(std::move(itemData));
 		}
 	} else {
 		auto LowerCase = [](CString& str) {
@@ -1039,7 +1039,7 @@ void CPPageAccelTbl::FilterList()
 				auto itemData = std::make_unique<ITEMDATA>();
 				itemData->index = i;
 				m_list.SetItemData(row, (DWORD_PTR)itemData.get());
-				m_pItemsData.push_back(std::move(itemData));
+				m_pItemsData.emplace_back(std::move(itemData));
 			}
 		}
 	}

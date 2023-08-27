@@ -665,8 +665,8 @@ STDMETHODIMP CFilterMapper2::RegisterFilter(REFCLSID clsidFilter, LPCWSTR Name, 
 						if (!rgPin.lpMediaType[j].clsMajorType || !rgPin.lpMediaType[j].clsMinorType) {
 							break;
 						}
-						f->guids.push_back(*rgPin.lpMediaType[j].clsMajorType);
-						f->guids.push_back(*rgPin.lpMediaType[j].clsMinorType);
+						f->guids.emplace_back(*rgPin.lpMediaType[j].clsMajorType);
+						f->guids.emplace_back(*rgPin.lpMediaType[j].clsMinorType);
 					}
 				}
 			} else if (prf2->dwVersion == 2) {
@@ -680,13 +680,13 @@ STDMETHODIMP CFilterMapper2::RegisterFilter(REFCLSID clsidFilter, LPCWSTR Name, 
 						if (!rgPin.lpMediaType[j].clsMajorType || !rgPin.lpMediaType[j].clsMinorType) {
 							break;
 						}
-						f->guids.push_back(*rgPin.lpMediaType[j].clsMajorType);
-						f->guids.push_back(*rgPin.lpMediaType[j].clsMinorType);
+						f->guids.emplace_back(*rgPin.lpMediaType[j].clsMajorType);
+						f->guids.emplace_back(*rgPin.lpMediaType[j].clsMinorType);
 					}
 				}
 			}
 
-			m_filters.push_back(f);
+			m_filters.emplace_back(f);
 		}
 
 		return S_OK;

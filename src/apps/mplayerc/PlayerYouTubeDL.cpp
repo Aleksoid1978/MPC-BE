@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2022 see Authors.txt
+ * (C) 2018-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -219,7 +219,7 @@ namespace YoutubeDL
 
 							auto profilePtr = std::make_unique<Youtube::YoutubeProfile>();
 							auto profile = profilePtr.get();
-							YoutubeProfiles.push_back(std::move(profilePtr));
+							YoutubeProfiles.emplace_back(std::move(profilePtr));
 
 							CString ext;
 							getJsonValue(format, "ext", ext);
@@ -391,21 +391,21 @@ namespace YoutubeDL
 							}
 						}
 
-						urls.push_back(CString(bestUrl));
+						urls.emplace_back(CString(bestUrl));
 						if (bVideoOnly) {
 							if (audioUrls.size() > 1) {
 								for (const auto& [language, audioUrl] : audioUrls) {
-									urls.push_back(CString(audioUrl));
+									urls.emplace_back(CString(audioUrl));
 								}
 							} else if (!bestAudioUrl.IsEmpty()) {
-								urls.push_back(CString(bestAudioUrl));
+								urls.emplace_back(CString(bestAudioUrl));
 							}
 						}
 
 						if (!bestAudioUrl.IsEmpty()) {
 							auto profilePtr = std::make_unique<Youtube::YoutubeProfile>();
 							auto profile = profilePtr.get();
-							YoutubeProfiles.push_back(std::move(profilePtr));
+							YoutubeProfiles.emplace_back(std::move(profilePtr));
 
 							profile->type = Youtube::ytype::y_audio;
 
@@ -439,7 +439,7 @@ namespace YoutubeDL
 								CString sub_lang = UTF8ToWStr(subtitle.name.GetString());
 
 								if (!sub_url.IsEmpty() && !sub_lang.IsEmpty()) {
-									subs.push_back({ sub_url, sub_lang });
+									subs.emplace_back(sub_url, sub_lang);
 								}
 							}
 						}
@@ -450,7 +450,7 @@ namespace YoutubeDL
 								float start_time = 0.0f;
 								CString title;
 								if (getJsonValue(chapter, "title", title) && getJsonValue(chapter, "start_time", start_time)) {
-									y_fields.chaptersList.push_back({ title, REFERENCE_TIME(start_time * UNITS) });
+									y_fields.chaptersList.emplace_back(title, REFERENCE_TIME(start_time * UNITS));
 								}
 							}
 						}

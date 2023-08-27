@@ -114,7 +114,7 @@ void CBaseGraph::NotifyEvent(long lEventCode, LONG_PTR lParam1, LONG_PTR lParam2
 	msg.m_lEventCode = lEventCode;
 	msg.m_lParam1 = lParam1;
 	msg.m_lParam2 = lParam2;
-	m_msgqueue.push_back(msg);
+	m_msgqueue.emplace_back(msg);
 
 	PostMessageW((HWND)m_hNotifyWnd, m_lNotifyMsg, 0, m_lNotifyInstData);
 }

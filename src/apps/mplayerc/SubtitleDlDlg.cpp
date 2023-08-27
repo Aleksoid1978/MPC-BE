@@ -242,9 +242,9 @@ bool CSubtitleDlDlg::Parse()
 		} else if (param == "email") {
 			sub.email = value;
 		} else if (param.IsEmpty() && value == "endsubtitle") {
-			m.subs.push_back(sub);
+			m.subs.emplace_back(sub);
 		} else if (param.IsEmpty() && value == "endmovie") {
-			m_pTA->raw_movies.push_back(m);
+			m_pTA->raw_movies.emplace_back(m);
 		} else if (param.IsEmpty() && value == "end") {
 			break;
 		}
@@ -265,7 +265,7 @@ bool CSubtitleDlDlg::Parse()
 			p.disc.Format(L"%d/%d", s.disc_no, s.discs);
 			p.ptr = reinterpret_cast<DWORD_PTR>(&s);
 
-			m_parsed_movies.push_back(p);
+			m_parsed_movies.emplace_back(p);
 		}
 	}
 
@@ -321,7 +321,7 @@ BOOL CSubtitleDlDlg::OnInitDialog()
 
 	while (!token.IsEmpty()) {
 		if (swscanf_s(token, L"%d", &n) == 1) {
-			columnWidth.push_back(n);
+			columnWidth.emplace_back(n);
 			token = strColumnWidth.Tokenize(L",", curPos);
 		} else {
 			throw 1;
@@ -334,11 +334,11 @@ BOOL CSubtitleDlDlg::OnInitDialog()
 
 	if (columnWidth.size() != 5) {
 		columnWidth.clear();
-		columnWidth.push_back(290);
-		columnWidth.push_back(70);
-		columnWidth.push_back(50);
-		columnWidth.push_back(50);
-		columnWidth.push_back(270);
+		columnWidth.emplace_back(290);
+		columnWidth.emplace_back(70);
+		columnWidth.emplace_back(50);
+		columnWidth.emplace_back(50);
+		columnWidth.emplace_back(270);
 	}
 
 	m_list.InsertColumn(COL_FILENAME, ResStr(IDS_SUBDL_DLG_FILENAME_COL), LVCFMT_LEFT, columnWidth[0]);
@@ -405,7 +405,7 @@ void CSubtitleDlDlg::OnOK()
 
 	for (int i = 0; i < m_list.GetItemCount(); ++i) {
 		if (m_list.GetCheck(i)) {
-			m_selsubs.push_back(*reinterpret_cast<isdb_subtitle*>(m_list.GetItemData(i)));
+			m_selsubs.emplace_back(*reinterpret_cast<isdb_subtitle*>(m_list.GetItemData(i)));
 		}
 	}
 

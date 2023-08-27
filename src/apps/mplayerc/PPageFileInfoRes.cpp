@@ -55,7 +55,7 @@ CPPageFileInfoRes::CPPageFileInfoRes(const CString& fn, IFilterGraph* pFG)
 					r.data.resize(len);
 					memcpy(r.data.data(), pData, r.data.size());
 					CoTaskMemFree(pData);
-					m_resources.push_back(r);
+					m_resources.emplace_back(r);
 				}
 			}
 		}

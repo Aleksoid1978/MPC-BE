@@ -295,9 +295,9 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 							str.AppendFormat(L" [%s]", pszName);
 						}
 						if (mt.majortype == MEDIATYPE_Video || mt.subtype == MEDIASUBTYPE_MPEG2_VIDEO) {
-							videoStreams.push_back(str);
+							videoStreams.emplace_back(str);
 						} else if (!pDVDI) {
-							otherStreams.push_back(str);
+							otherStreams.emplace_back(str);
 						}
 
 						bUsePins = FALSE;
@@ -321,9 +321,9 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 				if (!str.IsEmpty()) {
 					str.AppendFormat(L" [%s]", GetPinName(pPin));
 					if (mt.majortype == MEDIATYPE_Video || mt.subtype == MEDIASUBTYPE_MPEG2_VIDEO) {
-						videoStreams.push_back(str);
+						videoStreams.emplace_back(str);
 					} else if (!pDVDI) {
-						otherStreams.push_back(str);
+						otherStreams.emplace_back(str);
 					}
 				}
 
@@ -392,7 +392,7 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 						}
 					}
 
-					otherStreams.push_back(L"Audio: " + str);
+					otherStreams.emplace_back(L"Audio: " + str);
 				}
 			}
 		}
@@ -454,7 +454,7 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 						}
 					}
 
-					otherStreams.push_back(L"Subtitle: " + str + L" [DVD Subtitles]");
+					otherStreams.emplace_back(L"Subtitle: " + str + L" [DVD Subtitles]");
 				}
 			}
 		}

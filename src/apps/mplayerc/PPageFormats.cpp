@@ -892,7 +892,7 @@ void GetUnRegisterExts(CString saved_ext, CString new_ext, std::list<CString>& U
 			});
 
 			if (it == new_exts.cend()) {
-				UnRegisterExts.push_back(L"." + ext);
+				UnRegisterExts.emplace_back(L"." + ext);
 			}
 		}
 	}

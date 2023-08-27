@@ -339,7 +339,7 @@ void CPlayerSubresyncBar::UpdatePreview()
 						break;
 					}
 					if (data & (TSMOD | TSADJ)) {
-						schk.push_back(end);
+						schk.emplace_back(end);
 					}
 				}
 
@@ -966,7 +966,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 					std::vector<int> items;
 					pos = m_list.GetFirstSelectedItemPosition();
 					while (pos) {
-						items.push_back(m_list.GetNextSelectedItem(pos));
+						items.emplace_back(m_list.GetNextSelectedItem(pos));
 					}
 
 					std::sort(items.begin(), items.end(), std::greater<int>());
@@ -1004,7 +1004,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 					std::vector<int> items;
 					pos = m_list.GetFirstSelectedItemPosition();
 					while (pos) {
-						items.push_back(m_list.GetNextSelectedItem(pos));
+						items.emplace_back(m_list.GetNextSelectedItem(pos));
 					}
 
 					std::sort(items.begin(), items.end(), std::greater<int>());
@@ -1073,7 +1073,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 							std::unique_ptr<CPPageSubStyle> page(DNew CPPageSubStyle());
 							page->InitSubStyle(key, val);
 							pages.emplace_back(std::move(page));
-							styles.push_back(val);
+							styles.emplace_back(val);
 
 							if (stss == val) {
 								iSelPage = i;
