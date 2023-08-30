@@ -2,6 +2,18 @@
 
 1.6.9.x dev
 =============================
+AudioSplitter
+Added support for multiple ARTIS tags for FLAC.
+
+SyncRenderer
+Fixed hang when using pixel post-resize shaders.
+
+Player
+Added a Gamma shader with a value of 1.3 which makes the image slightly lighter.
+The COPYING.txt file has been renamed to LICENSE.txt.
+
+Updated Korean translation (by Hackjjang).
+
 Updated libraries:
 	zlib 1.3;
 
