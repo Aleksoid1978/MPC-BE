@@ -68,7 +68,7 @@ public:
 		return nullptr;
 	}
 
-	bool FindFormat(AM_MEDIA_TYPE* pmt, CFormat<T>** ppf) {
+	bool FindFormat(const AM_MEDIA_TYPE* pmt, CFormat<T>** ppf) {
 		if (!pmt) {
 			return false;
 		}

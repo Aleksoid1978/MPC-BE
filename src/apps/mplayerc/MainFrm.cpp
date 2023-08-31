@@ -4982,9 +4982,7 @@ void CMainFrame::OnStreamSub(UINT nID)
 							}
 
 							CString sub_stream(pName);
-							if (pName) {
-								CoTaskMemFree(pName);
-							}
+							CoTaskMemFree(pName);
 
 							if (dwGroup != 2) {
 								continue;
@@ -13853,9 +13851,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 						m_SubtitlesStreams.emplace_back(substream);
 					}
 
-					if (pName) {
-						CoTaskMemFree(pName);
-					}
+					CoTaskMemFree(pName);
 				}
 			}
 		}

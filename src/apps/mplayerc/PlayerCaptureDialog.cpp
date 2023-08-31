@@ -346,10 +346,9 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 	if (!pcurmt) {
 		pf = tfa.front().get();
 		pfeCurrent = pf->front().get();
-	} else if (!tfa.FindFormat(pcurmt, nullptr, &pf, &pfeCurrent) && !tfa.FindFormat(pcurmt, &pf)) {
-		if (pcurmt) {
-			DeleteMediaType(pcurmt);
-		}
+	}
+	else if (!tfa.FindFormat(pcurmt, nullptr, &pf, &pfeCurrent) && !tfa.FindFormat(pcurmt, &pf)) {
+		DeleteMediaType(pcurmt);
 		return;
 	}
 

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -95,12 +95,10 @@ void CMediaTypesDlg::OnCbnSelchangeCombo1()
 		return;
 	}
 
-	if (paths.size()) {
-		for (const auto& path : paths) {
-			reportStr.Append(path + L"\r\n");
-		}
-		reportStr.Append(L"\r\n");
+	for (const auto& path : paths) {
+		reportStr.Append(path + L"\r\n");
 	}
+	reportStr.Append(L"\r\n");
 
 	auto it = mts.begin();
 

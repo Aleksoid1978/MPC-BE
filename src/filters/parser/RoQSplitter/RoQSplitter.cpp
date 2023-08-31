@@ -565,13 +565,16 @@ HRESULT CRoQVideoDecoder::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	if(FAILED(hr = pIn->GetPointer(&pDataIn))) return hr;
 
 	long len = pIn->GetActualDataLength();
-	if(len <= 0) return S_OK; // nothing to do
+	if (len <= 0) {
+		return S_OK; // nothing to do
+	}
 
 	REFERENCE_TIME rtStart = 0, rtStop = 0;
 	pIn->GetTime(&rtStart, &rtStop);
 
-	if(pIn->IsPreroll() == S_OK || rtStart < 0)
+	if (pIn->IsPreroll() == S_OK || rtStart < 0) {
 		return S_OK;
+	}
 
 	BYTE* pDataOut = nullptr;
 	if(FAILED(hr = pOut->GetPointer(&pDataOut)))
@@ -706,9 +709,6 @@ HRESULT CRoQVideoDecoder::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	{
 		return E_UNEXPECTED;
 	}
-
-	if(rtStart < 0)
-		return S_FALSE;
 
 	const BYTE* const src[3] = { m_y[1], m_u[1], m_v[1] };
 

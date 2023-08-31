@@ -916,7 +916,9 @@ HRESULT CBaseSplitterParserOutputPin::ParseVobSub(std::unique_ptr<CPacket>& p)
 		return S_OK;
 	}
 
-	if (p) m_p->AppendData(*p);
+	if (p) {
+		m_p->AppendData(*p);
+	}
 
 	HandleInvalidPacket(5);
 
@@ -924,35 +926,30 @@ HRESULT CBaseSplitterParserOutputPin::ParseVobSub(std::unique_ptr<CPacket>& p)
 	int len = (pData[0] << 8) | pData[1];
 
 	if (!len) {
-		if (m_p) {
-			m_p.reset();
-		}
+		m_p.reset();
 		return hr;
-
 	}
 
 	if ((len > (int)m_p->size())) {
 		return hr;
 	}
 
-	if (m_p) {
-		std::unique_ptr<CPacket> p2(DNew CPacket());
-		p2->TrackNumber		= m_p->TrackNumber;
-		p2->bDiscontinuity	= m_p->bDiscontinuity;
-		p2->bSyncPoint		= m_p->bSyncPoint;
-		p2->rtStart			= m_p->rtStart;
-		p2->rtStop			= m_p->rtStop;
-		p2->pmt				= m_p->pmt;
-		p2->SetData(m_p->data(), m_p->size());
-		m_p.reset();
+	std::unique_ptr<CPacket> p2(DNew CPacket());
+	p2->TrackNumber		= m_p->TrackNumber;
+	p2->bDiscontinuity	= m_p->bDiscontinuity;
+	p2->bSyncPoint		= m_p->bSyncPoint;
+	p2->rtStart			= m_p->rtStart;
+	p2->rtStop			= m_p->rtStop;
+	p2->pmt				= m_p->pmt;
+	p2->SetData(m_p->data(), m_p->size());
+	m_p.reset();
 
-		if (!p2->pmt && m_bFlushed) {
-			p2->pmt = CreateMediaType(&m_mt);
-			m_bFlushed = false;
-		}
-
-		hr = __super::DeliverPacket(std::move(p2));
+	if (!p2->pmt && m_bFlushed) {
+		p2->pmt = CreateMediaType(&m_mt);
+		m_bFlushed = false;
 	}
+
+	hr = __super::DeliverPacket(std::move(p2));
 
 	return hr;
 }
