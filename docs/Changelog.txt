@@ -3,7 +3,7 @@
 1.6.9.x dev
 =============================
 AudioSplitter
-Added support for multiple ARTIS tags for FLAC.
+Added support for multiple ARTIST tags for FLAC.
 
 SyncRenderer
 Fixed hang when using pixel post-resize shaders.
