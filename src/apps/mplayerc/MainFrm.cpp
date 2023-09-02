@@ -14634,7 +14634,7 @@ static void RecurseAddDir(const CString& path, std::list<CString>& sl)
 
 void CMainFrame::ParseDirs(std::list<CString>& sl)
 {
-	std::list<CString> tmp(sl);
+	std::vector<CString> tmp{ sl.cbegin(), sl.cend() };
 	for (auto fn : tmp) {
 		if (::PathIsDirectoryW(fn) && ::PathFileExistsW(fn)) {
 			fn = AddSlash(fn);
