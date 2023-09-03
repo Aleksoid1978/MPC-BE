@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,10 +23,10 @@
 #include "DVBSub.h"
 #include "DSUtil/GolombBuffer.h"
 
-#if (0)		// Set to 1 to activate DVB subtitles traces
-	#define TRACE_DVB	DLog
+#if (0)  // Set to 1 to activate DVB subtitles traces
+	#define TRACE_DVB DLog
 #else
-	#define TRACE_DVB	__noop
+	#define TRACE_DVB __noop
 #endif
 
 #define BUFFER_CHUNK_GROW 0x1000

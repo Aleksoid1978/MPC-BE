@@ -24,10 +24,10 @@
 #include "DSUtil/PixelUtils.h"
 #include "RoQSplitter.h"
 
-#if (0)
-	#define TRACE_ROQ	DLog
+#if (0)  // Set to 1 to activate RoQ packet traces
+	#define TRACE_ROQ DLog
 #else
-	#define TRACE_ROQ	__noop
+	#define TRACE_ROQ __noop
 #endif
 
 #define RoQ_INFO           0x1001

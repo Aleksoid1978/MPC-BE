@@ -30,10 +30,10 @@
 #include <IMediaSideData.h>
 #include <clsids.h>
 
-#if (0)		// Set to 1 to activate EVR traces
-	#define TRACE_EVR	TRACE
+#if (0)  // Set to 1 to activate EVR traces
+	#define TRACE_EVR DLog
 #else
-	#define TRACE_EVR	__noop
+	#define TRACE_EVR __noop
 #endif
 
 #define MIN_FRAME_TIME 15000
