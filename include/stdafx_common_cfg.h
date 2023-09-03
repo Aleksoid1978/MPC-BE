@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2014 see Authors.txt
+ * (C) 2009-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,10 +19,6 @@
  */
 
 #pragma once
-
-#ifdef _WIN64
-	#pragma warning(disable:4267) // hide warning C4267: conversion from 'size_t' to 'type', possible loss of data
-#endif
 
 #ifdef _DEBUG
 	#define _CRTDBG_MAP_ALLOC // include Microsoft memory leak detection procedures

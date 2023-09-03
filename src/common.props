@@ -16,6 +16,7 @@
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <ExceptionHandling>Sync</ExceptionHandling>
       <DisableSpecificWarnings>4244;4302;4838;26451;26812</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Platform)'=='x64'">4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
