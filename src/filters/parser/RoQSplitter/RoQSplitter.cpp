@@ -24,6 +24,12 @@
 #include "DSUtil/PixelUtils.h"
 #include "RoQSplitter.h"
 
+#if (0)
+	#define TRACE_ROQ	DLog
+#else
+	#define TRACE_ROQ	__noop
+#endif
+
 #define RoQ_INFO           0x1001
 #define RoQ_QUAD_CODEBOOK  0x1002
 #define RoQ_QUAD_VQ        0x1011
@@ -285,6 +291,7 @@ void CRoQSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	{
 		m_indexpos = m_index.cend();
 		while(m_indexpos != m_index.cbegin() && (--m_indexpos)->rtv > rt);
+		//m_indexpos = --std::lower_bound(m_index.cbegin(), m_index.cend(), rt, [](const index& item, REFERENCE_TIME rt) {return item.rtv < rt; });
 	}
 }
 
@@ -322,7 +329,7 @@ bool CRoQSplitterFilter::DemuxLoop()
 			p->bSyncPoint = rtVideo == 0;
 			p->rtStart = rtVideo;
 			p->rtStop = rtVideo += (rc.id == RoQ_QUAD_VQ ? 10000000i64/30 : 0);
-			DLog(L"v: %I64d - %I64d (%Iu)", p->rtStart/10000, p->rtStop/10000, p->size());
+			TRACE_ROQ(L"v: %I64d - %I64d (%Iu)", p->rtStart/10000, p->rtStop/10000, p->size());
 		}
 		else if(rc.id == RoQ_SOUND_MONO || rc.id == RoQ_SOUND_STEREO)
 		{
@@ -332,7 +339,7 @@ bool CRoQSplitterFilter::DemuxLoop()
 			p->bSyncPoint = TRUE;
 			p->rtStart = rtAudio;
 			p->rtStop = rtAudio += 10000000i64*rc.size/(nChannels*22050);
-			DLog(L"a: %I64d - %I64d (%Iu)", p->rtStart/10000, p->rtStop/10000, p->size());
+			TRACE_ROQ(L"a: %I64d - %I64d (%Iu)", p->rtStart/10000, p->rtStop/10000, p->size());
 		}
 
 		if(rc.id == RoQ_QUAD_CODEBOOK || rc.id == RoQ_QUAD_VQ || rc.id == RoQ_SOUND_MONO || rc.id == RoQ_SOUND_STEREO)
