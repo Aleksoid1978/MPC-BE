@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -396,7 +396,7 @@ bool Rasterizer::ScanConvert()
 		}
 
 		// Initialize scanline list.
-		mpScanBuffer = DEBUG_NEW unsigned int[m_pOutlineData->mHeight];
+		mpScanBuffer = DNew unsigned int[m_pOutlineData->mHeight];
 		ZeroMemory(mpScanBuffer, m_pOutlineData->mHeight * sizeof(unsigned int));
 
 		// Scan convert the outline.  Yuck, Bezier curves....
