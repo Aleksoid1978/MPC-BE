@@ -316,11 +316,7 @@ WCHAR CDiskImage::MountWin8(LPCWSTR pathName)
 
 									devDesc = (PSTORAGE_DEVICE_DESCRIPTOR)outBuf;
 									if (devDesc->ProductIdOffset && outBuf[devDesc->ProductIdOffset]) {
-										char* productID = DNew char[bytesUsed];
-										memcpy(productID, &outBuf[devDesc->ProductIdOffset], bytesUsed);
-										bIsVirtualDVD = !strncmp(productID, "Virtual DVD-ROM", 15);
-
-										delete [] productID;
+										bIsVirtualDVD = !strncmp(&outBuf[devDesc->ProductIdOffset], "Virtual DVD-ROM", 15);
 									}
 								}
 
