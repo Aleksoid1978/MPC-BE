@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -652,14 +652,12 @@ HRESULT CStreamSwitcherInputPin::CompleteConnect(IPin* pReceivePin)
 					}
 				}
 
-				WCHAR* pName = DNew WCHAR[fileName.GetLength() + 1];
-				if (pName) {
-					wcscpy_s(pName, fileName.GetLength() + 1, fileName);
-					SAFE_DELETE_ARRAY(m_pName);
-					m_pName = pName;
-					if (cStreams == 1) { // Simple external track, no need to use the info from IAMStreamSelect
-						m_pISSF.Release();
-					}
+				SAFE_DELETE_ARRAY(m_pName);
+				m_pName = DNew WCHAR[fileName.GetLength() + 1];
+				wcscpy_s(m_pName, fileName.GetLength() + 1, fileName);
+
+				if (cStreams == 1) { // Simple external track, no need to use the info from IAMStreamSelect
+					m_pISSF.Release();
 				}
 			}
 
