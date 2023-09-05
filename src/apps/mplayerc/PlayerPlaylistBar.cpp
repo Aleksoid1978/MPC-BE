@@ -1957,6 +1957,8 @@ void CPlayerPlaylistBar::RemoveMissingFiles()
 	if (GetCurTab().type == PL_BASIC) {
 		auto& PlayList = GetCurPlayList();
 
+		int n = 0;
+
 		POSITION pos = PlayList.GetHeadPosition();
 		while (pos) {
 			POSITION cur = pos;
@@ -1965,8 +1967,14 @@ void CPlayerPlaylistBar::RemoveMissingFiles()
 				LPCWSTR path = pli.m_fns.front();
 				if (!::PathIsURLW(path) && !::PathFileExistsW(path)) {
 					PlayList.RemoveAt(cur);
+					n++;
 				}
 			}
+		}
+
+		if (n) {
+			SetupList();
+			SavePlaylist();
 		}
 	}
 }
