@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2022 see Authors.txt
+ * (C) 2014-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -416,11 +416,10 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 						if (comment_lenght > gb.RemainingSize()) {
 							break;
 						}
-						BYTE* comment = DNew BYTE[comment_lenght + 1];
-						ZeroMemory(comment, comment_lenght + 1);
-						gb.ReadBuffer(comment, comment_lenght);
-						CString vorbisTag = AltUTF8ToWStr((LPCSTR)comment);
-						delete [] comment;
+						std::vector<BYTE> comment(comment_lenght + 1);
+						gb.ReadBuffer(comment.data(), comment_lenght);
+						CString vorbisTag = AltUTF8ToWStr((LPCSTR)comment.data());
+
 						CString tagValue;
 						if (!vorbisTag.IsEmpty() && ParseVorbisTag(L"WAVEFORMATEXTENSIBLE_CHANNEL_MASK", vorbisTag, tagValue)) {
 							uint64_t channel_layout = wcstol(tagValue, nullptr, 0);
