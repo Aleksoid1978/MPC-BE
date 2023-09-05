@@ -22,8 +22,7 @@ MPC-BE is based on the original Guliverkli project and "Media Player Classic Hom
 ## Links
 - [Project Page  ](https://sourceforge.net/projects/mpcbe/)
 - [Get code      ](https://github.com/Aleksoid1978/MPC-BE.git)
-- [Nightly Builds](https://disk.yandex.ru/d/hlf1lfC8mKU58)
-- [Nightly Builds](https://disk.yandex.ru/d/AjAXDDHtHRIELg)
+- [Nightly Builds](https://github.com/Aleksoid1978/MPC-BE/wiki/Nightly-builds)
 
 ---
  
