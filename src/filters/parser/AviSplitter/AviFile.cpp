@@ -542,11 +542,8 @@ bool CAviFile::IsInterleaved(bool fKeepInfo)
 		m_strms[i]->cs2.resize(m_strms[i]->cs.size());
 	}
 
-	DWORD* curchunks = DNew DWORD[m_avih.dwStreams];
-	UINT64* cursizes = DNew UINT64[m_avih.dwStreams];
-
-	memset(curchunks, 0, sizeof(DWORD)*m_avih.dwStreams);
-	memset(cursizes, 0, sizeof(UINT64)*m_avih.dwStreams);
+	std::vector<DWORD> curchunks(m_avih.dwStreams);
+	std::vector<UINT64> cursizes(m_avih.dwStreams);
 
 	int end = 0;
 
@@ -585,7 +582,7 @@ bool CAviFile::IsInterleaved(bool fKeepInfo)
 		++curchunk;
 	}
 
-	memset(curchunks, 0, sizeof(DWORD)*m_avih.dwStreams);
+	std::fill(curchunks.begin(), curchunks.end(), 0);
 
 	strm_t::chunk2 cs2last = {(DWORD)-1, 0};
 
@@ -618,9 +615,6 @@ bool CAviFile::IsInterleaved(bool fKeepInfo)
 
 		cs2last = cs2min;
 	}
-
-	delete [] curchunks;
-	delete [] cursizes;
 
 	if (fInterleaved && !fKeepInfo) {
 		// this is not needed anymore, let's save a little memory then
