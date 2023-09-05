@@ -1851,11 +1851,11 @@ HRESULT CDX9RenderingEngine::CreateIccProfileLut(wchar_t* profilePath, float* lu
 		return E_FAIL;
 	}
 
-	// Create the 3D LUT input
-	uint16_t* lut3DOutput = DNew uint16_t[m_Lut3DEntryCount * 3];
-	uint16_t* lut3DInput  = DNew uint16_t[m_Lut3DEntryCount * 3];
+	auto lut3DOutput = std::make_unique<uint16_t[]>(m_Lut3DEntryCount * 3);
+	auto lut3DInput  = std::make_unique<uint16_t[]>(m_Lut3DEntryCount * 3);
 
-	uint16_t* lut3DInputIterator = lut3DInput;
+	// Create the 3D LUT input
+	uint16_t* lut3DInputIterator = lut3DInput.get();
 
 	for (unsigned b = 0; b < m_Lut3DSize; b++) {
 		for (unsigned g = 0; g < m_Lut3DSize; g++) {
@@ -1868,7 +1868,7 @@ HRESULT CDX9RenderingEngine::CreateIccProfileLut(wchar_t* profilePath, float* lu
 	}
 
 	// Do the transform
-	cmsDoTransform(hTransform, lut3DInput, lut3DOutput, m_Lut3DEntryCount);
+	cmsDoTransform(hTransform, lut3DInput.get(), lut3DOutput.get(), m_Lut3DEntryCount);
 
 	// Convert the output to floating point
 	for (unsigned i = 0; i < m_Lut3DEntryCount * 3; i++) {
@@ -1876,8 +1876,6 @@ HRESULT CDX9RenderingEngine::CreateIccProfileLut(wchar_t* profilePath, float* lu
 	}
 
 	// Cleanup
-	delete[] lut3DOutput;
-	delete[] lut3DInput;
 	cmsDeleteTransform(hTransform);
 
 	return S_OK;

@@ -1925,45 +1925,44 @@ STDMETHODIMP CBaseAP::GetDIB(BYTE* lpDib, DWORD* size)
 	bih->biPlanes = 1;
 	bih->biSizeImage = DIBSIZE(*bih);
 
-	uint32_t* p = nullptr;
+	std::unique_ptr<uint32_t> tmp_frame;
 	if (m_iRotation) {
-		p = DNew uint32_t[bih->biWidth * bih->biHeight];
+		tmp_frame.reset(new(std::nothrow) uint32_t[bih->biWidth * bih->biHeight]);
 	}
 
-	RetrieveBitmapData(desc.Width, desc.Height, 32, p ? (BYTE*)p : (BYTE*)(bih + 1), (BYTE*)r.pBits, r.Pitch);
+	RetrieveBitmapData(desc.Width, desc.Height, 32, tmp_frame ? (BYTE*)tmp_frame.get() : (BYTE*)(bih + 1), (BYTE*)r.pBits, r.Pitch);
 
 	pSurface->UnlockRect();
 
-	if (p) {
+	if (tmp_frame) {
 		int w = bih->biWidth;
 		int h = bih->biHeight;
+		uint32_t* src = tmp_frame.get();
 		uint32_t* out = (uint32_t*)(bih + 1);
 
 		switch (m_iRotation) {
 		case 90:
 			for (int x = w-1; x >= 0; x--) {
 				for (int y = 0; y < h; y++) {
-					*out++ = p[x + w*y];
+					*out++ = src[x + w*y];
 				}
 			}
 			std::swap(bih->biWidth, bih->biHeight);
 			break;
 		case 180:
 			for (int i = w*h - 1; i >= 0; i--) {
-				*out++ = p[i];
+				*out++ = src[i];
 			}
 			break;
 		case 270:
 			for (int x = 0; x < w; x++) {
 				for (int y = h-1; y >= 0; y--) {
-					*out++ = p[x + w*y];
+					*out++ = src[x + w*y];
 				}
 			}
 			std::swap(bih->biWidth, bih->biHeight);
 			break;
 		}
-
-		delete[] p;
 	}
 
 	return S_OK;
