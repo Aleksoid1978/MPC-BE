@@ -536,7 +536,8 @@ bool CCDXAStream::LookForMediaSubType()
 
 				if (nMatches > 0 && nMatches*4 == nTries) {
 					m_subtype = GUIDFromCString(subtype);
-					return S_OK;
+
+					return true;
 				}
 			}
 		}
