@@ -67,12 +67,14 @@ STDMETHODIMP CBaseSplitterOutputPin::NonDelegatingQueryInterface(REFIID riid, vo
 HRESULT CBaseSplitterOutputPin::SetName(LPCWSTR pName)
 {
 	CheckPointer(pName, E_POINTER);
-	SAFE_DELETE_ARRAY(m_pName);
 
-	size_t len = wcslen(pName) + 1;
+	if (m_pName) {
+		delete[] m_pName;
+	}
+	const size_t len = wcslen(pName) + 1;
 	m_pName = DNew WCHAR[len];
-	CheckPointer(m_pName, E_OUTOFMEMORY);
 	wcscpy_s(m_pName, len, pName);
+
 	return S_OK;
 }
 

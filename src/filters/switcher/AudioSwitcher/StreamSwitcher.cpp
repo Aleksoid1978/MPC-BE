@@ -652,9 +652,12 @@ HRESULT CStreamSwitcherInputPin::CompleteConnect(IPin* pReceivePin)
 					}
 				}
 
-				SAFE_DELETE_ARRAY(m_pName);
-				m_pName = DNew WCHAR[fileName.GetLength() + 1];
-				wcscpy_s(m_pName, fileName.GetLength() + 1, fileName);
+				if (m_pName) {
+					delete[] m_pName;
+				}
+				const size_t len = fileName.GetLength() + 1;
+				m_pName = DNew WCHAR[len];
+				wcscpy_s(m_pName, len, fileName);
 
 				if (cStreams == 1) { // Simple external track, no need to use the info from IAMStreamSelect
 					m_pISSF.Release();

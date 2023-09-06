@@ -192,13 +192,13 @@ STDMETHODIMP CBaseStream::Notify(IBaseFilter* pSender, Quality q)
 HRESULT CBaseStream::SetName(LPCWSTR pName)
 {
 	CheckPointer(pName, E_POINTER);
-	if (m_pName) {
-		delete [] m_pName;
-	}
 
-	size_t len = wcslen(pName) + 1;
+	if (m_pName) {
+		delete[] m_pName;
+	}
+	const size_t len = wcslen(pName) + 1;
 	m_pName = DNew WCHAR[len];
-	CheckPointer(m_pName, E_OUTOFMEMORY);
 	wcscpy_s(m_pName, len, pName);
+
 	return S_OK;
 }
