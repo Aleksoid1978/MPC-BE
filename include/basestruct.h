@@ -123,21 +123,6 @@ struct ColorSpace {
 	BYTE ChromaLocation;
 };
 
-// A byte that is not initialized to std::vector when using the resize method.
-// Note: can be slow in debug mode.
-struct NoInitByte
-{
-	uint8_t value;
-#pragma warning(push)
-#pragma warning(disable:26495)
-	NoInitByte() {
-		// do nothing
-		static_assert(sizeof(*this) == sizeof (value), "invalid size");
-		//static_assert(__alignof(*this) == __alignof(value), "invalid alignment");
-	}
-#pragma warning(pop)
-};
-
 struct PinType {
 	GUID major;
 	GUID sub;
