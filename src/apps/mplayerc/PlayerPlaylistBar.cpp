@@ -356,15 +356,15 @@ void CPlaylistItem::AutoLoadFiles()
 		return;
 	}
 
-	CString fn = m_fns.front();
-	if (fn.Find(L"://") >= 0) { // skip URLs
+	CStringW fpath = m_fns.front();
+	if (fpath.Find(L"://") >= 0) { // skip URLs
 		return;
 	}
 
-	int n = fn.ReverseFind('\\') + 1;
-	CString curdir = fn.Left(n);
-	CString name   = fn.Mid(n);
-	CString ext;
+	int n = fpath.ReverseFind('\\') + 1;
+	CStringW curdir = fpath.Left(n);
+	CStringW name   = fpath.Mid(n);
+	CStringW ext;
 	n = name.ReverseFind('.');
 	if (n >= 0) {
 		ext = name.Mid(n + 1).MakeLower();
@@ -372,7 +372,7 @@ void CPlaylistItem::AutoLoadFiles()
 	}
 
 	CString BDLabel, empty;
-	AfxGetMainFrame()->MakeBDLabel(fn, empty, &BDLabel);
+	AfxGetMainFrame()->MakeBDLabel(fpath, empty, &BDLabel);
 	if (!BDLabel.IsEmpty()) {
 		FixFilename(BDLabel);
 	}
@@ -394,9 +394,9 @@ void CPlaylistItem::AutoLoadFiles()
 
 				HANDLE hFind;
 				std::vector<CString> searchPattern;
-				searchPattern.emplace_back(path + name + L"*.*");
+				searchPattern.emplace_back(path + name + L".*"); // more general filename mask, clarification will follow
 				if (!BDLabel.IsEmpty()) {
-					searchPattern.emplace_back(path + BDLabel + L"*.*");
+					searchPattern.emplace_back(path + BDLabel + L".*");
 				}
 				for (size_t j = 0; j < searchPattern.size(); j++) {
 					hFind = FindFirstFileW(searchPattern[j], &fd);
@@ -406,19 +406,16 @@ void CPlaylistItem::AutoLoadFiles()
 							if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 								continue;
 							}
-
-							CString ext2 = fd.cFileName;
-							n = ext2.ReverseFind('.');
-							if (n < 0) {
+							const CStringW fn = fd.cFileName;
+							if (fn[name.GetLength()] != L'.') {
 								continue;
 							}
-							ext2 = ext2.Mid(n + 1).MakeLower();
-							CString fullpath = path + fd.cFileName;
-
-							if (ext != ext2
-									&& mf.FindAudioExt(ext2)
-									&& !FindFileInList(m_fns, fullpath)
-									&& s.GetFileEngine(fullpath) == DirectShow) {
+							const CStringW ext2 = fn.Mid(fn.ReverseFind('.') + 1).MakeLower();
+							if (ext == ext2 || !mf.FindAudioExt(ext2)) {
+								continue;
+							}
+							const CStringW fullpath = path + fn;
+							if (!FindFileInList(m_fns, fullpath)) {
 								m_fns.emplace_back(fullpath);
 							}
 						} while (FindNextFileW(hFind, &fd));
@@ -439,7 +436,7 @@ void CPlaylistItem::AutoLoadFiles()
 		}
 
 		std::vector<CString> ret;
-		Subtitle::GetSubFileNames(fn, paths, ret);
+		Subtitle::GetSubFileNames(fpath, paths, ret);
 
 		for (const auto& sub_fn : ret) {
 			if (!FindFileInList(m_subs, sub_fn)) {
@@ -460,7 +457,7 @@ void CPlaylistItem::AutoLoadFiles()
 	}
 
 	// cue-sheet file auto-load
-	CString cuefn(fn);
+	CString cuefn(fpath);
 	cuefn.Replace(ext, L"cue");
 	if (::PathFileExistsW(cuefn)) {
 		CString filter;
