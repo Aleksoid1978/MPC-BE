@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -83,9 +83,9 @@ HRESULT CWave64File::Open(CBaseSplitterFile* pFile)
 				return E_FAIL;
 			}
 			m_fmtsize = std::max(Chunk64.size, (__int64)sizeof(WAVEFORMATEX)); // PCMWAVEFORMAT to WAVEFORMATEX
-			m_fmtdata = DNew BYTE[m_fmtsize];
-			memset(m_fmtdata, 0, m_fmtsize);
-			if (m_pFile->ByteRead(m_fmtdata, Chunk64.size) != S_OK) {
+			m_fmtdata.reset(DNew BYTE[m_fmtsize]);
+			memset(m_fmtdata.get(), 0, m_fmtsize);
+			if (m_pFile->ByteRead(m_fmtdata.get(), Chunk64.size) != S_OK) {
 				DLog(L"CWave64File::Open() : format can not be read.");
 				return E_FAIL;
 			}

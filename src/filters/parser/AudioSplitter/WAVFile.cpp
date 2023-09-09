@@ -38,7 +38,6 @@ typedef union {
 
 CWAVFile::~CWAVFile()
 {
-	SAFE_DELETE_ARRAY(m_fmtdata);
 }
 
 bool CWAVFile::ProcessWAVEFORMATEX()
@@ -47,9 +46,9 @@ bool CWAVFile::ProcessWAVEFORMATEX()
 		return false;
 	}
 
-	WAVEFORMATEX* wfe = (WAVEFORMATEX*)m_fmtdata;
+	WAVEFORMATEX* wfe = (WAVEFORMATEX*)m_fmtdata.get();
 	if (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && m_fmtsize >= sizeof(WAVEFORMATEXTENSIBLE)) {
-		WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)m_fmtdata;
+		WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)m_fmtdata.get();
 		m_subtype = wfex->SubFormat;
 		if (CountBits(wfex->dwChannelMask) != wfex->Format.nChannels) {
 			// fix incorrect dwChannelMask
@@ -75,19 +74,18 @@ bool CWAVFile::ProcessWAVEFORMATEX()
 		wfex.dwChannelMask               = GetDefChannelMask(wfe->nChannels);
 		wfex.SubFormat                   = m_subtype;
 
-		delete[] m_fmtdata;
 		m_fmtsize = sizeof(WAVEFORMATEXTENSIBLE);
-		m_fmtdata = DNew BYTE[m_fmtsize];
-		memcpy(m_fmtdata, &wfex, m_fmtsize);
+		m_fmtdata.reset(DNew BYTE[m_fmtsize]);
+		memcpy(m_fmtdata.get(), &wfex, m_fmtsize);
 
-		wfe = (WAVEFORMATEX*)m_fmtdata;
+		wfe = (WAVEFORMATEX*)m_fmtdata.get();
 	}
 
 	m_samplerate		= wfe->nSamplesPerSec;
 	m_bitdepth			= wfe->wBitsPerSample;
 	m_channels			= wfe->nChannels;
 	if (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && m_fmtsize >= sizeof(WAVEFORMATEXTENSIBLE)) {
-		m_layout = ((WAVEFORMATEXTENSIBLE*)m_fmtdata)->dwChannelMask;
+		m_layout = ((WAVEFORMATEXTENSIBLE*)wfe)->dwChannelMask;
 	} else {
 		m_layout = GetDefChannelMask(wfe->nChannels);
 	}
@@ -102,7 +100,7 @@ bool CWAVFile::ProcessWAVEFORMATEX()
 
 bool CWAVFile::CheckDTSAC3CD()
 {
-	WAVEFORMATEX* wfe = (WAVEFORMATEX*)m_fmtdata;
+	WAVEFORMATEX* wfe = (WAVEFORMATEX*)m_fmtdata.get();
 	if (m_fmtsize != sizeof(WAVEFORMATEX)
 			|| wfe->wFormatTag != WAVE_FORMAT_PCM
 			|| wfe->nChannels != 2
@@ -165,7 +163,7 @@ bool CWAVFile::SetMediaType(CMediaType& mt)
 	mt.subtype		= m_subtype;
 	mt.SetSampleSize(m_blocksize);
 
-	memcpy(mt.AllocFormatBuffer(m_fmtsize), m_fmtdata, m_fmtsize);
+	memcpy(mt.AllocFormatBuffer(m_fmtsize), m_fmtdata.get(), m_fmtsize);
 
 	return true;
 }
@@ -238,9 +236,9 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 				return E_FAIL;
 			}
 			m_fmtsize = std::max(Chunk.size, (DWORD)sizeof(WAVEFORMATEX)); // PCMWAVEFORMAT to WAVEFORMATEX
-			m_fmtdata = DNew BYTE[m_fmtsize];
-			memset(m_fmtdata, 0, m_fmtsize);
-			if (m_pFile->ByteRead(m_fmtdata, Chunk.size) != S_OK) {
+			m_fmtdata.reset(DNew BYTE[m_fmtsize]);
+			memset(m_fmtdata.get(), 0, m_fmtsize);
+			if (m_pFile->ByteRead(m_fmtdata.get(), Chunk.size) != S_OK) {
 				DLog(L"CWAVFile::Open() : format can not be read.");
 				return E_FAIL;
 			}
@@ -431,7 +429,7 @@ HRESULT CWAVFile::ReadCueTag(const DWORD chunk_size)
 		return E_FAIL;
 	}
 
-	const auto wfe = (WAVEFORMATEX*)m_fmtdata;
+	const auto wfe = (WAVEFORMATEX*)m_fmtdata.get();
 	if (chunk_size > 4 && wfe->nSamplesPerSec) {
 		const auto& samplerate = wfe->nSamplesPerSec;
 		unsigned cues;

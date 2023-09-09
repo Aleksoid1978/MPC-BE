@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2020 see Authors.txt
+ * (C) 2014-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,7 +27,7 @@ class CWAVFile : public CAudioFile
 protected:
 	__int64  m_length      = 0;
 
-	BYTE*    m_fmtdata     = nullptr;
+	std::unique_ptr<BYTE> m_fmtdata;
 	DWORD    m_fmtsize     = 0;
 
 	WORD     m_nBlockAlign = 0;
