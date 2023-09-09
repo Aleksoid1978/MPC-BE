@@ -836,9 +836,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	ASSERT(pApp);
 	CProfile& profile = AfxGetProfile();
 
-	UINT len;
-	BYTE* ptr = nullptr;
-
 	if (bInitialized && !bForce) {
 		return;
 	}
@@ -1292,6 +1289,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		}
 
 		entry.Format(L"Res%u", cnt);
+		BYTE* ptr = nullptr;
+		UINT len;
 		if (profile.ReadBinaryOld(IDS_RS_FULLSCREENRES, entry, &ptr, len)) {
 			if (len >= (sizeof(fpsmode) + 1)) {
 				BYTE size = ptr[0];
