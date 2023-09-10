@@ -119,9 +119,9 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "Randor audio",IDC_STATIC,5,5,285,46
     COMBOBOX        IDC_AUDRND_COMBO,10,15,212,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Proprietăți",IDC_BUTTON1,226,14,70,14
+    PUSHBUTTON      "Proprietăți",IDC_BUTTON1,226,14,60,14
     COMBOBOX        IDC_COMBO1,10,33,212,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Ieșire duală",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,226,35,70,10
+    CONTROL         "Ieșire duală",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,226,35,60,10
     GROUPBOX        "Setări de deschidere audio",IDC_STATIC,5,54,285,51
     CONTROL         "Încarcă automat fișierele audio",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,65,276,9
     EDITTEXT        IDC_EDIT4,10,76,222,13,ES_AUTOHSCROLL
@@ -161,7 +161,7 @@ BEGIN
     CONTROL         "Int16",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,218,32,9
     CONTROL         "Int24",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,52,218,32,9
     CONTROL         "Int32",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,94,218,32,9
-    CONTROL         "Float (număr întreg)", 10232, BUTTON, BS_AUTOCHECKBOX | WS_CHILD | WS_VISIBLE | WS_TABSTOP, 137, 218, 97, 9 
+    CONTROL         "Float (număr întreg)",IDC_CHECK12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,137,218,32,9
     CONTROL         "Decalarea timpului audio (ms):",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,240,115,9
     EDITTEXT        IDC_EDIT2,129,238,46,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,174,238,12,13
@@ -255,9 +255,9 @@ BEGIN
     CONTROL         "Forțează un singur proces",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE | WS_GROUP,10,53,105,18
     CONTROL         "Folosește același player pentru fiecare fișier media",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE,10,17,105,18
     CONTROL         "Deschide un player nou pentru fiecare fișier media redat",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE,10,35,105,18
-    LTEXT           "Textul barei de titlu",IDC_STATIC,10,80,180,8
+    LTEXT           "Textul barei de titlu",IDC_STATIC,10,80,109,8
     COMBOBOX        IDC_COMBO1,10,91,109,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Caută textul barei",IDC_STATIC,10,108,80,8
+    LTEXT           "Caută textul barei",IDC_STATIC,10,108,100,8
     COMBOBOX        IDC_COMBO2,10,119,109,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Locația setărilor",IDC_STATIC,5,140,115,55
     CONTROL         "Registru Windows",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | BS_TOP | WS_GROUP,10,153,106,10
@@ -345,8 +345,8 @@ BEGIN
     EDITTEXT        IDC_EDIT3,190,85,94,13,ES_AUTOHSCROLL
     LTEXT           "(Exemplu: rum eng jap swe)",IDC_STATIC,147,101,132,8
     GROUPBOX        "Setări pentru deschidere",IDC_STATIC,5,172,286,79
-    CONTROL         "Când se deschide un fișier audio,", -1, STATIC, SS_LEFT | WS_CHILD | WS_VISIBLE | WS_GROUP,  119, 180, 166, 45
-    CONTROL         "", 10244, COMBOBOX, CBS_DROPDOWNLIST | WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_TABSTOP, 135, 181, 150, 46
+    LTEXT           "Când se deschide un fișier audio,",IDC_STATIC,10,185,99,8
+    COMBOBOX        IDC_COMBO4,113,182,172,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Adaugă în plus, la lista de redare:",IDC_STATIC,10,201,139,8
     COMBOBOX        IDC_COMBO5,150,198,135,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Folosește un fir de execuţie secundar pentru a construi graficul filtrelor",IDC_CHECK7,
@@ -417,8 +417,8 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "",IDC_STATIC,7,5,282,83
-    CONTROL         "Folosește tema "întunecată" (în mod implicit)",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,5,227,8,WS_EX_TRANSPARENT
-    LTEXT           "Luminozitate :",IDC_STATIC1,14,19,46,8,0,WS_EX_TRANSPARENT
+    CONTROL         "Folosește tema ",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,5,114,8,WS_EX_TRANSPARENT
+    LTEXT           "Luminozitate:",IDC_STATIC1,14,19,46,8,0,WS_EX_TRANSPARENT
     CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,58,19,165,12
     LTEXT           "Setarea culorii indicatorului sunetului:",IDC_STATIC2,14,31,165,8
     LTEXT           "Umplere:",IDC_STATIC_CLRFACE,14,43,46,8,0,WS_EX_TRANSPARENT
@@ -438,13 +438,13 @@ BEGIN
     CONTROL         "Folosește indiciu de timp:",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,99,152,9
     COMBOBOX        IDC_COMBO3,170,97,115,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Folosește previzualizarea în căutare",IDC_CHECK_PRV,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,113,264,9
-    LTEXT           "Dimensiunea raportată la lățimea ecranului:",IDC_STATIC6,15,127,139,8
+    LTEXT           "Dimensiunea raportată la lățimea ecranului:",IDC_STATIC6,24,127,130,8
     EDITTEXT        IDC_EDIT1,159,125,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC7,186,127,10,8
     COMBOBOX        IDC_COMBO4,209,125,76,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Arată semne pentru capitole în bara de căutare",IDC_CHECK_CHM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,139,182,9
     CONTROL         "Folosește bara pentru sărituri",IDC_CHECK_FLYBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,152,182,9
-    LTEXT           "Dimensiunea scrisului (fontului) listei de redare:",IDC_STATIC,13,165,110,17 
+    LTEXT           "Dimensiunea scrisului (fontului) listei de redare:",IDC_STATIC,13,165,110,8
     EDITTEXT        IDC_EDIT2,127,163,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,165,10,8
     GROUPBOX        "OSD",IDC_STATIC,7,183,282,60
@@ -458,7 +458,7 @@ BEGIN
     PUSHBUTTON      "G2",IDC_BUTTON_CLRGRAD2,62,226,20,14
     RTEXT           "Transparent:",IDC_STATIC,86,211,59,8
     CONTROL         "",IDC_SLIDER_OSDTRANS,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,149,210,51,12
-    RTEXT           "Dimensiunea chenarului:",IDC_STATIC,87,226,58,17
+    RTEXT           "Dimensiunea chenarului:",IDC_STATIC,94,228,51,8
     EDITTEXT        IDC_EDIT4,152,226,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN10,"msctls_updown32",UDS_WRAP | UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,166,226,12,13
     CONTROL         "Umbră",IDC_CHECK_SHADOW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,224,194,46,9
@@ -472,9 +472,9 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "Dimensiunea ferestrei la pornire",IDC_STATIC,5,5,286,67
-    CONTROL         "Dimensiunea standard a ferestrei",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,16,142,10
+    CONTROL         "Dimensiunea standard a ferestrei",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,16,106,10
     CONTROL         "Reține ultima dimensiune a ferestrei",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,30,127,10
-    CONTROL         "Setează mărimea ferestrei specificată",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,4,44,135,10
+    CONTROL         "Setează mărimea ferestrei specificată",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,10,44,118,10
     CONTROL         "Setează zona video specificată",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,10,58,118,10
     EDITTEXT        IDC_EDIT1,133,43,28,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
     CTEXT           "×",IDC_STATIC,162,45,8,8
@@ -870,16 +870,16 @@ BEGIN
     COMBOBOX        IDC_D3D9DEVICE_COMBO,144,49,142,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Ecran complet exclusiv pe o fereastră suplimentară",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,79,224,10
-    CONTROL         "Ieșire RGB de 10 biți",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,92,99,10
+    CONTROL         "Ieșire RGB de 10 biți",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,92,92,10
     CONTROL         "Reinițializează la schimbarea ecranului",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_TOP | WS_TABSTOP,10,65,164,9
     LTEXT           "Preîncărcări EVR:",IDC_STATIC5,10,107,65,8
     EDITTEXT        IDC_EVR_BUFFERS,10,120,35,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,33,120,12,13
-    LTEXT           "Formatul de suprafață:",IDC_STATIC2,99,124,89,8
+    LTEXT           "Formatul de suprafață:",IDC_STATIC2,115,124,72,8
     COMBOBOX        IDC_COMBO1,188,122,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Redimensionare:",IDC_STATIC3,99,141,89,8
     COMBOBOX        IDC_DX9RESIZER_COMBO,188,139,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Reducere la scară de <50%:",IDC_STATIC10,99,158,72,8
+    LTEXT           "Reducere la scară de <50%:",IDC_STATIC10,115,158,72,8
     COMBOBOX        IDC_COMBO7,188,156,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Interval de ieșire:",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -894,7 +894,7 @@ BEGIN
     CONTROL         "Nu scala la scăderile mici de dimensiuni de cadre",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,247,195,10
     PUSHBUTTON      "Implicit",IDC_BUTTON3,234,246,56,14
-    LTEXT           "Modul de prezentare:",IDC_STATIC6,99,107,89,8
+    LTEXT           "Modul de prezentare:",IDC_STATIC6,115,107,72,8
     COMBOBOX        IDC_COMBO3,188,105,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
 END
 
@@ -903,7 +903,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "YouTube",IDC_STATIC,6,5,285,96
-    CONTROL         "Folosește analizatorul de pagini web încorporat",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,16,200,10
+    CONTROL         "Folosește analizatorul de pagini web încorporat",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,16,120,10
     LTEXT           "Formatul preferat:",IDC_STATIC2,10,30,104,8
     COMBOBOX        IDC_COMBO1,10,40,50,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO2,64,40,50,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -918,7 +918,7 @@ BEGIN
     COMBOBOX        IDC_COMBO4,116,116,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Înălțimea video maximă:",IDC_STATIC,10,134,104,8
     COMBOBOX        IDC_COMBO3,116,132,43,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Selectează numărul maxim de cadre/secundă (fps) sau rata de biți",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,148,230,10
+    CONTROL         "Selectează numărul maxim de cadre/secundă (fps) sau rata de biți",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,148,196,10
     LTEXT           "Adresa AceStream:",IDC_STATIC,10,169,77,8
     EDITTEXT        IDC_EDIT1,91,167,195,13,ES_AUTOHSCROLL
     LTEXT           "Adresa MatriX (TorrServer):",IDC_STATIC,10,186,103,8
