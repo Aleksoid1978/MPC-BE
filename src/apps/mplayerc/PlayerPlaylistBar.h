@@ -76,6 +76,10 @@ public:
 		return m_fn;
 	};
 
+	CString GetExt() const {
+		return m_fn.Mid(m_fn.ReverseFind(L'.') + 1).MakeLower();
+	};
+
 	REFERENCE_TIME GetDuration() const {
 		return m_duration;
 	};

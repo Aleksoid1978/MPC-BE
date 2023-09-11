@@ -1994,14 +1994,19 @@ void CPlayerPlaylistBar::Remove(const std::vector<int>& items, const bool bDelet
 
 			if (bDelete) {
 				const auto item = curPlayList.GetAt(pos);
-				for (const auto& fn : item.m_fns) {
-					if (::PathFileExistsW(fn)) {
-						fns.emplace_back(fn);
-					}
-				}
-				for (const auto& sub : item.m_subs) {
-					if (::PathFileExistsW(sub)) {
-						fns.emplace_back(sub);
+				if (item.m_fns.size()) {
+					CStringW ext = item.m_fns.front().GetExt();
+					if (ext != L"ifo") {
+						for (const auto& fn : item.m_fns) {
+							if (::PathFileExistsW(fn)) {
+								fns.emplace_back(fn);
+							}
+						}
+						for (const auto& sub : item.m_subs) {
+							if (::PathFileExistsW(sub)) {
+								fns.emplace_back(sub);
+							}
+						}
 					}
 				}
 			}
