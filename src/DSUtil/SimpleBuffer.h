@@ -60,9 +60,8 @@ public:
 	// Increase the size if necessary. Old data may be lost. The size will be rounded up to a multiple of 256 bytes.
 	void ExtendSize(const size_t size)
 	{
-		size_t newsize = ((size * sizeof(T) + 255) & ~(size_t)255) / sizeof(T); // rounded up a multiple of 256 bytes.
-
-		if (newsize > this->m_size) {
+		if (size > this->m_size) {
+			size_t newsize = ((size * sizeof(T) + 255) & ~(size_t)255) / sizeof(T); // rounded up a multiple of 256 bytes.
 			this->SetSize(newsize);
 		}
 	}
@@ -70,14 +69,14 @@ public:
 	// Increase the size if necessary. Old data will be intact. The size will be rounded up to a multiple of 256 bytes.
 	void ExtendSizeNoDiscard(const size_t size)
 	{
-		size_t newsize = ((size * sizeof(T) + 255) & ~(size_t)255) / sizeof(T); // rounded up a multiple of 256 bytes.
-
-		if (newsize > this->m_size) {
+		if (size > this->m_size) {
 			size_t old_bytes = this->Bytes();
 			std::unique_ptr<T[]> old_data = std::move(this->m_data);
 			this->m_size = 0;
 
+			size_t newsize = ((size * sizeof(T) + 255) & ~(size_t)255) / sizeof(T); // rounded up a multiple of 256 bytes.
 			this->SetSize(newsize);
+
 			memcpy(this->m_data.get(), old_data.get(), old_bytes);
 		}
 	}
