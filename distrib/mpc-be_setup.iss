@@ -662,6 +662,9 @@ begin
 
   WizardForm.ComponentsList.Height := WizardForm.ComponentsList.Height + DeltaY;
 
+  Idx := WizardForm.ComponentsList.Items.IndexOf(ExpandConstant('{cm:comp_intel_msdk}'));
+  WizardForm.ComponentsList.Checked[Idx] := False;
+
   Idx := WizardForm.ComponentsList.Items.IndexOf('{#mpcvr_desc}');
   WizardForm.ComponentsList.Checked[Idx] := False;
   Path := ExpandConstant('{src}\{#mpcvr_zip}');
