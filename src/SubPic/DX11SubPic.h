@@ -27,7 +27,7 @@
 class CDX11SubPicAllocator;
 
 struct MemPic_t {
-	std::unique_ptr<uint32_t> data;
+	std::unique_ptr<uint32_t[]> data;
 	UINT w = 0;
 	UINT h = 0;
 };
