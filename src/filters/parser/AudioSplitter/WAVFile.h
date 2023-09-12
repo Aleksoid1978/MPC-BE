@@ -27,7 +27,7 @@ class CWAVFile : public CAudioFile
 protected:
 	__int64  m_length      = 0;
 
-	std::unique_ptr<BYTE> m_fmtdata;
+	std::unique_ptr<BYTE[]> m_fmtdata;
 	DWORD    m_fmtsize     = 0;
 
 	WORD     m_nBlockAlign = 0;

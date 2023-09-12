@@ -2243,7 +2243,7 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 	bih->biPlanes         = 1;
 	bih->biSizeImage      = DIBSIZE(*bih);
 
-	std::unique_ptr<uint32_t> tmp_frame;
+	std::unique_ptr<uint32_t[]> tmp_frame;
 	if (rotation) {
 		tmp_frame.reset(new(std::nothrow) uint32_t[bih->biWidth * bih->biHeight]);
 	}
