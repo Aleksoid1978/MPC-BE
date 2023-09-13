@@ -105,10 +105,15 @@ static bool ParseCUESheetFile(CString fn, std::list<CUETrack> &CUETrackList, CSt
 		CString cmd = GetCUECommand(cueLine);
 		if (cmd == L"TRACK") {
 			sTrackArray.emplace_back(cueLine);
-		} else if (cmd == L"FILE" && cueLine.Find(L" WAVE") > 0) {
-			cueLine.Replace(L" WAVE", L"");
-			cueLine.Trim(L" \"");
-			sFilesArray.emplace_back(cueLine);
+		} else if (cmd == L"FILE") {
+			int a = cueLine.Find('\"');
+			int b = cueLine.Find('\"', a + 1);
+			int len = b - 1 - a;
+			if (len > 0) {
+				CStringW fn = cueLine.Mid(a + 1, len);
+				fn.Trim();
+				sFilesArray.emplace_back(fn);
+			}
 		}
 	};
 
@@ -159,13 +164,17 @@ static bool ParseCUESheetFile(CString fn, std::list<CUETrack> &CUETrackList, CSt
 			if (sFileName2.IsEmpty() && Performer.IsEmpty()) {
 				Performer = sPerformer;
 			}
-		} else if (cmd == L"FILE" && cueLine.Find(L" WAVE") > 0) {
-			cueLine.Replace(L" WAVE", L"");
-			cueLine.Trim(L" \"");
-			if (sFileName.IsEmpty()) {
-				sFileName = sFileName2 = cueLine;
-			} else {
-				sFileName2 = cueLine;
+		} else if (cmd == L"FILE") {
+			int a = cueLine.Find('\"');
+			int b = cueLine.Find('\"', a + 1);
+			int len = b - 1 - a;
+			if (len > 0) {
+				CStringW fn = cueLine.Mid(a + 1, len);
+				fn.Trim();
+				sFileName2 = fn;
+				if (sFileName.IsEmpty()) {
+					sFileName = fn;
+				}
 			}
 		} else if (cmd == L"INDEX") {
 			unsigned mm, ss, ff;
