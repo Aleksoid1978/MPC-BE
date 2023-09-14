@@ -1090,10 +1090,12 @@ BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoi
 	BOOL bResult = FALSE;
 
 	CLIPFORMAT cfFormat = 0;
-	bool bUnicode = false;
-	bool bUrl = false;
 
-	if (pDataObject->IsDataAvailable(CF_HDROP)) {
+	if (pDataObject->IsDataAvailable(CF_URLW)) {
+		cfFormat = CF_URLW;
+	} else if (pDataObject->IsDataAvailable(CF_URLA)) {
+		cfFormat = CF_URLA;
+	} else if (pDataObject->IsDataAvailable(CF_HDROP)) {
 		if (HGLOBAL hGlobal = pDataObject->GetGlobalData(CF_HDROP)) {
 			if (HDROP hDrop = (HDROP)GlobalLock(hGlobal)) {
 				std::list<CString> slFiles;
@@ -1109,16 +1111,8 @@ BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoi
 			}
 			GlobalUnlock(hGlobal);
 		}
-	} else if (pDataObject->IsDataAvailable(CF_URLW)) {
-		cfFormat = CF_URLW;
-		bUnicode = true;
-		bUrl = true;
-	} else if (pDataObject->IsDataAvailable(CF_URLA)) {
-		cfFormat = CF_URLA;
-		bUrl = true;
 	} else if (pDataObject->IsDataAvailable(CF_UNICODETEXT)) {
 		cfFormat = CF_UNICODETEXT;
-		bUnicode = true;
 	} else if (pDataObject->IsDataAvailable(CF_TEXT)) {
 		cfFormat = CF_TEXT;
 	}
@@ -1127,18 +1121,14 @@ BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoi
 		FORMATETC fmt = { cfFormat, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 		if (HGLOBAL hGlobal = pDataObject->GetGlobalData(cfFormat, &fmt)) {
 			LPVOID LockData = GlobalLock(hGlobal);
-			auto pUnicodeText = (LPCWSTR)LockData;
-			auto pAnsiText = (LPCSTR)LockData;
+			auto pUnicodeText = reinterpret_cast<LPCWSTR>(LockData);
+			auto pAnsiText = reinterpret_cast<LPCSTR>(LockData);
+			bool bUnicode = cfFormat == CF_URLW || cfFormat == CF_UNICODETEXT;
 			if (bUnicode ? AfxIsValidString(pUnicodeText) : AfxIsValidString(pAnsiText)) {
-				CStringW text;
-				if (bUnicode) {
-					text = pUnicodeText;
-				} else {
-					text = CStringW(pAnsiText);
-				}
+				CStringW text(bUnicode ? pUnicodeText : CStringW(pAnsiText));
 				if (!text.IsEmpty()) {
 					std::list<CString> slFiles;
-					if (bUrl) {
+					if (cfFormat == CF_URLW || cfFormat == CF_URLA) {
 						slFiles.emplace_back(text);
 					} else {
 						std::list<CString> lines;
