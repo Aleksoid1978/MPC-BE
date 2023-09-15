@@ -1099,10 +1099,10 @@ BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoi
 		if (HGLOBAL hGlobal = pDataObject->GetGlobalData(CF_HDROP)) {
 			if (HDROP hDrop = (HDROP)GlobalLock(hGlobal)) {
 				std::list<CString> slFiles;
-				UINT nFiles = ::DragQueryFile(hDrop, UINT_MAX, nullptr, 0);
+				UINT nFiles = ::DragQueryFileW(hDrop, UINT_MAX, nullptr, 0);
 				for (UINT iFile = 0; iFile < nFiles; iFile++) {
 					CString fn;
-					fn.ReleaseBuffer(::DragQueryFile(hDrop, iFile, fn.GetBuffer(MAX_PATH), MAX_PATH));
+					fn.ReleaseBuffer(::DragQueryFileW(hDrop, iFile, fn.GetBuffer(MAX_PATH), MAX_PATH));
 					slFiles.emplace_back(fn);
 				}
 				::DragFinish(hDrop);
