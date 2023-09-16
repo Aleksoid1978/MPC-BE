@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include <wmcodecdsp.h>
 #include <moreuuids.h>
+#include <encdec.h> // MEDIASUBTYPE_CPFilters_Processed, FORMATTYPE_CPFilters_Processed
 #include "GUIDString.h"
 
 #define ENTRYNAME(subtype) #subtype
