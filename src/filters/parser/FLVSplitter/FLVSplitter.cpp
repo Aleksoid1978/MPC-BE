@@ -731,7 +731,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						name += L" Nellimoser";
 						break;
 					case FLV_AUDIO_SPEEX:
-						mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_SPEEX);
+						mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_SPEEX_VOICE);
 						wfe->nSamplesPerSec = 16000;
 						name += L" Speex";
 						break;

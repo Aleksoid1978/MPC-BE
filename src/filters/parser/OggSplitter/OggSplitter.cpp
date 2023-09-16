@@ -1797,7 +1797,7 @@ COggSpeexOutputPin::COggSpeexOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBase
 
 	WAVEFORMATEX* wfe = (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + nCount];
 	memset(wfe, 0, sizeof(WAVEFORMATEX));
-	wfe->wFormatTag      = WAVE_FORMAT_SPEEX;
+	wfe->wFormatTag      = WAVE_FORMAT_SPEEX_VOICE;
 	wfe->nChannels       = nb_channels;
 	wfe->nSamplesPerSec  = rate;
 	wfe->wBitsPerSample  = 16;

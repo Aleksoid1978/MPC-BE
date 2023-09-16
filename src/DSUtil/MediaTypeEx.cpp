@@ -132,7 +132,7 @@ static const std::map<WORD, LPCSTR> aformattags = {
 	{WAVE_FORMAT_LATM_AAC,              "AAC(LATM)"},
 	{WAVE_FORMAT_FLAC,                  "FLAC"},
 	{WAVE_FORMAT_TTA1,                  "TTA"},
-	{WAVE_FORMAT_WAVPACK4,              "WavPack"},
+	{WAVE_FORMAT_WAVPACK_AUDIO,         "WavPack"},
 	{WAVE_FORMAT_14_4,                  "RealAudio 14.4"},
 	{WAVE_FORMAT_28_8,                  "RealAudio 28.8"},
 	{WAVE_FORMAT_ATRC,                  "RealAudio ATRC"},
@@ -143,7 +143,7 @@ static const std::map<WORD, LPCSTR> aformattags = {
 	{WAVE_FORMAT_SIPR,                  "RealAudio SIPR"},
 	{WAVE_FORMAT_PS2_PCM,               "PS2 PCM"},
 	{WAVE_FORMAT_PS2_ADPCM,             "PS2 ADPCM"},
-	{WAVE_FORMAT_SPEEX,                 "Speex"},
+	{WAVE_FORMAT_SPEEX_VOICE,           "Speex"},
 	{WAVE_FORMAT_ADX_ADPCM,             "ADX ADPCM"},
 };
 
@@ -543,44 +543,14 @@ CString CMediaTypeEx::GetSubtitleCodecName(const GUID& subtype)
 
 CString GetGUIDString(const GUID& guid)
 {
-	// to prevent print TIME_FORMAT_NONE for GUID_NULL
-	if (guid == GUID_NULL) {
-		return L"GUID_NULL";
-	}
+	CString ret(GetGUIDName(guid));
 
-	const CHAR* guidStr = GuidNames[guid]; // GUID names from uuids.h
-
-	if (strcmp(guidStr, "Unknown GUID Name") == 0) {
-		guidStr = m_GuidNames[guid]; // GUID names from moreuuids.h
-	}
-
-	if (strcmp(guidStr, "Unknown GUID Name") == 0) {
-		auto it = dxvaguids.find(guid);
-		if (it != dxvaguids.cend()) {
-			guidStr = (*it).second;
-		}
-		else if (memcmp(&guid.Data2, &MEDIASUBTYPE_YUY2.Data2, sizeof(GUID) - sizeof(GUID::Data1)) == 0) {
-			// GUID like {xxxxxxxx-0000-0010-8000-00AA00389B71}
-
-			switch (guid.Data1) {
-			case WAVE_FORMAT_ADPCM:         guidStr = "MEDIASUBTYPE_MS_ADPCM"; break;
-			case WAVE_FORMAT_GSM610:        guidStr = "MEDIASUBTYPE_GSM610"; break;
-			case WAVE_FORMAT_MPEG_ADTS_AAC: guidStr = "MEDIASUBTYPE_MPEG_ADTS_AAC"; break;
-			case WAVE_FORMAT_MPEG_RAW_AAC:  guidStr = "MEDIASUBTYPE_MPEG_RAW_AAC"; break;
-			case WAVE_FORMAT_MPEG_LOAS:     guidStr = "MEDIASUBTYPE_MPEG_LOAS"; break;
-			case WAVE_FORMAT_MPEG_HEAAC:    guidStr = "MEDIASUBTYPE_MPEG_HEAAC"; break;
-			default:
-				return L"MEDIASUBTYPE_" + FourccToWStr(guid.Data1);
-			}
-		}
-	}
-
-	return CString(guidStr);
+	return ret;
 }
 
 CString GetGUIDString2(const GUID& guid)
 {
-	CString ret = GetGUIDString(guid);
+	CString ret(GetGUIDName(guid));
 	if (ret == L"Unknown GUID Name") {
 		ret.AppendFormat(L" %s", CStringFromGUID(guid));
 	}

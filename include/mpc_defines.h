@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2022 see Authors.txt
+ * (C) 2016-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,6 +37,12 @@
                   (((DWORD)(ch4) & 0xFF00) << 8) |    \
                   (((DWORD)(ch4) & 0xFF0000) >> 8) |  \
                   (((DWORD)(ch4) & 0xFF000000) >> 24))
+#endif
+
+#ifndef DEFINE_MEDIATYPE_GUID
+#define DEFINE_MEDIATYPE_GUID(name, format) \
+    DEFINE_GUID(name,                       \
+    format, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
 #endif
 
 #define SCALE64(a, b, c) (__int64)((double)(a) * (b) / (c)) // very fast, but it can give a small rounding error

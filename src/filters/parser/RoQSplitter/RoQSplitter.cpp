@@ -246,7 +246,7 @@ HRESULT CRoQSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				mt.formattype = FORMAT_WaveFormatEx;
 				WAVEFORMATEX wfe;
 				memset(&wfe, 0, sizeof(wfe));
-				wfe.wFormatTag = (WORD)WAVE_FORMAT_RoQA; // cut into half, hehe, like anyone would care
+				wfe.wFormatTag = (WORD)MEDIASUBTYPE_RoQA.Data1; // cut into half, hehe, like anyone would care
 				wfe.nChannels = (rc.id&1)+1;
 				wfe.nSamplesPerSec = 22050;
 				wfe.wBitsPerSample = 16;

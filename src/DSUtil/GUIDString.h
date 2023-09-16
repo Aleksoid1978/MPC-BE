@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2021 see Authors.txt
+ * (C) 2013-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,11 +20,4 @@
 
 #pragma once
 
-// modified code from wxdebug.h
-
-class C_MPCGuidNameList {
-public:
-	const char *operator [] (const GUID& guid);
-};
-
-extern C_MPCGuidNameList m_GuidNames;
+CStringA GetGUIDName(const GUID& guid);
