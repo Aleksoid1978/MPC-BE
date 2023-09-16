@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <MMReg.h>
 #include "DSMMuxer.h"
 #include "DSUtil/DSUtil.h"
 #include "DSUtil/std_helper.h"

@@ -19,7 +19,7 @@
  */
 
 #include "stdafx.h"
-#include <mmreg.h>
+#include <wmcodecdsp.h>
 #include <moreuuids.h>
 #include "GUIDString.h"
 

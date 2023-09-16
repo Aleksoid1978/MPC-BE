@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <mmreg.h>
 #include "OggSplitter.h"
 #include "DSUtil/CUE.h"
 #include "DSUtil/DSUtil.h"

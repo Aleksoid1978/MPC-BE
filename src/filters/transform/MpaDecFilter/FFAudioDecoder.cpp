@@ -32,6 +32,7 @@ extern "C" {
 }
 #pragma warning(pop)
 
+#include <wmcodecdsp.h>
 #include <moreuuids.h>
 #include "DSUtil/AudioParser.h"
 #include "DSUtil/DSUtil.h"

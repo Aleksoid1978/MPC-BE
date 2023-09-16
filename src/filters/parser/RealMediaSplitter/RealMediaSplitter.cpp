@@ -21,9 +21,9 @@
 
 #include "stdafx.h"
 #include <Shlwapi.h>
-#include <MMReg.h>
 #include <ks.h>
 #include <ksmedia.h>
+#include <wmcodecdsp.h>
 #include <moreuuids.h>
 #include "DSUtil/DSUtil.h"
 #include "DSUtil/PixelUtils.h"

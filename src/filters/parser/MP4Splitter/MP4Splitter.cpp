@@ -20,7 +20,7 @@
  */
 
 #include "stdafx.h"
-#include <MMreg.h>
+#include <wmcodecdsp.h>
 #include <moreuuids.h>
 #include <basestruct.h>
 #include "DSUtil/GolombBuffer.h"

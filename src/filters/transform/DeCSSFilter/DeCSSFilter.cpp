@@ -28,6 +28,7 @@
 #include "DSUtil/DSUtil.h"
 #include "CSSauth.h"
 #include "CSSscramble.h"
+#include <wmcodecdsp.h>
 #include <moreuuids.h>
 
 #ifdef REGISTER_FILTER

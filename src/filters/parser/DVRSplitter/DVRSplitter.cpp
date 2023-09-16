@@ -19,9 +19,9 @@
  */
 
 #include "stdafx.h"
-#include <MMReg.h>
-#include "DVRSplitter.h"
+#include <wmcodecdsp.h>
 #include <moreuuids.h>
+#include "DVRSplitter.h"
 
 #ifdef REGISTER_FILTER
 

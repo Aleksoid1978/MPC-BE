@@ -20,7 +20,6 @@
 
 #include "stdafx.h"
 #include "DSUtil/CUE.h"
-#include <MMReg.h>
 #include <moreuuids.h>
 #include "AudioSplitter.h"
 

@@ -20,10 +20,10 @@
  */
 
 #include "stdafx.h"
-#include <MMReg.h>
+#include <wmcodecdsp.h>
+#include <moreuuids.h>
 #include "AVI2AC3Filter.h"
 #include "DSUtil/DSUtil.h"
-#include <moreuuids.h>
 
 #ifdef REGISTER_FILTER
 

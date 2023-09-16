@@ -27,6 +27,7 @@
 #include <dvbsiparser.h>
 #include "DSUtil/GolombBuffer.h"
 #include "filters/switcher/AudioSwitcher/AudioSwitcher.h"
+#include <wmcodecdsp.h>
 #include <moreuuids.h>
 #include <basestruct.h>
 #include "FGManagerBDA.h"

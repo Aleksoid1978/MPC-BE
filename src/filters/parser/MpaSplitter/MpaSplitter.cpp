@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <MMReg.h>
 #include "MpaSplitter.h"
 #include <moreuuids.h>
 

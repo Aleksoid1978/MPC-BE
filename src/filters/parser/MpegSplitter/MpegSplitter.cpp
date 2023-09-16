@@ -21,12 +21,12 @@
 
 #include "stdafx.h"
 #include <atlpath.h>
-#include <MMReg.h>
 #include <ks.h>
 #include <ksmedia.h>
 #include <dmodshow.h>
-#include "MpegSplitter.h"
+#include <wmcodecdsp.h>
 #include <moreuuids.h>
+#include "MpegSplitter.h"
 #include <basestruct.h>
 
 #include "filters/reader/VTSReader/VTSReader.h"

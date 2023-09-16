@@ -25,7 +25,7 @@
 #include "DSUtil/SimpleBuffer.h"
 #include "DSUtil/AudioParser.h"
 #include "DSUtil/entities.h"
-#include <MMReg.h>
+#include <wmcodecdsp.h>
 #include <moreuuids.h>
 
 #define RAPIDJSON_SSE2

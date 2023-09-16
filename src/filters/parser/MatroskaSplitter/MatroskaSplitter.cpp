@@ -20,7 +20,10 @@
  */
 
 #include "stdafx.h"
-#include <MMReg.h>
+
+#include <wmcodecdsp.h>
+#include <moreuuids.h>
+
 #include "MatroskaSplitter.h"
 #include "../BaseSplitter/TimecodeAnalyzer.h"
 #include "DSUtil/AudioParser.h"
@@ -31,7 +34,6 @@
 #include "DSUtil/BitsWriter.h"
 #include <IMediaSideData.h>
 
-#include <moreuuids.h>
 #include <basestruct.h>
 #include <libavutil/pixfmt.h>
 #include <libavutil/intreadwrite.h>

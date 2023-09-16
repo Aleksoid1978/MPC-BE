@@ -19,7 +19,8 @@
  */
 
 #include "stdafx.h"
-#include <MMReg.h>
+#include <wmcodecdsp.h>
+#include <moreuuids.h>
 #include "MPCVideoDec.h"
 #include "DXVADecoder/DXVAAllocator.h"
 #include "FfmpegContext.h"
@@ -38,7 +39,6 @@
 #include "filters/parser/MpegSplitter/MpegSplitter.h"
 #include "filters/parser/FLVSplitter/FLVSplitter.h"
 #include "filters/Lock.h"
-#include <moreuuids.h>
 #include <FilterInterfaces.h>
 
 #include "DxgiUtils.h"

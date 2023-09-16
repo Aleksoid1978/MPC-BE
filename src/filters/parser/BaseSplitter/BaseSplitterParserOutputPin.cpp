@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include <wmcodecdsp.h>
 #include <moreuuids.h>
 #include "BaseSplitterParserOutputPin.h"
 

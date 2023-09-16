@@ -30,6 +30,7 @@
 #include "std_helper.h"
 #include <atlpath.h>
 #include <clsids.h>
+#include <wmcodecdsp.h>
 #include <moreuuids.h>
 #include <basestruct.h>
 #include <emmintrin.h>

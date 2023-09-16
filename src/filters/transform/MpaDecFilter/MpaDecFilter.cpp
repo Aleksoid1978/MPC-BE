@@ -20,10 +20,11 @@
  */
 
 #include "stdafx.h"
-#include <MMReg.h>
 #include <Ks.h>
 #include <KsMedia.h>
 #include <sys/timeb.h>
+#include <wmcodecdsp.h>
+#include <moreuuids.h>
 
 #include "MpaDecFilter.h"
 #include "AudioTools/AudioHelper.h"
@@ -31,7 +32,6 @@
 #include "DSUtil/AudioParser.h"
 #include "DSUtil/SysVersion.h"
 #include "Version.h"
-#include <moreuuids.h>
 #include <basestruct.h>
 
 #include <ExtLib/ffmpeg/libavcodec/avcodec.h>

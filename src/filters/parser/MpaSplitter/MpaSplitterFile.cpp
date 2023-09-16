@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <MMReg.h>
 #include "MpaSplitterFile.h"
 #include "DSUtil/AudioParser.h"
 

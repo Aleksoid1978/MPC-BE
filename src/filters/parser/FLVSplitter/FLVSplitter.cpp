@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <MMReg.h>
 #include "FLVSplitter.h"
 #include "../BaseSplitter/TimecodeAnalyzer.h"
 #include "DSUtil/DSUtil.h"

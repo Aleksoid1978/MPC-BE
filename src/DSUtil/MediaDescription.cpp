@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include <ks.h>
 #include <ksmedia.h>
-#include <MMReg.h>
+#include <wmcodecdsp.h>
 #include <moreuuids.h>
 #include "MediaDescription.h"
 #include "AudioParser.h"

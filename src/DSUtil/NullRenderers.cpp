@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "NullRenderers.h"
+#include <wmcodecdsp.h>
 #include <moreuuids.h>
 #include "MediaTypeEx.h"
 #include "D3D9Helper.h"

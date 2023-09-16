@@ -24,7 +24,7 @@
 #include "MediaTypeEx.h"
 #include "AudioParser.h"
 
-#include <MMReg.h>
+#include <wmcodecdsp.h>
 #include <moreuuids.h>
 #include <basestruct.h>
 #include <d3d9types.h>
