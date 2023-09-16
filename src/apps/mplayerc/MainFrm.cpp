@@ -53,7 +53,6 @@
 #include <ksmedia.h>
 #include <dvdevcod.h>
 #include <dsound.h>
-#include <uuids.h>
 #include <moreuuids.h>
 #include <clsids.h>
 #include <psapi.h>

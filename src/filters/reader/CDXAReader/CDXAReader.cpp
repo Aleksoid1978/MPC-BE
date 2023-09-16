@@ -22,7 +22,6 @@
 #include "stdafx.h"
 #include "CDXAReader.h"
 #include "DSUtil/DSUtil.h"
-#include <uuids.h>
 #include <moreuuids.h>
 
 /////////

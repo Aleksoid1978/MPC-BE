@@ -22,7 +22,6 @@
 #include "stdafx.h"
 #include <ks.h>
 #include <aviriff.h>
-#include <uuids.h>
 #include <wmcodecdsp.h>
 #include <moreuuids.h>
 #include "DTSAC3Source.h"
