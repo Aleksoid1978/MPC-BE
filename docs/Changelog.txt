@@ -7,6 +7,13 @@ Various fixes to reduce the likelihood of memory leaks and improve stability.
 AudioSplitter
 Added support for multiple ARTIST tags for FLAC.
 
+MpaDecFilter
+Added support for the "Intel Music Coder" codec.
+Fixed decoding of 24-bit "Monkey's Audio" (FFmpeg updated).
+
+MPCVideoDec
+Added support for the "Intel H.263" codec.
+
 SyncRenderer
 Fixed hang when using pixel post-resize shaders.
 
@@ -16,6 +23,8 @@ The COPYING.txt file has been renamed to LICENSE.txt.
 The work of the playlist command "Remove missing files" has been fixed.
 Fixed loading of inappropriate external audio files.
 The "Delete to Recycle bin" command will not work for .ifo, .bdmv and .mpls files.
+Fixed opening of some Cue Sheet (.cue) files.
+Fixed Drag'n'Drop from browsers.
 
 Installer
 The files for "H.264 MVC 3D Decoder" are now included in the installer.
