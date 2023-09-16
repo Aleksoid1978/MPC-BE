@@ -2320,6 +2320,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	}
 
 	if (!IsPreview) {
+		// RealAudio
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(audio[ADEC_REAL]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(audio[ADEC_REAL]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
@@ -2335,18 +2336,14 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_RALF);
 		m_transform.emplace_back(pFGF);
 
-		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(MPCAudioDecName, MERIT64_ABOVE_DSHOW);
-		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ATRAC3);
-		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ATRAC3plus);
-		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ATRAC9);
-		m_transform.emplace_back(pFGF);
-
+		// Vorbis
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(audio[ADEC_VORBIS]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(audio[ADEC_VORBIS]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_Vorbis2);
 		m_transform.emplace_back(pFGF);
 
+		// FLAC
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(audio[ADEC_FLAC]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(audio[ADEC_FLAC]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
@@ -2354,24 +2351,28 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_FLAC);
 		m_transform.emplace_back(pFGF);
 
+		// Nelly Moser
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(audio[ADEC_NELLY]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(audio[ADEC_NELLY]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NELLYMOSER);
 		m_transform.emplace_back(pFGF);
 
+		// Apple Lossless Audio Coding
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(audio[ADEC_ALAC]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(audio[ADEC_ALAC]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ALAC);
 		m_transform.emplace_back(pFGF);
 
+		// MPEG-4 Audio Lossless Coding (ALS)
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(audio[ADEC_ALS]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(audio[ADEC_ALS]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ALS);
 		m_transform.emplace_back(pFGF);
 
+		// PCM, ADPCM
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(audio[ADEC_PCM_ADPCM]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(audio[ADEC_PCM_ADPCM]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
@@ -2396,6 +2397,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_AES3);
 		m_transform.emplace_back(pFGF);
 
+		// QDesign Music Codec
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(audio[ADEC_QDMC]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(audio[ADEC_QDMC]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
@@ -2403,12 +2405,14 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_QDM2);
 		m_transform.emplace_back(pFGF);
 
+		// WavPack
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(audio[ADEC_WAVPACK]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(audio[ADEC_WAVPACK]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_WAVPACK4);
 		m_transform.emplace_back(pFGF);
 
+		// Musepack
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(audio[ADEC_MUSEPACK]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(audio[ADEC_MUSEPACK]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
@@ -2416,7 +2420,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_MPC8);
 		m_transform.emplace_back(pFGF);
 
-		// APE
+		// Monkey's Audio (APE)
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(audio[ADEC_APE]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(audio[ADEC_APE]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
@@ -2495,25 +2499,28 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_WMSP1);
 		m_transform.emplace_back(pFGF);
 
-		// Indeo Audio Coder
+		// Indeo Audio
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(audio[ADEC_INDEO]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(audio[ADEC_INDEO]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
-		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_IAC);
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_INDEO_AUDIO);
 		m_transform.emplace_back(pFGF);
 
+		// Opus
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(audio[ADEC_OPUS]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(audio[ADEC_OPUS]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_OPUS);
 		m_transform.emplace_back(pFGF);
 
+		// Speex
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(audio[ADEC_SPEEX]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(audio[ADEC_SPEEX]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_SPEEX);
 		m_transform.emplace_back(pFGF);
 
+		// DSD
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 			(audio[ADEC_DSD]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 			(audio[ADEC_DSD]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
@@ -2525,6 +2532,14 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_DST);
 		m_transform.emplace_back(pFGF);
 
+		// other audio
+		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(MPCAudioDecName, MERIT64_ABOVE_DSHOW);
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ATRAC3);
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ATRAC3plus);
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ATRAC9);
+		m_transform.emplace_back(pFGF);
+
+		// subtitles
 		pFGF = DNew CFGFilterInternal<CNullTextRenderer>(L"NullTextRenderer", MERIT64_DO_USE);
 		pFGF->AddType(MEDIATYPE_Text, MEDIASUBTYPE_NULL);
 		pFGF->AddType(MEDIATYPE_ScriptCommand, MEDIASUBTYPE_NULL);

@@ -137,7 +137,7 @@ static const struct {
 	{ &MEDIASUBTYPE_BINKA_DCT,         AV_CODEC_ID_BINKAUDIO_DCT  },
 	{ &MEDIASUBTYPE_BINKA_RDFT,        AV_CODEC_ID_BINKAUDIO_RDFT },
 	// Indeo Audio
-	{ &MEDIASUBTYPE_IAC,               AV_CODEC_ID_IAC },
+	{ &MEDIASUBTYPE_INDEO_AUDIO,       AV_CODEC_ID_IAC },
 	// Opus
 	{ &MEDIASUBTYPE_OPUS,              AV_CODEC_ID_OPUS },
 	// Speex
