@@ -185,6 +185,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	// Bink Audio
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_BINKA_DCT},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_BINKA_RDFT},
+	// Intel Music Coder
+	{ &MEDIATYPE_Audio,				&MEDIASUBTYPE_INTEL_MUSIC},
 	// Indeo Audio
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_INDEO_AUDIO},
 	// Opus Audio

@@ -107,6 +107,7 @@ static const FFCodec * const codec_list[] = {
     &ff_eac3_decoder,
     &ff_flac_decoder,
     &ff_iac_decoder,
+    &ff_imc_decoder,
     &ff_metasound_decoder,
     &ff_mlp_decoder,
     &ff_mp1float_decoder,

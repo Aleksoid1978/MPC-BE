@@ -136,6 +136,8 @@ static const struct {
 	// Bink Audio
 	{ &MEDIASUBTYPE_BINKA_DCT,         AV_CODEC_ID_BINKAUDIO_DCT  },
 	{ &MEDIASUBTYPE_BINKA_RDFT,        AV_CODEC_ID_BINKAUDIO_RDFT },
+	// Intel Music Coder
+	{ &MEDIASUBTYPE_INTEL_MUSIC,       AV_CODEC_ID_IMC },
 	// Indeo Audio
 	{ &MEDIASUBTYPE_INDEO_AUDIO,       AV_CODEC_ID_IAC },
 	// Opus
