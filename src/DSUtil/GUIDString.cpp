@@ -154,9 +154,9 @@ CStringA GetGUIDName(const GUID& guid)
 
 		if ((guid.Data1 & 0x0000FFFF) == guid.Data1) {
 			const WORD wFormatTag = (WORD)guid.Data1;
-			for (size_t i = 0; i < std::size(MPC_g_WaveGuidNames); i++) {
-				if (MPC_g_WaveGuidNames[i].wFormatTag == wFormatTag) {
-					str.Append(MPC_g_WaveGuidNames[i].szName);
+			for (const auto& waveGuidName : MPC_g_WaveGuidNames) {
+				if (waveGuidName.wFormatTag == wFormatTag) {
+					str.Append(waveGuidName.szName);
 					return str;
 				}
 			}
@@ -173,9 +173,9 @@ CStringA GetGUIDName(const GUID& guid)
 		return str;
 	}
 
-	for (int i = 0; i < std::size(MPC_g_GuidNames); i++) {
-		if (MPC_g_GuidNames[i].guid == guid) {
-			return MPC_g_GuidNames[i].szName;
+	for (const auto& guidName : MPC_g_GuidNames) {
+		if (guidName.guid == guid) {
+			return guidName.szName;
 		}
 	}
 
