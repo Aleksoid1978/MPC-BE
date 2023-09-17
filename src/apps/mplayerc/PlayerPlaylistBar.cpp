@@ -2344,7 +2344,6 @@ bool CPlayerPlaylistBar::SetNext()
 		}
 		break;
 	}
-	UpdateList();
 	curPlayList.SetPos(pos);
 	EnsureVisible(pos);
 
@@ -2365,7 +2364,6 @@ bool CPlayerPlaylistBar::SetPrev()
 		}
 		break;
 	}
-	UpdateList();
 	curPlayList.SetPos(pos);
 	EnsureVisible(pos);
 
@@ -2388,7 +2386,6 @@ void CPlayerPlaylistBar::SetFirstSelected()
 			break;
 		}
 	}
-	UpdateList();
 	curPlayList.SetPos(pos);
 	EnsureVisible(pos);
 }
@@ -2403,7 +2400,6 @@ void CPlayerPlaylistBar::SetFirst()
 		}
 		break;
 	}
-	UpdateList();
 	curPlayList.SetPos(pos);
 	EnsureVisible(pos);
 }
@@ -2418,7 +2414,6 @@ void CPlayerPlaylistBar::SetLast()
 		}
 		break;
 	}
-	UpdateList();
 	curPlayList.SetPos(pos);
 	EnsureVisible(pos);
 }
@@ -2429,9 +2424,13 @@ void CPlayerPlaylistBar::SetCurValid(const bool bValid)
 		if (m_nCurPlaybackListId == m_tabs[i].id) {
 			POSITION pos = m_pls[i]->GetPos();
 			if (pos) {
-				m_pls[i]->GetAt(pos).m_bInvalid = !bValid;
+				auto& pli = m_pls[i]->GetAt(pos);
+				pli.m_bInvalid = !bValid;
 				if (i == m_nCurPlayListIndex) {
-					UpdateList();
+					auto index = FindItem(pos);
+					if (index >= 0) {
+						m_list.SetItemText(index, COL_NAME, pli.GetLabel(0));
+					}
 				}
 			}
 			break;
@@ -2445,9 +2444,13 @@ void CPlayerPlaylistBar::SetCurLabel(CString label)
 		if (m_nCurPlaybackListId == m_tabs[i].id) {
 			POSITION pos = m_pls[i]->GetPos();
 			if (pos) {
-				m_pls[i]->GetAt(pos).m_label = label;
+				auto& pli = m_pls[i]->GetAt(pos);
+				pli.m_label = label;
 				if (i == m_nCurPlayListIndex) {
-					UpdateList();
+					auto index = FindItem(pos);
+					if (index >= 0) {
+						m_list.SetItemText(index, COL_NAME, pli.GetLabel(0));
+					}
 				}
 			}
 			break;
@@ -2469,12 +2472,13 @@ void CPlayerPlaylistBar::SetCurTime(REFERENCE_TIME rt)
 		if (m_nCurPlaybackListId == m_tabs[i].id) {
 			POSITION pos = m_pls[i]->GetPos();
 			if (pos) {
-				m_pls[i]->GetAt(pos).m_duration = rt;
+				auto& pli = m_pls[i]->GetAt(pos);
+				pli.m_duration = rt;
 				if (i == m_nCurPlayListIndex) {
-					UpdateList();
-					//CPlaylistItem& pli = curPlayList.GetAt(pos);
-					//pli.m_duration = rt;
-					//m_list.SetItemText(FindItem(pos), COL_TIME, pli.GetLabel(1));
+					auto index = FindItem(pos);
+					if (index >= 0) {
+						m_list.SetItemText(index, COL_TIME, pli.GetLabel(1));
+					}
 				}
 			}
 			break;
