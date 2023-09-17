@@ -3,6 +3,7 @@
 1.6.9.x dev
 =============================
 Various fixes to reduce the likelihood of memory leaks and improve stability.
+The COPYING.txt file has been renamed to LICENSE.txt.
 
 AudioSplitter
 Added support for multiple ARTIST tags for FLAC.
@@ -19,12 +20,12 @@ Fixed hang when using pixel post-resize shaders.
 
 Player
 Added a Gamma shader with a value of 1.3 which makes the image slightly lighter.
-The COPYING.txt file has been renamed to LICENSE.txt.
 The work of the playlist command "Remove missing files" has been fixed.
 Fixed loading of inappropriate external audio files.
 The "Delete to Recycle bin" command will not work for .ifo, .bdmv and .mpls files.
 Fixed opening of some Cue Sheet (.cue) files.
 Fixed Drag'n'Drop from browsers.
+Speeded up work with large playlists.
 
 Installer
 The files for "H.264 MVC 3D Decoder" are now included in the installer.
