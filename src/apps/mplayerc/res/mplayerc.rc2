@@ -71,7 +71,6 @@ IDF_SEEKBARLEFT_PNG              FILE                    "res\\web\\seekbarleft.
 IDF_SEEKBARMID_PNG               FILE                    "res\\web\\seekbarmid.png"
 IDF_SEEKBARRIGHT_PNG             FILE                    "res\\web\\seekbarright.png"
 IDF_SLIDERBACK_PNG               FILE                    "res\\web\\sliderback.png"
-IDF_SLIDERBAR_GIF                FILE                    "res\\web\\sliderbar.gif"
 IDF_SLIDERGRIP_GIF               FILE                    "res\\web\\slidergrip.gif"
 IDF_VBR_PNG                      FILE                    "res\\web\\vbg.png"
 IDF_VBS_PNG                      FILE                    "res\\web\\vbs.png"

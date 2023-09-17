@@ -38,7 +38,6 @@
 #define IDR_HTML_CONTROLS               503
 #define IDR_HTML_PLAYER                 504
 #define IDF_DEFAULT_CSS                 505
-#define IDF_SLIDERBAR_GIF               506
 #define IDF_VBR_PNG                     507
 #define IDF_VBS_PNG                     508
 #define IDF_SLIDERGRIP_GIF              509

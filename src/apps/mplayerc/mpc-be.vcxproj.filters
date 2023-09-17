@@ -988,9 +988,6 @@
     <None Include="res\web\sliderback.gif">
       <Filter>Resource Files\web</Filter>
     </None>
-    <None Include="res\web\sliderbar.gif">
-      <Filter>Resource Files\web</Filter>
-    </None>
     <None Include="res\web\slidergrip.gif">
       <Filter>Resource Files\web</Filter>
     </None>

@@ -65,7 +65,6 @@ const std::map<CString, UINT> CWebServer::m_downloads = {
 	{L"/favicon.png",                  IDF_FAVICON},
 	{L"/vbg.png",                      IDF_VBR_PNG},
 	{L"/vbs.png",                      IDF_VBS_PNG},
-	{L"/sliderbar.gif",                IDF_SLIDERBAR_GIF},
 	{L"/slidergrip.gif",               IDF_SLIDERGRIP_GIF},
 	{L"/sliderback.png",               IDF_SLIDERBACK_PNG},
 	{L"/1pix.gif",                     IDF_1PIX_GIF},

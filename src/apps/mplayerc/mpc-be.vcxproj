@@ -432,7 +432,6 @@
     <None Include="res\web\seekbarmid.png" />
     <None Include="res\web\seekbarright.png" />
     <None Include="res\web\sliderback.gif" />
-    <None Include="res\web\sliderbar.gif" />
     <None Include="res\web\slidergrip.gif" />
     <None Include="res\web\variables.html">
       <FileType>HTML</FileType>
