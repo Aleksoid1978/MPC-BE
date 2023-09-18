@@ -43,7 +43,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 IDF_LOGO0                        FILE                    "res\\logo.0.png"
 IDF_LOGO1                        FILE                    "res\\logo.1.png"
-IDF_1PIX_GIF                     FILE                    "res\\web\\1pix.gif"
+IDF_1PIX_PNG                     FILE                    "res\\web\\1pix.png"
 IDF_BOTTOMSIDE_PNG               FILE                    "res\\web\\bottomside.png"
 IDF_CONTROLBACK_PNG              FILE                    "res\\web\\controlback.png"
 IDF_CONTROLBUTTONDECRATE_PNG     FILE                    "res\\web\\controlbuttondecrate.png"
@@ -71,7 +71,7 @@ IDF_SEEKBARLEFT_PNG              FILE                    "res\\web\\seekbarleft.
 IDF_SEEKBARMID_PNG               FILE                    "res\\web\\seekbarmid.png"
 IDF_SEEKBARRIGHT_PNG             FILE                    "res\\web\\seekbarright.png"
 IDF_SLIDERBACK_PNG               FILE                    "res\\web\\sliderback.png"
-IDF_SLIDERGRIP_GIF               FILE                    "res\\web\\slidergrip.gif"
+IDF_SLIDERGRIP_PNG               FILE                    "res\\web\\slidergrip.png"
 IDF_VBR_PNG                      FILE                    "res\\web\\vbg.png"
 IDF_VBS_PNG                      FILE                    "res\\web\\vbs.png"
 IDF_FAVICON                      FILE                    "res\\web\\favicon.png"

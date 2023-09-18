@@ -40,8 +40,8 @@
 #define IDF_DEFAULT_CSS                 505
 #define IDF_VBR_PNG                     507
 #define IDF_VBS_PNG                     508
-#define IDF_SLIDERGRIP_GIF              509
-#define IDF_1PIX_GIF                    510
+#define IDF_SLIDERGRIP_PNG              509
+#define IDF_1PIX_PNG                    510
 #define IDF_SLIDERBACK_PNG              511
 #define IDF_HEADERICON_PNG              512
 #define IDF_HEADERBACK_PNG              513
