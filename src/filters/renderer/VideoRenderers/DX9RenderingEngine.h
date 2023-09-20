@@ -164,9 +164,10 @@ namespace DSObjects
 		std::unique_ptr<CPixelShaderCompiler> m_pPSC;
 
 		// Settings
-		VideoSystem						m_InputVideoSystem = VIDEO_SYSTEM_UNKNOWN;
-		AmbientLight					m_AmbientLight     = AMBIENT_LIGHT_BRIGHT;
-		ColorRenderingIntent			m_RenderingIntent  = COLOR_RENDERING_INTENT_PERCEPTUAL;
+		VideoSystem					m_InputVideoSystem = VIDEO_SYSTEM_UNKNOWN;
+		AmbientLight				m_AmbientLight     = AMBIENT_LIGHT_BRIGHT;
+		ColorRenderingIntent		m_RenderingIntent  = COLOR_RENDERING_INTENT_PERCEPTUAL;
+		CStringW					m_ICMProfile;
 
 		// Custom pixel shaders
 		CComPtr<IDirect3DPixelShader9>	m_pPSCorrection;

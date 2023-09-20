@@ -1503,7 +1503,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	m_pLut3DTexture.Release();
 	m_pFinalPixelShader.Release();
 
-	if (bDither && !m_pDitherTexture) {
+	if (m_bDither && !m_pDitherTexture) {
 		// Create the dither texture
 		hr = m_pDevice9Ex->CreateTexture(DITHER_MATRIX_SIZE, DITHER_MATRIX_SIZE,
 									  1,
@@ -1545,7 +1545,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	}
 
 	// Initialize the color management if necessary
-	if (bColorManagement) {
+	if (m_bColorManagement) {
 		// Get the ICC profile path
 		CStringW iccProfilePath;
 		HMONITOR hMonitor = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
@@ -1554,77 +1554,81 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 		GetMonitorInfoW(hMonitor, &miex);
 		HDC hDC = CreateDCW(L"DISPLAY", miex.szDevice, nullptr, nullptr);
 
-		if (hDC != nullptr) {
+		hr = E_NOT_VALID_STATE;
+
+		if (hDC) {
 			DWORD icmProfilePathSize = 0;
 			GetICMProfileW(hDC, &icmProfilePathSize, nullptr);
-
+			
 			GetICMProfileW(hDC, &icmProfilePathSize, iccProfilePath.GetBuffer(icmProfilePathSize));
 			iccProfilePath.ReleaseBuffer();
+			if (iccProfilePath.GetLength()) {
+				m_ICMProfile = iccProfilePath.Mid(iccProfilePath.ReverseFind(L'\\')+1);
+				hr = S_OK;
+			}
 
 			DeleteDC(hDC);
 		}
 
-		// Create the 3D LUT texture
-		hr = m_pDevice9Ex->CreateVolumeTexture(m_Lut3DSize, m_Lut3DSize, m_Lut3DSize,
-											1,
-											D3DUSAGE_DYNAMIC,
-											D3DFMT_A16B16G16R16F,
-											D3DPOOL_DEFAULT,
-											&m_pLut3DTexture,
-											nullptr);
-
-		if (FAILED(hr)) {
-			CleanupFinalPass();
-			return hr;
+		if (SUCCEEDED(hr)) {
+			// Create the 3D LUT texture
+			hr = m_pDevice9Ex->CreateVolumeTexture(
+				m_Lut3DSize, m_Lut3DSize, m_Lut3DSize,
+				1, D3DUSAGE_DYNAMIC,
+				D3DFMT_A16B16G16R16F,
+				D3DPOOL_DEFAULT,
+				&m_pLut3DTexture,
+				nullptr);
 		}
 
-		auto lut3DFloat32 = std::make_unique<float[]>(m_Lut3DEntryCount * 3);
-		hr = CreateIccProfileLut(iccProfilePath.GetBuffer(), lut3DFloat32.get());
-		if (FAILED(hr)) {
-			CleanupFinalPass();
-			return hr;
+		std::unique_ptr<float[]> lut3DFloat32;
+		std::unique_ptr<DirectX::PackedVector::HALF[]> lut3DFloat16;
+
+		if (SUCCEEDED(hr)) {
+			lut3DFloat32 = std::make_unique<float[]>(m_Lut3DEntryCount * 3);
+			hr = CreateIccProfileLut(iccProfilePath.GetBuffer(), lut3DFloat32.get());
 		}
 
-		auto lut3DFloat16 = std::make_unique<DirectX::PackedVector::HALF[]>(m_Lut3DEntryCount * 3);
-		DirectX::PackedVector::XMConvertFloatToHalfStream(lut3DFloat16.get(), sizeof(lut3DFloat16[0]), lut3DFloat32.get(), sizeof(lut3DFloat32[0]), m_Lut3DEntryCount * 3);
+		if (SUCCEEDED(hr)) {
+			lut3DFloat16 = std::make_unique<DirectX::PackedVector::HALF[]>(m_Lut3DEntryCount * 3);
+			DirectX::PackedVector::XMConvertFloatToHalfStream(lut3DFloat16.get(), sizeof(lut3DFloat16[0]), lut3DFloat32.get(), sizeof(lut3DFloat32[0]), m_Lut3DEntryCount * 3);
+			DirectX::PackedVector::HALF oneFloat16 = DirectX::PackedVector::XMConvertFloatToHalf(1.0f);
 
-		DirectX::PackedVector::HALF oneFloat16 = DirectX::PackedVector::XMConvertFloatToHalf(1.0f);
+			D3DLOCKED_BOX lockedBox;
+			hr = m_pLut3DTexture->LockBox(0, &lockedBox, nullptr, D3DLOCK_DISCARD);
+			if (SUCCEEDED(hr)) {
+				DirectX::PackedVector::HALF* lut3DFloat16Iterator = lut3DFloat16.get();
+				char* outputSliceIterator = static_cast<char*>(lockedBox.pBits);
+				for (unsigned b = 0; b < m_Lut3DSize; b++) {
+					char* outputRowIterator = outputSliceIterator;
 
-		D3DLOCKED_BOX lockedBox;
-		hr = m_pLut3DTexture->LockBox(0, &lockedBox, nullptr, D3DLOCK_DISCARD);
-		if (FAILED(hr)) {
-			CleanupFinalPass();
-			return hr;
-		}
+					for (unsigned g = 0; g < m_Lut3DSize; g++) {
+						DirectX::PackedVector::HALF* outputIterator = reinterpret_cast<DirectX::PackedVector::HALF*>(outputRowIterator);
 
-		DirectX::PackedVector::HALF* lut3DFloat16Iterator = lut3DFloat16.get();
-		char* outputSliceIterator = static_cast<char*>(lockedBox.pBits);
-		for (unsigned b = 0; b < m_Lut3DSize; b++) {
-			char* outputRowIterator = outputSliceIterator;
-
-			for (unsigned g = 0; g < m_Lut3DSize; g++) {
-				DirectX::PackedVector::HALF* outputIterator = reinterpret_cast<DirectX::PackedVector::HALF*>(outputRowIterator);
-
-				for (unsigned r = 0; r < m_Lut3DSize; r++) {
-					// R, G, B
-					for (int i = 0; i < 3; i++) {
-						*outputIterator++ = *lut3DFloat16Iterator++;
+						for (unsigned r = 0; r < m_Lut3DSize; r++) {
+							// R, G, B
+							for (int i = 0; i < 3; i++) {
+								*outputIterator++ = *lut3DFloat16Iterator++;
+							}
+							// A
+							*outputIterator++ = oneFloat16;
+						}
+						outputRowIterator += lockedBox.RowPitch;
 					}
-
-					// A
-					*outputIterator++ = oneFloat16;
+					outputSliceIterator += lockedBox.SlicePitch;
 				}
-
-				outputRowIterator += lockedBox.RowPitch;
+				hr = m_pLut3DTexture->UnlockBox(0);
 			}
-
-			outputSliceIterator += lockedBox.SlicePitch;
 		}
-
-		hr = m_pLut3DTexture->UnlockBox(0);
+		
 		if (FAILED(hr)) {
-			CleanupFinalPass();
-			return hr;
+			m_bColorManagement = false;
+			m_pLut3DTexture.Release();
+
+			if (!m_bDither) {
+				CleanupFinalPass();
+				return hr;
+			}
 		}
 	}
 
@@ -1638,11 +1642,11 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	size_t i = 0;
 
 	ShaderMacros[i++] = { "QUANTIZATION", m_DisplayFmt == D3DFMT_A2R10G10B10 ? "1023.0" : "255.0" }; // 10-bit or 8-bit
-	ShaderMacros[i++] = { "LUT3D_ENABLED", bColorManagement ? "1" : "0" };
+	ShaderMacros[i++] = { "LUT3D_ENABLED", m_bColorManagement ? "1" : "0" };
 	static char lut3DSizeStr[8];
 	sprintf_s(lut3DSizeStr, "%u", m_Lut3DSize);
 	ShaderMacros[i++] = { "LUT3D_SIZE", lut3DSizeStr };
-	ShaderMacros[i++] = { "DITHER_ENABLED", bDither ? "1" : "0" };
+	ShaderMacros[i++] = { "DITHER_ENABLED", m_bDither ? "1" : "0" };
 
 	CString ErrorMessage;
 	hr = m_pPSC->CompileShader(srcdata, "main", m_ShaderProfile, 0, ShaderMacros, &m_pFinalPixelShader, &ErrorMessage);
@@ -1674,7 +1678,7 @@ void CDX9RenderingEngine::UpdateFinalPassStr()
 			case COLOR_RENDERING_INTENT_SATURATION:            m_strFinalPass.Append(L",Saturation");           break;
 			case COLOR_RENDERING_INTENT_ABSOLUTE_COLORIMETRIC: m_strFinalPass.Append(L",Absolute—olorimetric"); break;
 			}
-			m_strFinalPass.Append(L")");
+			m_strFinalPass.AppendFormat(L",\"%s\")", m_ICMProfile);
 		}
 
 		if (m_bDither) {
