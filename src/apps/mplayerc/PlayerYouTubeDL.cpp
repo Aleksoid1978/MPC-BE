@@ -39,45 +39,7 @@ namespace YoutubeDL
 		YoutubeProfiles.clear();
 		urls.clear();
 
-		CStringW ydl_path;
-		do {
-			if (StartsWith(ydlExePath, L":\\", 1) || StartsWith(ydlExePath, L"\\\\")) {
-				// looks like full path
-				if (::PathFileExistsW(ydlExePath)) {
-					ydl_path = ydlExePath;
-				}
-				break; // complete the checks anyway
-			}
-
-			CStringW apppath = GetProgramDir() + ydlExePath;
-			if (::PathFileExistsW(apppath)) {
-				ydl_path = apppath;
-				break;
-			}
-
-			// CreateProcessW and other functions (unlike ShellExecuteExW) does not look for
-			// an executable file in the "App Paths", so we will do it manually.
-			if (ydlExePath.Find('\\') < 0) {
-				// see "App Paths" in HKEY_CURRENT_USER
-				apppath = GetRegAppPath(ydlExePath, true);
-				if (apppath.GetLength() && ::PathFileExistsW(apppath)) {
-					ydl_path = apppath;
-					break;
-				}
-				// see "App Paths" in HKEY_LOCAL_MACHINE
-				apppath = GetRegAppPath(ydlExePath, false);
-				if (apppath.GetLength() && ::PathFileExistsW(apppath)) {
-					ydl_path = apppath;
-					break;
-				}
-			}
-
-			int length = SearchPathW(nullptr, ydlExePath.GetString(), nullptr, MAX_PATH, apppath.GetBuffer(MAX_PATH), nullptr);
-			if (length <= MAX_PATH) {
-				apppath.ReleaseBufferSetLength(length);
-				ydl_path = apppath;
-			}
-		} while (0);
+		CStringW ydl_path = GetFullExePath(ydlExePath, true);
 
 		if (ydl_path.IsEmpty()) {
 			return false;

@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2022 see Authors.txt
+ * (C) 2011-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -42,6 +42,12 @@ CStringW GetProgramDir();
 
 // Get application path from "App Paths" subkey
 CStringW GetRegAppPath(LPCWSTR appFileName, const bool bUser);
+
+// Searches and checks for the presence of an executable file in the application folder,
+// in "App paths" (if bLookAppPaths is true)
+// and in the folders described in the PATH environment variable.
+// Returns the full path to the existing executable file, otherwise an empty string.
+CStringW GetFullExePath(const CStringW exePath, const bool bLookAppPaths);
 
 void CleanPath(CStringW& path);
 
