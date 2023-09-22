@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"浏览..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
 5		"步进距离 (小, 中, 大每毫秒)"
 9		"默认"
 10		"快速搜索 (以关键帧)"
@@ -356,13 +356,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 23		"开启罗技 LCD 支持"
 24		"启用窗口播放控件"
 25		"使用小型存储器转储 (MiniDump)"
-26		"检查更新"
-27		"启用自动更新检查"
-28		"更新检查间隔:"
-31		"天"
-32		"设置管理"
-33		"重置"
-34		"导出"
+26		"FFmpeg executable file:"
+28		"检查更新"
+29		"启用自动更新检查"
+30		"更新检查间隔:"
+33		"天"
+34		"设置管理"
+35		"重置"
+36		"导出"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

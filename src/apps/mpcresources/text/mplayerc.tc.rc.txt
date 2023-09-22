@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"瀏覽..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
 5		"跳躍距離（小、中、大，以毫秒作單位）"
 9		"預設值"
 10		"快速搜尋（於關鍵影格）"
@@ -356,13 +356,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 23		"啟用 Logitech LCD 支援"
 24		"啟用 Windows 媒體控制項"
 25		"啟用小型記憶體傾印 (MiniDump)"
-26		"檢查更新"
-27		"啟用更新檢查"
-28		"檢查間隔："
-31		"日"
-32		"設定管理"
-33		"重設"
-34		"匯出"
+26		"FFmpeg executable file:"
+28		"檢查更新"
+29		"啟用更新檢查"
+30		"檢查間隔："
+33		"日"
+34		"設定管理"
+35		"重設"
+36		"匯出"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

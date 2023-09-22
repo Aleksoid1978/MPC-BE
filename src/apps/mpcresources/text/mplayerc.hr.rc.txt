@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Pretraži..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
 5		"Preskoči daljine (malu, srednju, veliku u ms)"
 9		"Default"
 10		"Brzo traženje (na keyframu)"
@@ -356,13 +356,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 23		"Omogući Logitech LCD podršku"
 24		"Koristi Window Media Controls"
 25		"Omogući MiniDump"
-26		"Provjera nadogradnji"
-27		"Omogući automatsku provjeru nadogradnji"
-28		"Odgoda između provjera:"
-31		"dan(a)"
-32		"Upravljanje postavkama"
-33		"Reset"
-34		"Izvoz"
+26		"FFmpeg executable file:"
+28		"Provjera nadogradnji"
+29		"Omogući automatsku provjeru nadogradnji"
+30		"Odgoda između provjera:"
+33		"dan(a)"
+34		"Upravljanje postavkama"
+35		"Reset"
+36		"Izvoz"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

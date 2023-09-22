@@ -6048,11 +6048,8 @@ void CMainFrame::OnFileSaveAs()
 				if (SUCCEEDED(hr)) {
 					save_dlg2.DoModal();
 					if (save_dlg2.IsCompleteOk()) {
-						CString ffmpegpath;
-						int length = SearchPathW(nullptr, L"ffmpeg.exe", nullptr, MAX_PATH, ffmpegpath.GetBuffer(MAX_PATH), nullptr);
-						if (length > 0 && length <= MAX_PATH) {
-							ffmpegpath.ReleaseBufferSetLength(length);
-
+						CString ffmpegpath = GetFullExePath(AfxGetAppSettings().strFFmpegExePath, false);
+						if (ffmpegpath.GetLength()) {
 							CString outFileName = fileName.GetString();
 							if (MoveFileW(fileName, fileName + L".tmp")) {
 								fileName += L".tmp";

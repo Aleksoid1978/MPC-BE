@@ -322,6 +322,7 @@
 #define IDS_RS_HIDE_WINDOWED_MOUSE_POINTER	L"HideWindowedMousePointer"
 #define IDS_RS_MIN_MPLS_DURATION			L"MinMPlsDuration"
 #define IDS_RS_MINI_DUMP					L"MiniDump"
+#define IDS_RS_FFMPEG_EXEPATH				L"FFmpegExePath"
 
 #define IDS_RS_LCD_SUPPORT					L"LcdSupport"
 #define IDS_RS_WINMEDIACONTROLS				L"WinMediaControls"

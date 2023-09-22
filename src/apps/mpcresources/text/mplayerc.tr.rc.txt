@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Gözat..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
 5		"Atlama uzaklıkları (ms olarak kısa, orta, uzun)"
 9		"Varsayılan"
 10		"Hızlı arama (ref. karede)"
@@ -356,13 +356,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 23		"Logitech LCD desteğini etkinleştir"
 24		"Windows Medya Kontrollerini kullan"
 25		"MiniDump etkinleştir"
-26		"Güncelleme kontrolü"
-27		"Otomatik güncelleme kontrolünü etkinleştir"
-28		"Her kontrol arasındaki gecikme:"
-31		"gün"
-32		"Ayar yönetimi"
-33		"Sıfırla"
-34		"Ver"
+26		"FFmpeg executable file:"
+28		"Güncelleme kontrolü"
+29		"Otomatik güncelleme kontrolünü etkinleştir"
+30		"Her kontrol arasındaki gecikme:"
+33		"gün"
+34		"Ayar yönetimi"
+35		"Sıfırla"
+36		"Ver"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

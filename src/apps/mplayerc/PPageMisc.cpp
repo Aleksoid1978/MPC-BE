@@ -22,6 +22,7 @@
 #include "MiniDump.h"
 #include "MainFrm.h"
 #include "PPageMisc.h"
+#include "DSUtil/Filehandle.h"
 
 // CPPageMisc dialog
 
@@ -64,6 +65,7 @@ void CPPageMisc::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_LCD, m_fLCDSupport);
 	DDX_Check(pDX, IDC_CHECK9, m_bWinMediaControls);
 	DDX_Check(pDX, IDC_CHECK2, m_fMiniDump);
+	DDX_Control(pDX, IDC_COMBO1, m_cbFFmpegExePath);
 	DDX_Control(pDX, IDC_CHECK3, m_updaterAutoCheckCtrl);
 	DDX_Control(pDX, IDC_EDIT4, m_updaterDelayCtrl);
 	DDX_Control(pDX, IDC_SPIN1, m_updaterDelaySpin);
@@ -104,6 +106,12 @@ BOOL CPPageMisc::OnInitDialog()
 	m_bWinMediaControls = s.bWinMediaControls;
 	m_fMiniDump = s.fMiniDump;
 
+	m_cbFFmpegExePath.AddString(L"ffmpeg.exe");
+	if (s.strFFmpegExePath.CompareNoCase(L"ffmpeg.exe") != 0) {
+		m_cbFFmpegExePath.AddString(s.strFFmpegExePath);
+	}
+	m_cbFFmpegExePath.SelectString(0, s.strFFmpegExePath);
+
 	m_updaterAutoCheckCtrl.SetCheck(s.bUpdaterAutoCheck);
 	m_nUpdaterDelay = s.nUpdaterDelay;
 	m_updaterDelaySpin.SetRange32(1, 365);
@@ -134,6 +142,8 @@ BOOL CPPageMisc::OnApply()
 	s.fMiniDump                 = !!m_fMiniDump;
 	CMiniDump::SetState(s.fMiniDump);
 
+    m_cbFFmpegExePath.GetWindowTextW(s.strFFmpegExePath);
+	CleanPath(s.strFFmpegExePath);
 	s.bUpdaterAutoCheck = !!m_updaterAutoCheckCtrl.GetCheck();
 	s.nUpdaterDelay     = (m_nUpdaterDelay = std::clamp(m_nUpdaterDelay, 1, 365));
 

@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Bilatu..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
 5		"Jauzi hurruntasunak (txikia, ertaina, handia sm-tan)"
 9		"Berezkoa"
 10		"Bilaketa azkarra (giltzaframean)"
@@ -356,13 +356,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 23		"Gaitu Logitech LCD sostengua"
 24		"Use Window Media Controls"
 25		"Gaitu MiniDump"
-26		"Eguneraketa egiaztapena"
-27		"Gaitu berezgaitasunezko eguneraketa egiaztapena"
-28		"Egiaztapen bakoitzaren arteko aldea:"
-31		"egun"
-32		"Ezarpen kudeaketa"
-33		"Berrezarri"
-34		"Esportatu"
+26		"FFmpeg executable file:"
+28		"Eguneraketa egiaztapena"
+29		"Gaitu berezgaitasunezko eguneraketa egiaztapena"
+30		"Egiaztapen bakoitzaren arteko aldea:"
+33		"egun"
+34		"Ezarpen kudeaketa"
+35		"Berrezarri"
+36		"Esportatu"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

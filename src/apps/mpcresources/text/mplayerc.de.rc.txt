@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Öffnen..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
 5		"Sprungintervalle (klein, mittel, groß in ms)"
 9		"Zurücksetzen"
 10		"Schnellen Suchlauf verwenden (Keyframes)"
@@ -356,13 +356,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 23		"LCD-Unterstützung für Logitech-Tastaturen aktivieren"
 24		"Desktop-Overlay bei Verwendung von Medientasten anzeigen"
 25		"MiniDumps aktivieren"
-26		"Updates"
-27		"Automatisch nach Updates suchen"
-28		"Suchintervall nach Updates:"
-31		"Tag(e)"
-32		"Programmeinstellungen verwalten"
-33		"Zurücksetzen"
-34		"Exportieren..."
+26		"FFmpeg executable file:"
+28		"Updates"
+29		"Automatisch nach Updates suchen"
+30		"Suchintervall nach Updates:"
+33		"Tag(e)"
+34		"Programmeinstellungen verwalten"
+35		"Zurücksetzen"
+36		"Exportieren..."
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

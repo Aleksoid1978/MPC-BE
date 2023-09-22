@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"参照..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
 5		"ジャンプ間隔 (小、中、大: ミリ秒単位)"
 9		"既定"
 10		"高速シーク (キーフレームに)"
@@ -356,13 +356,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 23		"Logitech (Logicool) LCD サポートを有効にする"
 24		"ウィンドウ メディア コントロールを使用する"
 25		"MiniDump を有効にする"
-26		"更新の確認"
-27		"更新を自動で確認する"
-28		"確認する間隔:"
-31		"日"
-32		"設定の管理"
-33		"リセット"
-34		"エクスポート"
+26		"FFmpeg executable file:"
+28		"更新の確認"
+29		"更新を自動で確認する"
+30		"確認する間隔:"
+33		"日"
+34		"設定の管理"
+35		"リセット"
+36		"エクスポート"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

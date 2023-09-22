@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Tallózás..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
 5		"Ugrás távolságok (kicsi, közepes, nagy, tizedmásodpercben)"
 9		"Alapértelmezett"
 10		"Gyors keresés (kulcspozícióban)"
@@ -356,13 +356,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 23		"Engedélyezze a Logitech LCD támogatást"
 24		"Használja a Window Media Controls-t"
 25		"MiniDump engedélyezése"
-26		"Frissítés ellenőrzése"
-27		"Automatikus frissítésellenőrzés engedélyezése"
-28		"Késleltetés az ellenőrzéseknél:"
-31		"nap(ok)"
-32		"Beállítások kezelése"
-33		"Visszaállítás"
-34		"Export"
+26		"FFmpeg executable file:"
+28		"Frissítés ellenőrzése"
+29		"Automatikus frissítésellenőrzés engedélyezése"
+30		"Késleltetés az ellenőrzéseknél:"
+33		"nap(ok)"
+34		"Beállítások kezelése"
+35		"Visszaállítás"
+36		"Export"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

@@ -43,6 +43,7 @@ private:
 	BOOL m_fLCDSupport;
 	BOOL m_bWinMediaControls = FALSE;
 	BOOL m_fMiniDump;
+	CComboBox m_cbFFmpegExePath;
 
 	CButton m_updaterAutoCheckCtrl;
 	CEdit m_updaterDelayCtrl;

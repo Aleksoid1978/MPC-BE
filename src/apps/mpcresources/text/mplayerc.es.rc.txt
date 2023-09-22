@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Explorar..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
 5		"Saltar distancias (pequeña, mediana, grande en ms)"
 9		"Predeterminado"
 10		"Búsqueda rápida (en fotograma clave)"
@@ -356,13 +356,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 23		"Habilitar soporte de LCD Logitech"
 24		"Usar Controles de Windows Media"
 25		"Habilitar MiniDump"
-26		"Comprobar Actualización"
-27		"Habilitar Comprobación Automática de Actualizaciones"
-28		"Retraso entre cada comprobación:"
-31		"día(s)"
-32		"Gestión de Ajustes"
-33		"Reiniciar"
-34		"Exportar"
+26		"FFmpeg executable file:"
+28		"Comprobar Actualización"
+29		"Habilitar Comprobación Automática de Actualizaciones"
+30		"Retraso entre cada comprobación:"
+33		"día(s)"
+34		"Gestión de Ajustes"
+35		"Reiniciar"
+36		"Exportar"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

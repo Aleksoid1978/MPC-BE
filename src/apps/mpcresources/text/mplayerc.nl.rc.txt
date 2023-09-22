@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Bladeren..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
 5		"Verspring intervallen (kort, middel, lang in ms)"
 9		"Standaard"
 10		"Snel zoeken (op sleutelframe)"
@@ -356,13 +356,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 23		"Activeer Logitech LCD-ondersteuning"
 24		"Gebruik mediabediening van Windows"
 25		"Activeer MiniDump"
-26		"Op updates controleren"
-27		"Activeer automatische updatecontrole"
-28		"Controleer 1 keer per"
-31		"dag(en)"
-32		"Instellingen beheren"
-33		"Resetten"
-34		"Exporteren"
+26		"FFmpeg executable file:"
+28		"Op updates controleren"
+29		"Activeer automatische updatecontrole"
+30		"Controleer 1 keer per"
+33		"dag(en)"
+34		"Instellingen beheren"
+35		"Resetten"
+36		"Exporteren"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

@@ -802,6 +802,7 @@ public:
 	bool			bUpdaterAutoCheck;
 	int				nUpdaterDelay;
 	time_t			tUpdaterLastCheck;
+	CStringW		strFFmpegExePath;
 
 	// MENUS
 	// View

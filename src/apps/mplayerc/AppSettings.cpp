@@ -752,6 +752,7 @@ void CAppSettings::ResetSettings()
 	nMinMPlsDuration = 3;
 	fMiniDump = false;
 	CMiniDump::SetState(fMiniDump);
+	strFFmpegExePath = L"ffmpeg.exe";
 
 	fLCDSupport = false;
 	bWinMediaControls = false;
@@ -1417,6 +1418,12 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MINI_DUMP, fMiniDump);
 	CMiniDump::SetState(fMiniDump);
 
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_FFMPEG_EXEPATH, strFFmpegExePath);
+	strFFmpegExePath.Trim();
+
+	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_YDL_EXEPATH, strYDLExePath);
+	strYDLExePath.Trim();
+
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_LCD_SUPPORT, fLCDSupport);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WINMEDIACONTROLS, bWinMediaControls);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SMARTSEEK, fSmartSeek);
@@ -1756,6 +1763,8 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_HIDE_WINDOWED_MOUSE_POINTER, bHideWindowedMousePointer);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_MIN_MPLS_DURATION, nMinMPlsDuration);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_MINI_DUMP, fMiniDump);
+
+	profile.WriteString(IDS_R_SETTINGS, IDS_RS_FFMPEG_EXEPATH, strFFmpegExePath);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_LCD_SUPPORT, fLCDSupport);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_WINMEDIACONTROLS, bWinMediaControls);

@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"찾아보기..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
 5		"이동 간격(최소/중간/최대 간격을 밀리초 단위로 입력)"
 9		"기본값"
 10		"빠른 탐색(키 프레임)"
@@ -356,13 +356,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 23		"로지텍 LCD 지원 활성화(실험적)"
 24		"윈도 미디어 제어 사용"
 25		"미니 덤프 활성화"
-26		"업데이트 확인"
-27		"자동 업데이트 확인 활성화"
-28		"확인할 간격 :"
-31		"일"
-32		"설정 관리"
-33		"초기화"
-34		"내보내기"
+26		"FFmpeg executable file:"
+28		"업데이트 확인"
+29		"자동 업데이트 확인 활성화"
+30		"확인할 간격 :"
+33		"일"
+34		"설정 관리"
+35		"초기화"
+36		"내보내기"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

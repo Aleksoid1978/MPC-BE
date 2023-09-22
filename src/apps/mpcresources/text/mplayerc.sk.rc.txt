@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Prehľadávať"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
 5		"Jump distances (small, medium, large in ms)"
 9		"Default"
 10		"Fast seek (on keyframe)"
@@ -356,13 +356,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 23		"Enable Logitech LCD support"
 24		"Use Window Media Controls"
 25		"Enable MiniDump"
-26		"Update check"
-27		"Enable automatic update check"
-28		"Delay between each check:"
-31		"day(s)"
-32		"Správa nastavení"
-33		"Reset"
-34		"Export"
+26		"FFmpeg executable file:"
+28		"Update check"
+29		"Enable automatic update check"
+30		"Delay between each check:"
+33		"day(s)"
+34		"Správa nastavení"
+35		"Reset"
+36		"Export"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17

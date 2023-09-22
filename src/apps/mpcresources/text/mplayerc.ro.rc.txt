@@ -343,7 +343,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Răsfoire..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
 5		"Intervale de sărire (mic, mediu, mare în ms)"
 9		"Implicit"
 10		"Căutare rapidă (la cadru cheie)"
@@ -356,13 +356,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 35
 23		"Activează suportul LCD pentru tastaturi Logitech"
 24		"Use Window Media Controls"
 25		"Enable MiniDump"
-26		"Update check"
-27		"Enable automatic update check"
-28		"Delay between each check:"
-31		"day(s)"
-32		"Administrare setări"
-33		"Resetează"
-34		"Exportă"
+26		"FFmpeg executable file:"
+28		"Update check"
+29		"Enable automatic update check"
+30		"Delay between each check:"
+33		"day(s)"
+34		"Administrare setări"
+35		"Resetează"
+36		"Exportă"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
