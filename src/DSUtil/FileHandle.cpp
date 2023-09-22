@@ -226,18 +226,25 @@ CStringW GetRegAppPath(LPCWSTR appFileName, const bool bCurrentUser)
 
 CStringW GetFullExePath(const CStringW exePath, const bool bLookAppPaths)
 {
+	if (exePath.IsEmpty()) {
+		return L"";
+	}
+
 	if (StartsWith(exePath, L":\\", 1) || StartsWith(exePath, L"\\\\")) {
 		// looks like full path
-		
+
 		if (::PathFileExistsW(exePath)) {
-			return exePath; // complete the checks anyway
+			return exePath;
 		} else {
-			return L"";
+			return L""; // complete the checks anyway
 		}
 	}
 
-	CStringW apppath = GetProgramDir() + exePath;
-	if (::PathFileExistsW(apppath)) {
+	CStringW apppath;
+	// look for in the application folder and in the folders described in the PATH environment variable
+	int length = SearchPathW(nullptr, exePath.GetString(), nullptr, MAX_PATH, apppath.GetBuffer(MAX_PATH), nullptr);
+	if (length > 0 && length <= MAX_PATH) {
+		apppath.ReleaseBufferSetLength(length);
 		return apppath;
 	}
 
@@ -254,12 +261,6 @@ CStringW GetFullExePath(const CStringW exePath, const bool bLookAppPaths)
 		if (apppath.GetLength() && ::PathFileExistsW(apppath)) {
 			return apppath;
 		}
-	}
-
-	int length = SearchPathW(nullptr, exePath.GetString(), nullptr, MAX_PATH, apppath.GetBuffer(MAX_PATH), nullptr);
-	if (length <= MAX_PATH) {
-		apppath.ReleaseBufferSetLength(length);
-		return apppath;
 	}
 
 	return L"";

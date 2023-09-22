@@ -43,9 +43,10 @@ CStringW GetProgramDir();
 // Get application path from "App Paths" subkey
 CStringW GetRegAppPath(LPCWSTR appFileName, const bool bUser);
 
-// Searches and checks for the presence of an executable file in the application folder,
-// in "App paths" (if bLookAppPaths is true)
-// and in the folders described in the PATH environment variable.
+// Searches and checks for the presence of an executable file
+// in the application folder,
+// in the folders described in the PATH environment variable,
+// in "App paths" (if bLookAppPaths is true).
 // Returns the full path to the existing executable file, otherwise an empty string.
 CStringW GetFullExePath(const CStringW exePath, const bool bLookAppPaths);
 
