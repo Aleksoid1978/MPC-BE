@@ -6048,7 +6048,7 @@ void CMainFrame::OnFileSaveAs()
 				if (SUCCEEDED(hr)) {
 					save_dlg2.DoModal();
 					if (save_dlg2.IsCompleteOk()) {
-						CString ffmpegpath = GetFullExePath(AfxGetAppSettings().strFFmpegExePath, false);
+						CString ffmpegpath = GetFullExePath(AfxGetAppSettings().strFFmpegExePath, true);
 						if (ffmpegpath.GetLength()) {
 							CString outFileName = fileName.GetString();
 							if (MoveFileW(fileName, fileName + L".tmp")) {
