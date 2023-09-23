@@ -111,6 +111,7 @@ class __declspec(uuid("3D446B6F-71DE-4437-BE15-8CE47174340F"))
 			uint32_t prev_mat_framesize;
 
 			DWORD padding;
+			std::vector<BYTE> paddingData;
 		} TrueHDMATState;
 	} m_hdmi_bitstream = {};
 

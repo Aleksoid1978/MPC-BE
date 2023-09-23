@@ -1024,14 +1024,11 @@ void CMpaDecFilter::MATWriteHeader()
 void CMpaDecFilter::MATWritePadding()
 {
 	if (m_hdmi_bitstream.TrueHDMATState.padding > 0) {
-		// allocate padding (on the stack of possible)
-		BYTE *padding = (BYTE*)_malloca(m_hdmi_bitstream.TrueHDMATState.padding);
+		if (m_hdmi_bitstream.TrueHDMATState.padding > m_hdmi_bitstream.TrueHDMATState.paddingData.size()) {
+			m_hdmi_bitstream.TrueHDMATState.paddingData.resize(static_cast<size_t>(m_hdmi_bitstream.TrueHDMATState.padding * 2));
+		}
 
-		memset(padding, 0, m_hdmi_bitstream.TrueHDMATState.padding);
-		int remaining = MATFillDataBuffer(padding, m_hdmi_bitstream.TrueHDMATState.padding, true);
-
-		// free the padding block
-		_freea(padding);
+		int remaining = MATFillDataBuffer(m_hdmi_bitstream.TrueHDMATState.paddingData.data(), m_hdmi_bitstream.TrueHDMATState.padding, true);
 
 		// not all padding could be written to the buffer, write it later
 		if (remaining >= 0) {
