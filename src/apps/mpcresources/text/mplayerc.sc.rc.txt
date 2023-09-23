@@ -356,7 +356,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
 23		"开启罗技 LCD 支持"
 24		"启用窗口播放控件"
 25		"使用小型存储器转储 (MiniDump)"
-26		"FFmpeg executable file:"
+26		"FFmpeg文件位置:"
 28		"检查更新"
 29		"启用自动更新检查"
 30		"更新检查间隔:"
