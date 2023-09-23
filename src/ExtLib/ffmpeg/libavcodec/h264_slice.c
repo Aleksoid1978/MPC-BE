@@ -28,15 +28,11 @@
 #include "config_components.h"
 
 #include "libavutil/avassert.h"
-#include "libavutil/display.h"
-#include "libavutil/film_grain_params.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/timecode.h"
-#include "internal.h"
 #include "decode.h"
 #include "cabac.h"
 #include "cabac_functions.h"
-#include "decode.h"
 #include "error_resilience.h"
 #include "avcodec.h"
 #include "h264.h"
@@ -209,16 +205,18 @@ static int alloc_picture(H264Context *h, H264Picture *pic)
             goto fail;
     }
 
-    if (h->avctx->hwaccel) {
-        const AVHWAccel *hwaccel = h->avctx->hwaccel;
-        av_assert0(!pic->hwaccel_picture_private);
-        if (hwaccel->frame_priv_data_size) {
-            pic->hwaccel_priv_buf = ff_hwaccel_frame_priv_alloc(h->avctx, hwaccel);
-            if (!pic->hwaccel_priv_buf)
-                return AVERROR(ENOMEM);
-            pic->hwaccel_picture_private = pic->hwaccel_priv_buf->data;
-        }
+    ret = ff_hwaccel_frame_priv_alloc(h->avctx, &pic->hwaccel_picture_private,
+                                      &pic->hwaccel_priv_buf);
+    if (ret < 0)
+        goto fail;
+
+    if (h->decode_error_flags_pool) {
+        pic->decode_error_flags = av_buffer_pool_get(h->decode_error_flags_pool);
+        if (!pic->decode_error_flags)
+            goto fail;
+        atomic_init((atomic_int*)pic->decode_error_flags->data, 0);
     }
+
     if (CONFIG_GRAY && !h->avctx->hwaccel && h->flags & AV_CODEC_FLAG_GRAY && pic->f->data[2]) {
         int h_chroma_shift, v_chroma_shift;
         av_pix_fmt_get_chroma_sub_sample(pic->f->format,
@@ -301,6 +299,34 @@ static void copy_picture_range(H264Picture **to, H264Picture **from, int count,
                    IN_RANGE(from[i], old_base, 1) ||
                    IN_RANGE(from[i], old_base->DPB, H264_MAX_PICTURE_COUNT));
         to[i] = REBASE_PICTURE(from[i], new_base, old_base);
+    }
+}
+
+static void color_frame(AVFrame *frame, const int c[4])
+{
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(frame->format);
+
+    av_assert0(desc->flags & AV_PIX_FMT_FLAG_PLANAR);
+
+    for (int p = 0; p < desc->nb_components; p++) {
+        uint8_t *dst = frame->data[p];
+        int is_chroma = p == 1 || p == 2;
+        int bytes  = is_chroma ? AV_CEIL_RSHIFT(frame->width,  desc->log2_chroma_w) : frame->width;
+        int height = is_chroma ? AV_CEIL_RSHIFT(frame->height, desc->log2_chroma_h) : frame->height;
+        if (desc->comp[0].depth >= 9) {
+            ((uint16_t*)dst)[0] = c[p];
+            av_memcpy_backptr(dst + 2, 2, bytes - 2);
+            dst += frame->linesize[p];
+            for (int y = 1; y < height; y++) {
+                memcpy(dst, frame->data[p], 2*bytes);
+                dst += frame->linesize[p];
+            }
+        } else {
+            for (int y = 0; y < height; y++) {
+                memset(dst, c[p], bytes);
+                dst += frame->linesize[p];
+            }
+        }
     }
 }
 
@@ -906,7 +932,7 @@ static enum AVPixelFormat get_pixel_format(H264Context *h, int force_callback)
     for (int i = 0; pix_fmts[i] != AV_PIX_FMT_NONE; i++)
         if (pix_fmts[i] == h->avctx->pix_fmt && !force_callback)
             return pix_fmts[i];
-    return ff_thread_get_format(h->avctx, pix_fmts);
+    return ff_get_format(h->avctx, pix_fmts);
 }
 
 // ==> Start patch MPC
@@ -1576,7 +1602,7 @@ static int h264_field_start(H264Context *h, const H264SliceContext *sl,
                 if (h->short_ref[0]->field_picture)
                     ff_thread_report_progress(&h->short_ref[0]->tf, INT_MAX, 1);
             } else if (!h->frame_recovered && !h->avctx->hwaccel)
-                ff_color_frame(h->short_ref[0]->f, c);
+                color_frame(h->short_ref[0]->f, c);
             h->short_ref[0]->frame_num = h->poc.prev_frame_num;
         }
     }

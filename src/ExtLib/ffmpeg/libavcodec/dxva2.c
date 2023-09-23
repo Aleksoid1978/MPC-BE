@@ -64,23 +64,23 @@ typedef struct dxva_mode {
     const int      *profiles;
 } dxva_mode;
 
-static const int prof_mpeg2_main[]   = {FF_PROFILE_MPEG2_SIMPLE,
-                                        FF_PROFILE_MPEG2_MAIN,
-                                        FF_PROFILE_UNKNOWN};
-static const int prof_h264_high[]    = {FF_PROFILE_H264_CONSTRAINED_BASELINE,
-                                        FF_PROFILE_H264_MAIN,
-                                        FF_PROFILE_H264_HIGH,
-                                        FF_PROFILE_UNKNOWN};
-static const int prof_hevc_main[]    = {FF_PROFILE_HEVC_MAIN,
-                                        FF_PROFILE_UNKNOWN};
-static const int prof_hevc_main10[]  = {FF_PROFILE_HEVC_MAIN_10,
-                                        FF_PROFILE_UNKNOWN};
-static const int prof_vp9_profile0[] = {FF_PROFILE_VP9_0,
-                                        FF_PROFILE_UNKNOWN};
-static const int prof_vp9_profile2[] = {FF_PROFILE_VP9_2,
-                                        FF_PROFILE_UNKNOWN};
-static const int prof_av1_profile0[] = {FF_PROFILE_AV1_MAIN,
-                                        FF_PROFILE_UNKNOWN};
+static const int prof_mpeg2_main[]   = {AV_PROFILE_MPEG2_SIMPLE,
+                                        AV_PROFILE_MPEG2_MAIN,
+                                        AV_PROFILE_UNKNOWN};
+static const int prof_h264_high[]    = {AV_PROFILE_H264_CONSTRAINED_BASELINE,
+                                        AV_PROFILE_H264_MAIN,
+                                        AV_PROFILE_H264_HIGH,
+                                        AV_PROFILE_UNKNOWN};
+static const int prof_hevc_main[]    = {AV_PROFILE_HEVC_MAIN,
+                                        AV_PROFILE_UNKNOWN};
+static const int prof_hevc_main10[]  = {AV_PROFILE_HEVC_MAIN_10,
+                                        AV_PROFILE_UNKNOWN};
+static const int prof_vp9_profile0[] = {AV_PROFILE_VP9_0,
+                                        AV_PROFILE_UNKNOWN};
+static const int prof_vp9_profile2[] = {AV_PROFILE_VP9_2,
+                                        AV_PROFILE_UNKNOWN};
+static const int prof_av1_profile0[] = {AV_PROFILE_AV1_MAIN,
+                                        AV_PROFILE_UNKNOWN};
 
 static const dxva_mode dxva_modes[] = {
     /* MPEG-2 */
@@ -205,7 +205,7 @@ static int dxva_check_codec_compatibility(AVCodecContext *avctx, const dxva_mode
 
     if (mode->profiles && !(avctx->hwaccel_flags & AV_HWACCEL_FLAG_ALLOW_PROFILE_MISMATCH)) {
         int i, found = 0;
-        for (i = 0; mode->profiles[i] != FF_PROFILE_UNKNOWN; i++) {
+        for (i = 0; mode->profiles[i] != AV_PROFILE_UNKNOWN; i++) {
             if (avctx->profile == mode->profiles[i]) {
                 found = 1;
                 break;

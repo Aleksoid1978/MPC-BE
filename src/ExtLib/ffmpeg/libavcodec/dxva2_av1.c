@@ -27,7 +27,7 @@
 
 #include "dxva2_internal.h"
 #include "av1dec.h"
-
+#include "hwaccel_internal.h"
 // ==> Start patch MPC
 #if !HAVE_DXVA_PICPARAMS_AV1
 #include "compat/windows/dxva_av1.h"
@@ -463,11 +463,11 @@ static int dxva2_av1_uninit(AVCodecContext *avctx)
 }
 
 #if CONFIG_AV1_DXVA2_HWACCEL
-const AVHWAccel ff_av1_dxva2_hwaccel = {
-    .name           = "av1_dxva2",
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_AV1,
-    .pix_fmt        = AV_PIX_FMT_DXVA2_VLD,
+const FFHWAccel ff_av1_dxva2_hwaccel = {
+    .p.name         = "av1_dxva2",
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_AV1,
+    .p.pix_fmt      = AV_PIX_FMT_DXVA2_VLD,
     .init           = ff_dxva2_decode_init,
     .uninit         = dxva2_av1_uninit,
     .start_frame    = dxva2_av1_start_frame,
@@ -480,11 +480,11 @@ const AVHWAccel ff_av1_dxva2_hwaccel = {
 #endif
 
 #if CONFIG_AV1_D3D11VA_HWACCEL
-const AVHWAccel ff_av1_d3d11va_hwaccel = {
-    .name           = "av1_d3d11va",
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_AV1,
-    .pix_fmt        = AV_PIX_FMT_D3D11VA_VLD,
+const FFHWAccel ff_av1_d3d11va_hwaccel = {
+    .p.name         = "av1_d3d11va",
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_AV1,
+    .p.pix_fmt      = AV_PIX_FMT_D3D11VA_VLD,
     .init           = ff_dxva2_decode_init,
     .uninit         = dxva2_av1_uninit,
     .start_frame    = dxva2_av1_start_frame,
@@ -497,11 +497,11 @@ const AVHWAccel ff_av1_d3d11va_hwaccel = {
 #endif
 
 #if CONFIG_AV1_D3D11VA2_HWACCEL
-const AVHWAccel ff_av1_d3d11va2_hwaccel = {
-    .name           = "av1_d3d11va2",
-    .type           = AVMEDIA_TYPE_VIDEO,
-    .id             = AV_CODEC_ID_AV1,
-    .pix_fmt        = AV_PIX_FMT_D3D11,
+const FFHWAccel ff_av1_d3d11va2_hwaccel = {
+    .p.name         = "av1_d3d11va2",
+    .p.type         = AVMEDIA_TYPE_VIDEO,
+    .p.id           = AV_CODEC_ID_AV1,
+    .p.pix_fmt      = AV_PIX_FMT_D3D11,
     .init           = ff_dxva2_decode_init,
     .uninit         = dxva2_av1_uninit,
     .start_frame    = dxva2_av1_start_frame,

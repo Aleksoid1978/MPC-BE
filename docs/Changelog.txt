@@ -34,6 +34,7 @@ Updated Korean translation (by Hackjjang).
 Updated Romanian translation (by AndreiMiloiu).
 
 Updated libraries:
+	ffmpeg git-n6.1-dev-2279-g5d98259841;
 	zlib 1.3;
 
 

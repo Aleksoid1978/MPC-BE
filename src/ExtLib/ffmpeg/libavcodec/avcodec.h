@@ -421,8 +421,6 @@ typedef struct RcOverride{
  */
 #define AV_GET_ENCODE_BUFFER_FLAG_REF (1 << 0)
 
-struct AVCodecInternal;
-
 /**
  * main external API structure.
  * New fields can be added to the end with minor version bumps.
@@ -1262,7 +1260,7 @@ typedef struct AVCodecContext {
     /**
      * decoder bitstream buffer size
      * - encoding: Set by user.
-     * - decoding: unused
+     * - decoding: May be set by libavcodec.
      */
     int rc_buffer_size;
 
@@ -1589,8 +1587,12 @@ typedef struct AVCodecContext {
      * profile
      * - encoding: Set by user.
      * - decoding: Set by libavcodec.
+     * See the AV_PROFILE_* defines in defs.h.
      */
      int profile;
+#if FF_API_FF_PROFILE_LEVEL
+    /** @deprecated The following defines are deprecated; use AV_PROFILE_*
+     * in defs.h instead. */
 #define FF_PROFILE_UNKNOWN -99
 #define FF_PROFILE_RESERVED -100
 
@@ -1721,14 +1723,20 @@ typedef struct AVCodecContext {
 
 #define FF_PROFILE_EVC_BASELINE             0
 #define FF_PROFILE_EVC_MAIN                 1
+#endif
 
     /**
      * level
      * - encoding: Set by user.
      * - decoding: Set by libavcodec.
+     * See AV_LEVEL_* in defs.h.
      */
      int level;
+#if FF_API_FF_PROFILE_LEVEL
+    /** @deprecated The following define is deprecated; use AV_LEVEL_UNKOWN
+     * in defs.h instead. */
 #define FF_LEVEL_UNKNOWN -99
+#endif
 
     /**
      * Skip loop filtering for selected frames.
@@ -1796,9 +1804,9 @@ typedef struct AVCodecContext {
     enum AVPixelFormat sw_pix_fmt;
 
     /**
-     * Timebase in which pkt_dts/pts and AVPacket.dts/pts are.
-     * - encoding unused.
-     * - decoding set by user.
+     * Timebase in which pkt_dts/pts and AVPacket.dts/pts are expressed.
+     * - encoding: unused.
+     * - decoding: set by user.
      */
     AVRational pkt_timebase;
 
@@ -2146,139 +2154,6 @@ typedef struct AVHWAccel {
      * see AV_HWACCEL_CODEC_CAP_*
      */
     int capabilities;
-
-    /*****************************************************************
-     * No fields below this line are part of the public API. They
-     * may not be used outside of libavcodec and can be changed and
-     * removed at will.
-     * New public fields should be added right above.
-     *****************************************************************
-     */
-
-    /**
-     * Allocate a custom buffer
-     */
-    int (*alloc_frame)(AVCodecContext *avctx, AVFrame *frame);
-
-    /**
-     * Called at the beginning of each frame or field picture.
-     *
-     * Meaningful frame information (codec specific) is guaranteed to
-     * be parsed at this point. This function is mandatory.
-     *
-     * Note that buf can be NULL along with buf_size set to 0.
-     * Otherwise, this means the whole frame is available at this point.
-     *
-     * @param avctx the codec context
-     * @param buf the frame data buffer base
-     * @param buf_size the size of the frame in bytes
-     * @return zero if successful, a negative value otherwise
-     */
-    int (*start_frame)(AVCodecContext *avctx, const uint8_t *buf, uint32_t buf_size);
-
-    /**
-     * Callback for parameter data (SPS/PPS/VPS etc).
-     *
-     * Useful for hardware decoders which keep persistent state about the
-     * video parameters, and need to receive any changes to update that state.
-     *
-     * @param avctx the codec context
-     * @param type the nal unit type
-     * @param buf the nal unit data buffer
-     * @param buf_size the size of the nal unit in bytes
-     * @return zero if successful, a negative value otherwise
-     */
-    int (*decode_params)(AVCodecContext *avctx, int type, const uint8_t *buf, uint32_t buf_size);
-
-    /**
-     * Callback for each slice.
-     *
-     * Meaningful slice information (codec specific) is guaranteed to
-     * be parsed at this point. This function is mandatory.
-     *
-     * @param avctx the codec context
-     * @param buf the slice data buffer base
-     * @param buf_size the size of the slice in bytes
-     * @return zero if successful, a negative value otherwise
-     */
-    int (*decode_slice)(AVCodecContext *avctx, const uint8_t *buf, uint32_t buf_size);
-
-    /**
-     * Called at the end of each frame or field picture.
-     *
-     * The whole picture is parsed at this point and can now be sent
-     * to the hardware accelerator. This function is mandatory.
-     *
-     * @param avctx the codec context
-     * @return zero if successful, a negative value otherwise
-     */
-    int (*end_frame)(AVCodecContext *avctx);
-
-    /**
-     * Size of per-frame hardware accelerator private data.
-     *
-     * Private data is allocated with av_mallocz() before
-     * AVCodecContext.get_buffer() and deallocated after
-     * AVCodecContext.release_buffer().
-     */
-    int frame_priv_data_size;
-
-    /**
-     * Initialize the hwaccel private data.
-     *
-     * This will be called from ff_get_format(), after hwaccel and
-     * hwaccel_context are set and the hwaccel private data in AVCodecInternal
-     * is allocated.
-     */
-    int (*init)(AVCodecContext *avctx);
-
-    /**
-     * Uninitialize the hwaccel private data.
-     *
-     * This will be called from get_format() or avcodec_close(), after hwaccel
-     * and hwaccel_context are already uninitialized.
-     */
-    int (*uninit)(AVCodecContext *avctx);
-
-    /**
-     * Size of the private data to allocate in
-     * AVCodecInternal.hwaccel_priv_data.
-     */
-    int priv_data_size;
-
-    /**
-     * Internal hwaccel capabilities.
-     */
-    int caps_internal;
-
-    /**
-     * Fill the given hw_frames context with current codec parameters. Called
-     * from get_format. Refer to avcodec_get_hw_frames_parameters() for
-     * details.
-     *
-     * This CAN be called before AVHWAccel.init is called, and you must assume
-     * that avctx->hwaccel_priv_data is invalid.
-     */
-    int (*frame_params)(AVCodecContext *avctx, AVBufferRef *hw_frames_ctx);
-
-    /**
-     * Copy necessary context variables from a previous thread context to the current one.
-     * For thread-safe hwaccels only.
-     */
-    int (*update_thread_context)(AVCodecContext *dst, const AVCodecContext *src);
-
-    /**
-     * Callback to free the hwaccel-specific frame data.
-     *
-     * @param hwctx a pointer to an AVHWDeviceContext.
-     * @param data the per-frame hardware accelerator private data to be freed.
-     */
-    void (*free_frame_priv)(void *hwctx, uint8_t *data);
-
-    /**
-     * Callback to flush the hwaccel state.
-     */
-    void (*flush)(AVCodecContext *avctx);
 } AVHWAccel;
 
 /**

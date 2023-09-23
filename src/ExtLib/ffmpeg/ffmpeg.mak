@@ -603,7 +603,6 @@ SRCS_LC_B = \
 	libavcodec/x86/hevcdsp_init.c \
 	libavcodec/x86/h264_qpel.c \
 	libavcodec/x86/hpeldsp_init.c \
-	libavcodec/x86/hpeldsp_vp3_init.c \
 	libavcodec/x86/huffyuvdsp_init.c \
 	libavcodec/x86/idctdsp_init.c \
 	libavcodec/x86/jpeg2000dsp_init.c \
@@ -809,7 +808,6 @@ SRCS_YASM_LC = \
 	libavcodec/x86/hevc_sao.asm \
 	libavcodec/x86/hevc_sao_10bit.asm \
 	libavcodec/x86/hpeldsp.asm \
-	libavcodec/x86/hpeldsp_vp3.asm \
 	libavcodec/x86/huffyuvdsp.asm \
 	libavcodec/x86/idctdsp.asm \
 	libavcodec/x86/imdct36.asm \

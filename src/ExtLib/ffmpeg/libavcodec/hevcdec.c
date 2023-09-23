@@ -46,6 +46,7 @@
 #include "hevc_data.h"
 #include "hevc_parse.h"
 #include "hevcdec.h"
+#include "hwaccel_internal.h"
 #include "hwconfig.h"
 #include "internal.h"
 #include "profiles.h"
@@ -511,6 +512,7 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
 #if CONFIG_HEVC_VIDEOTOOLBOX_HWACCEL
         *fmt++ = AV_PIX_FMT_VIDEOTOOLBOX;
 #endif
+    /* NOTE: fallthrough */
     case AV_PIX_FMT_YUV420P12:
     case AV_PIX_FMT_YUV444P12:
 // ==> Start patch MPC
@@ -536,6 +538,9 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
 //    case AV_PIX_FMT_YUV422P12:
 //#if CONFIG_HEVC_VAAPI_HWACCEL
 //       *fmt++ = AV_PIX_FMT_VAAPI;
+//#endif
+//#if CONFIG_HEVC_VULKAN_HWACCEL
+//        *fmt++ = AV_PIX_FMT_VULKAN;
 // ==> End patch MPC
 #endif
         break;
@@ -544,7 +549,7 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
     *fmt++ = sps->pix_fmt;
     *fmt = AV_PIX_FMT_NONE;
 
-    return ff_thread_get_format(s->avctx, pix_fmts);
+    return ff_get_format(s->avctx, pix_fmts);
 }
 
 static int set_sps(HEVCContext *s, const HEVCSPS *sps,
@@ -1586,7 +1591,8 @@ static void luma_mc_uni(HEVCLocalContext *lc, uint8_t *dst, ptrdiff_t dststride,
 
     if (x_off < QPEL_EXTRA_BEFORE || y_off < QPEL_EXTRA_AFTER ||
         x_off >= pic_width - block_w - QPEL_EXTRA_AFTER ||
-        y_off >= pic_height - block_h - QPEL_EXTRA_AFTER) {
+        y_off >= pic_height - block_h - QPEL_EXTRA_AFTER ||
+        ref == s->frame) {
         const ptrdiff_t edge_emu_stride = EDGE_EMU_BUFFER_STRIDE << s->ps.sps->pixel_shift;
         int offset     = QPEL_EXTRA_BEFORE * srcstride       + (QPEL_EXTRA_BEFORE << s->ps.sps->pixel_shift);
         int buf_offset = QPEL_EXTRA_BEFORE * edge_emu_stride + (QPEL_EXTRA_BEFORE << s->ps.sps->pixel_shift);
@@ -1736,6 +1742,7 @@ static void chroma_mc_uni(HEVCLocalContext *lc, uint8_t *dst0,
     intptr_t my          = av_mod_uintp2(mv->y, 2 + vshift);
     intptr_t _mx         = mx << (1 - hshift);
     intptr_t _my         = my << (1 - vshift);
+    int emu              = src0 == s->frame->data[1] || src0 == s->frame->data[2];
 
     x_off += mv->x >> (2 + hshift);
     y_off += mv->y >> (2 + vshift);
@@ -1743,7 +1750,8 @@ static void chroma_mc_uni(HEVCLocalContext *lc, uint8_t *dst0,
 
     if (x_off < EPEL_EXTRA_BEFORE || y_off < EPEL_EXTRA_AFTER ||
         x_off >= pic_width - block_w - EPEL_EXTRA_AFTER ||
-        y_off >= pic_height - block_h - EPEL_EXTRA_AFTER) {
+        y_off >= pic_height - block_h - EPEL_EXTRA_AFTER ||
+        emu) {
         const int edge_emu_stride = EDGE_EMU_BUFFER_STRIDE << s->ps.sps->pixel_shift;
         int offset0 = EPEL_EXTRA_BEFORE * (srcstride + (1 << s->ps.sps->pixel_shift));
         int buf_offset0 = EPEL_EXTRA_BEFORE *
@@ -2980,11 +2988,9 @@ static int decode_nal_unit(HEVCContext *s, const H2645NAL *nal)
 
     switch (s->nal_unit_type) {
     case HEVC_NAL_VPS:
-        if (s->avctx->hwaccel && s->avctx->hwaccel->decode_params) {
-            ret = s->avctx->hwaccel->decode_params(s->avctx,
-                                                   nal->type,
-                                                   nal->raw_data,
-                                                   nal->raw_size);
+        if (FF_HW_HAS_CB(s->avctx, decode_params)) {
+            ret = FF_HW_CALL(s->avctx, decode_params,
+                             nal->type, nal->raw_data, nal->raw_size);
             if (ret < 0)
                 goto fail;
         }
@@ -2993,11 +2999,9 @@ static int decode_nal_unit(HEVCContext *s, const H2645NAL *nal)
             goto fail;
         break;
     case HEVC_NAL_SPS:
-        if (s->avctx->hwaccel && s->avctx->hwaccel->decode_params) {
-            ret = s->avctx->hwaccel->decode_params(s->avctx,
-                                                   nal->type,
-                                                   nal->raw_data,
-                                                   nal->raw_size);
+        if (FF_HW_HAS_CB(s->avctx, decode_params)) {
+            ret = FF_HW_CALL(s->avctx, decode_params,
+                             nal->type, nal->raw_data, nal->raw_size);
             if (ret < 0)
                 goto fail;
         }
@@ -3007,11 +3011,9 @@ static int decode_nal_unit(HEVCContext *s, const H2645NAL *nal)
             goto fail;
         break;
     case HEVC_NAL_PPS:
-        if (s->avctx->hwaccel && s->avctx->hwaccel->decode_params) {
-            ret = s->avctx->hwaccel->decode_params(s->avctx,
-                                                   nal->type,
-                                                   nal->raw_data,
-                                                   nal->raw_size);
+        if (FF_HW_HAS_CB(s->avctx, decode_params)) {
+            ret = FF_HW_CALL(s->avctx, decode_params,
+                             nal->type, nal->raw_data, nal->raw_size);
             if (ret < 0)
                 goto fail;
         }
@@ -3021,11 +3023,9 @@ static int decode_nal_unit(HEVCContext *s, const H2645NAL *nal)
         break;
     case HEVC_NAL_SEI_PREFIX:
     case HEVC_NAL_SEI_SUFFIX:
-        if (s->avctx->hwaccel && s->avctx->hwaccel->decode_params) {
-            ret = s->avctx->hwaccel->decode_params(s->avctx,
-                                                   nal->type,
-                                                   nal->raw_data,
-                                                   nal->raw_size);
+        if (FF_HW_HAS_CB(s->avctx, decode_params)) {
+            ret = FF_HW_CALL(s->avctx, decode_params,
+                             nal->type, nal->raw_data, nal->raw_size);
             if (ret < 0)
                 goto fail;
         }
@@ -3111,17 +3111,17 @@ static int decode_nal_unit(HEVCContext *s, const H2645NAL *nal)
         }
 
         if (s->sh.first_slice_in_pic_flag && s->avctx->hwaccel) {
-            ret = s->avctx->hwaccel->start_frame(s->avctx, NULL, 0);
+            ret = FF_HW_CALL(s->avctx, start_frame, NULL, 0);
             if (ret < 0)
                 goto fail;
         }
 
         if (s->avctx->hwaccel) {
-            ret = s->avctx->hwaccel->decode_slice(s->avctx, nal->raw_data, nal->raw_size);
+            ret = FF_HW_CALL(s->avctx, decode_slice, nal->raw_data, nal->raw_size);
             if (ret < 0)
                 goto fail;
         } else {
-            if (s->avctx->profile == FF_PROFILE_HEVC_SCC) {
+            if (s->avctx->profile == AV_PROFILE_HEVC_SCC) {
                 av_log(s->avctx, AV_LOG_ERROR,
                        "SCC profile is not yet implemented in hevc native decoder.\n");
                 ret = AVERROR_PATCHWELCOME;
@@ -3385,7 +3385,7 @@ static int hevc_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
         return ret;
 
     if (avctx->hwaccel) {
-        if (s->ref && (ret = avctx->hwaccel->end_frame(avctx)) < 0) {
+        if (s->ref && (ret = FF_HW_SIMPLE_CALL(avctx, end_frame)) < 0) {
             av_log(avctx, AV_LOG_ERROR,
                    "hardware accelerator failed to decode picture\n");
             ff_hevc_unref_frame(s, s->ref, ~0);
@@ -3701,8 +3701,8 @@ static void hevc_decode_flush(AVCodecContext *avctx)
     s->max_ra = INT_MAX;
     s->eos = 1;
 
-    if (avctx->hwaccel && avctx->hwaccel->flush)
-        avctx->hwaccel->flush(avctx);
+    if (FF_HW_HAS_CB(avctx, flush))
+        FF_HW_SIMPLE_CALL(avctx, flush);
 }
 
 #define OFFSET(x) offsetof(HEVCContext, x)

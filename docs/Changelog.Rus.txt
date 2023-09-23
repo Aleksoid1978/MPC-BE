@@ -34,6 +34,7 @@ SyncRenderer
 Обновлен румынский перевод (автор AndreiMiloiu).
 
 Обновлены библиотеки:
+	ffmpeg git-n6.1-dev-2279-g5d98259841;
 	zlib 1.3;
 
 

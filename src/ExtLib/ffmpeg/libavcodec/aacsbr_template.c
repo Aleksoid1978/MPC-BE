@@ -971,14 +971,14 @@ static void read_sbr_extension(AACContext *ac, SpectralBandReplication *sbr,
             // ==> Start patch MPC
             av_log(ac->avctx, AV_LOG_ERROR, "Parametric Stereo signaled to be not-present but was found in the bitstream, force stereo output.\n");
             *num_bits_left -= ff_ps_read_data(ac->avctx, gb, &sbr->ps.common, *num_bits_left);
-            ac->avctx->profile = FF_PROFILE_AAC_HE_V2;
+            ac->avctx->profile = AV_PROFILE_AAC_HE_V2;
             ac->oc[1].m4ac.ps = 1;
             //skip_bits_long(gb, *num_bits_left); // bs_fill_bits
             //*num_bits_left = 0;
             // ==> End patch MPC
         } else {
             *num_bits_left -= ff_ps_read_data(ac->avctx, gb, &sbr->ps.common, *num_bits_left);
-            ac->avctx->profile = FF_PROFILE_AAC_HE_V2;
+            ac->avctx->profile = AV_PROFILE_AAC_HE_V2;
             // ensure the warning is not printed if PS extension is present
             ac->warned_he_aac_mono = 1;
         }
