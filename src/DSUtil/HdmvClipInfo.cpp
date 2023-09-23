@@ -79,14 +79,14 @@ BYTE CHdmvClipInfo::ReadByte()
 
 BOOL CHdmvClipInfo::Skip(LONGLONG nLen)
 {
-	LARGE_INTEGER newPos = {0, 0};
+	LARGE_INTEGER newPos = {};
 	newPos.QuadPart = nLen;
 	return SetFilePointerEx(m_hFile, newPos, nullptr, FILE_CURRENT);
 }
 
 BOOL CHdmvClipInfo::GetPos(LONGLONG& Pos)
 {
-	LARGE_INTEGER curPos = {0, 0};
+	LARGE_INTEGER curPos = {};
 	const BOOL bRet = SetFilePointerEx(m_hFile, curPos, &curPos, FILE_CURRENT);
 	Pos = curPos.QuadPart;
 
@@ -94,7 +94,7 @@ BOOL CHdmvClipInfo::GetPos(LONGLONG& Pos)
 }
 BOOL CHdmvClipInfo::SetPos(LONGLONG Pos, DWORD dwMoveMethod/* = FILE_BEGIN*/)
 {
-	LARGE_INTEGER newPos = {0, 0};
+	LARGE_INTEGER newPos = {};
 	newPos.QuadPart = Pos;
 	return SetFilePointerEx(m_hFile, newPos, nullptr, dwMoveMethod);
 }
@@ -238,9 +238,9 @@ HRESULT CHdmvClipInfo::ReadCpiInfo(SyncPoints& sps)
 	const BYTE num_stream_pid = ReadByte();
 
 	DWORD size = num_stream_pid * 12;
-	BYTE* buf = DNew BYTE[size];
-	ReadBuffer(buf, size);
-	CGolombBuffer gb(buf, size);
+	auto buf = std::make_unique<BYTE[]>(size);
+	ReadBuffer(buf.get(), size);
+	CGolombBuffer gb(buf.get(), size);
 	for (BYTE i = 0; i < num_stream_pid; i++) {
 		ClpiEpMapEntry em;
 
@@ -256,30 +256,28 @@ HRESULT CHdmvClipInfo::ReadCpiInfo(SyncPoints& sps)
 
 		ClpiEpMapList.emplace_back(em);
 	}
-	SAFE_DELETE_ARRAY(buf);
 
 	for (auto& em : ClpiEpMapList) {
 		SetPos(em.ep_map_stream_start_addr);
 		const DWORD fine_start = ReadDword();
 
 		size = em.num_ep_coarse * 8;
-		buf = DNew BYTE[size];
-		ReadBuffer(buf, size);
-		gb.Reset(buf, size);
+		buf = std::make_unique<BYTE[]>(size);
+		ReadBuffer(buf.get(), size);
+		gb.Reset(buf.get(), size);
 
 		for (WORD j = 0; j < em.num_ep_coarse; j++) {
 			em.coarse[j].ref_ep_fine_id = gb.BitRead(18);
 			em.coarse[j].pts_ep         = gb.BitRead(14);
 			em.coarse[j].spn_ep         = gb.ReadDword();
 		}
-		SAFE_DELETE_ARRAY(buf);
 
 		SetPos(em.ep_map_stream_start_addr + fine_start);
 
 		size = em.num_ep_fine * 4;
-		buf = DNew BYTE[size];
-		ReadBuffer(buf, size);
-		gb.Reset(buf, size);
+		buf = std::make_unique<BYTE[]>(size);
+		ReadBuffer(buf.get(), size);
+		gb.Reset(buf.get(), size);
 
 		for (UINT j = 0; j < em.num_ep_fine; j++) {
 			em.fine[j].is_angle_change_point = gb.BitRead(1);
@@ -287,7 +285,6 @@ HRESULT CHdmvClipInfo::ReadCpiInfo(SyncPoints& sps)
 			em.fine[j].pts_ep                = gb.BitRead(11);
 			em.fine[j].spn_ep                = gb.BitRead(17);
 		}
-		SAFE_DELETE_ARRAY(buf);
 	}
 
 	if (!ClpiEpMapList.empty()) {
