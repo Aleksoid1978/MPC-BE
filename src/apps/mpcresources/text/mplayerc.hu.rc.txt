@@ -356,7 +356,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
 23		"Engedélyezze a Logitech LCD támogatást"
 24		"Használja a Window Media Controls-t"
 25		"MiniDump engedélyezése"
-26		"FFmpeg executable file:"
+26		"FFmpeg futtatható fájl:"
 28		"Frissítés ellenőrzése"
 29		"Automatikus frissítésellenőrzés engedélyezése"
 30		"Késleltetés az ellenőrzéseknél:"

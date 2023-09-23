@@ -1083,7 +1083,7 @@ BEGIN
     CONTROL         "LCD-Unterstützung für Logitech-Tastaturen aktivieren",IDC_CHECK_LCD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,126,264,9
     CONTROL         "Desktop-Overlay bei Verwendung von Medientasten anzeigen",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,138,220,9
     CONTROL         "MiniDumps aktivieren",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,150,184,9
-    LTEXT           "FFmpeg executable file:",IDC_STATIC,7,165,104,8
+    LTEXT           "Ausführbare FFmpeg-Datei:",IDC_STATIC,7,165,104,8
     COMBOBOX        IDC_COMBO1,113,163,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Updates",IDC_STATIC,5,180,286,40
     CONTROL         "Automatisch nach Updates suchen",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,192,250,9
