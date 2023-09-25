@@ -33,6 +33,8 @@ class CSaveDlg : public CTaskDialog
 private:
 	const CStringW m_name;
 	const std::vector<std::pair<CStringW, CStringW>> m_saveItems;
+	CStringW m_ffmpegpath;
+
 	HICON m_hIcon;
 
 	CComPtr<IGraphBuilder>   m_pGB;
@@ -96,8 +98,9 @@ private:
 	sockaddr_in m_addr = {};
 
 public:
-	CSaveDlg(LPCWSTR name, const std::list<std::pair<CStringW, CStringW>>& saveItems, HRESULT& hr);
+	CSaveDlg(const CStringW& name, const std::list<std::pair<CStringW, CStringW>>& saveItems, HRESULT& hr);
 
+	void SetFFmpegPath(const CStringW& ffmpegpath);
 	bool IsCompleteOk();
 
 private:

@@ -6022,6 +6022,7 @@ void CMainFrame::OnFileSaveAs()
 	std::list<std::pair<CStringW, CStringW>> saveItems;
 	saveItems.emplace_back(in, savedFileName);
 	CStringW name;
+	CString ffmpegpath;
 
 	if (m_youtubeFields.fname.GetLength()) {
 		name = GetAltFileName();
@@ -6032,6 +6033,7 @@ void CMainFrame::OnFileSaveAs()
 			auto it = pFileData->fns.begin();
 			++it;
 			saveItems.emplace_back(it->GetName(), audiofile);
+			ffmpegpath = GetFullExePath(AfxGetAppSettings().strFFmpegExePath, true);
 		}
 	}
 	else {
@@ -6040,37 +6042,10 @@ void CMainFrame::OnFileSaveAs()
 
 	HRESULT hr = S_OK;
 	CSaveDlg save_dlg(name, saveItems, hr);
+
 	if (SUCCEEDED(hr)) {
+		save_dlg.SetFFmpegPath(ffmpegpath);
 		save_dlg.DoModal();
-		if (save_dlg.IsCompleteOk() && saveItems.size() == 2) {
-			CString ffmpegpath = GetFullExePath(AfxGetAppSettings().strFFmpegExePath, true);
-			if (ffmpegpath.GetLength()) {
-				const CString tmpfile = saveItems.front().second + L".tmp";
-				CString strArgs = L"-y";
-				for (const auto& item : saveItems) {
-					strArgs.AppendFormat(LR"( -i "%s")", item.second);
-				}
-				strArgs.AppendFormat(LR"( -c copy -f %s "%s")", ext.Mid(1), tmpfile);
-
-				SHELLEXECUTEINFOW execinfo = { sizeof(execinfo) };
-				execinfo.lpFile = ffmpegpath.GetString();
-				execinfo.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_NO_UI;
-				execinfo.nShow = SW_HIDE;
-				execinfo.lpParameters = strArgs.GetString();
-
-				if (ShellExecuteExW(&execinfo)) {
-					WaitForSingleObject(execinfo.hProcess, INFINITE);
-					CloseHandle(execinfo.hProcess);
-				}
-
-				if (PathFileExistsW(tmpfile)) {
-					for (const auto& item : saveItems) {
-						DeleteFileW(item.second);
-					}
-					MoveFileW(tmpfile, saveItems.front().second);
-				}
-			}
-		}
 	}
 
 	if (fs == State_Running) {

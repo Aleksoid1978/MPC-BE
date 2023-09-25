@@ -44,13 +44,14 @@ static unsigned int AdaptUnit(double& val, size_t unitsNb)
 }
 
 enum {
+	PROGRESS_MERGING = 10000,
 	PROGRESS_COMPLETED = INT16_MAX,
 };
 
 // CSaveDlg dialog
 
 IMPLEMENT_DYNAMIC(CSaveDlg, CTaskDialog)
-CSaveDlg::CSaveDlg(LPCWSTR name, const std::list<std::pair<CStringW, CStringW>>& saveItems, HRESULT& hr)
+CSaveDlg::CSaveDlg(const CStringW& name, const std::list<std::pair<CStringW, CStringW>>& saveItems, HRESULT& hr)
 	: CTaskDialog(L"", L"", ResStr(IDS_SAVE_FILE), TDCBF_CANCEL_BUTTON, TDF_CALLBACK_TIMER | TDF_POSITION_RELATIVE_TO_WINDOW)
 	, m_name(name)
 	, m_saveItems(saveItems.cbegin(), saveItems.cend())
@@ -76,6 +77,10 @@ CSaveDlg::CSaveDlg(LPCWSTR name, const std::list<std::pair<CStringW, CStringW>>&
 	hr = InitFileCopy();
 }
 
+void CSaveDlg::SetFFmpegPath(const CStringW& ffmpegpath)
+{
+	m_ffmpegpath = ffmpegpath;
+}
 
 bool CSaveDlg::IsCompleteOk()
 {
@@ -340,6 +345,36 @@ void CSaveDlg::SaveHTTP()
 			return;
 		}
 	}
+
+	if (m_saveItems.size() >= 2 && m_ffmpegpath.GetLength()) {
+		CPath finalfile = m_saveItems.front().second;
+
+		const CString tmpfile = finalfile + L".tmp";
+		CString strArgs = L"-y";
+		for (const auto& item : m_saveItems) {
+			strArgs.AppendFormat(LR"( -i "%s")", item.second);
+		}
+		strArgs.AppendFormat(LR"( -c copy -f %s "%s")", finalfile.GetExtension().Mid(1), tmpfile);
+
+		SHELLEXECUTEINFOW execinfo = { sizeof(execinfo) };
+		execinfo.lpFile = m_ffmpegpath.GetString();
+		execinfo.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_NO_UI;
+		execinfo.nShow = SW_HIDE;
+		execinfo.lpParameters = strArgs.GetString();
+
+		if (ShellExecuteExW(&execinfo)) {
+			WaitForSingleObject(execinfo.hProcess, INFINITE);
+			CloseHandle(execinfo.hProcess);
+		}
+
+		if (PathFileExistsW(tmpfile)) {
+			for (const auto& item : m_saveItems) {
+				DeleteFileW(item.second);
+			}
+			MoveFileW(tmpfile, finalfile);
+		}
+	}
+
 	m_iProgress = PROGRESS_COMPLETED;
 }
 
@@ -446,8 +481,12 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 			CStringW path = m_saveItems[iProgress].second;
 			EllipsisPath(path, 50);
 			SetMainInstruction(m_name + L"\n" + path);
+			m_SaveStats.Reset();
 		}
-		m_SaveStats.Reset();
+		else if (iProgress == PROGRESS_MERGING) {
+			SetMainInstruction(m_name);
+			SetContent(L"Merging files...");
+		}
 		m_iPrevState = iProgress;
 	}
 
