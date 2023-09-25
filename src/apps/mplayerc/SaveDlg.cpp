@@ -53,7 +53,7 @@ IMPLEMENT_DYNAMIC(CSaveDlg, CTaskDialog)
 CSaveDlg::CSaveDlg(LPCWSTR name, const std::list<std::pair<CStringW, CStringW>>& saveItems, HRESULT& hr)
 	: CTaskDialog(L"", L"", ResStr(IDS_SAVE_FILE), TDCBF_CANCEL_BUTTON, TDF_CALLBACK_TIMER | TDF_POSITION_RELATIVE_TO_WINDOW)
 	, m_name(name)
-	, m_saveItems(saveItems)
+	, m_saveItems(saveItems.cbegin(), saveItems.cend())
 {
 	if (m_saveItems.empty()) {
 		hr = E_INVALIDARG;
@@ -343,14 +343,16 @@ void CSaveDlg::Save()
 void CSaveDlg::SaveHTTP()
 {
 	if (m_protocol == protocol::PROTOCOL_HTTP) {
+		m_iProgress = -1;
 		for (const auto item : m_saveItems) {
-			SetMainInstruction(m_name + L"\n" + item.second);
-
+			++m_iProgress;
 			HRESULT hr = DownloadHTTP(item.first, item.second);
 			if (FAILED(hr)) {
+				m_bAbort = true;
 				return;
 			}
 		}
+		m_iProgress = PROGRESS_COMPLETED;
 	}
 }
 
@@ -394,7 +396,6 @@ HRESULT CSaveDlg::DownloadHTTP(const CStringW url, const CStringW filepath)
 
 		m_pos += dwSizeRead;
 		if (m_len && m_len == m_pos) {
-			m_iProgress = PROGRESS_COMPLETED;
 			hr = S_OK;
 			break;
 		}
@@ -443,9 +444,21 @@ HRESULT CSaveDlg::OnDestroy()
 
 HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 {
-	if (m_iProgress == PROGRESS_COMPLETED) {
+	const int iProgress = m_iProgress;
+
+	if (iProgress == PROGRESS_COMPLETED) {
 		ClickCommandControl(IDCANCEL);
 		return S_OK;
+	}
+
+	if (iProgress != m_iPrevState) {
+		if (iProgress >= 0 && iProgress < m_saveItems.size()) {
+			CStringW path = m_saveItems[iProgress].second;
+			EllipsisPath(path, 50);
+			SetMainInstruction(m_name + L"\n" + path);
+		}
+		m_SaveStats.Reset();
+		m_iPrevState = iProgress;
 	}
 
 	static UINT sizeUnits[]  = { IDS_SIZE_UNIT_K,  IDS_SIZE_UNIT_M,  IDS_SIZE_UNIT_G  };

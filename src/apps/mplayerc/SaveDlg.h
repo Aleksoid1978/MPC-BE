@@ -32,7 +32,7 @@ class CSaveDlg : public CTaskDialog
 
 private:
 	const CStringW m_name;
-	const std::list<std::pair<CStringW, CStringW>> m_saveItems;
+	const std::vector<std::pair<CStringW, CStringW>> m_saveItems;
 	HICON m_hIcon;
 
 	CComPtr<IGraphBuilder>   m_pGB;
@@ -72,12 +72,19 @@ private:
 
 			return speed;
 		}
+
+		void Reset() {
+			ZeroMemory(TimeLens, sizeof(TimeLens));
+			pos = 0;
+		}
 	} m_SaveStats;
 
 	std::thread        m_SaveThread;
 	std::atomic_ullong m_pos       = 0;
-	std::atomic_int    m_iProgress = 0;
+	std::atomic_int    m_iProgress = -1;
 	std::atomic_bool   m_bAbort    = false;
+
+	int m_iPrevState = -1;
 
 	void Save();
 	void SaveHTTP();
