@@ -46,8 +46,6 @@ private:
 	};
 	protocol m_protocol = protocol::PROTOCOL_NONE;
 
-	CHTTPAsync m_HTTPAsync;
-	HANDLE  m_hFile     = INVALID_HANDLE_VALUE;
 	UINT64  m_len       = 0;
 	clock_t m_startTime = 0;
 
@@ -86,9 +84,9 @@ private:
 
 	int m_iPrevState = -1;
 
-	void Save();
+	void SaveUDP();
 	void SaveHTTP();
-	HRESULT DownloadHTTP(const CStringW url, const CStringW filepath);
+	HRESULT DownloadHTTP(CHTTPAsync& httpAsync, const CStringW url, const CStringW filepath);
 
 	SOCKET m_UdpSocket  = INVALID_SOCKET;
 	WSAEVENT m_WSAEvent = nullptr;

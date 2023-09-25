@@ -99,6 +99,7 @@ HRESULT CSaveDlg::InitFileCopy()
 	if (::PathIsURLW(fn)) {
 		CUrlParser urlParser(fn.GetString());
 		const CString protocol = urlParser.GetSchemeName();
+
 		if (protocol == L"http" || protocol == L"https") {
 			CComPtr<IUnknown> pUnk;
 			pUnk.CoCreateInstance(CLSID_3DYDYoutubeSource);
@@ -114,8 +115,12 @@ HRESULT CSaveDlg::InitFileCopy()
 
 			if (!pReader) {
 				m_protocol = protocol::PROTOCOL_HTTP;
+				m_SaveThread = std::thread([this] { SaveHTTP(); });
+
+				return S_OK;
 			}
-		} else if (protocol == L"udp") {
+		}
+		else if (protocol == L"udp") {
 			WSADATA wsaData = {};
 			WSAStartup(MAKEWORD(2, 2), &wsaData);
 
@@ -162,31 +167,13 @@ HRESULT CSaveDlg::InitFileCopy()
 
 			if (m_UdpSocket != INVALID_SOCKET) {
 				m_protocol = protocol::PROTOCOL_UDP;
-			}
-		}
-
-		if (m_protocol == protocol::PROTOCOL_HTTP) {
-			m_SaveThread = std::thread([this] { SaveHTTP(); });
-			return S_OK;
-		}
-		else if (m_protocol != protocol::PROTOCOL_NONE) {
-			m_hFile = CreateFileW(m_saveItems.front().second, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-			if (m_hFile != INVALID_HANDLE_VALUE) {
-				if (m_len) {
-					ULARGE_INTEGER usize = { 0 };
-					usize.QuadPart = m_len;
-					HANDLE hMapping = CreateFileMappingW(m_hFile, nullptr, PAGE_READWRITE, usize.HighPart, usize.LowPart, nullptr);
-					if (hMapping != INVALID_HANDLE_VALUE) {
-						CloseHandle(hMapping);
-					}
-				}
-
-				m_SaveThread = std::thread([this] { Save(); });
+				m_SaveThread = std::thread([this] { SaveUDP(); });
 
 				return S_OK;
 			}
 		}
-	} else {
+	}
+	else {
 		hr = S_OK;
 		CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew CCDDAReader(nullptr, &hr);
 
@@ -284,112 +271,122 @@ fail:
 	return S_OK;
 }
 
-void CSaveDlg::Save()
+void CSaveDlg::SaveUDP()
 {
-	if (m_hFile != INVALID_HANDLE_VALUE) {
-		m_startTime = clock();
+	if (m_protocol != protocol::PROTOCOL_UDP) {
+		return;
+	}
 
-		const DWORD bufLen = 64 * KILOBYTE;
-		std::vector<BYTE> pBuffer(bufLen);
+	m_iProgress = -1;
 
-		int attempts = 0;
-		while (!m_bAbort && attempts <= 20) {
-			DWORD dwSizeRead = 0;
-			if (m_protocol == protocol::PROTOCOL_HTTP) {
-				auto hr = m_HTTPAsync.Read(pBuffer.data(), bufLen, dwSizeRead);
-				if (hr != S_OK) {
-					m_bAbort = true;
-					break;
-				}
-			} else if (m_protocol == protocol::PROTOCOL_UDP) {
-				const DWORD dwResult = WSAWaitForMultipleEvents(1, &m_WSAEvent, FALSE, 200, FALSE);
-				if (dwResult == WSA_WAIT_EVENT_0) {
-					WSAResetEvent(m_WSAEvent);
-					static int fromlen = sizeof(m_addr);
-					dwSizeRead = recvfrom(m_UdpSocket, (char*)pBuffer.data(), bufLen, 0, (SOCKADDR*)&m_addr, &fromlen);
-					if (dwSizeRead <= 0) {
-						const int wsaLastError = WSAGetLastError();
-						if (wsaLastError != WSAEWOULDBLOCK) {
-							attempts++;
-						}
-						continue;
-					}
-				} else {
+	HANDLE hFile = CreateFileW(m_saveItems.front().second, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	if (hFile == INVALID_HANDLE_VALUE) {
+		return;
+	}
+
+	m_startTime = clock();
+	m_iProgress = 0;
+
+	const DWORD bufLen = 64 * KILOBYTE;
+	std::vector<BYTE> pBuffer(bufLen);
+
+	int attempts = 0;
+	while (!m_bAbort && attempts <= 20) {
+		DWORD dwSizeRead = 0;
+		const DWORD dwResult = WSAWaitForMultipleEvents(1, &m_WSAEvent, FALSE, 200, FALSE);
+		if (dwResult == WSA_WAIT_EVENT_0) {
+			WSAResetEvent(m_WSAEvent);
+			static int fromlen = sizeof(m_addr);
+			dwSizeRead = recvfrom(m_UdpSocket, (char*)pBuffer.data(), bufLen, 0, (SOCKADDR*)&m_addr, &fromlen);
+			if (dwSizeRead <= 0) {
+				const int wsaLastError = WSAGetLastError();
+				if (wsaLastError != WSAEWOULDBLOCK) {
 					attempts++;
-					continue;
 				}
+				continue;
 			}
-
-			DWORD dwSizeWritten = 0;
-			if (FALSE == WriteFile(m_hFile, (LPCVOID)pBuffer.data(), dwSizeRead, &dwSizeWritten, nullptr) || dwSizeRead != dwSizeWritten) {
-				m_bAbort = true;
-				break;
-			}
-
-			m_pos += dwSizeRead;
-			if (m_len && m_len == m_pos) {
-				m_iProgress = PROGRESS_COMPLETED;
-				break;
-			}
-
-			attempts = 0;
+		} else {
+			attempts++;
+			continue;
 		}
 
-		CloseHandle(m_hFile);
-		m_hFile = INVALID_HANDLE_VALUE;
+		DWORD dwSizeWritten = 0;
+		if (FALSE == WriteFile(hFile, (LPCVOID)pBuffer.data(), dwSizeRead, &dwSizeWritten, nullptr) || dwSizeRead != dwSizeWritten) {
+			m_bAbort = true;
+			break;
+		}
+
+		m_pos += dwSizeRead;
+
+		attempts = 0;
 	}
+
+	CloseHandle(hFile);
 }
 
 void CSaveDlg::SaveHTTP()
 {
-	if (m_protocol == protocol::PROTOCOL_HTTP) {
-		m_iProgress = -1;
-		for (const auto item : m_saveItems) {
-			++m_iProgress;
-			HRESULT hr = DownloadHTTP(item.first, item.second);
-			if (FAILED(hr)) {
-				m_bAbort = true;
-				return;
-			}
-		}
-		m_iProgress = PROGRESS_COMPLETED;
+	if (m_protocol != protocol::PROTOCOL_HTTP) {
+		return;
 	}
+
+	CHTTPAsync httpAsync;
+	m_iProgress = -1;
+
+	for (const auto item : m_saveItems) {
+		++m_iProgress;
+		HRESULT hr = DownloadHTTP(httpAsync, item.first, item.second);
+		if (FAILED(hr)) {
+			m_bAbort = true;
+			return;
+		}
+	}
+	m_iProgress = PROGRESS_COMPLETED;
 }
 
-HRESULT CSaveDlg::DownloadHTTP(const CStringW url, const CStringW filepath)
+HRESULT CSaveDlg::DownloadHTTP(CHTTPAsync& httpAsync, CStringW url, const CStringW filepath)
 {
 	m_startTime = clock();
 
 	const DWORD bufLen = 64 * KILOBYTE;
 	std::vector<BYTE> pBuffer(bufLen);
 
-	HRESULT hr = m_HTTPAsync.Connect(url, AfxGetAppSettings().iNetworkTimeout * 1000);
+	HRESULT hr = httpAsync.Connect(url, AfxGetAppSettings().iNetworkTimeout * 1000);
 	if (FAILED(hr)) {
 		return hr;
 	}
 	m_pos = 0;
-	m_len = m_HTTPAsync.GetLenght();
+	m_len = httpAsync.GetLenght();
 
 	if (m_bAbort) { // check after connection
 		return E_ABORT;
 	}
 
-	m_hFile = CreateFileW(filepath, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-	if (m_hFile == INVALID_HANDLE_VALUE) {
-		m_HTTPAsync.Close();
+	HANDLE hFile = CreateFileW(filepath, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	if (hFile == INVALID_HANDLE_VALUE) {
+		httpAsync.Close();
 		return E_FAIL;
+	}
+
+	if (m_len) {
+		ULARGE_INTEGER usize;
+		usize.QuadPart = m_len;
+		HANDLE hMapping = CreateFileMappingW(hFile, nullptr, PAGE_READWRITE, usize.HighPart, usize.LowPart, nullptr);
+		if (hMapping != INVALID_HANDLE_VALUE) {
+			CloseHandle(hMapping);
+		}
 	}
 
 	int attempts = 0;
 	while (!m_bAbort && attempts <= 20) {
 		DWORD dwSizeRead = 0;
-		hr = m_HTTPAsync.Read(pBuffer.data(), bufLen, dwSizeRead);
+		hr = httpAsync.Read(pBuffer.data(), bufLen, dwSizeRead);
 		if (hr != S_OK) {
 			break;
 		}
 
 		DWORD dwSizeWritten = 0;
-		if (FALSE == WriteFile(m_hFile, (LPCVOID)pBuffer.data(), dwSizeRead, &dwSizeWritten, nullptr) || dwSizeRead != dwSizeWritten) {
+		if (FALSE == WriteFile(hFile, (LPCVOID)pBuffer.data(), dwSizeRead, &dwSizeWritten, nullptr) || dwSizeRead != dwSizeWritten) {
 			hr = E_FAIL;
 			break;
 		}
@@ -401,8 +398,8 @@ HRESULT CSaveDlg::DownloadHTTP(const CStringW url, const CStringW filepath)
 		}
 	}
 
-	m_HTTPAsync.Close();
-	SAFE_CLOSE_HANDLE(m_hFile);
+	httpAsync.Close();
+	CloseHandle(hFile);
 
 	return m_bAbort ? E_ABORT : hr;
 }
@@ -429,10 +426,6 @@ HRESULT CSaveDlg::OnDestroy()
 		}
 
 		WSACleanup();
-	}
-
-	if (m_hFile != INVALID_HANDLE_VALUE) {
-		CloseHandle(m_hFile);
 	}
 
 	if (m_hIcon) {
@@ -464,7 +457,7 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 	static UINT sizeUnits[]  = { IDS_SIZE_UNIT_K,  IDS_SIZE_UNIT_M,  IDS_SIZE_UNIT_G  };
 	static UINT speedUnits[] = { IDS_SPEED_UNIT_K, IDS_SPEED_UNIT_M, IDS_SPEED_UNIT_G };
 
-	if (m_hFile != INVALID_HANDLE_VALUE) {
+	if (iProgress >= 0 && iProgress < m_saveItems.size()) {
 		const UINT64 pos = m_pos;                            // bytes
 		const clock_t time = (clock() - m_startTime);        // milliseconds
 		const long speed = m_SaveStats.AddValuesGetSpeed(pos, time);
