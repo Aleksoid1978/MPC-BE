@@ -284,7 +284,6 @@ void CSaveDlg::SaveUDP()
 		return;
 	}
 
-	m_startTime = clock();
 	m_iProgress = 0;
 
 	const DWORD bufLen = 64 * KILOBYTE;
@@ -346,8 +345,6 @@ void CSaveDlg::SaveHTTP()
 
 HRESULT CSaveDlg::DownloadHTTP(CHTTPAsync& httpAsync, CStringW url, const CStringW filepath)
 {
-	m_startTime = clock();
-
 	const DWORD bufLen = 64 * KILOBYTE;
 	std::vector<BYTE> pBuffer(bufLen);
 
@@ -458,9 +455,8 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 	static UINT speedUnits[] = { IDS_SPEED_UNIT_K, IDS_SPEED_UNIT_M, IDS_SPEED_UNIT_G };
 
 	if (iProgress >= 0 && iProgress < m_saveItems.size()) {
-		const UINT64 pos = m_pos;                            // bytes
-		const clock_t time = (clock() - m_startTime);        // milliseconds
-		const long speed = m_SaveStats.AddValuesGetSpeed(pos, time);
+		const UINT64 pos = m_pos.load(); // bytes
+		const long speed = m_SaveStats.AddValuesGetSpeed(pos, clock());
 
 		double dPos = pos / 1024.0;
 		const unsigned int unitPos = AdaptUnit(dPos, std::size(sizeUnits));
@@ -479,7 +475,7 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 
 			if (speed > 0) {
 				const REFERENCE_TIME sec = (m_len - pos) / speed;
-				if (sec > 0) {
+				if (sec > 0 && sec < 921600) {
 					DVD_HMSF_TIMECODE tcDur = {
 						(BYTE)(sec / 3600),
 						(BYTE)(sec / 60 % 60),

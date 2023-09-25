@@ -46,34 +46,37 @@ private:
 	};
 	protocol m_protocol = protocol::PROTOCOL_NONE;
 
-	UINT64  m_len       = 0;
-	clock_t m_startTime = 0;
+	UINT64  m_len = 0;
 
 	struct {
 		struct {
-			long time;
 			UINT64 len;
-		} TimeLens[40] = {}; // about 8 seconds
-		unsigned pos = 0;
+			clock_t time;
+		} LenTimes[40] = {}; // about 8 seconds
+		unsigned idx = 0;
 
-		long AddValuesGetSpeed(const UINT64 len, const long time) {
-			pos++;
-			if (pos >= std::size(TimeLens)) {
-				pos = 0;
+		long AddValuesGetSpeed(const UINT64 len, const long time)
+		{
+			LenTimes[idx] = { len, time };
+
+			idx++;
+			if (idx >= std::size(LenTimes)) {
+				idx = 0;
 			}
 
-			long interval = time - TimeLens[pos].time;
-			long speed = interval > 0 ? (long)((len - TimeLens[pos].len) * 1000 / interval) : 0;
+			const auto start_idx = LenTimes[idx].time ? idx : 0;
 
-			TimeLens[pos].time = time;
-			TimeLens[pos].len = len;
+			long time_interval = time - LenTimes[start_idx].time;
+			UINT64 len_increment = len - LenTimes[start_idx].len;
+
+			long speed = time_interval ? (long)(len_increment * 1000 / time_interval) : 0;
 
 			return speed;
 		}
 
 		void Reset() {
-			ZeroMemory(TimeLens, sizeof(TimeLens));
-			pos = 0;
+			ZeroMemory(LenTimes, sizeof(LenTimes));
+			idx = 0;
 		}
 	} m_SaveStats;
 
@@ -88,7 +91,7 @@ private:
 	void SaveHTTP();
 	HRESULT DownloadHTTP(CHTTPAsync& httpAsync, const CStringW url, const CStringW filepath);
 
-	SOCKET m_UdpSocket  = INVALID_SOCKET;
+	SOCKET m_UdpSocket = INVALID_SOCKET;
 	WSAEVENT m_WSAEvent = nullptr;
 	sockaddr_in m_addr = {};
 
