@@ -334,12 +334,10 @@ void CSaveDlg::SaveHTTP()
 		return;
 	}
 
-	CHTTPAsync httpAsync;
 	m_iProgress = -1;
 
-	for (const auto item : m_saveItems) {
-		++m_iProgress;
-		HRESULT hr = DownloadHTTP(httpAsync, item.first, item.second);
+	for (const auto& item : m_saveItems) {
+		HRESULT hr = DownloadHTTP(item.first, item.second);
 		if (FAILED(hr)) {
 			m_bAbort = true;
 			return;
@@ -378,17 +376,20 @@ void CSaveDlg::SaveHTTP()
 	m_iProgress = PROGRESS_COMPLETED;
 }
 
-HRESULT CSaveDlg::DownloadHTTP(CHTTPAsync& httpAsync, CStringW url, const CStringW filepath)
+HRESULT CSaveDlg::DownloadHTTP(CStringW url, const CStringW filepath)
 {
 	const DWORD bufLen = 64 * KILOBYTE;
 	std::vector<BYTE> pBuffer(bufLen);
 
+	CHTTPAsync httpAsync;
 	HRESULT hr = httpAsync.Connect(url, AfxGetAppSettings().iNetworkTimeout * 1000);
 	if (FAILED(hr)) {
 		return hr;
 	}
 	m_pos = 0;
 	m_len = httpAsync.GetLenght();
+
+	++m_iProgress;
 
 	if (m_bAbort) { // check after connection
 		return E_ABORT;
@@ -430,7 +431,6 @@ HRESULT CSaveDlg::DownloadHTTP(CHTTPAsync& httpAsync, CStringW url, const CStrin
 		}
 	}
 
-	httpAsync.Close();
 	CloseHandle(hFile);
 
 	return m_bAbort ? E_ABORT : hr;

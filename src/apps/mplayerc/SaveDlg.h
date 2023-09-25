@@ -91,7 +91,7 @@ private:
 
 	void SaveUDP();
 	void SaveHTTP();
-	HRESULT DownloadHTTP(CHTTPAsync& httpAsync, const CStringW url, const CStringW filepath);
+	HRESULT DownloadHTTP(const CStringW url, const CStringW filepath);
 
 	SOCKET m_UdpSocket = INVALID_SOCKET;
 	WSAEVENT m_WSAEvent = nullptr;
