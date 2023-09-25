@@ -34,9 +34,9 @@ private:
 	CString m_in, m_out;
 	HICON m_hIcon;
 
-	CComPtr<IGraphBuilder>   pGB;
-	CComQIPtr<IMediaControl> pMC;
-	CComQIPtr<IMediaSeeking> pMS;
+	CComPtr<IGraphBuilder>   m_pGB;
+	CComQIPtr<IMediaControl> m_pMC;
+	CComQIPtr<IMediaSeeking> m_pMS;
 
 	enum protocol {
 		PROTOCOL_NONE,

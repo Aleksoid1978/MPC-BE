@@ -77,7 +77,7 @@ bool CSaveDlg::IsCompleteOk()
 
 HRESULT CSaveDlg::InitFileCopy()
 {
-	if (FAILED(pGB.CoCreateInstance(CLSID_FilterGraph)) || !(pMC = pGB) || !(pMS = pGB)) {
+	if (FAILED(m_pGB.CoCreateInstance(CLSID_FilterGraph)) || !(m_pMC = m_pGB) || !(m_pMS = m_pGB)) {
 		SetFooterIcon(MAKEINTRESOURCEW(IDI_ERROR));
 		SetFooterText(ResStr(IDS_AG_ERROR));
 
@@ -97,11 +97,11 @@ HRESULT CSaveDlg::InitFileCopy()
 			pUnk.CoCreateInstance(CLSID_3DYDYoutubeSource);
 
 			if (CComQIPtr<IBaseFilter> pSrc = pUnk.p) {
-				pGB->AddFilter(pSrc, fn);
+				m_pGB->AddFilter(pSrc, fn);
 
 				if (!(pReader = pUnk) || FAILED(hr = pReader->Load(fn, nullptr))) {
 					pReader.Release();
-					pGB->RemoveFilter(pSrc);
+					m_pGB->RemoveFilter(pSrc);
 				}
 			}
 
@@ -215,7 +215,7 @@ HRESULT CSaveDlg::InitFileCopy()
 fail:
 
 	CComQIPtr<IBaseFilter> pSrc = pReader.p;
-	if (FAILED(pGB->AddFilter(pSrc, fn))) {
+	if (FAILED(m_pGB->AddFilter(pSrc, fn))) {
 		SetFooterIcon(MAKEINTRESOURCEW(IDI_ERROR));
 		SetFooterText(L"Sorry, can't save this file, press \"Cancel\"");
 
@@ -223,7 +223,7 @@ fail:
 	}
 
 	CComQIPtr<IBaseFilter> pMid = DNew CStreamDriveThruFilter(nullptr, &hr);
-	if (FAILED(pGB->AddFilter(pMid, L"StreamDriveThru"))) {
+	if (FAILED(m_pGB->AddFilter(pMid, L"StreamDriveThru"))) {
 		SetFooterIcon(MAKEINTRESOURCEW(IDI_ERROR));
 		SetFooterText(ResStr(IDS_AG_ERROR));
 
@@ -241,14 +241,14 @@ fail:
 	pFSF->SetFileName(CStringW(m_out), nullptr);
 	pFSF->SetMode(AM_FILE_OVERWRITE);
 
-	if (FAILED(pGB->AddFilter(pDst, L"File Writer"))) {
+	if (FAILED(m_pGB->AddFilter(pDst, L"File Writer"))) {
 		SetFooterIcon(MAKEINTRESOURCEW(IDI_ERROR));
 		SetFooterText(ResStr(IDS_AG_ERROR));
 
 		return S_FALSE;
 	}
 
-	hr = pGB->Connect(
+	hr = m_pGB->Connect(
 		GetFirstPin((pSrc), PINDIR_OUTPUT),
 		GetFirstPin((pMid), PINDIR_INPUT));
 	if (FAILED(hr)) {
@@ -258,7 +258,7 @@ fail:
 		return S_FALSE;
 	}
 
-	hr = pGB->Connect(
+	hr = m_pGB->Connect(
 		GetFirstPin((pMid), PINDIR_OUTPUT),
 		GetFirstPin((pDst), PINDIR_INPUT));
 	if (FAILED(hr)) {
@@ -268,9 +268,9 @@ fail:
 		return S_FALSE;
 	}
 
-	pMS = pMid;
+	m_pMS = pMid;
 
-	pMC->Run();
+	m_pMC->Run();
 
 	return S_OK;
 }
@@ -333,8 +333,8 @@ void CSaveDlg::Save()
 
 HRESULT CSaveDlg::OnDestroy()
 {
-	if (pMC) {
-		pMC->Stop();
+	if (m_pMC) {
+		m_pMC->Stop();
 	}
 
 	if (m_SaveThread.joinable()) {
@@ -435,13 +435,13 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 			ClickCommandControl(IDCANCEL);
 			return S_FALSE;
 		}
-	} else if (pGB && pMS) {
+	} else if (m_pGB && m_pMS) {
 		CString str;
 		REFERENCE_TIME pos = 0, dur = 0;
-		pMS->GetCurrentPosition(&pos);
-		pMS->GetDuration(&dur);
+		m_pMS->GetCurrentPosition(&pos);
+		m_pMS->GetDuration(&dur);
 		REFERENCE_TIME time = 0;
-		CComQIPtr<IMediaSeeking>(pGB)->GetCurrentPosition(&time);
+		CComQIPtr<IMediaSeeking>(m_pGB)->GetCurrentPosition(&time);
 		const REFERENCE_TIME speed = time > 0 ? pos * 10000000 / time : 0;
 
 		double dPos = pos / 1024.0;
@@ -496,11 +496,11 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 HRESULT CSaveDlg::OnCommandControlClick(_In_ int nCommandControlID)
 {
 	if (nCommandControlID == IDCANCEL) {
-		if (pGB) {
-			pGB->Abort();
+		if (m_pGB) {
+			m_pGB->Abort();
 		}
-		if (pMC) {
-			pMC->Stop();
+		if (m_pMC) {
+			m_pMC->Stop();
 		}
 	}
 
