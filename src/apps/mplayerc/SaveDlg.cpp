@@ -50,15 +50,22 @@ enum {
 // CSaveDlg dialog
 
 IMPLEMENT_DYNAMIC(CSaveDlg, CTaskDialog)
-CSaveDlg::CSaveDlg(LPCWSTR in, LPCWSTR name, LPCWSTR out, HRESULT& hr)
-	: CTaskDialog(L"", CString(name) + L"\n" + out, ResStr(IDS_SAVE_FILE), TDCBF_CANCEL_BUTTON, TDF_CALLBACK_TIMER|TDF_POSITION_RELATIVE_TO_WINDOW)
-	, m_in(in)
-	, m_out(out)
+CSaveDlg::CSaveDlg(LPCWSTR name, const std::list<std::pair<CStringW, CStringW>>& saveItems, HRESULT& hr)
+	: CTaskDialog(L"", L"", ResStr(IDS_SAVE_FILE), TDCBF_CANCEL_BUTTON, TDF_CALLBACK_TIMER | TDF_POSITION_RELATIVE_TO_WINDOW)
+	, m_name(name)
+	, m_saveItems(saveItems)
 {
+	if (m_saveItems.empty()) {
+		hr = E_INVALIDARG;
+		return;
+	}
+
 	m_hIcon = (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 	if (m_hIcon != nullptr) {
 		SetMainIcon(m_hIcon);
 	}
+
+	SetMainInstruction(m_name + L"\n" + m_saveItems.front().second);
 
 	SetProgressBarMarquee();
 	SetProgressBarRange(0, 1000);
@@ -86,7 +93,7 @@ HRESULT CSaveDlg::InitFileCopy()
 
 	HRESULT hr;
 
-	const CString fn = m_in;
+	const CString fn = m_saveItems.front().first;
 	CComPtr<IFileSourceFilter> pReader;
 
 	if (::PathIsURLW(fn)) {
@@ -105,9 +112,7 @@ HRESULT CSaveDlg::InitFileCopy()
 				}
 			}
 
-			if (!pReader
-					&& (m_HTTPAsync.Connect(fn, AfxGetAppSettings().iNetworkTimeout * 1000) == S_OK)) {
-				m_len = m_HTTPAsync.GetLenght();
+			if (!pReader) {
 				m_protocol = protocol::PROTOCOL_HTTP;
 			}
 		} else if (protocol == L"udp") {
@@ -160,8 +165,12 @@ HRESULT CSaveDlg::InitFileCopy()
 			}
 		}
 
-		if (m_protocol != protocol::PROTOCOL_NONE) {
-			m_hFile = CreateFileW(m_out, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+		if (m_protocol == protocol::PROTOCOL_HTTP) {
+			m_SaveThread = std::thread([this] { SaveHTTP(); });
+			return S_OK;
+		}
+		else if (m_protocol != protocol::PROTOCOL_NONE) {
+			m_hFile = CreateFileW(m_saveItems.front().second, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 			if (m_hFile != INVALID_HANDLE_VALUE) {
 				if (m_len) {
 					ULARGE_INTEGER usize = { 0 };
@@ -205,7 +214,7 @@ HRESULT CSaveDlg::InitFileCopy()
 
 		if (!pReader) {
 			const DWORD fileOpflags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR | FOFX_NOMINIMIZEBOX;
-			hr = FileOperation(m_in, m_out, FO_COPY, fileOpflags);
+			hr = FileOperation(m_saveItems.front().first, m_saveItems.front().second, FO_COPY, fileOpflags);
 			DLogIf(FAILED(hr), L"CSaveDlg : file copy was aborted with error %s", HR2Str(hr));
 
 			return E_ABORT;
@@ -238,7 +247,7 @@ fail:
 		return S_FALSE;
 	}
 	CComQIPtr<IFileSinkFilter2> pFSF = pDst.p;
-	pFSF->SetFileName(CStringW(m_out), nullptr);
+	pFSF->SetFileName(m_saveItems.front().second, nullptr);
 	pFSF->SetMode(AM_FILE_OVERWRITE);
 
 	if (FAILED(m_pGB->AddFilter(pDst, L"File Writer"))) {
@@ -329,6 +338,72 @@ void CSaveDlg::Save()
 		CloseHandle(m_hFile);
 		m_hFile = INVALID_HANDLE_VALUE;
 	}
+}
+
+void CSaveDlg::SaveHTTP()
+{
+	if (m_protocol == protocol::PROTOCOL_HTTP) {
+		for (const auto item : m_saveItems) {
+			SetMainInstruction(m_name + L"\n" + item.second);
+
+			HRESULT hr = DownloadHTTP(item.first, item.second);
+			if (FAILED(hr)) {
+				return;
+			}
+		}
+	}
+}
+
+HRESULT CSaveDlg::DownloadHTTP(const CStringW url, const CStringW filepath)
+{
+	m_startTime = clock();
+
+	const DWORD bufLen = 64 * KILOBYTE;
+	std::vector<BYTE> pBuffer(bufLen);
+
+	HRESULT hr = m_HTTPAsync.Connect(url, AfxGetAppSettings().iNetworkTimeout * 1000);
+	if (FAILED(hr)) {
+		return hr;
+	}
+	m_pos = 0;
+	m_len = m_HTTPAsync.GetLenght();
+
+	if (m_bAbort) { // check after connection
+		return E_ABORT;
+	}
+
+	m_hFile = CreateFileW(filepath, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	if (m_hFile == INVALID_HANDLE_VALUE) {
+		m_HTTPAsync.Close();
+		return E_FAIL;
+	}
+
+	int attempts = 0;
+	while (!m_bAbort && attempts <= 20) {
+		DWORD dwSizeRead = 0;
+		hr = m_HTTPAsync.Read(pBuffer.data(), bufLen, dwSizeRead);
+		if (hr != S_OK) {
+			break;
+		}
+
+		DWORD dwSizeWritten = 0;
+		if (FALSE == WriteFile(m_hFile, (LPCVOID)pBuffer.data(), dwSizeRead, &dwSizeWritten, nullptr) || dwSizeRead != dwSizeWritten) {
+			hr = E_FAIL;
+			break;
+		}
+
+		m_pos += dwSizeRead;
+		if (m_len && m_len == m_pos) {
+			m_iProgress = PROGRESS_COMPLETED;
+			hr = S_OK;
+			break;
+		}
+	}
+
+	m_HTTPAsync.Close();
+	SAFE_CLOSE_HANDLE(m_hFile);
+
+	return m_bAbort ? E_ABORT : hr;
 }
 
 HRESULT CSaveDlg::OnDestroy()

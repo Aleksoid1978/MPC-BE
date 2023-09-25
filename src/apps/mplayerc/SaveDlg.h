@@ -31,7 +31,8 @@ class CSaveDlg : public CTaskDialog
 	DECLARE_DYNAMIC(CSaveDlg)
 
 private:
-	CString m_in, m_out;
+	const CStringW m_name;
+	const std::list<std::pair<CStringW, CStringW>> m_saveItems;
 	HICON m_hIcon;
 
 	CComPtr<IGraphBuilder>   m_pGB;
@@ -79,13 +80,15 @@ private:
 	std::atomic_bool   m_bAbort    = false;
 
 	void Save();
+	void SaveHTTP();
+	HRESULT DownloadHTTP(const CStringW url, const CStringW filepath);
 
 	SOCKET m_UdpSocket  = INVALID_SOCKET;
 	WSAEVENT m_WSAEvent = nullptr;
 	sockaddr_in m_addr = {};
 
 public:
-	CSaveDlg(LPCWSTR in, LPCWSTR name, LPCWSTR out, HRESULT& hr);
+	CSaveDlg(LPCWSTR name, const std::list<std::pair<CStringW, CStringW>>& saveItems, HRESULT& hr);
 
 	bool IsCompleteOk();
 
