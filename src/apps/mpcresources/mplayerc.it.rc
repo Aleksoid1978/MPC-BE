@@ -1083,10 +1083,10 @@ BEGIN
     CONTROL         "Abilita il supporto LCD Logitech",IDC_CHECK_LCD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,126,264,9
     CONTROL         "Usa i controlli Window Media",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,138,220,9
     CONTROL         "Abilita MiniDump",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,150,184,9
-    LTEXT           "FFmpeg executable file:",IDC_STATIC,7,165,104,8
+    LTEXT           "File eseguibile FFmpeg:",IDC_STATIC,7,165,104,8
     COMBOBOX        IDC_COMBO1,113,163,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Controllo aggiornamento",IDC_STATIC,5,180,286,40
-    CONTROL         "Abilita controllo aggiornamento automatico",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,192,250,9
+    GROUPBOX        "Controlla aggiornamenti",IDC_STATIC,5,180,286,40
+    CONTROL         "Abilita controllo aggiornamenti automatico",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,192,250,9
     LTEXT           "Controlla ogni:",IDC_STATIC5,10,205,110,8
     EDITTEXT        IDC_EDIT4,120,203,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,140,203,13,14
