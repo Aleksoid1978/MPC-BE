@@ -6035,14 +6035,13 @@ void CMainFrame::OnFileSaveAs()
 			saveItems.emplace_back(it->GetName(), audiofile);
 			ffmpegpath = GetFullExePath(AfxGetAppSettings().strFFmpegExePath, true);
 		}
-		if (pFileData->subs.size()) {
-			for (const auto& sub : pFileData->subs) {
-				if (sub.GetName().Find(L"fmt=vtt") > 0) {
-					CStringW subext = L"." + sub.GetTitle() + L".vtt";
-					FixFilename(subext);
-					CStringW subfile = RenameFileExt(savedFileName, subext);
-					saveItems.emplace_back(sub.GetName(), subfile);
-				}
+
+		for (const auto& sub : pFileData->subs) {
+			if (sub.GetPath().Find(L"fmt=vtt") > 0) {
+				CStringW subext = L"." + sub.GetTitle() + L".vtt";
+				FixFilename(subext);
+				CStringW subfile = RenameFileExt(savedFileName, subext);
+				saveItems.emplace_back(sub.GetPath(), subfile);
 			}
 		}
 	}

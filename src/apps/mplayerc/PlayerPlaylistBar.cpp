@@ -1650,7 +1650,7 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(const CString& fn, const CTextFile::enc
 			}
 
 			for (const auto& si : pli.m_subs) {
-				CString fn = si.GetName();
+				CString fn = si.GetPath();
 				if (bRemovePath) {
 					CPath p(fn);
 					p.StripPath();
