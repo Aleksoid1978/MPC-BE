@@ -432,48 +432,48 @@ public:
 
 class CSubtitleItem
 {
-	CString m_fn;
-	CString m_title;
+	CStringW m_fpath;
+	CStringW m_title;
 
 public:
 	CSubtitleItem() = default;
-	CSubtitleItem(const CString& fname, const CString& title = L"")
-		: m_fn(fname)
+	CSubtitleItem(const CStringW& fpath, const CStringW& title = L"")
+		: m_fpath(fpath)
 		, m_title(title)
 	{}
-	CSubtitleItem(const WCHAR* fname, const WCHAR* title = L"")
-		: m_fn(fname)
+	CSubtitleItem(const WCHAR* fpath, const WCHAR* title = L"")
+		: m_fpath(fpath)
 		, m_title(title)
 	{}
 
-	const CSubtitleItem& operator = (const CString& fname) {
-		m_fn = fname;
+	const CSubtitleItem& operator = (const CStringW& fpath) {
+		m_fpath = fpath;
 
 		return *this;
 	}
 
-	operator CString() const {
-		return m_fn;
+	operator CStringW() const {
+		return m_fpath;
 	}
 
 	operator LPCWSTR() const {
-		return m_fn;
+		return m_fpath;
 	}
 
-	void SetName(const CString& name) {
-		m_fn = name;
+	void SetPath(const CStringW& fpath) {
+		m_fpath = fpath;
 	}
 
-	CString GetName() const {
-		return m_fn;
+	CStringW GetPath() const {
+		return m_fpath;
 	};
 
 	// Title
-	void SetTitle(const CString& title) {
+	void SetTitle(const CStringW& title) {
 		m_title = title;
 	}
 
-	CString GetTitle() const {
+	CStringW GetTitle() const {
 		return m_title;
 	};
 };
