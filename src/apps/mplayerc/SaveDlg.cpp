@@ -349,10 +349,16 @@ void CSaveDlg::SaveHTTP()
 		const CStringW tmpfile = finalfile + L".tmp";
 
 		CStringW mapping;
+		CStringW metadata;
+		unsigned isub = 0;
 		CStringW strArgs = L"-y";
 		for (unsigned i = 0; i < m_saveItems.size(); ++i) {
 			strArgs.AppendFormat(LR"( -i "%s")", m_saveItems[i].dstpath);
 			mapping.AppendFormat(L" -map %u", i);
+			if (m_saveItems[i].type == 's') {
+				mapping.AppendFormat(LR"( -metadata:s:s:%u title="%s")", isub, m_saveItems[i].title);
+				isub++;
+			}
 		}
 		strArgs.Append(L" -c copy");
 		if (finalext == L"mp4") {

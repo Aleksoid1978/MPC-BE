@@ -31,11 +31,12 @@ class CSaveDlg : public CTaskDialog
 	DECLARE_DYNAMIC(CSaveDlg)
 public:
 	struct SaveItem_t {
+		char type = 0;
 		CStringW title;
 		CStringW path; // file path or url
 		CStringW dstpath;
-		SaveItem_t(const CStringW& _title, const CStringW& _path, const CStringW& _dstpath)
-			: title(_title), path(_path), dstpath(_dstpath) {}
+		SaveItem_t(const char _type, const CStringW& _title, const CStringW& _path, const CStringW& _dstpath)
+			: type(_type), title(_title), path(_path), dstpath(_dstpath) {}
 	};
 
 private:

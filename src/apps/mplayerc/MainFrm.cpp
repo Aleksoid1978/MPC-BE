@@ -6023,16 +6023,15 @@ void CMainFrame::OnFileSaveAs()
 	CString ffmpegpath;
 
 	if (m_youtubeFields.fname.GetLength()) {
-		saveItems.emplace_back(GetAltFileName(), in, savedFileName);
+		saveItems.emplace_back('v', GetAltFileName(), in, savedFileName);
 
 		const auto pFileData = dynamic_cast<OpenFileData*>(m_lastOMD.get());
 		if (pFileData) {
 			if (pFileData->fns.size() == 2) {
 				ext = GetFileExt(savedFileName);
 				CStringW audiofile = RenameFileExt(savedFileName, (ext == L".mp4") ? L".audio.m4a" : L".audio.mka");
-				auto it = pFileData->fns.begin();
-				++it;
-				saveItems.emplace_back(it->GetTitle(), it->GetName(), audiofile);
+				auto it = ++(pFileData->fns.begin());
+				saveItems.emplace_back('a', it->GetTitle(), it->GetName(), audiofile);
 				ffmpegpath = GetFullExePath(AfxGetAppSettings().strFFmpegExePath, true);
 			}
 
@@ -6041,13 +6040,13 @@ void CMainFrame::OnFileSaveAs()
 					CStringW subext = L"." + sub.GetTitle() + L".vtt";
 					FixFilename(subext);
 					CStringW subfile = RenameFileExt(savedFileName, subext);
-					saveItems.emplace_back(sub.GetTitle(), sub.GetPath(), subfile);
+					saveItems.emplace_back('s', sub.GetTitle(), sub.GetPath(), subfile);
 				}
 			}
 		}
 	}
 	else {
-		saveItems.emplace_back(in, in, savedFileName);
+		saveItems.emplace_back(0, in, in, savedFileName);
 	}
 
 	HRESULT hr = S_OK;
