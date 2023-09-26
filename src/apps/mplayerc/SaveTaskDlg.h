@@ -1,6 +1,5 @@
 /*
- * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,11 +23,11 @@
 #include <afxtaskdialog.h>
 #include "DSUtil/HTTPAsync.h"
 
-// CSaveDlg dialog
+// CSaveTaskDlg dialog
 
-class CSaveDlg : public CTaskDialog
+class CSaveTaskDlg : public CTaskDialog
 {
-	DECLARE_DYNAMIC(CSaveDlg)
+	DECLARE_DYNAMIC(CSaveTaskDlg)
 public:
 	struct SaveItem_t {
 		char type = 0;
@@ -106,7 +105,7 @@ private:
 	sockaddr_in m_addr = {};
 
 public:
-	CSaveDlg(const std::list<SaveItem_t>& saveItems, HRESULT& hr);
+	CSaveTaskDlg(const std::list<SaveItem_t>& saveItems, HRESULT& hr);
 
 	void SetFFmpegPath(const CStringW& ffmpegpath);
 	bool IsCompleteOk();

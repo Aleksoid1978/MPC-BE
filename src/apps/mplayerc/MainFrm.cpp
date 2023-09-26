@@ -32,7 +32,7 @@
 #include "DSUtil/UrlParser.h"
 #include "DSUtil/NullRenderers.h"
 #include "OpenDlg.h"
-#include "SaveDlg.h"
+#include "SaveTaskDlg.h"
 #include "GoToDlg.h"
 #include "PnSPresetsDlg.h"
 #include "MediaTypesDlg.h"
@@ -6019,7 +6019,7 @@ void CMainFrame::OnFileSaveAs()
 		m_pMC->Pause();
 	}
 
-	std::list<CSaveDlg::SaveItem_t> saveItems;
+	std::list<CSaveTaskDlg::SaveItem_t> saveItems;
 	CString ffmpegpath;
 
 	if (m_youtubeFields.fname.GetLength()) {
@@ -6050,7 +6050,7 @@ void CMainFrame::OnFileSaveAs()
 	}
 
 	HRESULT hr = S_OK;
-	CSaveDlg save_dlg(saveItems, hr);
+	CSaveTaskDlg save_dlg(saveItems, hr);
 
 	if (SUCCEEDED(hr)) {
 		save_dlg.SetFFmpegPath(ffmpegpath);

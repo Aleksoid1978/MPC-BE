@@ -1,6 +1,5 @@
 /*
- * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,7 +22,7 @@
 #include <afxglobals.h>
 #include <clsids.h>
 #include "MainFrm.h"
-#include "SaveDlg.h"
+#include "SaveTaskDlg.h"
 #include "DSUtil/FileHandle.h"
 #include "DSUtil/UrlParser.h"
 #include "filters/reader/CDDAReader/CDDAReader.h"
@@ -48,10 +47,10 @@ enum {
 	PROGRESS_COMPLETED = INT16_MAX,
 };
 
-// CSaveDlg dialog
+// CSaveTaskDlg dialog
 
-IMPLEMENT_DYNAMIC(CSaveDlg, CTaskDialog)
-CSaveDlg::CSaveDlg(const std::list<SaveItem_t>& saveItems, HRESULT& hr)
+IMPLEMENT_DYNAMIC(CSaveTaskDlg, CTaskDialog)
+CSaveTaskDlg::CSaveTaskDlg(const std::list<SaveItem_t>& saveItems, HRESULT& hr)
 	: CTaskDialog(L"", L"", ResStr(IDS_SAVE_FILE), TDCBF_CANCEL_BUTTON, TDF_CALLBACK_TIMER | TDF_POSITION_RELATIVE_TO_WINDOW)
 	, m_saveItems(saveItems.cbegin(), saveItems.cend())
 {
@@ -76,17 +75,17 @@ CSaveDlg::CSaveDlg(const std::list<SaveItem_t>& saveItems, HRESULT& hr)
 	hr = InitFileCopy();
 }
 
-void CSaveDlg::SetFFmpegPath(const CStringW& ffmpegpath)
+void CSaveTaskDlg::SetFFmpegPath(const CStringW& ffmpegpath)
 {
 	m_ffmpegpath = ffmpegpath;
 }
 
-bool CSaveDlg::IsCompleteOk()
+bool CSaveTaskDlg::IsCompleteOk()
 {
 	return m_iProgress == PROGRESS_COMPLETED;
 }
 
-HRESULT CSaveDlg::InitFileCopy()
+HRESULT CSaveTaskDlg::InitFileCopy()
 {
 	if (FAILED(m_pGB.CoCreateInstance(CLSID_FilterGraph)) || !(m_pMC = m_pGB) || !(m_pMS = m_pGB)) {
 		SetFooterIcon(MAKEINTRESOURCEW(IDI_ERROR));
@@ -206,7 +205,7 @@ HRESULT CSaveDlg::InitFileCopy()
 		if (!pReader) {
 			const DWORD fileOpflags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR | FOFX_NOMINIMIZEBOX;
 			hr = FileOperation(m_saveItems.front().path, m_saveItems.front().dstpath, FO_COPY, fileOpflags);
-			DLogIf(FAILED(hr), L"CSaveDlg : file copy was aborted with error %s", HR2Str(hr));
+			DLogIf(FAILED(hr), L"CSaveTaskDlg : file copy was aborted with error %s", HR2Str(hr));
 
 			return E_ABORT;
 		}
@@ -275,7 +274,7 @@ fail:
 	return S_OK;
 }
 
-void CSaveDlg::SaveUDP()
+void CSaveTaskDlg::SaveUDP()
 {
 	if (m_protocol != protocol::PROTOCOL_UDP) {
 		return;
@@ -327,7 +326,7 @@ void CSaveDlg::SaveUDP()
 	CloseHandle(hFile);
 }
 
-void CSaveDlg::SaveHTTP()
+void CSaveTaskDlg::SaveHTTP()
 {
 	if (m_protocol != protocol::PROTOCOL_HTTP) {
 		return;
@@ -389,7 +388,7 @@ void CSaveDlg::SaveHTTP()
 	m_iProgress = PROGRESS_COMPLETED;
 }
 
-HRESULT CSaveDlg::DownloadHTTP(CStringW url, const CStringW filepath)
+HRESULT CSaveTaskDlg::DownloadHTTP(CStringW url, const CStringW filepath)
 {
 	const DWORD bufLen = 64 * KILOBYTE;
 	std::vector<BYTE> pBuffer(bufLen);
@@ -449,7 +448,7 @@ HRESULT CSaveDlg::DownloadHTTP(CStringW url, const CStringW filepath)
 	return m_bAbort ? E_ABORT : hr;
 }
 
-HRESULT CSaveDlg::OnDestroy()
+HRESULT CSaveTaskDlg::OnDestroy()
 {
 	if (m_pMC) {
 		m_pMC->Stop();
@@ -480,7 +479,7 @@ HRESULT CSaveDlg::OnDestroy()
 	return S_OK;
 }
 
-HRESULT CSaveDlg::OnTimer(_In_ long lTime)
+HRESULT CSaveTaskDlg::OnTimer(_In_ long lTime)
 {
 	const int iProgress = m_iProgress;
 
@@ -622,7 +621,7 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 	return S_OK;
 }
 
-HRESULT CSaveDlg::OnCommandControlClick(_In_ int nCommandControlID)
+HRESULT CSaveTaskDlg::OnCommandControlClick(_In_ int nCommandControlID)
 {
 	if (nCommandControlID == IDCANCEL) {
 		if (m_pGB) {
