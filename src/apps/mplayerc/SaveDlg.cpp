@@ -348,14 +348,17 @@ void CSaveDlg::SaveHTTP()
 		const CStringW finalext = finalfile.GetExtension().Mid(1).MakeLower();
 		const CStringW tmpfile = finalfile + L".tmp";
 
-		CString strArgs = L"-y";
-		for (const auto& item : m_saveItems) {
-			strArgs.AppendFormat(LR"( -i "%s")", item.dstpath);
+		CStringW mapping;
+		CStringW strArgs = L"-y";
+		for (unsigned i = 0; i < m_saveItems.size(); ++i) {
+			strArgs.AppendFormat(LR"( -i "%s")", m_saveItems[i].dstpath);
+			mapping.AppendFormat(L" -map %u", i);
 		}
 		strArgs.Append(L" -c copy");
 		if (finalext == L"mp4") {
 			strArgs.Append(L" -c:s mov_text");
 		}
+		strArgs.Append(mapping);
 		strArgs.AppendFormat(LR"( -f %s "%s")", finalext, tmpfile);
 
 		SHELLEXECUTEINFOW execinfo = { sizeof(execinfo) };
