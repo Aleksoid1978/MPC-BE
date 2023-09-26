@@ -345,14 +345,19 @@ void CSaveDlg::SaveHTTP()
 	}
 
 	if (m_saveItems.size() >= 2 && m_ffmpegpath.GetLength()) {
-		CPath finalfile = m_saveItems.front().second;
+		const CPathW finalfile = m_saveItems.front().second;
+		const CStringW finalext = finalfile.GetExtension().Mid(1).MakeLower();
+		const CStringW tmpfile = finalfile + L".tmp";
 
-		const CString tmpfile = finalfile + L".tmp";
 		CString strArgs = L"-y";
 		for (const auto& item : m_saveItems) {
 			strArgs.AppendFormat(LR"( -i "%s")", item.second);
 		}
-		strArgs.AppendFormat(LR"( -c copy -f %s "%s")", finalfile.GetExtension().Mid(1), tmpfile);
+		strArgs.Append(L" -c copy");
+		if (finalext == L"mp4") {
+			strArgs.Append(L" -c:s mov_text");
+		}
+		strArgs.AppendFormat(LR"( -f %s "%s")", finalext, tmpfile);
 
 		SHELLEXECUTEINFOW execinfo = { sizeof(execinfo) };
 		execinfo.lpFile = m_ffmpegpath.GetString();
