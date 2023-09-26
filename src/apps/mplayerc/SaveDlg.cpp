@@ -51,9 +51,8 @@ enum {
 // CSaveDlg dialog
 
 IMPLEMENT_DYNAMIC(CSaveDlg, CTaskDialog)
-CSaveDlg::CSaveDlg(const CStringW& name, const std::list<std::pair<CStringW, CStringW>>& saveItems, HRESULT& hr)
+CSaveDlg::CSaveDlg(const std::list<SaveItem_t>& saveItems, HRESULT& hr)
 	: CTaskDialog(L"", L"", ResStr(IDS_SAVE_FILE), TDCBF_CANCEL_BUTTON, TDF_CALLBACK_TIMER | TDF_POSITION_RELATIVE_TO_WINDOW)
-	, m_name(name)
 	, m_saveItems(saveItems.cbegin(), saveItems.cend())
 {
 	if (m_saveItems.empty()) {
@@ -66,7 +65,7 @@ CSaveDlg::CSaveDlg(const CStringW& name, const std::list<std::pair<CStringW, CSt
 		SetMainIcon(m_hIcon);
 	}
 
-	SetMainInstruction(m_name + L"\n" + m_saveItems.front().second);
+	SetMainInstruction(m_saveItems.front().title + L"\n" + m_saveItems.front().dstpath);
 
 	SetProgressBarMarquee();
 	SetProgressBarRange(0, 1000);
@@ -98,7 +97,7 @@ HRESULT CSaveDlg::InitFileCopy()
 
 	HRESULT hr;
 
-	const CString fn = m_saveItems.front().first;
+	const CString fn = m_saveItems.front().path;
 	CComPtr<IFileSourceFilter> pReader;
 
 	if (::PathIsURLW(fn)) {
@@ -206,7 +205,7 @@ HRESULT CSaveDlg::InitFileCopy()
 
 		if (!pReader) {
 			const DWORD fileOpflags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR | FOFX_NOMINIMIZEBOX;
-			hr = FileOperation(m_saveItems.front().first, m_saveItems.front().second, FO_COPY, fileOpflags);
+			hr = FileOperation(m_saveItems.front().path, m_saveItems.front().dstpath, FO_COPY, fileOpflags);
 			DLogIf(FAILED(hr), L"CSaveDlg : file copy was aborted with error %s", HR2Str(hr));
 
 			return E_ABORT;
@@ -239,7 +238,7 @@ fail:
 		return S_FALSE;
 	}
 	CComQIPtr<IFileSinkFilter2> pFSF = pDst.p;
-	pFSF->SetFileName(m_saveItems.front().second, nullptr);
+	pFSF->SetFileName(m_saveItems.front().dstpath, nullptr);
 	pFSF->SetMode(AM_FILE_OVERWRITE);
 
 	if (FAILED(m_pGB->AddFilter(pDst, L"File Writer"))) {
@@ -284,7 +283,7 @@ void CSaveDlg::SaveUDP()
 
 	m_iProgress = -1;
 
-	HANDLE hFile = CreateFileW(m_saveItems.front().second, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	HANDLE hFile = CreateFileW(m_saveItems.front().dstpath, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		return;
 	}
@@ -337,7 +336,7 @@ void CSaveDlg::SaveHTTP()
 	m_iProgress = -1;
 
 	for (const auto& item : m_saveItems) {
-		HRESULT hr = DownloadHTTP(item.first, item.second);
+		HRESULT hr = DownloadHTTP(item.path, item.dstpath);
 		if (FAILED(hr)) {
 			m_bAbort = true;
 			return;
@@ -345,13 +344,13 @@ void CSaveDlg::SaveHTTP()
 	}
 
 	if (m_saveItems.size() >= 2 && m_ffmpegpath.GetLength()) {
-		const CPathW finalfile = m_saveItems.front().second;
+		const CPathW finalfile = m_saveItems.front().dstpath;
 		const CStringW finalext = finalfile.GetExtension().Mid(1).MakeLower();
 		const CStringW tmpfile = finalfile + L".tmp";
 
 		CString strArgs = L"-y";
 		for (const auto& item : m_saveItems) {
-			strArgs.AppendFormat(LR"( -i "%s")", item.second);
+			strArgs.AppendFormat(LR"( -i "%s")", item.dstpath);
 		}
 		strArgs.Append(L" -c copy");
 		if (finalext == L"mp4") {
@@ -372,7 +371,7 @@ void CSaveDlg::SaveHTTP()
 
 		if (PathFileExistsW(tmpfile)) {
 			for (const auto& item : m_saveItems) {
-				DeleteFileW(item.second);
+				DeleteFileW(item.dstpath);
 			}
 			MoveFileW(tmpfile, finalfile);
 		}
@@ -483,13 +482,13 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 
 	if (iProgress != m_iPrevState) {
 		if (iProgress >= 0 && iProgress < m_saveItems.size()) {
-			CStringW path = m_saveItems[iProgress].second;
+			CStringW path = m_saveItems[iProgress].dstpath;
 			EllipsisPath(path, 50);
-			SetMainInstruction(m_name + L"\n" + path);
+			SetMainInstruction(m_saveItems.front().title + L"\n" + path);
 			m_SaveStats.Reset();
 		}
 		else if (iProgress == PROGRESS_MERGING) {
-			SetMainInstruction(m_name);
+			SetMainInstruction(m_saveItems.front().title);
 			SetContent(L"Merging files...");
 		}
 		m_iPrevState = iProgress;

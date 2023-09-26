@@ -29,10 +29,17 @@
 class CSaveDlg : public CTaskDialog
 {
 	DECLARE_DYNAMIC(CSaveDlg)
+public:
+	struct SaveItem_t {
+		CStringW title;
+		CStringW path; // file path or url
+		CStringW dstpath;
+		SaveItem_t(const CStringW& _title, const CStringW& _path, const CStringW& _dstpath)
+			: title(_title), path(_path), dstpath(_dstpath) {}
+	};
 
 private:
-	const CStringW m_name;
-	const std::vector<std::pair<CStringW, CStringW>> m_saveItems;
+	const std::vector<SaveItem_t> m_saveItems;
 	CStringW m_ffmpegpath;
 
 	HICON m_hIcon;
@@ -98,7 +105,7 @@ private:
 	sockaddr_in m_addr = {};
 
 public:
-	CSaveDlg(const CStringW& name, const std::list<std::pair<CStringW, CStringW>>& saveItems, HRESULT& hr);
+	CSaveDlg(const std::list<SaveItem_t>& saveItems, HRESULT& hr);
 
 	void SetFFmpegPath(const CStringW& ffmpegpath);
 	bool IsCompleteOk();
