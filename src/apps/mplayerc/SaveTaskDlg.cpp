@@ -489,7 +489,7 @@ HRESULT CSaveTaskDlg::OnTimer(_In_ long lTime)
 	}
 
 	if (iProgress != m_iPrevState) {
-		if (iProgress >= 0 && iProgress < m_saveItems.size()) {
+		if (iProgress >= 0 && iProgress < (int)m_saveItems.size()) {
 			CStringW path = m_saveItems[iProgress].dstpath;
 			EllipsisPath(path, 50);
 			SetMainInstruction(m_saveItems.front().title + L"\n" + path);
@@ -505,7 +505,7 @@ HRESULT CSaveTaskDlg::OnTimer(_In_ long lTime)
 	static UINT sizeUnits[]  = { IDS_SIZE_UNIT_K,  IDS_SIZE_UNIT_M,  IDS_SIZE_UNIT_G  };
 	static UINT speedUnits[] = { IDS_SPEED_UNIT_K, IDS_SPEED_UNIT_M, IDS_SPEED_UNIT_G };
 
-	if (iProgress >= 0 && iProgress < m_saveItems.size()) {
+	if (iProgress >= 0 && iProgress < (int)m_saveItems.size()) {
 		const UINT64 pos = m_pos.load(); // bytes
 		const long speed = m_SaveStats.AddValuesGetSpeed(pos, clock());
 
