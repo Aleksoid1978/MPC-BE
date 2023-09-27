@@ -1487,8 +1487,11 @@ namespace Youtube
 						}
 					}
 
+					CStringA sub_lang;
+					getJsonValue(elem, "languageCode", sub_lang);
+
 					if (!sub_url.IsEmpty() && !sub_name.IsEmpty()) {
-						subs.emplace_back(sub_url, sub_name);
+						subs.emplace_back(sub_url, sub_name, sub_lang);
 					}
 				}
 			}

@@ -434,16 +434,19 @@ class CSubtitleItem
 {
 	CStringW m_fpath;
 	CStringW m_title;
+	CStringA m_lang;
 
 public:
 	CSubtitleItem() = default;
-	CSubtitleItem(const CStringW& fpath, const CStringW& title = L"")
+	CSubtitleItem(const CStringW& fpath, const CStringW& title = L"", const CStringA& lang = "")
 		: m_fpath(fpath)
 		, m_title(title)
+		, m_lang(lang)
 	{}
-	CSubtitleItem(const WCHAR* fpath, const WCHAR* title = L"")
+	CSubtitleItem(const WCHAR* fpath, const WCHAR* title = L"", const CHAR* lang = "")
 		: m_fpath(fpath)
 		, m_title(title)
+		, m_lang(lang)
 	{}
 
 	const CSubtitleItem& operator = (const CStringW& fpath) {
@@ -475,6 +478,10 @@ public:
 
 	CStringW GetTitle() const {
 		return m_title;
+	};
+
+	CStringA GetLang() const {
+		return m_lang;
 	};
 };
 typedef std::list<CSubtitleItem> CSubtitleItemList;

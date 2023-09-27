@@ -16188,7 +16188,7 @@ bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 	}
 
 	CComPtr<ISubStream> pSubStream;
-	const CStringW fname = subItem;
+	const CStringW fname = subItem.GetPath();
 	const CStringW ext = GetFileExt(fname).MakeLower();
 
 	if (ext == L".mks" && s.IsISRAutoLoadEnabled()) {
