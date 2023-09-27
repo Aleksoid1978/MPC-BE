@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2022 see Authors.txt
+ * (C) 2020-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -48,7 +48,7 @@ inline bool getJsonValue(const rapidjson::Value& jsonValue, const char* name, T&
 				value = it->value.GetString();
 				return true;
 			}
-		} else if constexpr (std::is_same_v<T, CString>) {
+		} else if constexpr (std::is_same_v<T, CStringW>) {
 			if (it->value.IsString()) {
 				value = UTF8ToWStr(it->value.GetString());
 				return true;

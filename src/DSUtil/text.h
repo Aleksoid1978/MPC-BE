@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -138,8 +138,8 @@ extern DWORD    CharSetToCodePage(DWORD dwCharSet);
 extern CStringA ConvertMBCS(CStringA str, DWORD SrcCharSet, DWORD DstCharSet);
 extern CStringA UrlEncode(const CStringA& str_in, const bool bArg = false);
 extern CStringA UrlDecode(const CStringA& str_in);
-extern CString  UrlDecode(LPCWSTR lpWideCharStr);
-extern CString  ExtractTag(CString tag, CMapStringToString& attribs, bool& fClosing);
+extern CStringW UrlDecode(LPCWSTR lpWideCharStr);
+extern CStringW ExtractTag(CStringW tag, CMapStringToString& attribs, bool& fClosing);
 extern CStringA HtmlSpecialChars(CStringA str, bool bQuotes = false);
 
 extern CStringA WStrToUTF8(LPCWSTR lpWideCharStr);
@@ -154,7 +154,7 @@ void EllipsisText(CStringW& text, const int maxlen);
 void EllipsisURL(CStringW& url, const int maxlen);
 void EllipsisPath(CStringW& path, const int maxlen);
 
-CString FormatNumber(const CString& szNumber, const bool bNoFractionalDigits = true);
+CStringW FormatNumber(const CStringW& szNumber, const bool bNoFractionalDigits = true);
 
 CStringW FourccToWStr(uint32_t fourcc);
 

@@ -122,7 +122,7 @@ CStringA UrlDecode(const CStringA& str_in)
 	return str_out;
 }
 
-CString UrlDecode(LPCWSTR lpWideCharStr)
+CStringW UrlDecode(LPCWSTR lpWideCharStr)
 {
 	if (wcsrchr(lpWideCharStr, L'%') == nullptr) {
 		return lpWideCharStr;
@@ -133,7 +133,7 @@ CString UrlDecode(LPCWSTR lpWideCharStr)
 	return UTF8ToWStr(utf8);
 }
 
-CString ExtractTag(CString tag, CMapStringToString& attribs, bool& fClosing)
+CStringW ExtractTag(CStringW tag, CMapStringToString& attribs, bool& fClosing)
 {
 	tag.Trim();
 	attribs.RemoveAll();
@@ -145,11 +145,11 @@ CString ExtractTag(CString tag, CMapStringToString& attribs, bool& fClosing)
 	if (i < 0) {
 		i = tag.GetLength();
 	}
-	CString type = tag.Left(i).MakeLower();
+	CStringW type = tag.Left(i).MakeLower();
 	tag = tag.Mid(i).Trim();
 
 	while ((i = tag.Find('=')) > 0) {
-		CString attrib = tag.Left(i).Trim().MakeLower();
+		CStringW attrib = tag.Left(i).Trim().MakeLower();
 		tag = tag.Mid(i+1);
 		for (i = 0; i < tag.GetLength() && _istspace(tag[i]); i++) {
 			;
@@ -164,7 +164,7 @@ CString ExtractTag(CString tag, CMapStringToString& attribs, bool& fClosing)
 		if (i < 0) {
 			i = tag.GetLength();
 		}
-		CString param = tag.Left(i).Trim();
+		CStringW param = tag.Left(i).Trim();
 		if (!param.IsEmpty()) {
 			attribs[attrib] = param;
 		}
@@ -197,9 +197,9 @@ CStringA WStrToUTF8(LPCWSTR lpWideCharStr)
 	return str;
 }
 
-CString ConvertToWStr(LPCSTR lpMultiByteStr, UINT CodePage)
+CStringW ConvertToWStr(LPCSTR lpMultiByteStr, UINT CodePage)
 {
-	CString str;
+	CStringW str;
 	int len = MultiByteToWideChar(CodePage, 0, lpMultiByteStr, -1, nullptr, 0) - 1;
 	if (len > 0) {
 		str.ReleaseBuffer(MultiByteToWideChar(CodePage, 0, lpMultiByteStr, -1, str.GetBuffer(len), len + 1) - 1);
@@ -207,7 +207,7 @@ CString ConvertToWStr(LPCSTR lpMultiByteStr, UINT CodePage)
 	return str;
 }
 
-CString UTF8ToWStr(LPCSTR lpUTF8Str)
+CStringW UTF8ToWStr(LPCSTR lpUTF8Str)
 {
 	return ConvertToWStr(lpUTF8Str, CP_UTF8);
 }
@@ -245,13 +245,13 @@ void ReplaceCharacterU32(uint32_t& ch)
 	}
 }
 
-CString AltUTF8ToWStr(LPCSTR lpUTF8Str) // Use if MultiByteToWideChar() function does not work.
+CStringW AltUTF8ToWStr(LPCSTR lpUTF8Str) // Use if MultiByteToWideChar() function does not work.
 {
 	if (!lpUTF8Str) {
 		return L"";
 	}
 
-	CString str;
+	CStringW str;
 	// Don't use MultiByteToWideChar(), some characters are not well decoded
 	const unsigned char* Z = (const unsigned char*)lpUTF8Str;
 	while (*Z) { //0 is end
@@ -305,9 +305,9 @@ CString AltUTF8ToWStr(LPCSTR lpUTF8Str) // Use if MultiByteToWideChar() function
 	return str;
 }
 
-CString UTF8orLocalToWStr(LPCSTR lpMultiByteStr)
+CStringW UTF8orLocalToWStr(LPCSTR lpMultiByteStr)
 {
-	CString str = AltUTF8ToWStr(lpMultiByteStr);
+	CStringW str = AltUTF8ToWStr(lpMultiByteStr);
 	if (str.IsEmpty()) {
 		str = ConvertToWStr(lpMultiByteStr, CP_ACP); // Trying Local...
 	}
@@ -334,7 +334,7 @@ void FixFilename(CStringW& str)
 		}
 	}
 
-	CString tmp;
+	CStringW tmp;
 	// not support the following file names: "con", "con.txt" "con.name.txt". But supported "content" "name.con" and "name.con.txt".
 	if (str.GetLength() == 3 || str.Find('.') == 3) {
 		tmp = str.Left(3).MakeUpper();
@@ -425,9 +425,9 @@ void EllipsisPath(CStringW& path, const int maxlen)
 	}
 }
 
-CString FormatNumber(const CString& szNumber, const bool bNoFractionalDigits /*= true*/)
+CStringW FormatNumber(const CStringW& szNumber, const bool bNoFractionalDigits /*= true*/)
 {
-	CString ret;
+	CStringW ret;
 
 	int nChars = GetNumberFormatW(LOCALE_USER_DEFAULT, 0, szNumber, nullptr, nullptr, 0);
 	GetNumberFormatW(LOCALE_USER_DEFAULT, 0, szNumber, nullptr, ret.GetBuffer(nChars), nChars);
