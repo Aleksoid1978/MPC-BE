@@ -491,7 +491,7 @@ HRESULT CSaveTaskDlg::OnTimer(_In_ long lTime)
 	if (iProgress != m_iPrevState) {
 		if (iProgress >= 0 && iProgress < (int)m_saveItems.size()) {
 			CStringW path = m_saveItems[iProgress].dstpath;
-			EllipsisPath(path, 50);
+			EllipsisPath(path, 100);
 			SetMainInstruction(m_saveItems.front().title + L"\n" + path);
 			m_SaveStats.Reset();
 		}
