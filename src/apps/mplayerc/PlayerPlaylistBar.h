@@ -29,7 +29,7 @@
 typedef std::vector<Chapters> ChaptersList;
 class CFileItem
 {
-	CString m_fn;
+	CString m_fpath;
 	CString m_Title;
 	ChaptersList m_ChaptersList;
 
@@ -39,45 +39,45 @@ public:
 	CFileItem() = default;
 	~CFileItem() = default;
 
-	CFileItem(const CString& str)
-		: m_fn(str)
+	CFileItem(const CString& fpath)
+		: m_fpath(fpath)
 	{}
-	CFileItem(const CString& strFn, const CString& strTitle, const REFERENCE_TIME duration = 0)
-		: m_fn(strFn)
-		, m_Title(strTitle)
+	CFileItem(const CString& fpath, const CString& title, const REFERENCE_TIME duration = 0)
+		: m_fpath(fpath)
+		, m_Title(title)
 		, m_duration(duration)
 	{}
-	CFileItem(const WCHAR* str)
-		: m_fn(str)
+	CFileItem(const WCHAR* fpath)
+		: m_fpath(fpath)
 	{}
 
 	const CFileItem& operator = (const CFileItem& fi) {
-		m_fn = fi.m_fn;
+		m_fpath = fi.m_fpath;
 		m_ChaptersList.assign(fi.m_ChaptersList.begin(), fi.m_ChaptersList.end());
 
 		return *this;
 	}
 
 	const CFileItem& operator = (const CString& str) {
-		m_fn = str;
+		m_fpath = str;
 
 		return *this;
 	}
 
 	operator CString() const {
-		return m_fn;
+		return m_fpath;
 	}
 
 	operator LPCWSTR() const {
-		return m_fn;
+		return m_fpath;
 	}
 
-	CString GetName() const {
-		return m_fn;
+	CString GetPath() const {
+		return m_fpath;
 	};
 
 	CString GetExt() const {
-		return m_fn.Mid(m_fn.ReverseFind(L'.') + 1).MakeLower();
+		return m_fpath.Mid(m_fpath.ReverseFind(L'.') + 1).MakeLower();
 	};
 
 	REFERENCE_TIME GetDuration() const {

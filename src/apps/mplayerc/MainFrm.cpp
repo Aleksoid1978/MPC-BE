@@ -6031,7 +6031,7 @@ void CMainFrame::OnFileSaveAs()
 				ext = GetFileExt(savedFileName);
 				CStringW audiofile = RenameFileExt(savedFileName, (ext == L".mp4") ? L".audio.m4a" : L".audio.mka");
 				auto it = ++(pFileData->fns.begin());
-				saveItems.emplace_back('a', it->GetTitle(), it->GetName(), audiofile);
+				saveItems.emplace_back('a', it->GetTitle(), it->GetPath(), audiofile);
 				ffmpegpath = GetFullExePath(AfxGetAppSettings().strFFmpegExePath, true);
 			}
 
@@ -12231,7 +12231,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	CString youtubeErrorMessage;
 
 	if (!m_youtubeUrllist.empty()) {
-		youtubeUrl = pOFD->fns.front().GetName();
+		youtubeUrl = pOFD->fns.front().GetPath();
 		Content::Online::Disconnect(youtubeUrl);
 
 		pOFD->fns.clear();
@@ -12257,7 +12257,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			FixFilename(m_youtubeFields.fname);
 		}
 
-		m_strPlaybackRenderedPath = pOFD->fns.front().GetName();
+		m_strPlaybackRenderedPath = pOFD->fns.front().GetPath();
 		m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
 	}
 	else if (s.bYoutubePageParser && pOFD->fns.size() == 1) {
@@ -12273,7 +12273,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 					pOFD->fns.emplace_back(url);
 				}
 
-				m_strPlaybackRenderedPath = pOFD->fns.front().GetName();
+				m_strPlaybackRenderedPath = pOFD->fns.front().GetPath();
 				m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
 			}
 		}
@@ -12283,7 +12283,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			&& youtubeUrl.IsEmpty()
 			&& pOFD->fns.size() == 1
 			&& ::PathIsURLW(pOFD->fns.front())) {
-		const CString fn = pOFD->fns.front().GetName();
+		const CString fn = pOFD->fns.front().GetPath();
 		const auto ext = GetFileExt(fn.GetString()).MakeLower();
 		if (!(ext == L".m3u" || ext == L".m3u8")
 				&& Content::Online::CheckConnect(fn)) {
@@ -12319,7 +12319,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 							pOFD->fns.emplace_back(url);
 						}
 
-						m_strPlaybackRenderedPath = pOFD->fns.front().GetName();
+						m_strPlaybackRenderedPath = pOFD->fns.front().GetPath();
 						m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
 					}
 				}
@@ -12367,7 +12367,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	bool bFirst = true;
 
 	for (auto& fi : pOFD->fns) {
-		CString fn = fi.GetName();
+		CString fn = fi.GetPath();
 
 		fn.Trim();
 		if (fn.IsEmpty() && !bFirst) {
@@ -12523,7 +12523,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	}
 
 	if (!pOFD->fns.empty()) {
-		const CString fn = youtubeUrl.GetLength() ? youtubeUrl : pOFD->fns.front().GetName();
+		const CString fn = youtubeUrl.GetLength() ? youtubeUrl : pOFD->fns.front().GetPath();
 
 		if (!StartsWith(fn, L"pipe:")) {
 			const bool diskImage = m_DiskImage.GetDriveLetter() && m_SessionInfo.Path.GetLength();
@@ -13996,12 +13996,12 @@ bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 	if (pFileData) {
 		UINT index = 0;
 		for (auto& fi : pFileData->fns) {
-			if (::PathIsURLW(fi) && fi.GetName().Find(L"://") <= 0) {
-				fi = L"http://" + fi.GetName();
+			if (::PathIsURLW(fi) && fi.GetPath().Find(L"://") <= 0) {
+				fi = L"http://" + fi.GetPath();
 			}
 
 			DLog(L"--> CMainFrame::OpenMediaPrivate() - pFileData->fns[%d]:", index++);
-			DLog(L"    %s", fi.GetName());
+			DLog(L"    %s", fi.GetPath());
 		}
 	}
 
@@ -15718,7 +15718,7 @@ void CMainFrame::SetupAudioTracksSubMenu()
 					auto it = pli.m_fns.begin();
 					++it; // skip main file
 					for (; it != pli.m_fns.end(); ++it) {
-						CString str = (*it).GetName();
+						CString str = (*it).GetPath();
 						if (!str.IsEmpty() && name == GetFileOnly(str)) {
 							fExternal = true;
 							break;
@@ -17463,7 +17463,7 @@ BOOL CMainFrame::OpenCurPlaylistItem(REFERENCE_TIME rtStart/* = INVALID_TIME*/, 
 
 	if (pli.m_fns.size()) {
 		if (!::PathIsURLW(pli.m_fns.front())) {
-			AfxGetAppSettings().strLastOpenFile = pli.m_fns.front().GetName();
+			AfxGetAppSettings().strLastOpenFile = pli.m_fns.front().GetPath();
 		}
 		if (OpenIso(pli.m_fns.front(), rtStart) || OpenBD(pli.m_fns.front(), rtStart, bAddRecent)) {
 			return TRUE;
@@ -18269,7 +18269,7 @@ void CMainFrame::SendNowPlayingToApi()
 
 			m_wndPlaylistBar.GetCur(pli);
 			if (!pli.m_fns.empty()) {
-				label = !pli.m_label.IsEmpty() ? pli.m_label : pli.m_fns.front().GetName();
+				label = !pli.m_label.IsEmpty() ? pli.m_label : pli.m_fns.front().GetPath();
 
 				m_pMS->GetDuration(&rtDur);
 				DVD_HMSF_TIMECODE tcDur = RT2HMSF(rtDur);
@@ -18639,7 +18639,7 @@ void CMainFrame::SendPlaylistToApi()
 
 		if (pli.m_type == CPlaylistItem::file) {
 			for (const auto& fi : pli.m_fns) {
-				CString fn = fi.GetName();
+				CString fn = fi.GetPath();
 				if (!strPlaylist.IsEmpty()) {
 					strPlaylist.Append (L"|");
 				}

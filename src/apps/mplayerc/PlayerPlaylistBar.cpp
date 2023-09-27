@@ -232,7 +232,7 @@ CPlaylistItem& CPlaylistItem::operator = (const CPlaylistItem& pli)
 bool CPlaylistItem::FindFile(LPCWSTR path)
 {
 	for (const auto& fi : m_fns) {
-		if (fi.GetName().CompareNoCase(path) == 0) {
+		if (fi.GetPath().CompareNoCase(path) == 0) {
 			return true;
 		}
 	}
@@ -243,7 +243,7 @@ bool CPlaylistItem::FindFile(LPCWSTR path)
 bool CPlaylistItem::FindFolder(LPCWSTR path) const
 {
 	for (const auto& fi : m_fns) {
-		CString str = fi.GetName();
+		CString str = fi.GetPath();
 		str.TrimRight(L'>');
 		str.TrimRight(L'<');
 		if (str.CompareNoCase(path) == 0) {
@@ -265,7 +265,7 @@ CString CPlaylistItem::GetLabel(int i)
 			const auto& fn = m_fns.front();
 			CUrlParser urlParser;
 			if (::PathIsURLW(fn) && urlParser.Parse(fn)) {
-				str = fn.GetName();
+				str = fn.GetPath();
 				if (urlParser.GetUrlPathLength() > 1) {
 					str = urlParser.GetUrlPath(); str.TrimRight(L'/');
 					if (const int pos = str.ReverseFind(L'/'); pos != -1) {
@@ -537,7 +537,7 @@ void CPlaylistItem::AutoLoadFiles()
 POSITION CPlaylist::Append(CPlaylistItem& item, const bool bParseDuration)
 {
 	if (bParseDuration && !item.m_duration && !item.m_fns.empty()) {
-		const auto& fn = item.m_fns.front().GetName();
+		const auto& fn = item.m_fns.front().GetPath();
 		if (!::PathIsURLW(item.m_fns.front()) && ::PathFileExistsW(item.m_fns.front())) {
 			MediaInfo MI;
 			MI.Option(L"ParseSpeed", L"0");
@@ -1101,7 +1101,7 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 					break;
 				case VK_BACK:
 					if (curTab.type == PL_EXPLORER) {
-						auto path = curPlayList.GetHead().m_fns.front().GetName();
+						auto path = curPlayList.GetHead().m_fns.front().GetPath();
 						if (LastChar(path) == L'<') {
 							auto oldPath = path;
 							oldPath.TrimRight(L"\\<");
@@ -1548,7 +1548,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(const CString& fn)
 		if (bIsEmpty && selected_idx >= 0 && selected_idx < PlayList.GetCount()) {
 			POSITION pos = PlayList.FindIndex(selected_idx);
 			if (pos) {
-				selected_path = PlayList.GetAt(pos).m_fns.front().GetName();
+				selected_path = PlayList.GetAt(pos).m_fns.front().GetPath();
 			}
 		}
 		selected_idx = 0;
@@ -1557,7 +1557,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(const CString& fn)
 			TParseFolder(L".\\");
 		}
 		else {
-			auto path = PlayList.GetHead().m_fns.front().GetName();
+			auto path = PlayList.GetHead().m_fns.front().GetPath();
 			if (LastChar(path) == L'<') {
 				path.TrimRight(L'<');
 				PlayList.RemoveAll();
@@ -1640,7 +1640,7 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(const CString& fn, const CTextFile::enc
 
 		if (pli.m_type == CPlaylistItem::file) {
 			for (const auto& fi : pli.m_fns) {
-				CString fn = fi.GetName();
+				CString fn = fi.GetPath();
 				if (bRemovePath) {
 					CPath p(fn);
 					p.StripPath();
@@ -1659,8 +1659,8 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(const CString& fn, const CTextFile::enc
 				f.WriteString(idx + L",subtitle," + fn + L"\n");
 			}
 		} else if (pli.m_type == CPlaylistItem::device && pli.m_fns.size() == 2) {
-			f.WriteString(idx + L",video," + pli.m_fns.front().GetName() + L"\n");
-			f.WriteString(idx + L",audio," + pli.m_fns.back().GetName() + L"\n");
+			f.WriteString(idx + L",video," + pli.m_fns.front().GetPath() + L"\n");
+			f.WriteString(idx + L",audio," + pli.m_fns.back().GetPath() + L"\n");
 			str.Format(L"%d,vinput,%d", i, pli.m_vinput);
 			f.WriteString(str + L"\n");
 			str.Format(L"%d,vchannel,%d", i, pli.m_vchannel);
@@ -2158,7 +2158,7 @@ void CPlayerPlaylistBar::Append(const CFileItemList& fis)
 
 	for (const auto& fi : fis) {
 		CPlaylistItem pli;
-		pli.m_fns.emplace_front(fi.GetName());
+		pli.m_fns.emplace_front(fi.GetPath());
 		pli.m_label = fi.GetTitle();
 		pli.m_duration = fi.GetDuration();
 		curPlayList.Append(pli, AfxGetAppSettings().bPlaylistDetermineDuration);
@@ -2325,7 +2325,7 @@ CString CPlayerPlaylistBar::GetCurFileName()
 	CString fn;
 	CPlaylistItem* pli = GetCur();
 	if (pli && !pli->m_fns.empty()) {
-		fn = pli->m_fns.front().GetName();
+		fn = pli->m_fns.front().GetPath();
 	}
 	return fn;
 }
@@ -2495,7 +2495,7 @@ OpenMediaData* CPlayerPlaylistBar::GetCurOMD(REFERENCE_TIME rtStart)
 
 	pli->AutoLoadFiles();
 
-	CString fn = pli->m_fns.front().GetName().MakeLower();
+	CString fn = pli->m_fns.front().GetPath().MakeLower();
 
 	if (TGetPathType(fn) != IT_FILE) {
 		return nullptr;
@@ -2505,7 +2505,7 @@ OpenMediaData* CPlayerPlaylistBar::GetCurOMD(REFERENCE_TIME rtStart)
 
 	if (fn.Find(L"video_ts.ifo") >= 0) {
 		if (OpenDVDData* p = DNew OpenDVDData()) {
-			p->path = pli->m_fns.front().GetName();
+			p->path = pli->m_fns.front().GetPath();
 			p->subs = pli->m_subs;
 			return p;
 		}
@@ -2515,7 +2515,7 @@ OpenMediaData* CPlayerPlaylistBar::GetCurOMD(REFERENCE_TIME rtStart)
 		if (OpenDeviceData* p = DNew OpenDeviceData()) {
 			auto it = pli->m_fns.begin();
 			for (unsigned i = 0; i < std::size(p->DisplayName) && it != pli->m_fns.end(); ++i, ++it) {
-				p->DisplayName[i] = (*it).GetName();
+				p->DisplayName[i] = (*it).GetPath();
 			}
 
 			p->vinput = pli->m_vinput;
@@ -2930,7 +2930,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 			if (POSITION pos = FindPos(nItem); pos) {
 				const CPlaylistItem& pli = curPlayList.GetAt(pos);
 				if (!pli.m_fns.empty()) {
-					path = pli.m_fns.front().GetName();
+					path = pli.m_fns.front().GetPath();
 				}
 			}
 
@@ -3271,7 +3271,7 @@ BOOL CPlayerPlaylistBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResul
 	strTipText.Empty();
 
 	for (const auto& fi : pli.m_fns) {
-		strTipText += L"\n" + fi.GetName();
+		strTipText += L"\n" + fi.GetPath();
 	}
 	strTipText.Trim();
 	if (pli.m_bDirectory) {
@@ -3360,7 +3360,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	if (pos) {
 		CPlaylistItem& pli = curPlayList.GetAt(pos);
 		if (!pli.m_fns.empty()) {
-			sCurrentPath = pli.m_fns.front().GetName();
+			sCurrentPath = pli.m_fns.front().GetPath();
 
 			if (curTab.type == PL_EXPLORER) {
 				item_type = (ItemType)TGetPathType(sCurrentPath);
@@ -3799,10 +3799,10 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 				const auto focusedElement = TGetFocusedElement();
 				POSITION pos = curPlayList.FindIndex(focusedElement);
 				if (pos) {
-					selected_path = curPlayList.GetAt(pos).m_fns.front().GetName();
+					selected_path = curPlayList.GetAt(pos).m_fns.front().GetPath();
 				}
 
-				auto path = curPlayList.GetHead().m_fns.front().GetName();
+				auto path = curPlayList.GetHead().m_fns.front().GetPath();
 				if (LastChar(path) == L'<') {
 					path.TrimRight(L'<');
 					curPlayList.RemoveAll();
@@ -4572,7 +4572,7 @@ void CPlayerPlaylistBar::TFillPlaylist(const bool bFirst/* = false*/)
 		const auto focusedElement = TGetFocusedElement();
 		POSITION pos = curPlayList.FindIndex(focusedElement);
 		if (pos) {
-			selected_path = curPlayList.GetAt(pos).m_fns.front().GetName();
+			selected_path = curPlayList.GetAt(pos).m_fns.front().GetPath();
 		}
 
 		CPlaylistItem pli = curPlayList.GetHead(); // parent
@@ -4950,7 +4950,7 @@ bool CPlayerPlaylistBar::TNavigate()
 		if (pos) {
 			const auto& pli = curPlayList.GetAt(pos);
 			if (pli.m_bDirectory && !pli.m_fns.empty()) {
-				CString path = pli.m_fns.front().GetName();
+				CString path = pli.m_fns.front().GetPath();
 				if (!path.IsEmpty()) {
 					auto oldPath = path;
 
@@ -5047,7 +5047,7 @@ void CPlayerPlaylistBar::CopyToClipboard()
 		for (const auto& item : items) {
 			CPlaylistItem &pli = curPlayList.GetAt(FindPos(item));
 			for (const auto& fi : pli.m_fns) {
-				str += L"\r\n" + fi.GetName();
+				str += L"\r\n" + fi.GetPath();
 			}
 		}
 
