@@ -29,6 +29,7 @@
 #include "MediaFormats.h"
 #include "DVBChannel.h"
 #include <afxsock.h>
+#include "FileItem.h"
 
 #define ENABLE_ASSFILTERMOD 0
 
@@ -429,62 +430,6 @@ public:
 	void LoadSettings();
 	void SaveSettings();
 };
-
-class CSubtitleItem
-{
-	CStringW m_fpath;
-	CStringW m_title;
-	CStringA m_lang;
-
-public:
-	CSubtitleItem() = default;
-	CSubtitleItem(const CStringW& fpath, const CStringW& title = L"", const CStringA& lang = "")
-		: m_fpath(fpath)
-		, m_title(title)
-		, m_lang(lang)
-	{}
-	CSubtitleItem(const WCHAR* fpath, const WCHAR* title = L"", const CHAR* lang = "")
-		: m_fpath(fpath)
-		, m_title(title)
-		, m_lang(lang)
-	{}
-
-	const CSubtitleItem& operator = (const CStringW& fpath) {
-		m_fpath = fpath;
-
-		return *this;
-	}
-
-	operator CStringW() const {
-		return m_fpath;
-	}
-
-	operator LPCWSTR() const {
-		return m_fpath;
-	}
-
-	void SetPath(const CStringW& fpath) {
-		m_fpath = fpath;
-	}
-
-	CStringW GetPath() const {
-		return m_fpath;
-	};
-
-	// Title
-	void SetTitle(const CStringW& title) {
-		m_title = title;
-	}
-
-	CStringW GetTitle() const {
-		return m_title;
-	};
-
-	CStringA GetLang() const {
-		return m_lang;
-	};
-};
-typedef std::list<CSubtitleItem> CSubtitleItemList;
 
 typedef std::list<CString> cmdLine;
 

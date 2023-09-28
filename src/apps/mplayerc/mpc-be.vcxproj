@@ -326,6 +326,7 @@
     <ClInclude Include="PPageWebServer.h" />
     <ClInclude Include="rapidjsonHelper.h" />
     <ClInclude Include="RegFilterChooserDlg.h" />
+    <ClInclude Include="FileItem.h" />
     <ClInclude Include="VideoSettings.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SaveTaskDlg.h" />
