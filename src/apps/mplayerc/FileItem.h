@@ -21,6 +21,7 @@
 #pragma once
 
 #include "DSUtil/CUE.h"
+#include "DSUtil/FileHandle.cpp"
 
 typedef std::vector<Chapters> ChaptersList;
 
@@ -28,8 +29,8 @@ typedef std::vector<Chapters> ChaptersList;
 class CFileItem
 {
 	CString m_fpath;
-	CString m_Title;
-	ChaptersList m_ChaptersList;
+	CString m_title;
+	ChaptersList m_chapters;
 
 	REFERENCE_TIME m_duration = 0;
 
@@ -42,7 +43,7 @@ public:
 	{}
 	CFileItem(const CString& fpath, const CString& title, const REFERENCE_TIME duration = 0)
 		: m_fpath(fpath)
-		, m_Title(title)
+		, m_title(title)
 		, m_duration(duration)
 	{}
 	CFileItem(const WCHAR* fpath)
@@ -51,7 +52,7 @@ public:
 
 	const CFileItem& operator = (const CFileItem& fi) {
 		m_fpath = fi.m_fpath;
-		m_ChaptersList.assign(fi.m_ChaptersList.begin(), fi.m_ChaptersList.end());
+		m_chapters.assign(fi.m_chapters.begin(), fi.m_chapters.end());
 
 		return *this;
 	}
@@ -75,7 +76,7 @@ public:
 	};
 
 	CString GetExt() const {
-		return m_fpath.Mid(m_fpath.ReverseFind(L'.') + 1).MakeLower();
+		return GetFileExt(m_fpath);
 	};
 
 	REFERENCE_TIME GetDuration() const {
@@ -83,29 +84,29 @@ public:
 	};
 
 	// Title
-	void SetTitle(const CString& Title) {
-		m_Title = Title;
+	void SetTitle(const CString& title) {
+		m_title = title;
 	}
 
 	CString GetTitle() const {
-		return m_Title;
+		return m_title;
 	};
 
 	// Chapters
-	void AddChapter(const Chapters& chap) {
-		m_ChaptersList.emplace_back(chap);
+	void AddChapter(const Chapters& chapter) {
+		m_chapters.emplace_back(chapter);
 	}
 
 	void ClearChapter() {
-		m_ChaptersList.clear();
+		m_chapters.clear();
 	}
 
 	size_t GetChapterCount() {
-		return m_ChaptersList.size();
+		return m_chapters.size();
 	}
 
 	void GetChapters(ChaptersList& chaplist) {
-		chaplist = m_ChaptersList;
+		chaplist = m_chapters;
 	}
 };
 
