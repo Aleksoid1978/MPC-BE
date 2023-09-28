@@ -113,26 +113,26 @@ public:
 typedef std::list<CFileItem> CFileItemList;
 
 
-class CSubtitleItem
+class CExtraFileItem
 {
 	CStringW m_fpath;
 	CStringW m_title;
 	CStringA m_lang;
 
 public:
-	CSubtitleItem() = default;
-	CSubtitleItem(const CStringW& fpath, const CStringW& title = L"", const CStringA& lang = "")
+	CExtraFileItem() = default;
+	CExtraFileItem(const CStringW& fpath, const CStringW& title = L"", const CStringA& lang = "")
 		: m_fpath(fpath)
 		, m_title(title)
 		, m_lang(lang)
 	{}
-	CSubtitleItem(const WCHAR* fpath, const WCHAR* title = L"", const CHAR* lang = "")
+	CExtraFileItem(const WCHAR* fpath, const WCHAR* title = L"", const CHAR* lang = "")
 		: m_fpath(fpath)
 		, m_title(title)
 		, m_lang(lang)
 	{}
 
-	const CSubtitleItem& operator = (const CStringW& fpath) {
+	const CExtraFileItem& operator = (const CStringW& fpath) {
 		m_fpath = fpath;
 
 		return *this;
@@ -168,4 +168,4 @@ public:
 	};
 };
 
-typedef std::list<CSubtitleItem> CSubtitleItemList;
+typedef std::list<CExtraFileItem> CSubtitleItemList;

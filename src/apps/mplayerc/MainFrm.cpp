@@ -16179,7 +16179,7 @@ void CMainFrame::ApplyExraRendererSettings()
 	}
 }
 
-bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
+bool CMainFrame::LoadSubtitle(CExtraFileItem subItem, ISubStream **actualStream)
 {
 	CAppSettings& s = AfxGetAppSettings();
 
