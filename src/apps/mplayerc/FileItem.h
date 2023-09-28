@@ -154,6 +154,10 @@ public:
 		return m_fpath;
 	};
 
+	bool IsEmpty() const {
+		return m_fpath.IsEmpty();
+	};
+
 	// Title
 	void SetTitle(const CStringW& title) {
 		m_title = title;
@@ -168,4 +172,5 @@ public:
 	};
 };
 
+typedef std::list<CExtraFileItem> CAudioItemList;
 typedef std::list<CExtraFileItem> CSubtitleItemList;
