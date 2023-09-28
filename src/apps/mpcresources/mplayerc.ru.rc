@@ -3433,9 +3433,9 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_UNIT_TIME_S         "с"
-    IDS_UNIT_TIME_M         "м"
     IDS_UNIT_TIME_H         "ч"
+    IDS_UNIT_TIME_M         "м"
+    IDS_UNIT_TIME_S         "с"
     IDS_UNIT_SIZE_KB        "КБ"
     IDS_UNIT_SIZE_MB        "МБ"
     IDS_UNIT_SIZE_GB        "ГБ"
