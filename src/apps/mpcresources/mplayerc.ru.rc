@@ -2378,7 +2378,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_SPEED_UNIT_G        "ГБ/с"
     IDS_FILE_FAV_ADDED      "Файл добавлен в закладки"
     IDS_DVD_FAV_ADDED       "DVD добавлен в закладки"
     IDS_CAPTURE_SETTINGS    "Настройки захвата"
@@ -2744,11 +2743,6 @@ BEGIN
     IDS_OSD_REGAIN_VOLUME_ON "Восстанавливать громкость: включено"
     IDS_OSD_REGAIN_VOLUME_OFF "Восстанавливать громкость: отключено"
     IDS_UNDETERMINED        "undetermined"
-    IDS_SIZE_UNIT_K         "КБ"
-    IDS_SIZE_UNIT_M         "МБ"
-    IDS_SIZE_UNIT_G         "ГБ"
-    IDS_SPEED_UNIT_K        "КБ/с"
-    IDS_SPEED_UNIT_M        "МБ/с"
 END
 
 STRINGTABLE
@@ -3435,6 +3429,19 @@ BEGIN
     IDS_NO_MORE_MEDIA       "Воспроизведение медиа-файлов из каталога закончено"
     IDS_FIRST_IN_FOLDER     "Загружен первый файл в каталоге"
     IDS_LAST_IN_FOLDER      "Загружен последний файл в каталоге"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_UNIT_TIME_S         "с"
+    IDS_UNIT_TIME_M         "м"
+    IDS_UNIT_TIME_H         "ч"
+    IDS_UNIT_SIZE_KB        "КБ"
+    IDS_UNIT_SIZE_MB        "МБ"
+    IDS_UNIT_SIZE_GB        "ГБ"
+    IDS_UNIT_SPEED_KB_S     "КБ/с"
+    IDS_UNIT_SPEED_MB_S     "МБ/с"
+    IDS_UNIT_SPEED_GB_S     "ГБ/с"
 END
 
 STRINGTABLE

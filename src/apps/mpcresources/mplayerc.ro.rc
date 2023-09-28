@@ -2377,7 +2377,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_SPEED_UNIT_G        "GB/s"
     IDS_FILE_FAV_ADDED      "Fişier adăugat la favorite"
     IDS_DVD_FAV_ADDED       "DVD adăugat la favorite"
     IDS_CAPTURE_SETTINGS    "Setări pentru captură"
@@ -2743,11 +2742,6 @@ BEGIN
     IDS_OSD_REGAIN_VOLUME_ON "Restabileşte volum: Pornit"
     IDS_OSD_REGAIN_VOLUME_OFF "Restabileşte volum: Oprit"
     IDS_UNDETERMINED        "Nedeterminat"
-    IDS_SIZE_UNIT_K         "KB"
-    IDS_SIZE_UNIT_M         "MB"
-    IDS_SIZE_UNIT_G         "GB"
-    IDS_SPEED_UNIT_K        "KB/s"
-    IDS_SPEED_UNIT_M        "MB/s"
 END
 
 STRINGTABLE
@@ -3434,6 +3428,19 @@ BEGIN
     IDS_NO_MORE_MEDIA       "Nu mai există media în dosarul curent."
     IDS_FIRST_IN_FOLDER     "Acum este încărcat primul fișier din dosar."
     IDS_LAST_IN_FOLDER      "Acum este încărcat ultimul fișier din dosar."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_UNIT_TIME_H         "h"
+    IDS_UNIT_TIME_M         "m"
+    IDS_UNIT_TIME_S         "s"
+    IDS_UNIT_SIZE_KB        "KB"
+    IDS_UNIT_SIZE_MB        "MB"
+    IDS_UNIT_SIZE_GB        "GB"
+    IDS_UNIT_SPEED_KB_S     "KB/s"
+    IDS_UNIT_SPEED_MB_S     "MB/s"
+    IDS_UNIT_SPEED_GB_S     "GB/s"
 END
 
 STRINGTABLE

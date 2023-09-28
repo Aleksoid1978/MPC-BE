@@ -2378,7 +2378,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_SPEED_UNIT_G        "GB/s"
     IDS_FILE_FAV_ADDED      "즐겨찾기에 추가된 파일"
     IDS_DVD_FAV_ADDED       "즐겨찾기에 추가된 DVD"
     IDS_CAPTURE_SETTINGS    "캡처 설정"
@@ -2744,11 +2743,6 @@ BEGIN
     IDS_OSD_REGAIN_VOLUME_ON "음량 복원 : 켬"
     IDS_OSD_REGAIN_VOLUME_OFF "음량 복원 : 끔"
     IDS_UNDETERMINED        "미정의"
-    IDS_SIZE_UNIT_K         "KB"
-    IDS_SIZE_UNIT_M         "MB"
-    IDS_SIZE_UNIT_G         "GB"
-    IDS_SPEED_UNIT_K        "KB/s"
-    IDS_SPEED_UNIT_M        "MB/s"
 END
 
 STRINGTABLE
@@ -3435,6 +3429,19 @@ BEGIN
     IDS_NO_MORE_MEDIA       "현재 폴더에 더 이상의 미디어 파일이 존재하지 않습니다."
     IDS_FIRST_IN_FOLDER     "폴더 내의 첫 번째 파일을 불러왔습니다."
     IDS_LAST_IN_FOLDER      "폴더 내의 마지막 파일을 불러왔습니다."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_UNIT_TIME_H         "h"
+    IDS_UNIT_TIME_M         "m"
+    IDS_UNIT_TIME_S         "s"
+    IDS_UNIT_SIZE_KB        "KB"
+    IDS_UNIT_SIZE_MB        "MB"
+    IDS_UNIT_SIZE_GB        "GB"
+    IDS_UNIT_SPEED_KB_S     "KB/s"
+    IDS_UNIT_SPEED_MB_S     "MB/s"
+    IDS_UNIT_SPEED_GB_S     "GB/s"
 END
 
 STRINGTABLE

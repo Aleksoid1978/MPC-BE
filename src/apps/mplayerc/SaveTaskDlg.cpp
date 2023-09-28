@@ -502,8 +502,8 @@ HRESULT CSaveTaskDlg::OnTimer(_In_ long lTime)
 		m_iPrevState = iProgress;
 	}
 
-	static UINT sizeUnits[]  = { IDS_SIZE_UNIT_K,  IDS_SIZE_UNIT_M,  IDS_SIZE_UNIT_G  };
-	static UINT speedUnits[] = { IDS_SPEED_UNIT_K, IDS_SPEED_UNIT_M, IDS_SPEED_UNIT_G };
+	static UINT sizeUnits[]  = { IDS_UNIT_SIZE_KB,  IDS_UNIT_SIZE_MB,  IDS_UNIT_SIZE_GB };
+	static UINT speedUnits[] = { IDS_UNIT_SPEED_KB_S, IDS_UNIT_SPEED_MB_S, IDS_UNIT_SPEED_GB_S };
 
 	if (iProgress >= 0 && iProgress < (int)m_saveItems.size()) {
 		const UINT64 pos = m_pos.load(); // bytes
@@ -537,13 +537,13 @@ HRESULT CSaveTaskDlg::OnTimer(_In_ long lTime)
 					str.AppendChar(L',');
 
 					if (tcDur.bHours > 0) {
-						str.AppendFormat(L" %0.2dh", tcDur.bHours);
+						str.AppendFormat(L" %2d %s", tcDur.bHours, ResStr(IDS_UNIT_TIME_H));
 					}
 					if (tcDur.bMinutes > 0) {
-						str.AppendFormat(L" %0.2dm", tcDur.bMinutes);
+						str.AppendFormat(L" %2d %s", tcDur.bMinutes, ResStr(IDS_UNIT_TIME_M));
 					}
 					if (tcDur.bSeconds > 0) {
-						str.AppendFormat(L" %0.2ds", tcDur.bSeconds);
+						str.AppendFormat(L" %2d %s", tcDur.bSeconds, ResStr(IDS_UNIT_TIME_S));
 					}
 				}
 			}

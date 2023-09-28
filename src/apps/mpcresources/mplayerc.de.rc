@@ -2378,7 +2378,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_SPEED_UNIT_G        "GB/s"
     IDS_FILE_FAV_ADDED      "Die Datei wurde zu den Favoriten hinzugefügt"
     IDS_DVD_FAV_ADDED       "Die DVD wurde zu den Favoriten hinzugefügt"
     IDS_CAPTURE_SETTINGS    "Aufnahmeeinstellungen"
@@ -2744,11 +2743,6 @@ BEGIN
     IDS_OSD_REGAIN_VOLUME_ON "Lautstärke zurücksetzen: ein"
     IDS_OSD_REGAIN_VOLUME_OFF "Lautstärke zurücksetzen: aus"
     IDS_UNDETERMINED        "Unbestimmt"
-    IDS_SIZE_UNIT_K         "kB"
-    IDS_SIZE_UNIT_M         "MB"
-    IDS_SIZE_UNIT_G         "GB"
-    IDS_SPEED_UNIT_K        "kB/s"
-    IDS_SPEED_UNIT_M        "MB/s"
 END
 
 STRINGTABLE
@@ -3435,6 +3429,19 @@ BEGIN
     IDS_NO_MORE_MEDIA       "Keine weiteren abspielbaren Medien im aktuellen Ordner."
     IDS_FIRST_IN_FOLDER     "Das ist die erste Datei im Ordner"
     IDS_LAST_IN_FOLDER      "Das ist die letzte Datei im Ordner"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_UNIT_TIME_H         "h"
+    IDS_UNIT_TIME_M         "m"
+    IDS_UNIT_TIME_S         "s"
+    IDS_UNIT_SIZE_KB        "kB"
+    IDS_UNIT_SIZE_MB        "MB"
+    IDS_UNIT_SIZE_GB        "GB"
+    IDS_UNIT_SPEED_KB_S     "kB/s"
+    IDS_UNIT_SPEED_MB_S     "MB/s"
+    IDS_UNIT_SPEED_GB_S     "GB/s"
 END
 
 STRINGTABLE

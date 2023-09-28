@@ -2378,7 +2378,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_SPEED_UNIT_G        "GB/s"
     IDS_FILE_FAV_ADDED      "A fájl hozzáadva a kedvencekhez"
     IDS_DVD_FAV_ADDED       "DVD hozzáadva a kedvencekhez"
     IDS_CAPTURE_SETTINGS    "Rögzítési beállítások"
@@ -2744,11 +2743,6 @@ BEGIN
     IDS_OSD_REGAIN_VOLUME_ON "Hangerősítés visszaállítása: Be"
     IDS_OSD_REGAIN_VOLUME_OFF "Hangerősítés visszaállítása: Ki"
     IDS_UNDETERMINED        "meghatározatlan"
-    IDS_SIZE_UNIT_K         "KB"
-    IDS_SIZE_UNIT_M         "MB"
-    IDS_SIZE_UNIT_G         "GB"
-    IDS_SPEED_UNIT_K        "KB/s"
-    IDS_SPEED_UNIT_M        "MB/s"
 END
 
 STRINGTABLE
@@ -3435,6 +3429,19 @@ BEGIN
     IDS_NO_MORE_MEDIA       "Nincs több média az aktuális mappában."
     IDS_FIRST_IN_FOLDER     "A mappában lévő első fájl betöltése most."
     IDS_LAST_IN_FOLDER      "A mappában lévő utolsó fájl betöltése most."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_UNIT_TIME_H         "h"
+    IDS_UNIT_TIME_M         "m"
+    IDS_UNIT_TIME_S         "s"
+    IDS_UNIT_SIZE_KB        "KB"
+    IDS_UNIT_SIZE_MB        "MB"
+    IDS_UNIT_SIZE_GB        "GB"
+    IDS_UNIT_SPEED_KB_S     "KB/s"
+    IDS_UNIT_SPEED_MB_S     "MB/s"
+    IDS_UNIT_SPEED_GB_S     "GB/s"
 END
 
 STRINGTABLE
