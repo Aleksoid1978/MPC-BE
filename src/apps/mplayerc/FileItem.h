@@ -21,7 +21,7 @@
 #pragma once
 
 #include "DSUtil/CUE.h"
-#include "DSUtil/FileHandle.cpp"
+#include "DSUtil/FileHandle.h"
 
 typedef std::vector<Chapters> ChaptersList;
 
