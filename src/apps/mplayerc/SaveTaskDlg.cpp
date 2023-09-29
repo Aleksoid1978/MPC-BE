@@ -64,7 +64,7 @@ CSaveTaskDlg::CSaveTaskDlg(const std::list<SaveItem_t>& saveItems, HRESULT& hr)
 		SetMainIcon(m_hIcon);
 	}
 
-	SetMainInstruction(m_saveItems.front().title + L"\n" + m_saveItems.front().dstpath);
+	SetMainInstruction(m_saveItems.front().dstpath);
 
 	SetProgressBarMarquee();
 	SetProgressBarRange(0, 1000);
@@ -492,7 +492,7 @@ HRESULT CSaveTaskDlg::OnTimer(_In_ long lTime)
 		if (iProgress >= 0 && iProgress < (int)m_saveItems.size()) {
 			CStringW path = m_saveItems[iProgress].dstpath;
 			EllipsisPath(path, 100);
-			SetMainInstruction(m_saveItems.front().title + L"\n" + path);
+			SetMainInstruction(path);
 			m_SaveStats.Reset();
 		}
 		else if (iProgress == PROGRESS_MERGING) {
