@@ -2340,6 +2340,13 @@ void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, int start, int end, C
 		return;
 	}
 
+	if (m_subtitleType == Subtitle::VTT) {
+		str = WebVTT2SSA(str);
+		if (str.IsEmpty()) {
+			return;
+		}
+	}
+
 	str.Remove(L'\r');
 	str.Replace(L"\n", L"\\N");
 	if (style.IsEmpty()) {

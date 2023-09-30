@@ -160,6 +160,10 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 			pRTS->m_dstScreenSize = DEFSCREENSIZE;
 			pRTS->CreateDefaultStyle(DEFAULT_CHARSET);
 
+			if (m_mt.subtype == MEDIASUBTYPE_WEBVTT) {
+				pRTS->m_subtitleType = Subtitle::VTT;
+			}
+
 			if (m_mt.subtype != MEDIASUBTYPE_WEBVTT && dwOffset > 0 && m_mt.cbFormat != dwOffset) {
 				CMediaType mt = m_mt;
 				if (mt.pbFormat[dwOffset+0] != 0xef
