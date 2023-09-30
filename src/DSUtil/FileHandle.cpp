@@ -94,6 +94,7 @@ CStringW RenameFileExt(LPCWSTR Path, LPCWSTR Ext)
 {
 	CStringW cs = Path;
 	::PathRenameExtensionW(cs.GetBuffer(MAX_PATH), Ext);
+	cs.ReleaseBuffer(-1);
 	return cs;
 }
 
@@ -104,6 +105,7 @@ CStringW RemoveFileExt(LPCWSTR Path)
 {
 	CStringW cs = Path;
 	::PathRemoveExtensionW(cs.GetBuffer(MAX_PATH));
+	cs.ReleaseBuffer(-1);
 	return cs;
 }
 
@@ -111,6 +113,7 @@ CStringW AddExtension(LPCWSTR Path, LPCWSTR Ext)
 {
 	CStringW cs = Path;
 	::PathAddExtensionW(cs.GetBuffer(MAX_PATH), Ext);
+	cs.ReleaseBuffer(-1);
 	return cs;
 }
 
