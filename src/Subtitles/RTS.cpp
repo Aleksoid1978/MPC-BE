@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include <intrin.h>
 #include "RTS.h"
+#include <moreuuids.h>
 
 #define MAXGDIFONTSIZE 15087
 
@@ -1571,9 +1572,6 @@ CAtlMap<CStringW, SSATagCmd, CStringElementTraits<CStringW>> CRenderedTextSubtit
 
 CRenderedTextSubtitle::CRenderedTextSubtitle(CCritSec* pLock)
 	: CSubPicProviderImpl(pLock)
-	, m_bOverrideStyle(false)
-	, m_bOverridePlacement(false)
-	, m_overridePlacement(50, 90)
 	, m_time(0)
 	, m_delay(0)
 	, m_animStart(0)
@@ -1584,6 +1582,9 @@ CRenderedTextSubtitle::CRenderedTextSubtitle(CCritSec* pLock)
 	, m_kend(0)
 	, m_nPolygon(0)
 	, m_polygonBaselineOffset(0)
+	, m_bOverrideStyle(false)
+	, m_bOverridePlacement(false)
+	, m_overridePlacement(50, 90)
 {
 	m_size = CSize(0, 0);
 
@@ -2950,6 +2951,21 @@ const bool CRenderedTextSubtitle::GetText(const REFERENCE_TIME rt, const double 
 	}
 
 	return !text.IsEmpty();
+}
+
+void CRenderedTextSubtitle::SetSubtitleTypeFromGUID(GUID subtype) {
+	if (subtype == MEDIASUBTYPE_UTF8) {
+		m_subtitleType = Subtitle::SRT;
+	}
+	else if (subtype == MEDIASUBTYPE_SSA) {
+		m_subtitleType = Subtitle::SSA;
+	}
+	else if (subtype == MEDIASUBTYPE_ASS || subtype == MEDIASUBTYPE_ASS2) {
+		m_subtitleType = Subtitle::ASS;
+	}
+	else if (subtype == MEDIASUBTYPE_WEBVTT) {
+		m_subtitleType = Subtitle::VTT;
+	}
 }
 
 //

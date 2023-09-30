@@ -508,6 +508,8 @@ public:
 	bool Init(CSize size, const CRect& vidrect); // will call Deinit()
 	void Deinit();
 
+	void SetSubtitleTypeFromGUID(GUID subtype);
+
 	DECLARE_IUNKNOWN
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
