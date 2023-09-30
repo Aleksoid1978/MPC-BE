@@ -55,8 +55,6 @@ private:
 	};
 	protocol m_protocol = protocol::PROTOCOL_NONE;
 
-	UINT64  m_len = 0;
-
 	struct {
 		struct {
 			UINT64 len;
@@ -90,7 +88,8 @@ private:
 	} m_SaveStats;
 
 	std::thread        m_SaveThread;
-	std::atomic_ullong m_pos       = 0;
+	std::atomic_ullong m_length    = 0;
+	std::atomic_ullong m_written   = 0;
 	std::atomic_int    m_iProgress = -1;
 	std::atomic_bool   m_bAbort    = false;
 
