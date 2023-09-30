@@ -3429,6 +3429,7 @@ BEGIN
     IDS_NO_MORE_MEDIA       "現在のフォルダーにはこれ以上メディアがありません。"
     IDS_FIRST_IN_FOLDER     "フォルダー内の最初のファイルが現在読み込まれています。"
     IDS_LAST_IN_FOLDER      "フォルダー内の最後のファイルが現在読み込まれています。"
+    IDS_MERGING_FILES       "Merging files..."
 END
 
 STRINGTABLE

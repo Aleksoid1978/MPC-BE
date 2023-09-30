@@ -3429,6 +3429,7 @@ BEGIN
     IDS_NO_MORE_MEDIA       "Nie ma więcej plików w bieżącym folderze."
     IDS_FIRST_IN_FOLDER     "Wczytano pierwszy plik z folderu."
     IDS_LAST_IN_FOLDER      "Wczytano ostatni plik z folderu."
+    IDS_MERGING_FILES       "Merging files..."
 END
 
 STRINGTABLE

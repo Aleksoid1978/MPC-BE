@@ -497,7 +497,7 @@ HRESULT CSaveTaskDlg::OnTimer(_In_ long lTime)
 		}
 		else if (iProgress == PROGRESS_MERGING) {
 			SetMainInstruction(m_saveItems.front().title);
-			SetContent(L"Merging files...");
+			SetContent(ResStr(IDS_MERGING_FILES));
 		}
 		m_iPrevState = iProgress;
 	}

@@ -3429,6 +3429,7 @@ BEGIN
     IDS_NO_MORE_MEDIA       "Більше немає медіафайлів в поточній теці."
     IDS_FIRST_IN_FOLDER     "Перший файл в теці запущений."
     IDS_LAST_IN_FOLDER      "Останній файл в теці запущений."
+    IDS_MERGING_FILES       "Merging files..."
 END
 
 STRINGTABLE

@@ -1506,6 +1506,7 @@
 #define IDS_NO_MORE_MEDIA               41026
 #define IDS_FIRST_IN_FOLDER             41027
 #define IDS_LAST_IN_FOLDER              41028
+#define IDS_MERGING_FILES               41030
 #define IDS_UNIT_TIME_H                 41040
 #define IDS_UNIT_TIME_M                 41041
 #define IDS_UNIT_TIME_S                 41042

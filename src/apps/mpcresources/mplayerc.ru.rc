@@ -3429,6 +3429,7 @@ BEGIN
     IDS_NO_MORE_MEDIA       "Воспроизведение медиа-файлов из каталога закончено"
     IDS_FIRST_IN_FOLDER     "Загружен первый файл в каталоге"
     IDS_LAST_IN_FOLDER      "Загружен последний файл в каталоге"
+    IDS_MERGING_FILES       "Объединение файлов..."
 END
 
 STRINGTABLE
