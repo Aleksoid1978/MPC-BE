@@ -28,8 +28,6 @@
 #include "RegexUtil.h"
 #include "DSUtil/std_helper.h"
 
-using std::wstring;
-
 static struct htmlcolor {
 	LPCWSTR name;
 	DWORD color;
@@ -3880,7 +3878,7 @@ STSStyle& operator <<= (STSStyle& s, const CString& style)
 
 static bool OpenRealText(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 {
-	wstring szFile;
+	std::wstring szFile;
 	CStringW buff;
 
 	while (file->ReadString(buff)) {
