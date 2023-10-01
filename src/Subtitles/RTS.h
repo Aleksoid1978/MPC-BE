@@ -508,6 +508,7 @@ public:
 	bool Init(CSize size, const CRect& vidrect); // will call Deinit()
 	void Deinit();
 
+	bool m_webvtt_allow_clear;
 	void SetSubtitleTypeFromGUID(GUID subtype);
 
 	DECLARE_IUNKNOWN

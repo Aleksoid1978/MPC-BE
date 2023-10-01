@@ -161,7 +161,7 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 			pRTS->m_dstScreenSize = DEFSCREENSIZE;
 			pRTS->CreateDefaultStyle(DEFAULT_CHARSET);
 
-			if (m_mt.subtype != MEDIASUBTYPE_WEBVTT && dwOffset > 0 && m_mt.cbFormat != dwOffset) {
+			if (dwOffset > 0 && m_mt.cbFormat != dwOffset) {
 				CMediaType mt = m_mt;
 				if (mt.pbFormat[dwOffset+0] != 0xef
 						&& mt.pbFormat[dwOffset+1] != 0xbb
@@ -259,8 +259,12 @@ STDMETHODIMP CSubtitleInputPin::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME
 				|| m_mt.subtype == MEDIASUBTYPE_WEBVTT))) {
 		CAutoLock cAutoLock2(m_pSubLock);
 		CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)m_pSubStream.p;
-		pRTS->RemoveAll();
-		pRTS->CreateSegments();
+		if (pRTS->m_webvtt_allow_clear || pRTS->m_subtitleType != Subtitle::VTT) {
+			pRTS->RemoveAll();
+			pRTS->CreateSegments();
+		}
+		// WebVTT can be read as one big blob of data during pin connection, instead of as samples during playback.
+		// This depends on how it is being demuxed. So clear only if we previously got data through samples.
 	} else if ((m_mt.majortype == MEDIATYPE_Subtitle && m_mt.subtype == MEDIASUBTYPE_VOBSUB)
 				|| (m_mt.majortype == MEDIATYPE_Video && m_mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE)) {
 		CAutoLock cAutoLock2(m_pSubLock);
@@ -475,20 +479,13 @@ REFERENCE_TIME CSubtitleInputPin::DecodeSample(const std::unique_ptr<SubtitleSam
 			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)m_pSubStream.p;
 
 			CStringW str = UTF8ToWStr(CStringA((LPCSTR)pData, nLen));
-			if (m_mt.subtype == MEDIASUBTYPE_WEBVTT) {
-				auto pos = str.Find(L"\r\n");
-				if (pos != -1) {
-					str.Delete(0, pos + 2);
-					pos = str.Find(L"\r\n");
-					if (pos != -1) {
-						str.Delete(0, pos + 2);
-					}
-				}
-			}
 			FastTrim(str);
 			if (!str.IsEmpty()) {
 				pRTS->Add(str, true, (int)(tStart / 10000), (int)(tStop / 10000));
 				bInvalidate = true;
+				if (pRTS->m_subtitleType == Subtitle::VTT) {
+					pRTS->m_webvtt_allow_clear = true;
+				}
 			}
 		} else if (m_mt.subtype == MEDIASUBTYPE_SSA || m_mt.subtype == MEDIASUBTYPE_ASS || m_mt.subtype == MEDIASUBTYPE_ASS2) {
 			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)m_pSubStream.p;

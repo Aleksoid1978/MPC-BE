@@ -57,6 +57,7 @@
     <ClCompile Include="HdmvSub.cpp" />
     <ClCompile Include="Rasterizer.cpp" />
     <ClCompile Include="RealTextParser.cpp" />
+    <ClCompile Include="RegexUtil.cpp" />
     <ClCompile Include="RenderedHdmvSubtitle.cpp" />
     <ClCompile Include="RenderingCache.cpp" />
     <ClCompile Include="RTS.cpp" />
@@ -82,6 +83,7 @@
     <ClInclude Include="HdmvSub.h" />
     <ClInclude Include="Rasterizer.h" />
     <ClInclude Include="RealTextParser.h" />
+    <ClInclude Include="RegexUtil.h" />
     <ClInclude Include="RenderedHdmvSubtitle.h" />
     <ClInclude Include="RenderingCache.h" />
     <ClInclude Include="RTS.h" />
