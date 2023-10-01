@@ -3429,7 +3429,7 @@ BEGIN
     IDS_NO_MORE_MEDIA       "Nincs több média az aktuális mappában."
     IDS_FIRST_IN_FOLDER     "A mappában lévő első fájl betöltése most."
     IDS_LAST_IN_FOLDER      "A mappában lévő utolsó fájl betöltése most."
-    IDS_MERGING_FILES       "Merging files..."
+    IDS_MERGING_FILES       "Fájlok egyesítése..."
 END
 
 STRINGTABLE

@@ -3429,14 +3429,14 @@ BEGIN
     IDS_NO_MORE_MEDIA       "Geçerli klasörde başka bir medya dosyası bulunmuyor."
     IDS_FIRST_IN_FOLDER     "Klasördeki ilk dosya yüklendi."
     IDS_LAST_IN_FOLDER      "Klasördeki son dosya yüklendi."
-    IDS_MERGING_FILES       "Merging files..."
+    IDS_MERGING_FILES       "Dosyalar birleştiriliyor..."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_UNIT_TIME_H         "h"
-    IDS_UNIT_TIME_M         "m"
-    IDS_UNIT_TIME_S         "s"
+    IDS_UNIT_TIME_H         "sa"
+    IDS_UNIT_TIME_M         "dk"
+    IDS_UNIT_TIME_S         "sn"
     IDS_UNIT_SIZE_KB        "KB"
     IDS_UNIT_SIZE_MB        "MB"
     IDS_UNIT_SIZE_GB        "GB"
