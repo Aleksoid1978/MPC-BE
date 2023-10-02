@@ -3429,7 +3429,7 @@ BEGIN
     IDS_NO_MORE_MEDIA       "Niente più media nella cartella corrente."
     IDS_FIRST_IN_FOLDER     "Il primo file nella cartella è ora caricato."
     IDS_LAST_IN_FOLDER      "L'ultimo file nella cartella è ora caricato."
-    IDS_MERGING_FILES       "Merging files..."
+    IDS_MERGING_FILES       "Unione file..."
 END
 
 STRINGTABLE

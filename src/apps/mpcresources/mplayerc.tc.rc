@@ -1083,7 +1083,7 @@ BEGIN
     CONTROL         "啟用 Logitech LCD 支援",IDC_CHECK_LCD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,126,264,9
     CONTROL         "啟用 Windows 媒體控制項",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,138,220,9
     CONTROL         "啟用小型記憶體傾印 (MiniDump)",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,150,184,9
-    LTEXT           "FFmpeg executable file:",IDC_STATIC,7,165,104,8
+    LTEXT           "FFmpeg 執行檔：",IDC_STATIC,7,165,104,8
     COMBOBOX        IDC_COMBO1,113,163,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "檢查更新",IDC_STATIC,5,180,286,40
     CONTROL         "啟用更新檢查",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,192,250,9
@@ -3429,14 +3429,14 @@ BEGIN
     IDS_NO_MORE_MEDIA       "目前的資料夾內已無更多媒體檔案。"
     IDS_FIRST_IN_FOLDER     "現已載入資料夾內的第一個檔案。"
     IDS_LAST_IN_FOLDER      "現已載入資料夾內的最後一個檔案"
-    IDS_MERGING_FILES       "Merging files..."
+    IDS_MERGING_FILES       "合併檔案中…"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_UNIT_TIME_H         "h"
-    IDS_UNIT_TIME_M         "m"
-    IDS_UNIT_TIME_S         "s"
+    IDS_UNIT_TIME_H         "小時"
+    IDS_UNIT_TIME_M         "分鐘"
+    IDS_UNIT_TIME_S         "秒"
     IDS_UNIT_SIZE_KB        "KB"
     IDS_UNIT_SIZE_MB        "MB"
     IDS_UNIT_SIZE_GB        "GB"
