@@ -527,7 +527,7 @@ HRESULT CSaveTaskDlg::OnTimer(_In_ long lTime)
 					   dSpeed, ResStr(speedUnits[unitSpeed]));
 
 			if (speed > 0) {
-				const REFERENCE_TIME sec = (length - written) / speed;
+				const UINT64 sec = (length - written + (speed - 1)) / speed; // round up the remaining time
 				if (sec > 0 && sec < 921600) {
 					DVD_HMSF_TIMECODE tcDur = {
 						(BYTE)(sec / 3600),
