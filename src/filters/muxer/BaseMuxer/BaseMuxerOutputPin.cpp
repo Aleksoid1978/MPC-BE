@@ -459,11 +459,11 @@ void CBaseMuxerRawOutputPin::MuxFooter(const CMediaType& mt)
 
 					fwrite(mt.Format() + si->dwOffset, mt.FormatLength() - si->dwOffset, 1, f);
 
-					CString iso6391 = ISO6392To6391(si->IsoLang);
+					CStringA iso6391(ISO6392To6391(si->IsoLang));
 					if (iso6391.IsEmpty()) {
-						iso6391 = L"--";
+						iso6391 = "--";
 					}
-					fwprintf_s(f, L"\nlangidx: 0\n\nid: %s, index: 0\n", iso6391.GetString());
+					fwprintf_s(f, L"\nlangidx: 0\n\nid: %S, index: 0\n", iso6391.GetString());
 
 					CString alt = CString(CStringW(si->TrackName));
 					if (!alt.IsEmpty()) {

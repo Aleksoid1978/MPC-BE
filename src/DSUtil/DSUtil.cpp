@@ -2199,32 +2199,32 @@ LCID ISO6392ToLcid(LPCSTR code)
 	return 0;
 }
 
-CString ISO6391To6392(LPCSTR code)
+LPCSTR ISO6391To6392(LPCSTR code)
 {
 	CHAR tmp[2+1];
 	if (strncpy_s(tmp, code, 2) == 0 && tmp[0]) {
 		_strlwr_s(tmp);
 		for (const auto& isolang : s_isolangs) {
 			if (!strcmp(isolang.iso6391, tmp)) {
-				return CString(isolang.iso6392);
+				return isolang.iso6392;
 			}
 		}
 	}
-	return L"";
+	return "";
 }
 
-CString ISO6392To6391(LPCSTR code)
+LPCSTR ISO6392To6391(LPCSTR code)
 {
 	CHAR tmp[3+1];
 	if (strncpy_s(tmp, code, 3) == 0 && tmp[0]) {
 		_strlwr_s(tmp);
 		for (const auto& isolang : s_isolangs) {
 			if (!strcmp(isolang.iso6392, tmp)) {
-				return CString(isolang.iso6391);
+				return isolang.iso6391;
 			}
 		}
 	}
-	return L"";
+	return "";
 }
 
 CString LanguageToISO6392(LPCWSTR lang)

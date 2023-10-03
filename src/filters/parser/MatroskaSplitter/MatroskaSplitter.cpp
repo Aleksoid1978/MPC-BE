@@ -1725,7 +1725,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	if (ChapterAtom* caroot = m_pFile->m_segment.FindChapterAtom(0)) {
 		CStringA str;
 		str.ReleaseBufferSetLength(GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO639LANGNAME, str.GetBuffer(3), 3));
-		CStringA ChapLanguage = CStringA(ISO6391To6392(str));
+		CStringA ChapLanguage(ISO6391To6392(str));
 		if (ChapLanguage.GetLength() < 3) {
 			ChapLanguage = "eng";
 		}
