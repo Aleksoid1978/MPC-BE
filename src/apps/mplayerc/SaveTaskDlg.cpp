@@ -343,6 +343,8 @@ void CSaveTaskDlg::SaveHTTP()
 	}
 
 	if (m_saveItems.size() >= 2 && m_ffmpegpath.GetLength()) {
+		m_iProgress = PROGRESS_MERGING;
+
 		const CPathW finalfile = m_saveItems.front().dstpath;
 		const CStringW finalext = finalfile.GetExtension().Mid(1).MakeLower();
 		const CStringW tmpfile = finalfile + L".tmp";
@@ -390,6 +392,10 @@ void CSaveTaskDlg::SaveHTTP()
 
 HRESULT CSaveTaskDlg::DownloadHTTP(CStringW url, const CStringW filepath)
 {
+	m_length = 0;
+	m_written = 0;
+	++m_iProgress;
+
 	const DWORD bufLen = 64 * KILOBYTE;
 	std::vector<BYTE> pBuffer(bufLen);
 
@@ -398,10 +404,7 @@ HRESULT CSaveTaskDlg::DownloadHTTP(CStringW url, const CStringW filepath)
 	if (FAILED(hr)) {
 		return hr;
 	}
-	m_written = 0;
-	m_length  = httpAsync.GetLenght();
-
-	++m_iProgress;
+	m_length = httpAsync.GetLenght();
 
 	if (m_bAbort) { // check after connection
 		return E_ABORT;
@@ -565,6 +568,9 @@ HRESULT CSaveTaskDlg::OnTimer(_In_ long lTime)
 			ClickCommandControl(IDCANCEL);
 			return S_FALSE;
 		}
+	}
+	else if (iProgress == PROGRESS_MERGING) {
+		return S_OK;
 	}
 	else if (m_pGB && m_pMS) {
 		CString str;
