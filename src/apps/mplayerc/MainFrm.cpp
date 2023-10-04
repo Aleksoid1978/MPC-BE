@@ -6029,7 +6029,7 @@ void CMainFrame::OnFileSaveAs()
 		if (pFileData) {
 			if (pFileData->fns.size() == 2) {
 				auto it = ++(pFileData->fns.begin());
-				//saveItems.emplace_back('a', it->GetPath(), it->GetTitle());
+				saveItems.emplace_back('a', it->GetPath(), it->GetTitle());
 				ffmpegpath = GetFullExePath(AfxGetAppSettings().strFFmpegExePath, true);
 			}
 
