@@ -68,10 +68,12 @@ CSaveTaskDlg::CSaveTaskDlg(const std::list<SaveItem_t>& saveItems, const CString
 		switch (item.type) {
 		case 'a':
 			m_dstPaths[i] = RenameFileExt(dstPath, (finalext == L".mp4") ? L".audio.m4a" : L".audio.mka");
+			break;
 		case 's':
 			CStringW subext = L"." + item.title + L".vtt";
 			FixFilename(subext);
 			m_dstPaths[i] = RenameFileExt(dstPath, subext);
+			break;
 		}
 	}
 
