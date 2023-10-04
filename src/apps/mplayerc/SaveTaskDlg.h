@@ -31,16 +31,19 @@ class CSaveTaskDlg : public CTaskDialog
 public:
 	struct SaveItem_t {
 		char type = 0;
-		CStringW title;
 		CStringW path; // file path or url
-		CStringW dstpath;
-		SaveItem_t(const char _type, const CStringW& _title, const CStringW& _path, const CStringW& _dstpath)
-			: type(_type), title(_title), path(_path), dstpath(_dstpath) {}
+		CStringW title;
+		SaveItem_t(const char _type, const CStringW& _path, const CStringW& _title)
+			: type(_type)
+			, path(_path)
+			, title(_title)
+		{}
 	};
 
 private:
 	const std::vector<SaveItem_t> m_saveItems;
-	CStringW m_ffmpegpath;
+	std::vector<CStringW> m_dstPaths;
+	CStringW m_ffmpegPath;
 
 	HICON m_hIcon;
 
@@ -104,7 +107,7 @@ private:
 	sockaddr_in m_addr = {};
 
 public:
-	CSaveTaskDlg(const std::list<SaveItem_t>& saveItems, HRESULT& hr);
+	CSaveTaskDlg(const std::list<SaveItem_t>& saveItems, const CStringW& dstPath, HRESULT& hr);
 
 	void SetFFmpegPath(const CStringW& ffmpegpath);
 	bool IsCompleteOk();

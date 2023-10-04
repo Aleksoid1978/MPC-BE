@@ -50,13 +50,29 @@ enum {
 // CSaveTaskDlg dialog
 
 IMPLEMENT_DYNAMIC(CSaveTaskDlg, CTaskDialog)
-CSaveTaskDlg::CSaveTaskDlg(const std::list<SaveItem_t>& saveItems, HRESULT& hr)
+CSaveTaskDlg::CSaveTaskDlg(const std::list<SaveItem_t>& saveItems, const CStringW& dstPath, HRESULT& hr)
 	: CTaskDialog(L"", L"", ResStr(IDS_SAVE_FILE), TDCBF_CANCEL_BUTTON, TDF_CALLBACK_TIMER | TDF_POSITION_RELATIVE_TO_WINDOW)
 	, m_saveItems(saveItems.cbegin(), saveItems.cend())
 {
-	if (m_saveItems.empty()) {
+	if (m_saveItems.empty() || dstPath.IsEmpty()) {
 		hr = E_INVALIDARG;
 		return;
+	}
+
+	const CStringW finalext = CPathW(dstPath).GetExtension().MakeLower();
+
+	m_dstPaths.resize(m_saveItems.size());
+	m_dstPaths[0] = dstPath;
+	for (unsigned i = 1; i < m_saveItems.size(); ++i) {
+		const auto& item = m_saveItems[i];
+		switch (item.type) {
+		case 'a':
+			m_dstPaths[i] = RenameFileExt(dstPath, (finalext == L".mp4") ? L".audio.m4a" : L".audio.mka");
+		case 's':
+			CStringW subext = L"." + item.title + L".vtt";
+			FixFilename(subext);
+			m_dstPaths[i] = RenameFileExt(dstPath, subext);
+		}
 	}
 
 	m_hIcon = (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
@@ -64,7 +80,7 @@ CSaveTaskDlg::CSaveTaskDlg(const std::list<SaveItem_t>& saveItems, HRESULT& hr)
 		SetMainIcon(m_hIcon);
 	}
 
-	SetMainInstruction(m_saveItems.front().dstpath);
+	SetMainInstruction(m_dstPaths.front());
 
 	SetProgressBarMarquee();
 	SetProgressBarRange(0, 1000);
@@ -77,7 +93,7 @@ CSaveTaskDlg::CSaveTaskDlg(const std::list<SaveItem_t>& saveItems, HRESULT& hr)
 
 void CSaveTaskDlg::SetFFmpegPath(const CStringW& ffmpegpath)
 {
-	m_ffmpegpath = ffmpegpath;
+	m_ffmpegPath = ffmpegpath;
 }
 
 bool CSaveTaskDlg::IsCompleteOk()
@@ -204,7 +220,7 @@ HRESULT CSaveTaskDlg::InitFileCopy()
 
 		if (!pReader) {
 			const DWORD fileOpflags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR | FOFX_NOMINIMIZEBOX;
-			hr = FileOperation(m_saveItems.front().path, m_saveItems.front().dstpath, FO_COPY, fileOpflags);
+			hr = FileOperation(m_saveItems.front().path, m_dstPaths.front(), FO_COPY, fileOpflags);
 			DLogIf(FAILED(hr), L"CSaveTaskDlg : file copy was aborted with error %s", HR2Str(hr));
 
 			return E_ABORT;
@@ -237,7 +253,7 @@ fail:
 		return S_FALSE;
 	}
 	CComQIPtr<IFileSinkFilter2> pFSF = pDst.p;
-	pFSF->SetFileName(m_saveItems.front().dstpath, nullptr);
+	pFSF->SetFileName(m_dstPaths.front(), nullptr);
 	pFSF->SetMode(AM_FILE_OVERWRITE);
 
 	if (FAILED(m_pGB->AddFilter(pDst, L"File Writer"))) {
@@ -282,7 +298,7 @@ void CSaveTaskDlg::SaveUDP()
 
 	m_iProgress = -1;
 
-	HANDLE hFile = CreateFileW(m_saveItems.front().dstpath, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	HANDLE hFile = CreateFileW(m_dstPaths.front(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		return;
 	}
@@ -334,30 +350,34 @@ void CSaveTaskDlg::SaveHTTP()
 
 	m_iProgress = -1;
 
-	for (const auto& item : m_saveItems) {
-		HRESULT hr = DownloadHTTP(item.path, item.dstpath);
+	for (unsigned i = 0; i < m_saveItems.size(); ++i) {
+		HRESULT hr = DownloadHTTP(m_saveItems[i].path, m_dstPaths[i]);
 		if (FAILED(hr)) {
 			m_bAbort = true;
 			return;
 		}
 	}
 
-	if (m_saveItems.size() >= 2 && m_ffmpegpath.GetLength()) {
+	if (m_saveItems.size() >= 2 && m_ffmpegPath.GetLength()) {
 		m_iProgress = PROGRESS_MERGING;
 
-		const CPathW finalfile = m_saveItems.front().dstpath;
+		const CPathW finalfile  = m_dstPaths.front();
 		const CStringW finalext = finalfile.GetExtension().Mid(1).MakeLower();
-		const CStringW tmpfile = finalfile + L".tmp";
+		const CStringW tmpfile  = finalfile + L".tmp";
 
 		CStringW mapping;
 		CStringW metadata;
 		unsigned isub = 0;
 		CStringW strArgs = L"-y";
 		for (unsigned i = 0; i < m_saveItems.size(); ++i) {
-			strArgs.AppendFormat(LR"( -i "%s")", m_saveItems[i].dstpath);
+			const auto& item = m_saveItems[i];
+
+			strArgs.AppendFormat(LR"( -i "%s")", m_dstPaths[i]);
 			mapping.AppendFormat(L" -map %u", i);
-			if (m_saveItems[i].type == 's') {
-				mapping.AppendFormat(LR"( -metadata:s:s:%u title="%s")", isub, m_saveItems[i].title);
+			if (item.type == 's') {
+				if (item.title.GetLength()) {
+					metadata.AppendFormat(LR"( -metadata:s:s:%u title="%s")", isub, item.title);
+				}
 				isub++;
 			}
 		}
@@ -366,10 +386,11 @@ void CSaveTaskDlg::SaveHTTP()
 			strArgs.Append(L" -c:s mov_text");
 		}
 		strArgs.Append(mapping);
+		strArgs.Append(metadata);
 		strArgs.AppendFormat(LR"( -f %s "%s")", finalext, tmpfile);
 
 		SHELLEXECUTEINFOW execinfo = { sizeof(execinfo) };
-		execinfo.lpFile = m_ffmpegpath.GetString();
+		execinfo.lpFile = m_ffmpegPath.GetString();
 		execinfo.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_NO_UI;
 		execinfo.nShow = SW_HIDE;
 		execinfo.lpParameters = strArgs.GetString();
@@ -380,8 +401,8 @@ void CSaveTaskDlg::SaveHTTP()
 		}
 
 		if (PathFileExistsW(tmpfile)) {
-			for (const auto& item : m_saveItems) {
-				DeleteFileW(item.dstpath);
+			for (const auto& dstpath : m_dstPaths) {
+				DeleteFileW(dstpath);
 			}
 			MoveFileW(tmpfile, finalfile);
 		}
@@ -493,7 +514,7 @@ HRESULT CSaveTaskDlg::OnTimer(_In_ long lTime)
 
 	if (iProgress != m_iPrevState) {
 		if (iProgress >= 0 && iProgress < (int)m_saveItems.size()) {
-			CStringW path = m_saveItems[iProgress].dstpath;
+			CStringW path = m_dstPaths[iProgress];
 			EllipsisPath(path, 100);
 			SetMainInstruction(path);
 			m_SaveStats.Reset();
