@@ -790,6 +790,8 @@ void File_DtsUhd::ExtractChMaskParams(MD01* MD01, MDObject* Object)
     else
         Object->ChActivityMask=MaskTable[ChLayoutIndex];
     Element_End0();
+
+    IsType1CertifiedContent=ChLayoutIndex==14 && (Object->ChActivityMask==0xF || Object->ChActivityMask==0x2F || Object->ChActivityMask==0x802F);
 }
 
 /* Table 7-22 */
@@ -1363,6 +1365,7 @@ File_DtsUhd::File_DtsUhd()
     #if MEDIAINFO_TRACE
         Trace_Layers_Update(8); //Stream
     #endif //MEDIAINFO_TRACE
+    IsType1CertifiedContent=false;
     LongTermLoudnessIndex=(int8u)-1;
     MustSynchronize=true;
     Buffer_TotalBytes_FirstSynched_Max=32*1024;
@@ -1380,9 +1383,11 @@ void File_DtsUhd::Streams_Fill()
         int32u MaxPayload=2048<<FrameDescriptor.MaxPayloadCode;
         BitRate_Max = 8.0f * MaxPayload * SampleRate / FrameDuration;
     }
-    std::string AudioCodec="dtsx", ProfileString="DTS:X P2";
+    std::string AudioCodec="dtsx", CommercialString="DTS:X P2";
     AudioCodec.back()+=FrameDescriptor.DecoderProfileCode > 0;
-    ProfileString.back()+=FrameDescriptor.DecoderProfileCode;
+    CommercialString.back()+=FrameDescriptor.DecoderProfileCode;
+    if (IsType1CertifiedContent)
+        CommercialString+=" with IMAX Enhanced";
 
     Fill(Stream_General, 0, General_Format, "DTS-UHD");
     Fill(Stream_General, 0, General_OverallBitRate_Mode, "VBR");
@@ -1393,9 +1398,11 @@ void File_DtsUhd::Streams_Fill()
     Fill(Stream_Audio, 0, Audio_BitRate_Mode, "VBR", Unlimited, true, true);
     Fill(Stream_Audio, 0, Audio_Codec, AudioCodec);
     Fill(Stream_Audio, 0, Audio_Format, "DTS-UHD");
-    Fill(Stream_Audio, 0, Audio_Format_Commercial_IfAny, ProfileString);
+    Fill(Stream_Audio, 0, Audio_Format_Commercial_IfAny, CommercialString);
     Fill(Stream_Audio, 0, Audio_Format_Profile, FrameDescriptor.DecoderProfileCode + 2);
     Fill(Stream_Audio, 0, Audio_Format_Settings, RepresentationTypeTable[FrameDescriptor.RepType]);
+    if (IsType1CertifiedContent)
+        Fill(Stream_Audio, 0, Audio_Format_Settings, "T1-CC");
     Fill(Stream_Audio, 0, Audio_SamplesPerFrame, FrameDescriptor.SampleCount, 10, true);
     if (SampleRate)
         Fill(Stream_Audio, 0, Audio_SamplingRate, SampleRate);

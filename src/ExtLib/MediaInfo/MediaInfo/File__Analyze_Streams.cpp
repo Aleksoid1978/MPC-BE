@@ -3986,6 +3986,18 @@ size_t File__Analyze::Fill_Parameter(stream_t StreamKind, generic StreamPos)
                                     case Generic_Codec_String : return Image_Codec_String;
                                     case Generic_Codec_Info : return Image_Codec_Info;
                                     case Generic_Codec_Url : return Image_Codec_Url;
+                                    case Generic_Duration : return Menu_Duration;
+                                    case Generic_Duration_String : return Menu_Duration_String;
+                                    case Generic_Duration_String1 : return Menu_Duration_String1;
+                                    case Generic_Duration_String2 : return Menu_Duration_String2;
+                                    case Generic_Duration_String3 : return Menu_Duration_String3;
+                                    case Generic_Duration_String4 : return Menu_Duration_String4;
+                                    case Generic_Duration_String5 : return Menu_Duration_String5;
+                                    case Generic_FrameRate : return Menu_FrameRate;
+                                    case Generic_FrameRate_String: return Menu_FrameRate_String;
+                                    case Generic_FrameRate_Num: return Menu_FrameRate_Num;
+                                    case Generic_FrameRate_Den: return Menu_FrameRate_Den;
+                                    case Generic_FrameCount : return Menu_FrameCount;
                                     case Generic_ColorSpace : return Image_ColorSpace;
                                     case Generic_ChromaSubsampling : return Image_ChromaSubsampling;
                                     case Generic_Resolution : return Image_Resolution;

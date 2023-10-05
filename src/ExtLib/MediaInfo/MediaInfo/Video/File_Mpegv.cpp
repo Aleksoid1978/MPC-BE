@@ -2538,16 +2538,22 @@ void File_Mpegv::slice_start()
             Time_End_Frames =Time_Current_Frames+(int8u)temporal_reference;
         }
 
+        bool IsSecondField=false;
         if (temporal_reference==temporal_reference_Old)
         {
             Frame_Count--;
             if (IFrame_IsParsed && Frame_Count_NotParsedIncluded!=(int64u)-1)
                 Frame_Count_NotParsedIncluded--;
             Frame_Count_InThisBlock--;
-            if (FrameInfo.DTS!=(int64u)-1)
-                FrameInfo.DTS-=tc_ToAdd;
-            if (FrameInfo.PTS!=(int64u)-1)
-                FrameInfo.PTS-=tc_ToAdd;
+            if (!progressive_sequence && picture_coding_type!=3)
+                IsSecondField=true;
+            else
+            {
+                if (FrameInfo.DTS!=(int64u)-1)
+                    FrameInfo.DTS-=tc_ToAdd;
+                if (FrameInfo.PTS!=(int64u)-1)
+                    FrameInfo.PTS-=tc_ToAdd;
+            }
         }
         else
         {
@@ -2565,6 +2571,8 @@ void File_Mpegv::slice_start()
         if (PTS_LastIFrame!=(int64u)-1)
         {
             FrameInfo.PTS=PTS_LastIFrame+(temporal_reference-temporal_reference_LastIFrame)*tc;
+            if (IsSecondField)
+                FrameInfo.PTS+=tc_ToAdd;
             if ((PTS_Begin==(int64u)-1 && picture_coding_type==1) //IFrame
              || (IFrame_Count<2 && group_start_IsParsed && group_start_closed_gop && FrameInfo.PTS<PTS_Begin))
                 PTS_Begin=FrameInfo.PTS;

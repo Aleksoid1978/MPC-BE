@@ -796,6 +796,7 @@ Language_eu;baszk
 Language_fa;perzsa
 Language_ff;
 Language_fi;finn
+Language_fil;
 Language_fj;fidzsi
 Language_fo;férői
 Language_fr;francia
@@ -1365,5 +1366,5 @@ Written_Location;Írás helye
 WrittenBy;Írta
 Yes;igen
 Your system;Rendszer
-ZZ_Automatic_Percent;63
+ZZ_Automatic_Percent;62
 ZZ_AutomaticLanguage_Percent;69

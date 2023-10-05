@@ -137,7 +137,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const Char*  MediaInfo_Version=__T("MediaInfoLib - v23.07");
+const Char*  MediaInfo_Version=__T("MediaInfoLib - v23.10");
 const Char*  MediaInfo_Url=__T("http://MediaArea.net/MediaInfo");
       Ztring EmptyZtring;       //Use it when we can't return a reference to a true Ztring
 const Ztring EmptyZtring_Const; //Use it when we can't return a reference to a true Ztring, const version
@@ -484,6 +484,7 @@ void MediaInfo_Config::Init(bool Force)
     CarriageReturnReplace=__T(" / ");
     #if MEDIAINFO_ADVANCED
         Collection_Trigger=-2;
+        Collection_Display=display_if::Needed;
     #endif
     #if MEDIAINFO_EVENTS
         Event_CallBackFunction=NULL;
@@ -1449,6 +1450,16 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
         #if MEDIAINFO_ADVANCED
             Collection_Trigger_Set(Value);
             return Ztring();
+        #else // MEDIAINFO_ADVANCED
+            return __T("advanced features are disabled due to compilation options");
+        #endif // MEDIAINFO_ADVANCED
+    }
+    if (Option_Lower==__T("collection_display"))
+    {
+        #if MEDIAINFO_ADVANCED
+            String Value_Lower(Value);
+            transform(Value_Lower.begin(), Value_Lower.end(), Value_Lower.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+            return Collection_Display_Set(Value_Lower);
         #else // MEDIAINFO_ADVANCED
             return __T("advanced features are disabled due to compilation options");
         #endif // MEDIAINFO_ADVANCED
@@ -3511,6 +3522,36 @@ int64s MediaInfo_Config::Collection_Trigger_Get()
     CriticalSectionLocker CSL(CS);
 
     return Collection_Trigger;
+}
+#endif // MEDIAINFO_ADVANCED
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_ADVANCED
+Ztring MediaInfo_Config::Collection_Display_Set(const Ztring& Value)
+{
+    display_if ValueI;
+    if (Value==__T("never"))
+        ValueI=display_if::Never;
+    else if (Value==__T("needed"))
+        ValueI=display_if::Needed;
+    else if (Value.empty() || Value==__T("supported"))
+        ValueI=display_if::Supported;
+    else if (Value==__T("always"))
+        ValueI=display_if::Always;
+    else
+        return __T("Unknown Collection_Display value");
+
+    CriticalSectionLocker CSL(CS);
+
+    Collection_Display=ValueI;
+    return Ztring();
+}
+
+display_if MediaInfo_Config::Collection_Display_Get()
+{
+    CriticalSectionLocker CSL(CS);
+
+    return Collection_Display;
 }
 #endif // MEDIAINFO_ADVANCED
 

@@ -266,7 +266,7 @@ File_MpegPs::~File_MpegPs()
 //---------------------------------------------------------------------------
 void File_MpegPs::Streams_Accept()
 {
-    if (!IsSub && !Config->File_IsReferenced_Get() && File_Name.size()>=5 && File_Name.find(__T("1.VOB"), File_Name.size()-5)!=string::npos && File_Size>=0x3F000000 && File_Size<0x40000000)
+    if (!IsSub && File_Name.size()>=5 && File_Name.find(__T("1.VOB"), File_Name.size()-5)!=string::npos && File_Size>=0x3F000000 && File_Size<0x40000000)
         TestContinuousFileNames(1, Ztring(), true);
 }
 
@@ -3226,9 +3226,12 @@ void File_MpegPs::private_stream_2()
     }
     else //DVD?
     {
-        Stream_Prepare(Stream_Menu);
-        Fill(Stream_Menu, StreamPos_Last, Menu_Format, "DVD-Video");
-        Fill(Stream_Menu, StreamPos_Last, Menu_Codec, "DVD-Video");
+        if (!Config->File_IsReferenced_Get()) //If referenced by e.g. IFO, we use menu stream from the referencing format
+        {
+            Stream_Prepare(Stream_Menu);
+            Fill(Stream_Menu, StreamPos_Last, Menu_Format, "DVD-Video");
+            Fill(Stream_Menu, StreamPos_Last, Menu_Codec, "DVD-Video");
+        }
         Streams[0xBF].StreamKind=StreamKind_Last;
         Streams[0xBF].StreamPos=StreamPos_Last;
 
@@ -3356,8 +3359,9 @@ void File_MpegPs::audio_stream()
         if (Streams[stream_id].Parsers[Streams[stream_id].Parsers.size()-1]==NULL)
         {
             Streams[stream_id].Parsers.clear();
-            #if defined(MEDIAINFO_MPEGA_YES)
-                Streams[stream_id].Parsers.push_back(ChooseParser_Mpega());
+            #if defined(MEDIAINFO_MPEGH3DA_YES)
+                if (Streams[stream_id].stream_type==45) // No synch available
+                    Streams[stream_id].Parsers.push_back(ChooseParser_Mpegh3da());
             #endif
             #if defined(MEDIAINFO_AC3_YES)
                 Streams[stream_id].Parsers.push_back(ChooseParser_AC3());
@@ -3373,6 +3377,9 @@ void File_MpegPs::audio_stream()
             #endif
             #if defined(MEDIAINFO_AAC_YES)
                 Streams[stream_id].Parsers.push_back(ChooseParser_Latm());
+            #endif
+            #if defined(MEDIAINFO_MPEGA_YES)
+                Streams[stream_id].Parsers.push_back(ChooseParser_Mpega());
             #endif
         }
         for (size_t Pos=0; Pos<Streams[stream_id].Parsers.size(); Pos++)

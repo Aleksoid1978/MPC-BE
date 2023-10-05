@@ -318,6 +318,15 @@ void File_Riff::Streams_Finish ()
                     Fill(StreamKind_Last, StreamPos_Last, General_ID, Temp_ID, true);
                     Fill(StreamKind_Last, StreamPos_Last, General_StreamOrder, Temp_ID_String, true);
 
+                    //Special case: multiple fmt/data chunks in WAV
+                    if (StreamKind_Last==Stream_Audio //TODO: smarter merge
+                        && Temp->second.Compression==1
+                        && Retrieve(Stream_General, 0, General_Format)==__T("Wave")
+                        && Temp->second.Parsers[0]->Get(Stream_Audio, 0, Audio_Format)==__T("PCM"))
+                    {
+                        for (size_t i=0; i<StreamPos_Base; i++)
+                            Merge(*Temp->second.Parsers[0], Stream_Audio, i, i);
+                    }
 
                     //Special case - MPEG Video + Captions
                     if (StreamKind_Last==Stream_Video && Temp->second.Parsers[0]->Count_Get(Stream_Text))
@@ -859,7 +868,7 @@ bool File_Riff::Header_Begin()
                 if (StreamItem->second.Parsers.size()>1 || (!StreamItem->second.Parsers.empty() && !StreamItem->second.Parsers[0]->Status[IsFilled]))
                     ShouldStop=false;
         }
-        if (ShouldStop)
+        if (ShouldStop && Buffer_DataToParse_End)
         {
             File_GoTo=Buffer_DataToParse_End;
             Buffer_Offset=Buffer_Size;

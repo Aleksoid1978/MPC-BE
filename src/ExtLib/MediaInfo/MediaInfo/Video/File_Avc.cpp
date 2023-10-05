@@ -3087,49 +3087,43 @@ void File_Avc::sei_message_pic_timing(int32u /*payloadSize*/, int32u seq_paramet
         {
             Element_Begin1("ClockTS");
             TEST_SB_SKIP(                                       "clock_timestamp_flag");
-                Ztring TimeStamp;
                 int32u time_offset=0;
                 int8u n_frames;
-                bool full_timestamp_flag, nuit_field_based_flag;
+                bool nuit_field_based_flag, full_timestamp_flag, cnt_dropped_flag, seconds_flag, minutes_flag, hours_flag;
                 Info_S1(2, ct_type,                             "ct_type"); Param_Info1(Avc_ct_type[ct_type]);
                 Get_SB (   nuit_field_based_flag,               "nuit_field_based_flag");
                 Skip_S1(5,                                      "counting_type");
                 Get_SB (   full_timestamp_flag,                 "full_timestamp_flag");
                 Skip_SB(                                        "discontinuity_flag");
-                Skip_SB(                                        "cnt_dropped_flag");
+                Get_SB (   cnt_dropped_flag,                    "cnt_dropped_flag");
                 Get_S1 (8, n_frames,                            "n_frames");
-                if (full_timestamp_flag)
-                {
-                    Get_S1 (6, seconds_value,                    "seconds_value");
-                    Get_S1 (6, minutes_value,                    "minutes_value");
-                    Get_S1 (5, hours_value,                      "hours_value");
-                }
-                else
-                {
-                    TEST_SB_SKIP(                               "seconds_flag");
-                        Get_S1 (6, seconds_value,               "seconds_value");
-                        TEST_SB_SKIP(                           "minutes_flag");
-                            Get_S1 (6, minutes_value,           "minutes_value");
-                            TEST_SB_SKIP(                       "hours_flag");
-                                Get_S1 (5, hours_value,         "hours_value");
-                            TEST_SB_END();
-                        TEST_SB_END();
-                    TEST_SB_END();
-                }
-                TimeStamp=Ztring::ToZtring(hours_value)+__T(':')+Ztring::ToZtring(minutes_value)+__T(':')+Ztring::ToZtring(seconds_value);
+                seconds_flag=minutes_flag=hours_flag=full_timestamp_flag;
+                if (!full_timestamp_flag)
+                    Get_SB (seconds_flag,                       "seconds_flag");
+                if (seconds_flag)
+                    Get_S1 (6, seconds_value,                   "seconds_value");
+                if (!full_timestamp_flag && seconds_flag)
+                    Get_SB (minutes_flag,                       "minutes_flag");
+                if (minutes_flag)
+                    Get_S1 (6, minutes_value,                   "minutes_value");
+                if (!full_timestamp_flag && minutes_flag)
+                    Get_SB (hours_flag,                         "hours_flag");
+                if (hours_flag)
+                    Get_S1 (5, hours_value,                     "hours_value");
                 if ((*seq_parameter_set_Item)->CpbDpbDelaysPresentFlag())
                 {
                     int8u time_offset_length=(*seq_parameter_set_Item)->vui_parameters->NAL?(*seq_parameter_set_Item)->vui_parameters->NAL->time_offset_length:(*seq_parameter_set_Item)->vui_parameters->VCL->time_offset_length; //Spec is not precise, I am not sure
                     if (time_offset_length)
                         Get_S4 (time_offset_length, time_offset,    "time_offset");
                 }
-                if ((*seq_parameter_set_Item)->vui_parameters && (*seq_parameter_set_Item)->vui_parameters->timing_info_present_flag && (*seq_parameter_set_Item)->vui_parameters->time_scale)
-                {
-                    float32 Milliseconds=((float32)(n_frames*((*seq_parameter_set_Item)->vui_parameters->num_units_in_tick*(1+(nuit_field_based_flag?1:0)))+time_offset))/(*seq_parameter_set_Item)->vui_parameters->time_scale;
-                    TimeStamp+=__T('.');
-                    TimeStamp+=Ztring::ToZtring(Milliseconds);
-                }
-                Element_Info1(TimeStamp);
+                FILLING_BEGIN();
+                    if (!i && seconds_flag && minutes_flag && hours_flag && !Frame_Count)
+                    {
+                        TimeCode TC(hours_value, minutes_value, seconds_value, n_frames, -1, TimeCode::DropFrame(cnt_dropped_flag));
+                        Fill(Stream_Video, 0, Video_TimeCode_FirstFrame, TC.ToString(), true, true);
+                        Element_Info1(TC.ToString());
+                    }
+                FILLING_END();
             TEST_SB_END();
             Element_End0();
         }
@@ -3277,7 +3271,11 @@ void File_Avc::sei_message_user_data_registered_itu_t_t35_GA94_03_Delayed(int32u
             TemporalReferences_Min_New--;
         TemporalReferences_Min=TemporalReferences_Min_New;
         while (TemporalReferences[TemporalReferences_Min]==NULL)
+        {
             TemporalReferences_Min++;
+            if (TemporalReferences_Min>=TemporalReferences.size())
+                return;
+        }
     }
 
     // Parsing captions

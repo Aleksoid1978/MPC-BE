@@ -206,7 +206,7 @@ AudioSceneInfoID;ID informazioni scena audio
 AudioTrackLayout;Layout traccia audio
 Author;Autore
 Back4ToBack2;Posteriore 4 a posteriore 2
-Balance_FrontBackListener;Bilancia ascolto frontale posteriore
+Balance_FrontBackListener;Bilancia ascolto frontale/posteriore
 Balance_FrontBackOverheadFloor;Bilancia frontale piano sopraelevato
 BarCode;Codice a barre
 Basic;Semplice
@@ -229,7 +229,7 @@ Bits-(Pixel*Frame);Bit/(pixel*frame)
 BufferSize; Dim. buffer
 Cancel;Annulla
 CaptionServiceName;Titolo nome servizio
-CatalogNumber;
+CatalogNumber;Numero catalogo
 Channel(s);Canali
 ChannelCoded;Canale codificato
 ChannelConfiguration;Configurazione canale
@@ -243,7 +243,7 @@ Chapters stream(s);Capitoli
 Chapters_Codec_List;Codec capitoli
 Chapters_No;Nessun capitolo
 ChaptersCount;Numero dei capitoli
-CharacterSet;
+CharacterSet;Set caratteri
 CheckNewVersion;Controlla aggiornamenti programma
 Choose custom;Vista personalizzata
 Choose custom sheet;Personalizza modalità scheda
@@ -304,7 +304,7 @@ Compression_Ratio; Rapporto compressione
 Conductor;Direttore d'orchestra 
 ConformanceCheck;Controllo di conformità
 ConformanceErrors;Errore conformità
-ConformanceInfos;Inbfo conformità
+ConformanceInfos;Info conformità
 ConformanceWarnings;Avviso conformità
 ContactEmail;Email contatto
 ContactTelephoneNumber;Telefono contatto
@@ -330,7 +330,7 @@ DarkMode;Modo scuro
 Date;Data
 Debug;Debug
 Decimal point;Separatore decimale
-Default;
+Default;Predefinito
 Default_Setting;Predefinito sistema
 DefaultTargetDeviceConfig;Configurazione predefinita dispositivo destinazione
 Delay;Ritardo
@@ -339,7 +339,7 @@ Delay_Source_Container;Contenitore
 Delay_Source_Stream;Flusso RAW
 Delete;Elimina
 Description;Descrizione
-Details;
+Details;Dettagli
 dialnorm;Finestra normalizzazione
 DialogueCorrected;Dialogo corretto
 DialogueEnhancement;Miglioramento del dialogo
@@ -389,7 +389,7 @@ EPG_Positions;Posizioni EPG (interne)
 EpisodeTitleNumber;Numero titolo episodio
 Error_File;Errore nella lettura del file
 Error_File_Write;Errore durante la scrittura del file
-Events_MinDuration;
+Events_MinDuration;Durata minima per evento
 Events_PaintOn;N. eventi PaintOn
 Events_PopOn;N. eventi PopOn
 Events_RollUp;N. eventi RollUp
@@ -426,7 +426,7 @@ Folder (R)_Hint;Seleziona cartella da analizzare (e le sue sottocartelle)
 Folder (Recursively);Cartella (e sottocartelle)
 Folder_Hint;Seleziona cartella da analizzare
 FolderName;Cartella
-Forced;
+Forced;Forzato
 Format;Formato
 Format_Commercial;Nome commerciale
 Format_Commercial_IfAny;Nome commerciale
@@ -479,9 +479,9 @@ FrameRate_Mode_VFR;Variabile
 FrameRate_Nominal;Frequenza fotogrammi nominale
 FrameRate_Original;Frequenza fotogrammi originale
 FrameRate_Real;Frequenza fotogrammi reale
-FullParsing;
+FullParsing;Analisi completa
 General;Generale
-GeneralCompliance;
+GeneralCompliance;Conformità generale
 Genre;Genere
 Genre_000;Blues
 Genre_001;Rock Classico
@@ -727,20 +727,20 @@ IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
 JocBalance_FrontBackListener;Bilanciamento ascoltatore anteriore/posteriore
-JocBalance_FrontBackOverheadFloor;Bilanciamento overhead anteriore/posteriore pavimento
+JocBalance_FrontBackOverheadFloor;Bilanciamento sopraelevato anteriore/posteriore pavimento
 JocTrim_Center;Ritaglio centrale
 JocTrim_Height;Ritaglio in altezza
 JocTrim_Surround;Ritaglio surround
 JocTrimMode;Modo ritaglio
-JocTrimMode0i;Modo ritaglio per 2.0 (stereo)
-JocTrimMode1i;Modo ritaglio per 5.1
-JocTrimMode2i;Modo ritaglio per 7.1
-JocTrimMode3i;Modo ritaglio per 2.1.2
-JocTrimMode4i;Modo ritaglio per 5.1.2
-JocTrimMode5i;Modo ritaglio per 7.1.2
-JocTrimMode6i;Modo ritaglio per 2.1.4
-JocTrimMode7i;Modo ritaglio per 5.1.4
-JocTrimMode8i;Modo ritaglio per 7.1.4
+JocTrimMode0i;Modo ritaglio audio 2.0 (stereo)
+JocTrimMode1i;Modo ritaglio audio 5.1
+JocTrimMode2i;Modo ritaglio audio 7.1
+JocTrimMode3i;Modo ritaglio audio 2.1.2
+JocTrimMode4i;Modo ritaglio audio 5.1.2
+JocTrimMode5i;Modo ritaglio audio 7.1.2
+JocTrimMode6i;Modo ritaglio audio 2.1.4
+JocTrimMode7i;Modo ritaglio audio 5.1.4
+JocTrimMode8i;Modo ritaglio audio 7.1.4
 Keywords;Parole chiavi
 Known codecs;Codec conosciuti
 Known formats;Formati conosciuti
@@ -772,7 +772,7 @@ Language_bs;Bosniaco
 Language_ca;Catalano
 Language_ce;Ceceno
 Language_ch;Chamorro
-Language_cmn;
+Language_cmn;Mandarino
 Language_co;Corso
 Language_cr;Cree
 Language_cs;Ceco
@@ -796,6 +796,7 @@ Language_eu;basco
 Language_fa;Persiano
 Language_ff;Fula
 Language_fi;Finnico
+Language_fil;
 Language_fj;Fijian
 Language_fo;Faroese
 Language_fr;Francese
@@ -942,17 +943,17 @@ Language_wo;Wolof
 Language_xh;Xhosa
 Language_yi;Yiddish
 Language_yo;Yoruba
-Language_yue;
+Language_yue;Cantonese
 Language_za;Zhuang
 Language_zh;Cinese
-Language_zh-cmn;
+Language_zh-cmn;Mandarin
 Language_zh-cn;Cinese (Cina)
-Language_zh-CN;
-Language_zh-Hans;
-Language_zh-Hant;
+Language_zh-CN;Cinese (Cina)
+Language_zh-Hans;Ciense (semplificato)
+Language_zh-Hant;Ciense (tradizionale)
 Language_zh-tw;Cinese (Taiwan)
-Language_zh-TW;
-Language_zh-yue;
+Language_zh-TW;Cinese (Taiwan)
+Language_zh-yue;Cantonese
 Language_zu;Zulu
 LawRating;Classificazione legale
 LCCN;LCCN
@@ -966,18 +967,18 @@ Lines_MaxCountPerEvent;N. max linee per evento
 LineUpStart;Avvio lineup
 LinkedTo_Bed_Pos;Letto #s
 LinkedTo_ChannelFormat_Pos;Formato canale #s
-LinkedTo_ComplementaryObject_Pos;Posizione oggetto complementare
+LinkedTo_ComplementaryObject_Pos;Oggetto complementare #s
 LinkedTo_Content_Pos;Contenuto #s
 LinkedTo_Group_Pos;Gruppo #s
 LinkedTo_Object_Pos;Oggetto #s
 LinkedTo_PackFormat_Pos;Formato pacchetto #s
 LinkedTo_SignalGroup_Pos;Gruppo segnale #s
-LinkedTo_StreamFormat_Pos;Posizione formato stream
-LinkedTo_Substream_Pos;Sottoflusso #s
+LinkedTo_StreamFormat_Pos;Formato stream #s
+LinkedTo_Substream_Pos;Sotto stream #s
 LinkedTo_TrackFormat_Pos;Formato traccia #s
 LinkedTo_TrackUID_Pos;UID traccia #s
 List;Elenco
-LongTermLoudness;
+LongTermLoudness;Loudness lungo termine
 LoRoCenterMixGain;Guadagno mix LoRo
 LoRoSurroundMixGain;Guadagno mix surround LoRo
 Loudness_Anchor;Ancoraggio loudness
@@ -1015,8 +1016,8 @@ MaxFALL;Livello luce media fotogramma max
 MaxGain;Guadagno max
 MaximumMomentaryLoudness;Loudness momentaneo max
 MaxTruePeak;Picco reale max
-MD5;
-MD5_Unencoded;
+MD5;MD5
+MD5_Unencoded;MD% contenuto non codificato
 MediaInfo_About;MediaInfo fornisce un accesso veloce alle informazioni tecniche ed alle etichette dei file audio e video.\r\nAd eccezione dell'interfaccia grafica Mac App Store, è un software open source, che significa che è gratuito per l'utente finale e lo sviluppatore è libero di studiare e migliorare e ridistribuire il programma (licenza LGPL)
 MediaInfo_About_About;MediaInfo v% MI_VERSION % usando MediaInfoLib v % MIL_VERSION%
 Menu;Menu
@@ -1146,7 +1147,7 @@ Rating;Posizione
 RealtimeLoudnessCorrected;Volume corretto in tempo reale
 Recorded_Date;Data registrazione
 Recorded_Location;Luogo registrazione
-Reel;
+Reel;Bobina
 Released_Date;Data distribuzione
 RemixedBy;Remixato da
 RenderMode;Modo render
@@ -1312,15 +1313,15 @@ Trim_Center;Ritaglia centro
 Trim_Height;Altezza taglio
 Trim_Surround;Taglio surround
 TrimMode;Modo taglio
-TrimMode0i;Modo taglio 0i
-TrimMode1i;Modo taglio 1i
-TrimMode2i;Modo taglio 2i
-TrimMode3i;Modo taglio 3i
-TrimMode4i;Modo taglio 4i
-TrimMode5i;Modo taglio 5i
-TrimMode6i;Modo taglio 6i
-TrimMode7i;Modo taglio 7i
-TrimMode8i;Modo taglio 8i
+TrimMode0i;Modo taglio audio 2.0 (stereo)
+TrimMode1i;Modo taglio audio 5.1
+TrimMode2i;Modo taglio audio 7.1
+TrimMode3i;Modo taglio audio 2.1.2
+TrimMode4i;Modo taglio audio 5.1.2
+TrimMode5i;Modo taglio audio 7.1.2
+TrimMode6i;Modo taglio audio 2.1.4
+TrimMode7i;Modo taglio audio 5.1.4
+TrimMode8i;Modo taglio audio 7.1.4
 TruePeakLevel;Livello di picco reale
 TruePeakLevel_Album;Livello di picco reale (album)
 Type;Tipo
@@ -1365,5 +1366,5 @@ Written_Location;Realizzato in
 WrittenBy;Realizzato da
 Yes;Si
 Your system;Info sul sistema
-ZZ_Automatic_Percent;98
+ZZ_Automatic_Percent;99
 ZZ_AutomaticLanguage_Percent;99

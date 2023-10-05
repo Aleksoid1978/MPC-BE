@@ -71,6 +71,14 @@ enum basicformat
     #define MEDIAINFO_FLAGX 0
 #endif //MEDIAINFO_COMPRESS
 
+enum class display_if
+{
+    Never,
+    Needed,
+    Supported,
+    Always,
+};
+
 //***************************************************************************
 // Class MediaInfo_Config
 //***************************************************************************
@@ -324,6 +332,10 @@ public :
     #if MEDIAINFO_ADVANCED
           void        Collection_Trigger_Set (const Ztring& Value);
           int64s      Collection_Trigger_Get();
+          Ztring      Collection_Display_Set(const Ztring& Value);
+          display_if  Collection_Display_Get();
+    #else //MEDIAINFO_ADVANCED
+          display_if  Collection_Display_Get() {return display_if::Needed;}
     #endif //MEDIAINFO_ADVANCED
 
     void            CustomMapping_Set (const Ztring &Value);
@@ -511,6 +523,7 @@ private :
 
     #if MEDIAINFO_ADVANCED
         int64s      Collection_Trigger;
+        display_if  Collection_Display;
     #endif //MEDIAINFO_ADVANCED
 
     std::map<Ztring, std::map<Ztring, Ztring> > CustomMapping;

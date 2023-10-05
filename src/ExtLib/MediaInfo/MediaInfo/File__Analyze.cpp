@@ -3232,7 +3232,8 @@ void File__Analyze::Reject (const char* ParserName)
 void File__Analyze::Reject ()
 #endif //MEDIAINFO_TRACE
 {
-    Status[IsAccepted]=false;
+    if (Status[IsAccepted])
+        return; //Do not reject if the stream was already accepted
     Status[IsFinished]=true;
     Clear();
 

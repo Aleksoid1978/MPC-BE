@@ -137,6 +137,7 @@ protected :
     UHDFrameDescriptor FrameDescriptor;
     bool FullChannelBasedMixFlag;
     bool InteractObjLimitsPresent;
+    bool IsType1CertifiedContent;
     bool HasLoudness;
     bool SyncFrameFlag;
     int32u ChunkBytes;

@@ -236,7 +236,7 @@ void File_Iso9660::Primary_Volume_Descriptor()
     Element_Name("Primary Volume Descriptor");
 
     //Parsing
-    Ztring VolumeIdentifier, ApplicationIdentifier;
+    Ztring VolumeIdentifier, PublisherIdentifier, ApplicationIdentifier, CopyrightIdentifier, CreationDateTime;
     int32u Volume_Space_Size, Location_Of_Path_Table;
     Skip_Local(32,                                              "System Identifier");
     Get_Local (32, VolumeIdentifier,                            "Volume Identifier");
@@ -253,18 +253,24 @@ void File_Iso9660::Primary_Volume_Descriptor()
     Skip_B4(                                                    "Location of Optional Occurrence of Type M Path Table");
     Directory_Record(34,                                        "Directory Record for Root Directory");
     Skip_Local(128,                                             "Volume Set Identifier");
-    Skip_Local(128,                                             "Publisher Identifier");
+    Get_Local (128, PublisherIdentifier,                        "Publisher Identifier");
     Skip_Local(128,                                             "Data Preparer Identifier");
     Get_Local (128, ApplicationIdentifier,                      "Application Identifier");
-    Skip_Local(37,                                              "Copyright File Identifier");
+    Get_Local (37, CopyrightIdentifier,                         "Copyright File Identifier");
     Skip_Local(37,                                              "Abstract File Identifier");
     Skip_Local(37,                                              "Bibliographic File Identifier");
-    Skip_XX(17,                                                 "Volume Creation Date and Time");
+    Get_DateTime (&CreationDateTime,                            "Volume Creation Date and Time");
+    Skip_DateTime(                                              "Volume Modification Date and Time");
+    Skip_DateTime(                                              "Volume Expiration Date and Time");
+    Skip_DateTime(                                              "Volume Effective Date and Time");
+    Skip_B1(                                                    "File Structure Version");
+    Element_End0();
 
-    VolumeIdentifier.Trim(__T(' '));
-    ApplicationIdentifier.Trim(__T(' '));
-    Fill(Stream_General, 0, General_Title, VolumeIdentifier);
-    Fill(Stream_General, 0, General_Encoded_Application, ApplicationIdentifier);
+    Fill(Stream_General, 0, General_Title, VolumeIdentifier.Trim(__T(' ')));
+    Fill(Stream_General, 0, General_Publisher, PublisherIdentifier.Trim(__T(' ')));
+    Fill(Stream_General, 0, General_Encoded_Application, ApplicationIdentifier.Trim(__T(' ')));
+    Fill(Stream_General, 0, General_Copyright, CopyrightIdentifier.Trim(__T(' ')));
+    Fill(Stream_General, 0, General_Encoded_Date, CreationDateTime);
 
     if (!NotParsed.empty())
     {
@@ -629,6 +635,39 @@ bool File_Iso9660::Manage_File(file_infos& MI_FileInfos)
     }
 
     return true;
+}
+
+void File_Iso9660::Get_DateTime(Ztring* Value, const char* Info)
+{
+    //Parsing
+    Element_Begin1(Info);
+    Ztring YY, MM, DD, hh, mm, ss, ds;
+    int8u oo;
+    Get_Local(4, YY,                                            "Year");
+    Get_Local(2, MM,                                            "Month");
+    Get_Local(2, DD,                                            "Day");
+    Get_Local(2, hh,                                            "Hour");
+    Get_Local(2, mm,                                            "Minute");
+    Get_Local(2, ss,                                            "Second");
+    Get_Local(2, ds,                                            "Hundredths");
+    Get_B1(oo,                                                  "Offset (1/4)");
+    if (Value && !YY.empty() && YY[0]!=__T('0'))
+    {
+        *Value=YY+__T('-')+MM+__T('-')+DD+__T(' ')+hh+__T(':')+mm+__T(':')+ss+__T('.')+ds;
+        if (oo)
+        {
+            *Value+=__T('+');
+            *Value+=__T('0')+oo/40;
+            *Value+=__T('0')+(oo%40)/4;
+            *Value+=__T(':');
+            *Value+=__T('0')+(oo%4)*15/10;
+            *Value+=__T('0')+(oo%4)*15%10;
+        }
+        else
+            *Value+=__T('Z');
+        Element_Info1(*Value);
+    }
+    Element_End0();
 }
 
 } //NameSpace

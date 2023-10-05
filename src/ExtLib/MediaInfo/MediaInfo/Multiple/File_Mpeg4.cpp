@@ -1650,6 +1650,12 @@ void File_Mpeg4::Read_Buffer_Unsynched()
     if (!IsSub && MajorBrand==0x6A703220) //"jp2 "
         return Read_Buffer_Unsynched_OneFramePerFile();
 
+    for (std::map<int32u, stream>::iterator Stream=Streams.begin(); Stream!=Streams.end(); ++Stream)
+    {
+        for (size_t Pos=0; Pos<Stream->second.Parsers.size(); Pos++)
+            Stream->second.Parsers[Pos]->Open_Buffer_Unsynch();
+    }
+
     if (mdat_Pos.empty())
     {
         IsParsing_mdat=false;
@@ -1691,9 +1697,6 @@ void File_Mpeg4::Read_Buffer_Unsynched()
 
     for (std::map<int32u, stream>::iterator Stream=Streams.begin(); Stream!=Streams.end(); ++Stream)
     {
-        for (size_t Pos=0; Pos<Stream->second.Parsers.size(); Pos++)
-            Stream->second.Parsers[Pos]->Open_Buffer_Unsynch();
-
         #if MEDIAINFO_SEEK && MEDIAINFO_DEMUX
             //Searching the next position for this stream
             int64u StreamOffset=(int64u)-1;
@@ -2031,10 +2034,12 @@ void File_Mpeg4::Read_Buffer_Init()
 {
     if (Config->ParseSpeed>=1.0)
         FrameCount_MaxPerStream=(int32u)-1;
+    else if (Config->ParseSpeed>=0.7)
+        FrameCount_MaxPerStream=2048;
     else if (Config->ParseSpeed<=0.3)
         FrameCount_MaxPerStream=128;
     else
-        FrameCount_MaxPerStream=512;
+        FrameCount_MaxPerStream=1024;
 
     #if MEDIAINFO_CONFORMANCE
         IsCmaf=MediaInfoLib::Config.Mp4Profile().find("cmfc")!=string::npos;
@@ -3336,8 +3341,6 @@ void File_Mpeg4::IsParsing_mdat_Set()
             int8u Buffer[4];
             int32u2BigEndian(Buffer, TimeCode_Value);
             Open_Buffer_Continue(Parser, Buffer, 4);
-            Open_Buffer_Finalize(Parser);
-            Merge(*Parser, Stream_Other, StreamPos_Last, 0);
 
             Streams[TimeCode_ID].Parsers.push_back(Parser);
             for (std::map<int32u, stream>::iterator Strea=Streams.begin(); Strea!=Streams.end(); ++Strea)

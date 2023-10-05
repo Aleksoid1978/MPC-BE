@@ -133,8 +133,10 @@ protected :
     void MCAEpisode();
     void MCAAudioContentKind();
     void MCAAudioElementKind();
+    void TextDataDescription();
     void ResourceID();
     void NamespaceURI();
+    void TextMIMEMediaType();
     void UCSEncoding();
     void Filler();
     void Filler01() {Filler();}
@@ -213,10 +215,10 @@ protected :
     void SDTI_ControlMetadataSet();
     void SystemScheme1();
     void DMScheme1();
-    void Application04_01_04_01_01();
-    void Application04_01_04_02_01();
-    void Application05_09_01();
-    void Application_08_BodySID();
+    void TextBasedFramework();
+    void GenericStreamTextBasedSet();
+    void MXFGenericStreamDataElementKey_09_01();
+    void GenericStreamID();
     void AS11_AAF_Core();
     void AS11_AAF_Segmentation();
     void AS11_AAF_UKDPP();
@@ -229,6 +231,12 @@ protected :
     void MGAAudioMetadataSubDescriptor();
     void MGASoundfieldGroupLabelSubDescriptor();
     void SADMAudioMetadataSubDescriptor();
+    void RIFFChunkDefinitionSubDescriptor();
+    void ADM_CHNASubDescriptor();
+    void ADMChannelMapping();
+    void RIFFChunkReferencesSubDescriptor();
+    void ADMAudioMetadataSubDescriptor();
+    void ADMSoundfieldGroupLabelSubDescriptor();
 
     //Common
     void GenerationInterchangeObject();
@@ -312,6 +320,7 @@ protected :
     void MasteringDisplayWhitePointChromaticity();
     void MasteringDisplayMaximumLuminance();
     void MasteringDisplayMinimumLuminance();
+    void TextBasedObject();
     void GenericSoundEssenceDescriptor_QuantizationBits();      //3D01
     void GenericSoundEssenceDescriptor_Locked();                //3D02
     void GenericSoundEssenceDescriptor_AudioSamplingRate();     //3D03
@@ -367,6 +376,24 @@ protected :
     void MGASoundEssenceBlockAlign() {WaveAudioDescriptor_BlockAlign();};
     void MGASoundEssenceAverageBytesPerSecond() {WaveAudioDescriptor_AvgBps();}
     void MGASoundEssenceSequenceOffset() {WaveAudioDescriptor_SequenceOffset();};
+    void RIFFChunkStreamID();
+    void RIFFChunkID();
+    void RIFFChunkUUID();
+    void RIFFChunkHashSHA1();
+    void RIFFChunkStreamIDsArray();
+    void NumLocalChannels();
+    void NumADMAudioTrackUIDs();
+    void ADMChannelMappingsArray();
+    void LocalChannelID();
+    void ADMAudioTrackUID();
+    void ADMAudioTrackChannelFormatID();
+    void ADMAudioPackFormatID();
+    void RIFFChunkStreamID_link1();
+    void ADMProfileLevelULBatch();
+    void RIFFChunkStreamID_link2();
+    void ADMAudioProgrammeID_ST2131();
+    void ADMAudioContentID_ST2131();
+    void ADMAudioObjectID_ST2131();
     void MGALinkID();                                           //
     void MGAAudioMetadataIndex();                               //
     void MGAAudioMetadataIdentifier();                          //
@@ -376,6 +403,7 @@ protected :
     void SADMProfileLevelULBatch();                             //
     void MpegAudioDescriptor_BitRate();                         //
     void MultipleDescriptor_FileDescriptors();                  //3F01
+    void RFC5646TextLanguageCode();
     void PrimaryExtendedSpokenLanguage();                       //
     void SecondaryExtendedSpokenLanguage();                     //
     void OriginalExtendedSpokenLanguage();                      //
@@ -1380,6 +1408,9 @@ protected :
     File_DolbyAudioMetadata* DolbyAudioMetadata;
     #if defined(MEDIAINFO_ADM_YES)
     File_Adm* Adm;
+    int32u ADMChannelMapping_LocalChannelID;
+    string ADMChannelMapping_ADMAudioTrackUID;
+    std::bitset<2> ADMChannelMapping_Presence;
     #endif
     #if defined(MEDIAINFO_IAB_YES)
     File_Iab* Adm_ForLaterMerge;

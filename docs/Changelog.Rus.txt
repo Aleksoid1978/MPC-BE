@@ -49,7 +49,8 @@ YouTube
 
 Обновлены библиотеки:
 	ffmpeg git-n6.1-dev-2279-g5d98259841;
-	zlib 1.3;
+	MediaInfo git-v23.10-2-g0530bf162;
+	zlib 1.3.
 
 
 1.6.9 - 2023-08-16

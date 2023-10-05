@@ -91,6 +91,8 @@ private :
     bool Manage_File(file_infos& MI_Files);
     void Manage_MasterFiles();
     void Manage_DataFiles();
+    void Skip_DateTime(const char* Info) { Get_DateTime(nullptr, Info); }
+    void Get_DateTime(Ztring* Value, const char* Info);
 };
 
 } //NameSpace

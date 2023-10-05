@@ -257,6 +257,15 @@ void File_Eia608::Read_Buffer_Unsynched()
         TextMode=false; DataChannelMode=false;
         HasChanged();
     #endif //MEDIAINFO_EVENTS
+    for (const auto StreamP : Streams)
+    {
+        if (StreamP)
+        {
+            stream& Stream=*StreamP;
+            Stream.Duration_End=FLT_MAX;
+            Stream.Duration_End_Command=FLT_MAX;
+        }
+    }
 }
 
 //***************************************************************************

@@ -614,7 +614,10 @@ void File_Mpegh3da::Streams_Fill()
                     Summary+=Retrieve_Const(Stream_Audio, 0, (e+" NumberOfObjects/String").c_str()).To_UTF8();
                     break;
             default:
-                    Summary+=Mpegh3da_signalGroupType[E.Type];
+                    if (E.Type<Mpegh3da_signalGroupType_Size)
+                        Summary+=Mpegh3da_signalGroupType[E.Type];
+                    else
+                        Summary+=to_string(E.Type);
         }
         if (!Summary.empty())
             Fill(Stream_Audio, 0, e.c_str(), Summary, true, true);

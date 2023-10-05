@@ -1337,8 +1337,8 @@ void File_Riff::AVI__hdlr_strl_strf_auds()
     StreamItem.AvgBytesPerSec=AvgBytesPerSec; //Saving bitrate for each stream
     if (SamplesPerSec && TimeReference!=(int64u)-1)
     {
-        Fill(Stream_Audio, 0, Audio_Delay, float64_int64s(((float64)TimeReference)*1000/SamplesPerSec));
-        Fill(Stream_Audio, 0, Audio_Delay_Source, "Container (bext)");
+        Fill(Stream_Audio, StreamPos_Last, Audio_Delay, ((float64)TimeReference)*1000/SamplesPerSec, 6);
+        Fill(Stream_Audio, StreamPos_Last, Audio_Delay_Source, "Container (bext)");
     }
 
     //Creating the parser
@@ -1451,7 +1451,7 @@ void File_Riff::AVI__hdlr_strl_strf_auds()
             Skip_XX(Element_Size-Element_Offset,               "Error");
     }
 
-    if (Retrieve(Stream_Audio, 0, Audio_Format)==__T("PCM"))
+    if (Retrieve(Stream_Audio, StreamPos_Last, Audio_Format)==__T("PCM"))
     {
         //BlockAlign
         int32u ComputedBlockAlign=Channels*BitsPerSample/8;
@@ -3045,17 +3045,17 @@ void File_Riff::CDDA_fmt_()
         Fill(Stream_General, 0, General_FileSize, File_Size+TDuration*2352, 10, true);
 
         Stream_Prepare(Stream_Audio);
-        Fill(Stream_Audio, 0, Audio_Format, "PCM");
-        Fill(Stream_Audio, 0, Audio_Format_Settings_Endianness, "Little");
-        Fill(Stream_Audio, 0, Audio_BitDepth, 16);
-        Fill(Stream_Audio, 0, Audio_Channel_s_, 2);
-        Fill(Stream_Audio, 0, Audio_SamplingRate, 44100);
-        Fill(Stream_Audio, 0, Audio_FrameRate, (float)75);
-        Fill(Stream_Audio, 0, Audio_BitRate, 1411200);
-        Fill(Stream_Audio, 0, Audio_Compression_Mode, "Lossless");
-        Fill(Stream_Audio, 0, Audio_FrameCount, TDuration);
-        Fill(Stream_Audio, 0, Audio_Duration, float32_int32s(((float32)TDuration)*1000/75));
-        Fill(Stream_Audio, 0, Audio_Delay, float32_int32s(((float32)TPosition)*1000/75));
+        Fill(Stream_Audio, StreamPos_Last, Audio_Format, "PCM");
+        Fill(Stream_Audio, StreamPos_Last, Audio_Format_Settings_Endianness, "Little");
+        Fill(Stream_Audio, StreamPos_Last, Audio_BitDepth, 16);
+        Fill(Stream_Audio, StreamPos_Last, Audio_Channel_s_, 2);
+        Fill(Stream_Audio, StreamPos_Last, Audio_SamplingRate, 44100);
+        Fill(Stream_Audio, StreamPos_Last, Audio_FrameRate, (float)75);
+        Fill(Stream_Audio, StreamPos_Last, Audio_BitRate, 1411200);
+        Fill(Stream_Audio, StreamPos_Last, Audio_Compression_Mode, "Lossless");
+        Fill(Stream_Audio, StreamPos_Last, Audio_FrameCount, TDuration);
+        Fill(Stream_Audio, StreamPos_Last, Audio_Duration, float32_int32s(((float32)TDuration)*1000/75));
+        Fill(Stream_Audio, StreamPos_Last, Audio_Delay, float32_int32s(((float32)TPosition)*1000/75));
 
         //No more need data
         Finish("CDDA");
@@ -3281,15 +3281,15 @@ void File_Riff::QLCM_fmt_()
         switch (codec_guid.hi)
         {
             case Elements::QLCM_QCELP1 :
-            case Elements::QLCM_QCELP2 : Fill(Stream_Audio, 0, Audio_Format, "QCELP"); Fill(Stream_Audio, 0, Audio_Codec, "QCELP"); break;
-            case Elements::QLCM_EVRC   : Fill(Stream_Audio, 0, Audio_Format, "EVRC"); Fill(Stream_Audio, 0, Audio_Codec, "EVRC"); break;
-            case Elements::QLCM_SMV    : Fill(Stream_Audio, 0, Audio_Format, "SMV"); Fill(Stream_Audio, 0, Audio_Codec, "SMV"); break;
+            case Elements::QLCM_QCELP2 : Fill(Stream_Audio, StreamPos_Last, Audio_Format, "QCELP"); Fill(Stream_Audio, StreamPos_Last, Audio_Codec, "QCELP"); break;
+            case Elements::QLCM_EVRC   : Fill(Stream_Audio, StreamPos_Last, Audio_Format, "EVRC"); Fill(Stream_Audio, StreamPos_Last, Audio_Codec, "EVRC"); break;
+            case Elements::QLCM_SMV    : Fill(Stream_Audio, StreamPos_Last, Audio_Format, "SMV"); Fill(Stream_Audio, StreamPos_Last, Audio_Codec, "SMV"); break;
             default :                    ;
         }
-        Fill(Stream_Audio, 0, Audio_BitRate, average_bps);
-        Fill(Stream_Audio, 0, Audio_SamplingRate, sampling_rate);
-        Fill(Stream_Audio, 0, Audio_BitDepth, sample_size);
-        Fill(Stream_Audio, 0, Audio_Channel_s_, 1);
+        Fill(Stream_Audio, StreamPos_Last, Audio_BitRate, average_bps);
+        Fill(Stream_Audio, StreamPos_Last, Audio_SamplingRate, sampling_rate);
+        Fill(Stream_Audio, StreamPos_Last, Audio_BitDepth, sample_size);
+        Fill(Stream_Audio, StreamPos_Last, Audio_Channel_s_, 1);
     FILLING_END();
 }
 
@@ -3425,7 +3425,7 @@ void File_Riff::RMP3_data()
 {
     Element_Name("Raw datas");
 
-    Fill(Stream_Audio, 0, Audio_StreamSize, Buffer_DataToParse_End-Buffer_DataToParse_Begin);
+    Fill(Stream_Audio, StreamPos_Last, Audio_StreamSize, Buffer_DataToParse_End-Buffer_DataToParse_Begin);
     Stream_Prepare(Stream_Audio);
 
     //Creating parser
@@ -3439,7 +3439,7 @@ void File_Riff::RMP3_data()
         StreamItem.StreamPos=0;
         StreamItem.Parsers.push_back(Parser);
     #else //MEDIAINFO_MPEG4_YES
-        Fill(Stream_Audio, 0, Audio_Format, "MPEG Audio");
+        Fill(Stream_Audio, StreamPos_Last, Audio_Format, "MPEG Audio");
         Skip_XX(Buffer_DataToParse_End-Buffer_DataToParse_Begin, "Data");
     #endif
 }
@@ -3881,8 +3881,8 @@ void File_Riff::WAVE_bext()
         Fill(Stream_General, 0, General_Encoded_Library_Settings, History);
         if (SamplesPerSec && TimeReference!=(int64u)-1)
         {
-            Fill(Stream_Audio, 0, Audio_Delay, ((float64)TimeReference*1000/SamplesPerSec), 6);
-            Fill(Stream_Audio, 0, Audio_Delay_Source, "Container (bext)");
+            Fill(Stream_Audio, StreamPos_Last, Audio_Delay, ((float64)TimeReference*1000/SamplesPerSec), 6);
+            Fill(Stream_Audio, StreamPos_Last, Audio_Delay_Source, "Container (bext)");
         }
         if (Version>=1 && UMID1 != 0 && UMID2 != 0)
         {
@@ -3894,15 +3894,15 @@ void File_Riff::WAVE_bext()
         if (Version>=2)
         {
             if (LoudnessValue!=0x7FFF)
-                Fill(Stream_Audio, 0, "LoudnessValue", (float)((int16s)LoudnessValue)/100, 2);
+                Fill(Stream_Audio, StreamPos_Last, "LoudnessValue", (float)((int16s)LoudnessValue)/100, 2);
             if (LoudnessRange!=0x7FFF)
-                Fill(Stream_Audio, 0, "LoudnessRange", (float)((int16s)LoudnessRange)/100, 2);
+                Fill(Stream_Audio, StreamPos_Last, "LoudnessRange", (float)((int16s)LoudnessRange)/100, 2);
             if (MaxTruePeakLevel!=0x7FFF)
-                Fill(Stream_Audio, 0, "MaxTruePeakLevel", (float)((int16s)MaxTruePeakLevel)/100, 2);
+                Fill(Stream_Audio, StreamPos_Last, "MaxTruePeakLevel", (float)((int16s)MaxTruePeakLevel)/100, 2);
             if (MaxMomentaryLoudness!=0x7FFF)
-                Fill(Stream_Audio, 0, "MaxMomentaryLoudness", (float)((int16s)MaxMomentaryLoudness)/100, 2);
+                Fill(Stream_Audio, StreamPos_Last, "MaxMomentaryLoudness", (float)((int16s)MaxMomentaryLoudness)/100, 2);
             if (MaxShortTermLoudness!=0x7FFF)
-                Fill(Stream_Audio, 0, "MaxShortTermLoudness", (float)((int16s)MaxShortTermLoudness)/100, 2);
+                Fill(Stream_Audio, StreamPos_Last, "MaxShortTermLoudness", (float)((int16s)MaxShortTermLoudness)/100, 2);
         }
     FILLING_END();
 }
@@ -3975,16 +3975,16 @@ void File_Riff::WAVE_data()
 
     FILLING_BEGIN();
         int64u StreamSize=Buffer_DataToParse_End-Buffer_DataToParse_Begin;
-        Fill(Stream_Audio, 0, Audio_StreamSize, StreamSize, 10, true);
-        if (Retrieve(Stream_Audio, 0, Audio_Format)==__T("PCM") && BlockAlign)
-            Fill(Stream_Audio, 0, Audio_SamplingCount, StreamSize/BlockAlign, 10, true);
-        float64 Duration=Retrieve(Stream_Audio, 0, Audio_Duration).To_float64();
-        float64 BitRate=Retrieve(Stream_Audio, 0, Audio_BitRate).To_float64();
+        Fill(Stream_Audio, StreamPos_Last, Audio_StreamSize, StreamSize, 10, true);
+        if (Retrieve(Stream_Audio, StreamPos_Last, Audio_Format)==__T("PCM") && BlockAlign)
+            Fill(Stream_Audio, StreamPos_Last, Audio_SamplingCount, StreamSize/BlockAlign, 10, true);
+        float64 Duration=Retrieve(Stream_Audio, StreamPos_Last, Audio_Duration).To_float64();
+        float64 BitRate=Retrieve(Stream_Audio, StreamPos_Last, Audio_BitRate).To_float64();
         if (Duration)
         {
             float64 BitRate_New=((float64)StreamSize)*8*1000/Duration;
             if (BitRate_New<BitRate*0.95 || BitRate_New>BitRate*1.05)
-                Fill(Stream_Audio, 0, Audio_BitRate, BitRate_New, 10, true); //Correcting the bitrate, it was false in the header
+                Fill(Stream_Audio, StreamPos_Last, Audio_BitRate, BitRate_New, 10, true); //Correcting the bitrate, it was false in the header
         }
         else if (BitRate)
         {
@@ -3993,8 +3993,8 @@ void File_Riff::WAVE_data()
                 Duration=((float64)LittleEndian2int32u(Buffer+Buffer_Offset-4))*8*1000/BitRate; //TODO: RF64 is not handled
             else
                 Duration=((float64)StreamSize)*8*1000/BitRate;
-            Fill(Stream_General, 0, General_Duration, Duration, 0, true);
-            Fill(Stream_Audio, 0, Audio_Duration, Duration, 0, true);
+            Fill(Stream_General, 0, General_Duration, Retrieve_Const(Stream_General, 0, General_Duration).To_int64u()+Duration, 0, true); // Found files with 2 fmt/data chunks
+            Fill(Stream_Audio, StreamPos_Last, Audio_Duration, Duration, 0, true);
         }
     FILLING_END();
 }
@@ -4054,14 +4054,14 @@ void File_Riff::WAVE_ds64()
         if (dataSize && dataSize<File_Size)
         {
             WAVE_data_Size=dataSize;
-            if (Retrieve(Stream_Audio, 0, Audio_StreamSize).empty()) // Not the priority
-                Fill(Stream_Audio, 0, Audio_StreamSize, WAVE_data_Size);
+            if (Retrieve(Stream_Audio, StreamPos_Last, Audio_StreamSize).empty()) // Not the priority
+                Fill(Stream_Audio, StreamPos_Last, Audio_StreamSize, WAVE_data_Size);
         }
         if (sampleCount && sampleCount<File_Size)
         {
             WAVE_fact_samplesCount=sampleCount;
-            if (WAVE_fact_samplesCount && WAVE_fact_samplesCount<File_Size && Retrieve(Stream_Audio, 0, Audio_SamplingCount).empty()) // Not the priority
-                Fill(Stream_Audio, 0, Audio_SamplingCount, WAVE_fact_samplesCount);
+            if (WAVE_fact_samplesCount && WAVE_fact_samplesCount<File_Size && Retrieve(Stream_Audio, StreamPos_Last, Audio_SamplingCount).empty()) // Not the priority
+                Fill(Stream_Audio, StreamPos_Last, Audio_SamplingCount, WAVE_fact_samplesCount);
         }
         if (WAVE_data_Size && WAVE_data_Size<File_Size && WAVE_fact_samplesCount && WAVE_fact_samplesCount<File_Size)
         {
@@ -4082,10 +4082,10 @@ void File_Riff::WAVE_fact()
     Get_L4 (SamplesCount,                                       "SamplesCount");
 
     FILLING_BEGIN();
-        if (!Retrieve(Stream_Audio, 0, Audio_SamplingCount).empty()) // Not the priority
+        if (!Retrieve(Stream_Audio, StreamPos_Last, Audio_SamplingCount).empty()) // Not the priority
         {
         int64u SamplesCount64=SamplesCount==(int32u)-1?WAVE_fact_samplesCount:SamplesCount;
-        float64 SamplingRate=Retrieve(Stream_Audio, 0, Audio_SamplingRate).To_float64();
+        float64 SamplingRate=Retrieve(Stream_Audio, StreamPos_Last, Audio_SamplingRate).To_float64();
         if (SamplesCount64!=(int64u)-1 && SamplingRate)
         {
             //Calculating
@@ -4095,7 +4095,7 @@ void File_Riff::WAVE_fact()
             bool IsOK=true;
             if (File_Size!=(int64u)-1)
             {
-                float64 BitRate=Retrieve(Stream_Audio, 0, Audio_BitRate).To_float64();
+                float64 BitRate=Retrieve(Stream_Audio, StreamPos_Last, Audio_BitRate).To_float64();
                 if (BitRate)
                 {
                     int64u Duration_FromBitRate = File_Size * 8 * 1000 / BitRate;
@@ -4106,7 +4106,7 @@ void File_Riff::WAVE_fact()
 
             //Filling
             if (IsOK)
-                Fill(Stream_Audio, 0, Audio_SamplingCount, SamplesCount, 10, true);
+                Fill(Stream_Audio, StreamPos_Last, Audio_SamplingCount, SamplesCount, 10, true);
         }
         }
     FILLING_END();

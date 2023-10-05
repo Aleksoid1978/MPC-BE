@@ -796,6 +796,7 @@ Language_eu;
 Language_fa;
 Language_ff;
 Language_fi;
+Language_fil;
 Language_fj;
 Language_fo;
 Language_fr;
@@ -1366,4 +1367,4 @@ WrittenBy;Scris de
 Yes;Da
 Your system;Sistemul dvs
 ZZ_Automatic_Percent;24
-ZZ_AutomaticLanguage_Percent;53
+ZZ_AutomaticLanguage_Percent;54

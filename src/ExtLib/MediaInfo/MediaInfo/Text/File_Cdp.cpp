@@ -376,6 +376,7 @@ void File_Cdp::Read_Buffer_Continue()
             if (Magic!=0x63636470)
             {
                 Reject("CDP");
+                Skip_XX(Element_Size-Element_Offset,            "Junk");
                 return;
             }
         FILLING_END();

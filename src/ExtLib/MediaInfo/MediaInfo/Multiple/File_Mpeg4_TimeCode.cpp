@@ -151,14 +151,17 @@ void File_Mpeg4_TimeCode::Streams_Finish()
             else
                 FrameCount=mdhd_Duration-FirstEditOffset;
         }
-        else
+        else if (mvhd_Duration_TimeScale)
         {
             float64 FrameCountF=(float64)tkhd_Duration/mvhd_Duration_TimeScale*FrameRate_WithDF*FrameMultiplier;
             FrameCount=(int64u)float64_int64s(FrameCountF);
             if (FrameCountF-FrameCount>0.01) // TODO: avoid rouding issues and better way to manage partial frames
                 FrameCount++;
         }
-        Fill(Stream_Other, StreamPos_Last, Other_FrameCount, FrameCount);
+        else
+            FrameCount=0;
+        if (FrameCount)
+            Fill(Stream_Other, StreamPos_Last, Other_FrameCount, FrameCount);
         if (Frame_Count==1)
         {
             Fill(Stream_Other, StreamPos_Last, Other_TimeCode_Stripped, "Yes");
