@@ -598,7 +598,7 @@ END
 
 IDD_PNSPRESET_DLG DIALOGEX 0, 0, 210, 120
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Setări prestabilite Panoramare&Scanare"
+CAPTION "Setări prestabilite Panoramare și scanare"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LISTBOX         IDC_LIST1,5,5,125,50,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
@@ -1648,7 +1648,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Limbă (Language)",                   ID_SUBMENU_LANGUAGE
         MENUITEM SEPARATOR
-        POPUP "Setări randor"
+        POPUP "Setările randorului"
         BEGIN
             MENUITEM "&Test de rupere (tearing)",         ID_VIEW_TEARING_TEST
             MENUITEM "&Afișează statistici",        ID_VIEW_DISPLAYSTATS
@@ -1661,10 +1661,10 @@ BEGIN
             MENUITEM "Resetează la setări implicite ale randorului", ID_VIEW_RESET_DEFAULT
         END
         MENUITEM "Cadru &video",                    ID_SUBMENU_VIDEOFRAME
-        MENUITEM "Panoramare&&S&canare",                      ID_SUBMENU_PANSCAN
+        MENUITEM "Panoramare și s&canare",                      ID_SUBMENU_PANSCAN
         POPUP "Modul Stereo 3D"
         BEGIN
-            MENUITEM "Auto(mat)",                        ID_STEREO3D_AUTO
+            MENUITEM "Automat (Auto)",                        ID_STEREO3D_AUTO
             MENUITEM "Mono",                        ID_STEREO3D_MONO
             MENUITEM "Rând intercalat",             ID_STEREO3D_ROW_INTERLEAVED
             MENUITEM "Rând intercalat (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
@@ -1689,7 +1689,7 @@ BEGIN
         MENUITEM "&Oprește",                 ID_PLAY_STOP
         MENUITEM "Pas cad&ru",            ID_PLAY_FRAMESTEP
         MENUITEM "&Du-te la...",             ID_PLAY_GOTO
-        POPUP "&Repeat"
+        POPUP "&Repetare"
         BEGIN
             MENUITEM "&Pentru totdeauna", ID_REPEAT_FOREVER
             MENUITEM SEPARATOR
@@ -1779,7 +1779,7 @@ BEGIN
         END
         MENUITEM SEPARATOR
         MENUITEM "Cadru &video",                    ID_SUBMENU_VIDEOFRAME
-        MENUITEM "Panoramare&&S&canare",                      ID_SUBMENU_PANSCAN
+        MENUITEM "Panoramare și s&canare",                      ID_SUBMENU_PANSCAN
         MENUITEM SEPARATOR
         MENUITEM "&Navigare",                   ID_SUBMENU_NAVIGATE
         MENUITEM "&Favorite",                  ID_SUBMENU_FAVORITES
@@ -1843,7 +1843,7 @@ BEGIN
         END
         POPUP "Modul Stereo 3D"
         BEGIN
-            MENUITEM "Auto(mat)",                        ID_STEREO3D_AUTO
+            MENUITEM "Automat (Auto)",                        ID_STEREO3D_AUTO
             MENUITEM "Mono",                        ID_STEREO3D_MONO
             MENUITEM "Rând intercalat",             ID_STEREO3D_ROW_INTERLEAVED
             MENUITEM "Rând intercalat (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
@@ -1929,10 +1929,10 @@ BEGIN
                 MENUITEM "Resetează la setări implicite ale randorului", ID_VIEW_RESET_DEFAULT
             END
             MENUITEM "Cadru &video",                    ID_SUBMENU_VIDEOFRAME
-            MENUITEM "Panoramare&&S&canare",                      ID_SUBMENU_PANSCAN
+            MENUITEM "Panoramare și s&canare",                      ID_SUBMENU_PANSCAN
             POPUP "Modul Stereo 3D"
             BEGIN
-                MENUITEM "Auto(mat)",                        ID_STEREO3D_AUTO
+                MENUITEM "Automat (Auto)",                        ID_STEREO3D_AUTO
                 MENUITEM "Mono",                        ID_STEREO3D_MONO
                 MENUITEM "Rând intercalat",             ID_STEREO3D_ROW_INTERLEAVED
                 MENUITEM "Rând intercalat (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
@@ -1975,7 +1975,7 @@ BEGIN
         POPUP "&Ajutor"
         BEGIN
             MENUITEM "&Pagină de pornire",                  ID_HELP_HOMEPAGE
-            MENUITEM "Check for &updates",          ID_HELP_CHECKFORUPDATE
+            MENUITEM "Verifică pentru &actualizări",          ID_HELP_CHECKFORUPDATE
             MENUITEM "&Comutatoare în linie de comandă",      ID_HELP_SHOWCOMMANDLINESWITCHES
             MENUITEM SEPARATOR
             MENUITEM "&Despre...",                   ID_HELP_ABOUT
@@ -2010,7 +2010,7 @@ BEGIN
         END
         POPUP "Modul Stereo 3D"
         BEGIN
-            MENUITEM "Auto(mat)",                        ID_STEREO3D_AUTO
+            MENUITEM "Automat (Auto)",                        ID_STEREO3D_AUTO
             MENUITEM "Mono",                        ID_STEREO3D_MONO
             MENUITEM "Rând intercalat",             ID_STEREO3D_ROW_INTERLEAVED
             MENUITEM "Rând intercalat (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
@@ -2557,7 +2557,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_SRC_CDDA            "Doar Windows XP"
-    IDS_SRC_AVI             "Fișierele ne-intercalate (non-interleaved) nu sunt bine primite"
+    IDS_SRC_AVI             "Fișierele neintercalate (non-interleaved) nu sunt bine primite"
     IDS_SRC_VTS             "Deschideți VTS_xx_0.ifo pentru a încărca fișierele VTS_xx_x.vob dintr-o bucată"
 END
 
@@ -2701,8 +2701,8 @@ BEGIN
     IDS_AG_MEDIAFILES       "Fișiere media (toate tipurile)|"
     IDS_AG_ALLFILES         "Toate fișierele (*.*)|*.*|"
     IDS_AG_AUDIOFILES       "Fișiere audio (toate tipurile)|"
-    IDS_PIXELSHADERCOMPILER_0  "D3DX9_xx.dll nu poate fi încărcat, shaderele pixel nu vor funcționa."
-    IDS_PIXELSHADERCOMPILER_1  "Punctele de intrare necesare ale funcției nu pot fi găsite în D3DX9_xx.dll, shaderele pixel nu vor funcționa."
+    IDS_PIXELSHADERCOMPILER_0  "D3DX9_xx.dll nu poate fi încărcat, nuanțatoarele pixel nu vor funcționa."
+    IDS_PIXELSHADERCOMPILER_1  "Punctele de intrare necesare ale funcției nu pot fi găsite în D3DX9_xx.dll, nuanțatoarele pixel nu vor funcționa."
     IDS_AG_NOT_KNOWN        "Necunoscut"
     IDS_AG_OPEN_FILE        "Deschide rapid un fișier"
     IDS_AG_OPEN_FILEURL     "Deschide fișier"
@@ -2905,7 +2905,7 @@ BEGIN
     IDS_AG_BOSS_KEY         "Tastă <Vine Şefu!>"
     IDS_AG_MENU_PLAYER_S    "Meniul player-ului (scurt)"
     IDS_AG_MENU_PLAYER_L    "Meniul player-ului (lung)"
-    IDS_AG_MENU_FILTERS     "Meniul filtre"
+    IDS_AG_MENU_FILTERS     "Meniul Filtre"
     IDS_AG_OPTIONS          "Opțiuni"
     IDS_AG_NEXT_AUDIO       "Următorul audio"
     IDS_AG_PREV_AUDIO       "Fișier audio precedent"
@@ -2950,7 +2950,7 @@ BEGIN
     IDS_PPAGEWEBSERVER_0    "Selectarea directorului"
     IDS_AG_DEFAULT          "Implicit"
     IDS_AG_DEFAULT_L        "implicit"
-    IDS_AG_AUTO             "Automat"
+    IDS_AG_AUTO             "Automat (Auto)"
     IDS_AG_RECOMMENDED      "recomandat"
     IDS_AG_NOTRECOMMENDED   "nerecomandat"
     IDS_AG_ADVANCED         "Avansat"
@@ -3279,7 +3279,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_VDF_SETTINGS        "Setări video"
-    IDS_VDF_AUTO            "Automat"
+    IDS_VDF_AUTO            "Automat (Auto)"
     IDS_VDF_THREADNUMBER    "Numărul firelor de decodare"
     IDS_VDF_SKIPBFRAMES     "Sari peste cadrele B"
 END
@@ -3428,7 +3428,7 @@ BEGIN
     IDS_NO_MORE_MEDIA       "Nu mai există media în dosarul curent."
     IDS_FIRST_IN_FOLDER     "Acum este încărcat primul fișier din dosar."
     IDS_LAST_IN_FOLDER      "Acum este încărcat ultimul fișier din dosar."
-    IDS_MERGING_FILES       "Merging files..."
+    IDS_MERGING_FILES       "Se unesc fișierele..."
 END
 
 STRINGTABLE
@@ -3639,7 +3639,7 @@ BEGIN
     IDS_SATURATION_INC      "Mărire saturație"
     IDS_SATURATION_DEC      "Micșorare saturație"
     IDS_RESET_COLOR         "Resetează setările de culoare"
-    IDS_AFTERPLAYBACK_CLOSE_FILE "După redare: Închide întotdeauna fișierul"
+    IDS_AFTERPLAYBACK_CLOSE_FILE "După redare: închide întotdeauna fișierul"
     IDS_UPDATE_ERROR_DATA   "Serverul pentru actualizare oferă date greșite.\n\nÎncercați mai târziu."
     IDS_USING_NEWER_VERSION "Deja folosești ultima versiune %s."
     IDS_NEW_UPDATE_AVAILABLE  "O nouă %s este disponibilă.\n\nVrei să vizitezi site-ul programului MPC-BE ca să o descarci?"
@@ -3706,15 +3706,15 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AFTERPLAYBACK_CLOSE "După redare: Închide programul"
-    IDS_AFTERPLAYBACK_STANDBY "După redare: Intră în repaus"
+    IDS_AFTERPLAYBACK_CLOSE "După redare: închide programul"
+    IDS_AFTERPLAYBACK_STANDBY "După redare: intră în repaus"
     IDS_AFTERPLAYBACK_HIBERNATE "După redare: Intră în hibernare"
-    IDS_AFTERPLAYBACK_SHUTDOWN "După redare: Închide calculatorul"
-    IDS_AFTERPLAYBACK_LOGOFF "După redare: Închide sesiunea"
-    IDS_AFTERPLAYBACK_LOCK  "După redare: Blochează desktopul"
+    IDS_AFTERPLAYBACK_SHUTDOWN "După redare: închide calculatorul"
+    IDS_AFTERPLAYBACK_LOGOFF "După redare: închide sesiunea"
+    IDS_AFTERPLAYBACK_LOCK  "După redare: blochează desktopul"
     IDS_AFTERPLAYBACK_EXIT  "După redare: Închide programul întotdeauna"
-    IDS_AFTERPLAYBACK_DONOTHING "După redare: Nicio acțiune"
-    IDS_AFTERPLAYBACK_NEXT  "După redare: Redă următorul fișier din dosar"
+    IDS_AFTERPLAYBACK_DONOTHING "După redare: nicio acțiune"
+    IDS_AFTERPLAYBACK_NEXT  "După redare: redă următorul fișier din dosar"
     IDS_OSD_BRIGHTNESS      "Luminozitate: %s"
     IDS_OSD_CONTRAST        "Contrast: %s"
     IDS_OSD_HUE             "Nuanță: %s°"
