@@ -1486,6 +1486,11 @@ namespace Youtube
 							}
 						}
 					}
+					if (EndsWith(sub_name, L" - Default")) {
+						// Removing the useless " - Default" at the end of the subtitle names of some YouTube clips
+						// Example: https://www.youtube.com/watch?v=_TTqjLv0PYI
+						sub_name.Truncate(sub_name.GetLength() - 10);
+					}
 
 					CStringA sub_lang;
 					getJsonValue(elem, "languageCode", sub_lang);
