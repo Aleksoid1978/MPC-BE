@@ -33,10 +33,13 @@ public:
 		char type = 0;
 		CStringW path; // file path or url
 		CStringW title;
-		SaveItem_t(const char _type, const CStringW& _path, const CStringW& _title)
+		CStringA lang;
+		SaveItem_t(const char _type, const CStringW& _path,
+			const CStringW& _title, const CStringA& _lang)
 			: type(_type)
 			, path(_path)
 			, title(_title)
+			, lang(_lang)
 		{}
 	};
 

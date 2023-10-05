@@ -377,6 +377,10 @@ void CSaveTaskDlg::SaveHTTP()
 			strArgs.AppendFormat(LR"( -i "%s")", m_dstPaths[i]);
 			mapping.AppendFormat(L" -map %u", i);
 			if (item.type == 's') {
+				LPCSTR lang = ISO6391To6392(item.lang);
+				if (lang[0]) {
+					metadata.AppendFormat(LR"( -metadata:s:s:%u language="%S")", isub, lang);
+				}
 				if (item.title.GetLength()) {
 					metadata.AppendFormat(LR"( -metadata:s:s:%u title="%s")", isub, item.title);
 				}

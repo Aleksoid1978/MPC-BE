@@ -6023,25 +6023,25 @@ void CMainFrame::OnFileSaveAs()
 	CString ffmpegpath;
 
 	if (m_youtubeFields.fname.GetLength()) {
-		saveItems.emplace_back('v', in, GetAltFileName());
+		saveItems.emplace_back('v', in, GetAltFileName(), "");
 
 		const auto pFileData = dynamic_cast<OpenFileData*>(m_lastOMD.get());
 		if (pFileData) {
 			if (pFileData->fns.size() == 2) {
 				auto it = ++(pFileData->fns.begin());
-				saveItems.emplace_back('a', it->GetPath(), it->GetTitle());
+				saveItems.emplace_back('a', it->GetPath(), it->GetTitle(), "");
 				ffmpegpath = GetFullExePath(AfxGetAppSettings().strFFmpegExePath, true);
 			}
 
 			for (const auto& sub : pFileData->subs) {
 				if (sub.GetPath().Find(L"fmt=vtt") > 0) {
-					saveItems.emplace_back('s', sub.GetPath(), sub.GetTitle());
+					saveItems.emplace_back('s', sub.GetPath(), sub.GetTitle(), sub.GetLang());
 				}
 			}
 		}
 	}
 	else {
-		saveItems.emplace_back(0, in, in);
+		saveItems.emplace_back(0, in, in, "");
 	}
 
 	HRESULT hr = S_OK;
