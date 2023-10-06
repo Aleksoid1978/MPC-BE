@@ -47,6 +47,8 @@
 #include <libavutil/intreadwrite.h>
 #include <libavutil/pixfmt.h>
 
+#define MOV_TKHD_FLAG_ENABLED       0x0001
+
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
@@ -384,6 +386,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			AP4_UI32 width = 0;
 			AP4_UI32 height = 0;
 			REFERENCE_TIME AvgTimePerFrame = 0;
+			AP4_UI32 tkhd_flags = 0;
 
 			if (track->GetType() == AP4_Track::TYPE_VIDEO) {
 				if (AP4_TkhdAtom* tkhd = dynamic_cast<AP4_TkhdAtom*>(track->GetTrakAtom()->GetChild(AP4_ATOM_TYPE_TKHD))) {
@@ -431,6 +434,11 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				if (!movie->HasFragments()
 						&& track->GetTrakAtom()->FindChild("mdia/minf/stbl/ctts") == nullptr) {
 					m_dtsonly = 1;
+				}
+			}
+			else if (track->GetType() == AP4_Track::TYPE_TEXT) {
+				if (AP4_TkhdAtom* tkhd = dynamic_cast<AP4_TkhdAtom*>(track->GetTrakAtom()->GetChild(AP4_ATOM_TYPE_TKHD))) {
+					tkhd_flags = tkhd->GetFlags();
 				}
 			}
 
@@ -789,12 +797,23 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						memset(si, 0, mt.FormatLength());
 						si->dwOffset = sizeof(SUBTITLEINFO);
 						strcpy_s(si->IsoLang, std::size(si->IsoLang), CStringA(TrackLanguage));
+						BOOL forced = 0;
 						if (AP4_Tx3gSampleEntry* tx3g = dynamic_cast<AP4_Tx3gSampleEntry*>(sample_entry)) {
 							const AP4_Tx3gSampleEntry::AP4_Tx3gDescription& description = tx3g->GetDescription();
-							if (description.DisplayFlags & 0x80000000) {
-								TrackName += L" [Forced]";
+							forced = description.DisplayFlags & 0x80000000;
+						}
+
+						if (tkhd_flags & MOV_TKHD_FLAG_ENABLED) {
+							if (forced) {
+								TrackName += L" [Default, Forced]";
+							} else {
+								TrackName += L" [Default]";
 							}
 						}
+						else if (forced) {
+							TrackName += L" [Forced]";
+						}
+
 						wcscpy_s(si->TrackName, std::size(si->TrackName), TrackName);
 						mts.push_back(mt);
 
