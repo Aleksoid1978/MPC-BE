@@ -370,6 +370,7 @@ void CSaveTaskDlg::SaveHTTP()
 		CStringW mapping;
 		CStringW metadata;
 		unsigned isub = 0;
+		int isub_def = -1;
 		CStringW strArgs = L"-y";
 		for (unsigned i = 0; i < m_saveItems.size(); ++i) {
 			const auto& item = m_saveItems[i];
@@ -380,6 +381,9 @@ void CSaveTaskDlg::SaveHTTP()
 				LPCSTR lang = ISO6391To6392(item.lang);
 				if (lang[0]) {
 					metadata.AppendFormat(LR"( -metadata:s:s:%u language="%S")", isub, lang);
+					if (isub_def < 0 && strcmp(lang, "eng") == 0) {
+						isub_def = isub;
+					}
 				}
 				if (item.title.GetLength()) {
 					metadata.AppendFormat(LR"( -metadata:s:s:%u title="%s")", isub, item.title);
@@ -393,6 +397,9 @@ void CSaveTaskDlg::SaveHTTP()
 		}
 		strArgs.Append(mapping);
 		strArgs.Append(metadata);
+		if (isub_def >= 0) {
+			strArgs.AppendFormat(L" -disposition:s:%d default", isub_def);
+		}
 		strArgs.AppendFormat(LR"( -f %s "%s")", finalext, tmpfile);
 
 		SHELLEXECUTEINFOW execinfo = { sizeof(execinfo) };
