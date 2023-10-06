@@ -54,14 +54,6 @@ struct VORBISFORMAT2 {
 	DWORD HeaderSize[3]; // 0: Identification, 1: Comment, 2: Setup
 };
 
-#pragma pack(push, 1)
-struct SUBTITLEINFO {
-	DWORD dwOffset;
-	CHAR  IsoLang[4];     // three letter lang code + terminating zero
-	WCHAR TrackName[256]; // 256 chars ought to be enough for everyone :)
-};
-#pragma pack(pop)
-
 struct WAVEFORMATEX_HDMV_LPCM : public WAVEFORMATEX {
 	BYTE channel_conf;
 

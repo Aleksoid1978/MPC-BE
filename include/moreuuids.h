@@ -423,6 +423,14 @@ DEFINE_GUID(MEDIASUBTYPE_WEBVTT, 0xc886d215, 0xf485, 0x40bb, 0x8d, 0xb6, 0xfa, 0
 // {A33D2F7D-96BC-4337-B23B-A8B9FBC295E9}
 DEFINE_GUID(FORMAT_SubtitleInfo, 0xa33d2f7d, 0x96bc, 0x4337, 0xb2, 0x3b, 0xa8, 0xb9, 0xfb, 0xc2, 0x95, 0xe9);
 
+#pragma pack(push, 1)
+struct SUBTITLEINFO {
+	DWORD dwOffset;
+	CHAR  IsoLang[4];     // three letter lang code + terminating zero
+	WCHAR TrackName[256]; // 256 chars ought to be enough for everyone :)
+};
+#pragma pack(pop)
+
 // SUBTITLEINFO structure content starting at dwOffset (also the content of CodecPrivate)
 // --------------------------------------------------------------------------------------
 //
@@ -486,26 +494,8 @@ DEFINE_GUID(FORMAT_SubtitleInfo, 0xa33d2f7d, 0x96bc, 0x4337, 0xb2, 0x3b, 0xa8, 0
 // S_VOBSUB/ZLIB<-> MEDIATYPE_Subtitle	MEDIASUBTYPE_VOBSUB	FORMAT_SubtitleInfo
 //
 
-/*
-DEFINE_GUID( MEDIATYPE_MPEG2_SECTIONS,
-	0x455f176c, 0x4b06, 0x47ce, 0x9a, 0xef, 0x8c, 0xae, 0xf7, 0x3d, 0xf7, 0xb5);
 
-DEFINE_GUID(MEDIASUBTYPE_ATSC_SI,
-0xb3c7397c, 0xd303, 0x414d, 0xb3, 0x3c, 0x4e, 0xd2, 0xc9, 0xd2, 0x97, 0x33);
-
-DEFINE_GUID(MEDIASUBTYPE_DVB_SI,
-0xe9dd31a3, 0x221d, 0x4adb, 0x85, 0x32, 0x9a, 0xf3, 0x09, 0xc1, 0xa4, 0x08);
-
-
-// {C892E55B-252D-42b5-A316-D997E7A5D995}
-DEFINE_GUID(MEDIASUBTYPE_MPEG2DATA,
-0xc892e55b, 0x252d, 0x42b5, 0xa3, 0x16, 0xd9, 0x97, 0xe7, 0xa5, 0xd9, 0x95);
-
-*/
-
-// H264
-// 34363248-0000-0010-8000-00aa00389b71
-// DEFINE_MEDIATYPE_GUID(MEDIASUBTYPE_H264, 0x34363248);
+// H.264
 
 // {6F29D2AD-E130-45AA-B42F-F623AD354A90}
 DEFINE_GUID(MEDIASUBTYPE_ArcsoftH264, 0x6F29D2AD, 0xE130, 0x45AA, 0xB4, 0x2F, 0xF6, 0x23, 0xAD, 0x35, 0x4A, 0x90);
@@ -537,6 +527,8 @@ DEFINE_MEDIATYPE_GUID(MEDIASUBTYPE_CCV1, FCC('CCV1'));
 // {8D2D71CB-243F-45E3-B2D8-5FD7967EC09B} <= Used by MediaPortal for example...
 DEFINE_GUID(MEDIASUBTYPE_H264_bis, 0x8D2D71CB, 0x243F, 0x45E3, 0xB2, 0xD8, 0x5F, 0xD7, 0x96, 0x7E, 0xC0, 0x9B);
 
+// MVC
+
 // {43564D41-0000-0010-8000-00AA00389B71} Full MVC
 DEFINE_MEDIATYPE_GUID(MEDIASUBTYPE_AMVC, FCC('AMVC'));
 
@@ -545,6 +537,8 @@ DEFINE_MEDIATYPE_GUID(MEDIASUBTYPE_MVC1, FCC('MVC1'));
 
 // {43564D45-0000-0010-8000-00AA00389B71} Subset MVC
 DEFINE_MEDIATYPE_GUID(MEDIASUBTYPE_EMVC, FCC('EMVC'));
+
+//
 
 // {33515653-0000-0010-8000-00aa00389b71}
 DEFINE_MEDIATYPE_GUID(MEDIASUBTYPE_SVQ3, FCC('SVQ3'));
