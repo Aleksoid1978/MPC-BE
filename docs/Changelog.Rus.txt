@@ -8,6 +8,9 @@
 AudioSplitter 
 Добавлена поддержка нескольких тегов ARTIST для FLAC.
 
+MP4Splitter
+Добавлена поддержка флага "default" для субтитров.
+
 MpaDecFilter
 Добавлена поддержка кодека "Intel Music Coder".
 Исправлено декодирование 24-битных "Monkey's Audio" (обновлен FFmpeg).

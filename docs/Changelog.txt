@@ -8,6 +8,9 @@ The COPYING.txt file has been renamed to LICENSE.txt.
 AudioSplitter
 Added support for multiple ARTIST tags for FLAC.
 
+MP4Splitter
+Added support for the "default" flag for subtitles.
+
 MpaDecFilter
 Added support for the "Intel Music Coder" codec.
 Fixed decoding of 24-bit "Monkey's Audio" (FFmpeg updated).
