@@ -47,6 +47,7 @@ private:
 	const std::vector<SaveItem_t> m_saveItems;
 	std::vector<CStringW> m_dstPaths;
 	CStringW m_ffmpegPath;
+	int m_iSubLangDefault = -1;
 
 	HICON m_hIcon;
 
@@ -102,7 +103,7 @@ private:
 	int m_iPrevState = -1;
 
 	void SaveUDP();
-	void SaveHTTP();
+	void SaveHTTP(const int iSubLangDefault);
 	HRESULT DownloadHTTP(const CStringW url, const CStringW filepath);
 
 	SOCKET m_UdpSocket = INVALID_SOCKET;
@@ -113,6 +114,7 @@ public:
 	CSaveTaskDlg(const std::list<SaveItem_t>& saveItems, const CStringW& dstPath, HRESULT& hr);
 
 	void SetFFmpegPath(const CStringW& ffmpegpath);
+	void SetLangDefault(const CStringA& langDefault); 
 	bool IsCompleteOk();
 
 private:

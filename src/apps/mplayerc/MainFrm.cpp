@@ -6019,6 +6019,7 @@ void CMainFrame::OnFileSaveAs()
 		m_pMC->Pause();
 	}
 
+	const CAppSettings& s = AfxGetAppSettings();
 	std::list<CSaveTaskDlg::SaveItem_t> saveItems;
 	CString ffmpegpath;
 
@@ -6030,7 +6031,7 @@ void CMainFrame::OnFileSaveAs()
 			if (pFileData->fns.size() == 2) {
 				auto it = ++(pFileData->fns.begin());
 				saveItems.emplace_back('a', it->GetPath(), it->GetTitle(), "");
-				ffmpegpath = GetFullExePath(AfxGetAppSettings().strFFmpegExePath, true);
+				ffmpegpath = GetFullExePath(s.strFFmpegExePath, true);
 			}
 
 			for (const auto& sub : pFileData->subs) {
@@ -6049,6 +6050,7 @@ void CMainFrame::OnFileSaveAs()
 
 	if (SUCCEEDED(hr)) {
 		save_dlg.SetFFmpegPath(ffmpegpath);
+		save_dlg.SetLangDefault(CStringA(s.strYoutubeAudioLang));
 		save_dlg.DoModal();
 	}
 
