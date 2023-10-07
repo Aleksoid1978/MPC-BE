@@ -5957,7 +5957,10 @@ void CMainFrame::OnFileSaveAs()
 		return;
 	}
 
-	CString ext, ext_list, in = m_strPlaybackRenderedPath, out = in;
+	CStringW ext;
+	CStringW ext_list;
+	CStringW in = m_strPlaybackRenderedPath;
+	CStringW out = in;
 
 	if (!m_youtubeFields.fname.IsEmpty()) {
 		out = GetAltFileName();
@@ -5999,7 +6002,7 @@ void CMainFrame::OnFileSaveAs()
 	}
 	ext_list.Append(ResStr(IDS_MAINFRM_48));
 
-	CFileDialog fd(FALSE, 0, out,
+	CFileDialog fd(FALSE, ext.GetLength() ? ext.GetString() : nullptr, out,
 				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT,
 				   ext_list, GetModalParent(), 0);
 
@@ -6008,7 +6011,7 @@ void CMainFrame::OnFileSaveAs()
 	}
 
 	CStringW savedFileName(fd.GetPathName());
-	if (!ext.IsEmpty()) {
+	if (ext.GetLength()) {
 		savedFileName = AddExtension(savedFileName, ext);
 	}
 
