@@ -400,7 +400,9 @@ void CSaveTaskDlg::SaveHTTP(const int iSubLangDefault)
 					metadata.AppendFormat(LR"( -metadata:s:s:%u language="%S")", isub, lang);
 				}
 				if (item.title.GetLength()) {
-					metadata.AppendFormat(LR"( -metadata:s:s:%u title="%s")", isub, item.title);
+					if (item.title != ISO6391ToLanguage(item.lang)) {
+						metadata.AppendFormat(LR"( -metadata:s:s:%u title="%s")", isub, item.title);
+					}
 				}
 				isub++;
 			}
