@@ -189,7 +189,7 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 	}
 
 	LOGFONTW lf = {};
-	lf.lfHeight = -AfxGetMainFrame()->PointsToPixels(8);
+	lf.lfHeight = -AfxGetMainFrame()->ScaleY(12);
 	lf.lfPitchAndFamily = FIXED_PITCH | FF_MODERN;
 
 	for (const auto &fontname : MonospaceFonts) {
