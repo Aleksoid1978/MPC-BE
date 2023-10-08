@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -250,7 +250,7 @@ BOOL CPPageSubStyle::OnApply()
 
 void CPPageSubStyle::OnBnClickedButton1()
 {
-	LOGFONT lf;
+	LOGFONTW lf;
 	lf <<= *m_stss;
 
 	CFontDialog dlg(&lf, CF_SCREENFONTS|CF_INITTOLOGFONTSTRUCT|CF_FORCEFONTEXIST|CF_SCALABLEONLY);

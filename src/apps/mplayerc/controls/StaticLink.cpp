@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -58,7 +58,7 @@ HBRUSH CStaticLink::CtlColor(CDC* pDC, UINT nCtlColor)
 
 		if (!(HFONT)m_font) {
 
-			LOGFONT lf;
+			LOGFONTW lf;
 			GetFont()->GetObjectW(sizeof(lf), &lf);
 			lf.lfUnderline = TRUE;
 			m_font.CreateFontIndirectW(&lf);

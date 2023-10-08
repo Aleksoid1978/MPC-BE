@@ -188,7 +188,7 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 		return FALSE;
 	}
 
-	LOGFONT lf = {};
+	LOGFONTW lf = {};
 	lf.lfHeight = -AfxGetMainFrame()->PointsToPixels(8);
 	lf.lfPitchAndFamily = FIXED_PITCH | FF_MODERN;
 

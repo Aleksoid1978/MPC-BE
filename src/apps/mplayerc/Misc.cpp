@@ -469,7 +469,7 @@ bool IsFontInstalled(LPCWSTR lpszFont)
 		return false;
 	}
 
-	LOGFONT lf = {0};
+	LOGFONTW lf = {0};
 	// Any character set will do
 	lf.lfCharSet = DEFAULT_CHARSET;
 	// Set the facename to check for

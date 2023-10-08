@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -82,7 +82,7 @@ BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRec
 			return FALSE;
 		}
 
-		LOGFONT lf = { 0 };
+		LOGFONTW lf = { 0 };
 		wcscpy_s(lf.lfFaceName, face);
 		lf.lfHeight = -PointsToPixels(height);
 		lf.lfWeight = FW_NORMAL;

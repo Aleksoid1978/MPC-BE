@@ -3765,7 +3765,7 @@ bool STSStyle::IsFontStyleEqual(const STSStyle& s) const
 			  && fontShiftY == s.fontShiftY);
 }
 
-STSStyle& STSStyle::operator = (LOGFONT& lf)
+STSStyle& STSStyle::operator = (LOGFONTW& lf)
 {
 	charSet = lf.lfCharSet;
 	fontName = lf.lfFaceName;

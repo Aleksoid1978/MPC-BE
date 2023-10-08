@@ -297,7 +297,7 @@ void COSD::CalcSeekbar()
 
 			m_SeekbarTextHeight = m_rectPosText.Height();
 
-			LOGFONT lf = {};
+			LOGFONTW lf = {};
 			lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
 			lf.lfHeight = -(m_SeekbarTextHeight * 72 / 96);
 			wcscpy_s(lf.lfFaceName, LF_FACESIZE, AfxGetAppSettings().strOSDFont);
@@ -1142,7 +1142,7 @@ void COSD::CreateFontInternal()
 		m_MainFont.DeleteObject();
 	}
 
-	LOGFONT lf = {};
+	LOGFONTW lf = {};
 	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
 	lf.lfHeight = -PointsToPixels(m_FontSize);
 	lf.lfQuality = AfxGetAppSettings().fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;

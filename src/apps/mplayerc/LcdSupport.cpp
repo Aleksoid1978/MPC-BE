@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -174,7 +174,7 @@ CLCDMyMonoPage::~CLCDMyMonoPage(void)
 
 HRESULT CLCDMyMonoPage::Initialize()
 {
-	LOGFONT lf;
+	LOGFONTW lf;
 	HFONT hFont;
 	unsigned int x, y;
 
@@ -256,7 +256,7 @@ HRESULT CLCDMyMonoPage::Initialize()
 	m_Text[0].SetText(L"");
 	m_Text[0].SetFontPointSize(7);
 	hFont = m_Text[0].GetFont();
-	GetObjectW(hFont, sizeof(LOGFONT), &lf);
+	GetObjectW(hFont, sizeof(LOGFONTW), &lf);
 	wcscpy_s(lf.lfFaceName, LF_FACESIZE, L"Microsoft Sans Serif");
 	m_Text[0].SetFont(lf);
 
@@ -269,7 +269,7 @@ HRESULT CLCDMyMonoPage::Initialize()
 	m_Text[1].SetText(L"");
 	m_Text[1].SetFontPointSize(7);
 	hFont = m_Text[1].GetFont();
-	GetObjectW(hFont, sizeof(LOGFONT), &lf);
+	GetObjectW(hFont, sizeof(LOGFONTW), &lf);
 	wcscpy_s(lf.lfFaceName, LF_FACESIZE, L"Microsoft Sans Serif");
 	m_Text[1].SetFont(lf);
 
@@ -295,10 +295,10 @@ void CLCDMyMonoPage::OnLCDButtonUp(int nButton)
 {
 	switch (nButton) {
 		case LGLCDBUTTON_BUTTON0: {
-			/*LOGFONT lf;
+			/*LOGFONTW lf;
 			HFONT hFont = m_Text1.GetFont();
 
-			GetObjectW(hFont, sizeof(LOGFONT), &lf);
+			GetObjectW(hFont, sizeof(LOGFONTW), &lf);
 
 			CFontDialog cfd(&lf);
 			if (cfd.DoModal() == IDOK) {
@@ -365,7 +365,7 @@ CLCDMyColorPage::~CLCDMyColorPage(void)
 
 HRESULT CLCDMyColorPage::Initialize()
 {
-	LOGFONT lf;
+	LOGFONTW lf;
 	HFONT hFont;
 	unsigned int x, y;
 
@@ -449,7 +449,7 @@ HRESULT CLCDMyColorPage::Initialize()
 	m_Text[0].SetText(L"");
 	m_Text[0].SetFontPointSize(14);
 	hFont = m_Text[0].GetFont();
-	GetObjectW(hFont, sizeof(LOGFONT), &lf);
+	GetObjectW(hFont, sizeof(LOGFONTW), &lf);
 	wcscpy_s(lf.lfFaceName, LF_FACESIZE, L"Microsoft Sans Serif");
 	m_Text[0].SetFont(lf);
 
@@ -462,7 +462,7 @@ HRESULT CLCDMyColorPage::Initialize()
 	m_Text[1].SetText(L"");
 	m_Text[1].SetFontPointSize(14);
 	hFont = m_Text[1].GetFont();
-	GetObjectW(hFont, sizeof(LOGFONT), &lf);
+	GetObjectW(hFont, sizeof(LOGFONTW), &lf);
 	wcscpy_s(lf.lfFaceName, LF_FACESIZE, L"Microsoft Sans Serif");
 	m_Text[1].SetFont(lf);
 
@@ -488,10 +488,10 @@ void CLCDMyColorPage::OnLCDButtonUp(int nButton)
 {
 	switch (nButton) {
 		case LGLCDBUTTON_BUTTON0: {
-			/*LOGFONT lf;
+			/*LOGFONTW lf;
 			HFONT hFont = m_Text1.GetFont();
 
-			GetObjectW(hFont, sizeof(LOGFONT), &lf);
+			GetObjectW(hFont, sizeof(LOGFONTW), &lf);
 
 			CFontDialog cfd(&lf);
 			if (cfd.DoModal() == IDOK) {
