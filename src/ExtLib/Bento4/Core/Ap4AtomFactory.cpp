@@ -142,27 +142,11 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
     stream.Tell(start);
 
     // read atom size
-
     AP4_UI64 size = 0;
     result = stream.ReadUI32((AP4_UI32&)size);
     if (AP4_FAILED(result)) {
         stream.Seek(start);
         return result;
-    }
-
-    if (size == 0) {
-        // atom extends to end of file
-        AP4_Size streamSize = 0;
-        stream.GetSize(streamSize);
-        if (streamSize >= start) {
-            size = streamSize - start;
-        }
-    }
-
-    // check the size (we don't handle extended size yet)
-    if (size != 1 && size < 8 || size > bytes_available) {
-        stream.Seek(start);
-        return AP4_ERROR_INVALID_FORMAT;
     }
 
     // read atom type
@@ -176,18 +160,30 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         // type = 0x0000; // TODO - need a sample
     }
 
-    if (size == 1) {
-        AP4_UI64 size_high;
-
-        result = stream.ReadUI64(size_high);
-        if (AP4_FAILED(result) ) {
+    // handle special size values
+    if (size == 0) {
+        // atom extends to end of file
+        AP4_Size streamSize = 0;
+        stream.GetSize(streamSize);
+        if (streamSize >= start) {
+            size = streamSize - start;
+        }
+    } else if (size == 1) {
+        // 64-bit size
+        if (bytes_available < 16) {
             stream.Seek(start);
             return AP4_ERROR_INVALID_FORMAT;
         }
-        size = size_high;
+
+        result = stream.ReadUI64(size);
+        if (AP4_FAILED(result)) {
+            stream.Seek(start);
+            return AP4_ERROR_INVALID_FORMAT;
+        }
     }
 
-    if (size == 0) {
+    // check the size
+    if ((size > 0 && size < 8) || size > bytes_available) {
         stream.Seek(start);
         return AP4_ERROR_INVALID_FORMAT;
     }
