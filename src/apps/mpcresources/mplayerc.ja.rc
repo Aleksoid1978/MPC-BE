@@ -1083,7 +1083,7 @@ BEGIN
     CONTROL         "Logitech (Logicool) LCD サポートを有効にする",IDC_CHECK_LCD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,126,264,9
     CONTROL         "ウィンドウ メディア コントロールを使用する",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,138,220,9
     CONTROL         "MiniDump を有効にする",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,150,184,9
-    LTEXT           "FFmpeg executable file:",IDC_STATIC,7,165,104,8
+    LTEXT           "FFmpeg 実行可能ファイル:",IDC_STATIC,7,165,104,8
     COMBOBOX        IDC_COMBO1,113,163,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "更新の確認",IDC_STATIC,5,180,286,40
     CONTROL         "更新を自動で確認する",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,192,250,9
@@ -3429,7 +3429,7 @@ BEGIN
     IDS_NO_MORE_MEDIA       "現在のフォルダーにはこれ以上メディアがありません。"
     IDS_FIRST_IN_FOLDER     "フォルダー内の最初のファイルが現在読み込まれています。"
     IDS_LAST_IN_FOLDER      "フォルダー内の最後のファイルが現在読み込まれています。"
-    IDS_MERGING_FILES       "Merging files..."
+    IDS_MERGING_FILES       "ファイルを結合しています..."
 END
 
 STRINGTABLE
