@@ -2373,6 +2373,9 @@ BEGIN
     IDS_PLAYLOOPMODE_AB_MARK_A "A-B Herhalen: Positie A markeren"
     IDS_PLAYLOOPMODE_AB_MARK_B "A-B Herhalen: Positie B markeren"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Aan afspeellijst toevoegen vanaf klembord"
+    IDS_MOVEWINDOWBYVIDEO_ONOFF "Move window by the video area: On/Off"
+    IDS_MOVEWINDOWBYVIDEO_ON "Move window by the video area: On"
+    IDS_MOVEWINDOWBYVIDEO_0FF "Move window by the video area: Off"
     IDS_AUDIO_FILTER_PRESET_1 "Voor audio met fluisteren en explosies"
 END
 

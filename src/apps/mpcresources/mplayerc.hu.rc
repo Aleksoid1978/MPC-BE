@@ -2373,6 +2373,9 @@ BEGIN
     IDS_PLAYLOOPMODE_AB_MARK_A "A-B Ismétlés: Jelölje meg az A pozíciót"
     IDS_PLAYLOOPMODE_AB_MARK_B "A-B Ismétlés: Jelölje meg a B pozíciót"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Hozzáadás a lejátszási listához a vágólapról"
+    IDS_MOVEWINDOWBYVIDEO_ONOFF "Move window by the video area: On/Off"
+    IDS_MOVEWINDOWBYVIDEO_ON "Move window by the video area: On"
+    IDS_MOVEWINDOWBYVIDEO_0FF "Move window by the video area: Off"
     IDS_AUDIO_FILTER_PRESET_1 "Suttogó és robbanásos részekkel rendelkező hanghoz"
 END
 

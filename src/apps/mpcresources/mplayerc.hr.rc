@@ -2371,6 +2371,9 @@ BEGIN
     IDS_PLAYLOOPMODE_AB_MARK_A "A-B Ponavljanje: Markiraj A Poziciju"
     IDS_PLAYLOOPMODE_AB_MARK_B "A-B Ponavljanje: Mark B Poziciju"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Dodaj playlistu iz spremnika (clipboard)"
+    IDS_MOVEWINDOWBYVIDEO_ONOFF "Move window by the video area: On/Off"
+    IDS_MOVEWINDOWBYVIDEO_ON "Move window by the video area: On"
+    IDS_MOVEWINDOWBYVIDEO_0FF "Move window by the video area: Off"
     IDS_AUDIO_FILTER_PRESET_1 "For audio with whisper and explosion parts"
 END
 

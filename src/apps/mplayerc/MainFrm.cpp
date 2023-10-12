@@ -487,6 +487,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_COMMAND(ID_ADDTOPLAYLISTROMCLIPBOARD, OnAddToPlaylistFromClipboard)
 
+	ON_COMMAND(ID_MOVEWINDOWBYVIDEO_ONOFF, OnChangeMouseEasyMove)
+
 	ON_WM_WTSSESSION_CHANGE()
 
 	ON_WM_SETTINGCHANGE()
@@ -10607,6 +10609,14 @@ void CMainFrame::OnSubCopyClipboard()
 void CMainFrame::OnAddToPlaylistFromClipboard()
 {
 	m_wndPlaylistBar.PasteFromClipboard();
+}
+
+void CMainFrame::OnChangeMouseEasyMove()
+{
+	CAppSettings& s = AfxGetAppSettings();
+	s.bMouseEasyMove = !s.bMouseEasyMove;
+
+	m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(s.bMouseEasyMove ? IDS_MOVEWINDOWBYVIDEO_ON : IDS_MOVEWINDOWBYVIDEO_0FF));
 }
 
 void CMainFrame::SetDefaultWindowRect(int iMonitor, const bool bLastCall)
