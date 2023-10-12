@@ -2373,9 +2373,9 @@ BEGIN
     IDS_PLAYLOOPMODE_AB_MARK_A "Ripeti A-B: segna posizione A"
     IDS_PLAYLOOPMODE_AB_MARK_B "Ripeti A-B: segna posizione B"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Aggiungi alla playlist dagli appunti"
-    IDS_MOVEWINDOWBYVIDEO_ONOFF "Move window by the video area: On/Off"
-    IDS_MOVEWINDOWBYVIDEO_ON "Move window by the video area: On"
-    IDS_MOVEWINDOWBYVIDEO_0FF "Move window by the video area: Off"
+    IDS_MOVEWINDOWBYVIDEO_ONOFF "Sposta la finestra nell'area del video: On/Off"
+    IDS_MOVEWINDOWBYVIDEO_ON "Sposta la finestra nell'area del video: On"
+    IDS_MOVEWINDOWBYVIDEO_0FF "Sposta la finestra nell'area del video: Off"
     IDS_AUDIO_FILTER_PRESET_1 "Per audio con parti sussurrate ed esplosive"
 END
 
@@ -2737,8 +2737,8 @@ STRINGTABLE
 BEGIN
     IDS_OSD_ZOOM_AUTO       "Zoom: Auto"
     IDS_CUSTOM_CHANNEL_MAPPING "Attiva/disattiva la mappatura personalizzata dei canali"
-    IDS_OSD_CUSTOM_CH_MAPPING_ON "Mappatura dei canali personalizzata: On"
-    IDS_OSD_CUSTOM_CH_MAPPING_OFF "Mappatura dei canali personalizzata: Off"
+    IDS_OSD_CUSTOM_CH_MAPPING_ON "Mappatura canali personalizzata: On"
+    IDS_OSD_CUSTOM_CH_MAPPING_OFF "Mappatura canali personalizzata: Off"
     IDS_TOGGLE_AUTOVOLUMECONTROL "Attiva/disattiva il controllo automatico del volume"
     IDS_OSD_AUTOVOLUMECONTROL_ON "Controllo volume automatico: On"
     IDS_OSD_AUTOVOLUMECONTROL_OFF "Controllo volume automatico: Off"

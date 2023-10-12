@@ -2373,9 +2373,9 @@ BEGIN
     IDS_PLAYLOOPMODE_AB_MARK_A "Repetir A-B: Marca Posición A"
     IDS_PLAYLOOPMODE_AB_MARK_B "Repetir A-B: Marca Posición B"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Agregar a la Lista de Reproducción desde el portapapeles"
-    IDS_MOVEWINDOWBYVIDEO_ONOFF "Move window by the video area: On/Off"
-    IDS_MOVEWINDOWBYVIDEO_ON "Move window by the video area: On"
-    IDS_MOVEWINDOWBYVIDEO_0FF "Move window by the video area: Off"
+    IDS_MOVEWINDOWBYVIDEO_ONOFF "Mover ventana por el área de video: Encendido/Apagado"
+    IDS_MOVEWINDOWBYVIDEO_ON "Mover ventana por el área de video: Encendido"
+    IDS_MOVEWINDOWBYVIDEO_0FF "Mover ventana por el área de video: Apagado"
     IDS_AUDIO_FILTER_PRESET_1 "Para audio con partes de susurro y explosión"
 END
 
