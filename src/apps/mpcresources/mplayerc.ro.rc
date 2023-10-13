@@ -2372,9 +2372,9 @@ BEGIN
     IDS_PLAYLOOPMODE_AB_MARK_A "Repetă A-B: Marchează poziția A"
     IDS_PLAYLOOPMODE_AB_MARK_B "Repetă A-B: Marchează poziția B"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Adaugă în lista de redare din clipboard"
-    IDS_MOVEWINDOWBYVIDEO_ONOFF "Move window by the video area: On/Off"
-    IDS_MOVEWINDOWBYVIDEO_ON "Move window by the video area: On"
-    IDS_MOVEWINDOWBYVIDEO_0FF "Move window by the video area: Off"
+    IDS_MOVEWINDOWBYVIDEO_ONOFF "Mută fereastra în zona video: Pornit/Oprit"
+    IDS_MOVEWINDOWBYVIDEO_ON "Mută fereastra în zona video: Pornit"
+    IDS_MOVEWINDOWBYVIDEO_0FF "Mută fereastra în zona video: Oprit"
     IDS_AUDIO_FILTER_PRESET_1 "Pentru sunet cu părți de șoaptă și de explozie"
 END
 
@@ -3379,7 +3379,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Încarcă fonturi încorporate"
-    IDS_MKVSPLT_CALC_DURATION "Calculaează durata pe baza datelor video"
+    IDS_MKVSPLT_CALC_DURATION "Calculează durata pe baza datelor video"
 END
 
 STRINGTABLE

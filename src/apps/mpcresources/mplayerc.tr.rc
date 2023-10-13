@@ -2373,9 +2373,9 @@ BEGIN
     IDS_PLAYLOOPMODE_AB_MARK_A "A-B Tekrarla: A Konumunu İşaretle"
     IDS_PLAYLOOPMODE_AB_MARK_B "A-B Tekrarla: B Konumunu İşaretle"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Panodan Oynatma Listesine Ekle"
-    IDS_MOVEWINDOWBYVIDEO_ONOFF "Move window by the video area: On/Off"
-    IDS_MOVEWINDOWBYVIDEO_ON "Move window by the video area: On"
-    IDS_MOVEWINDOWBYVIDEO_0FF "Move window by the video area: Off"
+    IDS_MOVEWINDOWBYVIDEO_ONOFF "Pencereyi Video Alanı Vasıtasıyla Taşı: Aç/Kapat"
+    IDS_MOVEWINDOWBYVIDEO_ON "Pencereyi Video Alanı Vasıtasıyla Taşı: Açık"
+    IDS_MOVEWINDOWBYVIDEO_0FF "Pencereyi Video Alanı Vasıtasıyla Taşı: Kapalı"
     IDS_AUDIO_FILTER_PRESET_1 "Hışırtı ve patlama bölümleri olan ses için"
 END
 
