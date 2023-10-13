@@ -2373,9 +2373,9 @@ BEGIN
     IDS_PLAYLOOPMODE_AB_MARK_A "A - B 重复：标记定位 A"
     IDS_PLAYLOOPMODE_AB_MARK_B "A - B 重复：标记定位 B"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "从剪贴板添加到播放列表"
-    IDS_MOVEWINDOWBYVIDEO_ONOFF "Move window by the video area: On/Off"
-    IDS_MOVEWINDOWBYVIDEO_ON "Move window by the video area: On"
-    IDS_MOVEWINDOWBYVIDEO_0FF "Move window by the video area: Off"
+    IDS_MOVEWINDOWBYVIDEO_ONOFF "按视频区域移动窗口: 开/关"
+    IDS_MOVEWINDOWBYVIDEO_ON "按视频区域移动窗口: 开"
+    IDS_MOVEWINDOWBYVIDEO_0FF "按视频区域移动窗口: 关"
     IDS_AUDIO_FILTER_PRESET_1 "用于有耳语和爆炸声的音频"
 END
 
