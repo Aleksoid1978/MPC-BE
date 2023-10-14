@@ -1830,15 +1830,11 @@ CString ReftimeToString(REFERENCE_TIME rt)
 		return L"INVALID TIME";
 	}
 
-	CString		strTemp;
-	LONGLONG	llTotalMs = ConvertToMilliseconds(rt);
-	int			lHour     = (int)(llTotalMs  / (1000 * 60 * 60));
-	int			lMinute   = (llTotalMs / (1000 * 60)) % 60;
-	int			lSecond   = (llTotalMs /  1000) % 60;
-	int			lMillisec = llTotalMs  %  1000;
+	TimeCode_t tc = ReftimeToTimecode(rt);
+	CString str;
+	str.Format(L"%02d:%02d:%02d.%03d", tc.Hours, tc.Minutes, tc.Seconds, tc.Milliseconds);
 
-	strTemp.Format(L"%02d:%02d:%02d.%03d", lHour, lMinute, lSecond, lMillisec);
-	return strTemp;
+	return str;
 }
 
 // hour, minute, second (round)
@@ -1848,14 +1844,11 @@ CString ReftimeToString2(REFERENCE_TIME rt)
 		return L"INVALID TIME";
 	}
 
-	CString		strTemp;
-	LONGLONG	seconds = (rt + 5000000) / 10000000;
-	int			lHour   = (int)(seconds / 3600);
-	int			lMinute = (int)(seconds / 60 % 60);
-	int			lSecond = (int)(seconds % 60);
+	TimeCode_t tc = ReftimeToHMS(rt);
+	CString str;
+	str.Format(L"%02d:%02d:%02d", tc.Hours, tc.Minutes, tc.Seconds);
 
-	strTemp.Format(L"%02d:%02d:%02d", lHour, lMinute, lSecond);
-	return strTemp;
+	return str;
 }
 
 CString DVDtimeToString(const DVD_HMSF_TIMECODE& rtVal, bool bAlwaysShowHours)
