@@ -292,13 +292,13 @@ void CBaseMuxerRawOutputPin::MuxPacket(const CMediaType& mt, const MuxerPacket* 
 			return;
 		}
 
-		DVD_HMSF_TIMECODE start = RT2HMSF(pPacket->rtStart, 25);
-		DVD_HMSF_TIMECODE stop = RT2HMSF(pPacket->rtStop, 25);
+		TimeCode_t start = ReftimeToTimecode(pPacket->rtStart);
+		TimeCode_t stop  = ReftimeToTimecode(pPacket->rtStop);
 
 		str.Format("%d\n%02u:%02u:%02u,%03d --> %02u:%02u:%02u,%03d\n%s\n\n",
 				   pPacket->index + 1,
-				   start.bHours, start.bMinutes, start.bSeconds, (int)((pPacket->rtStart / 10000) % 1000),
-				   stop.bHours, stop.bMinutes, stop.bSeconds, (int)((pPacket->rtStop / 10000) % 1000),
+				   start.Hours, start.Minutes, start.Seconds, start.Milliseconds,
+				   stop.Hours, stop.Minutes, stop.Seconds, start.Milliseconds,
 				   CStringA(str));
 
 		pBitStream->StrWrite(str, true);
@@ -310,9 +310,6 @@ void CBaseMuxerRawOutputPin::MuxPacket(const CMediaType& mt, const MuxerPacket* 
 		if (str.IsEmpty()) {
 			return;
 		}
-
-		DVD_HMSF_TIMECODE start = RT2HMSF(pPacket->rtStart, 25);
-		DVD_HMSF_TIMECODE stop = RT2HMSF(pPacket->rtStop, 25);
 
 		size_t fields = mt.subtype == MEDIASUBTYPE_ASS2 ? 10 : 9;
 
@@ -341,10 +338,13 @@ void CBaseMuxerRawOutputPin::MuxPacket(const CMediaType& mt, const MuxerPacket* 
 			layer = "Marked=0";
 		}
 
+		TimeCode_t start = ReftimeToTimecode(pPacket->rtStart);
+		TimeCode_t stop = ReftimeToTimecode(pPacket->rtStop);
+
 		str.Format("Dialogue: %s,%u:%02u:%02u.%02d,%u:%02u:%02u.%02d,%s,%s,%s,%s,%s,%s,%s\n",
 				   layer,
-				   start.bHours, start.bMinutes, start.bSeconds, (int)((pPacket->rtStart / 100000) % 100),
-				   stop.bHours, stop.bMinutes, stop.bSeconds, (int)((pPacket->rtStop / 100000) % 100),
+				   start.Hours, start.Minutes, start.Seconds, start.Milliseconds,
+				   stop.Hours, stop.Minutes, stop.Seconds, stop.Milliseconds,
 				   style, actor, left, right, top, effect,
 				   CStringA(str));
 
@@ -471,9 +471,10 @@ void CBaseMuxerRawOutputPin::MuxFooter(const CMediaType& mt)
 					}
 
 					for (const auto& item : m_idx) {
+						TimeCode_t start = ReftimeToTimecode(item.rt);
 						DVD_HMSF_TIMECODE start = RT2HMSF(item.rt, 25);
 						fwprintf_s(f, L"timestamp: %02u:%02u:%02u:%03d, filepos: %09I64x\n",
-									start.bHours, start.bMinutes, start.bSeconds, (int)((item.rt / 10000) % 1000),
+									start.Hours, start.Minutes, start.Seconds, start.Milliseconds,
 									item.fp);
 					}
 

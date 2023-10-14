@@ -121,8 +121,8 @@ struct PinType {
 };
 
 struct TimeCode_t {
-	int32_t Hours;
-	uint8_t Minutes;
-	uint8_t Seconds;
+	uint32_t Hours;
+	uint8_t  Minutes;
+	uint8_t  Seconds;
 	uint16_t Milliseconds;
 };
