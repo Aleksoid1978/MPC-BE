@@ -241,9 +241,6 @@
     <ClInclude Include="Profile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CUrl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UrlParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>

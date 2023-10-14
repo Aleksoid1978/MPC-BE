@@ -137,7 +137,6 @@
     <ClInclude Include="std_helper.h" />
     <ClInclude Include="SysVersion.h" />
     <ClInclude Include="text.h" />
-    <ClInclude Include="CUrl.h" />
     <ClInclude Include="UrlParser.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="VideoParser.h" />

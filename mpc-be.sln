@@ -158,6 +158,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Include", "Include", "{EA36
 		include\IBufferInfo.h = include\IBufferInfo.h
 		include\IChapterInfo.h = include\IChapterInfo.h
 		include\ID3DFullscreenControl.h = include\ID3DFullscreenControl.h
+		include\IDirectVobSub.h = include\IDirectVobSub.h
 		include\IDSMResourceBag.h = include\IDSMResourceBag.h
 		include\IFilterVersion.h = include\IFilterVersion.h
 		include\IKeyFrameInfo.h = include\IKeyFrameInfo.h
