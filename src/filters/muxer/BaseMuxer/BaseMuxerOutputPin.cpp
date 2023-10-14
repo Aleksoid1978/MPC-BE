@@ -472,7 +472,6 @@ void CBaseMuxerRawOutputPin::MuxFooter(const CMediaType& mt)
 
 					for (const auto& item : m_idx) {
 						TimeCode_t start = ReftimeToTimecode(item.rt);
-						DVD_HMSF_TIMECODE start = RT2HMSF(item.rt, 25);
 						fwprintf_s(f, L"timestamp: %02u:%02u:%02u:%03d, filepos: %09I64x\n",
 									start.Hours, start.Minutes, start.Seconds, start.Milliseconds,
 									item.fp);
