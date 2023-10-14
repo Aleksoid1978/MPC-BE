@@ -100,16 +100,16 @@ enum cdrom_t {
 extern cdrom_t			GetCDROMType(WCHAR drive, std::list<CString>& files);
 extern CString			GetDriveLabel(WCHAR drive);
 
-TimeCode_t ReftimeToTimecode(REFERENCE_TIME rt);
-TimeCode_t ReftimeToHMS(REFERENCE_TIME rt);
-REFERENCE_TIME TimecodeToReftime(TimeCode_t tc);
+TimeCode_t				ReftimeToTimecode(const REFERENCE_TIME rt);
+TimeCode_t				ReftimeToHMS(const REFERENCE_TIME rt); // seconds rounded to the nearest value
+REFERENCE_TIME			TimecodeToReftime(const TimeCode_t tc);
+CStringW				ReftimeToString(const REFERENCE_TIME rt);  // hh:mm::ss.millisec
+CStringW				ReftimeToString2(const REFERENCE_TIME rt, bool showZeroHours = true); // hh:mm::ss (round)
 
 extern DVD_HMSF_TIMECODE	RT2HMSF(REFERENCE_TIME rt, double fps = 0); // use to remember the current position
 extern DVD_HMSF_TIMECODE	RT2HMS_r(REFERENCE_TIME rt);                // use only for information (for display on the screen)
 extern REFERENCE_TIME		HMSF2RT(DVD_HMSF_TIMECODE hmsf, double fps = 0);
-extern CString				ReftimeToString(REFERENCE_TIME rt);  // hour, minute, second, millisec
-extern CString				ReftimeToString2(REFERENCE_TIME rt); // hour, minute, second (round)
-extern CString				DVDtimeToString(const DVD_HMSF_TIMECODE& rtVal, bool bAlwaysShowHours=false);
+extern CStringW				DVDtimeToString(const DVD_HMSF_TIMECODE dvd_tc, bool showZeroHours =false);
 extern REFERENCE_TIME		StringToReftime(LPCWSTR strVal);
 extern REFERENCE_TIME		StringToReftime2(LPCWSTR strVal);
 

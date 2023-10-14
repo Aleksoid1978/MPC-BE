@@ -580,25 +580,22 @@ HRESULT CSaveTaskDlg::OnTimer(_In_ long lTime)
 					   dSpeed, ResStr(speedUnits[unitSpeed]));
 
 			if (speed > 0) {
-				const UINT64 sec = (length - written + (speed - 1)) / speed; // round up the remaining time
-				if (sec > 0 && sec < 921600) {
-					DVD_HMSF_TIMECODE tcDur = {
-						(BYTE)(sec / 3600),
-						(BYTE)(sec / 60 % 60),
-						(BYTE)(sec % 60),
-						0
-					};
+				const UINT64 time = (length - written + (speed - 1)) / speed; // round up the remaining time
+				if (time > 0 && time < 360000) {
+					const unsigned hours   = time / 3600;
+					const unsigned minutes = time / 60 % 60;
+					const unsigned seconds = time % 60;
 
 					str.AppendChar(L',');
 
-					if (tcDur.bHours > 0) {
-						str.AppendFormat(L" %2d %s", tcDur.bHours, ResStr(IDS_UNIT_TIME_H));
+					if (hours > 0) {
+						str.AppendFormat(L" %2u %s", hours, ResStr(IDS_UNIT_TIME_H));
 					}
-					if (tcDur.bMinutes > 0) {
-						str.AppendFormat(L" %2d %s", tcDur.bMinutes, ResStr(IDS_UNIT_TIME_M));
+					if (minutes > 0) {
+						str.AppendFormat(L" %2u %s", minutes, ResStr(IDS_UNIT_TIME_M));
 					}
-					if (tcDur.bSeconds > 0) {
-						str.AppendFormat(L" %2d %s", tcDur.bSeconds, ResStr(IDS_UNIT_TIME_S));
+					if (seconds > 0) {
+						str.AppendFormat(L" %2u %s", seconds, ResStr(IDS_UNIT_TIME_S));
 					}
 				}
 			}

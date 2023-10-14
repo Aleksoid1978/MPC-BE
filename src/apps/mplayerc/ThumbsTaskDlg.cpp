@@ -257,8 +257,6 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 
 		rts.Add(str, true, 0, 1, L"thumbs", L"", L"", CRect(0, 0, 0, 0), -1);
 
-		const DVD_HMSF_TIMECODE hmsf = RT2HMS_r(duration);
-
 		CStringW ar;
 		if (dar.cx > 0 && dar.cy > 0 && dar != framesize) {
 			ar.Format(L"(%d:%d)", dar.cx, dar.cy);
@@ -285,11 +283,13 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 			}
 		}
 
+		const TimeCode_t tc = ReftimeToHMS(duration);
+
 		str.Format(ResStr(IDS_MAINFRM_59),
 				   CompactPath(filename, 90),
 				   filesize,
 				   framesize.cx, framesize.cy, ar,
-				   hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
+				   tc.Hours, tc.Minutes, tc.Seconds);
 
 		rts.Add(str, true, 0, 1, L"thumbs");
 		rts.Render(spd, 0, 25, bbox);

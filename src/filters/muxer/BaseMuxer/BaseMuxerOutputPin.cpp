@@ -295,7 +295,7 @@ void CBaseMuxerRawOutputPin::MuxPacket(const CMediaType& mt, const MuxerPacket* 
 		TimeCode_t start = ReftimeToTimecode(pPacket->rtStart);
 		TimeCode_t stop  = ReftimeToTimecode(pPacket->rtStop);
 
-		str.Format("%d\n%02u:%02u:%02u,%03d --> %02u:%02u:%02u,%03d\n%s\n\n",
+		str.Format("%d\n%02d:%02d:%02d,%03d --> %02d:%02d:%02d,%03d\n%s\n\n",
 				   pPacket->index + 1,
 				   start.Hours, start.Minutes, start.Seconds, start.Milliseconds,
 				   stop.Hours, stop.Minutes, stop.Seconds, start.Milliseconds,
@@ -341,7 +341,7 @@ void CBaseMuxerRawOutputPin::MuxPacket(const CMediaType& mt, const MuxerPacket* 
 		TimeCode_t start = ReftimeToTimecode(pPacket->rtStart);
 		TimeCode_t stop = ReftimeToTimecode(pPacket->rtStop);
 
-		str.Format("Dialogue: %s,%u:%02u:%02u.%02d,%u:%02u:%02u.%02d,%s,%s,%s,%s,%s,%s,%s\n",
+		str.Format("Dialogue: %s,%d:%02d:%02d.%02d,%d:%02d:%02d.%02d,%s,%s,%s,%s,%s,%s,%s\n",
 				   layer,
 				   start.Hours, start.Minutes, start.Seconds, start.Milliseconds,
 				   stop.Hours, stop.Minutes, stop.Seconds, stop.Milliseconds,
@@ -472,7 +472,7 @@ void CBaseMuxerRawOutputPin::MuxFooter(const CMediaType& mt)
 
 					for (const auto& item : m_idx) {
 						TimeCode_t start = ReftimeToTimecode(item.rt);
-						fwprintf_s(f, L"timestamp: %02u:%02u:%02u:%03d, filepos: %09I64x\n",
+						fwprintf_s(f, L"timestamp: %02d:%02d:%02d:%03d, filepos: %09I64x\n",
 									start.Hours, start.Minutes, start.Seconds, start.Milliseconds,
 									item.fp);
 					}
