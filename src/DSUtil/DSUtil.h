@@ -100,6 +100,10 @@ enum cdrom_t {
 extern cdrom_t			GetCDROMType(WCHAR drive, std::list<CString>& files);
 extern CString			GetDriveLabel(WCHAR drive);
 
+TimeCode_t ReftimeToTimecode(REFERENCE_TIME rt);
+TimeCode_t ReftimeToHMS(REFERENCE_TIME rt);
+REFERENCE_TIME TimecodeToReftime(TimeCode_t tc);
+
 extern DVD_HMSF_TIMECODE	RT2HMSF(REFERENCE_TIME rt, double fps = 0); // use to remember the current position
 extern DVD_HMSF_TIMECODE	RT2HMS_r(REFERENCE_TIME rt);                // use only for information (for display on the screen)
 extern REFERENCE_TIME		HMSF2RT(DVD_HMSF_TIMECODE hmsf, double fps = 0);

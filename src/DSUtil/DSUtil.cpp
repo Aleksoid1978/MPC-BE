@@ -1003,6 +1003,46 @@ CString GetDriveLabel(WCHAR drive)
 	return label;
 }
 
+TimeCode_t ReftimeToTimecode(REFERENCE_TIME rt)
+{
+	TimeCode_t timecode;
+
+	lldiv_t d = { abs(rt) / 10000, 0 };
+
+	d = std::lldiv(d.quot, 1000);
+	timecode.Milliseconds = (uint16_t)d.rem;
+
+	d = std::lldiv(d.quot, 60);
+	timecode.Seconds = (uint8_t)d.rem;
+
+	d = std::lldiv(d.quot, 60);
+	timecode.Hours = (uint32_t)d.quot;
+	timecode.Minutes = (uint8_t)d.rem;
+
+	return timecode;
+}
+
+TimeCode_t ReftimeToHMS(REFERENCE_TIME rt)
+{
+	TimeCode_t timecode;
+	lldiv_t d = { (abs(rt) + 5000000) / 10000000, 0 };
+
+	d = std::lldiv(d.quot, 60);
+	timecode.Seconds = (uint8_t)d.rem;
+	timecode.Milliseconds = 0;
+
+	d = std::lldiv(d.quot, 60);
+	timecode.Hours = (uint32_t)d.quot;
+	timecode.Minutes = (uint8_t)d.rem;
+
+	return timecode;
+}
+
+REFERENCE_TIME TimecodeToReftime(TimeCode_t tc)
+{
+	return ((((REFERENCE_TIME)tc.Hours * 60 + tc.Minutes) * 60 + tc.Seconds) * 1000 + tc.Milliseconds) * 10000;
+}
+
 DVD_HMSF_TIMECODE RT2HMSF(REFERENCE_TIME rt, double fps) // use to remember the current position
 {
 	DVD_HMSF_TIMECODE hmsf = {
