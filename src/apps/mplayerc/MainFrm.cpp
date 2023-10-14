@@ -6407,11 +6407,11 @@ void CMainFrame::SaveThumbnails(LPCWSTR fn)
 	}
 }
 
-static CString MakeSnapshotFileName(LPCWSTR prefix)
+static CStringW MakeSnapshotFileName(LPCWSTR prefix)
 {
 	CTime t = CTime::GetCurrentTime();
-	CString fn;
-	fn.Format(L"%s_[%s]%s", prefix, t.Format(L"%Y.%m.%d_%H.%M.%S"), AfxGetAppSettings().strSnapShotExt);
+	CStringW fn;
+	fn.Format(L"%s_[%s]%s", prefix, t.Format(L"%Y-%m-%d_%H.%M.%S"), AfxGetAppSettings().strSnapShotExt);
 	return fn;
 }
 
@@ -6450,29 +6450,34 @@ bool CMainFrame::IsRendererCompatibleWithSaveImage()
 	return result;
 }
 
-CString CMainFrame::GetVidPos()
+CStringW CMainFrame::GetVidPos()
 {
-	CString posstr;
+	CStringW str;
+
 	if ((GetPlaybackMode() == PM_FILE) || (GetPlaybackMode() == PM_DVD)) {
 		REFERENCE_TIME stop = m_wndSeekBar.GetRange();
 		REFERENCE_TIME pos = m_wndSeekBar.GetPosReal();
 
-		DVD_HMSF_TIMECODE tcNow = RT2HMSF(pos);
-		DVD_HMSF_TIMECODE tcDur = RT2HMSF(stop);
+		TimeCode_t tcNow = ReftimeToTimecode(pos);
+		auto DurHours = stop / 36000000000ll;
 
-		if (tcDur.bHours > 0 || (pos >= stop && tcNow.bHours > 0)) {
-			posstr.Format(L"%02d.%02d.%02d", tcNow.bHours, tcNow.bMinutes, tcNow.bSeconds);
+		if (DurHours > 0 || (pos >= stop && tcNow.Hours > 0)) {
+			str.Format(L"%02d.%02d.%02d", tcNow.Hours, tcNow.Minutes, tcNow.Seconds);
 		} else {
-			posstr.Format(L"%02d.%02d", tcNow.bMinutes, tcNow.bSeconds);
+			str.Format(L"%02d.%02d", tcNow.Minutes, tcNow.Seconds);
+		}
+
+		if (m_bShowMilliSecs) {
+			str.AppendFormat(L".%03d", tcNow.Milliseconds);
 		}
 	}
 
-	return posstr;
+	return str;
 }
 
-CString CMainFrame::CreateSnapShotFileName()
+CStringW CMainFrame::CreateSnapShotFileName()
 {
-	CString path(AfxGetAppSettings().strSnapShotPath);
+	CStringW path(AfxGetAppSettings().strSnapShotPath);
 	if (!::PathFileExistsW(path)) {
 		PWSTR pathPictures = nullptr;
 		SHGetKnownFolderPath(FOLDERID_Pictures, 0, nullptr, &pathPictures);
@@ -6481,23 +6486,28 @@ CString CMainFrame::CreateSnapShotFileName()
 		CoTaskMemFree(pathPictures);
 	}
 
-	CString prefix = L"snapshot";
-	if (GetPlaybackMode() == PM_FILE) {
-		CString filename = GetFileOnly(GetCurFileName());
-		FixFilename(filename); // need for URLs
-		if (!m_youtubeFields.fname.IsEmpty()) {
-			filename = GetAltFileName();
-		}
+	CStringW filename = L"snapshot";
 
-		prefix.Format(L"%s_snapshot_%s", filename, GetVidPos());
-	} else if (GetPlaybackMode() == PM_DVD) {
-		prefix.Format(L"snapshot_dvd_%s", GetVidPos());
+	if (GetPlaybackMode() == PM_FILE) {
+		if (m_youtubeFields.fname.GetLength()) {
+			filename = GetAltFileName();
+		}else {
+			filename = GetFileOnly(GetCurFileName());
+			FixFilename(filename); // need for URLs
+		}
+		filename.AppendFormat(L"_snapshot_%s", GetVidPos());
+	}
+	else if (GetPlaybackMode() == PM_DVD) {
+		filename.Format(L"snapshot_dvd_%s", GetVidPos());
+	}
+	else {
+		filename = L"snapshot";
 	}
 
-	CPath psrc;
-	psrc.Combine(path, MakeSnapshotFileName(prefix));
+	CPathW psrc;
+	psrc.Combine(path, MakeSnapshotFileName(filename));
 
-	return CString(psrc);
+	return psrc.m_strPath;
 }
 
 void CMainFrame::OnFileSaveImage()

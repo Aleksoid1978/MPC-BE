@@ -1432,8 +1432,8 @@ private:
 
 	void		AddRecent(const CString& pathName);
 
-	CString		GetVidPos();
-	CString		CreateSnapShotFileName();
+	CStringW	GetVidPos();
+	CStringW	CreateSnapShotFileName();
 
 	REFTIME		GetAvgTimePerFrame(BOOL bUsePCAP = TRUE) const;
 
