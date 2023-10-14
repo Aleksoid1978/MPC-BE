@@ -68,8 +68,7 @@ void CDitherInt16::ProcessFloat(int16_t* pDst, float* pSrc, const int samples)
 			float noise = r - m_previous[channel];
 			m_previous[channel] = r;
 
-			float outputSample = std::round(inputSample + noise);
-			ASSERT(outputSample >= INT16_MIN && outputSample <= INT16_MAX);
+			float outputSample = std::clamp<float>(std::round(inputSample + noise), INT16_MIN, INT16_MAX);
 			pDst[frame * m_chanels + channel] = (int16_t)outputSample;
 		}
 	}
