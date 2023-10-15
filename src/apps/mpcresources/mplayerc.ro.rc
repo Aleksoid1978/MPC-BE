@@ -327,7 +327,7 @@ BEGIN
     CONTROL         "Redă",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,65,55,10
     CONTROL         "Repetă la nesfârșit",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,80,116,8
     EDITTEXT        IDC_EDIT1,65,63,20,13,ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
-    LTEXT           "dată(ori)",IDC_STATIC1,90,65,40,8
+    LTEXT           "dată (ori)",IDC_STATIC1,90,65,40,8
     CONTROL         "Derulează la început la terminarea redării",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,10,93,116,18
     GROUPBOX        "Control",IDC_STATIC,5,115,286,54
     LTEXT           "Pas de volum:",IDC_STATIC,10,127,108,8
@@ -1068,30 +1068,30 @@ BEGIN
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "Implicit",IDC_BUTTON1,158,17,56,14
     CONTROL         "Căutare rapidă (la cadru cheie)",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,45,264,9
-    CONTROL         "Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist",IDC_CHECK7,
+    CONTROL         "Nu folosi 'Caută în dosar' pentru comenzile 'Sari înapoi/înainte' atunci când este numai un element în lista de redare",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,55,280,18
-    CONTROL         "Prevină minimizarea playerului din ecran complet pe un monitor care nu este implicit",IDC_CHECK6,
+    CONTROL         "Previne minimizarea playerului din ecran complet pe un monitor care nu este implicit",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,280,9
-    CONTROL         "Pause the video playback when minimized",IDC_CHECK4,
+    CONTROL         "Previne redarea videoclipului când este minimizat",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,87,280,9
-    CONTROL         "Auto-hide the pointer during playback in windowed mode",IDC_CHECK5,
+    CONTROL         "Ascunde automat indicatorul în timpul redării în modul fereastră",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,99,280,9
-    LTEXT           "Do not show 000xx.mpls shorter than",IDC_STATIC,7,112,150,8
+    LTEXT           "Nu afișa 000xx.mpls mai scurt decât",IDC_STATIC,7,112,150,8
     EDITTEXT        IDC_EDIT5,161,110,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,181,110,11,14
     LTEXT           "min",IDC_STATIC,197,112,30,8
     CONTROL         "Activează suportul LCD pentru tastaturi Logitech",IDC_CHECK_LCD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,126,264,9
-    CONTROL         "Use Window Media Controls",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,138,220,9
-    CONTROL         "Enable MiniDump",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,150,184,9
-    LTEXT           "FFmpeg executable file:",IDC_STATIC,7,165,104,8
+    CONTROL         "Folosește Window Media Controls",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,138,220,9
+    CONTROL         "Activează MiniDump",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,150,184,9
+    LTEXT           "Fișier executabil FFmpeg:",IDC_STATIC,7,165,104,8
     COMBOBOX        IDC_COMBO1,113,163,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Update check",IDC_STATIC,5,180,286,40
-    CONTROL         "Enable automatic update check",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,192,250,9
-    LTEXT           "Delay between each check:",IDC_STATIC5,10,205,110,8
+    GROUPBOX        "Verifică pentru actualizări",IDC_STATIC,5,180,286,40
+    CONTROL         "Activează verificarea automată a actualizărilor",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,192,250,9
+    LTEXT           "Întârziere între fiecare verificare:",IDC_STATIC5,10,205,110,8
     EDITTEXT        IDC_EDIT4,120,203,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,140,203,13,14
-    LTEXT           "day(s)",IDC_STATIC6,155,205,50,8
-    GROUPBOX        "Administrare setări",IDC_STATIC,5,222,286,28
+    LTEXT           "zi(le)",IDC_STATIC6,155,205,50,8
+    GROUPBOX        "Administrarea setărilor",IDC_STATIC,5,222,286,28
     PUSHBUTTON      "Resetează",IDC_RESET_SETTINGS,10,233,55,14
     PUSHBUTTON      "Exportă",IDC_EXPORT_SETTINGS,73,233,55,14
 END
@@ -1664,7 +1664,7 @@ BEGIN
         MENUITEM "Panoramare și s&canare",                      ID_SUBMENU_PANSCAN
         POPUP "Modul Stereo 3D"
         BEGIN
-            MENUITEM "Automat (Auto)",                        ID_STEREO3D_AUTO
+            MENUITEM "Auto(mat)",                        ID_STEREO3D_AUTO
             MENUITEM "Mono",                        ID_STEREO3D_MONO
             MENUITEM "Rând intercalat",             ID_STEREO3D_ROW_INTERLEAVED
             MENUITEM "Rând intercalat (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
@@ -1843,7 +1843,7 @@ BEGIN
         END
         POPUP "Modul Stereo 3D"
         BEGIN
-            MENUITEM "Automat (Auto)",                        ID_STEREO3D_AUTO
+            MENUITEM "Auto(mat)",                        ID_STEREO3D_AUTO
             MENUITEM "Mono",                        ID_STEREO3D_MONO
             MENUITEM "Rând intercalat",             ID_STEREO3D_ROW_INTERLEAVED
             MENUITEM "Rând intercalat (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
@@ -1932,7 +1932,7 @@ BEGIN
             MENUITEM "Panoramare și s&canare",                      ID_SUBMENU_PANSCAN
             POPUP "Modul Stereo 3D"
             BEGIN
-                MENUITEM "Automat (Auto)",                        ID_STEREO3D_AUTO
+                MENUITEM "Auto(mat)",                        ID_STEREO3D_AUTO
                 MENUITEM "Mono",                        ID_STEREO3D_MONO
                 MENUITEM "Rând intercalat",             ID_STEREO3D_ROW_INTERLEAVED
                 MENUITEM "Rând intercalat (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
@@ -1957,11 +1957,11 @@ BEGIN
             MENUITEM "&Oprește",                 ID_PLAY_STOP
             MENUITEM "Pas cad&ru",            ID_PLAY_FRAMESTEP
             MENUITEM "&Du-te la...",             ID_PLAY_GOTO
-            POPUP "&Repeat"
+            POPUP "&Repetare"
             BEGIN
-                MENUITEM "F&orever", ID_REPEAT_FOREVER
+                MENUITEM "Î&ntotdeauna", ID_REPEAT_FOREVER
                 MENUITEM SEPARATOR
-                MENUITEM "A-B (&Reset)", ID_PLAY_REPEAT_AB
+                MENUITEM "A-B (&Resetează)", ID_PLAY_REPEAT_AB
                 MENUITEM "A-B (Marchează &A)", ID_PLAY_REPEAT_AB_MARK_A
                 MENUITEM "A-B (Marchează &B)", ID_PLAY_REPEAT_AB_MARK_B
             END
@@ -2010,7 +2010,7 @@ BEGIN
         END
         POPUP "Modul Stereo 3D"
         BEGIN
-            MENUITEM "Automat (Auto)",                        ID_STEREO3D_AUTO
+            MENUITEM "Auto(mat)",                        ID_STEREO3D_AUTO
             MENUITEM "Mono",                        ID_STEREO3D_MONO
             MENUITEM "Rând intercalat",             ID_STEREO3D_ROW_INTERLEAVED
             MENUITEM "Rând intercalat (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
@@ -2953,7 +2953,7 @@ BEGIN
     IDS_PPAGEWEBSERVER_0    "Selectarea directorului"
     IDS_AG_DEFAULT          "Implicit"
     IDS_AG_DEFAULT_L        "implicit"
-    IDS_AG_AUTO             "Automat (Auto)"
+    IDS_AG_AUTO             "Auto(mat)"
     IDS_AG_RECOMMENDED      "recomandat"
     IDS_AG_NOTRECOMMENDED   "nerecomandat"
     IDS_AG_ADVANCED         "Avansat"
@@ -3282,7 +3282,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_VDF_SETTINGS        "Setări video"
-    IDS_VDF_AUTO            "Automat (Auto)"
+    IDS_VDF_AUTO            "Auto(mat)"
     IDS_VDF_THREADNUMBER    "Numărul firelor de decodare"
     IDS_VDF_SKIPBFRAMES     "Sari peste cadrele B"
 END
