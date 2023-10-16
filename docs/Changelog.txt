@@ -2,6 +2,21 @@
 
 1.6.10.x dev
 =============================
+MP4Splitter
+Fixed player crash on some incorrect MP4 files.
+
+Player
+Added the ability to change the "Move window by the video area" setting using a hotkey.
+If the "Show milliseconds" setting is active (Status), then milliseconds will be recorded in the screenshot file name.
+
+Updated Japanese translation (by tsubasanouta).
+Updated Spanish translation (by IPeluchito).
+Updated German translation (by Klaus1189).
+Updated Italian translation (by mapi68).
+Updated Turkish translation (by cmhrky).
+Updated Romanian translation (by AndreiMiloiu).
+Updated Chinese (Simplified) translation (by wushantao).
+Updated Hungarian translation (by mickey).
 
 
 1.6.10 - 2023-10-07
