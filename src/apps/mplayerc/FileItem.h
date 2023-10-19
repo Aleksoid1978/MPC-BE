@@ -79,6 +79,10 @@ public:
 		return GetFileExt(m_fpath);
 	};
 
+	bool Valid() const {
+		return m_fpath.GetLength() > 0;
+	};
+
 	REFERENCE_TIME GetDuration() const {
 		return m_duration;
 	};
@@ -107,6 +111,13 @@ public:
 
 	void GetChapters(ChaptersList& chaplist) {
 		chaplist = m_chapters;
+	}
+
+	void Clear() {
+		m_fpath.Empty();
+		m_title.Empty();
+		m_chapters.clear();
+		m_duration = 0;
 	}
 };
 

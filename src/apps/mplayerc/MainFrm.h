@@ -116,7 +116,8 @@ class OpenFileData : public OpenMediaData
 {
 public:
 	//OpenFileData() {}
-	CFileItemList fns;
+	CFileItem fi;
+	CAudioItemList auds;
 	REFERENCE_TIME rtStart = INVALID_TIME;
 };
 

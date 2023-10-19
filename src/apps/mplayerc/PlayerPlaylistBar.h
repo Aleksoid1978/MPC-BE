@@ -34,7 +34,8 @@ public:
 	UINT m_id;
 	CString m_label;
 
-	CFileItemList m_fns;
+	CFileItem         m_fi;
+	CAudioItemList    m_auds;
 	CSubtitleItemList m_subs;
 
 	enum type_t {
