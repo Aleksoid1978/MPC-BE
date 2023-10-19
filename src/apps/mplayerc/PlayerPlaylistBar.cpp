@@ -198,14 +198,6 @@ static bool ParseCUESheetFile(CString fn, std::list<CUETrack> &CUETrackList, CSt
 //
 
 CPlaylistItem::CPlaylistItem()
-	: m_type(file)
-	, m_bInvalid(false)
-	, m_bDirectory(false)
-	, m_duration(0)
-	, m_vinput(-1)
-	, m_vchannel(-1)
-	, m_ainput(-1)
-	, m_country(0)
 {
 	m_id = m_globalid++;
 }
@@ -2212,11 +2204,11 @@ void CPlayerPlaylistBar::Append(const CStringW& vdn, const CStringW& adn, const 
 {
 	CPlaylistItem pli;
 	pli.m_type = CPlaylistItem::device;
-	pli.m_fi = vdn;
+	pli.m_fi       = vdn;
 	pli.m_auds.emplace_back(adn);
-	pli.m_vinput = vinput;
+	pli.m_vinput   = vinput;
 	pli.m_vchannel = vchannel;
-	pli.m_ainput = ainput;
+	pli.m_ainput   = ainput;
 	std::list<CStringW> sl;
 	CStringW vfn = GetFriendlyName(vdn);
 	CStringW afn = GetFriendlyName(adn);
