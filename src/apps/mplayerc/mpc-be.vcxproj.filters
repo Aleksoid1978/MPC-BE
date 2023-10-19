@@ -432,6 +432,9 @@
     <ClCompile Include="VideoSettings.cpp">
       <Filter>Player Config</Filter>
     </ClCompile>
+    <ClCompile Include="GraphThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DVBChannel.h">
@@ -840,6 +843,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FileItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
