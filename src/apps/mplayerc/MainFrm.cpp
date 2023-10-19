@@ -43,8 +43,6 @@
 #include "ShaderCombineDlg.h"
 #include "FullscreenWnd.h"
 #include "TunerScanDlg.h"
-#include "SubtitleDlDlg.h"
-#include "ISDb.h"
 #include "UpdateChecker.h"
 
 #include <ExtLib/BaseClasses/mtype.h>

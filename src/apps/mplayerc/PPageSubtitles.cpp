@@ -19,7 +19,6 @@
  */
 
 #include "stdafx.h"
-#include "ISDb.h"
 #include <clsids.h>
 #include "MainFrm.h"
 #include "PPageSubtitles.h"
@@ -52,8 +51,6 @@ void CPPageSubtitles::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK3, m_fAutoReloadExtSubtitles);
 	DDX_Check(pDX, IDC_CHECK_SUBRESYNC, m_fUseSybresync);
 	DDX_Text(pDX, IDC_EDIT1, m_szAutoloadPaths);
-	DDX_Control(pDX, IDC_COMBO1, m_ISDbCombo);
-	DDX_CBString(pDX, IDC_COMBO1, m_ISDb);
 }
 
 BOOL CPPageSubtitles::OnInitDialog()
@@ -72,17 +69,10 @@ BOOL CPPageSubtitles::OnInitDialog()
 	m_fUseSybresync					= s.fUseSybresync;
 	m_szAutoloadPaths				= s.strSubtitlePaths;
 
-	m_ISDb = s.strISDb;
-	m_ISDbCombo.AddString(m_ISDb);
-
-	if (m_ISDb.CompareNoCase(L"www.opensubtitles.org/isdb")) {
-		m_ISDbCombo.AddString(L"www.opensubtitles.org/isdb");
-	}
-
 	GetDlgItem(IDC_STATIC1)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_STATIC2)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_STATIC3)->ShowWindow(SW_HIDE);
-	m_ISDbCombo.ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_COMBO1)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_BUTTON2)->ShowWindow(SW_HIDE);
 
 	UpdateData(FALSE);
@@ -106,9 +96,6 @@ BOOL CPPageSubtitles::OnApply()
 	s.fAutoReloadExtSubtitles		= !!m_fAutoReloadExtSubtitles;
 	s.fUseSybresync					= !!m_fUseSybresync;
 	s.strSubtitlePaths				= m_szAutoloadPaths;
-
-	s.strISDb = m_ISDb;
-	s.strISDb.TrimRight('/');
 
 	if (fAutoReloadExtSubtitles != s.fAutoReloadExtSubtitles) {
 		auto pFrame = AfxGetMainFrame();
@@ -187,9 +174,6 @@ void CPPageSubtitles::UpdateSubRenderersList(int select)
 
 BEGIN_MESSAGE_MAP(CPPageSubtitles, CPPageBase)
 	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedButton1)
-	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedButton2)
-	ON_UPDATE_COMMAND_UI(IDC_BUTTON2, OnUpdateButton2)
-	ON_CBN_EDITCHANGE(IDC_COMBO1, OnURLModified)
 	ON_CBN_SELCHANGE(IDC_COMBO2, OnSubRendModified)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK2, OnUpdateISRSelect)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK3, OnUpdateISRSelect)
@@ -202,40 +186,6 @@ void CPPageSubtitles::OnBnClickedButton1()
 
 	UpdateData(FALSE);
 
-	SetModified();
-}
-
-void CPPageSubtitles::OnBnClickedButton2()
-{
-	CString ISDb, ver, msg, str;
-
-	m_ISDbCombo.GetWindowTextW(ISDb);
-	ISDb.TrimRight('/');
-
-	ver.Format(L"ISDb v%d", ISDb_PROTOCOL_VERSION);
-
-	CWebTextFile wtf;
-	UINT nIconType = MB_ICONEXCLAMATION;
-
-	if (wtf.Open(L"http://" + ISDb + L"/test.php") && wtf.ReadString(str) && str == ver) {
-		msg = ResStr(IDS_PPSDB_URLCORRECT);
-		nIconType = MB_ICONINFORMATION;
-	} else if (StartsWith(str, L"ISDb v")) {
-		msg = ResStr(IDS_PPSDB_PROTOCOLERR);
-	} else {
-		msg = ResStr(IDS_PPSDB_BADURL);
-	}
-
-	AfxMessageBox(msg, nIconType | MB_OK);
-}
-
-void CPPageSubtitles::OnUpdateButton2(CCmdUI* pCmdUI)
-{
-	pCmdUI->Enable(m_ISDbCombo.GetWindowTextLength() > 0);
-}
-
-void CPPageSubtitles::OnURLModified()
-{
 	SetModified();
 }
 

@@ -294,9 +294,6 @@
     <ClCompile Include="ShaderNewDlg.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
-    <ClCompile Include="SubtitleDlDlg.cpp">
-      <Filter>Dialogs</Filter>
-    </ClCompile>
     <ClCompile Include="ThumbsTaskDlg.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
@@ -349,9 +346,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Ifo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ISDb.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LcdSupport.cpp">
@@ -447,9 +441,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Ifo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ISDb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LcdSupport.h">
@@ -765,9 +756,6 @@
       <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="ShaderNewDlg.h">
-      <Filter>Dialogs</Filter>
-    </ClInclude>
-    <ClInclude Include="SubtitleDlDlg.h">
       <Filter>Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="ThumbsTaskDlg.h">

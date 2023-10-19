@@ -735,8 +735,6 @@ void CAppSettings::ResetSettings()
 
 	bSubSaveExternalStyleFile = false;
 
-	strISDb = L"www.opensubtitles.org/isdb";
-
 	nLastUsedPage = 0;
 
 	iStereo3DMode = STEREO3D_AUTO;
@@ -1375,8 +1373,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SUBSAVEEXTERNALSTYLEFILE, bSubSaveExternalStyleFile);
 
-	profile.ReadString(IDS_R_SETTINGS, IDS_RS_ISDB, strISDb);
-
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_MODE, iStereo3DMode, STEREO3D_AUTO, STEREO3D_OVERUNDER);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_STEREO3D_SWAPLEFTRIGHT, bStereo3DSwapLR);
 
@@ -1969,8 +1965,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_THUMBLEVELPNG, iThumbLevelPNG);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SUBSAVEEXTERNALSTYLEFILE, bSubSaveExternalStyleFile);
-
-	profile.WriteString(IDS_R_SETTINGS, IDS_RS_ISDB, strISDb);
 
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR, strLastOpenFilterDir);
 

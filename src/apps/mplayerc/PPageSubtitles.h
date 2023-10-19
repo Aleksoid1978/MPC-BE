@@ -40,8 +40,6 @@ public:
 	BOOL m_fAutoReloadExtSubtitles;
 	BOOL m_fUseSybresync;
 	CString m_szAutoloadPaths;
-	CComboBox m_ISDbCombo;
-	CString m_ISDb;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
@@ -55,9 +53,6 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedButton1();
-	afx_msg void OnBnClickedButton2();
-	afx_msg void OnUpdateButton2(CCmdUI* pCmdUI);
-	afx_msg void OnURLModified();
 	afx_msg void OnSubRendModified();
 	afx_msg void OnUpdateISRSelect(CCmdUI* pCmdUI);
 };

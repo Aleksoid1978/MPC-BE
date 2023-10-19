@@ -165,7 +165,6 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 {
 	friend class CPPageFileInfoSheet;
 	friend class CPPageLogo;
-	friend class CSubtitleDlDlg;
 	friend class CChildView;
 	friend class CThumbsTaskDlg;
 	friend class CShaderEditorDlg;

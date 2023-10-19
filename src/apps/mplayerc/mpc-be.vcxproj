@@ -139,7 +139,6 @@
     <ClCompile Include="FullscreenWnd.cpp" />
     <ClCompile Include="GoToDlg.cpp" />
     <ClCompile Include="Ifo.cpp" />
-    <ClCompile Include="ISDb.cpp" />
     <ClCompile Include="KeyProvider.cpp" />
     <ClCompile Include="LcdSupport.cpp" />
     <ClCompile Include="MainFrm.cpp" />
@@ -205,7 +204,6 @@
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="SubtitleDlDlg.cpp" />
     <ClCompile Include="SvgHelper.cpp" />
     <ClCompile Include="ThumbsTaskDlg.cpp" />
     <ClCompile Include="TorrentInfo.cpp" />
@@ -274,7 +272,6 @@
     <ClInclude Include="FullscreenWnd.h" />
     <ClInclude Include="GoToDlg.h" />
     <ClInclude Include="Ifo.h" />
-    <ClInclude Include="ISDb.h" />
     <ClInclude Include="KeyProvider.h" />
     <ClInclude Include="LcdSupport.h" />
     <ClInclude Include="MainFrm.h" />
@@ -342,7 +339,6 @@
     <ClInclude Include="ShaderNewDlg.h" />
     <ClInclude Include="ShockwaveGraph.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="SubtitleDlDlg.h" />
     <ClInclude Include="SvgHelper.h" />
     <ClInclude Include="ThumbsTaskDlg.h" />
     <ClInclude Include="TorrentInfo.h" />

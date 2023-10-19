@@ -693,7 +693,6 @@ public:
 	bool			fDisableInternalSubtitles;
 	bool			fAutoReloadExtSubtitles;
 	bool			fUseSybresync;
-	CString			strISDb;
 
 	// Subtitles - Rendering
 	bool			fOverridePlacement;
