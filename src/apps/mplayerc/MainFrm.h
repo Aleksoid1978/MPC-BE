@@ -36,6 +36,7 @@
 #include "PlayerShaderEditorBar.h"
 #include "PPageSheet.h"
 #include "PPageFileInfoSheet.h"
+#include "OpenMediaData.h"
 #include "FileDropTarget.h"
 #include "KeyProvider.h"
 #include "PlayerYouTube.h"
@@ -100,44 +101,6 @@ enum PMODE {
 interface __declspec(uuid("6E8D4A21-310C-11d0-B79A-00AA003767A7")) // IID_IAMLine21Decoder
 IAMLine21Decoder_2 :
 public IAMLine21Decoder {};
-
-class OpenMediaData
-{
-public:
-	//OpenMediaData() {}
-	virtual ~OpenMediaData() {} // one virtual funct is needed to enable rtti
-	CString title;
-	CSubtitleItemList subs;
-
-	BOOL bAddRecent = TRUE;
-};
-
-class OpenFileData : public OpenMediaData
-{
-public:
-	//OpenFileData() {}
-	CFileItem fi;
-	CAudioItemList auds;
-	REFERENCE_TIME rtStart = INVALID_TIME;
-};
-
-class OpenDVDData : public OpenMediaData
-{
-public:
-	//OpenDVDData() {}
-	CString path;
-	CComPtr<IDvdState> pDvdState;
-};
-
-class OpenDeviceData : public OpenMediaData
-{
-public:
-	//OpenDeviceData() {}
-	CStringW DisplayName[2];
-	int vinput = -1;
-	int vchannel = -1;
-	int ainput = -1;
-};
 
 /*
 class CKeyFrameFinderThread : public CWinThread, public CCritSec
