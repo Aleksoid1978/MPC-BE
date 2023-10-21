@@ -36,6 +36,7 @@ namespace YoutubeDL
 		const CStringW& ydlExePath, // input parameter
 		const int maxHeightOptions, // input parameter
 		const bool bMaximumQuality, // input parameter
+		const CStringA lang,        // input parameter
 		Youtube::YoutubeFields& y_fields,
 		Youtube::YoutubeUrllist& youtubeUrllist,
 		Youtube::YoutubeUrllist& youtubeAudioUrllist,
@@ -367,10 +368,20 @@ namespace YoutubeDL
 						pOFD->fi = CStringW(bestUrl);
 						if (bVideoOnly) {
 							if (audioUrls.size() > 1) {
-								for (const auto& [aud_lang, audioUrl] : audioUrls) {
-									pOFD->auds.emplace_back(CStringW(audioUrl), CStringW(aud_lang), aud_lang);
+								std::pair<CStringA, CStringA> item;
+								if (auto it = audioUrls.find(lang); it != audioUrls.end()) {
+									item = *it;
 								}
-							} else if (bestAudioUrl.GetLength()) {
+								else if (auto it = audioUrls.find("en"); it != audioUrls.end()) {
+									item = *it;
+								}
+								else {
+									item = *audioUrls.begin();
+								}
+
+								pOFD->auds.emplace_back(CStringW(item.second), CStringW(item.first), item.first);
+							}
+							else if (bestAudioUrl.GetLength()) {
 								pOFD->auds.emplace_back(CStringW(bestAudioUrl));
 							}
 						}

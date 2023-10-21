@@ -12343,6 +12343,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 						s.strYDLExePath,
 						s.iYDLMaxHeight,
 						s.bYDLMaximumQuality,
+						CStringA(s.strYoutubeAudioLang),
 						m_youtubeFields,
 						m_youtubeUrllist,
 						m_youtubeAudioUrllist,
