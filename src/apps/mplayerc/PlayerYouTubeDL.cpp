@@ -419,11 +419,13 @@ namespace YoutubeDL
 						if (auto requested_subtitles = GetJsonObject(d, "requested_subtitles")) {
 							for (const auto& subtitle : requested_subtitles->GetObj()) {
 								CStringW sub_url;
+								CStringW sub_name;
 								getJsonValue(subtitle.value, "url", sub_url);
+								getJsonValue(subtitle.value, "name", sub_name);
 								CStringA sub_lang = subtitle.name.GetString();
 
 								if (sub_url.GetLength() && sub_lang.GetLength()) {
-									pOFD->subs.emplace_back(sub_url, CStringW(sub_lang), sub_lang);
+									pOFD->subs.emplace_back(sub_url, sub_name, sub_lang);
 								}
 							}
 						}
