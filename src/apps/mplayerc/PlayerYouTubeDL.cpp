@@ -154,7 +154,11 @@ namespace YoutubeDL
 
 					float aud_bitrate = 0.0f;
 					CStringA bestAudioUrl;
-					std::map<CStringA, CStringA> audioUrls;
+					struct audio_info_t {
+						float tbr = 0;
+						CStringA url;
+					};
+					std::map<CStringA, audio_info_t> audioUrls;
 
 					CStringA bestUrl;
 					getJsonValue(d, "url", bestUrl);
@@ -287,8 +291,9 @@ namespace YoutubeDL
 
 						CStringA language;
 						if (getJsonValue(format, "language", language)) {
-							if (const auto it = audioUrls.find(language); it == audioUrls.cend()) {
-								audioUrls[language] = url;
+							const auto it = audioUrls.find(language);
+							if (it == audioUrls.cend() || tbr > (*it).second.tbr) {
+								audioUrls[language] = { tbr, url };
 							}
 						}
 					}
@@ -368,7 +373,7 @@ namespace YoutubeDL
 						pOFD->fi = CStringW(bestUrl);
 						if (bVideoOnly) {
 							if (audioUrls.size() > 1) {
-								std::pair<CStringA, CStringA> item;
+								std::pair<CStringA, audio_info_t> item;
 								if (auto it = audioUrls.find(lang); it != audioUrls.end()) {
 									item = *it;
 								}
@@ -379,7 +384,7 @@ namespace YoutubeDL
 									item = *audioUrls.begin();
 								}
 
-								pOFD->auds.emplace_back(CStringW(item.second), CStringW(item.first), item.first);
+								pOFD->auds.emplace_back(CStringW(item.second.url), CStringW(item.first), item.first);
 							}
 							else if (bestAudioUrl.GetLength()) {
 								pOFD->auds.emplace_back(CStringW(bestAudioUrl));
