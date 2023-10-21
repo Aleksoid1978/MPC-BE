@@ -266,6 +266,10 @@ namespace YoutubeDL
 						if (!getJsonValue(format, "vcodec", vcodec) || vcodec != "none") {
 							continue;
 						}
+						CStringA acodec;
+						if (!getJsonValue(format, "acodec", vcodec) || vcodec == "none") {
+							continue;
+						}
 
 						float tbr = 0.0f;
 						if (getJsonValue(format, "tbr", tbr)) {
