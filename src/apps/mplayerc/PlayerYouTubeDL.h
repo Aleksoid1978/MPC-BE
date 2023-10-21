@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2021 see Authors.txt
+ * (C) 2018-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,8 +24,15 @@
 
 namespace YoutubeDL
 {
-	bool Parse_URL(const CString& url, const CString& ydlExePath, const int maxHeightOptions, const bool bMaximumQuality,
-		std::list<CString>& urls, CSubtitleItemList& subs, Youtube::YoutubeFields& y_fields,
-		Youtube::YoutubeUrllist& youtubeUrllist, Youtube::YoutubeUrllist& youtubeAudioUrllist);
+	bool Parse_URL(
+		const CStringW& url,        // input parameter
+		const CStringW& ydlExePath, // input parameter
+		const int maxHeightOptions, // input parameter
+		const bool bMaximumQuality, // input parameter
+		Youtube::YoutubeFields& y_fields,
+		Youtube::YoutubeUrllist& youtubeUrllist,
+		Youtube::YoutubeUrllist& youtubeAudioUrllist,
+		OpenFileData* pOFD
+	);
 	void Clear();
 }

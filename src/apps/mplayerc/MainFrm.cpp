@@ -12255,8 +12255,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		youtubeUrl = pOFD->fi.GetPath();
 		Content::Online::Disconnect(youtubeUrl);
 
-		pOFD->fi.Clear();
-		pOFD->auds.clear();
+		pOFD->Clear();
 
 		auto it = std::find_if(m_youtubeUrllist.cbegin(), m_youtubeUrllist.cend(), [&s](const Youtube::YoutubeUrllistItem& item) {
 			return item.profile->iTag == s.iYoutubeTagSelected;
@@ -12283,21 +12282,20 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
 	}
 	else if (s.bYoutubePageParser && pOFD->auds.empty()) {
-		CString fn = (CString)pOFD->fi;
-		if (Youtube::CheckURL(fn)) {
-			std::list<CString> urls;
-			if (Youtube::Parse_URL(fn, urls, m_youtubeFields, m_youtubeUrllist, m_youtubeAudioUrllist, pOFD->subs, pOFD->rtStart, youtubeErrorMessage)) {
-				youtubeUrl = fn;
-				Content::Online::Disconnect(fn);
-
-				pOFD->fi.Clear();
-				pOFD->auds.clear();
-
-				auto it = urls.cbegin();
-				pOFD->fi = *it++;
-				while (it != urls.cend()) {
-					pOFD->auds.emplace_back(*it++);
-				}
+		const CStringW url = pOFD->fi.GetPath();
+		bool ok = Youtube::CheckURL(url);
+		if (ok) {
+			ok = Youtube::Parse_URL(
+				url, pOFD->rtStart,
+				m_youtubeFields,
+				m_youtubeUrllist,
+				m_youtubeAudioUrllist,
+				pOFD,
+				youtubeErrorMessage
+			);
+			if (ok) {
+				youtubeUrl = url;
+				Content::Online::Disconnect(url);
 
 				m_strPlaybackRenderedPath = pOFD->fi.GetPath();
 				m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
@@ -12309,17 +12307,24 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			&& youtubeUrl.IsEmpty()
 			&& pOFD->auds.empty()
 			&& ::PathIsURLW(pOFD->fi)) {
-		const CString fn = pOFD->fi.GetPath();
-		const auto ext = GetFileExt(fn.GetString()).MakeLower();
-		if (!(ext == L".m3u" || ext == L".m3u8")
-				&& Content::Online::CheckConnect(fn)) {
+
+		const CStringW url = pOFD->fi.GetPath();
+		const auto ext = GetFileExt(url).MakeLower();
+
+		bool ok = (ext != L".m3u" && ext != L".m3u8");
+		if (ok) {
+			ok = Content::Online::CheckConnect(url);
+		}
+
+		if (ok) {
 			CString online_hdr;
-			Content::Online::GetHeader(fn, online_hdr);
+			Content::Online::GetHeader(url, online_hdr);
 			if (!online_hdr.IsEmpty()) {
 				online_hdr.Trim(L"\r\n "); online_hdr.Replace(L"\r", L"");
 				std::list<CString> params;
 				Explode(online_hdr, params, L'\n');
 				bool bIsHtml = false;
+
 				for (const auto& param : params) {
 					int k = param.Find(L':');
 					if (k > 0) {
@@ -12333,20 +12338,19 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				}
 
 				if (bIsHtml) {
-					std::list<CString> urls;
-					if (YoutubeDL::Parse_URL(fn, s.strYDLExePath, s.iYDLMaxHeight, s.bYDLMaximumQuality,
-							urls, pOFD->subs, m_youtubeFields, m_youtubeUrllist, m_youtubeAudioUrllist)) {
-						youtubeUrl = fn;
-						Content::Online::Disconnect(youtubeUrl);
-
-						pOFD->fi.Clear();
-						pOFD->auds.clear();
-
-						auto it = urls.cbegin();
-						pOFD->fi = *it++;
-						while (it != urls.cend()) {
-							pOFD->auds.emplace_back(*it++);
-						}
+					ok = YoutubeDL::Parse_URL(
+						url,
+						s.strYDLExePath,
+						s.iYDLMaxHeight,
+						s.bYDLMaximumQuality,
+						m_youtubeFields,
+						m_youtubeUrllist,
+						m_youtubeAudioUrllist,
+						pOFD
+					);
+					if (ok) {
+						youtubeUrl = url;
+						Content::Online::Disconnect(url);
 
 						m_strPlaybackRenderedPath = pOFD->fi.GetPath();
 						m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);

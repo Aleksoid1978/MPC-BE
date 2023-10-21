@@ -38,6 +38,15 @@ public:
 	CFileItem fi;
 	CAudioItemList auds;
 	REFERENCE_TIME rtStart = INVALID_TIME;
+
+	void Clear() {
+		title.Empty();
+		subs.clear();
+		bAddRecent = TRUE;
+		fi.Clear();
+		auds.clear();
+		rtStart = INVALID_TIME;
+	}
 };
 
 class OpenDVDData : public OpenMediaData

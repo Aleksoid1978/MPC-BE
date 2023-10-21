@@ -615,8 +615,14 @@ namespace Youtube
 	}
 
 
-	bool Parse_URL(CString url, std::list<CString>& urls, YoutubeFields& y_fields, YoutubeUrllist& youtubeUrllist, YoutubeUrllist& youtubeAudioUrllist,
-				   CSubtitleItemList& subs, REFERENCE_TIME& rtStart, CString& errorMessage)
+	bool Parse_URL(
+		CStringW url,           // input parameter
+		REFERENCE_TIME rtStart, // input parameter
+		YoutubeFields& y_fields,
+		YoutubeUrllist& youtubeUrllist,
+		YoutubeUrllist& youtubeAudioUrllist,
+		OpenFileData* pOFD,
+		CStringW& errorMessage)
 	{
 		if (!CheckURL(url)) {
 			return false;
@@ -624,7 +630,8 @@ namespace Youtube
 
 		DLog(L"Youtube::Parse_URL() : \"%s\"", url);
 
-		HandleURL(url); url += L"&gl=US&hl=en&has_verified=1&bpctr=9999999999";
+		HandleURL(url);
+		url += L"&gl=US&hl=en&has_verified=1&bpctr=9999999999";
 
 		CString videoId = RegExpParse(url.GetString(), videoIdRegExp);
 
@@ -665,6 +672,9 @@ namespace Youtube
 		if (!URLReadData(url.GetString(), data)) {
 			return false;
 		}
+
+		pOFD->fi.Clear();
+		pOFD->rtStart = rtStart;
 
 		const CString Title = AltUTF8ToWStr(GetEntry(data.data(), "<title>", "</title>"));
 		y_fields.title = FixHtmlSymbols(Title);
@@ -756,7 +766,7 @@ namespace Youtube
 			}
 
 			if (strUrlsLive.empty()) {
-				urls.emplace_front(url);
+				pOFD->fi = url;
 				return true;
 			}
 		} else {
@@ -1411,14 +1421,14 @@ namespace Youtube
 #endif
 
 		const YoutubeUrllistItem* final_item = nullptr;
-		CStringW final_video_url;
+		CStringW final_media_url;
 		CStringW final_audio_url;
 
 		if (s.YoutubeFormat.res == 0) { // audio only
 			final_item = SelectAudioStream(youtubeAudioUrllist);
 			if (final_item) {
 				DLog(L"Youtube::Parse_URL() : output audio format - %s, \"%s\"", final_item->title, final_item->url);
-				final_audio_url = final_item->url;
+				final_media_url = final_item->url;
 			}
 		}
 
@@ -1426,7 +1436,7 @@ namespace Youtube
 			final_item = SelectVideoStream(youtubeUrllist);
 			if (final_item) {
 				DLog(L"Youtube::Parse_URL() : output video format - %s, \"%s\"", final_item->title, final_item->url);
-				final_video_url = final_item->url;
+				final_media_url = final_item->url;
 
 				if (final_item->profile->type == y_video && !youtubeAudioUrllist.empty()) {
 					const auto audio_item = GetAudioUrl(final_item->profile, youtubeAudioUrllist);
@@ -1436,11 +1446,11 @@ namespace Youtube
 			}
 		}
 
-		if (final_video_url.IsEmpty() && final_audio_url.IsEmpty()) {
+		if (final_media_url.IsEmpty()) {
 			return false;
 		}
 
-		final_video_url.Replace(L"http://", L"https://");
+		final_media_url.Replace(L"http://", L"https://");
 		final_audio_url.Replace(L"http://", L"https://");
 
 		const auto bParseMetadata = ParseResponseJson(player_response_jsonDocument, y_fields);
@@ -1496,7 +1506,7 @@ namespace Youtube
 					getJsonValue(elem, "languageCode", sub_lang);
 
 					if (!sub_url.IsEmpty() && !sub_name.IsEmpty()) {
-						subs.emplace_back(sub_url, sub_name, sub_lang);
+						pOFD->subs.emplace_back(sub_url, sub_name, sub_lang);
 					}
 				}
 			}
@@ -1559,14 +1569,10 @@ namespace Youtube
 			}
 		}
 
-		if (final_video_url.GetLength()) {
-			urls.emplace_front(final_video_url);
-		}
-		if (final_audio_url.GetLength()) {
-			urls.emplace_back(final_audio_url);
-		}
+		pOFD->fi = final_media_url;
+		pOFD->auds.emplace_back(final_audio_url);
 
-		return !urls.empty();
+		return pOFD->fi.Valid();
 	}
 
 	bool Parse_Playlist(CString url, YoutubePlaylist& youtubePlaylist, int& idx_CurrentPlay)

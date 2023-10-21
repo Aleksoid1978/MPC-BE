@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include "OpenMediaData.h"
 #include "DSUtil/CUE.h"
 
 namespace Youtube
@@ -187,8 +188,15 @@ namespace Youtube
 	bool CheckURL(CString url);
 	bool CheckPlaylist(CString url);
 
-	bool Parse_URL(CString url, std::list<CString>& urls, YoutubeFields& y_fields, YoutubeUrllist& youtubeUrllist, YoutubeUrllist& youtubeAudioUrllist,
-				   CSubtitleItemList& subs, REFERENCE_TIME& rtStart, CString& errorMessage);
+	bool Parse_URL(
+		CStringW url,           // input parameter
+		REFERENCE_TIME rtStart, // input parameter
+		YoutubeFields& y_fields,
+		YoutubeUrllist& youtubeUrllist,
+		YoutubeUrllist& youtubeAudioUrllist,
+		OpenFileData* pOFD,
+		CStringW& errorMessage
+	);
 	bool Parse_Playlist(CString url, YoutubePlaylist& youtubePlaylist, int& idx_CurrentPlay);
 
 	bool Parse_URL(CString url, YoutubeFields& y_fields);
