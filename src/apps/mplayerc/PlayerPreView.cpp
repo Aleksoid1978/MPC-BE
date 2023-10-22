@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2021 see Authors.txt
+ * (C) 2012-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -136,43 +136,35 @@ void CPreView::OnPaint()
 
 	int i, k;
 
-	k = w;
-	for(i = 0; i < k; i++) {
+	for(i = 0, k = w; i < k; i++) {
 		mdc.SetPixelV(i, 0, RGBFill(m_cr2.R1, m_cr2.G1, m_cr2.B1, m_cr2.R2, m_cr2.G2, m_cr2.B2, i, k));
 	}
 
-	k = w;
-	for(i = rcBar.left + m_border; i < k - m_border; i++) {
+	for(i = rcBar.left + m_border, k = w - m_border; i < k; i++) {
 		mdc.SetPixelV(i, m_caption, RGBFill(m_cr3.R1, m_cr3.G1, m_cr3.B1, m_cr3.R2, m_cr3.G2, m_cr3.B2, i, k));
 	}
 
-	k = w;
-	for(i = rcBar.left + m_border; i < k - m_border; i++) {
+	for(i = rcBar.left + m_border, k = w - m_border; i < k; i++) {
 		mdc.SetPixelV(i, rcBar.bottom - m_border - 1, RGBFill(m_cr4.R1, m_cr4.G1, m_cr4.B1, m_cr4.R2, m_cr4.G2, m_cr4.B2, i, k));
 	}
 
-	k = w;
-	for(i = 0; i < k; i++) {
+	for(i = 0, k = w; i < k; i++) {
 		mdc.SetPixelV(i, rcBar.bottom - 1, RGBFill(m_cr5.R1, m_cr5.G1, m_cr5.B1, m_cr5.R2, m_cr5.G2, m_cr5.B2, i, k));
 	}
 
-	k = h;
-	for(i = 0; i < k - 1; i++) {
+	for(i = 0, k = h - 1; i < k; i++) {
 		mdc.SetPixelV(0, i, RGBFill(m_cr6.R1, m_cr6.G1, m_cr6.B1, m_cr6.R2, m_cr6.G2, m_cr6.B2, i, k));
 	}
 
-	k = h;
-	for(i = m_caption; i < k - m_border; i++) {
+	for(i = m_caption, k = h - m_border; i < k; i++) {
 		mdc.SetPixelV(m_border, i, RGBFill(m_cr7.R1, m_cr7.G1, m_cr7.B1, m_cr7.R2, m_cr7.G2, m_cr7.B2, i, k));
 	}
 
-	k = h;
-	for(i = m_caption; i < k - m_border; i++) {
+	for(i = m_caption, k = h - m_border; i < k; i++) {
 		mdc.SetPixelV(rcBar.right - m_border - 1, i, RGBFill(m_cr8.R1, m_cr8.G1, m_cr8.B1, m_cr8.R2, m_cr8.G2, m_cr8.B2, i, k));
 	}
 
-	k = h;
-	for(i = 0 ; i < k; i++) {
+	for(i = 0, k = h ; i < k; i++) {
 		mdc.SetPixelV(rcBar.right - 1, i, RGBFill(m_cr9.R1, m_cr9.G1, m_cr9.B1, m_cr9.R2, m_cr9.G2, m_cr9.B2, i, k));
 	}
 
