@@ -21,20 +21,20 @@
 #include "stdafx.h"
 #include "RealTextParser.h"
 
-CRealTextParser::CRealTextParser(void):
-	m_bIgnoreFont(false),
-	m_bIgnoreFontSize(false),
-	m_bIgnoreFontColor(false),
-	m_bIgnoreFontWeight(false),
-	m_bIgnoreFontFace(false),
-	m_iMinFontSize(14),
-	m_iMaxFontSize(25),
-	m_iDefaultSubtitleDurationInMillisecs(4000),
-	m_bTryToIgnoreErrors(true)
+CRealTextParser::CRealTextParser()
+	: m_bIgnoreFont(false)
+	, m_bIgnoreFontSize(false)
+	, m_bIgnoreFontColor(false)
+	, m_bIgnoreFontWeight(false)
+	, m_bIgnoreFontFace(false)
+	, m_iMinFontSize(14)
+	, m_iMaxFontSize(25)
+	, m_iDefaultSubtitleDurationInMillisecs(4000)
+	, m_bTryToIgnoreErrors(true)
 {
 }
 
-CRealTextParser::~CRealTextParser(void)
+CRealTextParser::~CRealTextParser()
 {
 }
 
@@ -42,11 +42,11 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
 {
 	std::vector<int> vStartTimecodes;
 	std::vector<int> vEndTimecodes;
-	bool bPrevEndTimeMissing(false);
+	bool bPrevEndTimeMissing = false;
 	std::list<Tag> listTags;
 	std::list<Tag> listPreviousOpenTags;
 
-	while (p_szFile.length() > 0) {
+	while (p_szFile.length()) {
 		if (p_szFile.at(0) == '<') {
 			Tag oTag;
 			if (!ExtractTag(p_szFile, oTag)) {
@@ -61,7 +61,7 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
 				int iStartTimecode = GetTimecode(oTag.m_mapAttributes[L"begin"]);
 				int iEndTimecode = GetTimecode(oTag.m_mapAttributes[L"end"]);
 
-				//				FilterReduntantTags(listTags);
+				//FilterReduntantTags(listTags);
 				std::wstring szLine = RenderTags(listTags);
 
 				if (bPrevEndTimeMissing) {
@@ -72,7 +72,7 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
 						pairTimecodes.second = pairTimecodes.first + m_iDefaultSubtitleDurationInMillisecs;
 					}
 
-					if (szLine.length() > 0) {
+					if (szLine.length()) {
 						m_RealText.m_mapLines[pairTimecodes] = szLine;
 					}
 
@@ -80,7 +80,7 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
 				} else if (!vStartTimecodes.empty() && !vEndTimecodes.empty()) {
 					std::pair<int, int> pairTimecodes(vStartTimecodes.back(), vEndTimecodes.back());
 
-					if (szLine.length() > 0) {
+					if (szLine.length()) {
 						m_RealText.m_mapLines[pairTimecodes] = szLine;
 					}
 
@@ -117,7 +117,7 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
 				m_RealText.m_bCenter = true;
 			} else if (oTag.m_szName == L"required") {
 				// Ignore
-			} else if (oTag.m_szName == L"") {
+			} else if (oTag.m_szName.empty()) {
 				// Ignore
 			} else {
 				// assume formating tag (handled later)
@@ -134,21 +134,20 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
 	}
 
 	// Handle final line
-	//	FilterReduntantTags(listTags);
+	//FilterReduntantTags(listTags);
 	std::wstring szLine = RenderTags(listTags);
 
 	if (bPrevEndTimeMissing) {
 		std::pair<int, int> pairTimecodes(vStartTimecodes.back(), vStartTimecodes.back() + m_iDefaultSubtitleDurationInMillisecs);
 
-		if (szLine.length() > 0) {
+		if (szLine.length()) {
 			m_RealText.m_mapLines[pairTimecodes] = szLine;
 		}
 
-		bPrevEndTimeMissing = false;
 	} else if (!vStartTimecodes.empty() && !vEndTimecodes.empty()) {
 		std::pair<int, int> pairTimecodes(vStartTimecodes.back(), vEndTimecodes.back());
 
-		if (szLine.length() > 0) {
+		if (szLine.length()) {
 			m_RealText.m_mapLines[pairTimecodes] = szLine;
 		}
 
@@ -263,7 +262,7 @@ bool CRealTextParser::ExtractTextTag(std::wstring& p_rszLine, Tag& p_rTag)
 
 bool CRealTextParser::ExtractString(std::wstring& p_rszLine, std::wstring& p_rszString)
 {
-	if (p_rszLine.length() == 0 || p_rszLine.at(0) == '<') {
+	if (p_rszLine.empty() || p_rszLine.at(0) == '<') {
 		if (m_bTryToIgnoreErrors) {
 			p_rszString = L"";
 			return true;
@@ -311,7 +310,7 @@ bool CRealTextParser::GetAttributes(std::wstring& p_rszLine, unsigned int& p_riP
 		return false;
 	}
 
-	while (p_riPos>p_rszLine.length() && p_rszLine.at(p_riPos) != '/' && p_rszLine.at(p_riPos) != '>') {
+	while (p_riPos < p_rszLine.length() && p_rszLine.at(p_riPos) != '/' && p_rszLine.at(p_riPos) != '>') {
 		std::wstring szName;
 		if (!GetString(p_rszLine, p_riPos, szName, L"\r\n\t =")) {
 			return false;
@@ -323,9 +322,11 @@ bool CRealTextParser::GetAttributes(std::wstring& p_rszLine, unsigned int& p_riP
 
 		if (p_rszLine.at(p_riPos) != '=') {
 			if (m_bTryToIgnoreErrors) {
-				p_riPos = (unsigned int)p_rszLine.find_first_of('=', p_riPos);
-				if (p_riPos == std::wstring::npos) {
+				size_t pos = p_rszLine.find_first_of('=', p_riPos);
+				if (pos == std::wstring::npos) {
 					return false;
+				} else {
+					p_riPos = (unsigned int)pos;
 				}
 			} else {
 				return false;
@@ -338,7 +339,7 @@ bool CRealTextParser::GetAttributes(std::wstring& p_rszLine, unsigned int& p_riP
 			return false;
 		}
 
-		bool bUsesQuotes(false);
+		bool bUsesQuotes = false;
 		if (p_rszLine.at(p_riPos) == '\'' || p_rszLine.at(p_riPos) == '\"') {
 			++p_riPos;
 			bUsesQuotes = true;
@@ -379,8 +380,8 @@ bool CRealTextParser::GetAttributes(std::wstring& p_rszLine, unsigned int& p_riP
 
 int CRealTextParser::GetTimecode(const std::wstring& p_crszTimecode)
 {
-	int iTimecode(0);
-	int iMultiplier(1);
+	int iTimecode = 0;
+	int iMultiplier = 1;
 
 	// Exception: if the timecode doesn't contain any separators, assume the time code is in seconds (and change multiplier to reflect that)
 	if (p_crszTimecode.find_first_of('.') == std::wstring::npos && p_crszTimecode.find_first_of(':') == std::wstring::npos) {
@@ -453,7 +454,7 @@ std::wstring CRealTextParser::FormatTimecode(int iTimecode,
 std::wstring CRealTextParser::StringToLower(const std::wstring& p_crszString)
 {
 	std::wstring szLowercaseString;
-	for (unsigned int i=0; i < p_crszString.length(); ++i) {
+	for (unsigned int i = 0; i < p_crszString.length(); ++i) {
 		szLowercaseString += towlower(p_crszString.at(i));
 	}
 	return szLowercaseString;
@@ -461,10 +462,10 @@ std::wstring CRealTextParser::StringToLower(const std::wstring& p_crszString)
 
 std::wstring CRealTextParser::RenderTags(const std::list<Tag>& p_crlTags)
 {
-	bool bEmpty(true);
+	bool bEmpty = true;
 	std::wstring szString;
 
-	for (std::list<Tag>::const_iterator iter = p_crlTags.begin(); iter != p_crlTags.end(); ++iter) {
+	for (auto iter = p_crlTags.cbegin(); iter != p_crlTags.cend(); ++iter) {
 		Tag oTag(*iter);
 
 		if (oTag.m_szName == L"br") {
@@ -502,7 +503,7 @@ std::wstring CRealTextParser::RenderTags(const std::list<Tag>& p_crlTags)
 							continue;
 						}
 
-						if (i->first == L"size" && i->second.length() > 0 && ::iswdigit(i->second.at(0))) {
+						if (i->first == L"size" && i->second.length() && ::iswdigit(i->second.at(0))) {
 							int iSize = ::_wtoi(i->second.c_str());
 
 							if (iSize > 0 && iSize < m_iMinFontSize) {
@@ -547,10 +548,8 @@ std::wstring CRealTextParser::RenderTags(const std::list<Tag>& p_crlTags)
 
 bool CRealTextParser::OutputSRT(std::wostream& p_rOutput)
 {
-	int iCounter(1);
-	for (std::map<std::pair<int, int>, std::wstring>::const_iterator i = m_RealText.m_mapLines.begin();
-			i != m_RealText.m_mapLines.end();
-			++i) {
+	int iCounter = 1;
+	for (auto i = m_RealText.m_mapLines.cbegin(); i != m_RealText.m_mapLines.cend(); ++i) {
 		p_rOutput << iCounter++;
 		p_rOutput << std::endl;
 
@@ -569,7 +568,7 @@ bool CRealTextParser::OutputSRT(std::wostream& p_rOutput)
 
 void CRealTextParser::PopTag(std::list<Tag>& p_rlistTags, const std::wstring& p_crszTagName)
 {
-	for (std::list<Tag>::reverse_iterator riter = p_rlistTags.rbegin(); riter != p_rlistTags.rend(); ++riter) {
+	for (auto riter = p_rlistTags.crbegin(); riter != p_rlistTags.crend(); ++riter) {
 		if (riter->m_szName == p_crszTagName) {
 			p_rlistTags.erase((++riter).base());
 			return;
@@ -577,6 +576,7 @@ void CRealTextParser::PopTag(std::list<Tag>& p_rlistTags, const std::wstring& p_
 	}
 }
 
+/*
 void CRealTextParser::FilterReduntantTags(std::list<Tag>& p_rlistTags)
 {
 	std::list<Tag>::iterator iterPrev;
@@ -590,3 +590,4 @@ void CRealTextParser::FilterReduntantTags(std::list<Tag>& p_rlistTags)
 		iterPrev = iterCurrent;
 	}
 }
+*/

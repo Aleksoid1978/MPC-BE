@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,7 +26,7 @@ class CRealTextParser
 {
 public:
 	CRealTextParser();
-	virtual ~CRealTextParser(void);
+	virtual ~CRealTextParser();
 
 	struct Tag {
 		Tag(): m_bOpen(false), m_bClose(false), m_bComment(false), m_bText(false) {}
@@ -80,8 +80,9 @@ private:
 
 	void PopTag(std::list<Tag>& p_rlistTags, const std::wstring& p_crszTagName);
 
-	// Filter out for example multiple font tags opened previously (font tags are not always terminated properly in realtext and can build up)
-	void FilterReduntantTags(std::list<Tag>& p_rlistTags);
+	// Filter out for example multiple font tags opened previously
+	// (font tags are not always terminated properly in realtext and can build up)
+	//void FilterReduntantTags(std::list<Tag>& p_rlistTags);
 
 
 	Subtitles m_RealText;
