@@ -84,6 +84,11 @@ bool CRealTextParser::ParseRealText(std::wstring p_szFile)
 						m_RealText.m_mapLines[pairTimecodes] = szLine;
 					}
 
+				} else if (vStartTimecodes.empty() && vEndTimecodes.empty() && m_RealText.m_mapLines.empty() && iStartTimecode > 0) {
+					// Handle first line
+					if (szLine.length()) {
+						m_RealText.m_mapLines[std::make_pair(0, iStartTimecode)] = szLine;
+					}
 				}
 
 				vStartTimecodes.push_back(iStartTimecode);
@@ -227,6 +232,9 @@ bool CRealTextParser::ExtractTag(std::wstring& p_rszLine, Tag& p_rTag)
 	if (p_rszLine.at(iPos) == '/') {
 		++iPos;
 		p_rTag.m_bClose = true;
+		if (iPos >= p_rszLine.length()) {
+			return false;
+		}
 	}
 
 	if (p_rszLine.at(iPos) == '>') {
