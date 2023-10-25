@@ -13497,9 +13497,11 @@ BOOL CMainFrame::SelectMatchTrack(const std::vector<Stream>& Tracks, CString pat
 		}
 	} while (bFound);
 
+	constexpr LPCWSTR pszTokens = L" ";
+
 	nIdx = 0;
 	int tPos = 0;
-	CString lang = pattern.Tokenize(L",; ", tPos);
+	CString lang = pattern.Tokenize(pszTokens, tPos);
 	while (tPos != -1) {
 		size_t iIndex = 0;
 		for (const auto& track : Tracks) {
@@ -13547,7 +13549,7 @@ BOOL CMainFrame::SelectMatchTrack(const std::vector<Stream>& Tracks, CString pat
 			iIndex++;
 		}
 
-		lang = pattern.Tokenize(L",; ", tPos);
+		lang = pattern.Tokenize(pszTokens, tPos);
 	}
 
 	return FALSE;
