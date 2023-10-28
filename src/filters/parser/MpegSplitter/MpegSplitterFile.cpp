@@ -2231,22 +2231,21 @@ void CMpegSplitterFile::ReadPMT(std::vector<BYTE>& pData, const WORD pid)
 								break;
 							case 0x80:
 								{
-									int channel_config_code = gb.BitRead(8); descriptor_length -= 1;
+									const int channel_config_code = gb.BitRead(8);
+									descriptor_length -= 1;
 									if (channel_config_code >= 0 && channel_config_code <= 0x8) {
 										std::vector<BYTE>& extradata = _streamData.pmt.extraData;
 										if (extradata.size() != sizeof(opus_default_extradata)) {
 											extradata.resize(sizeof(opus_default_extradata));
 											memcpy(extradata.data(), &opus_default_extradata, sizeof(opus_default_extradata));
 
-											BYTE channels = 0;
-											extradata[9] = channels = channel_config_code ? channel_config_code : 2;
+											const int channels = channel_config_code ? channel_config_code : 2;
+											extradata[9]  = channels;
 											extradata[18] = channel_config_code ? (channels > 2) : 255;
 											extradata[19] = opus_stream_cnt[channel_config_code];
 											extradata[20] = opus_coupled_stream_cnt[channel_config_code];
-											if (channels >= 1) {
-												memcpy(&extradata[21], opus_channel_map[channels - 1], channels);
-											}
-
+											memcpy(&extradata[21], opus_channel_map[channels - 1], channels);
+											
 											_streamData.codec = stream_codec::OPUS;
 										}
 									}
