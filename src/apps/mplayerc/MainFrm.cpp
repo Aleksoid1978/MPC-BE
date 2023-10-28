@@ -4572,7 +4572,7 @@ void CMainFrame::OnFilePostOpenMedia(std::unique_ptr<OpenMediaData>& pOMD)
 	}
 
 	if (!m_bAudioOnly &&
-			((m_bFullScreen && !m_bAudioOnly && !s.fLaunchfullscreen && !s.ExclusiveFSAllowed() && s.fullScreenModes.bEnabled == 1) || m_bNeedAutoChangeMonitorMode)) {
+			((m_bFullScreen && !s.fLaunchfullscreen && !s.ExclusiveFSAllowed() && s.fullScreenModes.bEnabled == 1) || m_bNeedAutoChangeMonitorMode)) {
 		AutoChangeMonitorMode();
 	}
 

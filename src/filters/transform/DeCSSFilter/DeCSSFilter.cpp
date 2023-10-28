@@ -184,7 +184,7 @@ HRESULT CDeCSSFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		}
 	}
 
-	if (!pDataIn || !pDataOut || len > size || len < 0) {
+	if (!pDataOut || len > size || len < 0) {
 		return S_FALSE;
 	}
 
