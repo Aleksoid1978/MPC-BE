@@ -2375,7 +2375,7 @@ BEGIN
     IDS_ADDTOPLAYLISTROMCLIPBOARD "從剪貼簿加入播放清單"
     IDS_MOVEWINDOWBYVIDEO_ONOFF "Move window by the video area: On/Off"
     IDS_MOVEWINDOWBYVIDEO_ON "Move window by the video area: On"
-    IDS_MOVEWINDOWBYVIDEO_0FF "Move window by the video area: Off"
+    IDS_MOVEWINDOWBYVIDEO_OFF "Move window by the video area: Off"
     IDS_AUDIO_FILTER_PRESET_1 "適用於含耳語及爆炸音效的音訊"
 END
 

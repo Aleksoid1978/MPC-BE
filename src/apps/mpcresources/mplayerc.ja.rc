@@ -2375,7 +2375,7 @@ BEGIN
     IDS_ADDTOPLAYLISTROMCLIPBOARD "クリップボードからプレイリストに追加"
     IDS_MOVEWINDOWBYVIDEO_ONOFF "映像領域でウィンドウを移動: オン/オフ"
     IDS_MOVEWINDOWBYVIDEO_ON "映像領域でウィンドウを移動: オン"
-    IDS_MOVEWINDOWBYVIDEO_0FF "映像領域でウィンドウを移動: オフ"
+    IDS_MOVEWINDOWBYVIDEO_OFF "映像領域でウィンドウを移動: オフ"
     IDS_AUDIO_FILTER_PRESET_1 "囁きや爆発部分のある音声用"
 END
 

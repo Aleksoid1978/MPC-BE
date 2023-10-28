@@ -2375,7 +2375,7 @@ BEGIN
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Agregar a la Lista de Reproducción desde el portapapeles"
     IDS_MOVEWINDOWBYVIDEO_ONOFF "Mover ventana por el área de video: Encendido/Apagado"
     IDS_MOVEWINDOWBYVIDEO_ON "Mover ventana por el área de video: Encendido"
-    IDS_MOVEWINDOWBYVIDEO_0FF "Mover ventana por el área de video: Apagado"
+    IDS_MOVEWINDOWBYVIDEO_OFF "Mover ventana por el área de video: Apagado"
     IDS_AUDIO_FILTER_PRESET_1 "Para audio con partes de susurro y explosión"
 END
 

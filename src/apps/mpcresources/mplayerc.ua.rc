@@ -2375,7 +2375,7 @@ BEGIN
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Додати в список відтворення з буферу обміну"
     IDS_MOVEWINDOWBYVIDEO_ONOFF "Переміщення вікна за відеообласть: Ввімк/Вимк."
     IDS_MOVEWINDOWBYVIDEO_ON "Переміщення вікна за відеообласть: Ввімк."
-    IDS_MOVEWINDOWBYVIDEO_0FF "Переміщення вікна за відеообласть: Вимк."
+    IDS_MOVEWINDOWBYVIDEO_OFF "Переміщення вікна за відеообласть: Вимк."
     IDS_AUDIO_FILTER_PRESET_1 "Для аудіо з шепотом і вибухами"
 END
 

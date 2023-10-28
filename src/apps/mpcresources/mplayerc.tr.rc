@@ -2375,7 +2375,7 @@ BEGIN
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Panodan Oynatma Listesine Ekle"
     IDS_MOVEWINDOWBYVIDEO_ONOFF "Pencereyi Video Alanı Vasıtasıyla Taşı: Aç/Kapat"
     IDS_MOVEWINDOWBYVIDEO_ON "Pencereyi Video Alanı Vasıtasıyla Taşı: Açık"
-    IDS_MOVEWINDOWBYVIDEO_0FF "Pencereyi Video Alanı Vasıtasıyla Taşı: Kapalı"
+    IDS_MOVEWINDOWBYVIDEO_OFF "Pencereyi Video Alanı Vasıtasıyla Taşı: Kapalı"
     IDS_AUDIO_FILTER_PRESET_1 "Hışırtı ve patlama bölümleri olan ses için"
 END
 

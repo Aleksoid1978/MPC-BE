@@ -10627,7 +10627,7 @@ void CMainFrame::OnChangeMouseEasyMove()
 	CAppSettings& s = AfxGetAppSettings();
 	s.bMouseEasyMove = !s.bMouseEasyMove;
 
-	m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(s.bMouseEasyMove ? IDS_MOVEWINDOWBYVIDEO_ON : IDS_MOVEWINDOWBYVIDEO_0FF));
+	m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(s.bMouseEasyMove ? IDS_MOVEWINDOWBYVIDEO_ON : IDS_MOVEWINDOWBYVIDEO_OFF));
 }
 
 void CMainFrame::SetDefaultWindowRect(int iMonitor, const bool bLastCall)

@@ -2375,7 +2375,7 @@ BEGIN
     IDS_ADDTOPLAYLISTROMCLIPBOARD "클립보드에서 재생 목록에 추가"
     IDS_MOVEWINDOWBYVIDEO_ONOFF "Move window by the video area: On/Off"
     IDS_MOVEWINDOWBYVIDEO_ON "Move window by the video area: On"
-    IDS_MOVEWINDOWBYVIDEO_0FF "Move window by the video area: Off"
+    IDS_MOVEWINDOWBYVIDEO_OFF "Move window by the video area: Off"
     IDS_AUDIO_FILTER_PRESET_1 "위스퍼 및 폭발음이 포함된 오디오인 경우"
 END
 

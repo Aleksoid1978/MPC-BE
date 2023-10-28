@@ -2375,7 +2375,7 @@ BEGIN
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Adicionar à lista de reprodução da área de transferência"
     IDS_MOVEWINDOWBYVIDEO_ONOFF "Move window by the video area: On/Off"
     IDS_MOVEWINDOWBYVIDEO_ON "Move window by the video area: On"
-    IDS_MOVEWINDOWBYVIDEO_0FF "Move window by the video area: Off"
+    IDS_MOVEWINDOWBYVIDEO_OFF "Move window by the video area: Off"
     IDS_AUDIO_FILTER_PRESET_1 "For audio with whisper and explosion parts"
 END
 

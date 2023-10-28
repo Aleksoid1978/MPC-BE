@@ -2374,7 +2374,7 @@ BEGIN
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Adaugă în lista de redare din clipboard"
     IDS_MOVEWINDOWBYVIDEO_ONOFF "Mută fereastra în zona video: Pornit/Oprit"
     IDS_MOVEWINDOWBYVIDEO_ON "Mută fereastra în zona video: Pornit"
-    IDS_MOVEWINDOWBYVIDEO_0FF "Mută fereastra în zona video: Oprit"
+    IDS_MOVEWINDOWBYVIDEO_OFF "Mută fereastra în zona video: Oprit"
     IDS_AUDIO_FILTER_PRESET_1 "Pentru sunet cu părți de șoaptă și de explozie"
 END
 

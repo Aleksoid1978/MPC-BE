@@ -2375,7 +2375,7 @@ BEGIN
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Aggiungi alla playlist dagli appunti"
     IDS_MOVEWINDOWBYVIDEO_ONOFF "Sposta la finestra nell'area del video: On/Off"
     IDS_MOVEWINDOWBYVIDEO_ON "Sposta la finestra nell'area del video: On"
-    IDS_MOVEWINDOWBYVIDEO_0FF "Sposta la finestra nell'area del video: Off"
+    IDS_MOVEWINDOWBYVIDEO_OFF "Sposta la finestra nell'area del video: Off"
     IDS_AUDIO_FILTER_PRESET_1 "Per audio con parti sussurrate ed esplosive"
 END
 

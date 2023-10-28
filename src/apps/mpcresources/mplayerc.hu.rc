@@ -2375,7 +2375,7 @@ BEGIN
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Hozzáadás a lejátszási listához a vágólapról"
     IDS_MOVEWINDOWBYVIDEO_ONOFF "Ablak mozgatása a videó területével: Be/Ki"
     IDS_MOVEWINDOWBYVIDEO_ON "Ablak mozgatása a videó területével: Be"
-    IDS_MOVEWINDOWBYVIDEO_0FF "Ablak mozgatása a videó területével: Ki"
+    IDS_MOVEWINDOWBYVIDEO_OFF "Ablak mozgatása a videó területével: Ki"
     IDS_AUDIO_FILTER_PRESET_1 "Suttogó és robbanásos részekkel rendelkező hanghoz"
 END
 

@@ -2375,7 +2375,7 @@ BEGIN
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Aus der Zwischenablage zur Wiedergabeliste hinzufügen"
     IDS_MOVEWINDOWBYVIDEO_ONOFF "Fenster im Videobereich verschieben: Ein/Aus"
     IDS_MOVEWINDOWBYVIDEO_ON "Fenster im Videobereich verschieben: Ein"
-    IDS_MOVEWINDOWBYVIDEO_0FF "Fenster im Videobereich verschieben: Aus"
+    IDS_MOVEWINDOWBYVIDEO_OFF "Fenster im Videobereich verschieben: Aus"
     IDS_AUDIO_FILTER_PRESET_1 "Für Audio mit Flüster- und Explosionsabschnitten"
 END
 
