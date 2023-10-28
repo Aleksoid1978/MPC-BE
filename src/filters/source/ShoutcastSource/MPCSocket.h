@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2022 see Authors.txt
+ * (C) 2012-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,21 +26,21 @@
 class CMPCSocket : public CSocket
 {
 protected:
-	int			m_nTimerID;
+	int			m_nTimerID = 0;
 
-	BOOL		m_bProxyEnable;
+	BOOL		m_bProxyEnable = FALSE;
 	CString		m_sProxyServer;
-	DWORD		m_nProxyPort;
+	DWORD		m_nProxyPort = 0;
 
-	CStringA	m_sUserAgent;
+	CStringA	m_sUserAgent = "MPC-BE";
 
 	CStringA	m_RequestHdr;
 	CStringA	m_Hdr;
 
 	std::list<CStringA> m_AddHeaderParams;
 
-	UINT		m_uConnectTimeOut;
-	UINT		m_uReceiveTimeOut;
+	UINT		m_uConnectTimeOut = 0;
+	UINT		m_uReceiveTimeOut = 0;
 
 	virtual BOOL OnMessagePending();
 

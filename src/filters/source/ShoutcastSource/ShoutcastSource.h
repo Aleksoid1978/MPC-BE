@@ -169,7 +169,9 @@ class CShoutcastStream : public CSourceStream
 		unsigned m_framesize	= 0;
 		unsigned m_aacprofile	= 0;
 
-		CString m_title, m_url, m_description;
+		CStringW m_title;
+		CStringW m_url;
+		CStringW m_description;
 
 		bool Connect(const CUrlParser& urlParser, CString& redirectUrl);
 		bool FindSync();
@@ -193,19 +195,21 @@ class CShoutcastStream : public CSourceStream
 
 	} m_socket;
 
-	HANDLE m_hSocketThread;
-	SOCKET m_hSocket;
+	HANDLE m_hSocketThread = nullptr;
+	SOCKET m_hSocket = INVALID_SOCKET;
 
 	CUrlParser m_urlParser;
 
-	bool m_fBuffering;
-	CString m_title, m_description;
+	bool m_bBuffering = false;
+	CString m_title;
+	CString m_description;
+
+	bool m_bExitThread = false;;
 
 public:
 	CShoutcastStream(const WCHAR* wfn, CShoutcastSource* pParent, HRESULT* phr);
 	virtual ~CShoutcastStream();
 
-	bool fExitThread;
 	UINT SocketThreadProc();
 
 	void EmptyBuffer();

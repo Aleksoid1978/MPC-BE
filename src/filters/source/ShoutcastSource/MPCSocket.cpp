@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2022 see Authors.txt
+ * (C) 2012-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,12 +26,6 @@
 #define PROXY_TIMEOUT_FACTOR 0
 
 CMPCSocket::CMPCSocket()
-	: m_nTimerID(0)
-	, m_uConnectTimeOut(0)
-	, m_uReceiveTimeOut(0)
-	, m_bProxyEnable(FALSE)
-	, m_nProxyPort(0)
-	, m_sUserAgent("MPC-BE")
 {
 	CRegKey key;
 	ULONG len			= MAX_PATH;

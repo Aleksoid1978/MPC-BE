@@ -231,14 +231,12 @@ STDMETHODIMP CShoutcastSource::QueryFilterInfo(FILTER_INFO* pInfo)
 
 CShoutcastStream::CShoutcastStream(const WCHAR* wfn, CShoutcastSource* pParent, HRESULT* phr)
 	: CSourceStream(L"ShoutcastStream", phr, pParent, L"Output")
-	, m_fBuffering(false)
-	, m_hSocket(INVALID_SOCKET)
 {
 	ASSERT(phr);
 
 	*phr = S_OK;
 
-	CString fn(wfn);
+	CStringW fn(wfn);
 	if (fn.Find(L"://") < 0) {
 		fn = L"http://" + fn;
 	}
@@ -305,7 +303,7 @@ void CShoutcastStream::EmptyBuffer()
 LONGLONG CShoutcastStream::GetBufferFullness()
 {
 	CAutoLock cAutoLock(&m_queue);
-	if (!m_fBuffering) {
+	if (!m_bBuffering) {
 		return 100;
 	}
 	if (m_queue.empty()) {
@@ -369,10 +367,10 @@ HRESULT CShoutcastStream::FillBuffer(IMediaSample* pSample)
 		}
 
 		DLog(L"CShoutcastStream(): START BUFFERING");
-		m_fBuffering = true;
+		m_bBuffering = true;
 
 		for (;;) {
-			if (fExitThread) { // playback stopped?
+			if (m_bExitThread) { // playback stopped?
 				return S_FALSE;
 			}
 
@@ -392,7 +390,7 @@ HRESULT CShoutcastStream::FillBuffer(IMediaSample* pSample)
 		DeliverNewSegment(0, ~0, 1.0);
 
 		DLog(L"CShoutcastStream(): END BUFFERING");
-		m_fBuffering = false;
+		m_bBuffering = false;
 	} while (false);
 
 	{
@@ -481,7 +479,7 @@ static UINT SocketThreadProc(LPVOID pParam)
 
 UINT CShoutcastStream::SocketThreadProc()
 {
-	fExitThread = false;
+	m_bExitThread = false;
 
 	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
 
@@ -515,7 +513,7 @@ UINT CShoutcastStream::SocketThreadProc()
 	CSimpleBuffer<BYTE> buffer;
 	size_t bufdatalen = 0;
 
-	while (!fExitThread) {
+	while (!m_bExitThread) {
 		{
 			if (m_queue.GetDuration() > MAXBUFFERLENGTH || m_queue.size() >= 500) {
 				// Buffer is full
@@ -645,7 +643,7 @@ UINT CShoutcastStream::SocketThreadProc()
 	soc.Close();
 	m_hSocket = INVALID_SOCKET;
 
-	fExitThread = true;
+	m_bExitThread = true;
 
 	return 0;
 }
@@ -654,10 +652,10 @@ HRESULT CShoutcastStream::OnThreadCreate()
 {
 	EmptyBuffer();
 
-	fExitThread = true;
+	m_bExitThread = true;
 	m_hSocketThread = AfxBeginThread(::SocketThreadProc, this)->m_hThread;
 
-	while (fExitThread) {
+	while (m_bExitThread) {
 		Sleep(10);
 	}
 
@@ -668,7 +666,7 @@ HRESULT CShoutcastStream::OnThreadDestroy()
 {
 	EmptyBuffer();
 
-	fExitThread = true;
+	m_bExitThread = true;
 	m_socket.CancelBlockingCall();
 	WaitForSingleObject(m_hSocketThread, INFINITE);
 
@@ -677,7 +675,7 @@ HRESULT CShoutcastStream::OnThreadDestroy()
 
 HRESULT CShoutcastStream::Inactive()
 {
-	fExitThread = true;
+	m_bExitThread = true;
 	return __super::Inactive();
 }
 
@@ -685,9 +683,8 @@ HRESULT CShoutcastStream::SetName(LPCWSTR pName)
 {
 	CheckPointer(pName, E_POINTER);
 
-	if (m_pName) {
-		delete[] m_pName;
-	}
+	delete[] m_pName;
+
 	const size_t len = wcslen(pName) + 1;
 	m_pName = DNew WCHAR[len];
 	wcscpy_s(m_pName, len, pName);
@@ -720,7 +717,7 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 		if (1 == __super::Receive(&b, 1) && b && b*16 == __super::Receive(buff, b*16)) {
 			int len = decode_html_entities_utf8((char*)buff, nullptr);
 
-			CString str = UTF8orLocalToWStr((LPCSTR)buff);
+			CStringW str = UTF8orLocalToWStr((LPCSTR)buff);
 
 			DLog(L"CShoutcastStream(): Metainfo: %s", str);
 
