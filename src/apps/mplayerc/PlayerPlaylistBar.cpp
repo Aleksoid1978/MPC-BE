@@ -1721,10 +1721,9 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 	CString audioId;
 
 	std::vector<CPlaylistItem> playlist;
-	CPlaylistItem *pli = nullptr;
 
 	INT_PTR c = curPlayList.GetCount();
-	CString str, title, album;
+	CStringW str;
 	while (f.ReadString(str)) {
 		FastTrim(str);
 
@@ -1732,9 +1731,9 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 			continue;
 		}
 
-		if (!pli) {
-			pli = DNew CPlaylistItem;
-		}
+		CPlaylistItem pli;
+		CStringW title;
+		CStringW album;
 
 		if (str.GetAt(0) == L'#') {
 			auto DeleteLeft = [](const auto pos, auto& str) {
@@ -1754,7 +1753,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 						str = str.Mid(pos, str.GetLength() - pos);
 
 						if (dur > 0) {
-							pli->m_duration = UNITS * dur;
+							pli.m_duration = UNITS * dur;
 						}
 					}
 				}
@@ -1780,7 +1779,6 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 		} else {
 			const auto path = MakePath(CombinePath(base, str));
 			if (!fn.CompareNoCase(path)) {
-				SAFE_DELETE(pli);
 				continue;
 			}
 
@@ -1788,19 +1786,16 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 				const auto ext = GetFileExt(path).MakeLower();
 				if (ext == L".m3u" || ext == L".m3u8") {
 					if (ParseM3UPlayList(path)) {
-						SAFE_DELETE(pli);
 						continue;
 					}
 				} else if (ext == L".mpcpl") {
 					if (ParseMPCPlayList(path)) {
-						SAFE_DELETE(pli);
 						continue;
 					}
 				} else {
 					std::list<CString> redir;
 					const auto ct = Content::GetType(path, &redir);
 					if (!redir.empty()) {
-						SAFE_DELETE(pli);
 						for (const auto& r : redir) {
 							ParsePlayList(r, nullptr);
 						}
@@ -1809,36 +1804,29 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 				}
 			}
 
-			pli->m_fi = path;
+			pli.m_fi = path;
 			if (!audioId.IsEmpty()) {
 				const auto it = audio_fns.find(audioId);
 				if (it != audio_fns.cend()) {
 					const auto& audio_items = it->second;
-					pli->m_auds.insert(pli->m_auds.end(), audio_items.begin(), audio_items.end());
+					pli.m_auds.insert(pli.m_auds.end(), audio_items.begin(), audio_items.end());
 				}
 				audioId.Empty();
 			}
 
-			if (!title.IsEmpty()) {
-				if (!album.IsEmpty()) {
-					pli->m_label = album + L" - " + title;
+			if (title.GetLength()) {
+				if (album.GetLength()) {
+					pli.m_label = album + L" - " + title;
 				} else {
-					pli->m_label = title;
+					pli.m_label = title;
 				}
-			} else if (!album.IsEmpty()) {
-				pli->m_label = album;
+			} else if (album.GetLength()) {
+				pli.m_label = album;
 			}
 
-			playlist.emplace_back(*pli);
-
-			SAFE_DELETE(pli);
-
-			title.Empty();
-			album.Empty();
+			playlist.emplace_back(pli);
 		}
 	}
-
-	SAFE_DELETE(pli);
 
 	bool bNeedParse = false;
 	if (playlist.size() == 1) {
