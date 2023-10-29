@@ -3239,25 +3239,27 @@ void CPlayerPlaylistBar::DropItemOnList()
 		m_list.DeleteItem(m_DragIndexes[i]);
 	}
 
-	std::list<CPlaylistItem> tmp;
+	std::vector<CPlaylistItem> pli_tmp;
+	pli_tmp.reserve(m_list.GetItemCount());
+
 	UINT id = (UINT)-1;
 	for (int i = 0; i < m_list.GetItemCount(); i++) {
 		POSITION pos = (POSITION)m_list.GetItemData(i);
 		CPlaylistItem& pli = curPlayList.GetAt(pos);
-		tmp.emplace_back(pli);
+		pli_tmp.emplace_back(pli);
 		if (pos == curPlayList.GetPos()) {
 			id = pli.m_id;
 		}
 	}
 	curPlayList.RemoveAll();
-	auto it = tmp.begin();
-	for (int i = 0; it != tmp.end(); i++) {
-		CPlaylistItem& pli = *it++;
+
+	for (size_t i = 0; i < pli_tmp.size(); i++) {
+		CPlaylistItem& pli = pli_tmp[i];
 		curPlayList.AddTail(pli);
 		if (pli.m_id == id) {
 			curPlayList.SetPos(curPlayList.GetTailPosition());
 		}
-		m_list.SetItemData(i, (DWORD_PTR)curPlayList.GetTailPosition());
+		m_list.SetItemData((int)i, (DWORD_PTR)curPlayList.GetTailPosition());
 	}
 
 	ResizeListColumn();
