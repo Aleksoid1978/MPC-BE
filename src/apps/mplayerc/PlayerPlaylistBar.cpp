@@ -1722,6 +1722,10 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 
 	std::vector<CPlaylistItem> playlist;
 
+	CStringW title;
+	CStringW album;
+	REFERENCE_TIME duration = 0;
+
 	INT_PTR c = curPlayList.GetCount();
 	CStringW str;
 	while (f.ReadString(str)) {
@@ -1730,10 +1734,6 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 		if (str.IsEmpty() || (StartsWith(str, L"#EXTM3U"))) {
 			continue;
 		}
-
-		CPlaylistItem pli;
-		CStringW title;
-		CStringW album;
 
 		if (str.GetAt(0) == L'#') {
 			auto DeleteLeft = [](const auto pos, auto& str) {
@@ -1753,7 +1753,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 						str = str.Mid(pos, str.GetLength() - pos);
 
 						if (dur > 0) {
-							pli.m_duration = UNITS * dur;
+							duration = UNITS * dur;
 						}
 					}
 				}
@@ -1804,6 +1804,8 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 				}
 			}
 
+			CPlaylistItem pli;
+
 			pli.m_fi = path;
 			if (!audioId.IsEmpty()) {
 				const auto it = audio_fns.find(audioId);
@@ -1824,7 +1826,13 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 				pli.m_label = album;
 			}
 
+			pli.m_duration = duration;
+
 			playlist.emplace_back(pli);
+
+			title.Empty();
+			album.Empty();
+			duration = 0;
 		}
 	}
 
