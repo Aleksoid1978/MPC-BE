@@ -84,6 +84,9 @@ private:
 	REFERENCE_TIME							m_rtAvrTimePerFrame;
 	bool									m_bCalculateStopTime;
 
+	BYTE*									m_pFFBuffer = nullptr;
+	unsigned int							m_nFFBufferSize = 0;
+
 	bool									m_bReorderBFrame;
 	struct Timings {
 		REFERENCE_TIME rtStart;

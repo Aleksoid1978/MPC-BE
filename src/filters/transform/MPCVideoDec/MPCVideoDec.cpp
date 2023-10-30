@@ -1734,8 +1734,10 @@ void CMPCVideoDecFilter::CleanupFFmpeg()
 {
 	m_pAVCodec = nullptr;
 
-	av_parser_close(m_pParser);
-	m_pParser = nullptr;
+	if (m_pParser) {
+		av_parser_close(m_pParser);
+		m_pParser = nullptr;
+	}
 
 	m_pStagingD3D11Texture2D.Release();
 
@@ -1749,6 +1751,9 @@ void CMPCVideoDecFilter::CleanupFFmpeg()
 	av_frame_free(&m_pFrame);
 
 	m_FormatConverter.Cleanup();
+
+	av_freep(&m_pFFBuffer);
+	m_nFFBufferSize = 0;
 }
 
 STDMETHODIMP CMPCVideoDecFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -3788,6 +3793,21 @@ HRESULT CMPCVideoDecFilter::ParseInternal(const BYTE *buffer, int buflen, REFERE
 	BOOL bFlush = (buffer == nullptr);
 	BYTE* pDataBuffer = (BYTE*)buffer;
 	HRESULT hr = S_OK;
+
+	if (buflen > 0 && buffer) {
+		// re-allocate buffer to have enough space
+		auto pBuf = reinterpret_cast<BYTE*>(av_fast_realloc(m_pFFBuffer, &m_nFFBufferSize, static_cast<size_t>(buflen) + AV_INPUT_BUFFER_PADDING_SIZE));
+		if (!pBuf) {
+			return E_FAIL;
+		}
+
+		m_pFFBuffer = pBuf;
+
+		// copy data to buffer
+		memcpy(m_pFFBuffer, buffer, buflen);
+		memset(m_pFFBuffer + buflen, 0, AV_INPUT_BUFFER_PADDING_SIZE);
+		pDataBuffer = m_pFFBuffer;
+	}
 
 	while (buflen > 0 || bFlush) {
 		REFERENCE_TIME rtStart = rtStartIn, rtStop = rtStopIn;
