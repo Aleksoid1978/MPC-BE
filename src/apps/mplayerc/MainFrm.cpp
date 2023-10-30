@@ -12255,7 +12255,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		youtubeUrl = pOFD->fi.GetPath();
 		Content::Online::Disconnect(youtubeUrl);
 
-		pOFD->Clear();
+		pOFD->fi.Clear();
+		pOFD->auds.clear();
+		pOFD->subs.clear();
 
 		auto it = std::find_if(m_youtubeUrllist.cbegin(), m_youtubeUrllist.cend(), [&s](const Youtube::YoutubeUrllistItem& item) {
 			return item.profile->iTag == s.iYoutubeTagSelected;
