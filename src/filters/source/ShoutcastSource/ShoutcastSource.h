@@ -138,7 +138,7 @@ class CShoutcastStream : public CSourceStream
 	};
 
 	class ShoutCastQueue
-		: public std::list<std::unique_ptr<CShoutCastPacket>>
+		: public std::deque<std::unique_ptr<CShoutCastPacket>>
 		, public CCritSec
 	{
 	public:
