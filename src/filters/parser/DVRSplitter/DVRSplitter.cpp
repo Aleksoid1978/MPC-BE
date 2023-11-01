@@ -327,10 +327,8 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						case 0x4:
 						case 0x8: pbmi.biCompression = FCC('H264'); break;
 						case 0xc: pbmi.biCompression = FCC('HEVC'); break;
-					}
-
-					if (!pbmi.biCompression) {
-						return false;
+						default:
+							return E_FAIL;
 					}
 
 					mt.InitMediaType();
@@ -343,7 +341,7 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (pbmi.biCompression == FCC('H264')) {
 						std::vector<BYTE> pData(hdr.size);
 						if ((hr = m_pFile->ByteRead(pData.data(), hdr.size)) != S_OK) {
-							return false;
+							return E_FAIL;
 						}
 
 						CBaseSplitterFileEx::avchdr h;
@@ -355,7 +353,7 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					} else if (pbmi.biCompression == FCC('HEVC')) {
 						std::vector<BYTE> pData(hdr.size);
 						if ((hr = m_pFile->ByteRead(pData.data(), hdr.size)) != S_OK) {
-							return false;
+							return E_FAIL;
 						}
 
 						CBaseSplitterFileEx::hevchdr h;
