@@ -5,9 +5,19 @@
 MP4Splitter
 Fixed player crash on some incorrect MP4 files.
 
+MPCVideoDec
+Fixed freezing on some H.264 streams when playing WTV.
+
+Subtitles
+Improved support for RealMedia subtitles. Developments from the MPC-HC project were used.
+
+YouTube
+Improved work with yt-dlp.
+
 Player
 Added the ability to change the "Move window by the video area" setting using a hotkey.
 If the "Show milliseconds" setting is active (Status), then milliseconds will be recorded in the screenshot file name.
+The separator for "Track Priority" is now only a space.
 
 Updated Japanese translation (by tsubasanouta).
 Updated Spanish translation (by IPeluchito).
@@ -17,6 +27,7 @@ Updated Turkish translation (by cmhrky).
 Updated Romanian translation (by AndreiMiloiu).
 Updated Chinese (Simplified) translation (by wushantao).
 Updated Hungarian translation (by mickey).
+Updated Ukrainian translation (by arestarh).
 
 Updated libraries:
 	nanosvg git-cb0ae54;
