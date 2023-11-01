@@ -18,6 +18,10 @@ Updated Romanian translation (by AndreiMiloiu).
 Updated Chinese (Simplified) translation (by wushantao).
 Updated Hungarian translation (by mickey).
 
+Updated libraries:
+	nanosvg git-cb0ae54;
+	rapidjson git-v1.1.0-744-gf9d53419.
+
 
 1.6.10 - 2023-10-07
 =============================
