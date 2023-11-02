@@ -68,6 +68,9 @@ bool CMixer::Init()
 		return false;
 	}
 
+	m_Buffer1.SetSize(0);
+	m_Buffer2.SetSize(0);
+
 	m_in_avsf  = m_in_sf  == SAMPLE_FMT_S24 ? AV_SAMPLE_FMT_S32 : (AVSampleFormat)m_in_sf;
 	m_out_avsf = m_out_sf == SAMPLE_FMT_S24 ? AV_SAMPLE_FMT_S32 : (AVSampleFormat)m_out_sf;
 
@@ -317,20 +320,19 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 	const int in_ch  = av_popcount64(m_in_layout);
 	const int out_ch = av_popcount(m_out_layout);
 
-	int32_t* buf1 = nullptr;
 	if (m_in_sf == SAMPLE_FMT_S24) {
 		ASSERT(m_in_avsf == AV_SAMPLE_FMT_S32);
-		buf1 = DNew int32_t[in_samples * in_ch];
-		convert_int24_to_int32(buf1, pInput, in_samples * in_ch);
-		pInput = (BYTE*)buf1;
+		size_t allsamples = in_samples * in_ch;
+		m_Buffer1.ExtendSize(allsamples);
+		convert_int24_to_int32(m_Buffer1.Data(), pInput, allsamples);
+		pInput = (BYTE*)m_Buffer1.Data();
 	}
 
 	BYTE* output;
-	int32_t* buf2 = nullptr;
 	if (m_out_sf == SAMPLE_FMT_S24) {
 		ASSERT(m_out_avsf == AV_SAMPLE_FMT_S32);
-		buf2 = DNew int32_t[out_samples * out_ch];
-		output = (BYTE*)buf2;
+		m_Buffer2.ExtendSize(out_samples * out_ch);
+		output = (BYTE*)m_Buffer2.Data();
 	} else {
 		output = pOutput;
 	}
@@ -349,12 +351,8 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 		out_samples = 0;
 	}
 
-	if (buf1) {
-		delete [] buf1;
-	}
-	if (buf2) {
-		convert_int32_to_int24(pOutput, buf2, out_samples * out_ch);
-		delete [] buf2;
+	if (output == (BYTE*)m_Buffer2.Data()) {
+		convert_int32_to_int24(pOutput, m_Buffer2.Data(), out_samples * out_ch);
 	}
 
 	return out_samples;
@@ -370,11 +368,10 @@ int CMixer::Receive(BYTE* pOutput, int out_samples)
 	const int out_ch = av_popcount(m_out_layout);
 
 	BYTE* output;
-	int32_t* buf = nullptr;
 	if (m_out_sf == SAMPLE_FMT_S24) {
 		ASSERT(m_out_avsf == AV_SAMPLE_FMT_S32);
-		buf = DNew int32_t[out_samples * out_ch];
-		output = (BYTE*)buf;
+		m_Buffer2.ExtendSize(out_samples * out_ch);
+		output = (BYTE*)m_Buffer2.Data();
 	} else {
 		output = pOutput;
 	}
@@ -385,9 +382,8 @@ int CMixer::Receive(BYTE* pOutput, int out_samples)
 		out_samples = 0;
 	}
 
-	if (buf) {
-		convert_int32_to_int24(pOutput, buf, out_samples * out_ch);
-		delete [] buf;
+	if (output == (BYTE*)m_Buffer2.Data()) {
+		convert_int32_to_int24(pOutput, m_Buffer2.Data(), out_samples * out_ch);
 	}
 
 	return out_samples;
