@@ -23,7 +23,16 @@
 #include "../MainFrm.h"
 #include "DSUtil/SysVersion.h"
 
-std::vector<std::unique_ptr<MENUITEM>> m_pMenuItems;
+struct MENUITEM
+{
+	CString strText;
+	UINT    uID = 0;
+	bool    bMainMenu = false;
+	bool    bFirstInMainMenu = false;
+	bool    bPopupMenu = false;
+};
+using LPMENUITEM = MENUITEM*;
+std::list<MENUITEM> m_pMenuItems;
 
 void CMenuEx::SetMain(CMainFrame* pMainFrame)
 {
@@ -110,7 +119,7 @@ void CMenuEx::DrawItem(LPDRAWITEMSTRUCT lpDIS)
 	dc.Attach(lpDIS->hDC);
 	CFont* pOldFont = dc.SelectObject(&m_font);
 
-	LPMENUITEM lpItem = (LPMENUITEM)lpDIS->itemData;
+	auto lpItem = reinterpret_cast<LPMENUITEM>(lpDIS->itemData);
 
 	const bool bSelected = lpDIS->itemState & ODS_SELECTED;
 	const bool bChecked = lpDIS->itemState & ODS_CHECKED;
@@ -199,7 +208,7 @@ void CMenuEx::DrawItem(LPDRAWITEMSTRUCT lpDIS)
 	dc.Detach();
 }
 
-void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, const bool bSelected, const bool bGrayed, const bool bNoAccel, const LPMENUITEM lpItem)
+void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, const bool bSelected, const bool bGrayed, const bool bNoAccel, const MENUITEM* lpItem)
 {
 	if (bSelected) {
 		const CAppSettings& s = AfxGetAppSettings();
@@ -275,16 +284,14 @@ void CMenuEx::ChangeStyle(CMenu *pMenu, const bool bMainMenu/* = false*/)
 		const auto uID = mii.wID;
 
 		LPMENUITEM lpItem = nullptr;
-		auto it = std::find_if(m_pMenuItems.begin(), m_pMenuItems.end(), [uID, bMainMenu](const std::unique_ptr<MENUITEM>& item) {
-			return item->uID == uID && item->bMainMenu == bMainMenu;
+		auto it = std::find_if(m_pMenuItems.begin(), m_pMenuItems.end(), [uID, bMainMenu](const MENUITEM& item) {
+			return item.uID == uID && item.bMainMenu == bMainMenu;
 		});
 
 		if (it != m_pMenuItems.end()) {
-			lpItem = it->get();
+			lpItem = &(*it);
 		} else {
-			auto itemPtr = std::make_unique<MENUITEM>();
-			lpItem = itemPtr.get();
-			m_pMenuItems.emplace_back(std::move(itemPtr));
+			lpItem = &m_pMenuItems.emplace_back();
 		}
 
 		lpItem->uID = uID;
@@ -317,7 +324,7 @@ void CMenuEx::ChangeStyle(CMenu *pMenu, const bool bMainMenu/* = false*/)
 
 void CMenuEx::MeasureItem(LPMEASUREITEMSTRUCT lpMIS)
 {
-	LPMENUITEM lpItem = (LPMENUITEM)lpMIS->itemData;
+	auto lpItem = reinterpret_cast<LPMENUITEM>(lpMIS->itemData);
 
 	if (lpItem->uID > 0) {
 		CDC dcScreen;
@@ -326,12 +333,11 @@ void CMenuEx::MeasureItem(LPMEASUREITEMSTRUCT lpMIS)
 
 		dcScreen.SelectObject(&m_font);
 
-		const CString strText(lpItem->strText);
 		CRect r;
 		dcScreen.DrawTextW(L"W", &r, DT_SINGLELINE | DT_CALCRECT);
 		CSize height(r.Size());
 
-		dcScreen.DrawTextW(strText, &r, DT_SINGLELINE | DT_CALCRECT);
+		dcScreen.DrawTextW(lpItem->strText, &r, DT_SINGLELINE | DT_CALCRECT);
 		CSize size(r.Size());
 
 		dcScreen.RestoreDC(-1);
@@ -341,7 +347,7 @@ void CMenuEx::MeasureItem(LPMEASUREITEMSTRUCT lpMIS)
 			lpMIS->itemWidth = size.cx;
 		} else {
 			lpMIS->itemWidth = size.cx + m_CYMENU * 2;
-			if (strText.Find('\t') > 0) {
+			if (lpItem->strText.Find('\t') > 0) {
 				lpMIS->itemWidth += m_CYMENU * 2;
 			}
 			if (lpItem->bPopupMenu) {

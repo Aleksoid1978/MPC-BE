@@ -20,16 +20,7 @@
 
 #pragma once
 
-struct MENUITEM
-{
-	CString strText;
-	UINT    uID = 0;
-	bool    bMainMenu = false;
-	bool    bFirstInMainMenu = false;
-	bool    bPopupMenu = false;
-};
-using LPMENUITEM = MENUITEM*;
-
+struct MENUITEM;
 class CMainFrame;
 
 class CMenuEx
@@ -101,5 +92,5 @@ protected:
 	static inline CString m_strModuleName;
 
 	static void DrawMenuElement(CDC* pDC, const CRect& rect, const UINT uState, const bool bGrayed, const bool bSelected, CRect* rcElement);
-	static void TextMenu(CDC *pDC, const CRect &rect, CRect rcText, const bool bSelected, const bool bGrayed, const bool bNoAccel, const LPMENUITEM lpItem);
+	static void TextMenu(CDC *pDC, const CRect &rect, CRect rcText, const bool bSelected, const bool bGrayed, const bool bNoAccel, const MENUITEM* lpItem);
 };
