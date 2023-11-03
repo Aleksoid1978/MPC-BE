@@ -427,7 +427,7 @@ void CDSMMuxerFilter::IndexSyncPoint(const MuxerPacket* p, __int64 fp)
 		if (sp2.id == sp.id && sp2.rtStop <= sp.rtStop || sp2.rtStop <= sp.rtStart) {
 			m_sps.erase(it++);
 		} else {
-			it++;
+			++it;
 		}
 	}
 

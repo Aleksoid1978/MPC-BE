@@ -1501,7 +1501,7 @@ void CMPCVideoDecFilter::GetPictSize(int& width, int& height)
 	FixFrameSize(m_pAVCtx, width, height);
 }
 
-static bool IsFFMPEGEnabled(FFMPEG_CODECS ffcodec, const bool FFmpegFilters[VDEC_COUNT])
+static bool IsFFMPEGEnabled(const FFMPEG_CODECS& ffcodec, const bool FFmpegFilters[VDEC_COUNT])
 {
 	if (ffcodec.FFMPEGCode < 0 || ffcodec.FFMPEGCode >= VDEC_COUNT) {
 		return false;

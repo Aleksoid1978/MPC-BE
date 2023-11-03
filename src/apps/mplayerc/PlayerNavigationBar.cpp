@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -246,11 +246,12 @@ void CPlayerNavigationDialog::SetupAudioSwitcherSubMenu(CDVBChannel* pChannel)
 		m_ComboAudio.ResetContent();
 
 		for (int i=0; i < pChannel->GetAudioCount(); i++) {
-			m_ComboAudio.AddString(pChannel->GetAudio(i)->Language);
-			m_audios[i].PID = pChannel->GetAudio(i)-> PID;
-			m_audios[i].Type = pChannel->GetAudio(i)->Type;
-			m_audios[i].PesType = pChannel->GetAudio(i) -> PesType;
-			m_audios[i].Language = pChannel->GetAudio(i) -> Language;
+			const auto& audio = pChannel->GetAudio(i);
+			m_ComboAudio.AddString(audio->Language);
+			m_audios[i].PID =      audio-> PID;
+			m_audios[i].Type =     audio->Type;
+			m_audios[i].PesType =  audio->PesType;
+			m_audios[i].Language = audio->Language;
 		}
 
 		m_ComboAudio.SetCurSel(pChannel->GetDefaultAudio());

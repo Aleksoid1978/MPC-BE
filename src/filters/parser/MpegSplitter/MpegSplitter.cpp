@@ -122,7 +122,7 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 
 	const auto ISO_639_codes_to_language = [](LPCSTR ISO_639_codes) {
 		if (ISO_639_codes[0]) {
-			if (strstr(ISO_639_codes, ",")) {
+			if (strchr(ISO_639_codes, ',')) {
 				std::list<CStringA> codes;
 				Explode(CStringA(ISO_639_codes), codes, ',');
 
