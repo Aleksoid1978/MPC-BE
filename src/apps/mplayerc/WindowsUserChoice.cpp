@@ -20,7 +20,7 @@
  */
 
 /*
-  * (C) 2022 see Authors.txt
+  * (C) 2022-2023 see Authors.txt
   *
   * This file is part of MPC-BE.
   *
@@ -372,7 +372,7 @@ CheckUserChoiceHashResult CheckUserChoiceHash(const wchar_t* aExt,
   }
   // +1 in case dataSizeBytes was odd, +1 to ensure termination
   DWORD dataSizeChars = (dataSizeBytes / sizeof(wchar_t)) + 2;
-  std::unique_ptr<wchar_t[]> progId(new wchar_t[dataSizeChars]());
+  auto progId = std::make_unique<wchar_t[]>(dataSizeChars);
   if (::RegGetValueW(rawAssocKey, L"UserChoice", L"ProgId", RRF_RT_REG_SZ,
                      nullptr, progId.get(), &dataSizeBytes) != ERROR_SUCCESS) {
     return CheckUserChoiceHashResult::ERR_OTHER;
@@ -385,7 +385,7 @@ CheckUserChoiceHashResult CheckUserChoiceHash(const wchar_t* aExt,
     return CheckUserChoiceHashResult::ERR_OTHER;
   }
   dataSizeChars = (dataSizeBytes / sizeof(wchar_t)) + 2;
-  std::unique_ptr<wchar_t[]> storedHash(new wchar_t[dataSizeChars]());
+  auto storedHash = std::make_unique<wchar_t[]>(dataSizeChars);
   if (::RegGetValueW(rawAssocKey, L"UserChoice", L"Hash", RRF_RT_REG_SZ,
                      nullptr, storedHash.get(),
                      &dataSizeBytes) != ERROR_SUCCESS) {

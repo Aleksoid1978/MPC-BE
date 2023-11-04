@@ -1070,7 +1070,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 							STSStyle* val;
 							m_sts.m_styles.GetNextAssoc(pos, key, val);
 
-							std::unique_ptr<CPPageSubStyle> page(DNew CPPageSubStyle());
+							auto page = std::make_unique<CPPageSubStyle>();
 							page->InitSubStyle(key, val);
 							pages.emplace_back(std::move(page));
 							styles.emplace_back(val);

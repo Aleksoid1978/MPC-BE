@@ -124,7 +124,7 @@ void CTunerScanDlg::OnBnClickedStart()
 {
 	if (!m_bInProgress) {
 		UpdateData(true);
-		std::unique_ptr<TunerScanData> pTSD(DNew TunerScanData);
+		auto pTSD = std::make_unique<TunerScanData>();
 		pTSD->Hwnd           = m_hWnd;
 		pTSD->FrequencyStart = m_ulFrequencyStart;
 		pTSD->FrequencyStop  = m_ulFrequencyEnd;

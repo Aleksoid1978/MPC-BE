@@ -1156,7 +1156,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 	}
 
 	if (fDeadEnd) {
-		std::unique_ptr<CStreamDeadEnd> psde(DNew CStreamDeadEnd());
+		auto psde = std::make_unique<CStreamDeadEnd>();
 		psde->insert(psde->end(), m_streampath.begin(), m_streampath.end());
 		int skip = 0;
 		BeginEnumMediaTypes(pPinOut, pEM, pmt) {

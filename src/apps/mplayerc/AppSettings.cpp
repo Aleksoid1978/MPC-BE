@@ -1050,7 +1050,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		for (unsigned int i = 0; ; i++) {
 			CString key;
 			key.Format(L"%s\\%03u", IDS_R_EXTERNAL_FILTERS, i);
-			std::unique_ptr<FilterOverride> f(DNew FilterOverride);
+			auto f = std::make_unique<FilterOverride>();
 
 			bool enabled = false;
 			profile.ReadBool(key, L"Enabled", enabled);

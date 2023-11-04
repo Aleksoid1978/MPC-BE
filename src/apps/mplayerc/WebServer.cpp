@@ -291,7 +291,7 @@ bool CWebServer::LoadPage(UINT resid, CStringA& str, CString path)
 
 void CWebServer::OnAccept(CWebServerSocket* pServer)
 {
-	std::unique_ptr<CWebClientSocket> p(DNew CWebClientSocket(this, m_pMainFrame));
+	auto p = std::make_unique<CWebClientSocket>(this, m_pMainFrame);
 	if (pServer->Accept(*p)) {
 		CString name;
 		UINT port;

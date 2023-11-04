@@ -59,7 +59,7 @@ public:
 		}
 
 		if (fCreate) {
-			std::unique_ptr<CFormat<T>> pf(DNew CFormat<T>(name));
+			auto pf = std::make_unique<CFormat<T>>(name);
 			CFormat<T>* tmp = pf.get();
 			this->emplace_back(std::move(pf));
 			return tmp;
@@ -126,7 +126,8 @@ public:
 			return false;
 		}
 
-		std::unique_ptr<CFormatElem<T>> pfe(DNew CFormatElem<T>());
+		auto pfe = std::make_unique<CFormatElem<T>>();
+
 		pfe->mt = *pmt;
 		pfe->caps = caps;
 		pf->emplace_back(std::move(pfe));
