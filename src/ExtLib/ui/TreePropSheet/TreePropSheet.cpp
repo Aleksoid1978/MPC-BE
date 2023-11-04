@@ -22,6 +22,9 @@
 #include "TreePropSheet.h"
 #include "PropPageFrameDefault.h"
 
+#include <memory>
+#include "../../../../include/HighDPI.h"
+
 
 namespace TreePropSheet
 {
@@ -773,8 +776,8 @@ BOOL CTreePropSheet::OnInitDialog()
 	m_pFrame->ShowCaption(m_bPageCaption);
 
 	// Lets make place for the tree ctrl
-	const int	nTreeWidth = m_nPageTreeWidth;
-	const int	nTreeSpace = 5;
+	const int nTreeWidth = m_nPageTreeWidth;
+	const int nTreeSpace = 5;
 
 	CRect	rectSheet;
 	GetWindowRect(rectSheet);
@@ -789,13 +792,24 @@ BOOL CTreePropSheet::OnInitDialog()
 	rectTree.right = rectTree.left + nTreeWidth - nTreeSpace;
 
 	// calculate caption height
-	CTabCtrl	wndTabCtrl;
+	CTabCtrl wndTabCtrl;
 	wndTabCtrl.Create(WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS, rectFrame, this, 0x1234);
 	wndTabCtrl.InsertItem(0, _T(""));
-	CRect	rectFrameCaption;
+	CRect rectFrameCaption;
 	wndTabCtrl.GetItemRect(0, rectFrameCaption);
 	wndTabCtrl.DestroyWindow();
-	m_pFrame->SetCaptionHeight(rectFrameCaption.Height());
+	auto frameCaptionHeight = rectFrameCaption.Height();
+
+	if (CDPI* pDpi = dynamic_cast<CDPI*>(AfxGetMainWnd())) {
+		frameCaptionHeight = pDpi->ScaleY(frameCaptionHeight);
+	} else {
+		pDpi = new CDPI();
+		frameCaptionHeight = pDpi->ScaleY(frameCaptionHeight);
+		delete pDpi;
+	}
+
+	frameCaptionHeight = std::min(frameCaptionHeight, 32); // I don't know why, but the caption height limit is 32 pixels
+	m_pFrame->SetCaptionHeight(frameCaptionHeight);
 
 	// if no caption should be displayed, make the window smaller in
 	// height
@@ -804,20 +818,20 @@ BOOL CTreePropSheet::OnInitDialog()
 		// make frame smaller
 		m_pFrame->GetWnd()->GetWindowRect(rectFrame);
 		ScreenToClient(rectFrame);
-		rectFrame.top+= rectFrameCaption.Height();
+		rectFrame.top += frameCaptionHeight;
 		m_pFrame->GetWnd()->MoveWindow(rectFrame);
 
 		// move all child windows up
-		MoveChildWindows(0, -rectFrameCaption.Height());
+		MoveChildWindows(0, -frameCaptionHeight);
 
 		// modify rectangle for the tree ctrl
-		rectTree.bottom-= rectFrameCaption.Height();
+		rectTree.bottom -= frameCaptionHeight;
 
 		// make us smaller
-		CRect	rect;
+		CRect rect;
 		GetWindowRect(rect);
-		rect.top+= rectFrameCaption.Height()/2;
-		rect.bottom-= rectFrameCaption.Height()-rectFrameCaption.Height()/2;
+		rect.top += frameCaptionHeight / 2;
+		rect.bottom -= frameCaptionHeight - frameCaptionHeight / 2;
 		if (GetParent())
 			GetParent()->ScreenToClient(rect);
 		MoveWindow(rect);

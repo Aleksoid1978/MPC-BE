@@ -58,7 +58,7 @@ namespace TreePropSheet
 
 
 /**
-Helper class for loading the uxtheme DLL and providing their 
+Helper class for loading the uxtheme DLL and providing their
 functions.
 
 One global object of this class exists.
@@ -87,7 +87,7 @@ public:
 	HTHEME OpenThemeData(HWND hwnd, LPCWSTR pszClassList) const
 	{THEMECALL(OpenThemeData)(hwnd, pszClassList);}
 
-	HRESULT CloseThemeData(HTHEME hTheme) const 
+	HRESULT CloseThemeData(HTHEME hTheme) const
 	{THEMECALL(CloseThemeData)(hTheme);}
 
 	HRESULT GetThemeBackgroundContentRect(HTHEME hTheme, OPTIONAL HDC hdc, int iPartId, int iStateId,  const RECT *pBoundingRect, OUT RECT *pContentRect) const
@@ -242,7 +242,7 @@ CRect CPropPageFrameDefault::CalcMsgArea()
 			g_ThemeLib.GetThemeBackgroundContentRect(hTheme, pDc->m_hDC, TABP_PANE, 0, rect, rectContent);
 			ReleaseDC(pDc);
 			g_ThemeLib.CloseThemeData(hTheme);
-			
+
 			if (GetShowCaption())
 				rectContent.top = rect.top+GetCaptionHeight()+1;
 			rect = rectContent;
@@ -250,7 +250,7 @@ CRect CPropPageFrameDefault::CalcMsgArea()
 	}
 	else if (GetShowCaption())
 		rect.top+= GetCaptionHeight()+1;
-	
+
 	return rect;
 }
 
@@ -269,9 +269,9 @@ CRect CPropPageFrameDefault::CalcCaptionArea()
 			g_ThemeLib.GetThemeBackgroundContentRect(hTheme, pDc->m_hDC, TABP_PANE, 0, rect, rectContent);
 			ReleaseDC(pDc);
 			g_ThemeLib.CloseThemeData(hTheme);
-			
+
 			if (GetShowCaption())
-				rectContent.bottom = rect.top+GetCaptionHeight();
+				rectContent.bottom = rect.top + GetCaptionHeight();
 			else
 				rectContent.bottom = rectContent.top;
 
@@ -308,7 +308,7 @@ void CPropPageFrameDefault::DrawCaption(CDC *pDc, CRect rect, LPCTSTR lpszCaptio
 	}
 
 	// draw text
-	rect.left+= 2;
+	rect.left += 2;
 
 	COLORREF	clrPrev = pDc->SetTextColor(GetSysColor(COLOR_CAPTIONTEXT));
 	int				nBkStyle = pDc->SetBkMode(TRANSPARENT);
@@ -317,17 +317,29 @@ void CPropPageFrameDefault::DrawCaption(CDC *pDc, CRect rect, LPCTSTR lpszCaptio
 	CFont* pSysFont = pDc->GetCurrentFont();
 	LOGFONT lf;
 	pSysFont->GetLogFont(&lf);
-	lf.lfHeight = rect.Height();
+	lf.lfHeight = -(rect.Height() * 72 / 96);
 	lf.lfWidth = 0;
 	// <MPC-BE Custom Code>
 	CString face = _T("Segoe UI");
 	_tcscpy_s(lf.lfFaceName, face);
 	// <MPC-BE Custom Code>
 	CFont f;
-	f.CreateFontIndirect(&lf);
+	f.CreateFontIndirectW(&lf);
 	pDc->SelectObject(&f);
 
-	pDc->DrawText(lpszCaption, rect, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
+	TEXTMETRICW GDIMetrics;
+	GetTextMetricsW(pDc->GetSafeHdc(), &GDIMetrics);
+	while (GDIMetrics.tmHeight > rect.Height() && abs(lf.lfHeight) > 10) {
+		pDc->SelectObject(pFont);
+		f.DeleteObject();
+		lf.lfHeight++;
+		f.CreateFontIndirectW(&lf);
+		pDc->SelectObject(&f);
+		GetTextMetricsW(pDc->GetSafeHdc(), &GDIMetrics);
+	}
+	rect.top -= GDIMetrics.tmDescent / 2;
+
+	pDc->DrawTextW(lpszCaption, rect, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
 
 	pDc->SetTextColor(clrPrev);
 	pDc->SetBkMode(nBkStyle);
@@ -362,7 +374,7 @@ void CPropPageFrameDefault::FillGradientRectH(CDC *pDc, const RECT &rect, COLORR
 		pDc->MoveTo(x, rect.top);
 		pDc->LineTo(x, rect.bottom);
 		pDc->SelectObject(pPrevPen);
-		
+
 		dR+= dRStep;
 		dG+= dGStep;
 		dB+= dBStep;
@@ -373,14 +385,14 @@ void CPropPageFrameDefault::FillGradientRectH(CDC *pDc, const RECT &rect, COLORR
 /////////////////////////////////////////////////////////////////////
 // message handlers
 
-void CPropPageFrameDefault::OnPaint() 
+void CPropPageFrameDefault::OnPaint()
 {
 	CPaintDC dc(this);
-	Draw(&dc);	
+	Draw(&dc);
 }
 
 
-BOOL CPropPageFrameDefault::OnEraseBkgnd(CDC* pDC) 
+BOOL CPropPageFrameDefault::OnEraseBkgnd(CDC* pDC)
 {
 	if (g_ThemeLib.IsAvailable() && g_ThemeLib.IsThemeActive())
 	{
