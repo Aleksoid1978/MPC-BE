@@ -153,9 +153,8 @@ bool CComPropertySheet::AddPage(IPropertyPage* pPage, IUnknown* pUnk)
 	hr = pPage->GetPageInfo(&ppi);
 	m_size.cx = std::max(m_size.cx, ppi.size.cx);
 	m_size.cy = std::max(m_size.cy, ppi.size.cy);
-	auto p = std::make_unique<CComPropertyPage>(pPage);
-	__super::AddPage(p.get());
-	m_pages.emplace_back(std::move(p));
+	auto page = &m_pages.emplace_back(pPage);
+	__super::AddPage(page);
 
 	return true;
 }

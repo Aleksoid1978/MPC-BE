@@ -36,7 +36,7 @@ class CComPropertySheet : public CPropertySheet, public IComPropertyPageDirty
 
 	CComPtr<IPropertyPageSite> m_pSite;
 	std::list<CComPtr<ISpecifyPropertyPages>> m_spp;
-	std::list<std::unique_ptr<CComPropertyPage>> m_pages;
+	std::list<CComPropertyPage> m_pages;
 	CSize m_size;
 
 public:
