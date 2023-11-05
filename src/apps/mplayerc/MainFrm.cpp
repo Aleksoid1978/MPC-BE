@@ -19569,7 +19569,7 @@ CStringW GetCoverImgFromPath(CString fullfilename)
 		L"box"
 	};
 
-	std::list<LPCWSTR> coverExts = { L".jpg", L".jpeg", L".png", L".bmp" };
+	std::vector<LPCWSTR> coverExts = { L".jpg", L".jpeg", L".png", L".bmp" };
 	if (S_OK == WicCheckComponent(CLSID_WICHeifDecoder)) {
 		coverExts.emplace_back(L".heif");
 		coverExts.emplace_back(L".heic");
@@ -19616,7 +19616,7 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 
 		if (s.nAudioWindowMode == 1) {
 			// load image from DSMResource to show in preview & logo;
-			std::list<LPCWSTR> mimeStrins = {
+			std::vector<LPCWSTR> mimeStrins = {
 				L"image/jpeg",
 				L"image/jpg", // non-standard?
 				L"image/png",

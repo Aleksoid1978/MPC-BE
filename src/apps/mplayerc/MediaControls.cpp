@@ -183,7 +183,7 @@ bool CMediaControls::Update()
 			}
 		}
 
-		static std::list<LPCWSTR> mimeStrings = {
+		static const std::vector<LPCWSTR> mimeStrings = {
 			L"image/jpeg",
 			L"image/jpg",
 			L"image/png",
