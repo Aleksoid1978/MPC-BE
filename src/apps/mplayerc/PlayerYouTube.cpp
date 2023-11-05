@@ -673,7 +673,6 @@ namespace Youtube
 			return false;
 		}
 
-		pOFD->fi.Clear();
 		pOFD->rtStart = rtStart;
 
 		const CString Title = AltUTF8ToWStr(GetEntry(data.data(), "<title>", "</title>"));
