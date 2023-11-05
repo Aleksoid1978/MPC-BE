@@ -12340,6 +12340,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				}
 
 				if (bIsHtml) {
+					OpenFileData OFD;
 					ok = YoutubeDL::Parse_URL(
 						url,
 						s.strYDLExePath,
@@ -12349,12 +12350,13 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 						m_youtubeFields,
 						m_youtubeUrllist,
 						m_youtubeAudioUrllist,
-						pOFD
+						&OFD
 					);
 					if (ok) {
 						youtubeUrl = url;
 						Content::Online::Disconnect(url);
 
+						*pOFD = OFD;
 						m_strPlaybackRenderedPath = pOFD->fi.GetPath();
 						m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
 					}
