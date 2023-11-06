@@ -24,6 +24,7 @@
 #include "Misc.h"
 #include "DSUtil/SysVersion.h"
 
+#include <array>
 #include <shcore.h>
 #include <systemmediatransportcontrolsinterop.h>
 
@@ -183,17 +184,17 @@ bool CMediaControls::Update()
 			}
 		}
 
-		static const std::vector<LPCWSTR> mimeStrings = {
+		constexpr std::array<LPCWSTR, 4> mimeStrings = {
 			L"image/jpeg",
 			L"image/jpg",
 			L"image/png",
 			L"image/bmp"
 		};
-		std::vector<uint8_t> m_imageData;
+		std::vector<uint8_t> imageData;
 		BeginEnumFilters(m_pMainFrame->m_pGB, pEF, pBF) {
 			if (CComQIPtr<IDSMResourceBag> pRB = pBF.p) {
 				if (pRB && m_pMainFrame->CheckMainFilter(pBF) && pRB->ResGetCount() > 0) {
-					for (DWORD i = 0; i < pRB->ResGetCount() && m_imageData.empty(); i++) {
+					for (DWORD i = 0; i < pRB->ResGetCount() && imageData.empty(); i++) {
 						CComBSTR mime;
 						BYTE* pData = nullptr;
 						DWORD len = 0;
@@ -202,7 +203,7 @@ bool CMediaControls::Update()
 							mimeStr.Trim();
 
 							if (std::find(mimeStrings.cbegin(), mimeStrings.cend(), mimeStr) != mimeStrings.cend()) {
-								m_imageData.insert(m_imageData.end(), pData, pData + len);
+								imageData.insert(imageData.end(), pData, pData + len);
 							}
 
 							CoTaskMemFree(pData);
@@ -211,20 +212,20 @@ bool CMediaControls::Update()
 				}
 			}
 
-			if (!m_imageData.empty()) {
+			if (!imageData.empty()) {
 				break;
 			}
 		}
 		EndEnumFilters;
 
-		if (m_imageData.empty() && !m_pMainFrame->m_youtubeThumbnailData.empty()) {
-			m_imageData = m_pMainFrame->m_youtubeThumbnailData;
+		if (imageData.empty() && !m_pMainFrame->m_youtubeThumbnailData.empty()) {
+			imageData = m_pMainFrame->m_youtubeThumbnailData;
 		}
 
-		if (!m_imageData.empty()) {
+		if (!imageData.empty()) {
 			ComPtr<IStream> stream;
 			CreateStreamOverRandomAccessStream(m_pImageStream.Get(), IID_PPV_ARGS(stream.GetAddressOf()));
-			stream->Write(m_imageData.data(), m_imageData.size(), nullptr);
+			stream->Write(imageData.data(), imageData.size(), nullptr);
 
 			m_pDisplay->put_Thumbnail(m_pImageStreamReference.Get());
 		} else if (!m_defaultImageData.empty()) {
