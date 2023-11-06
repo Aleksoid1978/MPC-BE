@@ -81,7 +81,7 @@ class __declspec(uuid("3D446B6F-71DE-4437-BE15-8CE47174340F"))
 	ps2_state_t     m_ps2_state;
 
 	struct {
-		BYTE buf[61440];
+		std::vector<BYTE> buf;
 		int  size;
 		int  count;
 
@@ -113,6 +113,14 @@ class __declspec(uuid("3D446B6F-71DE-4437-BE15-8CE47174340F"))
 			DWORD padding;
 			std::vector<BYTE> paddingData;
 		} TrueHDMATState;
+
+		void Clear()
+		{
+			size = 0;
+			count = 0;
+			EAC3State = {};
+			TrueHDMATState = {};
+		}
 	} m_hdmi_bitstream = {};
 
 	CFFAudioDecoder m_FFAudioDec;
