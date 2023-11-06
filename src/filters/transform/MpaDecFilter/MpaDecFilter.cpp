@@ -429,7 +429,7 @@ HRESULT CMpaDecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, d
 {
 	CAutoLock cAutoLock(&m_csReceive);
 	m_ps2_state.sync = false;
-	ZeroMemory(&m_hdmi_bitstream, sizeof(m_hdmi_bitstream));
+	m_hdmi_bitstream = {};
 
 	m_bResync = TRUE;
 	m_rtStart = 0; // LOOKATTHIS // reset internal timer?
