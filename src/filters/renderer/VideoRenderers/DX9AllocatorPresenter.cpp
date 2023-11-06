@@ -2029,16 +2029,16 @@ void CDX9AllocatorPresenter::DrawStats()
 				}
 
 				if (desc.Width != (UINT)m_nativeVideoSize.cx || desc.Height != (UINT)m_nativeVideoSize.cy) {
-					strText.AppendFormat(L"\nTexture size : %d x %d", desc.Width, desc.Height);
+					strText.AppendFormat(L"\nTexture size : %u x %u", desc.Width, desc.Height);
 				}
 			}
 
 			if (m_Decoder.GetLength()) {
-				strText.AppendFormat(L"\nDecoder      : " + m_Decoder + ", " + DXVAState::GetDescription());
+				strText.Append(L"\nDecoder      : " + m_Decoder + L", " + DXVAState::GetDescription());
 			}
 
 			if (m_D3D9Device.GetLength()) {
-				strText.AppendFormat(L"\nRender device: " + m_D3D9Device);
+				strText.Append(L"\nRender device: " + m_D3D9Device);
 			}
 
 			if (m_MonitorName.GetLength()) {
