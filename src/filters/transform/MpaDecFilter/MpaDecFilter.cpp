@@ -903,7 +903,7 @@ HRESULT CMpaDecFilter::ProcessAC3_SPDIF()
 HRESULT CMpaDecFilter::ProcessEAC3_SPDIF(BOOL bEOF/* = FALSE*/)
 {
 	HRESULT hr = S_OK;
-	m_hdmi_bitstream.buf.resize(61440);
+	m_hdmi_bitstream.buf.resize(61440); // the first time the memory is allocated, then the size is only checked
 
 	auto DeliverPacket = [&] {
 		hr = DeliverBitstream(m_hdmi_bitstream.buf.data(), m_hdmi_bitstream.size, m_rtStartInputCache, IEC61937_EAC3, m_hdmi_bitstream.EAC3State.samplerate, m_hdmi_bitstream.EAC3State.samples * m_hdmi_bitstream.EAC3State.repeat);
@@ -1124,7 +1124,7 @@ HRESULT CMpaDecFilter::MATDeliverPacket()
 
 HRESULT CMpaDecFilter::ProcessTrueHD_SPDIF()
 {
-	m_hdmi_bitstream.buf.resize(61440);
+	m_hdmi_bitstream.buf.resize(61440); // the first time the memory is allocated, then the size is only checked
 
 	BYTE* const base = m_buff.Data();
 	BYTE* end = base + m_buff.Size();
@@ -1255,7 +1255,7 @@ HRESULT CMpaDecFilter::ProcessTrueHD_SPDIF()
 
 HRESULT CMpaDecFilter::ProcessMLP_SPDIF()
 {
-	m_hdmi_bitstream.buf.resize(61440);
+	m_hdmi_bitstream.buf.resize(61440); // the first time the memory is allocated, then the size is only checked
 
 	BYTE* const base = m_buff.Data();
 	BYTE* end = base + m_buff.Size();
