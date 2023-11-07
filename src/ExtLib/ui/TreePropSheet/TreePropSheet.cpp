@@ -808,7 +808,10 @@ BOOL CTreePropSheet::OnInitDialog()
 		delete pDpi;
 	}
 
-	frameCaptionHeight = std::min(frameCaptionHeight, 32); // I don't know why, but the caption height limit is 32 pixels
+	if (frameCaptionHeight > 32) {
+		// I don't know why, but the caption height limit is 32 pixels
+		frameCaptionHeight = 32;
+	}
 	m_pFrame->SetCaptionHeight(frameCaptionHeight);
 
 	// if no caption should be displayed, make the window smaller in
