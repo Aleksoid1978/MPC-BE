@@ -22,16 +22,6 @@
 
 #include <VersionHelpers.h>
 
-#ifndef _WIN32_WINNT_WINTHRESHOLD
-#define _WIN32_WINNT_WINTHRESHOLD 0x0A00
-
-VERSIONHELPERAPI
-IsWindows10OrGreater()
-{
-	return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WINTHRESHOLD), LOBYTE(_WIN32_WINNT_WINTHRESHOLD), 0);
-}
-#endif
-
 static VERSIONHELPERAPI
 IsWindowsVersionOrGreaterBuild(WORD wMajorVersion, WORD wMinorVersion, DWORD dwBuildNumber)
 {
@@ -84,17 +74,21 @@ namespace SysVersion
 		const static bool bIsWin10orLater = IsWindows10OrGreater();
 		return bIsWin10orLater;
 	}
+	inline const bool IsWin10v1607orLater() { // LTSB 2016
+		const static bool bIsWin10v1803orLater = IsWindowsVersionOrGreaterBuild(HIBYTE(_WIN32_WINNT_WIN10), LOBYTE(_WIN32_WINNT_WIN10), 14393);
+		return bIsWin10v1803orLater;
+	}
 	inline const bool IsWin10v1803orLater() {
-		const static bool bIsWin10v1803orLater = IsWindowsVersionOrGreaterBuild(HIBYTE(_WIN32_WINNT_WINTHRESHOLD), LOBYTE(_WIN32_WINNT_WINTHRESHOLD), 17134);
+		const static bool bIsWin10v1803orLater = IsWindowsVersionOrGreaterBuild(HIBYTE(_WIN32_WINNT_WIN10), LOBYTE(_WIN32_WINNT_WIN10), 17134);
 		return bIsWin10v1803orLater;
 	}
 	inline const bool IsWin10v1809orLater() { // LTSC 2019
-		const static bool bIsWin10v1809orLater = IsWindowsVersionOrGreaterBuild(HIBYTE(_WIN32_WINNT_WINTHRESHOLD), LOBYTE(_WIN32_WINNT_WINTHRESHOLD), 17763);
+		const static bool bIsWin10v1809orLater = IsWindowsVersionOrGreaterBuild(HIBYTE(_WIN32_WINNT_WIN10), LOBYTE(_WIN32_WINNT_WIN10), 17763);
 		return bIsWin10v1809orLater;
 	}
 	inline const bool IsWin11orLater()
 	{
-		const static bool bIsWin11orLater = IsWindowsVersionOrGreaterBuild(HIBYTE(_WIN32_WINNT_WINTHRESHOLD), LOBYTE(_WIN32_WINNT_WINTHRESHOLD), 22000);
+		const static bool bIsWin11orLater = IsWindowsVersionOrGreaterBuild(HIBYTE(_WIN32_WINNT_WIN10), LOBYTE(_WIN32_WINNT_WIN10), 22000);
 		return bIsWin11orLater;
 	}
 	inline const bool IsW64() {
