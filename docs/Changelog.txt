@@ -5,6 +5,9 @@
 MP4Splitter
 Fixed player crash on some incorrect MP4 files.
 
+MpaDecFilter.
+Memory leak fixed.
+
 MPCVideoDec
 Fixed freezing on some H.264 streams when playing WTV.
 
@@ -13,6 +16,7 @@ Improved support for RealMedia subtitles. Developments from the MPC-HC project w
 
 YouTube
 Improved work with yt-dlp.
+If the built-in Youtube parser was unable to receive links, then an attempt will be made to use yt-dlp.
 
 Player
 Added the ability to change the "Move window by the video area" setting using a hotkey.
@@ -28,6 +32,7 @@ Updated Romanian translation (by AndreiMiloiu).
 Updated Chinese (Simplified) translation (by wushantao).
 Updated Hungarian translation (by mickey).
 Updated Ukrainian translation (by arestarh).
+Updated Korean translation (by Hackjjang).
 
 Updated libraries:
 	nanosvg git-cb0ae54;
