@@ -334,7 +334,7 @@ BEGIN
     COMBOBOX        IDC_COMBOVOLUME,120,124,60,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "속도 :",IDC_STATIC,10,143,108,8
     COMBOBOX        IDC_COMBOSPEEDSTEP,120,140,60,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "세션 속도를 재설정 안 함",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,157,175,9
+    CONTROL         "세션 속도를 다시 설정 안 함",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,157,175,9
     GROUPBOX        "",IDC_STATIC,137,57,154,56
     CONTROL         "기본 선호 트랙",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,56,100,9
     LTEXT           "자막 언어",IDC_STATIC,142,71,44,8
@@ -1083,7 +1083,7 @@ BEGIN
     CONTROL         "로지텍 LCD 지원 활성화(실험적)",IDC_CHECK_LCD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,126,264,9
     CONTROL         "윈도 미디어 제어 사용",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,138,220,9
     CONTROL         "미니 덤프 활성화",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,150,184,9
-    LTEXT           "FFmpeg executable file:",IDC_STATIC,7,165,104,8
+    LTEXT           "FFmpeg 실행 파일 :",IDC_STATIC,7,165,104,8
     COMBOBOX        IDC_COMBO1,113,163,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "업데이트 확인",IDC_STATIC,5,180,286,40
     CONTROL         "자동 업데이트 확인 활성화",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,192,250,9
@@ -2369,13 +2369,13 @@ BEGIN
     IDS_RECORD_STOP         "정지"
     IDS_FILTERS_COPY_TO_CLIPBOARD "클립보드에 필터 목록 복사(&C)"
     IDS_AG_COPY_IMAGE       "클립보드에 이미지 복사"
-    IDS_PLAYLOOPMODE_AB     "구간 반복 :  지점 초기화"
+    IDS_PLAYLOOPMODE_AB     "구간 반복 : 지점 초기화"
     IDS_PLAYLOOPMODE_AB_MARK_A "구간 반복 : 시작 지점 지정"
     IDS_PLAYLOOPMODE_AB_MARK_B "구간 반복 : 끝 지점 지정"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "클립보드에서 재생 목록에 추가"
-    IDS_MOVEWINDOWBYVIDEO_ONOFF "Move window by the video area: On/Off"
-    IDS_MOVEWINDOWBYVIDEO_ON "Move window by the video area: On"
-    IDS_MOVEWINDOWBYVIDEO_OFF "Move window by the video area: Off"
+    IDS_MOVEWINDOWBYVIDEO_ONOFF "비디오 영역별로 창 이동 : 켬/끔"
+    IDS_MOVEWINDOWBYVIDEO_ON "비디오 영역별로 창 이동 : 켬"
+    IDS_MOVEWINDOWBYVIDEO_OFF "비디오 영역별로 창 이동 : 끔"
     IDS_AUDIO_FILTER_PRESET_1 "위스퍼 및 폭발음이 포함된 오디오인 경우"
 END
 
@@ -2811,8 +2811,8 @@ STRINGTABLE
 BEGIN
     IDS_AG_DECREASE_RATE    "속도 감소"
     IDS_AG_RESET_RATE       "초기화"
-    IDS_AG_AUDIODELAY_PLUS  "오디오 10밀리초 느리게"
-    IDS_AG_AUDIODELAY_MINUS "오디오 10밀리초 빠르게"
+    IDS_AG_AUDIODELAY_PLUS  "오디오 0.01초 느리게"
+    IDS_AG_AUDIODELAY_MINUS "오디오 0.01초 빠르게"
     IDS_AG_JUMP_FORWARD_1   "앞으로 이동(조금)"
     IDS_AG_JUMP_BACKWARD_1  "뒤로 이동(조금)"
     IDS_AG_JUMP_FORWARD_2   "앞으로 이동(중간)"
@@ -3217,7 +3217,7 @@ BEGIN
     IDS_CMD_REGPL           "/regpl\t\t재생 목록 파일을 MPC-BE로 연결"
     IDS_CMD_REGALL          "/regall\t\t지원가능한 모든 파일을 MPC-BE로 연결"
     IDS_CMD_UNREGALL        "/unregall\t\t모든 연결 해제"
-    IDS_CMD_START           "/start ms\t\t지정한 ""ms""(=밀리 초)위치에서 재생 시작"
+    IDS_CMD_START           "/start ms\t\t지정한 ""ms""(=밀리초)위치에서 재생 시작"
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\t위치 hh:mm:ss에서 재생 시작"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\t지정한 가로(w), 세로(h) 크기로 고정"
     IDS_CMD_MONITOR         "/monitor N\tN번 모니터에서 시작(N은 1이상이어야함)"

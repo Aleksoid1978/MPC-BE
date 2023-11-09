@@ -544,7 +544,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 15		"EVR Pufferek:"
 18		"Felületi formátum:"
 20		"Átméretező:"
-22		"Leméretezni <50%:"
+22		"Leméretezés <50%:"
 24		"Kimeneti tartomány:"
 26		"MPC Video Renderer beállítások"
 27		"Exkluzív teljes képernyő egy további ablakban (kísérleti)"
