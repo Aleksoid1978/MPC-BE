@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -259,6 +259,7 @@ enum MPCAPI_COMMAND : unsigned int {
 	CMD_CLOSEAPP            = 0xA0004006,
 
 	// Set playing rate
+	// Parameter 1 : playing rate multiplier
 	CMD_SETSPEED            = 0xA0004008,
 
 	// show host defined OSD message string

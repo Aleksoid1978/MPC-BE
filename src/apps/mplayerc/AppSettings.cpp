@@ -1559,13 +1559,13 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 void CAppSettings::SaveSettings()
 {
-	CMPlayerCApp* pApp = AfxGetMyApp();
-	ASSERT(pApp);
-	CProfile& profile = AfxGetProfile();
-
 	if (!bInitialized) {
 		return;
 	}
+
+	CMPlayerCApp* pApp = AfxGetMyApp();
+	ASSERT(pApp);
+	CProfile& profile = AfxGetProfile();
 
 	CString str;
 
@@ -2043,12 +2043,12 @@ void CAppSettings::SaveSettings()
 
 void CAppSettings::SaveExternalFilters()
 {
-	// External Filter settings are saved for a long time. Use only when really necessary.
-	CProfile& profile = AfxGetProfile();
-
 	if (!bInitialized) {
 		return;
 	}
+
+	// External Filter settings are saved for a long time. Use only when really necessary.
+	CProfile& profile = AfxGetProfile();
 
 	for (unsigned int i = 0; ; i++) {
 		CString key;
