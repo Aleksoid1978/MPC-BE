@@ -292,9 +292,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_VIEW_SHADEREDITOR, OnViewShaderEditor)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_SHADEREDITOR, OnUpdateViewShaderEditor)
 	ON_COMMAND(ID_VIEW_PRESETS_MINIMAL, OnViewMinimal)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_PRESETS_MINIMAL, OnUpdateViewMinimal)
 	ON_COMMAND(ID_VIEW_PRESETS_COMPACT, OnViewCompact)
-	ON_UPDATE_COMMAND_UI(ID_VIEW_PRESETS_COMPACT, OnUpdateViewCompact)
 	ON_COMMAND(ID_VIEW_PRESETS_NORMAL, OnViewNormal)
 	ON_COMMAND(ID_VIEW_FULLSCREEN, OnViewFullscreen)
 	ON_COMMAND(ID_VIEW_FULLSCREEN_2, OnViewFullscreenSecondary)
@@ -417,7 +415,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND_RANGE(ID_VOLUME_UP, ID_VOLUME_MUTE, OnPlayVolume)
 	ON_COMMAND_RANGE(ID_VOLUME_GAIN_INC, ID_VOLUME_GAIN_MAX, OnPlayVolumeGain)
 	ON_COMMAND(ID_NORMALIZE, OnAutoVolumeControl)
-	ON_UPDATE_COMMAND_UI(ID_NORMALIZE, OnUpdateNormalizeVolume)
 	ON_COMMAND_RANGE(ID_AUDIO_CENTER_INC, ID_AUDIO_CENTER_DEC, OnPlayCenterLevel)
 
 	ON_COMMAND_RANGE(ID_COLOR_BRIGHTNESS_INC, ID_COLOR_RESET, OnPlayColor)
@@ -452,15 +449,12 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_FAVORITES_QUICKADD, OnFavoritesQuickAdd)
 	ON_COMMAND(ID_FAVORITES_ORGANIZE, OnFavoritesOrganize)
 	ON_COMMAND_RANGE(ID_FAVORITES_FILE_START, ID_FAVORITES_FILE_END, OnFavoritesFile)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_FAVORITES_FILE_START, ID_FAVORITES_FILE_END, OnUpdateFavoritesFile)
 	ON_COMMAND_RANGE(ID_FAVORITES_DVD_START, ID_FAVORITES_DVD_END, OnFavoritesDVD)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_FAVORITES_DVD_START, ID_FAVORITES_DVD_END, OnUpdateFavoritesDVD)
 
 	ON_COMMAND(ID_SHOW_HISTORY, OnShowHistory)
 	ON_COMMAND(ID_RECENT_FILES_CLEAR, OnRecentFileClear)
 	ON_UPDATE_COMMAND_UI(ID_RECENT_FILES_CLEAR, OnUpdateRecentFileClear)
 	ON_COMMAND_RANGE(ID_RECENT_FILE_START, ID_RECENT_FILE_END, OnRecentFile)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_RECENT_FILE_START, ID_RECENT_FILE_END, OnUpdateRecentFile)
 
 	ON_COMMAND(ID_HELP_HOMEPAGE, OnHelpHomepage)
 	ON_COMMAND(ID_HELP_CHECKFORUPDATE, OnHelpCheckForUpdate)
@@ -7465,20 +7459,12 @@ void CMainFrame::OnViewMinimal()
 	ShowControls(CS_NONE);
 }
 
-void CMainFrame::OnUpdateViewMinimal(CCmdUI* pCmdUI)
-{
-}
-
 void CMainFrame::OnViewCompact()
 {
 	while (AfxGetAppSettings().iCaptionMenuMode != MODE_FRAMEONLY) {
 		SendMessageW(WM_COMMAND, ID_VIEW_CAPTIONMENU);
 	}
 	ShowControls(CS_SEEKBAR | CS_TOOLBAR);
-}
-
-void CMainFrame::OnUpdateViewCompact(CCmdUI* pCmdUI)
-{
 }
 
 void CMainFrame::OnViewNormal()
@@ -9251,11 +9237,6 @@ void CMainFrame::OnAutoVolumeControl()
 	}
 }
 
-void CMainFrame::OnUpdateNormalizeVolume(CCmdUI* pCmdUI)
-{
-	pCmdUI->Enable();
-}
-
 void CMainFrame::OnPlayCenterLevel(UINT nID)
 {
 	CAppSettings& s = AfxGetAppSettings();
@@ -10412,12 +10393,6 @@ void CMainFrame::PlayFavoriteFile(SessionInfo fav) // use a copy of SessionInfo
 	}
 }
 
-void CMainFrame::OnUpdateFavoritesFile(CCmdUI* pCmdUI)
-{
-	UINT nID = pCmdUI->m_nID - ID_FAVORITES_FILE_START;
-	UNREFERENCED_PARAMETER(nID);
-}
-
 void CMainFrame::OnRecentFile(UINT nID)
 {
 	nID -= ID_RECENT_FILE_START;
@@ -10428,12 +10403,6 @@ void CMainFrame::OnRecentFile(UINT nID)
 		}
 		OpenCurPlaylistItem();
 	}
-}
-
-void CMainFrame::OnUpdateRecentFile(CCmdUI* pCmdUI)
-{
-	UINT nID = pCmdUI->m_nID - ID_RECENT_FILE_START;
-	UNREFERENCED_PARAMETER(nID);
 }
 
 void CMainFrame::OnFavoritesDVD(UINT nID)
@@ -10474,12 +10443,6 @@ void CMainFrame::PlayFavoriteDVD(SessionInfo fav) // use a copy of SessionInfo
 		p->pDvdState = pDvdState;
 	}
 	OpenMedia(std::move(p));
-}
-
-void CMainFrame::OnUpdateFavoritesDVD(CCmdUI* pCmdUI)
-{
-	UINT nID = pCmdUI->m_nID - ID_FAVORITES_DVD_START;
-	UNREFERENCED_PARAMETER(nID);
 }
 
 // help

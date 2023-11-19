@@ -976,9 +976,7 @@ public:
 	afx_msg void OnViewShaderEditor();
 	afx_msg void OnUpdateViewShaderEditor(CCmdUI* pCmdUI);
 	afx_msg void OnViewMinimal();
-	afx_msg void OnUpdateViewMinimal(CCmdUI* pCmdUI);
 	afx_msg void OnViewCompact();
-	afx_msg void OnUpdateViewCompact(CCmdUI* pCmdUI);
 	afx_msg void OnViewNormal();
 	afx_msg void OnViewFullscreen();
 	afx_msg void OnViewFullscreenSecondary();
@@ -1094,7 +1092,6 @@ public:
 	afx_msg void OnPlayVolume(UINT nID);
 	afx_msg void OnPlayVolumeGain(UINT nID);
 	afx_msg void OnAutoVolumeControl();
-	afx_msg void OnUpdateNormalizeVolume(CCmdUI* pCmdUI);
 	afx_msg void OnPlayCenterLevel(UINT nID);
 	afx_msg void OnPlayColor(UINT nID);
 	afx_msg void OnAfterplayback(UINT nID);
@@ -1120,14 +1117,11 @@ public:
 	afx_msg void OnFavoritesQuickAdd();
 	afx_msg void OnFavoritesOrganize();
 	afx_msg void OnFavoritesFile(UINT nID);
-	afx_msg void OnUpdateFavoritesFile(CCmdUI* pCmdUI);
 	afx_msg void OnFavoritesDVD(UINT nID);
-	afx_msg void OnUpdateFavoritesDVD(CCmdUI* pCmdUI);
 	afx_msg void OnShowHistory();
 	afx_msg void OnRecentFileClear();
 	afx_msg void OnUpdateRecentFileClear(CCmdUI* pCmdUI);
 	afx_msg void OnRecentFile(UINT nID);
-	afx_msg void OnUpdateRecentFile(CCmdUI* pCmdUI);
 
 	afx_msg void OnHelpHomepage();
 	afx_msg void OnHelpCheckForUpdate();
