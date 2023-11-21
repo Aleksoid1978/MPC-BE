@@ -630,11 +630,13 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 	WCHAR* cmdln = DNew WCHAR[32768];
 	_snwprintf_s(cmdln, 32768, 32768, L"\"%s\" \"%s\"", cgi.GetString(), path.GetString());
 
-	if (hChildStdinRd && hChildStdoutWr)
-		if (CreateProcess(
-					nullptr, cmdln, nullptr, nullptr, TRUE, 0,
-					envstr.GetLength() ? (LPVOID)(LPCSTR)envstr : nullptr,
-					dir, &siStartInfo, &piProcInfo)) {
+	if (hChildStdinRd && hChildStdoutWr) {
+		const BOOL bSuccess = CreateProcessW(
+			nullptr, cmdln, nullptr, nullptr, TRUE, 0,
+			envstr.GetLength() ? (LPVOID)envstr.GetString() : nullptr,
+			dir, &siStartInfo, &piProcInfo
+		);
+		if (bSuccess) {
 			DWORD ThreadId;
 			VERIFY(CreateThread(nullptr, 0, KillCGI, (LPVOID)piProcInfo.hProcess, 0, &ThreadId));
 
@@ -672,6 +674,7 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 		} else {
 			body = L"CGI Error";
 		}
+	}
 
 	delete [] cmdln;
 

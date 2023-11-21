@@ -73,11 +73,14 @@ namespace YoutubeDL
 		startup_info.wShowWindow = SW_HIDE;
 		startup_info.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
 
+		PROCESS_INFORMATION proc_info = {};
 		CStringW args;
 		args.Format(LR"(%s -j --all-subs --sub-format vtt --no-check-certificates "%s")", ydl_path.GetString(), url.GetString());
-		PROCESS_INFORMATION proc_info = {};
-		const bool bSuccess = CreateProcessW(nullptr, args.GetBuffer(), nullptr, nullptr, true, 0,
-											 nullptr, nullptr, &startup_info, &proc_info);
+
+		const BOOL bSuccess = CreateProcessW(
+			nullptr, args.GetBuffer(), nullptr, nullptr, TRUE, 0,
+			nullptr, nullptr, &startup_info, &proc_info
+		);
 		CloseHandle(hStdout_w);
 		CloseHandle(hStderr_w);
 
