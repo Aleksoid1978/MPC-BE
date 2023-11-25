@@ -96,9 +96,6 @@ typedef struct AVD3D11VADeviceContext {
     void *lock_ctx;
 
 // ==> Start patch MPC
-    /**
-     * device name
-    */
     char device_name[256];
 // ==> End patch MPC
 } AVD3D11VADeviceContext;

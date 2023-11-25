@@ -27,7 +27,7 @@
 #define QP_MAX_NUM (51 + 6*6)           // The maximum supported qp
 
 /*
- * Table 7-1 – NAL unit type codes, syntax element categories, and NAL unit type classes in
+ * Table 7-1 â€“ NAL unit type codes, syntax element categories, and NAL unit type classes in
  * T-REC-H.264-201704
  */
 enum {

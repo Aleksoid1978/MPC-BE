@@ -22,7 +22,7 @@
 #define AVCODEC_HEVC_H
 
 /**
- * Table 7-1 – NAL unit type codes and NAL unit type classes in
+ * Table 7-1 â€“ NAL unit type codes and NAL unit type classes in
  * T-REC-H.265-201802
  */
 enum HEVCNALUnitType {

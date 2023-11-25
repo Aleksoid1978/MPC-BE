@@ -1799,6 +1799,7 @@ static void vp9_decode_flush(AVCodecContext *avctx)
         vp9_frame_unref(avctx, &s->s.frames[i]);
     for (i = 0; i < 8; i++)
         ff_thread_release_ext_buffer(avctx, &s->s.refs[i]);
+
     if (FF_HW_HAS_CB(avctx, flush))
         FF_HW_SIMPLE_CALL(avctx, flush);
     // ==> Start patch MPC
