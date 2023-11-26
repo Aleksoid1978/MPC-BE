@@ -116,6 +116,7 @@ LicenseFile=..\LICENSE.txt
 OutputDir=.
 SetupIconFile=..\src\apps\mplayerc\res\icon.ico
 AppReadmeFile={app}\Readme.md
+DisableWelcomePage=false
 WizardImageFile=WizardImageFile.bmp
 WizardSmallImageFile=WizardSmallImageFile.bmp
 Compression=lzma2/ultra
