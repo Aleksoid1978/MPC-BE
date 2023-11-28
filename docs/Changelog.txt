@@ -36,7 +36,7 @@ Updated Korean translation (by Hackjjang).
 
 Updated libraries:
 	ffmpeg git-n6.2-dev-297-gbbdedd9663;
-	nanosvg git-cb0ae54;
+	nanosvg git-706eb06;
 	rapidjson git-v1.1.0-744-gf9d53419.
 
 
