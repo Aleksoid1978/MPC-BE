@@ -33,6 +33,7 @@ Updated Chinese (Simplified) translation (by wushantao).
 Updated Hungarian translation (by mickey).
 Updated Ukrainian translation (by arestarh).
 Updated Korean translation (by Hackjjang).
+Updated Dutch and Chinese (Traditional) translation (by beter).
 
 Updated libraries:
 	ffmpeg git-n6.2-dev-297-gbbdedd9663;
