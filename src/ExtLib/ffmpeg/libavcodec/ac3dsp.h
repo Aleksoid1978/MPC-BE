@@ -53,7 +53,7 @@ typedef struct AC3DSPContext {
      * @param len number of elements to convert.
      *            constraints: multiple of 32 greater than zero
      */
-    void (*float_to_fixed24)(int32_t *dst, const float *src, unsigned int len);
+    void (*float_to_fixed24)(int32_t *dst, const float *src, size_t len);
 
     /**
      * Calculate bit allocation pointers.
@@ -109,6 +109,7 @@ void ff_ac3dsp_init    (AC3DSPContext *c);
 void ff_ac3dsp_init_arm(AC3DSPContext *c);
 void ff_ac3dsp_init_x86(AC3DSPContext *c);
 void ff_ac3dsp_init_mips(AC3DSPContext *c);
+void ff_ac3dsp_init_riscv(AC3DSPContext *c);
 
 void ff_ac3dsp_downmix(AC3DSPContext *c, float **samples, float **matrix,
                        int out_ch, int in_ch, int len);

@@ -31,7 +31,7 @@
 #define AVCODEC_AACTAB_H
 
 #include "libavutil/mem_internal.h"
-#include "aac.h"
+#include "aac_defines.h"
 
 #include <stdint.h>
 
@@ -41,8 +41,6 @@
 
 extern float ff_aac_pow2sf_tab[428];
 extern float ff_aac_pow34sf_tab[428];
-
-void ff_aac_tableinit(void);
 
 /* @name ltp_coef
  * Table of the LTP coefficients

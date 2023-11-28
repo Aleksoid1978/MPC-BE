@@ -30,7 +30,10 @@ typedef struct Jpeg2000DSPContext {
     void (*mct_decode[FF_DWT_NB])(void *src0, void *src1, void *src2, int csize);
 } Jpeg2000DSPContext;
 
+extern const float ff_jpeg2000_f_ict_params[4];
+
 void ff_jpeg2000dsp_init(Jpeg2000DSPContext *c);
+void ff_jpeg2000dsp_init_riscv(Jpeg2000DSPContext *c);
 void ff_jpeg2000dsp_init_x86(Jpeg2000DSPContext *c);
 
 #endif /* AVCODEC_JPEG2000DSP_H */

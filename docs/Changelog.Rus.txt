@@ -35,6 +35,7 @@ YouTube
 Обновлен корейский перевод (авторы Hackjjang).
 
 Обновлены библиотеки:
+	ffmpeg git-n6.2-dev-297-gbbdedd9663;
 	nanosvg git-cb0ae54;
 	rapidjson git-v1.1.0-744-gf9d53419.
 

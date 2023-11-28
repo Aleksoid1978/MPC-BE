@@ -47,6 +47,7 @@
 #include "h264data.h"
 #include "mpegutils.h"
 #include "parser.h"
+#include "refstruct.h"
 #include "startcode.h"
 
 typedef struct H264ParseContext {
@@ -373,13 +374,7 @@ static inline int parse_nal_units(AVCodecParserContext *s,
                 goto fail;
             }
 
-            av_buffer_unref(&p->ps.pps_ref);
-            p->ps.pps = NULL;
-            p->ps.sps = NULL;
-            p->ps.pps_ref = av_buffer_ref(p->ps.pps_list[pps_id]);
-            if (!p->ps.pps_ref)
-                goto fail;
-            p->ps.pps = (const PPS*)p->ps.pps_ref->data;
+            ff_refstruct_replace(&p->ps.pps, p->ps.pps_list[pps_id]);
             p->ps.sps = p->ps.pps->sps;
             sps       = p->ps.sps;
 
@@ -646,10 +641,10 @@ static int h264_parse(AVCodecParserContext *s,
             int64_t num = time_base.num * (int64_t)avctx->pkt_timebase.den;
             if (s->dts != AV_NOPTS_VALUE) {
                 // got DTS from the stream, update reference timestamp
-                p->reference_dts = s->dts - av_rescale(s->dts_ref_dts_delta, num, den);
+                p->reference_dts = av_sat_sub64(s->dts, av_rescale(s->dts_ref_dts_delta, num, den));
             } else if (p->reference_dts != AV_NOPTS_VALUE) {
                 // compute DTS based on reference timestamp
-                s->dts = p->reference_dts + av_rescale(s->dts_ref_dts_delta, num, den);
+                s->dts = av_sat_add64(p->reference_dts, av_rescale(s->dts_ref_dts_delta, num, den));
             }
 
             if (p->reference_dts != AV_NOPTS_VALUE && s->pts == AV_NOPTS_VALUE)

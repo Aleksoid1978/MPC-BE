@@ -94,9 +94,6 @@
 #include "decode.h"
 #include "internal.h"
 
-static VLC vlc_scalefactors;
-static VLC vlc_spectral[11];
-
 static int output_configure(AACContext *ac,
                             uint8_t layout_map[MAX_ELEM_ID*4][3], int tags,
                             enum OCStatus oc_type, int get_new_frame);
@@ -283,10 +280,10 @@ static int assign_channels(struct elem_to_channel e2c_vec[MAX_ELEM_ID], uint8_t 
 
     if (pos == AAC_CHANNEL_LFE) {
         while (nb_channels) {
-            if (aac_channel_map[layer][pos - 1][j] == AV_CHAN_NONE)
+            if (ff_aac_channel_map[layer][pos - 1][j] == AV_CHAN_NONE)
                 return -1;
             e2c_vec[i] = (struct elem_to_channel) {
-                .av_position  = 1ULL << aac_channel_map[layer][pos - 1][j],
+                .av_position  = 1ULL << ff_aac_channel_map[layer][pos - 1][j],
                 .syn_ele      = layout_map[i][0],
                 .elem_id      = layout_map[i][1],
                 .aac_position = pos
@@ -302,12 +299,12 @@ static int assign_channels(struct elem_to_channel e2c_vec[MAX_ELEM_ID], uint8_t 
     }
 
     while (nb_channels & 1) {
-        if (aac_channel_map[layer][pos - 1][0] == AV_CHAN_NONE)
+        if (ff_aac_channel_map[layer][pos - 1][0] == AV_CHAN_NONE)
             return -1;
-        if (aac_channel_map[layer][pos - 1][0] == AV_CHAN_UNUSED)
+        if (ff_aac_channel_map[layer][pos - 1][0] == AV_CHAN_UNUSED)
             break;
         e2c_vec[i] = (struct elem_to_channel) {
-            .av_position  = 1ULL << aac_channel_map[layer][pos - 1][0],
+            .av_position  = 1ULL << ff_aac_channel_map[layer][pos - 1][0],
             .syn_ele      = layout_map[i][0],
             .elem_id      = layout_map[i][1],
             .aac_position = pos
@@ -319,21 +316,21 @@ static int assign_channels(struct elem_to_channel e2c_vec[MAX_ELEM_ID], uint8_t 
 
     j = (pos != AAC_CHANNEL_SIDE) && nb_channels <= 3 ? 3 : 1;
     while (nb_channels >= 2) {
-        if (aac_channel_map[layer][pos - 1][j]   == AV_CHAN_NONE ||
-            aac_channel_map[layer][pos - 1][j+1] == AV_CHAN_NONE)
+        if (ff_aac_channel_map[layer][pos - 1][j]   == AV_CHAN_NONE ||
+            ff_aac_channel_map[layer][pos - 1][j+1] == AV_CHAN_NONE)
             return -1;
         i += assign_pair(e2c_vec, layout_map, i,
-                         1ULL << aac_channel_map[layer][pos - 1][j],
-                         1ULL << aac_channel_map[layer][pos - 1][j+1],
+                         1ULL << ff_aac_channel_map[layer][pos - 1][j],
+                         1ULL << ff_aac_channel_map[layer][pos - 1][j+1],
                          pos, layout);
         j += 2;
         nb_channels -= 2;
     }
     while (nb_channels & 1) {
-        if (aac_channel_map[layer][pos - 1][5] == AV_CHAN_NONE)
+        if (ff_aac_channel_map[layer][pos - 1][5] == AV_CHAN_NONE)
             return -1;
         e2c_vec[i] = (struct elem_to_channel) {
-            .av_position  = 1ULL << aac_channel_map[layer][pos - 1][5],
+            .av_position  = 1ULL << ff_aac_channel_map[layer][pos - 1][5],
             .syn_ele      = layout_map[i][0],
             .elem_id      = layout_map[i][1],
             .aac_position = pos
@@ -552,8 +549,8 @@ static int set_default_channel_config(AACContext *ac, AVCodecContext *avctx,
                channel_config);
         return AVERROR_INVALIDDATA;
     }
-    *tags = tags_per_config[channel_config];
-    memcpy(layout_map, aac_channel_layout_map[channel_config - 1],
+    *tags = ff_tags_per_config[channel_config];
+    memcpy(layout_map, ff_aac_channel_layout_map[channel_config - 1],
            *tags * sizeof(*layout_map));
 
     /*
@@ -661,7 +658,7 @@ static ChannelElement *get_che(AACContext *ac, int type, int elem_id)
          * SCE[0] CPE[0] CPE[1] LFE[0].
          * If we seem to have encountered such a stream, transfer
          * the LFE[0] element to the SCE[1]'s mapping */
-        if (ac->tags_mapped == tags_per_config[ac->oc[1].m4ac.chan_config] - 1 && (type == TYPE_LFE || type == TYPE_SCE)) {
+        if (ac->tags_mapped == ff_tags_per_config[ac->oc[1].m4ac.chan_config] - 1 && (type == TYPE_LFE || type == TYPE_SCE)) {
             if (!ac->warned_remapping_once && (type != TYPE_LFE || elem_id != 0)) {
                 av_log(ac->avctx, AV_LOG_WARNING,
                    "This stream seems to incorrectly report its last channel as %s[%d], mapping to LFE[0]\n",
@@ -683,7 +680,7 @@ static ChannelElement *get_che(AACContext *ac, int type, int elem_id)
          * SCE[0] CPE[0] SCE[1].
          * If we seem to have encountered such a stream, transfer
          * the SCE[1] element to the LFE[0]'s mapping */
-        if (ac->tags_mapped == tags_per_config[ac->oc[1].m4ac.chan_config] - 1 && (type == TYPE_LFE || type == TYPE_SCE)) {
+        if (ac->tags_mapped == ff_tags_per_config[ac->oc[1].m4ac.chan_config] - 1 && (type == TYPE_LFE || type == TYPE_SCE)) {
             if (!ac->warned_remapping_once && (type != TYPE_SCE || elem_id != 1)) {
                 av_log(ac->avctx, AV_LOG_WARNING,
                    "This stream seems to incorrectly report its last channel as %s[%d], mapping to SCE[1]\n",
@@ -1128,35 +1125,9 @@ static void aacdec_init(AACContext *ac);
 
 static av_cold void aac_static_table_init(void)
 {
-    static VLCElem vlc_buf[304 + 270 + 550 + 300 + 328 +
-                           294 + 306 + 268 + 510 + 366 + 462];
-    for (unsigned i = 0, offset = 0; i < 11; i++) {
-        vlc_spectral[i].table           = &vlc_buf[offset];
-        vlc_spectral[i].table_allocated = FF_ARRAY_ELEMS(vlc_buf) - offset;
-        ff_vlc_init_sparse(&vlc_spectral[i], 8, ff_aac_spectral_sizes[i],
-                           ff_aac_spectral_bits[i],       sizeof(ff_aac_spectral_bits[i][0]),
-                                                          sizeof(ff_aac_spectral_bits[i][0]),
-                           ff_aac_spectral_codes[i],      sizeof(ff_aac_spectral_codes[i][0]),
-                                                          sizeof(ff_aac_spectral_codes[i][0]),
-                           ff_aac_codebook_vector_idx[i], sizeof(ff_aac_codebook_vector_idx[i][0]),
-                                                          sizeof(ff_aac_codebook_vector_idx[i][0]),
-                 VLC_INIT_STATIC_OVERLONG);
-        offset += vlc_spectral[i].table_size;
-    }
-
     AAC_RENAME(ff_aac_sbr_init)();
 
-    ff_aac_tableinit();
-
-    VLC_INIT_STATIC(&vlc_scalefactors, 7,
-                    FF_ARRAY_ELEMS(ff_aac_scalefactor_code),
-                    ff_aac_scalefactor_bits,
-                    sizeof(ff_aac_scalefactor_bits[0]),
-                    sizeof(ff_aac_scalefactor_bits[0]),
-                    ff_aac_scalefactor_code,
-                    sizeof(ff_aac_scalefactor_code[0]),
-                    sizeof(ff_aac_scalefactor_code[0]),
-                    352);
+    ff_aacdec_common_init_once();
 
     // window initialization
     AAC_RENAME(avpriv_kbd_window_init)(AAC_RENAME(aac_kbd_long_960), 4.0, 960);
@@ -1526,7 +1497,7 @@ static int decode_scalefactors(AACContext *ac, INTFLOAT sf[120], GetBitContext *
             } else if ((band_type[idx] == INTENSITY_BT) ||
                        (band_type[idx] == INTENSITY_BT2)) {
                 for (; i < run_end; i++, idx++) {
-                    offset[2] += get_vlc2(gb, vlc_scalefactors.table, 7, 3) - SCALE_DIFF_ZERO;
+                    offset[2] += get_vlc2(gb, ff_vlc_scalefactors, 7, 3) - SCALE_DIFF_ZERO;
                     clipped_offset = av_clip(offset[2], -155, 100);
                     if (offset[2] != clipped_offset) {
                         avpriv_request_sample(ac->avctx,
@@ -1545,7 +1516,7 @@ static int decode_scalefactors(AACContext *ac, INTFLOAT sf[120], GetBitContext *
                     if (noise_flag-- > 0)
                         offset[1] += get_bits(gb, NOISE_PRE_BITS) - NOISE_PRE;
                     else
-                        offset[1] += get_vlc2(gb, vlc_scalefactors.table, 7, 3) - SCALE_DIFF_ZERO;
+                        offset[1] += get_vlc2(gb, ff_vlc_scalefactors, 7, 3) - SCALE_DIFF_ZERO;
                     clipped_offset = av_clip(offset[1], -100, 155);
                     if (offset[1] != clipped_offset) {
                         avpriv_request_sample(ac->avctx,
@@ -1561,7 +1532,7 @@ static int decode_scalefactors(AACContext *ac, INTFLOAT sf[120], GetBitContext *
                 }
             } else {
                 for (; i < run_end; i++, idx++) {
-                    offset[0] += get_vlc2(gb, vlc_scalefactors.table, 7, 3) - SCALE_DIFF_ZERO;
+                    offset[0] += get_vlc2(gb, ff_vlc_scalefactors, 7, 3) - SCALE_DIFF_ZERO;
                     if (offset[0] > 255U) {
                         av_log(ac->avctx, AV_LOG_ERROR,
                                "Scalefactor (%d) out of range.\n", offset[0]);
@@ -1734,7 +1705,7 @@ static int decode_spectrum_and_dequant(AACContext *ac, INTFLOAT coef[1024],
 #if !USE_FIXED
                 const float *vq = ff_aac_codebook_vector_vals[cbt_m1];
 #endif /* !USE_FIXED */
-                const VLCElem *vlc_tab = vlc_spectral[cbt_m1].table;
+                const VLCElem *vlc_tab = ff_vlc_spectral[cbt_m1];
                 OPEN_READER(re, gb);
 
                 switch (cbt_m1 >> 1) {
@@ -2308,7 +2279,7 @@ static int decode_cce(AACContext *ac, GetBitContext *gb, ChannelElement *che)
         INTFLOAT gain_cache = FIXR10(1.);
         if (c) {
             cge = coup->coupling_point == AFTER_IMDCT ? 1 : get_bits1(gb);
-            gain = cge ? get_vlc2(gb, vlc_scalefactors.table, 7, 3) - 60: 0;
+            gain = cge ? get_vlc2(gb, ff_vlc_scalefactors, 7, 3) - 60: 0;
             gain_cache = GET_GAIN(scale, gain);
 #if USE_FIXED
             if ((abs(gain_cache)-1024) >> 3 > 30)
@@ -2322,7 +2293,7 @@ static int decode_cce(AACContext *ac, GetBitContext *gb, ChannelElement *che)
                 for (sfb = 0; sfb < sce->ics.max_sfb; sfb++, idx++) {
                     if (sce->band_type[idx] != ZERO_BT) {
                         if (!cge) {
-                            int t = get_vlc2(gb, vlc_scalefactors.table, 7, 3) - 60;
+                            int t = get_vlc2(gb, ff_vlc_scalefactors, 7, 3) - 60;
                             if (t) {
                                 int s = 1;
                                 t = gain += t;
@@ -2856,8 +2827,8 @@ static void imdct_and_windowing_eld(AACContext *ac, SingleChannelElement *sce)
         ac->mdct512_fn(ac->mdct512, buf, in, sizeof(INTFLOAT));
 
     for (i = 0; i < n; i+=2) {
-        buf[i + 0] = -(int)(USE_FIXED + 1U)*buf[i + 0];
-        buf[i + 1] =  (int)(USE_FIXED + 1U)*buf[i + 1];
+        buf[i + 0] = -(UINTFLOAT)(USE_FIXED + 1)*buf[i + 0];
+        buf[i + 1] =  (UINTFLOAT)(USE_FIXED + 1)*buf[i + 1];
     }
     // Like with the regular IMDCT at this point we still have the middle half
     // of a transform but with even symmetry on the left and odd symmetry on
@@ -3091,9 +3062,9 @@ static int aac_decode_er_frame(AVCodecContext *avctx, void *data,
                               chan_config);
         return AVERROR_INVALIDDATA;
     }
-    for (i = 0; i < tags_per_config[chan_config]; i++) {
-        const int elem_type = aac_channel_layout_map[chan_config-1][i][0];
-        const int elem_id   = aac_channel_layout_map[chan_config-1][i][1];
+    for (i = 0; i < ff_tags_per_config[chan_config]; i++) {
+        const int elem_type = ff_aac_channel_layout_map[chan_config-1][i][0];
+        const int elem_id   = ff_aac_channel_layout_map[chan_config-1][i][1];
         if (!(che=get_che(ac, elem_type, elem_id))) {
             av_log(ac->avctx, AV_LOG_ERROR,
                    "channel element %d.%d is not allocated\n",

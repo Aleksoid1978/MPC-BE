@@ -35,6 +35,7 @@
 #include "hwconfig.h"
 #include "internal.h"
 #include "pthread_internal.h"
+#include "refstruct.h"
 #include "thread.h"
 #include "threadframe.h"
 #include "version_major.h"
@@ -64,6 +65,10 @@ enum {
     NEEDS_CLOSE,    ///< FFCodec->close needs to be called
     INITIALIZED,    ///< Thread has been properly set up
 };
+
+typedef struct ThreadFrameProgress {
+    atomic_int progress[2];
+} ThreadFrameProgress;
 
 /**
  * Context used by codec threads and stored in their AVCodecInternal thread_ctx.
@@ -218,7 +223,7 @@ static attribute_align_arg void *frame_worker_thread(void *arg)
         p->result = codec->cb.decode(avctx, p->frame, &p->got_frame, p->avpkt);
 
         if ((p->result < 0 || !p->got_frame) && p->frame->buf[0])
-            ff_thread_release_buffer(avctx, p->frame);
+            av_frame_unref(p->frame);
 
         if (atomic_load(&p->state) == STATE_SETTING_UP)
             ff_thread_finish_setup(avctx);
@@ -329,9 +334,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
 
         dst->hwaccel_flags = src->hwaccel_flags;
 
-        err = av_buffer_replace(&dst->internal->pool, src->internal->pool);
-        if (err < 0)
-            return err;
+        ff_refstruct_replace(&dst->internal->pool, src->internal->pool);
     }
 
     if (for_user) {
@@ -586,7 +589,7 @@ finish:
 void ff_thread_report_progress(ThreadFrame *f, int n, int field)
 {
     PerThreadContext *p;
-    atomic_int *progress = f->progress ? (atomic_int*)f->progress->data : NULL;
+    atomic_int *progress = f->progress ? f->progress->progress : NULL;
 
     if (!progress ||
         atomic_load_explicit(&progress[field], memory_order_relaxed) >= n)
@@ -609,7 +612,7 @@ void ff_thread_report_progress(ThreadFrame *f, int n, int field)
 void ff_thread_await_progress(const ThreadFrame *f, int n, int field)
 {
     PerThreadContext *p;
-    atomic_int *progress = f->progress ? (atomic_int*)f->progress->data : NULL;
+    atomic_int *progress = f->progress ? f->progress->progress : NULL;
 
     if (!progress ||
         atomic_load_explicit(&progress[field], memory_order_acquire) >= n)
@@ -740,7 +743,7 @@ void ff_frame_thread_free(AVCodecContext *avctx, int thread_count)
                 av_freep(&ctx->priv_data);
             }
 
-            av_buffer_unref(&ctx->internal->pool);
+            ff_refstruct_unref(&ctx->internal->pool);
             av_packet_free(&ctx->internal->last_pkt_props);
             av_freep(&ctx->internal);
             av_buffer_unref(&ctx->hw_frames_ctx);
@@ -992,37 +995,24 @@ int ff_thread_get_ext_buffer(AVCodecContext *avctx, ThreadFrame *f, int flags)
         return ff_get_buffer(avctx, f->f, flags);
 
     if (ffcodec(avctx->codec)->caps_internal & FF_CODEC_CAP_ALLOCATE_PROGRESS) {
-        atomic_int *progress;
-        f->progress = av_buffer_alloc(2 * sizeof(*progress));
-        if (!f->progress) {
+        f->progress = ff_refstruct_allocz(sizeof(*f->progress));
+        if (!f->progress)
             return AVERROR(ENOMEM);
-        }
-        progress = (atomic_int*)f->progress->data;
 
-        atomic_init(&progress[0], -1);
-        atomic_init(&progress[1], -1);
+        atomic_init(&f->progress->progress[0], -1);
+        atomic_init(&f->progress->progress[1], -1);
     }
 
     ret = ff_thread_get_buffer(avctx, f->f, flags);
     if (ret)
-        av_buffer_unref(&f->progress);
+        ff_refstruct_unref(&f->progress);
     return ret;
 }
 
-void ff_thread_release_buffer(AVCodecContext *avctx, AVFrame *f)
+void ff_thread_release_ext_buffer(ThreadFrame *f)
 {
-    if (!f)
-        return;
-
-    if (avctx->debug & FF_DEBUG_BUFFERS)
-        av_log(avctx, AV_LOG_DEBUG, "thread_release_buffer called on pic %p\n", f);
-
-    av_frame_unref(f);
-}
-
-void ff_thread_release_ext_buffer(AVCodecContext *avctx, ThreadFrame *f)
-{
-    av_buffer_unref(&f->progress);
+    ff_refstruct_unref(&f->progress);
     f->owner[0] = f->owner[1] = NULL;
-    ff_thread_release_buffer(avctx, f->f);
+    if (f->f)
+        av_frame_unref(f->f);
 }

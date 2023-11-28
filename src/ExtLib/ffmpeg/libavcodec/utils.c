@@ -35,9 +35,12 @@
 #include "libavutil/pixfmt.h"
 #include "avcodec.h"
 #include "codec.h"
+#include "codec_desc.h"
 #include "codec_internal.h"
+#include "codec_par.h"
 #include "decode.h"
 #include "hwconfig.h"
+#include "refstruct.h"
 #include "thread.h"
 #include "threadframe.h"
 #include "internal.h"
@@ -878,17 +881,13 @@ int ff_thread_ref_frame(ThreadFrame *dst, const ThreadFrame *src)
 
     av_assert0(!dst->progress);
 
-    if (src->progress &&
-        !(dst->progress = av_buffer_ref(src->progress))) {
-        ff_thread_release_ext_buffer(dst->owner[0], dst);
-        return AVERROR(ENOMEM);
-    }
+    if (src->progress)
+        dst->progress = ff_refstruct_ref(src->progress);
 
     return 0;
 }
 
-int ff_thread_replace_frame(AVCodecContext *avctx, ThreadFrame *dst,
-                            const ThreadFrame *src)
+int ff_thread_replace_frame(ThreadFrame *dst, const ThreadFrame *src)
 {
     int ret;
 
@@ -899,11 +898,7 @@ int ff_thread_replace_frame(AVCodecContext *avctx, ThreadFrame *dst,
     if (ret < 0)
         return ret;
 
-    ret = av_buffer_replace(&dst->progress, src->progress);
-    if (ret < 0) {
-        ff_thread_release_ext_buffer(dst->owner[0], dst);
-        return ret;
-    }
+    ff_refstruct_replace(&dst->progress, src->progress);
 
     return 0;
 }
@@ -921,13 +916,7 @@ int ff_thread_get_ext_buffer(AVCodecContext *avctx, ThreadFrame *f, int flags)
     return ff_get_buffer(avctx, f->f, flags);
 }
 
-void ff_thread_release_buffer(AVCodecContext *avctx, AVFrame *f)
-{
-    if (f)
-        av_frame_unref(f);
-}
-
-void ff_thread_release_ext_buffer(AVCodecContext *avctx, ThreadFrame *f)
+void ff_thread_release_ext_buffer(ThreadFrame *f)
 {
     f->owner[0] = f->owner[1] = NULL;
     if (f->f)

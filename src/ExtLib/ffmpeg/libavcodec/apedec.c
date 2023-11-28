@@ -1220,7 +1220,7 @@ static av_always_inline int predictor_update_filter(APEPredictor64 *p,
     if (interim_mode < 1) {
         predictionA = (int32_t)predictionA;
         predictionB = (int32_t)predictionB;
-        p->lastA[filter] = decoded + ((int32_t)(predictionA + (predictionB >> 1)) >> 10);
+        p->lastA[filter] = (int32_t)(decoded + (unsigned)((int32_t)(predictionA + (predictionB >> 1)) >> 10));
     } else {
         p->lastA[filter] = decoded + ((int64_t)((uint64_t)predictionA + (predictionB >> 1)) >> 10);
     }
@@ -1284,7 +1284,7 @@ static void predictor_decode_stereo_3950(APEContext *ctx, int count)
             *decoded1++ = a1;
             if (num_passes > 1) {
                 int32_t left  = a1 - (unsigned)(a0 / 2);
-                int32_t right = left + a0;
+                int32_t right = left + (unsigned)a0;
 
                 if (FFMAX(FFABS(left), FFABS(right)) > (1<<23)) {
                     ctx->interim_mode = !interim_mode;

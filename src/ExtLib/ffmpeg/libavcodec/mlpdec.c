@@ -93,14 +93,6 @@ typedef struct SubStream {
 
     /// Bitmask of which parameter sets are conveyed in a decoding parameter block.
     uint8_t     param_presence_flags;
-#define PARAM_BLOCKSIZE     (1 << 7)
-#define PARAM_MATRIX        (1 << 6)
-#define PARAM_OUTSHIFT      (1 << 5)
-#define PARAM_QUANTSTEP     (1 << 4)
-#define PARAM_FIR           (1 << 3)
-#define PARAM_IIR           (1 << 2)
-#define PARAM_HUFFOFFSET    (1 << 1)
-#define PARAM_PRESENCE      (1 << 0)
     //@}
 
     //@{
@@ -391,6 +383,7 @@ static int read_major_sync(MLPDecodeContext *m, GetBitContext *gb)
     m->access_unit_size_pow2 = mh.access_unit_size_pow2;
 
     m->num_substreams        = mh.num_substreams;
+    m->extended_substream_info = mh.extended_substream_info;
     m->substream_info        = mh.substream_info;
 
     /*  If there is a 4th substream and the MSB of substream_info is set,
@@ -459,7 +452,10 @@ static int read_major_sync(MLPDecodeContext *m, GetBitContext *gb)
             else
                 m->substream[2].mask = mh.channel_layout_thd_stream1;
         if (m->avctx->ch_layout.nb_channels > 2)
-            m->substream[mh.num_substreams > 1].mask = mh.channel_layout_thd_stream1;
+            if (mh.num_substreams > 2)
+                m->substream[1].mask = mh.channel_layout_thd_stream1;
+            else
+                m->substream[mh.num_substreams > 1].mask = mh.channel_layout_thd_stream2;
     }
 
     m->needs_reordering = mh.channel_arrangement >= 18 && mh.channel_arrangement <= 20;

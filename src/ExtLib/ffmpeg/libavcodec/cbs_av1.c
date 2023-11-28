@@ -24,6 +24,7 @@
 #include "cbs_internal.h"
 #include "cbs_av1.h"
 #include "defs.h"
+#include "refstruct.h"
 
 
 static int cbs_av1_read_uvlc(CodedBitstreamContext *ctx, GetBitContext *gbc,
@@ -138,19 +139,25 @@ static int cbs_av1_read_leb128(CodedBitstreamContext *ctx, GetBitContext *gbc,
     return 0;
 }
 
-/** Minimum byte length will be used to indicate the len128 of value if byte_len is 0. */
 static int cbs_av1_write_leb128(CodedBitstreamContext *ctx, PutBitContext *pbc,
-                                const char *name, uint64_t value, uint8_t byte_len)
+                                const char *name, uint64_t value, int fixed_length)
 {
     int len, i;
     uint8_t byte;
 
     CBS_TRACE_WRITE_START();
 
-    if (byte_len)
-        av_assert0(byte_len >= (av_log2(value) + 7) / 7);
+    len = (av_log2(value) + 7) / 7;
 
-    len = byte_len ? byte_len : (av_log2(value) + 7) / 7;
+    if (fixed_length) {
+        if (fixed_length < len) {
+            av_log(ctx->log_ctx, AV_LOG_ERROR, "OBU is too large for "
+                   "fixed length size field (%d > %d).\n",
+                   len, fixed_length);
+            return AVERROR(EINVAL);
+        }
+        len = fixed_length;
+    }
 
     for (i = 0; i < len; i++) {
         if (put_bits_left(pbc) < 8)
@@ -863,12 +870,7 @@ static int cbs_av1_read_unit(CodedBitstreamContext *ctx,
                 priv->operating_point_idc = sequence_header->operating_point_idc[priv->operating_point];
             }
 
-            av_buffer_unref(&priv->sequence_header_ref);
-            priv->sequence_header = NULL;
-
-            priv->sequence_header_ref = av_buffer_ref(unit->content_ref);
-            if (!priv->sequence_header_ref)
-                return AVERROR(ENOMEM);
+            ff_refstruct_replace(&priv->sequence_header_ref, unit->content_ref);
             priv->sequence_header = &obu->obu.sequence_header;
         }
         break;
@@ -987,9 +989,7 @@ static int cbs_av1_write_obu(CodedBitstreamContext *ctx,
     av1ctx = *priv;
 
     if (priv->sequence_header_ref) {
-        av1ctx.sequence_header_ref = av_buffer_ref(priv->sequence_header_ref);
-        if (!av1ctx.sequence_header_ref)
-            return AVERROR(ENOMEM);
+        av1ctx.sequence_header_ref = ff_refstruct_ref(priv->sequence_header_ref);
     }
 
     if (priv->frame_header_ref) {
@@ -1006,8 +1006,8 @@ static int cbs_av1_write_obu(CodedBitstreamContext *ctx,
 
     if (obu->header.obu_has_size_field) {
         pbc_tmp = *pbc;
-        if (obu->obu_size_byte_len) {
-            for (int i = 0; i < obu->obu_size_byte_len; i++)
+        if (priv->fixed_obu_size_length) {
+            for (int i = 0; i < priv->fixed_obu_size_length; i++)
                 put_bits(pbc, 8, 0);
         } else {
             // Add space for the size field to fill later.
@@ -1027,19 +1027,14 @@ static int cbs_av1_write_obu(CodedBitstreamContext *ctx,
             if (err < 0)
                 goto error;
 
-            av_buffer_unref(&priv->sequence_header_ref);
+            ff_refstruct_unref(&priv->sequence_header_ref);
             priv->sequence_header = NULL;
 
             err = ff_cbs_make_unit_refcounted(ctx, unit);
             if (err < 0)
                 goto error;
 
-            priv->sequence_header_ref = av_buffer_ref(unit->content_ref);
-            if (!priv->sequence_header_ref) {
-                err = AVERROR(ENOMEM);
-                goto error;
-            }
-
+            priv->sequence_header_ref = ff_refstruct_ref(unit->content_ref);
             priv->sequence_header = &obu->obu.sequence_header;
         }
         break;
@@ -1133,7 +1128,8 @@ static int cbs_av1_write_obu(CodedBitstreamContext *ctx,
     end_pos   /= 8;
 
     *pbc = pbc_tmp;
-    err = cbs_av1_write_leb128(ctx, pbc, "obu_size", obu->obu_size, obu->obu_size_byte_len);
+    err = cbs_av1_write_leb128(ctx, pbc, "obu_size", obu->obu_size,
+                               priv->fixed_obu_size_length);
     if (err < 0)
         goto error;
 
@@ -1142,7 +1138,7 @@ static int cbs_av1_write_obu(CodedBitstreamContext *ctx,
     av_assert0(data_pos <= start_pos);
 
     if (8 * obu->obu_size > put_bits_left(pbc)) {
-        av_buffer_unref(&priv->sequence_header_ref);
+        ff_refstruct_unref(&priv->sequence_header_ref);
         av_buffer_unref(&priv->frame_header_ref);
         *priv = av1ctx;
 
@@ -1150,10 +1146,12 @@ static int cbs_av1_write_obu(CodedBitstreamContext *ctx,
     }
 
     if (obu->obu_size > 0) {
-        if (!obu->obu_size_byte_len) {
-            obu->obu_size_byte_len = start_pos - data_pos;
+        if (!priv->fixed_obu_size_length) {
             memmove(pbc->buf + data_pos,
                     pbc->buf + start_pos, header_size);
+        } else {
+            // The size was fixed so the following data was
+            // already written in the correct place.
         }
         skip_put_bytes(pbc, header_size);
 
@@ -1169,7 +1167,7 @@ static int cbs_av1_write_obu(CodedBitstreamContext *ctx,
     err = 0;
 
 error:
-    av_buffer_unref(&av1ctx.sequence_header_ref);
+    ff_refstruct_unref(&av1ctx.sequence_header_ref);
     av_buffer_unref(&av1ctx.frame_header_ref);
 
     return err;
@@ -1221,13 +1219,13 @@ static void cbs_av1_close(CodedBitstreamContext *ctx)
 {
     CodedBitstreamAV1Context *priv = ctx->priv_data;
 
-    av_buffer_unref(&priv->sequence_header_ref);
+    ff_refstruct_unref(&priv->sequence_header_ref);
     av_buffer_unref(&priv->frame_header_ref);
 }
 
-static void cbs_av1_free_metadata(void *unit, uint8_t *content)
+static void cbs_av1_free_metadata(FFRefStructOpaque unused, void *content)
 {
-    AV1RawOBU *obu = (AV1RawOBU*)content;
+    AV1RawOBU *obu = content;
     AV1RawMetadata *md;
 
     av_assert0(obu->header.obu_type == AV1_OBU_METADATA);
@@ -1245,7 +1243,6 @@ static void cbs_av1_free_metadata(void *unit, uint8_t *content)
     default:
         av_buffer_unref(&md->metadata.unknown.payload_ref);
     }
-    av_free(content);
 }
 
 static const CodedBitstreamUnitTypeDescriptor cbs_av1_unit_types[] = {
@@ -1273,6 +1270,8 @@ static const CodedBitstreamUnitTypeDescriptor cbs_av1_unit_types[] = {
 static const AVOption cbs_av1_options[] = {
     { "operating_point",  "Set operating point to select layers to parse from a scalable bitstream",
                           OFFSET(operating_point), AV_OPT_TYPE_INT, { .i64 = -1 }, -1, AV1_MAX_OPERATING_POINTS - 1, 0 },
+    { "fixed_obu_size_length", "Set fixed length of the obu_size field",
+      OFFSET(fixed_obu_size_length), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 8, 0 },
     { NULL }
 };
 

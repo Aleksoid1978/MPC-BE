@@ -44,17 +44,17 @@
 typedef struct NVDECFrame {
     unsigned int idx;
     unsigned int ref_idx;
-    AVBufferRef *idx_ref;
-    AVBufferRef *ref_idx_ref;
-    AVBufferRef *decoder_ref;
+    unsigned int *idx_ref;         ///< RefStruct reference
+    unsigned int *ref_idx_ref;     ///< RefStruct reference
+    struct NVDECDecoder  *decoder; ///< RefStruct reference
 } NVDECFrame;
 
 typedef struct NVDECContext {
     CUVIDPICPARAMS pic_params;
 
-    AVBufferPool *decoder_pool;
+    struct FFRefStructPool *decoder_pool;
 
-    AVBufferRef  *decoder_ref;
+    struct NVDECDecoder  *decoder; ///< RefStruct reference
 
     uint8_t      *bitstream;
     int           bitstream_len;

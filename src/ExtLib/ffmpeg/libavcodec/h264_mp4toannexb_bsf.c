@@ -36,6 +36,8 @@ typedef struct H264BSFContext {
     uint8_t *pps;
     int      sps_size;
     int      pps_size;
+    unsigned sps_buf_size;
+    unsigned pps_buf_size;
     uint8_t  length_size;
     uint8_t  new_idr;
     uint8_t  idr_sps_seen;
@@ -43,10 +45,26 @@ typedef struct H264BSFContext {
     int      extradata_parsed;
 } H264BSFContext;
 
+enum PsSource {
+    PS_OUT_OF_BAND = -1,
+    PS_NONE = 0,
+    PS_IN_BAND = 1,
+};
+
 static void count_or_copy(uint8_t **out, uint64_t *out_size,
-                          const uint8_t *in, int in_size, int ps, int copy)
+                          const uint8_t *in, int in_size, enum PsSource ps, int copy)
 {
-    uint8_t start_code_size = ps < 0 ? 0 : *out_size == 0 || ps ? 4 : 3;
+    uint8_t start_code_size;
+
+    if (ps == PS_OUT_OF_BAND)
+        /* start code already present in out-of-band ps data, so don't need to
+         * add it manually again
+         */
+        start_code_size = 0;
+    else if (ps == PS_IN_BAND || *out_size == 0)
+        start_code_size = 4;
+    else
+        start_code_size = 3;
 
     if (copy) {
         memcpy(*out + start_code_size, in, in_size);
@@ -62,7 +80,8 @@ static void count_or_copy(uint8_t **out, uint64_t *out_size,
     *out_size += start_code_size + in_size;
 }
 
-static int h264_extradata_to_annexb(AVBSFContext *ctx, const int padding)
+static int h264_extradata_to_annexb(AVBSFContext *ctx,
+                                    uint8_t *extradata, int extradata_size)
 {
     H264BSFContext *s = ctx->priv_data;
     GetByteContext ogb, *gb = &ogb;
@@ -70,9 +89,10 @@ static int h264_extradata_to_annexb(AVBSFContext *ctx, const int padding)
     uint32_t total_size                 = 0;
     uint8_t *out                        = NULL, unit_nb, sps_done = 0;
     static const uint8_t nalu_header[4] = { 0, 0, 0, 1 };
+    const int padding                   = AV_INPUT_BUFFER_PADDING_SIZE;
     int length_size, pps_offset = 0;
 
-    bytestream2_init(gb, ctx->par_in->extradata, ctx->par_in->extradata_size);
+    bytestream2_init(gb, extradata, extradata_size);
 
     bytestream2_skipu(gb, 4);
 
@@ -113,16 +133,33 @@ pps:
         memset(out + total_size, 0, padding);
 
     if (pps_offset) {
-        s->sps      = out;
+        uint8_t *sps;
+
         s->sps_size = pps_offset;
+        sps = av_fast_realloc(s->sps, &s->sps_buf_size, s->sps_size);
+        if (!sps) {
+            av_free(out);
+            return AVERROR(ENOMEM);
+        }
+        s->sps = sps;
+        memcpy(s->sps, out, s->sps_size);
     } else {
         av_log(ctx, AV_LOG_WARNING,
                "Warning: SPS NALU missing or invalid. "
                "The resulting stream may not play.\n");
     }
     if (pps_offset < total_size) {
-        s->pps      = out + pps_offset;
+        uint8_t *pps;
+
         s->pps_size = total_size - pps_offset;
+        pps = av_fast_realloc(s->pps, &s->pps_buf_size, s->pps_size);
+        if (!pps) {
+            av_freep(&s->sps);
+            av_free(out);
+            return AVERROR(ENOMEM);
+        }
+        s->pps = pps;
+        memcpy(s->pps, out + pps_offset, s->pps_size);
     } else {
         av_log(ctx, AV_LOG_WARNING,
                "Warning: PPS NALU missing or invalid. "
@@ -133,14 +170,47 @@ pps:
     ctx->par_out->extradata      = out;
     ctx->par_out->extradata_size = total_size;
 
-    return length_size;
+    s->length_size      = length_size;
+    s->new_idr          = 1;
+    s->idr_sps_seen     = 0;
+    s->idr_pps_seen     = 0;
+    s->extradata_parsed = 1;
+
+    return 0;
+}
+
+static int h264_mp4toannexb_save_ps(uint8_t **dst, int *dst_size,
+                                    unsigned *dst_buf_size,
+                                    const uint8_t *nal, uint32_t nal_size,
+                                    int first)
+{
+    static const uint8_t nalu_header[4] = { 0, 0, 0, 1 };
+    const int start_code_size = sizeof(nalu_header);
+    uint8_t *ptr;
+    uint32_t size;
+
+    if (first)
+        size = 0;
+    else
+        size = *dst_size;
+
+    ptr = av_fast_realloc(*dst, dst_buf_size, size + nal_size + start_code_size);
+    if (!ptr)
+        return AVERROR(ENOMEM);
+
+    memcpy(ptr + size, nalu_header, start_code_size);
+    size += start_code_size;
+    memcpy(ptr + size, nal, nal_size);
+    size += nal_size;
+
+    *dst = ptr;
+    *dst_size = size;
+    return 0;
 }
 
 static int h264_mp4toannexb_init(AVBSFContext *ctx)
 {
-    H264BSFContext *s = ctx->priv_data;
     int extra_size = ctx->par_in->extradata_size;
-    int ret;
 
     /* retrieve sps and pps NAL units from extradata */
     if (!extra_size                                               ||
@@ -149,15 +219,9 @@ static int h264_mp4toannexb_init(AVBSFContext *ctx)
         av_log(ctx, AV_LOG_VERBOSE,
                "The input looks like it is Annex B already\n");
     } else if (extra_size >= 7) {
-        ret = h264_extradata_to_annexb(ctx, AV_INPUT_BUFFER_PADDING_SIZE);
-        if (ret < 0)
-            return ret;
-
-        s->length_size      = ret;
-        s->new_idr          = 1;
-        s->idr_sps_seen     = 0;
-        s->idr_pps_seen     = 0;
-        s->extradata_parsed = 1;
+        return h264_extradata_to_annexb(ctx,
+                                        ctx->par_in->extradata,
+                                        ctx->par_in->extradata_size);
     } else {
         av_log(ctx, AV_LOG_ERROR, "Invalid extradata size: %d\n", extra_size);
         return AVERROR_INVALIDDATA;
@@ -176,10 +240,20 @@ static int h264_mp4toannexb_filter(AVBSFContext *ctx, AVPacket *opkt)
     uint8_t *out;
     uint64_t out_size;
     int ret;
+    size_t extradata_size;
+    uint8_t *extradata;
 
     ret = ff_bsf_get_packet(ctx, &in);
     if (ret < 0)
         return ret;
+
+    extradata = av_packet_get_side_data(in, AV_PKT_DATA_NEW_EXTRADATA,
+                                        &extradata_size);
+    if (extradata) {
+        ret = h264_extradata_to_annexb(ctx, extradata, extradata_size);
+        if (ret < 0)
+            goto fail;
+    }
 
     /* nothing to filter */
     if (!s->extradata_parsed) {
@@ -194,6 +268,9 @@ static int h264_mp4toannexb_filter(AVBSFContext *ctx, AVPacket *opkt)
     if (j) \
         av_log(__VA_ARGS__)
     for (int j = 0; j < 2; j++) {
+        int sps_count = 0;
+        int pps_count = 0;
+
         buf      = in->data;
         new_idr  = s->new_idr;
         sps_seen = s->idr_sps_seen;
@@ -202,6 +279,7 @@ static int h264_mp4toannexb_filter(AVBSFContext *ctx, AVPacket *opkt)
 
         do {
             uint32_t nal_size = 0;
+            enum PsSource ps;
 
             /* possible overread ok due to padding */
             for (int i = 0; i < s->length_size; i++)
@@ -223,14 +301,24 @@ static int h264_mp4toannexb_filter(AVBSFContext *ctx, AVPacket *opkt)
 
             if (unit_type == H264_NAL_SPS) {
                 sps_seen = new_idr = 1;
+                if (!j) {
+                    h264_mp4toannexb_save_ps(&s->sps, &s->sps_size, &s->sps_buf_size,
+                                             buf, nal_size, !sps_count);
+                    sps_count++;
+                }
             } else if (unit_type == H264_NAL_PPS) {
                 pps_seen = new_idr = 1;
+                if (!j) {
+                    h264_mp4toannexb_save_ps(&s->pps, &s->pps_size, &s->pps_buf_size,
+                                             buf, nal_size, !pps_count);
+                    pps_count++;
+                }
                 /* if SPS has not been seen yet, prepend the AVCC one to PPS */
                 if (!sps_seen) {
                     if (!s->sps_size) {
                         LOG_ONCE(ctx, AV_LOG_WARNING, "SPS not present in the stream, nor in AVCC, stream may be unreadable\n");
                     } else {
-                        count_or_copy(&out, &out_size, s->sps, s->sps_size, -1, j);
+                        count_or_copy(&out, &out_size, s->sps, s->sps_size, PS_OUT_OF_BAND, j);
                         sps_seen = 1;
                     }
                 }
@@ -244,22 +332,26 @@ static int h264_mp4toannexb_filter(AVBSFContext *ctx, AVPacket *opkt)
 
             /* prepend only to the first type 5 NAL unit of an IDR picture, if no sps/pps are already present */
             if (new_idr && unit_type == H264_NAL_IDR_SLICE && !sps_seen && !pps_seen) {
-                if (ctx->par_out->extradata)
-                    count_or_copy(&out, &out_size, ctx->par_out->extradata,
-                                  ctx->par_out->extradata_size, -1, j);
+                if (s->sps_size)
+                    count_or_copy(&out, &out_size, s->sps, s->sps_size, PS_OUT_OF_BAND, j);
+                if (s->pps_size)
+                    count_or_copy(&out, &out_size, s->pps, s->pps_size, PS_OUT_OF_BAND, j);
                 new_idr = 0;
             /* if only SPS has been seen, also insert PPS */
             } else if (new_idr && unit_type == H264_NAL_IDR_SLICE && sps_seen && !pps_seen) {
                 if (!s->pps_size) {
                     LOG_ONCE(ctx, AV_LOG_WARNING, "PPS not present in the stream, nor in AVCC, stream may be unreadable\n");
                 } else {
-                    count_or_copy(&out, &out_size, s->pps, s->pps_size, -1, j);
+                    count_or_copy(&out, &out_size, s->pps, s->pps_size, PS_OUT_OF_BAND, j);
                 }
             }
 
-            count_or_copy(&out, &out_size, buf, nal_size,
-                          unit_type == H264_NAL_SPS || unit_type == H264_NAL_PPS, j);
-            if (!new_idr && unit_type == H264_NAL_SLICE) {
+            if (unit_type == H264_NAL_SPS || unit_type == H264_NAL_PPS)
+                ps = PS_IN_BAND;
+            else
+                ps = PS_NONE;
+            count_or_copy(&out, &out_size, buf, nal_size, ps, j);
+            if (unit_type == H264_NAL_SLICE) {
                 new_idr  = 1;
                 sps_seen = 0;
                 pps_seen = 0;
@@ -299,6 +391,14 @@ fail:
     return ret;
 }
 
+static void h264_mp4toannexb_close(AVBSFContext *ctx)
+{
+    H264BSFContext *s = ctx->priv_data;
+
+    av_freep(&s->sps);
+    av_freep(&s->pps);
+}
+
 static void h264_mp4toannexb_flush(AVBSFContext *ctx)
 {
     H264BSFContext *s = ctx->priv_data;
@@ -318,5 +418,6 @@ const FFBitStreamFilter ff_h264_mp4toannexb_bsf = {
     .priv_data_size = sizeof(H264BSFContext),
     .init           = h264_mp4toannexb_init,
     .filter         = h264_mp4toannexb_filter,
+    .close          = h264_mp4toannexb_close,
     .flush          = h264_mp4toannexb_flush,
 };

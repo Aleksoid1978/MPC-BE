@@ -73,12 +73,16 @@ typedef struct MagicYUVContext {
     int (*magy_decode_slice)(AVCodecContext *avctx, void *tdata,
                              int j, int threadnr);
     LLVidDSPContext   llviddsp;
+    HuffEntry         he[1 << 14];
+    uint8_t           len[1 << 14];
 } MagicYUVContext;
 
-static int huff_build(const uint8_t len[], uint16_t codes_pos[33],
+static int huff_build(AVCodecContext *avctx,
+                      const uint8_t len[], uint16_t codes_pos[33],
                       VLC *vlc, VLC_MULTI *multi, int nb_elems, void *logctx)
 {
-    HuffEntry he[4096];
+    MagicYUVContext *s = avctx->priv_data;
+    HuffEntry *he = s->he;
 
     for (int i = 31; i > 0; i--)
         codes_pos[i] += codes_pos[i + 1];
@@ -121,10 +125,9 @@ static void magicyuv_median_pred16(uint16_t *dst, const uint16_t *src1,
     for (; CACHED_BITSTREAM_READER && x < width-c && get_bits_left(&gb) > 0;) {\
         ret = get_vlc_multi(&gb, (uint8_t *)dst + x * b, multi, \
                             vlc, vlc_bits, 3); \
-        if (ret > 0) \
-            x += ret; \
         if (ret <= 0) \
             return AVERROR_INVALIDDATA; \
+        x += ret; \
     } \
     for (; x < width && get_bits_left(&gb) > 0; x++) \
         dst[x] = get_vlc2(&gb, vlc, vlc_bits, 3); \
@@ -295,7 +298,7 @@ static int magy_decode_slice(AVCodecContext *avctx, void *tdata,
                 return ret;
 
             for (k = 0; k < height; k++)
-                READ_PLANE(dst, i, 1, 5)
+                READ_PLANE(dst, i, 1, 7)
         }
 
         switch (pred) {
@@ -381,7 +384,7 @@ static int build_huffman(AVCodecContext *avctx, const uint8_t *table,
 {
     MagicYUVContext *s = avctx->priv_data;
     GetByteContext gb;
-    uint8_t len[4096];
+    uint8_t *len = s->len;
     uint16_t length_count[33] = { 0 };
     int i = 0, j = 0, k;
 
@@ -409,7 +412,7 @@ static int build_huffman(AVCodecContext *avctx, const uint8_t *table,
 
         if (j == max) {
             j = 0;
-            if (huff_build(len, length_count, &s->vlc[i], &s->multi[i], max, avctx)) {
+            if (huff_build(avctx, len, length_count, &s->vlc[i], &s->multi[i], max, avctx)) {
                 av_log(avctx, AV_LOG_ERROR, "Cannot build Huffman codes\n");
                 return AVERROR_INVALIDDATA;
             }
@@ -525,6 +528,16 @@ static int magy_decode_frame(AVCodecContext *avctx, AVFrame *p,
         avctx->pix_fmt = AV_PIX_FMT_GBRAP12;
         s->decorrelate = 1;
         s->bps = 12;
+        break;
+    case 0x71:
+        avctx->pix_fmt = AV_PIX_FMT_GBRP14;
+        s->decorrelate = 1;
+        s->bps = 14;
+        break;
+    case 0x72:
+        avctx->pix_fmt = AV_PIX_FMT_GBRAP14;
+        s->decorrelate = 1;
+        s->bps = 14;
         break;
     case 0x73:
         avctx->pix_fmt = AV_PIX_FMT_GRAY10;
@@ -653,7 +666,9 @@ static int magy_decode_frame(AVCodecContext *avctx, AVFrame *p,
         avctx->pix_fmt == AV_PIX_FMT_GBRP10 ||
         avctx->pix_fmt == AV_PIX_FMT_GBRAP10||
         avctx->pix_fmt == AV_PIX_FMT_GBRAP12||
-        avctx->pix_fmt == AV_PIX_FMT_GBRP12) {
+        avctx->pix_fmt == AV_PIX_FMT_GBRAP14||
+        avctx->pix_fmt == AV_PIX_FMT_GBRP12||
+        avctx->pix_fmt == AV_PIX_FMT_GBRP14) {
         FFSWAP(uint8_t*, p->data[0], p->data[1]);
         FFSWAP(int, p->linesize[0], p->linesize[1]);
     } else {

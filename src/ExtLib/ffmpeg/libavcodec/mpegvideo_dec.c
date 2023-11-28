@@ -31,6 +31,7 @@
 #include "libavutil/video_enc_params.h"
 
 #include "avcodec.h"
+#include "decode.h"
 #include "h264chroma.h"
 #include "internal.h"
 #include "mpegutils.h"
@@ -54,6 +55,7 @@ void ff_mpv_decode_init(MpegEncContext *s, AVCodecContext *avctx)
     /* convert fourcc to upper case */
     s->codec_tag       = ff_toupper4(avctx->codec_tag);
 
+    ff_mpv_idct_init(s);
     ff_h264chroma_init(&s->h264chroma, 8); //for lowres
 }
 
@@ -76,20 +78,16 @@ int ff_mpeg_update_thread_context(AVCodecContext *dst,
         int err;
         memcpy(s, s1, sizeof(*s));
 
+        s->context_initialized   = 0;
+        s->context_reinit        = 0;
         s->avctx                 = dst;
         s->private_ctx           = private_ctx;
         s->bitstream_buffer      = NULL;
         s->bitstream_buffer_size = s->allocated_bitstream_buffer_size = 0;
 
         if (s1->context_initialized) {
-            ff_mpv_idct_init(s);
-            if ((err = ff_mpv_common_init(s)) < 0) {
-                memset(s, 0, sizeof(*s));
-                s->avctx = dst;
-                s->private_ctx = private_ctx;
-                memcpy(&s->h264chroma, &s1->h264chroma, sizeof(s->h264chroma));
+            if ((err = ff_mpv_common_init(s)) < 0)
                 return err;
-            }
         }
     }
 
@@ -108,17 +106,17 @@ int ff_mpeg_update_thread_context(AVCodecContext *dst,
     av_assert0(!s->picture || s->picture != s1->picture);
     if (s->picture)
         for (int i = 0; i < MAX_PICTURE_COUNT; i++) {
-            ff_mpeg_unref_picture(s->avctx, &s->picture[i]);
+            ff_mpeg_unref_picture(&s->picture[i]);
             if (s1->picture && s1->picture[i].f->buf[0] &&
-                (ret = ff_mpeg_ref_picture(s->avctx, &s->picture[i], &s1->picture[i])) < 0)
+                (ret = ff_mpeg_ref_picture(&s->picture[i], &s1->picture[i])) < 0)
                 return ret;
         }
 
 #define UPDATE_PICTURE(pic)\
 do {\
-    ff_mpeg_unref_picture(s->avctx, &s->pic);\
+    ff_mpeg_unref_picture(&s->pic);\
     if (s1->pic.f && s1->pic.f->buf[0])\
-        ret = ff_mpeg_ref_picture(s->avctx, &s->pic, &s1->pic);\
+        ret = ff_mpeg_ref_picture(&s->pic, &s1->pic);\
     else\
         ret = ff_update_picture_tables(&s->pic, &s1->pic);\
     if (ret < 0)\
@@ -239,20 +237,49 @@ int ff_mpv_common_frame_size_change(MpegEncContext *s)
 
 static int alloc_picture(MpegEncContext *s, Picture *pic)
 {
-    return ff_alloc_picture(s->avctx, pic, &s->me, &s->sc, 0, 0,
-                            s->chroma_x_shift, s->chroma_y_shift, s->out_format,
+    AVCodecContext *avctx = s->avctx;
+    int ret;
+
+    pic->tf.f = pic->f;
+
+    /* WM Image / Screen codecs allocate internal buffers with different
+     * dimensions / colorspaces; ignore user-defined callbacks for these. */
+    if (avctx->codec_id != AV_CODEC_ID_WMV3IMAGE &&
+        avctx->codec_id != AV_CODEC_ID_VC1IMAGE  &&
+        avctx->codec_id != AV_CODEC_ID_MSS2) {
+        ret = ff_thread_get_ext_buffer(avctx, &pic->tf,
+                                       pic->reference ? AV_GET_BUFFER_FLAG_REF : 0);
+    } else {
+        pic->f->width  = avctx->width;
+        pic->f->height = avctx->height;
+        pic->f->format = avctx->pix_fmt;
+        ret = avcodec_default_get_buffer2(avctx, pic->f, 0);
+    }
+    if (ret < 0)
+        goto fail;
+
+    ret = ff_hwaccel_frame_priv_alloc(avctx, &pic->hwaccel_picture_private);
+    if (ret < 0)
+        goto fail;
+
+    return ff_alloc_picture(s->avctx, pic, &s->me, &s->sc, 0, s->out_format,
                             s->mb_stride, s->mb_width, s->mb_height, s->b8_stride,
                             &s->linesize, &s->uvlinesize);
+fail:
+    ff_mpeg_unref_picture(pic);
+    return ret;
 }
 
-static void gray_frame(AVFrame *frame)
+static void color_frame(AVFrame *frame, int luma)
 {
     int h_chroma_shift, v_chroma_shift;
 
-    av_pix_fmt_get_chroma_sub_sample(frame->format, &h_chroma_shift, &v_chroma_shift);
-
     for (int i = 0; i < frame->height; i++)
-        memset(frame->data[0] + frame->linesize[0] * i, 0x80, frame->width);
+        memset(frame->data[0] + frame->linesize[0] * i, luma, frame->width);
+
+    if (!frame->data[1])
+        return;
+    av_pix_fmt_get_chroma_sub_sample(frame->format, &h_chroma_shift, &v_chroma_shift);
     for (int i = 0; i < AV_CEIL_RSHIFT(frame->height, v_chroma_shift); i++) {
         memset(frame->data[1] + frame->linesize[1] * i,
                0x80, AV_CEIL_RSHIFT(frame->width, h_chroma_shift));
@@ -281,7 +308,7 @@ int ff_mpv_frame_start(MpegEncContext *s, AVCodecContext *avctx)
     if (s->pict_type != AV_PICTURE_TYPE_B && s->last_picture_ptr &&
         s->last_picture_ptr != s->next_picture_ptr &&
         s->last_picture_ptr->f->buf[0]) {
-        ff_mpeg_unref_picture(s->avctx, s->last_picture_ptr);
+        ff_mpeg_unref_picture(s->last_picture_ptr);
     }
 
     /* release non reference/forgotten frames */
@@ -290,13 +317,13 @@ int ff_mpv_frame_start(MpegEncContext *s, AVCodecContext *avctx)
             (&s->picture[i] != s->last_picture_ptr &&
              &s->picture[i] != s->next_picture_ptr &&
              !s->picture[i].needs_realloc)) {
-            ff_mpeg_unref_picture(s->avctx, &s->picture[i]);
+            ff_mpeg_unref_picture(&s->picture[i]);
         }
     }
 
-    ff_mpeg_unref_picture(s->avctx, &s->current_picture);
-    ff_mpeg_unref_picture(s->avctx, &s->last_picture);
-    ff_mpeg_unref_picture(s->avctx, &s->next_picture);
+    ff_mpeg_unref_picture(&s->current_picture);
+    ff_mpeg_unref_picture(&s->last_picture);
+    ff_mpeg_unref_picture(&s->next_picture);
 
     if (s->current_picture_ptr && !s->current_picture_ptr->f->buf[0]) {
         // we already have an unused image
@@ -345,7 +372,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
     else
         s->current_picture_ptr->f->flags &= ~AV_FRAME_FLAG_KEY;
 
-    if ((ret = ff_mpeg_ref_picture(s->avctx, &s->current_picture,
+    if ((ret = ff_mpeg_ref_picture(&s->current_picture,
                                    s->current_picture_ptr)) < 0)
         return ret;
 
@@ -363,9 +390,6 @@ FF_ENABLE_DEPRECATION_WARNINGS
 
     if ((!s->last_picture_ptr || !s->last_picture_ptr->f->buf[0]) &&
         (s->pict_type != AV_PICTURE_TYPE_I)) {
-        int h_chroma_shift, v_chroma_shift;
-        av_pix_fmt_get_chroma_sub_sample(s->avctx->pix_fmt,
-                                         &h_chroma_shift, &v_chroma_shift);
         if (s->pict_type == AV_PICTURE_TYPE_B && s->next_picture_ptr && s->next_picture_ptr->f->buf[0])
             av_log(avctx, AV_LOG_DEBUG,
                    "allocating dummy last picture for B frame\n");
@@ -391,23 +415,8 @@ FF_ENABLE_DEPRECATION_WARNINGS
         }
 
         if (!avctx->hwaccel) {
-            for (int i = 0; i < avctx->height; i++)
-                memset(s->last_picture_ptr->f->data[0] + s->last_picture_ptr->f->linesize[0]*i,
-                       0x80, avctx->width);
-            if (s->last_picture_ptr->f->data[2]) {
-                for (int i = 0; i < AV_CEIL_RSHIFT(avctx->height, v_chroma_shift); i++) {
-                    memset(s->last_picture_ptr->f->data[1] + s->last_picture_ptr->f->linesize[1]*i,
-                        0x80, AV_CEIL_RSHIFT(avctx->width, h_chroma_shift));
-                    memset(s->last_picture_ptr->f->data[2] + s->last_picture_ptr->f->linesize[2]*i,
-                        0x80, AV_CEIL_RSHIFT(avctx->width, h_chroma_shift));
-                }
-            }
-
-            if (s->codec_id == AV_CODEC_ID_FLV1 || s->codec_id == AV_CODEC_ID_H263) {
-                for (int i = 0; i < avctx->height; i++)
-                    memset(s->last_picture_ptr->f->data[0] + s->last_picture_ptr->f->linesize[0] * i,
-                           16, avctx->width);
-            }
+            int luma_val = s->codec_id == AV_CODEC_ID_FLV1 || s->codec_id == AV_CODEC_ID_H263 ? 16 : 0x80;
+            color_frame(s->last_picture_ptr->f, luma_val);
         }
 
         ff_thread_report_progress(&s->last_picture_ptr->tf, INT_MAX, 0);
@@ -435,19 +444,15 @@ FF_ENABLE_DEPRECATION_WARNINGS
         ff_thread_report_progress(&s->next_picture_ptr->tf, INT_MAX, 1);
     }
 
-#if 0 // BUFREF-FIXME
-    memset(s->last_picture.f->data, 0, sizeof(s->last_picture.f->data));
-    memset(s->next_picture.f->data, 0, sizeof(s->next_picture.f->data));
-#endif
     if (s->last_picture_ptr) {
         if (s->last_picture_ptr->f->buf[0] &&
-            (ret = ff_mpeg_ref_picture(s->avctx, &s->last_picture,
+            (ret = ff_mpeg_ref_picture(&s->last_picture,
                                        s->last_picture_ptr)) < 0)
             return ret;
     }
     if (s->next_picture_ptr) {
         if (s->next_picture_ptr->f->buf[0] &&
-            (ret = ff_mpeg_ref_picture(s->avctx, &s->next_picture,
+            (ret = ff_mpeg_ref_picture(&s->next_picture,
                                        s->next_picture_ptr)) < 0)
             return ret;
     }
@@ -482,7 +487,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
     }
 
     if (s->avctx->debug & FF_DEBUG_NOMC)
-        gray_frame(s->current_picture_ptr->f);
+        color_frame(s->current_picture_ptr->f, 0x80);
 
     return 0;
 }
@@ -549,12 +554,12 @@ void ff_mpeg_flush(AVCodecContext *avctx)
         return;
 
     for (int i = 0; i < MAX_PICTURE_COUNT; i++)
-        ff_mpeg_unref_picture(s->avctx, &s->picture[i]);
+        ff_mpeg_unref_picture(&s->picture[i]);
     s->current_picture_ptr = s->last_picture_ptr = s->next_picture_ptr = NULL;
 
-    ff_mpeg_unref_picture(s->avctx, &s->current_picture);
-    ff_mpeg_unref_picture(s->avctx, &s->last_picture);
-    ff_mpeg_unref_picture(s->avctx, &s->next_picture);
+    ff_mpeg_unref_picture(&s->current_picture);
+    ff_mpeg_unref_picture(&s->last_picture);
+    ff_mpeg_unref_picture(&s->next_picture);
 
     s->mb_x = s->mb_y = 0;
 

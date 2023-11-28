@@ -203,11 +203,7 @@ static int decode_ext_header(WMV2DecContext *w)
 
 int ff_wmv2_decode_picture_header(MpegEncContext *s)
 {
-    WMV2DecContext *const w = (WMV2DecContext *) s;
     int code;
-
-    if (s->picture_number == 0)
-        decode_ext_header(w);
 
     s->pict_type = get_bits1(&s->gb) + 1;
     if (s->pict_type == AV_PICTURE_TYPE_I) {
@@ -333,7 +329,6 @@ int ff_wmv2_decode_secondary_picture_header(MpegEncContext *s)
     }
     s->esc3_level_length = 0;
     s->esc3_run_length   = 0;
-    s->picture_number++; // FIXME ?
 
     if (w->j_type) {
         ff_intrax8_decode_picture(&w->x8, &s->current_picture,
@@ -473,7 +468,7 @@ static int wmv2_decode_mb(MpegEncContext *s, int16_t block[6][64])
         if (get_bits_left(&s->gb) <= 0)
             return AVERROR_INVALIDDATA;
 
-        code = get_vlc2(&s->gb, ff_mb_non_intra_vlc[w->cbp_table_index].table,
+        code = get_vlc2(&s->gb, ff_mb_non_intra_vlc[w->cbp_table_index],
                         MB_NON_INTRA_VLC_BITS, 3);
         s->mb_intra = (~code & 0x40) >> 6;
 
@@ -482,7 +477,7 @@ static int wmv2_decode_mb(MpegEncContext *s, int16_t block[6][64])
         s->mb_intra = 1;
         if (get_bits_left(&s->gb) <= 0)
             return AVERROR_INVALIDDATA;
-        code = get_vlc2(&s->gb, ff_msmp4_mb_i_vlc.table,
+        code = get_vlc2(&s->gb, ff_msmp4_mb_i_vlc,
                         MSMP4_MB_INTRA_VLC_BITS, 2);
         /* predict coded block pattern */
         cbp = 0;
@@ -539,7 +534,7 @@ static int wmv2_decode_mb(MpegEncContext *s, int16_t block[6][64])
                 show_bits(&s->gb, 24));
         s->ac_pred = get_bits1(&s->gb);
         if (s->inter_intra_pred) {
-            s->h263_aic_dir = get_vlc2(&s->gb, ff_inter_intra_vlc.table,
+            s->h263_aic_dir = get_vlc2(&s->gb, ff_inter_intra_vlc,
                                        INTER_INTRA_VLC_BITS, 1);
             ff_dlog(s->avctx, "%d%d %d %d/",
                     s->ac_pred, s->h263_aic_dir, s->mb_x, s->mb_y);
@@ -577,6 +572,8 @@ static av_cold int wmv2_decode_init(AVCodecContext *avctx)
     s->decode_mb = wmv2_decode_mb;
 
     ff_wmv2_common_init(s);
+
+    decode_ext_header(w);
 
     return ff_intrax8_common_init(avctx, &w->x8,
                                   w->s.block, w->s.block_last_index,

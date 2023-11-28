@@ -112,12 +112,17 @@ static const uint32_t btype2mb_type[11] = {
     MB_TYPE_QUANT | MB_TYPE_L0L1 | MB_TYPE_CBP,
 };
 
+// ==> Start patch MPC
+int decode_chunks(AVCodecContext* avctx, AVFrame* picture,
+                  int* got_output, const uint8_t* buf, int buf_size);
+// ==> End patch MPC
+
 /* as H.263, but only 17 codes */
 static int mpeg_decode_motion(MpegEncContext *s, int fcode, int pred)
 {
     int code, sign, val, shift;
 
-    code = get_vlc2(&s->gb, ff_mv_vlc.table, MV_VLC_BITS, 2);
+    code = get_vlc2(&s->gb, ff_mv_vlc, MV_VLC_BITS, 2);
     if (code == 0)
         return pred;
     if (code < 0)
@@ -233,94 +238,6 @@ end:
     return 0;
 }
 
-/**
- * Changing this would eat up any speed benefits it has.
- * Do not use "fast" flag if you need the code to be robust.
- */
-static inline int mpeg1_fast_decode_block_inter(MpegEncContext *s,
-                                                int16_t *block, int n)
-{
-    int level, i, j, run;
-    uint8_t *const scantable = s->intra_scantable.permutated;
-    const int qscale         = s->qscale;
-
-    {
-        OPEN_READER(re, &s->gb);
-        i = -1;
-        // Special case for first coefficient, no need to add second VLC table.
-        UPDATE_CACHE(re, &s->gb);
-        if (((int32_t) GET_CACHE(re, &s->gb)) < 0) {
-            level = (3 * qscale) >> 1;
-            level = (level - 1) | 1;
-            if (GET_CACHE(re, &s->gb) & 0x40000000)
-                level = -level;
-            block[0] = level;
-            i++;
-            SKIP_BITS(re, &s->gb, 2);
-            if (((int32_t) GET_CACHE(re, &s->gb)) <= (int32_t) 0xBFFFFFFF)
-                goto end;
-        }
-
-        /* now quantify & encode AC coefficients */
-        for (;;) {
-            GET_RL_VLC(level, run, re, &s->gb, ff_mpeg1_rl_vlc,
-                       TEX_VLC_BITS, 2, 0);
-
-            if (level != 0) {
-                i += run;
-                if (i > MAX_INDEX)
-                    break;
-                j = scantable[i];
-                level = ((level * 2 + 1) * qscale) >> 1;
-                level = (level - 1) | 1;
-                level = (level ^ SHOW_SBITS(re, &s->gb, 1)) -
-                        SHOW_SBITS(re, &s->gb, 1);
-                SKIP_BITS(re, &s->gb, 1);
-            } else {
-                /* escape */
-                run = SHOW_UBITS(re, &s->gb, 6) + 1;
-                LAST_SKIP_BITS(re, &s->gb, 6);
-                UPDATE_CACHE(re, &s->gb);
-                level = SHOW_SBITS(re, &s->gb, 8);
-                SKIP_BITS(re, &s->gb, 8);
-                if (level == -128) {
-                    level = SHOW_UBITS(re, &s->gb, 8) - 256;
-                    SKIP_BITS(re, &s->gb, 8);
-                } else if (level == 0) {
-                    level = SHOW_UBITS(re, &s->gb, 8);
-                    SKIP_BITS(re, &s->gb, 8);
-                }
-                i += run;
-                if (i > MAX_INDEX)
-                    break;
-                j = scantable[i];
-                if (level < 0) {
-                    level = -level;
-                    level = ((level * 2 + 1) * qscale) >> 1;
-                    level = (level - 1) | 1;
-                    level = -level;
-                } else {
-                    level = ((level * 2 + 1) * qscale) >> 1;
-                    level = (level - 1) | 1;
-                }
-            }
-
-            block[j] = level;
-            if (((int32_t) GET_CACHE(re, &s->gb)) <= (int32_t) 0xBFFFFFFF)
-                break;
-            UPDATE_CACHE(re, &s->gb);
-        }
-end:
-        LAST_SKIP_BITS(re, &s->gb, 2);
-        CLOSE_READER(re, &s->gb);
-    }
-
-    check_scantable_index(s, i);
-
-    s->block_last_index[n] = i;
-    return 0;
-}
-
 static inline int mpeg2_decode_block_non_intra(MpegEncContext *s,
                                                int16_t *block, int n)
 {
@@ -399,81 +316,6 @@ end:
         CLOSE_READER(re, &s->gb);
     }
     block[63] ^= (mismatch & 1);
-
-    check_scantable_index(s, i);
-
-    s->block_last_index[n] = i;
-    return 0;
-}
-
-/**
- * Changing this would eat up any speed benefits it has.
- * Do not use "fast" flag if you need the code to be robust.
- */
-static inline int mpeg2_fast_decode_block_non_intra(MpegEncContext *s,
-                                                    int16_t *block, int n)
-{
-    int level, i, j, run;
-    uint8_t *const scantable = s->intra_scantable.permutated;
-    const int qscale         = s->qscale;
-    OPEN_READER(re, &s->gb);
-    i = -1;
-
-    // special case for first coefficient, no need to add second VLC table
-    UPDATE_CACHE(re, &s->gb);
-    if (((int32_t) GET_CACHE(re, &s->gb)) < 0) {
-        level = (3 * qscale) >> 1;
-        if (GET_CACHE(re, &s->gb) & 0x40000000)
-            level = -level;
-        block[0] = level;
-        i++;
-        SKIP_BITS(re, &s->gb, 2);
-        if (((int32_t) GET_CACHE(re, &s->gb)) <= (int32_t) 0xBFFFFFFF)
-            goto end;
-    }
-
-    /* now quantify & encode AC coefficients */
-    for (;;) {
-        GET_RL_VLC(level, run, re, &s->gb, ff_mpeg1_rl_vlc, TEX_VLC_BITS, 2, 0);
-
-        if (level != 0) {
-            i += run;
-            if (i > MAX_INDEX)
-                break;
-            j = scantable[i];
-            level = ((level * 2 + 1) * qscale) >> 1;
-            level = (level ^ SHOW_SBITS(re, &s->gb, 1)) -
-                    SHOW_SBITS(re, &s->gb, 1);
-            SKIP_BITS(re, &s->gb, 1);
-        } else {
-            /* escape */
-            run = SHOW_UBITS(re, &s->gb, 6) + 1;
-            LAST_SKIP_BITS(re, &s->gb, 6);
-            UPDATE_CACHE(re, &s->gb);
-            level = SHOW_SBITS(re, &s->gb, 12);
-            SKIP_BITS(re, &s->gb, 12);
-
-            i += run;
-            if (i > MAX_INDEX)
-                break;
-            j = scantable[i];
-            if (level < 0) {
-                level = ((-level * 2 + 1) * qscale) >> 1;
-                level = -level;
-            } else {
-                level = ((level * 2 + 1) * qscale) >> 1;
-            }
-        }
-
-        block[j] = level;
-        if (((int32_t) GET_CACHE(re, &s->gb)) <= (int32_t) 0xBFFFFFFF || i > 63)
-            break;
-
-        UPDATE_CACHE(re, &s->gb);
-    }
-end:
-    LAST_SKIP_BITS(re, &s->gb, 2);
-    CLOSE_READER(re, &s->gb);
 
     check_scantable_index(s, i);
 
@@ -563,83 +405,6 @@ static inline int mpeg2_decode_block_intra(MpegEncContext *s,
     return 0;
 }
 
-/**
- * Changing this would eat up any speed benefits it has.
- * Do not use "fast" flag if you need the code to be robust.
- */
-static inline int mpeg2_fast_decode_block_intra(MpegEncContext *s,
-                                                int16_t *block, int n)
-{
-    int level, dc, diff, i, j, run;
-    int component;
-    const RL_VLC_ELEM *rl_vlc;
-    uint8_t *const scantable = s->intra_scantable.permutated;
-    const uint16_t *quant_matrix;
-    const int qscale = s->qscale;
-
-    /* DC coefficient */
-    if (n < 4) {
-        quant_matrix = s->intra_matrix;
-        component    = 0;
-    } else {
-        quant_matrix = s->chroma_intra_matrix;
-        component    = (n & 1) + 1;
-    }
-    diff = decode_dc(&s->gb, component);
-    dc = s->last_dc[component];
-    dc += diff;
-    s->last_dc[component] = dc;
-    block[0] = dc * (1 << (3 - s->intra_dc_precision));
-    i = 0;
-    if (s->intra_vlc_format)
-        rl_vlc = ff_mpeg2_rl_vlc;
-    else
-        rl_vlc = ff_mpeg1_rl_vlc;
-
-    {
-        OPEN_READER(re, &s->gb);
-        /* now quantify & encode AC coefficients */
-        for (;;) {
-            UPDATE_CACHE(re, &s->gb);
-            GET_RL_VLC(level, run, re, &s->gb, rl_vlc,
-                       TEX_VLC_BITS, 2, 0);
-
-            if (level >= 64 || i > 63) {
-                break;
-            } else if (level != 0) {
-                i += run;
-                j = scantable[i];
-                level = (level * qscale * quant_matrix[j]) >> 4;
-                level = (level ^ SHOW_SBITS(re, &s->gb, 1)) -
-                        SHOW_SBITS(re, &s->gb, 1);
-                LAST_SKIP_BITS(re, &s->gb, 1);
-            } else {
-                /* escape */
-                run = SHOW_UBITS(re, &s->gb, 6) + 1;
-                SKIP_BITS(re, &s->gb, 6);
-                level = SHOW_SBITS(re, &s->gb, 12);
-                LAST_SKIP_BITS(re, &s->gb, 12);
-                i += run;
-                j = scantable[i];
-                if (level < 0) {
-                    level = (-level * qscale * quant_matrix[j]) >> 4;
-                    level = -level;
-                } else {
-                    level = (level * qscale * quant_matrix[j]) >> 4;
-                }
-            }
-
-            block[j] = level;
-        }
-        CLOSE_READER(re, &s->gb);
-    }
-
-    check_scantable_index(s, i);
-
-    s->block_last_index[n] = i;
-    return 0;
-}
-
 /******************************************/
 /* decoding */
 
@@ -710,7 +475,7 @@ static int mpeg_decode_mb(MpegEncContext *s, int16_t block[12][64])
         }
         break;
     case AV_PICTURE_TYPE_P:
-        mb_type = get_vlc2(&s->gb, ff_mb_ptype_vlc.table, MB_PTYPE_VLC_BITS, 1);
+        mb_type = get_vlc2(&s->gb, ff_mb_ptype_vlc, MB_PTYPE_VLC_BITS, 1);
         if (mb_type < 0) {
             av_log(s->avctx, AV_LOG_ERROR,
                    "Invalid mb type in P-frame at %d %d\n", s->mb_x, s->mb_y);
@@ -719,7 +484,7 @@ static int mpeg_decode_mb(MpegEncContext *s, int16_t block[12][64])
         mb_type = ptype2mb_type[mb_type];
         break;
     case AV_PICTURE_TYPE_B:
-        mb_type = get_vlc2(&s->gb, ff_mb_btype_vlc.table, MB_BTYPE_VLC_BITS, 1);
+        mb_type = get_vlc2(&s->gb, ff_mb_btype_vlc, MB_BTYPE_VLC_BITS, 1);
         if (mb_type < 0) {
             av_log(s->avctx, AV_LOG_ERROR,
                    "Invalid mb type in B-frame at %d %d\n", s->mb_x, s->mb_y);
@@ -767,14 +532,9 @@ static int mpeg_decode_mb(MpegEncContext *s, int16_t block[12][64])
         s->mb_intra = 1;
 
         if (s->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
-            if (s->avctx->flags2 & AV_CODEC_FLAG2_FAST) {
-                for (i = 0; i < 6; i++)
-                    mpeg2_fast_decode_block_intra(s, *s->pblocks[i], i);
-            } else {
-                for (i = 0; i < mb_block_count; i++)
-                    if ((ret = mpeg2_decode_block_intra(s, *s->pblocks[i], i)) < 0)
-                        return ret;
-            }
+            for (i = 0; i < mb_block_count; i++)
+                if ((ret = mpeg2_decode_block_intra(s, *s->pblocks[i], i)) < 0)
+                    return ret;
         } else {
             for (i = 0; i < 6; i++) {
                 ret = ff_mpeg1_decode_block_intra(&s->gb,
@@ -981,7 +741,7 @@ static int mpeg_decode_mb(MpegEncContext *s, int16_t block[12][64])
         if (HAS_CBP(mb_type)) {
             s->bdsp.clear_blocks(s->block[0]);
 
-            cbp = get_vlc2(&s->gb, ff_mb_pat_vlc.table, MB_PAT_VLC_BITS, 1);
+            cbp = get_vlc2(&s->gb, ff_mb_pat_vlc, MB_PAT_VLC_BITS, 1);
             if (mb_block_count > 6) {
                 cbp *= 1 << mb_block_count - 6;
                 cbp  |= get_bits(&s->gb, mb_block_count - 6);
@@ -994,46 +754,26 @@ static int mpeg_decode_mb(MpegEncContext *s, int16_t block[12][64])
             }
 
             if (s->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
-                if (s->avctx->flags2 & AV_CODEC_FLAG2_FAST) {
-                    for (i = 0; i < 6; i++) {
-                        if (cbp & 32)
-                            mpeg2_fast_decode_block_non_intra(s, *s->pblocks[i], i);
-                        else
-                            s->block_last_index[i] = -1;
-                        cbp += cbp;
-                    }
-                } else {
-                    cbp <<= 12 - mb_block_count;
+                cbp <<= 12 - mb_block_count;
 
-                    for (i = 0; i < mb_block_count; i++) {
-                        if (cbp & (1 << 11)) {
-                            if ((ret = mpeg2_decode_block_non_intra(s, *s->pblocks[i], i)) < 0)
-                                return ret;
-                        } else {
-                            s->block_last_index[i] = -1;
-                        }
-                        cbp += cbp;
+                for (i = 0; i < mb_block_count; i++) {
+                    if (cbp & (1 << 11)) {
+                        if ((ret = mpeg2_decode_block_non_intra(s, *s->pblocks[i], i)) < 0)
+                            return ret;
+                    } else {
+                        s->block_last_index[i] = -1;
                     }
+                    cbp += cbp;
                 }
             } else {
-                if (s->avctx->flags2 & AV_CODEC_FLAG2_FAST) {
-                    for (i = 0; i < 6; i++) {
-                        if (cbp & 32)
-                            mpeg1_fast_decode_block_inter(s, *s->pblocks[i], i);
-                        else
-                            s->block_last_index[i] = -1;
-                        cbp += cbp;
+                for (i = 0; i < 6; i++) {
+                    if (cbp & 32) {
+                        if ((ret = mpeg1_decode_block_inter(s, *s->pblocks[i], i)) < 0)
+                            return ret;
+                    } else {
+                        s->block_last_index[i] = -1;
                     }
-                } else {
-                    for (i = 0; i < 6; i++) {
-                        if (cbp & 32) {
-                            if ((ret = mpeg1_decode_block_inter(s, *s->pblocks[i], i)) < 0)
-                                return ret;
-                        } else {
-                            s->block_last_index[i] = -1;
-                        }
-                        cbp += cbp;
-                    }
+                    cbp += cbp;
                 }
             }
         } else {
@@ -1044,6 +784,50 @@ static int mpeg_decode_mb(MpegEncContext *s, int16_t block[12][64])
 
     s->current_picture.mb_type[s->mb_x + s->mb_y * s->mb_stride] = mb_type;
 
+    return 0;
+}
+
+static av_cold int mpeg_decode_init(AVCodecContext *avctx)
+{
+    Mpeg1Context *s    = avctx->priv_data;
+    MpegEncContext *s2 = &s->mpeg_enc_ctx;
+
+    // ==> Start patch MPC
+    /*
+    if (   avctx->codec_tag != AV_RL32("VCR2")
+        && avctx->codec_tag != AV_RL32("BW10"))
+        avctx->coded_width = avctx->coded_height = 0; // do not trust dimensions from input
+    */
+    // ==> End patch MPC
+    ff_mpv_decode_init(s2, avctx);
+
+    ff_mpeg12_init_vlcs();
+
+    s2->chroma_format              = 1;
+    s->mpeg_enc_ctx_allocated      = 0;
+    s->repeat_field                = 0;
+    avctx->color_range             = AVCOL_RANGE_MPEG;
+    // ==> Start patch MPC
+    if (avctx->extradata_size > 0 && avctx->extradata) {
+        int ret, got_output;
+        ret = decode_chunks(avctx, NULL, &got_output,
+                            avctx->extradata, avctx->extradata_size);
+        s->extradata_decoded = 1;
+        if (ret < 0 && (avctx->err_recognition & AV_EF_EXPLODE)) {
+            return ret;
+        }
+
+        Mpeg1Context* s1 = avctx->priv_data;
+        MpegEncContext* s = &s1->mpeg_enc_ctx;
+
+        if (s->chroma_format < 2)
+            avctx->pix_fmt = AV_PIX_FMT_YUV420P;
+        else if (s->chroma_format == 2)
+            avctx->pix_fmt = AV_PIX_FMT_YUV422P;
+        else
+            avctx->pix_fmt = AV_PIX_FMT_YUV444P;
+    }
+    // ==> End patch MPC
     return 0;
 }
 
@@ -1070,18 +854,6 @@ static int mpeg_decode_update_thread_context(AVCodecContext *avctx,
     return 0;
 }
 #endif
-
-static void quant_matrix_rebuild(uint16_t *matrix, const uint8_t *old_perm,
-                                 const uint8_t *new_perm)
-{
-    uint16_t temp_matrix[64];
-    int i;
-
-    memcpy(temp_matrix, matrix, 64 * sizeof(uint16_t));
-
-    for (i = 0; i < 64; i++)
-        matrix[new_perm[i]] = temp_matrix[old_perm[i]];
-}
 
 static const enum AVPixelFormat mpeg1_hwaccel_pixfmt_list_420[] = {
 #if CONFIG_MPEG1_NVDEC_HWACCEL
@@ -1155,7 +927,6 @@ static int mpeg_decode_postinit(AVCodecContext *avctx)
 {
     Mpeg1Context *s1  = avctx->priv_data;
     MpegEncContext *s = &s1->mpeg_enc_ctx;
-    uint8_t old_permutation[64];
     int ret;
 
     if (avctx->codec_id == AV_CODEC_ID_MPEG1VIDEO) {
@@ -1275,18 +1046,8 @@ FF_ENABLE_DEPRECATION_WARNINGS
 
         avctx->pix_fmt = mpeg_get_pixelformat(avctx);
 
-        /* Quantization matrices may need reordering
-         * if DCT permutation is changed. */
-        memcpy(old_permutation, s->idsp.idct_permutation, 64 * sizeof(uint8_t));
-
-        ff_mpv_idct_init(s);
         if ((ret = ff_mpv_common_init(s)) < 0)
             return ret;
-
-        quant_matrix_rebuild(s->intra_matrix,        old_permutation, s->idsp.idct_permutation);
-        quant_matrix_rebuild(s->inter_matrix,        old_permutation, s->idsp.idct_permutation);
-        quant_matrix_rebuild(s->chroma_intra_matrix, old_permutation, s->idsp.idct_permutation);
-        quant_matrix_rebuild(s->chroma_inter_matrix, old_permutation, s->idsp.idct_permutation);
 
         s1->mpeg_enc_ctx_allocated = 1;
     }
@@ -1330,11 +1091,6 @@ static int mpeg1_decode_picture(AVCodecContext *avctx, const uint8_t *buf,
         s->mpeg_f_code[1][0] = f_code;
         s->mpeg_f_code[1][1] = f_code;
     }
-    s->current_picture.f->pict_type = s->pict_type;
-    if (s->pict_type == AV_PICTURE_TYPE_I)
-        s->current_picture.f->flags |= AV_FRAME_FLAG_KEY;
-    else
-        s->current_picture.f->flags &= ~AV_FRAME_FLAG_KEY;
 
     if (avctx->debug & FF_DEBUG_PICT_INFO)
         av_log(avctx, AV_LOG_DEBUG,
@@ -1508,11 +1264,6 @@ static int mpeg_decode_picture_coding_extension(Mpeg1Context *s1)
                 s->pict_type = AV_PICTURE_TYPE_P;
         } else
             s->pict_type = AV_PICTURE_TYPE_B;
-        s->current_picture.f->pict_type = s->pict_type;
-        if (s->pict_type == AV_PICTURE_TYPE_I)
-            s->current_picture.f->flags |= AV_FRAME_FLAG_KEY;
-        else
-            s->current_picture.f->flags &= ~AV_FRAME_FLAG_KEY;
     }
 
     s->intra_dc_precision         = get_bits(&s->gb, 2);
@@ -1701,7 +1452,7 @@ static int mpeg_decode_slice(MpegEncContext *s, int mb_y,
         skip_bits1(&s->gb);
     } else {
         while (get_bits_left(&s->gb) > 0) {
-            int code = get_vlc2(&s->gb, ff_mbincr_vlc.table,
+            int code = get_vlc2(&s->gb, ff_mbincr_vlc,
                                 MBINCR_VLC_BITS, 2);
             if (code < 0) {
                 av_log(s->avctx, AV_LOG_ERROR, "first mb_incr damaged\n");
@@ -1870,7 +1621,7 @@ static int mpeg_decode_slice(MpegEncContext *s, int mb_y,
             /* read increment again */
             s->mb_skip_run = 0;
             for (;;) {
-                int code = get_vlc2(&s->gb, ff_mbincr_vlc.table,
+                int code = get_vlc2(&s->gb, ff_mbincr_vlc,
                                     MBINCR_VLC_BITS, 2);
                 if (code < 0) {
                     av_log(s->avctx, AV_LOG_ERROR, "mb incr damaged\n");
@@ -2147,7 +1898,6 @@ static int vcr2_init_sequence(AVCodecContext *avctx)
 
     avctx->pix_fmt = mpeg_get_pixelformat(avctx);
 
-    ff_mpv_idct_init(s);
     if ((ret = ff_mpv_common_init(s)) < 0)
         return ret;
     s1->mpeg_enc_ctx_allocated = 1;
@@ -2418,7 +2168,9 @@ static int mpeg_decode_gop(AVCodecContext *avctx,
     return 0;
 }
 
-static int decode_chunks(AVCodecContext *avctx, AVFrame *picture,
+// ==> Start patch MPC
+/*static */int decode_chunks(AVCodecContext* avctx, AVFrame* picture,
+// ==> End patch MPC
                          int *got_output, const uint8_t *buf, int buf_size)
 {
     Mpeg1Context *s = avctx->priv_data;
@@ -2757,57 +2509,6 @@ static int decode_chunks(AVCodecContext *avctx, AVFrame *picture,
     }
 }
 
-static av_cold int mpeg_decode_init(AVCodecContext *avctx)
-{
-    Mpeg1Context *s    = avctx->priv_data;
-    MpegEncContext *s2 = &s->mpeg_enc_ctx;
-
-    // ==> Start patch MPC
-    /*
-    if (   avctx->codec_tag != AV_RL32("VCR2")
-        && avctx->codec_tag != AV_RL32("BW10"))
-        avctx->coded_width = avctx->coded_height = 0; // do not trust dimensions from input
-    */
-    // ==> End patch MPC
-    ff_mpv_decode_init(s2, avctx);
-
-    s->mpeg_enc_ctx.avctx  = avctx;
-
-    /* we need some permutation to store matrices,
-     * until the decoder sets the real permutation. */
-    ff_mpv_idct_init(s2);
-//    ff_mpeg12_common_init(&s->mpeg_enc_ctx);
-    ff_mpeg12_init_vlcs();
-
-    s2->chroma_format              = 1;
-    s->mpeg_enc_ctx_allocated      = 0;
-    s->mpeg_enc_ctx.picture_number = 0;
-    s->repeat_field                = 0;
-    avctx->color_range             = AVCOL_RANGE_MPEG;
-    // ==> Start patch MPC
-    if (avctx->extradata_size > 0 && avctx->extradata) {
-        int ret, got_output;
-        ret = decode_chunks(avctx, NULL, &got_output,
-                            avctx->extradata, avctx->extradata_size);
-        s->extradata_decoded = 1;
-        if (ret < 0 && (avctx->err_recognition & AV_EF_EXPLODE)) {
-            return ret;
-        }
-
-        Mpeg1Context* s1 = avctx->priv_data;
-        MpegEncContext* s = &s1->mpeg_enc_ctx;
-
-        if (s->chroma_format < 2)
-            avctx->pix_fmt = AV_PIX_FMT_YUV420P;
-        else if (s->chroma_format == 2)
-            avctx->pix_fmt = AV_PIX_FMT_YUV422P;
-        else
-            avctx->pix_fmt = AV_PIX_FMT_YUV444P;
-    }
-    // ==> End patch MPC
-    return 0;
-}
-
 static int mpeg_decode_frame(AVCodecContext *avctx, AVFrame *picture,
                              int *got_output, AVPacket *avpkt)
 {
@@ -3103,7 +2804,6 @@ static av_cold int ipu_decode_init(AVCodecContext *avctx)
     avctx->pix_fmt = AV_PIX_FMT_YUV420P;
 
     ff_mpv_decode_init(m, avctx);
-    ff_mpv_idct_init(m);
     ff_mpeg12_init_vlcs();
 
     for (int i = 0; i < 64; i++) {

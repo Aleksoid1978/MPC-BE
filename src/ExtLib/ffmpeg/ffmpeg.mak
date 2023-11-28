@@ -92,6 +92,7 @@ SRCS_LC = \
 	libavcodec/aac_adtstoasc_bsf.c \
 	libavcodec/aac_parser.c \
 	libavcodec/aacdec.c \
+	libavcodec/aacdec_common.c \
 	libavcodec/aacps.c \
 	libavcodec/aacps_common.c \
 	libavcodec/aacps_float.c \
@@ -184,7 +185,6 @@ SRCS_LC = \
 	libavcodec/dcadec.c \
 	libavcodec/dcadsp.c \
 	libavcodec/dcahuff.c \
-	libavcodec/dct.c \
 	libavcodec/dct32_fixed.c \
 	libavcodec/dct32_float.c \
 	libavcodec/decode.c \
@@ -226,9 +226,6 @@ SRCS_LC = \
 	libavcodec/faandct.c \
 	libavcodec/faanidct.c \
 	libavcodec/fdctdsp.c \
-	libavcodec/fft_fixed_32.c \
-	libavcodec/fft_float.c \
-	libavcodec/fft_init_table.c \
 	libavcodec/ffv1.c \
 	libavcodec/ffv1dec.c \
 	libavcodec/fic.c \
@@ -341,8 +338,6 @@ SRCS_LC = \
 	libavcodec/magicyuv.c \
 	libavcodec/mathtables.c \
 	libavcodec/me_cmp.c \
-	libavcodec/mdct_fixed_32.c \
-	libavcodec/mdct_float.c \
 	libavcodec/metasound.c \
 	libavcodec/mjpeg_parser.c \
 	libavcodec/mjpeg2jpeg_bsf.c \
@@ -462,7 +457,7 @@ SRCS_LC_B = \
 	libavcodec/rangecoder.c \
 	libavcodec/raw.c \
 	libavcodec/rawdec.c \
-	libavcodec/rdft.c \
+	libavcodec/refstruct.c \
 	libavcodec/remove_extradata_bsf.c \
 	libavcodec/rl.c \
 	libavcodec/rpza.c \
@@ -585,12 +580,10 @@ SRCS_LC_B = \
 	libavcodec/x86/cfhddsp_init.c \
 	libavcodec/x86/constants.c \
 	libavcodec/x86/dcadsp_init.c \
-	libavcodec/x86/dct_init.c \
 	libavcodec/x86/dirac_dwt_init.c \
 	libavcodec/x86/diracdsp_init.c \
 	libavcodec/x86/fdct.c \
 	libavcodec/x86/fdctdsp_init.c \
-	libavcodec/x86/fft_init.c \
 	libavcodec/x86/flacdsp_init.c \
 	libavcodec/x86/fmtconvert_init.c \
 	libavcodec/x86/h263dsp_init.c \
@@ -784,7 +777,6 @@ SRCS_YASM_LC = \
 	libavcodec/x86/dct32.asm \
 	libavcodec/x86/dirac_dwt.asm \
 	libavcodec/x86/diracdsp.asm \
-	libavcodec/x86/fft.asm \
 	libavcodec/x86/flacdsp.asm \
 	libavcodec/x86/fmtconvert.asm \
 	libavcodec/x86/fpel.asm \

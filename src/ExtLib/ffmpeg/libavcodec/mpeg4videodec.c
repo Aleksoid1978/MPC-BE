@@ -42,6 +42,7 @@
 #include "h263.h"
 #include "h263data.h"
 #include "h263dec.h"
+#include "internal.h"
 #include "profiles.h"
 #include "qpeldsp.h"
 #include "threadframe.h"
@@ -57,12 +58,12 @@
 #define MB_TYPE_B_VLC_BITS 4
 #define STUDIO_INTRA_BITS 9
 
-static VLC dc_lum, dc_chrom;
-static VLC sprite_trajectory;
-static VLC mb_type_b_vlc;
-static VLC studio_intra_tab[12];
-static VLC studio_luma_dc;
-static VLC studio_chroma_dc;
+static VLCElem dc_lum[512], dc_chrom[512];
+static VLCElem sprite_trajectory[128];
+static VLCElem mb_type_b_vlc[16];
+static const VLCElem *studio_intra_tab[12];
+static VLCElem studio_luma_dc[528];
+static VLCElem studio_chroma_dc[528];
 
 static const uint8_t mpeg4_block_count[4] = { 0, 6, 8, 12 };
 
@@ -448,14 +449,14 @@ static int mpeg4_decode_sprite_trajectory(Mpeg4DecContext *ctx, GetBitContext *g
         int length;
         int x = 0, y = 0;
 
-        length = get_vlc2(gb, sprite_trajectory.table, SPRITE_TRAJ_VLC_BITS, 2);
+        length = get_vlc2(gb, sprite_trajectory, SPRITE_TRAJ_VLC_BITS, 2);
         if (length > 0)
             x = get_xbits(gb, length);
 
         if (!(ctx->divx_version == 500 && ctx->divx_build == 413))
             check_marker(s->avctx, gb, "before sprite_trajectory");
 
-        length = get_vlc2(gb, sprite_trajectory.table, SPRITE_TRAJ_VLC_BITS, 2);
+        length = get_vlc2(gb, sprite_trajectory, SPRITE_TRAJ_VLC_BITS, 2);
         if (length > 0)
             y = get_xbits(gb, length);
 
@@ -890,9 +891,9 @@ static inline int mpeg4_decode_dc(MpegEncContext *s, int n, int *dir_ptr)
     int level, code;
 
     if (n < 4)
-        code = get_vlc2(&s->gb, dc_lum.table, DC_VLC_BITS, 1);
+        code = get_vlc2(&s->gb, dc_lum, DC_VLC_BITS, 1);
     else
-        code = get_vlc2(&s->gb, dc_chrom.table, DC_VLC_BITS, 1);
+        code = get_vlc2(&s->gb, dc_chrom, DC_VLC_BITS, 1);
 
     if (code < 0 || code > 9 /* && s->nbit < 9 */) {
         av_log(s->avctx, AV_LOG_ERROR, "illegal dc vlc\n");
@@ -960,7 +961,7 @@ static int mpeg4_decode_partition_a(Mpeg4DecContext *ctx)
                     if (show_bits(&s->gb, 19) == DC_MARKER)
                         return mb_num - 1;
 
-                    cbpc = get_vlc2(&s->gb, ff_h263_intra_MCBPC_vlc.table, INTRA_MCBPC_VLC_BITS, 2);
+                    cbpc = get_vlc2(&s->gb, ff_h263_intra_MCBPC_vlc, INTRA_MCBPC_VLC_BITS, 2);
                     if (cbpc < 0) {
                         av_log(s->avctx, AV_LOG_ERROR,
                                "mcbpc corrupted at %d %d\n", s->mb_x, s->mb_y);
@@ -1032,7 +1033,7 @@ try_again:
                     continue;
                 }
 
-                cbpc = get_vlc2(&s->gb, ff_h263_inter_MCBPC_vlc.table, INTER_MCBPC_VLC_BITS, 2);
+                cbpc = get_vlc2(&s->gb, ff_h263_inter_MCBPC_vlc, INTER_MCBPC_VLC_BITS, 2);
                 if (cbpc < 0) {
                     av_log(s->avctx, AV_LOG_ERROR,
                            "mcbpc corrupted at %d %d\n", s->mb_x, s->mb_y);
@@ -1147,7 +1148,7 @@ static int mpeg4_decode_partition_b(MpegEncContext *s, int mb_count)
 
             if (s->pict_type == AV_PICTURE_TYPE_I) {
                 int ac_pred = get_bits1(&s->gb);
-                int cbpy    = get_vlc2(&s->gb, ff_h263_cbpy_vlc.table, CBPY_VLC_BITS, 1);
+                int cbpy    = get_vlc2(&s->gb, ff_h263_cbpy_vlc, CBPY_VLC_BITS, 1);
                 if (cbpy < 0) {
                     av_log(s->avctx, AV_LOG_ERROR,
                            "cbpy corrupted at %d %d\n", s->mb_x, s->mb_y);
@@ -1161,7 +1162,7 @@ static int mpeg4_decode_partition_b(MpegEncContext *s, int mb_count)
                     int i;
                     int dir     = 0;
                     int ac_pred = get_bits1(&s->gb);
-                    int cbpy    = get_vlc2(&s->gb, ff_h263_cbpy_vlc.table, CBPY_VLC_BITS, 1);
+                    int cbpy    = get_vlc2(&s->gb, ff_h263_cbpy_vlc, CBPY_VLC_BITS, 1);
 
                     if (cbpy < 0) {
                         av_log(s->avctx, AV_LOG_ERROR,
@@ -1193,7 +1194,7 @@ static int mpeg4_decode_partition_b(MpegEncContext *s, int mb_count)
                     s->current_picture.qscale_table[xy] = s->qscale;
                     s->cbp_table[xy]                    = 0;
                 } else {
-                    int cbpy = get_vlc2(&s->gb, ff_h263_cbpy_vlc.table, CBPY_VLC_BITS, 1);
+                    int cbpy = get_vlc2(&s->gb, ff_h263_cbpy_vlc, CBPY_VLC_BITS, 1);
 
                     if (cbpy < 0) {
                         av_log(s->avctx, AV_LOG_ERROR,
@@ -1689,7 +1690,7 @@ static int mpeg4_decode_mb(MpegEncContext *s, int16_t block[6][64])
                 }
                 goto end;
             }
-            cbpc = get_vlc2(&s->gb, ff_h263_inter_MCBPC_vlc.table, INTER_MCBPC_VLC_BITS, 2);
+            cbpc = get_vlc2(&s->gb, ff_h263_inter_MCBPC_vlc, INTER_MCBPC_VLC_BITS, 2);
             if (cbpc < 0) {
                 av_log(s->avctx, AV_LOG_ERROR,
                        "mcbpc damaged at %d %d\n", s->mb_x, s->mb_y);
@@ -1708,7 +1709,7 @@ static int mpeg4_decode_mb(MpegEncContext *s, int16_t block[6][64])
             s->mcsel = get_bits1(&s->gb);
         else
             s->mcsel = 0;
-        cbpy = get_vlc2(&s->gb, ff_h263_cbpy_vlc.table, CBPY_VLC_BITS, 1) ^ 0x0F;
+        cbpy = get_vlc2(&s->gb, ff_h263_cbpy_vlc, CBPY_VLC_BITS, 1) ^ 0x0F;
         if (cbpy < 0) {
             av_log(s->avctx, AV_LOG_ERROR,
                    "P cbpy damaged at %d %d\n", s->mb_x, s->mb_y);
@@ -1839,7 +1840,7 @@ static int mpeg4_decode_mb(MpegEncContext *s, int16_t block[6][64])
             cbp     = 0;
         } else {
             modb2   = get_bits1(&s->gb);
-            mb_type = get_vlc2(&s->gb, mb_type_b_vlc.table, MB_TYPE_B_VLC_BITS, 1);
+            mb_type = get_vlc2(&s->gb, mb_type_b_vlc, MB_TYPE_B_VLC_BITS, 1);
             if (mb_type < 0) {
                 av_log(s->avctx, AV_LOG_ERROR, "illegal MB_type\n");
                 return AVERROR_INVALIDDATA;
@@ -1951,7 +1952,7 @@ static int mpeg4_decode_mb(MpegEncContext *s, int16_t block[6][64])
         int use_intra_dc_vlc;
 
         do {
-            cbpc = get_vlc2(&s->gb, ff_h263_intra_MCBPC_vlc.table, INTRA_MCBPC_VLC_BITS, 2);
+            cbpc = get_vlc2(&s->gb, ff_h263_intra_MCBPC_vlc, INTRA_MCBPC_VLC_BITS, 2);
             if (cbpc < 0) {
                 av_log(s->avctx, AV_LOG_ERROR,
                        "I cbpc damaged at %d %d\n", s->mb_x, s->mb_y);
@@ -1969,7 +1970,7 @@ intra:
         else
             s->current_picture.mb_type[xy] = MB_TYPE_INTRA;
 
-        cbpy = get_vlc2(&s->gb, ff_h263_cbpy_vlc.table, CBPY_VLC_BITS, 1);
+        cbpy = get_vlc2(&s->gb, ff_h263_cbpy_vlc, CBPY_VLC_BITS, 1);
         if (cbpy < 0) {
             av_log(s->avctx, AV_LOG_ERROR,
                    "I cbpy damaged at %d %d\n", s->mb_x, s->mb_y);
@@ -2071,7 +2072,7 @@ static int mpeg4_decode_studio_block(MpegEncContext *s, int32_t block[64], int n
 
     int cc, dct_dc_size, dct_diff, code, j, idx = 1, group = 0, run = 0,
         additional_code_len, sign, mismatch;
-    const VLC *cur_vlc = &studio_intra_tab[0];
+    const VLCElem *cur_vlc = studio_intra_tab[0];
     uint8_t *const scantable = s->intra_scantable.permutated;
     const uint16_t *quant_matrix;
     uint32_t flc;
@@ -2085,14 +2086,14 @@ static int mpeg4_decode_studio_block(MpegEncContext *s, int32_t block[64], int n
 
     if (n < 4) {
         cc = 0;
-        dct_dc_size = get_vlc2(&s->gb, studio_luma_dc.table, STUDIO_INTRA_BITS, 2);
+        dct_dc_size = get_vlc2(&s->gb, studio_luma_dc, STUDIO_INTRA_BITS, 2);
         quant_matrix = s->intra_matrix;
     } else {
         cc = (n & 1) + 1;
         if (ctx->rgb)
-            dct_dc_size = get_vlc2(&s->gb, studio_luma_dc.table, STUDIO_INTRA_BITS, 2);
+            dct_dc_size = get_vlc2(&s->gb, studio_luma_dc, STUDIO_INTRA_BITS, 2);
         else
-            dct_dc_size = get_vlc2(&s->gb, studio_chroma_dc.table, STUDIO_INTRA_BITS, 2);
+            dct_dc_size = get_vlc2(&s->gb, studio_chroma_dc, STUDIO_INTRA_BITS, 2);
         quant_matrix = s->chroma_intra_matrix;
     }
 
@@ -2121,7 +2122,7 @@ static int mpeg4_decode_studio_block(MpegEncContext *s, int32_t block[64], int n
 
     /* AC Coefficients */
     while (1) {
-        group = get_vlc2(&s->gb, cur_vlc->table, STUDIO_INTRA_BITS, 2);
+        group = get_vlc2(&s->gb, cur_vlc, STUDIO_INTRA_BITS, 2);
 
         if (group < 0) {
             av_log(s->avctx, AV_LOG_ERROR, "illegal ac coefficient group vlc\n");
@@ -2129,7 +2130,7 @@ static int mpeg4_decode_studio_block(MpegEncContext *s, int32_t block[64], int n
         }
 
         additional_code_len = ac_state_tab[group][0];
-        cur_vlc = &studio_intra_tab[ac_state_tab[group][1]];
+        cur_vlc = studio_intra_tab[ac_state_tab[group][1]];
 
         if (group == 0) {
             /* End of Block */
@@ -3141,9 +3142,6 @@ static int decode_vop_header(Mpeg4DecContext *ctx, GetBitContext *gb,
 
         av_log(s->avctx, AV_LOG_WARNING,
                "time_increment_bits set to %d bits, based on bitstream analysis\n", ctx->time_increment_bits);
-        if (s->avctx->framerate.num && 4*s->avctx->framerate.num < 1<<ctx->time_increment_bits) {
-            s->avctx->framerate.num = 1<<ctx->time_increment_bits;
-        }
     }
 
     if (IS_3IV1)
@@ -3760,28 +3758,25 @@ static int mpeg4_update_thread_context_for_user(AVCodecContext *dst,
 static av_cold void mpeg4_init_static(void)
 {
     static uint8_t mpeg4_rvlc_rl_tables[2][2][2 * MAX_RUN + MAX_LEVEL + 3];
+    static VLCElem vlc_buf[6498];
+    VLCInitState state = VLC_INIT_STATE(vlc_buf);
 
-    VLC_INIT_STATIC_FROM_LENGTHS(&studio_luma_dc, STUDIO_INTRA_BITS, 19,
-                                 &ff_mpeg4_studio_dc_luma[0][1], 2,
-                                 &ff_mpeg4_studio_dc_luma[0][0], 2, 1,
-                                 0, 0, 528);
+    VLC_INIT_STATIC_TABLE_FROM_LENGTHS(studio_luma_dc, STUDIO_INTRA_BITS, 19,
+                                       &ff_mpeg4_studio_dc_luma[0][1], 2,
+                                       &ff_mpeg4_studio_dc_luma[0][0], 2, 1,
+                                       0, 0);
 
-    VLC_INIT_STATIC_FROM_LENGTHS(&studio_chroma_dc, STUDIO_INTRA_BITS, 19,
-                                 &ff_mpeg4_studio_dc_chroma[0][1], 2,
-                                 &ff_mpeg4_studio_dc_chroma[0][0], 2, 1,
-                                 0, 0, 528);
+    VLC_INIT_STATIC_TABLE_FROM_LENGTHS(studio_chroma_dc, STUDIO_INTRA_BITS, 19,
+                                       &ff_mpeg4_studio_dc_chroma[0][1], 2,
+                                       &ff_mpeg4_studio_dc_chroma[0][0], 2, 1,
+                                       0, 0);
 
-    for (unsigned i = 0, offset = 0; i < 12; i++) {
-        static VLCElem vlc_buf[6498];
-
-        studio_intra_tab[i].table           = &vlc_buf[offset];
-        studio_intra_tab[i].table_allocated = FF_ARRAY_ELEMS(vlc_buf) - offset;
-        ff_vlc_init_from_lengths(&studio_intra_tab[i],
-                                 STUDIO_INTRA_BITS, 24,
-                                 &ff_mpeg4_studio_intra[i][0][1], 2,
-                                 &ff_mpeg4_studio_intra[i][0][0], 2, 1,
-                                 0, VLC_INIT_STATIC_OVERLONG, NULL);
-        offset += studio_intra_tab[i].table_size;
+    for (unsigned i = 0; i < 12; i++) {
+        studio_intra_tab[i] =
+            ff_vlc_init_tables_from_lengths(&state, STUDIO_INTRA_BITS, 24,
+                                            &ff_mpeg4_studio_intra[i][0][1], 2,
+                                            &ff_mpeg4_studio_intra[i][0][0], 2, 1,
+                                            0, 0);
     }
 
     ff_mpeg4_init_rl_intra();
@@ -3790,18 +3785,18 @@ static av_cold void mpeg4_init_static(void)
     INIT_FIRST_VLC_RL(ff_mpeg4_rl_intra, 554);
     VLC_INIT_RL(ff_rvlc_rl_inter, 1072);
     INIT_FIRST_VLC_RL(ff_rvlc_rl_intra, 1072);
-    VLC_INIT_STATIC(&dc_lum, DC_VLC_BITS, 10 /* 13 */,
-                    &ff_mpeg4_DCtab_lum[0][1], 2, 1,
-                    &ff_mpeg4_DCtab_lum[0][0], 2, 1, 512);
-    VLC_INIT_STATIC(&dc_chrom, DC_VLC_BITS, 10 /* 13 */,
-                    &ff_mpeg4_DCtab_chrom[0][1], 2, 1,
-                    &ff_mpeg4_DCtab_chrom[0][0], 2, 1, 512);
-    VLC_INIT_STATIC_FROM_LENGTHS(&sprite_trajectory, SPRITE_TRAJ_VLC_BITS, 15,
-                                 ff_sprite_trajectory_lens, 1,
-                                 NULL, 0, 0, 0, 0, 128);
-    VLC_INIT_STATIC(&mb_type_b_vlc, MB_TYPE_B_VLC_BITS, 4,
-                    &ff_mb_type_b_tab[0][1], 2, 1,
-                    &ff_mb_type_b_tab[0][0], 2, 1, 16);
+    VLC_INIT_STATIC_TABLE(dc_lum, DC_VLC_BITS, 10 /* 13 */,
+                          &ff_mpeg4_DCtab_lum[0][1], 2, 1,
+                          &ff_mpeg4_DCtab_lum[0][0], 2, 1, 0);
+    VLC_INIT_STATIC_TABLE(dc_chrom, DC_VLC_BITS, 10 /* 13 */,
+                          &ff_mpeg4_DCtab_chrom[0][1], 2, 1,
+                          &ff_mpeg4_DCtab_chrom[0][0], 2, 1, 0);
+    VLC_INIT_STATIC_TABLE_FROM_LENGTHS(sprite_trajectory, SPRITE_TRAJ_VLC_BITS, 15,
+                                       ff_sprite_trajectory_lens, 1,
+                                       NULL, 0, 0, 0, 0);
+    VLC_INIT_STATIC_TABLE(mb_type_b_vlc, MB_TYPE_B_VLC_BITS, 4,
+                          &ff_mb_type_b_tab[0][1], 2, 1,
+                          &ff_mb_type_b_tab[0][0], 2, 1, 0);
 }
 
 static av_cold int decode_init(AVCodecContext *avctx)
@@ -3830,6 +3825,14 @@ static av_cold int decode_init(AVCodecContext *avctx)
     ff_mpeg4videodsp_init(&ctx->mdsp);
 
     ff_thread_once(&init_static_once, mpeg4_init_static);
+
+    /* Must be after initializing the MPEG-4 static tables */
+    if (avctx->extradata_size && !avctx->internal->is_copy) {
+        GetBitContext gb;
+
+        if (init_get_bits8(&gb, avctx->extradata, avctx->extradata_size) >= 0)
+            ff_mpeg4_decode_picture_header(ctx, &gb, 1, 0);
+    }
 
     return 0;
 }

@@ -204,6 +204,8 @@ static const FormatEntry format_entries[] = {
     [AV_PIX_FMT_GBRAP12BE]   = { 1, 1 },
     [AV_PIX_FMT_GBRP14LE]    = { 1, 1 },
     [AV_PIX_FMT_GBRP14BE]    = { 1, 1 },
+    [AV_PIX_FMT_GBRAP14LE]   = { 1, 1 },
+    [AV_PIX_FMT_GBRAP14BE]   = { 1, 1 },
     [AV_PIX_FMT_GBRP16LE]    = { 1, 1 },
     [AV_PIX_FMT_GBRP16BE]    = { 1, 1 },
     [AV_PIX_FMT_GBRPF32LE]   = { 1, 1 },
@@ -1047,9 +1049,7 @@ int sws_setColorspaceDetails(struct SwsContext *c, const int inv_table[4],
     c->srcRange   = srcRange;
     c->dstRange   = dstRange;
 
-    //The srcBpc check is possibly wrong but we seem to lack a definitive reference to test this
-    //and what we have in ticket 2939 looks better with this check
-    if (need_reinit && (c->srcBpc == 8 || !isYUV(c->srcFormat)))
+    if (need_reinit)
         ff_sws_init_range_convert(c);
 
     c->dstFormatBpp = av_get_bits_per_pixel(desc_dst);
@@ -1227,6 +1227,9 @@ static enum AVPixelFormat alphaless_fmt(enum AVPixelFormat fmt)
 
     case AV_PIX_FMT_GBRAP12LE:          return AV_PIX_FMT_GBRP12;
     case AV_PIX_FMT_GBRAP12BE:          return AV_PIX_FMT_GBRP12;
+
+    case AV_PIX_FMT_GBRAP14LE:          return AV_PIX_FMT_GBRP14;
+    case AV_PIX_FMT_GBRAP14BE:          return AV_PIX_FMT_GBRP14;
 
     case AV_PIX_FMT_GBRAP16LE:          return AV_PIX_FMT_GBRP16;
     case AV_PIX_FMT_GBRAP16BE:          return AV_PIX_FMT_GBRP16;
@@ -1496,6 +1499,7 @@ static av_cold int sws_init_single_context(SwsContext *c, SwsFilter *srcFilter,
         srcFormat != AV_PIX_FMT_GBRAP10BE && srcFormat != AV_PIX_FMT_GBRAP10LE &&
         srcFormat != AV_PIX_FMT_GBRP12BE  && srcFormat != AV_PIX_FMT_GBRP12LE &&
         srcFormat != AV_PIX_FMT_GBRAP12BE && srcFormat != AV_PIX_FMT_GBRAP12LE &&
+        srcFormat != AV_PIX_FMT_GBRAP14BE && srcFormat != AV_PIX_FMT_GBRAP14LE &&
         srcFormat != AV_PIX_FMT_GBRP14BE  && srcFormat != AV_PIX_FMT_GBRP14LE &&
         srcFormat != AV_PIX_FMT_GBRP16BE  && srcFormat != AV_PIX_FMT_GBRP16LE &&
         srcFormat != AV_PIX_FMT_GBRAP16BE  && srcFormat != AV_PIX_FMT_GBRAP16LE &&
@@ -1709,30 +1713,26 @@ static av_cold int sws_init_single_context(SwsContext *c, SwsFilter *srcFilter,
     if (unscaled && !usesHFilter && !usesVFilter &&
         c->alphablend != SWS_ALPHA_BLEND_NONE &&
         isALPHA(srcFormat) &&
-        (c->srcRange == c->dstRange || isAnyRGB(dstFormat)) &&
         alphaless_fmt(srcFormat) == dstFormat
     ) {
         c->convert_unscaled = ff_sws_alphablendaway;
 
         if (flags & SWS_PRINT_INFO)
             av_log(c, AV_LOG_INFO,
-                    "using alpha blendaway %s -> %s special converter\n",
+                    "alpha blendaway %s -> %s special converter is available\n",
                     av_get_pix_fmt_name(srcFormat), av_get_pix_fmt_name(dstFormat));
         return 0;
     }
 
     /* unscaled special cases */
-    if (unscaled && !usesHFilter && !usesVFilter &&
-        (c->srcRange == c->dstRange || isAnyRGB(dstFormat) ||
-         isFloat(srcFormat) || isFloat(dstFormat))){
+    if (unscaled && !usesHFilter && !usesVFilter) {
         ff_get_unscaled_swscale(c);
 
         if (c->convert_unscaled) {
             if (flags & SWS_PRINT_INFO)
                 av_log(c, AV_LOG_INFO,
-                       "using unscaled %s -> %s special converter\n",
+                       "unscaled %s -> %s special converter is available\n",
                        av_get_pix_fmt_name(srcFormat), av_get_pix_fmt_name(dstFormat));
-            return 0;
         }
     }
 

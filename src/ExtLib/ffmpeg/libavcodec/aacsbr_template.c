@@ -32,6 +32,7 @@
  * @author Zoran Basaric ( zoran.basaric@imgtec.com )
  */
 
+#include "aacdectab.h"
 #include "libavutil/qsort.h"
 
 static av_cold void aacsbr_tableinit(void)
@@ -44,34 +45,6 @@ static av_cold void aacsbr_tableinit(void)
 
 av_cold void AAC_RENAME(ff_aac_sbr_init)(void)
 {
-    static const struct {
-        const void *sbr_codes, *sbr_bits;
-        const unsigned int table_size, elem_size;
-    } sbr_tmp[] = {
-        SBR_VLC_ROW(t_huffman_env_1_5dB),
-        SBR_VLC_ROW(f_huffman_env_1_5dB),
-        SBR_VLC_ROW(t_huffman_env_bal_1_5dB),
-        SBR_VLC_ROW(f_huffman_env_bal_1_5dB),
-        SBR_VLC_ROW(t_huffman_env_3_0dB),
-        SBR_VLC_ROW(f_huffman_env_3_0dB),
-        SBR_VLC_ROW(t_huffman_env_bal_3_0dB),
-        SBR_VLC_ROW(f_huffman_env_bal_3_0dB),
-        SBR_VLC_ROW(t_huffman_noise_3_0dB),
-        SBR_VLC_ROW(t_huffman_noise_bal_3_0dB),
-    };
-
-    // SBR VLC table initialization
-    SBR_INIT_VLC_STATIC(0, 1098);
-    SBR_INIT_VLC_STATIC(1, 1092);
-    SBR_INIT_VLC_STATIC(2, 768);
-    SBR_INIT_VLC_STATIC(3, 1026);
-    SBR_INIT_VLC_STATIC(4, 1058);
-    SBR_INIT_VLC_STATIC(5, 1052);
-    SBR_INIT_VLC_STATIC(6, 544);
-    SBR_INIT_VLC_STATIC(7, 544);
-    SBR_INIT_VLC_STATIC(8, 592);
-    SBR_INIT_VLC_STATIC(9, 512);
-
     aacsbr_tableinit();
 
     AAC_RENAME(ff_ps_init)();
@@ -831,37 +804,28 @@ static int read_sbr_envelope(AACContext *ac, SpectralBandReplication *sbr, GetBi
     int bits;
     int i, j, k;
     const VLCElem *t_huff, *f_huff;
-    int t_lav, f_lav;
     const int delta = (ch == 1 && sbr->bs_coupling == 1) + 1;
     const int odd = sbr->n[1] & 1;
 
     if (sbr->bs_coupling && ch) {
         if (ch_data->bs_amp_res) {
             bits   = 5;
-            t_huff = vlc_sbr[T_HUFFMAN_ENV_BAL_3_0DB].table;
-            t_lav  = vlc_sbr_lav[T_HUFFMAN_ENV_BAL_3_0DB];
-            f_huff = vlc_sbr[F_HUFFMAN_ENV_BAL_3_0DB].table;
-            f_lav  = vlc_sbr_lav[F_HUFFMAN_ENV_BAL_3_0DB];
+            t_huff = ff_aac_sbr_vlc[T_HUFFMAN_ENV_BAL_3_0DB];
+            f_huff = ff_aac_sbr_vlc[F_HUFFMAN_ENV_BAL_3_0DB];
         } else {
             bits   = 6;
-            t_huff = vlc_sbr[T_HUFFMAN_ENV_BAL_1_5DB].table;
-            t_lav  = vlc_sbr_lav[T_HUFFMAN_ENV_BAL_1_5DB];
-            f_huff = vlc_sbr[F_HUFFMAN_ENV_BAL_1_5DB].table;
-            f_lav  = vlc_sbr_lav[F_HUFFMAN_ENV_BAL_1_5DB];
+            t_huff = ff_aac_sbr_vlc[T_HUFFMAN_ENV_BAL_1_5DB];
+            f_huff = ff_aac_sbr_vlc[F_HUFFMAN_ENV_BAL_1_5DB];
         }
     } else {
         if (ch_data->bs_amp_res) {
             bits   = 6;
-            t_huff = vlc_sbr[T_HUFFMAN_ENV_3_0DB].table;
-            t_lav  = vlc_sbr_lav[T_HUFFMAN_ENV_3_0DB];
-            f_huff = vlc_sbr[F_HUFFMAN_ENV_3_0DB].table;
-            f_lav  = vlc_sbr_lav[F_HUFFMAN_ENV_3_0DB];
+            t_huff = ff_aac_sbr_vlc[T_HUFFMAN_ENV_3_0DB];
+            f_huff = ff_aac_sbr_vlc[F_HUFFMAN_ENV_3_0DB];
         } else {
             bits   = 7;
-            t_huff = vlc_sbr[T_HUFFMAN_ENV_1_5DB].table;
-            t_lav  = vlc_sbr_lav[T_HUFFMAN_ENV_1_5DB];
-            f_huff = vlc_sbr[F_HUFFMAN_ENV_1_5DB].table;
-            f_lav  = vlc_sbr_lav[F_HUFFMAN_ENV_1_5DB];
+            t_huff = ff_aac_sbr_vlc[T_HUFFMAN_ENV_1_5DB];
+            f_huff = ff_aac_sbr_vlc[F_HUFFMAN_ENV_1_5DB];
         }
     }
 
@@ -870,7 +834,7 @@ static int read_sbr_envelope(AACContext *ac, SpectralBandReplication *sbr, GetBi
             // bs_freq_res[0] == bs_freq_res[bs_num_env] from prev frame
             if (ch_data->bs_freq_res[i + 1] == ch_data->bs_freq_res[i]) {
                 for (j = 0; j < sbr->n[ch_data->bs_freq_res[i + 1]]; j++) {
-                    ch_data->env_facs_q[i + 1][j] = ch_data->env_facs_q[i][j] + delta * (get_vlc2(gb, t_huff, 9, 3) - t_lav);
+                    ch_data->env_facs_q[i + 1][j] = ch_data->env_facs_q[i][j] + delta * get_vlc2(gb, t_huff, 9, 3);
                     if (ch_data->env_facs_q[i + 1][j] > 127U) {
                         av_log(ac->avctx, AV_LOG_ERROR, "env_facs_q %d is invalid\n", ch_data->env_facs_q[i + 1][j]);
                         return AVERROR_INVALIDDATA;
@@ -879,7 +843,7 @@ static int read_sbr_envelope(AACContext *ac, SpectralBandReplication *sbr, GetBi
             } else if (ch_data->bs_freq_res[i + 1]) {
                 for (j = 0; j < sbr->n[ch_data->bs_freq_res[i + 1]]; j++) {
                     k = (j + odd) >> 1; // find k such that f_tablelow[k] <= f_tablehigh[j] < f_tablelow[k + 1]
-                    ch_data->env_facs_q[i + 1][j] = ch_data->env_facs_q[i][k] + delta * (get_vlc2(gb, t_huff, 9, 3) - t_lav);
+                    ch_data->env_facs_q[i + 1][j] = ch_data->env_facs_q[i][k] + delta * get_vlc2(gb, t_huff, 9, 3);
                     if (ch_data->env_facs_q[i + 1][j] > 127U) {
                         av_log(ac->avctx, AV_LOG_ERROR, "env_facs_q %d is invalid\n", ch_data->env_facs_q[i + 1][j]);
                         return AVERROR_INVALIDDATA;
@@ -888,7 +852,7 @@ static int read_sbr_envelope(AACContext *ac, SpectralBandReplication *sbr, GetBi
             } else {
                 for (j = 0; j < sbr->n[ch_data->bs_freq_res[i + 1]]; j++) {
                     k = j ? 2*j - odd : 0; // find k such that f_tablehigh[k] == f_tablelow[j]
-                    ch_data->env_facs_q[i + 1][j] = ch_data->env_facs_q[i][k] + delta * (get_vlc2(gb, t_huff, 9, 3) - t_lav);
+                    ch_data->env_facs_q[i + 1][j] = ch_data->env_facs_q[i][k] + delta * get_vlc2(gb, t_huff, 9, 3);
                     if (ch_data->env_facs_q[i + 1][j] > 127U) {
                         av_log(ac->avctx, AV_LOG_ERROR, "env_facs_q %d is invalid\n", ch_data->env_facs_q[i + 1][j]);
                         return AVERROR_INVALIDDATA;
@@ -898,7 +862,7 @@ static int read_sbr_envelope(AACContext *ac, SpectralBandReplication *sbr, GetBi
         } else {
             ch_data->env_facs_q[i + 1][0] = delta * get_bits(gb, bits); // bs_env_start_value_balance
             for (j = 1; j < sbr->n[ch_data->bs_freq_res[i + 1]]; j++) {
-                ch_data->env_facs_q[i + 1][j] = ch_data->env_facs_q[i + 1][j - 1] + delta * (get_vlc2(gb, f_huff, 9, 3) - f_lav);
+                ch_data->env_facs_q[i + 1][j] = ch_data->env_facs_q[i + 1][j - 1] + delta * get_vlc2(gb, f_huff, 9, 3);
                 if (ch_data->env_facs_q[i + 1][j] > 127U) {
                     av_log(ac->avctx, AV_LOG_ERROR, "env_facs_q %d is invalid\n", ch_data->env_facs_q[i + 1][j]);
                     return AVERROR_INVALIDDATA;
@@ -919,25 +883,20 @@ static int read_sbr_noise(AACContext *ac, SpectralBandReplication *sbr, GetBitCo
 {
     int i, j;
     const VLCElem *t_huff, *f_huff;
-    int t_lav, f_lav;
     int delta = (ch == 1 && sbr->bs_coupling == 1) + 1;
 
     if (sbr->bs_coupling && ch) {
-        t_huff = vlc_sbr[T_HUFFMAN_NOISE_BAL_3_0DB].table;
-        t_lav  = vlc_sbr_lav[T_HUFFMAN_NOISE_BAL_3_0DB];
-        f_huff = vlc_sbr[F_HUFFMAN_ENV_BAL_3_0DB].table;
-        f_lav  = vlc_sbr_lav[F_HUFFMAN_ENV_BAL_3_0DB];
+        t_huff = ff_aac_sbr_vlc[T_HUFFMAN_NOISE_BAL_3_0DB];
+        f_huff = ff_aac_sbr_vlc[F_HUFFMAN_ENV_BAL_3_0DB];
     } else {
-        t_huff = vlc_sbr[T_HUFFMAN_NOISE_3_0DB].table;
-        t_lav  = vlc_sbr_lav[T_HUFFMAN_NOISE_3_0DB];
-        f_huff = vlc_sbr[F_HUFFMAN_ENV_3_0DB].table;
-        f_lav  = vlc_sbr_lav[F_HUFFMAN_ENV_3_0DB];
+        t_huff = ff_aac_sbr_vlc[T_HUFFMAN_NOISE_3_0DB];
+        f_huff = ff_aac_sbr_vlc[F_HUFFMAN_ENV_3_0DB];
     }
 
     for (i = 0; i < ch_data->bs_num_noise; i++) {
         if (ch_data->bs_df_noise[i]) {
             for (j = 0; j < sbr->n_q; j++) {
-                ch_data->noise_facs_q[i + 1][j] = ch_data->noise_facs_q[i][j] + delta * (get_vlc2(gb, t_huff, 9, 2) - t_lav);
+                ch_data->noise_facs_q[i + 1][j] = ch_data->noise_facs_q[i][j] + delta * get_vlc2(gb, t_huff, 9, 2);
                 if (ch_data->noise_facs_q[i + 1][j] > 30U) {
                     av_log(ac->avctx, AV_LOG_ERROR, "noise_facs_q %d is invalid\n", ch_data->noise_facs_q[i + 1][j]);
                     return AVERROR_INVALIDDATA;
@@ -946,7 +905,7 @@ static int read_sbr_noise(AACContext *ac, SpectralBandReplication *sbr, GetBitCo
         } else {
             ch_data->noise_facs_q[i + 1][0] = delta * get_bits(gb, 5); // bs_noise_start_value_balance or bs_noise_start_value_level
             for (j = 1; j < sbr->n_q; j++) {
-                ch_data->noise_facs_q[i + 1][j] = ch_data->noise_facs_q[i + 1][j - 1] + delta * (get_vlc2(gb, f_huff, 9, 3) - f_lav);
+                ch_data->noise_facs_q[i + 1][j] = ch_data->noise_facs_q[i + 1][j - 1] + delta * get_vlc2(gb, f_huff, 9, 3);
                 if (ch_data->noise_facs_q[i + 1][j] > 30U) {
                     av_log(ac->avctx, AV_LOG_ERROR, "noise_facs_q %d is invalid\n", ch_data->noise_facs_q[i + 1][j]);
                     return AVERROR_INVALIDDATA;
@@ -968,8 +927,8 @@ static void read_sbr_extension(AACContext *ac, SpectralBandReplication *sbr,
     switch (bs_extension_id) {
     case EXTENSION_ID_PS:
         if (!ac->oc[1].m4ac.ps) {
-            // ==> Start patch MPC
             av_log(ac->avctx, AV_LOG_ERROR, "Parametric Stereo signaled to be not-present but was found in the bitstream, force stereo output.\n");
+            // ==> Start patch MPC
             *num_bits_left -= ff_ps_read_data(ac->avctx, gb, &sbr->ps.common, *num_bits_left);
             ac->avctx->profile = AV_PROFILE_AAC_HE_V2;
             ac->oc[1].m4ac.ps = 1;
@@ -1574,7 +1533,7 @@ void AAC_RENAME(ff_sbr_apply)(AACContext *ac, SpectralBandReplication *sbr, int 
 
     if (ac->oc[1].m4ac.ps == 1) {
         if (sbr->ps.common.start) {
-            AAC_RENAME(ff_ps_apply)(ac->avctx, &sbr->ps, sbr->X[0], sbr->X[1], sbr->kx[1] + sbr->m[1]);
+            AAC_RENAME(ff_ps_apply)(&sbr->ps, sbr->X[0], sbr->X[1], sbr->kx[1] + sbr->m[1]);
         } else {
             memcpy(sbr->X[1], sbr->X[0], sizeof(sbr->X[0]));
         }

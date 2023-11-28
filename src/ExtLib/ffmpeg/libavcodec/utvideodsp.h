@@ -34,6 +34,7 @@ typedef struct UTVideoDSPContext {
 } UTVideoDSPContext;
 
 void ff_utvideodsp_init(UTVideoDSPContext *c);
+void ff_utvideodsp_init_riscv(UTVideoDSPContext *c);
 void ff_utvideodsp_init_x86(UTVideoDSPContext *c);
 
 #endif /* AVCODEC_UTVIDEODSP_H */

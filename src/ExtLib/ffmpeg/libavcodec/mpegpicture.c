@@ -26,12 +26,10 @@
 #include "libavutil/imgutils.h"
 
 #include "avcodec.h"
-#include "encode.h"
-#include "internal.h"
-#include "decode.h"
 #include "motion_est.h"
 #include "mpegpicture.h"
 #include "mpegutils.h"
+#include "refstruct.h"
 #include "threadframe.h"
 
 static void av_noinline free_picture_tables(Picture *pic)
@@ -124,57 +122,13 @@ int ff_mpeg_framesize_alloc(AVCodecContext *avctx, MotionEstContext *me,
 }
 
 /**
- * Allocate a frame buffer
+ * Check the pic's linesize and allocate linesize dependent scratch buffers
  */
-static int alloc_frame_buffer(AVCodecContext *avctx,  Picture *pic,
-                              MotionEstContext *me, ScratchpadContext *sc,
-                              int chroma_x_shift, int chroma_y_shift,
-                              int linesize, int uvlinesize)
+static int handle_pic_linesizes(AVCodecContext *avctx, Picture *pic,
+                                MotionEstContext *me, ScratchpadContext *sc,
+                                int linesize, int uvlinesize)
 {
-    int edges_needed = av_codec_is_encoder(avctx->codec);
-    int r, ret;
-
-    pic->tf.f = pic->f;
-
-    if (edges_needed) {
-        pic->f->width  = avctx->width  + 2 * EDGE_WIDTH;
-        pic->f->height = avctx->height + 2 * EDGE_WIDTH;
-
-        r = ff_encode_alloc_frame(avctx, pic->f);
-    } else if (avctx->codec_id != AV_CODEC_ID_WMV3IMAGE &&
-               avctx->codec_id != AV_CODEC_ID_VC1IMAGE  &&
-               avctx->codec_id != AV_CODEC_ID_MSS2) {
-        r = ff_thread_get_ext_buffer(avctx, &pic->tf,
-                                     pic->reference ? AV_GET_BUFFER_FLAG_REF : 0);
-    } else {
-        pic->f->width  = avctx->width;
-        pic->f->height = avctx->height;
-        pic->f->format = avctx->pix_fmt;
-        r = avcodec_default_get_buffer2(avctx, pic->f, 0);
-    }
-
-    if (r < 0 || !pic->f->buf[0]) {
-        av_log(avctx, AV_LOG_ERROR, "get_buffer() failed (%d %p)\n",
-               r, pic->f->data[0]);
-        return -1;
-    }
-
-    if (edges_needed) {
-        int i;
-        for (i = 0; pic->f->data[i]; i++) {
-            int offset = (EDGE_WIDTH >> (i ? chroma_y_shift : 0)) *
-                         pic->f->linesize[i] +
-                         (EDGE_WIDTH >> (i ? chroma_x_shift : 0));
-            pic->f->data[i] += offset;
-        }
-        pic->f->width  = avctx->width;
-        pic->f->height = avctx->height;
-    }
-
-    ret = ff_hwaccel_frame_priv_alloc(avctx, &pic->hwaccel_picture_private,
-                                      &pic->hwaccel_priv_buf);
-    if (ret < 0)
-        return ret;
+    int ret;
 
     if ((linesize   &&   linesize != pic->f->linesize[0]) ||
         (uvlinesize && uvlinesize != pic->f->linesize[1])) {
@@ -182,7 +136,7 @@ static int alloc_frame_buffer(AVCodecContext *avctx,  Picture *pic,
                "get_buffer() failed (stride changed: linesize=%d/%d uvlinesize=%d/%d)\n",
                linesize,   pic->f->linesize[0],
                uvlinesize, pic->f->linesize[1]);
-        ff_mpeg_unref_picture(avctx, pic);
+        ff_mpeg_unref_picture(pic);
         return -1;
     }
 
@@ -190,7 +144,7 @@ static int alloc_frame_buffer(AVCodecContext *avctx,  Picture *pic,
         pic->f->linesize[1] != pic->f->linesize[2]) {
         av_log(avctx, AV_LOG_ERROR,
                "get_buffer() failed (uv stride mismatch)\n");
-        ff_mpeg_unref_picture(avctx, pic);
+        ff_mpeg_unref_picture(pic);
         return -1;
     }
 
@@ -199,7 +153,7 @@ static int alloc_frame_buffer(AVCodecContext *avctx,  Picture *pic,
                                        pic->f->linesize[0])) < 0) {
         av_log(avctx, AV_LOG_ERROR,
                "get_buffer() failed to allocate context scratch buffers.\n");
-        ff_mpeg_unref_picture(avctx, pic);
+        ff_mpeg_unref_picture(pic);
         return ret;
     }
 
@@ -247,8 +201,7 @@ static int alloc_picture_tables(AVCodecContext *avctx, Picture *pic, int encodin
  * The pixels are allocated/set by calling get_buffer() if shared = 0
  */
 int ff_alloc_picture(AVCodecContext *avctx, Picture *pic, MotionEstContext *me,
-                     ScratchpadContext *sc, int shared, int encoding,
-                     int chroma_x_shift, int chroma_y_shift, int out_format,
+                     ScratchpadContext *sc, int encoding, int out_format,
                      int mb_stride, int mb_width, int mb_height, int b8_stride,
                      ptrdiff_t *linesize, ptrdiff_t *uvlinesize)
 {
@@ -259,19 +212,12 @@ int ff_alloc_picture(AVCodecContext *avctx, Picture *pic, MotionEstContext *me,
             || pic->alloc_mb_height != mb_height)
             free_picture_tables(pic);
 
-    if (shared) {
-        av_assert0(pic->f->data[0]);
-        pic->shared = 1;
-    } else {
-        av_assert0(!pic->f->buf[0]);
-        if (alloc_frame_buffer(avctx, pic, me, sc,
-                               chroma_x_shift, chroma_y_shift,
-                               *linesize, *uvlinesize) < 0)
-            return -1;
+    if (handle_pic_linesizes(avctx, pic, me, sc,
+                             *linesize, *uvlinesize) < 0)
+        return -1;
 
-        *linesize   = pic->f->linesize[0];
-        *uvlinesize = pic->f->linesize[1];
-    }
+    *linesize   = pic->f->linesize[0];
+    *uvlinesize = pic->f->linesize[1];
 
     if (!pic->qscale_table_buf)
         ret = alloc_picture_tables(avctx, pic, encoding, out_format,
@@ -295,7 +241,7 @@ int ff_alloc_picture(AVCodecContext *avctx, Picture *pic, MotionEstContext *me,
     return 0;
 fail:
     av_log(avctx, AV_LOG_ERROR, "Error allocating a picture.\n");
-    ff_mpeg_unref_picture(avctx, pic);
+    ff_mpeg_unref_picture(pic);
     free_picture_tables(pic);
     return AVERROR(ENOMEM);
 }
@@ -304,24 +250,16 @@ fail:
  * Deallocate a picture; frees the picture tables in case they
  * need to be reallocated anyway.
  */
-void ff_mpeg_unref_picture(AVCodecContext *avctx, Picture *pic)
+void ff_mpeg_unref_picture(Picture *pic)
 {
     pic->tf.f = pic->f;
-    /* WM Image / Screen codecs allocate internal buffers with different
-     * dimensions / colorspaces; ignore user-defined callbacks for these. */
-    if (avctx->codec_id != AV_CODEC_ID_WMV3IMAGE &&
-        avctx->codec_id != AV_CODEC_ID_VC1IMAGE  &&
-        avctx->codec_id != AV_CODEC_ID_MSS2)
-        ff_thread_release_ext_buffer(avctx, &pic->tf);
-    else if (pic->f)
-        av_frame_unref(pic->f);
+    ff_thread_release_ext_buffer(&pic->tf);
 
-    av_buffer_unref(&pic->hwaccel_priv_buf);
+    ff_refstruct_unref(&pic->hwaccel_picture_private);
 
     if (pic->needs_realloc)
         free_picture_tables(pic);
 
-    pic->hwaccel_picture_private = NULL;
     pic->field_picture = 0;
     pic->b_frame_score = 0;
     pic->needs_realloc = 0;
@@ -363,7 +301,7 @@ int ff_update_picture_tables(Picture *dst, const Picture *src)
     return 0;
 }
 
-int ff_mpeg_ref_picture(AVCodecContext *avctx, Picture *dst, Picture *src)
+int ff_mpeg_ref_picture(Picture *dst, Picture *src)
 {
     int ret;
 
@@ -380,14 +318,8 @@ int ff_mpeg_ref_picture(AVCodecContext *avctx, Picture *dst, Picture *src)
     if (ret < 0)
         goto fail;
 
-    if (src->hwaccel_picture_private) {
-        dst->hwaccel_priv_buf = av_buffer_ref(src->hwaccel_priv_buf);
-        if (!dst->hwaccel_priv_buf) {
-            ret = AVERROR(ENOMEM);
-            goto fail;
-        }
-        dst->hwaccel_picture_private = dst->hwaccel_priv_buf->data;
-    }
+    ff_refstruct_replace(&dst->hwaccel_picture_private,
+                          src->hwaccel_picture_private);
 
     dst->field_picture           = src->field_picture;
     dst->b_frame_score           = src->b_frame_score;
@@ -399,7 +331,7 @@ int ff_mpeg_ref_picture(AVCodecContext *avctx, Picture *dst, Picture *src)
 
     return 0;
 fail:
-    ff_mpeg_unref_picture(avctx, dst);
+    ff_mpeg_unref_picture(dst);
     return ret;
 }
 
@@ -451,15 +383,15 @@ int ff_find_unused_picture(AVCodecContext *avctx, Picture *picture, int shared)
 
     if (ret >= 0 && ret < MAX_PICTURE_COUNT) {
         if (picture[ret].needs_realloc) {
-            ff_mpeg_unref_picture(avctx, &picture[ret]);
+            ff_mpeg_unref_picture(&picture[ret]);
         }
     }
     return ret;
 }
 
-void av_cold ff_mpv_picture_free(AVCodecContext *avctx, Picture *pic)
+void av_cold ff_mpv_picture_free(Picture *pic)
 {
     free_picture_tables(pic);
-    ff_mpeg_unref_picture(avctx, pic);
+    ff_mpeg_unref_picture(pic);
     av_frame_free(&pic->f);
 }
