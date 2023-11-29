@@ -2905,8 +2905,13 @@ bool File_Mpeg4::BookMark_Needed()
                 if (StreamTemp.TimeCode && (StreamTemp.stts.size()>1 || (!StreamTemp.stts.empty() && StreamTemp.stts[0].SampleCount>1 && StreamTemp.Parsers.size()==1)))
                 {
                     ((File_Mpeg4_TimeCode*)StreamTemp.Parsers[0])->FirstEditOffset=0;
-                    if (Config->ParseSpeed<=0.5)
+                }
+                if (StreamTemp.TimeCode && StreamTemp.Parsers.size()==1)
+                {
+                    ((File_Mpeg4_TimeCode*)StreamTemp.Parsers[0])->LastUsedOffset=StreamTemp.LastUsedOffset;
+                    if (Config->ParseSpeed<=0.5 && StreamTemp.stco.size()>16)
                     {
+                        ((File_Mpeg4_TimeCode*)StreamTemp.Parsers[0])->AllFramesParsed=false;
                         auto StreamID=Temp->StreamID;
                         for (int j=mdat_Pos.size()-1; j>=0; j--)
                             if (StreamID==mdat_Pos[j].StreamID && mdat_Pos[j].Offset!=stco_ToFind && mdat_Pos[j].Offset!=StreamTemp.FirstUsedOffset && mdat_Pos[j].Offset!=StreamTemp.LastUsedOffset)
@@ -2925,6 +2930,8 @@ bool File_Mpeg4::BookMark_Needed()
                             mdat_Pos_Temp=Temp<mdat_Pos_Max?Temp:nullptr;
                         }
                     }
+                    else
+                        ((File_Mpeg4_TimeCode*)StreamTemp.Parsers[0])->AllFramesParsed=true;
                 }
             }
         }

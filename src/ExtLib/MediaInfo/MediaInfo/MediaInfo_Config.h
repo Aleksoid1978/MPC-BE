@@ -53,6 +53,7 @@ enum basicformat
     enum config_flags1
     {
         Flags_Cover_Data_base64,
+        Flags_Enable_FFmpeg,
     };
 #else //MEDIAINFO_COMPRESS
     #define MEDIAINFO_FLAG1 0
@@ -218,6 +219,10 @@ public :
           Ztring    Cover_Data_Set (const Ztring &NewValue);
           Ztring    Cover_Data_Get ();
           #endif //MEDIAINFO_ADVANCED
+          #if MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)
+          Ztring    Enable_FFmpeg_Set (bool NewValue);
+          bool      Enable_FFmpeg_Get ();
+          #endif //MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES
           #if MEDIAINFO_COMPRESS
           Ztring    Inform_Compress_Set (const Ztring &NewInform);
           Ztring    Inform_Compress_Get ();

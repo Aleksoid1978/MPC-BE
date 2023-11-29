@@ -764,6 +764,9 @@
     <ClInclude Include="MediaInfo\Audio\File_Mga.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\ExternalCommandHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1473,6 +1476,9 @@
     </ClCompile>
     <ClCompile Include="MediaInfo\Audio\File_DtsUhd.cpp">
       <Filter>Header Files\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\ExternalCommandHelpers.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

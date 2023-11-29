@@ -2616,6 +2616,13 @@ void File_Avc::slice_header()
                     PTS_Begin=FrameInfo.PTS;
                     PTS_End=FrameInfo.PTS;
                 }
+                if (IFrame_Count<=1 && TC_Current.IsSet())
+                {
+                    TimeCode TC_Previous(Retrieve_Const(Stream_Video, 0, Video_TimeCode_FirstFrame).To_UTF8(), TC_Current.GetFramesMax());
+                    if (!TC_Previous.IsSet() || TC_Current<TC_Previous)
+                        Fill(Stream_Video, 0, Video_TimeCode_FirstFrame, TC_Current.ToString(), true, true);
+                    TC_Current=TimeCode();
+                }
                 if ((*seq_parameter_set_Item)->pic_order_cnt_type != 1 && (Element_Code != 0x14 || seq_parameter_sets.empty())) //Not slice_layer_extension except if MVC only
                 {
                     if ((!IsSub || Frame_Count_InThisBlock))
@@ -3088,14 +3095,14 @@ void File_Avc::sei_message_pic_timing(int32u /*payloadSize*/, int32u seq_paramet
             Element_Begin1("ClockTS");
             TEST_SB_SKIP(                                       "clock_timestamp_flag");
                 int32u time_offset=0;
-                int8u n_frames;
-                bool nuit_field_based_flag, full_timestamp_flag, cnt_dropped_flag, seconds_flag, minutes_flag, hours_flag;
+                int8u counting_type, n_frames;
+                bool nuit_field_based_flag, full_timestamp_flag, seconds_flag, minutes_flag, hours_flag;
                 Info_S1(2, ct_type,                             "ct_type"); Param_Info1(Avc_ct_type[ct_type]);
                 Get_SB (   nuit_field_based_flag,               "nuit_field_based_flag");
-                Skip_S1(5,                                      "counting_type");
+                Get_S1 (5, counting_type,                       "counting_type");
                 Get_SB (   full_timestamp_flag,                 "full_timestamp_flag");
                 Skip_SB(                                        "discontinuity_flag");
-                Get_SB (   cnt_dropped_flag,                    "cnt_dropped_flag");
+                Skip_SB(                                        "cnt_dropped_flag");
                 Get_S1 (8, n_frames,                            "n_frames");
                 seconds_flag=minutes_flag=hours_flag=full_timestamp_flag;
                 if (!full_timestamp_flag)
@@ -3117,11 +3124,23 @@ void File_Avc::sei_message_pic_timing(int32u /*payloadSize*/, int32u seq_paramet
                         Get_S4 (time_offset_length, time_offset,    "time_offset");
                 }
                 FILLING_BEGIN();
-                    if (!i && seconds_flag && minutes_flag && hours_flag && !Frame_Count)
+                    if (!i && seconds_flag && minutes_flag && hours_flag && IFrame_Count<=1)
                     {
-                        TimeCode TC(hours_value, minutes_value, seconds_value, n_frames, -1, TimeCode::DropFrame(cnt_dropped_flag));
-                        Fill(Stream_Video, 0, Video_TimeCode_FirstFrame, TC.ToString(), true, true);
-                        Element_Info1(TC.ToString());
+                        int32u FrameMax;
+                        if (counting_type>1 && counting_type!=4)
+                        {
+                            n_frames=0;
+                            FrameMax=0; //Unsupported type
+                        }
+                        else if ((*seq_parameter_set_Item)->vui_parameters->fixed_frame_rate_flag && (*seq_parameter_set_Item)->vui_parameters->timing_info_present_flag && (*seq_parameter_set_Item)->vui_parameters->time_scale && (*seq_parameter_set_Item)->vui_parameters->num_units_in_tick)
+                            FrameMax=(int32u)(float64_int64s((float64)(*seq_parameter_set_Item)->vui_parameters->time_scale/(*seq_parameter_set_Item)->vui_parameters->num_units_in_tick/((*seq_parameter_set_Item)->frame_mbs_only_flag?2:(((*seq_parameter_set_Item)->pic_order_cnt_type==2 && Structure_Frame/2>Structure_Field)?1:2))/FrameRate_Divider)-1);
+                        else if (n_frames>99)
+                            FrameMax=n_frames;
+                        else
+                            FrameMax=99;
+
+                        TC_Current=TimeCode(hours_value, minutes_value, seconds_value, n_frames, FrameMax, TimeCode::DropFrame(counting_type==4));
+                        Element_Info1(TC_Current.ToString());
                     }
                 FILLING_END();
             TEST_SB_END();

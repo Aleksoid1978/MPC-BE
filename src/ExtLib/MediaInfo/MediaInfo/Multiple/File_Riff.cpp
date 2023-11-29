@@ -76,6 +76,7 @@ namespace Elements
     const int32u SMV0_xxxx=0x534D563A;
     const int32u W3DI=0x57334449;
     const int32u WAVE=0x57415645;
+    const int32u WAVE_axml=0x61786D6C;
     const int32u WAVE_data=0x64617461;
     const int32u WAVE_ds64=0x64733634;
 }
@@ -131,6 +132,7 @@ File_Riff::File_Riff()
     DolbyAudioMetadata=NULL;
     #if defined(MEDIAINFO_ADM_YES)
         Adm=NULL;
+        Adm_chna=NULL;
     #endif
     WAVE_data_Size=(int64u)-1;
     WAVE_fact_samplesCount=(int64u)-1;
@@ -179,6 +181,7 @@ File_Riff::~File_Riff()
     delete DolbyAudioMetadata;
     #if defined(MEDIAINFO_ADM_YES)
         delete Adm;
+        delete Adm_chna;
     #endif
 }
 
@@ -214,6 +217,11 @@ void File_Riff::Streams_Finish ()
         Merge(*DolbyAudioMetadata, Stream_Audio, 0, 0);
     if (Adm)
     {
+        if (Adm_chna)
+        {
+            Adm->chna_Move(Adm_chna);
+            delete Adm_chna; Adm_chna=NULL;
+        }
         Finish(Adm);
         Merge(*Adm, Stream_Audio, 0, 0);
     }
@@ -831,10 +839,23 @@ bool File_Riff::Header_Begin()
             else
         #endif //MEDIAINFO_DEMUX
         if (File_Offset+Buffer_Size<=Buffer_DataToParse_End)
+        {
             Element_Size=Buffer_Size; //All the buffer is used
+            Alignement_ExtraByte=0;
+        }
         else
         {
             Element_Size=Buffer_DataToParse_End-(File_Offset+Buffer_Offset);
+
+            //Alignment
+            if (Element_Size%2 && File_Offset+Buffer_Size>=Buffer_DataToParse_End && Buffer_DataToParse_End<File_Size)
+            {
+                Element_Size++; //Always 2-byte aligned
+                Alignement_ExtraByte=1;
+            }
+            else
+                Alignement_ExtraByte=0;
+
             Buffer_DataToParse_End=0;
         }
 
@@ -852,16 +873,29 @@ bool File_Riff::Header_Begin()
             Header_Fill_Size(Element_Size);
         Element_End();
 
+        //Alignement specific
+        if (Alignement_ExtraByte && Alignement_ExtraByte<=Element_Size)
+            Element_Size-=Alignement_ExtraByte;
+
         switch (Kind)
         {
             case Kind_Wave : WAVE_data_Continue(); break;
             case Kind_Aiff : AIFF_SSND_Continue(); break;
             case Kind_Rmp3 : RMP3_data_Continue(); break;
+            case Kind_Axml : WAVE_axml_Continue(); break;
             default        : AVI__movi_xxxx();
         }
 
+        //Alignement specific
+        if (Alignement_ExtraByte)
+        {
+            Element_Size+=Alignement_ExtraByte;
+            if (Element_Offset+Alignement_ExtraByte==Element_Size)
+                Skip_XX(Alignement_ExtraByte,                       "Alignement");
+        }
+
         bool ShouldStop=false;
-        if (Config->ParseSpeed<1.0 && File_Offset+Buffer_Offset+Element_Offset-Buffer_DataToParse_Begin>=256*1024)
+        if (Kind!=Kind_Axml && Config->ParseSpeed<1.0 && File_Offset+Buffer_Offset+Element_Offset-Buffer_DataToParse_Begin>=256*1024)
         {
             ShouldStop=true;
             for (std::map<int32u, stream>::iterator StreamItem=Stream.begin(); StreamItem!=Stream.end(); ++StreamItem)
@@ -870,6 +904,10 @@ bool File_Riff::Header_Begin()
         }
         if (ShouldStop && Buffer_DataToParse_End)
         {
+            //Alignment
+            if (Buffer_DataToParse_End%2)
+                Buffer_DataToParse_End++; //Always 2-byte aligned
+
             File_GoTo=Buffer_DataToParse_End;
             Buffer_Offset=Buffer_Size;
             Element_Size=0;
@@ -1098,14 +1136,20 @@ void File_Riff::Header_Parse()
         Buffer_DataToParse_End=File_Offset+Buffer_Offset+8+Size_Complete;
         Size_Complete=Buffer_Size-(Buffer_Offset+8);
     }
-    if ((Name==Elements::WAVE_data || Name==Elements::AIFF_SSND))
+    if ((Name==Elements::WAVE_data || Name==Elements::AIFF_SSND || Name==Elements::WAVE_axml))
     {
-        Buffer_DataToParse_Begin=File_Offset+Buffer_Offset+8;
+        int64u End;
         if (Size_Complete)
-            Buffer_DataToParse_End=File_Offset+Buffer_Offset+8+Size_Complete;
+            End=File_Offset+Buffer_Offset+8+Size_Complete;
         else
-            Buffer_DataToParse_End=File_Size; //Found one file with 0 as size of data part
-        Size_Complete=(Name==Elements::AIFF_SSND?8:0);
+            End=File_Size; //Found one file with 0 as size of data part
+        if (File_Offset+Buffer_Size<End)
+        {
+            Buffer_DataToParse_Begin=File_Offset+Buffer_Offset+8;
+            Buffer_DataToParse_End=End-Alignement_ExtraByte;
+            Alignement_ExtraByte=0; // Will be recalculated later
+            Size_Complete=(Name==Elements::AIFF_SSND?8:0);
+        }
     }
 
     //Filling

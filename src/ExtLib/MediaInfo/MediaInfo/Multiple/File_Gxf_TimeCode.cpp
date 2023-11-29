@@ -88,6 +88,7 @@ File_Gxf_TimeCode::File_Gxf_TimeCode()
     FieldsPerFrame_Code=(int32u)-1;
     IsAtc=false;
     IsBigEndian=false;
+    IsTimeCodeTrack=false;
 
     //Out
     TimeCode_FirstFrame_ms=(int64u)-1;
@@ -105,6 +106,12 @@ File_Gxf_TimeCode::~File_Gxf_TimeCode()
 //---------------------------------------------------------------------------
 void File_Gxf_TimeCode::Streams_Fill()
 {
+    Stream_Prepare(Stream_Other);
+    Fill(Stream_Other, 0, Other_TimeCode_FirstFrame, TimeCode_FirstFrame);
+    if (IsTimeCodeTrack)
+        return;
+
+
     Stream_Prepare(Stream_Video);
     Fill(Stream_Video, 0, Video_Delay, TimeCode_FirstFrame_ms);
     if (TimeCode_FirstFrame.size()==11)

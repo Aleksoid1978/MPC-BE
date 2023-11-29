@@ -309,6 +309,7 @@ UINT32  HTTPClientSetAuth (HTTP_SESSION_HANDLE pSession,
     case(AuthSchemaKerberos):
         strcpy(pHTTPSession->HttpCredentials.AuthSchemaName,"negotiate");
         break;
+    default: break;
     };
 
     if(AuthSchema >= AuthNotSupported)
@@ -1182,7 +1183,7 @@ UINT32 HTTPClientGetNextHeader (HTTP_SESSION_HANDLE pSession, CHAR *pHeaderBuffe
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static UINT32 HTTPIntrnSetURL (P_HTTP_SESSION pHTTPSession,
+UINT32 HTTPIntrnSetURL (P_HTTP_SESSION pHTTPSession,
                         CHAR *pUrl,         // [IN] a null terminated string containing the Url we should retrieve
                         UINT32 nUrlLength)  // [IN] The length the Url string
 {
@@ -1334,7 +1335,7 @@ static UINT32 HTTPIntrnSetURL (P_HTTP_SESSION pHTTPSession,
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static UINT32 HTTPIntrnResizeBuffer (P_HTTP_SESSION pHTTPSession,
+UINT32 HTTPIntrnResizeBuffer (P_HTTP_SESSION pHTTPSession,
                               UINT32 nNewBufferSize)    // [IN] The new (and larger) buffer size
 {
 
@@ -1404,7 +1405,7 @@ static UINT32 HTTPIntrnResizeBuffer (P_HTTP_SESSION pHTTPSession,
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static UINT32 HTTPIntrnHeadersRemove (P_HTTP_SESSION pHTTPSession,
+UINT32 HTTPIntrnHeadersRemove (P_HTTP_SESSION pHTTPSession,
                                CHAR *pHeaderName)   // [IN] The header's name
 
 {
@@ -1464,7 +1465,7 @@ static UINT32 HTTPIntrnHeadersRemove (P_HTTP_SESSION pHTTPSession,
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static UINT32 HTTPIntrnHeadersAdd (P_HTTP_SESSION pHTTPSession,
+UINT32 HTTPIntrnHeadersAdd (P_HTTP_SESSION pHTTPSession,
                             CHAR *pHeaderName,   // [IN] The header's name
                             UINT32 nNameLength,  // [IN] Name length
                             CHAR *pHeaderData,   // [IN] The Header's data
@@ -1615,14 +1616,14 @@ UINT32 HTTPIntrnConnectionClose (P_HTTP_SESSION pHTTPSession)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static UINT32 HTTPIntrnConnectionOpen (P_HTTP_SESSION pHTTPSession)
+UINT32 HTTPIntrnConnectionOpen (P_HTTP_SESSION pHTTPSession)
 {
     INT32            nRetCode = HTTP_CLIENT_SUCCESS;     // a function return code value
     UINT32           nNullOffset;                        // a helper value to null terminate a given string
-    int              nNonBlocking    = 1;                // non blocking mode parameter
+    ULONG            nNonBlocking    = 1;                // non blocking mode parameter
     CHAR             Backup;                             // a container for a char value (helps in temporary null termination)
     // HTTP_HOSTNET     *HostEntry;                          // Socket host entry pointer
-    UINT32           Address = 0;
+    ULONG            Address = 0;
     HTTP_SOCKADDR_IN ServerAddress;                      // Socket address structure
     HTTP_SOCKADDR_IN LoaclAddress;                       // Socket address structure (for client binding)
     do
@@ -1802,7 +1803,7 @@ static UINT32 HTTPIntrnConnectionOpen (P_HTTP_SESSION pHTTPSession)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static UINT32 HTTPIntrnSend (P_HTTP_SESSION pHTTPSession,
+UINT32 HTTPIntrnSend (P_HTTP_SESSION pHTTPSession,
                       CHAR *pData,            // [IN] a pointer to the data to be sent
                       UINT32 *nLength)        // [IN OUT] Length of data to send and the transmitted bytes count
 {
@@ -1927,7 +1928,7 @@ static UINT32 HTTPIntrnSend (P_HTTP_SESSION pHTTPSession,
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static UINT32 HTTPIntrnRecv (P_HTTP_SESSION pHTTPSession,
+UINT32 HTTPIntrnRecv (P_HTTP_SESSION pHTTPSession,
                       CHAR *pData,        // [IN] a pointer for a buffer that receives the data
                       UINT32 *nLength,    // [IN OUT] Length of the buffer and the count of the received bytes
                       BOOL PeekOnly)      // [IN] State if we should only peek the socket (default is no)
@@ -2092,7 +2093,7 @@ static UINT32 HTTPIntrnRecv (P_HTTP_SESSION pHTTPSession,
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static UINT32 HTTPIntrnGetRemoteChunkLength (P_HTTP_SESSION pHTTPSession)
+UINT32 HTTPIntrnGetRemoteChunkLength (P_HTTP_SESSION pHTTPSession)
 {
 
     UINT32          nBytesRead = 1;
@@ -2172,7 +2173,7 @@ static UINT32 HTTPIntrnGetRemoteChunkLength (P_HTTP_SESSION pHTTPSession)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static UINT32 HTTPIntrnGetRemoteHeaders (P_HTTP_SESSION pHTTPSession)
+UINT32 HTTPIntrnGetRemoteHeaders (P_HTTP_SESSION pHTTPSession)
 {
 
     UINT32          nBytesRead = 1;
@@ -2288,7 +2289,7 @@ static UINT32 HTTPIntrnGetRemoteHeaders (P_HTTP_SESSION pHTTPSession)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static UINT32 HTTPIntrnHeadersFind (P_HTTP_SESSION pHTTPSession,CHAR *pHeaderName,
+UINT32 HTTPIntrnHeadersFind (P_HTTP_SESSION pHTTPSession,CHAR *pHeaderName,
                              HTTP_PARAM *pParam,     //  [OUT] HTTP parameter structure that holds the search results
                              BOOL IncommingHeaders,  //  [IN]  Indicate if we are to search in the incoming or outgoing headers
                              UINT32 nOffset)         //  [IN]  Optionaly privide an offset to start looking from
@@ -2365,7 +2366,7 @@ static UINT32 HTTPIntrnHeadersFind (P_HTTP_SESSION pHTTPSession,CHAR *pHeaderNam
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static UINT32 HTTPIntrnAuthenticate(P_HTTP_SESSION pHTTPSession)
+UINT32 HTTPIntrnAuthenticate(P_HTTP_SESSION pHTTPSession)
 {
     UINT32      nRetCode = HTTP_CLIENT_SUCCESS;   // Function call return code
     UINT32      nBytes = 32;
@@ -2451,7 +2452,7 @@ static UINT32 HTTPIntrnAuthenticate(P_HTTP_SESSION pHTTPSession)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static UINT32 HTTPIntrnHeadersParse (P_HTTP_SESSION pHTTPSession)
+UINT32 HTTPIntrnHeadersParse (P_HTTP_SESSION pHTTPSession)
 {
 
     CHAR            *pPtr;                                      // a pointer that points on the incoming headers
@@ -2650,7 +2651,7 @@ static UINT32 HTTPIntrnHeadersParse (P_HTTP_SESSION pHTTPSession)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static UINT32 HTTPIntrnParseAuthHeader(P_HTTP_SESSION pHTTPSession)
+UINT32 HTTPIntrnParseAuthHeader(P_HTTP_SESSION pHTTPSession)
 {
 
     CHAR            *pPtrStart, *pPtrEnd;
@@ -2730,7 +2731,7 @@ static UINT32 HTTPIntrnParseAuthHeader(P_HTTP_SESSION pHTTPSession)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static UINT32 HTTPIntrnHeadersSend(P_HTTP_SESSION pHTTPSession,
+UINT32 HTTPIntrnHeadersSend(P_HTTP_SESSION pHTTPSession,
                             HTTP_VERB HttpVerb)  // [IN] Argument that can bypass the requested verb
                             // Can be used for evaluating a HEAD request
 {
@@ -2922,7 +2923,7 @@ static UINT32 HTTPIntrnHeadersSend(P_HTTP_SESSION pHTTPSession,
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static UINT32 HTTPIntrnAuthHandler (P_HTTP_SESSION pHTTPSession)
+UINT32 HTTPIntrnAuthHandler (P_HTTP_SESSION pHTTPSession)
 {
 
     UINT32 nRetCode = HTTP_CLIENT_SUCCESS;
@@ -2999,7 +3000,7 @@ static UINT32 HTTPIntrnAuthHandler (P_HTTP_SESSION pHTTPSession)
 ///////////////////////////////////////////////////////////////////////////////
 
 
-static UINT32 HTTPIntrnAuthSendBasic (P_HTTP_SESSION pHTTPSession)
+UINT32 HTTPIntrnAuthSendBasic (P_HTTP_SESSION pHTTPSession)
 {
 
     UINT32      nSegmentLength;
@@ -3122,7 +3123,7 @@ static UINT32 HTTPIntrnAuthSendBasic (P_HTTP_SESSION pHTTPSession)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static UINT32 HTTPIntrnAuthSendDigest (P_HTTP_SESSION pHTTPSession)
+UINT32 HTTPIntrnAuthSendDigest (P_HTTP_SESSION pHTTPSession)
 {
     CHAR        Cnonce[33];
     UINT32      nSegmentLength;
@@ -3442,7 +3443,7 @@ static UINT32 HTTPIntrnAuthSendDigest (P_HTTP_SESSION pHTTPSession)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static UINT32 HTTPIntrnSessionReset (P_HTTP_SESSION pHTTPSession, BOOL EntireSession)
+UINT32 HTTPIntrnSessionReset (P_HTTP_SESSION pHTTPSession, BOOL EntireSession)
 {
     UINT32 nActionTimeout; // For restoring a parameter after this reset
     UINT32 nAllocationSize;
@@ -3519,7 +3520,7 @@ static UINT32 HTTPIntrnSessionReset (P_HTTP_SESSION pHTTPSession, BOOL EntireSes
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static UINT32 HTTPIntrnHeadersReceive (P_HTTP_SESSION pHTTPSession,
+UINT32 HTTPIntrnHeadersReceive (P_HTTP_SESSION pHTTPSession,
                                 UINT32 nTimeout)        // [IN] Timeout for the operation
 
 {
@@ -3606,7 +3607,7 @@ static UINT32 HTTPIntrnHeadersReceive (P_HTTP_SESSION pHTTPSession,
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static UINT32 HTTPIntrnSessionGetUpTime(VOID)
+UINT32 HTTPIntrnSessionGetUpTime(VOID)
 {
 
     return GetUpTime();
@@ -3623,7 +3624,7 @@ static UINT32 HTTPIntrnSessionGetUpTime(VOID)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-static BOOL HTTPIntrnSessionEvalTimeout(P_HTTP_SESSION pHTTPSession)
+BOOL HTTPIntrnSessionEvalTimeout(P_HTTP_SESSION pHTTPSession)
 {
 
     UINT32 nElapsedTime;    // Integer for calculating the elapsed time

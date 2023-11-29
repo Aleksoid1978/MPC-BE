@@ -76,7 +76,6 @@ void   float322LittleEndian   (char* List, float32 Value);
 void   float642LittleEndian   (char* List, float64 Value);
 void   float802LittleEndian   (char* List, float80 Value);
 
-#ifndef __BORLANDC__
 inline int8s  LittleEndian2int8s  (const int8u* List) {return LittleEndian2int8s  ((const char*)List);}
 inline int8u  LittleEndian2int8u  (const int8u* List) {return LittleEndian2int8u  ((const char*)List);}
 inline int16s LittleEndian2int16s (const int8u* List) {return LittleEndian2int16s ((const char*)List);}
@@ -124,7 +123,6 @@ inline void   float162LittleEndian   (int8u* List, float32 Value) {return float1
 inline void   float322LittleEndian   (int8u* List, float32 Value) {return float322LittleEndian ((char*)List, Value);}
 inline void   float642LittleEndian   (int8u* List, float64 Value) {return float642LittleEndian ((char*)List, Value);}
 inline void   float802LittleEndian   (int8u* List, float80 Value) {return float802LittleEndian ((char*)List, Value);}
-#endif //__BORLANDC__
 
 //---------------------------------------------------------------------------
 //Big Endians
@@ -176,7 +174,6 @@ void   float322BigEndian   (char* List, float32 Value);
 void   float642BigEndian   (char* List, float64 Value);
 void   float802BigEndian   (char* List, float80 Value);
 
-#ifndef __BORLANDC__
 inline int8s  BigEndian2int8s     (const int8u* List) {return BigEndian2int8s     ((const char*)List);}
 inline int8u  BigEndian2int8u     (const int8u* List) {return BigEndian2int8u     ((const char*)List);}
 inline int16s BigEndian2int16s    (const int8u* List) {return BigEndian2int16s    ((const char*)List);}
@@ -224,7 +221,6 @@ inline void   float162BigEndian   (int8u* List, float32 Value) {return float162B
 inline void   float322BigEndian   (int8u* List, float32 Value) {return float322BigEndian ((char*)List, Value);}
 inline void   float642BigEndian   (int8u* List, float64 Value) {return float642BigEndian ((char*)List, Value);}
 inline void   float802BigEndian   (int8u* List, float80 Value) {return float802BigEndian ((char*)List, Value);}
-#endif //__BORLANDC__
 
 //---------------------------------------------------------------------------
 // int32 - int64
@@ -261,7 +257,6 @@ inline int32u CC4(const char*  C) {return BigEndian2int32u(C);}
 inline int32u CC3(const char*  C) {return BigEndian2int24u(C);}
 inline int16u CC2(const char*  C) {return BigEndian2int16u(C);}
 inline int8u  CC1(const char*  C) {return BigEndian2int8u (C);}
-#ifndef __BORLANDC__
 inline int64u CC8(const int8u* C) {return BigEndian2int64u(C);}
 inline int64u CC7(const int8u* C) {return BigEndian2int56u(C);}
 inline int64u CC6(const int8u* C) {return BigEndian2int48u(C);}
@@ -270,7 +265,6 @@ inline int32u CC4(const int8u* C) {return BigEndian2int32u(C);}
 inline int32u CC3(const int8u* C) {return BigEndian2int24u(C);}
 inline int16u CC2(const int8u* C) {return BigEndian2int16u(C);}
 inline int8u  CC1(const int8u* C) {return BigEndian2int8u (C);}
-#endif // __BORLANDC__
 
 //---------------------------------------------------------------------------
 // turn a numeric literal into a hex constant

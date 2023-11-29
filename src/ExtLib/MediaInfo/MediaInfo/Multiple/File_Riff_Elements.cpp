@@ -3577,7 +3577,6 @@ void File_Riff::WAVE()
 
     //Filling
     Fill(Stream_General, 0, General_Format, "Wave");
-    Kind=Kind_Wave;
     #if MEDIAINFO_EVENTS
         StreamIDs_Width[0]=0;
     #endif //MEDIAINFO_EVENTS
@@ -3656,22 +3655,33 @@ struct profile_info
 
 void File_Riff::WAVE_axml()
 {
-    int64u Element_TotalSize=Element_TotalSize_Get();
-    if (Element_Size!=Element_TotalSize-Alignement_ExtraByte)
+    //Preparing
+    delete Adm;
+    Adm=new File_Adm;
+    Open_Buffer_Init(Adm);
+    if (Adm_chna)
     {
-        if (Buffer_MaximumSize<Element_TotalSize)
-            Buffer_MaximumSize+=Element_TotalSize;
-        size_t* File_Buffer_Size_Hint_Pointer=Config->File_Buffer_Size_Hint_Pointer_Get();
-        if (File_Buffer_Size_Hint_Pointer)
-            (*File_Buffer_Size_Hint_Pointer)=(size_t)(Element_TotalSize-Element_Size);
-        Element_WaitForMoreData();
-        return; //Must wait for more data
+        Adm->chna_Move(Adm_chna);
+        delete Adm_chna; Adm_chna=NULL;
     }
+    Adm->MuxingMode=(Element_Code==Elements::WAVE_bxml)?'b':'a';
+    Adm->MuxingMode+="xml";
+    Kind=Kind_Axml;
 
-    int8u* UncompressedData;
-    size_t UncompressedData_Size;
     if (Element_Code==Elements::WAVE_bxml)
     {
+        int64u Element_TotalSize=Element_TotalSize_Get();
+        if (Element_Size!=Element_TotalSize-Alignement_ExtraByte)
+        {
+            if (Buffer_MaximumSize<Element_TotalSize)
+                Buffer_MaximumSize+=Element_TotalSize;
+            size_t* File_Buffer_Size_Hint_Pointer=Config->File_Buffer_Size_Hint_Pointer_Get();
+            if (File_Buffer_Size_Hint_Pointer)
+                (*File_Buffer_Size_Hint_Pointer)=(size_t)(Element_TotalSize-Element_Size);
+            Element_WaitForMoreData();
+            return; //Must wait for more data
+        }
+
         Element_Name("Compressed AXML");
 
         //Header
@@ -3718,31 +3728,26 @@ void File_Riff::WAVE_axml()
             strm.next_out=strm.next_out+strm.total_out;
             strm.avail_out=UncompressedData_NewMaxSize-strm.total_out;
         }
-        UncompressedData=strm.next_out-strm.total_out;
-        UncompressedData_Size=strm.total_out;
+        int8u* UncompressedData=strm.next_out-strm.total_out;
+        size_t UncompressedData_Size=strm.total_out;
+
+        //Parsing
+        Open_Buffer_Continue(Adm, UncompressedData, UncompressedData_Size);
+        Skip_UTF8(Element_Size, "XML data");
     }
     else
     {
         Element_Name("AXML");
 
-        UncompressedData=(int8u*)Buffer+Buffer_Offset;
-        UncompressedData_Size=(size_t)Element_Size;
+        //Parsing
+        WAVE_axml_Continue();
     }
+}
 
+void File_Riff::WAVE_axml_Continue()
+{
     //Parsing
-    File_Adm* Adm_New=new File_Adm;
-    Adm_New->MuxingMode=(Element_Code==Elements::WAVE_bxml)?'b':'a';
-    Adm_New->MuxingMode+="xml";
-    Open_Buffer_Init(Adm_New);
-    Open_Buffer_Continue(Adm_New, UncompressedData, UncompressedData_Size);
-    if (Adm_New->Status[IsAccepted])
-    {
-        Adm_New->chna_Move(Adm);
-        delete Adm;
-        Adm=Adm_New;
-    }
-
-    //Parsing
+    Open_Buffer_Continue(Adm, Buffer+Buffer_Offset, (size_t)Element_Size);
     Skip_UTF8(Element_Size, "XML data");
 }
 
@@ -3914,11 +3919,8 @@ void File_Riff::WAVE_chna()
 
     //Parsing
     int16u numUIDs;
-    if (!Adm)
-    {
-        Adm=new File_Adm;
-        Open_Buffer_Init(Adm);
-    }
+    auto Adm_Current = new File_Adm;
+    Open_Buffer_Init(Adm_chna);
     Skip_L2(                                                    "numTracks");
     Get_L2 (numUIDs,                                            "numUIDs");
     for (int32u Pos=0; Pos<numUIDs; Pos++)
@@ -3931,11 +3933,21 @@ void File_Riff::WAVE_chna()
         Skip_String(14,                                         "trackRef");
         Skip_String(11,                                         "packRef");
         Skip_L1(                                                "pad");
-        Adm->chna_Add(trackIndex, UID);
+        Adm_Current->chna_Add(trackIndex, UID);
         Element_End0();
         if (Element_Offset>=Element_Size)
             break;
     }
+
+    FILLING_BEGIN()
+        if (Adm)
+        {
+            Adm->chna_Move(Adm_Current);
+            delete Adm_Current; //Adm_Current=NULL
+        }
+        else
+            Adm_chna=Adm_Current;
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
@@ -3963,8 +3975,9 @@ void File_Riff::WAVE_cue_()
 void File_Riff::WAVE_data()
 {
     Element_Name("Raw datas");
+    Kind=Kind_Wave;
 
-    if (Buffer_DataToParse_End-Buffer_DataToParse_Begin<100)
+    if (Buffer_DataToParse_End && Buffer_DataToParse_End-Buffer_DataToParse_Begin<100)
     {
         Skip_XX(Buffer_DataToParse_End-Buffer_Offset,           "Unknown");
         return; //This is maybe embeded in another container, and there is only the header (What is the junk?)
@@ -3974,7 +3987,7 @@ void File_Riff::WAVE_data()
     Element_Code=(int64u)-1;
 
     FILLING_BEGIN();
-        int64u StreamSize=Buffer_DataToParse_End-Buffer_DataToParse_Begin;
+        int64u StreamSize=(Buffer_DataToParse_End?(Buffer_DataToParse_End-Buffer_DataToParse_Begin):Element_Size)-(Element_Code==Elements::AIFF_SSND?8:0);
         Fill(Stream_Audio, StreamPos_Last, Audio_StreamSize, StreamSize, 10, true);
         if (Retrieve(Stream_Audio, StreamPos_Last, Audio_Format)==__T("PCM") && BlockAlign)
             Fill(Stream_Audio, StreamPos_Last, Audio_SamplingCount, StreamSize/BlockAlign, 10, true);

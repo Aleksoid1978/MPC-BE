@@ -142,6 +142,7 @@ private :
     File_DolbyAudioMetadata* DolbyAudioMetadata;
     #if defined(MEDIAINFO_ADM_YES)
     File_Adm* Adm;
+    File_Adm* Adm_chna;
     #endif
     int64u WAVE_data_Size;  //RF64 WAVE_data real chunk size
     int64u WAVE_fact_samplesCount;  //RF64 WAVE_fact real samplesCount
@@ -181,6 +182,7 @@ private :
         Kind_Wave,
         Kind_Aiff,
         Kind_Rmp3,
+        Kind_Axml,
     };
     kind Kind;
     #if defined(MEDIAINFO_GXF_YES)
@@ -318,6 +320,7 @@ private :
     void WAVE_adtl_ltxt();
     void WAVE_adtl_note();
     void WAVE_axml ();
+    void WAVE_axml_Continue ();
     void WAVE_bext ();
     void WAVE_bxml () {WAVE_axml();}
     void WAVE_chna();

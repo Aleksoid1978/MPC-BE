@@ -535,7 +535,7 @@ void File_Id3v2::Data_Parse()
 {
     Id3v2_Size-=Header_Size+Element_Size;
 
-    int32u DataLength=(int32u)-1;
+    int32u DataLength;
     if (DataLengthIndicator)
     {
         Get_B4 (DataLength,                             "Data length");
@@ -545,6 +545,8 @@ void File_Id3v2::Data_Parse()
                  | ((DataLength>>3)&0x0FE00000);
         Param_Info2(DataLength, " bytes");
     }
+    else
+        DataLength=(int32u)-1;
 
     //Unsynchronisation
     int8u* Buffer_Unsynch=NULL;
@@ -552,35 +554,53 @@ void File_Id3v2::Data_Parse()
     int64u Save_File_Offset=File_Offset;
     size_t Save_Buffer_Offset=Buffer_Offset;
     int64u Save_Element_Size=Element_Size;
-    int64u Element_Offset_Unsynch=Element_Offset;
     std::vector<size_t> Unsynch_List;
-    if (Unsynchronisation_Global || Unsynchronisation_Frame)
+    if ((Unsynchronisation_Global || Unsynchronisation_Frame) && Element_Size-Element_Offset>1)
     {
-        while (Element_Offset_Unsynch+2<Element_Size)
+        auto Buffer_Beg=Buffer+Buffer_Offset;
+        auto Buffer_Cur=Buffer_Beg+(size_t)Element_Offset;
+        Buffer_Beg--;
+        auto Buffer_End=Buffer_Beg+(size_t)Element_Size;
+        for (; Buffer_Cur<Buffer_End; Buffer_Cur++)
         {
-            if (CC2(Buffer+Buffer_Offset+(size_t)Element_Offset_Unsynch)==0xFF00)
-                Unsynch_List.push_back((size_t)(Element_Offset_Unsynch+1));
-            Element_Offset_Unsynch++;
+            if (BigEndian2int16u(Buffer_Cur)==0xFF00)
+                Unsynch_List.push_back(Buffer_Cur-Buffer_Beg);
         }
-        if (DataLength!=(int32u)-1 && 4+DataLength!=Element_Size-Unsynch_List.size())
+    }
+    if (DataLength!=(int32u)-1)
+    {
+        int64u TotalLength=4+(int64u)DataLength;
+        if (TotalLength>Element_Size-Unsynch_List.size())
         {
             Skip_XX(Element_Size-Element_Offset,                "Size coherency issue");
             return;
         }
+        Element_Size=TotalLength;
+    }
+    else
+        Element_Size-=Unsynch_List.size();
+    {
         if (!Unsynch_List.empty())
         {
             //We must change the buffer for keeping out
             File_Offset=Save_File_Offset+Buffer_Offset;
-            Element_Size=Save_Element_Size-Unsynch_List.size();
             Buffer_Offset=0;
             Buffer_Unsynch=new int8u[(size_t)Element_Size];
             for (size_t Pos=0; Pos<=Unsynch_List.size(); Pos++)
             {
-                size_t Pos0=(Pos==Unsynch_List.size())?(size_t)Save_Element_Size:(Unsynch_List[Pos]);
+                size_t Pos0=(Pos==Unsynch_List.size())?(size_t)(Element_Size+Unsynch_List.size()):(Unsynch_List[Pos]);
                 size_t Pos1=(Pos==0)?0:(Unsynch_List[Pos-1]+1);
                 size_t Buffer_Unsynch_Begin=Pos1-Pos;
+                if (Buffer_Unsynch_Begin>=Element_Size)
+                {
+                    Unsynch_List.resize(Pos-1);
+                    break;
+                }
                 size_t Save_Buffer_Begin  =Pos1;
                 size_t Size=               Pos0-Pos1;
+                auto NextPos=Buffer_Unsynch_Begin+Size;
+                if (NextPos>Element_Size)
+                    Size=Element_Size-Buffer_Unsynch_Begin;
                 std::memcpy(Buffer_Unsynch+Buffer_Unsynch_Begin, Save_Buffer+Save_Buffer_Offset+Save_Buffer_Begin, Size);
             }
             Buffer=Buffer_Unsynch;
@@ -759,16 +779,18 @@ void File_Id3v2::Data_Parse()
         default : Skip_XX(Element_Size,                         "Data");
     }
 
+    Element_Size=Save_Element_Size;
     if (!Unsynch_List.empty())
     {
         //We must change the buffer for keeping out
         File_Offset=Save_File_Offset;
-        Element_Size=Save_Element_Size;
         Buffer_Offset=Save_Buffer_Offset;
         delete[] Buffer; Buffer=Save_Buffer;
         Buffer_Unsynch=NULL; //Same as Buffer...
         Element_Offset+=Unsynch_List.size();
     }
+    if (Element_Offset<Element_Size)
+        Skip_XX(Element_Size-Element_Offset,                    "Junk");
 
     if (!Id3v2_Size)
         Finish("Id3v2");

@@ -32,6 +32,7 @@
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #include "MediaInfo/MediaInfo_Internal.h"
 #include "MediaInfo/TimeCode.h"
+#include "MediaInfo/ExternalCommandHelpers.h"
 #if MEDIAINFO_IBI
     #include "MediaInfo/Multiple/File_Ibi.h"
 #endif //MEDIAINFO_IBI
@@ -196,7 +197,14 @@ void Merge_FillTimeCode(File__Analyze& In, const string& Prefix, const TimeCode&
     
     In.Fill(Stream_Audio, 0, Prefix.c_str(), TC_Time.ToString(), true, true);
     In.Fill_SetOptions(Stream_Audio, 0, Prefix.c_str(), "N NTY");
-    In.Fill(Stream_Audio, 0, (Prefix+"/String").c_str(), TC_Time.ToString()+(TC_WithExtraSamples_String.empty()?string():(" ("+TC_WithExtraSamples_String+')')), true, true);
+    string ForDisplay;
+    if (Prefix=="Dolby_Atmos_Metadata FirstFrameOfAction")
+        ForDisplay=TC_Frames.ToString();
+    else if (Prefix.find(" Start")+6==Prefix.size() || Prefix.find(" End")+4==Prefix.size())
+        ForDisplay=TC_WithExtraSubFrames_String;
+    else
+        ForDisplay=TC_WithExtraSamples_String;
+    In.Fill(Stream_Audio, 0, (Prefix+"/String").c_str(), TC_Time.ToString()+(ForDisplay.empty()?string():(" ("+ForDisplay+')')), true, true);
     In.Fill_SetOptions(Stream_Audio, 0, (Prefix+"/String").c_str(), "Y NTN");
     In.Fill(Stream_Audio, 0, (Prefix+"/TimeCode").c_str(), TC_Frames.ToString(), true, true);
     if (TC_Frames.IsValid())
@@ -329,6 +337,103 @@ void File__Analyze::Streams_Finish_Global()
                 Fill(Stream_General, 0, General_Codec_Extensions, Extensions, true);
         }
     }
+
+    #if MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)
+        // Cropped
+        if (Count_Get(Stream_Video)+Count_Get(Stream_Image) && MediaInfoLib::Config.Enable_FFmpeg_Get())
+        {
+            Ztring Command=External_Command_Exists(ffmpeg_PossibleNames);;
+            if (!Command.empty())
+            {
+                auto StreamKind=Count_Get(Stream_Video)?Stream_Video:Stream_Image;
+                {
+                    const auto StreamCount=Count_Get(StreamKind);
+                    for (size_t StreamPos=0; StreamPos<StreamCount; StreamPos++)
+                    {
+                        ZtringList Arguments;
+                        if (StreamKind==Stream_Video)
+                        {
+                            Arguments.push_back(__T("-noaccurate_seek"));
+                            Arguments.push_back(__T("-ss"));
+                            Arguments.push_back(Ztring::ToZtring(Retrieve_Const(Stream_Video, 0, Video_Duration).To_int64u()/2000));
+                        }
+                        Arguments.push_back(__T("-i"));
+                        Arguments.push_back(Retrieve_Const(Stream_General, 0, General_CompleteName));
+                        if (StreamKind==Stream_Video)
+                        {
+                            Arguments.push_back(__T("-map"));
+                            Arguments.push_back(__T("v:")+Ztring::ToZtring(StreamPos));
+                        }
+                        Arguments.push_back(__T("-vf"));
+                        Arguments.push_back(__T("cropdetect=skip=0:round=1"));
+                        if (StreamKind==Stream_Video)
+                        {
+                            Arguments.back().insert(0, __T("select='eq(pict_type,I)',"));
+                            Arguments.push_back(__T("-copyts"));
+                            Arguments.push_back(__T("-vframes"));
+                            Arguments.push_back(__T("4"));
+                        }
+                        Arguments.push_back(__T("-f"));
+                        Arguments.push_back(__T("null"));
+                        Arguments.push_back(__T("-"));
+                        Ztring Err;
+                        External_Command_Run(Command, Arguments, nullptr, &Err);
+                        auto Pos_Start=Err.rfind(__T("[Parsed_cropdetect_"));
+                        if (Pos_Start!=string::npos)
+                        {
+                            auto Pos_End=Err.find(__T('\n'), Pos_Start);
+                            if (Pos_End==string::npos)
+                                Pos_End=Err.size();
+                            Ztring Crop_Line=Err.substr(Pos_Start, Pos_End-Pos_Start);
+                            ZtringList Crop;
+                            Crop.Separator_Set(0, __T(" "));
+                            Crop.Write(Crop_Line);
+                            int32u Values[6];
+                            memset(Values, -1, sizeof(Values));
+                            int32u Width=Retrieve_Const(StreamKind, StreamPos, "Width").To_int32u();
+                            int32u Height=Retrieve_Const(StreamKind, StreamPos, "Height").To_int32u();
+                            for (const auto& Item : Crop)
+                            {
+                                if (Item.size()<=3
+                                 || Item[0]<__T('x') || Item[0]>__T('y')
+                                 || Item[1]<__T('1') || Item[1]>__T('2')
+                                 || Item[2]!=__T(':')
+                                 || Item[3]<__T('0') || Item[3]>__T('9'))
+                                    continue;
+                                Values[((Item[0]-__T('x'))<<1)|(Item[1]-__T('1'))]=Ztring(Item.substr(3)).To_int32u();
+                            }
+                            if (Values[0]!=(int32u)-1 && Values[1]!=(int32u)-1)
+                            {
+                                Values[4]=Values[1]-Values[0];
+                                if (((int32s)Values[4])>=0)
+                                {
+                                    Values[4]++;
+                                    if (Values[4]!=Width)
+                                        Fill(StreamKind, StreamPos, "Active_Width", Values[4]);
+                                }
+                            }
+                            if (Values[2]!=(int32u)-1 && Values[3]!=(int32u)-1)
+                            {
+                                Values[5]=Values[3]-=Values[2];
+                                if (((int32s)Values[5])>=0)
+                                {
+                                    Values[5]++;
+                                    if (Values[5]!=Height)
+                                        Fill(StreamKind, StreamPos, "Active_Height", Values[5]);
+                                }
+                            }
+                            if (((int32s)Values[4])>=0 && ((int32s)Values[5])>=0 && (Values[4]!=Width || Values[5]!=Height))
+                            {
+                                float32 PAR=Retrieve_Const(StreamKind, 0, "PixelAspectRatio").To_float32();
+                                if (PAR)
+                                    Fill(StreamKind, StreamPos, "Active_DisplayAspectRatio", ((float32)Values[4])/Values[5]*PAR, 2);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    #endif //MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)
 
     Streams_Finish_StreamOnly();
     Streams_Finish_StreamOnly();
@@ -947,8 +1052,25 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
            Fill(Stream_Video, Pos, Video_FrameRate, FrameCount/Duration, 3);
     }
 
-    //Pixel Aspect Ratio forced to 1.000 if none
+    //Pixel Aspect Ratio forced from picture pixel size and Display Aspect Ratio
     if (Retrieve(Stream_Video, Pos, Video_PixelAspectRatio).empty())
+    {
+        const Ztring& DAR_S=Retrieve_Const(Stream_Video, Pos, Video_DisplayAspectRatio);
+        float DAR=DAR_S.To_float32();
+        float Width=Retrieve(Stream_Video, Pos, Video_Width).To_float32();
+        float Height=Retrieve(Stream_Video, Pos, Video_Height).To_float32();
+        if (DAR && Height && Width)
+        {
+            if (DAR_S==__T("1.778"))
+                DAR=((float)16)/9; //More exact value
+            if (DAR_S==__T("1.333"))
+                DAR=((float)4)/3; //More exact value
+            Fill(Stream_Video, Pos, Video_PixelAspectRatio, DAR/(((float32)Width)/Height));
+        }
+    }
+
+    //Pixel Aspect Ratio forced to 1.000 if none
+    if (Retrieve(Stream_Video, Pos, Video_PixelAspectRatio).empty() && Retrieve(Stream_Video, Pos, Video_DisplayAspectRatio).empty())
         Fill(Stream_Video, Pos, Video_PixelAspectRatio, 1.000);
 
     //Standard

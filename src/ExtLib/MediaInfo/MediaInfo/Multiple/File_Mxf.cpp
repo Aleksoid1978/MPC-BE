@@ -3361,10 +3361,7 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
         if (!Adm_ForLaterMerge && (*Parser)->Retrieve(Stream_Audio, StreamPos_Last, Audio_Format)==__T("IAB"))
             Adm_ForLaterMerge=(File_Iab*)*Parser; // Will be used later for ADM
 
-        MergedStreams_Last.clear(); //TODO: better way to do this
-
         Merge(*(*Parser), StreamKind_Last, 0, StreamPos_Last);
-        MergedStreams_Last.push_back(streamidentity(StreamKind_Last, StreamPos_Last));
 
         Ztring LawRating=(*Parser)->Retrieve(Stream_General, 0, General_LawRating);
         if (!LawRating.empty())
@@ -3387,7 +3384,6 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
             Stream_Prepare(StreamKind_Last);
             Fill(StreamKind_Last, StreamPos_Last, "Title", Retrieve_Const(StreamKind_Last, StreamPos_Last-StreamPos, "Title"));
             Merge(*(*Parser), StreamKind_Last, StreamPos, StreamPos_Last);
-            MergedStreams_Last.push_back(streamidentity(StreamKind_Last, StreamPos_Last));
         }
 
         if (StreamKind_Last!=Stream_Other && (*Parser)->Count_Get(Stream_Other))

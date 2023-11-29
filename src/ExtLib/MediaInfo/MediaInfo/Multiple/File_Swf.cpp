@@ -316,6 +316,11 @@ bool File_Swf::FileHeader_Begin()
 void File_Swf::FileHeader_Parse()
 {
     //Parsing
+    if (Buffer_Size<8)
+    {
+        Element_WaitForMoreData();
+        return;
+    }
     int32u Signature;
     if (FileLength==0 && Version==0)
     {
@@ -335,6 +340,12 @@ void File_Swf::FileHeader_Parse()
     if (Signature==0x435753) //CWS
     {
         Decompress();
+        return;
+    }
+
+    if (Signature!=0x465753) //FWS
+    {
+        Reject();
         return;
     }
 

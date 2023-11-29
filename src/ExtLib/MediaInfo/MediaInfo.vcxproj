@@ -107,6 +107,7 @@
     <ClInclude Include="MediaInfo\Export\Export_EbuCore.h" />
     <ClInclude Include="MediaInfo\Export\Export_Fims.h" />
     <ClInclude Include="MediaInfo\Export\Export_PBCore2.h" />
+    <ClInclude Include="MediaInfo\ExternalCommandHelpers.h" />
     <ClInclude Include="MediaInfo\File__Analyze_Element.h" />
     <ClInclude Include="MediaInfo\File__HasReferences.h" />
     <ClInclude Include="MediaInfo\HashWrapper.h" />
@@ -358,6 +359,7 @@
     <ClCompile Include="MediaInfo\Export\Export_PBCore.cpp" />
     <ClCompile Include="MediaInfo\Export\Export_PBCore2.cpp" />
     <ClCompile Include="MediaInfo\Export\Export_reVTMD.cpp" />
+    <ClCompile Include="MediaInfo\ExternalCommandHelpers.cpp" />
     <ClCompile Include="MediaInfo\File_Dummy.cpp" />
     <ClCompile Include="MediaInfo\File_Other.cpp" />
     <ClCompile Include="MediaInfo\File_Unknown.cpp" />

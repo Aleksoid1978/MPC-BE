@@ -31,6 +31,12 @@ using namespace std;
 namespace MediaInfoLib
 {
 
+struct stts_struct
+{
+    int32u                      SampleCount;
+    int32u                      SampleDuration;
+};
+
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -50,6 +56,9 @@ File_Mpeg4_TimeCode::File_Mpeg4_TimeCode()
     NegativeTimes=false;
     tkhd_Duration=0;
     mvhd_Duration_TimeScale=0;
+    DurationsPerFrame=nullptr;
+    LastUsedOffset=(int64u)-1;
+    AllFramesParsed=false;
 
     //Temp
     FrameMultiplier_Pos=0;
@@ -177,7 +186,7 @@ void File_Mpeg4_TimeCode::Streams_Finish()
                 int64s Frames=TC_Last.GetFrames();
                 TC_Last-=TC_Last.GetFrames();
                 TC_Last=TimeCode((int64_t)(TC_Last.ToFrames()*FrameMultiplier), NumberOfFrames*FrameMultiplier-1, TimeCode::DropFrame(DropFrame));
-                TC_Last+=Frames*FrameMultiplier+(Config->ParseSpeed<=0.5?(FrameMultiplier-1):FrameMultiplier_Pos);
+                TC_Last+=Frames*FrameMultiplier+(AllFramesParsed?FrameMultiplier_Pos:(FrameMultiplier-1));
             }
             Fill(Stream_Other, StreamPos_Last, Other_TimeCode_LastFrame, TC_Last.ToString().c_str());
         }
@@ -198,6 +207,7 @@ void File_Mpeg4_TimeCode::Read_Buffer_Init()
         DropFrame=Map(__T("DropFrame")).To_int8u()?true:false;
         NegativeTimes=Map(__T("NegativeTimes")).To_int8u()?true:false;
     }
+    Frame_Count_NotParsedIncluded=0;
 }
 
 //---------------------------------------------------------------------------
@@ -220,7 +230,7 @@ void File_Mpeg4_TimeCode::Read_Buffer_Continue()
             if (Config->ParseSpeed<=0.5 && Element_Offset!=Element_Size)
                 Skip_XX(Element_Size-Element_Offset,            "Other positions");
         }
-        else if (Config->ParseSpeed>0.5)
+        else if (AllFramesParsed)
         {
             FrameMultiplier_Pos++;
             if (FrameMultiplier_Pos>=FrameMultiplier)
@@ -230,6 +240,18 @@ void File_Mpeg4_TimeCode::Read_Buffer_Continue()
             }
             if (Pos_Last!=Pos_Last_Temp)
             {
+                bool ShouldIgnore=false;
+                if (Frame_Count_NotParsedIncluded!=(int64u)-1 && DurationsPerFrame && tmcd_Duration)
+                {
+                    int64u Frame_Count_Temp=0;
+                    size_t i=0;
+                    for (; Frame_Count_NotParsedIncluded-Frame_Count_Temp>=(*DurationsPerFrame)[i].SampleCount; i++)
+                        Frame_Count_Temp+=(*DurationsPerFrame)[i].SampleCount;
+                    if (i<DurationsPerFrame->size() && (*DurationsPerFrame)[i].SampleDuration==0)
+                        ShouldIgnore=true;
+                }
+                if (!ShouldIgnore)
+                {
                 const Ztring& Discontinuities=Retrieve_Const(Stream_Other, 0, "Discontinuities");
                 if (Discontinuities.size()>25*10)
                 {
@@ -260,13 +282,39 @@ void File_Mpeg4_TimeCode::Read_Buffer_Continue()
                     Discontinuity+=TC_Last2.ToString();
                     Fill(Stream_Other, 0, "Discontinuities", Discontinuity);
                 }
+                }
             }
         }
         Pos_Last=Pos_Last_Temp;
     }
 
     FILLING_BEGIN();
-        Frame_Count+=Element_Size/4;
+        int64u SamplesInThisBlock=Element_Size/4;
+        if (File_Offset+Buffer_Offset==LastUsedOffset)
+        {
+            //TODO: this compute should be generic in MP4 parser
+            Frame_Count_NotParsedIncluded=0;
+            for (size_t i=0; i<DurationsPerFrame->size(); i++)
+                Frame_Count_NotParsedIncluded+=(*DurationsPerFrame)[i].SampleCount;
+            Frame_Count_NotParsedIncluded--;
+        }
+        if (Frame_Count_NotParsedIncluded!=(int64u)-1 && DurationsPerFrame && tmcd_Duration)
+        {
+            int64u Frame_Count_Temp=0;
+            size_t i=0;
+            for (; Frame_Count_NotParsedIncluded-Frame_Count_Temp>=(*DurationsPerFrame)[i].SampleCount; i++)
+                Frame_Count_Temp+=(*DurationsPerFrame)[i].SampleCount;
+            if (i<DurationsPerFrame->size())
+            {
+                SamplesInThisBlock=(*DurationsPerFrame)[i].SampleDuration/tmcd_Duration;
+                if (SamplesInThisBlock)
+                    Pos_Last+=SamplesInThisBlock-1;
+            }
+        }
+
+        Frame_Count++;
+        if (Frame_Count_NotParsedIncluded!=(int64u)-1)
+            Frame_Count_NotParsedIncluded++;
 
         if (!Status[IsAccepted])
         {

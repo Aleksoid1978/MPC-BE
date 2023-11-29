@@ -1445,8 +1445,6 @@ bool File_MpegPs::Header_Parse_PES_packet(int8u stream_id)
         if (Demux_UnpacketizeContainer && Buffer_Offset+6+PES_packet_length>Buffer_Size)
             return false;
     #endif //MEDIAINFO_DEMUX
-    if (PES_packet_length && Buffer_Offset+6+PES_packet_length>=Buffer_Size && Config->IsFinishing)
-        PES_packet_length=(int16u)(Buffer_Size-(Buffer_Offset+6));
 
     //Parsing
     switch (stream_id)

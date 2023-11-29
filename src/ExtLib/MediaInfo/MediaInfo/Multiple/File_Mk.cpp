@@ -1287,6 +1287,17 @@ void File_Mk::Streams_Finish()
             if (Temp->second.StreamKind==Stream_Video && !Codec_Temp.empty())
                 Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Codec), Codec_Temp, true);
 
+            //BlockAdditions
+            for (auto Add=Temp->second.BlockAdditions.begin(); Add!=Temp->second.BlockAdditions.end(); ++Add)
+            {
+                auto StreamKind_Last_Sav=StreamKind_Last;
+                auto StreamPos_Last_Sav=StreamPos_Last;
+                Merge(*Add->second);
+                Fill(StreamKind_Last, StreamPos_Last, Other_ID, to_string(Temp->first)+"-Add-"+to_string(Add->first));
+                Fill(StreamKind_Last, StreamPos_Last, Other_MuxingMode, "BlockAddition");
+                StreamKind_Last=StreamKind_Last_Sav;
+                StreamPos_Last=StreamPos_Last_Sav;
+            }
 
             //Format specific
             #if defined(MEDIAINFO_DVDIF_YES)
@@ -3137,12 +3148,12 @@ void File_Mk::Segment_Info_DateUTC()
 {
     //Parsing
     int64u Data;
-    Get_B8(Data,                                                "Data"); Element_Info1(Data/1000000000+978307200); //From Beginning of the millenium, in nanoseconds
+    Get_B8(Data,                                                "Data"); Element_Info1((int64s)Data/1000000000+978307200); //From Beginning of the millenium, in nanoseconds
 
     FILLING_BEGIN();
         if (Segment_Info_Count>1)
             return; //First element has the priority
-        Ztring Time=Ztring().Date_From_Seconds_1970((int32u)(Data/1000000000+978307200)); //978307200s between beginning of the millenium and 1970
+        Ztring Time=Ztring().Date_From_Seconds_1970((int32u)((int64s)Data/1000000000+978307200)); //978307200s between beginning of the millenium and 1970
         if (!Time.empty())
         {
             Time.FindAndReplace(__T("UTC "), __T(""));
@@ -3571,6 +3582,7 @@ void File_Mk::Segment_Tracks_TrackEntry_BlockAdditionMapping_Manage()
             {
             auto Temp=new File_Gxf_TimeCode();
             Temp->IsBigEndian=true;
+            Temp->IsTimeCodeTrack=true;
             Parser=Temp;
             }
             #endif

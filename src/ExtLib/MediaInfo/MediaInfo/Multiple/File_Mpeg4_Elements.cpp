@@ -5420,6 +5420,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_tmcd()
         Parser->mdhd_Duration_TimeScale=Streams[moov_trak_tkhd_TrackID].mdhd_TimeScale;
         Parser->tmcd_Duration = tc->FrameDuration;
         Parser->tmcd_Duration_TimeScale = tc->TimeScale;
+        Parser->DurationsPerFrame=&Streams[moov_trak_tkhd_TrackID].stts;
 
         //Get delay from timecode track's edit list
         int64s FrameDurationInMediaUnits = tc->FrameDuration * Streams[moov_trak_tkhd_TrackID].mdhd_TimeScale;

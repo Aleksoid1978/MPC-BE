@@ -497,8 +497,11 @@ struct Items_Struct {
         StringVectors_Size =StringVectors_Size_;
     }
 
-    Item_Struct& New()
+    Item_Struct& New(bool Init = true)
     {
+        if (!Init) {
+            return Items.back();
+        }
         Items.resize(Items.size() + 1);
         Item_Struct& Item = Items[Items.size() - 1];
         Item.Strings.resize(Strings_Size);
@@ -575,7 +578,38 @@ static void Apply_SubStreams(File__Analyze& F, const string& P_And_LinkedTo, Ite
 static void CheckErrors_Formating(file_adm_private* File_Adm_Private, const string& ID, const item_info& ID_Start, vector<string>& Errors, const char* Sub = nullptr);
 static void CheckErrors_Formating(file_adm_private* File_Adm_Private, Items_Struct& MainItem, const item_info& ID_Start, const char* Sub = nullptr);
 
-class file_adm_private
+class tfsxml
+{
+public:
+    void Enter();
+    void Leave();
+    int Init(const void* const Buffer, size_t Buffer_Size);
+    int NextElement();
+    int Attribute();
+    int Value();
+    bool IsInit() { return IsInit_; }
+    size_t Remain() { return p.len < 0 ? 0 : (size_t)p.len; }
+    void SetSavedAttribute(int Pos) { Attributes_[Level].insert({Pos, tfsxml_decode(v)}); }
+    const map<int, string>::iterator GetSavedAttribute(int Pos, int UpperLevel = 0) { return Attributes_[Level - UpperLevel].find(Pos); }
+    const map<int, string>::iterator NoSavedAttribute(int UpperLevel = 0) { return Attributes_[Level - UpperLevel].end(); }
+
+private:
+    tfsxml_string p;
+
+public:
+    tfsxml_string b, v;
+
+private:
+    string Code[16];
+    map<int, string> Attributes_[16];
+    int8u Level = 0;
+    int8u Level_Max = 0;
+    bool IsInit_ = false;
+    bool MustEnter = false;
+    bool ParsingAttr = false;
+};
+
+class file_adm_private : public tfsxml
 {
 public:
     // In
@@ -596,7 +630,7 @@ public:
     }
 
     // Actions
-    void parse();
+    int parse(const void* const Buffer, size_t Buffer_Size);
     void clear();
 
     // Helpers
@@ -613,22 +647,123 @@ public:
     }
 
 //private:
-    tfsxml_string p;
 
-    void coreMetadata();
-    void format();
-    void audioFormatExtended();
-    void frameHeader();
-    void transportTrackFormat();
+    int coreMetadata();
+    int format();
+    int audioFormatExtended();
+    int frameHeader();
+    int transportTrackFormat();
 
     // Common definitions
     vector<string> audioChannelFormatIDRefs;
 };
 
-void file_adm_private::parse()
-{
-    tfsxml_string b, v;
+void tfsxml::Enter() {
+    if (Level == Level_Max) {
+        if (MustEnter) {
+            return;
+        }
+        MustEnter = true;
+        Level++;
+        Level_Max = Level;
+    }
+    else {
+        Level++;
+    }
+}
 
+void tfsxml::Leave() {
+    IsInit_ = false;
+    MustEnter = false;
+    if (Level != (decltype(Level))-1) {
+        Level--;
+        Level_Max = Level;
+    }
+}
+
+
+int tfsxml::Init(const void* const Buffer, size_t Buffer_Size) {
+    if (!p.buf)
+    {
+        int Result = tfsxml_init(&p, Buffer, Buffer_Size, 0);
+        if (Result) {
+            return Result;
+        }
+    }
+    else
+    {
+        p.buf = (const char*)Buffer;
+        p.len = Buffer_Size;
+    }
+    return 0;
+}
+
+int tfsxml::NextElement() {
+    IsInit_ = false;
+    if (MustEnter && Level == Level_Max + ParsingAttr) {
+        int Result;
+        if (Level > 1)
+            Result = tfsxml_enter(&p);
+        else
+            Result = 0;
+        if (Result > 0) {
+            Level = 0;
+            return Result;
+        }
+        MustEnter = false;
+        if (Result) {
+            return Result;
+        }
+    }
+    if (Level == Level_Max + ParsingAttr) {
+        auto Result = tfsxml_next(&p, &b);
+        if (Result < 0) {
+            return Result;
+        }
+        if (Result > 0) {
+            Level = 0;
+            return Result;
+        }
+        IsInit_ = true;
+        Attributes_[Level].clear();
+        Code[Level] = tfsxml_decode(b);
+        Code[Level + 1].clear();
+    }
+    else {
+        b.buf = Code[Level].c_str();
+        b.len = Code[Level].size();
+    }
+    return 0;
+}
+
+int tfsxml::Attribute() {
+    IsInit_ = false;
+    if (Level == Level_Max) {
+        auto Result = tfsxml_attr(&p, &b, &v);
+        if (Result > 0) {
+            ParsingAttr = true;
+            Level = 0;
+            return Result;
+        }
+        ParsingAttr = false;
+        return Result;
+    }
+    return -1;
+}
+
+int tfsxml::Value() {
+    auto Result = tfsxml_value(&p, &b);
+    if (Result > 0) {
+        ParsingAttr = true;
+        Level = 0;
+        return Result;
+    }
+    ParsingAttr = false;
+    return Result;
+}
+
+int file_adm_private::parse(const void* const Buffer, size_t Buffer_Size)
+{
     # define STRUCTS(NAME) \
         Items[item_##NAME].Init(NAME##_String_Max, NAME##_StringVector_Max);
 
@@ -642,36 +777,82 @@ void file_adm_private::parse()
     STRUCTS(audioTrackFormat);
     STRUCTS(audioStreamFormat);
 
-    
+ 
+    #define XML_BEGIN \
+
+    #define XML_ATTR_START \
+        for (;;) { \
+            { \
+                int Result = Attribute(); \
+                if (Result < 0) { \
+                    break; \
+                } \
+                if (Result > 0) { \
+                    return Result; \
+                } \
+            } \
+            if (false) { \
+            } \
+
+    #define XML_ATTR_END \
+        } \
+
+    #define XML_VALUE \
+        { \
+            auto Result = Value(); \
+            if (Result > 0) { \
+                return Result; \
+            } \
+        } \
+
+    #define XML_ELEM_START \
+        Enter(); \
+        for (;;) { \
+            { \
+                int Result = NextElement(); \
+                if (Result < 0) { \
+                    break; \
+                } \
+                if (Result > 0) { \
+                    return Result; \
+                } \
+            } \
+            if (false) { \
+            } \
+
+    #define XML_ELEM_END \
+        } \
+        Leave(); \
+
+    #define XML_SUB(_A) \
+        { \
+            int Result = _A; \
+            if (Result > 0) { \
+                return Result; \
+            } \
+        } \
+
+    #define XML_END \
+        return -1;
+   
     #define ELEMENT_START(NAME) \
         if (!tfsxml_strcmp_charp(b, #NAME)) \
         { \
-            Item_Struct& NAME##_Content = Items[item_##NAME].New(); \
-            for (;;) { \
-                if (tfsxml_attr(&p, &b, &v)) \
-                    break; \
-                if (false) { \
-                } \
+            Item_Struct& NAME##_Content = Items[item_##NAME].New(IsInit()); \
+            XML_ATTR_START \
 
     #define ELEMENT_MIDDLE(NAME) \
                 else if (!Items[item_audioProgramme].Items.empty() && &NAME##_Content == &Items[item_audioProgramme].Items.back()) { \
                     NAME##_Content.Errors[Warning].push_back(":XmlAttributes:\"" + tfsxml_decode(b) + "\" is not part of specs"); \
                 } \
-            } \
-        if (!tfsxml_enter(&p)) \
-        { \
-            for (;;) { \
-                if (tfsxml_next(&p, &b)) \
-                    break; \
-                if (false) { \
-                } \
+            XML_ATTR_END \
+            XML_ELEM_START \
 
     #define ELEMENT_END(NAME) \
-                    else if (!Items[item_audioProgramme].Items.empty() && &NAME##_Content == &Items[item_audioProgramme].Items.back()) { \
-                        NAME##_Content.Errors[Warning].push_back(":XmlElements:\"" + tfsxml_decode(b) + "\" is not part of specs"); \
-                    } \
+                else if (!Items[item_audioProgramme].Items.empty() && &NAME##_Content == &Items[item_audioProgramme].Items.back()) { \
+                    NAME##_Content.Errors[Warning].push_back(":XmlElements:\"" + tfsxml_decode(b) + "\" is not part of specs"); \
                 } \
-            } \
+            XML_ELEM_END \
         } \
 
     #define ATTRIBUTE(NAME,ATTR) \
@@ -685,13 +866,13 @@ void file_adm_private::parse()
             NAME##_Content.Strings[NAME##_##ATTR].assign(tfsxml_decode(v)); \
         } \
 
-#define ATTRIBUTE_I(NAME,ATTR) \
+    #define ATTRIBUTE_I(NAME,ATTR) \
         else if (!tfsxml_strcmp_charp(b, #ATTR)) { \
         } \
 
     #define ELEMENT(NAME,ELEM) \
         else if (!tfsxml_strcmp_charp(b, #ELEM)) { \
-            tfsxml_value(&p, &b); \
+            XML_VALUE \
             NAME##_Content.StringVectors[NAME##_##ELEM].push_back(tfsxml_decode(b)); \
         } \
 
@@ -699,41 +880,39 @@ void file_adm_private::parse()
         else if (!tfsxml_strcmp_charp(b, #ELEM)) { \
         } \
 
-    for (;;) {
-        if (tfsxml_next(&p, &b))
-            break;
+    if (auto Result = Init(Buffer, Buffer_Size)) {
+        return Result;
+    }
+
+    XML_BEGIN
+    XML_ELEM_START
         if (!tfsxml_strcmp_charp(b, "audioFormatExtended"))
         {
-            audioFormatExtended();
+            XML_SUB(audioFormatExtended())
         }
         if (!tfsxml_strcmp_charp(b, "ebuCoreMain"))
         {
-            while (!tfsxml_attr(&p, &b, &v)) {
+            XML_ATTR_START
                 if (!tfsxml_strcmp_charp(b, "xmlns") || !tfsxml_strcmp_charp(b, "xsi:schemaLocation")) {
                     DolbyProfileCanNotBeVersion1 = false;
                     if (!tfsxml_strstr_charp(v, "ebuCore_2014").len && !tfsxml_strstr_charp(v, "ebuCore_2016").len) {
                         DolbyProfileCanNotBeVersion1 = true;
                     }
-                    if (!DolbyProfileCanNotBeVersion1)
-                        break;
                 }
-            }
-            if (!tfsxml_enter(&p))
-            {
-                for (;;) {
-                    if (tfsxml_next(&p, &b))
-                        break;
+            XML_ATTR_END
+            XML_ELEM_START
                     if (!tfsxml_strcmp_charp(b, "coreMetadata"))
                     {
-                        coreMetadata();
+                        XML_SUB(coreMetadata());
                     }
-                }
-            }
+            XML_ELEM_END
         }
         if (!tfsxml_strcmp_charp(b, "frame"))
         {
-            Version_S = 0;
-            while (!tfsxml_attr(&p, &b, &v)) {
+            if (IsInit()) {
+                Version_S = 0;
+            }
+            XML_ATTR_START
                 if (!tfsxml_strcmp_charp(b, "version")) {
                     if (!tfsxml_strcmp_charp(v, "ITU-R_BS.2125-1")) {
                         Version_S = 1;
@@ -742,14 +921,15 @@ void file_adm_private::parse()
                         Version_S = 2;
                     }
                 }
-            }
-            format();
+            XML_ATTR_END
+            XML_SUB(format());
         }
         if (!tfsxml_strcmp_charp(b, "format"))
         {
-            format();
+            XML_SUB(format());
         }
-    }
+    XML_ELEM_END
+    XML_END
 }
 
 
@@ -760,42 +940,37 @@ void file_adm_private::clear()
     profileInfos.clear();
 }
 
-void file_adm_private::coreMetadata()
+int file_adm_private::coreMetadata()
 {
-    tfsxml_string b;
-
-    tfsxml_enter(&p);
-    for (;;) {
-        if (tfsxml_next(&p, &b))
-            break;
+    XML_BEGIN
+    XML_ELEM_START
         if (!tfsxml_strcmp_charp(b, "format"))
         {
-            format();
+            XML_SUB(format());
         }
-    }
+    XML_ELEM_END
+    XML_END
 }
 
-void file_adm_private::format()
+int file_adm_private::format()
 {
-    tfsxml_string b, v;
-
-    tfsxml_enter(&p);
-    for (;;) {
-        if (tfsxml_next(&p, &b))
-            break;
+    XML_BEGIN
+    XML_ELEM_START
         if (!tfsxml_strcmp_charp(b, "audioFormatCustom")) {
-            tfsxml_enter(&p);
-            while (!tfsxml_next(&p, &b)) {
+            XML_ELEM_START
                 if (!tfsxml_strcmp_charp(b, "audioFormatCustomSet")) {
-                    tfsxml_enter(&p);
-                    while (!tfsxml_next(&p, &b)) {
+                    XML_ELEM_START
                         if (!tfsxml_strcmp_charp(b, "admInformation")) {
-                            tfsxml_enter(&p);
-                            while (!tfsxml_next(&p, &b)) {
+                            if (IsInit()) {
+                                profileInfos.clear();
+                            }
+                            XML_ELEM_START
                                 if (!tfsxml_strcmp_charp(b, "profile")) {
-                                    profileInfos.resize(profileInfos.size() + 1);
+                                    if (IsInit()) {
+                                        profileInfos.resize(profileInfos.size() + 1);
+                                    }
                                     profile_info& profileInfo = profileInfos[profileInfos.size() - 1];
-                                    while (!tfsxml_attr(&p, &b, &v)) {
+                                    XML_ATTR_START
                                         for (size_t i = 0; i < profile_names_size; i++)
                                         {
                                             if (!tfsxml_strcmp_charp(b, profile_names[i])) {
@@ -804,28 +979,38 @@ void file_adm_private::format()
                                                     profileInfo.Strings[0].resize(profileInfo.Strings[0].size() - 12);
                                             }
                                         }
-                                    }
+                                    XML_ATTR_END
                                 }
-                            }
+                            XML_ELEM_END
                         }
-                    }
+                    XML_ELEM_END
                 }
-            }
+            XML_ELEM_END
         }
         if (!tfsxml_strcmp_charp(b, "audioFormatExtended")) {
-            audioFormatExtended();
+            XML_SUB(audioFormatExtended());
         }
         if (!tfsxml_strcmp_charp(b, "frameHeader")) {
-            frameHeader();
+            XML_SUB(frameHeader());
         }
-    }
+    XML_ELEM_END
+    XML_END
 }
 
-void file_adm_private::audioFormatExtended()
+int file_adm_private::audioFormatExtended()
 {
-    tfsxml_string b, v;
+    if (IsInit()) {
+        for (size_t i = 0; i < item_Max; i++) {
+            if (i == item_audioTrack) {
+                continue;
+            }
+            auto& Item = Items[i];
+            Item.Items.clear();
+        }
+    }
 
-    while (!tfsxml_attr(&p, &b, &v)) {
+    XML_BEGIN
+    XML_ATTR_START
         if (!tfsxml_strcmp_charp(b, "version")) {
             if (!tfsxml_strcmp_charp(v, "ITU-R_BS.2076-1")) {
                 Version = 1;
@@ -834,11 +1019,8 @@ void file_adm_private::audioFormatExtended()
                 Version = 2;
             }
         }
-    }
-    tfsxml_enter(&p);
-    for (;;) {
-        if (tfsxml_next(&p, &b))
-            break;
+    XML_ATTR_END
+    XML_ELEM_START
         ELEMENT_START(audioProgramme)
             ATTRIB_ID(audioProgramme, audioProgrammeID)
             ATTRIBUTE(audioProgramme, audioProgrammeName)
@@ -856,57 +1038,39 @@ void file_adm_private::audioFormatExtended()
             ATTRIBUTE(audioProgramme, maxDuckingDepth)
         ELEMENT_MIDDLE(audioProgramme)
             else if (!tfsxml_strcmp_charp(b, "audioProgrammeLabel")) {
-                string Language;
-                for (;;) {
-                    if (tfsxml_attr(&p, &b, &v))
-                        break;
+                XML_ATTR_START
                     if (!tfsxml_strcmp_charp(b, "language")) {
-                        Language += tfsxml_decode(v);
+                        SetSavedAttribute(0);
                     }
-                }
-                tfsxml_value(&p, &b);
+                XML_ATTR_END
+                XML_VALUE
                 string Value = tfsxml_decode(b);
-                if (!Value.empty() && !Language.empty()) {
-                    Value.insert(0, '(' + Language + ')');
+                if (!Value.empty() && GetSavedAttribute(0) != NoSavedAttribute()) {
+                    Value.insert(0, '(' + GetSavedAttribute(0)->second + ')');
                 }
                 audioProgramme_Content.StringVectors[audioProgramme_audioProgrammeLabel].push_back(Value);
             }
             ELEMENT(audioProgramme, audioContentIDRef)
             else if (!tfsxml_strcmp_charp(b, "loudnessMetadata")) {
-                if (!tfsxml_enter(&p))
-                {
-                    for (;;) {
-                        if (tfsxml_next(&p, &b))
-                            break;
+                XML_ELEM_START
                         if (!tfsxml_strcmp_charp(b, "integratedLoudness")) {
-                            tfsxml_value(&p, &b);
+                            XML_VALUE
                             audioProgramme_Content.StringVectors[audioProgramme_loudnessMetadata_integratedLoudness].push_back(tfsxml_decode(b));
                         }
-                    }
-                }
+                XML_ELEM_END
             }
             ELEMENT(audioProgramme, audioProgrammeReferenceScreen)
             else if (!tfsxml_strcmp_charp(b, "authoringInformation")) {
-                if (!tfsxml_enter(&p))
-                {
-                    for (;;) {
-                        if (tfsxml_next(&p, &b))
-                            break;
+                XML_ELEM_START
                         if (!tfsxml_strcmp_charp(b, "referenceLayout")) {
-                            if (!tfsxml_enter(&p))
-                            {
-                                for (;;) {
-                                    if (tfsxml_next(&p, &b))
-                                        break;
+                            XML_ELEM_START
                                     if (!tfsxml_strcmp_charp(b, "audioPackFormatIDRef")) {
-                                        tfsxml_value(&p, &b);
+                                        XML_VALUE
                                         audioProgramme_Content.StringVectors[audioProgramme_authoringInformation_referenceLayout_audioPackFormatIDRef].push_back(tfsxml_decode(b));
                                     }
-                                }
-                            }
+                            XML_ELEM_END
                         }
-                    }
-                }
+                XML_ELEM_END
             }
             ELEMENT(audioProgramme, alternativeValueSetIDRef)
         ELEMENT_END(audioProgramme)
@@ -918,111 +1082,104 @@ void file_adm_private::audioFormatExtended()
         ELEMENT_MIDDLE(audioContent)
             ELEMENT(audioContent, audioObjectIDRef)
             else if (!tfsxml_strcmp_charp(b, "dialogue")) {
-                string Type;
-                for (;;) {
-                    if (tfsxml_attr(&p, &b, &v))
-                        break;
+                XML_ATTR_START
                     if (!tfsxml_strcmp_charp(b, "nonDialogueContentKind")
                         || !tfsxml_strcmp_charp(b, "dialogueContentKind")
                         || !tfsxml_strcmp_charp(b, "mixedContentKind")) {
-                        Type += tfsxml_decode(v);
+                        SetSavedAttribute(0);
                     }
-                }
-                tfsxml_value(&p, &b);
+                XML_ATTR_END
+                XML_VALUE
                 string Value;
+                string Kind;
+                auto KindP = GetSavedAttribute(0);
+                if (KindP != NoSavedAttribute())
+                    Kind = KindP->second;
                 if (!tfsxml_strcmp_charp(b, "0")) {
-                    if (Type == "1") {
+                    if (Kind == "1") {
                         Value = "Music";
                     }
-                    else if (Type == "2") {
+                    else if (Kind == "2") {
                         Value = "Effect";
                     }
                     else {
                         Value = "No Dialogue";
-                        if (!Type.empty() && Type != "0") {
-                            Value += " (" + Type + ')';
+                        if (!Kind.empty() && Kind != "0") {
+                            Value += " (" + Kind + ')';
                         }
                     }
                 }
                 else if (!tfsxml_strcmp_charp(b, "1")) {
-                    if (Type == "1") {
+                    if (Kind == "1") {
                         Value = "Music";
                     }
-                    else if (Type == "2") {
+                    else if (Kind == "2") {
                         Value = "Effect";
                     }
-                    else if (Type == "3") {
+                    else if (Kind == "3") {
                         Value = "Spoken Subtitle";
                     }
-                    else if (Type == "4") {
+                    else if (Kind == "4") {
                         Value = "Visually Impaired";
                     }
-                    else if (Type == "5") {
+                    else if (Kind == "5") {
                         Value = "Commentary";
                     }
-                    else if (Type == "6") {
+                    else if (Kind == "6") {
                         Value = "Emergency";
                     }
                     else {
                         Value = "Dialogue";
-                        if (!Type.empty() && Type != "0") {
-                            Value += " (" + Type + ')';
+                        if (!Kind.empty() && Kind != "0") {
+                            Value += " (" + Kind + ')';
                         }
                     }
                 }
                 else if (!tfsxml_strcmp_charp(b, "2")) {
-                    if (Type == "1") {
+                    if (Kind == "1") {
                         Value = "Complete Main";
                     }
-                    else if (Type == "2") {
+                    else if (Kind == "2") {
                         Value = "Mixed (Mixed)";
                     }
-                    else if (Type == "3") {
+                    else if (Kind == "3") {
                         Value = "Hearing Impaired";
                     }
                     else {
                         Value = "Mixed";
-                        if (!Type.empty() && Type != "0") {
-                            Value += " (" + Type + ')';
+                        if (!Kind.empty() && Kind != "0") {
+                            Value += " (" + Kind + ')';
                         }
                     }
                 }
                 else {
                     Value = tfsxml_decode(b);
-                    if (!Type.empty()) {
-                        Value += " (" + Type + ')';
+                    if (!Kind.empty()) {
+                        Value += " (" + Kind + ')';
                     }
                 }
                 audioContent_Content.StringVectors[audioContent_dialogue].push_back(Value);
             }
             else if (!tfsxml_strcmp_charp(b, "audioContentLabel")) {
-                string Language;
-                for (;;) {
-                    if (tfsxml_attr(&p, &b, &v))
-                        break;
+                XML_ATTR_START
                     if (!tfsxml_strcmp_charp(b, "language")) {
-                        Language += tfsxml_decode(v);
+                        SetSavedAttribute(0);
                     }
-                }
-                tfsxml_value(&p, &b);
+                XML_ATTR_END
+                XML_VALUE
                 string Value = tfsxml_decode(b);
-                if (!Value.empty() && !Language.empty()) {
-                    Value.insert(0, '(' + Language + ')');
+                if (!Value.empty() && GetSavedAttribute(0) != NoSavedAttribute()) {
+                    Value.insert(0, '(' + GetSavedAttribute(0)->second + ')');
                 }
                 audioContent_Content.StringVectors[audioContent_audioContentLabel].push_back(Value);
             }
             else if (!tfsxml_strcmp_charp(b, "loudnessMetadata")) {
-                if (!tfsxml_enter(&p))
-                {
-                    for (;;) {
-                        if (tfsxml_next(&p, &b))
-                            break;
+                XML_ELEM_START
                         if (!tfsxml_strcmp_charp(b, "integratedLoudness")) {
-                            tfsxml_value(&p, &b);
+                            XML_VALUE
                             audioContent_Content.StringVectors[audioContent_loudnessMetadata_integratedLoudness].push_back(tfsxml_decode(b));
                         }
-                    }
-                }
+                XML_ELEM_END
             }
             ELEMENT(audioContent, dialogue)
         ELEMENT_END(audioContent)
@@ -1053,22 +1210,14 @@ void file_adm_private::audioFormatExtended()
             ATTRIBUTE(audioChannelFormat, typeLabel)
         ELEMENT_MIDDLE(audioChannelFormat)
             else if (!tfsxml_strcmp_charp(b, "audioBlockFormat")) {
-                for (;;) {
-                    if (tfsxml_attr(&p, &b, &v))
-                        break;
-                    if (false) {
-                    }
+                XML_ATTR_START
                     else if (!tfsxml_strcmp_charp(b, "audioBlockFormatID")) {
                         CheckErrors_Formating(this, tfsxml_decode(v), item_Info[item_audioBlockFormat], *this->Items[item_audioChannelFormat].Items.back().Errors, "audioBlockFormat:audioBlockFormatID");
                     }
-                }
-                if (!tfsxml_enter(&p))
-                {
-                    for (;;) {
-                        if (tfsxml_next(&p, &b))
-                            break;
+                XML_ATTR_END
+                XML_ELEM_START
                         if (!tfsxml_strcmp_charp(b, "speakerLabel")) {
-                            tfsxml_value(&p, &b);
+                            XML_VALUE
                             string SpeakerLabel = tfsxml_decode(b);
                             if (SpeakerLabel.rfind("RC_", 0) == 0) {
                                 SpeakerLabel.erase(0, 3);
@@ -1082,13 +1231,9 @@ void file_adm_private::audioFormatExtended()
                             else if (Extra_Type != audioChannelFormat_Content.Extra.end()) {
                                 audioChannelFormat_Content.Extra.clear();
                                 audioChannelFormat_Content.Extra["Type"] = "Dynamic";
-                                tfsxml_leave(&p); // audioBlockFormat
-                                tfsxml_leave(&p); // audioChannelFormat
-                                break;
                             }
-                        }
                     }
-                }
+                XML_ELEM_END
             }
         ELEMENT_END(audioChannelFormat)
         ELEMENT_START(audioTrackUID)
@@ -1122,17 +1267,17 @@ void file_adm_private::audioFormatExtended()
             ELEMENT(audioStreamFormat, audioPackFormatIDRef)
             ELEMENT(audioStreamFormat, audioTrackFormatIDRef)
         ELEMENT_END(audioStreamFormat)
-    }
+    XML_ELEM_END
+    XML_END
 }
 
-void file_adm_private::frameHeader()
+int file_adm_private::frameHeader()
 {
-    tfsxml_string a, v;
-    tfsxml_enter(&p);
-    while (!tfsxml_next(&p, &v)) {
-        if (!tfsxml_strcmp_charp(v, "frameFormat")) {
-            while (!tfsxml_attr(&p, &a, &v)) {
-                if (!tfsxml_strcmp_charp(a, "duration")) {
+    XML_BEGIN
+    XML_ELEM_START
+        if (!tfsxml_strcmp_charp(b, "frameFormat")) {
+            XML_ATTR_START
+                if (!tfsxml_strcmp_charp(b, "duration")) {
                     auto Duration = TimeCodeToFloat(tfsxml_decode(v));
                     if (FrameRate_Den < 5) // Handling of 1.001 frames rates
                     {
@@ -1145,43 +1290,47 @@ void file_adm_private::frameHeader()
                     else
                         More["Duration"] = Ztring().From_Number(Duration * 1000, 0).To_UTF8();
                 }
-                if (!tfsxml_strcmp_charp(a, "flowID")) {
+                if (!tfsxml_strcmp_charp(b, "flowID")) {
                     More["FlowID"] = tfsxml_decode(v);
                 }
-                if (!tfsxml_strcmp_charp(a, "start") && More["TimeCode_FirstFrame"].empty()) {
+                if (!tfsxml_strcmp_charp(b, "start") && More["TimeCode_FirstFrame"].empty()) {
                     More["TimeCode_FirstFrame"] = tfsxml_decode(v);
                 }
-                if (!tfsxml_strcmp_charp(a, "type")) {
+                if (!tfsxml_strcmp_charp(b, "type")) {
                     More["Metadata_Format_Type"] = tfsxml_decode(v);
                 }
-            }
+            XML_ATTR_END
         }
-        if (!tfsxml_strcmp_charp(v, "transportTrackFormat")) {
-            transportTrackFormat();
+        if (!tfsxml_strcmp_charp(b, "transportTrackFormat")) {
+            XML_SUB(transportTrackFormat());
         }
-    }
+    XML_ELEM_END
+    XML_END
 }
 
-void file_adm_private::transportTrackFormat()
+int file_adm_private::transportTrackFormat()
 {
-    Items[item_audioTrack].Items.clear();
-    tfsxml_string b, v;
-    int32u trackID = 0;
-    tfsxml_enter(&p);
-    for (;;) {
-        if (tfsxml_next(&p, &b))
-            break;
+    if (IsInit()) {
+        Items[item_audioTrack].Items.clear();
+    }
+    XML_BEGIN
+    XML_ELEM_START
         ELEMENT_START(audioTrack)
             else if (!tfsxml_strcmp_charp(b, "trackID")) {
-                trackID = Ztring().From_UTF8(v.buf, v.len).To_int32u();
+                SetSavedAttribute(0);
             }
         ELEMENT_MIDDLE(audioTrack)
             else if (!tfsxml_strcmp_charp(b, "audioTrackUIDRef")) {
-                tfsxml_value(&p, &b);
-                chna_Add(trackID, tfsxml_decode(b));
+                XML_VALUE
+                auto trackIDP = GetSavedAttribute(0, 1);
+                if (trackIDP != NoSavedAttribute(1)) {
+                    auto trackID = Ztring().From_UTF8(trackIDP->second.c_str()).To_int32u();
+                    chna_Add(trackID, tfsxml_decode(b));
+                }
             }
         ELEMENT_END(audioTrack)
-    }
+    XML_ELEM_END
+    XML_END
 }
 
 //---------------------------------------------------------------------------
@@ -1687,9 +1836,6 @@ bool File_Adm::FileHeader_Begin()
             Reject();
             return false;
         }
-
-        Element_WaitForMoreData();
-        return false; //Must wait for more data
     }
 
     return true;
@@ -1700,21 +1846,25 @@ bool File_Adm::FileHeader_Begin()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+void File_Adm::Read_Buffer_Init()
+{
+    File_Adm_Private->IsSub = IsSub;
+}
+
+//---------------------------------------------------------------------------
 void File_Adm::Read_Buffer_Continue()
 {
-    if (tfsxml_init(&File_Adm_Private->p, (void*)(Buffer), Buffer_Size))
-        return;
-    File_Adm_Private->IsSub = IsSub;
-    File_Adm_Private->clear();
-    File_Adm_Private->parse();
-    if (File_Adm_Private->Items[item_audioContent].Items.empty())
+    auto Result = File_Adm_Private->parse((void*)Buffer, Buffer_Size);
+    if (!Status[IsAccepted] && !File_Adm_Private->Items[item_audioContent].Items.empty())
     {
-        Reject();
+        Accept("ADM");
+    }
+    if (Result > 0 && File_Offset + Buffer_Size < File_Size)
+    {
+        Buffer_Offset = Buffer_Size - File_Adm_Private->Remain();
+        Element_WaitForMoreData();
         return;
     }
-
-    if (!Status[IsAccepted])
-        Accept("ADM");
 }
 
 //***************************************************************************
@@ -1745,4 +1895,3 @@ void File_Adm::chna_Move(File_Adm* Adm)
 } //NameSpace
 
 #endif //MEDIAINFO_ADM_YES
-

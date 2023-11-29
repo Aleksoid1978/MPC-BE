@@ -17,6 +17,7 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
+#include "MediaInfo/TimeCode.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -41,6 +42,7 @@ private :
 
     //Buffer - File header
     bool FileHeader_Begin();
+    void FileHeader_Parse();
 
     //Buffer - Demux
     #if MEDIAINFO_DEMUX
@@ -58,14 +60,24 @@ private :
     void Data_Parse();
 
     //Elements
-    void Signature();
-    void IDAT() {Skip_XX(Element_Size, "Data");}
-    void IEND();
+    void IDAT();
+    void IEND() {}
     void IHDR();
     void PLTE() {Skip_XX(Element_Size, "Data");}
+    void iTXt() {Textual(bitset8().set(IsCompressed).set(IsUTF8));}
+    void gAMA();
+    void pHYs();
+    void sBIT();
+    void tEXt() {Textual(bitset8());}
+    void zTXt() {Textual(bitset8().set(IsCompressed));}
 
-    //Temp
-    bool    Signature_Parsed;
+    //Helpers
+    enum Text_Style
+    {
+        IsCompressed,
+        IsUTF8,
+    };
+    void Textual(bitset8 Method);
 };
 
 } //NameSpace

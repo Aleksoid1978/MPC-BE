@@ -917,11 +917,32 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
     //MergedStreams
     if (FillAllMergedStreams)
     {
-        FillAllMergedStreams=false;
-        size_t s = MergedStreams_Last.size();
-        for (size_t i=0; i<s; ++i)
-            Fill(MergedStreams_Last[i].StreamKind, MergedStreams_Last[i].StreamPos, Parameter, Value, Replace);
-        FillAllMergedStreams=true;
+        for (size_t i=0; sizeof(generic); i++)
+            if (Fill_Parameter(StreamKind, (generic)i)==Parameter)
+            {
+                generic Parameter2=(generic)i;
+                FillAllMergedStreams=false;
+                Ztring ID=Retrieve(StreamKind, StreamPos, General_ID); //TODO: find a better to catch content from same stream
+                auto ID_Dash_Pos=ID.find(__T("-"));
+                if (ID_Dash_Pos!=string::npos)
+                    ID.resize(ID_Dash_Pos);
+                for (size_t StreamKind2=Stream_Audio; StreamKind2<Stream_Max; StreamKind2++)
+                    for (size_t StreamPos2=0; StreamPos2<(*Stream)[StreamKind2].size(); StreamPos2++)
+                    {
+                        Ztring ID2=Retrieve((stream_t)StreamKind2, StreamPos2, General_ID);
+                        auto ID2_Dash_Pos=ID2.find(__T("-"));
+                        if (ID2_Dash_Pos!=string::npos && ID2.substr(ID2_Dash_Pos)!=__T("-Material"))
+                            ID2.resize(ID2_Dash_Pos);
+                        if (ID2==ID)
+                        {
+                            size_t Parameter3=Fill_Parameter((stream_t)StreamKind2, Parameter2);
+                            if (Parameter3!=(size_t)-1)
+                                Fill((stream_t)StreamKind2, StreamPos2, Parameter3, Value, Replace);
+                        }
+                    }
+                FillAllMergedStreams=true;
+                break;
+            }
         return;
     }
 
@@ -1069,6 +1090,7 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
                                 case Video_Width:   if (StreamSource==IsStream) Fill(Stream_Video, StreamPos, Video_Sampled_Width, Value); break;
                                 case Video_Height:  if (StreamSource==IsStream) Fill(Stream_Video, StreamPos, Video_Sampled_Height, Value); break;
                                 case Video_DisplayAspectRatio:  DisplayAspectRatio_Fill(Value, Stream_Video, StreamPos, Video_Width, Video_Height, Video_PixelAspectRatio, Video_DisplayAspectRatio); break;
+                                case Video_Active_DisplayAspectRatio:  DisplayAspectRatio_Fill(Value, Stream_Video, StreamPos, Video_Active_Width, Video_Active_Height, Video_PixelAspectRatio, Video_Active_DisplayAspectRatio); break;
                                 case Video_PixelAspectRatio:    PixelAspectRatio_Fill(Value, Stream_Video, StreamPos, Video_Width, Video_Height, Video_PixelAspectRatio, Video_DisplayAspectRatio);   break;
                                 case Video_DisplayAspectRatio_CleanAperture:  DisplayAspectRatio_Fill(Value, Stream_Video, StreamPos, Video_Width_CleanAperture, Video_Height_CleanAperture, Video_PixelAspectRatio_CleanAperture, Video_DisplayAspectRatio_CleanAperture); break;
                                 case Video_PixelAspectRatio_CleanAperture:    PixelAspectRatio_Fill(Value, Stream_Video, StreamPos, Video_Width_CleanAperture, Video_Height_CleanAperture, Video_PixelAspectRatio_CleanAperture, Video_DisplayAspectRatio_CleanAperture);   break;
@@ -1134,6 +1156,7 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
                             switch (Parameter)
                             {
                                 case Image_DisplayAspectRatio:  DisplayAspectRatio_Fill(Value, Stream_Image, StreamPos, Image_Width, Image_Height, Image_PixelAspectRatio, Image_DisplayAspectRatio); break;
+                                case Image_Active_DisplayAspectRatio:  DisplayAspectRatio_Fill(Value, Stream_Image, StreamPos, Image_Active_Width, Image_Active_Height, Image_PixelAspectRatio, Image_Active_DisplayAspectRatio); break;
                                 case Image_PixelAspectRatio:    PixelAspectRatio_Fill(Value, Stream_Image, StreamPos, Image_Width, Image_Height, Image_PixelAspectRatio, Image_DisplayAspectRatio);   break;
                                 case Image_DisplayAspectRatio_Original:  DisplayAspectRatio_Fill(Value, Stream_Image, StreamPos, Image_Width_Original, Image_Height_Original, Image_PixelAspectRatio_Original, Image_DisplayAspectRatio_Original); break;
                                 case Image_PixelAspectRatio_Original:    PixelAspectRatio_Fill(Value, Stream_Image, StreamPos, Image_Width_Original, Image_Height_Original, Image_PixelAspectRatio_Original, Image_DisplayAspectRatio_Original);   break;
@@ -2149,15 +2172,12 @@ size_t File__Analyze::Merge(MediaInfo_Internal &ToAdd, stream_t StreamKind, size
 //---------------------------------------------------------------------------
 size_t File__Analyze::Merge(File__Analyze &ToAdd, bool Erase)
 {
-    MergedStreams_Last.clear();
-
     size_t Count=0;
     for (size_t StreamKind=(size_t)Stream_General+1; StreamKind<(size_t)Stream_Max; StreamKind++)
         for (size_t StreamPos=0; StreamPos<(*ToAdd.Stream)[StreamKind].size(); StreamPos++)
         {
             //Prepare a new stream
             Stream_Prepare((stream_t)StreamKind);
-            MergedStreams_Last.push_back(streamidentity(StreamKind_Last, StreamPos_Last));
 
             //Merge
             Merge(ToAdd, (stream_t)StreamKind, StreamPos, StreamPos_Last, Erase);
@@ -2994,6 +3014,7 @@ void File__Analyze::Duration_Duration123(stream_t StreamKind, size_t StreamPos, 
                 if (!DropFrame_IsValid)
                 {
                     int32s  FrameRateI=float32_int32s(FrameRateS.To_float32());
+                    if (!(FrameRateI%30))
                     {
                         float32 FrameRateF=FrameRateS.To_float32();
                         float FrameRateF_Min=((float32)FrameRateI)/((float32)1.002);
@@ -3020,6 +3041,8 @@ void File__Analyze::Duration_Duration123(stream_t StreamKind, size_t StreamPos, 
                         else
                             DropFrame=false;
                     }
+                    else
+                        DropFrame=false;
                 }
 
                 TimeCode TC((int64_t)FrameCountS.To_int64s(), (uint32_t)float32_int32s(FrameRateS.To_float32()-1), TimeCode::DropFrame(DropFrame).FPS1001(FrameRateI!=FrameRateF));
@@ -3444,7 +3467,8 @@ void File__Analyze::DisplayAspectRatio_Fill(const Ztring &Value, stream_t Stream
     else if (DAR>=(float)2.15 && DAR<(float)2.22)   DARS=__T("2.2:1");
     else if (DAR>=(float)2.23 && DAR<(float)2.30)   DARS=__T("2.25:1");
     else if (DAR>=(float)2.30 && DAR<(float)2.37)   DARS=__T("2.35:1");
-    else if (DAR>=(float)2.37 && DAR<(float)2.45)   DARS=__T("2.40:1");
+    else if (DAR>=(float)2.37 && DAR<(float)2.395)  DARS=__T("2.39:1");
+    else if (DAR>=(float)2.395 && DAR<(float)2.45)  DARS=__T("2.40:1");
     else                                            DARS.From_Number(DAR);
       DARS.FindAndReplace(__T("."), MediaInfoLib::Config.Language_Get(__T("  Config_Text_FloatSeparator")));
     if (MediaInfoLib::Config.Language_Get(__T("  Language_ISO639"))==__T("fr") &&   DARS.find(__T(":1"))==string::npos)

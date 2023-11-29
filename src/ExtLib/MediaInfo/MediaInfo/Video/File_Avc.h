@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
 #include "MediaInfo/File__Duplicate.h"
+#include "MediaInfo/TimeCode.h"
 #include <cmath>
 //---------------------------------------------------------------------------
 
@@ -512,6 +513,9 @@ private :
         File__Analyze*                  GA94_03_Parser;
         bool                            GA94_03_IsPresent;
     #endif //defined(MEDIAINFO_DTVCCTRANSPORT_YES)
+
+    //Misc
+    TimeCode                            TC_Current;
 
     //Replacement of File__Analyze buffer
     const int8u*                        Buffer_ToSave;

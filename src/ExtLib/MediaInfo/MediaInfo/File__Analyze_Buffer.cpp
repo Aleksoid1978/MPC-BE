@@ -1837,6 +1837,33 @@ void File__Analyze::Get_ISO_8859_5(int64u Bytes, Ztring &Info, const char* Name)
 }
 
 //---------------------------------------------------------------------------
+void File__Analyze::Get_ISO_8859_9(int64u Bytes, Ztring &Info, const char* Name)
+{
+    INTEGRITY_SIZE_ATLEAST_STRING(Bytes);
+    Info.clear();
+    size_t End = Buffer_Offset + (size_t)Element_Offset + (size_t)Bytes;
+    for (size_t Pos=Buffer_Offset+(size_t)Element_Offset; Pos<End; ++Pos)
+    {
+        switch (Buffer[Pos])
+        {
+            case 0xD0 : Info+=Ztring().From_Unicode(L"\x11E"); break;
+            case 0xDD : Info+=Ztring().From_Unicode(L"\x130"); break;
+            case 0xDE : Info+=Ztring().From_Unicode(L"\x15E"); break;
+            case 0xF0 : Info+=Ztring().From_Unicode(L"\x11F"); break;
+            case 0xFD : Info+=Ztring().From_Unicode(L"\x131"); break;
+            case 0xFE : Info+=Ztring().From_Unicode(L"\x15F"); break;
+            default   :
+                        {
+                        wchar_t NewChar=Buffer[Pos];
+                        Info+=Ztring().From_Unicode(&NewChar, 1);
+                        }
+        }
+    }
+    if (Trace_Activated && Bytes) Param(Name, Info);
+    Element_Offset+=Bytes;
+}
+
+//---------------------------------------------------------------------------
 extern const int16u Ztring_MacRoman[128];
 void File__Analyze::Get_MacRoman(int64u Bytes, Ztring& Info, const char* Name)
 {
@@ -1935,6 +1962,19 @@ void File__Analyze::Skip_Local(int64u Bytes, const char* Name)
     if (Trace_Activated && Bytes) Param(Name, Ztring().From_ISO_8859_1((const char*)(Buffer+Buffer_Offset+(size_t)Element_Offset), (size_t)Bytes)); //Trying with the most commonly used charset before UTF8
     #endif //WINDOWS
     Element_Offset+=Bytes;
+}
+
+//---------------------------------------------------------------------------
+void File__Analyze::Skip_ISO_8859_1(int64u Bytes, const char* Name)
+{
+    INTEGRITY_SIZE_ATLEAST(Bytes);
+    if (Trace_Activated && Bytes)
+    {
+        Ztring Temp;
+        Get_ISO_8859_1(Bytes, Temp, Name);
+    }
+    else
+        Element_Offset+=Bytes;
 }
 
 //---------------------------------------------------------------------------
