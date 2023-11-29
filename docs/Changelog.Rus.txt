@@ -37,6 +37,7 @@ YouTube
 
 Обновлены библиотеки:
 	ffmpeg git-n6.2-dev-297-gbbdedd9663;
+	Little-CMS git-lcms2.16rc1-gd90d134b;
 	nanosvg git-706eb06;
 	rapidjson git-v1.1.0-744-gf9d53419.
 

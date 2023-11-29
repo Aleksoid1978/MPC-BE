@@ -1161,20 +1161,6 @@ cmsUInt32Number CMSEXPORT cmsGetSupportedIntentsTHR(cmsContext ContextID, cmsUIn
     cmsIntentsList* pt;
     cmsUInt32Number nIntents;
 
-
-    for (nIntents=0, pt = ctx->Intents; pt != NULL; pt = pt -> Next)
-    {
-        if (nIntents < nMax) {
-            if (Codes != NULL)
-                Codes[nIntents] = pt ->Intent;
-
-            if (Descriptions != NULL)
-                Descriptions[nIntents] = pt ->Description;
-        }
-
-        nIntents++;
-    }
-
     for (nIntents=0, pt = DefaultIntents; pt != NULL; pt = pt -> Next)
     {
         if (nIntents < nMax) {
@@ -1187,6 +1173,20 @@ cmsUInt32Number CMSEXPORT cmsGetSupportedIntentsTHR(cmsContext ContextID, cmsUIn
 
         nIntents++;
     }
+
+    for (pt = ctx->Intents; pt != NULL; pt = pt -> Next)
+    {
+        if (nIntents < nMax) {
+            if (Codes != NULL)
+                Codes[nIntents] = pt ->Intent;
+
+            if (Descriptions != NULL)
+                Descriptions[nIntents] = pt ->Description;
+        }
+
+        nIntents++;
+    }
+
     return nIntents;
 }
 
