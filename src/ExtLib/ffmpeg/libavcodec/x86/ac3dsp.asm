@@ -77,16 +77,20 @@ AC3_EXPONENT_MIN
 INIT_XMM sse2
 cglobal float_to_fixed24, 3, 3, 9, dst, src, len
     movaps     m0, [pf_1_24]
+    shl      lenq, 2
+    add      srcq, lenq
+    add      dstq, lenq
+    neg      lenq
 .loop:
-    movaps     m1, [srcq    ]
-    movaps     m2, [srcq+16 ]
-    movaps     m3, [srcq+32 ]
-    movaps     m4, [srcq+48 ]
+    movaps     m1, [srcq+lenq    ]
+    movaps     m2, [srcq+lenq+16 ]
+    movaps     m3, [srcq+lenq+32 ]
+    movaps     m4, [srcq+lenq+48 ]
 %ifdef m8
-    movaps     m5, [srcq+64 ]
-    movaps     m6, [srcq+80 ]
-    movaps     m7, [srcq+96 ]
-    movaps     m8, [srcq+112]
+    movaps     m5, [srcq+lenq+64 ]
+    movaps     m6, [srcq+lenq+80 ]
+    movaps     m7, [srcq+lenq+96 ]
+    movaps     m8, [srcq+lenq+112]
 %endif
     mulps      m1, m0
     mulps      m2, m0
@@ -108,24 +112,44 @@ cglobal float_to_fixed24, 3, 3, 9, dst, src, len
     cvtps2dq   m7, m7
     cvtps2dq   m8, m8
 %endif
-    movdqa  [dstq    ], m1
-    movdqa  [dstq+16 ], m2
-    movdqa  [dstq+32 ], m3
-    movdqa  [dstq+48 ], m4
+    movdqa  [dstq+lenq    ], m1
+    movdqa  [dstq+lenq+16 ], m2
+    movdqa  [dstq+lenq+32 ], m3
+    movdqa  [dstq+lenq+48 ], m4
 %ifdef m8
-    movdqa  [dstq+64 ], m5
-    movdqa  [dstq+80 ], m6
-    movdqa  [dstq+96 ], m7
-    movdqa  [dstq+112], m8
-    add      srcq, 128
-    add      dstq, 128
-    sub      lenq, 32
+    movdqa  [dstq+lenq+64 ], m5
+    movdqa  [dstq+lenq+80 ], m6
+    movdqa  [dstq+lenq+96 ], m7
+    movdqa  [dstq+lenq+112], m8
+    add      lenq, 128
 %else
-    add      srcq, 64
-    add      dstq, 64
-    sub      lenq, 16
+    add      lenq, 64
 %endif
-    ja .loop
+    jl .loop
+    RET
+
+INIT_YMM avx
+cglobal float_to_fixed24, 3, 3, 5, dst, src, len
+    vbroadcastf128 m0, [pf_1_24]
+    shl      lenq, 2
+    add      srcq, lenq
+    add      dstq, lenq
+    neg      lenq
+.loop:
+    mulps      m1, m0, [srcq+lenq+mmsize*0]
+    mulps      m2, m0, [srcq+lenq+mmsize*1]
+    mulps      m3, m0, [srcq+lenq+mmsize*2]
+    mulps      m4, m0, [srcq+lenq+mmsize*3]
+    cvtps2dq   m1, m1
+    cvtps2dq   m2, m2
+    cvtps2dq   m3, m3
+    cvtps2dq   m4, m4
+    mova  [dstq+lenq+mmsize*0], m1
+    mova  [dstq+lenq+mmsize*1], m2
+    mova  [dstq+lenq+mmsize*2], m3
+    mova  [dstq+lenq+mmsize*3], m4
+    add      lenq, mmsize*4
+    jl .loop
     RET
 
 ;------------------------------------------------------------------------------
