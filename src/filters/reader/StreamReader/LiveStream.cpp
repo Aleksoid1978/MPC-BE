@@ -234,6 +234,8 @@ bool CLiveStream::ParseM3U8(const CString& url, CString& realUrl)
 
 	bool bMediaSequence = false;
 	uint64_t sequenceNumber = {};
+
+	double segmentDuration = {};
 	int64_t segmentsDuration = {};
 
 	bool bDiscontinuity = false;
@@ -362,11 +364,7 @@ bool CLiveStream::ParseM3U8(const CString& url, CString& realUrl)
 			continue;
 		} else if (StartsWith(str, L"#EXTINF:")) {
 			DeleteLeft(8, str);
-			double value = {};
-			if (StrToDouble(str, value) && value > 0.) {
-				segmentsDuration += std::llround(value * 1000.);
-			}
-
+			StrToDouble(str, segmentDuration);
 			continue;
 		} else if (StartsWith(str, L"#EXT-X-MAP:")) {
 			if (!m_hlsData.bInit) {
@@ -403,15 +401,25 @@ bool CLiveStream::ParseM3U8(const CString& url, CString& realUrl)
 				if (it == m_hlsData.DiscontinuitySegments.cend()) {
 					m_hlsData.Segments.emplace_back(fullUrl);
 					m_hlsData.DiscontinuitySegments.emplace_back(fullUrl);
+
+					if (segmentDuration > 0.) {
+						segmentsDuration += std::llround(segmentDuration * 1000.);
+					}
 				}
 			} else {
 				if (bMediaSequence && sequenceNumber > m_hlsData.SequenceNumber) {
 					m_hlsData.Segments.emplace_back(CombinePath(base, str));
 					m_hlsData.SequenceNumber = sequenceNumber;
+
+					if (segmentDuration > 0.) {
+						segmentsDuration += std::llround(segmentDuration * 1000.);
+					}
 				}
 				sequenceNumber++;
 			}
 		}
+
+		segmentDuration = {};
 	}
 
 	if (bDiscontinuity) {
@@ -430,7 +438,18 @@ bool CLiveStream::ParseM3U8(const CString& url, CString& realUrl)
 	}
 
 	if (m_hlsData.PlaylistDuration && (bMediaSequence || bDiscontinuity)) {
-		m_hlsData.bInit = true;
+		if (!m_hlsData.bInit) {
+			/*
+			https://datatracker.ietf.org/doc/html/draft-pantos-http-live-streaming-19#section-6.3.3
+			We still need to check the EXT-X-ENDLIST tag and the duration of each segment - but so far so good.
+			If there are problems, we will look at specific links.
+			*/
+			if (m_hlsData.Segments.size() > 2) {
+				m_hlsData.Segments.erase(m_hlsData.Segments.begin(), m_hlsData.Segments.end() - 2);
+			}
+			m_hlsData.bInit = true;
+		}
+
 		bool ret = segmentsCount < m_hlsData.Segments.size();
 		if (!ret) {
 			/* If we need to reload the playlist again
