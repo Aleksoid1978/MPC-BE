@@ -16117,13 +16117,14 @@ void CMainFrame::SetAlwaysOnTop(int i)
 		} else if (i == 1) {
 			pInsertAfter = &wndTopMost;
 		} else if (i == 2) {
-			pInsertAfter = GetMediaState() == State_Running ? &wndTopMost : &wndNoTopMost;
+			pInsertAfter = (GetMediaState() == State_Running) ? &wndTopMost : &wndNoTopMost;
 		} else { // if (i == 3)
 			pInsertAfter = (GetMediaState() == State_Running && !m_bAudioOnly) ? &wndTopMost : &wndNoTopMost;
 		}
 
 		if (pInsertAfter) {
 			SetWindowPos(pInsertAfter, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+			SetForegroundWindow();
 		}
 	} else if (bD3DOnMain) {
 		SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
