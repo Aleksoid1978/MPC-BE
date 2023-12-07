@@ -8789,7 +8789,7 @@ void CMainFrame::OnPlayFiltersCopyToClipboard()
 	}
 
 	// Allocate a global memory object for the text
-	int len = filtersList.GetLength() + 1;
+	const int len = filtersList.GetLength() + 1;
 	HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, len * sizeof(WCHAR));
 	if (hGlob) {
 		// Lock the handle and copy the text to the buffer
@@ -10563,6 +10563,8 @@ void CMainFrame::OnSubCopyClipboard()
 						GlobalUnlock(hGlob);
 
 						if (OpenClipboard()) {
+							// Place the handle on the clipboard, if the call succeeds
+							// the system will take care of the allocated memory
 							if (EmptyClipboard() && SetClipboardData(CF_UNICODETEXT, hGlob)) {
 								hGlob = nullptr;
 							}

@@ -118,7 +118,7 @@ void CHistoryDlg::CopySelectedPaths()
 
 	if (paths.GetLength()) {
 		// Allocate a global memory object for the text
-		int len = paths.GetLength() + 1;
+		const int len = paths.GetLength() + 1;
 		HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, len * sizeof(WCHAR));
 		if (hGlob) {
 			// Lock the handle and copy the text to the buffer
