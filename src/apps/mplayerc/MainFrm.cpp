@@ -8789,30 +8789,7 @@ void CMainFrame::OnPlayFiltersCopyToClipboard()
 	}
 
 	// Allocate a global memory object for the text
-	const int len = filtersList.GetLength() + 1;
-	HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, len * sizeof(WCHAR));
-	if (hGlob) {
-		// Lock the handle and copy the text to the buffer
-		LPVOID pData = GlobalLock(hGlob);
-		if (pData) {
-			wcscpy_s((WCHAR*)pData, len, filtersList.GetString());
-			GlobalUnlock(hGlob);
-
-			if (OpenClipboard()) {
-				// Place the handle on the clipboard, if the call succeeds
-				// the system will take care of the allocated memory
-				if (::EmptyClipboard() && ::SetClipboardData(CF_UNICODETEXT, hGlob)) {
-					hGlob = nullptr;
-				}
-
-				::CloseClipboard();
-			}
-		}
-
-		if (hGlob) {
-			GlobalFree(hGlob);
-		}
-	}
+	CopyStringToClipboard(this->m_hWnd, filtersList);
 }
 
 void CMainFrame::OnPlayFilters(UINT nID)
@@ -10556,27 +10533,7 @@ void CMainFrame::OnSubCopyClipboard()
 
 			CString text;
 			if (pRTS->GetText(rtNow, m_pCAP->GetFPS(), text)) {
-				const int len = text.GetLength() + 1;
-				if (HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, len * sizeof(WCHAR))) {
-					if (WCHAR* sData = (WCHAR*)GlobalLock(hGlob)) {
-						wcscpy_s(sData, len, text);
-						GlobalUnlock(hGlob);
-
-						if (OpenClipboard()) {
-							// Place the handle on the clipboard, if the call succeeds
-							// the system will take care of the allocated memory
-							if (EmptyClipboard() && SetClipboardData(CF_UNICODETEXT, hGlob)) {
-								hGlob = nullptr;
-							}
-
-							CloseClipboard();
-						}
-					}
-
-					if (hGlob) {
-						::GlobalFree(hGlob);
-					}
-				}
+				CopyStringToClipboard(this->m_hWnd, text);
 			}
 		}
 	}

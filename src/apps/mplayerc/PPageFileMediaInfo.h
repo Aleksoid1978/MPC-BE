@@ -41,8 +41,8 @@ public:
 	virtual ~CPPageFileMediaInfo() = default;
 
 	enum { IDD = IDD_FILEMEDIAINFO };
-	CString MI_File;
-	CString MI_Text;
+	CStringW MI_File;
+	CStringW MI_Text;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

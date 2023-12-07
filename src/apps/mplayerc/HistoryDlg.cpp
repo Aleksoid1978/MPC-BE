@@ -117,31 +117,7 @@ void CHistoryDlg::CopySelectedPaths()
 	}
 
 	if (paths.GetLength()) {
-		// Allocate a global memory object for the text
-		const int len = paths.GetLength() + 1;
-		HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, len * sizeof(WCHAR));
-		if (hGlob) {
-			// Lock the handle and copy the text to the buffer
-			LPVOID pData = GlobalLock(hGlob);
-			if (pData) {
-				wcscpy_s((WCHAR*)pData, len, paths.GetString());
-				GlobalUnlock(hGlob);
-
-				if (OpenClipboard()) {
-					// Place the handle on the clipboard, if the call succeeds
-					// the system will take care of the allocated memory
-					if (::EmptyClipboard() && ::SetClipboardData(CF_UNICODETEXT, hGlob)) {
-						hGlob = nullptr;
-					}
-
-					::CloseClipboard();
-				}
-			}
-
-			if (hGlob) {
-				GlobalFree(hGlob);
-			}
-		}
+		CopyStringToClipboard(this->m_hWnd, paths);
 	}
 }
 

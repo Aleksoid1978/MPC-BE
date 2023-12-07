@@ -167,29 +167,9 @@ void CPPageFileInfoSheet::OnSaveAs()
 
 void CPPageFileInfoSheet::OnCopyToClipboard()
 {
-	const int size = (m_mi.MI_Text.GetLength() + 1) * sizeof(WCHAR);
-	HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, size);
-	if (hGlob) {
-		LPVOID pData = GlobalLock(hGlob);
-		if (pData) {
-			memcpy_s(GlobalLock(pData), size, m_mi.MI_Text.LockBuffer(), size);
-			GlobalUnlock(hGlob);
-			m_mi.MI_Text.UnlockBuffer();
-
-			if (OpenClipboard()) {
-				// Place the handle on the clipboard, if the call succeeds
-				// the system will take care of the allocated memory
-				if (EmptyClipboard() && SetClipboardData(CF_UNICODETEXT, hGlob)) {
-					hGlob = nullptr;
-				}
-
-				CloseClipboard();
-			}
-		}
-
-		if (hGlob) {
-			::GlobalFree(hGlob);
-		}
+	if (m_mi.MI_Text.GetLength()) {
+		CStringW str(m_mi.MI_Text); // make a copy of the text
+		CopyStringToClipboard(this->m_hWnd, str);
 	}
 }
 

@@ -5059,32 +5059,24 @@ void CPlayerPlaylistBar::CloseMedia() const
 
 void CPlayerPlaylistBar::CopyToClipboard()
 {
-	if (OpenClipboard() && EmptyClipboard()) {
+	std::vector<int> items;
+	items.reserve(m_list.GetSelectedCount());
+	POSITION pos = m_list.GetFirstSelectedItemPosition();
+	while (pos) {
+		items.emplace_back(m_list.GetNextSelectedItem(pos));
+	}
+
+	if (items.size()) {
 		CString str;
-
-		std::vector<int> items;
-		items.reserve(m_list.GetSelectedCount());
-		POSITION pos = m_list.GetFirstSelectedItemPosition();
-		while (pos) {
-			items.emplace_back(m_list.GetNextSelectedItem(pos));
-		}
-
 		for (const auto& item : items) {
-			CPlaylistItem &pli = curPlayList.GetAt(FindPos(item));
+			CPlaylistItem& pli = curPlayList.GetAt(FindPos(item));
 			str = pli.m_fi.GetPath();
 			for (const auto& fi : pli.m_auds) {
 				str += L"\r\n" + fi.GetPath();
 			}
 		}
 
-		if (HGLOBAL h = GlobalAlloc(GMEM_MOVEABLE, (str.GetLength() + 1) * sizeof(WCHAR))) {
-			if (WCHAR * s = (WCHAR*)GlobalLock(h)) {
-				wcscpy_s(s, str.GetLength() + 1, str);
-				GlobalUnlock(h);
-				SetClipboardData(CF_UNICODETEXT, h);
-			}
-		}
-		CloseClipboard();
+		CopyStringToClipboard(this->m_hWnd, str);
 	}
 }
 
