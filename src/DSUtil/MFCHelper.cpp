@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2018 see Authors.txt
+ * (C) 2016-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -161,6 +161,33 @@ void SelectByItemData(CListBox& ListBox, DWORD_PTR data)
 			ListBox.SetCurSel(i);
 			ListBox.SetTopIndex(i);
 			break;
+		}
+	}
+}
+
+void CopyStringToClipboard(HWND hWnd, const CStringW& str)
+{
+	const int len = str.GetLength() + 1;
+	HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, len * sizeof(WCHAR));
+	if (hGlob) {
+		LPVOID pData = GlobalLock(hGlob);
+		if (pData) {
+			wcscpy_s((WCHAR*)pData, len, str.GetString());
+			GlobalUnlock(hGlob);
+
+			if (OpenClipboard(hWnd)) {
+				// Place the handle on the clipboard, if the call succeeds
+				// the system will take care of the allocated memory
+				if (::EmptyClipboard() && ::SetClipboardData(CF_UNICODETEXT, hGlob)) {
+					hGlob = nullptr;
+				}
+
+				::CloseClipboard();
+			}
+		}
+
+		if (hGlob) {
+			::GlobalFree(hGlob);
 		}
 	}
 }

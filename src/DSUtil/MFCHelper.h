@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2018 see Authors.txt
+ * (C) 2016-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,3 +36,5 @@ extern inline DWORD_PTR GetCurItemData(CComboBox& ComboBox);
 extern inline DWORD_PTR GetCurItemData(CListBox& ListBox);
 extern void SelectByItemData(CComboBox& ComboBox, DWORD_PTR data);
 extern void SelectByItemData(CListBox& ListBox, DWORD_PTR data);
+
+void CopyStringToClipboard(HWND hWnd, const CStringW& str);
