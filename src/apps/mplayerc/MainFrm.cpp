@@ -8795,7 +8795,7 @@ void CMainFrame::OnPlayFiltersCopyToClipboard()
 		// Lock the handle and copy the text to the buffer
 		LPVOID pData = GlobalLock(hGlob);
 		if (pData) {
-			wcscpy_s((WCHAR*)pData, len, (LPCWSTR)filtersList);
+			wcscpy_s((WCHAR*)pData, len, filtersList.GetString());
 			GlobalUnlock(hGlob);
 
 			if (OpenClipboard()) {
