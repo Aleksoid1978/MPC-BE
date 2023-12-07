@@ -16124,7 +16124,9 @@ void CMainFrame::SetAlwaysOnTop(int i)
 
 		if (pInsertAfter) {
 			SetWindowPos(pInsertAfter, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
-			SetForegroundWindow();
+			if (pInsertAfter == &wndTopMost) {
+				SetForegroundWindow();
+			}
 		}
 	} else if (bD3DOnMain) {
 		SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
