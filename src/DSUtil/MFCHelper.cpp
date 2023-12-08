@@ -165,20 +165,19 @@ void SelectByItemData(CListBox& ListBox, DWORD_PTR data)
 	}
 }
 
-void CopyStringToClipboard(HWND hWnd, const CStringW& str)
+void CopyDataToClipboard(HWND hWnd, const UINT uFormat, const void* data, const size_t size)
 {
-	const int len = str.GetLength() + 1;
-	HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, len * sizeof(WCHAR));
+	HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, size);
 	if (hGlob) {
 		LPVOID pData = GlobalLock(hGlob);
 		if (pData) {
-			wcscpy_s((WCHAR*)pData, len, str.GetString());
+			memcpy(pData, data, size);
 			GlobalUnlock(hGlob);
 
 			if (OpenClipboard(hWnd)) {
 				// Place the handle on the clipboard, if the call succeeds
 				// the system will take care of the allocated memory
-				if (::EmptyClipboard() && ::SetClipboardData(CF_UNICODETEXT, hGlob)) {
+				if (::EmptyClipboard() && ::SetClipboardData(uFormat, hGlob)) {
 					hGlob = nullptr;
 				}
 
@@ -190,4 +189,9 @@ void CopyStringToClipboard(HWND hWnd, const CStringW& str)
 			::GlobalFree(hGlob);
 		}
 	}
+}
+
+void CopyStringToClipboard(HWND hWnd, const CStringW& str)
+{
+	CopyDataToClipboard(hWnd, CF_UNICODETEXT, str.GetString(), (str.GetLength() + 1) * sizeof(WCHAR));
 }

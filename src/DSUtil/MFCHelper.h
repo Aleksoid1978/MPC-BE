@@ -37,4 +37,5 @@ extern inline DWORD_PTR GetCurItemData(CListBox& ListBox);
 extern void SelectByItemData(CComboBox& ComboBox, DWORD_PTR data);
 extern void SelectByItemData(CListBox& ListBox, DWORD_PTR data);
 
+void CopyDataToClipboard(HWND hWnd, const UINT uFormat, const void* data, const size_t size);
 void CopyStringToClipboard(HWND hWnd, const CStringW& str);
