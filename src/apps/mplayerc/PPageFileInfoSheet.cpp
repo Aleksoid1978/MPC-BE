@@ -168,8 +168,12 @@ void CPPageFileInfoSheet::OnSaveAs()
 void CPPageFileInfoSheet::OnCopyToClipboard()
 {
 	if (m_mi.MI_Text.GetLength()) {
-		CStringW str(m_mi.MI_Text); // make a copy of the text
-		CopyStringToClipboard(this->m_hWnd, str);
+		CopyDataToClipboard(
+			this->m_hWnd, CF_UNICODETEXT,
+			m_mi.MI_Text.LockBuffer(),
+			(m_mi.MI_Text.GetLength() + 1) * sizeof(WCHAR)
+		);
+		m_mi.MI_Text.UnlockBuffer();
 	}
 }
 

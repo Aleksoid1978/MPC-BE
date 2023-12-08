@@ -6327,30 +6327,7 @@ void CMainFrame::SaveImage(LPCWSTR fn, bool displayed)
 				m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_OSD_IMAGE_SAVED), 3000);
 			}
 		} else {
-			// Allocate a global memory object for the DIB
-			HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, dib.Size());
-			if (hGlob) {
-				// Lock the handle and copy the DIB to the buffer
-				LPVOID pData = GlobalLock(hGlob);
-				if (pData) {
-					memcpy(pData, dib.Data(), dib.Size());
-					GlobalUnlock(hGlob);
-
-					if (OpenClipboard()) {
-						// Place the handle on the clipboard, if the call succeeds
-						// the system will take care of the allocated memory
-						if (::EmptyClipboard() && ::SetClipboardData(CF_DIB, hGlob)) {
-							hGlob = nullptr;
-						}
-
-						::CloseClipboard();
-					}
-				}
-
-				if (hGlob) {
-					GlobalFree(hGlob);
-				}
-			}
+			CopyDataToClipboard(this->m_hWnd, CF_DIB, dib.Data(), dib.Size());
 		}
 	}
 	else {
