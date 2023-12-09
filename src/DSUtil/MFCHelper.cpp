@@ -167,14 +167,14 @@ void SelectByItemData(CListBox& ListBox, DWORD_PTR data)
 
 void CopyDataToClipboard(HWND hWnd, const UINT uFormat, const void* data, const size_t size)
 {
-	HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, size);
+	HGLOBAL hGlob = ::GlobalAlloc(GMEM_MOVEABLE, size);
 	if (hGlob) {
-		LPVOID pData = GlobalLock(hGlob);
+		LPVOID pData = ::GlobalLock(hGlob);
 		if (pData) {
 			memcpy(pData, data, size);
-			GlobalUnlock(hGlob);
+			::GlobalUnlock(hGlob);
 
-			if (OpenClipboard(hWnd)) {
+			if (::OpenClipboard(hWnd)) {
 				// Place the handle on the clipboard, if the call succeeds
 				// the system will take care of the allocated memory
 				if (::EmptyClipboard() && ::SetClipboardData(uFormat, hGlob)) {
