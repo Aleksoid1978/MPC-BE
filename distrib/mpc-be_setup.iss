@@ -59,7 +59,6 @@
   #define BeveledLabel = app_name + " " + app_version
   #define Description  = app_name + " " + app_version
   #define VisualElementsManifest = "VisualElements\mpc-be.VisualElementsManifest.xml"
-  #define mpcvr_ax     = "MpcVideoRenderer.ax"
 #else
   #define bindir       = bin_dir + "\mpc-be_x64"
   #define mpcbe_exe    = "mpc-be64.exe"
@@ -68,7 +67,6 @@
   #define BeveledLabel = app_name + " x64 " + app_version
   #define Description  = app_name + " x64 " + app_version
   #define VisualElementsManifest = "VisualElements\mpc-be64.VisualElementsManifest.xml"
-  #define mpcvr_ax     = "MpcVideoRenderer64.ax"
 #endif
 #define mpcvr_desc     = "MPC Video Renderer 0.6.9"
 
@@ -218,10 +216,10 @@ Source: "VisualElements\*.png";            DestDir: "{app}";                    
 Source: "{#VisualElementsManifest}";       DestDir: "{app}";                             Flags: ignoreversion; Components: main
 #ifdef Win32Build
 Source: "MPC_components\IntelMediaSDK\libmfxsw32.dll"; DestDir: "{app}"; Flags: ignoreversion;  Components: intel_msdk;
-Source: "MPC_components\MpcVideoRenderer\MpcVideoRenderer.ax"; DestDir: "{app}\Filters"; Flags: ignoreversion;  Components: mpcvr;
+Source: "MPC_components\MpcVideoRenderer\MpcVideoRenderer.ax"; DestDir: "{app}\Filters"; Flags: ignoreversion regserver;  Components: mpcvr;
 #else
 Source: "MPC_components\IntelMediaSDK\libmfxsw64.dll"; DestDir: "{app}"; Flags: ignoreversion;  Components: intel_msdk;
-Source: "MPC_components\MpcVideoRenderer\MpcVideoRenderer64.ax"; DestDir: "{app}\Filters"; Flags: ignoreversion;  Components: mpcvr;
+Source: "MPC_components\MpcVideoRenderer\MpcVideoRenderer64.ax"; DestDir: "{app}\Filters"; Flags: ignoreversion regserver;  Components: mpcvr;
 #endif
 
 [Icons]
@@ -288,9 +286,6 @@ function SetFileAttributes(lpFileName: String; dwFileAttributes: Cardinal): Inte
 
 var
   TasksList: TNewCheckListBox;
-  DownloadPage: TDownloadWizardPage;
-
-  path_mpcvr: String;
 
 // thank for code to "El Sanchez" from forum.oszone.net
 procedure PinToTaskbar(Filename: String; IsPin: Boolean);
@@ -526,25 +521,7 @@ begin
         sRegParams := sRegParams + ' /regpl';
       Exec(ExpandConstant('{app}\{#mpcbe_exe}'), sRegParams, ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, resCode);
     end;
-
-    if WizardIsComponentSelected('mpcvr') then
-    begin
-      RegisterServer(Is64BitInstallMode, ExpandConstant('{app}\Filters\{#mpcvr_ax}'), False);
-    end;
   end;
-end;
-
-function NextButtonClick(CurPageID: Integer): Boolean;
-var
-  need_dl_mpcvr: Boolean;
-  new_path: String;
-begin
-  if CurPageID = wpReady then
-  begin
-    need_dl_mpcvr := WizardIsComponentSelected('mpcvr') and (Length(path_mpcvr)=0);
-  end;
-
-  Result := True;
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
