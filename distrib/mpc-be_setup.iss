@@ -55,7 +55,7 @@
   #define bindir       = bin_dir + "\mpc-be_x86"
   #define mpcbe_exe    = "mpc-be.exe"
   #define mpcbe_ini    = "mpc-be.ini"
-  #define dxdir        = "DirectX\x86"
+  #define dxdir        = "MPC_components\DirectX\x86"
   #define BeveledLabel = app_name + " " + app_version
   #define Description  = app_name + " " + app_version
   #define VisualElementsManifest = "VisualElements\mpc-be.VisualElementsManifest.xml"
@@ -64,7 +64,7 @@
   #define bindir       = bin_dir + "\mpc-be_x64"
   #define mpcbe_exe    = "mpc-be64.exe"
   #define mpcbe_ini    = "mpc-be64.ini"
-  #define dxdir        = "DirectX\x64"
+  #define dxdir        = "MPC_components\DirectX\x64"
   #define BeveledLabel = app_name + " x64 " + app_version
   #define Description  = app_name + " x64 " + app_version
   #define VisualElementsManifest = "VisualElements\mpc-be64.VisualElementsManifest.xml"
@@ -220,9 +220,9 @@ Source: "Shaders11\*.hlsl";                DestDir: "{app}\Shaders11";          
 Source: "VisualElements\*.png";            DestDir: "{app}";                             Flags: ignoreversion; Components: main
 Source: "{#VisualElementsManifest}";       DestDir: "{app}";                             Flags: ignoreversion; Components: main
 #ifdef Win32Build
-Source: "IntelMediaSDK\x86\libmfxsw32.dll"; DestDir: "{app}"; Flags: ignoreversion;  Components: intel_msdk;
+Source: "MPC_components\IntelMediaSDK\libmfxsw32.dll"; DestDir: "{app}"; Flags: ignoreversion;  Components: intel_msdk;
 #else
-Source: "IntelMediaSDK\x64\libmfxsw64.dll"; DestDir: "{app}"; Flags: ignoreversion;  Components: intel_msdk;
+Source: "MPC_components\IntelMediaSDK\libmfxsw64.dll"; DestDir: "{app}"; Flags: ignoreversion;  Components: intel_msdk;
 #endif
 
 [Icons]

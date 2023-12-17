@@ -13,3 +13,6 @@
 [submodule "src/ExtLib/rapidjson"]
 	path = src/ExtLib/rapidjson
 	url = https://github.com/Tencent/rapidjson.git
+[submodule "distrib/MPC_components"]
+	path = distrib/MPC_components
+	url = https://github.com/Aleksoid1978/MPC_components
