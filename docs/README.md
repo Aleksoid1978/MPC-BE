@@ -17,12 +17,14 @@ MPC-BE is based on the original Guliverkli project and "Media Player Classic Hom
 * An SSE2 capable CPU
 * Windows 7, 8, 8.1, 10, 11 32-bit/64-bit
 
----
+## Downloads
+- [Releases      ](https://github.com/Aleksoid1978/MPC-BE/releases)
+- [Nightly Builds](https://github.com/Aleksoid1978/MPC-BE/wiki/Nightly-builds)
 
 ## Links
 - [Project Page  ](https://sourceforge.net/projects/mpcbe/)
+- [Wiki          ](https://github.com/Aleksoid1978/MPC-BE/wiki)
 - [Get code      ](https://github.com/Aleksoid1978/MPC-BE.git)
-- [Nightly Builds](https://github.com/Aleksoid1978/MPC-BE/wiki/Nightly-builds)
 
 ---
  
