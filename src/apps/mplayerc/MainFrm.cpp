@@ -1654,9 +1654,11 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 {
 	const BOOL bMenuVisible = IsMainMenuVisible();
 
+	lpMMI->ptMinTrackSize = { 32, 32 }; // minimum video area size
 	CSize cSize;
 	CalcControlsSize(cSize);
-	lpMMI->ptMinTrackSize = CPoint(cSize);
+	lpMMI->ptMinTrackSize.x += cSize.cx;
+	lpMMI->ptMinTrackSize.y += cSize.cy;
 
 	if (bMenuVisible) {
 		MENUBARINFO mbi = { sizeof(mbi) };
