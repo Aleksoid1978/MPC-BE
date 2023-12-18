@@ -2,6 +2,9 @@
 
 1.6.10.x dev
 =============================
+StreamReader
+Fixed opening HLS Live.
+
 MP4Splitter
 Fixed player crash on some incorrect MP4 files.
 
@@ -22,6 +25,12 @@ Player
 Added the ability to change the "Move window by the video area" setting using a hotkey.
 If the "Show milliseconds" setting is active (Status), then milliseconds will be recorded in the screenshot file name.
 The separator for "Track Priority" is now only a space.
+Added the ability to copy paths of history entries to the clipboard.
+Fixed copying MediaInfo data to the clipboard.
+Fixed the operation of the "On Top > While Playing..." setting when the player window is hidden by another window.
+
+Installer
+MPC Video Renderer is now included in the installer.
 
 Updated Japanese translation (by tsubasanouta).
 Updated Spanish translation (by IPeluchito).
