@@ -1,88 +1,90 @@
-﻿Part A: Preparing the Visual Studio environment
+﻿1. Preparing the Visual Studio environment
 
  Visual Studio 2017
-  1. Install Visual Studio 2017 v15.5.7 or later (any edition will work fine). During installation, you must select the following components: 
+  Download URL: https://learn.microsoft.com/en-us/visualstudio/releasenotes/vs2017-relnotes
+  Install Visual Studio 2017 v15.5.7 or later (any edition will work fine). During installation, you must select the following components: 
    * Desktop development with C++
      * VC++ 2017 v141 tools
      * Windows SDK 10.0.17763.0
      * Visual C++ ATL support
      * Visual C++ MFC support
-  Download URL: https://learn.microsoft.com/en-us/visualstudio/releasenotes/vs2017-relnotes
 
  Visual Studio 2019
-  1. Install Visual Studio 2019 (any edition will work fine). During installation, you must select the following components: 
+  Download URL: https://learn.microsoft.com/en-us/visualstudio/releases/2019/release-notes
+  Install Visual Studio 2019 (any edition will work fine). During installation, you must select the following components: 
    * Desktop development with C++
      * MSVC v142 - Build Tools C++ 
      * Windows SDK 10.0.17763.0 or newer (latest).
      * C++ ATL support
      * C++ MFC support
-  Download URL: https://learn.microsoft.com/en-us/visualstudio/releases/2019/release-notes
 
  Visual Studio 2022
+  Download URL: https://learn.microsoft.com/en-us/visualstudio/releases/2022/release-notes
   1. Install Visual Studio 2022 (any edition will work fine). During installation, you must select the following components: 
    * Desktop development with C++
      * MSVC v143 - Build Tools C++ 
      * Windows SDK 10.0.18362.0 or newer (latest).
      * C++ ATL support
      * C++ MFC support
-  Download URL: https://learn.microsoft.com/en-us/visualstudio/releases/2022/release-notes
 
-Part B: Preparing the GCC environment
- NOTES:
-  * If you installed the MSYS/MinGW package in an other directory you will have to use that path in the following steps.
 
- 1. Download and extract "MSYS_MinGW-w64_GCC_1320_x86-x64.7z" to "C:\MSYS" -> https://mpc-be.org/MSYS/MSYS_MinGW-w64_GCC_1320_x86-x64.7z
- 2. Create a file named "environments.bat" in the source code folder of MPC-BE (see part D) containing the following entries:
-    @ECHO OFF
-    SET "MPCBE_MSYS=C:\MSYS"
-    SET "MPCBE_MINGW=C:\MSYS\mingw"
+2. Preparing the GCC environment (YASM is already included)
+ 2.1. Download https://mpc-be.org/MSYS/MSYS_MinGW-w64_GCC_1320_x86-x64.7z
+ 2.2. Unpack the archive to "C:\MSYS".
+ NOTES: If you installed the MSYS/MinGW package in an other directory you will have to use that path in the following steps.
 
-Part C: Yasm
 
-Download YASM and save it as yasm.exe in a folder that is included in %PATH%. For example C:\Windows.
-    For 64-bit Windows: http://www.tortall.net/projects/yasm/releases/yasm-1.3.0-win64.exe (Recommended)
-    For 32-bit Windows: http://www.tortall.net/projects/yasm/releases/yasm-1.3.0-win32.exe
+3 Preparing the Inno Setup environment
+  3.1. Download Inno Setup 6.2.2 or never (https://jrsoftware.org/isdl.php)
+  3.2. Install everything.
 
- NOTES:
-  * Yasm may require Microsoft Visual C++ 2010 redistributable packages. Download it:
-    For 64-bit Windows: https://download.microsoft.com/download/A/8/0/A80747C3-41BD-45DF-B505-E9710D2744E0/vcredist_x64.exe (Recommended)
-    For 32-bit Windows: https://download.microsoft.com/download/C/6/D/C6D0FD4E-9E53-4897-9B91-836EBA2AACD3/vcredist_x86.exe
 
-Part D: Downloading and compiling the MPC-BE source
-
-1. Use a Git client to checkout MPC-BE's trunk to "C:\repos\MPC-BE" (or anywhere else you like)
+4. Downloading and preparing the MPC-BE source
+  4.1. Use a Git client to checkout MPC-BE's trunk to "C:\repos\MPC-BE" (or anywhere else you like)
     Repository URL: https://github.com/Aleksoid1978/MPC-BE.git
     Git for Windows: https://git-scm.com/download/win
     The recommended Git client is TortoiseGit (https://tortoisegit.org/download/)
-2. When using TortoiseGit
-    a) Navigate to the folder where you want to place the local copy of the repository (e.g: C:\repos)
-    b) Right-click on that directory and choose "Git Clone".
-    c) Put https://github.com/Aleksoid1978/MPC-BE.git in "URL" and press OK.
-    d) Wait for the source tree to be downloaded.
-   When usin Git client
-    a) open cmd/terminal, cd "c:\repos"
-    b) run command "git clone --recursive https://github.com/Aleksoid1978/MPC-BE.git"
-    c) Wait for the source tree to be downloaded.
-
-3. Open folder "C:\repos\MPC-BE"
-   Execute the batch file update_gcc.bat (it is necessary to do to copy the files libgcc.a and libmingwex.a, in the folders "lib" and "lib64")
-4. Open the solution file: C:\repos\MPC-BE\mpc-be.sln 
-   Change the solution's configuration to "Release" (in the toolbar).
-
-5. Press OK to save the changes and close the Properties window.
-6. Press F7 to build the solution.
-7. You now have mpc-be.exe under C:\repos\MPC-BE\_bin\mpc-be_x86
-8. Open the solution file C:\repos\MPC-BE\mpciconlib.sln
-9. Press F7 to build the solution.
-10. You now have mpciconlib.dll under C:\repos\MPC-BE\_bin\mpc-be_x86
-11. Open the solution file C:\repos\MPC-BE\mpcresources.sln
-    In Visual Studio go to Build->Batch Build->Press Select All->Press Build
-12. You now have mpcresources.XX.dll under C:\repos\MPC-BE\_bin\mpc-be_x86\Lang
-
-Alternatively, you can use build.bat (run: build.bat help for more info)
+  4.2. Clone the MPC-BE repository with all submodules
+    When using TortoiseGit
+      a) Navigate to the folder where you want to place the local copy of the repository (e.g: C:\repos).
+      b) Right-click on that directory and choose "Git Clone".
+      c) Put https://github.com/Aleksoid1978/MPC-BE.git in "URL", сheck the "Recursive" and press OK.
+      d) Wait for the source code to be downloaded.
+    When using Git CMD
+      a) Run Git CMD, CD "c:\repos"
+      b) run command "git clone --recursive https://github.com/Aleksoid1978/MPC-BE.git"
+      c) Wait for the source code to be downloaded.
+  4.3. Open the "C:\repos\MPC-BE" folder and create "environments.bat" containing the following entries:
+    @ECHO OFF
+    SET "MPCBE_MSYS=C:\MSYS"
+    SET "MPCBE_MINGW=C:\MSYS\mingw"
+  4.4. Execute the batch file update_gcc.bat (it is necessary to do to copy the files libgcc.a and libmingwex.a, in the folders "lib" and "lib64")
 
 
-Part D: Building the installer
+5. Source code update
+  5.1. Receive changes from the server:
+    When using TortoiseGit
+      a) Navigate to the "C:\repos".
+      b) Select MPC-BE folder, right-click, choose "TortoiseGit > Pull.." and press OK.
+      с) Wait for the source code to be updated.
+    When using Git CMD
+      a) Run Git CMD, CD "c:\repos\MPC-BE".
+      b) Run command "git pull". Wait for the source code to be updated.
+      с) Wait for the source code to be updated.
+  5.2. Update submodules
+    When using TortoiseGit
+      a) Navigate to the "C:\repos".
+      b) Select MPC-BE folder, right-click, choose "TortoiseGit > Submodule Update..". Select all submodules in the list and press OK.
+      c) Wait for the submodules to be updated.
+    When using Git CMD
+      a) Run Git CMD, CD "c:\repos\MPC-BE".
+      b) Run command "git submodule update --init --recursive".
+      c) Wait for the submodules to be updated.
 
-1. Download Inno Setup 6.2.2 or never (https://jrsoftware.org/isdl.php)
-2. Install everything and then go to C:\repos\MPC-BE\distrib, open mpc-be_setup.iss with Inno Setup and compile it.
+
+6. Building of MPC-BE
+  6.1. Run one of the following commands or write your own.
+    Build MPC-BE: build.bat
+    Build MPC-BE x64 installer: build.bat Build x64 Installer
+    Build all packages: build.bat Build All Packages
+  6.2. If there were problems, then delete the "_bin" folder and try again.
