@@ -34,9 +34,9 @@
  NOTES: If you installed the MSYS/MinGW package in an other directory you will have to use that path in the following steps.
 
 
-3 Preparing the Inno Setup environment
-  3.1. Download Inno Setup 6.2.2 or never (https://jrsoftware.org/isdl.php)
-  3.2. Install everything.
+3. Additional optional components
+  3.1. Inno Setup 6.2.2 or never (https://jrsoftware.org/isdl.php).
+  3.2. 7-zip file archiver (https://www.7-zip.org/download.html).
 
 
 4. Downloading and preparing the MPC-BE source
