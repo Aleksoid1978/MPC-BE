@@ -386,7 +386,7 @@ void CPlaylistItem::AutoLoadFiles()
 
 	CString BDLabel, empty;
 	AfxGetMainFrame()->MakeBDLabel(fpath, empty, &BDLabel);
-	if (!BDLabel.IsEmpty()) {
+	if (BDLabel.GetLength()) {
 		FixFilename(BDLabel);
 	}
 
@@ -403,14 +403,15 @@ void CPlaylistItem::AutoLoadFiles()
 		CMediaFormats& mf = s.m_Formats;
 		if (!mf.FindAudioExt(ext)) {
 			for (const auto& path : paths) {
-				WIN32_FIND_DATAW fd = {0};
-
-				HANDLE hFind;
 				std::vector<CString> searchPattern;
 				searchPattern.emplace_back(path + name + L".*"); // more general filename mask, clarification will follow
-				if (!BDLabel.IsEmpty()) {
+				if (BDLabel.GetLength()) {
 					searchPattern.emplace_back(path + BDLabel + L".*");
 				}
+
+				WIN32_FIND_DATAW fd = {0};
+				HANDLE hFind;
+
 				for (size_t j = 0; j < searchPattern.size(); j++) {
 					hFind = FindFirstFileW(searchPattern[j], &fd);
 
@@ -457,7 +458,7 @@ void CPlaylistItem::AutoLoadFiles()
 			}
 		}
 
-		if (!BDLabel.IsEmpty()) {
+		if (BDLabel.GetLength()) {
 			ret.clear();
 			Subtitle::GetSubFileNames(BDLabel, paths, ret);
 
