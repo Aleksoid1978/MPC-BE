@@ -26,7 +26,6 @@
 #include "SubtitleHelpers.h"
 #include "DSUtil/Filehandle.h"
 
-static LPCWSTR separators = L".\\-_";
 static LPCWSTR extListVid = L"(avi)|(mkv)|(mp4)|((m2)?ts)";
 
 LPCWSTR Subtitle::GetSubtitleFileExt(SubType type)
@@ -58,7 +57,6 @@ void Subtitle::GetSubFileNames(CString fn, const std::vector<CString>& paths, st
 	CString orgpath = fn.Left(l);
 	CString title = fn.Mid(l, l2 - l);
 	int titleLength = title.GetLength();
-	//CString filename = title + L".nooneexpectsthespanishinquisition";
 
 	if (!fWeb) {
 		WIN32_FIND_DATA wfd;
@@ -70,7 +68,7 @@ void Subtitle::GetSubFileNames(CString fn, const std::vector<CString>& paths, st
 		}
 		extListSub.TrimRight('|');
 
-		regExpSub.Format(L"([%s]+.+)?\\.(%s)$", separators, extListSub);
+		regExpSub.Format(L"(\\..+)?\\.(%s)$", extListSub);
 		regExpVid.Format(L".+\\.(%s)$", extListVid);
 
 		const std::wregex::flag_type reFlags = std::wregex::icase | std::wregex::optimize;
