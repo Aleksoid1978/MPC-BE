@@ -129,7 +129,7 @@ BEGIN DIALOGEX IDD_NAVIGATION_DLG LINES 10
 7		"Info"
 END
 
-BEGIN DIALOGEX IDD_Ouvrir_DLG LINES 18
+BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"Ouvrir"
 7		"Entrez l'adresse d'un film ou d'un fichier audio (sur Internet ou sur votre ordinateur) et le lecteur l'ouvrira pour vous."
 8		"Ouvrir :"
@@ -719,7 +719,7 @@ BEGIN MENU IDR_MAINFRAME LINES 138
 47		"Plein écran"
 48		"&Zoom"
 53		"Automatique"
-56		"&Langue"
+56		"&Langue (Language)"
 58		"Options d'affichage"
 60		"Test de &Tearing"
 61		"Statistiques d'affichage"
@@ -833,7 +833,7 @@ BEGIN MENU IDR_POPUP LINES 130
 89		"Capture"
 90		"Editeur de rendu"
 91		"Navigation"
-92		"&Langue"
+92		"&Langue (Language)"
 93		"Présélections..."
 95		"Minimal"
 96		"Compact"
@@ -887,7 +887,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 37		"Capture"
 38		"Editeur de Pixels Shaders"
 39		"Navigation"
-40		"&Langue"
+40		"&Langue (Language)"
 41		"Pré sélections..."
 43		"Minimal"
 44		"Compact"

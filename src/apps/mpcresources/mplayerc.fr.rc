@@ -197,7 +197,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,148,94,50,14,WS_GROUP
     PUSHBUTTON      "Annuler",IDCANCEL,200,94,50,14
     CONTROL         "Ajouter à la liste de lecture sans l'ouvrir",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,84,188,9
-    CONTROL         "Paste URL from clipboard",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,96,134,9
+    CONTROL         "Copier l'URL du Presse-papier",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,96,134,9
 END
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 241, 202
@@ -1646,7 +1646,7 @@ BEGIN
             MENUITEM "Automatique",            ID_VIEW_ZOOM_AUTOFIT
         END
         MENUITEM SEPARATOR
-        MENUITEM "&Langue",                   ID_SUBMENU_LANGUAGE
+        MENUITEM "&Langue (Language)",                   ID_SUBMENU_LANGUAGE
         MENUITEM SEPARATOR
         POPUP "Options d'affichage"
         BEGIN
@@ -1821,7 +1821,7 @@ BEGIN
             MENUITEM "Capture",               ID_VIEW_CAPTURE
             MENUITEM "Editeur de rendu",      ID_VIEW_SHADEREDITOR
             MENUITEM "Navigation",                  ID_VIEW_NAVIGATION
-            MENUITEM "&Langue",                   ID_SUBMENU_LANGUAGE
+            MENUITEM "&Langue (Language)",                   ID_SUBMENU_LANGUAGE
             POPUP "Présélections..."
             BEGIN
                 MENUITEM "Minimal",                     ID_VIEW_PRESETS_MINIMAL
@@ -1900,7 +1900,7 @@ BEGIN
             MENUITEM "Capture",               ID_VIEW_CAPTURE
             MENUITEM "Editeur de Pixels Shaders",   ID_VIEW_SHADEREDITOR
             MENUITEM "Navigation",                  ID_VIEW_NAVIGATION
-            MENUITEM "&Langue",                   ID_SUBMENU_LANGUAGE
+            MENUITEM "&Langue (Language)",                   ID_SUBMENU_LANGUAGE
             POPUP "Pré sélections..."
             BEGIN
                 MENUITEM "Minimal",                     ID_VIEW_PRESETS_MINIMAL
