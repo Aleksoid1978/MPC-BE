@@ -68,7 +68,7 @@ void Subtitle::GetSubFileNames(CString fn, const std::vector<CString>& paths, st
 		}
 		extListSub.TrimRight('|');
 
-		regExpSub.Format(L"(\\..+)?\\.(%s)$", extListSub);
+		regExpSub.Format(L"(\\..+)?\\.(%s)$", extListSub); // [.suffix].ext
 		regExpVid.Format(L".+\\.(%s)$", extListVid);
 
 		const std::wregex::flag_type reFlags = std::wregex::icase | std::wregex::optimize;
