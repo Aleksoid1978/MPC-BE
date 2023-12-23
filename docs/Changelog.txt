@@ -49,7 +49,7 @@ Updated libraries:
 	Little-CMS git-lcms2.16rc1-gd90d134b;
 	MediaInfo git-v23.10-57-g56ad167c6;
 	nanosvg git-706eb06;
-	rapidjson git-v1.1.0-744-gf9d53419;
+	rapidjson git-v1.1.0-745-g6089180e;
 	ZenLib git-v0.4.41-7-g1250d32.
 
 
