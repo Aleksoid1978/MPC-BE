@@ -33,6 +33,9 @@
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #include "MediaInfo/Tag/File_Xmp.h"
 #include <zlib.h>
+#if defined(MEDIAINFO_ICC_YES)
+    #include "MediaInfo/Tag/File_Icc.h"
+#endif
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -56,6 +59,13 @@ static const char* Png_Colour_type(int8u Colour_type)
     }
 }
 
+//---------------------------------------------------------------------------
+const char* Mpegv_colour_primaries(int8u colour_primaries);
+const char* Mpegv_transfer_characteristics(int8u transfer_characteristics);
+const char* Mpegv_matrix_coefficients(int8u matrix_coefficients);
+const char* Mpegv_matrix_coefficients_ColorSpace(int8u matrix_coefficients);
+const char* Mk_Video_Colour_Range(int8u range);
+
 //***************************************************************************
 // Constants
 //***************************************************************************
@@ -67,8 +77,12 @@ namespace Elements
     const int32u IEND=0x49454E44;
     const int32u IHDR=0x49484452;
     const int32u PLTE=0x506C5445;
+    const int32u cICP=0x63494350;
+    const int32u cLLi=0x634C4C69;
     const int32u gAMA=0x67414D41;
+    const int32u iCCP=0x69434350;
     const int32u iTXt=0x69545874;
+    const int32u mDCv=0x6D444376;
     const int32u pHYs=0x70485973;
     const int32u sBIT=0x73424954;
     const int32u tEXt=0x74455874;
@@ -228,8 +242,12 @@ void File_Png::Data_Parse()
         CASE_INFO(IEND,                                         "Image trailer");
         CASE_INFO(IHDR,                                         "Image header");
         CASE_INFO(PLTE,                                         "Palette table");
+        CASE_INFO(cICP,                                         "Coding-independent code points");
+        CASE_INFO(cLLi,                                         "Content Light Level Information");
         CASE_INFO(gAMA,                                         "Gamma");
+        CASE_INFO(iCCP,                                         "Embedded ICC profile");
         CASE_INFO(iTXt,                                         "International textual data");
+        CASE_INFO(mDCv,                                         "Mastering Display Color Volume");
         CASE_INFO(pHYs,                                         "Physical pixel dimensions");
         CASE_INFO(sBIT,                                         "Significant bits");
         CASE_INFO(tEXt,                                         "Textual data");
@@ -304,6 +322,44 @@ void File_Png::IHDR()
 }
 
 //---------------------------------------------------------------------------
+void File_Png::cICP()
+{
+    //Parsing
+    int8u ColourPrimaries, TransferFunction, MatrixCoefficients, VideoFullRangeFlag;
+    Get_B1 (ColourPrimaries,                                    "Colour Primaries"); Param_Info1(Mpegv_colour_primaries(ColourPrimaries));
+    Get_B1 (TransferFunction,                                   "Transfer Function"); Param_Info1(Mpegv_transfer_characteristics(TransferFunction));
+    Get_B1 (MatrixCoefficients,                                 "Matrix Coefficients"); Param_Info1(Mpegv_matrix_coefficients(MatrixCoefficients));
+    Get_B1 (VideoFullRangeFlag,                                 "Video Full Range Flag"); Param_Info1(Mk_Video_Colour_Range(VideoFullRangeFlag + 1));
+
+    FILLING_BEGIN()
+        Fill(StreamKind_Last, StreamPos_Last, "colour_description_present", "Yes");
+        auto colour_primaries=Mpegv_colour_primaries(ColourPrimaries);
+        Fill(StreamKind_Last, StreamPos_Last, "colour_primaries", (*colour_primaries)?colour_primaries:std::to_string(ColourPrimaries).c_str());
+        auto transfer_characteristics=Mpegv_transfer_characteristics(TransferFunction);
+        Fill(StreamKind_Last, StreamPos_Last, "transfer_characteristics", (*transfer_characteristics)?transfer_characteristics:std::to_string(TransferFunction).c_str());
+        auto matrix_coefficients=Mpegv_matrix_coefficients(MatrixCoefficients);
+        Fill(StreamKind_Last, StreamPos_Last, "matrix_coefficients", (*matrix_coefficients)?matrix_coefficients:std::to_string(MatrixCoefficients).c_str());
+        Ztring ColorSpace=Mpegv_matrix_coefficients_ColorSpace(MatrixCoefficients);
+        if (!ColorSpace.empty() && ColorSpace!=Retrieve_Const(StreamKind_Last, StreamPos_Last, "ColorSpace"))
+            Fill(StreamKind_Last, StreamPos_Last, "ColorSpace", Mpegv_matrix_coefficients_ColorSpace(MatrixCoefficients));
+        Fill(StreamKind_Last, StreamPos_Last, "colour_range", Mk_Video_Colour_Range(VideoFullRangeFlag+1));
+    FILLING_END()
+}
+
+//---------------------------------------------------------------------------
+void File_Png::cLLi()
+{
+    //Parsing
+    Ztring MaxCLL, MaxFALL;
+    Get_LightLevel(MaxCLL, MaxFALL, 10000);
+
+    FILLING_BEGIN();
+        Fill(StreamKind_Last, StreamPos_Last, "MaxCLL", MaxCLL);
+        Fill(StreamKind_Last, StreamPos_Last, "MaxFALL", MaxFALL);
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
 void File_Png::gAMA()
 {
     //Parsing
@@ -313,6 +369,93 @@ void File_Png::gAMA()
     FILLING_BEGIN()
         Fill(StreamKind_Last, 0, "Gamma", Gamma/100000.0);
     FILLING_END()
+}
+
+//---------------------------------------------------------------------------
+void File_Png::iCCP()
+{
+    //Parsing
+    int8u Compression;
+    size_t Zero=(size_t)Element_Offset;
+    for (; Zero<Element_Size; Zero++)
+        if (!Buffer[Buffer_Offset+Zero])
+            break;
+    if (Zero>=Element_Size)
+    {
+        Skip_XX(Element_Size-Element_Offset,                    "(Problem)");
+        return;
+    }
+    Skip_XX(Zero-Element_Offset,                                "Profile name");
+    Skip_B1(                                                    "Null separator");
+    Get_B1 (Compression,                                        "Compression method");
+
+    if (!Compression)
+    {
+        //Uncompress init
+        z_stream strm;
+        strm.next_in=(Bytef*)Buffer+Buffer_Offset+(size_t)Element_Offset;
+        strm.avail_in=(int)(Element_Size-Element_Offset);
+        strm.next_out=NULL;
+        strm.avail_out=0;
+        strm.total_out=0;
+        strm.zalloc=Z_NULL;
+        strm.zfree=Z_NULL;
+        inflateInit(&strm);
+
+        //Prepare out
+        strm.avail_out=0x1000000; //Blocks of 64 KiB, arbitrary chosen, as a begin //TEMP increase
+        strm.next_out=(Bytef*)new Bytef[strm.avail_out];
+
+        //Parse compressed data, with handling of the case the output buffer is not big enough
+        for (;;)
+        {
+            //inflate
+            int inflate_Result=inflate(&strm, Z_NO_FLUSH);
+            if (inflate_Result<0)
+                break;
+
+            //Check if we need to stop
+            if (strm.avail_out || inflate_Result)
+                break;
+
+            //Need to increase buffer
+            size_t UncompressedData_NewMaxSize=strm.total_out*4;
+            int8u* UncompressedData_New=new int8u[UncompressedData_NewMaxSize];
+            memcpy(UncompressedData_New, strm.next_out-strm.total_out, strm.total_out);
+            delete[] strm.next_out; strm.next_out=UncompressedData_New;
+            strm.next_out=strm.next_out+strm.total_out;
+            strm.avail_out=UncompressedData_NewMaxSize-strm.total_out;
+        }
+        auto Buffer=(const char*)strm.next_out-strm.total_out;
+        auto Buffer_Size=(size_t)strm.total_out;
+        #if defined(MEDIAINFO_ICC_YES)
+            File_Icc ICC_Parser;
+            ICC_Parser.StreamKind=StreamKind_Last;
+            ICC_Parser.IsAdditional=true;
+            Open_Buffer_Init(&ICC_Parser);
+            Open_Buffer_Continue(&ICC_Parser, (const int8u*)Buffer, Buffer_Size);
+            Open_Buffer_Finalize(&ICC_Parser);
+            Merge(ICC_Parser, StreamKind_Last, 0, 0);
+        #else
+            Skip_XX(Element_Size-Element_Offset,                "ICC profile");
+        #endif
+    }
+    else
+        Skip_XX(Element_Size-Element_Offset,                    "ICC profile");
+}
+
+//---------------------------------------------------------------------------
+void File_Png::mDCv()
+{
+    Ztring MasteringDisplay_ColorPrimaries, MasteringDisplay_Luminance;
+    Get_MasteringDisplayColorVolume(MasteringDisplay_ColorPrimaries, MasteringDisplay_Luminance);
+
+    FILLING_BEGIN();
+        Fill(StreamKind_Last, StreamPos_Last, "HDR_Format", "SMPTE ST 2086");
+        Fill(StreamKind_Last, StreamPos_Last, "HDR_Format_Compatibility", "HDR10");
+        Fill(StreamKind_Last, StreamPos_Last, "MasteringDisplay_ColorPrimaries", MasteringDisplay_ColorPrimaries);
+        Fill(StreamKind_Last, StreamPos_Last, "MasteringDisplay_Luminance", MasteringDisplay_Luminance);
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------

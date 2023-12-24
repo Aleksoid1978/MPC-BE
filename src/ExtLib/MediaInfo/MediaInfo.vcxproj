@@ -132,6 +132,7 @@
     <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Resource.h" />
     <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Sequence.h" />
     <ClInclude Include="MediaInfo\OutputHelpers.h" />
+    <ClInclude Include="MediaInfo\Tag\File_Icc.h" />
     <ClInclude Include="MediaInfo\Tag\File_PropertyList.h" />
     <ClInclude Include="MediaInfo\Tag\File_Xmp.h" />
     <ClInclude Include="MediaInfo\Text\File_AribStdB24B37.h" />
@@ -418,6 +419,7 @@
     <ClCompile Include="MediaInfo\PreComp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="MediaInfo\Tag\File_Icc.cpp" />
     <ClCompile Include="MediaInfo\Tag\File_PropertyList.cpp" />
     <ClCompile Include="MediaInfo\Tag\File_Xmp.cpp" />
     <ClCompile Include="MediaInfo\Text\File_AribStdB24B37.cpp" />

@@ -47,7 +47,7 @@ MPC Video Renderer теперь включен в инсталлятор.
 Обновлены библиотеки:
 	ffmpeg git-n6.2-dev-567-gf5f414d9c4;
 	Little-CMS git-lcms2.16-8-gf1060e7;
-	MediaInfo git-v23.10-57-g56ad167c6;
+	MediaInfo git-v23.11-26-gd6ee71845;
 	nanosvg git-706eb06;
 	rapidjson git-v1.1.0-745-g6089180e;
 	ZenLib git-v0.4.41-7-g1250d32.

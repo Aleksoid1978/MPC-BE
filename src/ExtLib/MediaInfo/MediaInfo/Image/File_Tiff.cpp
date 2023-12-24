@@ -35,6 +35,9 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Image/File_Tiff.h"
 #include "ZenLib/Utils.h"
+#if defined(MEDIAINFO_ICC_YES)
+    #include "MediaInfo/Tag/File_Icc.h"
+#endif
 using namespace ZenLib;
 //---------------------------------------------------------------------------
 
@@ -53,10 +56,12 @@ namespace Tiff_Tag
     const int16u BitsPerSample              = 258;
     const int16u Compression                = 259;
     const int16u PhotometricInterpretation  = 262;
+    const int16u DocumentName               = 269;
     const int16u ImageDescription           = 270;
     const int16u Make                       = 271;
     const int16u Model                      = 272;
     const int16u StripOffsets               = 273;
+    const int16u Orientation                = 274;
     const int16u SamplesPerPixel            = 277;
     const int16u RowsPerStrip               = 278;
     const int16u StripByteCounts            = 279;
@@ -67,6 +72,7 @@ namespace Tiff_Tag
     const int16u Software                   = 305;
     const int16u DateTime                   = 306;
     const int16u ExtraSamples               = 338;
+    const int16u ICC                        = 34675;
 }
 
 //---------------------------------------------------------------------------
@@ -79,10 +85,12 @@ static const char* Tiff_Tag_Name(int32u Tag)
         case Tiff_Tag::BitsPerSample                : return "BitsPerSample";
         case Tiff_Tag::Compression                  : return "Compression";
         case Tiff_Tag::PhotometricInterpretation    : return "PhotometricInterpretation";
+        case Tiff_Tag::DocumentName                 : return "DocumentName";
         case Tiff_Tag::ImageDescription             : return "ImageDescription";
         case Tiff_Tag::Make                         : return "Make";
         case Tiff_Tag::Model                        : return "Model";
         case Tiff_Tag::StripOffsets                 : return "StripOffsets";
+        case Tiff_Tag::Orientation                  : return "Orientation";
         case Tiff_Tag::SamplesPerPixel              : return "SamplesPerPixel";
         case Tiff_Tag::RowsPerStrip                 : return "RowsPerStrip";
         case Tiff_Tag::StripByteCounts              : return "StripByteCounts";
@@ -93,6 +101,7 @@ static const char* Tiff_Tag_Name(int32u Tag)
         case Tiff_Tag::Software                     : return "Software";
         case Tiff_Tag::DateTime                     : return "DateTime";
         case Tiff_Tag::ExtraSamples                 : return "ExtraSamples";
+        case Tiff_Tag::ICC                          : return "ICC";
         default                                     : return "";
     }
 }
@@ -105,6 +114,7 @@ namespace Tiff_Type
     const int16u Short      = 3;
     const int16u Long       = 4;
     const int16u Rational   = 5;
+    const int16u Undefined  = 7;
 }
 
 //---------------------------------------------------------------------------
@@ -117,6 +127,7 @@ static const char* Tiff_Type_Name(int32u Type)
         case Tiff_Type::Short                       : return "Short";
         case Tiff_Type::Long                        : return "Long";
         case Tiff_Type::Rational                    : return "Rational";
+        case Tiff_Type::Undefined                   : return "Undefined";
         default                                     : return ""; //Unknown
     }
 }
@@ -126,6 +137,7 @@ static const int8u Tiff_Type_Size(int32u Type)
 {
     switch (Type)
     {
+        case Tiff_Type::Undefined                   :
         case Tiff_Type::Byte                        : return 1;
         case Tiff_Type::ASCII                       : return 1;
         case Tiff_Type::Short                       : return 2;
@@ -243,6 +255,9 @@ bool File_Tiff::FileHeader_Begin()
     //All should be OK...
     Accept("TIFF");
     Fill(Stream_General, 0, General_Format, "TIFF");
+    #if defined(MEDIAINFO_ICC_YES)
+        ICC_Parser=nullptr;
+    #endif //defined(MEDIAINFO_ICC_YES)
     return true;
 }
 
@@ -405,6 +420,11 @@ void File_Tiff::Data_Parse_Fill()
         //Note: should we differeniate between raw RGB and palette (also RGB actually...)
     }
 
+    //DocumentName
+    Info=Infos.find(Tiff_Tag::DocumentName);
+    if (Info!=Infos.end())
+        Fill(Stream_Image, StreamPos_Last, Image_Title, Info->second.Read());
+
     //ImageDescription
     Info=Infos.find(Tiff_Tag::ImageDescription);
     if (Info!=Infos.end())
@@ -495,6 +515,10 @@ void File_Tiff::Data_Parse_Fill()
         ColorSpace+=Ztring().From_UTF8(Tiff_ExtraSamples_ColorSpace(Info->second.Read().To_int32u()));
         Fill(Stream_Image, StreamPos_Last, Image_ColorSpace, ColorSpace, true);
     }
+
+    //ICC
+    if (ICC_Parser)
+        Merge(*ICC_Parser, Stream_Image, 0, 0);
 }
 
 //***************************************************************************
@@ -520,6 +544,7 @@ void File_Tiff::Read_Directory()
     #endif //MEDIAINFO_TRACE
 
     int32u Size=Tiff_Type_Size(IfdItem.Type)*IfdItem.Count;
+
     if (Size<=4)
     {
         GetValueOffsetu(IfdItem);
@@ -564,7 +589,7 @@ void File_Tiff::GetValueOffsetu(ifditem &IfdItem)
 {
     ZtringList &Info=Infos[IfdItem.Tag]; Info.clear(); Info.Separator_Set(0, __T(" / "));
 
-    if (IfdItem.Type!=Tiff_Type::ASCII && IfdItem.Count>=1000)
+    if (IfdItem.Type!=Tiff_Type::ASCII && IfdItem.Type!=Tiff_Type::Undefined && IfdItem.Count>=1000)
     {
         //Too many data, we don't currently need it and we skip it
         Skip_XX(Tiff_Type_Size(IfdItem.Type)*IfdItem.Count,     "Data");
@@ -695,6 +720,25 @@ void File_Tiff::GetValueOffsetu(ifditem &IfdItem)
                         Info.push_back(Ztring::ToZtring(((float64)N)/D, D==1?0:3));
                     else
                         Info.push_back(Ztring()); // Division by zero, undefined
+                }
+                break;
+        case 7:                /* Undefined */
+                if (false)
+                    ;
+                #if defined(MEDIAINFO_ICC_YES)
+                else if (IfdItem.Tag==Tiff_Tag::ICC)
+                {
+                    delete ICC_Parser; ICC_Parser=new File_Icc;
+                    ((File_Icc*)ICC_Parser)->StreamKind=Stream_Image;
+                    ((File_Icc*)ICC_Parser)->IsAdditional=true;
+                    Open_Buffer_Init(ICC_Parser);
+                    Open_Buffer_Continue(ICC_Parser, Buffer+Buffer_Offset+(size_t)Element_Offset, IfdItem.Count);
+                    Open_Buffer_Finalize(ICC_Parser);
+                }
+                #endif
+                else
+                {
+                    Skip_XX(Tiff_Type_Size(IfdItem.Type)*IfdItem.Count, "Data");
                 }
                 break;
 

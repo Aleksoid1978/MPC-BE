@@ -2049,7 +2049,7 @@ void File__Analyze::Skip_XX(int64u Bytes, const char* Name)
 {
     if (Element_Offset+Bytes!=Element_TotalSize_Get()) //Exception for seek to end of the element
     {
-        INTEGRITY_SIZE_ATLEAST(Bytes);
+        //INTEGRITY_SIZE_ATLEAST(Bytes);
     }
     if (Trace_Activated && Bytes) Param(Name, Ztring("(")+Ztring::ToZtring(Bytes)+Ztring(" bytes)"));
     Element_Offset+=Bytes;

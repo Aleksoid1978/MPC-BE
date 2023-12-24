@@ -38,6 +38,7 @@ public :
 
     //Constructor/Destructor
     File_Jpeg();
+    ~File_Jpeg();
 
 private :
     //Streams management
@@ -133,8 +134,6 @@ private :
     void APP1_EXIF();
     void APP2();
     void APP2_ICC_PROFILE();
-    void APP2_ICC_PROFILE_XYZNumber();
-    void APP2_ICC_PROFILE_s15Fixed16Number(const char* Name);
     void APP3() {Skip_XX(Element_Size, "Data");}
     void APP4() {Skip_XX(Element_Size, "Data");}
     void APP5() {Skip_XX(Element_Size, "Data");}
@@ -169,6 +168,7 @@ private :
     int8u APPE_Adobe0_transform;
     bool  APP0_JFIF_Parsed;
     bool  SOS_SOD_Parsed;
+    File__Analyze* ICC_Parser=nullptr;
 };
 
 } //NameSpace

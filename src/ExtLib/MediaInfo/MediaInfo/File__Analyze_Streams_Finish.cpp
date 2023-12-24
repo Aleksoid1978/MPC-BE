@@ -1112,21 +1112,15 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
     }
 
     //Commercial name
-    if ((Retrieve(Stream_Video, Pos, Video_BitDepth).empty() || Retrieve(Stream_Video, Pos, Video_BitDepth)==__T("10")) //e.g. ProRes has not bitdepth info
-     && Retrieve(Stream_Video, Pos, Video_ChromaSubsampling)==__T("4:2:0")
-     && (Retrieve(Stream_Video, Pos, Video_colour_description_present).empty() || //From  CFF: "colour_description_present_flag SHALL be set to 1 if the color parameters from [R709] are not used."
-       ( Retrieve(Stream_Video, Pos, Video_colour_primaries)==__T("BT.2020")
-      && Retrieve(Stream_Video, Pos, Video_transfer_characteristics)==__T("PQ")
-      && Retrieve(Stream_Video, Pos, Video_matrix_coefficients).find(__T("BT.2020"))==0))
-     && !Retrieve(Stream_Video, Pos, "MasteringDisplay_ColorPrimaries").empty()
-     // && !Retrieve(Stream_Video, Pos, "MaxCLL").empty()
-     // && !Retrieve(Stream_Video, Pos, "MaxFALL").empty() // MaxCLL & MaxFALL are required except if not available so not required in practice https://www.cta.tech/News/Press-Releases/2015/August/CEA-Defines-%E2%80%98HDR-Compatible%E2%80%99-Displays.aspx https://www.ultrahdforum.org/wp-content/uploads/2016/04/Ultra-HD-Forum-Deployment-Guidelines-V1.1-Summer-2016.pdf
-        )
+    if (Retrieve(Stream_Video, Pos, Video_HDR_Format_Compatibility).rfind(__T("HDR10"), 0)==0
+     && ((!Retrieve(Stream_Video, Pos, Video_BitDepth).empty() && Retrieve(Stream_Video, Pos, Video_BitDepth).To_int64u()<10) //e.g. ProRes has not bitdepth info
+     || Retrieve(Stream_Video, Pos, Video_colour_primaries)!=__T("BT.2020")
+     || Retrieve(Stream_Video, Pos, Video_transfer_characteristics)!=__T("PQ")
+     || Retrieve(Stream_Video, Pos, Video_MasteringDisplay_ColorPrimaries).empty()
+        ))
     {
         //We actually fill HDR10/HDR10+ by default, so it will be removed below if not fitting in the color related rules
-    }
-    else if (!Retrieve_Const(Stream_Video, Pos, Video_HDR_Format_Compatibility).empty())
-    {
+        Clear(Stream_Video, Pos, Video_HDR_Format_Compatibility);
     }
     if (Retrieve(Stream_Video, Pos, Video_HDR_Format_String).empty())
     {
@@ -1142,7 +1136,7 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
             HDR_Format_Compatibility.resize(Summary.size());
             ZtringList ToAdd;
             ToAdd.Separator_Set(0, __T(" / "));
-            for (size_t i=Video_HDR_Format_String+1; i<=Video_HDR_Format_Settings; i++)
+            for (size_t i=Video_HDR_Format_String+1; i<=Video_HDR_Format_Compression; i++)
             {
                 ToAdd.Write(Retrieve(Stream_Video, Pos, i));
                 ToAdd.resize(Summary.size());
@@ -1154,6 +1148,7 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
                         {
                             case Video_HDR_Format_Version: Summary[j]+=__T(", Version "); break;
                             case Video_HDR_Format_Level: Summary[j]+=__T('.'); break;
+                            case Video_HDR_Format_Compression: ToAdd[j][0]+=0x20; if (ToAdd[j].size()==4) ToAdd[j].resize(2); ToAdd[j]+=__T(" metadata compression"); // Fallthrough
                             default: Summary[j] += __T(", ");
                         }
                         Summary[j]+=ToAdd[j];
@@ -1676,8 +1671,69 @@ void File__Analyze::Streams_Finish_StreamOnly_Other(size_t UNUSED(StreamPos))
 }
 
 //---------------------------------------------------------------------------
-void File__Analyze::Streams_Finish_StreamOnly_Image(size_t UNUSED(StreamPos))
+void File__Analyze::Streams_Finish_StreamOnly_Image(size_t Pos)
 {
+    //Commercial name
+    if (Retrieve(Stream_Image, Pos, Image_HDR_Format_Compatibility).rfind(__T("HDR10"), 0)==0
+     && ((!Retrieve(Stream_Image, Pos, Image_BitDepth).empty() && Retrieve(Stream_Image, Pos, Image_BitDepth).To_int64u()<10) //e.g. ProRes has not bitdepth info
+      || Retrieve(Stream_Image, Pos, Image_colour_primaries)!=__T("BT.2020")
+      || Retrieve(Stream_Image, Pos, Image_transfer_characteristics)!=__T("PQ")
+      || Retrieve(Stream_Image, Pos, Image_MasteringDisplay_ColorPrimaries).empty()
+        ))
+    {
+        //We actually fill HDR10/HDR10+ by default, so it will be removed below if not fitting in the color related rules
+        Clear(Stream_Image, Pos, Image_HDR_Format_Compatibility);
+    }
+    if (Retrieve(Stream_Image, Pos, Image_HDR_Format_String).empty())
+    {
+        ZtringList Summary;
+        Summary.Separator_Set(0, __T(" / "));
+        Summary.Write(Retrieve(Stream_Image, Pos, Image_HDR_Format));
+        ZtringList Commercial=Summary;
+        if (!Summary.empty())
+        {
+            ZtringList HDR_Format_Compatibility;
+            HDR_Format_Compatibility.Separator_Set(0, __T(" / "));
+            HDR_Format_Compatibility.Write(Retrieve(Stream_Image, Pos, Image_HDR_Format_Compatibility));
+            HDR_Format_Compatibility.resize(Summary.size());
+            ZtringList ToAdd;
+            ToAdd.Separator_Set(0, __T(" / "));
+            for (size_t i=Image_HDR_Format_String+1; i<=Image_HDR_Format_Settings; i++)
+            {
+                ToAdd.Write(Retrieve(Stream_Image, Pos, i));
+                ToAdd.resize(Summary.size());
+                for (size_t j=0; j<Summary.size(); j++)
+                {
+                    if (!ToAdd[j].empty())
+                    {
+                        switch (i)
+                        {
+                            case Image_HDR_Format_Version: Summary[j]+=__T(", Version "); break;
+                            case Image_HDR_Format_Level: Summary[j]+=__T('.'); break;
+                            default: Summary[j] += __T(", ");
+                        }
+                        Summary[j]+=ToAdd[j];
+                    }
+                }
+            }
+            for (size_t j=0; j<Summary.size(); j++)
+                if (!HDR_Format_Compatibility[j].empty())
+                {
+                    Summary[j]+=__T(", ")+HDR_Format_Compatibility[j]+__T(" compatible");
+                    Commercial[j]=HDR_Format_Compatibility[j];
+                    if (!Commercial[j].empty())
+                    {
+                        auto Commercial_Reduce=Commercial[j].find(__T(' '));
+                        if (Commercial_Reduce<Commercial[j].size()-1 && Commercial[j][Commercial_Reduce+1]>='0' && Commercial[j][Commercial_Reduce+1]<='9')
+                            Commercial_Reduce=Commercial[j].find(__T(' '), Commercial_Reduce+1);
+                        if (Commercial_Reduce!=string::npos)
+                            Commercial[j].resize(Commercial_Reduce);
+                    }
+                }
+            Fill(Stream_Image, Pos, Image_HDR_Format_String, Summary.Read());
+            Fill(Stream_Image, Pos, Image_HDR_Format_Commercial, Commercial.Read());
+        }
+    }
 }
 
 //---------------------------------------------------------------------------

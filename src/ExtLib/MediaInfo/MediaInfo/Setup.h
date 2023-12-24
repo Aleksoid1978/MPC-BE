@@ -987,6 +987,9 @@
 #if !defined(MEDIAINFO_TAG_NO) && !defined(MEDIAINFO_APETAG_NO) && !defined(MEDIAINFO_APETAG_YES)
     #define MEDIAINFO_APETAG_YES
 #endif
+#if !defined(MEDIAINFO_TAG_NO) && !defined(MEDIAINFO_ICC_NO) && !defined(MEDIAINFO_ICC_YES)
+    #define MEDIAINFO_ICC_YES
+#endif
 #if !defined(MEDIAINFO_TAG_NO) && !defined(MEDIAINFO_ID3_NO) && !defined(MEDIAINFO_ID3_YES)
     #define MEDIAINFO_ID3_YES
 #endif

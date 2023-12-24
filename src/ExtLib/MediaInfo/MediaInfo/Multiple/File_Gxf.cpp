@@ -32,8 +32,14 @@
 #if defined(MEDIAINFO_GXF_YES)
     #include "MediaInfo/Multiple/File_Umf.h"
 #endif
+#if defined(MEDIAINFO_AVC_YES)
+    #include "MediaInfo/Video/File_Avc.h"
+#endif
 #if defined(MEDIAINFO_MPEGV_YES)
     #include "MediaInfo/Video/File_Mpegv.h"
+#endif
+#if defined(MEDIAINFO_VC3_YES)
+    #include "MediaInfo/Video/File_Vc3.h"
 #endif
 #if defined(MEDIAINFO_AC3_YES)
     #include "MediaInfo/Audio/File_Ac3.h"
@@ -112,6 +118,9 @@ static const char* Gxf_MediaTypes(int8u Type)
         case 23 : return "MPEG-1 Video"; //625 lines
         case 24 : return "SMPTE 12M"; //HD
         case 25 : return "DV"; //DVCPRO HD
+        case 26 : return "AVC";
+        case 29 : return "AVC";
+        case 30 : return "VC-3";
         default : return "";
     }
 }
@@ -142,6 +151,9 @@ static stream_t Gxf_MediaTypes_StreamKind(int8u Type)
         case 23 : return Stream_Video;
         case 24 : return Stream_Max;
         case 25 : return Stream_Video;
+        case 26 : return Stream_Video;
+        case 29 : return Stream_Video;
+        case 30 : return Stream_Video;
         default : return Stream_Max;
     }
 }
@@ -1077,6 +1089,27 @@ void File_Gxf::map()
                                         if (SizeToAnalyze<8*16*1024*1024)
                                             SizeToAnalyze*=8; //10x more, to be sure to find captions
                                         #endif //MEDIAINFO_RIFF_YES
+                                    }
+                                    break;
+                        case 26 :
+                        case 29 :   //AVC
+                                    {
+                                        File__Analyze* Parser=new File_Avc();
+                                        Open_Buffer_Init(Parser);
+                                        Streams[TrackID].Parsers.push_back(Parser);
+
+                                        Parsers_Count++;
+                                        Streams[TrackID].Searching_Payload=true;
+                                    }
+                                    break;
+                        case 30 :   //VC-3
+                                    {
+                                        File__Analyze* Parser=new File_Vc3();
+                                        Open_Buffer_Init(Parser);
+                                        Streams[TrackID].Parsers.push_back(Parser);
+
+                                        Parsers_Count++;
+                                        Streams[TrackID].Searching_Payload=true;
                                     }
                                     break;
                         default :   ;

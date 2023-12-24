@@ -78,8 +78,9 @@ private :
     void idsc();
     void jp2c();
     void jp2h();
-    void jp2h_ihdr();
     void jp2h_colr();
+    void jp2h_ihdr();
+    void jp2h_ricc() {jp2h_colr(); }
     void mdat();
     void mdat_xxxx();
     void mdat_StreamJump();
@@ -254,6 +255,7 @@ private :
     void moov_trak_mdia_minf_stbl_stsd_xxxx_jp2h() {jp2h();}
     void moov_trak_mdia_minf_stbl_stsd_xxxx_jp2h_colr() {jp2h_colr();}
     void moov_trak_mdia_minf_stbl_stsd_xxxx_jp2h_ihdr() {jp2h_ihdr();}
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_lhvC();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_mdcv();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_mhaC();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_pasp();
@@ -265,6 +267,11 @@ private :
     void moov_trak_mdia_minf_stbl_stsd_xxxx_sinf_schm();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_sinf_schi();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_udts();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_vexu();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_vexu_eyes();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_vexu_eyes_hero();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_vexu_eyes_stri();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_vexu_must();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_vvcC();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_wave();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_wave_acbf();

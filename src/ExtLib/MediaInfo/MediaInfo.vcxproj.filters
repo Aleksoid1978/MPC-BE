@@ -767,6 +767,9 @@
     <ClInclude Include="MediaInfo\ExternalCommandHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Tag\File_Icc.h">
+      <Filter>Header Files\Tag</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1479,6 +1482,9 @@
     </ClCompile>
     <ClCompile Include="MediaInfo\ExternalCommandHelpers.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Tag\File_Icc.cpp">
+      <Filter>Source Files\Tag</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

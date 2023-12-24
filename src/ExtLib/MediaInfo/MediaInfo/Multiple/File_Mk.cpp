@@ -1293,10 +1293,13 @@ void File_Mk::Streams_Finish()
                 auto StreamKind_Last_Sav=StreamKind_Last;
                 auto StreamPos_Last_Sav=StreamPos_Last;
                 Merge(*Add->second);
-                Fill(StreamKind_Last, StreamPos_Last, Other_ID, to_string(Temp->first)+"-Add-"+to_string(Add->first));
-                Fill(StreamKind_Last, StreamPos_Last, Other_MuxingMode, "BlockAddition");
-                StreamKind_Last=StreamKind_Last_Sav;
-                StreamPos_Last=StreamPos_Last_Sav;
+                if (StreamKind_Last!=StreamKind_Last_Sav || StreamPos_Last!=StreamPos_Last_Sav)
+                {
+                    Fill(StreamKind_Last, StreamPos_Last, Other_ID, to_string(Temp->first)+"-Add-"+to_string(Add->first));
+                    Fill(StreamKind_Last, StreamPos_Last, Other_MuxingMode, "BlockAddition");
+                    StreamKind_Last=StreamKind_Last_Sav;
+                    StreamPos_Last=StreamPos_Last_Sav;
+                }
             }
 
             //Format specific

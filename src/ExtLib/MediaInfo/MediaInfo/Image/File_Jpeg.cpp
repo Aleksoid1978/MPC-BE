@@ -33,6 +33,9 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Image/File_Jpeg.h"
+#if defined(MEDIAINFO_ICC_YES)
+    #include "MediaInfo/Tag/File_Icc.h"
+#endif
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #include "ZenLib/Utils.h"
 #include <vector>
@@ -207,43 +210,6 @@ string Jpeg2000_Rsiz(int16u Rsiz)
     }
 }
 
-string ICC_Tag(int32u Signature)
-{
-    switch (Signature)
-    {
-        case 0x63707274: return "Copyright";
-        case 0x64657363: return "Profile description";
-        case 0x77747074: return "White point";
-        case 0x626B7074: return "Black point";
-        case 0x72545243: return "Reproduction curve, red";
-        case 0x67545243: return "Reproduction curve, green";
-        case 0x62545243: return "Reproduction curve, blue";
-        case 0x7258595A: return "Matrix, red";
-        case 0x6758595A: return "Matrix, green";
-        case 0x6258595A: return "Matrix, blue";
-        default        : return Ztring().From_CC4(Signature).To_UTF8();
-    }
-}
-
-string ICC_ColorSpace(int32u ColorSpace)
-{
-    switch (ColorSpace)
-    {
-        case 0x434D5920: return "CMY";
-        case 0x434D594B: return "CMYK";
-        case 0x47524159: return "Y";
-        case 0x484C5320: return "HLS";
-        case 0x48535620: return "HSV";
-        case 0x4C616220: return "Lab";
-        case 0x4C757620: return "Luv";
-        case 0x52474220: return "RGB";
-        case 0x58595A20: return "XYZ";
-        case 0x59436272: return "YCbCr";
-        case 0x59787920: return "xyY";
-        default        : return Ztring().From_CC4(ColorSpace).To_UTF8();
-    }
-}
-
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -270,6 +236,12 @@ File_Jpeg::File_Jpeg()
     #endif //MEDIAINFO_DEMUX
 }
 
+//---------------------------------------------------------------------------
+File_Jpeg::~File_Jpeg()
+{
+    delete ICC_Parser;
+}
+
 //***************************************************************************
 // Streams management
 //***************************************************************************
@@ -280,8 +252,11 @@ void File_Jpeg::Streams_Accept()
     if (!IsSub)
     {
         TestContinuousFileNames();
+        if (Config->File_Names.size()>1)
+            StreamKind=Stream_Video;
 
-        Stream_Prepare(Config->File_Names.size()>1?Stream_Video:StreamKind);
+        if (!Count_Get(StreamKind))
+            Stream_Prepare(StreamKind);
         if (File_Size!=(int64u)-1)
             Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize), File_Size);
         if (StreamKind_Last==Stream_Video)
@@ -935,6 +910,8 @@ void File_Jpeg::SOF_()
 
             //ColorSpace from http://docs.oracle.com/javase/1.4.2/docs/api/javax/imageio/metadata/doc-files/jpeg_metadata.html
             //TODO: if APPE_Adobe0_transform is present, indicate that K is inverted, see http://halicery.com/Image/jpeg/JPEGCMYK.html
+            if (Retrieve_Const(StreamKind_Last, 0, "ColorSpace").empty())
+            {
             switch (APPE_Adobe0_transform)
             {
                 case 0x01 :
@@ -986,6 +963,7 @@ void File_Jpeg::SOF_()
                                 default:    ;
                             }
                             }
+            }
             }
 
             //Chroma subsampling
@@ -1230,209 +1208,49 @@ void File_Jpeg::APP1_EXIF()
 void File_Jpeg::APP2()
 {
     //Parsing
-    if (Element_Size>=12 && Buffer[Buffer_Offset+11]==0 && string((const char*)Buffer+Buffer_Offset)=="ICC_PROFILE")
-    {
-        Element_Info1("ICC profile");
-        int8u Pos;
-        Skip_Local(12,                                          "Signature");
-        Get_B1 (Pos,                                            "Chunk position?"); //1-based?
-        Skip_B1(                                                "Chunk Max?"); //1-based?
-        if (Pos<=1) //Multi-chunk ICC is not supported so we test it is order to skip the extra ICC blocks
-            APP2_ICC_PROFILE();
-        else
-            Skip_XX(Element_Size-Element_Offset,                "(Multi-chunk ICC is not supported)");
-    }
+    if (Element_Size>=14 && !strncmp((const char*)Buffer+Buffer_Offset, "ICC_PROFILE", 12))
+        APP2_ICC_PROFILE();
     else
         Skip_XX(Element_Size,                                   "Data");
 }
 
 //---------------------------------------------------------------------------
-struct icctagtable
-{
-    int32u Signature;
-    int32u Offset;
-    int32u Size;
-};
 void File_Jpeg::APP2_ICC_PROFILE()
 {
-    Element_Begin1("ICC profile");
-
-    //Parsing
-    int64u Element_Start=Element_Offset; // Needed for tags position
-    int32u ColorSpace;
-    Element_Begin1("Profile header");
-        Skip_B4(                                                "Profile size");
-        Skip_C4(                                                "Preferred CMM type");
-        Element_Begin1("Profile version number");
-            int8u M;
-            Get_B1(M,                                           "Major");
-            if (M>4)
-            {
-                Element_End0();
-                Element_End0();
-                Element_End0();
-                return;
-            }
-            BS_Begin();
-            Info_S1(4, m,                                       "Minor");
-            Info_S1(4, f,                                       "Fix");
-            BS_End();
-            Skip_B2(                                            "Reserved");
-            Element_Info1(Ztring().From_Number(M)+__T('.')+Ztring().From_Number(m)+__T('.')+Ztring().From_Number(f));
-        Element_End0();
-        Skip_C4(                                                "Profile/Device class");
-        Get_C4 (ColorSpace,                                     "Colour space of data");
-        Skip_C4(                                                "PCS");
-        Element_Begin1("Date/Time");
-            Info_B2(YY,                                         "Year");
-            Info_B2(MM,                                         "Month");
-            Info_B2(DD,                                         "Day");
-            Info_B2(hh,                                         "Hour");
-            Info_B2(mm,                                         "Minute");
-            Info_B2(ss,                                         "Second");
-            #if MEDIAINFO_TRACE
-                string DateTime;
-                DateTime+='0'+YY/1000;
-                DateTime+='0'+(YY%1000)/100;
-                DateTime+='0'+(YY%100)/10;
-                DateTime+='0'+(YY%1000);
-                DateTime+='-';
-                DateTime+='0'+MM/10;
-                DateTime+='0'+(MM%10);
-                DateTime+='-';
-                DateTime+='0'+DD/10;
-                DateTime+='0'+(DD%10);
-                DateTime+=' ';
-                DateTime+='0'+hh/10;
-                DateTime+='0'+(hh%10);
-                DateTime+=':';
-                DateTime+='0'+mm/10;
-                DateTime+='0'+(mm%10);
-                DateTime+=':';
-                DateTime+='0'+ss/10;
-                DateTime+='0'+(ss%10);
-                Element_Info1(DateTime.c_str());
-            #endif //MEDIAINFO_TRACE
-        Element_End0();
-        Skip_C4(                                                "'acsp' profile file signature ");
-        Skip_C4(                                                "Primary platform signature");
-        Skip_B4(                                                "Profile flags");
-        Skip_C4(                                                "Device manufacturer");
-        Skip_B4(                                                "Device model");
-        Skip_B4(                                                "Device attributes TODO 1");
-        Skip_B4(                                                "Device attributes TODO 2");
-        Skip_B4(                                                "Rendering Intent");
-        Element_Begin1("Illuminant of the PCS");
-            APP2_ICC_PROFILE_XYZNumber();
-        Element_End0();
-        Skip_C4(                                                "Profile creator signature");
-        Skip_XX(16,                                             "Profile ID");
-        Skip_XX(28,                                             "Reserved");
-    Element_End0();
-
-    int32u Count;
-    vector<icctagtable> TagTables;
-    Element_Begin1("Tag table");
-        Get_B4(Count,                                           "Count");
-        if (Count*12>Element_Size-Element_Offset)
-            Count=(Element_Size-Element_Offset)/12;
-        for (int32u i=0; i<Count; i++)
+    Element_Info1("ICC profile");
+    #if defined(MEDIAINFO_ICC_YES)
+        Element_Begin1("ICC profile");
+        int8u Pos, Max;
+        Skip_Local(12,                                          "Signature");
+        Get_B1 (Pos,                                            "Chunk position");
+        Get_B1 (Max,                                            "Chunk max");
+        if (Pos==1)
         {
-            icctagtable TagTable;
-            Get_C4(TagTable.Signature,                          "Signature"); Param_Info1(ICC_Tag(TagTable.Signature).c_str());
-            Get_B4(TagTable.Offset,                             "Offset");
-            Get_B4(TagTable.Size,                               "Size");
-            if (((int64u)TagTable.Offset)+TagTable.Size<=Element_Size-Element_Start)
-                TagTables.push_back(TagTable);
+            Accept("JPEG");
+            delete ICC_Parser;
+            ICC_Parser=new File_Icc();
+            ((File_Icc*)ICC_Parser)->StreamKind=StreamKind;
+            Open_Buffer_Init(ICC_Parser);
         }
-    Element_End0();
-
-    Element_Begin1("Tagged element data");
-        Count=(int32u)TagTables.size();
-        for (int32u i=0; i<Count; i++)
+        if (ICC_Parser)
         {
-            icctagtable& TagTable=TagTables[i];
-            Ztring Name;
-            
-            Element_Begin1(ICC_Tag(TagTable.Signature).c_str());
-            Element_Offset=Element_Start+TagTable.Offset;
-            int32u Type;
-            Get_C4(Type,                                        "Type");
-            switch (Type)
+            ((File_Icc*)ICC_Parser)->Frame_Count_Max=Max;
+            ((File_Icc*)ICC_Parser)->IsAdditional=true;
+            Open_Buffer_Continue(ICC_Parser);
+            if (Pos==Max)
             {
-                case 0x63757276: //curv
-                                if (TagTable.Size<12)
-                                    Skip_XX(TagTable.Size-4,    "Unknown");
-                                else
-                                {
-                                    int32u Count;
-                                    Skip_B4(                    "Reserved");
-                                    Get_B4(Count,               "Count");
-                                    if (12+4*((Count+1)/2)!=TagTable.Size)
-                                        Skip_XX(TagTable.Size-12, "Unknown");
-                                    else
-                                    {
-                                        for (int32u i=0; i<Count; i++)
-                                            Skip_B2(            "Value");
-                                        if (Count%2)
-                                            Skip_B2(            "Padding");
-                                    }
-                                }
-                                break;
-                case 0x64657363: //desc
-                                if (TagTable.Size<12)
-                                    Skip_XX(TagTable.Size-4,    "Unknown");
-                                else
-                                {
-                                    Skip_B7(                    "?");
-                                    Skip_B1(                    "String size");
-                                    Skip_Local(TagTable.Size-12, "Value"); //TODO: beter handling of this complex type
-                                }
-                                break;
-                case 0x74657874: //text
-                                if (TagTable.Size<8)
-                                    Skip_XX(TagTable.Size-4,    "Unknown");
-                                else
-                                {
-                                    Skip_B4(                    "Reserved");
-                                    Skip_Local(TagTable.Size-8, "Value");
-                                }
-                                break;
-                case 0x58595A20: //XYZ
-                                if (TagTable.Size!=20)
-                                    Skip_XX(TagTable.Size-4,    "Unknown");
-                                else
-                                {
-                                    Skip_B4(                    "Reserved");
-                                    APP2_ICC_PROFILE_XYZNumber();
-                                }
-                                break;
-                default:        Skip_XX(TagTable.Size-4,        "Unknown");
+                Open_Buffer_Finalize(ICC_Parser);
+                Merge(*ICC_Parser, StreamKind, 0, 0);
             }
-            Element_End0();
         }
-    Element_End0();
-    Element_End0();
-
-    FILLING_BEGIN()
-        Fill(StreamKind, 0, "ColorSpace_ICC", ICC_ColorSpace(ColorSpace));
-    FILLING_END()
-}
-
-void File_Jpeg::APP2_ICC_PROFILE_XYZNumber()
-{
-    #if MEDIAINFO_TRACE
-        APP2_ICC_PROFILE_s15Fixed16Number("X");
-        APP2_ICC_PROFILE_s15Fixed16Number("Y");
-        APP2_ICC_PROFILE_s15Fixed16Number("Z");
-    #else //MEDIAINFO_TRACE
-        Element_Offset+=12;
-    #endif //MEDIAINFO_TRACE
-}
-
-void File_Jpeg::APP2_ICC_PROFILE_s15Fixed16Number(const char* Name)
-{
-    Info_B4(Value,                                              Name); Param_Info1(Ztring().From_Number(((float64)Value)/0x10000, 6));
+        else
+        {
+            Skip_XX(Element_Size-Element_Offset,                "ICC profile (partial)");
+        }
+        Element_End0();
+    #else
+        Skip_XX(Element_Size-Element_Offset,                    "ICC profile");
+    #endif
 }
 
 //---------------------------------------------------------------------------

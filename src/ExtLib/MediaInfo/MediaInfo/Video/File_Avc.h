@@ -545,6 +545,8 @@ private :
     size_t                              Interlaced_Bottom;
     size_t                              Structure_Field;
     size_t                              Structure_Frame;
+    size_t                              Slices_CountInThisFrame;
+    size_t                              MaxSlicesCount;
 
     //Temp
     Ztring                              Encoded_Library;

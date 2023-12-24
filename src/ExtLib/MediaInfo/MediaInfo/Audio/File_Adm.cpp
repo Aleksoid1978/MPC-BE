@@ -347,6 +347,7 @@ enum audioContent_StringVector {
 enum audioObject_String {
     audioObject_audioObjectID,
     audioObject_audioObjectName,
+    audioObject_start,
     audioObject_startTime,
     audioObject_duration,
     audioObject_typeLabel,
@@ -1188,6 +1189,7 @@ int file_adm_private::audioFormatExtended()
             ATTRIBUTE(audioObject, audioObjectName)
             ATTRIBUTE(audioObject, duration)
             ATTRIBUTE(audioObject, startTime)
+            ATTRIBUTE(audioObject, start)
             ATTRIBUTE(audioObject, typeLabel)
         ELEMENT_MIDDLE(audioObject)
             ELEMENT(audioObject, audioPackFormatIDRef)
@@ -1673,6 +1675,7 @@ void File_Adm::Streams_Fill()
             FILL_A(audioObject, audioObjectID, "ID");
         FILL_A(audioObject, audioObjectName, "Title");
         FILL_A(audioObject, startTime, "Start");
+        FILL_A(audioObject, start, "Start");
         FILL_A(audioObject, duration, "Duration");
         LINK(audioObject, "PackFormat", audioPackFormatIDRef, audioPackFormat);
         LINK(audioObject, "Object", audioObjectIDRef, audioObject);

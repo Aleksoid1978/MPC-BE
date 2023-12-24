@@ -1140,6 +1140,8 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
     Fill(Stream_Video, 0, Video_ChromaSubsampling, Avc_ChromaSubsampling_format_idc((*seq_parameter_set_Item)->chroma_format_idc));
     if ((*seq_parameter_set_Item)->bit_depth_luma_minus8==(*seq_parameter_set_Item)->bit_depth_chroma_minus8)
         Fill(Stream_Video, 0, Video_BitDepth, (*seq_parameter_set_Item)->bit_depth_luma_minus8+8);
+    if (MaxSlicesCount>1)
+        Fill(Stream_Video, 0, Video_Format_Settings_SliceCount, MaxSlicesCount);
 
     hdr::iterator EtsiTs103433 = HDR.find(HdrFormat_EtsiTs103433);
     if (EtsiTs103433 != HDR.end())
@@ -1701,6 +1703,8 @@ void File_Avc::Synched_Init()
     Interlaced_Bottom=0;
     Structure_Field=0;
     Structure_Frame=0;
+    Slices_CountInThisFrame=0;
+    MaxSlicesCount=0;
 
     //Temp
     FrameRate_Divider=1;
@@ -1761,6 +1765,7 @@ void File_Avc::Read_Buffer_Unsynched()
     TemporalReferences_pic_order_cnt_Min=numeric_limits<decltype(TemporalReferences_pic_order_cnt_Min)>::max();
     pic_order_cnt_Displayed=numeric_limits<decltype(pic_order_cnt_Displayed)>::max();
     pic_order_cnt_Delta=0;
+    Slices_CountInThisFrame=0;
 
     //Text
     #if defined(MEDIAINFO_DTVCCTRANSPORT_YES)
@@ -2372,6 +2377,14 @@ void File_Avc::slice_header()
         //Count of I-Frames
         if (first_mb_in_slice==0 && Element_Code!=20 && (slice_type==2 || slice_type==7)) //Not slice_layer_extension, I-Frame
             IFrame_Count++;
+        if (!first_mb_in_slice && Slices_CountInThisFrame)
+        {
+            if (MaxSlicesCount<Slices_CountInThisFrame)
+                MaxSlicesCount=Slices_CountInThisFrame;
+            Slices_CountInThisFrame=1;
+        }
+        else
+            Slices_CountInThisFrame++;
 
         //pic_struct
         if (field_pic_flag && (*seq_parameter_set_Item)->pic_struct_FirstDetected==(int8u)-1)

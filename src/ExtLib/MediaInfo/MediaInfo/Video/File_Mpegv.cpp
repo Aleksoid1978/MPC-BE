@@ -21,7 +21,7 @@
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-#if defined(MEDIAINFO_MPEGV_YES) || defined(MEDIAINFO_MPEG4V_YES) || defined(MEDIAINFO_AVC_YES) || defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_PRORES_YES)
+#if defined(MEDIAINFO_MPEGV_YES) || defined(MEDIAINFO_MPEG4V_YES) || defined(MEDIAINFO_AVC_YES) || defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_PRORES_YES) || defined(MEDIAINFO_PNG_YES)
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib

@@ -4505,11 +4505,13 @@ void File_Ac3::HD_format_info()
         Skip_S1( 2,                                             "2ch_presentation_channel_modifier");
         Skip_S1( 2,                                             "6ch_presentation_channel_modifier");
         Get_S1 ( 5, HD_Channels1,                               "6ch_presentation_channel_assignment"); Param_Info1(AC3_TrueHD_Channels(HD_Channels1)); Param_Info1(Ztring().From_UTF8(AC3_TrueHD_Channels_Positions(HD_Channels1)));
-        Skip_S1( 2,                                             "8ch_presentation_channel_modifier");
+        Get_S1 ( 2, dsurexmod,                                  "8ch_presentation_channel_modifier");
         Get_S2 (13, HD_Channels2,                               "8ch_presentation_channel_assignment"); Param_Info1(AC3_TrueHD_Channels(HD_Channels2)); Param_Info1(Ztring().From_UTF8(AC3_TrueHD_Channels_Positions(HD_Channels2)));
         BS_End();
         HD_Resolution2=HD_Resolution1=24; //Not sure
         HD_SamplingRate2=HD_SamplingRate1;
+        if (dsurexmod && !(HD_Channels2&(1<<3)))
+            dsurexmod=0; //Only if Ls/Rs
         Element_End0();
     }
     if (HD_StreamType==0xBB)
