@@ -202,7 +202,7 @@ void CMediaFormats::UpdateData(const bool bSave)
 		emplace_back(L"dsd",         ResStr(IDS_MFMT_DSD),         L"dsf dff", TAudio);
 		emplace_back(L"flac",        ResStr(IDS_MFMT_FLAC),        L"flac", TAudio);
 		emplace_back(L"m4a",         ResStr(IDS_MFMT_M4A),         L"m4a m4b aac", TAudio);
-		emplace_back(L"midi",        ResStr(IDS_MFMT_MIDI),        L"mid midi rmi", TAudio);
+		emplace_back(L"midi",        ResStr(IDS_MFMT_MIDI),        L"mid midi rmi kar", TAudio);
 		emplace_back(L"mka",         ResStr(IDS_MFMT_MKA),         L"mka", TAudio);
 		emplace_back(L"weba",        ResStr(IDS_MFMT_WEBA),        L"weba", TAudio);
 		emplace_back(L"mlp",         ResStr(IDS_MFMT_MLP),         L"mlp", TAudio);
