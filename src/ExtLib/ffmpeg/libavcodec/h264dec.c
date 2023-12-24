@@ -1133,7 +1133,6 @@ static const AVOption h264_options[] = {
 
 static const AVClass h264_class = {
     .class_name = "H264 Decoder",
-    .item_name  = av_default_item_name,
     .option     = h264_options,
     .version    = LIBAVUTIL_VERSION_INT,
 };
@@ -1159,6 +1158,9 @@ const FFCodec ff_h264_decoder = {
 #endif
 #if CONFIG_H264_D3D11VA2_HWACCEL
                                HWACCEL_D3D11VA2(h264),
+#endif
+#if CONFIG_H264_D3D12VA_HWACCEL
+                               HWACCEL_D3D12VA(h264),
 #endif
 #if CONFIG_H264_NVDEC_HWACCEL
                                HWACCEL_NVDEC(h264),

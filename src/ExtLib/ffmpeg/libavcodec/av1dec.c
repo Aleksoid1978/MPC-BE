@@ -177,7 +177,7 @@ static uint8_t get_shear_params_valid(AV1DecContext *s, int idx)
     int16_t alpha, beta, gamma, delta, divf, divs;
     int64_t v, w;
     int32_t *param = &s->cur_frame.gm_params[idx][0];
-    if (param[2] < 0)
+    if (param[2] <= 0)
         return 0;
 
     alpha = av_clip_int16(param[2] - (1 << AV1_WARPEDMODEL_PREC_BITS));
@@ -511,6 +511,7 @@ static int get_pixel_format(AVCodecContext *avctx)
     enum AVPixelFormat pix_fmt = get_sw_pixel_format(avctx, seq);
 #define HWACCEL_MAX (CONFIG_AV1_DXVA2_HWACCEL + \
                      CONFIG_AV1_D3D11VA_HWACCEL * 2 + \
+                     CONFIG_AV1_D3D12VA_HWACCEL + \
                      CONFIG_AV1_NVDEC_HWACCEL + \
                      CONFIG_AV1_VAAPI_HWACCEL + \
                      CONFIG_AV1_VDPAU_HWACCEL + \
@@ -528,6 +529,9 @@ static int get_pixel_format(AVCodecContext *avctx)
 #if CONFIG_AV1_D3D11VA_HWACCEL
         *fmtp++ = AV_PIX_FMT_D3D11VA_VLD;
         *fmtp++ = AV_PIX_FMT_D3D11;
+#endif
+#if CONFIG_AV1_D3D12VA_HWACCEL
+        *fmtp++ = AV_PIX_FMT_D3D12;
 #endif
 #if CONFIG_AV1_NVDEC_HWACCEL
         *fmtp++ = AV_PIX_FMT_CUDA;
@@ -549,6 +553,9 @@ static int get_pixel_format(AVCodecContext *avctx)
 #if CONFIG_AV1_D3D11VA_HWACCEL
         *fmtp++ = AV_PIX_FMT_D3D11VA_VLD;
         *fmtp++ = AV_PIX_FMT_D3D11;
+#endif
+#if CONFIG_AV1_D3D12VA_HWACCEL
+        *fmtp++ = AV_PIX_FMT_D3D12;
 #endif
 #if CONFIG_AV1_NVDEC_HWACCEL
         *fmtp++ = AV_PIX_FMT_CUDA;
@@ -1478,7 +1485,6 @@ static const AVOption av1_options[] = {
 
 static const AVClass av1_class = {
     .class_name = "AV1 decoder",
-    .item_name  = av_default_item_name,
     .option     = av1_options,
     .version    = LIBAVUTIL_VERSION_INT,
 };
@@ -1506,6 +1512,9 @@ const FFCodec ff_av1_decoder = {
 #endif
 #if CONFIG_AV1_D3D11VA2_HWACCEL
         HWACCEL_D3D11VA2(av1),
+#endif
+#if CONFIG_AV1_D3D12VA_HWACCEL
+        HWACCEL_D3D12VA(av1),
 #endif
 #if CONFIG_AV1_NVDEC_HWACCEL
         HWACCEL_NVDEC(av1),

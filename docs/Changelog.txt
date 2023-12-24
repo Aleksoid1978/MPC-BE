@@ -45,7 +45,7 @@ Updated Korean translation (by Hackjjang).
 Updated Dutch and Chinese (Traditional) translation (by beter).
 
 Updated libraries:
-	ffmpeg git-n6.2-dev-297-gbbdedd9663;
+	ffmpeg git-n6.2-dev-567-gf5f414d9c4;
 	Little-CMS git-lcms2.16rc1-gd90d134b;
 	MediaInfo git-v23.10-57-g56ad167c6;
 	nanosvg git-706eb06;

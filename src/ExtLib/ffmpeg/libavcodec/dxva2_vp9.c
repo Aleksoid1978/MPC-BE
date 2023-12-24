@@ -43,18 +43,17 @@ static void fill_picture_entry(DXVA_PicEntry_VPx *pic,
     pic->bPicEntry = index | (flag << 7);
 }
 
-static int fill_picture_parameters(const AVCodecContext *avctx, AVDXVAContext *ctx, const VP9SharedContext *h,
+int ff_dxva2_vp9_fill_picture_parameters(const AVCodecContext *avctx, AVDXVAContext *ctx,
                                     DXVA_PicParams_VP9 *pp)
 {
+    const VP9SharedContext   *h       = avctx->priv_data;
+    const AVPixFmtDescriptor *pixdesc = av_pix_fmt_desc_get(avctx->sw_pix_fmt);
     int i;
-    const AVPixFmtDescriptor * pixdesc = av_pix_fmt_desc_get(avctx->sw_pix_fmt);
 
     if (!pixdesc)
         return -1;
 
     memset(pp, 0, sizeof(*pp));
-
-    fill_picture_entry(&pp->CurrPic, ff_dxva2_get_surface_index(avctx, ctx, h->frames[CUR_FRAME].tf.f), 0);
 
     pp->profile = h->h.profile;
     pp->wFormatAndPictureInfoFlags = ((h->h.keyframe == 0)   <<  0) |
@@ -81,7 +80,7 @@ static int fill_picture_parameters(const AVCodecContext *avctx, AVDXVAContext *c
 
     for (i = 0; i < 8; i++) {
         if (h->refs[i].f->buf[0]) {
-            fill_picture_entry(&pp->ref_frame_map[i], ff_dxva2_get_surface_index(avctx, ctx, h->refs[i].f), 0);
+            fill_picture_entry(&pp->ref_frame_map[i], ff_dxva2_get_surface_index(avctx, ctx, h->refs[i].f, 0), 0);
             pp->ref_frame_coded_width[i]  = h->refs[i].f->width;
             pp->ref_frame_coded_height[i] = h->refs[i].f->height;
         } else
@@ -91,12 +90,14 @@ static int fill_picture_parameters(const AVCodecContext *avctx, AVDXVAContext *c
     for (i = 0; i < 3; i++) {
         uint8_t refidx = h->h.refidx[i];
         if (h->refs[refidx].f->buf[0])
-            fill_picture_entry(&pp->frame_refs[i], ff_dxva2_get_surface_index(avctx, ctx, h->refs[refidx].f), 0);
+            fill_picture_entry(&pp->frame_refs[i], ff_dxva2_get_surface_index(avctx, ctx, h->refs[refidx].f, 0), 0);
         else
             pp->frame_refs[i].bPicEntry = 0xFF;
 
         pp->ref_frame_sign_bias[i + 1] = h->h.signbias[i];
     }
+
+    fill_picture_entry(&pp->CurrPic, ff_dxva2_get_surface_index(avctx, ctx, h->frames[CUR_FRAME].tf.f, 1), 0);
 
     pp->filter_level    = h->h.filter.level;
     pp->sharpness_level = h->h.filter.sharpness;
@@ -265,7 +266,7 @@ static int dxva2_vp9_start_frame(AVCodecContext *avctx,
     av_assert0(ctx_pic);
 
     /* Fill up DXVA_PicParams_VP9 */
-    if (fill_picture_parameters(avctx, ctx, h, &ctx_pic->pp) < 0)
+    if (ff_dxva2_vp9_fill_picture_parameters(avctx, ctx, &ctx_pic->pp) < 0)
         return -1;
 
     ctx_pic->bitstream_size = 0;

@@ -661,18 +661,21 @@ void WriteCLUT(cmsIOHANDLER* m, cmsStage* mpe, const char* PreMaj,
     sc.FixWhite = FixWhite;
     sc.ColorSpace = ColorSpace;
 
-    _cmsIOPrintf(m, "[");
+    if (sc.Pipeline != NULL && sc.Pipeline->Params != NULL) {
 
-    for (i=0; i < sc.Pipeline->Params->nInputs; i++)
-        _cmsIOPrintf(m, " %d ", sc.Pipeline->Params->nSamples[i]);
+        _cmsIOPrintf(m, "[");
 
-    _cmsIOPrintf(m, " [\n");
+        for (i = 0; i < sc.Pipeline->Params->nInputs; i++)
+            _cmsIOPrintf(m, " %d ", sc.Pipeline->Params->nSamples[i]);
 
-    cmsStageSampleCLut16bit(mpe, OutputValueSampler, (void*) &sc, SAMPLER_INSPECT);
+        _cmsIOPrintf(m, " [\n");
 
-    _cmsIOPrintf(m, PostMin);
-    _cmsIOPrintf(m, PostMaj);
-    _cmsIOPrintf(m, "] ");
+        cmsStageSampleCLut16bit(mpe, OutputValueSampler, (void*)&sc, SAMPLER_INSPECT);
+
+        _cmsIOPrintf(m, PostMin);
+        _cmsIOPrintf(m, PostMaj);
+        _cmsIOPrintf(m, "] ");
+    }
 
 }
 
