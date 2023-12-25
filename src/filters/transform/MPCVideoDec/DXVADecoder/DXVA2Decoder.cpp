@@ -28,6 +28,7 @@
 
 extern "C" {
 	#include <ExtLib/ffmpeg/libavcodec/avcodec.h>
+	#include <ExtLib/ffmpeg/compat/windows/dxva_av1.h> // must be included before dxva2_internal.h
 	#include <ExtLib/ffmpeg/libavcodec/dxva2_internal.h>
 }
 
