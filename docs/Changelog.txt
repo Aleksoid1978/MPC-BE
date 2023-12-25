@@ -16,6 +16,7 @@ Fixed freezing on some H.264 streams when playing WTV.
 
 Subtitles
 Improved support for RealMedia subtitles. Developments from the MPC-HC project were used.
+Additional information in the external subtitle file name should only be after the dot symbol.
 
 YouTube
 Improved work with yt-dlp.
@@ -28,6 +29,7 @@ The separator for "Track Priority" is now only a space.
 Added the ability to copy paths of history entries to the clipboard.
 Fixed copying MediaInfo data to the clipboard.
 Fixed the operation of the "On Top > While Playing..." setting when the player window is hidden by another window.
+Added extension .kar in group of formats MIDI.
 
 Installer
 MPC Video Renderer 0.7.1 is included in the installer.
@@ -43,6 +45,7 @@ Updated Hungarian translation (by mickey).
 Updated Ukrainian translation (by arestarh).
 Updated Korean translation (by Hackjjang).
 Updated Dutch and Chinese (Traditional) translation (by beter).
+Updated French translation (by rhahgleuhargh).
 
 Updated libraries:
 	ffmpeg git-n6.2-dev-567-gf5f414d9c4;
