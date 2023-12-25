@@ -16,7 +16,7 @@
 *  with this program; if not, write to the Free Software Foundation, Inc.,
 *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 *
-*  Adaptation for MPC-BE (C) 2021-2022 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+*  Adaptation for MPC-BE (C) 2021-2023 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
 */
 
 #include "stdafx.h"
@@ -27,6 +27,8 @@
 #include "D3D11Decoder.h"
 #include "../MPCVideoDec.h"
 #include "../DxgiUtils.h"
+
+#include <dxgi1_2.h>
 
 #pragma warning(push)
 #pragma warning(disable: 4005)

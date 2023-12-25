@@ -44,12 +44,6 @@
 #include "thread.h"
 #include "compat/w32dlfcn.h"
 
-// ==> Start patch MPC
-#define FF_DEFINE_GUID(name,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8) const GUID DECLSPEC_SELECTANY name = { l, w1, w2, { b1, b2, b3, b4, b5, b6, b7, b8 } }
-FF_DEFINE_GUID(_IID_ID3D11VideoContext, 0x61F21C45,0x3C0E,0x4a74,0x9C,0xEA,0x67,0x10,0x0D,0x9A,0xD5,0xE4);
-FF_DEFINE_GUID(_IID_ID3D11VideoDevice,  0x10EC4D5B,0x975A,0x4689,0xB9,0xE4,0xD0,0xAA,0xC3,0x0F,0xE3,0x33);
-// ==> End patch MPC
-
 typedef HRESULT(WINAPI *PFN_CREATE_DXGI_FACTORY)(REFIID riid, void **ppFactory);
 
 static AVOnce functions_loaded = AV_ONCE_INIT;
@@ -71,10 +65,7 @@ static av_cold void load_functions(void)
         return;
 
     mD3D11CreateDevice = (PFN_D3D11_CREATE_DEVICE) GetProcAddress(d3dlib, "D3D11CreateDevice");
-// ==> Start patch MPC
-    //mCreateDXGIFactory = (PFN_CREATE_DXGI_FACTORY) GetProcAddress(dxgilib, "CreateDXGIFactory");
-    mCreateDXGIFactory = (PFN_CREATE_DXGI_FACTORY) GetProcAddress(dxgilib, "CreateDXGIFactory1");
-// ==> End patch MPC
+    mCreateDXGIFactory = (PFN_CREATE_DXGI_FACTORY) GetProcAddress(dxgilib, "CreateDXGIFactory");
 #else
     // In UWP (which lacks LoadLibrary), CreateDXGIFactory isn't available,
     // only CreateDXGIFactory1
@@ -519,20 +510,14 @@ static int d3d11va_device_init(AVHWDeviceContext *hwdev)
     }
 
     if (!device_hwctx->video_device) {
-// ==> Start patch MPC
-        //hr = ID3D11DeviceContext_QueryInterface(device_hwctx->device, &IID_ID3D11VideoDevice,
-        hr = ID3D11DeviceContext_QueryInterface(device_hwctx->device, &_IID_ID3D11VideoDevice,
-// ==> End patch MPC
+        hr = ID3D11DeviceContext_QueryInterface(device_hwctx->device, &IID_ID3D11VideoDevice,
                                                 (void **)&device_hwctx->video_device);
         if (FAILED(hr))
             return AVERROR_UNKNOWN;
     }
 
     if (!device_hwctx->video_context) {
-// ==> Start patch MPC
-        //hr = ID3D11DeviceContext_QueryInterface(device_hwctx->device_context, &IID_ID3D11VideoContext,
-        hr = ID3D11DeviceContext_QueryInterface(device_hwctx->device_context, &_IID_ID3D11VideoContext,
-// ==> End patch MPC
+        hr = ID3D11DeviceContext_QueryInterface(device_hwctx->device_context, &IID_ID3D11VideoContext,
                                                 (void **)&device_hwctx->video_context);
         if (FAILED(hr))
             return AVERROR_UNKNOWN;
@@ -580,8 +565,6 @@ static int d3d11va_device_find_adapter_by_vendor_id(AVHWDeviceContext *ctx, uint
 {
     HRESULT hr;
     IDXGIAdapter *adapter = NULL;
-// ==> Start patch MPC
-/*
     IDXGIFactory2 *factory;
     int adapter_id = 0;
     long int id = strtol(vendor_id, NULL, 0);
@@ -616,42 +599,6 @@ static int d3d11va_device_find_adapter_by_vendor_id(AVHWDeviceContext *ctx, uint
     }
 
     IDXGIFactory2_Release(factory);
-*/
-    IDXGIFactory1 *factory;
-    int adapter_id = 0;
-    long int id = strtol(vendor_id, NULL, 0);
-
-    hr = mCreateDXGIFactory(&IID_IDXGIFactory1, (void **)&factory);
-    if (FAILED(hr)) {
-        av_log(ctx, AV_LOG_ERROR, "CreateDXGIFactory returned error\n");
-        return -1;
-    }
-
-    while (IDXGIFactory1_EnumAdapters(factory, adapter_id++, &adapter) != DXGI_ERROR_NOT_FOUND) {
-        ID3D11Device* device = NULL;
-        DXGI_ADAPTER_DESC adapter_desc;
-
-        hr = mD3D11CreateDevice(adapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, flags, NULL, 0, D3D11_SDK_VERSION, &device, NULL, NULL);
-        if (FAILED(hr)) {
-            av_log(ctx, AV_LOG_DEBUG, "D3D11CreateDevice returned error, try next adapter\n");
-            IDXGIAdapter_Release(adapter);
-            continue;
-        }
-
-        hr = IDXGIAdapter2_GetDesc(adapter, &adapter_desc);
-        ID3D11Device_Release(device);
-        IDXGIAdapter_Release(adapter);
-        if (FAILED(hr)) {
-            av_log(ctx, AV_LOG_DEBUG, "IDXGIAdapter2_GetDesc returned error, try next adapter\n");
-            continue;
-        } else if (adapter_desc.VendorId == id) {
-            IDXGIFactory1_Release(factory);
-            return adapter_id - 1;
-        }
-    }
-
-    IDXGIFactory1_Release(factory);
-// ==> End patch MPC
     return -1;
 }
 
@@ -703,8 +650,6 @@ static int d3d11va_device_create(AVHWDeviceContext *ctx, const char *device,
     }
 
     if (adapter >= 0) {
-// ==> Start patch MPC
-        /*
         IDXGIFactory2 *pDXGIFactory;
 
         av_log(ctx, AV_LOG_VERBOSE, "Selecting d3d11va adapter %d\n", adapter);
@@ -714,22 +659,6 @@ static int d3d11va_device_create(AVHWDeviceContext *ctx, const char *device,
                 pAdapter = NULL;
             IDXGIFactory2_Release(pDXGIFactory);
         }
-        */
-        IDXGIFactory1 *pDXGIFactory;
-
-        av_log(ctx, AV_LOG_VERBOSE, "Selecting d3d11va adapter %d\n", adapter);
-        hr = mCreateDXGIFactory(&IID_IDXGIFactory1, (void **)&pDXGIFactory);
-        if (SUCCEEDED(hr)) {
-            if (FAILED(IDXGIFactory1_EnumAdapters(pDXGIFactory, adapter, &pAdapter)))
-                pAdapter = NULL;
-            IDXGIFactory1_Release(pDXGIFactory);
-
-            if (!pAdapter) {
-                av_log(ctx, AV_LOG_ERROR, "Failed to get DXGI adapter '%s'\n", device);
-                return AVERROR_UNKNOWN;
-            }
-        }
-// ==> End patch MPC
     }
 
     if (pAdapter) {

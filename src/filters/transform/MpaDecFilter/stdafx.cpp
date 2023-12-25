@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2023 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,6 +20,11 @@
  */
 
 #include "stdafx.h"
+
+#ifdef REGISTER_FILTER
+	#include <d3d11.h>
+	#include <dxgi1_2.h>
+#endif
 
 #pragma comment(lib, "winmm.lib")
 
