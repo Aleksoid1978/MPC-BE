@@ -30,7 +30,7 @@ Fixed copying MediaInfo data to the clipboard.
 Fixed the operation of the "On Top > While Playing..." setting when the player window is hidden by another window.
 
 Installer
-MPC Video Renderer is now included in the installer.
+MPC Video Renderer 0.7.1 is included in the installer.
 
 Updated Japanese translation (by tsubasanouta).
 Updated Spanish translation (by IPeluchito).
