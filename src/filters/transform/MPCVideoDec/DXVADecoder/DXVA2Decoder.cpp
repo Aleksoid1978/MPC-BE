@@ -26,10 +26,12 @@
 #include "../FfmpegContext.h"
 #include "DSUtil/DSUtil.h"
 
+#define FF_DXVA2_WORKAROUND_SCALING_LIST_ZIGZAG 1 ///< Work around for DXVA2/Direct3D11 and old UVD/UVD+ ATI video cards
+#define FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO    2 ///< Work around for DXVA2/Direct3D11 and old Intel GPUs with ClearVideo interface
+
 extern "C" {
 	#include <ExtLib/ffmpeg/libavcodec/avcodec.h>
-	#include <ExtLib/ffmpeg/compat/windows/dxva_av1.h> // must be included before dxva2_internal.h
-	#include <ExtLib/ffmpeg/libavcodec/dxva2_internal.h>
+	#include <ExtLib/ffmpeg/libavcodec/dxva2.h>
 }
 
 CDXVA2Decoder::CDXVA2Decoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVA2_ConfigPictureDecode* pDXVA2Config, LPDIRECT3DSURFACE9* ppD3DSurface, UINT numSurfaces)

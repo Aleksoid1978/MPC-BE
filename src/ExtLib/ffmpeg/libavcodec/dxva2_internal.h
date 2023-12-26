@@ -65,7 +65,6 @@
 #endif
 
 // ==> Start patch MPC
-#ifdef __GNUC__
 #if CONFIG_AV1_D3D12VA_HWACCEL || CONFIG_AV1_D3D11VA_HWACCEL || CONFIG_AV1_D3D11VA2_HWACCEL || CONFIG_AV1_DXVA2_HWACCEL
 #if !HAVE_DXVA_PICPARAMS_AV1
 #include "dxva_av1.h"
@@ -107,7 +106,6 @@ typedef struct
     CHAR cr_qp_offset_list[6];
 } DXVA_PicParams_HEVC_Rext;
 #pragma pack(pop)
-#endif
 // ==> End patch MPC
 
 #include "libavutil/hwcontext.h"
@@ -219,9 +217,7 @@ void ff_dxva2_h264_fill_scaling_lists(const AVCodecContext *avctx, AVDXVAContext
 
 // ==> Start patch MPC
 //void ff_dxva2_hevc_fill_picture_parameters(const AVCodecContext *avctx, AVDXVAContext *ctx, DXVA_PicParams_HEVC *pp);
-#ifdef __GNUC__
 void ff_dxva2_hevc_fill_picture_parameters(const AVCodecContext *avctx, AVDXVAContext *ctx, DXVA_PicParams_HEVC_Rext *ppext);
-#endif
 // ==> End patch MPC
 
 void ff_dxva2_hevc_fill_scaling_lists(const AVCodecContext *avctx, AVDXVAContext *ctx, DXVA_Qmatrix_HEVC *qm);
