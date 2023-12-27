@@ -1,0 +1,1 @@
+/* dummy header to avoid linking conflict with the MSVC */

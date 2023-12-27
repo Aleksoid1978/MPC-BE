@@ -23,10 +23,7 @@
 
 #include <d3d9.h>
 #include <dxva2api.h>
-// ==> Start patch MPC
-// Conflict when linking with the MSVC
-// #include <initguid.h>
-// ==> End patch MPC
+#include <initguid.h>
 
 #include "avassert.h"
 #include "common.h"
@@ -97,10 +94,15 @@ static const struct {
 };
 
 // ==> Start patch MPC
-#define FF_DEFINE_GUID(name,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8) const GUID DECLSPEC_SELECTANY name = { l, w1, w2, { b1, b2, b3, b4, b5, b6, b7, b8 } }
-FF_DEFINE_GUID(video_decoder_service,   0xfc51a551, 0xd5e7, 0x11d9, 0xaf, 0x55, 0x00, 0x05, 0x4e, 0x43, 0xff, 0x02);
-FF_DEFINE_GUID(video_processor_service, 0xfc51a552, 0xd5e7, 0x11d9, 0xaf, 0x55, 0x00, 0x05, 0x4e, 0x43, 0xff, 0x02);
+#ifdef DEFINE_GUID
+#undef DEFINE_GUID
+#endif
+#define DEFINE_GUID(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
+        const GUID name \
+                = { l, w1, w2, { b1, b2,  b3,  b4,  b5,  b6,  b7,  b8 } }
 // ==> End patch MPC
+DEFINE_GUID(video_decoder_service,   0xfc51a551, 0xd5e7, 0x11d9, 0xaf, 0x55, 0x00, 0x05, 0x4e, 0x43, 0xff, 0x02);
+DEFINE_GUID(video_processor_service, 0xfc51a552, 0xd5e7, 0x11d9, 0xaf, 0x55, 0x00, 0x05, 0x4e, 0x43, 0xff, 0x02);
 
 static void dxva2_frames_uninit(AVHWFramesContext *ctx)
 {
