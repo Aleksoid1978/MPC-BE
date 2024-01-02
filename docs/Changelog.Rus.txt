@@ -8,7 +8,8 @@
 Обновлен французский перевод (автор rhahgleuhargh).
 
 Обновлены библиотеки:
-	ffmpeg git-n6.2-dev-629-g85b8d59ec7.
+	ffmpeg git-n6.2-dev-629-g85b8d59ec7;
+	nanosvg git-93ce879.
 
 
 1.6.11 - 2023-12-27
