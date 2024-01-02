@@ -2,6 +2,8 @@
 
 1.6.11.x dev
 =============================
+Updated libraries:
+	ffmpeg git-n6.2-dev-629-g85b8d59ec7.
 
 
 1.6.11 - 2023-12-27
