@@ -24,7 +24,6 @@
 extern const AVFilter ff_af_aresample;
 extern const AVFilter ff_af_atempo;
 extern const AVFilter ff_af_compand;
-// extern AVFilter ff_af_lowpass;
 
 extern  const AVFilter ff_asrc_abuffer;
 extern  const AVFilter ff_asink_abuffer;

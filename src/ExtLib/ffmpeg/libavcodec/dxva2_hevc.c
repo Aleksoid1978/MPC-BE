@@ -28,6 +28,7 @@
 #include "hevc_data.h"
 #include "hevcdec.h"
 #include "hwaccel_internal.h"
+
 #define MAX_SLICES 256
 
 struct hevc_dxva2_picture_context {
