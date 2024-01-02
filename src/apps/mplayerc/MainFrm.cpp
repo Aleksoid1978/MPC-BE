@@ -482,6 +482,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_COMMAND(ID_MOVEWINDOWBYVIDEO_ONOFF, OnChangeMouseEasyMove)
 
+	ON_COMMAND(ID_PLAYLIST_OPENFOLDER, OnPlaylistOpenFolder)
+
 	ON_WM_WTSSESSION_CHANGE()
 
 	ON_WM_SETTINGCHANGE()
@@ -10529,6 +10531,18 @@ void CMainFrame::OnChangeMouseEasyMove()
 	s.bMouseEasyMove = !s.bMouseEasyMove;
 
 	m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(s.bMouseEasyMove ? IDS_MOVEWINDOWBYVIDEO_ON : IDS_MOVEWINDOWBYVIDEO_OFF));
+}
+
+void CMainFrame::OnPlaylistOpenFolder()
+{
+	if (m_wndPlaylistBar.GetCount() == 0) {
+		return;
+	}
+
+	CPlaylistItem pli;
+	if (m_wndPlaylistBar.GetCur(pli) && pli.m_fi.Valid()) {
+		ShellExecuteW(nullptr, nullptr, L"explorer.exe", L"/select,\"" + pli.m_fi.GetPath() + L"\"", nullptr, SW_SHOWNORMAL);
+	}
 }
 
 void CMainFrame::SetDefaultWindowRect(int iMonitor, const bool bLastCall)

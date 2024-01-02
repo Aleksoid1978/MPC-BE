@@ -1139,6 +1139,8 @@ public:
 
 	afx_msg void OnChangeMouseEasyMove();
 
+	afx_msg void OnPlaylistOpenFolder();
+
 	afx_msg void OnClose();
 
 	afx_msg void OnLanguage(UINT nID);
