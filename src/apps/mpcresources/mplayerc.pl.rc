@@ -2654,7 +2654,7 @@ BEGIN
     IDS_AG_PNS_ROTATE_CCW   "PnS Obróć przeciwnie do ruchu wskazówek zegara"
     IDS_AG_PNS_ROTATE_CW    "PnS Obróć zgodnie z ruchem wskazówek zegara"
     IDS_AG_TEARING_TEST     "Przetestuj szarpanie obrazu"
-    IDS_SCALE_16_9          "Przeskaluj do formatu 16:9 TV ,%.3f,%.3f,%.3f,%.3f"
+    IDS_SCALE_16_9          "Przeskaluj do formatu 16:9 TV,%.3f,%.3f,%.3f,%.3f"
     IDS_SCALE_WIDESCREEN    "Przeskaluj do formatu szerokoekranowego,%.3f,%.3f,%.3f,%.3f"
     IDS_SCALE_ULTRAWIDE     "Przeskaluj do formatu ultra-szerokoekranowego,%.3f,%.3f,%.3f,%.3f"
 END
