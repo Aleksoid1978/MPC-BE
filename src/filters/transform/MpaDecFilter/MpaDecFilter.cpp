@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1651,9 +1651,9 @@ HRESULT CMpaDecFilter::ProcessPS2PCM()
 	while (p + size <= end) {
 		DWORD* dw = (DWORD*)p;
 
-		if (dw[0] == 'dhSS') {
+		if (dw[0] == FCC('SShd')) {
 			p += dw[1] + 8;
-		} else if (dw[0] == 'dbSS') {
+		} else if (dw[0] == FCC('SSbd')) {
 			p += 8;
 			m_ps2_state.sync = true;
 		} else {
