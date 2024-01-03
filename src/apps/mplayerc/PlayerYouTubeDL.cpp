@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2023 see Authors.txt
+ * (C) 2018-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -376,18 +376,16 @@ namespace YoutubeDL
 						pOFD->fi = CStringW(bestUrl);
 						if (bVideoOnly) {
 							if (audioUrls.size() > 1) {
-								std::pair<CStringA, audio_info_t> item;
+								auto select = audioUrls.begin();
+
 								if (auto it = audioUrls.find(lang); it != audioUrls.end()) {
-									item = *it;
+									select = it;
 								}
 								else if (auto it = audioUrls.find("en"); it != audioUrls.end()) {
-									item = *it;
-								}
-								else {
-									item = *audioUrls.begin();
+									select = it;
 								}
 
-								pOFD->auds.emplace_back(CStringW(item.second.url), CStringW(item.first), item.first);
+								pOFD->auds.emplace_back(CStringW(select->second.url), CStringW(select->first), select->first);
 							}
 							else if (bestAudioUrl.GetLength()) {
 								pOFD->auds.emplace_back(CStringW(bestAudioUrl));
