@@ -8,7 +8,7 @@ Added the ability to open the folder of the currently playing file using a hotke
 Updated French translation (by rhahgleuhargh).
 
 Updated libraries:
-	ffmpeg git-n6.2-dev-629-g85b8d59ec7;
+	ffmpeg git-n6.2-dev-651-g59686eaf33;
 	nanosvg git-93ce879.
 
 
