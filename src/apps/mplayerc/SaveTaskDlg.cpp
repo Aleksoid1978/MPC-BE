@@ -1,5 +1,5 @@
 /*
- * (C) 2023 see Authors.txt
+ * (C) 2023-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -381,7 +381,7 @@ void CSaveTaskDlg::SaveHTTP(const int iSubLangDefault)
 	if (m_saveItems.size() >= 2 && m_ffmpegPath.GetLength()) {
 		m_iProgress = PROGRESS_MERGING;
 
-		const CPathW finalfile  = m_dstPaths.front();
+		const CPathW finalfile(m_dstPaths.front());
 		const CStringW finalext = finalfile.GetExtension().Mid(1).MakeLower();
 		const CStringW tmpfile  = finalfile + L".tmp";
 

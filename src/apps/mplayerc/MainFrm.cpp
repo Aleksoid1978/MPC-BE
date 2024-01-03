@@ -1121,7 +1121,7 @@ BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoi
 			auto pAnsiText = reinterpret_cast<LPCSTR>(LockData);
 			bool bUnicode = cfFormat == CF_URLW || cfFormat == CF_UNICODETEXT;
 			if (bUnicode ? AfxIsValidString(pUnicodeText) : AfxIsValidString(pAnsiText)) {
-				CStringW text(bUnicode ? pUnicodeText : CStringW(pAnsiText));
+				CStringW text = bUnicode ? CStringW(pUnicodeText) : CStringW(pAnsiText);
 				if (!text.IsEmpty()) {
 					std::list<CString> slFiles;
 					if (cfFormat == CF_URLW || cfFormat == CF_URLA) {
