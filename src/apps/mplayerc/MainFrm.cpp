@@ -1681,9 +1681,10 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 
 	for (const auto& pDockingBar : m_dockingbars) {
 		if (IsWindow(pDockingBar->m_hWnd)) {
-			if (auto* playlistBar = dynamic_cast<CPlayerPlaylistBar*>(pDockingBar); playlistBar && playlistBar->IsPlaylistVisible()) {
-				if (!playlistBar->IsFloating()) {
-					lpMMI->ptMinTrackSize.y += playlistBar->GetMinSize().cy;
+			auto* pPlaylistBar = dynamic_cast<CPlayerPlaylistBar*>(pDockingBar);
+			if (pPlaylistBar) {
+				if (pPlaylistBar->IsPlaylistVisible() && !pPlaylistBar->IsFloating()) {
+					lpMMI->ptMinTrackSize.y += pPlaylistBar->GetMinSize().cy;
 				}
 				break;
 			}
