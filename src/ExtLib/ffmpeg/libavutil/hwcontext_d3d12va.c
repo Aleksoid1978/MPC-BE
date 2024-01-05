@@ -534,7 +534,6 @@ int d3d12va_direct_copy(const AVFrame* src, AVFrame* tmp, uint8_t* output,
     D3D12VAFramesContext   *s            = ctx->internal->priv;
 
     int ret;
-    int download = src->format == AV_PIX_FMT_D3D12;
 
     AVD3D12VAFrame* f = (AVD3D12VAFrame*)src->data[0];
     ID3D12Resource* texture = (ID3D12Resource*)f->texture;
@@ -563,7 +562,7 @@ int d3d12va_direct_copy(const AVFrame* src, AVFrame* tmp, uint8_t* output,
         .Transition = {
             .pResource   = texture,
             .StateBefore = D3D12_RESOURCE_STATE_COMMON,
-            .StateAfter  = download ? D3D12_RESOURCE_STATE_COPY_SOURCE : D3D12_RESOURCE_STATE_COPY_DEST,
+            .StateAfter  = D3D12_RESOURCE_STATE_COPY_SOURCE,
             .Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
         },
     };
