@@ -20,10 +20,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <assert.h>
 #include <string.h>
 #include <initguid.h>
 
+#include "libavutil/avassert.h"
 #include "libavutil/common.h"
 #include "libavutil/log.h"
 #include "libavutil/time.h"
@@ -815,7 +815,7 @@ unsigned ff_dxva2_get_surface_index(const AVCodecContext *avctx,
     }
 #endif
 
-    assert(0);
+    av_log(avctx, AV_LOG_WARNING, "Could not get surface index. Using 0 instead.\n");
     return 0;
 }
 
@@ -1032,7 +1032,7 @@ int ff_dxva2_common_end_frame(AVCodecContext *avctx, AVFrame *frame,
 
     /* TODO Film Grain when possible */
 
-    assert(buffer_count == 1 + (qm_size > 0) + 2);
+    av_assert0(buffer_count == 1 + (qm_size > 0) + 2);
 
 #if CONFIG_D3D11VA
     if (ff_dxva2_is_d3d11(avctx))
