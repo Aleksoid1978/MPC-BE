@@ -1805,7 +1805,7 @@ static const struct {
 	{&DXVA2_ModeMPEG4pt2_VLD_Simple,				L"MPEG-4 SP"},
 	{&DXVA2_ModeMPEG4pt2_VLD_AdvSimple_NoGMC,		L"MPEG-4 ASP, no GMC"},
 	{&DXVA2_ModeMPEG4pt2_VLD_AdvSimple_GMC,			L"MPEG-4 ASP, GMC"},
-	{&DXVA2_Nvidia_MPEG4_ASP,						L"MPEG-4 ASP (Nvidia)"},
+	{&DXVA2_MPEG4pt2_VLD_AdvSimple_Nvidia,			L"MPEG-4 ASP (Nvidia)"},
 	// VC-1
 	{&DXVA2_ModeVC1_D,/*DXVA2_ModeVC1_VLD*/			L"VC-1"},
 	{&DXVA2_ModeVC1_D2010,							L"VC-1 (2010)"},
@@ -1816,7 +1816,7 @@ static const struct {
 	{&DXVA2_ModeH264_F,/*DXVA2_ModeH264_VLD_FGT*/	L"H.264, FGT"},
 	{&DXVA2_ModeH264_VLD_WithFMOASO_NoFGT,			L"H.264, no FGT, with FMOASO"},
 	{&DXVA2_H264_VLD_Intel,							L"H.264 (Intel)"},
-	{&DXVA2_ModeH264_Flash,							L"H.264 Flash"},
+	{&DXVA2_H264_VLD_NoFGT_AMD,						L"H.264 (AMD)"},
 	// H.264 stereo
 	{&DXVA2_ModeH264_VLD_Stereo_Progressive_NoFGT,	L"H.264 stereo progressive, no FGT"},
 	{&DXVA2_ModeH264_VLD_Stereo_NoFGT,				L"H.264 stereo, no FGT"},
