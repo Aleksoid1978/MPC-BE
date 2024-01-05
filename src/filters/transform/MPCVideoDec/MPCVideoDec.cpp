@@ -159,14 +159,14 @@ struct {
 	// H.264
 	{ AV_CODEC_ID_H264, DXVA2_ModeH264_E, false },
 	{ AV_CODEC_ID_H264, DXVA2_ModeH264_F, false },
-	{ AV_CODEC_ID_H264, DXVA2_Intel_H264_ClearVideo, false },
+	{ AV_CODEC_ID_H264, DXVA2_H264_VLD_Intel, false },
 	// HEVC Intel
-	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main_12bit_Intel,    false, AV_PIX_FMT_YUV420P12 },
-	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main422_10bit_Intel, false, AV_PIX_FMT_YUV422P10 },
-	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main422_12bit_Intel, false, AV_PIX_FMT_YUV422P12 },
-	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main444_Intel,       false, AV_PIX_FMT_YUV444P   },
-	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main444_10bit_Intel, false, AV_PIX_FMT_YUV444P10 },
-	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main444_12bit_Intel, false, AV_PIX_FMT_YUV444P12 },
+	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main12_Intel,     false, AV_PIX_FMT_YUV420P12 },
+	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main422_10_Intel, false, AV_PIX_FMT_YUV422P10 },
+	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main422_12_Intel, false, AV_PIX_FMT_YUV422P12 },
+	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main444_Intel,    false, AV_PIX_FMT_YUV444P   },
+	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main444_10_Intel, false, AV_PIX_FMT_YUV444P10 },
+	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main444_12_Intel, false, AV_PIX_FMT_YUV444P12 },
 	// HEVC
 	{ AV_CODEC_ID_HEVC, DXVA2_ModeHEVC_VLD_Main10, true},
 	{ AV_CODEC_ID_HEVC, DXVA2_ModeHEVC_VLD_Main, false},
@@ -1897,7 +1897,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 				for (const auto& guid : supportedDecoderGuids) {
 					DLog(L"    => Attempt : %s", GetGUIDString2(guid));
 
-					if (DXVA2_Intel_H264_ClearVideo == guid) {
+					if (DXVA2_H264_VLD_Intel == guid) {
 						const int width_mbs  = m_nSurfaceWidth / 16;
 						const int height_mbs = m_nSurfaceWidth / 16;
 						const int max_ref_frames_dpb41 = std::min(11, 32768 / (width_mbs * height_mbs));

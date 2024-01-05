@@ -378,7 +378,7 @@ HRESULT CD3D11Decoder::FindVideoServiceConversion(AVCodecContext* c, enum AVCode
 		for (const auto& guid : supportedDecoderGuids) {
 			DLog(L"    => Attempt : %s", GetGUIDString2(guid));
 
-			if (DXVA2_Intel_H264_ClearVideo == guid) {
+			if (DXVA2_H264_VLD_Intel == guid) {
 				const int width_mbs = m_dwSurfaceWidth / 16;
 				const int height_mbs = m_dwSurfaceHeight / 16;
 				const int max_ref_frames_dpb41 = std::min(11, 32768 / (width_mbs * height_mbs));

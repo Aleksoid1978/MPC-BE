@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1809,13 +1809,13 @@ static const struct {
 	// VC-1
 	{&DXVA2_ModeVC1_D,/*DXVA2_ModeVC1_VLD*/			L"VC-1"},
 	{&DXVA2_ModeVC1_D2010,							L"VC-1 (2010)"},
-	{&DXVA2_Intel_VC1_ClearVideo,					L"VC-1 (Intel ClearVideo)"},
-	{&DXVA2_Intel_VC1_ClearVideo_2,					L"VC-1 (Intel ClearVideo 2)"},
+	{&DXVA2_VC1_VLD_Intel,							L"VC-1 (Intel)"},
+	{&DXVA2_VC1_VLD_2_Intel,						L"VC-1 (Intel, 2)"},
 	// H.264
 	{&DXVA2_ModeH264_E,/*DXVA2_ModeH264_VLD_NoFGT*/	L"H.264, no FGT"},
 	{&DXVA2_ModeH264_F,/*DXVA2_ModeH264_VLD_FGT*/	L"H.264, FGT"},
 	{&DXVA2_ModeH264_VLD_WithFMOASO_NoFGT,			L"H.264, no FGT, with FMOASO"},
-	{&DXVA2_Intel_H264_ClearVideo,					L"H.264 (Intel ClearVideo)"},
+	{&DXVA2_H264_VLD_Intel,							L"H.264 (Intel)"},
 	{&DXVA2_ModeH264_Flash,							L"H.264 Flash"},
 	// H.264 stereo
 	{&DXVA2_ModeH264_VLD_Stereo_Progressive_NoFGT,	L"H.264 stereo progressive, no FGT"},
@@ -1833,12 +1833,12 @@ static const struct {
 	// AV1
 	{&DXVA2_ModeAV1_VLD_Profile0,					L"AV1 profile 0"},
 	// HEVC Intel
-	{&DXVA2_HEVC_VLD_Main_12bit_Intel,				L"HEVC 12-bit Intel"},
-	{&DXVA2_HEVC_VLD_Main422_10bit_Intel,			L"HEVC 422 10-bit Intel"},
-	{&DXVA2_HEVC_VLD_Main422_12bit_Intel,			L"HEVC 422 12-bit Intel"},
+	{&DXVA2_HEVC_VLD_Main12_Intel,					L"HEVC 12-bit Intel"},
+	{&DXVA2_HEVC_VLD_Main422_10_Intel,				L"HEVC 422 10-bit Intel"},
+	{&DXVA2_HEVC_VLD_Main422_12_Intel,				L"HEVC 422 12-bit Intel"},
 	{&DXVA2_HEVC_VLD_Main444_Intel,					L"HEVC 444 8-bit Intel"},
-	{&DXVA2_HEVC_VLD_Main444_10bit_Intel,			L"HEVC 444 10-bit Intel"},
-	{&DXVA2_HEVC_VLD_Main444_12bit_Intel,			L"HEVC 444 12-bit Intel"},
+	{&DXVA2_HEVC_VLD_Main444_10_Intel,				L"HEVC 444 10-bit Intel"},
+	{&DXVA2_HEVC_VLD_Main444_12_Intel,				L"HEVC 444 12-bit Intel"},
 };
 
 CString GetDXVAMode(const GUID& guidDecoder)
