@@ -171,6 +171,13 @@ SRCS_LC = \
 	libavcodec/cook.c \
 	libavcodec/cscd.c \
 	libavcodec/d3d11va.c \
+	libavcodec/d3d12va_av1.c \
+	libavcodec/d3d12va_decode.c \
+	libavcodec/d3d12va_h264.c \
+	libavcodec/d3d12va_hevc.c \
+	libavcodec/d3d12va_mpeg2.c \
+	libavcodec/d3d12va_vc1.c \
+	libavcodec/d3d12va_vp9.c \
 	libavcodec/dca.c \
 	libavcodec/dca_core.c \
 	libavcodec/dca_core_bsf.c \
@@ -683,6 +690,7 @@ SRCS_LU = \
 	libavutil/hwcontext.c \
 	libavutil/hwcontext_cuda.c \
 	libavutil/hwcontext_d3d11va.c \
+	libavutil/hwcontext_d3d12va.c \
 	libavutil/hwcontext_dxva2.c \
 	libavutil/imgutils.c \
 	libavutil/integer.c \

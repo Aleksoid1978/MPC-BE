@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -155,6 +155,11 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	m_cbHWDecoder.AddString(L"D3D11, DXVA2");
 	str = L"D3D11cb";
 	if (!SysVersion::IsWin8orLater()) {
+		str.Append(L" (not available)");
+	}
+	m_cbHWDecoder.AddString(str);
+	str = L"D3D12cb";
+	if (!SysVersion::IsWin10orLater()) {
 		str.Append(L" (not available)");
 	}
 	m_cbHWDecoder.AddString(str);

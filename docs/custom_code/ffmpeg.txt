@@ -34,6 +34,8 @@
 
 * libavutil/hwcontext_d3d11va.c
 * libavutil/hwcontext_d3d11va.h
+* libavutil/hwcontext_d3d12va.c
+* libavutil/hwcontext_d3d12va.h
 * libavutil/hwcontext_dxva2.c
 
 ======

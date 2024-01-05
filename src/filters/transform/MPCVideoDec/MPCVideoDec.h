@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -108,6 +108,7 @@ private:
 	CSize									m_pOutSize;				// Picture size on output pin
 
 	bool									m_bUseD3D11cb = false;
+	bool									m_bUseD3D12cb = false;
 	bool									m_bUseNVDEC = false;
 	AVPixelFormat							m_HWPixFmt;
 	AVBufferRef*							m_HWDeviceCtx = nullptr;

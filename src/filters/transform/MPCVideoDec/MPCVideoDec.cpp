@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -58,6 +58,7 @@ extern "C" {
 	#include <ExtLib/ffmpeg/libavutil/pixdesc.h>
 	#include <ExtLib/ffmpeg/libavutil/hwcontext_cuda_internal.h>
 	#include <ExtLib/ffmpeg/libavutil/hwcontext_d3d11va.h>
+	#include <ExtLib/ffmpeg/libavutil/hwcontext_d3d12va.h>
 }
 #pragma warning(pop)
 
@@ -1512,7 +1513,7 @@ static bool IsFFMPEGEnabled(const FFMPEG_CODECS& ffcodec, const bool FFmpegFilte
 
 int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE*/)
 {
-	m_bUseFFmpeg = m_bUseDXVA = m_bUseD3D11 = m_bUseD3D11cb = m_bUseNVDEC = false;
+	m_bUseFFmpeg = m_bUseDXVA = m_bUseD3D11 = m_bUseD3D11cb = m_bUseD3D12cb = m_bUseNVDEC = false;
 
 	for (size_t i = 0; i < std::size(ffCodecs); i++) {
 		if (mtIn->subtype == *ffCodecs[i].clsMinorType) {
@@ -2066,28 +2067,30 @@ redo:
 		m_CodecId = ffCodecs[nNewCodec].nFFCodec;
 		m_bUseD3D11 = m_bUseDXVA && m_pD3D11Decoder;
 
-		if (m_bUseDXVA && (m_nHwDecoder == HWDec_D3D11cb || m_nHwDecoder == HWDec_NVDEC)) {
+		if (m_bUseDXVA && (m_nHwDecoder == HWDec_D3D11cb || m_nHwDecoder == HWDec_D3D12cb || m_nHwDecoder == HWDec_NVDEC)) {
 			m_bUseDXVA = m_bUseD3D11 = false;
 			m_bUseD3D11cb = (m_nHwDecoder == HWDec_D3D11cb);
+			m_bUseD3D12cb = (m_nHwDecoder == HWDec_D3D12cb);
 			m_bUseNVDEC = (m_nHwDecoder == HWDec_NVDEC);
 		}
 	}
 
-	if (m_CodecId == AV_CODEC_ID_AV1 && (m_bUseDXVA || m_bUseD3D11 || m_bUseD3D11cb || m_bUseNVDEC)) {
+	if (m_CodecId == AV_CODEC_ID_AV1 && (m_bUseDXVA || m_bUseD3D11 || m_bUseD3D11cb || m_bUseD3D12cb || m_bUseNVDEC)) {
 		m_pAVCodec = avcodec_find_decoder_by_name("av1");
 	} else {
 		m_pAVCodec = avcodec_find_decoder(m_CodecId);
 	}
 	CheckPointer(m_pAVCodec, VFW_E_UNSUPPORTED_VIDEO);
 
-	if (bMediaTypeChanged && (m_bUseD3D11cb || m_bUseNVDEC)) {
-		auto hwDeviceType = m_bUseD3D11cb ? AV_HWDEVICE_TYPE_D3D11VA : AV_HWDEVICE_TYPE_CUDA;
+	if (bMediaTypeChanged && (m_bUseD3D11cb || m_bUseD3D12cb || m_bUseNVDEC)) {
+		auto hwDeviceType = m_bUseD3D11cb ? AV_HWDEVICE_TYPE_D3D11VA : (m_bUseD3D12cb ? AV_HWDEVICE_TYPE_D3D12VA : AV_HWDEVICE_TYPE_CUDA);
 		m_HWPixFmt = AV_PIX_FMT_NONE;
 		for (int i = 0;; i++) {
 			auto config = avcodec_get_hw_config(m_pAVCodec, i);
 			if (!config) {
-				DLog(L"CMPCVideoDecFilter::InitDecoder() : %s decoder initialization FAILED.", m_bUseD3D11cb ? L"D3D11-copyback" : L"NVDEC");
+				DLog(L"CMPCVideoDecFilter::InitDecoder() : %s decoder initialization FAILED.", m_bUseD3D11cb ? L"D3D11-copyback" : (m_bUseD3D12cb ? L"D3D12-copyback" : L"NVDEC"));
 				m_bUseD3D11cb = false;
+				m_bUseD3D12cb = false;
 				m_bUseNVDEC = false;
 				break;
 			}
@@ -2256,9 +2259,9 @@ redo:
 		m_pAVCtx->get_format        = av_get_format;
 		m_pAVCtx->get_buffer2       = av_get_buffer;
 		m_pAVCtx->slice_flags      |= SLICE_FLAG_ALLOW_FIELD;
-	} else if ((m_bUseD3D11cb || m_bUseNVDEC) && m_HWPixFmt != AV_PIX_FMT_NONE) {
+	} else if ((m_bUseD3D11cb || m_bUseD3D12cb || m_bUseNVDEC) && m_HWPixFmt != AV_PIX_FMT_NONE) {
 		CStringA device("0");
-		if (m_bUseD3D11cb && m_HwAdapter.DeviceId && m_HwAdapter.VendorId) {
+		if ((m_bUseD3D11cb || m_bUseD3D12cb) && m_HwAdapter.DeviceId && m_HwAdapter.VendorId) {
 			std::list<DXGI_ADAPTER_DESC> dxgi_adapters;
 			if (SUCCEEDED(GetDxgiAdapters(dxgi_adapters))) {
 				unsigned n = 0;
@@ -2271,9 +2274,9 @@ redo:
 				}
 			}
 		}
-		if (av_hwdevice_ctx_create(&m_HWDeviceCtx, m_bUseD3D11cb ? AV_HWDEVICE_TYPE_D3D11VA : AV_HWDEVICE_TYPE_CUDA, device.GetString(), nullptr, 0) < 0) {
+		if (av_hwdevice_ctx_create(&m_HWDeviceCtx, m_bUseD3D11cb ? AV_HWDEVICE_TYPE_D3D11VA : (m_bUseD3D12cb ? AV_HWDEVICE_TYPE_D3D12VA : AV_HWDEVICE_TYPE_CUDA), device.GetString(), nullptr, 0) < 0) {
 			m_HWPixFmt = AV_PIX_FMT_NONE;
-			m_bUseD3D11cb = m_bUseNVDEC = false;
+			m_bUseD3D11cb = m_bUseD3D12cb = m_bUseNVDEC = false;
 		} else {
 			m_pAVCtx->get_format = av_get_format;
 			m_pAVCtx->hw_device_ctx = av_buffer_ref(m_HWDeviceCtx);
@@ -3467,11 +3470,11 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 			InitDecoder(&m_pCurrentMediaType);
 			ChangeOutputMediaFormat(2);
-		} else if ((m_bUseD3D11cb || m_bUseNVDEC) && !m_bDecoderAcceptFormat) {
+		} else if ((m_bUseD3D11cb || m_bUseD3D12cb || m_bUseNVDEC) && !m_bDecoderAcceptFormat) {
 			m_FormatConverter.Clear();
 			DXVAState::ClearState();
 			m_HWPixFmt = AV_PIX_FMT_NONE;
-			m_bUseD3D11cb = m_bUseNVDEC = false;
+			m_bUseD3D11cb = m_bUseD3D12cb = m_bUseNVDEC = false;
 			InitDecoder(&m_pCurrentMediaType);
 			ChangeOutputMediaFormat(2);
 		}
@@ -3516,7 +3519,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			if (hw_frame->format != m_HWPixFmt) {
 				DXVAState::ClearState();
 				m_HWPixFmt = AV_PIX_FMT_NONE;
-				m_bUseD3D11cb = m_bUseNVDEC = false;
+				m_bUseD3D11cb = m_bUseD3D12cb = m_bUseNVDEC = false;
 
 				m_pFrame->format = hw_frame->format;
 				m_pFrame->width = hw_frame->width;
@@ -3542,7 +3545,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 					case AV_CODEC_ID_VP9:        codec = L"VP9";    break;
 				}
 
-				CString description = m_bUseD3D11cb ? L"D3D11 Copy-back" : L"NVDEC";
+				CString description = m_bUseD3D11cb ? L"D3D11 Copy-back" : (m_bUseD3D12cb ? L"D3D12 Copy-back" : L"NVDEC");
 				if (!codec.IsEmpty()) {
 					const int depth = GetLumaBits(m_pAVCtx->sw_pix_fmt);
 					if (depth > 8) {
@@ -3572,6 +3575,14 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 				if (frames_ctx->format == AV_PIX_FMT_D3D11) {
 					auto device_hwctx = reinterpret_cast<AVD3D11VADeviceContext*>(frames_ctx->device_ctx->hwctx);
+					const auto deviceName = UTF8ToWStr(device_hwctx->device_name);
+					if (!deviceName.IsEmpty()) {
+						m_strDeviceDescription = deviceName;
+					}
+				}
+
+				if (frames_ctx->format == AV_PIX_FMT_D3D12) {
+					auto device_hwctx = reinterpret_cast<AVD3D12VADeviceContext*>(frames_ctx->device_ctx->hwctx);
 					const auto deviceName = UTF8ToWStr(device_hwctx->device_name);
 					if (!deviceName.IsEmpty()) {
 						m_strDeviceDescription = deviceName;
@@ -3963,7 +3974,7 @@ HRESULT CMPCVideoDecFilter::ChangeOutputMediaFormat(int nType)
 void CMPCVideoDecFilter::SetThreadCount()
 {
 	if (m_pAVCtx) {
-		if (m_bUseNVDEC || m_CodecId == AV_CODEC_ID_MPEG4 || IsDXVASupported(m_bUseDXVA || m_bUseD3D11)) {
+		if (m_bUseNVDEC || m_bUseD3D12cb || m_CodecId == AV_CODEC_ID_MPEG4 || IsDXVASupported(m_bUseDXVA || m_bUseD3D11)) {
 			m_pAVCtx->thread_count = 1;
 			m_pAVCtx->thread_type  = 0;
 		} else {
@@ -4787,6 +4798,8 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 			}
 			if (m_bUseD3D11cb) {
 				infostr = L"D3D11 Copy-back: ";
+			} else if (m_bUseD3D12cb) {
+				infostr = L"D3D12 Copy-back: ";
 			} else if (m_bUseNVDEC) {
 				infostr = L"NVDEC: ";
 			}

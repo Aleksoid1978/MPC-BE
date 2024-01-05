@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -85,6 +85,7 @@ enum MPCHwDecoder {
 	HWDec_DXVA2 = 0,
 	HWDec_D3D11,
 	HWDec_D3D11cb,
+	HWDec_D3D12cb,
 	HWDec_NVDEC,
 	HWDec_count
 };

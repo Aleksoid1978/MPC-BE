@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2023 see Authors.txt
+ * (C) 2009-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,6 +23,7 @@
 #ifdef REGISTER_FILTER
 	#include <d3d11.h>
 	#include <dxgi1_2.h>
+	#include <d3d12video.h>
 #endif
 
 #pragma comment(lib, "winmm.lib")
