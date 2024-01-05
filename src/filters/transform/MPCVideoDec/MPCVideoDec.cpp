@@ -3690,6 +3690,16 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 				device_hwctx->unlock(device_hwctx->lock_ctx);
 			}
+			else if (frames_ctx->format == AV_PIX_FMT_D3D12) {
+				ret = d3d12va_direct_copy(hw_frame, m_pFrame, pDataOut,
+										  +[](void* ptr, AVFrame* frame, uint8_t* data) {
+					auto pFilter = static_cast<CMPCVideoDecFilter*>(ptr);
+					pFilter->m_FormatConverter.Converting(data, frame);
+				}, this);
+				if (ret < 0) {
+					CLEAR_AND_CONTINUE;
+				}
+			}
 			else if (frames_ctx->format == AV_PIX_FMT_CUDA && m_FormatConverter.DirectCopyPossible(frames_ctx->sw_format)) {
 				auto device_hwctx = reinterpret_cast<AVHWDeviceContext*>(frames_ctx->device_ctx);
 				auto cuda_hwctx = reinterpret_cast<AVCUDADeviceContext*>(device_hwctx->hwctx);

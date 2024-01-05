@@ -36,6 +36,10 @@
 #include <d3d12sdklayers.h>
 #include <d3d12video.h>
 
+// ==> Start patch MPC
+#include "frame.h"
+// ==> End patch MPC
+
 /**
  * @brief This struct is allocated as AVHWDeviceContext.hwctx
  *
@@ -134,5 +138,10 @@ typedef struct AVD3D12VAFramesContext {
      */
     DXGI_FORMAT format;
 } AVD3D12VAFramesContext;
+
+// ==> Start patch MPC
+int d3d12va_direct_copy(const AVFrame* src, AVFrame* tmp, uint8_t* output,
+                        void (*convert_funct_ptr)(void*, AVFrame*, uint8_t*), void* ptr);
+// ==> End patch MPC
 
 #endif /* AVUTIL_HWCONTEXT_D3D12VA_H */
