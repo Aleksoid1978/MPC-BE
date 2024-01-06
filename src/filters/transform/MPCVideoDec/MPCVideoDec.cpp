@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include <wmcodecdsp.h>
 #include <moreuuids.h>
+#include <dxva2_guids.h>
 #include "MPCVideoDec.h"
 #include "DXVADecoder/DXVAAllocator.h"
 #include "FfmpegContext.h"

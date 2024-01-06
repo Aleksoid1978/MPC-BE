@@ -25,7 +25,7 @@
 #include <dxva.h>
 #include <dxva2api.h>
 #include <clsids.h>
-#include <moreuuids.h>
+#include <dxva2_guids.h>
 
 #include "IPinHook.h"
 #include "AllocatorCommon.h"

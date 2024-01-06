@@ -26,6 +26,7 @@
 
 #include <wmcodecdsp.h>
 #include <moreuuids.h>
+#include <dxva2_guids.h>
 #include <basestruct.h>
 #include <d3d9types.h>
 #include <dxva.h>

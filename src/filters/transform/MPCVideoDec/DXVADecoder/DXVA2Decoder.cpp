@@ -19,7 +19,7 @@
  */
 
 #include "stdafx.h"
-#include <moreuuids.h>
+#include <dxva2_guids.h>
 #include "DXVA2Decoder.h"
 #include "../MPCVideoDec.h"
 #include "DXVAAllocator.h"

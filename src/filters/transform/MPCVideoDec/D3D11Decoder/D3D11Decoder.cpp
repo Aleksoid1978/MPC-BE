@@ -22,6 +22,7 @@
 #include "stdafx.h"
 
 #include <moreuuids.h>
+#include <dxva2_guids.h>
 #include "DSUtil/DSUtil.h"
 #include "DSUtil/DXVAState.h"
 #include "D3D11Decoder.h"

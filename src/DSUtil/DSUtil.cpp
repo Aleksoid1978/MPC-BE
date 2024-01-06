@@ -32,6 +32,7 @@
 #include <clsids.h>
 #include <wmcodecdsp.h>
 #include <moreuuids.h>
+#include <dxva2_guids.h>
 #include <basestruct.h>
 #include <emmintrin.h>
 #include <d3d9.h>
