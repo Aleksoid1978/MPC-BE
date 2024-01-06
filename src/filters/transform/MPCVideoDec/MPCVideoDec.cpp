@@ -3453,6 +3453,10 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 	int ret = avcodec_send_packet(m_pAVCtx, avpkt);
 	if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
+		if (ret == AVERROR_INVALIDDATA) {
+			return S_FALSE;
+		}
+
 		if (UseDXVA2() && (!m_bDXVACompatible || m_bFailDXVA2Decode)) {
 			CleanupDXVAVariables();
 			CleanupD3DResources();
