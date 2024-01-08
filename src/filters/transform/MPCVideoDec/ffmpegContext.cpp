@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,6 +38,7 @@ extern "C" {
 	#include <ExtLib/ffmpeg/libavcodec/h264dec.h>
 	#include <ExtLib/ffmpeg/libavcodec/ffv1.h>
 #undef class
+	#include <ExtLib/ffmpeg/libavcodec/vvc/vvcdec.h>
 }
 #pragma warning(pop)
 
@@ -317,6 +318,57 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, BITMAPINFOHEADER* pBMI)
 		case AV_CODEC_ID_G2M:
 		case AV_CODEC_ID_DXTORY:
 			pAVCtx->pix_fmt = AV_PIX_FMT_RGB24; // and other RGB formats, but it is not important here
+			break;
+		case AV_CODEC_ID_VVC:
+			{
+				auto s = reinterpret_cast<VVCContext*>(pAVCtx->priv_data);
+				if (s->cbc && s->cbc->priv_data) {
+					auto h266 = reinterpret_cast<CodedBitstreamH266Context*>(s->cbc->priv_data);
+					auto pps = h266->pps[0];
+					if (pps) {
+						auto sps = h266->sps[pps->pps_seq_parameter_set_id];
+						if (sps) {
+							auto get_format = [](const H266RawSPS* sps) {
+								static const AVPixelFormat pix_fmts_8bit[] = {
+									AV_PIX_FMT_GRAY8, AV_PIX_FMT_YUV420P,
+									AV_PIX_FMT_YUV422P, AV_PIX_FMT_YUV444P
+								};
+
+								static const AVPixelFormat pix_fmts_10bit[] = {
+									AV_PIX_FMT_GRAY10, AV_PIX_FMT_YUV420P10,
+									AV_PIX_FMT_YUV422P10, AV_PIX_FMT_YUV444P10
+								};
+
+								switch (sps->sps_bitdepth_minus8) {
+									case 0:
+										return pix_fmts_8bit[sps->sps_chroma_format_idc];
+									case 2:
+										return pix_fmts_10bit[sps->sps_chroma_format_idc];
+								}
+
+								return AV_PIX_FMT_NONE;
+							};
+
+							pAVCtx->pix_fmt = get_format(sps);
+							pAVCtx->profile = sps->profile_tier_level.general_profile_idc;
+							pAVCtx->level = sps->profile_tier_level.general_level_idc;
+							pAVCtx->colorspace = static_cast<AVColorSpace>(sps->vui.vui_matrix_coeffs);
+							pAVCtx->color_primaries = static_cast<AVColorPrimaries>(sps->vui.vui_colour_primaries);
+							pAVCtx->color_trc = static_cast<AVColorTransferCharacteristic>(sps->vui.vui_transfer_characteristics);
+							pAVCtx->color_range = sps->vui.vui_full_range_flag ? AVCOL_RANGE_JPEG : AVCOL_RANGE_MPEG;
+
+							if (sps->sps_ptl_dpb_hrd_params_present_flag && sps->sps_timing_hrd_params_present_flag) {
+								int64_t num = sps->sps_general_timing_hrd_parameters.num_units_in_tick;
+								int64_t den = sps->sps_general_timing_hrd_parameters.time_scale;
+
+								if (num != 0 && den != 0) {
+									av_reduce(&pAVCtx->framerate.den, &pAVCtx->framerate.num, num, den, 1LL << 30);
+								}
+							}
+						}
+					}
+				}
+			}
 			break;
 		}
 
