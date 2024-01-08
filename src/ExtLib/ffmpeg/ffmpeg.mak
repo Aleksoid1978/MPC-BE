@@ -61,6 +61,7 @@ endif
 OBJ_DIRS = $(OBJ_DIR) \
 	$(OBJ_DIR)compat \
 	$(OBJ_DIR)libavcodec \
+	$(OBJ_DIR)libavcodec/vvc \
 	$(OBJ_DIR)libavcodec/x86 \
 	$(OBJ_DIR)libavfilter \
 	$(OBJ_DIR)libavfilter/x86 \
@@ -158,6 +159,8 @@ SRCS_LC = \
 	libavcodec/cbrt_data.c \
 	libavcodec/cbs.c \
 	libavcodec/cbs_av1.c \
+	libavcodec/cbs_h2645.c \
+	libavcodec/cbs_sei.c \
 	libavcodec/celp_filters.c \
 	libavcodec/celp_math.c \
 	libavcodec/cfhd.c \
@@ -578,6 +581,22 @@ SRCS_LC_B = \
 	libavcodec/xvididct.c \
 	libavcodec/zlib_wrapper.c \
 	\
+	libavcodec/vvc_mp4toannexb_bsf.c \
+	libavcodec/vvc_parser.c \
+	libavcodec/vvc/vvcdec.c \
+	libavcodec/vvc/vvcdsp.c \
+	libavcodec/vvc/vvc_cabac.c \
+	libavcodec/vvc/vvc_ctu.c \
+	libavcodec/vvc/vvc_data.c \
+	libavcodec/vvc/vvc_filter.c \
+	libavcodec/vvc/vvc_inter.c \
+	libavcodec/vvc/vvc_intra.c \
+	libavcodec/vvc/vvc_itx_1d.c \
+	libavcodec/vvc/vvc_mvs.c \
+	libavcodec/vvc/vvc_ps.c \
+	libavcodec/vvc/vvc_refs.c \
+	libavcodec/vvc/vvc_thread.c \
+	\
 	libavcodec/x86/aacpsdsp_init.c \
 	libavcodec/x86/ac3dsp_init.c \
 	libavcodec/x86/alacdsp_init.c \
@@ -677,6 +696,7 @@ SRCS_LU = \
 	libavutil/downmix_info.c \
 	libavutil/error.c \
 	libavutil/eval.c \
+	libavutil/executor.c \
 	libavutil/fifo.c \
 	libavutil/file_open.c \
 	libavutil/film_grain_params.c \
