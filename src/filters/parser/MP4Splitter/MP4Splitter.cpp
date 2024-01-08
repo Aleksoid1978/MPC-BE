@@ -1338,6 +1338,35 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									}
 								}
 								break;
+							case AP4_ATOM_TYPE_VVC1:
+								{ // H.266/VVC
+									const AP4_DataBuffer* di = nullptr;
+									if (AP4_DataInfoAtom* vvcC = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_VVCC))) {
+										di = vvcC->GetData();
+									}
+									if (!di) {
+										di = &empty;
+									}
+
+									BYTE* data         = (BYTE*)di->GetData();
+									size_t size        = (size_t)di->GetDataSize();
+
+									BITMAPINFOHEADER pbmi = {};
+									pbmi.biSize        = sizeof(pbmi);
+									pbmi.biWidth       = (LONG)vse->GetWidth();
+									pbmi.biHeight      = (LONG)vse->GetHeight();
+									pbmi.biCompression = FCC('VVC1');
+									pbmi.biPlanes      = 1;
+									pbmi.biBitCount    = 24;
+									pbmi.biSizeImage   = DIBSIZE(pbmi);
+
+									CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, PictAR, data, size);
+									mt.SetSampleSize(pbmi.biSizeImage);
+
+									mts.clear();
+									mts.push_back(mt);
+								}
+								break;
 							case AP4_ATOM_TYPE_vp08:
 							case AP4_ATOM_TYPE_vp09:
 								if (AP4_DataInfoAtom* vpcC = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_VPCC))) {

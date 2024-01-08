@@ -72,6 +72,7 @@ static const std::map<DWORD, LPCSTR> vfourcs = {
 	{FCC('HM12'), "HEVC(HM12)"},
 	{FCC('BIKB'), "Bink"},
 	{FCC('BIKI'), "Bink"},
+	{FCC('VVC1'), "H.266/VVC"},
 };
 
 static const std::map<WORD, LPCSTR> aformattags = {
