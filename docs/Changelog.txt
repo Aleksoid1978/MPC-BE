@@ -15,6 +15,7 @@ Added the ability to open the folder of the currently playing file using a hotke
 
 Updated French translation (by rhahgleuhargh).
 Updated Italian translation (by mapi68).
+Updated Korean translation (by Hackjjang).
 
 Updated libraries:
 	ffmpeg git-n6.2-dev-694-g90bef6390f;
