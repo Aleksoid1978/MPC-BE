@@ -80,11 +80,11 @@ static const FFCodec * const codec_list[] = {
     &ff_vp7_decoder,
     &ff_vp8_decoder,
     &ff_vp9_decoder,
+    &ff_vvc_decoder,
     &ff_wmv1_decoder,
     &ff_wmv2_decoder,
     &ff_wmv3_decoder,
     &ff_wmv3image_decoder,
-    &ff_vvc_decoder,
 
     &ff_aac_decoder,
     &ff_aac_latm_decoder,
@@ -124,6 +124,7 @@ static const FFCodec * const codec_list[] = {
     &ff_ra_144_decoder,
     &ff_ra_288_decoder,
     &ff_ralf_decoder,
+    &ff_s302m_decoder,
     &ff_shorten_decoder,
     &ff_sipr_decoder,
     &ff_tak_decoder,
@@ -137,12 +138,15 @@ static const FFCodec * const codec_list[] = {
     &ff_wmav1_decoder,
     &ff_wmav2_decoder,
     &ff_wmavoice_decoder,
+
     &ff_pcm_alaw_decoder,
     &ff_pcm_mulaw_decoder,
+
     &ff_adpcm_4xm_decoder,
     &ff_adpcm_adx_decoder,
     &ff_adpcm_ct_decoder,
     &ff_adpcm_ea_decoder,
+    &ff_adpcm_g726_decoder,
     &ff_adpcm_ima_amv_decoder,
     &ff_adpcm_ima_dk3_decoder,
     &ff_adpcm_ima_dk4_decoder,
@@ -157,12 +161,11 @@ static const FFCodec * const codec_list[] = {
     &ff_adpcm_swf_decoder,
     &ff_adpcm_xa_decoder,
     &ff_adpcm_yamaha_decoder,
-    &ff_s302m_decoder,
-    &ff_adpcm_g726_decoder,
 
-    &ff_libspeex_decoder,
     &ff_libdav1d_decoder,
+    &ff_libspeex_decoder,
     &ff_libuavs3d_decoder,
 
-    &ff_av1_decoder,
-    NULL };
+    &ff_av1_decoder, // after ff_libdav1d_decoder
+    NULL
+};
