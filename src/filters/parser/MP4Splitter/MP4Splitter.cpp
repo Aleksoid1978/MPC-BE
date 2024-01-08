@@ -1339,6 +1339,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								}
 								break;
 							case AP4_ATOM_TYPE_VVC1:
+							case AP4_ATOM_TYPE_VVI1:
 								{ // H.266/VVC
 									const AP4_DataBuffer* di = nullptr;
 									if (AP4_DataInfoAtom* vvcC = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_VVCC))) {

@@ -624,6 +624,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_DVH1:
         // VVC/H.266
         case AP4_ATOM_TYPE_VVC1:
+        case AP4_ATOM_TYPE_VVI1:
         // VP8/VP9/AV1
         case AP4_ATOM_TYPE_vp08:
         case AP4_ATOM_TYPE_vp09:

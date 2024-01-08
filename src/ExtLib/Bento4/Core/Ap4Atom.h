@@ -374,6 +374,7 @@ const AP4_Atom::Type AP4_ATOM_TYPE_DVH1 = AP4_ATOM_TYPE('d','v','h','1');
 const AP4_Atom::Type AP4_ATOM_TYPE_HVCC = AP4_ATOM_TYPE('h','v','c','C');
 // VVC/H.266
 const AP4_Atom::Type AP4_ATOM_TYPE_VVC1 = AP4_ATOM_TYPE('v','v','c','1');
+const AP4_Atom::Type AP4_ATOM_TYPE_VVI1 = AP4_ATOM_TYPE('v','v','i','1');
 const AP4_Atom::Type AP4_ATOM_TYPE_VVCC = AP4_ATOM_TYPE('v','v','c','C');
 // image
 const AP4_Atom::Type AP4_ATOM_TYPE_JPEG = AP4_ATOM_TYPE('j','p','e','g');
