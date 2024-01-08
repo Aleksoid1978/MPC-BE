@@ -140,6 +140,8 @@ vcodecs[] = {
 	{L"cineform",		CODEC_CINEFORM	},
 	{L"hap",			CODEC_HAP		},
 	{L"av1",			CODEC_AV1		},
+	{L"avs3",			CODEC_AVS3		},
+	{L"vvc",			CODEC_VVC		},
 };
 #endif
 
@@ -537,6 +539,9 @@ FFMPEG_CODECS ffCodecs[] = {
 	// AVS3
 	{ &MEDIASUBTYPE_AVS3, AV_CODEC_ID_AVS3, VDEC_AVS3, HWCodec_None },
 
+	// VVC
+	{ &MEDIASUBTYPE_VVC1, AV_CODEC_ID_VVC, VDEC_VVC, HWCodec_None },
+
 	// uncompressed video
 	{ &MEDIASUBTYPE_v210, AV_CODEC_ID_V210, VDEC_UNCOMPRESSED, HWCodec_None },
 	{ &MEDIASUBTYPE_V410, AV_CODEC_ID_V410, VDEC_UNCOMPRESSED, HWCodec_None },
@@ -917,7 +922,10 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_SHQ9 },
 
 	// AVS3
-	{ &MEDIATYPE_Video, &MEDIASUBTYPE_AVS3 }
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_AVS3 },
+
+	// VVC
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_VVC1 }
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesInUncompressed[] = {
@@ -1680,6 +1688,12 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 				case AV_CODEC_ID_AV1:
 					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_AV1) != 0;
 					break;
+				case AV_CODEC_ID_AVS3:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_AVS3) != 0;
+					break;
+				case AV_CODEC_ID_VVC:
+					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_VVC) != 0;
+					break;
 				default:
 					m_bUseFFmpeg = true;
 					break;
@@ -2183,6 +2197,7 @@ redo:
 	if (m_CodecId == AV_CODEC_ID_MPEG2VIDEO
 			|| m_CodecId == AV_CODEC_ID_MPEG1VIDEO
 			|| m_CodecId == AV_CODEC_ID_AVS3
+			|| m_CodecId == AV_CODEC_ID_VVC
 			|| pmt->subtype == MEDIASUBTYPE_H264
 			|| pmt->subtype == MEDIASUBTYPE_h264
 			|| pmt->subtype == MEDIASUBTYPE_X264

@@ -621,6 +621,7 @@ static const struct {
 } mpc_codecs[] = {
 	{CODEC_AMVV,		L"AMV video"},
 	{CODEC_AV1,			L"AOMedia Video 1 (AV1)"},
+	{CODEC_AVS3,		L"AVS3"},
 	{CODEC_PRORES,		L"Apple ProRes"},
 	{CODEC_DNXHD,		L"Avid DNxHD"},
 	{CODEC_BINKV,		L"Bink video"},
@@ -634,7 +635,8 @@ static const struct {
 	{CODEC_H263,		L"H.263"},
 	{CODEC_H264,		L"H.264/AVC (FFmpeg)"},
 	{CODEC_H264_MVC,	L"H.264 (MVC 3D)"},
-	{CODEC_HEVC,		L"HEVC"},
+	{CODEC_HEVC,		L"H.265/HEVC"},
+	{CODEC_VVC,			L"H.266/VVC"},
 	{CODEC_INDEO,		L"Indeo 3/4/5"},
 	{CODEC_LOSSLESS,	L"Lossless video (huffyuv, Lagarith, FFV1, MagicYUV)"},
 	{CODEC_MJPEG,		L"MJPEG"},

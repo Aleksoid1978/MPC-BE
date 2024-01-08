@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -83,7 +83,8 @@ static filter_t s_video_decoders[] = {
 	{L"H.263",						VIDEO_DECODER, VDEC_H263,			0},
 	{L"H.264/AVC",					VIDEO_DECODER, VDEC_H264,			0},
 	{L"H.264 (MVC 3D)",				VIDEO_DECODER, VDEC_H264_MVC,		IDS_TRA_INTEL_MSDK},
-	{L"HEVC",						VIDEO_DECODER, VDEC_HEVC,			0},
+	{L"H.265/HEVC",					VIDEO_DECODER, VDEC_HEVC,			0},
+	{L"H.266/VVC",					VIDEO_DECODER, VDEC_VVC,			0},
 	{L"Indeo 3/4/5",				VIDEO_DECODER, VDEC_INDEO,			0},
 	{L"Lossless video (HuffYUV, FFV1, Lagarith, MagicYUV)", VIDEO_DECODER, VDEC_LOSSLESS, 0},
 	{L"MJPEG",						VIDEO_DECODER, VDEC_MJPEG,			0},

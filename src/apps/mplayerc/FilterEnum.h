@@ -1,5 +1,5 @@
 /*
- * (C) 2010-2022 see Authors.txt
+ * (C) 2010-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -103,6 +103,7 @@ enum VIDEO_FILTER {
 	VDEC_AV1,
 	VDEC_SHQ,
 	VDEC_AVS3,
+	VDEC_VVC,
 	VDEC_UNCOMPRESSED,
 
 	VDEC_COUNT
