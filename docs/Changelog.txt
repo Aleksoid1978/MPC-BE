@@ -2,10 +2,19 @@
 
 1.6.11.x dev
 =============================
+MP4Splitter
+Added support for VVC(H.266) codec.
+
+MPCVideoDec
+Added support for D3D12 copy back mode.
+Added support for VVC(H.266) video decoding.
+Added AVS3 support for external filter.
+
 Player
 Added the ability to open the folder of the currently playing file using a hotkey.
 
 Updated French translation (by rhahgleuhargh).
+Updated Italian translation (by mapi68).
 
 Updated libraries:
 	ffmpeg git-n6.2-dev-694-g90bef6390f;
