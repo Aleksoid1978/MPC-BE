@@ -159,6 +159,7 @@ SRCS_LC = \
 	libavcodec/cbrt_data.c \
 	libavcodec/cbs.c \
 	libavcodec/cbs_av1.c \
+	libavcodec/cbs_bsf.c \
 	libavcodec/cbs_h2645.c \
 	libavcodec/cbs_sei.c \
 	libavcodec/celp_filters.c \
@@ -279,6 +280,7 @@ SRCS_LC = \
 	libavcodec/h264idct.c \
 	libavcodec/h264pred.c \
 	libavcodec/h264qpel.c \
+	libavcodec/h266_metadata_bsf.c \
 	libavcodec/h2645_parse.c \
 	libavcodec/h2645_sei.c \
 	libavcodec/h2645_vui.c \

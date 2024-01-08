@@ -1348,23 +1348,27 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										di = &empty;
 									}
 
-									BYTE* data         = (BYTE*)di->GetData();
-									size_t size        = (size_t)di->GetDataSize();
+									BYTE* data  = (BYTE*)di->GetData();
+									size_t size = (size_t)di->GetDataSize();
+									if (size > 4) {
+										size -= 4;
+										data += 4;
 
-									BITMAPINFOHEADER pbmi = {};
-									pbmi.biSize        = sizeof(pbmi);
-									pbmi.biWidth       = (LONG)vse->GetWidth();
-									pbmi.biHeight      = (LONG)vse->GetHeight();
-									pbmi.biCompression = FCC('VVC1');
-									pbmi.biPlanes      = 1;
-									pbmi.biBitCount    = 24;
-									pbmi.biSizeImage   = DIBSIZE(pbmi);
+										BITMAPINFOHEADER pbmi = {};
+										pbmi.biSize        = sizeof(pbmi);
+										pbmi.biWidth       = (LONG)vse->GetWidth();
+										pbmi.biHeight      = (LONG)vse->GetHeight();
+										pbmi.biCompression = FCC('VVC1');
+										pbmi.biPlanes      = 1;
+										pbmi.biBitCount    = 24;
+										pbmi.biSizeImage   = DIBSIZE(pbmi);
 
-									CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, PictAR, data, size);
-									mt.SetSampleSize(pbmi.biSizeImage);
+										CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, PictAR, data, size);
+										mt.SetSampleSize(pbmi.biSizeImage);
 
-									mts.clear();
-									mts.push_back(mt);
+										mts.clear();
+										mts.push_back(mt);
+									}
 								}
 								break;
 							case AP4_ATOM_TYPE_vp08:

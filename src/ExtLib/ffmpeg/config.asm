@@ -493,3 +493,4 @@
 
 %define CONFIG_CBS 1
 %define CONFIG_CBS_AV1 1
+%define CONFIG_CBS_H266 1
