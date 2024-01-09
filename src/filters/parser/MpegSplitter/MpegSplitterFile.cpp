@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -811,6 +811,7 @@ void CMpegSplitterFile::SearchStreams(const __int64 start, const __int64 stop, c
 #define AC4_AUDIO         (1ULL << 16)
 #define AES3_AUDIO        (1ULL << 17)
 #define AVS3_VIDEO        (1ULL << 18)
+#define VVC_VIDEO         (1ULL << 19)
 
 #define PES_STREAM_TYPE_ANY (MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB | TELETEXT_SUB | DTS_EXPRESS_AUDIO)
 
@@ -868,8 +869,10 @@ static const struct StreamType {
 	{ PES_PRIVATE,							TELETEXT_SUB},
 	// MPEG4 Video
 	{ VIDEO_STREAM_MPEG4,					MPEG4_VIDEO },
-	// MPEG4 Video
-	{ VIDEO_STREAM_AVS3,					AVS3_VIDEO  }
+	// AES3 Video
+	{ VIDEO_STREAM_AVS3,					AVS3_VIDEO  },
+	// VVC Video
+	{ VIDEO_STREAM_VVC,						VVC_VIDEO   },
 };
 
 static const struct {
@@ -1064,6 +1067,11 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 
 				m_pix_fmt = h.bitdepth == 10 ? AV_PIX_FMT_YUV420P10 : AV_PIX_FMT_YUV420P;
 			}
+		}
+
+		// VVC Video
+		if (type == stream_type::unknown && (stream_type & VVC_VIDEO) && m_type == MPEG_TYPES::mpeg_ts) {
+			// TODO
 		}
 	}
 
@@ -2245,7 +2253,7 @@ void CMpegSplitterFile::ReadPMT(std::vector<BYTE>& pData, const WORD pid)
 											extradata[19] = opus_stream_cnt[channel_config_code];
 											extradata[20] = opus_coupled_stream_cnt[channel_config_code];
 											memcpy(&extradata[21], opus_channel_map[channels - 1], channels);
-											
+
 											_streamData.codec = stream_codec::OPUS;
 										}
 									}

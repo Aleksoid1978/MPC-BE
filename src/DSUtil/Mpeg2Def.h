@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -57,6 +57,7 @@ enum PES_STREAM_TYPE {
 	VIDEO_STREAM_MPEG2_ADDITIONAL_VIEW	= 0x22,	// Additional view Rec. ITU-T H.262 - ISO/IEC 13818-2 video stream for service-compatible stereoscopic 3D services
 	VIDEO_STREAM_H264_ADDITIONAL_VIEW	= 0x23,	// Additional view Rec. ITU-T H.264 - ISO/IEC 14496-10 video stream for service-compatible stereoscopic 3D services
 	VIDEO_STREAM_HEVC					= 0x24,
+	VIDEO_STREAM_VVC					= 0x33,
 	AUDIO_STREAM_LPCM					= 0x80,
 	AUDIO_STREAM_AC3					= 0x81,
 	AUDIO_STREAM_DTS					= 0x82,

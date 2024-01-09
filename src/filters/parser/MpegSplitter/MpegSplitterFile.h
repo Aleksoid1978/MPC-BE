@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -204,7 +204,8 @@ public:
 		MPEG4Video,
 		AC4,
 		AES3,
-		AVS3
+		AVS3,
+		VVC
 	};
 
 	enum stream_type {
