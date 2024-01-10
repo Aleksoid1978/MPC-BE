@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -43,12 +43,45 @@ enum NALU_TYPE {
 	NALU_TYPE_HEVC_BLA_N_LP   = 18,
 	NALU_TYPE_HEVC_IDR_W_RADL = 19,
 	NALU_TYPE_HEVC_IDR_N_LP   = 20,
-	NALU_TYPE_HEVC_CRA_NUT    = 21,
+	NALU_TYPE_HEVC_CRA        = 21,
 	NALU_TYPE_HEVC_VPS        = 32,
 	NALU_TYPE_HEVC_SPS        = 33,
 	NALU_TYPE_HEVC_PPS        = 34,
 	NALU_TYPE_HEVC_AUD        = 35,
-	NALU_TYPE_HEVC_SEI_PREFIX = 39
+	NALU_TYPE_HEVC_SEI_PREFIX = 39,
+	// VVC
+	NALU_TYPE_VVC_TRAIL       = 0,
+	NALU_TYPE_VVC_STSA        = 1,
+	NALU_TYPE_VVC_RADL        = 2,
+	NALU_TYPE_VVC_RASL        = 3,
+	NALU_TYPE_VVC_RSV_VCL_4   = 4,
+	NALU_TYPE_VVC_RSV_VCL_5   = 5,
+	NALU_TYPE_VVC_RSV_VCL_6   = 6,
+	NALU_TYPE_VVC_IDR_W_RADL  = 7,
+	NALU_TYPE_VVC_IDR_N_LP    = 8,
+	NALU_TYPE_VVC_CRA         = 9,
+	NALU_TYPE_VVC_GDR         = 10,
+	NALU_TYPE_VVC_RSV_IRAP_11 = 11,
+	NALU_TYPE_VVC_OPI         = 12,
+	NALU_TYPE_VVC_DCI         = 13,
+	NALU_TYPE_VVC_VPS         = 14,
+	NALU_TYPE_VVC_SPS         = 15,
+	NALU_TYPE_VVC_PPS         = 16,
+	NALU_TYPE_VVC_PREFIX_APS  = 17,
+	NALU_TYPE_VVC_SUFFIX_APS  = 18,
+	NALU_TYPE_VVC_PH          = 19,
+	NALU_TYPE_VVC_AUD         = 20,
+	NALU_TYPE_VVC_EOS         = 21,
+	NALU_TYPE_VVC_EOB         = 22,
+	NALU_TYPE_VVC_PREFIX_SEI  = 23,
+	NALU_TYPE_VVC_SUFFIX_SEI  = 24,
+	NALU_TYPE_VVC_FD          = 25,
+	NALU_TYPE_VVC_RSV_NVCL_26 = 26,
+	NALU_TYPE_VVC_RSV_NVCL_27 = 27,
+	NALU_TYPE_VVC_UNSPEC_28   = 28,
+	NALU_TYPE_VVC_UNSPEC_29   = 29,
+	NALU_TYPE_VVC_UNSPEC_30   = 30,
+	NALU_TYPE_VVC_UNSPEC_31   = 31
 };
 
 class CH264Nalu
@@ -99,3 +132,9 @@ public:
 	bool ReadNext();
 };
 
+class CH266Nalu : public CH264Nalu
+{
+public:
+	CH266Nalu() : CH264Nalu() {};
+	bool ReadNext();
+};

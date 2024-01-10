@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -115,6 +115,16 @@ bool CH265Nalu::ReadNext()
 {
 	if (__super::ReadNext()) {
 		nal_unit_type = (NALU_TYPE)((m_pBuffer[m_nNALDataPos] >> 1) & 0x3F);
+		return true;
+	}
+
+	return false;
+}
+
+bool CH266Nalu::ReadNext()
+{
+	if (__super::ReadNext()) {
+		nal_unit_type = static_cast<NALU_TYPE>(m_pBuffer[m_nNALDataPos + 1] & 0x1f);
 		return true;
 	}
 

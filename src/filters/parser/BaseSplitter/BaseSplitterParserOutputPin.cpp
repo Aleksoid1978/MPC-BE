@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -585,7 +585,7 @@ static int hevc_find_frame_end(BYTE* pData, int nSize, MpegParseContext& pc)
 				return i - 5;
 			}
 		} else if (nut <= NALU_TYPE_HEVC_RASL_R ||
-				  (nut >= NALU_TYPE_HEVC_BLA_W_LP && nut <= NALU_TYPE_HEVC_CRA_NUT)) {
+				  (nut >= NALU_TYPE_HEVC_BLA_W_LP && nut <= NALU_TYPE_HEVC_CRA)) {
 			int first_slice_segment_in_pic_flag = pData[i] >> 7;
 			if (first_slice_segment_in_pic_flag) {
 				if (!pc.bFrameStartFound) {
