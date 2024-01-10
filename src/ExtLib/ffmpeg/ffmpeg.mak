@@ -33,7 +33,7 @@ ARSCRIPT          = $(OBJ_DIR)script.ar
 CFLAGS = -I. -I.. -Icompat/atomics/win32 -Icompat/windows -I$(ZLIB_DIR) -I$(SPEEX_DIR) -I$(SOXR_DIR) -I$(DAV1_DIR) -I$(FFNVCODEC_DIR) -I$(UAVS3D_DIR) \
 	   -DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
 	   -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DOPJ_STATIC \
-	   -D_WIN32_WINNT=0x0600 -DWINVER=0x0600 \
+	   -D_WIN32_WINNT=0x0601 -DWINVER=0x0601 \
 	   -fomit-frame-pointer -std=gnu99 \
 	   -fno-common -fno-ident -mthreads
 YASMFLAGS = -I. -Pconfig.asm
