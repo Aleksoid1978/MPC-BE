@@ -124,7 +124,7 @@ bool CH265Nalu::ReadNext()
 bool CH266Nalu::ReadNext()
 {
 	if (__super::ReadNext()) {
-		nal_unit_type = static_cast<NALU_TYPE>(m_pBuffer[m_nNALDataPos + 1] & 0x1f);
+		nal_unit_type = static_cast<NALU_TYPE>((m_pBuffer[m_nNALDataPos + 1] >> 3) & 0x1f);
 		return true;
 	}
 
