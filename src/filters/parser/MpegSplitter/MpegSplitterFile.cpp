@@ -1071,7 +1071,12 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 
 		// VVC Video
 		if (type == stream_type::unknown && (stream_type & VVC_VIDEO) && m_type == MPEG_TYPES::mpeg_ts) {
-			// TODO
+			Seek(start);
+			auto& vvc = vvc_streams[s];
+			if (!m_streams[stream_type::video].Find(s) && Read(vvc.h, len, vvc.pData, &s.mt)) {
+				s.codec = stream_codec::VVC;
+				type = stream_type::video;
+			}
 		}
 	}
 

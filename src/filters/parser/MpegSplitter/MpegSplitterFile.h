@@ -55,6 +55,12 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 	};
 	std::map<DWORD, hevc_data> hevc_streams;
 
+	struct vvc_data {
+		vvchdr h;
+		std::vector<BYTE> pData;
+	};
+	std::map<DWORD, vvc_data> vvc_streams;
+
 	template<class T, BYTE validCount = 5>
 	class CValidStream {
 		BYTE m_nValidStream = 0;

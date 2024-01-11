@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -302,6 +302,9 @@ public:
 	struct hevchdr {
 	};
 
+	struct vvchdr {
+	};
+
 	struct mpeg4videohdr {
 	};
 
@@ -354,6 +357,10 @@ public:
 	bool Read(hevchdr& h, std::vector<BYTE>& pData, CMediaType* pmt = nullptr);
 	bool Read(hevchdr& h, int len, CMediaType* pmt = nullptr);
 	bool Read(hevchdr& h, int len, std::vector<BYTE>& pData, CMediaType* pmt = nullptr);
+
+	bool Read(vvchdr& h, std::vector<BYTE>& pData, CMediaType* pmt = nullptr);
+	bool Read(vvchdr& h, int len, CMediaType* pmt = nullptr);
+	bool Read(vvchdr& h, int len, std::vector<BYTE>& pData, CMediaType* pmt = nullptr);
 
 	bool Read(mpeg4videohdr& h, int len, CMediaType* pmt = nullptr);
 

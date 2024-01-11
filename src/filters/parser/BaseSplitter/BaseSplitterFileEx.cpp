@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1654,6 +1654,150 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, std::vector<BYTE>& pData, CM
 		}
 
 		if (nalu_type != NALU_TYPE_HEVC_VPS) {
+			return false;
+		}
+
+		pData.resize(len);
+		memcpy(pData.data(), m_tmpBuffer.Data(), len);
+	} else {
+		const size_t dataLen = pData.size();
+		pData.resize(dataLen + len);
+		ByteRead(pData.data() + dataLen, len);
+	}
+
+	return Read(h, pData, pmt);
+}
+
+bool CBaseSplitterFileEx::Read(vvchdr& h, std::vector<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
+{
+	NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
+	CH266Nalu Nalu;
+
+	{
+		int pps_present = 0;
+		int sps_present = 0;
+
+		Nalu.SetBuffer(pData.data(), pData.size());
+		Nalu.ReadNext();
+		while (!(pps_present && sps_present)) {
+			NALU_TYPE nalu_type = Nalu.GetType();
+			if (!Nalu.ReadNext()) {
+				break;
+			}
+			switch (nalu_type) {
+				case NALU_TYPE_VVC_PPS:
+					pps_present++;
+					break;
+				case NALU_TYPE_VVC_SPS:
+					sps_present++;
+					break;
+			}
+		}
+
+		if (!(pps_present && sps_present)) {
+			return false;
+		}
+	}
+
+	std::vector<BYTE> nalu_data[2];
+	int sps_present = 0;
+	int pps_present = 0;
+	vc_params_vvc_t params = {};
+
+	Nalu.SetBuffer(pData.data(), pData.size());
+	while (!(sps_present && pps_present)
+		   && Nalu.ReadNext()) {
+		nalu_type = Nalu.GetType();
+		switch (nalu_type) {
+			case NALU_TYPE_VVC_SPS:
+			case NALU_TYPE_VVC_PPS:
+				if (nalu_type == NALU_TYPE_VVC_SPS) {
+					if (sps_present) continue;
+
+					if (!VVCParser::ParseSequenceParameterSet(Nalu.GetDataBuffer() + 2, Nalu.GetDataLength() - 2, params)) {
+						pData.clear();
+						return false;
+					}
+					sps_present++;
+				} else if (nalu_type == NALU_TYPE_VVC_PPS) {
+					if (pps_present) continue;
+
+					if (!VVCParser::ParsePictureParameterSet(Nalu.GetDataBuffer() + 2, Nalu.GetDataLength() - 2, params)) {
+						pData.clear();
+						return false;
+					}
+					pps_present++;
+				}
+
+				if (pmt) {
+					auto& data = nalu_data[nalu_type - NALU_TYPE_VVC_SPS];
+					data.resize(Nalu.GetLength());
+					memcpy(data.data(), Nalu.GetNALBuffer(), Nalu.GetLength());
+				}
+		}
+	}
+
+	if (pmt) {
+		BITMAPINFOHEADER bmi = {};
+		bmi.biSize        = sizeof(bmi);
+		bmi.biWidth       = params.width;
+		bmi.biHeight      = params.height;
+		bmi.biCompression = FCC('VVC1');
+		bmi.biPlanes      = 1;
+		bmi.biBitCount    = 24;
+		bmi.biSizeImage   = DIBSIZE(bmi);
+
+		CSize aspect(params.width * params.sar.num, params.height * params.sar.den);
+		ReduceDim(aspect);
+
+		REFERENCE_TIME AvgTimePerFrame = 0;
+		if (params.sps_timing.num_units_in_tick && params.sps_timing.time_scale) {
+			AvgTimePerFrame = (REFERENCE_TIME)(10000000.0 * params.sps_timing.num_units_in_tick / params.sps_timing.time_scale);
+		}
+
+		std::vector<BYTE> extradata;
+		for (const auto& data : nalu_data) {
+			if (data.empty()) {
+				continue;
+			}
+
+			extradata.insert(extradata.end(), data.begin(), data.end());
+		}
+
+		CreateMPEG2VISimple(pmt, &bmi, AvgTimePerFrame, aspect, extradata.data(), extradata.size(), params.profile, params.level);
+		pmt->SetTemporalCompression(TRUE);
+		pmt->SetVariableSize();
+	}
+
+	pData.clear();
+	return true;
+}
+
+bool CBaseSplitterFileEx::Read(vvchdr& h, int len, CMediaType* pmt/* = nullptr*/)
+{
+	std::vector<BYTE> pData;
+	pData.resize(len);
+	if (S_OK != ByteRead(pData.data(), len)) {
+		return false;
+	}
+
+	return Read(h, pData, pmt);
+}
+
+bool CBaseSplitterFileEx::Read(vvchdr& h, int len, std::vector<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
+{
+	if (pData.empty()) {
+		m_tmpBuffer.ExtendSize(len);
+		ByteRead(m_tmpBuffer.Data(), len);
+
+		NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
+		CH266Nalu Nalu;
+		Nalu.SetBuffer(m_tmpBuffer.Data(), len);
+		while (nalu_type != NALU_TYPE_VVC_SPS && Nalu.ReadNext()) {
+			nalu_type = Nalu.GetType();
+		}
+
+		if (nalu_type != NALU_TYPE_VVC_SPS) {
 			return false;
 		}
 

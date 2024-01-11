@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2023 see Authors.txt
+ * (C) 2012-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -64,6 +64,22 @@ struct vc_params_t {
 	void clear() {
 		ZeroMemory(this, sizeof(*this));
 	}
+};
+
+struct vc_params_vvc_t : public vc_params_t {
+	timing sps_timing;
+
+	uint8_t sps_chroma_format_idc;
+	uint16_t sps_pic_width_max_in_luma_samples;
+	uint16_t sps_pic_height_max_in_luma_samples;
+	uint8_t sps_log2_min_luma_coding_block_size_minus2;
+	uint8_t sps_res_change_in_clvs_allowed_flag;
+	uint8_t	sps_log2_ctu_size_minus5;
+	uint8_t sps_ref_wraparound_enabled_flag;
+	uint16_t sps_conf_win_left_offset;
+	uint16_t sps_conf_win_right_offset;
+	uint16_t sps_conf_win_top_offset;
+	uint16_t sps_conf_win_bottom_offset;
 };
 
 bool ParseDiracHeader(const BYTE* data, const int size, vc_params_t& params);
@@ -138,3 +154,8 @@ namespace AVS3Parser {
 
 	bool ParseSequenceHeader(const BYTE* data, const int size, AVS3SequenceHeader& seq_header);
 } // namespace AVS3Parser
+
+namespace VVCParser {
+	bool ParseSequenceParameterSet(const BYTE* data, const int size, vc_params_vvc_t& params);
+	bool ParsePictureParameterSet(const BYTE* data, const int size, vc_params_vvc_t& params);
+} // namespace VVCParser

@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2023 see Authors.txt
+ * (C) 2012-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1632,3 +1632,1638 @@ namespace AVS3Parser {
 		return true;
 	}
 } // namespace AVS3Parser
+
+namespace VVCParser {
+	#define VVC_MAX_SLICES 600
+	#define VVC_MAX_SAMPLE_ARRAYS 3
+	#define VVC_MAX_POINTS_IN_QP_TABLE 111
+	#define VVC_MAX_REF_PIC_LISTS 64
+	#define VVC_MAX_SUBLAYERS 7
+	#define VVC_MAX_SUB_PROFILES 256
+	#define VVC_MAX_DPB_SIZE 16
+	#define VVC_MAX_REF_ENTRIES (VVC_MAX_DPB_SIZE + 13)
+	#define VVC_MAX_CPB_CNT 32
+	#define VVC_MAX_TILE_COLUMNS 20
+	#define VVC_MAX_TILE_ROWS 440
+	#define VVC_MAX_WIDTH 16888
+	#define VVC_MAX_HEIGHT 16888
+
+	struct H266RawNALUnitHeader {
+		uint8_t nuh_layer_id;
+		uint8_t nal_unit_type;
+		uint8_t nuh_temporal_id_plus1;
+		uint8_t nuh_reserved_zero_bit;
+	};
+
+	struct H266GeneralConstraintsInfo {
+		uint8_t gci_present_flag;
+		/* general */
+		uint8_t gci_intra_only_constraint_flag;
+		uint8_t gci_all_layers_independent_constraint_flag;
+		uint8_t gci_one_au_only_constraint_flag;
+
+		/* picture format */
+		uint8_t gci_sixteen_minus_max_bitdepth_constraint_idc;
+		uint8_t gci_three_minus_max_chroma_format_constraint_idc;
+
+		/* NAL unit type related */
+		uint8_t gci_no_mixed_nalu_types_in_pic_constraint_flag;
+		uint8_t gci_no_trail_constraint_flag;
+		uint8_t gci_no_stsa_constraint_flag;
+		uint8_t gci_no_rasl_constraint_flag;
+		uint8_t gci_no_radl_constraint_flag;
+		uint8_t gci_no_idr_constraint_flag;
+		uint8_t gci_no_cra_constraint_flag;
+		uint8_t gci_no_gdr_constraint_flag;
+		uint8_t gci_no_aps_constraint_flag;
+		uint8_t gci_no_idr_rpl_constraint_flag;
+
+		/* tile, slice, subpicture partitioning */
+		uint8_t gci_one_tile_per_pic_constraint_flag;
+		uint8_t gci_pic_header_in_slice_header_constraint_flag;
+		uint8_t gci_one_slice_per_pic_constraint_flag;
+		uint8_t gci_no_rectangular_slice_constraint_flag;
+		uint8_t gci_one_slice_per_subpic_constraint_flag;
+		uint8_t gci_no_subpic_info_constraint_flag;
+
+		/* CTU and block partitioning */
+		uint8_t gci_three_minus_max_log2_ctu_size_constraint_idc;
+		uint8_t gci_no_partition_constraints_override_constraint_flag;
+		uint8_t gci_no_mtt_constraint_flag;
+		uint8_t gci_no_qtbtt_dual_tree_intra_constraint_flag;
+
+		/* intra */
+		uint8_t gci_no_palette_constraint_flag;
+		uint8_t gci_no_ibc_constraint_flag;
+		uint8_t gci_no_isp_constraint_flag;
+		uint8_t gci_no_mrl_constraint_flag;
+		uint8_t gci_no_mip_constraint_flag;
+		uint8_t gci_no_cclm_constraint_flag;
+
+		/* inter */
+		uint8_t gci_no_ref_pic_resampling_constraint_flag;
+		uint8_t gci_no_res_change_in_clvs_constraint_flag;
+		uint8_t gci_no_weighted_prediction_constraint_flag;
+		uint8_t gci_no_ref_wraparound_constraint_flag;
+		uint8_t gci_no_temporal_mvp_constraint_flag;
+		uint8_t gci_no_sbtmvp_constraint_flag;
+		uint8_t gci_no_amvr_constraint_flag;
+		uint8_t gci_no_bdof_constraint_flag;
+		uint8_t gci_no_smvd_constraint_flag;
+		uint8_t gci_no_dmvr_constraint_flag;
+		uint8_t gci_no_mmvd_constraint_flag;
+		uint8_t gci_no_affine_motion_constraint_flag;
+		uint8_t gci_no_prof_constraint_flag;
+		uint8_t gci_no_bcw_constraint_flag;
+		uint8_t gci_no_ciip_constraint_flag;
+		uint8_t gci_no_gpm_constraint_flag;
+
+		/* transform, quantization, residual */
+		uint8_t gci_no_luma_transform_size_64_constraint_flag;
+		uint8_t gci_no_transform_skip_constraint_flag;
+		uint8_t gci_no_bdpcm_constraint_flag;
+		uint8_t gci_no_mts_constraint_flag;
+		uint8_t gci_no_lfnst_constraint_flag;
+		uint8_t gci_no_joint_cbcr_constraint_flag;
+		uint8_t gci_no_sbt_constraint_flag;
+		uint8_t gci_no_act_constraint_flag;
+		uint8_t gci_no_explicit_scaling_list_constraint_flag;
+		uint8_t gci_no_dep_quant_constraint_flag;
+		uint8_t gci_no_sign_data_hiding_constraint_flag;
+		uint8_t gci_no_cu_qp_delta_constraint_flag;
+		uint8_t gci_no_chroma_qp_offset_constraint_flag;
+
+		/* loop filter */
+		uint8_t gci_no_sao_constraint_flag;
+		uint8_t gci_no_alf_constraint_flag;
+		uint8_t gci_no_ccalf_constraint_flag;
+		uint8_t gci_no_lmcs_constraint_flag;
+		uint8_t gci_no_ladf_constraint_flag;
+		uint8_t gci_no_virtual_boundaries_constraint_flag;
+
+		uint8_t gci_num_additional_bits;
+		uint8_t gci_reserved_bit[255];
+
+		uint8_t gci_all_rap_pictures_constraint_flag;
+		uint8_t gci_no_extended_precision_processing_constraint_flag;
+		uint8_t gci_no_ts_residual_coding_rice_constraint_flag;
+		uint8_t gci_no_rrc_rice_extension_constraint_flag;
+		uint8_t gci_no_persistent_rice_adaptation_constraint_flag;
+		uint8_t gci_no_reverse_last_sig_coeff_constraint_flag;
+	};
+
+	struct H266RawProfileTierLevel {
+		uint8_t  general_profile_idc;
+		uint8_t  general_tier_flag;
+		uint8_t  general_level_idc;
+		uint8_t  ptl_frame_only_constraint_flag;
+		uint8_t  ptl_multilayer_enabled_flag;
+		H266GeneralConstraintsInfo general_constraints_info;
+		uint8_t  ptl_sublayer_level_present_flag[VVC_MAX_SUBLAYERS - 1];
+		uint8_t  sublayer_level_idc[VVC_MAX_SUBLAYERS - 1];
+		uint8_t  ptl_num_sub_profiles;
+		uint32_t general_sub_profile_idc[VVC_MAX_SUB_PROFILES];
+
+		uint8_t  ptl_reserved_zero_bit;
+	};
+
+	struct H266DpbParameters {
+		uint8_t dpb_max_dec_pic_buffering_minus1[VVC_MAX_SUBLAYERS];
+		uint8_t dpb_max_num_reorder_pics[VVC_MAX_SUBLAYERS];
+		uint8_t dpb_max_latency_increase_plus1[VVC_MAX_SUBLAYERS];
+	};
+
+	struct H266RefPicListStruct {
+		uint8_t num_ref_entries;
+		uint8_t ltrp_in_header_flag;
+		uint8_t inter_layer_ref_pic_flag[VVC_MAX_REF_ENTRIES];
+		uint8_t st_ref_pic_flag[VVC_MAX_REF_ENTRIES];
+		uint8_t abs_delta_poc_st[VVC_MAX_REF_ENTRIES];
+		uint8_t strp_entry_sign_flag[VVC_MAX_REF_ENTRIES];
+		uint8_t rpls_poc_lsb_lt[VVC_MAX_REF_ENTRIES];
+		uint8_t ilrp_idx[VVC_MAX_REF_ENTRIES];
+	};
+
+	struct H266RawGeneralTimingHrdParameters {
+		uint32_t num_units_in_tick;
+		uint32_t time_scale;
+		uint8_t  general_nal_hrd_params_present_flag;
+		uint8_t  general_vcl_hrd_params_present_flag;
+		uint8_t  general_same_pic_timing_in_all_ols_flag;
+		uint8_t  general_du_hrd_params_present_flag;
+		uint8_t  tick_divisor_minus2;
+		uint8_t  bit_rate_scale;
+		uint8_t  cpb_size_scale;
+		uint8_t  cpb_size_du_scale;
+		uint8_t  hrd_cpb_cnt_minus1;
+	};
+
+	struct H266RawSubLayerHRDParameters {
+		uint32_t bit_rate_value_minus1[VVC_MAX_SUBLAYERS][VVC_MAX_CPB_CNT];
+		uint32_t cpb_size_value_minus1[VVC_MAX_SUBLAYERS][VVC_MAX_CPB_CNT];
+		uint32_t cpb_size_du_value_minus1[VVC_MAX_SUBLAYERS][VVC_MAX_CPB_CNT];
+		uint32_t bit_rate_du_value_minus1[VVC_MAX_SUBLAYERS][VVC_MAX_CPB_CNT];
+		uint8_t  cbr_flag[VVC_MAX_SUBLAYERS][VVC_MAX_CPB_CNT];
+	};
+
+	struct H266RawOlsTimingHrdParameters {
+		uint8_t  fixed_pic_rate_general_flag[VVC_MAX_SUBLAYERS];
+		uint8_t  fixed_pic_rate_within_cvs_flag[VVC_MAX_SUBLAYERS];
+		uint16_t elemental_duration_in_tc_minus1[VVC_MAX_SUBLAYERS];
+		uint8_t  low_delay_hrd_flag[VVC_MAX_SUBLAYERS];
+		H266RawSubLayerHRDParameters nal_sub_layer_hrd_parameters;
+		H266RawSubLayerHRDParameters vcl_sub_layer_hrd_parameters;
+	};
+
+	struct H266RawVUI {
+		uint8_t  vui_progressive_source_flag;
+		uint8_t  vui_interlaced_source_flag;
+		uint8_t  vui_non_packed_constraint_flag;
+		uint8_t  vui_non_projected_constraint_flag;
+
+		uint8_t  vui_aspect_ratio_info_present_flag;
+		uint8_t  vui_aspect_ratio_constant_flag;
+		uint8_t  vui_aspect_ratio_idc;
+
+		uint16_t vui_sar_width;
+		uint16_t vui_sar_height;
+
+		uint8_t  vui_overscan_info_present_flag;
+		uint8_t  vui_overscan_appropriate_flag;
+
+		uint8_t  vui_colour_description_present_flag;
+		uint8_t  vui_colour_primaries;
+
+		uint8_t  vui_transfer_characteristics;
+		uint8_t  vui_matrix_coeffs;
+		uint8_t  vui_full_range_flag;
+
+		uint8_t  vui_chroma_loc_info_present_flag;
+		uint8_t  vui_chroma_sample_loc_type_frame;
+		uint8_t  vui_chroma_sample_loc_type_top_field;
+		uint8_t  vui_chroma_sample_loc_type_bottom_field;
+	};
+
+	struct H266RawSPS {
+		H266RawNALUnitHeader nal_unit_header;
+
+		uint8_t  sps_seq_parameter_set_id;
+		uint8_t  sps_video_parameter_set_id;
+		uint8_t  sps_max_sublayers_minus1;
+		uint8_t  sps_chroma_format_idc;
+		uint8_t  sps_log2_ctu_size_minus5;
+		uint8_t  sps_ptl_dpb_hrd_params_present_flag;
+		H266RawProfileTierLevel profile_tier_level;
+		uint8_t  sps_gdr_enabled_flag;
+		uint8_t  sps_ref_pic_resampling_enabled_flag;
+		uint8_t  sps_res_change_in_clvs_allowed_flag;
+
+		uint16_t sps_pic_width_max_in_luma_samples;
+		uint16_t sps_pic_height_max_in_luma_samples;
+
+		uint8_t  sps_conformance_window_flag;
+		uint16_t sps_conf_win_left_offset;
+		uint16_t sps_conf_win_right_offset;
+		uint16_t sps_conf_win_top_offset;
+		uint16_t sps_conf_win_bottom_offset;
+
+		uint8_t  sps_subpic_info_present_flag;
+		uint16_t sps_num_subpics_minus1;
+		uint8_t  sps_independent_subpics_flag;
+		uint8_t  sps_subpic_same_size_flag;
+		uint16_t sps_subpic_ctu_top_left_x[VVC_MAX_SLICES];
+		uint16_t sps_subpic_ctu_top_left_y[VVC_MAX_SLICES];
+		uint16_t sps_subpic_width_minus1[VVC_MAX_SLICES];
+		uint16_t sps_subpic_height_minus1[VVC_MAX_SLICES];
+		uint8_t  sps_subpic_treated_as_pic_flag[VVC_MAX_SLICES];
+		uint8_t  sps_loop_filter_across_subpic_enabled_flag[VVC_MAX_SLICES];
+		uint8_t  sps_subpic_id_len_minus1;
+		uint8_t  sps_subpic_id_mapping_explicitly_signalled_flag;
+		uint8_t  sps_subpic_id_mapping_present_flag;
+		uint32_t sps_subpic_id[VVC_MAX_SLICES];
+
+
+		uint8_t  sps_bitdepth_minus8;
+		uint8_t  sps_entropy_coding_sync_enabled_flag;
+		uint8_t  sps_entry_point_offsets_present_flag;
+
+		uint8_t  sps_log2_max_pic_order_cnt_lsb_minus4;
+		uint8_t  sps_poc_msb_cycle_flag;
+		uint8_t  sps_poc_msb_cycle_len_minus1;
+
+		uint8_t  sps_num_extra_ph_bytes;
+		uint8_t  sps_extra_ph_bit_present_flag[16];
+
+		uint8_t  sps_num_extra_sh_bytes;
+		uint8_t  sps_extra_sh_bit_present_flag[16];
+
+		uint8_t  sps_sublayer_dpb_params_flag;
+		H266DpbParameters sps_dpb_params;
+
+		uint8_t  sps_log2_min_luma_coding_block_size_minus2;
+		uint8_t  sps_partition_constraints_override_enabled_flag;
+		uint8_t  sps_log2_diff_min_qt_min_cb_intra_slice_luma;
+		uint8_t  sps_max_mtt_hierarchy_depth_intra_slice_luma;
+		uint8_t  sps_log2_diff_max_bt_min_qt_intra_slice_luma;
+		uint8_t  sps_log2_diff_max_tt_min_qt_intra_slice_luma;
+
+		uint8_t  sps_qtbtt_dual_tree_intra_flag;
+		uint8_t  sps_log2_diff_min_qt_min_cb_intra_slice_chroma;
+		uint8_t  sps_max_mtt_hierarchy_depth_intra_slice_chroma;
+		uint8_t  sps_log2_diff_max_bt_min_qt_intra_slice_chroma;
+		uint8_t  sps_log2_diff_max_tt_min_qt_intra_slice_chroma;
+
+		uint8_t  sps_log2_diff_min_qt_min_cb_inter_slice;
+		uint8_t  sps_max_mtt_hierarchy_depth_inter_slice;
+		uint8_t  sps_log2_diff_max_bt_min_qt_inter_slice;
+		uint8_t  sps_log2_diff_max_tt_min_qt_inter_slice;
+
+		uint8_t  sps_max_luma_transform_size_64_flag;
+
+		uint8_t  sps_transform_skip_enabled_flag;
+		uint8_t  sps_log2_transform_skip_max_size_minus2;
+		uint8_t  sps_bdpcm_enabled_flag;
+
+		uint8_t  sps_mts_enabled_flag;
+		uint8_t  sps_explicit_mts_intra_enabled_flag;
+		uint8_t  sps_explicit_mts_inter_enabled_flag;
+
+		uint8_t  sps_lfnst_enabled_flag;
+
+		uint8_t  sps_joint_cbcr_enabled_flag;
+		uint8_t  sps_same_qp_table_for_chroma_flag;
+
+		int8_t   sps_qp_table_start_minus26[VVC_MAX_SAMPLE_ARRAYS];
+		uint8_t  sps_num_points_in_qp_table_minus1[VVC_MAX_SAMPLE_ARRAYS];
+		uint8_t  sps_delta_qp_in_val_minus1[VVC_MAX_SAMPLE_ARRAYS][VVC_MAX_POINTS_IN_QP_TABLE];
+		uint8_t  sps_delta_qp_diff_val[VVC_MAX_SAMPLE_ARRAYS][VVC_MAX_POINTS_IN_QP_TABLE];
+
+		uint8_t  sps_sao_enabled_flag;
+		uint8_t  sps_alf_enabled_flag;
+		uint8_t  sps_ccalf_enabled_flag;
+		uint8_t  sps_lmcs_enabled_flag;
+		uint8_t  sps_weighted_pred_flag;
+		uint8_t  sps_weighted_bipred_flag;
+		uint8_t  sps_long_term_ref_pics_flag;
+		uint8_t  sps_inter_layer_prediction_enabled_flag;
+		uint8_t  sps_idr_rpl_present_flag;
+		uint8_t  sps_rpl1_same_as_rpl0_flag;
+
+		uint8_t  sps_num_ref_pic_lists[2];
+		H266RefPicListStruct sps_ref_pic_list_struct[2][VVC_MAX_REF_PIC_LISTS];
+
+		uint8_t  sps_ref_wraparound_enabled_flag;
+		uint8_t  sps_temporal_mvp_enabled_flag;
+		uint8_t  sps_sbtmvp_enabled_flag;
+		uint8_t  sps_amvr_enabled_flag;
+		uint8_t  sps_bdof_enabled_flag;
+		uint8_t  sps_bdof_control_present_in_ph_flag;
+		uint8_t  sps_smvd_enabled_flag;
+		uint8_t  sps_dmvr_enabled_flag;
+		uint8_t  sps_dmvr_control_present_in_ph_flag;
+		uint8_t  sps_mmvd_enabled_flag;
+		uint8_t  sps_mmvd_fullpel_only_enabled_flag;
+		uint8_t  sps_six_minus_max_num_merge_cand;
+		uint8_t  sps_sbt_enabled_flag;
+		uint8_t  sps_affine_enabled_flag;
+		uint8_t  sps_five_minus_max_num_subblock_merge_cand;
+		uint8_t  sps_6param_affine_enabled_flag;
+		uint8_t  sps_affine_amvr_enabled_flag;
+		uint8_t  sps_affine_prof_enabled_flag;
+		uint8_t  sps_prof_control_present_in_ph_flag;
+		uint8_t  sps_bcw_enabled_flag;
+		uint8_t  sps_ciip_enabled_flag;
+		uint8_t  sps_gpm_enabled_flag;
+		uint8_t  sps_max_num_merge_cand_minus_max_num_gpm_cand;
+		uint8_t  sps_log2_parallel_merge_level_minus2;
+		uint8_t  sps_isp_enabled_flag;
+		uint8_t  sps_mrl_enabled_flag;
+		uint8_t  sps_mip_enabled_flag;
+		uint8_t  sps_cclm_enabled_flag;
+		uint8_t  sps_chroma_horizontal_collocated_flag;
+		uint8_t  sps_chroma_vertical_collocated_flag;
+		uint8_t  sps_palette_enabled_flag;
+		uint8_t  sps_act_enabled_flag;
+		uint8_t  sps_min_qp_prime_ts;
+		uint8_t  sps_ibc_enabled_flag;
+		uint8_t  sps_six_minus_max_num_ibc_merge_cand;
+		uint8_t  sps_ladf_enabled_flag;
+		uint8_t  sps_num_ladf_intervals_minus2;
+		int8_t   sps_ladf_lowest_interval_qp_offset;
+		int8_t   sps_ladf_qp_offset[4];
+		uint16_t sps_ladf_delta_threshold_minus1[4];
+
+		uint8_t  sps_explicit_scaling_list_enabled_flag;
+		uint8_t  sps_scaling_matrix_for_lfnst_disabled_flag;
+		uint8_t  sps_scaling_matrix_for_alternative_colour_space_disabled_flag;
+		uint8_t  sps_scaling_matrix_designated_colour_space_flag;
+		uint8_t  sps_dep_quant_enabled_flag;
+		uint8_t  sps_sign_data_hiding_enabled_flag;
+
+		uint8_t  sps_virtual_boundaries_enabled_flag;
+		uint8_t  sps_virtual_boundaries_present_flag;
+		uint8_t  sps_num_ver_virtual_boundaries;
+		uint16_t sps_virtual_boundary_pos_x_minus1[3];
+		uint8_t  sps_num_hor_virtual_boundaries;
+		uint16_t sps_virtual_boundary_pos_y_minus1[3];
+
+		uint8_t  sps_timing_hrd_params_present_flag;
+		uint8_t  sps_sublayer_cpb_params_present_flag;
+		H266RawGeneralTimingHrdParameters sps_general_timing_hrd_parameters;
+		H266RawOlsTimingHrdParameters sps_ols_timing_hrd_parameters;
+
+		uint8_t  sps_field_seq_flag;
+		uint8_t  sps_vui_parameters_present_flag;
+		uint16_t sps_vui_payload_size_minus1;
+		H266RawVUI vui;
+
+		uint8_t  sps_extension_flag;
+
+		uint8_t  sps_range_extension_flag;
+		uint8_t  sps_extension_7bits;
+
+		uint8_t  sps_extended_precision_flag;
+		uint8_t  sps_ts_residual_coding_rice_present_in_sh_flag;
+		uint8_t  sps_rrc_rice_extension_flag;
+		uint8_t  sps_persistent_rice_adaptation_enabled_flag;
+		uint8_t  sps_reverse_last_sig_coeff_enabled_flag;
+	};
+
+	struct H266RawPPS {
+		H266RawNALUnitHeader nal_unit_header;
+
+		uint8_t  pps_pic_parameter_set_id;
+		uint8_t  pps_seq_parameter_set_id;
+		uint8_t  pps_mixed_nalu_types_in_pic_flag;
+		uint16_t pps_pic_width_in_luma_samples;
+		uint16_t pps_pic_height_in_luma_samples;
+
+		uint8_t  pps_conformance_window_flag;
+		uint16_t pps_conf_win_left_offset;
+		uint16_t pps_conf_win_right_offset;
+		uint16_t pps_conf_win_top_offset;
+		uint16_t pps_conf_win_bottom_offset;
+
+		uint8_t  pps_scaling_window_explicit_signalling_flag;
+		int16_t  pps_scaling_win_left_offset;
+		int16_t  pps_scaling_win_right_offset;
+		int16_t  pps_scaling_win_top_offset;
+		int16_t  pps_scaling_win_bottom_offset;
+
+		uint8_t  pps_output_flag_present_flag;
+		uint8_t  pps_no_pic_partition_flag;
+
+		uint8_t  pps_subpic_id_mapping_present_flag;
+		uint16_t pps_num_subpics_minus1;
+		uint8_t  pps_subpic_id_len_minus1;
+		uint16_t pps_subpic_id[VVC_MAX_SLICES];
+
+		uint8_t  pps_log2_ctu_size_minus5;
+		uint8_t  pps_num_exp_tile_columns_minus1;
+		uint8_t  pps_num_exp_tile_rows_minus1;
+		uint16_t pps_tile_column_width_minus1[VVC_MAX_TILE_COLUMNS];
+		uint16_t pps_tile_row_height_minus1[VVC_MAX_TILE_ROWS];
+
+		uint8_t  pps_loop_filter_across_tiles_enabled_flag;
+		uint8_t  pps_rect_slice_flag;
+		uint8_t  pps_single_slice_per_subpic_flag;
+
+		uint16_t pps_num_slices_in_pic_minus1;
+		uint8_t  pps_tile_idx_delta_present_flag;
+		uint16_t pps_slice_width_in_tiles_minus1[VVC_MAX_SLICES];
+		uint16_t pps_slice_height_in_tiles_minus1[VVC_MAX_SLICES];
+		uint16_t pps_num_exp_slices_in_tile[VVC_MAX_SLICES];
+		uint16_t pps_exp_slice_height_in_ctus_minus1[VVC_MAX_SLICES][VVC_MAX_TILE_ROWS];
+		int16_t  pps_tile_idx_delta_val[VVC_MAX_SLICES];
+
+		uint8_t  pps_loop_filter_across_slices_enabled_flag;
+		uint8_t  pps_cabac_init_present_flag;
+		uint8_t  pps_num_ref_idx_default_active_minus1[2];
+		uint8_t  pps_rpl1_idx_present_flag;
+		uint8_t  pps_weighted_pred_flag;
+		uint8_t  pps_weighted_bipred_flag;
+		uint8_t  pps_ref_wraparound_enabled_flag;
+		uint16_t pps_pic_width_minus_wraparound_offset;
+		int8_t   pps_init_qp_minus26;
+		uint8_t  pps_cu_qp_delta_enabled_flag;
+		uint8_t  pps_chroma_tool_offsets_present_flag;
+		int8_t   pps_cb_qp_offset;
+		int8_t   pps_cr_qp_offset;
+		uint8_t  pps_joint_cbcr_qp_offset_present_flag;
+		int8_t   pps_joint_cbcr_qp_offset_value;
+		uint8_t  pps_slice_chroma_qp_offsets_present_flag;
+		uint8_t  pps_cu_chroma_qp_offset_list_enabled_flag;
+		uint8_t  pps_chroma_qp_offset_list_len_minus1;
+		int8_t   pps_cb_qp_offset_list[6];
+		int8_t   pps_cr_qp_offset_list[6];
+		int8_t   pps_joint_cbcr_qp_offset_list[6];
+		uint8_t  pps_deblocking_filter_control_present_flag;
+		uint8_t  pps_deblocking_filter_override_enabled_flag;
+		uint8_t  pps_deblocking_filter_disabled_flag;
+		uint8_t  pps_dbf_info_in_ph_flag;
+
+		int8_t   pps_luma_beta_offset_div2;
+		int8_t   pps_luma_tc_offset_div2;
+		int8_t   pps_cb_beta_offset_div2;
+		int8_t   pps_cb_tc_offset_div2;
+		int8_t   pps_cr_beta_offset_div2;
+		int8_t   pps_cr_tc_offset_div2;
+
+		uint8_t  pps_rpl_info_in_ph_flag;
+		uint8_t  pps_sao_info_in_ph_flag;
+		uint8_t  pps_alf_info_in_ph_flag;
+		uint8_t  pps_wp_info_in_ph_flag;
+		uint8_t  pps_qp_delta_info_in_ph_flag;
+
+		uint8_t  pps_picture_header_extension_present_flag;
+		uint8_t  pps_slice_header_extension_present_flag;
+		uint8_t  pps_extension_flag;
+
+		//calculated value;
+		uint16_t num_tile_columns;
+		uint16_t num_tile_rows;
+		uint16_t num_tiles_in_pic;
+		uint16_t slice_height_in_ctus[VVC_MAX_SLICES];
+		uint16_t num_slices_in_subpic[VVC_MAX_SLICES];
+		uint16_t sub_pic_id_val[VVC_MAX_SLICES];
+		uint16_t col_width_val[VVC_MAX_TILE_COLUMNS];
+		uint16_t row_height_val[VVC_MAX_TILE_ROWS];
+	};
+
+#define bit_position(gb) (gb.GetBitsPos())
+#define byte_alignment(gb) (gb.GetBitsPos() % 8)
+#define CHECK(call) \
+	{ \
+		auto ret = (call); \
+		if (!ret) return false; \
+	}
+#define ub(width, name) \
+	{ \
+		current->name = gb.BitRead(width); \
+	}
+#define u(width, name, range_min, range_max) \
+	{ \
+		current->name = gb.BitRead(width); \
+		if (current->name < (range_min) || current->name > (range_max)) return false; \
+	}
+#define ue(name, range_min, range_max) \
+	{ \
+		current->name = gb.UExpGolombRead(); \
+		if (current->name < (range_min) || current->name > (range_max)) return false; \
+	}
+#define ses(name, range_min, range_max, ...) \
+	{ \
+		current->name = gb.SExpGolombRead(); \
+		if (current->name < (range_min) || current->name > (range_max)) return false; \
+	}
+#define se(name, range_min, range_max) \
+	{ \
+		current->name = gb.SExpGolombRead(); \
+		if (current->name < (range_min) || current->name > (range_max)) return false; \
+	}
+#define ues(name, range_min, range_max, ...) \
+		ue(name, range_min, range_max)
+#define ubs(width, name, range_min, range_max) \
+		u(width, name, range_min, range_max)
+#define flag(name) \
+	{ \
+		current->name = gb.BitRead(1); \
+	}
+#define flags(name, ...) \
+        u(1, name, 0, 1)
+#define fixed(width, name, value) \
+	{ \
+		uint32_t name = gb.BitRead(width); \
+		if (name > (value)) return false; \
+	}
+#define infer(name, value) \
+	{ \
+		current->name = value; \
+	}
+
+#define AV_CEIL_RSHIFT(a,b) (-((-(a)) >> (b)))
+#define MAX_UINT_BITS(length) ((UINT64_C(1) << (length)) - 1)
+
+	static const int av_ceil_log2(int x)
+	{
+		return log2((x - 1U) << 1);
+	}
+
+	static bool general_constraints_info(CGolombBuffer& gb, H266GeneralConstraintsInfo* current)
+	{
+		flag(gci_present_flag);
+		if (current->gci_present_flag) {
+			int num_additional_bits_used = 0;
+
+			/* general */
+			flag(gci_intra_only_constraint_flag);
+			flag(gci_all_layers_independent_constraint_flag);
+			flag(gci_one_au_only_constraint_flag);
+
+			/* picture format */
+			u(4, gci_sixteen_minus_max_bitdepth_constraint_idc, 0, 8);
+			ub(2, gci_three_minus_max_chroma_format_constraint_idc);
+
+			/* NAL unit type related */
+			flag(gci_no_mixed_nalu_types_in_pic_constraint_flag);
+			flag(gci_no_trail_constraint_flag);
+			flag(gci_no_stsa_constraint_flag);
+			flag(gci_no_rasl_constraint_flag);
+			flag(gci_no_radl_constraint_flag);
+			flag(gci_no_idr_constraint_flag);
+			flag(gci_no_cra_constraint_flag);
+			flag(gci_no_gdr_constraint_flag);
+			flag(gci_no_aps_constraint_flag);
+			flag(gci_no_idr_rpl_constraint_flag);
+
+			/* tile, slice, subpicture partitioning */
+			flag(gci_one_tile_per_pic_constraint_flag);
+			flag(gci_pic_header_in_slice_header_constraint_flag);
+			flag(gci_one_slice_per_pic_constraint_flag);
+			flag(gci_no_rectangular_slice_constraint_flag);
+			flag(gci_one_slice_per_subpic_constraint_flag);
+			flag(gci_no_subpic_info_constraint_flag);
+
+			/* CTU and block partitioning */
+			ub(2, gci_three_minus_max_log2_ctu_size_constraint_idc);
+			flag(gci_no_partition_constraints_override_constraint_flag);
+			flag(gci_no_mtt_constraint_flag);
+			flag(gci_no_qtbtt_dual_tree_intra_constraint_flag);
+
+			/* intra */
+			flag(gci_no_palette_constraint_flag);
+			flag(gci_no_ibc_constraint_flag);
+			flag(gci_no_isp_constraint_flag);
+			flag(gci_no_mrl_constraint_flag);
+			flag(gci_no_mip_constraint_flag);
+			flag(gci_no_cclm_constraint_flag);
+
+			/* inter */
+			flag(gci_no_ref_pic_resampling_constraint_flag);
+			flag(gci_no_res_change_in_clvs_constraint_flag);
+			flag(gci_no_weighted_prediction_constraint_flag);
+			flag(gci_no_ref_wraparound_constraint_flag);
+			flag(gci_no_temporal_mvp_constraint_flag);
+			flag(gci_no_sbtmvp_constraint_flag);
+			flag(gci_no_amvr_constraint_flag);
+			flag(gci_no_bdof_constraint_flag);
+			flag(gci_no_smvd_constraint_flag);
+			flag(gci_no_dmvr_constraint_flag);
+			flag(gci_no_mmvd_constraint_flag);
+			flag(gci_no_affine_motion_constraint_flag);
+			flag(gci_no_prof_constraint_flag);
+			flag(gci_no_bcw_constraint_flag);
+			flag(gci_no_ciip_constraint_flag);
+			flag(gci_no_gpm_constraint_flag);
+
+			/* transform, quantization, residual */
+			flag(gci_no_luma_transform_size_64_constraint_flag);
+			flag(gci_no_transform_skip_constraint_flag);
+			flag(gci_no_bdpcm_constraint_flag);
+			flag(gci_no_mts_constraint_flag);
+			flag(gci_no_lfnst_constraint_flag);
+			flag(gci_no_joint_cbcr_constraint_flag);
+			flag(gci_no_sbt_constraint_flag);
+			flag(gci_no_act_constraint_flag);
+			flag(gci_no_explicit_scaling_list_constraint_flag);
+			flag(gci_no_dep_quant_constraint_flag);
+			flag(gci_no_sign_data_hiding_constraint_flag);
+			flag(gci_no_cu_qp_delta_constraint_flag);
+			flag(gci_no_chroma_qp_offset_constraint_flag);
+
+			/* loop filter */
+			flag(gci_no_sao_constraint_flag);
+			flag(gci_no_alf_constraint_flag);
+			flag(gci_no_ccalf_constraint_flag);
+			flag(gci_no_lmcs_constraint_flag);
+			flag(gci_no_ladf_constraint_flag);
+			flag(gci_no_virtual_boundaries_constraint_flag);
+			ub(8, gci_num_additional_bits);
+			if (current->gci_num_additional_bits > 5) {
+				flag(gci_all_rap_pictures_constraint_flag);
+				flag(gci_no_extended_precision_processing_constraint_flag);
+				flag(gci_no_ts_residual_coding_rice_constraint_flag);
+				flag(gci_no_rrc_rice_extension_constraint_flag);
+				flag(gci_no_persistent_rice_adaptation_constraint_flag);
+				flag(gci_no_reverse_last_sig_coeff_constraint_flag);
+				num_additional_bits_used = 6;
+			}
+
+			for (int i = 0; i < current->gci_num_additional_bits - num_additional_bits_used; i++)
+				flags(gci_reserved_bit[i], 1, i);
+		}
+		while (byte_alignment(gb) != 0)
+			fixed(1, gci_alignment_zero_bit, 0);
+
+		return true;
+	}
+
+	static bool profile_tier_level(CGolombBuffer& gb, H266RawProfileTierLevel* current,
+								   int profile_tier_present_flag,
+								   int max_num_sub_layers_minus1)
+	{
+		if (profile_tier_present_flag) {
+			ub(7, general_profile_idc);
+			flag(general_tier_flag);
+		}
+		ub(8, general_level_idc);
+		flag(ptl_frame_only_constraint_flag);
+		flag(ptl_multilayer_enabled_flag);
+		if (profile_tier_present_flag) {
+			CHECK(general_constraints_info(gb,&current->general_constraints_info));
+		}
+		for (int i = max_num_sub_layers_minus1 - 1; i >= 0; i--)
+			flags(ptl_sublayer_level_present_flag[i], 1, i);
+		while (byte_alignment(gb) != 0)
+			flag(ptl_reserved_zero_bit);
+		for (int i = max_num_sub_layers_minus1 - 1; i >= 0; i--)
+			if (current->ptl_sublayer_level_present_flag[i])
+				ubs(8, sublayer_level_idc[i], 1, i);
+		if (profile_tier_present_flag) {
+			ub(8, ptl_num_sub_profiles);
+			for (int i = 0; i < current->ptl_num_sub_profiles; i++)
+				ubs(32, general_sub_profile_idc[i], 1, static_cast<uint32_t>(i));
+		}
+
+		return true;
+	}
+
+	static bool dpb_parameters(CGolombBuffer& gb, H266DpbParameters* current,
+							   uint8_t max_sublayers_minus1,
+							   uint8_t sublayer_info_flag)
+	{
+		for (int i = (sublayer_info_flag ? 0 : max_sublayers_minus1);
+			i <= max_sublayers_minus1; i++) {
+			ues(dpb_max_dec_pic_buffering_minus1[i], 0, VVC_MAX_DPB_SIZE - 1, 1, i);
+			ues(dpb_max_num_reorder_pics[i],
+				0, current->dpb_max_dec_pic_buffering_minus1[i], 1, i);
+			ues(dpb_max_latency_increase_plus1[i], 0, UINT32_MAX - 1, 1, i);
+		}
+
+		return true;
+	}
+
+	static bool ref_pic_list_struct(CGolombBuffer& gb,
+									H266RefPicListStruct* current,
+									uint8_t list_idx, uint8_t rpls_idx,
+									const H266RawSPS* sps)
+	{
+		ue(num_ref_entries, 0, VVC_MAX_REF_ENTRIES);
+		if (sps->sps_long_term_ref_pics_flag &&
+			rpls_idx < sps->sps_num_ref_pic_lists[list_idx] &&
+			current->num_ref_entries > 0)
+			flag(ltrp_in_header_flag);
+		if (sps->sps_long_term_ref_pics_flag &&
+			rpls_idx == sps->sps_num_ref_pic_lists[list_idx])
+			infer(ltrp_in_header_flag, 1);
+		for (int i = 0, j = 0; i < current->num_ref_entries; i++) {
+			if (sps->sps_inter_layer_prediction_enabled_flag) {
+				flags(inter_layer_ref_pic_flag[i], 1, i);
+			}
+			else
+				infer(inter_layer_ref_pic_flag[i], 0);
+
+			if (!current->inter_layer_ref_pic_flag[i]) {
+				if (sps->sps_long_term_ref_pics_flag) {
+					flags(st_ref_pic_flag[i], 1, i);
+				}
+				else
+					infer(st_ref_pic_flag[i], 1);
+				if (current->st_ref_pic_flag[i]) {
+					int abs_delta_poc_st;
+					ues(abs_delta_poc_st[i], 0, MAX_UINT_BITS(15), 1, i);
+					if ((sps->sps_weighted_pred_flag ||
+						 sps->sps_weighted_bipred_flag) && i != 0)
+						abs_delta_poc_st = current->abs_delta_poc_st[i];
+					else
+						abs_delta_poc_st = current->abs_delta_poc_st[i] + 1;
+					if (abs_delta_poc_st > 0)
+						flags(strp_entry_sign_flag[i], 1, i);
+				} else {
+					if (!current->ltrp_in_header_flag) {
+						uint8_t bits = sps->sps_log2_max_pic_order_cnt_lsb_minus4 + 4;
+						ubs(bits, rpls_poc_lsb_lt[j], 1, j);
+						j++;
+					}
+				}
+			} else {
+				ues(ilrp_idx[i], 0, 255, 1, i);
+			}
+		}
+
+		return true;
+	}
+
+	static bool general_timing_hrd_parameters(CGolombBuffer& gb, H266RawGeneralTimingHrdParameters* current)
+	{
+		ub(32, num_units_in_tick);
+		u(32, time_scale, 1, MAX_UINT_BITS(32));
+		flag(general_nal_hrd_params_present_flag);
+		flag(general_vcl_hrd_params_present_flag);
+
+		if (current->general_nal_hrd_params_present_flag ||
+			current->general_vcl_hrd_params_present_flag) {
+			flag(general_same_pic_timing_in_all_ols_flag);
+			flag(general_du_hrd_params_present_flag);
+			if (current->general_du_hrd_params_present_flag)
+				ub(8, tick_divisor_minus2);
+			ub(4, bit_rate_scale);
+			ub(4, cpb_size_scale);
+			if (current->general_du_hrd_params_present_flag)
+				ub(4, cpb_size_du_scale);
+			ue(hrd_cpb_cnt_minus1, 0, 31);
+		} else {
+			//infer general_same_pic_timing_in_all_ols_flag?
+			infer(general_du_hrd_params_present_flag, 0);
+		}
+
+		return true;
+	}
+
+	static bool sublayer_hrd_parameters(CGolombBuffer& gb, H266RawSubLayerHRDParameters* current,
+										int sublayer_id,
+										const H266RawGeneralTimingHrdParameters* general)
+	{
+		for (int i = 0; i <= general->hrd_cpb_cnt_minus1; i++) {
+			ues(bit_rate_value_minus1[sublayer_id][i], 0, UINT32_MAX - 1, 2,
+				sublayer_id, i);
+			ues(cpb_size_value_minus1[sublayer_id][i], 0, UINT32_MAX - 1, 2,
+				sublayer_id, i);
+			if (general->general_du_hrd_params_present_flag) {
+				ues(cpb_size_du_value_minus1[sublayer_id][i],
+					0, UINT32_MAX - 1, 2, sublayer_id, i);
+				ues(bit_rate_du_value_minus1[sublayer_id][i],
+					0, UINT32_MAX - 1, 2, sublayer_id, i);
+			}
+			flags(cbr_flag[sublayer_id][i], 2, sublayer_id, i);
+		}
+
+		return true;
+	}
+
+
+	static bool ols_timing_hrd_parameters(CGolombBuffer& gb, H266RawOlsTimingHrdParameters* current,
+										  uint8_t first_sublayer, uint8_t max_sublayers_minus1,
+										  const H266RawGeneralTimingHrdParameters* general)
+	{
+		for (int i = first_sublayer; i <= max_sublayers_minus1; i++) {
+			flags(fixed_pic_rate_general_flag[i], 1, i);
+			if (!current->fixed_pic_rate_general_flag[i]) {
+				flags(fixed_pic_rate_within_cvs_flag[i], 1, i);
+			}
+			else
+				infer(fixed_pic_rate_within_cvs_flag[i], 1);
+			if (current->fixed_pic_rate_within_cvs_flag[i]) {
+				ues(elemental_duration_in_tc_minus1[i], 0, 2047, 1, i);
+				infer(low_delay_hrd_flag[i], 0);
+			} else if ((general->general_nal_hrd_params_present_flag ||
+						general->general_vcl_hrd_params_present_flag) &&
+					   general->hrd_cpb_cnt_minus1 == 0) {
+				flags(low_delay_hrd_flag[i], 1, i);
+			} else {
+				infer(low_delay_hrd_flag[i], 0);
+			}
+			if (general->general_nal_hrd_params_present_flag)
+				CHECK(sublayer_hrd_parameters(gb,
+											  &current->nal_sub_layer_hrd_parameters,
+											  i, general));
+			if (general->general_vcl_hrd_params_present_flag)
+				CHECK(sublayer_hrd_parameters(gb,
+											  &current->nal_sub_layer_hrd_parameters,
+											  i, general));
+		}
+
+		return true;
+	}
+
+	static bool vui_parameters_default(H266RawVUI* current)
+	{
+		//defined in D.8
+		infer(vui_progressive_source_flag, 0);
+		infer(vui_interlaced_source_flag, 0);
+
+		infer(vui_non_packed_constraint_flag, 0);
+		infer(vui_non_projected_constraint_flag, 0);
+
+		infer(vui_aspect_ratio_constant_flag, 0);
+		infer(vui_aspect_ratio_idc, 0);
+
+		infer(vui_overscan_info_present_flag, 0);
+
+		infer(vui_colour_primaries, 2);
+		infer(vui_transfer_characteristics, 2);
+		infer(vui_matrix_coeffs, 2);
+		infer(vui_full_range_flag, 0);
+
+		infer(vui_chroma_sample_loc_type_frame, 6);
+		infer(vui_chroma_sample_loc_type_top_field, 6);
+		infer(vui_chroma_sample_loc_type_bottom_field, 6);
+
+		return true;
+	}
+
+	static bool vui_parameters(CGolombBuffer& gb,
+							   H266RawVUI* current,
+							   uint8_t chroma_format_idc)
+	{
+		flag(vui_progressive_source_flag);
+		flag(vui_interlaced_source_flag);
+		flag(vui_non_packed_constraint_flag);
+		flag(vui_non_projected_constraint_flag);
+		flag(vui_aspect_ratio_info_present_flag);
+		if (current->vui_aspect_ratio_info_present_flag) {
+			flag(vui_aspect_ratio_constant_flag);
+			ub(8, vui_aspect_ratio_idc);
+			if (current->vui_aspect_ratio_idc == 255) {
+				ub(16, vui_sar_width);
+				ub(16, vui_sar_height);
+			}
+		} else {
+			infer(vui_aspect_ratio_constant_flag, 0);
+			infer(vui_aspect_ratio_idc, 0);
+		}
+		flag(vui_overscan_info_present_flag);
+		if (current->vui_overscan_info_present_flag)
+			flag(vui_overscan_appropriate_flag);
+		flag(vui_colour_description_present_flag);
+		if (current->vui_colour_description_present_flag) {
+			ub(8, vui_colour_primaries);
+			ub(8, vui_transfer_characteristics);
+			ub(8, vui_matrix_coeffs);
+			flag(vui_full_range_flag);
+		} else {
+			infer(vui_colour_primaries, 2);
+			infer(vui_transfer_characteristics, 2);
+			infer(vui_matrix_coeffs, 2);
+			infer(vui_full_range_flag, 0);
+		}
+		flag(vui_chroma_loc_info_present_flag);
+		if (chroma_format_idc != 1 && current->vui_chroma_loc_info_present_flag) {
+			return false;
+		}
+		if (current->vui_chroma_loc_info_present_flag) {
+			if (current->vui_progressive_source_flag &&
+				!current->vui_interlaced_source_flag) {
+				ue(vui_chroma_sample_loc_type_frame, 0, 6);
+			} else {
+				ue(vui_chroma_sample_loc_type_top_field, 0, 6);
+				ue(vui_chroma_sample_loc_type_bottom_field, 0, 6);
+			}
+		} else {
+			if (chroma_format_idc == 1) {
+				infer(vui_chroma_sample_loc_type_frame, 6);
+				infer(vui_chroma_sample_loc_type_top_field,
+					  current->vui_chroma_sample_loc_type_frame);
+				infer(vui_chroma_sample_loc_type_bottom_field,
+					  current->vui_chroma_sample_loc_type_frame);
+			}
+		}
+
+		return true;
+	}
+
+	static bool vui_payload(CGolombBuffer& gb,
+							H266RawVUI* current, uint16_t vui_payload_size,
+							uint8_t chroma_format_idc)
+	{
+		CHECK(vui_parameters(gb, current, chroma_format_idc));
+
+		return true;
+	}
+
+	static bool sps_range_extension(CGolombBuffer& gb,
+									H266RawSPS* current)
+	{
+		flag(sps_extended_precision_flag);
+		if (current->sps_transform_skip_enabled_flag) {
+			flag(sps_ts_residual_coding_rice_present_in_sh_flag);
+		}
+		else
+			infer(sps_ts_residual_coding_rice_present_in_sh_flag, 0);
+		flag(sps_rrc_rice_extension_flag);
+		flag(sps_persistent_rice_adaptation_enabled_flag);
+		flag(sps_reverse_last_sig_coeff_enabled_flag);
+
+		return 0;
+	}
+
+	bool ParseSequenceParameterSet(const BYTE* data, const int size, vc_params_vvc_t& params)
+	{
+		static const uint8_t h266_sub_width_c[] = {
+			1, 2, 2, 1
+		};
+		static const uint8_t h266_sub_height_c[] = {
+			1, 2, 1, 1
+		};
+
+		CGolombBuffer gb(data, size, true);
+		auto rawSPS = std::make_unique<H266RawSPS>();
+		auto current = rawSPS.get();
+
+		ub(4, sps_seq_parameter_set_id);
+		ub(4, sps_video_parameter_set_id);
+
+		u(3, sps_max_sublayers_minus1, 0, VVC_MAX_SUBLAYERS - 1);
+		u(2, sps_chroma_format_idc, 0, 3);
+		u(2, sps_log2_ctu_size_minus5, 0, 3);
+		uint32_t ctb_log2_size_y = current->sps_log2_ctu_size_minus5 + 5;
+		uint32_t ctb_size_y = 1 << ctb_log2_size_y;
+
+		flag(sps_ptl_dpb_hrd_params_present_flag);
+		if (current->sps_ptl_dpb_hrd_params_present_flag) {
+			CHECK(profile_tier_level(gb, &current->profile_tier_level,
+									 1, current->sps_max_sublayers_minus1));
+		}
+
+		flag(sps_gdr_enabled_flag);
+		flag(sps_ref_pic_resampling_enabled_flag);
+		if (current->sps_ref_pic_resampling_enabled_flag)
+			flag(sps_res_change_in_clvs_allowed_flag);
+
+		ue(sps_pic_width_max_in_luma_samples, 1, VVC_MAX_WIDTH);
+		ue(sps_pic_height_max_in_luma_samples, 1, VVC_MAX_HEIGHT);
+
+		flag(sps_conformance_window_flag);
+		if (current->sps_conformance_window_flag) {
+			uint8_t sub_width_c = h266_sub_width_c[current->sps_chroma_format_idc];
+			uint8_t sub_height_c = h266_sub_height_c[current->sps_chroma_format_idc];
+			uint16_t width = current->sps_pic_width_max_in_luma_samples / sub_width_c;
+			uint16_t height = current->sps_pic_height_max_in_luma_samples / sub_height_c;
+			ue(sps_conf_win_left_offset, 0, width);
+			ue(sps_conf_win_right_offset, 0, width - current->sps_conf_win_left_offset);
+			ue(sps_conf_win_top_offset, 0, height);
+			ue(sps_conf_win_bottom_offset, 0, height - current->sps_conf_win_top_offset);
+		}
+
+		uint32_t tmp_width_val = AV_CEIL_RSHIFT(current->sps_pic_width_max_in_luma_samples,
+												ctb_log2_size_y);
+		uint32_t tmp_height_val = AV_CEIL_RSHIFT(current->sps_pic_height_max_in_luma_samples,
+												 ctb_log2_size_y);
+
+		flag(sps_subpic_info_present_flag);
+		if (current->sps_subpic_info_present_flag) {
+			ue(sps_num_subpics_minus1, 1, VVC_MAX_SLICES - 1);
+			if (current->sps_num_subpics_minus1 > 0) {
+				flag(sps_independent_subpics_flag);
+				flag(sps_subpic_same_size_flag);
+			}
+
+			if (current->sps_num_subpics_minus1 > 0) {
+				int wlen = av_ceil_log2(tmp_width_val);
+				int hlen = av_ceil_log2(tmp_height_val);
+				infer(sps_subpic_ctu_top_left_x[0], 0);
+				infer(sps_subpic_ctu_top_left_y[0], 0);
+				if (current->sps_pic_width_max_in_luma_samples > ctb_size_y) {
+					ubs(wlen, sps_subpic_width_minus1[0], 1, 0);
+				}
+				else
+					infer(sps_subpic_width_minus1[0], tmp_width_val - 1);
+				if (current->sps_pic_height_max_in_luma_samples > ctb_size_y) {
+					ubs(hlen, sps_subpic_height_minus1[0], 1, 0);
+				}
+				else
+					infer(sps_subpic_height_minus1[0], tmp_height_val - 1);
+				if (!current->sps_independent_subpics_flag) {
+					flags(sps_subpic_treated_as_pic_flag[0], 1, 0);
+					flags(sps_loop_filter_across_subpic_enabled_flag[0], 1, 0);
+				} else {
+					infer(sps_subpic_treated_as_pic_flag[0], 1);
+					infer(sps_loop_filter_across_subpic_enabled_flag[0], 1);
+				}
+				for (int i = 1; i <= current->sps_num_subpics_minus1; i++) {
+					if (!current->sps_subpic_same_size_flag) {
+						if (current->sps_pic_width_max_in_luma_samples > ctb_size_y) {
+							ubs(wlen, sps_subpic_ctu_top_left_x[i], 1, i);
+						}
+						else
+							infer(sps_subpic_ctu_top_left_x[i], 0);
+						if (current->sps_pic_height_max_in_luma_samples >
+							ctb_size_y) {
+							ubs(hlen, sps_subpic_ctu_top_left_y[i], 1, i);
+						}
+						else
+							infer(sps_subpic_ctu_top_left_y[i], 0);
+						if (i < current->sps_num_subpics_minus1 &&
+							current->sps_pic_width_max_in_luma_samples >
+							ctb_size_y) {
+							ubs(wlen, sps_subpic_width_minus1[i], 1, i);
+						} else {
+							infer(sps_subpic_width_minus1[i],
+								  tmp_width_val -
+								  current->sps_subpic_ctu_top_left_x[i] - 1);
+						}
+						if (i < current->sps_num_subpics_minus1 &&
+							current->sps_pic_height_max_in_luma_samples >
+							ctb_size_y) {
+							ubs(hlen, sps_subpic_height_minus1[i], 1, i);
+						} else {
+							infer(sps_subpic_height_minus1[i],
+								  tmp_height_val -
+								  current->sps_subpic_ctu_top_left_y[i] - 1);
+						}
+					} else {
+						int num_subpic_cols = tmp_width_val /
+							(current->sps_subpic_width_minus1[0] + 1);
+						if (tmp_width_val % (current->sps_subpic_width_minus1[0] + 1) ||
+							tmp_height_val % (current->sps_subpic_width_minus1[0] + 1) ||
+							current->sps_num_subpics_minus1 !=
+							(num_subpic_cols * tmp_height_val /
+							 (current->sps_subpic_height_minus1[0] + 1) - 1))
+							return false;
+						infer(sps_subpic_ctu_top_left_x[i],
+							  (i % num_subpic_cols) *
+							  (current->sps_subpic_width_minus1[0] + 1));
+						infer(sps_subpic_ctu_top_left_y[i],
+							  (i / num_subpic_cols) *
+							  (current->sps_subpic_height_minus1[0] + 1));
+						infer(sps_subpic_width_minus1[i],
+							  current->sps_subpic_width_minus1[0]);
+						infer(sps_subpic_height_minus1[i],
+							  current->sps_subpic_height_minus1[0]);
+					}
+					if (!current->sps_independent_subpics_flag) {
+						flags(sps_subpic_treated_as_pic_flag[i], 1, i);
+						flags(sps_loop_filter_across_subpic_enabled_flag[i], 1, i);
+					} else {
+						infer(sps_subpic_treated_as_pic_flag[i], 1);
+						infer(sps_loop_filter_across_subpic_enabled_flag[i], 0);
+					}
+				}
+				ue(sps_subpic_id_len_minus1, 0, 15);
+				if ((1 << (current->sps_subpic_id_len_minus1 + 1)) <
+					current->sps_num_subpics_minus1 + 1) {
+					return false;
+				}
+				flag(sps_subpic_id_mapping_explicitly_signalled_flag);
+				if (current->sps_subpic_id_mapping_explicitly_signalled_flag) {
+					flag(sps_subpic_id_mapping_present_flag);
+					if (current->sps_subpic_id_mapping_present_flag) {
+						for (int i = 0; i <= current->sps_num_subpics_minus1; i++) {
+							ubs(current->sps_subpic_id_len_minus1 + 1,
+								sps_subpic_id[i], 1, static_cast<uint32_t>(i));
+						}
+					}
+				}
+			} else {
+				infer(sps_subpic_ctu_top_left_x[0], 0);
+				infer(sps_subpic_ctu_top_left_y[0], 0);
+				infer(sps_subpic_width_minus1[0], tmp_width_val - 1);
+				infer(sps_subpic_height_minus1[0], tmp_height_val - 1);
+			}
+		} else {
+			infer(sps_num_subpics_minus1, 0);
+			infer(sps_independent_subpics_flag, 1);
+			infer(sps_subpic_same_size_flag, 0);
+			infer(sps_subpic_id_mapping_explicitly_signalled_flag, 0);
+			infer(sps_subpic_ctu_top_left_x[0], 0);
+			infer(sps_subpic_ctu_top_left_y[0], 0);
+			infer(sps_subpic_width_minus1[0], tmp_width_val - 1);
+			infer(sps_subpic_height_minus1[0], tmp_height_val - 1);
+		}
+
+		ue(sps_bitdepth_minus8, 0, 8);
+		uint8_t qp_bd_offset = 6 * current->sps_bitdepth_minus8;
+
+		flag(sps_entropy_coding_sync_enabled_flag);
+		flag(sps_entry_point_offsets_present_flag);
+
+		u(4, sps_log2_max_pic_order_cnt_lsb_minus4, 0, 12);
+		flag(sps_poc_msb_cycle_flag);
+		if (current->sps_poc_msb_cycle_flag)
+			ue(sps_poc_msb_cycle_len_minus1,
+			   0, 32 - current->sps_log2_max_pic_order_cnt_lsb_minus4 - 5);
+
+		u(2, sps_num_extra_ph_bytes, 0, 2);
+		for (int i = 0; i < (current->sps_num_extra_ph_bytes * 8); i++) {
+			flags(sps_extra_ph_bit_present_flag[i], 1, i);
+		}
+
+		u(2, sps_num_extra_sh_bytes, 0, 2);
+		for (int i = 0; i < (current->sps_num_extra_sh_bytes * 8); i++) {
+			flags(sps_extra_sh_bit_present_flag[i], 1, i);
+		}
+
+		if (current->sps_ptl_dpb_hrd_params_present_flag) {
+			if (current->sps_max_sublayers_minus1 > 0) {
+				flag(sps_sublayer_dpb_params_flag);
+			}
+			else
+				infer(sps_sublayer_dpb_params_flag, 0);
+			CHECK(dpb_parameters(gb, &current->sps_dpb_params,
+								 current->sps_max_sublayers_minus1,
+								 current->sps_sublayer_dpb_params_flag));
+		}
+
+		ue(sps_log2_min_luma_coding_block_size_minus2,
+		   0, std::min(4, current->sps_log2_ctu_size_minus5 + 3));
+		uint32_t min_cb_log2_size_y =
+			current->sps_log2_min_luma_coding_block_size_minus2 + 2;
+
+		flag(sps_partition_constraints_override_enabled_flag);
+
+		ue(sps_log2_diff_min_qt_min_cb_intra_slice_luma,
+		   0, std::min(6u, ctb_log2_size_y) - min_cb_log2_size_y);
+		uint32_t min_qt_log2_size_intra_y =
+			current->sps_log2_diff_min_qt_min_cb_intra_slice_luma +
+			min_cb_log2_size_y;
+
+		ue(sps_max_mtt_hierarchy_depth_intra_slice_luma,
+		   0, 2 * (ctb_log2_size_y - min_cb_log2_size_y));
+
+		if (current->sps_max_mtt_hierarchy_depth_intra_slice_luma != 0) {
+			ue(sps_log2_diff_max_bt_min_qt_intra_slice_luma,
+			   0, ctb_log2_size_y - min_qt_log2_size_intra_y);
+			ue(sps_log2_diff_max_tt_min_qt_intra_slice_luma,
+			   0, std::min(6u, ctb_log2_size_y) - min_qt_log2_size_intra_y);
+		} else {
+			infer(sps_log2_diff_max_bt_min_qt_intra_slice_luma, 0);
+			infer(sps_log2_diff_max_tt_min_qt_intra_slice_luma, 0);
+		}
+
+		if (current->sps_chroma_format_idc != 0) {
+			flag(sps_qtbtt_dual_tree_intra_flag);
+		} else {
+			infer(sps_qtbtt_dual_tree_intra_flag, 0);
+		}
+
+		if (current->sps_qtbtt_dual_tree_intra_flag) {
+			ue(sps_log2_diff_min_qt_min_cb_intra_slice_chroma,
+			   0, std::min(6u, ctb_log2_size_y) - min_cb_log2_size_y);
+			ue(sps_max_mtt_hierarchy_depth_intra_slice_chroma,
+			   0, 2 * (ctb_log2_size_y - min_cb_log2_size_y));
+			if (current->sps_max_mtt_hierarchy_depth_intra_slice_chroma != 0) {
+				unsigned int min_qt_log2_size_intra_c =
+					current->sps_log2_diff_min_qt_min_cb_intra_slice_chroma +
+					min_cb_log2_size_y;
+				ue(sps_log2_diff_max_bt_min_qt_intra_slice_chroma,
+				   0, std::min(6u, ctb_log2_size_y) - min_qt_log2_size_intra_c);
+				ue(sps_log2_diff_max_tt_min_qt_intra_slice_chroma,
+				   0, std::min(6u, ctb_log2_size_y) - min_qt_log2_size_intra_c);
+			}
+		} else {
+			infer(sps_log2_diff_min_qt_min_cb_intra_slice_chroma, 0);
+			infer(sps_max_mtt_hierarchy_depth_intra_slice_chroma, 0);
+		}
+		if (current->sps_max_mtt_hierarchy_depth_intra_slice_chroma == 0) {
+			infer(sps_log2_diff_max_bt_min_qt_intra_slice_chroma, 0);
+			infer(sps_log2_diff_max_tt_min_qt_intra_slice_chroma, 0);
+		}
+
+		ue(sps_log2_diff_min_qt_min_cb_inter_slice,
+		   0, std::min(6u, ctb_log2_size_y) - min_cb_log2_size_y);
+		uint32_t min_qt_log2_size_inter_y =
+			current->sps_log2_diff_min_qt_min_cb_inter_slice + min_cb_log2_size_y;
+
+		ue(sps_max_mtt_hierarchy_depth_inter_slice,
+		   0, 2 * (ctb_log2_size_y - min_cb_log2_size_y));
+		if (current->sps_max_mtt_hierarchy_depth_inter_slice != 0) {
+			ue(sps_log2_diff_max_bt_min_qt_inter_slice,
+			   0, ctb_log2_size_y - min_qt_log2_size_inter_y);
+			ue(sps_log2_diff_max_tt_min_qt_inter_slice,
+			   0, std::min(6u, ctb_log2_size_y) - min_qt_log2_size_inter_y);
+		} else {
+			infer(sps_log2_diff_max_bt_min_qt_inter_slice, 0);
+			infer(sps_log2_diff_max_tt_min_qt_inter_slice, 0);
+		}
+
+		if (ctb_size_y > 32) {
+			flag(sps_max_luma_transform_size_64_flag);
+		}
+		else
+			infer(sps_max_luma_transform_size_64_flag, 0);
+
+		flag(sps_transform_skip_enabled_flag);
+		if (current->sps_transform_skip_enabled_flag) {
+			ue(sps_log2_transform_skip_max_size_minus2, 0, 3);
+			flag(sps_bdpcm_enabled_flag);
+		}
+
+		flag(sps_mts_enabled_flag);
+		if (current->sps_mts_enabled_flag) {
+			flag(sps_explicit_mts_intra_enabled_flag);
+			flag(sps_explicit_mts_inter_enabled_flag);
+		} else {
+			infer(sps_explicit_mts_intra_enabled_flag, 0);
+			infer(sps_explicit_mts_inter_enabled_flag, 0);
+		}
+
+		flag(sps_lfnst_enabled_flag);
+
+		if (current->sps_chroma_format_idc != 0) {
+			uint8_t num_qp_tables;
+			flag(sps_joint_cbcr_enabled_flag);
+			flag(sps_same_qp_table_for_chroma_flag);
+			num_qp_tables = current->sps_same_qp_table_for_chroma_flag ?
+				1 : (current->sps_joint_cbcr_enabled_flag ? 3 : 2);
+			for (int i = 0; i < num_qp_tables; i++) {
+				ses(sps_qp_table_start_minus26[i], -26 - qp_bd_offset, 36, 1, i);
+				ues(sps_num_points_in_qp_table_minus1[i],
+					0, 36 - current->sps_qp_table_start_minus26[i], 1, i);
+				for (int j = 0; j <= current->sps_num_points_in_qp_table_minus1[i]; j++) {
+					uint8_t max = MAX_UINT_BITS(8);
+					ues(sps_delta_qp_in_val_minus1[i][j], 0, max, 2, i, j);
+					ues(sps_delta_qp_diff_val[i][j], 0, max, 2, i, j);
+				}
+			}
+		} else {
+			infer(sps_joint_cbcr_enabled_flag, 0);
+			infer(sps_same_qp_table_for_chroma_flag, 0);
+		}
+
+		flag(sps_sao_enabled_flag);
+		flag(sps_alf_enabled_flag);
+		if (current->sps_alf_enabled_flag && current->sps_chroma_format_idc) {
+			flag(sps_ccalf_enabled_flag);
+		}
+		else
+			infer(sps_ccalf_enabled_flag, 0);
+		flag(sps_lmcs_enabled_flag);
+		flag(sps_weighted_pred_flag);
+		flag(sps_weighted_bipred_flag);
+		flag(sps_long_term_ref_pics_flag);
+		if (current->sps_video_parameter_set_id > 0) {
+			flag(sps_inter_layer_prediction_enabled_flag);
+		}
+		else
+			infer(sps_inter_layer_prediction_enabled_flag, 0);
+		flag(sps_idr_rpl_present_flag);
+		flag(sps_rpl1_same_as_rpl0_flag);
+
+		for (int i = 0; i < (current->sps_rpl1_same_as_rpl0_flag ? 1 : 2); i++) {
+			ues(sps_num_ref_pic_lists[i], 0, VVC_MAX_REF_PIC_LISTS, 1, i);
+			for (int j = 0; j < current->sps_num_ref_pic_lists[i]; j++)
+				CHECK(ref_pic_list_struct(gb, &current->sps_ref_pic_list_struct[i][j], i,
+										  j, current));
+		}
+
+		if (current->sps_rpl1_same_as_rpl0_flag) {
+			current->sps_num_ref_pic_lists[1] = current->sps_num_ref_pic_lists[0];
+			for (int j = 0; j < current->sps_num_ref_pic_lists[0]; j++)
+				memcpy(&current->sps_ref_pic_list_struct[1][j],
+					   &current->sps_ref_pic_list_struct[0][j],
+					   sizeof(current->sps_ref_pic_list_struct[0][j]));
+		}
+
+		flag(sps_ref_wraparound_enabled_flag);
+
+		flag(sps_temporal_mvp_enabled_flag);
+		if (current->sps_temporal_mvp_enabled_flag) {
+			flag(sps_sbtmvp_enabled_flag);
+		}
+		else
+			infer(sps_sbtmvp_enabled_flag, 0);
+
+		flag(sps_amvr_enabled_flag);
+		flag(sps_bdof_enabled_flag);
+		if (current->sps_bdof_enabled_flag) {
+			flag(sps_bdof_control_present_in_ph_flag);
+		}
+		else
+			infer(sps_bdof_control_present_in_ph_flag, 0);
+
+		flag(sps_smvd_enabled_flag);
+		flag(sps_dmvr_enabled_flag);
+		if (current->sps_dmvr_enabled_flag) {
+			flag(sps_dmvr_control_present_in_ph_flag);
+		}
+		else
+			infer(sps_dmvr_control_present_in_ph_flag, 0);
+
+		flag(sps_mmvd_enabled_flag);
+		if (current->sps_mmvd_enabled_flag) {
+			flag(sps_mmvd_fullpel_only_enabled_flag);
+		}
+		else
+			infer(sps_mmvd_fullpel_only_enabled_flag, 0);
+
+		ue(sps_six_minus_max_num_merge_cand, 0, 5);
+		uint32_t max_num_merge_cand = 6 - current->sps_six_minus_max_num_merge_cand;
+
+		flag(sps_sbt_enabled_flag);
+
+		flag(sps_affine_enabled_flag);
+		if (current->sps_affine_enabled_flag) {
+			ue(sps_five_minus_max_num_subblock_merge_cand,
+			   0, 5 - current->sps_sbtmvp_enabled_flag);
+			flag(sps_6param_affine_enabled_flag);
+			if (current->sps_amvr_enabled_flag) {
+				flag(sps_affine_amvr_enabled_flag);
+			}
+			else
+				infer(sps_affine_amvr_enabled_flag, 0);
+			flag(sps_affine_prof_enabled_flag);
+			if (current->sps_affine_prof_enabled_flag) {
+				flag(sps_prof_control_present_in_ph_flag);
+			}
+			else
+				infer(sps_prof_control_present_in_ph_flag, 0);
+		} else {
+			infer(sps_6param_affine_enabled_flag, 0);
+			infer(sps_affine_amvr_enabled_flag, 0);
+			infer(sps_affine_prof_enabled_flag, 0);
+			infer(sps_prof_control_present_in_ph_flag, 0);
+		}
+
+		flag(sps_bcw_enabled_flag);
+		flag(sps_ciip_enabled_flag);
+
+		if (max_num_merge_cand >= 2) {
+			flag(sps_gpm_enabled_flag);
+			if (current->sps_gpm_enabled_flag && max_num_merge_cand >= 3)
+				ue(sps_max_num_merge_cand_minus_max_num_gpm_cand,
+				   0, max_num_merge_cand - 2);
+		} else {
+			infer(sps_gpm_enabled_flag, 0);
+		}
+
+		ue(sps_log2_parallel_merge_level_minus2, 0, ctb_log2_size_y - 2);
+
+		flag(sps_isp_enabled_flag);
+		flag(sps_mrl_enabled_flag);
+		flag(sps_mip_enabled_flag);
+
+		if (current->sps_chroma_format_idc != 0) {
+			flag(sps_cclm_enabled_flag);
+		}
+		else
+			infer(sps_cclm_enabled_flag, 0);
+		if (current->sps_chroma_format_idc == 1) {
+			flag(sps_chroma_horizontal_collocated_flag);
+			flag(sps_chroma_vertical_collocated_flag);
+		} else {
+			infer(sps_chroma_horizontal_collocated_flag, 1);
+			infer(sps_chroma_vertical_collocated_flag, 1);
+		}
+
+		flag(sps_palette_enabled_flag);
+		if (current->sps_chroma_format_idc == 3 &&
+			!current->sps_max_luma_transform_size_64_flag) {
+			flag(sps_act_enabled_flag);
+		}
+		else
+			infer(sps_act_enabled_flag, 0);
+		if (current->sps_transform_skip_enabled_flag ||
+			current->sps_palette_enabled_flag)
+			ue(sps_min_qp_prime_ts, 0, 8);
+
+		flag(sps_ibc_enabled_flag);
+		if (current->sps_ibc_enabled_flag)
+			ue(sps_six_minus_max_num_ibc_merge_cand, 0, 5);
+
+		flag(sps_ladf_enabled_flag);
+		if (current->sps_ladf_enabled_flag) {
+			ub(2, sps_num_ladf_intervals_minus2);
+			se(sps_ladf_lowest_interval_qp_offset, -63, 63);
+			for (int i = 0; i < current->sps_num_ladf_intervals_minus2 + 1; i++) {
+				ses(sps_ladf_qp_offset[i], -63, 63, 1, i);
+				ues(sps_ladf_delta_threshold_minus1[i],
+					0, (2 << (8 + current->sps_bitdepth_minus8)) - 3, 1, i);
+			}
+		}
+
+		flag(sps_explicit_scaling_list_enabled_flag);
+		if (current->sps_lfnst_enabled_flag &&
+			current->sps_explicit_scaling_list_enabled_flag)
+			flag(sps_scaling_matrix_for_lfnst_disabled_flag);
+
+		if (current->sps_act_enabled_flag &&
+			current->sps_explicit_scaling_list_enabled_flag) {
+			flag(sps_scaling_matrix_for_alternative_colour_space_disabled_flag);
+		}
+		else
+			infer(sps_scaling_matrix_for_alternative_colour_space_disabled_flag, 0);
+		if (current->sps_scaling_matrix_for_alternative_colour_space_disabled_flag)
+			flag(sps_scaling_matrix_designated_colour_space_flag);
+
+		flag(sps_dep_quant_enabled_flag);
+		flag(sps_sign_data_hiding_enabled_flag);
+
+		flag(sps_virtual_boundaries_enabled_flag);
+		if (current->sps_virtual_boundaries_enabled_flag) {
+			flag(sps_virtual_boundaries_present_flag);
+			if (current->sps_virtual_boundaries_present_flag) {
+				ue(sps_num_ver_virtual_boundaries,
+				   0, current->sps_pic_width_max_in_luma_samples <= 8 ? 0 : 3);
+				for (int i = 0; i < current->sps_num_ver_virtual_boundaries; i++)
+					ues(sps_virtual_boundary_pos_x_minus1[i],
+						0, (current->sps_pic_width_max_in_luma_samples + 7) / 8 - 2,
+						1, i);
+				ue(sps_num_hor_virtual_boundaries,
+				   0, current->sps_pic_height_max_in_luma_samples <= 8 ? 0 : 3);
+				for (int i = 0; i < current->sps_num_hor_virtual_boundaries; i++)
+					ues(sps_virtual_boundary_pos_y_minus1[i],
+						0, (current->sps_pic_height_max_in_luma_samples + 7) /
+						8 - 2, 1, i);
+			}
+		} else {
+			infer(sps_virtual_boundaries_present_flag, 0);
+			infer(sps_num_ver_virtual_boundaries, 0);
+			infer(sps_num_hor_virtual_boundaries, 0);
+		}
+
+		if (current->sps_ptl_dpb_hrd_params_present_flag) {
+			flag(sps_timing_hrd_params_present_flag);
+			if (current->sps_timing_hrd_params_present_flag) {
+				uint8_t first_sublayer;
+				CHECK(general_timing_hrd_parameters(gb,
+													&current->sps_general_timing_hrd_parameters));
+				if (current->sps_max_sublayers_minus1 > 0) {
+					flag(sps_sublayer_cpb_params_present_flag);
+				}
+				else
+					infer(sps_sublayer_cpb_params_present_flag, 0);
+				first_sublayer = current->sps_sublayer_cpb_params_present_flag ?
+					0 : current->sps_max_sublayers_minus1;
+				CHECK(ols_timing_hrd_parameters(gb,
+												&current->sps_ols_timing_hrd_parameters, first_sublayer,
+												current->sps_max_sublayers_minus1,
+												&current->sps_general_timing_hrd_parameters));
+			}
+		}
+
+		flag(sps_field_seq_flag);
+		flag(sps_vui_parameters_present_flag);
+		if (current->sps_vui_parameters_present_flag) {
+			ue(sps_vui_payload_size_minus1, 0, 1023);
+			while (byte_alignment(gb) != 0)
+				fixed(1, sps_vui_alignment_zero_bit, 0);
+			CHECK(vui_payload(gb, &current->vui,
+							  current->sps_vui_payload_size_minus1 + 1,
+							  current->sps_chroma_format_idc));
+		} else {
+			CHECK(vui_parameters_default(&current->vui));
+		}
+
+		auto sps = rawSPS.get();
+
+		params.sps_pic_width_max_in_luma_samples = sps->sps_pic_width_max_in_luma_samples;
+		params.sps_pic_height_max_in_luma_samples = sps->sps_pic_height_max_in_luma_samples;
+		params.sps_log2_min_luma_coding_block_size_minus2 = sps->sps_log2_min_luma_coding_block_size_minus2;
+		params.sps_chroma_format_idc = sps->sps_chroma_format_idc;
+		params.sps_res_change_in_clvs_allowed_flag = sps->sps_res_change_in_clvs_allowed_flag;
+		params.sps_log2_ctu_size_minus5 = sps->sps_log2_ctu_size_minus5;
+		params.sps_ref_wraparound_enabled_flag = sps->sps_ref_wraparound_enabled_flag;
+
+		params.sps_conf_win_left_offset = sps->sps_conf_win_left_offset;
+		params.sps_conf_win_right_offset = sps->sps_conf_win_right_offset;
+		params.sps_conf_win_top_offset = sps->sps_conf_win_top_offset;
+		params.sps_conf_win_bottom_offset = sps->sps_conf_win_bottom_offset;
+
+		params.profile = sps->profile_tier_level.general_profile_idc;
+		params.level = sps->profile_tier_level.general_level_idc;
+
+		params.sar.num = params.sar.num = 1;
+		if (sps->vui.vui_sar_width && sps->vui.vui_sar_height) {
+			params.sar.num = sps->vui.vui_sar_width;
+			params.sar.den = sps->vui.vui_sar_height;
+		}
+
+		if (sps->sps_ptl_dpb_hrd_params_present_flag && sps->sps_timing_hrd_params_present_flag) {
+			params.sps_timing.num_units_in_tick = sps->sps_general_timing_hrd_parameters.num_units_in_tick;
+			params.sps_timing.time_scale = sps->sps_general_timing_hrd_parameters.time_scale;
+		}
+
+		return true;
+	}
+
+	bool ParsePictureParameterSet(const BYTE* data, const int size, vc_params_vvc_t& params)
+	{
+		CGolombBuffer gb(data, size, true);
+		auto rawPPS = std::make_unique<H266RawPPS>();
+		auto current = rawPPS.get();
+
+		static const uint8_t h266_sub_width_c[] = {
+			1, 2, 2, 1
+		};
+		static const uint8_t h266_sub_height_c[] = {
+			1, 2, 1, 1
+		};
+
+		ub(6, pps_pic_parameter_set_id);
+		ub(4, pps_seq_parameter_set_id);
+
+		flag(pps_mixed_nalu_types_in_pic_flag);
+		ue(pps_pic_width_in_luma_samples,
+		   1, params.sps_pic_width_max_in_luma_samples);
+		ue(pps_pic_height_in_luma_samples,
+		   1, params.sps_pic_height_max_in_luma_samples);
+
+		uint32_t min_cb_size_y = 1 << (params.sps_log2_min_luma_coding_block_size_minus2 + 2);
+		uint32_t divisor = std::max(min_cb_size_y, 8u);
+		if (current->pps_pic_width_in_luma_samples % divisor ||
+			current->pps_pic_height_in_luma_samples % divisor) {
+			return false;
+		}
+		if (!params.sps_res_change_in_clvs_allowed_flag &&
+			(current->pps_pic_width_in_luma_samples !=
+			 params.sps_pic_width_max_in_luma_samples ||
+			 current->pps_pic_height_in_luma_samples !=
+			 params.sps_pic_height_max_in_luma_samples)) {
+			return false;
+		}
+
+		uint32_t ctb_size_y = 1 << (params.sps_log2_ctu_size_minus5 + 5);
+		if (params.sps_ref_wraparound_enabled_flag) {
+			if ((ctb_size_y / min_cb_size_y + 1) >
+				(current->pps_pic_width_in_luma_samples / min_cb_size_y - 1)) {
+				return false;
+			}
+		}
+
+		flag(pps_conformance_window_flag);
+		if (current->pps_pic_width_in_luma_samples ==
+			params.sps_pic_width_max_in_luma_samples &&
+			current->pps_pic_height_in_luma_samples ==
+			params.sps_pic_height_max_in_luma_samples &&
+			current->pps_conformance_window_flag) {
+			return false;
+		}
+
+		uint8_t sub_width_c = h266_sub_width_c[params.sps_chroma_format_idc];
+		uint8_t sub_height_c = h266_sub_height_c[params.sps_chroma_format_idc];
+		if (current->pps_conformance_window_flag) {
+			ue(pps_conf_win_left_offset, 0, current->pps_pic_width_in_luma_samples);
+			ue(pps_conf_win_right_offset,
+			   0, current->pps_pic_width_in_luma_samples);
+			ue(pps_conf_win_top_offset, 0, current->pps_pic_height_in_luma_samples);
+			ue(pps_conf_win_bottom_offset,
+			   0, current->pps_pic_height_in_luma_samples);
+			if (sub_width_c *
+				(current->pps_conf_win_left_offset +
+				 current->pps_conf_win_right_offset) >=
+				current->pps_pic_width_in_luma_samples ||
+				sub_height_c *
+				(current->pps_conf_win_top_offset +
+				 current->pps_conf_win_bottom_offset) >=
+				current->pps_pic_height_in_luma_samples) {
+				return false;
+			}
+		} else {
+			if (current->pps_pic_width_in_luma_samples ==
+				params.sps_pic_width_max_in_luma_samples &&
+				current->pps_pic_height_in_luma_samples ==
+				params.sps_pic_height_max_in_luma_samples) {
+				infer(pps_conf_win_left_offset, params.sps_conf_win_left_offset);
+				infer(pps_conf_win_right_offset, params.sps_conf_win_right_offset);
+				infer(pps_conf_win_top_offset, params.sps_conf_win_top_offset);
+				infer(pps_conf_win_bottom_offset, params.sps_conf_win_bottom_offset);
+			} else {
+				infer(pps_conf_win_left_offset, 0);
+				infer(pps_conf_win_right_offset, 0);
+				infer(pps_conf_win_top_offset, 0);
+				infer(pps_conf_win_bottom_offset, 0);
+			}
+		}
+
+		auto pps = rawPPS.get();
+
+		params.width = pps->pps_pic_width_in_luma_samples -
+			(pps->pps_conf_win_left_offset + pps->pps_conf_win_right_offset) *
+			h266_sub_width_c[params.sps_chroma_format_idc];
+		params.height = pps->pps_pic_height_in_luma_samples -
+			(pps->pps_conf_win_top_offset + pps->pps_conf_win_bottom_offset) *
+			h266_sub_height_c[params.sps_chroma_format_idc];
+
+		return true;
+	}
+} // namespace VVCParser

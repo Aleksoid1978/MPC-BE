@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -72,6 +72,7 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 
 			bool bIsAVC		= false;
 			bool bIsHEVC	= false;
+			bool bIsVVC		= false;
 			bool bIsMPEG2	= false;
 
 			if (pInfo->hdr.bmiHeader.biCompression == FCC('AVC1') || pInfo->hdr.bmiHeader.biCompression == FCC('H264')) {
@@ -91,8 +92,12 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 				bIsMPEG2 = true;
 				bAdd = TRUE;
 			} else if (pInfo->hdr.bmiHeader.biCompression == FCC('HEVC') || pInfo->hdr.bmiHeader.biCompression == FCC('HVC1')) {
-				Infos.emplace_back(L"HEVC");
+				Infos.emplace_back(L"H.265/HEVC");
 				bIsHEVC = true;
+				bAdd = TRUE;
+			} else if (pInfo->hdr.bmiHeader.biCompression == FCC('VVC1')) {
+				Infos.emplace_back(L"H.266/VVC");
+				bIsVVC = true;
 				bAdd = TRUE;
 			}
 
@@ -142,6 +147,18 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 							break;
 						case 2:
 							Infos.emplace_back(L"Main/10 Profile");
+							break;
+						default:
+							Infos.emplace_back(FormatString(L"Profile %u", pInfo->dwProfile));
+							break;
+					}
+				} else if (bIsVVC) {
+					switch (pInfo->dwProfile) {
+						case 1:
+							Infos.emplace_back(L"Main/10 Profile");
+							break;
+						case 33:
+							Infos.emplace_back(L"Main/10 4:4:4 Profile");
 							break;
 						default:
 							Infos.emplace_back(FormatString(L"Profile %u", pInfo->dwProfile));

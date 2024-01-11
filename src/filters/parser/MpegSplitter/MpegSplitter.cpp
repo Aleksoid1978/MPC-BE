@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -186,6 +186,7 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 
 			bool bIsAVC		= false;
 			bool bIsHEVC	= false;
+			bool bIsVVC		= false;
 			bool bIsMPEG2	= false;
 
 			if (pInfo->hdr.bmiHeader.biCompression == FCC('AVC1') || pInfo->hdr.bmiHeader.biCompression == FCC('H264')) {
@@ -201,8 +202,11 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 				Infos.emplace_back(L"MPEG2");
 				bIsMPEG2 = true;
 			} else if (pInfo->hdr.bmiHeader.biCompression == FCC('HEVC') || pInfo->hdr.bmiHeader.biCompression == FCC('HVC1')) {
-				Infos.emplace_back(L"HEVC");
+				Infos.emplace_back(L"H.265/HEVC");
 				bIsHEVC = true;
+			} else if (pInfo->hdr.bmiHeader.biCompression == FCC('VVC1')) {
+				Infos.emplace_back(L"H.266/VVC");
+				bIsVVC = true;
 			} else {
 				WCHAR Temp[5];
 				memset(Temp, 0, sizeof(Temp));
@@ -259,6 +263,18 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 							break;
 						case 2:
 							Infos.emplace_back(L"Main/10 Profile");
+							break;
+						default:
+							Infos.emplace_back(FormatString(L"Profile %u", pInfo->dwProfile));
+							break;
+					}
+				} else if (bIsVVC) {
+					switch (pInfo->dwProfile) {
+						case 1:
+							Infos.emplace_back(L"Main/10 Profile");
+							break;
+						case 33:
+							Infos.emplace_back(L"Main/10 4:4:4 Profile");
 							break;
 						default:
 							Infos.emplace_back(FormatString(L"Profile %u", pInfo->dwProfile));

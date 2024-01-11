@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -51,6 +51,7 @@ public:
 	int          BitsLeft() const { return 8 * RemainingSize() + m_bitlen; }
 	bool         IsEOF() const { return m_nBitPos >= m_nSize; }
 	int          GetPos() const;
+	int          GetBitsPos() const;
 	const BYTE*  GetBufferPos() const { return m_pBuffer + m_nBitPos; }
 
 	void         SkipBytes(const int nCount);

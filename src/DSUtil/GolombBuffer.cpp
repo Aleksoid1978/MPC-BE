@@ -1,5 +1,5 @@
 ﻿/*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -133,6 +133,11 @@ void CGolombBuffer::BitByteAlign()
 int CGolombBuffer::GetPos() const
 {
 	return m_nBitPos - (m_bitlen >> 3);
+}
+
+int CGolombBuffer::GetBitsPos() const
+{
+	return m_nBitPos * 8 - m_bitlen;
 }
 
 void CGolombBuffer::ReadBuffer(BYTE* pDest, int nSize)
