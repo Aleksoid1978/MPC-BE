@@ -20,6 +20,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavcodec/h26x/h2656_sao_template.c"
+
 static void FUNC(lmcs_filter_luma)(uint8_t *_dst, ptrdiff_t dst_stride, const int width, const int height, const uint8_t *_lut)
 {
     const pixel *lut = (const pixel *)_lut;
@@ -32,197 +34,6 @@ static void FUNC(lmcs_filter_luma)(uint8_t *_dst, ptrdiff_t dst_stride, const in
         dst += dst_stride;
     }
 }
-
-static void FUNC(sao_band_filter)(uint8_t *_dst, const uint8_t *_src, ptrdiff_t dst_stride, ptrdiff_t src_stride,
-    const int16_t *sao_offset_val, const int sao_left_class, const int width, const int height)
-{
-    pixel *dst       = (pixel *)_dst;
-    const pixel *src = (pixel *)_src;
-    int offset_table[32] = { 0 };
-    int k, y, x;
-    int shift  = BIT_DEPTH - 5;
-
-    dst_stride /= sizeof(pixel);
-    src_stride /= sizeof(pixel);
-
-    for (k = 0; k < 4; k++)
-        offset_table[(k + sao_left_class) & 31] = sao_offset_val[k + 1];
-    for (y = 0; y < height; y++) {
-        for (x = 0; x < width; x++)
-            dst[x] = av_clip_pixel(src[x] + offset_table[src[x] >> shift]);
-        dst += dst_stride;
-        src += src_stride;
-    }
-}
-
-#define CMP(a, b) (((a) > (b)) - ((a) < (b)))
-
-static void FUNC(sao_edge_filter)(uint8_t *_dst, const uint8_t *_src, ptrdiff_t dst_stride,
-    const int16_t *sao_offset_val, const int eo, const int width, const int height)
-{
-    static const uint8_t edge_idx[] = { 1, 2, 0, 3, 4 };
-    static const int8_t pos[4][2][2] = {
-        { { -1,  0 }, {  1, 0 } }, // horizontal
-        { {  0, -1 }, {  0, 1 } }, // vertical
-        { { -1, -1 }, {  1, 1 } }, // 45 degree
-        { {  1, -1 }, { -1, 1 } }, // 135 degree
-    };
-    pixel *dst          = (pixel *)_dst;
-    const pixel *src    = (pixel *)_src;
-    int a_stride, b_stride;
-    int x, y;
-    ptrdiff_t src_stride = (2 * MAX_PB_SIZE + AV_INPUT_BUFFER_PADDING_SIZE) / sizeof(pixel);
-    dst_stride /= sizeof(pixel);
-
-    a_stride = pos[eo][0][0] + pos[eo][0][1] * src_stride;
-    b_stride = pos[eo][1][0] + pos[eo][1][1] * src_stride;
-    for (y = 0; y < height; y++) {
-        for (x = 0; x < width; x++) {
-            int diff0 = CMP(src[x], src[x + a_stride]);
-            int diff1 = CMP(src[x], src[x + b_stride]);
-            int offset_val        = edge_idx[2 + diff0 + diff1];
-            dst[x] = av_clip_pixel(src[x] + sao_offset_val[offset_val]);
-        }
-        src += src_stride;
-        dst += dst_stride;
-    }
-}
-
-static void FUNC(sao_edge_restore_0)(uint8_t *_dst, const uint8_t *_src,
-    ptrdiff_t dst_stride, ptrdiff_t src_stride, const SAOParams *sao,
-    const int *borders, const int _width, const int _height, const int c_idx,
-    const uint8_t *vert_edge, const uint8_t *horiz_edge, const uint8_t *diag_edge)
-{
-    int x, y;
-    pixel *dst                      = (pixel *)_dst;
-    const pixel *src                = (pixel *)_src;
-    const int16_t *sao_offset_val   = sao->offset_val[c_idx];
-    const int sao_eo_class          = sao->eo_class[c_idx];
-    int init_x = 0, width = _width, height = _height;
-
-    dst_stride /= sizeof(pixel);
-    src_stride /= sizeof(pixel);
-
-    if (sao_eo_class != SAO_EO_VERT) {
-        if (borders[0]) {
-            int offset_val = sao_offset_val[0];
-            for (y = 0; y < height; y++) {
-                dst[y * dst_stride] = av_clip_pixel(src[y * src_stride] + offset_val);
-            }
-            init_x = 1;
-        }
-        if (borders[2]) {
-            int offset_val = sao_offset_val[0];
-            int offset     = width - 1;
-            for (x = 0; x < height; x++) {
-                dst[x * dst_stride + offset] = av_clip_pixel(src[x * src_stride + offset] + offset_val);
-            }
-            width--;
-        }
-    }
-    if (sao_eo_class != SAO_EO_HORIZ) {
-        if (borders[1]) {
-            int offset_val = sao_offset_val[0];
-            for (x = init_x; x < width; x++)
-                dst[x] = av_clip_pixel(src[x] + offset_val);
-        }
-        if (borders[3]) {
-            int offset_val   = sao_offset_val[0];
-            ptrdiff_t y_dst_stride = dst_stride * (height - 1);
-            ptrdiff_t y_src_stride = src_stride * (height - 1);
-            for (x = init_x; x < width; x++)
-                dst[x + y_dst_stride] = av_clip_pixel(src[x + y_src_stride] + offset_val);
-            height--;
-        }
-    }
-}
-
-static void FUNC(sao_edge_restore_1)(uint8_t *_dst, const uint8_t *_src,
-    ptrdiff_t dst_stride, ptrdiff_t src_stride, const SAOParams *sao,
-    const int *borders, const int _width, const int _height, const int c_idx,
-    const uint8_t *vert_edge, const uint8_t *horiz_edge, const uint8_t *diag_edge)
-{
-    int x, y;
-    pixel *dst                      = (pixel *)_dst;
-    const pixel *src                = (pixel *)_src;
-    const int16_t *sao_offset_val   = sao->offset_val[c_idx];
-    const int sao_eo_class          = sao->eo_class[c_idx];
-    int init_x = 0, init_y = 0, width = _width, height = _height;
-
-    dst_stride /= sizeof(pixel);
-    src_stride /= sizeof(pixel);
-
-    if (sao_eo_class != SAO_EO_VERT) {
-        if (borders[0]) {
-            int offset_val = sao_offset_val[0];
-            for (y = 0; y < height; y++) {
-                dst[y * dst_stride] = av_clip_pixel(src[y * src_stride] + offset_val);
-            }
-            init_x = 1;
-        }
-        if (borders[2]) {
-            int offset_val = sao_offset_val[0];
-            int offset     = width - 1;
-            for (x = 0; x < height; x++) {
-                dst[x * dst_stride + offset] = av_clip_pixel(src[x * src_stride + offset] + offset_val);
-            }
-            width--;
-        }
-    }
-    if (sao_eo_class != SAO_EO_HORIZ) {
-        if (borders[1]) {
-            int offset_val = sao_offset_val[0];
-            for (x = init_x; x < width; x++)
-                dst[x] = av_clip_pixel(src[x] + offset_val);
-            init_y = 1;
-        }
-        if (borders[3]) {
-            int offset_val   = sao_offset_val[0];
-            ptrdiff_t y_dst_stride = dst_stride * (height - 1);
-            ptrdiff_t y_src_stride = src_stride * (height - 1);
-            for (x = init_x; x < width; x++)
-                dst[x + y_dst_stride] = av_clip_pixel(src[x + y_src_stride] + offset_val);
-            height--;
-        }
-    }
-
-    {
-        int save_upper_left  = !diag_edge[0] && sao_eo_class == SAO_EO_135D && !borders[0] && !borders[1];
-        int save_upper_right = !diag_edge[1] && sao_eo_class == SAO_EO_45D  && !borders[1] && !borders[2];
-        int save_lower_right = !diag_edge[2] && sao_eo_class == SAO_EO_135D && !borders[2] && !borders[3];
-        int save_lower_left  = !diag_edge[3] && sao_eo_class == SAO_EO_45D  && !borders[0] && !borders[3];
-
-        // Restore pixels that can't be modified
-        if (vert_edge[0] && sao_eo_class != SAO_EO_VERT) {
-            for (y = init_y + save_upper_left; y < height - save_lower_left; y++)
-                dst[y * dst_stride] = src[y * src_stride];
-        }
-        if (vert_edge[1] && sao_eo_class != SAO_EO_VERT) {
-            for (y = init_y + save_upper_right; y < height - save_lower_right; y++)
-                dst[y * dst_stride + width - 1] = src[y * src_stride + width - 1];
-        }
-
-        if (horiz_edge[0] && sao_eo_class != SAO_EO_HORIZ) {
-            for (x = init_x + save_upper_left; x < width - save_upper_right; x++)
-                dst[x] = src[x];
-        }
-        if (horiz_edge[1] && sao_eo_class != SAO_EO_HORIZ) {
-            for (x = init_x + save_lower_left; x < width - save_lower_right; x++)
-                dst[(height - 1) * dst_stride + x] = src[(height - 1) * src_stride + x];
-        }
-        if (diag_edge[0] && sao_eo_class == SAO_EO_135D)
-            dst[0] = src[0];
-        if (diag_edge[1] && sao_eo_class == SAO_EO_45D)
-            dst[width - 1] = src[width - 1];
-        if (diag_edge[2] && sao_eo_class == SAO_EO_135D)
-            dst[dst_stride * (height - 1) + width - 1] = src[src_stride * (height - 1) + width - 1];
-        if (diag_edge[3] && sao_eo_class == SAO_EO_45D)
-            dst[dst_stride * (height - 1)] = src[src_stride * (height - 1)];
-
-    }
-}
-
-#undef CMP
 
 static av_always_inline int16_t FUNC(alf_clip)(pixel curr, pixel v0, pixel v1, int16_t clip)
 {
@@ -650,6 +461,8 @@ static void FUNC(alf_recon_coeff_and_clip)(int16_t *coeff, int16_t *clip,
 #define FQ2 pix[2  * xstride + 1 * ystride]
 #define FQ3 pix[3  * xstride + 1 * ystride]
 
+#include "libavcodec/h26x/h2656_deblock_template.c"
+
 static void FUNC(loop_filter_luma_large)(pixel *pix, const ptrdiff_t xstride, const ptrdiff_t ystride, const int32_t tc,
     const uint8_t no_p, const uint8_t no_q, const uint8_t max_len_p, const uint8_t max_len_q)
 {
@@ -730,66 +543,6 @@ static void FUNC(loop_filter_luma_large)(pixel *pix, const ptrdiff_t xstride, co
     }
 }
 
-static void FUNC(loop_filter_luma_strong)(pixel *pix, const ptrdiff_t xstride, const ptrdiff_t ystride, const int32_t tc,
-    const uint8_t no_p, const uint8_t no_q)
-{
-    const int tc2 = tc << 1;
-    const int tc3 = tc * 3;
-    for (int d = 0; d < 4; d++) {
-        const int p3 = P3;
-        const int p2 = P2;
-        const int p1 = P1;
-        const int p0 = P0;
-        const int q0 = Q0;
-        const int q1 = Q1;
-        const int q2 = Q2;
-        const int q3 = Q3;
-        if (!no_p) {
-            P0 = p0 + av_clip(((p2 + 2 * p1 + 2 * p0 + 2 * q0 + q1 + 4) >> 3) - p0, -tc3, tc3);
-            P1 = p1 + av_clip(((p2 + p1 + p0 + q0 + 2) >> 2) - p1, -tc2, tc2);
-            P2 = p2 + av_clip(((2 * p3 + 3 * p2 + p1 + p0 + q0 + 4) >> 3) - p2, -tc, tc);
-        }
-        if (!no_q) {
-            Q0 = q0 + av_clip(((p1 + 2 * p0 + 2 * q0 + 2 * q1 + q2 + 4) >> 3) - q0, -tc3, tc3);
-            Q1 = q1 + av_clip(((p0 + q0 + q1 + q2 + 2) >> 2) - q1, -tc2, tc2);
-            Q2 = q2 + av_clip(((2 * q3 + 3 * q2 + q1 + q0 + p0 + 4) >> 3) - q2, -tc, tc);
-        }
-        pix += ystride;
-    }
-}
-
-static void FUNC(loop_filter_luma_weak)(pixel *pix, const ptrdiff_t xstride, const ptrdiff_t ystride,
-    const int32_t tc, const int32_t beta, const uint8_t no_p, const uint8_t no_q, const int nd_p, const int nd_q)
-{
-    const int tc_2 = tc >> 1;
-    for (int d = 0; d < 4; d++) {
-        const int p2 = P2;
-        const int p1 = P1;
-        const int p0 = P0;
-        const int q0 = Q0;
-        const int q1 = Q1;
-        const int q2 = Q2;
-        int delta0 = (9 * (q0 - p0) - 3 * (q1 - p1) + 8) >> 4;
-        if (abs(delta0) < 10 * tc) {
-            delta0 = av_clip(delta0, -tc, tc);
-            if (!no_p)
-                P0 = av_clip_pixel(p0 + delta0);
-            if (!no_q)
-                Q0 = av_clip_pixel(q0 - delta0);
-            if (!no_p && nd_p > 1) {
-                const int deltap1 = av_clip((((p2 + p0 + 1) >> 1) - p1 + delta0) >> 1, -tc_2, tc_2);
-                P1 = av_clip_pixel(p1 + deltap1);
-            }
-            if (!no_q && nd_q > 1) {
-                const int deltaq1 = av_clip((((q2 + q0 + 1) >> 1) - q1 - delta0) >> 1, -tc_2, tc_2);
-                Q1 = av_clip_pixel(q1 + deltaq1);
-            }
-        }
-        pix += ystride;
-    }
-
-}
-
 static void FUNC(vvc_loop_filter_luma)(uint8_t* _pix, ptrdiff_t _xstride, ptrdiff_t _ystride,
     const int32_t *_beta, const int32_t *_tc, const uint8_t *_no_p, const uint8_t *_no_q,
     const uint8_t *_max_len_p, const uint8_t *_max_len_q, int hor_ctu_edge)
@@ -862,7 +615,7 @@ static void FUNC(vvc_loop_filter_luma)(uint8_t* _pix, ptrdiff_t _xstride, ptrdif
                 abs(P3 - P0) + abs(Q3 - Q0) < beta_3 && abs(P0 - Q0) < tc25 &&
                 abs(TP3 - TP0) + abs(TQ3 - TQ0) < beta_3 && abs(TP0 - TQ0) < tc25 &&
                 (d0 << 1) < beta_2 && (d3 << 1) < beta_2) {
-                FUNC(loop_filter_luma_strong)(pix, xstride, ystride, tc, no_p, no_q);
+                FUNC(loop_filter_luma_strong)(pix, xstride, ystride, tc, tc << 1, tc * 3, no_p, no_q);
             } else { // weak filtering
                 int nd_p = 1;
                 int nd_q = 1;
@@ -922,24 +675,6 @@ static void FUNC(loop_filter_chroma_strong_one_side)(pixel *pix, const ptrdiff_t
             Q1 = av_clip((p1 + p0 + q0 + 2 * q1 + q2 + 2 * q3 + 4) >> 3, q1 - tc, q1 + tc);
             Q2 = av_clip((p0 + q0 + q1 + 2 * q2 + 3 * q3 + 4) >> 3, q2 - tc, q2 + tc);
         }
-        pix += ystride;
-    }
-}
-
-static void FUNC(loop_filter_chroma_weak)(pixel *pix, const ptrdiff_t xstride, const ptrdiff_t ystride,
-    const int size, const int32_t tc, const uint8_t no_p, const uint8_t no_q)
-{
-    for (int d = 0; d < size; d++) {
-        int delta0;
-        const int p1 = P1;
-        const int p0 = P0;
-        const int q0 = Q0;
-        const int q1 = Q1;
-        delta0 = av_clip((((q0 - p0) * 4) + p1 - q1 + 4) >> 3, -tc, tc);
-        if (!no_p)
-            P0 = av_clip_pixel(p0 + delta0);
-        if (!no_q)
-            Q0 = av_clip_pixel(q0 - delta0);
         pix += ystride;
     }
 }
