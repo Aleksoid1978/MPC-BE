@@ -195,6 +195,9 @@ HRESULT CBaseSplitterParserOutputPin::DeliverPacket(std::unique_ptr<CPacket> p)
 	} else if (m_mt.subtype == MEDIASUBTYPE_HEVC) {
 		// HEVC
 		return ParseHEVC(p);
+	} else if (m_mt.subtype == MEDIASUBTYPE_VVC1) {
+		// HEVC
+		return ParseVVC(p);
 	} else if (m_mt.subtype == MEDIASUBTYPE_WVC1 || m_mt.subtype == FOURCCMap('1cvw')
 			   || m_mt.subtype == MEDIASUBTYPE_WVC1_CYBERLINK || m_mt.subtype == MEDIASUBTYPE_WVC1_ARCSOFT) {
 		// VC1
@@ -632,6 +635,103 @@ HRESULT CBaseSplitterParserOutputPin::ParseHEVC(std::unique_ptr<CPacket>& p)
 				size = end - start;
 			} else {
 				size = hevc_find_frame_end(start + nBufferPos, end - start - nBufferPos, m_ParseContext);
+				if (size == END_NOT_FOUND) {
+					break;
+				}
+
+				size += nBufferPos;
+			}
+
+			HRESULT hr = DeliverParsed(start, size);
+			if (hr != S_OK) {
+				return hr;
+			}
+			HandlePacket(p);
+
+			start += size;
+			nBufferPos = 0;
+
+			if (m_bEndOfStream) {
+				break;
+			}
+		}
+	}
+
+	ENDDATA;
+
+	return S_OK;
+}
+
+#define IS_H266_SLICE(nut) (nut <= NALU_TYPE_VVC_RASL || (nut >= NALU_TYPE_VVC_IDR_W_RADL && nut <= NALU_TYPE_VVC_GDR))
+
+static int vvc_find_frame_end(BYTE* pData, int nSize, MpegParseContext& pc)
+{
+	for (int i = 0; i < nSize; i++) {
+		pc.state64 = (pc.state64 << 8) | pData[i];
+		if (((pc.state64 >> 3 * 8) & 0xFFFFFF) != START_CODE) {
+			continue;
+		}
+
+		int code_len = ((pc.state64 >> 3 * 8) & 0xFFFFFFFF) == 0x01 ? 4 : 3;
+
+		int nut = (pc.state64 >> (8 + 3)) & 0x1F;
+
+		// 7.4.2.4.3 and 7.4.2.4.4
+		if ((nut >= NALU_TYPE_VVC_OPI && nut <= NALU_TYPE_VVC_PREFIX_APS && nut != NALU_TYPE_VVC_PH) || nut == NALU_TYPE_VVC_AUD ||
+			(nut == NALU_TYPE_VVC_PREFIX_SEI && !pc.bFrameStartFound) ||
+			nut == NALU_TYPE_VVC_RSV_NVCL_26 || nut == NALU_TYPE_VVC_UNSPEC_28 || nut == NALU_TYPE_VVC_UNSPEC_29) {
+			if (pc.bFrameStartFound) {
+				pc.bFrameStartFound = 0;
+				return i - (code_len + 2);
+			}
+		} else if (nut == NALU_TYPE_VVC_PH || IS_H266_SLICE(nut)) {
+			int sh_picture_header_in_slice_header_flag = pData[i] >> 7;
+
+			if (nut == NALU_TYPE_VVC_PH || sh_picture_header_in_slice_header_flag) {
+				if (!pc.bFrameStartFound) {
+					pc.bFrameStartFound = 1;
+				} else { // First slice of next frame found
+					pc.bFrameStartFound = 0;
+					return i - (code_len + 2);
+				}
+			}
+		}
+	}
+
+	return END_NOT_FOUND;
+}
+
+HRESULT CBaseSplitterParserOutputPin::ParseVVC(std::unique_ptr<CPacket>& p)
+{
+	if (!m_p) {
+		InitPacket(p.get());
+	}
+
+	if (!m_p) {
+		return S_OK;
+	}
+
+	int nBufferPos = m_p->size();
+
+	if (p) m_p->AppendData(*p);
+
+	HandleInvalidPacket(6);
+
+	BEGINDATA;
+
+	MOVE_TO_H264_START_CODE(start, end);
+	if (start <= end - 4) {
+		if (start > base) {
+			m_ParseContext.state64 = 0;
+			nBufferPos = std::max(0, nBufferPos - (int)(start - base));
+		}
+
+		for (;;) {
+			int size = 0;
+			if (m_bEndOfStream) {
+				size = end - start;
+			} else {
+				size = vvc_find_frame_end(start + nBufferPos, end - start - nBufferPos, m_ParseContext);
 				if (size == END_NOT_FOUND) {
 					break;
 				}

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,7 +38,7 @@ class CBaseSplitterParserOutputPin : public CBaseSplitterOutputPin, protected CC
 			BOOL bDataExists = FALSE;
 	};
 
-	std::unique_ptr<CPacket>         m_p;
+	std::unique_ptr<CPacket> m_p;
 	std::list<std::unique_ptr<CH264Packet>> m_pl;
 
 	MpegParseContext m_ParseContext;
@@ -74,6 +74,7 @@ private:
 	HRESULT ParseAACLATM(std::unique_ptr<CPacket>& p);
 	HRESULT ParseAnnexB(std::unique_ptr<CPacket>& p, bool bConvertToAVCC);
 	HRESULT ParseHEVC(std::unique_ptr<CPacket>& p);
+	HRESULT ParseVVC(std::unique_ptr<CPacket>& p);
 	HRESULT ParseVC1(std::unique_ptr<CPacket>& p);
 	HRESULT ParseHDMVLPCM(std::unique_ptr<CPacket>& p);
 	HRESULT ParseAC3(std::unique_ptr<CPacket>& p);

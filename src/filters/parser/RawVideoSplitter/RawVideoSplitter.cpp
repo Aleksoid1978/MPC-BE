@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -893,6 +893,18 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			mts.push_back(mt);
 			m_RAWType = RAW_HEVC;
 			pName = L"H.265/HEVC Video Output";
+		}
+	}
+
+	if (m_RAWType == RAW_NONE
+			&& (COMPARE(SHORT_START_CODE) || COMPARE(LONG_START_CODE))) {
+		m_pFile->Seek(0);
+
+		CBaseSplitterFileEx::vvchdr h;
+		if (m_pFile->Read(h, (int)std::min((__int64)MEGABYTE, m_pFile->GetLength()), &mt)) {
+			mts.push_back(mt);
+			m_RAWType = RAW_HEVC;
+			pName = L"H.266/VVC Video Output";
 		}
 	}
 
