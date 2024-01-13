@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -955,7 +955,7 @@ void CPlayerSeekBar::UpdateToolTipText()
 	GUID timeFormat = m_pMainFrame->GetTimeFormat();
 	CString tooltipText;
 	if (timeFormat == TIME_FORMAT_MEDIA_TIME) {
-		tooltipText = ReftimeToString2(m_tooltipPos);
+		tooltipText = ReftimeToString2(m_tooltipPos, false);
 	} else if (timeFormat == TIME_FORMAT_FRAME) {
 		tooltipText.Format(L"%I64d", m_tooltipPos);
 	} else {

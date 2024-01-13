@@ -365,12 +365,10 @@ void COSD::DrawSeekbar()
 	DrawRect(rect, &m_brushBar);
 
 	if (m_SeekbarFont.GetSafeHandle()) {
-		const bool bShowZeroHours = HourOrMore(m_llSeekStop > 0 ? m_llSeekStop : m_llSeekPos);
-
-		CStringW text = ReftimeToString2(m_llSeekPos, bShowZeroHours);
+		CStringW text = ReftimeToString2(m_llSeekPos, false);
 		if (m_llSeekStop > 0) {
 			text.Append(L" / ");
-			text.Append(ReftimeToString2(m_llSeekStop, bShowZeroHours));
+			text.Append(ReftimeToString2(m_llSeekStop, false));
 		}
 
 		m_MemDC.SelectObject(m_SeekbarFont);
