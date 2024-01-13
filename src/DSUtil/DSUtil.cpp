@@ -1046,7 +1046,7 @@ REFERENCE_TIME TimecodeToReftime(TimeCode_t tc)
 }
 
 // hh:mm::ss.millisec
-CStringW ReftimeToString(REFERENCE_TIME rt)
+CStringW ReftimeToString(REFERENCE_TIME rt, bool showZeroHours /* = true*/)
 {
 	if (rt == INVALID_TIME) {
 		return L"INVALID TIME";
@@ -1054,7 +1054,11 @@ CStringW ReftimeToString(REFERENCE_TIME rt)
 
 	TimeCode_t tc = ReftimeToTimecode(rt);
 	CStringW str;
-	str.Format(L"%02d:%02d:%02d.%03d", tc.Hours, tc.Minutes, tc.Seconds, tc.Milliseconds);
+	if (tc.Hours || showZeroHours) {
+		str.Format(L"%02d:%02d:%02d.%03d", tc.Hours, tc.Minutes, tc.Seconds, tc.Milliseconds);
+	} else {
+		str.Format(L"%02d:%02d.%03d", tc.Minutes, tc.Seconds, tc.Milliseconds);
+	}
 
 	return str;
 }
