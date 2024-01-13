@@ -236,12 +236,13 @@ void CPlayerStatusBar::SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur
 	CString strPos, strDur;
 
 	if (timeFormat == TIME_FORMAT_MEDIA_TIME) {
+		const bool bShowZeroHours = ReftimeToHMS(rtDur).Hours > 0;
 		if (bShowMilliSecs) {
-			strPos = ReftimeToString(rt);
-			strDur = ReftimeToString(rtDur);
+			strPos = ReftimeToString(rt, bShowZeroHours);
+			strDur = ReftimeToString(rtDur, bShowZeroHours);
 		} else {
-			strPos = ReftimeToString2(rt);
-			strDur = ReftimeToString2(rtDur);
+			strPos = ReftimeToString2(rt, bShowZeroHours);
+			strDur = ReftimeToString2(rtDur, bShowZeroHours);
 		}
 	} else if (timeFormat == TIME_FORMAT_FRAME) {
 		strPos.Format(L"%I64d", rt);
