@@ -236,7 +236,7 @@ void CPlayerStatusBar::SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur
 	CString strPos, strDur;
 
 	if (timeFormat == TIME_FORMAT_MEDIA_TIME) {
-		const bool bShowZeroHours = ReftimeToHMS(rtDur).Hours > 0;
+		const bool bShowZeroHours = ReftimeToHMS(rtDur).Hours > 0 || (rtNow > rtDur && ReftimeToHMS(rtNow).Hours > 0);
 		if (bShowMilliSecs) {
 			strPos = ReftimeToString(rt, bShowZeroHours);
 			strDur = ReftimeToString(rtDur, bShowZeroHours);
