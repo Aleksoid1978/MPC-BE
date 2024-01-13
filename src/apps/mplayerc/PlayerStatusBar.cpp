@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -233,10 +233,10 @@ void CPlayerStatusBar::SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur
 {
 	const bool bRemainingTime = AfxGetAppSettings().fRemainingTime && rtDur > 0;
 	REFERENCE_TIME rt = bRemainingTime ? rtDur - rtNow : rtNow;
-	CString strPos, strDur;
+	CStringW strPos, strDur;
 
 	if (timeFormat == TIME_FORMAT_MEDIA_TIME) {
-		const bool bShowZeroHours = ReftimeToHMS(rtDur).Hours > 0 || (rtNow > rtDur && ReftimeToHMS(rtNow).Hours > 0);
+		const bool bShowZeroHours = HourOrMore(rtDur);
 		if (bShowMilliSecs) {
 			strPos = ReftimeToString(rt, bShowZeroHours);
 			strDur = ReftimeToString(rtDur, bShowZeroHours);
@@ -249,7 +249,7 @@ void CPlayerStatusBar::SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur
 		strDur.Format(L"%I64d", rtDur);
 	}
 
-	CString str;
+	CStringW str;
 	if (rtDur > 0 && rtNow < rtDur) {
 		if (bRemainingTime) {
 			str = L"- " + strPos + L" / " + strDur;
