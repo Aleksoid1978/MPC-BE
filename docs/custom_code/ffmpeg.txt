@@ -12,6 +12,7 @@
 * libavcodec/aacsbr_template.c
 * libavcodec/bsf_list.c
 * libavcodec/codec_list.c
+* libavcodec/d3d12va_vc1.c
 * libavcodec/dxva2.c
 * libavcodec/dxva2_hevc.c
 * libavcodec/dxva2_internal.h
