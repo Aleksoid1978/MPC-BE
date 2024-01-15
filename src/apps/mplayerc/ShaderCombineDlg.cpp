@@ -143,6 +143,7 @@ void CShaderCombineDlg::OnSelChangeDXNum()
 	m_cbList2.ResetContent();
 
 	if (m_bD3D11) {
+		m_chEnable1.EnableWindow(FALSE);
 		m_cbList1.EnableWindow(FALSE);
 
 		for (const auto& shader : s.Shaders11PostScale) {
@@ -154,6 +155,7 @@ void CShaderCombineDlg::OnSelChangeDXNum()
 		m_cbList2.SetFocus();
 	}
 	else {
+		m_chEnable1.EnableWindow(TRUE);
 		m_cbList1.EnableWindow(TRUE);
 		for (const auto& shader : s.ShaderList) {
 			m_cbList1.AddString(shader);
