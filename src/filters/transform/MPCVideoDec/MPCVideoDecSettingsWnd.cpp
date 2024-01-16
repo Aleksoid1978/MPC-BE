@@ -482,7 +482,7 @@ void CMPCVideoDecSettingsWnd::OnCbnChangeHwDec()
 {
 	m_cbHWAdapter.ResetContent();
 
-	if (SysVersion::IsWin8orLater() && m_cbHWDecoder.GetCurSel() == HWDec_D3D11cb && m_D3D11Adapters.size()) {
+	if (SysVersion::IsWin8orLater() && (m_cbHWDecoder.GetCurSel() == HWDec_D3D11cb || m_cbHWDecoder.GetCurSel() == HWDec_D3D12cb) && m_D3D11Adapters.size()) {
 		for (const auto& adapter : m_D3D11Adapters) {
 			m_cbHWAdapter.AddString(adapter.Description);
 		}
