@@ -615,7 +615,7 @@ BEGIN
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,93,188,1
     PUSHBUTTON      "&Renunță",IDCANCEL,49,100,50,14
     PUSHBUTTON      "&Salvează",IDOK,105,100,50,14
-    LTEXT           "Poziție: 0.1 -> 0.9",IDC_STATIC,134,5,70,8
+    LTEXT           "Poziție: 0.0 -> 1.0",IDC_STATIC,134,5,70,8
     LTEXT           "Mărire: 0.2 -> 5.0",IDC_STATIC,134,32,70,8
 END
 

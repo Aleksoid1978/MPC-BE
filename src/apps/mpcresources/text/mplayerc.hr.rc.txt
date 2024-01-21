@@ -158,7 +158,7 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 16		"&Postavi"
 18		"Poništi"
 19		"&Spremi"
-20		"Poz: 0.1 -> 0.9"
+20		"Poz: 0.0 -> 1.0"
 21		"Uvećavanje: 0.2 -> 5.0"
 END
 

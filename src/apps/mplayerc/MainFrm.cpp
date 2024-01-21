@@ -7695,22 +7695,16 @@ void CMainFrame::OnViewPanNScan(UINT nID)
 	const double shift = 0.005;
 
 	if (dx) {
-		if (dx < 0) {
-			m_PosX = std::max(m_PosX - shift, 0.1);
-		} else { // dx > 0
-			m_PosX = std::min(m_PosX + shift, 0.9);
-		}
+		m_PosX = std::clamp(m_PosX + shift * dx, 0.0, 1.0);
+
 		if (abs(m_PosX - 0.5) * 2 < shift) {
 			m_PosX = 0.5;
 		}
 	}
 
 	if (dy) {
-		if (dy < 0) {
-			m_PosY = std::max(m_PosY - shift, 0.1);
-		} else { // dy > 0
-			m_PosY = std::min(m_PosY + shift, 0.9);
-		}
+		m_PosY = std::clamp(m_PosY + shift * dy, 0.0, 1.0);
+		
 		if (abs(m_PosY - 0.5) * 2 < shift) {
 			m_PosY = 0.5;
 		}
@@ -7782,8 +7776,8 @@ void CMainFrame::OnViewPanNScanPresets(UINT nID)
 		return;
 	}
 
-	m_PosX  = std::clamp(m_PosX, 0.1, 0.9);
-	m_PosY  = std::clamp(m_PosY, 0.1, 0.9);
+	m_PosX  = std::clamp(m_PosX, 0.0, 1.0);
+	m_PosY  = std::clamp(m_PosY, 0.0, 1.0);
 	m_ZoomX = std::clamp(m_ZoomX, 0.2, 5.0);
 	m_ZoomY = std::clamp(m_ZoomY, 0.2, 5.0);
 
