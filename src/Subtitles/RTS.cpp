@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2202,18 +2202,27 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 				size_t nParamsInt = tag.paramsInt.GetCount();
 
 				if (nParams == 1 && nParamsInt == 0 && !sub->m_pClipper) {
-					sub->m_pClipper = std::make_shared<CClipper>(tag.params[0], CSize(m_size.cx >> 3, m_size.cy >> 3), sub->m_scalex, sub->m_scaley,
-																 invert, (sub->m_relativeTo == 1) ? CPoint(m_vidrect.left, m_vidrect.top) : CPoint(0, 0),
-																 m_renderingCaches);
+					sub->m_pClipper = std::make_shared<CClipper>(
+						tag.params[0],
+						CSize(m_size.cx >> 3, m_size.cy >> 3),
+						sub->m_scalex, sub->m_scaley,
+						invert,
+						(sub->m_relativeTo == 1) ? CPoint(m_vidrect.left, m_vidrect.top) : CPoint(0, 0),
+						m_renderingCaches
+					);
 				} else if (nParams == 1 && nParamsInt == 1 && !sub->m_pClipper) {
 					long scale = tag.paramsInt[0];
 					if (scale < 1) {
 						scale = 1;
 					}
-					sub->m_pClipper = std::make_shared<CClipper>(tag.params[0], CSize(m_size.cx >> 3, m_size.cy >> 3),
-																 sub->m_scalex / (1 << (scale - 1)), sub->m_scaley / (1 << (scale - 1)), invert,
-																 (sub->m_relativeTo == 1) ? CPoint(m_vidrect.left, m_vidrect.top) : CPoint(0, 0),
-																 m_renderingCaches);
+					sub->m_pClipper = std::make_shared<CClipper>(
+						tag.params[0],
+						CSize(m_size.cx >> 3, m_size.cy >> 3),
+						sub->m_scalex / (1 << (scale - 1)), sub->m_scaley / (1 << (scale - 1)),
+						invert,
+						(sub->m_relativeTo == 1) ? CPoint(m_vidrect.left, m_vidrect.top) : CPoint(0, 0),
+						m_renderingCaches
+					);
 				} else if (nParamsInt == 4) {
 					sub->m_clipInverse = invert;
 
@@ -2744,7 +2753,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 	sub->m_wrapStyle = m_defaultWrapStyle;
 	sub->m_fAnimated = false;
 	sub->m_relativeTo = stss.relativeTo;
-	sub->m_scalex = dstScreenSize.cx > 0 ? double(stss.relativeTo == STSStyle::VIDEO ? m_vidrect.Width() : m_size.cx) / (dstScreenSize.cx * 8) : 1.0;
+	sub->m_scalex = dstScreenSize.cx > 0 ? double(stss.relativeTo == STSStyle::VIDEO ? m_vidrect.Width()  : m_size.cx) / (dstScreenSize.cx * 8) : 1.0;
 	sub->m_scaley = dstScreenSize.cy > 0 ? double(stss.relativeTo == STSStyle::VIDEO ? m_vidrect.Height() : m_size.cy) / (dstScreenSize.cy * 8) : 1.0;
 
 	STSEntry stse = GetAt(entry);
@@ -3195,8 +3204,8 @@ STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 				}
 				break;
 				case EF_BANNER: { // Banner;delay=param[0][;leftoright=param[1];fadeawaywidth=param[2]]
-					int left = s->m_relativeTo == 1 ? m_vidrect.left : 0,
-						right = s->m_relativeTo == 1 ? m_vidrect.right : m_size.cx;
+					int left  = s->m_relativeTo == 1 ? m_vidrect.left : 0;
+					int right = s->m_relativeTo == 1 ? m_vidrect.right : m_size.cx;
 
 					r.left = !!s->m_effects[k]->param[1]
 							 ? (left/*marginRect.left*/ - spaceNeeded.cx) + (int)(m_time*8.0/s->m_effects[k]->param[0])
@@ -3219,9 +3228,9 @@ STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 					CRect cr(0, (s->m_effects[k]->param[0] + 4) >> 3, spd.w, (s->m_effects[k]->param[1] + 4) >> 3);
 
 					if (s->m_relativeTo == 1) {
-						r.top += m_vidrect.top;
-						r.bottom += m_vidrect.top;
-						cr.top += m_vidrect.top >> 3;
+						r.top     += m_vidrect.top;
+						r.bottom  += m_vidrect.top;
+						cr.top    += m_vidrect.top >> 3;
 						cr.bottom += m_vidrect.top >> 3;
 					}
 
