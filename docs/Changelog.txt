@@ -2,8 +2,14 @@
 
 1.6.11.x dev
 =============================
+MpegSplitter
+Added support for VVC(H.266) video.
+
 MP4Splitter
-Added support for VVC(H.266) codec.
+Added support for VVC(H.266) video.
+
+RawVideoSplitter
+Added support for VVC(H.266) video.
 
 MPCVideoDec
 Added support for D3D12 copy back mode.
@@ -12,13 +18,15 @@ Added AVS3 support for external filter.
 
 Player
 Added the ability to open the folder of the currently playing file using a hotkey.
+Do not show zero hours when displaying time.
+Changed the logic of frame offset relative to the center of the window.
 
 Updated French translation (by rhahgleuhargh).
 Updated Italian translation (by mapi68).
 Updated Korean translation (by Hackjjang).
 
 Updated libraries:
-	ffmpeg git-n6.2-dev-804-gd595e0a0b6;
+	ffmpeg git-n6.2-dev-848-gd2eb6f4d44;
 	nanosvg git-93ce879.
 
 

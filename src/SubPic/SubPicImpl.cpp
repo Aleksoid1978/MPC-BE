@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -191,10 +191,10 @@ STDMETHODIMP CSubPicImpl::SetSize(SIZE size, RECT vidrect)
 	}
 
 	if (m_size.cx != size.cx || m_size.cy != size.cy) {
-		m_vidrect.top = MulDiv(m_vidrect.top, m_size.cx, size.cx);
+		m_vidrect.top    = MulDiv(m_vidrect.top,    m_size.cx, size.cx);
 		m_vidrect.bottom = MulDiv(m_vidrect.bottom, m_size.cx, size.cx);
-		m_vidrect.left = MulDiv(m_vidrect.left, m_size.cy, size.cy);
-		m_vidrect.right = MulDiv(m_vidrect.right, m_size.cy, size.cy);
+		m_vidrect.left   = MulDiv(m_vidrect.left,   m_size.cy, size.cy);
+		m_vidrect.right  = MulDiv(m_vidrect.right,  m_size.cy, size.cy);
 	}
 	m_virtualTextureSize = m_size;
 
@@ -243,9 +243,9 @@ STDMETHODIMP_(void) CSubPicImpl::SetInverseAlpha(bool bInverted)
 CSubPicAllocatorImpl::CSubPicAllocatorImpl(SIZE cursize, bool fDynamicWriteOnly)
 	: CUnknown(L"ISubPicAllocatorImpl", nullptr)
 	, m_cursize(cursize)
+	, m_curvidrect(CPoint(0, 0), m_cursize)
 	, m_fDynamicWriteOnly(fDynamicWriteOnly)
 {
-	m_curvidrect = CRect(CPoint(0,0), m_cursize);
 }
 
 STDMETHODIMP CSubPicAllocatorImpl::NonDelegatingQueryInterface(REFIID riid, void** ppv)
