@@ -835,6 +835,7 @@ public:
 	afx_msg void OnSizing(UINT nSide, LPRECT pRect);
 	afx_msg void OnDisplayChange();
 	afx_msg void OnWindowPosChanging(WINDOWPOS* lpwndpos);
+	afx_msg BOOL OnQueryEndSession();
 
 	LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
 	LRESULT OnDwmCompositionChanged(WPARAM wParam, LPARAM lParam);

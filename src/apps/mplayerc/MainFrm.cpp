@@ -177,6 +177,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_MESSAGE_VOID(WM_DISPLAYCHANGE, OnDisplayChange)
 	ON_WM_WINDOWPOSCHANGING()
 
+	ON_WM_QUERYENDSESSION()
+
 	ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
 	ON_MESSAGE(WM_DWMCOMPOSITIONCHANGED, OnDwmCompositionChanged)
 
@@ -2174,6 +2176,13 @@ void CMainFrame::OnWindowPosChanging(WINDOWPOS* lpwndpos)
 	}
 
 	__super::OnWindowPosChanging(lpwndpos);
+}
+
+BOOL CMainFrame::OnQueryEndSession()
+{
+	CloseMedia();
+
+	return TRUE;
 }
 
 LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
@@ -7704,7 +7713,7 @@ void CMainFrame::OnViewPanNScan(UINT nID)
 
 	if (dy) {
 		m_PosY = std::clamp(m_PosY + shift * dy, 0.0, 1.0);
-		
+
 		if (abs(m_PosY - 0.5) * 2 < shift) {
 			m_PosY = 0.5;
 		}
