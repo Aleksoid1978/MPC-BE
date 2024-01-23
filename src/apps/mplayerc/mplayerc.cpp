@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1311,19 +1311,6 @@ int CMPlayerCApp::ExitInstance()
 	OleUninitialize();
 
 	return CWinApp::ExitInstance();
-}
-
-BOOL CMPlayerCApp::SaveAllModified()
-{
-	// CWinApp::SaveAllModified
-	// Called by the framework to save all documents
-	// when the application's main frame window is to be closed,
-	// or through a WM_QUERYENDSESSION message.
-	if (auto pMainFrame = AfxFindMainFrame()) {
-		pMainFrame->CloseMedia();
-	}
-
-	return TRUE;
 }
 
 /////////////////////////////////////////////////////////////////////////////
