@@ -954,6 +954,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		m_CMediaControls.Init(this);
 	}
 
+	RegisterApplicationRestart(L"", RESTART_NO_CRASH | RESTART_NO_HANG);
+
 	cmdLineThread = std::thread([this] { cmdLineThreadFunction(); });
 
 	return 0;
