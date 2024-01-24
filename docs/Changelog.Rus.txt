@@ -26,7 +26,7 @@ MPCVideoDec
 Обновлен корейский перевод (автор Hackjjang).
 
 Обновлены библиотеки:
-	ffmpeg git-n6.2-dev-848-gd2eb6f4d44;
+	ffmpeg git-n6.2-dev-870-g0b8e51b584;
 	nanosvg git-93ce879.
 
 
