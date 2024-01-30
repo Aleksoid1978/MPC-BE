@@ -18,19 +18,22 @@ else
 	CONFIGURATION = Release
 endif
 
-OBJ_DIR	          = $(BIN_DIR)/obj/$(CONFIGURATION)_$(PLATFORM)/ffmpeg/
-TARGET_LIB_DIR    = $(BIN_DIR)/lib/$(CONFIGURATION)_$(PLATFORM)
-LIB_LIBAVCODEC    = $(OBJ_DIR)libavcodec.a
-LIB_LIBAVCODEC_B  = $(OBJ_DIR)libavcodec_b.a
-LIB_LIBAVFILTER   = $(OBJ_DIR)libavfilter.a
-LIB_LIBAVUTIL     = $(OBJ_DIR)libavutil.a
-LIB_LIBSWRESAMPLE = $(OBJ_DIR)libswresample.a
-LIB_LIBSWSCALE    = $(OBJ_DIR)libswscale.a
-TARGET_LIB        = $(TARGET_LIB_DIR)/ffmpeg.lib
-ARSCRIPT          = $(OBJ_DIR)script.ar
+OBJ_DIR	           = $(BIN_DIR)/obj/$(CONFIGURATION)_$(PLATFORM)/ffmpeg/
+TARGET_LIB_DIR     = $(BIN_DIR)/lib/$(CONFIGURATION)_$(PLATFORM)
+LIB_LIBAVCODEC     = $(OBJ_DIR)libavcodec.a
+LIB_LIBAVCODEC_B   = $(OBJ_DIR)libavcodec_b.a
+LIB_LIBAVCODEC_BSF = $(OBJ_DIR)libavcodec_bsf.a
+LIB_LIBAVFILTER    = $(OBJ_DIR)libavfilter.a
+LIB_LIBAVUTIL      = $(OBJ_DIR)libavutil.a
+LIB_LIBSWRESAMPLE  = $(OBJ_DIR)libswresample.a
+LIB_LIBSWSCALE     = $(OBJ_DIR)libswscale.a
+TARGET_LIB         = $(TARGET_LIB_DIR)/ffmpeg.lib
+ARSCRIPT           = $(OBJ_DIR)script.ar
 
 # Compiler and yasm flags
-CFLAGS = -I. -I.. -Icompat/atomics/win32 -Icompat/windows -I$(ZLIB_DIR) -I$(SPEEX_DIR) -I$(SOXR_DIR) -I$(DAV1_DIR) -I$(FFNVCODEC_DIR) -I$(UAVS3D_DIR) \
+CFLAGS = -I. -I.. -Icompat/atomics/win32 -Icompat/windows \
+	   -Ilibavcodec \
+	   -I$(ZLIB_DIR) -I$(SPEEX_DIR) -I$(SOXR_DIR) -I$(DAV1_DIR) -I$(FFNVCODEC_DIR) -I$(UAVS3D_DIR) \
 	   -DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
 	   -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DOPJ_STATIC \
 	   -D_WIN32_WINNT=0x0601 -DWINVER=0x0601 \
@@ -61,6 +64,7 @@ endif
 OBJ_DIRS = $(OBJ_DIR) \
 	$(OBJ_DIR)compat \
 	$(OBJ_DIR)libavcodec \
+	$(OBJ_DIR)libavcodec/bsf \
 	$(OBJ_DIR)libavcodec/vvc \
 	$(OBJ_DIR)libavcodec/x86 \
 	$(OBJ_DIR)libavfilter \
@@ -74,7 +78,7 @@ OBJ_DIRS = $(OBJ_DIR) \
 	$(TARGET_LIB_DIR)
 
 # Targets
-all: make_objdirs $(LIB_LIBAVCODEC) $(LIB_LIBAVCODEC_B) $(LIB_LIBAVFILTER) $(LIB_LIBAVUTIL) $(LIB_LIBSWRESAMPLE) $(LIB_LIBSWSCALE) $(TARGET_LIB)
+all: make_objdirs $(LIB_LIBAVCODEC) $(LIB_LIBAVCODEC_B) $(LIB_LIBAVCODEC_BSF) $(LIB_LIBAVFILTER) $(LIB_LIBAVUTIL) $(LIB_LIBSWRESAMPLE) $(LIB_LIBSWSCALE) $(TARGET_LIB)
 
 make_objdirs: $(OBJ_DIRS)
 $(OBJ_DIRS):
@@ -90,7 +94,6 @@ SRCS_LC = \
 	\
 	libavcodec/8bps.c \
 	libavcodec/aac_ac3_parser.c \
-	libavcodec/aac_adtstoasc_bsf.c \
 	libavcodec/aac_parser.c \
 	libavcodec/aacdec.c \
 	libavcodec/aacdec_common.c \
@@ -136,7 +139,6 @@ SRCS_LC = \
 	libavcodec/atrac9dec.c \
 	libavcodec/atsc_a53.c \
 	libavcodec/audiodsp.c \
-	libavcodec/av1_frame_split_bsf.c \
 	libavcodec/av1_parse.c \
 	libavcodec/av1_parser.c \
 	libavcodec/av1dec.c \
@@ -167,7 +169,6 @@ SRCS_LC = \
 	libavcodec/cfhd.c \
 	libavcodec/cfhddata.c \
 	libavcodec/cfhddsp.c \
-	libavcodec/chomp_bsf.c \
 	libavcodec/cinepak.c \
 	libavcodec/cllc.c \
 	libavcodec/codec_desc.c \
@@ -184,7 +185,6 @@ SRCS_LC = \
 	libavcodec/d3d12va_vp9.c \
 	libavcodec/dca.c \
 	libavcodec/dca_core.c \
-	libavcodec/dca_core_bsf.c \
 	libavcodec/dca_exss.c \
 	libavcodec/dca_lbr.c \
 	libavcodec/dca_parser.c \
@@ -213,7 +213,6 @@ SRCS_LC = \
 	libavcodec/dsd.c \
 	libavcodec/dsddec.c \
 	libavcodec/dstdec.c \
-	libavcodec/dump_extradata_bsf.c \
 	libavcodec/dv.c \
 	libavcodec/dv_profile.c \
 	libavcodec/dvdata.c \
@@ -233,7 +232,6 @@ SRCS_LC = \
 	libavcodec/encode.c \
 	libavcodec/error_resilience.c \
 	libavcodec/exif.c \
-	libavcodec/extract_extradata_bsf.c \
 	libavcodec/faandct.c \
 	libavcodec/faanidct.c \
 	libavcodec/fdctdsp.c \
@@ -265,7 +263,6 @@ SRCS_LC = \
 	libavcodec/h264_direct.c \
 	libavcodec/h264_loopfilter.c \
 	libavcodec/h264_mb.c \
-	libavcodec/h264_mp4toannexb_bsf.c \
 	libavcodec/h264_parse.c \
 	libavcodec/h264_parser.c \
 	libavcodec/h264_picture.c \
@@ -280,7 +277,6 @@ SRCS_LC = \
 	libavcodec/h264idct.c \
 	libavcodec/h264pred.c \
 	libavcodec/h264qpel.c \
-	libavcodec/h266_metadata_bsf.c \
 	libavcodec/h2645_parse.c \
 	libavcodec/h2645_sei.c \
 	libavcodec/h2645_vui.c \
@@ -292,7 +288,6 @@ SRCS_LC = \
 	libavcodec/hevc_cabac.c \
 	libavcodec/hevc_data.c \
 	libavcodec/hevc_filter.c \
-	libavcodec/hevc_mp4toannexb_bsf.c \
 	libavcodec/hevc_mvs.c \
 	libavcodec/hevc_parse.c \
 	libavcodec/hevc_parser.c \
@@ -316,7 +311,6 @@ SRCS_LC = \
 	libavcodec/idctdsp.c \
 	libavcodec/imc.c \
 	libavcodec/imgconvert.c \
-	libavcodec/imx_dump_header_bsf.c \
 	libavcodec/indeo3.c \
 	libavcodec/indeo4.c \
 	libavcodec/indeo5.c \
@@ -352,8 +346,6 @@ SRCS_LC = \
 	libavcodec/me_cmp.c \
 	libavcodec/metasound.c \
 	libavcodec/mjpeg_parser.c \
-	libavcodec/mjpeg2jpeg_bsf.c \
-	libavcodec/mjpega_dump_header_bsf.c \
 	libavcodec/mjpegbdec.c \
 	libavcodec/mjpegdec.c \
 	libavcodec/mjpegdec_common.c \
@@ -364,8 +356,6 @@ SRCS_LC = \
 	libavcodec/mlpdsp.c \
 	libavcodec/mlz.c \
 	libavcodec/motion_est.c \
-	libavcodec/movsub_bsf.c \
-	libavcodec/mp3_header_decompress_bsf.c \
 	libavcodec/mpc.c \
 	libavcodec/mpc7.c \
 	libavcodec/mpc8.c \
@@ -374,7 +364,6 @@ SRCS_LC = \
 	libavcodec/mpeg12data.c \
 	libavcodec/mpeg12dec.c \
 	libavcodec/mpeg12framerate.c \
-	libavcodec/mpeg4_unpack_bframes_bsf.c \
 	libavcodec/mpeg4audio.c \
 	libavcodec/mpeg4audio_sample_rates.c \
 	libavcodec/mpeg4video.c \
@@ -423,8 +412,6 @@ SRCS_LC = \
 	libavcodec/nellymoserdec.c
 
 SRCS_LC_B = \
-	libavcodec/noise_bsf.c \
-	libavcodec/null_bsf.c \
 	libavcodec/nvdec.c \
 	libavcodec/nvdec_av1.c \
 	libavcodec/nvdec_h264.c \
@@ -470,7 +457,6 @@ SRCS_LC_B = \
 	libavcodec/raw.c \
 	libavcodec/rawdec.c \
 	libavcodec/refstruct.c \
-	libavcodec/remove_extradata_bsf.c \
 	libavcodec/rl.c \
 	libavcodec/rpza.c \
 	libavcodec/rv10.c \
@@ -552,9 +538,6 @@ SRCS_LC_B = \
 	libavcodec/vp8dsp.c \
 	libavcodec/vp9.c \
 	libavcodec/vp9_parser.c \
-	libavcodec/vp9_raw_reorder_bsf.c \
-	libavcodec/vp9_superframe_bsf.c \
-	libavcodec/vp9_superframe_split_bsf.c \
 	libavcodec/vp9block.c \
 	libavcodec/vp9data.c \
 	libavcodec/vp9dsp.c \
@@ -566,6 +549,7 @@ SRCS_LC_B = \
 	libavcodec/vp9prob.c \
 	libavcodec/vp9recon.c \
 	libavcodec/vpx_rac.c\
+	libavcodec/vvc_parser.c \
 	libavcodec/wavpack.c \
 	libavcodec/wavpackdata.c \
 	libavcodec/wma.c \
@@ -583,8 +567,6 @@ SRCS_LC_B = \
 	libavcodec/xvididct.c \
 	libavcodec/zlib_wrapper.c \
 	\
-	libavcodec/vvc_mp4toannexb_bsf.c \
-	libavcodec/vvc_parser.c \
 	libavcodec/vvc/vvcdec.c \
 	libavcodec/vvc/vvcdsp.c \
 	libavcodec/vvc/vvc_cabac.c \
@@ -661,6 +643,30 @@ SRCS_LC_B = \
 	libavcodec/x86/vp9dsp_init_12bpp.c \
 	libavcodec/x86/vp9dsp_init_16bpp.c \
 	libavcodec/x86/xvididct_init.c
+
+SRCS_LC_BSF = \
+	libavcodec/bsf/aac_adtstoasc.c \
+	libavcodec/bsf/av1_frame_split.c \
+	libavcodec/bsf/chomp.c \
+	libavcodec/bsf/dca_core.c \
+	libavcodec/bsf/dump_extradata.c \
+	libavcodec/bsf/extract_extradata.c \
+	libavcodec/bsf/h264_mp4toannexb.c \
+	libavcodec/bsf/h266_metadata.c \
+	libavcodec/bsf/hevc_mp4toannexb.c \
+	libavcodec/bsf/imx_dump_header.c \
+	libavcodec/bsf/mjpeg2jpeg.c \
+	libavcodec/bsf/mjpega_dump_header.c \
+	libavcodec/bsf/movsub.c \
+	libavcodec/bsf/mp3_header_decompress.c \
+	libavcodec/bsf/mpeg4_unpack_bframes.c \
+	libavcodec/bsf/noise.c \
+	libavcodec/bsf/null.c \
+	libavcodec/bsf/remove_extradata.c \
+	libavcodec/bsf/vp9_raw_reorder.c \
+	libavcodec/bsf/vp9_superframe.c \
+	libavcodec/bsf/vp9_superframe_split.c \
+	libavcodec/bsf/vvc_mp4toannexb.c \
 
 SRCS_LF = \
 	libavfilter/af_aresample.c \
@@ -904,6 +910,9 @@ OBJS_LC = \
 
 OBJS_LC_B = \
 	$(SRCS_LC_B:%.c=$(OBJ_DIR)%.o)
+	
+OBJS_LC_BSF = \
+	$(SRCS_LC_BSF:%.c=$(OBJ_DIR)%.o)
 
 OBJS_LF = \
 	$(SRCS_LF:%.c=$(OBJ_DIR)%.o) \
@@ -937,6 +946,10 @@ $(LIB_LIBAVCODEC): $(OBJS_LC)
 $(LIB_LIBAVCODEC_B): $(OBJS_LC_B)
 	@echo $@
 	@$(GCC_PREFIX)ar rc $@ $(OBJS_LC_B)
+	
+$(LIB_LIBAVCODEC_BSF): $(OBJS_LC_BSF)
+	@echo $@
+	@$(GCC_PREFIX)ar rc $@ $(OBJS_LC_BSF)
 
 $(LIB_LIBAVFILTER): $(OBJS_LF)
 	@echo $@
@@ -954,21 +967,23 @@ $(LIB_LIBSWRESAMPLE): $(OBJS_LR)
 	@echo $@
 	@$(GCC_PREFIX)ar rc $@ $(OBJS_LR)
 
-$(TARGET_LIB): $(LIB_LIBAVCODEC) $(LIB_LIBAVCODEC_B) $(LIB_LIBAVFILTER) $(LIB_LIBAVUTIL) $(LIB_LIBSWRESAMPLE) $(LIB_LIBSWSCALE)
+$(TARGET_LIB): $(LIB_LIBAVCODEC) $(LIB_LIBAVCODEC_B) $(LIB_LIBAVCODEC_BSF) $(LIB_LIBAVFILTER) $(LIB_LIBAVUTIL) $(LIB_LIBSWRESAMPLE) $(LIB_LIBSWSCALE)
 	@rm -f $(ARSCRIPT)
-	@echo "CREATE $@"                   >> $(ARSCRIPT)
-	@echo "ADDLIB $(LIB_LIBAVCODEC)"    >> $(ARSCRIPT)
-	@echo "ADDLIB $(LIB_LIBAVCODEC_B)"  >> $(ARSCRIPT)
-	@echo "ADDLIB $(LIB_LIBAVFILTER)"   >> $(ARSCRIPT)
-	@echo "ADDLIB $(LIB_LIBSWSCALE)"    >> $(ARSCRIPT)
-	@echo "ADDLIB $(LIB_LIBAVUTIL)"     >> $(ARSCRIPT)
-	@echo "ADDLIB $(LIB_LIBSWRESAMPLE)" >> $(ARSCRIPT)
-	@echo "SAVE"                        >> $(ARSCRIPT)
-	@echo "END"                         >> $(ARSCRIPT)
+	@echo "CREATE $@"                    >> $(ARSCRIPT)
+	@echo "ADDLIB $(LIB_LIBAVCODEC)"     >> $(ARSCRIPT)
+	@echo "ADDLIB $(LIB_LIBAVCODEC_B)"   >> $(ARSCRIPT)
+	@echo "ADDLIB $(LIB_LIBAVCODEC_BSF)" >> $(ARSCRIPT)	
+	@echo "ADDLIB $(LIB_LIBAVFILTER)"    >> $(ARSCRIPT)
+	@echo "ADDLIB $(LIB_LIBSWSCALE)"     >> $(ARSCRIPT)
+	@echo "ADDLIB $(LIB_LIBAVUTIL)"      >> $(ARSCRIPT)
+	@echo "ADDLIB $(LIB_LIBSWRESAMPLE)"  >> $(ARSCRIPT)
+	@echo "SAVE"                         >> $(ARSCRIPT)
+	@echo "END"                          >> $(ARSCRIPT)
 	@$(GCC_PREFIX)ar -M < $(ARSCRIPT)
 
 -include $(SRCS_LC:%.c=$(OBJ_DIR)%.d)
 -include $(SRCS_LC_B:%.c=$(OBJ_DIR)%.d)
+-include $(SRCS_LC_BSF:%.c=$(OBJ_DIR)%.d)
 -include $(SRCS_LF:%.c=$(OBJ_DIR)%.d)
 -include $(SRCS_LU:%.c=$(OBJ_DIR)%.d)
 -include $(SRCS_LR:%.c=$(OBJ_DIR)%.d)

@@ -800,12 +800,6 @@ void ff_vvc_ps_uninit(VVCParamSets *ps)
         ff_refstruct_unref(&ps->pps_list[i]);
 }
 
-enum {
-    APS_ALF,
-    APS_LMCS,
-    APS_SCALING,
-};
-
 static void alf_coeff(int16_t *coeff,
     const uint8_t *abs, const uint8_t *sign, const int size)
 {
@@ -910,7 +904,7 @@ static void scaling_derive(VVCScalingList *sl, const H266RawAPS *aps)
 {
     for (int id = 0; id < SL_MAX_ID; id++) {
         const int matrix_size   = derive_matrix_size(id);
-        const int log2_size     = log2(matrix_size);
+        const int log2_size     = av_log2(matrix_size);
         const int list_size     = matrix_size * matrix_size;
         int coeff[SL_MAX_MATRIX_SIZE * SL_MAX_MATRIX_SIZE];
         const uint8_t *pred;
@@ -990,13 +984,13 @@ int ff_vvc_decode_aps(VVCParamSets *ps, const CodedBitstreamUnit *unit)
         return AVERROR_INVALIDDATA;
 
     switch (aps->aps_params_type) {
-        case APS_ALF:
+        case VVC_ASP_TYPE_ALF:
             ret = aps_decode_alf(&ps->alf_list[aps->aps_adaptation_parameter_set_id], aps);
             break;
-        case APS_LMCS:
+        case VVC_ASP_TYPE_LMCS:
             ff_refstruct_replace(&ps->lmcs_list[aps->aps_adaptation_parameter_set_id], aps);
             break;
-        case APS_SCALING:
+        case VVC_ASP_TYPE_SCALING:
             ret = aps_decode_scaling(&ps->scaling_list[aps->aps_adaptation_parameter_set_id], aps);
             break;
     }
