@@ -16082,7 +16082,7 @@ void CMainFrame::SetAlwaysOnTop(int i)
 
 		if (pInsertAfter) {
 			SetWindowPos(pInsertAfter, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
-			if (pInsertAfter == &wndTopMost && !IsIconic()) {
+			if (i >= 2 && pInsertAfter == &wndTopMost && !IsIconic()) {
 				SetForegroundWindow();
 			}
 		}
