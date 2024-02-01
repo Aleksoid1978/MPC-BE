@@ -16081,11 +16081,11 @@ void CMainFrame::SetAlwaysOnTop(int i)
 		}
 
 		if (pInsertAfter) {
-			SetWindowPos(pInsertAfter, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 			if (i >= 2 && pInsertAfter == &wndTopMost && !IsIconic()) {
-				SetForegroundWindow();
+				ShowWindow(SW_SHOWNA);
 			}
-		}
+			SetWindowPos(pInsertAfter, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+		} 
 	} else if (bD3DOnMain) {
 		SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 	}
