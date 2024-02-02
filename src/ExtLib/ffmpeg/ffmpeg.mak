@@ -67,6 +67,8 @@ OBJ_DIRS = $(OBJ_DIR) \
 	$(OBJ_DIR)libavcodec/bsf \
 	$(OBJ_DIR)libavcodec/vvc \
 	$(OBJ_DIR)libavcodec/x86 \
+	$(OBJ_DIR)libavcodec/x86/h26x \
+	$(OBJ_DIR)libavcodec/x86/vvc \
 	$(OBJ_DIR)libavfilter \
 	$(OBJ_DIR)libavfilter/x86 \
 	$(OBJ_DIR)libavutil \
@@ -642,7 +644,11 @@ SRCS_LC_B = \
 	libavcodec/x86/vp9dsp_init_10bpp.c \
 	libavcodec/x86/vp9dsp_init_12bpp.c \
 	libavcodec/x86/vp9dsp_init_16bpp.c \
-	libavcodec/x86/xvididct_init.c
+	libavcodec/x86/xvididct_init.c \
+	\
+	libavcodec/x86/h26x/h2656dsp.c \
+	\
+	libavcodec/x86/vvc/vvcdsp_init.c
 
 SRCS_LC_BSF = \
 	libavcodec/bsf/aac_adtstoasc.c \
@@ -666,7 +672,7 @@ SRCS_LC_BSF = \
 	libavcodec/bsf/vp9_raw_reorder.c \
 	libavcodec/bsf/vp9_superframe.c \
 	libavcodec/bsf/vp9_superframe_split.c \
-	libavcodec/bsf/vvc_mp4toannexb.c \
+	libavcodec/bsf/vvc_mp4toannexb.c
 
 SRCS_LF = \
 	libavfilter/af_aresample.c \
@@ -877,7 +883,11 @@ SRCS_YASM_LC = \
 	libavcodec/x86/vp9lpf_16bpp.asm \
 	libavcodec/x86/vp9mc.asm \
 	libavcodec/x86/vp9mc_16bpp.asm \
-	libavcodec/x86/xvididct.asm
+	libavcodec/x86/xvididct.asm \
+	\
+	libavcodec/x86/h26x/h2656_inter.asm \
+	\
+	libavcodec/x86/vvc/vvc_mc.asm
 
 SRCS_YASM_LF = 
 
