@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,33 +34,6 @@ DWORD CharSetToCodePage(DWORD dwCharSet)
 	CHARSETINFO cs= {0};
 	::TranslateCharsetInfo((DWORD*)(DWORD_PTR)dwCharSet, &cs, TCI_SRCCHARSET);
 	return cs.ciACP;
-}
-
-CStringA ConvertMBCS(CStringA str, DWORD SrcCharSet, DWORD DstCharSet)
-{
-	WCHAR* utf16 = DNew WCHAR[str.GetLength()+1];
-	memset(utf16, 0, (str.GetLength()+1)*sizeof(WCHAR));
-
-	CHAR* mbcs = DNew CHAR[str.GetLength()*6+1];
-	memset(mbcs, 0, str.GetLength()*6+1);
-
-	int len = MultiByteToWideChar(
-				  CharSetToCodePage(SrcCharSet), 0,
-				  str, -1, // null terminated string
-				  utf16, str.GetLength()+1);
-
-	len = WideCharToMultiByte(
-			  CharSetToCodePage(DstCharSet), 0,
-			  utf16, len,
-			  mbcs, str.GetLength()*6,
-			  nullptr, nullptr);
-
-	str = mbcs;
-
-	delete [] utf16;
-	delete [] mbcs;
-
-	return str;
 }
 
 CStringA UrlEncode(const CStringA& str_in, const bool bArg/* = false*/)
@@ -447,6 +420,10 @@ CStringW FormatNumber(const CStringW& szNumber, const bool bNoFractionalDigits /
 
 CStringW FourccToWStr(uint32_t fourcc)
 {
+	if (fourcc == 0) {
+		return L"0";
+	}
+
 	CStringW ret;
 
 	for (unsigned i = 0; i < 4; i++) {

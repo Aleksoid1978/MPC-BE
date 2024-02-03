@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -135,7 +135,6 @@ ImplodeEsc(const std::list<T>& sl, const SEP sep, const SEP esc = '\\')
 }
 
 extern DWORD    CharSetToCodePage(DWORD dwCharSet);
-extern CStringA ConvertMBCS(CStringA str, DWORD SrcCharSet, DWORD DstCharSet);
 extern CStringA UrlEncode(const CStringA& str_in, const bool bArg = false);
 extern CStringA UrlDecode(const CStringA& str_in);
 extern CStringW UrlDecode(LPCWSTR lpWideCharStr);
