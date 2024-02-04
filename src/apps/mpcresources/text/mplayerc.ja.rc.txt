@@ -1347,7 +1347,7 @@ STRING IDS_BDA_ERROR_CONNECT_TUNER_REC		"チューナーと受信機を接続で
 STRING IDS_BDA_ERROR_CREATE_RECEIVER		"受信機を作成できませんでした。"
 STRING IDS_BDA_ERROR_CREATE_TUNER		"チューナーを作成できませんでした。"
 STRING IDS_BDA_ERROR_DEMULTIPLEXER		"デマルチプレクサーを作成できませんでした。"
-STRING IDS_BLOCK_EXTERNAL_VR		"You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
+STRING IDS_BLOCK_EXTERNAL_VR		"%s を外部フィルターとして追加することはできません。\n[映像] 設定ページで、お好みのビデオ レンダラーを選択する必要があります。"
 STRING IDS_BRIGHTNESS_DEC		"明るさを下げる"
 STRING IDS_BRIGHTNESS_INC		"明るさを上げる"
 STRING IDS_CANCEL		"キャンセル"
