@@ -27,6 +27,7 @@ Updated Korean translation (by Hackjjang).
 
 Updated libraries:
 	ffmpeg git-n6.2-dev-967-gb181868aba;
+	Little-CMS git-lcms2.16-26-gc2a5401;
 	nanosvg git-93ce879.
 
 

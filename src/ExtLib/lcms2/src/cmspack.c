@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2023 Marti Maria Saguer
+//  Copyright (c) 1998-2024 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -188,7 +188,7 @@ cmsUInt8Number* UnrollPlanarBytes(CMSREGISTER _cmsTRANSFORM* info,
     else
     {
         if (Premul && Extra)
-            alpha_factor = _cmsToFixedDomain(FROM_8_TO_16(accum[(nChan) * Stride]));
+            alpha_factor = _cmsToFixedDomain(FROM_8_TO_16(accum[nChan * Stride]));
     }
 
     for (i=0; i < nChan; i++) {
@@ -1357,7 +1357,7 @@ cmsUInt8Number* UnrollFloatsToFloat(_cmsTRANSFORM* info,
     if (Premul && Extra)
     {        
         if (Planar)
-            alpha_factor = (ExtraFirst ? ptr[0] : ptr[nChan * Stride / sizeof(cmsFloat32Number)]) / maximum;
+            alpha_factor = (ExtraFirst ? ptr[0] : ptr[nChan * Stride]) / maximum;
         else
             alpha_factor = (ExtraFirst ? ptr[0] : ptr[nChan]) / maximum;        
     }
@@ -1424,7 +1424,7 @@ cmsUInt8Number* UnrollDoublesToFloat(_cmsTRANSFORM* info,
     if (Premul && Extra)
     {
         if (Planar)
-            alpha_factor = (ExtraFirst ? ptr[0] : ptr[(nChan) * Stride / sizeof(cmsFloat64Number)]) / maximum;
+            alpha_factor = (ExtraFirst ? ptr[0] : ptr[nChan * Stride]) / maximum;
         else
             alpha_factor = (ExtraFirst ? ptr[0] : ptr[nChan]) / maximum;
     }
@@ -3022,6 +3022,7 @@ cmsUInt8Number* PackWordsFromFloat(_cmsTRANSFORM* info,
     if (ExtraFirst)
         start = Extra;
 
+    Stride /= 2;
     for (i = 0; i < nChan; i++) {
 
         cmsUInt32Number index = DoSwap ? (nChan - i - 1) : i;
@@ -3034,7 +3035,7 @@ cmsUInt8Number* PackWordsFromFloat(_cmsTRANSFORM* info,
         vv = _cmsQuickSaturateWord(v);
 
         if (Planar)
-            ((cmsUInt16Number*)output)[(i + start) * Stride/2] = vv;
+            ((cmsUInt16Number*)output)[(i + start) * Stride] = vv;
         else
             ((cmsUInt16Number*)output)[i + start] = vv;
     }
@@ -3085,7 +3086,7 @@ cmsUInt8Number* PackFloatsFromFloat(_cmsTRANSFORM* info,
                      v = maximum - v;
 
               if (Planar)
-                     ((cmsFloat32Number*)output)[(i + start)* Stride] = (cmsFloat32Number)v;
+                     ((cmsFloat32Number*)output)[(i + start) * Stride] = (cmsFloat32Number)v;
               else
                      ((cmsFloat32Number*)output)[i + start] = (cmsFloat32Number)v;
        }
