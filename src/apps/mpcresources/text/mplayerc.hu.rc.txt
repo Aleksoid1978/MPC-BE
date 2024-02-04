@@ -1347,6 +1347,7 @@ STRING IDS_BDA_ERROR_CONNECT_TUNER_REC		"Nem sikerült a tuner és a vevőkész�
 STRING IDS_BDA_ERROR_CREATE_RECEIVER		"Nem sikerült létrehozni a vevőt."
 STRING IDS_BDA_ERROR_CREATE_TUNER		"Nem sikerült létrehozni a tunert."
 STRING IDS_BDA_ERROR_DEMULTIPLEXER		"Nem sikerült létrehozni a demultiplexert."
+STRING IDS_BLOCK_EXTERNAL_VR		"You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
 STRING IDS_BRIGHTNESS_DEC		"Fényerő csökkentése"
 STRING IDS_BRIGHTNESS_INC		"Fényerő növelése"
 STRING IDS_CANCEL		"Mégse"

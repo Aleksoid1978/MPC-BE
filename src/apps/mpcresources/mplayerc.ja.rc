@@ -3169,11 +3169,12 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_HAALI_VR       "VMR-9 とほぼ同じですが、真のバイキュービック リサイザーを使用します。"
+    IDS_BLOCK_EXTERNAL_VR   "You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
 END
 
 STRINGTABLE
 BEGIN
+    IDS_DESC_HAALI_VR       "VMR-9 とほぼ同じですが、真のバイキュービック リサイザーを使用します。"
     IDS_DESC_NULLVR_ANY     "あらゆる動画の (ような) メディア タイプに接続して入力サンプルをどこにも出力しません。映像の表示を必要とせず、CPU を無駄な動作から節約したい場合に使用してください。"
     IDS_DESC_NULLVR_UNCOMP  "標準の Null レンダラーと同じですが、これは非圧縮タイプにのみ接続します。"
     IDS_DESC_EVR            "ハードウェア デコーディングに対応したレンダラーです。"

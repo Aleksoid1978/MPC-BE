@@ -1347,6 +1347,7 @@ STRING IDS_BDA_ERROR_CONNECT_TUNER_REC		"Could not connect the tuner and the rec
 STRING IDS_BDA_ERROR_CREATE_RECEIVER		"Prijemnik nije bilo moguće kreirat."
 STRING IDS_BDA_ERROR_CREATE_TUNER		"Tuner nije bilo moguće kreirat."
 STRING IDS_BDA_ERROR_DEMULTIPLEXER		"Demultiplekser nije kreiran."
+STRING IDS_BLOCK_EXTERNAL_VR		"You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
 STRING IDS_BRIGHTNESS_DEC		"Smanjenje svjetline"
 STRING IDS_BRIGHTNESS_INC		"Povećanje svjetline"
 STRING IDS_CANCEL		"Cancel"

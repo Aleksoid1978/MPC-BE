@@ -1347,6 +1347,7 @@ STRING IDS_BDA_ERROR_CONNECT_TUNER_REC		"Kon geen verbinding maken met de tuner 
 STRING IDS_BDA_ERROR_CREATE_RECEIVER		"Kon de receiver niet maken."
 STRING IDS_BDA_ERROR_CREATE_TUNER		"Kon de tuner niet maken."
 STRING IDS_BDA_ERROR_DEMULTIPLEXER		"Kon de demultiplexer niet maken."
+STRING IDS_BLOCK_EXTERNAL_VR		"You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
 STRING IDS_BRIGHTNESS_DEC		"Helderheid verminderen"
 STRING IDS_BRIGHTNESS_INC		"Helderheid vermeerderen"
 STRING IDS_CANCEL		"Annuleren"

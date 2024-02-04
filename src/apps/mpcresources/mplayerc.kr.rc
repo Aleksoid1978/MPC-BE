@@ -3169,11 +3169,12 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_HAALI_VR       "VMR-9과 다름없지만, 고등 차수 보간을 사용합니다."
+    IDS_BLOCK_EXTERNAL_VR   "You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
 END
 
 STRINGTABLE
 BEGIN
+    IDS_DESC_HAALI_VR       "VMR-9과 다름없지만, 고등 차수 보간을 사용합니다."
     IDS_DESC_NULLVR_ANY     "모든 비디오 형식의 샘플을 출력하지 않습니다. 비디오를 출력하지 않으면서 CPU가 작동하도록 할 때 사용합니다."
     IDS_DESC_NULLVR_UNCOMP  "일반적인 Null 렌더러와 다름없지만 압축되지 않은 형식만을 연결합니다."
     IDS_DESC_EVR            "하드웨어 디코딩을 지원하는 비디오 렌더러입니다."

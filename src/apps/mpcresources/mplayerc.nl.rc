@@ -3169,11 +3169,12 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_HAALI_VR       "Hetzelfde als VMR-9, maar met een echte bicubicresizer."
+    IDS_BLOCK_EXTERNAL_VR   "You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
 END
 
 STRINGTABLE
 BEGIN
+    IDS_DESC_HAALI_VR       "Hetzelfde als VMR-9, maar met een echte bicubicresizer."
     IDS_DESC_NULLVR_ANY     "Verbind met elk video-achtig mediatype en zal de inkomende signalen in het, grote dan wel kleine, niets zenden. Gebruik dit als geen uitvoersignaal nodig is en de om de CPU te ontlasten."
     IDS_DESC_NULLVR_UNCOMP  "Hetzelfde als de normale Null renderer, maar deze zal alleen verbinding maken met ongecomprimeerde types."
     IDS_DESC_EVR            "Videorenderer met mogelijkheid tot hardwaredecoding."

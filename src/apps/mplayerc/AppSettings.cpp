@@ -33,6 +33,8 @@
 #include "AppSettings.h"
 #include "DSUtil/HTTPAsync.h"
 
+#include "PPageExternalFilters.h"
+
 const LPCWSTR channel_mode_sets[] = {
 	//         ID          Name
 	L"1.0", // SPK_MONO   "Mono"
@@ -1088,6 +1090,11 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 				break;
 			}
 
+			if (IsSupportedExternalVideoRenderer(f->clsid)) {
+				// supported external video renderers that must be selected in the "Video" settings
+				continue;
+			}
+
 			f->guids.clear();
 			for (unsigned int i = 0; ; i++) {
 				CString entry;
@@ -2053,16 +2060,7 @@ void CAppSettings::SaveExternalFilters()
 	// External Filter settings are saved for a long time. Use only when really necessary.
 	CProfile& profile = AfxGetProfile();
 
-	for (unsigned int i = 0; ; i++) {
-		CString key;
-		key.Format(L"%s\\%03u", IDS_R_EXTERNAL_FILTERS, i);
-		int j = -1;
-		profile.ReadInt(key, L"Enabled", j);
-		profile.DeleteSection(key);
-		if (j < 0) {
-			break;
-		}
-	}
+	profile.DeleteSection(IDS_R_EXTERNAL_FILTERS);
 
 	unsigned int k = 0;
 	for (const auto& f : m_ExternalFilters) {

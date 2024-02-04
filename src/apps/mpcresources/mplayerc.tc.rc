@@ -3169,11 +3169,12 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_HAALI_VR       "和 VMR-9 類同，但使用眞正的 bicubic 變更大小。"
+    IDS_BLOCK_EXTERNAL_VR   "You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
 END
 
 STRINGTABLE
 BEGIN
+    IDS_DESC_HAALI_VR       "和 VMR-9 類同，但使用眞正的 bicubic 變更大小。"
     IDS_DESC_NULLVR_ANY     "連到所有視訊媒體類型，並且不傳送傳入的取樣資料。當你不需要任何視訊顯示而又想節省不必要的 CPU 工作時可以使用。"
     IDS_DESC_NULLVR_UNCOMP  "與無繪製器相同，但只會連到未壓縮的類型。"
     IDS_DESC_EVR            "此視訊繪製器支援硬體解碼。"

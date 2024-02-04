@@ -3169,11 +3169,12 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_HAALI_VR       "Looks like VMR-9, but uses a true bicubic resizer."
+    IDS_BLOCK_EXTERNAL_VR   "You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
 END
 
 STRINGTABLE
 BEGIN
+    IDS_DESC_HAALI_VR       "Looks like VMR-9, but uses a true bicubic resizer."
     IDS_DESC_NULLVR_ANY     "Conecta a cualsevol tipus de mitjà de vídeo i manda les mostres a cap lloc. Utilitza'l quant no necesitis veure el vídeo, i vulguis  evitar l'ús no necessari de la cpu."
     IDS_DESC_NULLVR_UNCOMP  "Igual que el renderitzador null normal, perè només conectarà a tipus sense compresió."
     IDS_DESC_EVR            "Video renderer with hardware decoding support."

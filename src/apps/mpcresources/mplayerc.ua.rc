@@ -3169,11 +3169,12 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_HAALI_VR       "Так само як і VMR-9, але використовує справжній bicubic масштабувальник."
+    IDS_BLOCK_EXTERNAL_VR   "You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
 END
 
 STRINGTABLE
 BEGIN
+    IDS_DESC_HAALI_VR       "Так само як і VMR-9, але використовує справжній bicubic масштабувальник."
     IDS_DESC_NULLVR_ANY     "Підключається до будь-якого типу відеоданих і відправляє вхідні кадри в нікуди. Може бути корисний для економії ресурсів процесора, якщо потрібен лише звук."
     IDS_DESC_NULLVR_UNCOMP  "Так само як нормальний Null-рендерер, але підключається лише до нестиснених даних."
     IDS_DESC_EVR            "Відеорендерер з підтримкою апаратного декодування."

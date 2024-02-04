@@ -1347,6 +1347,7 @@ STRING IDS_BDA_ERROR_CONNECT_TUNER_REC		"Impossible de connecter le tuner et le 
 STRING IDS_BDA_ERROR_CREATE_RECEIVER		"Impossible de créer le récepteur."
 STRING IDS_BDA_ERROR_CREATE_TUNER		"Impossible de créer le tuner."
 STRING IDS_BDA_ERROR_DEMULTIPLEXER		"Impossible de créer le démultiplexeur."
+STRING IDS_BLOCK_EXTERNAL_VR		"You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
 STRING IDS_BRIGHTNESS_DEC		"Diminuer la luminosité"
 STRING IDS_BRIGHTNESS_INC		"Augmenter la luminosité"
 STRING IDS_CANCEL		"Annuler"

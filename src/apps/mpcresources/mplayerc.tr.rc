@@ -3169,11 +3169,12 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_HAALI_VR       "VKİ-9 gibidir, ancak gerçek kübik boyutlandırıcı kullanır."
+    IDS_BLOCK_EXTERNAL_VR   "You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
 END
 
 STRINGTABLE
 BEGIN
+    IDS_DESC_HAALI_VR       "VKİ-9 gibidir, ancak gerçek kübik boyutlandırıcı kullanır."
     IDS_DESC_NULLVR_ANY     "Her video benzeri medya biçimine bağlanır ve dahili örnekleri bir yere göndermez. Video gösterimine ihtiyaç duymadığınız ve işlemciyi pek az kullanmak istediğiniz durumlarda bu seçeneği seçiniz."
     IDS_DESC_NULLVR_UNCOMP  "Boş işleyici ile aynıdır, ancak sadece sıkıştırılmamış biçimleri destekler."
     IDS_DESC_EVR            "Donanım kod çözme desteğine sahip video işleyici."

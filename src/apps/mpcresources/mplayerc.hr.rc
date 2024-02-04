@@ -3167,11 +3167,12 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_HAALI_VR       "Izgleda poput VMR-9, ali koristi stvaran dvokubični mijenjač veličine."
+    IDS_BLOCK_EXTERNAL_VR   "You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
 END
 
 STRINGTABLE
 BEGIN
+    IDS_DESC_HAALI_VR       "Izgleda poput VMR-9, ali koristi stvaran dvokubični mijenjač veličine."
     IDS_DESC_NULLVR_ANY     "Povezuje se na bilo koji video-liki tip medija i pristigle uzorke šalje u prazno. Koristite kad nemate potrebu za zaslonom i želite uštedjeti CPU od praznog hoda."
     IDS_DESC_NULLVR_UNCOMP  "Jednako kao normalan Null render, jedino što se ovaj povezuje na nekomprimirane tipove."
     IDS_DESC_EVR            "Video render uz hardversku podršku za dekodiranje."

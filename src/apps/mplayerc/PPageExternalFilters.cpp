@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,6 +30,15 @@
 #include <wmcodecdsp.h>
 #include <moreuuids.h>
 #include "DSUtil/std_helper.h"
+
+#include <clsids.h>
+#include <d3d9.h>
+#include <mvrInterfaces.h>
+
+bool IsSupportedExternalVideoRenderer(CLSID clsid)
+{
+	return clsid == CLSID_EnhancedVideoRenderer || clsid == CLSID_MPCVR || clsid == CLSID_DXR || clsid == CLSID_madVR;
+}
 
 static const std::vector<GUID> s_MajorTypes = {
 	MEDIATYPE_NULL,
@@ -377,6 +386,13 @@ void CPPageExternalFilters::OnAddRegistered()
 
 				if (f->name.IsEmpty() && !f->guids.size() && !f->dwMerit) {
 					// skip something strange
+					continue;
+				}
+				else if (IsSupportedExternalVideoRenderer(f->clsid)) {
+					// supported external video renderers that must be selected in the "Video" settings
+					CStringW strMessage;
+					strMessage.Format(ResStr(IDS_BLOCK_EXTERNAL_VR), f->name);
+					AfxMessageBox(strMessage, MB_OK);
 					continue;
 				}
 
@@ -770,6 +786,15 @@ void CPPageExternalFilters::OnDropFiles(HDROP hDropInfo)
 
 			if (f) {
 				std::unique_ptr<FilterOverride> p(f);
+
+				if (IsSupportedExternalVideoRenderer(f->clsid)) {
+					// supported external video renderers that must be selected in the "Video" settings
+					CStringW strMessage;
+					strMessage.Format(ResStr(IDS_BLOCK_EXTERNAL_VR), f->name);
+					AfxMessageBox(strMessage, MB_OK);
+					continue;
+				}
+
 				int i = m_filters.AddString(f->name);
 				m_ExtFilters.emplace_back(std::move(p));
 				m_filters.SetItemDataPtr(i, m_ExtFilters.back().get());

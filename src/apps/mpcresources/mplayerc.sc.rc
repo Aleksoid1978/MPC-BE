@@ -3169,11 +3169,12 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_HAALI_VR       "与 VMR-9 类同, 但是使用真正的 bicubic 改变大小。"
+    IDS_BLOCK_EXTERNAL_VR   "You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
 END
 
 STRINGTABLE
 BEGIN
+    IDS_DESC_HAALI_VR       "与 VMR-9 类同, 但是使用真正的 bicubic 改变大小。"
     IDS_DESC_NULLVR_ANY     "连接到任意视频文件类型并且会将进入的采样信息传送到任意地方。当您不需要显示视频并希望节省不必要的 cpu 工作时请使用它。"
     IDS_DESC_NULLVR_UNCOMP  "和普通的空渲染器相同, 但仅会被连接到未压缩的类型上。"
     IDS_DESC_EVR            "此视频渲染器支持硬件解码"
