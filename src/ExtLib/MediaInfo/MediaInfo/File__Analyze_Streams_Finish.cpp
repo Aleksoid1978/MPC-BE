@@ -51,6 +51,7 @@ namespace MediaInfoLib
 
 //---------------------------------------------------------------------------
 extern MediaInfo_Config Config;
+extern size_t DolbyVision_Compatibility_Pos(const Ztring& Value);
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -1128,6 +1129,10 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
         Summary.Separator_Set(0, __T(" / "));
         Summary.Write(Retrieve(Stream_Video, Pos, Video_HDR_Format));
         ZtringList Commercial=Summary;
+        size_t DolbyVision_Pos=(size_t)-1;
+        for (size_t j=0; j<Summary.size(); j++)
+            if (Summary[j]==__T("Dolby Vision"))
+                DolbyVision_Pos=j;
         if (!Summary.empty())
         {
             ZtringList HDR_Format_Compatibility;
@@ -1152,6 +1157,34 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
                             default: Summary[j] += __T(", ");
                         }
                         Summary[j]+=ToAdd[j];
+                        if (i==Video_HDR_Format_Version && j==DolbyVision_Pos)
+                        {
+                            ToAdd.Write(Retrieve(Stream_Video, Pos, Video_HDR_Format_Profile));
+                            if (j<ToAdd.size())
+                            {
+                                const Ztring& Profile=ToAdd[j];
+                                size_t Profile_Dot=Profile.find(__T('.'));
+                                if (Profile_Dot!=string::npos)
+                                {
+                                    Profile_Dot++;
+                                    if (Profile_Dot<Profile.size() && Profile[Profile_Dot]==__T('0'))
+                                        Profile_Dot++;
+                                    Summary[j]+=__T(", Profile ");
+                                    Summary[j]+=Profile.substr(Profile_Dot);
+                                    ToAdd.Write(Retrieve(Stream_Video, Pos, Video_HDR_Format_Compatibility));
+                                    if (j<ToAdd.size())
+                                    {
+                                        const Ztring& Compatibility=ToAdd[j];
+                                        size_t Compatibility_Pos=DolbyVision_Compatibility_Pos(Compatibility);
+                                        if (Compatibility_Pos!=size_t()-1)
+                                        {
+                                            Summary[j]+=__T('.');
+                                            Summary[j]+=Ztring::ToZtring(Compatibility_Pos, 16);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

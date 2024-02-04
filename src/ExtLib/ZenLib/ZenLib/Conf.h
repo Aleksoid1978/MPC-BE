@@ -63,6 +63,11 @@
             #define WINDOWS_UWP
         #endif
     #endif
+    #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY==WINAPI_FAMILY_GAMES)
+        #ifndef WINDOWS_GAMES
+            #define WINDOWS_GAMES
+        #endif
+    #endif
 #endif
 
 //---------------------------------------------------------------------------

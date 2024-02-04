@@ -1044,6 +1044,7 @@ void MediaInfo_Config_DefaultLanguage (Translation &Info)
     "MSDI;MSDI\n"
     "MultipleStream;Multiple-stream\n"
     "MusicBy;Music by\n"
+    "MultiView_Count;Count of views\n"
     "MuxingMode;Muxing mode\n"
     "MuxingMode_MoreInfo;Muxing mode, more info\n"
     "MuxingMode_PackedBitstream;Packed bitstream\n"
@@ -1381,6 +1382,7 @@ void MediaInfo_Config_Format (InfoMap &Info)
     "HEIF;;;M;Mpeg4;;heif avci avcs heic heics avif avis\n"
     "HLS;;;M;Hls;;m3u8\n"
     "Google Video;;;M;Riff;Hack of AVI;gvi;;http://video.google.com/playerdownload.html\n"
+    "ICC;;;;Icc;;icc\n"
     "ISM;Internet Streaming Media;;M;Ism;;ism\n"
     "IVF;;;M;Ivf;;ivf\n"
     "LXF;;;M;Lxf;;lxf;video/lxf\n"
@@ -1501,7 +1503,6 @@ void MediaInfo_Config_Format (InfoMap &Info)
     "TIFF;;;I;Tiff;;tiff tif;image/tiff\n"
     "TGA;;;I;Tga;;tga;image/tga\n"
     "7-Zip;;;C;7z;;7z;;http://7-zip.org\n"
-    "ICC;;;C;Icc;;icc;;\n"
     "ACE;;;C;Ace;;ace;;http://winace.com\n"
     "ELF;;;C;Elf;;so\n"
     "ISO 9660;;;C;Iso9660;;iso\n"
@@ -1527,6 +1528,7 @@ void MediaInfo_Config_Format (InfoMap &Info)
     "AutoCAD;;;O;Other;;;;http://www.autodesk.com\n"
     "PlayLater Video;;;V;Other;;;;http://www.playon.tv/playlater\n"
     "WTV;;;M;WTV;Windows Recorded TV Show;wtv;video/wtv\n"
+    "VVC;;;V;Vvc;Versatile Video Coding;vvc h266 266;video/H266\n"
     ));
     Info.Separator_Set(0, ZenLib::EOL);
 }

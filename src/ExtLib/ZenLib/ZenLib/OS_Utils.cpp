@@ -40,6 +40,7 @@
             using namespace ABI::Windows::Security::Cryptography::Core;
         #else
             #include <shlobj.h>
+            #include <shellapi.h>
         #endif
     #endif
 #endif //ZENLIB_USEWX
@@ -234,7 +235,7 @@ void Shell_Execute(const Ztring &ToExecute)
 {
     #ifdef ZENLIB_USEWX
     #else //ZENLIB_USEWX
-        #if defined(WINDOWS) && !defined(WINDOWS_UWP)
+        #if defined(WINDOWS) && !defined(WINDOWS_UWP) && !defined(WINDOWS_GAMES)
             ShellExecute(NULL, __T("open"), ToExecute.c_str(), NULL, NULL, 0);
         #else
             //Not supported
@@ -252,7 +253,7 @@ void Shell_Execute(const Ztring &ToExecute)
 
 Ztring Directory_Select_Caption;
 
-#if defined(WINDOWS) && !defined(WINDOWS_UWP)
+#if defined(WINDOWS) && !defined(WINDOWS_UWP) && !defined(WINDOWS_GAMES)
     #ifdef UNICODE
         char    InitDirA[MAX_PATH];
         wchar_t InitDir [MAX_PATH];

@@ -802,8 +802,10 @@ void File_Gxf::Header_Parse()
         {
             if (PacketType==0xBF) //media
             {
+	#if MEDIAINFO_NEXTPACKET
                 if (Config->NextPacket_Get() && Config->Event_CallBackFunction_IsSet())
                     Config->Demux_EventWasSent=true; //First set is to indicate the user that header is parsed
+	#endif
                 Demux_HeaderParsed=true;
             }
         }

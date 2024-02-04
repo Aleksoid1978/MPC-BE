@@ -159,6 +159,9 @@
 About;Honi buruz
 About_Hint;Nola jarri harremanetan nirekin eta azken bertsioa aurkitu
 Accompaniment;Laguntza
+Active_DisplayAspectRatio;
+Active_Height;
+Active_Width;
 ActiveFormatDescription;Eragin Heuskarri Azalpena
 ActiveFormatDescription_MuxingMode;Eragin Heuskarri Azalpena, Nahasketa modua
 Actor;Antzezlea

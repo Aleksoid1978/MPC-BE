@@ -159,6 +159,9 @@
 About;Hakkında
 About_Hint;Bana nasıl ulaşacak ve son sürümü nasıl bulacaksınız
 Accompaniment;Eşlik eden
+Active_DisplayAspectRatio;
+Active_Height;
+Active_Width;
 ActiveFormatDescription;Etkin Biçim Açıklaması
 ActiveFormatDescription_MuxingMode;Etkin Biçim Açıklaması, Çoklama kipi
 Actor;Oyuncu

@@ -421,6 +421,25 @@ void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_Col
 #endif
 
 //---------------------------------------------------------------------------
+extern const char* DolbyVision_Compatibility[] =
+{
+    "",
+    "HDR10",
+    "SDR",
+    NULL,
+    "HLG",
+    NULL,
+    "Blu-ray",
+};
+static const size_t DolbyVision_Compatibility_Size = sizeof(DolbyVision_Compatibility) / sizeof(const char*);
+size_t DolbyVision_Compatibility_Pos(const Ztring& Value)
+{
+
+    for (size_t Pos = 0; Pos < DolbyVision_Compatibility_Size; Pos++)
+        if (Ztring(DolbyVision_Compatibility[Pos]) == Value)
+            return Pos;
+    return (size_t)-1;
+}
 #if defined(MEDIAINFO_AV1_YES) || defined(MEDIAINFO_AVC_YES) || defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MATROSKA_YES) || defined(MEDIAINFO_MXF_YES)
 enum class dolbyvision_profile : uint8_t
 {
@@ -485,17 +504,6 @@ static void DolbyVision_Profiles_Append(string& Profile, int8u i)
         return add_dec_2chars(Profile, i);
     Profile.append(DolbyVision_Profiles_Names+((size_t)j)*4, 4);
 }
-extern const char* DolbyVision_Compatibility[] =
-{
-    "",
-    "HDR10",
-    "SDR",
-    NULL,
-    "HLG",
-    NULL,
-    "Blu-ray",
-};
-static const size_t DolbyVision_Compatibility_Size=sizeof(DolbyVision_Compatibility)/sizeof(const char*);
 extern const char* DolbyVision_Compression[] =
 {
     "None",

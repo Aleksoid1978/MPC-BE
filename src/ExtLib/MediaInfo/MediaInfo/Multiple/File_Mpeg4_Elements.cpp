@@ -962,6 +962,7 @@ namespace Elements
     const int64u moov_udta_meta_uuid=0x75756964;
     const int64u moov_udta_ndrm=0x6E64726D;
     const int64u moov_udta_nsav=0x6E736176;
+    const int64u moov_udta_PANA=0x50414E41;
     const int64u moov_udta_ptv =0x70747620;
     const int64u moov_udta_rtng=0x72746E67;
     const int64u moov_udta_Sel0=0x53656C30;
@@ -1425,6 +1426,7 @@ void File_Mpeg4::Data_Parse()
                 ATOM_END
             ATOM(moov_udta_ndrm)
             ATOM(moov_udta_nsav)
+            ATOM(moov_udta_PANA)
             ATOM(moov_udta_ptv )
             ATOM(moov_udta_rtng)
             ATOM(moov_udta_Sel0)
@@ -1438,7 +1440,7 @@ void File_Mpeg4::Data_Parse()
                 ATOM_END
             ATOM(moov_udta_WLOC)
             ATOM(moov_udta_thmb)
-            LIST_SKIP(moov_udta_XMP_)
+            LIST_SKIP(moov_udta_XMP_) //TODO: parse XMP
             ATOM(moov_udta_Xtra)
             ATOM(moov_udta_yrrc)
             ATOM_DEFAULT (moov_udta_xxxx); //User data
@@ -7816,6 +7818,55 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_lhvC()
 {
     Element_Name("LHEVCDecoderConfigurationRecord");
     AddCodecConfigurationBoxInfo();
+
+    //Parsing
+    #ifdef MEDIAINFO_HEVC_YES
+        File_Hevc* Parser=(File_Hevc*)Streams[moov_trak_tkhd_TrackID].Parsers[0];
+        Parser->FrameIsAlwaysComplete=true;
+        #if MEDIAINFO_DEMUX
+            Element_Code=moov_trak_tkhd_TrackID;
+            if (Config->Demux_Hevc_Transcode_Iso14496_15_to_AnnexB_Get())
+            {
+                Streams[moov_trak_tkhd_TrackID].Demux_Level=4; //Intermediate
+                Parser->Demux_Level=2; //Container
+                Parser->Demux_UnpacketizeContainer=true;
+            }
+        #endif //MEDIAINFO_DEMUX
+        Open_Buffer_Init(Parser);
+        Parser->MustParse_VPS_SPS_PPS=true;
+        Parser->MustParse_VPS_SPS_PPS_FromLhvc=true;
+        Parser->MustSynchronize=false;
+        //Streams[moov_trak_tkhd_TrackID].Parsers.push_back(Parser);
+        mdat_MustParse=true; //Data is in MDAT
+
+        //Demux
+        #if MEDIAINFO_DEMUX
+            if (!Config->Demux_Hevc_Transcode_Iso14496_15_to_AnnexB_Get())
+                switch (Config->Demux_InitData_Get())
+                {
+                    case 0 :    //In demux event
+                                Demux_Level=2; //Container
+                                Demux(Buffer+Buffer_Offset, (size_t)Element_Size, ContentType_Header);
+                                break;
+                    case 1 :    //In field
+                                {
+                                std::string Data_Raw((const char*)(Buffer+Buffer_Offset), (size_t)Element_Size);
+                                std::string Data_Base64(Base64::encode(Data_Raw));
+                                Fill(Stream_Video, StreamPos_Last, "Demux_InitBytes", Data_Base64);
+                                Fill_SetOptions(Stream_Video, StreamPos_Last, "Demux_InitBytes", "N NT");
+                                }
+                                break;
+                    default :   ;
+                }
+        #endif //MEDIAINFO_DEMUX
+
+        //Parsing
+        Open_Buffer_Continue(Parser);
+
+        Parser->SizedBlocks=true;  //Now this is SizeBlocks
+    #else
+        Skip_XX(Element_Size,                               "HEVC Data");
+    #endif
 }
 
 //---------------------------------------------------------------------------
@@ -9513,6 +9564,15 @@ void File_Mpeg4::moov_udta_nsav()
 }
 
 //---------------------------------------------------------------------------
+void File_Mpeg4::moov_udta_PANA()
+{
+    Element_Name("Panasonic");
+
+    //Parsing
+    Skip_XX(Element_Size,                                       "Data"); //TODO: parse Panasonic metadata
+}
+
+//---------------------------------------------------------------------------
 void File_Mpeg4::moov_udta_ptv()
 {
     Element_Name("Print To Video");
@@ -9808,6 +9868,7 @@ void File_Mpeg4::moov_udta_xxxx()
                     return;
                 }
 
+                size_t Count=0;
                 while (Element_Size-Element_Offset>4)
                 {
                     std::string ValueS;
@@ -9819,6 +9880,11 @@ void File_Mpeg4::moov_udta_xxxx()
                     else
                     {
                         Get_B2 (Size16,                         "Size");
+                        if (!Size16)
+                        {
+                            Skip_XX(Element_Size-Element_Offset,"Unknown");
+                            return;
+                        }
                         Info_B2(Language,                       "Language"); Param_Info1(Language_Get(Language));
                         Get_String(Size16, ValueS,              "Value");
                     }
@@ -9848,10 +9914,26 @@ void File_Mpeg4::moov_udta_xxxx()
                     // Check zero padding
                     auto Buffer_Current=Buffer+Buffer_Offset+Element_Offset;
                     auto Buffer_End=Buffer+Buffer_Offset+Element_Size;
+                    if (Buffer_End-Buffer_Current>=0x100)
+                        Buffer_End=Buffer_Current+0x100; // Limiting padding check
                     while (Buffer_Current<Buffer_End && !*Buffer_Current)
                         Buffer_Current++;
                     if (Buffer_Current>=Buffer_End)
-                        Skip_XX(Element_Size-Element_Offset,    "Padding");
+                    {
+                        auto SizePadding=Element_Size-Element_Offset;
+                        if (SizePadding>=0x100)
+                        {
+                            Skip_XX(Element_Size-Element_Offset,    "Unknown");
+                            return;
+                        }
+                        Skip_XX(SizePadding,                        "Padding");
+                    }
+                    Count++;
+                    if (Count>0x100) // Many values, likely not really strings
+                    {
+                        Skip_XX(Element_Size-Element_Offset,        "Unknown");
+                        return;
+                    }
                 }
 
                 FILLING_BEGIN_PRECISE();

@@ -159,6 +159,9 @@
 About;O programu
 About_Hint;O programu
 Accompaniment;Accompaniment
+Active_DisplayAspectRatio;
+Active_Height;
+Active_Width;
 ActiveFormatDescription;
 ActiveFormatDescription_MuxingMode;
 Actor;Herec

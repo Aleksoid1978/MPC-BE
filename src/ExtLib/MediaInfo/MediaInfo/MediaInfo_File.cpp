@@ -774,7 +774,7 @@ static File__Analyze* SelectFromExtension(const String& Parser)
         if (Parser==__T("Tga"))         return new File_Tga();
     #endif
 
-    // Archive
+    // Tags
     #if defined(MEDIAINFO_ICC_YES)
         if (Parser==__T("Icc"))          return new File_Icc();
     #endif
@@ -1215,6 +1215,9 @@ int MediaInfo_Internal::ListFormats(const String &File_Name)
     #endif
     #if defined(MEDIAINFO_H263_YES)
         delete Info; Info=new File_H263();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+    #endif
+    #if defined(MEDIAINFO_ICC_YES)
+        delete Info; Info=new File_Icc();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
 
     //At the end, could load too much data for nothing

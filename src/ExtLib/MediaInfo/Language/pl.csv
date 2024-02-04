@@ -159,6 +159,9 @@
 About;O programie
 About_Hint;Kontakt i informacje o nowych wersjach
 Accompaniment;Akompaniament
+Active_DisplayAspectRatio;
+Active_Height;
+Active_Width;
 ActiveFormatDescription;
 ActiveFormatDescription_MuxingMode;
 Actor;Aktor

@@ -159,6 +159,9 @@
 About;Пра праграму
 About_Hint;Як звязацца са мной і знайсці апошнюю версію праграмы
 Accompaniment;Суправаджэнне
+Active_DisplayAspectRatio;
+Active_Height;
+Active_Width;
 ActiveFormatDescription;
 ActiveFormatDescription_MuxingMode;
 Actor;Актор

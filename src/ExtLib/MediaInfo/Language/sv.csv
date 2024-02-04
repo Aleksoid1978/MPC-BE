@@ -159,6 +159,9 @@
 About;Om
 About_Hint;Kontakt - och versionsinformation
 Accompaniment;Ackompanjemang
+Active_DisplayAspectRatio;
+Active_Height;
+Active_Width;
 ActiveFormatDescription;Aktiv formatbeskrivning
 ActiveFormatDescription_MuxingMode;Aktiv formatbeskrivning, mux-läge
 Actor;Skådespelare

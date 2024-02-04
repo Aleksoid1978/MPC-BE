@@ -911,7 +911,7 @@ void File_Lxf::Header()
 
     Info_General_StreamSize=0x48+Element_Size;
 
-    #if MEDIAINFO_DEMUX
+    #if MEDIAINFO_DEMUX && MEDIAINFO_NEXTPACKET
         if (Config->NextPacket_Get() && Config->Event_CallBackFunction_IsSet())
             Config->Demux_EventWasSent=true; //First set is to indicate the user that header is parsed
     #endif //MEDIAINFO_DEMUX

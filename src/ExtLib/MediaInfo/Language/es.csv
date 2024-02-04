@@ -159,6 +159,9 @@
 About;Acerca de 
 About_Hint;Cómo contactar con el autor y buscar la última versión
 Accompaniment;Acompañamiento
+Active_DisplayAspectRatio;
+Active_Height;
+Active_Width;
 ActiveFormatDescription;Descripción formato activo
 ActiveFormatDescription_MuxingMode;Descripción formato activo, modo multiplexado
 Actor;Actor

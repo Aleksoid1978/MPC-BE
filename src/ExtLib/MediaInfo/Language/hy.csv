@@ -159,6 +159,9 @@
 About;Ծրագրի մասին
 About_Hint;Կապնվել ծրագրի հեղինակի հետ կամ բացել ծրագրի կայքը
 Accompaniment;Ուղեկցումը
+Active_DisplayAspectRatio;
+Active_Height;
+Active_Width;
 ActiveFormatDescription;
 ActiveFormatDescription_MuxingMode;
 Actor;Կատարողը
@@ -1367,4 +1370,4 @@ WrittenBy;Գրվել է՝
 Yes;Այո
 Your system;Ձեր համակարգը
 ZZ_Automatic_Percent;67
-ZZ_AutomaticLanguage_Percent;72
+ZZ_AutomaticLanguage_Percent;71

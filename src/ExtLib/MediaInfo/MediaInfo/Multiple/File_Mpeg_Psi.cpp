@@ -115,6 +115,9 @@ const char* Mpeg_Psi_stream_type_Format(int8u stream_type, int32u format_identif
         case 0x2D : return "MPEG-H 3D Audio";
         case 0x2E : return "MPEG-H 3D Audio";
         case 0x32 : return "JPEG XS";
+        case 0x33 :
+        case 0x34 : return "VVC";
+        case 0x35 : return "EVC";
         default :
             switch (format_identifier)
             {
@@ -246,6 +249,9 @@ stream_t Mpeg_Psi_stream_type_StreamKind(int32u stream_type, int32u format_ident
         case 0x24 :
         case 0x27 :
         case 0x32 :
+        case 0x33 :
+        case 0x34 :
+        case 0x35 :
                     return Stream_Video;
         case 0x03 :
         case 0x04 :
@@ -367,6 +373,9 @@ const char* Mpeg_Psi_stream_type_Info_Table[] =
     "Media Orchestration Access Units carried in sections",
     "Substream of a Rec. ITU-T H.265 | ISO/IEC 23008 2 video stream that contains a Motion Constrained Tile Set, parameter sets, slice headers or a combination thereof",
     "JPEG XS video stream conforming to one or more profiles as defined in ISO/IEC 21122-2",
+    "VVC video stream or a VVC temporal video sub-bitstream conforming to one or more profiles defined in Annex A of Rec. ITU-T H.266 | ISO/IEC 23090-3",
+    "VVC temporal video subset of a VVC video stream conforming to one or more profiles defined in Annex A of Rec. ITU-T H.266 | ISO/IEC 23090-3",
+    "EVC video stream or an EVC temporal video sub-bitstream conforming to one or more profiles defined in ISO/IEC 23094-1",
 };
 const size_t Mpeg_Psi_stream_type_Info_Table_Size=sizeof(Mpeg_Psi_stream_type_Info_Table)/sizeof(*Mpeg_Psi_stream_type_Info_Table);
 const char* Mpeg_Psi_stream_type_Info(int8u stream_type, int32u format_identifier)

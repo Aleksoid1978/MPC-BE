@@ -32,7 +32,9 @@
     #ifdef WINDOWS
         #undef __TEXT
         #include <windows.h>
-        #include <tchar.h>
+        #ifndef WINDOWS_GAMES
+            #include <tchar.h>
+        #endif
     #endif
 #endif //ZENLIB_USEWX
 #ifdef __MINGW32__

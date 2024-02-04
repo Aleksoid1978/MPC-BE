@@ -730,7 +730,7 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                 if (Conformance_JSON)
                 {
                     Ztring Name=Get((stream_t)StreamKind, StreamPos, Champ_Pos, Info_Name);
-                    if (Name!=__T("Format") && Name.rfind(__T("Conformance"), 11))
+                    if (Name!=__T("StreamKind") && Name!=__T("Format") && Name!=__T("Metadata_Format") && Name.rfind(__T("Conformance"), 11))
                         Shouldshow=false; // Override, it is intended only for conformance checks
                 }
             #endif 

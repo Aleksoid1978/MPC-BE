@@ -80,7 +80,7 @@ void sequence::AddFileName(const Ztring& FileName, size_t Pos)
 //---------------------------------------------------------------------------
 void sequence::AddResource(resource* NewResource, size_t Pos)
 {
-    #if MEDIAINFO_DEMUX
+    #if MEDIAINFO_NEXTPACKET
     if (Resources.empty())
     {
         NewResource->Demux_Offset_DTS=0;

@@ -159,6 +159,9 @@
 About;Despre
 About_Hint;Sfaturi
 Accompaniment;Acompaniament
+Active_DisplayAspectRatio;
+Active_Height;
+Active_Width;
 ActiveFormatDescription;
 ActiveFormatDescription_MuxingMode;
 Actor;Actor
@@ -1367,4 +1370,4 @@ WrittenBy;Scris de
 Yes;Da
 Your system;Sistemul dvs
 ZZ_Automatic_Percent;24
-ZZ_AutomaticLanguage_Percent;54
+ZZ_AutomaticLanguage_Percent;53
