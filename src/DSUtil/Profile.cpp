@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2023 see Authors.txt
+ * (C) 2018-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1002,7 +1002,21 @@ bool CProfile::DeleteSection(const wchar_t* section)
 	}
 	else {
 		InitIni();
-		if (m_ProfileMap.erase(section)) {
+		const CStringW mainsection(section);
+		const CStringW prefix(mainsection + L'\\');
+
+		auto start = m_ProfileMap.cbegin();
+		while (start != m_ProfileMap.cend() && start->first != mainsection && !StartsWith(start->first, prefix)) {
+			++start;
+		}
+
+		if (start != m_ProfileMap.cend()) {
+			auto end = std::next(start);
+			while (end != m_ProfileMap.cend() && StartsWith(end->first, prefix)) {
+				++end;
+			}
+
+			m_ProfileMap.erase(start, end);
 			m_bIniNeedFlush = true;
 			ret = true;
 		}
