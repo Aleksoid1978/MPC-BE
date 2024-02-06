@@ -1088,8 +1088,8 @@ DROPEFFECT CMainFrame::OnDragOver(COleDataObject* pDataObject, DWORD dwKeyState,
 BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point)
 {
 	BOOL bResult = FALSE;
-
 	CLIPFORMAT cfFormat = 0;
+	auto& s = AfxGetAppSettings();
 
 	if (pDataObject->IsDataAvailable(CF_URLW)) {
 		cfFormat = CF_URLW;
@@ -1102,8 +1102,8 @@ BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoi
 				UINT nFiles = ::DragQueryFileW(hDrop, UINT_MAX, nullptr, 0);
 				for (UINT iFile = 0; iFile < nFiles; iFile++) {
 					CString fn;
-					fn.ReleaseBuffer(::DragQueryFileW(hDrop, iFile, fn.GetBuffer(MAX_PATH), MAX_PATH));
-					slFiles.emplace_back(fn);
+					fn.ReleaseBuffer(::DragQueryFileW(hDrop, iFile, fn.GetBuffer(2048), 2048));
+					slFiles.emplace_back(s.ParseFileName(fn));
 				}
 				::DragFinish(hDrop);
 				DropFiles(slFiles);
@@ -1134,8 +1134,9 @@ BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoi
 						std::list<CString> lines;
 						Explode(text, lines, L'\n');
 						for (const auto& line : lines) {
-							if (::PathIsURLW(line) || ::PathFileExistsW(line)) {
-								slFiles.emplace_back(line);
+							auto path = s.ParseFileName(line);
+							if (::PathIsURLW(path) || ::PathFileExistsW(path)) {
+								slFiles.emplace_back(path);
 							}
 						}
 					}
@@ -16085,7 +16086,7 @@ void CMainFrame::SetAlwaysOnTop(int i)
 				ShowWindow(SW_SHOWNA);
 			}
 			SetWindowPos(pInsertAfter, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
-		} 
+		}
 	} else if (bD3DOnMain) {
 		SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 	}
@@ -20570,6 +20571,7 @@ void CMainFrame::StartAutoHideCursor()
 
 const bool CMainFrame::GetFromClipboard(std::list<CString>& sl) const
 {
+	auto& s = AfxGetAppSettings();
 	sl.clear();
 
 	if (::IsClipboardFormatAvailable(CF_UNICODETEXT) && ::OpenClipboard(m_hWnd)) {
@@ -20582,8 +20584,9 @@ const bool CMainFrame::GetFromClipboard(std::list<CString>& sl) const
 					std::list<CString> lines;
 					Explode(text, lines, L'\n');
 					for (const auto& line : lines) {
-						if (::PathIsURLW(line) || ::PathFileExistsW(line)) {
-							sl.emplace_back(line);
+						auto path = s.ParseFileName(line);
+						if (::PathIsURLW(path) || ::PathFileExistsW(path)) {
+							sl.emplace_back(path);
 						}
 					}
 				}
@@ -20597,7 +20600,7 @@ const bool CMainFrame::GetFromClipboard(std::list<CString>& sl) const
 				UINT nFiles = ::DragQueryFileW(hDrop, UINT_MAX, nullptr, 0);
 				for (UINT iFile = 0; iFile < nFiles; iFile++) {
 					CString fn;
-					fn.ReleaseBuffer(::DragQueryFileW(hDrop, iFile, fn.GetBuffer(MAX_PATH), MAX_PATH));
+					fn.ReleaseBuffer(::DragQueryFileW(hDrop, iFile, fn.GetBuffer(2048), 2048));
 					sl.emplace_back(fn);
 				}
 				GlobalUnlock(hglb);
