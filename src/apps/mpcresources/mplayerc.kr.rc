@@ -3181,6 +3181,7 @@ BEGIN
     IDS_DESC_EVR_CP         "EVR과 다름없지만, 자막 및 후처리를 위해 할당자-발표자를 사용합니다."
     IDS_DESC_MADVR          "고품질 렌더러, D3D9 이상을 지원하는 GPU 필요."
     IDS_DESC_EVR_SYNC       "EVR(CP)와 다름없지만, 스킵되거나 중복된 영상 프레임을 제거하기 위한 디스플레이 주사율과 비디오 프레임율을 동기화해주는 여러 옵션 제공"
+    IDS_DESC_MPC_VR         "Video renderer with support for Direct3D 11."
 END
 
 STRINGTABLE

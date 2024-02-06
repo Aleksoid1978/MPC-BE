@@ -1435,6 +1435,7 @@ STRING IDS_DESC_EVR_CP		"Same as the EVR, but with the Allocator-Presenter for s
 STRING IDS_DESC_EVR_SYNC		"Same as the EVR (CP), but offers several options to synchronize the video frame rate with the display refresh rate to eliminate skipped or duplicated video frames."
 STRING IDS_DESC_HAALI_VR		"Looks like VMR-9, but uses a true bicubic resizer."
 STRING IDS_DESC_MADVR		"High-quality renderer, requires a GPU that supports D3D9 or later."
+STRING IDS_DESC_MPC_VR		"Video renderer with support for Direct3D 11."
 STRING IDS_DESC_NULLVR_ANY		"מתחבר לכל סוג מדיה דומה לוידאו וישלח את הדגימות הנכנסות לשום מקום. השתמש בזה כאשר אינך זקוק לתצוגת וידאו ואתה רוצה לחסוך עבודה מיותרת של המעבד."
 STRING IDS_DESC_NULLVR_UNCOMP		"כמו מציג ה-Null הרגיל, אך זה יתחבר רק לסוגים לא מכווצים."
 STRING IDS_DISABLE_ALL_FILTERS		"כבה את כל הפילטרים"

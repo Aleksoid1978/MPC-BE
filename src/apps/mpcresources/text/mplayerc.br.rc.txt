@@ -1435,6 +1435,7 @@ STRING IDS_DESC_EVR_CP		"Igual ao EVR, mas com o Alocador-Apresentador para lege
 STRING IDS_DESC_EVR_SYNC		"Igual ao EVR (CP), mas oferece várias opções para sincronizar a taxa de quadros do vídeo com a taxa de atualização da tela para eliminar os quadros de vídeo ignorados ou duplicados."
 STRING IDS_DESC_HAALI_VR		"Parece VMR-9, mas usa um redimensionador bicúbico verdadeiro."
 STRING IDS_DESC_MADVR		"Renderizador de alta qualidade, requer uma GPU que suporte D3D9 ou posterior."
+STRING IDS_DESC_MPC_VR		"Video renderer with support for Direct3D 11."
 STRING IDS_DESC_NULLVR_ANY		"Conecta-se a qualquer tipo de mídia de vídeo e enviará as amostras a lugar nenhum. Use-o quando não precisar ver o vídeo e quiser evitar o uso da CPU desnecessariamente."
 STRING IDS_DESC_NULLVR_UNCOMP		"Igual ao renderizador nulo normal, mas só se conectará a tipos não comprimido."
 STRING IDS_DISABLE_ALL_FILTERS		"&Desativar todos os filtros"

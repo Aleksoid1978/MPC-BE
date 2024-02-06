@@ -1435,6 +1435,7 @@ STRING IDS_DESC_EVR_CP		"Jednako kao EVR, uz Allocator-Presenter za podnaslove i
 STRING IDS_DESC_EVR_SYNC		"Jednako kao EVR (CP), uz nekoliko mogućnosti za sinkronizaciju video sličica skladnu vrijednosti osvježenja na monitoru za poništenje preskočenih ili udvostručenih sličica."
 STRING IDS_DESC_HAALI_VR		"Izgleda poput VMR-9, ali koristi stvaran dvokubični mijenjač veličine."
 STRING IDS_DESC_MADVR		"Visoko-kvalitetni render, zahtjeva GPU koji podržava D3D9 ili kasnije."
+STRING IDS_DESC_MPC_VR		"Video renderer with support for Direct3D 11."
 STRING IDS_DESC_NULLVR_ANY		"Povezuje se na bilo koji video-liki tip medija i pristigle uzorke šalje u prazno. Koristite kad nemate potrebu za zaslonom i želite uštedjeti CPU od praznog hoda."
 STRING IDS_DESC_NULLVR_UNCOMP		"Jednako kao normalan Null render, jedino što se ovaj povezuje na nekomprimirane tipove."
 STRING IDS_DISABLE_ALL_FILTERS		"&Onemogući sve filtere"

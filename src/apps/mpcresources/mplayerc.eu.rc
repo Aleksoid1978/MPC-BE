@@ -3181,6 +3181,7 @@ BEGIN
     IDS_DESC_EVR_CP         "Same as the EVR, but with the Allocator-Presenter for subtitling and postprocessing."
     IDS_DESC_MADVR          "Ontasun-handiko aurkezlea, D3D9 edo berriagoa sostengatzen duen GPU-a behar du."
     IDS_DESC_EVR_SYNC       "EVR (CP)-ren berdina, baina aukera ugari eskaintzen ditu bideo frame neurria erakuspen berritze neurriarekin aldiberetzeko jauzitako edo bikoiztutako bideo frameak ezabatzeko."
+    IDS_DESC_MPC_VR         "Video renderer with support for Direct3D 11."
 END
 
 STRINGTABLE

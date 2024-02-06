@@ -1435,6 +1435,7 @@ STRING IDS_DESC_EVR_CP		"GVİ ile aynıdır, ancak alt yazı ve son işleme içi
 STRING IDS_DESC_EVR_SYNC		"GVİ (ÖS) ile aynıdır, ancak atlanan ya da çoğaltılan video karelerini ortadan kaldırmak için video kare hızını ekran yenileme hızı ile senkronize etmek için çeşitli seçenekler sunar."
 STRING IDS_DESC_HAALI_VR		"VKİ-9 gibidir, ancak gerçek kübik boyutlandırıcı kullanır."
 STRING IDS_DESC_MADVR		"Yüksek kaliteli bir işleyicidir. D3D9 ya da daha sonrasını destekleyen bir ekran kartı gerektirir."
+STRING IDS_DESC_MPC_VR		"Video renderer with support for Direct3D 11."
 STRING IDS_DESC_NULLVR_ANY		"Her video benzeri medya biçimine bağlanır ve dahili örnekleri bir yere göndermez. Video gösterimine ihtiyaç duymadığınız ve işlemciyi pek az kullanmak istediğiniz durumlarda bu seçeneği seçiniz."
 STRING IDS_DESC_NULLVR_UNCOMP		"Boş işleyici ile aynıdır, ancak sadece sıkıştırılmamış biçimleri destekler."
 STRING IDS_DISABLE_ALL_FILTERS		"&Tüm süzgeçleri devre dışı bırak"

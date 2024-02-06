@@ -3181,6 +3181,7 @@ BEGIN
     IDS_DESC_EVR_CP         "Ugyanaz, mint az EVR, de az Allocator-Presenterrel a feliratozáshoz és az utófeldolgozáshoz."
     IDS_DESC_MADVR          "Kiváló minőségű megjelenítőhöz olyan GPU szükséges, amely támogatja a D3D9 vagy újabb verziókat."
     IDS_DESC_EVR_SYNC       "Ugyanaz, mint az EVR (CP), de számos lehetőséget kínál a képkocka sebességének szinkronizálására a képernyő frissítési gyakoriságával, hogy kiküszöbölje a kihagyott vagy duplikált képkockákat."
+    IDS_DESC_MPC_VR         "Video renderer with support for Direct3D 11."
 END
 
 STRINGTABLE

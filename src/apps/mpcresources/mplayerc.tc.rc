@@ -3181,6 +3181,7 @@ BEGIN
     IDS_DESC_EVR_CP         "和 EVR 相同，但藉助配置呈現器顯示字幕及進行後期處理。"
     IDS_DESC_MADVR          "高品質繪製器，需要支援 Direct3D 9 或更新版本的顯示卡。"
     IDS_DESC_EVR_SYNC       "與 EVR 自訂呈現 相同，但提供額外選項來同步化影格速率及顯示器更新頻率，以減少被丟棄或重複的影格。"
+    IDS_DESC_MPC_VR         "Video renderer with support for Direct3D 11."
 END
 
 STRINGTABLE

@@ -3179,6 +3179,7 @@ BEGIN
     IDS_DESC_EVR_CP         "Jednako kao EVR, uz Allocator-Presenter za podnaslove i postprocesing."
     IDS_DESC_MADVR          "Visoko-kvalitetni render, zahtjeva GPU koji podržava D3D9 ili kasnije."
     IDS_DESC_EVR_SYNC       "Jednako kao EVR (CP), uz nekoliko mogućnosti za sinkronizaciju video sličica skladnu vrijednosti osvježenja na monitoru za poništenje preskočenih ili udvostručenih sličica."
+    IDS_DESC_MPC_VR         "Video renderer with support for Direct3D 11."
 END
 
 STRINGTABLE

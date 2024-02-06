@@ -1435,6 +1435,7 @@ STRING IDS_DESC_EVR_CP		"Ugyanaz, mint az EVR, de az Allocator-Presenterrel a fe
 STRING IDS_DESC_EVR_SYNC		"Ugyanaz, mint az EVR (CP), de számos lehetőséget kínál a képkocka sebességének szinkronizálására a képernyő frissítési gyakoriságával, hogy kiküszöbölje a kihagyott vagy duplikált képkockákat."
 STRING IDS_DESC_HAALI_VR		"Úgy néz ki, mint a VMR-9, de valódi bicubic átméretezőt használ."
 STRING IDS_DESC_MADVR		"Kiváló minőségű megjelenítőhöz olyan GPU szükséges, amely támogatja a D3D9 vagy újabb verziókat."
+STRING IDS_DESC_MPC_VR		"Video renderer with support for Direct3D 11."
 STRING IDS_DESC_NULLVR_ANY		"Minden videószerű médiatípushoz csatlakozni fog és a bejövő mintákat nem küldi ki sehová. Ezt akkor válassza, ha a videómegjelenítésre nincs szüksége és meg szeretné kímélni a processzorát a felesleges munkától."
 STRING IDS_DESC_NULLVR_UNCOMP		"Ugyan az, mint a sima Null átalakító, de ez csak tömörítetlen típusokhoz fog csatlakozni."
 STRING IDS_DISABLE_ALL_FILTERS		"&Összes szűrő tiltása"

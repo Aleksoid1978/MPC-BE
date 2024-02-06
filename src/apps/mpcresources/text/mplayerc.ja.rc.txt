@@ -1435,6 +1435,7 @@ STRING IDS_DESC_EVR_CP		"EVR と同じですが、字幕と後処理のために
 STRING IDS_DESC_EVR_SYNC		"EVR (CP) と同じですが、ディスプレイのリフレッシュ レートと動画のフレーム レートを同期させて、ビデオ フレームのスキップや重複をなくすためのオプションがいくつかあります。"
 STRING IDS_DESC_HAALI_VR		"VMR-9 とほぼ同じですが、真のバイキュービック リサイザーを使用します。"
 STRING IDS_DESC_MADVR		"高品質なレンダラーで、D3D9 以降に対応した GPU が必要です。"
+STRING IDS_DESC_MPC_VR		"Video renderer with support for Direct3D 11."
 STRING IDS_DESC_NULLVR_ANY		"あらゆる動画の (ような) メディア タイプに接続して入力サンプルをどこにも出力しません。映像の表示を必要とせず、CPU を無駄な動作から節約したい場合に使用してください。"
 STRING IDS_DESC_NULLVR_UNCOMP		"標準の Null レンダラーと同じですが、これは非圧縮タイプにのみ接続します。"
 STRING IDS_DISABLE_ALL_FILTERS		"すべてのフィルターを無効にする(&D)"

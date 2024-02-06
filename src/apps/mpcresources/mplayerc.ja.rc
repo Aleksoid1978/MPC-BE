@@ -3181,6 +3181,7 @@ BEGIN
     IDS_DESC_EVR_CP         "EVR と同じですが、字幕と後処理のためにアロケーター プレゼンターを使用します。"
     IDS_DESC_MADVR          "高品質なレンダラーで、D3D9 以降に対応した GPU が必要です。"
     IDS_DESC_EVR_SYNC       "EVR (CP) と同じですが、ディスプレイのリフレッシュ レートと動画のフレーム レートを同期させて、ビデオ フレームのスキップや重複をなくすためのオプションがいくつかあります。"
+    IDS_DESC_MPC_VR         "Video renderer with support for Direct3D 11."
 END
 
 STRINGTABLE

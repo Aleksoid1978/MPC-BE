@@ -472,6 +472,7 @@ void CPPageVideo::OnDSRendererChange()
 			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
 			break;
 		case VIDRNDT_MPCVR:
+			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_MPC_VR), &m_cbVideoRenderer);
 			m_chkMPCVRFullscreenControl.EnableWindow(TRUE);
 			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
 			break;

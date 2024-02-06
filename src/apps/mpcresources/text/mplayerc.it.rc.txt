@@ -1435,6 +1435,7 @@ STRING IDS_DESC_EVR_CP		"Come l'EVR, ma con Allocator-Presenter per la sottotito
 STRING IDS_DESC_EVR_SYNC		"Come il EVR (CP), ma offre diverse opzioni per sincronizzare il video frame rate con la frequenza di aggiornamento display per eliminare video frame duplicati."
 STRING IDS_DESC_HAALI_VR		"Sembra VMR-9, ma usa un vero ridimensionatore bicubico."
 STRING IDS_DESC_MADVR		"Rendering di alta qualità, richiede una GPU che supporti D3D9 o successivo."
+STRING IDS_DESC_MPC_VR		"Video renderer with support for Direct3D 11."
 STRING IDS_DESC_NULLVR_ANY		"Si collega a qualsiasi tipo di supporto simile a un video e non invierà i campioni in arrivo da nessuna parte. Usalo quando non hai bisogno del display video e vuoi evitare che la CPU funzioni inutilmente."
 STRING IDS_DESC_NULLVR_UNCOMP		"Come il normale renderer Null, ma questo si collegherà solo ai tipi non compressi."
 STRING IDS_DISABLE_ALL_FILTERS		"&Disattiva tutti i filtri"

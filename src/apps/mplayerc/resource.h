@@ -991,6 +991,7 @@
 #define IDS_DESC_EVR_CP                 31011
 #define IDS_DESC_MADVR                  31012
 #define IDS_DESC_EVR_SYNC               31013
+#define IDS_DESC_MPC_VR                 31014
 #define IDS_CMD_USAGE                   32700
 #define IDS_CMD_HELP                    32701
 #define IDS_CMD_DUB                     32702

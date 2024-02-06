@@ -3181,6 +3181,7 @@ BEGIN
     IDS_DESC_EVR_CP         "Igual que el EVR, pero con el Asignador-Presentador para subtitulado y postprocesado."
     IDS_DESC_MADVR          "Renderizador de alta calidad, requiere una GPU que soporte D3D9 o posterior."
     IDS_DESC_EVR_SYNC       "Igual que el EVR (CP), pero ofrece varias opciones para sincronizar la frecuencia de fotogramas de video con la frecuencia de actualización de pantalla para eliminar fotogramas de video omitidos o duplicados."
+    IDS_DESC_MPC_VR         "Video renderer with support for Direct3D 11."
 END
 
 STRINGTABLE

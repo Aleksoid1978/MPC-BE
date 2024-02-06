@@ -3181,6 +3181,7 @@ BEGIN
     IDS_DESC_EVR_CP         "Wie der EVR, aber mit Allocator-Presenter für Untertitelung und Nachbearbeitung"
     IDS_DESC_MADVR          "Qualitativ sehr hochwertiger Renderer, der eine Grafikkarte mit D3D9-Unterstützung (oder höher) benötigt."
     IDS_DESC_EVR_SYNC       "Wie der EVR (custom presenter), bietet jedoch verschiedene Optionen zum Synchronisieren der Videobildrate mit der Bildwiederholrate des Anzeigegeräts, um übersprungene oder doppelte Videobilder zu vermeiden."
+    IDS_DESC_MPC_VR         "Video renderer with support for Direct3D 11."
 END
 
 STRINGTABLE
