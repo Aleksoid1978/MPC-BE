@@ -22,7 +22,6 @@
 #include <algorithm>
 #include <shellapi.h>
 #include <shlwapi.h>
-#include <propkey.h>
 #include "MPCBEContextMenu.h"
 
 #define MPC_WND_CLASS_NAME L"MPC-BE"
