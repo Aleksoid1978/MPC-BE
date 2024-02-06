@@ -1089,7 +1089,6 @@ BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoi
 {
 	BOOL bResult = FALSE;
 	CLIPFORMAT cfFormat = 0;
-	auto& s = AfxGetAppSettings();
 
 	if (pDataObject->IsDataAvailable(CF_URLW)) {
 		cfFormat = CF_URLW;
@@ -1103,7 +1102,7 @@ BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoi
 				for (UINT iFile = 0; iFile < nFiles; iFile++) {
 					CString fn;
 					fn.ReleaseBuffer(::DragQueryFileW(hDrop, iFile, fn.GetBuffer(2048), 2048));
-					slFiles.emplace_back(s.ParseFileName(fn));
+					slFiles.emplace_back(ParseFileName(fn));
 				}
 				::DragFinish(hDrop);
 				DropFiles(slFiles);
@@ -1134,7 +1133,7 @@ BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoi
 						std::list<CString> lines;
 						Explode(text, lines, L'\n');
 						for (const auto& line : lines) {
-							auto path = s.ParseFileName(line);
+							auto path = ParseFileName(line);
 							if (::PathIsURLW(path) || ::PathFileExistsW(path)) {
 								slFiles.emplace_back(path);
 							}
@@ -20571,7 +20570,6 @@ void CMainFrame::StartAutoHideCursor()
 
 const bool CMainFrame::GetFromClipboard(std::list<CString>& sl) const
 {
-	auto& s = AfxGetAppSettings();
 	sl.clear();
 
 	if (::IsClipboardFormatAvailable(CF_UNICODETEXT) && ::OpenClipboard(m_hWnd)) {
@@ -20584,7 +20582,7 @@ const bool CMainFrame::GetFromClipboard(std::list<CString>& sl) const
 					std::list<CString> lines;
 					Explode(text, lines, L'\n');
 					for (const auto& line : lines) {
-						auto path = s.ParseFileName(line);
+						auto path = ParseFileName(line);
 						if (::PathIsURLW(path) || ::PathFileExistsW(path)) {
 							sl.emplace_back(path);
 						}

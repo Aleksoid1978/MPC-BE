@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,6 +30,8 @@
 #include "DVBChannel.h"
 #include <afxsock.h>
 #include "FileItem.h"
+
+constexpr auto EXTENDED_PATH_PREFIX = LR"(\\?\)";
 
 #define ENABLE_ASSFILTERMOD 0
 
@@ -466,7 +468,6 @@ public:
 
 	int				iMonitor;
 
-	CStringW		ParseFileName(const CStringW& param);
 	void			ParseCommandLine(cmdLine& cmdln);
 
 	// Added a Debug display to the screen (/debug option)
@@ -902,3 +903,5 @@ public:
 	std::list<CString>			slSubtitlePathsAddons;
 	std::list<CString>			slAudioPathsAddons;
 };
+
+CStringW ParseFileName(const CStringW& param);

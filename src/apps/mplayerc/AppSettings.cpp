@@ -2186,36 +2186,6 @@ void CAppSettings::ExtractDVDStartPos(CString& strParam)
 	}
 }
 
-CStringW CAppSettings::ParseFileName(const CStringW& param)
-{
-	if (param.Find(L':') < 0) {
-		// try to convert relative path to full path
-		CStringW fullPathName;
-		fullPathName.ReleaseBuffer(GetFullPathNameW(param, MAX_PATH, fullPathName.GetBuffer(MAX_PATH), nullptr));
-
-		CFileStatus fs;
-		if (!fullPathName.IsEmpty() && CFileGetStatus(fullPathName, fs)) {
-			return fullPathName;
-		}
-	}
-	else if (param.GetLength() > MAX_PATH && !::PathIsURLW(param) && !::PathIsUNCW(param)) {
-		// trying to shorten a long local path
-		CStringW longpath = StartsWith(param, L"\\\\?\\") ? param : L"\\\\?\\" + param;
-		auto length = GetShortPathNameW(longpath, nullptr, 0);
-		if (length > 0) {
-			CStringW shortPathName;
-			length = GetShortPathNameW(longpath, shortPathName.GetBuffer(length), length);
-			if (length > 0) {
-				shortPathName.ReleaseBuffer(length);
-				shortPathName.Delete(0, 4); // remove "\\?\" prefix
-				return shortPathName;
-			}
-		}
-	}
-
-	return param;
-}
-
 void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 {
 	nCLSwitches = 0;
@@ -2480,3 +2450,32 @@ void CAppSettings::SaveFormats()
 
 extern BOOL AFXAPI AfxFullPath(LPTSTR lpszPathOut, LPCTSTR lpszFileIn);
 extern BOOL AFXAPI AfxComparePath(LPCTSTR lpszPath1, LPCTSTR lpszPath2);
+
+CStringW ParseFileName(const CStringW& param)
+{
+	if (param.Find(L':') < 0) {
+		// try to convert relative path to full path
+		CStringW fullPathName;
+		fullPathName.ReleaseBuffer(GetFullPathNameW(param, MAX_PATH, fullPathName.GetBuffer(MAX_PATH), nullptr));
+
+		CFileStatus fs;
+		if (!fullPathName.IsEmpty() && CFileGetStatus(fullPathName, fs)) {
+			return fullPathName;
+		}
+	} else if (param.GetLength() > MAX_PATH && !::PathIsURLW(param) && !::PathIsUNCW(param)) {
+		// trying to shorten a long local path
+		CStringW longpath = StartsWith(param, EXTENDED_PATH_PREFIX) ? param : EXTENDED_PATH_PREFIX + param;
+		auto length = GetShortPathNameW(longpath, nullptr, 0);
+		if (length > 0) {
+			CStringW shortPathName;
+			length = GetShortPathNameW(longpath, shortPathName.GetBuffer(length), length);
+			if (length > 0) {
+				shortPathName.ReleaseBuffer(length);
+				shortPathName.Delete(0, 4); // remove "\\?\" prefix
+				return shortPathName;
+			}
+		}
+	}
+
+	return param;
+}

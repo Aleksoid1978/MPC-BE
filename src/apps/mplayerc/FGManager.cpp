@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -359,7 +359,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 	HANDLE hFile = INVALID_HANDLE_VALUE;
 	std::vector<BYTE> httpbuf;
 
-	if ((protocol.GetLength() <= 1 || protocol == L"file") && (ext.Compare(L".cda") != 0)) {
+	if ((protocol.GetLength() <= 1 || protocol == L"file" || StartsWith(protocol, EXTENDED_PATH_PREFIX)) && (ext.Compare(L".cda") != 0)) {
 		hFile = CreateFileW(fn, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
 		if (hFile == INVALID_HANDLE_VALUE) {
