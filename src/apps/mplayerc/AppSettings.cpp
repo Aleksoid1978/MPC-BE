@@ -2208,6 +2208,7 @@ CStringW CAppSettings::ParseFileName(const CStringW& param)
 			length = GetShortPathNameW(longpath, shortPathName.GetBuffer(length), length);
 			if (length > 0) {
 				shortPathName.ReleaseBuffer(length);
+				shortPathName.Delete(0, 4); // remove "\\?\" prefix
 				return shortPathName;
 			}
 		}

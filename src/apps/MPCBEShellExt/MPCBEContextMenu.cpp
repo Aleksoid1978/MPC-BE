@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2021 see Authors.txt
+ * (C) 2012-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,8 @@
 #include "stdafx.h"
 #include <algorithm>
 #include <shellapi.h>
+#include <shlwapi.h>
+#include <propkey.h>
 #include "MPCBEContextMenu.h"
 
 #define MPC_WND_CLASS_NAME L"MPC-BE"
@@ -119,11 +121,6 @@ CMPCBEContextMenu::~CMPCBEContextMenu()
 
 static HRESULT DragFiles(LPDATAOBJECT lpdobj, std::vector<CString>& fileNames)
 {
-	FORMATETC fmte = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-	STGMEDIUM stg = { TYMED_HGLOBAL };
-	UINT      uNumFiles = 0;
-	WCHAR     strFilePath[MAX_PATH] = { 0 };
-
 	fileNames.clear();
 
 	// No data object
@@ -131,50 +128,42 @@ static HRESULT DragFiles(LPDATAOBJECT lpdobj, std::vector<CString>& fileNames)
 		return E_INVALIDARG;
 	}
 
-	// Use the given IDataObject to get a list of filenames (CF_HDROP).
-	if (FAILED(lpdobj->GetData(&fmte, &stg))) {
-		return E_INVALIDARG;
-	}
+	CComPtr<IShellItemArray> psia;
+	auto hr = SHCreateShellItemArrayFromDataObject(lpdobj, IID_PPV_ARGS(&psia));
+	if (SUCCEEDED(hr)) {
+		CComPtr<IEnumShellItems> pesi;
+		hr = psia->EnumItems(&pesi);
+		if (SUCCEEDED(hr)) {
+			CComPtr<IShellItem> psi;
+			while (pesi->Next(1, &psi, nullptr) == S_OK) {
+				LPWSTR pszName = nullptr;
+				hr = psi->GetDisplayName(SIGDN_FILESYSPATH, &pszName);
+				if (hr == S_OK) {
+					CString fn(pszName);
+					CoTaskMemFree(pszName);
 
-	// Get a pointer to the actual data.
-	HDROP hDrop = (HDROP)GlobalLock(stg.hGlobal);
+					SFGAOF sfgaoAttribs;
+					hr = psi->GetAttributes(SFGAO_FOLDER, &sfgaoAttribs);
+					if (hr == S_OK) {
+						if (fn[fn.GetLength() - 1] != L'\\') {
+							fn += L"\\";
+						}
+					}
 
-	// Make sure it worked.
-	if (!hDrop) {
-		ReleaseStgMedium(&stg);
-		return E_INVALIDARG;
-	}
-
-	// Make sure HDROP contains at least one file.
-	if ((uNumFiles = DragQueryFileW(hDrop, 0xFFFFFFFF, NULL, 0)) >= 1) {
-		for (UINT i = 0; i < uNumFiles; i++) {
-			DragQueryFileW(hDrop, i, strFilePath, MAX_PATH);
-			if (GetFileAttributesW(strFilePath) & FILE_ATTRIBUTE_DIRECTORY) {
-				size_t nLen = wcslen(strFilePath);
-				if (strFilePath[nLen - 1] != L'\\') {
-					wcscat_s(strFilePath, L"\\");
+					fileNames.emplace_back(fn);
 				}
-			}
-			// Add the file name to the list
-			fileNames.emplace_back(strFilePath);
-		}
 
-		// sort list by path
-		static HMODULE h = LoadLibraryW(L"Shlwapi.dll");
-		if (h) {
-			typedef int (WINAPI* StrCmpLogicalW)(_In_ PCWSTR psz1, _In_ PCWSTR psz2);
-			static StrCmpLogicalW pStrCmpLogicalW = (StrCmpLogicalW)GetProcAddress(h, "StrCmpLogicalW");
-			if (pStrCmpLogicalW) {
+				psi.Release();
+			}
+
+			if (fileNames.size() > 1) {
+				// sort list by path
 				std::sort(fileNames.begin(), fileNames.end(), [](const CString& a, const CString& b) {
-					return pStrCmpLogicalW(a, b) < 0;
+					return StrCmpLogicalW(a, b) < 0;
 				});
 			}
 		}
 	}
-
-	// Release the data.
-	GlobalUnlock(stg.hGlobal);
-	ReleaseStgMedium(&stg);
 
 	return fileNames.empty() ? E_INVALIDARG : S_OK;
 }
