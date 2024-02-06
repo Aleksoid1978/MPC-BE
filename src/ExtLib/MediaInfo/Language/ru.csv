@@ -159,6 +159,9 @@
 About;О программе
 About_Hint;Как связаться со мной и найти последнюю версию программы
 Accompaniment;Сопровождение
+Active_DisplayAspectRatio;
+Active_Height;
+Active_Width;
 ActiveFormatDescription;Описание активного формата
 ActiveFormatDescription_MuxingMode;Описание активного формата, режим смешивания
 Actor;Исполнитель
@@ -1366,5 +1369,5 @@ Written_Location;Место записи
 WrittenBy;Запись произвёл
 Yes;Да
 Your system;Ваша система
-ZZ_Automatic_Percent;50
-ZZ_AutomaticLanguage_Percent;79
+ZZ_Automatic_Percent;49
+ZZ_AutomaticLanguage_Percent;78

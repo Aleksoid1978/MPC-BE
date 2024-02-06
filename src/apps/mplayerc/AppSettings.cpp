@@ -1052,24 +1052,36 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	{
 		m_ExternalFilters.clear();
-		for (unsigned int i = 0; ; i++) {
-			CString key;
-			key.Format(L"%s\\%03u", IDS_R_EXTERNAL_FILTERS, i);
+
+		std::vector<CStringW> sectionnames;
+		profile.EnumSectionNames(IDS_R_EXTERNAL_FILTERS, sectionnames);
+
+		for (const auto& section : sectionnames) {
+			const CStringW key = IDS_R_EXTERNAL_FILTERS L"\\" + section;
+
 			auto f = std::make_unique<FilterOverride>();
+
+			profile.ReadString(key, L"Name", f->name);
+			int sourceType = -1;
+			profile.ReadInt(key, L"SourceType", sourceType, FilterOverride::REGISTERED, FilterOverride::EXTERNAL);
+			f->iLoadType = -1;
+			profile.ReadInt(key, L"LoadType", f->iLoadType, FilterOverride::PREFERRED, FilterOverride::MERIT);
+
+			if (f->name.IsEmpty() || sourceType < 0 || f->iLoadType < 0) {
+				continue;
+			}
+
+			if (profile.ReadString(key, L"CLSID", str)) {
+				f->clsid = GUIDFromCString(str);
+			}
 
 			bool enabled = false;
 			profile.ReadBool(key, L"Enabled", enabled);
 			f->fDisabled = !enabled;
 
-			int j = -1;
-			profile.ReadInt(key, L"SourceType", j);
-			if (j == 0) {
+			if (sourceType == 0) {
 				f->type = FilterOverride::REGISTERED;
 				profile.ReadString(key, L"DisplayName", f->dispname);
-				profile.ReadString(key, L"Name", f->name);
-				if (profile.ReadString(key, L"CLSID", str)) {
-					f->clsid = GUIDFromCString(str);
-				}
 				if (f->clsid == CLSID_NULL) {
 					CComPtr<IBaseFilter> pBF;
 					CStringW FriendlyName;
@@ -1078,19 +1090,12 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 						profile.WriteString(key, L"CLSID", CStringFromGUID(f->clsid));
 					}
 				}
-			} else if (j == 1) {
+			} else if (sourceType == 1) {
 				f->type = FilterOverride::EXTERNAL;
 				profile.ReadString(key, L"Path", f->path);
-				profile.ReadString(key, L"Name", f->name);
-				if (profile.ReadString(key, L"CLSID", str)) {
-					f->clsid = GUIDFromCString(str);
-				}
-			} else {
-				profile.DeleteSection(key);
-				break;
 			}
 
-			if (IsSupportedExternalVideoRenderer(f->clsid)) {
+			if (f->clsid == CLSID_NULL || IsSupportedExternalVideoRenderer(f->clsid)) {
 				// supported external video renderers that must be selected in the "Video" settings
 				continue;
 			}
@@ -1115,12 +1120,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 			}
 			if (f->guids.size() & 1) {
 				f->guids.pop_back();
-			}
-
-			f->iLoadType = -1;
-			profile.ReadInt(key, L"LoadType", f->iLoadType);
-			if (f->iLoadType < 0) {
-				break;
 			}
 
 			f->dwMerit = MERIT_DO_NOT_USE + 1;

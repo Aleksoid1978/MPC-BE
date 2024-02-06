@@ -3169,7 +3169,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_BLOCK_EXTERNAL_VR   "You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
+    IDS_BLOCK_EXTERNAL_VR   "%s harici süzgeç olarak eklenemez.\nTercih ettiğiniz video işleyiciyi Video ayarları sayfasında seçmelisiniz."
 END
 
 STRINGTABLE

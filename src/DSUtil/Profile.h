@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2022 see Authors.txt
+ * (C) 2018-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -45,6 +45,7 @@ private:
 			return str1.CompareNoCase(str2) < 0;
 		}
 	};
+	// There should be a std::map here, because the sorting of the sections is important (see EnumSectionNames).
 	std::map<CStringW, std::map<CStringW, CStringW, KeyCmp>, KeyCmp> m_ProfileMap;
 	bool  m_bIniFirstInit = false;
 	bool  m_bIniNeedFlush = false;
@@ -86,6 +87,7 @@ public:
 	bool WriteBinary(const wchar_t* section, const wchar_t* entry, const BYTE* pdata, const unsigned nbytes);
 
 	void EnumValueNames(const wchar_t* section, std::vector<CStringW>& valuenames);
+	void EnumSectionNames(const wchar_t* section, std::vector<CStringW>& sectionnames);
 
 	bool DeleteValue(const wchar_t* section, const wchar_t* entry);
 	bool DeleteSection(const wchar_t* section);

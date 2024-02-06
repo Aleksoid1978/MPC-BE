@@ -27,7 +27,10 @@ MPCVideoDec
 
 Обновлены библиотеки:
 	ffmpeg git-n6.2-dev-967-gb181868aba;
-	nanosvg git-93ce879.
+	Little-CMS git-lcms2.16-26-gc2a5401;
+	MediaInfo git-v24.01-g51dbd896;
+	nanosvg git-93ce879;
+	ZenLib git-v0.4.41-12-g26b4aa1.
 
 
 1.6.11 - 2023-12-27

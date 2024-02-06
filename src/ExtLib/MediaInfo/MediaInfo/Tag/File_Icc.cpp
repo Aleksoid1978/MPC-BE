@@ -167,7 +167,7 @@ void File_Icc::FileHeader_Parse()
     int32u Size, ColorSpace, acsp, DeviceModel;
     int8u Version_M, Version_m;
     Get_B4 (Size,                                               "Profile size");
-    if ((IsSub && Size<Buffer_Size) || (!IsSub && File_Size!=(int64u)-1 && Size<File_Size))
+    if ((IsSub && Size<Buffer_Size) || (!IsSub && File_Size!=(int64u)-1 && (Size<File_Size || Size>=0x01000000)))
     {
         Reject();
         return;
@@ -186,12 +186,19 @@ void File_Icc::FileHeader_Parse()
     Get_C4 (ColorSpace,                                         "Colour space of data");
     Skip_C4(                                                    "PCS");
     Element_Begin1("Date/Time");
-        Info_B2(YY,                                             "Year");
-        Info_B2(MM,                                             "Month");
-        Info_B2(DD,                                             "Day");
-        Info_B2(hh,                                             "Hour");
-        Info_B2(mm,                                             "Minute");
-        Info_B2(ss,                                             "Second");
+        int16u YY, MM, DD, hh, mm, ss;
+        Get_B2 (YY,                                             "Year");
+        Get_B2 (MM,                                             "Month");
+        Get_B2 (DD,                                             "Day");
+        Get_B2 (hh,                                             "Hour");
+        Get_B2 (mm,                                             "Minute");
+        Get_B2 (ss,                                             "Second");
+        if (!IsSub && (YY || MM || DD || hh || mm || ss) && (YY<=1970 || MM>=12 || DD>=31 || hh>=24 || mm>=60 || ss>=60))
+        {
+            Element_End0();
+            Reject();
+            return;
+        }
         #if MEDIAINFO_TRACE
             string DateTime;
             DateTime+='0'+YY/1000;

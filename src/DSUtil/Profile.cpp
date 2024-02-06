@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2023 see Authors.txt
+ * (C) 2018-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,6 +26,7 @@
 #include "CryptoUtils.h"
 #include "Log.h"
 #include "Profile.h"
+#include "text.h"
 
 CStringW GetIniProgramDir()
 {
@@ -848,48 +849,40 @@ void CProfile::EnumValueNames(const wchar_t* section, std::vector<CStringW>& val
 	if (m_hAppRegKey) {
 		CRegKey regkey;
 		if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, section, KEY_READ)) {
-			// https://docs.microsoft.com/ru-ru/windows/desktop/SysInfo/enumerating-registry-subkeys
-			WCHAR    achClass[MAX_PATH] = L"";
-			DWORD    cchClassName = MAX_PATH;
-			DWORD    cSubKeys = 0;
-			DWORD    cbMaxSubKey;
-			DWORD    cchMaxClass;
-			DWORD    cValues;
-			DWORD    cchMaxValue;
-			DWORD    cbMaxValueData;
-			DWORD    cbSecurityDescriptor;
-			FILETIME ftLastWriteTime;
+			DWORD cValues     = 0;
+			DWORD cchMaxValue = 0;
 
 			// Get the class name and the value count.
 			DWORD retCode = RegQueryInfoKeyW(
 				regkey.m_hKey,
-				achClass,
-				&cchClassName,
 				nullptr,
-				&cSubKeys,
-				&cbMaxSubKey,
-				&cchMaxClass,
+				nullptr,
+				nullptr,
+				nullptr,
+				nullptr,
+				nullptr,
 				&cValues,
 				&cchMaxValue,
-				&cbMaxValueData,
-				&cbSecurityDescriptor,
-				&ftLastWriteTime);
+				nullptr,
+				nullptr,
+				nullptr);
 
-			if (ERROR_SUCCESS == retCode && cValues) {
-				WCHAR achValue[16383];
+			if (ERROR_SUCCESS == retCode && cValues && cchMaxValue) {
+				std::vector<WCHAR> achValue(cchMaxValue + 1, '\0');
 
 				for (DWORD i = 0, retCode = ERROR_SUCCESS; i < cValues; i++) {
-					DWORD cchValue = std::size(achValue);
+					DWORD cchValue = cchMaxValue + 1;
 					achValue[0] = '\0';
-					retCode = RegEnumValueW(regkey.m_hKey, i, achValue, &cchValue, NULL, NULL, NULL, NULL);
+					retCode = RegEnumValueW(regkey.m_hKey, i, achValue.data(), &cchValue, NULL, NULL, NULL, NULL);
 					if (retCode == ERROR_SUCCESS) {
-						valuenames.emplace_back(achValue, cchValue);
+						valuenames.emplace_back(achValue.data(), cchValue);
 					}
 				}
 			}
 			regkey.Close();
 		}
-	} else {
+	}
+	else {
 		InitIni();
 		auto it1 = m_ProfileMap.find(section);
 		if (it1 != m_ProfileMap.end()) {
@@ -897,6 +890,67 @@ void CProfile::EnumValueNames(const wchar_t* section, std::vector<CStringW>& val
 			for (const auto& entry : sectionMap) {
 				valuenames.emplace_back(entry.first);
 			}
+		}
+	}
+}
+
+void CProfile::EnumSectionNames(const wchar_t* section, std::vector<CStringW>& sectionnames)
+{
+	std::lock_guard<std::recursive_mutex> lock(m_Mutex);
+
+	sectionnames.clear();
+
+	if (m_hAppRegKey) {
+		CRegKey regkey;
+		if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, section, KEY_READ)) {
+			DWORD cSubKeys    = 0;
+			DWORD cbMaxSubKey = 0;
+
+			// Get the class name and the value count.
+			DWORD retCode = RegQueryInfoKeyW(
+				regkey.m_hKey,
+				nullptr,
+				nullptr,
+				nullptr,
+				&cSubKeys,
+				&cbMaxSubKey,
+				nullptr,
+				nullptr,
+				nullptr,
+				nullptr,
+				nullptr,
+				nullptr);
+
+			if (ERROR_SUCCESS == retCode && cSubKeys && cbMaxSubKey) {
+				std::vector<WCHAR> achKey(cbMaxSubKey + 1, '\0');
+
+				for (DWORD i = 0; i < cSubKeys; i++) {
+					DWORD cbName = cbMaxSubKey + 1;
+					achKey[0] = '\0';
+					retCode = RegEnumKeyExW(regkey.m_hKey, i, achKey.data(), &cbName, nullptr, nullptr, nullptr, nullptr);
+					if (retCode == ERROR_SUCCESS) {
+						sectionnames.emplace_back(achKey.data(), cbName);
+					}
+				}
+			}
+			regkey.Close();
+		}
+	}
+	else {
+		InitIni();
+		CStringW prefix(section);
+		prefix += L'\\';
+
+		auto it = m_ProfileMap.cbegin();
+		while (it != m_ProfileMap.cend() && !StartsWith(it->first, prefix)) {
+			++it;
+		}
+
+		while (it != m_ProfileMap.cend() && StartsWith(it->first, prefix)) {
+			if (it->first.GetLength() > prefix.GetLength()) {
+				sectionnames.emplace_back(it->first.Mid(prefix.GetLength()));
+			}
+			++it;
 		}
 	}
 }
@@ -948,7 +1002,21 @@ bool CProfile::DeleteSection(const wchar_t* section)
 	}
 	else {
 		InitIni();
-		if (m_ProfileMap.erase(section)) {
+		const CStringW mainsection(section);
+		const CStringW prefix(mainsection + L'\\');
+
+		auto start = m_ProfileMap.cbegin();
+		while (start != m_ProfileMap.cend() && start->first != mainsection && !StartsWith(start->first, prefix)) {
+			++start;
+		}
+
+		if (start != m_ProfileMap.cend()) {
+			auto end = std::next(start);
+			while (end != m_ProfileMap.cend() && StartsWith(end->first, prefix)) {
+				++end;
+			}
+
+			m_ProfileMap.erase(start, end);
 			m_bIniNeedFlush = true;
 			ret = true;
 		}

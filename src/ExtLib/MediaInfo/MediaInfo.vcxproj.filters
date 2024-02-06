@@ -770,6 +770,9 @@
     <ClInclude Include="MediaInfo\Tag\File_Icc.h">
       <Filter>Header Files\Tag</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Video\File_Vvc.h">
+      <Filter>Header Files\Video</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1485,6 +1488,9 @@
     </ClCompile>
     <ClCompile Include="MediaInfo\Tag\File_Icc.cpp">
       <Filter>Source Files\Tag</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Video\File_Vvc.cpp">
+      <Filter>Source Files\Video</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

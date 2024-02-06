@@ -416,6 +416,9 @@ void CSaveTaskDlg::SaveHTTP(const int iSubLangDefault)
 		if (iSubLangDefault >= 0) {
 			strArgs.AppendFormat(L" -disposition:s:%d default", iSubLangDefault);
 		}
+		if (finalext == L"mp4") {
+			strArgs.Append(L" -movflags +faststart");
+		}
 		strArgs.AppendFormat(LR"( -f %s "%s")", finalext, tmpfile);
 
 		SHELLEXECUTEINFOW execinfo = { sizeof(execinfo) };

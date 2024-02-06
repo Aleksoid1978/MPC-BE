@@ -159,6 +159,9 @@
 About;정보
 About_Hint;연락처와 최신 버전 확인
 Accompaniment;반주
+Active_DisplayAspectRatio;
+Active_Height;
+Active_Width;
 ActiveFormatDescription;
 ActiveFormatDescription_MuxingMode;
 Actor;배우
@@ -1366,5 +1369,5 @@ Written_Location;제작 장소
 WrittenBy;제작자
 Yes;예
 Your system;이 시스템
-ZZ_Automatic_Percent;66
+ZZ_Automatic_Percent;65
 ZZ_AutomaticLanguage_Percent;70

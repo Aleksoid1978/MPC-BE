@@ -159,6 +159,9 @@
 About;このソフトの情報
 About_Hint;連絡方法と最新版チェック
 Accompaniment;伴奏
+Active_DisplayAspectRatio;
+Active_Height;
+Active_Width;
 ActiveFormatDescription;アクティブフォーマットデスクリプション
 ActiveFormatDescription_MuxingMode;アクティブフォーマットデスクリプション Mux 種別
 Actor;主演

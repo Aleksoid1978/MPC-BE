@@ -170,9 +170,9 @@ int External_Command_Run(const Ztring& Command, const ZtringList& Arguments, Ztr
         StdErrWrite=nullptr;
     }
 
-    STARTUPINFO StartupInfo;
-    ZeroMemory(&StartupInfo, sizeof(STARTUPINFO));
-    StartupInfo.cb=sizeof(STARTUPINFO);
+    STARTUPINFOW StartupInfo;
+    ZeroMemory(&StartupInfo, sizeof(StartupInfo));
+    StartupInfo.cb=sizeof(StartupInfo);
     StartupInfo.hStdError=StdErrWrite;
     StartupInfo.hStdOutput=StdOutWrite;
     StartupInfo.dwFlags|=STARTF_USESTDHANDLES;

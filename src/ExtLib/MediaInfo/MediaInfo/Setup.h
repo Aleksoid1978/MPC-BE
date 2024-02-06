@@ -678,6 +678,9 @@
 #if !defined(MEDIAINFO_VIDEO_NO) && !defined(MEDIAINFO_VC3_NO) && !defined(MEDIAINFO_VC3_YES)
     #define MEDIAINFO_VC3_YES
 #endif
+#if !defined(MEDIAINFO_VIDEO_NO) && !defined(MEDIAINFO_VVC_NO) && !defined(MEDIAINFO_VVC_YES)
+    #define MEDIAINFO_VVC_YES
+#endif
 #if !defined(MEDIAINFO_VIDEO_NO) && !defined(MEDIAINFO_TIMECODE_NO) && !defined(MEDIAINFO_TIMECODE_YES)
     #define MEDIAINFO_TIMECODE_YES
 #endif

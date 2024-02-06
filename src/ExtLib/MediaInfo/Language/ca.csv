@@ -159,6 +159,9 @@
 About;Quant a...
 About_Hint;Com contactar-me i trobar l'última versió
 Accompaniment;Acompanyament
+Active_DisplayAspectRatio;
+Active_Height;
+Active_Width;
 ActiveFormatDescription;Descripció format actiu
 ActiveFormatDescription_MuxingMode;Descripció format actiu, mode multiplexor
 Actor;Actor
@@ -1366,5 +1369,5 @@ Written_Location;Ubicació escrita
 WrittenBy;Escrit per
 Yes;Sí
 Your system;El teu sistema
-ZZ_Automatic_Percent;76
+ZZ_Automatic_Percent;75
 ZZ_AutomaticLanguage_Percent;79

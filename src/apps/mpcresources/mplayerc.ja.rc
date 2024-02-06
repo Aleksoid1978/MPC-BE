@@ -3169,7 +3169,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_BLOCK_EXTERNAL_VR   "You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
+    IDS_BLOCK_EXTERNAL_VR   "%s を外部フィルターとして追加することはできません。\n[映像] 設定ページで、お好みのビデオ レンダラーを選択する必要があります。"
 END
 
 STRINGTABLE

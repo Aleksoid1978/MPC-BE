@@ -159,6 +159,9 @@
 About;Про програму
 About_Hint;Контакти та пошук нової версії
 Accompaniment;Супровід
+Active_DisplayAspectRatio;
+Active_Height;
+Active_Width;
 ActiveFormatDescription;Чинний опис формату
 ActiveFormatDescription_MuxingMode;Чинний опис формату, Режим мультиплексування
 Actor;Актор
@@ -1367,4 +1370,4 @@ WrittenBy;Записано
 Yes;Так
 Your system;Ваша система
 ZZ_Automatic_Percent;68
-ZZ_AutomaticLanguage_Percent;73
+ZZ_AutomaticLanguage_Percent;72

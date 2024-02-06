@@ -159,6 +159,9 @@
 About;关于
 About_Hint;联系作者和检查更新
 Accompaniment;伴奏
+Active_DisplayAspectRatio;
+Active_Height;
+Active_Width;
 ActiveFormatDescription;活动图像标识符 (AFD)
 ActiveFormatDescription_MuxingMode;活动图像标识符 (AFD), 混流模式
 Actor;演员

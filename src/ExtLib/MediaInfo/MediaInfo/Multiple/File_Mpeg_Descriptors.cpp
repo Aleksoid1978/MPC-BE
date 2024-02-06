@@ -76,14 +76,69 @@ namespace Elements
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-//Extern
-extern string Avc_profile_level_string(int8u profile_idc, int8u level_idc=0, int8u constraint_set_flags=0);
-
-//---------------------------------------------------------------------------
 const char* Mpegv_colour_primaries(int8u colour_primaries);
 const char* Mpegv_transfer_characteristics(int8u transfer_characteristics);
 const char* Mpegv_matrix_coefficients(int8u matrix_coefficients);
 const char* Mpegv_matrix_coefficients_ColorSpace(int8u matrix_coefficients);
+string Avc_profile_level_string(int8u profile_idc, int8u level_idc=0, int8u constraint_set_flags=0);
+const char* Hevc_profile_idc(int32u profile_idc);
+const char* Hevc_tier_flag(bool tier_flag);
+string Vvc_profile_idc(int8u profile_idc);
+string Vvc_level_idc(int8u level_idc);
+string Vvc_profile_level_tier_string(int8u profile_idc, int8u level_idc, bool tier_flag);
+
+//---------------------------------------------------------------------------
+typedef int8u tag_struct[][4];
+static tag_struct Mpeg_Descriptors_video_properties_tag_0=
+{
+    {  1,  1,  1, 0},
+    {  1,  1,  0, 0},
+    {  6,  6,  6, 0},
+    {  5,  6,  5, 0},
+    {  1,  1,  0, 1},
+};
+static int8u Mpeg_Descriptors_video_properties_tag_0_Size=sizeof(Mpeg_Descriptors_video_properties_tag_0)/sizeof(Mpeg_Descriptors_video_properties_tag_0[0]);
+static tag_struct Mpeg_Descriptors_video_properties_tag_1=
+{
+    {  9, 14,  9, 0},
+    {  9, 14,  0, 0},
+    {  9, 14,  0, 1},
+    { 12,  1,  6, 1},
+};
+static int8u Mpeg_Descriptors_video_properties_tag_1_Size=sizeof(Mpeg_Descriptors_video_properties_tag_0)/sizeof(Mpeg_Descriptors_video_properties_tag_0[0]);
+static tag_struct Mpeg_Descriptors_video_properties_tag_2=
+{
+    {  9, 16,  9, 0},
+    {  9, 18,  9, 0},
+    {  9, 16, 14, 0},
+    {  9, 16,  0, 0},
+    {  9, 18,  0, 0},
+};
+static int8u Mpeg_Descriptors_video_properties_tag_2_Size=sizeof(Mpeg_Descriptors_video_properties_tag_0)/sizeof(Mpeg_Descriptors_video_properties_tag_0[0]);
+static int8u Mpeg_Descriptors_video_properties_tag_Sizes[]=
+{
+    Mpeg_Descriptors_video_properties_tag_0_Size,
+    Mpeg_Descriptors_video_properties_tag_1_Size,
+    Mpeg_Descriptors_video_properties_tag_2_Size,
+};
+static tag_struct* Mpeg_Descriptors_video_properties_tag_Data[]=
+{
+    (tag_struct*)&Mpeg_Descriptors_video_properties_tag_0,
+    (tag_struct*)&Mpeg_Descriptors_video_properties_tag_1,
+    (tag_struct*)&Mpeg_Descriptors_video_properties_tag_2,
+};
+static void Mpeg_Descriptors_video_properties_tag(std::map<std::string, Ztring>& Infos, int8u HDR_WCG_idc, int8u video_properties_tag)
+{
+    if (HDR_WCG_idc>=3 || !video_properties_tag || video_properties_tag>Mpeg_Descriptors_video_properties_tag_Sizes[HDR_WCG_idc])
+        return;
+    const auto& Data=(*(Mpeg_Descriptors_video_properties_tag_Data[HDR_WCG_idc]))[video_properties_tag-1];
+    Infos["colour_description_present"]=__T("Yes");
+    Infos["colour_primaries"].From_UTF8(Mpegv_colour_primaries(Data[0]));
+    Infos["transfer_characteristics"].From_UTF8(Mpegv_transfer_characteristics(Data[1]));
+    Infos["matrix_coefficients"].From_UTF8(Mpegv_matrix_coefficients(Data[2]));
+    Infos["ColorSpace"].From_UTF8(Mpegv_matrix_coefficients_ColorSpace(Data[2]));
+    Infos["colour_range"].From_UTF8(Data[3]?"Full":"Limited");
+}
 
 //---------------------------------------------------------------------------
 const char* Mpeg_Descriptors_audio_type(int8u ID)
@@ -1551,6 +1606,7 @@ void File_Mpeg_Descriptors::Data_Parse()
             ELEMENT_CASE(36, "Stereoscopic_video_info");
             ELEMENT_CASE(37, "Transport_profile");
             ELEMENT_CASE(38, "HEVC video");
+            ELEMENT_CASE(39, "VVC video");
             ELEMENT_CASE(3F, "Extension");
 
             //Following is in private sections, in case there is not network type detected
@@ -2261,8 +2317,6 @@ void File_Mpeg_Descriptors::Descriptor_2F()
 }
 
 //---------------------------------------------------------------------------
-extern const char* Hevc_tier_flag(bool tier_flag);
-extern const char* Hevc_profile_idc(int32u profile_idc);
 void File_Mpeg_Descriptors::Descriptor_38()
 {
     //Parsing
@@ -2310,6 +2364,46 @@ void File_Mpeg_Descriptors::Descriptor_38()
         }
 
         Complete_Stream->Streams[elementary_PID]->Infos["Format_Profile"]=Profile;
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Mpeg_Descriptors::Descriptor_39()
+{
+    //Parsing
+    int8u  profile_idc, num_sub_profiles, level_idc, HDR_WCG_idc, video_properties_tag;
+    bool   tier_flag, temporal_layer_subset_flag;
+    BS_Begin();
+    Get_S1 (7, profile_idc,                                     "profile_idc"); Param_Info1(Vvc_profile_idc(profile_idc));
+    Get_SB (   tier_flag,                                       "tier_flag"); Param_Info1(Hevc_tier_flag(tier_flag));
+    Get_S1 (8, num_sub_profiles,                                "num_sub_profiles");
+    for (int8u i=0; i<num_sub_profiles; i++)
+        Skip_S4(32,                                             "sub_profile_idc");
+    Skip_SB(                                                    "progressive_source_flag");
+    Skip_SB(                                                    "interlaced_source_flag");
+    Skip_SB(                                                    "non_packed_constraint_flag");
+    Skip_SB(                                                    "frame_only_constraint_flag");
+    Skip_S1(4,                                                  "reserved");
+    Get_S1 (8, level_idc,                                       "level_idc"); Param_Info1(Vvc_level_idc(level_idc));
+    Get_SB (    temporal_layer_subset_flag,                     "temporal_layer_subset_flag");
+    Skip_SB(                                                    "VVC_still_present_flag");
+    Skip_SB(                                                    "VVC_24hr_picture_present_flag");
+    Skip_S1(5,                                                  "reserved");
+    Get_S1 (2, HDR_WCG_idc,                                     "HDR_WCG_idc");
+    Skip_S1(4,                                                  "reserved");
+    Get_S1 (2, video_properties_tag,                            "video_properties_tag");
+    if (temporal_layer_subset_flag)
+    {
+        Skip_S1(5,                                              "reserved");
+        Skip_S1(3,                                              "temporal_id_min");
+        Skip_S1(5,                                              "reserved");
+        Skip_S1(3,                                              "temporal_id_max");
+    }
+    BS_End();
+
+    FILLING_BEGIN();
+        Complete_Stream->Streams[elementary_PID]->Infos["Format_Profile"].From_UTF8(Vvc_profile_level_tier_string(profile_idc, level_idc, tier_flag));
+        Mpeg_Descriptors_video_properties_tag(Complete_Stream->Streams[elementary_PID]->Infos, HDR_WCG_idc, video_properties_tag);
     FILLING_END();
 }
 

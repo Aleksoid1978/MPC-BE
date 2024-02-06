@@ -74,7 +74,7 @@ static inline void set_level(tfsxml_string* priv, int level)
     priv->flags |= level << offset;
 }
 
-static inline void get_level(tfsxml_string* priv, int* level)
+static inline void get_level(tfsxml_string* priv, unsigned* level)
 {
     const int offset = (sizeof(priv->flags) - 1) * 8;
     *level = priv->flags >> offset;
@@ -172,7 +172,7 @@ int tfsxml_init(tfsxml_string* priv, const void* buf, unsigned len, unsigned ver
 
 int tfsxml_next(tfsxml_string* priv, tfsxml_string* n) {
     tfsxml_string priv_bak;
-    int level;
+    unsigned level;
 
     get_level(priv, &level);
 

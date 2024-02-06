@@ -190,11 +190,15 @@ Ztring FileName::TempFileName_Create(const Ztring &Prefix)
             if (!GetTempPath(MAX_PATH, Path))
                 return Ztring(); //Problem while getting a temp path
 
-            Char FileName[MAX_PATH+1];
-            if (!GetTempFileName(Path, Prefix.c_str(), 0, FileName))
-                 return Ztring(); //Problem while getting a file name
+            #ifndef WINDOWS_GAMES
+                Char FileName[MAX_PATH+1];
+                if (!GetTempFileName(Path, Prefix.c_str(), 0, FileName))
+                    return Ztring(); //Problem while getting a file name
 
-            return Ztring(FileName);
+                return Ztring(FileName);
+            #else // #ifdef WINDOWS_GAMES
+                return __T("D:\\xxx.txt");
+            #endif // #ifdef WINDOWS_GAMES
         #else
             return __T("C:\\xxx.txt");
         #endif
