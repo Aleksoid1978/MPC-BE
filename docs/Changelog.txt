@@ -20,6 +20,7 @@ Player
 Added the ability to open the folder of the currently playing file using a hotkey.
 Do not show zero hours when displaying time.
 Changed the logic of frame offset relative to the center of the window.
+Improvements to opening long paths and paths starting with "\\?\".
 
 Updated French translation (by rhahgleuhargh).
 Updated Italian translation (by mapi68).
