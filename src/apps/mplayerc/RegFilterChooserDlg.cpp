@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,6 +25,7 @@
 #include "FGFilter.h"
 #include "DSUtil/FileHandle.h"
 #include "DSUtil/std_helper.h"
+#include "PPageExternalFilters.h"
 
 // CRegFilterChooserDlg dialog
 
@@ -50,9 +51,17 @@ void CRegFilterChooserDlg::DoDataExchange(CDataExchange* pDX)
 void CRegFilterChooserDlg::AddToList(IMoniker* pMoniker)
 {
 	CComPtr<IPropertyBag> pPB;
-	if (SUCCEEDED(pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB))) {
+	if (SUCCEEDED(pMoniker->BindToStorage(0, 0, IID_PPV_ARGS(&pPB)))) {
 		CComVariant var;
 		if (SUCCEEDED(pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr))) {
+			CComVariant var2;
+			if (SUCCEEDED(pPB->Read(_T("CLSID"), &var2, nullptr))) {
+				CStringW clsid(var2.bstrVal);
+				if (!clsid.IsEmpty() && IsSupportedExternalVideoRenderer(GUIDFromCString(clsid))) {
+					return;
+				}
+			}
+
 			m_monikers.emplace_back(pMoniker);
 			int iItem = m_list.InsertItem(m_list.GetItemCount(), CStringW(var.bstrVal));
 			m_list.SetItemData(iItem, (DWORD_PTR)pMoniker);
