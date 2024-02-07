@@ -3181,7 +3181,7 @@ BEGIN
     IDS_DESC_EVR_CP         "和 EVR 相同，但依托分配管理器负担显示字幕并进行后处理。"
     IDS_DESC_MADVR          "高品渲染器，需要支持 Direct3D 9 或更新版本的显卡。"
     IDS_DESC_EVR_SYNC       "与 EVR (自定义) 相同, 但提供了几个选项来同步显示刷新率，用以减少视频中被丢弃与重复的帧。"
-    IDS_DESC_MPC_VR         "Video renderer with support for Direct3D 11."
+    IDS_DESC_MPC_VR         "支持 Direct3D 11 的视频渲染器。"
 END
 
 STRINGTABLE

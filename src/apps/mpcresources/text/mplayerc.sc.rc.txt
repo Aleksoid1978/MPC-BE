@@ -1435,7 +1435,7 @@ STRING IDS_DESC_EVR_CP		"和 EVR 相同，但依托分配管理器负担显示�
 STRING IDS_DESC_EVR_SYNC		"与 EVR (自定义) 相同, 但提供了几个选项来同步显示刷新率，用以减少视频中被丢弃与重复的帧。"
 STRING IDS_DESC_HAALI_VR		"与 VMR-9 类同, 但是使用真正的 bicubic 改变大小。"
 STRING IDS_DESC_MADVR		"高品渲染器，需要支持 Direct3D 9 或更新版本的显卡。"
-STRING IDS_DESC_MPC_VR		"Video renderer with support for Direct3D 11."
+STRING IDS_DESC_MPC_VR		"支持 Direct3D 11 的视频渲染器。"
 STRING IDS_DESC_NULLVR_ANY		"连接到任意视频文件类型并且会将进入的采样信息传送到任意地方。当您不需要显示视频并希望节省不必要的 cpu 工作时请使用它。"
 STRING IDS_DESC_NULLVR_UNCOMP		"和普通的空渲染器相同, 但仅会被连接到未压缩的类型上。"
 STRING IDS_DISABLE_ALL_FILTERS		"禁用全部滤镜(&D)"

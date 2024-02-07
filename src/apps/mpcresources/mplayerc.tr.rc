@@ -3181,7 +3181,7 @@ BEGIN
     IDS_DESC_EVR_CP         "GVİ ile aynıdır, ancak alt yazı ve son işleme için Bölüştürücü-Sunucu ile birlikte çalışır."
     IDS_DESC_MADVR          "Yüksek kaliteli bir işleyicidir. D3D9 ya da daha sonrasını destekleyen bir ekran kartı gerektirir."
     IDS_DESC_EVR_SYNC       "GVİ (ÖS) ile aynıdır, ancak atlanan ya da çoğaltılan video karelerini ortadan kaldırmak için video kare hızını ekran yenileme hızı ile senkronize etmek için çeşitli seçenekler sunar."
-    IDS_DESC_MPC_VR         "Video renderer with support for Direct3D 11."
+    IDS_DESC_MPC_VR         "Direct3D 11 destekli video işleyici."
 END
 
 STRINGTABLE
