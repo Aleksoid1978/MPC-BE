@@ -164,17 +164,12 @@ static int d3d12va_vc1_end_frame(AVCodecContext *avctx)
 
 static int d3d12va_vc1_decode_init(AVCodecContext *avctx)
 {
-    D3D12VADecodeContext *ctx = D3D12VA_DECODE_CONTEXT(avctx);
-    // ==> Start patch MPC
-    //ctx->cfg.DecodeProfile = D3D12_VIDEO_DECODE_PROFILE_VC1;
-    ctx->cfg.DecodeProfile = D3D12_VIDEO_DECODE_PROFILE_VC1_D2010;
     int ret;
-    // ==> End patch MPC
+    D3D12VADecodeContext *ctx = D3D12VA_DECODE_CONTEXT(avctx);
+    ctx->cfg.DecodeProfile = D3D12_VIDEO_DECODE_PROFILE_VC1_D2010;
 
     ctx->max_num_ref = 3;
 
-    // ==> Start patch MPC
-    //return ff_d3d12va_decode_init(avctx);
     ret = ff_d3d12va_decode_init(avctx);
     if (ret < 0) {
         ctx->cfg.DecodeProfile = D3D12_VIDEO_DECODE_PROFILE_VC1;
@@ -182,7 +177,6 @@ static int d3d12va_vc1_decode_init(AVCodecContext *avctx)
     }
 
     return ret;
-    // ==> End patch MPC
 }
 
 #if CONFIG_WMV3_D3D12VA_HWACCEL
