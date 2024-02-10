@@ -2513,7 +2513,7 @@ END
 STRINGTABLE
 BEGIN
     IDC_REGULARSURF         "映像の表面を通常のオフスクリーン サーフェスとして割り当てます。"
-    IDC_DX9RESIZER_COMBO    "ピクセル シェーダー 2.0 に対応していなければ自動的に単純な線形補間が使用されます。"
+    IDC_DX9RESIZER_COMBO    "ピクセル シェーダー 2.0 がサポートされていない場合は、単純な線形補間が自動的に使用されます。"
 END
 
 STRINGTABLE
@@ -3177,9 +3177,9 @@ BEGIN
     IDS_DESC_HAALI_VR       "VMR-9 とほぼ同じですが、真のバイキュービック リサイザーを使用します。"
     IDS_DESC_NULLVR_ANY     "あらゆる動画の (ような) メディア タイプに接続して入力サンプルをどこにも出力しません。映像の表示を必要とせず、CPU を無駄な動作から節約したい場合に使用してください。"
     IDS_DESC_NULLVR_UNCOMP  "標準の Null レンダラーと同じですが、これは非圧縮タイプにのみ接続します。"
-    IDS_DESC_EVR            "ハードウェア デコードをサポートするビデオレンダラーです。"
+    IDS_DESC_EVR            "ハードウェア デコードをサポートするビデオ レンダラーです。"
     IDS_DESC_EVR_CP         "EVR と同じですが、字幕作成と後処理のためにアロケーター プレゼンターを使用します。"
-    IDS_DESC_MADVR          "高品質のレンダラーで、D3D9 以降をサポートする GPU が必要です。"
+    IDS_DESC_MADVR          "高品質のレンダラーであり、D3D9 以降をサポートする GPU が必要です。"
     IDS_DESC_EVR_SYNC       "EVR (CP) と同じですが、動画のフレーム レートをディスプレイのリフレッシュ レートと同期させて、ビデオ フレームのスキップや重複をなくすためのオプションがいくつかあります。"
     IDS_DESC_MPC_VR         "Direct3D 11 をサポートするビデオ レンダラーです。"
 END
@@ -3360,7 +3360,7 @@ BEGIN
     IDS_ARS_RELEASE_DEVICE_IDLE "アイドル状態時にデバイスを解放する"
     IDS_ARS_CROSSFEED       "ステレオ クロスフィードを有効にする (ヘッドホン用)"
     IDS_ARS_DEVICE_PERIOD   "デバイス バッファー:"
-    IDS_ARS_ALT_CHECK_FORMAT "対応している形式の代替確認"
+    IDS_ARS_ALT_CHECK_FORMAT "サポートされている形式の代替確認"
     IDS_ARS_STATUS          "ステータス"
     IDS_ARS_DEVICE          "デバイス:"
     IDS_ARS_MODE            "モード:"
@@ -3425,7 +3425,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_NAVIGATE_TUNERSCAN  "チューナー調整"
-    IDS_SUBTITLES_ERROR     "字幕が読み込まれていないか、未対応のレンダラーです。"
+    IDS_SUBTITLES_ERROR     "字幕が読み込まれていないか、レンダラーがサポートされていません。"
 END
 
 STRINGTABLE
@@ -3666,7 +3666,7 @@ BEGIN
     IDS_GOTO_ERROR_PARSING_TEXT "入力されたテキストの解析エラーが発生しました!"
     IDS_GOTO_ERROR_PARSING_FPS "入力されたフレーム レートの解析エラーが発生しました!"
     IDS_FRAME_STEP_ERROR_RENDERER  "コマ送りできません。別のビデオ レンダラーを試してください。"
-    IDS_SCREENSHOT_ERROR_SHOCKWAVE  "「画像を保存」と「サムネイルを保存」機能は、Shockwave ファイルには対応していません。"
+    IDS_SCREENSHOT_ERROR_SHOCKWAVE  "「画像を保存」と「サムネイルを保存」機能は、Shockwave ファイルでは機能しません。"
     IDS_SCREENSHOT_ERROR_OVERLAY  "「画像を保存」と「サムネイルを保存」機能は、オーバーレイ ミキサー ビデオ レンダラーでは動作しません。\nMPC-BE の出力オプションでビデオ レンダラーを変更し、ファイルを開き直してください。"
     IDS_SUBDL_DLG_CONNECT_ERROR  "オンライン字幕データベースに接続できません。"
 END
@@ -3726,7 +3726,7 @@ BEGIN
     IDS_OSD_HUE             "色相: %s°"
     IDS_OSD_SATURATION      "彩度: %s"
     IDS_OSD_RESET_COLOR     "カラー設定を復元しました"
-    IDS_OSD_NO_COLORCONTROL "カラー コントロールには対応していません"
+    IDS_OSD_NO_COLORCONTROL "カラー コントロールはサポートされていません"
     IDS_BRIGHTNESS_INC      "明るさを上げる"
 END
 
