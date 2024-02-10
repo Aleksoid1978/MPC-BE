@@ -31,7 +31,8 @@ MPCVideoDec
 	Little-CMS git-lcms2.16-26-gc2a5401;
 	MediaInfo git-v24.01-g51dbd896;
 	nanosvg git-93ce879;
-	ZenLib git-v0.4.41-12-g26b4aa1.
+	ZenLib git-v0.4.41-12-g26b4aa1;
+	zlib 1.3.1.
 
 
 1.6.11 - 2023-12-27
