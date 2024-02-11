@@ -283,24 +283,28 @@ void CPlayerSeekBar::OnPaint()
 	const CRect channelRect(GetChannelRect());
 
 	if (s.bUseDarkTheme) {
-		auto funcMarkChannelTheme = [&](REFERENCE_TIME pos, CDC& memdc, CPen& pen, const CRect& rect) {
+		auto funcMarkChannelTheme = [&](REFERENCE_TIME pos, CDC& memdc, CPen& pen, const CRect& rect, bool thick) {
 			if (pos <= 0 || pos >= m_stop) {
 				return;
 			}
 
-			const CRect r(channelRect);
 			memdc.SelectObject(&pen);
-			const int x = r.left + (long)(pos * r.Width() / m_stop);
+			const int x = channelRect.left + (long)(pos * channelRect.Width() / m_stop);
 
 			// instead of drawing hands can be a marker icon
 			// HICON appIcon = (HICON)::LoadImageW(AfxGetResourceHandle(), MAKEINTRESOURCEW(IDR_MARKERS), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 			// ::DrawIconEx(memdc, x, rc2.top + 10, appIcon, 0, 0, 0, nullptr, DI_NORMAL);
 			// ::DestroyIcon(appIcon);
 
-			memdc.MoveTo(x, rect.top + m_scaleY14);
+			memdc.MoveTo(x, rect.top + (thick ? m_scaleY14 / 2 : m_scaleY14));
 			memdc.LineTo(x, rect.bottom - m_scaleY2);
-			memdc.MoveTo(x - m_scaleX1, rect.bottom - m_scaleY2);
-			memdc.LineTo(x + m_scaleX1, rect.bottom - m_scaleY2);
+			if (thick) {
+				memdc.MoveTo(x + m_scaleX1, rect.top + m_scaleY14 / 2);
+				memdc.LineTo(x + m_scaleX1, rect.bottom - m_scaleY2);
+			}
+
+			memdc.MoveTo(x - (thick ? m_scaleX1 * 2 : m_scaleX1), rect.bottom - m_scaleY2);
+			memdc.LineTo(x + (thick ? m_scaleX1 * 2 : m_scaleX1), rect.bottom - m_scaleY2);
 		};
 
 		CDC memdc;
@@ -391,7 +395,7 @@ void CPlayerSeekBar::OnPaint()
 						if (FAILED(m_pChapterBag->ChapGet(idx, &rt, nullptr))) {
 							continue;
 						}
-						funcMarkChannelTheme(rt, memdc, m_penChapters, rc);
+						funcMarkChannelTheme(rt, memdc, m_penChapters, rc, false);
 					}
 				}
 			}
@@ -400,10 +404,10 @@ void CPlayerSeekBar::OnPaint()
 			bool aEnabled, bEnabled;
 			if (m_pMainFrame->CheckABRepeat(aPos, bPos, aEnabled, bEnabled)) {
 				if (aEnabled) {
-					funcMarkChannelTheme(aPos, memdc, m_penRepeatAB, rc);
+					funcMarkChannelTheme(aPos, memdc, m_penRepeatAB, rc, true);
 				}
 				if (bEnabled) {
-					funcMarkChannelTheme(bPos, memdc, m_penRepeatAB, rc);
+					funcMarkChannelTheme(bPos, memdc, m_penRepeatAB, rc, true);
 				}
 			}
 		}
