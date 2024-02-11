@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2020 see Authors.txt
+ * (C) 2018-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,6 @@
 
 #pragma once
 
-struct MENUITEM;
 class CMainFrame;
 
 class CMenuEx
@@ -33,6 +32,17 @@ class CMenuEx
 	static inline HHOOK m_hookMSG = nullptr;
 
 	static inline HMENU m_hMenuLast = nullptr;
+
+	struct MENUITEM
+	{
+		CString strText;
+		UINT    uID = 0;
+		bool    bMainMenu = false;
+		bool    bFirstInMainMenu = false;
+		bool    bPopupMenu = false;
+	};
+	using LPMENUITEM = MENUITEM*;
+	static inline std::list<MENUITEM> m_pMenuItems;
 
 public:
 	CMenuEx() = default;

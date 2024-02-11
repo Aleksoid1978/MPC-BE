@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2023 see Authors.txt
+ * (C) 2018-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,17 +22,6 @@
 #include "MenuEx.h"
 #include "../MainFrm.h"
 #include "DSUtil/SysVersion.h"
-
-struct MENUITEM
-{
-	CString strText;
-	UINT    uID = 0;
-	bool    bMainMenu = false;
-	bool    bFirstInMainMenu = false;
-	bool    bPopupMenu = false;
-};
-using LPMENUITEM = MENUITEM*;
-std::list<MENUITEM> m_pMenuItems;
 
 void CMenuEx::SetMain(CMainFrame* pMainFrame)
 {
