@@ -815,6 +815,10 @@ static int decode_nal_units(VVCContext *s, VVCFrameContext *fc, AVPacket *avpkt)
                         "Error parsing NAL unit #%d.\n", i);
                 goto fail;
             }
+// ==> Start patch MPC
+            if (unit->type == VVC_IDR_W_RADL || unit->type == VVC_IDR_N_LP || unit->type == VVC_CRA_NUT || unit->type == VVC_GDR_NUT)
+                fc->frame->flags |= AV_FRAME_FLAG_KEY;
+// ==> End patch MPC
         }
     }
     return 0;

@@ -2252,7 +2252,8 @@ redo:
 						 || m_CodecId == AV_CODEC_ID_RV40
 						 || m_CodecId == AV_CODEC_ID_VP3
 						 || m_CodecId == AV_CODEC_ID_THEORA
-						 || m_CodecId == AV_CODEC_ID_MPEG4;
+						 || m_CodecId == AV_CODEC_ID_MPEG4
+						 || m_CodecId == AV_CODEC_ID_VVC;
 	}
 
 	m_pAVCtx->codec_id              = m_CodecId;

@@ -9,6 +9,8 @@
 * libavcodec/x86/hevcdsp.h
 * libavcodec/x86/hevcdsp_init.c
 
+* libavcodec/vvc/vvcdec.c
+
 * libavcodec/aacsbr_template.c
 * libavcodec/bsf_list.c
 * libavcodec/codec_list.c
