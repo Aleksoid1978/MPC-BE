@@ -2373,9 +2373,9 @@ BEGIN
     IDS_PLAYLOOPMODE_AB_MARK_A "Ripeti A-B: segna posizione A"
     IDS_PLAYLOOPMODE_AB_MARK_B "Ripeti A-B: segna posizione B"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "Aggiungi alla playlist dagli appunti"
-    IDS_MOVEWINDOWBYVIDEO_ONOFF "Sposta la finestra nell'area del video: On/Off"
-    IDS_MOVEWINDOWBYVIDEO_ON "Sposta la finestra nell'area del video: On"
-    IDS_MOVEWINDOWBYVIDEO_OFF "Sposta la finestra nell'area del video: Off"
+    IDS_MOVEWINDOWBYVIDEO_ONOFF "Sposta finestra nell'area del video: On/Off"
+    IDS_MOVEWINDOWBYVIDEO_ON "Sposta finestra nell'area del video: On"
+    IDS_MOVEWINDOWBYVIDEO_OFF "Sposta finestra nell'area del video: Off"
     IDS_AUDIO_FILTER_PRESET_1 "Per audio con parti sussurrate ed esplosive"
 END
 
@@ -3169,7 +3169,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_BLOCK_EXTERNAL_VR   "You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
+    IDS_BLOCK_EXTERNAL_VR   "Non puoi aggiungere %s come filtro esterno.\nDovresti selezionare il tuo renderer video preferito nella pagina Impostazioni video."
 END
 
 STRINGTABLE
@@ -3177,11 +3177,11 @@ BEGIN
     IDS_DESC_HAALI_VR       "Sembra VMR-9, ma usa un vero ridimensionatore bicubico."
     IDS_DESC_NULLVR_ANY     "Si collega a qualsiasi tipo di supporto simile a un video e non invierà i campioni in arrivo da nessuna parte. Usalo quando non hai bisogno del display video e vuoi evitare che la CPU funzioni inutilmente."
     IDS_DESC_NULLVR_UNCOMP  "Come il normale renderer Null, ma questo si collegherà solo ai tipi non compressi."
-    IDS_DESC_EVR            "Render video con supporto per la decodifica hardware."
+    IDS_DESC_EVR            "Renderer video con supporto per decodifica hardware."
     IDS_DESC_EVR_CP         "Come l'EVR, ma con Allocator-Presenter per la sottotitolazione e la postelaborazione."
-    IDS_DESC_MADVR          "Rendering di alta qualità, richiede una GPU che supporti D3D9 o successivo."
+    IDS_DESC_MADVR          "Renderer di alta qualità, richiede una GPU che supporti D3D9 o successivo."
     IDS_DESC_EVR_SYNC       "Come il EVR (CP), ma offre diverse opzioni per sincronizzare il video frame rate con la frequenza di aggiornamento display per eliminare video frame duplicati."
-    IDS_DESC_MPC_VR         "Video renderer with support for Direct3D 11."
+    IDS_DESC_MPC_VR         "Renderer video con supporto per Direct3D 11."
 END
 
 STRINGTABLE
@@ -3480,7 +3480,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DISABLE_ALL_FILTERS "&Disattiva tutti i filtri"
+    IDS_DISABLE_ALL_FILTERS "&Disabilita tutti i filtri"
     IDS_ENABLE_FFMPEG_FILTERS "Abilita i filtri FFMpeg"
     IDS_DISABLE_FFMPEG_FILTERS "Disabilita i filtri FFmpeg"
     IDS_ENABLE_DXVA_FILTERS "Abilita i filtri DXVA"
