@@ -1,0 +1,91 @@
+name: Build MPC-BE
+
+on:
+  push:
+    paths-ignore:
+      - .github/workflows/main.yml
+      - docs/*.*
+      - LICENSE.txt
+  pull_request:
+    paths-ignore:
+      - .github/workflows/main.yml      
+      - docs/*.*
+      - LICENSE.txt
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Prepare MSYS
+        run: |
+          curl -sSL https://mpc-be.org/MSYS/MSYS_MinGW-w64_GCC_1320_x86-x64.7z -o MSYS_MinGW-w64_GCC_1320_x86-x64.7z
+          7z x MSYS_MinGW-w64_GCC_1320_x86-x64.7z -oC:\\MSYS
+          echo '@ECHO OFF' > environments.bat
+          echo 'SET "MPCBE_MSYS=C:\\MSYS"' >> environments.bat
+          echo 'SET "MPCBE_MINGW=C:\\MSYS\\mingw"' >> environments.bat
+          .\\update_gcc.bat
+        shell: pwsh
+
+      - name: Build MPC-BE x64
+        run: |
+          .\\build.bat x64 All Packages
+        shell: pwsh
+
+      - name: Clean
+        run: |
+          .\\build.bat clean All
+        shell: pwsh
+
+      - name: Build MPC-BE x86
+        run: |
+          .\\build.bat x86 All Packages
+        shell: pwsh
+
+      - name: Upload Installer x64
+        uses: actions/upload-artifact@v4
+        with:
+          name: "Installer x64" 
+          path: _bin/Packages/**/MPC-BE*.x64-installer.zip
+          compression-level: 0
+
+      - name: Upload Portable x64
+        uses: actions/upload-artifact@v4
+        with:
+          name: "Portable x64" 
+          path: _bin/Packages/**/MPC-BE*.x64.7z
+          compression-level: 0
+
+      - name: Upload standalone_filters x64
+        uses: actions/upload-artifact@v4
+        with:
+          name: "standalone_filters x64" 
+          path: _bin/Packages/**/standalone_filters-mpc-be*.x64.7z
+          compression-level: 0
+
+      - name: Upload Installer x86
+        uses: actions/upload-artifact@v4
+        with:
+          name: "Installer x86" 
+          path: _bin/Packages/**/MPC-BE*.x86-installer.zip
+          compression-level: 0
+
+      - name: Upload Portable x86
+        uses: actions/upload-artifact@v4
+        with:
+          name: "Portable x86" 
+          path: _bin/Packages/**/MPC-BE*.x86.7z
+          compression-level: 0
+
+      - name: Upload standalone_filters x86
+        uses: actions/upload-artifact@v4
+        with:
+          name: "standalone_filters x86" 
+          path: _bin/Packages/**/standalone_filters-mpc-be*.x86.7z
+          compression-level: 0
