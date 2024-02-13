@@ -72,6 +72,9 @@ static const int prof_mpeg2_main[]   = {AV_PROFILE_MPEG2_SIMPLE,
 static const int prof_h264_high[]    = {AV_PROFILE_H264_CONSTRAINED_BASELINE,
                                         AV_PROFILE_H264_MAIN,
                                         AV_PROFILE_H264_HIGH,
+                                        // ==> Start patch MPC
+                                        AV_PROFILE_H264_BASELINE,
+                                        // ==> End patch MPC
                                         AV_PROFILE_UNKNOWN};
 static const int prof_hevc_main[]    = {AV_PROFILE_HEVC_MAIN,
                                         AV_PROFILE_UNKNOWN};
