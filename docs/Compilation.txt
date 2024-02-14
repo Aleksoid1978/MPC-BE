@@ -20,7 +20,7 @@
 
  Visual Studio 2022
   Download URL: https://learn.microsoft.com/en-us/visualstudio/releases/2022/release-notes
-  1. Install Visual Studio 2022 (any edition will work fine). During installation, you must select the following components: 
+  Install Visual Studio 2022 (any edition will work fine). During installation, you must select the following components: 
    * Desktop development with C++
      * MSVC v143 - Build Tools C++ 
      * Windows SDK 10.0.18362.0 or newer (latest).
@@ -29,9 +29,12 @@
 
 
 2. Preparing the GCC environment (YASM is already included)
- 2.1. Download https://mpc-be.org/MSYS/MSYS_MinGW-w64_GCC_1320_x86-x64.7z
- 2.2. Unpack the archive to "C:\MSYS".
- NOTES: If you installed the MSYS/MinGW package in an other directory you will have to use that path in the following steps.
+  2.1. Download https://github.com/Aleksoid1978/MSYS/raw/main/MSYS_MinGW-w64_GCC_1320_x86-x64.7z
+  2.2. Unpack the archive to "C:\MSYS".
+    Example of downloading and unpacking:
+      curl -sSL https://github.com/Aleksoid1978/MSYS/raw/main/MSYS_MinGW-w64_GCC_1320_x86-x64.7z -o MSYS.7z
+      7z x MSYS.7z -oC:\MSYS
+  NOTES: If you installed the MSYS/MinGW package in an other directory you will have to use that path in the following steps.
 
 
 3. Additional optional components
