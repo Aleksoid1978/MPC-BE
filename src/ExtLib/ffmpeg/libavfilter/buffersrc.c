@@ -291,6 +291,11 @@ FF_DISABLE_DEPRECATION_WARNINGS
 FF_ENABLE_DEPRECATION_WARNINGS
 #endif
 
+    if (copy->colorspace == AVCOL_SPC_UNSPECIFIED)
+        copy->colorspace = ctx->outputs[0]->colorspace;
+    if (copy->color_range == AVCOL_RANGE_UNSPECIFIED)
+        copy->color_range = ctx->outputs[0]->color_range;
+
     ret = ff_filter_frame(ctx->outputs[0], copy);
     if (ret < 0)
         return ret;
@@ -501,8 +506,14 @@ static int query_formats(AVFilterContext *ctx)
             if ((ret = ff_add_format(&color_spaces, c->color_space)) < 0 ||
                 (ret = ff_set_common_color_spaces(ctx, color_spaces)) < 0)
                 return ret;
-            if ((ret = ff_add_format(&color_ranges, c->color_range)) < 0 ||
-                (ret = ff_set_common_color_ranges(ctx, color_ranges)) < 0)
+            if ((ret = ff_add_format(&color_ranges, c->color_range)) < 0)
+                return ret;
+            if (c->color_range == AVCOL_RANGE_UNSPECIFIED) {
+                /* allow implicitly promoting unspecified to mpeg */
+                if ((ret = ff_add_format(&color_ranges, AVCOL_RANGE_MPEG)) < 0)
+                    return ret;
+            }
+            if ((ret = ff_set_common_color_ranges(ctx, color_ranges)) < 0)
                 return ret;
         }
         break;
