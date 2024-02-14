@@ -464,6 +464,8 @@ HRESULT CHTTPAsync::ReadInternal(PBYTE pBuffer, DWORD dwSizeToRead, DWORD& dwSiz
 
 HRESULT CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSizeToRead, DWORD& dwSizeRead, DWORD dwTimeOut/* = INFINITE*/)
 {
+	dwSizeRead = 0;
+
 	if (m_http_chunk.use) {
 		HRESULT hr = S_OK;
 		auto begin = pBuffer;

@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2023 see Authors.txt
+ * (C) 2013-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,24 +22,13 @@
 #include <afxinet.h>
 #include "DSUtil/SysVersion.h"
 #include "DSUtil/text.h"
+#include "DSUtil/HTTPAsync.h"
+#include "rapidjsonHelper.h"
 #include "UpdateChecker.h"
 
 #include "Version.h"
 
 // UpdateChecker
-
-bool UpdateChecker::bUpdating = false;
-CCritSec UpdateChecker::csUpdating;
-Version UpdateChecker::m_UpdateVersion = { 0, 0, 0, 0 };
-CStringA UpdateChecker::m_UpdateURL;
-
-UpdateChecker::UpdateChecker()
-{
-}
-
-UpdateChecker::~UpdateChecker(void)
-{
-}
 
 bool UpdateChecker::IsTimeToAutoUpdate(int delay, time_t lastcheck)
 {
@@ -59,41 +48,43 @@ void UpdateChecker::CheckForUpdate(bool autocheck)
 Update_Status UpdateChecker::CheckNewVersion()
 {
 	m_UpdateURL.Empty();
-	m_UpdateVersion = { 0, 0, 0, 0 };
+	m_UpdateVersion = {};
 
 	Update_Status updatestatus = UPDATER_ERROR_CONNECT;
-	CStringA updateinfo;
-
-	HINTERNET hInet = InternetOpenW(L"MPC-BE", 0, nullptr, nullptr, 0);
-	if (hInet) {
-		HINTERNET hUrl = InternetOpenUrlW(hInet, L"http://mpc-be.org/version.txt", nullptr, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
-		if (hUrl) {
-			char buffer[1024] = { 0 }; // limit update file to 1024 bytes
-			DWORD dwBytesRead = 0;
-
-			if (InternetReadFile(hUrl, (LPVOID)buffer, std::size(buffer), &dwBytesRead) == TRUE && dwBytesRead < std::size(buffer)) {
-				updateinfo = CStringA(buffer);
-			}
-			InternetCloseHandle(hUrl);
+	CHTTPAsync HTTPAsync;
+	if (SUCCEEDED(HTTPAsync.Connect(L"https://api.github.com/repos/Aleksoid1978/MPC-BE/releases/latest", 3000))) {
+		constexpr auto sizeRead = 16 * KILOBYTE;
+		CStringA data;
+		DWORD dwSizeRead = 0;
+		int dataSize = 0;
+		while (S_OK == HTTPAsync.Read(reinterpret_cast<PBYTE>(data.GetBuffer(dataSize + sizeRead) + dataSize), sizeRead, dwSizeRead)) {
+			data.ReleaseBuffer(dataSize + dwSizeRead);
+			dataSize = data.GetLength();
+			dwSizeRead = 0;
 		}
-		InternetCloseHandle(hInet);
-	}
+		data.ReleaseBuffer(dataSize);
 
-	if (updateinfo.GetLength()) {
-		updatestatus = UPDATER_ERROR_DATA;
-		int pos = 0;
-		CStringA updateversion = updateinfo.Tokenize("\r\n", pos).Trim();
-		m_UpdateURL = updateinfo.Tokenize("\r\n", pos).Trim();
-
-		int n = sscanf_s(updateversion, "%u.%u.%u.%u", &m_UpdateVersion.major, &m_UpdateVersion.minor, &m_UpdateVersion.patch, &m_UpdateVersion.revision);
-		if (n == 4 && (StartsWith(m_UpdateURL, "http://") || StartsWith(m_UpdateURL, "https://"))) {
-			if (MPC_VERSION_MAJOR < m_UpdateVersion.major
-					|| MPC_VERSION_MAJOR == m_UpdateVersion.major && MPC_VERSION_MINOR < m_UpdateVersion.minor
-					|| MPC_VERSION_MAJOR == m_UpdateVersion.major && MPC_VERSION_MINOR == m_UpdateVersion.minor && MPC_VERSION_PATCH < m_UpdateVersion.patch
-					|| MPC_VERSION_MAJOR == m_UpdateVersion.major && MPC_VERSION_MINOR == m_UpdateVersion.minor && MPC_VERSION_PATCH == m_UpdateVersion.patch && MPC_VERSION_REV < m_UpdateVersion.revision) {
-				updatestatus = UPDATER_NEW_VERSION_IS_AVAILABLE;
-			} else {
-				updatestatus = UPDATER_NO_NEW_VERSION;
+		if (!data.IsEmpty()) {
+			updatestatus = UPDATER_ERROR_DATA;
+			rapidjson::Document json;
+			if (!json.Parse(data.GetString()).HasParseError()) {
+				CString tag_name;
+				if (getJsonValue(json, "tag_name", tag_name)) {
+					int n = swscanf_s(tag_name, L"%u.%u.%u.%u",
+									  &m_UpdateVersion.major, &m_UpdateVersion.minor, &m_UpdateVersion.patch, &m_UpdateVersion.revision);
+					if (n == 3 || n == 4) {
+						if (getJsonValue(json, "html_url", m_UpdateURL)) {
+							if (MPC_VERSION_MAJOR < m_UpdateVersion.major
+									|| MPC_VERSION_MAJOR == m_UpdateVersion.major && MPC_VERSION_MINOR < m_UpdateVersion.minor
+									|| MPC_VERSION_MAJOR == m_UpdateVersion.major && MPC_VERSION_MINOR == m_UpdateVersion.minor && MPC_VERSION_PATCH < m_UpdateVersion.patch
+									|| MPC_VERSION_MAJOR == m_UpdateVersion.major && MPC_VERSION_MINOR == m_UpdateVersion.minor && MPC_VERSION_PATCH == m_UpdateVersion.patch && MPC_VERSION_REV < m_UpdateVersion.revision) {
+								updatestatus = UPDATER_NEW_VERSION_IS_AVAILABLE;
+							} else {
+								updatestatus = UPDATER_NO_NEW_VERSION;
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -105,7 +96,6 @@ UINT UpdateChecker::RunCheckForUpdateThread(LPVOID pParam)
 {
 	bool autocheck = !!pParam;
 	Update_Status updatestatus = CheckNewVersion();
-
 
 	if (!autocheck || updatestatus == UPDATER_NEW_VERSION_IS_AVAILABLE) {
 		UpdateCheckerDlg dlg(updatestatus, m_UpdateVersion, m_UpdateURL);
@@ -125,8 +115,8 @@ UINT UpdateChecker::RunCheckForUpdateThread(LPVOID pParam)
 
 IMPLEMENT_DYNAMIC(UpdateCheckerDlg, CDialog)
 
-UpdateCheckerDlg::UpdateCheckerDlg(Update_Status updateStatus, Version UpdateVersion, LPCSTR UpdateURL, CWnd* pParent)
-	: CDialog(UpdateCheckerDlg::IDD, pParent), m_updateStatus(updateStatus)
+UpdateCheckerDlg::UpdateCheckerDlg(Update_Status updateStatus, Version UpdateVersion, LPCWSTR UpdateURL)
+	: CDialog(UpdateCheckerDlg::IDD), m_updateStatus(updateStatus)
 {
 	CString VersionStr;
 
@@ -153,10 +143,6 @@ UpdateCheckerDlg::UpdateCheckerDlg(Update_Status updateStatus, Version UpdateVer
 	default:
 		ASSERT(0);
 	}
-}
-
-UpdateCheckerDlg::~UpdateCheckerDlg()
-{
 }
 
 void UpdateCheckerDlg::DoDataExchange(CDataExchange* pDX)

@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2017 see Authors.txt
+ * (C) 2013-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,15 +41,15 @@ enum Update_Status
 
 class UpdateChecker
 {
-	static bool bUpdating;
-	static CCritSec csUpdating;
+	static inline bool bUpdating = false;
+	static inline CCritSec csUpdating;
 
-	static Version m_UpdateVersion;
-	static CStringA m_UpdateURL;
+	static inline Version m_UpdateVersion = {};
+	static inline CString m_UpdateURL;
 
 public:
-	UpdateChecker();
-	~UpdateChecker(void);
+	UpdateChecker() = default;
+	~UpdateChecker() = default;
 
 	static bool IsTimeToAutoUpdate(int delay, time_t lastcheck);
 	static void CheckForUpdate(bool autocheck = false);
@@ -64,8 +64,8 @@ class UpdateCheckerDlg : public CDialog
 	DECLARE_DYNAMIC(UpdateCheckerDlg)
 
 public:
-	UpdateCheckerDlg(Update_Status updateStatus, Version UpdateVersion, LPCSTR UpdateURL, CWnd* pParent = nullptr);
-	virtual ~UpdateCheckerDlg();
+	UpdateCheckerDlg(Update_Status updateStatus, Version UpdateVersion, LPCWSTR UpdateURL);
+	~UpdateCheckerDlg() = default;
 
 	enum { IDD = IDD_UPDATE_DIALOG };
 
