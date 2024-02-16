@@ -783,7 +783,7 @@ BEGIN
     LTEXT           "点击",IDC_STATIC,10,18,60,8
     COMBOBOX        IDC_COMBO1,70,16,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "如果未加载任何内容，则打开最近使用的文件",IDC_CHECK1,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,206,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,208,10
     LTEXT           "双击",IDC_STATIC,10,49,60,8
     COMBOBOX        IDC_COMBO2,70,47,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "通过视频区域移动播放窗口",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,65,133,10
@@ -1071,7 +1071,7 @@ BEGIN
     CONTROL         "在播放列表中仅有一个项目时禁用 ""向前 / 后跳转"" 后打开文件中的下一个 / 上一个文件",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,55,280,18
     CONTROL         "在非默认显示器上全屏时防止播放器被最小化",IDC_CHECK6,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,282,9
     CONTROL         "最小化时暂停播放",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,87,280,9
     CONTROL         "在窗口模式下播放时自动隐藏鼠标指针",IDC_CHECK5,
@@ -1154,10 +1154,10 @@ BEGIN
     CONTROL         "内置垂直同步",IDC_VSYNC_INTERNAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,26,121,10
     CONTROL         "允许帧时间校准",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,170,10
     CONTROL         "垂直同步前刷新 (GPU) ",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,14,140,10
-    CONTROL         "垂直同步后刷新 (GPU)",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,140,10
+    CONTROL         "垂直同步后刷新 (GPU)",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,142,10
     CONTROL         "等待刷新",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,38,100,10
     GROUPBOX        "EVR 同步设置",IDC_STATIC2,5,67,286,117
-    CONTROL         "将视频同步到显示器",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,140,8
+    CONTROL         "将视频同步到显示器",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,142,8
     CONTROL         "使用显示器刷新率与视频帧率最接近的同步方式",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,170,8
     LTEXT           "频率调整: ",IDC_STATIC5,20,93,85,8
     EDITTEXT        IDC_CYCLEDELTA,109,91,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
@@ -3170,11 +3170,11 @@ END
 STRINGTABLE
 BEGIN
     IDS_BLOCK_EXTERNAL_VR   "不能添加 %s 为外部滤镜。\n应该在视频设置页面选择首选的视频渲染器。"
+    IDS_DESC_HAALI_VR       "与 VMR-9 类同, 但是使用真正的 bicubic 改变大小。"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_HAALI_VR       "与 VMR-9 类同, 但是使用真正的 bicubic 改变大小。"
     IDS_DESC_NULLVR_ANY     "连接到任意视频文件类型并且会将进入的采样信息传送到任意地方。当您不需要显示视频并希望节省不必要的 cpu 工作时请使用它。"
     IDS_DESC_NULLVR_UNCOMP  "和普通的空渲染器相同, 但仅会被连接到未压缩的类型上。"
     IDS_DESC_EVR            "此视频渲染器支持硬件解码"

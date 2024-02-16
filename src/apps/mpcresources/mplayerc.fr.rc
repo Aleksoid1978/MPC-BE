@@ -783,7 +783,7 @@ BEGIN
     LTEXT           "Clic",IDC_STATIC,10,18,60,8
     COMBOBOX        IDC_COMBO1,70,16,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Si rien n'est chargé, ouvrir le fichier récent",IDC_CHECK1,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,206,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,208,10
     LTEXT           "Double clic",IDC_STATIC,10,49,60,8
     COMBOBOX        IDC_COMBO2,70,47,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Déplacer la fenêtre par la zone vidéo",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,65,133,10
@@ -1071,7 +1071,7 @@ BEGIN
     CONTROL         "Ne pas utiliser la « recherche dans le dossier » sur les commandes « Passer en arrière/en avant » lorsqu'il n'y a qu'un seul élément dans la Playlist",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,55,280,18
     CONTROL         "Empêcher de MINIMISER en plein écran sur un moniteur autre que celui par défaut",IDC_CHECK6,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,282,9
     CONTROL         "Mettre en pause la lecture vidéo lorsqu'elle est réduite",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,87,280,9
     CONTROL         "Masquer automatiquement le pointeur pendant la lecture en mode fenêtré",IDC_CHECK5,
@@ -1154,10 +1154,10 @@ BEGIN
     CONTROL         "VSync interne",IDC_VSYNC_INTERNAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,26,121,10
     CONTROL         "Activer la correction du temps d'image",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,170,10
     CONTROL         "Vider le GPU avant VSync",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,14,140,10
-    CONTROL         "Vider le GPU après présentation",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,140,10
+    CONTROL         "Vider le GPU après présentation",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,142,10
     CONTROL         "Attendre la vidange",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,38,100,10
     GROUPBOX        "Paramètres EVR Sync",IDC_STATIC2,5,67,286,117
-    CONTROL         "Synchroniser la fréquence de la vidéo avec celle de l'écran",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,140,8
+    CONTROL         "Synchroniser la fréquence de la vidéo avec celle de l'écran",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,142,8
     CONTROL         "Présenter à la Vsync la plus proche",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,170,8
     LTEXT           "Fréquence d'ajustement :",IDC_STATIC5,20,93,85,8
     EDITTEXT        IDC_CYCLEDELTA,109,91,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
@@ -3170,11 +3170,11 @@ END
 STRINGTABLE
 BEGIN
     IDS_BLOCK_EXTERNAL_VR   "You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
+    IDS_DESC_HAALI_VR       "Ressemble à VMR-9, mais utilise un véritable redimensionneur bicubique."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_HAALI_VR       "Ressemble à VMR-9, mais utilise un véritable redimensionneur bicubique."
     IDS_DESC_NULLVR_ANY     "Connection vers n'importe quel type de média vidéo et enverra l'exemple entrant vers nul part. Utilisez le quand vous n'avez pas besoin de l'affichage vidéo and que vous voulez garder des ressources processeur et éviter de le faire travailler inutilement."
     IDS_DESC_NULLVR_UNCOMP  "Identique au rendu normal Null, mais ne se connectera qu'à des types non compressés."
     IDS_DESC_EVR            "Moteur de rendu vidéo avec prise en charge du décodage matériel."

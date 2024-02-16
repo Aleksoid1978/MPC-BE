@@ -783,7 +783,7 @@ BEGIN
     LTEXT           "Klikken",IDC_STATIC,10,18,60,8
     COMBOBOX        IDC_COMBO1,70,16,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Recent bestand openen als er niets wordt geladen",IDC_CHECK1,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,206,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,208,10
     LTEXT           "Dubbelklikken",IDC_STATIC,10,49,60,8
     COMBOBOX        IDC_COMBO2,70,47,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Venster verplaatsen door het videobeeld te verslepen",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,65,133,10
@@ -1071,7 +1071,7 @@ BEGIN
     CONTROL         "Zoek NIET op andere bestanden in dezelfde map bij het gebruik van ""Vorige/Volgende"" als er alleen een item in afspeellijst staat.",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,55,280,18
     CONTROL         "Minimaliseren vermijden in geval van volledig scherm op niet-primair scherm",IDC_CHECK6,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,282,9
     CONTROL         "Weergave pauseren als het venster geminimaliseerd is",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,87,280,9
     CONTROL         "Verberg automatisch de muisaanwijzer tijdens het afspelen in de venstermodus",IDC_CHECK5,
@@ -1154,10 +1154,10 @@ BEGIN
     CONTROL         "Interne VSync",IDC_VSYNC_INTERNAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,26,121,10
     CONTROL         "Activeer frametime-correctie",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,170,10
     CONTROL         "GPU legen voor VSync",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,14,140,10
-    CONTROL         "GPU legen na afspelen",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,140,10
+    CONTROL         "GPU legen na afspelen",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,142,10
     CONTROL         "Wacht tot GPU leeg",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,38,100,10
     GROUPBOX        "Instellingen voor EVR Sync",IDC_STATIC2,5,67,286,117
-    CONTROL         "Synchroniseer video aan monitor",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,140,8
+    CONTROL         "Synchroniseer video aan monitor",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,142,8
     CONTROL         "Toon bij de dichtstbijzijnde VSync",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,170,8
     LTEXT           "Frequentieaanpassing:",IDC_STATIC5,20,93,85,8
     EDITTEXT        IDC_CYCLEDELTA,109,91,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
@@ -3170,11 +3170,11 @@ END
 STRINGTABLE
 BEGIN
     IDS_BLOCK_EXTERNAL_VR   "You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
+    IDS_DESC_HAALI_VR       "Hetzelfde als VMR-9, maar met een echte bicubicresizer."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_HAALI_VR       "Hetzelfde als VMR-9, maar met een echte bicubicresizer."
     IDS_DESC_NULLVR_ANY     "Verbind met elk video-achtig mediatype en zal de inkomende signalen in het, grote dan wel kleine, niets zenden. Gebruik dit als geen uitvoersignaal nodig is en de om de CPU te ontlasten."
     IDS_DESC_NULLVR_UNCOMP  "Hetzelfde als de normale Null renderer, maar deze zal alleen verbinding maken met ongecomprimeerde types."
     IDS_DESC_EVR            "Videorenderer met mogelijkheid tot hardwaredecoding."

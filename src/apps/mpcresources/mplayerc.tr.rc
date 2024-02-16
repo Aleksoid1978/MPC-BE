@@ -783,7 +783,7 @@ BEGIN
     LTEXT           "Tıklama",IDC_STATIC,10,18,60,8
     COMBOBOX        IDC_COMBO1,70,16,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Hiçbir şey yüklenmemişse son dosyayı aç",IDC_CHECK1,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,206,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,208,10
     LTEXT           "Çift Tıklama",IDC_STATIC,10,49,60,8
     COMBOBOX        IDC_COMBO2,70,47,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Pencereyi video alanı vasıtasıyla taşı",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,65,133,10
@@ -1071,7 +1071,7 @@ BEGIN
     CONTROL         "Oynatma listesinde sadece bir öğe olduğunda 'Geri/İleri Git' komutlarındaki 'klasörde arama' özelliğini kullanma.",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,55,280,18
     CONTROL         "Varsayılan olmayan monitörde Tam Ekran olduğunda SİMGE DURUMUNA'yı engelle",IDC_CHECK6,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,282,9
     CONTROL         "Küçültüldüğünde video oynatmayı duraklat",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,87,280,9
     CONTROL         "Pencere modunda oynatma sırasında işaretçiyi otomatik gizle",IDC_CHECK5,
@@ -1154,10 +1154,10 @@ BEGIN
     CONTROL         "Dahili Dikey Eşzamanlama",IDC_VSYNC_INTERNAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,26,121,10
     CONTROL         "Görüntü zaman düzeltmesini etkinleştir",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,170,10
     CONTROL         "GPU'yu Dikey Eşzaman. önce sıfırla",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,14,140,10
-    CONTROL         "GPU'yu gösterdikten sonra sıfırla",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,140,10
+    CONTROL         "GPU'yu gösterdikten sonra sıfırla",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,142,10
     CONTROL         "Sıfırlama için bekle",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,38,100,10
     GROUPBOX        "GVİ Eşzamanlama Ayarları",IDC_STATIC2,5,67,286,117
-    CONTROL         "Videoyu ekrana eşzamanla",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,140,8
+    CONTROL         "Videoyu ekrana eşzamanla",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,142,8
     CONTROL         "En yakın dikey eşzamanlama",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,170,8
     LTEXT           "Frekans düzeltmesi:",IDC_STATIC5,20,93,85,8
     EDITTEXT        IDC_CYCLEDELTA,109,91,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
@@ -3170,11 +3170,11 @@ END
 STRINGTABLE
 BEGIN
     IDS_BLOCK_EXTERNAL_VR   "%s harici süzgeç olarak eklenemez.\nTercih ettiğiniz video işleyiciyi Video ayarları sayfasında seçmelisiniz."
+    IDS_DESC_HAALI_VR       "VKİ-9 gibidir, ancak gerçek kübik boyutlandırıcı kullanır."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_HAALI_VR       "VKİ-9 gibidir, ancak gerçek kübik boyutlandırıcı kullanır."
     IDS_DESC_NULLVR_ANY     "Her video benzeri medya biçimine bağlanır ve dahili örnekleri bir yere göndermez. Video gösterimine ihtiyaç duymadığınız ve işlemciyi pek az kullanmak istediğiniz durumlarda bu seçeneği seçiniz."
     IDS_DESC_NULLVR_UNCOMP  "Boş işleyici ile aynıdır, ancak sadece sıkıştırılmamış biçimleri destekler."
     IDS_DESC_EVR            "Donanım kod çözme desteğine sahip video işleyici."

@@ -783,7 +783,7 @@ BEGIN
     LTEXT           "Klik",IDC_STATIC,10,18,60,8
     COMBOBOX        IDC_COMBO1,70,16,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Ukoliko nema učitanja, otvori nedavnu datoteku",IDC_CHECK1,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,206,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,208,10
     LTEXT           "Dvoklik",IDC_STATIC,10,49,60,8
     COMBOBOX        IDC_COMBO2,70,47,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Pomakni prozor uz područje video zapisa",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,65,133,10
@@ -1071,7 +1071,7 @@ BEGIN
     CONTROL         "Ne koristi 'traženje u mapi' uz naredbe 'Preskoči natrag/naprijed' uz samo jedan predmet na playlisti",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,55,280,18
     CONTROL         "Spriječi MINIMIZIRANJE kada je postavljen puni zaslon na nepodrazumijevanom monitoru",IDC_CHECK6,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,282,9
     CONTROL         "Zaustavi video pregled pri minimiziranju",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,87,280,9
     CONTROL         "Auto-skrivanje pokazivača tijekom pregleda u uokvirenom modu",IDC_CHECK5,
@@ -1154,10 +1154,10 @@ BEGIN
     CONTROL         "Interni VSync",IDC_VSYNC_INTERNAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,26,121,10
     CONTROL         "Omogući vremensku korekciju kadra",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,170,10
     CONTROL         "Čisti GPU prije VSynca",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,14,140,10
-    CONTROL         "Čisti GPU nakon Presenta",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,140,10
+    CONTROL         "Čisti GPU nakon Presenta",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,142,10
     CONTROL         "Čekaj za čišćenja",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,38,100,10
     GROUPBOX        "EVR Sync Postavke",IDC_STATIC2,5,67,286,117
-    CONTROL         "Sinkroniziraj video prema zaslonu",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,140,8
+    CONTROL         "Sinkroniziraj video prema zaslonu",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,142,8
     CONTROL         "Prisutan uz najbliži VSync",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,170,8
     LTEXT           "Podešenje frekvencije:",IDC_STATIC5,20,93,85,8
     EDITTEXT        IDC_CYCLEDELTA,109,91,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
@@ -3168,11 +3168,11 @@ END
 STRINGTABLE
 BEGIN
     IDS_BLOCK_EXTERNAL_VR   "You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
+    IDS_DESC_HAALI_VR       "Izgleda poput VMR-9, ali koristi stvaran dvokubični mijenjač veličine."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_HAALI_VR       "Izgleda poput VMR-9, ali koristi stvaran dvokubični mijenjač veličine."
     IDS_DESC_NULLVR_ANY     "Povezuje se na bilo koji video-liki tip medija i pristigle uzorke šalje u prazno. Koristite kad nemate potrebu za zaslonom i želite uštedjeti CPU od praznog hoda."
     IDS_DESC_NULLVR_UNCOMP  "Jednako kao normalan Null render, jedino što se ovaj povezuje na nekomprimirane tipove."
     IDS_DESC_EVR            "Video render uz hardversku podršku za dekodiranje."

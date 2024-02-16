@@ -783,7 +783,7 @@ BEGIN
     LTEXT           "Clique",IDC_STATIC,10,18,60,8
     COMBOBOX        IDC_COMBO1,70,16,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Se nada for carregado, abrir arquivo recente",IDC_CHECK1,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,206,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,208,10
     LTEXT           "Duplo clique",IDC_STATIC,10,49,60,8
     COMBOBOX        IDC_COMBO2,70,47,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Mover janela pela área de vídeo",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,65,133,10
@@ -1071,7 +1071,7 @@ BEGIN
     CONTROL         "Não usar 'buscar na pasta' nos comandos 'Voltar/avançar' quando houver apenas um item na lista de reprodução",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,55,280,18
     CONTROL         "Impedir de MINIMIZAR quando em tela cheia no monitor não padrão",IDC_CHECK6,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,282,9
     CONTROL         "Pausar reprodução do vídeo quando minimizado",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,87,280,9
     CONTROL         "Auto-ocultar o ponteiro durante a reprodução no modo em janela",IDC_CHECK5,
@@ -1154,10 +1154,10 @@ BEGIN
     CONTROL         "Sincronia vertical interna",IDC_VSYNC_INTERNAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,26,121,10
     CONTROL         "Ativar correção de tempo de quadro",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,170,10
     CONTROL         "Limpar GPU antes da sincronia vertical",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,14,140,10
-    CONTROL         "Limpar GPU após o presente",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,140,10
+    CONTROL         "Limpar GPU após o presente",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,142,10
     CONTROL         "Aguardar por flushes",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,38,100,10
     GROUPBOX        "Configurar sincronia EVR",IDC_STATIC2,5,67,286,117
-    CONTROL         "Sincronizar vídeo com exibição",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,140,8
+    CONTROL         "Sincronizar vídeo com exibição",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,142,8
     CONTROL         "Presente na sincronia vertical mais próxima",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,170,8
     LTEXT           "Ajuste de frequência:",IDC_STATIC5,20,93,85,8
     EDITTEXT        IDC_CYCLEDELTA,109,91,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
@@ -3170,11 +3170,11 @@ END
 STRINGTABLE
 BEGIN
     IDS_BLOCK_EXTERNAL_VR   "You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
+    IDS_DESC_HAALI_VR       "Parece VMR-9, mas usa um redimensionador bicúbico verdadeiro."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_HAALI_VR       "Parece VMR-9, mas usa um redimensionador bicúbico verdadeiro."
     IDS_DESC_NULLVR_ANY     "Conecta-se a qualquer tipo de mídia de vídeo e enviará as amostras a lugar nenhum. Use-o quando não precisar ver o vídeo e quiser evitar o uso da CPU desnecessariamente."
     IDS_DESC_NULLVR_UNCOMP  "Igual ao renderizador nulo normal, mas só se conectará a tipos não comprimido."
     IDS_DESC_EVR            "Renderizador de vídeo com suporte para decodificação de hardware."

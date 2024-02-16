@@ -783,7 +783,7 @@ BEGIN
     LTEXT           "單按",IDC_STATIC,10,18,60,8
     COMBOBOX        IDC_COMBO1,70,16,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "如未有載入內容，則開啟最近檔案",IDC_CHECK1,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,206,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,208,10
     LTEXT           "雙按",IDC_STATIC,10,49,60,8
     COMBOBOX        IDC_COMBO2,70,47,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "拖曳影格時移動視窗",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,65,133,10
@@ -1071,7 +1071,7 @@ BEGIN
     CONTROL         "播放清單只有一個項目時，不要於「上一段/下一段」按鈕連結其他位於同一資料夾的檔案",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,55,280,18
     CONTROL         "避免於非預設顯示器全螢幕時最小化",IDC_CHECK6,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,282,9
     CONTROL         "最小化時暫停播放",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,87,280,9
     CONTROL         "視窗模式播放時自動隱藏滑鼠游標",IDC_CHECK5,
@@ -1154,10 +1154,10 @@ BEGIN
     CONTROL         "內置垂直同步",IDC_VSYNC_INTERNAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,26,121,10
     CONTROL         "啟用影格時間校正",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,170,10
     CONTROL         "在垂直同步之前排空 GPU",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,14,140,10
-    CONTROL         "在呈現之後排空 GPU",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,140,10
+    CONTROL         "在呈現之後排空 GPU",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,142,10
     CONTROL         "等待排空",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,38,100,10
     GROUPBOX        "EVR 同步繪製 設定",IDC_STATIC2,5,67,286,117
-    CONTROL         "同步視訊至顯示",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,140,8
+    CONTROL         "同步視訊至顯示",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,142,8
     CONTROL         "於最近的垂直同步呈現",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,170,8
     LTEXT           "頻率調整：",IDC_STATIC5,20,93,85,8
     EDITTEXT        IDC_CYCLEDELTA,109,91,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
@@ -3170,11 +3170,11 @@ END
 STRINGTABLE
 BEGIN
     IDS_BLOCK_EXTERNAL_VR   "You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
+    IDS_DESC_HAALI_VR       "和 VMR-9 類同，但使用眞正的 bicubic 變更大小。"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_HAALI_VR       "和 VMR-9 類同，但使用眞正的 bicubic 變更大小。"
     IDS_DESC_NULLVR_ANY     "連到所有視訊媒體類型，並且不傳送傳入的取樣資料。當你不需要任何視訊顯示而又想節省不必要的 CPU 工作時可以使用。"
     IDS_DESC_NULLVR_UNCOMP  "與無繪製器相同，但只會連到未壓縮的類型。"
     IDS_DESC_EVR            "此視訊繪製器支援硬體解碼。"

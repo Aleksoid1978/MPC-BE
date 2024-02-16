@@ -783,7 +783,7 @@ BEGIN
     LTEXT           "クリック",IDC_STATIC,10,18,60,8
     COMBOBOX        IDC_COMBO1,70,16,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "何も読み込まれていない場合は、最近使ったファイルを開く",IDC_CHECK1,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,206,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,208,10
     LTEXT           "ダブル クリック",IDC_STATIC,10,49,60,8
     COMBOBOX        IDC_COMBO2,70,47,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "映像領域でウィンドウを移動する",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,65,133,10
@@ -1071,7 +1071,7 @@ BEGIN
     CONTROL         "プレイリスト登録が 1 項目の時は「フォルダー内検索」の「前へ/次へ」を使用しない",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,55,280,18
     CONTROL         "既定のモニター以外では全画面表示で 最小化 を禁止する",IDC_CHECK6,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,282,9
     CONTROL         "最小化時にビデオ再生を一時停止させる",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,87,280,9
     CONTROL         "ウィンドウ モードで再生中にポインターを自動で隠す",IDC_CHECK5,
@@ -1154,10 +1154,10 @@ BEGIN
     CONTROL         "内蔵の垂直同期",IDC_VSYNC_INTERNAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,26,121,10
     CONTROL         "フレーム時間補正を有効にする",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,170,10
     CONTROL         "垂直同期の前に GPU をフラッシュ",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,14,140,10
-    CONTROL         "表示後に GPU をフラッシュ",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,140,10
+    CONTROL         "表示後に GPU をフラッシュ",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,142,10
     CONTROL         "フラッシュを待機する",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,38,100,10
     GROUPBOX        "EVR 同期設定",IDC_STATIC2,5,67,286,117
-    CONTROL         "ビデオをディスプレイに同期させる",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,140,8
+    CONTROL         "ビデオをディスプレイに同期させる",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,142,8
     CONTROL         "最も近い垂直同期で表示する",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,170,8
     LTEXT           "周波数調整:",IDC_STATIC5,20,93,85,8
     EDITTEXT        IDC_CYCLEDELTA,109,91,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
@@ -3170,11 +3170,11 @@ END
 STRINGTABLE
 BEGIN
     IDS_BLOCK_EXTERNAL_VR   "%s を外部フィルターとして追加することはできません。\n[映像] 設定ページで、お好みのビデオ レンダラーを選択する必要があります。"
+    IDS_DESC_HAALI_VR       "VMR-9 とほぼ同じですが、真のバイキュービック リサイザーを使用します。"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_HAALI_VR       "VMR-9 とほぼ同じですが、真のバイキュービック リサイザーを使用します。"
     IDS_DESC_NULLVR_ANY     "あらゆる動画の (ような) メディア タイプに接続して入力サンプルをどこにも出力しません。映像の表示を必要とせず、CPU を無駄な動作から節約したい場合に使用してください。"
     IDS_DESC_NULLVR_UNCOMP  "標準の Null レンダラーと同じですが、これは非圧縮タイプにのみ接続します。"
     IDS_DESC_EVR            "ハードウェア デコードをサポートするビデオ レンダラーです。"

@@ -783,7 +783,7 @@ BEGIN
     LTEXT           "Щелчок",IDC_STATIC,10,18,60,8
     COMBOBOX        IDC_COMBO1,70,16,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Если ничего не загружено, то открыть последний файл",IDC_CHECK1,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,206,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,208,10
     LTEXT           "Двойной щелчок",IDC_STATIC,10,49,60,8
     COMBOBOX        IDC_COMBO2,70,47,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Переносить окно за видеообласть",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,65,133,10
@@ -1071,7 +1071,7 @@ BEGIN
     CONTROL         "Не использовать переход по файлам в директории по нажатию ""Шаг вперед/назад""",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,55,280,18
     CONTROL         "Не сворачивать окно на дополнительном дисплее в полноэкранном режиме",IDC_CHECK6,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,282,9
     CONTROL         "Приостанавливать воспроизведение видео при сворачивании окна",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,87,280,9
     CONTROL         "Скрывать курсор при воспроизведении в окне",IDC_CHECK5,
@@ -1154,10 +1154,10 @@ BEGIN
     CONTROL         "Встроенный VSync",IDC_VSYNC_INTERNAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,26,121,10
     CONTROL         "Включить коррекцию времени кадра",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,170,10
     CONTROL         "Заполнить GPU перед VSync",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,14,140,10
-    CONTROL         "Заполнить GPU после представления",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,140,10
+    CONTROL         "Заполнить GPU после представления",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,142,10
     CONTROL         "Ожидать заполнения",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,38,100,10
     GROUPBOX        "Настройки EVR Sync",IDC_STATIC2,5,67,286,117
-    CONTROL         "Синхронизировать видео с дисплеем",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,140,8
+    CONTROL         "Синхронизировать видео с дисплеем",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,142,8
     CONTROL         "Представлять с ближайшим vsync",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,170,8
     LTEXT           "Коррекция частоты:",IDC_STATIC5,20,93,85,8
     EDITTEXT        IDC_CYCLEDELTA,109,91,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
@@ -3170,11 +3170,11 @@ END
 STRINGTABLE
 BEGIN
     IDS_BLOCK_EXTERNAL_VR   "Вы не можете добавить %s как внешний фильтр.\nВам необходимо выбрать прдепочтительный видеорендерерв в панели настроек Видео."
+    IDS_DESC_HAALI_VR       "Похож на VMR-9, но использует корректное бикубическое изменения размера."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_HAALI_VR       "Похож на VMR-9, но использует корректное бикубическое изменения размера."
     IDS_DESC_NULLVR_ANY     "Подключается к любому типу видеоданных и отсылает входящие кадры в никуда. Режим может пригодиться для сохранения ресурсов процессора в случае, если нужен только звук."
     IDS_DESC_NULLVR_UNCOMP  "То же, что и нормальный Null-рендер, но подключается только к несжатым типам данных."
     IDS_DESC_EVR            "Видеорендерер с поддержкой аппаратного декодирования."

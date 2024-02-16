@@ -783,7 +783,7 @@ BEGIN
     LTEXT           "Kattintás",IDC_STATIC,10,18,60,8
     COMBOBOX        IDC_COMBO1,70,16,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Ha semmi nincs betöltve, nyissa meg a legutóbbi fájlt",IDC_CHECK1,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,206,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,208,10
     LTEXT           "Dupla kattintás",IDC_STATIC,10,49,60,8
     COMBOBOX        IDC_COMBO2,70,47,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Ablak áthelyezése a videó területre",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,65,133,10
@@ -1071,7 +1071,7 @@ BEGIN
     CONTROL         "Ne használja a 'keresés a mappában' parancsot az 'Ugrás vissza/előre' parancsokra, ha csak egy elem van a lejátszási listában",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,55,280,18
     CONTROL         "Megakadályozza a Kis méretet, amikor a Teljes képernyő nem az alap monitoron van",IDC_CHECK6,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,282,9
     CONTROL         "Szüneteltesse a videó lejátszását, amikor kis méretben van",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,87,280,9
     CONTROL         "A mutató automatikus elrejtése ablakos lejátszás közben",IDC_CHECK5,
@@ -1154,10 +1154,10 @@ BEGIN
     CONTROL         "Belső VSync",IDC_VSYNC_INTERNAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,26,121,10
     CONTROL         "Képkocka időkorrekció engedélyezése",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,170,10
     CONTROL         "Kiüríti a GPU-t a VSync előtt",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,14,140,10
-    CONTROL         "Kiüríti a GPU-t a jelenlegi után",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,140,10
+    CONTROL         "Kiüríti a GPU-t a jelenlegi után",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,142,10
     CONTROL         "Várj a kiürítésre",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,38,100,10
     GROUPBOX        "EVR Szinkronizálási beállítások",IDC_STATIC2,5,67,286,117
-    CONTROL         "Videó képernyőhöz illesztése",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,140,8
+    CONTROL         "Videó képernyőhöz illesztése",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,142,8
     CONTROL         "Megjelenítés a legközelebbi VSync-nél",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,170,8
     LTEXT           "Frekvencia hangolás:",IDC_STATIC5,20,93,85,8
     EDITTEXT        IDC_CYCLEDELTA,109,91,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
@@ -3170,11 +3170,11 @@ END
 STRINGTABLE
 BEGIN
     IDS_BLOCK_EXTERNAL_VR   "A %s nem adható hozzá külső szűrőként.\nA Videóbeállítások oldalon válassza ki a kívánt videómegjelenítőt."
+    IDS_DESC_HAALI_VR       "Úgy néz ki, mint a VMR-9, de valódi bicubic átméretezőt használ."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_HAALI_VR       "Úgy néz ki, mint a VMR-9, de valódi bicubic átméretezőt használ."
     IDS_DESC_NULLVR_ANY     "Minden videószerű médiatípushoz csatlakozni fog és a bejövő mintákat nem küldi ki sehová. Ezt akkor válassza, ha a videómegjelenítésre nincs szüksége és meg szeretné kímélni a processzorát a felesleges munkától."
     IDS_DESC_NULLVR_UNCOMP  "Ugyan az, mint a sima Null átalakító, de ez csak tömörítetlen típusokhoz fog csatlakozni."
     IDS_DESC_EVR            "Videó megjelenítő hardveres dekódolási támogatással."
