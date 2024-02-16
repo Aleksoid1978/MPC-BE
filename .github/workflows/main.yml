@@ -7,14 +7,14 @@ on:
       - docs/**
       - LICENSE.txt
       - src/apps/mpcresources/text/**
-      - **.vcxproj.filters
+      - '**.vcxproj.filters'
   pull_request:
     paths-ignore:
       - .github/workflows/main.yml      
       - docs/**
       - LICENSE.txt
       - src/apps/mpcresources/text/**
-      - **.vcxproj.filters
+      - '**.vcxproj.filters'
 
 jobs:
   build:
