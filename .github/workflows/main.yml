@@ -10,7 +10,7 @@ on:
       - '**.vcxproj.filters'
   pull_request:
     paths-ignore:
-      - .github/workflows/main.yml      
+      - .github/workflows/main.yml
       - docs/**
       - LICENSE.txt
       - src/apps/mpcresources/text/**
@@ -19,7 +19,7 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    timeout-minutes: 10
+    timeout-minutes: 60
 
     steps:
       - name: Checkout repository
@@ -69,7 +69,7 @@ jobs:
           path: _bin/Packages/**/MPC-BE*.x86-installer.zip
           compression-level: 0
 
-      - name: Upload Portable x86
+      - name: Upload Zip x86
         uses: actions/upload-artifact@v4
         with:
           name: "Zip x86" 
