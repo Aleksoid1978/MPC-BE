@@ -34,13 +34,6 @@ CRegFilterChooserDlg::CRegFilterChooserDlg(CWnd* pParent)
 {
 }
 
-CRegFilterChooserDlg::~CRegFilterChooserDlg()
-{
-	for (auto& filter : m_filters) {
-		delete filter;
-	}
-}
-
 void CRegFilterChooserDlg::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
@@ -133,8 +126,7 @@ void CRegFilterChooserDlg::OnBnClickedOk()
 	}
 	if (pMoniker) {
 		CFGFilterRegistry fgf(pMoniker);
-		FilterOverride* f = DNew FilterOverride;
-		f->fDisabled = false;
+		auto& f = m_filters.emplace_back(DNew FilterOverride);
 		f->type      = FilterOverride::REGISTERED;
 		f->name      = fgf.GetName();
 		f->dispname  = fgf.GetDisplayName();
@@ -142,7 +134,6 @@ void CRegFilterChooserDlg::OnBnClickedOk()
 		f->guids     = fgf.GetTypes();
 		f->dwMerit   = fgf.GetMeritForDirectShow();
 		f->iLoadType = FilterOverride::MERIT;
-		m_filters.emplace_back(f);
 	}
 
 	__super::OnOK();

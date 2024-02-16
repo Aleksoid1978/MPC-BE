@@ -5459,26 +5459,19 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 				CFilterMapper2 fm2(false);
 				fm2.Register(path + fd.cFileName);
 
-				while (!fm2.m_filters.empty()) {
-					FilterOverride* f = fm2.m_filters.back();
-					fm2.m_filters.pop_back();
+				for (auto& f : fm2.m_filters) {
+					f->fTemporary = true;
+					bool bFound = false;
 
-					if (f) {
-						f->fTemporary = true;
-						bool bFound = false;
-
-						for (auto& f2 : s.m_ExternalFilters) {
-							if (f2->type == FilterOverride::EXTERNAL && !f2->path.CompareNoCase(f->path)) {
-								bFound = true;
-								delete f;
-								break;
-							}
+					for (auto& f2 : s.m_ExternalFilters) {
+						if (f2->type == FilterOverride::EXTERNAL && !f2->path.CompareNoCase(f->path)) {
+							bFound = true;
+							break;
 						}
+					}
 
-						if (!bFound) {
-							std::unique_ptr<FilterOverride> p(f);
-							s.m_ExternalFilters.emplace_front(std::move(p));
-						}
+					if (!bFound) {
+						s.m_ExternalFilters.emplace_front(std::move(f));
 					}
 				}
 			} while (FindNextFileW(hFind, &fd));

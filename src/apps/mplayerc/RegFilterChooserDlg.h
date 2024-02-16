@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,6 +22,7 @@
 #pragma once
 
 #include <afxwin.h>
+#include <memory>
 #include <ExtLib/ui/ResizableLib/ResizableDialog.h>
 
 // CRegFilterChooserDlg dialog
@@ -34,10 +35,10 @@ class CRegFilterChooserDlg : public CResizableDialog
 	void AddToList(IMoniker* pMoniker);
 
 public:
-	CRegFilterChooserDlg(CWnd* pParent = nullptr);
-	virtual ~CRegFilterChooserDlg();
+	CRegFilterChooserDlg(CWnd* pParent);
+	virtual ~CRegFilterChooserDlg() = default;
 
-	std::list<FilterOverride*> m_filters;
+	std::list<std::unique_ptr<FilterOverride>> m_filters;
 
 	enum { IDD = IDD_ADDREGFILTER };
 	CListCtrl m_list;

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -577,13 +577,6 @@ CFilterMapper2::CFilterMapper2(bool fRefCounted, bool fAllowUnreg, LPUNKNOWN pUn
 	}
 }
 
-CFilterMapper2::~CFilterMapper2()
-{
-	for (const auto& filter : m_filters) {
-		delete filter;
-	}
-}
-
 STDMETHODIMP CFilterMapper2::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	if (riid == __uuidof(IFilterMapper2)) {
@@ -645,48 +638,44 @@ STDMETHODIMP CFilterMapper2::UnregisterFilter(const CLSID* pclsidCategory, const
 STDMETHODIMP CFilterMapper2::RegisterFilter(REFCLSID clsidFilter, LPCWSTR Name, IMoniker** ppMoniker, const CLSID* pclsidCategory, const OLECHAR* szInstance, const REGFILTER2* prf2)
 {
 	if (!m_path.IsEmpty()) {
-		if (FilterOverride* f = DNew FilterOverride) {
-			f->fDisabled = false;
-			f->type = FilterOverride::EXTERNAL;
-			f->path = m_path;
-			f->name = CStringW(Name);
-			f->clsid = clsidFilter;
-			f->iLoadType = FilterOverride::MERIT;
-			f->dwMerit = prf2->dwMerit;
+		auto& f = m_filters.emplace_back(DNew FilterOverride);
+		f->type      = FilterOverride::EXTERNAL;
+		f->path      = m_path;
+		f->name      = Name;
+		f->clsid     = clsidFilter;
+		f->dwMerit   = prf2->dwMerit;
+		f->iLoadType = FilterOverride::MERIT;
 
-			if (prf2->dwVersion == 1) {
-				for (ULONG i = 0; i < prf2->cPins; i++) {
-					const REGFILTERPINS& rgPin = prf2->rgPins[i];
-					if (rgPin.bOutput) {
-						continue;
-					}
-
-					for (UINT j = 0; j < rgPin.nMediaTypes; j++) {
-						if (!rgPin.lpMediaType[j].clsMajorType || !rgPin.lpMediaType[j].clsMinorType) {
-							break;
-						}
-						f->guids.emplace_back(*rgPin.lpMediaType[j].clsMajorType);
-						f->guids.emplace_back(*rgPin.lpMediaType[j].clsMinorType);
-					}
+		if (prf2->dwVersion == 1) {
+			for (ULONG i = 0; i < prf2->cPins; i++) {
+				const REGFILTERPINS& rgPin = prf2->rgPins[i];
+				if (rgPin.bOutput) {
+					continue;
 				}
-			} else if (prf2->dwVersion == 2) {
-				for (ULONG i = 0; i < prf2->cPins2; i++) {
-					const REGFILTERPINS2& rgPin = prf2->rgPins2[i];
-					if (rgPin.dwFlags&REG_PINFLAG_B_OUTPUT) {
-						continue;
-					}
 
-					for (UINT j = 0; j < rgPin.nMediaTypes; j++) {
-						if (!rgPin.lpMediaType[j].clsMajorType || !rgPin.lpMediaType[j].clsMinorType) {
-							break;
-						}
-						f->guids.emplace_back(*rgPin.lpMediaType[j].clsMajorType);
-						f->guids.emplace_back(*rgPin.lpMediaType[j].clsMinorType);
+				for (UINT j = 0; j < rgPin.nMediaTypes; j++) {
+					if (!rgPin.lpMediaType[j].clsMajorType || !rgPin.lpMediaType[j].clsMinorType) {
+						break;
 					}
+					f->guids.emplace_back(*rgPin.lpMediaType[j].clsMajorType);
+					f->guids.emplace_back(*rgPin.lpMediaType[j].clsMinorType);
 				}
 			}
+		} else if (prf2->dwVersion == 2) {
+			for (ULONG i = 0; i < prf2->cPins2; i++) {
+				const REGFILTERPINS2& rgPin = prf2->rgPins2[i];
+				if (rgPin.dwFlags&REG_PINFLAG_B_OUTPUT) {
+					continue;
+				}
 
-			m_filters.emplace_back(f);
+				for (UINT j = 0; j < rgPin.nMediaTypes; j++) {
+					if (!rgPin.lpMediaType[j].clsMajorType || !rgPin.lpMediaType[j].clsMinorType) {
+						break;
+					}
+					f->guids.emplace_back(*rgPin.lpMediaType[j].clsMajorType);
+					f->guids.emplace_back(*rgPin.lpMediaType[j].clsMinorType);
+				}
+			}
 		}
 
 		return S_OK;

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <memory>
+
 class FilterOverride
 {
 public:
@@ -38,7 +40,7 @@ public:
 	int iLoadType = 0;
 	DWORD dwMerit = 0;
 
-	FilterOverride() {}
+	FilterOverride() = default;
 	FilterOverride(FilterOverride* f)
         : fDisabled (f->fDisabled)
         , fTemporary(f->fTemporary)
@@ -111,7 +113,7 @@ protected:
 
 public:
 	CFilterMapper2(bool fRefCounted, bool fAllowUnreg = false, LPUNKNOWN pUnkOuter = nullptr);
-	virtual ~CFilterMapper2();
+	virtual ~CFilterMapper2() = default;
 
 	void SetInner(IUnknown* pUnk) {
 		m_pFM2 = pUnk;
@@ -120,6 +122,6 @@ public:
 	static void Init();
 
 	static IFilterMapper2* m_pFilterMapper2;
-	std::list<FilterOverride*> m_filters;
+	std::list<std::unique_ptr<FilterOverride>> m_filters;
 	void Register(CString path);
 };
