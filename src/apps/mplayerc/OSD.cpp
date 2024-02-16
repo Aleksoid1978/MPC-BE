@@ -443,10 +443,10 @@ void COSD::DrawMessage()
 
 		GradientFill(&m_MemDC, &rectMessages);
 
-		DWORD uFormat = DT_LEFT|DT_VCENTER|DT_NOPREFIX;
+		UINT uFormat = DT_LEFT|DT_VCENTER|DT_NOPREFIX;
 
 		if (rectText.right + 10 >= (rectMessages.right)) {
-			uFormat = uFormat|DT_END_ELLIPSIS;
+			uFormat |= DT_END_ELLIPSIS;
 		}
 
 		const CAppSettings& s = AfxGetAppSettings();
@@ -999,7 +999,7 @@ void COSD::DrawWnd()
 
 	GradientFill(&mdc, &rcBar);
 
-	DWORD uFormat = DT_LEFT | DT_TOP | DT_END_ELLIPSIS | DT_NOPREFIX;
+	const UINT uFormat = DT_LEFT | DT_TOP | DT_END_ELLIPSIS | DT_NOPREFIX;
 
 	CRect r;
 
