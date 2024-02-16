@@ -31,7 +31,7 @@ MPCVideoDec
 
 Обновлены библиотеки:
 	dav1d git-1.4.0-1-g97cc6ce;
-	ffmpeg git-n6.2-dev-1097-geb5b4e60c9;
+	ffmpeg git-n6.2-dev-1117-g7ed1e806e7;
 	Little-CMS git-lcms2.16-26-gc2a5401;
 	MediaInfo git-v24.01-g51dbd896;
 	nanosvg git-93ce879;

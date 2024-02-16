@@ -32,13 +32,13 @@
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 
-#define FF_INTERNAL_FIELDS 1
-#include "framequeue.h"
 
 #include "avfilter.h"
 #include "buffersink.h"
 #include "formats.h"
+#include "framequeue.h"
 #include "internal.h"
+#include "link_internal.h"
 #include "thread.h"
 
 #define OFFSET(x) offsetof(AVFilterGraph, x)
@@ -47,10 +47,10 @@
 #define A AV_OPT_FLAG_AUDIO_PARAM
 static const AVOption filtergraph_options[] = {
     { "thread_type", "Allowed thread types", OFFSET(thread_type), AV_OPT_TYPE_FLAGS,
-        { .i64 = AVFILTER_THREAD_SLICE }, 0, INT_MAX, F|V|A, "thread_type" },
+        { .i64 = AVFILTER_THREAD_SLICE }, 0, INT_MAX, F|V|A, .unit = "thread_type" },
         { "slice", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = AVFILTER_THREAD_SLICE }, .flags = F|V|A, .unit = "thread_type" },
     { "threads",     "Maximum number of threads", OFFSET(nb_threads), AV_OPT_TYPE_INT,
-        { .i64 = 0 }, 0, INT_MAX, F|V|A, "threads"},
+        { .i64 = 0 }, 0, INT_MAX, F|V|A, .unit = "threads"},
         {"auto", "autodetect a suitable number of threads to use", 0, AV_OPT_TYPE_CONST, {.i64 = 0 }, .flags = F|V|A, .unit = "threads"},
     {"scale_sws_opts"       , "default scale filter options"        , OFFSET(scale_sws_opts)        ,
         AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, F|V },
@@ -1483,10 +1483,11 @@ int avfilter_graph_request_oldest(AVFilterGraph *graph)
     av_assert1(oldest->age_index >= 0);
     frame_count = oldest->frame_count_out;
     while (frame_count == oldest->frame_count_out) {
+        FilterLinkInternal * const li = ff_link_internal(oldest);
         r = ff_filter_graph_run_once(graph);
         if (r == AVERROR(EAGAIN) &&
-            !oldest->frame_wanted_out && !oldest->frame_blocked_in &&
-            !oldest->status_in)
+            !oldest->frame_wanted_out && !li->frame_blocked_in &&
+            !li->status_in)
             ff_request_frame(oldest);
         else if (r < 0)
             return r;
