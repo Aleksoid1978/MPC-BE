@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -72,8 +72,6 @@ CFilterApp theApp;
 
 CWavDestFilter::CWavDestFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CTransformFilter(L"WavDest filter", pUnk, __uuidof(this))
-	, m_cbWavData(0)
-	, m_cbHeader(0)
 {
 	if (CWavDestOutputPin* pOut = DNew CWavDestOutputPin(this, phr)) {
 		if (SUCCEEDED(*phr)) {
@@ -284,9 +282,9 @@ HRESULT CWavDestFilter::StopStreaming()
 
 	HRESULT hr = ((IMemInputPin*) pDwnstrmInputPin)->QueryInterface(IID_PPV_ARGS(&pStream));
 	if (SUCCEEDED(hr)) {
-		BYTE* pb = (BYTE*)_alloca(m_cbHeader);
+		auto pb = std::make_unique<BYTE[]>(m_cbHeader);
 
-		RIFFLIST* pRiffWave = (RIFFLIST*)pb;
+		RIFFLIST* pRiffWave = (RIFFLIST*)pb.get();
 		RIFFCHUNK* pRiffFmt = (RIFFCHUNK*)(pRiffWave + 1);
 		RIFFCHUNK* pRiffData = (RIFFCHUNK*)(((BYTE*)(pRiffFmt + 1)) + m_pInput->CurrentMediaType().FormatLength());
 
@@ -302,11 +300,11 @@ HRESULT CWavDestFilter::StopStreaming()
 		pRiffWave->fccListType = FCC('WAVE');
 
 		LARGE_INTEGER li;
-		ZeroMemory(&li, sizeof(li));
+		li.QuadPart = 0;
 
 		hr = pStream->Seek(li, STREAM_SEEK_SET, 0);
 		if (SUCCEEDED(hr)) {
-			hr = pStream->Write(pb, m_cbHeader, 0);
+			hr = pStream->Write(pb.get(), m_cbHeader, 0);
 		}
 		pStream->Release();
 	}

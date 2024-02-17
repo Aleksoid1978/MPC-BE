@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,6 +35,9 @@ public:
 class __declspec(uuid("8685214E-4D32-4058-BE04-D01104F00B0C"))
 	CWavDestFilter : public CTransformFilter
 {
+	ULONG m_cbWavData = 0;
+	ULONG m_cbHeader = 0;
+
 public:
 	CWavDestFilter(LPUNKNOWN pUnk, HRESULT* pHr);
 	~CWavDestFilter();
@@ -58,7 +61,4 @@ private:
 	HRESULT Copy(IMediaSample* pSource, IMediaSample* pDest) const;
 	HRESULT Transform(IMediaSample* pMediaSample);
 	HRESULT Transform(AM_MEDIA_TYPE* pType, const signed char ContrastLevel) const;
-
-	ULONG m_cbWavData;
-	ULONG m_cbHeader;
 };
