@@ -341,10 +341,11 @@ static void StringToPaths(const CString& curentdir, const CString& str, std::vec
 		} else {
 			CPath parentdir(path + L"\\..");
 			parentdir.Canonicalize();
+			parentdir.AddBackslash();
 
 			do {
 				if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && wcscmp(fd.cFileName, L".") && wcscmp(fd.cFileName, L"..")) {
-					CString folder = parentdir + '\\' + fd.cFileName + '\\';
+					CString folder = parentdir + fd.cFileName + '\\';
 
 					size_t index = 0;
 					size_t count = paths.size();
@@ -374,15 +375,9 @@ void CPlaylistItem::AutoLoadFiles()
 		return;
 	}
 
-	int n = fpath.ReverseFind('\\') + 1;
-	CStringW curdir = fpath.Left(n);
-	CStringW name   = fpath.Mid(n);
-	CStringW ext;
-	n = name.ReverseFind('.');
-	if (n >= 0) {
-		ext = name.Mid(n + 1).MakeLower();
-		name.Truncate(n);
-	}
+	auto curdir = GetFolderOnly(fpath);
+	auto name   = GetFileOnly(fpath);
+	auto ext    = GetFileExt(fpath);
 
 	CString BDLabel, empty;
 	AfxGetMainFrame()->MakeBDLabel(fpath, empty, &BDLabel);
