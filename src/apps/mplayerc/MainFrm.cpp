@@ -15695,9 +15695,16 @@ void CMainFrame::SetupAudioTracksSubMenu()
 				bool fExternal = false;
 				CPlaylistItem pli;
 				if (m_wndPlaylistBar.GetCur(pli)) {
+					auto mainFileDir = GetFolderOnly(pli.m_fi);
 					for (const auto& fi : pli.m_auds) {
-						auto& str = fi.GetPath();
-						if (!str.IsEmpty() && name == GetFileOnly(str)) {
+						auto& audioPath = fi.GetPath();
+						if (!audioPath.IsEmpty() && name == audioPath) {
+							if (!mainFileDir.IsEmpty() && StartsWith(name, mainFileDir.GetString())) {
+								name.Delete(0, mainFileDir.GetLength());
+							} else {
+								name = GetFileOnly(name.GetString());
+							}
+
 							fExternal = true;
 							break;
 						}
