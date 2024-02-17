@@ -2515,7 +2515,8 @@ OpenMediaData* CPlayerPlaylistBar::GetCurOMD(REFERENCE_TIME rtStart)
 
 	pli->AutoLoadFiles();
 
-	CString fn = pli->m_fi.GetPath().MakeLower();
+	CStringW fn = pli->m_fi.GetPath();
+	fn.MakeLower();
 
 	if (TGetPathType(fn) != IT_FILE) {
 		return nullptr;

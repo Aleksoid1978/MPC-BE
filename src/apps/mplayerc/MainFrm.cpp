@@ -12198,7 +12198,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
 	}
 	else if (s.bYoutubePageParser && pOFD->auds.empty()) {
-		const CStringW url = pOFD->fi.GetPath();
+		auto& url = pOFD->fi.GetPath();
 		bool ok = Youtube::CheckURL(url);
 		if (ok) {
 			ok = Youtube::Parse_URL(
@@ -12224,7 +12224,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			&& pOFD->auds.empty()
 			&& ::PathIsURLW(pOFD->fi)) {
 
-		const CStringW url = pOFD->fi.GetPath();
+		auto& url = pOFD->fi.GetPath();
 		const auto ext = GetFileExt(url).MakeLower();
 
 		bool ok = (ext != L".m3u" && ext != L".m3u8");
@@ -12500,7 +12500,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	}
 
 	if (pOFD->fi.Valid()) {
-		const CString fn = youtubeUrl.GetLength() ? youtubeUrl : pOFD->fi.GetPath();
+		auto& fn = youtubeUrl.GetLength() ? youtubeUrl : pOFD->fi.GetPath();
 
 		if (!StartsWith(fn, L"pipe:")) {
 			const bool diskImage = m_DiskImage.GetDriveLetter() && m_SessionInfo.Path.GetLength();
@@ -13497,7 +13497,7 @@ void CMainFrame::OpenSetupAudioStream()
 	CPlaylistItem pli;
 	if (m_wndPlaylistBar.GetCur(pli)) {
 		for (const auto& fi : pli.m_auds) {
-			CString str = fi.GetPath();
+			auto& str = fi.GetPath();
 			extAudioList.emplace_back(GetFileOnly(str));
 		}
 	}
@@ -13971,7 +13971,7 @@ bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 	m_bWasPausedOnMinimizedVideo = false;
 
 	if (pFileData) {
-		CString path = pFileData->fi.GetPath();
+		auto& path = pFileData->fi.GetPath();
 		if (::PathIsURLW(path) && path.Find(L"://") <= 0) {
 			pFileData->fi = L"http://" + path;
 		}
@@ -15696,7 +15696,7 @@ void CMainFrame::SetupAudioTracksSubMenu()
 				CPlaylistItem pli;
 				if (m_wndPlaylistBar.GetCur(pli)) {
 					for (const auto& fi : pli.m_auds) {
-						CString str = fi.GetPath();
+						auto& str = fi.GetPath();
 						if (!str.IsEmpty() && name == GetFileOnly(str)) {
 							fExternal = true;
 							break;
@@ -16169,7 +16169,7 @@ bool CMainFrame::LoadSubtitle(const CExtraFileItem& subItem, ISubStream **actual
 	}
 
 	CComPtr<ISubStream> pSubStream;
-	const CStringW fname = subItem.GetPath();
+	auto& fname = subItem.GetPath();
 	const CStringW ext = GetFileExt(fname).MakeLower();
 
 	if (ext == L".mks" && s.IsISRAutoLoadEnabled()) {

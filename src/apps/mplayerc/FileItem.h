@@ -1,5 +1,5 @@
 /*
- * (C) 2023 see Authors.txt
+ * (C) 2023-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,13 +23,12 @@
 #include "DSUtil/CUE.h"
 #include "DSUtil/FileHandle.h"
 
-typedef std::vector<Chapters> ChaptersList;
-
+using ChaptersList = std::vector<Chapters>;
 
 class CFileItem
 {
-	CString m_fpath;
-	CString m_title;
+	CStringW m_fpath;
+	CStringW m_title;
 	ChaptersList m_chapters;
 
 	REFERENCE_TIME m_duration = 0;
@@ -38,10 +37,10 @@ public:
 	CFileItem() = default;
 	~CFileItem() = default;
 
-	CFileItem(const CString& fpath)
+	CFileItem(const CStringW& fpath)
 		: m_fpath(fpath)
 	{}
-	CFileItem(const CString& fpath, const CString& title, const REFERENCE_TIME duration = 0)
+	CFileItem(const CStringW& fpath, const CStringW& title, const REFERENCE_TIME duration = 0)
 		: m_fpath(fpath)
 		, m_title(title)
 		, m_duration(duration)
@@ -57,13 +56,13 @@ public:
 		return *this;
 	}
 
-	const CFileItem& operator = (const CString& str) {
+	const CFileItem& operator = (const CStringW& str) {
 		m_fpath = str;
 
 		return *this;
 	}
 
-	operator CString() const {
+	operator CStringW() const {
 		return m_fpath;
 	}
 
@@ -71,11 +70,11 @@ public:
 		return m_fpath;
 	}
 
-	CString GetPath() const {
+	const CStringW& GetPath() const {
 		return m_fpath;
 	};
 
-	CString GetExt() const {
+	CStringW GetExt() const {
 		return GetFileExt(m_fpath);
 	};
 
@@ -88,11 +87,11 @@ public:
 	};
 
 	// Title
-	void SetTitle(const CString& title) {
+	void SetTitle(const CStringW& title) {
 		m_title = title;
 	}
 
-	CString GetTitle() const {
+	const CStringW& GetTitle() const {
 		return m_title;
 	};
 
@@ -105,11 +104,11 @@ public:
 		m_chapters.clear();
 	}
 
-	size_t GetChapterCount() {
+	size_t GetChapterCount() const {
 		return m_chapters.size();
 	}
 
-	void GetChapters(ChaptersList& chaplist) {
+	void GetChapters(ChaptersList& chaplist) const {
 		chaplist = m_chapters;
 	}
 
@@ -121,8 +120,7 @@ public:
 	}
 };
 
-typedef std::list<CFileItem> CFileItemList;
-
+using CFileItemList = std::list<CFileItem>;
 
 class CExtraFileItem
 {
@@ -161,7 +159,7 @@ public:
 		m_fpath = fpath;
 	}
 
-	CStringW GetPath() const {
+	const CStringW& GetPath() const {
 		return m_fpath;
 	};
 
@@ -174,14 +172,14 @@ public:
 		m_title = title;
 	}
 
-	CStringW GetTitle() const {
+	const CStringW& GetTitle() const {
 		return m_title;
 	};
 
-	CStringA GetLang() const {
+	const CStringA& GetLang() const {
 		return m_lang;
 	};
 };
 
-typedef std::list<CExtraFileItem> CAudioItemList;
-typedef std::list<CExtraFileItem> CSubtitleItemList;
+using CAudioItemList = std::list<CExtraFileItem>;
+using CSubtitleItemList = std::list<CExtraFileItem>;
