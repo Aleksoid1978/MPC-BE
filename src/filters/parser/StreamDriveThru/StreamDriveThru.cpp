@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -123,7 +123,7 @@ DWORD CStreamDriveThruFilter::ThreadProc()
 			case CMD_RUN:
 				Reply(S_OK);
 
-				do {
+				{
 					CComPtr<IAsyncReader> pAsyncReader;
 					CComPtr<IStream> pStream;
 
@@ -195,7 +195,7 @@ DWORD CStreamDriveThruFilter::ThreadProc()
 					if (CComPtr<IPin> pPin = m_pOutput->GetConnected()) {
 						pPin->EndOfStream();
 					}
-				} while (false);
+				}
 
 				break;
 		}
