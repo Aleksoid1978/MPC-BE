@@ -33,6 +33,7 @@
 
 struct hevc_dxva2_picture_context {
 // ==> Start patch MPC
+    //DXVA_PicParams_HEVC   pp;
     DXVA_PicParams_HEVC_Rext pp;
 // ==> End patch MPC
     DXVA_Qmatrix_HEVC     qm;
