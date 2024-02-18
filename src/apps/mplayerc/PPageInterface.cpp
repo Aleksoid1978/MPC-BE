@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,6 +36,7 @@ CPPageInterface::CPPageInterface()
 	, m_nThemeBlue(255)
 	, m_fUseTimeTooltip(TRUE)
 	, m_fSmartSeek(FALSE)
+	, m_bSmartSeekOnline(FALSE)
 	, m_fChapterMarker(FALSE)
 	, m_fFlybar(TRUE)
 	, m_fFontShadow(FALSE)
@@ -78,6 +79,7 @@ void CPPageInterface::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO3, m_TimeTooltipPosition);
 	DDX_Control(pDX, IDC_COMBO1, m_FontType);
 	DDX_Check(pDX, IDC_CHECK_PRV, m_fSmartSeek);
+	DDX_Check(pDX, IDC_CHECK6, m_bSmartSeekOnline);
 	DDX_Control(pDX, IDC_EDIT1, m_edSmartSeekSize);
 	DDX_Control(pDX, IDC_COMBO4, m_SmartSeekVR);
 	DDX_Check(pDX, IDC_CHECK_CHM, m_fChapterMarker);
@@ -147,6 +149,7 @@ BOOL CPPageInterface::OnInitDialog()
 	m_OSD_Font	= s.strOSDFont;
 
 	m_fSmartSeek		= s.fSmartSeek;
+	m_bSmartSeekOnline	= s.bSmartSeekOnline;
 	m_edSmartSeekSize.SetRange(5, 30);
 	m_edSmartSeekSize	= s.iSmartSeekSize;
 	m_SmartSeekVR.AddString(L"EVR");
@@ -189,6 +192,7 @@ BOOL CPPageInterface::OnInitDialog()
 	GetDlgItem(IDC_EDIT1)->EnableWindow(m_fSmartSeek);
 	GetDlgItem(IDC_STATIC7)->EnableWindow(m_fSmartSeek);
 	m_SmartSeekVR.EnableWindow(m_fSmartSeek);
+	GetDlgItem(IDC_CHECK6)->EnableWindow(m_fSmartSeek);
 
 	if (!SysVersion::IsWin11orLater()) {
 		m_chkDarkTitle.EnableWindow(FALSE);
@@ -237,6 +241,7 @@ BOOL CPPageInterface::OnApply()
 	m_FontType.GetLBText(m_FontType.GetCurSel(),s.strOSDFont);
 
 	s.fSmartSeek			= !!m_fSmartSeek;
+	s.bSmartSeekOnline		= !!m_bSmartSeekOnline;
 	s.iSmartSeekSize		= m_edSmartSeekSize;
 	s.iSmartSeekVR	= m_SmartSeekVR.GetCurSel();
 
@@ -668,6 +673,7 @@ void CPPageInterface::OnUsePreview()
 	GetDlgItem(IDC_EDIT1)->EnableWindow(m_fSmartSeek);
 	GetDlgItem(IDC_STATIC7)->EnableWindow(m_fSmartSeek);
 	m_SmartSeekVR.EnableWindow(m_fSmartSeek);
+	GetDlgItem(IDC_CHECK6)->EnableWindow(m_fSmartSeek);
 
 	SetModified();
 }

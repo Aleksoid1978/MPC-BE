@@ -290,7 +290,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Herstel resolutie bij afsluiten"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 54
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 6		"Gebruik Donker thema (standaard)"
 7		"Helderheid :"
 9		"Kleur van de geluidindicator:"
@@ -307,20 +307,21 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 54
 24		"Toon scherminfo voor tijd:"
 26		"Activeer voorvertoning op zoekbalk"
 27		"Grootte op basis v/d schermbreedte:"
-31		"Toon hoofdstukmarkeringen op zoekbalk"
-32		"Gebruik flybar"
-33		"Tekengrootte van afspeellijst:"
-36		"OSD"
-37		"Lettertype:"
-41		"F"
-42		"Achtergrond:"
-43		"G1"
-44		"G2"
-45		"Transparantie:"
-47		"Omlijning:"
-50		"Schaduw"
-51		"Anti-aliasing"
-52		"Gebruik mogelijkheden van Windows 7 (en hoger)-taakbalk"
+31		"Online"
+32		"Toon hoofdstukmarkeringen op zoekbalk"
+33		"Gebruik flybar"
+34		"Tekengrootte van afspeellijst:"
+37		"OSD"
+38		"Lettertype:"
+42		"F"
+43		"Achtergrond:"
+44		"G1"
+45		"G2"
+46		"Transparantie:"
+48		"Omlijning:"
+51		"Schaduw"
+52		"Anti-aliasing"
+53		"Gebruik mogelijkheden van Windows 7 (en hoger)-taakbalk"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

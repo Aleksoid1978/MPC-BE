@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -43,6 +43,7 @@ public:
 	int  m_nThemeBlue;
 	BOOL m_fUseTimeTooltip;
 	BOOL m_fSmartSeek;
+	BOOL m_bSmartSeekOnline;
 	BOOL m_fChapterMarker;
 	BOOL m_fFlybar;
 	BOOL m_fFontShadow;

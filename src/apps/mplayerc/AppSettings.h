@@ -723,6 +723,7 @@ public:
 	bool			fUseTimeTooltip;
 	int				nTimeTooltipPosition;
 	bool			fSmartSeek;
+	bool			bSmartSeekOnline;
 	int				iSmartSeekSize;
 	int				iSmartSeekVR;
 	bool			fChapterMarker;

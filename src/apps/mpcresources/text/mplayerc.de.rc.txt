@@ -290,7 +290,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Ursprüngliche Auflösung beim Schließen der App wiederherstellen"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 54
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 6		"Dunkles Theme aktivieren"
 7		"Helligkeit:"
 9		"Farbe des Lautstärkestellers:"
@@ -307,20 +307,21 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 54
 24		"Zeit-Tooltip anzeigen:"
 26		"Vorschau bei der Suche anzeigen"
 27		"Größe bezogen auf Bildschirmbreite:"
-31		"Kapitelmarker in der Suchleiste anzeigen"
-32		"Flybar aktivieren"
-33		"Schriftgröße der Wiedergabeliste:"
-36		"OSD"
-37		"Schrift:"
-41		"F"
-42		"Hintergrund:"
-43		"G1"
-44		"G2"
-45		"Transparent:"
-47		"Rahmengröße:"
-50		"Schatten"
-51		"Anti-Aliasing"
-52		"Windows-Taskbarfunktionen verwenden (ab Windows 7)"
+31		"Online"
+32		"Kapitelmarker in der Suchleiste anzeigen"
+33		"Flybar aktivieren"
+34		"Schriftgröße der Wiedergabeliste:"
+37		"OSD"
+38		"Schrift:"
+42		"F"
+43		"Hintergrund:"
+44		"G1"
+45		"G2"
+46		"Transparent:"
+48		"Rahmengröße:"
+51		"Schatten"
+52		"Anti-Aliasing"
+53		"Windows-Taskbarfunktionen verwenden (ab Windows 7)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

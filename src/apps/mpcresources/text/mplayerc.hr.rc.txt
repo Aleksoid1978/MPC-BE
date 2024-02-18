@@ -290,7 +290,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Vrati rezoluciju pri izlasku iz programa"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 54
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 6		"Koristi ""tamnu"" temu (default)"
 7		"Svjetlina :"
 9		"Postavi boju indikatora zvuka:"
@@ -307,20 +307,21 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 54
 24		"Koristi vremenski tooltip:"
 26		"Koristi pretpregled prilikom pretrage"
 27		"Veličina relativna širini ekrana:"
-31		"Koristi marker poglavlja"
-32		"Koristi flybar"
-33		"Veličina fonta playliste:"
-36		"OSD"
-37		"Font:"
-41		"F"
-42		"Pozadina:"
-43		"G1"
-44		"G2"
-45		"Prozirnost:"
-47		"Veličina granice:"
-50		"Sjena"
-51		"Anti-aliasing"
-52		"Koristi Windows 7 (i iznad) Taskbar mogućnosti"
+31		"Online"
+32		"Koristi marker poglavlja"
+33		"Koristi flybar"
+34		"Veličina fonta playliste:"
+37		"OSD"
+38		"Font:"
+42		"F"
+43		"Pozadina:"
+44		"G1"
+45		"G2"
+46		"Prozirnost:"
+48		"Veličina granice:"
+51		"Sjena"
+52		"Anti-aliasing"
+53		"Koristi Windows 7 (i iznad) Taskbar mogućnosti"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

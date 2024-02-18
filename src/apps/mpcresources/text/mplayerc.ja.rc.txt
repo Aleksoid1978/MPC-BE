@@ -290,7 +290,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"プログラム終了時に解像度を元に戻す"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 54
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 6		"ダーク テーマを使用する (既定)"
 7		"明るさ :"
 9		"音量調節の色設定:"
@@ -307,20 +307,21 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 54
 24		"タイム ツールヒントを使用する:"
 26		"検索でプレビュー機能を使用する"
 27		"画面横幅に対するサイズ:"
-31		"チャプター マーカーを使用する"
-32		"フライ バーを使用する"
-33		"プレイリスト フォント サイズ:"
-36		"OSD"
-37		"フォント:"
-41		"F"
-42		"背景:"
-43		"G1"
-44		"G2"
-45		"透過度:"
-47		"境界線サイズ:"
-50		"影"
-51		"アンチエイリアス"
-52		"Windows 7 (とそれ以降) のタスク バーの機能を使用する"
+31		"Online"
+32		"チャプター マーカーを使用する"
+33		"フライ バーを使用する"
+34		"プレイリスト フォント サイズ:"
+37		"OSD"
+38		"フォント:"
+42		"F"
+43		"背景:"
+44		"G1"
+45		"G2"
+46		"透過度:"
+48		"境界線サイズ:"
+51		"影"
+52		"アンチエイリアス"
+53		"Windows 7 (とそれ以降) のタスク バーの機能を使用する"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

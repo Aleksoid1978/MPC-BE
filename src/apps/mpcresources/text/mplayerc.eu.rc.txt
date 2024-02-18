@@ -290,7 +290,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Leheneratu bereizmena programatik irtetzerakoan"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 54
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 6		"Erabili ""iluna"" azalgaia (berezkoa)"
 7		"Dizdira :"
 9		"Soinu adierazle margo ezarpena:"
@@ -307,20 +307,21 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 54
 24		"Erabili denbora oharra:"
 26		"Erabili aurrekoa bilaketan"
 27		"Neurria ikusleiho zabaleraren arabera:"
-31		"Erabili atal markatzailea"
-32		"Erabili gainbarra"
-33		"Playlist font size:"
-36		"IGE"
-37		"Hizkia:"
-41		"F"
-42		"Barrena:"
-43		"G1"
-44		"G2"
-45		"Gardena:"
-47		"Hertz Neurria:"
-50		"Itzala"
-51		"Hertz-lehunketa"
-52		"Erabili Windows 7 (eta berriagoa) Eginkizun-barra ezaugarriak"
+31		"Online"
+32		"Erabili atal markatzailea"
+33		"Erabili gainbarra"
+34		"Playlist font size:"
+37		"IGE"
+38		"Hizkia:"
+42		"F"
+43		"Barrena:"
+44		"G1"
+45		"G2"
+46		"Gardena:"
+48		"Hertz Neurria:"
+51		"Itzala"
+52		"Hertz-lehunketa"
+53		"Erabili Windows 7 (eta berriagoa) Eginkizun-barra ezaugarriak"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

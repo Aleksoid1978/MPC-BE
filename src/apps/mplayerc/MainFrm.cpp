@@ -11927,11 +11927,15 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 	ReleasePreviewGraph(); // Hmm, most likely it is no longer needed
 
 	bool bUseSmartSeek = s.fSmartSeek;
-
-	if (OpenFileData* pFileData = dynamic_cast<OpenFileData*>(pOMD)) {
-		CString fn = pFileData->fi;
-		if (!fn.IsEmpty() && (fn.Find(L"://") >= 0)) { // disable SmartSeek for streaming data.
-			bUseSmartSeek = false;
+	if (!s.bSmartSeekOnline) {
+		if (OpenFileData* pFileData = dynamic_cast<OpenFileData*>(pOMD)) {
+			auto& fn = pFileData->fi.GetPath();
+			if (!fn.IsEmpty()) {
+				CUrlParser urlParser(fn.GetString());
+				if (urlParser.IsValid()) {
+					bUseSmartSeek = false;
+				}
+			}
 		}
 	}
 
@@ -12024,7 +12028,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 
 	m_pCB = DNew CDSMChapterBag(nullptr, nullptr);
 
-	return L"";
+	return {};
 }
 
 void CMainFrame::ReleasePreviewGraph()

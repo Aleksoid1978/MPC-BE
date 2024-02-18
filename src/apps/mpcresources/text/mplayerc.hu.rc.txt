@@ -290,7 +290,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Felbontás visszaállítása kilépéskor"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 54
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 6		"Használja a ""sötét"" témát (alapértelmezett)"
 7		"Fényerősség:"
 9		"A hangjelző színének beállítása:"
@@ -307,20 +307,21 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 54
 24		"Használja az időtippet:"
 26		"Használja az előnézetet a keresésben"
 27		"A képernyő szélességéhez viszonyított méret:"
-31		"Használjon fejezetjelölőt"
-32		"Használjon léptéket"
-33		"Lejátszási lista betüméret:"
-36		"OSD"
-37		"Betűtípus:"
-41		"F"
-42		"Háttér:"
-43		"G1"
-44		"G2"
-45		"Átlátszóság:"
-47		"Szegély mérete:"
-50		"Árnyék"
-51		"Élsimítás"
-52		"Használja a Windows 7 (és újabb) tálca szolgáltatásait"
+31		"Online"
+32		"Használjon fejezetjelölőt"
+33		"Használjon léptéket"
+34		"Lejátszási lista betüméret:"
+37		"OSD"
+38		"Betűtípus:"
+42		"F"
+43		"Háttér:"
+44		"G1"
+45		"G2"
+46		"Átlátszóság:"
+48		"Szegély mérete:"
+51		"Árnyék"
+52		"Élsimítás"
+53		"Használja a Windows 7 (és újabb) tálca szolgáltatásait"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

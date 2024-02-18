@@ -290,7 +290,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Restaurar resolución al salir"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 54
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 6		"Usar Tema ""Oscuro"" (predeterminado)"
 7		"Brillo :"
 9		"Ajuste de color del indicador de sonido:"
@@ -307,20 +307,21 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 54
 24		"Usar herramienta informativa de tiempo:"
 26		"Usar vista previa en la búsqueda"
 27		"Tamaño relativo al ancho de pantalla:"
-31		"Usar marcador de capítulos"
-32		"Usar barra flotante"
-33		"Tamaño de fuente de Lista de Reproducción:"
-36		"OSD"
-37		"Fuente:"
-41		"F"
-42		"Fondo:"
-43		"G1"
-44		"G2"
-45		"Transparencia:"
-47		"Borde:"
-50		"Sombra"
-51		"Suavizado"
-52		"Usar características de la Barra de tareas de Windows 7 (y superior)"
+31		"Online"
+32		"Usar marcador de capítulos"
+33		"Usar barra flotante"
+34		"Tamaño de fuente de Lista de Reproducción:"
+37		"OSD"
+38		"Fuente:"
+42		"F"
+43		"Fondo:"
+44		"G1"
+45		"G2"
+46		"Transparencia:"
+48		"Borde:"
+51		"Sombra"
+52		"Suavizado"
+53		"Usar características de la Barra de tareas de Windows 7 (y superior)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

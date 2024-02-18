@@ -290,7 +290,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"종료 후, 해상도 복원"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 54
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 6		"다크 테마 사용(기본값)"
 7		"명도 :"
 9		"음량 조절 색 설정 :"
@@ -307,20 +307,21 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 54
 24		"시간 툴팁 사용 :"
 26		"탐색 표시줄에서 미리 보기 사용"
 27		"화면 너비 대비 크기 :"
-31		"챕터 구분 표기 사용"
-32		"플라이바 사용"
-33		"재생 목록 글자 크기 :"
-36		"화면 표시"
-37		"화면 표시 글꼴 :"
-41		"F"
-42		"배경 :"
-43		"G1"
-44		"G2"
-45		"투명도 :"
-47		"경계 크기 :"
-50		"그림자"
-51		"위신호 제거"
-52		"(윈도7 이상) 작업 표시줄 기능 사용"
+31		"Online"
+32		"챕터 구분 표기 사용"
+33		"플라이바 사용"
+34		"재생 목록 글자 크기 :"
+37		"화면 표시"
+38		"화면 표시 글꼴 :"
+42		"F"
+43		"배경 :"
+44		"G1"
+45		"G2"
+46		"투명도 :"
+48		"경계 크기 :"
+51		"그림자"
+52		"위신호 제거"
+53		"(윈도7 이상) 작업 표시줄 기능 사용"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
