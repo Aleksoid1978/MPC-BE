@@ -12202,7 +12202,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
 	}
 	else if (s.bYoutubePageParser && pOFD->auds.empty()) {
-		auto& url = pOFD->fi.GetPath();
+		auto url = pOFD->fi.GetPath();
 		bool ok = Youtube::CheckURL(url);
 		if (ok) {
 			ok = Youtube::Parse_URL(
