@@ -307,7 +307,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 24		"Süre bilgi ipucunu göster:"
 26		"Arama Çubuğu üzerinde ön izleme resmi göster"
 27		"Ekran genişliğine göre boyut:"
-31		"Online"
+31		"Çevrim içi"
 32		"Bölüm işaretlerini göster"
 33		"Şeffaf Çubuğu göster"
 34		"Oynatma listesi yazı tipi boyutu:"
