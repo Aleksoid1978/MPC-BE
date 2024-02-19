@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2021 see Authors.txt
+ * (C) 2014-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -92,7 +92,7 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* pFile)
 		pAudioFile = DNew CDSFFile();
 	} else if (*id == FCC('MPCK')) {
 		pAudioFile = DNew CMPC8File();
-	} else if ((*id & 0x00ffffff) == FCC('MP+\0') && (data[3] & 0x0f) == 0x7) {
+	} else if ((*id & 0x00ffffff) == MAKEFOURCC('M','P','+',0) && (data[3] & 0x0f) == 0x7) {
 		pAudioFile = DNew CMPC7File();
 	} else if (*id == FCC('fLaC')) {
 		pAudioFile = DNew CFLACFile();

@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2023 see Authors.txt
+ * (C) 2017-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -205,7 +205,7 @@ static void GetType(const BYTE* buf, int size, GUID& subtype)
 		subtype = MEDIASUBTYPE_Ogg;
 	} else if (size > 4 && GETU32(buf) == 0xA3DF451A) {
 		subtype = MEDIASUBTYPE_Matroska;
-	} else if (size > 4 && GETU32(buf) == FCC('FLV\x1')) {
+	} else if (size > 4 && GETU32(buf) == MAKEFOURCC('F','L','V',1)) {
 		subtype = MEDIASUBTYPE_FLV;
 	} else if (size > 8 && GETU32(buf + 4) == FCC('ftyp')) {
 		subtype = MEDIASUBTYPE_MP4;
