@@ -60,7 +60,7 @@ HRESULT CMPC7File::Open(CBaseSplitterFile* pFile)
 	}
 
 	DWORD id = 0;
-	if (m_pFile->ByteRead((BYTE*)&id, 4) != S_OK || (id & 0x00ffffff) != MAKEFOURCC('M','P','+',0) || ((id >> 24) & 0x0f) != 0x7) {
+	if (m_pFile->ByteRead((BYTE*)&id, 4) != S_OK || (id & 0x0fffffff) != MAKEFOURCC('M','P','+',7)) {
 		return E_FAIL;
 	}
 

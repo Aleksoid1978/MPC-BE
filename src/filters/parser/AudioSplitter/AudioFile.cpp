@@ -92,7 +92,7 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* pFile)
 		pAudioFile = DNew CDSFFile();
 	} else if (*id == FCC('MPCK')) {
 		pAudioFile = DNew CMPC8File();
-	} else if ((*id & 0x00ffffff) == MAKEFOURCC('M','P','+',0) && (data[3] & 0x0f) == 0x7) {
+	} else if ((*id & 0x0fffffff) == MAKEFOURCC('M','P','+',7)) {
 		pAudioFile = DNew CMPC7File();
 	} else if (*id == FCC('fLaC')) {
 		pAudioFile = DNew CFLACFile();
