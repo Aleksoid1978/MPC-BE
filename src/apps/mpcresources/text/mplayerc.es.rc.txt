@@ -307,7 +307,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 24		"Usar herramienta informativa de tiempo:"
 26		"Usar vista previa en la búsqueda"
 27		"Tamaño relativo al ancho de pantalla:"
-31		"Online"
+31		"En línea"
 32		"Usar marcador de capítulos"
 33		"Usar barra flotante"
 34		"Tamaño de fuente de Lista de Reproducción:"
