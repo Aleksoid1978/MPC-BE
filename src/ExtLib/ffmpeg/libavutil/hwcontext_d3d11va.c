@@ -86,21 +86,29 @@ static const struct {
 } supported_formats[] = {
     { DXGI_FORMAT_NV12,         AV_PIX_FMT_NV12 },
     { DXGI_FORMAT_P010,         AV_PIX_FMT_P010 },
+    { DXGI_FORMAT_B8G8R8A8_UNORM,    AV_PIX_FMT_BGRA },
+    { DXGI_FORMAT_R10G10B10A2_UNORM, AV_PIX_FMT_X2BGR10 },
+    { DXGI_FORMAT_R16G16B16A16_FLOAT, AV_PIX_FMT_RGBAF16 },
+    { DXGI_FORMAT_AYUV,         AV_PIX_FMT_VUYX },
+    { DXGI_FORMAT_YUY2,         AV_PIX_FMT_YUYV422 },
+    { DXGI_FORMAT_Y210,         AV_PIX_FMT_Y210 },
+    { DXGI_FORMAT_Y410,         AV_PIX_FMT_XV30 },
+    { DXGI_FORMAT_P016,         AV_PIX_FMT_P012 },
+    { DXGI_FORMAT_Y216,         AV_PIX_FMT_Y212 },
+    { DXGI_FORMAT_Y416,         AV_PIX_FMT_XV36 },
+    // Special opaque formats. The pix_fmt is merely a place holder, as the
+    // opaque format cannot be accessed directly.
+    { DXGI_FORMAT_420_OPAQUE,   AV_PIX_FMT_YUV420P },
 // ==> Start patch MPC
-    // 420 12bit
+    { DXGI_FORMAT_P016,         AV_PIX_FMT_P016      },
     { DXGI_FORMAT_P016,         AV_PIX_FMT_YUV420P12 },
-    // 422 8/10/12 bit
     { DXGI_FORMAT_YUY2,         AV_PIX_FMT_YUV422P   },
     { DXGI_FORMAT_Y210,         AV_PIX_FMT_YUV422P10 },
     { DXGI_FORMAT_Y216,         AV_PIX_FMT_YUV422P12 },
-    // 444 8/10/12 bit
     { DXGI_FORMAT_AYUV,         AV_PIX_FMT_YUV444P   },
     { DXGI_FORMAT_Y410,         AV_PIX_FMT_YUV444P10 },
     { DXGI_FORMAT_Y416,         AV_PIX_FMT_YUV444P12 },
 // ==> End patch MPC
-    // Special opaque formats. The pix_fmt is merely a place holder, as the
-    // opaque format cannot be accessed directly.
-    { DXGI_FORMAT_420_OPAQUE,   AV_PIX_FMT_YUV420P },
 };
 
 static void d3d11va_default_lock(void *ctx)
