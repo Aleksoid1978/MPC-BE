@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -157,9 +157,6 @@ BOOL CShaderAutoCompleteDlg::OnInitDialog()
 						CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
 						nullptr, nullptr, nullptr, nullptr);
 
-	memset(&m_ti, 0, sizeof(m_ti));
-	m_ti.cbSize = sizeof(TOOLINFO);
-	m_ti.uFlags = TTF_ABSOLUTE|TTF_TRACK;
 	m_ti.hwnd = m_hWnd;
 	m_ti.lpszText = m_text;
 

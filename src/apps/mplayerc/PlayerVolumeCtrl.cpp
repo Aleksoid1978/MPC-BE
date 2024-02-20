@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -429,7 +429,7 @@ void CVolumeCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 		SetCapture();
 
 		if (m_toolTipHandle) {
-			TOOLINFO ti = { sizeof(TOOLINFO) };
+			TOOLINFOW ti = { sizeof(TOOLINFOW) };
 			ti.uFlags = TTF_TRACK | TTF_IDISHWND | TTF_ABSOLUTE;
 			ti.hwnd = m_hWnd;
 			ti.uId = (UINT_PTR)m_hWnd;

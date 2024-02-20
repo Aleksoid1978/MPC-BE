@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -46,7 +46,7 @@ private:
 	REFERENCE_TIME m_tooltipLastPos = -1;
 	UINT_PTR       m_tooltipTimer   = 1;
 
-	TOOLINFO        m_ti            = {};
+	TOOLINFOW       m_ti            = { sizeof(TOOLINFOW), TTF_IDISHWND | TTF_TRACK | TTF_ABSOLUTE };
 	CToolTipCtrl    m_tooltip;
 	CCritSec        m_CBLock;
 	CComPtr<IDSMChapterBag> m_pChapterBag;
