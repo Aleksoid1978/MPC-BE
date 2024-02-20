@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -370,13 +370,13 @@ void CPlaylistItem::AutoLoadFiles()
 		return;
 	}
 
-	CStringW fpath = m_fi;
+	auto& fpath = m_fi.GetPath();
 	if (fpath.Find(L"://") >= 0) { // skip URLs
 		return;
 	}
 
 	auto curdir = GetFolderOnly(fpath);
-	auto name   = GetFileOnly(fpath);
+	auto name   = RemoveFileExt(GetFileOnly(fpath));
 	auto ext    = GetFileExt(fpath);
 
 	CString BDLabel, empty;
@@ -404,7 +404,7 @@ void CPlaylistItem::AutoLoadFiles()
 					searchPattern.emplace_back(path + BDLabel + L".*");
 				}
 
-				WIN32_FIND_DATAW fd = {0};
+				WIN32_FIND_DATAW fd = {};
 				HANDLE hFind;
 
 				for (size_t j = 0; j < searchPattern.size(); j++) {
@@ -415,11 +415,11 @@ void CPlaylistItem::AutoLoadFiles()
 							if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 								continue;
 							}
-							const CStringW fn = fd.cFileName;
+							const CStringW fn(fd.cFileName);
 							if (fn[name.GetLength()] != L'.') {
 								continue;
 							}
-							const CStringW ext2 = fn.Mid(fn.ReverseFind('.') + 1).MakeLower();
+							const CStringW ext2 = GetFileExt(fn);
 							if (ext == ext2 || !mf.FindAudioExt(ext2)) {
 								continue;
 							}
@@ -466,8 +466,7 @@ void CPlaylistItem::AutoLoadFiles()
 	}
 
 	// cue-sheet file auto-load
-	CString cuefn(fpath);
-	cuefn.Replace(ext, L"cue");
+	const CString cuefn = RenameFileExt(fpath, L".cue");
 	if (::PathFileExistsW(cuefn)) {
 		CString filter;
 		std::vector<CString> mask;
