@@ -3566,8 +3566,16 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 					case AV_CODEC_ID_VP9:        codec = L"VP9";    break;
 				}
 
+				auto frames_ctx = (AVHWFramesContext*)hw_frame->hw_frames_ctx->data;
+
 				CString description = m_bUseD3D11cb ? L"D3D11 Copy-back" : (m_bUseD3D12cb ? L"D3D12 Copy-back" : L"NVDEC");
 				if (!codec.IsEmpty()) {
+					if (m_bUseNVDEC) {
+						if (frames_ctx->sw_format == AV_PIX_FMT_YUV444P || frames_ctx->sw_format == AV_PIX_FMT_YUV444P16) {
+							codec.Append(L" 444");
+						}
+					}
+
 					const int depth = GetLumaBits(m_pAVCtx->sw_pix_fmt);
 					if (depth > 8) {
 						codec.AppendFormat(L" %d-bit", depth);
@@ -3578,7 +3586,6 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 				DXVAState::SetActiveState(GUID_NULL, description);
 
-				auto frames_ctx = (AVHWFramesContext*)hw_frame->hw_frames_ctx->data;
 				if (frames_ctx->format == AV_PIX_FMT_CUDA) {
 					auto device_hwctx = reinterpret_cast<AVHWDeviceContext*>(frames_ctx->device_ctx);
 					auto cuda_hwctx = reinterpret_cast<AVCUDADeviceContext*>(device_hwctx->hwctx);
