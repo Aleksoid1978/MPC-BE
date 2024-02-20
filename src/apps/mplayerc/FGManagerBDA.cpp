@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -595,17 +595,19 @@ STDMETHODIMP CFGManagerBDA::Enable(long lIndex, DWORD dwFlags)
 
 	if (pChannel) {
 		if (lIndex>=0 && lIndex < pChannel->GetAudioCount()) {
-			pStreamInfo	= pChannel->GetAudio(lIndex);
-			pStream		= &m_DVBStreams[pStreamInfo->Type];
-			if (pStream && pStreamInfo) {
-				nState = GetState();
-				if (m_nCurAudioType != pStreamInfo->Type) {
-					SwitchStream (m_nCurAudioType, pStreamInfo->Type);
-				}
-				pStream->Map (pStreamInfo->PID);
-				ChangeState ((FILTER_STATE)nState);
+			pStreamInfo = pChannel->GetAudio(lIndex);
+			if (pStreamInfo) {
+				pStream = &m_DVBStreams[pStreamInfo->Type];
+				if (pStream) {
+					nState = GetState();
+					if (m_nCurAudioType != pStreamInfo->Type) {
+						SwitchStream(m_nCurAudioType, pStreamInfo->Type);
+					}
+					pStream->Map(pStreamInfo->PID);
+					ChangeState((FILTER_STATE)nState);
 
-				hr = S_OK;
+					hr = S_OK;
+				}
 			}
 		} else if (lIndex > 0 && lIndex < pChannel->GetAudioCount()+pChannel->GetSubtitleCount()) {
 			pStreamInfo	= pChannel->GetSubtitle(lIndex-pChannel->GetAudioCount());
