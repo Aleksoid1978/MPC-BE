@@ -3574,6 +3574,19 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 						if (frames_ctx->sw_format == AV_PIX_FMT_YUV444P || frames_ctx->sw_format == AV_PIX_FMT_YUV444P16) {
 							codec.Append(L" 444");
 						}
+					} else if (m_bUseD3D11cb) {
+						switch (frames_ctx->sw_format) {
+							case AV_PIX_FMT_YUYV422:
+							case AV_PIX_FMT_Y210:
+							case AV_PIX_FMT_Y212:
+								codec.Append(L" 422");
+								break;
+							case AV_PIX_FMT_VUYX:
+							case AV_PIX_FMT_XV30:
+							case AV_PIX_FMT_XV36:
+								codec.Append(L" 444");
+								break;
+						}
 					}
 
 					const int depth = GetLumaBits(m_pAVCtx->sw_pix_fmt);
