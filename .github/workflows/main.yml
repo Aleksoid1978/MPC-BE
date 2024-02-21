@@ -43,7 +43,7 @@ jobs:
           .\\build.bat Clean All
         shell: pwsh
 
-      - name: Build MPC-BE and standalone filters
+      - name: Build MPC-BE
         run: |
           .\\build.bat Build Packages
         shell: pwsh
