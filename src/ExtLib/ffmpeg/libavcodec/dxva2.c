@@ -719,7 +719,7 @@ int ff_dxva2_common_frame_params(AVCodecContext *avctx,
     /*
     frames_ctx->sw_format = avctx->sw_pix_fmt == AV_PIX_FMT_YUV420P10 ?
                             AV_PIX_FMT_P010 : AV_PIX_FMT_NV12;
-                            */
+    */
     frames_ctx->sw_format = map_sw_pix_format(avctx->sw_pix_fmt, frames_ctx->format);
     // ==> End patch MPC
 

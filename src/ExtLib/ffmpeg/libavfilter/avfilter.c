@@ -36,12 +36,12 @@
 
 #include "audio.h"
 #include "avfilter.h"
+#include "avfilter_internal.h"
 #include "filters.h"
 #include "formats.h"
 #include "framequeue.h"
 #include "framepool.h"
 #include "internal.h"
-#include "link_internal.h"
 #include "video.h"
 
 static void tlog_ref(void *ctx, AVFrame *ref, int end)
@@ -159,7 +159,7 @@ int avfilter_link(AVFilterContext *src, unsigned srcpad,
         src->outputs[srcpad]      || dst->inputs[dstpad])
         return AVERROR(EINVAL);
 
-    if (!src->internal->initialized || !dst->internal->initialized) {
+    if (!fffilterctx(src)->initialized || !fffilterctx(dst)->initialized) {
         av_log(src, AV_LOG_ERROR, "Filters must be initialized before linking.\n");
         return AVERROR(EINVAL);
     }
@@ -187,7 +187,7 @@ int avfilter_link(AVFilterContext *src, unsigned srcpad,
     av_assert0(AV_PIX_FMT_NONE == -1 && AV_SAMPLE_FMT_NONE == -1);
     link->format  = -1;
     link->colorspace = AVCOL_SPC_UNSPECIFIED;
-    ff_framequeue_init(&li->fifo, &src->graph->internal->frame_queues);
+    ff_framequeue_init(&li->fifo, &fffiltergraph(src->graph)->frame_queues);
 
     return 0;
 }
@@ -201,21 +201,23 @@ void avfilter_link_free(AVFilterLink **link)
     li = ff_link_internal(*link);
 
     ff_framequeue_free(&li->fifo);
-    ff_frame_pool_uninit((FFFramePool**)&(*link)->frame_pool);
+    ff_frame_pool_uninit(&li->frame_pool);
     av_channel_layout_uninit(&(*link)->ch_layout);
 
     av_freep(link);
 }
 
-static void update_link_current_pts(AVFilterLink *link, int64_t pts)
+static void update_link_current_pts(FilterLinkInternal *li, int64_t pts)
 {
+    AVFilterLink *const link = &li->l;
+
     if (pts == AV_NOPTS_VALUE)
         return;
     link->current_pts = pts;
     link->current_pts_us = av_rescale_q(pts, link->time_base, AV_TIME_BASE_Q);
     /* TODO use duration */
-    if (link->graph && link->age_index >= 0)
-        ff_avfilter_graph_update_heap(link->graph, link);
+    if (link->graph && li->age_index >= 0)
+        ff_avfilter_graph_update_heap(link->graph, li);
 }
 
 void ff_filter_set_ready(AVFilterContext *filter, unsigned priority)
@@ -265,7 +267,7 @@ static void link_set_out_status(AVFilterLink *link, int status, int64_t pts)
     av_assert0(!li->status_out);
     li->status_out = status;
     if (pts != AV_NOPTS_VALUE)
-        update_link_current_pts(link, pts);
+        update_link_current_pts(li, pts);
     filter_unblock(link->dst);
     ff_filter_set_ready(link->src, 200);
 }
@@ -322,6 +324,7 @@ int avfilter_config_links(AVFilterContext *filter)
     for (i = 0; i < filter->nb_inputs; i ++) {
         AVFilterLink *link = filter->inputs[i];
         AVFilterLink *inlink;
+        FilterLinkInternal *li = ff_link_internal(link);
 
         if (!link) continue;
         if (!link->src || !link->dst) {
@@ -334,14 +337,14 @@ int avfilter_config_links(AVFilterContext *filter)
         link->current_pts =
         link->current_pts_us = AV_NOPTS_VALUE;
 
-        switch (link->init_state) {
+        switch (li->init_state) {
         case AVLINK_INIT:
             continue;
         case AVLINK_STARTINIT:
             av_log(filter, AV_LOG_INFO, "circular filter chain detected\n");
             return 0;
         case AVLINK_UNINIT:
-            link->init_state = AVLINK_STARTINIT;
+            li->init_state = AVLINK_STARTINIT;
 
             if ((ret = avfilter_config_links(link->src)) < 0)
                 return ret;
@@ -412,7 +415,7 @@ int avfilter_config_links(AVFilterContext *filter)
                     return ret;
                 }
 
-            link->init_state = AVLINK_INIT;
+            li->init_state = AVLINK_INIT;
         }
     }
 
@@ -668,15 +671,17 @@ static int default_execute(AVFilterContext *ctx, avfilter_action_func *func, voi
 
 AVFilterContext *ff_filter_alloc(const AVFilter *filter, const char *inst_name)
 {
+    FFFilterContext *ctx;
     AVFilterContext *ret;
     int preinited = 0;
 
     if (!filter)
         return NULL;
 
-    ret = av_mallocz(sizeof(AVFilterContext));
-    if (!ret)
+    ctx = av_mallocz(sizeof(*ctx));
+    if (!ctx)
         return NULL;
+    ret = &ctx->p;
 
     ret->av_class = &avfilter_class;
     ret->filter   = filter;
@@ -698,10 +703,7 @@ AVFilterContext *ff_filter_alloc(const AVFilter *filter, const char *inst_name)
         av_opt_set_defaults(ret->priv);
     }
 
-    ret->internal = av_mallocz(sizeof(*ret->internal));
-    if (!ret->internal)
-        goto err;
-    ret->internal->execute = default_execute;
+    ctx->execute = default_execute;
 
     ret->nb_inputs  = filter->nb_inputs;
     if (ret->nb_inputs ) {
@@ -735,7 +737,6 @@ err:
     av_freep(&ret->output_pads);
     ret->nb_outputs = 0;
     av_freep(&ret->priv);
-    av_freep(&ret->internal);
     av_free(ret);
     return NULL;
 }
@@ -807,7 +808,6 @@ void avfilter_free(AVFilterContext *filter)
     av_expr_free(filter->enable);
     filter->enable = NULL;
     av_freep(&filter->var_values);
-    av_freep(&filter->internal);
     av_free(filter);
 }
 
@@ -891,9 +891,10 @@ int ff_filter_process_command(AVFilterContext *ctx, const char *cmd,
 
 int avfilter_init_dict(AVFilterContext *ctx, AVDictionary **options)
 {
+    FFFilterContext *ctxi = fffilterctx(ctx);
     int ret = 0;
 
-    if (ctx->internal->initialized) {
+    if (ctxi->initialized) {
         av_log(ctx, AV_LOG_ERROR, "Filter already initialized\n");
         return AVERROR(EINVAL);
     }
@@ -906,9 +907,9 @@ int avfilter_init_dict(AVFilterContext *ctx, AVDictionary **options)
 
     if (ctx->filter->flags & AVFILTER_FLAG_SLICE_THREADS &&
         ctx->thread_type & ctx->graph->thread_type & AVFILTER_THREAD_SLICE &&
-        ctx->graph->internal->thread_execute) {
+        fffiltergraph(ctx->graph)->thread_execute) {
         ctx->thread_type       = AVFILTER_THREAD_SLICE;
-        ctx->internal->execute = ctx->graph->internal->thread_execute;
+        ctxi->execute    = fffiltergraph(ctx->graph)->thread_execute;
     } else {
         ctx->thread_type = 0;
     }
@@ -924,7 +925,7 @@ int avfilter_init_dict(AVFilterContext *ctx, AVDictionary **options)
             return ret;
     }
 
-    ctx->internal->initialized = 1;
+    ctxi->initialized = 1;
 
     return 0;
 }
@@ -1393,7 +1394,7 @@ int ff_inlink_acknowledge_status(AVFilterLink *link, int *rstatus, int64_t *rpts
     if (!li->status_in)
         return *rstatus = 0;
     *rstatus = li->status_out = li->status_in;
-    update_link_current_pts(link, li->status_in_pts);
+    update_link_current_pts(li, li->status_in_pts);
     *rpts = link->current_pts;
     return 1;
 }
@@ -1424,9 +1425,10 @@ int ff_inlink_check_available_samples(AVFilterLink *link, unsigned min)
     return samples >= min || (li->status_in && samples);
 }
 
-static void consume_update(AVFilterLink *link, const AVFrame *frame)
+static void consume_update(FilterLinkInternal *li, const AVFrame *frame)
 {
-    update_link_current_pts(link, frame->pts);
+    AVFilterLink *const link = &li->l;
+    update_link_current_pts(li, frame->pts);
     ff_inlink_process_commands(link, frame);
     link->dst->is_disabled = !ff_inlink_evaluate_timeline_at_frame(link, frame);
     link->frame_count_out++;
@@ -1448,7 +1450,7 @@ int ff_inlink_consume_frame(AVFilterLink *link, AVFrame **rframe)
     }
 
     frame = ff_framequeue_take(&li->fifo);
-    consume_update(link, frame);
+    consume_update(li, frame);
     *rframe = frame;
     return 1;
 }
@@ -1469,7 +1471,7 @@ int ff_inlink_consume_samples(AVFilterLink *link, unsigned min, unsigned max,
     ret = take_samples(li, min, max, &frame);
     if (ret < 0)
         return ret;
-    consume_update(link, frame);
+    consume_update(li, frame);
     *rframe = frame;
     return 1;
 }

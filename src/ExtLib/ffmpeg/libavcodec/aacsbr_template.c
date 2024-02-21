@@ -927,7 +927,7 @@ static void read_sbr_extension(AACContext *ac, SpectralBandReplication *sbr,
     switch (bs_extension_id) {
     case EXTENSION_ID_PS:
         if (!ac->oc[1].m4ac.ps) {
-            av_log(ac->avctx, AV_LOG_ERROR, "Parametric Stereo signaled to be not-present but was found in the bitstream, force stereo output.\n");
+            av_log(ac->avctx, AV_LOG_ERROR, "Parametric Stereo signaled to be not-present but was found in the bitstream.\n");
             // ==> Start patch MPC
             *num_bits_left -= ff_ps_read_data(ac->avctx, gb, &sbr->ps.common, *num_bits_left);
             ac->avctx->profile = AV_PROFILE_AAC_HE_V2;

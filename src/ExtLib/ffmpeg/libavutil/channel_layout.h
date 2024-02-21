@@ -119,7 +119,7 @@ enum AVChannelOrder {
     /**
      * The channel order does not correspond to any other predefined order and
      * is stored as an explicit map. For example, this could be used to support
-     * layouts with 64 or more channels, or with empty/skipped (AV_CHAN_SILENCE)
+     * layouts with 64 or more channels, or with empty/skipped (AV_CHAN_UNUSED)
      * channels at arbitrary positions.
      */
     AV_CHANNEL_ORDER_CUSTOM,
@@ -146,6 +146,10 @@ enum AVChannelOrder {
      * as defined in AmbiX format $ 2.1.
      */
     AV_CHANNEL_ORDER_AMBISONIC,
+    /**
+     * Number of channel orders, not part of ABI/API
+     */
+    FF_CHANNEL_ORDER_NB
 };
 
 

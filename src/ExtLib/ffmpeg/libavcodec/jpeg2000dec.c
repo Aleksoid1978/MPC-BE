@@ -489,7 +489,7 @@ static int get_cox(Jpeg2000DecoderContext *s, Jpeg2000CodingStyle *c)
 
 /* get coding parameters for a particular tile or whole image*/
 static int get_cod(Jpeg2000DecoderContext *s, Jpeg2000CodingStyle *c,
-                   uint8_t *properties)
+                   const uint8_t *properties)
 {
     Jpeg2000CodingStyle tmp;
     int compno, ret;
@@ -639,7 +639,7 @@ static int get_qcx(Jpeg2000DecoderContext *s, int n, Jpeg2000QuantStyle *q)
 
 /* Get quantization parameters for a particular tile or a whole image. */
 static int get_qcd(Jpeg2000DecoderContext *s, int n, Jpeg2000QuantStyle *q,
-                   uint8_t *properties)
+                   const uint8_t *properties)
 {
     Jpeg2000QuantStyle tmp;
     int compno, ret;
@@ -886,8 +886,8 @@ static int get_ppm(Jpeg2000DecoderContext *s, int n)
         return AVERROR(ENOMEM);
     s->has_ppm = 1;
     memset(&s->packed_headers_stream, 0, sizeof(s->packed_headers_stream));
-    bytestream_get_buffer(&s->g.buffer, s->packed_headers + s->packed_headers_size,
-                          n - 3);
+    bytestream2_get_bufferu(&s->g, s->packed_headers + s->packed_headers_size,
+                            n - 3);
     s->packed_headers_size += n - 3;
 
     return 0;
@@ -921,10 +921,8 @@ static int get_ppt(Jpeg2000DecoderContext *s, int n)
     } else
         return AVERROR(ENOMEM);
     memset(&tile->packed_headers_stream, 0, sizeof(tile->packed_headers_stream));
-    memcpy(tile->packed_headers + tile->packed_headers_size,
-           s->g.buffer, n - 3);
+    bytestream2_get_bufferu(&s->g, tile->packed_headers + tile->packed_headers_size, n - 3);
     tile->packed_headers_size += n - 3;
-    bytestream2_skip(&s->g, n - 3);
 
     return 0;
 }
@@ -1004,7 +1002,7 @@ static int getlblockinc(Jpeg2000DecoderContext *s)
     return res;
 }
 
-static inline void select_header(Jpeg2000DecoderContext *s, Jpeg2000Tile *tile,
+static inline void select_header(Jpeg2000DecoderContext *s, const Jpeg2000Tile *tile,
                                  int *tp_index)
 {
     s->g = tile->tile_part[*tp_index].header_tpg;
@@ -1015,8 +1013,8 @@ static inline void select_header(Jpeg2000DecoderContext *s, Jpeg2000Tile *tile,
     }
 }
 
-static inline void select_stream(Jpeg2000DecoderContext *s, Jpeg2000Tile *tile,
-                                 int *tp_index, Jpeg2000CodingStyle *codsty)
+static inline void select_stream(Jpeg2000DecoderContext *s, const Jpeg2000Tile *tile,
+                                 int *tp_index, const Jpeg2000CodingStyle *codsty)
 {
     s->g = tile->tile_part[*tp_index].tpg;
     if (bytestream2_get_bytes_left(&s->g) == 0 && s->bit_index == 8) {
@@ -1033,9 +1031,9 @@ static inline void select_stream(Jpeg2000DecoderContext *s, Jpeg2000Tile *tile,
 }
 
 static int jpeg2000_decode_packet(Jpeg2000DecoderContext *s, Jpeg2000Tile *tile, int *tp_index,
-                                  Jpeg2000CodingStyle *codsty,
+                                  const Jpeg2000CodingStyle *codsty,
                                   Jpeg2000ResLevel *rlevel, int precno,
-                                  int layno, uint8_t *expn, int numgbits)
+                                  int layno, const uint8_t *expn, int numgbits)
 {
     int bandno, cblkno, ret, nb_code_blocks;
     int cwsno;

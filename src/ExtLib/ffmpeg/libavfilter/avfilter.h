@@ -611,13 +611,6 @@ struct AVFilterLink {
      */
     AVFilterFormatsConfig outcfg;
 
-    /** stage of the initialization of the link properties (dimensions, etc) */
-    enum {
-        AVLINK_UNINIT = 0,      ///< not started
-        AVLINK_STARTINIT,       ///< started, but incomplete
-        AVLINK_INIT             ///< complete
-    } init_state;
-
     /**
      * Graph the filter belongs to.
      */
@@ -634,11 +627,6 @@ struct AVFilterLink {
      * frame(s), in AV_TIME_BASE units.
      */
     int64_t current_pts_us;
-
-    /**
-     * Index in the age array.
-     */
-    int age_index;
 
     /**
      * Frame rate of the stream on the link, or 1/0 if unknown or variable;
@@ -677,11 +665,6 @@ struct AVFilterLink {
      * Number of past samples sent through the link.
      */
     int64_t sample_count_in, sample_count_out;
-
-    /**
-     * A pointer to a FFFramePool struct.
-     */
-    void *frame_pool;
 
     /**
      * True if a frame is currently wanted on the output of this filter.
@@ -899,18 +882,6 @@ typedef struct AVFilterGraph {
     avfilter_execute_func *execute;
 
     char *aresample_swr_opts; ///< swr options to use for the auto-inserted aresample filters, Access ONLY through AVOptions
-
-    /**
-     * Private fields
-     *
-     * The following fields are for internal use only.
-     * Their type, offset, number and semantic can change without notice.
-     */
-
-    AVFilterLink **sink_links;
-    int sink_links_count;
-
-    unsigned disable_auto_convert;
 } AVFilterGraph;
 
 /**
