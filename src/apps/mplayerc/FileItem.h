@@ -96,8 +96,9 @@ public:
 	};
 
 	// Chapters
-	void AddChapter(const Chapters& chapter) {
-		m_chapters.emplace_back(chapter);
+	template<class... Args>
+	void AddChapter(Args&&... args) {
+		m_chapters.emplace_back(args ...);
 	}
 
 	void ClearChapter() {
