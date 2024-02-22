@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2023 see Authors.txt
+ * (C) 2016-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -99,6 +99,7 @@ namespace Content {
 		CString ct;
 		CString body;
 		CString hdr;
+		CString realPath;
 	};
 	static std::map<CString, Content> Contents;
 
@@ -146,6 +147,7 @@ namespace Content {
 
 			CString realPath(fn);
 			CorrectAceStream(realPath);
+			content.realPath = realPath;
 
 			content.bHTTPConnected = (content.HTTPAsync->Connect(realPath, AfxGetAppSettings().iNetworkTimeout * 1000, L"Icy-MetaData: 1\r\n") == S_OK);
 			content.hdr = content.HTTPAsync->GetHeader();
@@ -471,7 +473,10 @@ namespace Content {
 
 		void GetRaw(const CString& fn, std::vector<BYTE>& raw)
 		{
-			auto it = Contents.find(fn);
+			auto it = std::find_if(Contents.begin(), Contents.end(), [&fn](const auto& pair) {
+				return pair.first == fn || pair.second.realPath == fn;
+			});
+
 			if (it != Contents.end()) {
 				auto& content = it->second;
 				raw = content.raw;
