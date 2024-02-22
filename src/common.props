@@ -19,6 +19,7 @@
       <DisableSpecificWarnings Condition="'$(Platform)'=='x64'">4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PreprocessorDefinitions>_WINDOWS;WINDOWS;WINVER=0x0A00;_WIN32_WINNT=0x0A00;_WIN32_IE=0x0800;PSAPI_VERSION=1;_USE_MATH_DEFINES;__STDC_CONSTANT_MACROS;_HAS_STD_BYTE=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(NOMINMAX)'!='False'">NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
