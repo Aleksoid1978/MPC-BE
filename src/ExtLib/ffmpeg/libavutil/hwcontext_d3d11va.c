@@ -404,11 +404,36 @@ static void fill_texture_ptrs(uint8_t *data[4], int linesize[4],
                               D3D11_TEXTURE2D_DESC *desc,
                               D3D11_MAPPED_SUBRESOURCE *map)
 {
+// ==> Start patch MPC
+    /*
     int i;
 
     for (i = 0; i < 4; i++)
         linesize[i] = map->RowPitch;
+    */
+    int width;
+    int codedbytes = 1;
 
+    switch (ctx->sw_format) {
+    case AV_PIX_FMT_P010:
+    case AV_PIX_FMT_P016:
+    case AV_PIX_FMT_YUYV422:
+        codedbytes = 2;
+        break;
+    case AV_PIX_FMT_Y210:
+    case AV_PIX_FMT_Y212:
+    case AV_PIX_FMT_VUYX:
+    case AV_PIX_FMT_XV30:
+        codedbytes = 4;
+        break;
+    case AV_PIX_FMT_XV36:
+        codedbytes = 8;
+        break;
+    }
+
+    width = map->RowPitch / codedbytes;
+    av_image_fill_linesizes(linesize, ctx->sw_format, width);
+// ==> End patch MPC
     av_image_fill_pointers(data, ctx->sw_format, desc->Height,
                            (uint8_t*)map->pData, linesize);
 }

@@ -62,7 +62,9 @@ static int d3d12va_hevc_start_frame(AVCodecContext *avctx, av_unused const uint8
 
     ctx->used_mask = 0;
 
-    ff_dxva2_hevc_fill_picture_parameters(avctx, (AVDXVAContext *)ctx, &ctx_pic->pp);
+    // ==> Start patch MPC
+    ff_dxva2_hevc_fill_picture_parameters(avctx, (AVDXVAContext *)ctx, (DXVA_PicParams_HEVC_Rext*)&ctx_pic->pp);
+    // ==> End patch MPC
 
     ff_dxva2_hevc_fill_scaling_lists(avctx, (AVDXVAContext *)ctx, &ctx_pic->qm);
 
