@@ -307,7 +307,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 24		"Usa descrizione comando sul tempo:"
 26		"Usa l'anteprima nella ricerca"
 27		"Dimensioni relative alla larghezza dello schermo:"
-31		"Online"
+31		"In linea"
 32		"Usa marcatore capitoli"
 33		"Usa la flybar"
 34		"Dimensione carattere playlist:"
