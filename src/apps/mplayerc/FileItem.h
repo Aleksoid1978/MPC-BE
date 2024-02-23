@@ -98,7 +98,7 @@ public:
 	// Chapters
 	template<class... Args>
 	void AddChapter(Args&&... args) {
-		m_chapters.emplace_back(args ...);
+		m_chapters.emplace_back(std::forward<Args>(args)...);
 	}
 
 	void ClearChapter() {
