@@ -262,11 +262,11 @@ void ff_vvc_set_mvf(const VVCLocalContext *lc, const int x0, const int y0, const
     }
 }
 
-void ff_vvc_set_intra_mvf(const VVCLocalContext *lc)
+void ff_vvc_set_intra_mvf(const VVCLocalContext *lc, const int dmvr)
 {
     const VVCFrameContext *fc   = lc->fc;
     const CodingUnit *cu        = lc->cu;
-    MvField *tab_mvf            = fc->tab.mvf;
+    MvField *tab_mvf            = dmvr ? fc->ref->tab_dmvr_mvf : fc->tab.mvf;
     const int min_pu_width      = fc->ps.pps->min_pu_width;
     const int min_pu_size       = 1 << MIN_PU_LOG2;
     for (int dy = 0; dy < cu->cb_height; dy += min_pu_size) {
@@ -589,7 +589,12 @@ static void init_neighbour_context(NeighbourContext *ctx, const VVCLocalContext 
     ctx->lc = lc;
 }
 
-static int check_available(Neighbour *n, const VVCLocalContext *lc, const int is_mvp)
+static av_always_inline PredMode pred_flag_to_mode(PredFlag pred)
+{
+    return pred == PF_IBC ? MODE_IBC : (pred == PF_INTRA ? MODE_INTRA : MODE_INTER);
+}
+
+static int check_available(Neighbour *n, const VVCLocalContext *lc, const int check_mer)
 {
     const VVCFrameContext *fc   = lc->fc;
     const VVCSPS *sps           = fc->ps.sps;
@@ -600,8 +605,8 @@ static int check_available(Neighbour *n, const VVCLocalContext *lc, const int is
     if (!n->checked) {
         n->checked = 1;
         n->available = !sps->r->sps_entropy_coding_sync_enabled_flag || ((n->x >> sps->ctb_log2_size_y) <= (cu->x0 >> sps->ctb_log2_size_y));
-        n->available &= TAB_MVF(n->x, n->y).pred_flag != PF_INTRA;
-        if (!is_mvp)
+        n->available &= cu->pred_mode == pred_flag_to_mode(TAB_MVF(n->x, n->y).pred_flag);
+        if (check_mer)
             n->available &= !is_same_mer(fc, n->x, n->y, cu->x0, cu->y0);
     }
     return n->available;
@@ -620,10 +625,9 @@ static const MvField *mv_merge_candidate(const VVCLocalContext *lc, const int x_
 static const MvField* mv_merge_from_nb(NeighbourContext *ctx, const NeighbourIdx nb)
 {
     const VVCLocalContext *lc   = ctx->lc;
-    const int is_mvp            = 0;
     Neighbour *n                = &ctx->neighbours[nb];
 
-    if (check_available(n, lc, is_mvp))
+    if (check_available(n, lc, 1))
         return mv_merge_candidate(lc, n->x, n->y);
     return 0;
 }
@@ -943,10 +947,9 @@ static int affine_merge_candidate(const VVCLocalContext *lc, const int x_cand, c
 static int affine_merge_from_nbs(NeighbourContext *ctx, const NeighbourIdx *nbs, const int num_nbs, MotionInfo* cand)
 {
     const VVCLocalContext *lc = ctx->lc;
-    const int is_mvp          = 0;
     for (int i = 0; i < num_nbs; i++) {
         Neighbour *n = &ctx->neighbours[nbs[i]];
-        if (check_available(n, lc, is_mvp) && affine_merge_candidate(lc, n->x, n->y, cand))
+        if (check_available(n, lc, 1) && affine_merge_candidate(lc, n->x, n->y, cand))
             return 1;
     }
     return 0;
@@ -961,7 +964,7 @@ static const MvField* derive_corner_mvf(NeighbourContext *ctx, const NeighbourId
     const int min_pu_width      = fc->ps.pps->min_pu_width;
     for (int i = 0; i < num_neighbour; i++) {
         Neighbour *n = &ctx->neighbours[neighbour[i]];
-        if (check_available(n, ctx->lc, 0)) {
+        if (check_available(n, ctx->lc, 1)) {
             return &TAB_MVF(n->x, n->y);
         }
     }
@@ -1461,12 +1464,11 @@ static int mvp_from_nbs(NeighbourContext *ctx,
     Mv *cps, const int num_cps)
 {
     const VVCLocalContext *lc   = ctx->lc;
-    const int is_mvp            = 1;
     int available               = 0;
 
     for (int i = 0; i < num_nbs; i++) {
         Neighbour *n = &ctx->neighbours[nbs[i]];
-        if (check_available(n, lc, is_mvp)) {
+        if (check_available(n, lc, 0)) {
             if (num_cps > 1)
                 available = affine_mvp_candidate(lc, n->x, n->y, lx, ref_idx, cps, num_cps);
             else
@@ -1592,6 +1594,112 @@ void ff_vvc_mvp(VVCLocalContext *lc, const int *mvp_lx_flag, const int amvr_shif
         mvp(lc, mvp_lx_flag[L1], L1, mi->ref_idx, amvr_shift, &mi->mv[L1][0]);
 }
 
+static int ibc_spatial_candidates(const VVCLocalContext *lc, const int merge_idx, Mv *const cand_list, int *nb_merge_cand)
+{
+    const CodingUnit *cu      = lc->cu;
+    const VVCFrameContext *fc = lc->fc;
+    const int min_pu_width    = fc->ps.pps->min_pu_width;
+    const MvField *tab_mvf    = fc->tab.mvf;
+    const int is_gt4by4       = (cu->cb_width * cu->cb_height) > 16;
+    int num_cands             = 0;
+
+    NeighbourContext nctx;
+    Neighbour *a1 = &nctx.neighbours[A1];
+    Neighbour *b1 = &nctx.neighbours[B1];
+
+    if (!is_gt4by4) {
+        *nb_merge_cand = 0;
+        return 0;
+    }
+
+    init_neighbour_context(&nctx, lc);
+
+    if (check_available(a1, lc, 1)) {
+        cand_list[num_cands++] = TAB_MVF(a1->x, a1->y).mv[L0];
+        if (num_cands > merge_idx)
+            return 1;
+    }
+    if (check_available(b1, lc, 1)) {
+        const MvField *mvf = &TAB_MVF(b1->x, b1->y);
+        if (!num_cands || !IS_SAME_MV(&cand_list[0], mvf->mv)) {
+            cand_list[num_cands++] = mvf->mv[L0];
+            if (num_cands > merge_idx)
+                return 1;
+        }
+    }
+
+    *nb_merge_cand = num_cands;
+    return 0;
+}
+
+static int ibc_history_candidates(const VVCLocalContext *lc,
+    const int merge_idx, Mv *cand_list, int *nb_merge_cand)
+{
+    const CodingUnit *cu = lc->cu;
+    const EntryPoint *ep = lc->ep;
+    const int is_gt4by4  = (cu->cb_width * cu->cb_height) > 16;
+    int num_cands        = *nb_merge_cand;
+
+    for (int i = 1; i <= ep->num_hmvp_ibc; i++) {
+        int same_motion = 0;
+        const MvField *mvf = &ep->hmvp_ibc[ep->num_hmvp_ibc - i];
+        for (int j = 0; j < *nb_merge_cand; j++) {
+            same_motion = is_gt4by4 && i == 1 && IS_SAME_MV(&mvf->mv[L0], &cand_list[j]);
+            if (same_motion)
+                break;
+        }
+        if (!same_motion) {
+            cand_list[num_cands++] = mvf->mv[L0];
+            if (num_cands > merge_idx)
+                return 1;
+        }
+    }
+
+    *nb_merge_cand = num_cands;
+    return 0;
+}
+
+#define MV_BITS 18
+#define IBC_SHIFT(v) ((v) >= (1 << (MV_BITS - 1)) ? ((v) - (1 << MV_BITS)) : (v))
+
+static inline void ibc_add_mvp(Mv *mv, Mv *mvp, const int amvr_shift)
+{
+    ff_vvc_round_mv(mv, amvr_shift, 0);
+    ff_vvc_round_mv(mvp, amvr_shift, amvr_shift);
+    mv->x = IBC_SHIFT(mv->x + mvp->x);
+    mv->y = IBC_SHIFT(mv->y + mvp->y);
+}
+
+static void ibc_merge_candidates(VVCLocalContext *lc, const int merge_idx, Mv *mv)
+{
+    const CodingUnit *cu = lc->cu;
+    LOCAL_ALIGNED_8(Mv, cand_list, [MRG_MAX_NUM_CANDS]);
+    int nb_cands;
+
+    ff_vvc_set_neighbour_available(lc, cu->x0, cu->y0, cu->cb_width, cu->cb_height);
+    if (ibc_spatial_candidates(lc, merge_idx, cand_list, &nb_cands) ||
+        ibc_history_candidates(lc, merge_idx, cand_list, &nb_cands)) {
+        *mv = cand_list[merge_idx];
+        return;
+    }
+
+    //zero mv
+    memset(mv, 0, sizeof(*mv));
+}
+
+void ff_vvc_mvp_ibc(VVCLocalContext *lc, const int mvp_l0_flag, const int amvr_shift, Mv *mv)
+{
+    LOCAL_ALIGNED_8(Mv, mvp, [1]);
+
+    ibc_merge_candidates(lc, mvp_l0_flag, mvp);
+    ibc_add_mvp(mv, mvp, amvr_shift);
+}
+
+void ff_vvc_luma_mv_merge_ibc(VVCLocalContext *lc, const int merge_idx, Mv *mv)
+{
+    ibc_merge_candidates(lc, merge_idx, mv);
+}
+
 static int affine_mvp_constructed_cp(NeighbourContext *ctx,
     const NeighbourIdx *neighbour, const int num_neighbour,
     const int lx, const int8_t ref_idx, const int amvr_shift, Mv *cp)
@@ -1601,12 +1709,11 @@ static int affine_mvp_constructed_cp(NeighbourContext *ctx,
     const MvField *tab_mvf          = fc->tab.mvf;
     const int min_pu_width          = fc->ps.pps->min_pu_width;
     const RefPicList* rpl           = lc->sc->rpl;
-    const int is_mvp                = 1;
     int available                   = 0;
 
     for (int i = 0; i < num_neighbour; i++) {
         Neighbour *n = &ctx->neighbours[neighbour[i]];
-        if (check_available(n, ctx->lc, is_mvp)) {
+        if (check_available(n, ctx->lc, 0)) {
             const PredFlag maskx = lx + 1;
             const MvField* mvf = &TAB_MVF(n->x, n->y);
             const int poc = rpl[lx].list[ref_idx];
@@ -1758,34 +1865,49 @@ static av_always_inline int is_greater_mer(const VVCFrameContext *fc, const int 
            y0_br >> plevel > y0 >> plevel;
 }
 
+static void update_hmvp(MvField *hmvp, int *num_hmvp, const MvField *mvf,
+    int (*compare)(const MvField *n, const MvField *o))
+{
+    int i;
+    for (i = 0; i < *num_hmvp; i++) {
+        if (compare(mvf, hmvp + i)) {
+            (*num_hmvp)--;
+            break;
+        }
+    }
+    if (i == MAX_NUM_HMVP_CANDS) {
+        (*num_hmvp)--;
+        i = 0;
+    }
+
+    memmove(hmvp + i, hmvp + i + 1, (*num_hmvp - i) * sizeof(MvField));
+    hmvp[(*num_hmvp)++] = *mvf;
+}
+
+static int compare_l0_mv(const MvField *n, const MvField *o)
+{
+    return IS_SAME_MV(&n->mv[L0], &o->mv[L0]);
+}
+
+//8.6.2.4 Derivation process for IBC history-based block vector candidates
 //8.5.2.16 Updating process for the history-based motion vector predictor candidate list
 void ff_vvc_update_hmvp(VVCLocalContext *lc, const MotionInfo *mi)
 {
     const VVCFrameContext *fc   = lc->fc;
     const CodingUnit *cu        = lc->cu;
     const int min_pu_width      = fc->ps.pps->min_pu_width;
-    const MvField* tab_mvf      = fc->tab.mvf;
-    EntryPoint* ep              = lc->ep;
-    const MvField *mvf;
-    int i;
+    const MvField *tab_mvf      = fc->tab.mvf;
+    EntryPoint *ep              = lc->ep;
 
-    if (!is_greater_mer(fc, cu->x0, cu->y0, cu->x0 + cu->cb_width, cu->y0 + cu->cb_height))
-        return;
-    mvf = &TAB_MVF(cu->x0, cu->y0);
-
-    for (i = 0; i < ep->num_hmvp; i++) {
-        if (compare_mv_ref_idx(mvf, ep->hmvp + i)) {
-            ep->num_hmvp--;
-            break;
-        }
+    if (cu->pred_mode == MODE_IBC) {
+        if (cu->cb_width * cu->cb_height <= 16)
+            return;
+        update_hmvp(ep->hmvp_ibc, &ep->num_hmvp_ibc, &TAB_MVF(cu->x0, cu->y0), compare_l0_mv);
+    } else {
+        if (!is_greater_mer(fc, cu->x0, cu->y0, cu->x0 + cu->cb_width, cu->y0 + cu->cb_height))
+            return;
+        update_hmvp(ep->hmvp, &ep->num_hmvp, &TAB_MVF(cu->x0, cu->y0), compare_mv_ref_idx);
     }
-    if (i == MAX_NUM_HMVP_CANDS) {
-        ep->num_hmvp--;
-        i = 0;
-    }
-
-    memmove(ep->hmvp + i, ep->hmvp + i + 1, (ep->num_hmvp - i) * sizeof(MvField));
-    ep->hmvp[ep->num_hmvp++] = *mvf;
 }
 
 MvField* ff_vvc_get_mvf(const VVCFrameContext *fc, const int x0, const int y0)

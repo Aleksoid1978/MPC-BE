@@ -1713,26 +1713,31 @@ static av_cold int sws_init_single_context(SwsContext *c, SwsFilter *srcFilter,
     if (unscaled && !usesHFilter && !usesVFilter &&
         c->alphablend != SWS_ALPHA_BLEND_NONE &&
         isALPHA(srcFormat) &&
+        (c->srcRange == c->dstRange || isAnyRGB(dstFormat)) &&
         alphaless_fmt(srcFormat) == dstFormat
     ) {
         c->convert_unscaled = ff_sws_alphablendaway;
 
         if (flags & SWS_PRINT_INFO)
             av_log(c, AV_LOG_INFO,
-                    "alpha blendaway %s -> %s special converter is available\n",
+                    "using alpha blendaway %s -> %s special converter\n",
                     av_get_pix_fmt_name(srcFormat), av_get_pix_fmt_name(dstFormat));
         return 0;
     }
 
     /* unscaled special cases */
-    if (unscaled && !usesHFilter && !usesVFilter) {
+    if (unscaled && !usesHFilter && !usesVFilter &&
+        (c->srcRange == c->dstRange || isAnyRGB(dstFormat) ||
+         isFloat(srcFormat) || isFloat(dstFormat) || isBayer(srcFormat))){
+
         ff_get_unscaled_swscale(c);
 
         if (c->convert_unscaled) {
             if (flags & SWS_PRINT_INFO)
                 av_log(c, AV_LOG_INFO,
-                       "unscaled %s -> %s special converter is available\n",
+                       "using unscaled %s -> %s special converter\n",
                        av_get_pix_fmt_name(srcFormat), av_get_pix_fmt_name(dstFormat));
+            return 0;
         }
     }
 
@@ -1885,7 +1890,7 @@ static av_cold int sws_init_single_context(SwsContext *c, SwsFilter *srcFilter,
     }
 
     for (i = 0; i < 4; i++)
-        if (!FF_ALLOCZ_TYPED_ARRAY(c->dither_error[i], c->dstW + 2))
+        if (!FF_ALLOCZ_TYPED_ARRAY(c->dither_error[i], c->dstW + 3))
             goto nomem;
 
     c->needAlpha = (CONFIG_SWSCALE_ALPHA && isALPHA(c->srcFormat) && isALPHA(c->dstFormat)) ? 1 : 0;
