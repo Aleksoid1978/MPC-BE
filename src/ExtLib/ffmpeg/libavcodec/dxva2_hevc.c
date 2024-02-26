@@ -89,7 +89,7 @@ void ff_dxva2_hevc_fill_picture_parameters(const AVCodecContext *avctx, AVDXVACo
                                         (sps->explicit_rdpcm_enabled_flag              <<  3) |
                                         (sps->extended_precision_processing_flag       <<  4) |
                                         (sps->intra_smoothing_disabled_flag            <<  5) |
-                                        (sps->high_precision_offsets_enabled_flag      <<  5) |
+                                        (sps->high_precision_offsets_enabled_flag      <<  6) |
                                         (sps->persistent_rice_adaptation_enabled_flag  <<  7) |
                                         (sps->cabac_bypass_alignment_enabled_flag      <<  8);
     }
