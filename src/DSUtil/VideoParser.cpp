@@ -1634,7 +1634,7 @@ namespace AVS3Parser {
 } // namespace AVS3Parser
 
 namespace VVCParser {
-	#define VVC_MAX_SLICES 600
+	#define VVC_MAX_SLICES 1000
 	#define VVC_MAX_SAMPLE_ARRAYS 3
 	#define VVC_MAX_POINTS_IN_QP_TABLE 111
 	#define VVC_MAX_REF_PIC_LISTS 64
@@ -1643,8 +1643,8 @@ namespace VVCParser {
 	#define VVC_MAX_DPB_SIZE 16
 	#define VVC_MAX_REF_ENTRIES (VVC_MAX_DPB_SIZE + 13)
 	#define VVC_MAX_CPB_CNT 32
-	#define VVC_MAX_WIDTH 16888
-	#define VVC_MAX_HEIGHT 16888
+	#define VVC_MAX_WIDTH 25332
+	#define VVC_MAX_HEIGHT 25332
 
 	struct H266RawNALUnitHeader {
 		uint8_t nuh_layer_id;
@@ -2555,7 +2555,7 @@ namespace VVCParser {
 
 		flag(sps_subpic_info_present_flag);
 		if (current->sps_subpic_info_present_flag) {
-			ue(sps_num_subpics_minus1, 1, VVC_MAX_SLICES - 1);
+			ue(sps_num_subpics_minus1, 0, VVC_MAX_SLICES - 1);
 			if (current->sps_num_subpics_minus1 > 0) {
 				flag(sps_independent_subpics_flag);
 				flag(sps_subpic_same_size_flag);
@@ -2642,26 +2642,26 @@ namespace VVCParser {
 						infer(sps_loop_filter_across_subpic_enabled_flag[i], 0);
 					}
 				}
-				ue(sps_subpic_id_len_minus1, 0, 15);
-				if ((1 << (current->sps_subpic_id_len_minus1 + 1)) <
-					current->sps_num_subpics_minus1 + 1) {
-					return false;
-				}
-				flag(sps_subpic_id_mapping_explicitly_signalled_flag);
-				if (current->sps_subpic_id_mapping_explicitly_signalled_flag) {
-					flag(sps_subpic_id_mapping_present_flag);
-					if (current->sps_subpic_id_mapping_present_flag) {
-						for (int i = 0; i <= current->sps_num_subpics_minus1; i++) {
-							ubs(current->sps_subpic_id_len_minus1 + 1,
-								sps_subpic_id[i], 1, static_cast<uint32_t>(i));
-						}
-					}
-				}
 			} else {
 				infer(sps_subpic_ctu_top_left_x[0], 0);
 				infer(sps_subpic_ctu_top_left_y[0], 0);
 				infer(sps_subpic_width_minus1[0], tmp_width_val - 1);
 				infer(sps_subpic_height_minus1[0], tmp_height_val - 1);
+			}
+			ue(sps_subpic_id_len_minus1, 0, 15);
+			if ((1 << (current->sps_subpic_id_len_minus1 + 1)) <
+				current->sps_num_subpics_minus1 + 1) {
+				return false;
+			}
+			flag(sps_subpic_id_mapping_explicitly_signalled_flag);
+			if (current->sps_subpic_id_mapping_explicitly_signalled_flag) {
+				flag(sps_subpic_id_mapping_present_flag);
+				if (current->sps_subpic_id_mapping_present_flag) {
+					for (int i = 0; i <= current->sps_num_subpics_minus1; i++) {
+						ubs(current->sps_subpic_id_len_minus1 + 1,
+							sps_subpic_id[i], 1, static_cast<uint32_t>(i));
+					}
+				}
 			}
 		} else {
 			infer(sps_num_subpics_minus1, 0);
