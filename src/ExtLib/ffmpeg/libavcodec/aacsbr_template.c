@@ -32,7 +32,9 @@
  * @author Zoran Basaric ( zoran.basaric@imgtec.com )
  */
 
+#include "aacdec.h"
 #include "aacdectab.h"
+#include "avcodec.h"
 #include "libavutil/qsort.h"
 
 static av_cold void aacsbr_tableinit(void)
@@ -62,7 +64,7 @@ static void sbr_turnoff(SpectralBandReplication *sbr) {
     memset(&sbr->spectrum_params, -1, sizeof(SpectrumParameters));
 }
 
-av_cold int AAC_RENAME(ff_aac_sbr_ctx_init)(AACContext *ac, SpectralBandReplication *sbr, int id_aac)
+av_cold int AAC_RENAME(ff_aac_sbr_ctx_init)(AACDecContext *ac, SpectralBandReplication *sbr, int id_aac)
 {
     int ret;
     float scale;
@@ -252,7 +254,7 @@ static int check_n_master(AVCodecContext *avctx, int n_master, int bs_xover_band
 }
 
 /// Master Frequency Band Table (14496-3 sp04 p194)
-static int sbr_make_f_master(AACContext *ac, SpectralBandReplication *sbr,
+static int sbr_make_f_master(AACDecContext *ac, SpectralBandReplication *sbr,
                              SpectrumParameters *spectrum)
 {
     unsigned int temp, max_qmf_subbands = 0;
@@ -472,7 +474,7 @@ static int sbr_make_f_master(AACContext *ac, SpectralBandReplication *sbr,
 }
 
 /// High Frequency Generation - Patch Construction (14496-3 sp04 p216 fig. 4.46)
-static int sbr_hf_calc_npatches(AACContext *ac, SpectralBandReplication *sbr)
+static int sbr_hf_calc_npatches(AACDecContext *ac, SpectralBandReplication *sbr)
 {
     int i, k, last_k = -1, last_msb = -1, sb = 0;
     int msb = sbr->k[0];
@@ -530,7 +532,7 @@ static int sbr_hf_calc_npatches(AACContext *ac, SpectralBandReplication *sbr)
 }
 
 /// Derived Frequency Band Tables (14496-3 sp04 p197)
-static int sbr_make_f_derived(AACContext *ac, SpectralBandReplication *sbr)
+static int sbr_make_f_derived(AACDecContext *ac, SpectralBandReplication *sbr)
 {
     int k, temp;
 #if USE_FIXED
@@ -615,7 +617,7 @@ static const int8_t ceil_log2[] = {
     0, 1, 2, 2, 3, 3,
 };
 
-static int read_sbr_grid(AACContext *ac, SpectralBandReplication *sbr,
+static int read_sbr_grid(AACDecContext *ac, SpectralBandReplication *sbr,
                          GetBitContext *gb, SBRData *ch_data)
 {
     int i;
@@ -798,7 +800,7 @@ static void read_sbr_invf(SpectralBandReplication *sbr, GetBitContext *gb,
         ch_data->bs_invf_mode[0][i] = get_bits(gb, 2);
 }
 
-static int read_sbr_envelope(AACContext *ac, SpectralBandReplication *sbr, GetBitContext *gb,
+static int read_sbr_envelope(AACDecContext *ac, SpectralBandReplication *sbr, GetBitContext *gb,
                               SBRData *ch_data, int ch)
 {
     int bits;
@@ -878,7 +880,7 @@ static int read_sbr_envelope(AACContext *ac, SpectralBandReplication *sbr, GetBi
     return 0;
 }
 
-static int read_sbr_noise(AACContext *ac, SpectralBandReplication *sbr, GetBitContext *gb,
+static int read_sbr_noise(AACDecContext *ac, SpectralBandReplication *sbr, GetBitContext *gb,
                            SBRData *ch_data, int ch)
 {
     int i, j;
@@ -920,7 +922,7 @@ static int read_sbr_noise(AACContext *ac, SpectralBandReplication *sbr, GetBitCo
     return 0;
 }
 
-static void read_sbr_extension(AACContext *ac, SpectralBandReplication *sbr,
+static void read_sbr_extension(AACDecContext *ac, SpectralBandReplication *sbr,
                                GetBitContext *gb,
                                int bs_extension_id, int *num_bits_left)
 {
@@ -952,7 +954,7 @@ static void read_sbr_extension(AACContext *ac, SpectralBandReplication *sbr,
     }
 }
 
-static int read_sbr_single_channel_element(AACContext *ac,
+static int read_sbr_single_channel_element(AACDecContext *ac,
                                             SpectralBandReplication *sbr,
                                             GetBitContext *gb)
 {
@@ -976,7 +978,7 @@ static int read_sbr_single_channel_element(AACContext *ac,
     return 0;
 }
 
-static int read_sbr_channel_pair_element(AACContext *ac,
+static int read_sbr_channel_pair_element(AACDecContext *ac,
                                           SpectralBandReplication *sbr,
                                           GetBitContext *gb)
 {
@@ -1028,7 +1030,7 @@ static int read_sbr_channel_pair_element(AACContext *ac,
     return 0;
 }
 
-static unsigned int read_sbr_data(AACContext *ac, SpectralBandReplication *sbr,
+static unsigned int read_sbr_data(AACDecContext *ac, SpectralBandReplication *sbr,
                                   GetBitContext *gb, int id_aac)
 {
     unsigned int cnt = get_bits_count(gb);
@@ -1072,7 +1074,7 @@ static unsigned int read_sbr_data(AACContext *ac, SpectralBandReplication *sbr,
     return get_bits_count(gb) - cnt;
 }
 
-static void sbr_reset(AACContext *ac, SpectralBandReplication *sbr)
+static void sbr_reset(AACDecContext *ac, SpectralBandReplication *sbr)
 {
     int err;
     err = sbr_make_f_master(ac, sbr, &sbr->spectrum_params);
@@ -1093,7 +1095,7 @@ static void sbr_reset(AACContext *ac, SpectralBandReplication *sbr)
  *
  * @return  Returns number of bytes consumed from the TYPE_FIL element.
  */
-int AAC_RENAME(ff_decode_sbr_extension)(AACContext *ac, SpectralBandReplication *sbr,
+int AAC_RENAME(ff_decode_sbr_extension)(AACDecContext *ac, SpectralBandReplication *sbr,
                             GetBitContext *gb_host, int crc, int cnt, int id_aac)
 {
     unsigned int num_sbr_bits = 0, num_align_bits;
@@ -1246,7 +1248,7 @@ static void sbr_qmf_synthesis(AVTXContext *mdct, av_tx_fn mdct_fn,
 #endif
 
 /// Generate the subband filtered lowband
-static int sbr_lf_gen(AACContext *ac, SpectralBandReplication *sbr,
+static int sbr_lf_gen(SpectralBandReplication *sbr,
                       INTFLOAT X_low[32][40][2], const INTFLOAT W[2][32][32][2],
                       int buf_idx)
 {
@@ -1271,7 +1273,7 @@ static int sbr_lf_gen(AACContext *ac, SpectralBandReplication *sbr,
 }
 
 /// High Frequency Generator (14496-3 sp04 p215)
-static int sbr_hf_gen(AACContext *ac, SpectralBandReplication *sbr,
+static int sbr_hf_gen(AACDecContext *ac, SpectralBandReplication *sbr,
                       INTFLOAT X_high[64][40][2], const INTFLOAT X_low[32][40][2],
                       const INTFLOAT (*alpha0)[2], const INTFLOAT (*alpha1)[2],
                       const INTFLOAT bw_array[5], const uint8_t *t_env,
@@ -1345,7 +1347,7 @@ static int sbr_x_gen(SpectralBandReplication *sbr, INTFLOAT X[2][38][64],
 /** High Frequency Adjustment (14496-3 sp04 p217) and Mapping
  * (14496-3 sp04 p217)
  */
-static int sbr_mapping(AACContext *ac, SpectralBandReplication *sbr,
+static int sbr_mapping(AACDecContext *ac, SpectralBandReplication *sbr,
                         SBRData *ch_data, int e_a[2])
 {
     int e, i, m;
@@ -1459,7 +1461,7 @@ static void sbr_env_estimate(AAC_FLOAT (*e_curr)[48], INTFLOAT X_high[64][40][2]
     }
 }
 
-void AAC_RENAME(ff_sbr_apply)(AACContext *ac, SpectralBandReplication *sbr, int id_aac,
+void AAC_RENAME(ff_sbr_apply)(AACDecContext *ac, SpectralBandReplication *sbr, int id_aac,
                   INTFLOAT* L, INTFLOAT* R)
 {
     int downsampled = ac->oc[1].m4ac.ext_sample_rate < sbr->sample_rate;
@@ -1496,7 +1498,7 @@ void AAC_RENAME(ff_sbr_apply)(AACContext *ac, SpectralBandReplication *sbr, int 
                          ch ? R : L, sbr->data[ch].analysis_filterbank_samples,
                          (INTFLOAT*)sbr->qmf_filter_scratch,
                          sbr->data[ch].W, sbr->data[ch].Ypos);
-        sbr->c.sbr_lf_gen(ac, sbr, sbr->X_low,
+        sbr->c.sbr_lf_gen(sbr, sbr->X_low,
                           (const INTFLOAT (*)[32][32][2]) sbr->data[ch].W,
                           sbr->data[ch].Ypos);
         sbr->data[ch].Ypos ^= 1;
@@ -1516,7 +1518,7 @@ void AAC_RENAME(ff_sbr_apply)(AACContext *ac, SpectralBandReplication *sbr, int 
             err = sbr_mapping(ac, sbr, &sbr->data[ch], sbr->data[ch].e_a);
             if (!err) {
                 sbr_env_estimate(sbr->e_curr, sbr->X_high, sbr, &sbr->data[ch]);
-                sbr_gain_calc(ac, sbr, &sbr->data[ch], sbr->data[ch].e_a);
+                sbr_gain_calc(sbr, &sbr->data[ch], sbr->data[ch].e_a);
                 sbr->c.sbr_hf_assemble(sbr->data[ch].Y[sbr->data[ch].Ypos],
                                 (const INTFLOAT (*)[40][2]) sbr->X_high,
                                 sbr, &sbr->data[ch],
