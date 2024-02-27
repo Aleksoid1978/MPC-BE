@@ -304,6 +304,10 @@ void FixFilename(CStringW& str)
 			case '|':
 			case ':':
 				str.GetBuffer()[i] = '_';
+				break;
+			case '\t':
+				str.GetBuffer()[i] = ' ';
+				break;
 		}
 	}
 
