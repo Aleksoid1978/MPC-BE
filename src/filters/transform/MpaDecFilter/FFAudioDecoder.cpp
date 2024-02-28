@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2023 see Authors.txt
+ * (C) 2014-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -268,6 +268,10 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 	m_bNeedReinit      = false;
 	m_bNeedMix         = false;
 
+	if (mediaType || codecID != AV_CODEC_ID_AAC) {
+		m_bUseLibfdk = false;
+	}
+
 	if (codecID == AV_CODEC_ID_NONE || mediaType == nullptr) {
 		if (m_pAVCodec == nullptr || m_pAVCtx == nullptr || m_pAVCtx->codec_id == AV_CODEC_ID_NONE) {
 			return false;
@@ -328,76 +332,96 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		StreamFinish();
 	}
 
-	m_pAVCodec = avcodec_find_decoder(codec_id);
+	m_pAVCodec = m_bUseLibfdk ? avcodec_find_decoder_by_name("libfdk_aac") : avcodec_find_decoder(codec_id);
 	if (m_pAVCodec) {
-		m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
-		CheckPointer(m_pAVCtx, false);
+		for (;;) {
+			m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
+			CheckPointer(m_pAVCtx, false);
 
-		if (!ch_layout.nb_channels) {
-			av_channel_layout_from_mask(&ch_layout, GetDefChannelMask(channels));
-		}
+			if (!ch_layout.nb_channels) {
+				av_channel_layout_from_mask(&ch_layout, GetDefChannelMask(channels));
+			}
 
-		m_pAVCtx->codec_id				= codec_id;
-		m_pAVCtx->sample_rate			= samplerate;
-		m_pAVCtx->ch_layout				= ch_layout;
-		m_pAVCtx->bits_per_coded_sample	= bitdeph;
-		m_pAVCtx->block_align			= block_align;
-		m_pAVCtx->bit_rate				= bitrate;
-		m_pAVCtx->err_recognition		= 0;
-		m_pAVCtx->thread_count			= 1;
-		m_pAVCtx->thread_type			= 0;
+			m_pAVCtx->codec_id              = codec_id;
+			m_pAVCtx->sample_rate           = samplerate;
+			m_pAVCtx->ch_layout             = ch_layout;
+			m_pAVCtx->bits_per_coded_sample = bitdeph;
+			m_pAVCtx->block_align           = block_align;
+			m_pAVCtx->bit_rate              = bitrate;
+			m_pAVCtx->err_recognition       = 0;
+			m_pAVCtx->thread_count          = 1;
+			m_pAVCtx->thread_type           = 0;
 
-		AVDictionary* options = nullptr;
-		if (m_bStereoDownmix) { // works to AC3, TrueHD, DTS
-			int ret = av_dict_set(&options, "downmix", "stereo", 0);
-			DLogIf(ret < 0, L"CFFAudioDecoder::Init() : Set downmix to stereo FAILED!");
-		}
+			AVDictionary* options = nullptr;
+			if (m_bStereoDownmix) { // works to AC3, TrueHD, DTS
+				int ret = av_dict_set(&options, "downmix", "stereo", 0);
+				DLogIf(ret < 0, L"CFFAudioDecoder::Init() : Set downmix to stereo FAILED!");
+			}
 
-		m_pParser = av_parser_init(codec_id);
+			m_pParser = av_parser_init(codec_id);
 
-		memset(&m_raData, 0, sizeof(m_raData));
+			memset(&m_raData, 0, sizeof(m_raData));
 
-		if (extradata && extralen) {
-			if (codec_id == AV_CODEC_ID_COOK || codec_id == AV_CODEC_ID_ATRAC3 || codec_id == AV_CODEC_ID_SIPR) {
-				if (extralen >= 4 && GETU32(extradata) == MAKEFOURCC('.', 'r', 'a', 0xfd)) {
-					HRESULT hr = ParseRealAudioHeader(extradata, extralen);
-					av_freep(&extradata);
-					extralen = 0;
-					if (FAILED(hr)) {
-						return false;
-					}
-					if (codec_id == AV_CODEC_ID_SIPR) {
-						if (m_raData.flavor > 3) {
-							DLog(L"CFFAudioDecoder::Init() : Invalid SIPR flavor (%d)", m_raData.flavor);
+			if (extradata && extralen) {
+				if (codec_id == AV_CODEC_ID_COOK || codec_id == AV_CODEC_ID_ATRAC3 || codec_id == AV_CODEC_ID_SIPR) {
+					if (extralen >= 4 && GETU32(extradata) == MAKEFOURCC('.', 'r', 'a', 0xfd)) {
+						HRESULT hr = ParseRealAudioHeader(extradata, extralen);
+						av_freep(&extradata);
+						extralen = 0;
+						if (FAILED(hr)) {
 							return false;
 						}
-						static BYTE sipr_subpk_size[4] = { 29, 19, 37, 20 };
-						m_pAVCtx->block_align = sipr_subpk_size[m_raData.flavor];
+						if (codec_id == AV_CODEC_ID_SIPR) {
+							if (m_raData.flavor > 3) {
+								DLog(L"CFFAudioDecoder::Init() : Invalid SIPR flavor (%d)", m_raData.flavor);
+								return false;
+							}
+							static BYTE sipr_subpk_size[4] = { 29, 19, 37, 20 };
+							m_pAVCtx->block_align = sipr_subpk_size[m_raData.flavor];
+						}
+					} else {
+						// Try without any processing?
+						m_pAVCtx->extradata_size = extralen;
+						m_pAVCtx->extradata = extradata;
 					}
 				} else {
-					// Try without any processing?
 					m_pAVCtx->extradata_size = extralen;
-					m_pAVCtx->extradata      = extradata;
+					m_pAVCtx->extradata = extradata;
 				}
-			} else {
-				m_pAVCtx->extradata_size = extralen;
-				m_pAVCtx->extradata      = extradata;
 			}
-		}
 
-		avcodec_lock;
-		if (avcodec_open2(m_pAVCtx, m_pAVCodec, &options) >= 0) {
-			m_pFrame = av_frame_alloc();
-			m_pPacket = av_packet_alloc();
-		}
-		avcodec_unlock;
+			avcodec_lock;
+			if (avcodec_open2(m_pAVCtx, m_pAVCodec, &options) >= 0) {
+				m_pFrame = av_frame_alloc();
+				m_pPacket = av_packet_alloc();
+			}
+			avcodec_unlock;
 
-		if (options) {
-			av_dict_free(&options);
+			if (!m_pFrame && codec_id == AV_CODEC_ID_AAC && !m_bUseLibfdk && mediaType) {
+				StreamFinish();
+				m_pAVCodec = avcodec_find_decoder_by_name("libfdk_aac");
+				if (m_pAVCodec) {
+					getExtraData(mediaType->Format(), &mediaType->formattype, mediaType->cbFormat, nullptr, &extralen);
+					if (extralen) {
+						extradata = (uint8_t*)av_mallocz(extralen + AV_INPUT_BUFFER_PADDING_SIZE);
+						getExtraData(mediaType->Format(), &mediaType->formattype, mediaType->cbFormat, extradata, nullptr);
+					}
+
+					m_bUseLibfdk = true;
+					continue;
+				}
+			}
+
+			if (options) {
+				av_dict_free(&options);
+			}
+
+			break;
 		}
 	}
 
 	if (!m_pFrame || !m_pPacket) {
+		m_bUseLibfdk = false;
 		StreamFinish();
 
 		return false;
@@ -539,7 +563,7 @@ HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 		hr = S_OK;
 	}
 
-	if (hr == E_FAIL) {
+	if (hr == E_FAIL && !m_bUseLibfdk) {
 		Init(GetCodecId(), nullptr);
 	}
 

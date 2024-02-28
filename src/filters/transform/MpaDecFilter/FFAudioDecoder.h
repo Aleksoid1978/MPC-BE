@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2022 see Authors.txt
+ * (C) 2014-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -45,6 +45,8 @@ private:
 	AVCodecParserContext* m_pParser  = nullptr;
 	AVFrame*              m_pFrame   = nullptr;
 	AVPacket*             m_pPacket  = nullptr;
+
+	bool m_bUseLibfdk = false;
 
 	struct {
 		int flavor;

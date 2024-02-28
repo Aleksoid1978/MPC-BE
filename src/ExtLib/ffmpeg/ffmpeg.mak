@@ -338,6 +338,7 @@ SRCS_LC = \
 	libavcodec/lagarithrac.c \
 	libavcodec/latm_parser.c \
 	libavcodec/libdav1d.c \
+	libavcodec/libfdk-aacdec.c \
 	libavcodec/libspeexdec.c \
 	libavcodec/libuavs3d.c \
 	libavcodec/lossless_audiodsp.c \
