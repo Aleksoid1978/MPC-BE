@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -607,17 +607,15 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		rt += m_rtOggOffset;
 
 		const __int64 len = m_pFile->GetLength();
-		__int64 seekpos   = CalcPos(rt);
+		__int64 currpos   = CalcPos(rt);
+		__int64 seekpos   = 0;
 
-		const REFERENCE_TIME rtmax = rt - UNITS * (m_bitstream_serial_number_Video != DWORD_MAX ? 4 : 0);
-		const REFERENCE_TIME rtmin = rtmax - UNITS / 2;
+		const bool bHasVideo = m_bitstream_serial_number_Video != DWORD_MAX;
+		const REFERENCE_TIME rtmax = rt - UNITS * (bHasVideo ? 4 : 0);
 
-		__int64 curpos = seekpos;
-		double div = 1.0;
-		for (;;) {
-			REFERENCE_TIME rtSeek = INVALID_TIME;
+		m_pFile->Seek(currpos);
 
-			m_pFile->Seek(curpos);
+		auto ReadPage = [&] {
 			OggPage page;
 			while (m_pFile->Read(page, false)) {
 				if (page.m_hdr.granule_position == -1) {
@@ -632,40 +630,50 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 					continue;
 				}
 
-				if (m_bitstream_serial_number_Video != DWORD_MAX
-						&& m_bitstream_serial_number_Video != page.m_hdr.bitstream_serial_number) {
+				if (bHasVideo && m_bitstream_serial_number_Video != page.m_hdr.bitstream_serial_number) {
 					continue;
 				}
 
-				rtSeek = pOggPin->GetRefTime(page.m_hdr.granule_position);
-				break;
+				seekpos = page.pos;
+				return pOggPin->GetRefTime(page.m_hdr.granule_position);
 			}
 
-			if (rtSeek == INVALID_TIME) {
-				break;
-			}
+			return INVALID_TIME;
+		};
 
-			if (rtmin <= rtSeek && rtSeek <= rtmax) {
-				m_pFile->Seek(page.pos);
-				return;
-			}
+		REFERENCE_TIME rtSeek = ReadPage();
+		while (rtSeek > rtmax) {
+			REFERENCE_TIME dt = std::max(rtSeek - rtmax, UNITS);
+			currpos -= CalcPos(dt);
 
-			REFERENCE_TIME dt = rtSeek - rtmax;
-			if (rtSeek < 0) {
-				dt = UNITS / div;
-			}
-			dt /= div;
-			div += 0.05;
-
-			if (div >= 5.0) {
-				break;
-			}
-
-			curpos -= CalcPos(dt);
-			m_pFile->Seek(curpos);
+			m_pFile->Seek(currpos);
+			rtSeek = ReadPage();
 		}
 
-		m_pFile->Seek(0);
+		if (rtSeek == INVALID_TIME) {
+			DLog(L"COggSplitterFilter::DemuxSeek(), epic fail ... start from begin");
+			m_pFile->Seek(0);
+			return;
+		}
+
+		__int64 savedpos = seekpos;
+		REFERENCE_TIME savedrt = rtSeek;
+		for (;;) {
+			rtSeek = ReadPage();
+			if (rtSeek < rtmax) {
+				savedpos = seekpos;
+				savedrt = rtSeek;
+				continue;
+			}
+
+			break;
+		}
+
+		m_pFile->Seek(savedpos);
+
+#ifndef NDEBUG
+		DLog(L"COggSplitterFilter::DemuxSeek() : %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(savedrt), rt, savedrt);
+#endif
 	}
 }
 
