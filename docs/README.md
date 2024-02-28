@@ -45,6 +45,7 @@ MPC-BE makes use of the following 3rd party code:
 | coolsb            |                     | https://www.codeproject.com/KB/dialog/coolscroll.aspx |
 | CSizingControlBar | GPLv2               | http://datamekanix.com/sizecbar/                      |
 | Detours           | MIT License         | https://github.com/microsoft/detours/                 |
+| fdk-aac           |                     | https://github.com/mstorsjo/fdk-aac/                  |
 | FFmpeg            | GPLv3               | http://ffmpeg.org/                                    |
 | dav1d             | BSD License         | https://code.videolan.org/videolan/dav1d/             |
 | libflac           | GPLv2/BSD License   | https://github.com/glennrp/libpng/                    |

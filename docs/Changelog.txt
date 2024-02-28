@@ -11,6 +11,9 @@ Added support for VVC(H.266) video.
 RawVideoSplitter
 Added support for VVC(H.266) video.
 
+MpaDecFilter
+Added support for USAC / xHE-AAC.
+
 MPCVideoDec
 Added support for D3D12 copy back mode.
 Added support for VVC(H.266) video decoding.
@@ -31,6 +34,7 @@ Updated Korean translation (by Hackjjang).
 
 Updated libraries:
 	dav1d git-1.4.0-1-g97cc6ce;
+	fdk-aac git-v2.0.3;
 	ffmpeg git-n6.2-dev-1298-g1bb7d5ca9f;
 	Little-CMS git-lcms2.16-26-gc2a5401;
 	MediaInfo git-v24.01-g51dbd896;
