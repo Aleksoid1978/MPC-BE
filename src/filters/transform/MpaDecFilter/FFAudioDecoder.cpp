@@ -397,6 +397,10 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 			}
 			avcodec_unlock;
 
+			if (options) {
+				av_dict_free(&options);
+			}
+
 			if (!m_pFrame && codec_id == AV_CODEC_ID_AAC && !m_bUseLibfdk && mediaType) {
 				StreamFinish();
 				m_pAVCodec = avcodec_find_decoder_by_name("libfdk_aac");
@@ -410,10 +414,6 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 					m_bUseLibfdk = true;
 					continue;
 				}
-			}
-
-			if (options) {
-				av_dict_free(&options);
 			}
 
 			break;
