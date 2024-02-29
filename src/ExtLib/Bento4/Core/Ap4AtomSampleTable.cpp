@@ -292,24 +292,47 @@ AP4_AtomSampleTable::GetSampleIndexForTimeStamp(AP4_TimeStamp ts,
         result = GetCts(index, cts);
         if (AP4_FAILED(result)) return result;
 
-        if (index > 0 && cts > (AP4_SI64)ts) {
-            for (AP4_Ordinal i = index - 1; i > 0; i--) {
-                result = GetCts(i, cts);
-                if (AP4_FAILED(result)) return result;
+        auto searched_ts = static_cast<AP4_SI64>(ts);
 
-                if (cts <= (AP4_SI64)ts) {
-                    index = i;
-                    break;
+        if (cts == searched_ts
+                && (!m_StssAtom || (m_StssAtom && m_StssAtom->IsSampleSync(index + 1)))) {
+            return AP4_SUCCESS;
+        }
+
+        for (;;) {
+            if (index > 0 && cts >= searched_ts) {
+                for (AP4_Ordinal i = index - 1; i > 0; i--) {
+                    if (m_StssAtom && !m_StssAtom->IsSampleSync(i + 1)) {
+                        continue;
+                    }
+
+                    result = GetCts(i, cts);
+                    if (AP4_FAILED(result)) return result;
+
+                    if (cts <= searched_ts) {
+                        index = i;
+                        return AP4_SUCCESS;
+                    }
                 }
-            }
-        } else if (index < GetSampleCount() && cts < (AP4_SI64)ts) {
-            for (AP4_Ordinal i = index + 1; i < GetSampleCount(); i++) {
-                result = GetCts(i, cts);
-                if (AP4_FAILED(result)) return result;
 
-                if (cts > (AP4_SI64)ts) {
-                    index = i > 0 ? i - 1 : 0;
-                    break;
+                break;
+            } else if (index < GetSampleCount() && cts < searched_ts) {
+                for (AP4_Ordinal i = index + 1; i < GetSampleCount(); i++) {
+                    if (m_StssAtom && !m_StssAtom->IsSampleSync(i + 1)) {
+                        continue;
+                    }
+
+                    result = GetCts(i, cts);
+                    if (AP4_FAILED(result)) return result;
+
+                    if (cts > searched_ts) {
+                        if (!m_StssAtom) {
+                            index = i > 0 ? i - 1 : 0;
+                            return AP4_SUCCESS;
+                        }
+                        index = i;
+                        break;
+                    }
                 }
             }
         }
