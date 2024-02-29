@@ -1,5 +1,5 @@
 /*
- * (C) 2018 see Authors.txt
+ * (C) 2018-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -59,6 +59,7 @@ const BYTE AOT_SLS_NON_CORE          = 38; /**< SLS Sclable Lossless Coding Non-
 const BYTE AOT_ER_AAC_ELD            = 39; /**< Error Resilient AAC ELD                      */
 const BYTE AOT_SMR_SIMPLE            = 40; /**< SMR Simple                                   */
 const BYTE AOT_SMR_MAIN              = 41; /**< SMR Main                                     */
+const BYTE AOT_USAC                  = 42; /**< Unified Speech and Audio Coding              */
 
 class CMP4AudioDecoderConfig {
 public:

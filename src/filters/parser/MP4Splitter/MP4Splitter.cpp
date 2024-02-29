@@ -622,7 +622,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								if (objectType == AOT_AAC_LC
 										|| objectType == AOT_AAC_MAIN
 										|| objectType == AOT_SBR
-										|| objectType == AOT_PS) {
+										|| objectType == AOT_PS
+										|| objectType == AOT_USAC) {
 									CMP4AudioDecoderConfig MP4AudioDecoderConfig;
 									if (MP4AudioDecoderConfig.Parse(di->GetData(), di->GetDataSize())) {
 										if (MP4AudioDecoderConfig.m_ChannelCount != wfe->nChannels) {

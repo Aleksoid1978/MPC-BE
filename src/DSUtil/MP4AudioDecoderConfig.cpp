@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2021 see Authors.txt
+ * (C) 2018-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -297,6 +297,7 @@ bool CMP4AudioDecoderConfig::Parse(CGolombBuffer& parser)
         case AOT_ER_AAC_LD:
         case AOT_ER_TWINVQ:
         case AOT_ER_BSAC:
+        case AOT_USAC:
             result = ParseGASpecificInfo(parser);
             if (result == true) {
                 if (m_Extension.m_ObjectType !=  AOT_SBR &&
