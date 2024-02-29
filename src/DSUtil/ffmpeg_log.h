@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,21 +31,9 @@ inline void ff_log(void* ptr, int level, const char *fmt, va_list valist)
 {
 	if (level <= AV_LOG_VERBOSE) {
 		static int print_prefix = 1;
-		static int count = 0;
-		static char line[LOG_BUF_LEN] = {}, prev[LOG_BUF_LEN] = {};
+		static char line[LOG_BUF_LEN] = {};
 
 		av_log_format_line(ptr, level, fmt, valist, line, sizeof(line), &print_prefix);
-
-		if (print_prefix && !strcmp(line, prev)) {
-			count++;
-			return;
-		}
-		if (count > 0) {
-			DLog(L"FF_LOG :     Last message repeated %d times", count);
-			count = 0;
-		}
-
-		strncpy_s(prev, line, _TRUNCATE);
 
 		const size_t len = strnlen_s(line, LOG_BUF_LEN);
 		if (len > 0 && line[len - 1] == '\n') {
