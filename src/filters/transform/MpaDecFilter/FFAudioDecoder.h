@@ -46,8 +46,6 @@ private:
 	AVFrame*              m_pFrame   = nullptr;
 	AVPacket*             m_pPacket  = nullptr;
 
-	bool m_bUseLibfdk = false;
-
 	struct {
 		int flavor;
 		int coded_frame_size;

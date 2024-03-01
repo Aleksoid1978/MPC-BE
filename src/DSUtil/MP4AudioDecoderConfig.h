@@ -59,7 +59,7 @@ const BYTE AOT_SLS_NON_CORE          = 38; /**< SLS Sclable Lossless Coding Non-
 const BYTE AOT_ER_AAC_ELD            = 39; /**< Error Resilient AAC ELD                      */
 const BYTE AOT_SMR_SIMPLE            = 40; /**< SMR Simple                                   */
 const BYTE AOT_SMR_MAIN              = 41; /**< SMR Main                                     */
-const BYTE AOT_USAC                  = 42; /**< Unified Speech and Audio Coding              */
+const BYTE AOT_USAC                  = 42; /**< Unified Speech and Audio Coding / xHE-AAC    */
 
 class CMP4AudioDecoderConfig {
 public:
