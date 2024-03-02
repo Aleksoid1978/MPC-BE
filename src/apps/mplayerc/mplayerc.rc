@@ -2710,9 +2710,9 @@ BEGIN
     IDS_AG_AUDIO_FILE       "Audio file"
     IDS_AG_PLAYLIST_FILE    "Playlist file"
     IDS_AG_OTHER            "Other"
-    IDS_AG_MEDIAFILES       "Media files (all types)|"
-    IDS_AG_ALLFILES         "All files (*.*)|*.*|"
-    IDS_AG_AUDIOFILES       "Audio files (all types)|"
+    IDS_AG_MEDIAFILES       "Media files (all types)"
+    IDS_AG_ALLFILES         "All files"
+    IDS_AG_AUDIOFILES       "Audio files (all types)"
     IDS_PIXELSHADERCOMPILER_0 
                             "Cannot load D3DX9_xx.DLL, pixel shaders will not work."
     IDS_PIXELSHADERCOMPILER_1 
@@ -2733,7 +2733,7 @@ BEGIN
     IDS_CANCEL              "Cancel"
     IDS_TEXTFILE_ENC        "Encoding:"
     IDS_SAVE_FILE           "Saving file"
-    IDS_AG_VIDEOFILES       "Video files (all types)|"
+    IDS_AG_VIDEOFILES       "Video files (all types)"
     IDS_VOLUME_OSD_MUTE     "Vol: %d%% [Mute]"
     IDS_COPY_TO_CLIPBOARD   "Copy to Clipboard"
     IDS_AUDIO_LEVEL         "Level (%d):"
@@ -3077,7 +3077,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_MAINFRM_47          " loaded successfully"
-    IDS_MAINFRM_48          "All files (*.*)|*.*||"
+    IDS_MAINFRM_48          "All files"
     IDS_MAINFRM_49          "GetDIB failed, hr = %08x"
     IDS_MAINFRM_51          "GetCurrentImage failed, hr = %08x"
     IDS_MAINFRM_53          "Cannot create file"

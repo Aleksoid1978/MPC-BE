@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -262,61 +262,61 @@ void CMediaFormats::GetFilter(CString& filter, std::vector<CString>& mask)
 	CString strTemp;
 
 	// Add All Media formats
-	filter += ResStr(IDS_AG_MEDIAFILES);
+	filter += ResStr(IDS_AG_MEDIAFILES) + L'|';
 	mask.emplace_back(L"");
 
 	for (const auto& mfc : (*this)) {
-		strTemp = mfc.GetFilter() + L";";
+		strTemp = mfc.GetFilter() + L';';
 		mask[0] += strTemp;
 		filter += strTemp;
 	}
 	mask[0].TrimRight(';');
 	filter.TrimRight(';');
-	filter += L"|";
+	filter += L'|';
 
 	// Add Video formats
-	filter += ResStr(IDS_AG_VIDEOFILES);
+	filter += ResStr(IDS_AG_VIDEOFILES) + L'|';
 	mask.emplace_back(L"");
 
 	for (const auto& mfc : (*this)) {
 		if (mfc.GetFileType() == TVideo) {
-			strTemp = mfc.GetFilter() + L";";
+			strTemp = mfc.GetFilter() + L';';
 			mask[1] += strTemp;
 			filter += strTemp;
 		}
 	}
 	filter.TrimRight(';');
-	filter += L"|";
+	filter += L'|';
 
 	// Add Audio formats
-	filter += ResStr(IDS_AG_AUDIOFILES);
+	filter += ResStr(IDS_AG_AUDIOFILES) + L'|';
 	mask.emplace_back(L"");
 
 	for (const auto& mfc : (*this)) {
 		if (mfc.GetFileType() == TAudio) {
-			strTemp = mfc.GetFilter() + L";";
+			strTemp = mfc.GetFilter() + L';';
 			mask[1] += strTemp;
 			filter += strTemp;
 		}
 	}
 	filter.TrimRight(';');
-	filter += L"|";
+	filter += L'|';
 
 	for (const auto& mfc : (*this)) {
-		filter += mfc.GetDescription() + L"|" + mfc.GetFilter() + L"|";
+		filter += mfc.GetDescription() + L'|' + mfc.GetFilter() + L'|';
 		mask.emplace_back(mfc.GetFilter());
 	}
 
-	filter += ResStr(IDS_AG_ALLFILES);
+	filter += ResStr(IDS_AG_ALLFILES) + L" (*.*)|*.*|";
 	mask.emplace_back(L"*.*");
 
-	filter += L"|";
+	filter += L'|';
 }
 
 void CMediaFormats::GetAudioFilter(CString& filter, std::vector<CString>& mask)
 {
 	CString strTemp;
-	filter += ResStr(IDS_AG_AUDIOFILES);
+	filter += ResStr(IDS_AG_AUDIOFILES) + L'|';
 	mask.emplace_back(L"");
 
 	for (const auto& mfc : (*this)) {
@@ -338,7 +338,7 @@ void CMediaFormats::GetAudioFilter(CString& filter, std::vector<CString>& mask)
 		}
 	}
 
-	filter += ResStr(IDS_AG_ALLFILES);
+	filter += ResStr(IDS_AG_ALLFILES) + L" (*.*)|*.*|";
 	mask.emplace_back(L"*.*");
 
 	filter += L"|";
