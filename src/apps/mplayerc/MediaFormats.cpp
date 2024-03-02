@@ -347,7 +347,7 @@ void CMediaFormats::GetAudioFilter(CString& filter, std::vector<CString>& mask)
 		}
 	}
 
-	filter += ResStr(IDS_AG_AUDIOFILES) + L"(*.mp3;*.m4a;*.mka;...)|";
+	filter += ResStr(IDS_AG_AUDIOFILES);
 	if (bExplorerShowsFileExts) {
 		filter += L"(*.mp3;*.m4a;*.mka;...)";
 	}
