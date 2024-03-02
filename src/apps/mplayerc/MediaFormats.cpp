@@ -261,8 +261,21 @@ void CMediaFormats::GetFilter(CString& filter, std::vector<CString>& mask)
 {
 	CString strTemp;
 
+	bool bExplorerShowsFileExts = false;
+	CRegKey key;
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", KEY_READ)) {
+		DWORD dw;
+		if (ERROR_SUCCESS == key.QueryDWORDValue(L"HideFileExt", dw)) {
+			bExplorerShowsFileExts = (dw == 0);
+		}
+	}
+
 	// Add All Media formats
-	filter += ResStr(IDS_AG_MEDIAFILES) + L'|';
+	filter += ResStr(IDS_AG_MEDIAFILES);
+	if (bExplorerShowsFileExts) {
+		filter += L"(*.avi;*.mp4;*.mkv;*.mp3;*.m4a;*.mka;...)";
+	}
+	filter += L'|';
 	mask.emplace_back(L"");
 
 	for (const auto& mfc : (*this)) {
@@ -275,7 +288,11 @@ void CMediaFormats::GetFilter(CString& filter, std::vector<CString>& mask)
 	filter += L'|';
 
 	// Add Video formats
-	filter += ResStr(IDS_AG_VIDEOFILES) + L'|';
+	filter += ResStr(IDS_AG_VIDEOFILES);
+	if (bExplorerShowsFileExts) {
+		filter += L"(*.avi;*.mp4;*.mkv;...)";
+	}
+	filter += L'|';
 	mask.emplace_back(L"");
 
 	for (const auto& mfc : (*this)) {
@@ -289,7 +306,11 @@ void CMediaFormats::GetFilter(CString& filter, std::vector<CString>& mask)
 	filter += L'|';
 
 	// Add Audio formats
-	filter += ResStr(IDS_AG_AUDIOFILES) + L'|';
+	filter += ResStr(IDS_AG_AUDIOFILES);
+	if (bExplorerShowsFileExts) {
+		filter += L"(*.mp3;*.m4a;*.mka;...)";
+	}
+	filter += L'|';
 	mask.emplace_back(L"");
 
 	for (const auto& mfc : (*this)) {
@@ -316,7 +337,21 @@ void CMediaFormats::GetFilter(CString& filter, std::vector<CString>& mask)
 void CMediaFormats::GetAudioFilter(CString& filter, std::vector<CString>& mask)
 {
 	CString strTemp;
-	filter += ResStr(IDS_AG_AUDIOFILES) + L'|';
+
+	bool bExplorerShowsFileExts = false;
+	CRegKey key;
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", KEY_READ)) {
+		DWORD dw;
+		if (ERROR_SUCCESS == key.QueryDWORDValue(L"HideFileExt", dw)) {
+			bExplorerShowsFileExts = (dw == 0);
+		}
+	}
+
+	filter += ResStr(IDS_AG_AUDIOFILES) + L"(*.mp3;*.m4a;*.mka;...)|";
+	if (bExplorerShowsFileExts) {
+		filter += L"(*.mp3;*.m4a;*.mka;...)";
+	}
+	filter += L'|';
 	mask.emplace_back(L"");
 
 	for (const auto& mfc : (*this)) {
