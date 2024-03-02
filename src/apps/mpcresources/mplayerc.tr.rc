@@ -2700,12 +2700,17 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_AG_MEDIAFILES       "Medya dosyaları (tüm biçimler)"
+    IDS_AG_VIDEOFILES       "Video dosyası (tüm biçimler)"
+    IDS_AG_AUDIOFILES       "Ses dosyaları (tüm biçimler)"
+    IDS_AG_ALLFILES         "Tüm dosyalar"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_AUDIO_FILE       "Ses dosyası"
     IDS_AG_PLAYLIST_FILE    "Oynatma listesi dosyası"
     IDS_AG_OTHER            "Diğer"
-    IDS_AG_MEDIAFILES       "Medya dosyaları (tüm biçimler)"
-    IDS_AG_ALLFILES         "Tüm dosyalar"
-    IDS_AG_AUDIOFILES       "Ses dosyaları (tüm biçimler)"
     IDS_PIXELSHADERCOMPILER_0  "D3DX9_xx.DLL yüklenemedi, piksel tonlayıcıları çalışmayabilir."
     IDS_PIXELSHADERCOMPILER_1  "D3DX9_xx.DLL içindeki gerekli bazı özellik noktaları bulunamadı, piksel tonlayıcıları çalışmayabilir."
     IDS_AG_NOT_KNOWN        "Bilinmeyen"
@@ -2724,7 +2729,6 @@ BEGIN
     IDS_CANCEL              "İptal"
     IDS_TEXTFILE_ENC        "Kodlama:"
     IDS_SAVE_FILE           "Dosya kaydediliyor"
-    IDS_AG_VIDEOFILES       "Video dosyası (tüm biçimler)"
     IDS_VOLUME_OSD_MUTE     "Ses: %d%% [Sessiz]"
     IDS_COPY_TO_CLIPBOARD   "Panoya Kopyala"
     IDS_AUDIO_LEVEL         "Seviye (%d):"
@@ -3061,7 +3065,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_MAINFRM_47          " başarıyla yüklendi"
-    IDS_MAINFRM_48          "Tüm Dosyalar"
     IDS_MAINFRM_49          "VTB alınamadı, hr = %08x"
     IDS_MAINFRM_51          "GeçerliGörAl yapılamadı, hr = %08x"
     IDS_MAINFRM_53          "Dosya oluşturulamadı"

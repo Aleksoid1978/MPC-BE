@@ -2700,12 +2700,17 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_AG_MEDIAFILES       "Archivos de Medios (Todos los tipos)"
+    IDS_AG_VIDEOFILES       "Archivos de video (todos los tipos)"
+    IDS_AG_AUDIOFILES       "Archivos de Audio (Todos los tipos)"
+    IDS_AG_ALLFILES         "Todos los Archivos"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_AUDIO_FILE       "Archivo de Audio"
     IDS_AG_PLAYLIST_FILE    "Archivo de Lista de Reproducción"
     IDS_AG_OTHER            "Otro"
-    IDS_AG_MEDIAFILES       "Archivos de Medios (Todos los tipos)"
-    IDS_AG_ALLFILES         "Todos los Archivos"
-    IDS_AG_AUDIOFILES       "Archivos de Audio (Todos los tipos)"
     IDS_PIXELSHADERCOMPILER_0  "Imposible cargar D3DX9_xx.DLL, los sombreadores de píxel no funcionarán."
     IDS_PIXELSHADERCOMPILER_1  "Imposible encontrar las entradas de funciones necesarias en D3DX9_xx.DLL, los sombreadores de píxel no funcionarán."
     IDS_AG_NOT_KNOWN        "No conocido"
@@ -2724,7 +2729,6 @@ BEGIN
     IDS_CANCEL              "Cancelar"
     IDS_TEXTFILE_ENC        "Codificación:"
     IDS_SAVE_FILE           "Guardando archivo"
-    IDS_AG_VIDEOFILES       "Archivos de video (todos los tipos)"
     IDS_VOLUME_OSD_MUTE     "Vol: %d%% [Silencio]"
     IDS_COPY_TO_CLIPBOARD   "Copiar al Portapapeles"
     IDS_AUDIO_LEVEL         "Nivel (%d):"
@@ -3061,7 +3065,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_MAINFRM_47          "Cargado con éxito"
-    IDS_MAINFRM_48          "Todos los archivos"
     IDS_MAINFRM_49          "Fallo en GetDIB, hr = %08x"
     IDS_MAINFRM_51          "Fallo en GetCurrentImage, hr = %08x"
     IDS_MAINFRM_53          "Imposible crear archivo"

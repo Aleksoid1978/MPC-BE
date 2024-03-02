@@ -2700,12 +2700,17 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_AG_MEDIAFILES       "Медыяфайлы (усе тыпы)"
+    IDS_AG_VIDEOFILES       "Video files (all types)"
+    IDS_AG_AUDIOFILES       "Аўдыёфайлы (усе тыпы)"
+    IDS_AG_ALLFILES         "Усе файлы"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_AUDIO_FILE       "Аўдыёфайл"
     IDS_AG_PLAYLIST_FILE    "Плэйліст"
     IDS_AG_OTHER            "Іншае"
-    IDS_AG_MEDIAFILES       "Медыяфайлы (усе тыпы)"
-    IDS_AG_ALLFILES         "Усе файлы"
-    IDS_AG_AUDIOFILES       "Аўдыёфайлы (усе тыпы)"
     IDS_PIXELSHADERCOMPILER_0  "Немагчыма загрузіць D3DX9_xx.DLL, піксельныя шэйдары працаваць не будуць."
     IDS_PIXELSHADERCOMPILER_1  "Не атрымліваецца знайсці кропку ўваходу неабходнае функцыі D3DX9_xx.DLL, піксельныя шэйдары працаваць не будуць. Паспрабуйце ўсталяваць навейшую версію DirectX."
     IDS_AG_NOT_KNOWN        "Невядома"
@@ -2724,7 +2729,6 @@ BEGIN
     IDS_CANCEL              "Cancel"
     IDS_TEXTFILE_ENC        "Encoding:"
     IDS_SAVE_FILE           "Saving file"
-    IDS_AG_VIDEOFILES       "Video files (all types)"
     IDS_VOLUME_OSD_MUTE     "Vol: %d%% [Mute]"
     IDS_COPY_TO_CLIPBOARD   "Copy to Clipboard"
     IDS_AUDIO_LEVEL         "Level (%d):"
@@ -3061,7 +3065,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_MAINFRM_47          " паспяхова загружаны"
-    IDS_MAINFRM_48          "Усе файлы"
     IDS_MAINFRM_49          "Праблема з GetDIB hr = %08x"
     IDS_MAINFRM_51          "Праблема з GetCurrentImage hr = %08x"
     IDS_MAINFRM_53          "Не атрымліваецца стварыць файл"

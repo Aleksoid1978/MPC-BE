@@ -2700,12 +2700,17 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_AG_MEDIAFILES       "Wszystkie pliki multimedialne"
+    IDS_AG_VIDEOFILES       "Wideo (wszystkie typy)"
+    IDS_AG_AUDIOFILES       "Pliki audio (wszystkie typy)"
+    IDS_AG_ALLFILES         "Wszystkie pliki"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_AUDIO_FILE       "Pliki dźwiękowe"
     IDS_AG_PLAYLIST_FILE    "Plik listy odtwarzania"
     IDS_AG_OTHER            "Inne"
-    IDS_AG_MEDIAFILES       "Wszystkie pliki multimedialne"
-    IDS_AG_ALLFILES         "Wszystkie pliki"
-    IDS_AG_AUDIOFILES       "Pliki audio (wszystkie typy)"
     IDS_PIXELSHADERCOMPILER_0  "Nie można wczytać pliku D3DX9_xx.dll. Cieniowanie pikseli nie będzie działać."
     IDS_PIXELSHADERCOMPILER_1  "Nie można odnaleźć niezbędnych punktów wejścia funkcji w D3DX9_xx.dll. Cieniowanie pikseli nie będzie działać."
     IDS_AG_NOT_KNOWN        "Brak danych"
@@ -2724,7 +2729,6 @@ BEGIN
     IDS_CANCEL              "Anuluj"
     IDS_TEXTFILE_ENC        "Kodowanie:"
     IDS_SAVE_FILE           "Zapisywanie pliku"
-    IDS_AG_VIDEOFILES       "Wideo (wszystkie typy)"
     IDS_VOLUME_OSD_MUTE     "Głośność: %d%% [Wyciszony]"
     IDS_COPY_TO_CLIPBOARD   "Kopiuj do schowka"
     IDS_AUDIO_LEVEL         "Poziom (%d):"
@@ -3061,7 +3065,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_MAINFRM_47          " wczytano pomyślnie"
-    IDS_MAINFRM_48          "Wszystkie pliki"
     IDS_MAINFRM_49          "GetDIB nie powiodło się, hr = %08x"
     IDS_MAINFRM_51          "GetCurrentImage nie powiodło się, hr = %08x"
     IDS_MAINFRM_53          "Nie można utworzyć pliku."

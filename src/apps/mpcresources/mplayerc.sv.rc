@@ -2700,12 +2700,17 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_AG_MEDIAFILES       "Media filer (alla typer)"
+    IDS_AG_VIDEOFILES       "Video files (all types)"
+    IDS_AG_AUDIOFILES       "Ljud filer (alla typer)"
+    IDS_AG_ALLFILES         "All filer"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_AUDIO_FILE       "Ljud fil"
     IDS_AG_PLAYLIST_FILE    "Spellist fil"
     IDS_AG_OTHER            "Övriga"
-    IDS_AG_MEDIAFILES       "Media filer (alla typer)"
-    IDS_AG_ALLFILES         "All filer"
-    IDS_AG_AUDIOFILES       "Ljud filer (alla typer)"
     IDS_PIXELSHADERCOMPILER_0  "Kan inte ladda D3DX9_xx.DLL, pixel shaders kommer inte att fungera."
     IDS_PIXELSHADERCOMPILER_1  "Kan du inte hitta nödvändig funktion kontaktpunkter i D3DX9_xx.DLL, pixel shaders kommer inte att fungera."
     IDS_AG_NOT_KNOWN        "Ej känt"
@@ -2724,7 +2729,6 @@ BEGIN
     IDS_CANCEL              "Cancel"
     IDS_TEXTFILE_ENC        "Encoding:"
     IDS_SAVE_FILE           "Saving file"
-    IDS_AG_VIDEOFILES       "Video files (all types)"
     IDS_VOLUME_OSD_MUTE     "Vol: %d%% [Mute]"
     IDS_COPY_TO_CLIPBOARD   "Copy to Clipboard"
     IDS_AUDIO_LEVEL         "Level (%d):"
@@ -3061,7 +3065,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_MAINFRM_47          " laddes OK"
-    IDS_MAINFRM_48          "Alla filer"
     IDS_MAINFRM_49          "GetDIB misslyckades, hr = %08x"
     IDS_MAINFRM_51          "GetCurrentImage misslyckades, hr = %08x"
     IDS_MAINFRM_53          "Kan inte skapa filen"

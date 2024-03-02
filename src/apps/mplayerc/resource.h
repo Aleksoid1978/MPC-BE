@@ -1034,12 +1034,13 @@
 #define IDS_AG_MOUSE_FS                 32837
 #define IDS_AG_APP_COMMAND              32838
 #define IDS_AG_MENU_PLAYER_A            32840
-#define IDS_AG_AUDIO_FILE               32868
-#define IDS_AG_PLAYLIST_FILE            32869
-#define IDS_AG_OTHER                    32870
-#define IDS_AG_MEDIAFILES               32871
-#define IDS_AG_ALLFILES                 32872
-#define IDS_AG_AUDIOFILES               32873
+#define IDS_AG_MEDIAFILES               32860
+#define IDS_AG_VIDEOFILES               32861
+#define IDS_AG_AUDIOFILES               32862
+#define IDS_AG_ALLFILES                 32863
+#define IDS_AG_AUDIO_FILE               32864
+#define IDS_AG_PLAYLIST_FILE            32865
+#define IDS_AG_OTHER                    32866
 #define IDS_PIXELSHADERCOMPILER_0       32874
 #define IDS_PIXELSHADERCOMPILER_1       32875
 #define IDS_AG_NOT_KNOWN                32876
@@ -1196,7 +1197,6 @@
 #define IDS_SUBTITLE_STREAM             33054
 #define IDS_MAINFRM_46                  33055
 #define IDS_MAINFRM_47                  33056
-#define IDS_MAINFRM_48                  33057
 #define IDS_MAINFRM_49                  33058
 #define IDS_MAINFRM_51                  33059
 #define IDS_MAINFRM_53                  33060
@@ -1372,7 +1372,6 @@
 #define IDS_CANCEL                      33445
 #define IDS_TEXTFILE_ENC                33446
 #define IDS_SAVE_FILE                   33447
-#define IDS_AG_VIDEOFILES               33448
 #define IDS_VOLUME_OSD_MUTE             33449
 #define IDS_COPY_TO_CLIPBOARD           33450
 #define IDS_AUDIO_LEVEL                 33451

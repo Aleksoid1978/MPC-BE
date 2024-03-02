@@ -2700,12 +2700,17 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_AG_MEDIAFILES       "Մեդիաֆայլեր (բոլոր տեսակի)"
+    IDS_AG_VIDEOFILES       "Video files (all types)"
+    IDS_AG_AUDIOFILES       "Ձայնային ֆայլեր (բոլոր տեսակի)"
+    IDS_AG_ALLFILES         "Բոլոր ֆայլերը"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_AUDIO_FILE       "Ձայնային ֆայլը"
     IDS_AG_PLAYLIST_FILE    "Խաղացանկի ֆայլ"
     IDS_AG_OTHER            "Այլ"
-    IDS_AG_MEDIAFILES       "Մեդիաֆայլեր (բոլոր տեսակի)"
-    IDS_AG_ALLFILES         "Բոլոր ֆայլերը"
-    IDS_AG_AUDIOFILES       "Ձայնային ֆայլեր (բոլոր տեսակի)"
     IDS_PIXELSHADERCOMPILER_0  "Հնարավոր չէ բացել D3DX9_xx.DLL-ն, փիքսելային շեյդերները չեն աշխատի։"
     IDS_PIXELSHADERCOMPILER_1  "D3DX9_xx.DLL-ը հասանելի չէ, փիքսելային շեյդերները չեն աշխատի։ Տեղակայեք DirectX-ի նոր տարբերակը։"
     IDS_AG_NOT_KNOWN        "Հայտնի չէ"
@@ -2724,7 +2729,6 @@ BEGIN
     IDS_CANCEL              "Չեղարկել"
     IDS_TEXTFILE_ENC        "Encoding:"
     IDS_SAVE_FILE           "Saving file"
-    IDS_AG_VIDEOFILES       "Video files (all types)"
     IDS_VOLUME_OSD_MUTE     "Vol: %d%% [Mute]"
     IDS_COPY_TO_CLIPBOARD   "Copy to Clipboard"
     IDS_AUDIO_LEVEL         "Level (%d):"
@@ -3061,7 +3065,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_MAINFRM_47          " Հաջողությամբ բեռնվել է"
-    IDS_MAINFRM_48          "Բոլոր ֆայլերը"
     IDS_MAINFRM_49          "Խնդիր GetDIB, hr = %08x"
     IDS_MAINFRM_51          "Խնդիր GetCurrentImage, hr = %08x"
     IDS_MAINFRM_53          "Հնարավոր չէ ստեղծել ֆայլը"

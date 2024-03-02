@@ -6004,7 +6004,7 @@ void CMainFrame::OnFileSaveAs()
 			ext_list.Format(L"Media (*%s)|*%s|", ext, ext);
 		}
 	}
-	ext_list.Append(ResStr(IDS_MAINFRM_48) + L" (*.*)|*.*||");
+	ext_list.Append(ResStr(IDS_AG_ALLFILES) + L" (*.*)|*.*||");
 
 	CFileDialog fd(FALSE, ext.GetLength() ? ext.GetString() : nullptr, out,
 				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT,

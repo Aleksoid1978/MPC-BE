@@ -2700,12 +2700,17 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_AG_MEDIAFILES       "File multimediali (tutti i tipi)"
+    IDS_AG_VIDEOFILES       "File video (tutti i tipi)"
+    IDS_AG_AUDIOFILES       "File audio (tutti i tipi)"
+    IDS_AG_ALLFILES         "Tutti i file"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_AUDIO_FILE       "File audio"
     IDS_AG_PLAYLIST_FILE    "File playlist"
     IDS_AG_OTHER            "Altro"
-    IDS_AG_MEDIAFILES       "File multimediali (tutti i tipi)"
-    IDS_AG_ALLFILES         "Tutti i file"
-    IDS_AG_AUDIOFILES       "File audio (tutti i tipi)"
     IDS_PIXELSHADERCOMPILER_0  "Impossibile caricare D3DX9_xx.DLL, i pixel shader non funzioneranno."
     IDS_PIXELSHADERCOMPILER_1  "Impossibile trovare i punti di ingresso della funzione necessari in D3DX9_xx.DLL, i pixel shader non funzioneranno."
     IDS_AG_NOT_KNOWN        "Non conosciuto"
@@ -2724,7 +2729,6 @@ BEGIN
     IDS_CANCEL              "Annulla"
     IDS_TEXTFILE_ENC        "Codifica:"
     IDS_SAVE_FILE           "Salvataggio file"
-    IDS_AG_VIDEOFILES       "File video (tutti i tipi)"
     IDS_VOLUME_OSD_MUTE     "Vol: %d%% [Muto]"
     IDS_COPY_TO_CLIPBOARD   "Copia negli appunti"
     IDS_AUDIO_LEVEL         "Livello (%d):"
@@ -3061,7 +3065,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_MAINFRM_47          " caricato correttamente"
-    IDS_MAINFRM_48          "Tutti i file"
     IDS_MAINFRM_49          "GetDIB fallito, hr = %08x"
     IDS_MAINFRM_51          "GetCurrentImage fallito, hr = %08x"
     IDS_MAINFRM_53          "Impossibile creare il file"

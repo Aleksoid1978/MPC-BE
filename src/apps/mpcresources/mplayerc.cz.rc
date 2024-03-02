@@ -2700,12 +2700,17 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_AG_MEDIAFILES       "Mediální soubory (všechny typy)"
+    IDS_AG_VIDEOFILES       "Video files (all types)"
+    IDS_AG_AUDIOFILES       "Audio soubory (všechny typy)"
+    IDS_AG_ALLFILES         "Všechny soubory"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_AUDIO_FILE       "Audio soubory"
     IDS_AG_PLAYLIST_FILE    "Playlist soubory"
     IDS_AG_OTHER            "Ostatní"
-    IDS_AG_MEDIAFILES       "Mediální soubory (všechny typy)"
-    IDS_AG_ALLFILES         "Všechny soubory"
-    IDS_AG_AUDIOFILES       "Audio soubory (všechny typy)"
     IDS_PIXELSHADERCOMPILER_0  "Nepodařilo se načíst D3DX9_xx.DLL, pixel shadery nebudou funkční."
     IDS_PIXELSHADERCOMPILER_1  "Nepodařilo se nalézt potřebné vstupní body funkcí v D3DX9_xx.DLL, pixel shadery nebudou funkční."
     IDS_AG_NOT_KNOWN        "Neznámé"
@@ -2724,7 +2729,6 @@ BEGIN
     IDS_CANCEL              "Storno"
     IDS_TEXTFILE_ENC        "Encoding:"
     IDS_SAVE_FILE           "Saving file"
-    IDS_AG_VIDEOFILES       "Video files (all types)"
     IDS_VOLUME_OSD_MUTE     "Vol: %d%% [Mute]"
     IDS_COPY_TO_CLIPBOARD   "Copy to Clipboard"
     IDS_AUDIO_LEVEL         "Level (%d):"
@@ -3061,7 +3065,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_MAINFRM_47          " úspěšně načteny"
-    IDS_MAINFRM_48          "Všechny soubory"
     IDS_MAINFRM_49          "GetDIB selhalo, hr = %08x"
     IDS_MAINFRM_51          "GetCurrentImage selhalo, hr = %08x"
     IDS_MAINFRM_53          "Nepodařilo se vytvořit soubor"

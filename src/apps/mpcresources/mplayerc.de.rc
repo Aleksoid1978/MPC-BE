@@ -2700,12 +2700,17 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_AG_MEDIAFILES       "Mediendateien (alle Formate)"
+    IDS_AG_VIDEOFILES       "Videodateien (alle Formate)"
+    IDS_AG_AUDIOFILES       "Audiodateien (alle Formate)"
+    IDS_AG_ALLFILES         "Alle Dateien"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_AUDIO_FILE       "Audiodatei"
     IDS_AG_PLAYLIST_FILE    "Wiedergabeliste"
     IDS_AG_OTHER            "Andere"
-    IDS_AG_MEDIAFILES       "Mediendateien (alle Formate)"
-    IDS_AG_ALLFILES         "Alle Dateien"
-    IDS_AG_AUDIOFILES       "Audiodateien (alle Formate)"
     IDS_PIXELSHADERCOMPILER_0  "Kann D3DX9_xx.dll nicht laden, Pixel-Shader bleiben inaktiv."
     IDS_PIXELSHADERCOMPILER_1  "Kann benötigte Funktionen in der D3DX9_xx.dll Library nicht\nfinden (evtl. falsche Version), Pixel-Shader bleiben inaktiv."
     IDS_AG_NOT_KNOWN        "Unbekannt"
@@ -2724,7 +2729,6 @@ BEGIN
     IDS_CANCEL              "&Abbrechen"
     IDS_TEXTFILE_ENC        "Kodierung:"
     IDS_SAVE_FILE           "Datei speichern"
-    IDS_AG_VIDEOFILES       "Videodateien (alle Formate)"
     IDS_VOLUME_OSD_MUTE     "Lautstärke: %d%% [Ton aus]"
     IDS_COPY_TO_CLIPBOARD   "In die Zwischenablage"
     IDS_AUDIO_LEVEL         "Pegel (%d):"
@@ -3061,7 +3065,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_MAINFRM_47          " erfolgreich geladen"
-    IDS_MAINFRM_48          "Alle Dateien"
     IDS_MAINFRM_49          "GetDIB fehlgeschlagen, hr = %08x"
     IDS_MAINFRM_51          "GetCurrentImage fehlgeschlagen, hr = %08x"
     IDS_MAINFRM_53          "Kann Datei nicht anlegen"

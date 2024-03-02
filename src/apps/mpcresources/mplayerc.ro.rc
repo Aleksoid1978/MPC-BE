@@ -2699,12 +2699,17 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_AG_MEDIAFILES       "Fișiere media (toate tipurile)"
+    IDS_AG_VIDEOFILES       "Fișiere video (toate tipurile)"
+    IDS_AG_AUDIOFILES       "Fișiere audio (toate tipurile)"
+    IDS_AG_ALLFILES         "Toate fișierele"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_AUDIO_FILE       "Fișier audio"
     IDS_AG_PLAYLIST_FILE    "Fișier de listă de redare"
     IDS_AG_OTHER            "Altele"
-    IDS_AG_MEDIAFILES       "Fișiere media (toate tipurile)"
-    IDS_AG_ALLFILES         "Toate fișierele"
-    IDS_AG_AUDIOFILES       "Fișiere audio (toate tipurile)"
     IDS_PIXELSHADERCOMPILER_0  "D3DX9_xx.dll nu poate fi încărcat, nuanțatoarele pixel nu vor funcționa."
     IDS_PIXELSHADERCOMPILER_1  "Punctele de intrare necesare ale funcției nu pot fi găsite în D3DX9_xx.dll, nuanțatoarele pixel nu vor funcționa."
     IDS_AG_NOT_KNOWN        "Necunoscut"
@@ -2723,7 +2728,6 @@ BEGIN
     IDS_CANCEL              "Renunță"
     IDS_TEXTFILE_ENC        "Codare:"
     IDS_SAVE_FILE           "Se salvează fișierul"
-    IDS_AG_VIDEOFILES       "Fișiere video (toate tipurile)"
     IDS_VOLUME_OSD_MUTE     "Vol: %d%% [mut]"
     IDS_COPY_TO_CLIPBOARD   "Copiază în clipboard"
     IDS_AUDIO_LEVEL         "Nivel (%d):"
@@ -3060,7 +3064,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_MAINFRM_47          " încărcată cu succes"
-    IDS_MAINFRM_48          "Toate fișierele"
     IDS_MAINFRM_49          "GetDIB a eșuat, hr = %08x"
     IDS_MAINFRM_51          "GetCurrentImage a eșuat, hr = %08x"
     IDS_MAINFRM_53          "Fișierul nu poate fi creat"

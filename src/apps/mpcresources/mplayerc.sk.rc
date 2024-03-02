@@ -2700,12 +2700,17 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_AG_MEDIAFILES       "Mediálne súbory (všetky typy)"
+    IDS_AG_VIDEOFILES       "Video files (all types)"
+    IDS_AG_AUDIOFILES       "Zvukové súbory (všetky typy)"
+    IDS_AG_ALLFILES         "Všetky súbory"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_AUDIO_FILE       "Zvukový súbor"
     IDS_AG_PLAYLIST_FILE    "Playlist"
     IDS_AG_OTHER            "Iné "
-    IDS_AG_MEDIAFILES       "Mediálne súbory (všetky typy)"
-    IDS_AG_ALLFILES         "Všetky súbory"
-    IDS_AG_AUDIOFILES       "Zvukové súbory (všetky typy)"
     IDS_PIXELSHADERCOMPILER_0  "Nemožno načítať súbor D3DX9_xx.DLL, pixel shadery nebudú pracovať."
     IDS_PIXELSHADERCOMPILER_1  "Nemožno nájsť potrebný vstupný bod procedúry v knižnici D3DX9_xx.DLL, pixel shadery nebudú pracovať."
     IDS_AG_NOT_KNOWN        "Neznáme"
@@ -2724,7 +2729,6 @@ BEGIN
     IDS_CANCEL              "Storno"
     IDS_TEXTFILE_ENC        "Encoding:"
     IDS_SAVE_FILE           "Saving file"
-    IDS_AG_VIDEOFILES       "Video files (all types)"
     IDS_VOLUME_OSD_MUTE     "Vol: %d%% [Mute]"
     IDS_COPY_TO_CLIPBOARD   "Copy to Clipboard"
     IDS_AUDIO_LEVEL         "Level (%d):"
@@ -3061,7 +3065,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_MAINFRM_47          " úspešne načítané"
-    IDS_MAINFRM_48          "Všetky súbory"
     IDS_MAINFRM_49          "Príkaz GetDIB zlyhal, hr = %08x"
     IDS_MAINFRM_51          "Príkaz GetCurrentImage zlyhal, hr = %08x"
     IDS_MAINFRM_53          "Nemožno vytvoriť súbor"

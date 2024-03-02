@@ -2698,12 +2698,17 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_AG_MEDIAFILES       "Media datoteke (svi tipovi)"
+    IDS_AG_VIDEOFILES       "Video datoteke (svi tipovi)"
+    IDS_AG_AUDIOFILES       "Audio datoteke (svi tipovi)"
+    IDS_AG_ALLFILES         "Sve Datoteke"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_AUDIO_FILE       "Audio datoteka"
     IDS_AG_PLAYLIST_FILE    "Playlist datoteka"
     IDS_AG_OTHER            "Ostalo"
-    IDS_AG_MEDIAFILES       "Media datoteke (svi tipovi)"
-    IDS_AG_ALLFILES         "Sve Datoteke"
-    IDS_AG_AUDIOFILES       "Audio datoteke (svi tipovi)"
     IDS_PIXELSHADERCOMPILER_0  "Cannot load D3DX9_xx.DLL, pixel shaders will not work."
     IDS_PIXELSHADERCOMPILER_1  "Cannot find necessary function entry points in D3DX9_xx.DLL, pixel shaders will not work."
     IDS_AG_NOT_KNOWN        "Nepoznato"
@@ -2722,7 +2727,6 @@ BEGIN
     IDS_CANCEL              "Cancel"
     IDS_TEXTFILE_ENC        "Enkodiranje:"
     IDS_SAVE_FILE           "Spremi datoteku"
-    IDS_AG_VIDEOFILES       "Video datoteke (svi tipovi)"
     IDS_VOLUME_OSD_MUTE     "Glasnoća: %d%% [Nečujno]"
     IDS_COPY_TO_CLIPBOARD   "Kopiranje U Clipboard"
     IDS_AUDIO_LEVEL         "Razina (%d):"
@@ -3059,7 +3063,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_MAINFRM_47          " uspješno učitano"
-    IDS_MAINFRM_48          "Sve datoteke"
     IDS_MAINFRM_49          "GetDIB neuspjeh, hr = %08x"
     IDS_MAINFRM_51          "GetCurrentImage neuspjeh, hr = %08x"
     IDS_MAINFRM_53          "Datoteku nije moguće kreirati"

@@ -2700,12 +2700,17 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_AG_MEDIAFILES       "Arxius de mitjans (tots els tipus)"
+    IDS_AG_VIDEOFILES       "Video files (all types)"
+    IDS_AG_AUDIOFILES       "Arxius d'Àudio (tots els tipus)"
+    IDS_AG_ALLFILES         "Tots els arxius"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_AUDIO_FILE       "Arxiu d'Àudio"
     IDS_AG_PLAYLIST_FILE    "Arxiu de Llista de Reproducció"
     IDS_AG_OTHER            "Altre"
-    IDS_AG_MEDIAFILES       "Arxius de mitjans (tots els tipus)"
-    IDS_AG_ALLFILES         "Tots els arxius"
-    IDS_AG_AUDIOFILES       "Arxius d'Àudio (tots els tipus)"
     IDS_PIXELSHADERCOMPILER_0  "No es pot cargar D3DX9_xx.DLL, els pixel shaders no funcionarant."
     IDS_PIXELSHADERCOMPILER_1  "No es poden trobar les entrades de funcions necessàries en D3DX9_xx.DLL, els pixel shaders no funcionarant."
     IDS_AG_NOT_KNOWN        "Desconegut"
@@ -2724,7 +2729,6 @@ BEGIN
     IDS_CANCEL              "Cancel"
     IDS_TEXTFILE_ENC        "Encoding:"
     IDS_SAVE_FILE           "Saving file"
-    IDS_AG_VIDEOFILES       "Video files (all types)"
     IDS_VOLUME_OSD_MUTE     "Vol: %d%% [Mute]"
     IDS_COPY_TO_CLIPBOARD   "Copy to Clipboard"
     IDS_AUDIO_LEVEL         "Level (%d):"
@@ -3061,7 +3065,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_MAINFRM_47          "Carregat amb èxit"
-    IDS_MAINFRM_48          "Tots els arxius"
     IDS_MAINFRM_49          "GetDIB a fallat, hr = %08x"
     IDS_MAINFRM_51          "GetCurrentImage ha fallat, hr = %08x"
     IDS_MAINFRM_53          "No es pot crear l'Arxiu"

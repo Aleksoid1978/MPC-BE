@@ -2700,12 +2700,17 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_AG_MEDIAFILES       "Fichiers multimédia (tous types)"
+    IDS_AG_VIDEOFILES       "Fichiers Vidéo (tous types)"
+    IDS_AG_AUDIOFILES       "Fichiers audio (tous types)"
+    IDS_AG_ALLFILES         "Tous les fichiers"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_AUDIO_FILE       "Fichier audio"
     IDS_AG_PLAYLIST_FILE    "Fichier Playlist"
     IDS_AG_OTHER            "Autres "
-    IDS_AG_MEDIAFILES       "Fichiers multimédia (tous types)"
-    IDS_AG_ALLFILES         "Tous les fichiers"
-    IDS_AG_AUDIOFILES       "Fichiers audio (tous types)"
     IDS_PIXELSHADERCOMPILER_0  "Le fichier D3DX9_xx.dll est introuvable, une mise à jour de DirectX 9 est nécessaire pour utiliser les Pixels Shaders."
     IDS_PIXELSHADERCOMPILER_1  "Problème au chargement de D3DX9_xx.dll, les Pixels Shaders ne fonctionnerons pas."
     IDS_AG_NOT_KNOWN        "Inconnu"
@@ -2724,7 +2729,6 @@ BEGIN
     IDS_CANCEL              "Annuler"
     IDS_TEXTFILE_ENC        "Encodage :"
     IDS_SAVE_FILE           "Enregistrement du fichier"
-    IDS_AG_VIDEOFILES       "Fichiers Vidéo (tous types)"
     IDS_VOLUME_OSD_MUTE     "Vol: %d%% [Mute]"
     IDS_COPY_TO_CLIPBOARD   "Copier vers le Presse-papiers"
     IDS_AUDIO_LEVEL         "Niveau (%d):"
@@ -3061,7 +3065,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_MAINFRM_47          "Chargé avec succès"
-    IDS_MAINFRM_48          "Tous fichiers"
     IDS_MAINFRM_49          "GetDIB impossible, hr = %08x"
     IDS_MAINFRM_51          "Obtention de l'image courante impossible, hr = %08x"
     IDS_MAINFRM_53          "Ne peut pas créer de fichier"
