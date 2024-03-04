@@ -93,6 +93,7 @@
 #include "libavutil/thread.h"
 #include "decode.h"
 #include "internal.h"
+#include "lpc_functions.h"
 
 static int output_configure(AACDecContext *ac,
                             uint8_t layout_map[MAX_ELEM_ID*4][3], int tags,
@@ -1297,7 +1298,7 @@ static void decode_ltp(LongTermPrediction *ltp,
     int sfb;
 
     ltp->lag  = get_bits(gb, 11);
-    ltp->coef = ltp_coef[get_bits(gb, 3)];
+    ltp->coef = AAC_RENAME2(ltp_coef)[get_bits(gb, 3)];
     for (sfb = 0; sfb < FFMIN(max_sfb, MAX_LTP_LONG_SFB); sfb++)
         ltp->used[sfb] = get_bits1(gb);
 }
@@ -1610,7 +1611,7 @@ static int decode_tns(AACDecContext *ac, TemporalNoiseShaping *tns,
                     tmp2_idx = 2 * coef_compress + coef_res;
 
                     for (i = 0; i < tns->order[w][filt]; i++)
-                        tns->coef[w][filt][i] = tns_tmp2_map[tmp2_idx][get_bits(gb, coef_len)];
+                        tns->coef[w][filt][i] = AAC_RENAME2(tns_tmp2_map)[tmp2_idx][get_bits(gb, coef_len)];
                 }
             }
         }
@@ -2516,7 +2517,7 @@ static void apply_tns(INTFLOAT coef_param[1024], TemporalNoiseShaping *tns,
                 continue;
 
             // tns_decode_coef
-            AAC_RENAME(compute_lpc_coefs)(tns->coef[w][filt], order, lpc, 0, 0, 0);
+            compute_lpc_coefs(tns->coef[w][filt], order, lpc, 0, 0, 0);
 
             start = ics->swb_offset[FFMIN(bottom, mmm)];
             end   = ics->swb_offset[FFMIN(   top, mmm)];

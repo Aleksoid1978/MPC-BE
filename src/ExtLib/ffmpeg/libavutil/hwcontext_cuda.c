@@ -35,6 +35,11 @@ typedef struct CUDAFramesContext {
     int tex_alignment;
 } CUDAFramesContext;
 
+typedef struct CUDADeviceContext {
+    AVCUDADeviceContext p;
+    AVCUDADeviceContextInternal internal;
+} CUDADeviceContext;
+
 static const enum AVPixelFormat supported_formats[] = {
     AV_PIX_FMT_NV12,
     AV_PIX_FMT_YUV420P,
@@ -130,7 +135,7 @@ static int cuda_frames_init(AVHWFramesContext *ctx)
 {
     AVHWDeviceContext *device_ctx = ctx->device_ctx;
     AVCUDADeviceContext    *hwctx = device_ctx->hwctx;
-    CUDAFramesContext       *priv = ctx->internal->priv;
+    CUDAFramesContext       *priv = ctx->hwctx;
     CudaFunctions             *cu = hwctx->internal->cuda_dl;
     int err, i;
 
@@ -175,7 +180,7 @@ static int cuda_frames_init(AVHWFramesContext *ctx)
 
 static int cuda_get_buffer(AVHWFramesContext *ctx, AVFrame *frame)
 {
-    CUDAFramesContext *priv = ctx->internal->priv;
+    CUDAFramesContext *priv = ctx->hwctx;
     int res;
 
     frame->buf[0] = av_buffer_pool_get(ctx->pool);
@@ -223,7 +228,7 @@ static int cuda_transfer_get_formats(AVHWFramesContext *ctx,
 static int cuda_transfer_data(AVHWFramesContext *ctx, AVFrame *dst,
                                  const AVFrame *src)
 {
-    CUDAFramesContext       *priv = ctx->internal->priv;
+    CUDAFramesContext       *priv = ctx->hwctx;
     AVHWDeviceContext *device_ctx = ctx->device_ctx;
     AVCUDADeviceContext    *hwctx = device_ctx->hwctx;
     CudaFunctions             *cu = hwctx->internal->cuda_dl;
@@ -282,39 +287,35 @@ exit:
 
 static void cuda_device_uninit(AVHWDeviceContext *device_ctx)
 {
-    AVCUDADeviceContext *hwctx = device_ctx->hwctx;
+    CUDADeviceContext *hwctx = device_ctx->hwctx;
 
-    if (hwctx->internal) {
-        CudaFunctions *cu = hwctx->internal->cuda_dl;
+    if (hwctx->p.internal) {
+        CudaFunctions *cu = hwctx->internal.cuda_dl;
 
-        if (hwctx->internal->is_allocated && hwctx->cuda_ctx) {
-            if (hwctx->internal->flags & AV_CUDA_USE_PRIMARY_CONTEXT)
-                CHECK_CU(cu->cuDevicePrimaryCtxRelease(hwctx->internal->cuda_device));
-            else if (!(hwctx->internal->flags & AV_CUDA_USE_CURRENT_CONTEXT))
-                CHECK_CU(cu->cuCtxDestroy(hwctx->cuda_ctx));
+        if (hwctx->internal.is_allocated && hwctx->p.cuda_ctx) {
+            if (hwctx->internal.flags & AV_CUDA_USE_PRIMARY_CONTEXT)
+                CHECK_CU(cu->cuDevicePrimaryCtxRelease(hwctx->internal.cuda_device));
+            else if (!(hwctx->internal.flags & AV_CUDA_USE_CURRENT_CONTEXT))
+                CHECK_CU(cu->cuCtxDestroy(hwctx->p.cuda_ctx));
 
-            hwctx->cuda_ctx = NULL;
+            hwctx->p.cuda_ctx = NULL;
         }
 
-        cuda_free_functions(&hwctx->internal->cuda_dl);
+        cuda_free_functions(&hwctx->internal.cuda_dl);
+        memset(&hwctx->internal, 0, sizeof(hwctx->internal));
+        hwctx->p.internal = NULL;
     }
-
-    av_freep(&hwctx->internal);
 }
 
 static int cuda_device_init(AVHWDeviceContext *ctx)
 {
-    AVCUDADeviceContext *hwctx = ctx->hwctx;
+    CUDADeviceContext *hwctx = ctx->hwctx;
     int ret;
 
-    if (!hwctx->internal) {
-        hwctx->internal = av_mallocz(sizeof(*hwctx->internal));
-        if (!hwctx->internal)
-            return AVERROR(ENOMEM);
-    }
+    hwctx->p.internal = &hwctx->internal;
 
-    if (!hwctx->internal->cuda_dl) {
-        ret = cuda_load_functions(&hwctx->internal->cuda_dl, ctx);
+    if (!hwctx->internal.cuda_dl) {
+        ret = cuda_load_functions(&hwctx->internal.cuda_dl, ctx);
         if (ret < 0) {
             av_log(ctx, AV_LOG_ERROR, "Could not dynamically load CUDA\n");
             goto error;
@@ -562,8 +563,8 @@ const HWContextType ff_hwcontext_type_cuda = {
     .type                 = AV_HWDEVICE_TYPE_CUDA,
     .name                 = "CUDA",
 
-    .device_hwctx_size    = sizeof(AVCUDADeviceContext),
-    .frames_priv_size     = sizeof(CUDAFramesContext),
+    .device_hwctx_size    = sizeof(CUDADeviceContext),
+    .frames_hwctx_size    = sizeof(CUDAFramesContext),
 
     .device_create        = cuda_device_create,
     .device_derive        = cuda_device_derive,

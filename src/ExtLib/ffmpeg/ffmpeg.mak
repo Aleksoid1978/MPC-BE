@@ -578,6 +578,7 @@ SRCS_LC_B = \
 	libavcodec/vvc/vvc_filter.c \
 	libavcodec/vvc/vvc_inter.c \
 	libavcodec/vvc/vvc_intra.c \
+	libavcodec/vvc/vvc_intra_utils.c \
 	libavcodec/vvc/vvc_itx_1d.c \
 	libavcodec/vvc/vvc_mvs.c \
 	libavcodec/vvc/vvc_ps.c \
@@ -665,7 +666,6 @@ SRCS_LC_BSF = \
 	libavcodec/bsf/mjpeg2jpeg.c \
 	libavcodec/bsf/mjpega_dump_header.c \
 	libavcodec/bsf/movsub.c \
-	libavcodec/bsf/mp3_header_decompress.c \
 	libavcodec/bsf/mpeg4_unpack_bframes.c \
 	libavcodec/bsf/noise.c \
 	libavcodec/bsf/null.c \
