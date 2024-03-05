@@ -28,6 +28,9 @@ Fixed the operation of the "On Top" setting.
 The ability to add supported video renderers to the list of external filters has been removed. Supported video renderers are selected in the Video settings panel.
 Various interface fixes.
 
+Installer
+MPC Video Renderer 0.7.3 is included in the installer.
+
 Updated French translation (by rhahgleuhargh).
 Updated Italian translation (by mapi68).
 Updated Korean translation (by Hackjjang).
