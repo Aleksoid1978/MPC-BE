@@ -2704,6 +2704,7 @@ BEGIN
     IDS_AG_VIDEOFILES       "視訊檔案（所有類型）"
     IDS_AG_AUDIOFILES       "音訊檔案（所有種類）"
     IDS_AG_ALLFILES         "所有檔案"
+    IDS_AG_SUBTITLEFILES    "Subtitle files"
 END
 
 STRINGTABLE

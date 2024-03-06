@@ -2703,6 +2703,7 @@ BEGIN
     IDS_AG_VIDEOFILES       "Fișiere video (toate tipurile)"
     IDS_AG_AUDIOFILES       "Fișiere audio (toate tipurile)"
     IDS_AG_ALLFILES         "Toate fișierele"
+    IDS_AG_SUBTITLEFILES    "Subtitle files"
 END
 
 STRINGTABLE

@@ -2702,6 +2702,7 @@ BEGIN
     IDS_AG_VIDEOFILES       "Video datoteke (svi tipovi)"
     IDS_AG_AUDIOFILES       "Audio datoteke (svi tipovi)"
     IDS_AG_ALLFILES         "Sve Datoteke"
+    IDS_AG_SUBTITLEFILES    "Subtitle files"
 END
 
 STRINGTABLE

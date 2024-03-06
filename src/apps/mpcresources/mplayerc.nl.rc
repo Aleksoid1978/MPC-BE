@@ -2704,6 +2704,7 @@ BEGIN
     IDS_AG_VIDEOFILES       "Videobestanden (alle soorten)"
     IDS_AG_AUDIOFILES       "Audiobestanden (alle soorten)"
     IDS_AG_ALLFILES         "Alle bestanden"
+    IDS_AG_SUBTITLEFILES    "Subtitle files"
 END
 
 STRINGTABLE

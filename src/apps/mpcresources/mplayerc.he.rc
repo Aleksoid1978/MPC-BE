@@ -2702,6 +2702,7 @@ BEGIN
     IDS_AG_VIDEOFILES       "Video files (all types)"
     IDS_AG_AUDIOFILES       "קבצי שמע (כל הסוגים)"
     IDS_AG_ALLFILES         "כל הקבצים"
+    IDS_AG_SUBTITLEFILES    "Subtitle files"
 END
 
 STRINGTABLE

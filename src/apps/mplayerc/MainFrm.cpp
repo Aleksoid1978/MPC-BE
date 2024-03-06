@@ -6667,18 +6667,16 @@ void CMainFrame::OnFileLoadSubtitle()
 		return;
 	}
 
-	CString filter;
-	for (size_t idx = 0; idx < std::size(Subtitle::s_SubFileExts); idx++) {
-		filter += (idx == 0 ? L"." : L" .") + CString(Subtitle::s_SubFileExts[idx]);
+	CStringW exts;
+	for (const auto& subext : Subtitle::s_SubFileExts) {
+		exts.AppendFormat(L"*.%s;", subext);
 	}
-	filter += L"|";
+	exts.TrimRight(';');
 
-	for (size_t idx = 0; idx < std::size(Subtitle::s_SubFileExts); idx++) {
-		filter += (idx == 0 ? L"*." : L";*.") + CString(Subtitle::s_SubFileExts[idx]);
-	}
-	filter += L"||";
+	CStringW filter;
+	filter.Format(L"%s (%s)|%s||", ResStr(IDS_AG_SUBTITLEFILES), exts, exts);
 
-	std::vector<CString> mask;
+	std::vector<CStringW> mask;
 	for (const auto& subExt : Subtitle::s_SubFileExts) {
 		mask.emplace_back(L"*." + CString(subExt));
 	}
@@ -6690,7 +6688,7 @@ void CMainFrame::OnFileLoadSubtitle()
 		return;
 	}
 
-	std::list<CString> fns;
+	std::list<CStringW> fns;
 	POSITION pos = fd.GetStartPosition();
 	while (pos) {
 		fns.emplace_back(fd.GetNextPathName(pos));

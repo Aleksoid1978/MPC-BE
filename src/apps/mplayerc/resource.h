@@ -1038,9 +1038,10 @@
 #define IDS_AG_VIDEOFILES               32861
 #define IDS_AG_AUDIOFILES               32862
 #define IDS_AG_ALLFILES                 32863
-#define IDS_AG_AUDIO_FILE               32864
-#define IDS_AG_PLAYLIST_FILE            32865
-#define IDS_AG_OTHER                    32866
+#define IDS_AG_SUBTITLEFILES            32864
+#define IDS_AG_AUDIO_FILE               32866
+#define IDS_AG_PLAYLIST_FILE            32867
+#define IDS_AG_OTHER                    32868
 #define IDS_PIXELSHADERCOMPILER_0       32874
 #define IDS_PIXELSHADERCOMPILER_1       32875
 #define IDS_AG_NOT_KNOWN                32876
