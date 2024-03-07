@@ -1660,7 +1660,8 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 {
 	const BOOL bMenuVisible = IsMainMenuVisible();
 
-	lpMMI->ptMinTrackSize = { 32, 32 }; // minimum video area size
+	// minimum video area size 32 x 32
+	lpMMI->ptMinTrackSize = { 32, (m_bAudioOnly && AfxGetAppSettings().nAudioWindowMode == 2) ? 0 : 32 };
 	CSize cSize;
 	CalcControlsSize(cSize);
 	lpMMI->ptMinTrackSize.x += cSize.cx;
