@@ -7,6 +7,10 @@ Added support for VVC(H.266) video.
 
 MP4Splitter
 Added support for VVC(H.266) video.
+Improved file search for some audio tracks.
+
+OggSplitter
+Improved file search.
 
 RawVideoSplitter
 Added support for VVC(H.266) video.
@@ -18,6 +22,8 @@ MPCVideoDec
 Added support for D3D12 copy back mode.
 Added support for VVC(H.266) video decoding.
 Added AVS3 support for external filter.
+Expanded support for H.264 hardware decoding for full range and Baseline profile video.
+Added support for additional HEVC Intel decoders for D3D11 copy back mode.
 
 Player
 Added the ability to open the folder of the currently playing file using a hotkey.
@@ -26,6 +32,11 @@ Changed the logic of frame offset relative to the center of the window.
 Improvements to opening long paths and paths starting with "\\?\".
 Fixed the operation of the "On Top" setting.
 The ability to add supported video renderers to the list of external filters has been removed. Supported video renderers are selected in the Video settings panel.
+Checking for updates now uses the GitHub API.
+Improved display of external audio tracks in subfolders.
+Added the ability to enable video preview for URLs.
+Fixed priority of HTTP filters for Ace Stream.
+"MPC Audio Renderer" is now the default audio renderer.
 Various interface fixes.
 
 Installer
@@ -34,6 +45,12 @@ MPC Video Renderer 0.7.3 is included in the installer.
 Updated French translation (by rhahgleuhargh).
 Updated Italian translation (by mapi68).
 Updated Korean translation (by Hackjjang).
+Updated Chinese (Simplified) translation (by wushantao).
+Updated Spanish translation (by IPeluchito).
+Updated Turkish translation (by cmhrky).
+Updated Japanese translation (by tsubasanouta).
+Updated Hungarian translation (by mickey).
+Updated German translation (by Klaus1189).
 
 Updated libraries:
 	dav1d git-1.4.0-1-g97cc6ce;
