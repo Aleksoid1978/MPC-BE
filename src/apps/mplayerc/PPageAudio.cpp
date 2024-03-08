@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,7 +29,7 @@
 IMPLEMENT_DYNAMIC(CPPageAudio, CPPageBase)
 CPPageAudio::CPPageAudio()
 	: CPPageBase(CPPageAudio::IDD, CPPageAudio::IDD)
-	, m_iAudioRendererType(1)
+	, m_iAudioRendererType(0)
 	, m_iSecAudioRendererType(1)
 
 	, m_fAutoloadAudio(FALSE)
@@ -142,7 +142,7 @@ BOOL CPPageAudio::OnInitDialog()
 	m_iAudioRendererTypeCtrl.AddString(str);
 	m_iSecAudioRendererTypeCtrl.AddString(str);
 
-	m_iAudioRendererType = 1;
+	m_iAudioRendererType = 0;
 	m_iSecAudioRendererType = 1;
 	for (INT_PTR idx = 0; idx < m_AudioRendererDisplayNames.GetCount(); idx++) {
 		if (s.strAudioRendererDisplayName == m_AudioRendererDisplayNames[idx]) {

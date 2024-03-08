@@ -488,7 +488,7 @@ void CAppSettings::ResetSettings()
 	nSpeedStep = 0; // auto
 	bSpeedNotReset = false;
 
-	strAudioRendererDisplayName.Empty();
+	strAudioRendererDisplayName = L"MPC Audio Renderer";
 	strAudioRendererDisplayName2.Empty();
 	fDualAudioOutput = false;
 
