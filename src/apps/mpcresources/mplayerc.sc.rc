@@ -160,7 +160,7 @@ BEGIN
     CONTROL         "Int24",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,52,218,32,9
     CONTROL         "Int32",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,94,218,32,9
     CONTROL         "浮点",IDC_CHECK12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,137,218,32,9
-    CONTROL         "音频延迟时间 (毫秒): ",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,240,115,9
+    CONTROL         "音频延迟时间 (毫秒):",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,240,115,9
     EDITTEXT        IDC_EDIT2,129,238,46,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,174,238,12,13
     PUSHBUTTON      "默认值",IDC_BUTTON3,230,237,56,14
@@ -187,7 +187,7 @@ CAPTION "打开"
 FONT 8, "Tahoma", 400, 0, 0x0
 BEGIN
     ICON            IDR_MAINFRAME,IDC_MAINFRAME_ICON,5,5,21,20
-    LTEXT           "请先输入视频或音频文件的链接 ( Internet 链接或本地电脑文件路径 ) 随后播放器将会为您打开它。",IDC_STATIC,35,5,213,25
+    LTEXT           "请先输入视频或音频文件的链接 (Internet 链接或本地电脑文件路径) 随后播放器将会为您打开它。",IDC_STATIC,35,5,213,25
     LTEXT           "打开",IDC_STATIC2,10,32,90,8
     COMBOBOX        IDC_COMBO1,10,42,188,65,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "浏览...",IDC_BUTTON1,200,41,50,14
@@ -210,8 +210,8 @@ BEGIN
     CONTROL         "版权所有 © 2002-2024 请查看 Authors.txt",IDC_AUTHORS_LINK,
                     "SysLink",WS_TABSTOP,30,17,195,8
     LTEXT           "版本 :",IDC_VERSION,30,34,90,8
-    LTEXT           "MPC-BE 编译器: ",IDC_STATIC,30,66,90,8
-    LTEXT           "FFmpeg 编译器: ",IDC_STATIC,30,83,90,8
+    LTEXT           "MPC-BE 编译器:",IDC_STATIC,30,66,90,8
+    LTEXT           "FFmpeg 编译器:",IDC_STATIC,30,83,90,8
     LTEXT           "Libavcodec / Libavutil :",IDC_STATIC,30,99,90,8
     EDITTEXT        IDC_VERSION_NUMBER,120,32,110,13,ES_AUTOHSCROLL | ES_READONLY
     EDITTEXT        IDC_EDIT2,120,48,110,13,ES_AUTOHSCROLL | ES_READONLY
@@ -223,7 +223,7 @@ BEGIN
     CONTROL         "<a>https://github.com/Aleksoid1978/MPC-BE</a>",IDC_GITHUB_LINK,
                     "SysLink",WS_TABSTOP,30,126,200,8
     LTEXT           "此程序是遵守 GNU 通用公众授权协议发布的自由软件。",IDC_STATIC,30,138,200,18
-    LTEXT           "简体中文翻译调整：insolo and xikuai",IDC_STATIC,30,161,200,18
+    LTEXT           "简体中文翻译调整: insolo and xikuai",IDC_STATIC,30,161,200,18
     DEFPUSHBUTTON   "确定",IDOK,185,183,50,14,WS_GROUP
 END
 
@@ -294,9 +294,9 @@ IDD_PPAGEDVD DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "Tahoma", 400, 0, 0x0
 BEGIN
-    GROUPBOX        "指定 DVD 驱动器盘符或“VIDEO_TS”文件夹路径",IDC_STATIC,5,5,286,53
+    GROUPBOX        "指定 DVD 驱动器盘符或 “VIDEO_TS” 文件夹路径",IDC_STATIC,5,5,286,53
     CONTROL         "默认",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,17,280,8
-    CONTROL         "用户指定的路径: ",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,29,280,8
+    CONTROL         "用户指定的路径:",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,29,280,8
     EDITTEXT        IDC_DVDPATH,20,41,249,13,ES_AUTOHSCROLL | WS_GROUP
     PUSHBUTTON      "...",IDC_BUTTON1,273,41,13,13
     GROUPBOX        "设置 DVD 导航器的首选语言",IDC_STATIC,5,62,286,74
@@ -345,7 +345,7 @@ BEGIN
     GROUPBOX        "打开设置",IDC_STATIC,5,172,286,79
     LTEXT           "开启音频文件时，",IDC_STATIC,10,185,99,8
     COMBOBOX        IDC_COMBO4,113,182,172,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "额外添加到播放列表：",IDC_STATIC,10,201,139,8
+    LTEXT           "额外添加到播放列表:",IDC_STATIC,10,201,139,8
     COMBOBOX        IDC_COMBO5,150,198,135,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "使用工作线程来创建筛选器图表",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,215,276,9
@@ -359,11 +359,11 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "",IDC_STATIC,5,5,203,28
     CONTROL         "覆盖位置",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,5,100,10
-    LTEXT           "水平: ",IDC_STATIC1,10,19,47,8
+    LTEXT           "水平:",IDC_STATIC1,10,19,47,8
     EDITTEXT        IDC_EDIT2,60,17,32,12,ES_CENTER | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,80,17,12,12
     LTEXT           "%",IDC_STATIC2,96,19,8,8
-    LTEXT           "垂直: ",IDC_STATIC3,111,19,45,8
+    LTEXT           "垂直:",IDC_STATIC3,111,19,45,8
     EDITTEXT        IDC_EDIT3,160,17,32,12,ES_CENTER | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN3,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,180,17,12,12
     LTEXT           "%",IDC_STATIC4,196,19,8,8
@@ -371,10 +371,10 @@ BEGIN
     EDITTEXT        IDC_EDIT4,217,17,40,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "毫秒",IDC_STATIC,261,19,25,11
     GROUPBOX        "纹理设置 (重新打开视频来查看更改效果)",IDC_STATIC,5,37,286,68
-    LTEXT           "字幕图像缓冲数量: ",IDC_STATIC,10,51,125,8
+    LTEXT           "字幕图像缓冲数量:",IDC_STATIC,10,51,125,8
     EDITTEXT        IDC_EDIT1,139,49,32,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,159,49,12,12
-    LTEXT           "最大纹理分辨率: ",IDC_STATIC,10,67,125,8
+    LTEXT           "最大纹理分辨率:",IDC_STATIC,10,67,125,8
     COMBOBOX        IDC_COMBO1,139,65,59,45,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "开启缓冲时允许使用字幕动画效果",IDC_CHECK_SPCANIMWITHBUFFER,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,81,277,9
@@ -504,7 +504,7 @@ BEGIN
     PUSHBUTTON      "删除",IDC_BUTTON2,221,21,70,14
     CONTROL         "首选",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,221,39,70,8
     CONTROL         "禁用",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,221,51,70,8
-    CONTROL         "赋值: ",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,221,63,70,8
+    CONTROL         "赋值:",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,221,63,70,8
     EDITTEXT        IDC_EDIT1,221,75,70,13,ES_RIGHT | ES_AUTOHSCROLL | WS_GROUP
     PUSHBUTTON      "上",IDC_BUTTON3,221,92,33,14
     PUSHBUTTON      "下",IDC_BUTTON4,258,92,33,14
@@ -523,9 +523,9 @@ BEGIN
     ICON            "",IDC_DEFAULTICON,5,5,21,20,SS_REALSIZEIMAGE
     EDITTEXT        IDC_EDIT1,32,13,186,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,30,214,1
-    LTEXT           "文件类型: ",IDC_STATIC,10,36,60,8
+    LTEXT           "文件类型:",IDC_STATIC,10,36,60,8
     EDITTEXT        IDC_EDIT4,72,36,151,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
-    LTEXT           "文件大小: ",IDC_STATIC,10,51,60,8
+    LTEXT           "文件大小:",IDC_STATIC,10,51,60,8
     EDITTEXT        IDC_EDIT3,72,51,151,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
     LTEXT           "媒体文件时间长度:",IDC_STATIC,10,66,60,8
     EDITTEXT        IDC_EDIT2,72,66,151,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
@@ -544,21 +544,21 @@ BEGIN
     ICON            "",IDC_DEFAULTICON,5,5,21,20,SS_REALSIZEIMAGE
     EDITTEXT        IDC_EDIT1,32,13,186,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,30,214,1
-    LTEXT           "片名: ",IDC_STATIC,10,36,50,8
+    LTEXT           "片名:",IDC_STATIC,10,36,50,8
     EDITTEXT        IDC_EDIT4,62,36,162,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
-    LTEXT           "作者: ",IDC_STATIC,10,51,50,8
+    LTEXT           "作者:",IDC_STATIC,10,51,50,8
     EDITTEXT        IDC_EDIT3,62,51,162,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
-    LTEXT           "专辑: ",IDC_STATIC,10,66,50,8
+    LTEXT           "专辑:",IDC_STATIC,10,66,50,8
     EDITTEXT        IDC_EDIT8,62,66,162,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
-    LTEXT           "版权: ",IDC_STATIC,10,81,50,8
+    LTEXT           "版权:",IDC_STATIC,10,81,50,8
     EDITTEXT        IDC_EDIT2,62,81,162,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
-    LTEXT           "评级: ",IDC_STATIC,10,96,50,8
+    LTEXT           "评级:",IDC_STATIC,10,96,50,8
     EDITTEXT        IDC_EDIT5,62,96,162,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,111,214,1
-    LTEXT           "位置: ",IDC_STATIC,10,117,50,8
+    LTEXT           "位置:",IDC_STATIC,10,117,50,8
     EDITTEXT        IDC_EDIT6,62,117,162,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,132,214,1
-    LTEXT           "描述: ",IDC_STATIC,10,136,50,8
+    LTEXT           "描述:",IDC_STATIC,10,136,50,8
     EDITTEXT        IDC_EDIT7,62,136,162,56,ES_MULTILINE | ES_READONLY | WS_VSCROLL
 END
 
@@ -575,7 +575,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "添加到收藏夹"
 FONT 8, "Tahoma", 400, 0, 0x0
 BEGIN
-    GROUPBOX        "选择快捷方式的名称: ",IDC_STATIC,5,5,242,29
+    GROUPBOX        "选择快捷方式的名称:",IDC_STATIC,5,5,242,29
     COMBOBOX        IDC_COMBO1,10,17,232,62,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     CONTROL         "记忆位置",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,38,232,9
     CONTROL         "相对硬盘位置",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,50,232,10
@@ -645,7 +645,7 @@ CAPTION "警告"
 FONT 8, "Tahoma", 400, 0, 0x0
 BEGIN
     LTEXT           "MPC-BE 无法渲染筛选器图表中的某些 pin ，您或许未在系统中安装所需的解码器或分离器。",IDC_STATIC1,5,5,286,18
-    LTEXT           "以下接口 (pin) 无法查找到可用滤镜的信息: ",IDC_STATIC2,5,27,286,8
+    LTEXT           "以下接口 (pin) 无法查找到可用滤镜的信息:",IDC_STATIC2,5,27,286,8
     COMBOBOX        IDC_COMBO1,5,39,286,87,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_EDIT1,5,56,286,140,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
     DEFPUSHBUTTON   "关闭",IDOK,241,200,50,14
@@ -655,7 +655,7 @@ IDD_SAVETEXTFILEDIALOGTEMPL DIALOGEX 0, 0, 304, 42
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN
 FONT 8, "Tahoma", 400, 0, 0x0
 BEGIN
-    LTEXT           "编码方式: ",IDC_STATIC,68,7,50,8
+    LTEXT           "编码方式:",IDC_STATIC,68,7,50,8
     COMBOBOX        IDC_COMBO1,130,5,164,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "保存自定义风格",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,68,27,226,10
 END
@@ -807,7 +807,7 @@ BEGIN
     PUSHBUTTON      "MPEG 分离器\n设置",IDC_BUTTON1,220,76,70,30,BS_MULTILINE
     PUSHBUTTON      "Matroska 分离器\n设置",IDC_BUTTON6,220,111,70,30,BS_MULTILINE
     PUSHBUTTON      "CDDA 读取器\n设置",IDC_BUTTON8,220,146,70,30,BS_MULTILINE
-    PUSHBUTTON      "VTS(IFO) 读取器\n设置",IDC_BUTTON7,220,181,70,30,BS_MULTILINE
+    PUSHBUTTON      "VTS (IFO) 读取器\n设置",IDC_BUTTON7,220,181,70,30,BS_MULTILINE
     PUSHBUTTON      "视频解码器\n设置",IDC_BUTTON2,220,41,70,30,BS_MULTILINE
     PUSHBUTTON      "DVD-视频\n解码器\n设置",IDC_BUTTON3,220,76,70,30,BS_MULTILINE
     PUSHBUTTON      "音频解码器\n设置",IDC_BUTTON4,220,41,70,30,BS_MULTILINE
@@ -825,13 +825,13 @@ BEGIN
     RTEXT           "HTTP:",IDC_STATIC,10,18,50,8
     RTEXT           "UDP:",IDC_STATIC,10,33,50,8
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,9,48,277,1
-    RTEXT           "AVI文件:",IDC_STATIC,10,55,50,8
-    RTEXT           "MKV文件:",IDC_STATIC,10,69,50,8
-    RTEXT           "MPEG-TS文件:",IDC_STATIC,10,84,50,8
-    RTEXT           "MPEG-PS文件:",IDC_STATIC,10,99,50,8
-    RTEXT           "MP4文件:",IDC_STATIC,10,114,50,8
-    RTEXT           "FLV文件:",IDC_STATIC,10,129,50,8
-    RTEXT           "WMV文件:",IDC_STATIC,10,144,50,8
+    RTEXT           "AVI 文件:",IDC_STATIC,10,55,50,8
+    RTEXT           "MKV 文件:",IDC_STATIC,10,69,50,8
+    RTEXT           "MPEG-TS 文件:",IDC_STATIC,10,84,50,8
+    RTEXT           "MPEG-PS 文件:",IDC_STATIC,10,99,50,8
+    RTEXT           "MP4 文件:",IDC_STATIC,10,114,50,8
+    RTEXT           "FLV 文件:",IDC_STATIC,10,129,50,8
+    RTEXT           "WMV 文件:",IDC_STATIC,10,144,50,8
     COMBOBOX        IDC_COMBO1,66,16,220,30,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO2,66,31,220,30,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO3,66,52,220,30,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
@@ -849,8 +849,8 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "Tahoma", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_LOGOPREVIEW,"Static",SS_BITMAP | SS_CENTERIMAGE,5,5,284,196
-    CONTROL         "内置: ",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,5,208,58,8
-    CONTROL         "外部: ",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,5,224,58,8
+    CONTROL         "内置:",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,5,208,58,8
+    CONTROL         "外部:",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,5,224,58,8
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_ARROWKEYS | UDS_HORZ | WS_GROUP,64,205,36,13
     RTEXT           "",IDC_AUTHOR,100,207,190,8
     EDITTEXT        IDC_LOGOFILENAME,64,222,173,13,ES_AUTOHSCROLL
@@ -882,7 +882,7 @@ BEGIN
     COMBOBOX        IDC_COMBO7,188,156,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "输出范围:",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "MPC渲染器设置",IDC_STATIC,5,177,285,27
+    GROUPBOX        "MPC 渲染器设置",IDC_STATIC,5,177,285,27
     CONTROL         "全屏独占使用额外的窗口（实验性）",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
     GROUPBOX        "播放框布置",IDC_STATIC,5,208,210,53
@@ -936,8 +936,8 @@ BEGIN
     PUSHBUTTON      "取消",IDCANCEL,158,108,50,14
     CONTROL         337,IDC_STATIC,"Static",SS_BITMAP,0,0,213,37
     LTEXT           "受限区域",IDC_STATIC,10,40,198,11
-    LTEXT           "用户名: ",IDC_STATIC,10,56,66,8
-    LTEXT           "密码: ",IDC_STATIC,10,74,66,8
+    LTEXT           "用户名:",IDC_STATIC,10,56,66,8
+    LTEXT           "密码:",IDC_STATIC,10,74,66,8
     COMBOBOX        IDC_COMBO1,79,56,129,56,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_EDIT3,79,74,129,13,ES_PASSWORD | ES_AUTOHSCROLL
     CONTROL         "记住我的密码",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,79,92,129,9
@@ -947,7 +947,7 @@ IDD_PPAGEWEBSERVER DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "Tahoma", 400, 0, 0x0
 BEGIN
-    CONTROL         "监听端口: ",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,7,95,9
+    CONTROL         "监听端口:",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,7,95,9
     EDITTEXT        IDC_EDIT1,104,5,30,13,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "图像品质 %:",IDC_STATIC,150,7,95,8
     EDITTEXT        IDC_EDIT4,250,5,30,13,ES_AUTOHSCROLL | ES_NUMBER
@@ -959,11 +959,11 @@ BEGIN
     CONTROL         "显示调试信息",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,61,285,9
     LTEXT           "在网页浏览器中打开...",IDC_STATIC1,150,26,120,8
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,73,284,1
-    CONTROL         "服务页面来自: ",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,77,285,9
+    CONTROL         "服务页面来自:",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,77,285,9
     EDITTEXT        IDC_EDIT2,15,89,167,14,ES_AUTOHSCROLL
     PUSHBUTTON      "浏览...",IDC_BUTTON1,186,89,50,14
     PUSHBUTTON      "部署...",IDC_BUTTON2,240,89,50,14
-    LTEXT           "默认页: ",IDC_STATIC,5,107,285,8
+    LTEXT           "默认页:",IDC_STATIC,5,107,285,8
     EDITTEXT        IDC_EDIT9,15,119,275,14,ES_AUTOHSCROLL
     LTEXT           "CGI 操作器:(.ext1＝路径1; .ext2＝路径2; ...)",IDC_STATIC,5,137,285,8
     EDITTEXT        IDC_EDIT3,15,149,275,14,ES_AUTOHSCROLL
@@ -1035,7 +1035,7 @@ IDD_PPAGECOLOR DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "Tahoma", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "色彩控制 ( 用于 EVR 、 madVR 和 MPC VR )",IDC_STATIC,5,5,286,80
+    GROUPBOX        "色彩控制 (用于 EVR、madVR 和 MPC VR)",IDC_STATIC,5,5,286,80
     LTEXT           "亮度",IDC_STATIC,10,19,55,8
     LTEXT           "对比度",IDC_STATIC,10,35,55,8
     LTEXT           "色调",IDC_STATIC,10,51,55,8
@@ -1063,13 +1063,13 @@ IDD_PPAGEMISC DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "Tahoma", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "步进距离 (小, 中, 大每毫秒)",IDC_STATIC,7,5,220,34
+    GROUPBOX        "步进距离 (小、中、大每毫秒)",IDC_STATIC,7,5,220,34
     EDITTEXT        IDC_EDIT1,15,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT2,64,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "默认",IDC_BUTTON1,158,17,56,14
     CONTROL         "快速搜索 (以关键帧)",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,45,264,9
-    CONTROL         "在播放列表中仅有一个项目时禁用 ""向前 / 后跳转"" 后打开文件中的下一个 / 上一个文件",IDC_CHECK7,
+    CONTROL         "在播放列表中仅有一个项目时禁用 ""向前/后跳转"" 后打开文件中的下一个/上一个文件",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,55,280,18
     CONTROL         "在非默认显示器上全屏时防止播放器被最小化",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,282,9
@@ -1084,7 +1084,7 @@ BEGIN
     CONTROL         "开启罗技 LCD 支持",IDC_CHECK_LCD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,126,264,9
     CONTROL         "启用窗口播放控件",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,138,220,9
     CONTROL         "使用小型存储器转储 (MiniDump)",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,150,184,9
-    LTEXT           "FFmpeg文件位置:",IDC_STATIC,7,165,104,8
+    LTEXT           "FFmpeg 文件位置:",IDC_STATIC,7,165,104,8
     COMBOBOX        IDC_COMBO1,113,163,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "检查更新",IDC_STATIC,5,180,286,40
     CONTROL         "启用自动更新检查",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,192,250,9
@@ -1160,13 +1160,13 @@ BEGIN
     GROUPBOX        "EVR 同步设置",IDC_STATIC2,5,67,286,117
     CONTROL         "将视频同步到显示器",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,142,8
     CONTROL         "使用显示器刷新率与视频帧率最接近的同步方式",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,170,8
-    LTEXT           "频率调整: ",IDC_STATIC5,20,93,85,8
+    LTEXT           "频率调整:",IDC_STATIC5,20,93,85,8
     EDITTEXT        IDC_CYCLEDELTA,109,91,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,123,278,1
-    LTEXT           "目标同步偏移: ",IDC_STATIC3,10,129,100,8
+    LTEXT           "目标同步偏移:",IDC_STATIC3,10,129,100,8
     EDITTEXT        IDC_TARGETSYNCOFFSET,114,127,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
     LTEXT           "毫秒",IDC_STATIC4,158,129,24,8
-    LTEXT           "控制限制: ",IDC_STATIC9,10,143,86,8
+    LTEXT           "控制限制:",IDC_STATIC9,10,143,86,8
     LTEXT           "+/-",IDC_STATIC11,100,143,10,8
     EDITTEXT        IDC_CONTROLLIMIT,114,141,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
     LTEXT           "毫秒",IDC_STATIC10,158,143,24,8
@@ -1235,7 +1235,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,79,285,9
     CONTROL         "启用字幕同步编辑器",IDC_CHECK_SUBRESYNC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,91,285,9
     GROUPBOX        "在线数据库",IDC_STATIC1,5,105,286,45
-    LTEXT           "在线字幕数据库的链接: ",IDC_STATIC2,10,116,222,8
+    LTEXT           "在线字幕数据库的链接:",IDC_STATIC2,10,116,222,8
     LTEXT           "http://",IDC_STATIC3,10,130,22,8
     COMBOBOX        IDC_COMBO1,35,128,199,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "测试",IDC_BUTTON2,237,127,50,14
@@ -2280,7 +2280,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_STATSBAR_SYNC_OFFSET "同步偏移量"
-    IDS_STATSBAR_SYNC_OFFSET_FORMAT "典型: %d ms, 偏差: %d ms"
+    IDS_STATSBAR_SYNC_OFFSET_FORMAT "典型: %d ms，偏差: %d ms"
     IDS_STATSBAR_JITTER     "抖动"
     IDS_STATSBAR_BITRATE    "比特率"
     IDS_STATSBAR_BITRATE_AVG_CUR "(典型/当前)"
@@ -2370,9 +2370,9 @@ BEGIN
     IDS_RECORD_STOP         "停止"
     IDS_FILTERS_COPY_TO_CLIPBOARD "将滤镜列表复制到剪贴板(&C)"
     IDS_AG_COPY_IMAGE       "复制图像到剪贴板"
-    IDS_PLAYLOOPMODE_AB     "A-B重复：重置定位"
-    IDS_PLAYLOOPMODE_AB_MARK_A "A - B 重复：标记定位 A"
-    IDS_PLAYLOOPMODE_AB_MARK_B "A - B 重复：标记定位 B"
+    IDS_PLAYLOOPMODE_AB     "A-B 重复: 重置定位"
+    IDS_PLAYLOOPMODE_AB_MARK_A "A-B 重复: 标记定位 A"
+    IDS_PLAYLOOPMODE_AB_MARK_B "A-B 重复: 标记定位 B"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "从剪贴板添加到播放列表"
     IDS_MOVEWINDOWBYVIDEO_ONOFF "按视频区域移动窗口: 开/关"
     IDS_MOVEWINDOWBYVIDEO_ON "按视频区域移动窗口: 开"
@@ -2406,7 +2406,7 @@ BEGIN
     IDS_SUBRESYNC_CLN_LAYER "层"
     IDS_SUBRESYNC_CLN_ACTOR "演员"
     IDS_SUBRESYNC_CLN_EFFECT "效果"
-    IDS_PPAGE_FS_CLN_ON_OFF "开 / 关"
+    IDS_PPAGE_FS_CLN_ON_OFF "开/关"
     IDS_PPAGE_FS_CLN_FROM_FPS "从 fps"
     IDS_PPAGE_FS_CLN_TO_FPS "到 fps"
     IDS_PPAGE_FS_CLN_DISPLAY_MODE "显示模式(Hz)"
@@ -2507,7 +2507,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_CHECK_SUBRESYNC     "启用后可查看并编辑字幕文件 (包括时间码) ，通过选取字幕预览影片。启用后会明显的降低字幕加载速度。"
+    IDC_CHECK_SUBRESYNC     "启用后可查看并编辑字幕文件 (包括时间码)，通过选取字幕预览影片。启用后会明显的降低字幕加载速度。"
     IDC_BASSREDIRECT_CHECK  "抽出主声道的低频并转送到低音喇叭"
 END
 
@@ -2519,7 +2519,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PPAGE_OUTPUT_MPCVR  "MPC渲染器"
+    IDS_PPAGE_OUTPUT_MPCVR  "MPC 渲染器"
     IDS_PPAGE_OUTPUT_EVR    "EVR"
     IDS_PPAGE_OUTPUT_EVR_CUSTOM "EVR (自定义) 渲染器"
     IDS_PPAGE_OUTPUT_DXR    "Haali 视频渲染器"
@@ -2556,7 +2556,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_EXCLUSIVE_FULLSCREEN_CHECK  "减少撕裂，但会阻碍工具栏显示，在这种模式下按 Alt+Enter 、 Ctrl+Enter 或 Ctrl + C 退出全屏。"
+    IDC_EXCLUSIVE_FULLSCREEN_CHECK  "减少撕裂，但会阻碍工具栏显示，在这种模式下按 Alt+Enter、Ctrl+Enter 或 Ctrl + C 退出全屏。"
 END
 
 STRINGTABLE
@@ -2641,7 +2641,7 @@ BEGIN
     IDS_RECENT_FILES_CLEAR  "清空列表"
     IDS_RECENT_FILES        "近期打开的文件"
     IDS_RECENT_FILES_QUESTION  "您确实要删除最近的文件列表吗？"
-    IDS_HISTORY_REDUCE_QUESTION  "Your history file contains %u entries. Are you sure you want to reduce the number of entries to %u?"
+    IDS_HISTORY_REDUCE_QUESTION  "您的历史文件记录包含有 %u 个条目。是否减少条目数到 %u？"
 END
 
 STRINGTABLE
@@ -2702,7 +2702,7 @@ STRINGTABLE
 BEGIN
     IDS_AG_MEDIAFILES       "媒体文件 (所有类型)"
     IDS_AG_VIDEOFILES       "视频文件 (所有格式)"
-    IDS_AG_AUDIOFILES       "音频文件(所有类型)"
+    IDS_AG_AUDIOFILES       "音频文件 (所有类型)"
     IDS_AG_ALLFILES         "所有文件"
     IDS_AG_SUBTITLEFILES    "字幕文件"
 END
@@ -2759,8 +2759,8 @@ BEGIN
     IDS_AG_OPEN_DEVICE      "打开设备"
     IDS_AG_SAVE_AS          "另存为"
     IDS_AG_SAVE_IMAGE       "保存图像"
-    IDS_AG_AUTOSAVE_IMAGE   "保存图像(自动)"
-    IDS_OSD_IMAGE_SAVED     "图像已成功保存: "
+    IDS_AG_AUTOSAVE_IMAGE   "保存图像 (自动)"
+    IDS_OSD_IMAGE_SAVED     "图像已成功保存:"
     IDS_AG_LOAD_SUBTITLE    "载入字幕文件"
     IDS_AG_SAVE_SUBTITLE    "保存字幕"
     IDS_AG_PROPERTIES       "属性"
@@ -2785,7 +2785,7 @@ BEGIN
     IDS_MENU_VIDEO_STREAM   "视频流(&T)"
     IDS_MENU_VIDEO_ANGLE    "视频角度(&L)"
     IDS_RESET_SETTINGS      "重置设置"
-    IDS_RESET_SETTINGS_WARNING  "您确定要恢复 MPC-BE 的默认设置吗？\n警告:您当前所有的设置将会丢失！"
+    IDS_RESET_SETTINGS_WARNING  "您确定要恢复 MPC-BE 的默认设置吗？\n警告：您当前所有的设置将会丢失！"
     IDS_RESET_SETTINGS_MUTEX  "请关闭所有正在运行的 MPC-BE 程序以便恢复默认设置。"
     IDS_EXPORT_SETTINGS     "导出设置"
     IDS_EXPORT_SETTINGS_WARNING  "一些改变还没有被保存。\n您想在导出前保存它们吗？"
@@ -2950,7 +2950,7 @@ BEGIN
     IDS_MPLAYERC_103        "字幕右移"
     IDS_AG_DISPLAY_STATS    "显示状态"
     IDS_AG_AUDIODELAY_ONOFF "启用/禁用音频延迟"
-    IDS_AG_AUTOSAVE_DISPLAY "保存当前图像(自动)"
+    IDS_AG_AUTOSAVE_DISPLAY "保存当前图像 (自动)"
     IDS_AG_OPEN_ISO         "打开光盘镜像"
     IDS_AG_OPEN_DIR         "打开目录"
 END
@@ -3036,8 +3036,8 @@ BEGIN
     IDS_EXCLUSIVE_FS_WARNING  "此选项被设计用于减少撕裂。但是也会使 MPC-BE 在播放时不能显示上下文菜单和对话框。\n\n为了退出 Direct3D 全屏幕并停止播放，您必须同时按住 Ctrl 和 C 。\n\n您确实要打开这个选项？"
     IDS_MAINFRM_139         "字幕延迟: %ld毫秒"
     IDS_AG_TITLE2           "标题: %02d/%02d"
-    IDS_THUMB_ROWNUMBER     "行: "
-    IDS_THUMB_COLNUMBER     "列: "
+    IDS_THUMB_ROWNUMBER     "行:"
+    IDS_THUMB_COLNUMBER     "列:"
     IDS_THUMB_IMAGE_WIDTH   "图像宽度"
     IDS_PPSDB_URLCORRECT    "URL 看上去正确！"
     IDS_PPSDB_PROTOCOLERR   "协议版本不匹配，请升级您的播放器或选择一个不同的链接！"
@@ -3075,7 +3075,7 @@ BEGIN
     IDS_MAINFRM_57          "无效的图像格式, 无法创建大于 %d bpp 的缩略图。"
     IDS_MAINFRM_58          "文件大小: %s(%s 字节)\\N"
     IDS_MAINFRM_59          "{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}文件名: %s\\N%s分辨率: %dx%d %s\\N持续时间: %02d:%02d:%02d"
-    IDS_MAINFRM_60          "要载入字幕,您需要更改视频渲染器类型然后重新打开文件。\n"
+    IDS_MAINFRM_60          "要载入字幕，您需要更改视频渲染器类型然后重新打开文件。\n"
     IDS_MAINFRM_61          "- DirectShow: EVR-CP、EVR Sync、Haali、madVR 或 MPC VR。\n"
     IDS_MAINFRM_64          "- ShockWave: n/a\n"
 END
@@ -3086,8 +3086,8 @@ BEGIN
     IDS_MAINFRM_69          "高宽比: 默认"
     IDS_MAINFRM_70          "音频延迟: %I64dms"
     IDS_AG_CHAPTER          "章节 %d"
-    IDS_MAINFRM_73          "无法载入着色器: "
-    IDS_AG_SHADER           "着色器: "
+    IDS_MAINFRM_73          "无法载入着色器:"
+    IDS_AG_SHADER           "着色器:"
     IDS_AG_OUT_OF_MEMORY    "内存溢出"
     IDS_MAINFRM_77          "错误: 需要适用于 IE 的 Flash player"
     IDS_MAINFRM_80          "创建滤镜图表对象失败"
@@ -3098,13 +3098,13 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PPSDB_BADURL        "错误的 URL ，无法定位字幕数据库！"
-    IDS_AG_CHAPTER2         "章节: "
+    IDS_PPSDB_BADURL        "错误的 URL，无法定位字幕数据库！"
+    IDS_AG_CHAPTER2         "章节:"
     IDS_VOLUME_OSD          "音量: %d%%"
     IDS_GAIN_OSD            "增益: %+.1f dB"
     IDS_BALANCE_OSD         "平衡: %s"
     IDS_FULLSCREENMONITOR_CURRENT "当前"
-    IDS_MPC_CRASH           "MPC-BE 已被异常终止。要帮助我们修复此问题, 请将此文件 ""%s"" 发送至我们的 bug 跟踪器上。\n\n您是否要打开含有迷您转储文件的文件夹并访问 bug 跟踪器？"
+    IDS_MPC_CRASH           "MPC-BE 已被异常终止。要帮助我们修复此问题，请将此文件 ""%s"" 发送至我们的 bug 跟踪器上。\n\n您是否要打开含有迷您转储文件的文件夹并访问 bug 跟踪器？"
     IDS_MPC_MINIDUMP_FAIL   "未能创建转储文件“%s” (错误号%d)"
     IDS_MAINFRM_DIR_TITLE   "选择目录"
     IDS_MAINFRM_DIR_CHECK   "包括子目录"
@@ -3159,7 +3159,7 @@ BEGIN
     IDS_AG_DISABLED         "已禁用"
     IDS_AG_VSYNCOFFSET_DECREASE "减少垂直同步偏移量"
     IDS_MAINFRM_132         "警告 (CMainFrame::SeekTo): 正尝试在捕获模式中搜索"
-    IDS_AG_REMOVING         "正在删除: "
+    IDS_AG_REMOVING         "正在删除:"
     IDS_MAINFRM_134         "警告: CMainFrame::CloseMedia() 被调用了两次或更多次\n"
     IDS_MAINFRM_135         "严重错误！！！ 必须关闭所有打开的线程！！！"
     IDS_MAINFRM_136         "MPC-BE 全屏幕独占模式"
@@ -3180,7 +3180,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_NULLVR_ANY     "连接到任意视频文件类型并且会将进入的采样信息传送到任意地方。当您不需要显示视频并希望节省不必要的 cpu 工作时请使用它。"
+    IDS_DESC_NULLVR_ANY     "连接到任意视频文件类型并且会将进入的采样信息传送到任意地方。当您不需要显示视频并希望节省不必要的 CPU 工作时请使用它。"
     IDS_DESC_NULLVR_UNCOMP  "和普通的空渲染器相同, 但仅会被连接到未压缩的类型上。"
     IDS_DESC_EVR            "此视频渲染器支持硬件解码"
     IDS_DESC_EVR_CP         "和 EVR 相同，但依托分配管理器负担显示字幕并进行后处理。"
@@ -3269,12 +3269,12 @@ BEGIN
     IDS_MPEGSPLITTER_SUB_ORDER "字幕语言顺序:"
     IDS_MPEGSPLITTER_TRUEHD_OUTPUT "TrueHD + AC-3 流输出"
     IDS_MPEGSPLITTER_SUB_EMPTY_PIN "输出空字幕接口"
-    IDS_MPEGSPLITTER_SUPPORT_MVC "支持3D MVC扩展"
+    IDS_MPEGSPLITTER_SUPPORT_MVC "支持 3D MVC 扩展"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_MPADEC_SAMPLE_FMT   "输出采样格式: "
+    IDS_MPADEC_SAMPLE_FMT   "输出采样格式:"
     IDS_MPADEC_DRC          "为 AC-3 和 E-AC-3 应用动态范围压缩"
     IDS_MPADEC_MIXER        "混响器"
     IDS_MPADEC_MIX_SPEAKERS "输出扬声器:"
@@ -3347,7 +3347,7 @@ STRINGTABLE
 BEGIN
     IDS_MPEG2_BRIGHTNESS    "亮度"
     IDS_MPEG2_RESET         "重置"
-    IDS_MPEG2_NOTE1         "说明: 使用一个非平面格式色彩空间输出、 bob 反交错、或自定义色彩属性会降低性能。必要时反交错模式“自动”将会更改为“混合”。"
+    IDS_MPEG2_NOTE1         "说明: 使用一个非平面格式色彩空间输出、bob 反交错、或自定义色彩属性会降低性能。必要时反交错模式“自动”将会更改为“混合”。"
     IDS_MPEG2_CONTRAST      "对比度"
     IDS_MPEG2_HUE           "色调"
     IDS_MPEG2_SATURATION    "饱和度"
@@ -3545,7 +3545,7 @@ BEGIN
     IDS_MFMT_OPUS           "Opus 格式"
     IDS_MFMT_SPEEX          "Speex 格式"
     IDS_MFMT_MLP            "MLP 音频格式"
-    IDS_MFMT_DVDAUDIO       "DVD - 音频格式"
+    IDS_MFMT_DVDAUDIO       "DVD-音频格式"
     IDS_MFMT_DSD            "DSD"
     IDS_MFMT_DTS            "DTS/DTS-HD 格式"
     IDS_MFMT_WEBA           "WebM 音频格式"
@@ -3609,7 +3609,7 @@ STRINGTABLE
 BEGIN
     IDS_OSD_RS_AMBIENT_LIGHT_BRIGHT "环境光线: 明亮 (2.2 伽玛)"
     IDS_OSD_RS_AMBIENT_LIGHT_DIM "环境光线: 昏暗 (2.35 伽玛)"
-    IDS_OSD_RS_AMBIENT_LIGHT_DARK "环境光线:黑暗 (2.4 伽玛)"
+    IDS_OSD_RS_AMBIENT_LIGHT_DARK "环境光线: 黑暗 (2.4 伽玛)"
     IDS_OSD_RS_REND_INTENT_PERCEPT "渲染意图: 感知"
     IDS_OSD_RS_REND_INTENT_RELATIVE "渲染意图: 相对比色分析"
     IDS_OSD_RS_REND_INTENT_SATUR "渲染意图: 饱和度"
@@ -3652,7 +3652,7 @@ BEGIN
     IDS_RESET_COLOR         "重置颜色设置"
     IDS_AFTERPLAYBACK_CLOSE_FILE "回放结束后: 总是关闭文件"
     IDS_UPDATE_ERROR_DATA   "更新服务器返回了错误数据。\n\n请稍后再试。"
-    IDS_USING_NEWER_VERSION "您当前使用的版本， %s 已是最新的版本。"
+    IDS_USING_NEWER_VERSION "您当前使用的版本，%s 已是最新的版本。"
     IDS_NEW_UPDATE_AVAILABLE  "有可用的新版本 %s 。\n\n请访问 MPC-BE 主页下载。"
     IDS_UPDATE_ERROR_CONNECT  "没有找到升级服务器。\n\n请检查您的网络连接或稍后重试。"
     IDS_UPDATE_CLOSE        "关闭(&C)"
@@ -3821,7 +3821,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PUBLISHED           "发布于 : "
+    IDS_PUBLISHED           "发布于 :"
 END
 
 STRINGTABLE
