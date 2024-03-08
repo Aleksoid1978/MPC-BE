@@ -403,8 +403,6 @@ unsigned avfilter_filter_pad_count(const AVFilter *filter, int is_output);
  */
 #define AVFILTER_THREAD_SLICE (1 << 0)
 
-typedef struct AVFilterInternal AVFilterInternal;
-
 /** An instance of a filter */
 struct AVFilterContext {
     const AVClass *av_class;        ///< needed for av_log() and filters common options
@@ -444,9 +442,11 @@ struct AVFilterContext {
     int thread_type;
 
     /**
-     * An opaque struct for libavfilter internal use.
+     * Max number of threads allowed in this filter instance.
+     * If <= 0, its value is ignored.
+     * Overrides global number of threads set per filter graph.
      */
-    AVFilterInternal *internal;
+    int nb_threads;
 
     struct AVFilterCommand *command_queue;
 
@@ -467,13 +467,6 @@ struct AVFilterContext {
      * avfilter_init_dict().
      */
     AVBufferRef *hw_device_ctx;
-
-    /**
-     * Max number of threads allowed in this filter instance.
-     * If <= 0, its value is ignored.
-     * Overrides global number of threads set per filter graph.
-     */
-    int nb_threads;
 
     /**
      * Ready status of the filter.
@@ -555,34 +548,12 @@ struct AVFilterLink {
 
     enum AVMediaType type;      ///< filter media type
 
+    int format;                 ///< agreed upon media format
+
     /* These parameters apply only to video */
     int w;                      ///< agreed upon image width
     int h;                      ///< agreed upon image height
     AVRational sample_aspect_ratio; ///< agreed upon sample aspect ratio
-    /* These parameters apply only to audio */
-#if FF_API_OLD_CHANNEL_LAYOUT
-    /**
-     * channel layout of current buffer (see libavutil/channel_layout.h)
-     * @deprecated use ch_layout
-     */
-    attribute_deprecated
-    uint64_t channel_layout;
-#endif
-    int sample_rate;            ///< samples per second
-
-    int format;                 ///< agreed upon media format
-
-    /**
-     * Define the time base used by the PTS of the frames/samples
-     * which will pass through this link.
-     * During the configuration stage, each filter is supposed to
-     * change only the output timebase, while the timebase of the
-     * input link is assumed to be an unchangeable property.
-     */
-    AVRational time_base;
-
-    AVChannelLayout ch_layout;  ///< channel layout of current buffer (see libavutil/channel_layout.h)
-
     /**
      * For non-YUV links, these are respectively set to fallback values (as
      * appropriate for that colorspace).
@@ -592,6 +563,19 @@ struct AVFilterLink {
      */
     enum AVColorSpace colorspace;   ///< agreed upon YUV color space
     enum AVColorRange color_range;  ///< agreed upon YUV color range
+
+    /* These parameters apply only to audio */
+    int sample_rate;            ///< samples per second
+    AVChannelLayout ch_layout;  ///< channel layout of current buffer (see libavutil/channel_layout.h)
+
+    /**
+     * Define the time base used by the PTS of the frames/samples
+     * which will pass through this link.
+     * During the configuration stage, each filter is supposed to
+     * change only the output timebase, while the timebase of the
+     * input link is assumed to be an unchangeable property.
+     */
+    AVRational time_base;
 
     /*****************************************************************
      * All fields below this line are not part of the public API. They
@@ -692,18 +676,19 @@ struct AVFilterLink {
 int avfilter_link(AVFilterContext *src, unsigned srcpad,
                   AVFilterContext *dst, unsigned dstpad);
 
+#if FF_API_LINK_PUBLIC
 /**
- * Free the link in *link, and set its pointer to NULL.
+ * @deprecated this function should never be called by users
  */
+attribute_deprecated
 void avfilter_link_free(AVFilterLink **link);
 
 /**
- * Negotiate the media format, dimensions, etc of all inputs to a filter.
- *
- * @param filter the filter to negotiate the properties for its inputs
- * @return       zero on successful negotiation
+ * @deprecated this function should never be called by users
  */
+attribute_deprecated
 int avfilter_config_links(AVFilterContext *filter);
+#endif
 
 #define AVFILTER_CMD_FLAG_ONE   1 ///< Stop once a filter understood the command (for target=all for example), fast filters are favored automatically
 #define AVFILTER_CMD_FLAG_FAST  2 ///< Only execute command when its fast (like a video out that supports contrast adjustment in hw)
@@ -796,8 +781,6 @@ int avfilter_insert_filter(AVFilterLink *link, AVFilterContext *filt,
  */
 const AVClass *avfilter_get_class(void);
 
-typedef struct AVFilterGraphInternal AVFilterGraphInternal;
-
 /**
  * A function pointer passed to the @ref AVFilterGraph.execute callback to be
  * executed multiple times, possibly in parallel.
@@ -854,11 +837,6 @@ typedef struct AVFilterGraph {
      * default) means that the number of threads is determined automatically.
      */
     int nb_threads;
-
-    /**
-     * Opaque object for libavfilter internal use.
-     */
-    AVFilterGraphInternal *internal;
 
     /**
      * Opaque user data. May be set by the caller to an arbitrary value, e.g. to

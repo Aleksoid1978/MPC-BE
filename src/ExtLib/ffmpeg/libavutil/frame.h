@@ -466,19 +466,6 @@ typedef struct AVFrame {
      */
     AVRational time_base;
 
-#if FF_API_FRAME_PICTURE_NUMBER
-    /**
-     * picture number in bitstream order
-     */
-    attribute_deprecated
-    int coded_picture_number;
-    /**
-     * picture number in display order
-     */
-    attribute_deprecated
-    int display_picture_number;
-#endif
-
     /**
      * quality (between 1 (good) and FF_LAMBDA_MAX (bad))
      */
@@ -546,34 +533,10 @@ typedef struct AVFrame {
     int palette_has_changed;
 #endif
 
-#if FF_API_REORDERED_OPAQUE
-    /**
-     * reordered opaque 64 bits (generally an integer or a double precision float
-     * PTS but can be anything).
-     * The user sets AVCodecContext.reordered_opaque to represent the input at
-     * that time,
-     * the decoder reorders values as needed and sets AVFrame.reordered_opaque
-     * to exactly one of the values provided by the user through AVCodecContext.reordered_opaque
-     *
-     * @deprecated Use AV_CODEC_FLAG_COPY_OPAQUE instead
-     */
-    attribute_deprecated
-    int64_t reordered_opaque;
-#endif
-
     /**
      * Sample rate of the audio data.
      */
     int sample_rate;
-
-#if FF_API_OLD_CHANNEL_LAYOUT
-    /**
-     * Channel layout of the audio data.
-     * @deprecated use ch_layout instead
-     */
-    attribute_deprecated
-    uint64_t channel_layout;
-#endif
 
     /**
      * AVBuffer references backing the data for this frame. All the pointers in
@@ -687,19 +650,6 @@ typedef struct AVFrame {
     int64_t pkt_pos;
 #endif
 
-#if FF_API_PKT_DURATION
-    /**
-     * duration of the corresponding packet, expressed in
-     * AVStream->time_base units, 0 if unknown.
-     * - encoding: unused
-     * - decoding: Read by user.
-     *
-     * @deprecated use duration instead
-     */
-    attribute_deprecated
-    int64_t pkt_duration;
-#endif
-
     /**
      * metadata.
      * - encoding: Set by user.
@@ -719,17 +669,6 @@ typedef struct AVFrame {
 #define FF_DECODE_ERROR_MISSING_REFERENCE   2
 #define FF_DECODE_ERROR_CONCEALMENT_ACTIVE  4
 #define FF_DECODE_ERROR_DECODE_SLICES       8
-
-#if FF_API_OLD_CHANNEL_LAYOUT
-    /**
-     * number of audio channels, only used for audio.
-     * - encoding: unused
-     * - decoding: Read by user.
-     * @deprecated use ch_layout instead
-     */
-    attribute_deprecated
-    int channels;
-#endif
 
 #if FF_API_FRAME_PKT
     /**

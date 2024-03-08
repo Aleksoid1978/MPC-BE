@@ -43,6 +43,16 @@
  * ("objects"). An option can have a help text, a type and a range of possible
  * values. Options may then be enumerated, read and written to.
  *
+ * There are two modes of access to members of AVOption and its child structs.
+ * One is called 'native access', and refers to access from the code that
+ * declares the AVOption in question.  The other is 'foreign access', and refers
+ * to access from other code.
+ *
+ * Certain struct members in this header are documented as 'native access only'
+ * or similar - it means that only the code that declared the AVOption in
+ * question is allowed to access the field. This allows us to extend the
+ * semantics of those fields without breaking API compatibility.
+ *
  * @section avoptions_implement Implementing AVOptions
  * This section describes how to add AVOptions capabilities to a struct.
  *
@@ -221,7 +231,7 @@
  */
 
 enum AVOptionType{
-    AV_OPT_TYPE_FLAGS,
+    AV_OPT_TYPE_FLAGS = 1,
     AV_OPT_TYPE_INT,
     AV_OPT_TYPE_INT64,
     AV_OPT_TYPE_DOUBLE,
@@ -238,11 +248,19 @@ enum AVOptionType{
     AV_OPT_TYPE_VIDEO_RATE, ///< offset must point to AVRational
     AV_OPT_TYPE_DURATION,
     AV_OPT_TYPE_COLOR,
-#if FF_API_OLD_CHANNEL_LAYOUT
-    AV_OPT_TYPE_CHANNEL_LAYOUT,
-#endif
     AV_OPT_TYPE_BOOL,
     AV_OPT_TYPE_CHLAYOUT,
+
+    /**
+     * May be combined with another regular option type to declare an array
+     * option.
+     *
+     * For array options, @ref AVOption.offset should refer to a pointer
+     * corresponding to the option type. The pointer should be immediately
+     * followed by an unsigned int that will store the number of elements in the
+     * array.
+     */
+    AV_OPT_TYPE_FLAG_ARRAY = (1 << 16),
 };
 
 /**
@@ -289,6 +307,40 @@ enum AVOptionType{
 #define AV_OPT_FLAG_CHILD_CONSTS    (1 << 18)
 
 /**
+ * May be set as default_val for AV_OPT_TYPE_FLAG_ARRAY options.
+ */
+typedef struct AVOptionArrayDef {
+    /**
+     * Native access only.
+     *
+     * Default value of the option, as would be serialized by av_opt_get() (i.e.
+     * using the value of sep as the separator).
+     */
+    const char         *def;
+
+    /**
+     * Minimum number of elements in the array. When this field is non-zero, def
+     * must be non-NULL and contain at least this number of elements.
+     */
+    unsigned            size_min;
+    /**
+     * Maximum number of elements in the array, 0 when unlimited.
+     */
+    unsigned            size_max;
+
+    /**
+     * Separator between array elements in string representations of this
+     * option, used by av_opt_set() and av_opt_get(). It must be a printable
+     * ASCII character, excluding alphanumeric and the backslash. A comma is
+     * used when sep=0.
+     *
+     * The separator and the backslash must be backslash-escaped in order to
+     * appear in string representations of the option value.
+     */
+    char                sep;
+} AVOptionArrayDef;
+
+/**
  * AVOption
  */
 typedef struct AVOption {
@@ -301,6 +353,8 @@ typedef struct AVOption {
     const char *help;
 
     /**
+     * Native access only.
+     *
      * The offset relative to the context structure where the option
      * value is stored. It should be 0 for named constants.
      */
@@ -308,6 +362,7 @@ typedef struct AVOption {
     enum AVOptionType type;
 
     /**
+     * Native access only, except when documented otherwise.
      * the default value for scalar options
      */
     union {
@@ -316,6 +371,14 @@ typedef struct AVOption {
         const char *str;
         /* TODO those are unused now */
         AVRational q;
+
+        /**
+         * Used for AV_OPT_TYPE_FLAG_ARRAY options. May be NULL.
+         *
+         * Foreign access to some members allowed, as noted in AVOptionArrayDef
+         * documentation.
+         */
+        const AVOptionArrayDef *arr;
     } default_val;
     double min;                 ///< minimum valid value for the option
     double max;                 ///< maximum valid value for the option
@@ -723,10 +786,6 @@ int av_opt_set_image_size(void *obj, const char *name, int w, int h, int search_
 int av_opt_set_pixel_fmt (void *obj, const char *name, enum AVPixelFormat fmt, int search_flags);
 int av_opt_set_sample_fmt(void *obj, const char *name, enum AVSampleFormat fmt, int search_flags);
 int av_opt_set_video_rate(void *obj, const char *name, AVRational val, int search_flags);
-#if FF_API_OLD_CHANNEL_LAYOUT
-attribute_deprecated
-int av_opt_set_channel_layout(void *obj, const char *name, int64_t ch_layout, int search_flags);
-#endif
 int av_opt_set_chlayout(void *obj, const char *name, const AVChannelLayout *layout, int search_flags);
 /**
  * @note Any old dictionary present is discarded and replaced with a copy of the new one. The
@@ -788,10 +847,6 @@ int av_opt_get_image_size(void *obj, const char *name, int search_flags, int *w_
 int av_opt_get_pixel_fmt (void *obj, const char *name, int search_flags, enum AVPixelFormat *out_fmt);
 int av_opt_get_sample_fmt(void *obj, const char *name, int search_flags, enum AVSampleFormat *out_fmt);
 int av_opt_get_video_rate(void *obj, const char *name, int search_flags, AVRational *out_val);
-#if FF_API_OLD_CHANNEL_LAYOUT
-attribute_deprecated
-int av_opt_get_channel_layout(void *obj, const char *name, int search_flags, int64_t *ch_layout);
-#endif
 int av_opt_get_chlayout(void *obj, const char *name, int search_flags, AVChannelLayout *layout);
 /**
  * @param[out] out_val The returned dictionary is a copy of the actual value and must

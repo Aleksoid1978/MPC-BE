@@ -301,7 +301,6 @@ SRCS_LC = \
 	libavcodec/hevcpred.c \
 	libavcodec/hpeldsp.c \
 	libavcodec/hq_hqa.c \
-	libavcodec/hq_hqadata.c \
 	libavcodec/hq_hqadsp.c \
 	libavcodec/hqx.c \
 	libavcodec/hqxdsp.c \

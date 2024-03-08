@@ -311,12 +311,6 @@ FF_ENABLE_DEPRECATION_WARNINGS
 
         dst->sample_rate    = src->sample_rate;
         dst->sample_fmt     = src->sample_fmt;
-#if FF_API_OLD_CHANNEL_LAYOUT
-FF_DISABLE_DEPRECATION_WARNINGS
-        dst->channels       = src->channels;
-        dst->channel_layout = src->channel_layout;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
         err = av_channel_layout_copy(&dst->ch_layout, &src->ch_layout);
         if (err < 0)
             return err;
@@ -418,16 +412,6 @@ static int update_context_from_user(AVCodecContext *dst, const AVCodecContext *s
     dst->skip_frame       = src->skip_frame;
 
     dst->frame_num        = src->frame_num;
-#if FF_API_AVCTX_FRAME_NUMBER
-FF_DISABLE_DEPRECATION_WARNINGS
-    dst->frame_number     = src->frame_number;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
-#if FF_API_REORDERED_OPAQUE
-FF_DISABLE_DEPRECATION_WARNINGS
-    dst->reordered_opaque = src->reordered_opaque;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
 
     av_packet_unref(dst->internal->last_pkt_props);
     err = av_packet_copy_props(dst->internal->last_pkt_props, src->internal->last_pkt_props);

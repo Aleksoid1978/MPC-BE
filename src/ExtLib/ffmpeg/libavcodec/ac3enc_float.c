@@ -92,7 +92,7 @@ static av_cold int ac3_float_mdct_init(AC3EncodeContext *s)
         return AVERROR(ENOMEM);
     }
 
-    avpriv_kbd_window_init(window, 5.0, AC3_BLOCK_SIZE);
+    ff_kbd_window_init(window, 5.0, AC3_BLOCK_SIZE);
     s->mdct_window = window;
 
     return av_tx_init(&s->tx, &s->tx_fn, AV_TX_FLOAT_MDCT, 0,
@@ -125,7 +125,6 @@ const FFCodec ff_ac3_encoder = {
                                                       AV_SAMPLE_FMT_NONE },
     .p.priv_class    = &ff_ac3enc_class,
     .p.supported_samplerates = ff_ac3_sample_rate_tab,
-    CODEC_OLD_CHANNEL_LAYOUTS_ARRAY(ff_ac3_channel_layouts)
     .p.ch_layouts    = ff_ac3_ch_layouts,
     .defaults        = ff_ac3_enc_defaults,
     .caps_internal   = FF_CODEC_CAP_INIT_CLEANUP,

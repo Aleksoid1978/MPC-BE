@@ -192,7 +192,7 @@ int avfilter_link(AVFilterContext *src, unsigned srcpad,
     return 0;
 }
 
-void avfilter_link_free(AVFilterLink **link)
+static void link_free(AVFilterLink **link)
 {
     FilterLinkInternal *li;
 
@@ -206,6 +206,17 @@ void avfilter_link_free(AVFilterLink **link)
 
     av_freep(link);
 }
+
+#if FF_API_LINK_PUBLIC
+void avfilter_link_free(AVFilterLink **link)
+{
+    link_free(link);
+}
+int avfilter_config_links(AVFilterContext *filter)
+{
+    return ff_filter_config_links(filter);
+}
+#endif
 
 static void update_link_current_pts(FilterLinkInternal *li, int64_t pts)
 {
@@ -315,7 +326,7 @@ int avfilter_insert_filter(AVFilterLink *link, AVFilterContext *filt,
     return 0;
 }
 
-int avfilter_config_links(AVFilterContext *filter)
+int ff_filter_config_links(AVFilterContext *filter)
 {
     int (*config_link)(AVFilterLink *);
     unsigned i;
@@ -346,7 +357,7 @@ int avfilter_config_links(AVFilterContext *filter)
         case AVLINK_UNINIT:
             li->init_state = AVLINK_STARTINIT;
 
-            if ((ret = avfilter_config_links(link->src)) < 0)
+            if ((ret = ff_filter_config_links(link->src)) < 0)
                 return ret;
 
             if (!(config_link = link->srcpad->config_props)) {
@@ -763,7 +774,7 @@ static void free_link(AVFilterLink *link)
     ff_formats_unref(&link->outcfg.samplerates);
     ff_channel_layouts_unref(&link->incfg.channel_layouts);
     ff_channel_layouts_unref(&link->outcfg.channel_layouts);
-    avfilter_link_free(&link);
+    link_free(&link);
 }
 
 void avfilter_free(AVFilterContext *filter)
@@ -1039,11 +1050,6 @@ int ff_filter_frame(AVFilterLink *link, AVFrame *frame)
 
         frame->duration = av_rescale_q(frame->nb_samples, (AVRational){ 1, frame->sample_rate },
                                        link->time_base);
-#if FF_API_PKT_DURATION
-FF_DISABLE_DEPRECATION_WARNINGS
-        frame->pkt_duration = frame->duration;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
     }
 
     li->frame_blocked_in = link->frame_wanted_out = 0;

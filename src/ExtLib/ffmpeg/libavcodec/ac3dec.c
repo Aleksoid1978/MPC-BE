@@ -190,14 +190,6 @@ static void ac3_downmix(AVCodecContext *avctx)
     const AVChannelLayout stereo = (AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO;
 
     /* allow downmixing to stereo or mono */
-#if FF_API_OLD_CHANNEL_LAYOUT
-FF_DISABLE_DEPRECATION_WARNINGS
-    if (avctx->request_channel_layout) {
-        av_channel_layout_uninit(&s->downmix_layout);
-        av_channel_layout_from_mask(&s->downmix_layout, avctx->request_channel_layout);
-    }
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
     if (avctx->ch_layout.nb_channels > 1 &&
         !av_channel_layout_compare(&s->downmix_layout, &mono)) {
         av_channel_layout_uninit(&avctx->ch_layout);
@@ -228,7 +220,7 @@ static av_cold int ac3_decode_init(AVCodecContext *avctx)
     if ((ret = av_tx_init(&s->tx_256, &s->tx_fn_256, IMDCT_TYPE, 1, 256, &scale, 0)))
         return ret;
 
-    AC3_RENAME(avpriv_kbd_window_init)(s->window, 5.0, 256);
+    AC3_RENAME(ff_kbd_window_init)(s->window, 5.0, 256);
     ff_bswapdsp_init(&s->bdsp);
 
 #if (USE_FIXED)

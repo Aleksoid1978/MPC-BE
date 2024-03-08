@@ -499,11 +499,6 @@ static int h264_frame_start(H264Context *h)
     pic = &h->DPB[i];
 
     pic->reference              = h->droppable ? 0 : h->picture_structure;
-#if FF_API_FRAME_PICTURE_NUMBER
-FF_DISABLE_DEPRECATION_WARNINGS
-    pic->f->coded_picture_number = h->coded_picture_number++;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
     pic->field_picture          = h->picture_structure != PICT_FRAME;
     pic->frame_num               = h->poc.frame_num;
     /*
@@ -1286,26 +1281,27 @@ static int h264_export_frame_props(H264Context *h)
     if (h->sei.picture_timing.timecode_cnt > 0) {
         uint32_t *tc_sd;
         char tcbuf[AV_TIMECODE_STR_SIZE];
+        AVFrameSideData *tcside;
+        ret = ff_frame_new_side_data(h->avctx, out, AV_FRAME_DATA_S12M_TIMECODE,
+                                     sizeof(uint32_t)*4, &tcside);
+        if (ret < 0)
+            return ret;
 
-        AVFrameSideData *tcside = av_frame_new_side_data(out,
-                                                         AV_FRAME_DATA_S12M_TIMECODE,
-                                                         sizeof(uint32_t)*4);
-        if (!tcside)
-            return AVERROR(ENOMEM);
+        if (tcside) {
+            tc_sd = (uint32_t*)tcside->data;
+            tc_sd[0] = h->sei.picture_timing.timecode_cnt;
 
-        tc_sd = (uint32_t*)tcside->data;
-        tc_sd[0] = h->sei.picture_timing.timecode_cnt;
+            for (int i = 0; i < tc_sd[0]; i++) {
+                int drop = h->sei.picture_timing.timecode[i].dropframe;
+                int   hh = h->sei.picture_timing.timecode[i].hours;
+                int   mm = h->sei.picture_timing.timecode[i].minutes;
+                int   ss = h->sei.picture_timing.timecode[i].seconds;
+                int   ff = h->sei.picture_timing.timecode[i].frame;
 
-        for (int i = 0; i < tc_sd[0]; i++) {
-            int drop = h->sei.picture_timing.timecode[i].dropframe;
-            int   hh = h->sei.picture_timing.timecode[i].hours;
-            int   mm = h->sei.picture_timing.timecode[i].minutes;
-            int   ss = h->sei.picture_timing.timecode[i].seconds;
-            int   ff = h->sei.picture_timing.timecode[i].frame;
-
-            tc_sd[i + 1] = av_timecode_get_smpte(h->avctx->framerate, drop, hh, mm, ss, ff);
-            av_timecode_make_smpte_tc_string2(tcbuf, h->avctx->framerate, tc_sd[i + 1], 0, 0);
-            av_dict_set(&out->metadata, "timecode", tcbuf, 0);
+                tc_sd[i + 1] = av_timecode_get_smpte(h->avctx->framerate, drop, hh, mm, ss, ff);
+                av_timecode_make_smpte_tc_string2(tcbuf, h->avctx->framerate, tc_sd[i + 1], 0, 0);
+                av_dict_set(&out->metadata, "timecode", tcbuf, 0);
+            }
         }
         h->sei.picture_timing.timecode_cnt = 0;
     }
