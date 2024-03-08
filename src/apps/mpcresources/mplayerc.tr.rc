@@ -2704,7 +2704,7 @@ BEGIN
     IDS_AG_VIDEOFILES       "Video dosyası (tüm biçimler)"
     IDS_AG_AUDIOFILES       "Ses dosyaları (tüm biçimler)"
     IDS_AG_ALLFILES         "Tüm dosyalar"
-    IDS_AG_SUBTITLEFILES    "Subtitle files"
+    IDS_AG_SUBTITLEFILES    "Alt yazı dosyaları"
 END
 
 STRINGTABLE
