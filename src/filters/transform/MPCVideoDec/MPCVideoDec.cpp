@@ -3141,7 +3141,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	}
 
 	if (m_bDecodingStart && m_pAVCtx) {
-		if (m_CodecId == AV_CODEC_ID_H264 || m_CodecId == AV_CODEC_ID_MPEG2VIDEO) {
+		if (m_CodecId == AV_CODEC_ID_H264 || m_CodecId == AV_CODEC_ID_MPEG2VIDEO || m_CodecId == AV_CODEC_ID_VVC) {
 			InitDecoder(&m_pCurrentMediaType);
 		}
 
