@@ -3769,6 +3769,8 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 		return;
 	}
 
+	m_bLeftMouseDown = FALSE;
+
 	if (AssignedMouseToCmd(MOUSE_CLICK_LEFT, 0) && !m_bFullScreen && !CursorOnD3DFullScreenWindow()) {
 		MouseMessage(MOUSE_CLICK_LEFT, nFlags, point);
 		return;
