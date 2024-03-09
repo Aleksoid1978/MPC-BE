@@ -172,6 +172,8 @@ BOOL CPPageYoutube::OnInitDialog()
 	m_edTorrServerAddress.SetWindowTextW(s.strTorrServerAddress);
 	m_edUserAgent.SetWindowTextW(s.strUserAgent);
 
+	OnCheckYDLEnable();
+
 	UpdateData(FALSE);
 
 	return TRUE;
