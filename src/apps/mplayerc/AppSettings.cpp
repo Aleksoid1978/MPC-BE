@@ -652,7 +652,7 @@ void CAppSettings::ResetSettings()
 	bWinLirc = false;
 	strUIceAddr = L"127.0.0.1:1234";
 	bUIce = false;
-	bGlobalMedia = true;
+	bGlobalMedia = false;
 	ZeroMemory(AccelTblColWidths, sizeof(AccelTblColWidths));
 
 	// Mouse
