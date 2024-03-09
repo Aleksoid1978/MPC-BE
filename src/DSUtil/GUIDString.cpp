@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2023 see Authors.txt
+ * (C) 2013-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -67,17 +67,6 @@ MPC_g_WaveGuidNames[] = {
 	{WAVE_FORMAT_PS2_PCM,             "PS2_PCM"},        //0xF521
 	{WAVE_FORMAT_PS2_ADPCM,           "PS2_ADPCM"},      //0xF522
 };
-
-/*
-// 
-static const struct {
-	uint32_t fourcc;
-	const CHAR* szName;
-}
-MPC_g_FourCCGuidNames[] = {
-
-}
-*/
 
 #define ADDENTRY(subtype) { #subtype, subtype },
 static const GUID_STRING_ENTRY MPC_g_GuidNames[] = {

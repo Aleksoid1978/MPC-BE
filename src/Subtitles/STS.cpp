@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -588,7 +588,7 @@ static void WebVTT2SSA(CStringW& str, CStringW& cueTags, WebVTTcolorMap clrMap)
 				bg = colorData.bg;
 			}
 		}
-		else { //could find multiple classes 
+		else { //could find multiple classes
 			RegexUtil::wregexResults results;
 			std::wregex clsPattern(LR"((\.?[^\.]+))");
 			RegexUtil::wstringMatch(clsPattern, (const wchar_t*)inner, results);

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -266,7 +266,7 @@ bool CDVDSession::ReadKey(DVD_KEY_TYPE KeyType, BYTE* pKeyData, int lba)
 	}
 
 	std::unique_ptr<BYTE[]> buf = std::make_unique<BYTE[]>(keyLength);
-	
+
 	DVD_COPY_PROTECT_KEY* key = (DVD_COPY_PROTECT_KEY*)buf.get();
 
 	key->KeyLength = keyLength;

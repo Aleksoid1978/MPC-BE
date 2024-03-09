@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -438,7 +438,7 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, std::list<CComQIPtr<I
 	CComPtr<IAllocatorPresenter> pCAP;
 
 	HRESULT hr = CreateAllocatorPresenter(m_clsid, m_hWnd, bFullscreen, &pCAP);
-	
+
 	if (hr == E_NOTIMPL) {
 		CComPtr<IBaseFilter> pBF;
 		hr = pBF.CoCreateInstance(m_clsid);

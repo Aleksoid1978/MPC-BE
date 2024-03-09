@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1559,7 +1559,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 		if (hDC) {
 			DWORD icmProfilePathSize = 0;
 			GetICMProfileW(hDC, &icmProfilePathSize, nullptr);
-			
+
 			GetICMProfileW(hDC, &icmProfilePathSize, iccProfilePath.GetBuffer(icmProfilePathSize));
 			iccProfilePath.ReleaseBuffer();
 			if (iccProfilePath.GetLength()) {
@@ -1620,7 +1620,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 				hr = m_pLut3DTexture->UnlockBox(0);
 			}
 		}
-		
+
 		if (FAILED(hr)) {
 			m_bColorManagement = false;
 			m_pLut3DTexture.Release();
@@ -1638,7 +1638,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 		return E_FAIL;
 	}
 
-	D3D_SHADER_MACRO ShaderMacros[5] = {}; // number of macros + 1 
+	D3D_SHADER_MACRO ShaderMacros[5] = {}; // number of macros + 1
 	size_t i = 0;
 
 	ShaderMacros[i++] = { "QUANTIZATION", m_DisplayFmt == D3DFMT_A2R10G10B10 ? "1023.0" : "255.0" }; // 10-bit or 8-bit

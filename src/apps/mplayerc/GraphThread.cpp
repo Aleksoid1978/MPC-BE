@@ -1,5 +1,5 @@
 /*
- * (C) 2023 see Authors.txt
+ * (C) 2023-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -17,12 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
- 
+
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "TunerScanDlg.h"
 #include "GraphThread.h"
- 
+
 //
 // CGraphThread
 //

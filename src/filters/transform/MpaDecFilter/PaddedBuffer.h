@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2023 see Authors.txt
+ * (C) 2014-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -112,7 +112,7 @@ public:
 			memmove(m_data, m_data + count, newsize);
 			m_size = newsize;
 			memset(m_data + m_size, 0, m_padsize);
-		} 
+		}
 		else {
 			m_size = 0;
 		}

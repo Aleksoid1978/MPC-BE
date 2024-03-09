@@ -1,5 +1,5 @@
 /*
- * (C) 2023 see Authors.txt
+ * (C) 2023-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -114,7 +114,7 @@ public:
 	CSaveTaskDlg(const std::list<SaveItem_t>& saveItems, const CStringW& dstPath, HRESULT& hr);
 
 	void SetFFmpegPath(const CStringW& ffmpegpath);
-	void SetLangDefault(const CStringA& langDefault); 
+	void SetLangDefault(const CStringA& langDefault);
 	bool IsCompleteOk();
 
 private:

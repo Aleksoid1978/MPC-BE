@@ -2471,7 +2471,7 @@ LRESULT CMainFrame::OnHotKey(WPARAM wParam, LPARAM lParam)
 	const CAppSettings& s = AfxGetAppSettings();
 	BOOL fRet = FALSE;
 
-	if (GetActiveWindow() == this || s.bGlobalMedia == TRUE) {
+	if (GetActiveWindow() == this || s.bGlobalMedia == true) {
 		for (const auto& wc : s.wmcmds) {
 			if (wc.appcmd == wParam && TRUE == SendMessageW(WM_COMMAND, wc.cmd)) {
 				fRet = TRUE;
