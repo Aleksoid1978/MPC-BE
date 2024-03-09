@@ -494,7 +494,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 67
 54		"PRI"
 56		"서브 자막"
 57		"초"
-59		"테두리"
+59		"외곽선"
 60		"OUTL"
 62		"그림자"
 63		"SHAD"
