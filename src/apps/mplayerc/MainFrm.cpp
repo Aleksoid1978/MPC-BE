@@ -2074,6 +2074,10 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 		}
 		m_bWasPausedOnMinimizedVideo = false;
 	}
+
+	if (nType == SIZE_RESTORED || nType == SIZE_MINIMIZED || nType == SIZE_MAXIMIZED) {
+		m_bLeftMouseDown = FALSE;
+	}
 }
 
 void CMainFrame::OnSizing(UINT nSide, LPRECT pRect)
