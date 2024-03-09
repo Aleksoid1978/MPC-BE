@@ -316,7 +316,17 @@ HRESULT CD3D11Decoder::AllocateFramesContext(AVCodecContext* c, int width, int h
 
 	AVHWFramesContext* pFrames = (AVHWFramesContext*)(*ppFramesCtx)->data;
 	pFrames->format = AV_PIX_FMT_D3D11;
-	pFrames->sw_format = (format == AV_PIX_FMT_YUV420P10) ? AV_PIX_FMT_P010 : (format == AV_PIX_FMT_YUV420P ? AV_PIX_FMT_NV12 : format);
+	switch (format) {
+	case AV_PIX_FMT_YUV420P10:
+		pFrames->sw_format = AV_PIX_FMT_P010;
+		break;
+	case AV_PIX_FMT_YUV420P:
+	case AV_PIX_FMT_YUVJ420P:
+		pFrames->sw_format = AV_PIX_FMT_NV12;
+		break;
+	default:
+		pFrames->sw_format = format;
+	}
 	pFrames->width = width;
 	pFrames->height = height;
 	pFrames->initial_pool_size = nSurfaces;
