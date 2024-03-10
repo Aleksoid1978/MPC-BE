@@ -53,7 +53,7 @@ Updated Hungarian translation (by mickey).
 Updated German translation (by Klaus1189).
 
 Updated libraries:
-	dav1d git-1.4.0-1-g97cc6ce;
+	dav1d git-1.4.0-83-g872e470;
 	fdk-aac git-v2.0.3;
 	ffmpeg git-n6.2-dev-1538-g901165516c;
 	Little-CMS git-lcms2.16-26-gc2a5401;

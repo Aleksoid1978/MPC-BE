@@ -53,7 +53,7 @@ MPC Video Renderer 0.7.3 включен в инсталлятор.
 Обновлен немецкий перевод (автор Klaus1189).
 
 Обновлены библиотеки:
-	dav1d git-1.4.0-1-g97cc6ce;
+	dav1d git-1.4.0-83-g872e470;
 	fdk-aac git-v2.0.3;
 	ffmpeg git-n6.2-dev-1538-g901165516c;
 	Little-CMS git-lcms2.16-26-gc2a5401;
