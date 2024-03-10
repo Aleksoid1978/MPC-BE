@@ -22,8 +22,11 @@ MPCVideoDec
 Added support for D3D12 copy back mode.
 Added support for VVC(H.266) video decoding.
 Added AVS3 support for external filter.
-Expanded support for H.264 hardware decoding for full range and Baseline profile video.
+Expanded support for hardware decoding for full range video and H.264 Baseline profile.
 Added support for additional HEVC Intel decoders for D3D11 copy back mode.
+
+YouTube
+Improved YouTube support in the built-in parser.
 
 Player
 Added the ability to open the folder of the currently playing file using a hotkey.
@@ -37,6 +40,7 @@ Improved display of external audio tracks in subfolders.
 Added the ability to enable video preview for URLs.
 Fixed priority of HTTP filters for Ace Stream.
 "MPC Audio Renderer" is now the default audio renderer.
+The "Global Media Keys" setting is disabled by default because it conflicts with other applications.
 Various interface fixes.
 
 Installer
@@ -55,7 +59,7 @@ Updated German translation (by Klaus1189).
 Updated libraries:
 	dav1d git-1.4.0-83-g872e470;
 	fdk-aac git-v2.0.3;
-	ffmpeg git-n6.2-dev-1538-g901165516c;
+	ffmpeg git-n6.2-dev-1539-g64634e809f;
 	Little-CMS git-lcms2.16-26-gc2a5401;
 	MediaInfo git-v24.01-g51dbd896;
 	nanosvg git-93ce879;
