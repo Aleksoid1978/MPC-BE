@@ -2704,7 +2704,7 @@ BEGIN
     IDS_AG_VIDEOFILES       "Videobestanden (alle soorten)"
     IDS_AG_AUDIOFILES       "Audiobestanden (alle soorten)"
     IDS_AG_ALLFILES         "Alle bestanden"
-    IDS_AG_SUBTITLEFILES    "Subtitle files"
+    IDS_AG_SUBTITLEFILES    "Ondertitelingsbestanden"
 END
 
 STRINGTABLE
@@ -3174,7 +3174,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_BLOCK_EXTERNAL_VR   "You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
+    IDS_BLOCK_EXTERNAL_VR   "U kunt %s niet toevoegen als extern filter.\nU moet uw gewenste videorenderer op het tabblad ""Video"" selecteren."
     IDS_DESC_HAALI_VR       "Hetzelfde als VMR-9, maar met een echte bicubicresizer."
 END
 
@@ -3186,7 +3186,7 @@ BEGIN
     IDS_DESC_EVR_CP         "Hetzelfde als EVR, maar met de Allocator-Presenter plugin voor ondertiteling en nabewerking."
     IDS_DESC_MADVR          "Renderer in hoge kwaliteit, vereist een GPU die D3D9 of hoger ondersteunt."
     IDS_DESC_EVR_SYNC       "Hetzelfde als EVR (CP), maar biedt een paar opties om de framesnelheid en vernieuwingsfrequentie te synchroniseren. Deze kan het aantal overgeslagen of gedupliceerd videoframes verminderen."
-    IDS_DESC_MPC_VR         "Video renderer with support for Direct3D 11."
+    IDS_DESC_MPC_VR         "Videorenderer met ondersteuning voor Direct3D 11."
 END
 
 STRINGTABLE
