@@ -383,7 +383,7 @@ int InkLimitingSampler(CMSREGISTER const cmsUInt16Number In[], CMSREGISTER cmsUI
     Out[1] = _cmsQuickSaturateWord(In[1] * Ratio);     // M
     Out[2] = _cmsQuickSaturateWord(In[2] * Ratio);     // Y
 
-    Out[3] = In[3];                                 // K (untouched)
+    Out[3] = In[3];                                    // K (untouched)
 
     return TRUE;
 }
@@ -404,7 +404,7 @@ cmsHPROFILE CMSEXPORT cmsCreateInkLimitingDeviceLinkTHR(cmsContext ContextID,
         return NULL;
     }
 
-    if (Limit < 0.0 || Limit > 400) {
+    if (Limit < 1.0 || Limit > 400) {
 
         cmsSignalError(ContextID, cmsERROR_RANGE, "InkLimiting: Limit should be between 1..400");
         if (Limit < 1) Limit = 1;
@@ -745,6 +745,8 @@ cmsHPROFILE CMSEXPORT cmsCreate_OkLabProfile(cmsContext ctx)
     cmsPipeline* BToA = cmsPipelineAlloc(ctx, 3, 3);
 
     cmsHPROFILE hProfile = cmsCreateProfilePlaceholder(ctx);
+    if (!hProfile)            // can't allocate
+        goto error;
   
     cmsSetProfileVersion(hProfile, 4.4);
 

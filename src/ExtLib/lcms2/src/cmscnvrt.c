@@ -720,8 +720,7 @@ int BlackPreservingGrayOnlySampler(CMSREGISTER const cmsUInt16Number In[], CMSRE
 static
 cmsBool is_cmyk_devicelink(cmsHPROFILE hProfile)
 {
-    return cmsGetDeviceClass(hProfile) == cmsSigLinkClass &&
-            cmsGetColorSpace(hProfile) == cmsSigCmykData &&
+    return cmsGetDeviceClass(hProfile) == cmsSigLinkClass &&            
             cmsGetColorSpace(hProfile) == cmsSigCmykData;
 }
 

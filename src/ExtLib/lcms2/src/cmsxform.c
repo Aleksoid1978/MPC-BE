@@ -266,7 +266,7 @@ void FloatXFORM(_cmsTRANSFORM* p,
     cmsUInt8Number* output;
     cmsFloat32Number fIn[cmsMAXCHANNELS], fOut[cmsMAXCHANNELS];
     cmsFloat32Number OutOfGamut;
-    cmsUInt32Number i, j, c, strideIn, strideOut;
+    size_t i, j, c, strideIn, strideOut;
 
     _cmsHandleExtraChannels(p, in, out, PixelsPerLine, LineCount, Stride);
 
@@ -332,7 +332,7 @@ void NullFloatXFORM(_cmsTRANSFORM* p,
     cmsUInt8Number* accum;
     cmsUInt8Number* output;
     cmsFloat32Number fIn[cmsMAXCHANNELS];
-    cmsUInt32Number i, j, strideIn, strideOut;
+    size_t i, j, strideIn, strideOut;
 
     _cmsHandleExtraChannels(p, in, out, PixelsPerLine, LineCount, Stride);
 
@@ -370,7 +370,7 @@ void NullXFORM(_cmsTRANSFORM* p,
     cmsUInt8Number* accum;
     cmsUInt8Number* output;
     cmsUInt16Number wIn[cmsMAXCHANNELS];
-    cmsUInt32Number i, j, strideIn, strideOut;
+    size_t i, j, strideIn, strideOut;
 
     _cmsHandleExtraChannels(p, in, out, PixelsPerLine, LineCount, Stride);
 
@@ -380,17 +380,17 @@ void NullXFORM(_cmsTRANSFORM* p,
 
     for (i = 0; i < LineCount; i++) {
 
-           accum = (cmsUInt8Number*)in + strideIn;
-           output = (cmsUInt8Number*)out + strideOut;
+        accum = (cmsUInt8Number*)in + strideIn;
+        output = (cmsUInt8Number*)out + strideOut;
 
-           for (j = 0; j < PixelsPerLine; j++) {
+        for (j = 0; j < PixelsPerLine; j++) {
 
-                  accum = p->FromInput(p, wIn, accum, Stride->BytesPerPlaneIn);
-                  output = p->ToOutput(p, wIn, output, Stride->BytesPerPlaneOut);
-    }
+            accum = p->FromInput(p, wIn, accum, Stride->BytesPerPlaneIn);
+            output = p->ToOutput(p, wIn, output, Stride->BytesPerPlaneOut);
+        }
 
-           strideIn += Stride->BytesPerLineIn;
-           strideOut += Stride->BytesPerLineOut;
+        strideIn += Stride->BytesPerLineIn;
+        strideOut += Stride->BytesPerLineOut;
     }
 
 }
@@ -408,7 +408,7 @@ void PrecalculatedXFORM(_cmsTRANSFORM* p,
     CMSREGISTER cmsUInt8Number* accum;
     CMSREGISTER cmsUInt8Number* output;
     cmsUInt16Number wIn[cmsMAXCHANNELS], wOut[cmsMAXCHANNELS];
-    cmsUInt32Number i, j, strideIn, strideOut;
+    size_t i, j, strideIn, strideOut;
 
     _cmsHandleExtraChannels(p, in, out, PixelsPerLine, LineCount, Stride);
 
@@ -471,7 +471,7 @@ void PrecalculatedXFORMGamutCheck(_cmsTRANSFORM* p,
     cmsUInt8Number* accum;
     cmsUInt8Number* output;
     cmsUInt16Number wIn[cmsMAXCHANNELS], wOut[cmsMAXCHANNELS];
-    cmsUInt32Number i, j, strideIn, strideOut;
+    size_t i, j, strideIn, strideOut;
 
     _cmsHandleExtraChannels(p, in, out, PixelsPerLine, LineCount, Stride);
 
@@ -482,18 +482,18 @@ void PrecalculatedXFORMGamutCheck(_cmsTRANSFORM* p,
 
     for (i = 0; i < LineCount; i++) {
 
-           accum = (cmsUInt8Number*)in + strideIn;
-           output = (cmsUInt8Number*)out + strideOut;
+        accum = (cmsUInt8Number*)in + strideIn;
+        output = (cmsUInt8Number*)out + strideOut;
 
-           for (j = 0; j < PixelsPerLine; j++) {
+        for (j = 0; j < PixelsPerLine; j++) {
 
-                  accum = p->FromInput(p, wIn, accum, Stride->BytesPerPlaneIn);
-                  TransformOnePixelWithGamutCheck(p, wIn, wOut);
-                  output = p->ToOutput(p, wOut, output, Stride->BytesPerPlaneOut);
-           }
+            accum = p->FromInput(p, wIn, accum, Stride->BytesPerPlaneIn);
+            TransformOnePixelWithGamutCheck(p, wIn, wOut);
+            output = p->ToOutput(p, wOut, output, Stride->BytesPerPlaneOut);
+        }
 
-           strideIn += Stride->BytesPerLineIn;
-           strideOut += Stride->BytesPerLineOut;
+        strideIn += Stride->BytesPerLineIn;
+        strideOut += Stride->BytesPerLineOut;
     }
 }
 
@@ -511,7 +511,7 @@ void CachedXFORM(_cmsTRANSFORM* p,
     cmsUInt8Number* output;
     cmsUInt16Number wIn[cmsMAXCHANNELS], wOut[cmsMAXCHANNELS];
     _cmsCACHE Cache;
-    cmsUInt32Number i, j, strideIn, strideOut;
+    size_t i, j, strideIn, strideOut;
 
     _cmsHandleExtraChannels(p, in, out, PixelsPerLine, LineCount, Stride);
 
@@ -566,7 +566,7 @@ void CachedXFORMGamutCheck(_cmsTRANSFORM* p,
     cmsUInt8Number* output;
     cmsUInt16Number wIn[cmsMAXCHANNELS], wOut[cmsMAXCHANNELS];
     _cmsCACHE Cache;
-    cmsUInt32Number i, j, strideIn, strideOut;
+    size_t i, j, strideIn, strideOut;
 
     _cmsHandleExtraChannels(p, in, out, PixelsPerLine, LineCount, Stride);
 
@@ -683,7 +683,7 @@ void _cmsTransform2toTransformAdaptor(struct _cmstransform_struct *CMMcargo,
                                       const cmsStride* Stride)
 {
      
-       cmsUInt32Number i, strideIn, strideOut;
+       size_t i, strideIn, strideOut;
 
        _cmsHandleExtraChannels(CMMcargo, InputBuffer, OutputBuffer, PixelsPerLine, LineCount, Stride);
 
