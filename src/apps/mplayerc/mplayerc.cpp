@@ -1234,7 +1234,10 @@ void CMPlayerCApp::RegisterHotkeys()
 	if (m_s.bGlobalMedia) {
 		for (const auto& wc : m_s.wmcmds) {
 			if (wc.appcmd != 0) {
-				RegisterHotKey(m_pMainWnd->m_hWnd, wc.appcmd, 0, GetVKFromAppCommand(wc.appcmd));
+				UINT vkappcmd = GetVKFromAppCommand(wc.appcmd);
+				if (vkappcmd > 0) {
+					RegisterHotKey(m_pMainWnd->m_hWnd, wc.appcmd, 0, vkappcmd);
+				}
 			}
 		}
 	}
