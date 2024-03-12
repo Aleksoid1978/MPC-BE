@@ -127,6 +127,9 @@
  second1; másodperc
  second2; másodperc
  second3; másodperc
+ slice per frame1;
+ slice per frame2;
+ slice per frame3;
  text stream1; szövegsáv
  text stream2; szövegsáv
  text stream3; szövegsáv
@@ -364,7 +367,6 @@ DotsPerInch;
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Időtartam
@@ -382,6 +384,7 @@ EditorialClassification;
 ElementaryStream;
 ElementCount;
 EMail;Email
+Enable FFmpeg plugin;
 Encoded_Application;Kódoló szoftver
 Encoded_Date;Kódolás dátuma
 Encoded_Library;Kódoló könyvtár
@@ -463,6 +466,7 @@ Format_Settings_QPel;Formátum beállítások, QPel
 Format_Settings_RefFrames;Formátum beállítások, RefFrames
 Format_Settings_SBR;Formátum beállítások, SBR
 Format_Settings_Sign;Formátum beállítások, Sign
+Format_Settings_SliceCount;
 Format_Settings_Wrapping;
 Format_Tier;
 Format_Url;Formátum weblapja
@@ -473,7 +477,6 @@ FpaPass;
 FpaVersion;
 FrameCount;Képkockaszám
 FrameRate;Képkockasebesség
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Legnagyobb képkockasebesség
 FrameRate_Minimum;Legkisebb képkockasebesség
 FrameRate_Mode;Képkockasebességi mód
@@ -729,21 +732,6 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;Kulcsszavak
 Known codecs;Ismert kódekek
 Known formats;Ismert formátumok
@@ -1042,6 +1030,7 @@ ms;emp
 MSDI;MSDI
 MultipleStream;
 MusicBy;Zeneszerző
+MultiView_Count;
 MuxingMode;Keverési mód
 MuxingMode_MoreInfo;
 MuxingMode_PackedBitstream;adatcsomag
@@ -1369,5 +1358,5 @@ Written_Location;Írás helye
 WrittenBy;Írta
 Yes;igen
 Your system;Rendszer
-ZZ_Automatic_Percent;62
-ZZ_AutomaticLanguage_Percent;68
+ZZ_Automatic_Percent;63
+ZZ_AutomaticLanguage_Percent;69

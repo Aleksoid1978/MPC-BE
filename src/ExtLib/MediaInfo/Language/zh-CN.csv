@@ -127,6 +127,9 @@
  second1; 秒
  second2; 秒
  second3; 秒
+ slice per frame1;
+ slice per frame2;
+ slice per frame3;
  text stream1; 个字幕流
  text stream2; 个字幕流
  text stream3; 个字幕流
@@ -364,7 +367,6 @@ DotsPerInch;DPI
 Downmix;Downmix
 Downmix_5.1.x;5.1 and 5.1.x downmix
 Downmix_5to2;5.1 to 2.0 downmix
-Downmix_5to2_90deg;
 DrcSets_Count;DRC 组数
 DrcSets_Effects;DRC 效果类型
 Duration;时长
@@ -382,6 +384,7 @@ EditorialClassification;编辑分类
 ElementaryStream;基本流
 ElementCount;元素总数
 EMail;电子邮件
+Enable FFmpeg plugin;
 Encoded_Application;编码程序
 Encoded_Date;编码日期
 Encoded_Library;编码函数库
@@ -463,6 +466,7 @@ Format_Settings_QPel;格式设置, QPel
 Format_Settings_RefFrames;格式设置, 参考帧
 Format_Settings_SBR;格式设置, SBR
 Format_Settings_Sign;格式设置, Sign
+Format_Settings_SliceCount;
 Format_Settings_Wrapping;格式设置, 封装模式
 Format_Tier;格式等级 (Tier)
 Format_Url;格式网址
@@ -473,7 +477,6 @@ FpaPass;FPA 通过
 FpaVersion;FPA 版本
 FrameCount;总帧数
 FrameRate;帧率
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;最高帧率
 FrameRate_Minimum;最低帧率
 FrameRate_Mode;帧率模式
@@ -729,21 +732,6 @@ InternetMediaType;网络媒体类型
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;关键词
 Known codecs;已知解码器
 Known formats;已知格式
@@ -1042,6 +1030,7 @@ ms; 毫秒
 MSDI;MSDI
 MultipleStream;多个流
 MusicBy;音乐制作
+MultiView_Count;
 MuxingMode;混流模式
 MuxingMode_MoreInfo;混流模式详细信息
 MuxingMode_PackedBitstream;Packed bitstream
@@ -1370,4 +1359,4 @@ WrittenBy;作者
 Yes;是
 Your system;您的系统
 ZZ_Automatic_Percent;97
-ZZ_AutomaticLanguage_Percent;97
+ZZ_AutomaticLanguage_Percent;98

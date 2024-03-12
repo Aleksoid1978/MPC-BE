@@ -127,6 +127,9 @@
  second1; сек.
  second2; сек.
  second3; сек.
+ slice per frame1;
+ slice per frame2;
+ slice per frame3;
  text stream1; Текстовий потік
  text stream2; Текстовий (-і,-их) потік (-оки,-оків)
  text stream3; Текстові потоки
@@ -364,7 +367,6 @@ DotsPerInch;Точок на дюйм
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Тривалість
@@ -382,6 +384,7 @@ EditorialClassification;
 ElementaryStream;
 ElementCount;
 EMail;Е-mail
+Enable FFmpeg plugin;
 Encoded_Application;Програма кодування
 Encoded_Date;Дата кодування
 Encoded_Library;Бібліотека кодування
@@ -463,6 +466,7 @@ Format_Settings_QPel;Налаштування формату, QPel
 Format_Settings_RefFrames;Налаштування формату, RefFrames
 Format_Settings_SBR;Налаштування формату, SBR
 Format_Settings_Sign;Налаштування формату, Sign
+Format_Settings_SliceCount;
 Format_Settings_Wrapping;
 Format_Tier;
 Format_Url;Інтернет-адреса формату
@@ -473,7 +477,6 @@ FpaPass;
 FpaVersion;
 FrameCount;Кількість кадрів
 FrameRate;Частота кадрів
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Максимальна частота кадрів
 FrameRate_Minimum;Мінімальна частота кадрів
 FrameRate_Mode;Режим частоти кадрів
@@ -729,21 +732,6 @@ InternetMediaType;MIME-тип
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;Ключові слова
 Known codecs;Відомі кодеки
 Known formats;Відомі формати
@@ -1042,6 +1030,7 @@ ms; мс
 MSDI;MSDI
 MultipleStream;
 MusicBy;Створено
+MultiView_Count;
 MuxingMode;Режим мультиплексування
 MuxingMode_MoreInfo;Режим мультиплексування, додаткова інформація
 MuxingMode_PackedBitstream;Стиснутий бітовий потік
@@ -1369,5 +1358,5 @@ Written_Location;Місце запису
 WrittenBy;Записано
 Yes;Так
 Your system;Ваша система
-ZZ_Automatic_Percent;68
-ZZ_AutomaticLanguage_Percent;72
+ZZ_Automatic_Percent;69
+ZZ_AutomaticLanguage_Percent;73

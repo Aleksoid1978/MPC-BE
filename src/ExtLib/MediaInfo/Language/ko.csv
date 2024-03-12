@@ -127,6 +127,9 @@
  second1; 초
  second2; 초
  second3; 초
+ slice per frame1;
+ slice per frame2;
+ slice per frame3;
  text stream1; 텍스트 스트림
  text stream2; 텍스트 스트림
  text stream3; 텍스트 스트림
@@ -364,7 +367,6 @@ DotsPerInch;인치당 도트
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;길이
@@ -382,6 +384,7 @@ EditorialClassification;
 ElementaryStream;
 ElementCount;
 EMail;이메일
+Enable FFmpeg plugin;
 Encoded_Application;인코딩 프로그램
 Encoded_Date;인코딩 날짜
 Encoded_Library;인코딩 라이브러리
@@ -463,6 +466,7 @@ Format_Settings_QPel;포맷 설정, QPel
 Format_Settings_RefFrames;포맷 설정, RefFrames
 Format_Settings_SBR;포맷 설정, SBR
 Format_Settings_Sign;포맷 설정, Sign
+Format_Settings_SliceCount;
 Format_Settings_Wrapping;
 Format_Tier;
 Format_Url;포맷 웹링크
@@ -473,7 +477,6 @@ FpaPass;
 FpaVersion;
 FrameCount;포맷 개수
 FrameRate;프레임레이트
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;최대 프레임레이트
 FrameRate_Minimum;최소 프레임레이트
 FrameRate_Mode;프레임레이트 모드
@@ -729,21 +732,6 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;키워드
 Known codecs;알고 있는 코덱
 Known formats;알고 있는 포맷
@@ -1042,6 +1030,7 @@ ms;미리초
 MSDI;MSDI
 MultipleStream;
 MusicBy;음악
+MultiView_Count;
 MuxingMode;먹싱 모드
 MuxingMode_MoreInfo;먹싱 모드, 추가 정보
 MuxingMode_PackedBitstream;팩드 비트스트림
@@ -1369,5 +1358,5 @@ Written_Location;제작 장소
 WrittenBy;제작자
 Yes;예
 Your system;이 시스템
-ZZ_Automatic_Percent;65
+ZZ_Automatic_Percent;66
 ZZ_AutomaticLanguage_Percent;70

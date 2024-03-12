@@ -127,6 +127,9 @@
  second1; sekund
  second2; sekunder
  second3; sekunder
+ slice per frame1;
+ slice per frame2;
+ slice per frame3;
  text stream1; textström
  text stream2; textströmmar
  text stream3; textströmmar
@@ -364,7 +367,6 @@ DotsPerInch;Punkter per inch
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Varaktighet
@@ -382,6 +384,7 @@ EditorialClassification;
 ElementaryStream;
 ElementCount;
 EMail;E-post
+Enable FFmpeg plugin;
 Encoded_Application;Skrivande program
 Encoded_Date;Kodningsdatum
 Encoded_Library;Skrivande bibliotek
@@ -463,6 +466,7 @@ Format_Settings_QPel;Formatinställningar, QPel
 Format_Settings_RefFrames;Formatinställningar, RefFrames
 Format_Settings_SBR;Formatinställningar, SBR
 Format_Settings_Sign;Formatinställningar, Sign
+Format_Settings_SliceCount;
 Format_Settings_Wrapping;Formatinställningar, Omslagsläge
 Format_Tier;
 Format_Url;Webblänk för format
@@ -473,7 +477,6 @@ FpaPass;FPA Pass
 FpaVersion;FPA Version
 FrameCount;Antal bildrutor
 FrameRate;Bildfrekvens
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Max. bildfrekvens
 FrameRate_Minimum;Min. bildfrekvens
 FrameRate_Mode;Bildfrekvensläge
@@ -729,21 +732,6 @@ InternetMediaType;Internetmediatyp
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;Nyckelord
 Known codecs;Kända kodekar
 Known formats;Kända format
@@ -1042,6 +1030,7 @@ ms; ms
 MSDI;MSDI
 MultipleStream;
 MusicBy;Musik av
+MultiView_Count;
 MuxingMode;Muxningsläge
 MuxingMode_MoreInfo;Muxningsläge, mer info
 MuxingMode_PackedBitstream;Paketerad bitström
@@ -1369,5 +1358,5 @@ Written_Location;Ort
 WrittenBy;Skrivet av
 Yes;Ja
 Your system;Ditt system
-ZZ_Automatic_Percent;77
-ZZ_AutomaticLanguage_Percent;78
+ZZ_Automatic_Percent;78
+ZZ_AutomaticLanguage_Percent;79

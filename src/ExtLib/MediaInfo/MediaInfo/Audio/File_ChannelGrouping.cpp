@@ -135,7 +135,7 @@ void File_ChannelGrouping::Read_Buffer_Init()
         //SMPTE ST 337
         {
             File_SmpteSt0337* Parser=new File_SmpteSt0337;
-            Parser->Container_Bits=BitDepth;
+            Parser->BitDepth=BitDepth;
             Parser->Endianness=Endianness;
             Parser->Aligned=Aligned;
             Common->Parsers.push_back(Parser);

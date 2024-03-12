@@ -127,6 +127,9 @@
  second1; 秒
  second2; 秒
  second3; 秒
+ slice per frame1;
+ slice per frame2;
+ slice per frame3;
  text stream1; 字幕串流
  text stream2; 字幕串流
  text stream3; 字幕串流
@@ -364,7 +367,6 @@ DotsPerInch;每吋點數 (DPI)
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;時間長度
@@ -382,6 +384,7 @@ EditorialClassification;
 ElementaryStream;
 ElementCount;
 EMail;電子信箱
+Enable FFmpeg plugin;
 Encoded_Application;使用編碼程式
 Encoded_Date;編碼日期
 Encoded_Library;編碼函式庫
@@ -463,6 +466,7 @@ Format_Settings_QPel;格式設定, QPel
 Format_Settings_RefFrames;格式設定, RefFrames
 Format_Settings_SBR;格式設定, SBR
 Format_Settings_Sign;格式設定, Sign
+Format_Settings_SliceCount;
 Format_Settings_Wrapping;
 Format_Tier;
 Format_Url;該格式的網址
@@ -473,7 +477,6 @@ FpaPass;
 FpaVersion;
 FrameCount;影格數
 FrameRate;影格頻率
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;最大影格頻率
 FrameRate_Minimum;最小影格頻率
 FrameRate_Mode;影格頻率模式
@@ -729,21 +732,6 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;關鍵字
 Known codecs;已知編解碼器
 Known formats;已知格式
@@ -1042,6 +1030,7 @@ ms;毫秒
 MSDI;MSDI
 MultipleStream;
 MusicBy;配樂者
+MultiView_Count;
 MuxingMode;合成模式
 MuxingMode_MoreInfo;更多有關此合成模式的資訊
 MuxingMode_PackedBitstream;Packed bitstream

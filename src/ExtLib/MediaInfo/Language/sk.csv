@@ -127,6 +127,9 @@
  second1; sekunda
  second2; sekúndy
  second3; sekúnd
+ slice per frame1;
+ slice per frame2;
+ slice per frame3;
  text stream1; text stream
  text stream2; text streams
  text stream3; text streams
@@ -364,7 +367,6 @@ DotsPerInch;Bodov na palec
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Trvanie
@@ -382,6 +384,7 @@ EditorialClassification;
 ElementaryStream;
 ElementCount;
 EMail;E-Mail
+Enable FFmpeg plugin;
 Encoded_Application;Použitý software
 Encoded_Date;Dátum zakódovania
 Encoded_Library;Zakódoval
@@ -463,6 +466,7 @@ Format_Settings_QPel;
 Format_Settings_RefFrames;
 Format_Settings_SBR;
 Format_Settings_Sign;
+Format_Settings_SliceCount;
 Format_Settings_Wrapping;
 Format_Tier;
 Format_Url;
@@ -473,7 +477,6 @@ FpaPass;
 FpaVersion;
 FrameCount;
 FrameRate;Frekvencia snímok
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Maximálna frekvencia snímok
 FrameRate_Minimum;Minimálna frekvencia snímok
 FrameRate_Mode;Režim frekvencie snímok
@@ -729,21 +732,6 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;Identifikujúce slová
 Known codecs;Známe kodeky
 Known formats;Známe formáty
@@ -1042,6 +1030,7 @@ ms; ms
 MSDI;MSDI
 MultipleStream;
 MusicBy;Hudbu zložil
+MultiView_Count;
 MuxingMode;
 MuxingMode_MoreInfo;
 MuxingMode_PackedBitstream;
@@ -1370,4 +1359,4 @@ WrittenBy;Napísal
 Yes;Áno
 Your system;Váš systém
 ZZ_Automatic_Percent;59
-ZZ_AutomaticLanguage_Percent;63
+ZZ_AutomaticLanguage_Percent;64

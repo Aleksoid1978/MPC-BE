@@ -127,6 +127,9 @@
  second1; сек.
  second2; сек.
  second3; сек.
+ slice per frame1;
+ slice per frame2;
+ slice per frame3;
  text stream1; тэкставы струмень
  text stream2; тэкставыя струмені
  text stream3; тэкставыя струмені
@@ -364,7 +367,6 @@ DotsPerInch;Кропак на дзюйм
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Працягласць
@@ -382,6 +384,7 @@ EditorialClassification;
 ElementaryStream;
 ElementCount;
 EMail;Пошта
+Enable FFmpeg plugin;
 Encoded_Application;Праграма-кадавальнік
 Encoded_Date;Дата кадавання
 Encoded_Library;Бібліятэка кадавання
@@ -463,6 +466,7 @@ Format_Settings_QPel;Налада QPel фармату
 Format_Settings_RefFrames;Налада RefFrames фармату
 Format_Settings_SBR;Налада SBR фармату
 Format_Settings_Sign;Налада Sign фармату
+Format_Settings_SliceCount;
 Format_Settings_Wrapping;
 Format_Tier;
 Format_Url;Спасылка на фармат
@@ -473,7 +477,6 @@ FpaPass;
 FpaVersion;
 FrameCount;Лічыльнік кадраў
 FrameRate;Частата кадраў
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Максімальная частата кадраў
 FrameRate_Minimum;Мінімальная частата кадраў
 FrameRate_Mode;Рэжым частаты кадраў
@@ -729,21 +732,6 @@ InternetMediaType;Інтэрнэт-тып носьбіта
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;Ключавыя словы
 Known codecs;Вядомыя кодэкі
 Known formats;Вядомыя фарматы
@@ -1042,6 +1030,7 @@ ms;мс
 MSDI;MSDI
 MultipleStream;
 MusicBy;Кампазітар
+MultiView_Count;
 MuxingMode;Рэжым змешвання
 MuxingMode_MoreInfo;Рэжым змешвання, болей інфармацыі
 MuxingMode_PackedBitstream;Сціснуты бітавы струмень
@@ -1370,4 +1359,4 @@ WrittenBy;Напісаў
 Yes;Так
 Your system;Ваша сістэма
 ZZ_Automatic_Percent;67
-ZZ_AutomaticLanguage_Percent;71
+ZZ_AutomaticLanguage_Percent;72

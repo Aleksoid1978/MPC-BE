@@ -58,6 +58,18 @@ static const char* Png_Colour_type(int8u Colour_type)
     default: return "";
     }
 }
+static string Png_Colour_type_Settings(int8u Colour_type, int8u Bit_depth)
+{
+    switch (Colour_type)
+    {
+        case 0 :
+        case 2 :
+        case 4 :
+        case 6 : return "Linear";
+        case 3 : return "Indexed-"+std::to_string(Bit_depth);
+        default: return "";
+    }
+}
 
 //---------------------------------------------------------------------------
 const char* Mpegv_colour_primaries(int8u colour_primaries);
@@ -291,12 +303,26 @@ void File_Png::IHDR()
     FILLING_BEGIN_PRECISE();
         if (!Status[IsFilled])
         {
+            auto Packing=Png_Colour_type_Settings(Colour_type, Bit_depth);
+            Fill(StreamKind_Last, 0, "Format_Settings_Packing", Packing);
+            Fill(StreamKind_Last, 0, "Format_Settings", Packing);
             Fill(StreamKind_Last, 0, "Width", Width);
             Fill(StreamKind_Last, 0, "Height", Height);
-            string ColorSpace=(Colour_type&(1<<1))?"RGB":"Y";
-            if (Colour_type&(1<<2))
-                ColorSpace+='A';
-            Fill(StreamKind_Last, 0, "ColorSpace", ColorSpace);
+            switch (Colour_type)
+            {
+                case 3:
+                    Bit_depth=8; // From spec: "indexed-colour PNG images (colour type 3), in which the sample depth is always 8 bits" (sample depth is our bit depth
+                    // Fallthrough
+                case 0 :
+                case 2:
+                case 4:
+                case 6:
+                    string ColorSpace=(Colour_type&(1<<1))?"RGB":"Y";
+                    if (Colour_type&(1<<2))
+                        ColorSpace+='A';
+                    Fill(StreamKind_Last, 0, "ColorSpace", ColorSpace);
+                    break;
+            }
             Fill(StreamKind_Last, 0, "BitDepth", Bit_depth);
             if (Retrieve_Const(StreamKind_Last, 0, "PixelAspectRatio").empty())
                 Fill(StreamKind_Last, 0, "PixelAspectRatio", 1.0, 3);

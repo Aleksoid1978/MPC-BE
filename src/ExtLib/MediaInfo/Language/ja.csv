@@ -127,6 +127,9 @@
  second1; 秒
  second2; 秒
  second3; 秒
+ slice per frame1;
+ slice per frame2;
+ slice per frame3;
  text stream1; 個の字幕ストリーム
  text stream2; 個の字幕ストリーム
  text stream3; 個の字幕ストリーム
@@ -364,7 +367,6 @@ DotsPerInch;ドット/インチ
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;DRC の数
 DrcSets_Effects;DRC エフェクトの種類
 Duration;長さ
@@ -382,6 +384,7 @@ EditorialClassification;
 ElementaryStream;
 ElementCount;要素数
 EMail;電子メール
+Enable FFmpeg plugin;
 Encoded_Application;使用したエンコーダ
 Encoded_Date;エンコード日
 Encoded_Library;使用したライブラリ
@@ -463,6 +466,7 @@ Format_Settings_QPel;形式の設定 QPel
 Format_Settings_RefFrames;形式の設定 参照フレーム
 Format_Settings_SBR;形式の設定 SBR
 Format_Settings_Sign;形式の設定 Sign
+Format_Settings_SliceCount;
 Format_Settings_Wrapping;形式の設定 ラッピング方法
 Format_Tier;形式の層
 Format_Url;形式のURL
@@ -473,7 +477,6 @@ FpaPass;FPAパス
 FpaVersion;FPAバージョン
 FrameCount;フレーム数
 FrameRate;フレームレート
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;最大フレームレート
 FrameRate_Minimum;最小フレームレート
 FrameRate_Mode;フレームレートの種類
@@ -729,21 +732,6 @@ InternetMediaType;ネット用メディアタイプ
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;キーワード
 Known codecs;対応するコーデック
 Known formats;対応する形式
@@ -1042,6 +1030,7 @@ ms;ミリ秒
 MSDI;MSDI
 MultipleStream;
 MusicBy;演奏者
+MultiView_Count;
 MuxingMode;Mux 方法
 MuxingMode_MoreInfo;Mux 方法 詳細情報
 MuxingMode_PackedBitstream;ビットストリーム パック
@@ -1369,5 +1358,5 @@ Written_Location;作成場所
 WrittenBy;著者
 Yes;はい
 Your system;システム情報
-ZZ_Automatic_Percent;84
+ZZ_Automatic_Percent;85
 ZZ_AutomaticLanguage_Percent;85

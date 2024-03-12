@@ -30,7 +30,6 @@ class File_SmpteSt0337 : public File_Pcm_Base
 {
 public :
     // In
-    int8u   Container_Bits;
     int8u   Endianness;
     bool    Aligned;
 

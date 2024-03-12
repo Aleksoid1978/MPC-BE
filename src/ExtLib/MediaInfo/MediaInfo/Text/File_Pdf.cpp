@@ -231,7 +231,15 @@ void File_Pdf::xref()
     Element_Begin1("Cross-Reference Section");
 
     string FirstLine;
-    Skip_String(SizeOfLine(),                                       "Object name");
+    Get_String(SizeOfLine(), FirstLine,                             "Object name");
+    if (FirstLine!="xref")
+    {
+        //Problem
+        Skip_XX(Element_Size-Element_Offset,                        "(Problem)");
+        Element_End0();
+        Element_End0();
+        return;
+    }
     Element_Begin1("Cross-Reference SubSection");
         Get_String(SizeOfLine(), FirstLine,                         "Header");
         size_t FirstLine_Space=FirstLine.find(' ');
@@ -240,21 +248,26 @@ void File_Pdf::xref()
         if (FirstLine_Space!=string::npos)
             Count=atoi((const char*)FirstLine.c_str()+FirstLine_Space+1);
 
-        if (0x10000+20*Count>Buffer_Size && File_Offset+Buffer_Size<File_Size)
+        while (Element_Offset<Element_Size && (Buffer[Buffer_Offset+(size_t)Element_Offset]=='\r' || Buffer[Buffer_Offset+(size_t)Element_Offset]=='\n'))
+            Element_Offset++;
+        if (Count>(Element_Size-Element_Offset)/20)
         {
-            // We wait for more data
-            Buffer_Offset=0;
-            Element_Offset=0;
-            Element_DoNotShow();
+            if (File_Offset+Buffer_Size<File_Size)
+            {
+                // We wait for more data
+                Buffer_Offset=0;
+                Element_Offset=0;
+                Element_DoNotShow();
+                Element_WaitForMoreData();
+            }
+            else
+                Skip_XX(Element_Size-Element_Offset,                "(Problem)");
             Element_End0();
             Element_End0();
             Element_End0();
-            Element_WaitForMoreData();
             return;
         }
 
-        while (Element_Offset<Element_Size && (Buffer[Buffer_Offset+(size_t)Element_Offset]=='\r' || Buffer[Buffer_Offset+(size_t)Element_Offset]=='\n'))
-            Element_Offset++;
         const int8u* Buffer_Temp=Buffer+Buffer_Offset+(size_t)Element_Offset+17;
         for (int32u Pos=0; Pos<Count; ++Pos)
         {
@@ -296,6 +309,12 @@ void File_Pdf::trailer()
     int32u Prev=(int32u)-1;
     string Key;
     Ztring Value;
+    Get_String(SizeOfLine(), Key,                                   "Object name");
+    if (Key!="trailer")
+    {
+        //Problem
+        Skip_XX(Element_Size-Element_Offset,                        "(Problem)");
+    }
     Skip_String(SizeOfLine(),                                       "Object name");
     while (Element_Offset<Element_Size)
     {

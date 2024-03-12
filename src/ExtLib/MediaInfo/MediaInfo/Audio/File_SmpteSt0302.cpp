@@ -73,7 +73,7 @@ void File_SmpteSt0302::Streams_Accept()
     // SMPTE ST 337
     {
         File_SmpteSt0337* SmpteSt0337=new File_SmpteSt0337();
-        SmpteSt0337->Container_Bits=(4+bits_per_sample)*4;
+        SmpteSt0337->BitDepth=(4+bits_per_sample)*4;
         SmpteSt0337->Endianness='L';
         SmpteSt0337->Aligned=true;
         #if MEDIAINFO_DEMUX

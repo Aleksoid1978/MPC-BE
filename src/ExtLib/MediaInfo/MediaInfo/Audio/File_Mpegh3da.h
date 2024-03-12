@@ -206,6 +206,7 @@ private :
     void Streams_Finish();
 
     //Buffer - Global
+    void Read_Buffer_Init();
     void Read_Buffer_Continue();
 
     //Buffer - Per element

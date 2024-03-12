@@ -127,6 +127,9 @@
  second1; segon
  second2; segons
  second3; segons
+ slice per frame1;
+ slice per frame2;
+ slice per frame3;
  text stream1; pista de text
  text stream2; pistes de text
  text stream3; pistes de text
@@ -364,7 +367,6 @@ DotsPerInch;Punts per polçada
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Durada
@@ -382,6 +384,7 @@ EditorialClassification;
 ElementaryStream;
 ElementCount;
 EMail;Correu
+Enable FFmpeg plugin;
 Encoded_Application;Aplicació
 Encoded_Date;Data de codificació
 Encoded_Library;Llibreria d'escriptura
@@ -463,6 +466,7 @@ Format_Settings_QPel;Ajustos del perfil, QPel
 Format_Settings_RefFrames;Ajustos del perfil, RefFrames
 Format_Settings_SBR;Ajustos del perfil, SBR
 Format_Settings_Sign;Ajustos del perfil, SBR
+Format_Settings_SliceCount;
 Format_Settings_Wrapping;Ajustos del perfil, wrapping mode
 Format_Tier;
 Format_Url;Enllaç web format
@@ -473,7 +477,6 @@ FpaPass;Passada FPA
 FpaVersion;Versió FPA
 FrameCount;Quantitat fotogrames
 FrameRate;Fotogrames per segon
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Fotogrames per segon màxims
 FrameRate_Minimum;Fotogrames per segon mínims
 FrameRate_Mode;Mode fotogrames per segon
@@ -729,21 +732,6 @@ InternetMediaType;Tipus medis Internet
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;Paraules clau
 Known codecs;Còdecs coneguts
 Known formats;Formats coneguts
@@ -1042,6 +1030,7 @@ ms; ms
 MSDI;MSDI
 MultipleStream;
 MusicBy;Música per
+MultiView_Count;
 MuxingMode;Mode multiplexat
 MuxingMode_MoreInfo;Mode multiplexat, més info
 MuxingMode_PackedBitstream;Seqüència de bits empaquetada
@@ -1369,5 +1358,5 @@ Written_Location;Ubicació escrita
 WrittenBy;Escrit per
 Yes;Sí
 Your system;El teu sistema
-ZZ_Automatic_Percent;75
+ZZ_Automatic_Percent;76
 ZZ_AutomaticLanguage_Percent;79

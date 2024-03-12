@@ -125,6 +125,7 @@ protected :
     void FileHeader_Parse_ADTS();
 
     //Buffer - Global
+    void Read_Buffer_Init();
     void Read_Buffer_Continue ();
     void Read_Buffer_Continue_AudioSpecificConfig();
     void Read_Buffer_Continue_payload();

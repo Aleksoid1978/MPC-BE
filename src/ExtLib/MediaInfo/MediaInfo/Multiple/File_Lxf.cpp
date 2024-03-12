@@ -1410,7 +1410,7 @@ void File_Lxf::Audio_Stream(size_t Pos)
         #ifdef MEDIAINFO_SMPTEST0337_YES
         {
             File_SmpteSt0337* Parser=new File_SmpteSt0337;
-            Parser->Container_Bits=SampleSize;
+            Parser->BitDepth=SampleSize;
             Parser->Endianness='L';
             Parser->Aligned=true;
 

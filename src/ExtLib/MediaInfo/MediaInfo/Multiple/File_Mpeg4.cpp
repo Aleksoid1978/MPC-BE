@@ -937,7 +937,7 @@ void File_Mpeg4::Streams_Finish()
         //Parser specific
         if (Temp->second.Parsers.size()==1)
         {
-            if (Config->ParseSpeed<=1.0)
+            if (Config->ParseSpeed<=1.0 && !Temp->second.Parsers[0]->Status[IsFinished])
             {
                 Fill(Temp->second.Parsers[0]);
                 Temp->second.Parsers[0]->Open_Buffer_Unsynch();

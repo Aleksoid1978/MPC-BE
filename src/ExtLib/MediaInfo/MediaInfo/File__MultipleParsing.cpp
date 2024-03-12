@@ -432,10 +432,9 @@ File__MultipleParsing::File__MultipleParsing()
         {File_MpegTs* Temp=new File_MpegTs(); Temp->BDAV_Size=4; Parser.push_back(Temp);}
         {File_MpegTs* Temp=new File_MpegTs(); Temp->BDAV_Size=4; Temp->NoPatPmt=true; Parser.push_back(Temp);}
     #endif
-//    Only with directories, no By Buffer interface
-//    #if defined(MEDIAINFO_BDMV_YES)
-//        Parser.push_back(new File_Bdmv());
-//    #endif
+    #if defined(MEDIAINFO_BDMV_YES)
+        Parser.push_back(new File_Bdmv());
+    #endif
     #if defined(MEDIAINFO_CDXA_YES)
         Parser.push_back(new File_Cdxa());
     #endif

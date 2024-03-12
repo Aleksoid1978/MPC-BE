@@ -127,6 +127,9 @@
  second1; Sekunde
  second2; Sekunden
  second3; Sekunden
+ slice per frame1;
+ slice per frame2;
+ slice per frame3;
  text stream1; Text-Stream
  text stream2; Text-Streams
  text stream3; Text-Streams
@@ -364,7 +367,6 @@ DotsPerInch;DPI
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Dauer
@@ -382,6 +384,7 @@ EditorialClassification;
 ElementaryStream;
 ElementCount;
 EMail;Email
+Enable FFmpeg plugin;
 Encoded_Application;Kodierendes Programm
 Encoded_Date;Kodierungs-Datum
 Encoded_Library;verwendete Encoder-Bibliothek
@@ -463,6 +466,7 @@ Format_Settings_QPel;Format-Einstellungen für Qpel
 Format_Settings_RefFrames;Format-Einstellungen für RefFrames
 Format_Settings_SBR;Format-Einstellungen für SBR
 Format_Settings_Sign;Format-Einstellungen für Sign
+Format_Settings_SliceCount;
 Format_Settings_Wrapping;
 Format_Tier;
 Format_Url;Web-Link zum Format
@@ -473,7 +477,6 @@ FpaPass;
 FpaVersion;
 FrameCount;Anzahl der Frames
 FrameRate;Bildwiederholungsrate
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;maximale Bildwiederholungsrate
 FrameRate_Minimum;minimale Bildwiederholungsrate
 FrameRate_Mode;Modus der Bildwiederholungsrate
@@ -729,21 +732,6 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;Schlüsselwörter
 Known codecs;Bekannte Codecs
 Known formats;Bekannte Formate
@@ -1042,6 +1030,7 @@ ms; ms
 MSDI;MSDI
 MultipleStream;
 MusicBy;Musik von
+MultiView_Count;
 MuxingMode;Muxing-Modus
 MuxingMode_MoreInfo;Muxing-Modus, weitere Infos
 MuxingMode_PackedBitstream;Packed bitstream
@@ -1369,5 +1358,5 @@ Written_Location;Ort des Schreibbeginns
 WrittenBy;Geschrieben von
 Yes;Ja
 Your system;Deine Systeminformationen
-ZZ_Automatic_Percent;65
+ZZ_Automatic_Percent;66
 ZZ_AutomaticLanguage_Percent;70

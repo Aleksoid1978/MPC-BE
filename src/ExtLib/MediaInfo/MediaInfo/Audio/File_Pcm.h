@@ -31,11 +31,13 @@ class File_Pcm_Base : public File__Analyze
 {
 public:
     int8u   Endianness;
+    int8u   BitDepth;
 
     //Constructor/destructor
     File_Pcm_Base() : File__Analyze()
     {
         Endianness='\0';
+        BitDepth=0;
     }
 };
 
@@ -46,7 +48,6 @@ public :
     int64u          Frame_Count_Valid;
     ZenLib::Ztring  Codec;
     int32u          SamplingRate;
-    int8u           BitDepth;
     int8u           BitDepth_Significant;
     int8u           Channels;
     int8u           Sign;

@@ -127,6 +127,9 @@
  second1; վայր.
  second2; վայր.
  second3; վայր.
+ slice per frame1;
+ slice per frame2;
+ slice per frame3;
  text stream1; տեքստային հոսք
  text stream2; տեքստային հոսքեր
  text stream3; տեքստային հոսքեր
@@ -364,7 +367,6 @@ DotsPerInch;Կետեր դյույմի վրա
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Տևողությունը
@@ -382,6 +384,7 @@ EditorialClassification;
 ElementaryStream;
 ElementCount;
 EMail;Փոստը
+Enable FFmpeg plugin;
 Encoded_Application;Կոդավորող ծրագիրը
 Encoded_Date;Կոդավորման ամսաթիվը
 Encoded_Library;Կոդավորման շտեմարանը
@@ -463,6 +466,7 @@ Format_Settings_QPel;QPel տեսակի ցուցիչները
 Format_Settings_RefFrames;RefFrames տեսակի ցուցիչները
 Format_Settings_SBR;SBR տեսակի ցուցիչները
 Format_Settings_Sign;Sign տեսակի ցուցիչները
+Format_Settings_SliceCount;
 Format_Settings_Wrapping;
 Format_Tier;
 Format_Url;Տեսակի հղումը
@@ -473,7 +477,6 @@ FpaPass;
 FpaVersion;
 FrameCount;Կադրերի հաշվիչ
 FrameRate;Կադրերի հաճախականությունը
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Կադրերի առավելագույն հաճախ-ը
 FrameRate_Minimum;Կադրերի նվազագույն հաճախ-ը
 FrameRate_Mode;Կադրերի հաճախականության եղանակը
@@ -729,21 +732,6 @@ InternetMediaType;Կրիչի ինտերնետային տեսակ
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;Հիմնաբառերը
 Known codecs;Հայտնի կոդավորիչները
 Known formats;Հայտնի տեսակները
@@ -1042,6 +1030,7 @@ ms; մվ.
 MSDI;MSDI
 MultipleStream;
 MusicBy;Երգահանը
+MultiView_Count;
 MuxingMode;Խառման եղանակը
 MuxingMode_MoreInfo;Խառման եղանակը, լր. տեղեկություն
 MuxingMode_PackedBitstream;Սեղմված բիթային հոսք
@@ -1369,5 +1358,5 @@ Written_Location;Գրելու տեղը
 WrittenBy;Գրվել է՝
 Yes;Այո
 Your system;Ձեր համակարգը
-ZZ_Automatic_Percent;67
-ZZ_AutomaticLanguage_Percent;71
+ZZ_Automatic_Percent;68
+ZZ_AutomaticLanguage_Percent;72

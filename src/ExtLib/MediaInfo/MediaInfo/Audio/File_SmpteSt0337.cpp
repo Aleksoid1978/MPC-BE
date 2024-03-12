@@ -168,8 +168,6 @@ File_SmpteSt0337::File_SmpteSt0337()
     PTS_DTS_Needed=true;
 
     // In
-    Container_Bits=0;
-    Endianness=0x00;
     Aligned=false;
 
     // Temp
@@ -241,10 +239,10 @@ void File_SmpteSt0337::Streams_Fill()
         {
             FrameSize=FrameSizes.begin()->first;
         }
-        else if (FrameSizes.size()==2 && ((--FrameSizes.end())->first-FrameSizes.begin()->first)*4==Container_Bits && FrameSizes.begin()->second*3<=(--FrameSizes.end())->second*2 && (FrameSizes.begin()->second+1)*3>=(--FrameSizes.end())->second*2)
+        else if (FrameSizes.size()==2 && ((--FrameSizes.end())->first-FrameSizes.begin()->first)*4==BitDepth && FrameSizes.begin()->second*3<=(--FrameSizes.end())->second*2 && (FrameSizes.begin()->second+1)*3>=(--FrameSizes.end())->second*2)
         {
             // Maybe NTSC frame rate and 48 kHz.
-            FrameSize=FrameSizes.begin()->first+((float64)Container_Bits)/4*3/5; //2x small then 3x big
+            FrameSize=FrameSizes.begin()->first+((float64)BitDepth)/4*3/5; //2x small then 3x big
         }
         else
         {
@@ -262,7 +260,7 @@ void File_SmpteSt0337::Streams_Fill()
         if (FrameSize)
         {
             float64 BitRate=FrameSize*8*FrameRate;
-            float64 BitRate_Theory=Container_Bits*2*48000;
+            float64 BitRate_Theory=BitDepth*2*48000;
             if (BitRate>=BitRate_Theory*0.999 && BitRate<=BitRate_Theory*1.001)
                 BitRate=BitRate_Theory;
             Fill(Stream_General, 0, General_OverallBitRate, BitRate, 0, true);
@@ -306,7 +304,7 @@ void File_SmpteSt0337::Streams_Fill()
                             break;
                 default  : ;
             }
-            Fill(StreamKind_Last, Pos, "Format_Settings_Mode", Container_Bits);
+            Fill(StreamKind_Last, Pos, "Format_Settings_Mode", BitDepth);
             if (Retrieve(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitDepth)).empty())
                 Fill(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitDepth), Stream_Bits);
             if (Retrieve(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitRate_Mode))!=__T("CBR"))
@@ -457,14 +455,14 @@ bool File_SmpteSt0337::Synchronize()
             return false;
         }
 
-        if ((Container_Bits==0 || Container_Bits==16) && (!Aligned || ((Buffer_TotalBytes+Buffer_Offset)%4)==0))
+        if ((BitDepth==0 || BitDepth==16) && (!Aligned || ((Buffer_TotalBytes+Buffer_Offset)%4)==0))
         {
             if (Buffer[Buffer_Offset  ]==0xF8
              && Buffer[Buffer_Offset+1]==0x72
              && Buffer[Buffer_Offset+2]==0x4E
              && Buffer[Buffer_Offset+3]==0x1F) // 16-bit, BE
             {
-                Container_Bits=16;
+                BitDepth=16;
                 Stream_Bits=16;
                 Endianness='B'; // BE
                 break; // while()
@@ -474,13 +472,13 @@ bool File_SmpteSt0337::Synchronize()
              && Buffer[Buffer_Offset+2]==0x1F
              && Buffer[Buffer_Offset+3]==0x4E) // 16-bit, LE
             {
-                Container_Bits=16;
+                BitDepth=16;
                 Stream_Bits=16;
                 Endianness='L'; // LE
                 break; // while()
             }
         }
-        if ((Container_Bits==0 || Container_Bits==20) && (!Aligned || ((Buffer_TotalBytes+Buffer_Offset)%5)==0))
+        if ((BitDepth==0 || BitDepth==20) && (!Aligned || ((Buffer_TotalBytes+Buffer_Offset)%5)==0))
         {
             if (Buffer[Buffer_Offset  ]==0x6F
              && Buffer[Buffer_Offset+1]==0x87
@@ -488,13 +486,13 @@ bool File_SmpteSt0337::Synchronize()
              && Buffer[Buffer_Offset+3]==0x4E
              && Buffer[Buffer_Offset+4]==0x1F) // 20-bit, BE
             {
-                Container_Bits=20;
+                BitDepth=20;
                 Stream_Bits=20;
                 Endianness='B'; // BE
                 break; // while()
             }
         }
-        if ((Container_Bits==0 || Container_Bits==20) && (!Aligned || ((Buffer_TotalBytes+Buffer_Offset)%5)==0))
+        if ((BitDepth==0 || BitDepth==20) && (!Aligned || ((Buffer_TotalBytes+Buffer_Offset)%5)==0))
         {
             if (Buffer[Buffer_Offset  ]==0x72
              && Buffer[Buffer_Offset+1]==0xF8
@@ -502,13 +500,13 @@ bool File_SmpteSt0337::Synchronize()
              && Buffer[Buffer_Offset+3]==0xE1
              && Buffer[Buffer_Offset+4]==0x54) // 20-bit, LE
             {
-                Container_Bits=20;
+                BitDepth=20;
                 Stream_Bits=20;
                 Endianness='L'; // BE
                 break; // while()
             }
         }
-        if ((Container_Bits==0 || Container_Bits==24) && (!Aligned || ((Buffer_TotalBytes+Buffer_Offset)%6)==0))
+        if ((BitDepth==0 || BitDepth==24) && (!Aligned || ((Buffer_TotalBytes+Buffer_Offset)%6)==0))
         {
             if (Buffer[Buffer_Offset  ]==0x96
              && Buffer[Buffer_Offset+1]==0xF8
@@ -517,7 +515,7 @@ bool File_SmpteSt0337::Synchronize()
              && Buffer[Buffer_Offset+4]==0x4E
              && Buffer[Buffer_Offset+5]==0x1F) // 24-bit, BE
             {
-                Container_Bits=24;
+                BitDepth=24;
                 Stream_Bits=24;
                 Endianness='B'; // BE
                 break; // while()
@@ -529,7 +527,7 @@ bool File_SmpteSt0337::Synchronize()
              && Buffer[Buffer_Offset+4]==0x4E
              && Buffer[Buffer_Offset+5]==0xA5) // 24-bit, LE
             {
-                Container_Bits=24;
+                BitDepth=24;
                 Stream_Bits=24;
                 Endianness='L'; // LE
                 break; // while()
@@ -541,7 +539,7 @@ bool File_SmpteSt0337::Synchronize()
              && Buffer[Buffer_Offset+4]==0x4E
              && Buffer[Buffer_Offset+5]==0x1F) // 16-bit in 24-bit, BE
             {
-                Container_Bits=24;
+                BitDepth=24;
                 Stream_Bits=16;
                 Endianness='B'; // BE
                 NullPadding_Size=1;
@@ -554,7 +552,7 @@ bool File_SmpteSt0337::Synchronize()
              && Buffer[Buffer_Offset+4]==0x1F
              && Buffer[Buffer_Offset+5]==0x4E) // 16-bit in 24-bit, LE
             {
-                Container_Bits=24;
+                BitDepth=24;
                 Stream_Bits=16;
                 Endianness='L'; // LE
                 NullPadding_Size=1;
@@ -567,7 +565,7 @@ bool File_SmpteSt0337::Synchronize()
              && Buffer[Buffer_Offset+4]==0xE1
              && Buffer[Buffer_Offset+5]==0xF0) // 20-bit in 24-bit, BE
             {
-                Container_Bits=24;
+                BitDepth=24;
                 Stream_Bits=20;
                 Endianness='B'; // BE
                 break; // while()
@@ -579,13 +577,13 @@ bool File_SmpteSt0337::Synchronize()
              && Buffer[Buffer_Offset+4]==0xE1
              && Buffer[Buffer_Offset+5]==0x54) // 20-bit in 24-bit, LE
             {
-                Container_Bits=24;
+                BitDepth=24;
                 Stream_Bits=20;
                 Endianness='L'; // LE
                 break; // while()
             }
         }
-        if ((Container_Bits==0 || Container_Bits==32) && (!Aligned || ((Buffer_TotalBytes+Buffer_Offset)%8)==0))
+        if ((BitDepth==0 || BitDepth==32) && (!Aligned || ((Buffer_TotalBytes+Buffer_Offset)%8)==0))
         {
             if (Buffer[Buffer_Offset  ]==0x00
              && Buffer[Buffer_Offset+1]==0x00
@@ -596,7 +594,7 @@ bool File_SmpteSt0337::Synchronize()
              && Buffer[Buffer_Offset+6]==0x4E
              && Buffer[Buffer_Offset+7]==0x1F) // 16-bit in 32-bit, BE
             {
-                Container_Bits=32;
+                BitDepth=32;
                 Stream_Bits=16;
                 Endianness='B'; // BE
                 NullPadding_Size=2;
@@ -611,7 +609,7 @@ bool File_SmpteSt0337::Synchronize()
              && Buffer[Buffer_Offset+6]==0x1F
              && Buffer[Buffer_Offset+7]==0x4E) // 16-bit in 32-bit, LE
             {
-                Container_Bits=32;
+                BitDepth=32;
                 Stream_Bits=16;
                 Endianness='L'; // LE
                 NullPadding_Size=2;
@@ -626,7 +624,7 @@ bool File_SmpteSt0337::Synchronize()
              && Buffer[Buffer_Offset+6]==0xE1
              && Buffer[Buffer_Offset+7]==0xF0) // 20-bit in 32-bit, BE
             {
-                Container_Bits=32;
+                BitDepth=32;
                 Stream_Bits=20;
                 Endianness='B'; // BE
                 NullPadding_Size=1;
@@ -641,7 +639,7 @@ bool File_SmpteSt0337::Synchronize()
              && Buffer[Buffer_Offset+6]==0xE1
              && Buffer[Buffer_Offset+7]==0x54) // 20-bit in 32-bit, LE
             {
-                Container_Bits=32;
+                BitDepth=32;
                 Stream_Bits=20;
                 Endianness='L'; // LE
                 NullPadding_Size=1;
@@ -656,7 +654,7 @@ bool File_SmpteSt0337::Synchronize()
              && Buffer[Buffer_Offset+6]==0x4E
              && Buffer[Buffer_Offset+7]==0x1F) // 24-bit in 32-bit, BE
             {
-                Container_Bits=32;
+                BitDepth=32;
                 Stream_Bits=24;
                 Endianness='B'; // BE
                 NullPadding_Size=1;
@@ -671,7 +669,7 @@ bool File_SmpteSt0337::Synchronize()
              && Buffer[Buffer_Offset+6]==0x4E
              && Buffer[Buffer_Offset+7]==0xA5) // 24-bit in 32-bit, LE
             {
-                Container_Bits=32;
+                BitDepth=32;
                 Stream_Bits=24;
                 Endianness='L'; // LE
                 NullPadding_Size=1;
@@ -679,8 +677,8 @@ bool File_SmpteSt0337::Synchronize()
             }
         }
 
-        if (Container_Bits>=4 && Aligned)
-            Buffer_Offset+=Container_Bits/4;
+        if (BitDepth>=4 && Aligned)
+            Buffer_Offset+=BitDepth/4;
         else
             Buffer_Offset++;
     }
@@ -721,7 +719,7 @@ bool File_SmpteSt0337::Synched_Test()
     size_t Buffer_Offset_Temp=Buffer_Offset;
     if (Aligned)
     {
-        if (Container_Bits==16)
+        if (BitDepth==16)
         {
             while ((Buffer_TotalBytes+Buffer_Offset_Temp)%4) // Padding in part of the AES3 block
             {
@@ -745,7 +743,7 @@ bool File_SmpteSt0337::Synched_Test()
                 return false;
             }
         }
-        if (Container_Bits==20)
+        if (BitDepth==20)
         {
             while ((Buffer_TotalBytes+Buffer_Offset_Temp)%5) // Padding in part of the AES3 block
             {
@@ -769,7 +767,7 @@ bool File_SmpteSt0337::Synched_Test()
                 return false;
             }
         }
-        if (Container_Bits==24)
+        if (BitDepth==24)
         {
             while ((Buffer_TotalBytes+Buffer_Offset_Temp)%6) // Padding in part of the AES3 block
             {
@@ -793,7 +791,7 @@ bool File_SmpteSt0337::Synched_Test()
                 return false;
             }
         }
-        else if (Container_Bits==32)
+        else if (BitDepth==32)
         {
             while ((Buffer_TotalBytes+Buffer_Offset_Temp)%8) // Padding in part of the AES3 block
             {
@@ -846,7 +844,7 @@ bool File_SmpteSt0337::Synched_Test()
     switch (Endianness)
     {
         case 'B' :
-                    switch (Container_Bits)
+                    switch (BitDepth)
                     {
                         case 16 :   if (CC4(Buffer+Buffer_Offset)!=0xF8724E1F) {Synched=false; return true;} break;
                         case 20 :   if (CC5(Buffer+Buffer_Offset)!=0x6F87254E1FLL) {Synched=false; return true;} break;
@@ -872,7 +870,7 @@ bool File_SmpteSt0337::Synched_Test()
                     }
                     break;
         case 'L'  :
-                    switch (Container_Bits)
+                    switch (BitDepth)
                     {
                         case 16 :   if (CC4(Buffer+Buffer_Offset)!=0x72F81F4E) {Synched=false; return true;} break;
                         case 20 :   if (CC5(Buffer+Buffer_Offset)!=0x72F8F6E154LL) {Synched=false; return true;} break;
@@ -939,7 +937,7 @@ void File_SmpteSt0337::Header_Parse()
     switch (Endianness)
     {
         case 'B' :
-                    switch (Container_Bits)
+                    switch (BitDepth)
                     {
                         case 16 :   Size=BigEndian2int16u(Buffer+Buffer_Offset+6)         ; break;
                         case 20 :   Size=BigEndian2int24u(Buffer+Buffer_Offset+7)&0x0FFFFF; break;
@@ -965,7 +963,7 @@ void File_SmpteSt0337::Header_Parse()
                     }
                     break;
         case 'L'  :
-                    switch (Container_Bits)
+                    switch (BitDepth)
                     {
                         case 16 :   Size=LittleEndian2int16u(Buffer+Buffer_Offset+6)   ; break;
                         case 20 :   Size=LittleEndian2int24u(Buffer+Buffer_Offset+7)>>4; break;
@@ -994,26 +992,26 @@ void File_SmpteSt0337::Header_Parse()
     }
 
     // Adaptation
-    if (Container_Bits!=Stream_Bits)
+    if (BitDepth!=Stream_Bits)
     {
-        Size*=Container_Bits; Size/=Stream_Bits;
+        Size*=BitDepth; Size/=Stream_Bits;
     }
 
     // Coherency test
     if (!IsSub && !Status[IsAccepted])
     {
-        size_t Offset=Buffer_Offset+(size_t)(Container_Bits*4/8+Size/8);
+        size_t Offset=Buffer_Offset+(size_t)(BitDepth*4/8+Size/8);
         while (Offset<Buffer_Size && Buffer[Offset]==0x00)
             Offset++;
-        if (Offset+Container_Bits/4>Buffer_Size)
+        if (Offset+BitDepth/4>Buffer_Size)
         {
             Element_WaitForMoreData();
             return;
         }
-        Offset/=Container_Bits/4;
-        Offset*=Container_Bits/4;
+        Offset/=BitDepth/4;
+        Offset*=BitDepth/4;
         bool IsOK=true;
-        for (int8u Pos=0; Pos<Container_Bits/4; Pos++)
+        for (int8u Pos=0; Pos<BitDepth/4; Pos++)
             if (Buffer[Buffer_Offset+Pos]!=Buffer[Offset+Pos])
             {
                 IsOK=false;
@@ -1028,10 +1026,10 @@ void File_SmpteSt0337::Header_Parse()
     }
 
     // Filling
-    Padding=(int8u)(Size%Container_Bits);
+    Padding=(int8u)(Size%BitDepth);
     if (Padding)
-        Size+=Container_Bits-Padding;
-    Header_Fill_Size(Container_Bits*4/8+Size/8);
+        Size+=BitDepth-Padding;
+    Header_Fill_Size(BitDepth*4/8+Size/8);
     Header_Fill_Code(0, "SMPTE ST 337");
 }
 
@@ -1050,12 +1048,12 @@ void File_SmpteSt0337::Data_Parse()
     size_t Save_Buffer_Size=0;
     int64u Save_Element_Size=0;
 
-    if (Endianness=='L'|| Container_Bits!=Stream_Bits)
+    if (Endianness=='L'|| BitDepth!=Stream_Bits)
     {
         int8u* Info=new int8u[(size_t)Element_Size];
         int8u* Info_Temp=Info;
 
-        if (Endianness=='L' && Container_Bits==16 && Stream_Bits==16)
+        if (Endianness=='L' && BitDepth==16 && Stream_Bits==16)
         {
             // Source: 16LE / L1L0 L3L2 R1R0 R3R2
             // Dest  : 16BE / L3L2 L1L0 R3R2 R1R0
@@ -1081,7 +1079,7 @@ void File_SmpteSt0337::Data_Parse()
             }
         }
 
-        if (Endianness=='L' && Container_Bits==20 && Stream_Bits==20)
+        if (Endianness=='L' && BitDepth==20 && Stream_Bits==20)
         {
             // Source: 20LE / L1L0 L3L2 R0L4 R2R1 R4R3
             // Dest  : 20BE / L4L3 L2L1 L0R4 R3R2 R1R0
@@ -1099,7 +1097,7 @@ void File_SmpteSt0337::Data_Parse()
             }
         }
 
-        if (Endianness=='L' && Container_Bits==24 && Stream_Bits==16)
+        if (Endianness=='L' && BitDepth==24 && Stream_Bits==16)
         {
             // Source:        XXXX L1L0 L3L2 XXXX R1R0 R3R2
             // Dest  : 16BE / L3L2 L1L0 R3R2 R1R0
@@ -1116,7 +1114,7 @@ void File_SmpteSt0337::Data_Parse()
             }
         }
 
-        if (Endianness=='L' && Container_Bits==24 && Stream_Bits==20)
+        if (Endianness=='L' && BitDepth==24 && Stream_Bits==20)
         {
             // Source:        L0XX L2L1 L4L3 R0XX R2R1 R4R3
             // Dest  : 20BE / L4L3 L2L1 L0R4 R3R2 R1R0
@@ -1142,7 +1140,7 @@ void File_SmpteSt0337::Data_Parse()
             }
         }
 
-        if (Endianness=='L' && Container_Bits==24 && Stream_Bits==24)
+        if (Endianness=='L' && BitDepth==24 && Stream_Bits==24)
         {
             // Source: 24LE / L1L0 L3L2 L5L3 R1R0 R3R2 R5R4
             // Dest  : 24BE / L5L3 L3L2 L1L0 R5R4 R3R2 R1R0
@@ -1161,7 +1159,7 @@ void File_SmpteSt0337::Data_Parse()
             }
         }
 
-        if (Endianness=='L' && Container_Bits==32 && Stream_Bits==16)
+        if (Endianness=='L' && BitDepth==32 && Stream_Bits==16)
         {
             // Source:        XXXX XXXX L1L0 L3L2 XXXX XXXX R1R0 R3R2
             // Dest  : 16BE / L3L2 L1L0 R3R2 R1R0
@@ -1177,7 +1175,7 @@ void File_SmpteSt0337::Data_Parse()
                 Element_Offset+=8;
             }
         }
-        if (Endianness=='L' && Container_Bits==32 && Stream_Bits==20)
+        if (Endianness=='L' && BitDepth==32 && Stream_Bits==20)
         {
             // Source:        XXXX L0XX L2L1 L4L3 XXXX R0XX R2R1 R4R3
             // Dest  : 20BE / L4L3 L2L1 L0R4 R3R2 R1R0
@@ -1195,7 +1193,7 @@ void File_SmpteSt0337::Data_Parse()
             }
         }
 
-        if (Endianness=='L' && Container_Bits==32 && Stream_Bits==24)
+        if (Endianness=='L' && BitDepth==32 && Stream_Bits==24)
         {
             // Source:        XXXX L1L0 L3L2 L5L3 XXXX R1R0 R3R2 R5R4
             // Dest  : 24BE / L5L3 L3L2 L1L0 R5R4 R3R2 R1R0
@@ -1214,7 +1212,7 @@ void File_SmpteSt0337::Data_Parse()
             }
         }
 
-        if (Endianness=='B' && Container_Bits==24 && Stream_Bits==20)
+        if (Endianness=='B' && BitDepth==24 && Stream_Bits==20)
         {
             // Source:        L4L3 L2L1 L0XX R4R3 R2R1 R0XX
             // Dest  : 20BE / L4L3 L2L1 L0R4 R3R2 R1R0
@@ -1531,7 +1529,7 @@ void File_SmpteSt0337::Data_Parse()
             int64u Demux_Element_Offset=Element_Offset;
             Element_Offset=0;
 
-            if (Container_Bits==20)
+            if (BitDepth==20)
             {
                 //We must pad to 24 bits
                 int8u*          Info2=new int8u[(size_t)Element_Size*6/5];
@@ -1565,7 +1563,7 @@ void File_SmpteSt0337::Data_Parse()
             Element_Offset=Demux_Element_Offset;
         }
         else
-            Demux(Buffer+Buffer_Offset+Container_Bits/2, (size_t)(Element_Size-Container_Bits/2), ContentType_MainStream);
+            Demux(Buffer+Buffer_Offset+BitDepth/2, (size_t)(Element_Size-BitDepth/2), ContentType_MainStream);
 
         if (Save_Buffer)
         {
@@ -1588,7 +1586,7 @@ void File_SmpteSt0337::Data_Parse()
             case 28 :
                         ((File_DolbyE*)Parser)->GuardBand_Before=GuardBand_Before;
                         ((File_DolbyE*)Parser)->GuardBand_Before*=Stream_Bits;
-                        ((File_DolbyE*)Parser)->GuardBand_Before/=Container_Bits;
+                        ((File_DolbyE*)Parser)->GuardBand_Before/=BitDepth;
                         break;
             default : ;
         }
@@ -1628,7 +1626,7 @@ void File_SmpteSt0337::Data_Parse()
         {
             case 28 :
                         GuardBand_After=((File_DolbyE*)Parser)->GuardBand_After;
-                        GuardBand_After*=Container_Bits;
+                        GuardBand_After*=BitDepth;
                         GuardBand_After/=Stream_Bits;
                         break;
             default : ;

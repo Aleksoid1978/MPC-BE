@@ -127,6 +127,9 @@
  second1; segundo
  second2; segundos
  second3; segundos
+ slice per frame1;
+ slice per frame2;
+ slice per frame3;
  text stream1; pista de texto
  text stream2; pistas de texto
  text stream3; pistas de texto
@@ -364,7 +367,6 @@ DotsPerInch;Puntos por pulgada
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Duración
@@ -382,6 +384,7 @@ EditorialClassification;
 ElementaryStream;
 ElementCount;
 EMail;Correo
+Enable FFmpeg plugin;
 Encoded_Application;Aplicación de codifición
 Encoded_Date;Fecha de codificación
 Encoded_Library;Librería de codificación
@@ -463,6 +466,7 @@ Format_Settings_QPel;Ajustes del formato, Qpel
 Format_Settings_RefFrames;Ajustes del formato, RefFrames
 Format_Settings_SBR;Ajustes del formato, SBR
 Format_Settings_Sign;Ajustes del formato, Sign
+Format_Settings_SliceCount;
 Format_Settings_Wrapping;Ajustes del formato, modo envase
 Format_Tier;
 Format_Url;Enlace web del formato
@@ -473,7 +477,6 @@ FpaPass;Paso FPA
 FpaVersion;Versión FPA
 FrameCount;Recuento fotogramas
 FrameRate;Velocidad de fotogramas
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Velocidad fotogramas máxima
 FrameRate_Minimum;Velocidad fotogramas mínima
 FrameRate_Mode;Modo velocidad fotogramas
@@ -729,21 +732,6 @@ InternetMediaType;Tipo medios Internet
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;Palabras clave
 Known codecs;Códecs conocidos
 Known formats;Formatos conocidos
@@ -1042,6 +1030,7 @@ ms; ms
 MSDI;MSDI
 MultipleStream;
 MusicBy;Música por
+MultiView_Count;
 MuxingMode;Modo multiplexor
 MuxingMode_MoreInfo;Modo multiplexor, más info
 MuxingMode_PackedBitstream;Secuencia de bits empaquetada
@@ -1369,5 +1358,5 @@ Written_Location;Escrito en
 WrittenBy;Escrito por
 Yes;Sí
 Your system;Tu sistema
-ZZ_Automatic_Percent;68
+ZZ_Automatic_Percent;69
 ZZ_AutomaticLanguage_Percent;79

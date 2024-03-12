@@ -43,6 +43,9 @@ class File_DolbyAudioMetadata;
 class File_Mxf : public File__Analyze, File__HasReferences
 {
 public :
+    //In
+    bool IsRtmd;
+
     //Constructor/Destructor
     File_Mxf();
     ~File_Mxf();
@@ -510,7 +513,9 @@ protected :
     void LensUnitMetadata_IrisRingPosition();                   //8009
     void LensUnitMetadata_FocusRingPosition();                  //800A
     void LensUnitMetadata_ZoomRingPosition();                   //800B
-    void CameraUnitMetadata_CaptureGammaEquation();             //3210
+    void CameraUnitMetadata_TransferCharacteristic();           //3210
+    void CameraUnitMetadata_ColorPrimaries();                   //3219
+    void CameraUnitMetadata_CodingEquations();                  //321A
     void CameraUnitMetadata_AutoExposureMode();                 //8100
     void CameraUnitMetadata_AutoFocusSensingAreaSetting();      //8101
     void CameraUnitMetadata_ColorCorrectionFilterWheelSetting();//8102

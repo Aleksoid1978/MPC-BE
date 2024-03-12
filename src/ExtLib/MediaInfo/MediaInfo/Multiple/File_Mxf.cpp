@@ -1545,26 +1545,118 @@ static const char* Mxf_ColorPrimaries(const int128u ColorPrimaries)
 }
 
 //---------------------------------------------------------------------------
-static const char* Mxf_TransferCharacteristic(const int128u TransferCharacteristic)
+const char* Mxf_TransferCharacteristic_MXF[]=
 {
-    int32u Code_Compare4=(int32u)TransferCharacteristic.lo;
-    switch ((int8u)(Code_Compare4>>16))
+    "BT.601",
+    "BT.709",
+    "SMPTE 240M",
+    "SMPTE 274M",
+    "BT.1361",
+    "Linear",
+    "SMPTE 428M",
+    "xvYCC",
+    "BT.2020", // ISO does a difference of value between 10 and 12 bit
+    "PQ",
+    "HLG",
+    "Gamma 2.6", // SMPTE ST 2067-50
+    "sRGB/sYCC", // IEC 61966-2-1
+};
+const char* Mxf_TransferCharacteristic_Sony_1[]= // 0x0E06x Sony values are read from SR Viewer program
+{
+    "DVW-709 Like",                      
+    "E10/E30STD for J EK",
+    "E10/E30STD for UC",
+    "",
+    "",
+    "BBC Initial50",
+    "SD CamCorder STD",
+    "BVW-400 Like",
+    "Ikegami",
+};
+const char* Mxf_TransferCharacteristic_Sony_2[]= // 0x0E06x Sony values are read from SR Viewer program
+{
+    "HG3250G36",
+    "HG4600G30",
+    "HG3259G40",
+    "HG4609G33",
+    "HG8000G36",
+    "HG8000G30",
+    "HG8009G40",
+    "HG8009G33",
+};
+const char* Mxf_TransferCharacteristic_Sony_3[]= // 0x0E06x Sony values are read from SR Viewer program
+{
+    "CINE1 of EX1/EX3",
+    "CINE2 of EX1/EX3",
+    "CINE3 of EX1/EX3",
+    "CINE4 of EX1/EX3",
+    "Kodak 5248 film like",
+    "Kodak 5245 film like",
+    "Kodak 5293 film like",
+    "Kodak 5296 film like",
+    "Average of Film of MSW-900",
+};
+const char* Mxf_TransferCharacteristic_Sony_4[]= // 0x0E06x Sony values are read from SR Viewer program
+{
+    "User defined curve1",
+    "User defined curve2",
+    "User defined curve3",
+    "User defined curve4",
+    "User defined curve5",
+    "User defined curve6",
+    "User defined curve7",
+    "User defined curve8",
+};
+const char* Mxf_TransferCharacteristic_Sony_5[]= // 0x0E06x Sony values are read from SR Viewer program
+{
+    "S-Log",
+    "FS-Log",
+    "R709 180%",
+    "R709 800%",
+    "",
+    "Cine-Log",
+    "ASC-CDL",
+};
+const char** Mxf_TransferCharacteristic_Sony[]=
+{
+    Mxf_TransferCharacteristic_Sony_1,
+    Mxf_TransferCharacteristic_Sony_2,
+    Mxf_TransferCharacteristic_Sony_3,
+    Mxf_TransferCharacteristic_Sony_4,
+    Mxf_TransferCharacteristic_Sony_5,
+};
+const int8u Mxf_TransferCharacteristic_Sony_Size[]=
+{
+    (int8u)(sizeof(Mxf_TransferCharacteristic_Sony_1)/sizeof(Mxf_TransferCharacteristic_Sony_1[0])),
+    (int8u)(sizeof(Mxf_TransferCharacteristic_Sony_2)/sizeof(Mxf_TransferCharacteristic_Sony_2[0])),
+    (int8u)(sizeof(Mxf_TransferCharacteristic_Sony_3)/sizeof(Mxf_TransferCharacteristic_Sony_3[0])),
+    (int8u)(sizeof(Mxf_TransferCharacteristic_Sony_4)/sizeof(Mxf_TransferCharacteristic_Sony_4[0])),
+    (int8u)(sizeof(Mxf_TransferCharacteristic_Sony_5)/sizeof(Mxf_TransferCharacteristic_Sony_5[0])),
+};
+static string Mxf_TransferCharacteristic(const int128u Value)
+{
+    if ((Value.lo>>24)==0x0401010101000000LL>>24) // MXF
     {
-        case 0x01 : return "BT.601";
-        case 0x02 : return "BT.709";
-        case 0x03 : return "SMPTE 240M";
-        case 0x04 : return "SMPTE 274M";
-        case 0x05 : return "BT.1361";
-        case 0x06 : return "Linear";
-        case 0x07 : return "SMPTE 428M";
-        case 0x08 : return "xvYCC";
-        case 0x09 : return "BT.2020"; // ISO does a difference of value between 10 and 12 bit
-        case 0x0A : return "PQ";
-        case 0x0B : return "HLG";
-        case 0x0C : return "Gamma 2.6"; // SMPTE ST 2067-50
-        case 0x0D : return "sRGB/sYCC"; // IEC 61966-2-1
-        default   : return "";
+        int8u Value2=(int8u)((Value.lo>>16)-1);
+        if (Value2<sizeof(Mxf_TransferCharacteristic_MXF)/sizeof(Mxf_TransferCharacteristic_MXF[0]))
+            return Mxf_TransferCharacteristic_MXF[Value2];
     }
+    if ((Value.lo>>16)==0x0E06040101010000LL>>16) // Sony
+    {
+        int8u Value2=(int8u)((Value.lo>>8)-1);
+        if (Value2<sizeof(Mxf_TransferCharacteristic_Sony_Size)/sizeof(Mxf_TransferCharacteristic_Sony_Size[0]))
+        {
+            int8u Value3=(int8u)(size_t(Value.lo)-1);
+            if (Value3<Mxf_TransferCharacteristic_Sony_Size[Value2])
+                return Mxf_TransferCharacteristic_Sony[Value2][Value3];
+        }
+    }
+
+    Ztring ValueS;
+    ValueS.From_Number(Value.lo, 16);
+    if (ValueS.size()<16)
+        ValueS.insert(0, 16-ValueS.size(), __T('0'));
+    return ValueS.To_UTF8();
 }
 
 //---------------------------------------------------------------------------
@@ -2106,10 +2198,10 @@ static string Mxf_CameraUnitMetadata_GammaforCDL(int8u Value)
     switch(Value)
     {
         case 0x00 : return "Same as Capture Gamma";
-        case 0x01 : return "Scene Linear";
+        case 0x01 : return "Linear";
         case 0x02 : return "S-Log";
         case 0x03 : return "Cine-Log";
-        case 0xFF : return "Undefined";
+        case 0xFF : return "";
         default   : return Ztring::ToZtring(Value).To_UTF8();
     }
 };
@@ -2136,70 +2228,6 @@ static string Mxf_CameraUnitMetadata_ImageSensorReadoutMode(int8u Value)
         case 0x02 : return "Progressive frame";
         case 0xFF : return "Undefined";
         default   : return Ztring::ToZtring(Value).To_UTF8();
-    }
-};
-
-//---------------------------------------------------------------------------
-// EBU Tech 3349
-static string Mxf_CameraUnitMetadata_CaptureGammaEquation(int128u Value)
-{
-    switch(Value.lo)
-    {
-        case 0x0401010101010000LL : return "BT.470";                            // Directly from SMPTE registry
-        case 0x0401010101020000LL : return "BT.709";
-        case 0x0401010101030000LL : return "SMPTE ST 240";
-        case 0x0401010101040000LL : return "SMPTE ST 274";                      // Directly from SMPTE registry
-        case 0x0401010101050000LL : return "BT.1361";                           // Directly from SMPTE registry
-        case 0x0401010101060000LL : return "SceneLinear";                       // Directly from SMPTE registry
-        case 0x0E06040101010101LL : return "DVW-709 Like";                      // 0x0E06x values are read from SR Viewer program
-        case 0x0E06040101010102LL : return "E10/E30STD for J EK";
-        case 0x0E06040101010103LL : return "E10/E30STD for UC";
-        case 0x0E06040101010106LL : return "BBC Initial50";
-        case 0x0E06040101010107LL : return "SD CamCorder STD";
-        case 0x0E06040101010108LL : return "BVW-400 Like";
-        case 0x0E06040101010109LL : return "Ikegami";
-        case 0x0E0604010101017FLL : return "reproduced unknown label";
-        case 0x0E06040101010201LL : return "HG3250G36";
-        case 0x0E06040101010202LL : return "HG4600G30";
-        case 0x0E06040101010203LL : return "HG3259G40";
-        case 0x0E06040101010204LL : return "HG4609G33";
-        case 0x0E06040101010205LL : return "HG8000G36";
-        case 0x0E06040101010206LL : return "HG8000G30";
-        case 0x0E06040101010207LL : return "HG8009G40";
-        case 0x0E06040101010208LL : return "HG8009G33";
-        case 0x0E06040101010301LL : return "CINE1 of EX1/EX3";
-        case 0x0E06040101010302LL : return "CINE2 of EX1/EX3";
-        case 0x0E06040101010303LL : return "CINE3 of EX1/EX3";
-        case 0x0E06040101010304LL : return "CINE4 of EX1/EX3";
-        case 0x0E06040101010305LL : return "Kodak 5248 film like";
-        case 0x0E06040101010306LL : return "Kodak 5245 film like";
-        case 0x0E06040101010307LL : return "Kodak 5293 film like";
-        case 0x0E06040101010308LL : return "Kodak 5296 film like";
-        case 0x0E06040101010309LL : return "Average of Film of MSW-900";
-        case 0x0E06040101010401LL : return "User defined curve1";
-        case 0x0E06040101010402LL : return "User defined curve2";
-        case 0x0E06040101010403LL : return "User defined curve3";
-        case 0x0E06040101010404LL : return "User defined curve4";
-        case 0x0E06040101010405LL : return "User defined curve5";
-        case 0x0E06040101010406LL : return "User defined curve6";
-        case 0x0E06040101010407LL : return "User defined curve7";
-        case 0x0E06040101010408LL : return "User defined curve8";
-        case 0x0E06040101010501LL : return "S-Log";
-        case 0x0E06040101010502LL : return "FS-Log";
-        case 0x0E06040101010503LL : return "R709 180%";
-        case 0x0E06040101010504LL : return "R709 800%";
-        case 0x0E06040101010506LL : return "Cine-Log";
-        case 0x0E06040101010507LL : return "ASC-CDL";
-                                            
-
-        default   :
-                    {
-                    Ztring ValueS;
-                    ValueS.From_Number(Value.lo, 16);
-                    if (ValueS.size()<16)
-                        ValueS.insert(0, 16-ValueS.size(), __T('0'));
-                    return ValueS.To_UTF8();
-                    }
     }
 };
 
@@ -2293,7 +2321,9 @@ static string Mxf_AcquisitionMetadata_ElementName(int16u Value, bool IsSony=fals
 
     switch (Value) // From EBU Tech 3349
     {
-        case 0x3210: return "CaptureGammaEquation";
+        case 0x3210: return "TransferCharacteristics"; // a.k.a. Capture Gamma Equation
+        case 0x3219: return "ColorPrimaries";
+        case 0x321A: return "MatrixCoefficients"; // a.k.a. Coding Equations
         case 0x8000: return "IrisFNumber";
         case 0x8001: return "FocusPositionFromImagePlane";
         case 0x8002: return "FocusPositionFromFrontLensVertex";
@@ -2435,6 +2465,9 @@ File_Mxf::File_Mxf()
     #if MEDIAINFO_DEMUX
         Demux_EventWasSent_Accept_Specific=true;
     #endif //MEDIAINFO_DEMUX
+
+    //In
+    IsRtmd=false;
 
     //Hints
     File_Buffer_Size_Hint_Pointer=NULL;
@@ -2628,11 +2661,6 @@ void File_Mxf::Streams_Finish()
         if (Tracks.empty())
         {
             //Clear
-            for (size_t StreamKind=Stream_General+1; StreamKind<Stream_Max; StreamKind++)
-            {
-                (*Stream)[StreamKind].clear();
-                (*Stream_More)[StreamKind].clear();
-            }
             for (essences::iterator Essence=Essences.begin(); Essence!=Essences.end(); ++Essence)
                 for (parsers::iterator Parser=Essence->second.Parsers.begin(); Parser!=Essence->second.Parsers.end(); ++Parser)
                 {
@@ -2819,7 +2847,8 @@ void File_Mxf::Streams_Finish()
     //CameraUnitMetadata
     if (!AcquisitionMetadataLists.empty())
     {
-        Stream_Prepare(Stream_Other);
+        if (!Count_Get(Stream_Other))
+            Stream_Prepare(Stream_Other);
 
         for (size_t Pos = 0; Pos < AcquisitionMetadataLists.size(); Pos++)
         {
@@ -4784,6 +4813,32 @@ void File_Mxf::Read_Buffer_Continue()
 
     Read_Buffer_CheckFileModifications();
 
+    if (IsRtmd)
+    {
+        Synched=false;
+        if (Buffer_Size>=18)
+        {
+            Skip_XX(13,                                         "Unknown");
+            Element_Begin1("Time code");
+                int8u HH, MM, SS, Drop, FF;
+                Get_B1(HH,                                      "HH");
+                Get_B1(MM,                                      "MM");
+                Get_B1(SS,                                      "SS");
+                Get_B1(Drop,                                    "Drop");
+                Get_B1(FF,                                      "SS");
+                TimeCode TC(HH, MM, SS, FF, FF<=99?99:255, TimeCode::flags().DropFrame());
+                Element_Info1(TC.ToString());
+                if (!Frame_Count_NotParsedIncluded)
+                {
+                    Accept();
+                    Stream_Prepare(Stream_Other);
+                    Fill(Stream_Other, 0, Other_Format, "Sony Real Time Metadata");
+                    Fill(Stream_Other, 0, Other_TimeCode_FirstFrame, TC.ToString());
+                }
+            Element_End0();
+        }
+    }
+
     if (IsSearchingFooterPartitionAddress)
     {
         if (File_Offset+Buffer_Size<File_Size)
@@ -5062,7 +5117,7 @@ void File_Mxf::Read_Buffer_AfterParsing()
         Frame_Count++;
         if (Frame_Count_NotParsedIncluded!=(int64u)-1)
             Frame_Count_NotParsedIncluded++;
-        if (!Status[IsFilled] && Config->ParseSpeed<=0)
+        if (!Status[IsFilled] && (Config->ParseSpeed<=0 || IsRtmd))
             Fill();
     }
 }
@@ -9241,7 +9296,9 @@ void File_Mxf::CameraUnitMetadata()
 
     switch(Code2)
     {
-        ELEMENT(3210, CameraUnitMetadata_CaptureGammaEquation,              "Capture Gamma Equation")
+        ELEMENT(3210, CameraUnitMetadata_TransferCharacteristic,            "Capture Gamma Equation")
+        ELEMENT(3219, CameraUnitMetadata_ColorPrimaries,                    "Color Primaries")
+        ELEMENT(321A, CameraUnitMetadata_CodingEquations,                   "Coding Equations")
         ELEMENT(8100, CameraUnitMetadata_AutoExposureMode,                  "AutoExposure Mode")
         ELEMENT(8101, CameraUnitMetadata_AutoFocusSensingAreaSetting,       "Auto Focus Sensing Area Setting")
         ELEMENT(8102, CameraUnitMetadata_ColorCorrectionFilterWheelSetting, "Color Correction Filter Wheel Setting")
@@ -10495,10 +10552,10 @@ void File_Mxf::GenericPictureEssenceDescriptor_TransferCharacteristic()
 {
     //Parsing
     int128u Data;
-    Get_UL(Data,                                                "Data", Mxf_TransferCharacteristic);  Element_Info1(Mxf_TransferCharacteristic(Data));
+    Get_UL(Data,                                                "Data", NULL); Element_Info1(Mxf_TransferCharacteristic(Data));
 
     FILLING_BEGIN();
-        Descriptor_Fill("transfer_characteristics", Mxf_TransferCharacteristic(Data));
+        Descriptor_Fill("transfer_characteristics", Ztring().From_UTF8(Mxf_TransferCharacteristic(Data)));
     FILLING_END();
 }
 
@@ -13075,14 +13132,40 @@ void File_Mxf::LensUnitMetadata_ZoomRingPosition()
 
 //---------------------------------------------------------------------------
 //
-void File_Mxf::CameraUnitMetadata_CaptureGammaEquation()
+void File_Mxf::CameraUnitMetadata_TransferCharacteristic()
 {
     //Parsing
-    int128u Value;
-    Get_UUID(Value,                                             "Value");
+    int128u Data;
+    Get_UL(Data,                                                "Data", NULL); Element_Info1(Mxf_TransferCharacteristic(Data));
 
     FILLING_BEGIN();
-        AcquisitionMetadata_Add(Code2, Mxf_CameraUnitMetadata_CaptureGammaEquation(Value));
+        AcquisitionMetadata_Add(Code2, Mxf_TransferCharacteristic(Data));
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::CameraUnitMetadata_ColorPrimaries()
+{
+    //Parsing
+    int128u Data;
+    Get_UL(Data,                                                "Data", Mxf_ColorPrimaries); Element_Info1(Mxf_ColorPrimaries(Data));
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Mxf_ColorPrimaries(Data));
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::CameraUnitMetadata_CodingEquations()
+{
+    //Parsing
+    int128u Data;
+    Get_UL(Data,                                                "Data", Mxf_CodingEquations); Element_Info1(Mxf_CodingEquations(Data));
+
+    FILLING_BEGIN();
+        AcquisitionMetadata_Add(Code2, Mxf_CodingEquations(Data));
     FILLING_END();
 }
 
@@ -18678,9 +18761,9 @@ void File_Mxf::ChooseParser_SmpteSt0337(const essences::iterator &Essence, const
         if (Descriptor!=Descriptors.end())
         {
             if (Descriptor->second.BlockAlign<64)
-                Parser->Container_Bits=(int8u)(Descriptor->second.BlockAlign*4);
+                Parser->BitDepth=(int8u)(Descriptor->second.BlockAlign*4);
             else if (Descriptor->second.QuantizationBits!=(int32u)-1)
-                Parser->Container_Bits=(int8u)Descriptor->second.QuantizationBits;
+                Parser->BitDepth=(int8u)Descriptor->second.QuantizationBits;
             std::map<std::string, Ztring>::const_iterator i=Descriptor->second.Infos.find("Format_Settings_Endianness");
             if (i!=Descriptor->second.Infos.end())
             {

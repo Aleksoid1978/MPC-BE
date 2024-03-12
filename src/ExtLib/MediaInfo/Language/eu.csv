@@ -127,6 +127,9 @@
  second1; segundu
  second2; segundu
  second3; segundu
+ slice per frame1;
+ slice per frame2;
+ slice per frame3;
  text stream1; idazki jarioa
  text stream2; idazki jarioa
  text stream3; idazki jarioa
@@ -364,7 +367,6 @@ DotsPerInch;Puntu hatzbeteko
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;Iraupena
@@ -382,6 +384,7 @@ EditorialClassification;
 ElementaryStream;
 ElementCount;
 EMail;Post@
+Enable FFmpeg plugin;
 Encoded_Application;Idazketa aplikazioa
 Encoded_Date;Kodeaketa eguna
 Encoded_Library;Idazketa liburutegia
@@ -463,6 +466,7 @@ Format_Settings_QPel;Heuskarri ezarpenak, QPel
 Format_Settings_RefFrames;Heuskarri ezarpenak, RefFrames
 Format_Settings_SBR;Heuskarri ezarpenak, SBR
 Format_Settings_Sign;Heuskarri ezarpenak, Sign
+Format_Settings_SliceCount;
 Format_Settings_Wrapping;
 Format_Tier;
 Format_Url;Heuskarriaren weblotura
@@ -473,7 +477,6 @@ FpaPass;
 FpaVersion;
 FrameCount;Frame zenbatekoa
 FrameRate;Frame neurria
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;Gehienezko frame neurria
 FrameRate_Minimum;Gutxienezko frame neurria
 FrameRate_Mode;Frame neurri modua
@@ -729,21 +732,6 @@ InternetMediaType;Internet multimedia mota
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;Laterteklak
 Known codecs;Ezagutu kodekak
 Known formats;Ezagutu heuskarriak
@@ -1042,6 +1030,7 @@ ms; sm
 MSDI;MSDI
 MultipleStream;
 MusicBy;Musikaria
+MultiView_Count;
 MuxingMode;Nahasketa modua
 MuxingMode_MoreInfo;Nahasketa modua, argibide gehiago
 MuxingMode_PackedBitstream;Paketatutako bitjarioa

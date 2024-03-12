@@ -127,6 +127,9 @@
  second1;secunda
  second2;secunde
  second3;secunde
+ slice per frame1;
+ slice per frame2;
+ slice per frame3;
  text stream1;flux test
  text stream2;fluxuri test
  text stream3;fluxuri text
@@ -364,7 +367,6 @@ DotsPerInch;
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
-Downmix_5to2_90deg;
 DrcSets_Count;
 DrcSets_Effects;
 Duration;
@@ -382,6 +384,7 @@ EditorialClassification;
 ElementaryStream;
 ElementCount;
 EMail;E-mail
+Enable FFmpeg plugin;
 Encoded_Application;Dezvoltator aplicatie
 Encoded_Date;Data codarii
 Encoded_Library;Dezvoltator biblioteci
@@ -463,6 +466,7 @@ Format_Settings_QPel;
 Format_Settings_RefFrames;
 Format_Settings_SBR;
 Format_Settings_Sign;
+Format_Settings_SliceCount;
 Format_Settings_Wrapping;
 Format_Tier;
 Format_Url;
@@ -473,7 +477,6 @@ FpaPass;
 FpaVersion;
 FrameCount;
 FrameRate;Frecventa cadre
-FrameRate_MaxFrameNumber;
 FrameRate_Maximum;
 FrameRate_Minimum;
 FrameRate_Mode;
@@ -729,21 +732,6 @@ InternetMediaType;
 IRCA;
 ISBN;
 ISRC;
-JocBalance_FrontBackListener;
-JocBalance_FrontBackOverheadFloor;
-JocTrim_Center;
-JocTrim_Height;
-JocTrim_Surround;
-JocTrimMode;
-JocTrimMode0i;
-JocTrimMode1i;
-JocTrimMode2i;
-JocTrimMode3i;
-JocTrimMode4i;
-JocTrimMode5i;
-JocTrimMode6i;
-JocTrimMode7i;
-JocTrimMode8i;
 Keywords;Cuvinte cheie
 Known codecs;Codecuri cunoscute
 Known formats;Formate cunoscute
@@ -1042,6 +1030,7 @@ ms; ms
 MSDI;
 MultipleStream;
 MusicBy;
+MultiView_Count;
 MuxingMode;
 MuxingMode_MoreInfo;
 MuxingMode_PackedBitstream;
@@ -1369,5 +1358,5 @@ Written_Location;Locul mesajului
 WrittenBy;Scris de
 Yes;Da
 Your system;Sistemul dvs
-ZZ_Automatic_Percent;24
-ZZ_AutomaticLanguage_Percent;53
+ZZ_Automatic_Percent;25
+ZZ_AutomaticLanguage_Percent;54
