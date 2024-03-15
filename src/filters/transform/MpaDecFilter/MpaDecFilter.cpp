@@ -33,8 +33,9 @@
 #include "DSUtil/SysVersion.h"
 #include "Version.h"
 #include <basestruct.h>
-
-#include <ExtLib/ffmpeg/libavcodec/avcodec.h>
+extern "C" {
+	#include <ExtLib/ffmpeg/libavcodec/avcodec.h>
+}
 #include "AudioDecoders.h"
 
 // option names

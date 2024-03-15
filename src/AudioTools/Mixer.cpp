@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2023 see Authors.txt
+ * (C) 2014-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,9 +26,7 @@
 #pragma warning(push)
 #pragma warning(disable: 4005)
 extern "C" {
-	#include "ExtLib/ffmpeg/libswresample/swresample.h"
 	#include "ExtLib/ffmpeg/libswresample/swresample_internal.h"
-	#include "ExtLib/ffmpeg/libavutil/samplefmt.h"
 	#include "ExtLib/ffmpeg/libavutil/opt.h"
 }
 #pragma warning(pop)
