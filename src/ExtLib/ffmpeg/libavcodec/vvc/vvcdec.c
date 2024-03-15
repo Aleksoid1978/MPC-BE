@@ -727,8 +727,8 @@ static void export_frame_params(VVCContext *s, const VVCFrameContext *fc)
     c->pix_fmt      = sps->pix_fmt;
     c->coded_width  = pps->width;
     c->coded_height = pps->height;
-    c->width        = pps->width  - pps->r->pps_conf_win_left_offset - pps->r->pps_conf_win_right_offset;
-    c->height       = pps->height - pps->r->pps_conf_win_top_offset - pps->r->pps_conf_win_bottom_offset;
+    c->width        = pps->width  - ((pps->r->pps_conf_win_left_offset + pps->r->pps_conf_win_right_offset) << sps->hshift[CHROMA]);
+    c->height       = pps->height - ((pps->r->pps_conf_win_top_offset + pps->r->pps_conf_win_bottom_offset) << sps->vshift[CHROMA]);
 }
 
 static int frame_setup(VVCFrameContext *fc, VVCContext *s)
@@ -1044,7 +1044,8 @@ const FFCodec ff_vvc_decoder = {
     .close          = vvc_decode_free,
     FF_CODEC_DECODE_CB(vvc_decode_frame),
     .flush          = vvc_decode_flush,
-    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY | AV_CODEC_CAP_OTHER_THREADS,
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY | AV_CODEC_CAP_OTHER_THREADS |
+                      AV_CODEC_CAP_EXPERIMENTAL,
     .caps_internal  = FF_CODEC_CAP_EXPORTS_CROPPING | FF_CODEC_CAP_INIT_CLEANUP |
                       FF_CODEC_CAP_AUTO_THREADS,
     .p.profiles     = NULL_IF_CONFIG_SMALL(ff_vvc_profiles),
