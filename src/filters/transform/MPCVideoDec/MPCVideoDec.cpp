@@ -2306,6 +2306,10 @@ redo:
 		av_dict_set_int(&options, "x264_build", x264_build, 0);
 	}
 
+	if (m_CodecId == AV_CODEC_ID_VVC) {
+		m_pAVCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
+	}
+
 	avcodec_lock;
 	m_bInInit = TRUE;
 	const int ret = avcodec_open2(m_pAVCtx, m_pAVCodec, &options);
