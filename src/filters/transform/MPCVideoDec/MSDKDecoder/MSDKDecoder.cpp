@@ -24,8 +24,7 @@
 #pragma warning(push)
 #pragma warning(disable: 4005)
 extern "C" {
-  #include <ExtLib/ffmpeg/libavcodec/avcodec.h>
-  #include <ExtLib/ffmpeg/libavutil/imgutils.h>
+  #include <ExtLib/ffmpeg/libavutil/frame.h>
   #include <ExtLib/ffmpeg/libavutil/intreadwrite.h>
 }
 #pragma warning(pop)

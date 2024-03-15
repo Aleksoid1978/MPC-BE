@@ -21,7 +21,9 @@
 #include "stdafx.h"
 #include "MPCVideoDecSettingsWnd.h"
 #include "DSUtil/MFCHelper.h"
-#include <ExtLib/ffmpeg/libavcodec/avcodec.h>
+extern "C" {
+	#include <ExtLib/ffmpeg/libavcodec/defs.h>
+}
 #include "DxgiUtils.h"
 
 //

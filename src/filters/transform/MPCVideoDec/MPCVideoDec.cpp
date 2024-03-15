@@ -56,7 +56,6 @@ extern "C" {
 	#include <ExtLib/ffmpeg/libavutil/mastering_display_metadata.h>
 	#include <ExtLib/ffmpeg/libavutil/dovi_meta.h>
 	#include <ExtLib/ffmpeg/libavutil/opt.h>
-	#include <ExtLib/ffmpeg/libavutil/pixdesc.h>
 	#include <ExtLib/ffmpeg/libavutil/hwcontext_cuda_internal.h>
 	#include <ExtLib/ffmpeg/libavutil/hwcontext_d3d11va.h>
 	#include <ExtLib/ffmpeg/libavutil/hwcontext_d3d12va.h>

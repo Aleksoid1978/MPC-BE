@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2021 see Authors.txt
+ * (C) 2014-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,10 +29,9 @@
 #pragma warning(disable: 4005)
 #pragma warning(disable: 5033)
 extern "C" {
-	#include <ExtLib/ffmpeg/libavcodec/avcodec.h>
+	#include <ExtLib/ffmpeg/libavcodec/defs.h>
 	#include <ExtLib/ffmpeg/libswscale/swscale.h>
 	#include <ExtLib/ffmpeg/libswscale/swscale_internal.h>
-	#include <ExtLib/ffmpeg/libavutil/pixdesc.h>
 }
 #pragma warning(pop)
 
