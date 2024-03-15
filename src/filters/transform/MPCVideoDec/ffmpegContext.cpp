@@ -34,7 +34,6 @@ extern "C" {
 	#include <ExtLib/ffmpeg/libavcodec/avcodec.h>
 // This is kind of an hack but it avoids using a C++ keyword as a struct member name
 #define class classFFMPEG
-	#include <ExtLib/ffmpeg/libavcodec/mpegvideo.h>
 	#include <ExtLib/ffmpeg/libavcodec/h264dec.h>
 	#include <ExtLib/ffmpeg/libavcodec/ffv1.h>
 #undef class
