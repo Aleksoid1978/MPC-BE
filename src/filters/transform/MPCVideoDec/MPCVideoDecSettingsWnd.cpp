@@ -328,7 +328,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 		m_cbScanType.SetCurSel((int)m_pMDF->GetScanType());
 
 		m_chARMode.SetCheck(m_pMDF->GetARMode());
-		m_chSkipBFrames.SetCheck(m_pMDF->GetDiscardMode() == AVDISCARD_BIDIR);
+		m_chSkipBFrames.SetCheck(m_pMDF->GetDiscardMode() == AVDISCARD_NONREF);
 
 		for (int i = 0; i < HWCodec_count; i++) {
 			m_cbHWCodec[i].SetCheck(!!m_pMDF->GetHwCodec((MPCHwCodec)i));
@@ -418,7 +418,7 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 		m_pMDF->SetScanType((MPC_SCAN_TYPE)m_cbScanType.GetCurSel());
 
 		m_pMDF->SetARMode(m_chARMode.GetCheck());
-		m_pMDF->SetDiscardMode(m_chSkipBFrames.GetCheck() ? AVDISCARD_BIDIR : AVDISCARD_DEFAULT);
+		m_pMDF->SetDiscardMode(m_chSkipBFrames.GetCheck() ? AVDISCARD_NONREF : AVDISCARD_DEFAULT);
 
 		for (int i = 0; i < HWCodec_count; i++) {
 			m_pMDF->SetHwCodec((MPCHwCodec)i, m_cbHWCodec[i].GetCheck() == BST_CHECKED);

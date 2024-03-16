@@ -1224,7 +1224,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	}
 #endif
 
-	if (m_nDiscardMode != AVDISCARD_BIDIR) {
+	if (m_nDiscardMode != AVDISCARD_NONREF) {
 		m_nDiscardMode = AVDISCARD_DEFAULT;
 	}
 
@@ -4582,7 +4582,7 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetThreadNumber()
 
 STDMETHODIMP CMPCVideoDecFilter::SetDiscardMode(int nValue)
 {
-	if (nValue != AVDISCARD_DEFAULT && nValue != AVDISCARD_BIDIR) {
+	if (nValue != AVDISCARD_DEFAULT && nValue != AVDISCARD_NONREF) {
 		return E_INVALIDARG;
 	}
 
