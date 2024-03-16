@@ -124,7 +124,7 @@ BEGIN
     CONTROL         "自动加载外部音轨",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,65,276,9
     EDITTEXT        IDC_EDIT4,10,76,222,13,ES_AUTOHSCROLL
     PUSHBUTTON      "重置",IDC_BUTTON2,235,76,50,13
-    CONTROL         "选择外部音频文件替代内嵌音轨。",IDC_CHECK3,
+    CONTROL         "选择外部音频文件替代内嵌音轨",IDC_CHECK3,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,92,273,9
 END
 
@@ -212,7 +212,7 @@ BEGIN
     LTEXT           "版本:",IDC_VERSION,30,34,90,8
     LTEXT           "MPC-BE 编译器:",IDC_STATIC,30,66,90,8
     LTEXT           "FFmpeg 编译器:",IDC_STATIC,30,83,90,8
-    LTEXT           "Libavcodec / Libavutil :",IDC_STATIC,30,99,90,8
+    LTEXT           "Libavcodec / Libavutil:",IDC_STATIC,30,99,90,8
     EDITTEXT        IDC_VERSION_NUMBER,120,32,110,13,ES_AUTOHSCROLL | ES_READONLY
     EDITTEXT        IDC_EDIT2,120,48,110,13,ES_AUTOHSCROLL | ES_READONLY
     EDITTEXT        IDC_MPC_COMPILER,120,64,110,13,ES_AUTOHSCROLL | ES_READONLY
@@ -343,7 +343,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,190,85,94,13,ES_AUTOHSCROLL
     LTEXT           "(例如: eng jap swe)",IDC_STATIC,147,101,132,8
     GROUPBOX        "打开设置",IDC_STATIC,5,172,286,79
-    LTEXT           "开启音频文件时，",IDC_STATIC,10,185,99,8
+    LTEXT           "开启音频文件时:",IDC_STATIC,10,185,99,8
     COMBOBOX        IDC_COMBO4,113,182,172,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "额外添加到播放列表:",IDC_STATIC,10,201,139,8
     COMBOBOX        IDC_COMBO5,150,198,135,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -882,7 +882,7 @@ BEGIN
     COMBOBOX        IDC_COMBO7,188,156,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "输出范围:",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "MPC渲染器设置",IDC_STATIC,5,177,285,27
+    GROUPBOX        "MPC 渲染器设置",IDC_STATIC,5,177,285,27
     CONTROL         "全屏独占使用额外的窗口 (实验性)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
     GROUPBOX        "播放框布置",IDC_STATIC,5,208,210,53
@@ -1170,7 +1170,7 @@ BEGIN
     LTEXT           "+/-",IDC_STATIC11,100,143,10,8
     EDITTEXT        IDC_CONTROLLIMIT,114,141,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
     LTEXT           "毫秒",IDC_STATIC10,158,143,24,8
-    LTEXT           "设置在关闭并重新启动后生效。",IDC_STATIC12,10,162,276,18
+    LTEXT           "设置在关闭并重新启动后生效",IDC_STATIC12,10,162,276,18
 END
 
 IDD_PPAGEFULLSCREEN DIALOGEX 0, 0, 296, 264
@@ -1182,7 +1182,7 @@ BEGIN
     EDITTEXT        IDC_EDIT1,14,27,32,13,ES_CENTER | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,35,27,12,13
     LTEXT           "秒",IDC_STATIC1,51,29,30,8
-    LTEXT           "0: 自动隐藏; -1: 不隐藏",IDC_STATIC2,85,29,195,8
+    LTEXT           "0: 自动隐藏；-1: 不隐藏",IDC_STATIC2,85,29,195,8
     CONTROL         "在播放结束后退出全屏幕模式",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,43,276,9
     CONTROL         "失去用户焦点时退出全屏模式",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,55,276,9
@@ -1695,8 +1695,8 @@ BEGIN
             MENUITEM "永远(&O)", ID_REPEAT_FOREVER
             MENUITEM SEPARATOR
             MENUITEM "A-B 重置定位(&R)", ID_PLAY_REPEAT_AB
-            MENUITEM "A-B 标记定位A(&A)", ID_PLAY_REPEAT_AB_MARK_A
-            MENUITEM "A-B 标记定位B(&B)", ID_PLAY_REPEAT_AB_MARK_B
+            MENUITEM "A-B 标记定位 A(&A)", ID_PLAY_REPEAT_AB_MARK_A
+            MENUITEM "A-B 标记定位 B(&B)", ID_PLAY_REPEAT_AB_MARK_B
         END
         MENUITEM SEPARATOR
         MENUITEM "增加速率(&I)",             ID_PLAY_INCRATE
@@ -1767,8 +1767,8 @@ BEGIN
             MENUITEM "永远(&O)", ID_REPEAT_FOREVER
             MENUITEM SEPARATOR
             MENUITEM "A-B 重置定位(&R)", ID_PLAY_REPEAT_AB
-            MENUITEM "A-B 标记定位A(&A)", ID_PLAY_REPEAT_AB_MARK_A
-            MENUITEM "A-B 标记定位B(&B)", ID_PLAY_REPEAT_AB_MARK_B
+            MENUITEM "A-B 标记定位 A(&A)", ID_PLAY_REPEAT_AB_MARK_A
+            MENUITEM "A-B 标记定位 B(&B)", ID_PLAY_REPEAT_AB_MARK_B
         END
         MENUITEM SEPARATOR
         MENUITEM "全屏幕(&L)",            ID_VIEW_FULLSCREEN
@@ -1964,8 +1964,8 @@ BEGIN
                 MENUITEM "永远(&O)", ID_REPEAT_FOREVER
                 MENUITEM SEPARATOR
                 MENUITEM "A-B 重置定位(&R)", ID_PLAY_REPEAT_AB
-                MENUITEM "A-B 标记定位A(&A)", ID_PLAY_REPEAT_AB_MARK_A
-                MENUITEM "A-B 标记定位B(&B)", ID_PLAY_REPEAT_AB_MARK_B
+                MENUITEM "A-B 标记定位 A(&A)", ID_PLAY_REPEAT_AB_MARK_A
+                MENUITEM "A-B 标记定位 B(&B)", ID_PLAY_REPEAT_AB_MARK_B
             END
             MENUITEM SEPARATOR
             MENUITEM "增加速率(&I)",             ID_PLAY_INCRATE
@@ -2286,7 +2286,7 @@ BEGIN
     IDS_STATSBAR_BITRATE_AVG_CUR "(典型/当前)"
     IDS_AUTOPLAY_PLAYBDMOVIE "播放蓝光光盘"
     IDS_TEXTBAR_NOTHING     "无显示"
-    IDS_TEXTBAR_FILENANE    "文件名(如不适用，则标题或网址)"
+    IDS_TEXTBAR_FILENANE    "文件名 (如不适用，则标题或网址)"
     IDS_TEXTBAR_TITLE       "标题 (如不适用，则文件名或网址)"
     IDS_TEXTBAR_FULLPATH    "完整路径"
 END
@@ -2370,9 +2370,9 @@ BEGIN
     IDS_RECORD_STOP         "停止"
     IDS_FILTERS_COPY_TO_CLIPBOARD "将滤镜列表复制到剪贴板(&C)"
     IDS_AG_COPY_IMAGE       "复制图像到剪贴板"
-    IDS_PLAYLOOPMODE_AB     "A-B重复：重置定位"
-    IDS_PLAYLOOPMODE_AB_MARK_A "A - B 重复：标记定位 A"
-    IDS_PLAYLOOPMODE_AB_MARK_B "A - B 重复：标记定位 B"
+    IDS_PLAYLOOPMODE_AB     "A-B 重复: 重置定位"
+    IDS_PLAYLOOPMODE_AB_MARK_A "A-B 重复: 标记定位 A"
+    IDS_PLAYLOOPMODE_AB_MARK_B "A-B 重复: 标记定位 B"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "从剪贴板添加到播放列表"
     IDS_MOVEWINDOWBYVIDEO_ONOFF "按视频区域移动窗口: 开/关"
     IDS_MOVEWINDOWBYVIDEO_ON "按视频区域移动窗口: 开"
@@ -2406,10 +2406,10 @@ BEGIN
     IDS_SUBRESYNC_CLN_LAYER "层"
     IDS_SUBRESYNC_CLN_ACTOR "演员"
     IDS_SUBRESYNC_CLN_EFFECT "效果"
-    IDS_PPAGE_FS_CLN_ON_OFF "开 / 关"
+    IDS_PPAGE_FS_CLN_ON_OFF "开/关"
     IDS_PPAGE_FS_CLN_FROM_FPS "从 fps"
     IDS_PPAGE_FS_CLN_TO_FPS "到 fps"
-    IDS_PPAGE_FS_CLN_DISPLAY_MODE "显示模式(Hz)"
+    IDS_PPAGE_FS_CLN_DISPLAY_MODE "显示模式 (Hz)"
     IDS_PPAGE_FS_DEFAULT    "默认"
     IDS_PPAGE_FS_OTHER      "其它"
     IDS_PPAGE_OUTPUT_SYS_DEF "系统默认"
@@ -2582,9 +2582,9 @@ STRINGTABLE
 BEGIN
     IDS_SRC_MPA             "mp3 和 aac 的源滤镜"
     IDS_TRA_DVD_VIDEO       "基于 libmpeg2"
-    IDS_TRA_PS2AUD          "解码 PSS文件的音频流"
-    IDS_TRA_FFMPEG          "基于 FFmpeg ， http://ffmpeg.org/"
-    IDS_TRA_INTEL_MSDK      "基于Intel Media SDK, 需要外部链接库 (libmfxsw32.dll/libmfxsw64.dll)"
+    IDS_TRA_PS2AUD          "解码 PSS 文件的音频流"
+    IDS_TRA_FFMPEG          "基于 FFmpeg，http://ffmpeg.org/"
+    IDS_TRA_INTEL_MSDK      "基于Intel Media SDK，需要外部链接库 (libmfxsw32.dll/libmfxsw64.dll)"
 END
 
 STRINGTABLE
@@ -2785,7 +2785,7 @@ BEGIN
     IDS_MENU_VIDEO_STREAM   "视频流(&T)"
     IDS_MENU_VIDEO_ANGLE    "视频角度(&L)"
     IDS_RESET_SETTINGS      "重置设置"
-    IDS_RESET_SETTINGS_WARNING  "您确定要恢复 MPC-BE 的默认设置吗？\n警告:您当前所有的设置将会丢失！"
+    IDS_RESET_SETTINGS_WARNING  "您确定要恢复 MPC-BE 的默认设置吗？\n警告：您当前所有的设置将会丢失！"
     IDS_RESET_SETTINGS_MUTEX  "请关闭所有正在运行的 MPC-BE 程序以便恢复默认设置。"
     IDS_EXPORT_SETTINGS     "导出设置"
     IDS_EXPORT_SETTINGS_WARNING  "一些改变还没有被保存。\n您想在导出前保存它们吗？"
@@ -2850,7 +2850,7 @@ BEGIN
     IDS_CENTER_LEVEL_INC    "提高中央声道水平"
     IDS_CENTER_LEVEL_DEC    "降低中央声道水平"
     IDS_CENTER_LEVEL        "中央声道水平 (%+.1f dB)"
-    IDS_CENTER_LEVEL_OSD    "中央声道水平：%+.1f dB"
+    IDS_CENTER_LEVEL_OSD    "中央声道水平: %+.1f dB"
     IDS_SURROUND_LEVEL      "环绕声道水平 (%+.1f dB)"
 END
 
@@ -2925,7 +2925,7 @@ STRINGTABLE
 BEGIN
     IDS_AG_NEXT_SUBTITLE    "下一个字幕"
     IDS_AG_PREV_SUBTITLE    "上一个字幕"
-    IDS_AG_SUBTITLE_ONOFF   "开 / 关字幕"
+    IDS_AG_SUBTITLE_ONOFF   "开/关字幕"
     IDS_AG_SUBTITLE_RELOAD  "重新加载字幕"
     IDS_AG_NEXT_VIDEO       "下一视频/ DVD 视角"
     IDS_AG_PREV_VIDEO       "上一视频/ DVD 视角"
@@ -3098,7 +3098,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PPSDB_BADURL        "错误的 URL ，无法定位字幕数据库！"
+    IDS_PPSDB_BADURL        "错误的 URL，无法定位字幕数据库！"
     IDS_AG_CHAPTER2         "章节:"
     IDS_VOLUME_OSD          "音量: %d%%"
     IDS_GAIN_OSD            "增益: %+.1f dB"
@@ -3760,7 +3760,7 @@ BEGIN
     IDS_THUMB_PIXELS        "像素:"
     IDS_THUMB_LEVEL         "压缩级别 (1-9):"
     IDS_SNAPSHOT_SUBTITLES  "包含字幕"
-    IDS_REND_UNAVAILABLEMSG "%s 不可用。 %s 将被启用"
+    IDS_REND_UNAVAILABLEMSG "%s 不可用。%s 将被启用"
     IDS_REMOVEFROMLISTQUESTION  "确定删除列表中的 %d 个条目吗？"
 END
 
