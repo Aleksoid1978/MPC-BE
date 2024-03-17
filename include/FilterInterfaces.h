@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2019 see Authors.txt
+ * (C) 2017-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -53,19 +53,19 @@ interface __declspec(uuid("37CBDF10-D65E-4E5A-8F37-40E0C8EA1695")) IExFilterConf
 	// The memory for strings and binary data is allocated by the callee
 	// by using LocalAlloc. It is the caller's responsibility to release the
 	// memory by calling LocalFree.
-	STDMETHOD(GetBool  )(LPCSTR field, bool    *value) PURE;
-	STDMETHOD(GetInt   )(LPCSTR field, int     *value) PURE;
-	STDMETHOD(GetInt64 )(LPCSTR field, __int64 *value) PURE;
-	STDMETHOD(GetDouble)(LPCSTR field, double  *value) PURE;
-	STDMETHOD(GetString)(LPCSTR field, LPWSTR  *value, unsigned *chars) PURE;
-	STDMETHOD(GetBin   )(LPCSTR field, LPVOID  *value, unsigned *size ) PURE;
+	STDMETHOD(Flt_GetBool  )(LPCSTR field, bool    *value) PURE;
+	STDMETHOD(Flt_GetInt   )(LPCSTR field, int     *value) PURE;
+	STDMETHOD(Flt_GetInt64 )(LPCSTR field, __int64 *value) PURE;
+	STDMETHOD(Flt_GetDouble)(LPCSTR field, double  *value) PURE;
+	STDMETHOD(Flt_GetString)(LPCSTR field, LPWSTR  *value, unsigned *chars) PURE;
+	STDMETHOD(Flt_GetBin   )(LPCSTR field, LPVOID  *value, unsigned *size ) PURE;
 
-	STDMETHOD(SetBool  )(LPCSTR field, bool    value) PURE;
-	STDMETHOD(SetInt   )(LPCSTR field, int     value) PURE;
-	STDMETHOD(SetInt64 )(LPCSTR field, __int64 value) PURE;
-	STDMETHOD(SetDouble)(LPCSTR field, double  value) PURE;
-	STDMETHOD(SetString)(LPCSTR field, LPWSTR  value, int chars) PURE;
-	STDMETHOD(SetBin   )(LPCSTR field, LPVOID  value, int size ) PURE;
+	STDMETHOD(Flt_SetBool  )(LPCSTR field, bool    value) PURE;
+	STDMETHOD(Flt_SetInt   )(LPCSTR field, int     value) PURE;
+	STDMETHOD(Flt_SetInt64 )(LPCSTR field, __int64 value) PURE;
+	STDMETHOD(Flt_SetDouble)(LPCSTR field, double  value) PURE;
+	STDMETHOD(Flt_SetString)(LPCSTR field, LPWSTR  value, int chars) PURE;
+	STDMETHOD(Flt_SetBin   )(LPCSTR field, LPVOID  value, int size ) PURE;
 };
 // available settings:
 // name            type  filter            mode     valid values

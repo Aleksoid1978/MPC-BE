@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2019 see Authors.txt
+ * (C) 2017-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,17 +31,17 @@ class CExFilterInfoImpl : public IExFilterInfo
 
 class CExFilterConfigImpl : public IExFilterConfig
 {
-	STDMETHODIMP GetBool  (LPCSTR field, bool    *value)                  { return E_NOTIMPL; };
-	STDMETHODIMP GetInt   (LPCSTR field, int     *value)                  { return E_NOTIMPL; };
-	STDMETHODIMP GetInt64 (LPCSTR field, __int64 *value)                  { return E_NOTIMPL; };
-	STDMETHODIMP GetDouble(LPCSTR field, double  *value)                  { return E_NOTIMPL; };
-	STDMETHODIMP GetString(LPCSTR field, LPWSTR  *value, unsigned *chars) { return E_NOTIMPL; };
-	STDMETHODIMP GetBin   (LPCSTR field, LPVOID  *value, unsigned *size ) { return E_NOTIMPL; };
+	STDMETHODIMP Flt_GetBool  (LPCSTR field, bool    *value)                  { return E_NOTIMPL; };
+	STDMETHODIMP Flt_GetInt   (LPCSTR field, int     *value)                  { return E_NOTIMPL; };
+	STDMETHODIMP Flt_GetInt64 (LPCSTR field, __int64 *value)                  { return E_NOTIMPL; };
+	STDMETHODIMP Flt_GetDouble(LPCSTR field, double  *value)                  { return E_NOTIMPL; };
+	STDMETHODIMP Flt_GetString(LPCSTR field, LPWSTR  *value, unsigned *chars) { return E_NOTIMPL; };
+	STDMETHODIMP Flt_GetBin   (LPCSTR field, LPVOID  *value, unsigned *size ) { return E_NOTIMPL; };
 
-	STDMETHODIMP SetBool  (LPCSTR field, bool    value)            { return E_NOTIMPL; };
-	STDMETHODIMP SetInt   (LPCSTR field, int     value)            { return E_NOTIMPL; };
-	STDMETHODIMP SetInt64 (LPCSTR field, __int64 value)            { return E_NOTIMPL; };
-	STDMETHODIMP SetDouble(LPCSTR field, double  value)            { return E_NOTIMPL; };
-	STDMETHODIMP SetString(LPCSTR field, LPWSTR  value, int chars) { return E_NOTIMPL; };
-	STDMETHODIMP SetBin   (LPCSTR field, LPVOID  value, int size ) { return E_NOTIMPL; };
+	STDMETHODIMP Flt_SetBool  (LPCSTR field, bool    value)            { return E_NOTIMPL; };
+	STDMETHODIMP Flt_SetInt   (LPCSTR field, int     value)            { return E_NOTIMPL; };
+	STDMETHODIMP Flt_SetInt64 (LPCSTR field, __int64 value)            { return E_NOTIMPL; };
+	STDMETHODIMP Flt_SetDouble(LPCSTR field, double  value)            { return E_NOTIMPL; };
+	STDMETHODIMP Flt_SetString(LPCSTR field, LPWSTR  value, int chars) { return E_NOTIMPL; };
+	STDMETHODIMP Flt_SetBin   (LPCSTR field, LPVOID  value, int size ) { return E_NOTIMPL; };
 };

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -242,6 +242,6 @@ public:
 	STDMETHODIMP_(CString) GetInformation(MPCAInfo index);
 
 	// IExFilterConfig
-	STDMETHODIMP GetInt64(LPCSTR field, __int64* value) override;
-	STDMETHODIMP SetBool(LPCSTR field, bool value) override;
+	STDMETHODIMP Flt_GetInt64(LPCSTR field, __int64* value) override;
+	STDMETHODIMP Flt_SetBool(LPCSTR field, bool value) override;
 };

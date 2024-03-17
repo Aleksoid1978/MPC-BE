@@ -143,7 +143,7 @@ STDMETHODIMP CRawVideoSplitterFilter::GetPropertyInt(LPCSTR field, int *value)
 
 // IExFilterConfig
 
-STDMETHODIMP CRawVideoSplitterFilter::SetInt(LPCSTR field, int value)
+STDMETHODIMP CRawVideoSplitterFilter::Flt_SetInt(LPCSTR field, int value)
 {
 	if (strcmp(field, "queueDuration") == 0) {
 		if (m_RAWType == RAW_MPEG1 || m_RAWType == RAW_MPEG2 || m_RAWType == RAW_H264 || m_RAWType == RAW_VC1 || m_RAWType == RAW_HEVC) {

@@ -1,5 +1,5 @@
 /*
- * (C) 2019-2023 see Authors.txt
+ * (C) 2019-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -221,8 +221,8 @@ STDMETHODIMP CMPCVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 	(*ppRenderer = (IUnknown*)(INonDelegatingUnknown*)(this))->AddRef();
 
 	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
-		hr = pIExFilterConfig->SetBool("lessRedraws", true);
-		hr = pIExFilterConfig->SetBool("d3dFullscreenControl", m_bMPCVRFullscreenControl);
+		hr = pIExFilterConfig->Flt_SetBool("lessRedraws", true);
+		hr = pIExFilterConfig->Flt_SetBool("d3dFullscreenControl", m_bMPCVRFullscreenControl);
 	}
 
 	CComQIPtr<IBaseFilter> pBF(m_pMPCVR);
@@ -256,9 +256,9 @@ STDMETHODIMP CMPCVRAllocatorPresenter::SetRotation(int rotation)
 		HRESULT hr = E_NOTIMPL;
 		if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 			int curRotation = rotation;
-			hr = pIExFilterConfig->GetInt("rotation", &curRotation);
+			hr = pIExFilterConfig->Flt_GetInt("rotation", &curRotation);
 			if (SUCCEEDED(hr) && rotation != curRotation) {
-				hr = pIExFilterConfig->SetInt("rotation", rotation);
+				hr = pIExFilterConfig->Flt_SetInt("rotation", rotation);
 				if (SUCCEEDED(hr)) {
 					m_bOtherTransform = true;
 				}
@@ -273,7 +273,7 @@ STDMETHODIMP_(int) CMPCVRAllocatorPresenter::GetRotation()
 {
 	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 		int rotation = 0;
-		if (SUCCEEDED(pIExFilterConfig->GetInt("rotation", &rotation))) {
+		if (SUCCEEDED(pIExFilterConfig->Flt_GetInt("rotation", &rotation))) {
 			return rotation;
 		}
 	}
@@ -285,9 +285,9 @@ STDMETHODIMP CMPCVRAllocatorPresenter::SetFlip(bool flip)
 	HRESULT hr = E_NOTIMPL;
 	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 		bool curFlip = false;
-		hr = pIExFilterConfig->GetBool("flip", &curFlip);
+		hr = pIExFilterConfig->Flt_GetBool("flip", &curFlip);
 		if (SUCCEEDED(hr) && flip != curFlip) {
-			hr = pIExFilterConfig->SetBool("flip", flip);
+			hr = pIExFilterConfig->Flt_SetBool("flip", flip);
 			if (SUCCEEDED(hr)) {
 				m_bOtherTransform = true;
 			}
@@ -300,7 +300,7 @@ STDMETHODIMP_(bool) CMPCVRAllocatorPresenter::GetFlip()
 {
 	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 		bool flip = false;
-		if (SUCCEEDED(pIExFilterConfig->GetBool("flip", &flip))) {
+		if (SUCCEEDED(pIExFilterConfig->Flt_GetBool("flip", &flip))) {
 			return flip;
 		}
 	}
@@ -330,7 +330,7 @@ STDMETHODIMP_(SIZE) CMPCVRAllocatorPresenter::GetVideoSizeAR()
 STDMETHODIMP_(bool) CMPCVRAllocatorPresenter::Paint(bool /*bAll*/)
 {
 	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
-		return SUCCEEDED(pIExFilterConfig->SetBool("cmd_redraw", true));
+		return SUCCEEDED(pIExFilterConfig->Flt_SetBool("cmd_redraw", true));
 	}
 	return false;
 }
@@ -348,7 +348,7 @@ STDMETHODIMP CMPCVRAllocatorPresenter::GetDisplayedImage(LPVOID* dibImage)
 {
 	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 		unsigned size = 0;
-		HRESULT hr = pIExFilterConfig->GetBin("displayedImage", dibImage, &size);
+		HRESULT hr = pIExFilterConfig->Flt_GetBin("displayedImage", dibImage, &size);
 
 		return hr;
 	}
@@ -360,7 +360,7 @@ STDMETHODIMP_(int) CMPCVRAllocatorPresenter::GetPixelShaderMode()
 {
 	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 		int rtype = 0;
-		if (S_OK == pIExFilterConfig->GetInt("renderType", &rtype)) {
+		if (S_OK == pIExFilterConfig->Flt_GetInt("renderType", &rtype)) {
 			return rtype;
 		}
 	}
@@ -373,7 +373,7 @@ STDMETHODIMP CMPCVRAllocatorPresenter::ClearPixelShaders(int target)
 
 	if (TARGET_SCREEN == target) {
 		if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
-			hr = pIExFilterConfig->SetBool("cmd_clearPostScaleShaders", true);
+			hr = pIExFilterConfig->Flt_SetBool("cmd_clearPostScaleShaders", true);
 		}
 	}
 	return hr;
@@ -411,7 +411,7 @@ STDMETHODIMP CMPCVRAllocatorPresenter::AddPixelShader(int target, LPCWSTR name, 
 	if (codesize && TARGET_SCREEN == target) {
 		if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 			int rtype = 0;
-			hr = pIExFilterConfig->GetInt("renderType", &rtype);
+			hr = pIExFilterConfig->Flt_GetInt("renderType", &rtype);
 			if (S_OK == hr && (rtype == 9 && iProfile == 3 || rtype == 11 && iProfile == 4)) {
 				int size = 8 + codesize;
 				if (namesize) {
@@ -426,7 +426,7 @@ STDMETHODIMP CMPCVRAllocatorPresenter::AddPixelShader(int target, LPCWSTR name, 
 					}
 					p = WriteChunk(p, FCC('CODE'), codesize, (BYTE*)sourceCode);
 
-					hr = pIExFilterConfig->SetBin("cmd_addPostScaleShader", (LPVOID)pBuf, size);
+					hr = pIExFilterConfig->Flt_SetBin("cmd_addPostScaleShader", (LPVOID)pBuf, size);
 					LocalFree(pBuf);
 				}
 			}
@@ -440,7 +440,7 @@ STDMETHODIMP_(bool) CMPCVRAllocatorPresenter::IsRendering()
 {
 	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
 		int playbackState;
-		if (SUCCEEDED(pIExFilterConfig->GetInt("playbackState", &playbackState))) {
+		if (SUCCEEDED(pIExFilterConfig->Flt_GetInt("playbackState", &playbackState))) {
 			return playbackState == State_Running;
 		}
 	}
@@ -453,7 +453,7 @@ STDMETHODIMP_(void) CMPCVRAllocatorPresenter::SetStereo3DSettings(Stereo3DSettin
 	if (pStereo3DSets) {
 		m_Stereo3DSets = *pStereo3DSets;
 		if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
-			pIExFilterConfig->SetInt("stereo3dTransform", m_Stereo3DSets.iTransform);
+			pIExFilterConfig->Flt_SetInt("stereo3dTransform", m_Stereo3DSets.iTransform);
 		}
 	}
 }

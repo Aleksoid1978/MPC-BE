@@ -103,7 +103,7 @@ public:
 			pBF->SetSwPixelFormat(PixFmt_RGB32, true);
 
 			if (CComQIPtr<IExFilterConfig> pEFC = pBF.p) {
-				pEFC->SetBool("hw_decoding", false);
+				pEFC->Flt_SetBool("hw_decoding", false);
 			}
 		}
 		video_filters[VDEC_UNCOMPRESSED] = false;
@@ -123,7 +123,7 @@ public:
 			}
 			const int mvc_mode_value = (iMvcOutputMode << 16) | (s.bStereo3DSwapLR ? 1 : 0);
 
-			pEFC->SetInt("mvc_mode", mvc_mode_value);
+			pEFC->Flt_SetInt("mvc_mode", mvc_mode_value);
 		}
 
 		*ppBF = pBF.Detach();
@@ -2771,7 +2771,7 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 	}
 
 	if (CComQIPtr<IExFilterConfig> pEFC = pBF) {
-		pEFC->SetBool("stereodownmix", s.bAudioMixer && s.nAudioMixerLayout == SPK_STEREO && s.bAudioStereoFromDecoder);
+		pEFC->Flt_SetBool("stereodownmix", s.bAudioMixer && s.nAudioMixerLayout == SPK_STEREO && s.bAudioStereoFromDecoder);
 	}
 
 	if (CComQIPtr<IAudioSwitcherFilter> pASF = pBF) {

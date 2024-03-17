@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -220,9 +220,9 @@ public:
 
 	// IExFilterConfig
 
-	STDMETHODIMP GetInt(LPCSTR field, int *value) override;
-	STDMETHODIMP GetInt64(LPCSTR field, __int64* value) override;
-	STDMETHODIMP SetInt(LPCSTR field, int value) override;
+	STDMETHODIMP Flt_GetInt(LPCSTR field, int *value) override;
+	STDMETHODIMP Flt_GetInt64(LPCSTR field, __int64* value) override;
+	STDMETHODIMP Flt_SetInt(LPCSTR field, int value) override;
 
 public:
 	CComQIPtr<ISyncReader> m_pSyncReader;

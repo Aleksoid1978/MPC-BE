@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2023 see Authors.txt
+ * (C) 2017-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -276,7 +276,7 @@ BOOL CPPageSoundProcessing::OnApply()
 			CLSID clsid;
 			if (SUCCEEDED(pBF->GetClassID(&clsid)) && __uuidof(CMpaDecFilter) == clsid) {
 				if (CComQIPtr<IExFilterConfig> pEFC = pBF.p) {
-					pEFC->SetBool("stereodownmix", s.bAudioMixer && s.nAudioMixerLayout == SPK_STEREO && s.bAudioStereoFromDecoder);
+					pEFC->Flt_SetBool("stereodownmix", s.bAudioMixer && s.nAudioMixerLayout == SPK_STEREO && s.bAudioStereoFromDecoder);
 				}
 			}
 		}

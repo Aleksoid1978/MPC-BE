@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -877,7 +877,7 @@ STDMETHODIMP_(DWORD) CBaseSplitterFilter::GetPriority()
 
 // CExFilterConfig
 
-STDMETHODIMP CBaseSplitterFilter::GetInt(LPCSTR field, int *value)
+STDMETHODIMP CBaseSplitterFilter::Flt_GetInt(LPCSTR field, int *value)
 {
 	CheckPointer(value, E_POINTER);
 
@@ -894,7 +894,7 @@ STDMETHODIMP CBaseSplitterFilter::GetInt(LPCSTR field, int *value)
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CBaseSplitterFilter::GetInt64(LPCSTR field, __int64 *value)
+STDMETHODIMP CBaseSplitterFilter::Flt_GetInt64(LPCSTR field, __int64 *value)
 {
 	CheckPointer(value, E_POINTER);
 
@@ -909,7 +909,7 @@ STDMETHODIMP CBaseSplitterFilter::GetInt64(LPCSTR field, __int64 *value)
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CBaseSplitterFilter::SetInt(LPCSTR field, int value)
+STDMETHODIMP CBaseSplitterFilter::Flt_SetInt(LPCSTR field, int value)
 {
 	if (strcmp(field, "queueDuration") == 0) {
 		if (value < QUEUE_DURATION_MIN || value > QUEUE_DURATION_MAX) {

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -72,7 +72,7 @@ public:
 	STDMETHODIMP GetPropertyInt(LPCSTR field, int *value) override;
 
 	// IExFilterConfig
-	STDMETHODIMP SetInt(LPCSTR field, int value) override;
+	STDMETHODIMP Flt_SetInt(LPCSTR field, int value) override;
 };
 
 class __declspec(uuid("E32A3501-04A9-486B-898B-F5A4C8A4AAAC"))

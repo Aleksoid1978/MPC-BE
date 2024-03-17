@@ -4887,7 +4887,7 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 
 // IExFilterConfig
 
-STDMETHODIMP CMPCVideoDecFilter::GetInt(LPCSTR field, int* value)
+STDMETHODIMP CMPCVideoDecFilter::Flt_GetInt(LPCSTR field, int* value)
 {
 	CheckPointer(value, E_POINTER);
 
@@ -4911,7 +4911,7 @@ STDMETHODIMP CMPCVideoDecFilter::GetInt(LPCSTR field, int* value)
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CMPCVideoDecFilter::GetInt64(LPCSTR field, __int64 *value)
+STDMETHODIMP CMPCVideoDecFilter::Flt_GetInt64(LPCSTR field, __int64 *value)
 {
 	CheckPointer(value, E_POINTER);
 
@@ -4926,7 +4926,7 @@ STDMETHODIMP CMPCVideoDecFilter::GetInt64(LPCSTR field, __int64 *value)
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CMPCVideoDecFilter::GetString(LPCSTR field, LPWSTR* value, unsigned* chars)
+STDMETHODIMP CMPCVideoDecFilter::Flt_GetString(LPCSTR field, LPWSTR* value, unsigned* chars)
 {
 	// experimental !
 
@@ -4969,7 +4969,7 @@ STDMETHODIMP CMPCVideoDecFilter::GetString(LPCSTR field, LPWSTR* value, unsigned
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CMPCVideoDecFilter::SetBool(LPCSTR field, bool value)
+STDMETHODIMP CMPCVideoDecFilter::Flt_SetBool(LPCSTR field, bool value)
 {
 	if (strcmp(field, "hw_decoding") == 0) {
 		CAutoLock cLock(&m_csInitDec);
@@ -4981,7 +4981,7 @@ STDMETHODIMP CMPCVideoDecFilter::SetBool(LPCSTR field, bool value)
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CMPCVideoDecFilter::SetInt(LPCSTR field, int value)
+STDMETHODIMP CMPCVideoDecFilter::Flt_SetInt(LPCSTR field, int value)
 {
 	if (strcmp(field, "mvc_mode") == 0) {
 		CAutoLock cLock(&m_csInitDec);

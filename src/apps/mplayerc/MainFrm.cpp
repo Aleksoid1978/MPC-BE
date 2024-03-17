@@ -4417,7 +4417,7 @@ void CMainFrame::OnFilePostOpenMedia(std::unique_ptr<OpenMediaData>& pOMD)
 
 	BOOL bMvcActive = FALSE;
 	if (CComQIPtr<IExFilterConfig> pEFC = FindFilter(__uuidof(CMPCVideoDecFilter), m_pGB)) {
-		pEFC->GetInt("decode_mode_mvc", &bMvcActive);
+		pEFC->Flt_GetInt("decode_mode_mvc", &bMvcActive);
 	}
 
 	if (s.iStereo3DMode == STEREO3D_ROWINTERLEAVED || s.iStereo3DMode == STEREO3D_ROWINTERLEAVED_2X
@@ -6950,7 +6950,7 @@ void CMainFrame::OnUpdateViewDisplayStats(CCmdUI* pCmdUI)
 		CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pCAP.p;
 		if (pIExFilterConfig) {
 			bool statsEnable = 0;
-			if (S_OK == pIExFilterConfig->GetBool("statsEnable", &statsEnable)) {
+			if (S_OK == pIExFilterConfig->Flt_GetBool("statsEnable", &statsEnable)) {
 				pCmdUI->Enable(TRUE);
 				pCmdUI->SetCheck(statsEnable);
 
@@ -6993,9 +6993,9 @@ void CMainFrame::OnViewDisplayStatsSC()
 		CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pCAP.p;
 		if (pIExFilterConfig) {
 			bool statsEnable = 0;
-			if (S_OK == pIExFilterConfig->GetBool("statsEnable", &statsEnable)) {
+			if (S_OK == pIExFilterConfig->Flt_GetBool("statsEnable", &statsEnable)) {
 				statsEnable = !statsEnable;
-				pIExFilterConfig->SetBool("statsEnable", statsEnable);
+				pIExFilterConfig->Flt_SetBool("statsEnable", statsEnable);
 			}
 		}
 	}
@@ -7912,8 +7912,8 @@ void CMainFrame::OnViewStereo3DMode(UINT nID)
 		}
 		const int mvc_mode_value = (iMvcOutputMode << 16) | (s.bStereo3DSwapLR ? 1 : 0);
 
-		pEFC->SetInt("mvc_mode", mvc_mode_value);
-		pEFC->GetInt("decode_mode_mvc", &bMvcActive);
+		pEFC->Flt_SetInt("mvc_mode", mvc_mode_value);
+		pEFC->Flt_GetInt("decode_mode_mvc", &bMvcActive);
 	}
 
 	if (s.iStereo3DMode == STEREO3D_ROWINTERLEAVED || s.iStereo3DMode == STEREO3D_ROWINTERLEAVED_2X
@@ -7955,7 +7955,7 @@ void CMainFrame::OnViewSwapLeftRight()
 			}
 			const int mvc_mode_value = (iMvcOutputMode << 16) | (s.bStereo3DSwapLR ? 1 : 0);
 
-			pEFC->SetInt("mvc_mode", mvc_mode_value);
+			pEFC->Flt_SetInt("mvc_mode", mvc_mode_value);
 		}
 	}
 
@@ -11147,7 +11147,7 @@ void CMainFrame::AutoChangeMonitorMode()
 				if (m_clsidCAP == CLSID_MPCVRAllocatorPresenter) {
 					if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pCAP.p) {
 						bool bDoubleRate = false;
-						if (S_OK == pIExFilterConfig->GetBool("doubleRate", &bDoubleRate) && bDoubleRate) {
+						if (S_OK == pIExFilterConfig->Flt_GetBool("doubleRate", &bDoubleRate) && bDoubleRate) {
 							dFPS *= 2.0;
 						}
 					}
@@ -14259,7 +14259,7 @@ bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 			CComQIPtr<IExFilterConfig> pIExFilterConfig;
 			BeginEnumFilters(m_pGB, pEF, pBF) {
 				if (pIExFilterConfig = pBF) {
-					pIExFilterConfig->SetInt("queueDuration", s.iBufferDuration);
+					pIExFilterConfig->Flt_SetInt("queueDuration", s.iBufferDuration);
 					//pIExFilterConfig->SetInt("networkTimeout", s.iNetworkTimeout);
 				}
 			}

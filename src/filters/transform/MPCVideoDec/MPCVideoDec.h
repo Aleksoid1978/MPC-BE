@@ -308,11 +308,11 @@ public:
 	STDMETHODIMP SetD3D11Adapter(UINT VendorId, UINT DeviceId);
 
 	// IExFilterConfig
-	STDMETHODIMP GetInt(LPCSTR field, int* value) override;
-	STDMETHODIMP GetInt64(LPCSTR field, __int64* value) override;
-	STDMETHODIMP GetString(LPCSTR field, LPWSTR* value, unsigned* chars);
-	STDMETHODIMP SetBool(LPCSTR field, bool value) override;
-	STDMETHODIMP SetInt(LPCSTR field, int value) override;
+	STDMETHODIMP Flt_GetInt(LPCSTR field, int* value) override;
+	STDMETHODIMP Flt_GetInt64(LPCSTR field, __int64* value) override;
+	STDMETHODIMP Flt_GetString(LPCSTR field, LPWSTR* value, unsigned* chars);
+	STDMETHODIMP Flt_SetBool(LPCSTR field, bool value) override;
+	STDMETHODIMP Flt_SetInt(LPCSTR field, int value) override;
 
 	// === common functions
 	BOOL						IsSupportedDecoderConfig(const D3DFORMAT& nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered);
