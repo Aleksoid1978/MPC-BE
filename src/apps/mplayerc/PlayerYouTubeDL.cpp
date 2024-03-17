@@ -75,7 +75,13 @@ namespace YoutubeDL
 
 		PROCESS_INFORMATION proc_info = {};
 		CStringW args;
-		args.Format(LR"(%s -j --all-subs --sub-format vtt --no-check-certificates "%s")", ydl_path.GetString(), url.GetString());
+		if (ydl_path.Mid(ydl_path.GetLength() - 10).CompareNoCase(L"yt-dlp.exe") == 0) {
+			// yt-dlp.exe
+			args.Format(LR"(%s -j --all-subs --sub-format vtt --no-check-certificates "%s")", ydl_path.GetString(), url.GetString());
+		} else {
+			// youtube-dl.exe
+			args.Format(LR"(%s -j --all-subs --sub-format vtt --no-check-certificate "%s")", ydl_path.GetString(), url.GetString());
+		}
 
 		const BOOL bSuccess = CreateProcessW(
 			nullptr, args.GetBuffer(), nullptr, nullptr, TRUE, 0,
