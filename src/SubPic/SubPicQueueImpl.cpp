@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,8 +35,6 @@ const double CSubPicQueueImpl::DEFAULT_FPS = 24/1.001;
 CSubPicQueueImpl::CSubPicQueueImpl(ISubPicAllocator* pAllocator, HRESULT* phr)
 	: CUnknown(L"CSubPicQueueImpl", nullptr)
 	, m_pAllocator(pAllocator)
-	, m_fps(DEFAULT_FPS)
-	, m_rtTimePerFrame(std::llround(10000000.0 / DEFAULT_FPS))
 {
 	if (phr) {
 		*phr = S_OK;

@@ -86,8 +86,8 @@ private:
 	std::shared_ptr<SubPicProviderWithSharedLock> m_pSubPicProviderWithSharedLock;
 
 protected:
-	double m_fps;
-	REFERENCE_TIME m_rtTimePerFrame;
+	double m_fps = DEFAULT_FPS;
+	REFERENCE_TIME m_rtTimePerFrame = std::llround(10000000.0 / DEFAULT_FPS);
 	REFERENCE_TIME m_rtNow = 0;
 
 	CComPtr<ISubPicAllocator> m_pAllocator;
