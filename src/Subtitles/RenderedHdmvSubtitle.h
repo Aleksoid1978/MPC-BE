@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -55,7 +55,7 @@ public:
 	STDMETHODIMP_(int) GetStream();
 	STDMETHODIMP SetStream(int iStream);
 	STDMETHODIMP Reload();
-	STDMETHODIMP SetSourceTargetInfo(CString yuvMatrix, CString inputRange, CString outpuRange);
+	STDMETHODIMP SetSourceTargetInfo(LPCWSTR yuvMatrix, LPCWSTR inputRange, LPCWSTR outpuRange);
 
 	HRESULT ParseSample(BYTE* pData, long nLen, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 	HRESULT	NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);

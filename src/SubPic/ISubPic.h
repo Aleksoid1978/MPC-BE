@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -178,7 +178,7 @@ public IPersist {
 	STDMETHOD_(int, GetStream) () PURE;
 	STDMETHOD (SetStream) (int iStream) PURE;
 	STDMETHOD (Reload) () PURE;
-	STDMETHOD (SetSourceTargetInfo)(CString yuvMatrix, CString inputRange, CString outpuRange) { return E_NOTIMPL; };
+	STDMETHOD (SetSourceTargetInfo)(LPCWSTR yuvMatrix, LPCWSTR inputRange, LPCWSTR outpuRange) { return E_NOTIMPL; };
 	// TODO: get rid of IPersist to identify type and use only
 	// interface functions to modify the settings of the substream
 };

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -42,7 +42,7 @@ public:
 	virtual void			CleanOld(REFERENCE_TIME rt) PURE;
 	virtual HRESULT			EndOfStream() { return S_OK; }
 
-	HRESULT					SetConvertType(const CString& _yuvMatrix, ColorConvert::convertType _convertType);
+	HRESULT					SetConvertType(LPCWSTR _yuvMatrix, ColorConvert::convertType _convertType);
 
 protected :
 	SUBTITLE_TYPE			m_nType;

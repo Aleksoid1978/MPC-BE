@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -72,11 +72,12 @@ void CBaseSub::FinalizeRender(SubPicDesc& spd)
 	}
 }
 
-HRESULT CBaseSub::SetConvertType(const CString& _yuvMatrix, ColorConvert::convertType _convertType)
+HRESULT CBaseSub::SetConvertType(LPCWSTR _yuvMatrix, ColorConvert::convertType _convertType)
 {
-	if (_yuvMatrix == L"709") {
+	if (wcscmp(_yuvMatrix, L"709") == 0) {
 		yuvMatrix = YUVMATRIX::BT709;
-	} else if (_yuvMatrix == L"601") {
+	}
+	else if (wcscmp(_yuvMatrix, L"601") == 0) {
 		yuvMatrix = YUVMATRIX::BT601;
 	}
 
