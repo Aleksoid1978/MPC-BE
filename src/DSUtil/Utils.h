@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2022 see Authors.txt
+ * (C) 2016-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -112,5 +112,5 @@ bool StrToDouble(const wchar_t* str, double& value);
 
 CStringW HR2Str(const HRESULT hr);
 
-// Usage: SetThreadName((DWORD)-1, "MainThread") or SetThreadName(DWORD_MAX, "MainThread")
-void SetThreadName(DWORD dwThreadID, LPCSTR szThreadName);
+// Usage: SetThreadName ((DWORD)-1, "MainThread");
+void SetThreadName(DWORD dwThreadID, const char* threadName);

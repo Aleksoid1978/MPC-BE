@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -351,7 +351,7 @@ STDMETHODIMP CSubtitleInputPin::Receive(IMediaSample* pSample)
 
 void  CSubtitleInputPin::DecodeSamples()
 {
-	SetThreadName(DWORD_MAX, "Subtitle Input Pin Thread");
+	SetThreadName((DWORD)-1, "Subtitle Input Pin Thread");
 
 	while(!m_bExitDecodingThread) {
 		std::unique_lock<std::mutex> lock(m_mutexQueue);

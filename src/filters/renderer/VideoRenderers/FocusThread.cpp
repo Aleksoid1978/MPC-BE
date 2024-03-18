@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2022 see Authors.txt
+ * (C) 2015-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -64,7 +64,7 @@ CFocusThread::~CFocusThread()
 
 BOOL CFocusThread::InitInstance()
 {
-	SetThreadName(DWORD_MAX, "FocusThread");
+	SetThreadName((DWORD)-1, "FocusThread");
 	m_hWnd = CreateWindowExW(0L, L"D3DFocusClass", L"D3D Focus Window", WS_OVERLAPPED, 0, 0, 0, 0, nullptr, nullptr, nullptr, nullptr);
 	SetEvent(m_hEvtInit);
 	if (!m_hWnd) {

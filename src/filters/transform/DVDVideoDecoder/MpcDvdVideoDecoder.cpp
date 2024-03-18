@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -244,7 +244,7 @@ public:
 
 protected:
 	DWORD ThreadProc() {
-		SetThreadName(DWORD_MAX, "CMpeg2DecFilter Control Thread");
+		SetThreadName((DWORD)-1, "CMpeg2DecFilter Control Thread");
 		while (TRUE) {
 			DWORD cmd = GetRequest();
 			switch (cmd) {
