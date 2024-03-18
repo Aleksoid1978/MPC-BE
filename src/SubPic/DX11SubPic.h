@@ -1,5 +1,5 @@
 /*
- * (C) 2022-2023 see Authors.txt
+ * (C) 2022-2024 see Authors.txt
  * This file is part of MPC-BE.
  *
  * MPC-BE is free software; you can redistribute it and/or modify
@@ -77,8 +77,8 @@ class CDX11SubPicAllocator : public CSubPicAllocatorImpl, public CCritSec
 
 public:
 	inline static CCritSec ms_SurfaceQueueLock;
-	std::list<MemPic_t> m_FreeSurfaces;
-	std::list<CDX11SubPic*> m_AllocatedSurfaces;
+	std::deque<MemPic_t> m_FreeSurfaces;
+	std::deque<CDX11SubPic*> m_AllocatedSurfaces;
 
 	HRESULT Render(const MemPic_t& memPic, const CRect& dirtyRect, const CRect& srcRect, const CRect& dstRect);
 

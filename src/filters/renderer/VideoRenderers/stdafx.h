@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,6 +33,7 @@
 #include <cmath>
 #include <algorithm>
 #include <vector>
+#include <deque>
 #include <list>
 #include <memory>
 #include <atomic>

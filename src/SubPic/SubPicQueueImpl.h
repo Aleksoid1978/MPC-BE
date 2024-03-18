@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -134,7 +134,7 @@ protected:
 	bool m_bExitThread = false;
 
 	CComPtr<ISubPic> m_pSubPic;
-	std::list<CComQIPtr<ISubPic>> m_queue;
+	std::deque<CComQIPtr<ISubPic>> m_queue;
 
 	std::mutex m_mutexSubpic; // to protect m_pSubPic
 	std::mutex m_mutexQueue; // to protect m_queue

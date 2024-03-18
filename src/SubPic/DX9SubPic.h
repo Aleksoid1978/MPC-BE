@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -63,8 +63,8 @@ class CDX9SubPicAllocator : public CSubPicAllocatorImpl, public CCritSec
 
 public:
 	inline static CCritSec ms_SurfaceQueueLock;
-	std::list<CComPtr<IDirect3DSurface9> > m_FreeSurfaces;
-	std::list<CDX9SubPic*> m_AllocatedSurfaces;
+	std::deque<CComPtr<IDirect3DSurface9> > m_FreeSurfaces;
+	std::deque<CDX9SubPic*> m_AllocatedSurfaces;
 
 	CDX9SubPicAllocator(IDirect3DDevice9* pDevice, SIZE maxsize, bool bExternalRenderer);
 	~CDX9SubPicAllocator();
