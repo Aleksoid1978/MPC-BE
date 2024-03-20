@@ -989,6 +989,73 @@ int av_frame_apply_cropping(AVFrame *frame, int flags);
 const char *av_frame_side_data_name(enum AVFrameSideDataType type);
 
 /**
+ * Free all side data entries and their contents, then zeroes out the
+ * values which the pointers are pointing to.
+ *
+ * @param sd    pointer to array of side data to free. Will be set to NULL
+ *              upon return.
+ * @param nb_sd pointer to an integer containing the number of entries in
+ *              the array. Will be set to 0 upon return.
+ */
+void av_frame_side_data_free(AVFrameSideData ***sd, int *nb_sd);
+
+#define AV_FRAME_SIDE_DATA_FLAG_UNIQUE (1 << 0)
+
+/**
+ * Add new side data entry to an array.
+ *
+ * @param sd    pointer to array of side data to which to add another entry,
+ *              or to NULL in order to start a new array.
+ * @param nb_sd pointer to an integer containing the number of entries in
+ *              the array.
+ * @param type  type of the added side data
+ * @param size  size of the side data
+ * @param flags Some combination of AV_FRAME_SIDE_DATA_FLAG_* flags, or 0.
+ *
+ * @return newly added side data on success, NULL on error. In case of
+ *         AV_FRAME_SIDE_DATA_FLAG_UNIQUE being set, entries of matching
+ *         AVFrameSideDataType will be removed before the addition is
+ *         attempted.
+ */
+AVFrameSideData *av_frame_side_data_new(AVFrameSideData ***sd, int *nb_sd,
+                                        enum AVFrameSideDataType type,
+                                        size_t size, unsigned int flags);
+
+/**
+ * Add a new side data entry to an array based on existing side data, taking
+ * a reference towards the contained AVBufferRef.
+ *
+ * @param sd    pointer to array of side data to which to add another entry,
+ *              or to NULL in order to start a new array.
+ * @param nb_sd pointer to an integer containing the number of entries in
+ *              the array.
+ * @param src   side data to be cloned, with a new reference utilized
+ *              for the buffer.
+ * @param flags Some combination of AV_FRAME_SIDE_DATA_FLAG_* flags, or 0.
+ *
+ * @return negative error code on failure, >=0 on success. In case of
+ *         AV_FRAME_SIDE_DATA_FLAG_UNIQUE being set, entries of matching
+ *         AVFrameSideDataType will be removed before the addition is
+ *         attempted.
+ */
+int av_frame_side_data_clone(AVFrameSideData ***sd, int *nb_sd,
+                             const AVFrameSideData *src, unsigned int flags);
+
+/**
+ * Get a side data entry of a specific type from an array.
+ *
+ * @param sd    array of side data.
+ * @param nb_sd integer containing the number of entries in the array.
+ * @param type  type of side data to be queried
+ *
+ * @return a pointer to the side data of a given type on success, NULL if there
+ *         is no side data with such type in this set.
+ */
+const AVFrameSideData *av_frame_side_data_get(const AVFrameSideData **sd,
+                                              const int nb_sd,
+                                              enum AVFrameSideDataType type);
+
+/**
  * @}
  */
 

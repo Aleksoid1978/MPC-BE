@@ -16,19 +16,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVCODEC_VORBIS_DATA_H
-#define AVCODEC_VORBIS_DATA_H
+#ifndef AVCODEC_ITUT35_H
+#define AVCODEC_ITUT35_H
 
-#include <stdint.h>
+#define ITU_T_T35_COUNTRY_CODE_CN 0x26
+#define ITU_T_T35_COUNTRY_CODE_US 0xB5
 
-#include "libavutil/attributes_internal.h"
-#include "libavutil/channel_layout.h"
+#define ITU_T_T35_PROVIDER_CODE_ATSC  0x31
+#define ITU_T_T35_PROVIDER_CODE_CUVA  0x04
+#define ITU_T_T35_PROVIDER_CODE_DOLBY 0x3B
+#define ITU_T_T35_PROVIDER_CODE_SMTPE 0x3C
 
-FF_VISIBILITY_PUSH_HIDDEN
-extern const float ff_vorbis_floor1_inverse_db_table[256];
-extern const float * const ff_vorbis_vwin[8];
-extern const uint8_t ff_vorbis_channel_layout_offsets[8][8];
-extern const AVChannelLayout ff_vorbis_ch_layouts[9];
-FF_VISIBILITY_POP_HIDDEN
-
-#endif /* AVCODEC_VORBIS_DATA_H */
+#endif /* AVCODEC_ITUT35_H */

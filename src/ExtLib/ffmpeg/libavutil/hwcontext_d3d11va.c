@@ -62,7 +62,9 @@ static av_cold void load_functions(void)
         return;
 
     mD3D11CreateDevice = (PFN_D3D11_CREATE_DEVICE) GetProcAddress(d3dlib, "D3D11CreateDevice");
-    mCreateDXGIFactory = (PFN_CREATE_DXGI_FACTORY) GetProcAddress(dxgilib, "CreateDXGIFactory");
+    mCreateDXGIFactory = (PFN_CREATE_DXGI_FACTORY) GetProcAddress(dxgilib, "CreateDXGIFactory1");
+    if (!mCreateDXGIFactory)
+        mCreateDXGIFactory = (PFN_CREATE_DXGI_FACTORY) GetProcAddress(dxgilib, "CreateDXGIFactory");
 #else
     // In UWP (which lacks LoadLibrary), CreateDXGIFactory isn't available,
     // only CreateDXGIFactory1
@@ -651,14 +653,10 @@ static int d3d11va_device_create(AVHWDeviceContext *ctx, const char *device,
     int ret;
     int adapter = -1;
 
-    // (On UWP we can't check this.)
-#if !HAVE_UWP
-    if (!LoadLibrary("d3d11_1sdklayers.dll"))
-        is_debug = 0;
-#endif
-
-    if (is_debug)
+    if (is_debug) {
         creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+        av_log(ctx, AV_LOG_INFO, "Enabling d3d11 debugging.\n");
+    }
 
     if ((ret = ff_thread_once(&functions_loaded, load_functions)) != 0)
         return AVERROR_UNKNOWN;
@@ -734,9 +732,17 @@ static int d3d11va_device_create(AVHWDeviceContext *ctx, const char *device,
             if (pf_DXGIGetDebugInterface) {
                 IDXGIDebug *dxgi_debug = NULL;
                 hr = pf_DXGIGetDebugInterface(&IID_IDXGIDebug, (void**)&dxgi_debug);
-                if (SUCCEEDED(hr) && dxgi_debug)
+                if (SUCCEEDED(hr) && dxgi_debug) {
                     IDXGIDebug_ReportLiveObjects(dxgi_debug, DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+                    av_log(ctx, AV_LOG_INFO, "Enabled dxgi debugging.\n");
+                } else {
+                    av_log(ctx, AV_LOG_WARNING, "Failed enabling dxgi debugging.\n");
+                }
+            } else {
+                av_log(ctx, AV_LOG_WARNING, "Failed getting dxgi debug interface.\n");
             }
+        } else {
+            av_log(ctx, AV_LOG_WARNING, "Failed loading dxgi debug library.\n");
         }
     }
 #endif

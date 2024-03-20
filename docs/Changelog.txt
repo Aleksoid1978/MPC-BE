@@ -59,7 +59,7 @@ Updated German translation (by Klaus1189).
 Updated libraries:
 	dav1d git-1.4.0-83-g872e470;
 	fdk-aac git-v2.0.3;
-	ffmpeg git-n6.2-dev-1636-g53a51e70f2;
+	ffmpeg git-n6.2-dev-1752-gd7d2213a6b;
 	Little-CMS git-lcms2.16-41-gfcf6792;
 	MediaInfo git-v24.01-19-gb7bb56e8d;
 	nanosvg git-93ce879;
