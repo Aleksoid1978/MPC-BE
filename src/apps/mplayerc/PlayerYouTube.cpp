@@ -232,7 +232,7 @@ namespace Youtube
 
 	static bool URLPostData(LPCWSTR videoId, urlData& pData, bool bAgeGate)
 	{
-		if (auto hInet = InternetOpenW(L"com.google.android.youtube/17.31.35 (Linux; U; Android 11) gzip", INTERNET_OPEN_TYPE_PRECONFIG, nullptr, nullptr, 0)) {
+		if (auto hInet = InternetOpenW(L"com.google.android.youtube/19.09.37 (Linux; U; Android 11) gzip", INTERNET_OPEN_TYPE_PRECONFIG, nullptr, nullptr, 0)) {
 			if (auto hSession = InternetConnectW(hInet, L"www.youtube.com", 443, nullptr, nullptr, INTERNET_SERVICE_HTTP, 0, 1)) {
 				if (auto hRequest = HttpOpenRequestW(hSession,
 													 L"POST",
@@ -241,11 +241,11 @@ namespace Youtube
 					CStringA requestData;
 					constexpr const char* str[] = {
 						// android player API JSON
-						R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "18.11.34", "hl": "en"}}, )"
+						R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "19.09.37", "hl": "en"}}, )"
 						R"("videoId": "%S", "params": "CgIQBg==", "playbackContext": {"contentPlaybackContext": {"html5Preference": "HTML5_PREF_WANTS"}}, )"
 						R"("contentCheckOk": true, "racyCheckOk": true})",
 						// android agegate player API JSON
-						R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "18.11.34", "clientScreen": "EMBED"}, )"
+						R"({"context": {"client": {"clientName": "ANDROID", "clientVersion": "19.09.37", "clientScreen": "EMBED"}, )"
 						R"("thirdParty": {"embedUrl": "https://google.com"}}, "videoId": "%S", "params": "CgIQBg==", )"
 						R"("contentCheckOk": true, "racyCheckOk": true})"
 					};
@@ -253,7 +253,7 @@ namespace Youtube
 					requestData.Format(str[bAgeGate ? 1 : 0], videoId);
 
 					static const CStringW lpszHeaders = LR"(X-YouTube-Client-Name: 3\r\n)"
-														LR"(X-YouTube-Client-Version: 17.31.35\r\n)"
+														LR"(X-YouTube-Client-Version: 19.09.37\r\n)"
 														LR"(Origin: https://www.youtube.com\r\n)"
 														LR"(content-type: application/json\r\n)";
 
@@ -857,6 +857,11 @@ namespace Youtube
 						getJsonValue(adaptiveFormat, "qualityLabel", std::get<3>(element));
 						if (getJsonValue(adaptiveFormat, "url", std::get<1>(element))
 								|| getJsonValue(adaptiveFormat, "cipher", std::get<2>(element)) || getJsonValue(adaptiveFormat, "signatureCipher", std::get<2>(element))) {
+
+							if (std::get<1>(element).Find("xtags=drc") > 0) {
+								// DRC audio
+								continue;
+							}
 
 							CStringA lang_id;
 							if (auto audioTrack = GetJsonObject(adaptiveFormat, "audioTrack")) {
