@@ -3,6 +3,7 @@
 1.6.11.x dev
 =============================
 Build in Visual Studio 2017 is no longer supported.
+The names of methods in the IExFilterConfig interface have been changed without losing compatibility.
 
 MpegSplitter
 Added support for VVC(H.266) video.
@@ -26,9 +27,12 @@ Added support for VVC(H.266) video decoding.
 Added AVS3 support for external filter.
 Expanded support for hardware decoding for full range video and H.264 Baseline profile.
 Added support for additional HEVC Intel decoders for D3D11 copy back mode.
+Fixed "Skip B-frames" setting for H.264 and HEVC.
 
 YouTube
 Improved YouTube support in the built-in parser.
+Fixed work with youtube-dl.
+Audio tracks with DRC will now be ignored.
 
 Player
 Added the ability to open the folder of the currently playing file using a hotkey.
@@ -42,21 +46,24 @@ Improved display of external audio tracks in subfolders.
 Added the ability to enable video preview for URLs.
 Fixed priority of HTTP filters for Ace Stream.
 "MPC Audio Renderer" is now the default audio renderer.
-The "Global Media Keys" setting is disabled by default because it conflicts with other applications.
+The "Global Media Keys" setting is disabled by default.
+The operation of global multimedia keys has been fixed.
 Various interface fixes.
 
 Installer
 MPC Video Renderer 0.7.3 is included in the installer.
+New installations will not have "x64" appended to the folder name.
 
 Updated French translation (by rhahgleuhargh).
 Updated Italian translation (by mapi68).
 Updated Korean translation (by Hackjjang).
-Updated Chinese (Simplified) translation (by wushantao).
+Updated Chinese (Simplified) translation (by wushantao and WanderMax).
 Updated Spanish translation (by IPeluchito).
 Updated Turkish translation (by cmhrky).
 Updated Japanese translation (by tsubasanouta).
 Updated Hungarian translation (by mickey).
 Updated German translation (by Klaus1189).
+Updated Dutch and Chinese (Traditional) translation (by beter).
 
 Updated libraries:
 	dav1d git-1.4.0-83-g872e470;
