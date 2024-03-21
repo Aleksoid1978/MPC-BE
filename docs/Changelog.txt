@@ -2,6 +2,8 @@
 
 1.6.11.x dev
 =============================
+Build in Visual Studio 2017 is no longer supported.
+
 MpegSplitter
 Added support for VVC(H.266) video.
 
