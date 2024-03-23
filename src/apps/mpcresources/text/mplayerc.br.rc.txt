@@ -502,7 +502,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 67
 66		"Resetar"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 16
 5		"Renderizador-legenda:"
 7		"Autocarregar caminhos"
 9		"Resetar"
@@ -510,9 +510,6 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 12		"Ignorar legendas incorporadas"
 13		"Recarregar automaticamente os arquivos de legenda após detectar a modificação"
 15		"Usar Subresync"
-16		"Base de dados online"
-17		"URL base da base de dados de legendas online:"
-20		"Testar"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26

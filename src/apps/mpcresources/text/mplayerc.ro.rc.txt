@@ -502,7 +502,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 67
 66		"Resetează"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 16
 5		"Randor de subtitrări:"
 7		"Căi de încărcare automată"
 9		"Resetează"
@@ -510,9 +510,6 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 12		"Ignoră subtitrările integrate"
 13		"Reîncarcă automat fișierele de subtitrări după ce se detectează modificările"
 15		"Folosește Subresync"
-16		"Bază de date online"
-17		"URL de bază pentru baza de date cu subtitrări online:"
-20		"Testează"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26

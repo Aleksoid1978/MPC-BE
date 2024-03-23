@@ -502,7 +502,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 67
 66		"Visszaállítás"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 16
 5		"Felirat megjelenítő:"
 7		"Útvonalak automatikus betöltése"
 9		"Visszaállítás"
@@ -510,9 +510,6 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 12		"Ne töltsön beágyazott feliratokat"
 13		"A feliratfájlok automatikus újratöltése a módosítás észlelése után"
 15		"A Subresync használata"
-16		"Online adatbázis"
-17		"Az online felirat adatbázis alap URL címe:"
-20		"Tesztelés"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26

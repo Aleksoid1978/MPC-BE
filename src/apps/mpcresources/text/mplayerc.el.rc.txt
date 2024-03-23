@@ -502,7 +502,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 67
 66		"Επαναφορά"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 16
 5		"Απόδοση υπότιτλου:"
 7		"Κατάλογοι αυτόματης φόρτωσης"
 9		"Επαναφορά"
@@ -510,9 +510,6 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 12		"Παράβλεψη ενσωματωμένων υπότιτλων"
 13		"Αυτόματη επαναφόρτωση αρχείων υποτίτλων μετά από ανίχνευση τροποποίησης"
 15		"Χρήση Subresync"
-16		"Βάση δεδομένων σε σύνδεση"
-17		"Βασική διεύθυνση URL της βάσης δεδομένων υποτίτλων:"
-20		"Έλεγχος"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26

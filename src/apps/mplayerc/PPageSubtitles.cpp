@@ -69,12 +69,6 @@ BOOL CPPageSubtitles::OnInitDialog()
 	m_fUseSybresync					= s.fUseSybresync;
 	m_szAutoloadPaths				= s.strSubtitlePaths;
 
-	GetDlgItem(IDC_STATIC1)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_STATIC2)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_STATIC3)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_COMBO1)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_BUTTON2)->ShowWindow(SW_HIDE);
-
 	UpdateData(FALSE);
 
 	CreateToolTip();

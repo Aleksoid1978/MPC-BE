@@ -502,7 +502,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 67
 66		"Reimposta"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 16
 5		"Renderer sottotitoli:"
 7		"Percorsi di caricamento automatico"
 9		"Reimposta"
@@ -510,9 +510,6 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 21
 12		"Ignora i sottotitoli incorporati"
 13		"Ricarica automaticamente i file dei sottotitoli dopo aver rilevato la modifica"
 15		"Usa subresync"
-16		"Database in linea"
-17		"URL di base del database dei sottotitoli in linea:"
-20		"Prova"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
