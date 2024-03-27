@@ -15,20 +15,20 @@ BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11
 3		"Comanda de selecție"
 6		"Filtru:"
 9		"OK"
-10		"Renunță"
+10		"Revocare"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
 3		"Alege filtru"
 7		"Răsfoire..."
 8		"OK"
-9		"Renunță"
+9		"Revocare"
 END
 
 BEGIN DIALOGEX IDD_AUTH_DLG LINES 15
 3		"Este necesară autentificarea"
 6		"OK"
-7		"Renunță"
+7		"Revocare"
 9		"Zonă restricționată"
 10		"Nume utilizator:"
 11		"Parolă:"
@@ -60,7 +60,7 @@ BEGIN DIALOGEX IDD_FAVADD LINES 12
 8		"Memorează poziția"
 9		"Unitate relativă"
 10		"OK"
-11		"Renunță"
+11		"Revocare"
 END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
@@ -112,7 +112,7 @@ END
 
 BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
 5		"&Save"
-6		"&Renunță"
+6		"&Revocare"
 7		"Title:"
 9		"Path:"
 END
@@ -137,7 +137,7 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 11		"Dublaj:"
 13		"Răsfoire..."
 14		"OK"
-15		"Renunță"
+15		"Revocare"
 16		"Adaugă la lista de redare fără a deschide"
 17		"Paste URL from clipboard"
 END
@@ -145,7 +145,7 @@ END
 BEGIN DIALOGEX IDD_PLAYLISTNAME LINES 10
 3		"Dialogul numelui listei de redare"
 6		"OK"
-7		"Renunță"
+7		"Revocare"
 9		"Nume:"
 END
 
@@ -156,7 +156,7 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 14		"Sus"
 15		"Jos"
 16		"&Setează"
-18		"&Renunță"
+18		"&Revocare"
 19		"&Salvează"
 20		"Poziție: 0.0 -> 1.0"
 21		"Mărire: 0.2 -> 5.0"
@@ -626,7 +626,7 @@ END
 BEGIN DIALOGEX IDD_SELECTMEDIATYPE LINES 9
 3		"Selectează tipul media"
 7		"OK"
-8		"Renunță"
+8		"Revocare"
 END
 
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
@@ -638,7 +638,7 @@ BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
 15		"Mută în &sus"
 16		"Mută în &jos"
 17		"OK"
-18		"Renunță"
+18		"Revocare"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 13
@@ -651,7 +651,7 @@ BEGIN DIALOGEX IDD_SHADERNEW_DLG LINES 10
 3		"Crează un nou nuanțator"
 6		"Nume:"
 8		"OK"
-9		"Renunță"
+9		"Revocare"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
@@ -663,7 +663,7 @@ END
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25
 3		"Scanare tuner"
 6		"Pornește"
-7		"Renunță"
+7		"Revocare"
 13		"Frecv. de pornire"
 15		"Lățime de bandă"
 17		"Frecv. de încheiere"
@@ -1089,7 +1089,7 @@ STRING IDS_AFTERPLAYBACK_EXIT		"După redare: Închide programul întotdeauna"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"După redare: Intră în hibernare"
 STRING IDS_AFTERPLAYBACK_LOCK		"După redare: blochează desktopul"
 STRING IDS_AFTERPLAYBACK_LOGOFF		"După redare: închide sesiunea"
-STRING IDS_AFTERPLAYBACK_NEXT		"După redare: redă următorul fișier din dosar"
+STRING IDS_AFTERPLAYBACK_NEXT		"După redare: Redare următorul fișier din dosar"
 STRING IDS_AFTERPLAYBACK_SHUTDOWN		"După redare: închide calculatorul"
 STRING IDS_AFTERPLAYBACK_STANDBY		"După redare: intră în repaus"
 STRING IDS_AG_ABORTED		"Abandonat"
@@ -1245,7 +1245,7 @@ STRING IDS_AG_STEP		"Pas"
 STRING IDS_AG_STOP		"Oprire"
 STRING IDS_AG_SUBDELAY_DEC		"Întârziere subtitrare -"
 STRING IDS_AG_SUBDELAY_INC		"Întârziere subtitrare +"
-STRING IDS_AG_SUBTITLEFILES		"Subtitle files"
+STRING IDS_AG_SUBTITLEFILES		"Fișiere de subtitrare"
 STRING IDS_AG_SUBTITLELANG		"Limba subtitrării"
 STRING IDS_AG_SUBTITLES		"Subtitrări"
 STRING IDS_AG_SUBTITLES_SAVED		"Subtitrări salvate"
@@ -1346,10 +1346,10 @@ STRING IDS_BDA_ERROR_CONNECT_TUNER_REC		"Tunerul și receptorul nu pot fi conect
 STRING IDS_BDA_ERROR_CREATE_RECEIVER		"Receptorul nu poate fi creat."
 STRING IDS_BDA_ERROR_CREATE_TUNER		"Tunerul nu  poate fi creat."
 STRING IDS_BDA_ERROR_DEMULTIPLEXER		"Demultiplexorul nu poate fi creat."
-STRING IDS_BLOCK_EXTERNAL_VR		"You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
+STRING IDS_BLOCK_EXTERNAL_VR		"Puteți adăuga %s ca un filtru extern.\nTrebuie să vă selectați randorul video preferat de pe pagina de setări Video."
 STRING IDS_BRIGHTNESS_DEC		"Micșorare luminozitate"
 STRING IDS_BRIGHTNESS_INC		"Mărire luminozitate"
-STRING IDS_CANCEL		"Renunță"
+STRING IDS_CANCEL		"Revocare"
 STRING IDS_CANNOT_CHANGE_FORMAT		"MPC-BE nu are destule drepturi pentru a schimba asocierea cu formatele de fișiere. Dați clic pe butonul ""Modifică"" pentru a obține drepturi de administrator."
 STRING IDS_CAPTURE_CHANNEL_FREQ		"Canal %d (%.1f MHz)"
 STRING IDS_CAPTURE_ERROR		"Eroare captură"
@@ -1434,7 +1434,7 @@ STRING IDS_DESC_EVR_CP		"Same as the EVR, but with the Allocator-Presenter for s
 STRING IDS_DESC_EVR_SYNC		"La fel ca și la EVR (CP), dar oferă multe opțiune pentru a sincroniza  rata de cadre video cu rata de reîmprospătare a afișajului pentru a elimina cadrele video sărite sau duplicate."
 STRING IDS_DESC_HAALI_VR		"Arată ca VMR-9, dar folosește un redimensionator bicubic adevărat."
 STRING IDS_DESC_MADVR		"Randor de înaltă calitate, necesită un GPU care acceptă D3D9 sau o versiune ulterioară."
-STRING IDS_DESC_MPC_VR		"Video renderer with support for Direct3D 11."
+STRING IDS_DESC_MPC_VR		"Randor video cu suport pentru Direct3D 11."
 STRING IDS_DESC_NULLVR_ANY		"Se conectează la orice mediu de tip video și mostrele video nu vor fi trimise niciunde. Folosiți-l când nu aveți nevoie de afișarea video și vreți să salvați procesorul de la o muncă inutilă."
 STRING IDS_DESC_NULLVR_UNCOMP		"La fel ca randorul normal Null, dar acesta se va conecta doar la tipurile necomprimate."
 STRING IDS_DISABLE_ALL_FILTERS		"&Dezactivează toate filtrele"
