@@ -65,6 +65,8 @@ AP4_AtomSampleTable::AP4_AtomSampleTable(AP4_ContainerAtom* stbl,
     // keep a reference to the sample stream
     m_SampleStream.AddReference();
 
+#if (0)
+    // Very strange code, replaces parameters from the container
     if (m_StsdAtom && m_StszAtom && m_StscAtom && m_SttsAtom
         && (m_StszAtom->m_SampleSize == 1
             || (m_SttsAtom->m_Entries.ItemCount() == 1 && m_SttsAtom->m_Entries[0].m_SampleDuration == 1)))
@@ -98,6 +100,7 @@ AP4_AtomSampleTable::AP4_AtomSampleTable(AP4_ContainerAtom* stbl,
             }
         }
     }
+#endif
 }
 
 /*----------------------------------------------------------------------
