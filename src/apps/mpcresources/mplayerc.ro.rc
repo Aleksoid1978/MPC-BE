@@ -66,7 +66,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     COMBOBOX        IDC_COMBO1,5,5,215,37,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,116,28,50,14
-    PUSHBUTTON      "Renunță",IDCANCEL,170,28,50,14
+    PUSHBUTTON      "Revocare",IDCANCEL,170,28,50,14
 END
 
 IDD_CAPTURE_DLG DIALOGEX 0, 0, 132, 293
@@ -195,7 +195,7 @@ BEGIN
     COMBOBOX        IDC_COMBO2,10,68,188,20,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Răsfoire...",IDC_BUTTON2,200,67,50,14
     DEFPUSHBUTTON   "OK",IDOK,148,94,50,14,WS_GROUP
-    PUSHBUTTON      "Renunță",IDCANCEL,200,94,50,14
+    PUSHBUTTON      "Revocare",IDCANCEL,200,94,50,14
     CONTROL         "Adaugă la lista de redare fără a deschide",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,84,188,9
     CONTROL         "Paste URL from clipboard",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,96,134,9
 END
@@ -580,7 +580,7 @@ BEGIN
     CONTROL         "Memorează poziția",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,38,232,9
     CONTROL         "Unitate relativă",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,50,232,10
     DEFPUSHBUTTON   "OK",IDOK,143,62,50,14
-    PUSHBUTTON      "Renunță",IDCANCEL,197,62,50,14
+    PUSHBUTTON      "Revocare",IDCANCEL,197,62,50,14
 END
 
 IDD_FAVORGANIZE DIALOGEX 0, 0, 276, 170
@@ -614,7 +614,7 @@ BEGIN
     PUSHBUTTON      "Jos",IDC_BUTTON5,125,76,35,12
     PUSHBUTTON      "&Setează",IDC_BUTTON1,165,76,35,12
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,93,188,1
-    PUSHBUTTON      "&Renunță",IDCANCEL,49,100,50,14
+    PUSHBUTTON      "&Revocare",IDCANCEL,49,100,50,14
     PUSHBUTTON      "&Salvează",IDOK,105,100,50,14
     LTEXT           "Poziție: 0.0 -> 1.0",IDC_STATIC,134,5,70,8
     LTEXT           "Mărire: 0.2 -> 5.0",IDC_STATIC,134,32,70,8
@@ -705,7 +705,7 @@ BEGIN
     CONTROL         "",IDC_LIST2,"SysListView32",LVS_LIST | LVS_SINGLESEL | LVS_SORTASCENDING | LVS_ALIGNLEFT | WS_TABSTOP,5,5,275,154,WS_EX_CLIENTEDGE
     PUSHBUTTON      "Răsfoire...",IDC_BUTTON1,5,163,60,14
     DEFPUSHBUTTON   "OK",IDOK,177,163,50,14
-    PUSHBUTTON      "Renunță",IDCANCEL,230,163,50,14
+    PUSHBUTTON      "Revocare",IDCANCEL,230,163,50,14
 END
 
 IDD_PPAGESUBSTYLE DIALOGEX 0, 0, 296, 264
@@ -933,7 +933,7 @@ CAPTION "Este necesară autentificarea"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,106,108,50,14
-    PUSHBUTTON      "Renunță",IDCANCEL,158,108,50,14
+    PUSHBUTTON      "Revocare",IDCANCEL,158,108,50,14
     CONTROL         337,IDC_STATIC,"Static",SS_BITMAP,0,0,213,37
     LTEXT           "Zonă restricționată",IDC_STATIC,10,40,198,11
     LTEXT           "Nume utilizator:",IDC_STATIC,10,56,66,8
@@ -1007,7 +1007,7 @@ BEGIN
     PUSHBUTTON      "Mută în &sus",IDC_BUTTON1,162,90,50,14
     PUSHBUTTON      "Mută în &jos",IDC_BUTTON4,162,108,50,14
     DEFPUSHBUTTON   "OK",IDOK,162,153,50,14
-    PUSHBUTTON      "Renunță",IDCANCEL,162,173,50,14
+    PUSHBUTTON      "Revocare",IDCANCEL,162,173,50,14
 END
 
 IDD_SHADEREDITOR_DLG DIALOGEX 0, 0, 205, 73
@@ -1103,7 +1103,7 @@ CAPTION "Scanare tuner"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "Pornește",ID_START,244,227,50,14
-    PUSHBUTTON      "Renunță",IDCANCEL,352,227,50,14
+    PUSHBUTTON      "Revocare",IDCANCEL,352,227,50,14
     CONTROL         "",IDC_STRENGTH,"msctls_progress32",PBS_VERTICAL | WS_BORDER,373,51,10,158
     CONTROL         "",IDC_QUALITY,"msctls_progress32",PBS_VERTICAL | WS_BORDER,387,51,10,158
     CONTROL         "",IDC_CHANNEL_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,5,37,343,172
@@ -1252,7 +1252,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Save",IDOK,129,82,50,14
-    PUSHBUTTON      "&Renunță",IDCANCEL,182,82,50,14
+    PUSHBUTTON      "&Revocare",IDCANCEL,182,82,50,14
     LTEXT           "Title:",IDC_STATIC,10,6,50,8
     EDITTEXT        IDC_EDIT1,10,18,219,13,ES_AUTOHSCROLL
     LTEXT           "Path:",IDC_STATIC,10,36,50,8
@@ -1267,7 +1267,7 @@ BEGIN
     LTEXT           "Nume:",IDC_STATIC,4,5,50,8
     EDITTEXT        IDC_EDIT1,58,4,188,13,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,142,23,50,14
-    PUSHBUTTON      "Renunță",IDCANCEL,196,23,50,14
+    PUSHBUTTON      "Revocare",IDCANCEL,196,23,50,14
 END
 
 IDD_CMD_LINE_HELP DIALOGEX 0, 0, 309, 177
@@ -1286,7 +1286,7 @@ CAPTION "Dialogul numelui listei de redare"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,150,42,50,14
-    PUSHBUTTON      "Renunță",IDCANCEL,204,42,50,14
+    PUSHBUTTON      "Revocare",IDCANCEL,204,42,50,14
     EDITTEXT        IDC_EDIT1,94,14,159,14,ES_AUTOHSCROLL
     RTEXT           "Nume:",IDC_STATIC,7,16,84,8
 END
@@ -1300,7 +1300,7 @@ BEGIN
     EDITTEXT        IDC_EDIT1,38,5,86,13,ES_AUTOHSCROLL
     CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,5,20,275,139,WS_EX_CLIENTEDGE
     DEFPUSHBUTTON   "OK",IDOK,177,163,50,14
-    PUSHBUTTON      "Renunță",IDCANCEL,230,163,50,14
+    PUSHBUTTON      "Revocare",IDCANCEL,230,163,50,14
 END
 
 IDD_HISTORY DIALOGEX 0, 0, 276, 170
@@ -2698,7 +2698,7 @@ BEGIN
     IDS_AG_VIDEOFILES       "Fișiere video (toate tipurile)"
     IDS_AG_AUDIOFILES       "Fișiere audio (toate tipurile)"
     IDS_AG_ALLFILES         "Toate fișierele"
-    IDS_AG_SUBTITLEFILES    "Subtitle files"
+    IDS_AG_SUBTITLEFILES    "Fișiere de subtitrare"
 END
 
 STRINGTABLE
@@ -2721,7 +2721,7 @@ BEGIN
     IDS_VIDEO_STREAM        "Video: %s"
     IDS_APPLY               "Aplică"
     IDS_CLEAR               "Goleşte"
-    IDS_CANCEL              "Renunță"
+    IDS_CANCEL              "Revocare"
     IDS_TEXTFILE_ENC        "Codare:"
     IDS_SAVE_FILE           "Se salvează fișierul"
     IDS_VOLUME_OSD_MUTE     "Vol: %d%% [mut]"
@@ -3168,7 +3168,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_BLOCK_EXTERNAL_VR   "You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
+    IDS_BLOCK_EXTERNAL_VR   "Puteți adăuga %s ca un filtru extern.\nTrebuie să vă selectați randorul video preferat de pe pagina de setări Video."
     IDS_DESC_HAALI_VR       "Arată ca VMR-9, dar folosește un redimensionator bicubic adevărat."
 END
 
@@ -3180,7 +3180,7 @@ BEGIN
     IDS_DESC_EVR_CP         "Same as the EVR, but with the Allocator-Presenter for subtitling and postprocessing."
     IDS_DESC_MADVR          "Randor de înaltă calitate, necesită un GPU care acceptă D3D9 sau o versiune ulterioară."
     IDS_DESC_EVR_SYNC       "La fel ca și la EVR (CP), dar oferă multe opțiune pentru a sincroniza  rata de cadre video cu rata de reîmprospătare a afișajului pentru a elimina cadrele video sărite sau duplicate."
-    IDS_DESC_MPC_VR         "Video renderer with support for Direct3D 11."
+    IDS_DESC_MPC_VR         "Randor video cu suport pentru Direct3D 11."
 END
 
 STRINGTABLE
@@ -3719,7 +3719,7 @@ BEGIN
     IDS_AFTERPLAYBACK_LOCK  "După redare: blochează desktopul"
     IDS_AFTERPLAYBACK_EXIT  "După redare: Închide programul întotdeauna"
     IDS_AFTERPLAYBACK_DONOTHING "După redare: nicio acțiune"
-    IDS_AFTERPLAYBACK_NEXT  "După redare: redă următorul fișier din dosar"
+    IDS_AFTERPLAYBACK_NEXT  "După redare: se redă următorul fișier din dosar"
     IDS_OSD_BRIGHTNESS      "Luminozitate: %s"
     IDS_OSD_CONTRAST        "Contrast: %s"
     IDS_OSD_HUE             "Nuanță: %s°"
