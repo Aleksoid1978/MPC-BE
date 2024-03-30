@@ -168,7 +168,7 @@ END
 
 IDD_GOTO_DLG DIALOGEX 0, 0, 186, 120
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Du-te la..."
+CAPTION "Mergi la..."
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "Introduceți un cod de timp folosind formatul [hh:]mm:ss.ms pentru a sări la un timp specificat. Nu este necesar să introduceţi separatorii explicit.",IDC_STATIC,5,5,173,27
@@ -324,7 +324,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,176,31,85,19
     LTEXT           "D",IDC_STATIC,262,32,27,8
     GROUPBOX        "Redare",IDC_STATIC,5,53,129,60
-    CONTROL         "Redă",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,65,55,10
+    CONTROL         "Redare",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,65,55,10
     CONTROL         "Repetă la nesfârșit",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,80,116,8
     EDITTEXT        IDC_EDIT1,65,63,20,13,ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
     LTEXT           "dată (ori)",IDC_STATIC1,90,65,40,8
@@ -1679,12 +1679,12 @@ BEGIN
         END
         MENUITEM "&Opțiuni...",                 ID_VIEW_OPTIONS
     END
-    POPUP "&Redă"
+    POPUP "&Redare"
     BEGIN
-        MENUITEM "&Redă/Pauză",            ID_PLAY_PLAYPAUSE
+        MENUITEM "&Redare/Pauză",            ID_PLAY_PLAYPAUSE
         MENUITEM "&Oprește",                 ID_PLAY_STOP
         MENUITEM "Pas cad&ru",            ID_PLAY_FRAMESTEP
-        MENUITEM "&Du-te la...",             ID_PLAY_GOTO
+        MENUITEM "&Mergi la...",             ID_PLAY_GOTO
         POPUP "&Repetare"
         BEGIN
             MENUITEM "&Pentru totdeauna", ID_REPEAT_FOREVER
@@ -1947,12 +1947,12 @@ BEGIN
             END
             MENUITEM "&Opțiuni...",                 ID_VIEW_OPTIONS
         END
-        POPUP "&Redă"
+        POPUP "&Redare"
         BEGIN
-            MENUITEM "&Redă/Pauză",            ID_PLAY_PLAYPAUSE
+            MENUITEM "&Redare/Pauză",            ID_PLAY_PLAYPAUSE
             MENUITEM "&Oprește",                 ID_PLAY_STOP
             MENUITEM "Pas cad&ru",            ID_PLAY_FRAMESTEP
-            MENUITEM "&Du-te la...",             ID_PLAY_GOTO
+            MENUITEM "&Mergi la...",             ID_PLAY_GOTO
             POPUP "&Repetare"
             BEGIN
                 MENUITEM "Î&ntotdeauna", ID_REPEAT_FOREVER
@@ -2259,10 +2259,10 @@ BEGIN
     IDS_INFOBAR_AUDIO       "Audio"
     IDS_INFOBAR_SUBTITLES   "Subtitrări"
     IDS_CONTROLS_COMPLETING "Terminare..."
-    IDS_AUTOPLAY_PLAYVIDEO  "Redă video"
-    IDS_AUTOPLAY_PLAYMUSIC  "Redă muzică"
-    IDS_AUTOPLAY_PLAYAUDIOCD "Redă CD audio"
-    IDS_AUTOPLAY_PLAYDVDMOVIE "Redă film DVD"
+    IDS_AUTOPLAY_PLAYVIDEO  "Redare video"
+    IDS_AUTOPLAY_PLAYMUSIC  "Redare muzică"
+    IDS_AUTOPLAY_PLAYAUDIOCD "Redare CD audio"
+    IDS_AUTOPLAY_PLAYDVDMOVIE "Redare film DVD"
     IDS_PROPSHEET_PROPERTIES "Proprietăți"
     IDS_GRAPHBUILDER_AUDIOSWITCHER "Comutator audio"
     IDS_SUBTITLES_DEFAULT_STYLE "&Stil implicit"
@@ -2278,7 +2278,7 @@ BEGIN
     IDS_STATSBAR_JITTER     "Mișcare ușor neregulată (jitter)"
     IDS_STATSBAR_BITRATE    "Rată de biți"
     IDS_STATSBAR_BITRATE_AVG_CUR " (avg/cur)"
-    IDS_AUTOPLAY_PLAYBDMOVIE "Redă disc Blu-ray"
+    IDS_AUTOPLAY_PLAYBDMOVIE "Redare disc Blu-ray"
     IDS_TEXTBAR_NOTHING     "Nimic"
     IDS_TEXTBAR_FILENANE    "Numele fișierului (altfel, titlul sau URL-ul)"
     IDS_TEXTBAR_TITLE       "Titlu (altfel, numele fișierului sau URL-ul)"
@@ -2591,7 +2591,7 @@ END
 
 STRINGTABLE
 BEGIN
-    ID_PLAY_PLAY            "Redă\nRedă"
+    ID_PLAY_PLAY            "Redare\nRedă"
     ID_PLAY_PAUSE           "Pauză\nPauză"
     ID_PLAY_STOP            "Stop\nOprește"
     ID_PLAY_FRAMESTEP       "Pas\nPas"
@@ -2759,12 +2759,12 @@ BEGIN
     IDS_AG_SAVE_SUBTITLE    "Salvează subtitrare"
     IDS_AG_PROPERTIES       "Proprietăți"
     IDS_AG_EXIT             "Ieșire"
-    IDS_AG_PLAYPAUSE        "Redă/Pauză"
-    IDS_AG_PLAY             "Redă"
+    IDS_AG_PLAYPAUSE        "Redare/Pauză"
+    IDS_AG_PLAY             "Redare"
     IDS_AG_STOP             "Oprire"
     IDS_AG_FRAMESTEP        "Deplasare cadru"
     IDS_AG_FRAMESTEP_BACK   "Deplasare cadru înapoi"
-    IDS_AG_GO_TO            "Du-te la"
+    IDS_AG_GO_TO            "Mergi la"
     IDS_AG_INCREASE_RATE    "Mărește rata"
 END
 
@@ -2938,8 +2938,8 @@ END
 STRINGTABLE
 BEGIN
     IDS_MPLAYERC_99         "Comutare ecran complet exclusiv"
-    IDS_MPLAYERC_100        "Du-te la subtitrarea anterioară"
-    IDS_MPLAYERC_101        "Du-te la subtitrarea următoare"
+    IDS_MPLAYERC_100        "Mergi la subtitrarea anterioară"
+    IDS_MPLAYERC_101        "Mergi la subtitrarea următoare"
     IDS_MPLAYERC_102        "Deplasează subtitrarea la stânga"
     IDS_MPLAYERC_103        "Deplasează subtitrarea la dreapta"
     IDS_AG_DISPLAY_STATS    "Afișează statistici"
@@ -2996,7 +2996,7 @@ BEGIN
     IDS_ZOOM_AUTOFIT        "Potrivire automată"
     IDS_ZOOM_AUTOFITLARGE   "Potrivire automată (doar mai mare)"
     IDS_ADD_TO_PLAYLIST     "Adaugă la lista de redare a MPC-BE"
-    IDS_OPEN_WITH_MPC       "Redă cu MPC-BE"
+    IDS_OPEN_WITH_MPC       "Redare cu MPC-BE"
     IDS_CANNOT_CHANGE_FORMAT  "MPC-BE nu are destule drepturi pentru a schimba asocierea cu formatele de fișiere. Dați clic pe butonul ""Modifică"" pentru a obține drepturi de administrator."
     IDS_APP_DESCRIPTION     "Unul dintre cele mai puternice și configurabile lectoare multimedia pentru sistemul de operare Windows. Creat la început de un dezvoltator maghiar cunoscut ca Gabest, această versiune are aptitudini adiționale cum ar fi mod pe tot ecranul Direct 3D și o compatibilitate mai bună cu Vista/7."
     IDS_MAINFRM_12          "canal"
