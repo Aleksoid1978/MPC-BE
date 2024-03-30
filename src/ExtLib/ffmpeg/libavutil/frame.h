@@ -180,6 +180,10 @@ enum AVFrameSideDataType {
     /**
      * Film grain parameters for a frame, described by AVFilmGrainParams.
      * Must be present for every frame which should have film grain applied.
+     *
+     * May be present multiple times, for example when there are multiple
+     * alternative parameter sets for different video signal characteristics.
+     * The user should select the most appropriate set for the application.
      */
     AV_FRAME_DATA_FILM_GRAIN_PARAMS,
 
@@ -250,6 +254,37 @@ typedef struct AVFrameSideData {
     AVDictionary *metadata;
     AVBufferRef *buf;
 } AVFrameSideData;
+
+enum AVSideDataProps {
+    /**
+     * The side data type can be used in stream-global structures.
+     * Side data types without this property are only meaningful on per-frame
+     * basis.
+     */
+    AV_SIDE_DATA_PROP_GLOBAL = (1 << 0),
+
+    /**
+     * Multiple instances of this side data type can be meaningfully present in
+     * a single side data array.
+     */
+    AV_SIDE_DATA_PROP_MULTI  = (1 << 1),
+};
+
+/**
+ * This struct describes the properties of a side data type. Its instance
+ * corresponding to a given type can be obtained from av_frame_side_data_desc().
+ */
+typedef struct AVSideDataDescriptor {
+    /**
+     * Human-readable side data description.
+     */
+    const char      *name;
+
+    /**
+     * Side data property flags, a combination of AVSideDataProps values.
+     */
+    unsigned         props;
+} AVSideDataDescriptor;
 
 /**
  * Structure describing a single Region Of Interest.
@@ -989,6 +1024,12 @@ int av_frame_apply_cropping(AVFrame *frame, int flags);
 const char *av_frame_side_data_name(enum AVFrameSideDataType type);
 
 /**
+ * @return side data descriptor corresponding to a given side data type, NULL
+ *         when not available.
+ */
+const AVSideDataDescriptor *av_frame_side_data_desc(enum AVFrameSideDataType type);
+
+/**
  * Free all side data entries and their contents, then zeroes out the
  * values which the pointers are pointing to.
  *
@@ -1051,9 +1092,24 @@ int av_frame_side_data_clone(AVFrameSideData ***sd, int *nb_sd,
  * @return a pointer to the side data of a given type on success, NULL if there
  *         is no side data with such type in this set.
  */
-const AVFrameSideData *av_frame_side_data_get(const AVFrameSideData **sd,
+const AVFrameSideData *av_frame_side_data_get_c(const AVFrameSideData * const *sd,
+                                                const int nb_sd,
+                                                enum AVFrameSideDataType type);
+
+/**
+ * Wrapper around av_frame_side_data_get_c() to workaround the limitation
+ * that for any type T the conversion from T * const * to const T * const *
+ * is not performed automatically in C.
+ * @see av_frame_side_data_get_c()
+ */
+static inline
+const AVFrameSideData *av_frame_side_data_get(AVFrameSideData * const *sd,
                                               const int nb_sd,
-                                              enum AVFrameSideDataType type);
+                                              enum AVFrameSideDataType type)
+{
+    return av_frame_side_data_get_c((const AVFrameSideData * const *)sd,
+                                    nb_sd, type);
+}
 
 /**
  * @}

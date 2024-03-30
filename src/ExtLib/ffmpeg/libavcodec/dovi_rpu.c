@@ -68,7 +68,7 @@ void ff_dovi_ctx_replace(DOVIContext *s, const DOVIContext *s0)
     s->mapping = s0->mapping;
     s->color = s0->color;
     s->dv_profile = s0->dv_profile;
-    for (int i = 0; i < DOVI_MAX_DM_ID; i++)
+    for (int i = 0; i <= DOVI_MAX_DM_ID; i++)
         ff_refstruct_replace(&s->vdr[i], s0->vdr[i]);
 }
 
@@ -145,7 +145,7 @@ static inline uint64_t get_ue_coef(GetBitContext *gb, const AVDOVIRpuDataHeader 
     case RPU_COEFF_FIXED:
         ipart = get_ue_golomb_long(gb);
         fpart.u32 = get_bits_long(gb, hdr->coef_log2_denom);
-        return (ipart << hdr->coef_log2_denom) + fpart.u32;
+        return (ipart << hdr->coef_log2_denom) | fpart.u32;
 
     case RPU_COEFF_FLOAT:
         fpart.u32 = get_bits_long(gb, 32);
@@ -164,7 +164,7 @@ static inline int64_t get_se_coef(GetBitContext *gb, const AVDOVIRpuDataHeader *
     case RPU_COEFF_FIXED:
         ipart = get_se_golomb_long(gb);
         fpart.u32 = get_bits_long(gb, hdr->coef_log2_denom);
-        return ipart * (1LL << hdr->coef_log2_denom) + fpart.u32;
+        return ipart * (1LL << hdr->coef_log2_denom) | fpart.u32;
 
     case RPU_COEFF_FLOAT:
         fpart.u32 = get_bits_long(gb, 32);

@@ -132,6 +132,7 @@ SRCS_LC = \
 	libavcodec/alsdec.c \
 	libavcodec/amrnbdec.c \
 	libavcodec/amrwbdec.c \
+	libavcodec/aom_film_grain.c \
 	libavcodec/apedec.c \
 	libavcodec/atrac.c \
 	libavcodec/atrac3.c \
@@ -147,7 +148,6 @@ SRCS_LC = \
 	libavcodec/avcodec.c \
 	libavcodec/avdct.c \
 	libavcodec/avfft.c \
-	libavcodec/avpacket.c \
 	libavcodec/avs3_parser.c \
 	libavcodec/bgmc.c \
 	libavcodec/bink.c \
@@ -432,6 +432,7 @@ SRCS_LC_B = \
 	libavcodec/opusdec_celt.c \
 	libavcodec/opusdsp.c \
 	libavcodec/opustab.c \
+	libavcodec/packet.c \
 	libavcodec/parser.c \
 	libavcodec/parsers.c \
 	libavcodec/pcm.c \
@@ -751,6 +752,7 @@ SRCS_LU = \
 	libavutil/threadmessage.c \
 	libavutil/time.c \
 	libavutil/timecode.c \
+	libavutil/timestamp.c \
 	libavutil/tx.c \
 	libavutil/tx_double.c \
 	libavutil/tx_float.c \

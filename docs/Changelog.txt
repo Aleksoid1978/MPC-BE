@@ -68,7 +68,7 @@ Updated Dutch and Chinese (Traditional) translation (by beter).
 Updated libraries:
 	dav1d git-1.4.0-83-g872e470;
 	fdk-aac git-v2.0.3;
-	ffmpeg git-n6.2-dev-1754-g5ff0eb34d2;
+	ffmpeg git-n6.2-dev-1976-ge99c273fec;
 	Little-CMS git-lcms2.16-41-gfcf6792;
 	MediaInfo git-v24.01-19-gb7bb56e8d;
 	nanosvg git-93ce879;

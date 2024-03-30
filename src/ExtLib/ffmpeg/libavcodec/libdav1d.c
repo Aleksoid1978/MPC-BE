@@ -305,10 +305,6 @@ static void libdav1d_flush(AVCodecContext *c)
     dav1d_flush(dav1d->c);
 }
 
-typedef struct OpaqueData {
-    void    *pkt_orig_opaque;
-} OpaqueData;
-
 static void libdav1d_data_free(const uint8_t *data, void *opaque) {
     AVBufferRef *buf = opaque;
 
@@ -318,7 +314,6 @@ static void libdav1d_data_free(const uint8_t *data, void *opaque) {
 static void libdav1d_user_data_free(const uint8_t *data, void *opaque) {
     AVPacket *pkt = opaque;
     av_assert0(data == opaque);
-    av_free(pkt->opaque);
     av_packet_free(&pkt);
 }
 
@@ -341,8 +336,6 @@ static int libdav1d_receive_frame_internal(AVCodecContext *c, Dav1dPicture *p)
         }
 
         if (pkt->size) {
-            OpaqueData *od = NULL;
-
             res = dav1d_data_wrap(data, pkt->data, pkt->size,
                                   libdav1d_data_free, pkt->buf);
             if (res < 0) {
@@ -352,21 +345,9 @@ static int libdav1d_receive_frame_internal(AVCodecContext *c, Dav1dPicture *p)
 
             pkt->buf = NULL;
 
-            if (pkt->opaque && (c->flags & AV_CODEC_FLAG_COPY_OPAQUE)) {
-                od = av_mallocz(sizeof(*od));
-                if (!od) {
-                    av_packet_free(&pkt);
-                    dav1d_data_unref(data);
-                    return AVERROR(ENOMEM);
-                }
-                od->pkt_orig_opaque  = pkt->opaque;
-            }
-            pkt->opaque = od;
-
             res = dav1d_data_wrap_user_data(data, (const uint8_t *)pkt,
                                             libdav1d_user_data_free, pkt);
             if (res < 0) {
-                av_free(pkt->opaque);
                 av_packet_free(&pkt);
                 dav1d_data_unref(data);
                 return res;
@@ -405,7 +386,6 @@ static int libdav1d_receive_frame(AVCodecContext *c, AVFrame *frame)
     Libdav1dContext *dav1d = c->priv_data;
     Dav1dPicture pic = { 0 }, *p = &pic;
     AVPacket *pkt;
-    OpaqueData *od = NULL;
 #if FF_DAV1D_VERSION_AT_LEAST(5,1)
     enum Dav1dEventFlags event_flags = 0;
 #endif
@@ -460,16 +440,9 @@ static int libdav1d_receive_frame(AVCodecContext *c, AVFrame *frame)
     ff_set_sar(c, frame->sample_aspect_ratio);
 
     pkt = (AVPacket *)p->m.user_data.data;
-    od  = pkt->opaque;
-
-    // restore the original user opaque value for
-    // ff_decode_frame_props_from_pkt()
-    pkt->opaque = od ? od->pkt_orig_opaque : NULL;
-    av_freep(&od);
 
     // match timestamps and packet size
     res = ff_decode_frame_props_from_pkt(c, frame, pkt);
-    pkt->opaque = NULL;
     if (res < 0)
         goto fail;
 
@@ -615,6 +588,8 @@ static int libdav1d_receive_frame(AVCodecContext *c, AVFrame *frame)
     if (p->frame_hdr->film_grain.present && (!dav1d->apply_grain ||
         (c->export_side_data & AV_CODEC_EXPORT_DATA_FILM_GRAIN))) {
         AVFilmGrainParams *fgp = av_film_grain_params_create_side_data(frame);
+        const AVPixFmtDescriptor *pixdesc = av_pix_fmt_desc_get(frame->format);
+        av_assert0(pixdesc);
         if (!fgp) {
             res = AVERROR(ENOMEM);
             goto fail;
@@ -622,6 +597,14 @@ static int libdav1d_receive_frame(AVCodecContext *c, AVFrame *frame)
 
         fgp->type = AV_FILM_GRAIN_PARAMS_AV1;
         fgp->seed = p->frame_hdr->film_grain.data.seed;
+        fgp->width = frame->width;
+        fgp->height = frame->height;
+        fgp->color_range = frame->color_range;
+        fgp->color_primaries = frame->color_primaries;
+        fgp->color_trc = frame->color_trc;
+        fgp->color_space = frame->colorspace;
+        fgp->subsampling_x = pixdesc->log2_chroma_w;
+        fgp->subsampling_y = pixdesc->log2_chroma_h;
         fgp->codec.aom.num_y_points = p->frame_hdr->film_grain.data.num_y_points;
         fgp->codec.aom.chroma_scaling_from_luma = p->frame_hdr->film_grain.data.chroma_scaling_from_luma;
         fgp->codec.aom.scaling_shift = p->frame_hdr->film_grain.data.scaling_shift;
