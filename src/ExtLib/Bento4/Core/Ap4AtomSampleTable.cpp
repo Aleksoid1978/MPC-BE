@@ -77,6 +77,7 @@ AP4_AtomSampleTable::AP4_AtomSampleTable(AP4_ContainerAtom* stbl,
 
             if (atom->GetType() == AP4_ATOM_TYPE_MP4A) {
                 // ignore corrupted Vorbis (I don't know why the 'mp4a' type is here)
+                AP4_ASSERT(0);
                 break;
             }
 
