@@ -1666,7 +1666,7 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 		// always show a video and album cover if its display is set in the settings
 		lpMMI->ptMinTrackSize.y = 32;
 	} else {
-		lpMMI->ptMinTrackSize.x = 0;
+		lpMMI->ptMinTrackSize.y = 0;
 	}
 
 	CSize cSize;
