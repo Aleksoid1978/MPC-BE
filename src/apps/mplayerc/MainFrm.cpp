@@ -1661,7 +1661,14 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 	const BOOL bMenuVisible = IsMainMenuVisible();
 
 	// minimum video area size 32 x 32
-	lpMMI->ptMinTrackSize = { 32, (m_bAudioOnly && AfxGetAppSettings().nAudioWindowMode == 2) ? 0 : 32 };
+	lpMMI->ptMinTrackSize.x = 32;
+	if (m_eMediaLoadState == MLS_LOADED && (!m_bAudioOnly || AfxGetAppSettings().nAudioWindowMode == 1)) {
+		// always show a video and album cover if its display is set in the settings
+		lpMMI->ptMinTrackSize.y = 32;
+	} else {
+		lpMMI->ptMinTrackSize.x = 0;
+	}
+
 	CSize cSize;
 	CalcControlsSize(cSize);
 	lpMMI->ptMinTrackSize.x += cSize.cx;
