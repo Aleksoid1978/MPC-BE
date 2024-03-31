@@ -11,6 +11,7 @@ Added support for VVC(H.266) video.
 MP4Splitter
 Added support for VVC(H.266) video.
 Improved file search for some audio tracks.
+Fixed hang on corrupted Vorbis streams.
 
 OggSplitter
 Improved file search.
@@ -64,6 +65,7 @@ Updated Japanese translation (by tsubasanouta).
 Updated Hungarian translation (by mickey).
 Updated German translation (by Klaus1189).
 Updated Dutch and Chinese (Traditional) translation (by beter).
+Updated Romanian translation (by Andrei Miloiu)
 
 Updated libraries:
 	dav1d git-1.4.0-83-g872e470;
