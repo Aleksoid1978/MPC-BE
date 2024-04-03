@@ -31,6 +31,7 @@
 #include "libavutil/film_grain_params.h"
 #include "libavutil/internal.h"
 #include "libavutil/md5.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/timecode.h"
@@ -3239,7 +3240,8 @@ static int decode_nal_units(HEVCContext *s, const uint8_t *buf, int length)
             return AVERROR(ENOMEM);
         memcpy(s->rpu_buf->data, nal->raw_data + 2, nal->raw_size - 2);
 
-        ret = ff_dovi_rpu_parse(&s->dovi_ctx, nal->data + 2, nal->size - 2);
+        ret = ff_dovi_rpu_parse(&s->dovi_ctx, nal->data + 2, nal->size - 2,
+                                s->avctx->err_recognition);
         if (ret < 0) {
             av_buffer_unref(&s->rpu_buf);
             av_log(s->avctx, AV_LOG_WARNING, "Error parsing DOVI NAL unit.\n");

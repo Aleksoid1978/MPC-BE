@@ -115,10 +115,10 @@ typedef struct VVCPPS {
     uint16_t min_tu_height;
 
     uint32_t *ctb_addr_in_slice;            ///< CtbAddrInCurrSlice for entire picture
-    uint16_t *col_bd;
-    uint16_t *row_bd;
-    uint16_t *ctb_to_col_bd;
-    uint16_t *ctb_to_row_bd;
+    uint16_t *col_bd;                       ///< TileColBdVal
+    uint16_t *row_bd;                       ///< TileRowBdVal
+    uint16_t *ctb_to_col_bd;                ///< CtbToTileColBd
+    uint16_t *ctb_to_row_bd;                ///< CtbToTileRowBd
 
     uint16_t width32;                       ///< width  in 32 pixels
     uint16_t height32;                      ///< height in 32 pixels
@@ -127,6 +127,10 @@ typedef struct VVCPPS {
 
     uint16_t ref_wraparound_offset;         ///< PpsRefWraparoundOffset
 
+    uint16_t subpic_x[VVC_MAX_SLICES];      ///< SubpicLeftBoundaryPos
+    uint16_t subpic_y[VVC_MAX_SLICES];      ///< SubpicTopBoundaryPos
+    uint16_t subpic_width[VVC_MAX_SLICES];
+    uint16_t subpic_height[VVC_MAX_SLICES];
 } VVCPPS;
 
 #define MAX_WEIGHTS 15

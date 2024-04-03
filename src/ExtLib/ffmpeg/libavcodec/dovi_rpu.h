@@ -45,9 +45,17 @@ typedef struct DOVIContext {
     const AVDOVIColorMetadata *color;
 
     /**
+     * Currently active extension blocks, updates on every ff_dovi_rpu_parse()
+     */
+    AVDOVIDmData *ext_blocks;
+    int num_ext_blocks;
+
+    /**
      * Private fields internal to dovi_rpu.c
      */
     struct DOVIVdr *vdr[DOVI_MAX_DM_ID+1]; ///< RefStruct references
+    uint8_t *rpu_buf; ///< temporary buffer
+    unsigned rpu_buf_sz;
     uint8_t dv_profile;
 
 } DOVIContext;
@@ -77,7 +85,8 @@ void ff_dovi_update_cfg(DOVIContext *s, const AVDOVIDecoderConfigurationRecord *
  *
  * Returns 0 or an error code.
  */
-int ff_dovi_rpu_parse(DOVIContext *s, const uint8_t *rpu, size_t rpu_size);
+int ff_dovi_rpu_parse(DOVIContext *s, const uint8_t *rpu, size_t rpu_size,
+                      int err_recognition);
 
 /**
  * Attach the decoded AVDOVIMetadata as side data to an AVFrame.

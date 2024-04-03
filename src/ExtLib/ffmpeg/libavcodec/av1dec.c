@@ -23,6 +23,7 @@
 #include "libavutil/hdr_dynamic_metadata.h"
 #include "libavutil/film_grain_params.h"
 #include "libavutil/mastering_display_metadata.h"
+#include "libavutil/mem.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/opt.h"
 #include "avcodec.h"
@@ -1001,7 +1002,8 @@ static int export_itut_t35(AVCodecContext *avctx, AVFrame *frame,
             provider_oriented_code != 0x800)
             break;
 
-        ret = ff_dovi_rpu_parse(&s->dovi, gb.buffer, gb.buffer_end - gb.buffer);
+        ret = ff_dovi_rpu_parse(&s->dovi, gb.buffer, gb.buffer_end - gb.buffer,
+                                avctx->err_recognition);
         if (ret < 0) {
             av_log(avctx, AV_LOG_WARNING, "Error parsing DOVI OBU.\n");
             break; // ignore

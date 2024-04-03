@@ -492,7 +492,6 @@ SRCS_LC_B = \
 	libavcodec/takdec.c \
 	libavcodec/takdsp.c \
 	libavcodec/texturedsp.c \
-	libavcodec/tiff.c \
 	libavcodec/tiff_common.c \
 	libavcodec/to_upper4.c \
 	libavcodec/tpeldsp.c \

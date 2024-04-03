@@ -22,7 +22,10 @@
  */
 
 #include "libavutil/buffer.h"
+#include "libavutil/mem.h"
+#include "libavutil/crc.h"
 
+#include "avcodec.h"
 #include "dovi_rpu.h"
 #include "golomb.h"
 #include "get_bits.h"
@@ -45,6 +48,8 @@ void ff_dovi_ctx_unref(DOVIContext *s)
 {
     for (int i = 0; i < FF_ARRAY_ELEMS(s->vdr); i++)
         ff_refstruct_unref(&s->vdr[i]);
+    ff_refstruct_unref(&s->ext_blocks);
+    av_free(s->rpu_buf);
 
     *s = (DOVIContext) {
         .logctx = s->logctx,
@@ -55,10 +60,14 @@ void ff_dovi_ctx_flush(DOVIContext *s)
 {
     for (int i = 0; i < FF_ARRAY_ELEMS(s->vdr); i++)
         ff_refstruct_unref(&s->vdr[i]);
+    ff_refstruct_unref(&s->ext_blocks);
 
     *s = (DOVIContext) {
         .logctx = s->logctx,
         .dv_profile = s->dv_profile,
+        /* preserve temporary buffer */
+        .rpu_buf = s->rpu_buf,
+        .rpu_buf_sz = s->rpu_buf_sz,
     };
 }
 
@@ -70,6 +79,7 @@ void ff_dovi_ctx_replace(DOVIContext *s, const DOVIContext *s0)
     s->dv_profile = s0->dv_profile;
     for (int i = 0; i <= DOVI_MAX_DM_ID; i++)
         ff_refstruct_replace(&s->vdr[i], s0->vdr[i]);
+    ff_refstruct_replace(&s->ext_blocks, s0->ext_blocks);
 }
 
 void ff_dovi_update_cfg(DOVIContext *s, const AVDOVIDecoderConfigurationRecord *cfg)
@@ -85,7 +95,7 @@ int ff_dovi_attach_side_data(DOVIContext *s, AVFrame *frame)
     AVFrameSideData *sd;
     AVBufferRef *buf;
     AVDOVIMetadata *dovi;
-    size_t dovi_size;
+    size_t dovi_size, ext_sz;
 
     if (!s->mapping || !s->color)
         return 0; /* incomplete dovi metadata */
@@ -109,8 +119,12 @@ int ff_dovi_attach_side_data(DOVIContext *s, AVFrame *frame)
     /* Copy only the parts of these structs known to us at compiler-time. */
 #define COPY(t, a, b, last) memcpy(a, b, offsetof(t, last) + sizeof((b)->last))
     COPY(AVDOVIRpuDataHeader, av_dovi_get_header(dovi), &s->header, disable_residual_flag);
-    COPY(AVDOVIDataMapping, av_dovi_get_mapping(dovi), s->mapping, nlq[2].linear_deadzone_threshold);
+    COPY(AVDOVIDataMapping, av_dovi_get_mapping(dovi), s->mapping, nlq_pivots);
     COPY(AVDOVIColorMetadata, av_dovi_get_color(dovi), s->color, source_diagonal);
+    ext_sz = FFMIN(sizeof(AVDOVIDmData), dovi->ext_block_size);
+    for (int i = 0; i < s->num_ext_blocks; i++)
+        memcpy(av_dovi_get_ext(dovi, i), &s->ext_blocks[i], ext_sz);
+    dovi->num_ext_blocks = s->num_ext_blocks;
     return 0;
 }
 
@@ -195,24 +209,189 @@ static inline unsigned get_variable_bits(GetBitContext *gb, int n)
         }                                                                       \
     } while (0)
 
-int ff_dovi_rpu_parse(DOVIContext *s, const uint8_t *rpu, size_t rpu_size)
+static void parse_ext_v1(DOVIContext *s, GetBitContext *gb, AVDOVIDmData *dm)
+{
+    switch (dm->level) {
+    case 1:
+        dm->l1.min_pq = get_bits(gb, 12);
+        dm->l1.max_pq = get_bits(gb, 12);
+        dm->l1.avg_pq = get_bits(gb, 12);
+        break;
+    case 2:
+        dm->l2.target_max_pq = get_bits(gb, 12);
+        dm->l2.trim_slope = get_bits(gb, 12);
+        dm->l2.trim_offset = get_bits(gb, 12);
+        dm->l2.trim_power = get_bits(gb, 12);
+        dm->l2.trim_chroma_weight = get_bits(gb, 12);
+        dm->l2.trim_saturation_gain = get_bits(gb, 12);
+        dm->l2.ms_weight = get_bits(gb, 13) - 8192;
+        break;
+    case 4:
+        dm->l4.anchor_pq = get_bits(gb, 12);
+        dm->l4.anchor_power = get_bits(gb, 12);
+        break;
+    case 5:
+        dm->l5.left_offset = get_bits(gb, 13);
+        dm->l5.right_offset = get_bits(gb, 13);
+        dm->l5.top_offset = get_bits(gb, 13);
+        dm->l5.bottom_offset = get_bits(gb, 13);
+        break;
+    case 6:
+        dm->l6.max_luminance = get_bits(gb, 16);
+        dm->l6.min_luminance = get_bits(gb, 16);
+        dm->l6.max_cll = get_bits(gb, 16);
+        dm->l6.max_fall = get_bits(gb, 16);
+        break;
+    case 255:
+        dm->l255.dm_run_mode = get_bits(gb, 8);
+        dm->l255.dm_run_version = get_bits(gb, 8);
+        for (int i = 0; i < 4; i++)
+            dm->l255.dm_debug[i] = get_bits(gb, 8);
+        break;
+    default:
+        av_log(s->logctx, AV_LOG_WARNING,
+               "Unknown Dolby Vision DM v1 level: %u\n", dm->level);
+    }
+}
+
+static AVCIExy get_cie_xy(GetBitContext *gb)
+{
+    AVCIExy xy;
+    const int denom = 32767;
+    xy.x = av_make_q(get_sbits(gb, 16), denom);
+    xy.y = av_make_q(get_sbits(gb, 16), denom);
+    return xy;
+}
+
+static void parse_ext_v2(DOVIContext *s, GetBitContext *gb, AVDOVIDmData *dm,
+                         int ext_block_length)
+{
+    switch (dm->level) {
+    case 3:
+        dm->l3.min_pq_offset = get_bits(gb, 12);
+        dm->l3.max_pq_offset = get_bits(gb, 12);
+        dm->l3.avg_pq_offset = get_bits(gb, 12);
+        break;
+    case 8:
+        dm->l8.target_display_index = get_bits(gb, 8);
+        dm->l8.trim_slope = get_bits(gb, 12);
+        dm->l8.trim_offset = get_bits(gb, 12);
+        dm->l8.trim_power = get_bits(gb, 12);
+        dm->l8.trim_chroma_weight = get_bits(gb, 12);
+        dm->l8.trim_saturation_gain = get_bits(gb, 12);
+        dm->l8.ms_weight = get_bits(gb, 12) - 8192;
+        if (ext_block_length < 12)
+            break;
+        dm->l8.target_mid_contrast = get_bits(gb, 12);
+        if (ext_block_length < 13)
+            break;
+        dm->l8.clip_trim = get_bits(gb, 12);
+        if (ext_block_length < 19)
+            break;
+        for (int i = 0; i < 6; i++)
+            dm->l8.saturation_vector_field[i] = get_bits(gb, 8);
+        if (ext_block_length < 25)
+            break;
+        for (int i = 0; i < 6; i++)
+            dm->l8.hue_vector_field[i] = get_bits(gb, 8);
+        break;
+    case 9:
+        dm->l9.source_primary_index = get_bits(gb, 8);
+        if (ext_block_length < 17)
+            break;
+        dm->l9.source_display_primaries.prim.r = get_cie_xy(gb);
+        dm->l9.source_display_primaries.prim.g = get_cie_xy(gb);
+        dm->l9.source_display_primaries.prim.b = get_cie_xy(gb);
+        dm->l9.source_display_primaries.wp = get_cie_xy(gb);
+        break;
+    case 10:
+        dm->l10.target_display_index = get_bits(gb, 8);
+        dm->l10.target_max_pq = get_bits(gb, 12);
+        dm->l10.target_min_pq = get_bits(gb, 12);
+        dm->l10.target_primary_index = get_bits(gb, 8);
+        if (ext_block_length < 21)
+            break;
+        dm->l10.target_display_primaries.prim.r = get_cie_xy(gb);
+        dm->l10.target_display_primaries.prim.g = get_cie_xy(gb);
+        dm->l10.target_display_primaries.prim.b = get_cie_xy(gb);
+        dm->l10.target_display_primaries.wp = get_cie_xy(gb);
+        break;
+    case 11:
+        dm->l11.content_type = get_bits(gb, 8);
+        dm->l11.whitepoint = get_bits(gb, 4);
+        dm->l11.reference_mode_flag = get_bits1(gb);
+        skip_bits(gb, 3); /* reserved */
+        dm->l11.sharpness = get_bits(gb, 2);
+        dm->l11.noise_reduction = get_bits(gb, 2);
+        dm->l11.mpeg_noise_reduction = get_bits(gb, 2);
+        dm->l11.frame_rate_conversion = get_bits(gb, 2);
+        dm->l11.brightness = get_bits(gb, 2);
+        dm->l11.color = get_bits(gb, 2);
+        break;
+    case 254:
+        dm->l254.dm_mode = get_bits(gb, 8);
+        dm->l254.dm_version_index = get_bits(gb, 8);
+        break;
+    default:
+        av_log(s->logctx, AV_LOG_WARNING,
+               "Unknown Dolby Vision DM v2 level: %u\n", dm->level);
+    }
+}
+
+static int parse_ext_blocks(DOVIContext *s, GetBitContext *gb, int ver)
+{
+    int num_ext_blocks, ext_block_length, start_pos, parsed_bits;
+
+    num_ext_blocks = get_ue_golomb_31(gb);
+    align_get_bits(gb);
+    if (s->num_ext_blocks + num_ext_blocks > AV_DOVI_MAX_EXT_BLOCKS)
+        return AVERROR_INVALIDDATA;
+
+    if (!s->ext_blocks) {
+        s->ext_blocks = ff_refstruct_allocz(sizeof(AVDOVIDmData) * AV_DOVI_MAX_EXT_BLOCKS);
+        if (!s->ext_blocks)
+            return AVERROR(ENOMEM);
+    }
+
+    while (num_ext_blocks--) {
+        AVDOVIDmData *dm = &s->ext_blocks[s->num_ext_blocks++];
+        ext_block_length = get_ue_golomb_31(gb);
+        dm->level = get_bits(gb, 8);
+        start_pos = get_bits_count(gb);
+
+        switch (ver) {
+        case 1: parse_ext_v1(s, gb, dm); break;
+        case 2: parse_ext_v2(s, gb, dm, ext_block_length); break;
+        }
+
+        parsed_bits = get_bits_count(gb) - start_pos;
+        if (parsed_bits > ext_block_length * 8)
+            return AVERROR_INVALIDDATA;
+        skip_bits(gb, ext_block_length * 8 - parsed_bits);
+    }
+
+    return 0;
+}
+
+int ff_dovi_rpu_parse(DOVIContext *s, const uint8_t *rpu, size_t rpu_size,
+                      int err_recognition)
 {
     AVDOVIRpuDataHeader *hdr = &s->header;
     GetBitContext *gb = &(GetBitContext){0};
     DOVIVdr *vdr;
     int ret;
 
-    uint8_t nal_prefix;
     uint8_t rpu_type;
     uint8_t vdr_seq_info_present;
     uint8_t vdr_dm_metadata_present;
     uint8_t use_prev_vdr_rpu;
     uint8_t use_nlq;
     uint8_t profile;
-    if ((ret = init_get_bits8(gb, rpu, rpu_size)) < 0)
-        return ret;
 
-    /* Container header */
+    if (rpu_size < 5)
+        goto fail;
+
+    /* Container */
     if (s->dv_profile == 10 /* dav1.10 */) {
         /* DV inside AV1 re-uses an EMDF container skeleton, but with fixed
          * values - so we can effectively treat this as a magic byte sequence.
@@ -229,17 +408,55 @@ int ff_dovi_rpu_parse(DOVIContext *s, const uint8_t *rpu, size_t rpu_size)
          *   discard_unknown_payload : f(1) = 1
          */
         const unsigned header_magic = 0x01be6841u;
-        unsigned header, emdf_payload_size;
-        header = get_bits_long(gb, 27);
-        VALIDATE(header, header_magic, header_magic);
+        unsigned emdf_header, emdf_payload_size, emdf_protection;
+        if ((ret = init_get_bits8(gb, rpu, rpu_size)) < 0)
+            return ret;
+        emdf_header = get_bits_long(gb, 27);
+        VALIDATE(emdf_header, header_magic, header_magic);
         emdf_payload_size = get_variable_bits(gb, 8);
         VALIDATE(emdf_payload_size, 6, 512);
         if (emdf_payload_size * 8 > get_bits_left(gb))
             return AVERROR_INVALIDDATA;
+
+        /* The payload is not byte-aligned (off by *one* bit, curse Dolby),
+         * so copy into a fresh buffer to preserve byte alignment of the
+         * RPU struct */
+        av_fast_padded_malloc(&s->rpu_buf, &s->rpu_buf_sz, emdf_payload_size);
+        if (!s->rpu_buf)
+            return AVERROR(ENOMEM);
+        for (int i = 0; i < emdf_payload_size; i++)
+            s->rpu_buf[i] = get_bits(gb, 8);
+        rpu = s->rpu_buf;
+        rpu_size = emdf_payload_size;
+
+        /* Validate EMDF footer */
+        emdf_protection = get_bits(gb, 5 + 12);
+        VALIDATE(emdf_protection, 0x400, 0x400);
     } else {
-        nal_prefix = get_bits(gb, 8);
-        VALIDATE(nal_prefix, 25, 25);
+        /* NAL RBSP with prefix and trailing zeroes */
+        VALIDATE(rpu[0], 25, 25); /* NAL prefix */
+        rpu++;
+        rpu_size--;
+        /* Strip trailing padding bytes */
+        while (rpu_size && rpu[rpu_size - 1] == 0)
+            rpu_size--;
     }
+
+    if (!rpu_size || rpu[rpu_size - 1] != 0x80)
+        goto fail;
+
+    if (err_recognition & AV_EF_CRCCHECK) {
+        uint32_t crc = av_bswap32(av_crc(av_crc_get_table(AV_CRC_32_IEEE),
+                                  -1, rpu, rpu_size - 1)); /* exclude 0x80 */
+        if (crc) {
+            av_log(s->logctx, AV_LOG_ERROR, "RPU CRC mismatch: %X\n", crc);
+            if (err_recognition & AV_EF_EXPLODE)
+                goto fail;
+        }
+    }
+
+    if ((ret = init_get_bits8(gb, rpu, rpu_size)) < 0)
+        return ret;
 
     /* RPU header */
     rpu_type = get_bits(gb, 6);
@@ -346,7 +563,14 @@ int ff_dovi_rpu_parse(DOVIContext *s, const uint8_t *rpu, size_t rpu_size)
         }
 
         if (use_nlq) {
+            int nlq_pivot = 0;
             vdr->mapping.nlq_method_idc = get_bits(gb, 3);
+
+            for (int i = 0; i < 2; i++) {
+                nlq_pivot += get_bits(gb, hdr->bl_bit_depth);
+                vdr->mapping.nlq_pivots[i] = av_clip_uint16(nlq_pivot);
+            }
+
             /**
              * The patent mentions another legal value, NLQ_MU_LAW, but it's
              * not documented anywhere how to parse or apply that type of NLQ.
@@ -471,10 +695,23 @@ int ff_dovi_rpu_parse(DOVIContext *s, const uint8_t *rpu, size_t rpu_size)
         color->source_diagonal = get_bits(gb, 10);
     }
 
-    /* FIXME: verify CRC32, requires implementation of AV_CRC_32_MPEG_2 */
+    /* Parse extension blocks */
+    s->num_ext_blocks = 0;
+    if ((ret = parse_ext_blocks(s, gb, 1)) < 0) {
+        ff_dovi_ctx_unref(s);
+        return ret;
+    }
+
+    if (get_bits_left(gb) > 48 /* padding + CRC32 + terminator */) {
+        if ((ret = parse_ext_blocks(s, gb, 2)) < 0) {
+            ff_dovi_ctx_unref(s);
+            return ret;
+        }
+    }
+
     return 0;
 
 fail:
     ff_dovi_ctx_unref(s); /* don't leak potentially invalid state */
-    return AVERROR(EINVAL);
+    return AVERROR_INVALIDDATA;
 }

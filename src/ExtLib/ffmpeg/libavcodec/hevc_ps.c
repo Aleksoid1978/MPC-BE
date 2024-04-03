@@ -24,6 +24,7 @@
  */
 
 #include "libavutil/imgutils.h"
+#include "libavutil/mem.h"
 #include "golomb.h"
 #include "h2645_vui.h"
 #include "hevc_data.h"
@@ -459,7 +460,7 @@ int ff_hevc_decode_nal_vps(GetBitContext *gb, AVCodecContext *avctx,
     int ret = AVERROR_INVALIDDATA;
     HEVCVPS *vps;
 
-    if (ps->pps_list[vps_id]) {
+    if (ps->vps_list[vps_id]) {
         const HEVCVPS *vps1 = ps->vps_list[vps_id];
         if (vps1->data_size == nal_size &&
             !memcmp(vps1->data, gb->buffer, vps1->data_size))

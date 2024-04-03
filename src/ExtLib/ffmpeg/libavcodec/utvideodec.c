@@ -31,6 +31,7 @@
 #define UNCHECKED_BITSTREAM_READER 1
 
 #include "libavutil/intreadwrite.h"
+#include "libavutil/mem.h"
 #include "libavutil/pixdesc.h"
 #include "avcodec.h"
 #include "bswapdsp.h"
@@ -120,7 +121,7 @@ static int build_huff(UtvideoContext *c, const uint8_t *src, VLC *vlc,
     i = 0; \
     for (; CACHED_BITSTREAM_READER && i < width-end && get_bits_left(&gb) > 0;) {\
         ret = get_vlc_multi(&gb, (uint8_t *)buf + i * b, multi.table, \
-                            vlc.table, VLC_BITS, 3); \
+                            vlc.table, VLC_BITS, 3, b); \
         if (ret > 0) \
             i += ret; \
         if (ret <= 0) \

@@ -20,8 +20,10 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+
 #include "libavcodec/cbs_h266.h"
-#include "libavutil/imgutils.h"
+#include "libavutil/mem.h"
+#include "libavutil/pixdesc.h"
 #include "libavcodec/refstruct.h"
 #include "vvc_data.h"
 #include "vvc_ps.h"
@@ -290,6 +292,7 @@ static int pps_bd(VVCPPS *pps)
         for (int k = pps->col_bd[i]; k < j; k++)
             pps->ctb_to_col_bd[k] = pps->col_bd[i];
     }
+    pps->col_bd[r->num_tile_columns] = pps->ctb_to_col_bd[pps->ctb_width] = pps->ctb_width;
 
     for (int i = 0, j = 0; i < r->num_tile_rows; i++) {
         pps->row_bd[i] = j;
@@ -297,6 +300,8 @@ static int pps_bd(VVCPPS *pps)
         for (int k = pps->row_bd[i]; k < j; k++)
             pps->ctb_to_row_bd[k] = pps->row_bd[i];
     }
+    pps->row_bd[r->num_tile_rows] = pps->ctb_to_row_bd[pps->ctb_height] = pps->ctb_height;
+
     return 0;
 }
 
@@ -319,43 +324,120 @@ static void tile_xy(int *tile_x, int *tile_y, const int tile_idx, const VVCPPS *
     *tile_y = tile_idx / pps->r->num_tile_columns;
 }
 
-static void ctu_xy(int *ctu_x, int *ctu_y, const int tile_x, const int tile_y, const VVCPPS *pps)
+static void ctu_xy(int *rx, int *ry, const int tile_x, const int tile_y, const VVCPPS *pps)
 {
-    *ctu_x = pps->col_bd[tile_x];
-    *ctu_y = pps->row_bd[tile_y];
+    *rx = pps->col_bd[tile_x];
+    *ry = pps->row_bd[tile_y];
 }
 
-static int ctu_rs(const int ctu_x, const int ctu_y, const VVCPPS *pps)
+static int ctu_rs(const int rx, const int ry, const VVCPPS *pps)
 {
-    return pps->ctb_width * ctu_y + ctu_x;
+    return pps->ctb_width * ry + rx;
 }
 
-static int pps_add_ctus(VVCPPS *pps, int *off, const int ctu_x, const int ctu_y,
+static int pps_add_ctus(VVCPPS *pps, int *off, const int rx, const int ry,
     const int w, const int h)
 {
     int start = *off;
     for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
-            pps->ctb_addr_in_slice[*off] = ctu_rs(ctu_x + x, ctu_y + y, pps);
+            pps->ctb_addr_in_slice[*off] = ctu_rs(rx + x, ry + y, pps);
             (*off)++;
         }
     }
     return *off - start;
 }
 
+static void pps_single_slice_picture(VVCPPS *pps, int *off)
+{
+    for (int j = 0; j < pps->r->num_tile_rows; j++) {
+        for (int i = 0; i < pps->r->num_tile_columns; i++) {
+            pps->num_ctus_in_slice[0] = pps_add_ctus(pps, off,
+                pps->col_bd[i], pps->row_bd[j],
+                pps->r->col_width_val[i], pps->r->row_height_val[j]);
+        }
+    }
+}
+
+static void subpic_tiles(int *tile_x, int *tile_y, int *tile_x_end, int *tile_y_end,
+    const VVCSPS *sps, const VVCPPS *pps,  const int i)
+{
+    const int rx = sps->r->sps_subpic_ctu_top_left_x[i];
+    const int ry = sps->r->sps_subpic_ctu_top_left_y[i];
+
+    *tile_x = *tile_y = 0;
+
+    while (pps->col_bd[*tile_x] != rx)
+        (*tile_x)++;
+
+    while (pps->row_bd[*tile_y] != ry)
+        (*tile_y)++;
+
+    *tile_x_end = (*tile_x);
+    *tile_y_end = (*tile_y);
+
+    while (pps->col_bd[*tile_x_end] < rx + sps->r->sps_subpic_width_minus1[i] + 1)
+        (*tile_x_end)++;
+
+    while (pps->row_bd[*tile_y_end] < ry + sps->r->sps_subpic_height_minus1[i] + 1)
+        (*tile_y_end)++;
+}
+
+static void pps_subpic_less_than_one_tile_slice(VVCPPS *pps, const VVCSPS *sps, const int i, const int tx, const int ty, int *off)
+{
+    pps->num_ctus_in_slice[i] = pps_add_ctus(pps, off,
+        pps->col_bd[tx], pps->row_bd[ty],
+        pps->r->col_width_val[tx], sps->r->sps_subpic_height_minus1[i] + 1);
+}
+
+static void pps_subpic_one_or_more_tiles_slice(VVCPPS *pps, const int tile_x, const int tile_y, const int x_end, const int y_end, const int i, int *off)
+{
+    for (int ty = tile_y; ty < y_end; ty++) {
+        for (int tx = tile_x; tx < x_end; tx++) {
+            pps->num_ctus_in_slice[i] += pps_add_ctus(pps, off,
+                pps->col_bd[tx], pps->row_bd[ty],
+                pps->r->col_width_val[tx], pps->r->row_height_val[ty]);
+        }
+    }
+}
+
+static void pps_subpic_slice(VVCPPS *pps, const VVCSPS *sps, const int i, int *off)
+{
+    int tx, ty, x_end, y_end;
+
+    pps->slice_start_offset[i] = *off;
+    pps->num_ctus_in_slice[i] = 0;
+
+    subpic_tiles(&tx, &ty, &x_end, &y_end, sps, pps, i);
+    if (ty + 1 == y_end && sps->r->sps_subpic_height_minus1[i] + 1 < pps->r->row_height_val[ty])
+        pps_subpic_less_than_one_tile_slice(pps, sps, i, tx, ty, off);
+    else
+        pps_subpic_one_or_more_tiles_slice(pps, tx, ty, x_end, y_end, i, off);
+}
+
+static void pps_single_slice_per_subpic(VVCPPS *pps, const VVCSPS *sps, int *off)
+{
+    if (!sps->r->sps_subpic_info_present_flag) {
+        pps_single_slice_picture(pps, off);
+    } else {
+        for (int i = 0; i < pps->r->pps_num_slices_in_pic_minus1 + 1; i++)
+            pps_subpic_slice(pps, sps, i, off);
+    }
+}
+
 static int pps_one_tile_slices(VVCPPS *pps, const int tile_idx, int i, int *off)
 {
     const H266RawPPS *r = pps->r;
-    int ctu_x, ctu_y, ctu_y_end, tile_x, tile_y;
+    int rx, ry, ctu_y_end, tile_x, tile_y;
 
     tile_xy(&tile_x, &tile_y, tile_idx, pps);
-    ctu_xy(&ctu_x, &ctu_y, tile_x, tile_y, pps);
-    ctu_y_end = ctu_y + r->row_height_val[tile_y];
-    while (ctu_y < ctu_y_end) {
+    ctu_xy(&rx, &ry, tile_x, tile_y, pps);
+    ctu_y_end = ry + r->row_height_val[tile_y];
+    while (ry < ctu_y_end) {
         pps->slice_start_offset[i] = *off;
-        pps->num_ctus_in_slice[i] = pps_add_ctus(pps, off, ctu_x, ctu_y,
+        pps->num_ctus_in_slice[i] = pps_add_ctus(pps, off, rx, ry,
             r->col_width_val[tile_x], r->slice_height_in_ctus[i]);
-        ctu_y += r->slice_height_in_ctus[i++];
+        ry += r->slice_height_in_ctus[i++];
     }
     i--;
     return i;
@@ -364,24 +446,29 @@ static int pps_one_tile_slices(VVCPPS *pps, const int tile_idx, int i, int *off)
 static void pps_multi_tiles_slice(VVCPPS *pps, const int tile_idx, const int i, int *off)
 {
     const H266RawPPS *r = pps->r;
-    int ctu_x, ctu_y,tile_x, tile_y;
+    int rx, ry, tile_x, tile_y;
 
     tile_xy(&tile_x, &tile_y, tile_idx, pps);
     pps->slice_start_offset[i] = *off;
     pps->num_ctus_in_slice[i] = 0;
     for (int ty = tile_y; ty <= tile_y + r->pps_slice_height_in_tiles_minus1[i]; ty++) {
         for (int tx = tile_x; tx <= tile_x + r->pps_slice_width_in_tiles_minus1[i]; tx++) {
-            ctu_xy(&ctu_x, &ctu_y, tx, ty, pps);
-            pps->num_ctus_in_slice[i] += pps_add_ctus(pps, off, ctu_x, ctu_y,
+            ctu_xy(&rx, &ry, tx, ty, pps);
+            pps->num_ctus_in_slice[i] += pps_add_ctus(pps, off, rx, ry,
                 r->col_width_val[tx], r->row_height_val[ty]);
         }
     }
 }
 
-static void pps_rect_slice(VVCPPS* pps)
+static void pps_rect_slice(VVCPPS *pps, const VVCSPS *sps)
 {
-    const H266RawPPS* r = pps->r;
+    const H266RawPPS *r = pps->r;
     int tile_idx = 0, off = 0;
+
+    if (r->pps_single_slice_per_subpic_flag) {
+        pps_single_slice_per_subpic(pps, sps, &off);
+        return;
+    }
 
     for (int i = 0; i < r->pps_num_slices_in_pic_minus1 + 1; i++) {
         if (!r->pps_slice_width_in_tiles_minus1[i] &&
@@ -389,7 +476,6 @@ static void pps_rect_slice(VVCPPS* pps)
             i = pps_one_tile_slices(pps, tile_idx, i, &off);
         } else {
             pps_multi_tiles_slice(pps, tile_idx, i, &off);
-
         }
         tile_idx = next_tile_idx(tile_idx, i, r);
     }
@@ -398,24 +484,24 @@ static void pps_rect_slice(VVCPPS* pps)
 static void pps_no_rect_slice(VVCPPS* pps)
 {
     const H266RawPPS* r = pps->r;
-    int ctu_x, ctu_y, off = 0;
+    int rx, ry, off = 0;
 
     for (int tile_y = 0; tile_y < r->num_tile_rows; tile_y++) {
         for (int tile_x = 0; tile_x < r->num_tile_columns; tile_x++) {
-            ctu_xy(&ctu_x, &ctu_y, tile_x, tile_y, pps);
-            pps_add_ctus(pps, &off, ctu_x, ctu_y, r->col_width_val[tile_x], r->row_height_val[tile_y]);
+            ctu_xy(&rx, &ry, tile_x, tile_y, pps);
+            pps_add_ctus(pps, &off, rx, ry, r->col_width_val[tile_x], r->row_height_val[tile_y]);
         }
     }
 }
 
-static int pps_slice_map(VVCPPS *pps)
+static int pps_slice_map(VVCPPS *pps, const VVCSPS *sps)
 {
     pps->ctb_addr_in_slice = av_calloc(pps->ctb_count, sizeof(*pps->ctb_addr_in_slice));
     if (!pps->ctb_addr_in_slice)
         return AVERROR(ENOMEM);
 
     if (pps->r->pps_rect_slice_flag)
-        pps_rect_slice(pps);
+        pps_rect_slice(pps, sps);
     else
         pps_no_rect_slice(pps);
 
@@ -430,6 +516,24 @@ static void pps_ref_wraparound_offset(VVCPPS *pps, const VVCSPS *sps)
         pps->ref_wraparound_offset = (pps->width / sps->min_cb_size_y) - r->pps_pic_width_minus_wraparound_offset;
 }
 
+static void pps_subpic(VVCPPS *pps, const VVCSPS *sps)
+{
+    const H266RawSPS *rsps = sps->r;
+    for (int i = 0; i < rsps->sps_num_subpics_minus1 + 1; i++) {
+        if (rsps->sps_subpic_treated_as_pic_flag[i]) {
+            pps->subpic_x[i]      = rsps->sps_subpic_ctu_top_left_x[i] << sps->ctb_log2_size_y;
+            pps->subpic_y[i]      = rsps->sps_subpic_ctu_top_left_y[i] << sps->ctb_log2_size_y;
+            pps->subpic_width[i]  = FFMIN(pps->width  - pps->subpic_x[i], (rsps->sps_subpic_width_minus1[i]  + 1) << sps->ctb_log2_size_y);
+            pps->subpic_height[i] = FFMIN(pps->height - pps->subpic_y[i], (rsps->sps_subpic_height_minus1[i] + 1) << sps->ctb_log2_size_y);
+        } else {
+            pps->subpic_x[i]      = 0;
+            pps->subpic_y[i]      = 0;
+            pps->subpic_width[i]  = pps->width;
+            pps->subpic_height[i] = pps->height;
+        }
+    }
+}
+
 static int pps_derive(VVCPPS *pps, const VVCSPS *sps)
 {
     int ret;
@@ -441,11 +545,12 @@ static int pps_derive(VVCPPS *pps, const VVCSPS *sps)
     if (ret < 0)
         return ret;
 
-    ret = pps_slice_map(pps);
+    ret = pps_slice_map(pps, sps);
     if (ret < 0)
         return ret;
 
     pps_ref_wraparound_offset(pps, sps);
+    pps_subpic(pps, sps);
 
     return 0;
 }

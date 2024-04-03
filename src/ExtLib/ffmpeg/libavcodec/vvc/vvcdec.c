@@ -25,6 +25,7 @@
 #include "libavcodec/profiles.h"
 #include "libavcodec/refstruct.h"
 #include "libavutil/cpu.h"
+#include "libavutil/mem.h"
 #include "libavutil/thread.h"
 
 #include "vvcdec.h"
@@ -942,6 +943,9 @@ static int vvc_decode_frame(AVCodecContext *avctx, AVFrame *output,
     ret = decode_nal_units(s, fc, avpkt);
     if (ret < 0)
         return ret;
+
+    if (!fc->ft)
+        return avpkt->size;
 
     ret = submit_frame(s, fc, output, got_output);
     if (ret < 0)

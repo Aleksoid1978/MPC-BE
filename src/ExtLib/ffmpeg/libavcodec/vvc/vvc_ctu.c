@@ -87,10 +87,10 @@ static int get_qp_y_pred(const VVCLocalContext *lc)
     const int min_cb_width  = fc->ps.pps->min_cb_width;
     const int x_cb          = cu->x0 >> sps->min_cb_log2_size_y;
     const int y_cb          = cu->y0 >> sps->min_cb_log2_size_y;
-    const int x_ctb         = cu->x0 >> ctb_log2_size;
-    const int y_ctb         = cu->y0 >> ctb_log2_size;
-    const int in_same_ctb_a = ((xQg - 1) >> ctb_log2_size) == x_ctb && (yQg >> ctb_log2_size) == y_ctb;
-    const int in_same_ctb_b = (xQg >> ctb_log2_size) == x_ctb && ((yQg - 1) >> ctb_log2_size) == y_ctb;
+    const int rx            = cu->x0 >> ctb_log2_size;
+    const int ry            = cu->y0 >> ctb_log2_size;
+    const int in_same_ctb_a = ((xQg - 1) >> ctb_log2_size) == rx && (yQg >> ctb_log2_size) == ry;
+    const int in_same_ctb_b = (xQg >> ctb_log2_size) == rx && ((yQg - 1) >> ctb_log2_size) == ry;
     int qPy_pred, qPy_a, qPy_b;
 
     if (lc->na.cand_up) {
@@ -2493,6 +2493,10 @@ void ff_vvc_decode_neighbour(VVCLocalContext *lc, const int x_ctb, const int y_c
         lc->boundary_flags |= BOUNDARY_UPPER_TILE;
     if (ry > 0 && fc->tab.slice_idx[rs] != fc->tab.slice_idx[rs - fc->ps.pps->ctb_width])
         lc->boundary_flags |= BOUNDARY_UPPER_SLICE;
+    if (fc->ps.sps->r->sps_subpic_ctu_top_left_x[lc->sc->sh.r->curr_subpic_idx] == rx)
+        lc->boundary_flags |= BOUNDARY_LEFT_SUBPIC;
+    if (fc->ps.sps->r->sps_subpic_ctu_top_left_y[lc->sc->sh.r->curr_subpic_idx] == ry)
+        lc->boundary_flags |= BOUNDARY_UPPER_SUBPIC;
     lc->ctb_left_flag = rx > 0 && !(lc->boundary_flags & BOUNDARY_LEFT_TILE);
     lc->ctb_up_flag   = ry > 0 && !(lc->boundary_flags & BOUNDARY_UPPER_TILE) && !(lc->boundary_flags & BOUNDARY_UPPER_SLICE);
     lc->ctb_up_right_flag = lc->ctb_up_flag && (fc->ps.pps->ctb_to_col_bd[rx] == fc->ps.pps->ctb_to_col_bd[rx + 1]) &&

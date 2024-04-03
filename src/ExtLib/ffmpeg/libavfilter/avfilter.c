@@ -29,6 +29,7 @@
 #include "libavutil/frame.h"
 #include "libavutil/hwcontext.h"
 #include "libavutil/internal.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/rational.h"
@@ -834,19 +835,18 @@ int ff_filter_opt_parse(void *logctx, const AVClass *priv_class,
 {
     const AVOption *o = NULL;
     int ret;
-    char *av_uninit(parsed_key), *av_uninit(value);
-    const char *key;
     int offset= -1;
 
     if (!args)
         return 0;
 
     while (*args) {
+        char *parsed_key, *value;
+        const char *key;
         const char *shorthand = NULL;
+        int additional_flags  = 0;
 
-        if (priv_class)
-            o = av_opt_next(&priv_class, o);
-        if (o) {
+        if (priv_class && (o = av_opt_next(&priv_class, o))) {
             if (o->type == AV_OPT_TYPE_CONST || o->offset == offset)
                 continue;
             offset = o->offset;
@@ -868,20 +868,16 @@ int ff_filter_opt_parse(void *logctx, const AVClass *priv_class,
             args++;
         if (parsed_key) {
             key = parsed_key;
-
-            /* discard all remaining shorthand */
-            if (priv_class)
-                while ((o = av_opt_next(&priv_class, o)));
+            additional_flags = AV_DICT_DONT_STRDUP_KEY;
+            priv_class = NULL; /* reject all remaining shorthand */
         } else {
             key = shorthand;
         }
 
         av_log(logctx, AV_LOG_DEBUG, "Setting '%s' to value '%s'\n", key, value);
 
-        av_dict_set(options, key, value, AV_DICT_MULTIKEY);
-
-        av_free(value);
-        av_free(parsed_key);
+        av_dict_set(options, key, value,
+                    additional_flags | AV_DICT_DONT_STRDUP_VAL | AV_DICT_MULTIKEY);
     }
 
     return 0;

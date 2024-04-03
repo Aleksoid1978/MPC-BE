@@ -26,21 +26,19 @@
 #include <float.h>
 
 #include "libavutil/channel_layout.h"
-#include "libavutil/common.h"
 #include "libavutil/frame.h"
 #include "libavutil/hwcontext.h"
-#include "libavutil/imgutils.h"
 #include "libavutil/internal.h"
+#include "libavutil/mem.h"
 #include "libavutil/opt.h"
+#include "libavutil/pixdesc.h"
 #include "libavutil/samplefmt.h"
 #include "libavutil/timestamp.h"
-#include "audio.h"
 #include "avfilter.h"
 #include "buffersrc.h"
 #include "filters.h"
 #include "formats.h"
 #include "internal.h"
-#include "video.h"
 
 typedef struct BufferSourceContext {
     const AVClass    *class;
@@ -337,12 +335,15 @@ static const AVOption buffer_options[] = {
     {   "smpte170m",   NULL,  0, AV_OPT_TYPE_CONST, {.i64=AVCOL_SPC_SMPTE170M},         INT_MIN, INT_MAX, V, .unit = "colorspace"},
     {   "smpte240m",   NULL,  0, AV_OPT_TYPE_CONST, {.i64=AVCOL_SPC_SMPTE240M},         INT_MIN, INT_MAX, V, .unit = "colorspace"},
     {   "ycgco",       NULL,  0, AV_OPT_TYPE_CONST, {.i64=AVCOL_SPC_YCGCO},             INT_MIN, INT_MAX, V, .unit = "colorspace"},
+    {   "ycgco-re",    NULL,  0, AV_OPT_TYPE_CONST, {.i64=AVCOL_SPC_YCGCO_RE},          INT_MIN, INT_MAX, V, .unit = "colorspace"},
+    {   "ycgco-ro",    NULL,  0, AV_OPT_TYPE_CONST, {.i64=AVCOL_SPC_YCGCO_RO},          INT_MIN, INT_MAX, V, .unit = "colorspace"},
     {   "bt2020nc",    NULL,  0, AV_OPT_TYPE_CONST, {.i64=AVCOL_SPC_BT2020_NCL},        INT_MIN, INT_MAX, V, .unit = "colorspace"},
     {   "bt2020c",     NULL,  0, AV_OPT_TYPE_CONST, {.i64=AVCOL_SPC_BT2020_CL},         INT_MIN, INT_MAX, V, .unit = "colorspace"},
     {   "smpte2085",   NULL,  0, AV_OPT_TYPE_CONST, {.i64=AVCOL_SPC_SMPTE2085},         INT_MIN, INT_MAX, V, .unit = "colorspace"},
     {   "chroma-derived-nc",  NULL,  0, AV_OPT_TYPE_CONST, {.i64=AVCOL_SPC_CHROMA_DERIVED_NCL},INT_MIN, INT_MAX, V, .unit = "colorspace"},
     {   "chroma-derived-c",   NULL,  0, AV_OPT_TYPE_CONST, {.i64=AVCOL_SPC_CHROMA_DERIVED_CL}, INT_MIN, INT_MAX, V, .unit = "colorspace"},
     {   "ictcp",       NULL,  0, AV_OPT_TYPE_CONST, {.i64=AVCOL_SPC_ICTCP},             INT_MIN, INT_MAX, V, .unit = "colorspace"},
+    {   "ipt-c2",      NULL,  0, AV_OPT_TYPE_CONST, {.i64=AVCOL_SPC_IPT_C2},            INT_MIN, INT_MAX, V, .unit = "colorspace"},
     { "range", "select color range", OFFSET(color_range), AV_OPT_TYPE_INT, {.i64=AVCOL_RANGE_UNSPECIFIED}, 0, AVCOL_RANGE_NB-1, V, .unit = "range"},
     {   "unspecified", NULL,   0, AV_OPT_TYPE_CONST, {.i64=AVCOL_RANGE_UNSPECIFIED},  0, 0, V, .unit = "range"},
     {   "unknown",     NULL,   0, AV_OPT_TYPE_CONST, {.i64=AVCOL_RANGE_UNSPECIFIED},  0, 0, V, .unit = "range"},
@@ -507,7 +508,7 @@ static int config_props(AVFilterLink *link)
         }
         break;
     case AVMEDIA_TYPE_AUDIO:
-        if (!c->ch_layout.nb_channels) {
+        if (!c->ch_layout.nb_channels || c->ch_layout.order == AV_CHANNEL_ORDER_UNSPEC) {
             int ret = av_channel_layout_copy(&c->ch_layout, &link->ch_layout);
             if (ret < 0)
                 return ret;
