@@ -36,7 +36,7 @@ extern "C" {
 	#include <ExtLib/ffmpeg/libavcodec/h264dec.h>
 	#include <ExtLib/ffmpeg/libavcodec/ffv1.h>
 #undef class
-	#include <ExtLib/ffmpeg/libavcodec/vvc/vvcdec.h>
+	#include <ExtLib/ffmpeg/libavcodec/vvc/dec.h>
 }
 #pragma warning(pop)
 

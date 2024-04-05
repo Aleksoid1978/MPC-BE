@@ -569,20 +569,20 @@ SRCS_LC_B = \
 	libavcodec/xvididct.c \
 	libavcodec/zlib_wrapper.c \
 	\
-	libavcodec/vvc/vvcdec.c \
-	libavcodec/vvc/vvcdsp.c \
-	libavcodec/vvc/vvc_cabac.c \
-	libavcodec/vvc/vvc_ctu.c \
-	libavcodec/vvc/vvc_data.c \
-	libavcodec/vvc/vvc_filter.c \
-	libavcodec/vvc/vvc_inter.c \
-	libavcodec/vvc/vvc_intra.c \
-	libavcodec/vvc/vvc_intra_utils.c \
-	libavcodec/vvc/vvc_itx_1d.c \
-	libavcodec/vvc/vvc_mvs.c \
-	libavcodec/vvc/vvc_ps.c \
-	libavcodec/vvc/vvc_refs.c \
-	libavcodec/vvc/vvc_thread.c \
+	libavcodec/vvc/dec.c \
+	libavcodec/vvc/dsp.c \
+	libavcodec/vvc/cabac.c \
+	libavcodec/vvc/ctu.c \
+	libavcodec/vvc/data.c \
+	libavcodec/vvc/filter.c \
+	libavcodec/vvc/inter.c \
+	libavcodec/vvc/intra.c \
+	libavcodec/vvc/intra_utils.c \
+	libavcodec/vvc/itx_1d.c \
+	libavcodec/vvc/mvs.c \
+	libavcodec/vvc/ps.c \
+	libavcodec/vvc/refs.c \
+	libavcodec/vvc/thread.c \
 	\
 	libavcodec/x86/aacpsdsp_init.c \
 	libavcodec/x86/ac3dsp_init.c \
