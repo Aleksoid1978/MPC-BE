@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2022 see Authors.txt
+ * (C) 2013-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,7 +31,7 @@ public:
 private:
 	ULONGLONG SubtractTimes(const FILETIME& ftA, const FILETIME& ftB);
 	bool EnoughTimePassed();
-	inline bool IsFirstRun() const { return (m_dwLastRun == 0); }
+	inline bool IsFirstRun() const { return (m_LastRun == 0); }
 
 	//system total times
 	FILETIME m_ftPrevSysKernel = {};
@@ -42,7 +42,7 @@ private:
 	FILETIME m_ftPrevProcUser   = {};
 
 	short m_nCPUUsage = 0;
-	DWORD m_dwLastRun = 0;
+	ULONGLONG m_LastRun = 0;
 
 	volatile LONG m_lRunCount = 0;
 };

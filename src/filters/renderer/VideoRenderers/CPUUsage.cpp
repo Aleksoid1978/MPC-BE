@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2022 see Authors.txt
+ * (C) 2013-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -88,7 +88,7 @@ const short CCPUUsage::GetUsage()
 		m_ftPrevProcKernel	= ftProcKernel;
 		m_ftPrevProcUser	= ftProcUser;
 
-		m_dwLastRun = GetTickCount();
+		m_LastRun = GetTickCount64();
 
 		nCpuCopy = m_nCPUUsage;
 	}
@@ -112,6 +112,6 @@ ULONGLONG CCPUUsage::SubtractTimes(const FILETIME& ftA, const FILETIME& ftB)
 
 bool CCPUUsage::EnoughTimePassed()
 {
-	const DWORD minElapsedMS = 1000UL;
-	return (GetTickCount() - m_dwLastRun) >= minElapsedMS;
+	const ULONGLONG minElapsedMS = 1000;
+	return (GetTickCount64() - m_LastRun) >= minElapsedMS;
 }

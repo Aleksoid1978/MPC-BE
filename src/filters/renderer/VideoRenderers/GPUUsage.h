@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2020 see Authors.txt
+ * (C) 2013-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -112,7 +112,7 @@ public:
 private:
 	bool EnoughTimePassed();
 
-	DWORD         m_dwLastRun = 0;
+	ULONGLONG     m_LastRun   = 0;
 	volatile LONG m_lRunCount = 0;
 
 	GPUType m_GPUType = UNKNOWN_GPU;

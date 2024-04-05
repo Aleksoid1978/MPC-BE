@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2023 see Authors.txt
+ * (C) 2013-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -103,7 +103,7 @@ void CGPUUsage::Clean()
 	gpuNode = decodeNode = processingNode = -1;
 
 	m_statistic = {};
-	m_dwLastRun = 0;
+	m_LastRun   = 0;
 	m_lRunCount = 0;
 
 	gpuTimeStatistics.clear();
@@ -656,7 +656,7 @@ void CGPUUsage::GetUsage(statistic& gpu_statistic)
 		}
 
 		gpu_statistic = m_statistic;
-		m_dwLastRun = GetTickCount();
+		m_LastRun = GetTickCount64();
 	}
 
 	::InterlockedDecrement(&m_lRunCount);
@@ -664,6 +664,6 @@ void CGPUUsage::GetUsage(statistic& gpu_statistic)
 
 bool CGPUUsage::EnoughTimePassed()
 {
-	const DWORD minElapsedMS = 1000UL;
-	return (GetTickCount() - m_dwLastRun) >= minElapsedMS;
+	const ULONGLONG minElapsedMS = 1000;
+	return (GetTickCount64() - m_LastRun) >= minElapsedMS;
 }

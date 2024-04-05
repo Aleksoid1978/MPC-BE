@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2016 see Authors.txt
+ * (C) 2015-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,7 +38,7 @@ const size_t CMemUsage::GetUsage()
 
 		}
 
-		m_dwLastRun	= GetTickCount();
+		m_LastRun  = GetTickCount64();
 		szMemUsage = m_szMemUsage;
 	}
 
@@ -49,6 +49,6 @@ const size_t CMemUsage::GetUsage()
 
 const bool CMemUsage::EnoughTimePassed()
 {
-	const DWORD minElapsedMS = 1000UL;
-	return (GetTickCount() - m_dwLastRun) >= minElapsedMS;
+	const ULONGLONG minElapsedMS = 1000;
+	return (GetTickCount64() - m_LastRun) >= minElapsedMS;
 }

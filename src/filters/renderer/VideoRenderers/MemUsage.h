@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2016 see Authors.txt
+ * (C) 2015-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,7 +30,7 @@ private:
 	const bool EnoughTimePassed();
 
 	size_t m_szMemUsage = 0;
-	DWORD m_dwLastRun = 0;
+	ULONGLONG m_LastRun = 0;
 
 	volatile LONG m_lRunCount = 0;
 };
