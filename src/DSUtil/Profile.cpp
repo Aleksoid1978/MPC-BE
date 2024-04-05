@@ -94,14 +94,14 @@ void CProfile::InitIni()
 	}
 
 	// Don't reread mpc-be.ini if the cache needs to be flushed or it was accessed recently
-	const DWORD tick = GetTickCount();
-	if (m_bIniFirstInit && (m_bIniNeedFlush || tick - m_dwIniLastAccessTick < 100)) {
-		m_dwIniLastAccessTick = tick;
+	const ULONGLONG tick = GetTickCount64();
+	if (m_bIniFirstInit && (m_bIniNeedFlush || tick - m_IniLastAccessTick < 100u)) {
+		m_IniLastAccessTick = tick;
 		return;
 	}
 
 	m_bIniFirstInit = true;
-	m_dwIniLastAccessTick = tick;
+	m_IniLastAccessTick = tick;
 
 	if (!::PathFileExistsW(m_IniPath)) {
 		return;
@@ -171,7 +171,7 @@ void CProfile::InitIni()
 	fpStatus = fclose(fp);
 	ASSERT(fpStatus == 0);
 
-	m_dwIniLastAccessTick = GetTickCount(); // update the last access tick because reading the file can take a long time
+	m_IniLastAccessTick = GetTickCount64(); // update the last access tick because reading the file can take a long time
 }
 
 bool CProfile::StoreSettingsTo(const SettingsLocation newLocation)

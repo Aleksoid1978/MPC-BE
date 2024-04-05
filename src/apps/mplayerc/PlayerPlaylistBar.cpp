@@ -755,7 +755,7 @@ POSITION CPlaylist::Shuffle()
 			}
 		}
 
-		std::shuffle(a.begin(), a.end(), std::default_random_engine((unsigned)GetTickCount()));
+		std::shuffle(a.begin(), a.end(), std::default_random_engine((unsigned)GetTickCount64()));
 	}
 
 	return a[idx++];

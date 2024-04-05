@@ -1,5 +1,5 @@
 /*
- * (C) 2021-2023 see Authors.txt
+ * (C) 2021-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,8 +33,8 @@ FILE* CMpcLstFile::CheckOpenFileForRead(bool& valid)
 		return nullptr;
 	}
 
-	const DWORD tick = GetTickCount();
-	if (m_LastAccessTick && std::labs(tick - m_LastAccessTick) < 100) {
+	const ULONGLONG tick = GetTickCount64();
+	if (m_LastAccessTick && tick - m_LastAccessTick < 100u) {
 		valid = true;
 		return nullptr;
 	}
@@ -74,7 +74,7 @@ void CMpcLstFile::CloseFile(FILE*& pFile)
 {
 	int fpStatus = fclose(pFile);
 	ASSERT(fpStatus == 0);
-	m_LastAccessTick = GetTickCount();
+	m_LastAccessTick = GetTickCount64();
 	pFile = nullptr;
 }
 

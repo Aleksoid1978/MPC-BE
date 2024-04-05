@@ -1,5 +1,5 @@
 /*
- * (C) 2021-2023 see Authors.txt
+ * (C) 2021-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -74,7 +74,7 @@ struct SessionInfo {
 class CMpcLstFile
 {
 private:
-	DWORD m_LastAccessTick = 0;
+	ULONGLONG m_LastAccessTick = 0;
 
 protected:
 	std::mutex m_Mutex;

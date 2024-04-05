@@ -49,7 +49,7 @@ private:
 	std::map<CStringW, std::map<CStringW, CStringW, KeyCmp>, KeyCmp> m_ProfileMap;
 	bool  m_bIniFirstInit = false;
 	bool  m_bIniNeedFlush = false;
-	DWORD m_dwIniLastAccessTick = 0;
+	ULONGLONG m_IniLastAccessTick = 0;
 
 public:
 	CProfile();
