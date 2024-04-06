@@ -159,7 +159,7 @@ static inline spx_word32_t cheb_poly_eva(
     b1=16384;
     b0=x;
 
-    /* Evaluate Chebyshev series formulation usin g iterative approach  */
+    /* Evaluate Chebyshev series formulation using an iterative approach  */
     sum = ADD32(EXTEND32(coef[m]), EXTEND32(MULT16_16_P14(coef[m-1],x)));
     for(i=2;i<=m;i++)
     {

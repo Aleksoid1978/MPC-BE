@@ -363,7 +363,7 @@ int   update_target
       /*"erase" nbest list*/
       for (j=0;j<N;j++)
          ndist[j]=VERY_LARGE32;
-      /* This is not strictly necessary, but it provides an additonal safety
+      /* This is not strictly necessary, but it provides an additional safety
          to prevent crashes in case something goes wrong in the previous
          steps (e.g. NaNs) */
       for (j=0;j<N;j++)

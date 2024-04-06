@@ -74,6 +74,7 @@ Updated libraries:
 	Little-CMS git-lcms2.16-43-g4635588;
 	MediaInfo git-v24.03-g83b52779;
 	nanosvg git-93ce879;
+	Speex-1.2.1-20-g3693431;
 	rapidjson git-v1.1.0-748-g3f73edae;
 	ZenLib git-v0.4.41-12-g26b4aa1;
 	zlib 1.3.1.

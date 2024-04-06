@@ -40,7 +40,7 @@
 
 /*
   Note http://gcc.gnu.org/onlinedocs/gcc/Machine-Constraints.html
-  well tell you all the magic resgister constraints used below
+  well tell you all the magic register constraints used below
   for gcc in-line asm.
 */
 
@@ -102,7 +102,7 @@ static int lsp_quant(
 
 /*
   Note http://gcc.gnu.org/onlinedocs/gcc/Machine-Constraints.html
-  well tell you all the magic resgister constraints used below
+  well tell you all the magic register constraints used below
   for gcc in-line asm.
 */
 

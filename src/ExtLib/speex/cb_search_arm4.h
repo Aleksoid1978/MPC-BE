@@ -32,7 +32,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/* This optimization is temporaly disabled until it is fixed to account for the fact 
+/* This optimization is temporarily disabled until it is fixed to account for the fact
    that "r" is now a 16-bit array */
 #if 0
 #define OVERRIDE_COMPUTE_WEIGHTED_CODEBOOK

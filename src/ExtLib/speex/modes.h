@@ -87,7 +87,7 @@ typedef void (*innovation_quant_func)(spx_word16_t *, spx_coef_t *, spx_coef_t *
 /** Innovation unquantization function */
 typedef void (*innovation_unquant_func)(spx_sig_t *, const void *, int, SpeexBits*, char *, spx_uint32_t *);
 
-/** Description of a Speex sub-mode (wither narrowband or wideband */
+/** Description of a Speex sub-mode (either narrowband or wideband) */
 typedef struct SpeexSubmode {
    int     lbr_pitch;          /**< Set to -1 for "normal" modes, otherwise encode pitch using a global pitch and allowing a +- lbr_pitch variation (for low not-rates)*/
    int     forced_pitch_gain;  /**< Use the same (forced) pitch gain for all sub-frames */
