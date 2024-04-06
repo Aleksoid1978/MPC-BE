@@ -71,7 +71,7 @@ Updated libraries:
 	dav1d git-1.4.1-14-ge27b451;
 	fdk-aac git-v2.0.3;
 	ffmpeg git-n7.1-dev-220-gd307aca184;
-	Little-CMS git-lcms2.16-41-gfcf6792;
+	Little-CMS git-lcms2.16-43-g4635588;
 	MediaInfo git-v24.03-g83b52779;
 	nanosvg git-93ce879;
 	rapidjson git-v1.1.0-748-g3f73edae;

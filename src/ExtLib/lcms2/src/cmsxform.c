@@ -1131,7 +1131,15 @@ cmsHTRANSFORM CMSEXPORT cmsCreateExtendedTransform(cmsContext ContextID,
     cmsColorSpaceSignature EntryColorSpace;
     cmsColorSpaceSignature ExitColorSpace;
     cmsPipeline* Lut;
-    cmsUInt32Number LastIntent = Intents[nProfiles-1];
+    cmsUInt32Number LastIntent;
+
+    // Safeguard
+    if (nProfiles <= 0 || nProfiles > 255) {
+        cmsSignalError(ContextID, cmsERROR_RANGE, "Wrong number of profiles. 1..255 expected, %d found.", nProfiles);
+        return NULL;
+    }
+
+    LastIntent = Intents[nProfiles - 1];
 
     // If it is a fake transform
     if (dwFlags & cmsFLAGS_NULLTRANSFORM)

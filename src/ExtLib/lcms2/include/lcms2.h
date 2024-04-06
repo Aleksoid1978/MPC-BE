@@ -23,7 +23,7 @@
 //
 //---------------------------------------------------------------------------------
 //
-// Version 2.16
+// Version 2.17alpha0
 //
 
 #ifndef _lcms2_H
@@ -84,7 +84,7 @@ extern "C" {
 #endif
 
 // Version/release
-#define LCMS_VERSION        2160
+#define LCMS_VERSION        2170
 
 // I will give the chance of redefining basic types for compilers that are not fully C99 compliant
 #ifndef CMS_BASIC_TYPES_ALREADY_DEFINED
@@ -248,7 +248,7 @@ typedef int                  cmsBool;
 #     define CMSAPI
 #  endif
 #else  // not Windows
-#  ifdef HAVE_FUNC_ATTRIBUTE_VISIBILITY
+#  if defined(HAVE_FUNC_ATTRIBUTE_VISIBILITY) && !defined(CMS_NO_VISIBILITY)
 #     define CMSEXPORT
 #     define CMSAPI    __attribute__((visibility("default")))
 #  else
