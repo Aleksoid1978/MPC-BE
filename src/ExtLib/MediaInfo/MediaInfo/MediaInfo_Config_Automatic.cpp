@@ -190,6 +190,7 @@ void MediaInfo_Config_DefaultLanguage (Translation &Info)
     "7.1ch;7.1\n"
     "About;About\n"
     "About_Hint;How to contact me and find last version\n"
+    "AC3_metadata;AC-3 metadata\n"
     "Accompaniment;Accompaniment\n"
     "Active_DisplayAspectRatio;Active display aspect ratio\n"
     "Active_Height;Active height\n"

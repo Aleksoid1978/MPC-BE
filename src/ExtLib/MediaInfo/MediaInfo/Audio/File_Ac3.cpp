@@ -537,7 +537,7 @@ int CRC16_Init(int16u *Table, int16u Polynomial)
 }
 
 //---------------------------------------------------------------------------
-const float64 AC3_dynrng[]=
+extern const float64 AC3_dynrng[]=
 {
       6.02,
      12.04,
@@ -550,7 +550,7 @@ const float64 AC3_dynrng[]=
 };
 
 //---------------------------------------------------------------------------
-const float64 AC3_compr[]=
+extern const float64 AC3_compr[]=
 {
       6.02,
      12.04,
@@ -1007,6 +1007,8 @@ File_Ac3::File_Ac3()
             acmod_Max[Pos][Pos2]=(int8u)-1;
             lfeon_Max[Pos][Pos2]=false;
             bsmod_Max[Pos][Pos2]=0;
+            cmixlev_Max[Pos][Pos2]=(int8u)-1;
+            surmixlev_Max[Pos][Pos2]=(int8u)-1;
             dsurmod_Max[Pos][Pos2]=0;
             chanmape_Max[Pos][Pos2]=false;
             chanmap_Max[Pos][Pos2]=0;
@@ -1468,6 +1470,16 @@ void File_Ac3::Streams_Fill()
     Fill(Stream_General, 0, General_Format, Retrieve(Stream_Audio, 0, Audio_Format), true);
     Fill(Stream_General, 0, General_Format_Profile, Retrieve(Stream_Audio, 0, Audio_Format_Profile));
     Fill(Stream_General, 0, General_Format_Commercial_IfAny, Retrieve(Stream_Audio, 0, Audio_Format_Commercial_IfAny));
+
+    // Other metadata
+    if (cmixlev_Max[0][0]<=2)
+    {
+        Fill(Stream_Audio, 0, "AC3_metadata cmixlev/String", Ztring::ToZtring(-3 - ((float)cmixlev_Max[0][0]) * 1.5, 1).To_UTF8() + " dB");
+    }
+    if (surmixlev_Max[0][0]<=2)
+    {
+        Fill(Stream_Audio, 0, "AC3_metadata surmixlev/String", (surmixlev_Max[0][0]==2?string("-inf"):to_string(-3 - (int)surmixlev_Max[0][0] * 3)) + " dB");
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -2271,7 +2283,7 @@ void File_Ac3::Core_Frame()
 
     //Parsing
     int16u frmsiz=0, chanmap=0;
-    int8u  dialnorm=(int8u)-1, dialnorm2=(int8u)-1, compr=(int8u)-1, compr2=(int8u)-1, dynrng=(int8u)-1, dynrng2=(int8u)-1;
+    int8u  dialnorm=(int8u)-1, dialnorm2=(int8u)-1, compr=(int8u)-1, compr2=(int8u)-1, dynrng=(int8u)-1, dynrng2=(int8u)-1, cmixlev=(int8u)-1, surmixlev=(int8u)-1;
     int8u  strmtyp=0, substreamid=0, acmod=0, bsmod=0, dsurmod=0;
     bool   compre=false, compr2e=false, dynrnge=false, dynrng2e=false;
     bool   lfeon=false, chanmape=false;
@@ -2292,9 +2304,9 @@ void File_Ac3::Core_Frame()
             Get_S1 (3, bsmod,                                       "bsmod - Bit Stream Mode"); Param_Info1(AC3_Mode[bsmod]);
             Get_S1 (3, acmod,                                       "acmod - Audio Coding Mode"); Param_Info1(AC3_ChannelPositions[acmod]);
             if ((acmod&1) && acmod!=1) //central present
-                Skip_S1(2,                                          "cmixlev - Center Mix Level");
+                Get_S1 (2, cmixlev,                                 "cmixlev - Center Mix Level");
             if (acmod&4) //back present
-                Skip_S1(2,                                          "surmixlev - Surround Mix Level");
+                Get_S1 (2, surmixlev,                               "surmixlev - Surround Mix Level");
             if (acmod==2)
                 Get_S1 (2, dsurmod,                                 "dsurmod - Dolby Surround Mode"); Param_Info1(AC3_Surround[dsurmod]);
             Get_SB (   lfeon,                                       "lfeon - Low Frequency Effects");
@@ -3799,6 +3811,8 @@ void File_Ac3::Core_Frame()
             acmod_Max[substreamid_Independant_Current][strmtyp+substreamid]=acmod;
             lfeon_Max[substreamid_Independant_Current][strmtyp+substreamid]=lfeon;
             bsmod_Max[substreamid_Independant_Current][strmtyp+substreamid]=bsmod;
+            cmixlev_Max[substreamid_Independant_Current][strmtyp+substreamid]=cmixlev;
+            surmixlev_Max[substreamid_Independant_Current][strmtyp+substreamid]=surmixlev;
             dsurmod_Max[substreamid_Independant_Current][strmtyp+substreamid]=dsurmod;
             chanmape_Max[substreamid_Independant_Current][strmtyp+substreamid]=chanmape;
             chanmap_Max[substreamid_Independant_Current][strmtyp+substreamid]=chanmap;

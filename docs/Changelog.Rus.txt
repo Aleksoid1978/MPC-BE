@@ -72,7 +72,7 @@ MPC Video Renderer 0.7.3 включен в инсталлятор.
 	fdk-aac git-v2.0.3;
 	ffmpeg git-n7.1-dev-220-gd307aca184;
 	Little-CMS git-lcms2.16-41-gfcf6792;
-	MediaInfo git-v24.01-19-gb7bb56e8d;
+	MediaInfo git-v24.03-g83b52779;
 	nanosvg git-93ce879;
 	rapidjson git-v1.1.0-748-g3f73edae;
 	ZenLib git-v0.4.41-12-g26b4aa1;

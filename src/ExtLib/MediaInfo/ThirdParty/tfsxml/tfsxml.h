@@ -150,6 +150,16 @@ void tfsxml_decode(void* s, const tfsxml_string* v, void (*func)(void* func_s, c
  */
 int tfsxml_strcmp_charp(tfsxml_string a, const char* b);
 
+/** Compare two strings
+ *
+ * @param a  string to compare
+ * @param b  string to compare
+ * @param n  maximum number of characters to compare
+ *
+ * @note similar to C strncmp function
+ */
+int tfsxml_strncmp_charp(tfsxml_string a, const char* b, unsigned n);
+
 /** Locate substring
  *
  * @param a  string to be scanned

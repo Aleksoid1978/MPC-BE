@@ -41,7 +41,7 @@ public :
 private :
     //Streams management
     void Streams_Fill();
-    void Streams_Fill_PerProgram();
+    void Streams_Fill_PerProgram(size_t program);
     void Streams_Finish();
 
     //Buffer - Synchro

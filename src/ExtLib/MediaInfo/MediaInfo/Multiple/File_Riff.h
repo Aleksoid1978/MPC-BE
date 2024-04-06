@@ -135,6 +135,12 @@ private :
     int64u Interleaved1_10;
 
     //Temp
+    struct chunk_size_64
+    {
+        int32u                  ChunkId;
+        int64u                  Size;
+    };
+    std::vector<chunk_size_64> DS64_Table;
     Ztring INFO_ISMP;
     Ztring Tdat_tc_A;
     Ztring Tdat_tc_O;

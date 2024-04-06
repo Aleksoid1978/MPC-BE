@@ -1777,7 +1777,7 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, const char* Par
 
     if (StreamKind==Stream_Other && !strcmp(Parameter, "Codec"))
         return; // "Codec" does not exist in "Other"
-    
+
     //Handling of unknown parameters
     ZtringListList& Stream_More_Item = (*Stream_More)[StreamKind][StreamPos];
     const Ztring Parameter_ISO = Ztring().From_ISO_8859_1(Parameter);
@@ -1799,33 +1799,52 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, const char* Par
             Ztring ToSearch=Parameter_ISO.substr(0, Space);
             for (size_t i=0; i<Stream_More_Item.size(); i++)
             {
-                if (Stream_More_Item(i, Info_Name) == Parameter_ISO)
+                const auto& Item=Stream_More_Item[i][Info_Name];
+                if (Item==Parameter_ISO)
                 {
                     LastFound=(size_t)-1;
                     break;
                 }
-                if (Stream_More_Item(i, Info_Name).rfind(ToSearch, ToSearch.size())==0 && (Stream_More_Item(i, Info_Name).size()==ToSearch.size() || Stream_More_Item(i, Info_Name)[ToSearch.size()]==__T(' ')))
+                if (Item.rfind(ToSearch, 0)==0 && (Item.size()==ToSearch.size() || Item[ToSearch.size()]==__T(' ')))
                     LastFound=i;
             }
             if (LastFound!=(size_t)-1)
             {
-                ZtringList ToInsert;
-                ToInsert(Info_Name)=Parameter_ISO;
-                Stream_More_Item.insert(Stream_More_Item.begin()+LastFound+1, ToInsert);
+                auto& Line=*Stream_More_Item.insert(Stream_More_Item.begin()+LastFound+1, ZtringList());
+                Line.resize(max(max(Info_Name, Info_Text),max(Info_Options,Info_Name_Text))+1);
+                Line[Info_Name]=Parameter_ISO;
+                Line[Info_Text]=Value;
+                Line[Info_Options]=__T("Y NT");
+                Line[Info_Name_Text]=MediaInfoLib::Config.Language_Get(Parameter_Local);
+                return;
             }
         }
 
-        Ztring &Target= Stream_More_Item(Parameter_ISO, Info_Text);
-        if (Target.empty() || Replace)
+        auto TargetFind=[&Parameter_ISO](const ZtringList& Line) { return !Line.empty() && Line[0] == Parameter_ISO; };
+        auto Target=find_if(Stream_More_Item.begin(), Stream_More_Item.end(), TargetFind);
+        if (Target==Stream_More_Item.end())
         {
-            Target=Value; //First value
-            Stream_More_Item(Parameter_ISO, Info_Name_Text)=MediaInfoLib::Config.Language_Get(Parameter_Local);
-            Fill_SetOptions(StreamKind, StreamPos, Parameter, "Y NT");
+            size_t Pos=Stream_More_Item.size();
+            Stream_More_Item.resize(Pos+1);
+            auto& Line=Stream_More_Item.back();
+            Line.resize(max(max(Info_Name, Info_Text),max(Info_Options,Info_Name_Text))+1);
+            Line[Info_Name]=Parameter_ISO;
+            Line[Info_Text]=Value;
+            Line[Info_Options]=__T("Y NT");
+            Line[Info_Name_Text]=MediaInfoLib::Config.Language_Get(Parameter_Local);
         }
         else
         {
-            Target+=MediaInfoLib::Config.TagSeparator_Get();
-            Target+=Value;
+            auto& Item=(*Target)(Info_Text);
+            if (Item.empty() || Replace)
+            {
+                Item=Value;
+            }
+            else
+            {
+                Item+=MediaInfoLib::Config.TagSeparator_Get();
+                Item+=Value;
+            }
         }
     }
     Fill(StreamKind, StreamPos, (size_t)General_Count, Count_Get(StreamKind, StreamPos), 10, true);

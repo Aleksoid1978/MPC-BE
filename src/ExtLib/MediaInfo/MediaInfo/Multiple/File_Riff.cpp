@@ -1048,6 +1048,16 @@ void File_Riff::Header_Parse()
             Size_Complete=WAVE_data_Size;
             Param_Info1(Size_Complete);
         }
+        else if (Element_Level==3) // Only the chunks directly under the main RIFF chunk
+        {
+            for (const chunk_size_64& DS64_Table_Temp : DS64_Table)
+            {
+                if (DS64_Table_Temp.ChunkId==Name) {
+                    Size_Complete=DS64_Table_Temp.Size;
+                    Param_Info1(Size_Complete);
+                }
+            }
+        }
     }
 
     //Testing malformed (not word aligned)

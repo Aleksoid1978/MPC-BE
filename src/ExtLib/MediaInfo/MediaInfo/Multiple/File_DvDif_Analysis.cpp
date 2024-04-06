@@ -1892,7 +1892,7 @@ void File_DvDif::Errors_Stats_Update()
             memset(BlockStatus, 0, Event1.BlockStatus_Count);
         #endif //MEDIAINFO_EVENTS
         if (MoreData)
-            delete (MoreData-sizeof(size_t));
+            delete[] (MoreData-sizeof(size_t));
     }
 
     //Speed_TimeCode_Current

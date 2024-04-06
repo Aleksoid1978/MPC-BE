@@ -154,6 +154,8 @@ private :
     int8u  bsid_Max;
     int8u  bsmod_Max[8][9];
     int8u  acmod_Max[8][9];
+    int8u  cmixlev_Max[8][9];
+    int8u  surmixlev_Max[8][9];
     int8u  dsurmod_Max[8][9];
     int8u  numblkscod;
     int8u  dsurexmod;
