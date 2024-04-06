@@ -23,7 +23,6 @@
 	#define HAVE_SSE42 1
 	#define HAVE_SSSE3 1
 	#define HAVE_XOP 1
-	#define HAVE_CPUNOP 0
 	#define HAVE_I686 1
 	#define HAVE_AESNI_EXTERNAL 1
 	#define HAVE_AMD3DNOW_EXTERNAL 1
@@ -43,7 +42,6 @@
 	#define HAVE_SSE42_EXTERNAL 1
 	#define HAVE_SSSE3_EXTERNAL 1
 	#define HAVE_XOP_EXTERNAL 1
-	#define HAVE_CPUNOP_EXTERNAL 0
 	#define HAVE_I686_EXTERNAL 0
 	#define HAVE_AESNI_INLINE 1
 	#define HAVE_AMD3DNOW_INLINE 1
@@ -63,7 +61,6 @@
 	#define HAVE_SSE42_INLINE 1
 	#define HAVE_SSSE3_INLINE 1
 	#define HAVE_XOP_INLINE 1
-	#define HAVE_CPUNOP_INLINE 0
 	#define HAVE_I686_INLINE 0
 
 	#ifdef ARCH_X86_64
@@ -85,9 +82,6 @@
 		#define CONFIG_PIC 0
 	#endif
 
-	#ifndef av_restrict
-	#define av_restrict restrict
-	#endif
 #else
 	#define HAVE_INLINE_ASM 0
 	#define HAVE_AESNI 0
@@ -108,7 +102,6 @@
 	#define HAVE_SSE42 0
 	#define HAVE_SSSE3 0
 	#define HAVE_XOP 0
-	#define HAVE_CPUNOP 0
 	#define HAVE_I686 0
 	#define HAVE_AESNI_EXTERNAL 0
 	#define HAVE_AMD3DNOW_EXTERNAL 0
@@ -128,7 +121,6 @@
 	#define HAVE_SSE42_EXTERNAL 0
 	#define HAVE_SSSE3_EXTERNAL 0
 	#define HAVE_XOP_EXTERNAL 0
-	#define HAVE_CPUNOP_EXTERNAL 0
 	#define HAVE_I686_EXTERNAL 0
 	#define HAVE_AESNI_INLINE 0
 	#define HAVE_AMD3DNOW_INLINE 0
@@ -148,7 +140,6 @@
 	#define HAVE_SSE42_INLINE 0
 	#define HAVE_SSSE3_INLINE 0
 	#define HAVE_XOP_INLINE 0
-	#define HAVE_CPUNOP_INLINE 0
 	#define HAVE_I686_INLINE 0
 	#define ARCH_X86 0
 	#define ARCH_X86_32 0
