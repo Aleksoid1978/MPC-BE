@@ -1,6 +1,6 @@
 ﻿This file includes only a short list of the changes between Media Player Classic - BE's versions.
 
-1.6.11.x dev
+1.7.0 - 2024-04-07
 =============================
 Build in Visual Studio 2017 is no longer supported.
 The names of methods in the IExFilterConfig interface have been changed without losing compatibility.
