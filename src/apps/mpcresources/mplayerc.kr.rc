@@ -155,7 +155,7 @@ BEGIN
     PUSHBUTTON      "사전 설정",IDC_BUTTON1,9,166,59,14
     COMBOBOX        IDC_COMBO1,10,184,58,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_EDIT1,72,184,214,14,ES_AUTOHSCROLL
-    GROUPBOX        "출력 샘플 형식 :",IDC_STATIC,5,206,286,29
+    GROUPBOX        "출력 포본화 형식 :",IDC_STATIC,5,206,286,29
     CONTROL         "Int16",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,218,32,9
     CONTROL         "Int24",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,52,218,32,9
     CONTROL         "Int32",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,94,218,32,9
@@ -367,7 +367,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,160,17,32,12,ES_CENTER | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN3,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,180,17,12,12
     LTEXT           "%",IDC_STATIC4,196,19,8,8
-    GROUPBOX        "딜레이 설정",IDC_STATIC,212,5,79,28
+    GROUPBOX        "지연 설정",IDC_STATIC,212,5,79,28
     EDITTEXT        IDC_EDIT4,217,17,40,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "밀리초",IDC_STATIC,261,19,25,11
     GROUPBOX        "텍스쳐 설정(파일을 다시 열어야 함)",IDC_STATIC,5,37,286,68
@@ -644,7 +644,7 @@ EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "경고"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "MPC-BE가 파일 렌더링에 실패했습니다. 추가적인 코덱이나 필터 설치가 필요할 수 있습니다.",IDC_STATIC1,5,5,286,18
+    LTEXT           "MPC-BE가 파일 생성에 실패했습니다. 추가적인 코덱이나 필터 설치가 필요할 수 있습니다.",IDC_STATIC1,5,5,286,18
     LTEXT           "다음 핀이 연결 가능한 필터를 찾는 데 실패 :",IDC_STATIC2,5,27,286,8
     COMBOBOX        IDC_COMBO1,5,39,286,87,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_EDIT1,5,56,286,140,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
@@ -1119,7 +1119,7 @@ BEGIN
     DEFPUSHBUTTON   "저장",ID_SAVE,298,227,50,14
     LTEXT           "F",IDC_STATIC,375,37,8,8
     LTEXT           "Q",IDC_STATIC,389,37,8,8
-    CONTROL         "오프셋 사용",IDC_CHECK_OFFSET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,21,75,9
+    CONTROL         "편차 사용",IDC_CHECK_OFFSET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,21,75,9
     EDITTEXT        IDC_OFFSET,211,20,40,12,ES_AUTOHSCROLL
 END
 
@@ -1163,7 +1163,7 @@ BEGIN
     LTEXT           "주사율 조정 :",IDC_STATIC5,20,93,85,8
     EDITTEXT        IDC_CYCLEDELTA,109,91,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,123,278,1
-    LTEXT           "목표 싱크 오프셋 :",IDC_STATIC3,10,129,100,8
+    LTEXT           "목표 싱크 편차 :",IDC_STATIC3,10,129,100,8
     EDITTEXT        IDC_TARGETSYNCOFFSET,114,127,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
     LTEXT           "밀리초",IDC_STATIC4,158,129,24,8
     LTEXT           "한계 :",IDC_STATIC9,10,143,86,8
@@ -1189,7 +1189,7 @@ BEGIN
     LTEXT           "전체 화면 모니터",IDC_STATIC,13,66,238,8
     COMBOBOX        IDC_COMBO1,13,75,273,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "",IDC_STATIC,5,92,287,158
-    CONTROL         "전체 화면 모니터 모드 자동전환 사용",IDC_CHECK2,
+    CONTROL         "전체 화면 모니터 모드 자동 전환 사용",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,92,267,9
     CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,10,103,226,112
     PUSHBUTTON      "추가",IDC_BUTTON1,240,103,48,16
@@ -2274,7 +2274,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_STATSBAR_SYNC_OFFSET "동기화 오프셋"
+    IDS_STATSBAR_SYNC_OFFSET "동기화 편차"
     IDS_STATSBAR_SYNC_OFFSET_FORMAT "avg : %d ms, dev : %d ms"
     IDS_STATSBAR_JITTER     "지터"
     IDS_STATSBAR_BITRATE    "비트레이트"
@@ -2390,7 +2390,7 @@ BEGIN
     IDS_SUBRESYNC_CLN_CELL_ID "셀 ID"
     IDS_SUBRESYNC_CLN_FORCED "강제"
     IDS_SUBRESYNC_CLN_TEXT  "텍스트"
-    IDS_SUBRESYNC_CLN_STYLE "스타일"
+    IDS_SUBRESYNC_CLN_STYLE "형태"
     IDS_SUBRESYNC_CLN_FONT  "글꼴"
 END
 
@@ -2462,7 +2462,7 @@ END
 STRINGTABLE
 BEGIN
     IDD_PPAGEACCELTBL       "재생기::단축키"
-    IDD_PPAGESUBSTYLE       "자막::스타일"
+    IDD_PPAGESUBSTYLE       "자막::형태"
     IDD_PPAGEMOUSE          "재생기::마우스"
     IDD_PPAGEINTERNALFILTERS "내장 필터"
     IDD_PPAGELOGO           "재생기::로고"
@@ -2486,7 +2486,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDD_PPAGESUBRENDERING   "자막::렌더링"
+    IDD_PPAGESUBRENDERING   "자막::생성"
 END
 
 STRINGTABLE
@@ -2546,7 +2546,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_D3D9DEVICE_CHECK    "렌더링을 위한 그래픽 어댑터를 지정합니다. 경고 : 디스플레이에서 가능한 잘못된 작업이 다른 어댑터에 연결되어 있습니다."
+    IDC_D3D9DEVICE_CHECK    "생성을 위한 그래픽 어댑터를 지정합니다. 경고 : 디스플레이에서 가능한 잘못된 작업이 다른 어댑터에 연결되어 있습니다."
 END
 
 STRINGTABLE
@@ -2773,8 +2773,8 @@ STRINGTABLE
 BEGIN
     IDS_OSD_RS_FT_CORRECTION_ON "프레임 시간 수정 : 켬"
     IDS_OSD_RS_FT_CORRECTION_OFF "프레임 시간 수정 : 끔"
-    IDS_OSD_RS_TARGET_VSYNC_OFFSET "목표 수직 동기화 오프셋 : %.1f"
-    IDS_OSD_RS_VSYNC_OFFSET "수직 동기화 오프셋 : %d"
+    IDS_OSD_RS_TARGET_VSYNC_OFFSET "목표 수직 동기화 편차 : %.1f"
+    IDS_OSD_RS_VSYNC_OFFSET "수직 동기화 편차 : %d"
     IDS_OSD_SPEED           "속도 : %sx"
     IDS_OSD_THUMBS_SAVED    "썸네일이 성공적으로 저장되었습니다."
     IDS_MENU_VIDEO_STREAM   "비디오 스트림(&T)"
@@ -3146,13 +3146,13 @@ BEGIN
     IDS_MAINFRM_122         "(음성 해설 2)"
     IDS_AG_ENABLED          "사용"
     IDS_AG_ANGLE            "기울기 %d"
-    IDS_AG_VSYNCOFFSET_INCREASE "수직 동기화 오프셋 증가"
+    IDS_AG_VSYNCOFFSET_INCREASE "수직 동기화 편차 증가"
 END
 
 STRINGTABLE
 BEGIN
     IDS_AG_DISABLED         "사용하지 않음"
-    IDS_AG_VSYNCOFFSET_DECREASE "수직 동기화 오프셋 감소"
+    IDS_AG_VSYNCOFFSET_DECREASE "수직 동기화 편차 감소"
     IDS_MAINFRM_132         "경고(CMainFrame::SeekTo) : 캡처모드에서 탐색"
     IDS_AG_REMOVING         "제거 : "
     IDS_MAINFRM_134         "경고 : CMainFrame::CloseMedia() 두 번 이상 호출됨\n"
@@ -3189,12 +3189,12 @@ BEGIN
     IDS_CMD_USAGE           "사용법 : mpc-be.exe ""경로명"" [스위치]\n\n""경로명""\t불러올 파일이나 디렉터리.(와일드 카드\n\t\t사용 가능)"
     IDS_CMD_HELP            "/help /h /?\t명령입력 스위치 옵션을 출력"
     IDS_CMD_DUB             "/dub ""더빙파일""\t추가적인 오디오 파일"
-    IDS_CMD_DUBDELAY        "/dubdelay ""파일""\tXXms 딜레이된 추가적인 오디오 파일(\n\t\t파일이 다음을 포함 ""...DELAY XXms..."")"
+    IDS_CMD_DUBDELAY        "/dubdelay ""파일""\tXXms 지연된 추가적인 오디오 파일(\n\t\t파일이 다음을 포함 ""...DELAY XXms..."")"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_D3DFS           "/d3dfs\t\tD3D 전체 화면 모드에서 렌더링"
+    IDS_CMD_D3DFS           "/d3dfs\t\tD3D 전체 화면 모드에서 생성"
     IDS_CMD_SUB             "/sub ""자막 파일""\t추가적인 자막 파일"
     IDS_CMD_FILTER          "/filter ""필터 파일""\tDLL파일에서 다이렉트쇼 필터를 불러옴(와일드카드사용 가능)"
     IDS_CMD_DVD             "/dvd\t\tdvd재생모드, ""경로 이름"" 을 지정했을 때, DVD 폴더를 의미함(옵션)"
