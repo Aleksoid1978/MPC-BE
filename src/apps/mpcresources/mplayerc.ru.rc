@@ -3223,7 +3223,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tВоспроизводить с позиции hh:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tУстановить фиксированный размер окна"
     IDS_CMD_MONITOR         "/monitor N\tЗапускаться на мониторе N, где N\n\t\tотсчитывается с 1"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tИспользовать аудиорендер N, где N\n\t\tотсчитывается с 1 (смотрите настройки\n\t\t""Аудио"")"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tИспользовать аудиорендер N, где N\n\t\tотсчитывается с 0 (смотрите настройки\n\t\t""Аудио"")"
     IDS_CMD_CLIPBOARD       "/clipboard\t\tОткрыть пути/ссылки из буфера обмена"
     IDS_CMD_RESET           "/reset\t\tВостановить настройки по умолчанию"
 END
