@@ -43,41 +43,42 @@ constexpr auto EXTENDED_PATH_PREFIX = LR"(\\?\)";
 #define CS_STATSBAR		(1 << 3)
 #define CS_STATUSBAR	(1 << 4)
 
-#define CLSW_NONE				0
-#define CLSW_OPEN				(1u << 0)
-#define CLSW_PLAY				(1u << 1)
-#define CLSW_CLOSE				(1u << 2)
-#define CLSW_STANDBY			(1u << 3)
-#define CLSW_HIBERNATE			(1u << 4)
-#define CLSW_SHUTDOWN			(1u << 5)
-#define CLSW_LOGOFF				(1u << 6)
-#define CLSW_LOCK				(1u << 7)
-#define CLSW_AFTERPLAYBACK_MASK	(CLSW_CLOSE|CLSW_STANDBY|CLSW_SHUTDOWN|CLSW_HIBERNATE|CLSW_LOGOFF|CLSW_LOCK)
-#define CLSW_FULLSCREEN			(1u << 8)
-#define CLSW_NEW				(1u << 9)
-#define CLSW_HELP				(1u << 10)
-#define CLSW_DVD				(1u << 11)
-#define CLSW_CD					(1u << 12)
-#define CLSW_ADD				(1u << 13)
-#define CLSW_MINIMIZED			(1u << 14)
-#define CLSW_CLIPBOARD			(1u << 15)
+constexpr auto CLSW_NONE               = 0ull;
+constexpr auto CLSW_OPEN               = 1ull;
+constexpr auto CLSW_PLAY               = (CLSW_OPEN << 1);
+constexpr auto CLSW_CLOSE              = (CLSW_PLAY << 1);
+constexpr auto CLSW_STANDBY            = (CLSW_CLOSE << 1);
+constexpr auto CLSW_HIBERNATE          = (CLSW_STANDBY << 1);
+constexpr auto CLSW_SHUTDOWN           = (CLSW_HIBERNATE << 1);
+constexpr auto CLSW_LOGOFF             = (CLSW_SHUTDOWN << 1);
+constexpr auto CLSW_LOCK               = (CLSW_LOGOFF << 1);
+constexpr auto CLSW_AFTERPLAYBACK_MASK = (CLSW_CLOSE | CLSW_STANDBY | CLSW_SHUTDOWN | CLSW_HIBERNATE | CLSW_LOGOFF | CLSW_LOCK);
+constexpr auto CLSW_FULLSCREEN         = (CLSW_LOCK << 1);
+constexpr auto CLSW_NEW                = (CLSW_FULLSCREEN << 1);
+constexpr auto CLSW_HELP               = (CLSW_NEW << 1);
+constexpr auto CLSW_DVD                = (CLSW_HELP << 1);
+constexpr auto CLSW_CD                 = (CLSW_DVD << 1);
+constexpr auto CLSW_ADD                = (CLSW_CD << 1);
+constexpr auto CLSW_MINIMIZED          = (CLSW_ADD << 1);
+constexpr auto CLSW_CLIPBOARD          = (CLSW_MINIMIZED << 1);
 
-#define CLSW_REGEXTVID			(1u << 16)
-#define CLSW_REGEXTAUD			(1u << 17)
-#define CLSW_REGEXTPL			(1u << 18)
-#define CLSW_UNREGEXT			(1u << 19)
+constexpr auto CLSW_REGEXTVID          = (CLSW_CLIPBOARD << 1);
+constexpr auto CLSW_REGEXTAUD          = (CLSW_REGEXTVID << 1);
+constexpr auto CLSW_REGEXTPL           = (CLSW_REGEXTAUD << 1);
+constexpr auto CLSW_UNREGEXT           = (CLSW_REGEXTPL << 1);
 
-#define CLSW_STARTVALID			(1u << 21)
-#define CLSW_NOFOCUS			(1u << 22)
-#define CLSW_FIXEDSIZE			(1u << 23)
-#define CLSW_MONITOR			(1u << 24)
-#define CLSW_D3DFULLSCREEN		(1u << 25)
-#define CLSW_ADMINOPTION		(1u << 26)
-#define CLSW_SLAVE				(1u << 27)
-#define CLSW_AUDIORENDERER		(1u << 28)
-#define CLSW_RESET				(1u << 29)
-#define CLSW_RANDOMIZE			(1u << 30)
-#define CLSW_UNRECOGNIZEDSWITCH	(1u << 31)
+constexpr auto CLSW_STARTVALID         = (CLSW_UNREGEXT << 1);
+constexpr auto CLSW_NOFOCUS            = (CLSW_STARTVALID << 1);
+constexpr auto CLSW_FIXEDSIZE          = (CLSW_NOFOCUS << 1);
+constexpr auto CLSW_MONITOR            = (CLSW_FIXEDSIZE << 1);
+constexpr auto CLSW_D3DFULLSCREEN      = (CLSW_MONITOR << 1);
+constexpr auto CLSW_ADMINOPTION        = (CLSW_D3DFULLSCREEN << 1);
+constexpr auto CLSW_SLAVE              = (CLSW_ADMINOPTION << 1);
+constexpr auto CLSW_AUDIORENDERER      = (CLSW_SLAVE << 1);
+constexpr auto CLSW_RESET              = (CLSW_AUDIORENDERER << 1);
+constexpr auto CLSW_RANDOMIZE          = (CLSW_RESET << 1);
+constexpr auto CLSW_VOLUME             = (CLSW_RANDOMIZE << 1);
+constexpr auto CLSW_UNRECOGNIZEDSWITCH = (CLSW_VOLUME << 1);
 
 #define APP_RECENTFILES_MIN		5
 #define APP_RECENTFILES_DEF		20
@@ -450,7 +451,7 @@ public:
 	bool bResetSettings;
 
 	// cmdline params
-	UINT nCLSwitches;
+	UINT64 nCLSwitches;
 	std::list<CString>	slFilters;
 	std::list<CString>	slFiles, slDubs;
 	CSubtitleItemList	slSubs;
@@ -875,6 +876,8 @@ public:
 
 	void			LoadFormats(const bool bLoadLanguage);
 	void			SaveFormats();
+
+	int				nCmdVolume;
 
 private :
 	LPCWSTR			SrcFiltersKeys[SRC_COUNT];

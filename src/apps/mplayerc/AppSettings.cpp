@@ -834,6 +834,8 @@ void CAppSettings::ResetSettings()
 
 	ZeroMemory(HistoryColWidths, sizeof(HistoryColWidths));
 
+	nCmdVolume = 0;
+
 	strTabs.Empty();
 }
 
@@ -2367,6 +2369,16 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 			}
 			else if (sw == L"clipboard") {
 				nCLSwitches |= CLSW_CLIPBOARD;
+			}
+			else if (sw == L"volume" && next_available) {
+				auto volumeValue = _wtoi(*it++);
+				nCLSwitches |= CLSW_CLIPBOARD;
+				if (volumeValue >= 0 && volumeValue <= 100) {
+					nCmdVolume = volumeValue;
+					nCLSwitches |= CLSW_VOLUME;
+				} else {
+					nCLSwitches |= CLSW_UNRECOGNIZEDSWITCH;
+				}
 			}
 			else {
 				nCLSwitches |= CLSW_HELP|CLSW_UNRECOGNIZEDSWITCH;

@@ -5627,6 +5627,11 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 		s.nCLSwitches = (s.nCLSwitches & CLSW_OPEN) ? CLSW_OPEN : CLSW_NONE;
 	}
 
+	if (s.nCLSwitches & CLSW_VOLUME) {
+		m_wndToolBar.SetVolume(s.nCmdVolume);
+		s.nCLSwitches &= ~CLSW_VOLUME;
+	}
+
 	if (fSetForegroundWindow && !(s.nCLSwitches & CLSW_NOFOCUS)) {
 		SetForegroundWindow();
 	}
