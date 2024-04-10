@@ -13516,8 +13516,7 @@ void CMainFrame::OpenSetupAudioStream()
 	CPlaylistItem pli;
 	if (m_wndPlaylistBar.GetCur(pli)) {
 		for (const auto& fi : pli.m_auds) {
-			auto& str = fi.GetPath();
-			extAudioList.emplace_back(GetFileOnly(str));
+			extAudioList.emplace_back(fi.GetPath());
 		}
 	}
 
