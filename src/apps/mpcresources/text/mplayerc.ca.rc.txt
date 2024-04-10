@@ -171,14 +171,21 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
 16		"Reiniciar Sel."
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 5		"Audio renderer"
 7		"Properties"
 9		"Dual output"
-10		"Audio open settings"
-11		"Carga auto. d'àudio"
-13		"Reset"
-14		"Prefer external audio files over embedded audio track"
+10		"Àudio"
+11		"Vol."
+12		"Mín"
+14		"Màx"
+15		"Balanç"
+16		"I"
+18		"D"
+19		"Audio open settings"
+20		"Carga auto. d'àudio"
+22		"Reset"
+23		"Prefer external audio files over embedded audio track"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -377,33 +384,26 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
-5		"Àudio"
-6		"Vol."
-7		"Mín"
-9		"Màx"
-10		"Balanç"
-11		"I"
-13		"D"
-14		"Reproducció"
-15		"Reproduir"
-16		"Repetir per sempre"
-18		"cop(vegades)"
-19		"Tornar al inici en acabar"
-20		"Control"
-21		"Volume step:"
-23		"Speed step:"
-25		"Do not reset speed for session"
-27		"Pista per defecta"
-28		"Subtítols"
-30		"Àudio"
-32		"(Exemple: cat eng jap)"
-33		"Opcions d'apertura"
-34		"When opening an audio file,"
-36		"Additionally add to playlist:"
-38		"Ajuda en la construcció del Filter Graph"
-40		"Reportar conectors que no volen funcionar"
-41		"Remember selected tracks in playlist"
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+5		"Reproducció"
+6		"Reproduir"
+7		"Repetir per sempre"
+9		"cop(vegades)"
+10		"Tornar al inici en acabar"
+11		"Control"
+12		"Volume step:"
+14		"Speed step:"
+16		"Do not reset speed for session"
+18		"Pista per defecta"
+19		"Subtítols"
+21		"Àudio"
+23		"(Exemple: cat eng jap)"
+24		"Opcions d'apertura"
+25		"When opening an audio file,"
+27		"Additionally add to playlist:"
+29		"Ajuda en la construcció del Filter Graph"
+31		"Reportar conectors que no volen funcionar"
+32		"Remember selected tracks in playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

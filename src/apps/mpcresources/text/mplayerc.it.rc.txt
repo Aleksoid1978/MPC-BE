@@ -171,14 +171,21 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
 16		"Reimposta selezionati"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 5		"Renderer audio"
 7		"Proprietà"
 9		"Uscita doppia"
-10		"Apri impostazioni audio"
-11		"Carica automaticamente i file audio"
-13		"Reimposta"
-14		"Preferisci i file audio esterni alla traccia audio incorporata"
+10		"Audio"
+11		"Volume"
+12		"Min"
+14		"Max"
+15		"Bilanciamento"
+16		"L"
+18		"R"
+19		"Apri impostazioni audio"
+20		"Carica automaticamente i file audio"
+22		"Reimposta"
+23		"Preferisci i file audio esterni alla traccia audio incorporata"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -377,33 +384,26 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Predefinito"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
-5		"Audio"
-6		"Volume"
-7		"Min"
-9		"Max"
-10		"Bilanciamento"
-11		"L"
-13		"R"
-14		"Riproduzione"
-15		"Riproduci"
-16		"Ripeti per sempre"
-18		"volta/e"
-19		"Riavvolgi al termine"
-20		"Controllo"
-21		"Passi volume:"
-23		"Passi velocità:"
-25		"Non reimpostare la velocità per la sessione"
-27		"Preferenza traccia predefinita"
-28		"Sottotitoli"
-30		"Audio"
-32		"(Esempio: ita eng)"
-33		"Impostazioni all'apertura"
-34		"Quando si apre un file audio,"
-36		"Aggiungi in più alla playlist:"
-38		"Usa il thread di lavoro per costruire il grafico del filtro"
-40		"Segnala pin che non vengono visualizzati"
-41		"Ricorda brani selezionati nella playlist"
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+5		"Riproduzione"
+6		"Riproduci"
+7		"Ripeti per sempre"
+9		"volta/e"
+10		"Riavvolgi al termine"
+11		"Controllo"
+12		"Passi volume:"
+14		"Passi velocità:"
+16		"Non reimpostare la velocità per la sessione"
+18		"Preferenza traccia predefinita"
+19		"Sottotitoli"
+21		"Audio"
+23		"(Esempio: ita eng)"
+24		"Impostazioni all'apertura"
+25		"Quando si apre un file audio,"
+27		"Aggiungi in più alla playlist:"
+29		"Usa il thread di lavoro per costruire il grafico del filtro"
+31		"Segnala pin che non vengono visualizzati"
+32		"Ricorda brani selezionati nella playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

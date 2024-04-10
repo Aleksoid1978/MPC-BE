@@ -171,14 +171,21 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
 16		"Berrezarri Hautatutakoa"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 5		"Audio Aurkezlea"
 7		"Ezaugarriak"
 9		"Biko irteera"
-10		"Audio irekitze ezarpenak"
-11		"Berez-gertatu audio agiriak"
-13		"Berrezarri"
-14		"Hobetsi kanpoko audio agiriak barneratutako audio bideen gainetik"
+10		"Audioa"
+11		"Bolumena"
+12		"Gutx"
+14		"Geh"
+15		"Oreka"
+16		"EZ"
+18		"ES"
+19		"Audio irekitze ezarpenak"
+20		"Berez-gertatu audio agiriak"
+22		"Berrezarri"
+23		"Hobetsi kanpoko audio agiriak barneratutako audio bideen gainetik"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -377,33 +384,26 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
-5		"Audioa"
-6		"Bolumena"
-7		"Gutx"
-9		"Geh"
-10		"Oreka"
-11		"EZ"
-13		"ES"
-14		"Irakurketa"
-15		"Irakurri"
-16		"Berregin etengabe"
-18		"denbora(k)"
-19		"Atzerabildu irakurketa egindakoan"
-20		"Kontrola"
-21		"Bolumen urratsa:"
-23		"Abiadura urratsa:"
-25		"Do not reset speed for session"
-27		"Berezko bide hobespena"
-28		"Azpidatziak:"
-30		"Audioa:"
-32		"(Azpidatziak: eng jap baq)"
-33		"Ireki ezarpenak"
-34		"Audio agiri bat irekitzerakoan,"
-36		"Additionally add to playlist:"
-38		"Erabili langile hariak iragazki grafika eraikitzeko"
-40		"Jakinarazi aurkezlean huts egiten duten pin-ak"
-41		"Remember selected tracks in playlist"
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+5		"Irakurketa"
+6		"Irakurri"
+7		"Berregin etengabe"
+9		"denbora(k)"
+10		"Atzerabildu irakurketa egindakoan"
+11		"Kontrola"
+12		"Bolumen urratsa:"
+14		"Abiadura urratsa:"
+16		"Do not reset speed for session"
+18		"Berezko bide hobespena"
+19		"Azpidatziak:"
+21		"Audioa:"
+23		"(Azpidatziak: eng jap baq)"
+24		"Ireki ezarpenak"
+25		"Audio agiri bat irekitzerakoan,"
+27		"Additionally add to playlist:"
+29		"Erabili langile hariak iragazki grafika eraikitzeko"
+31		"Jakinarazi aurkezlean huts egiten duten pin-ak"
+32		"Remember selected tracks in playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

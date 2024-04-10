@@ -171,14 +171,21 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
 16		"Resetiraj odabrano"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 5		"Zvučni render"
 7		"Svojstva"
 9		"Dvostruki izlaz"
-10		"Zvuk otvorene postavke"
-11		"Automatsko učitavanje datoteka zvuka"
-13		"Reset"
-14		"Daj prednost vanjskim audio datotekama nasprom ugrađenih audio zapisa"
+10		"Zvuk"
+11		"Glasnoća"
+12		"Min"
+14		"Max"
+15		"Balans"
+16		"L"
+18		"R"
+19		"Zvuk otvorene postavke"
+20		"Automatsko učitavanje datoteka zvuka"
+22		"Reset"
+23		"Daj prednost vanjskim audio datotekama nasprom ugrađenih audio zapisa"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -377,33 +384,26 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
-5		"Zvuk"
-6		"Glasnoća"
-7		"Min"
-9		"Max"
-10		"Balans"
-11		"L"
-13		"R"
-14		"Reprodukcija"
-15		"Pusti"
-16		"Ponavljaj beskonačno"
-18		"put(a)"
-19		"Premotaj nakon završetka"
-20		"Kontrola"
-21		"Glasnoća korak:"
-23		"Brzina korak:"
-25		"Ne resetiraj brzinu sesije"
-27		"Podrazumijevane postavke zapisa"
-28		"Podnaslovi:"
-30		"Zvuk:"
-32		"(Primjeri: eng jap swe)"
-33		"Postavke otvaranja"
-34		"Kod otvaranja audio datoteke,"
-36		"Uz to, dodaj na playlistu:"
-38		"Koristi radnu dretvu za konstrukciju grafa filtara"
-40		"Izvijesti o pinovima koji se nisu rendali"
-41		"Zapamti izabrane zapise iz playliste"
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+5		"Reprodukcija"
+6		"Pusti"
+7		"Ponavljaj beskonačno"
+9		"put(a)"
+10		"Premotaj nakon završetka"
+11		"Kontrola"
+12		"Glasnoća korak:"
+14		"Brzina korak:"
+16		"Ne resetiraj brzinu sesije"
+18		"Podrazumijevane postavke zapisa"
+19		"Podnaslovi:"
+21		"Zvuk:"
+23		"(Primjeri: eng jap swe)"
+24		"Postavke otvaranja"
+25		"Kod otvaranja audio datoteke,"
+27		"Uz to, dodaj na playlistu:"
+29		"Koristi radnu dretvu za konstrukciju grafa filtara"
+31		"Izvijesti o pinovima koji se nisu rendali"
+32		"Zapamti izabrane zapise iz playliste"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

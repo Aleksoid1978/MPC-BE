@@ -23,6 +23,7 @@
 #include "filters/renderer/MpcAudioRenderer/MpcAudioRenderer.h"
 #include "ComPropertySheet.h"
 #include "PPageAudio.h"
+#include "MainFrm.h"
 
 // CPPageAudio dialog
 
@@ -52,16 +53,24 @@ void CPPageAudio::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BUTTON1, m_audRendPropButton);
 	DDX_Control(pDX, IDC_CHECK1, m_DualAudioOutput);
 
+	DDX_Control(pDX, IDC_SLIDER1, m_volumectrl);
+	DDX_Control(pDX, IDC_SLIDER2, m_balancectrl);
+	DDX_Slider(pDX, IDC_SLIDER1, m_nVolume);
+	DDX_Slider(pDX, IDC_SLIDER2, m_nBalance);
+
 	DDX_Check(pDX, IDC_CHECK2, m_fAutoloadAudio);
 	DDX_Text(pDX, IDC_EDIT4, m_sAudioPaths);
 	DDX_Check(pDX, IDC_CHECK3, m_fPrioritizeExternalAudio);
 }
 
 BEGIN_MESSAGE_MAP(CPPageAudio, CPPageBase)
+	ON_WM_HSCROLL()
 	ON_CBN_SELCHANGE(IDC_AUDRND_COMBO, OnAudioRendererChange)
 	ON_BN_CLICKED(IDC_BUTTON1, OnAudioRenderPropClick)
 	ON_BN_CLICKED(IDC_CHECK1, OnDualAudioOutputCheck)
+	ON_STN_DBLCLK(IDC_STATIC_BALANCE, OnBalanceTextDblClk)
 	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedResetAudioPaths)
+	ON_NOTIFY_EX(TTN_NEEDTEXTW, 0, OnToolTipNotify)
 END_MESSAGE_MAP()
 
 // CPPageAudio message handlers
@@ -166,6 +175,15 @@ BOOL CPPageAudio::OnInitDialog()
 	m_DualAudioOutput.SetCheck(s.fDualAudioOutput);
 	OnDualAudioOutputCheck();
 
+	m_volumectrl.SetRange(0, 100);
+	m_volumectrl.SetTicFreq(10);
+	m_balancectrl.SetRange(-100, 100);
+	m_balancectrl.SetLineSize(2);
+	m_balancectrl.SetPageSize(2);
+	m_balancectrl.SetTicFreq(20);
+	m_nVolume = m_oldVolume = s.nVolume;
+	m_nBalance = s.nBalance;
+
 	m_fAutoloadAudio           = s.fAutoloadAudio;
 	m_fPrioritizeExternalAudio = s.fPrioritizeExternalAudio;
 	m_sAudioPaths              = s.strAudioPaths;
@@ -193,11 +211,30 @@ BOOL CPPageAudio::OnApply()
 	}
 	s.fDualAudioOutput             = !!m_DualAudioOutput.GetCheck();
 
+	s.nVolume = m_oldVolume = m_nVolume;
+	s.nBalance = m_nBalance;
+
 	s.fAutoloadAudio = !!m_fAutoloadAudio;
 	s.fPrioritizeExternalAudio = !!m_fPrioritizeExternalAudio;
 	s.strAudioPaths = m_sAudioPaths;
 
 	return __super::OnApply();
+}
+
+void CPPageAudio::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	if (*pScrollBar == m_volumectrl) {
+		UpdateData();
+		AfxGetMainFrame()->m_wndToolBar.Volume = m_nVolume;
+	}
+	else if (*pScrollBar == m_balancectrl) {
+		UpdateData();
+		AfxGetMainFrame()->SetBalance(m_nBalance);
+	}
+
+	SetModified();
+
+	__super::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
 void CPPageAudio::ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKNOWN lpunk, HRESULT* phr))
@@ -333,6 +370,17 @@ void CPPageAudio::OnDualAudioOutputCheck()
 	SetModified();
 }
 
+void CPPageAudio::OnBalanceTextDblClk()
+{
+	// double click on text "Balance" resets the balance to zero
+	m_nBalance = 0;
+	m_balancectrl.SetPos(m_nBalance);
+
+	AfxGetMainFrame()->SetBalance(m_nBalance);
+
+	SetModified();
+}
+
 void CPPageAudio::OnBnClickedResetAudioPaths()
 {
 	m_sAudioPaths = DEFAULT_AUDIO_PATHS;
@@ -341,3 +389,60 @@ void CPPageAudio::OnBnClickedResetAudioPaths()
 
 	SetModified();
 }
+
+void CPPageAudio::OnCancel()
+{
+	CAppSettings& s = AfxGetAppSettings();
+
+	if (m_nVolume != m_oldVolume) {
+		AfxGetMainFrame()->m_wndToolBar.Volume = m_oldVolume;    //not very nice solution
+	}
+
+	if (m_nBalance != s.nBalance) {
+		AfxGetMainFrame()->SetBalance(s.nBalance);
+	}
+
+	__super::OnCancel();
+}
+
+BOOL CPPageAudio::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
+{
+	TOOLTIPTEXTW* pTTT = (TOOLTIPTEXTW*)pNMHDR;
+
+	UINT_PTR nID = pNMHDR->idFrom;
+
+	if (pTTT->uFlags & TTF_IDISHWND) {
+		nID = ::GetDlgCtrlID((HWND)nID);
+	}
+
+	if (nID == 0) {
+		return FALSE;
+	}
+
+	static CString strTipText;
+
+	if (nID == IDC_SLIDER1) {
+		strTipText.Format(L"%d%%", m_nVolume);
+	}
+	else if (nID == IDC_SLIDER2) {
+		if (m_nBalance > 0) {
+			strTipText.Format(L"R +%d%%", m_nBalance);
+		}
+		else if (m_nBalance < 0) {
+			strTipText.Format(L"L +%d%%", -m_nBalance);
+		}
+		else { //if (m_nBalance == 0)
+			strTipText = L"L = R";
+		}
+	}
+	else {
+		return FALSE;
+	}
+
+	pTTT->lpszText = (LPWSTR)(LPCWSTR)strTipText;
+
+	*pResult = 0;
+
+	return TRUE;
+}
+

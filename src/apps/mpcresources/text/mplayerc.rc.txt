@@ -171,14 +171,21 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
 16		"Reset Selected"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 5		"Audio renderer"
 7		"Properties"
 9		"Dual output"
-10		"Audio open settings"
-11		"Auto-load audio files"
-13		"Reset"
-14		"Prefer external audio files over embedded audio track"
+10		"Audio"
+11		"Volume"
+12		"Min"
+14		"Max"
+15		"Balance"
+16		"L"
+18		"R"
+19		"Audio open settings"
+20		"Auto-load audio files"
+22		"Reset"
+23		"Prefer external audio files over embedded audio track"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -377,33 +384,26 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
-5		"Audio"
-6		"Volume"
-7		"Min"
-9		"Max"
-10		"Balance"
-11		"L"
-13		"R"
-14		"Playback"
-15		"Play"
-16		"Repeat forever"
-18		"time(s)"
-19		"Rewind when done playing"
-20		"Control"
-21		"Volume step:"
-23		"Speed step:"
-25		"Do not reset speed for session"
-27		"Default track preference"
-28		"Subtitles:"
-30		"Audio:"
-32		"(Example: eng jap swe)"
-33		"Open settings"
-34		"When opening an audio file,"
-36		"Additionally add to playlist:"
-38		"Use worker thread to construct the filter graph"
-40		"Report pins which fail to render"
-41		"Remember selected tracks in playlist"
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+5		"Playback"
+6		"Play"
+7		"Repeat forever"
+9		"time(s)"
+10		"Rewind when done playing"
+11		"Control"
+12		"Volume step:"
+14		"Speed step:"
+16		"Do not reset speed for session"
+18		"Default track preference"
+19		"Subtitles:"
+21		"Audio:"
+23		"(Example: eng jap swe)"
+24		"Open settings"
+25		"When opening an audio file,"
+27		"Additionally add to playlist:"
+29		"Use worker thread to construct the filter graph"
+31		"Report pins which fail to render"
+32		"Remember selected tracks in playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

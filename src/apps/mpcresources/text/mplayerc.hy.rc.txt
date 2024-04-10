@@ -171,14 +171,21 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
 16		"Ետարկել ընտրումը"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 5		"Audio renderer"
 7		"Properties"
 9		"Dual output"
-10		"Audio open settings"
-11		"Ձայնի ֆայլերի ինքնաբացում"
-13		"Reset"
-14		"Prefer external audio files over embedded audio track"
+10		"Ձայնը"
+11		"Բարձրությունը"
+12		"Min"
+14		"Max"
+15		"Բալանսը"
+16		"L"
+18		"R"
+19		"Audio open settings"
+20		"Ձայնի ֆայլերի ինքնաբացում"
+22		"Reset"
+23		"Prefer external audio files over embedded audio track"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -377,33 +384,26 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
-5		"Ձայնը"
-6		"Բարձրությունը"
-7		"Min"
-9		"Max"
-10		"Բալանսը"
-11		"L"
-13		"R"
-14		"Վերարտադրում"
-15		"Վերարտադրում"
-16		"Անվերջ կրկնել"
-18		"անգամ"
-19		"Վերափաթաթել վերջում"
-20		"Control"
-21		"Volume step:"
-23		"Speed step:"
-25		"Do not reset speed for session"
-27		"Շավիղի կարգավորումներ"
-28		"Տողագրերի"
-30		"Ձայնի"
-32		"(Օրինակ՝ eng jap swe)"
-33		"Ֆայլերի բացման կարգավորում"
-34		"When opening an audio file,"
-36		"Additionally add to playlist:"
-38		"Ֆիլտրերի շարքի կառուցման հոսք"
-40		"Հաշվետվություն՝ ցուցադրման հոսքերի սխալների համար"
-41		"Remember selected tracks in playlist"
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+5		"Վերարտադրում"
+6		"Վերարտադրում"
+7		"Անվերջ կրկնել"
+9		"անգամ"
+10		"Վերափաթաթել վերջում"
+11		"Control"
+12		"Volume step:"
+14		"Speed step:"
+16		"Do not reset speed for session"
+18		"Շավիղի կարգավորումներ"
+19		"Տողագրերի"
+21		"Ձայնի"
+23		"(Օրինակ՝ eng jap swe)"
+24		"Ֆայլերի բացման կարգավորում"
+25		"When opening an audio file,"
+27		"Additionally add to playlist:"
+29		"Ֆիլտրերի շարքի կառուցման հոսք"
+31		"Հաշվետվություն՝ ցուցադրման հոսքերի սխալների համար"
+32		"Remember selected tracks in playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

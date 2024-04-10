@@ -171,14 +171,21 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
 16		"重設已選項目"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 5		"音訊譜製器"
 7		"選項"
 9		"多重輸出"
-10		"音訊載入設定"
-11		"自動載入音訊檔案"
-13		"重設"
-14		"外部音訊檔案優先於內部音軌"
+10		"音訊"
+11		"音量"
+12		"小"
+14		"大"
+15		"平衡"
+16		"左"
+18		"右"
+19		"音訊載入設定"
+20		"自動載入音訊檔案"
+22		"重設"
+23		"外部音訊檔案優先於內部音軌"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -377,33 +384,26 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"重設"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
-5		"音訊"
-6		"音量"
-7		"小"
-9		"大"
-10		"平衡"
-11		"左"
-13		"右"
-14		"播放"
-15		"播放"
-16		"永遠重複播放"
-18		"次"
-19		"結束播放時回到開端"
-20		"控制"
-21		"音量步進幅度："
-23		"速度步進幅度："
-25		"同一工作階段內不重設速度"
-27		"預設軌道"
-28		"字幕"
-30		"音訊"
-32		"（範例：eng jap swe）"
-33		"開啟設定"
-34		"開啟音訊檔案時，"
-36		"附加到播放清單︰"
-38		"使用工作執行緒建立篩選器圖 (Filter Graph)"
-40		"回報繪製失敗的 Pin"
-41		"記住播放清單中選定的項目"
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+5		"播放"
+6		"播放"
+7		"永遠重複播放"
+9		"次"
+10		"結束播放時回到開端"
+11		"控制"
+12		"音量步進幅度："
+14		"速度步進幅度："
+16		"同一工作階段內不重設速度"
+18		"預設軌道"
+19		"字幕"
+21		"音訊"
+23		"（範例：eng jap swe）"
+24		"開啟設定"
+25		"開啟音訊檔案時，"
+27		"附加到播放清單︰"
+29		"使用工作執行緒建立篩選器圖 (Filter Graph)"
+31		"回報繪製失敗的 Pin"
+32		"記住播放清單中選定的項目"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

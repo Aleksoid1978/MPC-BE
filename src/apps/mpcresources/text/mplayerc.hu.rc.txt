@@ -171,14 +171,21 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
 16		"Kijelöltek visszaállítása"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 5		"Audió renderer"
 7		"Tulajdonságok"
 9		"Dual kimenet"
-10		"Audió nyitott beállítások"
-11		"Audiófájlok automatikus betöltése"
-13		"Visszaállítás"
-14		"Külső audió fájlok előnyben részesítse a beágyazott audió sáv felett"
+10		"Audió"
+11		"Hangerő"
+12		"Min"
+14		"Max"
+15		"Balansz"
+16		"B"
+18		"J"
+19		"Audió nyitott beállítások"
+20		"Audiófájlok automatikus betöltése"
+22		"Visszaállítás"
+23		"Külső audió fájlok előnyben részesítse a beágyazott audió sáv felett"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -377,33 +384,26 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Alapértelmezett"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
-5		"Audió"
-6		"Hangerő"
-7		"Min"
-9		"Max"
-10		"Balansz"
-11		"B"
-13		"J"
-14		"Lejátszás"
-15		"Lejátszás"
-16		"Végtelenített ismétlés"
-18		"alkalommal"
-19		"Lejátszás után visszatekerés"
-20		"Szabályzás"
-21		"Hangerő léptetés:"
-23		"Sebesség léptetés:"
-25		"Ne állítsa vissza a munkamenet sebességét"
-27		"Alapértelmezett lejátszási preferencia"
-28		"Feliratok:"
-30		"Audió:"
-32		"(Példa: eng jap swe)"
-33		"Megnyitási beállítások"
-34		"Amikor megnyit egy hangfájlt,"
-36		"Hozzáadás a lejátszási listához:"
-38		"Használjon szálat a szűrő gráf felépítéséhez"
-40		"Hibás, nem átalakítható csatlakozók jelentése"
-41		"Emlékezzen a kiválasztott zeneszámokra a lejátszási listában"
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+5		"Lejátszás"
+6		"Lejátszás"
+7		"Végtelenített ismétlés"
+9		"alkalommal"
+10		"Lejátszás után visszatekerés"
+11		"Szabályzás"
+12		"Hangerő léptetés:"
+14		"Sebesség léptetés:"
+16		"Ne állítsa vissza a munkamenet sebességét"
+18		"Alapértelmezett lejátszási preferencia"
+19		"Feliratok:"
+21		"Audió:"
+23		"(Példa: eng jap swe)"
+24		"Megnyitási beállítások"
+25		"Amikor megnyit egy hangfájlt,"
+27		"Hozzáadás a lejátszási listához:"
+29		"Használjon szálat a szűrő gráf felépítéséhez"
+31		"Hibás, nem átalakítható csatlakozók jelentése"
+32		"Emlékezzen a kiválasztott zeneszámokra a lejátszási listában"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

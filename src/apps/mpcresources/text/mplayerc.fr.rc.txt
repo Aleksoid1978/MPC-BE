@@ -171,14 +171,21 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
 16		"Rétablir"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 5		"Moteur de rendu audio"
 7		"Propriétés"
 9		"Double sortie"
-10		"Paramètres d'ouverture audio"
-11		"Lecture automatique des fichiers audio"
-13		"Réinitialiser"
-14		"Préférer les fichiers audio externes à la piste audio intégrée"
+10		"Audio"
+11		"Volume"
+12		"Min"
+14		"Max"
+15		"Balance"
+16		"G"
+18		"D"
+19		"Paramètres d'ouverture audio"
+20		"Lecture automatique des fichiers audio"
+22		"Réinitialiser"
+23		"Préférer les fichiers audio externes à la piste audio intégrée"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -377,33 +384,26 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Par défaut"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
-5		"Audio"
-6		"Volume"
-7		"Min"
-9		"Max"
-10		"Balance"
-11		"G"
-13		"D"
-14		"Lecture"
-15		"Lire"
-16		"Répéter automatiquement"
-18		"fois"
-19		"Rembobiner à la fin"
-20		"Controle"
-21		"Pas de volume :"
-23		"Pas de vitesse :"
-25		"Ne pas réinitialiser la vitesse pour la session"
-27		"Ordre préféré des pistes"
-28		"Sous-titres"
-30		"Audio"
-32		"(Exemple : fre eng jap)"
-33		"Paramètres d'ouverture"
-34		"Lors de l'ouverture d'un fichier audio,"
-36		"Ajouter à la Playlist :"
-38		"Processus d'aide à la construction des filtres"
-40		"Indiquer les connexions échouées lors du rendu"
-41		"Mémoriser les pistes sélectionnées dans la Playlist"
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+5		"Lecture"
+6		"Lire"
+7		"Répéter automatiquement"
+9		"fois"
+10		"Rembobiner à la fin"
+11		"Controle"
+12		"Pas de volume :"
+14		"Pas de vitesse :"
+16		"Ne pas réinitialiser la vitesse pour la session"
+18		"Ordre préféré des pistes"
+19		"Sous-titres"
+21		"Audio"
+23		"(Exemple : fre eng jap)"
+24		"Paramètres d'ouverture"
+25		"Lors de l'ouverture d'un fichier audio,"
+27		"Ajouter à la Playlist :"
+29		"Processus d'aide à la construction des filtres"
+31		"Indiquer les connexions échouées lors du rendu"
+32		"Mémoriser les pistes sélectionnées dans la Playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

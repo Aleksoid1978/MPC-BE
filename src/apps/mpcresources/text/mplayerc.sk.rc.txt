@@ -171,14 +171,21 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
 16		"Obnoviť vybrané"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 5		"Audio renderer"
 7		"Properties"
 9		"Dual output"
-10		"Audio open settings"
-11		"Aut. načítanie zvuk. stôp"
-13		"Reset"
-14		"Prefer external audio files over embedded audio track"
+10		"Zvuk"
+11		"Hlasitosť"
+12		"Min"
+14		"Max"
+15		"Vyváženie"
+16		"L"
+18		"R"
+19		"Audio open settings"
+20		"Aut. načítanie zvuk. stôp"
+22		"Reset"
+23		"Prefer external audio files over embedded audio track"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -377,33 +384,26 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
-5		"Zvuk"
-6		"Hlasitosť"
-7		"Min"
-9		"Max"
-10		"Vyváženie"
-11		"L"
-13		"R"
-14		"Prehrávanie"
-15		"Prehrať"
-16		"Opakovať dookola"
-18		"krát"
-19		"Po prehratí previnúť"
-20		"Control"
-21		"Volume step:"
-23		"Speed step:"
-25		"Do not reset speed for session"
-27		"Uprednostnenie predvolenej stopy"
-28		"Titulky"
-30		"zvuk"
-32		"(príklad: eng jap swe)"
-33		"Nastavenia otvárania súborov"
-34		"When opening an audio file,"
-36		"Additionally add to playlist:"
-38		"Pri vytváraní grafu filtra otvoriť iné vlákno"
-40		"Zaznamenať piny, ktoré sa nevykreslia"
-41		"Remember selected tracks in playlist"
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+5		"Prehrávanie"
+6		"Prehrať"
+7		"Opakovať dookola"
+9		"krát"
+10		"Po prehratí previnúť"
+11		"Control"
+12		"Volume step:"
+14		"Speed step:"
+16		"Do not reset speed for session"
+18		"Uprednostnenie predvolenej stopy"
+19		"Titulky"
+21		"zvuk"
+23		"(príklad: eng jap swe)"
+24		"Nastavenia otvárania súborov"
+25		"When opening an audio file,"
+27		"Additionally add to playlist:"
+29		"Pri vytváraní grafu filtra otvoriť iné vlákno"
+31		"Zaznamenať piny, ktoré sa nevykreslia"
+32		"Remember selected tracks in playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

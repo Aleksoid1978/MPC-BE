@@ -171,14 +171,21 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
 16		"Resetuj wybrane"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 5		"Renderer dźwięku"
 7		"Właściwości"
 9		"Podwójne wyjście"
-10		"Ustawienia wczytywania dźwięku"
-11		"Wczytywanie ścieżek dźwiękowych"
-13		"Resetuj"
-14		"Preferuj zewnętrzne pliki audio zamiast zawartych w kontenerze"
+10		"Dźwięk"
+11		"Głośność"
+12		"Min."
+14		"Maks."
+15		"Balans"
+16		"L"
+18		"P"
+19		"Ustawienia wczytywania dźwięku"
+20		"Wczytywanie ścieżek dźwiękowych"
+22		"Resetuj"
+23		"Preferuj zewnętrzne pliki audio zamiast zawartych w kontenerze"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -377,33 +384,26 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Domyślne"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
-5		"Dźwięk"
-6		"Głośność"
-7		"Min."
-9		"Maks."
-10		"Balans"
-11		"L"
-13		"P"
-14		"Odtwarzanie"
-15		"Odtwarzaj"
-16		"Ciągłe"
-18		"raz(y)"
-19		"Przejdź do początku po zakończeniu"
-20		"Kontrola"
-21		"Zmiana głosności co:"
-23		"Zmiana tempa co:"
-25		"Nie resetuj tempa dla sesji"
-27		"Preferowane ścieżki"
-28		"napisy:"
-30		"audio:"
-32		"(Na przykład: eng jap swe)"
-33		"Otwieranie"
-34		"Kiedy otwiera plik audio,"
-36		"Dodatkowo dodaj do listy odtwarzania:"
-38		"Osobny wątek programu do utworzenia grafu filtrów"
-40		"Powiadamiaj o niepołączonych pinach grafu"
-41		"Zapamiętaj wybrane ścieżki na liście odtwarzania"
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+5		"Odtwarzanie"
+6		"Odtwarzaj"
+7		"Ciągłe"
+9		"raz(y)"
+10		"Przejdź do początku po zakończeniu"
+11		"Kontrola"
+12		"Zmiana głosności co:"
+14		"Zmiana tempa co:"
+16		"Nie resetuj tempa dla sesji"
+18		"Preferowane ścieżki"
+19		"napisy:"
+21		"audio:"
+23		"(Na przykład: eng jap swe)"
+24		"Otwieranie"
+25		"Kiedy otwiera plik audio,"
+27		"Dodatkowo dodaj do listy odtwarzania:"
+29		"Osobny wątek programu do utworzenia grafu filtrów"
+31		"Powiadamiaj o niepołączonych pinach grafu"
+32		"Zapamiętaj wybrane ścieżki na liście odtwarzania"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

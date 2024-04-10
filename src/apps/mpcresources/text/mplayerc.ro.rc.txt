@@ -171,14 +171,21 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
 16		"Resetează selectate"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 5		"Randor audio"
 7		"Proprietăți"
 9		"Ieșire duală"
-10		"Setări de deschidere audio"
-11		"Încarcă automat fișierele audio"
-13		"Resetare"
-14		"Preferă fișierele audio externe decât pista audio încorporată"
+10		"Audio"
+11		"Volum"
+12		"Min"
+14		"Max"
+15		"Balans"
+16		"S"
+18		"D"
+19		"Setări de deschidere audio"
+20		"Încarcă automat fișierele audio"
+22		"Resetare"
+23		"Preferă fișierele audio externe decât pista audio încorporată"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -377,33 +384,26 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Implicit"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
-5		"Audio"
-6		"Volum"
-7		"Min"
-9		"Max"
-10		"Balans"
-11		"S"
-13		"D"
-14		"Redare"
-15		"Redare"
-16		"Repetă la nesfârșit"
-18		"dată (ori)"
-19		"Derulează la început la terminarea redării"
-20		"Control"
-21		"Pas de volum:"
-23		"Pas de viteză:"
-25		"Nu reseta viteza pentru sesiune"
-27		"Preferința pentru pistă implicită"
-28		"Subtitrări:"
-30		"Audio:"
-32		"(De exemplu: rum eng jap swe)"
-33		"Setări pentru deschidere"
-34		"Când se deschide un fișier audio,"
-36		"Adaugă în plus, la lista de redare:"
-38		"Folosește un fir de execuţie secundar pentru a construi graficul filtrelor"
-40		"Raportează pinii care eșuează să randeze"
-41		"Ține minte pistele selectate în lista de redare"
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+5		"Redare"
+6		"Redare"
+7		"Repetă la nesfârșit"
+9		"dată (ori)"
+10		"Derulează la început la terminarea redării"
+11		"Control"
+12		"Pas de volum:"
+14		"Pas de viteză:"
+16		"Nu reseta viteza pentru sesiune"
+18		"Preferința pentru pistă implicită"
+19		"Subtitrări:"
+21		"Audio:"
+23		"(De exemplu: rum eng jap swe)"
+24		"Setări pentru deschidere"
+25		"Când se deschide un fișier audio,"
+27		"Adaugă în plus, la lista de redare:"
+29		"Folosește un fir de execuţie secundar pentru a construi graficul filtrelor"
+31		"Raportează pinii care eșuează să randeze"
+32		"Ține minte pistele selectate în lista de redare"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

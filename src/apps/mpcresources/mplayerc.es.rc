@@ -120,12 +120,21 @@ BEGIN
     PUSHBUTTON      "Propiedades",IDC_BUTTON1,226,14,60,14
     COMBOBOX        IDC_COMBO1,10,33,212,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Salida doble",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,226,35,60,10
-    GROUPBOX        "Configuración abierta de audio",IDC_STATIC,5,54,285,51
-    CONTROL         "Auto-carga de audio",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,65,276,9
-    EDITTEXT        IDC_EDIT4,10,76,222,13,ES_AUTOHSCROLL
-    PUSHBUTTON      "Reiniciar",IDC_BUTTON2,235,76,50,13
+    GROUPBOX        "Audio",IDC_STATIC,5,53,285,46
+    CTEXT           "Volumen",IDC_STATIC,42,60,55,8
+    RTEXT           "Mín",IDC_STATIC,7,80,20,8
+    CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | TBS_TOOLTIPS | WS_TABSTOP,28,72,85,19
+    LTEXT           "Máx",IDC_STATIC,116,80,27,8
+    CTEXT           "Balance",IDC_STATIC_BALANCE,191,60,55,8,SS_NOTIFY
+    RTEXT           "I",IDC_STATIC,144,80,30,8
+    CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOOLTIPS | WS_TABSTOP,176,79,85,19
+    LTEXT           "D",IDC_STATIC,262,80,27,8
+    GROUPBOX        "Configuración abierta de audio",IDC_STATIC,5,102,285,51
+    CONTROL         "Auto-carga de audio",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,113,276,9
+    EDITTEXT        IDC_EDIT4,10,124,222,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "Reiniciar",IDC_BUTTON2,235,124,50,13
     CONTROL         "Preferir archivos de audio externos a pistas de audio incrustadas",IDC_CHECK3,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,92,273,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,140,273,9
 END
 
 IDD_PPAGESOUNDPROCESSING DIALOGEX 0, 0, 296, 264
@@ -314,43 +323,34 @@ IDD_PPAGEPLAYBACK DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Audio",IDC_STATIC,5,5,286,46
-    CTEXT           "Volumen",IDC_STATIC,42,12,55,8
-    RTEXT           "Mín",IDC_STATIC,7,32,20,8
-    CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | TBS_TOOLTIPS | WS_TABSTOP | 0x400,28,24,85,19
-    LTEXT           "Máx",IDC_STATIC,116,32,27,8
-    CTEXT           "Balance",IDC_STATIC_BALANCE,191,12,55,8,SS_NOTIFY
-    RTEXT           "I",IDC_STATIC,144,32,30,8
-    CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,176,31,85,19
-    LTEXT           "D",IDC_STATIC,262,32,27,8
-    GROUPBOX        "Reproducción",IDC_STATIC,5,53,129,60
-    CONTROL         "Reproducir",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,65,55,10
-    CONTROL         "Repetir siempre",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,80,116,8
-    EDITTEXT        IDC_EDIT1,65,63,20,13,ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
-    LTEXT           "vez(veces)",IDC_STATIC1,90,65,40,8
-    CONTROL         "Volver al inicio al terminar",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,10,93,116,18
-    GROUPBOX        "Control",IDC_STATIC,5,115,286,54
-    LTEXT           "Paso de volumen:",IDC_STATIC,10,127,108,8
-    COMBOBOX        IDC_COMBOVOLUME,120,124,60,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Paso de velocidad:",IDC_STATIC,10,143,108,8
-    COMBOBOX        IDC_COMBOSPEEDSTEP,120,140,60,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "No restablecer velocidad para la sesión",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,157,175,9
-    GROUPBOX        "",IDC_STATIC,137,57,154,56
-    CONTROL         "Preferencia de pista predeterminada",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,56,100,9
-    LTEXT           "Subtítulos",IDC_STATIC,142,71,44,8
-    EDITTEXT        IDC_EDIT2,190,69,94,13,ES_AUTOHSCROLL
-    LTEXT           "Audio",IDC_STATIC,142,87,44,8
-    EDITTEXT        IDC_EDIT3,190,85,94,13,ES_AUTOHSCROLL
-    LTEXT           "(Ejemplo: eng jap swe)",IDC_STATIC,147,101,132,8
-    GROUPBOX        "Opciones de apertura",IDC_STATIC,5,172,286,79
-    LTEXT           "Al abrir un archivo de audio:",IDC_STATIC,10,185,99,8
-    COMBOBOX        IDC_COMBO4,113,182,172,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Agregar a la Lista de Reproducción:",IDC_STATIC,10,201,139,8
-    COMBOBOX        IDC_COMBO5,150,198,135,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Reproducción",IDC_STATIC,5,5,129,60
+    CONTROL         "Reproducir",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,17,55,10
+    CONTROL         "Repetir siempre",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,32,116,8
+    EDITTEXT        IDC_EDIT1,65,15,20,13,ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
+    LTEXT           "vez(veces)",IDC_STATIC1,90,17,40,8
+    CONTROL         "Volver al inicio al terminar",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,10,45,116,18
+    GROUPBOX        "Control",IDC_STATIC,5,67,286,54
+    LTEXT           "Paso de volumen:",IDC_STATIC,10,79,108,8
+    COMBOBOX        IDC_COMBOVOLUME,120,76,60,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Paso de velocidad:",IDC_STATIC,10,95,108,8
+    COMBOBOX        IDC_COMBOSPEEDSTEP,120,92,60,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "No restablecer velocidad para la sesión",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,109,175,9
+    GROUPBOX        "",IDC_STATIC,137,9,154,56
+    CONTROL         "Preferencia de pista predeterminada",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,8,100,9
+    LTEXT           "Subtítulos",IDC_STATIC,142,23,44,8
+    EDITTEXT        IDC_EDIT2,190,21,94,13,ES_AUTOHSCROLL
+    LTEXT           "Audio",IDC_STATIC,142,39,44,8
+    EDITTEXT        IDC_EDIT3,190,37,94,13,ES_AUTOHSCROLL
+    LTEXT           "(Ejemplo: eng jap swe)",IDC_STATIC,147,53,132,8
+    GROUPBOX        "Opciones de apertura",IDC_STATIC,5,124,286,79
+    LTEXT           "Al abrir un archivo de audio:",IDC_STATIC,10,137,99,8
+    COMBOBOX        IDC_COMBO4,113,134,172,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Agregar a la Lista de Reproducción:",IDC_STATIC,10,153,139,8
+    COMBOBOX        IDC_COMBO5,150,150,135,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Usar proceso funcional para construir cadena de filtros",IDC_CHECK7,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,215,276,9
-    CONTROL         "Reportar conectores que no quieran funcionar",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,227,276,9
-    CONTROL         "Recordar pistas seleccionadas en la Lista de Reproducción",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,239,276,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,167,276,9
+    CONTROL         "Reportar conectores que no quieran funcionar",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,179,276,9
+    CONTROL         "Recordar pistas seleccionadas en la Lista de Reproducción",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,191,276,9
 END
 
 IDD_PPAGESUBRENDERING DIALOGEX 0, 0, 296, 264
@@ -1330,7 +1330,9 @@ BEGIN
 
     IDD_PPAGEAUDIO, DIALOG
     BEGIN
-        VERTGUIDE, 124
+        VERTGUIDE, 5
+        VERTGUIDE, 10
+        VERTGUIDE, 290
     END
 
     IDD_PPAGESOUNDPROCESSING, DIALOG
@@ -2448,45 +2450,41 @@ END
 
 STRINGTABLE
 BEGIN
-    IDD_PPAGEPLAYBACK       "Reproducción"
     IDD_PPAGEPLAYER         "Reproductor"
-    IDD_PPAGEDVD            "Reproducción::DVD-Video"
-    IDD_PPAGESUBTITLES      "Subtítulos"
     IDD_PPAGEFORMATS        "Reproductor::Formatos"
-    IDD_PPAGECOLOR          "Video::Corrección de color"
-    IDD_PPAGEAUDIO          "Audio"
-    IDD_PPAGEEXTERNALFILTERS "Filtros Externos"
-    IDD_PPAGESOUNDPROCESSING "Audio::Procesamiento de Sonido"
+    IDD_PPAGEACCELTBL       "Reproductor::Teclas"
+    IDD_PPAGEMOUSE          "Reproductor::Mouse"
+    IDD_PPAGELOGO           "Reproductor::Logo"
+    IDD_PPAGEINTERFACE      "Reproductor::Interfaz"
+    IDD_PPAGEWINDOWSIZE     "Reproductor::Tamaño de ventana"
+    IDD_PPAGEWEBSERVER      "Reproductor::Interfaz Web"
+    IDD_PPAGEPLAYBACK       "Reproducción"
+    IDD_PPAGEDVD            "Reproducción::DVD-Video"
 END
 
 STRINGTABLE
 BEGIN
-    IDD_PPAGEACCELTBL       "Reproductor::Teclas"
-    IDD_PPAGESUBSTYLE       "Subtítulos::Estilo Predeterminado"
-    IDD_PPAGEMOUSE          "Reproductor::Mouse"
-    IDD_PPAGEINTERNALFILTERS "Filtros Internos"
-    IDD_PPAGELOGO           "Reproductor::Logo"
+    IDD_PPAGECAPTURE        "Reproducción::Captura"
+    IDD_PPAGEYOUTUBE        "Reproducción::Servicios de medios en línea"
     IDD_PPAGEVIDEO          "Video"
-    IDD_PPAGEWEBSERVER      "Reproductor::Interfaz Web"
+    IDD_PPAGECOLOR          "Video::Corrección de color"
+    IDD_PPAGESYNC           "Video::Sincronización de fotograma"
+    IDD_PPAGEFULLSCREEN     "Video::Pantalla completa"
+    IDD_PPAGEAUDIO          "Audio"
+    IDD_PPAGESOUNDPROCESSING "Audio::Procesamiento de Sonido"
+    IDD_PPAGESUBTITLES      "Subtítulos"
+    IDD_PPAGESUBRENDERING   "Subtítulos::Renderizado"
+    IDD_PPAGESUBSTYLE       "Subtítulos::Estilo Predeterminado"
+    IDD_PPAGEINTERNALFILTERS "Filtros Internos"
+    IDD_PPAGEEXTERNALFILTERS "Filtros Externos"
+    IDD_PPAGEFILTERSPRIORITY "Filtros Externos::Prioridad"
+    IDD_PPAGEMISC           "Misceláneos"
 END
 
 STRINGTABLE
 BEGIN
     IDD_FILEPROPRES         "Recursos"
-    IDD_PPAGEMISC           "Misceláneos"
     IDD_FILEMEDIAINFO       "MediaInfo"
-    IDD_PPAGECAPTURE        "Reproducción::Captura"
-    IDD_PPAGESYNC           "Video::Sincronización de fotograma"
-    IDD_PPAGEFULLSCREEN     "Video::Pantalla completa"
-    IDD_PPAGEINTERFACE      "Reproductor::Interfaz"
-    IDD_PPAGEYOUTUBE        "Reproducción::Servicios de medios en línea"
-    IDD_PPAGEWINDOWSIZE     "Reproductor::Tamaño de ventana"
-    IDD_PPAGEFILTERSPRIORITY "Filtros Externos::Prioridad"
-END
-
-STRINGTABLE
-BEGIN
-    IDD_PPAGESUBRENDERING   "Subtítulos::Renderizado"
 END
 
 STRINGTABLE
@@ -2699,11 +2697,11 @@ BEGIN
     IDS_AG_VIDEOFILES       "Archivos de video (todos los tipos)"
     IDS_AG_AUDIOFILES       "Archivos de Audio (Todos los tipos)"
     IDS_AG_ALLFILES         "Todos los Archivos"
-    IDS_AG_SUBTITLEFILES    "Archivos de Subtítulos"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_AG_SUBTITLEFILES    "Archivos de Subtítulos"
     IDS_AG_AUDIO_FILE       "Archivo de Audio"
     IDS_AG_PLAYLIST_FILE    "Archivo de Lista de Reproducción"
     IDS_AG_OTHER            "Otro"

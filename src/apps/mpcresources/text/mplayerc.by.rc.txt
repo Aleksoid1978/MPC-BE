@@ -171,14 +171,21 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
 16		"Скінуць абраныя"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 5		"Audio renderer"
 7		"Properties"
 9		"Dual output"
-10		"Audio open settings"
-11		"Аўтазагрузка гуку"
-13		"Reset"
-14		"Prefer external audio files over embedded audio track"
+10		"Аўдыё"
+11		"Гучнасць"
+12		"Min"
+14		"Max"
+15		"Баланс"
+16		"L"
+18		"R"
+19		"Audio open settings"
+20		"Аўтазагрузка гуку"
+22		"Reset"
+23		"Prefer external audio files over embedded audio track"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -377,33 +384,26 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
-5		"Аўдыё"
-6		"Гучнасць"
-7		"Min"
-9		"Max"
-10		"Баланс"
-11		"L"
-13		"R"
-14		"Прайграванне"
-15		"Паўтараць"
-16		"Паўтараць бясконца"
-18		"разоў"
-19		"Пераматаць у канцы"
-20		"Control"
-21		"Volume step:"
-23		"Speed step:"
-25		"Do not reset speed for session"
-27		"Парадак загрузкі гуку"
-28		"Субтытры:"
-30		"Аўдыё:"
-32		"(Напрыклад: eng jap swe)"
-33		"Налады адкрыцця файлаў"
-34		"When opening an audio file,"
-36		"Additionally add to playlist:"
-38		"Прац. струмень для пабудовы ланцуга фільтраў"
-40		"Справазд. аб памылках рэндэрынгу струменяў"
-41		"Remember selected tracks in playlist"
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+5		"Прайграванне"
+6		"Паўтараць"
+7		"Паўтараць бясконца"
+9		"разоў"
+10		"Пераматаць у канцы"
+11		"Control"
+12		"Volume step:"
+14		"Speed step:"
+16		"Do not reset speed for session"
+18		"Парадак загрузкі гуку"
+19		"Субтытры:"
+21		"Аўдыё:"
+23		"(Напрыклад: eng jap swe)"
+24		"Налады адкрыцця файлаў"
+25		"When opening an audio file,"
+27		"Additionally add to playlist:"
+29		"Прац. струмень для пабудовы ланцуга фільтраў"
+31		"Справазд. аб памылках рэндэрынгу струменяў"
+32		"Remember selected tracks in playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

@@ -171,14 +171,21 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
 16		"Resetar selecionado"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 5		"Renderizador de áudio"
 7		"Propriedades"
 9		"Saída dupla"
-10		"Configurar abertura de áudio"
-11		"Autocarregar arquivos de áudio"
-13		"Resetar"
-14		"Preferir arquivos de áudio externos em vez de trilha de áudio incorporada"
+10		"Áudio"
+11		"Volume"
+12		"Mín."
+14		"Máx."
+15		"Balanço"
+16		"Esq."
+18		"Dir."
+19		"Configurar abertura de áudio"
+20		"Autocarregar arquivos de áudio"
+22		"Resetar"
+23		"Preferir arquivos de áudio externos em vez de trilha de áudio incorporada"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -377,33 +384,26 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Padrão"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
-5		"Áudio"
-6		"Volume"
-7		"Mín."
-9		"Máx."
-10		"Balanço"
-11		"Esq."
-13		"Dir."
-14		"Reprodução"
-15		"Reproduzir"
-16		"Repetir sempre"
-18		"vez(es)"
-19		"Retornar ao início quando terminar"
-20		"Controle"
-21		"Passo de volume:"
-23		"Passo de velociadade:"
-25		"Não restaurar velocidade da sessão"
-27		"Preferência de faixa padrão"
-28		"Legendas"
-30		"Áudio"
-32		"(Exemplo: eng jap swe)"
-33		"Configurações de abrir"
-34		"Quando abrir um arq.de áudio,"
-36		"Adicionalmente à lista de reprodução:"
-38		"Usar trabalho encadeado para construir o filtro gráfico"
-40		"Reportar pinos que falham na renderização"
-41		"Lembrar faixas selecionadas na lista de reprodução"
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+5		"Reprodução"
+6		"Reproduzir"
+7		"Repetir sempre"
+9		"vez(es)"
+10		"Retornar ao início quando terminar"
+11		"Controle"
+12		"Passo de volume:"
+14		"Passo de velociadade:"
+16		"Não restaurar velocidade da sessão"
+18		"Preferência de faixa padrão"
+19		"Legendas"
+21		"Áudio"
+23		"(Exemplo: eng jap swe)"
+24		"Configurações de abrir"
+25		"Quando abrir um arq.de áudio,"
+27		"Adicionalmente à lista de reprodução:"
+29		"Usar trabalho encadeado para construir o filtro gráfico"
+31		"Reportar pinos que falham na renderização"
+32		"Lembrar faixas selecionadas na lista de reprodução"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

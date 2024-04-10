@@ -171,14 +171,21 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
 16		"Selectie(s) resetten"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 5		"Audiorenderer"
 7		"Eigenschappen"
 9		"Duale uitvoer"
-10		"Instellingen voor audio inladen"
-11		"Geluidsbestanden autom. laden"
-13		"Resetten"
-14		"Prefereer externe audiobestanden boven ingesloten audiospoor"
+10		"Audio"
+11		"Volume"
+12		"Min"
+14		"Max"
+15		"Balans"
+16		"L"
+18		"R"
+19		"Instellingen voor audio inladen"
+20		"Geluidsbestanden autom. laden"
+22		"Resetten"
+23		"Prefereer externe audiobestanden boven ingesloten audiospoor"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -377,33 +384,26 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Resetten"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
-5		"Audio"
-6		"Volume"
-7		"Min"
-9		"Max"
-10		"Balans"
-11		"L"
-13		"R"
-14		"Afspelen"
-15		"Afspelen"
-16		"Steeds herhalen"
-18		"keer"
-19		"Terugspoelen na afspelen"
-20		"Bediening"
-21		"Volumestap:"
-23		"Snelheidsstap:"
-25		"Reset de snelheid niet binnen één sessie"
-27		"Voorkeursspoor in standaard"
-28		"Ondertiteling"
-30		"Audio"
-32		"(Bijv.: nl eng jap )"
-33		"Opties voor openen"
-34		"Wanneer een audio-bestand is geopend,"
-36		"Voeg daarnaast toe aan de afspeellijst:"
-38		"Filtergraph in aparte CPU-thread samenstellen"
-40		"Rapporteer pins die niet renderen"
-41		"Onthoud geselecteerde items in de afspeellijst"
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+5		"Afspelen"
+6		"Afspelen"
+7		"Steeds herhalen"
+9		"keer"
+10		"Terugspoelen na afspelen"
+11		"Bediening"
+12		"Volumestap:"
+14		"Snelheidsstap:"
+16		"Reset de snelheid niet binnen één sessie"
+18		"Voorkeursspoor in standaard"
+19		"Ondertiteling"
+21		"Audio"
+23		"(Bijv.: nl eng jap )"
+24		"Opties voor openen"
+25		"Wanneer een audio-bestand is geopend,"
+27		"Voeg daarnaast toe aan de afspeellijst:"
+29		"Filtergraph in aparte CPU-thread samenstellen"
+31		"Rapporteer pins die niet renderen"
+32		"Onthoud geselecteerde items in de afspeellijst"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

@@ -171,14 +171,21 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
 16		"אפס נבחר"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 5		"Audio renderer"
 7		"Properties"
 9		"Dual output"
-10		"Audio open settings"
-11		"טען אוטומטית קבצי אודיו"
-13		"Reset"
-14		"Prefer external audio files over embedded audio track"
+10		"שמע"
+11		"עצמת קול"
+12		"מינימום"
+14		"מקסימום"
+15		"איזון"
+16		"שמאל"
+18		"ימין"
+19		"Audio open settings"
+20		"טען אוטומטית קבצי אודיו"
+22		"Reset"
+23		"Prefer external audio files over embedded audio track"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -377,33 +384,26 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
-5		"שמע"
-6		"עצמת קול"
-7		"מינימום"
-9		"מקסימום"
-10		"איזון"
-11		"שמאל"
-13		"ימין"
-14		"השמעה"
-15		"נגן"
-16		"חזרה ללא הפסק"
-18		"מספר פעמים"
-19		"החזר אחורה כאשר ניגון מסתיים"
-20		"Control"
-21		"Volume step:"
-23		"Speed step:"
-25		"Do not reset speed for session"
-27		"תעדוף ברירת מחדל"
-28		"כתוביות:"
-30		"שמע:"
-32		"(דוגמה: eng jap swe)"
-33		"פתח הגדרות"
-34		"When opening an audio file,"
-36		"Additionally add to playlist:"
-38		"השתמש בתהליך נפרד בכדי לבנות את גרף הפילטרים"
-40		"דווח על תקעים שלא מתנגנים"
-41		"Remember selected tracks in playlist"
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+5		"השמעה"
+6		"נגן"
+7		"חזרה ללא הפסק"
+9		"מספר פעמים"
+10		"החזר אחורה כאשר ניגון מסתיים"
+11		"Control"
+12		"Volume step:"
+14		"Speed step:"
+16		"Do not reset speed for session"
+18		"תעדוף ברירת מחדל"
+19		"כתוביות:"
+21		"שמע:"
+23		"(דוגמה: eng jap swe)"
+24		"פתח הגדרות"
+25		"When opening an audio file,"
+27		"Additionally add to playlist:"
+29		"השתמש בתהליך נפרד בכדי לבנות את גרף הפילטרים"
+31		"דווח על תקעים שלא מתנגנים"
+32		"Remember selected tracks in playlist"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

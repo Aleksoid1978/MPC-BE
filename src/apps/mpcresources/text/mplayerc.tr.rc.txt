@@ -171,14 +171,21 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
 16		"Seçimi Sıfırla"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 5		"Ses işleyici"
 7		"Özellikler"
 9		"İkili çıkış"
-10		"Ses açma ayarları"
-11		"Ses dosyalarını oto-yükle"
-13		"Sıfırla"
-14		"Her zaman harici ses dosyalarını tercih et"
+10		"Ses"
+11		"Ses"
+12		"Alçak"
+14		"Yüksek"
+15		"Denge"
+16		"Sol"
+18		"Sağ"
+19		"Ses açma ayarları"
+20		"Ses dosyalarını oto-yükle"
+22		"Sıfırla"
+23		"Her zaman harici ses dosyalarını tercih et"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -377,33 +384,26 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Varsayılan"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
-5		"Ses"
-6		"Ses"
-7		"Alçak"
-9		"Yüksek"
-10		"Denge"
-11		"Sol"
-13		"Sağ"
-14		"Oynatma"
-15		"Sadece"
-16		"Sürekli tekrarla"
-18		"kez oynat"
-19		"Oynatma bitince geri sar"
-20		"Kontrol"
-21		"Ses adımı:"
-23		"Hız adımı:"
-25		"Oturum için hızı varsayılan ayarlara getirme"
-27		"Varsayılan parça seçimi"
-28		"Alt yazı:"
-30		"Ses:"
-32		"(Örnek: tur türkçe İngilizce eng jap)"
-33		"Açma ayarları"
-34		"Bir ses dosyası açıldığında"
-36		"Oynatma listesine ekle:"
-38		"Süzgeç grafiği kurulumu için oynatıcı önceliğini kullan"
-40		"Oluşturulamayan bağlantıları rapor et"
-41		"Oynatma listesindeki seçili parçaları hatırla"
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+5		"Oynatma"
+6		"Sadece"
+7		"Sürekli tekrarla"
+9		"kez oynat"
+10		"Oynatma bitince geri sar"
+11		"Kontrol"
+12		"Ses adımı:"
+14		"Hız adımı:"
+16		"Oturum için hızı varsayılan ayarlara getirme"
+18		"Varsayılan parça seçimi"
+19		"Alt yazı:"
+21		"Ses:"
+23		"(Örnek: tur türkçe İngilizce eng jap)"
+24		"Açma ayarları"
+25		"Bir ses dosyası açıldığında"
+27		"Oynatma listesine ekle:"
+29		"Süzgeç grafiği kurulumu için oynatıcı önceliğini kullan"
+31		"Oluşturulamayan bağlantıları rapor et"
+32		"Oynatma listesindeki seçili parçaları hatırla"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

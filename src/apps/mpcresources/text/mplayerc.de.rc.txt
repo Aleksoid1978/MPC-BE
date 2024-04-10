@@ -171,14 +171,21 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 17
 16		"Markierte &zurücksetzen"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 25
 5		"Audiorenderer"
 7		"Eigenschaften"
 9		"Duale Ausgabe"
-10		"Audioeinstellungen beim Öffnen"
-11		"Externe Audiodateien automatisch laden"
-13		"Zurücksetzen"
-14		"Externe Audiodateien gegenüber eingebetteten Audiospuren bevorzugen"
+10		"Audio"
+11		"Lautstärke"
+12		"Min."
+14		"Max."
+15		"Balance"
+16		"L"
+18		"R"
+19		"Audioeinstellungen beim Öffnen"
+20		"Externe Audiodateien automatisch laden"
+22		"Zurücksetzen"
+23		"Externe Audiodateien gegenüber eingebetteten Audiospuren bevorzugen"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
@@ -377,33 +384,26 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Zurücksetzen"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 42
-5		"Audio"
-6		"Lautstärke"
-7		"Min."
-9		"Max."
-10		"Balance"
-11		"L"
-13		"R"
-14		"Wiedergabe"
-15		"Spiele"
-16		"&Endlosschleife"
-18		"Mal ab"
-19		"Am Ende &zurückspringen"
-20		"Steuerung"
-21		"Lautstärkestufen:"
-23		"Geschwindigkeitsstufen:"
-25		"Geschwindigkeit in einer Sitzung nicht zurücksetzen"
-27		"Bevorzugte Spuren"
-28		"Untertitel:"
-30		"Audio:"
-32		"(Beispiel: eng jap swe)"
-33		"Aktionen beim Öffnen einer Datei"
-34		"Beim Öffnen einer Audiodatei,"
-36		"Zusätzlich zur Wiedergabeliste hinzufügen:"
-38		"Filter-Graph in separatem &Thread erstellen"
-40		"Fehlerhafte Pins im Graph &melden"
-41		"Ausgewählte Titel in der Wiedergabeliste merken"
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+5		"Wiedergabe"
+6		"Spiele"
+7		"&Endlosschleife"
+9		"Mal ab"
+10		"Am Ende &zurückspringen"
+11		"Steuerung"
+12		"Lautstärkestufen:"
+14		"Geschwindigkeitsstufen:"
+16		"Geschwindigkeit in einer Sitzung nicht zurücksetzen"
+18		"Bevorzugte Spuren"
+19		"Untertitel:"
+21		"Audio:"
+23		"(Beispiel: eng jap swe)"
+24		"Aktionen beim Öffnen einer Datei"
+25		"Beim Öffnen einer Audiodatei,"
+27		"Zusätzlich zur Wiedergabeliste hinzufügen:"
+29		"Filter-Graph in separatem &Thread erstellen"
+31		"Fehlerhafte Pins im Graph &melden"
+32		"Ausgewählte Titel in der Wiedergabeliste merken"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
