@@ -795,7 +795,8 @@ void CAppSettings::ResetSettings()
 	bStartMainTitle = false;
 	bNormalStartDVD = true;
 
-	fRemainingTime = false;
+	bRemainingTime = false;
+	bShowZeroHours = false;
 
 	strLastOpenFilterDir.Empty();
 
@@ -1480,7 +1481,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_DVDPOS, bRememberDVDPos);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FILEPOS, bRememberFilePos);
 
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, fRemainingTime);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, bRemainingTime);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SHOW_ZERO_HOURS, bShowZeroHours);
 
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR, strLastOpenFilterDir);
 
@@ -2003,7 +2005,8 @@ void CAppSettings::SaveSettings()
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_USER_AGENT, strUserAgent);
 	http::userAgent = strUserAgent;
 
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, fRemainingTime);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, bRemainingTime);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SHOW_ZERO_HOURS, bShowZeroHours);
 
 	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, nLastFileInfoPage);
 

@@ -641,7 +641,7 @@ void CPlayerSeekBar::OnRButtonDown(UINT nFlags, CPoint point)
 		ScreenToClient(&p);
 
 		if (rt.PtInRect(p)) {
-			s.fRemainingTime = !s.fRemainingTime;
+			s.bRemainingTime = !s.bRemainingTime;
 			m_pMainFrame->OnTimer(CMainFrame::TIMER_STREAMPOSPOLLER);
 			Invalidate();
 		}

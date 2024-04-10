@@ -334,6 +334,7 @@
 #define IDS_RS_FILENAMEONSEEKBAR			L"FileNameOnSeekBar"
 
 #define IDS_RS_REMAINING_TIME				L"RemainingTime"
+#define IDS_RS_SHOW_ZERO_HOURS				L"ShowZeroHours"
 
 #define IDS_RS_SHADERS_INITIALIZED			L"Initialized"
 

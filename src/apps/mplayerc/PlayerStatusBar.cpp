@@ -231,16 +231,19 @@ void CPlayerStatusBar::SetStatusTimer(CString str)
 
 void CPlayerStatusBar::SetStatusTimer(REFERENCE_TIME rtNow, REFERENCE_TIME rtDur, bool bShowMilliSecs, const GUID& timeFormat)
 {
-	const bool bRemainingTime = AfxGetAppSettings().fRemainingTime && rtDur > 0;
+	const bool bRemainingTime = AfxGetAppSettings().bRemainingTime && rtDur > 0;
+	const bool bShowZeroHours = AfxGetAppSettings().bShowZeroHours && rtDur >= (UNITS * 3600);
+
 	REFERENCE_TIME rt = bRemainingTime ? rtDur - rtNow : rtNow;
+
 	CStringW strPos, strDur;
 
 	if (timeFormat == TIME_FORMAT_MEDIA_TIME) {
 		if (bShowMilliSecs) {
-			strPos = ReftimeToString(rt, false);
+			strPos = ReftimeToString(rt, bShowZeroHours);
 			strDur = ReftimeToString(rtDur, false);
 		} else {
-			strPos = ReftimeToString2(rt, false);
+			strPos = ReftimeToString2(rt, bShowZeroHours);
 			strDur = ReftimeToString2(rtDur, false);
 		}
 	} else if (timeFormat == TIME_FORMAT_FRAME) {
@@ -444,7 +447,7 @@ void CPlayerStatusBar::OnLButtonDown(UINT nFlags, CPoint point)
 	CAppSettings& s = AfxGetAppSettings();
 
 	if (m_time_rect.PtInRect(point) || m_time_rect2.PtInRect(point)) {
-		s.fRemainingTime = !s.fRemainingTime;
+		s.bRemainingTime = !s.bRemainingTime;
 		m_pMainFrame->OnTimer(2);
 		return;
 	}

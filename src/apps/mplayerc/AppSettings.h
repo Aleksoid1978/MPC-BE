@@ -820,7 +820,8 @@ public:
 	CString			strLastSavedPlaylistDir;
 
 	UINT			nLastUsedPage;
-	bool			fRemainingTime;
+	bool			bRemainingTime;
+	bool			bShowZeroHours;
 
 	CString			strTimeOnSeekBar;
 	bool			bStatusBarIsVisible;
