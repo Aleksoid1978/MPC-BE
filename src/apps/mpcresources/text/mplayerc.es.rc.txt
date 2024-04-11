@@ -351,25 +351,26 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Explorar..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 5		"Saltar distancias (pequeña, mediana, grande en ms)"
 9		"Predeterminado"
 10		"No usar 'buscar en carpeta' en comandos 'Saltar hacia atrás/adelante' cuando sólo hay un elemento en la lista de reproducción"
 12		"Evitar el MINIMIZADO en Pantalla Completa en un monitor no predeterminado"
 14		"Ocultar automáticamente el puntero durante la reproducción en modo ventana"
-16		"No mostrar 000xx.mpls de menos de"
-19		"min"
-20		"Habilitar soporte de LCD Logitech"
-21		"Usar Controles de Windows Media"
-22		"Habilitar MiniDump"
-23		"Archivo ejecutable FFmpeg:"
-25		"Comprobar Actualización"
-26		"Habilitar Comprobación Automática de Actualizaciones"
-27		"Retraso entre cada comprobación:"
-30		"día(s)"
-31		"Gestión de Ajustes"
-32		"Reiniciar"
-33		"Exportar"
+16		"Show zero hours in status bar and OSD"
+18		"No mostrar 000xx.mpls de menos de"
+21		"min"
+22		"Habilitar soporte de LCD Logitech"
+23		"Usar Controles de Windows Media"
+24		"Habilitar MiniDump"
+25		"Archivo ejecutable FFmpeg:"
+27		"Comprobar Actualización"
+28		"Habilitar Comprobación Automática de Actualizaciones"
+29		"Retraso entre cada comprobación:"
+32		"día(s)"
+33		"Gestión de Ajustes"
+34		"Reiniciar"
+35		"Exportar"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -1408,6 +1409,7 @@ STRING IDS_CMD_STARTPOS		"/startpos hh:mm:ss\tInicia la reproducción en la posi
 STRING IDS_CMD_SUB		"/sub ""subtítulo""\tCarga un archivo de subtítulos adicional"
 STRING IDS_CMD_UNREGALL		"/unregall\t\tAnula registro de formatos de video"
 STRING IDS_CMD_USAGE		"Uso: mpc-be.exe ""ruta"" [modificadores]\n\n""ruta""\t\tArchivo o carpeta principal a cargar (se permiten comodines)"
+STRING IDS_CMD_VOLUME		"/volume N\tSet Volume, where N is a range from 0 to 100"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"Brillante (Gama 2.2)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"Oscuro (Gama 2.4)"
 STRING IDS_CM_AMBIENTLIGHT_DIM		"Tenue (Gama 2.35)"

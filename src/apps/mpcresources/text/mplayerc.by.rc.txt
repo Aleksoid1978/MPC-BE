@@ -351,25 +351,26 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Абраць..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 5		"Jump distances (small, medium, large in ms)"
 9		"Default"
 10		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
 12		"Prevent from MINIMIZE when Fullscreen on non default monitor"
 14		"Auto-hide the pointer during playback in windowed mode"
-16		"Do not show 000xx.mpls shorter than"
-19		"min"
-20		"Enable Logitech LCD support"
-21		"Use Window Media Controls"
-22		"Enable MiniDump"
-23		"FFmpeg executable file:"
-25		"Update check"
-26		"Enable automatic update check"
-27		"Delay between each check:"
-30		"day(s)"
-31		"Settings management"
-32		"Скід"
-33		"Экспарт"
+16		"Show zero hours in status bar and OSD"
+18		"Do not show 000xx.mpls shorter than"
+21		"min"
+22		"Enable Logitech LCD support"
+23		"Use Window Media Controls"
+24		"Enable MiniDump"
+25		"FFmpeg executable file:"
+27		"Update check"
+28		"Enable automatic update check"
+29		"Delay between each check:"
+32		"day(s)"
+33		"Settings management"
+34		"Скід"
+35		"Экспарт"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -1408,6 +1409,7 @@ STRING IDS_CMD_STARTPOS		"/startpos hh:mm:ss\tStart playing at position hh:mm:ss
 STRING IDS_CMD_SUB		"/sub ""subname""\tЗагрузiць дадатковыя субтытры"
 STRING IDS_CMD_UNREGALL		"/unregall\t\tRemove all file associations"
 STRING IDS_CMD_USAGE		"Выкарыстанне: mpc-be.exe ""шлях"" [перамыкачы]\n\n""шлях""\tФайл або каталог для загрузкі (дазволеныя маскі)"
+STRING IDS_CMD_VOLUME		"/volume N\tSet Volume, where N is a range from 0 to 100"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"Bright (2.2 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"Dark (2.4 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DIM		"Dim (2.35 Gamma)"

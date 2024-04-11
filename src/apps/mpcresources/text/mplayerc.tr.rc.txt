@@ -351,25 +351,26 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Gözat..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 5		"Atlama uzaklıkları (ms olarak kısa, orta, uzun)"
 9		"Varsayılan"
 10		"Oynatma listesinde sadece bir öğe olduğunda 'Geri/İleri Git' komutlarındaki 'klasörde arama' özelliğini kullanma."
 12		"Varsayılan olmayan monitörde Tam Ekran olduğunda SİMGE DURUMUNA'yı engelle"
 14		"Pencere modunda oynatma sırasında işaretçiyi otomatik gizle"
-16		"Bu süreden daha kısa 000xx.mpls gösterme:"
-19		"dk."
-20		"Logitech LCD desteğini etkinleştir"
-21		"Windows Medya Kontrollerini kullan"
-22		"MiniDump etkinleştir"
-23		"FFmpeg çalıştırılabilir dosyası:"
-25		"Güncelleme kontrolü"
-26		"Otomatik güncelleme kontrolünü etkinleştir"
-27		"Her kontrol arasındaki gecikme:"
-30		"gün"
-31		"Ayar yönetimi"
-32		"Sıfırla"
-33		"Ver"
+16		"Show zero hours in status bar and OSD"
+18		"Bu süreden daha kısa 000xx.mpls gösterme:"
+21		"dk."
+22		"Logitech LCD desteğini etkinleştir"
+23		"Windows Medya Kontrollerini kullan"
+24		"MiniDump etkinleştir"
+25		"FFmpeg çalıştırılabilir dosyası:"
+27		"Güncelleme kontrolü"
+28		"Otomatik güncelleme kontrolünü etkinleştir"
+29		"Her kontrol arasındaki gecikme:"
+32		"gün"
+33		"Ayar yönetimi"
+34		"Sıfırla"
+35		"Ver"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -1408,6 +1409,7 @@ STRING IDS_CMD_STARTPOS		"/startpos ss:dd:ss\tOynatmaya ss:dd:ss süresinden ba�
 STRING IDS_CMD_SUB		"/sub ""alt_yazı""\tHarici bir alt yazı kullanmak için"
 STRING IDS_CMD_UNREGALL		"/unregall\t\tTüm dosya ilişkilendirilmeleri geri alınır"
 STRING IDS_CMD_USAGE		"Kullanım: mpc-be.exe ""yol_adı"" [anahtarlar]\n\n""yol_adı""\t\tYüklenecek dosya ya da klasör (özel\n\t\tkarakterler desteklenmektedir))"
+STRING IDS_CMD_VOLUME		"/volume N\tSet Volume, where N is a range from 0 to 100"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"Parlak (2.2 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"Koyu (2.4 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DIM		"Soluk (2.35 Gamma)"

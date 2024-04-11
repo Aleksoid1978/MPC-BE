@@ -351,25 +351,26 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Parcourir..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 5		"Distances de saut (petite, moyenne, grande, en ms)"
 9		"Par défaut"
 10		"Ne pas utiliser la « recherche dans le dossier » sur les commandes « Passer en arrière/en avant » lorsqu'il n'y a qu'un seul élément dans la Playlist"
 12		"Empêcher de MINIMISER en plein écran sur un moniteur autre que celui par défaut"
 14		"Masquer automatiquement le pointeur pendant la lecture en mode fenêtré"
-16		"Ne pas afficher les 000xx.mpls plus courts que"
-19		"min"
-20		"Activer le support de l'écran LCD Logitech"
-21		"Utiliser les contrôles Windows Media"
-22		"Activer MiniDump"
-23		"Fichier exécutable FFmpeg :"
-25		"Vérifier les mises à jour"
-26		"Activer la vérification automatique des mises à jour"
-27		"Délai entre chaque vérification :"
-30		"jour(s)"
-31		"Gestion des paramètres"
-32		"Réinitialiser"
-33		"Exporter"
+16		"Show zero hours in status bar and OSD"
+18		"Ne pas afficher les 000xx.mpls plus courts que"
+21		"min"
+22		"Activer le support de l'écran LCD Logitech"
+23		"Utiliser les contrôles Windows Media"
+24		"Activer MiniDump"
+25		"Fichier exécutable FFmpeg :"
+27		"Vérifier les mises à jour"
+28		"Activer la vérification automatique des mises à jour"
+29		"Délai entre chaque vérification :"
+32		"jour(s)"
+33		"Gestion des paramètres"
+34		"Réinitialiser"
+35		"Exporter"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -1408,6 +1409,7 @@ STRING IDS_CMD_STARTPOS		"/startpos hh:mm:ss\tCommencer à lecture à la positio
 STRING IDS_CMD_SUB		"/sub ""fichier ST""\tCharge un fichier de sous-titres"
 STRING IDS_CMD_UNREGALL		"/unregall\t\tSupprime l'association des formats vidéo à MPC-BE"
 STRING IDS_CMD_USAGE		"Utilisation : mpc-be.exe ""nom du fichier"" [options]\n\n""nom du fichier""\tFichier principal ou répertoire à charger (jockers\n\t\tautorisés)"
+STRING IDS_CMD_VOLUME		"/volume N\tSet Volume, where N is a range from 0 to 100"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"Luminosité (2.2 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"Niveau de noir (2.4 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DIM		"Dim (2.35 Gamma)"

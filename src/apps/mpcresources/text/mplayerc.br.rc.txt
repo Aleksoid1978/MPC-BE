@@ -351,25 +351,26 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Procurar..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 5		"Distâncias do pulo (pequeno, médio, longo em ms)"
 9		"Padrão"
 10		"Não usar 'buscar na pasta' nos comandos 'Voltar/avançar' quando houver apenas um item na lista de reprodução"
 12		"Impedir de MINIMIZAR quando em tela cheia no monitor não padrão"
 14		"Auto-ocultar o ponteiro durante a reprodução no modo em janela"
-16		"Não mostrar 000xx.mpls mais curto que"
-19		"mín"
-20		"Ativar suporte Logitech LCD"
-21		"Use Window Media Controls"
-22		"Ativar MiniDump"
-23		"FFmpeg executable file:"
-25		"Verificar atualização"
-26		"Ativar verificação de atualização automática"
-27		"Demora entre cada verificação:"
-30		"dia(s)"
-31		"Gerenciar configurações"
-32		"Resetar"
-33		"Exportar"
+16		"Show zero hours in status bar and OSD"
+18		"Não mostrar 000xx.mpls mais curto que"
+21		"mín"
+22		"Ativar suporte Logitech LCD"
+23		"Use Window Media Controls"
+24		"Ativar MiniDump"
+25		"FFmpeg executable file:"
+27		"Verificar atualização"
+28		"Ativar verificação de atualização automática"
+29		"Demora entre cada verificação:"
+32		"dia(s)"
+33		"Gerenciar configurações"
+34		"Resetar"
+35		"Exportar"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -1408,6 +1409,7 @@ STRING IDS_CMD_STARTPOS		"/startpos hh:mm:ss\tIniciar reprodução na posição 
 STRING IDS_CMD_SUB		"/sub ""subname""\tCarregar um arquivo de legenda adicional"
 STRING IDS_CMD_UNREGALL		"/unregall\t\tRemover todas as associações de arquivo"
 STRING IDS_CMD_USAGE		"Uso: mpc-be.exe ""pathname"" [opções]\n\n""pathname""\tO arquivo principal ou diretório a ser carregado\n\t\t(curingas permitidos)"
+STRING IDS_CMD_VOLUME		"/volume N\tSet Volume, where N is a range from 0 to 100"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"Brilhante (2.2 gama)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"Escuro (2.4 gama)"
 STRING IDS_CM_AMBIENTLIGHT_DIM		"Dim (2.35 gama)"

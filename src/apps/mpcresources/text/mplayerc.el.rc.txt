@@ -351,25 +351,26 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Εύρεση..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 5		"Αποστάσεις μεταπήδησης (μικρή, μεσαία, μεγάλη σε ms)"
 9		"Προεπιλογή"
 10		"Χωρίς χρήση της ‘αναζήτησης στο φάκελο’ στις εντολές ‘Μετάβαση πίσω/μπροστά’ όταν μόνο ένα στοιχείο είναι στη λίστα"
 12		"Αποτροπή ελαχιστοποίησης από την πλήρη οθόνη σε μη προεπιλεγμένη οθόνη"
 14		"Αυτόματη απόκρυψη του δείκτη κατά την αναπαραγωγή σε λειτουργία με παράθυρα"
-16		"Να μην εμφανίζεται 000xx.mpls μικρότερη από ό, τι"
-19		"λεπ"
-20		"Ενεργοποίηση υποστήριξης Logitech LCD"
-21		"Use Window Media Controls"
-22		"Ενεργοποίηση MiniDump"
-23		"FFmpeg executable file:"
-25		"Έλεγχος για ενημέρωση"
-26		"Ενεργοποίηση αυτόματου ελέγχου ενημέρωσης"
-27		"Καθυστέρηση μεταξύ κάθε ελέγχου:"
-30		"ημέρα(ες)"
-31		"Διαχείριση ρυθμίσεων"
-32		"Επαναφορά"
-33		"Εξαγωγή"
+16		"Show zero hours in status bar and OSD"
+18		"Να μην εμφανίζεται 000xx.mpls μικρότερη από ό, τι"
+21		"λεπ"
+22		"Ενεργοποίηση υποστήριξης Logitech LCD"
+23		"Use Window Media Controls"
+24		"Ενεργοποίηση MiniDump"
+25		"FFmpeg executable file:"
+27		"Έλεγχος για ενημέρωση"
+28		"Ενεργοποίηση αυτόματου ελέγχου ενημέρωσης"
+29		"Καθυστέρηση μεταξύ κάθε ελέγχου:"
+32		"ημέρα(ες)"
+33		"Διαχείριση ρυθμίσεων"
+34		"Επαναφορά"
+35		"Εξαγωγή"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -1408,6 +1409,7 @@ STRING IDS_CMD_STARTPOS		"/startpos hh:mm:ss\tΈναρξη αναπαραγωγ�
 STRING IDS_CMD_SUB		"/sub ""όνομα υπότιτλων""\tΦόρτωση ενός πρόσθετου αρχείου υποτίτλων"
 STRING IDS_CMD_UNREGALL		"/unregall\t\tΚαταργεί όλες τις συσχετίσεις αρχείων"
 STRING IDS_CMD_USAGE		"Χρήση: mpc-be.exe ""κατάλογος"" [παράμετροι]\n\n""κατάλογος""\tΤο κύριο αρχείο ή ο κατάλογος που θα φορτωθεί\n\t\t(τα wildcards επιτρέπονται)"
+STRING IDS_CMD_VOLUME		"/volume N\tSet Volume, where N is a range from 0 to 100"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"Φωτεινό (2.2 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"Σκοτεινό (2.4 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DIM		"Ημισκότεινο (2.35 Gamma)"

@@ -351,25 +351,26 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Öffnen..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 5		"Sprungintervalle (klein, mittel, groß in ms)"
 9		"Zurücksetzen"
 10		"Bei nur einem Eintrag in der Wiedergabeliste keine weiteren Medien im Ordner durch 'Rückwärts springen | Vorherige Datei' / 'Vorwärts springen | Nächste Datei' öffnen"
 12		"Minimieren des Fensters auf sekundärem Anzeigegerät bei Vollbild verhindern"
 14		"Während der Wiedergabe im Fenstermodus den Mauszeiger automatisch verstecken"
-16		"Keine 000xx.mpls anzeigen, die kürzer sind als"
-19		"Min."
-20		"LCD-Unterstützung für Logitech-Tastaturen aktivieren"
-21		"Desktop-Overlay bei Verwendung von Medientasten anzeigen"
-22		"MiniDumps aktivieren"
-23		"FFmpeg-Ausführungsdatei:"
-25		"Updates"
-26		"Automatisch nach Updates suchen"
-27		"Suchintervall nach Updates:"
-30		"Tag(e)"
-31		"Programmeinstellungen verwalten"
-32		"Zurücksetzen"
-33		"Exportieren..."
+16		"Show zero hours in status bar and OSD"
+18		"Keine 000xx.mpls anzeigen, die kürzer sind als"
+21		"Min."
+22		"LCD-Unterstützung für Logitech-Tastaturen aktivieren"
+23		"Desktop-Overlay bei Verwendung von Medientasten anzeigen"
+24		"MiniDumps aktivieren"
+25		"FFmpeg-Ausführungsdatei:"
+27		"Updates"
+28		"Automatisch nach Updates suchen"
+29		"Suchintervall nach Updates:"
+32		"Tag(e)"
+33		"Programmeinstellungen verwalten"
+34		"Zurücksetzen"
+35		"Exportieren..."
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -1408,6 +1409,7 @@ STRING IDS_CMD_STARTPOS		"/startpos hh:mm:ss\tStartet Wiedergabe bei Position (h
 STRING IDS_CMD_SUB		"/sub ""Subname""\tÖffnet zusätzliche Untertiteldatei."
 STRING IDS_CMD_UNREGALL		"/unregall\t\tDeregistriert alle Medienformate."
 STRING IDS_CMD_USAGE		"Aufruf: mpc-be.exe ""Pfadname"" [Parameter]\n\n""Pfadname""\tGibt Mediendatei oder Verzeichnis an\n\t\t(Wildcards sind möglich, Standardeingabe kann\n\t\tals ""-"" angegeben werden)."
+STRING IDS_CMD_VOLUME		"/volume N\tSet Volume, where N is a range from 0 to 100"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"Hell (2.2 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"Dunkel (2.4 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DIM		"Schwach (2.35 Gamma)"

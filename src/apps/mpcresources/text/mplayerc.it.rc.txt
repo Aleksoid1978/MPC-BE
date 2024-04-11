@@ -351,25 +351,26 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Sfoglia..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 5		"Intervalli di salto (piccolo, medio, grande in ms)"
 9		"Predefinito"
 10		"Non usare la funzione 'cerca nella cartella' nei comandi 'Salta avanti/indietro' quando è presente un solo elemento in playlist"
 12		"Evita riduzione a icona quando è a tutto schermo su monitor non predefinito"
 14		"Nascondi automaticamente il puntatore durante la riproduzione in modalità finestra"
-16		"Non mostrare 000xx.mpls più breve di"
-19		"min"
-20		"Abilita il supporto LCD Logitech"
-21		"Usa i controlli Window Media"
-22		"Abilita MiniDump"
-23		"File eseguibile FFmpeg:"
-25		"Controlla aggiornamenti"
-26		"Abilita controllo aggiornamenti automatico"
-27		"Controlla ogni:"
-30		"giorno(i)"
-31		"Gestione impostazioni"
-32		"Reimposta"
-33		"Esporta"
+16		"Show zero hours in status bar and OSD"
+18		"Non mostrare 000xx.mpls più breve di"
+21		"min"
+22		"Abilita il supporto LCD Logitech"
+23		"Usa i controlli Window Media"
+24		"Abilita MiniDump"
+25		"File eseguibile FFmpeg:"
+27		"Controlla aggiornamenti"
+28		"Abilita controllo aggiornamenti automatico"
+29		"Controlla ogni:"
+32		"giorno(i)"
+33		"Gestione impostazioni"
+34		"Reimposta"
+35		"Esporta"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -1408,6 +1409,7 @@ STRING IDS_CMD_STARTPOS		"/startpos hh:mm:ss\tInizia la riproduzione alla posizi
 STRING IDS_CMD_SUB		"/sub ""subname""\tCarica un file di sottotitoli aggiuntivo"
 STRING IDS_CMD_UNREGALL		"/unregall\t\tRimuovi tutte le associazioni di file"
 STRING IDS_CMD_USAGE		"Utilizzo: mpc-be.exe ""nome_percorso"" [opzioni]\n\n""nome_percorso""\tIl file o la directory principale da caricare (caratteri jolly\n\t\tammessi)"
+STRING IDS_CMD_VOLUME		"/volume N\tSet Volume, where N is a range from 0 to 100"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"Luminoso (2,2 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"Scuro (2.4 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DIM		"Dim (2.35 Gamma)"

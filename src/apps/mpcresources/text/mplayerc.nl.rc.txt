@@ -351,25 +351,26 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Bladeren..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 5		"Verspring intervallen (kort, middel, lang in ms)"
 9		"Standaard"
 10		"Zoek NIET op andere bestanden in dezelfde map bij het gebruik van ""Vorige/Volgende"" als er alleen een item in afspeellijst staat."
 12		"Minimaliseren vermijden in geval van volledig scherm op niet-primair scherm"
 14		"Verberg automatisch de muisaanwijzer tijdens het afspelen in de venstermodus"
-16		"Toon 000xx.mpls niet, die korter zijn dan"
-19		"min"
-20		"Activeer Logitech LCD-ondersteuning"
-21		"Gebruik mediabediening van Windows"
-22		"Activeer MiniDump"
-23		"Executablebestand ffmpeg:"
-25		"Op updates controleren"
-26		"Activeer automatische updatecontrole"
-27		"Controleer 1 keer per"
-30		"dag(en)"
-31		"Instellingen beheren"
-32		"Resetten"
-33		"Exporteren"
+16		"Show zero hours in status bar and OSD"
+18		"Toon 000xx.mpls niet, die korter zijn dan"
+21		"min"
+22		"Activeer Logitech LCD-ondersteuning"
+23		"Gebruik mediabediening van Windows"
+24		"Activeer MiniDump"
+25		"Executablebestand ffmpeg:"
+27		"Op updates controleren"
+28		"Activeer automatische updatecontrole"
+29		"Controleer 1 keer per"
+32		"dag(en)"
+33		"Instellingen beheren"
+34		"Resetten"
+35		"Exporteren"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -1408,6 +1409,7 @@ STRING IDS_CMD_STARTPOS		"/startpos uu:mm:ss\tStart afspelen op positie uu:mm:ss
 STRING IDS_CMD_SUB		"/sub ""ondertitel""\tLaad nog een ondertitelingsbestand"
 STRING IDS_CMD_UNREGALL		"/unregall\t\tVerwijder alle bestandskoppelingen"
 STRING IDS_CMD_USAGE		"Gebruik: mpc-be.exe ""padnaam"" [parameters]\n\n""padnaam""\tHet te laden bestand of map (wildcards\n\t\ttoegestaan)"
+STRING IDS_CMD_VOLUME		"/volume N\tSet Volume, where N is a range from 0 to 100"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"Helder (2.2 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"Donker (2.4 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DIM		"Schemerig (2.35 Gamma)"

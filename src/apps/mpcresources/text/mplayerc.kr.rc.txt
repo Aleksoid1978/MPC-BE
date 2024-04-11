@@ -351,25 +351,26 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"찾아보기..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 5		"이동 간격(최소/중간/최대 간격을 밀리초 단위로 입력)"
 9		"기본값"
 10		"재생 목록에 파일 하나만 있다면 '앞/뒤 탐색' 시에 '폴더 내에서 찾기' 사용 안 함"
 12		"전체 화면 시, 최소화 방지"
 14		"창 모드에서 재생하는 동안 포인터 자동 숨기기"
-16		"다음 시간보다 짧은 000xx.mpls를 표시하지 않음"
-19		"분"
-20		"로지텍 LCD 지원 활성화(실험적)"
-21		"윈도 미디어 제어 사용"
-22		"미니 덤프 활성화"
-23		"FFmpeg 실행 파일 :"
-25		"업데이트 확인"
-26		"자동 업데이트 확인 활성화"
-27		"확인할 간격 :"
-30		"일"
-31		"설정 관리"
-32		"초기화"
-33		"내보내기"
+16		"Show zero hours in status bar and OSD"
+18		"다음 시간보다 짧은 000xx.mpls를 표시하지 않음"
+21		"분"
+22		"로지텍 LCD 지원 활성화(실험적)"
+23		"윈도 미디어 제어 사용"
+24		"미니 덤프 활성화"
+25		"FFmpeg 실행 파일 :"
+27		"업데이트 확인"
+28		"자동 업데이트 확인 활성화"
+29		"확인할 간격 :"
+32		"일"
+33		"설정 관리"
+34		"초기화"
+35		"내보내기"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -1408,6 +1409,7 @@ STRING IDS_CMD_STARTPOS		"/startpos hh:mm:ss\t위치 hh:mm:ss에서 재생 시�
 STRING IDS_CMD_SUB		"/sub ""자막 파일""\t추가적인 자막 파일"
 STRING IDS_CMD_UNREGALL		"/unregall\t\t모든 연결 해제"
 STRING IDS_CMD_USAGE		"사용법 : mpc-be.exe ""경로명"" [스위치]\n\n""경로명""\t불러올 파일이나 디렉터리.(와일드 카드\n\t\t사용 가능)"
+STRING IDS_CMD_VOLUME		"/volume N\tSet Volume, where N is a range from 0 to 100"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"밝게(2.2 감마)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"어둡게(2.4 감마)"
 STRING IDS_CM_AMBIENTLIGHT_DIM		"조금 어둡게(2.35 감마)"

@@ -1077,24 +1077,26 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "A mutató automatikus elrejtése ablakos lejátszás közben",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
-    LTEXT           "Ne mutasd ha 000xx.mpls rövidebb",IDC_STATIC,7,86,150,8
-    EDITTEXT        IDC_EDIT5,161,84,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,181,84,11,14
-    LTEXT           "perc",IDC_STATIC,197,86,30,8
-    CONTROL         "Engedélyezze a Logitech LCD támogatást",IDC_CHECK_LCD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,100,264,9
-    CONTROL         "Használja a Window Media Controls-t",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,112,220,9
-    CONTROL         "MiniDump engedélyezése",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,124,184,9
-    LTEXT           "FFmpeg futtatható fájl:",IDC_STATIC,7,139,104,8
-    COMBOBOX        IDC_COMBO1,113,137,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Frissítés ellenőrzése",IDC_STATIC,5,154,286,40
-    CONTROL         "Automatikus frissítésellenőrzés engedélyezése",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,166,250,9
-    LTEXT           "Késleltetés az ellenőrzéseknél:",IDC_STATIC5,10,179,110,8
-    EDITTEXT        IDC_EDIT4,120,177,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,140,177,13,14
-    LTEXT           "nap(ok)",IDC_STATIC6,155,179,50,8
-    GROUPBOX        "Beállítások kezelése",IDC_STATIC,5,196,286,28
-    PUSHBUTTON      "Visszaállítás",IDC_RESET_SETTINGS,10,207,55,14
-    PUSHBUTTON      "Export",IDC_EXPORT_SETTINGS,73,207,55,14
+    CONTROL         "Show zero hours in status bar and OSD",IDC_CHECK8,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
+    LTEXT           "Ne mutasd ha 000xx.mpls rövidebb",IDC_STATIC,7,99,150,8
+    EDITTEXT        IDC_EDIT5,161,97,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,181,97,11,14
+    LTEXT           "perc",IDC_STATIC,197,99,30,8
+    CONTROL         "Engedélyezze a Logitech LCD támogatást",IDC_CHECK_LCD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,113,264,9
+    CONTROL         "Használja a Window Media Controls-t",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,125,220,9
+    CONTROL         "MiniDump engedélyezése",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,137,184,9
+    LTEXT           "FFmpeg futtatható fájl:",IDC_STATIC,7,152,104,8
+    COMBOBOX        IDC_COMBO1,113,150,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Frissítés ellenőrzése",IDC_STATIC,5,167,286,40
+    CONTROL         "Automatikus frissítésellenőrzés engedélyezése",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,179,250,9
+    LTEXT           "Késleltetés az ellenőrzéseknél:",IDC_STATIC5,10,192,110,8
+    EDITTEXT        IDC_EDIT4,120,190,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,140,190,13,14
+    LTEXT           "nap(ok)",IDC_STATIC6,155,192,50,8
+    GROUPBOX        "Beállítások kezelése",IDC_STATIC,5,209,286,28
+    PUSHBUTTON      "Visszaállítás",IDC_RESET_SETTINGS,10,220,55,14
+    PUSHBUTTON      "Export",IDC_EXPORT_SETTINGS,73,220,55,14
 END
 
 IDD_TUNER_SCAN DIALOGEX 0, 0, 407, 246
@@ -3222,6 +3224,7 @@ BEGIN
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tFix ablakméret beállítása"
     IDS_CMD_MONITOR         "/monitor N\tIndítás az N. monitoron, ahol N egytől indul"
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\tN. audió átalakító használata, ahol N egytől indul\n\t\t(lásd ""Hang"" beállítások)"
+    IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
     IDS_CMD_CLIPBOARD       "/clipboard\t\tNyissa meg az elérési utakat/hivatkozásokat a vágólapról"
     IDS_CMD_RESET           "/reset\t\tAlapbeállítások visszaállítása"
 END

@@ -29,16 +29,6 @@
 IMPLEMENT_DYNAMIC(CPPageMisc, CPPageBase)
 CPPageMisc::CPPageMisc()
 	: CPPageBase(CPPageMisc::IDD, CPPageMisc::IDD)
-	, m_nJumpDistS(0)
-	, m_nJumpDistM(0)
-	, m_nJumpDistL(0)
-	, m_fDontUseSearchInFolder(FALSE)
-	, m_fPreventMinimize(FALSE)
-	, m_bHideWindowedMousePointer(FALSE)
-	, m_nMinMPlsDuration(3)
-	, m_fLCDSupport(FALSE)
-	, m_fMiniDump(FALSE)
-	, m_nUpdaterDelay(7)
 {
 }
 
@@ -56,6 +46,7 @@ void CPPageMisc::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK6, m_fPreventMinimize);
 	DDX_Check(pDX, IDC_CHECK7, m_fDontUseSearchInFolder);
 	DDX_Check(pDX, IDC_CHECK5, m_bHideWindowedMousePointer);
+	DDX_Check(pDX, IDC_CHECK8, m_bShowZeroHours);
 	DDX_Text(pDX, IDC_EDIT5, m_nMinMPlsDuration);
 	DDX_Control(pDX, IDC_SPIN2, m_spnMinMPlsDuration);
 	DDX_Check(pDX, IDC_CHECK_LCD, m_fLCDSupport);
@@ -94,6 +85,7 @@ BOOL CPPageMisc::OnInitDialog()
 	m_fPreventMinimize = s.fPreventMinimize;
 	m_fDontUseSearchInFolder = s.fDontUseSearchInFolder;
 	m_bHideWindowedMousePointer = s.bHideWindowedMousePointer;
+	m_bShowZeroHours = s.bShowZeroHours;
 	m_nMinMPlsDuration = s.nMinMPlsDuration;
 	m_spnMinMPlsDuration.SetRange32(0, 20);
 	m_fLCDSupport = s.fLCDSupport;
@@ -128,6 +120,7 @@ BOOL CPPageMisc::OnApply()
 	s.fPreventMinimize          = !!m_fPreventMinimize;
 	s.fDontUseSearchInFolder    = !!m_fDontUseSearchInFolder;
 	s.bHideWindowedMousePointer = !!m_bHideWindowedMousePointer;
+	s.bShowZeroHours            = !!m_bShowZeroHours;
 	s.nMinMPlsDuration          = (m_nMinMPlsDuration = std::clamp(m_nMinMPlsDuration, 0, 20));
 	s.fLCDSupport               = !!m_fLCDSupport;
 	s.bWinMediaControls         = !!m_bWinMediaControls;

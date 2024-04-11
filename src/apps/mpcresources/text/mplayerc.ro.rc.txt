@@ -351,25 +351,26 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Răsfoire..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 5		"Intervale de sărire (mic, mediu, mare în ms)"
 9		"Implicit"
 10		"Nu folosi 'Caută în dosar' pentru comenzile 'Sari înapoi/înainte' atunci când este numai un element în lista de redare"
 12		"Previne minimizarea playerului din ecran complet pe un monitor care nu este implicit"
 14		"Ascunde automat indicatorul în timpul redării în modul fereastră"
-16		"Nu afișa 000xx.mpls mai scurt decât"
-19		"min"
-20		"Activează suportul LCD pentru tastaturi Logitech"
-21		"Folosește Window Media Controls"
-22		"Activează MiniDump"
-23		"Fișier executabil FFmpeg:"
-25		"Verifică pentru actualizări"
-26		"Activează verificarea automată a actualizărilor"
-27		"Întârziere între fiecare verificare:"
-30		"zi(le)"
-31		"Administrarea setărilor"
-32		"Resetează"
-33		"Exportă"
+16		"Show zero hours in status bar and OSD"
+18		"Nu afișa 000xx.mpls mai scurt decât"
+21		"min"
+22		"Activează suportul LCD pentru tastaturi Logitech"
+23		"Folosește Window Media Controls"
+24		"Activează MiniDump"
+25		"Fișier executabil FFmpeg:"
+27		"Verifică pentru actualizări"
+28		"Activează verificarea automată a actualizărilor"
+29		"Întârziere între fiecare verificare:"
+32		"zi(le)"
+33		"Administrarea setărilor"
+34		"Resetează"
+35		"Exportă"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -1408,6 +1409,7 @@ STRING IDS_CMD_STARTPOS		"/startpos hh:mm:ss\tPornește redarea la poziția hh:m
 STRING IDS_CMD_SUB		"/sub ""nume subtitrare""\tÎncarcă o subtitrare suplimentară"
 STRING IDS_CMD_UNREGALL		"/unregall\t\tElimină toate asocierile de fișiere"
 STRING IDS_CMD_USAGE		"Utilizare: mpc-be.exe ""cale"" [comutatoare]\n\n""cale""\tFișierul sau directorul principal ce trebuie încărcat (metacaractere\n\t\tpermise)"
+STRING IDS_CMD_VOLUME		"/volume N\tSet Volume, where N is a range from 0 to 100"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"Luminos (2.2 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"Întunecat (2.4 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DIM		"Lumină fadă (2.35 Gamma)"

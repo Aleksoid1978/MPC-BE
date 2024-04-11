@@ -351,25 +351,26 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"参照..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 5		"ジャンプ間隔 (小、中、大: ミリ秒単位)"
 9		"既定"
 10		"プレイリスト登録が 1 項目の時は「フォルダー内検索」の「前へ/次へ」を使用しない"
 12		"既定のモニター以外では全画面表示で 最小化 を禁止する"
 14		"ウィンドウ モードで再生中にポインターを自動で隠す"
-16		"指定した時間より短い 000xx.mpls を表示しない:"
-19		"分"
-20		"Logitech (Logicool) LCD サポートを有効にする"
-21		"ウィンドウ メディア コントロールを使用する"
-22		"MiniDump を有効にする"
-23		"FFmpeg 実行可能ファイル:"
-25		"更新の確認"
-26		"更新を自動で確認する"
-27		"確認する間隔:"
-30		"日"
-31		"設定の管理"
-32		"リセット"
-33		"エクスポート"
+16		"Show zero hours in status bar and OSD"
+18		"指定した時間より短い 000xx.mpls を表示しない:"
+21		"分"
+22		"Logitech (Logicool) LCD サポートを有効にする"
+23		"ウィンドウ メディア コントロールを使用する"
+24		"MiniDump を有効にする"
+25		"FFmpeg 実行可能ファイル:"
+27		"更新の確認"
+28		"更新を自動で確認する"
+29		"確認する間隔:"
+32		"日"
+33		"設定の管理"
+34		"リセット"
+35		"エクスポート"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -1408,6 +1409,7 @@ STRING IDS_CMD_STARTPOS		"/startpos hh:mm:ss\t位置 hh:mm:ss から再生を開
 STRING IDS_CMD_SUB		"/sub ""subname""\t追加の字幕ファイルを読み込む"
 STRING IDS_CMD_UNREGALL		"/unregall\t\tすべての関連付けを解除する"
 STRING IDS_CMD_USAGE		"使用方法: mpc-be.exe ""pathname"" [switches]\n\n""pathname""\t読み込むメイン ファイルまたはディレクトリ (ワイルドカード使用可)"
+STRING IDS_CMD_VOLUME		"/volume N\tSet Volume, where N is a range from 0 to 100"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"明るい (ガンマ値 2.2)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"暗い (ガンマ値 2.4)"
 STRING IDS_CM_AMBIENTLIGHT_DIM		"薄暗い (ガンマ値 2.35)"
