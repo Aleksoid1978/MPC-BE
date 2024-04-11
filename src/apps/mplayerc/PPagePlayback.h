@@ -55,6 +55,9 @@ public:
 	BOOL		m_fEnableWorkerThreadForOpening = FALSE;
 	BOOL		m_fReportFailedPins = FALSE;
 
+	BOOL		m_bFastSeek = FALSE;
+	BOOL		m_bPauseMinimizedVideo = FALSE;
+
 	enum { IDD = IDD_PPAGEPLAYBACK };
 
 protected:

@@ -351,27 +351,25 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Pretraži..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 5		"Preskoči daljine (malu, srednju, veliku u ms)"
 9		"Default"
-10		"Brzo traženje (na keyframu)"
-11		"Ne koristi 'traženje u mapi' uz naredbe 'Preskoči natrag/naprijed' uz samo jedan predmet na playlisti"
-13		"Spriječi MINIMIZIRANJE kada je postavljen puni zaslon na nepodrazumijevanom monitoru"
-15		"Zaustavi video pregled pri minimiziranju"
-17		"Auto-skrivanje pokazivača tijekom pregleda u uokvirenom modu"
-19		"Ne pokazuj 000xx.mpls kraće od"
-22		"min"
-23		"Omogući Logitech LCD podršku"
-24		"Koristi Window Media Controls"
-25		"Omogući MiniDump"
-26		"FFmpeg executable file:"
-28		"Provjera nadogradnji"
-29		"Omogući automatsku provjeru nadogradnji"
-30		"Odgoda između provjera:"
-33		"dan(a)"
-34		"Upravljanje postavkama"
-35		"Reset"
-36		"Izvoz"
+10		"Ne koristi 'traženje u mapi' uz naredbe 'Preskoči natrag/naprijed' uz samo jedan predmet na playlisti"
+12		"Spriječi MINIMIZIRANJE kada je postavljen puni zaslon na nepodrazumijevanom monitoru"
+14		"Auto-skrivanje pokazivača tijekom pregleda u uokvirenom modu"
+16		"Ne pokazuj 000xx.mpls kraće od"
+19		"min"
+20		"Omogući Logitech LCD podršku"
+21		"Koristi Window Media Controls"
+22		"Omogući MiniDump"
+23		"FFmpeg executable file:"
+25		"Provjera nadogradnji"
+26		"Omogući automatsku provjeru nadogradnji"
+27		"Odgoda između provjera:"
+30		"dan(a)"
+31		"Upravljanje postavkama"
+32		"Reset"
+33		"Izvoz"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -384,7 +382,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 5		"Reprodukcija"
 6		"Pusti"
 7		"Ponavljaj beskonačno"
@@ -404,6 +402,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
 29		"Koristi radnu dretvu za konstrukciju grafa filtara"
 31		"Izvijesti o pinovima koji se nisu rendali"
 32		"Zapamti izabrane zapise iz playliste"
+33		"Brzo traženje (na keyframu)"
+34		"Zaustavi video pregled pri minimiziranju"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

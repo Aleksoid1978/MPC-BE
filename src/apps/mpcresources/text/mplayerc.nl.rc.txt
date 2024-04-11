@@ -351,27 +351,25 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Bladeren..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 5		"Verspring intervallen (kort, middel, lang in ms)"
 9		"Standaard"
-10		"Snel zoeken (op sleutelframe)"
-11		"Zoek NIET op andere bestanden in dezelfde map bij het gebruik van ""Vorige/Volgende"" als er alleen een item in afspeellijst staat."
-13		"Minimaliseren vermijden in geval van volledig scherm op niet-primair scherm"
-15		"Weergave pauseren als het venster geminimaliseerd is"
-17		"Verberg automatisch de muisaanwijzer tijdens het afspelen in de venstermodus"
-19		"Toon 000xx.mpls niet, die korter zijn dan"
-22		"min"
-23		"Activeer Logitech LCD-ondersteuning"
-24		"Gebruik mediabediening van Windows"
-25		"Activeer MiniDump"
-26		"Executablebestand ffmpeg:"
-28		"Op updates controleren"
-29		"Activeer automatische updatecontrole"
-30		"Controleer 1 keer per"
-33		"dag(en)"
-34		"Instellingen beheren"
-35		"Resetten"
-36		"Exporteren"
+10		"Zoek NIET op andere bestanden in dezelfde map bij het gebruik van ""Vorige/Volgende"" als er alleen een item in afspeellijst staat."
+12		"Minimaliseren vermijden in geval van volledig scherm op niet-primair scherm"
+14		"Verberg automatisch de muisaanwijzer tijdens het afspelen in de venstermodus"
+16		"Toon 000xx.mpls niet, die korter zijn dan"
+19		"min"
+20		"Activeer Logitech LCD-ondersteuning"
+21		"Gebruik mediabediening van Windows"
+22		"Activeer MiniDump"
+23		"Executablebestand ffmpeg:"
+25		"Op updates controleren"
+26		"Activeer automatische updatecontrole"
+27		"Controleer 1 keer per"
+30		"dag(en)"
+31		"Instellingen beheren"
+32		"Resetten"
+33		"Exporteren"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -384,7 +382,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Resetten"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 5		"Afspelen"
 6		"Afspelen"
 7		"Steeds herhalen"
@@ -404,6 +402,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
 29		"Filtergraph in aparte CPU-thread samenstellen"
 31		"Rapporteer pins die niet renderen"
 32		"Onthoud geselecteerde items in de afspeellijst"
+33		"Snel zoeken (op sleutelframe)"
+34		"Weergave pauseren als het venster geminimaliseerd is"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

@@ -351,27 +351,25 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Öffnen..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 5		"Sprungintervalle (klein, mittel, groß in ms)"
 9		"Zurücksetzen"
-10		"Schnellen Suchlauf verwenden (Keyframes)"
-11		"Bei nur einem Eintrag in der Wiedergabeliste keine weiteren Medien im Ordner durch 'Rückwärts springen | Vorherige Datei' / 'Vorwärts springen | Nächste Datei' öffnen"
-13		"Minimieren des Fensters auf sekundärem Anzeigegerät bei Vollbild verhindern"
-15		"Videowiedergabe pausieren, wenn minimiert"
-17		"Während der Wiedergabe im Fenstermodus den Mauszeiger automatisch verstecken"
-19		"Keine 000xx.mpls anzeigen, die kürzer sind als"
-22		"Min."
-23		"LCD-Unterstützung für Logitech-Tastaturen aktivieren"
-24		"Desktop-Overlay bei Verwendung von Medientasten anzeigen"
-25		"MiniDumps aktivieren"
-26		"FFmpeg-Ausführungsdatei:"
-28		"Updates"
-29		"Automatisch nach Updates suchen"
-30		"Suchintervall nach Updates:"
-33		"Tag(e)"
-34		"Programmeinstellungen verwalten"
-35		"Zurücksetzen"
-36		"Exportieren..."
+10		"Bei nur einem Eintrag in der Wiedergabeliste keine weiteren Medien im Ordner durch 'Rückwärts springen | Vorherige Datei' / 'Vorwärts springen | Nächste Datei' öffnen"
+12		"Minimieren des Fensters auf sekundärem Anzeigegerät bei Vollbild verhindern"
+14		"Während der Wiedergabe im Fenstermodus den Mauszeiger automatisch verstecken"
+16		"Keine 000xx.mpls anzeigen, die kürzer sind als"
+19		"Min."
+20		"LCD-Unterstützung für Logitech-Tastaturen aktivieren"
+21		"Desktop-Overlay bei Verwendung von Medientasten anzeigen"
+22		"MiniDumps aktivieren"
+23		"FFmpeg-Ausführungsdatei:"
+25		"Updates"
+26		"Automatisch nach Updates suchen"
+27		"Suchintervall nach Updates:"
+30		"Tag(e)"
+31		"Programmeinstellungen verwalten"
+32		"Zurücksetzen"
+33		"Exportieren..."
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -384,7 +382,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Zurücksetzen"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 5		"Wiedergabe"
 6		"Spiele"
 7		"&Endlosschleife"
@@ -404,6 +402,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
 29		"Filter-Graph in separatem &Thread erstellen"
 31		"Fehlerhafte Pins im Graph &melden"
 32		"Ausgewählte Titel in der Wiedergabeliste merken"
+33		"Schnellen Suchlauf verwenden (Keyframes)"
+34		"Videowiedergabe pausieren, wenn minimiert"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

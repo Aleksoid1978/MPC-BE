@@ -351,27 +351,25 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"参照..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 5		"ジャンプ間隔 (小、中、大: ミリ秒単位)"
 9		"既定"
-10		"高速シーク (キーフレームに)"
-11		"プレイリスト登録が 1 項目の時は「フォルダー内検索」の「前へ/次へ」を使用しない"
-13		"既定のモニター以外では全画面表示で 最小化 を禁止する"
-15		"最小化時にビデオ再生を一時停止させる"
-17		"ウィンドウ モードで再生中にポインターを自動で隠す"
-19		"指定した時間より短い 000xx.mpls を表示しない:"
-22		"分"
-23		"Logitech (Logicool) LCD サポートを有効にする"
-24		"ウィンドウ メディア コントロールを使用する"
-25		"MiniDump を有効にする"
-26		"FFmpeg 実行可能ファイル:"
-28		"更新の確認"
-29		"更新を自動で確認する"
-30		"確認する間隔:"
-33		"日"
-34		"設定の管理"
-35		"リセット"
-36		"エクスポート"
+10		"プレイリスト登録が 1 項目の時は「フォルダー内検索」の「前へ/次へ」を使用しない"
+12		"既定のモニター以外では全画面表示で 最小化 を禁止する"
+14		"ウィンドウ モードで再生中にポインターを自動で隠す"
+16		"指定した時間より短い 000xx.mpls を表示しない:"
+19		"分"
+20		"Logitech (Logicool) LCD サポートを有効にする"
+21		"ウィンドウ メディア コントロールを使用する"
+22		"MiniDump を有効にする"
+23		"FFmpeg 実行可能ファイル:"
+25		"更新の確認"
+26		"更新を自動で確認する"
+27		"確認する間隔:"
+30		"日"
+31		"設定の管理"
+32		"リセット"
+33		"エクスポート"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -384,7 +382,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"既定"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 5		"再生"
 6		"再生"
 7		"繰り返し再生"
@@ -404,6 +402,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
 29		"ワーカー スレッドを使用してフィルター グラフを作成する"
 31		"レンダリングに失敗したピンを報告する"
 32		"プレイリストで選択されたトラックを記憶する"
+33		"高速シーク (キーフレームに)"
+34		"最小化時にビデオ再生を一時停止させる"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

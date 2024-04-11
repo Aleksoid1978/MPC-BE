@@ -351,27 +351,25 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Parcourir..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 5		"Distances de saut (petite, moyenne, grande, en ms)"
 9		"Par défaut"
-10		"Recherche rapide (sur image clé)"
-11		"Ne pas utiliser la « recherche dans le dossier » sur les commandes « Passer en arrière/en avant » lorsqu'il n'y a qu'un seul élément dans la Playlist"
-13		"Empêcher de MINIMISER en plein écran sur un moniteur autre que celui par défaut"
-15		"Mettre en pause la lecture vidéo lorsqu'elle est réduite"
-17		"Masquer automatiquement le pointeur pendant la lecture en mode fenêtré"
-19		"Ne pas afficher les 000xx.mpls plus courts que"
-22		"min"
-23		"Activer le support de l'écran LCD Logitech"
-24		"Utiliser les contrôles Windows Media"
-25		"Activer MiniDump"
-26		"Fichier exécutable FFmpeg :"
-28		"Vérifier les mises à jour"
-29		"Activer la vérification automatique des mises à jour"
-30		"Délai entre chaque vérification :"
-33		"jour(s)"
-34		"Gestion des paramètres"
-35		"Réinitialiser"
-36		"Exporter"
+10		"Ne pas utiliser la « recherche dans le dossier » sur les commandes « Passer en arrière/en avant » lorsqu'il n'y a qu'un seul élément dans la Playlist"
+12		"Empêcher de MINIMISER en plein écran sur un moniteur autre que celui par défaut"
+14		"Masquer automatiquement le pointeur pendant la lecture en mode fenêtré"
+16		"Ne pas afficher les 000xx.mpls plus courts que"
+19		"min"
+20		"Activer le support de l'écran LCD Logitech"
+21		"Utiliser les contrôles Windows Media"
+22		"Activer MiniDump"
+23		"Fichier exécutable FFmpeg :"
+25		"Vérifier les mises à jour"
+26		"Activer la vérification automatique des mises à jour"
+27		"Délai entre chaque vérification :"
+30		"jour(s)"
+31		"Gestion des paramètres"
+32		"Réinitialiser"
+33		"Exporter"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -384,7 +382,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Par défaut"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 5		"Lecture"
 6		"Lire"
 7		"Répéter automatiquement"
@@ -404,6 +402,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
 29		"Processus d'aide à la construction des filtres"
 31		"Indiquer les connexions échouées lors du rendu"
 32		"Mémoriser les pistes sélectionnées dans la Playlist"
+33		"Recherche rapide (sur image clé)"
+34		"Mettre en pause la lecture vidéo lorsqu'elle est réduite"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

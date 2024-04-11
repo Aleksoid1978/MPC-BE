@@ -351,27 +351,25 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Tallózás..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 5		"Ugrás távolságok (kicsi, közepes, nagy, tizedmásodpercben)"
 9		"Alapértelmezett"
-10		"Gyors keresés (kulcspozícióban)"
-11		"Ne használja a 'keresés a mappában' parancsot az 'Ugrás vissza/előre' parancsokra, ha csak egy elem van a lejátszási listában"
-13		"Megakadályozza a Kis méretet, amikor a Teljes képernyő nem az alap monitoron van"
-15		"Szüneteltesse a videó lejátszását, amikor kis méretben van"
-17		"A mutató automatikus elrejtése ablakos lejátszás közben"
-19		"Ne mutasd ha 000xx.mpls rövidebb"
-22		"perc"
-23		"Engedélyezze a Logitech LCD támogatást"
-24		"Használja a Window Media Controls-t"
-25		"MiniDump engedélyezése"
-26		"FFmpeg futtatható fájl:"
-28		"Frissítés ellenőrzése"
-29		"Automatikus frissítésellenőrzés engedélyezése"
-30		"Késleltetés az ellenőrzéseknél:"
-33		"nap(ok)"
-34		"Beállítások kezelése"
-35		"Visszaállítás"
-36		"Export"
+10		"Ne használja a 'keresés a mappában' parancsot az 'Ugrás vissza/előre' parancsokra, ha csak egy elem van a lejátszási listában"
+12		"Megakadályozza a Kis méretet, amikor a Teljes képernyő nem az alap monitoron van"
+14		"A mutató automatikus elrejtése ablakos lejátszás közben"
+16		"Ne mutasd ha 000xx.mpls rövidebb"
+19		"perc"
+20		"Engedélyezze a Logitech LCD támogatást"
+21		"Használja a Window Media Controls-t"
+22		"MiniDump engedélyezése"
+23		"FFmpeg futtatható fájl:"
+25		"Frissítés ellenőrzése"
+26		"Automatikus frissítésellenőrzés engedélyezése"
+27		"Késleltetés az ellenőrzéseknél:"
+30		"nap(ok)"
+31		"Beállítások kezelése"
+32		"Visszaállítás"
+33		"Export"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -384,7 +382,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Alapértelmezett"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 5		"Lejátszás"
 6		"Lejátszás"
 7		"Végtelenített ismétlés"
@@ -404,6 +402,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
 29		"Használjon szálat a szűrő gráf felépítéséhez"
 31		"Hibás, nem átalakítható csatlakozók jelentése"
 32		"Emlékezzen a kiválasztott zeneszámokra a lejátszási listában"
+33		"Gyors keresés (kulcspozícióban)"
+34		"Szüneteltesse a videó lejátszását, amikor kis méretben van"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

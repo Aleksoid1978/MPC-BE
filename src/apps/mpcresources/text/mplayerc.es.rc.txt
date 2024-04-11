@@ -351,27 +351,25 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Explorar..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 5		"Saltar distancias (pequeña, mediana, grande en ms)"
 9		"Predeterminado"
-10		"Búsqueda rápida (en fotograma clave)"
-11		"No usar 'buscar en carpeta' en comandos 'Saltar hacia atrás/adelante' cuando sólo hay un elemento en la lista de reproducción"
-13		"Evitar el MINIMIZADO en Pantalla Completa en un monitor no predeterminado"
-15		"Pausar la reproducción de video cuando se minimiza"
-17		"Ocultar automáticamente el puntero durante la reproducción en modo ventana"
-19		"No mostrar 000xx.mpls de menos de"
-22		"min"
-23		"Habilitar soporte de LCD Logitech"
-24		"Usar Controles de Windows Media"
-25		"Habilitar MiniDump"
-26		"Archivo ejecutable FFmpeg:"
-28		"Comprobar Actualización"
-29		"Habilitar Comprobación Automática de Actualizaciones"
-30		"Retraso entre cada comprobación:"
-33		"día(s)"
-34		"Gestión de Ajustes"
-35		"Reiniciar"
-36		"Exportar"
+10		"No usar 'buscar en carpeta' en comandos 'Saltar hacia atrás/adelante' cuando sólo hay un elemento en la lista de reproducción"
+12		"Evitar el MINIMIZADO en Pantalla Completa en un monitor no predeterminado"
+14		"Ocultar automáticamente el puntero durante la reproducción en modo ventana"
+16		"No mostrar 000xx.mpls de menos de"
+19		"min"
+20		"Habilitar soporte de LCD Logitech"
+21		"Usar Controles de Windows Media"
+22		"Habilitar MiniDump"
+23		"Archivo ejecutable FFmpeg:"
+25		"Comprobar Actualización"
+26		"Habilitar Comprobación Automática de Actualizaciones"
+27		"Retraso entre cada comprobación:"
+30		"día(s)"
+31		"Gestión de Ajustes"
+32		"Reiniciar"
+33		"Exportar"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -384,7 +382,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Predeterminado"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 5		"Reproducción"
 6		"Reproducir"
 7		"Repetir siempre"
@@ -404,6 +402,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
 29		"Usar proceso funcional para construir cadena de filtros"
 31		"Reportar conectores que no quieran funcionar"
 32		"Recordar pistas seleccionadas en la Lista de Reproducción"
+33		"Búsqueda rápida (en fotograma clave)"
+34		"Pausar la reproducción de video cuando se minimiza"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,10 +33,8 @@ private:
 	int m_nJumpDistM;
 	int m_nJumpDistL;
 
-	BOOL m_fFastSeek;
 	BOOL m_fDontUseSearchInFolder;
 	BOOL m_fPreventMinimize;
-	BOOL m_bPauseMinimizedVideo;
 	BOOL m_bHideWindowedMousePointer;
 	int  m_nMinMPlsDuration;
 	CSpinButtonCtrl m_spnMinMPlsDuration;

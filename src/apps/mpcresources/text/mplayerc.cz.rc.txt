@@ -351,27 +351,25 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Procházet..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 5		"Jump distances (small, medium, large in ms)"
 9		"Default"
-10		"Fast seek (on keyframe)"
-11		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
-13		"Prevent from MINIMIZE when Fullscreen on non default monitor"
-15		"Pause the video playback when minimized"
-17		"Auto-hide the pointer during playback in windowed mode"
-19		"Do not show 000xx.mpls shorter than"
-22		"min"
-23		"Enable Logitech LCD support"
-24		"Use Window Media Controls"
-25		"Enable MiniDump"
-26		"FFmpeg executable file:"
-28		"Update check"
-29		"Enable automatic update check"
-30		"Delay between each check:"
-33		"day(s)"
-34		"Správa nastavení"
-35		"Obnovit výchozí"
-36		"Exportovat"
+10		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
+12		"Prevent from MINIMIZE when Fullscreen on non default monitor"
+14		"Auto-hide the pointer during playback in windowed mode"
+16		"Do not show 000xx.mpls shorter than"
+19		"min"
+20		"Enable Logitech LCD support"
+21		"Use Window Media Controls"
+22		"Enable MiniDump"
+23		"FFmpeg executable file:"
+25		"Update check"
+26		"Enable automatic update check"
+27		"Delay between each check:"
+30		"day(s)"
+31		"Správa nastavení"
+32		"Obnovit výchozí"
+33		"Exportovat"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -384,7 +382,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 5		"Přehrávání"
 6		"Přehrát"
 7		"Opakovat donekonečna"
@@ -404,6 +402,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
 29		"Filtry načítat v samostatném podprocesu"
 31		"Vypisovat podrobné informace o chybějících kodecích"
 32		"Remember selected tracks in playlist"
+33		"Fast seek (on keyframe)"
+34		"Pause the video playback when minimized"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

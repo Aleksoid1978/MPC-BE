@@ -351,27 +351,25 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Sfoglia..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 5		"Intervalli di salto (piccolo, medio, grande in ms)"
 9		"Predefinito"
-10		"Ricerca veloce (su keyframe)"
-11		"Non usare la funzione 'cerca nella cartella' nei comandi 'Salta avanti/indietro' quando è presente un solo elemento in playlist"
-13		"Evita riduzione a icona quando è a tutto schermo su monitor non predefinito"
-15		"Metti in pausa la riproduzione video quando è ridotto a icona"
-17		"Nascondi automaticamente il puntatore durante la riproduzione in modalità finestra"
-19		"Non mostrare 000xx.mpls più breve di"
-22		"min"
-23		"Abilita il supporto LCD Logitech"
-24		"Usa i controlli Window Media"
-25		"Abilita MiniDump"
-26		"File eseguibile FFmpeg:"
-28		"Controlla aggiornamenti"
-29		"Abilita controllo aggiornamenti automatico"
-30		"Controlla ogni:"
-33		"giorno(i)"
-34		"Gestione impostazioni"
-35		"Reimposta"
-36		"Esporta"
+10		"Non usare la funzione 'cerca nella cartella' nei comandi 'Salta avanti/indietro' quando è presente un solo elemento in playlist"
+12		"Evita riduzione a icona quando è a tutto schermo su monitor non predefinito"
+14		"Nascondi automaticamente il puntatore durante la riproduzione in modalità finestra"
+16		"Non mostrare 000xx.mpls più breve di"
+19		"min"
+20		"Abilita il supporto LCD Logitech"
+21		"Usa i controlli Window Media"
+22		"Abilita MiniDump"
+23		"File eseguibile FFmpeg:"
+25		"Controlla aggiornamenti"
+26		"Abilita controllo aggiornamenti automatico"
+27		"Controlla ogni:"
+30		"giorno(i)"
+31		"Gestione impostazioni"
+32		"Reimposta"
+33		"Esporta"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -384,7 +382,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Predefinito"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 5		"Riproduzione"
 6		"Riproduci"
 7		"Ripeti per sempre"
@@ -404,6 +402,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
 29		"Usa il thread di lavoro per costruire il grafico del filtro"
 31		"Segnala pin che non vengono visualizzati"
 32		"Ricorda brani selezionati nella playlist"
+33		"Ricerca veloce (su keyframe)"
+34		"Metti in pausa la riproduzione video quando è ridotto a icona"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

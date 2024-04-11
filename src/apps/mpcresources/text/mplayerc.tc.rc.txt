@@ -351,27 +351,25 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"瀏覽..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 5		"跳躍距離（小、中、大，以毫秒作單位）"
 9		"預設值"
-10		"快速搜尋（於關鍵影格）"
-11		"播放清單只有一個項目時，不要於「上一段/下一段」按鈕連結其他位於同一資料夾的檔案"
-13		"避免於非預設顯示器全螢幕時最小化"
-15		"最小化時暫停播放"
-17		"視窗模式播放時自動隱藏滑鼠游標"
-19		"不顯示短於設定長度的 000xx.mpls："
-22		"分鐘"
-23		"啟用 Logitech LCD 支援"
-24		"啟用 Windows 媒體控制項"
-25		"啟用小型記憶體傾印 (MiniDump)"
-26		"FFmpeg 執行檔："
-28		"檢查更新"
-29		"啟用更新檢查"
-30		"檢查間隔："
-33		"日"
-34		"設定管理"
-35		"重設"
-36		"匯出"
+10		"播放清單只有一個項目時，不要於「上一段/下一段」按鈕連結其他位於同一資料夾的檔案"
+12		"避免於非預設顯示器全螢幕時最小化"
+14		"視窗模式播放時自動隱藏滑鼠游標"
+16		"不顯示短於設定長度的 000xx.mpls："
+19		"分鐘"
+20		"啟用 Logitech LCD 支援"
+21		"啟用 Windows 媒體控制項"
+22		"啟用小型記憶體傾印 (MiniDump)"
+23		"FFmpeg 執行檔："
+25		"檢查更新"
+26		"啟用更新檢查"
+27		"檢查間隔："
+30		"日"
+31		"設定管理"
+32		"重設"
+33		"匯出"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -384,7 +382,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"重設"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 5		"播放"
 6		"播放"
 7		"永遠重複播放"
@@ -404,6 +402,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
 29		"使用工作執行緒建立篩選器圖 (Filter Graph)"
 31		"回報繪製失敗的 Pin"
 32		"記住播放清單中選定的項目"
+33		"快速搜尋（於關鍵影格）"
+34		"最小化時暫停播放"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

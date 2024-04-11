@@ -351,27 +351,25 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"찾아보기..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 5		"이동 간격(최소/중간/최대 간격을 밀리초 단위로 입력)"
 9		"기본값"
-10		"빠른 탐색(키 프레임)"
-11		"재생 목록에 파일 하나만 있다면 '앞/뒤 탐색' 시에 '폴더 내에서 찾기' 사용 안 함"
-13		"전체 화면 시, 최소화 방지"
-15		"최소화 시, 영상 재생 일시 정지"
-17		"창 모드에서 재생하는 동안 포인터 자동 숨기기"
-19		"다음 시간보다 짧은 000xx.mpls를 표시하지 않음"
-22		"분"
-23		"로지텍 LCD 지원 활성화(실험적)"
-24		"윈도 미디어 제어 사용"
-25		"미니 덤프 활성화"
-26		"FFmpeg 실행 파일 :"
-28		"업데이트 확인"
-29		"자동 업데이트 확인 활성화"
-30		"확인할 간격 :"
-33		"일"
-34		"설정 관리"
-35		"초기화"
-36		"내보내기"
+10		"재생 목록에 파일 하나만 있다면 '앞/뒤 탐색' 시에 '폴더 내에서 찾기' 사용 안 함"
+12		"전체 화면 시, 최소화 방지"
+14		"창 모드에서 재생하는 동안 포인터 자동 숨기기"
+16		"다음 시간보다 짧은 000xx.mpls를 표시하지 않음"
+19		"분"
+20		"로지텍 LCD 지원 활성화(실험적)"
+21		"윈도 미디어 제어 사용"
+22		"미니 덤프 활성화"
+23		"FFmpeg 실행 파일 :"
+25		"업데이트 확인"
+26		"자동 업데이트 확인 활성화"
+27		"확인할 간격 :"
+30		"일"
+31		"설정 관리"
+32		"초기화"
+33		"내보내기"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -384,7 +382,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"기본값"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 5		"재생"
 6		"파일을"
 7		"계속 반복"
@@ -404,6 +402,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
 29		"필터 그래프를 생성하는 작업자 스레드 사용"
 31		"렌더링에 실패하면 핀 보고"
 32		"재생 목록에서 선택한 트랙 기억"
+33		"빠른 탐색(키 프레임)"
+34		"최소화 시, 영상 재생 일시 정지"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

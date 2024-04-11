@@ -351,27 +351,25 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Gözat..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 5		"Atlama uzaklıkları (ms olarak kısa, orta, uzun)"
 9		"Varsayılan"
-10		"Hızlı arama (ref. karede)"
-11		"Oynatma listesinde sadece bir öğe olduğunda 'Geri/İleri Git' komutlarındaki 'klasörde arama' özelliğini kullanma."
-13		"Varsayılan olmayan monitörde Tam Ekran olduğunda SİMGE DURUMUNA'yı engelle"
-15		"Küçültüldüğünde video oynatmayı duraklat"
-17		"Pencere modunda oynatma sırasında işaretçiyi otomatik gizle"
-19		"Bu süreden daha kısa 000xx.mpls gösterme:"
-22		"dk."
-23		"Logitech LCD desteğini etkinleştir"
-24		"Windows Medya Kontrollerini kullan"
-25		"MiniDump etkinleştir"
-26		"FFmpeg çalıştırılabilir dosyası:"
-28		"Güncelleme kontrolü"
-29		"Otomatik güncelleme kontrolünü etkinleştir"
-30		"Her kontrol arasındaki gecikme:"
-33		"gün"
-34		"Ayar yönetimi"
-35		"Sıfırla"
-36		"Ver"
+10		"Oynatma listesinde sadece bir öğe olduğunda 'Geri/İleri Git' komutlarındaki 'klasörde arama' özelliğini kullanma."
+12		"Varsayılan olmayan monitörde Tam Ekran olduğunda SİMGE DURUMUNA'yı engelle"
+14		"Pencere modunda oynatma sırasında işaretçiyi otomatik gizle"
+16		"Bu süreden daha kısa 000xx.mpls gösterme:"
+19		"dk."
+20		"Logitech LCD desteğini etkinleştir"
+21		"Windows Medya Kontrollerini kullan"
+22		"MiniDump etkinleştir"
+23		"FFmpeg çalıştırılabilir dosyası:"
+25		"Güncelleme kontrolü"
+26		"Otomatik güncelleme kontrolünü etkinleştir"
+27		"Her kontrol arasındaki gecikme:"
+30		"gün"
+31		"Ayar yönetimi"
+32		"Sıfırla"
+33		"Ver"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -384,7 +382,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Varsayılan"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 5		"Oynatma"
 6		"Sadece"
 7		"Sürekli tekrarla"
@@ -404,6 +402,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
 29		"Süzgeç grafiği kurulumu için oynatıcı önceliğini kullan"
 31		"Oluşturulamayan bağlantıları rapor et"
 32		"Oynatma listesindeki seçili parçaları hatırla"
+33		"Hızlı arama (ref. karede)"
+34		"Küçültüldüğünde video oynatmayı duraklat"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

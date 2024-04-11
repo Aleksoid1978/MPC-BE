@@ -351,6 +351,9 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,167,276,9
     CONTROL         "Rapporteer pins die niet renderen",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,179,276,9
     CONTROL         "Onthoud geselecteerde items in de afspeellijst",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,191,276,9
+    CONTROL         "Snel zoeken (op sleutelframe)",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,209,264,9
+    CONTROL         "Weergave pauseren als het venster geminimaliseerd is",IDC_CHECK5,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,221,280,9
 END
 
 IDD_PPAGESUBRENDERING DIALOGEX 0, 0, 296, 264
@@ -1068,33 +1071,30 @@ BEGIN
     EDITTEXT        IDC_EDIT2,64,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "Standaard",IDC_BUTTON1,158,17,56,14
-    CONTROL         "Snel zoeken (op sleutelframe)",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,45,264,9
     CONTROL         "Zoek NIET op andere bestanden in dezelfde map bij het gebruik van ""Vorige/Volgende"" als er alleen een item in afspeellijst staat.",IDC_CHECK7,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,55,280,18
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,280,18
     CONTROL         "Minimaliseren vermijden in geval van volledig scherm op niet-primair scherm",IDC_CHECK6,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,282,9
-    CONTROL         "Weergave pauseren als het venster geminimaliseerd is",IDC_CHECK4,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,87,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Verberg automatisch de muisaanwijzer tijdens het afspelen in de venstermodus",IDC_CHECK5,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,99,280,9
-    LTEXT           "Toon 000xx.mpls niet, die korter zijn dan",IDC_STATIC,7,112,150,8
-    EDITTEXT        IDC_EDIT5,161,110,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,181,110,11,14
-    LTEXT           "min",IDC_STATIC,197,112,30,8
-    CONTROL         "Activeer Logitech LCD-ondersteuning",IDC_CHECK_LCD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,126,264,9
-    CONTROL         "Gebruik mediabediening van Windows",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,138,220,9
-    CONTROL         "Activeer MiniDump",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,150,184,9
-    LTEXT           "Executablebestand ffmpeg:",IDC_STATIC,7,165,104,8
-    COMBOBOX        IDC_COMBO1,113,163,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Op updates controleren",IDC_STATIC,5,180,286,40
-    CONTROL         "Activeer automatische updatecontrole",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,192,250,9
-    LTEXT           "Controleer 1 keer per",IDC_STATIC5,10,205,110,8
-    EDITTEXT        IDC_EDIT4,120,203,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,140,203,13,14
-    LTEXT           "dag(en)",IDC_STATIC6,155,205,50,8
-    GROUPBOX        "Instellingen beheren",IDC_STATIC,5,222,286,28
-    PUSHBUTTON      "Resetten",IDC_RESET_SETTINGS,10,233,55,14
-    PUSHBUTTON      "Exporteren",IDC_EXPORT_SETTINGS,73,233,55,14
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
+    LTEXT           "Toon 000xx.mpls niet, die korter zijn dan",IDC_STATIC,7,86,150,8
+    EDITTEXT        IDC_EDIT5,161,84,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,181,84,11,14
+    LTEXT           "min",IDC_STATIC,197,86,30,8
+    CONTROL         "Activeer Logitech LCD-ondersteuning",IDC_CHECK_LCD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,100,264,9
+    CONTROL         "Gebruik mediabediening van Windows",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,112,220,9
+    CONTROL         "Activeer MiniDump",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,124,184,9
+    LTEXT           "Executablebestand ffmpeg:",IDC_STATIC,7,139,104,8
+    COMBOBOX        IDC_COMBO1,113,137,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Op updates controleren",IDC_STATIC,5,154,286,40
+    CONTROL         "Activeer automatische updatecontrole",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,166,250,9
+    LTEXT           "Controleer 1 keer per",IDC_STATIC5,10,179,110,8
+    EDITTEXT        IDC_EDIT4,120,177,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,140,177,13,14
+    LTEXT           "dag(en)",IDC_STATIC6,155,179,50,8
+    GROUPBOX        "Instellingen beheren",IDC_STATIC,5,196,286,28
+    PUSHBUTTON      "Resetten",IDC_RESET_SETTINGS,10,207,55,14
+    PUSHBUTTON      "Exporteren",IDC_EXPORT_SETTINGS,73,207,55,14
 END
 
 IDD_TUNER_SCAN DIALOGEX 0, 0, 407, 246

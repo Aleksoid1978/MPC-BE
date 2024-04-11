@@ -351,27 +351,25 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Przeglądaj..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 5		"Odstepy skoków (mały, średni, duży w ms)"
 9		"Domyślne"
-10		"Szybkie przewijanie (na klatkę kluczową)"
-11		"Nie używaj 'szukaj w folderze' oraz komend 'Przejdź do tyłu / do przodu', gdy jest tylko jedna pozycja na liście odtwarzania"
-13		"Zapobiegaj minimalizacji w trybie pełnoekranowym na dodatkowych ekranach"
-15		"Wstrzymaj odtwarzanie po minimalizacji"
-17		"Autoukrywanie kursora podczas odtwarzania w trybie okienkowym"
-19		"Nie pokazuj 000xx.mpls krótsze niż"
-22		"min"
-23		"Włącz wsparcie dla ekranów LCD Logitech"
-24		"Use Window Media Controls"
-25		"Włącz MiniDump"
-26		"FFmpeg executable file:"
-28		"Sprawdzanie aktualizacji"
-29		"Włącz automatyczne sprawdzanie aktualizacji"
-30		"Sprawdzaj co:"
-33		"dni"
-34		"Zarządzanie ustawieniami"
-35		"Resetuj"
-36		"Eksportuj"
+10		"Nie używaj 'szukaj w folderze' oraz komend 'Przejdź do tyłu / do przodu', gdy jest tylko jedna pozycja na liście odtwarzania"
+12		"Zapobiegaj minimalizacji w trybie pełnoekranowym na dodatkowych ekranach"
+14		"Autoukrywanie kursora podczas odtwarzania w trybie okienkowym"
+16		"Nie pokazuj 000xx.mpls krótsze niż"
+19		"min"
+20		"Włącz wsparcie dla ekranów LCD Logitech"
+21		"Use Window Media Controls"
+22		"Włącz MiniDump"
+23		"FFmpeg executable file:"
+25		"Sprawdzanie aktualizacji"
+26		"Włącz automatyczne sprawdzanie aktualizacji"
+27		"Sprawdzaj co:"
+30		"dni"
+31		"Zarządzanie ustawieniami"
+32		"Resetuj"
+33		"Eksportuj"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -384,7 +382,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Domyślne"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 5		"Odtwarzanie"
 6		"Odtwarzaj"
 7		"Ciągłe"
@@ -404,6 +402,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
 29		"Osobny wątek programu do utworzenia grafu filtrów"
 31		"Powiadamiaj o niepołączonych pinach grafu"
 32		"Zapamiętaj wybrane ścieżki na liście odtwarzania"
+33		"Szybkie przewijanie (na klatkę kluczową)"
+34		"Wstrzymaj odtwarzanie po minimalizacji"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

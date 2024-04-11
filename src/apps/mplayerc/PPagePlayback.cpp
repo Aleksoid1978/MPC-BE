@@ -57,8 +57,10 @@ void CPPagePlayback::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO5, m_cbAddSimilarFiles);
 	DDX_Check(pDX, IDC_CHECK7, m_fEnableWorkerThreadForOpening);
 	DDX_Check(pDX, IDC_CHECK6, m_fReportFailedPins);
-
 	DDX_Check(pDX, IDC_CHECK8, m_bRememberSelectedTracks);
+
+	DDX_Check(pDX, IDC_CHECK3, m_bFastSeek);
+	DDX_Check(pDX, IDC_CHECK5, m_bPauseMinimizedVideo);
 }
 
 BEGIN_MESSAGE_MAP(CPPagePlayback, CPPageBase)
@@ -115,8 +117,10 @@ BOOL CPPagePlayback::OnInitDialog()
 
 	m_fEnableWorkerThreadForOpening = s.fEnableWorkerThreadForOpening;
 	m_fReportFailedPins = s.fReportFailedPins;
-
 	m_bRememberSelectedTracks = s.bRememberSelectedTracks;
+
+	m_bFastSeek = s.fFastSeek;
+	m_bPauseMinimizedVideo = s.bPauseMinimizedVideo;
 
 	CorrectCWndWidth(GetDlgItem(IDC_CHECK4));
 
@@ -149,6 +153,9 @@ BOOL CPPagePlayback::OnApply()
 	s.fUseInternalSelectTrackLogic = !!m_fUseInternalSelectTrackLogic;
 
 	s.bRememberSelectedTracks = !!m_bRememberSelectedTracks;
+
+	s.fFastSeek = !!m_bFastSeek;
+	s.bPauseMinimizedVideo = !!m_bPauseMinimizedVideo;
 
 	return __super::OnApply();
 }

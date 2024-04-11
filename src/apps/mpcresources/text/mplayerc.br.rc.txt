@@ -351,27 +351,25 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Procurar..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 37
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 34
 5		"Distâncias do pulo (pequeno, médio, longo em ms)"
 9		"Padrão"
-10		"Busca rápida (no quadro-chave)"
-11		"Não usar 'buscar na pasta' nos comandos 'Voltar/avançar' quando houver apenas um item na lista de reprodução"
-13		"Impedir de MINIMIZAR quando em tela cheia no monitor não padrão"
-15		"Pausar reprodução do vídeo quando minimizado"
-17		"Auto-ocultar o ponteiro durante a reprodução no modo em janela"
-19		"Não mostrar 000xx.mpls mais curto que"
-22		"mín"
-23		"Ativar suporte Logitech LCD"
-24		"Use Window Media Controls"
-25		"Ativar MiniDump"
-26		"FFmpeg executable file:"
-28		"Verificar atualização"
-29		"Ativar verificação de atualização automática"
-30		"Demora entre cada verificação:"
-33		"dia(s)"
-34		"Gerenciar configurações"
-35		"Resetar"
-36		"Exportar"
+10		"Não usar 'buscar na pasta' nos comandos 'Voltar/avançar' quando houver apenas um item na lista de reprodução"
+12		"Impedir de MINIMIZAR quando em tela cheia no monitor não padrão"
+14		"Auto-ocultar o ponteiro durante a reprodução no modo em janela"
+16		"Não mostrar 000xx.mpls mais curto que"
+19		"mín"
+20		"Ativar suporte Logitech LCD"
+21		"Use Window Media Controls"
+22		"Ativar MiniDump"
+23		"FFmpeg executable file:"
+25		"Verificar atualização"
+26		"Ativar verificação de atualização automática"
+27		"Demora entre cada verificação:"
+30		"dia(s)"
+31		"Gerenciar configurações"
+32		"Resetar"
+33		"Exportar"
 END
 
 BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
@@ -384,7 +382,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Padrão"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 5		"Reprodução"
 6		"Reproduzir"
 7		"Repetir sempre"
@@ -404,6 +402,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 33
 29		"Usar trabalho encadeado para construir o filtro gráfico"
 31		"Reportar pinos que falham na renderização"
 32		"Lembrar faixas selecionadas na lista de reprodução"
+33		"Busca rápida (no quadro-chave)"
+34		"Pausar reprodução do vídeo quando minimizado"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
