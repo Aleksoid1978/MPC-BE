@@ -1077,7 +1077,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Während der Wiedergabe im Fenstermodus den Mauszeiger automatisch verstecken",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
-    CONTROL         "Show zero hours in status bar and OSD",IDC_CHECK8,
+    CONTROL         "Führende Null-Stunden in der Statusleiste und im OSD anzeigen",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "Keine 000xx.mpls anzeigen, die kürzer sind als",IDC_STATIC,7,99,150,8
     EDITTEXT        IDC_EDIT5,161,97,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
@@ -3224,7 +3224,7 @@ BEGIN
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tFixiert Fenstergröße bei Breite W und Höhe H."
     IDS_CMD_MONITOR         "/monitor N\tStartet Player auf Monitor N (wobei N > 0)."
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\tLädt Audiorenderer N (wobei N > 0, siehe\n\t\tAusgabe-Optionen)."
-    IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
+    IDS_CMD_VOLUME          "/volume N\tLautstärke stellen, wobei N eine Zahl im Bereich von 0 bis 100 ist."
     IDS_CMD_CLIPBOARD       "/clipboard\t\tPfade/Links aus der Zwischenablage öffnen"
     IDS_CMD_RESET           "/reset\t\tSetzt alle Programm-Einstellungen zurück."
 END

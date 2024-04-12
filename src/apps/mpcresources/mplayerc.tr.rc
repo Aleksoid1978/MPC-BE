@@ -1077,7 +1077,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Pencere modunda oynatma sırasında işaretçiyi otomatik gizle",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
-    CONTROL         "Show zero hours in status bar and OSD",IDC_CHECK8,
+    CONTROL         "Durum çubuğunda ve OSD'de sıfır saati göster",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "Bu süreden daha kısa 000xx.mpls gösterme:",IDC_STATIC,7,99,150,8
     EDITTEXT        IDC_EDIT5,161,97,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
@@ -3186,7 +3186,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Kullanım: mpc-be.exe ""yol_adı"" [anahtarlar]\n\n""yol_adı""\t\tYüklenecek dosya ya da klasör (özel\n\t\tkarakterler desteklenmektedir))"
+    IDS_CMD_USAGE           "Kullanım: mpc-be.exe ""yol_adı"" [anahtarlar]\n\n""yol_adı""\t\tYüklenecek dosya ya da klasör (özel\n\t\tkarakterler desteklenmektedir)"
     IDS_CMD_HELP            "/help /h /?\tKomut satırı anahtarları hakkında yardım görüntülenir"
     IDS_CMD_DUB             "/dub ""dublaj_adı""\tHarici bir ses dosyası yüklemek için"
     IDS_CMD_DUBDELAY        "/dubdelay ""dosya""\tXXms olarak atlanacak harici bir ses dosyası yüklemek için\n\t\t(eğer dosya ""...GECİKME XXms..."" içeriyorsa)"
@@ -3224,7 +3224,7 @@ BEGIN
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tSabit pencere boyutu kullanılır"
     IDS_CMD_MONITOR         "/monitor N\tN monitöründe başlatılır; N, 1'den başlar"
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\tSes işleyici N ile başlanılır; N, 0 ile başlar\n\t\t(""Ses"" ayarlarına bakınız)"
-    IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
+    IDS_CMD_VOLUME          "/volume N\tSesi Ayarlar. Burada N, 0 ile 100 arasında bir aralıktır"
     IDS_CMD_CLIPBOARD       "/clipboard\t\tPanodan dosya yolu/URL açar (liste desteklenir)"
     IDS_CMD_RESET           "/reset\t\tVarsayılan ayarlara geri dönülür"
 END
