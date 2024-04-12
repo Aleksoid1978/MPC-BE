@@ -33,6 +33,7 @@ namespace DSObjects
 		, ISubRenderCallback4
 		, ISubRender11Callback
 	{
+	protected:
 		CComPtr<IUnknown> m_pMPCVR;
 		bool m_bMPCVRFullscreenControl = false;
 
