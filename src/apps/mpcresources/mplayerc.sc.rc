@@ -1077,7 +1077,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "在窗口模式下播放时自动隐藏鼠标指针",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
-    CONTROL         "Show zero hours in status bar and OSD",IDC_CHECK8,
+    CONTROL         "在状态栏和 OSD 中显示零小时",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "不显示短于此时间的 000xx.mpls",IDC_STATIC,7,99,150,8
     EDITTEXT        IDC_EDIT5,161,97,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
@@ -3224,7 +3224,7 @@ BEGIN
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\t设置窗口固定大小"
     IDS_CMD_MONITOR         "/monitor N\t在监视器 N 上打开播放器，N从1开始"
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\t开始使用音频渲染器 N，N 从1开始\n\t\t (参见 ""输出"" 设置)"
-    IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
+    IDS_CMD_VOLUME          "/volume N\t设置音量，其中 N 的范围是 0 到 100"
     IDS_CMD_CLIPBOARD       "/clipboard\t\t从剪贴板打开文件路径或链接"
     IDS_CMD_RESET           "/reset\t\t恢复默认设置"
 END
