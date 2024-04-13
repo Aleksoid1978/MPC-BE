@@ -1,4 +1,4 @@
-name: Build MPC-BE
+name: Build Filters
 
 on:
   push:
@@ -19,6 +19,8 @@ on:
       - '**.cmd'
       - '**.bat'
       - '**.vcxproj.filters'
+  workflow_dispatch:
+    # no inputs
 
 jobs:
   build:
@@ -47,35 +49,19 @@ jobs:
           .\\build.bat Clean All
         shell: pwsh
 
-      - name: Build MPC-BE
+      - name: Build Filters
         run: |
-          .\\build.bat Build Packages
+          .\\build.bat Build Filters
         shell: pwsh
 
-      - name: Upload Installer x64
+      - name: Upload Filters x64
         uses: actions/upload-artifact@v4
         with:
-          name: "Installer x64" 
-          path: _bin/Packages/**/MPC-BE*.x64-installer.zip
-          compression-level: 0
+          name: "Filters x64" 
+          path: _bin/Filters_x64/*.ax
 
-      - name: Upload Zip x64
+      - name: Upload Filters x86
         uses: actions/upload-artifact@v4
         with:
-          name: "Zip x64" 
-          path: _bin/Packages/**/MPC-BE*.x64.7z
-          compression-level: 0
-
-      - name: Upload Installer x86
-        uses: actions/upload-artifact@v4
-        with:
-          name: "Installer x86" 
-          path: _bin/Packages/**/MPC-BE*.x86-installer.zip
-          compression-level: 0
-
-      - name: Upload Zip x86
-        uses: actions/upload-artifact@v4
-        with:
-          name: "Zip x86" 
-          path: _bin/Packages/**/MPC-BE*.x86.7z
-          compression-level: 0
+          name: "Filters x86" 
+          path: _bin/Filters_x86/*.ax
