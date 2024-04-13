@@ -211,6 +211,17 @@ STDMETHODIMP CMPCVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 		return hr;
 	}
 
+	(*ppRenderer = (IUnknown*)(INonDelegatingUnknown*)(this))->AddRef();
+
+	AttachToRenderer();
+
+	return S_OK;
+}
+
+void CMPCVRAllocatorPresenter::AttachToRenderer()
+{
+	ASSERT(m_pMPCVR);
+
 	if (CComQIPtr<ISubRender> pSR = m_pMPCVR.p) {
 		VERIFY(SUCCEEDED(pSR->SetCallback(this)));
 	}
@@ -218,17 +229,13 @@ STDMETHODIMP CMPCVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 		VERIFY(SUCCEEDED(pSR11->SetCallback11(this)));
 	}
 
-	(*ppRenderer = (IUnknown*)(INonDelegatingUnknown*)(this))->AddRef();
-
 	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
-		hr = pIExFilterConfig->Flt_SetBool("lessRedraws", true);
-		hr = pIExFilterConfig->Flt_SetBool("d3dFullscreenControl", m_bMPCVRFullscreenControl);
+		pIExFilterConfig->Flt_SetBool("lessRedraws", true);
+		pIExFilterConfig->Flt_SetBool("d3dFullscreenControl", m_bMPCVRFullscreenControl);
 	}
 
 	CComQIPtr<IBaseFilter> pBF(m_pMPCVR);
 	HookNewSegmentAndReceive(GetFirstPin(pBF), true);
-
-	return S_OK;
 }
 
 STDMETHODIMP_(CLSID) CMPCVRAllocatorPresenter::GetAPCLSID()
@@ -464,3 +471,4 @@ STDMETHODIMP_(void) CMPCVRAllocatorPresenter::SetExtraSettings(ExtraRendererSett
 		m_bMPCVRFullscreenControl = pExtraSets->bMPCVRFullscreenControl;
 	}
 }
+

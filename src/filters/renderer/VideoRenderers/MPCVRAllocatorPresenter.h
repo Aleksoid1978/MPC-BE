@@ -102,5 +102,8 @@ namespace DSObjects
 		STDMETHODIMP_(bool) IsRendering() override;
 		STDMETHODIMP_(void) SetStereo3DSettings(Stereo3DSettings* pStereo3DSets) override;
 		STDMETHODIMP_(void) SetExtraSettings(ExtraRendererSettings* pExtraSets) override;
+
+	protected:
+		void AttachToRenderer();
 	};
 }
