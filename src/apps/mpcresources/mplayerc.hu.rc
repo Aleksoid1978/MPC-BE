@@ -1077,7 +1077,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "A mutató automatikus elrejtése ablakos lejátszás közben",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
-    CONTROL         "Show zero hours in status bar and OSD",IDC_CHECK8,
+    CONTROL         "Nulla óra megjelenítése az állapotsorban és az OSD-n",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "Ne mutasd ha 000xx.mpls rövidebb",IDC_STATIC,7,99,150,8
     EDITTEXT        IDC_EDIT5,161,97,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
@@ -3224,7 +3224,7 @@ BEGIN
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tFix ablakméret beállítása"
     IDS_CMD_MONITOR         "/monitor N\tIndítás az N. monitoron, ahol N egytől indul"
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\tN. audió átalakító használata, ahol N egytől indul\n\t\t(lásd ""Hang"" beállítások)"
-    IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
+    IDS_CMD_VOLUME          "/volume N\tÁllítsa be a hangerőt, ahol N egy 0 és 100 közötti tartomány"
     IDS_CMD_CLIPBOARD       "/clipboard\t\tNyissa meg az elérési utakat/hivatkozásokat a vágólapról"
     IDS_CMD_RESET           "/reset\t\tAlapbeállítások visszaállítása"
 END
