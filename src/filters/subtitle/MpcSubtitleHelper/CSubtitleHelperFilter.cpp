@@ -23,6 +23,12 @@
 #include "clsids.h"
 #include "DSUtil/ds_defines.h"
 
+const std::list<GUID> CSubtitleHelperFilter::mBlockedInterfaces = 
+{
+	IID_IUnknown,
+	__uuidof(ISpecifyPropertyPages),
+};
+
 CSubtitleHelperFilter::CSubtitleHelperFilter(LPUNKNOWN pUnk, HRESULT *phr)
 	: CBaseFilter(szName, pUnk, &mInterfaceLock, __uuidof(this))
 {
@@ -43,7 +49,8 @@ STDMETHODIMP CSubtitleHelperFilter::NonDelegatingQueryInterface(REFIID riid, voi
 
 #undef TRY_RETURN_AS
 
-	if ((riid != IID_IUnknown) && mpSubtitleConsumer)
+	// Delegate to the consumer, unless it's a blocked interface
+	if (mpSubtitleConsumer && (std::find(mBlockedInterfaces.begin(), mBlockedInterfaces.end(), riid) == mBlockedInterfaces.end()))
 	{
 		if (SUCCEEDED(mpSubtitleConsumer->NonDelegatingQueryInterface(riid, ppv)))
 			return S_OK;
@@ -54,7 +61,7 @@ STDMETHODIMP CSubtitleHelperFilter::NonDelegatingQueryInterface(REFIID riid, voi
 
 STDMETHODIMP CSubtitleHelperFilter::Connect(HWND hWnd)
 {
-	HRESULT ahRet(S_OK);
+	HRESULT ahRet(E_FAIL);
 	CString aoErrorMessage;
 
 	mpSubtitleConsumer.Release();

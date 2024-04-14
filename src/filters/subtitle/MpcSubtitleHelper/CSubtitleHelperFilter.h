@@ -57,5 +57,6 @@ private:
 	CCritSec								   mInterfaceLock; // Critical section for interfaces
 	HWND									   mhOwnerWnd = nullptr;
 	CComPtr<CSubtitleHelperAllocatorPresenter> mpSubtitleConsumer;
+	static const std::list<GUID>			   mBlockedInterfaces;
 };
 
