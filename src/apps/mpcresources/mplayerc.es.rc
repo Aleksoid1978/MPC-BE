@@ -1077,7 +1077,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Ocultar automáticamente el puntero durante la reproducción en modo ventana",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
-    CONTROL         "Show zero hours in status bar and OSD",IDC_CHECK8,
+    CONTROL         "Mostrar cero horas en barra de estado y OSD",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "No mostrar 000xx.mpls de menos de",IDC_STATIC,7,99,150,8
     EDITTEXT        IDC_EDIT5,161,97,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
@@ -3224,7 +3224,7 @@ BEGIN
     IDS_CMD_FIXEDSIZE       "/fixedsize l,a\tEstablece tamaño de ventana fijo"
     IDS_CMD_MONITOR         "/monitor N\tInicia en el monitor N, donde N empieza de 1"
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\tInicia usando Renderizador de Audio N, donde N empieza de 1\n\t\t(consulte Configuración de Audio)"
-    IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
+    IDS_CMD_VOLUME          "/volume N\tEstablece Volumen, donde N es un rango de 0 a 100"
     IDS_CMD_CLIPBOARD       "/clipboard\t\tAbre rutas/enlaces desde el portapapeles"
     IDS_CMD_RESET           "/reset\t\tRestaura la configuración predeterminada"
 END
