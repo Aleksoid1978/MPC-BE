@@ -114,19 +114,19 @@ HRESULT CBaseVideoFilter::GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, 
 		return hr;
 	}
 
-	if (m_bSendMediaType) {
-		CMediaType& mt = m_pOutput->CurrentMediaType();
-		AM_MEDIA_TYPE *sendmt = CreateMediaType(&mt);
-		(*ppOut)->SetMediaType(sendmt);
-		DeleteMediaType(sendmt);
-		m_bSendMediaType = false;
-	}
-
 	AM_MEDIA_TYPE* pmt;
 	if (SUCCEEDED((*ppOut)->GetMediaType(&pmt)) && pmt) {
 		CMediaType mt = *pmt;
 		m_pOutput->SetMediaType(&mt);
 		DeleteMediaType(pmt);
+	}
+
+	if (m_bSendMediaType) {
+		CMediaType& mt = m_pOutput->CurrentMediaType();
+		AM_MEDIA_TYPE* sendmt = CreateMediaType(&mt);
+		(*ppOut)->SetMediaType(sendmt);
+		DeleteMediaType(sendmt);
+		m_bSendMediaType = false;
 	}
 
 	(*ppOut)->SetDiscontinuity(FALSE);
@@ -155,22 +155,21 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 	}
 
 	REFERENCE_TIME nAvgTimePerFrame = 0;
-	{
-		ExtractAvgTimePerFrame(&mt, nAvgTimePerFrame);
-		if (!AvgTimePerFrame) {
-			AvgTimePerFrame = nAvgTimePerFrame;
-		}
-
-		if (abs(nAvgTimePerFrame - AvgTimePerFrame) > 10) {
-			bNeedReconnect = true;
-		}
+	ExtractAvgTimePerFrame(&mt, nAvgTimePerFrame);
+	if (!AvgTimePerFrame) {
+		AvgTimePerFrame = nAvgTimePerFrame;
 	}
 
-	if (width != m_wout || height != m_hout || m_arx != m_arxout || m_ary != m_aryout) {
+	if (!bNeedReconnect && abs(nAvgTimePerFrame - AvgTimePerFrame) > 10) {
 		bNeedReconnect = true;
 	}
 
-	if (dxvaExtFormat) {
+	if (!bNeedReconnect &&
+			(width != m_wout || height != m_hout || m_arx != m_arxout || m_ary != m_aryout)) {
+		bNeedReconnect = true;
+	}
+
+	if (!bNeedReconnect && dxvaExtFormat) {
 		VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.Format();
 		if (vih2->dwControlFlags != dxvaExtFormat->value) {
 			bNeedReconnect = true;
@@ -186,16 +185,18 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 		const bool m_bOverlayMixer = !!(clsid == CLSID_OverlayMixer);
 
 		CRect vih_rect(0, 0, width, height);
+		VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.Format();
 
-		DLog(L"CBaseVideoFilter::ReconnectOutput() : Performing reconnect");
-		DLog(L"    => SIZE  : %d:%d => %d:%d", m_wout, m_hout, vih_rect.Width(), vih_rect.Height());
-		DLog(L"    => AR    : %d:%d => %d:%d", m_arxout, m_aryout, m_arx, m_ary);
-		DLog(L"    => FPS   : %I64d => %I64d", nAvgTimePerFrame, AvgTimePerFrame);
+#ifndef NDEBUG
+		CStringW debugMessage(L"CBaseVideoFilter::ReconnectOutput() : Performing reconnect\n");
+		debugMessage.AppendFormat(L"    => SIZE  : %d:%d -> %d:%d\n", m_wout, m_hout, vih_rect.Width(), vih_rect.Height());
+		debugMessage.AppendFormat(L"    => AR    : %d:%d -> %d:%d\n", m_arxout, m_aryout, m_arx, m_ary);
+		debugMessage.AppendFormat(L"    => FPS   : %I64d -> %I64d\n", nAvgTimePerFrame, AvgTimePerFrame);
+		debugMessage.AppendFormat(L"    => FLAGS : 0x%0.8x -> 0x%0.8x", vih2->dwControlFlags, dxvaExtFormat ? dxvaExtFormat->value : vih2->dwControlFlags);
+		DLog(debugMessage);
+#endif
 
 		const bool bVideoSizeChanged = (width != m_wout || height != m_hout);
-
-		BITMAPINFOHEADER* pBMI = nullptr;
-		VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.Format();
 		if (bVideoSizeChanged) {
 			vih2->rcSource = vih2->rcTarget = vih_rect;
 		}
@@ -203,12 +204,11 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 		vih2->dwPictAspectRatioX = m_arx;
 		vih2->dwPictAspectRatioY = m_ary;
 
-		DLog(L"    => FLAGS : 0x%0.8x -> 0x%0.8x", vih2->dwControlFlags, dxvaExtFormat ? dxvaExtFormat->value : vih2->dwControlFlags);
 		if (dxvaExtFormat) {
 			vih2->dwControlFlags = dxvaExtFormat->value;
 		}
 
-		pBMI = &vih2->bmiHeader;
+		auto pBMI         = &vih2->bmiHeader;
 		pBMI->biWidth     = width;
 		pBMI->biHeight    = height;
 		pBMI->biSizeImage = DIBSIZE(*pBMI);
@@ -229,6 +229,11 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 					if (SUCCEEDED(hr = m_pOutput->GetDeliveryBuffer(&pOut, nullptr, nullptr, 0))) {
 						AM_MEDIA_TYPE* pmt;
 						if (SUCCEEDED(pOut->GetMediaType(&pmt)) && pmt) {
+							BITMAPINFOHEADER bihOut;
+							if (ExtractBIH(pmt, &bihOut)) {
+								DLog(L"CBaseVideoFilter::ReconnectOutput() : new MediaType from IMediaSample negotiated, actual width: %d, requested: %ld", width, bihOut.biWidth);
+							}
+
 							CMediaType mt2 = *pmt;
 							m_pOutput->SetMediaType(&mt2);
 							DeleteMediaType(pmt);
@@ -240,11 +245,12 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 							}
 							m_pOutput->SetMediaType(&mt);
 						}
+						m_bSendMediaType = true;
 					} else {
 						return E_FAIL;
 					}
 				} else if (hr == VFW_E_BUFFERS_OUTSTANDING && tryReceiveConnection) {
-					DLog(L"    VFW_E_BUFFERS_OUTSTANDING, flushing data ...");
+					DLog(L"CBaseVideoFilter::ReconnectOutput() : VFW_E_BUFFERS_OUTSTANDING, flushing data ...");
 					m_pOutput->DeliverBeginFlush();
 					m_pOutput->DeliverEndFlush();
 					tryReceiveConnection = false;
@@ -254,7 +260,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 					m_pOutput->SetMediaType(&mt);
 					m_bSendMediaType = true;
 				} else {
-					DLog(L"    ReceiveConnection() failed (hr: %x); QueryAccept: %x", hr, hrQA);
+					DLog(L"CBaseVideoFilter::ReconnectOutput() : ReceiveConnection() failed (hr: %x); QueryAccept: %x", hr, hrQA);
 					return E_FAIL;
 				}
 
