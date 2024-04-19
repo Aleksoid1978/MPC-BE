@@ -2,6 +2,22 @@
 
 1.7.0.x dev
 =============================
+MPCVideoDec.
+Fixed handling of media type change from next filter.
+
+Player
+Added line command parameter "/volume N" to change the volume level.
+Fixed the "Prefer external audio files over embedded audio track" setting.
+Added "Show zero hours in status bar and OSD" setting that works for durations of 1 hour or more.
+
+Updated Korean translation (by Hackjjang).
+Updated Turkish translation (by cmhrky).
+Updated German translation (by Klaus1189).
+Updated Chinese (Simplified) translation (by wushantao).
+Updated Hungarian translation (by mickey).
+Updated Italian translation (by mapi68).
+Updated Spanish translation (by IPeluchito).
+
 Updated libraries:
 	ffmpeg git-n7.1-dev-431-gbba996d6cd.
 
