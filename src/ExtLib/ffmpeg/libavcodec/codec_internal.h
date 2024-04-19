@@ -62,11 +62,10 @@
  * Codec initializes slice-based threading with a main function
  */
 #define FF_CODEC_CAP_SLICE_THREAD_HAS_MF    (1 << 5)
-/*
- * The codec supports frame threading and has inter-frame dependencies, so it
- * uses ff_thread_report/await_progress().
+/**
+ * The decoder might make use of the ProgressFrame API.
  */
-#define FF_CODEC_CAP_ALLOCATE_PROGRESS      (1 << 6)
+#define FF_CODEC_CAP_USES_PROGRESSFRAMES    (1 << 6)
 /**
  * Codec handles avctx->thread_count == 0 (auto) internally.
  */

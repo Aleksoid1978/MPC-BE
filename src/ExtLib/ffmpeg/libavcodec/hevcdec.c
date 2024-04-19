@@ -49,9 +49,9 @@
 #include "hwconfig.h"
 #include "internal.h"
 #include "profiles.h"
+#include "progressframe.h"
 #include "refstruct.h"
 #include "thread.h"
-#include "threadframe.h"
 
 static const uint8_t hevc_pel_weight[65] = { [2] = 0, [4] = 1, [6] = 2, [8] = 3, [12] = 4, [16] = 5, [24] = 6, [32] = 7, [48] = 8, [64] = 9 };
 
@@ -1891,7 +1891,7 @@ static void hevc_await_progress(const HEVCContext *s, const HEVCFrame *ref,
     if (s->threads_type == FF_THREAD_FRAME ) {
         int y = FFMAX(0, (mv->y >> 2) + y0 + height + 9);
 
-        ff_thread_await_progress(&ref->tf, y, 0);
+        ff_progress_frame_await(&ref->tf, y);
     }
 }
 
@@ -2925,10 +2925,15 @@ static int hevc_frame_start(HEVCContext *s)
         !(s->avctx->export_side_data & AV_CODEC_EXPORT_DATA_FILM_GRAIN) &&
         !s->avctx->hwaccel;
 
+    ret = set_side_data(s);
+    if (ret < 0)
+        goto fail;
+
     if (s->ref->needs_fg &&
-        s->sei.common.film_grain_characteristics.present &&
-        !ff_h274_film_grain_params_supported(s->sei.common.film_grain_characteristics.model_id,
-                                             s->ref->frame->format)) {
+        (s->sei.common.film_grain_characteristics.present &&
+         !ff_h274_film_grain_params_supported(s->sei.common.film_grain_characteristics.model_id,
+                                              s->ref->frame->format)
+         || !av_film_grain_params_select(s->ref->frame))) {
         av_log_once(s->avctx, AV_LOG_WARNING, AV_LOG_DEBUG, &s->film_grain_warning_shown,
                     "Unsupported film grain parameters. Ignoring film grain.\n");
         s->ref->needs_fg = 0;
@@ -2941,10 +2946,6 @@ static int hevc_frame_start(HEVCContext *s)
         if ((ret = ff_thread_get_buffer(s->avctx, s->ref->frame_grain, 0)) < 0)
             goto fail;
     }
-
-    ret = set_side_data(s);
-    if (ret < 0)
-        goto fail;
 
     s->frame->pict_type = 3 - s->sh.slice_type;
 
@@ -3270,7 +3271,7 @@ static int decode_nal_units(HEVCContext *s, const uint8_t *buf, int length)
 
 fail:
     if (s->ref && s->threads_type == FF_THREAD_FRAME)
-        ff_thread_report_progress(&s->ref->tf, INT_MAX, 0);
+        ff_progress_frame_report(&s->ref->tf, INT_MAX);
 
     return ret;
 }
@@ -3448,14 +3449,15 @@ static int hevc_ref_frame(HEVCFrame *dst, HEVCFrame *src)
 {
     int ret;
 
-    ret = ff_thread_ref_frame(&dst->tf, &src->tf);
-    if (ret < 0)
-        return ret;
+    ff_progress_frame_ref(&dst->tf, &src->tf);
+    dst->frame = dst->tf.f;
 
     if (src->needs_fg) {
         ret = av_frame_ref(dst->frame_grain, src->frame_grain);
-        if (ret < 0)
+        if (ret < 0) {
+            ff_hevc_unref_frame(dst, ~0);
             return ret;
+        }
         dst->needs_fg = 1;
     }
 
@@ -3495,7 +3497,6 @@ static av_cold int hevc_decode_free(AVCodecContext *avctx)
 
     for (i = 0; i < FF_ARRAY_ELEMS(s->DPB); i++) {
         ff_hevc_unref_frame(&s->DPB[i], ~0);
-        av_frame_free(&s->DPB[i].frame);
         av_frame_free(&s->DPB[i].frame_grain);
     }
 
@@ -3541,11 +3542,6 @@ static av_cold int hevc_init_context(AVCodecContext *avctx)
         return AVERROR(ENOMEM);
 
     for (i = 0; i < FF_ARRAY_ELEMS(s->DPB); i++) {
-        s->DPB[i].frame = av_frame_alloc();
-        if (!s->DPB[i].frame)
-            return AVERROR(ENOMEM);
-        s->DPB[i].tf.f = s->DPB[i].frame;
-
         s->DPB[i].frame_grain = av_frame_alloc();
         if (!s->DPB[i].frame_grain)
             return AVERROR(ENOMEM);
@@ -3577,7 +3573,7 @@ static int hevc_update_thread_context(AVCodecContext *dst,
 
     for (i = 0; i < FF_ARRAY_ELEMS(s->DPB); i++) {
         ff_hevc_unref_frame(&s->DPB[i], ~0);
-        if (s0->DPB[i].frame->buf[0]) {
+        if (s0->DPB[i].frame) {
             ret = hevc_ref_frame(&s->DPB[i], &s0->DPB[i]);
             if (ret < 0)
                 return ret;
@@ -3690,6 +3686,10 @@ static av_cold int hevc_decode_init(AVCodecContext *avctx)
             if (ret < 0) {
                 return ret;
             }
+
+            ret = ff_h2645_sei_to_context(avctx, &s->sei.common);
+            if (ret < 0)
+                return ret;
         }
 
         sd = ff_get_coded_side_data(avctx, AV_PKT_DATA_DOVI_CONF);
@@ -3747,7 +3747,8 @@ const FFCodec ff_hevc_decoder = {
     .p.capabilities        = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY |
                              AV_CODEC_CAP_SLICE_THREADS | AV_CODEC_CAP_FRAME_THREADS,
     .caps_internal         = FF_CODEC_CAP_EXPORTS_CROPPING |
-                             FF_CODEC_CAP_ALLOCATE_PROGRESS | FF_CODEC_CAP_INIT_CLEANUP,
+                             FF_CODEC_CAP_USES_PROGRESSFRAMES |
+                             FF_CODEC_CAP_INIT_CLEANUP,
     .p.profiles            = NULL_IF_CONFIG_SMALL(ff_hevc_profiles),
     .hw_configs            = (const AVCodecHWConfigInternal *const []) {
 #if CONFIG_HEVC_DXVA2_HWACCEL

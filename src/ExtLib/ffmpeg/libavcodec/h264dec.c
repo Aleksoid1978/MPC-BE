@@ -1023,30 +1023,38 @@ static int send_next_delayed_frame(H264Context *h, AVFrame *dst_frame,
                                    int *got_frame, int buf_index)
 {
     int ret, i, out_idx;
-    H264Picture *out = h->delayed_pic[0];
+    H264Picture *out;
 
     h->cur_pic_ptr = NULL;
     h->first_field = 0;
 
-    out_idx = 0;
-    for (i = 1;
-         h->delayed_pic[i] &&
-         !(h->delayed_pic[i]->f->flags & AV_FRAME_FLAG_KEY) &&
-         !h->delayed_pic[i]->mmco_reset;
-         i++)
-        if (h->delayed_pic[i]->poc < out->poc) {
-            out     = h->delayed_pic[i];
-            out_idx = i;
+    while (h->delayed_pic[0]) {
+        out = h->delayed_pic[0];
+        out_idx = 0;
+        for (i = 1;
+             h->delayed_pic[i] &&
+             !(h->delayed_pic[i]->f->flags & AV_FRAME_FLAG_KEY) &&
+             !h->delayed_pic[i]->mmco_reset;
+             i++)
+            if (h->delayed_pic[i]->poc < out->poc) {
+                out     = h->delayed_pic[i];
+                out_idx = i;
+            }
+
+        for (i = out_idx; h->delayed_pic[i]; i++)
+            h->delayed_pic[i] = h->delayed_pic[i + 1];
+
+        if (out) {
+            h->frame_recovered |= out->recovered;
+            out->recovered |= h->frame_recovered & FRAME_RECOVERED_SEI;
+
+            out->reference &= ~DELAYED_PIC_REF;
+            ret = finalize_frame(h, dst_frame, out, got_frame);
+            if (ret < 0)
+                return ret;
+            if (*got_frame)
+                break;
         }
-
-    for (i = out_idx; h->delayed_pic[i]; i++)
-        h->delayed_pic[i] = h->delayed_pic[i + 1];
-
-    if (out) {
-        out->reference &= ~DELAYED_PIC_REF;
-        ret = finalize_frame(h, dst_frame, out, got_frame);
-        if (ret < 0)
-            return ret;
     }
 
     return buf_index;
@@ -1185,7 +1193,7 @@ const FFCodec ff_h264_decoder = {
                                NULL
                            },
     .caps_internal         = FF_CODEC_CAP_EXPORTS_CROPPING |
-                             FF_CODEC_CAP_ALLOCATE_PROGRESS | FF_CODEC_CAP_INIT_CLEANUP,
+                             FF_CODEC_CAP_INIT_CLEANUP,
     .flush                 = h264_decode_flush,
     UPDATE_THREAD_CONTEXT(ff_h264_update_thread_context),
     UPDATE_THREAD_CONTEXT_FOR_USER(ff_h264_update_thread_context_for_user),

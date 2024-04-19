@@ -449,7 +449,7 @@ SRCS_LC_B = \
 	libavcodec/qpeldsp.c \
 	libavcodec/qtrle.c \
 	libavcodec/proresdata.c \
-	libavcodec/proresdec2.c \
+	libavcodec/proresdec.c \
 	libavcodec/proresdsp.c \
 	libavcodec/r210dec.c \
 	libavcodec/ra144.c \
@@ -492,6 +492,7 @@ SRCS_LC_B = \
 	libavcodec/takdec.c \
 	libavcodec/takdsp.c \
 	libavcodec/texturedsp.c \
+	libavcodec/threadprogress.c \
 	libavcodec/tiff_common.c \
 	libavcodec/to_upper4.c \
 	libavcodec/tpeldsp.c \

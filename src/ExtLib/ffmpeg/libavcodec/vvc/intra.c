@@ -339,18 +339,20 @@ static void derive_qp(const VVCLocalContext *lc, const TransformUnit *tu, Transf
 //8.7.3 Scaling process for transform coefficients
 static av_always_inline int derive_scale(const TransformBlock *tb, const int sh_dep_quant_used_flag)
 {
-    static const uint8_t rem6[63 + 2 * 6 + 1] = {
-        0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2,
-        3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5,
-        0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3,
-        4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3
+    static const uint8_t rem6[63 + 8 * 6 + 1] = {
+         0,  1,  2,  3,  4,  5,  0,  1,  2,  3,  4,  5,  0,  1,  2,  3,  4,  5,  0,  1,  2,  3,  4,  5,
+         0,  1,  2,  3,  4,  5,  0,  1,  2,  3,  4,  5,  0,  1,  2,  3,  4,  5,  0,  1,  2,  3,  4,  5,
+         0,  1,  2,  3,  4,  5,  0,  1,  2,  3,  4,  5,  0,  1,  2,  3,  4,  5,  0,  1,  2,  3,  4,  5,
+         0,  1,  2,  3,  4,  5,  0,  1,  2,  3,  4,  5,  0,  1,  2,  3,  4,  5,  0,  1,  2,  3,  4,  5,
+         0,  1,  2,  3,  4,  5,  0,  1,  2,  3,  4,  5,  0,  1,  2,  3,
     };
 
-    static const uint8_t div6[63 + 2 * 6 + 1] = {
-        0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3,  3,  3,
-        3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6,  6,  6,
-        7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 10, 10, 10, 10,
-        10, 10, 11, 11, 11, 11, 11, 11, 12, 12, 12, 12
+    static const uint8_t div6[63 + 8 * 6 + 1] = {
+         0,  0,  0,  0,  0,  0,  1,  1,  1,  1,  1,  1,  2,  2,  2,  2,  2,  2,  3,  3,  3,  3,  3,  3,
+         4,  4,  4,  4,  4,  4,  5,  5,  5,  5,  5,  5,  6,  6,  6,  6,  6,  6,  7,  7,  7,  7,  7,  7,
+         8,  8,  8,  8,  8,  8,  9,  9,  9,  9,  9,  9, 10, 10, 10, 10, 10, 10, 11, 11, 11, 11, 11, 11,
+        12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 15, 15, 15, 15, 15, 15,
+        16, 16, 16, 16, 16, 16, 17, 17, 17, 17, 17, 17, 18, 18, 18, 18,
     };
 
     const static int level_scale[2][6] = {
@@ -416,7 +418,7 @@ static const uint8_t* derive_scale_m(const VVCLocalContext *lc, const TransformB
 static av_always_inline int scale_coeff(const TransformBlock *tb, int coeff,
     const int scale, const int scale_m, const int log2_transform_range)
 {
-    coeff = (coeff * scale * scale_m + tb->bd_offset) >> tb->bd_shift;
+    coeff = ((int64_t) coeff * scale * scale_m + tb->bd_offset) >> tb->bd_shift;
     coeff = av_clip_intp2(coeff, log2_transform_range);
     return coeff;
 }

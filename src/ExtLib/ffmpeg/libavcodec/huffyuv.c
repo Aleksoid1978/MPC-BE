@@ -28,12 +28,12 @@
  * huffyuv codec for libavcodec.
  */
 
+#include <stddef.h>
 #include <stdint.h>
 
-#include "libavutil/attributes.h"
 #include "libavutil/error.h"
 #include "libavutil/log.h"
-#include "libavutil/mem.h"
+#include "libavutil/macros.h"
 
 #include "huffyuv.h"
 
@@ -49,7 +49,7 @@ int ff_huffyuv_generate_bits_table(uint32_t *dst, const uint8_t *len_table, int 
     for (int i = FF_ARRAY_ELEMS(lens) - 1; i > 0; i--) {
         if ((lens[i] + codes[i]) & 1) {
             av_log(NULL, AV_LOG_ERROR, "Error generating huffman table\n");
-            return -1;
+            return AVERROR_INVALIDDATA;
         }
         codes[i - 1] = (lens[i] + codes[i]) >> 1;
     }
@@ -58,27 +58,4 @@ int ff_huffyuv_generate_bits_table(uint32_t *dst, const uint8_t *len_table, int 
             dst[i] = codes[len_table[i]]++;
     }
     return 0;
-}
-
-av_cold int ff_huffyuv_alloc_temp(uint8_t *temp[3], uint16_t *temp16[3], int width)
-{
-    int i;
-
-    for (i=0; i<3; i++) {
-        temp[i] = av_malloc(4 * width + 16);
-        if (!temp[i])
-            return AVERROR(ENOMEM);
-        temp16[i] = (uint16_t*)temp[i];
-    }
-    return 0;
-}
-
-av_cold void ff_huffyuv_common_end(uint8_t *temp[3], uint16_t *temp16[3])
-{
-    int i;
-
-    for(i = 0; i < 3; i++) {
-        av_freep(&temp[i]);
-        temp16[i] = NULL;
-    }
 }

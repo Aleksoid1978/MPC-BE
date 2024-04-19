@@ -69,7 +69,7 @@ typedef struct VVCSPS {
     uint8_t     bit_depth;                                          ///< BitDepth
     uint8_t     qp_bd_offset;                                       ///< QpBdOffset
     uint8_t     ctb_log2_size_y;                                    ///< CtbLog2SizeY
-    uint8_t     ctb_size_y;                                         ///< CtbSizeY
+    uint16_t    ctb_size_y;                                         ///< CtbSizeY
     uint8_t     min_cb_log2_size_y;                                 ///< MinCbLog2SizeY
     uint8_t     min_cb_size_y;                                      ///< MinCbSizeY
     uint8_t     max_tb_size_y;                                      ///< MaxTbSizeY
@@ -214,6 +214,9 @@ typedef struct VVCParamSets {
     const VVCALF            *alf_list[VVC_MAX_ALF_COUNT];       ///< RefStruct reference
     const H266RawAPS        *lmcs_list[VVC_MAX_LMCS_COUNT];     ///< RefStruct reference
     const VVCScalingList    *scaling_list[VVC_MAX_SL_COUNT];    ///< RefStruct reference
+
+    // Bit field of SPS IDs used in the current CVS
+    uint16_t                 sps_id_used;
 } VVCParamSets;
 
 typedef struct VVCFrameParamSets {

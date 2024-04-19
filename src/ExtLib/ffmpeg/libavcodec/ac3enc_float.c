@@ -27,7 +27,6 @@
  */
 
 #define AC3ENC_FLOAT 1
-#include "libavutil/mem.h"
 #include "audiodsp.h"
 #include "ac3enc.h"
 #include "codec_internal.h"
@@ -87,14 +86,8 @@ static void sum_square_butterfly(AC3EncodeContext *s, float sum[4],
 static av_cold int ac3_float_mdct_init(AC3EncodeContext *s)
 {
     const float scale = -2.0 / AC3_WINDOW_SIZE;
-    float *window = av_malloc_array(AC3_BLOCK_SIZE, sizeof(*window));
-    if (!window) {
-        av_log(s->avctx, AV_LOG_ERROR, "Cannot allocate memory.\n");
-        return AVERROR(ENOMEM);
-    }
 
-    ff_kbd_window_init(window, 5.0, AC3_BLOCK_SIZE);
-    s->mdct_window = window;
+    ff_kbd_window_init(s->mdct_window_float, 5.0, AC3_BLOCK_SIZE);
 
     return av_tx_init(&s->tx, &s->tx_fn, AV_TX_FLOAT_MDCT, 0,
                       AC3_BLOCK_SIZE, &scale, 0);
@@ -104,11 +97,17 @@ static av_cold int ac3_float_mdct_init(AC3EncodeContext *s)
 av_cold int ff_ac3_float_encode_init(AVCodecContext *avctx)
 {
     AC3EncodeContext *s = avctx->priv_data;
-    s->mdct_init               = ac3_float_mdct_init;
-    s->allocate_sample_buffers = allocate_sample_buffers;
+    int ret;
+
+    s->encode_frame            = encode_frame;
     s->fdsp = avpriv_float_dsp_alloc(avctx->flags & AV_CODEC_FLAG_BITEXACT);
     if (!s->fdsp)
         return AVERROR(ENOMEM);
+
+    ret = ac3_float_mdct_init(s);
+    if (ret < 0)
+        return ret;
+
     return ff_ac3_encode_init(avctx);
 }
 
@@ -120,7 +119,7 @@ const FFCodec ff_ac3_encoder = {
     .p.capabilities  = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,
     .priv_data_size  = sizeof(AC3EncodeContext),
     .init            = ff_ac3_float_encode_init,
-    FF_CODEC_ENCODE_CB(ff_ac3_float_encode_frame),
+    FF_CODEC_ENCODE_CB(ff_ac3_encode_frame),
     .close           = ff_ac3_encode_close,
     .p.sample_fmts   = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_FLTP,
                                                       AV_SAMPLE_FMT_NONE },

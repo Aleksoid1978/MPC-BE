@@ -31,6 +31,7 @@
 #pragma warning(disable: 4005)
 #pragma warning(disable: 5033)
 extern "C" {
+	#include <ExtLib/ffmpeg/libavutil/pixdesc.h>
 // This is kind of an hack but it avoids using a C++ keyword as a struct member name
 #define class classFFMPEG
 	#include <ExtLib/ffmpeg/libavcodec/h264dec.h>

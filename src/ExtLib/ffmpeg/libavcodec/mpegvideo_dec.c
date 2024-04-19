@@ -235,12 +235,20 @@ int ff_mpv_common_frame_size_change(MpegEncContext *s)
     return err;
 }
 
-static int alloc_picture(MpegEncContext *s, Picture *pic)
+static int alloc_picture(MpegEncContext *s, Picture **picp, int reference)
 {
     AVCodecContext *avctx = s->avctx;
+    int idx = ff_find_unused_picture(s->avctx, s->picture, 0);
+    Picture *pic;
     int ret;
 
+    if (idx < 0)
+        return idx;
+
+    pic = &s->picture[idx];
+
     pic->tf.f = pic->f;
+    pic->reference = reference;
 
     /* WM Image / Screen codecs allocate internal buffers with different
      * dimensions / colorspaces; ignore user-defined callbacks for these. */
@@ -248,7 +256,7 @@ static int alloc_picture(MpegEncContext *s, Picture *pic)
         avctx->codec_id != AV_CODEC_ID_VC1IMAGE  &&
         avctx->codec_id != AV_CODEC_ID_MSS2) {
         ret = ff_thread_get_ext_buffer(avctx, &pic->tf,
-                                       pic->reference ? AV_GET_BUFFER_FLAG_REF : 0);
+                                       reference ? AV_GET_BUFFER_FLAG_REF : 0);
     } else {
         pic->f->width  = avctx->width;
         pic->f->height = avctx->height;
@@ -262,12 +270,32 @@ static int alloc_picture(MpegEncContext *s, Picture *pic)
     if (ret < 0)
         goto fail;
 
-    return ff_alloc_picture(s->avctx, pic, &s->me, &s->sc, 0, s->out_format,
-                            s->mb_stride, s->mb_width, s->mb_height, s->b8_stride,
-                            &s->linesize, &s->uvlinesize);
+    ret = ff_alloc_picture(s->avctx, pic, &s->me, &s->sc, 0, s->out_format,
+                           s->mb_stride, s->mb_width, s->mb_height, s->b8_stride,
+                           &s->linesize, &s->uvlinesize);
+    if (ret < 0)
+        goto fail;
+    *picp = pic;
+
+    return 0;
 fail:
     ff_mpeg_unref_picture(pic);
     return ret;
+}
+
+static int av_cold alloc_dummy_frame(MpegEncContext *s, Picture **picp)
+{
+    Picture *pic;
+    int ret = alloc_picture(s, picp, 1);
+    if (ret < 0)
+        return ret;
+
+    pic = *picp;
+
+    ff_thread_report_progress(&pic->tf, INT_MAX, 0);
+    ff_thread_report_progress(&pic->tf, INT_MAX, 1);
+
+    return 0;
 }
 
 static void color_frame(AVFrame *frame, int luma)
@@ -294,14 +322,13 @@ static void color_frame(AVFrame *frame, int luma)
  */
 int ff_mpv_frame_start(MpegEncContext *s, AVCodecContext *avctx)
 {
-    Picture *pic;
-    int idx, ret;
+    int ret;
 
     s->mb_skipped = 0;
 
     if (!ff_thread_can_start_frame(avctx)) {
         av_log(avctx, AV_LOG_ERROR, "Attempt to start a frame outside SETUP state\n");
-        return -1;
+        return AVERROR_BUG;
     }
 
     /* mark & release old frames */
@@ -325,37 +352,12 @@ int ff_mpv_frame_start(MpegEncContext *s, AVCodecContext *avctx)
     ff_mpeg_unref_picture(&s->last_picture);
     ff_mpeg_unref_picture(&s->next_picture);
 
-    if (s->current_picture_ptr && !s->current_picture_ptr->f->buf[0]) {
-        // we already have an unused image
-        // (maybe it was set before reading the header)
-        pic = s->current_picture_ptr;
-    } else {
-        idx = ff_find_unused_picture(s->avctx, s->picture, 0);
-        if (idx < 0) {
-            av_log(s->avctx, AV_LOG_ERROR, "no frame buffer available\n");
-            return idx;
-        }
-        pic = &s->picture[idx];
-    }
+    ret = alloc_picture(s, &s->current_picture_ptr,
+                        s->pict_type != AV_PICTURE_TYPE_B && !s->droppable);
+    if (ret < 0)
+        return ret;
 
-    pic->reference = 0;
-    if (!s->droppable) {
-        if (s->pict_type != AV_PICTURE_TYPE_B)
-            pic->reference = 3;
-    }
-
-    if (alloc_picture(s, pic) < 0)
-        return -1;
-
-    s->current_picture_ptr = pic;
-    // FIXME use only the vars from current_pic
     s->current_picture_ptr->f->flags |= AV_FRAME_FLAG_TOP_FIELD_FIRST * !!s->top_field_first;
-    if (s->codec_id == AV_CODEC_ID_MPEG1VIDEO ||
-        s->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
-        if (s->picture_structure != PICT_FRAME)
-            s->current_picture_ptr->f->flags |= AV_FRAME_FLAG_TOP_FIELD_FIRST *
-                ((s->picture_structure == PICT_TOP_FIELD) == s->first_field);
-    }
     s->current_picture_ptr->f->flags |= AV_FRAME_FLAG_INTERLACED * (!s->progressive_frame &&
                                                                     !s->progressive_sequence);
     s->current_picture_ptr->field_picture      =  s->picture_structure != PICT_FRAME;
@@ -387,55 +389,27 @@ int ff_mpv_frame_start(MpegEncContext *s, AVCodecContext *avctx)
         if (s->pict_type == AV_PICTURE_TYPE_B && s->next_picture_ptr && s->next_picture_ptr->f->buf[0])
             av_log(avctx, AV_LOG_DEBUG,
                    "allocating dummy last picture for B frame\n");
-        else if (s->pict_type != AV_PICTURE_TYPE_I)
+        else if (s->codec_id != AV_CODEC_ID_H261)
             av_log(avctx, AV_LOG_ERROR,
                    "warning: first frame is no keyframe\n");
 
         /* Allocate a dummy frame */
-        idx = ff_find_unused_picture(s->avctx, s->picture, 0);
-        if (idx < 0) {
-            av_log(s->avctx, AV_LOG_ERROR, "no frame buffer available\n");
-            return idx;
-        }
-        s->last_picture_ptr = &s->picture[idx];
-
-        s->last_picture_ptr->reference    = 3;
-        s->last_picture_ptr->f->flags &= ~AV_FRAME_FLAG_KEY;
-        s->last_picture_ptr->f->pict_type = AV_PICTURE_TYPE_P;
-
-        if (alloc_picture(s, s->last_picture_ptr) < 0) {
-            s->last_picture_ptr = NULL;
-            return -1;
-        }
+        ret = alloc_dummy_frame(s, &s->last_picture_ptr);
+        if (ret < 0)
+            return ret;
 
         if (!avctx->hwaccel) {
             int luma_val = s->codec_id == AV_CODEC_ID_FLV1 || s->codec_id == AV_CODEC_ID_H263 ? 16 : 0x80;
             color_frame(s->last_picture_ptr->f, luma_val);
         }
 
-        ff_thread_report_progress(&s->last_picture_ptr->tf, INT_MAX, 0);
-        ff_thread_report_progress(&s->last_picture_ptr->tf, INT_MAX, 1);
     }
     if ((!s->next_picture_ptr || !s->next_picture_ptr->f->buf[0]) &&
         s->pict_type == AV_PICTURE_TYPE_B) {
         /* Allocate a dummy frame */
-        idx = ff_find_unused_picture(s->avctx, s->picture, 0);
-        if (idx < 0) {
-            av_log(s->avctx, AV_LOG_ERROR, "no frame buffer available\n");
-            return idx;
-        }
-        s->next_picture_ptr = &s->picture[idx];
-
-        s->next_picture_ptr->reference   = 3;
-        s->next_picture_ptr->f->flags &= ~AV_FRAME_FLAG_KEY;
-        s->next_picture_ptr->f->pict_type = AV_PICTURE_TYPE_P;
-
-        if (alloc_picture(s, s->next_picture_ptr) < 0) {
-            s->next_picture_ptr = NULL;
-            return -1;
-        }
-        ff_thread_report_progress(&s->next_picture_ptr->tf, INT_MAX, 0);
-        ff_thread_report_progress(&s->next_picture_ptr->tf, INT_MAX, 1);
+        ret = alloc_dummy_frame(s, &s->next_picture_ptr);
+        if (ret < 0)
+            return ret;
     }
 
     if (s->last_picture_ptr) {
@@ -453,18 +427,6 @@ int ff_mpv_frame_start(MpegEncContext *s, AVCodecContext *avctx)
 
     av_assert0(s->pict_type == AV_PICTURE_TYPE_I || (s->last_picture_ptr &&
                                                  s->last_picture_ptr->f->buf[0]));
-
-    if (s->picture_structure != PICT_FRAME) {
-        for (int i = 0; i < 4; i++) {
-            if (s->picture_structure == PICT_BOTTOM_FIELD) {
-                s->current_picture.f->data[i] = FF_PTR_ADD(s->current_picture.f->data[i],
-                                                           s->current_picture.f->linesize[i]);
-            }
-            s->current_picture.f->linesize[i] *= 2;
-            s->last_picture.f->linesize[i]    *= 2;
-            s->next_picture.f->linesize[i]    *= 2;
-        }
-    }
 
     /* set dequantizer, we can't do it during init as
      * it might change for MPEG-4 and we can't do it in the header

@@ -497,9 +497,11 @@ static void ep_init_cabac_decoder(SliceContext *sc, const int index,
             skipped++;
         }
         size = end - start;
+        size = av_clip(size, 0, get_bits_left(gb) / 8);
     } else {
         size = get_bits_left(gb) / 8;
     }
+    av_assert0(gb->buffer + get_bits_count(gb) / 8 + size <= gb->buffer_end);
     ff_init_cabac_decoder (&ep->cc, gb->buffer + get_bits_count(gb) / 8, size);
     skip_bits(gb, size * 8);
 }
@@ -783,6 +785,12 @@ static int decode_nal_unit(VVCContext *s, VVCFrameContext *fc, const H2645NAL *n
 
     s->temporal_id = nal->temporal_id;
 
+    if (nal->nuh_layer_id > 0) {
+        avpriv_report_missing_feature(fc->log_ctx,
+                "Decoding of multilayer bitstreams");
+        return AVERROR_PATCHWELCOME;
+    }
+
     switch (unit->type) {
     case VVC_VPS_NUT:
     case VVC_SPS_NUT:
@@ -966,6 +974,8 @@ static av_cold void vvc_decode_flush(AVCodecContext *avctx)
         VVCFrameContext *last = get_frame_context(s, s->fcs, s->nb_frames - 1);
         ff_vvc_flush_dpb(last);
     }
+
+    s->ps.sps_id_used = 0;
 
     s->eos = 1;
 }
