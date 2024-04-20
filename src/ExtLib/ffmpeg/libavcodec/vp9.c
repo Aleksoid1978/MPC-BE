@@ -1766,10 +1766,6 @@ static void vp9_decode_flush(AVCodecContext *avctx)
 
     if (FF_HW_HAS_CB(avctx, flush))
         FF_HW_SIMPLE_CALL(avctx, flush);
-    // ==> Start patch MPC
-    for (i = 0; i < FF_ARRAY_ELEMS(s->next_refs); i++)
-        ff_thread_release_ext_buffer(&s->next_refs[i]);
-    // ==> End patch MPC
 }
 
 static av_cold int vp9_decode_init(AVCodecContext *avctx)
