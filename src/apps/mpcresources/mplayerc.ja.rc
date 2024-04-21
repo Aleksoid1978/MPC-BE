@@ -1077,7 +1077,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "ウィンドウ モードで再生中にポインターを自動で隠す",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
-    CONTROL         "Show zero hours in status bar and OSD",IDC_CHECK8,
+    CONTROL         "ステータス バーと OSD にゼロ時間を表示する",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "指定した時間より短い 000xx.mpls を表示しない:",IDC_STATIC,7,99,150,8
     EDITTEXT        IDC_EDIT5,161,97,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
@@ -3224,7 +3224,7 @@ BEGIN
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tウィンドウ サイズを固定する"
     IDS_CMD_MONITOR         "/monitor N\tN 番目 (N は 1 から始まる) のモニターで起動する"
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\tN 番目 (N は 1 から始まる) の音声レンダラーを使用する\n\t\t(「音声」設定を参照)"
-    IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
+    IDS_CMD_VOLUME          "/volume N\t音量を設定する、N は 0 から 100 の範囲で指定する"
     IDS_CMD_CLIPBOARD       "/clipboard\t\tクリップボードからパス/リンクを開く"
     IDS_CMD_RESET           "/reset\t\t初期設定に戻す"
 END
