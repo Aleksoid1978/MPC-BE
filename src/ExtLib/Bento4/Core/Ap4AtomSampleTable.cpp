@@ -341,6 +341,10 @@ AP4_AtomSampleTable::GetSampleIndexForTimeStamp(AP4_TimeStamp ts,
                     }
                 }
             }
+
+            if (!m_StssAtom) {
+                break;
+            }
         }
 
         return AP4_SUCCESS;
