@@ -3201,6 +3201,7 @@ BEGIN
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tOynatma T başlığının, C bölümünden başlar"
     IDS_CMD_DVDPOS2         "/dvdpos T#ss:dd\tOynatma T başlığının, ss:dd:ss süresinden başlar"
     IDS_CMD_CD              "/cd\t\tSes cd'si ya da (s)vcd'den tüm parçaları yüklemek için,\n\t\t""yol_adı"" Sürücü yolunu gösterir (isteğe bağlı)"
+    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_OPEN            "/open\t\tDosya açılır, ancak otomatik olarak oynatılmaz"
     IDS_CMD_PLAY            "/play\t\tUygulama açılır açılmaz oynatma başlatılır"
     IDS_CMD_CLOSE           "/close\t\tOynatmadan sonra uygulama kapatılır (sadece /play\n\t\tile birlikte kullanıldığında çalışır)"

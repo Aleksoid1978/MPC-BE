@@ -3200,6 +3200,7 @@ BEGIN
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tPornește redarea la titlul T, capitolul C"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tPornește redarea la titlul T, poziția hh:mm:ss"
     IDS_CMD_CD              "/cd\t\tÎncarcă toate pistele unui cd audio sau (s)vcd,\n\t\t""cale"" înseamnă calea unității (opțional)"
+    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_OPEN            "/open\t\tDeschide fișierul, nu porni redarea în mod automat"
     IDS_CMD_PLAY            "/play\t\tÎncepe redarea fișierului imediat ce playerul este\n\t\tlansat"
     IDS_CMD_CLOSE           "/close\t\tÎnchide playerul după redare (funcționează doar când\n\t\teste folosit cu /play)"

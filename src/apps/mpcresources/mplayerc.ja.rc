@@ -3201,6 +3201,7 @@ BEGIN
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tタイトル T、チャプター C から再生を開始する"
     IDS_CMD_DVDPOS2         "/dvdpos T#P\tタイトル T、位置 P (hh:mm:ss) から再生を開始する"
     IDS_CMD_CD              "/cd\t\t音声 CD または (S)VCD の全トラックを読み込む\n\t\t""pathname"" はドライブ パスを表す (オプション)"
+    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_OPEN            "/open\t\t自動で再生を開始せずにファイルを開く"
     IDS_CMD_PLAY            "/play\t\tプレーヤーの起動と同時にファイルを再生する"
     IDS_CMD_CLOSE           "/close\t\t再生終了後にプレーヤーを終了する (/play 使用時のみ有効)"

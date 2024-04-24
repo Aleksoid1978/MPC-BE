@@ -3201,6 +3201,7 @@ BEGIN
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tНачать воспроизведение с title T, chapter C"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tНачать воспроизведение с title T, позиции\n\t\thh:mm:ss"
     IDS_CMD_CD              "/cd\t\tЗагрузить все дорожки Audio CD или (S)VCD,\n\t\t""путь"" означает путь к диску (опционально)"
+    IDS_CMD_DEVICE          "/device\t\tОткрыть видео устройство по умолчанию"
     IDS_CMD_OPEN            "/open\t\tТолько открыть файл"
     IDS_CMD_PLAY            "/play\t\tНачинать воспроизведение сразу после запуска"
     IDS_CMD_CLOSE           "/close\t\tЗакрыть по окончании воспроизведения\n\t\t(работает только с ключем /play)"

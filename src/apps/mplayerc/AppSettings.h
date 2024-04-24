@@ -78,7 +78,8 @@ constexpr auto CLSW_AUDIORENDERER      = (CLSW_SLAVE << 1);
 constexpr auto CLSW_RESET              = (CLSW_AUDIORENDERER << 1);
 constexpr auto CLSW_RANDOMIZE          = (CLSW_RESET << 1);
 constexpr auto CLSW_VOLUME             = (CLSW_RANDOMIZE << 1);
-constexpr auto CLSW_UNRECOGNIZEDSWITCH = (CLSW_VOLUME << 1);
+constexpr auto CLSW_DEVICE             = (CLSW_VOLUME << 1);
+constexpr auto CLSW_UNRECOGNIZEDSWITCH = (CLSW_DEVICE << 1);
 
 #define APP_RECENTFILES_MIN		5
 #define APP_RECENTFILES_DEF		20

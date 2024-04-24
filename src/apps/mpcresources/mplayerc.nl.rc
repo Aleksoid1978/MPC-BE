@@ -3201,6 +3201,7 @@ BEGIN
     IDS_CMD_DVDPOS1         "/dvdpos T#H\tStart afspelen bij titel T, hoofdstuk H"
     IDS_CMD_DVDPOS2         "/dvdpos T#uu:mm\tStart afspelen bij titel T, positie uu:mm:ss"
     IDS_CMD_CD              "/cd\t\tLaad alle nummers van een audio-cd of (s)vcd\n\t\t""padnaam"" betekent het stationspad (hoeft niet)"
+    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_OPEN            "/open\t\tOpen het bestand zonder automatisch af te spelen"
     IDS_CMD_PLAY            "/play\t\tDirect afspelen, wanneer de speler wordt geopend"
     IDS_CMD_CLOSE           "/close\t\tSluit de speler af na afspelen (werkt alleen samen \n\t\tmet /play)"

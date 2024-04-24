@@ -5564,6 +5564,8 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 				}
 			}
 		}
+	} else if (s.nCLSwitches & CLSW_DEVICE) {
+		SendMessageW(WM_COMMAND, ID_FILE_OPENDEVICE);
 	} else if (!s.slFiles.empty()) {
 		if (s.slFiles.size() == 1 && OpenYoutubePlaylist(s.slFiles.front())) {
 		} else if (s.slFiles.size() == 1 && CheckDVD(s.slFiles.front())) {

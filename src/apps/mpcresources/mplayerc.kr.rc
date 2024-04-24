@@ -3201,6 +3201,7 @@ BEGIN
     IDS_CMD_DVDPOS1         "/dvdpos T#C\t타이틀 T, 챕터 C에서 재생 시작"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\t타이틀 T, 위치 hh:mm:ss에서 재생 시작"
     IDS_CMD_CD              "/cd\t\t오디오 CD 또는 (S)VCD의 모든 트랙을 불러옴,\n\t\t""경로 이름"" 을 지정했을 때 드라이브를 의미함 (옵션)"
+    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_OPEN            "/open\t\t파일을 열지만, 재생을 시작하지는 않음"
     IDS_CMD_PLAY            "/play\t\t파일을 열고 재생을 시작함"
     IDS_CMD_CLOSE           "/close\t\t재생이 끝나면 재생기 종료(/play 스위치를 같이 써야 함)"

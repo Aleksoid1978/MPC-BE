@@ -1383,6 +1383,7 @@ STRING IDS_CMD_CD		"/cd\t\tUčitaj sve zapise audio cd-a ili (s)vcd-a,\n\t\t""im
 STRING IDS_CMD_CLIPBOARD		"/clipboard\t\tOtvori putanje/veze iz clipboarda"
 STRING IDS_CMD_CLOSE		"/close\t\tZatvori aplikaciju nakon pokretanja (radi samo uz\n\t\tkorištenje /play)"
 STRING IDS_CMD_D3DFS		"/d3dfs\t\tZapočni očitavanje u modu s ekskluzivnim zaslonom"
+STRING IDS_CMD_DEVICE		"/device\t\tOpen the default video device"
 STRING IDS_CMD_DUB		"/dub ""dubname""\tUčitaj dodatnu datoteku zvuka"
 STRING IDS_CMD_DUBDELAY		"/dubdelay ""file""\tUčitaj dodatnu datoteku zvuka pomaknutu s XXms (ako\n\t\tdatoteka koristi ""...KAŠNJENJE XXms..."")"
 STRING IDS_CMD_DVD		"/dvd\t\tPokreni u dvd modu, ""imeputanje"" znači dvd\n\t\tmapu (opcionalno)"

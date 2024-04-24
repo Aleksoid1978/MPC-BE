@@ -1383,6 +1383,7 @@ STRING IDS_CMD_CD		"/cd\t\tЗавантажити всі доріжки Audio CD
 STRING IDS_CMD_CLIPBOARD		"/clipboard\t\tВідкрити шляхи/посилання з буферу обміну"
 STRING IDS_CMD_CLOSE		"/close\t\tЗакрити після завершення відтворення (працює лише з /play)"
 STRING IDS_CMD_D3DFS		"/d3dfs\t\tСтартувати в повноекранному D3D режимі"
+STRING IDS_CMD_DEVICE		"/device\t\tOpen the default video device"
 STRING IDS_CMD_DUB		"/dub ""dubname""\tЗавантажити додатковий дубляж"
 STRING IDS_CMD_DUBDELAY		"/dubdelay ""file""\tЗавантажити додатковий дубляж з затримкою XXмс\n(якщо ім'я файлу містить ""...DELAY XXms..."")"
 STRING IDS_CMD_DVD		"/dvd\t\tЗапуск в режимі DVD, ""шлях"" вказує на вміст DVD (опціонально)"

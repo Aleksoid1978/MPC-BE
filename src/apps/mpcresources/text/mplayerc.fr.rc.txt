@@ -1383,6 +1383,7 @@ STRING IDS_CMD_CD		"/cd\t\tCharge toutes les pistes d'un CD audio ou d'un (S)Vcd
 STRING IDS_CMD_CLIPBOARD		"/clipboard\t\tOuvrir paths/links from the clipboard"
 STRING IDS_CMD_CLOSE		"/close\t\tQuitte automatiquement après la lecture"
 STRING IDS_CMD_D3DFS		"/d3dfs\t\tLance le rendu en mode D3D plein écran (réduit le\n\t\ttearing)"
+STRING IDS_CMD_DEVICE		"/device\t\tOpen the default video device"
 STRING IDS_CMD_DUB		"/dub ""fichier audio""\tCharge un fichier audio supplémentaire"
 STRING IDS_CMD_DUBDELAY		"/dubdelay ""fichier""\tCharge un fichier audio avec décalage de XXms (si\n\t\tle nom contiens ""...DELAY XXms..."")"
 STRING IDS_CMD_DVD		"/dvd\t\tDémarre en mode DVD (possibilité de fournir le\n\t\tnom du répertoire)"

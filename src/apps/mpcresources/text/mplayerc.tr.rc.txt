@@ -1383,6 +1383,7 @@ STRING IDS_CMD_CD		"/cd\t\tSes cd'si ya da (s)vcd'den tüm parçaları yüklemek
 STRING IDS_CMD_CLIPBOARD		"/clipboard\t\tPanodan dosya yolu/URL açar (liste desteklenir)"
 STRING IDS_CMD_CLOSE		"/close\t\tOynatmadan sonra uygulama kapatılır (sadece /play\n\t\tile birlikte kullanıldığında çalışır)"
 STRING IDS_CMD_D3DFS		"/d3dfs\t\tÖzel tam ekran kipinde oynatmak için"
+STRING IDS_CMD_DEVICE		"/device\t\tOpen the default video device"
 STRING IDS_CMD_DUB		"/dub ""dublaj_adı""\tHarici bir ses dosyası yüklemek için"
 STRING IDS_CMD_DUBDELAY		"/dubdelay ""dosya""\tXXms olarak atlanacak harici bir ses dosyası yüklemek için\n\t\t(eğer dosya ""...GECİKME XXms..."" içeriyorsa)"
 STRING IDS_CMD_DVD		"/dvd\t\tDVD modunda çalıştırmak için, ""yol_adı"" DVD klasörünü\n\t\tgösterir (isteğe bağlı)"

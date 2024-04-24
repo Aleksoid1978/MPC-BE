@@ -1025,7 +1025,8 @@
 #define IDS_CMD_AUDIORENDERER           32729
 #define IDS_CMD_VOLUME                  32730
 #define IDS_CMD_CLIPBOARD               32731
-#define IDS_CMD_RESET                   32732
+#define IDS_CMD_DEVICE                  32732
+#define IDS_CMD_RESET                   32733
 #define IDS_AG_CLOSE                    32830
 #define IDS_SHADEREDITORDLG_0           32831
 #define IDS_AG_NONE                     32832

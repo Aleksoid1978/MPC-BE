@@ -3201,6 +3201,7 @@ BEGIN
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tHasi irakurketa I izenburuan, A atalean"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tHasi irakurketa I izenburuan, kokapena oo:mn:sg"
     IDS_CMD_CD              "/cd\t\tGertatu cd edo (s)vcd audio bide guztiak,\n\t\t""helburu-izena"" esanahi du gidagailu helburua\n\t\t(aukerazkoa)"
+    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_OPEN            "/open\t\tIreki agiria, ez hasi irakurketa berezgaitasunez"
     IDS_CMD_PLAY            "/play\t\tHasi agiriaren irakurketa irakurgailua abiaraziz\n\t\tbezain laister"
     IDS_CMD_CLOSE           "/close\t\tItxi irakurgailua irakurketaren ondoren\n\t\t(bakarrik lan egiten du /irakurri erabiltzen denean)"

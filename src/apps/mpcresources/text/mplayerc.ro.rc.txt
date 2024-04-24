@@ -1383,6 +1383,7 @@ STRING IDS_CMD_CD		"/cd\t\tÎncarcă toate pistele unui cd audio sau (s)vcd,\n\t
 STRING IDS_CMD_CLIPBOARD		"/clipboard\t\tOpen paths/links from the clipboard"
 STRING IDS_CMD_CLOSE		"/close\t\tÎnchide playerul după redare (funcționează doar când\n\t\teste folosit cu /play)"
 STRING IDS_CMD_D3DFS		"/d3dfs\t\tPornește randare în mod ecran complet D3D"
+STRING IDS_CMD_DEVICE		"/device\t\tOpen the default video device"
 STRING IDS_CMD_DUB		"/dub ""nume dublaj""\tÎncarcă un fișier audio adițional"
 STRING IDS_CMD_DUBDELAY		"/dubdelay ""fișier""\tÎncarcă un fișier audio adițional decalat cu XXms (dacă\n\t\tfișierul conține ""...DELAY XXms..."")"
 STRING IDS_CMD_DVD		"/dvd\t\tRulează în mod DVD, ""cale"" înseamnă dosarul\n\t\tdvd-ului (opțional)"

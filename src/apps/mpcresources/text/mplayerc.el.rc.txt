@@ -1383,6 +1383,7 @@ STRING IDS_CMD_CD		"/cd\t\tΦόρτωση όλων των κομματιών α�
 STRING IDS_CMD_CLIPBOARD		"/clipboard\t\tΆνοιγμα διαδρομών/συνδέσεων από το πρόχειρο"
 STRING IDS_CMD_CLOSE		"/close\t\tΚλείσιμο του προγράμματος μετά την αναπαραγωγή\n\t\t(δουλεύει μόνο όταν χρησιμοποιείται με το /play)"
 STRING IDS_CMD_D3DFS		"/d3dfs\t\tΕκκίνηση απόδοσης σε λειτουργία D3D πλήρους οθόνης"
+STRING IDS_CMD_DEVICE		"/device\t\tOpen the default video device"
 STRING IDS_CMD_DUB		"/dub ""αρχείο ήχου""\tΦόρτωση ενός πρόσθετου αρχείου ήχου"
 STRING IDS_CMD_DUBDELAY		"/dubdelay ""αρχείο""\tΦόρτωση ενός πρόσθετου αρχείου ήχου μετατοπισμένο με XXms\n\t\t(εάν το αρχείο περιέχει ""...DELAY XXms..."")"
 STRING IDS_CMD_DVD		"/dvd\t\tΕκτέλεση σε λειτουργία DVD. Ως ""κατάλογος"" εννοείται\n\t\tο φάκελος του DVD (προαιρετικά)"

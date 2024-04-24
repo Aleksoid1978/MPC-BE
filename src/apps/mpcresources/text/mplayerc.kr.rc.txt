@@ -1383,6 +1383,7 @@ STRING IDS_CMD_CD		"/cd\t\t오디오 CD 또는 (S)VCD의 모든 트랙을 불러
 STRING IDS_CMD_CLIPBOARD		"/clipboard\t\tOpen 클립보드에서 경로/링크 열기"
 STRING IDS_CMD_CLOSE		"/close\t\t재생이 끝나면 재생기 종료(/play 스위치를 같이 써야 함)"
 STRING IDS_CMD_D3DFS		"/d3dfs\t\tD3D 전체 화면 모드에서 생성"
+STRING IDS_CMD_DEVICE		"/device\t\tOpen the default video device"
 STRING IDS_CMD_DUB		"/dub ""더빙파일""\t추가적인 오디오 파일"
 STRING IDS_CMD_DUBDELAY		"/dubdelay ""파일""\tXXms 지연된 추가적인 오디오 파일(\n\t\t파일이 다음을 포함 ""...DELAY XXms..."")"
 STRING IDS_CMD_DVD		"/dvd\t\tdvd재생모드, ""경로 이름"" 을 지정했을 때, DVD 폴더를 의미함(옵션)"

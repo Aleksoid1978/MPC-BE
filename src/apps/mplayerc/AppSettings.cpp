@@ -2268,6 +2268,9 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 			else if (sw == L"cd") {
 				nCLSwitches |= CLSW_CD;
 			}
+			else if (sw == L"device") {
+				nCLSwitches |= CLSW_DEVICE;
+			}
 			else if (sw == L"add") {
 				nCLSwitches |= CLSW_ADD;
 			}

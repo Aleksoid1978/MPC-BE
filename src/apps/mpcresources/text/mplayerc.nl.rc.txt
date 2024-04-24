@@ -1383,6 +1383,7 @@ STRING IDS_CMD_CD		"/cd\t\tLaad alle nummers van een audio-cd of (s)vcd\n\t\t""p
 STRING IDS_CMD_CLIPBOARD		"/clipboard\t\tOpen paden of koppelingen vanuit het klembord"
 STRING IDS_CMD_CLOSE		"/close\t\tSluit de speler af na afspelen (werkt alleen samen \n\t\tmet /play)"
 STRING IDS_CMD_D3DFS		"/d3dfs\t\tStart renderen in exclusieve volledigschermmodus"
+STRING IDS_CMD_DEVICE		"/device\t\tOpen the default video device"
 STRING IDS_CMD_DUB		"/dub ""dubnaam""\tLaad nog een geluidsbestand"
 STRING IDS_CMD_DUBDELAY		"/dubdelay ""best""\tLaad nog een geluidsbestand met een\n\t\tverschuiving van XXms\n\t\t (als bestand ""..vertraging XXms.."" heeft)"
 STRING IDS_CMD_DVD		"/dvd\t\tStart in dvd-modus, ""padnaam"" betekent de dvd-\n\t\tmap (hoeft niet)"

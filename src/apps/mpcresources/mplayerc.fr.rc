@@ -3201,6 +3201,7 @@ BEGIN
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tDémarre la lecture du titre T, à partir du chapitre C"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tDémarre la lecture du titre T, à partir de la position hh:mm:ss"
     IDS_CMD_CD              "/cd\t\tCharge toutes les pistes d'un CD audio ou d'un (S)Vcd"
+    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_OPEN            "/Ouvrir\t\tOuvrir un fichier en pause"
     IDS_CMD_PLAY            "/play\t\tOuvrir un fichier et commencer la lecture"
     IDS_CMD_CLOSE           "/close\t\tQuitte automatiquement après la lecture"

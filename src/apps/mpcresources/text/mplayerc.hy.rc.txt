@@ -1383,6 +1383,7 @@ STRING IDS_CMD_CD		"/cd\t\tԲեռնել Audio CD--ի բոլոր ֆայլերը �
 STRING IDS_CMD_CLIPBOARD		"/clipboard\t\tOpen paths/links from the clipboard"
 STRING IDS_CMD_CLOSE		"/close\t\tՎերարտադրումը ավարտելուց հետո փակել (աշխատում է միայն /play փոխանցիչի հետ)։"
 STRING IDS_CMD_D3DFS		"/d3dfs\t\tՍկսել Ամբողջ էկրանով՝ D3D եղանակով։"
+STRING IDS_CMD_DEVICE		"/device\t\tOpen the default video device"
 STRING IDS_CMD_DUB		"/dub ""dubname""\tԲացել լրացուցիչ ձայնային ֆայլ"
 STRING IDS_CMD_DUBDELAY		"/dubdelay ""file""\tԲացել լրացուցիչ ձայնային ֆայլ՝ XXմվ\n(եթե ֆայլը ունի ""...DELAY XXms..."")։"
 STRING IDS_CMD_DVD		"/dvd\t\tԲացել DVD եղանակով, ""ճանապարհը"" նշանակում է DVD-ի թղթապանակը։"

@@ -1383,6 +1383,7 @@ STRING IDS_CMD_CD		"/cd\t\tNacitat vsetky stopy zvukoveho CD alebo (S)VCD,\n\t\t
 STRING IDS_CMD_CLIPBOARD		"/clipboard\t\tOpen paths/links from the clipboard"
 STRING IDS_CMD_CLOSE		"/close\t\tZatvorit prehravac po prehrati (funguje len s prepinacom\n\t\t /play)"
 STRING IDS_CMD_D3DFS		"/d3dfs\t\tspustit vykreslovanie v celoobrazovkovom rezime D3D"
+STRING IDS_CMD_DEVICE		"/device\t\tOpen the default video device"
 STRING IDS_CMD_DUB		"/dub ""zvukova stopa""\tNacitat pridavny zvukovy subor"
 STRING IDS_CMD_DUBDELAY		"/dubdelay ""subor""\tNacitat pridavny zvukovy subor, oneskoreny o XXms (ak\n\t\tsubor obsahuje ""...DELAY XXms..."")"
 STRING IDS_CMD_DVD		"/dvd\t\tSpustit v mode DVD, ""cesta"" - udaj o ceste k priecinku na\n\t\tDVD (volitelne)"

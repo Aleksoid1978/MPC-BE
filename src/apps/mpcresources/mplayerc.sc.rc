@@ -3201,6 +3201,7 @@ BEGIN
     IDS_CMD_DVDPOS1         "/dvdpos T#C\t从标题 T 章节 C 开始播放"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\t从标题T时间hh:mm:ss开始播放"
     IDS_CMD_CD              "/cd\t\t载入所有音频 CD 或 (S)VCD 的轨道。\n\t\t路径名表示驱动器路径 (可选)"
+    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_OPEN            "/open\t\t打开文件，但不自动播放"
     IDS_CMD_PLAY            "/play\t\t播放器启动后播放文件"
     IDS_CMD_CLOSE           "/close\t\t播放结束后关闭播放器 (只能与\n\t\t/play同时使用)"

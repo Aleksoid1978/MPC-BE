@@ -1383,6 +1383,7 @@ STRING IDS_CMD_CD		"/cd\t\t音声 CD または (S)VCD の全トラックを読�
 STRING IDS_CMD_CLIPBOARD		"/clipboard\t\tクリップボードからパス/リンクを開く"
 STRING IDS_CMD_CLOSE		"/close\t\t再生終了後にプレーヤーを終了する (/play 使用時のみ有効)"
 STRING IDS_CMD_D3DFS		"/d3dfs\t\t排他フルスクリーン モードでレンダリングを開始する"
+STRING IDS_CMD_DEVICE		"/device\t\tOpen the default video device"
 STRING IDS_CMD_DUB		"/dub ""dubname""\t追加の音声ファイルを読み込む"
 STRING IDS_CMD_DUBDELAY		"/dubdelay ""file""\t追加の音声ファイルを XXms シフトして読み込む\n\t\t(ファイルが ""...DELAY XXms..."" を含んでいる場合)"
 STRING IDS_CMD_DVD		"/dvd\t\tDVD モードで起動する\n\t\t""pathname"" は DVD フォルダーを表す (オプション)"

@@ -1383,6 +1383,7 @@ STRING IDS_CMD_CD		"/cd\t\tÖffnet Audio-CD oder (S)VCD (Laufwerk kann\n\t\tals 
 STRING IDS_CMD_CLIPBOARD		"/clipboard\t\tPfade/Links aus der Zwischenablage öffnen"
 STRING IDS_CMD_CLOSE		"/close\t\tBeendet Player (nach Wiedergabe) (in\n\t\tKombination mit ""/play"")."
 STRING IDS_CMD_D3DFS		"/d3dfs\t\tStartet Player im Vollbild (Exclusive Mode)."
+STRING IDS_CMD_DEVICE		"/device\t\tOpen the default video device"
 STRING IDS_CMD_DUB		"/dub ""dubname""\tÖffnet zusätzliche Audiodatei."
 STRING IDS_CMD_DUBDELAY		"/dubdelay ""file""\tÖffnet zusätzliche Audiodatei, deren Wiedergabe\n\t\tum Xms versetzt wird (Dateiname muss\n\t\t""DELAY Xms"" enthalten)."
 STRING IDS_CMD_DVD		"/dvd\t\tStartet Player im DVD-Modus (DVD-Verzeichnis\n\t\tkann als ""Pfadname"" angegeben werden)."

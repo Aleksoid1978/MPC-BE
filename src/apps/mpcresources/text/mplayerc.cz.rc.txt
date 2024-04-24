@@ -1383,6 +1383,7 @@ STRING IDS_CMD_CD		"/cd\t\tNačte všechny stopy AudioCD/(S)VCD, volitelný\n\t\
 STRING IDS_CMD_CLIPBOARD		"/clipboard\t\tOpen paths/links from the clipboard"
 STRING IDS_CMD_CLOSE		"/close\t\tPo ukončení přehrávání zavře přehrávač (funkční\n\t\tjen v kombinaci s /play)"
 STRING IDS_CMD_D3DFS		"/d3dfs\t\tSpustí vykreslování v D3D fullscreen režimu"
+STRING IDS_CMD_DEVICE		"/device\t\tOpen the default video device"
 STRING IDS_CMD_DUB		"/dub ""soubor""\tNačte soubor se zvukovou stopou"
 STRING IDS_CMD_DUBDELAY		"/dubdelay ""soubor""\tNačte soubor se zvukovou stopou posunutou\n\t\to XXms (pokud název souboru obsahuje\n\t\t""...DELAY XXms..."")"
 STRING IDS_CMD_DVD		"/dvd\t\tSpustí MPC-BE v DVD režimu, volitelný parametr\n\t\t""cesta"" určuje DVD adresář"

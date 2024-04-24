@@ -1380,6 +1380,7 @@ STRING IDS_CMD_CD		"/cd\t\tOtwiera wszystkie ścieżki CD-Audio lub (s)vcd\n\t\t
 STRING IDS_CMD_CLIPBOARD		"/clipboard\t\tOpen paths/links from the clipboard"
 STRING IDS_CMD_CLOSE		"/close\t\tKończy program po zakończeniu odtwarzania\n\t\t(działa z parametrem /play)"
 STRING IDS_CMD_D3DFS		"/d3dfs\t\tUruchamia odtwarzanie pełnoekranowe w D3D"
+STRING IDS_CMD_DEVICE		"/device\t\tOpen the default video device"
 STRING IDS_CMD_DUB		"/dub „plik”\tOtwiera dodatkową ścieżkę dźwiękową"
 STRING IDS_CMD_DUBDELAY		"/dubdelay „plik”\tOtwiera dodatkową ścieżkę dźwiękową opóźnioną\n\t\to XX ms jeśli nazwa pliku zawiera ciąg\n\t\t„DELAY XXms”"
 STRING IDS_CMD_DVD		"/dvd\t\tOtwiera płytę DVD, „ścieżka” wskazuje folder DVD\n\t\t(opcjonalnie)"

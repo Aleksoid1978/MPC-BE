@@ -3201,6 +3201,7 @@ BEGIN
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tUruchamia odtwarzanie tytułu T, rozdział C"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tUruchamia odtwarzanie tytułu T, pozycja\n\t\thh:mm:ss"
     IDS_CMD_CD              "/cd\t\tOtwiera wszystkie ścieżki CD-Audio lub (s)vcd\n\t\t„Ścieżka” wskazuje literę napędu (opcjonalnie)"
+    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_OPEN            "/open\t\tOtwiera plik, nie rozpoczyna odtwarzania"
     IDS_CMD_PLAY            "/play\t\tRozpoczyna odtwarzanie po uruchomieniu\n\t\tprogramu"
     IDS_CMD_CLOSE           "/close\t\tKończy program po zakończeniu odtwarzania\n\t\t(działa z parametrem /play)"

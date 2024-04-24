@@ -1383,6 +1383,7 @@ STRING IDS_CMD_CD		"/cd\t\tGertatu cd edo (s)vcd audio bide guztiak,\n\t\t""helb
 STRING IDS_CMD_CLIPBOARD		"/clipboard\t\tOpen paths/links from the clipboard"
 STRING IDS_CMD_CLOSE		"/close\t\tItxi irakurgailua irakurketaren ondoren\n\t\t(bakarrik lan egiten du /irakurri erabiltzen denean)"
 STRING IDS_CMD_D3DFS		"/d3dfs\t\tHasi aurkezpena D3D ikusleiho-osoko moduan"
+STRING IDS_CMD_DEVICE		"/device\t\tOpen the default video device"
 STRING IDS_CMD_DUB		"/dub ""dubname""\tGertatu audio agiri gehigarri bat"
 STRING IDS_CMD_DUBDELAY		"/dubdelay ""file""\tGertatu audio agiri gehigarri bat XXsm aldatuta\n\t\t(baldin agiriak baditu ""...ATZERAPENA XXsM..."")"
 STRING IDS_CMD_DVD		"/dvd\t\tEkin dvd moduan, ""helburu-izena"" esanahi du\n\t\tdvd agiritegia (aukerazkoa)"
