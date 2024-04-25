@@ -1383,7 +1383,7 @@ STRING IDS_CMD_CD		"/cd\t\t载入所有音频 CD 或 (S)VCD 的轨道。\n\t\t�
 STRING IDS_CMD_CLIPBOARD		"/clipboard\t\t从剪贴板打开文件路径或链接"
 STRING IDS_CMD_CLOSE		"/close\t\t播放结束后关闭播放器 (只能与\n\t\t/play同时使用)"
 STRING IDS_CMD_D3DFS		"/d3dfs\t\t以独占全屏幕模式开始渲染"
-STRING IDS_CMD_DEVICE		"/device\t\tOpen the default video device"
+STRING IDS_CMD_DEVICE		"/device\t\t打开默认的视频捕获设备"
 STRING IDS_CMD_DUB		"/dub ""伴音名""\t载入额外的音频文件"
 STRING IDS_CMD_DUBDELAY		"/dubdelay ""文件""\t载入额外的音频文件并偏移XX毫秒 (如果\n\t\t文件包含""...DELAY XXms..."")"
 STRING IDS_CMD_DVD		"/dvd\t\t以 DVD 模式运行。""路径名""为 DVD 目录 (可选)"

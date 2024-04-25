@@ -1077,7 +1077,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "視窗模式播放時自動隱藏滑鼠游標",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
-    CONTROL         "Show zero hours in status bar and OSD",IDC_CHECK8,
+    CONTROL         "即使時間不足一小時，仍在狀態列及 OSD 以數字零顯示小時位",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "不顯示短於設定長度的 000xx.mpls：",IDC_STATIC,7,99,150,8
     EDITTEXT        IDC_EDIT5,161,97,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
@@ -3225,7 +3225,7 @@ BEGIN
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\t設定固定的視窗大小"
     IDS_CMD_MONITOR         "/monitor N\t在第 N 顯示器啟動, N 從 1 開始"
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\t使用第 N 音訊譜製器啟動, N 從 1 開始\n\t\t(請見 ""輸出"" 設定)"
-    IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
+    IDS_CMD_VOLUME          "/volume N\t設定音量， N 的範圍為從 0 到 100"
     IDS_CMD_CLIPBOARD       "/clipboard\t\t開啟剪貼簿中的路徑或連結"
     IDS_CMD_RESET           "/reset\t\t還原為預設值"
 END

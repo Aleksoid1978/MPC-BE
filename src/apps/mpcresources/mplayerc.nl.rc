@@ -1077,7 +1077,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Verberg automatisch de muisaanwijzer tijdens het afspelen in de venstermodus",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
-    CONTROL         "Show zero hours in status bar and OSD",IDC_CHECK8,
+    CONTROL         "Toon het uurcijfer altijd op de statusbalk en het OSD, zelfs als het nul is",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "Toon 000xx.mpls niet, die korter zijn dan",IDC_STATIC,7,99,150,8
     EDITTEXT        IDC_EDIT5,161,97,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
@@ -3225,7 +3225,7 @@ BEGIN
     IDS_CMD_FIXEDSIZE       "/fixedsize B,H\tZet venstergrootte op BxH"
     IDS_CMD_MONITOR         "/monitor N\tStart op schermmonitor N (N start bij 1)"
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\tStart met audiorenderer N (N start bij 1)\n\t\t(zie ""Output"" instellingen)"
-    IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
+    IDS_CMD_VOLUME          "/volume N\tStel volume in, waarbij N een bereik tussen 0 en 100 heeft"
     IDS_CMD_CLIPBOARD       "/clipboard\t\tOpen paden of koppelingen vanuit het klembord"
     IDS_CMD_RESET           "/reset\t\tStandaardinstellingen terugzetten"
 END
