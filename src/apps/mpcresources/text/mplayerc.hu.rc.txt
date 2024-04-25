@@ -1383,7 +1383,7 @@ STRING IDS_CMD_CD		"/cd\t\tBetölti egy audió CD vagy egy (s)vcd összes műsor
 STRING IDS_CMD_CLIPBOARD		"/clipboard\t\tNyissa meg az elérési utakat/hivatkozásokat a vágólapról"
 STRING IDS_CMD_CLOSE		"/close\t\tZárja be a lejátszót a műsör befejeződése után (csak a /play kapcsolóval\n\t\tegyütt használható)"
 STRING IDS_CMD_D3DFS		"/d3dfs\t\tlejátszó indítása D3D teljes képernyős módban"
-STRING IDS_CMD_DEVICE		"/device\t\tOpen the default video device"
+STRING IDS_CMD_DEVICE		"/device\t\tNyissa meg az alapértelmezett videoeszközt"
 STRING IDS_CMD_DUB		"/dub ""dubname""\tBetölt egy külön audió fájlt"
 STRING IDS_CMD_DUBDELAY		"/dubdelay ""file""\tBetölt egy külön audió fájlt XX ms-al eltolva (ha a\n\t\tfájl tartalmaz ""...DELAY XXms..."")"
 STRING IDS_CMD_DVD		"/dvd\t\tDVD módban való futtatás, a ""pathname"" a dvd \n\t\tmappáját jelenti (opcionális)"

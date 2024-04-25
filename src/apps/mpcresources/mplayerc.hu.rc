@@ -3226,7 +3226,7 @@ BEGIN
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\tN. audió átalakító használata, ahol N egytől indul\n\t\t(lásd ""Hang"" beállítások)"
     IDS_CMD_VOLUME          "/volume N\tÁllítsa be a hangerőt, ahol N egy 0 és 100 közötti tartomány"
     IDS_CMD_CLIPBOARD       "/clipboard\t\tNyissa meg az elérési utakat/hivatkozásokat a vágólapról"
-    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
+    IDS_CMD_DEVICE          "/device\t\tNyissa meg az alapértelmezett videoeszközt"
     IDS_CMD_RESET           "/reset\t\tAlapbeállítások visszaállítása"
 END
 

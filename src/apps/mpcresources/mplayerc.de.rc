@@ -3226,7 +3226,7 @@ BEGIN
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\tLädt Audiorenderer N (wobei N > 0, siehe\n\t\tAusgabe-Optionen)."
     IDS_CMD_VOLUME          "/volume N\tLautstärke stellen, wobei N eine Zahl im Bereich von 0 bis 100 ist."
     IDS_CMD_CLIPBOARD       "/clipboard\t\tPfade/Links aus der Zwischenablage öffnen"
-    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
+    IDS_CMD_DEVICE          "/device\t\tStandard-Videogerät öffnen."
     IDS_CMD_RESET           "/reset\t\tSetzt alle Programm-Einstellungen zurück."
 END
 
