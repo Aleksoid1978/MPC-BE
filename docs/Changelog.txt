@@ -2,13 +2,18 @@
 
 1.7.0.x dev
 =============================
+MP4Splitter
+Fixed freezing during navigation on some files.
+
 MPCVideoDec.
 Fixed handling of media type change from next filter.
 
 Player
-Added line command parameter "/volume N" to change the volume level.
+Added "/volume N" command line option to change the volume level.
+Added "/device" command line option to open the capture device.
 Fixed the "Prefer external audio files over embedded audio track" setting.
 Added "Show zero hours in status bar and OSD" setting that works for durations of 1 hour or more.
+Various interface fixes.
 
 Updated Korean translation (by Hackjjang).
 Updated Turkish translation (by cmhrky).
@@ -17,6 +22,9 @@ Updated Chinese (Simplified) translation (by wushantao).
 Updated Hungarian translation (by mickey).
 Updated Italian translation (by mapi68).
 Updated Spanish translation (by IPeluchito).
+Updated Japanese translation (by tsubasanouta).
+Updated Romanian translation (by AndreiMiloiu).
+Updated Dutch and Chinese (Traditional) translation (by beter).
 
 Updated libraries:
 	ffmpeg git-n7.1-dev-431-gbba996d6cd.
@@ -87,7 +95,7 @@ Updated Japanese translation (by tsubasanouta).
 Updated Hungarian translation (by mickey).
 Updated German translation (by Klaus1189).
 Updated Dutch and Chinese (Traditional) translation (by beter).
-Updated Romanian translation (by Andrei Miloiu)
+Updated Romanian translation (by Andrei Miloiu).
 
 Updated libraries:
 	dav1d git-1.4.1-14-ge27b451;
