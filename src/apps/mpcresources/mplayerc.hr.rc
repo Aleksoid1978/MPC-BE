@@ -123,11 +123,11 @@ BEGIN
     GROUPBOX        "Zvuk",IDC_STATIC,5,53,285,46
     CTEXT           "Glasnoća",IDC_STATIC,42,60,55,8
     RTEXT           "Min",IDC_STATIC,7,80,20,8
-    CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | TBS_TOOLTIPS | WS_TABSTOP,28,72,85,19
+    CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | TBS_TOOLTIPS | WS_TABSTOP | 0x400,28,72,85,19
     LTEXT           "Max",IDC_STATIC,116,80,27,8
     CTEXT           "Balans",IDC_STATIC_BALANCE,191,60,55,8,SS_NOTIFY
     RTEXT           "L",IDC_STATIC,144,80,30,8
-    CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOOLTIPS | WS_TABSTOP,176,79,85,19
+    CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,176,79,85,19
     LTEXT           "R",IDC_STATIC,262,80,27,8
     GROUPBOX        "Zvuk otvorene postavke",IDC_STATIC,5,102,285,51
     CONTROL         "Automatsko učitavanje datoteka zvuka",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,113,276,9
@@ -3199,7 +3199,6 @@ BEGIN
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tPočni prikaz na titlu T, poglavlje C"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tPočni prikaz na titlu T, pozicija hh:mm:ss"
     IDS_CMD_CD              "/cd\t\tUčitaj sve zapise audio cd-a ili (s)vcd-a,\n\t\t""imeputanje"" znači putanju na disku(opcionalno)"
-    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_OPEN            "/open\t\tOtvori datoteku, ne započinji automatski prikaz"
     IDS_CMD_PLAY            "/play\t\tZapočni reprodukciju datoteke odmah nakon što je aplikacija\n\t\tpokrenuta"
     IDS_CMD_CLOSE           "/close\t\tZatvori aplikaciju nakon pokretanja (radi samo uz\n\t\tkorištenje /play)"
@@ -3225,6 +3224,7 @@ BEGIN
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\tKoristi audiorender N, gdje N počinje od 1\n\t\t(vidi ""Audio"" postavke)"
     IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
     IDS_CMD_CLIPBOARD       "/clipboard\t\tOtvori putanje/veze iz clipboarda"
+    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_RESET           "/reset\t\tVrati tvorničke postavke"
 END
 

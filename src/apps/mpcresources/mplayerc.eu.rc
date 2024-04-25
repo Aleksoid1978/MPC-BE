@@ -123,11 +123,11 @@ BEGIN
     GROUPBOX        "Audioa",IDC_STATIC,5,53,285,46
     CTEXT           "Bolumena",IDC_STATIC,42,60,55,8
     RTEXT           "Gutx",IDC_STATIC,7,80,20,8
-    CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | TBS_TOOLTIPS | WS_TABSTOP,28,72,85,19
+    CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | TBS_TOOLTIPS | WS_TABSTOP | 0x400,28,72,85,19
     LTEXT           "Geh",IDC_STATIC,116,80,27,8
     CTEXT           "Oreka",IDC_STATIC_BALANCE,191,60,55,8,SS_NOTIFY
     RTEXT           "EZ",IDC_STATIC,144,80,30,8
-    CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOOLTIPS | WS_TABSTOP,176,79,85,19
+    CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,176,79,85,19
     LTEXT           "ES",IDC_STATIC,262,80,27,8
     GROUPBOX        "Audio irekitze ezarpenak",IDC_STATIC,5,102,285,51
     CONTROL         "Berez-gertatu audio agiriak",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,113,276,9
@@ -3201,7 +3201,6 @@ BEGIN
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tHasi irakurketa I izenburuan, A atalean"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tHasi irakurketa I izenburuan, kokapena oo:mn:sg"
     IDS_CMD_CD              "/cd\t\tGertatu cd edo (s)vcd audio bide guztiak,\n\t\t""helburu-izena"" esanahi du gidagailu helburua\n\t\t(aukerazkoa)"
-    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_OPEN            "/open\t\tIreki agiria, ez hasi irakurketa berezgaitasunez"
     IDS_CMD_PLAY            "/play\t\tHasi agiriaren irakurketa irakurgailua abiaraziz\n\t\tbezain laister"
     IDS_CMD_CLOSE           "/close\t\tItxi irakurgailua irakurketaren ondoren\n\t\t(bakarrik lan egiten du /irakurri erabiltzen denean)"
@@ -3227,6 +3226,7 @@ BEGIN
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\tHasi N audio-aurkezlea erabiliz,\n\t\tnon N hasten den 1-etik (ikusi ""Irteera"" ezarpenak)"
     IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
     IDS_CMD_CLIPBOARD       "/clipboard\t\tOpen paths/links from the clipboard"
+    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_RESET           "/reset\t\tBerrezarri berezko ezarpenak"
 END
 

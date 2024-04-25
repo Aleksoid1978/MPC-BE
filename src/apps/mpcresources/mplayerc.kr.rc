@@ -123,11 +123,11 @@ BEGIN
     GROUPBOX        "오디오",IDC_STATIC,5,53,285,46
     CTEXT           "음량",IDC_STATIC,42,60,55,8
     RTEXT           "최소",IDC_STATIC,7,80,20,8
-    CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | TBS_TOOLTIPS | WS_TABSTOP,28,72,85,19
+    CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | TBS_TOOLTIPS | WS_TABSTOP | 0x400,28,72,85,19
     LTEXT           "최대",IDC_STATIC,116,80,27,8
     CTEXT           "균형",IDC_STATIC_BALANCE,191,60,55,8,SS_NOTIFY
     RTEXT           "좌",IDC_STATIC,144,80,30,8
-    CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOOLTIPS | WS_TABSTOP,176,79,85,19
+    CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,176,79,85,19
     LTEXT           "우",IDC_STATIC,262,80,27,8
     GROUPBOX        "오디오 열기 설정",IDC_STATIC,5,102,285,51
     CONTROL         "오디오 파일을 자동으로 열기",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,113,276,9
@@ -3201,7 +3201,6 @@ BEGIN
     IDS_CMD_DVDPOS1         "/dvdpos T#C\t타이틀 T, 챕터 C에서 재생 시작"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\t타이틀 T, 위치 hh:mm:ss에서 재생 시작"
     IDS_CMD_CD              "/cd\t\t오디오 CD 또는 (S)VCD의 모든 트랙을 불러옴,\n\t\t""경로 이름"" 을 지정했을 때 드라이브를 의미함 (옵션)"
-    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_OPEN            "/open\t\t파일을 열지만, 재생을 시작하지는 않음"
     IDS_CMD_PLAY            "/play\t\t파일을 열고 재생을 시작함"
     IDS_CMD_CLOSE           "/close\t\t재생이 끝나면 재생기 종료(/play 스위치를 같이 써야 함)"
@@ -3227,6 +3226,7 @@ BEGIN
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\t오디오 렌더러 N번(1부터 시작)을 사용해서 시작\n\t\t(""출력"" 설정을 참고하세요)"
     IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
     IDS_CMD_CLIPBOARD       "/clipboard\t\tOpen 클립보드에서 경로/링크 열기"
+    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_RESET           "/reset\t\t기본값으로 복구"
 END
 

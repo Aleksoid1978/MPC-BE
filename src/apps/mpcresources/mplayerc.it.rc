@@ -123,11 +123,11 @@ BEGIN
     GROUPBOX        "Audio",IDC_STATIC,5,53,285,46
     CTEXT           "Volume",IDC_STATIC,42,60,55,8
     RTEXT           "Min",IDC_STATIC,7,80,20,8
-    CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | TBS_TOOLTIPS | WS_TABSTOP,28,72,85,19
+    CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | TBS_TOOLTIPS | WS_TABSTOP | 0x400,28,72,85,19
     LTEXT           "Max",IDC_STATIC,116,80,27,8
     CTEXT           "Bilanciamento",IDC_STATIC_BALANCE,191,60,55,8,SS_NOTIFY
     RTEXT           "L",IDC_STATIC,144,80,30,8
-    CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOOLTIPS | WS_TABSTOP,176,79,85,19
+    CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,176,79,85,19
     LTEXT           "R",IDC_STATIC,262,80,27,8
     GROUPBOX        "Apri impostazioni audio",IDC_STATIC,5,102,285,51
     CONTROL         "Carica automaticamente i file audio",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,113,276,9
@@ -3201,7 +3201,6 @@ BEGIN
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tAvvia la riproduzione dal titolo T, capitolo C"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tAvvia la riproduzione dal titolo T, posizione hh:mm:ss"
     IDS_CMD_CD              "/cd\t\tCarica tutte le tracce di un cd audio o (s)vcd,\n\t\t""nome_percorso"" indica il percorso dell'unità (opzionale)"
-    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_OPEN            "/open\t\tApri il file, non avviare automaticamente la riproduzione"
     IDS_CMD_PLAY            "/play\t\tInizia a riprodurre il file non appena il lettore viene\n\t\tlanciato"
     IDS_CMD_CLOSE           "/close\t\tChiudi il lettore dopo la riproduzione (funziona solo quando\n\t\utilizzato con /play)"
@@ -3227,6 +3226,7 @@ BEGIN
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\tInizia a usare l'audiorenderer N, dove N inizia da 1\n\t\t(vedi impostazioni ""Audio"")"
     IDS_CMD_VOLUME          "/volume N\tImposta volume, il valore di N è tra 0 e 100"
     IDS_CMD_CLIPBOARD       "/clipboard\t\tApri percorsi/collegamenti dagli appunti"
+    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_RESET           "/reset\t\tRipristina le impostazioni predefinite"
 END
 

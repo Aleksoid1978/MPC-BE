@@ -123,11 +123,11 @@ BEGIN
     GROUPBOX        "音声",IDC_STATIC,5,53,285,46
     CTEXT           "音量",IDC_STATIC,42,60,55,8
     RTEXT           "最小",IDC_STATIC,7,80,20,8
-    CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | TBS_TOOLTIPS | WS_TABSTOP,28,72,85,19
+    CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | TBS_TOOLTIPS | WS_TABSTOP | 0x400,28,72,85,19
     LTEXT           "最大",IDC_STATIC,116,80,27,8
     CTEXT           "バランス",IDC_STATIC_BALANCE,191,60,55,8,SS_NOTIFY
     RTEXT           "左",IDC_STATIC,144,80,30,8
-    CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOOLTIPS | WS_TABSTOP,176,79,85,19
+    CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,176,79,85,19
     LTEXT           "右",IDC_STATIC,262,80,27,8
     GROUPBOX        "音声を開く設定",IDC_STATIC,5,102,285,51
     CONTROL         "音声ファイルを自動で読み込む",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,113,276,9
@@ -3201,7 +3201,6 @@ BEGIN
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tタイトル T、チャプター C から再生を開始する"
     IDS_CMD_DVDPOS2         "/dvdpos T#P\tタイトル T、位置 P (hh:mm:ss) から再生を開始する"
     IDS_CMD_CD              "/cd\t\t音声 CD または (S)VCD の全トラックを読み込む\n\t\t""pathname"" はドライブ パスを表す (オプション)"
-    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_OPEN            "/open\t\t自動で再生を開始せずにファイルを開く"
     IDS_CMD_PLAY            "/play\t\tプレーヤーの起動と同時にファイルを再生する"
     IDS_CMD_CLOSE           "/close\t\t再生終了後にプレーヤーを終了する (/play 使用時のみ有効)"
@@ -3227,6 +3226,7 @@ BEGIN
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\tN 番目 (N は 1 から始まる) の音声レンダラーを使用する\n\t\t(「音声」設定を参照)"
     IDS_CMD_VOLUME          "/volume N\t音量を設定する、N は 0 から 100 の範囲で指定する"
     IDS_CMD_CLIPBOARD       "/clipboard\t\tクリップボードからパス/リンクを開く"
+    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_RESET           "/reset\t\t初期設定に戻す"
 END
 

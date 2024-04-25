@@ -123,11 +123,11 @@ BEGIN
     GROUPBOX        "Ήχος",IDC_STATIC,5,53,285,46
     CTEXT           "Ένταση",IDC_STATIC,42,60,55,8
     RTEXT           "Ελάχ.",IDC_STATIC,7,80,20,8
-    CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | TBS_TOOLTIPS | WS_TABSTOP,28,72,85,19
+    CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | TBS_TOOLTIPS | WS_TABSTOP | 0x400,28,72,85,19
     LTEXT           "Μέγ.",IDC_STATIC,116,80,27,8
     CTEXT           "Ισορροπία",IDC_STATIC_BALANCE,191,60,55,8,SS_NOTIFY
     RTEXT           "Α",IDC_STATIC,144,80,30,8
-    CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOOLTIPS | WS_TABSTOP,176,79,85,19
+    CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,176,79,85,19
     LTEXT           "Δ",IDC_STATIC,262,80,27,8
     GROUPBOX        "Άνοιγμα ρυθμίσεων ήχου",IDC_STATIC,5,102,285,51
     CONTROL         "Αυτόματη φόρτωση αρχείων ήχου",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,113,276,9
@@ -3201,7 +3201,6 @@ BEGIN
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tΈναρξη αναπαραγωγής στον τίτλο T, κεφάλαιο C"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tΈναρξη αναπαραγωγής στον τίτλο T, θέση hh:mm:ss"
     IDS_CMD_CD              "/cd\t\tΦόρτωση όλων των κομματιών από ένα CD ή (S)VCD.\n\t\tΩς ""κατάλογος"" εννοείται της συσκευής οδήγησης (προαιρετικά)"
-    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_OPEN            "/open\t\tΆνοιγμα του αρχείου χωρίς αυτόματη έναρξη αναπαραγωγής"
     IDS_CMD_PLAY            "/play\t\tΈναρξη αναπαραγωγής του αρχείου με την εκκίνηση του\n\t\tπρογράμματος αναπαραγωγής"
     IDS_CMD_CLOSE           "/close\t\tΚλείσιμο του προγράμματος μετά την αναπαραγωγή\n\t\t(δουλεύει μόνο όταν χρησιμοποιείται με το /play)"
@@ -3227,6 +3226,7 @@ BEGIN
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\tΈναρξη απόδοσης ήχου με χρήση του N (όπου το N ξεκινά από 1)\n\t\t(βλέπε ρυθμίσεις ""Έξοδος"")"
     IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
     IDS_CMD_CLIPBOARD       "/clipboard\t\tΆνοιγμα διαδρομών/συνδέσεων από το πρόχειρο"
+    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
     IDS_CMD_RESET           "/reset\t\tΕπαναφορά προεπιλεγμένων ρυθμίσεων"
 END
 
