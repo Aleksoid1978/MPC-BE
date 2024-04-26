@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2023 see Authors.txt
+ * (C) 2016-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,6 +30,11 @@ void CALLBACK CHTTPAsync::Callback(_In_ HINTERNET hInternet,
 								   __in_opt LPVOID lpvStatusInformation,
 								   __in DWORD dwStatusInformationLength)
 {
+	if (dwInternetStatus == INTERNET_STATUS_HANDLE_CLOSING) {
+		// there is no point in processing further.
+		// also dwContext may be incorrect on Windows 7 if there is no network.
+		return;
+	}
 	if (!lpvStatusInformation) {
 		return;
 	}
