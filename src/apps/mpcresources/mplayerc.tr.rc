@@ -3226,7 +3226,7 @@ BEGIN
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\tSes işleyici N ile başlanılır; N, 0 ile başlar\n\t\t(""Ses"" ayarlarına bakınız)"
     IDS_CMD_VOLUME          "/volume N\tSesi Ayarlar. Burada N, 0 ile 100 arasında bir aralıktır"
     IDS_CMD_CLIPBOARD       "/clipboard\t\tPanodan dosya yolu/URL açar (liste desteklenir)"
-    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
+    IDS_CMD_DEVICE          "/device\t\tVarsayılan video aygıtını açar"
     IDS_CMD_RESET           "/reset\t\tVarsayılan ayarlara geri dönülür"
 END
 
