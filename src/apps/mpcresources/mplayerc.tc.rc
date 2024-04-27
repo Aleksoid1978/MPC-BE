@@ -3226,7 +3226,7 @@ BEGIN
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\t使用第 N 音訊譜製器啟動, N 從 1 開始\n\t\t(請見 ""輸出"" 設定)"
     IDS_CMD_VOLUME          "/volume N\t設定音量， N 的範圍為從 0 到 100"
     IDS_CMD_CLIPBOARD       "/clipboard\t\t開啟剪貼簿中的路徑或連結"
-    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
+    IDS_CMD_DEVICE          "/device\t\t開啟預設視訊裝置"
     IDS_CMD_RESET           "/reset\t\t還原為預設值"
 END
 
