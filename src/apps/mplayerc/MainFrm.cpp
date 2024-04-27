@@ -4629,6 +4629,10 @@ void CMainFrame::OnFilePostOpenMedia(std::unique_ptr<OpenMediaData>& pOMD)
 		MoveWindow(r);
 	}
 
+	if (!m_wndSeekBar.HasDuration()) {
+		ReleasePreviewGraph();
+	}
+
 	if (CanPreviewUse() && m_wndSeekBar.IsVisible()) {
 		CPoint point;
 		GetCursorPos(&point);
