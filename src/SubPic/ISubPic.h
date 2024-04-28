@@ -93,6 +93,8 @@ public IUnknown {
 	STDMETHOD (GetType) (SUBTITLE_TYPE* pSubtitleType /*[out]*/) PURE;
 
 	STDMETHOD_(void, SetInverseAlpha)(bool bInverted) PURE;
+
+	STDMETHOD_(bool, IsNeedAlloc) () PURE;
 };
 
 //

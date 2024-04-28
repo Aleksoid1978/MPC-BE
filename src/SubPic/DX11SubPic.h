@@ -52,6 +52,7 @@ public:
 	STDMETHODIMP Lock(SubPicDesc& spd) override;
 	STDMETHODIMP Unlock(RECT* pDirtyRect) override;
 	STDMETHODIMP AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget) override;
+	STDMETHODIMP_(bool) IsNeedAlloc() override;
 };
 
 // CDX11SubPicAllocator

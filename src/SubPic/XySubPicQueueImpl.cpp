@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -88,6 +88,10 @@ STDMETHODIMP_(bool) CXySubPicQueueNoThread::LookupSubPic(REFERENCE_TIME rtNow, b
 						// Ensure the previously allocated subpic is big enough to hold the subtitle to be rendered
 						SIZE maxSize;
 						bAllocSubPic = FAILED(pSubPic->GetMaxSize(&maxSize)) || maxSize.cx < MaxTextureSize.cx || maxSize.cy < MaxTextureSize.cy;
+
+						if (!bAllocSubPic) {
+							bAllocSubPic = pSubPic->IsNeedAlloc();
+						}
 					}
 				}
 

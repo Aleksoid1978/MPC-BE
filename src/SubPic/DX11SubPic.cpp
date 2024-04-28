@@ -1,5 +1,5 @@
 /*
- * (C) 2022-2023 see Authors.txt
+ * (C) 2022-2024 see Authors.txt
  * This file is part of MPC-BE.
  *
  * MPC-BE is free software; you can redistribute it and/or modify
@@ -282,6 +282,11 @@ STDMETHODIMP CDX11SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	CRect rSrc(*pSrc), rDst(*pDst);
 
 	return m_pAllocator->Render(m_MemPic, m_rcDirty, rSrc, rDst);
+}
+
+STDMETHODIMP_(bool) CDX11SubPic::IsNeedAlloc()
+{
+	return m_pAllocator == nullptr;
 }
 
 //

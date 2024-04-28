@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -114,6 +114,8 @@ public:
 	STDMETHODIMP GetType(SUBTITLE_TYPE* pSubtitleType);
 
 	STDMETHODIMP_(void) SetInverseAlpha(bool bInverted);
+
+	STDMETHODIMP_(bool) IsNeedAlloc() { return false; }
 };
 
 
