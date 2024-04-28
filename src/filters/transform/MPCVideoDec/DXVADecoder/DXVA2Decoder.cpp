@@ -132,7 +132,7 @@ int CDXVA2Decoder::get_buffer_dxva(AVFrame *pic)
 	IMediaSample* pSample = nullptr;
 	HRESULT hr = m_pFilter->m_pDXVA2Allocator->GetBuffer(&pSample, nullptr, nullptr, 0);
 	if (FAILED(hr)) {
-		DLog(L"DXVA2Allocator->GetBuffer() failed: 0x%08x", hr);
+		DLog(L"DXVA2Allocator->GetBuffer() failed: %s", HR2Str(hr));
 		return -1;
 	}
 

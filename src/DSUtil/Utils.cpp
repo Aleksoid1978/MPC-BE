@@ -395,6 +395,7 @@ CStringW HR2Str(const HRESULT hr)
 #ifdef __ERRORS__
 		// some DirectShow Error and Success Codes https://learn.microsoft.com/en-us/windows/win32/directshow/error-and-success-codes
 		UNPACK_VALUE(VFW_E_ENUM_OUT_OF_SYNC);
+		UNPACK_VALUE(VFW_E_NOT_COMMITTED);
 #endif
 #ifdef _D3D9_H_
 		// some D3DERR values https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3derr
