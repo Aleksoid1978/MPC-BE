@@ -27,7 +27,7 @@ MPCVideoDec
 Обновлены голландский и китайский (Traditional) переводы (автор beter)
 
 Обновлены библиотеки:
-	ffmpeg git-n7.1-dev-431-gbba996d6cd.
+	ffmpeg git-n7.1-dev-553-g31327c2d07.
 
 
 1.7.0 - 2024-04-07

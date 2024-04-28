@@ -32,23 +32,25 @@
  * @author Zoran Basaric ( zoran.basaric@imgtec.com )
  */
 
-#include "aacdec.h"
-#include "aacdectab.h"
+#include "aac/aacdec.h"
+#include "aac/aacdec_tab.h"
 #include "avcodec.h"
 #include "libavutil/qsort.h"
+#include "libavutil/mem.h"
 
-static av_cold void aacsbr_tableinit(void)
+typedef struct ExtChannelElement {
+    ChannelElement ch;
+    PredictorState predictor_state[2][MAX_PREDICTORS];
+    SpectralBandReplication sbr;
+} ExtChannelElement;
+
+static inline SpectralBandReplication *get_sbr(ChannelElement *ch)
 {
-    int n;
-
-    for (n = 0; n < 320; n++)
-        sbr_qmf_window_ds[n] = sbr_qmf_window_us[2*n];
+    return &((ExtChannelElement*)ch)->sbr;
 }
 
 av_cold void AAC_RENAME(ff_aac_sbr_init)(void)
 {
-    aacsbr_tableinit();
-
     AAC_RENAME(ff_ps_init)();
 }
 
@@ -64,13 +66,20 @@ static void sbr_turnoff(SpectralBandReplication *sbr) {
     memset(&sbr->spectrum_params, -1, sizeof(SpectrumParameters));
 }
 
-av_cold int AAC_RENAME(ff_aac_sbr_ctx_init)(AACDecContext *ac, SpectralBandReplication *sbr, int id_aac)
+av_cold int AAC_RENAME(ff_aac_sbr_ctx_alloc_init)(AACDecContext *ac,
+                                                  ChannelElement **che, int id_aac)
 {
+    SpectralBandReplication *sbr;
+    ExtChannelElement *ext = av_mallocz(sizeof(*ext));
     int ret;
     float scale;
 
-    if (sbr->mdct)
-        return 0;
+    if (!ext)
+        return AVERROR(ENOMEM);
+    *che = &ext->ch;
+    sbr  = &ext->sbr;
+    ext->ch.ch[0].AAC_RENAME(predictor_state) = ext->predictor_state[0];
+    ext->ch.ch[1].AAC_RENAME(predictor_state) = ext->predictor_state[1];
 
     sbr->kx[0] = sbr->kx[1];
     sbr->id_aac = id_aac;
@@ -102,8 +111,9 @@ av_cold int AAC_RENAME(ff_aac_sbr_ctx_init)(AACDecContext *ac, SpectralBandRepli
     return 0;
 }
 
-av_cold void AAC_RENAME(ff_aac_sbr_ctx_close)(SpectralBandReplication *sbr)
+av_cold void AAC_RENAME(ff_aac_sbr_ctx_close)(ChannelElement *che)
 {
+    SpectralBandReplication *sbr = get_sbr(che);
     av_tx_uninit(&sbr->mdct);
     av_tx_uninit(&sbr->mdct_ana);
 }
@@ -1095,9 +1105,11 @@ static void sbr_reset(AACDecContext *ac, SpectralBandReplication *sbr)
  *
  * @return  Returns number of bytes consumed from the TYPE_FIL element.
  */
-int AAC_RENAME(ff_decode_sbr_extension)(AACDecContext *ac, SpectralBandReplication *sbr,
-                            GetBitContext *gb_host, int crc, int cnt, int id_aac)
+int AAC_RENAME(ff_aac_sbr_decode_extension)(AACDecContext *ac, ChannelElement *che,
+                                            GetBitContext *gb_host, int crc,
+                                            int cnt, int id_aac)
 {
+    SpectralBandReplication *sbr = get_sbr(che);
     unsigned int num_sbr_bits = 0, num_align_bits;
     unsigned bytes_read;
     GetBitContext gbc = *gb_host, *gb = &gbc;
@@ -1461,9 +1473,10 @@ static void sbr_env_estimate(AAC_FLOAT (*e_curr)[48], INTFLOAT X_high[64][40][2]
     }
 }
 
-void AAC_RENAME(ff_sbr_apply)(AACDecContext *ac, SpectralBandReplication *sbr, int id_aac,
-                  INTFLOAT* L, INTFLOAT* R)
+void AAC_RENAME(ff_aac_sbr_apply)(AACDecContext *ac, ChannelElement *che,
+                                  int id_aac, INTFLOAT* L, INTFLOAT* R)
 {
+    SpectralBandReplication *sbr = get_sbr(che);
     int downsampled = ac->oc[1].m4ac.ext_sample_rate < sbr->sample_rate;
     int ch;
     int nch = (id_aac == TYPE_CPE) ? 2 : 1;
@@ -1561,10 +1574,4 @@ static void aacsbr_func_ptr_init(AACSBRContext *c)
     c->sbr_hf_assemble       = sbr_hf_assemble;
     c->sbr_x_gen             = sbr_x_gen;
     c->sbr_hf_inverse_filter = sbr_hf_inverse_filter;
-
-#if !USE_FIXED
-#if ARCH_MIPS
-    ff_aacsbr_func_ptr_init_mips(c);
-#endif
-#endif
 }

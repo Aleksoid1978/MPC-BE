@@ -27,8 +27,8 @@
  * @author Maxim Gavrilov ( maxim.gavrilov gmail com )
  */
 
-#ifndef AVCODEC_AACDEC_H
-#define AVCODEC_AACDEC_H
+#ifndef AVCODEC_AAC_AACDEC_H
+#define AVCODEC_AAC_AACDEC_H
 
 #include <stdint.h>
 
@@ -38,10 +38,10 @@
 #include "libavutil/mem_internal.h"
 #include "libavutil/tx.h"
 
-#include "aac.h"
-#include "aac_defines.h"
-#include "mpeg4audio.h"
-#include "sbr.h"
+#include "libavcodec/aac.h"
+#include "libavcodec/mpeg4audio.h"
+
+typedef struct AACDecContext AACDecContext;
 
 /**
  * Output configuration status
@@ -68,13 +68,27 @@ enum CouplingPoint {
     AFTER_IMDCT = 3,
 };
 
+// Supposed to be equal to AAC_RENAME() in case of USE_FIXED.
+#define RENAME_FIXED(name) name ## _fixed
+
+#define INTFLOAT_UNION(name, elems)     \
+    union {                             \
+        int   RENAME_FIXED(name) elems; \
+        float name       elems;         \
+    }
+
+#define INTFLOAT_ALIGNED_UNION(alignment, name, nb_elems)                \
+    union {                                                              \
+        DECLARE_ALIGNED(alignment, int,   RENAME_FIXED(name))[nb_elems]; \
+        DECLARE_ALIGNED(alignment, float, name)[nb_elems];               \
+    }
 /**
  * Long Term Prediction
  */
 typedef struct LongTermPrediction {
     int8_t present;
     int16_t lag;
-    INTFLOAT coef;
+    INTFLOAT_UNION(coef,);
     int8_t used[MAX_LTP_LONG_SFB];
 } LongTermPrediction;
 
@@ -108,7 +122,7 @@ typedef struct TemporalNoiseShaping {
     int length[8][4];
     int direction[8][4];
     int order[8][4];
-    INTFLOAT coef[8][4][TNS_MAX_ORDER];
+    INTFLOAT_UNION(coef, [8][4][TNS_MAX_ORDER]);
 } TemporalNoiseShaping;
 
 /**
@@ -122,7 +136,7 @@ typedef struct ChannelCoupling {
     int ch_select[8];      /**< [0] shared list of gains; [1] list of gains for right channel;
                             *   [2] list of gains for left channel; [3] lists of gains for both channels
                             */
-    INTFLOAT gain[16][120];
+    INTFLOAT_UNION(gain, [16][120]);
 } ChannelCoupling;
 
 /**
@@ -133,13 +147,20 @@ typedef struct SingleChannelElement {
     TemporalNoiseShaping tns;
     enum BandType band_type[128];                   ///< band types
     int band_type_run_end[120];                     ///< band type run end points
-    INTFLOAT sf[120];                               ///< scalefactors
-    DECLARE_ALIGNED(32, INTFLOAT, coeffs)[1024];    ///< coefficients for IMDCT, maybe processed
-    DECLARE_ALIGNED(32, INTFLOAT, saved)[1536];     ///< overlap
-    DECLARE_ALIGNED(32, INTFLOAT, ret_buf)[2048];   ///< PCM output buffer
-    DECLARE_ALIGNED(16, INTFLOAT, ltp_state)[3072]; ///< time signal for LTP
-    PredictorState predictor_state[MAX_PREDICTORS];
-    INTFLOAT *ret;                                  ///< PCM output
+    int sfo[120];                                   ///< scalefactor offsets
+    INTFLOAT_UNION(sf, [120]);                      ///< scalefactors
+    INTFLOAT_ALIGNED_UNION(32, coeffs,    1024);    ///< coefficients for IMDCT, maybe processed
+    INTFLOAT_ALIGNED_UNION(32, saved,     1536);    ///< overlap
+    INTFLOAT_ALIGNED_UNION(32, ret_buf,   2048);    ///< PCM output buffer
+    INTFLOAT_ALIGNED_UNION(16, ltp_state, 3072);    ///< time signal for LTP
+    union {
+        struct PredictorStateFixed *RENAME_FIXED(predictor_state);
+        struct PredictorState      *predictor_state;
+    };
+    union {
+        float *output;                              ///< PCM output
+        int   *RENAME_FIXED(output);                ///< PCM output
+    };
 } SingleChannelElement;
 
 /**
@@ -153,7 +174,6 @@ typedef struct ChannelElement {
     SingleChannelElement ch[2];
     // CCE specific
     ChannelCoupling coup;
-    SpectralBandReplication sbr;
 } ChannelElement;
 
 typedef struct OutputConfiguration {
@@ -181,11 +201,62 @@ typedef struct DynamicRangeControl {
 } DynamicRangeControl;
 
 /**
+ * Decode-specific primitives
+ */
+typedef struct AACDecProc {
+    int (*decode_spectrum_and_dequant)(AACDecContext *ac,
+                                       GetBitContext *gb,
+                                       const Pulse *pulse,
+                                       SingleChannelElement *sce);
+
+    int (*decode_cce)(AACDecContext *ac, GetBitContext *gb, ChannelElement *che);
+} AACDecProc;
+
+/**
+ * DSP-specific primitives
+ */
+typedef struct AACDecDSP {
+    int (*init)(AACDecContext *ac);
+
+    void (*dequant_scalefactors)(SingleChannelElement *sce);
+
+    void (*apply_mid_side_stereo)(AACDecContext *ac, ChannelElement *cpe);
+    void (*apply_intensity_stereo)(AACDecContext *ac, ChannelElement *cpe,
+                                   int ms_present);
+
+    void (*apply_tns)(void *_coef_param, TemporalNoiseShaping *tns,
+                      IndividualChannelStream *ics, int decode);
+
+    void (*apply_ltp)(AACDecContext *ac, SingleChannelElement *sce);
+    void (*update_ltp)(AACDecContext *ac, SingleChannelElement *sce);
+
+    void (*apply_prediction)(AACDecContext *ac, SingleChannelElement *sce);
+
+    void (*apply_dependent_coupling)(AACDecContext *ac,
+                                     SingleChannelElement *target,
+                                     ChannelElement *cce, int index);
+    void (*apply_independent_coupling)(AACDecContext *ac,
+                                       SingleChannelElement *target,
+                                       ChannelElement *cce, int index);
+
+    void (*imdct_and_windowing)(AACDecContext *ac, SingleChannelElement *sce);
+    void (*imdct_and_windowing_960)(AACDecContext *ac, SingleChannelElement *sce);
+    void (*imdct_and_windowing_ld)(AACDecContext *ac, SingleChannelElement *sce);
+    void (*imdct_and_windowing_eld)(AACDecContext *ac, SingleChannelElement *sce);
+
+    void (*clip_output)(AACDecContext *ac, ChannelElement *che, int type, int samples);
+} AACDecDSP;
+
+/**
  * main AAC decoding context
  */
-typedef struct AACDecContext {
+struct AACDecContext {
     const struct AVClass  *class;
     struct AVCodecContext *avctx;
+
+    AACDecDSP dsp;
+    AACDecProc proc;
+
     struct AVFrame *frame;
 
     int is_saved;                 ///< Set if elements have stored overlap from previous frame.
@@ -206,8 +277,8 @@ typedef struct AACDecContext {
      * (We do not want to have these on the stack.)
      * @{
      */
-    DECLARE_ALIGNED(32, INTFLOAT, buf_mdct)[1024];
-    DECLARE_ALIGNED(32, INTFLOAT, temp)[128];
+    INTFLOAT_ALIGNED_UNION(32, buf_mdct, 1024);
+    INTFLOAT_ALIGNED_UNION(32, temp, 128);
     /** @} */
 
     /**
@@ -229,11 +300,10 @@ typedef struct AACDecContext {
     av_tx_fn mdct960_fn;
     av_tx_fn mdct1024_fn;
     av_tx_fn mdct_ltp_fn;
-#if USE_FIXED
-    AVFixedDSPContext *fdsp;
-#else
-    AVFloatDSPContext *fdsp;
-#endif /* USE_FIXED */
+    union {
+        AVFixedDSPContext *RENAME_FIXED(fdsp);
+        AVFloatDSPContext *fdsp;
+    };
     int random_state;
     /** @} */
 
@@ -262,18 +332,20 @@ typedef struct AACDecContext {
     int warned_gain_control;
     int warned_he_aac_mono;
 
-    /* aacdec functions pointers */
-    void (*imdct_and_windowing)(struct AACDecContext *ac, SingleChannelElement *sce);
-    void (*apply_ltp)(struct AACDecContext *ac, SingleChannelElement *sce);
-    void (*apply_tns)(INTFLOAT coef[1024], TemporalNoiseShaping *tns,
-                      IndividualChannelStream *ics, int decode);
-    void (*windowing_and_mdct_ltp)(struct AACDecContext *ac, INTFLOAT *out,
-                                   INTFLOAT *in, IndividualChannelStream *ics);
-    void (*update_ltp)(struct AACDecContext *ac, SingleChannelElement *sce);
-    void (*vector_pow43)(int *coefs, int len);
-    void (*subband_scale)(int *dst, int *src, int scale, int offset, int len, void *log_context);
-} AACDecContext;
+    int is_fixed;
+};
 
-void ff_aacdec_init_mips(AACDecContext *c);
+#if defined(USE_FIXED) && USE_FIXED
+#define fdsp          RENAME_FIXED(fdsp)
+#endif
 
-#endif /* AVCODEC_AACDEC_H */
+extern const AACDecDSP aac_dsp;
+extern const AACDecDSP aac_dsp_fixed;
+
+extern const AACDecProc aac_proc;
+extern const AACDecProc aac_proc_fixed;
+
+int ff_aac_decode_ics(AACDecContext *ac, SingleChannelElement *sce,
+                      GetBitContext *gb, int common_window, int scale_flag);
+
+#endif /* AVCODEC_AAC_AACDEC_H */

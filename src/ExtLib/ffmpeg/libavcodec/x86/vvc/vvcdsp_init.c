@@ -30,9 +30,67 @@
 #include "libavcodec/vvc/dsp.h"
 #include "libavcodec/x86/h26x/h2656dsp.h"
 
+#define PUT_PROTOTYPE(name, depth, opt) \
+void ff_vvc_put_ ## name ## _ ## depth ## _##opt(int16_t *dst, const uint8_t *src, ptrdiff_t srcstride, int height, const int8_t *hf, const int8_t *vf, int width);
+
+#define PUT_PROTOTYPES(name, bitd, opt) \
+        PUT_PROTOTYPE(name##2,   bitd, opt) \
+        PUT_PROTOTYPE(name##4,   bitd, opt) \
+        PUT_PROTOTYPE(name##8,   bitd, opt) \
+        PUT_PROTOTYPE(name##12,  bitd, opt) \
+        PUT_PROTOTYPE(name##16,  bitd, opt) \
+        PUT_PROTOTYPE(name##24,  bitd, opt) \
+        PUT_PROTOTYPE(name##32,  bitd, opt) \
+        PUT_PROTOTYPE(name##48,  bitd, opt) \
+        PUT_PROTOTYPE(name##64,  bitd, opt) \
+        PUT_PROTOTYPE(name##128, bitd, opt)
+
+#define PUT_BPC_PROTOTYPES(name, opt) \
+    PUT_PROTOTYPES(name,  8, opt)     \
+    PUT_PROTOTYPES(name, 10, opt)     \
+    PUT_PROTOTYPES(name, 12, opt)
+
+#define PUT_TAP_PROTOTYPES(n, opt) \
+    PUT_BPC_PROTOTYPES(n##tap_h,  opt) \
+    PUT_BPC_PROTOTYPES(n##tap_v,  opt) \
+    PUT_BPC_PROTOTYPES(n##tap_hv, opt)
+
+PUT_BPC_PROTOTYPES(pixels, sse4)
+PUT_BPC_PROTOTYPES(pixels, avx2)
+
+PUT_TAP_PROTOTYPES(4, sse4)
+PUT_TAP_PROTOTYPES(8, sse4)
+PUT_TAP_PROTOTYPES(4, avx2)
+PUT_TAP_PROTOTYPES(8, avx2)
+
+#define bf(fn, bd,  opt) fn##_##bd##_##opt
+#define BF(fn, bpc, opt) fn##_##bpc##bpc_##opt
+
+#define AVG_BPC_PROTOTYPES(bpc, opt)                                                                 \
+void BF(ff_vvc_avg, bpc, opt)(uint8_t *dst, ptrdiff_t dst_stride,                                    \
+    const int16_t *src0, const int16_t *src1, intptr_t width, intptr_t height, intptr_t pixel_max);  \
+void BF(ff_vvc_w_avg, bpc, opt)(uint8_t *dst, ptrdiff_t dst_stride,                                  \
+    const int16_t *src0, const int16_t *src1, intptr_t width, intptr_t height,                       \
+    intptr_t denom, intptr_t w0, intptr_t w1,  intptr_t o0, intptr_t o1, intptr_t pixel_max);
+
+#define AVG_PROTOTYPES(bd, opt)                                                                      \
+void bf(ff_vvc_avg, bd, opt)(uint8_t *dst, ptrdiff_t dst_stride,                                     \
+    const int16_t *src0, const int16_t *src1, int width, int height);                                \
+void bf(ff_vvc_w_avg, bd, opt)(uint8_t *dst, ptrdiff_t dst_stride,                                   \
+    const int16_t *src0, const int16_t *src1, int width, int height,                                 \
+    int denom, int w0, int w1, int o0, int o1);
+
+AVG_BPC_PROTOTYPES( 8, avx2)
+AVG_BPC_PROTOTYPES(16, avx2)
+
+AVG_PROTOTYPES( 8, avx2)
+AVG_PROTOTYPES(10, avx2)
+AVG_PROTOTYPES(12, avx2)
+
 #if ARCH_X86_64
+#if HAVE_SSE4_EXTERNAL
 #define FW_PUT(name, depth, opt) \
-static void ff_vvc_put_ ## name ## _ ## depth ## _##opt(int16_t *dst, const uint8_t *src, ptrdiff_t srcstride, \
+void ff_vvc_put_ ## name ## _ ## depth ## _##opt(int16_t *dst, const uint8_t *src, ptrdiff_t srcstride,        \
                                                  int height, const int8_t *hf, const int8_t *vf, int width)    \
 {                                                                                                              \
     ff_h2656_put_## name ## _ ## depth ## _##opt(dst, 2 * MAX_PB_SIZE, src, srcstride, height, hf, vf, width); \
@@ -68,7 +126,9 @@ static void ff_vvc_put_ ## name ## _ ## depth ## _##opt(int16_t *dst, const uint
 FW_PUT_SSE4( 8)
 FW_PUT_SSE4(10)
 FW_PUT_SSE4(12)
+#endif
 
+#if HAVE_AVX2_EXTERNAL
 #define FW_PUT_TAP_AVX2(n, bitd)        \
     FW_PUT(n ## tap_h32,   bitd, avx2)  \
     FW_PUT(n ## tap_h64,   bitd, avx2)  \
@@ -103,6 +163,25 @@ FW_PUT_AVX2(12)
 
 FW_PUT_16BPC_AVX2(10)
 FW_PUT_16BPC_AVX2(12)
+
+#define AVG_FUNCS(bpc, bd, opt)                                                                     \
+void bf(ff_vvc_avg, bd, opt)(uint8_t *dst, ptrdiff_t dst_stride,                                    \
+    const int16_t *src0, const int16_t *src1, int width, int height)                                \
+{                                                                                                   \
+    BF(ff_vvc_avg, bpc, opt)(dst, dst_stride, src0, src1, width, height, (1 << bd)  - 1);           \
+}                                                                                                   \
+void bf(ff_vvc_w_avg, bd, opt)(uint8_t *dst, ptrdiff_t dst_stride,                                  \
+    const int16_t *src0, const int16_t *src1, int width, int height,                                \
+    int denom, int w0, int w1, int o0, int o1)                                                      \
+{                                                                                                   \
+    BF(ff_vvc_w_avg, bpc, opt)(dst, dst_stride, src0, src1, width, height,                          \
+        denom, w0, w1, o0, o1, (1 << bd)  - 1);                                                     \
+}
+
+AVG_FUNCS(8,  8,  avx2)
+AVG_FUNCS(16, 10, avx2)
+AVG_FUNCS(16, 12, avx2)
+#endif
 
 #define PEL_LINK(dst, C, W, idx1, idx2, name, D, opt)                              \
     dst[C][W][idx1][idx2] = ff_vvc_put_## name ## _ ## D ## _##opt;                \
@@ -169,40 +248,9 @@ FW_PUT_16BPC_AVX2(12)
     MC_TAP_LINKS_16BPC_AVX2(LUMA,   8, bd);                          \
     MC_TAP_LINKS_16BPC_AVX2(CHROMA, 4, bd);
 
-#define bf(fn, bd,  opt) fn##_##bd##_##opt
-#define BF(fn, bpc, opt) fn##_##bpc##bpc_##opt
-
-#define AVG_BPC_FUNC(bpc, opt)                                                                      \
-void BF(ff_vvc_avg, bpc, opt)(uint8_t *dst, ptrdiff_t dst_stride,                                   \
-    const int16_t *src0, const int16_t *src1, intptr_t width, intptr_t height, intptr_t pixel_max); \
-void BF(ff_vvc_w_avg, bpc, opt)(uint8_t *dst, ptrdiff_t dst_stride,                                 \
-    const int16_t *src0, const int16_t *src1, intptr_t width, intptr_t height,                      \
-    intptr_t denom, intptr_t w0, intptr_t w1,  intptr_t o0, intptr_t o1, intptr_t pixel_max);
-
-#define AVG_FUNCS(bpc, bd, opt)                                                                     \
-static void bf(avg, bd, opt)(uint8_t *dst, ptrdiff_t dst_stride,                                    \
-    const int16_t *src0, const int16_t *src1, int width, int height)                                \
-{                                                                                                   \
-    BF(ff_vvc_avg, bpc, opt)(dst, dst_stride, src0, src1, width, height, (1 << bd)  - 1);           \
-}                                                                                                   \
-static void bf(w_avg, bd, opt)(uint8_t *dst, ptrdiff_t dst_stride,                                  \
-    const int16_t *src0, const int16_t *src1, int width, int height,                                \
-    int denom, int w0, int w1, int o0, int o1)                                                      \
-{                                                                                                   \
-    BF(ff_vvc_w_avg, bpc, opt)(dst, dst_stride, src0, src1, width, height,                          \
-        denom, w0, w1, o0, o1, (1 << bd)  - 1);                                                     \
-}
-
-AVG_BPC_FUNC(8,   avx2)
-AVG_BPC_FUNC(16,  avx2)
-
-AVG_FUNCS(8,  8,  avx2)
-AVG_FUNCS(16, 10, avx2)
-AVG_FUNCS(16, 12, avx2)
-
-#define AVG_INIT(bd, opt) do {                                          \
-    c->inter.avg    = bf(avg, bd, opt);                                 \
-    c->inter.w_avg  = bf(w_avg, bd, opt);                               \
+#define AVG_INIT(bd, opt) do {                                       \
+    c->inter.avg    = bf(ff_vvc_avg, bd, opt);                       \
+    c->inter.w_avg  = bf(ff_vvc_w_avg, bd, opt);                     \
 } while (0)
 #endif
 

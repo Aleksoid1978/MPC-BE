@@ -8,6 +8,10 @@
  * Copyright (c) 2008-2010 Paul Kendall <paul@kcbbs.gen.nz>
  * Copyright (c) 2010      Janne Grunau <janne-libav@jannau.net>
  *
+ * AAC decoder fixed-point implementation
+ * Copyright (c) 2013
+ *      MIPS Technologies, Inc., California.
+ *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -25,240 +29,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/**
- * @file
- * AAC decoder
- * @author Oded Shimon  ( ods15 ods15 dyndns org )
- * @author Maxim Gavrilov ( maxim.gavrilov gmail com )
- */
-
-#define USE_FIXED 0
-#define TX_TYPE AV_TX_FLOAT_MDCT
-
-#include "libavutil/float_dsp.h"
-#include "libavutil/mem.h"
-#include "libavutil/opt.h"
-#include "avcodec.h"
-#include "codec_internal.h"
-#include "get_bits.h"
-#include "kbdwin.h"
-#include "sinewin.h"
-
-#include "aac.h"
-#include "aacdec.h"
-#include "aactab.h"
-#include "aacdectab.h"
-#include "adts_header.h"
-#include "cbrt_data.h"
-#include "sbr.h"
-#include "aacsbr.h"
-#include "mpeg4audio.h"
-#include "profiles.h"
-#include "libavutil/intfloat.h"
-
-#include <errno.h>
-#include <math.h>
-#include <stdint.h>
-#include <string.h>
-
-#if ARCH_ARM
-#   include "arm/aac.h"
-#elif ARCH_MIPS
-#   include "mips/aacdec_mips.h"
-#endif
-
-DECLARE_ALIGNED(32, static INTFLOAT, AAC_RENAME(sine_120))[120];
-DECLARE_ALIGNED(32, static INTFLOAT, AAC_RENAME(sine_960))[960];
-DECLARE_ALIGNED(32, static INTFLOAT, AAC_RENAME(aac_kbd_long_960))[960];
-DECLARE_ALIGNED(32, static INTFLOAT, AAC_RENAME(aac_kbd_short_120))[120];
-
-static av_always_inline void reset_predict_state(PredictorState *ps)
-{
-    ps->r0   = 0.0f;
-    ps->r1   = 0.0f;
-    ps->cor0 = 0.0f;
-    ps->cor1 = 0.0f;
-    ps->var0 = 1.0f;
-    ps->var1 = 1.0f;
-}
-
-#ifndef VMUL2
-static inline float *VMUL2(float *dst, const float *v, unsigned idx,
-                           const float *scale)
-{
-    float s = *scale;
-    *dst++ = v[idx    & 15] * s;
-    *dst++ = v[idx>>4 & 15] * s;
-    return dst;
-}
-#endif
-
-#ifndef VMUL4
-static inline float *VMUL4(float *dst, const float *v, unsigned idx,
-                           const float *scale)
-{
-    float s = *scale;
-    *dst++ = v[idx    & 3] * s;
-    *dst++ = v[idx>>2 & 3] * s;
-    *dst++ = v[idx>>4 & 3] * s;
-    *dst++ = v[idx>>6 & 3] * s;
-    return dst;
-}
-#endif
-
-#ifndef VMUL2S
-static inline float *VMUL2S(float *dst, const float *v, unsigned idx,
-                            unsigned sign, const float *scale)
-{
-    union av_intfloat32 s0, s1;
-
-    s0.f = s1.f = *scale;
-    s0.i ^= sign >> 1 << 31;
-    s1.i ^= sign      << 31;
-
-    *dst++ = v[idx    & 15] * s0.f;
-    *dst++ = v[idx>>4 & 15] * s1.f;
-
-    return dst;
-}
-#endif
-
-#ifndef VMUL4S
-static inline float *VMUL4S(float *dst, const float *v, unsigned idx,
-                            unsigned sign, const float *scale)
-{
-    unsigned nz = idx >> 12;
-    union av_intfloat32 s = { .f = *scale };
-    union av_intfloat32 t;
-
-    t.i = s.i ^ (sign & 1U<<31);
-    *dst++ = v[idx    & 3] * t.f;
-
-    sign <<= nz & 1; nz >>= 1;
-    t.i = s.i ^ (sign & 1U<<31);
-    *dst++ = v[idx>>2 & 3] * t.f;
-
-    sign <<= nz & 1; nz >>= 1;
-    t.i = s.i ^ (sign & 1U<<31);
-    *dst++ = v[idx>>4 & 3] * t.f;
-
-    sign <<= nz & 1;
-    t.i = s.i ^ (sign & 1U<<31);
-    *dst++ = v[idx>>6 & 3] * t.f;
-
-    return dst;
-}
-#endif
-
-static av_always_inline float flt16_round(float pf)
-{
-    union av_intfloat32 tmp;
-    tmp.f = pf;
-    tmp.i = (tmp.i + 0x00008000U) & 0xFFFF0000U;
-    return tmp.f;
-}
-
-static av_always_inline float flt16_even(float pf)
-{
-    union av_intfloat32 tmp;
-    tmp.f = pf;
-    tmp.i = (tmp.i + 0x00007FFFU + (tmp.i & 0x00010000U >> 16)) & 0xFFFF0000U;
-    return tmp.f;
-}
-
-static av_always_inline float flt16_trunc(float pf)
-{
-    union av_intfloat32 pun;
-    pun.f = pf;
-    pun.i &= 0xFFFF0000U;
-    return pun.f;
-}
-
-static av_always_inline void predict(PredictorState *ps, float *coef,
-                                     int output_enable)
-{
-    const float a     = 0.953125; // 61.0 / 64
-    const float alpha = 0.90625;  // 29.0 / 32
-    float e0, e1;
-    float pv;
-    float k1, k2;
-    float   r0 = ps->r0,     r1 = ps->r1;
-    float cor0 = ps->cor0, cor1 = ps->cor1;
-    float var0 = ps->var0, var1 = ps->var1;
-
-    k1 = var0 > 1 ? cor0 * flt16_even(a / var0) : 0;
-    k2 = var1 > 1 ? cor1 * flt16_even(a / var1) : 0;
-
-    pv = flt16_round(k1 * r0 + k2 * r1);
-    if (output_enable)
-        *coef += pv;
-
-    e0 = *coef;
-    e1 = e0 - k1 * r0;
-
-    ps->cor1 = flt16_trunc(alpha * cor1 + r1 * e1);
-    ps->var1 = flt16_trunc(alpha * var1 + 0.5f * (r1 * r1 + e1 * e1));
-    ps->cor0 = flt16_trunc(alpha * cor0 + r0 * e0);
-    ps->var0 = flt16_trunc(alpha * var0 + 0.5f * (r0 * r0 + e0 * e0));
-
-    ps->r1 = flt16_trunc(a * (r0 - k1 * e0));
-    ps->r0 = flt16_trunc(a * e0);
-}
-
-/**
- * Apply dependent channel coupling (applied before IMDCT).
- *
- * @param   index   index into coupling gain array
- */
-static void apply_dependent_coupling(AACDecContext *ac,
-                                     SingleChannelElement *target,
-                                     ChannelElement *cce, int index)
-{
-    IndividualChannelStream *ics = &cce->ch[0].ics;
-    const uint16_t *offsets = ics->swb_offset;
-    float *dest = target->coeffs;
-    const float *src = cce->ch[0].coeffs;
-    int g, i, group, k, idx = 0;
-    if (ac->oc[1].m4ac.object_type == AOT_AAC_LTP) {
-        av_log(ac->avctx, AV_LOG_ERROR,
-               "Dependent coupling is not supported together with LTP\n");
-        return;
-    }
-    for (g = 0; g < ics->num_window_groups; g++) {
-        for (i = 0; i < ics->max_sfb; i++, idx++) {
-            if (cce->ch[0].band_type[idx] != ZERO_BT) {
-                const float gain = cce->coup.gain[index][idx];
-                for (group = 0; group < ics->group_len[g]; group++) {
-                    for (k = offsets[i]; k < offsets[i + 1]; k++) {
-                        // FIXME: SIMDify
-                        dest[group * 128 + k] += gain * src[group * 128 + k];
-                    }
-                }
-            }
-        }
-        dest += ics->group_len[g] * 128;
-        src  += ics->group_len[g] * 128;
-    }
-}
-
-/**
- * Apply independent channel coupling (applied after IMDCT).
- *
- * @param   index   index into coupling gain array
- */
-static void apply_independent_coupling(AACDecContext *ac,
-                                       SingleChannelElement *target,
-                                       ChannelElement *cce, int index)
-{
-    const float gain = cce->coup.gain[index][0];
-    const float *src = cce->ch[0].ret;
-    float *dest = target->ret;
-    const int len = 1024 << (ac->oc[1].m4ac.sbr == 1);
-
-    ac->fdsp->vector_fmac_scalar(dest, src, gain, len);
-}
-
-#include "aacdec_template.c"
+#ifndef AVCODEC_AAC_AACDEC_LATM_H
+#define AVCODEC_AAC_AACDEC_LATM_H
 
 #define LOAS_SYNC_WORD   0x2b7       ///< 11 bits LOAS sync word
 
@@ -551,26 +323,6 @@ static av_cold int latm_decode_init(AVCodecContext *avctx)
     return ret;
 }
 
-const FFCodec ff_aac_decoder = {
-    .p.name          = "aac",
-    CODEC_LONG_NAME("AAC (Advanced Audio Coding)"),
-    .p.type          = AVMEDIA_TYPE_AUDIO,
-    .p.id            = AV_CODEC_ID_AAC,
-    .priv_data_size  = sizeof(AACDecContext),
-    .init            = aac_decode_init,
-    .close           = aac_decode_close,
-    FF_CODEC_DECODE_CB(aac_decode_frame),
-    .p.sample_fmts   = (const enum AVSampleFormat[]) {
-        AV_SAMPLE_FMT_FLTP, AV_SAMPLE_FMT_NONE
-    },
-    .p.capabilities  = AV_CODEC_CAP_CHANNEL_CONF | AV_CODEC_CAP_DR1,
-    .caps_internal   = FF_CODEC_CAP_INIT_CLEANUP,
-    .p.ch_layouts    = ff_aac_ch_layout,
-    .flush = flush,
-    .p.priv_class    = &aac_decoder_class,
-    .p.profiles      = NULL_IF_CONFIG_SMALL(ff_aac_profiles),
-};
-
 /*
     Note: This decoder filter is intended to decode LATM streams transferred
     in MPEG transport streams which only contain one program.
@@ -583,7 +335,7 @@ const FFCodec ff_aac_latm_decoder = {
     .p.id            = AV_CODEC_ID_AAC_LATM,
     .priv_data_size  = sizeof(struct LATMContext),
     .init            = latm_decode_init,
-    .close           = aac_decode_close,
+    .close           = decode_close,
     FF_CODEC_DECODE_CB(latm_decode_frame),
     .p.sample_fmts   = (const enum AVSampleFormat[]) {
         AV_SAMPLE_FMT_FLTP, AV_SAMPLE_FMT_NONE
@@ -594,3 +346,5 @@ const FFCodec ff_aac_latm_decoder = {
     .flush = flush,
     .p.profiles      = NULL_IF_CONFIG_SMALL(ff_aac_profiles),
 };
+
+#endif /* AVCODEC_AAC_AACDEC_LATM_H */

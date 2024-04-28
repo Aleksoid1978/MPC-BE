@@ -65,6 +65,7 @@ OBJ_DIRS = $(OBJ_DIR) \
 	$(OBJ_DIR)compat \
 	$(OBJ_DIR)libavcodec \
 	$(OBJ_DIR)libavcodec/bsf \
+	$(OBJ_DIR)libavcodec/aac \
 	$(OBJ_DIR)libavcodec/vvc \
 	$(OBJ_DIR)libavcodec/x86 \
 	$(OBJ_DIR)libavcodec/x86/h26x \
@@ -97,13 +98,14 @@ SRCS_LC = \
 	libavcodec/8bps.c \
 	libavcodec/aac_ac3_parser.c \
 	libavcodec/aac_parser.c \
-	libavcodec/aacdec.c \
-	libavcodec/aacdec_common.c \
 	libavcodec/aacps.c \
 	libavcodec/aacps_common.c \
+	libavcodec/aacps_fixed.c \
 	libavcodec/aacps_float.c \
+	libavcodec/aacpsdsp_fixed.c \
 	libavcodec/aacpsdsp_float.c \
 	libavcodec/aacsbr.c \
+	libavcodec/aacsbr_fixed.c \
 	libavcodec/aactab.c \
 	libavcodec/ac3.c \
 	libavcodec/ac3_channel_layout_tab.c \
@@ -161,6 +163,7 @@ SRCS_LC = \
 	libavcodec/cabac.c \
 	libavcodec/canopus.c \
 	libavcodec/cbrt_data.c \
+	libavcodec/cbrt_data_fixed.c \
 	libavcodec/cbs.c \
 	libavcodec/cbs_av1.c \
 	libavcodec/cbs_bsf.c \
@@ -212,6 +215,7 @@ SRCS_LC = \
 	libavcodec/dnxhddata.c \
 	libavcodec/dnxhddec.c \
 	libavcodec/dovi_rpu.c \
+	libavcodec/dovi_rpudec.c \
 	libavcodec/dsd.c \
 	libavcodec/dsddec.c \
 	libavcodec/dstdec.c \
@@ -411,7 +415,12 @@ SRCS_LC = \
 	libavcodec/mss4.c \
 	libavcodec/msvideo1.c \
 	libavcodec/nellymoser.c \
-	libavcodec/nellymoserdec.c
+	libavcodec/nellymoserdec.c \
+	\
+	libavcodec/aac/aacdec.c \
+	libavcodec/aac/aacdec_fixed.c \
+	libavcodec/aac/aacdec_float.c \
+	libavcodec/aac/aacdec_tab.c
 
 SRCS_LC_B = \
 	libavcodec/nvdec.c \
@@ -471,6 +480,7 @@ SRCS_LC_B = \
 	libavcodec/rv40dsp.c \
 	libavcodec/s302m.c \
 	libavcodec/sbrdsp.c \
+	libavcodec/sbrdsp_fixed.c \
 	libavcodec/shorten.c \
 	libavcodec/simple_idct.c \
 	libavcodec/sinewin.c \

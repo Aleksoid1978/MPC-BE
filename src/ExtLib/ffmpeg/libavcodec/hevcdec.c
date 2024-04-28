@@ -1993,13 +1993,13 @@ static void hls_prediction_unit(HEVCLocalContext *lc, int x0, int y0,
 
     if (current_mv.pred_flag & PF_L0) {
         ref0 = refPicList[0].ref[current_mv.ref_idx[0]];
-        if (!ref0 || !ref0->frame->data[0])
+        if (!ref0 || !ref0->frame)
             return;
         hevc_await_progress(s, ref0, &current_mv.mv[0], y0, nPbH);
     }
     if (current_mv.pred_flag & PF_L1) {
         ref1 = refPicList[1].ref[current_mv.ref_idx[1]];
-        if (!ref1 || !ref1->frame->data[0])
+        if (!ref1 || !ref1->frame)
             return;
         hevc_await_progress(s, ref1, &current_mv.mv[1], y0, nPbH);
     }
@@ -3397,14 +3397,13 @@ static int hevc_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
     }
 
     sd = av_packet_get_side_data(avpkt, AV_PKT_DATA_DOVI_CONF, &sd_size);
-    if (sd && sd_size > 0) {
-        int old = s->dovi_ctx.dv_profile;
-
-        ff_dovi_update_cfg(&s->dovi_ctx, (AVDOVIDecoderConfigurationRecord *) sd);
+    if (sd && sd_size >= sizeof(s->dovi_ctx.cfg)) {
+        int old = s->dovi_ctx.cfg.dv_profile;
+        s->dovi_ctx.cfg = *(AVDOVIDecoderConfigurationRecord *) sd;
         if (old)
             av_log(avctx, AV_LOG_DEBUG,
                    "New DOVI configuration record from input packet (profile %d -> %u).\n",
-                   old, s->dovi_ctx.dv_profile);
+                   old, s->dovi_ctx.cfg.dv_profile);
     }
 
     s->ref = s->collocated_ref = NULL;
@@ -3450,7 +3449,6 @@ static int hevc_ref_frame(HEVCFrame *dst, HEVCFrame *src)
     int ret;
 
     ff_progress_frame_ref(&dst->tf, &src->tf);
-    dst->frame = dst->tf.f;
 
     if (src->needs_fg) {
         ret = av_frame_ref(dst->frame_grain, src->frame_grain);
@@ -3693,8 +3691,8 @@ static av_cold int hevc_decode_init(AVCodecContext *avctx)
         }
 
         sd = ff_get_coded_side_data(avctx, AV_PKT_DATA_DOVI_CONF);
-        if (sd && sd->size > 0)
-            ff_dovi_update_cfg(&s->dovi_ctx, (AVDOVIDecoderConfigurationRecord *) sd->data);
+        if (sd && sd->size >= sizeof(s->dovi_ctx.cfg))
+            s->dovi_ctx.cfg = *(AVDOVIDecoderConfigurationRecord *) sd->data;
     }
 
     return 0;
