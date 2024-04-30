@@ -232,7 +232,7 @@ BEGIN
     CONTROL         "<a>https://github.com/Aleksoid1978/MPC-BE</a>",IDC_GITHUB_LINK,
                     "SysLink",WS_TABSTOP,30,126,200,8
     LTEXT           "Acesta program este gratuit și eliberat sub licența GNU General Public License.",IDC_STATIC,30,138,200,18
-    LTEXT           "În 2023: traducerea este actualizată şi corectată de Andrei Miloiu. În trecut: traducerea în română a fost realizată de Daniel Alămiță, actualizată şi corectată de lordkag.",IDC_STATIC,30,161,200,18
+    LTEXT           "În 2023-2024: traducerea a fost actualizată şi corectată de Andrei Miloiu. În trecut: traducerea a fost realizată de Daniel Alămiță, actualizată şi corectată de lordkag.",IDC_STATIC,30,161,200,18
     DEFPUSHBUTTON   "OK",IDOK,185,183,50,14,WS_GROUP
 END
 
@@ -3225,7 +3225,7 @@ BEGIN
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\tPornește folosind randorul audio N, unde N începe de la 1\n\t\t(vedeți setările ""Ieșire"")"
     IDS_CMD_VOLUME          "/volume N\tSetează volumul, unde N este un interval de la 0 la 100"
     IDS_CMD_CLIPBOARD       "/clipboard\t\tOpen paths/links from the clipboard"
-    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
+    IDS_CMD_DEVICE          "/device\t\tDeschide dispozitivul video implicit"
     IDS_CMD_RESET           "/reset\t\tRestaurează setări implicite"
 END
 
