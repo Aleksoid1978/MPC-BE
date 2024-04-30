@@ -33,6 +33,7 @@
 * libavcodec/parser_list.c
 * libavcodec/vc1.h
 * libavcodec/vc1dec.c
+* libavcodec/vp9.c
 
 * libavutil/hwcontext_d3d11va.c
 * libavutil/hwcontext_d3d11va.h
