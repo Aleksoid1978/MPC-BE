@@ -26,6 +26,7 @@
 #endif
 
 #include <afxadv.h>
+#include <afxmt.h>
 #include <atlsync.h>
 #include "DSUtil/Profile.h"
 #include "HistoryFile.h"

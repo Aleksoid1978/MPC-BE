@@ -74,7 +74,6 @@
 #include "IDirectVobSub.h"
 #include <ExtLib/ui/sizecbar/scbarg.h>
 #include <afxinet.h>
-#include <afxmt.h>
 #include "ColorControl.h"
 #include "RateControl.h"
 #include "DiskImage.h"
