@@ -231,8 +231,8 @@ BEGIN
                     "SysLink",WS_TABSTOP,30,114,200,8
     CONTROL         "<a>https://github.com/Aleksoid1978/MPC-BE</a>",IDC_GITHUB_LINK,
                     "SysLink",WS_TABSTOP,30,126,200,8
-    LTEXT           "Acesta program este gratuit și eliberat sub licența GNU General Public License.",IDC_STATIC,30,138,200,18
-    LTEXT           "În 2023-2024: traducerea a fost actualizată şi corectată de Andrei Miloiu. În trecut: traducerea a fost realizată de Daniel Alămiță, actualizată şi corectată de lordkag.",IDC_STATIC,30,161,200,18
+    LTEXT           "Acesta program este gratuit și lansat sub licența GNU General Public License.",IDC_STATIC,30,138,200,18
+    LTEXT           "În 2023-2024 traducător a fost Andrei Miloiu. În trecut, au contribuit Daniel Alămiță şi lordkag.",IDC_STATIC,30,161,200,18
     DEFPUSHBUTTON   "OK",IDOK,185,183,50,14,WS_GROUP
 END
 
