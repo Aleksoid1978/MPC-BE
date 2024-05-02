@@ -7,7 +7,7 @@
 12		"Compilator FFmpeg :"
 13		"Libavcodec / Libavutil :"
 23		"Acesta program este gratuit și lansat sub licența GNU General Public License."
-24		"În 2023-2024: traducerea a fost actualizată şi corectată de Andrei Miloiu. În trecut, au contribuit Daniel Alămiță şi lordkag."
+24		"În 2023-2024 traducător a fost Andrei Miloiu. În trecut, au contribuit Daniel Alămiță şi lordkag."
 25		"OK"
 END
 
