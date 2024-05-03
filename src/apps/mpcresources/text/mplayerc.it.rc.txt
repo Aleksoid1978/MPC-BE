@@ -1383,7 +1383,7 @@ STRING IDS_CMD_CD		"/cd\t\tCarica tutte le tracce di un cd audio o (s)vcd,\n\t\t
 STRING IDS_CMD_CLIPBOARD		"/clipboard\t\tApri percorsi/collegamenti dagli appunti"
 STRING IDS_CMD_CLOSE		"/close\t\tChiudi il lettore dopo la riproduzione (funziona solo quando\n\t\utilizzato con /play)"
 STRING IDS_CMD_D3DFS		"/d3dfs\t\tAvvia il rendering in modalità a schermo intero esclusiva"
-STRING IDS_CMD_DEVICE		"/device\t\tOpen the default video device"
+STRING IDS_CMD_DEVICE		"/device\t\tApri il dispositivo video predefinito"
 STRING IDS_CMD_DUB		"/dub ""nome dub""\tCarica un file audio aggiuntivo"
 STRING IDS_CMD_DUBDELAY		"/dubdelay ""file""\tCarica un file audio aggiuntivo spostato con XXms (se\n\t\til file contiene ""...RITARDO XXms..."")"
 STRING IDS_CMD_DVD		"/dvd\t\tEsegui in modalità dvd, ""nome del percorso"" indica la cartella dvd\n\t\t (opzionale)"
