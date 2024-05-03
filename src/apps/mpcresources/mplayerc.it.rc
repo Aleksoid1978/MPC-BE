@@ -3226,7 +3226,7 @@ BEGIN
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\tInizia a usare l'audiorenderer N, dove N inizia da 1\n\t\t(vedi impostazioni ""Audio"")"
     IDS_CMD_VOLUME          "/volume N\tImposta volume, il valore di N è tra 0 e 100"
     IDS_CMD_CLIPBOARD       "/clipboard\t\tApri percorsi/collegamenti dagli appunti"
-    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
+    IDS_CMD_DEVICE          "/device\t\tApri il dispositivo video predefinito"
     IDS_CMD_RESET           "/reset\t\tRipristina le impostazioni predefinite"
 END
 
