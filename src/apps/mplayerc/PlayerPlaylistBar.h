@@ -61,7 +61,7 @@ public:
 	bool FindFolder(LPCWSTR path) const;
 	void AutoLoadFiles();
 
-	CString GetLabel(int i = 0);
+	CString GetLabel(int i = 0) const;
 
 	const bool MustBeSkipped() const {
 		if (m_bInvalid) {

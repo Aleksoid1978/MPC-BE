@@ -258,7 +258,7 @@ bool CPlaylistItem::FindFolder(LPCWSTR path) const
 	return false;
 }
 
-CString CPlaylistItem::GetLabel(int i)
+CString CPlaylistItem::GetLabel(int i) const
 {
 	CString str;
 
@@ -2446,6 +2446,7 @@ void CPlayerPlaylistBar::SetCurValid(const bool bValid)
 						m_list.SetItemText(index, COL_NAME, pli.GetLabel(0));
 					}
 				}
+				m_list.Invalidate();
 			}
 			break;
 		}
@@ -2900,13 +2901,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 
 	pDC->SetTextColor(textcolor);
 
-	CString time;
-	if (pli.m_bInvalid) {
-		time = ResStr(IDS_PLAYLIST_INVALID);
-	} else {
-		time = m_list.GetItemText(nItem, COL_TIME);
-	}
-
+	CString time = pli.GetLabel(1);
 	if (time.GetLength()) {
 		CSize timesize = pDC->GetTextExtent(time);
 		if ((3 + timesize.cx + 3) < rcItem.Width() / 2) {
