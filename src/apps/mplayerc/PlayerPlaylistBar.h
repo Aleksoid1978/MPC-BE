@@ -339,7 +339,7 @@ public:
 	void SetLast();
 	void SetCurValid(const bool bValid);
 	void SetCurTime(REFERENCE_TIME rt);
-	void SetCurLabel(CString label);
+	void SetCurLabel(const CString& label);
 	void Randomize();
 
 	void Refresh();

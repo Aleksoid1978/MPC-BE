@@ -2444,16 +2444,16 @@ void CPlayerPlaylistBar::SetCurValid(const bool bValid)
 					auto index = FindItem(pos);
 					if (index >= 0) {
 						m_list.SetItemText(index, COL_NAME, pli.GetLabel(0));
+						m_list.SetItemText(index, COL_TIME, pli.GetLabel(1));
 					}
 				}
-				m_list.Invalidate();
 			}
 			break;
 		}
 	}
 }
 
-void CPlayerPlaylistBar::SetCurLabel(CString label)
+void CPlayerPlaylistBar::SetCurLabel(const CString& label)
 {
 	for (size_t i = 0; i < m_tabs.size(); i++) {
 		if (m_nCurPlaybackListId == m_tabs[i].id) {
@@ -2901,7 +2901,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 
 	pDC->SetTextColor(textcolor);
 
-	CString time = pli.GetLabel(1);
+	CString time = m_list.GetItemText(nItem, COL_TIME);
 	if (time.GetLength()) {
 		CSize timesize = pDC->GetTextExtent(time);
 		if ((3 + timesize.cx + 3) < rcItem.Width() / 2) {
