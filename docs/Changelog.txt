@@ -15,6 +15,9 @@ Fixed the "Prefer external audio files over embedded audio track" setting.
 Added "Show zero hours in status bar and OSD" setting that works for durations of 1 hour or more.
 Various interface fixes.
 
+Installer
+MPC Video Renderer 0.8.1 is included in the installer.
+
 Updated Korean translation (by Hackjjang).
 Updated Turkish translation (by cmhrky).
 Updated German translation (by Klaus1189).
