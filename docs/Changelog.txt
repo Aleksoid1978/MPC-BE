@@ -1,6 +1,6 @@
 ﻿This file includes only a short list of the changes between Media Player Classic - BE's versions.
 
-1.7.0.x dev
+1.7.1 - 2024-05-07
 =============================
 MP4Splitter
 Fixed freezing during navigation on some files.
@@ -8,11 +8,15 @@ Fixed freezing during navigation on some files.
 MPCVideoDec.
 Fixed handling of media type change from next filter.
 
+Subtitles
+Fixed a crash when using XySubFilter and MPC VR in DX11 mode in some cases.
+
 Player
 Added "/volume N" command line option to change the volume level.
 Added "/device" command line option to open the capture device.
 Fixed the "Prefer external audio files over embedded audio track" setting.
 Added "Show zero hours in status bar and OSD" setting that works for durations of 1 hour or more.
+Fixed erroneous activation of preview on some broadcasts.
 Various interface fixes.
 
 Installer
