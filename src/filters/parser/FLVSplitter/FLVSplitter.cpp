@@ -834,6 +834,11 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								break;
 						}
 
+						if (vWidth && vHeight) {
+							vih->bmiHeader.biWidth = vWidth;
+							vih->bmiHeader.biHeight = vHeight;
+						}
+
 						if (!vih->bmiHeader.biWidth || !vih->bmiHeader.biHeight) {
 							break;
 						}
@@ -847,6 +852,11 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vih->bmiHeader.biWidth  = (LONG)m_pFile->BitRead(12);
 						m_pFile->BitRead(4);
 						vih->bmiHeader.biHeight = (LONG)m_pFile->BitRead(12);
+
+						if (vWidth && vHeight) {
+							vih->bmiHeader.biWidth = vWidth;
+							vih->bmiHeader.biHeight = vHeight;
+						}
 
 						if (!vih->bmiHeader.biWidth || !vih->bmiHeader.biHeight) {
 							break;
@@ -906,6 +916,11 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						bih->biWidth = w;
 						bih->biHeight = h;
+
+						if (vWidth && vHeight) {
+							bih->biWidth = vWidth;
+							bih->biHeight = vHeight;
+						}
 #ifndef NOVIDEOTWEAK
 						SetRect(&vih->rcSource, 0, 0, w - fudge.x, h - fudge.y);
 						SetRect(&vih->rcTarget, 0, 0, w - fudge.x, h - fudge.y);
@@ -1031,6 +1046,11 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vih->hdr.dwPictAspectRatioX		= aspect.cx;
 						vih->hdr.dwPictAspectRatioY		= aspect.cy;
 						vih->hdr.AvgTimePerFrame		= AvgTimePerFrame;
+
+						if (vWidth && vHeight) {
+							vih->hdr.bmiHeader.biWidth = vWidth;
+							vih->hdr.bmiHeader.biHeight = vHeight;
+						}
 
 						HEVCParser::CreateSequenceHeaderAVC(headerData, headerSize, vih->dwSequenceHeader, vih->cbSequenceHeader);
 
