@@ -2464,7 +2464,8 @@ redo:
 			}
 
 			if (m_CodecId == AV_CODEC_ID_H264) {
-				if (m_nDXVA_SD && m_nSurfaceWidth < 1280) { // check "Disable DXVA for SD" option
+				// check "Disable DXVA for SD (H.264)" option 
+				if (m_nDXVA_SD && std::max(m_nSurfaceWidth, m_nSurfaceHeight) <= 1024 && std::min(m_nSurfaceWidth, m_nSurfaceHeight) <= 576) {
 					break;
 				}
 
