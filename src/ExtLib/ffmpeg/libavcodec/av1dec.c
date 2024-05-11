@@ -469,7 +469,7 @@ static int get_tiles_info(AVCodecContext *avctx, const AV1RawTileGroup *tile_gro
 static enum AVPixelFormat get_sw_pixel_format(void *logctx,
                                               const AV1RawSequenceHeader *seq)
 {
-    uint8_t bit_depth;
+    int bit_depth;
     enum AVPixelFormat pix_fmt = AV_PIX_FMT_NONE;
 
     if (seq->seq_profile == 2 && seq->color_config.high_bitdepth)
@@ -493,7 +493,7 @@ static enum AVPixelFormat get_sw_pixel_format(void *logctx,
             else if (bit_depth == 12)
                 pix_fmt = AV_PIX_FMT_YUV444P12;
             else
-                av_log(logctx, AV_LOG_WARNING, "Unknown AV1 pixel format.\n");
+                av_assert0(0);
         } else if (seq->color_config.subsampling_x == 1 &&
                    seq->color_config.subsampling_y == 0) {
             if (bit_depth == 8)
@@ -503,7 +503,7 @@ static enum AVPixelFormat get_sw_pixel_format(void *logctx,
             else if (bit_depth == 12)
                 pix_fmt = AV_PIX_FMT_YUV422P12;
             else
-                av_log(logctx, AV_LOG_WARNING, "Unknown AV1 pixel format.\n");
+                av_assert0(0);
         } else if (seq->color_config.subsampling_x == 1 &&
                    seq->color_config.subsampling_y == 1) {
             if (bit_depth == 8)
@@ -513,7 +513,7 @@ static enum AVPixelFormat get_sw_pixel_format(void *logctx,
             else if (bit_depth == 12)
                 pix_fmt = AV_PIX_FMT_YUV420P12;
             else
-                av_log(logctx, AV_LOG_WARNING, "Unknown AV1 pixel format.\n");
+                av_assert0(0);
         }
     } else {
         if (bit_depth == 8)
@@ -523,7 +523,7 @@ static enum AVPixelFormat get_sw_pixel_format(void *logctx,
         else if (bit_depth == 12)
             pix_fmt = AV_PIX_FMT_GRAY12;
         else
-            av_log(logctx, AV_LOG_WARNING, "Unknown AV1 pixel format.\n");
+            av_assert0(0);
     }
 
     return pix_fmt;
@@ -725,6 +725,8 @@ static void av1_frame_replace(AV1Frame *dst, const AV1Frame *src)
            sizeof(dst->ref_frame_sign_bias));
     memcpy(dst->order_hints, src->order_hints,
            sizeof(dst->order_hints));
+
+    dst->force_integer_mv = src->force_integer_mv;
 }
 
 static av_cold int av1_decode_free(AVCodecContext *avctx)
@@ -1255,6 +1257,11 @@ static int get_current_frame(AVCodecContext *avctx)
     order_hint_info(s);
     load_grain_params(s);
 
+    s->cur_frame.force_integer_mv =
+        s->raw_frame_header->force_integer_mv ||
+        s->raw_frame_header->frame_type == AV1_FRAME_KEY ||
+        s->raw_frame_header->frame_type == AV1_FRAME_INTRA_ONLY;
+
     return ret;
 }
 
@@ -1333,12 +1340,15 @@ static int av1_receive_frame_internal(AVCodecContext *avctx, AVFrame *frame)
 
                 if (s->cur_frame.f) {
                     ret = set_output_frame(avctx, frame);
-                    if (ret < 0)
+                    if (ret < 0) {
                         av_log(avctx, AV_LOG_ERROR, "Set output frame error.\n");
+                        goto end;
+                    }
                 }
 
                 s->raw_frame_header = NULL;
                 i++;
+                ret = 0;
 
                 goto end;
             }
@@ -1439,17 +1449,20 @@ static int av1_receive_frame_internal(AVCodecContext *avctx, AVFrame *frame)
 
             update_reference_list(avctx);
 
-            if (s->raw_frame_header->show_frame && s->cur_frame.f) {
-                ret = set_output_frame(avctx, frame);
-                if (ret < 0) {
-                    av_log(avctx, AV_LOG_ERROR, "Set output frame error\n");
-                    goto end;
-                }
-            }
-            raw_tile_group = NULL;
+            raw_tile_group      = NULL;
             s->raw_frame_header = NULL;
+
             if (show_frame) {
+                // cur_frame.f needn't exist due to skip_frame.
+                if (s->cur_frame.f) {
+                    ret = set_output_frame(avctx, frame);
+                    if (ret < 0) {
+                        av_log(avctx, AV_LOG_ERROR, "Set output frame error\n");
+                        goto end;
+                    }
+                }
                 i++;
+                ret = 0;
                 goto end;
             }
         }

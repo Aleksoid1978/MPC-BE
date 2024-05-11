@@ -51,33 +51,21 @@ DECLARE_ALIGNED(32, static float, aac_kbd_short_120)[120];
 
 static void init_tables_float_fn(void)
 {
-    AAC_RENAME(ff_cbrt_tableinit)();
+    ff_cbrt_tableinit();
 
-    AAC_RENAME(ff_kbd_window_init)(AAC_RENAME2(aac_kbd_long_1024), 4.0, 1024);
-    AAC_RENAME(ff_kbd_window_init)(AAC_RENAME2(aac_kbd_short_128), 6.0, 128);
+    ff_kbd_window_init(ff_aac_kbd_long_1024, 4.0, 1024);
+    ff_kbd_window_init(ff_aac_kbd_short_128, 6.0, 128);
 
-    AAC_RENAME(ff_kbd_window_init)(AAC_RENAME(aac_kbd_long_960), 4.0, 960);
-    AAC_RENAME(ff_kbd_window_init)(AAC_RENAME(aac_kbd_short_120), 6.0, 120);
+    ff_kbd_window_init(aac_kbd_long_960, 4.0, 960);
+    ff_kbd_window_init(aac_kbd_short_120, 6.0, 120);
 
-    AAC_RENAME(ff_sine_window_init)(AAC_RENAME(sine_960), 960);
-    AAC_RENAME(ff_sine_window_init)(AAC_RENAME(sine_120), 120);
-    AAC_RENAME(ff_init_ff_sine_windows)(9);
+    ff_sine_window_init(sine_960, 960);
+    ff_sine_window_init(sine_120, 120);
+    ff_init_ff_sine_windows(9);
 
-    AAC_RENAME(ff_aac_sbr_init)();
-}
-
-static int init(AACDecContext *ac)
-{
-    static AVOnce init_float_once = AV_ONCE_INIT;
-    ff_thread_once(&init_float_once, init_tables_float_fn);
-
-    ac->fdsp = avpriv_float_dsp_alloc(ac->avctx->flags & AV_CODEC_FLAG_BITEXACT);
-    if (!ac->fdsp)
-        return AVERROR(ENOMEM);
+    ff_aac_sbr_init();
 
     ff_aac_float_common_init();
-
-    return 0;
 }
 
 static const float cce_scale[] = {
@@ -163,3 +151,23 @@ static inline float *VMUL4S(float *dst, const float *v, unsigned idx,
 #include "aacdec_float_prediction.h"
 #include "aacdec_dsp_template.c"
 #include "aacdec_proc_template.c"
+
+av_cold int ff_aac_decode_init_float(AVCodecContext *avctx)
+{
+    static AVOnce init_float_once = AV_ONCE_INIT;
+    AACDecContext *ac = avctx->priv_data;
+
+    ac->is_fixed = 0;
+    avctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
+
+    aac_dsp_init(&ac->dsp);
+    aac_proc_init(&ac->proc);
+
+    ac->fdsp = avpriv_float_dsp_alloc(avctx->flags & AV_CODEC_FLAG_BITEXACT);
+    if (!ac->fdsp)
+        return AVERROR(ENOMEM);
+
+    ff_thread_once(&init_float_once, init_tables_float_fn);
+
+    return ff_aac_decode_init(avctx);
+}

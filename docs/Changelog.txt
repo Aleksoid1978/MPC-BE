@@ -6,7 +6,8 @@ MPCVideoDec
 VVC decoding is done using vvdec (https://github.com/fraunhoferhhi/vvdec).
 
 Updated libraries:
-	vvdec git-v2.3.0;
+	ffmpeg git-n7.1-dev-716-g0d9591841b;
+	vvdec git-v2.3.0.
 
 
 1.7.1 - 2024-05-07

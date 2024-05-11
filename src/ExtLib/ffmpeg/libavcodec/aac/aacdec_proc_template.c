@@ -433,7 +433,16 @@ static int AAC_RENAME(decode_cce)(AACDecContext *ac, GetBitContext *gb, ChannelE
     return 0;
 }
 
-const AACDecProc AAC_RENAME(aac_proc) = {
-    .decode_spectrum_and_dequant = AAC_RENAME(decode_spectrum_and_dequant),
-    .decode_cce = AAC_RENAME(decode_cce),
-};
+static av_cold void AAC_RENAME(aac_proc_init)(AACDecProc *aac_proc)
+{
+#define SET(member) aac_proc->member = AAC_RENAME(member)
+    SET(decode_spectrum_and_dequant);
+    SET(decode_cce);
+#undef SET
+#define SET(member) aac_proc->member = AV_JOIN(ff_aac_, AAC_RENAME(member));
+    SET(sbr_ctx_alloc_init);
+    SET(sbr_decode_extension);
+    SET(sbr_apply);
+    SET(sbr_ctx_close);
+#undef SET
+}

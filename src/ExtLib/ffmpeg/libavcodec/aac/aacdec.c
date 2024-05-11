@@ -42,6 +42,7 @@
 #include "aacdec_tab.h"
 
 #include "libavcodec/aac.h"
+#include "libavcodec/aac_defines.h"
 #include "libavcodec/aacsbr.h"
 #include "libavcodec/aactab.h"
 #include "libavcodec/adts_header.h"
@@ -60,7 +61,6 @@
 #include "libavutil/opt.h"
 #include "libavutil/tx.h"
 #include "libavutil/version.h"
-#include "libavutil/thread.h"
 
 /*
  * supported tools
@@ -149,11 +149,7 @@ static av_cold int che_configure(AACDecContext *ac,
         return AVERROR_INVALIDDATA;
     if (che_pos) {
         if (!ac->che[type][id]) {
-            int ret;
-            if (ac->is_fixed)
-                ret = ff_aac_sbr_ctx_alloc_init_fixed(ac, &ac->che[type][id], type);
-            else
-                ret = ff_aac_sbr_ctx_alloc_init(ac, &ac->che[type][id], type);
+            int ret = ac->proc.sbr_ctx_alloc_init(ac, &ac->che[type][id], type);
             if (ret < 0)
                 return ret;
         }
@@ -170,10 +166,7 @@ static av_cold int che_configure(AACDecContext *ac,
         }
     } else {
         if (ac->che[type][id]) {
-            if (ac->is_fixed)
-                ff_aac_sbr_ctx_close_fixed(ac->che[type][id]);
-            else
-                ff_aac_sbr_ctx_close(ac->che[type][id]);
+            ac->proc.sbr_ctx_close(ac->che[type][id]);
         }
         av_freep(&ac->che[type][id]);
     }
@@ -531,7 +524,7 @@ static int output_configure(AACDecContext *ac,
     return 0;
 }
 
-static void flush(AVCodecContext *avctx)
+static av_cold void flush(AVCodecContext *avctx)
 {
     AACDecContext *ac= avctx->priv_data;
     int type, i, j;
@@ -1111,23 +1104,14 @@ static int sample_rate_idx (int rate)
     else                    return 11;
 }
 
-static av_cold void aac_static_table_init(void)
-{
-    ff_aacdec_common_init_once();
-}
-static AVOnce aac_table_init = AV_ONCE_INIT;
-
 static av_cold int decode_close(AVCodecContext *avctx)
 {
     AACDecContext *ac = avctx->priv_data;
-    int is_fixed = ac->is_fixed;
-    void (*sbr_close)(ChannelElement *che) = is_fixed ? ff_aac_sbr_ctx_close_fixed :
-                                                        ff_aac_sbr_ctx_close;
 
     for (int type = 0; type < FF_ARRAY_ELEMS(ac->che); type++) {
         for (int i = 0; i < MAX_ELEM_ID; i++) {
             if (ac->che[type][i]) {
-                sbr_close(ac->che[type][i]);
+                ac->proc.sbr_ctx_close(ac->che[type][i]);
                 av_freep(&ac->che[type][i]);
             }
         }
@@ -1142,7 +1126,7 @@ static av_cold int decode_close(AVCodecContext *avctx)
     av_tx_uninit(&ac->mdct_ltp);
 
     // Compiler will optimize this branch away.
-    if (is_fixed)
+    if (ac->is_fixed)
         av_freep(&ac->RENAME_FIXED(fdsp));
     else
         av_freep(&ac->fdsp);
@@ -1157,13 +1141,6 @@ static av_cold int init_dsp(AVCodecContext *avctx)
     float scale_fixed, scale_float;
     const float *const scalep = is_fixed ? &scale_fixed : &scale_float;
     enum AVTXType tx_type = is_fixed ? AV_TX_INT32_MDCT : AV_TX_FLOAT_MDCT;
-
-    if (avctx->ch_layout.nb_channels > MAX_CHANNELS) {
-        av_log(avctx, AV_LOG_ERROR, "Too many channels\n");
-        return AVERROR_INVALIDDATA;
-    }
-
-    ac->random_state = 0x1f2e3d4c;
 
 #define MDCT_INIT(s, fn, len, sval)                                          \
     scale_fixed = (sval) * 128.0f;                                           \
@@ -1187,13 +1164,10 @@ static av_cold int init_dsp(AVCodecContext *avctx)
     if (ret < 0)
         return ret;
 
-    ac->dsp = is_fixed ? aac_dsp_fixed : aac_dsp;
-    ac->proc = is_fixed ? aac_proc_fixed : aac_proc;
-
-    return ac->dsp.init(ac);
+    return 0;
 }
 
-static av_cold int aac_decode_init_internal(AVCodecContext *avctx)
+av_cold int ff_aac_decode_init(AVCodecContext *avctx)
 {
     AACDecContext *ac = avctx->priv_data;
     int ret;
@@ -1201,17 +1175,10 @@ static av_cold int aac_decode_init_internal(AVCodecContext *avctx)
     if (avctx->sample_rate > 96000)
         return AVERROR_INVALIDDATA;
 
-    ret = ff_thread_once(&aac_table_init, &aac_static_table_init);
-    if (ret != 0)
-        return AVERROR_UNKNOWN;
+    ff_aacdec_common_init_once();
 
     ac->avctx = avctx;
     ac->oc[1].m4ac.sample_rate = avctx->sample_rate;
-
-    if (ac->is_fixed)
-        avctx->sample_fmt = AV_SAMPLE_FMT_S32P;
-    else
-        avctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
 
     if (avctx->extradata_size > 0) {
         if ((ret = decode_audio_specific_config(ac, ac->avctx, &ac->oc[1].m4ac,
@@ -1249,21 +1216,14 @@ static av_cold int aac_decode_init_internal(AVCodecContext *avctx)
         }
     }
 
+    if (avctx->ch_layout.nb_channels > MAX_CHANNELS) {
+        av_log(avctx, AV_LOG_ERROR, "Too many channels\n");
+        return AVERROR_INVALIDDATA;
+    }
+
+    ac->random_state = 0x1f2e3d4c;
+
     return init_dsp(avctx);
-}
-
-static av_cold int aac_decode_init(AVCodecContext *avctx)
-{
-    AACDecContext *ac = avctx->priv_data;
-    ac->is_fixed = 0;
-    return aac_decode_init_internal(avctx);
-}
-
-static av_cold int aac_decode_init_fixed(AVCodecContext *avctx)
-{
-    AACDecContext *ac = avctx->priv_data;
-    ac->is_fixed = 1;
-    return aac_decode_init_internal(avctx);
 }
 
 /**
@@ -1976,11 +1936,7 @@ static int decode_extension_payload(AACDecContext *ac, GetBitContext *gb, int cn
             ac->avctx->profile = AV_PROFILE_AAC_HE;
         }
 
-        if (CONFIG_AAC_FIXED_DECODER && ac->is_fixed)
-            res = ff_aac_sbr_decode_extension_fixed(ac, che, gb, crc_flag, cnt, elem_type);
-        else if (CONFIG_AAC_DECODER)
-            res = ff_aac_sbr_decode_extension(ac, che, gb, crc_flag, cnt, elem_type);
-
+        ac->proc.sbr_decode_extension(ac, che, gb, crc_flag, cnt, elem_type);
 
         if (ac->oc[1].m4ac.ps == 1 && !ac->warned_he_aac_mono) {
             av_log(ac->avctx, AV_LOG_VERBOSE, "Treating HE-AAC mono as stereo.\n");
@@ -2089,14 +2045,9 @@ static void spectral_to_sample(AACDecContext *ac, int samples)
                             ac->dsp.update_ltp(ac, &che->ch[1]);
                     }
                     if (ac->oc[1].m4ac.sbr > 0) {
-                        if (CONFIG_AAC_FIXED_DECODER && ac->is_fixed)
-                            ff_aac_sbr_apply_fixed(ac, che, type,
-                                                   (void *)che->ch[0].output,
-                                                   (void *)che->ch[1].output);
-                        else if (CONFIG_AAC_DECODER)
-                            ff_aac_sbr_apply(ac, che, type,
-                                             (void *)che->ch[0].output,
-                                             (void *)che->ch[1].output);
+                        ac->proc.sbr_apply(ac, che, type,
+                                           che->ch[0].output,
+                                           che->ch[1].output);
                     }
                 }
                 if (type <= TYPE_CCE)
@@ -2517,7 +2468,9 @@ static int aac_decode_frame(AVCodecContext *avctx, AVFrame *frame,
     return buf_size > buf_offset ? buf_consumed : buf_size;
 }
 
+#if CONFIG_AAC_LATM_DECODER
 #include "aacdec_latm.h"
+#endif
 
 #define AACDEC_FLAGS AV_OPT_FLAG_DECODING_PARAM | AV_OPT_FLAG_AUDIO_PARAM
 #define OFF(field) offsetof(AACDecContext, field)
@@ -2560,7 +2513,7 @@ const FFCodec ff_aac_decoder = {
     .p.id            = AV_CODEC_ID_AAC,
     .p.priv_class    = &decoder_class,
     .priv_data_size  = sizeof(AACDecContext),
-    .init            = aac_decode_init,
+    .init            = ff_aac_decode_init_float,
     .close           = decode_close,
     FF_CODEC_DECODE_CB(aac_decode_frame),
     .p.sample_fmts   = (const enum AVSampleFormat[]) {
@@ -2582,7 +2535,7 @@ const FFCodec ff_aac_fixed_decoder = {
     .p.id            = AV_CODEC_ID_AAC,
     .p.priv_class    = &decoder_class,
     .priv_data_size  = sizeof(AACDecContext),
-    .init            = aac_decode_init_fixed,
+    .init            = ff_aac_decode_init_fixed,
     .close           = decode_close,
     FF_CODEC_DECODE_CB(aac_decode_frame),
     .p.sample_fmts   = (const enum AVSampleFormat[]) {

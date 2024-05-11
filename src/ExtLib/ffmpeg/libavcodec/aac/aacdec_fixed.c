@@ -43,36 +43,24 @@
 #include "libavcodec/cbrt_data.h"
 #include "libavcodec/aacsbr.h"
 
-DECLARE_ALIGNED(32, static INTFLOAT, AAC_RENAME2(aac_kbd_long_1024))[1024];
-DECLARE_ALIGNED(32, static INTFLOAT, AAC_RENAME2(aac_kbd_short_128))[128];
-DECLARE_ALIGNED(32, static INTFLOAT, AAC_RENAME(aac_kbd_long_960))[960];
-DECLARE_ALIGNED(32, static INTFLOAT, AAC_RENAME(aac_kbd_short_120))[120];
+DECLARE_ALIGNED(32, static int, aac_kbd_long_1024_fixed)[1024];
+DECLARE_ALIGNED(32, static int, aac_kbd_short_128_fixed)[128];
+DECLARE_ALIGNED(32, static int, aac_kbd_long_960_fixed)[960];
+DECLARE_ALIGNED(32, static int, aac_kbd_short_120_fixed)[120];
 
 static void init_tables_fixed_fn(void)
 {
-    AAC_RENAME(ff_cbrt_tableinit)();
+    ff_cbrt_tableinit_fixed();
 
-    AAC_RENAME(ff_kbd_window_init)(AAC_RENAME2(aac_kbd_long_1024), 4.0, 1024);
-    AAC_RENAME(ff_kbd_window_init)(AAC_RENAME2(aac_kbd_short_128), 6.0, 128);
+    ff_kbd_window_init_fixed(aac_kbd_long_1024_fixed, 4.0, 1024);
+    ff_kbd_window_init_fixed(aac_kbd_short_128_fixed, 6.0, 128);
 
-    AAC_RENAME(ff_kbd_window_init)(AAC_RENAME(aac_kbd_long_960), 4.0, 960);
-    AAC_RENAME(ff_kbd_window_init)(AAC_RENAME(aac_kbd_short_120), 6.0, 120);
+    ff_kbd_window_init_fixed(aac_kbd_long_960_fixed, 4.0, 960);
+    ff_kbd_window_init_fixed(aac_kbd_short_120_fixed, 6.0, 120);
 
-    AAC_RENAME(ff_aac_sbr_init)();
+    ff_aac_sbr_init_fixed();
 
     init_sine_windows_fixed();
-}
-
-static int init_fixed(AACDecContext *ac)
-{
-    static AVOnce init_fixed_once = AV_ONCE_INIT;
-    ff_thread_once(&init_fixed_once, init_tables_fixed_fn);
-
-    ac->fdsp = avpriv_alloc_fixed_dsp(ac->avctx->flags & AV_CODEC_FLAG_BITEXACT);
-    if (!ac->fdsp)
-        return AVERROR(ENOMEM);
-
-    return 0;
 }
 
 static const int cce_scale_fixed[8] = {
@@ -93,3 +81,23 @@ static const int cce_scale_fixed[8] = {
 #include "aacdec_fixed_prediction.h"
 #include "aacdec_dsp_template.c"
 #include "aacdec_proc_template.c"
+
+av_cold int ff_aac_decode_init_fixed(AVCodecContext *avctx)
+{
+    static AVOnce init_fixed_once = AV_ONCE_INIT;
+    AACDecContext *ac = avctx->priv_data;
+
+    ac->is_fixed = 1;
+    avctx->sample_fmt = AV_SAMPLE_FMT_S32P;
+
+    aac_dsp_init_fixed(&ac->dsp);
+    aac_proc_init_fixed(&ac->proc);
+
+    ac->fdsp = avpriv_alloc_fixed_dsp(avctx->flags & AV_CODEC_FLAG_BITEXACT);
+    if (!ac->fdsp)
+        return AVERROR(ENOMEM);
+
+    ff_thread_once(&init_fixed_once, init_tables_fixed_fn);
+
+    return ff_aac_decode_init(avctx);
+}
