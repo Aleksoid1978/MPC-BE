@@ -231,6 +231,72 @@
     <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\InitX86.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\AdaptiveLoopFilter_sse42.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\Buffer_sse42.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\InterpolationFilter_sse42.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\InterPred_sse42.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\IntraPred_sse42.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\LoopFilter_sse42.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\Picture_sse42.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\Quant_sse42.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\RdCost_sse42.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\SampleAdaptiveOffset_sse42.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\Trafo_sse42.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\AdaptiveLoopFilter_avx.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\Buffer_avx.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\InterpolationFilter_avx.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\InterPred_avx.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\IntraPred_avx.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\LoopFilter_avx.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\Picture_avx.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\Quant_avx.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\RdCost_avx.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\SampleAdaptiveOffset_avx.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\Trafo_avx.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\AdaptiveLoopFilter.h">

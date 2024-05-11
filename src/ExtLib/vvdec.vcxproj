@@ -86,6 +86,39 @@
     <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\Trafo_avx2.cpp">
       <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\AdaptiveLoopFilter_avx.cpp">
+      <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\Buffer_avx.cpp">
+      <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\InterpolationFilter_avx.cpp">
+      <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\InterPred_avx.cpp">
+      <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\IntraPred_avx.cpp">
+      <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\LoopFilter_avx.cpp">
+      <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\Picture_avx.cpp">
+      <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\Quant_avx.cpp">
+      <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\RdCost_avx.cpp">
+      <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\SampleAdaptiveOffset_avx.cpp">
+      <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\Trafo_avx.cpp">
+      <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
     <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\CommonDefX86.cpp" />
     <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\InitX86.cpp" />
     <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\AdaptiveLoopFilter_sse41.cpp">
@@ -120,6 +153,39 @@
     </ClCompile>
     <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\Trafo_sse41.cpp">
       <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\AdaptiveLoopFilter_sse42.cpp">
+      <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\Buffer_sse42.cpp">
+      <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\InterpolationFilter_sse42.cpp">
+      <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\InterPred_sse42.cpp">
+      <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\IntraPred_sse42.cpp">
+      <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\LoopFilter_sse42.cpp">
+      <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\Picture_sse42.cpp">
+      <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\Quant_sse42.cpp">
+      <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\RdCost_sse42.cpp">
+      <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\SampleAdaptiveOffset_sse42.cpp">
+      <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\Trafo_sse42.cpp">
+      <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\AnnexBread.cpp" />
     <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\BinDecoder.cpp" />
