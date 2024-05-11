@@ -16,3 +16,6 @@
 [submodule "distrib/MPC_components"]
 	path = distrib/MPC_components
 	url = https://github.com/Aleksoid1978/MPC_components
+[submodule "src/ExtLib/vvdec/vvdec"]
+	path = src/ExtLib/vvdec/vvdec
+	url = https://github.com/fraunhoferhhi/vvdec.git

@@ -64,3 +64,4 @@ MPC-BE makes use of the following 3rd party code:
 | ZenLib            | zlib License        | https://github.com/MediaArea/ZenLib                   |
 | zlib              | zlib License        | https://zlib.net/                                     |
 | bs2b              | MIT License         | https://bs2b.sourceforge.net/                         |
+| VVdeC             | BSD License         | https://github.com/fraunhoferhhi/vvdec/               |

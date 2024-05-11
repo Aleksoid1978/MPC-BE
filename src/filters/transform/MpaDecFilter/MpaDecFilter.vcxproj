@@ -148,6 +148,9 @@
     <ProjectReference Include="..\..\..\ExtLib\uavs3d\uavs3d.vcxproj">
       <Project>{1cdbe640-bb75-422c-b63a-8c70c4d48bea}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\ExtLib\vvdec.vcxproj">
+      <Project>{a5b58721-0f63-4410-9598-880ebda78c53}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

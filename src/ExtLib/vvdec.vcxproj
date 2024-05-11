@@ -1,0 +1,251 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\AdaptiveLoopFilter.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\BitStream.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\Buffer.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\ChromaFormat.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\CodingStructure.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\ContextModelling.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\Contexts.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\dtrace.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\InterpolationFilter.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\InterPrediction.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\IntraPrediction.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\LoopFilter.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\MatrixIntraPrediction.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\Mv.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\ParameterSetManager.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\PicListManager.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\Picture.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\PicYuvMD5.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\Quant.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\RdCost.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\Reshape.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\Rom.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\RomLFNST.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\RomTr.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\SampleAdaptiveOffset.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\SEI_internal.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\Slice.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\StatCounter.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\TrQuant.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\TrQuant_EMT.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\Unit.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\UnitPartitioner.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\UnitTools.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\WeightPrediction.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\AdaptiveLoopFilter_avx2.cpp">
+      <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\Buffer_avx2.cpp">
+      <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\InterpolationFilter_avx2.cpp">
+      <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\InterPred_avx2.cpp">
+      <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\IntraPred_avx2.cpp">
+      <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\LoopFilter_avx2.cpp">
+      <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\Picture_avx2.cpp">
+      <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\Quant_avx2.cpp">
+      <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\RdCost_avx2.cpp">
+      <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\SampleAdaptiveOffset_avx2.cpp">
+      <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\Trafo_avx2.cpp">
+      <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\CommonDefX86.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\InitX86.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\AdaptiveLoopFilter_sse41.cpp">
+      <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\Buffer_sse41.cpp">
+      <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\InterpolationFilter_sse41.cpp">
+      <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\InterPred_sse41.cpp">
+      <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\IntraPred_sse41.cpp">
+      <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\LoopFilter_sse41.cpp">
+      <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\Picture_sse41.cpp">
+      <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\Quant_sse41.cpp">
+      <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\RdCost_sse41.cpp">
+      <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\SampleAdaptiveOffset_sse41.cpp">
+      <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\Trafo_sse41.cpp">
+      <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\AnnexBread.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\BinDecoder.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\CABACReader.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\DecCu.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\DecLib.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\DecLibParser.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\DecLibRecon.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\DecSlice.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\HLSyntaxReader.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\NALread.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\SEIread.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\VLCReader.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\Utilities\ThreadPool.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\vvdec\vvdec.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\vvdec\vvdecimpl.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\vvdec\wasm_bindings.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="vvdec\vvdec\source\VisualStudio\common.natvis" />
+    <Natvis Include="vvdec\vvdec\source\VisualStudio\static_vector.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="vvdec\vvdec\include\vvdec\sei.h" />
+    <ClInclude Include="vvdec\vvdec\include\vvdec\vvdec.h" />
+    <ClInclude Include="vvdec\vvdec\include\vvdec\vvdecDecl.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\AdaptiveLoopFilter.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\BitStream.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\Buffer.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\ChromaFormat.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\CodingStructure.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\Common.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\CommonDef.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\ContextModelling.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\Contexts.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\dtrace.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\dtrace_buffer.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\dtrace_codingstruct.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\dtrace_next.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\InterpolationFilter.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\InterPrediction.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\IntraPrediction.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\LoopFilter.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\MatrixIntraPrediction.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\MipData.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\MotionInfo.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\Mv.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\NAL.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\ParameterSetManager.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\PicListManager.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\Picture.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\Quant.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\RdCost.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\Reshape.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\Rom.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\SampleAdaptiveOffset.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\SEI_internal.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\Slice.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\StatCounter.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\TimeProfiler.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\TrQuant.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\TrQuant_EMT.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\TypeDef.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\Unit.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\UnitPartitioner.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\UnitTools.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\WeightPrediction.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\AdaptiveLoopFilterX86.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\BufferX86.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\CommonDefX86.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\FixMissingIntrin.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\InterpolationFilterX86.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\InterPredX86.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\IntraPredX86.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\LoopFilterX86.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\PictureX86.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\QuantX86.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\RdCostX86.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\SampleAdaptiveOffsetX86.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\TrafoX86.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\AnnexBread.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\BinDecoder.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\CABACReader.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\DecCu.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\DecLib.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\DecLibParser.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\DecLibRecon.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\DecSlice.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\HLSyntaxReader.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\NALread.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\SEIread.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\VLCReader.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\libmd5\MD5.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\Utilities\ThreadPool.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\vvdec\resource.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\vvdec\resource_version.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\vvdec\vvdecimpl.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\vvdec\wasm_bindings.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A5B58721-0F63-4410-9598-880EBDA78C53}</ProjectGuid>
+    <RootNamespace>vvdec</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>vvdec</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(SolutionDir)src\platform.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)src\common.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;TARGET_SIMD_X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4100;4127;4244;4245;4389;4456;4457;4458;4459;4505;4701;4702;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>.;./vvdec;./vvdec/vvdec/include;./vvdec/vvdec/source/Lib;./vvdec/vvdec/source/Lib/DecoderLib;./vvdec/vvdec/source/Lib/CommonLib;./vvdec/vvdec/source/Lib/CommonLib/x86;./vvdec/vvdec/source/Lib/libmd5;./vvdec/vvdec/thirdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

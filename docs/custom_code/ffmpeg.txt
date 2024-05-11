@@ -12,6 +12,7 @@
 * libavcodec/vvc/vvcdec.c
 
 * libavcodec/aacsbr_template.c
+* libavcodec/allcodecs.c
 * libavcodec/bsf_list.c
 * libavcodec/codec_list.c
 * libavcodec/d3d12va_hevc.c
@@ -52,3 +53,5 @@ The following files are available only in MPC-BE (compared with ffmpeg):
 * libavcodec/x86/hevc_idct_intrinsic.c
 * libavcodec/x86/hevc_intra_intrinsic.c
 * libavcodec/x86/hevcpred.h
+
+* libavcodec/libvvdec.c

@@ -5,6 +5,7 @@ SOXR_DIR      = ../soxr
 DAV1_DIR      = ../dav1d
 FFNVCODEC_DIR = ../nv-codec-headers/include
 UAVS3D_DIR    = ../uavs3d/source/decoder
+VVDEC_DIR     = ../vvdec/vvdec/include
 
 ifeq ($(64BIT),yes)
 	PLATFORM = x64
@@ -33,7 +34,7 @@ ARSCRIPT           = $(OBJ_DIR)script.ar
 # Compiler and yasm flags
 CFLAGS = -I. -I.. -Icompat/atomics/win32 -Icompat/windows \
 	   -Ilibavcodec \
-	   -I$(ZLIB_DIR) -I$(SPEEX_DIR) -I$(SOXR_DIR) -I$(DAV1_DIR) -I$(FFNVCODEC_DIR) -I$(UAVS3D_DIR) \
+	   -I$(ZLIB_DIR) -I$(SPEEX_DIR) -I$(SOXR_DIR) -I$(DAV1_DIR) -I$(FFNVCODEC_DIR) -I$(UAVS3D_DIR) -I$(VVDEC_DIR) \
 	   -DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
 	   -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DOPJ_STATIC \
 	   -D_WIN32_WINNT=0x0601 -DWINVER=0x0601 \
@@ -344,6 +345,7 @@ SRCS_LC = \
 	libavcodec/libfdk-aacdec.c \
 	libavcodec/libspeexdec.c \
 	libavcodec/libuavs3d.c \
+	libavcodec/libvvdec.c \
 	libavcodec/lossless_audiodsp.c \
 	libavcodec/lossless_videodsp.c \
 	libavcodec/lsp.c \

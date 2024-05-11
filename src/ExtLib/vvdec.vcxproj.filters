@@ -1,0 +1,476 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Natvis Include="vvdec\vvdec\source\VisualStudio\common.natvis">
+      <Filter>Natvis Files</Filter>
+    </Natvis>
+    <Natvis Include="vvdec\vvdec\source\VisualStudio\static_vector.natvis">
+      <Filter>Natvis Files</Filter>
+    </Natvis>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\AdaptiveLoopFilter_avx2.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\AdaptiveLoopFilter_sse41.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\Buffer_avx2.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\Buffer_sse41.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\InterpolationFilter_avx2.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\InterpolationFilter_sse41.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\InterPred_avx2.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\InterPred_sse41.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\IntraPred_avx2.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\IntraPred_sse41.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\LoopFilter_avx2.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\LoopFilter_sse41.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\Picture_avx2.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\Picture_sse41.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\RdCost_avx2.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\RdCost_sse41.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\SampleAdaptiveOffset_avx2.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\SampleAdaptiveOffset_sse41.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\Quant_avx2.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\Quant_sse41.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\BitStream.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\AdaptiveLoopFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\AnnexBread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\BinDecoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\Buffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\CABACReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\ChromaFormat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\CodingStructure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\ContextModelling.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\Contexts.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\DecCu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\DecLib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\DecLibParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\DecLibRecon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\DecSlice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\dtrace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\HLSyntaxReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\InterpolationFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\InterPrediction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\IntraPrediction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\LoopFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\MatrixIntraPrediction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\Picture.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\SampleAdaptiveOffset.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\Trafo_avx2.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\Trafo_sse41.cpp">
+      <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\Mv.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\NALread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\ParameterSetManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\PicListManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\PicYuvMD5.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\Quant.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\RdCost.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\Reshape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\Rom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\RomLFNST.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\RomTr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\SEI_internal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\SEIread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\Slice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\StatCounter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\Utilities\ThreadPool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\TrQuant.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\TrQuant_EMT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\Unit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\UnitPartitioner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\UnitTools.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\VLCReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\vvdec\vvdec.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\vvdec\vvdecimpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\vvdec\wasm_bindings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\WeightPrediction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\CommonDefX86.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\InitX86.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\AdaptiveLoopFilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\AdaptiveLoopFilterX86.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\AnnexBread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\BitStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\Buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\BufferX86.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\CABACReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\ChromaFormat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\CodingStructure.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\CommonDef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\CommonDefX86.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\ContextModelling.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\Contexts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\DecCu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\DecLib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\DecLibParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\BinDecoder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\DecLibRecon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\DecSlice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\dtrace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\dtrace_buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\dtrace_codingstruct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\dtrace_next.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\FixMissingIntrin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\HLSyntaxReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\InterpolationFilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\InterpolationFilterX86.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\InterPrediction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\InterPredX86.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\IntraPrediction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\IntraPredX86.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\LoopFilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\LoopFilterX86.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\MatrixIntraPrediction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\libmd5\MD5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\MipData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\MotionInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\Mv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\NAL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\NALread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\ParameterSetManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\Picture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\PictureX86.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\Quant.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\QuantX86.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\RdCost.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\RdCostX86.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\Reshape.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\vvdec\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\vvdec\resource_version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\Rom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\SampleAdaptiveOffset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\SampleAdaptiveOffsetX86.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\include\vvdec\sei.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\SEI_internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\PicListManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\SEIread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\Slice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\StatCounter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\Utilities\ThreadPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\TimeProfiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\x86\TrafoX86.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\TrQuant.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\TrQuant_EMT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\TypeDef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\Unit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\UnitPartitioner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\UnitTools.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\VLCReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\include\vvdec\vvdec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\include\vvdec\vvdecDecl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\vvdec\vvdecimpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\vvdec\wasm_bindings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\WeightPrediction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Natvis Files">
+      <UniqueIdentifier>{45eebab8-3590-40da-aa92-717709c1a511}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{bc328022-4a03-4ed6-850d-243783b6167a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{dd837523-5dfd-442a-b6c5-8d37acf18035}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\simd">
+      <UniqueIdentifier>{ff125c34-8239-4eb1-84b6-2f0365149a21}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

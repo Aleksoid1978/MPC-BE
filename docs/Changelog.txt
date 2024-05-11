@@ -2,6 +2,11 @@
 
 1.7.1.x dev
 =============================
+MPCVideoDec
+VVC decoding is done using vvdec (https://github.com/fraunhoferhhi/vvdec).
+
+Updated libraries:
+	vvdec git-v2.3.0;
 
 
 1.7.1 - 2024-05-07

@@ -2092,6 +2092,12 @@ redo:
 
 	if (m_CodecId == AV_CODEC_ID_AV1 && (m_bUseDXVA || m_bUseD3D11 || m_bUseD3D11cb || m_bUseD3D12cb || m_bUseNVDEC)) {
 		m_pAVCodec = avcodec_find_decoder_by_name("av1");
+	} else if (m_CodecId == AV_CODEC_ID_VVC) {
+		if (CPUInfo::HaveSSE4()) {
+			m_pAVCodec = avcodec_find_decoder_by_name("libvvdec");
+		} else {
+			m_pAVCodec = avcodec_find_decoder_by_name("vvc");
+		}
 	} else {
 		m_pAVCodec = avcodec_find_decoder(m_CodecId);
 	}
@@ -3135,7 +3141,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 
 	m_rtStartCache = INVALID_TIME;
 
-	m_rtLastStop  = 0;
+	m_rtLastStop = 0;
 
 	if (m_bReorderBFrame) {
 		m_nBFramePos = 0;
@@ -3144,7 +3150,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	}
 
 	if (m_bDecodingStart && m_pAVCtx) {
-		if (m_CodecId == AV_CODEC_ID_H264 || m_CodecId == AV_CODEC_ID_MPEG2VIDEO || m_CodecId == AV_CODEC_ID_VVC) {
+		if (m_CodecId == AV_CODEC_ID_H264 || m_CodecId == AV_CODEC_ID_MPEG2VIDEO) {
 			InitDecoder(&m_pCurrentMediaType);
 		}
 
