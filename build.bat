@@ -102,9 +102,9 @@ IF NOT EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
 SET "PARAMS=-property installationPath -requires Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.ATLMFC Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
 
 IF /I "%COMPILER%" == "VS2019" (
-  SET "PARAMS=%PARAMS% -version [15.0,16.0^)"
+  SET "PARAMS=%PARAMS% -version [,16.0)"
 ) ELSE IF /I "%COMPILER%" == "VS2022" (
-  SET "PARAMS=%PARAMS% -latest -version [,17.0)"
+  SET "PARAMS=%PARAMS% -version [,17.0)"
 ) ELSE (
   SET "PARAMS=%PARAMS% -latest"
 )
