@@ -1,5 +1,5 @@
 @ECHO OFF
-REM (C) 2009-2023 see Authors.txt
+REM (C) 2009-2024 see Authors.txt
 REM
 REM This file is part of MPC-BE.
 REM
@@ -59,7 +59,7 @@ FOR %%A IN (%ARG%) DO (
   IF /I "%%A" == "Resources"  SET "CONFIG=Resources"    & SET /A ARGC+=1  & SET /A ARGD+=1
   IF /I "%%A" == "Debug"      SET "BUILDCFG=Debug"      & SET /A ARGBC+=1 & SET /A ARGD+=1
   IF /I "%%A" == "Release"    SET "BUILDCFG=Release"    & SET /A ARGBC+=1
-  IF /I "%%A" == "VS2017"     SET "COMPILER=VS2017"     & SET /A ARGCOMP+=1
+  IF /I "%%A" == "VS2019"     SET "COMPILER=VS2019"     & SET /A ARGCOMP+=1
   IF /I "%%A" == "VS2022"     SET "COMPILER=VS2022"     & SET /A ARGCOMP+=1
   IF /I "%%A" == "Packages"   SET "PACKAGES=True"       & SET /A ARGPA+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Installer"  SET "INSTALLER=True"      & SET /A ARGIN+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
@@ -101,10 +101,10 @@ IF NOT EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
 
 SET "PARAMS=-property installationPath -requires Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.ATLMFC Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
 
-IF /I "%COMPILER%" == "VS2017" (
+IF /I "%COMPILER%" == "VS2019" (
   SET "PARAMS=%PARAMS% -version [15.0,16.0^)"
 ) ELSE IF /I "%COMPILER%" == "VS2022" (
-  SET "PARAMS=%PARAMS% -latest -prerelease -version [,17.0)"
+  SET "PARAMS=%PARAMS% -latest -version [,17.0)"
 ) ELSE (
   SET "PARAMS=%PARAMS% -latest"
 )
