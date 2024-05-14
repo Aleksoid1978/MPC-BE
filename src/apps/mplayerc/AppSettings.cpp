@@ -2378,7 +2378,6 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 			}
 			else if (sw == L"volume" && next_available) {
 				auto volumeValue = _wtoi(*it++);
-				nCLSwitches |= CLSW_CLIPBOARD;
 				if (volumeValue >= 0 && volumeValue <= 100) {
 					nCmdVolume = volumeValue;
 					nCLSwitches |= CLSW_VOLUME;
