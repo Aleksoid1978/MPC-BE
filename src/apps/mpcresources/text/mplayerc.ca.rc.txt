@@ -383,7 +383,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Reproducció"
 6		"Reproduir"
 7		"Repetir per sempre"
@@ -391,20 +391,20 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 10		"Tornar al inici en acabar"
 11		"Control"
 12		"Volume step:"
-14		"Speed step:"
-16		"Do not reset speed for session"
-18		"Pista per defecta"
-19		"Subtítols"
-21		"Àudio"
-23		"(Exemple: cat eng jap)"
-24		"Opcions d'apertura"
-25		"When opening an audio file,"
-27		"Additionally add to playlist:"
-29		"Ajuda en la construcció del Filter Graph"
-31		"Reportar conectors que no volen funcionar"
-32		"Remember selected tracks in playlist"
-33		"Fast seek (on keyframe)"
-34		"Pause the video playback when minimized"
+15		"Speed step:"
+18		"Do not reset speed for session"
+20		"Pista per defecta"
+21		"Subtítols"
+23		"Àudio"
+25		"(Exemple: cat eng jap)"
+26		"Opcions d'apertura"
+27		"When opening an audio file,"
+29		"Additionally add to playlist:"
+31		"Ajuda en la construcció del Filter Graph"
+33		"Reportar conectors que no volen funcionar"
+34		"Remember selected tracks in playlist"
+35		"Fast seek (on keyframe)"
+36		"Pause the video playback when minimized"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

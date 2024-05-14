@@ -383,7 +383,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Padrão"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Reprodução"
 6		"Reproduzir"
 7		"Repetir sempre"
@@ -391,20 +391,20 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 10		"Retornar ao início quando terminar"
 11		"Controle"
 12		"Passo de volume:"
-14		"Passo de velociadade:"
-16		"Não restaurar velocidade da sessão"
-18		"Preferência de faixa padrão"
-19		"Legendas"
-21		"Áudio"
-23		"(Exemplo: eng jap swe)"
-24		"Configurações de abrir"
-25		"Quando abrir um arq.de áudio,"
-27		"Adicionalmente à lista de reprodução:"
-29		"Usar trabalho encadeado para construir o filtro gráfico"
-31		"Reportar pinos que falham na renderização"
-32		"Lembrar faixas selecionadas na lista de reprodução"
-33		"Busca rápida (no quadro-chave)"
-34		"Pausar reprodução do vídeo quando minimizado"
+15		"Passo de velociadade:"
+18		"Não restaurar velocidade da sessão"
+20		"Preferência de faixa padrão"
+21		"Legendas"
+23		"Áudio"
+25		"(Exemplo: eng jap swe)"
+26		"Configurações de abrir"
+27		"Quando abrir um arq.de áudio,"
+29		"Adicionalmente à lista de reprodução:"
+31		"Usar trabalho encadeado para construir o filtro gráfico"
+33		"Reportar pinos que falham na renderização"
+34		"Lembrar faixas selecionadas na lista de reprodução"
+35		"Busca rápida (no quadro-chave)"
+36		"Pausar reprodução do vídeo quando minimizado"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

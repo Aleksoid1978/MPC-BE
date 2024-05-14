@@ -383,7 +383,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Domyślne"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Odtwarzanie"
 6		"Odtwarzaj"
 7		"Ciągłe"
@@ -391,20 +391,20 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 10		"Przejdź do początku po zakończeniu"
 11		"Kontrola"
 12		"Zmiana głosności co:"
-14		"Zmiana tempa co:"
-16		"Nie resetuj tempa dla sesji"
-18		"Preferowane ścieżki"
-19		"napisy:"
-21		"audio:"
-23		"(Na przykład: eng jap swe)"
-24		"Otwieranie"
-25		"Kiedy otwiera plik audio,"
-27		"Dodatkowo dodaj do listy odtwarzania:"
-29		"Osobny wątek programu do utworzenia grafu filtrów"
-31		"Powiadamiaj o niepołączonych pinach grafu"
-32		"Zapamiętaj wybrane ścieżki na liście odtwarzania"
-33		"Szybkie przewijanie (na klatkę kluczową)"
-34		"Wstrzymaj odtwarzanie po minimalizacji"
+15		"Zmiana tempa co:"
+18		"Nie resetuj tempa dla sesji"
+20		"Preferowane ścieżki"
+21		"napisy:"
+23		"audio:"
+25		"(Na przykład: eng jap swe)"
+26		"Otwieranie"
+27		"Kiedy otwiera plik audio,"
+29		"Dodatkowo dodaj do listy odtwarzania:"
+31		"Osobny wątek programu do utworzenia grafu filtrów"
+33		"Powiadamiaj o niepołączonych pinach grafu"
+34		"Zapamiętaj wybrane ścieżki na liście odtwarzania"
+35		"Szybkie przewijanie (na klatkę kluczową)"
+36		"Wstrzymaj odtwarzanie po minimalizacji"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

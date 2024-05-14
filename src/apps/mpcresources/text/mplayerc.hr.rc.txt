@@ -383,7 +383,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Reprodukcija"
 6		"Pusti"
 7		"Ponavljaj beskonačno"
@@ -391,20 +391,20 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 10		"Premotaj nakon završetka"
 11		"Kontrola"
 12		"Glasnoća korak:"
-14		"Brzina korak:"
-16		"Ne resetiraj brzinu sesije"
-18		"Podrazumijevane postavke zapisa"
-19		"Podnaslovi:"
-21		"Zvuk:"
-23		"(Primjeri: eng jap swe)"
-24		"Postavke otvaranja"
-25		"Kod otvaranja audio datoteke,"
-27		"Uz to, dodaj na playlistu:"
-29		"Koristi radnu dretvu za konstrukciju grafa filtara"
-31		"Izvijesti o pinovima koji se nisu rendali"
-32		"Zapamti izabrane zapise iz playliste"
-33		"Brzo traženje (na keyframu)"
-34		"Zaustavi video pregled pri minimiziranju"
+15		"Brzina korak:"
+18		"Ne resetiraj brzinu sesije"
+20		"Podrazumijevane postavke zapisa"
+21		"Podnaslovi:"
+23		"Zvuk:"
+25		"(Primjeri: eng jap swe)"
+26		"Postavke otvaranja"
+27		"Kod otvaranja audio datoteke,"
+29		"Uz to, dodaj na playlistu:"
+31		"Koristi radnu dretvu za konstrukciju grafa filtara"
+33		"Izvijesti o pinovima koji se nisu rendali"
+34		"Zapamti izabrane zapise iz playliste"
+35		"Brzo traženje (na keyframu)"
+36		"Zaustavi video pregled pri minimiziranju"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

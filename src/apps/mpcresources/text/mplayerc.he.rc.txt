@@ -383,7 +383,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"השמעה"
 6		"נגן"
 7		"חזרה ללא הפסק"
@@ -391,20 +391,20 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 10		"החזר אחורה כאשר ניגון מסתיים"
 11		"Control"
 12		"Volume step:"
-14		"Speed step:"
-16		"Do not reset speed for session"
-18		"תעדוף ברירת מחדל"
-19		"כתוביות:"
-21		"שמע:"
-23		"(דוגמה: eng jap swe)"
-24		"פתח הגדרות"
-25		"When opening an audio file,"
-27		"Additionally add to playlist:"
-29		"השתמש בתהליך נפרד בכדי לבנות את גרף הפילטרים"
-31		"דווח על תקעים שלא מתנגנים"
-32		"Remember selected tracks in playlist"
-33		"Fast seek (on keyframe)"
-34		"Pause the video playback when minimized"
+15		"Speed step:"
+18		"Do not reset speed for session"
+20		"תעדוף ברירת מחדל"
+21		"כתוביות:"
+23		"שמע:"
+25		"(דוגמה: eng jap swe)"
+26		"פתח הגדרות"
+27		"When opening an audio file,"
+29		"Additionally add to playlist:"
+31		"השתמש בתהליך נפרד בכדי לבנות את גרף הפילטרים"
+33		"דווח על תקעים שלא מתנגנים"
+34		"Remember selected tracks in playlist"
+35		"Fast seek (on keyframe)"
+36		"Pause the video playback when minimized"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

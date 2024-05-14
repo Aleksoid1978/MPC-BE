@@ -383,7 +383,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Resetten"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Afspelen"
 6		"Afspelen"
 7		"Steeds herhalen"
@@ -391,20 +391,20 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 10		"Terugspoelen na afspelen"
 11		"Bediening"
 12		"Volumestap:"
-14		"Snelheidsstap:"
-16		"Reset de snelheid niet binnen één sessie"
-18		"Voorkeursspoor in standaard"
-19		"Ondertiteling"
-21		"Audio"
-23		"(Bijv.: nl eng jap )"
-24		"Opties voor openen"
-25		"Wanneer een audio-bestand is geopend,"
-27		"Voeg daarnaast toe aan de afspeellijst:"
-29		"Filtergraph in aparte CPU-thread samenstellen"
-31		"Rapporteer pins die niet renderen"
-32		"Onthoud geselecteerde items in de afspeellijst"
-33		"Snel zoeken (op sleutelframe)"
-34		"Weergave pauseren als het venster geminimaliseerd is"
+15		"Snelheidsstap:"
+18		"Reset de snelheid niet binnen één sessie"
+20		"Voorkeursspoor in standaard"
+21		"Ondertiteling"
+23		"Audio"
+25		"(Bijv.: nl eng jap )"
+26		"Opties voor openen"
+27		"Wanneer een audio-bestand is geopend,"
+29		"Voeg daarnaast toe aan de afspeellijst:"
+31		"Filtergraph in aparte CPU-thread samenstellen"
+33		"Rapporteer pins die niet renderen"
+34		"Onthoud geselecteerde items in de afspeellijst"
+35		"Snel zoeken (op sleutelframe)"
+36		"Weergave pauseren als het venster geminimaliseerd is"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

@@ -383,7 +383,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Par défaut"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Lecture"
 6		"Lire"
 7		"Répéter automatiquement"
@@ -391,20 +391,20 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 10		"Rembobiner à la fin"
 11		"Controle"
 12		"Pas de volume :"
-14		"Pas de vitesse :"
-16		"Ne pas réinitialiser la vitesse pour la session"
-18		"Ordre préféré des pistes"
-19		"Sous-titres"
-21		"Audio"
-23		"(Exemple : fre eng jap)"
-24		"Paramètres d'ouverture"
-25		"Lors de l'ouverture d'un fichier audio,"
-27		"Ajouter à la Playlist :"
-29		"Processus d'aide à la construction des filtres"
-31		"Indiquer les connexions échouées lors du rendu"
-32		"Mémoriser les pistes sélectionnées dans la Playlist"
-33		"Recherche rapide (sur image clé)"
-34		"Mettre en pause la lecture vidéo lorsqu'elle est réduite"
+15		"Pas de vitesse :"
+18		"Ne pas réinitialiser la vitesse pour la session"
+20		"Ordre préféré des pistes"
+21		"Sous-titres"
+23		"Audio"
+25		"(Exemple : fre eng jap)"
+26		"Paramètres d'ouverture"
+27		"Lors de l'ouverture d'un fichier audio,"
+29		"Ajouter à la Playlist :"
+31		"Processus d'aide à la construction des filtres"
+33		"Indiquer les connexions échouées lors du rendu"
+34		"Mémoriser les pistes sélectionnées dans la Playlist"
+35		"Recherche rapide (sur image clé)"
+36		"Mettre en pause la lecture vidéo lorsqu'elle est réduite"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

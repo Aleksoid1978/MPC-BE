@@ -383,7 +383,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Uppspelning"
 6		"Spela"
 7		"Upprepa för evigt"
@@ -391,20 +391,20 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 10		"Spola tillbaka när spelat färdigt"
 11		"Control"
 12		"Volume step:"
-14		"Speed step:"
-16		"Do not reset speed for session"
-18		"Default track preference"
-19		"Subtitles:"
-21		"Audio:"
-23		"(Example: eng jap swe)"
-24		"Öppna inställningar"
-25		"When opening an audio file,"
-27		"Additionally add to playlist:"
-29		"Använd arbets tråd för att bygga filter diagrammet"
-31		"Rapportera stift som misslyckas att rendera"
-32		"Remember selected tracks in playlist"
-33		"Fast seek (on keyframe)"
-34		"Pause the video playback when minimized"
+15		"Speed step:"
+18		"Do not reset speed for session"
+20		"Default track preference"
+21		"Subtitles:"
+23		"Audio:"
+25		"(Example: eng jap swe)"
+26		"Öppna inställningar"
+27		"When opening an audio file,"
+29		"Additionally add to playlist:"
+31		"Använd arbets tråd för att bygga filter diagrammet"
+33		"Rapportera stift som misslyckas att rendera"
+34		"Remember selected tracks in playlist"
+35		"Fast seek (on keyframe)"
+36		"Pause the video playback when minimized"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

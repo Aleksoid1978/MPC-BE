@@ -383,7 +383,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"重設"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"播放"
 6		"播放"
 7		"永遠重複播放"
@@ -391,20 +391,20 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 10		"結束播放時回到開端"
 11		"控制"
 12		"音量步進幅度："
-14		"速度步進幅度："
-16		"同一工作階段內不重設速度"
-18		"預設軌道"
-19		"字幕"
-21		"音訊"
-23		"（範例：eng jap swe）"
-24		"開啟設定"
-25		"開啟音訊檔案時，"
-27		"附加到播放清單︰"
-29		"使用工作執行緒建立篩選器圖 (Filter Graph)"
-31		"回報繪製失敗的 Pin"
-32		"記住播放清單中選定的項目"
-33		"快速搜尋（於關鍵影格）"
-34		"最小化時暫停播放"
+15		"速度步進幅度："
+18		"同一工作階段內不重設速度"
+20		"預設軌道"
+21		"字幕"
+23		"音訊"
+25		"（範例：eng jap swe）"
+26		"開啟設定"
+27		"開啟音訊檔案時，"
+29		"附加到播放清單︰"
+31		"使用工作執行緒建立篩選器圖 (Filter Graph)"
+33		"回報繪製失敗的 Pin"
+34		"記住播放清單中選定的項目"
+35		"快速搜尋（於關鍵影格）"
+36		"最小化時暫停播放"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

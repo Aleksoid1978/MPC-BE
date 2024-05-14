@@ -383,7 +383,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Alapértelmezett"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Lejátszás"
 6		"Lejátszás"
 7		"Végtelenített ismétlés"
@@ -391,20 +391,20 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 10		"Lejátszás után visszatekerés"
 11		"Szabályzás"
 12		"Hangerő léptetés:"
-14		"Sebesség léptetés:"
-16		"Ne állítsa vissza a munkamenet sebességét"
-18		"Alapértelmezett lejátszási preferencia"
-19		"Feliratok:"
-21		"Audió:"
-23		"(Példa: eng jap swe)"
-24		"Megnyitási beállítások"
-25		"Amikor megnyit egy hangfájlt,"
-27		"Hozzáadás a lejátszási listához:"
-29		"Használjon szálat a szűrő gráf felépítéséhez"
-31		"Hibás, nem átalakítható csatlakozók jelentése"
-32		"Emlékezzen a kiválasztott zeneszámokra a lejátszási listában"
-33		"Gyors keresés (kulcspozícióban)"
-34		"Szüneteltesse a videó lejátszását, amikor kis méretben van"
+15		"Sebesség léptetés:"
+18		"Ne állítsa vissza a munkamenet sebességét"
+20		"Alapértelmezett lejátszási preferencia"
+21		"Feliratok:"
+23		"Audió:"
+25		"(Példa: eng jap swe)"
+26		"Megnyitási beállítások"
+27		"Amikor megnyit egy hangfájlt,"
+29		"Hozzáadás a lejátszási listához:"
+31		"Használjon szálat a szűrő gráf felépítéséhez"
+33		"Hibás, nem átalakítható csatlakozók jelentése"
+34		"Emlékezzen a kiválasztott zeneszámokra a lejátszási listában"
+35		"Gyors keresés (kulcspozícióban)"
+36		"Szüneteltesse a videó lejátszását, amikor kis méretben van"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

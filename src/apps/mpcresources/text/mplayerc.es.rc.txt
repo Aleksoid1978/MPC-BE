@@ -383,7 +383,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Predeterminado"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Reproducción"
 6		"Reproducir"
 7		"Repetir siempre"
@@ -391,20 +391,20 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 10		"Volver al inicio al terminar"
 11		"Control"
 12		"Paso de volumen:"
-14		"Paso de velocidad:"
-16		"No restablecer velocidad para la sesión"
-18		"Preferencia de pista predeterminada"
-19		"Subtítulos"
-21		"Audio"
-23		"(Ejemplo: eng jap swe)"
-24		"Opciones de apertura"
-25		"Al abrir un archivo de audio:"
-27		"Agregar a la Lista de Reproducción:"
-29		"Usar proceso funcional para construir cadena de filtros"
-31		"Reportar conectores que no quieran funcionar"
-32		"Recordar pistas seleccionadas en la Lista de Reproducción"
-33		"Búsqueda rápida (en fotograma clave)"
-34		"Pausar la reproducción de video cuando se minimiza"
+15		"Paso de velocidad:"
+18		"No restablecer velocidad para la sesión"
+20		"Preferencia de pista predeterminada"
+21		"Subtítulos"
+23		"Audio"
+25		"(Ejemplo: eng jap swe)"
+26		"Opciones de apertura"
+27		"Al abrir un archivo de audio:"
+29		"Agregar a la Lista de Reproducción:"
+31		"Usar proceso funcional para construir cadena de filtros"
+33		"Reportar conectores que no quieran funcionar"
+34		"Recordar pistas seleccionadas en la Lista de Reproducción"
+35		"Búsqueda rápida (en fotograma clave)"
+36		"Pausar la reproducción de video cuando se minimiza"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

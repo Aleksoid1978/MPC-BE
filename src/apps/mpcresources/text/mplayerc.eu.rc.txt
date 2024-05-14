@@ -383,7 +383,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Irakurketa"
 6		"Irakurri"
 7		"Berregin etengabe"
@@ -391,20 +391,20 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 10		"Atzerabildu irakurketa egindakoan"
 11		"Kontrola"
 12		"Bolumen urratsa:"
-14		"Abiadura urratsa:"
-16		"Do not reset speed for session"
-18		"Berezko bide hobespena"
-19		"Azpidatziak:"
-21		"Audioa:"
-23		"(Azpidatziak: eng jap baq)"
-24		"Ireki ezarpenak"
-25		"Audio agiri bat irekitzerakoan,"
-27		"Additionally add to playlist:"
-29		"Erabili langile hariak iragazki grafika eraikitzeko"
-31		"Jakinarazi aurkezlean huts egiten duten pin-ak"
-32		"Remember selected tracks in playlist"
-33		"Bilaketa azkarra (giltzaframean)"
-34		"Pausatu bideo irakurketa txikiendutakoan"
+15		"Abiadura urratsa:"
+18		"Do not reset speed for session"
+20		"Berezko bide hobespena"
+21		"Azpidatziak:"
+23		"Audioa:"
+25		"(Azpidatziak: eng jap baq)"
+26		"Ireki ezarpenak"
+27		"Audio agiri bat irekitzerakoan,"
+29		"Additionally add to playlist:"
+31		"Erabili langile hariak iragazki grafika eraikitzeko"
+33		"Jakinarazi aurkezlean huts egiten duten pin-ak"
+34		"Remember selected tracks in playlist"
+35		"Bilaketa azkarra (giltzaframean)"
+36		"Pausatu bideo irakurketa txikiendutakoan"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

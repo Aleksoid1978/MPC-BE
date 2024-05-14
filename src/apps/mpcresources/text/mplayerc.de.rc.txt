@@ -383,7 +383,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Zurücksetzen"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Wiedergabe"
 6		"Spiele"
 7		"&Endlosschleife"
@@ -391,20 +391,20 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 10		"Am Ende &zurückspringen"
 11		"Steuerung"
 12		"Lautstärkestufen:"
-14		"Geschwindigkeitsstufen:"
-16		"Geschwindigkeit in einer Sitzung nicht zurücksetzen"
-18		"Bevorzugte Spuren"
-19		"Untertitel:"
-21		"Audio:"
-23		"(Beispiel: eng jap swe)"
-24		"Aktionen beim Öffnen einer Datei"
-25		"Beim Öffnen einer Audiodatei,"
-27		"Zusätzlich zur Wiedergabeliste hinzufügen:"
-29		"Filter-Graph in separatem &Thread erstellen"
-31		"Fehlerhafte Pins im Graph &melden"
-32		"Ausgewählte Titel in der Wiedergabeliste merken"
-33		"Schnellen Suchlauf verwenden (Keyframes)"
-34		"Videowiedergabe pausieren, wenn minimiert"
+15		"Geschwindigkeitsstufen:"
+18		"Geschwindigkeit in einer Sitzung nicht zurücksetzen"
+20		"Bevorzugte Spuren"
+21		"Untertitel:"
+23		"Audio:"
+25		"(Beispiel: eng jap swe)"
+26		"Aktionen beim Öffnen einer Datei"
+27		"Beim Öffnen einer Audiodatei,"
+29		"Zusätzlich zur Wiedergabeliste hinzufügen:"
+31		"Filter-Graph in separatem &Thread erstellen"
+33		"Fehlerhafte Pins im Graph &melden"
+34		"Ausgewählte Titel in der Wiedergabeliste merken"
+35		"Schnellen Suchlauf verwenden (Keyframes)"
+36		"Videowiedergabe pausieren, wenn minimiert"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

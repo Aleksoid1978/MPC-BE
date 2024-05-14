@@ -383,7 +383,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Predefinito"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Riproduzione"
 6		"Riproduci"
 7		"Ripeti per sempre"
@@ -391,20 +391,20 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 10		"Riavvolgi al termine"
 11		"Controllo"
 12		"Passi volume:"
-14		"Passi velocità:"
-16		"Non reimpostare la velocità per la sessione"
-18		"Preferenza traccia predefinita"
-19		"Sottotitoli"
-21		"Audio"
-23		"(Esempio: ita eng)"
-24		"Impostazioni all'apertura"
-25		"Quando si apre un file audio,"
-27		"Aggiungi in più alla playlist:"
-29		"Usa il thread di lavoro per costruire il grafico del filtro"
-31		"Segnala pin che non vengono visualizzati"
-32		"Ricorda brani selezionati nella playlist"
-33		"Ricerca veloce (su keyframe)"
-34		"Metti in pausa la riproduzione video quando è ridotto a icona"
+15		"Passi velocità:"
+18		"Non reimpostare la velocità per la sessione"
+20		"Preferenza traccia predefinita"
+21		"Sottotitoli"
+23		"Audio"
+25		"(Esempio: ita eng)"
+26		"Impostazioni all'apertura"
+27		"Quando si apre un file audio,"
+29		"Aggiungi in più alla playlist:"
+31		"Usa il thread di lavoro per costruire il grafico del filtro"
+33		"Segnala pin che non vengono visualizzati"
+34		"Ricorda brani selezionati nella playlist"
+35		"Ricerca veloce (su keyframe)"
+36		"Metti in pausa la riproduzione video quando è ridotto a icona"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

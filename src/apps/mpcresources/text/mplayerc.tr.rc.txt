@@ -383,7 +383,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Varsayılan"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Oynatma"
 6		"Sadece"
 7		"Sürekli tekrarla"
@@ -391,20 +391,20 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 10		"Oynatma bitince geri sar"
 11		"Kontrol"
 12		"Ses adımı:"
-14		"Hız adımı:"
-16		"Oturum için hızı varsayılan ayarlara getirme"
-18		"Varsayılan parça seçimi"
-19		"Alt yazı:"
-21		"Ses:"
-23		"(Örnek: tur türkçe İngilizce eng jap)"
-24		"Açma ayarları"
-25		"Bir ses dosyası açıldığında"
-27		"Oynatma listesine ekle:"
-29		"Süzgeç grafiği kurulumu için oynatıcı önceliğini kullan"
-31		"Oluşturulamayan bağlantıları rapor et"
-32		"Oynatma listesindeki seçili parçaları hatırla"
-33		"Hızlı arama (ref. karede)"
-34		"Küçültüldüğünde video oynatmayı duraklat"
+15		"Hız adımı:"
+18		"Oturum için hızı varsayılan ayarlara getirme"
+20		"Varsayılan parça seçimi"
+21		"Alt yazı:"
+23		"Ses:"
+25		"(Örnek: tur türkçe İngilizce eng jap)"
+26		"Açma ayarları"
+27		"Bir ses dosyası açıldığında"
+29		"Oynatma listesine ekle:"
+31		"Süzgeç grafiği kurulumu için oynatıcı önceliğini kullan"
+33		"Oluşturulamayan bağlantıları rapor et"
+34		"Oynatma listesindeki seçili parçaları hatırla"
+35		"Hızlı arama (ref. karede)"
+36		"Küçültüldüğünde video oynatmayı duraklat"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

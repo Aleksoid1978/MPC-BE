@@ -383,7 +383,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Implicit"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Redare"
 6		"Redare"
 7		"Repetă la nesfârșit"
@@ -391,20 +391,20 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 10		"Derulează la început la terminarea redării"
 11		"Control"
 12		"Pas de volum:"
-14		"Pas de viteză:"
-16		"Nu reseta viteza pentru sesiune"
-18		"Preferința pentru pistă implicită"
-19		"Subtitrări:"
-21		"Audio:"
-23		"(De exemplu: rum eng jap swe)"
-24		"Setări pentru deschidere"
-25		"Când se deschide un fișier audio,"
-27		"Adaugă în plus, la lista de redare:"
-29		"Folosește un fir de execuţie secundar pentru a construi graficul filtrelor"
-31		"Raportează pinii care eșuează să randeze"
-32		"Ține minte pistele selectate în lista de redare"
-33		"Căutare rapidă (la cadru cheie)"
-34		"Previne redarea videoclipului când este minimizat"
+15		"Pas de viteză:"
+18		"Nu reseta viteza pentru sesiune"
+20		"Preferința pentru pistă implicită"
+21		"Subtitrări:"
+23		"Audio:"
+25		"(De exemplu: rum eng jap swe)"
+26		"Setări pentru deschidere"
+27		"Când se deschide un fișier audio,"
+29		"Adaugă în plus, la lista de redare:"
+31		"Folosește un fir de execuţie secundar pentru a construi graficul filtrelor"
+33		"Raportează pinii care eșuează să randeze"
+34		"Ține minte pistele selectate în lista de redare"
+35		"Căutare rapidă (la cadru cheie)"
+36		"Previne redarea videoclipului când este minimizat"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

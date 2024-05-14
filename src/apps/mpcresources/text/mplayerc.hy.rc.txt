@@ -383,7 +383,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Վերարտադրում"
 6		"Վերարտադրում"
 7		"Անվերջ կրկնել"
@@ -391,20 +391,20 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 10		"Վերափաթաթել վերջում"
 11		"Control"
 12		"Volume step:"
-14		"Speed step:"
-16		"Do not reset speed for session"
-18		"Շավիղի կարգավորումներ"
-19		"Տողագրերի"
-21		"Ձայնի"
-23		"(Օրինակ՝ eng jap swe)"
-24		"Ֆայլերի բացման կարգավորում"
-25		"When opening an audio file,"
-27		"Additionally add to playlist:"
-29		"Ֆիլտրերի շարքի կառուցման հոսք"
-31		"Հաշվետվություն՝ ցուցադրման հոսքերի սխալների համար"
-32		"Remember selected tracks in playlist"
-33		"Fast seek (on keyframe)"
-34		"Pause the video playback when minimized"
+15		"Speed step:"
+18		"Do not reset speed for session"
+20		"Շավիղի կարգավորումներ"
+21		"Տողագրերի"
+23		"Ձայնի"
+25		"(Օրինակ՝ eng jap swe)"
+26		"Ֆայլերի բացման կարգավորում"
+27		"When opening an audio file,"
+29		"Additionally add to playlist:"
+31		"Ֆիլտրերի շարքի կառուցման հոսք"
+33		"Հաշվետվություն՝ ցուցադրման հոսքերի սխալների համար"
+34		"Remember selected tracks in playlist"
+35		"Fast seek (on keyframe)"
+36		"Pause the video playback when minimized"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44

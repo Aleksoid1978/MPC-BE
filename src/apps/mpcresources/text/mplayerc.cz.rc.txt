@@ -383,7 +383,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
+BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Přehrávání"
 6		"Přehrát"
 7		"Opakovat donekonečna"
@@ -391,20 +391,20 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 36
 10		"Po přehrání přetočit"
 11		"Control"
 12		"Volume step:"
-14		"Speed step:"
-16		"Do not reset speed for session"
-18		"Preferované výchozí stopy"
-19		"Titulky:"
-21		"Zvuk:"
-23		"(Příklad: eng jap swe)"
-24		"Otevírání souborů"
-25		"When opening an audio file,"
-27		"Additionally add to playlist:"
-29		"Filtry načítat v samostatném podprocesu"
-31		"Vypisovat podrobné informace o chybějících kodecích"
-32		"Remember selected tracks in playlist"
-33		"Fast seek (on keyframe)"
-34		"Pause the video playback when minimized"
+15		"Speed step:"
+18		"Do not reset speed for session"
+20		"Preferované výchozí stopy"
+21		"Titulky:"
+23		"Zvuk:"
+25		"(Příklad: eng jap swe)"
+26		"Otevírání souborů"
+27		"When opening an audio file,"
+29		"Additionally add to playlist:"
+31		"Filtry načítat v samostatném podprocesu"
+33		"Vypisovat podrobné informace o chybějících kodecích"
+34		"Remember selected tracks in playlist"
+35		"Fast seek (on keyframe)"
+36		"Pause the video playback when minimized"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
