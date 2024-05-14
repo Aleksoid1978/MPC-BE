@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2023 see Authors.txt
+ * (C) 2012-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -178,7 +178,7 @@ pID3TagItem CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size
 			size -= 3;
 		}
 		else {
-			mime = ReadField(gbData, size, encoding);
+			mime = ReadField(gbData, size, ID3v2Encoding::ISO8859);
 		}
 
 		BYTE pict_type = (BYTE)gbData.BitRead(8);
