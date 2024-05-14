@@ -92,12 +92,13 @@ BOOL CPPagePlayback::OnInitDialog()
 	m_nVolumeStep = s.nVolumeStep - 1;
 
 	AddStringData(m_nSpeedStepCtrl, ResStr(IDS_AG_AUTO), 0);
-	AddStringData(m_nSpeedStepCtrl, L"0.05",  5);
-	AddStringData(m_nSpeedStepCtrl, L"0.1",  10);
-	AddStringData(m_nSpeedStepCtrl, L"0.2",  20);
-	AddStringData(m_nSpeedStepCtrl, L"0.25", 25);
-	AddStringData(m_nSpeedStepCtrl, L"0.5",  50);
-	AddStringData(m_nSpeedStepCtrl, L"1.0", 100);
+	AddStringData(m_nSpeedStepCtrl, L"1",     1);
+	AddStringData(m_nSpeedStepCtrl, L"5",     5);
+	AddStringData(m_nSpeedStepCtrl, L"10",   10);
+	AddStringData(m_nSpeedStepCtrl, L"20",   20);
+	AddStringData(m_nSpeedStepCtrl, L"25",   25);
+	AddStringData(m_nSpeedStepCtrl, L"50",   50);
+	AddStringData(m_nSpeedStepCtrl, L"100", 100);
 	SelectByItemData(m_nSpeedStepCtrl, s.nSpeedStep);
 	m_bSpeedNotReset = s.bSpeedNotReset;
 
