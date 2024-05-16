@@ -48,8 +48,8 @@ MPC-BE makes use of the following 3rd party code:
 | fdk-aac           |                     | https://github.com/mstorsjo/fdk-aac/                  |
 | FFmpeg            | GPLv3               | http://ffmpeg.org/                                    |
 | dav1d             | BSD License         | https://code.videolan.org/videolan/dav1d/             |
-| libflac           | GPLv2/BSD License   | https://github.com/glennrp/libpng/                    |
-| libpng            | zlib/libpng License | https://github.com/uclouvain/openjpeg/                |
+| libflac           | GPLv2/BSD License   | https://github.com/xiph/flac                          |
+| libpng            | zlib/libpng License | https://github.com/glennrp/libpng/                    |
 | libspeex          | BSD License         | https://speex.org/                                    |
 | Little CMS        | MIT License         | https://littlecms.com/                                |
 | Logitech SDK      |                     |                                                       |
