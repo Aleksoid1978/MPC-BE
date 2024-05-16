@@ -2094,6 +2094,7 @@ redo:
 		m_pAVCodec = avcodec_find_decoder_by_name("av1");
 	} else if (m_CodecId == AV_CODEC_ID_VVC) {
 		if (CPUInfo::HaveSSE4()) {
+			// VVdeC crashes on older CPUs. need more info...
 			m_pAVCodec = avcodec_find_decoder_by_name("libvvdec");
 		} else {
 			m_pAVCodec = avcodec_find_decoder_by_name("vvc");
