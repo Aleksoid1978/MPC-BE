@@ -7,7 +7,7 @@ MPCVideoDec
 
 Обновлены библиотеки:
 	ffmpeg git-n7.1-dev-716-g0d9591841b;
-	vvdec git-v2.3.0.
+	vvdec git-v2.3.0-5-gffe3010.
 
 
 1.7.1 - 2024-05-07
