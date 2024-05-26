@@ -1263,8 +1263,8 @@ static void derive_mmvd(const VVCLocalContext *lc, MvField *mvf, const Mv *mmvd_
         const RefPicList *rpl = sc->rpl;
         const int poc = lc->fc->ps.ph.poc;
         const int diff[] = {
-            poc - rpl[0].list[mvf->ref_idx[0]],
-            poc - rpl[1].list[mvf->ref_idx[1]]
+            poc - rpl[L0].refs[mvf->ref_idx[L0]].poc,
+            poc - rpl[L1].refs[mvf->ref_idx[L1]].poc
         };
         const int sign = FFSIGN(diff[0]) != FFSIGN(diff[1]);
 
@@ -1275,7 +1275,7 @@ static void derive_mmvd(const VVCLocalContext *lc, MvField *mvf, const Mv *mmvd_
             const int i = FFABS(diff[0]) < FFABS(diff[1]);
             const int o = !i;
             mmvd[i] = *mmvd_offset;
-            if (!rpl[0].isLongTerm[mvf->ref_idx[0]] && !rpl[1].isLongTerm[mvf->ref_idx[1]]) {
+            if (!rpl[L0].refs[mvf->ref_idx[L0]].is_lt && !rpl[L1].refs[mvf->ref_idx[L1]].is_lt) {
                 ff_vvc_mv_scale(&mmvd[o], mmvd_offset, diff[i], diff[o]);
             }
             else {
@@ -1689,25 +1689,25 @@ static void derive_dmvr_bdof_flag(const VVCLocalContext *lc, PredictionUnit *pu)
     const VVCPH *ph             = &fc->ps.ph;
     const VVCSH *sh             = &lc->sc->sh;
     const int poc               = ph->poc;
-    const RefPicList *rpl0      = lc->sc->rpl + L0;
-    const RefPicList *rpl1      = lc->sc->rpl + L1;
-    const int8_t *ref_idx       = pu->mi.ref_idx;
     const MotionInfo *mi        = &pu->mi;
+    const int8_t *ref_idx       = mi->ref_idx;
+    const VVCRefPic *rp0        = &lc->sc->rpl[L0].refs[ref_idx[L0]];
+    const VVCRefPic *rp1        = &lc->sc->rpl[L1].refs[ref_idx[L1]];
     const CodingUnit *cu        = lc->cu;
     const PredWeightTable *w    = pps->r->pps_wp_info_in_ph_flag ? &fc->ps.ph.pwt : &sh->pwt;
 
     pu->bdof_flag = 0;
 
     if (mi->pred_flag == PF_BI &&
-        (poc - rpl0->list[ref_idx[L0]] == rpl1->list[ref_idx[L1]] - poc) &&
-        !rpl0->isLongTerm[ref_idx[L0]] && !rpl1->isLongTerm[ref_idx[L1]] &&
+        (poc - rp0->poc == rp1->poc - poc) &&
+        !rp0->is_lt && !rp1->is_lt &&
         !cu->ciip_flag &&
         !mi->bcw_idx &&
-        !w->weight_flag[L0][LUMA][mi->ref_idx[L0]] && !w->weight_flag[L1][LUMA][mi->ref_idx[L1]] &&
-        !w->weight_flag[L0][CHROMA][mi->ref_idx[L0]] && !w->weight_flag[L1][CHROMA][mi->ref_idx[L1]] &&
+        !w->weight_flag[L0][LUMA][ref_idx[L0]] && !w->weight_flag[L1][LUMA][ref_idx[L1]] &&
+        !w->weight_flag[L0][CHROMA][ref_idx[L0]] && !w->weight_flag[L1][CHROMA][ref_idx[L1]] &&
         cu->cb_width >= 8 && cu->cb_height >= 8 &&
-        (cu->cb_width * cu->cb_height >= 128)) {
-        // fixme: for RprConstraintsActiveFlag
+        (cu->cb_width * cu->cb_height >= 128) &&
+        !rp0->is_scaled && !rp1->is_scaled) {
         if (!ph->r->ph_bdof_disabled_flag &&
             mi->motion_model_idc == MOTION_TRANSLATION &&
             !pu->merge_subblock_flag &&

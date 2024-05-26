@@ -30,6 +30,11 @@ typedef struct FLACDSPContext {
                   int qlevel, int len);
     void (*lpc32)(int32_t *samples, const int coeffs[32], int order,
                   int qlevel, int len);
+    void (*lpc33)(int64_t *samples, const int32_t *residual, const int coeffs[32],
+                  int pred_order, int qlevel, int len);
+    void (*wasted32)(int32_t *decoded, int wasted, int len);
+    void (*wasted33)(int64_t *decoded, const int32_t *residual,
+                     int wasted, int len);
     void (*lpc16_encode)(int32_t *res, const int32_t *smp, int len, int order,
                          const int32_t coefs[32], int shift);
     void (*lpc32_encode)(int32_t *res, const int32_t *smp, int len, int order,

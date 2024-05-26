@@ -40,6 +40,7 @@
 #include "mpeg12data.h"
 #include "mpeg12vlc.h"
 #include "speedhq.h"
+#include "thread.h"
 
 #define MAX_INDEX (64 - 1)
 
@@ -423,6 +424,9 @@ static int speedhq_decode_frame(AVCodecContext *avctx, AVFrame *frame,
         return AVERROR_INVALIDDATA;
     }
 
+    if (avctx->skip_frame >= AVDISCARD_ALL)
+        return avpkt->size;
+
     compute_quant_matrix(s->quant_matrix, 100 - quality);
 
     second_field_offset = AV_RL24(buf + 1);
@@ -433,10 +437,9 @@ static int speedhq_decode_frame(AVCodecContext *avctx, AVFrame *frame,
     avctx->coded_width = FFALIGN(avctx->width, 16);
     avctx->coded_height = FFALIGN(avctx->height, 16);
 
-    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0) {
+    if ((ret = ff_thread_get_buffer(avctx, frame, 0)) < 0) {
         return ret;
     }
-    frame->flags |= AV_FRAME_FLAG_KEY;
 
     if (second_field_offset == 4 || second_field_offset == (buf_size-4)) {
         /*
@@ -649,5 +652,5 @@ const FFCodec ff_speedhq_decoder = {
     .priv_data_size = sizeof(SHQContext),
     .init           = speedhq_decode_init,
     FF_CODEC_DECODE_CB(speedhq_decode_frame),
-    .p.capabilities = AV_CODEC_CAP_DR1,
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS,
 };

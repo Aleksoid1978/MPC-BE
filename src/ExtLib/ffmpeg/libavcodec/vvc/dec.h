@@ -42,10 +42,18 @@
 #define L0                      0
 #define L1                      1
 
+typedef struct VVCRefPic {
+    struct VVCFrame *ref;
+    int poc;
+    int is_lt;                  // is long term reference
+
+    // for RPR
+    int is_scaled;              ///< RprConstraintsActiveFlag
+    int scale[2];               ///< RefPicScale[]
+} VVCRefPic;
+
 typedef struct RefPicList {
-    struct VVCFrame *ref[VVC_MAX_REF_ENTRIES];
-    int list[VVC_MAX_REF_ENTRIES];
-    int isLongTerm[VVC_MAX_REF_ENTRIES];
+    VVCRefPic refs[VVC_MAX_REF_ENTRIES];
     int nb_refs;
 } RefPicList;
 
@@ -53,9 +61,18 @@ typedef struct RefPicListTab {
     RefPicList refPicList[2];
 } RefPicListTab;
 
+typedef struct VVCWindow {
+    int16_t left_offset;
+    int16_t right_offset;
+    int16_t top_offset;
+    int16_t bottom_offset;
+} VVCWindow;
+
 typedef struct VVCFrame {
     struct AVFrame *frame;
 
+    const VVCSPS *sps;                          ///< RefStruct reference
+    const VVCPPS *pps;                          ///< RefStruct reference
     struct MvField *tab_dmvr_mvf;               ///< RefStruct reference
     RefPicListTab **rpl_tab;                    ///< RefStruct reference
     RefPicListTab  *rpl;                        ///< RefStruct reference
@@ -64,6 +81,12 @@ typedef struct VVCFrame {
     int ctb_count;
 
     int poc;
+
+    //for RPR
+    VVCWindow scaling_win;                      ///< pps_scaling_win_left_offset * SubWithC,  pps_scaling_win_right_offset  * SubWithC,
+                                                ///< pps_scaling_win_top_offset  * SubHeigtC, pps_scaling_win_bottom_offset * SubHiehgtC
+    int ref_width;                              ///< CurrPicScalWinWidthL
+    int ref_height;                             ///< CurrPicScalWinHeightL
 
     struct VVCFrame *collocated_ref;
 

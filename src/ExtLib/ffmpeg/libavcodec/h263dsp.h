@@ -29,6 +29,7 @@ typedef struct H263DSPContext {
 } H263DSPContext;
 
 void ff_h263dsp_init(H263DSPContext *ctx);
+void ff_h263dsp_init_riscv(H263DSPContext *ctx);
 void ff_h263dsp_init_x86(H263DSPContext *ctx);
 void ff_h263dsp_init_mips(H263DSPContext *ctx);
 

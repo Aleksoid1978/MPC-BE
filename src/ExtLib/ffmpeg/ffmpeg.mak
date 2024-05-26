@@ -901,7 +901,9 @@ SRCS_YASM_LC = \
 	\
 	libavcodec/x86/h26x/h2656_inter.asm \
 	\
-	libavcodec/x86/vvc/vvc_mc.asm
+	libavcodec/x86/vvc/vvc_alf.asm \
+	libavcodec/x86/vvc/vvc_mc.asm \
+	libavcodec/x86/vvc/vvc_sad.asm
 
 SRCS_YASM_LF = 
 
