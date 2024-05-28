@@ -98,7 +98,8 @@ private:
 
 	int										m_nARX, m_nARY;
 
-	REFERENCE_TIME							m_rtLastStop;			// rtStop  for last delivered frame
+	REFERENCE_TIME							m_rtLastStart;			// rtStart for last delivered frame
+	REFERENCE_TIME							m_rtLastStop;			// rtStop for last delivered frame
 	double									m_dRate;
 
 	bool									m_bUseFFmpeg;

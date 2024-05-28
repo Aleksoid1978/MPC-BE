@@ -1071,6 +1071,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_DXVADecoderGUID(GUID_NULL)
 	, m_nActiveCodecs(CODECS_ALL & ~CODEC_H264_MVC)
 	, m_rtAvrTimePerFrame(0)
+	, m_rtLastStart(INVALID_TIME)
 	, m_rtLastStop(0)
 	, m_rtStartCache(INVALID_TIME)
 	, m_bDXVACompatible(true)
@@ -1315,7 +1316,8 @@ REFERENCE_TIME CMPCVideoDecFilter::GetFrameDuration()
 
 void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
 {
-	if (rtStart == INVALID_TIME) {
+	auto rtStartInput = rtStart;
+	if (rtStart == INVALID_TIME || (m_CodecId == AV_CODEC_ID_H264 && rtStart == m_rtLastStart)) {
 		rtStart = m_rtLastStop;
 		rtStop = INVALID_TIME;
 	}
@@ -1328,6 +1330,7 @@ void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME
 		rtStop = rtStart + (frame_duration / m_dRate);
 	}
 
+	m_rtLastStart = rtStartInput;
 	m_rtLastStop = rtStop;
 }
 
@@ -2465,7 +2468,7 @@ redo:
 			}
 
 			if (m_CodecId == AV_CODEC_ID_H264) {
-				// check "Disable DXVA for SD (H.264)" option 
+				// check "Disable DXVA for SD (H.264)" option
 				if (m_nDXVA_SD && std::max(m_nSurfaceWidth, m_nSurfaceHeight) <= 1024 && std::min(m_nSurfaceWidth, m_nSurfaceHeight) <= 576) {
 					break;
 				}
@@ -3143,6 +3146,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 
 	m_rtStartCache = INVALID_TIME;
 
+	m_rtLastStart = INVALID_TIME;
 	m_rtLastStop = 0;
 
 	if (m_bReorderBFrame) {
