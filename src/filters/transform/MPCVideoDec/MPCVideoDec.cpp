@@ -1358,9 +1358,9 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 	CComPtr<IMediaSideData> pMediaSideData;
 	if (SUCCEEDED(pSample->QueryInterface(&pMediaSideData))) {
 		HRESULT hr = E_FAIL;
-		if (AVFrameSideData* sd = av_frame_get_side_data(pFrame, AV_FRAME_DATA_MASTERING_DISPLAY_METADATA)) {
+		if (auto sd = av_frame_get_side_data(pFrame, AV_FRAME_DATA_MASTERING_DISPLAY_METADATA)) {
 			if (sd->size == sizeof(AVMasteringDisplayMetadata)) {
-				AVMasteringDisplayMetadata* metadata = (AVMasteringDisplayMetadata*)sd->data;
+				auto metadata = reinterpret_cast<AVMasteringDisplayMetadata*>(sd->data);
 				MediaSideDataHDR hdr = { 0 };
 
 				if (metadata->has_primaries) {
@@ -1381,12 +1381,18 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 					hdr.min_display_mastering_luminance = av_q2d(metadata->min_luminance);
 				}
 
-				hr = pMediaSideData->SetSideData(IID_MediaSideDataHDR, (const BYTE*)&hdr, sizeof(hdr));
+				if (metadata->has_primaries || metadata->has_luminance) {
+					hr = pMediaSideData->SetSideData(IID_MediaSideDataHDR,
+													 reinterpret_cast<const BYTE*>(&hdr),
+													 sizeof(hdr));
+				}
 			} else {
 				DLog(L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR data of an unexpected size (%zu)", sd->size);
 			}
 		} else if (m_FilterInfo.masterDataHDR) {
-			hr = pMediaSideData->SetSideData(IID_MediaSideDataHDR, (const BYTE*)m_FilterInfo.masterDataHDR, sizeof(MediaSideDataHDR));
+			hr = pMediaSideData->SetSideData(IID_MediaSideDataHDR,
+											 reinterpret_cast<const BYTE*>(m_FilterInfo.masterDataHDR),
+											 sizeof(MediaSideDataHDR));
 			SAFE_DELETE(m_FilterInfo.masterDataHDR);
 		}
 
@@ -1397,7 +1403,9 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 				DLog(L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR Light Level data of an unexpected size (%zu)", sd->size);
 			}
 		} else if (m_FilterInfo.HDRContentLightLevel) {
-			hr = pMediaSideData->SetSideData(IID_MediaSideDataHDRContentLightLevel, (const BYTE*)m_FilterInfo.HDRContentLightLevel, sizeof(MediaSideDataHDRContentLightLevel));
+			hr = pMediaSideData->SetSideData(IID_MediaSideDataHDRContentLightLevel,
+											 reinterpret_cast<const BYTE*>(m_FilterInfo.HDRContentLightLevel),
+											 sizeof(MediaSideDataHDRContentLightLevel));
 			SAFE_DELETE(m_FilterInfo.HDRContentLightLevel);
 		}
 
@@ -1497,7 +1505,9 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 #undef RPU_MAP
 #undef RPU_COLOR
 
-			hr = pMediaSideData->SetSideData(IID_MediaSideDataDOVIMetadata, (const BYTE*)&hdr, sizeof(hdr));
+			hr = pMediaSideData->SetSideData(IID_MediaSideDataDOVIMetadata,
+											 reinterpret_cast<const BYTE*>(&hdr),
+											 sizeof(hdr));
 		}
 
 		return (hr == S_OK);
