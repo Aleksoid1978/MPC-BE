@@ -1574,7 +1574,9 @@ namespace Youtube
 		}
 
 		pOFD->fi = final_media_url;
-		pOFD->auds.emplace_back(final_audio_url);
+		if (final_audio_url.GetLength()) {
+			pOFD->auds.emplace_back(final_audio_url);
+		}
 
 		return pOFD->fi.Valid();
 	}
