@@ -266,11 +266,11 @@ BEGIN
     COMBOBOX        IDC_COMBO1,10,91,109,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Suchleiste",IDC_STATIC,10,108,100,8
     COMBOBOX        IDC_COMBO2,10,119,109,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Speicherort der Einstellungen",IDC_STATIC,5,140,115,55
-    CONTROL         "Windows-Registry",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | BS_TOP | WS_GROUP,10,153,106,10
-    CONTROL         "Benutzerprofil",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,166,106,10
-    CONTROL         "Programm-Ordner",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,180,106,10
-    GROUPBOX        "Chronik und Position",IDC_STATIC,124,5,167,133,WS_GROUP
+    GROUPBOX        "Speicherort der Einstellungen",IDC_STATIC,5,136,115,55
+    CONTROL         "Windows-Registry",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | BS_TOP | WS_GROUP,10,149,106,10
+    CONTROL         "Benutzerprofil",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,162,106,10
+    CONTROL         "Programm-Ordner",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,176,106,10
+    GROUPBOX        "Chronik und Position",IDC_STATIC,124,5,167,128,WS_GROUP
     CONTROL         "&Chronik anlegen",IDC_CHECK1,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,17,156,9
     LTEXT           "Maximale Anzahl an Einträgen:",IDC_STATIC,129,31,110,8
@@ -286,17 +286,21 @@ BEGIN
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,129,108,158,1
     CONTROL         "Titel für URL in 'Neueste Chronik' anzeigen",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,129,112,156,17
-    GROUPBOX        "Weitere Einstellungen",IDC_STATIC,124,140,167,101,WS_GROUP
-    CONTROL         "&Taskleistensymbol anzeigen",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,152,156,9
-    CONTROL         "OSD anzeigen (Neustart notwendig)",IDC_SHOW_OSD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,164,156,9
-    CONTROL         "Dateiname (bzw. Titel)",IDC_CHECK14,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,138,176,148,9
-    CONTROL         "Verstrichene/Verbleibende Zeit / Gesamtzeit",IDC_CHECK15,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,138,188,148,9
-    CONTROL         "Disc-Wiedergabe deaktivieren",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,201,156,9
-    CONTROL         "&Prozesspriorität höher als normal",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,213,156,9
-    LTEXT           "Netzwerk-Zeitüberschreitung:",IDC_STATIC,129,227,96,8
-    EDITTEXT        IDC_EDIT2,230,225,29,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,248,225,11,13
-    LTEXT           "Sek.",IDC_STATIC,263,227,26,8
+    GROUPBOX        "Weitere Einstellungen",IDC_STATIC,124,136,167,117,WS_GROUP
+    CONTROL         "&Taskleistensymbol anzeigen",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,148,156,9
+    CONTROL         "OSD anzeigen (Neustart notwendig)",IDC_SHOW_OSD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,160,156,9
+    CONTROL         "Dateiname (bzw. Titel)",IDC_CHECK14,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,138,172,148,9
+    CONTROL         "Verstrichene/Verbleibende Zeit / Gesamtzeit",IDC_CHECK15,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,138,184,148,9
+    CONTROL         "Disc-Wiedergabe deaktivieren",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,197,156,9
+    CONTROL         "&Prozesspriorität höher als normal",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,209,156,9
+    LTEXT           "Netzwerk-Zeitüberschreitung:",IDC_STATIC,129,223,96,8
+    EDITTEXT        IDC_EDIT2,230,221,29,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,248,221,11,13
+    LTEXT           "Sek.",IDC_STATIC,263,223,26,8
+    LTEXT           "Receiving data (TODO):",IDC_STATIC4,129,239,96,8
+    EDITTEXT        IDC_EDIT4,230,237,29,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SPIN4,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,248,237,12,13
+    LTEXT           "sec.",IDC_STATIC5,263,239,26,8
 END
 
 IDD_PPAGEDVD DIALOGEX 0, 0, 296, 264

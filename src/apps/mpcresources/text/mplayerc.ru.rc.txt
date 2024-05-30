@@ -407,7 +407,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Приостанавливать воспроизведение видео при сворачивании окна"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 48
 5		"Открывать файлы, используя"
 6		"всегда один процесс"
 7		"один и тот же процесс для каждого файла"
@@ -436,6 +436,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 39		"Повышенный приоритет процесса"
 40		"Тайм-аут соединения:"
 43		"сек."
+44		"Receiving data (TODO):"
+47		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37

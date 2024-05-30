@@ -255,6 +255,7 @@
 #define IDS_RS_PANSCANZOOM					L"PanScanZoom"
 #define IDS_RS_BUFFERDURATION				L"BufferDuration"
 #define IDS_RS_NETWORKTIMEOUT				L"NetworkTimeout"
+#define IDS_RS_NETRECEIVETIMEOUT			L"NetworkReceiveTimeout"
 #define IDS_RS_SUBDELAYINTERVAL				L"SubDelayInterval"
 #define IDS_RS_LOGOFILE						L"LogoFile"
 #define IDS_RS_AUDIOWINDOWMODE				L"AudioWindowMode"

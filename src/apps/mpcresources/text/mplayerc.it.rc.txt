@@ -407,7 +407,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Metti in pausa la riproduzione video quando è ridotto a icona"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 48
 5		"Opzioni di apertura"
 6		"Forza un unico processo"
 7		"Usa la stessa procedura per ogni file"
@@ -436,6 +436,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 39		"Priorità del processo superiore al normale"
 40		"Timeout rete:"
 43		"sec."
+44		"Receiving data (TODO):"
+47		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37

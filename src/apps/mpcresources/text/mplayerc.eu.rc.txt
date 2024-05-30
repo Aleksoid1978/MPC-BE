@@ -407,7 +407,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Pausatu bideo irakurketa txikiendutakoan"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 48
 5		"Ireki aukerak"
 6		"Behartu prozesu bakarra"
 7		"Erabili prozesu berdina agiri guztientzat"
@@ -436,6 +436,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 39		"Ekinbide lehentasuna arruntetik gora"
 40		"Network timeout:"
 43		"sec."
+44		"Receiving data (TODO):"
+47		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37

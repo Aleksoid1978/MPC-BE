@@ -407,7 +407,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Pause the video playback when minimized"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 48
 5		"Open options"
 6		"Force a single process"
 7		"Use same process for every file"
@@ -436,6 +436,8 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 44
 39		"Process priority above normal"
 40		"Network timeout:"
 43		"sec."
+44		"Receiving data (TODO):"
+47		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37

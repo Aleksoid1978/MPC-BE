@@ -104,6 +104,10 @@ constexpr auto CLSW_UNRECOGNIZEDSWITCH = (CLSW_DEVICE << 1);
 #define APP_NETTIMEOUT_DEF		10
 #define APP_NETTIMEOUT_MAX		60
 
+#define APP_NETRECEIVETIMEOUT_MIN	 2
+#define APP_NETRECEIVETIMEOUT_DEF	10
+#define APP_NETRECEIVETIMEOUT_MAX	10
+
 #define APP_AUDIOLEVEL_MAX		 10.0
 #define APP_AUDIOLEVEL_MIN		-10.0
 #define APP_AUDIOGAIN_MAX		 10.0
@@ -667,6 +671,7 @@ public:
 	bool			AudioFilters[ADEC_COUNT];
 	int				iBufferDuration;
 	int				iNetworkTimeout;
+	int				iNetworkReceiveTimeout;
 
 	// Audio Switcher
 	bool			bAudioMixer;
