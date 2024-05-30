@@ -394,6 +394,17 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					mts.push_back(mt);
 
+					if (mt.subtype == MEDIASUBTYPE_HM10) {
+						std::vector<BYTE> pData;
+						if (ReadFirtsBlock(pData, pTE.get())) {
+							CBaseSplitterFileEx::hevchdr h;
+							CMediaType mt2;
+							if (m_pFile->CBaseSplitterFileEx::Read(h, pData, &mt2)) {
+								mts.insert(mts.cbegin(), mt2);
+							}
+						}
+					}
+
 					if (mt.subtype == MEDIASUBTYPE_H264 || mt.subtype == MEDIASUBTYPE_h264) {
 						m_dtsonly = (pTE->CodecPrivate.empty() || pTE->CodecPrivate.data()[0] != 1);
 					}
