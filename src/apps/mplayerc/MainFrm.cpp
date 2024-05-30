@@ -6054,21 +6054,29 @@ void CMainFrame::OnFileSaveAs()
 	CString ffmpegpath;
 
 	if (m_youtubeFields.fname.GetLength()) {
-		saveItems.emplace_back('v', in, GetAltFileName(), "");
-
-		const auto pFileData = dynamic_cast<OpenFileData*>(m_lastOMD.get());
-		if (pFileData) {
-			if (pFileData->auds.size()) {
+		if (m_bAudioOnly) {
+			saveItems.emplace_back('a', in, GetAltFileName(), "");
+			if (m_youtubeFields.thumbnailUrl.GetLength() && EndsWithNoCase(m_youtubeFields.thumbnailUrl, L".jpg")) {
+				saveItems.emplace_back('t', m_youtubeFields.thumbnailUrl, L".jpg", "");
 				ffmpegpath = GetFullExePath(s.strFFmpegExePath, true);
-
-				for (const auto& aud : pFileData->auds) {
-					saveItems.emplace_back('a', aud.GetPath(), aud.GetTitle(), "");
-				}
 			}
+		}
+		else {
+			saveItems.emplace_back('v', in, GetAltFileName(), "");
 
-			for (const auto& sub : pFileData->subs) {
-				if (sub.GetPath().Find(L"fmt=vtt") > 0) {
-					saveItems.emplace_back('s', sub.GetPath(), sub.GetTitle(), sub.GetLang());
+			const auto pFileData = dynamic_cast<OpenFileData*>(m_lastOMD.get());
+			if (pFileData) {
+				if (pFileData->auds.size()) {
+					for (const auto& aud : pFileData->auds) {
+						saveItems.emplace_back('a', aud.GetPath(), aud.GetTitle(), "");
+					}
+					ffmpegpath = GetFullExePath(s.strFFmpegExePath, true);
+				}
+
+				for (const auto& sub : pFileData->subs) {
+					if (sub.GetPath().Find(L"fmt=vtt") > 0) {
+						saveItems.emplace_back('s', sub.GetPath(), sub.GetTitle(), sub.GetLang());
+					}
 				}
 			}
 		}

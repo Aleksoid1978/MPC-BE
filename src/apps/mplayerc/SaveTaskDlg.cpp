@@ -71,11 +71,16 @@ CSaveTaskDlg::CSaveTaskDlg(const std::list<SaveItem_t>& saveItems, const CString
 		case 'a':
 			m_dstPaths[i] = RenameFileExt(dstPath, (finalext == L".mp4") ? L".audio.m4a" : L".audio.mka");
 			break;
-		case 's':
+		case 's': {
 			CStringW subext = L"." + item.title + L".vtt";
 			FixFilename(subext);
 			m_dstPaths[i] = RenameFileExt(dstPath, subext);
 			break;
+		}
+		case 't': {
+			GetTemporaryFilePath(item.title, m_dstPaths[i]);
+			break;
+		}
 		}
 	}
 
@@ -385,10 +390,11 @@ void CSaveTaskDlg::SaveHTTP(const int iSubLangDefault)
 		const CStringW finalext = finalfile.GetExtension().Mid(1).MakeLower();
 		const CStringW tmpfile  = finalfile + L".tmp";
 
+		CStringW strArgs = L"-y";
 		CStringW mapping;
 		CStringW metadata;
 		unsigned isub = 0;
-		CStringW strArgs = L"-y";
+
 		for (unsigned i = 0; i < m_saveItems.size(); ++i) {
 			const auto& item = m_saveItems[i];
 
@@ -416,10 +422,13 @@ void CSaveTaskDlg::SaveHTTP(const int iSubLangDefault)
 		if (iSubLangDefault >= 0) {
 			strArgs.AppendFormat(L" -disposition:s:%d default", iSubLangDefault);
 		}
-		if (finalext == L"mp4") {
+		if (m_saveItems.back().type == 't') {
+			strArgs.Append(L" -disposition:v:0 attached_pic");
+		}
+		if (finalext == L"mp4" || finalext == L"m4a") {
 			strArgs.Append(L" -movflags +faststart");
 		}
-		strArgs.AppendFormat(LR"( -f %s "%s")", finalext, tmpfile);
+		strArgs.AppendFormat(LR"( -f %s "%s")", (finalext == L"m4a") ? L"mp4" : finalext, tmpfile);
 
 		SHELLEXECUTEINFOW execinfo = { sizeof(execinfo) };
 		execinfo.lpFile = m_ffmpegPath.GetString();
