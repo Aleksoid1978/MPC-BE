@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -393,17 +393,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mt.SetSampleSize(pvih->bmiHeader.biSizeImage); // fix frame size
 
 					mts.push_back(mt);
-
-					if (mt.subtype == MEDIASUBTYPE_HM10) {
-						std::vector<BYTE> pData;
-						if (ReadFirtsBlock(pData, pTE.get())) {
-							CBaseSplitterFileEx::hevchdr h;
-							CMediaType mt2;
-							if (m_pFile->CBaseSplitterFileEx::Read(h, pData, &mt2)) {
-								mts.insert(mts.cbegin(), mt2);
-							}
-						}
-					}
 
 					if (mt.subtype == MEDIASUBTYPE_H264 || mt.subtype == MEDIASUBTYPE_h264) {
 						m_dtsonly = (pTE->CodecPrivate.empty() || pTE->CodecPrivate.data()[0] != 1);
