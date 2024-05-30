@@ -492,7 +492,7 @@ HRESULT CSaveTaskDlg::DownloadHTTP(CStringW url, const CStringW filepath)
 
 	while (!m_bAbort) {
 		DWORD dwSizeRead = 0;
-		hr = httpAsync.Read(pBuffer.data(), bufLen, dwSizeRead);
+		hr = httpAsync.Read(pBuffer.data(), bufLen, dwSizeRead, http::readTimeout);
 		if (hr != S_OK) {
 			break;
 		}

@@ -1018,6 +1018,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration, APP_BUFDURATION_MIN, APP_BUFDURATION_MAX);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_NETWORKTIMEOUT, iNetworkTimeout, APP_NETTIMEOUT_MIN, APP_NETTIMEOUT_MAX);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_NETRECEIVETIMEOUT, iNetworkReceiveTimeout, APP_NETRECEIVETIMEOUT_MIN, APP_NETRECEIVETIMEOUT_MAX);
+	http::connectTimeout = iNetworkTimeout * 1000;
+	http::readTimeout = iNetworkReceiveTimeout * 1000;
 
 	// Audio
 	profile.ReadInt(IDS_R_AUDIO, IDS_RS_VOLUME, nVolume, 0, 100);
@@ -1728,6 +1730,8 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_NETWORKTIMEOUT, iNetworkTimeout);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_NETRECEIVETIMEOUT, iNetworkReceiveTimeout);
+	http::connectTimeout = iNetworkTimeout * 1000;
+	http::readTimeout = iNetworkReceiveTimeout * 1000;
 
 	// Prevent Minimize when in Fullscreen mode on non default monitor
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_PREVENT_MINIMIZE, fPreventMinimize);

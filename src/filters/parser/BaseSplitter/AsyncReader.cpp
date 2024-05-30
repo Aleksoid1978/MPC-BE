@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -61,7 +61,7 @@ BOOL CAsyncFileReader::Open(LPCWSTR lpszFileName)
 		CUrlParser urlParser;
 		if (m_bSupportURL
 				&& urlParser.Parse(lpszFileName)
-				&& m_HTTPAsync.Connect(lpszFileName, 10000) == S_OK) {
+				&& m_HTTPAsync.Connect(lpszFileName, http::connectTimeout) == S_OK) {
 			const UINT64 ContentLength = m_HTTPAsync.GetLenght();
 			if (ContentLength == 0) {
 				return FALSE;
@@ -112,7 +112,7 @@ STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE*
 					const DWORD lenght = llPosition - m_pos;
 
 					DWORD dwSizeRead = 0;
-					HRESULT hr = m_HTTPAsync.Read(pBufferTmp.data(), lenght, dwSizeRead);
+					HRESULT hr = m_HTTPAsync.Read(pBufferTmp.data(), lenght, dwSizeRead, http::readTimeout);
 					if (hr != S_OK || dwSizeRead != lenght) {
 						if (RetryOnError()) {
 							continue;
@@ -133,7 +133,7 @@ STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE*
 			}
 
 			DWORD dwSizeRead = 0;
-			HRESULT hr = m_HTTPAsync.Read(pBuffer, lLength, dwSizeRead);
+			HRESULT hr = m_HTTPAsync.Read(pBuffer, lLength, dwSizeRead, http::readTimeout);
 			if (hr != S_OK || dwSizeRead != lLength) {
 				if (RetryOnError()) {
 					continue;

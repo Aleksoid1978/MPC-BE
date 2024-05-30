@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2023 see Authors.txt
+ * (C) 2016-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,6 +27,8 @@
 
 namespace http {
 	inline CStringW userAgent = L"Mozilla/5.0";
+	inline DWORD connectTimeout = 10000;
+	inline DWORD readTimeout = 10000;
 }
 
 class CHTTPAsync

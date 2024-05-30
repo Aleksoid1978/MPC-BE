@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -747,7 +747,7 @@ bool CWebTextFile::Open(LPCWSTR lpszFileName)
 	}
 
 	CHTTPAsync HTTPAsync;
-	if (SUCCEEDED(HTTPAsync.Connect(lpszFileName, 5000))) {
+	if (SUCCEEDED(HTTPAsync.Connect(lpszFileName, http::connectTimeout))) {
 		if (GetTemporaryFilePath(L".tmp", fn)) {
 			CFile temp;
 			if (!temp.Open(fn, modeCreate | modeWrite | typeBinary | shareDenyWrite)) {
@@ -768,7 +768,7 @@ bool CWebTextFile::Open(LPCWSTR lpszFileName)
 				DWORD dwSizeRead = 0;
 				DWORD totalSize = 0;
 				do {
-					if (HTTPAsync.Read(buffer, 1024, dwSizeRead) != S_OK) {
+					if (HTTPAsync.Read(buffer, 1024, dwSizeRead, http::readTimeout) != S_OK) {
 						break;
 					}
 					temp.Write(buffer, dwSizeRead);

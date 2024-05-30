@@ -126,7 +126,7 @@ namespace Content {
 
 					content.raw.resize(nMinSize);
 					DWORD dwSizeRead = 0;
-					if (content.HTTPAsync->Read(content.raw.data(), nMinSize, dwSizeRead) == S_OK) {
+					if (content.HTTPAsync->Read(content.raw.data(), nMinSize, dwSizeRead, AfxGetAppSettings().iNetworkReceiveTimeout * 1000) == S_OK) {
 						content.raw.resize(dwSizeRead);
 						if (dwSizeRead) {
 							Encoding(content);
@@ -176,7 +176,7 @@ namespace Content {
 						nMaxSize -= old_size;
 						content.raw.resize(old_size + nMaxSize);
 						DWORD dwSizeRead = 0;
-						if (content.HTTPAsync->Read(content.raw.data() + old_size, nMaxSize, dwSizeRead) == S_OK) {
+						if (content.HTTPAsync->Read(content.raw.data() + old_size, nMaxSize, dwSizeRead, AfxGetAppSettings().iNetworkReceiveTimeout * 1000) == S_OK) {
 							content.raw.resize(old_size + dwSizeRead);
 							if (dwSizeRead) {
 								Encoding(content);

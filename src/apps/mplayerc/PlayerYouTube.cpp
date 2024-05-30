@@ -200,21 +200,21 @@ namespace Youtube
 		pData.clear();
 
 		CHTTPAsync HTTPAsync;
-		if (FAILED(HTTPAsync.Connect(url, 10000, header))) {
+		if (FAILED(HTTPAsync.Connect(url, http::connectTimeout, header))) {
 			return false;
 		}
 		const auto contentLength = HTTPAsync.GetLenght();
 		if (contentLength) {
 			pData.resize(contentLength);
 			DWORD dwSizeRead = 0;
-			if (S_OK != HTTPAsync.Read((PBYTE)pData.data(), contentLength, dwSizeRead) || dwSizeRead != contentLength) {
+			if (S_OK != HTTPAsync.Read((PBYTE)pData.data(), contentLength, dwSizeRead, http::readTimeout) || dwSizeRead != contentLength) {
 				pData.clear();
 			}
 		} else {
 			static std::vector<char> tmp(16 * KILOBYTE);
 			for (;;) {
 				DWORD dwSizeRead = 0;
-				if (S_OK != HTTPAsync.Read((PBYTE)tmp.data(), tmp.size(), dwSizeRead)) {
+				if (S_OK != HTTPAsync.Read((PBYTE)tmp.data(), tmp.size(), dwSizeRead, http::readTimeout)) {
 					break;
 				}
 
@@ -546,7 +546,7 @@ namespace Youtube
 
 			const auto& url = final_item->url;
 			CHTTPAsync HTTPAsync;
-			if (FAILED(HTTPAsync.Connect(url, 10000))) {
+			if (FAILED(HTTPAsync.Connect(url, http::connectTimeout))) {
 				DLog(L"Youtube::Parse_URL() : failed to connect \"%s\", skip", url.GetString());
 				auto it = std::find_if(youtubeUrllist.cbegin(), youtubeUrllist.cend(),
 					[&url](const YoutubeUrllistItem& item) { return item.url == url; });
@@ -598,7 +598,7 @@ namespace Youtube
 
 			const auto& url = final_item->url;
 			CHTTPAsync HTTPAsync;
-			if (FAILED(HTTPAsync.Connect(url, 10000))) {
+			if (FAILED(HTTPAsync.Connect(url, http::connectTimeout))) {
 				DLog(L"Youtube::Parse_URL() : failed to connect \"%s\", skip", url.GetString());
 				auto it = std::find_if(youtubeAudioUrllist.cbegin(), youtubeAudioUrllist.cend(),
 					[&url](const YoutubeUrllistItem& item) { return item.url == url; });

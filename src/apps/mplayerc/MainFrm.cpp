@@ -19623,19 +19623,19 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 
 			if (!bLoadRes && !m_youtubeFields.thumbnailUrl.IsEmpty()) {
 				CHTTPAsync HTTPAsync;
-				if (SUCCEEDED(HTTPAsync.Connect(m_youtubeFields.thumbnailUrl.GetString(), 10000))) {
+				if (SUCCEEDED(HTTPAsync.Connect(m_youtubeFields.thumbnailUrl.GetString(), http::connectTimeout))) {
 					const auto contentLength = HTTPAsync.GetLenght();
 					if (contentLength) {
 						m_youtubeThumbnailData.resize(contentLength);
 						DWORD dwSizeRead = 0;
-						if (S_OK != HTTPAsync.Read((PBYTE)m_youtubeThumbnailData.data(), contentLength, dwSizeRead) || dwSizeRead != contentLength) {
+						if (S_OK != HTTPAsync.Read((PBYTE)m_youtubeThumbnailData.data(), contentLength, dwSizeRead, http::readTimeout) || dwSizeRead != contentLength) {
 							m_youtubeThumbnailData.clear();
 						}
 					} else {
 						std::vector<char> tmp(16 * KILOBYTE);
 						for (;;) {
 							DWORD dwSizeRead = 0;
-							if (S_OK != HTTPAsync.Read((PBYTE)tmp.data(), tmp.size(), dwSizeRead)) {
+							if (S_OK != HTTPAsync.Read((PBYTE)tmp.data(), tmp.size(), dwSizeRead, http::readTimeout)) {
 								break;
 							}
 

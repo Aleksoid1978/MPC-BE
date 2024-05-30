@@ -52,12 +52,12 @@ Update_Status UpdateChecker::CheckNewVersion()
 
 	Update_Status updatestatus = UPDATER_ERROR_CONNECT;
 	CHTTPAsync HTTPAsync;
-	if (SUCCEEDED(HTTPAsync.Connect(L"https://api.github.com/repos/Aleksoid1978/MPC-BE/releases/latest", 3000))) {
+	if (SUCCEEDED(HTTPAsync.Connect(L"https://api.github.com/repos/Aleksoid1978/MPC-BE/releases/latest", http::connectTimeout))) {
 		constexpr auto sizeRead = 16 * KILOBYTE;
 		CStringA data;
 		DWORD dwSizeRead = 0;
 		int dataSize = 0;
-		while (S_OK == HTTPAsync.Read(reinterpret_cast<PBYTE>(data.GetBuffer(dataSize + sizeRead) + dataSize), sizeRead, dwSizeRead)) {
+		while (S_OK == HTTPAsync.Read(reinterpret_cast<PBYTE>(data.GetBuffer(dataSize + sizeRead) + dataSize), sizeRead, dwSizeRead, http::readTimeout)) {
 			data.ReleaseBuffer(dataSize + dwSizeRead);
 			dataSize = data.GetLength();
 			dwSizeRead = 0;
