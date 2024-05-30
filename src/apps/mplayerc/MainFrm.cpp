@@ -6056,9 +6056,12 @@ void CMainFrame::OnFileSaveAs()
 	if (m_youtubeFields.fname.GetLength()) {
 		if (m_bAudioOnly) {
 			saveItems.emplace_back('a', in, GetAltFileName(), "");
-			if (ext == L".m4a" && EndsWithNoCase(m_youtubeFields.thumbnailUrl, L".jpg")) {
-				saveItems.emplace_back('t', m_youtubeFields.thumbnailUrl, L".jpg", "");
-				ffmpegpath = GetFullExePath(s.strFFmpegExePath, true);
+			if (ext == L".m4a") {
+				auto thumbnail_ext = m_youtubeFields.thumbnailUrl.Mid(m_youtubeFields.thumbnailUrl.ReverseFind('.')).MakeLower();
+				if (thumbnail_ext == L".jpg" || thumbnail_ext == L".webp") {
+					saveItems.emplace_back('t', m_youtubeFields.thumbnailUrl, thumbnail_ext, "");
+					ffmpegpath = GetFullExePath(s.strFFmpegExePath, true);
+				}
 			}
 		}
 		else {
