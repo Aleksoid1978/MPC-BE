@@ -6056,7 +6056,7 @@ void CMainFrame::OnFileSaveAs()
 	if (m_youtubeFields.fname.GetLength()) {
 		if (m_bAudioOnly) {
 			saveItems.emplace_back('a', in, GetAltFileName(), "");
-			if (m_youtubeFields.thumbnailUrl.GetLength() && EndsWithNoCase(m_youtubeFields.thumbnailUrl, L".jpg")) {
+			if (ext == L".m4a" && EndsWithNoCase(m_youtubeFields.thumbnailUrl, L".jpg")) {
 				saveItems.emplace_back('t', m_youtubeFields.thumbnailUrl, L".jpg", "");
 				ffmpegpath = GetFullExePath(s.strFFmpegExePath, true);
 			}
