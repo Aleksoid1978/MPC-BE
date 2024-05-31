@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2022 see Authors.txt
+ * (C) 2017-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -17,8 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-#pragma once
 
 #include "stdafx.h"
 #include "DXVAState.h"

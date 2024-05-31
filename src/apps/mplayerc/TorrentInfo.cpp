@@ -1,5 +1,5 @@
 /*
- * (C) 2019-2023 see Authors.txt
+ * (C) 2019-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -18,8 +18,6 @@
  *
  * using code from TorrentInfo plug-in for FAR 3.0 https://sourceforge.net/projects/farplugs/
  */
-
-#pragma once
 
 #include "stdafx.h"
 #include "TorrentInfo.h"

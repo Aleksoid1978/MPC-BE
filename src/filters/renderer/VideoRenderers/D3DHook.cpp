@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2021 see Authors.txt
+ * (C) 2017-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -18,8 +18,6 @@
  *
  *
  */
-
-#pragma once
 
 #include "stdafx.h"
 #include <ExtLib/Detours/src/detours.h>
