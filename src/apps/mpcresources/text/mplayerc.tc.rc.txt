@@ -407,7 +407,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"最小化時暫停播放"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 48
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 5		"開啟選項"
 6		"強制單一程式"
 7		"所有檔案使用同一處理程序"
@@ -434,10 +434,11 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 48
 37		"顯示搜尋時間"
 38		"停用「開啟光碟」選單"
 39		"程式優先順序調成標準以上"
-40		"連線逾時："
-43		"秒"
-44		"Receiving data (TODO):"
-47		"sec."
+40		"Network timeouts"
+41		"Connection:"
+44		"秒"
+45		"Receiving data:"
+48		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37

@@ -407,7 +407,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"최소화 시, 영상 재생 일시 정지"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 48
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 5		"열기 옵션"
 6		"프로세스 하나만 사용"
 7		"파일을 열 때마다 같은 재생기창 사용"
@@ -434,10 +434,11 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 48
 37		"탐색 시간 표기"
 38		"'디스크 열기' 메뉴 사용 안 함"
 39		"프로세스 우선순위 높이기"
-40		"네트워크 경과 시간 :"
-43		"초"
-44		"Receiving data (TODO):"
-47		"sec."
+40		"Network timeouts"
+41		"Connection:"
+44		"초"
+45		"Receiving data:"
+48		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37

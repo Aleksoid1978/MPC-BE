@@ -148,12 +148,6 @@ BOOL CPPagePlayer::OnInitDialog()
 	m_edtNetworkReceiveTimeout.SetRange(APP_NETRECEIVETIMEOUT_MIN, APP_NETRECEIVETIMEOUT_MAX);
 	m_spnNetworkReceiveTimeout.SetRange(APP_NETRECEIVETIMEOUT_MIN, APP_NETRECEIVETIMEOUT_MAX);
 
-	// TODO
-	m_edtNetworkReceiveTimeout.ShowWindow(SW_HIDE);
-	m_spnNetworkReceiveTimeout.ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_STATIC4)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_STATIC5)->ShowWindow(SW_HIDE);
-
 	UpdateData(FALSE);
 
 	GetDlgItem(IDC_FILE_POS)->EnableWindow(s.bKeepHistory);

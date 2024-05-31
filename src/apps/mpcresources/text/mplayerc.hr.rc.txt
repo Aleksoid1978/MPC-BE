@@ -407,7 +407,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Zaustavi video pregled pri minimiziranju"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 48
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 5		"Mogućnosti Otvaranja"
 6		"Forsiraj kao jedan proces"
 7		"UKoristi isti proces za svaku datoteku"
@@ -434,10 +434,11 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 48
 37		"Pokaži vrijeme pretrage"
 38		"Onesposobi izbornik 'Otvori Disk'"
 39		"Procesiraj prioritet iznad normalnog"
-40		"Mrežna stanka:"
-43		"sek."
-44		"Receiving data (TODO):"
-47		"sec."
+40		"Network timeouts"
+41		"Connection:"
+44		"sek."
+45		"Receiving data:"
+48		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37

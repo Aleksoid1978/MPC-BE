@@ -407,7 +407,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Küçültüldüğünde video oynatmayı duraklat"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 48
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 5		"Açılış ayarları"
 6		"Tek oynatıcı için zorla"
 7		"Her dosya için benzer oynatıcı"
@@ -434,10 +434,11 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 48
 37		"Atlama zamanını göster"
 38		"Disk Açma özelliğini devre dışı bırak"
 39		"İşlem önceliğini normalden yüksek tut"
-40		"Ağ zaman aşımı:"
-43		"sn."
-44		"Receiving data (TODO):"
-47		"sec."
+40		"Network timeouts"
+41		"Connection:"
+44		"sn."
+45		"Receiving data:"
+48		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
