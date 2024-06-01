@@ -434,11 +434,11 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 37		"显示搜索时间"
 38		"隐藏打开光盘菜单"
 39		"高于普通进程优先级"
-40		"Network timeouts"
-41		"Connection:"
+40		"网络超时"
+41		"连接:"
 44		"秒"
-45		"Receiving data:"
-48		"sec."
+45		"接收数据:"
+48		"秒"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
