@@ -39,7 +39,7 @@ CFLAGS = -I. -I.. -Icompat/atomics/win32 -Icompat/windows \
 	   -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DOPJ_STATIC \
 	   -D_WIN32_WINNT=0x0601 -DWINVER=0x0601 \
 	   -fomit-frame-pointer -std=c17 \
-	   -fno-common -fno-ident -mthreads
+	   -fno-common -fno-ident -mthreads -Wno-discarded-qualifiers
 YASMFLAGS = -I. -Pconfig.asm
 
 ifeq ($(64BIT),yes)
@@ -58,7 +58,7 @@ endif
 ifeq ($(DEBUG),yes)
 	CFLAGS     += -DDEBUG -D_DEBUG -g -Og
 else
-	CFLAGS     += -DNDEBUG -UDEBUG -U_DEBUG -O3 -fno-tree-vectorize
+	CFLAGS     += -DNDEBUG -UDEBUG -U_DEBUG -O3 -fno-tree-vectorize -Wno-stringop-overflow
 endif
 
 # Object directories
