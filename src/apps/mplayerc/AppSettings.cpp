@@ -628,6 +628,8 @@ void CAppSettings::ResetSettings()
 	iBufferDuration = APP_BUFDURATION_DEF;
 	iNetworkTimeout = APP_NETTIMEOUT_DEF;
 	iNetworkReceiveTimeout = APP_NETRECEIVETIMEOUT_DEF;
+	http::connectTimeout = iNetworkTimeout * 1000;
+	http::readTimeout = iNetworkReceiveTimeout * 1000;
 
 	bAudioMixer = false;
 	nAudioMixerLayout = SPK_STEREO;
