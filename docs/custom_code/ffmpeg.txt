@@ -19,7 +19,6 @@
 * libavcodec/dxva2.c
 * libavcodec/dxva2_hevc.c
 * libavcodec/dxva2_internal.h
-* libavcodec/dxva2_vp9.c
 * libavcodec/h264_refs.c
 * libavcodec/h264_slice.c
 * libavcodec/h264dec.c

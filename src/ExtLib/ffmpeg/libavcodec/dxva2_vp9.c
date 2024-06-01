@@ -120,12 +120,8 @@ int ff_dxva2_vp9_fill_picture_parameters(const AVCodecContext *avctx, AVDXVACont
 
     /* segmentation data */
     pp->stVP9Segments.wSegmentInfoFlags = (h->h.segmentation.enabled       << 0) |
-// ==> Start patch MPC
-                                          ((h->h.segmentation.enabled && h->h.segmentation.update_map)    << 1) |
-                                          ((h->h.segmentation.enabled && h->h.segmentation.temporal)      << 2) |
-                                          //(h->h.segmentation.update_map    << 1) |
-                                          //(h->h.segmentation.temporal      << 2) |
-// ==> End patch MPC
+                                          (h->h.segmentation.update_map    << 1) |
+                                          (h->h.segmentation.temporal      << 2) |
                                           (h->h.segmentation.absolute_vals << 3) |
                                           (0                               << 4);  /* ReservedSegmentFlags4Bits */
 
