@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2023 see Authors.txt
+ * (C) 2012-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -133,9 +133,9 @@ namespace Youtube
 		{140, y_mp4_aac,  y_audio, 128, L"m4a"},
 		{139, y_mp4_aac,  y_audio,  48, L"m4a"}, // may be outdated and no longer supported
 		// Opus
-		{251, y_webm_aud, y_audio, 160, L"webm"},
-		{250, y_webm_aud, y_audio,  70, L"webm"},
-		{249, y_webm_aud, y_audio,  50, L"webm"},
+		{251, y_webm_aud, y_audio, 160, L"mka"},
+		{250, y_webm_aud, y_audio,  70, L"mka"},
+		{249, y_webm_aud, y_audio,  50, L"mka"},
 		// Vorbis
 		//{249, y_webm_aud, y_audio, 128, L"webm", false, false},
 		// AC3

@@ -6056,7 +6056,7 @@ void CMainFrame::OnFileSaveAs()
 	if (m_youtubeFields.fname.GetLength()) {
 		if (m_bAudioOnly) {
 			saveItems.emplace_back('a', in, GetAltFileName(), "");
-			if (ext == L".m4a") {
+			if (ext == L".m4a" || ext == L".mka") {
 				auto thumbnail_ext = m_youtubeFields.thumbnailUrl.Mid(m_youtubeFields.thumbnailUrl.ReverseFind('.')).MakeLower();
 				if (thumbnail_ext == L".jpg" || thumbnail_ext == L".webp") {
 					saveItems.emplace_back('t', m_youtubeFields.thumbnailUrl, thumbnail_ext, "");

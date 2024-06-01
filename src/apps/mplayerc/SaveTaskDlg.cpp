@@ -389,6 +389,10 @@ void CSaveTaskDlg::SaveHTTP(const int iSubLangDefault)
 		const CPathW finalfile(m_dstPaths.front());
 		const CStringW finalext = finalfile.GetExtension().Mid(1).MakeLower();
 		const CStringW tmpfile  = finalfile + L".tmp";
+		const CStringW format =
+			(finalext == L"m4a") ? L"mp4" :
+			(finalext == L"mka") ? L"matroska" :
+			finalext;
 
 		CStringW strArgs = L"-y";
 		CStringW mapping;
@@ -398,8 +402,15 @@ void CSaveTaskDlg::SaveHTTP(const int iSubLangDefault)
 		for (unsigned i = 0; i < m_saveItems.size(); ++i) {
 			const auto& item = m_saveItems[i];
 
-			strArgs.AppendFormat(LR"( -i "%s")", m_dstPaths[i]);
-			mapping.AppendFormat(L" -map %u", i);
+			if (item.type == 't' && finalext == L"mka" && item.title == L".jpg") {
+				strArgs.AppendFormat(LR"( -attach "%s")", m_dstPaths[i]);
+				metadata.Append(L" -metadata:s:t mimetype=image/jpeg -metadata:s:t:0 filename=cover.jpg");
+			}
+			else {
+				strArgs.AppendFormat(LR"( -i "%s")", m_dstPaths[i]);
+				mapping.AppendFormat(L" -map %u", i);
+			}
+
 			if (item.type == 's') {
 				LPCSTR lang = ISO6391To6392(item.lang);
 				if (lang[0]) {
@@ -428,10 +439,10 @@ void CSaveTaskDlg::SaveHTTP(const int iSubLangDefault)
 			}
 			strArgs.Append(L" -disposition:v:0 attached_pic");
 		}
-		if (finalext == L"mp4" || finalext == L"m4a") {
+		if (format == L"mp4") {
 			strArgs.Append(L" -movflags +faststart");
 		}
-		strArgs.AppendFormat(LR"( -f %s "%s")", (finalext == L"m4a") ? L"mp4" : finalext, tmpfile);
+		strArgs.AppendFormat(LR"( -f %s "%s")", format, tmpfile);
 
 		SHELLEXECUTEINFOW execinfo = { sizeof(execinfo) };
 		execinfo.lpFile = m_ffmpegPath.GetString();
