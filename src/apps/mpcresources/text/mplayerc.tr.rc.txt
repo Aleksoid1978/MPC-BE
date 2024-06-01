@@ -434,11 +434,11 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 37		"Atlama zamanını göster"
 38		"Disk Açma özelliğini devre dışı bırak"
 39		"İşlem önceliğini normalden yüksek tut"
-40		"Network timeouts"
-41		"Connection:"
+40		"Ağ zaman aşımları"
+41		"Bağlantı:"
 44		"sn."
-45		"Receiving data:"
-48		"sec."
+45		"Veri alma:"
+48		"sn."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
