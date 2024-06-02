@@ -434,11 +434,11 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 37		"Mostrar tiempo de búsqueda"
 38		"Deshabilitar menú 'Abrir Disco'"
 39		"Mayor prioridad para el proceso"
-40		"Network timeouts"
-41		"Connection:"
+40		"Tiempo de espera de red"
+41		"Conexión:"
 44		"seg."
-45		"Receiving data:"
-48		"sec."
+45		"Recibiendo datos:"
+48		"seg."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
