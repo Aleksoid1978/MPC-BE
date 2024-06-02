@@ -434,10 +434,10 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 37		"Mostra tempo di ricerca"
 38		"Disabilita il menu ""Apri disco"""
 39		"Priorità del processo superiore al normale"
-40		"Network timeouts"
-41		"Connection:"
+40		"Timeout rete"
+41		"Connessione:"
 44		"sec."
-45		"Receiving data:"
+45		"Ricezione dati:"
 48		"sec."
 END
 
