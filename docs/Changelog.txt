@@ -2,8 +2,31 @@
 
 1.7.1.x dev
 =============================
+AudioSplitter
+Fixed reading pictures from ID3v2.3.
+
+FLVSplitter
+Fixed video frame size detection for some FLV files.
+
 MPCVideoDec
-VVC decoding is done using vvdec (https://github.com/fraunhoferhhi/vvdec).
+VVC decoding now uses the VVdeC decoder (https://github.com/fraunhoferhhi/vvdec).
+The "Disable DXVA for SD (H.264)" setting for vertical videos has been fixed.
+Fixed decoding of some VP9 videos.
+Fixed decoding of some interlaced H.264 videos.
+Added validation of HDR metadata.
+Added support for HEVC video received from WM ASF Reader.
+
+Player
+Playback speed can now be changed in 1% increments.
+When saving only audio from YouTube, add cover art to the audio file using the available FFmpeg.
+Added timeout time setting when receiving data from the network.
+
+Updated Hungarian translation (by mickey).
+Updated Chinese (Simplified) translation (by wushantao).
+Updated German translation (by Klaus1189).
+Updated Turkish translation (by cmhrky).
+Updated Italian translation (by mapi68).
+Updated Spanish translation (by IPeluchito).
 
 Updated libraries:
 	ffmpeg git-n7.1-dev-1050-g2c38ca3d37;
