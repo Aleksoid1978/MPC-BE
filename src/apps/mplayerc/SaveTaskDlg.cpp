@@ -402,9 +402,14 @@ void CSaveTaskDlg::SaveHTTP(const int iSubLangDefault)
 		for (unsigned i = 0; i < m_saveItems.size(); ++i) {
 			const auto& item = m_saveItems[i];
 
-			if (item.type == 't' && finalext == L"mka" && item.title == L".jpg") {
+			if (item.type == 't' && finalext == L"mka") {
 				strArgs.AppendFormat(LR"( -attach "%s")", m_dstPaths[i]);
-				metadata.Append(L" -metadata:s:t mimetype=image/jpeg -metadata:s:t:0 filename=cover.jpg");
+				if (item.title == L".jpg") {
+					metadata.Append(L" -metadata:s:t mimetype=image/jpeg -metadata:s:t:0 filename=cover.jpg");
+				}
+				else if (item.title == L".webp") {
+					metadata.Append(L" -metadata:s:t mimetype=image/webp -metadata:s:t:0 filename=cover.webp");
+				}
 			}
 			else {
 				strArgs.AppendFormat(LR"( -i "%s")", m_dstPaths[i]);
