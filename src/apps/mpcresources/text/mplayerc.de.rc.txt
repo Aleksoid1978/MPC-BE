@@ -434,7 +434,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 37		"Verstrichene/Verbleibende Zeit / Gesamtzeit"
 38		"Disc-Wiedergabe deaktivieren"
 39		"&Prozesspriorität höher als normal"
-40		"Netzwerk-Zeitüberschreitungen:"
+40		"Netzwerk-Zeitüberschreitungen"
 41		"Verbindung:"
 44		"Sek."
 45		"Datenempfang:"

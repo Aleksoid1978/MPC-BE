@@ -293,7 +293,7 @@ BEGIN
     CONTROL         "Verstrichene/Verbleibende Zeit / Gesamtzeit",IDC_CHECK15,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,138,183,148,9
     CONTROL         "Disc-Wiedergabe deaktivieren",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,196,156,9
     CONTROL         "&Prozesspriorität höher als normal",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,208,156,9
-    GROUPBOX        "Netzwerk-Zeitüberschreitungen:",IDC_STATIC,124,222,167,41,WS_GROUP
+    GROUPBOX        "Netzwerk-Zeitüberschreitungen",IDC_STATIC,124,222,167,41,WS_GROUP
     LTEXT           "Verbindung:",IDC_STATIC,129,233,96,8
     EDITTEXT        IDC_EDIT2,230,231,29,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,248,231,11,13
