@@ -30,6 +30,7 @@
 
 #include "config.h"
 #include "attributes.h"
+#include "float_dsp.h"
 #include "lls.h"
 
 static void update_lls(LLSModel *m, const double *var)
@@ -102,13 +103,7 @@ void avpriv_solve_lls(LLSModel *m, double threshold, unsigned short min_order)
 
 static double evaluate_lls(LLSModel *m, const double *param, int order)
 {
-    int i;
-    double out = 0;
-
-    for (i = 0; i <= order; i++)
-        out += param[i] * m->coeff[order][i];
-
-    return out;
+    return ff_scalarproduct_double_c(m->coeff[order], param, order + 1);
 }
 
 av_cold void avpriv_init_lls(LLSModel *m, int indep_count)
@@ -117,7 +112,9 @@ av_cold void avpriv_init_lls(LLSModel *m, int indep_count)
     m->indep_count = indep_count;
     m->update_lls = update_lls;
     m->evaluate_lls = evaluate_lls;
-#if ARCH_X86
+#if ARCH_RISCV
+    ff_init_lls_riscv(m);
+#elif ARCH_X86
     ff_init_lls_x86(m);
 #endif
 }
