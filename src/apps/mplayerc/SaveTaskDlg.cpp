@@ -438,7 +438,7 @@ void CSaveTaskDlg::SaveHTTP(const int iSubLangDefault)
 		if (iSubLangDefault >= 0) {
 			strArgs.AppendFormat(L" -disposition:s:%d default", iSubLangDefault);
 		}
-		if (m_saveItems.back().type == 't') {
+		if (m_saveItems.back().type == 't' && finalext == L"m4a") {
 			if (EndsWith(m_dstPaths.back(), L".webp")) {
 				strArgs.Append(L" -c:v:0 mjpeg");
 			}
