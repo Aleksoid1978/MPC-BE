@@ -18,6 +18,7 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #include "MediaInfo/MediaInfo_Config.h"
+#include "MediaInfo/TimeCode.h"
 #include "ZenLib/ZtringListListF.h"
 #if MEDIAINFO_EVENTS
     #include "ZenLib/FileName.h"
@@ -243,6 +244,8 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
     #endif //defined(MEDIAINFO_LIBMMS_YES)
     File_Eia608_DisplayEmptyStream=false;
     File_Eia708_DisplayEmptyStream=false;
+    File_CommandOnlyMeansEmpty=false;
+    File_ProbeCaption_Set({});
     State=0;
     #if defined(MEDIAINFO_AC3_YES)
     File_Ac3_IgnoreCrc=false;
@@ -1254,6 +1257,24 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
     {
         return File_Eia608_DisplayEmptyStream_Get()?"1":"0";
     }
+    else if (Option_Lower==__T("file_commandonlymeansempty"))
+    {
+        File_CommandOnlyMeansEmpty_Set(!(Value==__T("0") || Value.empty()));
+        return __T("");
+    }
+    else if (Option_Lower==__T("file_commandonlymeansempty_get"))
+    {
+        return File_CommandOnlyMeansEmpty_Get()?"1":"0";
+    }
+    else if (Option_Lower==__T("file_probecaption"))
+    {
+        File_ProbeCaption_Set(Value);
+        return __T("");
+    }
+    else if (Option_Lower==__T("file_probecaption_get"))
+    {
+        return __T("(Not supported)");
+    }
     else if (Option_Lower==__T("file_ac3_ignorecrc"))
     {
         #if defined(MEDIAINFO_AC3_YES)
@@ -1783,13 +1804,21 @@ void MediaInfo_Config_MediaInfo::File_ExpandSubs_Update(void** Source)
                         }
                         for (size_t i=0; i<Names.size(); i++)
                         {
-                            Ztring TranslatedName=MediaInfoLib::Config.Language_Get(Names[i]);
+                            auto& Name=Names[i];
+                            Ztring TranslatedName=MediaInfoLib::Config.Language_Get(Name);
                             if (!TranslatedName.empty())
-                                Names[i]=TranslatedName;
+                                Name=TranslatedName;
                             if (Nested && !i)
-                                Names[i].insert(0, Spaces, __T(' '));
-                            if (Numbers[i])
-                                Names[i]+=MediaInfoLib::Config.Language_Get(__T("  Config_Text_NumberTag"))+Ztring::ToZtring(Numbers[i]);
+                                Name.insert(0, Spaces, __T(' '));
+                            if (Name.size()>1 && Name.back()==__T('_'))
+                            {
+                                auto Last2=Name[Name.size()-2];
+                                if (Last2>='0' && Last2<='9')
+                                    Name.pop_back();
+                            }
+                            auto& Number=Numbers[i];
+                            if (Number)
+                                Name+=MediaInfoLib::Config.Language_Get(__T("  Config_Text_NumberTag"))+Ztring::ToZtring(Number);
                         }
                         Names.Separator_Set(0, __T(" "));
                         Names.Quote_Set(__T(""));
@@ -3571,6 +3600,183 @@ bool MediaInfo_Config_MediaInfo::File_Eia708_DisplayEmptyStream_Get ()
 {
     CriticalSectionLocker CSL(CS);
     return File_Eia708_DisplayEmptyStream;
+}
+
+//---------------------------------------------------------------------------
+void MediaInfo_Config_MediaInfo::File_CommandOnlyMeansEmpty_Set (bool NewValue)
+{
+    CriticalSectionLocker CSL(CS);
+    File_CommandOnlyMeansEmpty=NewValue;
+}
+
+bool MediaInfo_Config_MediaInfo::File_CommandOnlyMeansEmpty_Get ()
+{
+    CriticalSectionLocker CSL(CS);
+    return File_CommandOnlyMeansEmpty;
+}
+
+//---------------------------------------------------------------------------
+Ztring MediaInfo_Config_MediaInfo::File_ProbeCaption_Set (const Ztring& NewValue)
+{
+    static const auto Malformed = __T("File_ProbeCaption option malformed");
+    ZtringListList List;
+    List.Separator_Set(0, __T(","));
+    List.Separator_Set(1, __T("+"));
+    List.Write(NewValue);
+    CriticalSectionLocker CSL(CS);
+    File_ProbeCaption.clear();
+    bool HasForAll = false;
+    string AllMinus;
+    for (const auto& Line : List) {
+        config_probe Item;
+        for (const auto& Value : Line) {
+            auto Pos = Value.find_first_not_of(__T("0123456789"));
+            if (Pos == string::npos) {
+                Item.Start_Type = config_probe_size;
+                Item.Start = Value.To_int64u();
+            }
+            else if (!Value.empty() && ((Value[0] >= __T('A') && Value[0] <= __T('Z')) || (Value[0] >= __T('a') && Value[0] <= __T('z')))) {
+                string Value2(Ztring(Value).MakeUpperCase().To_UTF8());
+                bool Negative = false;
+                if (Value2.rfind("ALL", 0) == 0) {
+                    if (Value2.size() > 3) {
+                        if (Value2[3] != __T('-'))
+                            return Malformed;
+                        Negative = true;
+                        Value2 = Value.To_UTF8().substr(4);
+                        AllMinus += '-';
+                        AllMinus += Value2;
+                    }
+                }
+                if (Value2 != "MP4" && Value2 != "MPEG-4" && Value2 != "MXF" && !Value2.empty()) { //TODO: full list
+                    return Malformed;
+                }
+                Item.Parser = Value2 != "MP4" ? Value2 : "MPEG-4";
+                if (Negative) {
+                    Item.Parser.insert(Item.Parser.begin(), __T('-'));
+                }
+            }
+            else if (Pos == Value.size() - 1 && Value[Pos] == __T('%')) {
+                auto Value_Int = Value.To_int64u();
+                if (Value_Int > 100) {
+                    return Malformed;
+                }
+                if (Item.Start_Type == config_probe_none) {
+                    Item.Start_Type = config_probe_percent;
+                    Item.Start = Value_Int;
+                }
+                else if (Item.Duration_Type == config_probe_none) {
+                    Item.Duration_Type = config_probe_percent;
+                    Item.Duration = Value_Int;
+                }
+                else {
+                    return Malformed;
+                }
+            }
+            else if (Pos == Value.size() - 1 && (Value[Pos] == __T('E') || Value[Pos] == __T('G') || Value[Pos] == __T('K') || Value[Pos] == __T('M') || Value[Pos] == __T('P') || Value[Pos] == __T('T') || Value[Pos] == __T('k'))) {
+                auto Value_Int = Value.To_int64u();
+                switch (Value[Pos])
+                {
+                case 'E':
+                    Value_Int <<= 10;
+                    // Fall through
+                case 'P':
+                    Value_Int <<= 10;
+                    // Fall through
+                case 'T':
+                    Value_Int <<= 10;
+                    // Fall through
+                case 'G':
+                    Value_Int <<= 10;
+                    // Fall through
+                case 'M':
+                    Value_Int <<= 10;
+                    // Fall through
+                default:
+                    Value_Int <<= 10;
+                }
+                if (Item.Start_Type == config_probe_none) {
+                    Item.Start_Type = config_probe_size;
+                    Item.Start = Value_Int;
+                }
+                else if (Item.Duration_Type == config_probe_none) {
+                    Item.Duration_Type = config_probe_size;
+                    Item.Duration = Value_Int;
+                }
+                else {
+                    return Malformed;
+                }
+            }
+            else {
+                TimeCode TC(Value.To_UTF8(), 999);
+                if (!TC.IsValid()) {
+                    return Malformed;
+                }
+                auto Seconds = TC.ToSeconds();
+                if (Seconds <= 0) {
+                    return Malformed;
+                }
+                if (Item.Start_Type == config_probe_none) {
+                    Item.Start_Type = config_probe_dur;
+                    Item.Start = Seconds;
+                }
+                else if (Item.Duration_Type == config_probe_none) {
+                    Item.Duration_Type = config_probe_dur;
+                    Item.Duration = Seconds;
+                }
+                else {
+                    return Malformed;
+                }
+            }
+        }
+        if (Item.Parser.empty()) {
+            HasForAll=true;
+        }
+        if (Item.Duration_Type == config_probe_none) {
+            Item.Duration_Type = config_probe_dur;
+            Item.Duration = 30;
+        }
+        File_ProbeCaption.push_back(Item);
+    }
+    File_ProbeCaption_Pos=0;
+    if (!HasForAll) {
+        config_probe Probe;
+        Probe.Start_Type = config_probe_percent;
+        Probe.Start = 50;
+        Probe.Duration_Type = config_probe_dur;
+        Probe.Duration = 30;
+        Probe.Parser = AllMinus;
+        File_ProbeCaption.push_back(Probe);
+    }
+
+    return {};
+}
+
+config_probe MediaInfo_Config_MediaInfo::File_ProbeCaption_Get(const string& ParserName)
+{
+    if (ParseSpeed<=0 && ParseSpeed>=1)
+        return {};
+
+    CriticalSectionLocker CSL(CS);
+    for (;;)
+    {
+        if (File_ProbeCaption_Pos >= File_ProbeCaption.size())
+            return {};
+        const auto& Item = File_ProbeCaption[File_ProbeCaption_Pos];
+        File_ProbeCaption_Pos++;
+        if (Item.Parser.empty()) {
+            if (Item.Parser[0] == '-') {
+                if (Item.Parser.rfind(ParserName, 1) == 1) {
+                    continue;
+                }
+            }
+        }
+        else if (Item.Parser != ParserName) {
+            continue;
+        }
+
+        return Item;
+    }
 }
 
 //---------------------------------------------------------------------------

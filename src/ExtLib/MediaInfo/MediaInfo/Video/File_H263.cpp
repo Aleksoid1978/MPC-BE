@@ -38,14 +38,14 @@ namespace MediaInfoLib
 //---------------------------------------------------------------------------
 static const char* H263_Source_Format[]=
 {
-    "",
+    nullptr,
     "sub-QCIF",
     "QCIF",
     "CIF",
     "4CIF",
     "16CIF",
-    "",
-    "",
+    nullptr,
+    nullptr,
 };
 
 //---------------------------------------------------------------------------
@@ -129,8 +129,9 @@ File_H263::File_H263()
         Trace_Layers_Update(8); //Stream
     #endif //MEDIAINFO_TRACE
     MustSynchronize=true;
-    Buffer_TotalBytes_FirstSynched_Max=64*1024;
     StreamSource=IsStream;
+    Buffer_TotalBytes_FirstSynched_Max=1024*1024;
+    Trusted_Multiplier=2;
 
     //In
     Frame_Count_Valid=0;
@@ -164,12 +165,15 @@ void File_H263::Streams_Fill()
     Fill(Stream_Video, 0, Video_Format, "H.263");
     Fill(Stream_Video, 0, Video_Codec, "H.263");
 
-    Fill(Stream_Video, 0, Video_Width, H263_Source_Format_Width[Source_Format]);
-    Fill(Stream_Video, 0, Video_Height, H263_Source_Format_Height[Source_Format]);
+    if (H263_Source_Format_Width[Source_Format])
+        Fill(Stream_Video, 0, Video_Width, H263_Source_Format_Width[Source_Format]);
+    if (H263_Source_Format_Height[Source_Format])
+        Fill(Stream_Video, 0, Video_Height, H263_Source_Format_Height[Source_Format]);
     Fill(Stream_Video, 0, Video_ColorSpace, "YUV");
     Fill(Stream_Video, 0, Video_ChromaSubsampling, "4:2:0");
     Fill(Stream_Video, 0, Video_BitDepth, 8);
-    Fill(Stream_Video, 0, Video_PixelAspectRatio, ((float32)PAR_W)/PAR_H, 3);
+    if (PAR_W && PAR_H)
+        Fill(Stream_Video, 0, Video_PixelAspectRatio, ((float32)PAR_W)/PAR_H, 3);
 }
 
 //---------------------------------------------------------------------------
@@ -185,9 +189,11 @@ void File_H263::Streams_Finish()
 bool File_H263::Synchronize()
 {
     //Synchronizing
-    while(Buffer_Offset+3<=Buffer_Size && (Buffer[Buffer_Offset  ]!=0x00
+    while(Buffer_Offset+5<=Buffer_Size && (Buffer[Buffer_Offset  ]!=0x00
                                         || Buffer[Buffer_Offset+1]!=0x00
-                                        || (Buffer[Buffer_Offset+2]&0xFC)!=0x80))
+                                        || (Buffer[Buffer_Offset+2]&0xFC)!=0x80
+                                        || (Buffer[Buffer_Offset+3]&0x03)!=0x02
+                                        || (Buffer[Buffer_Offset+4]&0x1C)==0x00))
     {
         Buffer_Offset+=2;
         while(Buffer_Offset<Buffer_Size && Buffer[Buffer_Offset]!=0x00)
@@ -197,6 +203,11 @@ bool File_H263::Synchronize()
     }
 
     //Parsing last bytes if needed
+    if (Buffer_Offset+4==Buffer_Size && (Buffer[Buffer_Offset  ]!=0x00
+                                      || Buffer[Buffer_Offset+1]!=0x00
+                                      || (Buffer[Buffer_Offset+2]&0xFC)!=0x80
+                                      || (Buffer[Buffer_Offset+3]&0x03)!=0x02))
+        Buffer_Offset++;
     if (Buffer_Offset+3==Buffer_Size && (Buffer[Buffer_Offset  ]!=0x00
                                       || Buffer[Buffer_Offset+1]!=0x00
                                       || (Buffer[Buffer_Offset+2]&0xFC)!=0x80))
@@ -207,8 +218,12 @@ bool File_H263::Synchronize()
     if (Buffer_Offset+1==Buffer_Size &&  Buffer[Buffer_Offset  ]!=0x00)
         Buffer_Offset++;
 
-    if (Buffer_Offset+3>Buffer_Size)
+    if (Buffer_Offset+5>Buffer_Size)
+    {
+        if (Frame_Count==0 && Buffer_TotalBytes+Buffer_Offset>Buffer_TotalBytes_FirstSynched_Max)
+            Reject();
         return false;
+    }
 
     //Synched is OK
     Synched=true;
@@ -219,14 +234,23 @@ bool File_H263::Synchronize()
 bool File_H263::Synched_Test()
 {
     //Must have enough buffer for having header
-    if (Buffer_Offset+4>Buffer_Size)
+    if (Buffer_Size-Buffer_Offset<=4)
         return false;
 
     //Quick test of synchro
     if (Buffer[Buffer_Offset  ]!=0x00
      || Buffer[Buffer_Offset+1]!=0x00
-     || (Buffer[Buffer_Offset+2]&0xFC)!=0x80)
+     || (Buffer[Buffer_Offset+2]&0xFC)!=0x80
+     || (Buffer[Buffer_Offset+3]&0x03)!=0x02
+     || (Buffer[Buffer_Offset+4]&0x1C)==0x00
+     || (Buffer_Size>=0x100000 && !Header_Parser_Fill_Size())) //Preventing waiting too much after a false positive sync
     {
+        if (Frame_Count==0 && Buffer_TotalBytes>Buffer_TotalBytes_FirstSynched_Max)
+            Trusted=0;
+        if (!Status[IsFilled])
+            Frame_Count=0; // Back to start of sync
+        Trusted_IsNot("Sync issue");
+        Buffer_Offset++;
         Synched=false;
         return true;
     }
@@ -315,21 +339,23 @@ void File_H263::Data_Parse()
         Temporal_Reference=Temporal_Reference_Temp;
         Temporal_Reference_IsValid=true;
     }
-    else
-        Temporal_Reference++;
-    if (Temporal_Reference_Temp!=Temporal_Reference)
+    if (Temporal_Reference_Temp==Temporal_Reference || ((int8u)(Temporal_Reference_Temp-Temporal_Reference)>8 && (int8u)(Temporal_Reference-Temporal_Reference_Temp)>8))
     {
+        if (Frame_Count==0 && Buffer_TotalBytes>Buffer_TotalBytes_FirstSynched_Max)
+            Trusted=0;
+        if (!Status[IsFilled])
+            Frame_Count=0; // Back to start of sync
         Trusted_IsNot("Out of Order");
-        Open_Buffer_Unsynch();
         return;
     }
+    Temporal_Reference=Temporal_Reference_Temp;
     Element_Begin1("Type Information (PTYPE)");
         Mark_1();
         Mark_0();
         Skip_SB(                                                "Split screen indicator");
         Skip_SB(                                                "Document camera indicator");
         Skip_SB(                                                "Full Picture Freeze Release");
-        Get_S1 (3, Source_Format,                               "Source Format"); Param_Info1(H263_Source_Format[Source_Format]);
+        Get_S1 (3, Source_Format,                               "Source Format"); Param_Info1C(H263_Source_Format[Source_Format], H263_Source_Format[Source_Format]);
         if (Source_Format!=7)
         {
             Skip_SB(                                            "Picture Coding Type");
@@ -350,7 +376,7 @@ void File_H263::Data_Parse()
                             break;
                 case 1  :
                             Element_Begin1("Optional Part of PLUSPTYPE (OPPTYPE)");
-                            Get_S1 (3, Source_Format,           "Source Format"); Param_Info1(H263_Source_Format[Source_Format]);
+                            Get_S1 (3, Source_Format,           "Source Format"); Param_Info1C(H263_Source_Format[Source_Format], H263_Source_Format[Source_Format]);
                             Skip_SB(                            "Custom PCF");
                             Skip_SB(                            "Unrestricted Motion Vector (UMV) mode");
                             Skip_SB(                            "Syntax-based Arithmetic Coding (SAC) mode");
@@ -410,6 +436,16 @@ void File_H263::Data_Parse()
     Skip_XX(Element_Size-Element_Offset,                        "Other data");
 
     FILLING_BEGIN();
+        if (!H263_Source_Format[Source_Format])
+        {
+            if (Frame_Count==0 && Buffer_TotalBytes>Buffer_TotalBytes_FirstSynched_Max)
+                Trusted=0;
+            if (!Status[IsFilled])
+                Frame_Count=0; // Back to start of sync
+            Trusted_IsNot("Source_Format");
+            return;
+        }
+
         Element_Info1(Frame_Count);
         Frame_Count++;
 

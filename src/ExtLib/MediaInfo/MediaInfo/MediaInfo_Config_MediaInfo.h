@@ -68,6 +68,22 @@ enum encryption_padding
 };
 #endif //MEDIAINFO_AES
 
+enum config_probe_type
+{
+    config_probe_none,
+    config_probe_size,
+    config_probe_dur,
+    config_probe_percent,
+};
+struct config_probe
+{
+    config_probe_type   Start_Type=config_probe_none;
+    config_probe_type   Duration_Type=config_probe_none;
+    int64u              Start=0;
+    int64u              Duration=0;
+    string              Parser;
+};
+
 //***************************************************************************
 // Class MediaInfo_Config_MediaInfo
 //***************************************************************************
@@ -375,6 +391,10 @@ public :
     bool          File_Eia608_DisplayEmptyStream_Get ();
     void          File_Eia708_DisplayEmptyStream_Set (bool NewValue);
     bool          File_Eia708_DisplayEmptyStream_Get ();
+    void          File_CommandOnlyMeansEmpty_Set(bool NewValue);
+    bool          File_CommandOnlyMeansEmpty_Get();
+    Ztring        File_ProbeCaption_Set(const Ztring& NewValue);
+    config_probe  File_ProbeCaption_Get(const string& Parser);
     #if defined(MEDIAINFO_AC3_YES)
     void          File_Ac3_IgnoreCrc_Set (bool NewValue);
     bool          File_Ac3_IgnoreCrc_Get ();
@@ -609,6 +629,9 @@ private :
     #endif //defined(MEDIAINFO_LIBMMS_YES)
     bool                    File_Eia608_DisplayEmptyStream;
     bool                    File_Eia708_DisplayEmptyStream;
+    bool                    File_CommandOnlyMeansEmpty;
+    std::vector<config_probe> File_ProbeCaption;
+    size_t                  File_ProbeCaption_Pos;
     #if defined(MEDIAINFO_AC3_YES)
     bool                    File_Ac3_IgnoreCrc;
     #endif //defined(MEDIAINFO_AC3_YES)

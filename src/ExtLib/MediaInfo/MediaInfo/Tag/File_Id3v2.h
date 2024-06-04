@@ -226,6 +226,7 @@ private :
     bool   Unsynchronisation_Global;
     bool   Unsynchronisation_Frame;
     bool   DataLengthIndicator;
+    std::vector<size_t> Unsynch_List;
 
     //Helpers
     void Fill_Name();

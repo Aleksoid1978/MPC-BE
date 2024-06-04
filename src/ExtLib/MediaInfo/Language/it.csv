@@ -127,9 +127,9 @@
  second1; secondo
  second2; secondi
  second3; secondi
- slice per frame1;
- slice per frame2;
- slice per frame3;
+ slice per frame1;segmento per frame1
+ slice per frame2;segmento per frame2
+ slice per frame3;segmento per frame 3
  text stream1; sottotitolo
  text stream2; sottotitoli
  text stream3; sottotitoli
@@ -466,7 +466,7 @@ Format_Settings_QPel;Impostazioni formato, QPel
 Format_Settings_RefFrames;Impostazioni formato, ReFrames
 Format_Settings_SBR;Impostazioni formato, SBR
 Format_Settings_Sign;Impostazioni formato, Firma
-Format_Settings_SliceCount;
+Format_Settings_SliceCount;Impostazione numero segmenti
 Format_Settings_Wrapping;Impostazioni formato, modo a capo automatico
 Format_Tier;Livello formato
 Format_Url;Sito web formato
@@ -787,7 +787,7 @@ Language_eu;basco
 Language_fa;Persiano
 Language_ff;Fula
 Language_fi;Finnico
-Language_fil;
+Language_fil;Filippino
 Language_fj;Fijian
 Language_fo;Faroese
 Language_fr;Francese
@@ -1030,7 +1030,7 @@ ms;ms
 MSDI;MSDI
 MultipleStream;Tracce multiple
 MusicBy;Composto da
-MultiView_Count;
+MultiView_Count;N. viste multiple
 MuxingMode;Modo muxing
 MuxingMode_MoreInfo;Informazioni aggiuntive modo muxing
 MuxingMode_PackedBitstream;Packet Bitstream

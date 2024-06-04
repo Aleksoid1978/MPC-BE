@@ -114,7 +114,8 @@ void File_Ivf::FileHeader_Parse()
         {
             Stream_Prepare(Stream_Video);
             CodecID_Fill(Ztring().From_CC4(fourcc), Stream_Video, 0, InfoCodecID_Format_Riff);
-            Fill(Stream_Video, 0, Video_FrameRate, (float)frame_rate_num / frame_rate_den);
+            if (frame_rate_den)
+                Fill(Stream_Video, 0, Video_FrameRate, (float)frame_rate_num / frame_rate_den);
             Fill(Stream_Video, 0, Video_FrameCount, frame_count);
             Fill(Stream_Video, 0, Video_Width, width);
             Fill(Stream_Video, 0, Video_Height, height);

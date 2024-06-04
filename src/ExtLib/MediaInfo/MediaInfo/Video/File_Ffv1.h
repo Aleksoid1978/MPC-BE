@@ -244,7 +244,13 @@ private :
         #define Info_RC(_STATE, _INFO, _NAME) Skip_RC_(_STATE)
         #define Info_RU(_STATE, _INFO, _NAME) Skip_RU_(_STATE)
         #define Info_RS(_STATE, _INFO, _NAME) Skip_RS_(_STATE)
+        static constexpr auto Trace_Activated=false;
     #endif //MEDIAINFO_TRACE
+    #if MEDIAINFO_MACROBLOCKS
+        int     ParseCompletely;
+    #else //MEDIAINFO_MACROBLOCKS
+        static constexpr int ParseCompletely=0;
+    #endif //MEDIAINFO_MACROBLOCKS
     RangeCoder* RC;
     Slice *slices;
     Slice *current_slice;
@@ -289,6 +295,7 @@ private :
     int32s bits_mask3;
     states_context_plane Context_RC; // Range Coder context
     Slice::ContextPtr    Context_GR; // Rice Golomb context
+    size_t               Context_GR_Size;
     size_t x;
 
     states_context_plane plane_states[MAX_QUANT_TABLES];

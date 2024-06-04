@@ -31,7 +31,6 @@ class File_Vc1 : public File__Analyze
 public :
     //In
     int64u Frame_Count_Valid;
-    bool   FrameIsAlwaysComplete;
     bool   From_WMV3;
     bool   Only_0D;
 

@@ -259,7 +259,6 @@ File_MpegTs::File_MpegTs()
         Demux_Level=4; //Intermediate
     #endif //MEDIAINFO_DEMUX
     MustSynchronize=true;
-    Buffer_TotalBytes_FirstSynched_Max=64*1024;
     Buffer_TotalBytes_Fill_Max=(int64u)-1; //Disabling this feature for this format, this is done in the parser
     Trusted_Multiplier=2;
     #if MEDIAINFO_DEMUX
@@ -1510,7 +1509,10 @@ bool File_MpegTs::Synched_Test()
         //Synchro testing
         if (Buffer[Buffer_Offset+BDAV_Size]!=0x47)
         {
-            Synched=false;
+            Frame_Count=(int64u)-1;
+            Frame_Count_NotParsedIncluded=(int64u)-1;
+            SynchLost("MPEG-TS");
+            Frame_Count=0;
             #if MEDIAINFO_DUPLICATE
                 if (File__Duplicate_Get())
                     Trusted++; //We don't want to stop parsing if duplication is requested, TS is not a lot stable, normal...
@@ -1800,7 +1802,24 @@ bool File_MpegTs::Synched_Test()
     }
 
     if (File_Offset+Buffer_Size>=File_Size)
+    {
         Detect_EOF(); //for TRP files
+        if (File_GoTo==(int64u)-1)
+        {
+            int64u Current_Offset=File_Offset+Buffer_Offset;
+            if (Current_Offset!=File_Size)
+            {
+                IsTruncated(Current_Offset+TS_Size, true, "MPEG-TS");
+                auto LastPacket_Size=File_Size-Current_Offset;
+                auto LastPacker_Missing=TS_Size-LastPacket_Size;
+                if (LastPacker_Missing>=TSP_Size)
+                    TSP_Size=0; // Last bytes of a content and partial TS packet without the content after the TS content
+                else
+                    TSP_Size-=LastPacker_Missing;
+            }
+        }
+        return true;
+    }
 
     return false; //Not enough data
 }

@@ -90,7 +90,7 @@ void File_Eia708::Streams_Fill()
     }
 
     for (size_t Pos=0; Pos<Streams.size(); Pos++)
-        if (Streams[Pos] || (Pos && Pos<2 && Config->File_Eia708_DisplayEmptyStream_Get()))
+        if ((Streams[Pos] && ((DataDetected&((int64u)1)<<Pos) || !Config->File_CommandOnlyMeansEmpty_Get())) || (Pos && Pos<2 && Config->File_Eia708_DisplayEmptyStream_Get()))
         {
             Stream_Prepare(Stream_Text);
             Fill(Stream_Text, StreamPos_Last, Text_ID, Pos);

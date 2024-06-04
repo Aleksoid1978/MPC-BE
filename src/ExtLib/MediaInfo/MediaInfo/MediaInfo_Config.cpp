@@ -137,7 +137,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const Char*  MediaInfo_Version=__T("MediaInfoLib - v24.03");
+const Char*  MediaInfo_Version=__T("MediaInfoLib - v24.05");
 const Char*  MediaInfo_Url=__T("http://MediaArea.net/MediaInfo");
       Ztring EmptyZtring;       //Use it when we can't return a reference to a true Ztring
 const Ztring EmptyZtring_Const; //Use it when we can't return a reference to a true Ztring, const version
@@ -1673,7 +1673,6 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
             return __T("conformance features are disabled due to compilation options");
         #endif // MEDIAINFO_CONFORMANCE
     }
-
     if (Option_Lower==__T("info_canhandleurls"))
     {
         #if defined(MEDIAINFO_LIBCURL_YES)
@@ -3029,7 +3028,7 @@ const Ztring MediaInfo_Config::Iso639_Translate (const Ztring &Value)
 void MediaInfo_Config::Language_Set_Internal(stream_t KindOfStream)
 {
     //Loading codec table if not yet done
-    if (Info[KindOfStream].empty())
+    if (KindOfStream<Stream_Max && Info[KindOfStream].empty())
         switch (KindOfStream)
         {
             case Stream_General :   MediaInfo_Config_General(Info[Stream_General]);   Language_Set(Stream_General); break;

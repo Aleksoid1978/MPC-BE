@@ -190,8 +190,8 @@ void MediaInfo_Config_DefaultLanguage (Translation &Info)
     "7.1ch;7.1\n"
     "About;About\n"
     "About_Hint;How to contact me and find last version\n"
-    "AC3_metadata;AC-3 metadata\n"
     "Accompaniment;Accompaniment\n"
+    "AC3_Metadata;AC-3 metadata\n"
     "Active_DisplayAspectRatio;Active display aspect ratio\n"
     "Active_Height;Active height\n"
     "Active_Width;Active width\n"
@@ -334,6 +334,7 @@ void MediaInfo_Config_DefaultLanguage (Translation &Info)
     "Compression_Mode_Lossless;Lossless\n"
     "Compression_Mode_Lossy;Lossy\n"
     "Compression_Ratio;Compression ratio\n"
+    "comprprof;RF (compr) profile\n"
     "Conductor;Conductor\n"
     "ConformanceCheck;Conformance check\n"
     "ConformanceErrors;Conformance errors\n"
@@ -392,6 +393,7 @@ void MediaInfo_Config_DefaultLanguage (Translation &Info)
     "Downmix_5to2;5.1 to 2.0 downmix\n"
     "DrcSets_Count;DRC set count\n"
     "DrcSets_Effects;DRC effect type(s)\n"
+    "dynrngprof;Line (dynrng) profile\n"
     "Duration;Duration\n"
     "Duration_End;End time\n"
     "Duration_End_Command;End time (commands)\n"
@@ -1102,6 +1104,7 @@ void MediaInfo_Config_DefaultLanguage (Translation &Info)
     "PackFormat;Pack format\n"
     "Part;Part\n"
     "Part_Count;Total count\n"
+    "PartialParsing;Partial parsing\n"
     "PartNumber;Part Number\n"
     "PartTotal;Part Total\n"
     "Performer;Performer\n"
@@ -1683,6 +1686,7 @@ void MediaInfo_Config_CodecID_Video_Mpeg4 (InfoMap &Info)
     "ai5p;AVC;;Advanced Video Coding\n"
     "ai5q;AVC;;Advanced Video Coding\n"
     "AV01;AV1\n"
+    "av01;AV1\n"
     "AV1x;YUV;;;;;;YUV;4:2:2\n"
     "avc1;AVC;;Advanced Video Coding\n"
     "avc2;AVC;;Advanced Video Coding\n"
@@ -1822,6 +1826,8 @@ void MediaInfo_Config_CodecID_Video_Mpeg4 (InfoMap &Info)
     "v210;YUV;AJA Video Systems Xena;;;;;YUV;4:2:2\n"
     "V210;YUV;AJA Video Systems Xena;;;;;YUV;4:2:2\n"
     "vc-1;VC-1;;SMPTE VC-1;http://www.smpte.org/;;;YUV\n"
+    "vp08;VP8;;;http://www.webmproject.org;;;YUV;4:2:0\n"
+    "vp09;VP9;;;http://www.webmproject.org;;;YUV;4:2:0\n"
     "vvc1;VVC;;Versatile Video Coding\n"
     "vvi1;VVC;;Versatile Video Coding\n"
     "WMV3;VC-1;WMV3;Windows Media Video 9;http://www.microsoft.com/windows/windowsmedia/format/codecdownload.aspx\n"
@@ -6759,12 +6765,12 @@ void MediaInfo_Config_Summary (ZtringListList &Info)
 {
     Info.Separator_Set(0, __T("\n"));
     Info.Write(Ztring().From_UTF8(
-    "General;[%Format/String%][ (%Format_Profile%)][ (%Format_Commercial_IfAny%)]$if(%Format/String%,$: $)%FileSize/String%[, %Duration/String%]\n"
-    "Video;[%Language/String%, ][%BitRate/String%$if(%BitRate_Nominal/String%, \\(%BitRate_Nominal/String%\\)), ][%Width%*][%Height%][ (%DisplayAspectRatio/String%), ][$at$ %FrameRate/String%, ][%Format/String%][ (%CodecID/Hint%)][ (%Standard%)]$if(%MuxingMode%, \\(%MuxingMode%\\))$if(%Format_Version%, \\(%Format_Version%\\))$if(%Format_Profile%, \\(%Format_Profile%\\))$if(%Format_Settings%, \\(%Format_Settings%\\))[ (%Format_Commercial_IfAny%)][, %HDR_Format_Commercial%]\n"
+    "General;[%Format/String%][ (%Format_Profile%)][ (%Format_Commercial_IfAny%)]$if(%Format/String%,$: $)%FileSize/String%[, %Duration/String%]$if(%ConformanceErrors%, \\(%ConformanceErrors% conformance errors\\))$if(%ConformanceWarnings%, \\(%ConformanceWarnings% conformance warnings\\))\n"
+    "Video;[%Language/String%, ][%BitRate/String%$if(%BitRate_Nominal/String%, \\(%BitRate_Nominal/String%\\)), ][%Width%*][%Height%][ (%DisplayAspectRatio/String%), ][$at$ %FrameRate/String%, ][%Format/String%][ (%CodecID/Hint%)][ (%Standard%)]$if(%MuxingMode%, \\(%MuxingMode%\\))$if(%Format_Version%, \\(%Format_Version%\\))$if(%Format_Profile%, \\(%Format_Profile%\\))$if(%Format_Settings%, \\(%Format_Settings%\\))[ (%Format_Commercial_IfAny%)][, %HDR_Format_Commercial%]$if(%ConformanceErrors%, \\(%ConformanceErrors% conformance errors\\))$if(%ConformanceWarnings%, \\(%ConformanceWarnings% conformance warnings\\))\n"
     "Audio;[%Language/String%, ][%BitRate/String%$if(%BitRate_Nominal/String%, \\(%BitRate_Nominal/String%\\)), ][%SamplingRate/String%, ][%BitDepth/String%, ][%Channel(s)_Original/String%  / ][%Channel(s)/String%, ][%Format/String%][ (%CodecID/Hint%)]$if(%MuxingMode%, \\(%MuxingMode%\\))$if(%Format_Version%, \\(%Format_Version%\\))$if(%Format_Profile%, \\(%Format_Profile%\\))$if(%Format_Settings%, \\(%Format_Settings%\\))[ (%Format_Commercial_IfAny%)][, %NumberOfProgrammes% programmes][, %NumberOfObjects% objects][, %NumberOfPresentations% presentations][, %NumberOfSubstreams% substreams][ (%AdmProfile_Format% ADM profile)]$if(%ConformanceErrors%, \\(%ConformanceErrors% conformance errors\\))$if(%ConformanceWarnings%, \\(%ConformanceWarnings% conformance warnings\\))\n"
-    "Text;[%Language/String%, ][%Format/String%][ (%Format_Commercial_IfAny%)]$if(%MuxingMode%, \\(%MuxingMode%\\))\n"
-    "Image;[%Language/String%, ][%Width%*][%Height%][ (%DisplayAspectRatio/String%)][, %Format/String%]\n"
-    "Chapters;[%Language/String%, ]%Total% chapters[, %Format/String%][ (%Format_Commercial_IfAny%)]\n"
+    "Text;[%Language/String%, ][%Format/String%][ (%Format_Commercial_IfAny%)]$if(%MuxingMode%, \\(%MuxingMode%\\))$if(%ConformanceErrors%, \\(%ConformanceErrors% conformance errors\\))$if(%ConformanceWarnings%, \\(%ConformanceWarnings% conformance warnings\\))\n"
+    "Image;[%Language/String%, ][%Width%*][%Height%][ (%DisplayAspectRatio/String%)][, %Format/String%]$if(%ConformanceErrors%, \\(%ConformanceErrors% conformance errors\\))$if(%ConformanceWarnings%, \\(%ConformanceWarnings% conformance warnings\\))\n"
+    "Chapters;[%Language/String%, ]%Total% chapters[, %Format/String%][ (%Format_Commercial_IfAny%)]$if(%ConformanceErrors%, \\(%ConformanceErrors% conformance errors\\))$if(%ConformanceWarnings%, \\(%ConformanceWarnings% conformance warnings\\))\n"
     ));
     Info.Separator_Set(0, ZenLib::EOL);
 }

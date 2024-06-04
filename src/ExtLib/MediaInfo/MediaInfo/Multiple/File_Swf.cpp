@@ -688,9 +688,12 @@ bool File_Swf::Decompress()
     File_Swf MI;
     MI.FileLength=FileLength;
     MI.Version=Version;
+    auto File_Size_Sav=File_Size;
+    File_Size=Dest_Size;
     Open_Buffer_Init(&MI);
-    MI.Open_Buffer_Continue(Dest, FileLength-8);
+    MI.Open_Buffer_Continue(Dest, Dest_Size);
     MI.Open_Buffer_Finalize();
+    File_Size=File_Size_Sav;
     Merge(MI, Stream_General, 0, 0);
     Merge(MI);
     delete[] Dest; //Dest=NULL;

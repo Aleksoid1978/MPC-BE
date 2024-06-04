@@ -233,7 +233,6 @@ File_DvDif::File_DvDif()
         Demux_Level=3; //Container and Stream
     #endif //MEDIAINFO_DEMUX
     MustSynchronize=true;
-    Buffer_TotalBytes_FirstSynched_Max=64*1024;
 
     //In
     Frame_Count_Valid=IsSub?1:2;

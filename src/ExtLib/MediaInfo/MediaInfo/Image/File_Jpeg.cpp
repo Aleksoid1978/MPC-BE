@@ -231,6 +231,7 @@ File_Jpeg::File_Jpeg()
     //In
     StreamKind=Stream_Image;
     Interlaced=false;
+    MxfContentKind=(int8u)-1;
     #if MEDIAINFO_DEMUX
     FrameRate=0;
     #endif //MEDIAINFO_DEMUX
@@ -730,6 +731,22 @@ void File_Jpeg::SIZ()
     FILLING_BEGIN_PRECISE();
         if (Frame_Count==0 && Field_Count==0)
         {
+            if (IsSub && !Interlaced && MxfContentKind<=1)
+            {
+                //Checking if a 2nd field is present
+                size_t Size=(size_t)(Buffer_Offset+Element_Size);
+                if (Size<Buffer_Size)
+                {
+                    auto End=Buffer+Buffer_Size-Size;
+                    for (auto Search=Buffer+1; Search<End; Search++)
+                        if (!memcmp(Buffer, Search, Size))
+                        {
+                            Interlaced=true;
+                            break;
+                        }
+                }
+            }
+
             Accept("JPEG 2000");
             Fill("JPEG 2000");
 
@@ -742,6 +759,8 @@ void File_Jpeg::SIZ()
                 Fill(Stream_Image, 0, Image_Codec_String, "JPEG 2000", Unlimited, true, true); //To Avoid automatic filling
             Fill(StreamKind_Last, 0, StreamKind_Last==Stream_Image?(size_t)Image_Width:(size_t)Video_Width, Xsiz);
             Fill(StreamKind_Last, 0, StreamKind_Last==Stream_Image?(size_t)Image_Height:(size_t)Video_Height, Ysiz*(Interlaced?2:1)); //If image is from interlaced content, must multiply height by 2
+            if (Interlaced)
+                Fill(StreamKind_Last, 0, "ScanType", "Interlaced", Unlimited, true, true);
 
             if (BitDepths.size()==1)
                 Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_BitDepth), 1+BitDepths[0]);

@@ -1446,7 +1446,7 @@ void File__Analyze::Streams_Finish_StreamOnly_Audio(size_t Pos)
                 if (Audio_Begin!=List[2].size())
                 {
                     for (size_t j=0; j<6; j++)
-                        if (!List[j].empty())
+                        if (!List[j].empty() && Audio_Begin+i<List[j].size())
                             List[j].erase(List[j].begin()+Audio_Begin+i);
                     size_t Audio_End;
                     for (Audio_End=Audio_Begin+1; Audio_End<List[2].size(); Audio_End++)

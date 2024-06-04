@@ -37,6 +37,26 @@ extern std::string ExtensibleWave_ChannelMask (int32u ChannelMask); //In Multipl
 extern std::string ExtensibleWave_ChannelMask2 (int32u ChannelMask); //In Multiple/File_Riff_Elements.cpp
 extern std::string ExtensibleWave_ChannelMask_ChannelLayout(int32u ChannelMask); //In Multiple/File_Riff_Elements.cpp
 
+//---------------------------------------------------------------------------
+const char* VorbisCom_ToIgnore[]=
+{
+    "BUYCDURL",
+    "MUSICBRAINZ_ALBUMID",
+    "MUSICBRAINZ_ALBUMARTISTID",
+    "MUSICBRAINZ_ARTISTID",
+    "MUSICBRAINZ_TRACKID",
+    "MUSICBRAINZ_DISCID",
+    "NULL",
+    "REPLAYGAIN_REFERENCE_LOUDNESS",
+};
+bool VorbisCom_CheckToIgnore(const string& Key)
+{
+    for (const auto ToIgnore : VorbisCom_ToIgnore)
+        if (ToIgnore==Key)
+            return true;
+    return false;
+}
+
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -219,7 +239,6 @@ void File_VorbisCom::Data_Parse()
         else if (Key==__T("ALBUMARTIST"))            AlbumArtists.push_back(Value);
         else if (Key==__T("ARTIST"))                 Artists.push_back(Value);
         else if (Key==__T("AUTHOR"))                 Fill(StreamKind_Common,   0, "WrittenBy", Value);
-        else if (Key==__T("BUYCDURL"))               {}
         else if (Key==__T("BWFVERSION"))             // bext
         {
             Fill(Stream_General, 0, "bext_Present", "Yes");
@@ -264,13 +283,7 @@ void File_VorbisCom::Data_Parse()
         else if (Key==__T("LYRICS"))                 Fill(StreamKind_Common,   0, "Lyrics", Value);
         else if (Key==__T("LWING_GAIN"))             Fill(StreamKind_Multiple, 0, "ReplayGain_Gain", Value.To_float64(), 2);
         else if (Key==__T("LOCATION"))               Fill(StreamKind_Common,   0, "Recorded/Location", Value);
-        else if (Key==__T("MUSICBRAINZ_ALBUMID"))    {}
-        else if (Key==__T("MUSICBRAINZ_ALBUMARTISTID")) {}
-        else if (Key==__T("MUSICBRAINZ_ARTISTID"))   {}
-        else if (Key==__T("MUSICBRAINZ_TRACKID"))    {}
         else if (Key==__T("MUSICBRAINZ_SORTNAME"))   Fill(StreamKind_Common,   0, "Performer/Sort", Value);
-        else if (Key==__T("MUSICBRAINZ_DISCID"))     {}
-        else if (Key==__T("NULL"))                   {}
         else if (Key==__T("ORGANIZATION"))           Fill(StreamKind_Common,   0, "Producer", Value);
         else if (Key==__T("ORIGINATOR"))             Fill(StreamKind_Common,   0, "Producer", Value);
         else if (Key==__T("PERFORMER"))              Performers.push_back(Value);
@@ -279,7 +292,6 @@ void File_VorbisCom::Data_Parse()
         else if (Key==__T("RATING"))                 Fill(StreamKind_Multiple, 0, "Rating", Value);
         else if (Key==__T("REPLAYGAIN_ALBUM_GAIN"))  Fill(StreamKind_Common,   0, "Album_ReplayGain_Gain", Value.To_float64(), 2);
         else if (Key==__T("REPLAYGAIN_ALBUM_PEAK"))  Fill(StreamKind_Common,   0, "Album_ReplayGain_Peak", Value.To_float64(), 6);
-        else if (Key==__T("REPLAYGAIN_REFERENCE_LOUDNESS")) {}
         else if (Key==__T("REPLAYGAIN_TRACK_GAIN"))  Fill(StreamKind_Specific, 0, "ReplayGain_Gain",       Value.To_float64(), 2);
         else if (Key==__T("REPLAYGAIN_TRACK_PEAK"))  Fill(StreamKind_Specific, 0, "ReplayGain_Peak",       Value.To_float64(), 6);
         else if (Key==__T("REFERENCE"))              Fill(StreamKind_Common,   0, "Producer_Reference", Value);
@@ -407,6 +419,13 @@ void File_VorbisCom::Data_Parse()
                 Fill(Stream_Menu, 0, Chapter_Time.To_UTF8().c_str(), Value);
             }
             Fill(Stream_Menu, StreamPos_Last, Menu_Chapters_Pos_End, Count_Get(Stream_Menu, StreamPos_Last), 10, true);
+        }
+        else if (VorbisCom_CheckToIgnore(Key.To_UTF8()))
+        {
+            #if MEDIAINFO_ADVANCED
+                Fill(Stream_General, 0, Key.To_UTF8().c_str(), Value);
+                Fill_SetOptions(Stream_General, 0, Key.To_UTF8().c_str(), "N NTY");
+            #endif //MEDIAINFO_ADVANCED
         }
         else                                Fill(Stream_General, 0, comment.SubString(__T(""), __T("=")).To_UTF8().c_str(), Value);
     FILLING_END();

@@ -657,7 +657,6 @@ File_Avc::File_Avc()
         Trace_Layers_Update(8); //Stream
     #endif //MEDIAINFO_TRACE
     MustSynchronize=true;
-    Buffer_TotalBytes_FirstSynched_Max=64*1024;
     PTS_DTS_Needed=true;
     StreamSource=IsStream;
     Frame_Count_NotParsedIncluded=0;
@@ -1879,19 +1878,13 @@ void File_Avc::Header_Parse()
                         Size=Size_;
                     }
                     break;
+            default:    Trusted_IsNot("No size of NALU defined");
+                        Header_Fill_Size(Buffer_Size-Buffer_Offset);
+                        return;
         }
-        if (Size>Element_Size-Element_Offset)
-        {
-            if (File_Offset+Buffer_Size==File_Size)
-                Size=Element_Size-Element_Offset; //Partial but end of file so we do with what we have
-            else
-            {
-                Size=Element_Size-Element_Offset; //If Size is 0 or Size biger than sample size, it is not normal, we skip the complete frame
-                Element_Offset=Element_Size;
-            }
-        }
-        Size+=Element_Offset;
-        Header_Fill_Size(Size);
+        if (Element_Size<(int64u)SizeOfNALU_Minus1+1+1 || Size>Element_Size-Element_Offset)
+            return RanOutOfData("AVC");
+        Header_Fill_Size(Element_Offset+Size);
         BS_Begin();
         Mark_0 ();
         Get_S1 ( 2, nal_ref_idc,                                "nal_ref_idc");
@@ -4786,6 +4779,10 @@ void File_Avc::SPS_PPS()
         MustParse_SPS_PPS=false;
         if (!Status[IsAccepted])
             Accept("AVC");
+    FILLING_ELSE();
+        Frame_Count_NotParsedIncluded--;
+        RanOutOfData("AVC");
+        Frame_Count_NotParsedIncluded++;
     FILLING_END();
 }
 

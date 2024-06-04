@@ -791,9 +791,9 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                         size_t Space=SubName.rfind(' ');
                         if (Space!=(size_t)-1)
                             SubName.erase(0, Space+1);
-                        size_t NumbersPos=SubName.find_first_of("0123456789");
+                        size_t NumbersPos=SubName.find_last_not_of("0123456789");
                         if (NumbersPos!=(size_t)-1)
-                            SubName.resize(NumbersPos);
+                            SubName.resize(NumbersPos+1);
                         if (XML_0_7_78 || JSON)
                             SubName=Xml_Name_Escape_0_7_78(Ztring().From_UTF8(SubName)).To_UTF8();
                         else

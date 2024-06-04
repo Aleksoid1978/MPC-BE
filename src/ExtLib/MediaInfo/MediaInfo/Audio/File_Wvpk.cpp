@@ -110,7 +110,7 @@ File_Wvpk::File_Wvpk()
 
     //Configuration
     MustSynchronize=true;
-    Buffer_TotalBytes_FirstSynched_Max=32*1024;
+    Buffer_TotalBytes_FirstSynched_Max=64*1024;
 
     //In
     Frame_Count_Valid=2;
@@ -121,13 +121,17 @@ File_Wvpk::File_Wvpk()
     total_samples_FirstFrame=(int32u)-1;
     block_index_FirstFrame=0;
     block_index_LastFrame=0;
-    SamplingRate=(int8u)-1;
+    SamplingRate_Index=(int8u)-1;
+    SamplingRate_Shift=0;
+    SamplingRate=0;
     num_channels=0;
     channel_mask=0;
     mono=false;
     hybrid=false;
     resolution0=false;
     resolution1=false;
+    correction=false;
+    dsf=false;
 }
 
 //***************************************************************************
@@ -137,18 +141,20 @@ File_Wvpk::File_Wvpk()
 //---------------------------------------------------------------------------
 void File_Wvpk::Streams_Finish()
 {
-    Fill(Stream_Audio, 0, Audio_BitRate_Mode, "VBR");
-
     //Specific case
     if (FromMKV)
         return;
 
     //Duration
-    if (SamplingRate<15)
+    if (!SamplingRate && SamplingRate_Index<15)
+        SamplingRate=Wvpk_SamplingRate[SamplingRate_Index]<<SamplingRate_Shift;
+    if (SamplingRate)
     {
-        int64u Duration=(((int64u)(block_index_LastFrame+block_samples_LastFrame-block_index_FirstFrame))*1000/Wvpk_SamplingRate[SamplingRate]); //Don't forget the last frame with block_samples...
+        int64u Samples=(int64u)(block_index_LastFrame+block_samples_LastFrame-block_index_FirstFrame); //Don't forget the last frame with block_samples...
+        int64u BitDepth=dsf?1:(Wvpk_Resolution[(resolution1?1:0)*2+(resolution0?1:0)]);
+        int64u Duration=Samples*1000/SamplingRate;
         int64u CompressedSize=File_Size-TagsSize;
-        int64u UncompressedSize=Duration*(mono?1:2)*Wvpk_Resolution[(resolution1?1:0)*2+(resolution0?1:0)]*Wvpk_SamplingRate[SamplingRate]/8/1000;
+        int64u UncompressedSize=Duration*(mono?1:2)*BitDepth*(SamplingRate<<(3*dsf))/8/1000;
         float32 CompressionRatio=((float32)UncompressedSize)/CompressedSize;
         Fill(Stream_Audio, 0, Audio_StreamSize, CompressedSize, 3, true);
         Fill(Stream_Audio, 0, Audio_Duration, Duration, 10, true);
@@ -378,12 +384,12 @@ void File_Wvpk::Data_Parse()
                     Skip_Flags(flags, 23,                           "sampling rate");
                     Skip_Flags(flags, 24,                           "sampling rate");
                     Skip_Flags(flags, 25,                           "sampling rate");
-                    Skip_Flags(flags, 26,                           "sampling rate"); SamplingRate=(int8u)(((flags>>23)&0xF)); Param_Info1(Wvpk_SamplingRate[SamplingRate]);
+                    Skip_Flags(flags, 26,                           "sampling rate"); SamplingRate_Index=(int8u)(((flags>>23)&0xF)); Param_Info1(Wvpk_SamplingRate[SamplingRate_Index]);
                     Skip_Flags(flags, 27,                           "reserved");
                     Skip_Flags(flags, 28,                           "reserved");
                     Skip_Flags(flags, 29,                           "use IIR for negative hybrid noise shaping");
                     Skip_Flags(flags, 30,                           "false stereo");
-                    Skip_Flags(flags, 31,                           "reserved");
+                    Get_Flags (flags, 31, dsf,                      "dsf");
             }
             else
             {
@@ -435,7 +441,9 @@ void File_Wvpk::Data_Parse()
                 {
                     case 0x07 : id_07(); break;
                     case 0x0D : id_0D(); break;
+                    case 0x0E : id_0E(); break;
                     case 0x25 : id_25(); break;
+                    case 0x27 : id_27(); break;
                     default   : if (word_size)
                                     Skip_XX(Size,                   "data");
                 }
@@ -447,10 +455,15 @@ void File_Wvpk::Data_Parse()
     }
 
     //Filling
-    if (!Status[IsAccepted] && Frame_Count>=Frame_Count_Valid)
+    if (!Status[IsAccepted])
     {
-        File__Tags_Helper::Accept("WavPack");
-        Data_Parse_Fill();
+        if (File_Offset+Buffer_Offset+Element_Size==File_Size)
+            Frame_Count_Valid=Frame_Count;
+        if (Frame_Count>=Frame_Count_Valid)
+        {
+            File__Tags_Helper::Accept("WavPack");
+            Data_Parse_Fill();
+        }
     }
 }
 
@@ -465,7 +478,8 @@ void File_Wvpk::Data_Parse_Fill()
         Version_Minor.insert(0, 1, __T('0'));
     Fill(Stream_Audio, 0, Audio_Format_Profile, Ztring::ToZtring(version/0x100)+__T('.')+Version_Minor);
     Fill(Stream_Audio, 0, Audio_Codec, "Wavpack");
-    Fill(Stream_Audio, 0, Audio_BitDepth, Wvpk_Resolution[(resolution1?1:0)*2+(resolution0?1:0)]);
+    if (!dsf)
+        Fill(Stream_Audio, 0, Audio_BitDepth, Wvpk_Resolution[(resolution1?1:0)*2+(resolution0?1:0)]);
     Fill(Stream_Audio, StreamPos_Last, Audio_Channel_s_, num_channels?num_channels:(mono?1:2));
     if (channel_mask)
     {
@@ -558,18 +572,28 @@ void File_Wvpk::Data_Parse_Fill()
         Fill(Stream_Audio, 0, Audio_ChannelLayout, ExtensibleWave_ChannelMask_ChannelLayout(channel_mask));
     }
 
-    if (!FromMKV && SamplingRate<15)
+    if (!FromMKV && SamplingRate_Index<15)
     {
-        Fill(Stream_Audio, StreamPos_Last, Audio_SamplingRate, Wvpk_SamplingRate[SamplingRate]);
+        Fill(Stream_Audio, StreamPos_Last, Audio_SamplingRate, (Wvpk_SamplingRate[SamplingRate_Index]<<SamplingRate_Shift)<<(3*dsf));
         if (total_samples_FirstFrame!=(int32u)-1) //--> this is a valid value
-            Fill(Stream_Audio, 0, Audio_Duration, ((int64u)total_samples_FirstFrame)*1000/Wvpk_SamplingRate[SamplingRate]);
+            Fill(Stream_Audio, 0, Audio_Duration, ((int64u)total_samples_FirstFrame)*1000/(Wvpk_SamplingRate[SamplingRate_Index]<<SamplingRate_Shift));
     }
-    Fill(Stream_Audio, 0, Audio_Format_Settings, hybrid?"Hybrid lossy":"Lossless");
-    Fill(Stream_Audio, 0, Audio_Codec_Settings, hybrid?"hybrid lossy":"lossless");
     Fill(Stream_Audio, 0, Audio_Encoded_Library_Settings, Encoded_Library_Settings);
+    Fill(Stream_Audio, 0, Audio_BitRate_Mode, "VBR");
+    const char* Mode=(hybrid && !correction)?"Lossy":"Lossless";
+    Fill(Stream_Audio, 0, Audio_Compression_Mode, Mode);
+    Fill(Stream_Audio, 0, Audio_Codec_Settings, Mode);
+    if (dsf)
+    {
+        Fill(Stream_Audio, 0, Audio_Format_Settings_Mode, "DSF");
+        Fill(Stream_Audio, 0, Audio_Format_Settings, "DSF");
+    }
+    if (correction)
+        Fill(Stream_Audio, 0, Audio_Format_AdditionalFeatures, "Correction");
 
     //No more need data
-    File__Tags_Helper::GoToFromEnd(512*1024, "WavPack");
+    if (File_Size!=(int64u)-1 && File_Size-(File_Offset+Buffer_Offset)>=2*512*1024)
+        File__Tags_Helper::GoToFromEnd(512*1024, "WavPack");
 }
 
 //***************************************************************************
@@ -580,12 +604,9 @@ void File_Wvpk::Data_Parse_Fill()
 void File_Wvpk::id_07()
 {
     //Parsing
-    Skip_XX(Size,                                               "Data (Not decoded yet)");
+    Skip_XX(Size,                                               "Data");
 
-    FILLING_BEGIN();
-        if (Retrieve(Stream_Audio, 0, Audio_Compression_Mode).empty())
-            Fill(Stream_Audio, 0, Audio_Compression_Mode, "Lossless", Unlimited, true, true);
-    FILLING_END();
+    correction=true;
 }
 
 //---------------------------------------------------------------------------
@@ -619,6 +640,16 @@ void File_Wvpk::id_0D()
                     break;
         default :   Skip_XX(Size,                               "unknown");
     }
+}
+
+//---------------------------------------------------------------------------
+void File_Wvpk::id_0E()
+{
+    //Parsing
+    int8u Temp;
+    Get_L1 (Temp,                                               "framerate multiplier");
+    if (Temp<31)
+        SamplingRate_Shift=Temp;
 }
 
 //---------------------------------------------------------------------------
@@ -720,6 +751,16 @@ void File_Wvpk::id_25()
         Encoded_Library_Settings+=__T(" --optimize-mono");
     if (!Encoded_Library_Settings.empty())
         Encoded_Library_Settings.erase(Encoded_Library_Settings.begin());
+}
+
+//---------------------------------------------------------------------------
+void File_Wvpk::id_27()
+{
+    //Parsing
+    Get_L3 (SamplingRate,                                       "data");
+
+    if (SamplingRate)
+        Fill(Stream_Audio, StreamPos_Last, Audio_SamplingRate, SamplingRate, 10, true);
 }
 
 //***************************************************************************

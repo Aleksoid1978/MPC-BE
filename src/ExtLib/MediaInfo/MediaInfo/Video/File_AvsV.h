@@ -32,7 +32,6 @@ class File_AvsV : public File__Analyze
 public :
     //In
     int64u Frame_Count_Valid;
-    bool   FrameIsAlwaysComplete;
 
     //constructor/Destructor
     File_AvsV();

@@ -66,6 +66,10 @@ private :
 
     bool BookMark_Needed();
 
+    #if MEDIAINFO_CONFORMANCE
+        string CreateElementName();
+    #endif //MEDIAINFO_CONFORMANCE
+
     //Data
     struct stream
     {
@@ -176,6 +180,7 @@ private :
     bool   IsBigEndian;
     bool   IsWave64;
     bool   IsRIFF64;
+    bool   IsBW64;
     bool   IsWaveBroken;
     bool   IsNotWordAligned;
     bool   IsNotWordAligned_Tested;

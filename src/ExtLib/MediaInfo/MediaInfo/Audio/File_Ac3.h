@@ -156,7 +156,15 @@ private :
     int8u  acmod_Max[8][9];
     int8u  cmixlev_Max[8][9];
     int8u  surmixlev_Max[8][9];
+    int8u  mixlevel_Max[8][9];
+    int8u  roomtyp_Max[8][9];
     int8u  dsurmod_Max[8][9];
+    int8u  dmixmod_Max[8][9];
+    int8u  ltrtcmixlev_Max[8][9];
+    int8u  ltrtsurmixlev_Max[8][9];
+    int8u  lorocmixlev_Max[8][9];
+    int8u  lorosurmixlev_Max[8][9];
+    bool   adconvtyp_Max[8][9];
     int8u  numblkscod;
     int8u  dsurexmod;
     int8u  dheadphonmod;

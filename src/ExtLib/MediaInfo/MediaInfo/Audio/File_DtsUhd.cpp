@@ -1368,7 +1368,7 @@ File_DtsUhd::File_DtsUhd()
     IsType1CertifiedContent=false;
     LongTermLoudnessIndex=(int8u)-1;
     MustSynchronize=true;
-    Buffer_TotalBytes_FirstSynched_Max=32*1024;
+    Buffer_TotalBytes_FirstSynched_Max=64*1024;
     PTS_DTS_Needed=true;
     StreamSource=IsStream;
 }

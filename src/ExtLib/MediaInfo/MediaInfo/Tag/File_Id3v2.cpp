@@ -508,16 +508,30 @@ void File_Id3v2::Header_Parse()
             Element_WaitForMoreData();
             return;
         }
-        for (size_t Element_Offset_Unsynch=0; Element_Offset_Unsynch+2<Element_Offset+Size; Element_Offset_Unsynch++)
-            if (CC2(Buffer+Buffer_Offset+Element_Offset_Unsynch)==0xFF00)
+        auto Buffer_Beg=Buffer+Buffer_Offset+(size_t)Element_Offset;
+        auto Buffer_Cur=Buffer_Beg;
+        auto Buffer_End=Buffer_Beg+(size_t)Size-1;
+        for (; Buffer_Cur<Buffer_End; Buffer_Cur++)
+        {
+            if (*Buffer_Cur==0xFF) // check 0xFF00
             {
-                Size++;
-                if (Buffer_Offset+(size_t)Element_Offset+Size>Buffer_Size)
+                auto Buffer_Cur2=Buffer_Cur+1;
+                if (!*Buffer_Cur2) 
                 {
-                    Element_WaitForMoreData();
-                    return;
+                    Unsynch_List.push_back(Buffer_Cur2-Buffer_Beg);
+                    if (Id3v2_Version<4)
+                    {
+                        Size++;
+                        Buffer_End++;
+                        if (Buffer_Offset+(size_t)Element_Offset+Size>Buffer_Size)
+                        {
+                            Element_WaitForMoreData();
+                            return;
+                        }
+                    }
                 }
             }
+        }
     }
 
     //Filling
@@ -554,19 +568,6 @@ void File_Id3v2::Data_Parse()
     int64u Save_File_Offset=File_Offset;
     size_t Save_Buffer_Offset=Buffer_Offset;
     int64u Save_Element_Size=Element_Size;
-    std::vector<size_t> Unsynch_List;
-    if ((Unsynchronisation_Global || Unsynchronisation_Frame) && Element_Size-Element_Offset>1)
-    {
-        auto Buffer_Beg=Buffer+Buffer_Offset;
-        auto Buffer_Cur=Buffer_Beg+(size_t)Element_Offset;
-        Buffer_Beg--;
-        auto Buffer_End=Buffer_Beg+(size_t)Element_Size;
-        for (; Buffer_Cur<Buffer_End; Buffer_Cur++)
-        {
-            if (BigEndian2int16u(Buffer_Cur)==0xFF00)
-                Unsynch_List.push_back(Buffer_Cur-Buffer_Beg);
-        }
-    }
     if (DataLength!=(int32u)-1)
     {
         int64u TotalLength=4+(int64u)DataLength;
@@ -591,16 +592,8 @@ void File_Id3v2::Data_Parse()
                 size_t Pos0=(Pos==Unsynch_List.size())?(size_t)(Element_Size+Unsynch_List.size()):(Unsynch_List[Pos]);
                 size_t Pos1=(Pos==0)?0:(Unsynch_List[Pos-1]+1);
                 size_t Buffer_Unsynch_Begin=Pos1-Pos;
-                if (Buffer_Unsynch_Begin>=Element_Size)
-                {
-                    Unsynch_List.resize(Pos-1);
-                    break;
-                }
                 size_t Save_Buffer_Begin  =Pos1;
                 size_t Size=               Pos0-Pos1;
-                auto NextPos=Buffer_Unsynch_Begin+Size;
-                if (NextPos>Element_Size)
-                    Size=Element_Size-Buffer_Unsynch_Begin;
                 std::memcpy(Buffer_Unsynch+Buffer_Unsynch_Begin, Save_Buffer+Save_Buffer_Offset+Save_Buffer_Begin, Size);
             }
             Buffer=Buffer_Unsynch;
@@ -788,6 +781,7 @@ void File_Id3v2::Data_Parse()
         delete[] Buffer; Buffer=Save_Buffer;
         Buffer_Unsynch=NULL; //Same as Buffer...
         Element_Offset+=Unsynch_List.size();
+        Unsynch_List.clear();
     }
     if (Element_Offset<Element_Size)
         Skip_XX(Element_Size-Element_Offset,                    "Junk");

@@ -23,12 +23,12 @@ namespace ZenLib
 // Class bitset8
 //***************************************************************************
 
-#if __cplusplus >= 201400 || (_MSC_VER >= 1910 && _MSVC_LANG >= 201400)
+#if __cplusplus >= 201400 || (defined(_MSC_VER) && _MSC_VER >= 1910 && _MSVC_LANG >= 201400)
     #define constexpr14 constexpr
 #else
     #define constexpr14
 #endif
-#if __cplusplus >= 202000 || (_MSC_VER >= 1910 && _MSVC_LANG >= 202000)
+#if __cplusplus >= 202000 || (defined(_MSC_VER) && _MSC_VER >= 1910 && _MSVC_LANG >= 202000)
     #define constexpr20 constexpr
 #else
     #define constexpr20
@@ -268,7 +268,7 @@ public:
         return GetHours() == tc.GetHours()
             && GetMinutes() == tc.GetMinutes()
             && GetSeconds() == tc.GetSeconds()
-            && GetFrames() == tc.GetFrames();
+            && GetFrames() * (tc.GetFramesMax() + 1) == tc.GetFrames() * (GetFramesMax() + 1);
     }
     bool operator!= (const TimeCode& tc) const
     {

@@ -483,6 +483,8 @@ File_Ffv1::File_Ffv1()
     sample_aspect_ratio_den = 0;
     KeyFramePassed = false;
     memset(context_count, 0, MAX_QUANT_TABLES*sizeof(int32u));
+
+    Frame_Count_NotParsedIncluded=0;
 }
 
 //---------------------------------------------------------------------------
@@ -699,6 +701,8 @@ void File_Ffv1::Read_Buffer_OutOfBand()
     if (CRC_32)
         Param_Error("FFV1-HEADER-configuration_record_crc_parity:1");
     Element_End0();
+
+    Merge_Conformance(true);
 }
 
 //---------------------------------------------------------------------------
@@ -707,10 +711,13 @@ void File_Ffv1::Skip_Frame()
     Skip_XX(Element_Size-Element_Offset, "Data");
 
     Frame_Count++;
+    if (Frame_Count_NotParsedIncluded!=(int64u)-1)
+        Frame_Count_NotParsedIncluded++;
 
     delete RC;
     RC = NULL;
 
+    Merge_Conformance();
     Fill();
     if (Config->ParseSpeed<1.0)
         Finish();
@@ -721,6 +728,13 @@ void File_Ffv1::Read_Buffer_Continue()
 {
     if (!Buffer_Size)
         return;
+
+    if (Frame_Count==0)
+    {
+        #if MEDIAINFO_MACROBLOCKS
+            ParseCompletely=Config->File_Macroblocks_Parse_Get();
+        #endif //MEDIAINFO_MACROBLOCKS
+    }
 
     if (ConfigurationRecord_IsPresent && !Parameters_IsValid)
     {
@@ -743,19 +757,7 @@ void File_Ffv1::Read_Buffer_Continue()
         KeyFramePassed=true;
 
     if (!ConfigurationRecord_IsPresent && keyframe)
-    {
-        #if MEDIAINFO_TRACE
-            bool Trace_Activated_Save=Trace_Activated;
-            if (Trace_Activated && Frame_Count)
-                Trace_Activated=false; // Trace is relatively huge, temporarary deactivating it. TODO: an option for it
-        #endif //MEDIAINFO_TRACE
-
         Parameters();
-
-        #if MEDIAINFO_TRACE
-            Trace_Activated=Trace_Activated_Save; // Trace is too huge, reactivating it.
-        #endif //MEDIAINFO_TRACE
-    }
 
     if (!Parameters_IsValid || !KeyFramePassed)
     {
@@ -830,13 +832,13 @@ void File_Ffv1::Read_Buffer_Continue()
             ParseContent=true;
 
         //SliceContent
-        #if MEDIAINFO_TRACE
-        if (ParseContent && (!Frame_Count || Trace_Activated) && current_slice->w && current_slice->h) // Parse slice only if trace feature is activated
+        #if MEDIAINFO_TRACE || MEDIAINFO_MACROBLOCKS
+        if (ParseContent && (ParseCompletely || Trace_Activated) && current_slice->w && current_slice->h) // Parse slice only if trace feature is activated
         {
             SliceContent(States);
         }
         else
-        #endif //MEDIAINFO_TRACE
+        #endif //MEDIAINFO_TRACE || MEDIAINFO_MACROBLOCKS
             Skip_XX(Element_Size-Element_Offset,                "SliceContent");
         if (version<=1 && Element_Offset+5==Element_Size)
         {
@@ -900,7 +902,7 @@ void File_Ffv1::Read_Buffer_Continue()
     }
 
     //Integrity test
-    if (!BuggySlices && version>=3 && slices)
+    if (!BuggySlices && version>=3 && slices && (ParseCompletely || Trace_Activated))
     {
         vector<size_t> SlicesPlaces;
         size_t SlicesPlaces_Size=num_h_slices*num_v_slices;
@@ -934,11 +936,14 @@ void File_Ffv1::Read_Buffer_Continue()
         }
 
         Frame_Count++;
+        if (Frame_Count_NotParsedIncluded!=(int64u)-1)
+            Frame_Count_NotParsedIncluded++;
     FILLING_END();
 
     delete RC;
     RC = NULL;
 
+    Merge_Conformance();
     Fill();
     if (Config->ParseSpeed<1.0)
         Finish();
@@ -996,8 +1001,8 @@ void File_Ffv1::Parameters()
         Element_End0();
         return;
     }
-    if (Frame_Count==0)
-        Accept(); //TODO: better check without removing error info in trace
+    if (!Status[IsAccepted])
+        Accept();
     Get_RU (States, coder_type,                                 "coder_type");
     if (coder_type>2)
     {
@@ -1198,7 +1203,7 @@ void File_Ffv1::Parameters()
         }
 
         //Filling
-        if (Frame_Count==0)
+        if (Retrieve_Const(Stream_Video, 0, Video_BitDepth).empty())
         {
             Fill(Stream_Video, 0, "coder_type", Ffv1_coder_type(coder_type));
             Fill(Stream_Video, 0, Video_BitDepth, bits_per_raw_sample);
@@ -1251,9 +1256,9 @@ void File_Ffv1::Parameters()
                     ChromaSubsampling+=":4";
                 Fill(Stream_Video, 0, Video_ChromaSubsampling, ChromaSubsampling);
             }
-
-            Parameters_IsValid=true;
         }
+
+        Parameters_IsValid=true;
     FILLING_END();
 }
 
@@ -1323,6 +1328,10 @@ void File_Ffv1::SliceContent(states &States)
         RC->get_rac(&s);
     }
 
+    #if MEDIAINFO_TRACE
+        Trace_Activated=Trace_Activated_Save; // Trace is too huge, reactivating after during pixel decoding
+    #endif //MEDIAINFO_TRACE
+
     if (BS->BufferUnderRun || RC->Underrun())
         Element_Error("FFV1-SLICE-SliceContent:1");
 
@@ -1335,9 +1344,6 @@ void File_Ffv1::SliceContent(states &States)
         //Decode(Buffer, Buffer_Size);
     #endif //MEDIAINFO_DECODE
 
-    #if MEDIAINFO_TRACE
-        Trace_Activated=Trace_Activated_Save; // Trace is too huge, reactivating after during pixel decoding
-    #endif //MEDIAINFO_TRACE
     Element_End0();
 }
 
@@ -1671,7 +1677,14 @@ int32s File_Ffv1::pixel_GR(int32s context)
     if (current_slice->run_mode == RUN_MODE_STOP)
     {
         if (context)
+        {
+            if (context >= Context_GR_Size)
+            {
+                BS->Skip(BS->Remain());
+                return 0;
+            }
             return get_symbol_with_bias_correlation(&Context_GR[context]); // If not running, get the symbol
+        }
 
         current_slice->run_mode = RUN_MODE_PROCESSING; // New symbol, go to "run mode"
     }
@@ -1761,6 +1774,7 @@ void File_Ffv1::line(int pos, pixel_t *sample[2])
         current_slice->run_mode_init();
 
         Context_GR = current_slice->contexts[pos];
+        Context_GR_Size = context_count[pos];
         x = 0;
 
         while (s0c < s0e)

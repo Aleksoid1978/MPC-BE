@@ -349,6 +349,12 @@
 #endif
 
 //---------------------------------------------------------------------------
+// Tag
+#if defined(MEDIAINFO_ICC_YES)
+    #include "MediaInfo/Tag/File_Icc.h"
+#endif
+
+//---------------------------------------------------------------------------
 // Archive
 #if defined(MEDIAINFO_7Z_YES)
     #include "MediaInfo/Archive/File_7z.h"
@@ -565,9 +571,6 @@ File__MultipleParsing::File__MultipleParsing()
     #if defined(MEDIAINFO_FLIC_YES)
         Parser.push_back(new File_Flic());
     #endif
-    #if defined(MEDIAINFO_H263_YES)
-        Parser.push_back(new File_H263());
-    #endif
     #if defined(MEDIAINFO_MPEG4V_YES)
         Parser.push_back(new File_Mpeg4v());
     #endif
@@ -658,9 +661,6 @@ File__MultipleParsing::File__MultipleParsing()
     #if defined(MEDIAINFO_MPCSV8_YES)
         Parser.push_back(new File_MpcSv8());
     #endif
-    #if defined(MEDIAINFO_MPEGA_YES)
-        Parser.push_back(new File_Mpega());
-    #endif
     #if defined(MEDIAINFO_OPENMG_YES)
         Parser.push_back(new File_OpenMG());
     #endif
@@ -750,9 +750,6 @@ File__MultipleParsing::File__MultipleParsing()
     #if defined(MEDIAINFO_TIFF_YES)
         Parser.push_back(new File_Tiff());
     #endif
-    #if defined(MEDIAINFO_TGA_YES)
-        Parser.push_back(new File_Tga());
-    #endif
 
     // Archive
     #if defined(MEDIAINFO_7Z_YES)
@@ -790,6 +787,20 @@ File__MultipleParsing::File__MultipleParsing()
     #if defined(MEDIAINFO_OTHER_YES)
         Parser.push_back(new File_Other());
     #endif
+
+    //At the end, too much sensible
+    #if defined(MEDIAINFO_MPEGA_YES)
+        Parser.push_back(new File_Mpega());
+    #endif
+    #if defined(MEDIAINFO_TGA_YES)
+        Parser.push_back(new File_Tga());
+    #endif
+    #if defined(MEDIAINFO_H263_YES)
+        Parser.push_back(new File_H263());
+    #endif
+    #if defined(MEDIAINFO_ICC_YES)
+        Parser.push_back(new File_Icc());
+    #endif
 }
 
 //---------------------------------------------------------------------------
@@ -797,22 +808,6 @@ File__MultipleParsing::~File__MultipleParsing()
 {
     for (size_t Pos=0; Pos<Parser.size(); Pos++)
         delete Parser[Pos]; //Parser[Pos]=NULL
-}
-
-//***************************************************************************
-// Streams management
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-void File__MultipleParsing::Streams_Finish()
-{
-    if (Parser.size()!=1)
-        return;
-
-    Parser[0]->Open_Buffer_Finalize();
-    #if MEDIAINFO_TRACE
-        Details=Parser[0]->Details;
-    #endif //MEDIAINFO_TRACE
 }
 
 //***************************************************************************
@@ -847,6 +842,10 @@ void File__MultipleParsing::Read_Buffer_Unsynched()
 //---------------------------------------------------------------------------
 void File__MultipleParsing::Read_Buffer_Continue()
 {
+    //Position if requested (reset of value after it was set in the previous call)
+    if (Parser.size()==1 && Parser[0]->File_GoTo!=(int64u)-1)
+        Parser[0]->File_GoTo=File_GoTo;
+
     //Parsing
     for (size_t Pos=0; Pos<Parser.size(); Pos++)
     {
@@ -861,12 +860,6 @@ void File__MultipleParsing::Read_Buffer_Continue()
             delete Parser[Pos];
             Parser.erase(Parser.begin()+Pos);
             Pos--; //for the next position
-
-            if (Parser.empty())
-            {
-                File__Analyze* Temp=new File_Unknown(); Parser.push_back(Temp);
-                Read_Buffer_Init();
-            }
         }
         else
         {
@@ -886,17 +879,22 @@ void File__MultipleParsing::Read_Buffer_Continue()
             {
                 //Status
                 if (!Status[IsAccepted] && Parser[Pos]->Status[IsAccepted])
-                    Status[IsAccepted]=true;
+                    Accept();
                 if (!Status[IsFilled] && Parser[Pos]->Status[IsFilled])
-                    Status[IsFilled]=true;
+                    Fill();
                 if (!Status[IsUpdated] && Parser[Pos]->Status[IsUpdated])
-                    Status[IsUpdated]=true;
+                    Update();
                 if (!Status[IsFinished] && Parser[Pos]->Status[IsFinished])
-                    Status[IsFinished]=true;
+                    Finish();
 
-                //Positionning if requested
-                if (Parser[0]->File_GoTo!=(int64u)-1)
-                   File_GoTo=Parser[0]->File_GoTo;
+                //Seek if requested
+                if (Parser[0]->File_GoTo<File_Size)
+                    File_GoTo=Parser[0]->File_GoTo;
+                else if (Parser[0]->File_GoTo==File_Size && File_Size!=(int64u)-1)
+                {
+                    delete Parser[0];
+                    Parser.clear();
+                }
 
                 //Clean
                 #if MEDIAINFO_TRACE
@@ -904,6 +902,14 @@ void File__MultipleParsing::Read_Buffer_Continue()
                 #endif //MEDIAINFO_TRACE
             }
         }
+    }
+
+    if (Parser.empty())
+    {
+        File__Analyze* Temp=new File_Unknown(); Parser.push_back(Temp);
+        Read_Buffer_Init();
+        Accept();
+        Finish();
     }
 }
 

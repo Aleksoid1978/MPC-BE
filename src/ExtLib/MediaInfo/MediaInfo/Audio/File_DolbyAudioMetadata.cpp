@@ -530,6 +530,8 @@ void File_DolbyAudioMetadata::Merge(File__Analyze& In, size_t StreamPos)
         {
             string Name=TrackUID_String+Pos.To_UTF8();
             auto PosI=(size_t)Pos.To_int64u();
+            if (In.Retrieve_Const(Stream_Audio, 0, Name.c_str()).empty())
+                In.Fill(Stream_Audio, 0, Name.c_str(), "Yes");
             Name+=BinauralRenderMode_String;
             In.Fill(Stream_Audio, 0, Name.c_str(), BinauralRenderMode);
         }
@@ -543,6 +545,8 @@ void File_DolbyAudioMetadata::Merge(File__Analyze& In, size_t StreamPos)
         ZtringList LinkedToList;
         LinkedToList.Separator_Set(0, " + ");
         LinkedToList.Write(LinkedTos);
+        if (In.Retrieve_Const(Stream_Audio, 0, Name.c_str()).empty())
+            In.Fill(Stream_Audio, 0, Name.c_str(), "Yes");
         Name+=BinauralRenderMode_String;
         ZtringList BinauralRenderModes;
         set<Ztring> BinauralRenderMode_Diffs;

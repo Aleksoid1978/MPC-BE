@@ -2223,7 +2223,7 @@ void File_Mpeg4::Header_Parse()
 
     //Incoherencies
     if (Element_Level<=2 && File_Offset+Buffer_Offset+Size>File_Size)
-        Fill(Stream_General, 0, "IsTruncated", "Yes");
+        IsTruncated(File_Offset+Buffer_Offset+Size, false, "MPEG-4");
 }
 
 //---------------------------------------------------------------------------
@@ -2589,6 +2589,8 @@ bool File_Mpeg4::BookMark_Needed()
                                     else
                                         mdat_Pos_Temp2.Size = *stsz_Current;
                                     mdat_Pos.push_back(mdat_Pos_Temp2);
+                                    if (Temp->second.IsCaption)
+                                        mdat_Pos_Caption.push_back(mdat_Pos_Temp2);
                                     Chunk_Offset += *stsz_Current;
                                     stsz_Current++;
                                     if (stsz_Current2)
@@ -2607,6 +2609,8 @@ bool File_Mpeg4::BookMark_Needed()
                             mdat_Pos_Temp2.StreamID = Temp->first;
                             mdat_Pos_Temp2.Size = stsc_Current->SamplesPerChunk*Temp->second.stsz_Sample_Size*Temp->second.stsz_Sample_Multiplier;
                             mdat_Pos.push_back(mdat_Pos_Temp2);
+                            if (Temp->second.IsCaption)
+                                mdat_Pos_Caption.push_back(mdat_Pos_Temp2);
 
                             #if MEDIAINFO_DEMUX
                                 if (Temp_stts_Durations.empty() || stsc_Current->SamplesPerChunk != Temp_stts_Durations[Temp_stts_Durations.size() - 1].SampleDuration)
@@ -2658,6 +2662,8 @@ bool File_Mpeg4::BookMark_Needed()
                                     if (Temp->second.FirstUsedOffset==(int64u)-1)
                                         Temp->second.FirstUsedOffset=mdat_Pos_Temp2.Offset;
                                     mdat_Pos.push_back(mdat_Pos_Temp2);
+                                    if (Temp->second.IsCaption)
+                                        mdat_Pos_Caption.push_back(mdat_Pos_Temp2);
                                 }
                                 Chunk_Offset += Size;
                                 if (Chunk_Offset >= File_Size)
@@ -2667,7 +2673,7 @@ bool File_Mpeg4::BookMark_Needed()
                                 }
                                 Chunk_FrameCount++;
                                 }
-                            if (!Temp->second.TimeCode && Chunk_FrameCount >= FrameCount_MaxPerStream)
+                            if (!Temp->second.TimeCode && !Temp->second.IsCaption && Chunk_FrameCount >= FrameCount_MaxPerStream)
                                 break;
                         }
 
@@ -2980,6 +2986,28 @@ bool File_Mpeg4::BookMark_Needed()
     Buffer_TotalBytes=0; //Reset of the total bytes parsed as we start the second pass from the begining
     return false; //We do not want to use the bookmark feature, only detect the end of the file
 }
+
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_CONFORMANCE
+string File_Mpeg4::CreateElementName()
+{
+    if (IsParsing_mdat) {
+        return "mdat";
+    }
+    string Result;
+    for (size_t i = 1; i < Element_Level; i++) {
+        Result += Ztring().From_CC4(Element[i].Code).Trim().To_UTF8();
+        if (Result.back() >= '0' && Result.back() <= '9') {
+            Result += '_';
+        }
+        Result += __T(' ');
+    }
+    if (!Result.empty())
+        Result.pop_back();
+    return Result;
+}
+#endif
 
 //---------------------------------------------------------------------------
 //Get language string from 2CC

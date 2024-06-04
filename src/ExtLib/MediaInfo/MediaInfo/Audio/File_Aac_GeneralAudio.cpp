@@ -3202,6 +3202,8 @@ void File_Aac::raw_data_block()
         if (ChannelCount_Temp && ChannelPos_Temp!=ChannelCount_Temp)
             Fill(Stream_Audio, 0, "Errors", "Incoherent count of channels");
     }
+    if (IsSub && Mode==Mode_payload && (!Trusted_Get() || !HasEnd))
+        RanOutOfData("AAC");
     Element_End0();
 }
 

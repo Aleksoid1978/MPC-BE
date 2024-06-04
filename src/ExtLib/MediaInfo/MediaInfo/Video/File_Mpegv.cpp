@@ -1085,7 +1085,6 @@ File_Mpegv::File_Mpegv()
     #endif //MEDIAINFO_TRACE
     Trusted_Multiplier=2;
     MustSynchronize=true;
-    Buffer_TotalBytes_FirstSynched_Max=64*1024;
     PTS_DTS_Needed=true;
     StreamSource=IsStream;
     Frame_Count_NotParsedIncluded=0;

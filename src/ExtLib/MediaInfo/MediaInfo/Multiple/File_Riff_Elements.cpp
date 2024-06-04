@@ -3741,7 +3741,7 @@ void File_Riff::WAVE_axml()
         Element_Name("AXML");
 
         //Parsing
-        Adm->TotalSize = Element_TotalSize_Get();
+        Adm->TotalSize=Buffer_DataToParse_End?(Buffer_DataToParse_End-(File_Offset+Buffer_Offset)):Element_TotalSize_Get();
         WAVE_axml_Continue();
     }
 }
@@ -3750,7 +3750,18 @@ void File_Riff::WAVE_axml_Continue()
 {
     //Parsing
     Open_Buffer_Continue(Adm, Buffer+Buffer_Offset, (size_t)Element_Size);
-    Element_Offset=Adm->NeedToJumpToEnd?(File_Size-(File_Offset+Buffer_Offset)):Element_Size;
+    if (Adm->NeedToJumpToEnd)
+    {
+        auto Size=Element_TotalSize_Get();
+        if (Size>=16*1024*1024)
+        {
+            Size-=16*1024*1024;
+            GoTo(File_Offset+Buffer_Offset+Size);
+        }
+        else
+            Adm->NeedToJumpToEnd=false;
+    }
+    Element_Offset=Element_Size;
 }
 
 //---------------------------------------------------------------------------

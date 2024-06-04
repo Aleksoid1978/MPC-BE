@@ -58,8 +58,8 @@ private :
     void video_H263();
     void video_ScreenVideo(int8u Version);
     void video_VP6(bool WithAlpha);
-    void video_AVC();
-    void video_HEVC();
+    void video_AVC(int8u PacketType_plus1);
+    void video_HEVC(int8u PacketType_plus1);
     void audio();
     void audio_MPEG();
     void audio_AAC();

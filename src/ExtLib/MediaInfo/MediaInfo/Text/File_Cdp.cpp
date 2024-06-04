@@ -354,7 +354,8 @@ void File_Cdp::Data_Parse()
     }
 
     FILLING_BEGIN();
-        Frame_Count++;
+        if (!Status[IsFilled] && Frame_Count>=1024 && Config->ParseSpeed<1.0)
+            Fill();
         if (!IsSub && Config->ParseSpeed<1.0 && Frame_Count>=300)
             Finish();
     FILLING_END();

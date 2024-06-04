@@ -45,6 +45,20 @@
 #include <cstdlib>
 using namespace ZenLib;
 using namespace std;
+#if __cplusplus > 202002L || (defined(_MSC_VER) && _MSC_VER >= 1910 && _MSVC_LANG > 202002L)
+    #define constexpr23 constexpr
+#else
+    #define constexpr23
+#endif
+#if __cplusplus >= 202002L || (defined(_MSC_VER) && _MSC_VER >= 1910 && _MSVC_LANG >= 202002L)
+#else
+    #define consteval constexpr
+#endif
+#if  __cplusplus >= 201703 || _MSC_VER >= 1900
+#else
+    template <typename T, size_t N>
+    inline constexpr size_t size(const T(&)[N]) noexcept { return N; }
+#endif
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -246,6 +260,7 @@ static bool IsHexaDigit(const string& Value, size_t pos, size_t len)
 
 enum check_flags_items {
     Count0,
+    Count1,
     Count2,
     Dolby0,
     Dolby1,
@@ -253,7 +268,6 @@ enum check_flags_items {
     AdvSSE0,
     AdvSSE1,
     AdvSSE2,
-    Reserved8,
     Reserved9,
     Version_Max0,
     Version_Max1,
@@ -265,9 +279,9 @@ enum check_flags_items {
 };
 class check_flags : public bitset<flags_Max> {
 public:
-    constexpr check_flags(unsigned long val) : bitset(val) {}
-    constexpr check_flags(unsigned long min, unsigned long max, unsigned long val0, unsigned long val1, unsigned long val2, unsigned long val3, unsigned long val4, unsigned long val5, unsigned long val6, unsigned long val7)
-    : check_flags((val0 << 0) | (val1 << 1) | (val2 << 2) | (val3 << 3) | (val4 << 4) | (val5 << 5) | (val6 << 6) | (val7 << 7) | (min << Version_Min0) | (max << Version_Max0)) {}
+    consteval check_flags(unsigned long val) : bitset(val) {}
+    consteval check_flags(unsigned long min, unsigned long max, unsigned long val0, unsigned long val1, unsigned long val2, unsigned long val3, unsigned long val4, unsigned long val5, unsigned long val6, unsigned long val7, unsigned long val8)
+    : check_flags((val0 << 0) | (val1 << 1) | (val2 << 2) | (val3 << 3) | (val4 << 4) | (val5 << 5) | (val6 << 6) | (val7 << 7) | (val8 << 8) | (min << Version_Min0) | (max << Version_Max0)) {}
 };
 
 struct attribute_item {
@@ -283,12 +297,15 @@ struct attribute_item {
 typedef attribute_item attribute_items[];
 
 struct element_item {
-    const char*         Name;
-    check_flags         Flags;
-    unsigned long       Min() const {
+    const char* const   Name;
+    const check_flags   Flags;
+    const uint8_t       LinkedItem;
+    constexpr element_item(const char* const Name, const check_flags Flags, const uint8_t LinkedItem = 0)
+        : Name(Name), Flags(Flags), LinkedItem(LinkedItem) {}
+    constexpr23 unsigned long Min() const noexcept {
         return (Flags.to_ulong() >> Version_Min0);
     }
-    unsigned long       Max() const {
+    constexpr23 unsigned long Max() const noexcept {
         return (Flags.to_ulong() >> Version_Max0) & 0x7;
     }
 };
@@ -815,15 +832,14 @@ enum audioBlockFormat_Attribute {
 enum audioBlockFormat_Element {
     audioBlockFormat_gain,
     audioBlockFormat_importance,
+    audioBlockFormat_jumpPosition,
     audioBlockFormat_headLocked,
     audioBlockFormat_headphoneVirtualise,
     audioBlockFormat_speakerLabel,
     audioBlockFormat_position,
     audioBlockFormat_outputChannelFormatIDRef,
     audioBlockFormat_outputChannelIDRef,
-    audioBlockFormat_jumpPosition,
     audioBlockFormat_matrix,
-    audioBlockFormat_coefficient,
     audioBlockFormat_width,
     audioBlockFormat_height,
     audioBlockFormat_depth,
@@ -1002,6 +1018,7 @@ enum tagGroup_Element {
 enum error_Type {
     Error,
     Warning,
+    Information,
     error_Type_Max,
 };
 
@@ -1023,7 +1040,9 @@ static_assert(sizeof(Source_Strings) / sizeof(Source_Strings[0]) == source_Max, 
 static const char* error_Type_String[] = {
     "Errors",
     "Warnings",
+    "Infos",
 };
+static_assert(sizeof(error_Type_String) / sizeof(error_Type_String[0]) == error_Type_Max, IncoherencyMessage);
 
 enum schema {
     Schema_Unknown,
@@ -1042,583 +1061,669 @@ static_assert(schema_String_Size + 1 == Schema_Max, IncoherencyMessage);
 
                                                  // Ver  |Count|Atmos   |AdvSS-E
                                                  // m  M |0  2+|0  1  2+|0  1  2+
-static element_items root_Elements =
+static constexpr element_items root_Elements =
 {
-    { "frameHeader"                             , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "audioFormatExtended"                     , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
+    { "frameHeader"                             , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 }, item_frameHeader },
+    { "audioFormatExtended"                     , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 }, item_audioFormatExtended },
 };
 static_assert(sizeof(root_Elements) / sizeof(element_item) == root_Element_Max, IncoherencyMessage);
 
 static element_items audioFormatExtended_Elements =
 {
-    { "audioProgramme"                          , { 0, 7, 0, 1, 0, 1, 1, 0, 1, 1 } },
-    { "audioContent"                            , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 1 } },
-    { "audioObject"                             , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 1 } },
-    { "audioPackFormat"                         , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1 } },
-    { "audioChannelFormat"                      , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1 } },
-    { "audioTrackUID"                           , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 1 } },
-    { "audioTrackFormat"                        , { 0, 7, 1, 1, 1, 1, 1, 1, 0, 0 } },
-    { "audioStreamFormat"                       , { 0, 7, 1, 1, 1, 1, 1, 1, 0, 0 } },
-    { "profileList"                             , { 3, 7, 1, 0, 1, 1, 0, 0, 1, 0 } },
-    { "tagList"                                 , { 3, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "audioProgramme"                          , { 0, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1 }, item_audioProgramme },
+    { "audioContent"                            , { 0, 7, 1, 1, 1, 1, 1, 1, 0, 1, 1 }, item_audioContent },
+    { "audioObject"                             , { 0, 7, 1, 1, 1, 1, 1, 1, 0, 1, 1 }, item_audioObject },
+    { "audioPackFormat"                         , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_audioPackFormat },
+    { "audioChannelFormat"                      , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_audioChannelFormat },
+    { "audioTrackUID"                           , { 0, 7, 1, 1, 1, 1, 1, 1, 0, 1, 1 }, item_audioTrackUID },
+    { "audioTrackFormat"                        , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 0, 0 }, item_audioTrackFormat },
+    { "audioStreamFormat"                       , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 0, 0 }, item_audioStreamFormat },
+    { "profileList"                             , { 3, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0 }, item_profileList },
+    { "tagList"                                 , { 3, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 }, item_tagList },
 };
 static_assert(sizeof(audioFormatExtended_Elements) / sizeof(element_item) == audioFormatExtended_Element_Max, IncoherencyMessage);
 
 static attribute_items audioProgramme_Attributes =
 {
-    { "audioProgrammeID"                        , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "audioProgrammeName"                      , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "audioProgrammeLanguage"                  , { 0, 7, 1, 0, 1, 1, 0, 0, 1, 0 } },
-    { "start"                                   , { 0, 7, 1, 0, 0, 1, 0, 1, 0, 0 } },
-    { "end"                                     , { 0, 7, 1, 0, 0, 1, 0, 1, 0, 0 } },
-    { "typeLabel"                               , { 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "typeDefinition"                          , { 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "typeLink"                                , { 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "typeLanguage"                            , { 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "formatLabel"                             , { 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "formatDefinition"                        , { 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "formatLink"                              , { 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "formatLanguage"                          , { 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "maxDuckingDepth"                         , { 0, 7, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "audioProgrammeID"                        , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "audioProgrammeName"                      , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "audioProgrammeLanguage"                  , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0 } },
+    { "start"                                   , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 0, 0 } },
+    { "end"                                     , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 0, 0 } },
+    { "typeLabel"                               , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "typeDefinition"                          , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "typeLink"                                , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "typeLanguage"                            , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "formatLabel"                             , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "formatDefinition"                        , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "formatLink"                              , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "formatLanguage"                          , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "maxDuckingDepth"                         , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(audioProgramme_Attributes) / sizeof(attribute_item) == audioProgramme_Attribute_Max, IncoherencyMessage);
 
 static element_items audioProgramme_Elements =
 {
-    { "audioProgrammeLabel"                     , { 2, 7, 1, 1, 1, 0, 0, 1, 1, 1 } },
-    { "audioContentIDRef"                       , { 0, 7, 0, 1, 0, 1, 1, 0, 1, 1 } },
-    { "loudnessMetadata"                        , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0 } },
-    { "audioProgrammeReferenceScreen"           , { 0, 7, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "authoringInformation"                    , { 2, 7, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "alternativeValueSetIDRef"                , { 2, 7, 1, 1, 1, 0, 0, 1, 1, 1 } },
+    { "audioProgrammeLabel"                     , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1 }, item_audioProgrammeLabel },
+    { "audioContentIDRef"                       , { 0, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1 } },
+    { "loudnessMetadata"                        , { 0, 7, 1, 1, 1, 1, 1, 0, 0, 1, 0 }, item_loudnessMetadata },
+    { "audioProgrammeReferenceScreen"           , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 }, item_audioProgrammeReferenceScreen },
+    { "authoringInformation"                    , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 }, item_authoringInformation },
+    { "alternativeValueSetIDRef"                , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1 } },
 };
 static_assert(sizeof(audioProgramme_Elements) / sizeof(element_item) == audioProgramme_Element_Max, IncoherencyMessage);
 
 static attribute_items audioContent_Attributes =
 {
-    { "audioContentID"                          , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "audioContentName"                        , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "audioContentLanguage"                    , { 0, 7, 1, 0, 1, 0, 0, 0, 1, 0 } },
-    { "typeLabel"                               , { 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 } }, // TODO
+    { "audioContentID"                          , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "audioContentName"                        , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "audioContentLanguage"                    , { 0, 7, 1, 1, 0, 1, 0, 0, 0, 1, 0 } },
+    { "typeLabel"                               , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } }, // TODO
 };
 static_assert(sizeof(audioContent_Attributes) / sizeof(attribute_item) == audioContent_Attribute_Max, IncoherencyMessage);
 
 static element_items audioContent_Elements =
 {
-    { "audioContentLabel"                       , { 2, 7, 1, 1, 1, 0, 0, 1, 1, 1 } },
-    { "audioObjectIDRef"                        , { 0, 7, 0, 1, 0, 1, 1, 0, 1, 0 } },
-    { "loudnessMetadata"                        , { 0, 7, 1, 1, 1, 0, 0, 0, 1, 0 } },
-    { "dialogue"                                , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "alternativeValueSetIDRef"                , { 2, 7, 1, 1, 1, 0, 0, 1, 0, 1 } },
+    { "audioContentLabel"                       , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1 }, item_audioContentLabel },
+    { "audioObjectIDRef"                        , { 0, 7, 0, 1, 1, 0, 1, 1, 0, 1, 0 } },
+    { "loudnessMetadata"                        , { 0, 7, 1, 1, 1, 1, 0, 0, 0, 1, 0 }, item_loudnessMetadata },
+    { "dialogue"                                , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "alternativeValueSetIDRef"                , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 0, 1 } },
 };
 static_assert(sizeof(audioContent_Elements) / sizeof(element_item) == audioContent_Element_Max, IncoherencyMessage);
 
 static attribute_items audioObject_Attributes =
 {
-    { "audioObjectID"                           , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "audioObjectName"                         , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "start"                                   , { 1, 7, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "startTime"                               , { 0, 0, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "duration"                                , { 0, 7, 1, 0, 0, 1, 0, 1, 0, 0 } },
-    { "dialogue"                                , { 0, 7, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "importance"                              , { 0, 7, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "interact"                                , { 0, 7, 1, 0, 1, 0, 0, 0, 1, 0 } },
-    { "disableDucking"                          , { 0, 7, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "typeLabel"                               , { 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 } }, // TODO
+    { "audioObjectID"                           , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "audioObjectName"                         , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "start"                                   , { 1, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "startTime"                               , { 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "duration"                                , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 0, 0 } },
+    { "dialogue"                                , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "importance"                              , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "interact"                                , { 0, 7, 1, 1, 0, 1, 0, 0, 0, 1, 0 } },
+    { "disableDucking"                          , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "typeLabel"                               , { 0, 0, 1,1,  0, 1, 0, 0, 1, 0, 0 } }, // TODO
 };
 static_assert(sizeof(audioObject_Attributes) / sizeof(attribute_item) == audioObject_Attribute_Max, IncoherencyMessage);
 
 static element_items audioObject_Elements =
 {
-    { "audioPackFormatIDRef"                    , { 0, 7, 1, 1, 0, 1, 0, 1, 1, 0 } },
-    { "audioObjectIDRef"                        , { 0, 7, 1, 1, 1, 0, 0, 1, 1, 1 } },
-    { "audioObjectLabel"                        , { 2, 7, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "audioComplementaryObjectGroupLabel"      , { 2, 7, 1, 1, 1, 0, 0, 1, 1, 1 } },
-    { "audioComplementaryObjectIDRef"           , { 0, 7, 1, 1, 1, 0, 0, 1, 1, 1 } },
-    { "audioTrackUIDRef"                        , { 0, 7, 1, 1, 0, 1, 1, 1, 1, 1 } },
-    { "audioObjectInteraction"                  , { 0, 7, 1, 0, 1, 0, 0, 1, 1, 0 } },
-    { "gain"                                    , { 2, 7, 1, 0, 1, 0, 0, 1, 1, 0 } },
-    { "headLocked"                              , { 2, 7, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "positionOffset"                          , { 2, 7, 1, 0, 1, 0, 0, 1, 1, 0 } },
-    { "mute"                                    , { 2, 7, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "alternativeValueSet"                     , { 2, 7, 1, 1, 1, 0, 0, 1, 1, 1 } },
+    { "audioPackFormatIDRef"                    , { 0, 7, 1, 1, 1, 0, 1, 0, 1, 1, 0 } },
+    { "audioObjectIDRef"                        , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1 } },
+    { "audioObjectLabel"                        , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 }, item_audioObjectLabel },
+    { "audioComplementaryObjectGroupLabel"      , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1 }, item_audioComplementaryObjectGroupLabel },
+    { "audioComplementaryObjectIDRef"           , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1 } },
+    { "audioTrackUIDRef"                        , { 0, 7, 1, 1, 1, 0, 1, 1, 1, 1, 1 } },
+    { "audioObjectInteraction"                  , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 }, item_audioObjectInteraction },
+    { "gain"                                    , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 }, item_gain },
+    { "headLocked"                              , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "positionOffset"                          , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 }, item_positionOffset },
+    { "mute"                                    , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "alternativeValueSet"                     , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1 }, item_alternativeValueSet },
 };
 static_assert(sizeof(audioObject_Elements) / sizeof(element_item) == audioObject_Element_Max, IncoherencyMessage);
 
 static attribute_items audioPackFormat_Attributes =
 {
-    { "audioPackFormatID"                       , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "audioPackFormatName"                     , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "typeDefinition"                          , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "typeLabel"                               , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "typeLink"                                , { 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "typeLanguage"                            , { 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "importance"                              , { 0, 7, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "audioPackFormatID"                       , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "audioPackFormatName"                     , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "typeDefinition"                          , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "typeLabel"                               , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "typeLink"                                , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "typeLanguage"                            , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "importance"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(audioPackFormat_Attributes) / sizeof(attribute_item) == audioPackFormat_Attribute_Max, IncoherencyMessage);
 
 static element_items audioPackFormat_Elements =
 {
-    { "audioChannelFormatIDRef"                 , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1 } },
-    { "audioPackFormatIDRef"                    , { 0, 7, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "absoluteDistance"                        , { 0, 7, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "encodePackFormatIDRef"                   , { 1, 7, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "decodePackFormatIDRef"                   , { 1, 7, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "inputPackFormatIDRef"                    , { 1, 7, 1, 0, 1, 0, 0, 1, 1, 0 } },
-    { "outputPackFormatIDRef"                   , { 1, 7, 1, 0, 1, 0, 0, 1, 1, 0 } },
-    { "normalization"                           , { 1, 7, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "nfcRefDist"                              , { 1, 7, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "screenRef"                               , { 1, 7, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "audioChannelFormatIDRef"                 , { 0, 7, 1, 1, 1, 0, 1, 1, 0, 1, 1 } },
+    { "audioPackFormatIDRef"                    , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
+    { "absoluteDistance"                        , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "encodePackFormatIDRef"                   , { 1, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
+    { "decodePackFormatIDRef"                   , { 1, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
+    { "inputPackFormatIDRef"                    , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
+    { "outputPackFormatIDRef"                   , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
+    { "normalization"                           , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "nfcRefDist"                              , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "screenRef"                               , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(audioPackFormat_Elements) / sizeof(element_item) == audioPackFormat_Element_Max, IncoherencyMessage);
 
 static attribute_items audioChannelFormat_Attributes =
 {
-    { "audioChannelFormatID"                    , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "audioChannelFormatName"                  , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "typeDefinition"                          , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "typeLabel"                               , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "typeLink"                                , { 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "typeLanguage"                            , { 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "audioChannelFormatID"                    , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "audioChannelFormatName"                  , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "typeDefinition"                          , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "typeLabel"                               , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "typeLink"                                , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "typeLanguage"                            , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(audioChannelFormat_Attributes) / sizeof(attribute_item) == audioChannelFormat_Attribute_Max, IncoherencyMessage);
 
 static element_items audioChannelFormat_Elements =
 {
-    { "audioBlockFormat"                        , { 0, 7, 0, 1, 0, 1, 1, 0, 1, 1 } },
-    { "frequency"                               , { 0, 7, 1, 1, 1, 1, 1, 1, 0, 1 } },
+    { "audioBlockFormat"                        , { 0, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1 }, item_audioBlockFormat },
+    { "frequency"                               , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 0, 1 }, item_frequency },
 };
 static_assert(sizeof(audioChannelFormat_Elements) / sizeof(element_item) == audioChannelFormat_Element_Max, IncoherencyMessage);
 
 static attribute_items audioTrackUID_Attributes =
 {
-    { "UID"                                     , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "sampleRate"                              , { 0, 7, 1, 0, 0, 1, 0, 1, 1, 0 } },
-    { "bitDepth"                                , { 0, 7, 1, 0, 0, 1, 0, 1, 1, 0 } },
-    { "typeLabel"                               , { 0, 7, 1, 0, 1, 0, 0, 1, 0, 0 } }, // TODO
+    { "UID"                                     , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "sampleRate"                              , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "bitDepth"                                , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "typeLabel"                               , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } }, // TODO
 };
 static_assert(sizeof(audioTrackUID_Attributes) / sizeof(attribute_item) == audioTrackUID_Attribute_Max, IncoherencyMessage);
 
 static element_items audioTrackUID_Elements =
 {
-    { "audioMXFLookUp"                          , { 0, 2, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "audioTrackFormatIDRef"                   , { 0, 7, 1, 0, 0, 1, 0, 1, 0, 0 } },
-    { "audioChannelFormatIDRef"                 , { 2, 7, 1, 0, 1, 0, 0, 0, 1, 0 } },
-    { "audioPackFormatIDRef"                    , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "audioMXFLookUp"                          , { 0, 2, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "audioTrackFormatIDRef"                   , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 0, 0 } },
+    { "audioChannelFormatIDRef"                 , { 2, 7, 1, 1, 0, 1, 0, 0, 0, 1, 0 } },
+    { "audioPackFormatIDRef"                    , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
 };
 static_assert(sizeof(audioTrackUID_Elements) / sizeof(element_item) == audioTrackUID_Element_Max, IncoherencyMessage);
 
 static attribute_items audioTrackFormat_Attributes =
 {
-    { "audioTrackFormatID"                      , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "audioTrackFormatName"                    , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "typeLabel"                               , { 0, 7, 1, 0, 1, 0, 0, 1, 1, 0 } }, // TODO: present in some Atmos files
-    { "typeDefinition"                          , { 7, 7, 1, 0, 1, 0, 0, 1, 1, 0 } }, // TODO: present in some Atmos files
-    { "formatLabel"                             , { 0, 7, 1, 0, 0, 1, 0, 1, 1, 0 } },
-    { "formatDefinition"                        , { 0, 7, 1, 0, 0, 1, 0, 1, 1, 0 } },
-    { "formatLink"                              , { 0, 7, 1, 0, 1, 0, 0, 1, 1, 0 } },
-    { "formatLanguage"                          , { 0, 7, 1, 0, 1, 0, 0, 1, 1, 0 } },
+    { "audioTrackFormatID"                      , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "audioTrackFormatName"                    , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "typeLabel"                               , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } }, // TODO: present in some Atmos files
+    { "typeDefinition"                          , { 7, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } }, // TODO: present in some Atmos files
+    { "formatLabel"                             , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "formatDefinition"                        , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "formatLink"                              , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
+    { "formatLanguage"                          , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioTrackFormat_Attributes) / sizeof(attribute_item) == audioTrackFormat_Attribute_Max, IncoherencyMessage);
 
 static element_items audioTrackFormat_Elements =
 {
-    { "audioStreamFormatIDRef"                  , { 0, 7, 0, 0, 0, 1, 0, 1, 1, 0 } },
+    { "audioStreamFormatIDRef"                  , { 0, 7, 0, 1, 0, 0, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioTrackFormat_Elements) / sizeof(attribute_item) == audioTrackFormat_Element_Max, IncoherencyMessage);
 
 static attribute_items audioStreamFormat_Attributes =
 {
-    { "audioStreamFormatID"                     , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "audioStreamFormatName"                   , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "typeLabel"                               , { 0, 0, 1, 0, 1, 0, 0, 1, 1, 0 } }, // TODO: present in some Atmos files
-    { "typeDefinition"                          , { 0, 0, 1, 0, 1, 0, 0, 1, 1, 0 } }, // TODO: present in some Atmos files
-    { "formatLabel"                             , { 0, 7, 1, 0, 0, 1, 0, 1, 1, 0 } },
-    { "formatDefinition"                        , { 0, 0, 1, 0, 0, 1, 0, 1, 1, 0 } },
-    { "formatLink"                              , { 0, 7, 1, 0, 1, 0, 0, 1, 1, 0 } },
-    { "formatLanguage"                          , { 0, 0, 1, 0, 1, 0, 0, 1, 1, 0 } },
+    { "audioStreamFormatID"                     , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "audioStreamFormatName"                   , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "typeLabel"                               , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0 } }, // TODO: present in some Atmos files
+    { "typeDefinition"                          , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0 } }, // TODO: present in some Atmos files
+    { "formatLabel"                             , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "formatDefinition"                        , { 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "formatLink"                              , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
+    { "formatLanguage"                          , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioStreamFormat_Attributes) / sizeof(attribute_item) == audioStreamFormat_Attribute_Max, IncoherencyMessage);
 
 static element_items audioStreamFormat_Elements =
 {
-    { "audioChannelFormatIDRef"                 , { 0, 7, 1, 1, 0, 1, 0, 1, 1, 1 } },
-    { "audioPackFormatIDRef"                    , { 0, 7, 1, 1, 0, 1, 0, 1, 1, 1 } },
-    { "audioTrackFormatIDRef"                   , { 0, 7, 1, 1, 0, 1, 0, 1, 1, 1 } },
+    { "audioChannelFormatIDRef"                 , { 0, 7, 1, 1, 1, 0, 1, 0, 1, 1, 1 } },
+    { "audioPackFormatIDRef"                    , { 0, 7, 1, 1, 1, 0, 1, 0, 1, 1, 1 } },
+    { "audioTrackFormatIDRef"                   , { 0, 7, 1, 1, 1, 0, 1, 0, 1, 1, 1 } },
 };
 static_assert(sizeof(audioStreamFormat_Elements) / sizeof(element_item) == audioStreamFormat_Element_Max, IncoherencyMessage);
 
 static element_items profileList_Elements =
 {
-    { "profile"                                 , { 3, 7, 0, 1, 0, 1, 1, 0, 1, 1 } },
+    { "profile"                                 , { 3, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1 } },
 };
 static_assert(sizeof(profileList_Elements) / sizeof(element_item) == profileList_Element_Max, IncoherencyMessage);
 
 static element_items tagList_Elements =
 {
-    { "tagGroup"                                , { 3, 7, 0, 1, 0, 1, 1, 0, 1, 1 } },
+    { "tagGroup"                                , { 3, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1 } },
 };
 static_assert(sizeof(tagList_Elements) / sizeof(element_item) == tagList_Element_Max, IncoherencyMessage);
 
 static element_items frameHeader_Elements =
 {
-    { "profileList"                             , { 0, 7, 1, 0, 1, 1, 0, 0, 1, 0 } },
-    { "frameFormat"                             , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "transportTrackFormat"                    , { 0, 7, 0, 1, 0, 1, 1, 0, 1, 1 } },
+    { "profileList"                             , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0 }, item_profileList },
+    { "frameFormat"                             , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 }, item_frameFormat },
+    { "transportTrackFormat"                    , { 0, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1 }, item_transportTrackFormat },
 };
 static_assert(sizeof(frameHeader_Elements) / sizeof(element_item) == frameHeader_Element_Max, IncoherencyMessage);
 
 static attribute_items frameFormat_Attributes =
 {
-    { "frameFormatID"                           , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "start"                                   , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "duration"                                , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "type"                                    , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "timeReference"                           , { 0, 7, 1, 0, 1, 1, 0, 0, 1, 0 } },
-    { "flowID"                                  , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "countToFull"                             , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "numMetadataChunks"                       , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "countToSameChunk"                        , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "frameFormatID"                           , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "start"                                   , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "duration"                                , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "type"                                    , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "timeReference"                           , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0 } },
+    { "flowID"                                  , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "countToFull"                             , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "numMetadataChunks"                       , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "countToSameChunk"                        , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(frameFormat_Attributes) / sizeof(attribute_item) == frameFormat_Attribute_Max, IncoherencyMessage);
 
 static element_items frameFormat_Elements =
 {
-    { "changedIDs"                              , { 0, 7, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "chunkAdmElement"                         , { 0, 7, 1, 1, 1, 1, 0, 1, 0, 0 } },
+    { "changedIDs"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "chunkAdmElement"                         , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(frameFormat_Elements) / sizeof(element_item) == frameFormat_Element_Max, IncoherencyMessage);
 
 static attribute_items transportTrackFormat_Attributes =
 {
-    { "transportID"                             , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "transportName"                           , { 0, 7, 1, 0, 1, 1, 0, 0, 1, 0 } },
-    { "numTracks"                               , { 0, 7, 1, 0, 1, 1, 0, 0, 1, 0 } },
-    { "numIDs"                                  , { 0, 7, 1, 0, 1, 1, 0, 0, 1, 0 } },
+    { "transportID"                             , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "transportName"                           , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0 } },
+    { "numTracks"                               , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0 } },
+    { "numIDs"                                  , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0 } },
 };
 static_assert(sizeof(transportTrackFormat_Attributes) / sizeof(attribute_item) == transportTrackFormat_Attribute_Max, IncoherencyMessage);
 
 static element_items transportTrackFormat_Elements =
 {
-    { "audioTrack"                              , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1 } },
+    { "audioTrack"                              , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_audioTrack },
 };
 static_assert(sizeof(transportTrackFormat_Elements) / sizeof(element_item) == transportTrackFormat_Element_Max, IncoherencyMessage);
 
 static attribute_items audioTrack_Attributes =
 {
-    { "trackID"                                 , { 0, 7, 0, 0, 1, 0, 0, 0, 1, 0 } },
-    { "formatLabel"                             , { 0, 7, 1, 0, 1, 1, 0, 0, 1, 0 } },
-    { "formatDefinition"                        , { 0, 7, 1, 0, 1, 1, 0, 0, 1, 0 } },
+    { "trackID"                                 , { 0, 7, 0, 1, 0, 1, 0, 0, 0, 1, 0 } },
+    { "formatLabel"                             , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0 } },
+    { "formatDefinition"                        , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0 } },
 };
 static_assert(sizeof(audioTrack_Attributes) / sizeof(attribute_item) == audioTrack_Attribute_Max, IncoherencyMessage);
 
 static element_items audioTrack_Elements =
 {
-    { "audioTrackUIDRef"                        , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1 } },
+    { "audioTrackUIDRef"                        , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 } },
 };
 static_assert(sizeof(audioTrack_Elements) / sizeof(element_item) == audioTrack_Element_Max, IncoherencyMessage);
 
 static attribute_items audioProgrammeLabel_Attributes =
 {
-    { "language"                                , { 0, 7, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "language"                                , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioProgrammeLabel_Attributes) / sizeof(attribute_item) == audioProgrammeLabel_Attribute_Max, IncoherencyMessage);
 
 static attribute_items loudnessMetadata_Attributes =
 {
-    { "loudnessMethod"                          , { 0, 7, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "loudnessRecType"                         , { 0, 7, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "loudnessCorrectionType"                  , { 0, 7, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "loudnessMethod"                          , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "loudnessRecType"                         , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "loudnessCorrectionType"                  , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(loudnessMetadata_Attributes) / sizeof(attribute_item) == loudnessMetadata_Attribute_Max, IncoherencyMessage);
 
 static element_items loudnessMetadata_Elements =
 {
-    { "integratedLoudness"                      , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "loudnessRange"                           , { 0, 7, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "maxTruePeak"                             , { 0, 7, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "maxMomentary"                            , { 0, 7, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "maxShortTerm"                            , { 0, 7, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "dialogueLoudness"                        , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "renderer"                                , { 3, 7, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "integratedLoudness"                      , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "loudnessRange"                           , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "maxTruePeak"                             , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "maxMomentary"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "maxShortTerm"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "dialogueLoudness"                        , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "renderer"                                , { 3, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 }, item_renderer },
 };
 static_assert(sizeof(loudnessMetadata_Elements) / sizeof(element_item) == loudnessMetadata_Element_Max, IncoherencyMessage);
 
 static attribute_items renderer_Attributes =
 {
-    { "uri"                                     , { 0, 7, 1, 0, 0, 1, 0, 1, 1, 0 } },
-    { "name"                                    , { 0, 7, 1, 0, 0, 1, 0, 1, 1, 0 } },
-    { "version"                                 , { 0, 7, 1, 0, 0, 1, 0, 1, 1, 0 } },
-    { "coordinateMode"                          , { 3, 7, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "uri"                                     , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "name"                                    , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "version"                                 , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "coordinateMode"                          , { 3, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(renderer_Attributes) / sizeof(attribute_item) == renderer_Attribute_Max, IncoherencyMessage);
 
 static element_items renderer_Elements =
 {
-    { "audioPackFormatIDRef"                    , { 3, 7, 1, 1, 1, 1, 1, 1, 1, 0 } },
-    { "audioObjectIDRef"                        , { 3, 7, 1, 1, 1, 1, 1, 1, 1, 1 } },
+    { "audioPackFormatIDRef"                    , { 3, 7, 1, 1, 1, 1, 1, 1, 1, 1, 0 } },
+    { "audioObjectIDRef"                        , { 3, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 } },
 };
 static_assert(sizeof(renderer_Elements) / sizeof(element_item) == renderer_Element_Max, IncoherencyMessage);
 
 static attribute_items audioProgrammeReferenceScreen_Attributes =
 {
-    { "aspectRatio"                             , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "aspectRatio"                             , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioProgrammeReferenceScreen_Attributes) / sizeof(attribute_item) == audioProgrammeReferenceScreen_Attribute_Max, IncoherencyMessage);
 
 static element_items audioProgrammeReferenceScreen_Elements =
 {
-    { "screenCentrePosition"                    , { 0, 7, 1, 1, 1, 0, 0, 1, 1, 1 } },
-    { "screenWidth"                             , { 0, 7, 1, 1, 1, 1, 0, 1, 1, 1 } },
+    { "screenCentrePosition"                    , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1 }, item_screenCentrePosition },
+    { "screenWidth"                             , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 1, 1 }, item_screenWidth },
 };
 static_assert(sizeof(audioProgrammeReferenceScreen_Elements) / sizeof(element_item) == audioProgrammeReferenceScreen_Element_Max, IncoherencyMessage);
 
 static attribute_items screenCentrePosition_Attributes =
 {
-    { "coordinate"                              , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } }, // TODO: clarify coordinate="X" or X=
-    { "azimuth"                                 , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "elevation"                               , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "distance"                                , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "X"                                       , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "Y"                                       , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "Z"                                       , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "coordinate"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } }, // TODO: clarify coordinate="X" or X=
+    { "azimuth"                                 , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "elevation"                               , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "distance"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "X"                                       , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "Y"                                       , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "Z"                                       , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(screenCentrePosition_Attributes) / sizeof(attribute_item) == screenCentrePosition_Attribute_Max, IncoherencyMessage);
 
 static attribute_items screenWidth_Attributes =
 {
-    { "coordinate"                              , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } }, // TODO: clarify coordinate="X" or X=
-    { "azimuth"                                 , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "X"                                       , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "coordinate"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } }, // TODO: clarify coordinate="X" or X=
+    { "azimuth"                                 , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "X"                                       , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(screenWidth_Attributes) / sizeof(attribute_item) == screenWidth_Attribute_Max, IncoherencyMessage);
 
 static element_items authoringInformation_Elements =
 {
-    { "referenceLayout"                         , { 2, 7, 1, 1, 1, 0, 0, 1, 1, 1 } },
-    { "renderer"                                , { 2, 7, 1, 1, 1, 0, 0, 1, 1, 1 } },
+    { "referenceLayout"                         , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1 }, item_referenceLayout },
+    { "renderer"                                , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1 }, item_renderer },
 };
 static_assert(sizeof(authoringInformation_Elements) / sizeof(element_item) == authoringInformation_Element_Max, IncoherencyMessage);
 
 static element_items referenceLayout_Elements =
 {
-    { "audioPackFormatIDRef"                    , { 2, 7, 0, 0, 1, 0, 0, 0, 1, 0 } },
+    { "audioPackFormatIDRef"                    , { 2, 7, 0, 1, 0, 1, 0, 0, 0, 1, 0 } },
 };
 static_assert(sizeof(referenceLayout_Elements) / sizeof(element_item) == referenceLayout_Element_Max, IncoherencyMessage);
 
 static attribute_items audioContentLabel_Attributes =
 {
-    { "language"                                , { 0, 7, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "language"                                , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioContentLabel_Attributes) / sizeof(attribute_item) == audioContentLabel_Attribute_Max, IncoherencyMessage);
 
 static attribute_items dialogue_Attributes =
 {
-    { "nonDialogueContentKind"                  , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "dialogueContentKind"                     , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "mixedContentKind"                        , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "nonDialogueContentKind"                  , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "dialogueContentKind"                     , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "mixedContentKind"                        , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(dialogue_Attributes) / sizeof(attribute_item) == dialogue_Attribute_Max, IncoherencyMessage);
 
 static attribute_items audioObjectLabel_Attributes =
 {
-    { "language"                                , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "language"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioObjectLabel_Attributes) / sizeof(attribute_item) == audioObjectLabel_Attribute_Max, IncoherencyMessage);
 
 static attribute_items audioComplementaryObjectGroupLabel_Attributes =
 {
-    { "language"                                , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "language"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioComplementaryObjectGroupLabel_Attributes) / sizeof(attribute_item) == audioComplementaryObjectGroupLabel_Attribute_Max, IncoherencyMessage);
 
 static attribute_items audioObjectInteraction_Attributes =
 {
-    { "onOffInteract"                           , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "gainInteract"                            , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "positionInteract"                        , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "onOffInteract"                           , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "gainInteract"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "positionInteract"                        , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioObjectInteraction_Attributes) / sizeof(attribute_item) == audioObjectInteraction_Attribute_Max, IncoherencyMessage);
 
 static element_items audioObjectInteraction_Elements =
 {
-    { "gainInteractionRange"                    , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1 } },
-    { "positionInteractionRange"                , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1 } },
+    { "gainInteractionRange"                    , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_gainInteractionRange },
+    { "positionInteractionRange"                , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_positionInteractionRange },
 };
 static_assert(sizeof(audioObjectInteraction_Elements) / sizeof(element_item) == audioObjectInteraction_Element_Max, IncoherencyMessage);
 
 static attribute_items gainInteractionRange_Attributes =
 {
-    { "gainUnit"                                , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "bound"                                   , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "gainUnit"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "bound"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(gainInteractionRange_Attributes) / sizeof(attribute_item) == gainInteractionRange_Attribute_Max, IncoherencyMessage);
 
 static attribute_items positionInteractionRange_Attributes =
 {
-    { "coordinate"                              , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "bound"                                   , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "coordinate"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "bound"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(positionInteractionRange_Attributes) / sizeof(attribute_item) == positionInteractionRange_Attribute_Max, IncoherencyMessage);
 
 static attribute_items audioBlockFormat_Attributes =
 {
-    { "audioBlockFormatID"                      , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "rtime"                                   , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "duration"                                , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "lstart"                                  , { 0, 7, 1, 0, 1, 0, 0, 1, 1, 0 } },
-    { "lduration"                               , { 0, 7, 1, 0, 1, 0, 0, 1, 1, 0 } },
-    { "initializeBlock"                         , { 0, 7, 1, 0, 1, 0, 0, 1, 1, 0 } },
+    { "audioBlockFormatID"                      , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "rtime"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "duration"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "lstart"                                  , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
+    { "lduration"                               , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
+    { "initializeBlock"                         , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioBlockFormat_Attributes) / sizeof(attribute_item) == audioBlockFormat_Attribute_Max, IncoherencyMessage);
 
+static element_items audioBlockFormat_DirectSpeakers_Elements =
+{
+    { "gain"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 }, item_gain },
+    { "importance"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "jumpPosition"                            , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "headLocked"                              , { 2, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "headphoneVirtualise"                     , { 2, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "speakerLabel"                            , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0 } },
+    { "position"                                , { 0, 7, 0, 0, 1, 0, 0, 1, 0, 0, 1 }, item_position },
+    { "outputChannelFormatIDRef"                , { 1, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "outputChannelIDRef,"                     , { 1, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "matrix"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "width"                                   , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "height"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "depth"                                   , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "cartesian"                               , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "diffuse"                                 , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "channelLock"                             , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "objectDivergence"                        , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "zoneExclusion"                           , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "equation"                                , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "order"                                   , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "degree"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "normalization"                           , { 1, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "nfcRefDist"                              , { 1, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "screenRef"                               , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+};
+static_assert(sizeof(audioBlockFormat_DirectSpeakers_Elements) / sizeof(element_item) == audioBlockFormat_Element_Max, IncoherencyMessage);
+
+static element_items audioBlockFormat_Matrix_Elements =
+{
+    { "gain"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 }, item_gain },
+    { "importance"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "jumpPosition"                            , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "headLocked"                              , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "headphoneVirtualise"                     , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 }, item_headphoneVirtualise },
+    { "speakerLabel"                            , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0 } },
+    { "position"                                , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "outputChannelFormatIDRef"                , { 1, 7, 1, 1, 0, 1, 0, 0, 0, 1, 0 } },
+    { "outputChannelIDRef,"                     , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "matrix"                                  , { 0, 7, 0, 1, 1, 1, 0, 0, 0, 1, 0 }, item_matrix },
+    { "width"                                   , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "height"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "depth"                                   , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "cartesian"                               , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "diffuse"                                 , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "channelLock"                             , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "objectDivergence"                        , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "zoneExclusion"                           , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "equation"                                , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "order"                                   , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "degree"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "normalization"                           , { 1, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "nfcRefDist"                              , { 1, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "screenRef"                               , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+};
+static_assert(sizeof(audioBlockFormat_Matrix_Elements) / sizeof(element_item) == audioBlockFormat_Element_Max, IncoherencyMessage);
+
+static element_items audioBlockFormat_Object_Elements =
+{
+    { "gain"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 }, item_gain },
+    { "importance"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "jumpPosition"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 }, item_jumpPosition },
+    { "headLocked"                              , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "headphoneVirtualise"                     , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 }, item_headphoneVirtualise },
+    { "speakerLabel"                            , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "position"                                , { 0, 7, 1, 1, 1, 0, 1, 1, 1, 1, 1 }, item_position },
+    { "outputChannelFormatIDRef"                , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "outputChannelIDRef,"                     , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "matrix"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "width"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "height"                                  , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "depth"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "cartesian"                               , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "diffuse"                                 , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0 } },
+    { "channelLock"                             , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0 }, item_channelLock },
+    { "objectDivergence"                        , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 }, item_objectDivergence },
+    { "zoneExclusion"                           , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 }, item_zoneExclusion },
+    { "equation"                                , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
+    { "order"                                   , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
+    { "degree"                                  , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
+    { "normalization"                           , { 1, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
+    { "nfcRefDist"                              , { 1, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
+    { "screenRef"                               , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+};
+static_assert(sizeof(audioBlockFormat_Object_Elements) / sizeof(element_item) == audioBlockFormat_Element_Max, IncoherencyMessage);
+
 static element_items audioBlockFormat_Elements =
 {
-    { "gain"                                    , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "importance"                              , { 0, 7, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "headLocked"                              , { 2, 7, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "headphoneVirtualise"                     , { 2, 7, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "speakerLabel"                            , { 0, 7, 1, 1, 1, 1, 0, 1, 0, 0 } }, //TODO should be Dolby1 only for Objects only
-    { "position"                                , { 0, 7, 1, 1, 0, 1, 1, 1, 1, 1 } },
-    { "outputChannelFormatIDRef"                , { 1, 7, 1, 0, 1, 0, 0, 1, 1, 0 } },
-    { "outputChannelIDRef,"                     , { 1, 7, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "jumpPosition"                            , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } }, //TODO should be Dolby1 only for Objects only
-    { "matrix"                                  , { 0, 7, 1, 0, 1, 0, 0, 1, 1, 0 } },
-    { "coefficient"                             , { 0, 7, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "width"                                   , { 0, 7, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "height"                                  , { 0, 7, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "depth"                                   , { 0, 7, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "cartesian"                               , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "diffuse"                                 , { 0, 7, 1, 1, 1, 1, 0, 1, 0, 0 } },
-    { "channelLock"                             , { 0, 7, 1, 1, 1, 1, 0, 1, 0, 0 } },
-    { "objectDivergence"                        , { 0, 7, 1, 1, 1, 0, 0, 1, 1, 0 } },
-    { "zoneExclusion"                           , { 0, 7, 1, 1, 1, 1, 0, 1, 0, 0 } },
-    { "equation"                                , { 0, 7, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "order"                                   , { 0, 7, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "degree"                                  , { 0, 7, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "normalization"                           , { 1, 7, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "nfcRefDist"                              , { 1, 7, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "screenRef"                               , { 0, 7, 1, 1, 1, 0, 0, 1, 0, 0 } },
+    { "gain"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 }, item_gain },
+    { "importance"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "jumpPosition"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 }, item_jumpPosition },
+    { "headLocked"                              , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "headphoneVirtualise"                     , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 }, item_headphoneVirtualise },
+    { "speakerLabel"                            , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0 } },
+    { "position"                                , { 0, 7, 1, 1, 1, 0, 1, 1, 1, 1, 1 }, item_position },
+    { "outputChannelFormatIDRef"                , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
+    { "outputChannelIDRef,"                     , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "matrix"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 1, 0 }, item_matrix },
+    { "width"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "height"                                  , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "depth"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "cartesian"                               , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "diffuse"                                 , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0 } },
+    { "channelLock"                             , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0 }, item_channelLock },
+    { "objectDivergence"                        , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 }, item_objectDivergence },
+    { "zoneExclusion"                           , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 }, item_zoneExclusion },
+    { "equation"                                , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
+    { "order"                                   , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
+    { "degree"                                  , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
+    { "normalization"                           , { 1, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
+    { "nfcRefDist"                              , { 1, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
+    { "screenRef"                               , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(audioBlockFormat_Elements) / sizeof(element_item) == audioBlockFormat_Element_Max, IncoherencyMessage);
 
 static attribute_items gain_Attributes =
 {
-    { "gainUnit"                                , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "gainUnit"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(gain_Attributes) / sizeof(attribute_item) == gain_Attribute_Max, IncoherencyMessage);
 
 static attribute_items headphoneVirtualise_Attributes =
 {
-    { "bypass"                                  , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "DRR"                                     , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "bypass"                                  , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "DRR"                                     , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(headphoneVirtualise_Attributes) / sizeof(attribute_item) == headphoneVirtualise_Attribute_Max, IncoherencyMessage);
 
 static attribute_items position_Attributes =
 {
-    { "coordinate"                              , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "bound"                                   , { 0, 7, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "screenEdgeLock"                          , { 0, 7, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "coordinate"                              , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "bound"                                   , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "screenEdgeLock"                          , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(position_Attributes) / sizeof(attribute_item) == position_Attribute_Max, IncoherencyMessage);
 
 static attribute_items positionOffset_Attributes =
 {
-    { "coordinate"                              , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "coordinate"                              , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
 };
 static_assert(sizeof(position_Attributes) / sizeof(attribute_item) == position_Attribute_Max, IncoherencyMessage);
 
 static attribute_items channelLock_Attributes =
 {
-    { "maxDistance"                             , { 0, 7, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "maxDistance"                             , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(channelLock_Attributes) / sizeof(attribute_item) == channelLock_Attribute_Max, IncoherencyMessage);
 
 static attribute_items objectDivergence_Attributes =
 {
-    { "azimuthRange"                            , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "positionRange"                           , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "azimuthRange"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "positionRange"                           , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(objectDivergence_Attributes) / sizeof(attribute_item) == objectDivergence_Attribute_Max, IncoherencyMessage);
 
 static attribute_items jumpPosition_Attributes =
 {
-    { "interpolationLength"                     , { 0, 7, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "interpolationLength"                     , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(jumpPosition_Attributes) / sizeof(attribute_item) == jumpPosition_Attribute_Max, IncoherencyMessage);
 
 static element_items zoneExclusion_Elements =
 {
-    { "zone"                                    , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1 } },
+    { "zone"                                    , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_zone },
 };
 static_assert(sizeof(zoneExclusion_Elements) / sizeof(element_item) == zoneExclusion_Element_Max, IncoherencyMessage);
 
 static attribute_items zone_Attributes =
 {
-    { "minX"                                    , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "maxX"                                    , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "minY"                                    , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "maxY"                                    , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "minZ"                                    , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "maxZ"                                    , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "minElevation"                            , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "maxElevation"                            , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "minAzimuth"                              , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "maxAzimuth"                              , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "minX"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "maxX"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "minY"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "maxY"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "minZ"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "maxZ"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "minElevation"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "maxElevation"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "minAzimuth"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "maxAzimuth"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(zone_Attributes) / sizeof(attribute_item) == zone_Attribute_Max, IncoherencyMessage);
 
 static element_items matrix_Elements =
 {
-    { "coefficient"                             , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1 } },
+    { "coefficient"                             , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_coefficient },
 };
 static_assert(sizeof(matrix_Elements) / sizeof(element_item) == matrix_Element_Max, IncoherencyMessage);
 
 static attribute_items coefficient_Attributes =
 {
-    { "gainUnit"                                , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "gain"                                    , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "gainVar"                                 , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "phase"                                   , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "phaseVar"                                , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "delay"                                   , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "delayVar"                                , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "gainUnit"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "gain"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "gainVar"                                 , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "phase"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "phaseVar"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "delay"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "delayVar"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(coefficient_Attributes) / sizeof(attribute_item) == coefficient_Attribute_Max, IncoherencyMessage);
 
 static attribute_items alternativeValueSet_Attributes =
 {
-    { "alternativeValueSetID"                   , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "alternativeValueSetID"                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(alternativeValueSet_Attributes) / sizeof(attribute_item) == alternativeValueSet_Attribute_Max, IncoherencyMessage);
 
 static attribute_items frequency_Attributes =
 {
-    { "typeDefinition"                          , { 0, 7, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "typeDefinition"                          , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(frequency_Attributes) / sizeof(attribute_item) == frequency_Attribute_Max, IncoherencyMessage);
 
 static attribute_items profile_Attributes =
 {
-    { "profileName"                             , { 3, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "profileVersion"                          , { 3, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
-    { "profileLevel"                            , { 3, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
+    { "profileName"                             , { 3, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "profileVersion"                          , { 3, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "profileLevel"                            , { 3, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
 };
 static_assert(sizeof(profile_Attributes) / sizeof(attribute_item) == profile_Attribute_Max, IncoherencyMessage);
 
 static element_items tagGroup_Elements =
 {
-    { "tag"                                     , { 3, 7, 0, 1, 0, 1, 1, 0, 1, 1 } },
-    { "audioProgrammeIDRef"                     , { 3, 7, 1, 1, 1, 1, 1, 1, 1, 1 } },
-    { "audioContentIDRef"                       , { 3, 7, 1, 1, 1, 1, 1, 1, 1, 1 } },
-    { "audioObjectIDRef"                        , { 3, 7, 1, 1, 1, 1, 1, 1, 1, 1 } },
+    { "tag"                                     , { 3, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1 } },
+    { "audioProgrammeIDRef"                     , { 3, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 } },
+    { "audioContentIDRef"                       , { 3, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 } },
+    { "audioObjectIDRef"                        , { 3, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 } },
 };
 static_assert(sizeof(tagGroup_Elements) / sizeof(element_item) == tagGroup_Element_Max, IncoherencyMessage);
 
 static attribute_items tag_Attributes =
 {
-    { "class"                                   , { 0, 7, 0, 0, 0, 1, 0, 0, 1, 0 } },
+    { "class"                                   , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
 };
 static_assert(sizeof(tag_Attributes) / sizeof(attribute_item) == tag_Attribute_Max, IncoherencyMessage);
 
@@ -1693,7 +1798,7 @@ static const item_infos item_Infos = {
     { nullptr, (element_items*)&frameHeader_Elements, "frameHeader", nullptr, 0, (int8u)-1, 0xFFF},
     { (attribute_items*)&frameFormat_Attributes, (element_items*)&frameFormat_Elements, "frameFormat", "FF", F(ID_V), (int8u)-1, 0},
     { (attribute_items*)&transportTrackFormat_Attributes, (element_items*)&transportTrackFormat_Elements, "transportTrackFormat", "TP", F(ID_W), (int8u)-1, 0},
-    { (attribute_items*)&audioTrack_Attributes, (element_items*)&audioTrack_Elements, "TrackIndex", nullptr, 0, (int8u)-1, 0 },
+    { (attribute_items*)&audioTrack_Attributes, (element_items*)&audioTrack_Elements, "Track", nullptr, 0, (int8u)-1, 0 },
     { nullptr, nullptr, "changedIDs", nullptr, 0, (int8u)-1, 0 },
     { (attribute_items*)&audioProgrammeLabel_Attributes, nullptr, "audioProgrammeLabel", nullptr, 0, (int8u)-1, 0},
     { (attribute_items*)&loudnessMetadata_Attributes, (element_items*)&loudnessMetadata_Elements, "loudnessMetadata", nullptr, 0, (int8u)-1, 0},
@@ -1777,6 +1882,113 @@ static constexpr idrefs IDRefs = {
     { item_audioStreamFormat, audioStreamFormat_audioTrackFormatIDRef, item_audioTrackFormat },
     { item_audioTrack, audioTrack_audioTrackUIDRef, item_audioTrackUID },
 };
+
+// First value of each line is the line count
+static const int8u audioPackFormat_2_audioChannelFormatIDRef_Table[] = {
+     1, 0x03,
+     2, 0x01, 0x02,
+     6, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
+     8, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x0D, 0x0F,
+    10, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x0D, 0x0F, 0x10, 0x12,
+    11, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x0D, 0x0F, 0x10, 0x12, 0x15,
+    12, 0x03, 0x01, 0x02, 0x22, 0x23, 0x0A, 0x0B, 0x1C, 0x1D, 0x28, 0x20, 0x21,
+    14, 0x01, 0x02, 0x03, 0x04, 0x0A, 0x0B, 0x1C, 0x1D, 0x22, 0x23, 0x1E, 0x1F, 0x24, 0x25,
+    24, 0x18, 0x19, 0x03, 0x20, 0x1C, 0x1D, 0x01, 0x02, 0x09, 0x21, 0x0A, 0x0B, 0x22, 0x23, 0x0E, 0x0C, 0x1E, 0x1F, 0x13, 0x14, 0x11, 0x15, 0x16, 0x17,
+     3, 0x01, 0x02, 0x03,
+     4, 0x01, 0x02, 0x03, 0x09,
+     5, 0x01, 0x02, 0x03, 0x05, 0x06,
+     7, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x09,
+     8, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x26, 0x27,
+     8, 0x01, 0x02, 0x03, 0x04, 0x0A, 0x0B, 0x1C, 0x1D,
+    22, 0x18, 0x19, 0x03, 0x1C, 0x1D, 0x01, 0x02, 0x09, 0x0A, 0x0B, 0x22, 0x23, 0x0E, 0x0C, 0x1E, 0x1F, 0x13, 0x14, 0x11, 0x15, 0x16, 0x17,
+    19, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x0A, 0x0B, 0x1A, 0x1B, 0x0D, 0x0F, 0x0E, 0x10, 0x12, 0x13, 0x14, 0x1E, 0x1F,
+     8, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x24, 0x25,
+     8, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x13, 0x14,
+    10, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x13, 0x14, 0x24, 0x25,
+    12, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x0D, 0x0F, 0x10, 0x12, 0x24, 0x25,
+    10, 0x01, 0x02, 0x03, 0x04, 0x0A, 0x0B, 0x1C, 0x1D, 0x13, 0x14,
+    12, 0x01, 0x02, 0x03, 0x04, 0x0A, 0x0B, 0x1C, 0x1D, 0x22, 0x23, 0x1E, 0x1F,
+    14, 0x01, 0x02, 0x03, 0x04, 0x0A, 0x0B, 0x1C, 0x1D, 0x18, 0x19, 0x22, 0x23, 0x1E, 0x1F,
+    16, 0x01, 0x02, 0x03, 0x04, 0x0A, 0x0B, 0x1C, 0x1D, 0x18, 0x19, 0x22, 0x23, 0x13, 0x14, 0x1E, 0x1F,
+    24, 0x18, 0x19, 0x03, 0x20, 0x1C, 0x1D, 0x01, 0x02, 0x09, 0x21, 0x0A, 0x0B, 0x22, 0x23, 0x0E, 0x0C, 0x1E, 0x1F, 0x13, 0x14, 0x11, 0x15, 0x16, 0x17,
+     7, 0x01, 0x02, 0x03, 0x0A, 0x0B, 0x1C, 0x1D,
+     7, 0x01, 0x02, 0x03, 0x05, 0x06, 0x0D, 0x0F,
+     7, 0x01, 0x02, 0x03, 0x05, 0x06, 0x13, 0x14,
+     9, 0x01, 0x02, 0x03, 0x05, 0x06, 0x0D, 0x0F, 0x10, 0x12,
+    11, 0x01, 0x02, 0x03, 0x0A, 0x0B, 0x1C, 0x1D, 0x22, 0x23, 0x1E, 0x1F,
+     8, 0x01, 0x02, 0x05, 0x06, 0x0D, 0x0F, 0x10, 0x12,
+    11, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x0D, 0x0F, 0x10, 0x12, 0x0C,
+    12, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x0D, 0x0F, 0x10, 0x12, 0x0C, 0x0E,
+    12, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x29, 0x2A, 0x0D, 0x0F, 0x10, 0x12,
+    14, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x29, 0x2A, 0x0D, 0x0F, 0x10, 0x12, 0x0C, 0x0E,
+    13, 0x03, 0x01, 0x02, 0x05, 0x06, 0x0E, 0x0D, 0x0F, 0x10, 0x12, 0x15, 0x2B, 0x2C,
+     0
+};
+static const int8u audioPackFormat_2_audioChannelFormatIDRef_Table8[] = {
+     1, 0x03,
+     2, 0x01, 0x02,
+     6, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
+     8, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x0D, 0x0F,
+    10, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x0D, 0x0F, 0x10, 0x12,
+    11, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x0D, 0x0F, 0x10, 0x12, 0x15,
+    12, 0x03, 0x01, 0x02, 0x0D, 0x0F, 0x0A, 0x0B, 0x05, 0x06, 0x28, 0x20, 0x21,
+    14, 0x01, 0x02, 0x03, 0x04, 0x0A, 0x0B, 0x05, 0x06, 0x0D, 0x0F, 0x10, 0x12, 0x24, 0x25,
+    24, 0x01, 0x02, 0x03, 0x20, 0x05, 0x06, 0x07, 0x08, 0x09, 0x21, 0x0A, 0x0B, 0x0D, 0x0F, 0x0E, 0x0C, 0x10, 0x12, 0x13, 0x14, 0x11, 0x15, 0x16, 0x17,
+     3, 0x01, 0x02, 0x03,
+     4, 0x01, 0x02, 0x03, 0x09,
+     5, 0x01, 0x02, 0x03, 0x05, 0x06,
+     7, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x09,
+     8, 0x07, 0x08, 0x03, 0x04, 0x05, 0x06, 0x01, 0x02,
+     8, 0x01, 0x02, 0x03, 0x04, 0x0A, 0x0B, 0x05, 0x06,
+    22, 0x01, 0x02, 0x03, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0D, 0x0F, 0x0E, 0x0C, 0x10, 0x12, 0x13, 0x14, 0x11, 0x15, 0x16, 0x17,
+     1, 0x00,
+     8, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x24, 0x25,
+     8, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x13, 0x14,
+    10, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x13, 0x14, 0x24, 0x25,
+    12, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x0D, 0x0F, 0x10, 0x12, 0x24, 0x25,
+    10, 0x01, 0x02, 0x03, 0x04, 0x0A, 0x0B, 0x05, 0x06, 0x13, 0x14,
+    12, 0x01, 0x02, 0x03, 0x04, 0x0A, 0x0B, 0x05, 0x06, 0x0D, 0x0F, 0x10, 0x12,
+    14, 0x01, 0x02, 0x03, 0x04, 0x0A, 0x0B, 0x05, 0x06, 0x18, 0x19, 0x0D, 0x0F, 0x10, 0x12,
+    16, 0x01, 0x02, 0x03, 0x04, 0x0A, 0x0B, 0x05, 0x06, 0x18, 0x19, 0x0D, 0x0F, 0x13, 0x14, 0x10, 0x12,
+    24, 0x18, 0x19, 0x03, 0x20, 0x05, 0x06, 0x01, 0x02, 0x09, 0x21, 0x0A, 0x0B, 0x0D, 0x0F, 0x0E, 0x0C, 0x10, 0x12, 0x13, 0x14, 0x11, 0x15, 0x16, 0x17,
+     7, 0x01, 0x02, 0x03, 0x0A, 0x0B, 0x05, 0x06,
+     7, 0x01, 0x02, 0x03, 0x05, 0x06, 0x0D, 0x0F,
+     7, 0x01, 0x02, 0x03, 0x05, 0x06, 0x13, 0x14,
+     9, 0x01, 0x02, 0x03, 0x05, 0x06, 0x0D, 0x0F, 0x10, 0x12,
+    11, 0x01, 0x02, 0x03, 0x0A, 0x0B, 0x05, 0x06, 0x0D, 0x0F, 0x10, 0x12,
+     8, 0x01, 0x02, 0x05, 0x06, 0x0D, 0x0F, 0x10, 0x12,
+    11, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x0D, 0x0F, 0x10, 0x12, 0x0C,
+    12, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x0D, 0x0F, 0x10, 0x12, 0x0C, 0x0E,
+    12, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x29, 0x2A, 0x0D, 0x0F, 0x10, 0x12,
+    14, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x29, 0x2A, 0x0D, 0x0F, 0x10, 0x12, 0x0C, 0x0E,
+    13, 0x03, 0x01, 0x02, 0x05, 0x06, 0x0E, 0x0D, 0x0F, 0x10, 0x12, 0x15, 0x16, 0x17,
+     0
+};
+
+set<string> audioPackFormatID_2_audioChannelFormatIDRef (int16u audioPackFormatID_yyyy) {
+    size_t Pos = 0;
+    size_t i = 0;
+    auto SearchedPos = audioPackFormatID_yyyy & 0xF7FF; // 0x8xx values
+    auto Table = audioPackFormatID_yyyy - SearchedPos ? audioPackFormat_2_audioChannelFormatIDRef_Table8 : audioPackFormat_2_audioChannelFormatIDRef_Table;
+    for (;;) {
+        const auto Count = Table[i++];
+        if (!Count) {
+            return {};
+        }
+        if (++Pos != SearchedPos) {
+            i += Count;
+            continue;
+        }
+        if (!Table[i]) {
+            return {};
+        }
+        set<string> Result;
+        for (int j = 0; j < Count; j++) {
+            Result.insert("AC_000100" + Hex2String(Table[i++], 2));
+        }
+        return Result;
+    }
+}
 
 enum atmos_audioChannelFormatName {
     Atmos_L,
@@ -1911,8 +2123,8 @@ size_t Atmos_zone_Pos(const string& Name, float32* Values) {
     return (size_t)-1;
 }
 
-string CraftName(const char* Name) {
-    return (Name && Name[0] < 'a' ? "audio" : "") + string(Name);
+string CraftName(const char* Name, bool ID = false) {
+    return (ID && !strcmp(Name, "Track")) ? "track" : ((Name && Name[0] < 'a' ? "audio" : "") + string(Name));
 }
 
 enum class E {
@@ -2020,6 +2232,32 @@ static void Apply_SubStreams(File__Analyze& F, const string& P_And_LinkedTo, Ite
             }
         }
         if (Pos == -1) {
+            // Trying case insensitive, this is permitted by specs
+            auto Start = ID.rfind('_');
+            if (Start != string::npos) {
+                auto ID_Up = ID;
+                for (size_t i = Start; i < ID_Up.size(); i++) {
+                    auto& Letter = ID_Up[i];
+                    if (Letter >= 'A' && Letter <= 'F') {
+                        Letter += 'a' - 'A';
+                    }
+                }
+                for (size_t k = 0; k < Dest.Items.size(); k++) {
+                    auto Target_Up = Dest.Items[k].Attributes[0];
+                    for (size_t i = Start; i < Target_Up.size(); i++) {
+                        auto& Letter = Target_Up[i];
+                        if (Letter >= 'A' && Letter <= 'F') {
+                            Letter += 'a' - 'A';
+                        }
+                    }
+                    if (Target_Up == ID_Up) {
+                        Pos = k;
+                        break;
+                    }
+                }
+            }
+        }
+        if (Pos == -1) {
             auto LinkedTo_Pos = P_And_LinkedTo.find(" LinkedTo_TrackUID_Pos");
             auto HasTransport = !F.Retrieve_Const(Stream_Audio, 0, "Transport0").empty();
             if (!NoError && HasTransport && LinkedTo_Pos != string::npos) { // TODO: better way to avoid common definitions
@@ -2068,6 +2306,7 @@ public:
     void Enter();
     void Leave();
     int Init(const void* const Buffer, size_t Buffer_Size);
+    int Resynch(const string& Value);
     int NextElement();
     int Attribute();
     int Value();
@@ -2091,6 +2330,22 @@ public:
     size_t* File_Buffer_Size_Hint_Pointer = {};
 };
 
+enum cartesion_test : int8_t {
+    cartesian_unknown,
+    cartesian_alreadyincoherent,
+    cartesian_0,
+};
+
+struct channel_list {
+    size_t              BlockPos;
+    vector<string>      List;
+};
+
+struct channel_outputChannelFormatIDRef {
+    size_t              BlockPos;
+    string              outputChannelFormatIDRef;
+};
+
 class file_adm_private : public tfsxml
 {
 public:
@@ -2108,10 +2363,12 @@ public:
     bool DolbyProfileCanNotBeVersion1 = false;
     bool IsPartial = false;
     bool IsLocalTimeReference = false;
-    bool CartesianIsTested = false;
-    bool CartesianPresent = false;
-    bool CartesianAlreadyNotCoherent = false;
-    string CartesianValue;
+    cartesion_test CartesianAlreadyNotCoherent = cartesian_unknown;
+    TimeCode LastBlockFormatEnd;
+    TimeCode LastBlockFormatEnd_S;
+    vector<vector<channel_list>> ChannelFormat_Matrix_coefficients;
+    vector<vector<channel_list>> ChannelFormat_Matrix_outputChannelFormatIDRefs;
+    vector<string> coefficients;
     vector<profile_info> profileInfos;
     map<string, string> More;
     float32 FrameRate_Sum = 0;
@@ -2119,7 +2376,7 @@ public:
     vector<char> loudnessMetadata_Source;
     vector<size_t> ChannelFormat_BlockFormat_ReduceCount;
     string OldLocale;
-    vector<string> Errors_Tips;
+    vector<string> Errors_Tips[error_Type_Max][source_Max];
 
     file_adm_private()
     {
@@ -2148,6 +2405,7 @@ public:
         STRUCTS(frameFormat);
         STRUCTS(transportTrackFormat);
         STRUCTS(audioTrack);
+        STRUCTS(changedIDs);
         STRUCTS(audioProgrammeLabel);
         STRUCTS(loudnessMetadata);
         STRUCTS(renderer);
@@ -2272,6 +2530,20 @@ int tfsxml::Init(const void* const Buffer, size_t Buffer_Size) {
     return 0;
 }
 
+int tfsxml::Resynch(const string& Value) {
+    for (size_t i = 0; i < Level_Max; i++) {
+        if (Code[i] != Value) {
+            continue;
+        }
+        Level_Max = i + 1;
+        IsInit_ = false;
+        MustEnter = false;
+        ParsingAttr = false;
+        return 0;
+    }
+    return 1;
+}
+
 int tfsxml::NextElement() {
     IsInit_ = false;
     if (MustEnter && Level == Level_Max + ParsingAttr) {
@@ -2338,11 +2610,58 @@ int tfsxml::Value() {
 
 //---------------------------------------------------------------------------
 void Item_Struct::AddError(error_Type Error_Type, char AttEle, E Error_Value, file_adm_private* File_Adm_Private, const string& Opt0, source Source) {
-    auto Tips_Size = File_Adm_Private->Errors_Tips.size();
-    bool Tips_Size_Big = Tips_Size >= 255;
-    AddError(Error_Type, AttEle, Error_Value, Tips_Size_Big ? 0 : (char)Tips_Size, Source);
-    if (!Tips_Size_Big) {
-        File_Adm_Private->Errors_Tips.push_back(Opt0);
+    auto& Tips = File_Adm_Private->Errors_Tips[Error_Type][Source];
+    auto Tips_Size = Tips.size();
+    if (Tips_Size < 255) {
+        Tips.push_back(Opt0);
+    }
+    else {
+        Tips_Size = 255;
+        Tips[255].clear();
+    }
+    AddError(Error_Type, AttEle, Error_Value, (char)Tips_Size, Source);
+}
+
+//---------------------------------------------------------------------------
+static void MoveErrors (file_adm_private* File_Adm_Private, item Up_Type) {
+    auto& Items = File_Adm_Private->Items;
+    auto& Ups = Items[Up_Type].Items;
+    auto& Up = Ups.back();
+    size_t i = Ups.size() - 1;
+    const auto Up_Infos_Ptr = item_Infos[Up_Type].Element_Infos;
+    if (Up_Infos_Ptr) {
+        const auto& Up_Infos = *Up_Infos_Ptr;
+        for (size_t j = 0; j < Items[Up_Type].Elements_Size; j++) {
+            const auto& Up_Info = Up_Infos[j];
+            if (!Up_Info.LinkedItem) {
+                continue;
+            }
+            const auto& Elements = Up.Elements[j];
+            size_t Count = Elements.size();
+            auto& Sources = Items[Up_Info.LinkedItem].Items;
+            const auto k_Start = Sources.size() - Count;
+            for (size_t k = k_Start; k < Sources.size(); k++) {
+                auto& Item = Sources[k];
+                for (size_t Error_Type = 0; Error_Type < error_Type_Max; Error_Type++) {
+                    for (size_t Source = 0; Source < source_Max; Source++) {
+                        for (const auto& Error : Item.Errors[Error_Type][Source]) {
+                            if (!Error[0]) {
+                                Up.AddError((error_Type)Error_Type, Error + (char)Up_Info.LinkedItem + (char)(k - k_Start), (source)Source);
+                            }
+                            else {
+                                string Intermediate;
+                                string Intermediate2 = ':' + CraftName(Up_Info.Name);
+                                if (Error.rfind(Intermediate2, 0) || (Error.size() > Intermediate2.size() && !isdigit(Error[Intermediate2.size()]))) {
+                                    Intermediate = Intermediate2 + to_string(k - k_Start);
+                                }
+                                Up.AddError((error_Type)Error_Type, ':' + CraftName(item_Infos[Up_Type].Name) + to_string(i) + Intermediate + Error, (source)Source);
+                            }
+                        }
+                        Item.Errors[Error_Type][Source].clear();
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -2450,7 +2769,7 @@ static void CheckErrors_ID_Additions(file_adm_private* File_Adm_Private, item it
         if (Flags[item_info::Flags_ID_YX]) {
             auto xxxx = ID.substr(strlen(item_Infos[item_Type].ID_Begin) + 5, 4);
             if (xxxx[0] == '0' || xxxx == "1000") {
-                Item.AddError(Error, item_Type, i, ':' + CraftName(item_Infos[item_Type].Name) + "ID:" + CraftName(item_Infos[item_Type].Name) + "ID attribute xxxx value \"" + xxxx + "\" is not permitted, permitted values are \"1001\" to \"FFFF\"", Source_Atmos_1_0);
+                Item.AddError(Error, item_Type, i, ':' + CraftName(item_Infos[item_Type].Name, true) + "ID:" + CraftName(item_Infos[item_Type].Name, true) + "ID attribute xxxx value \"" + xxxx + "\" is not permitted, permitted values are \"1001\" to \"FFFF\"", Source_Atmos_1_0);
             }
         }
         if (Flags[item_info::Flags_ID_W]) {
@@ -2473,18 +2792,18 @@ static void CheckErrors_ID_Additions(file_adm_private* File_Adm_Private, item it
             auto min_int = strtoul(min, nullptr, 16);
             auto max_int = strtoul(max, nullptr, 16);
             if ((!i || i - 1 < max_int - min_int) && (wwww_int <= 0x1000 || wwww_int < min_int || wwww_int > max_int)) {
-                Item.AddError(Error, item_Type, i, ':' + CraftName(item_Infos[item_Type].Name) + "ID:" + CraftName(item_Infos[item_Type].Name) + "ID attribute wwww value \"" + wwww + "\" is not permitted" + (min_int == 0x100b ? " due to the Objects typed object" : "") + ", permitted values are \"" + min + "\" to \"" + max + "\"", Source_Atmos_1_0);
+                Item.AddError(Error, item_Type, i, ':' + CraftName(item_Infos[item_Type].Name, true) + "ID:" + CraftName(item_Infos[item_Type].Name, true) + "ID attribute wwww value \"" + wwww + "\" is not permitted" + (min_int == 0x100b ? " due to the Objects typed object" : "") + ", permitted values are \"" + min + "\" to \"" + max + "\"", Source_Atmos_1_0);
             }
         }
         if (Flags[item_info::Flags_ID_Z1] && !Flags[item_info::Flags_ID_Z2]) {
             if (ID[12] != '0' || ID[13] != '1') { // zz != 01
-                Item.AddError(Error, item_Type, i, ':' + CraftName(item_Infos[item_Type].Name) + "ID:" + CraftName(item_Infos[item_Type].Name) + "ID attribute zz value \"" + ID.substr(12, 2) + "\" is not permitted, permitted value is \"01\"", Source_Atmos_1_0);
+                Item.AddError(Error, item_Type, i, ':' + CraftName(item_Infos[item_Type].Name, true) + "ID:" + CraftName(item_Infos[item_Type].Name, true) + "ID attribute zz value \"" + ID.substr(12, 2) + "\" is not permitted, permitted value is \"01\"", Source_Atmos_1_0);
             }
         }
         if (Flags[item_info::Flags_ID_V]) {
             auto vvvvvvvv = ID.substr(strlen(item_Infos[item_Type].ID_Begin) + 1, 8);
             if (vvvvvvvv == "00000000") {
-                Item.AddError(Error, item_Type, i, ":" + (item_Type == item_audioTrackUID ? "U" : ("" + CraftName(item_Infos[item_Type].Name))) + "ID:" + (item_Type == item_audioTrackUID ? "U" : ("" + CraftName(item_Infos[item_Type].Name))) + "ID attribute vvvvvvvv value \"" + vvvvvvvv + "\" is not permitted, permitted values are \"00000001\" to \"FFFFFFFF\"", Source_Atmos_1_0);
+                Item.AddError(Error, item_Type, i, ":" + (item_Type == item_audioTrackUID ? "U" : ("" + CraftName(item_Infos[item_Type].Name, true))) + "ID:" + (item_Type == item_audioTrackUID ? "U" : ("" + CraftName(item_Infos[item_Type].Name))) + "ID attribute vvvvvvvv value \"" + vvvvvvvv + "\" is not permitted, permitted values are \"00000001\" to \"FFFFFFFF\"", Source_Atmos_1_0);
             }
         }
     }
@@ -2551,7 +2870,7 @@ static void CheckErrors_formatLabelDefinition(file_adm_private* File_Adm_Private
         if (item_Infos[item_Type].ID_Flags[item_info::Flags_ID_YX] && !CheckErrors_ID(File_Adm_Private, Item_ID, item_Infos[item_Type])) {
             const auto Item_ID_yyyy = Item_ID.substr(strlen(item_Infos[item_Type].ID_Begin) + 1, 4);
             if ((Label_Present && Item_ID_yyyy != Label) || (Definition_Present && formatLabel_Int != strtoul(Item_ID_yyyy.c_str(), nullptr, 16))) {
-                Item.AddError(Error, item_Type, i, ':' + CraftName(item_Infos[item_Type].Name) + "ID:" + CraftName(item_Infos[item_Type].Name) + "ID attribute yyyy value \"" + Item_ID_yyyy + "\" does not match " + (Label_Present ? ("formatLabel \"" + Label) : ("formatDefinition \"" + Definition)) + '\"');
+                Item.AddError(Error, item_Type, i, ':' + CraftName(item_Infos[item_Type].Name, true) + "ID:" + CraftName(item_Infos[item_Type].Name, true) + "ID attribute yyyy value \"" + Item_ID_yyyy + "\" does not match " + (Label_Present ? ("formatLabel \"" + Label) : ("formatDefinition \"" + Definition)) + '\"');
             }
         }
     }
@@ -2619,11 +2938,22 @@ static void CheckErrors_Attributes(file_adm_private* File_Adm_Private, item Item
 static void CheckErrors_Elements(file_adm_private* File_Adm_Private, item Item_Type) {
     auto& Items = File_Adm_Private->Items[Item_Type].Items;
     const auto& Item_Info = item_Infos[Item_Type];
-    const auto Element_Infos_Ptr = Item_Info.Element_Infos;
-    const auto& Element_Infos = *Element_Infos_Ptr;
     auto& Item = Items.back();
     size_t i = Items.size() - 1;
     auto& Elements = Item.Elements;
+    const element_items* Element_Infos_Ptr;
+    if (Item_Type == item_audioBlockFormat) {
+        static const element_items* audioBlockFormat_xxx_Elements[] = { (element_items*)audioBlockFormat_Elements, (element_items*)audioBlockFormat_DirectSpeakers_Elements, (element_items*)audioBlockFormat_Matrix_Elements, (element_items*)audioBlockFormat_Object_Elements };
+        auto Type = GetType(File_Adm_Private, item_audioChannelFormat, File_Adm_Private->Items[item_audioChannelFormat].Items.size() - 1);
+        if (Type >= size(audioBlockFormat_xxx_Elements)) {
+            Type = Type_Unknown;
+        }
+        Element_Infos_Ptr = audioBlockFormat_xxx_Elements[Type];
+    }
+    else {
+        Element_Infos_Ptr = Item_Info.Element_Infos;
+    }
+    const auto& Element_Infos = *Element_Infos_Ptr;
     for (size_t j = 0; j < Elements.size(); j++) {
         const auto& Element = Elements[j];
         const auto& Info = Element_Infos[j];
@@ -2634,19 +2964,26 @@ static void CheckErrors_Elements(file_adm_private* File_Adm_Private, item Item_T
                 Item.AddError(Error, j, E::Present0, 0);
                 break;
             }
-            if (!Info.Flags[AdvSSE0]) {
-                Item.AddError(Error, j, E::Present0, 0, Source_AdvSSE_1);
-            }
-            if (!Info.Flags[Dolby0]) {
-                Item.AddError(Error, j, E::Present0, 0, Source_Atmos_1_0);
+            else {
+                if (!Info.Flags[AdvSSE0]) {
+                    Item.AddError(Error, j, E::Present0, 0, Source_AdvSSE_1);
+                }
+                if (!Info.Flags[Dolby0]) {
+                    Item.AddError(Error, j, E::Present0, 0, Source_Atmos_1_0);
+                }
             }
             break;
         case 1:
-            if (!Info.Flags[AdvSSE1]) {
-                Item.AddError(Error, j, E::Present1, 0, Source_AdvSSE_1);
+            if (!Info.Flags[Count1]) {
+                Item.AddError(Error, j, E::Present1, 0);
             }
-            if (!Info.Flags[Dolby1]) {
-                Item.AddError(Error, j, E::Present1, 0, Source_Atmos_1_0);
+            else {
+                if (!Info.Flags[AdvSSE1]) {
+                    Item.AddError(Error, j, E::Present1, 0, Source_AdvSSE_1);
+                }
+                if (!Info.Flags[Dolby1]) {
+                    Item.AddError(Error, j, E::Present1, 0, Source_Atmos_1_0);
+                }
             }
             break;
         default:
@@ -2654,11 +2991,13 @@ static void CheckErrors_Elements(file_adm_private* File_Adm_Private, item Item_T
                 Item.AddError(Error, j, E::Present2, (int8u)Element_Size);
                 break;
             }
-            if (!Info.Flags[AdvSSE2]) {
-                Item.AddError(Error, j, E::Present2, (int8u)Element_Size, Source_AdvSSE_1);
-            }
-            if (!Info.Flags[Dolby2]) {
-                Item.AddError(Error, j, E::Present2, (int8u)Element_Size, Source_Atmos_1_0);
+            else {
+                if (!Info.Flags[AdvSSE2]) {
+                    Item.AddError(Error, j, E::Present2, (int8u)Element_Size, Source_AdvSSE_1);
+                }
+                if (!Info.Flags[Dolby2]) {
+                    Item.AddError(Error, j, E::Present2, (int8u)Element_Size, Source_Atmos_1_0);
+                }
             }
         }
         for (size_t k = 0; k < Element.size(); k++) {
@@ -2675,7 +3014,6 @@ static void CheckErrors_Elements(file_adm_private* File_Adm_Private, item Item_T
                 case ITEM_ELEM(item_audioProgrammeReferenceScreen, audioProgrammeReferenceScreen_screenCentrePosition):
                 case ITEM_ELEM(item_audioProgrammeReferenceScreen, audioProgrammeReferenceScreen_screenWidth):
                 case ITEM_ELEM(item_audioBlockFormat, audioBlockFormat_headphoneVirtualise):
-                case ITEM_ELEM(item_frameHeader, frameHeader_frameFormat):
                 #undef ITEM_ELEM
                     break;
                 default:
@@ -2701,7 +3039,7 @@ static void CheckErrors_Element_Target(file_adm_private* File_Adm_Private, item 
                 const auto Item_ID_yyyyxxxx = Item_ID.substr(3, 8);
                 const auto TargetIDRef_yyyyxxxx = TargetIDRef.substr(3, 8);
                 if (Item_ID_yyyyxxxx != TargetIDRef_yyyyxxxx) {
-                    Item.AddError(IsAtmos ? Error : Warning, item_Type, i, ':' + CraftName(item_Infos[Target_Type].Name) + "IDRef:" + CraftName(item_Infos[Target_Type].Name) + "IDRef subelement with yyyyxxxx value \"" + TargetIDRef_yyyyxxxx + "\" not same as " + CraftName(item_Infos[item_Type].Name) + "ID attribute yyyyxxxx value \"" + Item_ID_yyyyxxxx + "\"" + (IsAtmos ? ADM_Atmos_1_0 : ""));
+                    Item.AddError(IsAtmos ? Error : Warning, item_Type, i, ':' + CraftName(item_Infos[Target_Type].Name) + "IDRef:" + CraftName(item_Infos[Target_Type].Name) + "IDRef subelement with yyyyxxxx value \"" + TargetIDRef_yyyyxxxx + "\" not same as " + CraftName(item_Infos[item_Type].Name, true) + "ID attribute yyyyxxxx value \"" + Item_ID_yyyyxxxx + "\"" + (IsAtmos ? ADM_Atmos_1_0 : ""));
                 }
             }
         }
@@ -2723,18 +3061,44 @@ static void CheckErrors_Element_Target(file_adm_private* File_Adm_Private, item 
         }
         else {
             bool Target_Found = false;
-            auto Start = TargetIDRef.rfind('_');
-            if (Start != string::npos) {
-                auto Not0 = TargetIDRef.find_last_not_of('0');
-                Target_Found = Start == Not0; // Fake: ID 00000000 means not available, we don't raise an error for them
-            }
             for (const auto& Target : Targets) {
                 if (Target.Attributes[item_Infos[Target_Type].ID_Pos] == TargetIDRef) {
                     Target_Found = true;
                 }
             }
             if (!Target_Found) {
-                Item.AddError(Error, item_Type, i, ':' + CraftName(item_Infos[Target_Type].Name) + "IDRef:" + CraftName(item_Infos[Target_Type].Name) + "IDRef value \"" + TargetIDRef + "\" shall match the audio" + string(item_Infos[Target_Type].Name) + "ID attribute of an audio" + string(item_Infos[Target_Type].Name) + " element");
+                auto Start = TargetIDRef.rfind('_');
+                if (Start != string::npos) {
+                    auto Not0 = TargetIDRef.find_last_not_of('0');
+                    if (Start == Not0) {
+                        Target_Found = true; // Fake: ID 00000000 means not available, we don't raise an error for them
+                    }
+                    else {
+                        // Trying case insensitive, this is permitted by specs
+                        auto TargetIDRef_Up = TargetIDRef;
+                        for (size_t i = Start; i < TargetIDRef_Up.size(); i++) {
+                            auto& Letter = TargetIDRef_Up[i];
+                            if (Letter >= 'A' && Letter <= 'F') {
+                                Letter += 'a' - 'A';
+                            }
+                        }
+                        for (const auto& Target : Targets) {
+                            auto Target_Up = Target.Attributes[item_Infos[Target_Type].ID_Pos];
+                            for (size_t i = Start; i < Target_Up.size(); i++) {
+                                auto& Letter = Target_Up[i];
+                                if (Letter >= 'A' && Letter <= 'F') {
+                                    Letter += 'a' - 'A';
+                                }
+                            }
+                            if (Target_Up == TargetIDRef_Up) {
+                                Target_Found = true;
+                            }
+                        }
+                    }
+                }
+            }
+            if (!Target_Found) {
+                Item.AddError(Error, item_Type, i, ':' + CraftName(item_Infos[Target_Type].Name) + "IDRef:" + CraftName(item_Infos[Target_Type].Name) + "IDRef value \"" + TargetIDRef + "\" shall match the " + CraftName(item_Infos[Target_Type].Name, true) + "ID attribute of an " + CraftName(item_Infos[Target_Type].Name) + " element");
             }
         }
     }
@@ -2834,27 +3198,7 @@ void loudnessMetadata_Check(file_adm_private* File_Adm_Private, item Item_Type) 
     if (loudnessMetadata.Elements[loudnessMetadata_integratedLoudness].empty() && loudnessMetadata.Elements[loudnessMetadata_dialogueLoudness].empty())
         Programme.AddError(Error, string(":") + item_Infos[Item_Type].Name + to_string(i) + ":loudnessMetadata" + to_string(j) + ":integratedLoudness is not present", Source_AdvSSE_1);
 
-    auto MoveErrors = [&](size_t Element_Pos, item Item_Type) {
-        size_t Count = loudnessMetadata.Elements[Element_Pos].size();
-        auto& Sources = Items[Item_Type].Items;
-        for (size_t k = Sources.size() - Count; k < Sources.size(); k++) {
-            auto& Item = Sources[k];
-            for (size_t Error_Type = 0; Error_Type < error_Type_Max; Error_Type++) {
-                for (size_t Source = 0; Source < source_Max; Source++) {
-                    for (const auto& Error : Item.Errors[Error_Type][Source]) {
-                        if (!Error[0]) {
-                            Programme.AddError((error_Type)Error_Type, Error + (char)Item_Type + (char)k, (source)Source);
-                        }
-                        else {
-                            Programme.AddError((error_Type)Error_Type, string(":") + item_Infos[Item_Type].Name + to_string(i) + ":loudnessMetadata" + to_string(j) + Error, (source)Source);
-                        }
-                    }
-                    Item.Errors[Error_Type][Source].clear();
-                }
-            }
-        }
-    };
-    MoveErrors(loudnessMetadata_renderer, item_renderer);
+    MoveErrors(File_Adm_Private, item_loudnessMetadata);
 }
 
 //---------------------------------------------------------------------------
@@ -2868,28 +3212,7 @@ void audioProgrammeReferenceScreen_Check(file_adm_private* File_Adm_Private) {
     size_t i = Programmes.size() - 1;
     size_t j = Programme.Elements[audioProgramme_audioProgrammeReferenceScreen].size() - 1;
 
-    auto MoveErrors = [&](size_t Element_Pos, item Item_Type) {
-        size_t Count = ProgrammeReferenceScreen.Elements[Element_Pos].size();
-        auto& Sources = Items[Item_Type].Items;
-        for (size_t k = Sources.size() - Count; k < Sources.size(); k++) {
-            auto& Item = Sources[k];
-            for (size_t Error_Type = 0; Error_Type < error_Type_Max; Error_Type++) {
-                for (size_t Source = 0; Source < source_Max; Source++) {
-                    for (const auto& Error : Item.Errors[Error_Type][Source]) {
-                        if (!Error[0]) {
-                            Programme.AddError((error_Type)Error_Type, Error + (char)Item_Type + (char)k, (source)Source);
-                        }
-                        else {
-                            Programme.AddError((error_Type)Error_Type, ":audioProgramme" + to_string(i) + ":audioProgrammeReferenceScreen" + to_string(j) + Error, (source)Source);
-                        }
-                    }
-                    Item.Errors[Error_Type][Source].clear();
-                }
-            }
-        }
-    };
-    MoveErrors(audioProgrammeReferenceScreen_screenCentrePosition, item_screenCentrePosition);
-    MoveErrors(audioProgrammeReferenceScreen_screenWidth, item_screenWidth);
+    MoveErrors(File_Adm_Private, item_audioProgrammeReferenceScreen);
 }
 
 //---------------------------------------------------------------------------
@@ -2911,10 +3234,10 @@ void screenWidth_Check(file_adm_private* File_Adm_Private) {
         char* End;
         auto Value = strtof(Element.c_str(), &End);
         if (End - Element.c_str() != Element.size()) {
-            screenWidth.AddError(Error, ":audioProgramme" + to_string(i) + ":audioProgrammeReferenceScreen" + to_string(j) + ":screenWidth" + to_string(k) + ":X:X attribute value \"" + Element + "\" is malformed");
+            screenWidth.AddError(Error, ":X:X attribute value \"" + Element + "\" is malformed");
         }
         else if (Value < 0 || Value > 2) {
-            screenWidth.AddError(Error, ":audioProgramme" + to_string(i) + ":audioProgrammeReferenceScreen" + to_string(j) + ":screenWidth" + to_string(k) + ":X:X attribute value \"" + Element + "\" is not permitted, permitted values are [0 - 2]");
+            screenWidth.AddError(Error, ":X:X attribute value \"" + Element + "\" is not permitted, permitted values are [0 - 2]");
         }
     }
 }
@@ -2930,27 +3253,8 @@ void authoringInformation_Check(file_adm_private* File_Adm_Private) {
     size_t i = Programmes.size() - 1;
     size_t j = Programme.Elements[audioProgramme_authoringInformation].size() - 1;
 
-    auto MoveErrors = [&](size_t Element_Pos, item Item_Type) {
-        size_t Count = authoringInformation.Elements[Element_Pos].size();
-        auto& Sources = Items[Item_Type].Items;
-        for (size_t k = Sources.size() - Count; k < Sources.size(); k++) {
-            auto& Item = Sources[k];
-            for (size_t Error_Type = 0; Error_Type < error_Type_Max; Error_Type++) {
-                for (size_t Source = 0; Source < source_Max; Source++) {
-                    for (const auto& Error : Item.Errors[Error_Type][Source]) {
-                        if (!Error[0]) {
-                            Programme.AddError((error_Type)Error_Type, Error + (char)Item_Type + (char)k, (source)Source);
-                        }
-                        else {
-                            Programme.AddError((error_Type)Error_Type, ":audioProgramme" + to_string(i) + ":authoringInformation" + to_string(j) + Error, (source)Source);
-                        }
-                    }
-                    Item.Errors[Error_Type][Source].clear();
-                }
-            }
-        }
-    };
-    MoveErrors(authoringInformation_referenceLayout, item_referenceLayout);
+
+    MoveErrors(File_Adm_Private, item_authoringInformation);
 }
 
 //---------------------------------------------------------------------------
@@ -2968,30 +3272,7 @@ void audioProgramme_Check(file_adm_private* File_Adm_Private) {
 
     CheckError_Language(File_Adm_Private, item_audioProgramme, audioProgramme_audioProgrammeLanguage);
 
-    auto MoveErrors = [&](size_t Element_Pos, item Item_Type) {
-        size_t Count = Programme.Elements[Element_Pos].size();
-        auto& Sources = Items[Item_Type].Items;
-        for (size_t k = Sources.size() - Count; k < Sources.size(); k++) {
-            auto& Item = Sources[k];
-            for (size_t Error_Type = 0; Error_Type < error_Type_Max; Error_Type++) {
-                for (size_t Source = 0; Source < source_Max; Source++) {
-                    for (const auto& Error : Item.Errors[Error_Type][Source]) {
-                        if (!Error[0]) {
-                            Programme.AddError((error_Type)Error_Type, Error + (char)Item_Type + (char)k, (source)Source);
-                        }
-                        else {
-                            Programme.AddError((error_Type)Error_Type, ":audioProgramme" + to_string(i) + Error, (source)Source);
-                        }
-                    }
-                    Item.Errors[Error_Type][Source].clear();
-                }
-            }
-        }
-    };
-    MoveErrors(audioProgramme_audioProgrammeLabel, item_audioProgrammeLabel);
-    MoveErrors(audioProgramme_loudnessMetadata, item_loudnessMetadata);
-    MoveErrors(audioProgramme_audioProgrammeReferenceScreen, item_audioProgrammeReferenceScreen);
-    MoveErrors(audioProgramme_authoringInformation, item_authoringInformation);
+    MoveErrors(File_Adm_Private, item_audioProgramme);
 
     if (!File_Adm_Private->IsAtmos && Programme.Attributes[audioProgramme_audioProgrammeName] == "Atmos_Master") {
         File_Adm_Private->IsAtmos = true;
@@ -3023,28 +3304,20 @@ void audioContent_Check(file_adm_private* File_Adm_Private) {
         }
     }
 
-    auto MoveErrors = [&](size_t Element_Pos, item Item_Type) {
-        size_t Count = Content.Elements[Element_Pos].size();
-        auto& Sources = Items[Item_Type].Items;
-        for (size_t k = Sources.size() - Count; k < Sources.size(); k++) {
-            auto& Item = Sources[k];
-            for (size_t Error_Type = 0; Error_Type < error_Type_Max; Error_Type++) {
-                for (size_t Source = 0; Source < source_Max; Source++) {
-                    for (const auto& Error : Item.Errors[Error_Type][Source]) {
-                        if (!Error[0]) {
-                            Content.AddError((error_Type)Error_Type, Error + (char)Item_Type + (char)k, (source)Source);
-                        }
-                        else {
-                            Content.AddError((error_Type)Error_Type, ":audioContent" + to_string(i) + Error, (source)Source);
-                        }
-                    }
-                    Item.Errors[Error_Type][Source].clear();
-                }
-            }
+    auto& ContentLabels = Items[item_audioContentLabel].Items;
+    auto audioContentLabel_Start = Items[item_audioContentLabel].Items.size() - Content.Elements[audioContent_audioContentLabel].size();
+    set<string> PreviousLanguages;
+    for (size_t k = audioContentLabel_Start; k < ContentLabels.size(); k++) {
+        const auto& language = ContentLabels[k].Attributes[audioContentLabel_language];
+        if (PreviousLanguages.find(language) != PreviousLanguages.end()) {
+            ContentLabels[k].AddError(Error, item_audioContentLabel, k - audioContentLabel_Start, ":language:language attribute value \"" + language + "\" shall be unique");
         }
-    };
-    MoveErrors(audioContent_audioContentLabel, item_audioContentLabel);
-    MoveErrors(audioContent_loudnessMetadata, item_loudnessMetadata);
+        else {
+            PreviousLanguages.insert(language);
+        }
+    }
+
+    MoveErrors(File_Adm_Private, item_audioContent);
 }
 
 //---------------------------------------------------------------------------
@@ -3080,28 +3353,7 @@ void audioObjectInteraction_Check(file_adm_private* File_Adm_Private) {
     size_t i = audioObjects.size() - 1;
     size_t j = audioObject.Elements[audioObject_audioObjectInteraction].size() - 1;
 
-    auto MoveErrors = [&](size_t Element_Pos, item Item_Type) {
-        size_t Count = audioObjectInteraction.Elements[Element_Pos].size();
-        auto& Sources = Items[Item_Type].Items;
-        for (size_t k = Sources.size() - Count; k < Sources.size(); k++) {
-            auto& Item = Sources[k];
-            for (size_t Error_Type = 0; Error_Type < error_Type_Max; Error_Type++) {
-                for (size_t Source = 0; Source < source_Max; Source++) {
-                    for (const auto& Error : Item.Errors[Error_Type][Source]) {
-                        if (!Error[0]) {
-                            audioObject.AddError((error_Type)Error_Type, Error + (char)Item_Type + (char)k, (source)Source);
-                        }
-                        else {
-                            audioObject.AddError((error_Type)Error_Type, ":audioObject" + to_string(i) + ":audioObjectInteraction" + to_string(j) + Error, (source)Source);
-                        }
-                    }
-                    Item.Errors[Error_Type][Source].clear();
-                }
-            }
-        }
-    };
-    MoveErrors(audioObjectInteraction_gainInteractionRange, item_gainInteractionRange);
-    MoveErrors(audioObjectInteraction_positionInteractionRange, item_positionInteractionRange);
+    MoveErrors(File_Adm_Private, item_audioObjectInteraction);
 }
 
 //---------------------------------------------------------------------------
@@ -3112,31 +3364,7 @@ void Object_Check(file_adm_private* File_Adm_Private) {
 
     size_t i = Objects.size() - 1;
 
-    auto MoveErrors = [&](size_t Element_Pos, item Item_Type) {
-        size_t Count = Object.Elements[Element_Pos].size();
-        auto& Sources = Items[Item_Type].Items;
-        for (size_t k = Sources.size() - Count; k < Sources.size(); k++) {
-            auto& Item = Sources[k];
-            for (size_t Error_Type = 0; Error_Type < error_Type_Max; Error_Type++) {
-                for (size_t Source = 0; Source < source_Max; Source++) {
-                    for (const auto& Error : Item.Errors[Error_Type][Source]) {
-                        if (!Error[0]) {
-                            Object.AddError((error_Type)Error_Type, Error + (char)Item_Type + (char)k, (source)Source);
-                        }
-                        else {
-                            Object.AddError((error_Type)Error_Type, ":audioObject" + to_string(i) + Error, (source)Source);
-                        }
-                    }
-                    Item.Errors[Error_Type][Source].clear();
-                }
-            }
-        }
-    };
-    MoveErrors(audioObject_audioObjectLabel, item_audioObjectLabel);
-    MoveErrors(audioObject_audioComplementaryObjectGroupLabel, item_audioComplementaryObjectGroupLabel);
-    MoveErrors(audioObject_audioObjectInteraction, item_audioObjectInteraction);
-    MoveErrors(audioObject_positionOffset, item_positionOffset);
-    MoveErrors(audioObject_alternativeValueSet, item_alternativeValueSet);
+    MoveErrors(File_Adm_Private, item_audioObject);
 }
 
 //---------------------------------------------------------------------------
@@ -3147,22 +3375,98 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
     auto& BlockFormats = Items[item_audioBlockFormat].Items;
     auto& BlockFormat = BlockFormats.back();
     auto& Positions = Items[item_position].Items;
+    auto& objectDivergences = Items[item_objectDivergence].Items;
+
+    size_t audioBlockFormat_Count = ChannelFormat.Elements[audioChannelFormat_audioBlockFormat].size();
 
     size_t i = ChannelFormats.size() - 1;
-    size_t j = ChannelFormat.Elements[audioChannelFormat_audioBlockFormat].size() - 1;
+    size_t j = audioBlockFormat_Count - 1;
     if (i < File_Adm_Private->ChannelFormat_BlockFormat_ReduceCount.size()) {
         j += File_Adm_Private->ChannelFormat_BlockFormat_ReduceCount[i];
     }
     size_t Position_Pos = Positions.size() - BlockFormat.Elements[audioBlockFormat_position].size();
+    const auto objectDivergence_Pos = objectDivergences.size() - BlockFormat.Elements[audioBlockFormat_objectDivergence].size();
 
     const auto& ID = ChannelFormat.Attributes[audioChannelFormat_audioChannelFormatID];
     const auto Type = GetType(File_Adm_Private, item_audioChannelFormat, i);
     const auto ID_yyyyxxxx = CheckErrors_ID(File_Adm_Private, ID, item_Infos[item_audioChannelFormat]) ? string() : ID.substr(3, 8);
 
-    CheckError_Time(File_Adm_Private, item_audioBlockFormat, audioBlockFormat_rtime);
-    CheckError_Time(File_Adm_Private, item_audioBlockFormat, audioBlockFormat_duration);
-    CheckError_Time(File_Adm_Private, item_audioBlockFormat, audioBlockFormat_lstart);
-    CheckError_Time(File_Adm_Private, item_audioBlockFormat, audioBlockFormat_lduration);
+    bool initializeBlockActive = (int8s)File_Adm_Private->Version_S >= 0 && BlockFormat.Attributes[audioBlockFormat_initializeBlock] == "1";
+    bool CheckNotPresent = Type == Type_Objects && !initializeBlockActive;
+    auto GetStart = [&](size_t Element_Pos) -> TimeCode {
+        if (BlockFormat.Attributes_Present[Element_Pos]) {
+            if (File_Adm_Private->IsLocalTimeReference != (Element_Pos == audioBlockFormat_lstart) || initializeBlockActive) {
+                BlockFormat.AddError(Error, 0x80 | Element_Pos, E::Present1, 0);
+            }
+            else if (Type != Type_Objects) {
+                BlockFormat.AddError(Error, 0x80 | Element_Pos, E::Present1, 0, Source_AdvSSE_1);
+            }
+            auto Start_TC = CheckError_Time(File_Adm_Private, item_audioBlockFormat, Element_Pos);
+            if (Start_TC.IsValid() && audioBlockFormat_Count == 1) {
+                const auto& frameFormats = Items[item_frameFormat].Items;
+                for (size_t k = 0; k < frameFormats.size(); k++) {
+                    const auto& frameFormat = frameFormats[k];
+                    TimeCode frameFormat_start_TC = frameFormat.Attributes[frameFormat_start];
+                    if (frameFormat_start_TC.IsValid() && frameFormat_start_TC != Start_TC) {
+                        BlockFormat.AddError(Error, string(1, ':') + (*item_Infos[item_audioBlockFormat].Attribute_Infos)[Element_Pos].Name + ':' + (*item_Infos[item_audioBlockFormat].Attribute_Infos)[Element_Pos].Name + " attribute value does not match the frameFormat start attribute value", Source_AdvSSE_1);
+                    }
+                }
+                static const TimeCode Zero_TC(0, 0, 0, 0, 0);
+                if (Start_TC != Zero_TC) {
+                    BlockFormat.AddError(Error, string(1, ':') + (*item_Infos[item_audioBlockFormat].Attribute_Infos)[Element_Pos].Name + ':' + (*item_Infos[item_audioBlockFormat].Attribute_Infos)[Element_Pos].Name + " attribute value is not 0", Source_AdvSSE_1);
+                }
+            }
+            return Start_TC;
+        }
+        else if (File_Adm_Private->IsLocalTimeReference == (Element_Pos == audioBlockFormat_lstart) && CheckNotPresent) {
+            BlockFormat.AddError(Error, 0x80 | Element_Pos, E::Present0, 0, Source_AdvSSE_1);
+        }
+        return {};
+    };
+    auto GetDuration = [&](size_t Element_Pos) -> TimeCode {
+        if (BlockFormat.Attributes_Present[Element_Pos]) {
+            if (File_Adm_Private->IsLocalTimeReference != (Element_Pos == audioBlockFormat_lduration) || initializeBlockActive) {
+                BlockFormat.AddError(Error, 0x80 | Element_Pos, E::Present1, 0);
+            }
+            else if (Type != Type_Objects) {
+                BlockFormat.AddError(Error, 0x80 | Element_Pos, E::Present1, 0, Source_AdvSSE_1);
+            }
+            auto Duration_TC = CheckError_Time(File_Adm_Private, item_audioBlockFormat, Element_Pos);
+            if (Duration_TC.IsValid()) {
+                const auto Duration_ms = Duration_TC.ToMilliseconds();
+                if (Duration_ms && Duration_ms < 5) {
+                    BlockFormat.AddError(Error, string(1, ':') + (*item_Infos[item_audioBlockFormat].Attribute_Infos)[Element_Pos].Name + ':' + (*item_Infos[item_audioBlockFormat].Attribute_Infos)[Element_Pos].Name + " attribute value is not permitted, permitted values are 0 or > 5 ms", Source_AdvSSE_1);
+                }
+            }
+            return Duration_TC;
+        }
+        else if (File_Adm_Private->IsLocalTimeReference == (Element_Pos == audioBlockFormat_lduration) && CheckNotPresent) {
+            BlockFormat.AddError(Error, 0x80 | Element_Pos, E::Present0, 0, Source_AdvSSE_1);
+        }
+        return {};
+    };
+    auto CheckTimeOffset = [&](size_t Element_Pos, TimeCode& LastBlockFormatEnd, const TimeCode& Start, const TimeCode& Duration) {
+        if (audioBlockFormat_Count != 1 && LastBlockFormatEnd.IsValid() && Start.IsValid() && LastBlockFormatEnd != Start) {
+            BlockFormat.AddError(Error, string(1, ':') + (*item_Infos[item_audioBlockFormat].Attribute_Infos)[Element_Pos].Name + ':' + (*item_Infos[item_audioBlockFormat].Attribute_Infos)[Element_Pos].Name + " attribute value does not match the previous audioBlockFormat", Source_AdvSSE_1);
+        }
+        if (Start.IsValid() && Duration.IsValid()) {
+            LastBlockFormatEnd = Start + Duration;
+        }
+        else {
+            LastBlockFormatEnd = {};
+        }
+    };
+
+    TimeCode rtime, duration, lstart, lduration;
+    rtime = GetStart(audioBlockFormat_rtime);
+    duration = GetDuration(audioBlockFormat_duration);
+    if ((int8s)File_Adm_Private->Version_S < 0 && BlockFormat.Attributes_Present[audioBlockFormat_initializeBlock]) {
+        BlockFormat.AddError(Error, 0x80 | audioBlockFormat_initializeBlock, E::Present1, 0);
+    }
+    lstart = GetStart(audioBlockFormat_lstart);
+    lduration = GetDuration(audioBlockFormat_lduration);
+    CheckTimeOffset(audioBlockFormat_rtime, File_Adm_Private->LastBlockFormatEnd, rtime, duration);
+    CheckTimeOffset(audioBlockFormat_lstart, File_Adm_Private->LastBlockFormatEnd_S, lstart, lduration);
 
     atmos_audioChannelFormatName ChannelAssignment = (atmos_audioChannelFormatName)-1;
     if (Type == Type_DirectSpeakers && ChannelFormat.Attributes_Present[audioChannelFormat_audioChannelFormatName]) {
@@ -3174,7 +3478,7 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
     for (size_t k = 0; k < channelLocks.size(); k++) {
         const auto& channelLock = channelLocks[k];
         if (channelLock != "0" && channelLock != "1") {
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":channelLock" + to_string(k) + ":GeneralCompliance:channelLock element value " + channelLock + " is not permitted, permitted value are \"0\" or \"1\"");
+            BlockFormat.AddError(Error, ":channelLock" + to_string(k) + ":GeneralCompliance:channelLock element value " + channelLock + " is not permitted, permitted value are \"0\" or \"1\"");
         }
     }
 
@@ -3184,13 +3488,13 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
         char* End;
         auto Value = strtof(Element.c_str(), &End);
         if (End - Element.c_str() != Element.size()) {
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":diffuse" + to_string(k) + ":GeneralCompliance:diffuse element value \"" + Element + "\" is malformed");
+            BlockFormat.AddError(Error, ":diffuse" + to_string(k) + ":GeneralCompliance:diffuse element value \"" + Element + "\" is malformed");
         }
         else if (Value < 0 || Value > 1) {
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":diffuse" + to_string(k) + ":GeneralCompliance:diffuse element value \"" + Element + "\" is not permitted, permitted values are [0 - 1]");
+            BlockFormat.AddError(Error, ":diffuse" + to_string(k) + ":GeneralCompliance:diffuse element value \"" + Element + "\" is not permitted, permitted values are [0 - 1]");
         }
         else if (Value != 0 && Value != 1) {
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":diffuse" + to_string(k) + ":GeneralCompliance:diffuse element value \"" + Element + "\" is not permitted, permitted values are 0 or 1", Source_Atmos_1_0);
+            BlockFormat.AddError(Error, ":diffuse" + to_string(k) + ":GeneralCompliance:diffuse element value \"" + Element + "\" is not permitted, permitted values are 0 or 1", Source_Atmos_1_0);
         }
     }
 
@@ -3202,7 +3506,7 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
         char* End;
         auto Value = strtof(Element.c_str(), &End);
         if (End - Element.c_str() != Element.size()) {
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":gain:gain attribute value \"" + Element + "\" is malformed");
+            BlockFormat.AddError(Error, ":gain:gain attribute value \"" + Element + "\" is malformed");
         }
         else if (Value){
             Gains_Not0 = Element;
@@ -3216,17 +3520,17 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
         char* End;
         auto Value = strtof(Element.c_str(), &End);
         if (End - Element.c_str() != Element.size()) {
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":importance:importance element value \"" + Element + "\" is malformed");
+            BlockFormat.AddError(Error, ":importance:importance element value \"" + Element + "\" is malformed");
         }
         else if (Value < 0 || Value > 10) {
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":importance:importance element value \"" + Element + "\" is not permitted, permitted values are [0 - 10]");
+            BlockFormat.AddError(Error, ":importance:importance element value \"" + Element + "\" is not permitted, permitted values are [0 - 10]");
         }
         else if (Value == 0) {
             if (BlockFormat.Elements[audioBlockFormat_gain].empty()) {
-                ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":gain element is not present", Source_Atmos_1_0);
+                BlockFormat.AddError(Error, ":gain element is not present", Source_Atmos_1_0);
             }
             else {
-                ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":gain" + to_string(Gains_Not0_Pos) + ":gain element value \"" + Gains_Not0 + "\" is not permitted, permitted value is 0 due to importance element value not 0", Source_Atmos_1_0);
+                BlockFormat.AddError(Error, ":gain" + to_string(Gains_Not0_Pos) + ":gain element value \"" + Gains_Not0 + "\" is not permitted, permitted value is 0 due to importance element value not 0", Source_Atmos_1_0);
             }
         }
     }
@@ -3235,20 +3539,20 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
     for (size_t k = 0; k < jumpPositions.size(); k++) {
         const auto& jumpPosition = jumpPositions[k];
         if (jumpPosition != "0" && jumpPosition != "1") {
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":jumpPosition" + to_string(k) + ":GeneralCompliance:jumpPosition element value " + jumpPosition + " is not permitted, permitted value are \"0\" or  \"1\"");
+            BlockFormat.AddError(Error, ":jumpPosition" + to_string(k) + ":GeneralCompliance:jumpPosition element value " + jumpPosition + " is not permitted, permitted value are \"0\" or  \"1\"");
         }
     }
     switch (jumpPositions.size()) {
     case 0:
         switch (Type) {
         case Type_Objects:
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":jumpPosition:jumpPosition element is not present", Source_Atmos_1_0);
+            BlockFormat.AddError(Error, ":jumpPosition:jumpPosition element is not present", Source_Atmos_1_0);
         }
         break;
     default:
         switch (Type) {
         case Type_DirectSpeakers:
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":GeneralCompliance:jumpPosition subelement count " + to_string(jumpPositions.size()) + " is not permitted, max is 1", Source_Atmos_1_0);
+            BlockFormat.AddError(Error, ":GeneralCompliance:jumpPosition subelement count " + to_string(jumpPositions.size()) + " is not permitted, max is 1", Source_Atmos_1_0);
             break;
         }
         // Fallthrough
@@ -3262,17 +3566,17 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
                 char* End;
                 auto Value = strtof(interpolationLength.c_str(), &End);
                 if (End - interpolationLength.c_str() != interpolationLength.size()) {
-                    ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":jumpPosition0:interpolationLength:interpolationLength attribute value \"" + interpolationLength + "\" is malformed");
+                    BlockFormat.AddError(Error, ":jumpPosition0:interpolationLength:interpolationLength attribute value \"" + interpolationLength + "\" is malformed");
                 }
                 else {
                     float ValidValue = j ? 0.005208 : 0;
                     if (Value != ValidValue) {
-                        ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":jumpPosition0:interpolationLength:interpolationLength attribute value \"" + interpolationLength + "\" is not permitted, permitted value is " + (j ? "0.005208" : "0"), Source_Atmos_1_0);
+                        BlockFormat.AddError(Error, ":jumpPosition0:interpolationLength:interpolationLength attribute value \"" + interpolationLength + "\" is not permitted, permitted value is " + (j ? "0.005208" : "0"), Source_Atmos_1_0);
                     }
                 }
             }
             else {
-                ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":jumpPosition0:interpolationLength attribute is not present", Source_Atmos_1_0);
+                BlockFormat.AddError(Error, ":jumpPosition0:interpolationLength attribute is not present", Source_Atmos_1_0);
             }
         }
         }
@@ -3280,18 +3584,18 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
 
     if (Type == Type_DirectSpeakers) {
         if (BlockFormat.Attributes_Present[audioBlockFormat_rtime]) {
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":rtime:rtime attribute is present", Source_Atmos_1_0);
+            BlockFormat.AddError(Error, ":rtime:rtime attribute is present", Source_Atmos_1_0);
         }
         if (BlockFormat.Attributes_Present[audioBlockFormat_duration]) {
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":duration:duration attribute is present", Source_Atmos_1_0);
+            BlockFormat.AddError(Error, ":duration:duration attribute is present", Source_Atmos_1_0);
         }
     }
     if (Type == Type_Objects) {
         if (!BlockFormat.Attributes_Present[audioBlockFormat_rtime]) {
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":rtime:rtime attribute is not present", Source_Atmos_1_0);
+            BlockFormat.AddError(Error, ":rtime:rtime attribute is not present", Source_Atmos_1_0);
         }
         if (!BlockFormat.Attributes_Present[audioBlockFormat_duration]) {
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":duration:duration attribute is not present", Source_Atmos_1_0);
+            BlockFormat.AddError(Error, ":duration:duration attribute is not present", Source_Atmos_1_0);
         }
     }
 
@@ -3300,7 +3604,24 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
     if (!CheckErrors_ID(File_Adm_Private, ID_Block, item_Infos[item_audioBlockFormat])) {
         if (!CheckErrors_ID(File_Adm_Private, ID, item_Infos[item_audioChannelFormat])) {
             const auto ID_Block_yyyyxxxx = ID_Block.substr(3, 8);
-            if (ID_Block_yyyyxxxx != ID_yyyyxxxx) {
+            bool Found = ID_Block_yyyyxxxx == ID_yyyyxxxx;
+            if (!Found) {
+                // Trying case insensitive, this is permitted by specs
+                auto ID_Block_yyyyxxxx_Up = ID_Block_yyyyxxxx;
+                for (auto& Letter : ID_Block_yyyyxxxx_Up) {
+                    if (Letter >= 'A' && Letter <= 'F') {
+                        Letter += 'a' - 'A';
+                    }
+                }
+                auto ID_yyyyxxxx_Up = ID_yyyyxxxx;
+                for (auto& Letter : ID_yyyyxxxx_Up) {
+                    if (Letter >= 'A' && Letter <= 'F') {
+                        Letter += 'a' - 'A';
+                    }
+                }
+                Found = ID_Block_yyyyxxxx_Up == ID_yyyyxxxx_Up;
+            }
+            if (!Found) {
                 ChannelFormat.AddError(File_Adm_Private->IsAtmos ? Error : Warning, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":audioBlockFormatID:audioBlockFormatID attribute with yyyyxxxx value \"" + ID_Block_yyyyxxxx + "\" not same as audioChannelFormatID attribute yyyyxxxx value \"" + ID_yyyyxxxx + "\"", File_Adm_Private->IsAtmos ? Source_Atmos_1_0 : Source_ADM);
             }
         }
@@ -3309,7 +3630,7 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
         auto ID_Block_zzzzzzzz_Expected = j + HasNoInit;
         if ((HasNoInit || !j) && ID_Block_zzzzzzzz_Int != ID_Block_zzzzzzzz_Expected) {
             const auto ID_Block_Expected = ID_Block.substr(0, 12) + Hex2String(ID_Block_zzzzzzzz_Expected, 8);
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":audioBlockFormatID:audioBlockFormatID attribute value \"" + ID_Block + "\" shall be \"" + ID_Block_Expected + "\" in order to match the audioBlockFormat index");
+            BlockFormat.AddError(Error, ":audioBlockFormatID:audioBlockFormatID attribute value \"" + ID_Block + "\" shall be \"" + ID_Block_Expected + "\" in order to match the audioBlockFormat index");
         }
     }
 
@@ -3325,7 +3646,7 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
                 }
             }
             if (!IsInList) {
-                ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":GeneralConformance:" + (*item_Infos[item_audioBlockFormat].Element_Infos)[l].Name + " subelement is present");
+                BlockFormat.AddError(Error, string(":GeneralConformance:") + (*item_Infos[item_audioBlockFormat].Element_Infos)[l].Name + " subelement is present");
             }
         }
         };
@@ -3335,17 +3656,17 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
         const audioBlockFormat_Element BlockFormat_DirectSpeakers_List[] = { audioBlockFormat_cartesian, audioBlockFormat_speakerLabel, audioBlockFormat_position }; // TODO: cartesian is not in specs but lot of files have it
         List_Check((audioBlockFormat_Element*)&BlockFormat_DirectSpeakers_List, sizeof(BlockFormat_DirectSpeakers_List) / sizeof(*BlockFormat_DirectSpeakers_List));
         if (BlockFormat.Elements[audioBlockFormat_speakerLabel].empty()) {
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ':' + (*item_Infos[item_audioBlockFormat].Element_Infos)[audioBlockFormat_speakerLabel].Name + ':' + (*item_Infos[item_audioBlockFormat].Element_Infos)[audioBlockFormat_speakerLabel].Name + " element is not present");
+            BlockFormat.AddError(Error, string(1, ':') + (*item_Infos[item_audioBlockFormat].Element_Infos)[audioBlockFormat_speakerLabel].Name + ':' + (*item_Infos[item_audioBlockFormat].Element_Infos)[audioBlockFormat_speakerLabel].Name + " element is not present");
         }
         else {
             const auto& speakerLabel = BlockFormat.Elements[audioBlockFormat_speakerLabel].back();
             speakerLabel_ChannelAssignment = Atmos_audioChannelFormat_Pos(speakerLabel, true);
             if (speakerLabel_ChannelAssignment == (size_t)-1) {
-                ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":speakerLabel:speakerLabel element value " + speakerLabel + " is not permitted", Source_Atmos_1_0);
+                BlockFormat.AddError(Error, ":speakerLabel:speakerLabel element value " + speakerLabel + " is not permitted", Source_Atmos_1_0);
             }
             else {
                 if (ChannelAssignment != (atmos_audioChannelFormatName)-1 && speakerLabel_ChannelAssignment != ChannelAssignment) {
-                    ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":speakerLabel:speakerLabel element value " + speakerLabel + " is not permitted, permitted value is " + Atmos_audioChannelFormat_Content[ChannelAssignment].SpeakerLabel + "", Source_Atmos_1_0);
+                    BlockFormat.AddError(Error, ":speakerLabel:speakerLabel element value " + speakerLabel + " is not permitted, permitted value is " + Atmos_audioChannelFormat_Content[ChannelAssignment].SpeakerLabel + "", Source_Atmos_1_0);
                 }
             }
         }
@@ -3362,15 +3683,15 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
         char* End;
         is_cartesian = strtoul(cartesian.c_str(), &End, 10);
         if (to_string(is_cartesian) != cartesian) {
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":cartesian:cartesian element value \"" + cartesian + "\" is malformed");
+            BlockFormat.AddError(Error, ":cartesian:cartesian element value \"" + cartesian + "\" is malformed");
             is_cartesian = (unsigned long)-1;
         }
         else if (is_cartesian > 1) {
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":cartesian:cartesian element value \"" + cartesian + "\" is not permitted, permitted values are 0 or 1");
+            BlockFormat.AddError(Error, ":cartesian:cartesian element value \"" + cartesian + "\" is not permitted, permitted values are 0 or 1");
         }
         else {
             if (!is_cartesian) {
-                ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":cartesian:cartesian element value is not 1", Source_Atmos_1_0);
+                BlockFormat.AddError(Error, ":cartesian:cartesian element value is not 1", Source_Atmos_1_0);
             }
         }
     }
@@ -3380,21 +3701,36 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
         bitset<3> HasXYZ;
         for (size_t k = 0; k < position_Count; k++) {
             auto& Position = Positions[Position_Pos + k];
-            if (Position.Attributes_Present[position_coordinate]) {
+            if (Position.Attributes_Present[position_coordinate] && !Position.Attributes_Present[position_bound]) {
                 if (Position.Attributes[position_coordinate].size() == 1 && Position.Attributes[position_coordinate][0] >= 'X' && Position.Attributes[position_coordinate][0] <= 'Z') {
                     auto Pos = Position.Attributes[position_coordinate][0] - 'X';
-                    HasXYZ.set(Pos);
+                    if (HasXYZ[Pos]) {
+                        BlockFormat.AddError(Error, ":coordinate:coordinate@position=\"" + Position.Attributes[position_coordinate] + "\" element is not unique");
+                    }
+                    else {
+                        HasXYZ.set(Pos);
+                    }
                 }
                 size_t Pos = 0;
                 for (; Pos < 3 && Position.Attributes[position_coordinate] != Cartesian_0_Names[Pos]; Pos++) {
                 }
                 if (Pos < 3) {
-                    HasAED.set(Pos);
+                    if (HasAED[Pos]) {
+                        BlockFormat.AddError(Error, ":coordinate:coordinate@position=\"" + Position.Attributes[position_coordinate] + "\" element is not unique");
+                    }
+                    else {
+                        HasAED.set(Pos);
+                    }
                 }
             }
         }
         if (HasXYZ.count() > HasAED.count()) {
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":cartesian:cartesian element is not present", Source_Atmos_1_0);
+            if (Type == Type_Objects) {
+                BlockFormat.AddError(Error, ":cartesian:cartesian element is not present");
+            }
+            else {
+                BlockFormat.AddError(Error, ":cartesian:cartesian element is not present", Source_Atmos_1_0);
+            }
 
             is_cartesian = 1;
         }
@@ -3407,7 +3743,7 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
 
         if (Type == Type_Objects) {
             if (is_cartesian == 0) {
-                ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":position:position element use polar attributes", Source_Atmos_1_0);
+                BlockFormat.AddError(Error, ":position:position element use polar attributes", Source_Atmos_1_0);
             }
         }
     }
@@ -3417,30 +3753,45 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
         static float32 Cartesian_0_Limits[][2] = { {-180, 180}, { -90, 90}, {0, 1 } };
         for (size_t k = 0; k < position_Count; k++) {
             auto& Position = Positions[Position_Pos + k];
-            if (Position.Attributes_Present[position_coordinate]) {
+            if (Position.Attributes_Present[position_coordinate] && !Position.Attributes_Present[position_bound]) {
                 size_t Pos = 0;
                 for (; Pos < 3 && Position.Attributes[position_coordinate] != Cartesian_0_Names[Pos]; Pos++) {
                 }
                 if (Pos < 3) {
-                    HasAED.set(Pos);
+                    if (HasAED[Pos]) {
+                        BlockFormat.AddError(Error, ":coordinate:coordinate@position=\"" + Position.Attributes[position_coordinate] + "\" element is not unique");
+                    }
+                    else {
+                        HasAED.set(Pos);
+                    }
                     const auto& Element = BlockFormat.Elements[audioBlockFormat_position][k];
                     char* End;
                     auto Value = strtof(Element.c_str(), &End);
                     if (End - Element.c_str() != Element.size()) {
-                        ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":position" + to_string(k) + ":GeneralCompliance:position element value \"" + BlockFormat.Elements[audioBlockFormat_position][k] + "\" is malformed");
+                        BlockFormat.AddError(Error, ":position" + to_string(k) + ":GeneralCompliance:position element value \"" + BlockFormat.Elements[audioBlockFormat_position][k] + "\" is malformed");
                     }
                     else if (Value < Cartesian_0_Limits[Pos][0] || Value > Cartesian_0_Limits[Pos][1]) {
-                        ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":position" + to_string(k) + ":GeneralCompliance:position element value \"" + BlockFormat.Elements[audioBlockFormat_position][k] + "\" is not permitted, permitted values are [" + to_string(Cartesian_0_Limits[Pos][0]) + " - " + to_string(Cartesian_0_Limits[Pos][1]) + "]");
+                        BlockFormat.AddError(Error, ":position" + to_string(k) + ":GeneralCompliance:position element value \"" + BlockFormat.Elements[audioBlockFormat_position][k] + "\" is not permitted, permitted values are [" + to_string(Cartesian_0_Limits[Pos][0]) + " - " + to_string(Cartesian_0_Limits[Pos][1]) + "]");
                     }
                 }
                 else {
-                    ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":position" + to_string(k) + ":coordinate:coordinate attribute \"" + Position.Attributes[position_coordinate] + "\" is present");
+                    BlockFormat.AddError(Error, ":position" + to_string(k) + ":coordinate:coordinate attribute \"" + Position.Attributes[position_coordinate] + "\" is present");
                 }
             }
         }
         for (size_t k = 0; k < 2; k++) {
             if (!HasAED[k]) {
-                ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":position" + to_string(k) + ":coordinate:coordinate==\"" + Cartesian_0_Names[k] + "\" element is not present");
+                BlockFormat.AddError(Error, ":position" + to_string(k) + ":coordinate:coordinate==\"" + Cartesian_0_Names[k] + "\" element is not present");
+            }
+        }
+
+        for (size_t k = objectDivergence_Pos; k < objectDivergences.size(); k++) {
+            auto& objectDivergence = objectDivergences[k];
+            if (!objectDivergence.Attributes_Present[objectDivergence_azimuthRange]) {
+                objectDivergence.AddError(Error, 0x80 | objectDivergence_azimuthRange, E::Present0, 0);
+            }
+            if (objectDivergence.Attributes_Present[objectDivergence_positionRange]) {
+                objectDivergence.AddError(Error, 0x80 | objectDivergence_positionRange, E::Present1, 0);
             }
         }
     }
@@ -3450,39 +3801,52 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
         bool ValuesAreNok = false;
         for (size_t k = 0; k < position_Count; k++) {
             auto& Position = Positions[Position_Pos + k];
-            if (Position.Attributes_Present[position_coordinate]) {
+            if (Position.Attributes_Present[position_coordinate] && !Position.Attributes_Present[position_bound]) {
                 if (Position.Attributes[position_coordinate].size() == 1 && Position.Attributes[position_coordinate][0] >= 'X' && Position.Attributes[position_coordinate][0] <= 'Z') {
                     auto Pos = Position.Attributes[position_coordinate][0] - 'X';
+                    if (HasXYZ[Pos]) {
+                        BlockFormat.AddError(Error, ":coordinate:coordinate@position=\"" + Position.Attributes[position_coordinate] + "\" element is not unique");
+                    }
                     HasXYZ.set(Pos);
                     const auto& Element = BlockFormat.Elements[audioBlockFormat_position][k];
                     char* End;
                     Values[Pos] = strtof(Element.c_str(), &End);
                     if (End - Element.c_str() != Element.size()) {
                         ValuesAreNok = true;
-                        ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ':' + (*item_Infos[item_audioBlockFormat].Element_Infos)[k].Name + ':' + (*item_Infos[item_audioBlockFormat].Element_Infos)[k].Name + " element value \"" + Element + "\" is malformed");
+                        BlockFormat.AddError(Error, string(1, ':') + (*item_Infos[item_audioBlockFormat].Element_Infos)[k].Name + ':' + (*item_Infos[item_audioBlockFormat].Element_Infos)[k].Name + " element value \"" + Element + "\" is malformed");
                     }
                     else if (Values[Pos] < -1 || Values[Pos] > 1) {
                         ValuesAreNok = true;
-                        ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":position" + to_string(k) + ":coordinate:coordinate=\"" + Position.Attributes[position_coordinate] + "\" element value \"" + BlockFormat.Elements[audioBlockFormat_position][k] + "\" is not permitted, permitted values are [-1,1]");
+                        BlockFormat.AddError(Error, ":position" + to_string(k) + ":coordinate:coordinate=\"" + Position.Attributes[position_coordinate] + "\" element value \"" + BlockFormat.Elements[audioBlockFormat_position][k] + "\" is not permitted, permitted values are [-1,1]");
                     }
                 }
                 else {
-                    ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":position" + to_string(k) + ":coordinate:coordinate attribute \"" + Position.Attributes[position_coordinate] + "\" is present");
+                    BlockFormat.AddError(Error, ":position" + to_string(k) + ":coordinate:coordinate attribute \"" + Position.Attributes[position_coordinate] + "\" is present");
                 }
             }
         }
         for (size_t l = 0; l < 2; l++) {
             if (!HasXYZ[l]) {
-                ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":position:coordinate:coordinate==\"" + string(1, 'X' + l) + "\" element is not present");
+                BlockFormat.AddError(Error, ":position:coordinate:coordinate==\"" + string(1, 'X' + l) + "\" element is not present");
             }
         }
         if (!ValuesAreNok && speakerLabel_ChannelAssignment != -1) {
             auto position_ChannelAssignment = Atmos_audioChannelFormat_Pos(Values[0], Values[1], Values[2], speakerLabel_ChannelAssignment);
             if (position_ChannelAssignment == -1) {
-                ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":position:position@coordinate=\"X\" \"Y\" \"Z\" element value \"" + Ztring::ToZtring(Values[0], (Values[0] - (int)Values[0]) ? 5 : 0).To_UTF8() + "\" \"" + Ztring::ToZtring(Values[1], (Values[2] - (int)Values[2]) ? 5 : 0).To_UTF8() + "\" \"" + Ztring::ToZtring(Values[2], (Values[2] - (int)Values[2]) ? 5 : 0).To_UTF8() + "\" is not valid", Source_Atmos_1_0);
+                BlockFormat.AddError(Error, ":position:position@coordinate=\"X\" \"Y\" \"Z\" element value \"" + Ztring::ToZtring(Values[0], (Values[0] - (int)Values[0]) ? 5 : 0).To_UTF8() + "\" \"" + Ztring::ToZtring(Values[1], (Values[2] - (int)Values[2]) ? 5 : 0).To_UTF8() + "\" \"" + Ztring::ToZtring(Values[2], (Values[2] - (int)Values[2]) ? 5 : 0).To_UTF8() + "\" is not valid", Source_Atmos_1_0);
             }
             else if (position_ChannelAssignment != speakerLabel_ChannelAssignment) {
-                ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":position:position@coordinate=\"X\" \"Y\" \"Z\" element value \"" + Ztring::ToZtring(Values[0], (Values[0] - (int)Values[0]) ? 5 : 0).To_UTF8() + "\" \"" + Ztring::ToZtring(Values[1], (Values[2] - (int)Values[2]) ? 5 : 0).To_UTF8() + "\" \"" + Ztring::ToZtring(Values[2], (Values[2] - (int)Values[2]) ? 5 : 0).To_UTF8() + "\" so \"" + Atmos_audioChannelFormat_Content[position_ChannelAssignment].SpeakerLabel + "\" does not match corresponding speakerLabel element value \"" + Atmos_audioChannelFormat_Content[speakerLabel_ChannelAssignment].SpeakerLabel + "\"", Source_Atmos_1_0);
+                BlockFormat.AddError(Error, ":position:position@coordinate=\"X\" \"Y\" \"Z\" element value \"" + Ztring::ToZtring(Values[0], (Values[0] - (int)Values[0]) ? 5 : 0).To_UTF8() + "\" \"" + Ztring::ToZtring(Values[1], (Values[2] - (int)Values[2]) ? 5 : 0).To_UTF8() + "\" \"" + Ztring::ToZtring(Values[2], (Values[2] - (int)Values[2]) ? 5 : 0).To_UTF8() + "\" so \"" + Atmos_audioChannelFormat_Content[position_ChannelAssignment].SpeakerLabel + "\" does not match corresponding speakerLabel element value \"" + Atmos_audioChannelFormat_Content[speakerLabel_ChannelAssignment].SpeakerLabel + "\"", Source_Atmos_1_0);
+            }
+        }
+
+        for (size_t k = objectDivergence_Pos; k < objectDivergences.size(); k++) {
+            auto& objectDivergence = objectDivergences[k];
+            if (objectDivergence.Attributes_Present[objectDivergence_azimuthRange]) {
+                objectDivergence.AddError(Error, 0x80 | objectDivergence_azimuthRange, E::Present1, 0);
+            }
+            if (!objectDivergence.Attributes_Present[objectDivergence_positionRange]) {
+                objectDivergence.AddError(Error, 0x80 | objectDivergence_positionRange, E::Present0, 0);
             }
         }
     }
@@ -3500,121 +3864,53 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
                 }
                 else if (Element != Value_Ref && !AreNotSame) {
                     AreNotSame = true;
-                    ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":GeneralCompliance:width/height/depth element values are not same", Source_Atmos_1_0);
+                    BlockFormat.AddError(Error, ":GeneralCompliance:width/height/depth element values are not same", Source_Atmos_1_0);
                 }
                 auto Max = (is_cartesian || k == audioBlockFormat_depth) ? 1 : 360;
                 char* End;
                 auto Value = strtof(Element.c_str(), &End);
                 if (End - Element.c_str() < Element.size()) {
-                    ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ':' + (*item_Infos[item_audioBlockFormat].Element_Infos)[k].Name + ':' + (*item_Infos[item_audioBlockFormat].Element_Infos)[k].Name + " element value \"" + Element + "\" is malformed");
+                    BlockFormat.AddError(Error, string(1, ':') + (*item_Infos[item_audioBlockFormat].Element_Infos)[k].Name + ':' + (*item_Infos[item_audioBlockFormat].Element_Infos)[k].Name + " element value \"" + Element + "\" is malformed");
                 }
                 else if (Value < 0 || Value > Max) {
-                    ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ':' + (*item_Infos[item_audioBlockFormat].Element_Infos)[k].Name + ':' + (*item_Infos[item_audioBlockFormat].Element_Infos)[k].Name + " element value \"" + Element + "\" is not permitted, permitted values are [0," + to_string(Max) + "]");
+                    BlockFormat.AddError(Error, string(1, ':') + (*item_Infos[item_audioBlockFormat].Element_Infos)[k].Name + ':' + (*item_Infos[item_audioBlockFormat].Element_Infos)[k].Name + " element value \"" + Element + "\" is not permitted, permitted values are [0," + to_string(Max) + "]");
                 }
                 Count++;
             }
         }
         if (Count && Count != 3) {
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":GeneralCompliance:width/height/depth element values are not all present", Source_Atmos_1_0);
+            BlockFormat.AddError(Error, ":GeneralCompliance:width/height/depth element values are not all present", Source_Atmos_1_0);
         }
     }
 
-    if (!File_Adm_Private->CartesianAlreadyNotCoherent) {
-        switch (Type) {
-        case Type_DirectSpeakers:
-        case Type_Objects:
-            if (File_Adm_Private->CartesianIsTested) {
-                if ((File_Adm_Private->CartesianPresent && BlockFormats.back().Elements[audioBlockFormat_cartesian].empty()) || (File_Adm_Private->CartesianPresent && BlockFormats.back().Elements[audioBlockFormat_cartesian][0] != File_Adm_Private->CartesianValue)) {
-                    ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":cartesian:cartesian element values are not consistant between audioBlockFormat elements", Source_AdvSSE_1);
-                    File_Adm_Private->CartesianAlreadyNotCoherent = true;
-                }
+    if (Type == Type_Objects) {
+        switch (File_Adm_Private->CartesianAlreadyNotCoherent) {
+        case cartesian_unknown:
+            if (is_cartesian <= 1) {
+                File_Adm_Private->CartesianAlreadyNotCoherent = cartesion_test(cartesian_0 + is_cartesian);
             }
-            else {
-                File_Adm_Private->CartesianIsTested = true;
-                File_Adm_Private->CartesianPresent = !BlockFormat.Elements[audioBlockFormat_cartesian].empty();
-                if (File_Adm_Private->CartesianPresent) {
-                    File_Adm_Private->CartesianValue = BlockFormat.Elements[audioBlockFormat_cartesian][0];
-                }
+            break;
+        case cartesian_alreadyincoherent:
+            break;
+        default:
+            if (is_cartesian != File_Adm_Private->CartesianAlreadyNotCoherent - cartesian_0) {
+                BlockFormat.AddError(Error, ":cartesian:cartesian element values are not consistant between audioBlockFormat elements", Source_AdvSSE_1);
+                File_Adm_Private->CartesianAlreadyNotCoherent = cartesian_alreadyincoherent;
             }
         }
     }
 
-    if (BlockFormat.Attributes_Present[audioBlockFormat_rtime]) {
-        if (/*File_Adm_Private->IsLocalTimeReference ||*/ BlockFormat.Attributes[audioBlockFormat_initializeBlock] == "1") {
-            BlockFormat.AddError(Error, 0x80 | audioBlockFormat_rtime, E::Present1, 0);
+    while (File_Adm_Private->ChannelFormat_Matrix_outputChannelFormatIDRefs.size() < ChannelFormats.size()) {
+        File_Adm_Private->ChannelFormat_Matrix_outputChannelFormatIDRefs.push_back({});
+    }
+    const auto& outputChannelFormatIDRefs = BlockFormat.Elements[audioBlockFormat_outputChannelFormatIDRef];
+    if (File_Adm_Private->ChannelFormat_Matrix_outputChannelFormatIDRefs.back().empty() || outputChannelFormatIDRefs != File_Adm_Private->ChannelFormat_Matrix_outputChannelFormatIDRefs.back().back().List) {
+        if (File_Adm_Private->ChannelFormat_Matrix_outputChannelFormatIDRefs.back().size() < 0x100) { // Limit the count of different outputChannelFormatIDRefs stored
+            File_Adm_Private->ChannelFormat_Matrix_outputChannelFormatIDRefs.back().push_back({ audioBlockFormat_Count - 1, outputChannelFormatIDRefs });
         }
-    }
-    else if (!File_Adm_Private->IsLocalTimeReference) {
-        //BlockFormat.AddError(Error, 0x80 | audioBlockFormat_rtime, E::Present0, 0, Source_AdvSSE_1);
-    }
-    if (BlockFormat.Attributes_Present[audioBlockFormat_duration]) {
-        if (/*File_Adm_Private->IsLocalTimeReference ||*/ BlockFormat.Attributes[audioBlockFormat_initializeBlock] == "1") {
-            BlockFormat.AddError(Error, 0x80 | audioBlockFormat_duration, E::Present1, 0);
-        }
-        const auto& Duration = BlockFormat.Attributes[audioBlockFormat_duration];
-        const TimeCode Duration_TC = Duration;
-        const auto Duration_ms = Duration_TC.ToMilliseconds();
-        if (Duration_ms && Duration_ms < 5) {
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":duration:duration attribute value is not permitted, permitted values are 0 or > 5 ms", Source_AdvSSE_1);
-        }
-    }
-    if ((int8s)File_Adm_Private->Version_S < 0 && BlockFormat.Attributes_Present[audioBlockFormat_initializeBlock]) {
-        BlockFormat.AddError(Error, 0x80 | audioBlockFormat_initializeBlock, E::Present1, 0);
-    }
-    if (BlockFormat.Attributes_Present[audioBlockFormat_lstart]) {
-        if (/*!File_Adm_Private->IsLocalTimeReference || */ BlockFormat.Attributes[audioBlockFormat_initializeBlock] == "1") {
-            BlockFormat.AddError(Error, 0x80 | audioBlockFormat_lstart, E::Present1, 0);
-        }
-    }
-    else if (!File_Adm_Private->IsLocalTimeReference) {
-        //BlockFormat.AddError(Error, 0x80 | audioBlockFormat_lstart, E::Present0, 0, Source_AdvSSE_1);
-    }
-    if (BlockFormat.Attributes_Present[audioBlockFormat_lduration]) {
-        if (/*!File_Adm_Private->IsLocalTimeReference ||*/ BlockFormat.Attributes[audioBlockFormat_initializeBlock] == "1") {
-            BlockFormat.AddError(Error, 0x80 | audioBlockFormat_lduration, E::Present1, 0);
-        }
-        const auto& Duration = BlockFormat.Attributes[audioBlockFormat_lduration];
-        const TimeCode Duration_TC = Duration;
-        const auto Duration_ms = Duration_TC.ToMilliseconds();
-        if (Duration_ms && Duration_ms < 5) {
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":lduration:lduration attribute value is not permitted, permitted values are 0 or > 5 ms", Source_AdvSSE_1);
-        }
-    }
-    else if (!File_Adm_Private->IsLocalTimeReference) {
-        //BlockFormat.AddError(Error, 0x80 | audioBlockFormat_lduration, E::Present0, 0, Source_AdvSSE_1);
     }
 
-    auto MoveErrors = [&](size_t Element_Pos, item Item_Type) {
-        size_t Count = BlockFormat.Elements[Element_Pos].size();
-        auto& Sources = Items[Item_Type].Items;
-        for (size_t k = Sources.size() - Count; k < Sources.size(); k++) {
-            auto& Item = Sources[k];
-            for (size_t Error_Type = 0; Error_Type < error_Type_Max; Error_Type++) {
-                for (size_t Source = 0; Source < source_Max; Source++) {
-                    for (const auto& Error : Item.Errors[Error_Type][Source]) {
-                        if (!Error[0]) {
-                            auto l = BlockFormats.size() - ChannelFormat.Elements[audioChannelFormat_audioBlockFormat].size();
-                            if (l > 255) {
-                                l = 255;
-                            }
-                            ChannelFormat.AddError((error_Type)Error_Type, Error + (char)Item_Type + (char)k + (char)item_audioBlockFormat + (char)0, (source)Source);
-                        }
-                        else {
-                            ChannelFormat.AddError((error_Type)Error_Type, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + Error, (source)Source);
-                        }
-                    }
-                    Item.Errors[Error_Type][Source].clear();
-                }
-            }
-        }
-    };
-    MoveErrors(audioBlockFormat_gain, item_gain);
-    MoveErrors(audioBlockFormat_headphoneVirtualise, item_headphoneVirtualise);
-    MoveErrors(audioBlockFormat_position, item_position);
-    MoveErrors(audioBlockFormat_jumpPosition, item_jumpPosition);
-    MoveErrors(audioBlockFormat_channelLock, item_channelLock);
-    MoveErrors(audioBlockFormat_objectDivergence, item_objectDivergence);
-    MoveErrors(audioBlockFormat_zoneExclusion, item_zoneExclusion);
+    MoveErrors(File_Adm_Private, item_audioBlockFormat);
 }
 
 //---------------------------------------------------------------------------
@@ -3650,14 +3946,140 @@ void gain_Check(file_adm_private* File_Adm_Private) {
 
     const auto& Value = BlockFormat.Elements[audioBlockFormat_gain].back();
     char* End;
-    auto Float = strtof(Value.c_str(), &End);
+    auto Float = strtod(Value.c_str(), &End);
     if (End - Value.c_str() != Value.size()) {
         BlockFormat.AddError(Error, audioBlockFormat_gain, E::Form, File_Adm_Private, Value);
     }
     else if (Unit >= 0) {
-        if (Float > 10) {
-            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":gain:gain element value \"" + Value + "\" is not permitted");
+        static const double Linear_10dB = 3.1622776601683793319988935444327; // 10 ^ ( dB / 20)
+        if ((Unit == 0 && Float > Linear_10dB) || (Unit == 1 && Float > 10)) {
+            BlockFormat.AddError(Error, ":gain:gain element value \"" + Value + "\" is not permitted", Source_AdvSSE_1);
         }
+    }
+}
+
+//---------------------------------------------------------------------------
+void coefficient_Check(file_adm_private* File_Adm_Private) {
+    auto& Items = File_Adm_Private->Items;
+    auto& Matrixes = Items[item_matrix].Items;
+    auto& Matrix = Matrixes.back();
+    const auto Matrix_Coefficients = Matrix.Elements[matrix_coefficient];
+    const auto& coefficient = Matrix_Coefficients.back();
+    auto& Coefficients = Items[item_coefficient].Items;
+    auto& Coefficient = Coefficients.back();
+
+    static const char* gain_List[] = { "linear", "dB" };
+    int Unit = -1;
+    if (Coefficient.Attributes_Present[coefficient_gainUnit]) {
+        const auto& Type = Coefficient.Attributes[coefficient_gainUnit];
+        size_t List_Size = sizeof(gain_List) / sizeof(gain_List[0]);
+        for (size_t i = 0; i < List_Size; i++) {
+            if (Type == gain_List[i]) {
+                Unit = i;
+            }
+        }
+        if (Unit < 0) {
+            Coefficient.AddError(Error, 0x80 | (char)coefficient_gainUnit, E::Form, File_Adm_Private, Type);
+        }
+    }
+    else {
+        Unit = 0;
+    }
+
+    if (Coefficient.Attributes_Present[coefficient_gain]) {
+        const auto& Value = Coefficient.Attributes[coefficient_gain];
+        char* End;
+        auto Float = strtod(Value.c_str(), &End);
+        if (End - Value.c_str() != Value.size()) {
+            Coefficient.AddError(Error, coefficient_gain, E::Form, File_Adm_Private, Value);
+        }
+        else if (Unit >= 0) {
+            static const int Linear_20dB = 10; // 10 ^ ( dB / 20)
+            if ((Unit == 0 && Float > Linear_20dB) || (Unit == 1 && Float > 20)) {
+                Coefficient.AddError(Error, ":gain:gain attribute value \"" + Value + "\" is not permitted", Source_AdvSSE_1);
+            }
+        }
+    }
+
+    if (find(File_Adm_Private->coefficients.begin(), File_Adm_Private->coefficients.end(), coefficient) != File_Adm_Private->coefficients.end()) {
+        Matrix.AddError(Error, item_matrix, 0, ":coefficient" + to_string(Matrix_Coefficients.size() - 1) + ":coefficient value \"" + coefficient + "\" shall be unique");
+    }
+    else {
+        File_Adm_Private->coefficients.push_back(coefficient);
+    }
+}
+
+//---------------------------------------------------------------------------
+void matrix_Check(file_adm_private* File_Adm_Private) {
+    auto& Items = File_Adm_Private->Items;
+    auto& ChannelFormats = Items[item_audioChannelFormat].Items;
+    auto& ChannelFormat = ChannelFormats.back();
+    auto& BlockFormats = Items[item_audioBlockFormat].Items;
+    auto& BlockFormat = BlockFormats.back();
+    auto& Matrixes = Items[item_matrix].Items;
+    auto& Matrix = Matrixes.back();
+
+    while (File_Adm_Private->ChannelFormat_Matrix_coefficients.size() < ChannelFormats.size()) {
+        File_Adm_Private->ChannelFormat_Matrix_coefficients.push_back({});
+    }
+    if (!File_Adm_Private->ChannelFormat_Matrix_coefficients.back().empty() && File_Adm_Private->coefficients == File_Adm_Private->ChannelFormat_Matrix_coefficients.back().back().List) {
+        File_Adm_Private->coefficients.clear();
+        return;
+    }
+
+    auto audioBlockFormat_Count = ChannelFormat.Elements[audioChannelFormat_audioBlockFormat].size();
+    if (File_Adm_Private->ChannelFormat_Matrix_coefficients.back().size() < 0x100) { // Limit the count of different coefficients stored
+        File_Adm_Private->ChannelFormat_Matrix_coefficients.back().push_back({ audioBlockFormat_Count - 1, move(File_Adm_Private->coefficients) });
+    }
+}
+
+//---------------------------------------------------------------------------
+void objectDivergence_Check(file_adm_private* File_Adm_Private) {
+    auto& Items = File_Adm_Private->Items;
+    auto& ChannelFormats = Items[item_audioChannelFormat].Items;
+    auto& ChannelFormat = ChannelFormats.back();
+    auto& BlockFormats = Items[item_audioBlockFormat].Items;
+    auto& BlockFormat = BlockFormats.back();
+    auto& objectDivergence_Items = BlockFormat.Elements[audioBlockFormat_objectDivergence];
+    auto& objectDivergences = Items[item_objectDivergence].Items;
+    auto& objectDivergence = objectDivergences.back();
+
+    const size_t k = objectDivergence_Items.size() - 1;
+
+    if (objectDivergence.Attributes_Present[objectDivergence_azimuthRange])
+    {
+        const auto& Element = objectDivergence.Attributes[objectDivergence_azimuthRange];
+        char* End;
+        auto Value = strtof(Element.c_str(), &End);
+        if (End - Element.c_str() != Element.size()) {
+            objectDivergence.AddError(Error, 0x80 | (char)objectDivergence_azimuthRange, E::Form, File_Adm_Private, Element);
+        }
+        else if (Value < 0 || Value > 1) {
+            objectDivergence.AddError(Error, ":azimuthRange" + to_string(k) + ":GeneralCompliance:azimuthRange attribute value \"" + Element + "\" is not permitted, permitted values are [0,180]");
+        }
+    }
+
+    if (objectDivergence.Attributes_Present[objectDivergence_positionRange])
+    {
+        const auto& Element = objectDivergence.Attributes[objectDivergence_positionRange];
+        char* End;
+        auto Value = strtof(Element.c_str(), &End);
+        if (End - Element.c_str() != Element.size()) {
+            objectDivergence.AddError(Error, 0x80 | (char)objectDivergence_positionRange, E::Form, File_Adm_Private, Element);
+        }
+        else if (Value < 0 || Value > 1) {
+            objectDivergence.AddError(Error, ":positionRange" + to_string(k) + ":GeneralCompliance:positionRange attribute value \"" + Element + "\" is not permitted, permitted values are [0,1]");
+        }
+    }
+
+    const auto& Element = objectDivergence_Items.back();
+    char* End;
+    auto Value = strtof(Element.c_str(), &End);
+    if (End - Element.c_str() != Element.size()) {
+        BlockFormat.AddError(Error, (char)audioBlockFormat_objectDivergence, E::Form, File_Adm_Private, Element);
+    }
+    else if (Value < 0 || Value > 1) {
+        BlockFormat.AddError(Error, ":objectDivergence" + to_string(k) + ":GeneralCompliance:objectDivergence element value \"" + Element + "\" is not permitted, permitted values are [0,1]");
     }
 }
 
@@ -3723,52 +4145,32 @@ void zoneExclusion_Check(file_adm_private* File_Adm_Private) {
                         if (End - Attribute.c_str() != Attribute.size()) {
                             ValuesAreNok = true;
                             const auto& Info = (*item_Infos[item_zone].Attribute_Infos)[m];
-                            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":zoneExclusion" + to_string(k) + ":zone" + to_string(l) + ':' + Info.Name + ':' + Info.Name + " attribute value \"" + Attribute + "\" is malformed");
+                            BlockFormat.AddError(Error, ":zoneExclusion" + to_string(k) + ":zone" + to_string(l) + ':' + Info.Name + ':' + Info.Name + " attribute value \"" + Attribute + "\" is malformed");
                         }
                         else if (Values.Values[m] < -1 || Values.Values[m] > 1) {
                             ValuesAreNok = true;
                             const auto& Info = (*item_Infos[item_zone].Attribute_Infos)[m];
-                            ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":zoneExclusion" + to_string(k) + ":zone" + to_string(l) + ':' + Info.Name + ':' + Info.Name + " attribute value \"" + Attribute + "\" is not permitted, permitted values are [-1,1]");
+                            BlockFormat.AddError(Error, ":zoneExclusion" + to_string(k) + ":zone" + to_string(l) + ':' + Info.Name + ':' + Info.Name + " attribute value \"" + Attribute + "\" is not permitted, permitted values are [-1,1]");
                         }
                     }
                 }
                 for (size_t m = 0; m < 6; m++) {
                     if (!HasXYZ[m]) {
                         const auto& Info = (*item_Infos[item_zone].Attribute_Infos)[m];
-                        ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":zoneExclusion" + to_string(k) + ":zone" + to_string(l) + ':' + Info.Name + ':' + Info.Name + " attribute is not present");
+                        BlockFormat.AddError(Error, ":zoneExclusion" + to_string(k) + ":zone" + to_string(l) + ':' + Info.Name + ':' + Info.Name + " attribute is not present");
                     }
                 }
                 if (!ValuesAreNok) {
                     auto position_Channezone_PoslAssignment = Atmos_zone_Pos(Values.Name, Values.Values);
                     if (position_Channezone_PoslAssignment == -1) {
-                        ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + ":zoneExclusion" + to_string(k) + ":zone" + to_string(l) + ":GeneralCompliance:zone@minX maxX minY maxY minZ maxZ attributes and element value \"" + Zone.Attributes[zone_minX] + "\" \"" + Zone.Attributes[zone_maxX] + "\" \"" + Zone.Attributes[zone_minY] + "\" \"" + Zone.Attributes[zone_maxY] + "\" \"" + Zone.Attributes[zone_minZ] + "\" \"" + Zone.Attributes[zone_maxZ] + "\" \"" + ZoneExclusion.Elements[zoneExclusion_zone][l] + "\" is not valid", Source_Atmos_1_0);
+                        BlockFormat.AddError(Error, ":zoneExclusion" + to_string(k) + ":zone" + to_string(l) + ":GeneralCompliance:zone@minX maxX minY maxY minZ maxZ attributes and element value \"" + Zone.Attributes[zone_minX] + "\" \"" + Zone.Attributes[zone_maxX] + "\" \"" + Zone.Attributes[zone_minY] + "\" \"" + Zone.Attributes[zone_maxY] + "\" \"" + Zone.Attributes[zone_minZ] + "\" \"" + Zone.Attributes[zone_maxZ] + "\" \"" + ZoneExclusion.Elements[zoneExclusion_zone][l] + "\" is not valid", Source_Atmos_1_0);
                     }
                 }
             }
         }
     }
 
-    auto MoveErrors = [&](size_t Element_Pos, item Item_Type) {
-        size_t Count = ZoneExclusion.Elements[Element_Pos].size();
-        auto& Sources = Items[Item_Type].Items;
-        for (size_t k = Sources.size() - Count; k < Sources.size(); k++) {
-            auto& Item = Sources[k];
-            for (size_t Error_Type = 0; Error_Type < error_Type_Max; Error_Type++) {
-                for (size_t Source = 0; Source < source_Max; Source++) {
-                    for (const auto& Error : Item.Errors[Error_Type][Source]) {
-                        if (!Error[0]) {
-                            ChannelFormat.AddError((error_Type)Error_Type, Error + (char)Item_Type + (char)k, (source)Source);
-                        }
-                        else {
-                            ChannelFormat.AddError((error_Type)Error_Type, ":audioChannelFormat" + to_string(i) + ":audioBlockFormat" + to_string(j) + Error, (source)Source);
-                        }
-                    }
-                    Item.Errors[Error_Type][Source].clear();
-                }
-            }
-        }
-    };
-    MoveErrors(zoneExclusion_zone, item_zone);
+    MoveErrors(File_Adm_Private, item_zoneExclusion);
 }
 
 //---------------------------------------------------------------------------
@@ -3777,30 +4179,30 @@ void audioChannelFormat_Check(file_adm_private* File_Adm_Private) {
     auto& ChannelFormats = Items[item_audioChannelFormat].Items;
     auto& ChannelFormat = ChannelFormats.back();
 
-    size_t i = ChannelFormats.size() - 1;
+    if (!ChannelFormat.Elements[audioChannelFormat_audioBlockFormat].empty()) {
+        auto& BlockFormats = Items[item_audioBlockFormat].Items;
+        auto& BlockFormat = BlockFormats.back();
 
-    auto MoveErrors = [&](size_t Element_Pos, item Item_Type) {
-        size_t Count = ChannelFormat.Elements[Element_Pos].size();
-        auto& Sources = Items[Item_Type].Items;
-        for (size_t k = Sources.size() - Count; k < Sources.size(); k++) {
-            auto& Item = Sources[k];
-            for (size_t Error_Type = 0; Error_Type < error_Type_Max; Error_Type++) {
-                for (size_t Source = 0; Source < source_Max; Source++) {
-                    for (const auto& Error : Item.Errors[Error_Type][Source]) {
-                        if (!Error[0]) {
-                            ChannelFormat.AddError((error_Type)Error_Type, Error + (char)Item_Type + (char)k, (source)Source);
-                        }
-                        else {
-                            ChannelFormat.AddError((error_Type)Error_Type, ":audioChannelFormat" + to_string(i) + Error, (source)Source);
-                        }
-                    }
-                    Item.Errors[Error_Type][Source].clear();
+        auto CheckTimeOffset = [&](size_t Element_Pos, TimeCode& LastBlockFormatEnd) {
+            if (!LastBlockFormatEnd.IsValid()) {
+                return;
+            }
+            const auto& frameFormats = Items[item_frameFormat].Items;
+            for (size_t k = 0; k < frameFormats.size(); k++) {
+                const auto& frameFormat = frameFormats[k];
+                TimeCode frameFormat_start_TC = frameFormat.Attributes[frameFormat_start];
+                TimeCode frameFormat_duration_TC = frameFormat.Attributes[frameFormat_duration];
+                if (frameFormat_start_TC.IsValid() && frameFormat_duration_TC.IsValid() && frameFormat_start_TC + frameFormat_duration_TC != LastBlockFormatEnd) {
+                    BlockFormat.AddError(Error, string(1, ':') + (*item_Infos[item_audioBlockFormat].Attribute_Infos)[Element_Pos].Name + ':' + (*item_Infos[item_audioBlockFormat].Attribute_Infos)[Element_Pos].Name + " attribute value does not match the frameFormat start+duration attribute value", Source_AdvSSE_1);
                 }
             }
-        }
-    };
-    MoveErrors(audioChannelFormat_audioBlockFormat, item_audioBlockFormat);
-    MoveErrors(audioChannelFormat_frequency, item_frequency);
+        };
+
+        CheckTimeOffset(audioBlockFormat_duration, File_Adm_Private->LastBlockFormatEnd);
+        CheckTimeOffset(audioBlockFormat_lduration, File_Adm_Private->LastBlockFormatEnd_S);
+    }
+
+    MoveErrors(File_Adm_Private, item_audioChannelFormat);
 }
 
 //---------------------------------------------------------------------------
@@ -3936,19 +4338,21 @@ void transportTrackFormat_Check(file_adm_private* File_Adm_Private) {
     const auto Tracks_Pos = Tracks.size() - Track_Items.size();
     for (size_t j = 0; j < Track_Items.size();  j++) {
         auto& Track = Tracks[Tracks_Pos + j];
-        const auto& ID = Track.Attributes[audioTrack_trackID];
-        if (PreviousIDs.find(ID) != PreviousIDs.end()) {
-            Track.AddError(Error, item_audioTrack, j, ':' + CraftName(item_Infos[item_audioTrack].Name) + "ID:" + CraftName(item_Infos[item_audioTrack].Name) + "ID value \"" + ID + "\" shall be unique");
-        }
-        else {
-            PreviousIDs.insert(ID);
-            char* End;
-            auto ID_Int = strtoul(ID.c_str(), &End, 10);
-            if (to_string(ID_Int) != ID) {
-                Track.AddError(Error, item_audioTrack, j, ':' + CraftName(item_Infos[item_audioTrack].Name) + "ID:" + CraftName(item_Infos[item_audioTrack].Name) + "ID attribute value \"" + ID + "\" is malformed");
+        if (Track.Attributes_Present[audioTrack_trackID]) {
+            const auto& ID = Track.Attributes[audioTrack_trackID];
+            if (PreviousIDs.find(ID) != PreviousIDs.end()) {
+                Track.AddError(Error, item_audioTrack, j, ':' + CraftName(item_Infos[item_audioTrack].Name, true) + "ID:" + CraftName(item_Infos[item_audioTrack].Name, true) + "ID value \"" + ID + "\" shall be unique");
             }
-            else if (!ID_Int) {
-                Track.AddError(Error, item_audioTrack, j, ':' + CraftName(item_Infos[item_audioTrack].Name) + "ID:" + CraftName(item_Infos[item_audioTrack].Name) + "ID attribute value \"" + ID + "\" is not permitted, permitted values are [1...]");
+            else {
+                PreviousIDs.insert(ID);
+                char* End;
+                auto ID_Int = strtoul(ID.c_str(), &End, 10);
+                if (to_string(ID_Int) != ID) {
+                    Track.AddError(Error, item_audioTrack, j, ':' + CraftName(item_Infos[item_audioTrack].Name, true) + "ID:" + CraftName(item_Infos[item_audioTrack].Name, true) + "ID attribute value \"" + ID + "\" is malformed");
+                }
+                else if (!ID_Int) {
+                    Track.AddError(Error, item_audioTrack, j, ':' + CraftName(item_Infos[item_audioTrack].Name, true) + "ID:" + CraftName(item_Infos[item_audioTrack].Name, true) + "ID attribute value \"" + ID + "\" is not permitted, permitted values are [1...]");
+                }
             }
         }
         const auto& audioTrackUIDRef_Items = Track.Elements[audioTrack_audioTrackUIDRef];
@@ -3963,7 +4367,7 @@ void transportTrackFormat_Check(file_adm_private* File_Adm_Private) {
             }
             else {
                 if (PreviousaudioTrackUIDRef_Itemss.find(ID) != PreviousaudioTrackUIDRef_Itemss.end()) {
-                    Track.AddError(Error, item_audioTrack, j, ':' + CraftName(item_Infos[item_audioTrack].Name) + "ID:" + CraftName(item_Infos[item_audioTrack].Name) + "ID value \"" + ID + "\" shall be unique");
+                    Track.AddError(Error, item_audioTrack, j, ':' + CraftName(item_Infos[item_audioTrack].Name, true) + "ID:" + CraftName(item_Infos[item_audioTrack].Name, true) + "ID value \"" + ID + "\" shall be unique");
                 }
                 else {
                     PreviousaudioTrackUIDRef_Itemss.insert(ID);
@@ -3972,27 +4376,15 @@ void transportTrackFormat_Check(file_adm_private* File_Adm_Private) {
         }
     }
 
-    auto MoveErrors = [&](size_t Element_Pos, item Item_Type) {
-        size_t Count = TransportTrackFormat.Elements[Element_Pos].size();
-        auto& Sources = Items[Item_Type].Items;
-        for (size_t k = Sources.size() - Count; k < Sources.size(); k++) {
-            auto& Item = Sources[k];
-            for (size_t Error_Type = 0; Error_Type < error_Type_Max; Error_Type++) {
-                for (size_t Source = 0; Source < source_Max; Source++) {
-                    for (const auto& Error : Item.Errors[Error_Type][Source]) {
-                        if (!Error[0]) {
-                            TransportTrackFormat.AddError((error_Type)Error_Type, Error + (char)Item_Type + (char)k, (source)Source);
-                        }
-                        else {
-                            TransportTrackFormat.AddError((error_Type)Error_Type, ":transportTrackFormat" + to_string(i) + Error, (source)Source);
-                        }
-                    }
-                    Item.Errors[Error_Type][Source].clear();
-                }
-            }
+    if (TransportTrackFormat.Attributes_Present[transportTrackFormat_numIDs]) {
+        const auto& numIDs = TransportTrackFormat.Attributes[transportTrackFormat_numIDs];
+        auto numIDs_Int = strtoul(numIDs.c_str(), nullptr, 10);
+        if (to_string(numIDs_Int) != numIDs) {
+            TransportTrackFormat.AddError(Error, 0x80 | transportTrackFormat_numIDs, E::Form, File_Adm_Private, numIDs);
         }
-        };
-    MoveErrors(transportTrackFormat_audioTrack, item_audioTrack);
+    }
+
+    MoveErrors(File_Adm_Private, item_transportTrackFormat);
 }
 
 //---------------------------------------------------------------------------
@@ -4372,6 +4764,7 @@ int file_adm_private::audioFormatExtended()
         auto& coefficients = Items[item_coefficient].Items;
         coefficients.clear();
 
+        MoveErrors(this, item_audioChannelFormat);
         ChannelFormat_BlockFormats.pop_back();
         BlockFormats.pop_back();
         if (ChannelFormat_BlockFormat_ReduceCount.size() < ChannelFormats.size()) {
@@ -4418,9 +4811,9 @@ int file_adm_private::audioFormatExtended()
             ELEMENT_e(audioProgrammeLabel, audioProgramme, audioProgrammeLabel_Check(this))
         ELEMENT__(audioProgramme, audioContentIDRef)
         ELEMENT_s(audioProgramme, loudnessMetadata, loudnessMetadata_Source.push_back('P'))
-            ATTRIBU_I(loudnessMetadata, loudnessMethod)
-            ATTRIBU_I(loudnessMetadata, loudnessRecType)
-            ATTRIBU_I(loudnessMetadata, loudnessCorrectionType)
+            ATTRIBUTE(loudnessMetadata, loudnessMethod)
+            ATTRIBUTE(loudnessMetadata, loudnessRecType)
+            ATTRIBUTE(loudnessMetadata, loudnessCorrectionType)
             ELEMENT_M(loudnessMetadata)
             ELEMENT__(loudnessMetadata, integratedLoudness)
             ELEMENT_I(loudnessMetadata, loudnessRange)
@@ -4429,10 +4822,10 @@ int file_adm_private::audioFormatExtended()
             ELEMENT_I(loudnessMetadata, maxShortTerm)
             ELEMENT_I(loudnessMetadata, dialogueLoudness)
             ELEMENT_S(loudnessMetadata, renderer)
-                ATTRIBU_I(renderer, uri)
-                ATTRIBU_I(renderer, name)
-                ATTRIBU_I(renderer, version)
-                ATTRIBU_I(renderer, coordinateMode)
+                ATTRIBUTE(renderer, uri)
+                ATTRIBUTE(renderer, name)
+                ATTRIBUTE(renderer, version)
+                ATTRIBUTE(renderer, coordinateMode)
                 ELEMENT_M(renderer)
                 ELEMENT_I(renderer, audioPackFormatIDRef)
                 ELEMENT_I(renderer, audioObjectIDRef)
@@ -4465,10 +4858,10 @@ int file_adm_private::audioFormatExtended()
                 ELEMENT__(referenceLayout, audioPackFormatIDRef)
                 ELEMENT_E(referenceLayout, authoringInformation)
             ELEMENT_S(authoringInformation, renderer)
-                ATTRIBU_I(renderer, uri)
-                ATTRIBU_I(renderer, name)
-                ATTRIBU_I(renderer, version)
-                ATTRIBU_I(renderer, coordinateMode)
+                ATTRIBUTE(renderer, uri)
+                ATTRIBUTE(renderer, name)
+                ATTRIBUTE(renderer, version)
+                ATTRIBUTE(renderer, coordinateMode)
                 ELEMENT_M(renderer)
                 ELEMENT_I(renderer, audioPackFormatIDRef)
                 ELEMENT_I(renderer, audioObjectIDRef)
@@ -4488,9 +4881,9 @@ int file_adm_private::audioFormatExtended()
             ELEMENT_M(audioContentLabel)
             ELEMENT_e(audioContentLabel, audioContent, audioContentLabel_Check(this))
         ELEMENT_s(audioContent, loudnessMetadata, loudnessMetadata_Source.push_back('C'))
-            ATTRIBU_I(loudnessMetadata, loudnessMethod)
-            ATTRIBU_I(loudnessMetadata, loudnessRecType)
-            ATTRIBU_I(loudnessMetadata, loudnessCorrectionType)
+            ATTRIBUTE(loudnessMetadata, loudnessMethod)
+            ATTRIBUTE(loudnessMetadata, loudnessRecType)
+            ATTRIBUTE(loudnessMetadata, loudnessCorrectionType)
             ELEMENT_M(loudnessMetadata)
             ELEMENT__(loudnessMetadata, integratedLoudness)
             ELEMENT_I(loudnessMetadata, loudnessRange)
@@ -4499,10 +4892,10 @@ int file_adm_private::audioFormatExtended()
             ELEMENT_I(loudnessMetadata, maxShortTerm)
             ELEMENT_I(loudnessMetadata, dialogueLoudness)
             ELEMENT_S(loudnessMetadata, renderer)
-                ATTRIBU_I(renderer, uri)
-                ATTRIBU_I(renderer, name)
-                ATTRIBU_I(renderer, version)
-                ATTRIBU_I(renderer, coordinateMode)
+                ATTRIBUTE(renderer, uri)
+                ATTRIBUTE(renderer, name)
+                ATTRIBUTE(renderer, version)
+                ATTRIBUTE(renderer, coordinateMode)
                 ELEMENT_M(renderer)
                 ELEMENT_I(renderer, audioPackFormatIDRef)
                 ELEMENT_I(renderer, audioObjectIDRef)
@@ -4541,28 +4934,28 @@ int file_adm_private::audioFormatExtended()
         ELEMENT__(audioObject, audioComplementaryObjectIDRef)
         ELEMENT__(audioObject, audioTrackUIDRef)
         ELEMENT_S(audioObject, audioObjectInteraction)
-            ATTRIBU_I(audioObjectInteraction, onOffInteract)
-            ATTRIBU_I(audioObjectInteraction, gainInteract)
-            ATTRIBU_I(audioObjectInteraction, positionInteract)
+            ATTRIBUTE(audioObjectInteraction, onOffInteract)
+            ATTRIBUTE(audioObjectInteraction, gainInteract)
+            ATTRIBUTE(audioObjectInteraction, positionInteract)
             ELEMENT_M(audioObjectInteraction)
             ELEMENT_S(audioObjectInteraction, gainInteractionRange)
-                ATTRIBU_I(gainInteractionRange, gainUnit)
-                ATTRIBU_I(gainInteractionRange, bound)
+                ATTRIBUTE(gainInteractionRange, gainUnit)
+                ATTRIBUTE(gainInteractionRange, bound)
                 ELEMENT_M(gainInteractionRange)
                 ELEMENT_E(gainInteractionRange, audioObjectInteraction)
             ELEMENT_S(audioObjectInteraction, positionInteractionRange)
-                ATTRIBU_I(positionInteractionRange, coordinate)
-                ATTRIBU_I(positionInteractionRange, bound)
+                ATTRIBUTE(positionInteractionRange, coordinate)
+                ATTRIBUTE(positionInteractionRange, bound)
                 ELEMENT_M(positionInteractionRange)
                 ELEMENT_E(positionInteractionRange, audioObjectInteraction)
             ELEMENT_E(audioObjectInteraction, audioObject)
         ELEMENT_S(audioObject, gain)
-            ATTRIBU_I(gain, gainUnit)
+            ATTRIBUTE(gain, gainUnit)
             ELEMENT_M(gain)
             ELEMENT_E(gain, audioObject)
         ELEMENT__(audioObject, headLocked)
         ELEMENT_S(audioObject, positionOffset)
-            ATTRIBU_I(positionOffset, coordinate)
+            ATTRIBUTE(positionOffset, coordinate)
             ELEMENT_M(positionOffset)
             ELEMENT_E(positionOffset, audioObject)
         ELEMENT__(audioObject, mute)
@@ -4606,14 +4999,18 @@ int file_adm_private::audioFormatExtended()
             ATTRIBUTE(audioBlockFormat, initializeBlock)
             ELEMENT_M(audioBlockFormat)
             ELEMENT_S(audioBlockFormat, gain)
-                ATTRIBU_I(gain, gainUnit)
+                ATTRIBUTE(gain, gainUnit)
                 ELEMENT_M(gain)
                 ELEMENT_e(gain, audioBlockFormat, gain_Check(this))
             ELEMENT__(audioBlockFormat, importance)
             ELEMENT__(audioBlockFormat, headLocked)
+            ELEMENT_S(audioBlockFormat, jumpPosition)
+                ATTRIBUTE(jumpPosition, interpolationLength)
+                ELEMENT_M(jumpPosition)
+                ELEMENT_E(jumpPosition, audioBlockFormat)
             ELEMENT_S(audioBlockFormat, headphoneVirtualise)
-                ATTRIBU_I(headphoneVirtualise, bypass)
-                ATTRIBU_I(headphoneVirtualise, DRR)
+                ATTRIBUTE(headphoneVirtualise, bypass)
+                ATTRIBUTE(headphoneVirtualise, DRR)
                 ELEMENT_M(headphoneVirtualise)
                 ELEMENT_E(headphoneVirtualise, audioBlockFormat)
             ELEMENT__(audioBlockFormat, speakerLabel)
@@ -4624,10 +5021,6 @@ int file_adm_private::audioFormatExtended()
                 ELEMENT_M(position)
                 ELEMENT_E(position, audioBlockFormat)
             ELEMENT__(audioBlockFormat, outputChannelFormatIDRef)
-            ELEMENT_S(audioBlockFormat, jumpPosition)
-                ATTRIBUTE(jumpPosition, interpolationLength)
-                ELEMENT_M(jumpPosition)
-                ELEMENT_E(jumpPosition, audioBlockFormat)
             ELEMENT_S(audioBlockFormat, matrix)
                 ELEMENT_M(matrix)
                 ELEMENT_S(matrix, coefficient)
@@ -4639,9 +5032,8 @@ int file_adm_private::audioFormatExtended()
                     ATTRIBUTE(coefficient, delay)
                     ATTRIBUTE(coefficient, delayVar)
                     ELEMENT_M(coefficient)
-                    ELEMENT_E(coefficient, matrix)
-                ELEMENT_E(matrix, audioBlockFormat)
-            ELEMENT__(audioBlockFormat, coefficient)
+                    ELEMENT_e(coefficient, matrix, coefficient_Check(this))
+                ELEMENT_e(matrix, audioBlockFormat, matrix_Check(this))
             ELEMENT__(audioBlockFormat, width)
             ELEMENT__(audioBlockFormat, height)
             ELEMENT__(audioBlockFormat, depth)
@@ -4655,7 +5047,7 @@ int file_adm_private::audioFormatExtended()
                 ATTRIBUTE(objectDivergence, azimuthRange)
                 ATTRIBUTE(objectDivergence, positionRange)
                 ELEMENT_M(objectDivergence)
-                ELEMENT_E(objectDivergence, audioBlockFormat)
+                ELEMENT_e(objectDivergence, audioBlockFormat, objectDivergence_Check(this))
             ELEMENT_S(audioBlockFormat, zoneExclusion)
                 ELEMENT_M(zoneExclusion)
                 ELEMENT_S(zoneExclusion, zone)
@@ -4887,8 +5279,8 @@ static void FillErrors(file_adm_private* File_Adm_Private, const item item_Type,
                             switch ((E)ErrorType) {
                             case E::Form:
                             case E::Permitted:
-                                if (Opt0 < File_Adm_Private->Errors_Tips.size()) {
-                                    Value.insert(Pos, File_Adm_Private->Errors_Tips[Opt0]);
+                                if (Opt0 < File_Adm_Private->Errors_Tips[k][l].size()) {
+                                    Value.insert(Pos, File_Adm_Private->Errors_Tips[k][l][Opt0]);
                                 }
                                 break;
                             default:
@@ -5019,7 +5411,7 @@ void File_Adm::Streams_Fill()
         } \
 
     #define LINK(NAME,FIELD,VECTOR,TARGET) \
-        Apply_SubStreams(*this, P + " LinkedTo_" FIELD "_Pos", File_Adm_Private->Items[item_##NAME].Items[i], NAME##_##VECTOR, File_Adm_Private->Items[item_##TARGET], File_Adm_Private->Items[item_audioFormatExtended].Items.empty()); \
+        Apply_SubStreams(*this, P + " LinkedTo_" FIELD "_Pos", File_Adm_Private->Items[item_##NAME].Items[i], NAME##_##VECTOR, File_Adm_Private->Items[item_##TARGET], File_Adm_Private->IsPartial || File_Adm_Private->Items[item_audioFormatExtended].Items.empty()); \
 
     //Filling
     Stream_Prepare(Stream_Audio);
@@ -5073,6 +5465,9 @@ void File_Adm::Streams_Fill()
                 IsAdvSSE = true;
                 IsAdvSSE_Versions.push_back(strtoul(Profile_Item.Attributes[profile_profileVersion].c_str(), nullptr, 10));
                 IsAdvSSE_Levels.push_back(strtoul(Profile_Item.Attributes[profile_profileLevel].c_str(), nullptr, 10));
+                if (IsAdvSSE_Levels.back() > 2 && (Profile == "ITU-R BS.[ADM-NGA-EMISSION]-0" || Profile == "ITU-R BS.[ADM-NGA-EMISSION]-0")) {
+                    Profiles.back().AddError(Error, ':' + CraftName(item_Infos[item_profile].Name) + to_string(i) + ":profileLevel:profileLevel attribute value " + Profile_Item.Attributes[profile_profileLevel] + " is not permitted, max is 2", Source_AdvSSE_1);
+                }
             }
             else {
                 ProfileInfo.Strings[0] = Profile_Item.Attributes[profile_profileName];
@@ -5508,8 +5903,12 @@ void File_Adm::Streams_Fill()
     auto& ZoneExclusions = File_Adm_Private->Items[item_zoneExclusion].Items;
     auto& Zones = File_Adm_Private->Items[item_zone].Items;
     auto& TransportTrackFormats = File_Adm_Private->Items[item_transportTrackFormat].Items;
+    auto& frameHeaders = File_Adm_Private->Items[item_frameHeader].Items;
 
     CheckErrors_Elements(File_Adm_Private, item_root);
+    if (File_Adm_Private->Version_S != (uint8_t)-1 && frameHeaders.empty()) {
+        Root[0].AddError(Error, root_frameHeader, E::Present0, 0);
+    }
 
     set<string> TopLevelObjects;
     set<string> TopLevel_alternativeValueSetIDRefs;
@@ -5553,8 +5952,8 @@ void File_Adm::Streams_Fill()
             if (Level) {
                 static const int8u MaxCounts[][MaxCount_Size] =
                 {
-                    {0, 0, 8,  16,  48,  32,  32,  32, 0, 0 },
-                    {0, 0, 16,  28,  84,  56,  56,  56, 0, 0 },
+                    { 0, 0,   8,  16,  48,  32,  32,  32, 0, 0 },
+                    { 0, 0,  16,  28,  84,  56,  56,  56, 0, 0 },
                 };
                 Level--;
                 if (Level < sizeof(MaxCounts) / sizeof(MaxCounts[0]) && item_Type < sizeof(MaxCounts[0]) / sizeof(MaxCounts[0][0]) && MaxCounts[Level][item_Type] && Items.size() > MaxCounts[Level][item_Type]) {
@@ -5575,10 +5974,10 @@ void File_Adm::Streams_Fill()
             if (item_Infos[item_Type].ID_Pos != (int8u)-1) {
                 const auto& ID = Item.Attributes[item_Infos[item_Type].ID_Pos];
                 if (PreviousIDs.find(ID) != PreviousIDs.end()) {
-                    Item.AddError(Error, item_Type, i, ':' + CraftName(item_Infos[item_Type].Name) + "ID:" + CraftName(item_Infos[item_Type].Name) + "ID value \"" + ID + "\" shall be unique");
+                    Item.AddError(Error, item_Type, i, ':' + CraftName(item_Infos[item_Type].Name, true) + "ID:" + CraftName(item_Infos[item_Type].Name, true) + "ID value \"" + ID + "\" shall be unique");
                 }
                 else if (PreviousIDs_Forbidden.find(ID) != PreviousIDs_Forbidden.end()) {
-                    Item.AddError(Error, item_Type, i, ':' + CraftName(item_Infos[item_Type].Name) + "ID:" + CraftName(item_Infos[item_Type].Name) + "ID value \"" + ID + "\" is not permitted due to the ID of the DirectSpeakers typed object", Source_Atmos_1_0);
+                    Item.AddError(Error, item_Type, i, ':' + CraftName(item_Infos[item_Type].Name, true) + "ID:" + CraftName(item_Infos[item_Type].Name, true) + "ID value \"" + ID + "\" is not permitted due to the ID of the DirectSpeakers typed object", Source_Atmos_1_0);
                 }
                 else {
                     PreviousIDs.insert(ID);
@@ -5650,8 +6049,8 @@ void File_Adm::Streams_Fill()
             if (Level) {
                 static const int8u MaxCounts[][MaxCount_Size] =
                 {
-                    {  16,   4,   0,   0,   0,  16 },
-                    {  28,   8,   0,   0,   0,  28 },
+                    {   4,  16,   0,   0,   0,  16 },
+                    {   8,  28,   0,   0,   0,  28 },
                 };
                 Level--;
                 if (Level < sizeof(MaxCounts) / sizeof(MaxCounts[0])) {
@@ -5699,13 +6098,13 @@ void File_Adm::Streams_Fill()
             }
             dialogue_Pos++;
         }
-        static const size_t MaxCount_Size = 2;
+        static const size_t MaxCount_Size = audioContent_audioContentLabel + 1;
         for (auto Level : IsAdvSSE_Levels) {
             if (Level) {
                 static const int8u MaxCounts[][MaxCount_Size] =
                 {
-                    {   0,   4 },
-                    {   0,   8 },
+                    {  4 },
+                    {  8 },
                 };
                 Level--;
                 if (Level < sizeof(MaxCounts) / sizeof(MaxCounts[0])) {
@@ -5715,8 +6114,8 @@ void File_Adm::Streams_Fill()
                             if (!((int8u)(MaxCount + 1))) {
                             }
                             if (Content.Elements[j].size() > MaxCount) {
-                                const auto ElementName = (*item_Infos[item_audioProgramme].Element_Infos)[j].Name;
-                                Content.AddError(Error, ":audioProgramme" + to_string(i) + ':' + ElementName + ':' + ElementName + " element count " + to_string(Content.Elements[j].size()) + " is not permitted, max is " + to_string(MaxCount), Source_AdvSSE_1);
+                                const auto ElementName = (*item_Infos[item_audioContent].Element_Infos)[j].Name;
+                                Content.AddError(Error, ":audioContent" + to_string(i) + ':' + ElementName + ':' + ElementName + " element count " + to_string(Content.Elements[j].size()) + " is not permitted, max is " + to_string(MaxCount), Source_AdvSSE_1);
                             }
                         }
                     }
@@ -5761,8 +6160,8 @@ void File_Adm::Streams_Fill()
             if (Level) {
                 static const int8u MaxCounts[][MaxCount_Size] =
                 {
-                    {   0,  16, (int8u)-1,   4,  15,   0,   0,   0,   0,   0,   0,   8 },
-                    {   0,  28, (int8u)-1,   8,  27,   0,   0,   0,   0,   0,   0,  16 },
+                    {  0, 16, 12,  4, 15,  0,  0,  0,  0,  0,  0,  8 },
+                    {  0, 28, 24,  8, 27,  0,  0,  0,  0,  0,  0, 16 },
                 };
                 Level--;
                 if (Level < sizeof(MaxCounts) / sizeof(MaxCounts[0])) {
@@ -5772,8 +6171,8 @@ void File_Adm::Streams_Fill()
                             if (!((int8u)(MaxCount + 1))) {
                             }
                             if (Object.Elements[j].size() > MaxCount) {
-                                const auto ElementName = (*item_Infos[item_audioProgramme].Element_Infos)[j].Name;
-                                Object.AddError(Error, ":audioProgramme" + to_string(i) + ':' + ElementName + ':' + ElementName + " element count " + to_string(Object.Elements[j].size()) + " is not permitted, max is " + to_string(MaxCount), Source_AdvSSE_1);
+                                const auto ElementName = (*item_Infos[item_audioObject].Element_Infos)[j].Name;
+                                Object.AddError(Error, ":audioObject" + to_string(i) + ':' + ElementName + ':' + ElementName + " element count " + to_string(Object.Elements[j].size()) + " is not permitted, max is " + to_string(MaxCount), Source_AdvSSE_1);
                             }
                         }
                     }
@@ -5844,8 +6243,8 @@ void File_Adm::Streams_Fill()
     for (size_t i = 0; i < PackFormats.size(); i++) {
         auto& PackFormat = PackFormats[i];
         auto Type = GetType(File_Adm_Private, item_audioPackFormat, i);
+        const auto& ChannelFormatIDRefs = PackFormat.Elements[audioPackFormat_audioChannelFormatIDRef];
         if (IsAtmos) {
-            const auto& ChannelFormatIDRefs = PackFormat.Elements[audioPackFormat_audioChannelFormatIDRef];
             if (!ChannelFormatIDRefs.empty()) {
                 auto ChannelFormatIDRefs_Size = ChannelFormatIDRefs.size();
                 if ((Type == Type_DirectSpeakers && ChannelFormatIDRefs_Size > 10) || (Type == Type_Objects && ChannelFormatIDRefs_Size > 1)) {
@@ -5873,6 +6272,84 @@ void File_Adm::Streams_Fill()
                             List_Strings_Flat += Item;
                         }
                         PackFormat.AddError(Error, ":audioPackFormat" + to_string(i) + ":audioChannelFormatIDRef:audioChannelFormatIDRef order \"" + List_Strings_Flat + "\" is not permitted", Source_Atmos_1_0);
+                    }
+                }
+            }
+        }
+        if (Type == Type_Matrix) {
+            for (const auto& inputPackFormatIDRef : PackFormat.Elements[audioPackFormat_inputPackFormatIDRef]) {
+                set<string> audioChannelFormatIDRefs;
+                for (const auto& TrackUID : TrackUIDs) {
+                    for (const auto& audioPackFormatIDRef : TrackUID.Elements[audioTrackUID_audioPackFormatIDRef]) {
+                        if (audioPackFormatIDRef != inputPackFormatIDRef) {
+                            continue;
+                        }
+                        for (const auto& audioChannelFormatIDRef : TrackUID.Elements[audioTrackUID_audioChannelFormatIDRef]) {
+                            audioChannelFormatIDRefs.insert(audioChannelFormatIDRef);
+                        }
+                    }
+                }
+                for (const auto& audioChannelFormatIDRef : PackFormat.Elements[audioPackFormat_audioChannelFormatIDRef]) {
+                    for (size_t j = 0; j < ChannelFormats.size(); j++) {
+                        auto& ChannelFormat = ChannelFormats[j];
+                        if (ChannelFormat.Attributes[audioChannelFormat_audioChannelFormatID] != audioChannelFormatIDRef || j >= File_Adm_Private->ChannelFormat_Matrix_coefficients.size()) {
+                            continue;
+                        }
+                        const auto& coefficients_List = File_Adm_Private->ChannelFormat_Matrix_coefficients[j];
+                        for (size_t k = 0; k < coefficients_List.size(); k++) {
+                            const auto& coefficients = coefficients_List[k];
+                            for (size_t l = 0; l < coefficients.List.size(); l++) {
+                                const auto& coefficient = coefficients.List[l];
+                                if (audioChannelFormatIDRefs.find(coefficient) == audioChannelFormatIDRefs.end()) {
+                                    ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(j) + ":audioBlockFormat" + to_string(coefficients.BlockPos) + ":matrix" + to_string(0) + ":coefficient" + to_string(l) + ":coefficient value \"" + coefficient + "\" is not in corresponding inputPackFormatIDRef \"" + inputPackFormatIDRef + '\"', Source_AdvSSE_1);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            for (const auto& outputPackFormatIDRef : PackFormat.Elements[audioPackFormat_outputPackFormatIDRef]) {
+                set<string> audioChannelFormatIDRefs;
+                for (const auto& TrackUID : TrackUIDs) {
+                    for (const auto& audioPackFormatIDRef : TrackUID.Elements[audioTrackUID_audioPackFormatIDRef]) {
+                        if (audioPackFormatIDRef != outputPackFormatIDRef) {
+                            continue;
+                        }
+                        for (const auto& audioChannelFormatIDRef : TrackUID.Elements[audioTrackUID_audioChannelFormatIDRef]) {
+                            audioChannelFormatIDRefs.insert(audioChannelFormatIDRef);
+                        }
+                    }
+                }
+                bool CommonDefIsInvalid = false;
+                if (audioChannelFormatIDRefs.empty() && !CheckErrors_ID(File_Adm_Private, outputPackFormatIDRef, item_Infos[item_audioPackFormat]) && outputPackFormatIDRef.rfind("AP_00010", 0) == 0) {
+                    auto Value = strtoul(outputPackFormatIDRef.c_str() + 8, nullptr, 16);
+                    audioChannelFormatIDRefs = audioPackFormatID_2_audioChannelFormatIDRef(Value);
+                    if (audioChannelFormatIDRefs.empty()) {
+                        CommonDefIsInvalid = true;
+                    }
+                }
+                for (const auto& audioChannelFormatIDRef : PackFormat.Elements[audioPackFormat_audioChannelFormatIDRef]) {
+                    for (size_t j = 0; j < ChannelFormats.size(); j++) {
+                        auto& ChannelFormat = ChannelFormats[j];
+                        if (ChannelFormat.Attributes[audioChannelFormat_audioChannelFormatID] != audioChannelFormatIDRef || j >= File_Adm_Private->ChannelFormat_Matrix_outputChannelFormatIDRefs.size()) {
+                            continue;
+                        }
+                        const auto& outputChannelFormatIDRef_List = File_Adm_Private->ChannelFormat_Matrix_outputChannelFormatIDRefs[j];
+                        for (size_t k = 0; k < outputChannelFormatIDRef_List.size(); k++) {
+                            const auto& outputChannelFormatIDRefs = outputChannelFormatIDRef_List[k];
+                            for (size_t l = 0; l < outputChannelFormatIDRefs.List.size(); l++) {
+                                const auto& outputChannelFormatIDRef = outputChannelFormatIDRefs.List[l];
+                                if (audioChannelFormatIDRefs.find(outputChannelFormatIDRef) == audioChannelFormatIDRefs.end()) {
+                                    if (CommonDefIsInvalid) {
+                                        ChannelFormat.AddError(Information, ":audioChannelFormat" + to_string(j) + ":audioBlockFormat" + to_string(outputChannelFormatIDRefs.BlockPos) + ":outputChannelFormatIDRef" + to_string(0) + ":outputChannelFormatIDRef value \"" + outputPackFormatIDRef.substr(7) + "\" is not allocated in ITU-R BS.2094-1");
+                                        break;
+                                    }
+                                    else {
+                                        ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(j) + ":audioBlockFormat" + to_string(outputChannelFormatIDRefs.BlockPos) + ":matrix" + to_string(0) + ":outputChannelFormatIDRef" + to_string(l) + ":Value \"" + outputChannelFormatIDRef + "\" is not in corresponding outputPackFormatIDRef \"" + outputPackFormatIDRef + '\"', Source_AdvSSE_1);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -5908,7 +6385,7 @@ void File_Adm::Streams_Fill()
                         if (Value >= 0x800) {
                             Value -= 0x800;
                         }
-                        static int8u List[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x09, 0x0A, 0x0C, 0x0F, 0x17, 0x1A, 0x1B, 0x1C, 0x1E, 0x1F };
+                        static int8u List[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x09, 0x0A, 0x0C, 0x0F, 0x10, 0x17, 0x1B, 0x1C, 0x1E, 0x1F };
                         IsNotValid = true;
                         for (auto List_Item : List) {
                             if (List_Item == Value) {
@@ -6004,6 +6481,22 @@ void File_Adm::Streams_Fill()
                     break;
                 }
             }
+
+            const auto& ID = ChannelFormat.Attributes[audioChannelFormat_audioChannelFormatID];
+            size_t Found = 0;
+            for (size_t i = 0; i < PackFormats.size(); i++) {
+                const auto& PackFormat = PackFormats[i];
+                const auto& audioChannelFormatIDRefs = PackFormat.Elements[audioPackFormat_audioChannelFormatIDRef];
+                for (size_t j = 0; j < audioChannelFormatIDRefs.size(); j++) {
+                    const auto& audioChannelFormatIDRef = audioChannelFormatIDRefs[j];
+                    if (audioChannelFormatIDRef == ID) {
+                        Found++;
+                    }
+                }
+            }
+            if (Found != 1) {
+                ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":GeneralCompliance:this audioChannelFormat is referenced by " + to_string(Found) + " audioPackFormat", Source_AdvSSE_1);
+            }
         }
 
         if (IsAtmos) {
@@ -6093,6 +6586,13 @@ void File_Adm::Streams_Fill()
                         default:
                             TrackUID.AddError(Error, ":audioTrackUID" + to_string(i) + ":audioChannelFormatIDRef:audioChannelFormatIDRef attribute xxxx value \"" + audioChannelFormatIDRef_xxxx + "\" is not permitted, permitted values are \"0001\" or \"0003\"", Source_AdvSSE_1);
                         }
+                        if (audioChannelFormatIDRef[7] == '0') {
+                            auto audioChannelFormatIDRef_yyyy = audioChannelFormatIDRef.substr(7, 4);
+                            Value = strtoul(audioChannelFormatIDRef_yyyy.c_str(), nullptr, 16);
+                            if (Value > 0x0028) {
+                                TrackUID.AddError(Information, ":audioTrackUID" + to_string(i) + ":audioChannelFormatIDRef:audioChannelFormatIDRef attribute yyyy value \"" + audioChannelFormatIDRef_yyyy + "\" is not allocated in ITU-R BS.2094-1");
+                            }
+                        }
                     }
                 }
                 const auto& audioPackFormatIDRefs = TrackUID.Elements[audioTrackUID_audioPackFormatIDRef];
@@ -6136,7 +6636,6 @@ void File_Adm::Streams_Fill()
             const auto& numIDs = TransportTrackFormat.Attributes[transportTrackFormat_numIDs];
             auto numIDs_Int = strtoul(numIDs.c_str(), nullptr, 10);
             if (to_string(numIDs_Int) != numIDs) {
-                TransportTrackFormat.AddError(Error, 0x80 | transportTrackFormat_numIDs, E::Form, File_Adm_Private, numIDs);
             }
             else if (numIDs_Int < TrackUIDs.size()) {
                 TransportTrackFormat.AddError(Error, ":transportTrackFormat" + to_string(i) + ":numIDs:numIDs attribute value " + numIDs + " is less than audioTrackUID element count " + to_string(TrackUIDs.size()), Source_AdvSSE_1);
@@ -6144,31 +6643,9 @@ void File_Adm::Streams_Fill()
         }
     }   
 
-    /*
-    // Errors - audioTrack
-    for (size_t i = 0; i < Tracks.size(); i++) {
-        auto& Track = Tracks[i];
-
-        if (Track.Attributes_Present[audioTrack_trackID]) {
-            const auto& trackID = Track.Attributes[audioTrack_trackID];
-            if (trackID != "ATU_00000000") {
-                for (size_t j = 0; j < TrackUIDs.size(); j++) {
-                    bool Found = false;
-                    if (TrackUIDs[j].Attributes[audioTrackUID_UID] == trackID) {
-                        Found = true;
-                    }
-                    if (!Found) {
-                        Track.AddError(Error, ":audioTrack" + to_string(i) + ":trackID:trackID attribute value " + trackID + " is );
-                    }
-                }
-            }
-        }
-    }
-    */
-
     // Errors - Fill
     for (size_t t = 0; t < item_Max; t++) {
-        size_t Error_Count_Per_Type[2] = {};
+        size_t Error_Count_Per_Type[error_Type_Max] = {};
         for (size_t i = 0; i < File_Adm_Private->Items[t].Items.size(); i++) {
             FillErrors(File_Adm_Private, (item)t, i, item_Infos[t].Name, &Errors_Field[0], &Errors_Value[0], WarningError, &Error_Count_Per_Type[0], IsAdvSSE);
         }
@@ -6242,6 +6719,28 @@ void File_Adm::Read_Buffer_Init()
 //---------------------------------------------------------------------------
 void File_Adm::Read_Buffer_Continue()
 {
+    if (NeedToJumpToEnd) {
+        // There was a jump, trying to resynch
+        NeedToJumpToEnd = false;
+        static const char* ToSearch = "</audioChannelFormat>";
+        const char* Nok = (const char*)Buffer - 1;
+        const char* LastPos = Nok;
+        while (auto NextPos = strstr(LastPos + 1, ToSearch)) {
+            LastPos = NextPos;
+        }
+        if (LastPos == Nok || File_Adm_Private->Resynch("audioFormatExtended")) {
+            Buffer_Offset = Buffer_Size;
+            ForceFinish();
+            return;
+        }
+        size_t Offset = (const int8u*)LastPos - Buffer + 21; // + length of ToSearch
+        Buffer += Offset;
+        Buffer_Size -= Offset;
+        Read_Buffer_Continue();
+        Buffer_Size += Offset;
+        Buffer -= Offset;
+    }
+
     auto Result = File_Adm_Private->parse((void*)Buffer, Buffer_Size);
     if (!Status[IsAccepted]) {
         for (const auto& Items : File_Adm_Private->Items) {
@@ -6252,19 +6751,26 @@ void File_Adm::Read_Buffer_Continue()
         }
     }
     Buffer_Offset = Buffer_Size - File_Adm_Private->Remain();
-    if (TotalSize > 512 * 1024 * 1024 && !File_Adm_Private->ChannelFormat_BlockFormat_ReduceCount.empty()) {
-        // Too big, we stop parsing here
-        File_Adm_Private->IsPartial = true;
-        NeedToJumpToEnd = true;
-    }
-    else if (Result && File_Adm_Private->File_Buffer_Size_Hint_Pointer) {
-        auto File_Offset_Now = File_Offset + Buffer_Size;
-        auto Size = File_Size - File_Offset_Now;
-        if (Size > 16 * 1024 * 1024) {
-            Size = 16 * 1024 * 1024;
-        }
-        *File_Adm_Private->File_Buffer_Size_Hint_Pointer = Size;
+    if (Buffer_Offset < Buffer_Size) {
         Element_WaitForMoreData();
+    }
+    if (Status[IsAccepted]) {
+        if (!File_Adm_Private->ChannelFormat_BlockFormat_ReduceCount.empty() && !File_Adm_Private->IsPartial && TotalSize > 512 * 1024 * 1024) {
+            // Too big, we stop parsing here
+            File_Adm_Private->IsPartial = true;
+            NeedToJumpToEnd = true;
+        }
+        if (Result && TotalSize > 16 * 1024 * 1024 && File_Adm_Private->File_Buffer_Size_Hint_Pointer) {
+            auto File_Offset_Now = File_Offset + Buffer_Size;
+            auto Size = File_Size - File_Offset_Now;
+            if (Size > 16 * 1024 * 1024) {
+                Size = 16 * 1024 * 1024;
+            }
+            if (Size >= 64 * 1024) {
+                *File_Adm_Private->File_Buffer_Size_Hint_Pointer = Size;
+            }
+            Element_WaitForMoreData();
+        }
     }
 }
 

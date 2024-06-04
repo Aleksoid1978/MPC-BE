@@ -542,7 +542,7 @@ File_Dts::File_Dts()
         Trace_Layers_Update(8); //Stream
     #endif //MEDIAINFO_TRACE
     MustSynchronize=true;
-    Buffer_TotalBytes_FirstSynched_Max=32*1024;
+    Buffer_TotalBytes_FirstSynched_Max=64*1024;
     PTS_DTS_Needed=true;
     StreamSource=IsStream;
 

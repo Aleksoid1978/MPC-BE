@@ -329,12 +329,66 @@ static const char* Flv_VP6_Version2[]=
     "VP6.1/6.2",
 };
 
+enum flv_FrameType {
+    Reserved0,
+    KeyFrame,
+    InterFrame,
+    DisposableInterFrame,
+    GeneratedKeyFrame,
+    Command,
+};
 static const char* Flv_FrameType[]=
 {
     "",
     "KeyFrame",
     "InterFrame",
     "InterFrame (Disposable)",
+    "KeyFrame (Generated)",
+    "Command",
+    "",
+    "",
+};
+
+enum flv_PacketType {
+    SequenceStart,
+    CodedFrames,
+    SequenceEnd,
+    CodedFramesX,
+    Metadata,
+    MPEG2TSSequenceStart,
+    Multitrack,
+};
+static const char* Flv_PacketType[] =
+{
+    "SequenceStart",
+    "CodedFrames",
+    "SequenceEnd",
+    "CodedFramesX",
+    "Metadata",
+    "MPEG2TSSequenceStart",
+    "Multitrack",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+};
+
+enum flv_MultiTrackType {
+    OneTrack,
+    ManyTracks,
+    ManyTracksManyCodecs,
+};
+static const char* Flv_MultitrackType[] =
+{
+    "OneTrack",
+    "ManyTracks",
+    "ManyTracksManyCodecs",
+    "",
     "",
     "",
     "",
@@ -937,11 +991,36 @@ void File_Flv::video()
         return; //No more need of Video stream
 
     //Parsing
+    int32u videoFourCc=0;
     int8u Codec, FrameType;
+    int8u PacketType = 0;
     Element_Begin1("Stream header");
     BS_Begin();
-    Get_S1 (4, FrameType,                                       "frameType"); Param_Info1(Flv_FrameType[FrameType]);
+    Peek_S1(4, FrameType);
+    auto isExVideoHeader=FrameType>>3;
+    if (isExVideoHeader)
+    {
+        FrameType&=0x7;
+        Skip_SB(                                                "isExVideoHeader");
+        Skip_S1(3,                                              "videoFrameType"); Param_Info1(Flv_FrameType[FrameType]);
+        Get_S1 (4, PacketType,                                  "videoPacketType"); Param_Info1(Flv_PacketType[PacketType]);
+        if (PacketType!=Metadata && FrameType==Command)
+            Skip_S1(8,                                          "videoCommand");
+        else if (PacketType==Multitrack)
+        {
+            int8u MultitrackType;
+            Get_S1 (4, MultitrackType,                          "AvMultitrackType"); Param_Info1(Flv_MultitrackType[MultitrackType]);
+            Get_S1 (4, PacketType,                              "videoPacketType"); Param_Info1(Flv_PacketType[PacketType]);
+        }
+        BS_End();
+        Get_C4 (videoFourCc,                                    "videoFourCc"); // The first one if ManyTracksManyCodecs
+        BS_Begin();
+    }
+    else
+    {
+    Skip_S1(4,                                                  "frameType"); Param_Info1(Flv_FrameType[FrameType]);
     Get_S1 (4, Codec,                                           "codecID"); Param_Info1(Flv_Codec_Video[Codec]); Element_Info1(Flv_Codec_Video[Codec]);
+    }
     BS_End();
     Element_End0();
 
@@ -951,14 +1030,30 @@ void File_Flv::video()
         {
             if (Count_Get(Stream_Video)==0)
                 File__Analyze::Stream_Prepare(Stream_Video);
-            Fill(Stream_Video, 0, Video_Format, Flv_Format_Video[Codec]);
-            Fill(Stream_Video, 0, Video_Format_Profile, Flv_Format_Profile_Video[Codec]);
-            Fill(Stream_Video, 0, Video_Codec, Flv_Codec_Video[Codec]);
-            Fill(Stream_Video, 0, Video_CodecID, Codec);
-            Fill(Stream_Video, 0, Video_CodecID_Hint, Flv_CodecID_Hint_Video[Codec]);
+            if (isExVideoHeader)
+            {
+                CodecID_Fill(Ztring().From_CC4(videoFourCc), Stream_Video, 0, InfoCodecID_Format_Mpeg4);
+            }
+            else
+            {
+                Fill(Stream_Video, 0, Video_Format, Flv_Format_Video[Codec]);
+                Fill(Stream_Video, 0, Video_Format_Profile, Flv_Format_Profile_Video[Codec]);
+                Fill(Stream_Video, 0, Video_Codec, Flv_Codec_Video[Codec]);
+                Fill(Stream_Video, 0, Video_CodecID, Codec);
+                Fill(Stream_Video, 0, Video_CodecID_Hint, Flv_CodecID_Hint_Video[Codec]);
+            }
             Fill(Stream_Video, 0, Video_BitDepth, 8); //FLV is not known to support another bit depth
 
             MustSynchronize=true; // Now, synchronization test is possible
+        }
+        if (isExVideoHeader)
+        {
+            switch (videoFourCc)
+            {
+                case 0x61766331: Codec= 7; break; //AVC
+                case 0x68766331: Codec=12; break; //HEVC
+                default: Codec=(int8u)-1;
+            }
         }
 
         //Parsing video data
@@ -969,8 +1064,8 @@ void File_Flv::video()
             case  4 : video_VP6(false); break;
             case  5 : video_VP6(true); break;
             case  6 : video_ScreenVideo(2); break;
-            case  7 : video_AVC(); break;
-            case 12 : video_HEVC(); break;
+            case  7 : video_AVC(PacketType+isExVideoHeader); break;
+            case 12 : video_HEVC(PacketType+isExVideoHeader); break;
             default : Skip_XX(Element_Size-Element_Offset,      "Unknown");
                       video_stream_Count=false; //No more need of Video stream;
         }
@@ -1108,11 +1203,27 @@ void File_Flv::video_VP6(bool WithAlpha)
 }
 
 //---------------------------------------------------------------------------
-void File_Flv::video_AVC()
+void File_Flv::video_AVC(int8u PacketType_plus1)
 {
     int8u AVCPacketType;
+    if (PacketType_plus1)
+    {
+        switch (PacketType_plus1)
+        {
+            case SequenceStart+1: AVCPacketType=0; break;
+            case CodedFrames+1:
+            case CodedFramesX+1:  AVCPacketType=1; break;
+            default: AVCPacketType=-1;
+        }
+    }
+    else
+    {
     Get_B1 (AVCPacketType,                                      "AVCPacketType"); Param_Info1(Flv_AVCPacketType(AVCPacketType));
+    }
+    if (!PacketType_plus1 || PacketType_plus1==CodedFrames-1)
+    {
     Info_B3(CompositionTime,                                    "CompositionTime"); Param_Info1(Ztring::ToZtring((int32s)(CompositionTime+0xFF000000)));
+    }
 
     switch (AVCPacketType)
     {
@@ -1122,6 +1233,7 @@ void File_Flv::video_AVC()
                     {
                         Stream[Stream_Video].Parser=new File_Avc;
                         Open_Buffer_Init(Stream[Stream_Video].Parser);
+                        ((File_Avc*)Stream[Stream_Video].Parser)->FrameIsAlwaysComplete=true;
                         ((File_Avc*)Stream[Stream_Video].Parser)->MustParse_SPS_PPS=true;
                         ((File_Avc*)Stream[Stream_Video].Parser)->SizedBlocks=true;
                         ((File_Avc*)Stream[Stream_Video].Parser)->MustSynchronize=false;
@@ -1190,11 +1302,27 @@ void File_Flv::video_AVC()
 }
 
 //---------------------------------------------------------------------------
-void File_Flv::video_HEVC()
+void File_Flv::video_HEVC(int8u PacketType_plus1)
 {
     int8u AVCPacketType;
+    if (PacketType_plus1)
+    {
+        switch (PacketType_plus1)
+        {
+            case SequenceStart+1: AVCPacketType=0; break;
+            case CodedFrames+1:
+            case CodedFramesX+1:  AVCPacketType=1; break;
+            default: AVCPacketType=-1;
+        }
+    }
+    else
+    {
     Get_B1 (AVCPacketType,                                      "AVCPacketType"); Param_Info1(Flv_AVCPacketType(AVCPacketType));
+    }
+    if (!PacketType_plus1 || PacketType_plus1==CodedFrames-1)
+    {
     Info_B3(CompositionTime,                                    "CompositionTime"); Param_Info1(Ztring::ToZtring((int32s)(CompositionTime+0xFF000000)));
+    }
 
     switch (AVCPacketType)
     {

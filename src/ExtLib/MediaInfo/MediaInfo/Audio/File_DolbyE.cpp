@@ -58,6 +58,11 @@ extern const char* AC3_ChannelPositions[];
 extern const char* AC3_ChannelPositions2[];
 extern const char* AC3_ChannelLayout_lfeoff[];
 extern const char* AC3_ChannelLayout_lfeon[];
+extern const char* AC3_roomtyp[];
+extern const char* AC3_dmixmod[];
+extern string AC3_Level_Value(int8u Index, float Start, float Multiplier);
+extern void AC3_Level_Fill(File__Analyze* A, size_t StreamPos, int8u Index, float Start, float Multiplier, const char* Name);
+extern string AC3_dynrngprof_Get(int8u Value);
 
 //***************************************************************************
 // Utils
@@ -970,7 +975,7 @@ File_DolbyE::File_DolbyE()
 
     //Configuration
     MustSynchronize=true;
-    Buffer_TotalBytes_FirstSynched_Max=32*1024;
+    Buffer_TotalBytes_FirstSynched_Max=64*1024;
 
     //In
     GuardBand_Before=0;
@@ -1014,7 +1019,7 @@ void File_DolbyE::Streams_Fill()
             Stream_Prepare(Stream_Audio);
         Fill(Stream_Audio, program, Audio_Format, "Dolby E");
         if (DolbyE_Programs[program_config]>1)
-            Fill(Stream_Audio, program, Audio_ID, Count_Get(Stream_Audio));
+            Fill(Stream_Audio, program, Audio_ID, program+1);
         Fill(Stream_Audio, program, Audio_Channel_s_, DolbyE_Channels_PerProgram(program_config, program));
         Fill(Stream_Audio, program, Audio_ChannelPositions, DolbyE_ChannelPositions_PerProgram(program_config, program));
         Fill(Stream_Audio, program, Audio_ChannelPositions_String2, DolbyE_ChannelPositions2_PerProgram(program_config, program));
@@ -1048,12 +1053,12 @@ void File_DolbyE::Streams_Fill_PerProgram(size_t program)
 
     if (SMPTE_time_code_StartTimecode!=(int64u)-1)
     {
-        Fill(StreamKind_Last, program, Audio_Delay, SMPTE_time_code_StartTimecode);
-        Fill(StreamKind_Last, program, Audio_Delay_Source, "Stream");
+        Fill(Stream_Audio, program, Audio_Delay, SMPTE_time_code_StartTimecode);
+        Fill(Stream_Audio, program, Audio_Delay_Source, "Stream");
     }
 
     Fill(Stream_Audio, program, Audio_FrameRate, Mpegv_frame_rate[frame_rate_code]);
-    if (FrameInfo.PTS!=(int64u)-1 && bit_depth)
+    if (bit_depth)
     {
         float BitRate=(float)(96000*bit_depth);
 
@@ -1063,13 +1068,13 @@ void File_DolbyE::Streams_Fill_PerProgram(size_t program)
             Fill(Stream_Audio, program, "GuardBand_Before", GuardBand_Before_Initial_Duration, 9);
             Fill(Stream_Audio, program, "GuardBand_Before/String", Ztring::ToZtring(GuardBand_Before_Initial_Duration*1000000, 0)+Ztring().From_UTF8(" \xC2xB5s")); //0xC2 0xB5 = micro sign
             Fill_SetOptions(Stream_Audio, program, "GuardBand_Before", "N NT");
-            Fill_SetOptions(Stream_Audio, program, "GuardBand_Before/String", "N NT");
+            Fill_SetOptions(Stream_Audio, program, "GuardBand_Before/String", "Y NT");
 
             float GuardBand_After_Initial_Duration=GuardBand_After_Initial*8/BitRate;
             Fill(Stream_Audio, program, "GuardBand_After", GuardBand_After_Initial_Duration, 9);
             Fill(Stream_Audio, program, "GuardBand_After/String", Ztring::ToZtring(GuardBand_After_Initial_Duration*1000000, 0)+Ztring().From_UTF8(" \xC2xB5s")); //0xC2 0xB5 = micro sign
             Fill_SetOptions(Stream_Audio, program, "GuardBand_After", "N NT");
-            Fill_SetOptions(Stream_Audio, program, "GuardBand_After/String", "N NT");
+            Fill_SetOptions(Stream_Audio, program, "GuardBand_After/String", "Y NT");
         }
     }
 
@@ -1088,7 +1093,14 @@ void File_DolbyE::Streams_Fill_PerProgram(size_t program)
 //---------------------------------------------------------------------------
 void File_DolbyE::Streams_Fill_ED2()
 {
-    Stream_Prepare(Stream_Audio);
+    if (Count_Get(Stream_Audio))
+    {
+        while (Count_Get(Stream_Audio)>1)
+            Stream_Erase(Stream_Audio, Count_Get(Stream_Audio)-1); // We may have several streams due to metadata, we keep one
+        StreamPos_Last=0;
+    }
+    else
+        Stream_Prepare(Stream_Audio);
     Fill(Stream_Audio, StreamPos_Last, Audio_Format, "Dolby ED2");
     if (Guardband_EMDF_PresentAndSize)
         Fill(Stream_Audio, StreamPos_Last, Audio_BitRate, Guardband_EMDF_PresentAndSize*8*Mpegv_frame_rate[frame_rate_code], 0);
@@ -3469,6 +3481,7 @@ enum ac3 {
     ac3_roomtyp,
     ac3_copyrightb,
     ac3_origbs,
+    ac3_xbsi1e,
     ac3_dmixmod,
     ac3_ltrtcmixlev,
     ac3_ltrtsurmixlev,
@@ -3501,33 +3514,33 @@ void File_DolbyE::ac3_metadata_subsegment(bool xbsi)
     {
         int8u meta[ac3_max];
         Element_Begin1("per program");
-        Get_S1 (5, meta[ac3_datarate],                      "ac3_datarate");
-        Get_S1 (3, meta[ac3_bsmod],                         "ac3_bsmod");
-        Get_S1 (3, meta[ac3_acmod],                         "ac3_acmod");
-        Get_S1 (2, meta[ac3_cmixlev],                       "ac3_cmixlev");
-        Get_S1 (2, meta[ac3_surmixlev],                     "ac3_surmixlev");
-        Get_S1 (2, meta[ac3_dsurmod],                       "ac3_dsurmod");
-        Get_S1 (1, meta[ac3_lfeon],                         "ac3_lfeon");
-        Get_S1 (5, meta[ac3_dialnorm],                      "ac3_dialnorm");
+        Get_S1 (5, meta[ac3_datarate],                      "ac3_datarate"); Param_Info2C(meta[ac3_datarate]<19, AC3_BitRate[meta[ac3_datarate]], " kbps");
+        Get_S1 (3, meta[ac3_bsmod],                         "ac3_bsmod"); Param_Info1(AC3_Mode_String[meta[ac3_bsmod]]);
+        Get_S1 (3, meta[ac3_acmod],                         "ac3_acmod"); Param_Info1(AC3_ChannelLayout_lfeoff[meta[ac3_acmod]]);
+        Get_S1 (2, meta[ac3_cmixlev],                       "ac3_cmixlev"); Param_Info2C(meta[ac3_cmixlev]<=2, Ztring::ToZtring(-3 - ((float)meta[ac3_cmixlev]) * 1.5, 1).To_UTF8(), " dB");
+        Get_S1 (2, meta[ac3_surmixlev],                     "ac3_surmixlev"); Param_Info2C(meta[ac3_surmixlev]<=2, meta[ac3_surmixlev]==2?string("-inf"):to_string(-3 - (int)meta[ac3_cmixlev] * 3), " dB");
+        Get_S1 (2, meta[ac3_dsurmod],                       "ac3_dsurmod"); Param_Info1C(meta[ac3_dsurmod], "Dolby Surround");
+        Get_S1 (1, meta[ac3_lfeon],                         "ac3_lfeon"); Param_Info1C(meta[ac3_lfeon], "LFE");
+        Get_S1 (5, meta[ac3_dialnorm],                      "ac3_dialnorm"); Param_Info2(Ztring::ToZtring(meta[ac3_dialnorm]==0?-31:-(int)meta[ac3_dialnorm]).To_UTF8(), " dB");
         Get_S1 (1, meta[ac3_langcode],                      "ac3_langcode");
         Get_S1 (8, meta[ac3_langcod],                       "ac3_langcod");
         Get_S1 (1, meta[ac3_audprodie],                     "ac3_audprodie");
-        Get_S1 (5, meta[ac3_mixlevel],                      "ac3_mixlevel");
-        Get_S1 (2, meta[ac3_roomtyp],                       "ac3_roomtyp");
+        Get_S1 (5, meta[ac3_mixlevel],                      "ac3_mixlevel"); Param_Info2C(meta[ac3_audprodie], 80 + meta[ac3_mixlevel], " dB");
+        Get_S1 (2, meta[ac3_roomtyp],                       "ac3_roomtyp"); Param_Info1C(meta[ac3_audprodie] && meta[ac3_roomtyp], AC3_roomtyp[meta[ac3_roomtyp] - 1]);
         Get_S1 (1, meta[ac3_copyrightb],                    "ac3_copyrightb");
         Get_S1 (1, meta[ac3_origbs],                        "ac3_origbs");
         if (xbsi)
         {
-            Skip_S1(1,                                      "ac3_xbsi1e");
+            Get_S1 (1, meta[ac3_xbsi1e],                    "ac3_xbsi1e");
             Get_S1 (2, meta[ac3_dmixmod],                   "ac3_dmixmod");
-            Get_S1 (3, meta[ac3_ltrtcmixlev],               "ac3_ltrtcmixlev");
-            Get_S1 (3, meta[ac3_ltrtsurmixlev],             "ac3_ltrtsurmixlev");
-            Get_S1 (3, meta[ac3_lorocmixlev],               "ac3_lorocmixlev");
-            Get_S1 (3, meta[ac3_lorosurmixlev],             "ac3_lorosurmixlev");
+            Get_S1 (3, meta[ac3_ltrtcmixlev],               "ac3_ltrtcmixlev"); Param_Info2C(meta[ac3_xbsi1e], AC3_Level_Value(meta[ac3_ltrtcmixlev], 3, 1.5), " dB");
+            Get_S1 (3, meta[ac3_ltrtsurmixlev],             "ac3_ltrtsurmixlev"); Param_Info2C(meta[ac3_xbsi1e], AC3_Level_Value(meta[ac3_ltrtsurmixlev], 3, 1.5), " dB");
+            Get_S1 (3, meta[ac3_lorocmixlev],               "ac3_lorocmixlev"); Param_Info2C(meta[ac3_xbsi1e], AC3_Level_Value(meta[ac3_lorocmixlev], 3, 1.5), " dB");
+            Get_S1 (3, meta[ac3_lorosurmixlev],             "ac3_lorosurmixlev"); Param_Info2C(meta[ac3_xbsi1e], AC3_Level_Value(meta[ac3_lorosurmixlev], 3, 1.5), " dB");
             Get_S1 (1, meta[ac3_xbsi2e],                    "ac3_xbsi2e");
-            Get_S1 (2, meta[ac3_dsurexmod],                 "ac3_dsurexmod");
-            Get_S1 (2, meta[ac3_dheadphonmod],              "ac3_dheadphonmod");
-            Get_S1 (1, meta[ac3_adconvtyp],                 "ac3_adconvtyp");
+            Get_S1 (2, meta[ac3_dsurexmod],                 "ac3_dsurexmod"); Param_Info1C(meta[ac3_dsurexmod]>=2, meta[ac3_dsurexmod]==2?"Dolby Surround EX":"Dolby Pro Logic IIz");
+            Get_S1 (2, meta[ac3_dheadphonmod],              "ac3_dheadphonmod"); Param_Info1C(meta[ac3_dheadphonmod], "Dolby Headphone");
+            Get_S1 (1, meta[ac3_adconvtyp],                 "ac3_adconvtyp"); Param_Info1C(meta[ac3_xbsi2e] && meta[ac3_adconvtyp], "HDCD");
             Get_S1 (8, meta[ac3_xbsi2],                     "ac3_xbsi2");
             Get_S1 (1, meta[ac3_encinfo],                   "ac3_encinfo");
         }
@@ -3545,12 +3558,12 @@ void File_DolbyE::ac3_metadata_subsegment(bool xbsi)
         Get_S1 (1, meta[ac3_suratton],                      "ac3_suratton");
         Get_S1 (1, meta[ac3_rfpremphon],                    "ac3_rfpremphon");
         Get_S1 (1, meta[ac3_compre],                        "ac3_compre");
-        Get_S1 (8, meta[ac3_compr1],                        "ac3_compr1");
+        Get_S1 (8, meta[ac3_compr1],                        "ac3_compr1"); Param_Info2C(meta[ac3_compre], Ztring::ToZtring(meta[ac3_dynrng1]?(AC3_compr[meta[ac3_compr1]>>4]+20*std::log10(((float)(0x10+(meta[ac3_compr1]&0x0F)))/32)):0, 2), " dB");
         Get_S1 (1, meta[ac3_dynrnge],                       "ac3_dynrnge");
-        Get_S1 (8, meta[ac3_dynrng1],                       "ac3_dynrng1");
-        Get_S1 (8, meta[ac3_dynrng2],                       "ac3_dynrng2");
-        Get_S1 (8, meta[ac3_dynrng3],                       "ac3_dynrng3");
-        Get_S1 (8, meta[ac3_dynrng4],                       "ac3_dynrng4");
+        Get_S1 (8, meta[ac3_dynrng1],                       "ac3_dynrng1"); Param_Info2C(meta[ac3_dynrnge], Ztring::ToZtring(meta[ac3_dynrng1]?(AC3_dynrng[meta[ac3_dynrng1]>>5]+20*std::log10(((float)(0x20+(meta[ac3_dynrng1]&0x1F)))/64)):0, 2), " dB");
+        Get_S1 (8, meta[ac3_dynrng2],                       "ac3_dynrng2"); Param_Info2C(meta[ac3_dynrnge], Ztring::ToZtring(meta[ac3_dynrng2]?(AC3_dynrng[meta[ac3_dynrng2]>>5]+20*std::log10(((float)(0x20+(meta[ac3_dynrng2]&0x1F)))/64)):0, 2), " dB");
+        Get_S1 (8, meta[ac3_dynrng3],                       "ac3_dynrng3"); Param_Info2C(meta[ac3_dynrnge], Ztring::ToZtring(meta[ac3_dynrng3]?(AC3_dynrng[meta[ac3_dynrng3]>>5]+20*std::log10(((float)(0x20+(meta[ac3_dynrng3]&0x1F)))/64)):0, 2), " dB");
+        Get_S1 (8, meta[ac3_dynrng4],                       "ac3_dynrng4"); Param_Info2C(meta[ac3_dynrnge], Ztring::ToZtring(meta[ac3_dynrng4]?(AC3_dynrng[meta[ac3_dynrng4]>>5]+20*std::log10(((float)(0x20+(meta[ac3_dynrng4]&0x1F)))/64)):0, 2), " dB");
         Element_End0();
 
         FILLING_BEGIN()
@@ -3558,14 +3571,18 @@ void File_DolbyE::ac3_metadata_subsegment(bool xbsi)
             {
                 if (program >= Count_Get(Stream_Audio))
                     Stream_Prepare(Stream_Audio);
-                Fill(Stream_Audio, program, "AC3_metadata", "Yes");
-                int32u BitRate = AC3_BitRate[meta[ac3_datarate]]*1000;
-                if (BitRate)
-                    Fill(Stream_Audio, program, "AC3_metadata BitRate", BitRate);
-                //Fill(Stream_Audio, program, "AC3_metadata ServiceKind", AC3_Mode[meta[ac3_bsmod]]);
-                //Fill_SetOptions(Stream_Audio, program, "AC3_metadata ServiceKind", "N NTY");
-                Fill(Stream_Audio, program, "AC3_metadata ServiceKind/String", AC3_Mode_String[meta[ac3_bsmod]]);
-                //Fill_SetOptions(Stream_Audio, 0, "AC3_metadata ServiceKind/String", "Y NTN");
+                Fill(Stream_Audio, program, "AC3_Metadata", "Yes");
+                if (meta[ac3_datarate]<19)
+                {
+                    Fill(Stream_Audio, program, "AC3_Metadata BitRate", AC3_BitRate[meta[ac3_datarate]]*1000);
+                    Fill_SetOptions(Stream_Audio, program, "AC3_Metadata BitRate", "N NTY");
+                    Fill(Stream_Audio, program, "AC3_Metadata BitRate/String", Ztring::ToZtring(AC3_BitRate[meta[ac3_datarate]])+__T(" kbps"));
+                    Fill_SetOptions(Stream_Audio, program, "AC3_Metadata BitRate/String", "Y NTN");
+                }
+                Fill(Stream_Audio, program, "AC3_Metadata ServiceKind", AC3_Mode[meta[ac3_bsmod]]);
+                Fill_SetOptions(Stream_Audio, program, "AC3_Metadata ServiceKind", "N NTY");
+                Fill(Stream_Audio, program, "AC3_Metadata ServiceKind/String", AC3_Mode_String[meta[ac3_bsmod]]);
+                Fill_SetOptions(Stream_Audio, program, "AC3_Metadata ServiceKind/String", "Y NTN");
                 int8u Channels = AC3_Channels[meta[ac3_acmod]];
                 Ztring ChannelPositions; ChannelPositions.From_UTF8(AC3_ChannelPositions[meta[ac3_acmod]]);
                 Ztring ChannelPositions2; ChannelPositions2.From_UTF8(AC3_ChannelPositions2[meta[ac3_acmod]]);
@@ -3576,7 +3593,7 @@ void File_DolbyE::ac3_metadata_subsegment(bool xbsi)
                     ChannelPositions += __T(", LFE");
                     ChannelPositions2 += __T(".1");
                 }
-                Fill(Stream_Audio, program, "AC3_metadata ChannelLayout", ChannelLayout);
+                Fill(Stream_Audio, program, "AC3_Metadata ChannelLayout", ChannelLayout);
 
                 //Surround
                 if (meta[ac3_dsurmod]==2)
@@ -3597,15 +3614,26 @@ void File_DolbyE::ac3_metadata_subsegment(bool xbsi)
                 }
 
                 // Metadata
-                Fill(Stream_Audio, program, "AC3_metadata dialnorm/String", Ztring::ToZtring(meta[ac3_dialnorm]==0?-31:-(int)meta[ac3_dialnorm])+__T(" dB"));
-                //Fill_SetOptions(Stream_Audio, program, "AC3_metadata dialnorm/String", "N NTN");
+                Fill(Stream_Audio, program, "AC3_Metadata dialnorm", meta[ac3_dialnorm]==0?-31:-(int)meta[ac3_dialnorm]);
+                Fill_SetOptions(Stream_Audio, program, "AC3_Metadata dialnorm", "N NT");
+                Fill(Stream_Audio, program, "AC3_Metadata dialnorm/String", Ztring::ToZtring(meta[ac3_dialnorm]==0?-31:-(int)meta[ac3_dialnorm])+__T(" dB"));
+                Fill_SetOptions(Stream_Audio, program, "AC3_Metadata dialnorm/String", "Y NTN");
                 if (meta[ac3_compre])
                 {
-                    float64 Value=AC3_compr[meta[ac3_compr1]>>4]+20*std::log10(((float)(0x10+(meta[ac3_compr1]&0x0F)))/32);
-                    //Fill(Stream_Audio, program, "AC3_metadata compr", Value, 2);
-                    //Fill_SetOptions(Stream_Audio, program, "AC3_metadata compr", "N NT");
-                    Fill(Stream_Audio, program, "AC3_metadata compr/String", Ztring::ToZtring(Value, 2)+__T(" dB"));
-                    //Fill_SetOptions(Stream_Audio, program, "AC3_metadata compr/String", "N NTN");
+                    float64 Value;
+                    if (meta[ac3_compr1]==0)
+                        Value=0; //Special case in the formula
+                    else
+                        Value=AC3_compr[meta[ac3_compr1]>>4]+20*std::log10(((float)(0x10+(meta[ac3_compr1]&0x0F)))/32);
+                    Fill(Stream_Audio, program, "AC3_Metadata compr", Value, 2);
+                    Fill_SetOptions(Stream_Audio, program, "AC3_Metadata compr", "N NT");
+                    Fill(Stream_Audio, program, "AC3_Metadata compr/String", Ztring::ToZtring(Value, 2)+__T(" dB"));
+                    Fill_SetOptions(Stream_Audio, program, "AC3_Metadata compr/String", "Y NTN");
+                }
+                else if (meta[ac3_compr1])
+                {
+                    Fill(Stream_Audio, program, "AC3_Metadata comprprof", AC3_dynrngprof_Get(meta[ac3_compr1]));
+                    Fill_SetOptions(Stream_Audio, program, "AC3_Metadata comprprof", "Y NT");
                 }
                 if (meta[ac3_dynrnge])
                 {
@@ -3614,22 +3642,68 @@ void File_DolbyE::ac3_metadata_subsegment(bool xbsi)
                         Value=0; //Special case in the formula
                     else
                         Value=AC3_dynrng[meta[ac3_dynrng1]>>5]+20*std::log10(((float)(0x20+(meta[ac3_dynrng1]&0x1F)))/64);
-                    //Fill(Stream_Audio, program, "AC3_metadata dynrng", Value, 2);
-                    //Fill_SetOptions(Stream_Audio, program, "AC3_metadata dynrng", "N NT");
-                    Fill(Stream_Audio, program, "dynrng/String", Ztring::ToZtring(Value, 2)+__T(" dB"));
-                    //Fill_SetOptions(Stream_Audio, program, "AC3_metadata dynrng/String", "N NTN");
+                    Fill(Stream_Audio, program, "AC3_Metadata dynrng", Value, 2);
+                    Fill_SetOptions(Stream_Audio, program, "AC3_Metadata dynrng", "N NT");
+                    Fill(Stream_Audio, program, "AC3_Metadata dynrng/String", Ztring::ToZtring(Value, 2)+__T(" dB"));
+                    Fill_SetOptions(Stream_Audio, program, "AC3_Metadata dynrng/String", "Y NTN");
                 }
-
+                else if (meta[ac3_dynrng1])
+                {
+                    Fill(Stream_Audio, program, "AC3_Metadata dynrngprof", AC3_dynrngprof_Get(meta[ac3_dynrng1]));
+                    Fill_SetOptions(Stream_Audio, program, "AC3_Metadata dynrngprof", "Y NT");
+                }
 
                 // Other metadata
                 if (meta[ac3_cmixlev]<=2)
                 {
-                    Fill(Stream_Audio, program, "AC3_metadata cmixlev/String", Ztring::ToZtring(-3 - ((float)meta[ac3_cmixlev]) * 1.5, 1).To_UTF8() + " dB");
+                    string Value = Ztring::ToZtring(-3 - ((float)meta[ac3_cmixlev]) * 1.5, 1).To_UTF8();
+                    Fill(Stream_Audio, program, "AC3_Metadata cmixlev", Value);
+                    Fill_SetOptions(Stream_Audio, program, "AC3_Metadata cmixlev", "N NT");
+                    Fill(Stream_Audio, program, "AC3_Metadata cmixlev/String", Value + " dB");
+                    Fill_SetOptions(Stream_Audio, program, "AC3_Metadata cmixlev/String", "Y NTN");
                 }
                 if (meta[ac3_surmixlev]<=2)
                 {
-                    Fill(Stream_Audio, program, "AC3_metadata surmixlev/String", (meta[ac3_surmixlev]==2?string("-inf"):to_string(-3 - (int)meta[ac3_cmixlev] * 3)) + " dB");
+                    string Value = (meta[ac3_surmixlev]==2?string("-inf"):to_string(-3 - (int)meta[ac3_cmixlev] * 3));
+                    Fill(Stream_Audio, program, "AC3_Metadata surmixlev", Value + " dB");
+                    Fill_SetOptions(Stream_Audio, program, "AC3_Metadata surmixlev", "N NT");
+                    Fill(Stream_Audio, program, "AC3_Metadata surmixlev/String", Value + " dB");
+                    Fill_SetOptions(Stream_Audio, program, "AC3_Metadata surmixlev/String", "Y NTN");
                 }
+                if (meta[ac3_audprodie])
+                {
+                    string Value = to_string(80 + meta[ac3_mixlevel]);
+                    Fill(Stream_Audio, program, "AC3_Metadata mixlevel", Value);
+                    Fill_SetOptions(Stream_Audio, program, "AC3_Metadata mixlevel", "N NT");
+                    Fill(Stream_Audio, program, "AC3_Metadata mixlevel/String", Value + " dB");
+                    Fill_SetOptions(Stream_Audio, program, "AC3_Metadata mixlevel/String", "Y NTN");
+                    if (meta[ac3_roomtyp]) {
+                        Fill(Stream_Audio, program, "AC3_Metadata roomtyp", AC3_roomtyp[meta[ac3_roomtyp] - 1]);
+                        Fill_SetOptions(Stream_Audio, program, "AC3_Metadata roomtyp", "Y NTY");
+                    }
+                }
+                if (xbsi) {
+                    if (meta[ac3_xbsi1e]) {
+                        if (meta[ac3_dmixmod]) {
+                            Fill(Stream_Audio, program, "AC3_Metadata dmixmod", AC3_dmixmod[meta[ac3_dmixmod] - 1]);
+                            Fill_SetOptions(Stream_Audio, program, "AC3_Metadata dmixmod", "Y NTY");
+                        }
+                        AC3_Level_Fill(this, program, meta[ac3_ltrtcmixlev], 3, 1.5, "AC3_Metadata ltrtcmixlev");
+                        AC3_Level_Fill(this, program, meta[ac3_ltrtsurmixlev], 3, 1.5, "AC3_Metadata ltrtsurmixlev");
+                        AC3_Level_Fill(this, program, meta[ac3_lorocmixlev], 3, 1.5, "AC3_Metadata lorocmixlev");
+                        AC3_Level_Fill(this, program, meta[ac3_lorosurmixlev], 3, 1.5, "AC3_Metadata lorosurmixlev");
+                    }
+                    if (meta[ac3_xbsi2e] && meta[ac3_adconvtyp]) {
+                        Fill(Stream_Audio, program, "AC3_Metadata adconvtyp", "HDCD");
+                        Fill_SetOptions(Stream_Audio, program, "AC3_Metadata adconvtyp", "Y NTY");
+                    }
+                }
+                Fill(Stream_Audio, program, "AC3_Metadata hpfon", meta[ac3_hpfon] ? "Yes" : "No");
+                Fill(Stream_Audio, program, "AC3_Metadata bwlpfon", meta[ac3_bwlpfon] ? "Yes" : "No");
+                Fill(Stream_Audio, program, "AC3_Metadata lfelpfon", meta[ac3_lfelpfon] ? "Yes" : "No");
+                Fill(Stream_Audio, program, "AC3_Metadata sur90on", meta[ac3_sur90on] ? "Yes" : "No");
+                Fill(Stream_Audio, program, "AC3_Metadata suratton", meta[ac3_suratton] ? "Yes" : "No");
+                Fill(Stream_Audio, program, "AC3_Metadata rfpremphon", meta[ac3_rfpremphon] ? "Yes" : "No");
             }
         FILLING_END()
 

@@ -32,7 +32,6 @@ class File_DvDif : public File__Analyze
 public :
     //In
     int64u Frame_Count_Valid;
-    bool   FrameIsAlwaysComplete;
     int8u  AuxToAnalyze; //Only Aux must be parsed
     bool   IgnoreAudio;
 

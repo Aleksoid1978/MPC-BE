@@ -885,6 +885,7 @@ protected :
         int16u BlockAlign;
         int32u QuantizationBits;
         int64u Duration;
+        int8u  Jp2kContentKind;
         int8u  ActiveFormat;
         int8u  FieldTopness;
         int8u  FieldDominance;
@@ -962,6 +963,7 @@ protected :
             QuantizationBits=(int32u)-1;
             Duration=(int64u)-1;
             ActiveFormat=(int8u)-1;
+            Jp2kContentKind=(int8u)-1;
             FieldTopness=(int8u)-1; //Field x is upper field
             FieldDominance=1; //Default is field 1 temporaly first
             Type=Type_Unknown;
@@ -1287,8 +1289,6 @@ protected :
         int64u SDTI_PackageMetadataSet_Trace_Count;
         int64u Padding_Trace_Count;
     #endif // MEDIAINFO_TRACE
-    TimeCode SystemScheme1_TimeCodeArray_StartTimecode;
-    int64u SystemScheme1_FrameRateFromDescriptor;
     bool   Essences_FirstEssence_Parsed;
     bool   MayHaveCaptionsInStream;
     bool   StereoscopicPictureSubDescriptor_IsPresent;
@@ -1296,17 +1296,13 @@ protected :
     int32u Essences_UsedForFrameCount;
     int32u IndexTable_NSL;
     int32u IndexTable_NPE;
-    struct systemscheme
+    struct systemscheme1
     {
-        bool IsTimeCode;
-
-        systemscheme()
-        {
-            IsTimeCode=false;
-        }
+        vector<TimeCode> TimeCodeArray_StartTimecodes;
+        string ID;
     };
-    typedef std::map<int16u, systemscheme> systemschemes;
-    systemschemes SystemSchemes;
+    typedef std::map<int16u, systemscheme1> systemscheme1s;
+    systemscheme1s SystemScheme1s;
     #if MEDIAINFO_ADVANCED
         int64u Footer_Position;
     #endif //MEDIAINFO_ADVANCED

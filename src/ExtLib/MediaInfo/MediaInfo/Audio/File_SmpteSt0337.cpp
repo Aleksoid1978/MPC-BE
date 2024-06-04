@@ -164,7 +164,7 @@ File_SmpteSt0337::File_SmpteSt0337()
         ParserIDs[0]=MediaInfo_Parser_Aes3;
     #endif // MEDIAINFO_EVENTS
     MustSynchronize=true;
-    Buffer_TotalBytes_FirstSynched_Max=256*1024;
+    Buffer_TotalBytes_FirstSynched_Max=1024*1024;
     PTS_DTS_Needed=true;
 
     // In
@@ -449,12 +449,6 @@ bool File_SmpteSt0337::Synchronize()
     // Synchronizing
     while (Buffer_Offset+16<=Buffer_Size)
     {
-        if (!Status[IsAccepted] && File_Offset_FirstSynched==(int64u)-1 && Buffer_TotalBytes+Buffer_Offset>=Buffer_TotalBytes_FirstSynched_Max)
-        {
-            Reject();
-            return false;
-        }
-
         if ((BitDepth==0 || BitDepth==16) && (!Aligned || ((Buffer_TotalBytes+Buffer_Offset)%4)==0))
         {
             if (Buffer[Buffer_Offset  ]==0xF8
@@ -691,7 +685,7 @@ bool File_SmpteSt0337::Synchronize()
         return false;
     }
 
-    if (!Status[IsAccepted])
+    if (!Status[IsAccepted] && IsSub)
         Accept("SMPTE ST 337");
 
     // Guard band
@@ -998,7 +992,7 @@ void File_SmpteSt0337::Header_Parse()
     }
 
     // Coherency test
-    if (!IsSub && !Status[IsAccepted])
+    if (!IsSub && !Status[IsAccepted] && File_Offset+Buffer_Size<File_Size)
     {
         size_t Offset=Buffer_Offset+(size_t)(BitDepth*4/8+Size/8);
         while (Offset<Buffer_Size && Buffer[Offset]==0x00)
@@ -1656,7 +1650,10 @@ void File_SmpteSt0337::Data_Parse()
         if (Frame_Count_NotParsedIncluded!=(int64u)-1)
             Frame_Count_NotParsedIncluded++;
 
-        if (Parser==NULL || (Frame_Count>=2 && Parser->Status[IsFilled]))
+        int64u Frame_Count_Valid=1+(File_Offset+Buffer_Size<File_Size);
+        if (!Status[IsAccepted] && Frame_Count>=Frame_Count_Valid && (!Parser || Parser->Status[IsAccepted]))
+            Accept("SMPTE ST 337");
+        if (!Status[IsFilled] && Frame_Count>=2 && (!Parser || Parser->Status[IsFilled]))
         {
             Fill("SMPTE ST 337");
             if (!IsSub && Config->ParseSpeed<1.0)
@@ -1665,7 +1662,7 @@ void File_SmpteSt0337::Data_Parse()
                 Finish();
             }
         }
-        if (Parser==NULL || (Frame_Count>=2 && Parser->Status[IsFinished]))
+        if (!Status[IsFinished] && Frame_Count>=2 && (!Parser || Parser->Status[IsFinished]))
             Finish("SMPTE ST 337");
     FILLING_END();
 

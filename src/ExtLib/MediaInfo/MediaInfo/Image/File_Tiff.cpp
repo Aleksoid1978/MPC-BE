@@ -255,6 +255,7 @@ bool File_Tiff::FileHeader_Begin()
     //All should be OK...
     Accept("TIFF");
     Fill(Stream_General, 0, General_Format, "TIFF");
+    ExpectedFileSize=0;
     #if defined(MEDIAINFO_ICC_YES)
         ICC_Parser=nullptr;
     #endif //defined(MEDIAINFO_ICC_YES)
@@ -519,6 +520,33 @@ void File_Tiff::Data_Parse_Fill()
     //ICC
     if (ICC_Parser)
         Merge(*ICC_Parser, Stream_Image, 0, 0);
+
+    //FileSize
+    Info = Infos.find(Tiff_Tag::StripOffsets);
+    if (Info != Infos.end())
+    {
+        size_t ExpectedFileSize_Pos=(int64u)-1;
+        for (size_t i=0; i<Info->second.size(); i++)
+        {
+            auto Offset=Info->second[i].To_int64u();
+            if (ExpectedFileSize<Offset)
+            {
+                ExpectedFileSize=Offset;
+                ExpectedFileSize_Pos=i;
+            }
+        }
+        if (ExpectedFileSize!=(int64u)-1)
+        {
+            Info = Infos.find(Tiff_Tag::StripByteCounts);
+            if (Info != Infos.end() && ExpectedFileSize_Pos<Info->second.size())
+            {
+                ExpectedFileSize+=Info->second[ExpectedFileSize_Pos].To_int64u();
+            }
+        }
+        
+        if (ExpectedFileSize>File_Size)
+            IsTruncated(ExpectedFileSize, false, "TIFF");
+    }
 }
 
 //***************************************************************************
@@ -558,6 +586,9 @@ void File_Tiff::Read_Directory()
         int32u IFDOffset;
         Get_X4 (IFDOffset,                                      "IFDOffset");
         IfdItems[IFDOffset]=IfdItem;
+        auto End=IFDOffset+Size;
+        if (ExpectedFileSize<End)
+            ExpectedFileSize=End;
     }
     Element_End0();
 }

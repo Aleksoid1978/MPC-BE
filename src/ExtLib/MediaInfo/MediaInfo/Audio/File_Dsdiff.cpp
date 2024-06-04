@@ -284,17 +284,17 @@ void File_Dsdiff::Header_Parse()
     Get_C4 (Name,                                               "Name");
     Get_B8 (Size,                                               "Size");
 
+    //Coherency check
+    if (File_Offset+Buffer_Offset+12+Size>File_Size)
+    {
+        if (Element_Level<=2) //Incoherencies info only at the top level chunk
+            IsTruncated(File_Offset+Buffer_Offset+12+Size, false, "DSDIFF");
+        Size=File_Size-(File_Offset+Buffer_Offset+Element_Offset);
+    }
+
     //Top level chunks
     if (Name==Elements::FRM8)
         Get_C4 (Name,                                           "Real Name");
-
-    //Coherency check
-    if (File_Offset+Buffer_Offset+Size>File_Size)
-    {
-        Size=File_Size-(File_Offset+Buffer_Offset);
-        if (Element_Level<=2) //Incoherencies info only at the top level chunk
-            Fill(Stream_General, 0, "IsTruncated", "Yes");
-    }
 
     //Padding
     if (Size%2)

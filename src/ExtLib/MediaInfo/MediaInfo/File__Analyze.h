@@ -75,6 +75,13 @@ static inline int8u ReverseBits(int8u c)
 
 string uint128toString(uint128 Value, int radix);
 
+enum conformance_type {
+    Conformance_Error,
+    Conformance_Warning,
+    Conformance_Information,
+    Conformance_Max,
+};
+
 #if !MEDIAINFO_TRACE
     #include "MediaInfo/File__Analyze_MinimizeSize.h"
 #else
@@ -250,6 +257,7 @@ public :
     int64u Field_Count_InThisBlock;
     int64u Frame_Count_NotParsedIncluded;
     int64u FrameNumber_PresentationOrder;
+    bool   FrameIsAlwaysComplete;
     bool   Synched;                    //Data is synched
     bool   UnSynched_IsNotJunk;        //Data is actually synched
     bool   MustExtendParsingDuration;  //Data has some substreams difficult to detect (e.g. captions), must wait a bit before final filling
@@ -1360,6 +1368,7 @@ protected :
     friend class File__Tags_Helper;
     friend class File_Usac;
     friend class File_Mk;
+    friend class File_Riff;
     friend class File_Mpeg4;
     friend class File_Hevc;
 
@@ -1513,6 +1522,29 @@ public :
         int64u              Hash_Offset;
         int64u              Hash_ParseUpTo;
     #endif //MEDIAINFO_HASH
+
+    #if MEDIAINFO_CONFORMANCE
+        void*               Conformance_Data;
+        void                Fill_Conformance(const char* Field, const char* Value, uint8_t Flags = {}, conformance_type Level = Conformance_Error, stream_t StreamKind = Stream_General, size_t StreamPos = 0);
+        void                Fill_Conformance(const char* Field, const string& Value, uint8_t Flags = {}, conformance_type Level = Conformance_Error) { Fill_Conformance(Field, Value.c_str(), Flags, Level); }
+        void                Clear_Conformance();
+        void                Merge_Conformance(bool FromConfig = false);
+        void                Streams_Finish_Conformance();
+        virtual string      CreateElementName();
+        void                IsTruncated(int64u ExpectedSize = (int64u)-1, bool MoreThan = false, const char* Prefix = nullptr);
+        void                RanOutOfData(const char* Prefix = nullptr);
+        void                SynchLost(const char* Prefix = nullptr);
+    #else //MEDIAINFO_CONFORMANCE
+        void                Fill_Conformance(const char* Field, const char* Value, uint8_t Flags = {}, conformance_type Level = Conformance_Error, stream_t StreamKind = Stream_General, size_t StreamPos = 0) {}
+        void                Fill_Conformance(const char* Field, const string& Value, uint8_t Flags = {}, conformance_type Level = Conformance_Error) { Fill_Conformance(Field, Value.c_str(), Flags, Level); }
+        void                Clear_Conformance() {}
+        void                Merge_Conformance(bool FromConfig = false) {}
+        void                Streams_Finish_Conformance() {}
+        string              CreateElementName() { return {}; }
+        void                IsTruncated(int64u ExpectedSize = (int64u)-1, bool MoreThan = false, const char* = nullptr) {}
+        void                RanOutOfData(const char* = nullptr) { Trusted_IsNot(); }
+        void                SynchLost(const char* = nullptr) { Trusted_IsNot(); }
+    #endif //MEDIAINFO_CONFORMANCE
 
     #if MEDIAINFO_SEEK
     private:

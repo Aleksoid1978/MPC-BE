@@ -59,7 +59,9 @@ private :
     //Elements
     void id_07();
     void id_0D();
+    void id_0E();
     void id_25();
+    void id_27();
 
     //Temp - Technical info
     int32u total_samples_FirstFrame;
@@ -72,8 +74,12 @@ private :
     bool   hybrid;
     bool   joint_stereo;
     bool   cross_channel_decorrelation;
-    int8u  SamplingRate;
+    bool   correction;
+    bool   dsf;
+    int8u  SamplingRate_Index;
+    int8u  SamplingRate_Shift;
     int8u  num_channels;
+    int32u SamplingRate;
     int32u channel_mask;
     int32u Size;
     int16u version;

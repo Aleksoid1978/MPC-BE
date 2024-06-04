@@ -25,7 +25,6 @@ class File_Mpega : public File__Analyze, public File__Tags_Helper
 public :
     //In
     int64u Frame_Count_Valid;
-    bool   FrameIsAlwaysComplete;
     bool   CalculateDelay;
 
     //Constructor/Destructor

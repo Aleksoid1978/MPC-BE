@@ -78,6 +78,14 @@ const char* Av1_frame_type[4] =
     "Switch",
 };
 
+//---------------------------------------------------------------------------
+static const char* Av1_chroma_sample_position[3] =
+{
+    "Type 0",
+    "Type 2",
+    "3",
+};
+
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -251,7 +259,7 @@ void File_Av1::sequence_header()
 {
     //Parsing
     int32u max_frame_width_minus_1, max_frame_height_minus_1;
-    int8u seq_profile, seq_level_idx[33], operating_points_cnt_minus_1, buffer_delay_length_minus_1, frame_width_bits_minus_1, frame_height_bits_minus_1, seq_force_screen_content_tools, BitDepth, color_primaries, transfer_characteristics, matrix_coefficients;
+    int8u seq_profile, seq_level_idx[33], operating_points_cnt_minus_1, buffer_delay_length_minus_1, frame_width_bits_minus_1, frame_height_bits_minus_1, seq_force_screen_content_tools, BitDepth, color_primaries, transfer_characteristics, matrix_coefficients, chroma_sample_position;
     bool reduced_still_picture_header, seq_tier[33], timing_info_present_flag, decoder_model_info_present_flag, seq_choose_screen_content_tools, mono_chrome, color_range, color_description_present_flag, subsampling_x, subsampling_y;
     BS_Begin();
     Get_S1 ( 3, seq_profile,                                    "seq_profile"); Param_Info1(Av1_seq_profile(seq_profile));
@@ -408,7 +416,7 @@ void File_Av1::sequence_header()
                 }
             } 
             if (subsampling_x && subsampling_y)
-                Skip_S1( 2,                                     "chroma_sample_position");
+                Get_S1 ( 2, chroma_sample_position,             "chroma_sample_position");
         }
         Skip_SB(                                                "separate_uv_delta_q");
     Element_End0();
@@ -430,7 +438,11 @@ void File_Av1::sequence_header()
             Fill(Stream_Video, 0, Video_BitDepth, BitDepth);
             Fill(Stream_Video, 0, Video_ColorSpace, mono_chrome?"Y":((color_primaries==1 && transfer_characteristics==13 && matrix_coefficients==0)?"RGB":"YUV"));
             if (Retrieve(Stream_Video, 0, Video_ColorSpace)==__T("YUV"))
+            {
                 Fill(Stream_Video, 0, Video_ChromaSubsampling, subsampling_x?(subsampling_y?"4:2:0":"4:2:2"):"4:4:4"); // "!subsampling_x && subsampling_y" (4:4:0) not possible
+                if (subsampling_x && subsampling_y && chroma_sample_position)
+                    Fill(Stream_Video, 0, Video_ChromaSubsampling_Position, Av1_chroma_sample_position[chroma_sample_position-1]);
+            }
             if (color_description_present_flag)
             {
                 Fill(Stream_Video, 0, Video_colour_description_present, "Yes");

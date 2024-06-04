@@ -1654,7 +1654,7 @@ void File_Mk::Header_Parse()
     {
         Param_Error("TRUNCATED-ELEMENT:1");
         if (Element_Level<=2)
-            Fill(Stream_General, 0, "IsTruncated", "Yes");
+            IsTruncated(File_Offset+Buffer_Offset+Element_Offset+Size, true, "Matroska");
     }
 
     //Should we parse Cluster?

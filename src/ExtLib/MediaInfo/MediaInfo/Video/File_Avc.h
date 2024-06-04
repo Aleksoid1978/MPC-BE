@@ -33,7 +33,6 @@ class File_Avc :
 public :
     //In
     int64u Frame_Count_Valid;
-    bool   FrameIsAlwaysComplete;
     bool   MustParse_SPS_PPS;
     bool   SizedBlocks;
 

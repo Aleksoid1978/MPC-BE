@@ -843,7 +843,7 @@ bool File_Mpega::Synched_Test()
      || (Buffer[Buffer_Offset+2]&0xF0)==0xF0
      || (Buffer[Buffer_Offset+2]&0x0C)==0x0C)
     {
-        Synched=false;
+        SynchLost("MPEG-Audio");
         return true;
     }
 
@@ -854,7 +854,7 @@ bool File_Mpega::Synched_Test()
     int8u sampling_frequency0=(CC1(Buffer+Buffer_Offset+2)>>2)&0x03;
     if (Mpega_SamplingRate[ID0][sampling_frequency0]==0 || Mpega_Coefficient[ID0][layer0]==0 || Mpega_BitRate[ID0][layer0][bitrate_index0]==0 || Mpega_SlotSize[layer0]==0)
     {
-        Synched=false;
+        SynchLost("MPEG Audio");
         return true;
     }
 
@@ -982,8 +982,11 @@ void File_Mpega::Data_Parse()
     }
 
     //Partial frame
-    if (Header_Size + Element_Size<((int64u)Mpega_Coefficient[ID][layer] * (int64u)Mpega_BitRate[ID][layer][bitrate_index] * 1000 / (int64u)Mpega_SamplingRate[ID][sampling_frequency] + (padding_bit ? 1 : 0)) * (int64u)Mpega_SlotSize[layer])
+    auto FrameSize = ((int64u)Mpega_Coefficient[ID][layer] * (int64u)Mpega_BitRate[ID][layer][bitrate_index] * 1000 / (int64u)Mpega_SamplingRate[ID][sampling_frequency] + (padding_bit ? 1 : 0))* (int64u)Mpega_SlotSize[layer];
+    auto RealFrameSize = Header_Size + Element_Size;
+    if (RealFrameSize < FrameSize)
     {
+        IsTruncated(File_Offset+Buffer_Offset+RealFrameSize, true, "MPEG-Audio");
         Element_Name("Partial frame");
         Skip_XX(Element_Size,                                   "Data");
         return;

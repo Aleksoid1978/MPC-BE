@@ -1077,9 +1077,6 @@ int MediaInfo_Internal::ListFormats(const String &File_Name)
     #if defined(MEDIAINFO_MPCSV8_YES)
         delete Info; Info=new File_MpcSv8();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
-    #if defined(MEDIAINFO_MPEGA_YES)
-        delete Info; Info=new File_Mpega();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
-    #endif
     #if defined(MEDIAINFO_OPENMG_YES)
         delete Info; Info=new File_OpenMG();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
@@ -1210,6 +1207,9 @@ int MediaInfo_Internal::ListFormats(const String &File_Name)
     #endif
 
     //At the end, too much sensible
+    #if defined(MEDIAINFO_MPEGA_YES)
+        delete Info; Info=new File_Mpega();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+    #endif
     #if defined(MEDIAINFO_TGA_YES)
         delete Info; Info=new File_Tga();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1; //At the end, too much sensible
     #endif

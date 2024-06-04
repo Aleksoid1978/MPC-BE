@@ -89,7 +89,6 @@ class File_Aac : public File_Usac, public File__Tags_Helper
 public :
     //In
     int64u  Frame_Count_Valid;
-    bool    FrameIsAlwaysComplete;
     enum mode
     {
         Mode_Unknown,

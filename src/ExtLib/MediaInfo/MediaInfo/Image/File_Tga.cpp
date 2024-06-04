@@ -83,7 +83,6 @@ File_Tga::File_Tga()
 {
     //Configuration
     ParserName="TGA";
-    Buffer_MaximumSize=64*1024*1024; //Some big frames are possible (e.g YUV 4:2:2 10 bits 1080p)
 }
 
 //***************************************************************************
@@ -94,7 +93,6 @@ File_Tga::File_Tga()
 void File_Tga::Streams_Fill()
 {
     Fill(Stream_General, 0, General_Format, "TGA");
-    Fill(Stream_General, 0, General_Format_Version, __T("Version ")+Ztring::ToZtring(Version));
     Fill(Stream_General, 0, General_Title, Image_ID);
 
     Stream_Prepare(Stream_Image);
@@ -104,6 +102,13 @@ void File_Tga::Streams_Fill()
     Fill(Stream_Image, 0, Image_Width, Image_Width_);
     Fill(Stream_Image, 0, Image_Height, Image_Height_);
     Fill(Stream_Image, 0, Image_BitDepth, Pixel_Depth);
+}
+
+//---------------------------------------------------------------------------
+void File_Tga::Streams_Finish()
+{
+    if (Version)
+        Fill(Stream_General, 0, General_Format_Version, __T("Version ")+Ztring::ToZtring(Version));
 }
 
 //***************************************************************************
@@ -122,7 +127,7 @@ bool File_Tga::FileHeader_Begin()
         Reject();
         return false;
     }
-    if (Buffer_Size<File_Size)
+    if (Buffer_Size<18+(size_t)Buffer[0])
         return false; //Must wait for more data
 
     //All should be OK...
@@ -137,13 +142,14 @@ bool File_Tga::FileHeader_Begin()
 void File_Tga::Read_Buffer_Continue()
 {
     //Parsing
+    if (Status[IsAccepted])
+    {
+        Tga_File_Footer();
+        return;
+    }
     Tga_File_Header();
-    Image_Color_Map_Data();
-    Tga_File_Footer();
 
     FILLING_BEGIN();
-        //Coherency in case of no magic value
-        if (Version==1)
         {
             switch (Image_Type)
             {
@@ -210,12 +216,14 @@ void File_Tga::Read_Buffer_Continue()
                             return;
                             ;
             }
+            static const int64u MinFileSizeCheck=18+255+0x1000;
+            if (File_Size!=(int64u)-1 && File_Size>MinFileSizeCheck && Image_Width_*Image_Height_*(Pixel_Depth>>3)<File_Size-MinFileSizeCheck)
+                Reject();
         }
-
         Accept();
-        Fill();
-        Finish();
     FILLING_END();
+
+    Image_Color_Map_Data();
 }
 
 //***************************************************************************
@@ -260,8 +268,24 @@ void File_Tga::Image_Color_Map_Data()
         Skip_XX(Color_map_Length*EntrySizeInBits/8,             "Color Map Data");
 
     }
-    if (Element_Offset+26<Element_Size
-     && Buffer[Buffer_Size- 18]==0x54
+    int64u ImageDataEnd;
+    if (File_Size==(int64u)-1 || File_Size-Element_Offset<26)
+        ImageDataEnd=Element_Size;
+    else
+        ImageDataEnd=File_Size-26; // 26 in case of version 2 footer
+    Skip_XX(ImageDataEnd-Element_Offset,                        "Image Data");
+    Element_End0();
+}
+
+//---------------------------------------------------------------------------
+void File_Tga::Tga_File_Footer()
+{
+    if (Buffer_Size<26)
+    {
+        Element_WaitForMoreData();
+        return;
+    }
+    if (Buffer[Buffer_Size- 18]==0x54
      && Buffer[Buffer_Size- 17]==0x52
      && Buffer[Buffer_Size- 16]==0x55
      && Buffer[Buffer_Size- 15]==0x45
@@ -282,23 +306,22 @@ void File_Tga::Image_Color_Map_Data()
         Version=2;
      else
         Version=1;
-    Skip_XX(Element_Size-Element_Offset-(Version==2?26:0),      "Image Data");
-    Element_End0();
-}
 
-//---------------------------------------------------------------------------
-void File_Tga::Tga_File_Footer()
-{
     if (Version==1)
-        return; //No footer
+    {
+        Skip_XX(Element_Size-Element_Offset,                    "Image Data"); // Continuing
+        return;
+    }
 
-    Element_Begin1("Image/color Map Data");
+    Element_Begin1("File Footer");
     Skip_L4(                                                    "Extension Area Offset");
     Skip_L4(                                                    "Developer Directory Offset");
     Skip_Local(16,                                              "Signature");
     Skip_Local( 1,                                              "Reserved Character");
     Skip_L1(                                                    "Binary Zero String Terminator");
     Element_End0();
+
+    Accept();
 }
 
 } //NameSpace

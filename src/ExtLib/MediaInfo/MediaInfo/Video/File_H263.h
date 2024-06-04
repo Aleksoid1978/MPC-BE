@@ -31,7 +31,6 @@ class File_H263 : public File__Analyze
 public :
     //In
     int64u Frame_Count_Valid;
-    bool   FrameIsAlwaysComplete;
 
     //Constructor/Destructor
     File_H263();

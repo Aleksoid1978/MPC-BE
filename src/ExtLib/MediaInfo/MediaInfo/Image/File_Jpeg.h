@@ -32,6 +32,7 @@ public :
     //In
     stream_t StreamKind;
     bool     Interlaced;
+    int8u    MxfContentKind;
     #if MEDIAINFO_DEMUX
     float64  FrameRate;
     #endif //MEDIAINFO_DEMUX

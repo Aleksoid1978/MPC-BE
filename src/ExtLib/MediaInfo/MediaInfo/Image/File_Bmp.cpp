@@ -41,19 +41,16 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-static const char* Bmp_CompressionMethod(int32u CompressionMethod)
+static const char* Bmp_CompressionMethod[]
 {
-    switch(CompressionMethod)
-    {
-        case 0 : return "RGB";
-        case 1 : return "RLE8";
-        case 2 : return "RLE4";
-        case 3 : return "Bit field";
-        case 4 : return "JPEG";
-        case 5 : return "PNG";
-        default: return "";
-    }
-}
+    "Raw",
+    "RLE8",
+    "RLE4",
+    "Bit field",
+    "JPEG",
+    "PNG",
+};
+static const size_t Bmp_CompressionMethod_Size=sizeof(Bmp_CompressionMethod)/sizeof(Bmp_CompressionMethod[0]);
 
 //***************************************************************************
 // Static stuff
@@ -208,7 +205,7 @@ void File_Bmp::BitmapInfoHeader(int8u Version)
     Get_L4 (Height,                                             "Height");
     Skip_L2(                                                    "Color planes");
     Get_L2 (BitsPerPixel,                                       "Bits per pixel");
-    Get_L4 (CompressionMethod,                                  "Compression method"); Param_Info1(Bmp_CompressionMethod(CompressionMethod));
+    Get_L4 (CompressionMethod,                                  "Compression method"); Param_Info1C(CompressionMethod<Bmp_CompressionMethod_Size, Bmp_CompressionMethod[CompressionMethod]);
     Skip_L4(                                                    "Image size");
     Skip_L4(                                                    "Horizontal resolution");
     Skip_L4(                                                    "Vertical resolution");
@@ -216,20 +213,55 @@ void File_Bmp::BitmapInfoHeader(int8u Version)
     Skip_L4(                                                    "Number of important colors used");
 
     FILLING_BEGIN();
-        if (BitsPerPixel<8 && Palette)
+        bool IsGray=false;
+        bool IsRGB=false;
+        bool IsAlpha=false;
+        if (Palette)
+        {
             BitsPerPixel=8; //It is a palette
+            IsRGB=true;
+        }
+        else if (CompressionMethod==3) //Bit field
+        {
+            BitsPerPixel=0; //Not supported
+        }
+        else
+        {
+            switch (BitsPerPixel)
+            {
+                case  8: IsGray=true; break;
+                case 24: IsRGB=true; break;
+                case 32: IsRGB=true; IsAlpha=true; break;
+            }
+        }
 
         Fill(Stream_Image, 0, Image_Width, Width);
-    const int32s sHeight = int32s(Height);
-    Fill(Stream_Image, 0, Image_Height, std::abs(sHeight));
-    if (sHeight < 0)
-    {
-        Fill(Stream_Image, 0, "Method", "Top down");
-    }
-        Fill(Stream_Image, 0, Image_BitDepth, BitsPerPixel);
-        Fill(Stream_Image, 0, Image_Format, Bmp_CompressionMethod(CompressionMethod));
-        Fill(Stream_Image, 0, Image_Codec, Bmp_CompressionMethod(CompressionMethod));
-        Fill(Stream_Image, 0, Image_ColorSpace, "RGB");
+        const int32s sHeight = int32s(Height);
+        Fill(Stream_Image, 0, Image_Height, std::abs(sHeight));
+        if (sHeight < 0)
+        {
+            Fill(Stream_Image, 0, "Method", "Top down");
+        }
+        if (BitsPerPixel)
+            Fill(Stream_Image, 0, Image_BitDepth, BitsPerPixel);
+        if (CompressionMethod<Bmp_CompressionMethod_Size)
+        {
+            Fill(Stream_Image, 0, Image_Format, Bmp_CompressionMethod[CompressionMethod]);
+            Fill(Stream_Image, 0, Image_Codec, Bmp_CompressionMethod[CompressionMethod]);
+        }
+        else
+        {
+            Fill(Stream_Image, 0, Image_Format, CompressionMethod);
+            Fill(Stream_Image, 0, Image_Codec, CompressionMethod);
+        }
+        string ColorSpace;
+        if (IsRGB)
+            ColorSpace+="RGB";
+        if (IsGray)
+            ColorSpace+="Y";
+        if (IsAlpha)
+            ColorSpace+="A";
+        Fill(Stream_Image, 0, Image_ColorSpace, ColorSpace);
     FILLING_END();
 
     if (Version>1)

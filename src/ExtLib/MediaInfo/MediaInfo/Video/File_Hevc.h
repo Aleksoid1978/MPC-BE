@@ -26,7 +26,6 @@ class File_Hevc : public File__Analyze
 public :
     //In
     int64u Frame_Count_Valid;
-    bool   FrameIsAlwaysComplete;
     bool   MustParse_VPS_SPS_PPS;
     bool   MustParse_VPS_SPS_PPS_FromMatroska;
     bool   MustParse_VPS_SPS_PPS_FromFlv;

@@ -35,7 +35,6 @@ public :
     //In
     int8u  MPEG_Version;
     int64u Frame_Count_Valid;
-    bool   FrameIsAlwaysComplete;
     bool   TimeCodeIsNotTrustable;
     #if defined(MEDIAINFO_ANCILLARY_YES)
         File_Ancillary** Ancillary;
