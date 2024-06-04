@@ -30,6 +30,7 @@ Updated Spanish translation (by IPeluchito).
 
 Updated libraries:
 	ffmpeg git-n7.1-dev-1050-g2c38ca3d37;
+	Little-CMS git-lcms2.16-59-g2daf5c5;
 	MediaInfo git-v24.05-gd9ba2b6c;
 	vvdec git-v2.3.0-5-gffe3010.
 

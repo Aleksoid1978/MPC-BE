@@ -1263,7 +1263,7 @@ void EmitXYZ2Lab(cmsIOHANDLER* m)
 // 8 bits.
 
 static
-int WriteOutputLUT(cmsIOHANDLER* m, cmsHPROFILE hProfile, cmsUInt32Number Intent, cmsUInt32Number dwFlags)
+cmsBool WriteOutputLUT(cmsIOHANDLER* m, cmsHPROFILE hProfile, cmsUInt32Number Intent, cmsUInt32Number dwFlags)
 {
     cmsHPROFILE hLab;
     cmsHTRANSFORM xform;
@@ -1281,7 +1281,7 @@ int WriteOutputLUT(cmsIOHANDLER* m, cmsHPROFILE hProfile, cmsUInt32Number Intent
     cmsStage* first;
 
     hLab = cmsCreateLab4ProfileTHR(m ->ContextID, NULL);
-    if (hLab == NULL) return 0;
+    if (hLab == NULL) return FALSE;
 
     OutputFormat = cmsFormatterForColorspaceOfProfile(hProfile, 2, FALSE);
     nChannels    = T_CHANNELS(OutputFormat);
@@ -1306,7 +1306,7 @@ int WriteOutputLUT(cmsIOHANDLER* m, cmsHPROFILE hProfile, cmsUInt32Number Intent
 
     if (xform == NULL) {        
         cmsSignalError(m ->ContextID, cmsERROR_COLORSPACE_CHECK, "Cannot create transform Lab -> Profile in CRD creation");
-        return 0;
+        return FALSE;
     }
 
     // Get a copy of the internal devicelink
@@ -1314,16 +1314,21 @@ int WriteOutputLUT(cmsIOHANDLER* m, cmsHPROFILE hProfile, cmsUInt32Number Intent
     DeviceLink = cmsPipelineDup(v ->Lut);
     if (DeviceLink == NULL) {
         cmsDeleteTransform(xform);
-        return 0;
+        cmsSignalError(m->ContextID, cmsERROR_CORRUPTION_DETECTED, "Cannot access link for CRD");
+        return FALSE;
     }
 
      // We need a CLUT
     dwFlags |= cmsFLAGS_FORCE_CLUT;
-    _cmsOptimizePipeline(m->ContextID, &DeviceLink, RelativeEncodingIntent, &InFrm, &OutputFormat, &dwFlags);
+    if (!_cmsOptimizePipeline(m->ContextID, &DeviceLink, RelativeEncodingIntent, &InFrm, &OutputFormat, &dwFlags)) {
+        cmsPipelineFree(DeviceLink);
+        cmsDeleteTransform(xform);
+        cmsSignalError(m->ContextID, cmsERROR_CORRUPTION_DETECTED, "Cannot create CLUT table for CRD");
+        return FALSE;
+    }
 
     _cmsIOPrintf(m, "<<\n");
     _cmsIOPrintf(m, "/ColorRenderingType 1\n");
-
 
     cmsDetectBlackPoint(&BlackPointAdaptedToD50, hProfile, Intent, 0);
 
@@ -1368,7 +1373,7 @@ int WriteOutputLUT(cmsIOHANDLER* m, cmsHPROFILE hProfile, cmsUInt32Number Intent
     cmsPipelineFree(DeviceLink);
     cmsDeleteTransform(xform);
 
-    return 1;
+    return TRUE;
 }
 
 
