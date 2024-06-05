@@ -21,6 +21,9 @@ Playback speed can now be changed in 1% increments.
 When saving only audio from YouTube, add cover art to the audio file using the available FFmpeg.
 Added timeout time setting when receiving data from the network.
 
+Installer
+MPC Video Renderer 0.8.3 is included in the installer.
+
 Updated Hungarian translation (by mickey).
 Updated Chinese (Simplified) translation (by wushantao).
 Updated German translation (by Klaus1189).
