@@ -30,6 +30,7 @@ Updated German translation (by Klaus1189).
 Updated Turkish translation (by cmhrky).
 Updated Italian translation (by mapi68).
 Updated Spanish translation (by IPeluchito).
+Updated Japanese translation (by tsubasanouta).
 
 Updated libraries:
 	ffmpeg git-n7.1-dev-1050-g2c38ca3d37;
