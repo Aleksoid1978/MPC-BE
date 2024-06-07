@@ -434,11 +434,11 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 37		"顯示搜尋時間"
 38		"停用「開啟光碟」選單"
 39		"程式優先順序調成標準以上"
-40		"Network timeouts"
-41		"Connection:"
+40		"網路逾時"
+41		"連線逾時："
 44		"秒"
-45		"Receiving data:"
-48		"sec."
+45		"接收逾時："
+48		"秒"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37

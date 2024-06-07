@@ -434,10 +434,10 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 37		"Toon gezochte tijd"
 38		"Menu ""Schijf openen"" uitschakelen"
 39		"Procesprioriteit ""hoger dan normaal"""
-40		"Network timeouts"
-41		"Connection:"
+40		"Netwerktime-outs"
+41		"Time-out voor verbinding:"
 44		"sec."
-45		"Receiving data:"
+45		"Time-out voor ontvangen:"
 48		"sec."
 END
 
