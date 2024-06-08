@@ -63,6 +63,7 @@
     <ClInclude Include="BaseClasses\dllsetup.h" />
     <ClInclude Include="BaseClasses\dxmperf.h" />
     <ClInclude Include="BaseClasses\fourcc.h" />
+    <ClInclude Include="BaseClasses\guidutil.h" />
     <ClInclude Include="BaseClasses\measure.h" />
     <ClInclude Include="BaseClasses\msgthrd.h" />
     <ClInclude Include="BaseClasses\mtype.h" />
@@ -101,6 +102,7 @@
     <ClCompile Include="BaseClasses\ddmm.cpp" />
     <ClCompile Include="BaseClasses\dllentry.cpp" />
     <ClCompile Include="BaseClasses\dllsetup.cpp" />
+    <ClCompile Include="BaseClasses\guidutil.cpp" />
     <ClCompile Include="BaseClasses\mtype.cpp" />
     <ClCompile Include="BaseClasses\outputq.cpp" />
     <ClCompile Include="BaseClasses\perflog.cpp" />

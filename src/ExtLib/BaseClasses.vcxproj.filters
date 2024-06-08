@@ -44,6 +44,9 @@
     <ClInclude Include="BaseClasses\fourcc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BaseClasses\guidutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="BaseClasses\measure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -152,6 +155,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BaseClasses\dllsetup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseClasses\guidutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BaseClasses\mtype.cpp">
