@@ -67,7 +67,7 @@ void ff_dxva2_hevc_fill_picture_parameters(const AVCodecContext *avctx, AVDXVACo
 // ==> End patch MPC
 {
     const HEVCContext *h = avctx->priv_data;
-    const HEVCFrame *current_picture = h->ref;
+    const HEVCFrame *current_picture = h->cur_frame;
     const HEVCSPS *sps = h->ps.sps;
     const HEVCPPS *pps = h->ps.pps;
     int i, j;
@@ -211,7 +211,7 @@ void ff_dxva2_hevc_fill_picture_parameters(const AVCodecContext *avctx, AVDXVACo
         }
 
         if (frame) {
-            fill_picture_entry(&pp->RefPicList[i], ff_dxva2_get_surface_index(avctx, ctx, frame->frame, 0), !!(frame->flags & HEVC_FRAME_FLAG_LONG_REF));
+            fill_picture_entry(&pp->RefPicList[i], ff_dxva2_get_surface_index(avctx, ctx, frame->f, 0), !!(frame->flags & HEVC_FRAME_FLAG_LONG_REF));
             pp->PicOrderCntValList[i] = frame->poc;
         } else {
             pp->RefPicList[i].bPicEntry = 0xff;
@@ -219,7 +219,7 @@ void ff_dxva2_hevc_fill_picture_parameters(const AVCodecContext *avctx, AVDXVACo
         }
     }
 
-    fill_picture_entry(&pp->CurrPic, ff_dxva2_get_surface_index(avctx, ctx, current_picture->frame, 1), 0);
+    fill_picture_entry(&pp->CurrPic, ff_dxva2_get_surface_index(avctx, ctx, current_picture->f, 1), 0);
 
     #define DO_REF_LIST(ref_idx, ref_list) { \
         const RefPicList *rpl = &h->rps[ref_idx]; \
@@ -228,7 +228,7 @@ void ff_dxva2_hevc_fill_picture_parameters(const AVCodecContext *avctx, AVDXVACo
             while (!frame && j < rpl->nb_refs) \
                 frame = rpl->ref[j++]; \
             if (frame && frame->flags & (HEVC_FRAME_FLAG_LONG_REF | HEVC_FRAME_FLAG_SHORT_REF)) \
-                pp->ref_list[i] = get_refpic_index(pp, ff_dxva2_get_surface_index(avctx, ctx, frame->frame, 0)); \
+                pp->ref_list[i] = get_refpic_index(pp, ff_dxva2_get_surface_index(avctx, ctx, frame->f, 0)); \
             else \
                 pp->ref_list[i] = 0xff; \
         } \
@@ -286,7 +286,7 @@ static int commit_bitstream_and_slice_buffer(AVCodecContext *avctx,
 {
     const HEVCContext *h = avctx->priv_data;
     AVDXVAContext *ctx = DXVA_CONTEXT(avctx);
-    const HEVCFrame *current_picture = h->ref;
+    const HEVCFrame *current_picture = h->cur_frame;
     struct hevc_dxva2_picture_context *ctx_pic = current_picture->hwaccel_picture_private;
     DXVA_Slice_HEVC_Short *slice = NULL;
     void     *dxva_data_ptr;
@@ -405,7 +405,7 @@ static int dxva2_hevc_start_frame(AVCodecContext *avctx,
 {
     const HEVCContext *h = avctx->priv_data;
     AVDXVAContext *ctx = DXVA_CONTEXT(avctx);
-    struct hevc_dxva2_picture_context *ctx_pic = h->ref->hwaccel_picture_private;
+    struct hevc_dxva2_picture_context *ctx_pic = h->cur_frame->hwaccel_picture_private;
 
     if (!DXVA_CONTEXT_VALID(avctx, ctx))
         return -1;
@@ -428,7 +428,7 @@ static int dxva2_hevc_decode_slice(AVCodecContext *avctx,
                                    uint32_t size)
 {
     const HEVCContext *h = avctx->priv_data;
-    const HEVCFrame *current_picture = h->ref;
+    const HEVCFrame *current_picture = h->cur_frame;
     struct hevc_dxva2_picture_context *ctx_pic = current_picture->hwaccel_picture_private;
     unsigned position;
 
@@ -449,7 +449,7 @@ static int dxva2_hevc_decode_slice(AVCodecContext *avctx,
 static int dxva2_hevc_end_frame(AVCodecContext *avctx)
 {
     HEVCContext *h = avctx->priv_data;
-    struct hevc_dxva2_picture_context *ctx_pic = h->ref->hwaccel_picture_private;
+    struct hevc_dxva2_picture_context *ctx_pic = h->cur_frame->hwaccel_picture_private;
 // ==> Start patch MPC
     //int scale = ctx_pic->pp.dwCodingParamToolFlags & 1;
     int scale = ctx_pic->pp.main.dwCodingParamToolFlags & 1;
@@ -460,7 +460,7 @@ static int dxva2_hevc_end_frame(AVCodecContext *avctx)
     if (ctx_pic->slice_count <= 0 || ctx_pic->bitstream_size <= 0)
         return -1;
 
-    ret = ff_dxva2_common_end_frame(avctx, h->ref->frame,
+    ret = ff_dxva2_common_end_frame(avctx, h->cur_frame->f,
 // ==> Start patch MPC
                                     //&ctx_pic->pp, sizeof(ctx_pic->pp),
                                     &ctx_pic->pp, rext ? sizeof(ctx_pic->pp) : sizeof(ctx_pic->pp.main),

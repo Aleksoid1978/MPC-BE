@@ -34,7 +34,7 @@
 
 static void dpb_add(CUVIDHEVCPICPARAMS *pp, int idx, const HEVCFrame *src)
 {
-    FrameDecodeData *fdd = (FrameDecodeData*)src->frame->private_ref->data;
+    FrameDecodeData *fdd = (FrameDecodeData*)src->f->private_ref->data;
     const NVDECFrame *cf = fdd->hwaccel_priv;
 
     pp->RefPicIdx[idx]      = cf ? cf->idx : -1;
@@ -84,11 +84,11 @@ static int nvdec_hevc_start_frame(AVCodecContext *avctx,
 
     int i, j, dpb_size, ret;
 
-    ret = ff_nvdec_start_frame(avctx, s->ref->frame);
+    ret = ff_nvdec_start_frame(avctx, s->cur_frame->f);
     if (ret < 0)
         return ret;
 
-    fdd = (FrameDecodeData*)s->ref->frame->private_ref->data;
+    fdd = (FrameDecodeData*)s->cur_frame->f->private_ref->data;
     cf  = (NVDECFrame*)fdd->hwaccel_priv;
 
     *pp = (CUVIDPICPARAMS) {
@@ -191,7 +191,7 @@ static int nvdec_hevc_start_frame(AVCodecContext *avctx,
             .NumPocStCurrBefore                           = s->rps[ST_CURR_BEF].nb_refs,
             .NumPocStCurrAfter                            = s->rps[ST_CURR_AFT].nb_refs,
             .NumPocLtCurr                                 = s->rps[LT_CURR].nb_refs,
-            .CurrPicOrderCntVal                           = s->ref->poc,
+            .CurrPicOrderCntVal                           = s->cur_frame->poc,
         },
     };
 

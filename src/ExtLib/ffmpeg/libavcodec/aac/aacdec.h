@@ -39,7 +39,10 @@
 #include "libavutil/tx.h"
 
 #include "libavcodec/aac.h"
+#include "libavcodec/avcodec.h"
 #include "libavcodec/mpeg4audio.h"
+
+#include "aacdec_ac.h"
 
 typedef struct AACDecContext AACDecContext;
 
@@ -68,6 +71,32 @@ enum CouplingPoint {
     AFTER_IMDCT = 3,
 };
 
+enum AACUsacElem {
+    ID_USAC_SCE = 0,
+    ID_USAC_CPE = 1,
+    ID_USAC_LFE = 2,
+    ID_USAC_EXT = 3,
+};
+
+enum ExtensionHeaderType {
+    ID_CONFIG_EXT_FILL = 0,
+    ID_CONFIG_EXT_LOUDNESS_INFO = 2,
+    ID_CONFIG_EXT_STREAM_ID = 7,
+};
+
+enum AACUsacExtension {
+    ID_EXT_ELE_FILL,
+    ID_EXT_ELE_MPEGS,
+    ID_EXT_ELE_SAOC,
+    ID_EXT_ELE_AUDIOPREROLL,
+    ID_EXT_ELE_UNI_DRC,
+};
+
+enum AACUSACLoudnessExt {
+    UNIDRCLOUDEXT_TERM = 0x0,
+    UNIDRCLOUDEXT_EQ = 0x1,
+};
+
 // Supposed to be equal to AAC_RENAME() in case of USE_FIXED.
 #define RENAME_FIXED(name) name ## _fixed
 
@@ -91,6 +120,40 @@ typedef struct LongTermPrediction {
     INTFLOAT_UNION(coef,);
     int8_t used[MAX_LTP_LONG_SFB];
 } LongTermPrediction;
+
+/* Per channel core mode */
+typedef struct AACUsacElemData {
+    uint8_t core_mode;
+    uint8_t scale_factor_grouping;
+
+    /* Timewarping ratio */
+#define NUM_TW_NODES 16
+    uint8_t tw_ratio[NUM_TW_NODES];
+
+    struct {
+        uint8_t acelp_core_mode : 3;
+        uint8_t lpd_mode : 5;
+
+        uint8_t bpf_control_info : 1;
+        uint8_t core_mode_last : 1;
+        uint8_t fac_data_present : 1;
+
+        int last_lpd_mode;
+    } ldp;
+
+    struct {
+        unsigned int seed;
+        uint8_t level : 3;
+        uint8_t offset : 5;
+    } noise;
+
+    struct {
+        uint8_t gain;
+        uint32_t kv[8 /* (1024 / 16) / 8 */][8];
+    } fac;
+
+    AACArithState ac;
+} AACUsacElemData;
 
 /**
  * Individual Channel Stream
@@ -144,12 +207,13 @@ typedef struct ChannelCoupling {
  */
 typedef struct SingleChannelElement {
     IndividualChannelStream ics;
+    AACUsacElemData ue;                             ///< USAC element data
     TemporalNoiseShaping tns;
     enum BandType band_type[128];                   ///< band types
-    int band_type_run_end[120];                     ///< band type run end points
-    int sfo[120];                                   ///< scalefactor offsets
-    INTFLOAT_UNION(sf, [120]);                      ///< scalefactors
+    int sfo[128];                                   ///< scalefactor offsets
+    INTFLOAT_UNION(sf, [128]);                      ///< scalefactors (8 windows * 16 sfb max)
     INTFLOAT_ALIGNED_UNION(32, coeffs,    1024);    ///< coefficients for IMDCT, maybe processed
+    INTFLOAT_ALIGNED_UNION(32, prev_coeffs, 1024);  ///< unscaled previous contents of coeffs[] for USAC
     INTFLOAT_ALIGNED_UNION(32, saved,     1536);    ///< overlap
     INTFLOAT_ALIGNED_UNION(32, ret_buf,   2048);    ///< PCM output buffer
     INTFLOAT_ALIGNED_UNION(16, ltp_state, 3072);    ///< time signal for LTP
@@ -163,18 +227,140 @@ typedef struct SingleChannelElement {
     };
 } SingleChannelElement;
 
+typedef struct AACUsacStereo {
+    uint8_t common_window;
+    uint8_t common_tw;
+
+    uint8_t ms_mask_mode;
+    uint8_t config_idx;
+
+    /* Complex prediction */
+    uint8_t use_prev_frame;
+    uint8_t pred_dir;
+    uint8_t complex_coef;
+
+    uint8_t pred_used[128];
+
+    INTFLOAT_ALIGNED_UNION(32, alpha_q_re, 1024);
+    INTFLOAT_ALIGNED_UNION(32, alpha_q_im, 1024);
+    INTFLOAT_ALIGNED_UNION(32, prev_alpha_q_re, 1024);
+    INTFLOAT_ALIGNED_UNION(32, prev_alpha_q_im, 1024);
+
+    INTFLOAT_ALIGNED_UNION(32, dmix_re, 1024);
+    INTFLOAT_ALIGNED_UNION(32, prev_dmix_re, 1024); /* Recalculated on every frame */
+    INTFLOAT_ALIGNED_UNION(32, dmix_im, 1024); /* Final prediction data */
+} AACUsacStereo;
+
 /**
  * channel element - generic struct for SCE/CPE/CCE/LFE
  */
 typedef struct ChannelElement {
     int present;
     // CPE specific
+    uint8_t max_sfb_ste;      ///< (USAC) Maximum of both max_sfb values
     uint8_t ms_mask[128];     ///< Set if mid/side stereo is used for each scalefactor window band
     // shared
     SingleChannelElement ch[2];
     // CCE specific
     ChannelCoupling coup;
+    // USAC stereo coupling data
+    AACUsacStereo us;
 } ChannelElement;
+
+typedef struct AACUSACLoudnessInfo {
+    uint8_t drc_set_id : 6;
+    uint8_t downmix_id : 7;
+    struct {
+        uint16_t lvl : 12;
+        uint8_t present : 1;
+    } sample_peak;
+
+    struct {
+        uint16_t lvl : 12;
+        uint8_t measurement : 4;
+        uint8_t reliability : 2;
+        uint8_t present : 1;
+    } true_peak;
+
+    uint8_t nb_measurements : 4;
+    struct {
+        uint8_t method_def : 4;
+        uint8_t method_val;
+        uint8_t measurement : 4;
+        uint8_t reliability : 2;
+    } measurements[16];
+} AACUSACLoudnessInfo;
+
+typedef struct AACUsacElemConfig {
+    enum AACUsacElem type;
+
+    uint8_t tw_mdct : 1;
+    uint8_t noise_fill : 1;
+
+    uint8_t stereo_config_index;
+
+    struct {
+        int ratio;
+
+        uint8_t harmonic_sbr : 1; /* harmonicSBR */
+        uint8_t bs_intertes : 1; /* bs_interTes */
+        uint8_t bs_pvc : 1; /* bs_pvc */
+
+        struct {
+            uint8_t start_freq; /* dflt_start_freq */
+            uint8_t stop_freq; /* dflt_stop_freq */
+
+            uint8_t freq_scale; /* dflt_freq_scale */
+            uint8_t alter_scale : 1; /* dflt_alter_scale */
+            uint8_t noise_scale; /* dflt_noise_scale */
+
+            uint8_t limiter_bands; /* dflt_limiter_bands */
+            uint8_t limiter_gains; /* dflt_limiter_gains */
+            uint8_t interpol_freq : 1; /* dflt_interpol_freq */
+            uint8_t smoothing_mode : 1; /* dflt_smoothing_mode */
+        } dflt;
+    } sbr;
+
+    struct {
+        uint8_t freq_res; /* bsFreqRes */
+        uint8_t fixed_gain; /* bsFixedGainDMX */
+        uint8_t temp_shape_config; /* bsTempShapeConfig */
+        uint8_t decorr_config; /* bsDecorrConfig */
+        uint8_t high_rate_mode : 1; /* bsHighRateMode */
+        uint8_t phase_coding : 1; /* bsPhaseCoding */
+
+        uint8_t otts_bands_phase; /* bsOttBandsPhase */
+        uint8_t residual_coding; /* bsResidualCoding */
+        uint8_t residual_bands; /* bsResidualBands */
+        uint8_t pseudo_lr : 1; /* bsPseudoLr */
+        uint8_t env_quant_mode : 1; /* bsEnvQuantMode */
+    } mps;
+
+    struct {
+        enum AACUsacExtension type;
+        uint8_t payload_frag;
+        uint32_t default_len;
+        uint32_t pl_data_offset;
+        uint8_t *pl_data;
+    } ext;
+} AACUsacElemConfig;
+
+typedef struct AACUSACConfig {
+    uint8_t core_sbr_frame_len_idx; /* coreSbrFrameLengthIndex */
+    uint8_t rate_idx;
+    uint16_t core_frame_len;
+    uint16_t stream_identifier;
+
+    AACUsacElemConfig elems[64];
+    int nb_elems;
+
+    struct {
+        uint8_t nb_album;
+        AACUSACLoudnessInfo album_info[64];
+        uint8_t nb_info;
+        AACUSACLoudnessInfo info[64];
+    } loudness;
+} AACUSACConfig;
 
 typedef struct OutputConfiguration {
     MPEG4AudioConfig m4ac;
@@ -182,6 +368,7 @@ typedef struct OutputConfiguration {
     int layout_map_tags;
     AVChannelLayout ch_layout;
     enum OCStatus status;
+    AACUSACConfig usac;
 } OutputConfiguration;
 
 /**
@@ -245,6 +432,7 @@ typedef struct AACDecDSP {
                                        ChannelElement *cce, int index);
 
     void (*imdct_and_windowing)(AACDecContext *ac, SingleChannelElement *sce);
+    void (*imdct_and_windowing_768)(AACDecContext *ac, SingleChannelElement *sce);
     void (*imdct_and_windowing_960)(AACDecContext *ac, SingleChannelElement *sce);
     void (*imdct_and_windowing_ld)(AACDecContext *ac, SingleChannelElement *sce);
     void (*imdct_and_windowing_eld)(AACDecContext *ac, SingleChannelElement *sce);
@@ -290,18 +478,22 @@ struct AACDecContext {
      * @name Computed / set up during initialization
      * @{
      */
+    AVTXContext *mdct96;
     AVTXContext *mdct120;
     AVTXContext *mdct128;
     AVTXContext *mdct480;
     AVTXContext *mdct512;
+    AVTXContext *mdct768;
     AVTXContext *mdct960;
     AVTXContext *mdct1024;
     AVTXContext *mdct_ltp;
 
+    av_tx_fn mdct96_fn;
     av_tx_fn mdct120_fn;
     av_tx_fn mdct128_fn;
     av_tx_fn mdct480_fn;
     av_tx_fn mdct512_fn;
+    av_tx_fn mdct768_fn;
     av_tx_fn mdct960_fn;
     av_tx_fn mdct1024_fn;
     av_tx_fn mdct_ltp_fn;
@@ -344,10 +536,25 @@ struct AACDecContext {
 #define fdsp          RENAME_FIXED(fdsp)
 #endif
 
-int ff_aac_decode_init(struct AVCodecContext *avctx);
-int ff_aac_decode_init_float(struct AVCodecContext *avctx);
-int ff_aac_decode_init_fixed(struct AVCodecContext *avctx);
+int ff_aac_decode_init(AVCodecContext *avctx);
+int ff_aac_decode_init_float(AVCodecContext *avctx);
+int ff_aac_decode_init_fixed(AVCodecContext *avctx);
+
 int ff_aac_decode_ics(AACDecContext *ac, SingleChannelElement *sce,
                       GetBitContext *gb, int common_window, int scale_flag);
+
+int ff_aac_decode_tns(AACDecContext *ac, TemporalNoiseShaping *tns,
+                      GetBitContext *gb, const IndividualChannelStream *ics);
+
+int ff_aac_set_default_channel_config(AACDecContext *ac, AVCodecContext *avctx,
+                                      uint8_t (*layout_map)[3],
+                                      int *tags,
+                                      int channel_config);
+
+int ff_aac_output_configure(AACDecContext *ac,
+                            uint8_t layout_map[MAX_ELEM_ID * 4][3], int tags,
+                            enum OCStatus oc_type, int get_new_frame);
+
+ChannelElement *ff_aac_get_che(AACDecContext *ac, int type, int elem_id);
 
 #endif /* AVCODEC_AAC_AACDEC_H */

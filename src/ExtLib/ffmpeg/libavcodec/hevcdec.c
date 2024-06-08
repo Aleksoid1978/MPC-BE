@@ -617,15 +617,14 @@ fail:
     return ret;
 }
 
-static int hls_slice_header(HEVCContext *s)
+static int hls_slice_header(HEVCContext *s, GetBitContext *gb)
 {
-    GetBitContext *gb = &s->HEVClc->gb;
     SliceHeader *sh   = &s->sh;
     int i, ret;
 
     // Coded parameters
     sh->first_slice_in_pic_flag = get_bits1(gb);
-    if (s->ref && sh->first_slice_in_pic_flag) {
+    if (s->cur_frame && sh->first_slice_in_pic_flag) {
         av_log(s->avctx, AV_LOG_ERROR, "Two slices reporting being the first in the same frame.\n");
         return 1; // This slice will be skipped later, do not corrupt state
     }
@@ -999,8 +998,8 @@ static int hls_slice_header(HEVCContext *s)
             av_freep(&sh->offset);
             av_freep(&sh->size);
             sh->entry_point_offset = av_malloc_array(sh->num_entry_point_offsets, sizeof(unsigned));
-            sh->offset = av_malloc_array(sh->num_entry_point_offsets, sizeof(int));
-            sh->size = av_malloc_array(sh->num_entry_point_offsets, sizeof(int));
+            sh->offset             = av_malloc_array(sh->num_entry_point_offsets + 1, sizeof(int));
+            sh->size               = av_malloc_array(sh->num_entry_point_offsets + 1, sizeof(int));
             if (!sh->entry_point_offset || !sh->offset || !sh->size) {
                 sh->num_entry_point_offsets = 0;
                 av_log(s->avctx, AV_LOG_ERROR, "Failed to allocate memory\n");
@@ -1029,6 +1028,13 @@ static int hls_slice_header(HEVCContext *s)
             skip_bits(gb, 8);  // slice_header_extension_data_byte
     }
 
+    ret = get_bits1(gb);
+    if (!ret) {
+        av_log(s->avctx, AV_LOG_ERROR, "alignment_bit_equal_to_one=0\n");
+        return AVERROR_INVALIDDATA;
+    }
+    sh->data_offset = align_get_bits(gb) - gb->buffer;
+
     // Inferred parameters
     sh->slice_qp = 26U + s->ps.pps->pic_init_qp_minus26 + sh->slice_qp_delta;
     if (sh->slice_qp > 51 ||
@@ -1054,14 +1060,14 @@ static int hls_slice_header(HEVCContext *s)
         return AVERROR_INVALIDDATA;
     }
 
-    s->HEVClc->first_qp_group = !s->sh.dependent_slice_segment_flag;
+    s->local_ctx[0].first_qp_group = !s->sh.dependent_slice_segment_flag;
 
     if (!s->ps.pps->cu_qp_delta_enabled_flag)
-        s->HEVClc->qp_y = s->sh.slice_qp;
+        s->local_ctx[0].qp_y = s->sh.slice_qp;
 
     s->slice_initialized = 1;
-    s->HEVClc->tu.cu_qp_offset_cb = 0;
-    s->HEVClc->tu.cu_qp_offset_cr = 0;
+    s->local_ctx[0].tu.cu_qp_offset_cb = 0;
+    s->local_ctx[0].tu.cu_qp_offset_cr = 0;
 
     return 0;
 }
@@ -1276,14 +1282,14 @@ static int hls_transform_unit(HEVCLocalContext *lc, int x0, int y0,
                                                 log2_trafo_size_c, scan_idx_c, 1);
                 else
                     if (lc->tu.cross_pf) {
-                        ptrdiff_t stride = s->frame->linesize[1];
+                        ptrdiff_t stride = s->cur_frame->f->linesize[1];
                         int hshift = s->ps.sps->hshift[1];
                         int vshift = s->ps.sps->vshift[1];
                         const int16_t *coeffs_y = (int16_t*)lc->edge_emu_buffer;
                         int16_t *coeffs   = (int16_t*)lc->edge_emu_buffer2;
                         int size = 1 << log2_trafo_size_c;
 
-                        uint8_t *dst = &s->frame->data[1][(y0 >> vshift) * stride +
+                        uint8_t *dst = &s->cur_frame->f->data[1][(y0 >> vshift) * stride +
                                                               ((x0 >> hshift) << s->ps.sps->pixel_shift)];
                         for (i = 0; i < (size * size); i++) {
                             coeffs[i] = ((lc->tu.res_scale_val * coeffs_y[i]) >> 3);
@@ -1306,14 +1312,14 @@ static int hls_transform_unit(HEVCLocalContext *lc, int x0, int y0,
                                                 log2_trafo_size_c, scan_idx_c, 2);
                 else
                     if (lc->tu.cross_pf) {
-                        ptrdiff_t stride = s->frame->linesize[2];
+                        ptrdiff_t stride = s->cur_frame->f->linesize[2];
                         int hshift = s->ps.sps->hshift[2];
                         int vshift = s->ps.sps->vshift[2];
                         const int16_t *coeffs_y = (int16_t*)lc->edge_emu_buffer;
                         int16_t *coeffs   = (int16_t*)lc->edge_emu_buffer2;
                         int size = 1 << log2_trafo_size_c;
 
-                        uint8_t *dst = &s->frame->data[2][(y0 >> vshift) * stride +
+                        uint8_t *dst = &s->cur_frame->f->data[2][(y0 >> vshift) * stride +
                                                           ((x0 >> hshift) << s->ps.sps->pixel_shift)];
                         for (i = 0; i < (size * size); i++) {
                             coeffs[i] = ((lc->tu.res_scale_val * coeffs_y[i]) >> 3);
@@ -1520,12 +1526,12 @@ static int hls_pcm_sample(HEVCLocalContext *lc, int x0, int y0, int log2_cb_size
     const HEVCContext *const s = lc->parent;
     GetBitContext gb;
     int cb_size   = 1 << log2_cb_size;
-    ptrdiff_t stride0 = s->frame->linesize[0];
-    ptrdiff_t stride1 = s->frame->linesize[1];
-    ptrdiff_t stride2 = s->frame->linesize[2];
-    uint8_t *dst0 = &s->frame->data[0][y0 * stride0 + (x0 << s->ps.sps->pixel_shift)];
-    uint8_t *dst1 = &s->frame->data[1][(y0 >> s->ps.sps->vshift[1]) * stride1 + ((x0 >> s->ps.sps->hshift[1]) << s->ps.sps->pixel_shift)];
-    uint8_t *dst2 = &s->frame->data[2][(y0 >> s->ps.sps->vshift[2]) * stride2 + ((x0 >> s->ps.sps->hshift[2]) << s->ps.sps->pixel_shift)];
+    ptrdiff_t stride0 = s->cur_frame->f->linesize[0];
+    ptrdiff_t stride1 = s->cur_frame->f->linesize[1];
+    ptrdiff_t stride2 = s->cur_frame->f->linesize[2];
+    uint8_t *dst0 = &s->cur_frame->f->data[0][y0 * stride0 + (x0 << s->ps.sps->pixel_shift)];
+    uint8_t *dst1 = &s->cur_frame->f->data[1][(y0 >> s->ps.sps->vshift[1]) * stride1 + ((x0 >> s->ps.sps->hshift[1]) << s->ps.sps->pixel_shift)];
+    uint8_t *dst2 = &s->cur_frame->f->data[2][(y0 >> s->ps.sps->vshift[2]) * stride2 + ((x0 >> s->ps.sps->hshift[2]) << s->ps.sps->pixel_shift)];
 
     int length         = cb_size * cb_size * s->ps.sps->pcm.bit_depth +
                          (((cb_size >> s->ps.sps->hshift[1]) * (cb_size >> s->ps.sps->vshift[1])) +
@@ -1594,7 +1600,7 @@ static void luma_mc_uni(HEVCLocalContext *lc, uint8_t *dst, ptrdiff_t dststride,
     if (x_off < QPEL_EXTRA_BEFORE || y_off < QPEL_EXTRA_AFTER ||
         x_off >= pic_width - block_w - QPEL_EXTRA_AFTER ||
         y_off >= pic_height - block_h - QPEL_EXTRA_AFTER ||
-        ref == s->frame) {
+        ref == s->cur_frame->f) {
         const ptrdiff_t edge_emu_stride = EDGE_EMU_BUFFER_STRIDE << s->ps.sps->pixel_shift;
         int offset     = QPEL_EXTRA_BEFORE * srcstride       + (QPEL_EXTRA_BEFORE << s->ps.sps->pixel_shift);
         int buf_offset = QPEL_EXTRA_BEFORE * edge_emu_stride + (QPEL_EXTRA_BEFORE << s->ps.sps->pixel_shift);
@@ -1744,7 +1750,7 @@ static void chroma_mc_uni(HEVCLocalContext *lc, uint8_t *dst0,
     intptr_t my          = av_mod_uintp2(mv->y, 2 + vshift);
     intptr_t _mx         = mx << (1 - hshift);
     intptr_t _my         = my << (1 - vshift);
-    int emu              = src0 == s->frame->data[1] || src0 == s->frame->data[2];
+    int emu              = src0 == s->cur_frame->f->data[1] || src0 == s->cur_frame->f->data[2];
 
     x_off += mv->x >> (2 + hshift);
     y_off += mv->y >> (2 + vshift);
@@ -1870,11 +1876,11 @@ static void chroma_mc_bi(HEVCLocalContext *lc, uint8_t *dst0, ptrdiff_t dststrid
     s->hevcdsp.put_hevc_epel[idx][!!my0][!!mx0](lc->tmp, src1, src1stride,
                                                 block_h, _mx0, _my0, block_w);
     if (!weight_flag)
-        s->hevcdsp.put_hevc_epel_bi[idx][!!my1][!!mx1](dst0, s->frame->linesize[cidx+1],
+        s->hevcdsp.put_hevc_epel_bi[idx][!!my1][!!mx1](dst0, s->cur_frame->f->linesize[cidx+1],
                                                        src2, src2stride, lc->tmp,
                                                        block_h, _mx1, _my1, block_w);
     else
-        s->hevcdsp.put_hevc_epel_bi_w[idx][!!my1][!!mx1](dst0, s->frame->linesize[cidx+1],
+        s->hevcdsp.put_hevc_epel_bi_w[idx][!!my1][!!mx1](dst0, s->cur_frame->f->linesize[cidx+1],
                                                          src2, src2stride, lc->tmp,
                                                          block_h,
                                                          s->sh.chroma_log2_weight_denom,
@@ -1945,7 +1951,7 @@ static void hls_prediction_unit(HEVCLocalContext *lc, int x0, int y0,
                                 int log2_cb_size, int partIdx, int idx)
 {
 #define POS(c_idx, x, y)                                                              \
-    &s->frame->data[c_idx][((y) >> s->ps.sps->vshift[c_idx]) * s->frame->linesize[c_idx] + \
+    &s->cur_frame->f->data[c_idx][((y) >> s->ps.sps->vshift[c_idx]) * linesize[c_idx] + \
                            (((x) >> s->ps.sps->hshift[c_idx]) << s->ps.sps->pixel_shift)]
     const HEVCContext *const s = lc->parent;
     int merge_idx = 0;
@@ -1953,9 +1959,10 @@ static void hls_prediction_unit(HEVCLocalContext *lc, int x0, int y0,
 
     int min_pu_width = s->ps.sps->min_pu_width;
 
-    MvField *tab_mvf = s->ref->tab_mvf;
-    const RefPicList *refPicList = s->ref->refPicList;
+    MvField *tab_mvf = s->cur_frame->tab_mvf;
+    const RefPicList *refPicList = s->cur_frame->refPicList;
     const HEVCFrame *ref0 = NULL, *ref1 = NULL;
+    const int *linesize = s->cur_frame->f->linesize;
     uint8_t *dst0 = POS(0, x0, y0);
     uint8_t *dst1 = POS(1, x0, y0);
     uint8_t *dst2 = POS(2, x0, y0);
@@ -1993,13 +2000,13 @@ static void hls_prediction_unit(HEVCLocalContext *lc, int x0, int y0,
 
     if (current_mv.pred_flag & PF_L0) {
         ref0 = refPicList[0].ref[current_mv.ref_idx[0]];
-        if (!ref0 || !ref0->frame)
+        if (!ref0 || !ref0->f)
             return;
         hevc_await_progress(s, ref0, &current_mv.mv[0], y0, nPbH);
     }
     if (current_mv.pred_flag & PF_L1) {
         ref1 = refPicList[1].ref[current_mv.ref_idx[1]];
-        if (!ref1 || !ref1->frame)
+        if (!ref1 || !ref1->f)
             return;
         hevc_await_progress(s, ref1, &current_mv.mv[1], y0, nPbH);
     }
@@ -2010,16 +2017,16 @@ static void hls_prediction_unit(HEVCLocalContext *lc, int x0, int y0,
         int nPbW_c = nPbW >> s->ps.sps->hshift[1];
         int nPbH_c = nPbH >> s->ps.sps->vshift[1];
 
-        luma_mc_uni(lc, dst0, s->frame->linesize[0], ref0->frame,
+        luma_mc_uni(lc, dst0, linesize[0], ref0->f,
                     &current_mv.mv[0], x0, y0, nPbW, nPbH,
                     s->sh.luma_weight_l0[current_mv.ref_idx[0]],
                     s->sh.luma_offset_l0[current_mv.ref_idx[0]]);
 
         if (s->ps.sps->chroma_format_idc) {
-            chroma_mc_uni(lc, dst1, s->frame->linesize[1], ref0->frame->data[1], ref0->frame->linesize[1],
+            chroma_mc_uni(lc, dst1, linesize[1], ref0->f->data[1], ref0->f->linesize[1],
                           0, x0_c, y0_c, nPbW_c, nPbH_c, &current_mv,
                           s->sh.chroma_weight_l0[current_mv.ref_idx[0]][0], s->sh.chroma_offset_l0[current_mv.ref_idx[0]][0]);
-            chroma_mc_uni(lc, dst2, s->frame->linesize[2], ref0->frame->data[2], ref0->frame->linesize[2],
+            chroma_mc_uni(lc, dst2, linesize[2], ref0->f->data[2], ref0->f->linesize[2],
                           0, x0_c, y0_c, nPbW_c, nPbH_c, &current_mv,
                           s->sh.chroma_weight_l0[current_mv.ref_idx[0]][1], s->sh.chroma_offset_l0[current_mv.ref_idx[0]][1]);
         }
@@ -2029,17 +2036,17 @@ static void hls_prediction_unit(HEVCLocalContext *lc, int x0, int y0,
         int nPbW_c = nPbW >> s->ps.sps->hshift[1];
         int nPbH_c = nPbH >> s->ps.sps->vshift[1];
 
-        luma_mc_uni(lc, dst0, s->frame->linesize[0], ref1->frame,
+        luma_mc_uni(lc, dst0, linesize[0], ref1->f,
                     &current_mv.mv[1], x0, y0, nPbW, nPbH,
                     s->sh.luma_weight_l1[current_mv.ref_idx[1]],
                     s->sh.luma_offset_l1[current_mv.ref_idx[1]]);
 
         if (s->ps.sps->chroma_format_idc) {
-            chroma_mc_uni(lc, dst1, s->frame->linesize[1], ref1->frame->data[1], ref1->frame->linesize[1],
+            chroma_mc_uni(lc, dst1, linesize[1], ref1->f->data[1], ref1->f->linesize[1],
                           1, x0_c, y0_c, nPbW_c, nPbH_c, &current_mv,
                           s->sh.chroma_weight_l1[current_mv.ref_idx[1]][0], s->sh.chroma_offset_l1[current_mv.ref_idx[1]][0]);
 
-            chroma_mc_uni(lc, dst2, s->frame->linesize[2], ref1->frame->data[2], ref1->frame->linesize[2],
+            chroma_mc_uni(lc, dst2, linesize[2], ref1->f->data[2], ref1->f->linesize[2],
                           1, x0_c, y0_c, nPbW_c, nPbH_c, &current_mv,
                           s->sh.chroma_weight_l1[current_mv.ref_idx[1]][1], s->sh.chroma_offset_l1[current_mv.ref_idx[1]][1]);
         }
@@ -2049,15 +2056,15 @@ static void hls_prediction_unit(HEVCLocalContext *lc, int x0, int y0,
         int nPbW_c = nPbW >> s->ps.sps->hshift[1];
         int nPbH_c = nPbH >> s->ps.sps->vshift[1];
 
-        luma_mc_bi(lc, dst0, s->frame->linesize[0], ref0->frame,
+        luma_mc_bi(lc, dst0, linesize[0], ref0->f,
                    &current_mv.mv[0], x0, y0, nPbW, nPbH,
-                   ref1->frame, &current_mv.mv[1], &current_mv);
+                   ref1->f, &current_mv.mv[1], &current_mv);
 
         if (s->ps.sps->chroma_format_idc) {
-            chroma_mc_bi(lc, dst1, s->frame->linesize[1], ref0->frame, ref1->frame,
+            chroma_mc_bi(lc, dst1, linesize[1], ref0->f, ref1->f,
                          x0_c, y0_c, nPbW_c, nPbH_c, &current_mv, 0);
 
-            chroma_mc_bi(lc, dst2, s->frame->linesize[2], ref0->frame, ref1->frame,
+            chroma_mc_bi(lc, dst2, linesize[2], ref0->f, ref1->f,
                          x0_c, y0_c, nPbW_c, nPbH_c, &current_mv, 1);
         }
     }
@@ -2084,7 +2091,7 @@ static int luma_intra_pred_mode(HEVCLocalContext *lc, int x0, int y0, int pu_siz
 
     int y_ctb = (y0 >> (s->ps.sps->log2_ctb_size)) << (s->ps.sps->log2_ctb_size);
 
-    MvField *tab_mvf = s->ref->tab_mvf;
+    MvField *tab_mvf = s->cur_frame->tab_mvf;
     int intra_pred_mode;
     int candidate[3];
     int i, j;
@@ -2239,7 +2246,7 @@ static void intra_prediction_unit_default_value(HEVCLocalContext *lc,
     int pb_size          = 1 << log2_cb_size;
     int size_in_pus      = pb_size >> s->ps.sps->log2_min_pu_size;
     int min_pu_width     = s->ps.sps->min_pu_width;
-    MvField *tab_mvf     = s->ref->tab_mvf;
+    MvField *tab_mvf     = s->cur_frame->tab_mvf;
     int x_pu             = x0 >> s->ps.sps->log2_min_pu_size;
     int y_pu             = y0 >> s->ps.sps->log2_min_pu_size;
     int j, k;
@@ -2550,9 +2557,11 @@ static void hls_decode_neighbour(HEVCLocalContext *lc, int x_ctb, int y_ctb,
     lc->ctb_up_left_flag = ((x_ctb > 0) && (y_ctb > 0)  && (ctb_addr_in_slice-1 >= s->ps.sps->ctb_width) && (s->ps.pps->tile_id[ctb_addr_ts] == s->ps.pps->tile_id[s->ps.pps->ctb_addr_rs_to_ts[ctb_addr_rs-1 - s->ps.sps->ctb_width]]));
 }
 
-static int hls_decode_entry(HEVCContext *s)
+static int hls_decode_entry(HEVCContext *s, GetBitContext *gb)
 {
-    HEVCLocalContext *const lc = s->HEVClc;
+    HEVCLocalContext *const lc = &s->local_ctx[0];
+    const uint8_t *slice_data = gb->buffer + s->sh.data_offset;
+    const size_t   slice_size = gb->buffer_end - gb->buffer - s->sh.data_offset;
     int ctb_size    = 1 << s->ps.sps->log2_ctb_size;
     int more_data   = 1;
     int x_ctb       = 0;
@@ -2580,7 +2589,7 @@ static int hls_decode_entry(HEVCContext *s)
         y_ctb = (ctb_addr_rs / ((s->ps.sps->width + ctb_size - 1) >> s->ps.sps->log2_ctb_size)) << s->ps.sps->log2_ctb_size;
         hls_decode_neighbour(lc, x_ctb, y_ctb, ctb_addr_ts);
 
-        ret = ff_hevc_cabac_init(lc, ctb_addr_ts);
+        ret = ff_hevc_cabac_init(lc, ctb_addr_ts, slice_data, slice_size);
         if (ret < 0) {
             s->tab_slice_address[ctb_addr_rs] = -1;
             return ret;
@@ -2622,14 +2631,14 @@ static int hls_decode_entry_wpp(AVCodecContext *avctxt, void *hevc_lclist,
     int ctb_addr_rs = s->sh.slice_ctb_addr_rs + ctb_row * ((s->ps.sps->width + ctb_size - 1) >> s->ps.sps->log2_ctb_size);
     int ctb_addr_ts = s->ps.pps->ctb_addr_rs_to_ts[ctb_addr_rs];
     int thread = ctb_row % s->threads_number;
+
+    const uint8_t *data      = s->data + s->sh.offset[ctb_row];
+    const size_t   data_size = s->sh.size[ctb_row];
+
     int ret;
 
-    if(ctb_row) {
-        ret = init_get_bits8(&lc->gb, s->data + s->sh.offset[ctb_row - 1], s->sh.size[ctb_row - 1]);
-        if (ret < 0)
-            goto error;
-        ff_init_cabac_decoder(&lc->cc, s->data + s->sh.offset[(ctb_row)-1], s->sh.size[ctb_row - 1]);
-    }
+    if (ctb_row)
+        ff_init_cabac_decoder(&lc->cc, data, data_size);
 
     while(more_data && ctb_addr_ts < s->ps.sps->ctb_size) {
         int x_ctb = (ctb_addr_rs % s->ps.sps->ctb_width) << s->ps.sps->log2_ctb_size;
@@ -2647,7 +2656,7 @@ static int hls_decode_entry_wpp(AVCodecContext *avctxt, void *hevc_lclist,
             return 0;
         }
 
-        ret = ff_hevc_cabac_init(lc, ctb_addr_ts);
+        ret = ff_hevc_cabac_init(lc, ctb_addr_ts, data, data_size);
         if (ret < 0)
             goto error;
         hls_sao_param(lc, x_ctb >> s->ps.sps->log2_ctb_size, y_ctb >> s->ps.sps->log2_ctb_size);
@@ -2698,7 +2707,6 @@ static int hls_slice_data_wpp(HEVCContext *s, const H2645NAL *nal)
 {
     const uint8_t *data = nal->data;
     int length          = nal->size;
-    HEVCLocalContext *lc;
     int *ret;
     int64_t offset;
     int64_t startheader, cmpt = 0;
@@ -2721,7 +2729,6 @@ static int hls_slice_data_wpp(HEVCContext *s, const H2645NAL *nal)
         memcpy(tmp, s->local_ctx, sizeof(*s->local_ctx) * s->nb_local_ctx);
         av_free(s->local_ctx);
         s->local_ctx = tmp;
-        s->HEVClc    = &s->local_ctx[0];
 
         for (unsigned i = s->nb_local_ctx; i < s->threads_number; i++) {
             tmp = &s->local_ctx[i];
@@ -2736,8 +2743,7 @@ static int hls_slice_data_wpp(HEVCContext *s, const H2645NAL *nal)
         s->nb_local_ctx = s->threads_number;
     }
 
-    lc     = &s->local_ctx[0];
-    offset = (lc->gb.index >> 3);
+    offset = s->sh.data_offset;
 
     for (j = 0, cmpt = 0, startheader = offset + s->sh.entry_point_offset[0]; j < nal->skipped_bytes; j++) {
         if (nal->skipped_bytes_pos[j] >= offset && nal->skipped_bytes_pos[j] < startheader) {
@@ -2755,25 +2761,27 @@ static int hls_slice_data_wpp(HEVCContext *s, const H2645NAL *nal)
                 cmpt++;
             }
         }
-        s->sh.size[i - 1] = s->sh.entry_point_offset[i] - cmpt;
-        s->sh.offset[i - 1] = offset;
+        s->sh.size[i]   = s->sh.entry_point_offset[i] - cmpt;
+        s->sh.offset[i] = offset;
 
     }
-    if (s->sh.num_entry_point_offsets != 0) {
-        offset += s->sh.entry_point_offset[s->sh.num_entry_point_offsets - 1] - cmpt;
-        if (length < offset) {
-            av_log(s->avctx, AV_LOG_ERROR, "entry_point_offset table is corrupted\n");
-            return AVERROR_INVALIDDATA;
-        }
-        s->sh.size[s->sh.num_entry_point_offsets - 1] = length - offset;
-        s->sh.offset[s->sh.num_entry_point_offsets - 1] = offset;
 
+    offset += s->sh.entry_point_offset[s->sh.num_entry_point_offsets - 1] - cmpt;
+    if (length < offset) {
+        av_log(s->avctx, AV_LOG_ERROR, "entry_point_offset table is corrupted\n");
+        return AVERROR_INVALIDDATA;
     }
+    s->sh.size  [s->sh.num_entry_point_offsets] = length - offset;
+    s->sh.offset[s->sh.num_entry_point_offsets] = offset;
+
+    s->sh.offset[0] = s->sh.data_offset;
+    s->sh.size[0]   = s->sh.offset[1] - s->sh.offset[0];
+
     s->data = data;
 
     for (i = 1; i < s->threads_number; i++) {
         s->local_ctx[i].first_qp_group = 1;
-        s->local_ctx[i].qp_y = s->HEVClc->qp_y;
+        s->local_ctx[i].qp_y = s->local_ctx[0].qp_y;
     }
 
     atomic_store(&s->wpp_err, 0);
@@ -2797,7 +2805,7 @@ static int hls_slice_data_wpp(HEVCContext *s, const H2645NAL *nal)
 
 static int set_side_data(HEVCContext *s)
 {
-    AVFrame *out = s->ref->frame;
+    AVFrame *out = s->cur_frame->f;
     int ret;
 
     // Decrement the mastering display and content light level flag when IRAP
@@ -2814,7 +2822,7 @@ static int set_side_data(HEVCContext *s)
     ret = ff_h2645_sei_to_frame(out, &s->sei.common, AV_CODEC_ID_HEVC, s->avctx,
                                 &s->ps.sps->vui.common,
                                 s->ps.sps->bit_depth, s->ps.sps->bit_depth_chroma,
-                                s->ref->poc /* no poc_offset in HEVC */);
+                                s->cur_frame->poc /* no poc_offset in HEVC */);
     if (ret < 0)
         return ret;
 
@@ -2892,7 +2900,6 @@ static int set_side_data(HEVCContext *s)
 
 static int hevc_frame_start(HEVCContext *s)
 {
-    HEVCLocalContext *lc = s->HEVClc;
     int pic_size_in_ctb  = ((s->ps.sps->width  >> s->ps.sps->log2_min_cb_size) + 1) *
                            ((s->ps.sps->height >> s->ps.sps->log2_min_cb_size) + 1);
     int ret;
@@ -2909,9 +2916,9 @@ static int hevc_frame_start(HEVCContext *s)
     s->no_rasl_output_flag = IS_IDR(s) || IS_BLA(s) || (s->nal_unit_type == HEVC_NAL_CRA_NUT && s->last_eos);
 
     if (s->ps.pps->tiles_enabled_flag)
-        lc->end_of_tiles_x = s->ps.pps->column_width[0] << s->ps.sps->log2_ctb_size;
+        s->local_ctx[0].end_of_tiles_x = s->ps.pps->column_width[0] << s->ps.sps->log2_ctb_size;
 
-    ret = ff_hevc_set_new_ref(s, &s->frame, s->poc);
+    ret = ff_hevc_set_new_ref(s, s->poc);
     if (ret < 0)
         goto fail;
 
@@ -2922,12 +2929,12 @@ static int hevc_frame_start(HEVCContext *s)
     }
 
     if (IS_IRAP(s))
-        s->ref->frame->flags |= AV_FRAME_FLAG_KEY;
+        s->cur_frame->f->flags |= AV_FRAME_FLAG_KEY;
     else
-        s->ref->frame->flags &= ~AV_FRAME_FLAG_KEY;
+        s->cur_frame->f->flags &= ~AV_FRAME_FLAG_KEY;
 
-    s->ref->needs_fg = (s->sei.common.film_grain_characteristics.present ||
-                        s->sei.common.aom_film_grain.enable) &&
+    s->cur_frame->needs_fg = (s->sei.common.film_grain_characteristics.present ||
+                              s->sei.common.aom_film_grain.enable) &&
         !(s->avctx->export_side_data & AV_CODEC_EXPORT_DATA_FILM_GRAIN) &&
         !s->avctx->hwaccel;
 
@@ -2935,25 +2942,25 @@ static int hevc_frame_start(HEVCContext *s)
     if (ret < 0)
         goto fail;
 
-    if (s->ref->needs_fg &&
+    if (s->cur_frame->needs_fg &&
         (s->sei.common.film_grain_characteristics.present &&
          !ff_h274_film_grain_params_supported(s->sei.common.film_grain_characteristics.model_id,
-                                              s->ref->frame->format)
-         || !av_film_grain_params_select(s->ref->frame))) {
+                                              s->cur_frame->f->format) ||
+         !av_film_grain_params_select(s->cur_frame->f))) {
         av_log_once(s->avctx, AV_LOG_WARNING, AV_LOG_DEBUG, &s->film_grain_warning_shown,
                     "Unsupported film grain parameters. Ignoring film grain.\n");
-        s->ref->needs_fg = 0;
+        s->cur_frame->needs_fg = 0;
     }
 
-    if (s->ref->needs_fg) {
-        s->ref->frame_grain->format = s->ref->frame->format;
-        s->ref->frame_grain->width = s->ref->frame->width;
-        s->ref->frame_grain->height = s->ref->frame->height;
-        if ((ret = ff_thread_get_buffer(s->avctx, s->ref->frame_grain, 0)) < 0)
+    if (s->cur_frame->needs_fg) {
+        s->cur_frame->frame_grain->format = s->cur_frame->f->format;
+        s->cur_frame->frame_grain->width  = s->cur_frame->f->width;
+        s->cur_frame->frame_grain->height = s->cur_frame->f->height;
+        if ((ret = ff_thread_get_buffer(s->avctx, s->cur_frame->frame_grain, 0)) < 0)
             goto fail;
     }
 
-    s->frame->pict_type = 3 - s->sh.slice_type;
+    s->cur_frame->f->pict_type = 3 - s->sh.slice_type;
 
     if (!IS_IRAP(s))
         ff_hevc_bump_frame(s);
@@ -2969,31 +2976,31 @@ static int hevc_frame_start(HEVCContext *s)
     return 0;
 
 fail:
-    if (s->ref)
-        ff_hevc_unref_frame(s->ref, ~0);
-    s->ref = s->collocated_ref = NULL;
+    if (s->cur_frame)
+        ff_hevc_unref_frame(s->cur_frame, ~0);
+    s->cur_frame = s->collocated_ref = NULL;
     return ret;
 }
 
 static int hevc_frame_end(HEVCContext *s)
 {
-    HEVCFrame *out = s->ref;
+    HEVCFrame *out = s->cur_frame;
     const AVFilmGrainParams *fgp;
     av_unused int ret;
 
     if (out->needs_fg) {
         av_assert0(out->frame_grain->buf[0]);
-        fgp = av_film_grain_params_select(out->frame);
+        fgp = av_film_grain_params_select(out->f);
         switch (fgp->type) {
         case AV_FILM_GRAIN_PARAMS_NONE:
             av_assert0(0);
             return AVERROR_BUG;
         case AV_FILM_GRAIN_PARAMS_H274:
-            ret = ff_h274_apply_film_grain(out->frame_grain, out->frame,
+            ret = ff_h274_apply_film_grain(out->frame_grain, out->f,
                                            &s->h274db, fgp);
             break;
         case AV_FILM_GRAIN_PARAMS_AV1:
-            ret = ff_aom_apply_film_grain(out->frame_grain, out->frame, fgp);
+            ret = ff_aom_apply_film_grain(out->frame_grain, out->f, fgp);
             break;
         }
         av_assert1(ret >= 0);
@@ -3004,11 +3011,9 @@ static int hevc_frame_end(HEVCContext *s)
 
 static int decode_nal_unit(HEVCContext *s, const H2645NAL *nal)
 {
-    HEVCLocalContext *lc = s->HEVClc;
-    GetBitContext *gb    = &lc->gb;
+    GetBitContext     gb = nal->gb;
     int ctb_addr_ts, ret;
 
-    *gb              = nal->gb;
     s->nal_unit_type = nal->type;
     s->temporal_id   = nal->temporal_id;
 
@@ -3020,7 +3025,7 @@ static int decode_nal_unit(HEVCContext *s, const H2645NAL *nal)
             if (ret < 0)
                 goto fail;
         }
-        ret = ff_hevc_decode_nal_vps(gb, s->avctx, &s->ps);
+        ret = ff_hevc_decode_nal_vps(&gb, s->avctx, &s->ps);
         if (ret < 0)
             goto fail;
         break;
@@ -3031,7 +3036,7 @@ static int decode_nal_unit(HEVCContext *s, const H2645NAL *nal)
             if (ret < 0)
                 goto fail;
         }
-        ret = ff_hevc_decode_nal_sps(gb, s->avctx, &s->ps,
+        ret = ff_hevc_decode_nal_sps(&gb, s->avctx, &s->ps,
                                      s->apply_defdispwin);
         if (ret < 0)
             goto fail;
@@ -3043,7 +3048,7 @@ static int decode_nal_unit(HEVCContext *s, const H2645NAL *nal)
             if (ret < 0)
                 goto fail;
         }
-        ret = ff_hevc_decode_nal_pps(gb, s->avctx, &s->ps);
+        ret = ff_hevc_decode_nal_pps(&gb, s->avctx, &s->ps);
         if (ret < 0)
             goto fail;
         break;
@@ -3055,7 +3060,7 @@ static int decode_nal_unit(HEVCContext *s, const H2645NAL *nal)
             if (ret < 0)
                 goto fail;
         }
-        ret = ff_hevc_decode_nal_sei(gb, s->avctx, &s->sei, &s->ps, s->nal_unit_type);
+        ret = ff_hevc_decode_nal_sei(&gb, s->avctx, &s->sei, &s->ps, s->nal_unit_type);
         if (ret < 0)
             goto fail;
         break;
@@ -3075,7 +3080,7 @@ static int decode_nal_unit(HEVCContext *s, const H2645NAL *nal)
     case HEVC_NAL_RADL_R:
     case HEVC_NAL_RASL_N:
     case HEVC_NAL_RASL_R:
-        ret = hls_slice_header(s);
+        ret = hls_slice_header(s, &gb);
         if (ret < 0)
             return ret;
         if (ret == 1) {
@@ -3114,7 +3119,7 @@ static int decode_nal_unit(HEVCContext *s, const H2645NAL *nal)
             ret = hevc_frame_start(s);
             if (ret < 0)
                 return ret;
-        } else if (!s->ref) {
+        } else if (!s->cur_frame) {
             av_log(s->avctx, AV_LOG_ERROR, "First slice in a frame missing.\n");
             goto fail;
         }
@@ -3157,7 +3162,7 @@ static int decode_nal_unit(HEVCContext *s, const H2645NAL *nal)
             if (s->threads_number > 1 && s->sh.num_entry_point_offsets > 0)
                 ctb_addr_ts = hls_slice_data_wpp(s, nal);
             else
-                ctb_addr_ts = hls_decode_entry(s);
+                ctb_addr_ts = hls_decode_entry(s, &gb);
             if (ctb_addr_ts >= (s->ps.sps->ctb_width * s->ps.sps->ctb_height)) {
                 ret = hevc_frame_end(s);
                 if (ret < 0)
@@ -3197,7 +3202,7 @@ static int decode_nal_units(HEVCContext *s, const uint8_t *buf, int length)
     int i, ret = 0;
     int eos_at_start = 1;
 
-    s->ref = s->collocated_ref = NULL;
+    s->cur_frame = s->collocated_ref = NULL;
     s->last_eos = s->eos;
     s->eos = 0;
     s->overlap = 0;
@@ -3276,8 +3281,8 @@ static int decode_nal_units(HEVCContext *s, const uint8_t *buf, int length)
     }
 
 fail:
-    if (s->ref && s->threads_type == FF_THREAD_FRAME)
-        ff_progress_frame_report(&s->ref->tf, INT_MAX);
+    if (s->cur_frame && s->threads_type == FF_THREAD_FRAME)
+        ff_progress_frame_report(&s->cur_frame->tf, INT_MAX);
 
     return ret;
 }
@@ -3412,25 +3417,25 @@ static int hevc_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
                    old, s->dovi_ctx.cfg.dv_profile);
     }
 
-    s->ref = s->collocated_ref = NULL;
+    s->cur_frame = s->collocated_ref = NULL;
     ret    = decode_nal_units(s, avpkt->data, avpkt->size);
     if (ret < 0)
         return ret;
 
     if (avctx->hwaccel) {
-        if (s->ref && (ret = FF_HW_SIMPLE_CALL(avctx, end_frame)) < 0) {
+        if (s->cur_frame && (ret = FF_HW_SIMPLE_CALL(avctx, end_frame)) < 0) {
             av_log(avctx, AV_LOG_ERROR,
                    "hardware accelerator failed to decode picture\n");
-            ff_hevc_unref_frame(s->ref, ~0);
+            ff_hevc_unref_frame(s->cur_frame, ~0);
             return ret;
         }
     } else {
         /* verify the SEI checksum */
-        if (avctx->err_recognition & AV_EF_CRCCHECK && s->ref && s->is_decoded &&
+        if (avctx->err_recognition & AV_EF_CRCCHECK && s->cur_frame && s->is_decoded &&
             s->sei.picture_hash.is_md5) {
-            ret = verify_md5(s, s->ref->frame);
+            ret = verify_md5(s, s->cur_frame->f);
             if (ret < 0 && avctx->err_recognition & AV_EF_EXPLODE) {
-                ff_hevc_unref_frame(s->ref, ~0);
+                ff_hevc_unref_frame(s->cur_frame, ~0);
                 return ret;
             }
         }
@@ -3531,11 +3536,9 @@ static av_cold int hevc_init_context(AVCodecContext *avctx)
         return AVERROR(ENOMEM);
     s->nb_local_ctx = 1;
 
-    s->HEVClc = &s->local_ctx[0];
-
-    s->HEVClc->parent = s;
-    s->HEVClc->logctx = avctx;
-    s->HEVClc->common_cabac_state = &s->cabac;
+    s->local_ctx[0].parent = s;
+    s->local_ctx[0].logctx = avctx;
+    s->local_ctx[0].common_cabac_state = &s->cabac;
 
     s->output_frame = av_frame_alloc();
     if (!s->output_frame)
@@ -3573,7 +3576,7 @@ static int hevc_update_thread_context(AVCodecContext *dst,
 
     for (i = 0; i < FF_ARRAY_ELEMS(s->DPB); i++) {
         ff_hevc_unref_frame(&s->DPB[i], ~0);
-        if (s0->DPB[i].frame) {
+        if (s0->DPB[i].f) {
             ret = hevc_ref_frame(&s->DPB[i], &s0->DPB[i]);
             if (ret < 0)
                 return ret;

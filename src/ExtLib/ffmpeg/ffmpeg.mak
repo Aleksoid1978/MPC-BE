@@ -420,9 +420,12 @@ SRCS_LC = \
 	libavcodec/nellymoserdec.c \
 	\
 	libavcodec/aac/aacdec.c \
+	libavcodec/aac/aacdec_ac.c \
 	libavcodec/aac/aacdec_fixed.c \
 	libavcodec/aac/aacdec_float.c \
-	libavcodec/aac/aacdec_tab.c
+	libavcodec/aac/aacdec_lpd.c \
+	libavcodec/aac/aacdec_tab.c \
+	libavcodec/aac/aacdec_usac.c
 
 SRCS_LC_B = \
 	libavcodec/nvdec.c \

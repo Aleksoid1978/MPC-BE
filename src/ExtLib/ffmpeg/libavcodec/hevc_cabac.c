@@ -427,16 +427,6 @@ static int cabac_reinit(HEVCLocalContext *lc)
     return skip_bytes(&lc->cc, 0) == NULL ? AVERROR_INVALIDDATA : 0;
 }
 
-static int cabac_init_decoder(HEVCLocalContext *lc)
-{
-    GetBitContext *gb = &lc->gb;
-    skip_bits(gb, 1);
-    align_get_bits(gb);
-    return ff_init_cabac_decoder(&lc->cc,
-                          gb->buffer + get_bits_count(gb) / 8,
-                          (get_bits_left(gb) + 7) / 8);
-}
-
 static void cabac_init_state(HEVCLocalContext *lc, const HEVCContext *s)
 {
     int init_type = 2 - s->sh.slice_type;
@@ -461,12 +451,13 @@ static void cabac_init_state(HEVCLocalContext *lc, const HEVCContext *s)
         lc->stat_coeff[i] = 0;
 }
 
-int ff_hevc_cabac_init(HEVCLocalContext *lc, int ctb_addr_ts)
+int ff_hevc_cabac_init(HEVCLocalContext *lc, int ctb_addr_ts,
+                       const uint8_t *data, size_t size)
 {
     const HEVCContext *const s = lc->parent;
 
     if (ctb_addr_ts == s->ps.pps->ctb_addr_rs_to_ts[s->sh.slice_ctb_addr_rs]) {
-        int ret = cabac_init_decoder(lc);
+        int ret = ff_init_cabac_decoder(&lc->cc, data, size);
         if (ret < 0)
             return ret;
         if (s->sh.dependent_slice_segment_flag == 0 ||
@@ -490,7 +481,7 @@ int ff_hevc_cabac_init(HEVCLocalContext *lc, int ctb_addr_ts)
             if (s->threads_number == 1)
                 ret = cabac_reinit(lc);
             else {
-                ret = cabac_init_decoder(lc);
+                ret = ff_init_cabac_decoder(&lc->cc, data, size);
             }
             if (ret < 0)
                 return ret;
@@ -503,7 +494,7 @@ int ff_hevc_cabac_init(HEVCLocalContext *lc, int ctb_addr_ts)
                 if (s->threads_number == 1)
                     ret = cabac_reinit(lc);
                 else {
-                    ret = cabac_init_decoder(lc);
+                    ret = ff_init_cabac_decoder(&lc->cc, data, size);
                 }
                 if (ret < 0)
                     return ret;
@@ -1011,10 +1002,10 @@ void ff_hevc_hls_residual_coding(HEVCLocalContext *lc, int x0, int y0,
 
     const uint8_t *scan_x_cg, *scan_y_cg, *scan_x_off, *scan_y_off;
 
-    ptrdiff_t stride = s->frame->linesize[c_idx];
+    ptrdiff_t stride = s->cur_frame->f->linesize[c_idx];
     int hshift = s->ps.sps->hshift[c_idx];
     int vshift = s->ps.sps->vshift[c_idx];
-    uint8_t *dst = &s->frame->data[c_idx][(y0 >> vshift) * stride +
+    uint8_t *dst = &s->cur_frame->f->data[c_idx][(y0 >> vshift) * stride +
                                           ((x0 >> hshift) << s->ps.sps->pixel_shift)];
     int16_t *coeffs = (int16_t*)(c_idx ? lc->edge_emu_buffer2 : lc->edge_emu_buffer);
     uint8_t significant_coeff_group_flag[8][8] = {{0}};

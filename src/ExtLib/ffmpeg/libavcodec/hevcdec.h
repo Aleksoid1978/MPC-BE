@@ -277,6 +277,7 @@ typedef struct SliceHeader {
     int16_t chroma_offset_l1[16][2];
 
     int slice_ctb_addr_rs;
+    unsigned data_offset;
 } SliceHeader;
 
 typedef struct CodingUnit {
@@ -354,7 +355,7 @@ typedef struct DBParams {
 typedef struct HEVCFrame {
     union {
         struct {
-            AVFrame *frame;
+            AVFrame *f;
         };
         ProgressFrame tf;
     };
@@ -393,7 +394,6 @@ typedef struct HEVCLocalContext {
     void *logctx;
     const struct HEVCContext *parent;
 
-    GetBitContext gb;
     CABACContext cc;
 
     /**
@@ -452,8 +452,6 @@ typedef struct HEVCContext {
     HEVCLocalContext     *local_ctx;
     unsigned           nb_local_ctx;
 
-    HEVCLocalContext    *HEVClc;
-
     uint8_t             threads_type;
     uint8_t             threads_number;
 
@@ -463,7 +461,6 @@ typedef struct HEVCContext {
     /** 1 if the independent slice segment header was successfully parsed */
     uint8_t slice_initialized;
 
-    AVFrame *frame;
     AVFrame *output_frame;
     uint8_t *sao_pixel_buffer_h[3];
     uint8_t *sao_pixel_buffer_v[3];
@@ -483,7 +480,7 @@ typedef struct HEVCContext {
     DBParams *deblock;
     enum HEVCNALUnitType nal_unit_type;
     int temporal_id;  ///< temporal_id_plus1 - 1
-    HEVCFrame *ref;
+    HEVCFrame *cur_frame;
     HEVCFrame *collocated_ref;
     HEVCFrame DPB[32];
     int poc;
@@ -582,7 +579,8 @@ int ff_hevc_frame_rps(HEVCContext *s);
 int ff_hevc_slice_rpl(HEVCContext *s);
 
 void ff_hevc_save_states(HEVCLocalContext *lc, int ctb_addr_ts);
-int ff_hevc_cabac_init(HEVCLocalContext *lc, int ctb_addr_ts);
+int ff_hevc_cabac_init(HEVCLocalContext *lc, int ctb_addr_ts,
+                       const uint8_t *data, size_t size);
 int ff_hevc_sao_merge_flag_decode(HEVCLocalContext *lc);
 int ff_hevc_sao_type_idx_decode(HEVCLocalContext *lc);
 int ff_hevc_sao_band_position_decode(HEVCLocalContext *lc);
@@ -619,7 +617,7 @@ int ff_hevc_res_scale_sign_flag(HEVCLocalContext *lc, int idx);
  */
 int ff_hevc_frame_nb_refs(const HEVCContext *s);
 
-int ff_hevc_set_new_ref(HEVCContext *s, AVFrame **frame, int poc);
+int ff_hevc_set_new_ref(HEVCContext *s, int poc);
 
 static av_always_inline int ff_hevc_nal_is_nonref(enum HEVCNALUnitType type)
 {
