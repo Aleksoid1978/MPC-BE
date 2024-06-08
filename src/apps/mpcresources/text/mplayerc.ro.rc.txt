@@ -434,10 +434,10 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 37		"Afișează timpul de căutare"
 38		"Dezactivează meniul ""Deschide Disc"""
 39		"Prioritatea procesării peste normal"
-40		"Network timeouts"
-41		"Connection:"
+40		"Întreruperi de rețea"
+41		"Conexiune:"
 44		"sec."
-45		"Receiving data:"
+45		"Se primesc date:"
 48		"sec."
 END
 
