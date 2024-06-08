@@ -2,7 +2,7 @@
 #include "libavutil/avassert.h"
 #include "libavutil/mem_internal.h"
 #include "libavutil/pixdesc.h"
-#include "libavcodec/hevc.h"
+#include "libavcodec/hevc/hevc.h"
 #include "libavcodec/x86/hevcdsp.h"
 
 #ifdef __GNUC__

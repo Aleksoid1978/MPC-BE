@@ -20,8 +20,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVCODEC_HEVCPRED_H
-#define AVCODEC_HEVCPRED_H
+#ifndef AVCODEC_HEVC_PRED_H
+#define AVCODEC_HEVC_PRED_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -46,4 +46,4 @@ void ff_hevc_pred_init_mips(HEVCPredContext *hpc, int bit_depth);
 void ff_hevc_pred_init_x86(HEVCPredContext *hpc, int bit_depth);
 // ==> End patch MPC
 
-#endif /* AVCODEC_HEVCPRED_H */
+#endif /* AVCODEC_HEVC_PRED_H */

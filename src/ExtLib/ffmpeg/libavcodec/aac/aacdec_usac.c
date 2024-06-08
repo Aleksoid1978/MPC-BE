@@ -268,17 +268,25 @@ int ff_aac_usac_reset_state(AACDecContext *ac, OutputConfiguration *oc)
     /* Initialize state */
     for (int i = 0; i < usac->nb_elems; i++) {
         AACUsacElemConfig *e = &usac->elems[i];
-        if (e->type != ID_USAC_SCE && e->type != ID_USAC_CPE)
+        if (e->type == ID_USAC_EXT)
             continue;
 
-        if (e->type == ID_USAC_SCE) {
+        switch (e->type) {
+        case ID_USAC_SCE:
             ch = 1;
             type = TYPE_SCE;
             id = elem_id[0]++;
-        } else {
+            break;
+        case ID_USAC_CPE:
             ch = 2;
             type = TYPE_CPE;
             id = elem_id[1]++;
+            break;
+        case ID_USAC_LFE:
+            ch = 1;
+            type = TYPE_LFE;
+            id = elem_id[2]++;
+            break;
         }
 
         che = ff_aac_get_che(ac, type, id);
@@ -318,7 +326,8 @@ int ff_aac_usac_config_decode(AACDecContext *ac, AVCodecContext *avctx,
     AACUSACConfig *usac = &oc->usac;
     int elem_id[3 /* SCE, CPE, LFE */];
 
-    uint8_t layout_map[MAX_ELEM_ID*4][3];
+    int map_pos_set = 0;
+    uint8_t layout_map[MAX_ELEM_ID*4][3] = { 0 };
 
     memset(usac, 0, sizeof(*usac));
 
@@ -371,8 +380,6 @@ int ff_aac_usac_config_decode(AACDecContext *ac, AVCodecContext *avctx,
         for (int i = 0; i < nb_channels; i++) {
             AVChannelCustom *cm = &ac->oc[1].ch_layout.u.map[i];
             cm->id = usac_ch_pos_to_av[get_bits(gb, 5)]; /* bsOutputChannelPos */
-            if (cm->id == AV_CHAN_NONE)
-                cm->id = AV_CHAN_UNKNOWN;
         }
 
         ret = av_channel_layout_retype(&ac->oc[1].ch_layout,
@@ -393,6 +400,8 @@ int ff_aac_usac_config_decode(AACDecContext *ac, AVCodecContext *avctx,
         /* Fill in the number of expected channels */
         for (int i = 0; i < nb_elements; i++)
             nb_channels += layout_map[i][0] == TYPE_CPE ? 2 : 1;
+
+        map_pos_set = 1;
     }
 
     /* UsacDecoderConfig */
@@ -401,18 +410,20 @@ int ff_aac_usac_config_decode(AACDecContext *ac, AVCodecContext *avctx,
     if (usac->nb_elems > 64) {
         av_log(ac->avctx, AV_LOG_ERROR, "Too many elements: %i\n",
                usac->nb_elems);
+        usac->nb_elems = 0;
         return AVERROR(EINVAL);
     }
 
     for (int i = 0; i < usac->nb_elems; i++) {
+        int map_count = elem_id[0] + elem_id[1] + elem_id[2];
         AACUsacElemConfig *e = &usac->elems[i];
         memset(e, 0, sizeof(*e));
 
         e->type = get_bits(gb, 2); /* usacElementType */
-        if (e->type != ID_USAC_EXT &&
-            (elem_id[0] + elem_id[1] + elem_id[2] + 1) > nb_channels) {
+        if (e->type != ID_USAC_EXT && (map_count + 1) > nb_channels) {
             av_log(ac->avctx, AV_LOG_ERROR, "Too many channels for the channel "
                                             "configuration\n");
+            usac->nb_elems = 0;
             return AVERROR(EINVAL);
         }
 
@@ -425,27 +436,31 @@ int ff_aac_usac_config_decode(AACDecContext *ac, AVCodecContext *avctx,
             decode_usac_element_core(e, gb, sbr_ratio);
             if (e->sbr.ratio > 0)
                 decode_usac_sbr_data(e, gb);
-            layout_map[i][0] = TYPE_SCE;
-            layout_map[i][1] = i;
-            layout_map[i][2] = AAC_CHANNEL_FRONT;
-            elem_id[0]++;
+            layout_map[map_count][0] = TYPE_SCE;
+            layout_map[map_count][1] = elem_id[0]++;
+            if (!map_pos_set)
+                layout_map[map_count][2] = AAC_CHANNEL_FRONT;
 
             break;
         case ID_USAC_CPE: /* UsacChannelPairElementConf */
             /* UsacCoreConfig */
             decode_usac_element_core(e, gb, sbr_ratio);
             decode_usac_element_pair(e, gb);
-            layout_map[i][0] = TYPE_CPE;
-            layout_map[i][1] = i;
-            layout_map[i][2] = AAC_CHANNEL_FRONT;
-            elem_id[1]++;
+            layout_map[map_count][0] = TYPE_CPE;
+            layout_map[map_count][1] = elem_id[1]++;
+            if (!map_pos_set)
+                layout_map[map_count][2] = AAC_CHANNEL_FRONT;
 
             break;
         case ID_USAC_LFE: /* LFE */
             /* LFE has no need for any configuration */
             e->tw_mdct = 0;
             e->noise_fill = 0;
-            elem_id[2]++;
+            layout_map[map_count][0] = TYPE_LFE;
+            layout_map[map_count][1] = elem_id[2]++;
+            if (!map_pos_set)
+                layout_map[map_count][2] = AAC_CHANNEL_LFE;
+
             break;
         case ID_USAC_EXT: /* EXT */
             ret = decode_usac_extension(ac, e, gb);
@@ -455,9 +470,11 @@ int ff_aac_usac_config_decode(AACDecContext *ac, AVCodecContext *avctx,
         };
     }
 
-    ret = ff_aac_output_configure(ac, layout_map, elem_id[0] + elem_id[1] + elem_id[2], OC_GLOBAL_HDR, 0);
+    ret = ff_aac_output_configure(ac, layout_map, elem_id[0] + elem_id[1] + elem_id[2],
+                                  OC_GLOBAL_HDR, 0);
     if (ret < 0) {
         av_log(avctx, AV_LOG_ERROR, "Unable to parse channel config!\n");
+        usac->nb_elems = 0;
         return ret;
     }
 
@@ -493,6 +510,8 @@ int ff_aac_usac_config_decode(AACDecContext *ac, AVCodecContext *avctx,
             }
         }
     }
+
+    ac->avctx->profile = AV_PROFILE_AAC_USAC;
 
     ret = ff_aac_usac_reset_state(ac, oc);
     if (ret < 0)
@@ -553,8 +572,14 @@ static int decode_spectrum_and_dequant_ac(AACDecContext *s, float coef[1024],
     int gb_count;
     GetBitContext gb2;
 
-    ff_aac_ac_init(&ac, gb);
     c = ff_aac_ac_map_process(state, reset, N);
+
+    if (!len) {
+        ff_aac_ac_finish(state, 0, N);
+        return 0;
+    }
+
+    ff_aac_ac_init(&ac, gb);
 
     /* Backup reader for rolling back by 14 bits at the end */
     gb2 = *gb;
@@ -633,7 +658,9 @@ static int decode_spectrum_and_dequant_ac(AACDecContext *s, float coef[1024],
 
 static int decode_usac_stereo_cplx(AACDecContext *ac, AACUsacStereo *us,
                                    ChannelElement *cpe, GetBitContext *gb,
-                                   int num_window_groups, int indep_flag)
+                                   int num_window_groups,
+                                   int prev_num_window_groups,
+                                   int indep_flag)
 {
     int delta_code_time;
     IndividualChannelStream *ics = &cpe->ch[0].ics;
@@ -664,6 +691,10 @@ static int decode_usac_stereo_cplx(AACDecContext *ac, AACUsacStereo *us,
     if (!indep_flag)
         delta_code_time = get_bits1(gb);
 
+    /* Alpha values must be zeroed out if pred_used is 0. */
+    memset(us->alpha_q_re, 0, sizeof(us->alpha_q_re));
+    memset(us->alpha_q_im, 0, sizeof(us->alpha_q_im));
+
     /* TODO: shouldn't be needed */
     for (int g = 0; g < num_window_groups; g++) {
         for (int sfb = 0; sfb < cpe->max_sfb_ste; sfb += SFB_PER_PRED_BAND) {
@@ -671,15 +702,18 @@ static int decode_usac_stereo_cplx(AACDecContext *ac, AACUsacStereo *us,
             float last_alpha_q_im = 0;
             if (delta_code_time) {
                 if (g) {
-                    last_alpha_q_re = us->prev_alpha_q_re[(g - 1)*cpe->max_sfb_ste + sfb];
-                    last_alpha_q_im = us->prev_alpha_q_im[(g - 1)*cpe->max_sfb_ste + sfb];
-                } else if ((ics->window_sequence[0] == EIGHT_SHORT_SEQUENCE) &&
-                           ics->window_sequence[1] == EIGHT_SHORT_SEQUENCE ||
-                           ics->window_sequence[1] == EIGHT_SHORT_SEQUENCE) {
+                    /* Transient, after the first group - use the current frame,
+                     * previous window, alpha values. */
+                    last_alpha_q_re = us->alpha_q_re[(g - 1)*cpe->max_sfb_ste + sfb];
+                    last_alpha_q_im = us->alpha_q_im[(g - 1)*cpe->max_sfb_ste + sfb];
+                } else if (!g &&
+                           (ics->window_sequence[0] == EIGHT_SHORT_SEQUENCE) &&
+                           (ics->window_sequence[1] == EIGHT_SHORT_SEQUENCE)) {
                     /* The spec doesn't explicitly mention this, but it doesn't make
                      * any other sense otherwise! */
-                    last_alpha_q_re = us->prev_alpha_q_re[7*cpe->max_sfb_ste + sfb];
-                    last_alpha_q_im = us->prev_alpha_q_im[7*cpe->max_sfb_ste + sfb];
+                    const int wg = prev_num_window_groups - 1;
+                    last_alpha_q_re = us->prev_alpha_q_re[wg*cpe->max_sfb_ste + sfb];
+                    last_alpha_q_im = us->prev_alpha_q_im[wg*cpe->max_sfb_ste + sfb];
                 } else {
                     last_alpha_q_re = us->prev_alpha_q_re[g*cpe->max_sfb_ste + sfb];
                     last_alpha_q_im = us->prev_alpha_q_im[g*cpe->max_sfb_ste + sfb];
@@ -724,6 +758,7 @@ static int setup_sce(AACDecContext *ac, SingleChannelElement *sce,
     IndividualChannelStream *ics = &sce->ics;
 
     /* Setup window parameters */
+    ics->prev_num_window_groups = FFMAX(ics->num_window_groups, 1);
     if (ics->window_sequence[0] == EIGHT_SHORT_SEQUENCE) {
         if (usac->core_frame_len == 768) {
             ics->swb_offset = ff_swb_offset_96[usac->rate_idx];
@@ -732,7 +767,7 @@ static int setup_sce(AACDecContext *ac, SingleChannelElement *sce,
             ics->swb_offset = ff_swb_offset_128[usac->rate_idx];
             ics->num_swb = ff_aac_num_swb_128[usac->rate_idx];
         }
-        ics->tns_max_bands = ff_tns_max_bands_128[usac->rate_idx];
+        ics->tns_max_bands = ff_tns_max_bands_usac_128[usac->rate_idx];
 
         /* Setup scalefactor grouping. 7 bit mask. */
         ics->num_window_groups = 0;
@@ -755,7 +790,7 @@ static int setup_sce(AACDecContext *ac, SingleChannelElement *sce,
             ics->swb_offset = ff_swb_offset_1024[usac->rate_idx];
             ics->num_swb = ff_aac_num_swb_1024[usac->rate_idx];
         }
-        ics->tns_max_bands = ff_tns_max_bands_1024[usac->rate_idx];
+        ics->tns_max_bands = ff_tns_max_bands_usac_1024[usac->rate_idx];
 
         ics->group_len[0] = 1;
         ics->num_window_groups = 1;
@@ -844,7 +879,9 @@ static int decode_usac_stereo_info(AACDecContext *ac, AACUSACConfig *usac,
             memset(cpe->ms_mask, 0xFF, sizeof(cpe->ms_mask));
         } else if ((us->ms_mask_mode == 3) && !ec->stereo_config_index) {
             ret = decode_usac_stereo_cplx(ac, us, cpe, gb,
-                                          ics1->num_window_groups, indep_flag);
+                                          ics1->num_window_groups,
+                                          ics1->prev_num_window_groups,
+                                          indep_flag);
             if (ret < 0)
                 return ret;
         }
@@ -857,28 +894,30 @@ static int decode_usac_stereo_info(AACDecContext *ac, AACUSACConfig *usac,
         return AVERROR_PATCHWELCOME;
     }
 
-    sce1->tns.present = sce2->tns.present = 0;
+    us->tns_on_lr = 0;
+    ue1->tns_data_present = ue2->tns_data_present = 0;
     if (tns_active) {
-        av_unused int tns_on_lr;
         int common_tns = 0;
         if (us->common_window)
             common_tns = get_bits1(gb);
 
-        tns_on_lr = get_bits1(gb);
+        us->tns_on_lr = get_bits1(gb);
         if (common_tns) {
             ret = ff_aac_decode_tns(ac, &sce1->tns, gb, ics1);
             if (ret < 0)
                 return ret;
             memcpy(&sce2->tns, &sce1->tns, sizeof(sce1->tns));
-            sce2->tns.present = 0;
-            sce1->tns.present = 0;
+            sce2->tns.present = 1;
+            sce1->tns.present = 1;
+            ue1->tns_data_present = 0;
+            ue2->tns_data_present = 0;
         } else {
             if (get_bits1(gb)) {
-                sce2->tns.present = 1;
-                sce1->tns.present = 1;
+                ue1->tns_data_present = 1;
+                ue2->tns_data_present = 1;
             } else {
-                sce2->tns.present = get_bits1(gb);
-                sce1->tns.present = !sce2->tns.present;
+                ue2->tns_data_present = get_bits1(gb);
+                ue1->tns_data_present = !ue2->tns_data_present;
             }
         }
     }
@@ -903,7 +942,7 @@ static void apply_noise_fill(AACDecContext *ac, SingleChannelElement *sce,
     float *coef;
     IndividualChannelStream *ics = &sce->ics;
 
-    float noise_val = pow(2, (ue->noise.level - 14)/3);
+    float noise_val = powf(2, ((float)ue->noise.level - 14.0f)/3.0f);
     int noise_offset = ue->noise.offset - 16;
     int band_off;
 
@@ -1195,6 +1234,14 @@ static void spectrum_decode(AACDecContext *ac, AACUSACConfig *usac,
     }
 
     if (nb_channels > 1 && us->common_window) {
+        for (int ch = 0; ch < nb_channels; ch++) {
+            SingleChannelElement *sce = &cpe->ch[ch];
+
+            /* Apply TNS, if the tns_on_lr bit is not set. */
+            if (sce->tns.present && !us->tns_on_lr)
+                ac->dsp.apply_tns(sce->coeffs, &sce->tns, &sce->ics, 1);
+        }
+
         if (us->ms_mask_mode == 3) {
             const float *filt;
             complex_stereo_downmix_cur(ac, cpe, us->dmix_re);
@@ -1229,8 +1276,8 @@ static void spectrum_decode(AACDecContext *ac, AACUSACConfig *usac,
     for (int ch = 0; ch < nb_channels; ch++) {
         SingleChannelElement *sce = &cpe->ch[ch];
 
-        /* Apply TNS */
-        if (sce->tns.present)
+        /* Apply TNS, if it hasn't been applied yet. */
+        if (sce->tns.present && ((nb_channels == 1) || (us->tns_on_lr)))
             ac->dsp.apply_tns(sce->coeffs, &sce->tns, &sce->ics, 1);
 
         ac->oc[1].m4ac.frame_length_short ? ac->dsp.imdct_and_windowing_768(ac, sce) :
@@ -1250,11 +1297,13 @@ static int decode_usac_core_coder(AACDecContext *ac, AACUSACConfig *usac,
     uint8_t global_gain;
 
     us->common_window = 0;
-    che->ch[0].tns.present = che->ch[1].tns.present = 0;
 
     for (int ch = 0; ch < nb_channels; ch++) {
         SingleChannelElement *sce = &che->ch[ch];
         AACUsacElemData *ue = &sce->ue;
+
+        sce->tns.present = 0;
+        ue->tns_data_present = 0;
 
         ue->core_mode = get_bits1(gb);
     }
@@ -1274,11 +1323,12 @@ static int decode_usac_core_coder(AACDecContext *ac, AACUSACConfig *usac,
             ret = ff_aac_ldp_parse_channel_stream(ac, usac, ue, gb);
             if (ret < 0)
                 return ret;
+            continue;
         }
 
         if ((nb_channels == 1) ||
             (che->ch[0].ue.core_mode != che->ch[1].ue.core_mode))
-            sce->tns.present = get_bits1(gb);
+            ue->tns_data_present = get_bits1(gb);
 
         /* fd_channel_stream */
         global_gain = get_bits(gb, 8);
@@ -1323,7 +1373,8 @@ static int decode_usac_core_coder(AACDecContext *ac, AACUSACConfig *usac,
 
         ac->dsp.dequant_scalefactors(sce);
 
-        if (sce->tns.present) {
+        if (ue->tns_data_present) {
+            sce->tns.present = 1;
             ret = ff_aac_decode_tns(ac, &sce->tns, gb, ics);
             if (ret < 0)
                 return ret;
@@ -1525,52 +1576,60 @@ static int parse_ext_ele(AACDecContext *ac, AACUsacElemConfig *e,
 int ff_aac_usac_decode_frame(AVCodecContext *avctx, AACDecContext *ac,
                              GetBitContext *gb, int *got_frame_ptr)
 {
-    int ret, nb_ch_el, is_dmono = 0;
+    int ret, is_dmono = 0;
     int indep_flag, samples = 0;
-    int audio_found = 0, sce_count = 0;
+    int audio_found = 0;
+    int elem_id[3 /* SCE, CPE, LFE */] = { 0, 0, 0 };
+
     AVFrame *frame = ac->frame;
 
     ff_aac_output_configure(ac, ac->oc[1].layout_map, ac->oc[1].layout_map_tags,
                             ac->oc[1].status, 0);
 
+    ac->avctx->profile = AV_PROFILE_AAC_USAC;
+
     indep_flag = get_bits1(gb);
 
-    nb_ch_el = 0;
     for (int i = 0; i < ac->oc[1].usac.nb_elems; i++) {
+        int layout_id;
+        int layout_type;
         AACUsacElemConfig *e = &ac->oc[1].usac.elems[i];
         ChannelElement *che;
+
+        if (e->type == ID_USAC_SCE) {
+            layout_id = elem_id[0]++;
+            layout_type = TYPE_SCE;
+            che = ff_aac_get_che(ac, TYPE_SCE, layout_id);
+        } else if (e->type == ID_USAC_CPE) {
+            layout_id = elem_id[1]++;
+            layout_type = TYPE_CPE;
+            che = ff_aac_get_che(ac, TYPE_CPE, layout_id);
+        } else if (e->type == ID_USAC_LFE) {
+            layout_id = elem_id[2]++;
+            layout_type = TYPE_LFE;
+            che = ff_aac_get_che(ac, TYPE_LFE, layout_id);
+       }
+
+       if (e->type != ID_USAC_EXT && !che) {
+            av_log(ac->avctx, AV_LOG_ERROR,
+                   "channel element %d.%d is not allocated\n",
+                   layout_type, layout_id);
+            return AVERROR_INVALIDDATA;
+       }
 
         switch (e->type) {
         case ID_USAC_LFE:
             /* Fallthrough */
         case ID_USAC_SCE:
-            che = ff_aac_get_che(ac, TYPE_SCE, nb_ch_el++);
-            if (!che) {
-                av_log(ac->avctx, AV_LOG_ERROR,
-                       "channel element %d.%d is not allocated\n",
-                       TYPE_SCE, nb_ch_el - 1);
-                return AVERROR_INVALIDDATA;
-            }
-
             ret = decode_usac_core_coder(ac, &ac->oc[1].usac, e, che, gb,
                                          indep_flag, 1);
             if (ret < 0)
                 return ret;
 
-            sce_count++;
             audio_found = 1;
             che->present = 1;
-            samples = ac->oc[1].m4ac.frame_length_short ? 768 : 1024;
             break;
         case ID_USAC_CPE:
-            che = ff_aac_get_che(ac, TYPE_CPE, nb_ch_el++);
-            if (!che) {
-                av_log(ac->avctx, AV_LOG_ERROR,
-                       "channel element %d.%d is not allocated\n",
-                       TYPE_CPE, nb_ch_el - 1);
-                return AVERROR_INVALIDDATA;
-            }
-
             ret = decode_usac_core_coder(ac, &ac->oc[1].usac, e, che, gb,
                                          indep_flag, 2);
             if (ret < 0)
@@ -1578,7 +1637,6 @@ int ff_aac_usac_decode_frame(AVCodecContext *avctx, AACDecContext *ac,
 
             audio_found = 1;
             che->present = 1;
-            samples = ac->oc[1].m4ac.frame_length_short ? 768 : 1024;
             break;
         case ID_USAC_EXT:
             ret = parse_ext_ele(ac, e, gb);
@@ -1587,6 +1645,9 @@ int ff_aac_usac_decode_frame(AVCodecContext *avctx, AACDecContext *ac,
             break;
         }
     }
+
+    if (audio_found)
+        samples = ac->oc[1].m4ac.frame_length_short ? 768 : 1024;
 
     if (ac->oc[1].status && audio_found) {
         avctx->sample_rate = ac->oc[1].m4ac.sample_rate;
@@ -1611,7 +1672,7 @@ int ff_aac_usac_decode_frame(AVCodecContext *avctx, AACDecContext *ac,
     }
 
     /* for dual-mono audio (SCE + SCE) */
-    is_dmono = ac->dmono_mode && sce_count == 2 &&
+    is_dmono = ac->dmono_mode && elem_id[0] == 2 &&
                !av_channel_layout_compare(&ac->oc[1].ch_layout,
                                           &(AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO);
     if (is_dmono) {

@@ -3,7 +3,7 @@
 1.7.2.x dev
 =============================
 Updated libraries:
-	ffmpeg git-n7.1-dev-1103-gba56a300a9.
+	ffmpeg git-n7.1-dev-1158-g7560db937d.
 
 
 1.7.2 - 2024-06-07

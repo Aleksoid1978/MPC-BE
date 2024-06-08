@@ -67,6 +67,7 @@ OBJ_DIRS = $(OBJ_DIR) \
 	$(OBJ_DIR)libavcodec \
 	$(OBJ_DIR)libavcodec/bsf \
 	$(OBJ_DIR)libavcodec/aac \
+	$(OBJ_DIR)libavcodec/hevc \
 	$(OBJ_DIR)libavcodec/vvc \
 	$(OBJ_DIR)libavcodec/x86 \
 	$(OBJ_DIR)libavcodec/x86/h26x \
@@ -292,18 +293,6 @@ SRCS_LC = \
 	libavcodec/half2float.c \
 	libavcodec/hap.c \
 	libavcodec/hapdec.c \
-	libavcodec/hevc_cabac.c \
-	libavcodec/hevc_data.c \
-	libavcodec/hevc_filter.c \
-	libavcodec/hevc_mvs.c \
-	libavcodec/hevc_parse.c \
-	libavcodec/hevc_parser.c \
-	libavcodec/hevc_ps.c \
-	libavcodec/hevc_refs.c \
-	libavcodec/hevc_sei.c \
-	libavcodec/hevcdec.c \
-	libavcodec/hevcdsp.c \
-	libavcodec/hevcpred.c \
 	libavcodec/hpeldsp.c \
 	libavcodec/hq_hqa.c \
 	libavcodec/hq_hqadsp.c \
@@ -425,7 +414,20 @@ SRCS_LC = \
 	libavcodec/aac/aacdec_float.c \
 	libavcodec/aac/aacdec_lpd.c \
 	libavcodec/aac/aacdec_tab.c \
-	libavcodec/aac/aacdec_usac.c
+	libavcodec/aac/aacdec_usac.c \
+	\
+	libavcodec/hevc/cabac.c \
+	libavcodec/hevc/data.c \
+	libavcodec/hevc/dsp.c \
+	libavcodec/hevc/filter.c \
+	libavcodec/hevc/hevcdec.c \
+	libavcodec/hevc/mvs.c \
+	libavcodec/hevc/parse.c \
+	libavcodec/hevc/parser.c \
+	libavcodec/hevc/pred.c \
+	libavcodec/hevc/ps.c \
+	libavcodec/hevc/refs.c \
+	libavcodec/hevc/sei.c
 
 SRCS_LC_B = \
 	libavcodec/nvdec.c \

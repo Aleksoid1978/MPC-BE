@@ -30,41 +30,61 @@
 #define PROF_TEMP_OFFSET (MAX_PB_SIZE + 32)
 static const int bcw_w_lut[] = {4, 5, 3, 10, -2};
 
-static void subpic_offset(int *x_off, int *y_off,
-    const VVCSPS *sps, const VVCPPS *pps, const int subpic_idx, const int is_chroma)
+typedef struct VVCRect {
+    int l;                  // left
+    int t;                  // top
+    int r;                  // right
+    int b;                  // bottom
+} VVCRect;
+
+static void subpic_get_rect(VVCRect *r, const VVCFrame *src_frame, const int subpic_idx, const int is_chroma)
 {
-    *x_off -= pps->subpic_x[subpic_idx] >> sps->hshift[is_chroma];
-    *y_off -= pps->subpic_y[subpic_idx] >> sps->vshift[is_chroma];
+    const VVCSPS *sps = src_frame->sps;
+    const VVCPPS *pps = src_frame->pps;
+    const int hs      = sps->hshift[is_chroma];
+    const int vs      = sps->vshift[is_chroma];
+
+    r->l = pps->subpic_x[subpic_idx] >> hs;
+    r->t = pps->subpic_y[subpic_idx] >> vs;
+    r->r = r->l + (pps->subpic_width[subpic_idx]  >> hs);
+    r->b = r->t + (pps->subpic_height[subpic_idx] >> vs);
 }
 
-static void subpic_width_height(int *pic_width, int *pic_height,
-    const VVCSPS *sps, const VVCPPS *pps, const int subpic_idx, const int is_chroma)
+// clip to subblock and subpicture process in 8.5.6.3.2 Luma sample interpolation filtering process
+static void clip_to_subpic(int *x_off, int *y_off, int *pic_width, int *pic_height, const VVCRect *subpic, const VVCRect *sb, const int dmvr_clip)
 {
-    *pic_width  = pps->subpic_width[subpic_idx]  >> sps->hshift[is_chroma];
-    *pic_height = pps->subpic_height[subpic_idx] >> sps->vshift[is_chroma];
+    const int l = dmvr_clip ? FFMIN(FFMAX(subpic->l, sb->l), subpic->r - 1) : subpic->l;
+    const int t = dmvr_clip ? FFMIN(FFMAX(subpic->t, sb->t), subpic->b - 1) : subpic->t;
+    const int r = dmvr_clip ? FFMAX(FFMIN(subpic->r, sb->r), subpic->l + 1) : subpic->r;
+    const int b = dmvr_clip ? FFMAX(FFMIN(subpic->b, sb->b), subpic->t + 1) : subpic->b;
+
+    *x_off -= l;
+    *y_off -= t;
+    *pic_width  = r - l;
+    *pic_height = b - t;
 }
 
-static int emulated_edge(const VVCLocalContext *lc, uint8_t *dst, const uint8_t **src, ptrdiff_t *src_stride, const VVCFrame *src_frame,
-    int x_off, int y_off, const int block_w, const int block_h, const int is_chroma)
+static void emulated_edge_no_wrap(const VVCLocalContext *lc, uint8_t *dst,
+    const uint8_t **src, ptrdiff_t *src_stride,
+    int x_off, int y_off, const int block_w, const int block_h,
+    const int extra_before, const int extra_after,
+    const VVCRect *subpic, const VVCRect *sb, const int dmvr_clip)
 {
     const VVCFrameContext *fc = lc->fc;
-    const VVCSPS *sps         = src_frame->sps;
-    const VVCPPS *pps         = src_frame->pps;
-    const int subpic_idx      = lc->sc->sh.r->curr_subpic_idx;
-    const int extra_before    = is_chroma ? CHROMA_EXTRA_BEFORE : LUMA_EXTRA_BEFORE;
-    const int extra_after     = is_chroma ? CHROMA_EXTRA_AFTER : LUMA_EXTRA_AFTER;
-    const int extra           = is_chroma ? CHROMA_EXTRA : LUMA_EXTRA;
+    const int extra           = extra_before + extra_after;
     int pic_width, pic_height;
 
-    subpic_offset(&x_off, &y_off, sps, pps, subpic_idx, is_chroma);
-    subpic_width_height(&pic_width, &pic_height, sps, pps, subpic_idx, is_chroma);
+    *src  += y_off * *src_stride + (x_off * (1 << fc->ps.sps->pixel_shift));
 
-    if (x_off < extra_before || y_off < extra_before ||
+    clip_to_subpic(&x_off, &y_off, &pic_width, &pic_height, subpic, sb, dmvr_clip);
+
+    if (dmvr_clip || x_off < extra_before || y_off < extra_before ||
         x_off >= pic_width - block_w - extra_after ||
         y_off >= pic_height - block_h - extra_after) {
-        const ptrdiff_t edge_emu_stride = EDGE_EMU_BUFFER_STRIDE << fc->ps.sps->pixel_shift;
-        int offset     = extra_before * *src_stride      + (extra_before << fc->ps.sps->pixel_shift);
-        int buf_offset = extra_before * edge_emu_stride + (extra_before << fc->ps.sps->pixel_shift);
+        const int ps                    = fc->ps.sps->pixel_shift;
+        const ptrdiff_t edge_emu_stride = EDGE_EMU_BUFFER_STRIDE << ps;
+        const int offset                = extra_before * *src_stride     + (extra_before << ps);
+        const int buf_offset            = extra_before * edge_emu_stride + (extra_before << ps);
 
         fc->vdsp.emulated_edge_mc(dst, *src - offset, edge_emu_stride, *src_stride,
             block_w + extra, block_h + extra, x_off - extra_before, y_off - extra_before,
@@ -72,97 +92,126 @@ static int emulated_edge(const VVCLocalContext *lc, uint8_t *dst, const uint8_t 
 
         *src = dst + buf_offset;
         *src_stride = edge_emu_stride;
-        return 1;
-    }
-    return 0;
-}
-
-static void emulated_edge_dmvr(const VVCLocalContext *lc, uint8_t *dst, const uint8_t **src, ptrdiff_t *src_stride,
-    int x_sb, int y_sb, int x_off,  int y_off, const int block_w, const int block_h, const int is_chroma)
-{
-    const VVCFrameContext *fc = lc->fc;
-    const VVCSPS *sps         = fc->ps.sps;
-    const VVCPPS *pps         = fc->ps.pps;
-    const int subpic_idx      = lc->sc->sh.r->curr_subpic_idx;
-    const int extra_before    = is_chroma ? CHROMA_EXTRA_BEFORE : LUMA_EXTRA_BEFORE;
-    const int extra_after     = is_chroma ? CHROMA_EXTRA_AFTER : LUMA_EXTRA_AFTER;
-    const int extra           = is_chroma ? CHROMA_EXTRA : LUMA_EXTRA;
-    int pic_width, pic_height;
-
-    subpic_offset(&x_off, &y_off, sps, pps, subpic_idx, is_chroma);
-    subpic_offset(&x_sb, &y_sb, sps, pps, subpic_idx, is_chroma);
-    subpic_width_height(&pic_width, &pic_height, sps, pps, subpic_idx, is_chroma);
-
-    if (x_off < extra_before || y_off < extra_before ||
-        x_off >= pic_width - block_w - extra_after ||
-        y_off >= pic_height - block_h - extra_after||
-        (x_off != x_sb || y_off !=  y_sb)) {
-        const int ps                    = fc->ps.sps->pixel_shift;
-        const ptrdiff_t edge_emu_stride = EDGE_EMU_BUFFER_STRIDE << ps;
-        const int offset                = extra_before * *src_stride + (extra_before << ps);
-        const int buf_offset            = extra_before * edge_emu_stride + (extra_before << ps);
-
-        const int start_x               = FFMIN(FFMAX(x_sb - extra_before, 0), pic_width  - 1);
-        const int start_y               = FFMIN(FFMAX(y_sb - extra_before, 0), pic_height - 1);
-        const int width                 = FFMAX(FFMIN(pic_width, x_sb + block_w + extra_after) - start_x, 1);
-        const int height                = FFMAX(FFMIN(pic_height, y_sb + block_h + extra_after) - start_y, 1);
-
-        fc->vdsp.emulated_edge_mc(dst, *src - offset, edge_emu_stride, *src_stride, block_w + extra, block_h + extra,
-            x_off - start_x - extra_before, y_off - start_y - extra_before, width, height);
-
-        *src = dst + buf_offset;
-        *src_stride = edge_emu_stride;
-   }
-}
-
-static void emulated_edge_bilinear(const VVCLocalContext *lc, uint8_t *dst, const uint8_t **src, ptrdiff_t *src_stride,
-    int x_off, int y_off, const int block_w, const int block_h)
-{
-    const VVCFrameContext *fc = lc->fc;
-    const VVCSPS *sps         = fc->ps.sps;
-    const VVCPPS *pps         = fc->ps.pps;
-    const int subpic_idx      = lc->sc->sh.r->curr_subpic_idx;
-    int pic_width, pic_height;
-
-    subpic_offset(&x_off, &y_off, sps, pps, subpic_idx, 0);
-    subpic_width_height(&pic_width, &pic_height, sps, pps, subpic_idx, 0);
-
-    if (x_off < BILINEAR_EXTRA_BEFORE || y_off < BILINEAR_EXTRA_BEFORE ||
-        x_off >= pic_width - block_w - BILINEAR_EXTRA_AFTER ||
-        y_off >= pic_height - block_h - BILINEAR_EXTRA_AFTER) {
-        const ptrdiff_t edge_emu_stride = EDGE_EMU_BUFFER_STRIDE << fc->ps.sps->pixel_shift;
-        const int offset                = BILINEAR_EXTRA_BEFORE * *src_stride + (BILINEAR_EXTRA_BEFORE << fc->ps.sps->pixel_shift);
-        const int buf_offset            = BILINEAR_EXTRA_BEFORE * edge_emu_stride + (BILINEAR_EXTRA_BEFORE << fc->ps.sps->pixel_shift);
-
-        fc->vdsp.emulated_edge_mc(dst, *src - offset, edge_emu_stride, *src_stride, block_w + BILINEAR_EXTRA, block_h + BILINEAR_EXTRA,
-            x_off - BILINEAR_EXTRA_BEFORE, y_off - BILINEAR_EXTRA_BEFORE,  pic_width, pic_height);
-
-        *src = dst + buf_offset;
-        *src_stride = edge_emu_stride;
     }
 }
 
-#define MC_EMULATED_EDGE(dst, src, src_stride, x_off, y_off)                                                \
-    emulated_edge(lc, dst, src, src_stride, ref, x_off, y_off, block_w, block_h, is_chroma)
+static void emulated_half(const VVCLocalContext *lc, uint8_t *dst, const ptrdiff_t dst_stride,
+    const uint8_t *src, const ptrdiff_t src_stride, const int ps,
+    int x_off, int y_off, const int block_w, const int block_h,
+    const VVCRect *subpic,const VVCRect *half_sb, const int dmvr_clip)
+{
+    const VVCFrameContext *fc = lc->fc;
+    int pic_width, pic_height;
 
-#define MC_EMULATED_EDGE_DMVR(dst, src, src_stride, x_sb, y_sb, x_off, y_off)                               \
-    emulated_edge_dmvr(lc, dst, src, src_stride, x_sb, y_sb, x_off, y_off, block_w, block_h, is_chroma)
+    src += y_off * src_stride + x_off * (1 << ps);
 
-#define MC_EMULATED_EDGE_BILINEAR(dst, src, src_stride, x_off, y_off)                                       \
-    emulated_edge_bilinear(lc, dst, src, src_stride, x_off, y_off, pred_w, pred_h)
+    clip_to_subpic(&x_off, &y_off, &pic_width, &pic_height, subpic, half_sb, dmvr_clip);
+
+    fc->vdsp.emulated_edge_mc(dst, src, dst_stride, src_stride,
+        block_w, block_h, x_off, y_off, pic_width, pic_height);
+}
+
+static void sb_set_lr(VVCRect *sb, const int l, const int r)
+{
+    sb->l = l;
+    sb->r = r;
+}
+
+static void sb_wrap(VVCRect *sb, const int wrap)
+{
+    sb_set_lr(sb, sb->l + wrap, sb->r + wrap);
+}
+
+static void emulated_edge(const VVCLocalContext *lc, uint8_t *dst,
+    const uint8_t **src, ptrdiff_t *src_stride, const VVCFrame *src_frame,
+    int x_sb, int y_sb, int x_off, int y_off, int block_w, int block_h, const int wrap_enabled,
+    const int is_chroma, const int extra_before, const int extra_after)
+{
+    const VVCSPS *sps          = src_frame->sps;
+    const VVCPPS *pps          = src_frame->pps;
+    const int ps               = sps->pixel_shift;
+    const int subpic_idx       = lc->sc->sh.r->curr_subpic_idx;
+    const int extra            = extra_before + extra_after;
+    const int dmvr_clip        = x_sb != x_off || y_sb != y_off;
+    const int dmvr_left        = FFMAX(x_off, x_sb) - extra_before;
+    const int dmvr_right       = FFMIN(x_off, x_sb) + block_w + extra_after;
+    const int left             = x_off - extra_before;
+    const int top              = y_off - extra_before;
+    const int pic_width        = pps->width >> sps->hshift[is_chroma];
+    const int wrap             = pps->ref_wraparound_offset << (sps->min_cb_log2_size_y - sps->hshift[is_chroma]);
+    const ptrdiff_t dst_stride = EDGE_EMU_BUFFER_STRIDE << ps;
+    VVCRect sb                 = { x_sb - extra_before, y_sb - extra_before, x_sb + block_w + extra_after, y_sb + block_h + extra_after };
+    VVCRect subpic;
+
+    subpic_get_rect(&subpic, src_frame, subpic_idx, is_chroma);
+
+    if (!wrap_enabled || (dmvr_left >= 0 && dmvr_right <= pic_width)) {
+        return emulated_edge_no_wrap(lc, dst, src, src_stride,
+            x_off, y_off, block_w, block_h, extra_before, extra_after, &subpic, &sb, dmvr_clip);
+    }
+    if (dmvr_right <= 0) {
+        sb_wrap(&sb, wrap);
+        return emulated_edge_no_wrap(lc, dst, src, src_stride,
+            x_off + wrap, y_off, block_w, block_h, extra_before, extra_after, &subpic, &sb, dmvr_clip);
+    }
+    if (dmvr_left >= pic_width) {
+        sb_wrap(&sb, -wrap);
+        return emulated_edge_no_wrap(lc, dst, src, src_stride,
+            x_off - wrap, y_off, block_w, block_h, extra_before, extra_after, &subpic, &sb, dmvr_clip);
+    }
+
+    block_w += extra;
+    block_h += extra;
+
+    // half block are wrapped
+    if (dmvr_left < 0 ) {
+        const int w     = -left;
+        VVCRect half_sb = { sb.l + wrap, sb.t, 0 + wrap, sb.b };
+        emulated_half(lc, dst, dst_stride, *src, *src_stride, ps,
+            left + wrap, top, w, block_h, &subpic, &half_sb, dmvr_clip);
+
+        sb_set_lr(&half_sb, 0, sb.r);
+        emulated_half(lc, dst +  (w << ps), dst_stride, *src, *src_stride, ps,
+            0, top, block_w - w, block_h, &subpic, &half_sb, dmvr_clip);
+    } else {
+        const int w     = pic_width - left;
+        VVCRect half_sb = { sb.l, sb.t, pic_width, sb.b };
+        emulated_half(lc, dst, dst_stride, *src, *src_stride, ps,
+            left, top, w, block_h, &subpic, &half_sb, dmvr_clip);
+
+        sb_set_lr(&half_sb, pic_width - wrap, sb.r - wrap);
+        emulated_half(lc, dst +  (w << ps), dst_stride, *src, *src_stride, ps,
+            pic_width - wrap , top, block_w - w, block_h, &subpic, &half_sb, dmvr_clip);
+    }
+
+    *src = dst + extra_before * dst_stride + (extra_before << ps);
+    *src_stride = dst_stride;
+}
+
+#define MC_EMULATED_EDGE(dst, src, src_stride, x_off, y_off)                                                                    \
+    emulated_edge(lc, dst, src, src_stride, ref, x_off, y_off, x_off, y_off, block_w, block_h, wrap_enabled, is_chroma,         \
+        is_chroma ? CHROMA_EXTRA_BEFORE : LUMA_EXTRA_BEFORE, is_chroma ? CHROMA_EXTRA_AFTER : LUMA_EXTRA_AFTER)
+
+#define MC_EMULATED_EDGE_DMVR(dst, src, src_stride, x_sb, y_sb, x_off, y_off)                                                   \
+    emulated_edge(lc, dst, src, src_stride, ref, x_sb, y_sb, x_off, y_off, block_w, block_h, wrap_enabled, is_chroma,           \
+        is_chroma ? CHROMA_EXTRA_BEFORE : LUMA_EXTRA_BEFORE, is_chroma ? CHROMA_EXTRA_AFTER : LUMA_EXTRA_AFTER)
+
+#define MC_EMULATED_EDGE_BILINEAR(dst, src, src_stride, x_off, y_off)                                                           \
+    emulated_edge(lc, dst, src, src_stride, ref, x_off, y_off, x_off, y_off, pred_w, pred_h, wrap_enabled, 0,                   \
+        BILINEAR_EXTRA_BEFORE, BILINEAR_EXTRA_AFTER)
 
 // part of 8.5.6.6 Weighted sample prediction process
 static int derive_weight_uni(int *denom, int *wx, int *ox,
     const VVCLocalContext *lc, const MvField *mvf, const int c_idx)
 {
-    const VVCFrameContext *fc   = lc->fc;
-    const VVCPPS *pps           = fc->ps.pps;
-    const VVCSH *sh             = &lc->sc->sh;
-    const int weight_flag       = (IS_P(sh->r) && pps->r->pps_weighted_pred_flag) ||
+    const VVCFrameContext *fc = lc->fc;
+    const VVCPPS *pps         = fc->ps.pps;
+    const VVCSH *sh           = &lc->sc->sh;
+    const int weight_flag     = (IS_P(sh->r) && pps->r->pps_weighted_pred_flag) ||
                                   (IS_B(sh->r) && pps->r->pps_weighted_bipred_flag);
     if (weight_flag) {
-        const int lx                = mvf->pred_flag - PF_L0;
-        const PredWeightTable *w    = pps->r->pps_wp_info_in_ph_flag ? &fc->ps.ph.pwt : &sh->pwt;
+        const int lx             = mvf->pred_flag - PF_L0;
+        const PredWeightTable *w = pps->r->pps_wp_info_in_ph_flag ? &fc->ps.ph.pwt : &sh->pwt;
 
         *denom = w->log2_denom[c_idx > 0];
         *wx = w->weight[lx][c_idx][mvf->ref_idx[lx]];
@@ -175,11 +224,11 @@ static int derive_weight_uni(int *denom, int *wx, int *ox,
 static int derive_weight(int *denom, int *w0, int *w1, int *o0, int *o1,
     const VVCLocalContext *lc, const MvField *mvf, const int c_idx, const int dmvr_flag)
 {
-    const VVCFrameContext *fc   = lc->fc;
-    const VVCPPS *pps           = fc->ps.pps;
-    const VVCSH *sh             = &lc->sc->sh;
-    const int bcw_idx           = mvf->bcw_idx;
-    const int weight_flag       = (IS_P(sh->r) && pps->r->pps_weighted_pred_flag) ||
+    const VVCFrameContext *fc = lc->fc;
+    const VVCPPS *pps         = fc->ps.pps;
+    const VVCSH *sh           = &lc->sc->sh;
+    const int bcw_idx         = mvf->bcw_idx;
+    const int weight_flag     = (IS_P(sh->r) && pps->r->pps_weighted_pred_flag) ||
                                   (IS_B(sh->r) && pps->r->pps_weighted_bipred_flag && !dmvr_flag);
     if ((!weight_flag && !bcw_idx) || (bcw_idx && lc->cu->ciip_flag))
         return 0;
@@ -190,7 +239,7 @@ static int derive_weight(int *denom, int *w0, int *w1, int *o0, int *o1,
         *w0 = 8 - *w1;
         *o0 = *o1 = 0;
     } else {
-        const VVCPPS *pps = fc->ps.pps;
+        const VVCPPS *pps        = fc->ps.pps;
         const PredWeightTable *w = pps->r->pps_wp_info_in_ph_flag ? &fc->ps.ph.pwt : &sh->pwt;
 
         *denom = w->log2_denom[c_idx > 0];
@@ -207,23 +256,23 @@ static int derive_weight(int *denom, int *w0, int *w1, int *o0, int *o1,
 static void mc(VVCLocalContext *lc, int16_t *dst, const VVCFrame *ref, const Mv *mv,
     int x_off, int y_off, const int block_w, const int block_h, const int c_idx)
 {
-    const VVCFrameContext *fc   = lc->fc;
-    const PredictionUnit *pu    = &lc->cu->pu;
-    const uint8_t *src          = ref->frame->data[c_idx];
-    ptrdiff_t src_stride        = ref->frame->linesize[c_idx];
-    const int is_chroma         = !!c_idx;
-    const int hs                = fc->ps.sps->hshift[c_idx];
-    const int vs                = fc->ps.sps->vshift[c_idx];
-    const int idx               = av_log2(block_w) - 1;
-    const intptr_t mx           = av_mod_uintp2(mv->x, 4 + hs) << (is_chroma - hs);
-    const intptr_t my           = av_mod_uintp2(mv->y, 4 + vs) << (is_chroma - vs);
-    const int hpel_if_idx       = (is_chroma || pu->merge_gpm_flag) ? 0 : pu->mi.hpel_if_idx;
-    const int8_t *hf            = INTER_FILTER(hpel_if_idx, mx);
-    const int8_t *vf            = INTER_FILTER(hpel_if_idx, my);
+    const VVCFrameContext *fc = lc->fc;
+    const PredictionUnit *pu  = &lc->cu->pu;
+    const uint8_t *src        = ref->frame->data[c_idx];
+    ptrdiff_t src_stride      = ref->frame->linesize[c_idx];
+    const int is_chroma       = !!c_idx;
+    const int hs              = fc->ps.sps->hshift[c_idx];
+    const int vs              = fc->ps.sps->vshift[c_idx];
+    const int idx             = av_log2(block_w) - 1;
+    const intptr_t mx         = av_mod_uintp2(mv->x, 4 + hs) << (is_chroma - hs);
+    const intptr_t my         = av_mod_uintp2(mv->y, 4 + vs) << (is_chroma - vs);
+    const int hpel_if_idx     = (is_chroma || pu->merge_gpm_flag) ? 0 : pu->mi.hpel_if_idx;
+    const int8_t *hf          = INTER_FILTER(hpel_if_idx, mx);
+    const int8_t *vf          = INTER_FILTER(hpel_if_idx, my);
+    const int wrap_enabled    = fc->ps.pps->r->pps_ref_wraparound_enabled_flag;
 
     x_off += mv->x >> (4 + hs);
     y_off += mv->y >> (4 + vs);
-    src  += y_off * src_stride + (x_off * (1 << fc->ps.sps->pixel_shift));
 
     MC_EMULATED_EDGE(lc->edge_emu_buffer, &src, &src_stride, x_off, y_off);
     fc->vvcdsp.inter.put[is_chroma][idx][!!my][!!mx](dst, src, src_stride, block_h, hf, vf, block_w);
@@ -233,26 +282,26 @@ static void mc_uni(VVCLocalContext *lc, uint8_t *dst, const ptrdiff_t dst_stride
     const VVCFrame *ref, const MvField *mvf, int x_off, int y_off, const int block_w, const int block_h,
     const int c_idx)
 {
-    const VVCFrameContext *fc   = lc->fc;
-    const PredictionUnit *pu    = &lc->cu->pu;
-    const uint8_t *src          = ref->frame->data[c_idx];
-    ptrdiff_t src_stride        = ref->frame->linesize[c_idx];
-    const int lx                = mvf->pred_flag - PF_L0;
-    const int hs                = fc->ps.sps->hshift[c_idx];
-    const int vs                = fc->ps.sps->vshift[c_idx];
-    const int idx               = av_log2(block_w) - 1;
-    const Mv *mv                = &mvf->mv[lx];
-    const int is_chroma         = !!c_idx;
-    const intptr_t mx           = av_mod_uintp2(mv->x, 4 + hs) << (is_chroma - hs);
-    const intptr_t my           = av_mod_uintp2(mv->y, 4 + vs) << (is_chroma - vs);
-    const int hpel_if_idx       = is_chroma ? 0 : pu->mi.hpel_if_idx;
-    const int8_t *hf            = INTER_FILTER(hpel_if_idx, mx);
-    const int8_t *vf            = INTER_FILTER(hpel_if_idx, my);
+    const VVCFrameContext *fc = lc->fc;
+    const PredictionUnit *pu  = &lc->cu->pu;
+    const uint8_t *src        = ref->frame->data[c_idx];
+    ptrdiff_t src_stride      = ref->frame->linesize[c_idx];
+    const int lx              = mvf->pred_flag - PF_L0;
+    const int hs              = fc->ps.sps->hshift[c_idx];
+    const int vs              = fc->ps.sps->vshift[c_idx];
+    const int idx             = av_log2(block_w) - 1;
+    const Mv *mv              = &mvf->mv[lx];
+    const int is_chroma       = !!c_idx;
+    const intptr_t mx         = av_mod_uintp2(mv->x, 4 + hs) << (is_chroma - hs);
+    const intptr_t my         = av_mod_uintp2(mv->y, 4 + vs) << (is_chroma - vs);
+    const int hpel_if_idx     = is_chroma ? 0 : pu->mi.hpel_if_idx;
+    const int8_t *hf          = INTER_FILTER(hpel_if_idx, mx);
+    const int8_t *vf          = INTER_FILTER(hpel_if_idx, my);
+    const int wrap_enabled    = fc->ps.pps->r->pps_ref_wraparound_enabled_flag;
     int denom, wx, ox;
 
     x_off += mv->x >> (4 + hs);
     y_off += mv->y >> (4 + vs);
-    src  += y_off * src_stride + (x_off * (1 << fc->ps.sps->pixel_shift));
 
     MC_EMULATED_EDGE(lc->edge_emu_buffer, &src, &src_stride, x_off, y_off);
     if (derive_weight_uni(&denom, &wx, &ox, lc, mvf, c_idx)) {
@@ -269,29 +318,30 @@ static void mc_bi(VVCLocalContext *lc, uint8_t *dst, const ptrdiff_t dst_stride,
     const int x_off, const int y_off, const int block_w, const int block_h, const int c_idx,
     const int sb_bdof_flag)
 {
-    const VVCFrameContext *fc   = lc->fc;
-    const PredictionUnit *pu    = &lc->cu->pu;
-    const int hs                = fc->ps.sps->hshift[c_idx];
-    const int vs                = fc->ps.sps->vshift[c_idx];
-    const int idx               = av_log2(block_w) - 1;
-    const VVCFrame *refs[]      = { ref0, ref1 };
-    int16_t *tmp[]              = { lc->tmp + sb_bdof_flag * PROF_TEMP_OFFSET, lc->tmp1 + sb_bdof_flag * PROF_TEMP_OFFSET };
+    const VVCFrameContext *fc = lc->fc;
+    const PredictionUnit *pu  = &lc->cu->pu;
+    const int hs              = fc->ps.sps->hshift[c_idx];
+    const int vs              = fc->ps.sps->vshift[c_idx];
+    const int idx             = av_log2(block_w) - 1;
+    const VVCFrame *refs[]    = { ref0, ref1 };
+    int16_t *tmp[]            = { lc->tmp + sb_bdof_flag * PROF_TEMP_OFFSET, lc->tmp1 + sb_bdof_flag * PROF_TEMP_OFFSET };
     int denom, w0, w1, o0, o1;
-    const int weight_flag       = derive_weight(&denom, &w0, &w1, &o0, &o1, lc, mvf, c_idx, pu->dmvr_flag);
-    const int is_chroma         = !!c_idx;
-    const int hpel_if_idx       = is_chroma ? 0 : pu->mi.hpel_if_idx;
+    const int weight_flag     = derive_weight(&denom, &w0, &w1, &o0, &o1, lc, mvf, c_idx, pu->dmvr_flag);
+    const int is_chroma       = !!c_idx;
+    const int hpel_if_idx     = is_chroma ? 0 : pu->mi.hpel_if_idx;
 
     for (int i = L0; i <= L1; i++) {
-        const Mv *mv            = mvf->mv + i;
-        const int mx            = av_mod_uintp2(mv->x, 4 + hs) << (is_chroma - hs);
-        const int my            = av_mod_uintp2(mv->y, 4 + vs) << (is_chroma - vs);
-        const int ox            = x_off + (mv->x >> (4 + hs));
-        const int oy            = y_off + (mv->y >> (4 + vs));
-        const VVCFrame *ref     = refs[i];
-        ptrdiff_t src_stride    = ref->frame->linesize[c_idx];
-        const uint8_t *src      = ref->frame->data[c_idx] + oy * src_stride + (ox * (1 << fc->ps.sps->pixel_shift));
-        const int8_t *hf        = INTER_FILTER(hpel_if_idx, mx);
-        const int8_t *vf        = INTER_FILTER(hpel_if_idx, my);
+        const Mv *mv           = mvf->mv + i;
+        const int mx           = av_mod_uintp2(mv->x, 4 + hs) << (is_chroma - hs);
+        const int my           = av_mod_uintp2(mv->y, 4 + vs) << (is_chroma - vs);
+        const int ox           = x_off + (mv->x >> (4 + hs));
+        const int oy           = y_off + (mv->y >> (4 + vs));
+        const VVCFrame *ref    = refs[i];
+        ptrdiff_t src_stride   = ref->frame->linesize[c_idx];
+        const uint8_t *src     = ref->frame->data[c_idx];
+        const int8_t *hf       = INTER_FILTER(hpel_if_idx, mx);
+        const int8_t *vf       = INTER_FILTER(hpel_if_idx, my);
+        const int wrap_enabled = fc->ps.pps->r->pps_ref_wraparound_enabled_flag;
 
         if (pu->dmvr_flag) {
             const int x_sb = x_off + (orig_mv->mv[i].x >> (4 + hs));
@@ -357,23 +407,19 @@ static void scaled_ref_pos_and_step(const VVCLocalContext *lc, const VVCRefPic *
 }
 
 static void emulated_edge_scaled(VVCLocalContext *lc, const uint8_t **src, ptrdiff_t *src_stride, int *src_height,
-    const VVCFrame *ref, const int x, const int y, const int dx, const int dy,
-    const int block_w, const int block_h, const int is_chroma)
+    const VVCFrame *ref, const int x, const int y, const int dx, const int dy, const int w, const int h, const int is_chroma)
 {
-    const VVCFrameContext *fc = lc->fc;
-    const int x0              = SCALED_INT(x);
-    const int y0              = SCALED_INT(y);
-    const int x_end           = SCALED_INT(x + block_w * dx);
-    const int y_end           = SCALED_INT(y + block_h * dy);
-    const int x_last          = SCALED_INT(x + (block_w - 1) * dx);
-    const int y_last          = SCALED_INT(y + (block_h - 1) * dy);
-    const int src_width       = x_end - x0 + (x_end == x_last);
+    const int x_off         = SCALED_INT(x);
+    const int y_off         = SCALED_INT(y);
+    const int x_end         = SCALED_INT(x + w * dx);
+    const int y_end         = SCALED_INT(y + h * dy);
+    const int x_last        = SCALED_INT(x + (w - 1) * dx);
+    const int y_last        = SCALED_INT(y + (h - 1) * dy);
+    const int block_w       = x_end - x_off + (x_end == x_last);
+    const int block_h       = *src_height = y_end - y_off + (y_end == y_last);
+    const int wrap_enabled  = 0;
 
-    *src_height = y_end - y0 + (y_end == y_last);
-
-    *src  += y0 * *src_stride + (x0 * (1 << fc->ps.sps->pixel_shift));
-
-    emulated_edge(lc, lc->edge_emu_buffer, src, src_stride, ref, x0, y0, src_width, *src_height, is_chroma);
+    MC_EMULATED_EDGE(lc->edge_emu_buffer, src, src_stride, x_off, y_off);
 }
 
 static void mc_scaled(VVCLocalContext *lc, int16_t *dst, const VVCRefPic *refp, const Mv *mv,
@@ -452,24 +498,24 @@ static void luma_prof_uni(VVCLocalContext *lc, uint8_t *dst, const ptrdiff_t dst
     const VVCFrame *ref, const MvField *mvf, int x_off, int y_off, const int block_w, const int block_h,
     const int cb_prof_flag, const int16_t *diff_mv_x, const int16_t *diff_mv_y)
 {
-    const VVCFrameContext *fc   = lc->fc;
-    const uint8_t *src          = ref->frame->data[LUMA];
-    ptrdiff_t src_stride        = ref->frame->linesize[LUMA];
-    uint16_t *prof_tmp          = lc->tmp + PROF_TEMP_OFFSET;
-    const int idx               = av_log2(block_w) - 1;
-    const int lx                = mvf->pred_flag - PF_L0;
-    const Mv *mv                = mvf->mv + lx;
-    const int mx                = mv->x & 0xf;
-    const int my                = mv->y & 0xf;
-    const int8_t *hf            = ff_vvc_inter_luma_filters[VVC_INTER_LUMA_FILTER_TYPE_AFFINE][mx];
-    const int8_t *vf            = ff_vvc_inter_luma_filters[VVC_INTER_LUMA_FILTER_TYPE_AFFINE][my];
+    const VVCFrameContext *fc = lc->fc;
+    const uint8_t *src        = ref->frame->data[LUMA];
+    ptrdiff_t src_stride      = ref->frame->linesize[LUMA];
+    uint16_t *prof_tmp        = lc->tmp + PROF_TEMP_OFFSET;
+    const int idx             = av_log2(block_w) - 1;
+    const int lx              = mvf->pred_flag - PF_L0;
+    const Mv *mv              = mvf->mv + lx;
+    const int mx              = mv->x & 0xf;
+    const int my              = mv->y & 0xf;
+    const int8_t *hf          = ff_vvc_inter_luma_filters[VVC_INTER_LUMA_FILTER_TYPE_AFFINE][mx];
+    const int8_t *vf          = ff_vvc_inter_luma_filters[VVC_INTER_LUMA_FILTER_TYPE_AFFINE][my];
     int denom, wx, ox;
-    const int weight_flag       = derive_weight_uni(&denom, &wx, &ox, lc, mvf, LUMA);
-    const int is_chroma         = 0;
+    const int weight_flag     = derive_weight_uni(&denom, &wx, &ox, lc, mvf, LUMA);
+    const int wrap_enabled    = fc->ps.pps->r->pps_ref_wraparound_enabled_flag;
+    const int is_chroma       = 0;
 
     x_off += mv->x >> 4;
     y_off += mv->y >> 4;
-    src   += y_off * src_stride + (x_off * (1 << fc->ps.sps->pixel_shift));
 
     MC_EMULATED_EDGE(lc->edge_emu_buffer, &src, &src_stride, x_off, y_off);
     if (cb_prof_flag) {
@@ -499,10 +545,11 @@ static void luma_prof(VVCLocalContext *lc, int16_t *dst, const VVCFrame *ref,
     const int idx             = av_log2(block_w) - 1;
     const int is_chroma       = 0;
     uint16_t *prof_tmp        = lc->tmp2 + PROF_TEMP_OFFSET;
-    ptrdiff_t src_stride      = ref->frame->linesize[0];
-    const uint8_t *src        = ref->frame->data[0] + oy * src_stride + (ox * (1 << fc->ps.sps->pixel_shift));
+    ptrdiff_t src_stride      = ref->frame->linesize[LUMA];
+    const uint8_t *src        = ref->frame->data[LUMA];
     const int8_t *hf          = ff_vvc_inter_luma_filters[VVC_INTER_LUMA_FILTER_TYPE_AFFINE][mx];
     const int8_t *vf          = ff_vvc_inter_luma_filters[VVC_INTER_LUMA_FILTER_TYPE_AFFINE][my];
+    const int wrap_enabled    = fc->ps.pps->r->pps_ref_wraparound_enabled_flag;
 
     MC_EMULATED_EDGE(lc->edge_emu_buffer, &src, &src_stride, ox, oy);
     if (!pu->cb_prof_flag[lx]) {
@@ -518,11 +565,11 @@ static void luma_prof_bi(VVCLocalContext *lc, uint8_t *dst, const ptrdiff_t dst_
     const VVCRefPic *ref0, const VVCRefPic *ref1, const MvField *mvf, const int x_off, const int y_off,
     const int block_w, const int block_h)
 {
-    const VVCFrameContext *fc   = lc->fc;
-    const VVCRefPic *refps[]    = { ref0, ref1 };
-    int16_t *tmp[]              = { lc->tmp, lc->tmp1 };
+    const VVCFrameContext *fc = lc->fc;
+    const VVCRefPic *refps[]  = { ref0, ref1 };
+    int16_t *tmp[]            = { lc->tmp, lc->tmp1 };
     int denom, w0, w1, o0, o1;
-    const int weight_flag       = derive_weight(&denom, &w0, &w1, &o0, &o1, lc, mvf, LUMA, 0);
+    const int weight_flag     = derive_weight(&denom, &w0, &w1, &o0, &o1, lc, mvf, LUMA, 0);
 
     for (int i = L0; i <= L1; i++) {
         const VVCRefPic *refp = refps[i];
@@ -561,16 +608,16 @@ static int pred_get_refs(const VVCLocalContext *lc, VVCRefPic *refp[2], const Mv
 
 static void pred_gpm_blk(VVCLocalContext *lc)
 {
-    const VVCFrameContext *fc  = lc->fc;
-    const CodingUnit *cu       = lc->cu;
-    const PredictionUnit *pu   = &cu->pu;
+    const VVCFrameContext *fc = lc->fc;
+    const CodingUnit *cu      = lc->cu;
+    const PredictionUnit *pu  = &cu->pu;
 
     const uint8_t angle_idx   = ff_vvc_gpm_angle_idx[pu->gpm_partition_idx];
     const uint8_t weights_idx = ff_vvc_gpm_angle_to_weights_idx[angle_idx];
-    const int w = av_log2(cu->cb_width) - 3;
-    const int h = av_log2(cu->cb_height) - 3;
-    const uint8_t off_x = ff_vvc_gpm_weights_offset_x[pu->gpm_partition_idx][h][w];
-    const uint8_t off_y = ff_vvc_gpm_weights_offset_y[pu->gpm_partition_idx][h][w];
+    const int w               = av_log2(cu->cb_width) - 3;
+    const int h               = av_log2(cu->cb_height) - 3;
+    const uint8_t off_x       = ff_vvc_gpm_weights_offset_x[pu->gpm_partition_idx][h][w];
+    const uint8_t off_y       = ff_vvc_gpm_weights_offset_y[pu->gpm_partition_idx][h][w];
     const uint8_t mirror_type = ff_vvc_gpm_angle_to_mirror[angle_idx];
     const uint8_t *weights;
 
@@ -579,13 +626,13 @@ static void pred_gpm_blk(VVCLocalContext *lc)
     int16_t *tmp[2] = {lc->tmp, lc->tmp1};
 
     for (int c_idx = 0; c_idx < c_end; c_idx++) {
-        const int hs     = fc->ps.sps->hshift[c_idx];
-        const int vs     = fc->ps.sps->vshift[c_idx];
-        const int x      = lc->cu->x0  >> hs;
-        const int y      = lc->cu->y0  >> vs;
-        const int width  = cu->cb_width >> hs;
-        const int height = cu->cb_height >> vs;
-        uint8_t *dst = POS(c_idx, lc->cu->x0, lc->cu->y0);
+        const int hs         = fc->ps.sps->hshift[c_idx];
+        const int vs         = fc->ps.sps->vshift[c_idx];
+        const int x          = lc->cu->x0  >> hs;
+        const int y          = lc->cu->y0  >> vs;
+        const int width      = cu->cb_width >> hs;
+        const int height     = cu->cb_height >> vs;
+        uint8_t *dst         = POS(c_idx, lc->cu->x0, lc->cu->y0);
         ptrdiff_t dst_stride = fc->frame->linesize[c_idx];
 
         int step_x = 1 << hs;
@@ -602,8 +649,9 @@ static void pred_gpm_blk(VVCLocalContext *lc)
 
         for (int i = 0; i < 2; i++) {
             const MvField *mv = pu->gpm_mv + i;
-            const int lx = mv->pred_flag - PF_L0;
-            VVCRefPic *refp = lc->sc->rpl[lx].refs + mv->ref_idx[lx];
+            const int lx      = mv->pred_flag - PF_L0;
+            VVCRefPic *refp   = lc->sc->rpl[lx].refs + mv->ref_idx[lx];
+
             if (!refp->ref)
                 return;
             if (refp->is_scaled)
@@ -619,15 +667,14 @@ static void pred_gpm_blk(VVCLocalContext *lc)
 static int ciip_derive_intra_weight(const VVCLocalContext *lc, const int x0, const int y0,
     const int width, const int height)
 {
-    const VVCFrameContext *fc   = lc->fc;
-    const VVCSPS *sps           = fc->ps.sps;
-    const int x0b               = av_mod_uintp2(x0, sps->ctb_log2_size_y);
-    const int y0b               = av_mod_uintp2(y0, sps->ctb_log2_size_y);
-    const int available_l       = lc->ctb_left_flag || x0b;
-    const int available_u       = lc->ctb_up_flag || y0b;
-    const int min_pu_width      = fc->ps.pps->min_pu_width;
-
-    int w = 1;
+    const VVCFrameContext *fc = lc->fc;
+    const VVCSPS *sps         = fc->ps.sps;
+    const int x0b             = av_mod_uintp2(x0, sps->ctb_log2_size_y);
+    const int y0b             = av_mod_uintp2(y0, sps->ctb_log2_size_y);
+    const int available_l     = lc->ctb_left_flag || x0b;
+    const int available_u     = lc->ctb_up_flag || y0b;
+    const int min_pu_width    = fc->ps.pps->min_pu_width;
+    int w                     = 1;
 
     if (available_u &&fc->tab.mvf[((y0 - 1) >> MIN_PU_LOG2) * min_pu_width + ((x0 - 1 + width)>> MIN_PU_LOG2)].pred_flag == PF_INTRA)
         w++;
@@ -737,12 +784,12 @@ static int parametric_mv_refine(const int *sad, const int stride)
 #define SAD_ARRAY_SIZE 5
 //8.5.3 Decoder-side motion vector refinement process
 static void dmvr_mv_refine(VVCLocalContext *lc, MvField *mvf, MvField *orig_mv, int *sb_bdof_flag,
-    const AVFrame *ref0, const AVFrame *ref1, const int x_off, const int y_off, const int block_w, const int block_h)
+    const VVCFrame *ref0, const VVCFrame *ref1, const int x_off, const int y_off, const int block_w, const int block_h)
 {
-    const VVCFrameContext *fc   = lc->fc;
-    const int sr_range          = 2;
-    const AVFrame *ref[]        = { ref0, ref1 };
-    int16_t *tmp[]              = { lc->tmp, lc->tmp1 };
+    const VVCFrameContext *fc = lc->fc;
+    const int sr_range        = 2;
+    const VVCFrame *refs[]    = { ref0, ref1 };
+    int16_t *tmp[]            = { lc->tmp, lc->tmp1 };
     int sad[SAD_ARRAY_SIZE][SAD_ARRAY_SIZE];
     int min_dx, min_dy, min_sad, dx, dy;
 
@@ -757,8 +804,11 @@ static void dmvr_mv_refine(VVCLocalContext *lc, MvField *mvf, MvField *orig_mv, 
         const int my            = mv->y & 0xf;
         const int ox            = x_off + (mv->x >> 4) - sr_range;
         const int oy            = y_off + (mv->y >> 4) - sr_range;
-        ptrdiff_t src_stride    = ref[i]->linesize[LUMA];
-        const uint8_t *src      = ref[i]->data[LUMA] + oy * src_stride + (ox * (1 << fc->ps.sps->pixel_shift));
+        const VVCFrame *ref     = refs[i];
+        ptrdiff_t src_stride    = ref->frame->linesize[LUMA];
+        const uint8_t *src      = ref->frame->data[LUMA];
+        const int wrap_enabled  = fc->ps.pps->r->pps_ref_wraparound_enabled_flag;
+
         MC_EMULATED_EDGE_BILINEAR(lc->edge_emu_buffer, &src, &src_stride, ox, oy);
         fc->vvcdsp.inter.dmvr[!!my][!!mx](tmp[i], src, src_stride, pred_h, mx, my, pred_w);
     }
@@ -828,16 +878,16 @@ static void derive_sb_mv(VVCLocalContext *lc, MvField *mv, MvField *orig_mv, int
         VVCRefPic *refp[2];
         if (pred_get_refs(lc, refp, mv) < 0)
             return;
-        dmvr_mv_refine(lc, mv, orig_mv, sb_bdof_flag, refp[L0]->ref->frame, refp[L1]->ref->frame, x0, y0, sbw, sbh);
+        dmvr_mv_refine(lc, mv, orig_mv, sb_bdof_flag, refp[L0]->ref, refp[L1]->ref, x0, y0, sbw, sbh);
         set_dmvr_info(fc, x0, y0, sbw, sbh, mv);
     }
 }
 
 static void pred_regular_blk(VVCLocalContext *lc, const int skip_ciip)
 {
-    const CodingUnit *cu        = lc->cu;
-    PredictionUnit *pu          = &lc->cu->pu;
-    const MotionInfo *mi        = &pu->mi;
+    const CodingUnit *cu = lc->cu;
+    PredictionUnit *pu   = &lc->cu->pu;
+    const MotionInfo *mi = &pu->mi;
     MvField mv, orig_mv;
     int sbw, sbh, sb_bdof_flag = 0;
 
@@ -881,17 +931,17 @@ static void derive_affine_mvc(MvField *mvc, const VVCFrameContext *fc, const MvF
 
 static void pred_affine_blk(VVCLocalContext *lc)
 {
-    const VVCFrameContext *fc  = lc->fc;
-    const CodingUnit *cu       = lc->cu;
-    const PredictionUnit *pu   = &cu->pu;
-    const MotionInfo *mi       = &pu->mi;
-    const int x0   = cu->x0;
-    const int y0   = cu->y0;
-    const int sbw  = cu->cb_width / mi->num_sb_x;
-    const int sbh  = cu->cb_height / mi->num_sb_y;
-    const int hs = fc->ps.sps->hshift[1];
-    const int vs = fc->ps.sps->vshift[1];
-    const int dst_stride = fc->frame->linesize[LUMA];
+    const VVCFrameContext *fc = lc->fc;
+    const CodingUnit *cu      = lc->cu;
+    const PredictionUnit *pu  = &cu->pu;
+    const MotionInfo *mi      = &pu->mi;
+    const int x0              = cu->x0;
+    const int y0              = cu->y0;
+    const int sbw             = cu->cb_width / mi->num_sb_x;
+    const int sbh             = cu->cb_height / mi->num_sb_y;
+    const int hs              = fc->ps.sps->hshift[1];
+    const int vs              = fc->ps.sps->vshift[1];
+    const int dst_stride      = fc->frame->linesize[LUMA];
 
     for (int sby = 0; sby < mi->num_sb_y; sby++) {
         for (int sbx = 0; sbx < mi->num_sb_x; sbx++) {
@@ -932,9 +982,9 @@ static void pred_affine_blk(VVCLocalContext *lc)
 
 static void predict_inter(VVCLocalContext *lc)
 {
-    const VVCFrameContext *fc   = lc->fc;
-    const CodingUnit *cu        = lc->cu;
-    const PredictionUnit *pu    = &cu->pu;
+    const VVCFrameContext *fc = lc->fc;
+    const CodingUnit *cu      = lc->cu;
+    const PredictionUnit *pu  = &cu->pu;
 
     if (pu->merge_gpm_flag)
         pred_gpm_blk(lc);
@@ -956,9 +1006,9 @@ static int has_inter_luma(const CodingUnit *cu)
 
 int ff_vvc_predict_inter(VVCLocalContext *lc, const int rs)
 {
-    const VVCFrameContext *fc   = lc->fc;
-    const CTU *ctu              = fc->tab.ctus + rs;
-    CodingUnit *cu              = ctu->cus;
+    const VVCFrameContext *fc = lc->fc;
+    const CTU *ctu            = fc->tab.ctus + rs;
+    CodingUnit *cu            = ctu->cus;
 
     while (cu) {
         lc->cu = cu;

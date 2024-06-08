@@ -125,6 +125,7 @@ typedef struct LongTermPrediction {
 typedef struct AACUsacElemData {
     uint8_t core_mode;
     uint8_t scale_factor_grouping;
+    uint8_t tns_data_present;
 
     /* Timewarping ratio */
 #define NUM_TW_NODES 16
@@ -163,6 +164,7 @@ typedef struct IndividualChannelStream {
     enum WindowSequence window_sequence[2];
     uint8_t use_kb_window[2];   ///< If set, use Kaiser-Bessel window, otherwise use a sine window.
     int num_window_groups;
+    int prev_num_window_groups; ///< Previous frame's number of window groups
     uint8_t group_len[8];
     LongTermPrediction ltp;
     const uint16_t *swb_offset; ///< table of offsets to the lowest spectral coefficient of a scalefactor band, sfb, for a particular window
@@ -230,6 +232,7 @@ typedef struct SingleChannelElement {
 typedef struct AACUsacStereo {
     uint8_t common_window;
     uint8_t common_tw;
+    uint8_t tns_on_lr; ///< Apply TNS before M/S and stereo prediction
 
     uint8_t ms_mask_mode;
     uint8_t config_idx;

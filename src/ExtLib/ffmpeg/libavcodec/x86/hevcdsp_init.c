@@ -26,7 +26,7 @@
 #include "libavutil/mem_internal.h"
 #include "libavutil/x86/asm.h"
 #include "libavutil/x86/cpu.h"
-#include "libavcodec/hevcdsp.h"
+#include "libavcodec/hevc/dsp.h"
 #include "libavcodec/x86/hevcdsp.h"
 #include "libavcodec/x86/h26x/h2656dsp.h"
 
@@ -1266,7 +1266,7 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
 }
 
 // ==> Start patch MPC
-#include "libavcodec/hevcpred.h"
+#include "libavcodec/hevc/pred.h"
 #include "libavcodec/x86/hevcpred.h"
 
 #undef FUNC
