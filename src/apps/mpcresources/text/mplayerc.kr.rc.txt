@@ -434,11 +434,11 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 37		"탐색 시간 표기"
 38		"'디스크 열기' 메뉴 사용 안 함"
 39		"프로세스 우선순위 높이기"
-40		"Network timeouts"
-41		"Connection:"
+40		"네트워크 시간 초과"
+41		"연결 :"
 44		"초"
-45		"Receiving data:"
-48		"sec."
+45		"데이터 수신 :"
+48		"초"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
