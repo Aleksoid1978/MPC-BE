@@ -410,7 +410,7 @@ BEGIN
     PUSHBUTTON      "모두(&L)",IDC_BUTTON1,108,198,40,14
     PUSHBUTTON      "없음(&N)",IDC_BUTTON6,150,198,40,14
     CONTROL         "아이콘 사용",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,200,201,70,9
-    GROUPBOX        "자동 실행 (윈도XP 전용)",IDC_STATIC1,5,217,108,37
+    GROUPBOX        "자동 실행(윈도XP 전용)",IDC_STATIC1,5,217,108,37
     CONTROL         "비디오",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,229,47,9
     CONTROL         "음악",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,241,47,9
     CONTROL         "DVD",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,61,229,47,9
@@ -1045,7 +1045,7 @@ IDD_PPAGECOLOR DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "색 제어 (EVR, madVR 및 MPC VR용)",IDC_STATIC,5,5,286,80
+    GROUPBOX        "색 제어(EVR, madVR 및 MPC VR용)",IDC_STATIC,5,5,286,80
     LTEXT           "명도",IDC_STATIC,10,19,55,8
     LTEXT           "대비",IDC_STATIC,10,35,55,8
     LTEXT           "색조",IDC_STATIC,10,51,55,8
@@ -1084,7 +1084,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "창 모드에서 재생하는 동안 포인터 자동 숨기기",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
-    CONTROL         "Show zero hours in status bar and OSD",IDC_CHECK8,
+    CONTROL         "상태 표시줄 및 OSD에 개시 시간 표시",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "다음 시간보다 짧은 000xx.mpls를 표시하지 않음",IDC_STATIC,7,99,150,8
     EDITTEXT        IDC_EDIT5,161,97,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
@@ -1146,7 +1146,7 @@ BEGIN
     COMBOBOX        IDC_COMBO1,84,45,202,30,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO2,84,60,202,30,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO9,84,75,202,102,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "디지털 설정 (BDA)",IDC_STATIC,5,92,286,59
+    GROUPBOX        "디지털 설정(BDA)",IDC_STATIC,5,92,286,59
     LTEXT           "네트워크 공급자",IDC_STATIC4,10,106,70,8
     LTEXT           "튜너",IDC_STATIC5,10,121,70,8
     LTEXT           "수신기",IDC_STATIC6,10,136,70,8
@@ -3207,7 +3207,7 @@ BEGIN
     IDS_CMD_DVD             "/dvd\t\tdvd재생모드, ""경로 이름"" 을 지정했을 때, DVD 폴더를 의미함(옵션)"
     IDS_CMD_DVDPOS1         "/dvdpos T#C\t타이틀 T, 챕터 C에서 재생 시작"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\t타이틀 T, 위치 hh:mm:ss에서 재생 시작"
-    IDS_CMD_CD              "/cd\t\t오디오 CD 또는 (S)VCD의 모든 트랙을 불러옴,\n\t\t""경로 이름"" 을 지정했을 때 드라이브를 의미함 (옵션)"
+    IDS_CMD_CD              "/cd\t\t오디오 CD 또는 (S)VCD의 모든 트랙을 불러옴,\n\t\t""경로 이름"" 을 지정했을 때 드라이브를 의미함(옵션)"
     IDS_CMD_OPEN            "/open\t\t파일을 열지만, 재생을 시작하지는 않음"
     IDS_CMD_PLAY            "/play\t\t파일을 열고 재생을 시작함"
     IDS_CMD_CLOSE           "/close\t\t재생이 끝나면 재생기 종료(/play 스위치를 같이 써야 함)"
@@ -3443,7 +3443,7 @@ BEGIN
     IDS_NO_MORE_MEDIA       "현재 폴더에 더 이상의 미디어 파일이 존재하지 않습니다."
     IDS_FIRST_IN_FOLDER     "폴더 내의 첫 번째 파일을 불러왔습니다."
     IDS_LAST_IN_FOLDER      "폴더 내의 마지막 파일을 불러왔습니다."
-    IDS_MERGING_FILES       "Merging files..."
+    IDS_MERGING_FILES       "파일 병합..."
 END
 
 STRINGTABLE
