@@ -24,20 +24,15 @@
 #include <encdec.h> // MEDIASUBTYPE_CPFilters_Processed, FORMATTYPE_CPFilters_Processed
 #include "GUIDString.h"
 
-#define ENTRYNAME(subtype) #subtype
-static const struct {
-	WORD wFormatTag;
-	const CHAR* szName;
-}
-MPC_g_WaveGuidNames[] = {
+static const WaveStringEntry MPC_g_WaveGuidNames[] = {
 	// mmreg.h
-	{WAVE_FORMAT_ADPCM,               "MS_ADPCM"},  //
+	{WAVE_FORMAT_ADPCM,               "MS_ADPCM"},
 	{WAVE_FORMAT_ALAW,                "ALAW"},
 	{WAVE_FORMAT_MULAW,               "MULAW"},
-	{WAVE_FORMAT_IMA_ADPCM,           "IMA_ADPCM"}, //
+	{WAVE_FORMAT_IMA_ADPCM,           "IMA_ADPCM"},
 	{WAVE_FORMAT_WMAVOICE9,           "WMSP1"},
 	{WAVE_FORMAT_DSPGROUP_TRUESPEECH, "TRUESPEECH"},
-	{WAVE_FORMAT_GSM610,              "GSM610"},    //
+	{WAVE_FORMAT_GSM610,              "GSM610"},
 	{WAVE_FORMAT_SHARP_G726,          "G726_ADPCM"},
 	{WAVE_FORMAT_MPEGLAYER3,          "MP3"},
 	{WAVE_FORMAT_VOXWARE_RT29,        "VOXWARE_RT29"},
@@ -49,10 +44,10 @@ MPC_g_WaveGuidNames[] = {
 	{WAVE_FORMAT_INTEL_MUSIC_CODER,   "INTEL_MUSIC"},
 	{WAVE_FORMAT_INDEO_AUDIO,         "INDEO_AUDIO"},
 	{WAVE_FORMAT_DTS2,                "DTS2"},
-	{WAVE_FORMAT_MPEG_ADTS_AAC,       "MPEG_ADTS_AAC"}, //
-	{WAVE_FORMAT_MPEG_RAW_AAC,        "MPEG_RAW_AAC"},  //
-	{WAVE_FORMAT_MPEG_LOAS,           "MPEG_LOAS"},     //
-	{WAVE_FORMAT_MPEG_HEAAC,          "MPEG_HEAAC"},    //
+	{WAVE_FORMAT_MPEG_ADTS_AAC,       "MPEG_ADTS_AAC"},
+	{WAVE_FORMAT_MPEG_RAW_AAC,        "MPEG_RAW_AAC"},
+	{WAVE_FORMAT_MPEG_LOAS,           "MPEG_LOAS"},
+	{WAVE_FORMAT_MPEG_HEAAC,          "MPEG_HEAAC"},
 	{WAVE_FORMAT_WAVPACK_AUDIO,       "WAVPACK4"},
 	{WAVE_FORMAT_OPUS,                "OPUS_WAVE"},
 	{WAVE_FORMAT_SPEEX_VOICE,         "SPEEX"},
@@ -68,8 +63,8 @@ MPC_g_WaveGuidNames[] = {
 	{WAVE_FORMAT_PS2_ADPCM,           "PS2_ADPCM"},      //0xF522
 };
 
-#define ADDENTRY(subtype) { #subtype, subtype },
-static const GUID_STRING_ENTRY MPC_g_GuidNames[] = {
+#define ADDENTRY(subtype) { subtype, #subtype },
+static const GuidStringEntry MPC_g_GuidNames[] = {
 	ADDENTRY(MEDIASUBTYPE_FLAC_FRAMED)
 	ADDENTRY(MEDIASUBTYPE_TAK)
 	ADDENTRY(MEDIASUBTYPE_WavpackHybrid)
@@ -126,46 +121,13 @@ static const GUID_STRING_ENTRY MPC_g_GuidNames[] = {
 
 CStringA GetGUIDName(const GUID& guid)
 {
-	if (guid == GUID_NULL) {
-		// to prevent print TIME_FORMAT_NONE for GUID_NULL
-		return "GUID_NULL";
-	}
+	return GuidNames.GetString(guid).c_str();
+}
 
-	const char* guidStr = GuidNames[guid]; // GUID names from uuids.h
-	if (strcmp(guidStr, "Unknown GUID Name") != 0) {
-		return guidStr;
-	}
-
-	if (memcmp(&guid.Data2, &MEDIASUBTYPE_YUY2.Data2, sizeof(GUID) - sizeof(GUID::Data1)) == 0) {
-		// GUID like {xxxxxxxx-0000-0010-8000-00AA00389B71}
-		CStringA str = "MEDIASUBTYPE_";
-
-		if ((guid.Data1 & 0x0000FFFF) == guid.Data1) {
-			const WORD wFormatTag = (WORD)guid.Data1;
-			for (const auto& waveGuidName : MPC_g_WaveGuidNames) {
-				if (waveGuidName.wFormatTag == wFormatTag) {
-					str.Append(waveGuidName.szName);
-					return str;
-				}
-			}
-			str.AppendFormat("0x%04x", wFormatTag);
-			return str;
-		}
-
-		uint32_t fourcc = guid.Data1;
-		for (unsigned i = 0; i < 4; i++) {
-			const uint32_t c = fourcc & 0xff;
-			str.AppendFormat(c < 32 ? "[%u]" : "%c", c);
-			fourcc >>= 8;
-		}
-		return str;
-	}
-
-	for (const auto& guidName : MPC_g_GuidNames) {
-		if (guidName.guid == guid) {
-			return guidName.szName;
-		}
-	}
-
-	return "Unknown GUID Name";
+void SetExtraGuidStrings()
+{
+	GuidNames.SetExtraGuidStrings(
+		&MPC_g_GuidNames[0], std::size(MPC_g_GuidNames),
+		&MPC_g_WaveGuidNames[0], std::size(MPC_g_WaveGuidNames)
+	);
 }

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,6 +20,7 @@
  */
 
 #include <dshow.h>
+#define USE_STD_STRING
 #include <ExtLib/BaseClasses/streams.h>
 #include <dvdmedia.h>
 #include <initguid.h>

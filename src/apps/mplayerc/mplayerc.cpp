@@ -33,6 +33,7 @@
 #include "DSUtil/SysVersion.h"
 #include "DSUtil/FileHandle.h"
 #include "DSUtil/FileVersion.h"
+#include "DSUtil/GUIDString.h"
 #include <winddk/ntddcdvd.h>
 #include <ExtLib/Detours/src/detours.h>
 #include <afxsock.h>
@@ -750,6 +751,7 @@ BOOL CMPlayerCApp::InitInstance()
 	DbgSetModuleLevel(LOG_TRACE, DWORD_MAX);
 	DbgSetModuleLevel(LOG_ERROR, DWORD_MAX);
 #endif
+	SetExtraGuidStrings();
 
 	// Remove the working directory from the search path to work around the DLL preloading vulnerability
 	SetDllDirectory(L"");
