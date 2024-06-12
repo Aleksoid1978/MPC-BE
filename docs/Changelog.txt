@@ -2,6 +2,9 @@
 
 1.7.2.x dev
 =============================
+Updated Romanian translation (by Andrei Miloiu).
+Updated Korean translation (by Hackjjang).
+
 Updated libraries:
 	ffmpeg git-n7.1-dev-1158-g7560db937d.
 
