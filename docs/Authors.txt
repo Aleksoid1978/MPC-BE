@@ -37,7 +37,7 @@ Romanian              : AndreiMiloiu
 Spanish               : IPeluchito
 Turkish               : Thingol, cmhrky
 Ukrainian             : arestarh1986
-Japanese              : Gyeong, Socket774
+Japanese              : Gyeong, Socket774, tsubasanouta
 
 Official Beta testers:
 ----------------------
