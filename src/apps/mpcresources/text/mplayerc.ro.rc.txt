@@ -7,7 +7,7 @@
 12		"Compilator FFmpeg :"
 13		"Libavcodec / Libavutil :"
 23		"Acesta program este gratuit și lansat sub licența GNU General Public License."
-24		"În 2023-2024 traducător a fost Andrei Miloiu. În trecut, au contribuit Daniel Alămiță şi lordkag."
+24		"În 2023-2024 traducătorul e Andrei-Valentin Miloiu. În trecut, au contribuit Daniel Alămiță şi lordkag."
 25		"OK"
 END
 
@@ -15,20 +15,20 @@ BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11
 3		"Comanda de selecție"
 6		"Filtru:"
 9		"OK"
-10		"Revocare"
+10		"Anulare"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
 3		"Alege filtru"
 7		"Răsfoire..."
 8		"OK"
-9		"Revocare"
+9		"Anulare"
 END
 
 BEGIN DIALOGEX IDD_AUTH_DLG LINES 15
 3		"Este necesară autentificarea"
 6		"OK"
-7		"Revocare"
+7		"Anulare"
 9		"Zonă restricționată"
 10		"Nume utilizator:"
 11		"Parolă:"
@@ -60,7 +60,7 @@ BEGIN DIALOGEX IDD_FAVADD LINES 12
 8		"Memorează poziția"
 9		"Unitate relativă"
 10		"OK"
-11		"Revocare"
+11		"Anulare"
 END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
@@ -107,14 +107,14 @@ END
 BEGIN DIALOGEX IDD_HISTORY LINES 10
 3		"History"
 6		"MENU"
-8		"Remove selected"
+8		"Șterge selecția"
 END
 
 BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
-5		"&Save"
-6		"&Revocare"
-7		"Title:"
-9		"Path:"
+5		"&Salvează"
+6		"&Anulare"
+7		"Titlu:"
+9		"Cale:"
 END
 
 BEGIN DIALOGEX IDD_MEDIATYPES_DLG LINES 12
@@ -137,15 +137,15 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 11		"Dublaj:"
 13		"Răsfoire..."
 14		"OK"
-15		"Revocare"
+15		"Anulare"
 16		"Adaugă la lista de redare fără a deschide"
-17		"Paste URL from clipboard"
+17		"Lipește URL-ul din clipboard"
 END
 
 BEGIN DIALOGEX IDD_PLAYLISTNAME LINES 10
 3		"Dialogul numelui listei de redare"
 6		"OK"
-7		"Revocare"
+7		"Anulare"
 9		"Nume:"
 END
 
@@ -156,7 +156,7 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 14		"Sus"
 15		"Jos"
 16		"&Setează"
-18		"&Revocare"
+18		"&Anulare"
 19		"&Salvează"
 20		"Poziție: 0.0 -> 1.0"
 21		"Mărire: 0.2 -> 5.0"
@@ -197,7 +197,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 10		"Audio"
 11		"Țară"
 15		"Setări digital (BDA)"
-16		"Furnizor rețea"
+16		"Furnizor de rețea"
 17		"Tuner"
 18		"Receptor"
 END
@@ -545,7 +545,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
 14		"Reinițializează la schimbarea ecranului"
 15		"Preîncărcări EVR:"
 18		"Formatul de suprafață:"
-20		"Redimensionare:"
+20		"Scalare:"
 22		"Reducere la scară de <50%:"
 24		"Interval de ieșire:"
 26		"Setări pentru randorul video MPC Video Renderer"
@@ -630,7 +630,7 @@ END
 BEGIN DIALOGEX IDD_SELECTMEDIATYPE LINES 9
 3		"Selectează tipul media"
 7		"OK"
-8		"Revocare"
+8		"Anulare"
 END
 
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
@@ -642,7 +642,7 @@ BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
 15		"Mută în &sus"
 16		"Mută în &jos"
 17		"OK"
-18		"Revocare"
+18		"Anulare"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 13
@@ -655,7 +655,7 @@ BEGIN DIALOGEX IDD_SHADERNEW_DLG LINES 10
 3		"Crează un nou nuanțator"
 6		"Nume:"
 8		"OK"
-9		"Revocare"
+9		"Anulare"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
@@ -667,7 +667,7 @@ END
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25
 3		"Scanare tuner"
 6		"Pornește"
-7		"Revocare"
+7		"Anulare"
 13		"Frecv. de pornire"
 15		"Lățime de bandă"
 17		"Frecv. de încheiere"
@@ -1029,8 +1029,8 @@ BEGIN MENU IDR_POPUP_VIDEOFRAME LINES 26
 7		"&Mărime dublă"
 8		"&Întinde cât fereastra"
 9		"Atinge fereastra din &interior"
-10		"Zoom &1"
-11		"Zoom &2"
+10		"Scalare &1"
+11		"Scalare &2"
 12		"Atinge fereastra din exteri&or"
 14		"&Menține raportul de aspect"
 15		"Suprascrie raportul de aspect"
@@ -1353,7 +1353,7 @@ STRING IDS_BDA_ERROR_DEMULTIPLEXER		"Demultiplexorul nu poate fi creat."
 STRING IDS_BLOCK_EXTERNAL_VR		"Puteți adăuga %s ca un filtru extern.\nTrebuie să vă selectați randorul video preferat de pe pagina de setări Video."
 STRING IDS_BRIGHTNESS_DEC		"Micșorare luminozitate"
 STRING IDS_BRIGHTNESS_INC		"Mărire luminozitate"
-STRING IDS_CANCEL		"Revocare"
+STRING IDS_CANCEL		"Anulare"
 STRING IDS_CANNOT_CHANGE_FORMAT		"MPC-BE nu are destule drepturi pentru a schimba asocierea cu formatele de fișiere. Dați clic pe butonul ""Modifică"" pentru a obține drepturi de administrator."
 STRING IDS_CAPTURE_CHANNEL_FREQ		"Canal %d (%.1f MHz)"
 STRING IDS_CAPTURE_ERROR		"Eroare captură"
@@ -1492,8 +1492,8 @@ STRING IDS_FRAME_HALF		"Jumătate din mărime"
 STRING IDS_FRAME_NORMAL		"Mărime normală"
 STRING IDS_FRAME_STEP_ERROR_RENDERER		"Nu se poate face deplasare cadru cu cadru, încercați un randor video diferit."
 STRING IDS_FRAME_STRETCH		"Întinde cât fereastra"
-STRING IDS_FRAME_ZOOM1		"Redimensionare 1"
-STRING IDS_FRAME_ZOOM2		"Redimensionare 2"
+STRING IDS_FRAME_ZOOM1		"Scalare 1"
+STRING IDS_FRAME_ZOOM2		"Scalare 2"
 STRING IDS_FRONT_CENTER		"Centru față"
 STRING IDS_FRONT_LEFT		"Stânga față"
 STRING IDS_FRONT_LEFT_OF_CENTER		"Stânga față a centrului"
@@ -1792,8 +1792,8 @@ STRING IDS_OSD_SHADERS_2_ON		"Nuanțatoare pixel post-redimensionare: pornit"
 STRING IDS_OSD_SPEED		"Viteză: %sx"
 STRING IDS_OSD_TEST		"OSD Test"
 STRING IDS_OSD_THUMBS_SAVED		"Miniaturi salvate cu succes"
-STRING IDS_OSD_ZOOM		"Redimensionare: %.0lf%%"
-STRING IDS_OSD_ZOOM_AUTO		"Redimensionare: Automat"
+STRING IDS_OSD_ZOOM		"Scalare: %.0lf%%"
+STRING IDS_OSD_ZOOM_AUTO		"Scalare: Automat"
 STRING IDS_PANSCAN_EDIT		"Modificare..."
 STRING IDS_PIXELSHADERCOMPILER_0		"D3DX9_xx.dll nu poate fi încărcat, nuanțatoarele pixel nu vor funcționa."
 STRING IDS_PIXELSHADERCOMPILER_1		"Punctele de intrare necesare ale funcției nu pot fi găsite în D3DX9_xx.dll, nuanțatoarele pixel nu vor funcționa."
@@ -1927,7 +1927,7 @@ STRING IDS_SUBDL_DLG_FORMAT_COL		"Format"
 STRING IDS_SUBDL_DLG_LANGUAGE_COL		"Limbă"
 STRING IDS_SUBDL_DLG_NOT_FOUND		"Nu s-au găsit subtitrări."
 STRING IDS_SUBDL_DLG_PARSING		"Analizarea listei..."
-STRING IDS_SUBDL_DLG_SUBS_AVAIL		" %d subtitrare(ări) disponibilă(le)."
+STRING IDS_SUBDL_DLG_SUBS_AVAIL		" %d subtitrare(ări) disponibilă(e)."
 STRING IDS_SUBDL_DLG_TITLES_COL		"Titlu(ri)"
 STRING IDS_SUBRESYNC_CAPTION		"Resincronizarea subtitrărilor"
 STRING IDS_SUBRESYNC_CLN_ACTOR		"Actor"
@@ -2076,23 +2076,23 @@ STRING IDS_VOLUME_GAIN_INC		"Crește puterea volumului"
 STRING IDS_VOLUME_GAIN_MAX		"Puterea maximă a volumului"
 STRING IDS_VOLUME_GAIN_OFF		"Oprește puterea volumului"
 STRING IDS_VOLUME_OSD		"Volum: %d%%"
-STRING IDS_VOLUME_OSD_MUTE		"Vol: %d%% [mut]"
+STRING IDS_VOLUME_OSD_MUTE		"Volum: %d%% [Mut]"
 STRING IDS_VTSREADER_LOAD_PGC		"Activează o alegere de Titlu"
 STRING IDS_WEBSERVER_ERROR_TEST		"Trebuie să aplicați noile setări înainte de a le testa."
 STRING IDS_WEBUI_DISABLED_PREVIEW_MSG		"Previzualizarea este deocamdată dezactivată. Se poate activa în opțiunile lui MPC-BE."
-STRING IDS_ZOOM1		"Redimensionare 1"
-STRING IDS_ZOOM2		"Redimensionare 2"
+STRING IDS_ZOOM1		"Scalare 1"
+STRING IDS_ZOOM2		"Scalare 2"
 STRING IDS_ZOOM_AUTOFIT		"Potrivire automată"
 STRING IDS_ZOOM_AUTOFITLARGE		"Potrivire automată (doar mai mare)"
 STRING ID_NAVIGATE_SKIPBACK		"Sari înapoi\nSari înapoi"
 STRING ID_NAVIGATE_SKIPFORWARD		"Sari înainte\nSari înainte"
-STRING ID_PLAY_DECRATE		"Micșorează viteză\nMicșorează viteză"
+STRING ID_PLAY_DECRATE		"Micșorează viteza\nMicșorează viteza"
 STRING ID_PLAY_FRAMESTEP		"Pas\nPas"
-STRING ID_PLAY_INCRATE		"Mărește viteză\nMărește viteză"
+STRING ID_PLAY_INCRATE		"Mărește viteza\nMărește viteza"
 STRING ID_PLAY_PAUSE		"Pauză\nPauză"
-STRING ID_PLAY_PLAY		"Redare\nRedă"
-STRING ID_PLAY_STOP		"Stop\nOprește"
+STRING ID_PLAY_PLAY		"Redare\nRedare"
+STRING ID_PLAY_STOP		"Oprește\nOprește"
 STRING ID_SHOW_MILLISECONDS		"Afișează milisecundele"
 STRING ID_VOLUME_MUTE		"Silenţios\nSilenţios"
-STRING ID_VOLUME_MUTE_DISABLED		"Fără audio\nFără audio"
-STRING ID_VOLUME_MUTE_OFF		"Cu sunet\nCu sunet"
+STRING ID_VOLUME_MUTE_DISABLED		"Fără sunet\nFără sunet"
+STRING ID_VOLUME_MUTE_OFF		"Activează sunetul\nActivează sunetul"
