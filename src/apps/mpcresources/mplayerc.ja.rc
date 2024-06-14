@@ -3215,7 +3215,7 @@ BEGIN
     IDS_CMD_FULLSCREEN      "/fullscreen\t\t全画面表示モードで起動する"
     IDS_CMD_MINIMIZED       "/minimized\t\t最小化モードで起動する"
     IDS_CMD_NEW             "/new\t\t\t新規プレーヤーを起動する"
-    IDS_CMD_ADD             "/add\t\t\t""pathname"" をプレイリストに追加する\n\t\t/open および /play と同時に使用可能"
+    IDS_CMD_ADD             "/add\t\t\t""pathname"" をプレイリストに追加する\n\t\t\t/open および /play と同時に使用可能"
     IDS_CMD_RANDOMIZE       "/randomize\t\tプレイリストをランダム化する"
 END
 
