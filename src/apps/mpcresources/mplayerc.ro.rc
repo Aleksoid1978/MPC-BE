@@ -66,7 +66,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     COMBOBOX        IDC_COMBO1,5,5,215,37,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,116,28,50,14
-    PUSHBUTTON      "Revocare",IDCANCEL,170,28,50,14
+    PUSHBUTTON      "Anulare",IDCANCEL,170,28,50,14
 END
 
 IDD_CAPTURE_DLG DIALOGEX 0, 0, 132, 293
@@ -204,9 +204,9 @@ BEGIN
     COMBOBOX        IDC_COMBO2,10,68,188,20,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Răsfoire...",IDC_BUTTON2,200,67,50,14
     DEFPUSHBUTTON   "OK",IDOK,148,94,50,14,WS_GROUP
-    PUSHBUTTON      "Revocare",IDCANCEL,200,94,50,14
+    PUSHBUTTON      "Anulare",IDCANCEL,200,94,50,14
     CONTROL         "Adaugă la lista de redare fără a deschide",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,84,188,9
-    CONTROL         "Paste URL from clipboard",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,96,134,9
+    CONTROL         "Lipește URL-ul din clipboard",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,96,134,9
 END
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 241, 202
@@ -232,7 +232,7 @@ BEGIN
     CONTROL         "<a>https://github.com/Aleksoid1978/MPC-BE</a>",IDC_GITHUB_LINK,
                     "SysLink",WS_TABSTOP,30,126,200,8
     LTEXT           "Acesta program este gratuit și lansat sub licența GNU General Public License.",IDC_STATIC,30,138,200,18
-    LTEXT           "În 2023-2024 traducător a fost Andrei Miloiu. În trecut, au contribuit Daniel Alămiță şi lordkag.",IDC_STATIC,30,161,200,18
+    LTEXT           "În 2023-2024 traducătorul e Andrei-Valentin Miloiu. În trecut, au contribuit Daniel Alămiță şi lordkag.",IDC_STATIC,30,161,200,18
     DEFPUSHBUTTON   "OK",IDOK,185,183,50,14,WS_GROUP
 END
 
@@ -590,7 +590,7 @@ BEGIN
     CONTROL         "Memorează poziția",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,38,232,9
     CONTROL         "Unitate relativă",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,50,232,10
     DEFPUSHBUTTON   "OK",IDOK,143,62,50,14
-    PUSHBUTTON      "Revocare",IDCANCEL,197,62,50,14
+    PUSHBUTTON      "Anulare",IDCANCEL,197,62,50,14
 END
 
 IDD_FAVORGANIZE DIALOGEX 0, 0, 276, 170
@@ -624,7 +624,7 @@ BEGIN
     PUSHBUTTON      "Jos",IDC_BUTTON5,125,76,35,12
     PUSHBUTTON      "&Setează",IDC_BUTTON1,165,76,35,12
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,93,188,1
-    PUSHBUTTON      "&Revocare",IDCANCEL,49,100,50,14
+    PUSHBUTTON      "&Anulare",IDCANCEL,49,100,50,14
     PUSHBUTTON      "&Salvează",IDOK,105,100,50,14
     LTEXT           "Poziție: 0.0 -> 1.0",IDC_STATIC,134,5,70,8
     LTEXT           "Mărire: 0.2 -> 5.0",IDC_STATIC,134,32,70,8
@@ -715,7 +715,7 @@ BEGIN
     CONTROL         "",IDC_LIST2,"SysListView32",LVS_LIST | LVS_SINGLESEL | LVS_SORTASCENDING | LVS_ALIGNLEFT | WS_TABSTOP,5,5,275,154,WS_EX_CLIENTEDGE
     PUSHBUTTON      "Răsfoire...",IDC_BUTTON1,5,163,60,14
     DEFPUSHBUTTON   "OK",IDOK,177,163,50,14
-    PUSHBUTTON      "Revocare",IDCANCEL,230,163,50,14
+    PUSHBUTTON      "Anulare",IDCANCEL,230,163,50,14
 END
 
 IDD_PPAGESUBSTYLE DIALOGEX 0, 0, 296, 264
@@ -886,7 +886,7 @@ BEGIN
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,33,120,12,13
     LTEXT           "Formatul de suprafață:",IDC_STATIC2,115,124,72,8
     COMBOBOX        IDC_COMBO1,188,122,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Redimensionare:",IDC_STATIC3,115,141,72,8
+    LTEXT           "Scalare:",IDC_STATIC3,115,141,72,8
     COMBOBOX        IDC_DX9RESIZER_COMBO,188,139,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Reducere la scară de <50%:",IDC_STATIC10,115,158,72,8
     COMBOBOX        IDC_COMBO7,188,156,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -943,7 +943,7 @@ CAPTION "Este necesară autentificarea"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,106,108,50,14
-    PUSHBUTTON      "Revocare",IDCANCEL,158,108,50,14
+    PUSHBUTTON      "Anulare",IDCANCEL,158,108,50,14
     CONTROL         337,IDC_STATIC,"Static",SS_BITMAP,0,0,213,37
     LTEXT           "Zonă restricționată",IDC_STATIC,10,40,198,11
     LTEXT           "Nume utilizator:",IDC_STATIC,10,56,66,8
@@ -1017,7 +1017,7 @@ BEGIN
     PUSHBUTTON      "Mută în &sus",IDC_BUTTON1,162,90,50,14
     PUSHBUTTON      "Mută în &jos",IDC_BUTTON4,162,108,50,14
     DEFPUSHBUTTON   "OK",IDOK,162,153,50,14
-    PUSHBUTTON      "Revocare",IDCANCEL,162,173,50,14
+    PUSHBUTTON      "Anulare",IDCANCEL,162,173,50,14
 END
 
 IDD_SHADEREDITOR_DLG DIALOGEX 0, 0, 205, 73
@@ -1112,7 +1112,7 @@ CAPTION "Scanare tuner"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "Pornește",ID_START,244,227,50,14
-    PUSHBUTTON      "Revocare",IDCANCEL,352,227,50,14
+    PUSHBUTTON      "Anulare",IDCANCEL,352,227,50,14
     CONTROL         "",IDC_STRENGTH,"msctls_progress32",PBS_VERTICAL | WS_BORDER,373,51,10,158
     CONTROL         "",IDC_QUALITY,"msctls_progress32",PBS_VERTICAL | WS_BORDER,387,51,10,158
     CONTROL         "",IDC_CHANNEL_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,5,37,343,172
@@ -1147,7 +1147,7 @@ BEGIN
     COMBOBOX        IDC_COMBO2,84,60,202,30,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO9,84,75,202,102,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Setări digital (BDA)",IDC_STATIC,5,92,286,59
-    LTEXT           "Furnizor rețea",IDC_STATIC4,10,106,70,8
+    LTEXT           "Furnizor de rețea",IDC_STATIC4,10,106,70,8
     LTEXT           "Tuner",IDC_STATIC5,10,121,70,8
     LTEXT           "Receptor",IDC_STATIC6,10,136,70,8
     COMBOBOX        IDC_COMBO4,84,104,202,30,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
@@ -1260,11 +1260,11 @@ IDD_ITEMPROPERTIES_DIALOG DIALOGEX 0, 0, 238, 100
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "&Save",IDOK,129,82,50,14
-    PUSHBUTTON      "&Revocare",IDCANCEL,182,82,50,14
-    LTEXT           "Title:",IDC_STATIC,10,6,50,8
+    DEFPUSHBUTTON   "&Salvează",IDOK,129,82,50,14
+    PUSHBUTTON      "&Anulare",IDCANCEL,182,82,50,14
+    LTEXT           "Titlu:",IDC_STATIC,10,6,50,8
     EDITTEXT        IDC_EDIT1,10,18,219,13,ES_AUTOHSCROLL
-    LTEXT           "Path:",IDC_STATIC,10,36,50,8
+    LTEXT           "Cale:",IDC_STATIC,10,36,50,8
     EDITTEXT        IDC_EDIT2,10,48,219,13,ES_AUTOHSCROLL
 END
 
@@ -1276,7 +1276,7 @@ BEGIN
     LTEXT           "Nume:",IDC_STATIC,4,5,50,8
     EDITTEXT        IDC_EDIT1,58,4,188,13,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,142,23,50,14
-    PUSHBUTTON      "Revocare",IDCANCEL,196,23,50,14
+    PUSHBUTTON      "Anulare",IDCANCEL,196,23,50,14
 END
 
 IDD_CMD_LINE_HELP DIALOGEX 0, 0, 309, 177
@@ -1295,7 +1295,7 @@ CAPTION "Dialogul numelui listei de redare"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,150,42,50,14
-    PUSHBUTTON      "Revocare",IDCANCEL,204,42,50,14
+    PUSHBUTTON      "Anulare",IDCANCEL,204,42,50,14
     EDITTEXT        IDC_EDIT1,94,14,159,14,ES_AUTOHSCROLL
     RTEXT           "Nume:",IDC_STATIC,7,16,84,8
 END
@@ -1309,7 +1309,7 @@ BEGIN
     EDITTEXT        IDC_EDIT1,38,5,86,13,ES_AUTOHSCROLL
     CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,5,20,275,139,WS_EX_CLIENTEDGE
     DEFPUSHBUTTON   "OK",IDOK,177,163,50,14
-    PUSHBUTTON      "Revocare",IDCANCEL,230,163,50,14
+    PUSHBUTTON      "Anulare",IDCANCEL,230,163,50,14
 END
 
 IDD_HISTORY DIALOGEX 0, 0, 276, 170
@@ -1319,7 +1319,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     PUSHBUTTON      "MENU",IDC_BUTTON1,4,4,31,14
     EDITTEXT        IDC_EDIT1,39,5,100,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "Remove selected",IDC_BUTTON2,143,4,76,14
+    PUSHBUTTON      "Șterge selecția",IDC_BUTTON2,143,4,76,14
     CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,4,23,268,142,WS_EX_CLIENTEDGE
 END
 
@@ -2043,8 +2043,8 @@ BEGIN
         MENUITEM "&Mărime dublă",                ID_VIEW_VF_DOUBLE
         MENUITEM "&Întinde cât fereastra",          ID_VIEW_VF_STRETCH
         MENUITEM "Atinge fereastra din &interior",   ID_VIEW_VF_FROMINSIDE
-        MENUITEM "Zoom &1",                     ID_VIEW_VF_ZOOM1
-        MENUITEM "Zoom &2",                     ID_VIEW_VF_ZOOM2
+        MENUITEM "Scalare &1",                     ID_VIEW_VF_ZOOM1
+        MENUITEM "Scalare &2",                     ID_VIEW_VF_ZOOM2
         MENUITEM "Atinge fereastra din exteri&or",  ID_VIEW_VF_FROMOUTSIDE
         MENUITEM SEPARATOR
         MENUITEM "&Menține raportul de aspect",          ID_VIEW_VF_KEEPASPECTRATIO
@@ -2598,19 +2598,19 @@ END
 
 STRINGTABLE
 BEGIN
-    ID_PLAY_PLAY            "Redare\nRedă"
+    ID_PLAY_PLAY            "Redare\nRedare"
     ID_PLAY_PAUSE           "Pauză\nPauză"
-    ID_PLAY_STOP            "Stop\nOprește"
+    ID_PLAY_STOP            "Oprește\nOprește"
     ID_PLAY_FRAMESTEP       "Pas\nPas"
-    ID_PLAY_DECRATE         "Micșorează viteză\nMicșorează viteză"
-    ID_PLAY_INCRATE         "Mărește viteză\nMărește viteză"
+    ID_PLAY_DECRATE         "Micșorează viteza\nMicșorează viteza"
+    ID_PLAY_INCRATE         "Mărește viteza\nMărește viteza"
 END
 
 STRINGTABLE
 BEGIN
     ID_VOLUME_MUTE          "Silenţios\nSilenţios"
-    ID_VOLUME_MUTE_OFF      "Cu sunet\nCu sunet"
-    ID_VOLUME_MUTE_DISABLED "Fără audio\nFără audio"
+    ID_VOLUME_MUTE_OFF      "Activează sunetul\nActivează sunetul"
+    ID_VOLUME_MUTE_DISABLED "Fără sunet\nFără sunet"
 END
 
 STRINGTABLE
@@ -2728,10 +2728,10 @@ BEGIN
     IDS_VIDEO_STREAM        "Video: %s"
     IDS_APPLY               "Aplică"
     IDS_CLEAR               "Goleşte"
-    IDS_CANCEL              "Revocare"
+    IDS_CANCEL              "Anulare"
     IDS_TEXTFILE_ENC        "Codare:"
     IDS_SAVE_FILE           "Se salvează fișierul"
-    IDS_VOLUME_OSD_MUTE     "Vol: %d%% [mut]"
+    IDS_VOLUME_OSD_MUTE     "Volum: %d%% [Mut]"
     IDS_COPY_TO_CLIPBOARD   "Copiază în clipboard"
     IDS_AUDIO_LEVEL         "Nivel (%d):"
     IDS_AUDIO_RELEASETIME   "Timp de eliberare (%d):"
@@ -2742,7 +2742,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_OSD_ZOOM_AUTO       "Redimensionare: Automat"
+    IDS_OSD_ZOOM_AUTO       "Scalare: Automat"
     IDS_CUSTOM_CHANNEL_MAPPING "Comută repartizarea particularizată a canalelor"
     IDS_OSD_CUSTOM_CH_MAPPING_ON "Repartizare particularizată a canalelor: Pornită"
     IDS_OSD_CUSTOM_CH_MAPPING_OFF "Repartizare particularizată a canalelor: Oprită"
@@ -2845,8 +2845,8 @@ END
 STRINGTABLE
 BEGIN
     IDS_FRAME_FROMINSIDE    "Atinge fereastra din interior"
-    IDS_FRAME_ZOOM1         "Redimensionare 1"
-    IDS_FRAME_ZOOM2         "Redimensionare 2"
+    IDS_FRAME_ZOOM1         "Scalare 1"
+    IDS_FRAME_ZOOM2         "Scalare 2"
     IDS_FRAME_FROMOUTSIDE   "Atinge fereastra din exteri&or"
     IDS_CENTER_LEVEL_INC    "Crește nivelul central"
     IDS_CENTER_LEVEL_DEC    "Scade nivelul central"
@@ -3495,8 +3495,8 @@ BEGIN
     IDS_DISABLE_DXVA_FILTERS "Dezactivează filtrele DXVA"
     IDS_STRETCH_TO_WINDOW   "Întinde cât fereastra"
     IDS_TOUCH_WINDOW_FROM_INSIDE "Atinge fereastra din interior"
-    IDS_ZOOM1               "Redimensionare 1"
-    IDS_ZOOM2               "Redimensionare 2"
+    IDS_ZOOM1               "Scalare 1"
+    IDS_ZOOM2               "Scalare 2"
     IDS_TOUCH_WINDOW_FROM_OUTSIDE "Atinge fereastra din exterior"
     IDS_AUDIO_STREAM        "Audio %u/%u: %s"
     IDS_AG_REOPEN           "Redeschide fișier"
@@ -3659,7 +3659,7 @@ BEGIN
     IDS_NEW_UPDATE_AVAILABLE  "O nouă %s este disponibilă.\n\nVrei să vizitezi site-ul programului MPC-BE ca să o descarci?"
     IDS_UPDATE_ERROR_CONNECT  "Serverul pentru actualizare nu a fost găsit.\n\nVerificaţi conexiunea la internet sau încercaţi mai târziu."
     IDS_UPDATE_CLOSE        "În&chide"
-    IDS_OSD_ZOOM            "Redimensionare: %.0lf%%"
+    IDS_OSD_ZOOM            "Scalare: %.0lf%%"
 END
 
 STRINGTABLE
@@ -3745,7 +3745,7 @@ BEGIN
     IDS_SUBDL_DLG_DOWNLOADING "Descărcare subtitrare(ări), vă rugăm să aşteptaţi."
     IDS_SUBDL_DLG_PARSING   "Analizarea listei..."
     IDS_SUBDL_DLG_NOT_FOUND "Nu s-au găsit subtitrări."
-    IDS_SUBDL_DLG_SUBS_AVAIL " %d subtitrare(ări) disponibilă(le)."
+    IDS_SUBDL_DLG_SUBS_AVAIL " %d subtitrare(ări) disponibilă(e)."
     IDS_TOOLTIP_MINIMIZE    "Minimizează"
     IDS_TOOLTIP_RESTORE     "Restabilește"
     IDS_TOOLTIP_MAXIMIZE    "Maximizează"
