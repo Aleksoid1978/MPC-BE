@@ -34,6 +34,7 @@
 #include "mpegutils.h"
 #include "mpegvideo.h"
 #include "threadframe.h"
+#include "threadprogress.h"
 
 /**
  * @param stride the number of MVs to get to the next row
@@ -409,8 +410,12 @@ static void guess_mv(ERContext *s)
     set_mv_strides(s, &mot_step, &mot_stride);
 
     num_avail = 0;
-    if (s->last_pic.motion_val[0])
-        ff_thread_await_progress(s->last_pic.tf, mb_height-1, 0);
+    if (s->last_pic.motion_val[0]) {
+        if (s->last_pic.tf)
+            ff_thread_await_progress(s->last_pic.tf, mb_height-1, 0);
+        else
+            ff_thread_progress_await(s->last_pic.progress, mb_height - 1);
+    }
     for (i = 0; i < mb_width * mb_height; i++) {
         const int mb_xy = s->mb_index2xy[i];
         int f = 0;
@@ -763,7 +768,7 @@ static int is_intra_more_likely(ERContext *s)
                 if (s->avctx->codec_id == AV_CODEC_ID_H264) {
                     // FIXME
                 } else {
-                    ff_thread_await_progress(s->last_pic.tf, mb_y, 0);
+                    ff_thread_progress_await(s->last_pic.progress, mb_y);
                 }
                 is_intra_likely += s->sad(NULL, last_mb_ptr, mb_ptr,
                                           linesize[0], 16);
@@ -948,18 +953,9 @@ void ff_er_frame_end(ERContext *s, int *decode_error_flags)
             s->ref_index[i]       = av_calloc(s->mb_stride * s->mb_height, 4 * sizeof(uint8_t));
             s->motion_val_base[i] = av_calloc(size + 4, 2 * sizeof(uint16_t));
             if (!s->ref_index[i] || !s->motion_val_base[i])
-                break;
+                goto cleanup;
             s->cur_pic.ref_index[i]  = s->ref_index[i];
             s->cur_pic.motion_val[i] = s->motion_val_base[i] + 4;
-        }
-        if (i < 2) {
-            for (i = 0; i < 2; i++) {
-                av_freep(&s->ref_index[i]);
-                av_freep(&s->motion_val_base[i]);
-                s->cur_pic.ref_index[i]  = NULL;
-                s->cur_pic.motion_val[i] = NULL;
-            }
-            return;
         }
     }
 
@@ -1207,7 +1203,7 @@ void ff_er_frame_end(ERContext *s, int *decode_error_flags)
                     int time_pb = s->pb_time;
 
                     av_assert0(s->avctx->codec_id != AV_CODEC_ID_H264);
-                    ff_thread_await_progress(s->next_pic.tf, mb_y, 0);
+                    ff_thread_progress_await(s->next_pic.progress, mb_y);
 
                     s->mv[0][0][0] = s->next_pic.motion_val[0][xy][0] *  time_pb            / time_pp;
                     s->mv[0][0][1] = s->next_pic.motion_val[0][xy][1] *  time_pb            / time_pp;
@@ -1344,14 +1340,15 @@ void ff_er_frame_end(ERContext *s, int *decode_error_flags)
             s->mbintra_table[mb_xy] = 1;
     }
 
+    memset(&s->cur_pic, 0, sizeof(ERPicture));
+    memset(&s->last_pic, 0, sizeof(ERPicture));
+    memset(&s->next_pic, 0, sizeof(ERPicture));
+
+cleanup:
     for (i = 0; i < 2; i++) {
         av_freep(&s->ref_index[i]);
         av_freep(&s->motion_val_base[i]);
         s->cur_pic.ref_index[i]  = NULL;
         s->cur_pic.motion_val[i] = NULL;
     }
-
-    memset(&s->cur_pic, 0, sizeof(ERPicture));
-    memset(&s->last_pic, 0, sizeof(ERPicture));
-    memset(&s->next_pic, 0, sizeof(ERPicture));
 }

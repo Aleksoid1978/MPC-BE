@@ -120,12 +120,12 @@ av_cold void ff_msmpeg4_common_init(MpegEncContext *s)
     static AVOnce init_static_once = AV_ONCE_INIT;
 
     switch(s->msmpeg4_version){
-    case 1:
-    case 2:
+    case MSMP4_V1:
+    case MSMP4_V2:
         s->y_dc_scale_table=
         s->c_dc_scale_table= ff_mpeg1_dc_scale_table;
         break;
-    case 3:
+    case MSMP4_V3:
         if(s->workaround_bugs){
             s->y_dc_scale_table= ff_old_ff_y_dc_scale_table;
             s->c_dc_scale_table= ff_wmv1_c_dc_scale_table;
@@ -134,14 +134,14 @@ av_cold void ff_msmpeg4_common_init(MpegEncContext *s)
             s->c_dc_scale_table= ff_mpeg4_c_dc_scale_table;
         }
         break;
-    case 4:
-    case 5:
+    case MSMP4_WMV1:
+    case MSMP4_WMV2:
         s->y_dc_scale_table= ff_wmv1_y_dc_scale_table;
         s->c_dc_scale_table= ff_wmv1_c_dc_scale_table;
         break;
     }
 
-    if(s->msmpeg4_version>=4){
+    if (s->msmpeg4_version >= MSMP4_WMV1) {
         ff_init_scantable(s->idsp.idct_permutation, &s->intra_scantable,   ff_wmv1_scantable[1]);
         ff_init_scantable(s->idsp.idct_permutation, &s->inter_scantable,   ff_wmv1_scantable[0]);
         ff_permute_scantable(s->permutated_intra_h_scantable, ff_wmv1_scantable[2],
@@ -218,9 +218,8 @@ int ff_msmpeg4_pred_dc(MpegEncContext *s, int n,
     b = dc_val[ - 1 - wrap];
     c = dc_val[ - wrap];
 
-    if(s->first_slice_line && (n&2)==0 && s->msmpeg4_version<4){
+    if (s->first_slice_line && !(n & 2) && s->msmpeg4_version < MSMP4_WMV1)
         b=c=1024;
-    }
 
     /* XXX: the following solution consumes divisions, but it does not
        necessitate to modify mpegvideo.c. The problem comes from the
@@ -259,7 +258,7 @@ int ff_msmpeg4_pred_dc(MpegEncContext *s, int n,
 #endif
     /* XXX: WARNING: they did not choose the same test as MPEG-4. This
        is very important ! */
-    if(s->msmpeg4_version>3){
+    if (s->msmpeg4_version > MSMP4_V3) {
         if(s->inter_intra_pred){
             uint8_t *dest;
             int wrap;
@@ -282,10 +281,10 @@ int ff_msmpeg4_pred_dc(MpegEncContext *s, int n,
                 int bs = 8 >> s->avctx->lowres;
                 if(n<4){
                     wrap= s->linesize;
-                    dest= s->current_picture.f->data[0] + (((n >> 1) + 2*s->mb_y) * bs*  wrap ) + ((n & 1) + 2*s->mb_x) * bs;
+                    dest = s->cur_pic.data[0] + (((n >> 1) + 2*s->mb_y) * bs*  wrap ) + ((n & 1) + 2*s->mb_x) * bs;
                 }else{
                     wrap= s->uvlinesize;
-                    dest= s->current_picture.f->data[n - 3] + (s->mb_y * bs * wrap) + s->mb_x * bs;
+                    dest = s->cur_pic.data[n - 3] + (s->mb_y * bs * wrap) + s->mb_x * bs;
                 }
                 if(s->mb_x==0) a= (1024 + (scale>>1))/scale;
                 else           a= get_dc(dest-bs, wrap, scale*8>>(2*s->avctx->lowres), bs);

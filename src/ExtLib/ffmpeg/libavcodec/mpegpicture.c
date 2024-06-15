@@ -18,8 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <stdint.h>
-
 #include "libavutil/avassert.h"
 #include "libavutil/common.h"
 #include "libavutil/mem.h"
@@ -27,80 +25,139 @@
 #include "libavutil/imgutils.h"
 
 #include "avcodec.h"
-#include "motion_est.h"
 #include "mpegpicture.h"
-#include "mpegvideo.h"
 #include "refstruct.h"
-#include "threadframe.h"
 
-static void av_noinline free_picture_tables(Picture *pic)
+static void mpv_pic_reset(FFRefStructOpaque unused, void *obj)
 {
-    pic->alloc_mb_width  =
-    pic->alloc_mb_height = 0;
+    MPVPicture *pic = obj;
 
-    av_buffer_unref(&pic->mbskip_table_buf);
-    av_buffer_unref(&pic->qscale_table_buf);
-    av_buffer_unref(&pic->mb_type_buf);
+    av_frame_unref(pic->f);
+    ff_thread_progress_reset(&pic->progress);
+
+    ff_refstruct_unref(&pic->hwaccel_picture_private);
+
+    ff_refstruct_unref(&pic->mbskip_table);
+    ff_refstruct_unref(&pic->qscale_table_base);
+    ff_refstruct_unref(&pic->mb_type_base);
 
     for (int i = 0; i < 2; i++) {
-        av_buffer_unref(&pic->motion_val_buf[i]);
-        av_buffer_unref(&pic->ref_index_buf[i]);
+        ff_refstruct_unref(&pic->motion_val_base[i]);
+        ff_refstruct_unref(&pic->ref_index[i]);
+
+        pic->motion_val[i] = NULL;
     }
+
+    pic->mb_type                = NULL;
+    pic->qscale_table           = NULL;
+
+    pic->mb_stride =
+    pic->mb_width  =
+    pic->mb_height = 0;
+
+    pic->dummy                  = 0;
+    pic->field_picture          = 0;
+    pic->b_frame_score          = 0;
+    pic->reference              = 0;
+    pic->shared                 = 0;
+    pic->display_picture_number = 0;
+    pic->coded_picture_number   = 0;
 }
 
-static int make_table_writable(AVBufferRef **ref)
+static int av_cold mpv_pic_init(FFRefStructOpaque opaque, void *obj)
 {
-    AVBufferRef *old = *ref, *new;
+    MPVPicture *pic = obj;
+    int ret, init_progress = (uintptr_t)opaque.nc;
 
-    if (av_buffer_is_writable(old))
-        return 0;
-    new = av_buffer_allocz(old->size);
-    if (!new)
+    ret = ff_thread_progress_init(&pic->progress, init_progress);
+    if (ret < 0)
+        return ret;
+
+    pic->f = av_frame_alloc();
+    if (!pic->f)
         return AVERROR(ENOMEM);
-    av_buffer_unref(ref);
-    *ref = new;
     return 0;
 }
 
-static int make_tables_writable(Picture *pic)
+static void av_cold mpv_pic_free(FFRefStructOpaque unused, void *obj)
 {
-#define MAKE_WRITABLE(table) \
-do {\
-    int ret = make_table_writable(&pic->table); \
-    if (ret < 0) \
-        return ret; \
-} while (0)
+    MPVPicture *pic = obj;
 
-    MAKE_WRITABLE(mbskip_table_buf);
-    MAKE_WRITABLE(qscale_table_buf);
-    MAKE_WRITABLE(mb_type_buf);
-
-    if (pic->motion_val_buf[0]) {
-        for (int i = 0; i < 2; i++) {
-            MAKE_WRITABLE(motion_val_buf[i]);
-            MAKE_WRITABLE(ref_index_buf[i]);
-        }
-    }
-
-    return 0;
+    ff_thread_progress_destroy(&pic->progress);
+    av_frame_free(&pic->f);
 }
 
-int ff_mpeg_framesize_alloc(AVCodecContext *avctx, MotionEstContext *me,
-                            ScratchpadContext *sc, int linesize)
+av_cold FFRefStructPool *ff_mpv_alloc_pic_pool(int init_progress)
+{
+    return ff_refstruct_pool_alloc_ext(sizeof(MPVPicture),
+                                       FF_REFSTRUCT_POOL_FLAG_FREE_ON_INIT_ERROR,
+                                       (void*)(uintptr_t)init_progress,
+                                       mpv_pic_init, mpv_pic_reset, mpv_pic_free, NULL);
+}
+
+void ff_mpv_unref_picture(MPVWorkPicture *pic)
+{
+    ff_refstruct_unref(&pic->ptr);
+    memset(pic, 0, sizeof(*pic));
+}
+
+static void set_workpic_from_pic(MPVWorkPicture *wpic, const MPVPicture *pic)
+{
+    for (int i = 0; i < MPV_MAX_PLANES; i++) {
+        wpic->data[i]     = pic->f->data[i];
+        wpic->linesize[i] = pic->f->linesize[i];
+    }
+    wpic->qscale_table = pic->qscale_table;
+    wpic->mb_type      = pic->mb_type;
+    wpic->mbskip_table = pic->mbskip_table;
+
+    for (int i = 0; i < 2; i++) {
+        wpic->motion_val[i] = pic->motion_val[i];
+        wpic->ref_index[i]  = pic->ref_index[i];
+    }
+    wpic->reference  = pic->reference;
+}
+
+void ff_mpv_replace_picture(MPVWorkPicture *dst, const MPVWorkPicture *src)
+{
+    av_assert1(dst != src);
+    ff_refstruct_replace(&dst->ptr, src->ptr);
+    memcpy(dst, src, sizeof(*dst));
+}
+
+void ff_mpv_workpic_from_pic(MPVWorkPicture *wpic, MPVPicture *pic)
+{
+    ff_refstruct_replace(&wpic->ptr, pic);
+    if (!pic) {
+        memset(wpic, 0, sizeof(*wpic));
+        return;
+    }
+    set_workpic_from_pic(wpic, pic);
+}
+
+int ff_mpv_framesize_alloc(AVCodecContext *avctx,
+                           ScratchpadContext *sc, int linesize)
 {
 #   define EMU_EDGE_HEIGHT (4 * 70)
-    int alloc_size = FFALIGN(FFABS(linesize) + 64, 32);
+    int linesizeabs = FFABS(linesize);
+    int alloc_size = FFALIGN(linesizeabs + 64, 32);
+
+    if (linesizeabs <= sc->linesize)
+        return 0;
 
     if (avctx->hwaccel)
         return 0;
 
-    if (linesize < 24) {
+    if (linesizeabs < 24) {
         av_log(avctx, AV_LOG_ERROR, "Image too small, temporary buffers cannot function\n");
         return AVERROR_PATCHWELCOME;
     }
 
     if (av_image_check_size2(alloc_size, EMU_EDGE_HEIGHT, avctx->max_pixels, AV_PIX_FMT_NONE, 0, avctx) < 0)
         return AVERROR(ENOMEM);
+
+    av_freep(&sc->edge_emu_buffer);
+    av_freep(&sc->scratchpad_buf);
 
     // edge emu needs blocksize + filter length - 1
     // (= 17x17 for  halfpel / 21x21 for H.264)
@@ -109,290 +166,93 @@ int ff_mpeg_framesize_alloc(AVCodecContext *avctx, MotionEstContext *me,
     // linesize * interlaced * MBsize
     // we also use this buffer for encoding in encode_mb_internal() needig an additional 32 lines
     if (!FF_ALLOCZ_TYPED_ARRAY(sc->edge_emu_buffer, alloc_size * EMU_EDGE_HEIGHT) ||
-        !FF_ALLOCZ_TYPED_ARRAY(me->scratchpad,      alloc_size * 4 * 16 * 2)) {
+        !FF_ALLOCZ_TYPED_ARRAY(sc->scratchpad_buf,  alloc_size * 4 * 16 * 2)) {
+        sc->linesize = 0;
         av_freep(&sc->edge_emu_buffer);
         return AVERROR(ENOMEM);
     }
+    sc->linesize = linesizeabs;
 
-    me->temp            = me->scratchpad;
-    sc->rd_scratchpad   = me->scratchpad;
-    sc->b_scratchpad    = me->scratchpad;
-    sc->obmc_scratchpad = me->scratchpad + 16;
+    sc->obmc_scratchpad = sc->scratchpad_buf + 16;
 
     return 0;
 }
 
-/**
- * Check the pic's linesize and allocate linesize dependent scratch buffers
- */
-static int handle_pic_linesizes(AVCodecContext *avctx, Picture *pic,
-                                MotionEstContext *me, ScratchpadContext *sc,
-                                int linesize, int uvlinesize)
+int ff_mpv_pic_check_linesize(void *logctx, const AVFrame *f,
+                              ptrdiff_t *linesizep, ptrdiff_t *uvlinesizep)
 {
-    int ret;
+    ptrdiff_t linesize = *linesizep, uvlinesize = *uvlinesizep;
 
-    if ((linesize   &&   linesize != pic->f->linesize[0]) ||
-        (uvlinesize && uvlinesize != pic->f->linesize[1])) {
-        av_log(avctx, AV_LOG_ERROR,
-               "get_buffer() failed (stride changed: linesize=%d/%d uvlinesize=%d/%d)\n",
-               linesize,   pic->f->linesize[0],
-               uvlinesize, pic->f->linesize[1]);
-        ff_mpeg_unref_picture(pic);
-        return -1;
+    if ((linesize   &&   linesize != f->linesize[0]) ||
+        (uvlinesize && uvlinesize != f->linesize[1])) {
+        av_log(logctx, AV_LOG_ERROR, "Stride change unsupported: "
+               "linesize=%"PTRDIFF_SPECIFIER"/%d uvlinesize=%"PTRDIFF_SPECIFIER"/%d)\n",
+               linesize,   f->linesize[0],
+               uvlinesize, f->linesize[1]);
+        return AVERROR_PATCHWELCOME;
     }
 
-    if (av_pix_fmt_count_planes(pic->f->format) > 2 &&
-        pic->f->linesize[1] != pic->f->linesize[2]) {
-        av_log(avctx, AV_LOG_ERROR,
-               "get_buffer() failed (uv stride mismatch)\n");
-        ff_mpeg_unref_picture(pic);
-        return -1;
+    if (av_pix_fmt_count_planes(f->format) > 2 &&
+        f->linesize[1] != f->linesize[2]) {
+        av_log(logctx, AV_LOG_ERROR, "uv stride mismatch unsupported\n");
+        return AVERROR_PATCHWELCOME;
     }
-
-    if (!sc->edge_emu_buffer &&
-        (ret = ff_mpeg_framesize_alloc(avctx, me, sc,
-                                       pic->f->linesize[0])) < 0) {
-        av_log(avctx, AV_LOG_ERROR,
-               "get_buffer() failed to allocate context scratch buffers.\n");
-        ff_mpeg_unref_picture(pic);
-        return ret;
-    }
+    *linesizep   = f->linesize[0];
+    *uvlinesizep = f->linesize[1];
 
     return 0;
 }
 
-static int alloc_picture_tables(AVCodecContext *avctx, Picture *pic, int encoding, int out_format,
-                                int mb_stride, int mb_width, int mb_height, int b8_stride)
+static int alloc_picture_tables(BufferPoolContext *pools, MPVPicture *pic,
+                                int mb_height)
 {
-    const int big_mb_num    = mb_stride * (mb_height + 1) + 1;
-    const int mb_array_size = mb_stride * mb_height;
-    const int b8_array_size = b8_stride * mb_height * 2;
-    int i;
-
-
-    pic->mbskip_table_buf = av_buffer_allocz(mb_array_size + 2);
-    pic->qscale_table_buf = av_buffer_allocz(big_mb_num + mb_stride);
-    pic->mb_type_buf      = av_buffer_allocz((big_mb_num + mb_stride) *
-                                             sizeof(uint32_t));
-    if (!pic->mbskip_table_buf || !pic->qscale_table_buf || !pic->mb_type_buf)
-        return AVERROR(ENOMEM);
-
-    if (out_format == FMT_H263 || encoding ||
-        (avctx->export_side_data & AV_CODEC_EXPORT_DATA_MVS)) {
-        int mv_size        = 2 * (b8_array_size + 4) * sizeof(int16_t);
-        int ref_index_size = 4 * mb_array_size;
-
-        for (i = 0; mv_size && i < 2; i++) {
-            pic->motion_val_buf[i] = av_buffer_allocz(mv_size);
-            pic->ref_index_buf[i]  = av_buffer_allocz(ref_index_size);
-            if (!pic->motion_val_buf[i] || !pic->ref_index_buf[i])
-                return AVERROR(ENOMEM);
+#define GET_BUFFER(name, buf_suffix, idx_suffix) do { \
+    pic->name ## buf_suffix idx_suffix = ff_refstruct_pool_get(pools->name ## _pool); \
+    if (!pic->name ## buf_suffix idx_suffix) \
+        return AVERROR(ENOMEM); \
+} while (0)
+    GET_BUFFER(qscale_table, _base,);
+    GET_BUFFER(mb_type, _base,);
+    if (pools->motion_val_pool) {
+        if (pools->mbskip_table_pool)
+            GET_BUFFER(mbskip_table,,);
+        for (int i = 0; i < 2; i++) {
+            GET_BUFFER(ref_index,, [i]);
+            GET_BUFFER(motion_val, _base, [i]);
+            pic->motion_val[i] = pic->motion_val_base[i] + 4;
         }
     }
+#undef GET_BUFFER
 
-    pic->alloc_mb_width  = mb_width;
-    pic->alloc_mb_height = mb_height;
-    pic->alloc_mb_stride = mb_stride;
+    pic->mb_width  = pools->alloc_mb_width;
+    pic->mb_height = mb_height;
+    pic->mb_stride = pools->alloc_mb_stride;
+
+    pic->qscale_table = pic->qscale_table_base + 2 * pic->mb_stride + 1;
+    pic->mb_type      = pic->mb_type_base      + 2 * pic->mb_stride + 1;
 
     return 0;
 }
 
-/**
- * Allocate a Picture.
- * The pixels are allocated/set by calling get_buffer() if shared = 0
- */
-int ff_alloc_picture(AVCodecContext *avctx, Picture *pic, MotionEstContext *me,
-                     ScratchpadContext *sc, int encoding, int out_format,
-                     int mb_stride, int mb_width, int mb_height, int b8_stride,
-                     ptrdiff_t *linesize, ptrdiff_t *uvlinesize)
+int ff_mpv_alloc_pic_accessories(AVCodecContext *avctx, MPVWorkPicture *wpic,
+                                 ScratchpadContext *sc,
+                                 BufferPoolContext *pools, int mb_height)
 {
-    int i, ret;
+    MPVPicture *pic = wpic->ptr;
+    int ret;
 
-    if (pic->qscale_table_buf)
-        if (   pic->alloc_mb_width  != mb_width
-            || pic->alloc_mb_height != mb_height)
-            free_picture_tables(pic);
-
-    if (handle_pic_linesizes(avctx, pic, me, sc,
-                             *linesize, *uvlinesize) < 0)
-        return -1;
-
-    *linesize   = pic->f->linesize[0];
-    *uvlinesize = pic->f->linesize[1];
-
-    if (!pic->qscale_table_buf)
-        ret = alloc_picture_tables(avctx, pic, encoding, out_format,
-                                   mb_stride, mb_width, mb_height, b8_stride);
-    else
-        ret = make_tables_writable(pic);
+    ret = ff_mpv_framesize_alloc(avctx, sc, pic->f->linesize[0]);
     if (ret < 0)
         goto fail;
 
-    pic->mbskip_table = pic->mbskip_table_buf->data;
-    pic->qscale_table = pic->qscale_table_buf->data + 2 * mb_stride + 1;
-    pic->mb_type      = (uint32_t*)pic->mb_type_buf->data + 2 * mb_stride + 1;
+    ret = alloc_picture_tables(pools, pic, mb_height);
+    if (ret < 0)
+        goto fail;
 
-    if (pic->motion_val_buf[0]) {
-        for (i = 0; i < 2; i++) {
-            pic->motion_val[i] = (int16_t (*)[2])pic->motion_val_buf[i]->data + 4;
-            pic->ref_index[i]  = pic->ref_index_buf[i]->data;
-        }
-    }
+    set_workpic_from_pic(wpic, pic);
 
     return 0;
 fail:
-    av_log(avctx, AV_LOG_ERROR, "Error allocating a picture.\n");
-    ff_mpeg_unref_picture(pic);
-    free_picture_tables(pic);
-    return AVERROR(ENOMEM);
-}
-
-/**
- * Deallocate a picture; frees the picture tables in case they
- * need to be reallocated anyway.
- */
-void ff_mpeg_unref_picture(Picture *pic)
-{
-    pic->tf.f = pic->f;
-    ff_thread_release_ext_buffer(&pic->tf);
-
-    ff_refstruct_unref(&pic->hwaccel_picture_private);
-
-    if (pic->needs_realloc)
-        free_picture_tables(pic);
-
-    pic->field_picture = 0;
-    pic->b_frame_score = 0;
-    pic->needs_realloc = 0;
-    pic->reference     = 0;
-    pic->shared        = 0;
-    pic->display_picture_number = 0;
-    pic->coded_picture_number   = 0;
-}
-
-int ff_update_picture_tables(Picture *dst, const Picture *src)
-{
-    int i, ret;
-
-    ret  = av_buffer_replace(&dst->mbskip_table_buf, src->mbskip_table_buf);
-    ret |= av_buffer_replace(&dst->qscale_table_buf, src->qscale_table_buf);
-    ret |= av_buffer_replace(&dst->mb_type_buf,      src->mb_type_buf);
-    for (i = 0; i < 2; i++) {
-        ret |= av_buffer_replace(&dst->motion_val_buf[i], src->motion_val_buf[i]);
-        ret |= av_buffer_replace(&dst->ref_index_buf[i],  src->ref_index_buf[i]);
-    }
-
-    if (ret < 0) {
-        free_picture_tables(dst);
-        return ret;
-    }
-
-    dst->mbskip_table  = src->mbskip_table;
-    dst->qscale_table  = src->qscale_table;
-    dst->mb_type       = src->mb_type;
-    for (i = 0; i < 2; i++) {
-        dst->motion_val[i] = src->motion_val[i];
-        dst->ref_index[i]  = src->ref_index[i];
-    }
-
-    dst->alloc_mb_width  = src->alloc_mb_width;
-    dst->alloc_mb_height = src->alloc_mb_height;
-    dst->alloc_mb_stride = src->alloc_mb_stride;
-
-    return 0;
-}
-
-int ff_mpeg_ref_picture(Picture *dst, Picture *src)
-{
-    int ret;
-
-    av_assert0(!dst->f->buf[0]);
-    av_assert0(src->f->buf[0]);
-
-    src->tf.f = src->f;
-    dst->tf.f = dst->f;
-    ret = ff_thread_ref_frame(&dst->tf, &src->tf);
-    if (ret < 0)
-        goto fail;
-
-    ret = ff_update_picture_tables(dst, src);
-    if (ret < 0)
-        goto fail;
-
-    ff_refstruct_replace(&dst->hwaccel_picture_private,
-                          src->hwaccel_picture_private);
-
-    dst->field_picture           = src->field_picture;
-    dst->b_frame_score           = src->b_frame_score;
-    dst->needs_realloc           = src->needs_realloc;
-    dst->reference               = src->reference;
-    dst->shared                  = src->shared;
-    dst->display_picture_number  = src->display_picture_number;
-    dst->coded_picture_number    = src->coded_picture_number;
-
-    return 0;
-fail:
-    ff_mpeg_unref_picture(dst);
+    av_log(avctx, AV_LOG_ERROR, "Error allocating picture accessories.\n");
     return ret;
-}
-
-static inline int pic_is_unused(Picture *pic)
-{
-    if (!pic->f->buf[0])
-        return 1;
-    if (pic->needs_realloc)
-        return 1;
-    return 0;
-}
-
-static int find_unused_picture(AVCodecContext *avctx, Picture *picture, int shared)
-{
-    int i;
-
-    if (shared) {
-        for (i = 0; i < MAX_PICTURE_COUNT; i++) {
-            if (!picture[i].f->buf[0])
-                return i;
-        }
-    } else {
-        for (i = 0; i < MAX_PICTURE_COUNT; i++) {
-            if (pic_is_unused(&picture[i]))
-                return i;
-        }
-    }
-
-    av_log(avctx, AV_LOG_FATAL,
-           "Internal error, picture buffer overflow\n");
-    /* We could return -1, but the codec would crash trying to draw into a
-     * non-existing frame anyway. This is safer than waiting for a random crash.
-     * Also the return of this is never useful, an encoder must only allocate
-     * as much as allowed in the specification. This has no relationship to how
-     * much libavcodec could allocate (and MAX_PICTURE_COUNT is always large
-     * enough for such valid streams).
-     * Plus, a decoder has to check stream validity and remove frames if too
-     * many reference frames are around. Waiting for "OOM" is not correct at
-     * all. Similarly, missing reference frames have to be replaced by
-     * interpolated/MC frames, anything else is a bug in the codec ...
-     */
-    abort();
-    return -1;
-}
-
-int ff_find_unused_picture(AVCodecContext *avctx, Picture *picture, int shared)
-{
-    int ret = find_unused_picture(avctx, picture, shared);
-
-    if (ret >= 0 && ret < MAX_PICTURE_COUNT) {
-        if (picture[ret].needs_realloc) {
-            ff_mpeg_unref_picture(&picture[ret]);
-        }
-    }
-    return ret;
-}
-
-void av_cold ff_mpv_picture_free(Picture *pic)
-{
-    free_picture_tables(pic);
-    ff_mpeg_unref_picture(pic);
-    av_frame_free(&pic->f);
 }

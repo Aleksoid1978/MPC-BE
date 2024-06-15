@@ -61,13 +61,6 @@ static const uint8_t hevc_sub_height_c[] = {
     1, 2, 1, 1
 };
 
-static void remove_pps(HEVCParamSets *s, int id)
-{
-    if (s->pps == s->pps_list[id])
-        s->pps = NULL;
-    ff_refstruct_unref(&s->pps_list[id]);
-}
-
 static void remove_sps(HEVCParamSets *s, int id)
 {
     int i;
@@ -78,7 +71,7 @@ static void remove_sps(HEVCParamSets *s, int id)
         /* drop all PPS that depend on this SPS */
         for (i = 0; i < FF_ARRAY_ELEMS(s->pps_list); i++)
             if (s->pps_list[i] && s->pps_list[i]->sps_id == id)
-                remove_pps(s, i);
+                ff_refstruct_unref(&s->pps_list[i]);
 
         av_assert0(!(s->sps_list[id] && s->sps == s->sps_list[id]));
         ff_refstruct_unref(&s->sps_list[id]);
@@ -889,10 +882,13 @@ int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
 
     sps->vps_id = get_bits(gb, 4);
 
-    if (vps_list && !vps_list[sps->vps_id]) {
-        av_log(avctx, AV_LOG_ERROR, "VPS %d does not exist\n",
-               sps->vps_id);
-        return AVERROR_INVALIDDATA;
+    if (vps_list) {
+        if (!vps_list[sps->vps_id]) {
+            av_log(avctx, AV_LOG_ERROR, "VPS %d does not exist\n",
+                   sps->vps_id);
+            return AVERROR_INVALIDDATA;
+        }
+        sps->vps = ff_refstruct_ref_c(vps_list[sps->vps_id]);
     }
 
     sps->max_sub_layers = get_bits(gb, 3) + 1;
@@ -1262,8 +1258,8 @@ int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
 
     sps->qp_bd_offset = 6 * (sps->bit_depth - 8);
 
-    if (av_mod_uintp2(sps->width, sps->log2_min_cb_size) ||
-        av_mod_uintp2(sps->height, sps->log2_min_cb_size)) {
+    if (av_zero_extend(sps->width, sps->log2_min_cb_size) ||
+        av_zero_extend(sps->height, sps->log2_min_cb_size)) {
         av_log(avctx, AV_LOG_ERROR, "Invalid coded frame dimensions.\n");
         return AVERROR_INVALIDDATA;
     }
@@ -1299,6 +1295,8 @@ int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
 static void hevc_sps_free(FFRefStructOpaque opaque, void *obj)
 {
     HEVCSPS *sps = obj;
+
+    ff_refstruct_unref(&sps->vps);
 
     av_freep(&sps->data);
 }
@@ -1364,6 +1362,8 @@ err:
 static void hevc_pps_free(FFRefStructOpaque unused, void *obj)
 {
     HEVCPPS *pps = obj;
+
+    ff_refstruct_unref(&pps->sps);
 
     av_freep(&pps->column_width);
     av_freep(&pps->row_height);
@@ -1830,6 +1830,8 @@ int ff_hevc_decode_nal_pps(GetBitContext *gb, AVCodecContext *avctx,
     sps = ps->sps_list[pps->sps_id];
     vps = ps->vps_list[sps->vps_id];
 
+    pps->sps = ff_refstruct_ref_c(sps);
+
     pps->dependent_slice_segments_enabled_flag = get_bits1(gb);
     pps->output_flag_present_flag              = get_bits1(gb);
     pps->num_extra_slice_header_bits           = get_bits(gb, 3);
@@ -2028,7 +2030,7 @@ int ff_hevc_decode_nal_pps(GetBitContext *gb, AVCodecContext *avctx,
                "Overread PPS by %d bits\n", -get_bits_left(gb));
     }
 
-    remove_pps(ps, pps_id);
+    ff_refstruct_unref(&ps->pps_list[pps_id]);
     ps->pps_list[pps_id] = pps;
 
     return 0;
@@ -2050,7 +2052,6 @@ void ff_hevc_ps_uninit(HEVCParamSets *ps)
         ff_refstruct_unref(&ps->pps_list[i]);
 
     ps->sps = NULL;
-    ps->pps = NULL;
     ps->vps = NULL;
 }
 

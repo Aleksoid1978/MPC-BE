@@ -58,7 +58,7 @@ static av_always_inline void vc1_scale_chroma(uint8_t *srcU, uint8_t *srcV,
 }
 
 static av_always_inline void vc1_lut_scale_luma(uint8_t *srcY,
-                                                uint8_t *lut1, uint8_t *lut2,
+                                                const uint8_t *lut1, const uint8_t *lut2,
                                                 int k, int linesize)
 {
     int i, j;
@@ -78,7 +78,7 @@ static av_always_inline void vc1_lut_scale_luma(uint8_t *srcY,
 }
 
 static av_always_inline void vc1_lut_scale_chroma(uint8_t *srcU, uint8_t *srcV,
-                                                  uint8_t *lut1, uint8_t *lut2,
+                                                  const uint8_t *lut1, const uint8_t *lut2,
                                                   int k, int uvlinesize)
 {
     int i, j;
@@ -177,18 +177,18 @@ void ff_vc1_mc_1mv(VC1Context *v, int dir)
     int dxy, mx, my, uvmx, uvmy, src_x, src_y, uvsrc_x, uvsrc_y;
     int v_edge_pos = s->v_edge_pos >> v->field_mode;
     int i;
-    uint8_t (*luty)[256], (*lutuv)[256];
+    const uint8_t (*luty)[256], (*lutuv)[256];
     int use_ic;
     int interlace;
     int linesize, uvlinesize;
 
     if ((!v->field_mode ||
          (v->ref_field_type[dir] == 1 && v->cur_field_type == 1)) &&
-        !v->s.last_picture.f->data[0])
+        !v->s.last_pic.data[0])
         return;
 
-    linesize = s->current_picture_ptr->f->linesize[0];
-    uvlinesize = s->current_picture_ptr->f->linesize[1];
+    linesize   = s->cur_pic.ptr->f->linesize[0];
+    uvlinesize = s->cur_pic.ptr->f->linesize[1];
 
     mx = s->mv[dir][0][0];
     my = s->mv[dir][0][1];
@@ -196,8 +196,8 @@ void ff_vc1_mc_1mv(VC1Context *v, int dir)
     // store motion vectors for further use in B-frames
     if (s->pict_type == AV_PICTURE_TYPE_P) {
         for (i = 0; i < 4; i++) {
-            s->current_picture.motion_val[1][s->block_index[i] + v->blocks_off][0] = mx;
-            s->current_picture.motion_val[1][s->block_index[i] + v->blocks_off][1] = my;
+            s->cur_pic.motion_val[1][s->block_index[i] + v->blocks_off][0] = mx;
+            s->cur_pic.motion_val[1][s->block_index[i] + v->blocks_off][1] = my;
         }
     }
 
@@ -219,30 +219,30 @@ void ff_vc1_mc_1mv(VC1Context *v, int dir)
     }
     if (!dir) {
         if (v->field_mode && (v->cur_field_type != v->ref_field_type[dir]) && v->second_field) {
-            srcY = s->current_picture.f->data[0];
-            srcU = s->current_picture.f->data[1];
-            srcV = s->current_picture.f->data[2];
+            srcY = s->cur_pic.data[0];
+            srcU = s->cur_pic.data[1];
+            srcV = s->cur_pic.data[2];
             luty  = v->curr_luty;
             lutuv = v->curr_lutuv;
             use_ic = *v->curr_use_ic;
             interlace = 1;
         } else {
-            srcY = s->last_picture.f->data[0];
-            srcU = s->last_picture.f->data[1];
-            srcV = s->last_picture.f->data[2];
+            srcY = s->last_pic.data[0];
+            srcU = s->last_pic.data[1];
+            srcV = s->last_pic.data[2];
             luty  = v->last_luty;
             lutuv = v->last_lutuv;
             use_ic = v->last_use_ic;
-            interlace = !!(s->last_picture.f->flags & AV_FRAME_FLAG_INTERLACED);
+            interlace = v->last_interlaced;
         }
     } else {
-        srcY = s->next_picture.f->data[0];
-        srcU = s->next_picture.f->data[1];
-        srcV = s->next_picture.f->data[2];
+        srcY = s->next_pic.data[0];
+        srcU = s->next_pic.data[1];
+        srcV = s->next_pic.data[2];
         luty  = v->next_luty;
         lutuv = v->next_lutuv;
         use_ic = v->next_use_ic;
-        interlace = !!(s->next_picture.f->flags & AV_FRAME_FLAG_INTERLACED);
+        interlace = v->next_interlaced;
     }
 
     if (!srcY || !srcU) {
@@ -457,38 +457,38 @@ void ff_vc1_mc_4mv_luma(VC1Context *v, int n, int dir, int avg)
     int off;
     int fieldmv = (v->fcm == ILACE_FRAME) ? v->blk_mv_type[s->block_index[n]] : 0;
     int v_edge_pos = s->v_edge_pos >> v->field_mode;
-    uint8_t (*luty)[256];
+    const uint8_t (*luty)[256];
     int use_ic;
     int interlace;
     int linesize;
 
     if ((!v->field_mode ||
          (v->ref_field_type[dir] == 1 && v->cur_field_type == 1)) &&
-        !v->s.last_picture.f->data[0])
+        !v->s.last_pic.data[0])
         return;
 
-    linesize = s->current_picture_ptr->f->linesize[0];
+    linesize = s->cur_pic.ptr->f->linesize[0];
 
     mx = s->mv[dir][n][0];
     my = s->mv[dir][n][1];
 
     if (!dir) {
         if (v->field_mode && (v->cur_field_type != v->ref_field_type[dir]) && v->second_field) {
-            srcY = s->current_picture.f->data[0];
+            srcY = s->cur_pic.data[0];
             luty = v->curr_luty;
             use_ic = *v->curr_use_ic;
             interlace = 1;
         } else {
-            srcY = s->last_picture.f->data[0];
+            srcY = s->last_pic.data[0];
             luty = v->last_luty;
             use_ic = v->last_use_ic;
-            interlace = !!(s->last_picture.f->flags & AV_FRAME_FLAG_INTERLACED);
+            interlace = v->last_interlaced;
         }
     } else {
-        srcY = s->next_picture.f->data[0];
+        srcY = s->next_pic.data[0];
         luty = v->next_luty;
         use_ic = v->next_use_ic;
-        interlace = !!(s->next_picture.f->flags & AV_FRAME_FLAG_INTERLACED);
+        interlace = v->next_interlaced;
     }
 
     if (!srcY) {
@@ -503,8 +503,8 @@ void ff_vc1_mc_4mv_luma(VC1Context *v, int n, int dir, int avg)
 
     if (s->pict_type == AV_PICTURE_TYPE_P && n == 3 && v->field_mode) {
         int opp_count = get_luma_mv(v, 0,
-                                    &s->current_picture.motion_val[1][s->block_index[0] + v->blocks_off][0],
-                                    &s->current_picture.motion_val[1][s->block_index[0] + v->blocks_off][1]);
+                                    &s->cur_pic.motion_val[1][s->block_index[0] + v->blocks_off][0],
+                                    &s->cur_pic.motion_val[1][s->block_index[0] + v->blocks_off][1]);
         int k, f = opp_count > 2;
         for (k = 0; k < 4; k++)
             v->mv_f[1][s->block_index[k] + v->blocks_off] = f;
@@ -515,8 +515,8 @@ void ff_vc1_mc_4mv_luma(VC1Context *v, int n, int dir, int avg)
         int width  = s->avctx->coded_width;
         int height = s->avctx->coded_height >> 1;
         if (s->pict_type == AV_PICTURE_TYPE_P) {
-            s->current_picture.motion_val[1][s->block_index[n] + v->blocks_off][0] = mx;
-            s->current_picture.motion_val[1][s->block_index[n] + v->blocks_off][1] = my;
+            s->cur_pic.motion_val[1][s->block_index[n] + v->blocks_off][0] = mx;
+            s->cur_pic.motion_val[1][s->block_index[n] + v->blocks_off][1] = my;
         }
         qx = (s->mb_x * 16) + (mx >> 2);
         qy = (s->mb_y *  8) + (my >> 3);
@@ -640,12 +640,12 @@ void ff_vc1_mc_4mv_chroma(VC1Context *v, int dir)
     int16_t tx, ty;
     int chroma_ref_type;
     int v_edge_pos = s->v_edge_pos >> v->field_mode;
-    uint8_t (*lutuv)[256];
+    const uint8_t (*lutuv)[256];
     int use_ic;
     int interlace;
     int uvlinesize;
 
-    if (!v->field_mode && !v->s.last_picture.f->data[0])
+    if (!v->field_mode && !v->s.last_pic.data[0])
         return;
     if (CONFIG_GRAY && s->avctx->flags & AV_CODEC_FLAG_GRAY)
         return;
@@ -654,8 +654,8 @@ void ff_vc1_mc_4mv_chroma(VC1Context *v, int dir)
     if (!v->field_mode || !v->numref) {
         int valid_count = get_chroma_mv(v, dir, &tx, &ty);
         if (!valid_count) {
-            s->current_picture.motion_val[1][s->block_index[0] + v->blocks_off][0] = 0;
-            s->current_picture.motion_val[1][s->block_index[0] + v->blocks_off][1] = 0;
+            s->cur_pic.motion_val[1][s->block_index[0] + v->blocks_off][0] = 0;
+            s->cur_pic.motion_val[1][s->block_index[0] + v->blocks_off][1] = 0;
             v->luma_mv[s->mb_x][0] = v->luma_mv[s->mb_x][1] = 0;
             return; //no need to do MC for intra blocks
         }
@@ -664,12 +664,12 @@ void ff_vc1_mc_4mv_chroma(VC1Context *v, int dir)
         int opp_count = get_luma_mv(v, dir, &tx, &ty);
         chroma_ref_type = v->cur_field_type ^ (opp_count > 2);
     }
-    if (v->field_mode && chroma_ref_type == 1 && v->cur_field_type == 1 && !v->s.last_picture.f->data[0])
+    if (v->field_mode && chroma_ref_type == 1 && v->cur_field_type == 1 && !v->s.last_pic.data[0])
         return;
-    s->current_picture.motion_val[1][s->block_index[0] + v->blocks_off][0] = tx;
-    s->current_picture.motion_val[1][s->block_index[0] + v->blocks_off][1] = ty;
+    s->cur_pic.motion_val[1][s->block_index[0] + v->blocks_off][0] = tx;
+    s->cur_pic.motion_val[1][s->block_index[0] + v->blocks_off][1] = ty;
 
-    uvlinesize = s->current_picture_ptr->f->linesize[1];
+    uvlinesize = s->cur_pic.ptr->f->linesize[1];
 
     uvmx = (tx + ((tx & 3) == 3)) >> 1;
     uvmy = (ty + ((ty & 3) == 3)) >> 1;
@@ -698,24 +698,24 @@ void ff_vc1_mc_4mv_chroma(VC1Context *v, int dir)
 
     if (!dir) {
         if (v->field_mode && (v->cur_field_type != chroma_ref_type) && v->second_field) {
-            srcU = s->current_picture.f->data[1];
-            srcV = s->current_picture.f->data[2];
+            srcU = s->cur_pic.data[1];
+            srcV = s->cur_pic.data[2];
             lutuv = v->curr_lutuv;
             use_ic = *v->curr_use_ic;
             interlace = 1;
         } else {
-            srcU = s->last_picture.f->data[1];
-            srcV = s->last_picture.f->data[2];
+            srcU = s->last_pic.data[1];
+            srcV = s->last_pic.data[2];
             lutuv = v->last_lutuv;
             use_ic = v->last_use_ic;
-            interlace = !!(s->last_picture.f->flags & AV_FRAME_FLAG_INTERLACED);
+            interlace = v->last_interlaced;
         }
     } else {
-        srcU = s->next_picture.f->data[1];
-        srcV = s->next_picture.f->data[2];
+        srcU = s->next_pic.data[1];
+        srcV = s->next_pic.data[2];
         lutuv = v->next_lutuv;
         use_ic = v->next_use_ic;
-        interlace = !!(s->next_picture.f->flags & AV_FRAME_FLAG_INTERLACED);
+        interlace = v->next_interlaced;
     }
 
     if (!srcU) {
@@ -851,12 +851,12 @@ void ff_vc1_mc_4mv_chroma4(VC1Context *v, int dir, int dir2, int avg)
     int use_ic;
     int interlace;
     int uvlinesize;
-    uint8_t (*lutuv)[256];
+    const uint8_t (*lutuv)[256];
 
     if (CONFIG_GRAY && s->avctx->flags & AV_CODEC_FLAG_GRAY)
         return;
 
-    uvlinesize = s->current_picture_ptr->f->linesize[1];
+    uvlinesize = s->cur_pic.ptr->f->linesize[1];
 
     for (i = 0; i < 4; i++) {
         int d = i < 2 ? dir: dir2;
@@ -880,17 +880,17 @@ void ff_vc1_mc_4mv_chroma4(VC1Context *v, int dir, int dir2, int avg)
         else
             uvsrc_y = av_clip(uvsrc_y, -8, s->avctx->coded_height >> 1);
         if (i < 2 ? dir : dir2) {
-            srcU = s->next_picture.f->data[1];
-            srcV = s->next_picture.f->data[2];
+            srcU = s->next_pic.data[1];
+            srcV = s->next_pic.data[2];
             lutuv  = v->next_lutuv;
             use_ic = v->next_use_ic;
-            interlace = !!(s->next_picture.f->flags & AV_FRAME_FLAG_INTERLACED);
+            interlace = v->next_interlaced;
         } else {
-            srcU = s->last_picture.f->data[1];
-            srcV = s->last_picture.f->data[2];
+            srcU = s->last_pic.data[1];
+            srcV = s->last_pic.data[2];
             lutuv  = v->last_lutuv;
             use_ic = v->last_use_ic;
-            interlace = !!(s->last_picture.f->flags & AV_FRAME_FLAG_INTERLACED);
+            interlace = v->last_interlaced;
         }
         if (!srcU)
             return;
@@ -1009,14 +1009,14 @@ void ff_vc1_interp_mc(VC1Context *v)
     int dxy, mx, my, uvmx, uvmy, src_x, src_y, uvsrc_x, uvsrc_y;
     int v_edge_pos = s->v_edge_pos >> v->field_mode;
     int use_ic = v->next_use_ic;
-    int interlace;
+    int interlace = v->next_interlaced;
     int linesize, uvlinesize;
 
-    if (!v->field_mode && !v->s.next_picture.f->data[0])
+    if (!v->field_mode && !v->s.next_pic.data[0])
         return;
 
-    linesize = s->current_picture_ptr->f->linesize[0];
-    uvlinesize = s->current_picture_ptr->f->linesize[1];
+    linesize   = s->cur_pic.ptr->f->linesize[0];
+    uvlinesize = s->cur_pic.ptr->f->linesize[1];
 
     mx   = s->mv[1][0][0];
     my   = s->mv[1][0][1];
@@ -1030,11 +1030,9 @@ void ff_vc1_interp_mc(VC1Context *v)
         uvmx = uvmx + ((uvmx < 0) ? -(uvmx & 1) : (uvmx & 1));
         uvmy = uvmy + ((uvmy < 0) ? -(uvmy & 1) : (uvmy & 1));
     }
-    srcY = s->next_picture.f->data[0];
-    srcU = s->next_picture.f->data[1];
-    srcV = s->next_picture.f->data[2];
-
-    interlace = !!(s->next_picture.f->flags & AV_FRAME_FLAG_INTERLACED);
+    srcY = s->next_pic.data[0];
+    srcU = s->next_pic.data[1];
+    srcV = s->next_pic.data[2];
 
     src_x   = s->mb_x * 16 + (mx   >> 2);
     src_y   = s->mb_y * 16 + (my   >> 2);
@@ -1191,8 +1189,8 @@ void ff_vc1_interp_mc(VC1Context *v)
         }
 
         if (use_ic) {
-            uint8_t (*luty )[256] = v->next_luty;
-            uint8_t (*lutuv)[256] = v->next_lutuv;
+            const uint8_t (*luty )[256] = v->next_luty;
+            const uint8_t (*lutuv)[256] = v->next_lutuv;
             vc1_lut_scale_luma(srcY,
                                luty[v->field_mode ? v->ref_field_type[1] : ((0+src_y - s->mspel) & 1)],
                                luty[v->field_mode ? v->ref_field_type[1] : ((1+src_y - s->mspel) & 1)],

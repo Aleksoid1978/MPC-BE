@@ -170,7 +170,7 @@ static int rv20_decode_picture_header(RVDecContext *rv, int whole_size)
         av_log(s->avctx, AV_LOG_ERROR, "low delay B\n");
         return -1;
     }
-    if (!s->last_picture_ptr && s->pict_type == AV_PICTURE_TYPE_B) {
+    if (!s->last_pic.ptr && s->pict_type == AV_PICTURE_TYPE_B) {
         av_log(s->avctx, AV_LOG_ERROR, "early B-frame\n");
         return AVERROR_INVALIDDATA;
     }
@@ -364,7 +364,9 @@ static av_cold int rv10_decode_init(AVCodecContext *avctx)
                                    avctx->coded_height, 0, avctx)) < 0)
         return ret;
 
-    ff_mpv_decode_init(s, avctx);
+    ret = ff_mpv_decode_init(s, avctx);
+    if (ret < 0)
+        return ret;
 
     s->out_format  = FMT_H263;
 
@@ -416,14 +418,6 @@ static av_cold int rv10_decode_init(AVCodecContext *avctx)
     return 0;
 }
 
-static av_cold int rv10_decode_end(AVCodecContext *avctx)
-{
-    MpegEncContext *s = avctx->priv_data;
-
-    ff_mpv_common_end(s);
-    return 0;
-}
-
 static int rv10_decode_packet(AVCodecContext *avctx, const uint8_t *buf,
                               int buf_size, int buf_size2, int whole_size)
 {
@@ -458,9 +452,9 @@ static int rv10_decode_packet(AVCodecContext *avctx, const uint8_t *buf,
     if (whole_size < s->mb_width * s->mb_height / 8)
         return AVERROR_INVALIDDATA;
 
-    if ((s->mb_x == 0 && s->mb_y == 0) || !s->current_picture_ptr) {
+    if ((s->mb_x == 0 && s->mb_y == 0) || !s->cur_pic.ptr) {
         // FIXME write parser so we always have complete frames?
-        if (s->current_picture_ptr) {
+        if (s->cur_pic.ptr) {
             ff_er_frame_end(&s->er, NULL);
             ff_mpv_frame_end(s);
             s->mb_x = s->mb_y = s->resync_mb_x = s->resync_mb_y = 0;
@@ -469,7 +463,7 @@ static int rv10_decode_packet(AVCodecContext *avctx, const uint8_t *buf,
             return ret;
         ff_mpeg_er_frame_start(s);
     } else {
-        if (s->current_picture_ptr->f->pict_type != s->pict_type) {
+        if (s->cur_pic.ptr->f->pict_type != s->pict_type) {
             av_log(s->avctx, AV_LOG_ERROR, "Slice type mismatch\n");
             return AVERROR_INVALIDDATA;
         }
@@ -632,28 +626,28 @@ static int rv10_decode_frame(AVCodecContext *avctx, AVFrame *pict,
             i++;
     }
 
-    if (s->current_picture_ptr && s->mb_y >= s->mb_height) {
+    if (s->cur_pic.ptr && s->mb_y >= s->mb_height) {
         ff_er_frame_end(&s->er, NULL);
         ff_mpv_frame_end(s);
 
         if (s->pict_type == AV_PICTURE_TYPE_B || s->low_delay) {
-            if ((ret = av_frame_ref(pict, s->current_picture_ptr->f)) < 0)
+            if ((ret = av_frame_ref(pict, s->cur_pic.ptr->f)) < 0)
                 return ret;
-            ff_print_debug_info(s, s->current_picture_ptr, pict);
-            ff_mpv_export_qp_table(s, pict, s->current_picture_ptr, FF_MPV_QSCALE_TYPE_MPEG1);
-        } else if (s->last_picture_ptr) {
-            if ((ret = av_frame_ref(pict, s->last_picture_ptr->f)) < 0)
+            ff_print_debug_info(s, s->cur_pic.ptr, pict);
+            ff_mpv_export_qp_table(s, pict, s->cur_pic.ptr, FF_MPV_QSCALE_TYPE_MPEG1);
+        } else if (s->last_pic.ptr) {
+            if ((ret = av_frame_ref(pict, s->last_pic.ptr->f)) < 0)
                 return ret;
-            ff_print_debug_info(s, s->last_picture_ptr, pict);
-            ff_mpv_export_qp_table(s, pict,s->last_picture_ptr, FF_MPV_QSCALE_TYPE_MPEG1);
+            ff_print_debug_info(s, s->last_pic.ptr, pict);
+            ff_mpv_export_qp_table(s, pict,s->last_pic.ptr, FF_MPV_QSCALE_TYPE_MPEG1);
         }
 
-        if (s->last_picture_ptr || s->low_delay) {
+        if (s->last_pic.ptr || s->low_delay) {
             *got_frame = 1;
         }
 
         // so we can detect if frame_end was not called (find some nicer solution...)
-        s->current_picture_ptr = NULL;
+        ff_mpv_unref_picture(&s->cur_pic);
     }
 
     return avpkt->size;
@@ -666,10 +660,11 @@ const FFCodec ff_rv10_decoder = {
     .p.id           = AV_CODEC_ID_RV10,
     .priv_data_size = sizeof(RVDecContext),
     .init           = rv10_decode_init,
-    .close          = rv10_decode_end,
     FF_CODEC_DECODE_CB(rv10_decode_frame),
+    .close          = ff_mpv_decode_close,
     .p.capabilities = AV_CODEC_CAP_DR1,
     .p.max_lowres   = 3,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };
 
 const FFCodec ff_rv20_decoder = {
@@ -679,9 +674,10 @@ const FFCodec ff_rv20_decoder = {
     .p.id           = AV_CODEC_ID_RV20,
     .priv_data_size = sizeof(RVDecContext),
     .init           = rv10_decode_init,
-    .close          = rv10_decode_end,
     FF_CODEC_DECODE_CB(rv10_decode_frame),
+    .close          = ff_mpv_decode_close,
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
     .flush          = ff_mpeg_flush,
     .p.max_lowres   = 3,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

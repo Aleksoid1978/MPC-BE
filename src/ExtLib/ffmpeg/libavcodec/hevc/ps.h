@@ -302,6 +302,8 @@ typedef struct HEVCSPS {
 
     uint8_t *data;
     int data_size;
+
+    const HEVCVPS *vps; ///< RefStruct reference
 } HEVCSPS;
 
 typedef struct HEVCPPS {
@@ -437,6 +439,8 @@ typedef struct HEVCPPS {
 
     uint8_t *data;
     int data_size;
+
+    const HEVCSPS *sps;     ///< RefStruct reference
 } HEVCPPS;
 
 typedef struct HEVCParamSets {
@@ -447,7 +451,6 @@ typedef struct HEVCParamSets {
     /* currently active parameter sets */
     const HEVCVPS *vps;
     const HEVCSPS *sps;
-    const HEVCPPS *pps;
 } HEVCParamSets;
 
 /**

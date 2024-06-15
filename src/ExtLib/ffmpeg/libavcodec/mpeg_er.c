@@ -22,7 +22,7 @@
 #include "mpegvideodec.h"
 #include "mpeg_er.h"
 
-static void set_erpic(ERPicture *dst, Picture *src)
+static void set_erpic(ERPicture *dst, const MPVPicture *src)
 {
     int i;
 
@@ -34,7 +34,7 @@ static void set_erpic(ERPicture *dst, Picture *src)
     }
 
     dst->f = src->f;
-    dst->tf = &src->tf;
+    dst->progress = &src->progress;
 
     for (i = 0; i < 2; i++) {
         dst->motion_val[i] = src->motion_val[i];
@@ -49,9 +49,9 @@ void ff_mpeg_er_frame_start(MpegEncContext *s)
 {
     ERContext *er = &s->er;
 
-    set_erpic(&er->cur_pic,  s->current_picture_ptr);
-    set_erpic(&er->next_pic, s->next_picture_ptr);
-    set_erpic(&er->last_pic, s->last_picture_ptr);
+    set_erpic(&er->cur_pic,  s->cur_pic.ptr);
+    set_erpic(&er->next_pic, s->next_pic.ptr);
+    set_erpic(&er->last_pic, s->last_pic.ptr);
 
     er->pp_time           = s->pp_time;
     er->pb_time           = s->pb_time;
@@ -84,13 +84,13 @@ static void mpeg_er_decode_mb(void *opaque, int ref, int mv_dir, int mv_type,
     if (!s->chroma_y_shift)
         s->bdsp.clear_blocks(s->block[6]);
 
-    s->dest[0] = s->current_picture.f->data[0] +
+    s->dest[0] = s->cur_pic.data[0] +
                  s->mb_y * 16 * s->linesize +
                  s->mb_x * 16;
-    s->dest[1] = s->current_picture.f->data[1] +
+    s->dest[1] = s->cur_pic.data[1] +
                  s->mb_y * (16 >> s->chroma_y_shift) * s->uvlinesize +
                  s->mb_x * (16 >> s->chroma_x_shift);
-    s->dest[2] = s->current_picture.f->data[2] +
+    s->dest[2] = s->cur_pic.data[2] +
                  s->mb_y * (16 >> s->chroma_y_shift) * s->uvlinesize +
                  s->mb_x * (16 >> s->chroma_x_shift);
 

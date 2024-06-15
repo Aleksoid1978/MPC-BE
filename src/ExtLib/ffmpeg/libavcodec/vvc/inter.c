@@ -146,18 +146,21 @@ static void emulated_edge(const VVCLocalContext *lc, uint8_t *dst,
     subpic_get_rect(&subpic, src_frame, subpic_idx, is_chroma);
 
     if (!wrap_enabled || (dmvr_left >= 0 && dmvr_right <= pic_width)) {
-        return emulated_edge_no_wrap(lc, dst, src, src_stride,
+        emulated_edge_no_wrap(lc, dst, src, src_stride,
             x_off, y_off, block_w, block_h, extra_before, extra_after, &subpic, &sb, dmvr_clip);
+        return;
     }
     if (dmvr_right <= 0) {
         sb_wrap(&sb, wrap);
-        return emulated_edge_no_wrap(lc, dst, src, src_stride,
+        emulated_edge_no_wrap(lc, dst, src, src_stride,
             x_off + wrap, y_off, block_w, block_h, extra_before, extra_after, &subpic, &sb, dmvr_clip);
+        return;
     }
     if (dmvr_left >= pic_width) {
         sb_wrap(&sb, -wrap);
-        return emulated_edge_no_wrap(lc, dst, src, src_stride,
+        emulated_edge_no_wrap(lc, dst, src, src_stride,
             x_off - wrap, y_off, block_w, block_h, extra_before, extra_after, &subpic, &sb, dmvr_clip);
+        return;
     }
 
     block_w += extra;
@@ -264,8 +267,8 @@ static void mc(VVCLocalContext *lc, int16_t *dst, const VVCFrame *ref, const Mv 
     const int hs              = fc->ps.sps->hshift[c_idx];
     const int vs              = fc->ps.sps->vshift[c_idx];
     const int idx             = av_log2(block_w) - 1;
-    const intptr_t mx         = av_mod_uintp2(mv->x, 4 + hs) << (is_chroma - hs);
-    const intptr_t my         = av_mod_uintp2(mv->y, 4 + vs) << (is_chroma - vs);
+    const intptr_t mx         = av_zero_extend(mv->x, 4 + hs) << (is_chroma - hs);
+    const intptr_t my         = av_zero_extend(mv->y, 4 + vs) << (is_chroma - vs);
     const int hpel_if_idx     = (is_chroma || pu->merge_gpm_flag) ? 0 : pu->mi.hpel_if_idx;
     const int8_t *hf          = INTER_FILTER(hpel_if_idx, mx);
     const int8_t *vf          = INTER_FILTER(hpel_if_idx, my);
@@ -292,8 +295,8 @@ static void mc_uni(VVCLocalContext *lc, uint8_t *dst, const ptrdiff_t dst_stride
     const int idx             = av_log2(block_w) - 1;
     const Mv *mv              = &mvf->mv[lx];
     const int is_chroma       = !!c_idx;
-    const intptr_t mx         = av_mod_uintp2(mv->x, 4 + hs) << (is_chroma - hs);
-    const intptr_t my         = av_mod_uintp2(mv->y, 4 + vs) << (is_chroma - vs);
+    const intptr_t mx         = av_zero_extend(mv->x, 4 + hs) << (is_chroma - hs);
+    const intptr_t my         = av_zero_extend(mv->y, 4 + vs) << (is_chroma - vs);
     const int hpel_if_idx     = is_chroma ? 0 : pu->mi.hpel_if_idx;
     const int8_t *hf          = INTER_FILTER(hpel_if_idx, mx);
     const int8_t *vf          = INTER_FILTER(hpel_if_idx, my);
@@ -332,8 +335,8 @@ static void mc_bi(VVCLocalContext *lc, uint8_t *dst, const ptrdiff_t dst_stride,
 
     for (int i = L0; i <= L1; i++) {
         const Mv *mv           = mvf->mv + i;
-        const int mx           = av_mod_uintp2(mv->x, 4 + hs) << (is_chroma - hs);
-        const int my           = av_mod_uintp2(mv->y, 4 + vs) << (is_chroma - vs);
+        const int mx           = av_zero_extend(mv->x, 4 + hs) << (is_chroma - hs);
+        const int my           = av_zero_extend(mv->y, 4 + vs) << (is_chroma - vs);
         const int ox           = x_off + (mv->x >> (4 + hs));
         const int oy           = y_off + (mv->y >> (4 + vs));
         const VVCFrame *ref    = refs[i];
@@ -669,8 +672,8 @@ static int ciip_derive_intra_weight(const VVCLocalContext *lc, const int x0, con
 {
     const VVCFrameContext *fc = lc->fc;
     const VVCSPS *sps         = fc->ps.sps;
-    const int x0b             = av_mod_uintp2(x0, sps->ctb_log2_size_y);
-    const int y0b             = av_mod_uintp2(y0, sps->ctb_log2_size_y);
+    const int x0b             = av_zero_extend(x0, sps->ctb_log2_size_y);
+    const int y0b             = av_zero_extend(y0, sps->ctb_log2_size_y);
     const int available_l     = lc->ctb_left_flag || x0b;
     const int available_u     = lc->ctb_up_flag || y0b;
     const int min_pu_width    = fc->ps.pps->min_pu_width;
@@ -968,7 +971,7 @@ static void pred_affine_blk(VVCLocalContext *lc)
                 luma_prof_bi(lc, dst0, dst_stride, refp[L0], refp[L1], mv, x, y, sbw, sbh);
             }
             if (fc->ps.sps->r->sps_chroma_format_idc) {
-                if (!av_mod_uintp2(sby, vs) && !av_mod_uintp2(sbx, hs)) {
+                if (!av_zero_extend(sby, vs) && !av_zero_extend(sbx, hs)) {
                     MvField mvc;
 
                     derive_affine_mvc(&mvc, fc, mv, x, y, sbw, sbh);

@@ -84,10 +84,13 @@ static av_cold int h261_decode_init(AVCodecContext *avctx)
     static AVOnce init_static_once = AV_ONCE_INIT;
     H261DecContext *const h = avctx->priv_data;
     MpegEncContext *const s = &h->s;
+    int ret;
 
     s->private_ctx = &h->common;
     // set defaults
-    ff_mpv_decode_init(s, avctx);
+    ret = ff_mpv_decode_init(s, avctx);
+    if (ret < 0)
+        return ret;
 
     s->out_format  = FMT_H261;
     s->low_delay   = 1;
@@ -228,17 +231,17 @@ static int h261_decode_mb_skipped(H261DecContext *h, int mba1, int mba2)
 
         s->mv_dir                      = MV_DIR_FORWARD;
         s->mv_type                     = MV_TYPE_16X16;
-        s->current_picture.mb_type[xy] = MB_TYPE_SKIP | MB_TYPE_16x16 | MB_TYPE_L0;
+        s->cur_pic.mb_type[xy] = MB_TYPE_SKIP | MB_TYPE_16x16 | MB_TYPE_L0;
         s->mv[0][0][0]                 = 0;
         s->mv[0][0][1]                 = 0;
         s->mb_skipped                  = 1;
         h->common.mtype               &= ~MB_TYPE_H261_FIL;
 
-        if (s->current_picture.motion_val[0]) {
+        if (s->cur_pic.motion_val[0]) {
             int b_stride = 2*s->mb_width + 1;
             int b_xy     = 2 * s->mb_x + (2 * s->mb_y) * b_stride;
-            s->current_picture.motion_val[0][b_xy][0] = s->mv[0][0][0];
-            s->current_picture.motion_val[0][b_xy][1] = s->mv[0][0][1];
+            s->cur_pic.motion_val[0][b_xy][0] = s->mv[0][0][0];
+            s->cur_pic.motion_val[0][b_xy][1] = s->mv[0][0][1];
         }
 
         ff_mpv_reconstruct_mb(s, s->block);
@@ -281,7 +284,7 @@ static int h261_decode_block(H261DecContext *h, int16_t *block, int n, int coded
 {
     MpegEncContext *const s = &h->s;
     int level, i, j, run;
-    RLTable *rl = &ff_h261_rl_tcoeff;
+    const RLTable *rl = &ff_h261_rl_tcoeff;
     const uint8_t *scan_table;
 
     /* For the variable length encoding there are two code tables, one being
@@ -452,22 +455,22 @@ static int h261_decode_mb(H261DecContext *h)
         cbp = get_vlc2(&s->gb, h261_cbp_vlc, H261_CBP_VLC_BITS, 1) + 1;
 
     if (s->mb_intra) {
-        s->current_picture.mb_type[xy] = MB_TYPE_INTRA;
+        s->cur_pic.mb_type[xy] = MB_TYPE_INTRA;
         goto intra;
     }
 
     //set motion vectors
     s->mv_dir                      = MV_DIR_FORWARD;
     s->mv_type                     = MV_TYPE_16X16;
-    s->current_picture.mb_type[xy] = MB_TYPE_16x16 | MB_TYPE_L0;
+    s->cur_pic.mb_type[xy] = MB_TYPE_16x16 | MB_TYPE_L0;
     s->mv[0][0][0]                 = h->current_mv_x * 2; // gets divided by 2 in motion compensation
     s->mv[0][0][1]                 = h->current_mv_y * 2;
 
-    if (s->current_picture.motion_val[0]) {
+    if (s->cur_pic.motion_val[0]) {
         int b_stride = 2*s->mb_width + 1;
         int b_xy     = 2 * s->mb_x + (2 * s->mb_y) * b_stride;
-        s->current_picture.motion_val[0][b_xy][0] = s->mv[0][0][0];
-        s->current_picture.motion_val[0][b_xy][1] = s->mv[0][0][1];
+        s->cur_pic.motion_val[0][b_xy][0] = s->mv[0][0][0];
+        s->cur_pic.motion_val[0][b_xy][1] = s->mv[0][0][1];
     }
 
 intra:
@@ -649,25 +652,15 @@ static int h261_decode_frame(AVCodecContext *avctx, AVFrame *pict,
     }
     ff_mpv_frame_end(s);
 
-    av_assert0(s->current_picture.f->pict_type == s->current_picture_ptr->f->pict_type);
-    av_assert0(s->current_picture.f->pict_type == s->pict_type);
+    av_assert0(s->pict_type == s->cur_pic.ptr->f->pict_type);
 
-    if ((ret = av_frame_ref(pict, s->current_picture_ptr->f)) < 0)
+    if ((ret = av_frame_ref(pict, s->cur_pic.ptr->f)) < 0)
         return ret;
-    ff_print_debug_info(s, s->current_picture_ptr, pict);
+    ff_print_debug_info(s, s->cur_pic.ptr, pict);
 
     *got_frame = 1;
 
     return get_consumed_bytes(s, buf_size);
-}
-
-static av_cold int h261_decode_end(AVCodecContext *avctx)
-{
-    H261DecContext *const h = avctx->priv_data;
-    MpegEncContext *s = &h->s;
-
-    ff_mpv_common_end(s);
-    return 0;
 }
 
 const FFCodec ff_h261_decoder = {
@@ -677,8 +670,8 @@ const FFCodec ff_h261_decoder = {
     .p.id           = AV_CODEC_ID_H261,
     .priv_data_size = sizeof(H261DecContext),
     .init           = h261_decode_init,
-    .close          = h261_decode_end,
     FF_CODEC_DECODE_CB(h261_decode_frame),
+    .close          = ff_mpv_decode_close,
     .p.capabilities = AV_CODEC_CAP_DR1,
     .p.max_lowres   = 3,
 };

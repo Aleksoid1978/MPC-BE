@@ -560,10 +560,9 @@ static int decode_usac_scale_factors(AACDecContext *ac,
  *
  * @return  Returns error status. 0 - OK, !0 - error
  */
-static int decode_spectrum_and_dequant_ac(AACDecContext *s, float coef[1024],
-                                          GetBitContext *gb, const float sf[120],
-                                          AACArithState *state, int reset,
-                                          uint16_t len, uint16_t N)
+static int decode_spectrum_ac(AACDecContext *s, float coef[1024],
+                              GetBitContext *gb, AACArithState *state,
+                              int reset, uint16_t len, uint16_t N)
 {
     AACArith ac;
     int i, a, b;
@@ -690,10 +689,6 @@ static int decode_usac_stereo_cplx(AACDecContext *ac, AACUsacStereo *us,
     delta_code_time = 0;
     if (!indep_flag)
         delta_code_time = get_bits1(gb);
-
-    /* Alpha values must be zeroed out if pred_used is 0. */
-    memset(us->alpha_q_re, 0, sizeof(us->alpha_q_re));
-    memset(us->alpha_q_im, 0, sizeof(us->alpha_q_im));
 
     /* TODO: shouldn't be needed */
     for (int g = 0; g < num_window_groups; g++) {
@@ -828,6 +823,11 @@ static int decode_usac_stereo_info(AACDecContext *ac, AACUSACConfig *usac,
 
     us->common_window = 0;
     us->common_tw = 0;
+
+    /* Alpha values must always be zeroed out for the current frame,
+     * as they are propagated to the next frame and may be used. */
+    memset(us->alpha_q_re, 0, sizeof(us->alpha_q_re));
+    memset(us->alpha_q_im, 0, sizeof(us->alpha_q_im));
 
     if (!(!ue1->core_mode && !ue2->core_mode))
         return 0;
@@ -971,7 +971,7 @@ static void apply_noise_fill(AACDecContext *ac, SingleChannelElement *sce,
             }
 
             if (band_quantized_to_zero)
-                sce->sf[g*ics->max_sfb + sfb] += noise_offset;
+                sce->sfo[g*ics->max_sfb + sfb] += noise_offset;
         }
         coef += g_len << 7;
     }
@@ -986,6 +986,9 @@ static void spectrum_scale(AACDecContext *ac, SingleChannelElement *sce,
     /* Synthesise noise */
     if (ue->noise.level)
         apply_noise_fill(ac, sce, ue);
+
+    /* Noise filling may apply an offset to the scalefactor offset */
+    ac->dsp.dequant_scalefactors(sce);
 
     /* Apply scalefactors */
     coef = sce->coeffs;
@@ -1371,8 +1374,6 @@ static int decode_usac_core_coder(AACDecContext *ac, AACUSACConfig *usac,
         if (ret < 0)
             return ret;
 
-        ac->dsp.dequant_scalefactors(sce);
-
         if (ue->tns_data_present) {
             sce->tns.present = 1;
             ret = ff_aac_decode_tns(ac, &sce->tns, gb, ics);
@@ -1395,10 +1396,8 @@ static int decode_usac_core_coder(AACDecContext *ac, AACUSACConfig *usac,
             else
                 N = usac->core_frame_len;
 
-            ret = decode_spectrum_and_dequant_ac(ac, sce->coeffs + win*128, gb,
-                                                 sce->sf, &ue->ac,
-                                                 arith_reset_flag && (win == 0),
-                                                 lg, N);
+            ret = decode_spectrum_ac(ac, sce->coeffs + win*128, gb, &ue->ac,
+                                     arith_reset_flag && (win == 0), lg, N);
             if (ret < 0)
                 return ret;
         }

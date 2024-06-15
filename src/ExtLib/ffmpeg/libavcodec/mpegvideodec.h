@@ -44,22 +44,30 @@
  * Initialize the given MpegEncContext for decoding.
  * the changed fields will not depend upon
  * the prior state of the MpegEncContext.
+ *
+ * Also initialize the picture pool.
  */
-void ff_mpv_decode_init(MpegEncContext *s, AVCodecContext *avctx);
+int ff_mpv_decode_init(MpegEncContext *s, AVCodecContext *avctx);
 
 int ff_mpv_common_frame_size_change(MpegEncContext *s);
 
 int ff_mpv_frame_start(MpegEncContext *s, AVCodecContext *avctx);
+/**
+ * Ensure that the dummy frames are allocated according to pict_type if necessary.
+ */
+int ff_mpv_alloc_dummy_frames(MpegEncContext *s);
 void ff_mpv_reconstruct_mb(MpegEncContext *s, int16_t block[12][64]);
 void ff_mpv_report_decode_progress(MpegEncContext *s);
 void ff_mpv_frame_end(MpegEncContext *s);
 
-int ff_mpv_export_qp_table(const MpegEncContext *s, AVFrame *f, const Picture *p, int qp_type);
+int ff_mpv_export_qp_table(const MpegEncContext *s, AVFrame *f,
+                           const MPVPicture *p, int qp_type);
 int ff_mpeg_update_thread_context(AVCodecContext *dst, const AVCodecContext *src);
 void ff_mpeg_draw_horiz_band(MpegEncContext *s, int y, int h);
 void ff_mpeg_flush(AVCodecContext *avctx);
+int ff_mpv_decode_close(AVCodecContext *avctx);
 
-void ff_print_debug_info(const MpegEncContext *s, const Picture *p, AVFrame *pict);
+void ff_print_debug_info(const MpegEncContext *s, const MPVPicture *p, AVFrame *pict);
 
 static inline int mpeg_get_qscale(MpegEncContext *s)
 {

@@ -7,7 +7,7 @@
 Обновлен японский перевод (автор tsubasanouta).
 
 Обновлены библиотеки:
-	ffmpeg git-n7.1-dev-1158-g7560db937d.
+	ffmpeg git-n7.1-dev-1370-gbe2cabce32.
 
 
 1.7.2 - 2024-06-07
