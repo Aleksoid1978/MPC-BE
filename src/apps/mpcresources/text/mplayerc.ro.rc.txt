@@ -65,7 +65,7 @@ END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 3		"Organizare favorite"
-8		"Edit"
+8		"Editare"
 9		"Mută în sus"
 10		"Mută în jos"
 11		"Șterge"
@@ -106,7 +106,7 @@ END
 
 BEGIN DIALOGEX IDD_HISTORY LINES 10
 3		"Istoric"
-6		"MENU"
+6		"MENIU"
 8		"Șterge selecția"
 END
 
