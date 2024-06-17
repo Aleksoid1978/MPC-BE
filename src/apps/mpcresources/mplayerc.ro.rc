@@ -600,7 +600,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_TAB1,"SysTabControl32",0x0,5,5,205,160
     CONTROL         "",IDC_LIST2,"SysListView32",LVS_REPORT | LVS_EDITLABELS | LVS_OWNERDRAWFIXED | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,8,21,199,141,WS_EX_CLIENTEDGE
-    PUSHBUTTON      "Edit",IDC_BUTTON1,214,17,58,14
+    PUSHBUTTON      "Editare",IDC_BUTTON1,214,17,58,14
     PUSHBUTTON      "Mută în sus",IDC_BUTTON3,214,43,58,14
     PUSHBUTTON      "Mută în jos",IDC_BUTTON4,214,58,58,14
     PUSHBUTTON      "Șterge",IDC_BUTTON2,214,84,58,14
@@ -1317,7 +1317,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPT
 CAPTION "Istoric"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    PUSHBUTTON      "MENU",IDC_BUTTON1,4,4,31,14
+    PUSHBUTTON      "MENIU",IDC_BUTTON1,4,4,31,14
     EDITTEXT        IDC_EDIT1,39,5,100,14,ES_AUTOHSCROLL
     PUSHBUTTON      "Șterge selecția",IDC_BUTTON2,143,4,76,14
     CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,4,23,268,142,WS_EX_CLIENTEDGE
@@ -1604,7 +1604,7 @@ BEGIN
     BEGIN
         MENUITEM "&Deschide rapid un fișier...",   ID_FILE_OPENFILE
         MENUITEM SEPARATOR
-        MENUITEM "De&schide fișier...",     ID_FILE_OPENFILEURL
+        MENUITEM "De&schide fișierul...",     ID_FILE_OPENFILEURL
         MENUITEM "Deschide DVD/&BD...",   ID_FILE_OPENDVD
         MENUITEM "Deschide dis&pozitivul...",       ID_FILE_OPENDEVICE
         MENUITEM "Deschide directorul...",           ID_FILE_OPENDIRECTORY
@@ -1777,7 +1777,7 @@ BEGIN
         END
         MENUITEM SEPARATOR
         MENUITEM "Ecran comp&let",                ID_VIEW_FULLSCREEN
-        POPUP "&Mărire/Micșorare (Scalare) (Scalare)"
+        POPUP "&Mărire/Micșorare (Scalare)"
         BEGIN
             MENUITEM "&50%",                   ID_VIEW_ZOOM_50
             MENUITEM "&100%",                  ID_VIEW_ZOOM_100
@@ -2585,7 +2585,7 @@ BEGIN
     IDS_TRA_DVD_VIDEO       "Bazat pe libmpeg2"
     IDS_TRA_PS2AUD          "Decodează fluxurile audio din fișiere PSS"
     IDS_TRA_FFMPEG          "Bazat pe FFmpeg, http://ffmpeg.org/"
-    IDS_TRA_INTEL_MSDK      "Based on Intel Media SDK, requires external library(libmfxsw32.dll/libmfxsw64.dll)"
+    IDS_TRA_INTEL_MSDK      "Bazat pe Intel Media SDK, necesită biblioteca externă (libmfxsw32.dll/libmfxsw64.dll)"
 END
 
 STRINGTABLE
@@ -3495,8 +3495,8 @@ BEGIN
     IDS_DISABLE_DXVA_FILTERS "Dezactivează filtrele DXVA"
     IDS_STRETCH_TO_WINDOW   "Întinde cât fereastra"
     IDS_TOUCH_WINDOW_FROM_INSIDE "Atinge fereastra din interior"
-    IDS_ZOOM1               "Scalare 1"
-    IDS_ZOOM2               "Scalare 2"
+    IDS_ZOOM1               "Mărire/Micșorare (Scalare) 1"
+    IDS_ZOOM2               "Mărire/Micșorare (Scalare) 2"
     IDS_TOUCH_WINDOW_FROM_OUTSIDE "Atinge fereastra din exterior"
     IDS_AUDIO_STREAM        "Audio %u/%u: %s"
     IDS_AG_REOPEN           "Redeschide fișierul"
@@ -3592,8 +3592,8 @@ STRINGTABLE
 BEGIN
     IDS_OSD_RS_VSYNC_ON     "VSync: pornit"
     IDS_OSD_RS_VSYNC_OFF    "VSync: oprit"
-    IDS_OSD_RS_INTERNAL_VSYNC_ON "Internal VSync: On"
-    IDS_OSD_RS_INTERNAL_VSYNC_OFF "Internal VSync: Off"
+    IDS_OSD_RS_INTERNAL_VSYNC_ON "VSync intern: pornit"
+    IDS_OSD_RS_INTERNAL_VSYNC_OFF "VSync intern: oprit"
     IDS_OSD_RS_SYNC_TO_DISPLAY_ON "Sincronizare video cu afișarea: pornită"
     IDS_OSD_RS_SYNC_TO_DISPLAY_OFF "Sincronizare video cu afișarea: oprită"
     IDS_OSD_RS_SYNC_TO_VIDEO_ON "Sincronizare afișare cu video: pornită"
@@ -3694,7 +3694,7 @@ BEGIN
     IDS_GOTO_ERROR_INVALID_TIME  "Timpul introdus este mai mare decât durata fişierului."
     IDS_SCREENSHOT_ERROR_MADVR  "Funcțiile ""Salvează imagine"" și ""Salvează miniaturi"" nu funcționează cu randorul video madVR.\nSchimbați randorul video în opțiunile de ieșire ale MPC și redeschideți fișierul."
     IDS_SUBDL_DLG_FILENAME_COL "Fişier"
-    IDS_SUBDL_DLG_LANGUAGE_COL "Limbă"
+    IDS_SUBDL_DLG_LANGUAGE_COL "Limbă (Language)"
     IDS_SUBDL_DLG_FORMAT_COL "Format"
 END
 
@@ -3824,7 +3824,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PUBLISHED           "Publicat : "
+    IDS_PUBLISHED           "Publicat: "
 END
 
 STRINGTABLE
