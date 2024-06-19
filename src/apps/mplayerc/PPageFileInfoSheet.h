@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <HighDPI.h>
 #include "PPageFileInfoClip.h"
 #include "PPageFileInfoDetails.h"
 #include "PPageFileInfoRes.h"
@@ -61,13 +62,11 @@ protected:
 
 // CPPageFileInfoSheet
 
-class CPPageFileInfoSheet : public CMPCPropertySheet
+class CPPageFileInfoSheet : public CMPCPropertySheet, public CDPI
 {
 	DECLARE_DYNAMIC(CPPageFileInfoSheet)
 
 private:
-	CMainFrame* m_pMainFrame;
-
 	CPPageFileInfoDetails m_details;
 	CPPageFileInfoClip    m_clip;
 	CPPageFileInfoRes     m_res;
@@ -96,6 +95,7 @@ protected:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI);
 	afx_msg void OnDestroy();
+	LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
 
 	DECLARE_MESSAGE_MAP()
 };

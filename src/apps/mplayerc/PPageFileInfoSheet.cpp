@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,8 +38,7 @@ CPPageFileInfoSheet::CPPageFileInfoSheet(const std::list<CString>& files, CMainF
 	, m_clip(files.front(), pMainFrame->m_pGB)
 	, m_details(files.front(), pMainFrame->m_pGB, pMainFrame->m_pCAP, pMainFrame->m_pDVDI)
 	, m_res(files.front(), pMainFrame->m_pGB)
-	, m_mi(files, pMainFrame)
-	, m_pMainFrame(pMainFrame)
+	, m_mi(files, (CDPI*)this)
 	, m_bNeedInit(TRUE)
 	, m_nMinCX(0)
 	, m_nMinCY(0)
@@ -75,6 +74,7 @@ BEGIN_MESSAGE_MAP(CPPageFileInfoSheet, CMPCPropertySheet)
 	ON_WM_DESTROY()
 	ON_WM_GETMINMAXINFO()
 	ON_WM_SIZE()
+	ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
 	ON_BN_CLICKED(IDC_BUTTON_MI_SAVEAS, OnSaveAs)
 	ON_BN_CLICKED(IDC_BUTTON_MI_CLIPBOARD, OnCopyToClipboard)
 END_MESSAGE_MAP()
@@ -97,12 +97,12 @@ BOOL CPPageFileInfoSheet::OnInitDialog()
 	GetDlgItem(IDOK)->MoveWindow(r);
 
 	r.MoveToX(5);
-	r.right = r.left + m_pMainFrame->ScaleX(120);
+	r.right = r.left + ScaleX(120);
 	m_Button_MI_SaveAs.Create(ResStr(IDS_AG_SAVE_AS), WS_CHILD | BS_PUSHBUTTON | WS_VISIBLE, r, this, IDC_BUTTON_MI_SAVEAS);
 	m_Button_MI_SaveAs.SetFont(GetFont());
 	m_Button_MI_SaveAs.ShowWindow(SW_HIDE);
 
-	r.MoveToX(r.Width() + m_pMainFrame->ScaleX(10));
+	r.MoveToX(r.Width() + ScaleX(10));
 	m_Button_MI_Clipboard.Create(ResStr(IDS_COPY_TO_CLIPBOARD), WS_CHILD | BS_PUSHBUTTON | WS_VISIBLE, r, this, IDC_BUTTON_MI_CLIPBOARD);
 	m_Button_MI_Clipboard.SetFont(GetFont());
 	m_Button_MI_Clipboard.ShowWindow(SW_HIDE);
@@ -271,4 +271,13 @@ void CPPageFileInfoSheet::OnDestroy()
 	AfxGetAppSettings().nLastFileInfoPage = GetResourceId(GetActiveIndex());
 
 	CPropertySheet::OnDestroy();
+}
+
+LRESULT CPPageFileInfoSheet::OnDpiChanged(WPARAM wParam, LPARAM lParam)
+{
+	const int dpix = LOWORD(wParam);
+	const int dpiy = HIWORD(wParam);
+	OverrideDPI(dpix, dpiy);
+
+	return 0;
 }

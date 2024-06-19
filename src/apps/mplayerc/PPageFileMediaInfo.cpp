@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2023 see Authors.txt
+ * (C) 2012-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -70,11 +70,12 @@ static String mi_get_lang_file()
 // CPPageFileMediaInfo dialog
 
 IMPLEMENT_DYNAMIC(CPPageFileMediaInfo, CPropertyPage)
-CPPageFileMediaInfo::CPPageFileMediaInfo(const std::list<CString>& files, CMainFrame* pMainFrame)
+CPPageFileMediaInfo::CPPageFileMediaInfo(const std::list<CString>& files, CDPI* pSheetDpi)
 	: CPropertyPage(CPPageFileMediaInfo::IDD, CPPageFileMediaInfo::IDD)
 	, m_files(files)
-	, m_pMainFrame(pMainFrame)
+	, m_pSheetDpi(pSheetDpi)
 {
+	ASSERT(pSheetDpi);
 }
 
 void CPPageFileMediaInfo::DoDataExchange(CDataExchange* pDX)
@@ -112,7 +113,7 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 
 	LOGFONTW lf = {};
 	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
-	lf.lfHeight = -m_pMainFrame->ScaleY(12);
+	lf.lfHeight = -m_pSheetDpi->ScaleY(12);
 
 	UINT i = 0;
 	BOOL success;
