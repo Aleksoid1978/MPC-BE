@@ -419,7 +419,7 @@ void COSD::DrawMessage()
 	}
 
 	if (m_nMessagePos != OSD_NOMESSAGE) {
-		CRect rectText(0, 0, 0, 0);
+		CRect rectText;
 		CRect rectMessages;
 
 		m_MemDC.SelectObject(m_MainFont);
@@ -484,7 +484,7 @@ void COSD::DrawDebug()
 
 		m_MemDC.SelectObject(m_MainFont);
 
-		CRect rectText(0, 0, 0, 0);
+		CRect rectText;
 		CRect rectMessages;
 		m_MemDC.DrawText(msg, &rectText, DT_CALCRECT | DT_NOPREFIX);
 		rectText.InflateRect(20, 10);

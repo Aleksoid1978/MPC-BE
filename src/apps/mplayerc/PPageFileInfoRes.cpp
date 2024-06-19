@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -177,7 +177,7 @@ void CPPageFileInfoRes::OnSize(UINT nType, int cx, int cy)
 	int dy = cy - m_rCrt.Height();
 	GetClientRect(&m_rCrt);
 
-	CRect r(0, 0, 0, 0);
+	CRect r;
 	if (::IsWindow(m_list.GetSafeHwnd())) {
 		m_list.GetWindowRect(&r);
 		r.right += dx;

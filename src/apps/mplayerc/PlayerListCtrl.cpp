@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -563,7 +563,9 @@ CImageList* CPlayerListCtrl::CreateDragImageEx(LPPOINT lpPoint)
 		return nullptr;
 	}
 
-	CRect cSingleRect, cCompleteRect(0, 0, 0, 0);
+	CRect cSingleRect;
+	CRect cCompleteRect;
+
 	GetClientRect(cSingleRect);
 	int nWidth = cSingleRect.Width();
 
