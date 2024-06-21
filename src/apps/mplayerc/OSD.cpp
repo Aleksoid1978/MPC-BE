@@ -90,7 +90,7 @@ HRESULT COSD::Create(CWnd* pWnd)
 		dwStyleEx	|= WS_EX_TOPMOST;
 	}
 
-	if (!CreateEx(dwStyleEx, AfxRegisterWndClass(0), nullptr, dwStyle, CRect(0, 0, 0, 0), pWnd, 0, nullptr)) {
+	if (!CreateEx(dwStyleEx, AfxRegisterWndClass(0), nullptr, dwStyle, RECT{0,0,0,0}, pWnd, 0, nullptr)) {
 		DLog(L"Failed to create OSD Window");
 		return E_FAIL;
 	}

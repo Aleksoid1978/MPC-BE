@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -52,7 +52,7 @@ BOOL CComPropertyPage::OnInitDialog()
 	CRect r;
 	PROPPAGEINFO ppi;
 	m_pPage->GetPageInfo(&ppi);
-	r = CRect(CPoint(0,0), ppi.size);
+	r = CRect(POINT{0,0}, ppi.size);
 	m_pPage->Activate(m_hWnd, r, FALSE);
 	m_pPage->Show(SW_SHOW);
 

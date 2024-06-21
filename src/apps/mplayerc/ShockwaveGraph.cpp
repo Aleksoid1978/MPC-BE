@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,13 +38,13 @@ CShockwaveGraph::CShockwaveGraph(HWND hParent, HRESULT& hr)
 	hr = S_OK;
 
 	if (!m_wndWindowFrame.Create(nullptr, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-								 CRect(0, 0, 0, 0), CWnd::FromHandle(hParent), 0, nullptr)) {
+								 RECT{0,0,0,0}, CWnd::FromHandle(hParent), 0, nullptr)) {
 		hr = E_FAIL;
 		return;
 	}
 
 	if (!m_wndDestFrame.Create(nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
-							   CRect(0, 0, 0, 0), &m_wndWindowFrame, 0)) {
+							   RECT{0,0,0,0}, &m_wndWindowFrame, 0)) {
 		hr = E_FAIL;
 		return;
 	}

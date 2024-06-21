@@ -724,7 +724,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// create a Main View Window
 	if (!m_wndView.Create(nullptr, nullptr, AFX_WS_DEFAULT_VIEW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
-						  CRect(0, 0, 0, 0), this, AFX_IDW_PANE_FIRST)) {
+						  RECT{0,0,0,0}, this, AFX_IDW_PANE_FIRST)) {
 		DLog(L"Failed to create Main View Window");
 		return -1;
 	}

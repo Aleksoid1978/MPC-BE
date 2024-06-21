@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -194,10 +194,10 @@ void CComPropertySheet::OnActivated(CPropertyPage* pPage)
 		}
 	}
 
-	bounds |= CRect(0,0,0,0);
+	bounds |= RECT{0,0,0,0};
 	bounds.SetRect(0, 0, bounds.right + std::max(bounds.left, 4L), bounds.bottom + std::max(bounds.top, 4L));
 
-	CRect r = CRect(CPoint(0,0), bounds.Size());
+	CRect r = CRect(POINT{0,0}, bounds.Size());
 	pTC->AdjustRect(TRUE, r);
 	r.SetRect(twr.TopLeft(), twr.TopLeft() + r.Size());
 	ScreenToClient(r);

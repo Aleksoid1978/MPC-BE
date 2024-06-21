@@ -366,7 +366,7 @@ STDMETHODIMP CDX11SubPicAllocator::SetMaxTextureSize(SIZE MaxTextureSize)
 	}
 
 	SetCurSize(MaxTextureSize);
-	SetCurVidRect(CRect(CPoint(0,0), MaxTextureSize));
+	SetCurVidRect(CRect(POINT{0,0}, MaxTextureSize));
 
 	return S_OK;
 }

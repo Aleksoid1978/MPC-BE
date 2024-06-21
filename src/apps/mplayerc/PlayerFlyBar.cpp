@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2021 see Authors.txt
+ * (C) 2012-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,7 +40,7 @@ CFlyBar::~CFlyBar()
 
 HRESULT CFlyBar::Create(CWnd* pWnd)
 {
-	if (!CreateEx(WS_EX_TOPMOST | WS_EX_LAYERED, AfxRegisterWndClass(0), nullptr, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), pWnd, 0, nullptr)) {
+	if (!CreateEx(WS_EX_TOPMOST | WS_EX_LAYERED, AfxRegisterWndClass(0), nullptr, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, RECT{0,0,0,0}, pWnd, 0, nullptr)) {
 		DLog(L"Failed to create Flybar Window");
 		return E_FAIL;
 	}
