@@ -32,8 +32,6 @@ using namespace DSObjects;
 
 CShockwaveGraph::CShockwaveGraph(HWND hParent, HRESULT& hr)
 	: m_fs(State_Stopped)
-	, vsize(0, 0)
-	, m_fInitialVolume(1)
 {
 	hr = S_OK;
 

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,17 +32,17 @@ class CPPageFileInfoDetails : public CPropertyPage
 	DECLARE_DYNAMIC(CPPageFileInfoDetails)
 
 private:
-	HICON	m_hIcon;
+	HICON   m_hIcon = nullptr;
 
-	CStatic	m_icon;
-	CString	m_fn;
-	CString	m_type;
-	CString	m_size;
-	CString	m_time;
-	CString	m_resolution;
-	CString	m_created;
+	CStatic m_icon;
+	CString m_fn;
+	CString m_type;
+	CString m_size;
+	CString m_time;
+	CString m_resolution;
+	CString m_created;
 	CString m_encodingText;
-	CEdit	m_encoding;
+	CEdit   m_encoding;
 
 	void InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI);
 

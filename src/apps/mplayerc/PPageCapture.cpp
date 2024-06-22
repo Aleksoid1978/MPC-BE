@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -281,9 +281,7 @@ IMPLEMENT_DYNAMIC(CPPageCapture, CPPageBase)
 
 CPPageCapture::CPPageCapture()
 	: CPPageBase(CPPageCapture::IDD, CPPageCapture::IDD)
-	, m_iDefaultDevice(0)
 {
-
 }
 
 CPPageCapture::~CPPageCapture()

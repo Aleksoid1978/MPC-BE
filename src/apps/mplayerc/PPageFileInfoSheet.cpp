@@ -39,9 +39,6 @@ CPPageFileInfoSheet::CPPageFileInfoSheet(const std::list<CString>& files, CMainF
 	, m_details(files.front(), pMainFrame->m_pGB, pMainFrame->m_pCAP, pMainFrame->m_pDVDI)
 	, m_res(files.front(), pMainFrame->m_pGB)
 	, m_mi(files, (CDPI*)this)
-	, m_bNeedInit(TRUE)
-	, m_nMinCX(0)
-	, m_nMinCY(0)
 {
 	if (!bOnlyMI) {
 		AddPage(&m_details);

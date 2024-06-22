@@ -799,13 +799,6 @@ IMPLEMENT_DYNAMIC(CPlayerPlaylistBar, CPlayerBar)
 CPlayerPlaylistBar::CPlayerPlaylistBar(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
 	, m_list(0)
-	, m_nTimeColWidth(0)
-	, m_bDragging(FALSE)
-	, m_bHiddenDueToFullscreen(false)
-	, m_bVisible(false)
-	, m_cntOffset(0)
-	, m_iTFontSize(0)
-	, m_nSearchBarHeight(20)
 {
 	CAppSettings& s = AfxGetAppSettings();
 	m_bUseDarkTheme = s.bUseDarkTheme;

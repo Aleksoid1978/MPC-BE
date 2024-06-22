@@ -30,10 +30,10 @@ class CPPageColor : public CPPageBase
 
 private:
 	// Color control
-	int m_iBrightness;
-	int m_iContrast;
-	int m_iHue;
-	int m_iSaturation;
+	int m_iBrightness = 0;
+	int m_iContrast   = 0;
+	int m_iHue        = 0;
+	int m_iSaturation = 0;
 	CString m_sBrightness;
 	CString m_sContrast;
 	CString m_sHue;

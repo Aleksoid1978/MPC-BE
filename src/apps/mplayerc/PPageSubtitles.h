@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,10 +35,10 @@ public:
 
 	enum { IDD = IDD_PPAGESUBTITLES };
 	CComboBox m_cbSubtitleRenderer;
-	BOOL m_fPrioritizeExternalSubtitles;
-	BOOL m_fDisableInternalSubtitles;
-	BOOL m_fAutoReloadExtSubtitles;
-	BOOL m_fUseSybresync;
+	BOOL m_fPrioritizeExternalSubtitles = FALSE;
+	BOOL m_fDisableInternalSubtitles    = FALSE;
+	BOOL m_fAutoReloadExtSubtitles      = FALSE;
+	BOOL m_fUseSybresync                = FALSE;
 	CString m_szAutoloadPaths;
 
 protected:

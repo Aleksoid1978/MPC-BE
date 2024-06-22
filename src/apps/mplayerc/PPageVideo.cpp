@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -54,12 +54,6 @@ static HRESULT IsRendererAvailable(int VideoRendererType)
 IMPLEMENT_DYNAMIC(CPPageVideo, CPPageBase)
 CPPageVideo::CPPageVideo()
 	: CPPageBase(CPPageVideo::IDD, CPPageVideo::IDD)
-	, m_iVideoRendererType(VIDRNDT_EVR)
-	, m_iVideoRendererType_store(VIDRNDT_EVR)
-	, m_bResetDevice(FALSE)
-	, m_iEvrBuffers(RS_EVRBUFFERS_DEF)
-	, m_bD3D9RenderDevice(FALSE)
-	, m_iD3D9RenderDevice(-1)
 {
 }
 

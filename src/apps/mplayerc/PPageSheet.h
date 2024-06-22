@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -70,7 +70,7 @@ class CPPageSheet : public TreePropSheet::CTreePropSheet
 	DECLARE_DYNAMIC(CPPageSheet)
 
 private:
-	bool m_bLockPage;
+	bool m_bLockPage = false;
 
 	CPPagePlayer          m_player;
 	CPPageFormats         m_formats;

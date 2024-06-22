@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -62,7 +62,7 @@ public:
 	CProgressCtrl m_Strength;
 	CProgressCtrl m_Quality;
 	CListCtrl m_ChannelList;
-	bool m_bInProgress;
+	bool m_bInProgress = false;
 
 	afx_msg LRESULT OnScanProgress(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnScanEnd(WPARAM wParam, LPARAM lParam);

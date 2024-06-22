@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,7 +40,7 @@ private:
 	CComboBox m_cbDigitalNetworkProvider;
 	CComboBox m_cbDigitalTuner;
 	CComboBox m_cbDigitalReceiver;
-	int m_iDefaultDevice;
+	int m_iDefaultDevice = 0;
 
 public:
 	CPPageCapture();

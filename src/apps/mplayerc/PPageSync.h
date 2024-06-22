@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -42,7 +42,7 @@ public:
 	CButton m_chkFlushGPUAfterPresent;
 	CButton m_chkFlushGPUWait;
 
-	int m_iSyncMode;
+	int m_iSyncMode = 0;
 	CFloatEdit m_edtCycleDelta;
 
 	CIntEdit m_edtTargetSyncOffset;

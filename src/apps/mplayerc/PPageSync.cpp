@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,7 +29,6 @@ IMPLEMENT_DYNAMIC(CPPageSync, CPPageBase)
 
 CPPageSync::CPPageSync()
 	: CPPageBase(CPPageSync::IDD, CPPageSync::IDD)
-	, m_iSyncMode(0)
 {
 }
 

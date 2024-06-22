@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,8 +29,8 @@ class CPPageLogo : public CPPageBase
 
 private:
 	std::vector<UINT> m_logoids;
-	int m_logoidpos;
-	int m_intext;
+	int m_logoidpos = 0;
+	int m_intext    = 0;
 	CString m_logofn;
 	CStatic m_logopreview;
 	CString m_author;

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,7 +34,7 @@ class CPPageFileInfoRes : public CPPageBase
 	DECLARE_DYNAMIC(CPPageFileInfoRes)
 
 private:
-	HICON     m_hIcon;
+	HICON     m_hIcon = nullptr;
 	std::list<CDSMResource> m_resources;
 
 	CStatic   m_icon;

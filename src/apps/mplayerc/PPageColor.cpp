@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,10 +28,6 @@
 IMPLEMENT_DYNAMIC(CPPageColor, CPPageBase)
 CPPageColor::CPPageColor()
 	: CPPageBase(CPPageColor::IDD, CPPageColor::IDD)
-	, m_iBrightness(0)
-	, m_iContrast(0)
-	, m_iHue(0)
-	, m_iSaturation(0)
 {
 }
 

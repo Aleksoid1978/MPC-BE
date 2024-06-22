@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,17 +35,17 @@ public:
 	CPPageSubRend();
 	virtual ~CPPageSubRend();
 
-	BOOL m_fOverridePlacement;
+	BOOL m_fOverridePlacement = FALSE;
 	CIntEdit m_edtHorPos;
 	CSpinButtonCtrl m_nHorPosCtrl;
 	CIntEdit m_edtVerPos;
 	CSpinButtonCtrl m_nVerPosCtrl;
-	int m_nSPCSize;
+	int m_nSPCSize = RS_SPCSIZE_DEF;
 	CSpinButtonCtrl m_nSPCSizeCtrl;
 	CComboBox m_spmaxres;
-	BOOL m_bSPCAllowAnimationWhenBuffering;
-	BOOL m_bbSPAllowDropSubPic;
-	int m_nSubDelayInterval;
+	BOOL m_bSPCAllowAnimationWhenBuffering = TRUE;
+	BOOL m_bbSPAllowDropSubPic = TRUE;
+	int m_nSubDelayInterval    = 0;
 
 	enum { IDD = IDD_PPAGESUBRENDERING };
 

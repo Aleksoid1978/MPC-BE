@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,7 +34,7 @@ private:
 	CString m_title;
 	STSStyle* m_stss;
 	STSStyle m_stss_init;
-	BOOL m_bUseDefaultStyle;
+	BOOL m_bUseDefaultStyle = TRUE;
 
 	void AskColor(int i);
 
@@ -49,7 +49,7 @@ public:
 
 	enum { IDD = IDD_PPAGESUBSTYLE };
 	CButton m_font;
-	int m_iCharset;
+	int m_iCharset = 0;
 	CComboBox m_charset;
 	CFloatEdit m_spacing;
 	CIntEdit m_angle;
@@ -58,10 +58,10 @@ public:
 	CSpinButtonCtrl m_scalexspin;
 	CIntEdit m_scaley;
 	CSpinButtonCtrl m_scaleyspin;
-	int m_borderstyle;
+	int m_borderstyle = 0;
 	CFloatEdit m_borderwidth;
 	CFloatEdit m_shadowdepth;
-	int m_screenalignment;
+	int m_screenalignment = 0;
 	CIntEdit m_marginleft;
 	CIntEdit m_marginright;
 	CIntEdit m_margintop;
@@ -72,8 +72,8 @@ public:
 	CSpinButtonCtrl m_marginbottomspin;
 	int m_alpha[4];
 	CSliderCtrl m_alphasliders[4];
-	BOOL m_linkalphasliders;
-	BOOL m_relativeTo;
+	BOOL m_linkalphasliders = FALSE;
+	BOOL m_relativeTo = FALSE;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

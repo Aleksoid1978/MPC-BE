@@ -30,11 +30,6 @@
 IMPLEMENT_DYNAMIC(CPPageAudio, CPPageBase)
 CPPageAudio::CPPageAudio()
 	: CPPageBase(CPPageAudio::IDD, CPPageAudio::IDD)
-	, m_iAudioRendererType(0)
-	, m_iSecAudioRendererType(1)
-
-	, m_fAutoloadAudio(FALSE)
-	, m_fPrioritizeExternalAudio(FALSE)
 {
 }
 

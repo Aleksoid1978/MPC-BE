@@ -75,11 +75,11 @@ private:
 	CButton m_Button_MI_SaveAs;
 	CButton m_Button_MI_Clipboard;
 
-	BOOL    m_bNeedInit;
+	BOOL    m_bNeedInit = TRUE;
 	CRect   m_rCrt;
 	CRect   m_rWnd;
-	int     m_nMinCX;
-	int     m_nMinCY;
+	int     m_nMinCX = 0;
+	int     m_nMinCY = 0;
 
 public:
 	CPPageFileInfoSheet(const std::list<CString>& files, CMainFrame* pMainFrame, CWnd* pParentWnd, const bool bOnlyMI = false);

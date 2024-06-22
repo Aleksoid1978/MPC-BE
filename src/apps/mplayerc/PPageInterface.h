@@ -36,21 +36,21 @@ public:
 	virtual ~CPPageInterface();
 
 	enum { IDD = IDD_PPAGEINTERFACE };
-	BOOL m_bUseDarkTheme;
-	int  m_nThemeBrightness;
-	int  m_nThemeRed;
-	int  m_nThemeGreen;
-	int  m_nThemeBlue;
-	BOOL m_fUseTimeTooltip;
-	BOOL m_fSmartSeek;
-	BOOL m_bSmartSeekOnline;
-	BOOL m_fChapterMarker;
-	BOOL m_fFlybar;
-	BOOL m_fFontShadow;
-	BOOL m_fFontAA;
-	int  m_nOSDTransparent;
-	int  m_OSDBorder;
-	BOOL m_fUseWin7TaskBar;
+	BOOL m_bUseDarkTheme    = FALSE;
+	int  m_nThemeBrightness = 0;
+	int  m_nThemeRed        = 255;
+	int  m_nThemeGreen      = 255;
+	int  m_nThemeBlue       = 255;
+	BOOL m_fUseTimeTooltip  = TRUE;
+	BOOL m_fSmartSeek       = FALSE;
+	BOOL m_bSmartSeekOnline = FALSE;
+	BOOL m_fChapterMarker   = FALSE;
+	BOOL m_fFlybar          = TRUE;
+	BOOL m_fFontShadow      = FALSE;
+	BOOL m_fFontAA          = TRUE;
+	int  m_nOSDTransparent  = 0;
+	int  m_OSDBorder        = 1;
+	BOOL m_fUseWin7TaskBar  = TRUE;
 	CString m_OSD_Font;
 
 	CButton m_UseDarkThemeCtrl;
@@ -70,11 +70,11 @@ public:
 	CSpinButtonCtrl m_spOSDFontSize;
 	CSpinButtonCtrl m_OSDBorderCtrl;
 
-	COLORREF m_clrFaceABGR;
-	COLORREF m_clrOutlineABGR;
-	COLORREF m_clrFontABGR;
-	COLORREF m_clrGrad1ABGR;
-	COLORREF m_clrGrad2ABGR;
+	COLORREF m_clrFaceABGR    = 0x00ffffff;
+	COLORREF m_clrOutlineABGR = 0x00868686;
+	COLORREF m_clrFontABGR    = 0x00E0E0E0;
+	COLORREF m_clrGrad1ABGR   = 0x00302820;
+	COLORREF m_clrGrad2ABGR   = 0x00302820;
 
 	int m_nThemeBrightness_Old;
 	int m_nThemeRed_Old;

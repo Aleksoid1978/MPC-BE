@@ -165,8 +165,6 @@ static const std::vector<GUID> s_SubTypes = {
 IMPLEMENT_DYNAMIC(CPPageExternalFilters, CPPageBase)
 CPPageExternalFilters::CPPageExternalFilters()
 	: CPPageBase(CPPageExternalFilters::IDD, CPPageExternalFilters::IDD)
-	, m_iLoadType(FilterOverride::PREFERRED)
-	, m_pLastSelFilter(nullptr)
 {
 }
 

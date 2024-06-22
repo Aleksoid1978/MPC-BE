@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2019 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,19 +31,19 @@ class CPPageFileInfoClip : public CPropertyPage
 	DECLARE_DYNAMIC(CPPageFileInfoClip)
 
 private:
-	HICON	m_hIcon;
+	HICON   m_hIcon = nullptr;
 
-	CStatic	m_icon;
-	CString	m_fn;
-	CString	m_clip;
-	CString	m_author;
-	CString	m_album;
-	CString	m_copyright;
-	CString	m_rating;
-	CString	m_location_str;
-	CString	m_descText;
-	CEdit	m_location;
-	CEdit	m_desc;
+	CStatic m_icon;
+	CString m_fn;
+	CString m_clip;
+	CString m_author;
+	CString m_album;
+	CString m_copyright;
+	CString m_rating;
+	CString m_location_str;
+	CString m_descText;
+	CEdit   m_location;
+	CEdit   m_desc;
 
 public:
 	CPPageFileInfoClip(const CString& fn, IFilterGraph* pFG);

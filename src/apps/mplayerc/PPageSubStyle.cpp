@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,12 +28,6 @@
 IMPLEMENT_DYNAMIC(CPPageSubStyle, CPPageBase)
 CPPageSubStyle::CPPageSubStyle()
 	: CPPageBase(CPPageSubStyle::IDD, CPPageSubStyle::IDD)
-	, m_iCharset(0)
-	, m_borderstyle(0)
-	, m_screenalignment(0)
-	, m_linkalphasliders(FALSE)
-	, m_relativeTo(FALSE)
-	, m_bUseDefaultStyle(TRUE)
 	, m_stss(&AfxGetAppSettings().subdefstyle)
 	, m_stss_init(AfxGetAppSettings().subdefstyle)
 {

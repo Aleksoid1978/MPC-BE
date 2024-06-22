@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,15 +31,6 @@
 IMPLEMENT_DYNAMIC(CPPageWebServer, CPPageBase)
 CPPageWebServer::CPPageWebServer()
 	: CPPageBase(CPPageWebServer::IDD, CPPageWebServer::IDD)
-	, m_fEnableWebServer(FALSE)
-	, m_nWebServerPort(APP_WEBSRVPORT_DEF)
-	, m_nWebServerQuality(APP_WEBSRVQUALITY_DEF)
-	, m_launch(L"http://localhost:13579/")
-	, m_fWebServerPrintDebugInfo(FALSE)
-	, m_fWebServerUseCompression(FALSE)
-	, m_fWebRoot(FALSE)
-	, m_fWebServerLocalhostOnly(FALSE)
-	, m_bWebUIEnablePreview(FALSE)
 {
 }
 

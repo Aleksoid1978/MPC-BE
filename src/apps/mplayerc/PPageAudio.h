@@ -39,9 +39,9 @@ public:
 
 	enum { IDD = IDD_PPAGEAUDIO };
 
-	int			m_iAudioRendererType;
+	int			m_iAudioRendererType = 0;
 	CComboBox	m_iAudioRendererTypeCtrl;
-	int			m_iSecAudioRendererType;
+	int			m_iSecAudioRendererType = 1;
 	CComboBox	m_iSecAudioRendererTypeCtrl;
 	CButton		m_audRendPropButton;
 	CButton		m_DualAudioOutput;
@@ -51,9 +51,9 @@ public:
 	int			m_nBalance = 0;
 	CSliderCtrl	m_balancectrl;
 
-	BOOL		m_fAutoloadAudio;
+	BOOL		m_fAutoloadAudio = FALSE;
 	CString		m_sAudioPaths;
-	BOOL		m_fPrioritizeExternalAudio;
+	BOOL		m_fPrioritizeExternalAudio = FALSE;
 
 	void ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKNOWN lpunk, HRESULT* phr));
 

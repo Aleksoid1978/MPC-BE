@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,7 +37,6 @@ IMPLEMENT_DYNAMIC(CTunerScanDlg, CDialog)
 
 CTunerScanDlg::CTunerScanDlg(CWnd* pParent /*=nullptr*/)
 	: CDialog(CTunerScanDlg::IDD, pParent)
-	, m_bInProgress(false)
 {
 	CAppSettings& s = AfxGetAppSettings();
 

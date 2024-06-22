@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -124,7 +124,7 @@ private:
 	CImageList m_fakeImageList;
 	CPlayerListCtrl m_list;
 
-	int m_nTimeColWidth;
+	int m_nTimeColWidth = 0;
 	void ResizeListColumn();
 
 	void AddItem(std::list<CString>& fns, CSubtitleItemList* subs);
@@ -145,7 +145,7 @@ private:
 	POSITION FindPos(int i);
 
 	CImageList* m_pDragImage;
-	BOOL m_bDragging;
+	BOOL m_bDragging = FALSE;
 	int m_nDragIndex;               // dragged item for which the mouse is dragged
 	std::vector<int> m_DragIndexes; // all selected dragged items
 	int m_nDropIndex;               // the position where dragged items will be moved
@@ -154,9 +154,9 @@ private:
 
 	void DropItemOnList();
 
-	bool m_bHiddenDueToFullscreen;
+	bool m_bHiddenDueToFullscreen = false;
 
-	bool m_bVisible;
+	bool m_bVisible = false;
 
 	CFont m_font;
 	void ScaleFontInternal();
@@ -249,15 +249,15 @@ private:
 	bool bTMenuPopup = false;
 
 	CRect m_rcTPage;
-	size_t m_cntOffset;
+	size_t m_cntOffset = 0;
 
-	int m_nSearchBarHeight;
+	int m_nSearchBarHeight = 20;
 	CColorEdit m_REdit;
 
 	int TGetFirstVisible();
 	int TGetOffset();
 	int TGetPathType(const CString& path) const;
-	int m_iTFontSize;
+	int m_iTFontSize = 0;
 	bool TNavigate();
 	bool TSelectFolder(CString path);
 	int TGetFocusedElement() const;

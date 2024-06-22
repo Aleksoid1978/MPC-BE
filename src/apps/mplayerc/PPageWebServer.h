@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,16 +41,16 @@ public:
 	virtual ~CPPageWebServer();
 
 	enum { IDD = IDD_PPAGEWEBSERVER };
-	BOOL m_fEnableWebServer;
-	int m_nWebServerPort;
-	int m_nWebServerQuality;
+	BOOL m_fEnableWebServer = FALSE;
+	int m_nWebServerPort    = APP_WEBSRVPORT_DEF;
+	int m_nWebServerQuality = APP_WEBSRVQUALITY_DEF;
 	CSpinButtonCtrl m_nWebServerQualityCtrl;
-	CStaticLink m_launch;
-	BOOL m_fWebServerPrintDebugInfo;
-	BOOL m_fWebServerUseCompression;
-	BOOL m_fWebServerLocalhostOnly;
-	BOOL m_bWebUIEnablePreview;
-	BOOL m_fWebRoot;
+	CStaticLink m_launch    = L"http://localhost:13579/";
+	BOOL m_fWebServerPrintDebugInfo = FALSE;
+	BOOL m_fWebServerUseCompression = FALSE;
+	BOOL m_fWebServerLocalhostOnly  = FALSE;
+	BOOL m_bWebUIEnablePreview      = FALSE;
+	BOOL m_fWebRoot                 = FALSE;
 	CString m_WebRoot;
 	CString m_WebServerCGI;
 	CString m_WebDefIndex;

@@ -37,7 +37,7 @@ private:
 	void StepDown(CCheckListBox& list);
 
 	std::list<std::unique_ptr<FilterOverride>> m_ExtFilters;
-	FilterOverride* m_pLastSelFilter;
+	FilterOverride* m_pLastSelFilter = nullptr;
 	FilterOverride* GetCurFilter();
 
 public:
@@ -47,7 +47,7 @@ public:
 	enum { IDD = IDD_PPAGEEXTERNALFILTERS };
 
 	CCheckListBox m_filters;
-	int m_iLoadType;
+	int m_iLoadType = FilterOverride::PREFERRED;
 	CHexEdit m_dwMerit;
 	CTreeCtrl m_tree;
 

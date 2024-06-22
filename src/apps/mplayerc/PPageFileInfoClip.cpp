@@ -36,7 +36,6 @@ CPPageFileInfoClip::CPPageFileInfoClip(const CString& fn, IFilterGraph* pFG)
 	, m_rating(ResStr(IDS_AG_NONE))
 	, m_location_str(ResStr(IDS_AG_NONE))
 	, m_album(ResStr(IDS_AG_NONE))
-	, m_hIcon(nullptr)
 {
 	auto pFrame = AfxGetMainFrame();
 

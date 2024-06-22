@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,9 +36,9 @@ namespace DSObjects
 
 		FILTER_STATE m_fs;
 
-		CSize vsize;
+		CSize vsize = { 0, 0 };
 		CComPtr<ISimpleAudioVolume> m_pSimpleVolume;
-		float m_fInitialVolume;
+		float m_fInitialVolume = 1;
 
 	public:
 		CShockwaveGraph(HWND hParent, HRESULT& hr);

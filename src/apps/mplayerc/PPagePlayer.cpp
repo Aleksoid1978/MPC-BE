@@ -29,19 +29,6 @@
 IMPLEMENT_DYNAMIC(CPPagePlayer, CPPageBase)
 CPPagePlayer::CPPagePlayer()
 	: CPPageBase(CPPagePlayer::IDD, CPPagePlayer::IDD)
-	, m_iMultipleInst(1)
-	, m_bKeepHistory(FALSE)
-	, m_bRememberDVDPos(FALSE)
-	, m_bRememberFilePos(FALSE)
-	, m_bSavePnSZoom(FALSE)
-	, m_bRememberPlaylistItems(FALSE)
-	, m_bRecentFilesShowUrlTitle(FALSE)
-	, m_bTrayIcon(FALSE)
-	, m_bShowOSD(FALSE)
-	, m_bOSDFileName(FALSE)
-	, m_bOSDSeekTime(FALSE)
-	, m_bHideCDROMsSubMenu(FALSE)
-	, m_bPriority(FALSE)
 {
 }
 

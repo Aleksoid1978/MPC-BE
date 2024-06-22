@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -49,15 +49,15 @@ private:
 	CButton   m_chkNoSmallUpscale;
 	CButton   m_chkNoSmallDownscale;
 
-	int m_iEvrBuffers;
+	int m_iEvrBuffers = RS_EVRBUFFERS_DEF;
 	CSpinButtonCtrl m_spnEvrBuffers;
 
-	int m_iVideoRendererType_store;
-	int m_iVideoRendererType;
+	int m_iVideoRendererType_store = VIDRNDT_EVR;
+	int m_iVideoRendererType = VIDRNDT_EVR;
 
-	BOOL m_bD3D9RenderDevice;
-	int  m_iD3D9RenderDevice;
-	BOOL m_bResetDevice;
+	BOOL m_bD3D9RenderDevice = FALSE;
+	int  m_iD3D9RenderDevice = -1;
+	BOOL m_bResetDevice = FALSE;
 
 public:
 	CPPageVideo();

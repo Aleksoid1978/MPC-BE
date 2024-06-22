@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,8 +29,6 @@
 IMPLEMENT_DYNAMIC(CPPageLogo, CPPageBase)
 CPPageLogo::CPPageLogo()
 	: CPPageBase(CPPageLogo::IDD, CPPageLogo::IDD)
-	, m_intext(0)
-	, m_logoidpos(0)
 {
 	m_logoids.emplace_back(IDF_LOGO0);
 	m_logoids.emplace_back(IDF_LOGO1);

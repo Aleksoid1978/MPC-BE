@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,11 +29,6 @@
 IMPLEMENT_DYNAMIC(CPPageSubRend, CPPageBase)
 CPPageSubRend::CPPageSubRend()
 	: CPPageBase(CPPageSubRend::IDD, CPPageSubRend::IDD)
-	, m_fOverridePlacement(FALSE)
-	, m_nSPCSize(RS_SPCSIZE_DEF)
-	, m_bSPCAllowAnimationWhenBuffering(TRUE)
-	, m_bbSPAllowDropSubPic(TRUE)
-	, m_nSubDelayInterval(0)
 {
 }
 
