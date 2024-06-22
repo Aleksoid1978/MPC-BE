@@ -3242,7 +3242,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 					OpenDVDData* pDVDData = dynamic_cast<OpenDVDData*>(m_lastOMD.get());
 					ASSERT(pDVDData);
 
-					CString Domain('-');
+					CString Domain(L'-');
 
 					switch (m_iDVDDomain) {
 						case DVD_DOMAIN_FirstPlay:
@@ -3343,19 +3343,21 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 									// if the playback is reinitialized so we clear the saved state
 									pDVDData->pDvdState.Release();
 								}
-								else if (s.bKeepHistory && s.bRememberDVDPos) {
+								else if (s.bKeepHistory && s.bRememberDVDPos && m_SessionInfo.DVDTitle > 0) {
 									// restore DVD-Video position
-									hr = m_pDVDC->PlayTitle(m_SessionInfo.DVDTitle, DVD_CMD_FLAG_Flush, nullptr);
+									hr = m_pDVDC->PlayTitle(m_SessionInfo.DVDTitle, DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, nullptr);
 									if (SUCCEEDED(hr)) {
-										hr = m_pDVDC->Resume(DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, nullptr);
-										if (SUCCEEDED(hr)) {
-											hr = m_pDVDC->PlayAtTime(&m_SessionInfo.DVDTimecode, DVD_CMD_FLAG_Flush, nullptr);
-										} else {
-											hr = m_pDVDC->PlayChapterInTitle(m_SessionInfo.DVDTitle, 1, DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, nullptr);
+										if (m_SessionInfo.DVDTimecode.bSeconds > 0 || m_SessionInfo.DVDTimecode.bMinutes > 0 || m_SessionInfo.DVDTimecode.bHours > 0 || m_SessionInfo.DVDTimecode.bFrames > 0) {
+											hr = m_pDVDC->Resume(DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, nullptr);
 											if (SUCCEEDED(hr)) {
 												hr = m_pDVDC->PlayAtTime(&m_SessionInfo.DVDTimecode, DVD_CMD_FLAG_Flush, nullptr);
-												if (FAILED(hr)) {
-													hr = m_pDVDC->PlayAtTimeInTitle(m_SessionInfo.DVDTitle, &m_SessionInfo.DVDTimecode, DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, nullptr);
+											} else {
+												hr = m_pDVDC->PlayChapterInTitle(m_SessionInfo.DVDTitle, 1, DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, nullptr);
+												if (SUCCEEDED(hr)) {
+													hr = m_pDVDC->PlayAtTime(&m_SessionInfo.DVDTimecode, DVD_CMD_FLAG_Flush, nullptr);
+													if (FAILED(hr)) {
+														hr = m_pDVDC->PlayAtTimeInTitle(m_SessionInfo.DVDTitle, &m_SessionInfo.DVDTimecode, DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, nullptr);
+													}
 												}
 											}
 										}
@@ -3391,6 +3393,8 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 							if (s.bShowDebugInfo) {
 								m_OSD.DebugMessage(L"%s", Domain);
 							}
+
+							m_iDVDTitleForHistory = m_iDVDTitle;
 
 							if (!m_bValidDVDOpen) {
 								m_bValidDVDOpen = true;
@@ -10266,7 +10270,7 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 	}
 	else if (GetPlaybackMode() == PM_DVD) {
 		// RememberPos
-		if (s.bFavRememberPos) {
+		if (s.bFavRememberPos && m_iDVDTitleForHistory > 0) {
 			CDVDStateStream stream;
 			stream.AddRef();
 			CComPtr<IDvdState> pStateData;
@@ -10276,7 +10280,7 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 				&& SUCCEEDED(OleSaveToStream(pPersistStream, (IStream*)&stream))) {
 				sesInfo.DVDState = stream.m_data;
 			}
-			sesInfo.DVDTitle = m_iDVDTitle;
+			sesInfo.DVDTitle = m_iDVDTitleForHistory;
 			sesInfo.DVDTimecode = m_SessionInfo.DVDTimecode;
 		}
 		AfxGetMyApp()->m_FavoritesFile.AppendFavorite(sesInfo);
@@ -14571,6 +14575,9 @@ void CMainFrame::CloseMediaPrivate()
 	m_CMediaControls.Update();
 
 	m_bIsLiveOnline = false;
+
+	m_iDVDTitle = 0;
+	m_iDVDTitleForHistory = 0;
 
 	DLog(L"CMainFrame::CloseMediaPrivate() : end");
 }
@@ -20873,8 +20880,8 @@ void CMainFrame::SaveHistory()
 		}
 		historyFile.SaveSessionInfo(m_SessionInfo);
 	} else if (GetPlaybackMode() == PM_DVD && m_SessionInfo.DVDId) {
-		if (s.bRememberDVDPos) {
-			m_SessionInfo.DVDTitle = m_iDVDTitle;
+		if (s.bRememberDVDPos && m_iDVDTitleForHistory > 0) {
+			m_SessionInfo.DVDTitle = m_iDVDTitleForHistory;
 
 			CDVDStateStream stream;
 			stream.AddRef();
