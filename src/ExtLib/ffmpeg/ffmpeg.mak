@@ -929,6 +929,7 @@ SRCS_YASM_LR = \
 SRCS_YASM_LS = \
 	libswscale/x86/input.asm \
 	libswscale/x86/output.asm \
+	libswscale/x86/range_convert.asm \
 	libswscale/x86/rgb_2_rgb.asm \
 	libswscale/x86/scale.asm \
 	libswscale/x86/scale_avx2.asm \

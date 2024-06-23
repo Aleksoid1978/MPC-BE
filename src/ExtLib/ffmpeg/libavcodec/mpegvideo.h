@@ -220,7 +220,6 @@ typedef struct MpegEncContext {
     H264ChromaContext h264chroma;
     HpelDSPContext hdsp;
     IDCTDSPContext idsp;
-    MECmpContext mecc;
     MpegvideoEncDSPContext mpvencdsp;
     PixblockDSPContext pdsp;
     QpelDSPContext qdsp;
@@ -385,7 +384,6 @@ typedef struct MpegEncContext {
     uint16_t pp_field_time;
     uint16_t pb_field_time;         ///< like above, just for interlaced
     int mcsel;
-    int quant_precision;
     int quarter_sample;              ///< 1->qpel, 0->half pel ME/MC
     int data_partitioning;           ///< data partitioning flag from header
     int partitioned_frame;           ///< is current frame partitioned
@@ -506,6 +504,12 @@ typedef struct MpegEncContext {
     int mpv_flags;      ///< flags set by private options
     int quantizer_noise_shaping;
 
+    me_cmp_func ildct_cmp[2]; ///< 0 = intra, 1 = non-intra
+    me_cmp_func n_sse_cmp[2]; ///< either SSE or NSSE cmp func
+    me_cmp_func sad_cmp[2];
+    me_cmp_func sse_cmp[2];
+    int (*sum_abs_dctelem)(const int16_t *block);
+
     /**
      * ratecontrol qmin qmax limiting method
      * 0-> clipping, 1-> use a nice continuous function to limit qscale within qmin/qmax.
@@ -542,6 +546,7 @@ typedef struct MpegEncContext {
     int frame_skip_factor;
     int frame_skip_exp;
     int frame_skip_cmp;
+    me_cmp_func frame_skip_cmp_fn;
 
     int scenechange_threshold;
     int noise_reduction;

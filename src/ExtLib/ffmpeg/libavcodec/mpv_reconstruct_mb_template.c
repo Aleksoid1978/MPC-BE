@@ -20,9 +20,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#define NOT_MPEG12        0
-#define MAY_BE_MPEG12     1
-#define DEFINITELY_MPEG12 2
+#define NOT_MPEG12_H261        0
+#define MAY_BE_MPEG12_H261     1
+#define DEFINITELY_MPEG12_H261 2
 
 /* put block[] to dest[] */
 static inline void put_dct(MpegEncContext *s,
@@ -56,14 +56,14 @@ static av_always_inline
 void mpv_reconstruct_mb_internal(MpegEncContext *s, int16_t block[12][64],
                                  int lowres_flag, int is_mpeg12)
 {
-#define IS_MPEG12(s) (is_mpeg12 == MAY_BE_MPEG12 ? ((s)->out_format == FMT_MPEG1) : is_mpeg12)
+#define IS_MPEG12_H261(s) (is_mpeg12 == MAY_BE_MPEG12_H261 ? ((s)->out_format <= FMT_H261) : is_mpeg12)
     const int mb_xy = s->mb_y * s->mb_stride + s->mb_x;
 
     s->cur_pic.qscale_table[mb_xy] = s->qscale;
 
     /* update DC predictors for P macroblocks */
     if (!s->mb_intra) {
-        if (is_mpeg12 != DEFINITELY_MPEG12 && (s->h263_pred || s->h263_aic)) {
+        if (is_mpeg12 != DEFINITELY_MPEG12_H261 && (s->h263_pred || s->h263_aic)) {
             if (s->mbintra_table[mb_xy])
                 ff_clean_intra_table_entries(s);
         } else {
@@ -71,7 +71,7 @@ void mpv_reconstruct_mb_internal(MpegEncContext *s, int16_t block[12][64],
             s->last_dc[1] =
             s->last_dc[2] = 128 << s->intra_dc_precision;
         }
-    } else if (is_mpeg12 != DEFINITELY_MPEG12 && (s->h263_pred || s->h263_aic))
+    } else if (is_mpeg12 != DEFINITELY_MPEG12_H261 && (s->h263_pred || s->h263_aic))
         s->mbintra_table[mb_xy] = 1;
 
 #if IS_ENCODER
@@ -80,11 +80,10 @@ void mpv_reconstruct_mb_internal(MpegEncContext *s, int16_t block[12][64],
           s->avctx->mb_decision != FF_MB_DECISION_RD))  // FIXME precalc
 #endif /* IS_ENCODER */
     {
-        uint8_t *dest_y, *dest_cb, *dest_cr;
+        uint8_t *dest_y = s->dest[0], *dest_cb = s->dest[1], *dest_cr = s->dest[2];
         int dct_linesize, dct_offset;
         const int linesize   = s->cur_pic.linesize[0]; //not s->linesize as this would be wrong for field pics
         const int uvlinesize = s->cur_pic.linesize[1];
-        const int readable   = IS_ENCODER || lowres_flag || s->pict_type != AV_PICTURE_TYPE_B;
         const int block_size = lowres_flag ? 8 >> s->avctx->lowres : 8;
 
         /* avoid copy if macroblock skipped in last frame too */
@@ -106,22 +105,12 @@ void mpv_reconstruct_mb_internal(MpegEncContext *s, int16_t block[12][64],
         dct_linesize = linesize << s->interlaced_dct;
         dct_offset   = s->interlaced_dct ? linesize : linesize * block_size;
 
-        if (readable) {
-            dest_y  = s->dest[0];
-            dest_cb = s->dest[1];
-            dest_cr = s->dest[2];
-        } else {
-            dest_y  = s->sc.b_scratchpad;
-            dest_cb = s->sc.b_scratchpad + 16 * linesize;
-            dest_cr = s->sc.b_scratchpad + 32 * linesize;
-        }
-
         if (!s->mb_intra) {
             /* motion handling */
             /* decoding or more than one mb_type (MC was already done otherwise) */
 
 #if !IS_ENCODER
-            if (HAVE_THREADS && is_mpeg12 != DEFINITELY_MPEG12 &&
+            if (HAVE_THREADS && is_mpeg12 != DEFINITELY_MPEG12_H261 &&
                 s->avctx->active_thread_type & FF_THREAD_FRAME) {
                 if (s->mv_dir & MV_DIR_FORWARD) {
                     ff_thread_progress_await(&s->last_pic.ptr->progress,
@@ -147,7 +136,7 @@ void mpv_reconstruct_mb_internal(MpegEncContext *s, int16_t block[12][64],
                 const op_pixels_func (*op_pix)[4];
                 const qpel_mc_func (*op_qpix)[16];
 
-                if ((is_mpeg12 == DEFINITELY_MPEG12 || !s->no_rounding) || s->pict_type == AV_PICTURE_TYPE_B) {
+                if ((is_mpeg12 == DEFINITELY_MPEG12_H261 || !s->no_rounding) || s->pict_type == AV_PICTURE_TYPE_B) {
                     op_pix = s->hdsp.put_pixels_tab;
                     op_qpix = s->qdsp.put_qpel_pixels_tab;
                 } else {
@@ -169,11 +158,11 @@ void mpv_reconstruct_mb_internal(MpegEncContext *s, int16_t block[12][64],
                 if(  (s->avctx->skip_idct >= AVDISCARD_NONREF && s->pict_type == AV_PICTURE_TYPE_B)
                    ||(s->avctx->skip_idct >= AVDISCARD_NONKEY && s->pict_type != AV_PICTURE_TYPE_I)
                    || s->avctx->skip_idct >= AVDISCARD_ALL)
-                    goto skip_idct;
+                    return;
             }
 
             /* add dct residue */
-            if (!(IS_MPEG12(s) || s->msmpeg4_version != MSMP4_UNUSED ||
+            if (!(IS_MPEG12_H261(s) || s->msmpeg4_version != MSMP4_UNUSED ||
                   (s->codec_id == AV_CODEC_ID_MPEG4 && !s->mpeg_quant)))
 #endif /* !IS_ENCODER */
             {
@@ -183,7 +172,8 @@ void mpv_reconstruct_mb_internal(MpegEncContext *s, int16_t block[12][64],
                 add_dequant_dct(s, block[3], 3, dest_y + dct_offset + block_size, dct_linesize, s->qscale);
 
                 if (!CONFIG_GRAY || !(s->avctx->flags & AV_CODEC_FLAG_GRAY)) {
-                    if (s->chroma_y_shift) {
+                    av_assert2(IS_ENCODER || s->chroma_y_shift);
+                    if (!IS_ENCODER || s->chroma_y_shift) {
                         add_dequant_dct(s, block[4], 4, dest_cb, uvlinesize, s->chroma_qscale);
                         add_dequant_dct(s, block[5], 5, dest_cr, uvlinesize, s->chroma_qscale);
                     } else {
@@ -197,7 +187,7 @@ void mpv_reconstruct_mb_internal(MpegEncContext *s, int16_t block[12][64],
                 }
             }
 #if !IS_ENCODER
-              else if (is_mpeg12 == DEFINITELY_MPEG12 || (s->codec_id != AV_CODEC_ID_WMV2)) {
+              else if (is_mpeg12 == DEFINITELY_MPEG12_H261 || lowres_flag || (s->codec_id != AV_CODEC_ID_WMV2)) {
                 add_dct(s, block[0], 0, dest_y                          , dct_linesize);
                 add_dct(s, block[1], 1, dest_y              + block_size, dct_linesize);
                 add_dct(s, block[2], 2, dest_y + dct_offset             , dct_linesize);
@@ -232,12 +222,12 @@ void mpv_reconstruct_mb_internal(MpegEncContext *s, int16_t block[12][64],
 #if !IS_ENCODER
             /* Only MPEG-4 Simple Studio Profile is supported in > 8-bit mode.
                TODO: Integrate 10-bit properly into mpegvideo.c so that ER works properly */
-            if (is_mpeg12 != DEFINITELY_MPEG12 && CONFIG_MPEG4_DECODER &&
+            if (is_mpeg12 != DEFINITELY_MPEG12_H261 && CONFIG_MPEG4_DECODER &&
                 /* s->codec_id == AV_CODEC_ID_MPEG4 && */
                 s->avctx->bits_per_raw_sample > 8) {
                 ff_mpeg4_decode_studio(s, dest_y, dest_cb, dest_cr, block_size,
                                        uvlinesize, dct_linesize, dct_offset);
-            } else if (!IS_MPEG12(s))
+            } else if (!IS_MPEG12_H261(s))
 #endif /* !IS_ENCODER */
             {
                 /* dct only in intra block */
@@ -287,14 +277,6 @@ void mpv_reconstruct_mb_internal(MpegEncContext *s, int16_t block[12][64],
                         }
                     }
                 } //gray
-            }
-        }
-skip_idct:
-        if (!readable) {
-            s->hdsp.put_pixels_tab[0][0](s->dest[0], dest_y, linesize, 16);
-            if (!CONFIG_GRAY || !(s->avctx->flags & AV_CODEC_FLAG_GRAY)) {
-                s->hdsp.put_pixels_tab[s->chroma_x_shift][0](s->dest[1], dest_cb, uvlinesize, 16 >> s->chroma_y_shift);
-                s->hdsp.put_pixels_tab[s->chroma_x_shift][0](s->dest[2], dest_cr, uvlinesize, 16 >> s->chroma_y_shift);
             }
 #endif /* !IS_ENCODER */
         }

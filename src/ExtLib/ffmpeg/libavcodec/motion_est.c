@@ -305,45 +305,44 @@ static int zero_cmp(MpegEncContext *s, const uint8_t *a, const uint8_t *b,
 static void zero_hpel(uint8_t *a, const uint8_t *b, ptrdiff_t stride, int h){
 }
 
-int ff_init_me(MpegEncContext *s){
-    MotionEstContext * const c= &s->me;
-    int cache_size= FFMIN(ME_MAP_SIZE>>ME_MAP_SHIFT, 1<<ME_MAP_SHIFT);
-    int dia_size= FFMAX(FFABS(s->avctx->dia_size)&255, FFABS(s->avctx->pre_dia_size)&255);
+av_cold int ff_me_init(MotionEstContext *c, AVCodecContext *avctx,
+                       const MECmpContext *mecc, int mpvenc)
+{
+    int cache_size = FFMIN(ME_MAP_SIZE>>ME_MAP_SHIFT, 1<<ME_MAP_SHIFT);
+    int dia_size   = FFMAX(FFABS(avctx->dia_size) & 255, FFABS(avctx->pre_dia_size) & 255);
     int ret;
 
-    if(FFMIN(s->avctx->dia_size, s->avctx->pre_dia_size) < -FFMIN(ME_MAP_SIZE, MAX_SAB_SIZE)){
-        av_log(s->avctx, AV_LOG_ERROR, "ME_MAP size is too small for SAB diamond\n");
-        return -1;
+    if (FFMIN(avctx->dia_size, avctx->pre_dia_size) < -FFMIN(ME_MAP_SIZE, MAX_SAB_SIZE)) {
+        av_log(avctx, AV_LOG_ERROR, "ME_MAP size is too small for SAB diamond\n");
+        return AVERROR(EINVAL);
     }
 
-    c->avctx= s->avctx;
+    c->avctx = avctx;
 
-    if(s->codec_id == AV_CODEC_ID_H261)
-        c->avctx->me_sub_cmp = c->avctx->me_cmp;
+    if (avctx->codec_id == AV_CODEC_ID_H261)
+        avctx->me_sub_cmp = avctx->me_cmp;
 
-    if(cache_size < 2*dia_size && !c->stride){
-        av_log(s->avctx, AV_LOG_INFO, "ME_MAP size may be a little small for the selected diamond size\n");
-    }
+    if (cache_size < 2 * dia_size)
+        av_log(avctx, AV_LOG_INFO, "ME_MAP size may be a little small for the selected diamond size\n");
 
-    ret  = ff_set_cmp(&s->mecc, s->mecc.me_pre_cmp, c->avctx->me_pre_cmp);
-    ret |= ff_set_cmp(&s->mecc, s->mecc.me_cmp,     c->avctx->me_cmp);
-    ret |= ff_set_cmp(&s->mecc, s->mecc.me_sub_cmp, c->avctx->me_sub_cmp);
-    ret |= ff_set_cmp(&s->mecc, s->mecc.mb_cmp,     c->avctx->mb_cmp);
+    ret  = ff_set_cmp(mecc, c->me_pre_cmp, avctx->me_pre_cmp, mpvenc);
+    ret |= ff_set_cmp(mecc, c->me_cmp,     avctx->me_cmp,     mpvenc);
+    ret |= ff_set_cmp(mecc, c->me_sub_cmp, avctx->me_sub_cmp, mpvenc);
+    ret |= ff_set_cmp(mecc, c->mb_cmp,     avctx->mb_cmp,     mpvenc);
     if (ret < 0)
         return ret;
 
-    c->flags    = get_flags(c, 0, c->avctx->me_cmp    &FF_CMP_CHROMA);
-    c->sub_flags= get_flags(c, 0, c->avctx->me_sub_cmp&FF_CMP_CHROMA);
-    c->mb_flags = get_flags(c, 0, c->avctx->mb_cmp    &FF_CMP_CHROMA);
+    c->sse = mecc->sse[0];
+    memcpy(c->pix_abs, mecc->pix_abs, sizeof(c->pix_abs));
 
-/*FIXME s->no_rounding b_type*/
-    if (s->avctx->flags & AV_CODEC_FLAG_QPEL) {
+    c->flags     = get_flags(c, 0, avctx->me_cmp     & FF_CMP_CHROMA);
+    c->sub_flags = get_flags(c, 0, avctx->me_sub_cmp & FF_CMP_CHROMA);
+    c->mb_flags  = get_flags(c, 0, avctx->mb_cmp     & FF_CMP_CHROMA);
+
+    if (avctx->codec_id == AV_CODEC_ID_H261) {
+        c->sub_motion_search = no_sub_motion_search;
+    } else if (avctx->flags & AV_CODEC_FLAG_QPEL) {
         c->sub_motion_search= qpel_motion_search;
-        c->qpel_avg = s->qdsp.avg_qpel_pixels_tab;
-        if (s->no_rounding)
-            c->qpel_put = s->qdsp.put_no_rnd_qpel_pixels_tab;
-        else
-            c->qpel_put = s->qdsp.put_qpel_pixels_tab;
     }else{
         if(c->avctx->me_sub_cmp&FF_CMP_CHROMA)
             c->sub_motion_search= hpel_motion_search;
@@ -353,6 +352,32 @@ int ff_init_me(MpegEncContext *s){
             c->sub_motion_search= sad_hpel_motion_search; // 2050 vs. 2450 cycles
         else
             c->sub_motion_search= hpel_motion_search;
+    }
+
+    /* 8x8 fullpel search would need a 4x4 chroma compare, which we do
+     * not have yet, and even if we had, the motion estimation code
+     * does not expect it. */
+    if (avctx->codec_id != AV_CODEC_ID_SNOW) {
+        if ((avctx->me_cmp & FF_CMP_CHROMA) /* && !c->me_cmp[2] */)
+            c->me_cmp[2] = zero_cmp;
+        if ((avctx->me_sub_cmp & FF_CMP_CHROMA) && !c->me_sub_cmp[2])
+            c->me_sub_cmp[2] = zero_cmp;
+    }
+
+    return 0;
+}
+
+void ff_me_init_pic(MpegEncContext *s)
+{
+    MotionEstContext * const c= &s->me;
+
+/*FIXME s->no_rounding b_type*/
+    if (s->avctx->flags & AV_CODEC_FLAG_QPEL) {
+        c->qpel_avg = s->qdsp.avg_qpel_pixels_tab;
+        if (s->no_rounding)
+            c->qpel_put = s->qdsp.put_no_rnd_qpel_pixels_tab;
+        else
+            c->qpel_put = s->qdsp.put_qpel_pixels_tab;
     }
     c->hpel_avg = s->hdsp.avg_pixels_tab;
     if (s->no_rounding)
@@ -367,29 +392,15 @@ int ff_init_me(MpegEncContext *s){
         c->stride  = 16*s->mb_width + 32;
         c->uvstride=  8*s->mb_width + 16;
     }
-
-    /* 8x8 fullpel search would need a 4x4 chroma compare, which we do
-     * not have yet, and even if we had, the motion estimation code
-     * does not expect it. */
     if (s->codec_id != AV_CODEC_ID_SNOW) {
-        if ((c->avctx->me_cmp & FF_CMP_CHROMA) /* && !s->mecc.me_cmp[2] */)
-            s->mecc.me_cmp[2] = zero_cmp;
-        if ((c->avctx->me_sub_cmp & FF_CMP_CHROMA) && !s->mecc.me_sub_cmp[2])
-            s->mecc.me_sub_cmp[2] = zero_cmp;
         c->hpel_put[2][0]= c->hpel_put[2][1]=
         c->hpel_put[2][2]= c->hpel_put[2][3]= zero_hpel;
     }
-
-    if(s->codec_id == AV_CODEC_ID_H261){
-        c->sub_motion_search= no_sub_motion_search;
-    }
-
-    return 0;
 }
 
 #define CHECK_SAD_HALF_MV(suffix, x, y) \
 {\
-    d  = s->mecc.pix_abs[size][(x ? 1 : 0) + (y ? 2 : 0)](NULL, pix, ptr + ((x) >> 1), stride, h); \
+    d  = c->pix_abs[size][(x ? 1 : 0) + (y ? 2 : 0)](NULL, pix, ptr + ((x) >> 1), stride, h); \
     d += (mv_penalty[pen_x + x] + mv_penalty[pen_y + y])*penalty_factor;\
     COPY3_IF_LT(dminh, d, dx, x, dy, y)\
 }
@@ -526,7 +537,7 @@ static inline void set_p_mv_tables(MpegEncContext * s, int mx, int my, int mv4)
 /**
  * get fullpel ME search limits.
  */
-static inline void get_limits(MpegEncContext *s, int x, int y)
+static inline void get_limits(MpegEncContext *s, int x, int y, int bframe)
 {
     MotionEstContext * const c= &s->me;
     int range= c->avctx->me_range >> (1 + !!(c->flags&FLAG_QPEL));
@@ -540,7 +551,7 @@ static inline void get_limits(MpegEncContext *s, int x, int y)
         c->ymin = - y - 16;
         c->xmax = - x + s->width;
         c->ymax = - y + s->height;
-    } else if (s->out_format == FMT_H261){
+    } else if (!(av_builtin_constant_p(bframe) && bframe) && s->out_format == FMT_H261){
         // Search range of H.261 is different from other codec standards
         c->xmin = (x > 15) ? - 15 : 0;
         c->ymin = (y > 15) ? - 15 : 0;
@@ -642,7 +653,7 @@ static inline int h263_mv4_search(MpegEncContext *s, int mx, int my, int shift)
 
         dmin4= c->sub_motion_search(s, &mx4, &my4, dmin4, block, block, size, h);
 
-        if (s->mecc.me_sub_cmp[0] != s->mecc.mb_cmp[0]) {
+        if (c->me_sub_cmp[0] != c->mb_cmp[0]) {
             int dxy;
             const int offset= ((block&1) + (block>>1)*stride)*8;
             uint8_t *dest_y = c->scratchpad + offset;
@@ -684,11 +695,11 @@ static inline int h263_mv4_search(MpegEncContext *s, int mx, int my, int shift)
     if(same)
         return INT_MAX;
 
-    if (s->mecc.me_sub_cmp[0] != s->mecc.mb_cmp[0]) {
-        dmin_sum += s->mecc.mb_cmp[0](s,
-                                      s->new_pic->data[0] +
-                                      s->mb_x * 16 + s->mb_y * 16 * stride,
-                                      c->scratchpad, stride, 16);
+    if (c->me_sub_cmp[0] != c->mb_cmp[0]) {
+        dmin_sum += c->mb_cmp[0](s,
+                                 s->new_pic->data[0] +
+                                 s->mb_x * 16 + s->mb_y * 16 * stride,
+                                 c->scratchpad, stride, 16);
     }
 
     if(c->avctx->mb_cmp&FF_CMP_CHROMA){
@@ -710,8 +721,8 @@ static inline int h263_mv4_search(MpegEncContext *s, int mx, int my, int shift)
             s->hdsp.put_pixels_tab       [1][dxy](c->scratchpad + 8, s->last_pic.data[2] + offset, s->uvlinesize, 8);
         }
 
-        dmin_sum += s->mecc.mb_cmp[1](s, s->new_pic->data[1] + s->mb_x * 8 + s->mb_y * 8 * s->uvlinesize, c->scratchpad,     s->uvlinesize, 8);
-        dmin_sum += s->mecc.mb_cmp[1](s, s->new_pic->data[2] + s->mb_x * 8 + s->mb_y * 8 * s->uvlinesize, c->scratchpad + 8, s->uvlinesize, 8);
+        dmin_sum += c->mb_cmp[1](s, s->new_pic->data[1] + s->mb_x * 8 + s->mb_y * 8 * s->uvlinesize, c->scratchpad,     s->uvlinesize, 8);
+        dmin_sum += c->mb_cmp[1](s, s->new_pic->data[2] + s->mb_x * 8 + s->mb_y * 8 * s->uvlinesize, c->scratchpad + 8, s->uvlinesize, 8);
     }
 
     c->pred_x= mx;
@@ -807,7 +818,7 @@ static int interlaced_search(MpegEncContext *s, int ref_index,
             mv_table[xy][0]= mx_i;
             mv_table[xy][1]= my_i;
 
-            if (s->mecc.me_sub_cmp[0] != s->mecc.mb_cmp[0]) {
+            if (c->me_sub_cmp[0] != c->mb_cmp[0]) {
                 int dxy;
 
                 //FIXME chroma ME
@@ -819,7 +830,7 @@ static int interlaced_search(MpegEncContext *s, int ref_index,
                 }else{
                     s->hdsp.put_pixels_tab       [size][dxy](c->scratchpad, ref    , stride, h);
                 }
-                dmin = s->mecc.mb_cmp[size](s, c->src[block][0], c->scratchpad, stride, h);
+                dmin = c->mb_cmp[size](s, c->src[block][0], c->scratchpad, stride, h);
                 dmin+= (mv_penalty[mx_i-c->pred_x] + mv_penalty[my_i-c->pred_y] + 1)*c->mb_penalty_factor;
             }else
                 dmin+= c->mb_penalty_factor; //field_select bits
@@ -910,7 +921,7 @@ void ff_estimate_p_frame_motion(MpegEncContext * s,
     c->mb_penalty_factor = get_penalty_factor(s->lambda, s->lambda2, c->avctx->mb_cmp);
     c->current_mv_penalty= c->mv_penalty[s->f_code] + MAX_DMV;
 
-    get_limits(s, 16*mb_x, 16*mb_y);
+    get_limits(s, 16*mb_x, 16*mb_y, 0);
     c->skip=0;
 
     /* intra / predictive decision */
@@ -965,7 +976,7 @@ void ff_estimate_p_frame_motion(MpegEncContext * s,
     /* At this point (mx,my) are full-pell and the relative displacement */
     ppix = c->ref[0][0] + (my * s->linesize) + mx;
 
-    vard = s->mecc.sse[0](NULL, pix, ppix, s->linesize, 16);
+    vard = c->sse(NULL, pix, ppix, s->linesize, 16);
 
     s->mc_mb_var[s->mb_stride * mb_y + mb_x] = (vard+128)>>8;
     c->mc_mb_var_sum_temp += (vard+128)>>8;
@@ -1042,7 +1053,7 @@ void ff_estimate_p_frame_motion(MpegEncContext * s,
                 *(uint32_t*)(&c->scratchpad[i*s->linesize+12]) = mean;
             }
 
-            intra_score= s->mecc.mb_cmp[0](s, c->scratchpad, pix, s->linesize, 16);
+            intra_score= c->mb_cmp[0](s, c->scratchpad, pix, s->linesize, 16);
         }
         intra_score += c->mb_penalty_factor*16 + s->intra_penalty;
 
@@ -1077,7 +1088,7 @@ int ff_pre_estimate_p_frame_motion(MpegEncContext * s,
     c->pre_penalty_factor    = get_penalty_factor(s->lambda, s->lambda2, c->avctx->me_pre_cmp);
     c->current_mv_penalty= c->mv_penalty[s->f_code] + MAX_DMV;
 
-    get_limits(s, 16*mb_x, 16*mb_y);
+    get_limits(s, 16*mb_x, 16*mb_y, 0);
     c->skip=0;
 
     P_LEFT[0]       = s->p_mv_table[xy + 1][0];
@@ -1129,7 +1140,7 @@ static int estimate_motion_b(MpegEncContext *s, int mb_x, int mb_y,
 
     c->current_mv_penalty= mv_penalty;
 
-    get_limits(s, 16*mb_x, 16*mb_y);
+    get_limits(s, 16*mb_x, 16*mb_y, 1);
 
     if (s->motion_est != FF_ME_ZERO) {
         P_LEFT[0] = mv_table[mot_xy - 1][0];
@@ -1229,7 +1240,7 @@ static inline int check_bidir_mv(MpegEncContext * s,
 
     fbmin = (mv_penalty_f[motion_fx-pred_fx] + mv_penalty_f[motion_fy-pred_fy])*c->mb_penalty_factor
            +(mv_penalty_b[motion_bx-pred_bx] + mv_penalty_b[motion_by-pred_by])*c->mb_penalty_factor
-           + s->mecc.mb_cmp[size](s, src_data[0], dest_y, stride, h); // FIXME new_pic
+           + c->mb_cmp[size](s, src_data[0], dest_y, stride, h); // FIXME new_pic
 
     if(c->avctx->mb_cmp&FF_CMP_CHROMA){
     }
@@ -1478,7 +1489,7 @@ static inline int direct_search(MpegEncContext * s, int mb_x, int mb_y)
     if(c->avctx->me_sub_cmp != c->avctx->mb_cmp && !c->skip)
         dmin= get_mb_score(s, mx, my, 0, 0, 0, 16, 1);
 
-    get_limits(s, 16*mb_x, 16*mb_y); //restore c->?min/max, maybe not needed
+    get_limits(s, 16*mb_x, 16*mb_y, 1); //restore c->?min/max, maybe not needed
 
     mv_table[mot_xy][0]= mx;
     mv_table[mot_xy][1]= my;
@@ -1498,7 +1509,7 @@ void ff_estimate_b_frame_motion(MpegEncContext * s,
     init_ref(c, s->new_pic->data, s->last_pic.data,
              s->next_pic.data, 16 * mb_x, 16 * mb_y, 2);
 
-    get_limits(s, 16*mb_x, 16*mb_y);
+    get_limits(s, 16*mb_x, 16*mb_y, 1);
 
     c->skip=0;
 

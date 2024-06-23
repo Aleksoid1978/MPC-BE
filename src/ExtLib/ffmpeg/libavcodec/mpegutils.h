@@ -45,9 +45,12 @@
 #define MB_TYPE_8x8        (1 <<  6)
 #define MB_TYPE_INTERLACED (1 <<  7)
 #define MB_TYPE_DIRECT2    (1 <<  8) // FIXME
-#define MB_TYPE_ACPRED     (1 <<  9)
-#define MB_TYPE_GMC        (1 << 10)
-#define MB_TYPE_SKIP       (1 << 11)
+#define MB_TYPE_CBP        (1 << 10)
+#define MB_TYPE_QUANT      (1 << 11)
+#define MB_TYPE_FORWARD_MV (1 << 12)
+#define MB_TYPE_BACKWARD_MV (1 << 13)
+#define MB_TYPE_BIDIR_MV   (MB_TYPE_FORWARD_MV | MB_TYPE_BACKWARD_MV)
+// MB_TYPE_P[01]L[01], MB_TYPE_L[01] and MB_TYPE_L0L1 are H.264 only.
 #define MB_TYPE_P0L0       (1 << 12)
 #define MB_TYPE_P1L0       (1 << 13)
 #define MB_TYPE_P0L1       (1 << 14)
@@ -55,10 +58,14 @@
 #define MB_TYPE_L0         (MB_TYPE_P0L0 | MB_TYPE_P1L0)
 #define MB_TYPE_L1         (MB_TYPE_P0L1 | MB_TYPE_P1L1)
 #define MB_TYPE_L0L1       (MB_TYPE_L0   | MB_TYPE_L1)
-#define MB_TYPE_QUANT      (1 << 16)
-#define MB_TYPE_CBP        (1 << 17)
+#define MB_TYPE_GMC        (1 << 16)
+#define MB_TYPE_SKIP       (1 << 17)
+#define MB_TYPE_ACPRED     (1 << 18)
 
 #define MB_TYPE_INTRA    MB_TYPE_INTRA4x4 // default mb_type if there is just one type
+
+// The following MB-type can be used by each codec as it sees fit.
+#define MB_TYPE_CODEC_SPECIFIC  (1 << 9)
 
 #define IS_INTRA4x4(a)   ((a) & MB_TYPE_INTRA4x4)
 #define IS_INTRA16x16(a) ((a) & MB_TYPE_INTRA16x16)
@@ -75,18 +82,16 @@
 #define IS_16X8(a)       ((a) & MB_TYPE_16x8)
 #define IS_8X16(a)       ((a) & MB_TYPE_8x16)
 #define IS_8X8(a)        ((a) & MB_TYPE_8x8)
-#define IS_SUB_8X8(a)    ((a) & MB_TYPE_16x16) // note reused
-#define IS_SUB_8X4(a)    ((a) & MB_TYPE_16x8)  // note reused
-#define IS_SUB_4X8(a)    ((a) & MB_TYPE_8x16)  // note reused
-#define IS_SUB_4X4(a)    ((a) & MB_TYPE_8x8)   // note reused
 #define IS_ACPRED(a)     ((a) & MB_TYPE_ACPRED)
 #define IS_QUANT(a)      ((a) & MB_TYPE_QUANT)
-#define IS_DIR(a, part, list) ((a) & (MB_TYPE_P0L0 << ((part) + 2 * (list))))
-
-// does this mb use listX, note does not work if subMBs
-#define USES_LIST(a, list) ((a) & ((MB_TYPE_P0L0 | MB_TYPE_P1L0) << (2 * (list))))
 
 #define HAS_CBP(a)       ((a) & MB_TYPE_CBP)
+#define HAS_FORWARD_MV(a)  ((a) & MB_TYPE_FORWARD_MV)
+#define HAS_BACKWARD_MV(a) ((a) & MB_TYPE_BACKWARD_MV)
+// dir == 0 means forward, dir == 1 is backward
+#define HAS_MV(a, dir)     ((a) & (MB_TYPE_FORWARD_MV << (dir)))
+
+#define MB_TYPE_MV_2_MV_DIR(a) (((a) >> 12) & (MV_DIR_FORWARD | MV_DIR_BACKWARD))
 
 /**
  * Draw a horizontal band if supported.
@@ -101,7 +106,7 @@ void ff_draw_horiz_band(AVCodecContext *avctx, const AVFrame *cur, const AVFrame
  * Print debugging info for the given picture.
  */
 void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict,
-                          const uint8_t *mbskip_table, const uint32_t *mbtype_table,
+                          const uint32_t *mbtype_table,
                           const int8_t *qscale_table, int16_t (*const motion_val[2])[2],
                           int mb_width, int mb_height, int mb_stride, int quarter_sample);
 

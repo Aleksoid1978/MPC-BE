@@ -74,7 +74,8 @@ typedef struct DOVIContext {
     /**
      * Private fields internal to dovi_rpu.c
      */
-    struct DOVIVdr *vdr[DOVI_MAX_DM_ID+1]; ///< RefStruct references
+    AVDOVIColorMetadata *dm; ///< RefStruct
+    AVDOVIDataMapping *vdr[DOVI_MAX_DM_ID+1]; ///< RefStruct references
     uint8_t *rpu_buf; ///< temporary buffer
     unsigned rpu_buf_sz;
 
@@ -121,21 +122,6 @@ int ff_dovi_attach_side_data(DOVIContext *s, AVFrame *frame);
  */
 int ff_dovi_configure(DOVIContext *s, AVCodecContext *avctx);
 
-
-/***************************************************
- * The following section is for internal use only. *
- ***************************************************/
-
-typedef struct DOVIVdr {
-    AVDOVIDataMapping mapping;
-    AVDOVIColorMetadata color;
-} DOVIVdr;
-
-enum {
-    RPU_COEFF_FIXED = 0,
-    RPU_COEFF_FLOAT = 1,
-};
-
 /**
  * Synthesize a Dolby Vision RPU reflecting the current state. Note that this
  * assumes all previous calls to `ff_dovi_rpu_generate` have been appropriately
@@ -150,11 +136,24 @@ enum {
 int ff_dovi_rpu_generate(DOVIContext *s, const AVDOVIMetadata *metadata,
                          uint8_t **out_rpu, int *out_size);
 
+
+/***************************************************
+ * The following section is for internal use only. *
+ ***************************************************/
+
+enum {
+    RPU_COEFF_FIXED = 0,
+    RPU_COEFF_FLOAT = 1,
+};
+
 /**
  * Internal helper function to guess the correct DV profile for HEVC.
  *
  * Returns the profile number or 0 if unknown.
  */
 int ff_dovi_guess_profile_hevc(const AVDOVIRpuDataHeader *hdr);
+
+/* Default values for AVDOVIColorMetadata */
+extern const AVDOVIColorMetadata ff_dovi_color_default;
 
 #endif /* AVCODEC_DOVI_RPU_H */

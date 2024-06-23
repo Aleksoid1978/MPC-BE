@@ -59,6 +59,7 @@ int ff_mpv_decode_init(MpegEncContext *s, AVCodecContext *avctx)
     s->codec_tag       = ff_toupper4(avctx->codec_tag);
 
     ff_mpv_idct_init(s);
+
     ff_h264chroma_init(&s->h264chroma, 8); //for lowres
 
     if (s->picture_pool)  // VC-1 can call this multiple times
@@ -135,7 +136,6 @@ int ff_mpeg_update_thread_context(AVCodecContext *dst,
     // B-frame info
     s->max_b_frames = s1->max_b_frames;
     s->low_delay    = s1->low_delay;
-    s->droppable    = s1->droppable;
 
     // DivX handling (doesn't work)
     s->divx_packed  = s1->divx_packed;
@@ -151,14 +151,6 @@ int ff_mpeg_update_thread_context(AVCodecContext *dst,
         s->bitstream_buffer_size = s1->bitstream_buffer_size;
         memcpy(s->bitstream_buffer, s1->bitstream_buffer,
                s1->bitstream_buffer_size);
-    }
-
-    // linesize-dependent scratch buffer allocation
-    ret = ff_mpv_framesize_alloc(s->avctx, &s->sc, s1->linesize);
-    if (ret < 0) {
-        av_log(s->avctx, AV_LOG_ERROR, "Failed to allocate context "
-               "scratch buffers.\n");
-        return ret;
     }
 
     // MPEG-2/interlacing info
@@ -393,20 +385,6 @@ int ff_mpv_frame_start(MpegEncContext *s, AVCodecContext *avctx)
     if (ret < 0)
         return ret;
 
-    /* set dequantizer, we can't do it during init as
-     * it might change for MPEG-4 and we can't do it in the header
-     * decode as init is not called for MPEG-4 there yet */
-    if (s->mpeg_quant || s->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
-        s->dct_unquantize_intra = s->dct_unquantize_mpeg2_intra;
-        s->dct_unquantize_inter = s->dct_unquantize_mpeg2_inter;
-    } else if (s->out_format == FMT_H263 || s->out_format == FMT_H261) {
-        s->dct_unquantize_intra = s->dct_unquantize_h263_intra;
-        s->dct_unquantize_inter = s->dct_unquantize_h263_inter;
-    } else {
-        s->dct_unquantize_intra = s->dct_unquantize_mpeg1_intra;
-        s->dct_unquantize_inter = s->dct_unquantize_mpeg1_inter;
-    }
-
     if (s->avctx->debug & FF_DEBUG_NOMC)
         color_frame(s->cur_pic.ptr->f, 0x80);
 
@@ -424,7 +402,7 @@ void ff_mpv_frame_end(MpegEncContext *s)
 
 void ff_print_debug_info(const MpegEncContext *s, const MPVPicture *p, AVFrame *pict)
 {
-    ff_print_debug_info2(s->avctx, pict, s->mbskip_table, p->mb_type,
+    ff_print_debug_info2(s->avctx, pict, p->mb_type,
                          p->qscale_table, p->motion_val,
                          s->mb_width, s->mb_height, s->mb_stride, s->quarter_sample);
 }
@@ -499,10 +477,12 @@ static inline int hpel_motion_lowres(MpegEncContext *s,
                                      int motion_x, int motion_y)
 {
     const int lowres   = s->avctx->lowres;
-    const int op_index = FFMIN(lowres, 3);
+    const int op_index = lowres;
     const int s_mask   = (2 << lowres) - 1;
     int emu = 0;
     int sx, sy;
+
+    av_assert2(op_index <= 3);
 
     if (s->quarter_sample) {
         motion_x /= 2;
@@ -552,12 +532,15 @@ static av_always_inline void mpeg_motion_lowres(MpegEncContext *s,
     int mx, my, src_x, src_y, uvsrc_x, uvsrc_y, sx, sy, uvsx, uvsy;
     ptrdiff_t uvlinesize, linesize;
     const int lowres     = s->avctx->lowres;
-    const int op_index   = FFMIN(lowres - 1 + s->chroma_x_shift, 3);
+    const int op_index   = lowres - 1 + s->chroma_x_shift;
     const int block_s    = 8 >> lowres;
     const int s_mask     = (2 << lowres) - 1;
     const int h_edge_pos = s->h_edge_pos >> lowres;
     const int v_edge_pos = s->v_edge_pos >> lowres;
     int hc = s->chroma_y_shift ? (h+1-bottom_field)>>1 : h;
+
+    av_assert2(op_index <= 3);
+
     linesize   = s->cur_pic.linesize[0] << field_based;
     uvlinesize = s->cur_pic.linesize[1] << field_based;
 
@@ -682,7 +665,7 @@ static inline void chroma_4mv_motion_lowres(MpegEncContext *s,
                                             int mx, int my)
 {
     const int lowres     = s->avctx->lowres;
-    const int op_index   = FFMIN(lowres, 3);
+    const int op_index   = lowres;
     const int block_s    = 8 >> lowres;
     const int s_mask     = (2 << lowres) - 1;
     const int h_edge_pos = s->h_edge_pos >> lowres + 1;
@@ -690,6 +673,8 @@ static inline void chroma_4mv_motion_lowres(MpegEncContext *s,
     int emu = 0, src_x, src_y, sx, sy;
     ptrdiff_t offset;
     const uint8_t *ptr;
+
+    av_assert2(op_index <= 3);
 
     if (s->quarter_sample) {
         mx /= 2;
@@ -936,15 +921,16 @@ void ff_mpv_reconstruct_mb(MpegEncContext *s, int16_t block[12][64])
        }
     }
 
+    av_assert2((s->out_format <= FMT_H261) == (s->out_format == FMT_H261 || s->out_format == FMT_MPEG1));
     if (!s->avctx->lowres) {
 #if !CONFIG_SMALL
-        if (s->out_format == FMT_MPEG1)
-            mpv_reconstruct_mb_internal(s, block, 0, DEFINITELY_MPEG12);
+        if (s->out_format <= FMT_H261)
+            mpv_reconstruct_mb_internal(s, block, 0, DEFINITELY_MPEG12_H261);
         else
-            mpv_reconstruct_mb_internal(s, block, 0, NOT_MPEG12);
+            mpv_reconstruct_mb_internal(s, block, 0, NOT_MPEG12_H261);
 #else
-        mpv_reconstruct_mb_internal(s, block, 0, MAY_BE_MPEG12);
+        mpv_reconstruct_mb_internal(s, block, 0, MAY_BE_MPEG12_H261);
 #endif
     } else
-        mpv_reconstruct_mb_internal(s, block, 1, MAY_BE_MPEG12);
+        mpv_reconstruct_mb_internal(s, block, 1, MAY_BE_MPEG12_H261);
 }

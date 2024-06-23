@@ -315,7 +315,7 @@ typedef struct AACUsacElemConfig {
 
             uint8_t freq_scale; /* dflt_freq_scale */
             uint8_t alter_scale : 1; /* dflt_alter_scale */
-            uint8_t noise_scale; /* dflt_noise_scale */
+            uint8_t noise_bands; /* dflt_noise_bands */
 
             uint8_t limiter_bands; /* dflt_limiter_bands */
             uint8_t limiter_gains; /* dflt_limiter_gains */
@@ -350,7 +350,6 @@ typedef struct AACUsacElemConfig {
 
 typedef struct AACUSACConfig {
     uint8_t core_sbr_frame_len_idx; /* coreSbrFrameLengthIndex */
-    uint8_t rate_idx;
     uint16_t core_frame_len;
     uint16_t stream_identifier;
 

@@ -346,7 +346,6 @@ static av_cold void rv10_init_static(void)
         rv_dc_chrom.table[(0x1FE << (DC_VLC_BITS - 9)) + i].sym = 255;
         rv_dc_chrom.table[(0x1FE << (DC_VLC_BITS - 9)) + i].len = 18;
     }
-    ff_h263_decode_init_vlc();
 }
 
 static av_cold int rv10_decode_init(AVCodecContext *avctx)
@@ -364,16 +363,12 @@ static av_cold int rv10_decode_init(AVCodecContext *avctx)
                                    avctx->coded_height, 0, avctx)) < 0)
         return ret;
 
-    ret = ff_mpv_decode_init(s, avctx);
+    ret = ff_h263_decode_init(avctx);
     if (ret < 0)
         return ret;
 
-    s->out_format  = FMT_H263;
-
-    rv->orig_width  =
-    s->width        = avctx->coded_width;
-    rv->orig_height =
-    s->height       = avctx->coded_height;
+    rv->orig_width  = avctx->coded_width;
+    rv->orig_height = avctx->coded_height;
 
     s->h263_long_vectors = ((uint8_t *) avctx->extradata)[3] & 1;
     rv->sub_id           = AV_RB32((uint8_t *) avctx->extradata + 4);
@@ -382,7 +377,6 @@ static av_cold int rv10_decode_init(AVCodecContext *avctx)
     minor_ver = RV_GET_MINOR_VER(rv->sub_id);
     micro_ver = RV_GET_MICRO_VER(rv->sub_id);
 
-    s->low_delay = 1;
     switch (major_ver) {
     case 1:
         s->rv10_version = micro_ver ? 3 : 1;
@@ -391,11 +385,11 @@ static av_cold int rv10_decode_init(AVCodecContext *avctx)
     case 2:
         if (minor_ver >= 2) {
             s->low_delay           = 0;
-            s->avctx->has_b_frames = 1;
+            avctx->has_b_frames = 1;
         }
         break;
     default:
-        av_log(s->avctx, AV_LOG_ERROR, "unknown header %X\n", rv->sub_id);
+        av_log(avctx, AV_LOG_ERROR, "unknown header %X\n", rv->sub_id);
         avpriv_request_sample(avctx, "RV1/2 version");
         return AVERROR_PATCHWELCOME;
     }
@@ -404,13 +398,6 @@ static av_cold int rv10_decode_init(AVCodecContext *avctx)
         av_log(avctx, AV_LOG_DEBUG, "ver:%X ver0:%"PRIX32"\n", rv->sub_id,
                ((uint32_t *) avctx->extradata)[0]);
     }
-
-    avctx->pix_fmt = AV_PIX_FMT_YUV420P;
-
-    if ((ret = ff_mpv_common_init(s)) < 0)
-        return ret;
-
-    ff_h263dsp_init(&s->h263dsp);
 
     /* init static VLCs */
     ff_thread_once(&init_static_once, rv10_init_static);
@@ -498,12 +485,6 @@ static int rv10_decode_packet(AVCodecContext *avctx, const uint8_t *buf,
     s->rv10_first_dc_coded[0] = 0;
     s->rv10_first_dc_coded[1] = 0;
     s->rv10_first_dc_coded[2] = 0;
-    s->block_wrap[0] =
-    s->block_wrap[1] =
-    s->block_wrap[2] =
-    s->block_wrap[3] = s->b8_stride;
-    s->block_wrap[4] =
-    s->block_wrap[5] = s->mb_stride;
     ff_init_block_index(s);
 
     /* decode each macroblock */

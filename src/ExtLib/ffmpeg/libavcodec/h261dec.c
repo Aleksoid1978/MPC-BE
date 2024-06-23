@@ -67,9 +67,10 @@ static av_cold void h261_decode_init_static(void)
     VLC_INIT_STATIC_TABLE(h261_mba_vlc, H261_MBA_VLC_BITS, 35,
                           ff_h261_mba_bits, 1, 1,
                           ff_h261_mba_code, 1, 1, 0);
-    VLC_INIT_STATIC_TABLE(h261_mtype_vlc, H261_MTYPE_VLC_BITS, 10,
-                          ff_h261_mtype_bits, 1, 1,
-                          ff_h261_mtype_code, 1, 1, 0);
+    VLC_INIT_STATIC_SPARSE_TABLE(h261_mtype_vlc, H261_MTYPE_VLC_BITS, 10,
+                                 ff_h261_mtype_bits, 1, 1,
+                                 ff_h261_mtype_code, 1, 1,
+                                 ff_h261_mtype_map,  2, 2, 0);
     VLC_INIT_STATIC_TABLE(h261_mv_vlc, H261_MV_VLC_BITS, 17,
                           &ff_h261_mv_tab[0][1], 2, 1,
                           &ff_h261_mv_tab[0][0], 2, 1, 0);
@@ -86,6 +87,8 @@ static av_cold int h261_decode_init(AVCodecContext *avctx)
     MpegEncContext *const s = &h->s;
     int ret;
 
+    avctx->framerate = (AVRational) { 30000, 1001 };
+
     s->private_ctx = &h->common;
     // set defaults
     ret = ff_mpv_decode_init(s, avctx);
@@ -95,8 +98,6 @@ static av_cold int h261_decode_init(AVCodecContext *avctx)
     s->out_format  = FMT_H261;
     s->low_delay   = 1;
     avctx->pix_fmt = AV_PIX_FMT_YUV420P;
-
-    h->gob_start_code_skipped = 0;
 
     ff_thread_once(&init_static_once, h261_decode_init_static);
 
@@ -167,47 +168,6 @@ static int h261_decode_gob_header(H261DecContext *h)
 }
 
 /**
- * Decode the group of blocks / video packet header.
- * @return <0 if no resync found
- */
-static int h261_resync(H261DecContext *h)
-{
-    MpegEncContext *const s = &h->s;
-    int left, ret;
-
-    if (h->gob_start_code_skipped) {
-        ret = h261_decode_gob_header(h);
-        if (ret >= 0)
-            return 0;
-    } else {
-        if (show_bits(&s->gb, 15) == 0) {
-            ret = h261_decode_gob_header(h);
-            if (ret >= 0)
-                return 0;
-        }
-        // OK, it is not where it is supposed to be ...
-        s->gb = s->last_resync_gb;
-        align_get_bits(&s->gb);
-        left = get_bits_left(&s->gb);
-
-        for (; left > 15 + 1 + 4 + 5; left -= 8) {
-            if (show_bits(&s->gb, 15) == 0) {
-                GetBitContext bak = s->gb;
-
-                ret = h261_decode_gob_header(h);
-                if (ret >= 0)
-                    return 0;
-
-                s->gb = bak;
-            }
-            skip_bits(&s->gb, 8);
-        }
-    }
-
-    return -1;
-}
-
-/**
  * Decode skipped macroblocks.
  * @return 0
  */
@@ -231,7 +191,7 @@ static int h261_decode_mb_skipped(H261DecContext *h, int mba1, int mba2)
 
         s->mv_dir                      = MV_DIR_FORWARD;
         s->mv_type                     = MV_TYPE_16X16;
-        s->cur_pic.mb_type[xy] = MB_TYPE_SKIP | MB_TYPE_16x16 | MB_TYPE_L0;
+        s->cur_pic.mb_type[xy] = MB_TYPE_SKIP | MB_TYPE_16x16 | MB_TYPE_FORWARD_MV;
         s->mv[0][0][0]                 = 0;
         s->mv[0][0][1]                 = 0;
         s->mb_skipped                  = 1;
@@ -250,10 +210,6 @@ static int h261_decode_mb_skipped(H261DecContext *h, int mba1, int mba2)
     return 0;
 }
 
-static const int mvmap[17] = {
-    0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16
-};
-
 static int decode_mv_component(GetBitContext *gb, int v)
 {
     int mv_diff = get_vlc2(gb, h261_mv_vlc, H261_MV_VLC_BITS, 2);
@@ -262,9 +218,7 @@ static int decode_mv_component(GetBitContext *gb, int v)
     if (mv_diff < 0)
         return v;
 
-    mv_diff = mvmap[mv_diff];
-
-    if (mv_diff && !get_bits1(gb))
+    if (mv_diff && get_bits1(gb))
         mv_diff = -mv_diff;
 
     v += mv_diff;
@@ -286,6 +240,7 @@ static int h261_decode_block(H261DecContext *h, int16_t *block, int n, int coded
     int level, i, j, run;
     const RLTable *rl = &ff_h261_rl_tcoeff;
     const uint8_t *scan_table;
+    const int qmul = s->qscale << 1, qadd = (s->qscale - 1) | 1;
 
     /* For the variable length encoding there are two code tables, one being
      * used for the first transmitted LEVEL in INTER, INTER + MC and
@@ -307,7 +262,7 @@ static int h261_decode_block(H261DecContext *h, int16_t *block, int n, int coded
          * being coded as 1111 1111. */
         if (level == 255)
             level = 128;
-        block[0] = level;
+        block[0] = level * s->y_dc_scale;
         i        = 1;
     } else if (coded) {
         // Run  Level   Code
@@ -318,7 +273,8 @@ static int h261_decode_block(H261DecContext *h, int16_t *block, int n, int coded
         i = 0;
         if (check & 0x2) {
             skip_bits(&s->gb, 2);
-            block[0] = (check & 0x1) ? -1 : 1;
+            block[0] = qmul + qadd;
+            block[0] *= (check & 0x1) ? -1 : 1;
             i        = 1;
         }
     } else {
@@ -348,10 +304,15 @@ static int h261_decode_block(H261DecContext *h, int16_t *block, int n, int coded
             run   = SHOW_UBITS(re, &s->gb, 6) + 1;
             SKIP_CACHE(re, &s->gb, 6);
             level = SHOW_SBITS(re, &s->gb, 8);
+            if (level > 0)
+                level = level * qmul + qadd;
+            else if (level < 0)
+                level = level * qmul - qadd;
             SKIP_COUNTER(re, &s->gb, 6 + 8);
         } else if (level == 0) {
             break;
         } else {
+            level = level * qmul + qadd;
             if (SHOW_UBITS(re, &s->gb, 1))
                 level = -level;
             SKIP_COUNTER(re, &s->gb, 1);
@@ -414,12 +375,9 @@ static int h261_decode_mb(H261DecContext *h)
     // Read mtype
     com->mtype = get_vlc2(&s->gb, h261_mtype_vlc, H261_MTYPE_VLC_BITS, 2);
     if (com->mtype < 0) {
-        av_log(s->avctx, AV_LOG_ERROR, "Invalid mtype index %d\n",
-               com->mtype);
+        av_log(s->avctx, AV_LOG_ERROR, "Invalid mtype index\n");
         return SLICE_ERROR;
     }
-    av_assert0(com->mtype < FF_ARRAY_ELEMS(ff_h261_mtype_map));
-    com->mtype = ff_h261_mtype_map[com->mtype];
 
     // Read mquant
     if (IS_QUANT(com->mtype))
@@ -462,7 +420,7 @@ static int h261_decode_mb(H261DecContext *h)
     //set motion vectors
     s->mv_dir                      = MV_DIR_FORWARD;
     s->mv_type                     = MV_TYPE_16X16;
-    s->cur_pic.mb_type[xy] = MB_TYPE_16x16 | MB_TYPE_L0;
+    s->cur_pic.mb_type[xy] = MB_TYPE_16x16 | MB_TYPE_FORWARD_MV;
     s->mv[0][0][0]                 = h->current_mv_x * 2; // gets divided by 2 in motion compensation
     s->mv[0][0][1]                 = h->current_mv_y * 2;
 
@@ -516,8 +474,6 @@ static int h261_decode_picture_header(H261DecContext *h)
 
     /* temporal reference */
     skip_bits(&s->gb, 5); /* picture timestamp */
-
-    s->avctx->framerate = (AVRational) { 30000, 1001 };
 
     /* PTYPE starts here */
     skip_bits1(&s->gb); /* split screen off */
@@ -646,7 +602,7 @@ static int h261_decode_frame(AVCodecContext *avctx, AVFrame *pict,
     s->mb_y = 0;
 
     while (h->gob_number < (s->mb_height == 18 ? 12 : 5)) {
-        if (h261_resync(h) < 0)
+        if (h261_decode_gob_header(h) < 0)
             break;
         h261_decode_gob(h);
     }

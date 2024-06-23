@@ -21,6 +21,7 @@
 #ifndef AVCODEC_MPEGPICTURE_H
 #define AVCODEC_MPEGPICTURE_H
 
+#include <limits.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -35,7 +36,6 @@ typedef struct ScratchpadContext {
     uint8_t *obmc_scratchpad;
     union {
         uint8_t *scratchpad_buf;  ///< the other *_scratchpad point into this buffer
-        uint8_t *b_scratchpad;    ///< scratchpad used for writing into write only buffers
         uint8_t *rd_scratchpad;   ///< scratchpad for rate distortion mb decision
     };
     int      linesize;            ///< linesize that the buffers in this context have been allocated for
@@ -135,6 +135,15 @@ int ff_mpv_pic_check_linesize(void *logctx, const struct AVFrame *f,
 
 int ff_mpv_framesize_alloc(AVCodecContext *avctx,
                            ScratchpadContext *sc, int linesize);
+
+/**
+ * Disable allocating the ScratchpadContext's buffers in future calls
+ * to ff_mpv_framesize_alloc().
+ */
+static inline void ff_mpv_framesize_disable(ScratchpadContext *sc)
+{
+    sc->linesize = INT_MAX;
+}
 
 void ff_mpv_unref_picture(MPVWorkPicture *pic);
 void ff_mpv_workpic_from_pic(MPVWorkPicture *wpic, MPVPicture *pic);
