@@ -1,5 +1,5 @@
 @ECHO OFF
-REM (C) 2009-2017 see Authors.txt
+REM (C) 2009-2024 see Authors.txt
 REM
 REM This file is part of MPC-BE.
 REM
@@ -16,6 +16,8 @@ REM
 REM You should have received a copy of the GNU General Public License
 REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+SETLOCAL ENABLEDELAYEDEXPANSION
+
 IF /I "%~1"=="help"   GOTO SHOWHELP
 IF /I "%~1"=="/help"  GOTO SHOWHELP
 IF /I "%~1"=="-help"  GOTO SHOWHELP
@@ -26,7 +28,7 @@ IF EXIST "%~dp0..\..\..\environments.bat" CALL "%~dp0..\..\..\environments.bat"
 
 IF DEFINED MPCBE_MINGW IF DEFINED MPCBE_MSYS GOTO VarOk
 ECHO ERROR: Please define MPCBE_MINGW and MPCBE_MSYS environment variable(s)
-EXIT /B
+EXIT /B 1
 
 :VarOk
 SET PATH=%MPCBE_MSYS%\bin;%MPCBE_MINGW%\bin;%PATH%
@@ -49,10 +51,10 @@ IF /I "%BUILDTYPE%" == "rebuild" (
   CALL :SubMake clean
   SET "BUILDTYPE=build"
   CALL :SubMake
-  EXIT /B
+  EXIT /B !ERRORLEVEL!
 ) ELSE (
   CALL :SubMake
-  EXIT /B
+  EXIT /B !ERRORLEVEL!
 )
 
 :SubMake
@@ -70,7 +72,7 @@ IF "%BUILDTYPE%" == "clean" (
 make.exe -f ffmpeg.mak %BUILDTYPE% -j%JOBS% %BIT% %DEBUG%
 
 ENDLOCAL
-EXIT /B
+EXIT /B %ERRORLEVEL%
 
 :SHOWHELP
 TITLE "%~nx0 %1"
