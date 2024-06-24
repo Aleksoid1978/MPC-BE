@@ -2,6 +2,10 @@
 
 1.7.2.x dev
 =============================
+Player
+Improved support for moving the file properties window between displays with different text scaling.
+Fixed remembering the position of some DVD-Videos.
+
 Updated Romanian translation (by Andrei Miloiu).
 Updated Korean translation (by Hackjjang).
 Updated Japanese translation (by tsubasanouta).
