@@ -42,12 +42,12 @@ jobs:
 
       - name: Clean
         run: |
-          .\\build.bat Clean All
+          .\\build.bat Clean All NoWait
         shell: pwsh
 
       - name: Build MPC-BE
         run: |
-          .\\build.bat Build Packages
+          .\\build.bat Build Packages NoWait
         shell: pwsh
 
       - name: Upload Installer x64
