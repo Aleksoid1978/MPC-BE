@@ -202,7 +202,6 @@
     <ClCompile Include="vvdec\vvdec\source\Lib\Utilities\ThreadPool.cpp" />
     <ClCompile Include="vvdec\vvdec\source\Lib\vvdec\vvdec.cpp" />
     <ClCompile Include="vvdec\vvdec\source\Lib\vvdec\vvdecimpl.cpp" />
-    <ClCompile Include="vvdec\vvdec\source\Lib\vvdec\wasm_bindings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="vvdec\vvdec\source\VisualStudio\common.natvis" />
@@ -283,7 +282,6 @@
     <ClInclude Include="vvdec\vvdec\source\Lib\vvdec\resource.h" />
     <ClInclude Include="vvdec\vvdec\source\Lib\vvdec\resource_version.h" />
     <ClInclude Include="vvdec\vvdec\source\Lib\vvdec\vvdecimpl.h" />
-    <ClInclude Include="vvdec\vvdec\source\Lib\vvdec\wasm_bindings.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A5B58721-0F63-4410-9598-880EBDA78C53}</ProjectGuid>

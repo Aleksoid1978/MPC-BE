@@ -135,12 +135,6 @@
     <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\MatrixIntraPrediction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\Picture.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\SampleAdaptiveOffset.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\Trafo_avx2.cpp">
       <Filter>Source Files\simd</Filter>
     </ClCompile>
@@ -219,9 +213,6 @@
     <ClCompile Include="vvdec\vvdec\source\Lib\vvdec\vvdecimpl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\vvdec\wasm_bindings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\WeightPrediction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -296,6 +287,12 @@
     </ClCompile>
     <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\Trafo_avx.cpp">
       <Filter>Source Files\simd</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\Picture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\SampleAdaptiveOffset.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -516,9 +513,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vvdec\vvdec\source\Lib\vvdec\vvdecimpl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vvdec\vvdec\source\Lib\vvdec\wasm_bindings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vvdec\vvdec\source\Lib\CommonLib\WeightPrediction.h">
