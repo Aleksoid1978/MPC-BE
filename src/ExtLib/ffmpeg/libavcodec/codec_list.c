@@ -80,7 +80,6 @@ static const FFCodec * const codec_list[] = {
     &ff_vp7_decoder,
     &ff_vp8_decoder,
     &ff_vp9_decoder,
-    &ff_vvc_decoder,
     &ff_wmv1_decoder,
     &ff_wmv2_decoder,
     &ff_wmv3_decoder,
