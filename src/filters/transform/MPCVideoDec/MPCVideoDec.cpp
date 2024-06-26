@@ -2107,8 +2107,6 @@ redo:
 
 	if (m_CodecId == AV_CODEC_ID_AV1 && (m_bUseDXVA || m_bUseD3D11 || m_bUseD3D11cb || m_bUseD3D12cb || m_bUseNVDEC)) {
 		m_pAVCodec = avcodec_find_decoder_by_name("av1");
-	} else if (m_CodecId == AV_CODEC_ID_VVC) {
-		m_pAVCodec = avcodec_find_decoder_by_name("libvvdec");
 	} else {
 		m_pAVCodec = avcodec_find_decoder(m_CodecId);
 	}
