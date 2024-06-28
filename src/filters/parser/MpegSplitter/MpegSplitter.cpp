@@ -755,6 +755,7 @@ HRESULT CMpegSplitterFilter::DeliverPacket(std::unique_ptr<CPacket> p)
 						// Dolby Vision RPU
 						// TODO - check for NALU_TYPE_HEVC_EOSEQ
 						m_MasterDVStreamPacket->AppendData(Nalu.GetNALBuffer(), Nalu.GetLength());
+						break;
 					}
 				}
 
