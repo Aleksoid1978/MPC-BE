@@ -178,30 +178,18 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 // CFormatConverter
 
 CFormatConverter::CFormatConverter()
-	: m_pSwsContext(nullptr)
-	, m_out_pixfmt(PixFmt_None)
-	, m_dstRGBRange(0)
-	, m_dstStride(0)
-	, m_planeHeight(0)
-	, m_OutHeight(0)
-	, m_nAlignedBufferSize(0)
-	, m_pAlignedBuffer(nullptr)
-	, m_nCPUFlag(0)
-	, m_RequiredAlignment(0)
-	, m_NumThreads(1)
-	, pConvertFn(nullptr)
 {
 	ASSERT(PixFmt_count == std::size(s_sw_formats));
 
-	m_FProps.avpixfmt	= AV_PIX_FMT_NONE;
-	m_FProps.width		= 0;
-	m_FProps.height		= 0;
-	m_FProps.lumabits	= 0;
-	m_FProps.pftype		= PFType_unspecified;
-	m_FProps.colorspace	= AVCOL_SPC_UNSPECIFIED;
-	m_FProps.colorrange	= AVCOL_RANGE_UNSPECIFIED;
+	m_FProps.avpixfmt   = AV_PIX_FMT_NONE;
+	m_FProps.width      = 0;
+	m_FProps.height     = 0;
+	m_FProps.lumabits   = 0;
+	m_FProps.pftype     = PFType_unspecified;
+	m_FProps.colorspace = AVCOL_SPC_UNSPECIFIED;
+	m_FProps.colorrange = AVCOL_RANGE_UNSPECIFIED;
 
-	m_NumThreads		= std::clamp(CPUInfo::GetProcessorNumber() / 2, 1uL, 8uL);
+	m_NumThreads = std::clamp(CPUInfo::GetProcessorNumber() / 2, 1uL, 8uL);
 }
 
 CFormatConverter::~CFormatConverter()
@@ -275,60 +263,60 @@ void CFormatConverter::UpdateSWSContext()
 
 void CFormatConverter::SetConvertFunc()
 {
-	pConvertFn = &CFormatConverter::ConvertGeneric;
+	m_pConvertFn = &CFormatConverter::ConvertGeneric;
 	m_RequiredAlignment = 16;
 
 	switch (m_out_pixfmt) {
 		case PixFmt_AYUV:
 			if (m_FProps.pftype == PFType_YUV444Px) {
-				pConvertFn = &CFormatConverter::convert_yuv444_ayuv_dither_le;
+				m_pConvertFn = &CFormatConverter::convert_yuv444_ayuv_dither_le;
 			}
 			break;
 		case PixFmt_P010:
 		case PixFmt_P016:
 			if (m_FProps.pftype == PFType_YUV420Px) {
-				pConvertFn = &CFormatConverter::convert_yuv420_px1x_le;
+				m_pConvertFn = &CFormatConverter::convert_yuv420_px1x_le;
 			}
 			break;
 		case PixFmt_Y410:
 			if (m_FProps.pftype == PFType_YUV444Px && m_FProps.lumabits <= 10) {
-				pConvertFn = &CFormatConverter::convert_yuv444_y410;
+				m_pConvertFn = &CFormatConverter::convert_yuv444_y410;
 			}
 			break;
 		case PixFmt_P210:
 		case PixFmt_P216:
 			if (m_FProps.pftype == PFType_YUV422Px) {
-				pConvertFn = &CFormatConverter::convert_yuv420_px1x_le;
+				m_pConvertFn = &CFormatConverter::convert_yuv420_px1x_le;
 			}
 			break;
 		case PixFmt_YUY2:
 			if (m_FProps.pftype == PFType_YUV422Px) {
-				pConvertFn = &CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le;
+				m_pConvertFn = &CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le;
 				m_RequiredAlignment = 8;
 			} else if (m_FProps.pftype == PFType_YUV420
 					|| (m_FProps.pftype == PFType_YUV420Px && m_FProps.lumabits <= 14)
 					|| m_FProps.pftype == PFType_NV12) {
-				pConvertFn = &CFormatConverter::convert_yuv420_yuy2;
+				m_pConvertFn = &CFormatConverter::convert_yuv420_yuy2;
 				m_RequiredAlignment = 8;
 			}
 			break;
 		case PixFmt_NV12:
 			if (m_FProps.pftype == PFType_NV12) {
-				pConvertFn = &CFormatConverter::plane_copy_sse2;
+				m_pConvertFn = &CFormatConverter::plane_copy_sse2;
 				break;
 			} else if (m_FProps.pftype == PFType_YUV420) {
-				pConvertFn = &CFormatConverter::convert_yuv420_nv12;
+				m_pConvertFn = &CFormatConverter::convert_yuv420_nv12;
 				m_RequiredAlignment = 32;
 			}
 		case PixFmt_YV12:
 			if (m_FProps.pftype == PFType_YUV420Px) {
-				pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
+				m_pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
 				m_RequiredAlignment = 32;
 			} else if (m_FProps.pftype == PFType_NV12) {
-				pConvertFn = &CFormatConverter::convert_nv12_yv12;
+				m_pConvertFn = &CFormatConverter::convert_nv12_yv12;
 				m_RequiredAlignment = 32;
 			} else if (m_FProps.pftype == PFType_P01x) {
-				pConvertFn = &CFormatConverter::convert_p010_nv12_sse2;
+				m_pConvertFn = &CFormatConverter::convert_p010_nv12_sse2;
 			}
 #if (0) // disabled because not increase performance
 			else if (m_FProps.pftype == PFType_YUV420) {
@@ -338,7 +326,7 @@ void CFormatConverter::SetConvertFunc()
 			break;
 		case PixFmt_YV16:
 			if (m_FProps.pftype == PFType_YUV422Px) {
-				pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
+				m_pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
 				m_RequiredAlignment = 32;
 			}
 #if (0) // disabled because not increase performance
@@ -349,10 +337,10 @@ void CFormatConverter::SetConvertFunc()
 			break;
 		case PixFmt_YV24:
 			if (m_FProps.pftype == PFType_YUV444Px) {
-				pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
+				m_pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
 				m_RequiredAlignment = 32;
 			} else if (m_FProps.pftype == PFType_YUV444) {
-				pConvertFn = &CFormatConverter::convert_yuv_yv;
+				m_pConvertFn = &CFormatConverter::convert_yuv_yv;
 				m_RequiredAlignment = 0;
 			}
 			break;
@@ -366,7 +354,7 @@ void CFormatConverter::SetConvertFunc()
 				case PFType_YUV444Px:
 				case PFType_NV12:
 				case PFType_P01x:
-					pConvertFn = &CFormatConverter::convert_yuv_rgb;
+					m_pConvertFn = &CFormatConverter::convert_yuv_rgb;
 					m_RequiredAlignment = 4;
 			}
 			break;
@@ -375,18 +363,18 @@ void CFormatConverter::SetConvertFunc()
 	if (CPUInfo::HaveSSE4()) {
 		if (m_FProps.pftype == PFType_NV12) {
 			if (m_out_pixfmt == PixFmt_NV12) {
-				pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
+				m_pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
 			}
 			else if (m_out_pixfmt == PixFmt_YV12) {
-				pConvertFn = &CFormatConverter::convert_nv12_yv12_direct_sse4;
+				m_pConvertFn = &CFormatConverter::convert_nv12_yv12_direct_sse4;
 			}
 		}
 		else if (m_FProps.pftype == PFType_P01x) {
 			if (m_out_pixfmt == PixFmt_P010 || m_out_pixfmt == PixFmt_P016) {
-				pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
+				m_pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
 			}
 			else if (m_out_pixfmt == PixFmt_NV12) {
-				pConvertFn = &CFormatConverter::convert_p010_nv12_direct_sse4;
+				m_pConvertFn = &CFormatConverter::convert_p010_nv12_direct_sse4;
 			}
 		}
 	}
@@ -435,7 +423,7 @@ bool CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		Cleanup();
 	}
 
-	if (!pConvertFn) {
+	if (!m_pConvertFn) {
 		SetConvertFunc();
 	}
 
@@ -472,7 +460,7 @@ bool CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		srcStride[i] = pFrame->linesize[i];
 	}
 
-	(this->*pConvertFn)(pFrame->data, srcStride, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);
+	(this->*m_pConvertFn)(pFrame->data, srcStride, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);
 
 	if (out != dst) {
 		int line = 0;
@@ -521,7 +509,7 @@ void CFormatConverter::Cleanup()
 		m_rgbCoeffs = nullptr;
 	}
 
-	pConvertFn = nullptr;
+	m_pConvertFn = nullptr;
 }
 
 bool CFormatConverter::FormatChanged(AVPixelFormat* fmt1, AVPixelFormat* fmt2)

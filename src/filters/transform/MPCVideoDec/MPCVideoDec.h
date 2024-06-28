@@ -57,54 +57,54 @@ private:
 	CCritSec								m_csInitDec;
 	CCritSec								m_csProps;
 	// === Persistants parameters (registry)
-	int										m_nThreadNumber;
-	MPC_SCAN_TYPE							m_nScanType;
-	int										m_nARMode;
+	int										m_nThreadNumber = 0;
+	MPC_SCAN_TYPE							m_nScanType = SCAN_AUTO;
+	int										m_nARMode = 2;
 	int										m_nDiscardMode;
 	MPCHwDecoder							m_nHwDecoder;
 	MPC_ADAPTER_ID							m_HwAdapter = {};
 	bool									m_bHwCodecs[HWCodec_count];
-	int										m_nDXVACheckCompatibility;
-	int										m_nDXVA_SD;
+	int										m_nDXVACheckCompatibility = 1;
+	int										m_nDXVA_SD = 0;
 	bool									m_fPixFmts[PixFmt_count];
-	int										m_nSwRGBLevels;
+	int										m_nSwRGBLevels = 0;
 	//
-	bool									m_VideoFilters[VDEC_COUNT];
+	bool									m_VideoFilters[VDEC_COUNT] = { true, false, false, };
 
 	bool									m_bEnableHwDecoding  = true; // internal (not saved)
-	bool									m_bDXVACompatible;
-	unsigned __int64						m_nActiveCodecs;
+	bool									m_bDXVACompatible = true;
+	unsigned __int64						m_nActiveCodecs = CODECS_ALL & ~CODEC_H264_MVC;
 
 	// === FFMpeg variables
-	const AVCodec*							m_pAVCodec;
-	AVCodecContext*							m_pAVCtx;
-	AVCodecParserContext*					m_pParser;
-	AVFrame*								m_pFrame;
+	const AVCodec*							m_pAVCodec = nullptr;
+	AVCodecContext*							m_pAVCtx   = nullptr;
+	AVCodecParserContext*					m_pParser  = nullptr;
+	AVFrame*								m_pFrame   = nullptr;
 	enum AVCodecID							m_CodecId;
-	REFERENCE_TIME							m_rtAvrTimePerFrame;
-	bool									m_bCalculateStopTime;
+	REFERENCE_TIME							m_rtAvrTimePerFrame = 0;
+	bool									m_bCalculateStopTime = false;
 
 	BYTE*									m_pFFBuffer = nullptr;
 	unsigned int							m_nFFBufferSize = 0;
 
-	bool									m_bReorderBFrame;
+	bool									m_bReorderBFrame = false;
 	struct Timings {
 		REFERENCE_TIME rtStart;
 		REFERENCE_TIME rtStop;
 	} m_tBFrameDelay[2];
-	int										m_nBFramePos;
+	int										m_nBFramePos = 0;
 
-	bool									m_bWaitKeyFrame;
+	bool									m_bWaitKeyFrame = false;
 
-	int										m_nARX, m_nARY;
+	int										m_nARX = 0, m_nARY = 0;
 
-	REFERENCE_TIME							m_rtLastStart;			// rtStart for last delivered frame
-	REFERENCE_TIME							m_rtLastStop;			// rtStop for last delivered frame
-	double									m_dRate;
+	REFERENCE_TIME							m_rtLastStart = INVALID_TIME; // rtStart for last delivered frame
+	REFERENCE_TIME							m_rtLastStop  = 0;            // rtStop for last delivered frame
+	double									m_dRate = 1.0;
 
-	bool									m_bUseFFmpeg;
-	bool									m_bUseDXVA;
-	bool									m_bUseD3D11;
+	bool									m_bUseFFmpeg = true;
+	bool									m_bUseDXVA   = true;
+	bool									m_bUseD3D11  = true;
 	CFormatConverter						m_FormatConverter;
 	CSize									m_pOutSize;				// Picture size on output pin
 
@@ -117,8 +117,8 @@ private:
 
 	// === common variables
 	std::vector<VIDEO_OUTPUT_FORMATS>		m_VideoOutputFormats;
-	CDXVA2Decoder*							m_pDXVADecoder;
-	GUID									m_DXVADecoderGUID;
+	CDXVA2Decoder*							m_pDXVADecoder = nullptr;
+	GUID									m_DXVADecoderGUID = GUID_NULL;
 	D3DFORMAT								m_DXVASurfaceFormat = D3DFMT_UNKNOWN;
 
 	UINT									m_nPCIVendor;
@@ -126,14 +126,11 @@ private:
 	UINT64									m_VideoDriverVersion;
 	CString									m_strDeviceDescription;
 
-	// === DXVA1 variables
-	DDPIXELFORMAT							m_DDPixelFormat;
-
 	// === DXVA2 variables
 	CComPtr<IDirect3DDeviceManager9>		m_pDeviceManager;
 	CComPtr<IDirectXVideoDecoderService>	m_pDecoderService;
 	DXVA2_ConfigPictureDecode				m_DXVA2Config;
-	HANDLE									m_hDevice;
+	HANDLE									m_hDevice = INVALID_HANDLE_VALUE;
 	DXVA2_VideoDesc							m_VideoDesc;
 
 	BOOL									m_bFailDXVA2Decode = FALSE;
@@ -141,27 +138,27 @@ private:
 
 	bool									m_bReinit = false;
 
-	BOOL									m_bWaitingForKeyFrame;
-	BOOL									m_bRVDropBFrameTimings;
+	BOOL									m_bWaitingForKeyFrame  = TRUE;
+	BOOL									m_bRVDropBFrameTimings = FALSE;
 
-	REFERENCE_TIME							m_rtStartCache;
+	REFERENCE_TIME							m_rtStartCache = INVALID_TIME;
 
-	DWORD									m_dwSYNC;
-	DWORD									m_dwSYNC2;
+	DWORD									m_dwSYNC  = 0;
+	DWORD									m_dwSYNC2 = 0;
 
 	CMediaType								m_pCurrentMediaType;
 	DXVA2_ExtendedFormat					m_inputDxvaExtFormat = {};
 
-	BOOL									m_bDecodingStart;
+	BOOL									m_bDecodingStart = FALSE;
 	BOOL									m_bDecoderAcceptFormat = FALSE;
 
 	bool									m_bHighBitdepth = false;
 
-	CMSDKDecoder*							m_pMSDKDecoder;
-	int										m_iMvcOutputMode;
-	bool									m_bMvcSwapLR;
+	CMSDKDecoder*							m_pMSDKDecoder   = nullptr;
+	int										m_iMvcOutputMode = MVC_OUTPUT_Auto;
+	bool									m_bMvcSwapLR     = false;
 
-	BOOL									m_MVC_Base_View_R_flag;
+	BOOL									m_MVC_Base_View_R_flag = FALSE;
 
 	CLSID									m_OutputFilterClsid = GUID_NULL;
 

@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2021 see Authors.txt
+ * (C) 2014-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -109,25 +109,25 @@ class CFormatConverter
 #define CONV_FUNC_PARAMS const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[]
 
 protected:
-	SwsContext*			m_pSwsContext;
-	FrameProps			m_FProps;
+	SwsContext*		m_pSwsContext = nullptr;
+	FrameProps		m_FProps;
 
-	MPCPixelFormat		m_out_pixfmt;
+	MPCPixelFormat	m_out_pixfmt = PixFmt_None;
 
-	int					m_dstRGBRange;
+	int				m_dstRGBRange = 0;
 
-	int					m_dstStride;
-	int					m_planeHeight;
-	int					m_OutHeight;
+	int				m_dstStride   = 0;
+	int				m_planeHeight = 0;
+	int				m_OutHeight   = 0;
 
-	size_t				m_nAlignedBufferSize;
-	uint8_t*			m_pAlignedBuffer;
+	size_t			m_nAlignedBufferSize = 0;
+	uint8_t*		m_pAlignedBuffer = nullptr;
 
-	int					m_nCPUFlag;
+	int				m_nCPUFlag = 0;
 
-	unsigned			m_RequiredAlignment;
+	unsigned		m_RequiredAlignment = 0;
 
-	int					m_NumThreads;
+	int				m_NumThreads = 1;
 
 	bool InitSWSContext();
 	void UpdateSWSContext();
@@ -146,7 +146,7 @@ protected:
 
 	// Conversion function pointer
 	typedef HRESULT (CFormatConverter::*ConverterFn)(CONV_FUNC_PARAMS);
-	ConverterFn pConvertFn;
+	ConverterFn m_pConvertFn = nullptr;
 
 	// from LAV Filters
 	HRESULT ConvertGeneric(CONV_FUNC_PARAMS);

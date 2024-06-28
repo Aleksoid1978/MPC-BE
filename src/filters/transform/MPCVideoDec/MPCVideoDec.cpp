@@ -1053,47 +1053,9 @@ BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
 
 CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CBaseVideoFilter(L"MPC - Video decoder", lpunk, phr, __uuidof(this))
-	, m_nThreadNumber(0)
 	, m_nDiscardMode(AVDISCARD_DEFAULT)
-	, m_nScanType(SCAN_AUTO)
-	, m_nARMode(2)
 	, m_nHwDecoder(SysVersion::IsWin8orLater() ? HWDec_D3D11 : HWDec_DXVA2)
-	, m_nDXVACheckCompatibility(1)
-	, m_nDXVA_SD(0)
-	, m_nSwRGBLevels(0)
-	, m_pAVCodec(nullptr)
-	, m_pAVCtx(nullptr)
-	, m_pFrame(nullptr)
-	, m_pParser(nullptr)
 	, m_CodecId(AV_CODEC_ID_NONE)
-	, m_bCalculateStopTime(false)
-	, m_bReorderBFrame(false)
-	, m_nBFramePos(0)
-	, m_bWaitKeyFrame(false)
-	, m_DXVADecoderGUID(GUID_NULL)
-	, m_nActiveCodecs(CODECS_ALL & ~CODEC_H264_MVC)
-	, m_rtAvrTimePerFrame(0)
-	, m_rtLastStart(INVALID_TIME)
-	, m_rtLastStop(0)
-	, m_rtStartCache(INVALID_TIME)
-	, m_bDXVACompatible(true)
-	, m_nARX(0)
-	, m_nARY(0)
-	, m_bUseDXVA(true)
-	, m_bUseD3D11(true)
-	, m_bUseFFmpeg(true)
-	, m_pDXVADecoder(nullptr)
-	, m_hDevice(INVALID_HANDLE_VALUE)
-	, m_bWaitingForKeyFrame(TRUE)
-	, m_bRVDropBFrameTimings(FALSE)
-	, m_dwSYNC(0)
-	, m_dwSYNC2(0)
-	, m_bDecodingStart(FALSE)
-	, m_dRate(1.0)
-	, m_pMSDKDecoder(nullptr)
-	, m_iMvcOutputMode(MVC_OUTPUT_Auto)
-	, m_bMvcSwapLR(false)
-	, m_MVC_Base_View_R_flag(FALSE)
 	, m_dxva_pix_fmt(AV_PIX_FMT_NONE)
 	, m_HWPixFmt(AV_PIX_FMT_NONE)
 {
@@ -1127,10 +1089,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 			m_fPixFmts[i] = true;
 		}
 	}
-
-	memset(&m_DDPixelFormat, 0, sizeof(m_DDPixelFormat));
-	memset(&m_VideoFilters, false, sizeof(m_VideoFilters));
-	m_VideoFilters[VDEC_UNCOMPRESSED] = true;
 
 #ifdef REGISTER_FILTER
 	CRegKey key;
