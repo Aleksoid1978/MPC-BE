@@ -924,7 +924,9 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 		return s;
 	}
 
-	if (m_ClipInfo.IsHdmv() && !m_ClipInfo.FindStream(s.pid)) {
+	constexpr WORD DV_SECONDARY_STREAM_PID_START = 4117;
+
+	if (m_ClipInfo.IsHdmv() && s.pid < DV_SECONDARY_STREAM_PID_START && !m_ClipInfo.FindStream(s.pid)) {
 		return s;
 	}
 
@@ -1026,7 +1028,24 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 			Seek(start);
 			auto& hevc = hevc_streams[s];
 			if (!m_streams[stream_type::video].Find(s) && Read(hevc.h, len, hevc.pData, &s.mt)) {
-				s.codec = stream_codec::HEVC;
+				bool bIsDVStream = false;
+				if (s.pid >= DV_SECONDARY_STREAM_PID_START && m_streams[stream_type::video].size() == 1 && m_streams[stream_type::video].front().codec == stream_codec::HEVC) {
+					CH265Nalu Nalu;
+					Nalu.SetBuffer(hevc.pData.data(), hevc.pData.size());
+					while (Nalu.ReadNext()) {
+						auto nalu_type = Nalu.GetType();
+						if (nalu_type == NALU_TYPE_HEVC_UNSPEC62) {
+							// Dolby Vision RPU
+							bIsDVStream = true;
+							break;
+						}
+					}
+
+					if (!bIsDVStream && hevc.pData.size() < MEGABYTE) {
+						return s;
+					}
+				}
+				s.codec = bIsDVStream ? stream_codec::HEVC_DV_SECONDARY : stream_codec::HEVC;
 				type = stream_type::video;
 			}
 		}

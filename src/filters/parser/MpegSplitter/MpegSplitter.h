@@ -75,6 +75,11 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	DWORD m_dwMasterH264TrackNumber   = DWORD_MAX;
 	DWORD m_dwMVCExtensionTrackNumber = DWORD_MAX;
 
+	BOOL  m_bHandleDVStream          = FALSE;
+	DWORD m_dwMasterDVTrackNumber    = DWORD_MAX;
+	DWORD m_dwSecondaryDVTrackNumber = DWORD_MAX;
+	std::unique_ptr<CPacket> m_MasterDVStreamPacket;
+
 	std::vector<SyncPoint> m_sps;
 
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);

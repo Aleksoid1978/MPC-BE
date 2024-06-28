@@ -192,6 +192,7 @@ public:
 		H264,
 		MVC,
 		HEVC,
+		HEVC_DV_SECONDARY,
 		MPEG,
 		VC1,
 		OPUS,

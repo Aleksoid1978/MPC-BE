@@ -742,6 +742,29 @@ HRESULT CMpegSplitterFilter::DeliverPacket(std::unique_ptr<CPacket> p)
 		}
 
 		return S_OK;
+	} else if (m_bHandleDVStream) {
+		if (TrackNumber == m_dwMasterDVTrackNumber) {
+			m_MasterDVStreamPacket = std::move(p);
+		} else if (TrackNumber == m_dwSecondaryDVTrackNumber && m_MasterDVStreamPacket) {
+			if (p->rtStart == m_MasterDVStreamPacket->rtStart) {
+				CH265Nalu Nalu;
+				Nalu.SetBuffer(p->data(), p->size());
+				while (Nalu.ReadNext()) {
+					auto nalu_type = Nalu.GetType();
+					if (nalu_type == NALU_TYPE_HEVC_UNSPEC62) {
+						// Dolby Vision RPU
+						// TODO - check for NALU_TYPE_HEVC_EOSEQ
+						m_MasterDVStreamPacket->AppendData(Nalu.GetNALBuffer(), Nalu.GetLength());
+					}
+				}
+
+				return __super::DeliverPacket(std::move(m_MasterDVStreamPacket));
+			}
+		} else {
+			return __super::DeliverPacket(std::move(p));
+		}
+
+		return S_OK;
 	}
 
 	return __super::DeliverPacket(std::move(p));
@@ -860,7 +883,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(const REFERENCE_TIME rtStartOffset)
 
 		if (h.payload && ISVALIDPID(h.pid)) {
 			const DWORD TrackNumber = h.pid;
-			if (GetOutputPin(TrackNumber) || TrackNumber == m_dwMVCExtensionTrackNumber) {
+			if (GetOutputPin(TrackNumber) || TrackNumber == m_dwMVCExtensionTrackNumber || TrackNumber == m_dwSecondaryDVTrackNumber) {
 				const __int64 pos = m_pFile->GetPos();
 				CMpegSplitterFile::peshdr peshdr;
 				if (h.payloadstart
@@ -1034,14 +1057,16 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 		if (SUCCEEDED(CreateAVCfromH264(&mt))) {
 			s.mts.push_back(mt);
 		}
-	}
-
-	if (mt.subtype == MEDIASUBTYPE_AMVC) {
+	} else if (mt.subtype == MEDIASUBTYPE_AMVC) {
 		s.mts.push_back(mt);
 		s.mt.subtype = MEDIASUBTYPE_H264;
 		if (SUCCEEDED(CreateAVCfromH264(&mt))) {
 			s.mts.push_back(mt);
 		}
+	} else if (s.codec == CMpegSplitterFile::stream_codec::HEVC_DV_SECONDARY) {
+		m_bHandleDVStream          = TRUE;
+		m_dwMasterDVTrackNumber    = m_pFile->m_streams[CMpegSplitterFile::stream_type::video].front();
+		m_dwSecondaryDVTrackNumber = s;
 	}
 
 	s.mts.push_back(s.mt);
@@ -1255,6 +1280,13 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		for (auto& s : m_pFile->m_streams[type]) {
 			HandleStream(s, fullName, IfoASpect.num, IfoASpect.den, palette);
 		}
+	}
+
+	auto& streams = m_pFile->m_streams[CMpegSplitterFile::stream_type::video];
+	if (streams.size() == 2 && streams.back().codec == CMpegSplitterFile::stream_codec::HEVC_DV_SECONDARY) {
+		// Remove Dolby Vision stream from streams list
+		auto it = streams.begin(); ++it;
+		streams.erase(it);
 	}
 
 	for (int type = CMpegSplitterFile::stream_type::video; type <= CMpegSplitterFile::stream_type::subpic; type++) {
