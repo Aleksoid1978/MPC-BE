@@ -6,7 +6,5 @@ static const FFBitStreamFilter * const bitstream_filters[] = {
     &ff_vp9_superframe_split_bsf,
     &ff_vvc_metadata_bsf,
     &ff_vvc_mp4toannexb_bsf,
-    &ff_vvc_metadata_bsf,
-    &ff_vvc_mp4toannexb_bsf,
     NULL
 };
