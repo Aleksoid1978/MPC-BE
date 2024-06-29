@@ -1562,13 +1562,13 @@ static int FUNC(sps)(CodedBitstreamContext *ctx, RWContext *rw,
         flag(sps_virtual_boundaries_present_flag);
         if (current->sps_virtual_boundaries_present_flag) {
             ue(sps_num_ver_virtual_boundaries,
-               0, current->sps_pic_width_max_in_luma_samples <= 8 ? 0 : 3);
+               0, current->sps_pic_width_max_in_luma_samples <= 8 ? 0 : VVC_MAX_VBS);
             for (i = 0; i < current->sps_num_ver_virtual_boundaries; i++)
                 ues(sps_virtual_boundary_pos_x_minus1[i],
                     0, (current->sps_pic_width_max_in_luma_samples + 7) / 8 - 2,
                     1, i);
             ue(sps_num_hor_virtual_boundaries,
-               0, current->sps_pic_height_max_in_luma_samples <= 8 ? 0 : 3);
+               0, current->sps_pic_height_max_in_luma_samples <= 8 ? 0 : VVC_MAX_VBS);
             for (i = 0; i < current->sps_num_hor_virtual_boundaries; i++)
                 ues(sps_virtual_boundary_pos_y_minus1[i],
                     0, (current->sps_pic_height_max_in_luma_samples + 7) /
@@ -2714,13 +2714,13 @@ static int FUNC(picture_header) (CodedBitstreamContext *ctx, RWContext *rw,
         flag(ph_virtual_boundaries_present_flag);
         if (current->ph_virtual_boundaries_present_flag) {
             ue(ph_num_ver_virtual_boundaries,
-               0, pps->pps_pic_width_in_luma_samples <= 8 ? 0 : 3);
+               0, pps->pps_pic_width_in_luma_samples <= 8 ? 0 : VVC_MAX_VBS);
             for (i = 0; i < current->ph_num_ver_virtual_boundaries; i++) {
                 ues(ph_virtual_boundary_pos_x_minus1[i],
                     0, (pps->pps_pic_width_in_luma_samples + 7) / 8 - 2, 1, i);
             }
             ue(ph_num_hor_virtual_boundaries,
-               0, pps->pps_pic_height_in_luma_samples <= 8 ? 0 : 3);
+               0, pps->pps_pic_height_in_luma_samples <= 8 ? 0 : VVC_MAX_VBS);
             for (i = 0; i < current->ph_num_hor_virtual_boundaries; i++) {
                 ues(ph_virtual_boundary_pos_y_minus1[i],
                     0, (pps->pps_pic_height_in_luma_samples + 7) / 8 - 2, 1, i);
@@ -3439,34 +3439,6 @@ static int FUNC(slice_header) (CodedBitstreamContext *ctx, RWContext *rw,
     }
     CHECK(FUNC(byte_alignment) (ctx, rw));
 
-    return 0;
-}
-
-SEI_FUNC(sei_decoded_picture_hash, (CodedBitstreamContext *ctx,
-                                    RWContext *rw,
-                                    H266RawSEIDecodedPictureHash *current,
-                                    SEIMessageState *unused))
-{
-    int err, c_idx, i;
-
-    HEADER("Decoded Picture Hash");
-
-    u(8, dph_sei_hash_type, 0, 2);
-    flag(dph_sei_single_component_flag);
-    ub(7, dph_sei_reserved_zero_7bits);
-
-    for (c_idx = 0; c_idx < (current->dph_sei_single_component_flag ? 1 : 3);
-         c_idx++) {
-        if (current->dph_sei_hash_type == 0) {
-            for (i = 0; i < 16; i++)
-                us(8, dph_sei_picture_md5[c_idx][i], 0x00, 0xff, 2, c_idx, i);
-        } else if (current->dph_sei_hash_type == 1) {
-            us(16, dph_sei_picture_crc[c_idx], 0x0000, 0xffff, 1, c_idx);
-        } else if (current->dph_sei_hash_type == 2) {
-            us(32, dph_sei_picture_checksum[c_idx], 0x00000000, 0xffffffff, 1,
-               c_idx);
-        }
-    }
     return 0;
 }
 

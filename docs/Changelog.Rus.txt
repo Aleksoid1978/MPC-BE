@@ -11,8 +11,8 @@
 Обновлен японский перевод (автор tsubasanouta).
 
 Обновлены библиотеки:
-	ffmpeg git-n7.1-dev-1509-g0c0e7ec81e;
-	vvdec git-v2.3.0-24-gad8f4bb.
+	ffmpeg n7.1-dev-1585-g0b330d8642;
+	vvdec v2.3.0-24-gad8f4bb.
 
 
 1.7.2 - 2024-06-07

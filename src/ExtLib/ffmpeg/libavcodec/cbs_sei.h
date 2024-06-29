@@ -43,6 +43,36 @@ typedef struct SEIRawUserDataUnregistered {
     size_t       data_length;
 } SEIRawUserDataUnregistered;
 
+typedef struct SEIRawFramePackingArrangement {
+    uint32_t fp_arrangement_id;
+    uint8_t fp_arrangement_cancel_flag;
+    uint8_t fp_arrangement_type;
+    uint8_t fp_quincunx_sampling_flag;
+    uint8_t fp_content_interpretation_type;
+    uint8_t fp_spatial_flipping_flag;
+    uint8_t fp_frame0_flipped_flag;
+    uint8_t fp_field_views_flag;
+    uint8_t fp_current_frame_is_frame0_flag;
+    uint8_t fp_frame0_self_contained_flag;
+    uint8_t fp_frame1_self_contained_flag;
+    uint8_t fp_frame0_grid_position_x;
+    uint8_t fp_frame0_grid_position_y;
+    uint8_t fp_frame1_grid_position_x;
+    uint8_t fp_frame1_grid_position_y;
+    uint8_t fp_arrangement_persistence_flag;
+    uint8_t fp_upsampled_aspect_ratio_flag;
+} SEIRawFramePackingArrangement;
+
+typedef struct SEIRawDecodedPictureHash {
+    uint8_t  dph_sei_hash_type;
+    uint8_t  dph_sei_single_component_flag;
+    uint8_t  dph_sei_picture_md5[3][16];
+    uint16_t dph_sei_picture_crc[3];
+    uint32_t dph_sei_picture_checksum[3];
+
+    uint8_t  dph_sei_reserved_zero_7bits;
+} SEIRawDecodedPictureHash;
+
 typedef struct SEIRawMasteringDisplayColourVolume {
     uint16_t display_primaries_x[3];
     uint16_t display_primaries_y[3];

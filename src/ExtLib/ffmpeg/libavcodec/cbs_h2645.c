@@ -2129,6 +2129,18 @@ static const SEIMessageTypeDescriptor cbs_sei_common_types[] = {
         SEI_MESSAGE_RW(sei, user_data_unregistered),
     },
     {
+        SEI_TYPE_FRAME_PACKING_ARRANGEMENT,
+        1, 0,
+        sizeof(SEIRawFramePackingArrangement),
+        SEI_MESSAGE_RW(sei, frame_packing_arrangement),
+    },
+    {
+        SEI_TYPE_DECODED_PICTURE_HASH,
+        0, 1,
+        sizeof(SEIRawDecodedPictureHash),
+        SEI_MESSAGE_RW(sei, decoded_picture_hash),
+    },
+    {
         SEI_TYPE_MASTERING_DISPLAY_COLOUR_VOLUME,
         1, 0,
         sizeof(SEIRawMasteringDisplayColourVolume),
@@ -2185,6 +2197,12 @@ static const SEIMessageTypeDescriptor cbs_sei_h264_types[] = {
         1, 0,
         sizeof(H264RawFilmGrainCharacteristics),
         SEI_MESSAGE_RW(h264, film_grain_characteristics),
+    },
+    {
+        SEI_TYPE_FRAME_PACKING_ARRANGEMENT,
+        1, 0,
+        sizeof(H264RawSEIFramePackingArrangement),
+        SEI_MESSAGE_RW(h264, sei_frame_packing_arrangement),
     },
     {
         SEI_TYPE_DISPLAY_ORIENTATION,
@@ -2260,12 +2278,6 @@ static const SEIMessageTypeDescriptor cbs_sei_h265_types[] = {
 };
 
 static const SEIMessageTypeDescriptor cbs_sei_h266_types[] = {
-    {
-        SEI_TYPE_DECODED_PICTURE_HASH,
-        0, 1,
-        sizeof(H266RawSEIDecodedPictureHash),
-        SEI_MESSAGE_RW(h266, sei_decoded_picture_hash),
-    },
     SEI_MESSAGE_TYPE_END
 };
 
@@ -2274,11 +2286,6 @@ const SEIMessageTypeDescriptor *ff_cbs_sei_find_type(CodedBitstreamContext *ctx,
 {
     const SEIMessageTypeDescriptor *codec_list;
     int i;
-
-    for (i = 0; cbs_sei_common_types[i].type >= 0; i++) {
-        if (cbs_sei_common_types[i].type == payload_type)
-            return &cbs_sei_common_types[i];
-    }
 
     switch (ctx->codec->codec_id) {
     case AV_CODEC_ID_H264:
@@ -2297,6 +2304,11 @@ const SEIMessageTypeDescriptor *ff_cbs_sei_find_type(CodedBitstreamContext *ctx,
     for (i = 0; codec_list[i].type >= 0; i++) {
         if (codec_list[i].type == payload_type)
             return &codec_list[i];
+    }
+
+    for (i = 0; cbs_sei_common_types[i].type >= 0; i++) {
+        if (cbs_sei_common_types[i].type == payload_type)
+            return &cbs_sei_common_types[i];
     }
 
     return NULL;

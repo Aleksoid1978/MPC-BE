@@ -136,6 +136,11 @@ enum AVStereo3DType {
      * @endcode
      */
     AV_STEREO3D_COLUMNS,
+
+    /**
+     * Video is stereoscopic but the packing is unspecified.
+     */
+    AV_STEREO3D_UNSPEC,
 };
 
 /**
@@ -156,6 +161,11 @@ enum AVStereo3DView {
      * Frame contains only the right view.
      */
     AV_STEREO3D_VIEW_RIGHT,
+
+    /**
+     * Content is unspecified.
+     */
+    AV_STEREO3D_VIEW_UNSPEC,
 };
 
 /**
@@ -224,9 +234,9 @@ typedef struct AVStereo3D {
     AVRational horizontal_disparity_adjustment;
 
     /**
-     * Horizontal field of view in thousanths of a degree. Zero if unset.
+     * Horizontal field of view, in degrees. Zero if unset.
      */
-    uint32_t horizontal_field_of_view;
+    AVRational horizontal_field_of_view;
 } AVStereo3D;
 
 /**
@@ -236,6 +246,14 @@ typedef struct AVStereo3D {
  * @return An AVStereo3D filled with default values or NULL on failure.
  */
 AVStereo3D *av_stereo3d_alloc(void);
+
+/**
+ * Allocate an AVStereo3D structure and set its fields to default values.
+ * The resulting struct can be freed using av_freep().
+ *
+ * @return An AVStereo3D filled with default values or NULL on failure.
+ */
+AVStereo3D *av_stereo3d_alloc_size(size_t *size);
 
 /**
  * Allocate a complete AVFrameSideData and add it to the frame.

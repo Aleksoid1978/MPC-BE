@@ -464,9 +464,9 @@ typedef struct H266RawSPS {
     uint8_t  sps_virtual_boundaries_enabled_flag;
     uint8_t  sps_virtual_boundaries_present_flag;
     uint8_t  sps_num_ver_virtual_boundaries;
-    uint16_t sps_virtual_boundary_pos_x_minus1[3];
+    uint16_t sps_virtual_boundary_pos_x_minus1[VVC_MAX_VBS];
     uint8_t  sps_num_hor_virtual_boundaries;
-    uint16_t sps_virtual_boundary_pos_y_minus1[3];
+    uint16_t sps_virtual_boundary_pos_y_minus1[VVC_MAX_VBS];
 
     uint8_t  sps_timing_hrd_params_present_flag;
     uint8_t  sps_sublayer_cpb_params_present_flag;
@@ -703,9 +703,9 @@ typedef struct  H266RawPictureHeader {
 
     uint8_t  ph_virtual_boundaries_present_flag;
     uint8_t  ph_num_ver_virtual_boundaries;
-    uint16_t ph_virtual_boundary_pos_x_minus1[3];
+    uint16_t ph_virtual_boundary_pos_x_minus1[VVC_MAX_VBS];
     uint8_t  ph_num_hor_virtual_boundaries;
-    uint16_t ph_virtual_boundary_pos_y_minus1[3];
+    uint16_t ph_virtual_boundary_pos_y_minus1[VVC_MAX_VBS];
 
     uint8_t  ph_pic_output_flag;
     H266RefPicLists ph_ref_pic_lists;
@@ -847,16 +847,6 @@ typedef struct H266RawSlice {
     size_t       data_size;
     int          data_bit_start;
 } H266RawSlice;
-
-typedef struct H266RawSEIDecodedPictureHash {
-    uint8_t  dph_sei_hash_type;
-    uint8_t  dph_sei_single_component_flag;
-    uint8_t  dph_sei_picture_md5[3][16];
-    uint16_t dph_sei_picture_crc[3];
-    uint32_t dph_sei_picture_checksum[3];
-
-    uint8_t  dph_sei_reserved_zero_7bits;
-} H266RawSEIDecodedPictureHash;
 
 typedef struct H266RawSEI {
     H266RawNALUnitHeader nal_unit_header;

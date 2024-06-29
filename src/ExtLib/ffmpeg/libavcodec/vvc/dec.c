@@ -191,14 +191,12 @@ static void bs_tl_init(TabList *l, VVCFrameContext *fc)
 
     tl_init(l, 1, changed);
 
-    for (int i = 0; i < VVC_MAX_SAMPLE_ARRAYS; i++) {
-        TL_ADD(horizontal_bs[i], bs_count);
-        TL_ADD(vertical_bs[i],   bs_count);
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < VVC_MAX_SAMPLE_ARRAYS; j++)
+            TL_ADD(bs[i][j], bs_count);
+        TL_ADD(max_len_p[i], bs_count);
+        TL_ADD(max_len_q[i], bs_count);
     }
-    TL_ADD(horizontal_q, bs_count);
-    TL_ADD(horizontal_p, bs_count);
-    TL_ADD(vertical_p,   bs_count);
-    TL_ADD(vertical_q,   bs_count);
 }
 
 static void pixel_buffer_nz_tl_init(TabList *l, VVCFrameContext *fc)
@@ -1028,7 +1026,7 @@ static av_cold int vvc_decode_init(AVCodecContext *avctx)
     static AVOnce init_static_once = AV_ONCE_INIT;
     const int cpu_count            = av_cpu_count();
     const int delayed              = FFMIN(cpu_count, VVC_MAX_DELAYED_FRAMES);
-    const int thread_count         = avctx->thread_count ? avctx->thread_count : delayed;
+    int thread_count               = avctx->thread_count ? avctx->thread_count : delayed;
     int ret;
 
     s->avctx = avctx;
@@ -1055,6 +1053,8 @@ static av_cold int vvc_decode_init(AVCodecContext *avctx)
             return ret;
     }
 
+    if (thread_count == 1)
+        thread_count = 0;
     s->executor = ff_vvc_executor_alloc(s, thread_count);
     if (!s->executor)
         return AVERROR(ENOMEM);

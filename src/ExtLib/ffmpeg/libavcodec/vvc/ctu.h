@@ -461,9 +461,14 @@ typedef struct ALFParams {
     uint8_t ctb_filt_set_idx_y;         ///< AlfCtbFiltSetIdxY
     uint8_t alf_ctb_filter_alt_idx[2];  ///< alf_ctb_filter_alt_idx[]
     uint8_t ctb_cc_idc[2];              ///< alf_ctb_cc_cb_idc, alf_ctb_cc_cr_idc
-
-    uint8_t applied[3];
 } ALFParams;
+
+typedef struct VVCRect {
+    int l;                  // left
+    int t;                  // top
+    int r;                  // right
+    int b;                  // bottom
+} VVCRect;
 
 /**
  * parse a CTU
