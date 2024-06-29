@@ -2,6 +2,14 @@
 
 1.7.2.x dev
 =============================
+MpegSplitter
+Improved support for Dolby Vision Profile 7.
+
+MPCVideoDec
+The VVdeC decoder is now used for VVC video on processors without SSE4.1 support.
+Fixed P010 to YV12 conversion.
+Optimized P010 to NV12 conversion for processors without SSE4.
+
 Player
 Improved support for moving the file properties window between displays with different text scaling.
 Fixed remembering the position of some DVD-Videos.
