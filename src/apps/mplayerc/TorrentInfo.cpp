@@ -22,7 +22,8 @@
 #include "stdafx.h"
 #include "TorrentInfo.h"
 #include <assert.h>
-#include <wincrypt.h>
+#include <bcrypt.h>   // for calc SHA-1
+#include <winternl.h> // for NT_SUCCESS()
 
 struct bt_node {
 	enum data_type {
@@ -267,36 +268,32 @@ const std::wstring CTorrentInfo::CalcInfoHash() const
 		return std::wstring();
 	}
 
-	unsigned char infoHash[20 /* SHA1 hash lenght*/] = {};
-
 	//Calculate SHA1 info hash
-	HCRYPTPROV crypt_prov = NULL;
-	HCRYPTHASH crypt_hash = NULL;
-	DWORD sz = std::size(infoHash);
-	const BOOL ret =
-		CryptAcquireContextW(&crypt_prov, nullptr, nullptr, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT) &&
-		CryptCreateHash(crypt_prov, CALG_SHA1, 0, 0, &crypt_hash) &&
-		CryptHashData(crypt_hash, &m_data[info->offset], static_cast<DWORD>(info->length), 0) &&
-		CryptGetHashParam(crypt_hash, HP_HASHVAL, infoHash, &sz, 0);
-	if (crypt_hash) {
-		CryptDestroyHash(crypt_hash);
-	}
-	if (crypt_prov) {
-		CryptReleaseContext(crypt_prov, 0);
+	std::wstring infoHash;
+
+	BCRYPT_ALG_HANDLE hAlg = nullptr;
+	if (NT_SUCCESS(::BCryptOpenAlgorithmProvider(&hAlg, BCRYPT_SHA1_ALGORITHM, nullptr, 0))) {
+		BCRYPT_HASH_HANDLE hHash = nullptr;
+		// As of Windows 7 the hash handle will manage its own object buffer when
+		// pbHashObject is nullptr and cbHashObject is 0.
+		if (NT_SUCCESS(::BCryptCreateHash(hAlg, &hHash, nullptr, 0, nullptr, 0, 0))) {
+			// BCryptHashData promises not to modify pbInput.
+			if (NT_SUCCESS(::BCryptHashData(hHash, (PUCHAR)&m_data[info->offset], info->length, 0))) {
+				UCHAR hash[20] = {};
+				if (NT_SUCCESS(::BCryptFinishHash(hHash, hash, std::size(hash), 0))) {
+					for (const auto& b : hash) {
+						wchar_t d[3];
+						swprintf_s(d, L"%02x", b);
+						infoHash += d;
+					}
+				}
+			}
+			::BCryptDestroyHash(hHash);
+		}
+		::BCryptCloseAlgorithmProvider(hAlg, 0);
 	}
 
-	if (!ret) {
-		return std::wstring();
-	}
-
-	std::wstring hashCode;
-	for (const auto& hash : infoHash) {
-		wchar_t d[3];
-		swprintf_s(d, L"%02x", hash);
-		hashCode += d;
-	}
-
-	return hashCode;
+	return infoHash;
 }
 
 void CTorrentInfo::GetAnnounceList(const bt_node* nodeAnnounce, std::list<std::string>& list) const
