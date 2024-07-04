@@ -16,7 +16,7 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#if VER < EncodeVer(6,2,2)
+#if VER < EncodeVer(6,3,1)
   #error A more recent version of Inno Setup 6 is required to compile this script (6.2.2 or newer)
 #endif
 #ifndef UNICODE
@@ -146,7 +146,7 @@ Name: hu; MessagesFile: compiler:Languages\Hungarian.isl
 Name: hy; MessagesFile: compiler:Languages\Armenian.isl
 Name: it; MessagesFile: compiler:Languages\Italian.isl
 Name: ja; MessagesFile: compiler:Languages\Japanese.isl
-Name: kr; MessagesFile: Languages\Korean.isl
+Name: kr; MessagesFile: compiler:Languages\Korean.isl
 Name: nl; MessagesFile: compiler:Languages\Dutch.isl
 Name: pl; MessagesFile: compiler:Languages\Polish.isl
 Name: ro; MessagesFile: Languages\Romanian.isl

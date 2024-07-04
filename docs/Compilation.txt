@@ -29,7 +29,7 @@
 
 
 3. Additional optional components
-  3.1. Inno Setup 6.2.2 or never (https://jrsoftware.org/isdl.php).
+  3.1. Inno Setup 6.3.1 or never (https://jrsoftware.org/isdl.php).
   3.2. 7-zip file archiver (https://www.7-zip.org/download.html).
 
 
