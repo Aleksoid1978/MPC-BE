@@ -56,9 +56,6 @@ static String mi_get_lang_file()
 						delete [] wstr;
 					}
 				}
-
-				UnlockResource(lRes);
-				FreeResource(lRes);
 			}
 			FreeLibrary(mpcres);
 		}
