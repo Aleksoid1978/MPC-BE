@@ -1,5 +1,5 @@
 /*
- * (C) 2019 see Authors.txt
+ * (C) 2019-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,15 +30,15 @@ public:
 	~CTorrentInfo();
 
 	const bool Read(const wchar_t* fileName);
-	const std::wstring Magnet() const;
+	std::wstring Magnet() const;
 
 private:
 	bt_node* Decode();
 	const __int64 ReadInteger();
-	const std::string ReadString();
+	std::string ReadString();
 	const bt_node* Search(const char* nodeName, const bt_node* nodeParent) const;
 
-	const std::wstring CalcInfoHash() const;
+	std::wstring CalcInfoHash() const;
 	void GetAnnounceList(const bt_node* nodeAnnounce, std::list<std::string>& list) const;
 
 private:

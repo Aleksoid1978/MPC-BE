@@ -120,7 +120,7 @@ const bool CTorrentInfo::Read(const wchar_t* fileName)
 	return true;
 }
 
-const std::wstring CTorrentInfo::Magnet() const
+std::wstring CTorrentInfo::Magnet() const
 {
 	std::wstring magnet;
 
@@ -223,7 +223,7 @@ const __int64 CTorrentInfo::ReadInteger()
 	return _atoi64(num.c_str());
 }
 
-const std::string CTorrentInfo::ReadString()
+std::string CTorrentInfo::ReadString()
 {
 	std::string len;
 	while (m_offset < m_data.size() && m_data[m_offset] != ':') {
@@ -261,7 +261,7 @@ const bt_node* CTorrentInfo::Search(const char* nodeName, const bt_node* nodePar
 	return nullptr;
 }
 
-const std::wstring CTorrentInfo::CalcInfoHash() const
+std::wstring CTorrentInfo::CalcInfoHash() const
 {
 	auto info = Search("info", m_root);
 	if (!info || info->type != bt_node::dt_dictionary) {
