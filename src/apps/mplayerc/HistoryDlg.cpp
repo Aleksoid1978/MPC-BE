@@ -1,5 +1,5 @@
 /*
- * (C) 2021-2023 see Authors.txt
+ * (C) 2021-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -386,7 +386,7 @@ void CHistoryDlg::OnDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 	int nItem = ((NM_LISTVIEW *)pNMHDR)->iItem;
 	size_t index = m_list.GetItemData(nItem);
 
-	if (index < (int)m_recentSessions.size()) {
+	if (index < m_recentSessions.size()) {
 		const auto& sesInfo = m_recentSessions[index];
 
 		auto pFrame = AfxGetMainFrame();

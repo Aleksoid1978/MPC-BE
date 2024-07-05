@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -350,7 +350,7 @@ bool CVobSubFile::Open(CString fn)
 				sp[j].bForced = false;
 
 				int packetsize = 0, datasize = 0;
-				BYTE* buff = GetPacket((int)j, packetsize, datasize, i);
+				BYTE* buff = GetPacket(j, packetsize, datasize, i);
 				if (!buff) {
 					sp[j].bValid = false;
 					continue;
@@ -1731,7 +1731,7 @@ bool CVobSubFile::SaveWinSubMux(CString fn)
 
 	std::vector<SubPos>& sp = m_langs[m_nLang].subpos;
 	for (size_t i = 0; i < sp.size(); i++) {
-		if (!GetFrame((int)i)) {
+		if (!GetFrame(i)) {
 			continue;
 		}
 
@@ -1967,7 +1967,7 @@ bool CVobSubFile::SaveScenarist(CString fn)
 
 	std::vector<SubPos>& sp = m_langs[m_nLang].subpos;
 	for (size_t i = 0, k = 0; i < sp.size(); i++) {
-		if (!GetFrame((int)i)) {
+		if (!GetFrame(i)) {
 			continue;
 		}
 
@@ -2197,7 +2197,7 @@ bool CVobSubFile::SaveMaestro(CString fn)
 
 	std::vector<SubPos>& sp = m_langs[m_nLang].subpos;
 	for (size_t i = 0, k = 0; i < sp.size(); i++) {
-		if (!GetFrame((int)i)) {
+		if (!GetFrame(i)) {
 			continue;
 		}
 
