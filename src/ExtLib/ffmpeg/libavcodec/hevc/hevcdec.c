@@ -550,8 +550,7 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
     return ff_get_format(s->avctx, pix_fmts);
 }
 
-static int set_sps(HEVCContext *s, const HEVCSPS *sps,
-                   enum AVPixelFormat pix_fmt)
+static int set_sps(HEVCContext *s, const HEVCSPS *sps)
 {
     int ret, i;
 
@@ -565,10 +564,6 @@ static int set_sps(HEVCContext *s, const HEVCSPS *sps,
     ret = pic_arrays_init(s, sps);
     if (ret < 0)
         goto fail;
-
-    export_stream_params(s, sps);
-
-    s->avctx->pix_fmt = pix_fmt;
 
     ff_hevc_pred_init(&s->hpc,     sps->bit_depth);
     ff_hevc_dsp_init (&s->hevcdsp, sps->bit_depth);
@@ -632,7 +627,7 @@ static int hls_slice_header(SliceHeader *sh, const HEVCContext *s, GetBitContext
         av_log(s->avctx, AV_LOG_ERROR, "PPS id out of range: %d\n", pps_id);
         return AVERROR_INVALIDDATA;
     }
-    if (!sh->first_slice_in_pic_flag && pps_id != sh->pps_id) {
+    if (!sh->first_slice_in_pic_flag && s->ps.pps_list[pps_id] != s->pps) {
         av_log(s->avctx, AV_LOG_ERROR, "PPS changed between slices.\n");
         return AVERROR_INVALIDDATA;
     }
@@ -2950,9 +2945,11 @@ static int hevc_frame_start(HEVCContext *s)
 
         ff_hevc_clear_refs(s);
 
-        ret = set_sps(s, sps, sps->pix_fmt);
+        ret = set_sps(s, sps);
         if (ret < 0)
             return ret;
+
+        export_stream_params(s, sps);
 
         pix_fmt = get_format(s, sps);
         if (pix_fmt < 0)
@@ -2996,6 +2993,10 @@ static int hevc_frame_start(HEVCContext *s)
     if (pps->tiles_enabled_flag)
         s->local_ctx[0].end_of_tiles_x = pps->column_width[0] << sps->log2_ctb_size;
 
+    ret = export_stream_params_from_sei(s);
+    if (ret < 0)
+        return ret;
+
     ret = ff_hevc_set_new_ref(s, s->poc);
     if (ret < 0)
         goto fail;
@@ -3015,10 +3016,6 @@ static int hevc_frame_start(HEVCContext *s)
                               s->sei.common.aom_film_grain.enable) &&
         !(s->avctx->export_side_data & AV_CODEC_EXPORT_DATA_FILM_GRAIN) &&
         !s->avctx->hwaccel;
-
-    ret = export_stream_params_from_sei(s);
-    if (ret < 0)
-        return ret;
 
     ret = set_side_data(s);
     if (ret < 0)
@@ -3624,7 +3621,7 @@ static int hevc_update_thread_context(AVCodecContext *dst,
     ff_refstruct_unref(&s->pps);
 
     if (s->ps.sps != s0->ps.sps)
-        if ((ret = set_sps(s, s0->ps.sps, src->pix_fmt)) < 0)
+        if ((ret = set_sps(s, s0->ps.sps)) < 0)
             return ret;
 
     s->seq_decode = s0->seq_decode;
@@ -3668,10 +3665,6 @@ static int hevc_update_thread_context(AVCodecContext *dst,
     s->sei.common.mastering_display    = s0->sei.common.mastering_display;
     s->sei.common.content_light        = s0->sei.common.content_light;
     s->sei.common.aom_film_grain       = s0->sei.common.aom_film_grain;
-
-    ret = export_stream_params_from_sei(s);
-    if (ret < 0)
-        return ret;
 
     return 0;
 }
