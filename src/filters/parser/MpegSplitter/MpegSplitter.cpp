@@ -744,9 +744,12 @@ HRESULT CMpegSplitterFilter::DeliverPacket(std::unique_ptr<CPacket> p)
 		return S_OK;
 	} else if (m_bHandleDVStream) {
 		if (TrackNumber == m_dwMasterDVTrackNumber) {
+			if (m_MasterDVStreamPacket) {
+				__super::DeliverPacket(std::move(m_MasterDVStreamPacket));
+			}
 			m_MasterDVStreamPacket = std::move(p);
-		} else if (TrackNumber == m_dwSecondaryDVTrackNumber && m_MasterDVStreamPacket) {
-			if (p->rtStart == m_MasterDVStreamPacket->rtStart) {
+		} else if (TrackNumber == m_dwSecondaryDVTrackNumber) {
+			if (m_MasterDVStreamPacket && p->rtStart == m_MasterDVStreamPacket->rtStart) {
 				CH265Nalu Nalu;
 				Nalu.SetBuffer(p->data(), p->size());
 				while (Nalu.ReadNext()) {
@@ -755,11 +758,9 @@ HRESULT CMpegSplitterFilter::DeliverPacket(std::unique_ptr<CPacket> p)
 						// Dolby Vision RPU
 						// TODO - check for NALU_TYPE_HEVC_EOSEQ
 						m_MasterDVStreamPacket->AppendData(Nalu.GetNALBuffer(), Nalu.GetLength());
-						break;
+						return __super::DeliverPacket(std::move(m_MasterDVStreamPacket));
 					}
 				}
-
-				return __super::DeliverPacket(std::move(m_MasterDVStreamPacket));
 			}
 		} else {
 			return __super::DeliverPacket(std::move(p));
@@ -1499,6 +1500,8 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 	m_MVCExtensionQueue.clear();
 	m_MVCBaseQueue.clear();
+
+	m_MasterDVStreamPacket.reset();
 
 	if (rt == 0) {
 		m_pFile->Seek(m_pFile->m_posMin);
