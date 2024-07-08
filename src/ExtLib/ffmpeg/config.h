@@ -148,12 +148,13 @@
 	#define CONFIG_PIC 0
 
 	#define ARCH_X86 1
-	#ifdef ARCH_X86_64
+	#ifdef _WIN64
+		#define ARCH_X86_32 0
 		#define ARCH_X86_64 1
 	#else
+		#define ARCH_X86_32 1
 		#define ARCH_X86_64 0
 	#endif
-	#define ARCH_X86_32 0
 
 	#define av_restrict
 	#define __asm__ __asm
