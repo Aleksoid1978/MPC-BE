@@ -269,11 +269,18 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, BITMAPINFOHEADER* pBMI)
 			break;
 		case AV_CODEC_ID_FFV1:
 			if (pAVCtx->priv_data) {
-				const FFV1Context* h = (FFV1Context*)pAVCtx->priv_data;
-				if (h->version > 0) { // extra data has been parse
-					if (h->colorspace == 0) {
+				auto f = static_cast<FFV1Context*>(pAVCtx->priv_data);
+				if (!f->version) {
+					if (ff_ffv1_parse_extra_data(pAVCtx) < 0) {
+						break;
+					}
+				}
+				if (f->version > 0) { // extra data has been parse
+					if (f->colorspace == 0) {
+						auto chorma_shift = 16 * f->chroma_h_shift + f->chroma_v_shift;
+
 						if (pAVCtx->bits_per_raw_sample <= 8) { // <=8 bit and transparency
-							switch (16 * h->chroma_h_shift + h->chroma_v_shift) {
+							switch (chorma_shift) {
 							case 0x00: pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P; break;
 							case 0x01: pAVCtx->pix_fmt = AV_PIX_FMT_YUV440P; break;
 							case 0x10: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; break;
@@ -283,21 +290,21 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, BITMAPINFOHEADER* pBMI)
 							}
 						}
 						else if (pAVCtx->bits_per_raw_sample <= 10) { // 9, 10 bit and transparency
-							switch (16 * h->chroma_h_shift + h->chroma_v_shift) {
+							switch (chorma_shift) {
 							case 0x00: pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P10; break;
 							case 0x10: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10; break;
 							case 0x11: pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P10; break;
 							}
 						}
 						else if (pAVCtx->bits_per_raw_sample <= 16) { // 12, 14, 16 bit and transparency
-							switch (16 * h->chroma_h_shift + h->chroma_v_shift) {
+							switch (chorma_shift) {
 							case 0x00: pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P16; break;
 							case 0x10: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P16; break;
 							case 0x11: pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P16; break;
 							}
 						}
 					}
-					else if (h->colorspace == 1) {
+					else if (f->colorspace == 1) {
 						pAVCtx->pix_fmt = AV_PIX_FMT_RGBA; // and other RGB formats, but it is not important here
 					}
 				}
@@ -318,7 +325,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, BITMAPINFOHEADER* pBMI)
 		case AV_CODEC_ID_DXTORY:
 			pAVCtx->pix_fmt = AV_PIX_FMT_RGB24; // and other RGB formats, but it is not important here
 			break;
-			/*
+		/*
 		case AV_CODEC_ID_VVC:
 			{
 				auto s = reinterpret_cast<VVCContext*>(pAVCtx->priv_data);
@@ -370,7 +377,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, BITMAPINFOHEADER* pBMI)
 				}
 			}
 			break;
-			*/
+		*/
 		}
 
 		if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE) {

@@ -1118,3 +1118,19 @@ const FFCodec ff_ffv1_decoder = {
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP |
                       FF_CODEC_CAP_USES_PROGRESSFRAMES,
 };
+
+// ==> Start patch MPC
+int ff_ffv1_parse_extra_data(AVCodecContext* avctx)
+{
+    FFV1Context* f = avctx->priv_data;
+    int ret;
+
+    if ((ret = ff_ffv1_common_init(avctx)) < 0)
+        return ret;
+
+    if (avctx->extradata_size > 0 && (ret = read_extra_header(f)) < 0)
+        return ret;
+
+    return 0;
+}
+// ==> End patch MPC

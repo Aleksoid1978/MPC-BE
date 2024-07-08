@@ -181,4 +181,8 @@ static inline void update_vlc_state(VlcState *const state, const int v)
     state->count = count;
 }
 
+// ==> Start patch MPC
+int ff_ffv1_parse_extra_data(AVCodecContext* avctx);
+// ==> End patch MPC
+
 #endif /* AVCODEC_FFV1_H */
