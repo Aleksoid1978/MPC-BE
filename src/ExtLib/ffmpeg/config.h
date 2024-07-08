@@ -1,15 +1,6 @@
 #ifndef FFMPEG_CONFIG_H
 #define FFMPEG_CONFIG_H
 
-#define ARCH_X86 1
-#ifdef ARCH_X86_64
-	#define ARCH_X86_32 0
-	#define ARCH_X86_64 1
-#else
-	#define ARCH_X86_32 1
-	#define ARCH_X86_64 0
-#endif
-
 #define SWS_MAX_FILTER_SIZE 256
 #ifdef __GNUC__
 	#define HAVE_INLINE_ASM 1
@@ -71,7 +62,10 @@
 	#define HAVE_XOP_INLINE 1
 	#define HAVE_I686_INLINE 0
 
+	#define ARCH_X86 1
 	#ifdef ARCH_X86_64
+		#define ARCH_X86_32 0
+		#define ARCH_X86_64 1
 		#define BROKEN_RELOCATIONS 1
 		#define HAVE_FAST_64BIT 1
 		#define HAVE_FAST_CMOV 1
@@ -79,6 +73,8 @@
 		#define HAVE_XMM_CLOBBERS 1
 		#define CONFIG_PIC 1
 	#else
+		#define ARCH_X86_32 1
+		#define ARCH_X86_64 0
 		#define HAVE_FAST_64BIT 0
 		#define HAVE_FAST_CMOV 0
 		#define HAVE_MM_EMPTY 0
@@ -150,6 +146,14 @@
 	#define HAVE_MM_EMPTY 0
 	#define HAVE_XMM_CLOBBERS 0
 	#define CONFIG_PIC 0
+
+	#define ARCH_X86 1
+	#ifdef ARCH_X86_64
+		#define ARCH_X86_64 1
+	#else
+		#define ARCH_X86_64 0
+	#endif
+	#define ARCH_X86_32 0
 
 	#define av_restrict
 	#define __asm__ __asm
