@@ -37,7 +37,7 @@ extern "C" {
 	#include <ExtLib/ffmpeg/libavcodec/h264dec.h>
 	#include <ExtLib/ffmpeg/libavcodec/ffv1.h>
 #undef class
-	#include <ExtLib/ffmpeg/libavcodec/vvc/dec.h>
+	//#include <ExtLib/ffmpeg/libavcodec/vvc/dec.h>
 }
 #pragma warning(pop)
 
@@ -318,6 +318,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, BITMAPINFOHEADER* pBMI)
 		case AV_CODEC_ID_DXTORY:
 			pAVCtx->pix_fmt = AV_PIX_FMT_RGB24; // and other RGB formats, but it is not important here
 			break;
+			/*
 		case AV_CODEC_ID_VVC:
 			{
 				auto s = reinterpret_cast<VVCContext*>(pAVCtx->priv_data);
@@ -369,6 +370,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, BITMAPINFOHEADER* pBMI)
 				}
 			}
 			break;
+			*/
 		}
 
 		if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE) {
