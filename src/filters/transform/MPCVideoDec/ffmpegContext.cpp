@@ -305,7 +305,12 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, BITMAPINFOHEADER* pBMI)
 						}
 					}
 					else if (f->colorspace == 1) {
-						pAVCtx->pix_fmt = AV_PIX_FMT_RGBA; // and other RGB formats, but it is not important here
+						if (pAVCtx->bits_per_raw_sample <= 8) {
+							pAVCtx->pix_fmt = AV_PIX_FMT_RGBA;
+						}
+						else {
+							pAVCtx->pix_fmt = AV_PIX_FMT_RGB48;
+						}
 					}
 				}
 			}
