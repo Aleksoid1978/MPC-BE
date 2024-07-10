@@ -534,154 +534,6 @@ fail:
     return AVERROR(EINVAL);
 }
 
-// ==> Start patch MPC
-int d3d12va_direct_copy(const AVFrame* src, AVFrame* tmp, uint8_t* output,
-                        void (*convert_funct_ptr)(void*, AVFrame*, uint8_t*), void* ptr)
-{
-    AVHWFramesContext      *ctx          = (AVHWFramesContext*)src->hw_frames_ctx->data;
-    AVD3D12VADeviceContext *hwctx        = ctx->device_ctx->hwctx;
-    D3D12VAFramesContext   *s            = ctx->hwctx;
-    AVD3D12VAFramesContext *frames_hwctx = &s->p;
-
-    int ret;
-
-    AVD3D12VAFrame* f = (AVD3D12VAFrame*)src->data[0];
-    ID3D12Resource* texture = (ID3D12Resource*)f->texture;
-
-    uint8_t* mapped_data;
-    int linesizes[4];
-
-    D3D12_TEXTURE_COPY_LOCATION staging_y_location  = { 0 };
-    D3D12_TEXTURE_COPY_LOCATION staging_uv_location = { 0 };
-
-    D3D12_TEXTURE_COPY_LOCATION texture_y_location = {
-        .pResource        = texture,
-        .Type             = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX,
-        .SubresourceIndex = 0,
-    };
-
-    D3D12_TEXTURE_COPY_LOCATION texture_uv_location = {
-        .pResource        = texture,
-        .Type             = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX,
-        .SubresourceIndex = 1,
-    };
-
-    D3D12_RESOURCE_BARRIER barrier = {
-        .Type  = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
-        .Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
-        .Transition = {
-            .pResource   = texture,
-            .StateBefore = D3D12_RESOURCE_STATE_COMMON,
-            .StateAfter  = D3D12_RESOURCE_STATE_COPY_SOURCE,
-            .Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-        },
-    };
-
-    hwctx->lock(hwctx->lock_ctx);
-
-    if (!s->command_queue) {
-        ret = d3d12va_create_helper_objects(ctx);
-        if (ret < 0)
-            goto fail;
-    }
-
-    for (int i = 0; i < 4; i++)
-        linesizes[i] = FFALIGN(src->width * (frames_hwctx->format == DXGI_FORMAT_P010 ? 2 : 1),
-                               D3D12_TEXTURE_DATA_PITCH_ALIGNMENT);
-
-    staging_y_location = (D3D12_TEXTURE_COPY_LOCATION) {
-        .Type      = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT,
-        .PlacedFootprint = {
-            .Offset = 0,
-            .Footprint = {
-                .Format   = frames_hwctx->format == DXGI_FORMAT_P010 ?
-                                                    DXGI_FORMAT_R16_UNORM : DXGI_FORMAT_R8_UNORM,
-                .Width    = ctx->width,
-                .Height   = ctx->height,
-                .Depth    = 1,
-                .RowPitch = linesizes[0],
-            },
-        },
-    };
-
-    staging_uv_location = (D3D12_TEXTURE_COPY_LOCATION) {
-        .Type      = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT,
-        .PlacedFootprint = {
-            .Offset = s->luma_component_size,
-            .Footprint = {
-                .Format   = frames_hwctx->format == DXGI_FORMAT_P010 ?
-                                                    DXGI_FORMAT_R16G16_UNORM : DXGI_FORMAT_R8G8_UNORM,
-                .Width    = ctx->width  >> 1,
-                .Height   = ctx->height >> 1,
-                .Depth    = 1,
-                .RowPitch = linesizes[0],
-            },
-        },
-    };
-
-    DX_CHECK(ID3D12CommandAllocator_Reset(s->command_allocator));
-
-    DX_CHECK(ID3D12GraphicsCommandList_Reset(s->command_list, s->command_allocator, NULL));
-
-    if (!s->staging_download_buffer) {
-        ret = d3d12va_create_staging_buffer_resource(ctx, D3D12_RESOURCE_STATE_COPY_DEST,
-                                                     &s->staging_download_buffer, 1);
-        if (ret < 0) {
-            goto fail;
-        }
-    }
-
-    staging_y_location.pResource = staging_uv_location.pResource = s->staging_download_buffer;
-
-    ID3D12GraphicsCommandList_ResourceBarrier(s->command_list, 1, &barrier);
-
-    ID3D12GraphicsCommandList_CopyTextureRegion(s->command_list,
-                                                &staging_y_location, 0, 0, 0,
-                                                &texture_y_location, NULL);
-
-    ID3D12GraphicsCommandList_CopyTextureRegion(s->command_list,
-                                                &staging_uv_location, 0, 0, 0,
-                                                &texture_uv_location, NULL);
-
-    barrier.Transition.StateBefore = barrier.Transition.StateAfter;
-    barrier.Transition.StateAfter  = D3D12_RESOURCE_STATE_COMMON;
-    ID3D12GraphicsCommandList_ResourceBarrier(s->command_list, 1, &barrier);
-
-    DX_CHECK(ID3D12GraphicsCommandList_Close(s->command_list));
-
-    DX_CHECK(ID3D12CommandQueue_Wait(s->command_queue, f->sync_ctx.fence, f->sync_ctx.fence_value));
-
-    ID3D12CommandQueue_ExecuteCommandLists(s->command_queue, 1, (ID3D12CommandList **)&s->command_list);
-
-    ret = d3d12va_wait_queue_idle(&s->sync_ctx, s->command_queue);
-    if (ret < 0)
-        goto fail;
-
-    DX_CHECK(ID3D12Resource_Map(s->staging_download_buffer, 0, NULL, (void **)&mapped_data));
-    av_image_fill_pointers(tmp->data, ctx->sw_format, ctx->height, mapped_data, linesizes);
-
-    tmp->linesize[0] = linesizes[0];
-    tmp->linesize[1] = linesizes[1];
-    tmp->format      = ctx->sw_format;
-    tmp->width       = src->width;
-    tmp->height      = src->height;
-
-    convert_funct_ptr(ptr, tmp, output);
-
-    tmp->data[0] = tmp->data[1] = NULL;
-
-    ID3D12Resource_Unmap(s->staging_download_buffer, 0, NULL);
-
-    hwctx->unlock(hwctx->lock_ctx);
-
-    return 0;
-
-fail:
-    hwctx->unlock(hwctx->lock_ctx);
-    return AVERROR(EINVAL);
-}
-// ==> End patch MPC
-
 static int d3d12va_load_functions(AVHWDeviceContext *hwdev)
 {
     D3D12VADevicePriv *priv = hwdev->hwctx;
@@ -856,3 +708,151 @@ const HWContextType ff_hwcontext_type_d3d12va = {
 
     .pix_fmts               = (const enum AVPixelFormat[]){ AV_PIX_FMT_D3D12, AV_PIX_FMT_NONE },
 };
+
+// ==> Start patch MPC
+int d3d12va_direct_copy(const AVFrame* src, AVFrame* tmp, uint8_t* output,
+                        void (*convert_funct_ptr)(void*, AVFrame*, uint8_t*), void* ptr)
+{
+    AVHWFramesContext      *ctx          = (AVHWFramesContext*)src->hw_frames_ctx->data;
+    AVD3D12VADeviceContext *hwctx        = ctx->device_ctx->hwctx;
+    D3D12VAFramesContext   *s            = ctx->hwctx;
+    AVD3D12VAFramesContext *frames_hwctx = &s->p;
+
+    int ret;
+
+    AVD3D12VAFrame* f = (AVD3D12VAFrame*)src->data[0];
+    ID3D12Resource* texture = (ID3D12Resource*)f->texture;
+
+    uint8_t* mapped_data;
+    int linesizes[4];
+
+    D3D12_TEXTURE_COPY_LOCATION staging_y_location  = { 0 };
+    D3D12_TEXTURE_COPY_LOCATION staging_uv_location = { 0 };
+
+    D3D12_TEXTURE_COPY_LOCATION texture_y_location = {
+        .pResource        = texture,
+        .Type             = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX,
+        .SubresourceIndex = 0,
+    };
+
+    D3D12_TEXTURE_COPY_LOCATION texture_uv_location = {
+        .pResource        = texture,
+        .Type             = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX,
+        .SubresourceIndex = 1,
+    };
+
+    D3D12_RESOURCE_BARRIER barrier = {
+        .Type  = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
+        .Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
+        .Transition = {
+            .pResource   = texture,
+            .StateBefore = D3D12_RESOURCE_STATE_COMMON,
+            .StateAfter  = D3D12_RESOURCE_STATE_COPY_SOURCE,
+            .Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+        },
+    };
+
+    hwctx->lock(hwctx->lock_ctx);
+
+    if (!s->command_queue) {
+        ret = d3d12va_create_helper_objects(ctx);
+        if (ret < 0)
+            goto fail;
+    }
+
+    for (int i = 0; i < 4; i++)
+        linesizes[i] = FFALIGN(src->width * (frames_hwctx->format == DXGI_FORMAT_P010 ? 2 : 1),
+                               D3D12_TEXTURE_DATA_PITCH_ALIGNMENT);
+
+    staging_y_location = (D3D12_TEXTURE_COPY_LOCATION) {
+        .Type      = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT,
+        .PlacedFootprint = {
+            .Offset = 0,
+            .Footprint = {
+                .Format   = frames_hwctx->format == DXGI_FORMAT_P010 ?
+                                                    DXGI_FORMAT_R16_UNORM : DXGI_FORMAT_R8_UNORM,
+                .Width    = ctx->width,
+                .Height   = ctx->height,
+                .Depth    = 1,
+                .RowPitch = linesizes[0],
+            },
+        },
+    };
+
+    staging_uv_location = (D3D12_TEXTURE_COPY_LOCATION) {
+        .Type      = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT,
+        .PlacedFootprint = {
+            .Offset = s->luma_component_size,
+            .Footprint = {
+                .Format   = frames_hwctx->format == DXGI_FORMAT_P010 ?
+                                                    DXGI_FORMAT_R16G16_UNORM : DXGI_FORMAT_R8G8_UNORM,
+                .Width    = ctx->width  >> 1,
+                .Height   = ctx->height >> 1,
+                .Depth    = 1,
+                .RowPitch = linesizes[0],
+            },
+        },
+    };
+
+    DX_CHECK(ID3D12CommandAllocator_Reset(s->command_allocator));
+
+    DX_CHECK(ID3D12GraphicsCommandList_Reset(s->command_list, s->command_allocator, NULL));
+
+    if (!s->staging_download_buffer) {
+        ret = d3d12va_create_staging_buffer_resource(ctx, D3D12_RESOURCE_STATE_COPY_DEST,
+                                                     &s->staging_download_buffer, 1);
+        if (ret < 0) {
+            goto fail;
+        }
+    }
+
+    staging_y_location.pResource = staging_uv_location.pResource = s->staging_download_buffer;
+
+    ID3D12GraphicsCommandList_ResourceBarrier(s->command_list, 1, &barrier);
+
+    ID3D12GraphicsCommandList_CopyTextureRegion(s->command_list,
+                                                &staging_y_location, 0, 0, 0,
+                                                &texture_y_location, NULL);
+
+    ID3D12GraphicsCommandList_CopyTextureRegion(s->command_list,
+                                                &staging_uv_location, 0, 0, 0,
+                                                &texture_uv_location, NULL);
+
+    barrier.Transition.StateBefore = barrier.Transition.StateAfter;
+    barrier.Transition.StateAfter  = D3D12_RESOURCE_STATE_COMMON;
+    ID3D12GraphicsCommandList_ResourceBarrier(s->command_list, 1, &barrier);
+
+    DX_CHECK(ID3D12GraphicsCommandList_Close(s->command_list));
+
+    DX_CHECK(ID3D12CommandQueue_Wait(s->command_queue, f->sync_ctx.fence, f->sync_ctx.fence_value));
+
+    ID3D12CommandQueue_ExecuteCommandLists(s->command_queue, 1, (ID3D12CommandList **)&s->command_list);
+
+    ret = d3d12va_wait_queue_idle(&s->sync_ctx, s->command_queue);
+    if (ret < 0)
+        goto fail;
+
+    DX_CHECK(ID3D12Resource_Map(s->staging_download_buffer, 0, NULL, (void **)&mapped_data));
+    av_image_fill_pointers(tmp->data, ctx->sw_format, ctx->height, mapped_data, linesizes);
+
+    tmp->linesize[0] = linesizes[0];
+    tmp->linesize[1] = linesizes[1];
+    tmp->format      = ctx->sw_format;
+    tmp->width       = src->width;
+    tmp->height      = src->height;
+
+    convert_funct_ptr(ptr, tmp, output);
+
+    tmp->data[0] = tmp->data[1] = NULL;
+
+    ID3D12Resource_Unmap(s->staging_download_buffer, 0, NULL);
+
+    hwctx->unlock(hwctx->lock_ctx);
+
+    return 0;
+
+fail:
+    hwctx->unlock(hwctx->lock_ctx);
+    return AVERROR(EINVAL);
+}
+// ==> End patch MPC
