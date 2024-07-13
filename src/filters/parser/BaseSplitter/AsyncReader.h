@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -52,8 +52,8 @@ public:
 	};
 
 protected:
-	HANDLE m_hBreakEvent;
-	LONG m_lOsError; // CFileException::m_lOsError
+	HANDLE m_hBreakEvent = nullptr;
+	LONG m_lOsError = 0; // CFileException::m_lOsError
 
 	SourceType m_sourcetype = SourceType::LOCAL;
 

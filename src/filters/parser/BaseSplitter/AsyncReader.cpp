@@ -30,16 +30,12 @@
 CAsyncFileReader::CAsyncFileReader(CString fn, HRESULT& hr, BOOL bSupportURL)
 	: CUnknown(L"CAsyncFileReader", nullptr, &hr)
 	, m_bSupportURL(bSupportURL)
-	, m_hBreakEvent(nullptr)
-	, m_lOsError(0)
 {
 	hr = Open(fn) ? S_OK : E_FAIL;
 }
 
 CAsyncFileReader::CAsyncFileReader(CHdmvClipInfo::CPlaylist& Items, HRESULT& hr)
 	: CUnknown(L"CAsyncFileReader", nullptr, &hr)
-	, m_hBreakEvent(nullptr)
-	, m_lOsError(0)
 {
 	hr = OpenFiles(Items) ? S_OK : E_FAIL;
 }

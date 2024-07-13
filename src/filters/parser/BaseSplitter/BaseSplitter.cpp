@@ -31,16 +31,6 @@
 
 CBaseSplitterFilter::CBaseSplitterFilter(LPCWSTR pName, LPUNKNOWN pUnk, HRESULT* phr, const CLSID& clsid)
 	: CBaseFilter(pName, pUnk, this, clsid)
-	, m_rtDuration(0), m_rtStart(0), m_rtStop(0), m_rtCurrent(0)
-	, m_dRate(1.0)
-	, m_nOpenProgress(100)
-	, m_fAbort(false)
-	, m_rtLastStart(INVALID_TIME)
-	, m_rtLastStop(INVALID_TIME)
-	, m_priority(THREAD_PRIORITY_NORMAL)
-	, m_nFlag(0)
-	, m_iQueueDuration(QUEUE_DURATION_DEF)
-	//, m_iNetworkTimeout(NETWORK_TIMEOUT_DEF)
 {
 	if (phr) {
 		*phr = S_OK;

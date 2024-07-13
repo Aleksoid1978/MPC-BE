@@ -77,31 +77,35 @@ protected:
 	virtual HRESULT CreateOutputs(IAsyncReader* pAsyncReader) PURE; // override this ...
 	virtual LPCWSTR GetPartFilename(IAsyncReader* pAsyncReader);
 
-	LONGLONG m_nOpenProgress;
-	bool m_fAbort;
+	LONGLONG m_nOpenProgress = 100;
+	bool m_fAbort = false;
 
-	REFERENCE_TIME m_rtDuration; // derived filter should set this at the end of CreateOutputs
-	REFERENCE_TIME m_rtStart, m_rtStop, m_rtCurrent, m_rtNewStart, m_rtNewStop;
-	double m_dRate;
+	REFERENCE_TIME m_rtDuration = 0; // derived filter should set this at the end of CreateOutputs
+	REFERENCE_TIME m_rtStart    = 0;
+	REFERENCE_TIME m_rtStop     = 0;
+	REFERENCE_TIME m_rtCurrent  = 0;
+	REFERENCE_TIME m_rtNewStart = 0;
+	REFERENCE_TIME m_rtNewStop  = 0;
+	double m_dRate = 1.0;
 
 	std::list<DWORD> m_bDiscontinuitySent;
 	std::list<CBaseSplitterOutputPin*> m_pActivePins;
 
 	CAMEvent m_eEndFlush;
-	bool m_fFlushing;
+	bool m_fFlushing = false;
 
 	void DeliverBeginFlush();
 	void DeliverEndFlush();
 	HRESULT DeliverPacket(std::unique_ptr<CPacket> p);
 
-	int m_priority;
+	int m_priority = THREAD_PRIORITY_NORMAL;
 
 	CFontInstaller m_fontinst;
 
-	DWORD m_nFlag;
+	DWORD m_nFlag = 0;
 
-	int m_iQueueDuration;  //  100..15000 ms
-	//int m_iNetworkTimeout; // 2000..20000 ms
+	int m_iQueueDuration = QUEUE_DURATION_DEF; //  100..15000 ms
+	//int m_iNetworkTimeout = NETWORK_TIMEOUT_DEF; // 2000..20000 ms
 
 	REFERENCE_TIME m_rtOffset = INVALID_TIME;
 
@@ -165,7 +169,8 @@ protected:
 	virtual HRESULT SetPositionsInternal(void* id, LONGLONG* pCurrent, DWORD dwCurrentFlags, LONGLONG* pStop, DWORD dwStopFlags);
 
 private:
-	REFERENCE_TIME m_rtLastStart, m_rtLastStop;
+	REFERENCE_TIME m_rtLastStart = INVALID_TIME;
+	REFERENCE_TIME m_rtLastStop  = INVALID_TIME;
 	std::list<void*> m_LastSeekers;
 
 public:
