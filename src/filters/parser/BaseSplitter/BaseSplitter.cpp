@@ -192,7 +192,7 @@ HRESULT CBaseSplitterFilter::DeleteOutputs()
 	CAutoLock cAutoLockMT(&m_csmtnew);
 	m_mtnew.clear();
 
-	RemoveAll();
+	m_properties.RemoveAll();
 	ResRemoveAll();
 	ChapRemoveAll();
 

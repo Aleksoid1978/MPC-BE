@@ -123,8 +123,8 @@ void CDSMMuxerFilter::MuxFileInfo(IBitStream* pBS)
 	int len = 1;
 	CSimpleMap<CStringA, CStringA> si;
 
-	for (int i = 0; i < GetSize(); i++) {
-		CStringA key = CStringA(CString(GetKeyAt(i))), value = WStrToUTF8(GetValueAt(i));
+	for (int i = 0; i < m_properties.GetSize(); i++) {
+		CStringA key = CStringA(CString(m_properties.GetKeyAt(i))), value = WStrToUTF8(m_properties.GetValueAt(i));
 		if (key.GetLength() != 4) {
 			continue;
 		}
@@ -147,14 +147,19 @@ void CDSMMuxerFilter::MuxStreamInfo(IBitStream* pBS, CBaseMuxerInputPin* pPin)
 	int len = 1;
 	CSimpleMap<CStringA, CStringA> si;
 
-	for (int i = 0; i < pPin->GetSize(); i++) {
-		CStringA key = CStringA(CString(pPin->GetKeyAt(i))), value = WStrToUTF8(pPin->GetValueAt(i));
-		if (key.GetLength() != 4) {
-			continue;
+	auto props = pPin->LockProps();
+	if (props) {
+		for (int i = 0; i < props->GetSize(); i++) {
+			CStringA key = CStringA(props->GetKeyAt(i));
+			if (key.GetLength() != 4) {
+				continue;
+			}
+			CStringA value = WStrToUTF8(props->GetValueAt(i));
+			si.Add(key, value);
+			len += 4 + value.GetLength() + 1;
 		}
-		si.Add(key, value);
-		len += 4 + value.GetLength() + 1;
 	}
+	pPin->UnlockProps();
 
 	if (len > 1) {
 		MuxPacketHeader(pBS, DSMP_STREAMINFO, len);

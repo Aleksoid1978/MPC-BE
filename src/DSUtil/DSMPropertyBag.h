@@ -38,13 +38,19 @@ public IPropertyBag2 {
 	STDMETHOD(DelProperty) (LPCWSTR key) PURE;
 };
 
-class IDSMPropertyBagImpl : public ATL::CSimpleMap<CStringW, CStringW>, public IDSMPropertyBag, public IPropertyBag
+class IDSMPropertyBagImpl : public IDSMPropertyBag, public IPropertyBag
 {
 	std::mutex m_mutex;
+
+protected:
+	ATL::CSimpleMap<CStringW, CStringW> m_properties;
 
 public:
 	IDSMPropertyBagImpl() = default;
 	~IDSMPropertyBagImpl() = default;
+
+	ATL::CSimpleMap<CStringW, CStringW>* LockProps();
+	void UnlockProps();
 
 	// IPropertyBag
 

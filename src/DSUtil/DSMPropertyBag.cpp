@@ -29,6 +29,17 @@
 
 // IPropertyBag
 
+ATL::CSimpleMap<CStringW, CStringW>* IDSMPropertyBagImpl::LockProps()
+{
+	m_mutex.lock();
+	return &m_properties;
+}
+
+void IDSMPropertyBagImpl::UnlockProps()
+{
+	m_mutex.unlock();
+}
+
 STDMETHODIMP IDSMPropertyBagImpl::Read(LPCOLESTR pszPropName, VARIANT* pVar, IErrorLog* pErrorLog)
 {
 	CheckPointer(pVar, E_POINTER);
@@ -38,7 +49,7 @@ STDMETHODIMP IDSMPropertyBagImpl::Read(LPCOLESTR pszPropName, VARIANT* pVar, IEr
 
 	std::lock_guard lock(m_mutex);
 
-	CStringW value = Lookup(pszPropName);
+	CStringW value = m_properties.Lookup(pszPropName);
 	if (value.IsEmpty()) {
 		return E_FAIL;
 	}
@@ -62,7 +73,7 @@ STDMETHODIMP IDSMPropertyBagImpl::Read(ULONG cProperties, PROPBAG2* pPropBag, IE
 	std::lock_guard lock(m_mutex);
 
 	for (ULONG i = 0; i < cProperties; phrError[i] = S_OK, i++) {
-		CComVariant(Lookup(pPropBag[i].pstrName)).Detach(pvarValue);
+		CComVariant(m_properties.Lookup(pPropBag[i].pstrName)).Detach(pvarValue);
 	}
 	return S_OK;
 }
@@ -83,7 +94,7 @@ STDMETHODIMP IDSMPropertyBagImpl::CountProperties(ULONG* pcProperties)
 
 	std::lock_guard lock(m_mutex);
 
-	*pcProperties = GetSize();
+	*pcProperties = m_properties.GetSize();
 	return S_OK;
 }
 
@@ -95,7 +106,7 @@ STDMETHODIMP IDSMPropertyBagImpl::GetPropertyInfo(ULONG iProperty, ULONG cProper
 	std::lock_guard lock(m_mutex);
 
 	for (ULONG i = 0; i < cProperties; i++, iProperty++, (*pcProperties)++) {
-		CStringW key = GetKeyAt(iProperty);
+		CStringW key = m_properties.GetKeyAt(iProperty);
 		pPropBag[i].pstrName = (BSTR)CoTaskMemAlloc((key.GetLength()+1)*sizeof(WCHAR));
 		if (!pPropBag[i].pstrName) {
 			return E_FAIL;
@@ -119,10 +130,10 @@ HRESULT IDSMPropertyBagImpl::SetProperty(LPCWSTR key, LPCWSTR value)
 
 	std::lock_guard lock(m_mutex);
 
-	if (!Lookup(key).IsEmpty()) {
-		SetAt(key, value);
+	if (!m_properties.Lookup(key).IsEmpty()) {
+		m_properties.SetAt(key, value);
 	} else {
-		Add(key, value);
+		m_properties.Add(key, value);
 	}
 	return S_OK;
 }
@@ -144,11 +155,11 @@ HRESULT IDSMPropertyBagImpl::GetProperty(LPCWSTR key, BSTR* value)
 
 	std::lock_guard lock(m_mutex);
 
-	int i = FindKey(key);
+	int i = m_properties.FindKey(key);
 	if (i < 0) {
 		return E_FAIL;
 	}
-	*value = GetValueAt(i).AllocSysString();
+	*value = m_properties.GetValueAt(i).AllocSysString();
 	return S_OK;
 }
 
@@ -156,7 +167,7 @@ HRESULT IDSMPropertyBagImpl::DelAllProperties()
 {
 	std::lock_guard lock(m_mutex);
 
-	RemoveAll();
+	m_properties.RemoveAll();
 	return S_OK;
 }
 
@@ -164,7 +175,7 @@ HRESULT IDSMPropertyBagImpl::DelProperty(LPCWSTR key)
 {
 	std::lock_guard lock(m_mutex);
 
-	return Remove(key) ? S_OK : S_FALSE;
+	return m_properties.Remove(key) ? S_OK : S_FALSE;
 }
 
 //

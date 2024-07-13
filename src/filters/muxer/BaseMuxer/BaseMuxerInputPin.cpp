@@ -135,7 +135,7 @@ HRESULT CBaseMuxerInputPin::BreakConnect()
 		return hr;
 	}
 
-	RemoveAll();
+	m_properties.RemoveAll();
 
 	// TODO: remove extra disconnected pins, leave one
 
