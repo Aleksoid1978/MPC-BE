@@ -3,7 +3,7 @@
 // This file is part of ResizableLib
 // https://github.com/ppescher/resizablelib
 //
-// Copyright (C) 2000-2015 by Paolo Messina
+// Copyright (C) 2000-2024 by Paolo Messina
 // mailto:ppescher@hotmail.com
 //
 // The contents of this file are subject to the Artistic License 2.0
@@ -39,15 +39,15 @@ CResizableSheetState::~CResizableSheetState()
 // either in the registry or a private .INI file
 // depending on your application settings
 
-#define ACTIVEPAGE_ENT 	_T("ActivePage")
+#define ACTIVEPAGE_ENT	_T("ActivePage")
 
 /*!
  *  This function saves the current property sheet active page using the base
  *  class persist method.
  *  @sa CResizableState::WriteState
- *  
+ *
  *  @param pszName String that identifies stored settings
- *  
+ *
  *  @return Returns @a TRUE if successful, @a FALSE otherwise
  */
 BOOL CResizableSheetState::SavePage(LPCTSTR pszName)
@@ -59,10 +59,9 @@ BOOL CResizableSheetState::SavePage(LPCTSTR pszName)
 	if (pSheet == NULL)
 		return FALSE;
 
-	int page = pSheet->m_psh.nStartPage;
 	const CTabCtrl *pTab = pSheet->GetTabControl();
-	if (pTab != NULL) 
-		page = pTab->GetCurSel();
+	int page = (pTab != NULL) ? pTab->GetCurSel() : pSheet->m_psh.nStartPage;
+
 	if (page < 0)
 		page = pSheet->m_psh.nStartPage;
 
@@ -89,7 +88,7 @@ BOOL CResizableSheetState::LoadPage(LPCTSTR pszName)
 	// MPC-BE custom code
 	if (!ReadState(CString(pszName), ACTIVEPAGE_ENT, data))
 		return FALSE;
-	
+
 	CPropertySheet* pSheet = DYNAMIC_DOWNCAST(CPropertySheet, GetResizableWnd());
 
 	return (pSheet != NULL) && pSheet->SetActivePage(_ttoi(data));

@@ -5,7 +5,7 @@
 // This file is part of ResizableLib
 // https://github.com/ppescher/resizablelib
 //
-// Copyright (C) 2000-2015 by Paolo Messina
+// Copyright (C) 2000-2024 by Paolo Messina
 // mailto:ppescher@hotmail.com
 //
 // The contents of this file are subject to the Artistic License 2.0
@@ -27,7 +27,7 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // Registered message to communicate with the library
 
-// static intializer must be called before user code
+// static initializer must be called before user code
 #pragma warning(disable:4073)
 #pragma init_seg(lib)
 

@@ -3,7 +3,7 @@
 // This file is part of ResizableLib
 // https://github.com/ppescher/resizablelib
 //
-// Copyright (C) 2000-2015 by Paolo Messina
+// Copyright (C) 2000-2024 by Paolo Messina
 // mailto:ppescher@hotmail.com
 //
 // The contents of this file are subject to the Artistic License 2.0
@@ -57,7 +57,8 @@ CResizableWndState::~CResizableWndState()
  */
 BOOL CResizableWndState::SaveWindowRect(LPCTSTR pszName, BOOL bRectOnly)
 {
-	WINDOWPLACEMENT wp = {sizeof(WINDOWPLACEMENT)};
+	WINDOWPLACEMENT wp;
+	wp.length = sizeof(WINDOWPLACEMENT);
 
 	if (!GetResizableWnd()->GetWindowPlacement(&wp))
 		return FALSE;
@@ -69,7 +70,7 @@ BOOL CResizableWndState::SaveWindowRect(LPCTSTR pszName, BOOL bRectOnly)
 	if (bRectOnly)	// save size/pos only (normal state)
 	{
 		data.Format(PLACEMENT_FMT, rc.left, rc.top,
-			rc.right, rc.bottom, SW_SHOWNORMAL, 0U, 0L, 0L);
+			rc.right, rc.bottom, (unsigned)SW_SHOWNORMAL, 0U, 0L, 0L);
 	}
 	else	// save also min/max state
 	{
@@ -98,7 +99,8 @@ BOOL CResizableWndState::SaveWindowRect(LPCTSTR pszName, BOOL bRectOnly)
 BOOL CResizableWndState::LoadWindowRect(LPCTSTR pszName, BOOL bRectOnly)
 {
 	CString data;
-	WINDOWPLACEMENT wp = {sizeof(WINDOWPLACEMENT)};
+	WINDOWPLACEMENT wp;
+	wp.length = sizeof(WINDOWPLACEMENT);
 
 	// MPC-BE custom code
 	if (!ReadState(CString(pszName), PLACEMENT_ENT, data))	// never saved before

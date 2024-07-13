@@ -3,7 +3,7 @@
 // This file is part of ResizableLib
 // https://github.com/ppescher/resizablelib
 //
-// Copyright (C) 2000-2015 by Paolo Messina
+// Copyright (C) 2000-2024 by Paolo Messina
 // mailto:ppescher@hotmail.com
 //
 // The contents of this file are subject to the Artistic License 2.0
@@ -27,6 +27,19 @@
 static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
+
+/*!
+ *  Definition of the standard anchors
+ */
+const ANCHOR TOP_LEFT(0, 0);
+const ANCHOR TOP_CENTER(50, 0);
+const ANCHOR TOP_RIGHT(100, 0);
+const ANCHOR MIDDLE_LEFT(0, 50);
+const ANCHOR MIDDLE_CENTER(50, 50);
+const ANCHOR MIDDLE_RIGHT(100, 50);
+const ANCHOR BOTTOM_LEFT(0, 100);
+const ANCHOR BOTTOM_CENTER(50, 100);
+const ANCHOR BOTTOM_RIGHT(100, 100);
 
 /*!
  *  @internal Constant used to detect clipping and refresh properties
@@ -75,18 +88,13 @@ void CResizableLayout::AddAnchor(HWND hWnd, ANCHOR anchorTopLeft, ANCHOR anchorB
 	// adjust position, if client area has been scrolled
 	rectChild.OffsetRect(-rectParent.TopLeft());
 
-	// go calculate margins
-	CSize marginTopLeft, marginBottomRight;
-
 	// calculate margin for the top-left corner
-
-	marginTopLeft.cx = rectChild.left - rectParent.Width() * anchorTopLeft.cx / 100;
-	marginTopLeft.cy = rectChild.top - rectParent.Height() * anchorTopLeft.cy / 100;
+	CSize marginTopLeft(rectChild.left - rectParent.Width() * anchorTopLeft.cx / 100,
+				rectChild.top - rectParent.Height() * anchorTopLeft.cy / 100);
 
 	// calculate margin for the bottom-right corner
-
-	marginBottomRight.cx = rectChild.right - rectParent.Width() * anchorBottomRight.cx / 100;
-	marginBottomRight.cy = rectChild.bottom - rectParent.Height() * anchorBottomRight.cy / 100;
+	CSize marginBottomRight(rectChild.right - rectParent.Width() * anchorBottomRight.cx / 100,
+				rectChild.bottom - rectParent.Height() * anchorBottomRight.cy / 100);
 
 	// prepare the structure
 	LAYOUTINFO layout(hWnd, anchorTopLeft, marginTopLeft,
@@ -128,19 +136,29 @@ void CResizableLayout::AddAllOtherAnchors(ANCHOR anchorTopLeft, ANCHOR anchorBot
 	ASSERT(::IsWindow(hParent));
 
 	HWND hWnd = ::GetWindow(hParent, GW_CHILD);
-	while (hWnd != NULL)
+	for (; hWnd != NULL; hWnd = ::GetNextWindow(hWnd, GW_HWNDNEXT))
 	{
+		TCHAR szClassName[32];
+		if (::GetClassName(hWnd, szClassName, _countof(szClassName)))
+		{
+			if (lstrcmp(szClassName, WC_SCROLLBAR) == 0)
+			{
+				// skip size grip (which is handled on its own)
+				DWORD dwStyle = ::GetWindowLong(hWnd, GWL_STYLE);
+				if ((dwStyle & (WS_CHILD | WS_CLIPSIBLINGS | SBS_SIZEGRIP)) == (WS_CHILD | WS_CLIPSIBLINGS | SBS_SIZEGRIP))
+					continue;
+			}
+		}
+
 		POSITION pos;
 		if (!m_mapLayout.Lookup(hWnd, pos))
 			AddAnchor(hWnd, anchorTopLeft, anchorBottomRight);
-
-		hWnd = ::GetNextWindow(hWnd, GW_HWNDNEXT);
 	}
 }
 
 /*!
  *  This function adds a placeholder to the layout manager, that will be
- *  dinamically set by a callback function whenever required.
+ *  dynamically set by a callback function whenever required.
  *
  *  @return The return value is an integer used to distinguish between
  *          different placeholders in the callback implementation.
@@ -196,7 +214,7 @@ BOOL CResizableLayout::ArrangeLayoutCallback(LAYOUTINFO& layout) const
  *  controls layout should be updated, usually after a resize operation.
  *
  *  @remarks All the controls added to the layout are moved and resized at
- *           once for performace reasons, so all the controls are in their
+ *           once for performance reasons, so all the controls are in their
  *           old position when AddAnchorCallback is called.
  *           To know where a control will be placed use GetAnchorPosition.
  *
@@ -204,13 +222,11 @@ BOOL CResizableLayout::ArrangeLayoutCallback(LAYOUTINFO& layout) const
  */
 void CResizableLayout::ArrangeLayout() const
 {
-	// common vars
-	UINT uFlags;
-	CRect rectParent, rectChild;
 	const INT_PTR count = m_listLayout.GetCount() + m_listLayoutCB.GetCount();
-
 	if (count <= 0)
 		return;
+
+	CRect rectParent, rectChild;
 
 	// get parent window's rect
 	GetTotalClientRect(&rectParent);
@@ -223,6 +239,7 @@ void CResizableLayout::ArrangeLayout() const
 		// get layout info
 		const LAYOUTINFO layout = m_listLayout.GetNext(pos);
 
+		UINT uFlags;
 		// calculate new child's position, size and flags for SetWindowPos
 		CalcNewChildPosition(layout, rectParent, rectChild, &uFlags);
 
@@ -245,6 +262,7 @@ void CResizableLayout::ArrangeLayout() const
 		if (!ArrangeLayoutCallback(layout))
 			continue;
 
+		UINT uFlags;
 		// calculate new child's position, size and flags for SetWindowPos
 		CalcNewChildPosition(layout, rectParent, rectChild, &uFlags);
 
@@ -345,7 +363,7 @@ void CResizableLayout::GetClippingRegion(CRgn* pRegion) const
 		if (::IsWindowVisible(layout.hWnd))
 			ClipChildWindow(layout, pRegion);
 	}
-	
+
 	for (POSITION pos = m_listLayoutCB.GetHeadPosition(); pos != NULL;)
 	{
 		// get layout info
@@ -379,7 +397,7 @@ inline CWnd* GetRootParentWnd(CWnd* pWnd)
  *  area to avoid flickering.
  *
  *  @param pDC Pointer to the target device context
- *  @param bUndo Flag that specifies wether to restore the clipping region
+ *  @param bUndo Flag that specifies whether to restore the clipping region
  *
  *  @return The return value is @c TRUE if the clipping region has been
  *          modified, @c FALSE otherwise
@@ -594,7 +612,7 @@ BOOL CResizableLayout::LikesClipping(const LAYOUTINFO& layout) const
 			return clipping.bLikesClipping;
 	}
 
-	LONG_PTR style = ::GetWindowLongPtr(layout.hWnd, GWL_STYLE);
+	const LONG_PTR style = ::GetWindowLongPtr(layout.hWnd, GWL_STYLE);
 
 	// skip windows that wants background repainted
 	if (0 == lstrcmp(layout.sWndClass, WC_BUTTON))
@@ -684,7 +702,8 @@ void CResizableLayout::CalcNewChildPosition(const LAYOUTINFO& layout,
 		NeedsRefresh(layout, rectChild, rectNew) : layout.properties.bCachedNeedsRefresh;
 
 	// set flags
-	if (lpFlags) {
+	if (lpFlags)
+	{
 		*lpFlags = SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOREPOSITION;
 		if (bRefresh)
 			*lpFlags |= SWP_NOCOPYBITS;
@@ -721,10 +740,10 @@ BOOL CResizableLayout::GetAnchorMargins(HWND hWnd, const CSize &sizeChild, CRect
 	const LAYOUTINFO& layout = m_listLayout.GetAt(pos);
 
 	// augmented size, relative to anchor points
-	CSize size = sizeChild + layout.marginTopLeft - layout.marginBottomRight;
+	const CSize size = sizeChild + layout.marginTopLeft - layout.marginBottomRight;
 
 	// percent of parent size occupied by this control
-	CSize percent(layout.anchorBottomRight.cx - layout.anchorTopLeft.cx,
+	const CSize percent(layout.anchorBottomRight.cx - layout.anchorTopLeft.cx,
 		layout.anchorBottomRight.cy - layout.anchorTopLeft.cy);
 
 	// calculate total margins
@@ -755,10 +774,10 @@ BOOL CResizableLayout::GetAnchorMargins(HWND hWnd, const CSize &sizeChild, CRect
  *           @c LikesClipping only once, and the @a refresh property as
  *           dynamic, causing @c NeedsRefresh to be called every time.
  *        @n This should be right for most situations, as the need for
- *           @a refresh usually depends on the size fo a control, while the
+ *           @a refresh usually depends on the size of the control, while the
  *           support for @a clipping is usually linked to the specific type
  *           of control, which is unlikely to change at run-time, but you can
- *           still override this function if a different beahvior is needed.
+ *           still override this function if a different behaviour is needed.
  *
  *  @sa LikesClipping NeedsRefresh LAYOUTINFO RESIZEPROPERTIES
  */
@@ -827,7 +846,7 @@ void CResizableLayout::MakeResizable(LPCREATESTRUCT lpCreateStruct) const
  *  This function should be called inside the parent window @c WM_NCCALCSIZE
  *  message handler to help eliminate flickering.
  *
- *  @param bAfterDefault Flag that specifies wether the call is made before
+ *  @param bAfterDefault Flag that specifies whether the call is made before
  *         or after the default handler
  *  @param lpncsp Pointer to the @c NCCALCSIZE_PARAMS structure that is
  *         passed to the message handler

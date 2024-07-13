@@ -5,7 +5,7 @@
 // This file is part of ResizableLib
 // https://github.com/ppescher/resizablelib
 //
-// Copyright (C) 2000-2015 by Paolo Messina
+// Copyright (C) 2000-2024 by Paolo Messina
 // mailto:ppescher@hotmail.com
 //
 // The contents of this file are subject to the Artistic License 2.0
@@ -50,13 +50,13 @@ CResizableSheet::CResizableSheet()
 }
 
 CResizableSheet::CResizableSheet(UINT nIDCaption, CWnd *pParentWnd, UINT iSelectPage)
-	 : CPropertySheet(nIDCaption, pParentWnd, iSelectPage)
+	: CPropertySheet(nIDCaption, pParentWnd, iSelectPage)
 {
 	PrivateConstruct();
 }
 
 CResizableSheet::CResizableSheet(LPCTSTR pszCaption, CWnd *pParentWnd, UINT iSelectPage)
-	 : CPropertySheet(pszCaption, pParentWnd, iSelectPage)
+	: CPropertySheet(pszCaption, pParentWnd, iSelectPage)
 {
 	PrivateConstruct();
 }
@@ -79,7 +79,7 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CResizableSheet message handlers
 
-BOOL CResizableSheet::OnNcCreate(LPCREATESTRUCT lpCreateStruct) 
+BOOL CResizableSheet::OnNcCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (!CPropertySheet::OnNcCreate(lpCreateStruct))
 		return FALSE;
@@ -93,11 +93,11 @@ BOOL CResizableSheet::OnNcCreate(LPCREATESTRUCT lpCreateStruct)
 		return FALSE;
 
 	MakeResizable(lpCreateStruct);
-	
+
 	return TRUE;
 }
 
-BOOL CResizableSheet::OnInitDialog() 
+BOOL CResizableSheet::OnInitDialog()
 {
 	BOOL bResult = CPropertySheet::OnInitDialog();
 
@@ -108,7 +108,7 @@ BOOL CResizableSheet::OnInitDialog()
 	return bResult;
 }
 
-void CResizableSheet::OnDestroy() 
+void CResizableSheet::OnDestroy()
 {
 	if (m_bEnableSaveRestore)
 	{
@@ -220,7 +220,7 @@ void CResizableSheet::PresetLayout()
 		// grow tab to the available sheet space
 		if (cyDiff > 0)
 			rectSheet.bottom = rectPage.bottom + cyDiff;
-		
+
 		if (GetStyle() & WS_CHILD)
 			GetTabControl()->MoveWindow(&rectSheet);
 
@@ -263,15 +263,8 @@ BOOL CResizableSheet::ArrangeLayoutCallback(LAYOUTINFO &layout) const
 		if (!GetAnchorPosition(pTab->m_hWnd, rectSheet, rectPage))
 			return FALSE; // no page yet
 
-		// temporarily resize the tab control to calc page size
-		CRect rectSave;
-		pTab->GetWindowRect(rectSave);
-		::MapWindowPoints(NULL, m_hWnd, (LPPOINT)&rectSave, 2);
-		pTab->SetRedraw(FALSE);
-		pTab->MoveWindow(rectPage, FALSE);
-		pTab->AdjustRect(FALSE, &rectPage);
-		pTab->MoveWindow(rectSave, FALSE);
-		pTab->SetRedraw(TRUE);
+		// calculate page size/position from tab rect
+		AdjustTabRects(rectPage);
 
 		// set margins
 		layout.marginTopLeft = rectPage.TopLeft() - rectSheet.TopLeft();
@@ -286,10 +279,10 @@ BOOL CResizableSheet::ArrangeLayoutCallback(LAYOUTINFO &layout) const
 	return TRUE;
 }
 
-void CResizableSheet::OnSize(UINT nType, int cx, int cy) 
+void CResizableSheet::OnSize(UINT nType, int cx, int cy)
 {
 	CWnd::OnSize(nType, cx, cy);
-	
+
 	if (nType == SIZE_MAXHIDE || nType == SIZE_MAXSHOW)
 		return;		// arrangement not needed
 
@@ -312,7 +305,7 @@ BOOL CResizableSheet::OnPageChanging(NMHDR* /*pNotifyStruct*/, LRESULT* /*pResul
 	return FALSE;	// continue routing
 }
 
-BOOL CResizableSheet::OnEraseBkgnd(CDC* pDC) 
+BOOL CResizableSheet::OnEraseBkgnd(CDC* pDC)
 {
 	ClipChildren(pDC, FALSE);
 
@@ -334,9 +327,6 @@ BOOL CResizableSheet::CalcSizeExtra(HWND /*hWndChild*/, const CSize& sizeChild, 
 	if (!GetAnchorMargins(pTab->m_hWnd, sizeChild, rectMargins))
 		return FALSE;
 
-	// get margin caused by tabcontrol
-	CRect rectTabMargins(0,0,0,0);
-
 	// get tab position after resizing and calc page rect
 	CRect rectPage, rectSheet;
 	GetTotalClientRect(&rectSheet);
@@ -344,49 +334,71 @@ BOOL CResizableSheet::CalcSizeExtra(HWND /*hWndChild*/, const CSize& sizeChild, 
 	if (!GetAnchorPosition(pTab->m_hWnd, rectSheet, rectPage))
 		return FALSE; // no page yet
 
-	// temporarily resize the tab control to calc page size
-	CRect rectSave;
-	pTab->GetWindowRect(rectSave);
-	::MapWindowPoints(NULL, m_hWnd, (LPPOINT)&rectSave, 2);
-	pTab->SetRedraw(FALSE);
-	pTab->MoveWindow(rectPage, FALSE);
-	pTab->AdjustRect(TRUE, &rectTabMargins);
-	pTab->MoveWindow(rectSave, FALSE);
-	pTab->SetRedraw(TRUE);
+	// calculate tab margins
+	CRect rectTabMargins = AdjustTabRects(rectPage);
 
 	// add non-client size
-	::AdjustWindowRectEx(&rectTabMargins, GetStyle(), !(GetStyle() & WS_CHILD) &&
+	const DWORD dwStyle = GetStyle();
+	::AdjustWindowRectEx(&rectTabMargins, dwStyle, !(dwStyle & WS_CHILD) &&
 		::IsMenu(GetMenu()->GetSafeHmenu()), GetExStyle());
-
 	// compute extra size
 	sizeExtra = rectMargins.TopLeft() + rectMargins.BottomRight() +
 		rectTabMargins.Size();
 	return TRUE;
 }
 
-void CResizableSheet::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI) 
+CRect CResizableSheet::AdjustTabRects(CRect &rectPage) const
+{
+	CTabCtrl* pTab = GetTabControl();
+	CRect rectTabMargins;
+	if (m_rectLastPage == rectPage)
+	{
+		// use cached rects to avoid flickering while moving the window
+		rectPage = m_rectLastAjustedPage;
+		rectTabMargins = m_rectLastTabMargins;
+	}
+	else
+	{
+		m_rectLastPage = rectPage;
+
+		// temporarily resize the tab control to calc page size
+		CRect rectSave;
+		pTab->GetWindowRect(rectSave);
+		::MapWindowPoints(NULL, m_hWnd, (LPPOINT)&rectSave, 2);
+		pTab->SetRedraw(FALSE);
+		pTab->MoveWindow(rectPage, FALSE);
+		pTab->AdjustRect(FALSE, &rectPage);
+		pTab->AdjustRect(TRUE, &rectTabMargins);
+		pTab->MoveWindow(rectSave, FALSE);
+		pTab->SetRedraw(TRUE);
+
+		m_rectLastAjustedPage = rectPage;
+		m_rectLastTabMargins = rectTabMargins;
+	}
+	return rectTabMargins;
+}
+
+void CResizableSheet::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI)
 {
 	MinMaxInfo(lpMMI);
 
 	if (!GetTabControl())
 		return;
 
-	const int nCount = GetPageCount();
-	for (int idx = 0; idx < nCount; ++idx)
+	int idx = GetPageCount();
+	if (IsWizard())	// wizard mode
 	{
-		if (IsWizard())	// wizard mode
-		{
-			// use pre-calculated margins
-			CRect rectExtra(-CPoint(m_sizePageTL), -CPoint(m_sizePageBR));
-			// add non-client size
-			::AdjustWindowRectEx(&rectExtra, GetStyle(), !(GetStyle() & WS_CHILD) &&
-				::IsMenu(GetMenu()->GetSafeHmenu()), GetExStyle());
+		CRect rectExtra(-CPoint(m_sizePageTL), -CPoint(m_sizePageBR));
+		const DWORD dwStyle = GetStyle();
+		::AdjustWindowRectEx(&rectExtra, dwStyle, !(dwStyle & WS_CHILD) &&
+			::IsMenu(GetMenu()->GetSafeHmenu()), GetExStyle());
+		while (--idx >= 0)
 			ChainMinMaxInfo(lpMMI, *GetPage(idx), rectExtra.Size());
-		}
-		else	// tab mode
-		{
+	}
+	else	// tab mode
+	{
+		while (--idx >= 0)
 			ChainMinMaxInfoCB(lpMMI, *GetPage(idx));
-		}
 	}
 }
 
@@ -399,29 +411,29 @@ int CResizableSheet::GetMinWidth()
 
 	int max = 0, min = rectSheet.Width();
 	// search for leftmost and rightmost button margins
-	for (int i = 0; i < 7; i++)
+	for (int i = 0; i < 7; ++i)
 	{
 		const CWnd* pWnd = GetDlgItem(_propButtons[i]);
 		// exclude not present or hidden buttons
-		if (pWnd == NULL || !(pWnd->GetStyle() & WS_VISIBLE))
-			continue;
+		if (pWnd != NULL && (pWnd->GetStyle() & WS_VISIBLE))
+		{
+			// left position is relative to the right border
+			// of the parent window (negative value)
+			pWnd->GetWindowRect(&rectWnd);
+			::MapWindowPoints(NULL, m_hWnd, (LPPOINT)&rectWnd, 2);
+			const int left = rectSheet.right - rectWnd.left;
+			const int right = rectSheet.right - rectWnd.right;
 
-		// left position is relative to the right border
-		// of the parent window (negative value)
-		pWnd->GetWindowRect(&rectWnd);
-		::MapWindowPoints(NULL, m_hWnd, (LPPOINT)&rectWnd, 2);
-		const int left = rectSheet.right - rectWnd.left;
-		const int right = rectSheet.right - rectWnd.right;
-
-		if (left > max)
-			max = left;
-		if (right < min)
-			min = right;
+			if (left > max)
+				max = left;
+			if (right < min)
+				min = right;
+		}
 	}
 
 	// sizing border width
 	const int border = GetSystemMetrics(SM_CXSIZEFRAME);
-	
+
 	// compute total width
 	return max + min + 2*border;
 }
@@ -450,7 +462,7 @@ void CResizableSheet::RefreshLayout()
 	SendMessage(WM_SIZE);
 }
 
-LRESULT CResizableSheet::WindowProc(UINT message, WPARAM wParam, LPARAM lParam) 
+LRESULT CResizableSheet::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	if (message != WM_NCCALCSIZE || wParam == 0 || !m_bLayoutDone)
 		return CPropertySheet::WindowProc(message, wParam, lParam);

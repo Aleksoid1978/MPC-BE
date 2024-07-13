@@ -20,6 +20,7 @@ MPCVideoDec
 
 Обновлены библиотеки:
 	ffmpeg n7.1-dev-1688-ge0eff64ed1;
+	ResizableLib v1.5.3-8-g25a89da;
 	vvdec v2.3.0-24-gad8f4bb.
 
 

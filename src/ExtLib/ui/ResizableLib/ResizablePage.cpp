@@ -5,7 +5,7 @@
 // This file is part of ResizableLib
 // https://github.com/ppescher/resizablelib
 //
-// Copyright (C) 2000-2015 by Paolo Messina
+// Copyright (C) 2000-2024 by Paolo Messina
 // mailto:ppescher@hotmail.com
 //
 // The contents of this file are subject to the Artistic License 2.0
@@ -61,14 +61,14 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CResizablePage message handlers
 
-void CResizablePage::OnSize(UINT nType, int cx, int cy) 
+void CResizablePage::OnSize(UINT nType, int cx, int cy)
 {
 	CWnd::OnSize(nType, cx, cy);
-	
+
 	ArrangeLayout();
 }
 
-BOOL CResizablePage::OnEraseBkgnd(CDC* pDC) 
+BOOL CResizablePage::OnEraseBkgnd(CDC* pDC)
 {
 	ClipChildren(pDC, FALSE);
 
@@ -79,25 +79,25 @@ BOOL CResizablePage::OnEraseBkgnd(CDC* pDC)
 	return bRet;
 }
 
-void CResizablePage::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI) 
+void CResizablePage::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI)
 {
 	MinMaxInfo(lpMMI);
 }
 
-BOOL CResizablePage::OnInitDialog() 
+BOOL CResizablePage::OnInitDialog()
 {
 	CPropertyPage::OnInitDialog();
-	
+
 	// set the initial size as the min track size
 	CRect rc;
 	GetWindowRect(&rc);
 	SetMinTrackSize(rc.Size());
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE; // return TRUE unless you set the focus to a control
+				 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void CResizablePage::OnDestroy() 
+void CResizablePage::OnDestroy()
 {
 	// remove child windows
 	RemoveAllAnchors();
@@ -106,7 +106,7 @@ void CResizablePage::OnDestroy()
 	CPropertyPage::OnDestroy();
 }
 
-LRESULT CResizablePage::WindowProc(UINT message, WPARAM wParam, LPARAM lParam) 
+LRESULT CResizablePage::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	if (message != WM_NCCALCSIZE || wParam == 0)
 		return CPropertyPage::WindowProc(message, wParam, lParam);

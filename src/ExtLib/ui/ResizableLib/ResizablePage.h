@@ -12,7 +12,7 @@
 // This file is part of ResizableLib
 // https://github.com/ppescher/resizablelib
 //
-// Copyright (C) 2000-2015 by Paolo Messina
+// Copyright (C) 2000-2024 by Paolo Messina
 // mailto:ppescher@hotmail.com
 //
 // The contents of this file are subject to the Artistic License 2.0
@@ -40,15 +40,14 @@ public:
 	explicit CResizablePage(LPCTSTR lpszTemplateName, UINT nIDCaption = 0);
 
 // Attributes
-public:
 
 // Operations
-public:
 
 // Overrides
+	virtual BOOL OnInitDialog();
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CResizablePage)
-	protected:
+protected:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	//}}AFX_VIRTUAL
 
@@ -66,12 +65,10 @@ protected:
 	};
 
 // Generated message map functions
-protected:
 	//{{AFX_MSG(CResizablePage)
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI);
-	virtual BOOL OnInitDialog();
 	afx_msg void OnDestroy();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()

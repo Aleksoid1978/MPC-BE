@@ -5,7 +5,7 @@
 // This file is part of ResizableLib
 // https://github.com/ppescher/resizablelib
 //
-// Copyright (C) 2000-2015 by Paolo Messina
+// Copyright (C) 2000-2024 by Paolo Messina
 // mailto:ppescher@hotmail.com
 //
 // The contents of this file are subject to the Artistic License 2.0
@@ -24,7 +24,7 @@
 
 typedef struct tagRESIZEPROPERTIES
 {
-	// wether to ask for resizing properties every time
+	// whether to ask for resizing properties every time
 	BOOL bAskClipping;
 	BOOL bAskRefresh;
 	// otherwise, use the cached properties

@@ -5,7 +5,7 @@
 // This file is part of ResizableLib
 // https://github.com/ppescher/resizablelib
 //
-// Copyright (C) 2000-2015 by Paolo Messina
+// Copyright (C) 2000-2024 by Paolo Messina
 // mailto:ppescher@hotmail.com
 //
 // The contents of this file are subject to the Artistic License 2.0
@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////
 // Static initializer object (with macros to hide in ClassView)
 
-// static intializer must be called before user code
+// static initializer must be called before user code
 #pragma warning(disable:4073)
 #pragma init_seg(lib)
 
@@ -52,6 +52,8 @@ static _VersionInitializer g_version;
 static DLLVERSIONINFO g_dviCommCtrls;
 static OSVERSIONINFOEX g_osviWindows;
 
+#pragma warning(push)
+#pragma warning(disable:4996)
 static void CheckOsVersion()
 {
 	// Try calling GetVersionEx using the OSVERSIONINFOEX structure.
@@ -59,7 +61,7 @@ static void CheckOsVersion()
 	g_osviWindows.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 	if (GetVersionEx((LPOSVERSIONINFO)&g_osviWindows))
 		return;
-	
+
 	// If that fails, try using the OSVERSIONINFO structure.
 	g_osviWindows.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
 	if (GetVersionEx((LPOSVERSIONINFO)&g_osviWindows))
@@ -72,6 +74,7 @@ static void CheckOsVersion()
 	g_osviWindows.dwPlatformId = VER_PLATFORM_WIN32_WINDOWS;
 	g_osviWindows.szCSDVersion[0] = TEXT('\0');
 }
+#pragma warning(pop)
 
 static void CheckCommCtrlsVersion()
 {
@@ -194,7 +197,7 @@ void InitThemeSettings()
 	typedef BOOL (STDAPICALLTYPE * IS_APP_THEMED)(VOID);
 	typedef DWORD (STDAPICALLTYPE * GET_THEME_APP_PROPERTIES)(VOID);
 
-	// check dll is in place, themes can't work without
+	// check DLL is in place, themes can't work without
 	HMODULE hLib = GetModuleHandle(_T("uxtheme.dll"));
 	if (hLib == NULL)
 		return;
