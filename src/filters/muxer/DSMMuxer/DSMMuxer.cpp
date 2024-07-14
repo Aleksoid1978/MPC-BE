@@ -123,13 +123,11 @@ void CDSMMuxerFilter::MuxFileInfo(IBitStream* pBS)
 	int len = 1;
 	std::list<CStringA> entries;
 
-	for (int i = 0; i < m_properties.GetSize(); i++) {
-		const CStringA key(m_properties.GetKeyAt(i));
-		const CStringA value = WStrToUTF8(m_properties.GetValueAt(i));
-		if (key.GetLength() != 4 || value.IsEmpty()) {
+	for (const auto&[key, value] : m_properties) {
+		if (key.length() != 4 || value.IsEmpty()) {
 			continue;
 		}
-		entries.emplace_back(key + value);
+		entries.emplace_back(CStringA(key.c_str(), key.length()) + WStrToUTF8(value));
 		len += 4 + value.GetLength() + 1;
 	}
 

@@ -24,6 +24,7 @@
 #include "IDSMResourceBag.h"
 
 #include <map>
+#include <unordered_map>
 #include <mutex>
 
 // IDSMPropertyBag
@@ -43,7 +44,7 @@ class IDSMPropertyBagImpl : public IDSMPropertyBag, public IPropertyBag
 	std::mutex m_mutex;
 
 protected:
-	ATL::CSimpleMap<CStringW, CStringW> m_properties;
+	std::unordered_map<std::wstring, CStringW> m_properties; // unordered_map because no need to sort by key here
 
 public:
 	IDSMPropertyBagImpl() = default;
