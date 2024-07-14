@@ -49,9 +49,6 @@ public:
 	IDSMPropertyBagImpl() = default;
 	~IDSMPropertyBagImpl() = default;
 
-	ATL::CSimpleMap<CStringW, CStringW>* LockProps();
-	void UnlockProps();
-
 	// IPropertyBag
 
 	STDMETHODIMP Read(LPCOLESTR pszPropName, VARIANT* pVar, IErrorLog* pErrorLog) override;

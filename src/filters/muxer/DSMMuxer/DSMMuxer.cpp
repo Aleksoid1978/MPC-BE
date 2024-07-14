@@ -124,11 +124,11 @@ void CDSMMuxerFilter::MuxFileInfo(IBitStream* pBS)
 	std::list<CStringA> entries;
 
 	for (int i = 0; i < m_properties.GetSize(); i++) {
-		CStringA key = CStringA(m_properties.GetKeyAt(i));
-		if (key.GetLength() != 4) {
+		const CStringA key(m_properties.GetKeyAt(i));
+		const CStringA value = WStrToUTF8(m_properties.GetValueAt(i));
+		if (key.GetLength() != 4 || value.IsEmpty()) {
 			continue;
 		}
-		CStringA value = WStrToUTF8(m_properties.GetValueAt(i));
 		entries.emplace_back(key + value);
 		len += 4 + value.GetLength() + 1;
 	}
@@ -138,7 +138,6 @@ void CDSMMuxerFilter::MuxFileInfo(IBitStream* pBS)
 	for (const auto& entry : entries) {
 		pBS->ByteWrite((LPCSTR)entry, entry.GetLength() + 1);
 	}
-
 }
 
 void CDSMMuxerFilter::MuxStreamInfo(IBitStream* pBS, CBaseMuxerInputPin* pPin)
@@ -146,19 +145,32 @@ void CDSMMuxerFilter::MuxStreamInfo(IBitStream* pBS, CBaseMuxerInputPin* pPin)
 	int len = 1;
 	std::list<CStringA> entries;
 
-	auto props = pPin->LockProps();
-	if (props) {
-		for (int i = 0; i < props->GetSize(); i++) {
-			CStringA key = CStringA(props->GetKeyAt(i));
-			if (key.GetLength() != 4) {
+	ULONG cProperties = 0;
+	HRESULT hr = pPin->CountProperties(&cProperties);
+	if (SUCCEEDED(hr) && cProperties > 0) {
+		for (ULONG iProperty = 0; iProperty < cProperties; iProperty++) {
+			PROPBAG2 PropBag = {};
+			ULONG cPropertiesReturned = 0;
+			hr = pPin->GetPropertyInfo(iProperty, 1, &PropBag, &cPropertiesReturned);
+			if (FAILED(hr)) {
 				continue;
 			}
-			CStringA value = WStrToUTF8(props->GetValueAt(i));
-			entries.emplace_back(key + value);
-			len += 4 + value.GetLength() + 1;
+
+			HRESULT hr2;
+			CComVariant var;
+			hr = pPin->Read(1, &PropBag, nullptr, &var, &hr2);
+			if (SUCCEEDED(hr) && SUCCEEDED(hr2) && (var.vt & (VT_BSTR | VT_BYREF)) == VT_BSTR) {
+				const CStringA key(PropBag.pstrName);
+				const CStringA value = WStrToUTF8(var.bstrVal);
+				if (key.GetLength() != 4 || value.IsEmpty()) {
+					continue;
+				}
+				entries.emplace_back(key + value);
+				len += 4 + value.GetLength() + 1;
+			}
+			CoTaskMemFree(PropBag.pstrName);
 		}
 	}
-	pPin->UnlockProps();
 
 	if (len > 1) {
 		MuxPacketHeader(pBS, DSMP_STREAMINFO, len);

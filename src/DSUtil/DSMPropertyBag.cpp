@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,17 +28,6 @@
 //
 
 // IPropertyBag
-
-ATL::CSimpleMap<CStringW, CStringW>* IDSMPropertyBagImpl::LockProps()
-{
-	m_mutex.lock();
-	return &m_properties;
-}
-
-void IDSMPropertyBagImpl::UnlockProps()
-{
-	m_mutex.unlock();
-}
 
 STDMETHODIMP IDSMPropertyBagImpl::Read(LPCOLESTR pszPropName, VARIANT* pVar, IErrorLog* pErrorLog)
 {
@@ -104,6 +93,10 @@ STDMETHODIMP IDSMPropertyBagImpl::GetPropertyInfo(ULONG iProperty, ULONG cProper
 	CheckPointer(pcProperties, E_POINTER);
 
 	std::lock_guard lock(m_mutex);
+
+	if (iProperty + cProperties > (ULONG)m_properties.GetSize()) {
+		return E_FAIL;
+	}
 
 	for (ULONG i = 0; i < cProperties; i++, iProperty++, (*pcProperties)++) {
 		CStringW key = m_properties.GetKeyAt(iProperty);
