@@ -937,6 +937,16 @@ void CPlayerPlaylistBar::SelectDefaultPlaylist()
 	TSelectTab();
 }
 
+bool CPlayerPlaylistBar::CheckAudioInCurrent(const CString& fn)
+{
+	auto pli = GetCur();
+	if (pli) {
+		return FindFileInList(pli->m_auds, fn);
+	}
+
+	return false;
+}
+
 void CPlayerPlaylistBar::AddAudioToCurrent(const CString& fn)
 {
 	auto pli = GetCur();

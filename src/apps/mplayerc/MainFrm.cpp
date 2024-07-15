@@ -6782,17 +6782,19 @@ void CMainFrame::OnFileLoadAudio()
 		while (pos) {
 			CString fname = fd.GetNextPathName(pos);
 
-			if (CComQIPtr<IGraphBuilderAudio> pGBA = m_pGB.p) {
-				HRESULT hr = pGBA->RenderAudioFile(fname);
-				if (SUCCEEDED(hr)) {
-					m_wndPlaylistBar.AddAudioToCurrent(fname);
-					AddAudioPathsAddons(fname.GetString());
+			if (!m_wndPlaylistBar.CheckAudioInCurrent(fname)) {
+				if (CComQIPtr<IGraphBuilderAudio> pGBA = m_pGB.p) {
+					HRESULT hr = pGBA->RenderAudioFile(fname);
+					if (SUCCEEDED(hr)) {
+						m_wndPlaylistBar.AddAudioToCurrent(fname);
+						AddAudioPathsAddons(fname.GetString());
 
-					CComQIPtr<IAMStreamSelect> pSS = FindSwitcherFilter();
-					if (pSS) {
-						DWORD cStreams = 0;
-						if (SUCCEEDED(pSS->Count(&cStreams)) && cStreams > 0) {
-							pSS->Enable(cStreams - 1, AMSTREAMSELECTENABLE_ENABLE);
+						CComQIPtr<IAMStreamSelect> pSS = FindSwitcherFilter();
+						if (pSS) {
+							DWORD cStreams = 0;
+							if (SUCCEEDED(pSS->Count(&cStreams)) && cStreams > 0) {
+								pSS->Enable(cStreams - 1, AMSTREAMSELECTENABLE_ENABLE);
+							}
 						}
 					}
 				}
