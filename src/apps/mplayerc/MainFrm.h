@@ -711,7 +711,7 @@ public:
 	void ApplyExraRendererSettings();
 
 	// subtitle streams order function
-	bool LoadSubtitle(const CExtraFileItem& subItem, ISubStream **actualStream = nullptr);
+	bool LoadSubtitle(const CExtraFileItem& subItem, ISubStream **actualStream = nullptr, bool bAutoLoad = true);
 
 	void UpdateSubtitle(bool fDisplayMessage = false, bool fApplyDefStyle = false);
 	void SetSubtitle(ISubStream* pSubStream, int iSubtitleSel = -1, bool fApplyDefStyle = false);

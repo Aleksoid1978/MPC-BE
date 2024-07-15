@@ -374,6 +374,9 @@ public:
 
 	void SelectDefaultPlaylist();
 
+	void AddAudioToCurrent(const CString& fn);
+	void AddSubtitleToCurrent(const CString& fn);
+
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);

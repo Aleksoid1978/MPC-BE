@@ -301,7 +301,7 @@ CString CPlaylistItem::GetLabel(int i) const
 }
 
 template<class T>
-static bool FindFileInList(std::list<T>& sl, CString fn)
+static bool FindFileInList(std::list<T>& sl, const CString& fn)
 {
 	for (const auto& item : sl) {
 		if (CString(item).CompareNoCase(fn) == 0) {
@@ -935,6 +935,26 @@ void CPlayerPlaylistBar::SelectDefaultPlaylist()
 
 	TEnsureVisible(m_nCurPlayListIndex);
 	TSelectTab();
+}
+
+void CPlayerPlaylistBar::AddAudioToCurrent(const CString& fn)
+{
+	auto pli = GetCur();
+	if (pli) {
+		if (!FindFileInList(pli->m_auds, fn)) {
+			pli->m_auds.emplace_back(fn);
+		}
+	}
+}
+
+void CPlayerPlaylistBar::AddSubtitleToCurrent(const CString& fn)
+{
+	auto pli = GetCur();
+	if (pli) {
+		if (!FindFileInList(pli->m_subs, fn)) {
+			pli->m_subs.emplace_back(fn);
+		}
+	}
 }
 
 BOOL CPlayerPlaylistBar::PreCreateWindow(CREATESTRUCT& cs)
