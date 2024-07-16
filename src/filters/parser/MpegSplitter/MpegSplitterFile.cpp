@@ -420,9 +420,13 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 
 	m_pmt_streams.clear();
 	m_ProgramData.clear();
+
 	mpeg_streams.clear();
 	avc_streams.clear();
 	hevc_streams.clear();
+	vvc_streams.clear();
+	dtshd_streams.clear();
+
 	m_SyncPoints.clear();
 
 	Seek(m_posMin);
@@ -667,6 +671,8 @@ void CMpegSplitterFile::SearchStreams(const __int64 start, const __int64 stop, c
 	mpeg_streams.clear();
 	avc_streams.clear();
 	hevc_streams.clear();
+	vvc_streams.clear();
+	dtshd_streams.clear();
 
 	Seek(start);
 
@@ -1265,6 +1271,14 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 					if (Read(h, len, &s.mt, false)) {
 						s.dts.bDTSCore = true;
 						type = stream_type::audio;
+
+						if (pes_stream_type == AUDIO_STREAM_DTS_HD || pes_stream_type == AUDIO_STREAM_DTS_HD_MASTER_AUDIO) {
+							Seek(start);
+							auto& h = dtshd_streams[s];
+							h.pData.reserve(static_cast<size_t>(16)* KILOBYTE);
+							h.pData.resize(static_cast<size_t>(len));
+							ByteRead(h.pData.data(), len);
+						}
 					}
 				}
 
@@ -1361,29 +1375,46 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 				if (pes_stream_type == AUDIO_STREAM_DTS_HD || pes_stream_type == AUDIO_STREAM_DTS_HD_MASTER_AUDIO) {
 					stream* source = (stream*)m_streams[stream_type::audio].GetStream(s);
 					if (source && source->dts.bDTSCore && !source->dts.bDTSHD && source->mt.pbFormat) {
-						Seek(start);
-						if (BitRead(32, true) == FCC(DTS_SYNCWORD_SUBSTREAM)) {
-							BYTE* buf = DNew BYTE[len];
-							audioframe_t aframe;
-							if (ByteRead(buf, len) == S_OK && ParseDTSHDHeader(buf, len, &aframe)) {
-								WAVEFORMATEX* wfe = (WAVEFORMATEX*)source->mt.pbFormat;
-								wfe->nSamplesPerSec = aframe.samplerate;
-								wfe->nChannels = aframe.channels;
-								if (aframe.param1) {
-									wfe->wBitsPerSample = aframe.param1;
-								}
-								if (aframe.param2 == DCA_PROFILE_HD_HRA) {
-									wfe->nAvgBytesPerSec += CalcBitrate(aframe) / 8;
-								} else {
-									wfe->nAvgBytesPerSec = 0;
-								}
+						auto& h = dtshd_streams[s];
+						auto size = h.pData.size();
+						h.pData.resize(size + len);
+						ByteRead(h.pData.data() + size, len);
 
-								source->dts.bDTSHD = true;
+						if (h.pData.size() >= static_cast<size_t>(16) * KILOBYTE) {
+							BYTE* start = h.pData.data();
+							BYTE* end = start + h.pData.size();
+							audioframe_t aframe;
+							int size = ParseDTSHeader(start, &aframe);
+							if (size) {
+								auto wfe = reinterpret_cast<WAVEFORMATEX*>(source->mt.pbFormat);
+								if (aframe.samples) {
+									wfe->nAvgBytesPerSec = size * aframe.samplerate / aframe.samples;
+								}
+								if (start + size + 40 <= end) {
+									if (ParseDTSHDHeader(start + size, end - start - size, &aframe)) {
+										wfe->nSamplesPerSec = aframe.samplerate;
+										wfe->nChannels = aframe.channels;
+										if (aframe.param1) {
+											wfe->wBitsPerSample = aframe.param1;
+										}
+										wfe->nBlockAlign = wfe->nChannels * wfe->wBitsPerSample / 8;
+										if (aframe.param2 == DCA_PROFILE_HD_HRA || aframe.param2 == DCA_PROFILE_HD_HRA_X || aframe.param2 == DCA_PROFILE_HD_HRA_X_IMAX) {
+											wfe->nAvgBytesPerSec += CalcBitrate(aframe) / 8;
+										} else {
+											wfe->nAvgBytesPerSec = 0;
+										}
+
+										wfe = reinterpret_cast<WAVEFORMATEX*>(source->mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 1));
+										wfe->cbSize = 1;
+										((BYTE*)(wfe + 1))[0] = aframe.param2;
+									}
+								}
 							}
-							delete [] buf;
+
+							source->dts.bDTSHD = true;
 						}
 					}
-				} else if (pes_stream_type ==  AUDIO_STREAM_AC3 || pes_stream_type == AUDIO_STREAM_AC3_PLUS || pes_stream_type == AUDIO_STREAM_EAC3 || pes_stream_type == SECONDARY_AUDIO_AC3_PLUS) {
+				} else if (pes_stream_type == AUDIO_STREAM_AC3 || pes_stream_type == AUDIO_STREAM_AC3_PLUS || pes_stream_type == AUDIO_STREAM_EAC3 || pes_stream_type == SECONDARY_AUDIO_AC3_PLUS) {
 					stream* source = (stream*)m_streams[stream_type::audio].GetStream(s);
 					if (source && source->mt.pbFormat && source->bParseEAC3SubStream) {
 						Seek(start);

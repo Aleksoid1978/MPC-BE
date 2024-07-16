@@ -1254,7 +1254,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 												wfe->wBitsPerSample = aframe.param1;
 											}
 											wfe->nBlockAlign = wfe->nChannels * wfe->wBitsPerSample / 8;
-											if (aframe.param2 == DCA_PROFILE_HD_HRA) {
+											if (aframe.param2 == DCA_PROFILE_HD_HRA || aframe.param2 == DCA_PROFILE_HD_HRA_X || aframe.param2 == DCA_PROFILE_HD_HRA_X_IMAX) {
 												wfe->nAvgBytesPerSec += CalcBitrate(aframe) / 8;
 											} else {
 												wfe->nAvgBytesPerSec = 0;

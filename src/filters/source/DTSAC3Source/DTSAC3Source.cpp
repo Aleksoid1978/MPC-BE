@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -313,7 +313,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 			if (HD_size) {
 				m_framesize += HD_size;
-				if (aframe.param2 == DCA_PROFILE_HD_HRA) {
+				if (aframe.param2 == DCA_PROFILE_HD_HRA || aframe.param2 == DCA_PROFILE_HD_HRA_X || aframe.param2 == DCA_PROFILE_HD_HRA_X_IMAX) {
 					m_bitrate += CalcBitrate(aframe);
 				} else {
 					m_bitrate = 0;

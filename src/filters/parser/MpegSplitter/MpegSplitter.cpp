@@ -398,10 +398,18 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 					}
 					break;
 					case WAVE_FORMAT_DTS2: {
-						if (pPresentationDesc) {
-							Infos.emplace_back(pPresentationDesc);
-						} else {
-							Infos.emplace_back(L"DTS");
+						CStringW codecName;
+						if (pInfo->cbSize == 1) {
+							const auto profile = (reinterpret_cast<const BYTE*>(pInfo + 1))[0];
+							GetDTSHDDescription(profile, codecName);
+							Infos.emplace_back(codecName);
+						}
+						if (codecName.IsEmpty()) {
+							if (pPresentationDesc) {
+								Infos.emplace_back(pPresentationDesc);
+							} else {
+								Infos.emplace_back(L"DTS");
+							}
 						}
 					}
 					break;
