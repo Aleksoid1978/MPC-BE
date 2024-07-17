@@ -152,8 +152,22 @@ STDMETHODIMP CSubPicImpl::GetSourceAndDest(
 		if (bNeedSpecialCase && !bMatchesAR) {
 			const auto extraHeight = szTarget.cy - m_virtualTextureSize.cy * scaleY;
 			const auto extraWidth = szTarget.cx - m_virtualTextureSize.cx * scaleX;
-			offset.SetPoint(lround(extraWidth / 2.), lround(extraHeight / 2.));
-			rcTemp.OffsetRect(offset);
+			if (extraHeight != 0.0 || extraWidth != 0.0) {
+				offset.SetPoint(lround(extraWidth / 2.), lround(extraHeight / 2.));
+				rcTemp.OffsetRect(offset);
+			}
+
+			// shift bitmap subtitles if they go beyond the right/bottom border of the frame
+			offset.SetPoint(0, 0);
+			if (rcTemp.right > rcTarget.right) {
+				offset.x -= (rcTemp.right - rcTarget.right);
+			}
+			if (rcTemp.bottom > rcTarget.bottom) {
+				offset.y -= (rcTemp.bottom - rcTarget.bottom);
+			}
+			if (offset.x != 0 || offset.y != 0) {
+				rcTemp.OffsetRect(offset);
+			}
 		}
 
 		rcTemp.OffsetRect(ShiftPos);
