@@ -22,6 +22,7 @@ Subtitles added manually are now saved in the playlist.
 
 Installer
 Compiling the installer requires InnoSetup 6.1.0 or later.
+Updated MPC Video Renderer 0.8.5.
 
 Updated Romanian translation (by Andrei Miloiu).
 Updated Korean translation (by Hackjjang).
