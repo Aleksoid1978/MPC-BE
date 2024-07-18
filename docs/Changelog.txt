@@ -2,6 +2,9 @@
 
 1.7.2.x dev
 =============================
+Splitters
+Improved DTS-HD track detection.
+
 MpegSplitter
 Improved support for Dolby Vision Profile 7.
 
@@ -9,10 +12,16 @@ MPCVideoDec
 The VVdeC decoder is now used for VVC video on processors without SSE4.1 support.
 Fixed P010 to YV12 conversion.
 Optimized P010 to NV12 conversion for processors without SSE4.
+Optimized work with NVDEC.
+Fixed output format detection for FFV1 video.
 
 Player
 Improved support for moving the file properties window between displays with different text scaling.
 Fixed remembering the position of some DVD-Videos.
+Subtitles added manually are now saved in the playlist.
+
+Installer
+Compiling the installer requires InnoSetup 6.1.0 or later.
 
 Updated Romanian translation (by Andrei Miloiu).
 Updated Korean translation (by Hackjjang).
