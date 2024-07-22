@@ -47,6 +47,7 @@ class File_Mpeg4 : public File__Analyze, File__HasReferences
 protected :
     //Streams management
     void Streams_Accept();
+    void Streams_Accept_jp2(bool IsJp2=false);
     void Streams_Finish();
     void Streams_Finish_CommercialNames ();
 

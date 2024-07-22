@@ -74,6 +74,7 @@ private :
     //Elements
     void TEM () {};
     void SOC () {}
+    void CAP ();
     void SIZ ();
     void COD ();
     void COC () {Skip_XX(Element_Size, "Data");}

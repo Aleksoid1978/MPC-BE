@@ -84,6 +84,14 @@ struct config_probe
     string              Parser;
 };
 
+enum display_captions
+{
+    DisplayCaptions_Command,
+    DisplayCaptions_Content,
+    DisplayCaptions_Stream,
+    DisplayCaptions_Max
+};
+
 //***************************************************************************
 // Class MediaInfo_Config_MediaInfo
 //***************************************************************************
@@ -387,12 +395,8 @@ public :
     void          File_Mmsh_Describe_Only_Set (bool NewValue);
     bool          File_Mmsh_Describe_Only_Get ();
     #endif //defined(MEDIAINFO_LIBMMS_YES)
-    void          File_Eia608_DisplayEmptyStream_Set (bool NewValue);
-    bool          File_Eia608_DisplayEmptyStream_Get ();
-    void          File_Eia708_DisplayEmptyStream_Set (bool NewValue);
-    bool          File_Eia708_DisplayEmptyStream_Get ();
-    void          File_CommandOnlyMeansEmpty_Set(bool NewValue);
-    bool          File_CommandOnlyMeansEmpty_Get();
+    Ztring        File_DisplayCaptions_Set (const Ztring& NewValue);
+    display_captions File_DisplayCaptions_Get ();
     Ztring        File_ProbeCaption_Set(const Ztring& NewValue);
     config_probe  File_ProbeCaption_Get(const string& Parser);
     #if defined(MEDIAINFO_AC3_YES)
@@ -627,9 +631,7 @@ private :
     #if defined(MEDIAINFO_LIBMMS_YES)
     bool                    File_Mmsh_Describe_Only;
     #endif //defined(MEDIAINFO_LIBMMS_YES)
-    bool                    File_Eia608_DisplayEmptyStream;
-    bool                    File_Eia708_DisplayEmptyStream;
-    bool                    File_CommandOnlyMeansEmpty;
+    display_captions        DisplayCaptions;
     std::vector<config_probe> File_ProbeCaption;
     size_t                  File_ProbeCaption_Pos;
     #if defined(MEDIAINFO_AC3_YES)

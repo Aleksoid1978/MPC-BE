@@ -472,7 +472,7 @@ void File_Cdp::ccdata_section()
         BS_End();
 
         #if MEDIAINFO_ADVANCED
-            if (cc_type>=2 && !Streams[2] && Config->File_Eia708_DisplayEmptyStream_Get())
+            if (cc_type>=2 && !Streams[2] && Config->File_DisplayCaptions_Get()==DisplayCaptions_Stream)
                 CreateStream(2);
         #endif //MEDIAINFO_ADVANCED
 

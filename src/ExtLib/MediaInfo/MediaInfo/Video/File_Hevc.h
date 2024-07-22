@@ -418,7 +418,7 @@ private :
     void slice_segment_header();
     void profile_tier_level(profile_tier_level_struct& p, bool profilePresentFlag, int8u maxNumSubLayersMinus1);
     void short_term_ref_pic_sets(int8u num_short_term_ref_pic_sets);
-    void vui_parameters(std::vector<video_parameter_set_struct*>::iterator video_parameter_set_Item, seq_parameter_set_struct::vui_parameters_struct* &vui_parameters_Item);
+    void vui_parameters(seq_parameter_set_struct::vui_parameters_struct* &vui_parameters_Item, int8u maxNumSubLayersMinus1);
     void hrd_parameters(bool commonInfPresentFlag, int8u maxNumSubLayersMinus1, seq_parameter_set_struct::vui_parameters_struct::xxl_common* &xxL_Common, seq_parameter_set_struct::vui_parameters_struct::xxl* &NAL, seq_parameter_set_struct::vui_parameters_struct::xxl* &VCL);
     void sub_layer_hrd_parameters(seq_parameter_set_struct::vui_parameters_struct::xxl_common* xxL_Common, int8u bit_rate_scale, int8u cpb_size_scale, int32u cpb_cnt_minus1, seq_parameter_set_struct::vui_parameters_struct::xxl* &hrd_parameters_Item);
     void scaling_list_data();

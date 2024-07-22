@@ -240,6 +240,9 @@
 #if defined(MEDIAINFO_DTSUHD_YES)
     #include "MediaInfo/Audio/File_DtsUhd.h"
 #endif
+#if defined(MEDIAINFO_DAT_YES)
+    #include "MediaInfo/Audio/File_Dat.h"
+#endif
 #if defined(MEDIAINFO_DOLBYE_YES)
     #include "MediaInfo/Audio/File_DolbyE.h"
 #endif
@@ -643,6 +646,9 @@ static File__Analyze* SelectFromExtension(const String& Parser)
     #endif
     #if defined(MEDIAINFO_DTSUHD_YES)
         if (Parser==__T("DtsUhd"))      return new File_DtsUhd();
+    #endif
+    #if defined(MEDIAINFO_DAT_YES)
+        if (Parser==__T("Dat"))        return new File_Dat();
     #endif
     #if defined(MEDIAINFO_DOLBYE_YES)
         if (Parser==__T("DolbyE"))      return new File_DolbyE();
@@ -1051,6 +1057,9 @@ int MediaInfo_Internal::ListFormats(const String &File_Name)
     #endif
     #if defined(MEDIAINFO_DTSUHD_YES)
         delete Info; Info=new File_DtsUhd();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+    #endif
+    #if defined(MEDIAINFO_DAT_YES)
+        delete Info; Info=new File_Dat();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
 //    Too many false-positives
 //    #if defined(MEDIAINFO_DOLBYE_YES)

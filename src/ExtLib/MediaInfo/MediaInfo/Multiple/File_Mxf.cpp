@@ -588,6 +588,9 @@ namespace Elements
     UUID(060E2B34, 01020101, 0E067F03, 00000000, 0000, "", GenericContainer_Sony, "")
 
     //                         09 - Dolby
+    UUID(060E2B34, 01010105, 0E090400, 00000000, 0000, "Dolby", Dolby_040000000000, "")
+    UUID(060E2B34, 02530105, 0E090502, 00000000, 0000, "Dolby", Dolby_050200000000, "")
+    UUID(060E2B34, 01020105, 0E090502, 01000101, 0000, "Dolby", Dolby_050201000101, "")
     UUID(060E2B34, 01020105, 0E090607, 01010100, 0000, "Dolby", Dolby_PHDRImageMetadataItem, "")
     UUID(060E2B34, 02530105, 0E090607, 01010103, 0000, "Dolby", Dolby_PHDRMetadataTrackSubDescriptor, "")
     UUID(060E2B34, 01010105, 0E090607, 01010104, 0000, "Dolby", Dolby_DataDefinition, "")
@@ -3784,6 +3787,49 @@ void File_Mxf::Streams_Finish_Descriptor(const int128u DescriptorUID, const int1
         }
     }
 
+    Streams_Finish_Descriptor(Descriptor);
+    auto StreamKind_Last_Sav=StreamKind_Last;
+    auto StreamPos_Last_Sav=StreamPos_Last;
+    auto ID_Sav=Ztring::ToZtring(Descriptor->second.LinkedTrackID);
+    for (size_t StreamKind=Stream_Text; StreamKind<Stream_Max; StreamKind++)
+        for (size_t StreamPos=0; StreamPos<Count_Get((stream_t)StreamKind); StreamPos++)
+        {
+            if (StreamKind==StreamKind_Last_Sav && StreamPos==StreamPos_Last_Sav)
+                continue;
+            auto ID=Retrieve_Const((stream_t)StreamKind, StreamPos, General_ID);
+            size_t ID_SubStreamInfo_Pos=ID.find(__T('-'));
+            if (ID_SubStreamInfo_Pos!=string::npos)
+            {
+                ID.resize(ID_SubStreamInfo_Pos);
+            }
+            if (ID==ID_Sav)
+            {
+                if (Descriptor->second.StreamKind==Stream_Video)
+                {
+                    Fill((stream_t)StreamKind, StreamPos, General_StreamOrder, Retrieve_Const(Stream_Video, 0, General_StreamOrder));
+                    continue;
+                }
+                if (Descriptor->second.StreamKind==Stream_Audio) //TODO: handle correctly when ID is same in different tracks
+                {
+                    continue;
+                }
+                StreamKind_Last=(stream_t)StreamKind;
+                StreamPos_Last=StreamPos;
+                Streams_Finish_Descriptor(Descriptor);
+            }
+        }
+}
+
+//---------------------------------------------------------------------------
+void File_Mxf::Streams_Finish_Descriptor(descriptors::iterator Descriptor)
+{
+    size_t Before_Count[Stream_Max];
+    for (size_t Pos=0; Pos<Stream_Max; Pos++)
+        Before_Count[Pos]=(size_t)-1;
+    Before_Count[Stream_Video]=Count_Get(Stream_Video);
+    Before_Count[Stream_Audio]=Count_Get(Stream_Audio);
+    Before_Count[Stream_Text]=Count_Get(Stream_Text);
+
     if (StreamKind_Last!=Stream_Max && StreamPos_Last!=(size_t)-1)
     {
         //Handling buggy files
@@ -3955,7 +4001,10 @@ void File_Mxf::Streams_Finish_Descriptor(const int128u DescriptorUID, const int1
                             if (Info->first=="BitRate")
                                 continue; // Not always valid e.g. Dolby E. TODO: check in case of normal check
                             if (Info->first=="StreamOrder")
-                                continue; // Is not useful and has some issues with Dolby E
+                            {
+                                Fill(StreamKind_Last, StreamPos_Last+Pos, Info->first.c_str(), Info->second);
+                                continue;
+                            }
 
                             // Filling both values
                             Fill(StreamKind_Last, StreamPos_Last+Pos, (Info->first+"_Original").c_str(), FromEssence); //TODO: use the generic engine by filling descriptor info before merging essence info
@@ -4833,7 +4882,7 @@ void File_Mxf::Read_Buffer_Continue()
                 Get_B1(SS,                                      "SS");
                 Get_B1(Drop,                                    "Drop");
                 Get_B1(FF,                                      "SS");
-                TimeCode TC(HH, MM, SS, FF, FF<=99?99:255, TimeCode::flags().DropFrame());
+                TimeCode TC(HH, MM, SS, FF, FF<=99?99:255, TimeCode::flags().DropFrame(Drop));
                 Element_Info1(TC.ToString());
                 if (!Frame_Count_NotParsedIncluded)
                 {
@@ -6481,6 +6530,8 @@ void File_Mxf::Data_Parse()
     ELEMENT(TextBasedFramework,                                 "Text-based Framework")
     ELEMENT(GenericStreamTextBasedSet,                          "Generic Stream Text-based Set")
     ELEMENT(MXFGenericStreamDataElementKey_09_01,               "MXF Generic Stream Data Element Key")
+    ELEMENT(Dolby_050200000000,                                 "Dolby .05.02.00.00.00.00")
+    ELEMENT(Dolby_050201000101,                                 "Dolby .05.02.01.00.01.01")
     ELEMENT(Dolby_PHDRMetadataTrackSubDescriptor,               "Dolby PHDRMetadataTrackSubDescriptor")
     ELEMENT(Omneon_010201010100,                                "Omneon .01.02.01.01.01.00")
     ELEMENT(Omneon_010201020100,                                "Omneon .01.02.01.02.01.00")
@@ -9696,6 +9747,25 @@ void File_Mxf::Dolby_PHDRImageMetadataItem()
 {
     //Parsing
     Skip_String(Element_Size,                                   "Data");
+}
+
+//---------------------------------------------------------------------------
+void File_Mxf::Dolby_050200000000()
+{
+    {
+        std::map<int16u, int128u>::iterator Primer_Value=Primer_Values.find(Code2);
+        if (Primer_Value!=Primer_Values.end())
+        {
+            int32u Code_Compare1=Primer_Value->second.hi>>32;
+            int32u Code_Compare2=(int32u)Primer_Value->second.hi;
+            int32u Code_Compare3=Primer_Value->second.lo>>32;
+            int32u Code_Compare4=(int32u)Primer_Value->second.lo;
+            if(0);
+            ELEMENT_UUID(Dolby_040000000000,                            "Dolby 04.00.00.00.00.00")
+        }
+    }
+
+    GenericDataEssenceDescriptor();
 }
 
 //---------------------------------------------------------------------------
@@ -14666,6 +14736,14 @@ void File_Mxf::Omneon_010201020100_8006()
 }
 
 //---------------------------------------------------------------------------
+// 0x8006
+void File_Mxf::Dolby_040000000000()
+{
+    //Parsing
+    Skip_UTF8(Length2,                                          "Content");
+}
+
+//---------------------------------------------------------------------------
 //
 void File_Mxf::Dolby_DataDefinition()
 {
@@ -19197,13 +19275,13 @@ bool File_Mxf::BookMark_Needed()
     {
         int64u ProbeCaptionBytePos=(int64u)-1;
         int64u ProbeCaptionByteDur=(int64u)-1;
-        int64u Duration=0;
+        float32 Duration=0;
         for (size_t StreamKind=Stream_General; StreamKind<Stream_Max; StreamKind++)
         {
             auto Count=Count_Get((stream_t)StreamKind);
             for (size_t StreamPos=0; StreamPos<Count; StreamPos++)
             {
-                Duration=Retrieve_Const((stream_t)StreamKind, StreamPos, Fill_Parameter((stream_t)StreamKind, Generic_Duration)).To_int64u()/1000;
+                Duration=Retrieve_Const((stream_t)StreamKind, StreamPos, Fill_Parameter((stream_t)StreamKind, Generic_Duration)).To_int64u()/1000.0;
                 if (Duration)
                     break;
             }
@@ -19225,6 +19303,20 @@ bool File_Mxf::BookMark_Needed()
             }
         }
         auto Probe=Config->File_ProbeCaption_Get(ParserName);
+        int64u HeaderSize=0;
+        int64u ContentSize=File_Size;
+        if (!Partitions.empty())
+        {
+            const auto& FirstPartition=Partitions.front();
+            HeaderSize=FirstPartition.PartitionPackByteCount+FirstPartition.HeaderByteCount+FirstPartition.IndexByteCount;
+            ContentSize-=HeaderSize;
+            const auto& LastPartition=Partitions.back();
+            if (LastPartition.StreamOffset==FirstPartition.FooterPartition)
+            {
+                 int64u FooterSize=File_Size-LastPartition.StreamOffset;
+                 ContentSize-=FooterSize;
+            }
+        }
         switch (Probe.Start_Type)
         {
             case config_probe_size:
@@ -19233,15 +19325,13 @@ bool File_Mxf::BookMark_Needed()
             case config_probe_dur:
                 if (Duration)
                 {
-                    Probe.Start=Probe.Start*100/Duration; //TODO: real timestamp
-                    if (!Probe.Start)
-                        Probe.Start=1;
+                    ProbeCaptionBytePos=HeaderSize+(float32)Probe.Start/Duration*ContentSize; //TODO: real timestamp
                 }
                 else
-                    Probe.Start=50;
-                // Fall through
+                    ProbeCaptionBytePos=HeaderSize+ContentSize/2;
+                break;
             case config_probe_percent:
-                ProbeCaptionBytePos=File_Size/100*Probe.Start;
+                ProbeCaptionBytePos=HeaderSize+ContentSize/100*Probe.Start;
                 break;
         }
         switch (Probe.Duration_Type) {
@@ -19251,15 +19341,13 @@ bool File_Mxf::BookMark_Needed()
             case config_probe_dur:
                 if (Duration)
                 {
-                    Probe.Duration=Probe.Duration*100/Duration; //TODO: real timestamp
-                    if (!Probe.Duration)
-                        Probe.Duration++;
+                    ProbeCaptionByteDur=(float32)Probe.Duration/Duration*ContentSize; //TODO: real timestamp
                 }
                 else
-                    Probe.Duration=1;
-                // Fall through
+                    ProbeCaptionByteDur=ContentSize/100;
+                break;
             case config_probe_percent:
-                ProbeCaptionByteDur=File_Size/100*Probe.Duration;
+                ProbeCaptionByteDur=ContentSize/100*Probe.Duration;
                 break;
         }
         auto MaxOffset=ProbeCaptionBytePos+ProbeCaptionByteDur;

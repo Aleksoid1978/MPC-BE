@@ -1343,18 +1343,20 @@ void File_MpegTs::Streams_Update_Duration_Update()
         }
     }
 
-    if (Duration_Max)
-        Fill(Stream_General, 0, General_Duration, ((float64)Duration_Max) / 27000, 6, true);
     if (Duration_Count && Duration_Sum && Bytes_Sum)
     {
         //Filling Duration and bitrate with an average of content from all streams with PCR
         //Min and Max are based on a a 1 byte precision in the computed byte count + +/- 500 ns tolerance for hte PCR vale
-        Fill(Stream_General, 0, General_OverallBitRate, Bytes_Sum * 8 / (((float64)Duration_Sum) / 27000000), 0, true);
+        auto OverallBitRate = Bytes_Sum / (((float64)Duration_Sum) / ( 8 * 27000000) ); // 8-bit per byte and 27 MHz duration
+        Fill(Stream_General, 0, General_Duration, File_Size / (OverallBitRate / 8000), 6, true);
+        Fill(Stream_General, 0, General_OverallBitRate, OverallBitRate, 0, true);
         Fill(Stream_General, 0, "OverallBitRate_Precision_Min", (Bytes_Sum - Duration_Count) * 8 / (((float64)(Duration_Sum + 13500 * Duration_Count)) / 27000000), 0, true);
         Fill_SetOptions(Stream_General, 0, "OverallBitRate_Precision_Min", "N NT");
         Fill(Stream_General, 0, "OverallBitRate_Precision_Max", (Bytes_Sum + Duration_Count) * 8 / (((float64)(Duration_Sum - 13500 * Duration_Count)) / 27000000), 0, true);
         Fill_SetOptions(Stream_General, 0, "OverallBitRate_Precision_Max", "N NT");
     }
+    else if (Duration_Max)
+        Fill(Stream_General, 0, General_Duration, ((float64)Duration_Max) / 27000, 6, true);
 
     if (IsVbr)
         Fill(Stream_General, 0, General_OverallBitRate_Mode, "VBR", Unlimited, true, true);

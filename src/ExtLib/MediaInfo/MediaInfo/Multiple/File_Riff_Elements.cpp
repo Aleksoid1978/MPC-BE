@@ -3425,7 +3425,7 @@ void File_Riff::RMP3_data()
 {
     Element_Name("Raw datas");
 
-    Fill(Stream_Audio, StreamPos_Last, Audio_StreamSize, Buffer_DataToParse_End-Buffer_DataToParse_Begin);
+    Fill(Stream_Audio, StreamPos_Last, Audio_StreamSize, Buffer_DataToParse_End?((Buffer_DataToParse_End>File_Size?File_Size:Buffer_DataToParse_End)-Buffer_DataToParse_Begin):(Element_TotalSize_Get()-Alignement_ExtraByte));
     Stream_Prepare(Stream_Audio);
 
     //Creating parser
@@ -3440,7 +3440,7 @@ void File_Riff::RMP3_data()
         StreamItem.Parsers.push_back(Parser);
     #else //MEDIAINFO_MPEG4_YES
         Fill(Stream_Audio, StreamPos_Last, Audio_Format, "MPEG Audio");
-        Skip_XX(Buffer_DataToParse_End-Buffer_DataToParse_Begin, "Data");
+        Skip_XX(Buffer_DataToParse_End?((Buffer_DataToParse_End>File_Size?File_Size:Buffer_DataToParse_End)-Buffer_DataToParse_Begin):(Element_TotalSize_Get()-Alignement_ExtraByte), "Data");
     #endif
 }
 
@@ -3741,7 +3741,7 @@ void File_Riff::WAVE_axml()
         Element_Name("AXML");
 
         //Parsing
-        Adm->TotalSize=Buffer_DataToParse_End?(Buffer_DataToParse_End-(File_Offset+Buffer_Offset)):Element_TotalSize_Get();
+        Adm->TotalSize=Buffer_DataToParse_End?((Buffer_DataToParse_End>File_Size?File_Size:Buffer_DataToParse_End)-Buffer_DataToParse_Begin):(Element_TotalSize_Get()-Alignement_ExtraByte);
         WAVE_axml_Continue();
     }
 }
@@ -3992,7 +3992,7 @@ void File_Riff::WAVE_data()
 
     if (Buffer_DataToParse_End && Buffer_DataToParse_End-Buffer_DataToParse_Begin<100)
     {
-        Skip_XX(Buffer_DataToParse_End-Buffer_Offset,           "Unknown");
+        Skip_XX(Buffer_DataToParse_End-Alignement_ExtraByte-Buffer_Offset, "Unknown");
         return; //This is maybe embeded in another container, and there is only the header (What is the junk?)
     }
 
@@ -4000,7 +4000,7 @@ void File_Riff::WAVE_data()
     Element_Code=(int64u)-1;
 
     FILLING_BEGIN();
-        int64u StreamSize=(Buffer_DataToParse_End?(Buffer_DataToParse_End-Buffer_DataToParse_Begin):Element_Size)-(Element_Code==Elements::AIFF_SSND?8:0);
+        int64u StreamSize=(Buffer_DataToParse_End?((Buffer_DataToParse_End>File_Size?File_Size:Buffer_DataToParse_End)-Buffer_DataToParse_Begin):(Element_TotalSize_Get()-Alignement_ExtraByte))-(Element_Code==Elements::AIFF_SSND?8:0);
         Fill(Stream_Audio, StreamPos_Last, Audio_StreamSize, StreamSize, 10, true);
         if (Retrieve(Stream_Audio, StreamPos_Last, Audio_Format)==__T("PCM") && BlockAlign)
             Fill(Stream_Audio, StreamPos_Last, Audio_SamplingCount, StreamSize/BlockAlign, 10, true);
@@ -4022,6 +4022,8 @@ void File_Riff::WAVE_data()
             Fill(Stream_General, 0, General_Duration, Retrieve_Const(Stream_General, 0, General_Duration).To_int64u()+Duration, 0, true); // Found files with 2 fmt/data chunks
             Fill(Stream_Audio, StreamPos_Last, Audio_Duration, Duration, 0, true);
         }
+        if (!Buffer_DataToParse_End)
+            WAVE_data_Continue();
     FILLING_END();
 }
 

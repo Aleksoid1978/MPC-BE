@@ -55,6 +55,7 @@ namespace Elements
 {
     const int16u TEM =0xFF01;
     const int16u SOC =0xFF4F; //JPEG 2000
+    const int16u CAP =0xFF50; //JPEG 2000
     const int16u SIZ =0xFF51; //JPEG 2000
     const int16u COD =0xFF52; //JPEG 2000
     const int16u COC =0xFF53; //JPEG 2000
@@ -177,6 +178,18 @@ string Jpeg_WithLevel(string Profile, int8u Level, bool HasSubLevel=false)
 
 string Jpeg2000_Rsiz(int16u Rsiz)
 {
+    if (Rsiz&(1<<14))
+    {
+        string Result="HTJ2K";
+        Rsiz^=(1<<14);
+        if (Rsiz)
+        {
+            Result+=" / ";
+            Result+=Jpeg2000_Rsiz(Rsiz);
+        }
+        return Result;
+    }
+
     switch (Rsiz)
     {
         case 0x0000: return "No restrictions";
@@ -596,6 +609,7 @@ void File_Jpeg::Data_Parse()
     {
         CASE_INFO(TEM ,                                         "TEM");
         CASE_INFO(SOC ,                                         "Start of codestream"); //JPEG 2000
+        CASE_INFO(CAP ,                                         "Extended capabilities"); //JPEG 2000
         CASE_INFO(SIZ ,                                         "Image and tile size"); //JPEG 2000
         CASE_INFO(COD ,                                         "Coding style default"); //JPEG 2000
         CASE_INFO(COC ,                                         "Coding style component"); //JPEG 2000
@@ -684,6 +698,54 @@ void File_Jpeg::Data_Parse()
 //***************************************************************************
 // Elements
 //***************************************************************************
+
+//---------------------------------------------------------------------------
+void File_Jpeg::CAP()
+{
+    //Parsing
+    int32u Pcap;
+    Get_B4(Pcap,                                                "Pcap - Parts containing extended capabilities");
+    vector<int8u> Ccap_i;
+    for (int i=31; i>=0; i--)
+    {
+        if (Pcap & (1<<i))
+            Ccap_i.push_back(32-i);
+    }
+    for (auto Version : Ccap_i)
+    {
+        Element_Begin1(("ISO/IEC 15444-" + to_string(Version)).c_str());
+        switch (Version)
+        {
+            case 15:
+                {
+                int8u MAGB;
+                bool HTIRV;
+                BS_Begin();
+                Skip_S1(2,                                      "HTONLY HTDECLARED MIXED");
+                Skip_SB(                                        "MULTIHT");
+                Skip_SB(                                        "RGN");
+                Skip_SB(                                        "HETEROGENEOUS");
+                Skip_S1(5,                                      "Reserved");
+                Get_SB (   HTIRV,                               "HTIRV");
+                Get_S1 (5, MAGB,                                "MAGB");
+                if (!MAGB)
+                    MAGB = 8;
+                else if (MAGB < 20)
+                    MAGB = MAGB + 8;
+                else if (MAGB < 31)
+                    MAGB = 4 * (MAGB - 19) + 27;
+                else
+                    MAGB = 74;
+                Param_Info1(MAGB);
+                Fill(StreamKind_Last, 0, "Compression_Mode", HTIRV?"Lossy":"Lossless", Unlimited, true, true); // TODO: "Lossy" not sure, spec says "can be used with irreversible transforms"
+                BS_End();
+                }
+                break;
+            default: Skip_B2(                                   "(Unknown)");
+        }
+        Element_End0();
+    }
+}
 
 //---------------------------------------------------------------------------
 void File_Jpeg::SIZ()
@@ -844,8 +906,8 @@ void File_Jpeg::COD()
         {
             switch (MultipleComponentTransform)
             {
-                case 0x01 : Fill(StreamKind_Last, 0, "Compression_Mode", "Lossless"); break;
-                case 0x02 : Fill(StreamKind_Last, 0, "Compression_Mode", "Lossy"); break;
+                case 0x01 : Fill(StreamKind_Last, 0, "Compression_Mode", "Lossless", Unlimited, true, true); break;
+                case 0x02 : Fill(StreamKind_Last, 0, "Compression_Mode", "Lossy", Unlimited, true, true); break;
                 default   : ;
             }
         }

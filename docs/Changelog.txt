@@ -32,6 +32,7 @@ Updated libraries:
 	dav1d 1.4.2-15-g2355eeb;
 	ffmpeg n7.1-dev-1805-g9af348bd1a;
 	Little-CMS git-lcms2.16-60-g1c9021b;
+	MediaInfo git-v24.06-10-g88f3ea4aa;
 	ResizableLib v1.5.3-8-g25a89da;
 	vvdec v2.3.0-24-gad8f4bb.
 

@@ -157,7 +157,7 @@ void File_Scte20::Read_Buffer_Init()
     #endif //defined(MEDIAINFO_EIA608_YES)
 
     //Configuration
-    Eia608_DisplayEmptyStream=Config->File_Eia608_DisplayEmptyStream_Get();
+    Eia608_DisplayEmptyStream=Config->File_DisplayCaptions_Get()==DisplayCaptions_Stream;
 }
 
 //---------------------------------------------------------------------------

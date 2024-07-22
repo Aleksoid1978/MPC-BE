@@ -78,7 +78,7 @@ private :
     bool   dsf;
     int8u  SamplingRate_Index;
     int8u  SamplingRate_Shift;
-    int8u  num_channels;
+    int16u num_channels;
     int32u SamplingRate;
     int32u channel_mask;
     int32u Size;

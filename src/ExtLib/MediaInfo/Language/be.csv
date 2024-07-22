@@ -293,6 +293,10 @@ CoDirector;
 Collection;Калекцыя
 Colorimetry;Каларыметрыя
 ColorSpace;
+ColorTheme;
+ColorTheme_Dark;
+ColorTheme_Light;
+ColorTheme_System;
 colour_primaries;Асноўныя колеры
 colour_range;
 Comment;Каментар
@@ -358,6 +362,10 @@ Disabled;
 DisplayAspectRatio;Суадносіны кадра
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Арыгінальныя суадносіны бакоў
+DisplayCaptions;
+DisplayCaptions_Command;
+DisplayCaptions_Content;
+DisplayCaptions_Stream;
 DistributedBy;Распаўсюджвальнік
 Distributor;
 Dolby_Atmos_Metadata;
@@ -1359,4 +1367,4 @@ WrittenBy;Напісаў
 Yes;Так
 Your system;Ваша сістэма
 ZZ_Automatic_Percent;67
-ZZ_AutomaticLanguage_Percent;72
+ZZ_AutomaticLanguage_Percent;71

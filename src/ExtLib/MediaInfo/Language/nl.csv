@@ -293,6 +293,10 @@ CoDirector;
 Collection;Collectie
 Colorimetry; Colorimetrie
 ColorSpace;
+ColorTheme;
+ColorTheme_Dark;
+ColorTheme_Light;
+ColorTheme_System;
 colour_primaries;
 colour_range;
 Comment;Commentaar
@@ -358,6 +362,10 @@ Disabled;
 DisplayAspectRatio;Beeldverhouding
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Originele beeldverhouding
+DisplayCaptions;
+DisplayCaptions_Command;
+DisplayCaptions_Content;
+DisplayCaptions_Stream;
 DistributedBy;Gedistribueerd door
 Distributor;
 Dolby_Atmos_Metadata;

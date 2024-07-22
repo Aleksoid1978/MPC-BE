@@ -140,12 +140,13 @@ private :
             for (size_t Pos=0; Pos<Windows.size(); Pos++)
                 delete Windows[Pos]; //Windows[Pos]=NULL;
         }
+
+        bool HasContent() { return !Windows.empty(); }
     };
     std::vector<stream*> Streams;
     int8u service_number;
     int8u block_size;
     bool   HasContent;
-    int64u DataDetected; //1 service per bit
 
     //Elements
     void NUL();                 //NUL

@@ -293,6 +293,10 @@ CoDirector;Codirettore
 Collection;Collezione
 Colorimetry;Colorimetria
 ColorSpace;Spazio colore
+ColorTheme;
+ColorTheme_Dark;
+ColorTheme_Light;
+ColorTheme_System;
 colour_primaries;Colori primari
 colour_range;Intervallo colore
 Comment;Commento
@@ -358,6 +362,10 @@ Disabled;Disabilitato/a
 DisplayAspectRatio;Rapporto aspetto visualizzazione
 DisplayAspectRatio_CleanAperture;Rapporto aspetto visualizzazione apertura
 DisplayAspectRatio_Original;Rapporto aspetto originale
+DisplayCaptions;
+DisplayCaptions_Command;
+DisplayCaptions_Content;
+DisplayCaptions_Stream;
 DistributedBy;Distribuito da
 Distributor;Distributore
 Dolby_Atmos_Metadata;Metadati Dolby Atmos

@@ -85,7 +85,6 @@ File_Eia608::File_Eia608()
     cc_data_1_Old=0x00;
     cc_data_2_Old=0x00;
     HasContent=false;
-    HasContent_Displayed=false;
     HasJumped=false;
 }
 
@@ -103,7 +102,8 @@ File_Eia608::~File_Eia608()
 //---------------------------------------------------------------------------
 void File_Eia608::Streams_Fill()
 {
-    if (Config->File_Eia608_DisplayEmptyStream_Get() && Streams.size()<2)
+    auto DisplayCaptions=Config->File_DisplayCaptions_Get();
+    if (DisplayCaptions==DisplayCaptions_Stream && Streams.size()<2)
         Streams.resize(2);
 
     if (!HasContent && ServiceDescriptors && ServiceDescriptors->ServiceDescriptors608.find(cc_type)!=ServiceDescriptors->ServiceDescriptors608.end())
@@ -114,8 +114,15 @@ void File_Eia608::Streams_Fill()
     }
 
     for (size_t Pos=0; Pos<Streams.size(); Pos++)
-        if ((Streams[Pos] && (DataDetected[1+Pos] || !Config->File_CommandOnlyMeansEmpty_Get())) || (Pos<2 && Config->File_Eia608_DisplayEmptyStream_Get()))
+    {
+        const auto Stream=Streams[Pos];
+        if (Stream || DisplayCaptions==DisplayCaptions_Stream)
         {
+            auto HasCommand=Stream;
+            auto HasContent=Stream && Stream->HasContent();
+            if (!HasContent && DisplayCaptions==DisplayCaptions_Content)
+                continue;
+
             Stream_Prepare(Stream_Text);
             Fill(Stream_Text, StreamPos_Last, Text_Format, "EIA-608");
             Fill(Stream_Text, StreamPos_Last, Text_StreamSize, 0);
@@ -130,7 +137,7 @@ void File_Eia608::Streams_Fill()
             }
             if (Config->ParseSpeed>=1.0)
             {
-                Fill(Stream_Text, StreamPos_Last, "CaptionServiceContent_IsPresent", DataDetected[Pos+1]?"Yes":"No", Unlimited, true, true); //1 bit per service, starting at 1
+                Fill(Stream_Text, StreamPos_Last, "CaptionServiceContent_IsPresent", HasContent?"Yes":"No", Unlimited, true, true);
                 Fill_SetOptions(Stream_Text, StreamPos_Last, "CaptionServiceContent_IsPresent", "N NT");
             }
             if (ServiceDescriptors)
@@ -149,7 +156,13 @@ void File_Eia608::Streams_Fill()
                     Fill_SetOptions(Stream_Text, StreamPos_Last, "CaptionServiceDescriptor_IsPresent", "N NT");
                 }
             }
+            if (!HasContent)
+            {
+                Fill(Stream_Text, StreamPos_Last, "InternalDetectionKind", HasCommand?"Command":"Stream", Unlimited, true, true);
+                Fill_SetOptions(Stream_Text, StreamPos_Last, "InternalDetectionKind", "N NT");
+            }
         }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -164,9 +177,10 @@ void File_Eia608::Streams_Finish()
     if (PTS_End>PTS_Begin)
         Fill(Stream_General, 0, General_Duration, float64_int64s(((float64)(PTS_End-PTS_Begin))/1000000));
 
+    auto DisplayCaptions=Config->File_DisplayCaptions_Get();
     size_t i=0;
     for (size_t StreamPos=0; StreamPos<Streams.size(); StreamPos++)
-        if (Streams[StreamPos] || (StreamPos<2 && Config->File_Eia608_DisplayEmptyStream_Get()))
+        if (Streams[StreamPos] || (StreamPos<2 && DisplayCaptions==DisplayCaptions_Stream))
         {
             Fill(Stream_Text, i, Text_Duration, Retrieve_Const(Stream_General, 0, General_Duration));
             if (!Streams[StreamPos])
@@ -476,8 +490,6 @@ void File_Eia608::XDS()
 
     XDS_Data.erase(XDS_Data.begin()+XDS_Level);
     XDS_Level=(size_t)-1;
-
-    DataDetected[5]=true; //bit 5=XDS
 }
 
 //---------------------------------------------------------------------------
@@ -1306,7 +1318,6 @@ void File_Eia608::Character_Fill(wchar_t Character)
 
     if (!HasContent)
         HasContent=true;
-    DataDetected[1+StreamPos]=true;
 }
 
 //---------------------------------------------------------------------------

@@ -154,7 +154,7 @@ void File_Wvpk::Streams_Finish()
         int64u BitDepth=dsf?1:(Wvpk_Resolution[(resolution1?1:0)*2+(resolution0?1:0)]);
         int64u Duration=Samples*1000/SamplingRate;
         int64u CompressedSize=File_Size-TagsSize;
-        int64u UncompressedSize=Duration*(mono?1:2)*BitDepth*(SamplingRate<<(3*dsf))/8/1000;
+        int64u UncompressedSize=Duration*(num_channels?num_channels:(mono?1:2))*BitDepth*(SamplingRate<<(3*dsf))/8/1000;
         float32 CompressionRatio=((float32)UncompressedSize)/CompressedSize;
         Fill(Stream_Audio, 0, Audio_StreamSize, CompressedSize, 3, true);
         Fill(Stream_Audio, 0, Audio_Duration, Duration, 10, true);
@@ -585,8 +585,8 @@ void File_Wvpk::Data_Parse_Fill()
     Fill(Stream_Audio, 0, Audio_Codec_Settings, Mode);
     if (dsf)
     {
-        Fill(Stream_Audio, 0, Audio_Format_Settings_Mode, "DSF");
-        Fill(Stream_Audio, 0, Audio_Format_Settings, "DSF");
+        Fill(Stream_Audio, 0, Audio_Format_Settings_Mode, "DSD");
+        Fill(Stream_Audio, 0, Audio_Format_Settings, "DSD");
     }
     if (correction)
         Fill(Stream_Audio, 0, Audio_Format_AdditionalFeatures, "Correction");
@@ -613,7 +613,27 @@ void File_Wvpk::id_07()
 void File_Wvpk::id_0D()
 {
     //Parsing
-    Get_L1 (num_channels,                                       "num_channels");
+    if (Size > 7)
+    {
+        //No backward compatibility guaranteed, skipping all
+        Skip_XX(Size,                                           "(Not parsed)");
+        return;
+    }
+    int8u num_chans_low8;
+    Get_L1 (num_chans_low8,                                     "num_channels");
+    num_channels = num_chans_low8;
+    if (Size >= 6)
+    {
+        int8u num_chans_high4;
+        Skip_L1(                                                "num_streams");
+        BS_Begin();
+        Skip_S1(4,                                              "reserved");
+        Get_S1 (4, num_chans_high4,                             "num_channels (hi)");
+        BS_End();
+        num_channels |= (num_chans_high4 << 8);
+        num_channels++;
+        Param_Info2(num_channels, " channels");
+    }
     switch (Size)
     {
         case 1 :
@@ -633,12 +653,12 @@ void File_Wvpk::id_0D()
                     }
                     break;
         case 4 :
+        case 6 :
                     Get_L3 (channel_mask,                       "channel_mask");
                     break;
-        case 5 :
+        default:
                     Get_L4 (channel_mask,                       "channel_mask");
                     break;
-        default :   Skip_XX(Size,                               "unknown");
     }
 }
 
@@ -650,6 +670,7 @@ void File_Wvpk::id_0E()
     Get_L1 (Temp,                                               "framerate multiplier");
     if (Temp<31)
         SamplingRate_Shift=Temp;
+    Skip_XX(Size-1,                                             "(Not parsed)");
 }
 
 //---------------------------------------------------------------------------

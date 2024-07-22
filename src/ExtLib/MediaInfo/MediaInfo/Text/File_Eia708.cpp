@@ -59,7 +59,6 @@ File_Eia708::File_Eia708()
     //Temp
     StandAloneCommand=false;
     HasContent=false;
-    DataDetected=0x0000000000000000LL;
 }
 
 //---------------------------------------------------------------------------
@@ -76,7 +75,8 @@ File_Eia708::~File_Eia708()
 //---------------------------------------------------------------------------
 void File_Eia708::Streams_Fill()
 {
-    if (Config->File_Eia708_DisplayEmptyStream_Get() && Streams.size()<2)
+    auto DisplayCaptions=Config->File_DisplayCaptions_Get();
+    if (DisplayCaptions==DisplayCaptions_Stream && Streams.size()<2)
         Streams.resize(2);
 
     if (ServiceDescriptors)
@@ -89,9 +89,16 @@ void File_Eia708::Streams_Fill()
         }
     }
 
-    for (size_t Pos=0; Pos<Streams.size(); Pos++)
-        if ((Streams[Pos] && ((DataDetected&((int64u)1)<<Pos) || !Config->File_CommandOnlyMeansEmpty_Get())) || (Pos && Pos<2 && Config->File_Eia708_DisplayEmptyStream_Get()))
+    for (size_t Pos=1; Pos<Streams.size(); Pos++)
+    {
+        const auto Stream=Streams[Pos];
+        if (Stream || DisplayCaptions==DisplayCaptions_Stream)
         {
+            auto HasCommand=Stream;
+            auto HasContent=Stream && Stream->HasContent();
+            if (!HasContent && DisplayCaptions==DisplayCaptions_Content)
+                continue;
+
             Stream_Prepare(Stream_Text);
             Fill(Stream_Text, StreamPos_Last, Text_ID, Pos);
             Fill(Stream_Text, StreamPos_Last, "CaptionServiceName", Pos);
@@ -101,7 +108,7 @@ void File_Eia708::Streams_Fill()
             Fill(Stream_Text, StreamPos_Last, Text_BitRate_Mode, "CBR");
             if (Config->ParseSpeed>=1.0)
             {
-                Fill(Stream_Text, StreamPos_Last, "CaptionServiceContent_IsPresent", (DataDetected&((int64u)1)<<Pos)?"Yes":"No", Unlimited, true, true); //1 bit per service
+                Fill(Stream_Text, StreamPos_Last, "CaptionServiceContent_IsPresent", HasContent?"Yes":"No", Unlimited, true, true);
                 Fill_SetOptions(Stream_Text, StreamPos_Last, "CaptionServiceContent_IsPresent", "N NT");
             }
             if (ServiceDescriptors)
@@ -121,7 +128,13 @@ void File_Eia708::Streams_Fill()
                     Fill_SetOptions(Stream_Text, StreamPos_Last, "CaptionServiceDescriptor_IsPresent", "N NT");
                 }
             }
+            if (!HasContent)
+            {
+                Fill(Stream_Text, StreamPos_Last, "InternalDetectionKind", HasCommand?"Command":"Stream", Unlimited, true, true);
+                Fill_SetOptions(Stream_Text, StreamPos_Last, "InternalDetectionKind", "N NT");
+            }
         }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -1474,7 +1487,6 @@ void File_Eia708::Character_Fill(wchar_t Character)
 
     if (!HasContent)
         HasContent=true;
-    DataDetected|=((int64u)1)<<service_number; //1 bit per service
 }
 
 //---------------------------------------------------------------------------

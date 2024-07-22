@@ -293,6 +293,10 @@ CoDirector;
 Collection;콜렉션
 Colorimetry;색체계
 ColorSpace;
+ColorTheme;테마
+ColorTheme_Dark;어둠
+ColorTheme_Light;밝음
+ColorTheme_System;시스템 설정 사용
 colour_primaries;
 colour_range;
 Comment;주석
@@ -358,6 +362,10 @@ Disabled;
 DisplayAspectRatio;화면 종횡비
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;원본 화면 종횡비
+DisplayCaptions;
+DisplayCaptions_Command;
+DisplayCaptions_Content;
+DisplayCaptions_Stream;
 DistributedBy;배포
 Distributor;
 Dolby_Atmos_Metadata;

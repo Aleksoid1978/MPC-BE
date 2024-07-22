@@ -436,7 +436,23 @@ Ztring MediaInfo_Internal::Inform()
     #endif //defined(MEDIAINFO_CSV_YES)
 
     if (HTML)
-        Retour+=__T("<html>\n\n<head>\n<META http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /></head>\n<body>\n");
+        Retour+=__T("<!DOCTYPE html>\n"
+            "<html>\n"
+            "  <head>\n"
+            "    <meta charset=\"utf-8\">\n"
+            "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
+            "    <title>MediaInfo</title>\n"
+            "    <style>\n"
+            "      :root { color-scheme: var(--color-scheme, light); }\n"
+            "      @media (prefers-color-scheme: dark) {\n"
+            "        :root { --color-scheme: dark; --border-color: blue; }\n"
+            "      }\n"
+            "      table { width: 100%; padding: 2px; border-spacing: 2px; border:1px solid var(--border-color, navy); margin-bottom: 18px; }\n"
+            "      td.Prefix { width: 25vw; min-width: 150px; max-width: 500px; font-style: italic; }\n"
+            "      h2 { margin-top: 0px; }\n"
+            "    </style>\n"
+            "  </head>\n"
+            "  <body>\n");
     #if defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_JSON_YES)
     if (XML_0_7_78_MA || XML_0_7_78_MI || JSON)
     {
@@ -469,7 +485,7 @@ Ztring MediaInfo_Internal::Inform()
         for (size_t StreamPos=0; StreamPos<(size_t)Count_Get((stream_t)StreamKind); StreamPos++)
         {
             //Pour chaque stream
-            if (HTML) Retour+=__T("<table width=\"100%\" border=\"0\" cellpadding=\"1\" cellspacing=\"2\" style=\"border:1px solid Navy\">\n<tr>\n    <td width=\"150\"><h2>");
+            if (HTML) Retour+=__T("    <table>\n      <tr>\n        <td colspan=\"2\"><h2>");
             #if defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_JSON_YES)
             Node* Node_Current=NULL;
             if (XML || XML_0_7_78_MA || XML_0_7_78_MI || JSON) Node_Current=Node_MI?Node_MI->Add_Child("track", true):Node_Main->Add_Child("track", true);
@@ -489,7 +505,7 @@ Ztring MediaInfo_Internal::Inform()
                 }
                 Retour+=A;
             }
-            if (HTML) Retour+=__T("</h2></td>\n  </tr>");
+            if (HTML) Retour+=__T("</h2></td>\n      </tr>");
             #if defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_JSON_YES)
             if (XML || XML_0_7_78_MA || XML_0_7_78_MI || JSON)
             {
@@ -511,12 +527,12 @@ Ztring MediaInfo_Internal::Inform()
                 Retour+=Inform((stream_t)StreamKind, StreamPos, false);
             }
 
-            if (HTML) Retour+=__T("</table>\n<br />");
+            if (HTML) Retour += __T("    </table>");
             if (!XML && !XML_0_7_78_MA && !XML_0_7_78_MI && !JSON) Retour+=MediaInfoLib::Config.LineSeparator_Get();
         }
     }
 
-    if (HTML) Retour+=__T("\n</body>\n</html>\n");
+    if (HTML) Retour+=__T("  </body>\n</html>\n");
 
     if (!CSV && !HTML && !XML && !XML_0_7_78_MA && !XML_0_7_78_MI && !JSON)
     {
@@ -858,11 +874,11 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                     for (size_t Pos=0; Pos<Level; Pos++)
                         Prefix+=__T("&nbsp;");
 
-                    Retour+=__T("  <tr>\n    <td><i>");
+                    Retour+=__T("      <tr>\n        <td class=\"Prefix\">");
                     Retour+=Prefix+Nom.TrimLeft();
-                    Retour+=__T(" :</i></td>\n    <td colspan=\"3\">");
+                    Retour+=__T(" :</td>\n        <td>");
                     Retour+=Valeur;
-                    Retour+=__T("</td>\n  </tr>");
+                    Retour+=__T("</td>\n      </tr>");
                 }
                 #endif //defined(MEDIAINFO_HTML_YES)
                 #if defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_JSON_YES)

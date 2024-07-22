@@ -313,20 +313,18 @@ void File_Riff::Streams_Finish ()
                 for (size_t Pos=0; Pos<Temp->second.Parsers[0]->Count_Get(StreamKind_Last); Pos++)
                 {
                     Ztring Temp_ID=ID;
-                    Ztring Temp_ID_String=ID;
                     Merge(*Temp->second.Parsers[0], StreamKind_Last, Pos, StreamPos_Base+Pos);
                     if (!Retrieve(StreamKind_Last, StreamPos_Last, General_ID).empty())
                     {
                         if (!Temp_ID.empty())
-                        {
                             Temp_ID+=__T('-');
-                            Temp_ID_String+=__T('-');
-                        }
                         Temp_ID+=Retrieve(StreamKind_Last, StreamPos_Last, General_ID);
-                        Temp_ID_String+=Retrieve(StreamKind_Last, StreamPos_Last, General_ID);
                     }
                     Fill(StreamKind_Last, StreamPos_Last, General_ID, Temp_ID, true);
-                    Fill(StreamKind_Last, StreamPos_Last, General_StreamOrder, Temp_ID_String, true);
+                    auto Temp_ID_DashPos=Temp_ID.find(__T('-'));
+                    if (Temp_ID_DashPos!=string::npos)
+                        Temp_ID.resize(Temp_ID_DashPos);
+                    Fill(StreamKind_Last, StreamPos_Last, General_StreamOrder, Temp_ID, true);
 
                     //Special case: multiple fmt/data chunks in WAV
                     if (StreamKind_Last==Stream_Audio //TODO: smarter merge
@@ -870,7 +868,12 @@ bool File_Riff::Header_Begin()
         Element_Begin1("...Continued");
         Element_ThisIsAList();
         if (Buffer_DataToParse_End)
+        {
+            Header_Fill_Code(0x64617461);
             Header_Fill_Size(Buffer_DataToParse_End-(File_Offset+Buffer_Offset));
+            if (Buffer_DataToParse_End>File_Size)
+                Buffer_DataToParse_End=File_Size; // Done here for at least one conformance check of the value. TODO: better handling
+        }
         else
             Header_Fill_Size(Element_Size);
         Element_End();
@@ -1092,8 +1095,7 @@ void File_Riff::Header_Parse()
     if (File_Offset+Buffer_Offset+8+Size_Complete>File_Size)
     {
         if (Element_Level<=2) //Incoherencies info only at the top level chunk
-            IsTruncated(File_Offset+Buffer_Offset+8+Size_Complete, Element_Offset!=8, "RIFF");
-        Size_Complete=File_Size-(File_Offset+Buffer_Offset+Element_Offset);
+            IsTruncated(File_Offset+Buffer_Offset+8+Size_Complete, Element_Offset!=8, Ztring().From_CC4(Name).Trim().To_UTF8().c_str());
     }
 
     //Alignment

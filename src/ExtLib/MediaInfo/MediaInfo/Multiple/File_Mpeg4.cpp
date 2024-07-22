@@ -379,19 +379,29 @@ void File_Mpeg4::Streams_Accept()
         TestContinuousFileNames();*/
     }
 
-    if (!IsSub && MajorBrand==0x6A703220) //"jp2 "
-    {
-        StreamSource=IsStream; //TODO: do the difference between raw stream and sequence of files with file count being frame count
-        TestContinuousFileNames();
-
-        Stream_Prepare((Config->File_Names.size()>1 || Config->File_IsReferenced_Get())?Stream_Video:Stream_Image);
-        if (StreamKind_Last==Stream_Video)
-            Fill(Stream_Video, StreamPos_Last, Video_FrameCount, Config->File_Names.size());
-    }
+    Streams_Accept_jp2();
 
     //Configuration
     Buffer_MaximumSize=64*1024*1024; //Some big frames are possible (e.g YUV 4:2:2 10 bits 1080p)
     File_Buffer_Size_Hint_Pointer=Config->File_Buffer_Size_Hint_Pointer_Get();
+}
+
+
+//---------------------------------------------------------------------------
+void File_Mpeg4::Streams_Accept_jp2(bool IsJp2)
+{
+    //Warning: this method can be called several times
+
+    if (IsSub || StreamKind_Last != Stream_General || !(IsJp2 || MajorBrand==0x6A703220 || MajorBrand==0x6a707820)) //"jp2 "
+        return;
+
+    StreamSource=IsStream; //TODO: do the difference between raw stream and sequence of files with file count being frame count
+    TestContinuousFileNames();
+
+    Stream_Prepare((Config->File_Names.size()>1 || Config->File_IsReferenced_Get())?Stream_Video:Stream_Image);
+    Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Format), "JPEG 2000");
+    if (StreamKind_Last==Stream_Video)
+        Fill(Stream_Video, StreamPos_Last, Video_FrameCount, Config->File_Names.size());
 }
 
 //---------------------------------------------------------------------------
@@ -1003,6 +1013,7 @@ void File_Mpeg4::Streams_Finish()
                     stream_t NewKind=StreamKind_Last;
                     size_t NewPos1;
                     Ztring ID;
+                    vector<Ztring> StreamOrders;
                     if (Temp->second.Parsers[0]->Retrieve(Stream_General, 0, General_Format)==__T("ChannelGrouping"))
                     {
                         //Channel coupling, removing the 2 corresponding streams
@@ -1011,6 +1022,8 @@ void File_Mpeg4::Streams_Finish()
                         if (StreamSize_Encoded)
                             StreamSize_Encoded+=Retrieve(StreamKind_Last, NewPos1, Fill_Parameter(StreamKind_Last, Generic_StreamSize)).To_int64u();
 
+                        StreamOrders.push_back(Retrieve_Const(StreamKind_Last, NewPos1, General_StreamOrder));
+                        StreamOrders.push_back(Retrieve_Const(StreamKind_Last, StreamPos_Last, General_StreamOrder));
                         Stream_Erase(NewKind, StreamPos_Last);
                         Stream_Erase(NewKind, NewPos1);
 
@@ -1052,6 +1065,12 @@ void File_Mpeg4::Streams_Finish()
                         Ztring Parser_ID=ID+__T('-')+Retrieve(StreamKind_Last, StreamPos_Last, General_ID);
                         if (ID.size()+1==Parser_ID.size())
                             Parser_ID.resize(ID.size());
+                        if (!StreamOrders.empty())
+                        {
+                            Clear(StreamKind_Last, StreamPos_Last, General_StreamOrder);
+                            for (auto& StreamOrder : StreamOrders)
+                                Fill(StreamKind_Last, StreamPos_Last, General_StreamOrder, StreamOrder);
+                        }
                         Fill(StreamKind_Last, StreamPos_Last, General_ID, Parser_ID, true);
                         if (StreamPos)
                         {
@@ -2998,10 +3017,13 @@ string File_Mpeg4::CreateElementName()
     string Result;
     for (size_t i = 1; i < Element_Level; i++) {
         Result += Ztring().From_CC4(Element[i].Code).Trim().To_UTF8();
-        if (Result.back() >= '0' && Result.back() <= '9') {
+        if (Result.empty()) {
+            Result = "0x20202020"; // Full of spaces
+        }
+        else if (Result.back() >= '0' && Result.back() <= '9') {
             Result += '_';
         }
-        Result += __T(' ');
+        Result += ' ';
     }
     if (!Result.empty())
         Result.pop_back();

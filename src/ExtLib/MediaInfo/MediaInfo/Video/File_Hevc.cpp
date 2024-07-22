@@ -1914,8 +1914,9 @@ void File_Hevc::seq_parameter_set()
     }
     if (nuh_layer_id)
     {
-        max_sub_layers_minus1=0;
+        const auto vps_max_sub_layers_minus1 = (*video_parameter_set_Item)->vps_max_sub_layers_minus1;
         Get_S1 (3, sps_ext_or_max_sub_layers_minus1,            "sps_ext_or_max_sub_layers_minus1");
+        max_sub_layers_minus1=sps_ext_or_max_sub_layers_minus1 == 7 ? vps_max_sub_layers_minus1 : sps_ext_or_max_sub_layers_minus1;
     }
     else
     {
@@ -2046,9 +2047,16 @@ void File_Hevc::seq_parameter_set()
     Skip_UE(                                                    "max_transform_hierarchy_depth_inter");
     Skip_UE(                                                    "max_transform_hierarchy_depth_intra");
     TEST_SB_SKIP(                                               "scaling_list_enabled_flag");
-        TEST_SB_SKIP(                                           "sps_scaling_list_data_present_flag");
-            scaling_list_data();
-        TEST_SB_END();
+        bool sps_infer_scaling_list_flag = false;
+        if (MultiLayerExtSpsFlag)
+           Get_SB (sps_infer_scaling_list_flag,                 "sps_infer_scaling_list_flag");
+        if (sps_infer_scaling_list_flag)
+           Skip_S1 (6,                                          "sps_scaling_list_ref_layer_id");
+        else {
+            TEST_SB_SKIP(                                       "sps_scaling_list_data_present_flag");
+                scaling_list_data();
+            TEST_SB_END();
+        }
     TEST_SB_END();
     Skip_SB(                                                    "amp_enabled_flag");
     Skip_SB(                                                    "sample_adaptive_offset_enabled_flag");
@@ -2085,7 +2093,7 @@ void File_Hevc::seq_parameter_set()
     Skip_SB(                                                    "sps_temporal_mvp_enabled_flag");
     Skip_SB(                                                    "strong_intra_smoothing_enabled_flag");
     TEST_SB_SKIP(                                               "vui_parameters_present_flag");
-        vui_parameters(video_parameter_set_Item, vui_parameters_Item);
+        vui_parameters(vui_parameters_Item, max_sub_layers_minus1);
     TEST_SB_END();
     TESTELSE_SB_SKIP(                                           "sps_extension_flag");
         int8u sps_extension_4bits;
@@ -4197,7 +4205,7 @@ void File_Hevc::short_term_ref_pic_sets(int8u num_short_term_ref_pic_sets)
 }
 
 //---------------------------------------------------------------------------
-void File_Hevc::vui_parameters(std::vector<video_parameter_set_struct*>::iterator video_parameter_set_Item, seq_parameter_set_struct::vui_parameters_struct* &vui_parameters_Item_)
+void File_Hevc::vui_parameters(seq_parameter_set_struct::vui_parameters_struct* &vui_parameters_Item_, int8u maxNumSubLayersMinus1)
 {
     //Parsing
     seq_parameter_set_struct::vui_parameters_struct::xxl_common *xxL_Common=NULL;
@@ -4246,7 +4254,7 @@ void File_Hevc::vui_parameters(std::vector<video_parameter_set_struct*>::iterato
             Skip_UE(                                            "vui_num_ticks_poc_diff_one_minus1");
         TEST_SB_END();
         TEST_SB_SKIP(                                           "hrd_parameters_present_flag");
-            hrd_parameters(true, (*video_parameter_set_Item)->vps_max_sub_layers_minus1, xxL_Common, NAL, VCL);
+            hrd_parameters(true, maxNumSubLayersMinus1, xxL_Common, NAL, VCL);
         TEST_SB_END();
     TEST_SB_END();
     TEST_SB_SKIP(                                               "bitstream_restriction_flag");

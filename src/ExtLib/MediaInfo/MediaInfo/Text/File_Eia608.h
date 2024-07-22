@@ -163,15 +163,15 @@ private :
             Duration_End_Command=FLT_MAX;
             Duration_End_Command_WasJustUpdated=false;
         }
+
+        int64u HasContent() { return Count_PopOn + Count_RollUp + Count_PaintOn; }
     };
     std::vector<stream*> Streams;
 
     int8u cc_data_1_Old;
     int8u cc_data_2_Old;
     bool   HasContent;
-    bool   HasContent_Displayed;
     bool   HasJumped;
-    std::bitset<8> DataDetected; //1=CC1, 2=CC2, 3=T1, 4=T2, 5=XDS
 };
 
 } //NameSpace

@@ -129,6 +129,7 @@
 #if defined(MEDIAINFO_EBUCORE_YES)
     #include "MediaInfo/Export/Export_EbuCore.h"
 #endif //defined(MEDIAINFO_EBUCORE_YES)
+#include <limits>
 using namespace ZenLib;
 using namespace std;
 //---------------------------------------------------------------------------
@@ -137,7 +138,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const Char*  MediaInfo_Version=__T("MediaInfoLib - v24.05");
+const Char*  MediaInfo_Version=__T("MediaInfoLib - v24.06");
 const Char*  MediaInfo_Url=__T("http://MediaArea.net/MediaInfo");
       Ztring EmptyZtring;       //Use it when we can't return a reference to a true Ztring
 const Ztring EmptyZtring_Const; //Use it when we can't return a reference to a true Ztring, const version
@@ -483,6 +484,7 @@ void MediaInfo_Config::Init(bool Force)
     ThousandsPoint=Ztring();
     CarriageReturnReplace=__T(" / ");
     #if MEDIAINFO_ADVANCED
+        Conformance_Limit=32;
         Collection_Trigger=-2;
         Collection_Display=display_if::Needed;
     #endif
@@ -1454,6 +1456,15 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
     {
         CustomMapping_Set(Value);
         return Ztring();
+    }
+    if (Option_Lower==__T("conformance_limit"))
+    {
+        #if MEDIAINFO_CONFORMANCE
+            Conformance_Limit_Set(Value);
+            return Ztring();
+        #else // MEDIAINFO_CONFORMANCE
+            return __T("advanced features are disabled due to compilation options");
+        #endif // MEDIAINFO_CONFORMANCE
     }
     if (Option_Lower==__T("collection_trigger"))
     {
@@ -3535,6 +3546,35 @@ ZtringListList MediaInfo_Config::SubFile_Config_Get ()
 //***************************************************************************
 // Collections
 //***************************************************************************
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_CONFORMANCE
+Ztring MediaInfo_Config::Conformance_Limit_Set(const Ztring& Value)
+{
+    int64s ValueI;
+    auto Value_Lower(Value);
+    transform(Value_Lower.begin(), Value_Lower.end(), Value_Lower.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+    if (Value_Lower==__T("inf"))
+        ValueI=-1;
+    else
+    {
+        ValueI=-Value.To_int64s();
+        if ((!ValueI && Value != __T("0")) || ValueI>numeric_limits<int64s>::max())
+            return __T("Invalid Conformance_Limit value");
+    }
+
+    CriticalSectionLocker CSL(CS);
+    Conformance_Limit=(int64u)ValueI;
+    return {};
+}
+
+int64u MediaInfo_Config::Conformance_Limit_Get()
+{
+    CriticalSectionLocker CSL(CS);
+
+    return Conformance_Limit;
+}
+#endif // MEDIAINFO_CONFORMANCE
 
 //---------------------------------------------------------------------------
 #if MEDIAINFO_ADVANCED

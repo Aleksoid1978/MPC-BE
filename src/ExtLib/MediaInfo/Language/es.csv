@@ -293,6 +293,10 @@ CoDirector;Codirector
 Collection;Colección
 Colorimetry;Colorimetría
 ColorSpace;Espacio de color
+ColorTheme;
+ColorTheme_Dark;
+ColorTheme_Light;
+ColorTheme_System;
 colour_primaries;Colores primarios
 colour_range;Rango de color
 Comment;Comentarios
@@ -358,6 +362,10 @@ Disabled;
 DisplayAspectRatio;Relación de aspecto
 DisplayAspectRatio_CleanAperture;Relación aspecto abertura limpia
 DisplayAspectRatio_Original;Relación de aspecto original
+DisplayCaptions;
+DisplayCaptions_Command;
+DisplayCaptions_Content;
+DisplayCaptions_Stream;
 DistributedBy;Distribuido por
 Distributor;Distribuidor
 Dolby_Atmos_Metadata;
@@ -1358,5 +1366,5 @@ Written_Location;Escrito en
 WrittenBy;Escrito por
 Yes;Sí
 Your system;Tu sistema
-ZZ_Automatic_Percent;69
+ZZ_Automatic_Percent;68
 ZZ_AutomaticLanguage_Percent;79

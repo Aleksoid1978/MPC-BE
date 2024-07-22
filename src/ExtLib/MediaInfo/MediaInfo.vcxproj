@@ -41,7 +41,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>.;ThirdParty/base64;ThirdParty/tinyxml2;ThirdParty/MD5;../ZenLib;../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_LIB;MEDIAINFO_XML_YES;MEDIAINFO_MINIMAL_YES;MEDIAINFO_MPEGTS_DUPLICATE_NO;MEDIAINFO_DVDIF_ANALYZE_NO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_LIB;MEDIAINFO_XML_YES;MEDIAINFO_MINIMAL_YES;MEDIAINFO_ADVANCED_NO;MEDIAINFO_MPEGTS_DUPLICATE_NO;MEDIAINFO_DVDIF_ANALYZE_NO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>MediaInfo/PreComp.h</PrecompiledHeaderFile>
@@ -69,6 +69,7 @@
     <ClInclude Include="MediaInfo\Audio\File_Celt.h" />
     <ClInclude Include="MediaInfo\Audio\File_ChannelGrouping.h" />
     <ClInclude Include="MediaInfo\Audio\File_ChannelSplitting.h" />
+    <ClInclude Include="MediaInfo\Audio\File_Dat.h" />
     <ClInclude Include="MediaInfo\Audio\File_DolbyAudioMetadata.h" />
     <ClInclude Include="MediaInfo\Audio\File_DolbyE.h" />
     <ClInclude Include="MediaInfo\Audio\File_Dsdiff.h" />
@@ -316,6 +317,7 @@
     <ClCompile Include="MediaInfo\Audio\File_Celt.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_ChannelGrouping.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_ChannelSplitting.cpp" />
+    <ClCompile Include="MediaInfo\Audio\File_Dat.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_DolbyAudioMetadata.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_DolbyE.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Dsdiff.cpp" />

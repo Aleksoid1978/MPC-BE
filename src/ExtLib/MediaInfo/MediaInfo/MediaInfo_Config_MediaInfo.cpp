@@ -134,6 +134,18 @@ const size_t Buffer_NormalSize=/*188*7;//*/64*1024;
 // Info
 //***************************************************************************
 
+const char* DisplayCaptions_Strings[] =
+{
+    "Command",
+    "Content",
+    "Stream",
+};
+static_assert(sizeof(DisplayCaptions_Strings) / sizeof(*DisplayCaptions_Strings) == DisplayCaptions_Max, "");
+
+//***************************************************************************
+// Class
+//***************************************************************************
+
 MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
 {
     MediaInfoLib::Config.Init(); //Initialize Configuration
@@ -242,9 +254,7 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
     #if defined(MEDIAINFO_LIBMMS_YES)
         File_Mmsh_Describe_Only=false;
     #endif //defined(MEDIAINFO_LIBMMS_YES)
-    File_Eia608_DisplayEmptyStream=false;
-    File_Eia708_DisplayEmptyStream=false;
-    File_CommandOnlyMeansEmpty=false;
+    DisplayCaptions=DisplayCaptions_Command;
     File_ProbeCaption_Set({});
     State=0;
     #if defined(MEDIAINFO_AC3_YES)
@@ -1239,32 +1249,22 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
             return __T("Libmms support is disabled due to compilation options");
         #endif //defined(MEDIAINFO_LIBMMS_YES)
     }
+    else if (Option_Lower==__T("file_displaycaptions"))
+    {
+        return File_DisplayCaptions_Set(Value);
+    }
     else if (Option_Lower==__T("file_eia708_displayemptystream"))
     {
-        File_Eia708_DisplayEmptyStream_Set(!(Value==__T("0") || Value.empty()));
-        return __T("");
-    }
-    else if (Option_Lower==__T("file_eia708_displayemptystream_get"))
-    {
-        return File_Eia708_DisplayEmptyStream_Get()?"1":"0";
+        return File_DisplayCaptions_Set(Ztring().From_UTF8(DisplayCaptions_Strings[Value==__T("0")?DisplayCaptions_Command:DisplayCaptions_Stream]));
     }
     else if (Option_Lower==__T("file_eia608_displayemptystream"))
     {
-        File_Eia608_DisplayEmptyStream_Set(!(Value==__T("0") || Value.empty()));
-        return __T("");
-    }
-    else if (Option_Lower==__T("file_eia608_displayemptystream_get"))
-    {
-        return File_Eia608_DisplayEmptyStream_Get()?"1":"0";
+        return File_DisplayCaptions_Set(Ztring().From_UTF8(DisplayCaptions_Strings[Value==__T("0")?DisplayCaptions_Command:DisplayCaptions_Stream]));
     }
     else if (Option_Lower==__T("file_commandonlymeansempty"))
     {
-        File_CommandOnlyMeansEmpty_Set(!(Value==__T("0") || Value.empty()));
+        return File_DisplayCaptions_Set(Ztring().From_UTF8(DisplayCaptions_Strings[Value==__T("0")?DisplayCaptions_Command:DisplayCaptions_Content]));
         return __T("");
-    }
-    else if (Option_Lower==__T("file_commandonlymeansempty_get"))
-    {
-        return File_CommandOnlyMeansEmpty_Get()?"1":"0";
     }
     else if (Option_Lower==__T("file_probecaption"))
     {
@@ -3577,42 +3577,28 @@ bool MediaInfo_Config_MediaInfo::File_Mmsh_Describe_Only_Get ()
 #endif //defined(MEDIAINFO_LIBMMS_YES)
 
 //---------------------------------------------------------------------------
-void MediaInfo_Config_MediaInfo::File_Eia608_DisplayEmptyStream_Set (bool NewValue)
+Ztring MediaInfo_Config_MediaInfo::File_DisplayCaptions_Set (const Ztring& NewValue)
 {
+    auto NewValueS = NewValue.To_UTF8();
+    size_t i = 0;
+    for (; i < DisplayCaptions_Max; i++) {
+        if (NewValueS == DisplayCaptions_Strings[i]) {
+            break;
+        }
+    }
+    if (i >= DisplayCaptions_Max)
+        return __T("Unknown value");
+
     CriticalSectionLocker CSL(CS);
-    File_Eia608_DisplayEmptyStream=NewValue;
+    DisplayCaptions = (display_captions)i;
+
+    return {};
 }
 
-bool MediaInfo_Config_MediaInfo::File_Eia608_DisplayEmptyStream_Get ()
+display_captions MediaInfo_Config_MediaInfo::File_DisplayCaptions_Get ()
 {
     CriticalSectionLocker CSL(CS);
-    return File_Eia608_DisplayEmptyStream;
-}
-
-//---------------------------------------------------------------------------
-void MediaInfo_Config_MediaInfo::File_Eia708_DisplayEmptyStream_Set (bool NewValue)
-{
-    CriticalSectionLocker CSL(CS);
-    File_Eia708_DisplayEmptyStream=NewValue;
-}
-
-bool MediaInfo_Config_MediaInfo::File_Eia708_DisplayEmptyStream_Get ()
-{
-    CriticalSectionLocker CSL(CS);
-    return File_Eia708_DisplayEmptyStream;
-}
-
-//---------------------------------------------------------------------------
-void MediaInfo_Config_MediaInfo::File_CommandOnlyMeansEmpty_Set (bool NewValue)
-{
-    CriticalSectionLocker CSL(CS);
-    File_CommandOnlyMeansEmpty=NewValue;
-}
-
-bool MediaInfo_Config_MediaInfo::File_CommandOnlyMeansEmpty_Get ()
-{
-    CriticalSectionLocker CSL(CS);
-    return File_CommandOnlyMeansEmpty;
+    return DisplayCaptions;
 }
 
 //---------------------------------------------------------------------------

@@ -293,6 +293,10 @@ CoDirector;Codirecteur
 Collection;Collection
 Colorimetry;Colorimétrie
 ColorSpace;Espace de couleurs
+ColorTheme;Thème
+ColorTheme_Dark;Thème sombre
+ColorTheme_Light;Thème clair
+ColorTheme_System;Utiliser la configuration du système
 colour_primaries;Coordonnées de chromaticité
 colour_range;Gamme de couleurs
 Comment;Commentaire
@@ -358,6 +362,10 @@ Disabled;Désactivé
 DisplayAspectRatio;Facteur de forme l/h
 DisplayAspectRatio_CleanAperture;Ratio, Ouverture propre
 DisplayAspectRatio_Original;Ratio original l/h
+DisplayCaptions;Gestion des flux 608/708
+DisplayCaptions_Command;Quand une commande est détectée
+DisplayCaptions_Content;Quand un contenu est détecté
+DisplayCaptions_Stream;Même sans contenu ou commande
 DistributedBy;Distribué par
 Distributor;Distributeur
 Dolby_Atmos_Metadata;Métadonnées Dolby Atmos

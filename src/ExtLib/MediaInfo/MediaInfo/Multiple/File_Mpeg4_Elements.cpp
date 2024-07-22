@@ -1833,13 +1833,15 @@ void File_Mpeg4::jp2h_colr()
                     #if defined(MEDIAINFO_ICC_YES)
                     if (Element_Offset<Element_Size && Element_Size-Element_Offset>=132)
                     {
+                        Streams_Accept_jp2();
                         File_Icc ICC_Parser;
                         ICC_Parser.StreamKind=StreamKind_Last;
                         ICC_Parser.IsAdditional=true;
                         Open_Buffer_Init(&ICC_Parser);
                         Open_Buffer_Continue(&ICC_Parser);
                         Open_Buffer_Finalize(&ICC_Parser);
-                        Merge(ICC_Parser, StreamKind_Last, 0, 0);
+                        if (StreamKind_Last!=Stream_General) // We don't want e.g. ICC version as container version
+                            Merge(ICC_Parser, StreamKind_Last, 0, 0);
                     }
                     else
                         Skip_XX(Element_Size-Element_Offset,    "ICC profile");
@@ -1858,16 +1860,26 @@ void File_Mpeg4::jp2h_ihdr()
     Element_Name("Header");
 
     //Parsing
-    Skip_B4(                                                    "Height");
-    Skip_B4(                                                    "Width");
+    int32u Height, Width;
+    int8u BPC;
+    Get_B4 (Height,                                             "Height");
+    Get_B4 (Width,                                              "Width");
     Skip_B2(                                                    "NC - Number of components");
-    BS_Begin();
-    Skip_SB(                                                    "BPC - Bits per component (Sign)");
-    Skip_S1(7,                                                  "BPC - Bits per component (Value)");
-    BS_End();
+    Get_B1 (BPC,                                                "BPC - Bits per component");
     Skip_B1(                                                    "C - Compression type");
     Skip_B1(                                                    "UnkC - Colourspace Unknown");
     Skip_B1(                                                    "IPR - Intellectual Property");
+
+    FILLING_BEGIN()
+        Streams_Accept_jp2(true);
+        if (Width)
+            Fill(StreamKind_Last, StreamPos_Last, "Width", Width, 10, true);
+        if (Height)
+            Fill(StreamKind_Last, StreamPos_Last, "Height", Height, 10, true);
+        BPC++;
+        if (BPC)
+            Fill(StreamKind_Last, StreamPos_Last, "BitDepth", BPC, 10, true);
+    FILLING_END()
 }
 
 //---------------------------------------------------------------------------

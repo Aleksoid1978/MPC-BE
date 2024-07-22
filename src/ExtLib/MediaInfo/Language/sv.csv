@@ -293,6 +293,10 @@ CoDirector;Medregisör
 Collection;Samling
 Colorimetry;Kolorimetri
 ColorSpace;Färgrymd
+ColorTheme;
+ColorTheme_Dark;
+ColorTheme_Light;
+ColorTheme_System;
 colour_primaries;Primärfärger
 colour_range;Färgskala
 Comment;Kommentar
@@ -358,6 +362,10 @@ Disabled;
 DisplayAspectRatio;Skärmbildförhållande
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Ursprungligt skärmbildförhållande
+DisplayCaptions;
+DisplayCaptions_Command;
+DisplayCaptions_Content;
+DisplayCaptions_Stream;
 DistributedBy;Distribuerad av
 Distributor;Distributör
 Dolby_Atmos_Metadata;
@@ -1358,5 +1366,5 @@ Written_Location;Ort
 WrittenBy;Skrivet av
 Yes;Ja
 Your system;Ditt system
-ZZ_Automatic_Percent;78
-ZZ_AutomaticLanguage_Percent;79
+ZZ_Automatic_Percent;77
+ZZ_AutomaticLanguage_Percent;78

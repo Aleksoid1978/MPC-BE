@@ -1356,6 +1356,7 @@ void File__Analyze::Streams_Finish_StreamOnly_Audio(size_t Pos)
         for (size_t i=Pos+1; i<Count_Get(Stream_Audio);)
         {
             size_t OtherID_Count;
+            Ztring OtherStreamOrder;
             Ztring OtherID;
             Ztring OtherID_String;
             if (Retrieve_Const(Stream_Audio, i, Audio_Format)==__T("Dolby ED2"))
@@ -1364,6 +1365,7 @@ void File__Analyze::Streams_Finish_StreamOnly_Audio(size_t Pos)
                 if (!Retrieve_Const(Stream_Audio, i, "Presentation0").empty())
                     break; // It is the next ED2
                 OtherID_Count=0;
+                OtherStreamOrder=Retrieve(Stream_Audio, i, Audio_StreamOrder);
                 OtherID=Retrieve(Stream_Audio, i, Audio_ID);
                 OtherID_String =Retrieve(Stream_Audio, i, Audio_ID_String);
             }
@@ -1371,6 +1373,7 @@ void File__Analyze::Streams_Finish_StreamOnly_Audio(size_t Pos)
              && Retrieve_Const(Stream_Audio, i  , Audio_Format)==__T("Dolby E")
              && Retrieve_Const(Stream_Audio, i+7, Audio_Format)==__T("Dolby E"))
             {
+                Ztring NextStreamOrder=Retrieve_Const(Stream_Audio, i, Audio_StreamOrder);
                 Ztring NextID=Retrieve_Const(Stream_Audio, i, Audio_ID);
                 size_t NextID_DashPos=NextID.rfind(__T('-'));
                 if (NextID_DashPos!=(size_t)-1)
@@ -1378,6 +1381,7 @@ void File__Analyze::Streams_Finish_StreamOnly_Audio(size_t Pos)
                 if (Retrieve_Const(Stream_Audio, i+7, Audio_ID)==NextID+__T("-8"))
                 {
                     OtherID_Count=7;
+                    OtherStreamOrder=NextStreamOrder;
                     OtherID=NextID;
                 }
                 NextID=Retrieve_Const(Stream_Audio, i, Audio_ID_String);
@@ -1412,6 +1416,13 @@ void File__Analyze::Streams_Finish_StreamOnly_Audio(size_t Pos)
             else
             {
                 Ztring CurrentID_String=Retrieve(Stream_Audio, Pos, Audio_ID_String);
+                if (Retrieve_Const(Stream_General, 0, General_Format)==__T("MPEG-TS"))
+                {
+                    auto ProgramSeparator=OtherStreamOrder.find(__T('-'));
+                    if (ProgramSeparator!=string::npos)
+                        OtherStreamOrder.erase(0, ProgramSeparator+1);
+                }
+                Fill(Stream_Audio, Pos, Audio_StreamOrder, OtherStreamOrder);
                 Fill(Stream_Audio, Pos, Audio_ID, OtherID);
                 Fill(Stream_Audio, Pos, Audio_ID_String, CurrentID_String+__T(" / ")+OtherID_String, true);
             }

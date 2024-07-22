@@ -225,7 +225,9 @@ protected :
     void AS11_AAF_Core();
     void AS11_AAF_Segmentation();
     void AS11_AAF_UKDPP();
+    void Dolby_050201000101() { MXFGenericStreamDataElementKey_09_01(); }
     void Dolby_PHDRImageMetadataItem();
+    void Dolby_050200000000();
     void Dolby_PHDRMetadataTrackSubDescriptor();
     void Omneon_010201010100();
     void Omneon_010201020100();
@@ -604,6 +606,7 @@ protected :
     void AS11_UKDPP_ProgrammeTextLanguage();
     void AS11_UKDPP_ContactEmail();
     void AS11_UKDPP_ContactTelephoneNumber();
+    void Dolby_040000000000();
     void Dolby_DataDefinition();
     void Dolby_SourceTrackID();
     void Dolby_SimplePayloadSID();
@@ -1477,6 +1480,8 @@ protected :
         int64u  DemuxedSampleCount_AddedToFirstFrame;
         int64u  DemuxedElementSize_AddedToFirstFrame;
     #endif //MEDIAINFO_DEMUX || MEDIAINFO_SEEK
+
+    void Streams_Finish_Descriptor (descriptors::iterator Descriptor);
 };
 
 } //NameSpace

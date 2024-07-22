@@ -293,6 +293,10 @@ CoDirector;联合导演
 Collection;系列
 Colorimetry;比色法
 ColorSpace;色彩空间
+ColorTheme;主题
+ColorTheme_Dark;深色
+ColorTheme_Light;浅色
+ColorTheme_System;用系统设置
 colour_primaries;色彩原色
 colour_range;色彩范围
 Comment;注释
@@ -358,6 +362,10 @@ Disabled;禁用
 DisplayAspectRatio;画面比例
 DisplayAspectRatio_CleanAperture;干净光圈画面比例
 DisplayAspectRatio_Original;原始画面比例
+DisplayCaptions;
+DisplayCaptions_Command;
+DisplayCaptions_Content;
+DisplayCaptions_Stream;
 DistributedBy;发行商
 Distributor;发行商
 Dolby_Atmos_Metadata;杜比全景声元数据

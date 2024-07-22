@@ -293,6 +293,10 @@ CoDirector;Yardımcı Yönetmen
 Collection;Koleksiyon
 Colorimetry;Renkölçüm
 ColorSpace;Renk alanı
+ColorTheme;
+ColorTheme_Dark;
+ColorTheme_Light;
+ColorTheme_System;
 colour_primaries;Renk öncelikleri
 colour_range;Renk aralığı
 Comment;Yorum
@@ -358,6 +362,10 @@ Disabled;Etkisizleştirildi
 DisplayAspectRatio;Görüntü en-boy oranı
 DisplayAspectRatio_CleanAperture;Temiz diyafram görüntüsü en-boy oranı
 DisplayAspectRatio_Original;Orijinal görüntü en-boy oranı
+DisplayCaptions;
+DisplayCaptions_Command;
+DisplayCaptions_Content;
+DisplayCaptions_Stream;
 DistributedBy;Dağıtan
 Distributor;Dağıtıcı
 Dolby_Atmos_Metadata;

@@ -334,6 +334,10 @@ public :
 
     ZtringListList  SubFile_Config_Get ();
 
+    #if MEDIAINFO_CONFORMANCE
+          Ztring      Conformance_Limit_Set (const Ztring &Value);
+          int64u      Conformance_Limit_Get ();
+    #endif //MEDIAINFO_CONFORMANCE
     #if MEDIAINFO_ADVANCED
           void        Collection_Trigger_Set (const Ztring& Value);
           int64s      Collection_Trigger_Get();
@@ -526,6 +530,9 @@ private :
 
     ZtringListList  SubFile_Config;
 
+    #if MEDIAINFO_CONFORMANCE
+        int64u      Conformance_Limit;
+    #endif //MEDIAINFO_CONFORMANCE
     #if MEDIAINFO_ADVANCED
         int64s      Collection_Trigger;
         display_if  Collection_Display;
