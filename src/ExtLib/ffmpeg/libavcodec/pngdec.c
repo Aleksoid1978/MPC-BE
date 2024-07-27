@@ -1084,10 +1084,13 @@ static int decode_sbit_chunk(AVCodecContext *avctx, PNGDecContext *s,
         return AVERROR_INVALIDDATA;
     }
 
-    channels = ff_png_get_nb_channels(s->color_type);
+    channels = s->color_type & PNG_COLOR_MASK_PALETTE ? 3 : ff_png_get_nb_channels(s->color_type);
 
-    if (bytestream2_get_bytes_left(gb) != channels)
+    if (bytestream2_get_bytes_left(gb) != channels) {
+        av_log(avctx, AV_LOG_ERROR, "Invalid sBIT size: %d, expected: %d\n",
+            bytestream2_get_bytes_left(gb), channels);
         return AVERROR_INVALIDDATA;
+    }
 
     for (int i = 0; i < channels; i++) {
         int b = bytestream2_get_byteu(gb);

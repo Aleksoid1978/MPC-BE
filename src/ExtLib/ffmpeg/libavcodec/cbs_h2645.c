@@ -499,7 +499,8 @@ static int cbs_h2645_fragment_add_nals(CodedBitstreamContext *ctx,
         size_t size = nal->size;
         enum AVCodecID codec_id = ctx->codec->codec_id;
 
-        if (codec_id != AV_CODEC_ID_VVC && nal->nuh_layer_id > 0)
+        if (codec_id == AV_CODEC_ID_HEVC && nal->nuh_layer_id > 0 &&
+            (nal->type < HEVC_NAL_VPS || nal->type > HEVC_NAL_PPS))
             continue;
 
         // Remove trailing zeroes.
@@ -2273,6 +2274,12 @@ static const SEIMessageTypeDescriptor cbs_sei_h265_types[] = {
         1, 0,
         sizeof(H265RawSEIAlphaChannelInfo),
         SEI_MESSAGE_RW(h265, sei_alpha_channel_info),
+    },
+    {
+        SEI_TYPE_THREE_DIMENSIONAL_REFERENCE_DISPLAYS_INFO,
+        1, 0,
+        sizeof(H265RawSEI3DReferenceDisplaysInfo),
+        SEI_MESSAGE_RW(h265, sei_3d_reference_displays_info),
     },
     SEI_MESSAGE_TYPE_END
 };

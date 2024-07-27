@@ -292,7 +292,7 @@ static int decode_lt_rps(const HEVCSPS *sps, LongTermRPS *rps,
                 lt_idx_sps = get_bits(gb, av_ceil_log2(sps->num_long_term_ref_pics_sps));
 
             rps->poc[i]  = sps->lt_ref_pic_poc_lsb_sps[lt_idx_sps];
-            rps->used[i] = !!(sps->used_by_curr_pic_lt & (1 << lt_idx_sps));
+            rps->used[i] = !!(sps->used_by_curr_pic_lt & (1U << lt_idx_sps));
         } else {
             rps->poc[i]  = get_bits(gb, sps->log2_max_poc_lsb);
             rps->used[i] = get_bits1(gb);
@@ -645,6 +645,10 @@ static int hls_slice_header(SliceHeader *sh, const HEVCContext *s, GetBitContext
 
         if (pps->dependent_slice_segments_enabled_flag)
             sh->dependent_slice_segment_flag = get_bits1(gb);
+        if (sh->dependent_slice_segment_flag && !s->slice_initialized) {
+            av_log(s->avctx, AV_LOG_ERROR, "Independent slice segment missing.\n");
+            return AVERROR_INVALIDDATA;
+        }
 
         slice_address_length = av_ceil_log2(sps->ctb_width *
                                             sps->ctb_height);
@@ -917,9 +921,6 @@ static int hls_slice_header(SliceHeader *sh, const HEVCContext *s, GetBitContext
         } else {
             sh->slice_loop_filter_across_slices_enabled_flag = pps->seq_loop_filter_across_slices_enabled_flag;
         }
-    } else if (!s->slice_initialized) {
-        av_log(s->avctx, AV_LOG_ERROR, "Independent slice segment missing.\n");
-        return AVERROR_INVALIDDATA;
     }
 
     sh->num_entry_point_offsets = 0;
@@ -3187,8 +3188,11 @@ static int decode_slice(HEVCContext *s, const H2645NAL *nal, GetBitContext *gb)
     int ret;
 
     ret = hls_slice_header(&s->sh, s, gb);
-    if (ret < 0)
+    if (ret < 0) {
+        // hls_slice_header() does not cleanup on failure thus the state now is inconsistant so we cannot use it on depandant slices
+        s->slice_initialized = 0;
         return ret;
+    }
 
     if ((s->avctx->skip_frame >= AVDISCARD_BIDIR && s->sh.slice_type == HEVC_SLICE_B) ||
         (s->avctx->skip_frame >= AVDISCARD_NONINTRA && s->sh.slice_type != HEVC_SLICE_I) ||

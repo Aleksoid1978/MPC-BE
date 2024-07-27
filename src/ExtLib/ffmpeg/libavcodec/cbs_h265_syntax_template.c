@@ -747,6 +747,16 @@ static int FUNC(sps_scc_extension)(CodedBitstreamContext *ctx, RWContext *rw,
     return 0;
 }
 
+static int FUNC(sps_multilayer_extension)(CodedBitstreamContext *ctx, RWContext *rw,
+                                          H265RawSPS *current)
+{
+    int err;
+
+    flag(inter_view_mv_vert_constraint_flag);
+
+    return 0;
+}
+
 static int FUNC(vui_parameters_default)(CodedBitstreamContext *ctx,
                                         RWContext *rw, H265RawVUI *current,
                                         H265RawSPS *sps)
@@ -781,6 +791,7 @@ static int FUNC(sps)(CodedBitstreamContext *ctx, RWContext *rw,
     int err, i;
     unsigned int min_cb_log2_size_y, ctb_log2_size_y,
                  min_cb_size_y,   min_tb_log2_size_y;
+    unsigned int multi_layer_ext_sps_flag;
 
     HEADER("Sequence Parameter Set");
 
@@ -788,18 +799,25 @@ static int FUNC(sps)(CodedBitstreamContext *ctx, RWContext *rw,
 
     ub(4, sps_video_parameter_set_id);
     h265->active_vps = vps = h265->vps[current->sps_video_parameter_set_id];
+    if (!vps) {
+        av_log(ctx->log_ctx, AV_LOG_ERROR, "VPS id %d not available.\n",
+               current->sps_video_parameter_set_id);
+        return AVERROR_INVALIDDATA;
+    }
 
-    u(3, sps_max_sub_layers_minus1, 0, HEVC_MAX_SUB_LAYERS - 1);
-    flag(sps_temporal_id_nesting_flag);
-    if (vps) {
-        if (vps->vps_max_sub_layers_minus1 > current->sps_max_sub_layers_minus1) {
-            av_log(ctx->log_ctx, AV_LOG_ERROR, "Invalid stream: "
-                   "sps_max_sub_layers_minus1 (%d) must be less than or equal to "
-                   "vps_max_sub_layers_minus1 (%d).\n",
-                   vps->vps_max_sub_layers_minus1,
-                   current->sps_max_sub_layers_minus1);
-            return AVERROR_INVALIDDATA;
-        }
+    if (current->nal_unit_header.nuh_layer_id == 0)
+        u(3, sps_max_sub_layers_minus1, 0, vps->vps_max_sub_layers_minus1);
+    else {
+        u(3, sps_ext_or_max_sub_layers_minus1, 0, HEVC_MAX_SUB_LAYERS);
+        infer(sps_max_sub_layers_minus1, current->sps_ext_or_max_sub_layers_minus1 == HEVC_MAX_SUB_LAYERS
+                                         ? vps->vps_max_sub_layers_minus1
+                                         : current->sps_ext_or_max_sub_layers_minus1);
+    }
+    multi_layer_ext_sps_flag = current->nal_unit_header.nuh_layer_id &&
+                               current->sps_ext_or_max_sub_layers_minus1 == HEVC_MAX_SUB_LAYERS;
+    if (!multi_layer_ext_sps_flag) {
+        flag(sps_temporal_id_nesting_flag);
+
         if (vps->vps_temporal_id_nesting_flag &&
             !current->sps_temporal_id_nesting_flag) {
             av_log(ctx->log_ctx, AV_LOG_ERROR, "Invalid stream: "
@@ -807,59 +825,79 @@ static int FUNC(sps)(CodedBitstreamContext *ctx, RWContext *rw,
                    "vps_temporal_id_nesting_flag is 1.\n");
             return AVERROR_INVALIDDATA;
         }
-    }
+        if (current->sps_max_sub_layers_minus1 == 0 &&
+            current->sps_temporal_id_nesting_flag != 1) {
+            av_log(ctx->log_ctx, AV_LOG_ERROR, "Invalid stream: "
+                   "sps_temporal_id_nesting_flag must be 1 if "
+                   "sps_max_sub_layers_minus1 is 0.\n");
+            return AVERROR_INVALIDDATA;
+        }
 
-    CHECK(FUNC(profile_tier_level)(ctx, rw, &current->profile_tier_level,
-                                   1, current->sps_max_sub_layers_minus1));
+        CHECK(FUNC(profile_tier_level)(ctx, rw, &current->profile_tier_level,
+                                       1, current->sps_max_sub_layers_minus1));
+    } else {
+        if (current->sps_max_sub_layers_minus1 > 0)
+            infer(sps_temporal_id_nesting_flag, vps->vps_temporal_id_nesting_flag);
+        else
+            infer(sps_temporal_id_nesting_flag, 1);
+    }
 
     ue(sps_seq_parameter_set_id, 0, 15);
 
-    ue(chroma_format_idc, 0, 3);
-    if (current->chroma_format_idc == 3)
-        flag(separate_colour_plane_flag);
-    else
-        infer(separate_colour_plane_flag, 0);
-
-    ue(pic_width_in_luma_samples,  1, HEVC_MAX_WIDTH);
-    ue(pic_height_in_luma_samples, 1, HEVC_MAX_HEIGHT);
-
-    flag(conformance_window_flag);
-    if (current->conformance_window_flag) {
-        ue(conf_win_left_offset,   0, current->pic_width_in_luma_samples);
-        ue(conf_win_right_offset,  0, current->pic_width_in_luma_samples);
-        ue(conf_win_top_offset,    0, current->pic_height_in_luma_samples);
-        ue(conf_win_bottom_offset, 0, current->pic_height_in_luma_samples);
+    if (multi_layer_ext_sps_flag) {
+        flag(update_rep_format_flag);
+        if (current->update_rep_format_flag)
+            ub(8, sps_rep_format_idx);
     } else {
-        infer(conf_win_left_offset,   0);
-        infer(conf_win_right_offset,  0);
-        infer(conf_win_top_offset,    0);
-        infer(conf_win_bottom_offset, 0);
-    }
+        ue(chroma_format_idc, 0, 3);
+        if (current->chroma_format_idc == 3)
+            flag(separate_colour_plane_flag);
+        else
+            infer(separate_colour_plane_flag, 0);
 
-    ue(bit_depth_luma_minus8,   0, 8);
-    ue(bit_depth_chroma_minus8, 0, 8);
+        ue(pic_width_in_luma_samples,  1, HEVC_MAX_WIDTH);
+        ue(pic_height_in_luma_samples, 1, HEVC_MAX_HEIGHT);
+
+        flag(conformance_window_flag);
+        if (current->conformance_window_flag) {
+            ue(conf_win_left_offset,   0, current->pic_width_in_luma_samples);
+            ue(conf_win_right_offset,  0, current->pic_width_in_luma_samples);
+            ue(conf_win_top_offset,    0, current->pic_height_in_luma_samples);
+            ue(conf_win_bottom_offset, 0, current->pic_height_in_luma_samples);
+        } else {
+            infer(conf_win_left_offset,   0);
+            infer(conf_win_right_offset,  0);
+            infer(conf_win_top_offset,    0);
+            infer(conf_win_bottom_offset, 0);
+        }
+
+        ue(bit_depth_luma_minus8,   0, 8);
+        ue(bit_depth_chroma_minus8, 0, 8);
+    }
 
     ue(log2_max_pic_order_cnt_lsb_minus4, 0, 12);
 
-    flag(sps_sub_layer_ordering_info_present_flag);
-    for (i = (current->sps_sub_layer_ordering_info_present_flag ?
-              0 : current->sps_max_sub_layers_minus1);
-         i <= current->sps_max_sub_layers_minus1; i++) {
-        ues(sps_max_dec_pic_buffering_minus1[i],
-            0, HEVC_MAX_DPB_SIZE - 1,                        1, i);
-        ues(sps_max_num_reorder_pics[i],
-            0, current->sps_max_dec_pic_buffering_minus1[i], 1, i);
-        ues(sps_max_latency_increase_plus1[i],
-            0, UINT32_MAX - 1,                               1, i);
-    }
-    if (!current->sps_sub_layer_ordering_info_present_flag) {
-        for (i = 0; i < current->sps_max_sub_layers_minus1; i++) {
-            infer(sps_max_dec_pic_buffering_minus1[i],
-                  current->sps_max_dec_pic_buffering_minus1[current->sps_max_sub_layers_minus1]);
-            infer(sps_max_num_reorder_pics[i],
-                  current->sps_max_num_reorder_pics[current->sps_max_sub_layers_minus1]);
-            infer(sps_max_latency_increase_plus1[i],
-                  current->sps_max_latency_increase_plus1[current->sps_max_sub_layers_minus1]);
+    if (!multi_layer_ext_sps_flag) {
+        flag(sps_sub_layer_ordering_info_present_flag);
+        for (i = (current->sps_sub_layer_ordering_info_present_flag ?
+                  0 : current->sps_max_sub_layers_minus1);
+             i <= current->sps_max_sub_layers_minus1; i++) {
+            ues(sps_max_dec_pic_buffering_minus1[i],
+                0, HEVC_MAX_DPB_SIZE - 1,                        1, i);
+            ues(sps_max_num_reorder_pics[i],
+                0, current->sps_max_dec_pic_buffering_minus1[i], 1, i);
+            ues(sps_max_latency_increase_plus1[i],
+                0, UINT32_MAX - 1,                               1, i);
+        }
+        if (!current->sps_sub_layer_ordering_info_present_flag) {
+            for (i = 0; i < current->sps_max_sub_layers_minus1; i++) {
+                infer(sps_max_dec_pic_buffering_minus1[i],
+                      current->sps_max_dec_pic_buffering_minus1[current->sps_max_sub_layers_minus1]);
+                infer(sps_max_num_reorder_pics[i],
+                      current->sps_max_num_reorder_pics[current->sps_max_sub_layers_minus1]);
+                infer(sps_max_latency_increase_plus1[i],
+                      current->sps_max_latency_increase_plus1[current->sps_max_sub_layers_minus1]);
+            }
         }
     }
 
@@ -892,9 +930,17 @@ static int FUNC(sps)(CodedBitstreamContext *ctx, RWContext *rw,
 
     flag(scaling_list_enabled_flag);
     if (current->scaling_list_enabled_flag) {
-        flag(sps_scaling_list_data_present_flag);
-        if (current->sps_scaling_list_data_present_flag)
-            CHECK(FUNC(scaling_list_data)(ctx, rw, &current->scaling_list));
+        if (multi_layer_ext_sps_flag)
+            flag(sps_infer_scaling_list_flag);
+        else
+            infer(sps_infer_scaling_list_flag, 0);
+        if (current->sps_infer_scaling_list_flag)
+            ub(6, sps_scaling_list_ref_layer_id);
+        else {
+            flag(sps_scaling_list_data_present_flag);
+            if (current->sps_scaling_list_data_present_flag)
+                CHECK(FUNC(scaling_list_data)(ctx, rw, &current->scaling_list));
+        }
     } else {
         infer(sps_scaling_list_data_present_flag, 0);
     }
@@ -952,7 +998,7 @@ static int FUNC(sps)(CodedBitstreamContext *ctx, RWContext *rw,
     if (current->sps_range_extension_flag)
         CHECK(FUNC(sps_range_extension)(ctx, rw, current));
     if (current->sps_multilayer_extension_flag)
-        return AVERROR_PATCHWELCOME;
+        CHECK(FUNC(sps_multilayer_extension)(ctx, rw, current));
     if (current->sps_3d_extension_flag)
         return AVERROR_PATCHWELCOME;
     if (current->sps_scc_extension_flag)
@@ -989,6 +1035,167 @@ static int FUNC(pps_range_extension)(CodedBitstreamContext *ctx, RWContext *rw,
 
     ue(log2_sao_offset_scale_luma,   0, FFMAX(0, sps->bit_depth_luma_minus8   - 2));
     ue(log2_sao_offset_scale_chroma, 0, FFMAX(0, sps->bit_depth_chroma_minus8 - 2));
+
+    return 0;
+}
+
+static int FUNC(colour_mapping_octants)(CodedBitstreamContext *ctx, RWContext *rw,
+                                        H265RawPPS *current, unsigned int inp_depth,
+                                        unsigned int idx_y, unsigned int idx_cb,
+                                        unsigned int idx_cr, unsigned int inp_length)
+{
+    int part_num_y, cm_res_bits;
+    int err;
+
+    part_num_y = 1 << current->cm_y_part_num_log2;
+
+    av_assert0(inp_depth <= 1);
+    if (inp_depth < current->cm_octant_depth)
+        flags(split_octant_flag[inp_depth], 1, inp_depth);
+    else
+        infer(split_octant_flag[inp_depth], 0);
+
+    if (current->split_octant_flag[inp_depth])
+        for (int k = 0; k < 2; k++)
+            for (int m = 0; m < 2; m++)
+                for (int n = 0; n < 2; n++)
+                    CHECK(FUNC(colour_mapping_octants)(ctx, rw, current, inp_depth + 1,
+                                                       idx_y + part_num_y * k * inp_length / 2,
+                                                       idx_cb + m * inp_length / 2,
+                                                       idx_cr + n * inp_length / 2,
+                                                       inp_length / 2));
+    else
+        for (int i = 0; i < part_num_y; i++) {
+            int idx_shift_y = idx_y + (i << (current->cm_octant_depth - inp_depth));
+            for (int j = 0; j < 4; j++) {
+                flags(coded_res_flag[idx_shift_y][idx_cb][idx_cr][j],
+                      4, idx_shift_y, idx_cb, idx_cr, j);
+                if (current->coded_res_flag[idx_shift_y][idx_cb][idx_cr][j]) {
+                    for (int c = 0; c < 3; c++) {
+                        ues(res_coeff_q[idx_shift_y][idx_cb][idx_cr][j][c], 0, 3,
+                            5, idx_shift_y, idx_cb, idx_cr, j, c);
+                        cm_res_bits = FFMAX(0, 10 + (current->luma_bit_depth_cm_input_minus8 + 8) -
+                                            (current->luma_bit_depth_cm_output_minus8 + 8) -
+                                            current->cm_res_quant_bits - (current->cm_delta_flc_bits_minus1 + 1));
+                        if (cm_res_bits)
+                            ubs(cm_res_bits, res_coeff_r[idx_shift_y][idx_cb][idx_cr][j][c],
+                                5, idx_shift_y, idx_cb, idx_cr, j, c);
+                        else
+                            infer(res_coeff_r[idx_shift_y][idx_cb][idx_cr][j][c], 0);
+                        if (current->res_coeff_q[idx_shift_y][idx_cb][idx_cr][j][c] ||
+                            current->res_coeff_r[idx_shift_y][idx_cb][idx_cr][j][c])
+                            ub(1, res_coeff_s[idx_shift_y][idx_cb][idx_cr][j][c]);
+                        else
+                            infer(res_coeff_s[idx_shift_y][idx_cb][idx_cr][j][c], 0);
+                    }
+                } else {
+                    for (int c = 0; c < 3; c++) {
+                        infer(res_coeff_q[idx_shift_y][idx_cb][idx_cr][j][c], 0);
+                        infer(res_coeff_r[idx_shift_y][idx_cb][idx_cr][j][c], 0);
+                        infer(res_coeff_s[idx_shift_y][idx_cb][idx_cr][j][c], 0);
+                    }
+                }
+            }
+        }
+
+    return 0;
+}
+
+static int FUNC(colour_mapping_table)(CodedBitstreamContext *ctx, RWContext *rw,
+                                      H265RawPPS *current)
+{
+    int err;
+
+    ue(num_cm_ref_layers_minus1, 0, 61);
+    for (int i = 0; i <= current->num_cm_ref_layers_minus1; i++)
+        ubs(6, cm_ref_layer_id[i], 1, i);
+
+    u(2, cm_octant_depth, 0, 1);
+    u(2, cm_y_part_num_log2, 0, 3 - current->cm_octant_depth);
+
+    ue(luma_bit_depth_cm_input_minus8, 0, 8);
+    ue(chroma_bit_depth_cm_input_minus8, 0, 8);
+    ue(luma_bit_depth_cm_output_minus8, 0, 8);
+    ue(chroma_bit_depth_cm_output_minus8, 0, 8);
+
+    ub(2, cm_res_quant_bits);
+    ub(2, cm_delta_flc_bits_minus1);
+
+    if (current->cm_octant_depth == 1) {
+        se(cm_adapt_threshold_u_delta, -32768, 32767);
+        se(cm_adapt_threshold_v_delta, -32768, 32767);
+    } else {
+        infer(cm_adapt_threshold_u_delta, 0);
+        infer(cm_adapt_threshold_v_delta, 0);
+    }
+
+    CHECK(FUNC(colour_mapping_octants)(ctx, rw, current, 0, 0, 0, 0, 1 << current->cm_octant_depth));
+
+    return 0;
+}
+
+static int FUNC(pps_multilayer_extension)(CodedBitstreamContext *ctx, RWContext *rw,
+                                          H265RawPPS *current)
+{
+    CodedBitstreamH265Context *h265 = ctx->priv_data;
+    const H265RawVPS *vps = h265->active_vps;
+    int offset;
+    int err, i;
+
+    flag(poc_reset_info_present_flag);
+    flag(pps_infer_scaling_list_flag);
+    if (current->pps_infer_scaling_list_flag)
+        ub(6, pps_scaling_list_ref_layer_id);
+
+    if (!vps) {
+        av_log(ctx->log_ctx, AV_LOG_ERROR, "VPS missing for PPS Multilayer Extension.\n");
+        return AVERROR_INVALIDDATA;
+    }
+
+    ue(num_ref_loc_offsets, 0, vps->vps_max_layers_minus1);
+    for (i = 0; i < current->num_ref_loc_offsets; i++) {
+        ubs(6, ref_loc_offset_layer_id[i], 1, i);
+        offset = current->ref_loc_offset_layer_id[i];
+        flags(scaled_ref_layer_offset_present_flag[i], 1, i);
+        if (current->scaled_ref_layer_offset_present_flag[i]) {
+            ses(scaled_ref_layer_left_offset[offset], -16384, 16383, 1, offset);
+            ses(scaled_ref_layer_top_offset[offset], -16384, 16383, 1, offset);
+            ses(scaled_ref_layer_right_offset[offset], -16384, 16383, 1, offset);
+            ses(scaled_ref_layer_bottom_offset[offset], -16384, 16383, 1, offset);
+        } else {
+            infer(scaled_ref_layer_left_offset[offset], 0);
+            infer(scaled_ref_layer_top_offset[offset], 0);
+            infer(scaled_ref_layer_right_offset[offset], 0);
+            infer(scaled_ref_layer_bottom_offset[offset], 0);
+        }
+        flags(ref_region_offset_present_flag[i], 1, i);
+        if (current->ref_region_offset_present_flag[i]) {
+            ses(ref_region_left_offset[offset], -16384, 16383, 1, offset);
+            ses(ref_region_top_offset[offset], -16384, 16383, 1, offset);
+            ses(ref_region_right_offset[offset], -16384, 16383, 1, offset);
+            ses(ref_region_bottom_offset[offset], -16384, 16383, 1, offset);
+        } else {
+            infer(ref_region_left_offset[offset], 0);
+            infer(ref_region_top_offset[offset], 0);
+            infer(ref_region_right_offset[offset], 0);
+            infer(ref_region_bottom_offset[offset], 0);
+        }
+        flags(resample_phase_set_present_flag[i], 1, i);
+        if (current->resample_phase_set_present_flag[i]) {
+            ues(phase_hor_luma[offset], 0, 31, 1, offset);
+            ues(phase_ver_luma[offset], 0, 31, 1, offset);
+            ues(phase_hor_chroma_plus8[offset], 0, 63, 1, offset);
+            ues(phase_ver_chroma_plus8[offset], 0, 63, 1, offset);
+        } else {
+            infer(phase_hor_luma[offset], 0);
+            infer(phase_ver_luma[offset], 0);
+            infer(phase_hor_chroma_plus8[offset], 8);
+        }
+    }
+
+    flag(colour_mapping_enabled_flag);
+    if (current->colour_mapping_enabled_flag)
+        CHECK(FUNC(colour_mapping_table)(ctx, rw, current));
 
     return 0;
 }
@@ -1143,7 +1350,7 @@ static int FUNC(pps)(CodedBitstreamContext *ctx, RWContext *rw,
     if (current->pps_range_extension_flag)
         CHECK(FUNC(pps_range_extension)(ctx, rw, current));
     if (current->pps_multilayer_extension_flag)
-        return AVERROR_PATCHWELCOME;
+        CHECK(FUNC(pps_multilayer_extension)(ctx, rw, current));
     if (current->pps_3d_extension_flag)
         return AVERROR_PATCHWELCOME;
     if (current->pps_scc_extension_flag)
@@ -2073,6 +2280,48 @@ SEI_FUNC(sei_alpha_channel_info, (CodedBitstreamContext *ctx, RWContext *rw,
        infer(alpha_channel_incr_flag, 0);
        infer(alpha_channel_clip_flag, 0);
     }
+
+    return 0;
+}
+
+SEI_FUNC(sei_3d_reference_displays_info, (CodedBitstreamContext *ctx, RWContext *rw,
+                                          H265RawSEI3DReferenceDisplaysInfo *current,
+                                          SEIMessageState *sei))
+{
+    int length;
+    int err, i;
+
+    HEADER("Three Dimensional Reference Displays Information");
+
+    ue(prec_ref_display_width, 0, 31);
+    flag(ref_viewing_distance_flag);
+    if (current->ref_viewing_distance_flag)
+        ue(prec_ref_viewing_dist, 0, 31);
+    ue(num_ref_displays_minus1, 0, 31);
+    for (i = 0; i <= current->num_ref_displays_minus1; i++) {
+        ues(left_view_id[i], 0, UINT8_MAX, 1, i);
+        ues(right_view_id[i], 0, UINT8_MAX, 1, i);
+        us(6, exponent_ref_display_width[i], 0, 62, 1, i);
+        if (!current->exponent_ref_display_width[i])
+            length = FFMAX(0, (int)current->prec_ref_display_width - 30);
+        else
+            length = FFMAX(0, (int)current->exponent_ref_display_width[i] +
+                              (int)current->prec_ref_display_width - 31);
+        ubs(length, mantissa_ref_display_width[i], 1, i);
+        if (current->ref_viewing_distance_flag) {
+            us(6, exponent_ref_viewing_distance[i], 0, 62, 1, i);
+            if (!current->exponent_ref_viewing_distance[i])
+                length = FFMAX(0, (int)current->prec_ref_viewing_dist - 30);
+            else
+                length = FFMAX(0, (int)current->exponent_ref_viewing_distance[i] +
+                                  (int)current->prec_ref_viewing_dist - 31);
+            ubs(length, mantissa_ref_viewing_distance[i], 1, i);
+        }
+        flags(additional_shift_present_flag[i], 1, i);
+        if (current->additional_shift_present_flag[i])
+            us(10, num_sample_shift_plus512[i], 0, 1023, 1, i);
+    }
+    flag(three_dimensional_reference_displays_extension_flag);
 
     return 0;
 }
