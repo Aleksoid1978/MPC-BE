@@ -281,7 +281,7 @@ BEGIN
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,275,45,12,13
     CONTROL         "DVD 위치 기억",IDC_DVD_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,60,156,9
     CONTROL         "파일 위치 기억",IDC_FILE_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,72,158,9
-    CONTROL         "종료 시, 팬&스캔 확대율 기억",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,84,156,9
+    CONTROL         "종료 시, 팬&&스캔 확대율 기억",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,84,156,9
     CONTROL         "메인 재생 목록 기억",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,96,156,9
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,129,108,158,1
     CONTROL         "최근 열람한 파일 경로를 제목 표시줄에 표기",IDC_CHECK4,
@@ -609,7 +609,7 @@ END
 
 IDD_PNSPRESET_DLG DIALOGEX 0, 0, 210, 120
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "팬 & 스캔 사전 설정"
+CAPTION "팬 && 스캔 사전 설정"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LISTBOX         IDC_LIST1,5,5,125,50,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
@@ -2653,9 +2653,9 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_PNS_FLIP         "팬&스캔 - 좌우반전"
-    IDS_AG_PNS_ROTATE_CCW   "팬&스캔 - 반시계 방향으로 회전"
-    IDS_AG_PNS_ROTATE_CW    "팬&스캔 - 시계 방향으로 회전"
+    IDS_AG_PNS_FLIP         "팬&&스캔 - 좌우반전"
+    IDS_AG_PNS_ROTATE_CCW   "팬&&스캔 - 반시계 방향으로 회전"
+    IDS_AG_PNS_ROTATE_CW    "팬&&스캔 - 시계 방향으로 회전"
     IDS_AG_TEARING_TEST     "티어링 테스트"
     IDS_SCALE_16_9          "16:9 TV 스케일,%.3f,%.3f,%.3f,%.3f"
     IDS_SCALE_WIDESCREEN    "와이드 스크린으로 확대,%.3f,%.3f,%.3f,%.3f"
@@ -2868,12 +2868,12 @@ BEGIN
     IDS_AG_VIDFRM_NORMAL    "비디오폼 : 기본"
     IDS_AG_VIDFRM_DOUBLE    "비디오폼 : 2배"
     IDS_AG_ALWAYS_ON_TOP    "항상 위에 유지"
-    IDS_AG_PNS_INC_SIZE     "팬&스캔 - 크기 확대"
-    IDS_AG_PNS_INC_WIDTH    "팬&스캔 - 폭 확대"
-    IDS_AG_PNS_INC_HEIGHT   "팬&스캔 - 높이 확대"
-    IDS_AG_PNS_DEC_SIZE     "팬&스캔 - 크기 축소"
-    IDS_AG_PNS_DEC_WIDTH    "팬&스캔 - 폭 축소"
-    IDS_AG_PNS_DEC_HEIGHT   "팬&스캔 - 높이 축소"
+    IDS_AG_PNS_INC_SIZE     "팬&&스캔 - 크기 확대"
+    IDS_AG_PNS_INC_WIDTH    "팬&&스캔 - 폭 확대"
+    IDS_AG_PNS_INC_HEIGHT   "팬&&스캔 - 높이 확대"
+    IDS_AG_PNS_DEC_SIZE     "팬&&스캔 - 크기 축소"
+    IDS_AG_PNS_DEC_WIDTH    "팬&&스캔 - 폭 축소"
+    IDS_AG_PNS_DEC_HEIGHT   "팬&&스캔 - 높이 축소"
 END
 
 STRINGTABLE
@@ -2885,15 +2885,15 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_PNS_CENTER       "팬&스캔 - 중앙 배치"
-    IDS_AG_PNS_LEFT         "팬&스캔 - 왼쪽으로"
-    IDS_AG_PNS_RIGHT        "팬&스캔 - 오른쪽으로"
-    IDS_AG_PNS_UP           "팬&스캔 - 위로"
-    IDS_AG_PNS_DOWN         "팬&스캔 - 아래로"
-    IDS_AG_PNS_UPLEFT       "팬&스캔 - 왼쪽 위로"
-    IDS_AG_PNS_UPRIGHT      "팬&스캔 - 오른쪽 위로"
-    IDS_AG_PNS_DOWNLEFT     "팬&스캔 - 왼쪽 아래로"
-    IDS_AG_PNS_DOWNRIGHT    "퍈&스캔 - 오른쪽 아래로"
+    IDS_AG_PNS_CENTER       "팬&&스캔 - 중앙 배치"
+    IDS_AG_PNS_LEFT         "팬&&스캔 - 왼쪽으로"
+    IDS_AG_PNS_RIGHT        "팬&&스캔 - 오른쪽으로"
+    IDS_AG_PNS_UP           "팬&&스캔 - 위로"
+    IDS_AG_PNS_DOWN         "팬&&스캔 - 아래로"
+    IDS_AG_PNS_UPLEFT       "팬&&스캔 - 왼쪽 위로"
+    IDS_AG_PNS_UPRIGHT      "팬&&스캔 - 오른쪽 위로"
+    IDS_AG_PNS_DOWNLEFT     "팬&&스캔 - 왼쪽 아래로"
+    IDS_AG_PNS_DOWNRIGHT    "퍈&&스캔 - 오른쪽 아래로"
     IDS_AG_VOLUME_UP        "음량 크게"
     IDS_AG_VOLUME_DOWN      "음량 작게"
     IDS_AG_VOLUME_MUTE      "음 소거"
@@ -3111,7 +3111,7 @@ BEGIN
     IDS_MAINFRM_DIR_TITLE   "디렉터리 선택"
     IDS_MAINFRM_DIR_CHECK   "하위 폴더 포함"
     IDS_AG_PAUSE            "일시 중지"
-    IDS_AG_TOGGLE_CAPTION   "제목 표시줄 & 메뉴 토글"
+    IDS_AG_TOGGLE_CAPTION   "제목 표시줄 && 메뉴 토글"
     IDS_AG_TOGGLE_SEEKER    "탐색 표시줄 토글"
     IDS_AG_TOGGLE_CONTROLS  "제어 토글"
 END
@@ -3420,7 +3420,7 @@ BEGIN
     IDS_AG_VIDFRM_STRETCH   "비디오폼 : 늘리기"
     IDS_AG_VIDFRM_INSIDE    "비디오폼 : 안쪽"
     IDS_AG_VIDFRM_OUTSIDE   "비디오폼 : 바깥쪽"
-    IDS_AG_PNS_RESET        "팬&스캔 - 초기화"
+    IDS_AG_PNS_RESET        "팬&&스캔 - 초기화"
 END
 
 STRINGTABLE
