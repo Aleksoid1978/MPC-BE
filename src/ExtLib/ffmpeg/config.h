@@ -486,7 +486,7 @@
 #define HAVE_VAAPI_WIN32 0
 #define HAVE_TRUNC 1
 #define HAVE_TRUNCF 1
-#define HAVE_UNISTD_H 1
+#define HAVE_UNISTD_H 0
 #define HAVE_VALGRIND_VALGRIND_H 0
 #define HAVE_USLEEP 1
 #define HAVE_VDPAU_X11 0
