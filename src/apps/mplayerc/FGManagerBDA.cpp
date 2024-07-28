@@ -727,11 +727,11 @@ HRESULT CFGManagerBDA::CreateMicrosoftDemux(IBaseFilter* pReceiver, CComPtr<IBas
 			}
 
 			if (nType == m_nCurVideoType || nType == m_nCurAudioType) {
-				CheckNoLog (Connect (pPin, nullptr, true));
+				CheckNoLog (ConnectInternal (pPin, nullptr, true));
 				Stream.SetPin (pPin);
 				LOG (L"Graph completed for stream type %d.",nType);
 			} else {
-				CheckNoLog (Connect (pPin, nullptr, false));
+				CheckNoLog (ConnectInternal (pPin, nullptr, false));
 				Stream.SetPin (pPin);
 				LOG (L"Filter connected to Demux for media type %d.",nType);
 			}

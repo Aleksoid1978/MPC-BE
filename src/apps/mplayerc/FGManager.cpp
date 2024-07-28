@@ -648,13 +648,13 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 	return S_OK;
 }
 
-HRESULT CFGManager::AddSourceFilter(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrFilterName, IBaseFilter** ppBF)
+HRESULT CFGManager::AddSourceFilterInternal(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrFilterName, IBaseFilter** ppBF)
 {
 	if (m_bOpeningAborted) {
 		return E_ABORT;
 	}
 
-	DLog(L"FGM: AddSourceFilter() trying '%s'", pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName())/*CStringFromGUID(pFGF->GetCLSID())*/);
+	DLog(L"FGM: AddSourceFilterInternal() trying '%s'", pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName())/*CStringFromGUID(pFGF->GetCLSID())*/);
 
 	CheckPointer(lpcwstrFileName, E_POINTER);
 	CheckPointer(ppBF, E_POINTER);
@@ -707,7 +707,7 @@ HRESULT CFGManager::AddSourceFilter(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LP
 		if (pmt->subtype == guid1 || pmt->subtype == guid2 || pmt->subtype == guid3) {
 			RemoveFilter(pBF);
 			pFGF = DNew CFGFilterRegistry(CLSID_NetShowSource);
-			hr = AddSourceFilter(pFGF, lpcwstrFileName, lpcwstrFilterName, ppBF);
+			hr = AddSourceFilterInternal(pFGF, lpcwstrFileName, lpcwstrFilterName, ppBF);
 			delete pFGF;
 			SAFE_DELETE(pmt);
 			return hr;
@@ -840,10 +840,10 @@ STDMETHODIMP CFGManager::SetDefaultSyncSource()
 
 STDMETHODIMP CFGManager::Connect(IPin* pPinOut, IPin* pPinIn)
 {
-	return Connect(pPinOut, pPinIn, true);
+	return ConnectInternal(pPinOut, pPinIn, true);
 }
 
-HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
+HRESULT CFGManager::ConnectInternal(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 {
 	CAutoLock cAutoLock(this);
 
@@ -1217,7 +1217,7 @@ STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlay
 		CFGFilter* pFGF = fl.GetFilter(pos);
 		CComPtr<IBaseFilter> pBF;
 
-		if (SUCCEEDED(hr = AddSourceFilter(pFGF, lpcwstrFileName, pFGF->GetName(), &pBF))) {
+		if (SUCCEEDED(hr = AddSourceFilterInternal(pFGF, lpcwstrFileName, pFGF->GetName(), &pBF))) {
 			m_streampath.clear();
 			m_deadends.clear();
 
@@ -1258,7 +1258,7 @@ STDMETHODIMP CFGManager::AddSourceFilter(LPCWSTR lpcwstrFileName, LPCWSTR lpcwst
 
 	for (unsigned pos = 0, fltnum = fl.GetSortedSize(); pos < fltnum; pos++) {
 		CFGFilter* pFGF = fl.GetFilter(pos);
-		if (SUCCEEDED(hr = AddSourceFilter(pFGF, lpcwstrFileName, lpcwstrFilterName, ppFilter))) {
+		if (SUCCEEDED(hr = AddSourceFilterInternal(pFGF, lpcwstrFileName, lpcwstrFilterName, ppFilter))) {
 			return hr;
 		}
 	}
@@ -1812,7 +1812,7 @@ STDMETHODIMP CFGManager::RenderSubFile(LPCWSTR lpcwstrFileName)
 	CFGFilter* pFG = DNew CFGFilterInternal<CMatroskaSourceFilter>();
 
 	CComPtr<IBaseFilter> pBF;
-	if (SUCCEEDED(hr = AddSourceFilter(pFG, lpcwstrFileName, pFG->GetName(), &pBF))) {
+	if (SUCCEEDED(hr = AddSourceFilterInternal(pFG, lpcwstrFileName, pFG->GetName(), &pBF))) {
 		m_streampath.clear();
 		m_deadends.clear();
 

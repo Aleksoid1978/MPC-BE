@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -69,8 +69,8 @@ protected:
 	bool CheckBytes(PBYTE buf, DWORD size, CString chkbytes);
 
 	HRESULT EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl);
-	HRESULT AddSourceFilter(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrFilterName, IBaseFilter** ppBF);
-	HRESULT Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender);
+	HRESULT AddSourceFilterInternal(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrFilterName, IBaseFilter** ppBF);
+	HRESULT ConnectInternal(IPin* pPinOut, IPin* pPinIn, bool bContinueRender);
 
 	// IFilterGraph
 
