@@ -661,11 +661,11 @@ HRESULT CFGManager::AddSourceFilter(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LP
 
 	ASSERT(*ppBF == nullptr);
 
-	HRESULT hr;
-
 	CComPtr<IBaseFilter> pBF;
 	std::list<CComQIPtr<IUnknown, &IID_IUnknown>> pUnks;
-	if (FAILED(hr = pFGF->Create(&pBF, pUnks))) {
+
+	HRESULT hr = pFGF->Create(&pBF, pUnks);
+	if (FAILED(hr)) {
 		return hr;
 	}
 
@@ -674,7 +674,8 @@ HRESULT CFGManager::AddSourceFilter(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LP
 		return E_NOINTERFACE;
 	}
 
-	if (FAILED(hr = AddFilter(pBF, lpcwstrFilterName))) {
+	hr = AddFilter(pBF, lpcwstrFilterName);
+	if (FAILED(hr)) {
 		return hr;
 	}
 
@@ -688,8 +689,8 @@ HRESULT CFGManager::AddSourceFilter(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LP
 		pmt = &mt;
 	}
 
-	// sometimes looping with AviSynth
-	if (FAILED(hr = pFSF->Load(lpcwstrFileName, pmt)) || m_bOpeningAborted) {
+	hr = pFSF->Load(lpcwstrFileName, pmt);
+	if (FAILED(hr) || m_bOpeningAborted) { // sometimes looping with AviSynth
 		RemoveFilter(pBF);
 		return m_bOpeningAborted ? E_ABORT : hr;
 	}
