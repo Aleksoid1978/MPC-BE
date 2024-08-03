@@ -1033,9 +1033,9 @@ void CMainFrame::OnClose()
 		SaveControlBars();
 	}
 
-	ShowWindow(SW_HIDE);
-
 	CloseMedia();
+
+	ShowWindow(SW_HIDE);
 
 	s.WinLircClient.DisConnect();
 	s.UIceClient.DisConnect();
