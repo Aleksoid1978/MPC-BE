@@ -22,21 +22,24 @@
 
 #include "ffv1_template.c"
 
-static av_always_inline int RENAME(decode_line)(FFV1Context *s, int w,
-                                                 TYPE *sample[2],
-                                                 int plane_index, int bits)
+static av_always_inline int
+RENAME(decode_line)(FFV1Context *f, FFV1SliceContext *sc,
+                    GetBitContext *gb,
+                    int w, TYPE *sample[2], int plane_index, int bits,
+                    int ac)
 {
-    PlaneContext *const p = &s->plane[plane_index];
-    RangeCoder *const c   = &s->c;
+    PlaneContext *const p = &sc->plane[plane_index];
+    RangeCoder *const c   = &sc->c;
+    const int16_t (*quant_table)[256] = f->quant_tables[p->quant_table_index];
     int x;
     int run_count = 0;
     int run_mode  = 0;
-    int run_index = s->run_index;
+    int run_index = sc->run_index;
 
-    if (is_input_end(s))
+    if (is_input_end(c, gb, ac))
         return AVERROR_INVALIDDATA;
 
-    if (s->slice_coding_mode == 1) {
+    if (sc->slice_coding_mode == 1) {
         int i;
         for (x = 0; x < w; x++) {
             int v = 0;
@@ -53,11 +56,12 @@ static av_always_inline int RENAME(decode_line)(FFV1Context *s, int w,
         int diff, context, sign;
 
         if (!(x & 1023)) {
-            if (is_input_end(s))
+            if (is_input_end(c, gb, ac))
                 return AVERROR_INVALIDDATA;
         }
 
-        context = RENAME(get_context)(p, sample[1] + x, sample[0] + x, sample[1] + x);
+        context = RENAME(get_context)(quant_table,
+                                      sample[1] + x, sample[0] + x, sample[1] + x);
         if (context < 0) {
             context = -context;
             sign    = 1;
@@ -66,7 +70,7 @@ static av_always_inline int RENAME(decode_line)(FFV1Context *s, int w,
 
         av_assert2(context < p->context_count);
 
-        if (s->ac != AC_GOLOMB_RICE) {
+        if (ac != AC_GOLOMB_RICE) {
             diff = get_symbol_inline(c, p->state[context], 1);
         } else {
             if (context == 0 && run_mode == 0)
@@ -74,13 +78,13 @@ static av_always_inline int RENAME(decode_line)(FFV1Context *s, int w,
 
             if (run_mode) {
                 if (run_count == 0 && run_mode == 1) {
-                    if (get_bits1(&s->gb)) {
+                    if (get_bits1(gb)) {
                         run_count = 1 << ff_log2_run[run_index];
                         if (x + run_count <= w)
                             run_index++;
                     } else {
                         if (ff_log2_run[run_index])
-                            run_count = get_bits(&s->gb, ff_log2_run[run_index]);
+                            run_count = get_bits(gb, ff_log2_run[run_index]);
                         else
                             run_count = 0;
                         if (run_index)
@@ -105,17 +109,17 @@ static av_always_inline int RENAME(decode_line)(FFV1Context *s, int w,
                 if (run_count < 0) {
                     run_mode  = 0;
                     run_count = 0;
-                    diff      = get_vlc_symbol(&s->gb, &p->vlc_state[context],
+                    diff      = get_vlc_symbol(gb, &p->vlc_state[context],
                                                bits);
                     if (diff >= 0)
                         diff++;
                 } else
                     diff = 0;
             } else
-                diff = get_vlc_symbol(&s->gb, &p->vlc_state[context], bits);
+                diff = get_vlc_symbol(gb, &p->vlc_state[context], bits);
 
-            ff_dlog(s->avctx, "count:%d index:%d, mode:%d, x:%d pos:%d\n",
-                    run_count, run_index, run_mode, x, get_bits_count(&s->gb));
+            ff_dlog(f->avctx, "count:%d index:%d, mode:%d, x:%d pos:%d\n",
+                    run_count, run_index, run_mode, x, get_bits_count(gb));
         }
 
         if (sign)
@@ -123,27 +127,30 @@ static av_always_inline int RENAME(decode_line)(FFV1Context *s, int w,
 
         sample[1][x] = av_zero_extend(RENAME(predict)(sample[1] + x, sample[0] + x) + (SUINT)diff, bits);
     }
-    s->run_index = run_index;
+    sc->run_index = run_index;
     return 0;
 }
 
-static int RENAME(decode_rgb_frame)(FFV1Context *s, uint8_t *src[4], int w, int h, int stride[4])
+static int RENAME(decode_rgb_frame)(FFV1Context *f, FFV1SliceContext *sc,
+                                    GetBitContext *gb,
+                                    uint8_t *src[4], int w, int h, int stride[4])
 {
     int x, y, p;
     TYPE *sample[4][2];
-    int lbd    = s->avctx->bits_per_raw_sample <= 8;
-    int bits   = s->avctx->bits_per_raw_sample > 0 ? s->avctx->bits_per_raw_sample : 8;
+    int lbd    = f->avctx->bits_per_raw_sample <= 8;
+    int bits   = f->avctx->bits_per_raw_sample > 0 ? f->avctx->bits_per_raw_sample : 8;
     int offset = 1 << bits;
-    int transparency = s->transparency;
+    int transparency = f->transparency;
+    int ac = f->ac;
 
     for (x = 0; x < 4; x++) {
-        sample[x][0] = RENAME(s->sample_buffer) +  x * 2      * (w + 6) + 3;
-        sample[x][1] = RENAME(s->sample_buffer) + (x * 2 + 1) * (w + 6) + 3;
+        sample[x][0] = RENAME(sc->sample_buffer) +  x * 2      * (w + 6) + 3;
+        sample[x][1] = RENAME(sc->sample_buffer) + (x * 2 + 1) * (w + 6) + 3;
     }
 
-    s->run_index = 0;
+    sc->run_index = 0;
 
-    memset(RENAME(s->sample_buffer), 0, 8 * (w + 6) * sizeof(*RENAME(s->sample_buffer)));
+    memset(RENAME(sc->sample_buffer), 0, 8 * (w + 6) * sizeof(*RENAME(sc->sample_buffer)));
 
     for (y = 0; y < h; y++) {
         for (p = 0; p < 3 + transparency; p++) {
@@ -155,10 +162,10 @@ static int RENAME(decode_rgb_frame)(FFV1Context *s, uint8_t *src[4], int w, int 
 
             sample[p][1][-1]= sample[p][0][0  ];
             sample[p][0][ w]= sample[p][0][w-1];
-            if (lbd && s->slice_coding_mode == 0)
-                ret = RENAME(decode_line)(s, w, sample[p], (p + 1)/2, 9);
+            if (lbd && sc->slice_coding_mode == 0)
+                ret = RENAME(decode_line)(f, sc, gb, w, sample[p], (p + 1)/2, 9, ac);
             else
-                ret = RENAME(decode_line)(s, w, sample[p], (p + 1)/2, bits + (s->slice_coding_mode != 1));
+                ret = RENAME(decode_line)(f, sc, gb, w, sample[p], (p + 1)/2, bits + (sc->slice_coding_mode != 1), ac);
             if (ret < 0)
                 return ret;
         }
@@ -168,10 +175,10 @@ static int RENAME(decode_rgb_frame)(FFV1Context *s, uint8_t *src[4], int w, int 
             int r = sample[2][1][x];
             int a = sample[3][1][x];
 
-            if (s->slice_coding_mode != 1) {
+            if (sc->slice_coding_mode != 1) {
                 b -= offset;
                 r -= offset;
-                g -= (b * s->slice_rct_by_coef + r * s->slice_rct_ry_coef) >> 2;
+                g -= (b * sc->slice_rct_by_coef + r * sc->slice_rct_ry_coef) >> 2;
                 b += g;
                 r += g;
             }

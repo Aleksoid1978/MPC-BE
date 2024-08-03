@@ -30,7 +30,7 @@ Updated Japanese translation (by tsubasanouta).
 
 Updated libraries:
 	dav1d 1.4.2-15-g2355eeb;
-	ffmpeg n7.1-dev-1969-g719e46f54c;
+	ffmpeg n7.1-dev-2058-g677f28b310;
 	Little-CMS git-lcms2.16-60-g1c9021b;
 	MediaInfo git-v24.06-10-g88f3ea4aa;
 	ResizableLib v1.5.3-8-g25a89da;

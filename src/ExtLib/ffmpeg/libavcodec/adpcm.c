@@ -260,10 +260,6 @@ static av_cold int adpcm_decode_init(AVCodecContext * avctx)
     case AV_CODEC_ID_ADPCM_IMA_AMV:
         max_channels = 1;
         break;
-    case AV_CODEC_ID_ADPCM_DTK:
-    case AV_CODEC_ID_ADPCM_EA:
-        min_channels = 1;
-        break;
     case AV_CODEC_ID_ADPCM_AFC:
     case AV_CODEC_ID_ADPCM_EA_R1:
     case AV_CODEC_ID_ADPCM_EA_R2:
@@ -1684,22 +1680,24 @@ static int adpcm_decode_frame(AVCodecContext *avctx, AVFrame *frame,
             for (int count2 = 0; count2 < (channels == 2 ? 28 : 14); count2++) {
                 byte = bytestream2_get_byteu(&gb);
                 next_left_sample  = sign_extend(byte >> 4, 4) * (1 << shift_left);
-                next_right_sample = sign_extend(byte,      4) * (1 << shift_right);
 
                 next_left_sample = (next_left_sample +
                     (current_left_sample * coeff1l) +
                     (previous_left_sample * coeff2l) + 0x80) >> 8;
-                next_right_sample = (next_right_sample +
-                    (current_right_sample * coeff1r) +
-                    (previous_right_sample * coeff2r) + 0x80) >> 8;
 
                 previous_left_sample = current_left_sample;
                 current_left_sample = av_clip_int16(next_left_sample);
-                previous_right_sample = current_right_sample;
-                current_right_sample = av_clip_int16(next_right_sample);
                 *samples++ = current_left_sample;
 
                 if (channels == 2){
+                    next_right_sample = sign_extend(byte, 4) * (1 << shift_right);
+
+                    next_right_sample = (next_right_sample +
+                        (current_right_sample * coeff1r) +
+                        (previous_right_sample * coeff2r) + 0x80) >> 8;
+
+                    previous_right_sample = current_right_sample;
+                    current_right_sample = av_clip_int16(next_right_sample);
                     *samples++ = current_right_sample;
                 } else {
                     next_left_sample  = sign_extend(byte, 4) * (1 << shift_left);
