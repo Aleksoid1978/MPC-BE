@@ -45,6 +45,11 @@ CRenderedHdmvSubtitle::CRenderedHdmvSubtitle(CCritSec* pLock, SUBTITLE_TYPE nTyp
 			ASSERT(FALSE);
 			m_pSub = nullptr;
 	}
+
+	if (m_pSub) {
+		auto bForced = (CString(name).MakeLower().Find(L"forced") >= 0);
+		m_pSub->SetForced(bForced);
+	}
 }
 
 CRenderedHdmvSubtitle::CRenderedHdmvSubtitle(CCritSec* pLock)

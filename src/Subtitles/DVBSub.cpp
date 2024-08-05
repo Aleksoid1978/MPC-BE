@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -395,6 +395,11 @@ POSITION CDVBSub::GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld/
 	if (CleanOld) {
 		CDVBSub::CleanOld(rt);
 	}
+
+	if (g_bForcedSubtitle && !m_bForced) {
+		return nullptr;
+	}
+
 	POSITION pos = m_pages.GetHeadPosition();
 	while (pos) {
 		DVB_PAGE* pPage = m_pages.GetAt(pos);

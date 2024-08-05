@@ -44,6 +44,8 @@ public:
 
 	HRESULT					SetConvertType(LPCWSTR _yuvMatrix, ColorConvert::convertType _convertType);
 
+	void					SetForced(bool bForced) { m_bForced = bForced; }
+
 protected :
 	SUBTITLE_TYPE			m_nType;
 
@@ -64,4 +66,6 @@ protected :
 
 	YUVMATRIX					yuvMatrix = {};
 	ColorConvert::convertType	convertType;
+
+	bool m_bForced = false;
 };

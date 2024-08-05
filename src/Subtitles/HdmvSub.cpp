@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -54,7 +54,8 @@ POSITION CHdmvSub::GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld
 	POSITION pos = m_pObjects.GetHeadPosition();
 	while (pos) {
 		const CompositionObject* pObject = m_pObjects.GetAt(pos);
-		if (pObject->m_rtStop <= rt || (g_bForcedSubtitle && !pObject->m_forced_on_flag)) {
+		auto skipForced = pObject->m_forced_on_flag ? false : g_bForcedSubtitle && !m_bForced;
+		if (pObject->m_rtStop <= rt || skipForced) {
 			m_pObjects.GetNext(pos);
 		} else {
 			break;
