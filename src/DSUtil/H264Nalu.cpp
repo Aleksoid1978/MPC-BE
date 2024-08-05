@@ -82,6 +82,10 @@ bool CH264Nalu::ReadNext()
 	}
 
 	if ((m_nNALSize != 0) && (m_nCurPos == m_nNextRTP)) {
+		if (m_nCurPos + m_nNALSize >= m_nSize) {
+			return false;
+		}
+
 		// RTP Nalu type : (XX XX) XX XX NAL..., with XX XX XX XX or XX XX equal to NAL size
 		m_nNALStartPos = m_nCurPos;
 		m_nNALDataPos  = m_nCurPos + m_nNALSize;
@@ -92,9 +96,17 @@ bool CH264Nalu::ReadNext()
 		m_nNextRTP += nTemp + m_nNALSize;
 		MoveToNextRTPStartcode();
 	} else {
+		if (m_nCurPos + 3 >= m_nSize) {
+			return false;
+		}
+
 		// Remove trailing bits
 		while (m_pBuffer[m_nCurPos] == 0x00 && !CheckNaluStartCode(m_pBuffer + m_nCurPos)) {
 			m_nCurPos++;
+		}
+
+		if (m_nCurPos >= m_nSize) {
+			return false;
 		}
 
 		// AnnexB Nalu : 00 00 01 NAL...
