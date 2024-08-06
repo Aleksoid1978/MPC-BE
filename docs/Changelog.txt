@@ -15,10 +15,15 @@ Optimized P010 to NV12 conversion for processors without SSE4.
 Optimized work with NVDEC.
 Fixed output format detection for FFV1 video.
 
+Subtitles
+The "Forced Only" setting now works with the entire PSG subtitle track marked as Forced.
+
 Player
 Improved support for moving the file properties window between displays with different text scaling.
 Fixed remembering the position of some DVD-Videos.
 Subtitles added manually are now saved in the playlist.
+Do not hide the player until the DirectShow graph is closed.
+Fixed freezing with some URLs when using external filters.
 
 Installer
 Compiling the installer requires InnoSetup 6.1.0 or later.
