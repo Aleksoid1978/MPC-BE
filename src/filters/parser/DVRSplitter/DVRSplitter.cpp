@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2023 see Authors.txt
+ * (C) 2018-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -100,6 +100,7 @@ constexpr auto CCTV_PACKET_HEADER_END_SYNC = FCC(' uil');
 CDVRSplitterFilter::CDVRSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(L"CDVRSplitterFilter", pUnk, phr, __uuidof(this))
 {
+	m_nFlag |= SOURCE_SUPPORT_URL;
 }
 
 HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
