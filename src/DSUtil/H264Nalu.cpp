@@ -21,8 +21,8 @@
 #include "stdafx.h"
 #include "H264Nalu.h"
 
-constexpr DWORD NALU_START_CODE      = 0x00010000;
-constexpr DWORD NALU_START_CODE_MASK = 0x00FFFFFF;
+constexpr uint32_t NALU_START_CODE      = 0x000001;
+constexpr size_t   NALU_START_CODE_SIZE = 3;
 
 void CH264Nalu::SetBuffer(const BYTE* pBuffer, const size_t nSize, const int nNALSize/* = 0*/)
 {
@@ -40,23 +40,26 @@ void CH264Nalu::SetBuffer(const BYTE* pBuffer, const size_t nSize, const int nNA
 	}
 }
 
-static bool CheckNaluStartCode(const BYTE* pBuffer)
-{
-	return (*(reinterpret_cast<const DWORD*>(pBuffer)) & NALU_START_CODE_MASK) == NALU_START_CODE;
-}
-
 bool CH264Nalu::MoveToNextAnnexBStartcode()
 {
-	if (m_nSize < 4) {
-		return false;
-	}
-	const size_t nBuffEnd = m_nSize - 4;
+	m_nNALStartCodeSize = NALU_START_CODE_SIZE;
 
-	for (size_t i = m_nCurPos; i < nBuffEnd; i++) {
-		if (CheckNaluStartCode(m_pBuffer + i)) {
-			// Find next AnnexB Nal
-			m_nCurPos = i;
-			return true;
+	if (m_nCurPos + NALU_START_CODE_SIZE <= m_nSize) {
+		const auto nBuffEnd = m_nSize - NALU_START_CODE_SIZE;
+		for (size_t i = m_nCurPos; i < nBuffEnd; i++) {
+			auto CheckNaluStartCode = [](const BYTE* pBuffer) {
+				return (static_cast<uint32_t>((pBuffer[0] << 16) | (pBuffer[1] << 8) | pBuffer[2])) == NALU_START_CODE;
+			};
+
+			if (CheckNaluStartCode(m_pBuffer + i)) {
+				if (i > m_nCurPos && m_pBuffer[i - 1] == 0x00) {
+					// 00 00 00 01
+					m_nNALStartCodeSize = 4;
+					i--;
+				}
+				m_nCurPos = i;
+				return true;
+			}
 		}
 	}
 
@@ -89,36 +92,27 @@ bool CH264Nalu::ReadNext()
 		// RTP Nalu type : (XX XX) XX XX NAL..., with XX XX XX XX or XX XX equal to NAL size
 		m_nNALStartPos = m_nCurPos;
 		m_nNALDataPos  = m_nCurPos + m_nNALSize;
-		unsigned nTemp = 0;
+		size_t nTemp = 0;
 		for (int i = 0; i < m_nNALSize; i++) {
 			nTemp = (nTemp << 8) + m_pBuffer[m_nCurPos++];
 		}
 		m_nNextRTP += nTemp + m_nNALSize;
 		MoveToNextRTPStartcode();
 	} else {
-		if (m_nCurPos + 3 >= m_nSize) {
-			return false;
-		}
-
-		// Remove trailing bits
-		while (m_pBuffer[m_nCurPos] == 0x00 && !CheckNaluStartCode(m_pBuffer + m_nCurPos)) {
-			m_nCurPos++;
-		}
-
-		if (m_nCurPos >= m_nSize) {
+		if (m_nCurPos + m_nNALStartCodeSize >= m_nSize) {
 			return false;
 		}
 
 		// AnnexB Nalu : 00 00 01 NAL...
 		m_nNALStartPos  = m_nCurPos;
-		m_nCurPos      += 3;
+		m_nCurPos      += m_nNALStartCodeSize;
 		m_nNALDataPos   = m_nCurPos;
 		MoveToNextAnnexBStartcode();
 	}
 
 	forbidden_bit     = (m_pBuffer[m_nNALDataPos] >> 7) & 1;
 	nal_reference_idc = (m_pBuffer[m_nNALDataPos] >> 5) & 3;
-	nal_unit_type     = (NALU_TYPE)(m_pBuffer[m_nNALDataPos] & 0x1f);
+	nal_unit_type     = static_cast<NALU_TYPE>(m_pBuffer[m_nNALDataPos] & 0x1f);
 
 	return true;
 }
@@ -126,7 +120,7 @@ bool CH264Nalu::ReadNext()
 bool CH265Nalu::ReadNext()
 {
 	if (__super::ReadNext()) {
-		nal_unit_type = (NALU_TYPE)((m_pBuffer[m_nNALDataPos] >> 1) & 0x3F);
+		nal_unit_type = static_cast<NALU_TYPE>((m_pBuffer[m_nNALDataPos] >> 1) & 0x3F);
 		return true;
 	}
 

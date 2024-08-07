@@ -102,11 +102,13 @@ protected :
 	size_t      m_nSize           = 0;
 	int         m_nNALSize        = 0;
 
+	size_t      m_nNALStartCodeSize = 3;
+
 	bool        MoveToNextAnnexBStartcode();
 	bool        MoveToNextRTPStartcode();
 
 public :
-	CH264Nalu() { SetBuffer(nullptr, 0, 0); }
+	CH264Nalu() = default;
 
 	NALU_TYPE   GetType() const { return nal_unit_type; }
 	bool        IsRefFrame() const { return (nal_reference_idc != 0); }
