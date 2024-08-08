@@ -149,7 +149,7 @@ class CFGManagerCustom : public CFGManager
 public:
 	// IFilterGraph
 
-	STDMETHODIMP AddFilter(IBaseFilter* pFilter, LPCWSTR pName);
+	STDMETHODIMP AddFilter(IBaseFilter* pFilter, LPCWSTR pName) override;
 
 public:
 	CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd = 0, bool IsPreview = false);
@@ -160,7 +160,7 @@ class CFGManagerPlayer : public CFGManagerCustom
 protected:
 	// IFilterGraph
 
-	STDMETHODIMP ConnectDirect(IPin* pPinOut, IPin* pPinIn, const AM_MEDIA_TYPE* pmt);
+	STDMETHODIMP ConnectDirect(IPin* pPinOut, IPin* pPinIn, const AM_MEDIA_TYPE* pmt) override;
 
 public:
 	CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, int preview = 0);
@@ -171,8 +171,8 @@ class CFGManagerDVD : public CFGManagerPlayer
 protected:
 	// IGraphBuilder
 
-	STDMETHODIMP RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPlayList);
-	STDMETHODIMP AddSourceFilter(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrFilterName, IBaseFilter** ppFilter);
+	STDMETHODIMP RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPlayList) override;
+	STDMETHODIMP AddSourceFilter(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrFilterName, IBaseFilter** ppFilter) override;
 
 public:
 	CFGManagerDVD(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview = false);
