@@ -168,6 +168,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Include", "Include", "{EA36
 		include\IMediaSideData.h = include\IMediaSideData.h
 		include\inttypes.h = include\inttypes.h
 		include\ITrackInfo.h = include\ITrackInfo.h
+		include\IURLSourceFilterLAV.h = include\IURLSourceFilterLAV.h
 		include\LAVVideoSettings.h = include\LAVVideoSettings.h
 		include\libdivide.h = include\libdivide.h
 		include\MediaOffset3D.h = include\MediaOffset3D.h
