@@ -160,7 +160,7 @@ HRESULT IDSMPropertyBagImpl::GetProperty(LPCWSTR key, BSTR* value)
 
 	std::lock_guard lock(m_mutex);
 
-	auto& it = m_properties.find(key);
+	auto it = m_properties.find(key);
 	if (it == m_properties.end()) {
 		return E_FAIL;
 	}
