@@ -41,7 +41,7 @@ static const CString ConvertToUTF16(const BYTE* pData, size_t size)
 
 	if (bUTF16BE || bUTF16LE) {
 		size /= 2;
-		CString str((LPCTSTR)pData, size);
+		CStringW str((LPCWSTR)pData, size);
 		if (bUTF16BE) {
 			for (int i = 0, j = str.GetLength(); i < j; i++) {
 				str.SetAt(i, (str[i] << 8) | (str[i] >> 8));
@@ -205,10 +205,10 @@ namespace Content {
 							|| (content.body.GetLength() >= 4 && wcsncmp(content.body, L".RMF", 4) == 0)) {
 						content.ct = L"audio/x-pn-realaudio";
 					}
-					if (content.body.GetLength() >= 4 && GETU32((LPCTSTR)content.body) == 0x75b22630) {
+					if (content.body.GetLength() >= 4 && GETU32((LPCWSTR)content.body) == 0x75b22630) {
 						content.ct = L"video/x-ms-wmv";
 					}
-					if (content.body.GetLength() >= 8 && wcsncmp((LPCTSTR)content.body + 4, L"moov", 4) == 0) {
+					if (content.body.GetLength() >= 8 && wcsncmp((LPCWSTR)content.body + 4, L"moov", 4) == 0) {
 						content.ct = L"video/quicktime";
 					}
 					if (StartsWith(content.body, L"#EXTM3U") && content.body.Find(L"#EXT-X-MEDIA-SEQUENCE") > 7) {
@@ -353,7 +353,7 @@ namespace Content {
 			if (fn2.Find(':') < 0 && fn2.Find(L"\\\\") != 0 && fn2.Find(L"//") != 0) {
 				CPath p;
 				p.Combine(dir, fn2);
-				fn2 = (LPCTSTR)p;
+				fn2 = (LPCWSTR)p;
 			}
 
 			if (!fn2.CompareNoCase(fn)) {

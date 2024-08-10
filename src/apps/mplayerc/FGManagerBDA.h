@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -114,7 +114,7 @@ private :
 class CFGManagerBDA : public CFGManagerPlayer, IBDATuner, IAMStreamSelect
 {
 public:
-	CFGManagerBDA(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd);
+	CFGManagerBDA(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd);
 	~CFGManagerBDA();
 
 	// IGraphBuilder

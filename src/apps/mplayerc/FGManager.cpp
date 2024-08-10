@@ -137,7 +137,7 @@ public:
 // CFGManager
 //
 
-CFGManager::CFGManager(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
+CFGManager::CFGManager(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
 	: CUnknown(pName, pUnk)
 	, m_hWnd(hWnd)
 	, m_bIsPreview(IsPreview)
@@ -1851,7 +1851,7 @@ STDMETHODIMP CFGManager::RenderAudioFile(LPCWSTR lpcwstrFileName)
 // CFGManagerCustom
 //
 
-CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
+CFGManagerCustom::CFGManagerCustom(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
 	: CFGManager(pName, pUnk, hWnd, IsPreview)
 {
 	CAppSettings& s = AfxGetAppSettings();
@@ -2806,7 +2806,7 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 // CFGManagerPlayer
 //
 
-CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, int preview)
+CFGManagerPlayer::CFGManagerPlayer(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, int preview)
 	: CFGManagerCustom(pName, pUnk, hWnd, (preview > 0))
 {
 	DLog(L"CFGManagerPlayer::CFGManagerPlayer() on thread: %u", GetCurrentThreadId());
@@ -2935,7 +2935,7 @@ STDMETHODIMP CFGManagerPlayer::ConnectDirect(IPin* pPinOut, IPin* pPinIn, const 
 // CFGManagerDVD
 //
 
-CFGManagerDVD::CFGManagerDVD(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
+CFGManagerDVD::CFGManagerDVD(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
 	: CFGManagerPlayer(pName, pUnk, hWnd, IsPreview)
 {
 	// elecard's decoder isn't suited for dvd playback (atm)
@@ -2945,7 +2945,7 @@ CFGManagerDVD::CFGManagerDVD(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPr
 class CResetDVD : public CDVDSession
 {
 public:
-	CResetDVD(LPCTSTR path) {
+	CResetDVD(LPCWSTR path) {
 		if (Open(path)) {
 			if (BeginSession()) {
 				Authenticate(); /*GetDiscKey();*/
@@ -3028,7 +3028,7 @@ STDMETHODIMP CFGManagerDVD::AddSourceFilter(LPCWSTR lpcwstrFileName, LPCWSTR lpc
 // CFGManagerCapture
 //
 
-CFGManagerCapture::CFGManagerCapture(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd)
+CFGManagerCapture::CFGManagerCapture(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd)
 	: CFGManagerPlayer(pName, pUnk, hWnd)
 {
 	CFGFilter* pFGF = DNew CFGFilterInternal<CDeinterlacerFilter>(L"Deinterlacer", MERIT64_DO_USE);
@@ -3040,7 +3040,7 @@ CFGManagerCapture::CFGManagerCapture(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd)
 // CFGManagerMuxer
 //
 
-CFGManagerMuxer::CFGManagerMuxer(LPCTSTR pName, LPUNKNOWN pUnk)
+CFGManagerMuxer::CFGManagerMuxer(LPCWSTR pName, LPUNKNOWN pUnk)
 	: CFGManagerCustom(pName, pUnk)
 {
 	m_source.emplace_back(DNew CFGFilterInternal<CSubtitleSourceASS>());
@@ -3050,7 +3050,7 @@ CFGManagerMuxer::CFGManagerMuxer(LPCTSTR pName, LPUNKNOWN pUnk)
 // CFGAggregator
 //
 
-CFGAggregator::CFGAggregator(const CLSID& clsid, LPCTSTR pName, LPUNKNOWN pUnk, HRESULT& hr)
+CFGAggregator::CFGAggregator(const CLSID& clsid, LPCWSTR pName, LPUNKNOWN pUnk, HRESULT& hr)
 	: CUnknown(pName, pUnk)
 {
 	hr = m_pUnkInner.CoCreateInstance(clsid, GetOwner());
