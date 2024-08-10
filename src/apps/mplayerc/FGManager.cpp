@@ -41,6 +41,7 @@
 #include "MediaFormats.h"
 #include "Content.h"
 #include <filters/renderer/VideoRenderers/IPinHook.h>
+#include <IURLSourceFilterLAV.h>
 
 class CFGMPCVideoDecoderInternal : public CFGFilterInternal<CMPCVideoDecFilter>
 {
@@ -681,39 +682,49 @@ HRESULT CFGManager::AddSourceFilterInternal(CFGFilter* pFGF, LPCWSTR lpcwstrFile
 
 	const AM_MEDIA_TYPE* pmt = nullptr;
 
-	CMediaType mt;
-	const std::list<GUID>& types = pFGF->GetTypes();
-	if (types.size() == 2 && (types.front() != GUID_NULL || types.back() != GUID_NULL)) {
-		mt.majortype = types.front();
-		mt.subtype = types.back();
-		pmt = &mt;
-	}
-
-	hr = pFSF->Load(lpcwstrFileName, pmt);
-	if (FAILED(hr) || m_bOpeningAborted) { // sometimes looping with AviSynth
-		RemoveFilter(pBF);
-		return m_bOpeningAborted ? E_ABORT : hr;
-	}
-
-	// doh :P
-	BeginEnumMediaTypes(GetFirstPin(pBF, PINDIR_OUTPUT), pEMT, pmt) {
-		static const GUID guid1 =
-		{ 0x640999A0, 0xA946, 0x11D0, { 0xA5, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } }; // ASX file Parser
-		static const GUID guid2 =
-		{ 0x640999A1, 0xA946, 0x11D0, { 0xA5, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } }; // ASX v.2 file Parser
-		static const GUID guid3 =
-		{ 0xD51BD5AE, 0x7548, 0x11CF, { 0xA5, 0x20, 0x00, 0x80, 0xC7, 0x7E, 0xF5, 0x8A } }; // XML Playlist
-
-		if (pmt->subtype == guid1 || pmt->subtype == guid2 || pmt->subtype == guid3) {
-			RemoveFilter(pBF);
-			pFGF = DNew CFGFilterRegistry(CLSID_NetShowSource);
-			hr = AddSourceFilterInternal(pFGF, lpcwstrFileName, lpcwstrFilterName, ppBF);
-			delete pFGF;
-			SAFE_DELETE(pmt);
-			return hr;
+	hr = E_NOT_VALID_STATE;
+	if (::PathIsURLW(lpcwstrFileName)) {
+		CComQIPtr<IURLSourceFilterLAV> pUSFLAV = pBF.p;
+		if (pUSFLAV) {
+			hr = pUSFLAV->LoadURL(lpcwstrFileName, m_userAgent, m_referrer);
 		}
 	}
-	EndEnumMediaTypes(pmt)
+
+	if (FAILED(hr)) {
+		CMediaType mt;
+		const std::list<GUID>& types = pFGF->GetTypes();
+		if (types.size() == 2 && (types.front() != GUID_NULL || types.back() != GUID_NULL)) {
+			mt.majortype = types.front();
+			mt.subtype = types.back();
+			pmt = &mt;
+		}
+
+		hr = pFSF->Load(lpcwstrFileName, pmt);
+		if (FAILED(hr) || m_bOpeningAborted) { // sometimes looping with AviSynth
+			RemoveFilter(pBF);
+			return m_bOpeningAborted ? E_ABORT : hr;
+		}
+
+		// doh :P
+		BeginEnumMediaTypes(GetFirstPin(pBF, PINDIR_OUTPUT), pEMT, pmt) {
+			static const GUID guid1 =
+			{ 0x640999A0, 0xA946, 0x11D0, { 0xA5, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } }; // ASX file Parser
+			static const GUID guid2 =
+			{ 0x640999A1, 0xA946, 0x11D0, { 0xA5, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } }; // ASX v.2 file Parser
+			static const GUID guid3 =
+			{ 0xD51BD5AE, 0x7548, 0x11CF, { 0xA5, 0x20, 0x00, 0x80, 0xC7, 0x7E, 0xF5, 0x8A } }; // XML Playlist
+
+			if (pmt->subtype == guid1 || pmt->subtype == guid2 || pmt->subtype == guid3) {
+				RemoveFilter(pBF);
+				pFGF = DNew CFGFilterRegistry(CLSID_NetShowSource);
+				hr = AddSourceFilterInternal(pFGF, lpcwstrFileName, lpcwstrFilterName, ppBF);
+				delete pFGF;
+				SAFE_DELETE(pmt);
+				return hr;
+			}
+		}
+		EndEnumMediaTypes(pmt)
+	}
 
 	*ppBF = pBF.Detach();
 

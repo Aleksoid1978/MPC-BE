@@ -124,6 +124,8 @@ protected:
 
 	BOOL m_bOnlySub = FALSE;
 	BOOL m_bOnlyAudio = FALSE;
+	CStringW m_userAgent;
+	CStringW m_referrer; // not used
 
 	//
 	HWND m_hWnd;
@@ -164,6 +166,9 @@ protected:
 
 public:
 	CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, int preview = 0);
+
+	void SetUserAgent(CStringW useragent) { m_userAgent = useragent; };
+	void SetReferrer(CStringW referrer) { m_referrer = referrer; };
 };
 
 class CFGManagerDVD : public CFGManagerPlayer

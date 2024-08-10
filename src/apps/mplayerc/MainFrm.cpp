@@ -11999,11 +11999,21 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 		m_bCustomGraph = m_bShockwaveGraph;
 
 		if (!m_bCustomGraph) {
-			m_pGB = DNew CFGManagerPlayer(L"CFGManagerPlayer", nullptr, m_pVideoWnd->m_hWnd);
+			auto pFGManager = DNew CFGManagerPlayer(L"CFGManagerPlayer", nullptr, m_pVideoWnd->m_hWnd);
+			m_pGB = pFGManager;
 
-			if (m_pGB && bUseSmartSeek) {
-				// build graph for preview
-				m_pGB_preview = DNew CFGManagerPlayer(L"CFGManagerPlayer", nullptr, m_wndPreView.GetVideoHWND(), s.iSmartSeekVR+1);
+			if (m_pGB) {
+				pFGManager->SetUserAgent(s.strUserAgent);
+
+				if (bUseSmartSeek) {
+					// build graph for preview
+					auto pFGManager_preview = DNew CFGManagerPlayer(L"CFGManagerPlayer", nullptr, m_wndPreView.GetVideoHWND(), s.iSmartSeekVR + 1);
+					m_pGB_preview = pFGManager_preview;
+
+					if (m_pGB_preview) {
+						pFGManager_preview->SetUserAgent(s.strUserAgent);
+					}
+				}
 			}
 		}
 	} else if (OpenDVDData* pDVDData = dynamic_cast<OpenDVDData*>(pOMD)) {
