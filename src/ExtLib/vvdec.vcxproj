@@ -199,6 +199,10 @@
     <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\NALread.cpp" />
     <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\SEIread.cpp" />
     <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\VLCReader.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\FilmGrain\FilmGrain.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\FilmGrain\FilmGrainImpl.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\FilmGrain\FilmGrainImpl_avx2.cpp" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\FilmGrain\FilmGrainImpl_sse41.cpp" />
     <ClCompile Include="vvdec\vvdec\source\Lib\Utilities\ThreadPool.cpp" />
     <ClCompile Include="vvdec\vvdec\source\Lib\vvdec\vvdec.cpp" />
     <ClCompile Include="vvdec\vvdec\source\Lib\vvdec\vvdecimpl.cpp" />
@@ -277,6 +281,8 @@
     <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\NALread.h" />
     <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\SEIread.h" />
     <ClInclude Include="vvdec\vvdec\source\Lib\DecoderLib\VLCReader.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\FilmGrain\FilmGrain.h" />
+    <ClInclude Include="vvdec\vvdec\source\Lib\FilmGrain\FilmGrainImpl.h" />
     <ClInclude Include="vvdec\vvdec\source\Lib\libmd5\MD5.h" />
     <ClInclude Include="vvdec\vvdec\source\Lib\Utilities\ThreadPool.h" />
     <ClInclude Include="vvdec\vvdec\source\Lib\vvdec\resource.h" />
