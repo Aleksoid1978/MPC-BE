@@ -1,5 +1,5 @@
 /*
-* (C) 2021 see Authors.txt
+* (C) 2021-2024 see Authors.txt
 *
 * This file is part of MPC-BE.
 *
@@ -48,7 +48,7 @@ public:
 	CMediaControls(const CMediaControls&) = delete;
 	CMediaControls& operator=(CMediaControls&&) = delete;
 	CMediaControls& operator=(const CMediaControls&) = delete;
-	virtual ~CMediaControls();
+	~CMediaControls();
 
 	bool Init(CMainFrame* pMainFrame);
 	bool Update();

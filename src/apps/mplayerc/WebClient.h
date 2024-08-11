@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -51,20 +51,20 @@ public:
 	CString m_sessid;
 	CString m_cmd, m_path, m_query, m_ver;
 	CStringA m_data;
-	std::map<CString, CString> m_hdrlines;
-	std::map<CString, CString> m_get;
-	std::map<CString, CString> m_post;
-	std::map<CString, CString> m_cookie;
-	std::map<CString, CString> m_request;
+	std::map<CString, CString, std::less<>> m_hdrlines;
+	std::map<CString, CString, std::less<>> m_get;
+	std::map<CString, CString, std::less<>> m_post;
+	std::map<CString, CString, std::less<>> m_cookie;
+	std::map<CString, CString, std::less<>> m_request;
 
-	bool OnCommand(CStringA& hdr, CStringA& body, CStringA& mime);
-	bool OnIndex(CStringA& hdr, CStringA& body, CStringA& mime);
-	bool OnInfo(CStringA& hdr, CStringA& body, CStringA& mime);
-	bool OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime);
-	bool OnControls(CStringA& hdr, CStringA& body, CStringA& mime);
-	bool OnVariables(CStringA& hdr, CStringA& body, CStringA& mime);
-	bool OnStatus(CStringA& hdr, CStringA& body, CStringA& mime);
-	bool OnError404(CStringA& hdr, CStringA& body, CStringA& mime);
-	bool OnPlayer(CStringA& hdr, CStringA& body, CStringA& mime);
+	bool OnCommand     (CStringA& hdr, CStringA& body, CStringA& mime);
+	bool OnIndex       (CStringA& hdr, CStringA& body, CStringA& mime);
+	bool OnInfo        (CStringA& hdr, CStringA& body, CStringA& mime);
+	bool OnBrowser     (CStringA& hdr, CStringA& body, CStringA& mime);
+	bool OnControls    (CStringA& hdr, CStringA& body, CStringA& mime);
+	bool OnVariables   (CStringA& hdr, CStringA& body, CStringA& mime);
+	bool OnStatus      (CStringA& hdr, CStringA& body, CStringA& mime);
+	bool OnError404    (CStringA& hdr, CStringA& body, CStringA& mime);
+	bool OnPlayer      (CStringA& hdr, CStringA& body, CStringA& mime);
 	bool OnSnapShotJpeg(CStringA& hdr, CStringA& body, CStringA& mime);
 };
