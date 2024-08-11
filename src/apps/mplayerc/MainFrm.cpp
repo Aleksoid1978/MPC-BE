@@ -19561,7 +19561,7 @@ CStringW GetCoverImgFromPath(CString fullfilename)
 
 	path.AddBackslash();
 
-	const std::vector<CStringW> coverNames = {
+	const CStringW coverNames[] = {
 		L"cover",
 		L"folder",
 		foldername,

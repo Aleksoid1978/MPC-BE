@@ -390,8 +390,8 @@ void CSaveTaskDlg::SaveHTTP(const int iSubLangDefault)
 		const CStringW finalext = finalfile.GetExtension().Mid(1).MakeLower();
 		const CStringW tmpfile  = finalfile + L".tmp";
 		const CStringW format =
-			(finalext == L"m4a") ? L"mp4" :
-			(finalext == L"mka") ? L"matroska" :
+			(finalext == L"m4a") ? CStringW(L"mp4") :
+			(finalext == L"mka") ? CStringW(L"matroska") :
 			finalext;
 
 		CStringW strArgs = L"-y";

@@ -23,15 +23,15 @@
 #include <stdint.h>
 #include <numeric>
 
-template <typename T>
 // If the specified value is out of range, set to default values.
+template <typename T>
 inline T discard(T const& val, T const& def, T const& lo, T const& hi)
 {
 	return (val > hi || val < lo) ? def : val;
 }
 
-template <typename T>
 // If the specified value is out of set, set to default values.
+template <typename T>
 inline T discard(T const& val, T const& def, const std::vector<T>& vars)
 {
 	if (val != def) {
@@ -44,8 +44,8 @@ inline T discard(T const& val, T const& def, const std::vector<T>& vars)
 	return def;
 }
 
-template <typename T>
 // If the specified value is out of range, update lo or hi values.
+template <typename T>
 inline void expand_range(T const& val, T& lo, T& hi)
 {
 	if (val > hi) {
