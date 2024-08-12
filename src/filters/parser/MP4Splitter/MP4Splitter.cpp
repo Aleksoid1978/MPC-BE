@@ -2103,53 +2103,55 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 						}
 					} else if (AP4_DataAtom* data = dynamic_cast<AP4_DataAtom*>(atom->GetChild(AP4_ATOM_TYPE_DATA))) {
-						const AP4_DataBuffer* db = data->GetData();
+						auto db = data->GetData();
 
-						if (atom->GetType() == AP4_ATOM_TYPE_TRKN) {
-							if (db->GetDataSize() >= 4) {
-								unsigned short n = (db->GetData()[2] << 8) | db->GetData()[3];
-								if (n > 0 && n < 100) {
-									track.Format(L"%02d", n);
-								} else if (n >= 100) {
-									track.Format(L"%d", n);
-								}
-							}
-						} else {
-							CStringW str = UTF8ToWStr(CStringA((LPCSTR)db->GetData(), db->GetDataSize()));
-
-							switch (atom->GetType()) {
-								case AP4_ATOM_TYPE_NAM:
-									title = str;
-									break;
-								case AP4_ATOM_TYPE_ART:
-									artist = str;
-									break;
-								case AP4_ATOM_TYPE_WRT:
-									writer = str;
-									break;
-								case AP4_ATOM_TYPE_ALB:
-									album = str;
-									break;
-								case AP4_ATOM_TYPE_DAY:
-									year = str;
-									break;
-								case AP4_ATOM_TYPE_TOO:
-									appl = str;
-									break;
-								case AP4_ATOM_TYPE_CMT:
-									desc = str;
-									break;
-								case AP4_ATOM_TYPE_DESC:
-									if (desc.IsEmpty()) {
-										desc = str;
+						if (db->GetDataSize() > 0) {
+							if (atom->GetType() == AP4_ATOM_TYPE_TRKN) {
+								if (db->GetDataSize() >= 4) {
+									unsigned short n = (db->GetData()[2] << 8) | db->GetData()[3];
+									if (n > 0 && n < 100) {
+										track.Format(L"%02d", n);
+									} else if (n >= 100) {
+										track.Format(L"%d", n);
 									}
-									break;
-								case AP4_ATOM_TYPE_GEN:
-									gen = str;
-									break;
-								case AP4_ATOM_TYPE_CPRT:
-									copyright = str;
-									break;
+								}
+							} else {
+								CStringW str = UTF8ToWStr(CStringA((LPCSTR)db->GetData(), db->GetDataSize()));
+
+								switch (atom->GetType()) {
+									case AP4_ATOM_TYPE_NAM:
+										title = str;
+										break;
+									case AP4_ATOM_TYPE_ART:
+										artist = str;
+										break;
+									case AP4_ATOM_TYPE_WRT:
+										writer = str;
+										break;
+									case AP4_ATOM_TYPE_ALB:
+										album = str;
+										break;
+									case AP4_ATOM_TYPE_DAY:
+										year = str;
+										break;
+									case AP4_ATOM_TYPE_TOO:
+										appl = str;
+										break;
+									case AP4_ATOM_TYPE_CMT:
+										desc = str;
+										break;
+									case AP4_ATOM_TYPE_DESC:
+										if (desc.IsEmpty()) {
+											desc = str;
+										}
+										break;
+									case AP4_ATOM_TYPE_GEN:
+										gen = str;
+										break;
+									case AP4_ATOM_TYPE_CPRT:
+										copyright = str;
+										break;
+								}
 							}
 						}
 					}
