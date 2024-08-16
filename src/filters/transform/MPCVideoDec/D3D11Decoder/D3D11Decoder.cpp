@@ -357,6 +357,10 @@ HRESULT CD3D11Decoder::FindVideoServiceConversion(AVCodecContext* c, enum AVCode
 	UINT nProfiles = pDeviceContext->video_device->GetVideoDecoderProfileCount();
 	std::vector<GUID> supportedDecoderGuids;
 
+#ifdef DEBUG_OR_LOG
+	CString dbgstr;
+#endif
+
 	DLog(L"CD3D11Decoder::FindVideoServiceConversion() : Enumerating supported D3D11 modes (count: %d)", nProfiles);
 	for (UINT i = 0; i < nProfiles; i++) {
 		GUID guidProfile;
@@ -366,28 +370,26 @@ HRESULT CD3D11Decoder::FindVideoServiceConversion(AVCodecContext* c, enum AVCode
 			return hr;
 		}
 
+		bool supported = m_pFilter->IsSupportedDecoderMode(guidProfile);
 #ifdef DEBUG_OR_LOG
-		CString msg;
-		msg.Format(L"        %s", GetGUIDString2(guidProfile));
+		dbgstr.AppendFormat(L"        %s", GetDXVAModeStringAndName(guidProfile));
+		supported ? dbgstr.Append(L" - supported\n") : dbgstr.Append(L"\n");
 #endif
-		if (m_pFilter->IsSupportedDecoderMode(guidProfile)) {
-#ifdef DEBUG_OR_LOG
-			msg.Append(L" - supported");
-#endif
+		if (supported) {
 			if (guidProfile == DXVA2_ModeH264_E || guidProfile == DXVA2_ModeH264_F) {
 				supportedDecoderGuids.insert(supportedDecoderGuids.cbegin(), guidProfile);
 			} else {
 				supportedDecoderGuids.emplace_back(guidProfile);
 			}
 		}
-#ifdef DEBUG_OR_LOG
-		DLog(msg);
-#endif
 	}
+#ifdef DEBUG_OR_LOG
+	DLog(dbgstr);
+#endif
 
 	if (!supportedDecoderGuids.empty()) {
 		for (const auto& guid : supportedDecoderGuids) {
-			DLog(L"    => Attempt : %s", GetGUIDString2(guid));
+			DLog(L"    => Attempt : %s", GetDXVAModeString(guid));
 
 			if (DXVA2_H264_VLD_Intel == guid) {
 				const int width_mbs = m_dwSurfaceWidth / 16;
@@ -402,7 +404,7 @@ HRESULT CD3D11Decoder::FindVideoServiceConversion(AVCodecContext* c, enum AVCode
 			BOOL bSupported = FALSE;
 			hr = pDeviceContext->video_device->CheckVideoDecoderFormat(&guid, surface_format, &bSupported);
 			if (SUCCEEDED(hr) && bSupported) {
-				DLog(L"    => Use : %s", GetGUIDString2(guid));
+				DLog(L"    => Use : %s", GetDXVAModeString(guid));
 				*input = guid;
 				return S_OK;
 			}

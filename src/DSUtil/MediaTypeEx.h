@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,5 +39,8 @@ private:
 	CString GetSubtitleCodecName(const GUID& subtype);
 };
 
-CString GetGUIDString(const GUID& guid);
-CString GetGUIDString2(const GUID& guid);
+// get the name of a known media subtype, otherwise convert the GUID to a string
+CStringW GetGUIDString(const GUID& guid);
+
+// get the name of a known media subtype along with its GUID string
+CStringW GetGUIDNameAndString(const GUID& guid);

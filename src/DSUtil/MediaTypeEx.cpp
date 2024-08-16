@@ -543,18 +543,24 @@ CString CMediaTypeEx::GetSubtitleCodecName(const GUID& subtype)
 	return str;
 }
 
-CString GetGUIDString(const GUID& guid)
+CStringW GetGUIDString(const GUID& guid)
 {
-	CString ret(GetGUIDName(guid));
+	CStringW ret(GetGUIDName(guid));
 
 	return ret;
 }
 
-CString GetGUIDString2(const GUID& guid)
+CStringW GetGUIDNameAndString(const GUID& guid)
 {
-	CString ret(GetGUIDName(guid));
-	if (ret == L"Unknown GUID Name") {
-		ret.AppendFormat(L" %s", CStringFromGUID(guid));
+	CStringW ret;
+	auto guidstr = GetGUIDName(guid);
+	if (guidstr[0] == '{') {
+		ret = L"Unknown GUID Name ";
+		ret += guidstr;
+	}
+	else {
+		ret = guidstr;
+		ret += CStringFromGUID(guid);
 	}
 
 	return ret;
@@ -568,8 +574,8 @@ void CMediaTypeEx::Dump(std::list<CString>& sl)
 
 	ULONG fmtsize = 0;
 
-	CString major = CStringFromGUID(majortype);
-	CString sub = CStringFromGUID(subtype);
+	CString major  = CStringFromGUID(majortype);
+	CString sub    = CStringFromGUID(subtype);
 	CString format = CStringFromGUID(formattype);
 
 	sl.emplace_back(ToString());
@@ -583,7 +589,7 @@ void CMediaTypeEx::Dump(std::list<CString>& sl)
 	} else if (majortype == MEDIATYPE_Video && subtype == FOURCCMap(BI_RLE4)) { // fake subtype for RLE 4-bit
 		str.Format(L"subtype: BI_RLE4 %s", sub);
 	} else {
-		str.Format(L"subtype: %s %s", GetGUIDString(subtype), sub);
+		str.Format(L"subtype: %s", GetGUIDNameAndString(subtype));
 	}
 	sl.emplace_back(str);
 	str.Format(L"formattype: %s %s", GetGUIDString(formattype), format);

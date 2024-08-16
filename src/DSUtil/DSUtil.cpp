@@ -1846,7 +1846,7 @@ static const struct {
 	{&DXVA2_HEVC_VLD_Main444_12_Intel,				L"HEVC 444 12-bit Intel"},
 };
 
-CString GetDXVAMode(const GUID& guidDecoder)
+CStringW GetDXVAModeString(const GUID& guidDecoder)
 {
 	if (guidDecoder == GUID_NULL) {
 		return L"Not using DXVA";
@@ -1859,6 +1859,26 @@ CString GetDXVAMode(const GUID& guidDecoder)
 	}
 
 	return CStringFromGUID(guidDecoder);
+}
+
+CStringW GetDXVAModeStringAndName(const GUID& guidDecoder)
+{
+	CStringW str = CStringFromGUID(guidDecoder) + L" ";
+
+	if (guidDecoder == GUID_NULL) {
+		str.Append(L"Not using DXVA");
+		return str;
+	}
+
+	for (const auto& decoder : s_dxva2_vld_decoders) {
+		if (guidDecoder == *decoder.Guid) {
+			str.Append(decoder.Description);
+			return str;
+		}
+	}
+
+	str.Append(L"Unknown");
+	return str;
 }
 
 CStringW DVDtimeToString(const DVD_HMSF_TIMECODE dvd_tc, bool showZeroHours)

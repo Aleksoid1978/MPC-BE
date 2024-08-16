@@ -1857,34 +1857,34 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 		D3DFORMAT surfaceFormat          = D3DFMT_UNKNOWN;
 
 		if (SUCCEEDED(hr = m_pDecoderService->GetDecoderDeviceGuids(&cDecoderGuids, &pDecoderGuids)) && cDecoderGuids) {
-
+#ifdef DEBUG_OR_LOG
+			CString dbgstr;
+#endif
 			std::vector<GUID> supportedDecoderGuids;
 			DLog(L"    => Enumerating supported DXVA2 modes:");
 			for (UINT iGuid = 0; iGuid < cDecoderGuids; iGuid++) {
 				const auto& guid = pDecoderGuids[iGuid];
 
+				bool supported = IsSupportedDecoderMode(guid);
 #ifdef DEBUG_OR_LOG
-				CString msg;
-				msg.Format(L"        %s", GetGUIDString2(guid));
+				dbgstr.AppendFormat(L"        %s", GetDXVAModeStringAndName(guid));
+				supported ? dbgstr.Append(L" - supported\n") : dbgstr.Append(L"\n");
 #endif
-				if (IsSupportedDecoderMode(guid)) {
-#ifdef DEBUG_OR_LOG
-					msg.Append(L" - supported");
-#endif
+				if (supported) {
 					if (guid == DXVA2_ModeH264_E || guid == DXVA2_ModeH264_F) {
 						supportedDecoderGuids.insert(supportedDecoderGuids.cbegin(), guid);
 					} else {
 						supportedDecoderGuids.emplace_back(guid);
 					}
 				}
-#ifdef DEBUG_OR_LOG
-				DLog(msg);
-#endif
 			}
+#ifdef DEBUG_OR_LOG
+			DLog(dbgstr);
+#endif
 
 			if (!supportedDecoderGuids.empty()) {
 				for (const auto& guid : supportedDecoderGuids) {
-					DLog(L"    => Attempt : %s", GetGUIDString2(guid));
+					DLog(L"    => Attempt : %s", GetDXVAModeString(guid));
 
 					if (DXVA2_H264_VLD_Intel == guid) {
 						const int width_mbs  = m_nSurfaceWidth / 16;
@@ -1904,7 +1904,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 					if (bFoundDXVA2Configuration) {
 						// Found a good configuration. Save the GUID.
 						decoderGuid = guid;
-						DLog(L"    => Use : %s", GetGUIDString2(decoderGuid));
+						DLog(L"    => Use : %s", GetDXVAModeString(decoderGuid));
 						break;
 					}
 				}
@@ -4839,7 +4839,7 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 			break;
 		case INFO_OutputFormat:
 			if (GUID* DxvaGuid = GetDXVADecoderGuid()) {
-				infostr.Format(L"%s (%s)", UseDXVA2() ? L"DXVA2" : L"D3D11", GetDXVAMode(*DxvaGuid));
+				infostr.Format(L"%s (%s)", UseDXVA2() ? L"DXVA2" : L"D3D11", GetDXVAModeString(*DxvaGuid));
 				break;
 			}
 			if (m_bUseD3D11cb) {
