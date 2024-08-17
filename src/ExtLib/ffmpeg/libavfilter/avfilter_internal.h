@@ -28,10 +28,11 @@
 #include <stdint.h>
 
 #include "avfilter.h"
+#include "filters.h"
 #include "framequeue.h"
 
 typedef struct FilterLinkInternal {
-    AVFilterLink l;
+    FilterLink l;
 
     struct FFFramePool *frame_pool;
 
@@ -65,6 +66,13 @@ typedef struct FilterLinkInternal {
      * corresponding code.
      */
     int status_out;
+
+    /**
+     * True if a frame is currently wanted on the output of this filter.
+     * Set when ff_request_frame() is called by the output,
+     * cleared when a frame is filtered.
+     */
+    int frame_wanted_out;
 
     /**
      * Index in the age array.

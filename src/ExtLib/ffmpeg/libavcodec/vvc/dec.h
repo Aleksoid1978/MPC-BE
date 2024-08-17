@@ -187,8 +187,9 @@ typedef struct VVCFrameContext {
         uint8_t *alf_pixel_buffer_h[VVC_MAX_SAMPLE_ARRAYS][2];
         uint8_t *alf_pixel_buffer_v[VVC_MAX_SAMPLE_ARRAYS][2];
 
-        int         *coeffs;
-        struct CTU  *ctus;
+        int                 *coeffs;
+        struct CTU          *ctus;
+        struct CodingUnit  **cus;
 
         uint8_t *ibc_vir_buf[VVC_MAX_SAMPLE_ARRAYS];    ///< IbcVirBuf[]
 
@@ -205,8 +206,6 @@ typedef struct VVCFrameContext {
             int height;
             int chroma_format_idc;
             int pixel_shift;
-            int bs_width;
-            int bs_height;
             int ibc_buffer_width;       ///< IbcBufWidth
         } sz;
     } tab;

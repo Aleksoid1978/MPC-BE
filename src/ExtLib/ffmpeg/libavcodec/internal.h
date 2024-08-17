@@ -54,6 +54,13 @@ typedef struct AVCodecInternal {
     int is_copy;
 
     /**
+     * This field is set to 1 when frame threading is being used and the parent
+     * AVCodecContext of this AVCodecInternal is a worker-thread context (i.e.
+     * one of those actually doing the decoding), 0 otherwise.
+     */
+    int is_frame_mt;
+
+    /**
      * Audio encoders can set this flag during init to indicate that they
      * want the small last frame to be padded to a multiple of pad_samples.
      */
@@ -123,7 +130,11 @@ typedef struct AVCodecInternal {
     void *hwaccel_priv_data;
 
     /**
-     * checks API usage: after codec draining, flush is required to resume operation
+     * decoding: AVERROR_EOF has been returned from ff_decode_get_packet(); must
+     *           not be used by decoders that use the decode() callback, as they
+     *           do not call ff_decode_get_packet() directly.
+     *
+     * encoding: a flush frame has been submitted to avcodec_send_frame().
      */
     int draining;
 

@@ -34,6 +34,87 @@
 #define FFERROR_NOT_READY FFERRTAG('N','R','D','Y')
 
 /**
+ * Link properties exposed to filter code, but not external callers.
+ *
+ * Cf. AVFilterLink for public properties, FilterLinkInternal for
+ * properties private to the generic layer.
+ */
+typedef struct FilterLink {
+    AVFilterLink pub;
+
+    /**
+     * Graph the filter belongs to.
+     */
+    struct AVFilterGraph *graph;
+
+    /**
+     * Current timestamp of the link, as defined by the most recent
+     * frame(s), in link time_base units.
+     */
+    int64_t current_pts;
+
+    /**
+     * Current timestamp of the link, as defined by the most recent
+     * frame(s), in AV_TIME_BASE units.
+     */
+    int64_t current_pts_us;
+
+    /**
+     * Minimum number of samples to filter at once.
+     *
+     * May be set by the link destination filter in its config_props().
+     * If 0, all related fields are ignored.
+     */
+    int min_samples;
+
+    /**
+     * Maximum number of samples to filter at once. If filter_frame() is
+     * called with more samples, it will split them.
+     *
+     * May be set by the link destination filter in its config_props().
+     */
+    int max_samples;
+
+    /**
+     * Number of past frames sent through the link.
+     */
+    int64_t frame_count_in, frame_count_out;
+
+    /**
+     * Number of past samples sent through the link.
+     */
+    int64_t sample_count_in, sample_count_out;
+
+    /**
+     * Frame rate of the stream on the link, or 1/0 if unknown or variable.
+     *
+     * May be set by the link source filter in its config_props(); if left to
+     * 0/0, will be automatically copied from the first input of the source
+     * filter if it exists.
+     *
+     * Sources should set it to the best estimation of the real frame rate.
+     * If the source frame rate is unknown or variable, set this to 1/0.
+     * Filters should update it if necessary depending on their function.
+     * Sinks can use it to set a default output frame rate.
+     * It is similar to the r_frame_rate field in AVStream.
+     */
+    AVRational frame_rate;
+
+    /**
+     * For hwaccel pixel formats, this should be a reference to the
+     * AVHWFramesContext describing the frames.
+     *
+     * May be set by the link source filter in its config_props().
+     */
+    AVBufferRef *hw_frames_ctx;
+} FilterLink;
+
+static inline FilterLink* ff_filter_link(AVFilterLink *link)
+{
+    return (FilterLink*)link;
+}
+
+/**
  * Mark a filter ready and schedule it for activation.
  *
  * This is automatically done when something happens to the filter (queued
@@ -169,10 +250,7 @@ void ff_inlink_set_status(AVFilterLink *link, int status);
 /**
  * Test if a frame is wanted on an output link.
  */
-static inline int ff_outlink_frame_wanted(AVFilterLink *link)
-{
-    return link->frame_wanted_out;
-}
+int ff_outlink_frame_wanted(AVFilterLink *link);
 
 /**
  * Get the status on an output link.

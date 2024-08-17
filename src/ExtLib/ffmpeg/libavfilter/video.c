@@ -55,15 +55,15 @@ AVFrame *ff_default_get_video_buffer2(AVFilterLink *link, int w, int h, int alig
     int pool_align = 0;
     enum AVPixelFormat pool_format = AV_PIX_FMT_NONE;
 
-    if (link->hw_frames_ctx &&
-        ((AVHWFramesContext*)link->hw_frames_ctx->data)->format == link->format) {
+    if (li->l.hw_frames_ctx &&
+        ((AVHWFramesContext*)li->l.hw_frames_ctx->data)->format == link->format) {
         int ret;
         frame = av_frame_alloc();
 
         if (!frame)
             return NULL;
 
-        ret = av_hwframe_get_buffer(link->hw_frames_ctx, frame, 0);
+        ret = av_hwframe_get_buffer(li->l.hw_frames_ctx, frame, 0);
         if (ret < 0)
             av_frame_free(&frame);
 
@@ -71,8 +71,10 @@ AVFrame *ff_default_get_video_buffer2(AVFilterLink *link, int w, int h, int alig
     }
 
     if (!li->frame_pool) {
-        li->frame_pool = ff_frame_pool_video_init(av_buffer_allocz, w, h,
-                                                  link->format, align);
+        li->frame_pool = ff_frame_pool_video_init(CONFIG_MEMORY_POISONING
+                                                     ? NULL
+                                                     : av_buffer_allocz,
+                                                  w, h, link->format, align);
         if (!li->frame_pool)
             return NULL;
     } else {
@@ -86,8 +88,10 @@ AVFrame *ff_default_get_video_buffer2(AVFilterLink *link, int w, int h, int alig
             pool_format != link->format || pool_align != align) {
 
             ff_frame_pool_uninit(&li->frame_pool);
-            li->frame_pool = ff_frame_pool_video_init(av_buffer_allocz, w, h,
-                                                      link->format, align);
+            li->frame_pool = ff_frame_pool_video_init(CONFIG_MEMORY_POISONING
+                                                         ? NULL
+                                                         : av_buffer_allocz,
+                                                      w, h, link->format, align);
             if (!li->frame_pool)
                 return NULL;
         }

@@ -1080,10 +1080,15 @@ static PredMode pred_mode_decode(VVCLocalContext *lc,
         }
         if (pred_mode_ibc_flag)
             pred_mode = MODE_IBC;
-        return pred_mode;
     } else {
-        return MODE_INTRA;
+        pred_mode = MODE_INTRA;
     }
+
+    set_cb_tab(lc, fc->tab.cpm[cu->ch_type], pred_mode);
+    if (tree_type == SINGLE_TREE)
+        set_cb_tab(lc, fc->tab.cpm[CHROMA], pred_mode);
+
+    return pred_mode;
 }
 
 static void sbt_info(VVCLocalContext *lc, const VVCSPS *sps)
@@ -1174,7 +1179,7 @@ static CodingUnit* alloc_cu(VVCLocalContext *lc, const int x0, const int y0)
     const VVCPPS *pps   = fc->ps.pps;
     const int rx        = x0 >> sps->ctb_log2_size_y;
     const int ry        = y0 >> sps->ctb_log2_size_y;
-    CTU *ctu            = fc->tab.ctus + ry * pps->ctb_width + rx;
+    CodingUnit **cus    = fc->tab.cus + ry * pps->ctb_width + rx;
     CodingUnit *cu      = ff_refstruct_pool_get(fc->cu_pool);
 
     if (!cu)
@@ -1184,7 +1189,7 @@ static CodingUnit* alloc_cu(VVCLocalContext *lc, const int x0, const int y0)
     if (lc->cu)
         lc->cu->next = cu;
     else
-        ctu->cus = cu;
+        *cus = cu;
     lc->cu = cu;
 
     return cu;
@@ -1229,15 +1234,14 @@ static CodingUnit* add_cu(VVCLocalContext *lc, const int x0, const int y0,
 
 static void set_cu_tabs(const VVCLocalContext *lc, const CodingUnit *cu)
 {
-    const VVCFrameContext *fc   = lc->fc;
-    const TransformUnit *tu     = cu->tus.head;
+    const VVCFrameContext *fc = lc->fc;
+    const PredictionUnit *pu  = &cu->pu;
+    const TransformUnit *tu   = cu->tus.head;
 
-    if (cu->tree_type != DUAL_TREE_CHROMA) {
-        set_cb_tab(lc, fc->tab.cpm[LUMA], cu->pred_mode);
+    set_cb_tab(lc, fc->tab.mmi, pu->mi.motion_model_idc);
+    set_cb_tab(lc, fc->tab.msf, pu->merge_subblock_flag);
+    if (cu->tree_type != DUAL_TREE_CHROMA)
         set_cb_tab(lc, fc->tab.skip, cu->skip_flag);
-    }
-    if (fc->ps.sps->r->sps_chroma_format_idc && cu->tree_type != DUAL_TREE_LUMA)
-        set_cb_tab(lc, fc->tab.cpm[CHROMA], cu->pred_mode);
 
     while (tu) {
           for (int j = 0; j < tu->nb_tbs; j++) {
@@ -1324,7 +1328,6 @@ static void merge_data_subblock(VVCLocalContext *lc)
     PredictionUnit *pu          = &cu->pu;
     int merge_subblock_idx      = 0;
 
-    set_cb_tab(lc, fc->tab.msf, pu->merge_subblock_flag);
     if (ph->max_num_subblock_merge_cand > 1) {
         merge_subblock_idx = ff_vvc_merge_subblock_idx(lc, ph->max_num_subblock_merge_cand);
     }
@@ -2429,7 +2432,9 @@ static void ctu_get_pred(VVCLocalContext *lc, const int rs)
     const VVCFrameContext *fc       = lc->fc;
     const H266RawSliceHeader *rsh   = lc->sc->sh.r;
     CTU *ctu                        = fc->tab.ctus + rs;
-    const CodingUnit *cu            = ctu->cus;
+    const CodingUnit *cu            = fc->tab.cus[rs];
+
+    ctu->has_dmvr = 0;
 
     if (IS_I(rsh))
         return;
@@ -2526,9 +2531,8 @@ void ff_vvc_set_neighbour_available(VVCLocalContext *lc,
     lc->na.cand_up_right = lc->na.cand_up_right_sap && (x0 + w) < lc->end_of_tiles_x;
 }
 
-void ff_vvc_ctu_free_cus(CTU *ctu)
+void ff_vvc_ctu_free_cus(CodingUnit **cus)
 {
-    CodingUnit **cus  = &ctu->cus;
     while (*cus) {
         CodingUnit *cu          = *cus;
         TransformUnit **head    = &cu->tus.head;

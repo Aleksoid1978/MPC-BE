@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2023 see Authors.txt
+ * (C) 2018-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,6 +26,15 @@
 inline bool operator < (const GUID & a, const GUID & b)
 {
 	return memcmp(&a, &b, sizeof(GUID)) < 0;
+}
+
+// helper function to create array without specifying size
+// example: auto test_array = make_array<float>(0, 1, 3.14, 2,718, );
+template <typename V, typename... T>
+constexpr auto make_array(T&&... t)
+-> std::array < V, sizeof...(T) >
+{
+	return { { std::forward<T>(t)... } };
 }
 
 // returns an iterator on the found element, or last if nothing is found

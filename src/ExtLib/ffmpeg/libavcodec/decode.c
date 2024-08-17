@@ -207,14 +207,17 @@ fail:
     return ret;
 }
 
+#if !HAVE_THREADS
+#define ff_thread_get_packet(avctx, pkt) (AVERROR_BUG)
+#define ff_thread_receive_frame(avctx, frame) (AVERROR_BUG)
+#endif
+
 static int decode_get_packet(AVCodecContext *avctx, AVPacket *pkt)
 {
     AVCodecInternal *avci = avctx->internal;
     int ret;
 
     ret = av_bsf_receive_packet(avci->bsf, pkt);
-    if (ret == AVERROR_EOF)
-        avci->draining = 1;
     if (ret < 0)
         return ret;
 
@@ -242,19 +245,26 @@ int ff_decode_get_packet(AVCodecContext *avctx, AVPacket *pkt)
     if (avci->draining)
         return AVERROR_EOF;
 
+    /* If we are a worker thread, get the next packet from the threading
+     * context. Otherwise we are the main (user-facing) context, so we get the
+     * next packet from the input filterchain.
+     */
+    if (avctx->internal->is_frame_mt)
+        return ff_thread_get_packet(avctx, pkt);
+
     while (1) {
         int ret = decode_get_packet(avctx, pkt);
         if (ret == AVERROR(EAGAIN) &&
             (!AVPACKET_IS_EMPTY(avci->buffer_pkt) || dc->draining_started)) {
             ret = av_bsf_send_packet(avci->bsf, avci->buffer_pkt);
-            if (ret < 0) {
-                av_packet_unref(avci->buffer_pkt);
-                return ret;
-            }
+            if (ret >= 0)
+                continue;
 
-            continue;
+            av_packet_unref(avci->buffer_pkt);
         }
 
+        if (ret == AVERROR_EOF)
+            avci->draining = 1;
         return ret;
     }
 }
@@ -415,29 +425,24 @@ static inline int decode_simple_internal(AVCodecContext *avctx, AVFrame *frame, 
         return AVERROR_EOF;
 
     if (!pkt->data &&
-        !(avctx->codec->capabilities & AV_CODEC_CAP_DELAY ||
-          avctx->active_thread_type & FF_THREAD_FRAME))
+        !(avctx->codec->capabilities & AV_CODEC_CAP_DELAY))
         return AVERROR_EOF;
 
     got_frame = 0;
 
-    if (HAVE_THREADS && avctx->active_thread_type & FF_THREAD_FRAME) {
-        consumed = ff_thread_decode_frame(avctx, frame, &got_frame, pkt);
-    } else {
-        frame->pict_type = dc->initial_pict_type;
-        frame->flags    |= dc->intra_only_flag;
-        consumed = codec->cb.decode(avctx, frame, &got_frame, pkt);
+    frame->pict_type = dc->initial_pict_type;
+    frame->flags    |= dc->intra_only_flag;
+    consumed = codec->cb.decode(avctx, frame, &got_frame, pkt);
 
-        if (!(codec->caps_internal & FF_CODEC_CAP_SETS_PKT_DTS))
-            frame->pkt_dts = pkt->dts;
-        if (avctx->codec->type == AVMEDIA_TYPE_VIDEO) {
+    if (!(codec->caps_internal & FF_CODEC_CAP_SETS_PKT_DTS))
+        frame->pkt_dts = pkt->dts;
+    if (avctx->codec->type == AVMEDIA_TYPE_VIDEO) {
 #if FF_API_FRAME_PKT
 FF_DISABLE_DEPRECATION_WARNINGS
-            if(!avctx->has_b_frames)
-                frame->pkt_pos = pkt->pos;
+        if(!avctx->has_b_frames)
+            frame->pkt_pos = pkt->pos;
 FF_ENABLE_DEPRECATION_WARNINGS
 #endif
-        }
     }
     emms_c();
 
@@ -605,33 +610,52 @@ static int decode_simple_receive_frame(AVCodecContext *avctx, AVFrame *frame)
     return 0;
 }
 
-static int decode_receive_frame_internal(AVCodecContext *avctx, AVFrame *frame)
+int ff_decode_receive_frame_internal(AVCodecContext *avctx, AVFrame *frame)
 {
     AVCodecInternal *avci = avctx->internal;
     DecodeContext     *dc = decode_ctx(avci);
     const FFCodec *const codec = ffcodec(avctx->codec);
-    int ret, ok;
+    int ret;
 
     av_assert0(!frame->buf[0]);
 
     if (codec->cb_type == FF_CODEC_CB_TYPE_RECEIVE_FRAME) {
-        frame->pict_type = dc->initial_pict_type;
-        frame->flags    |= dc->intra_only_flag;
-        ret = codec->cb.receive_frame(avctx, frame);
-        emms_c();
-        if (!ret) {
-            if (avctx->codec->type == AVMEDIA_TYPE_VIDEO)
-                ret = (frame->flags & AV_FRAME_FLAG_DISCARD) ? AVERROR(EAGAIN) : 0;
-            else if (avctx->codec->type == AVMEDIA_TYPE_AUDIO) {
-                int64_t discarded_samples = 0;
-                ret = discard_samples(avctx, frame, &discarded_samples);
+        while (1) {
+            frame->pict_type = dc->initial_pict_type;
+            frame->flags    |= dc->intra_only_flag;
+            ret = codec->cb.receive_frame(avctx, frame);
+            emms_c();
+            if (!ret) {
+                if (avctx->codec->type == AVMEDIA_TYPE_AUDIO) {
+                    int64_t discarded_samples = 0;
+                    ret = discard_samples(avctx, frame, &discarded_samples);
+                }
+                if (ret == AVERROR(EAGAIN) || (frame->flags & AV_FRAME_FLAG_DISCARD)) {
+                    av_frame_unref(frame);
+                    continue;
+                }
             }
+            break;
         }
     } else
         ret = decode_simple_receive_frame(avctx, frame);
 
     if (ret == AVERROR_EOF)
         avci->draining_done = 1;
+
+    return ret;
+}
+
+static int decode_receive_frame_internal(AVCodecContext *avctx, AVFrame *frame)
+{
+    AVCodecInternal *avci = avctx->internal;
+    DecodeContext     *dc = decode_ctx(avci);
+    int ret, ok;
+
+    if (avctx->active_thread_type & FF_THREAD_FRAME)
+        ret = ff_thread_receive_frame(avctx, frame);
+    else
+        ret = ff_decode_receive_frame_internal(avctx, frame);
 
     /* preserve ret */
     ok = detect_colorspace(avctx, frame);
@@ -2148,7 +2172,8 @@ void ff_decode_flush_buffers(AVCodecContext *avctx)
     dc->pts_correction_last_pts =
     dc->pts_correction_last_dts = INT64_MIN;
 
-    av_bsf_flush(avci->bsf);
+    if (avci->bsf)
+        av_bsf_flush(avci->bsf);
 
     dc->nb_draining_errors = 0;
     dc->draining_started   = 0;

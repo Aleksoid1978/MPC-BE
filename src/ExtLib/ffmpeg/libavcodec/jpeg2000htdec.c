@@ -122,7 +122,7 @@ static void jpeg2000_init_mel(StateVars *s, uint32_t Pcup)
 
 static void jpeg2000_init_mag_ref(StateVars *s, uint32_t Lref)
 {
-    s->pos       = Lref - 2;
+    s->pos       = Lref - 1;
     s->bits      = 0;
     s->last      = 0xFF;
     s->tmp       = 0;
@@ -145,8 +145,9 @@ static void jpeg2000_init_mel_decoder(MelDecoderState *mel_state)
 static int jpeg2000_bitbuf_refill_backwards(StateVars *buffer, const uint8_t *array)
 {
     uint64_t tmp = 0;
-    int32_t position = buffer->pos - 4;
     uint32_t new_bits = 32;
+
+    buffer->last = array[buffer->pos + 1];
 
     if (buffer->bits_left >= 32)
         return 0; // enough data, no need to pull in more bits
@@ -157,9 +158,24 @@ static int jpeg2000_bitbuf_refill_backwards(StateVars *buffer, const uint8_t *ar
      *  the bottom most bits.
      */
 
-    for(int i = FFMAX(0, position + 1); i <= buffer->pos + 1; i++)
-        tmp = 256*tmp + array[i];
-
+    if (buffer->pos >= 3) {  // Common case; we have at least 4 bytes available
+         tmp = array[buffer->pos - 3];
+         tmp = (tmp << 8) | array[buffer->pos - 2];
+         tmp = (tmp << 8) | array[buffer->pos - 1];
+         tmp = (tmp << 8) | array[buffer->pos];
+         tmp = (tmp << 8) | buffer->last;  // For stuffing bit detection
+         buffer->pos -= 4;
+    } else {
+        if (buffer->pos >= 2)
+            tmp = array[buffer->pos - 2];
+        if (buffer->pos >= 1)
+            tmp = (tmp << 8) | array[buffer->pos - 1];
+        if (buffer->pos >= 0)
+            tmp = (tmp << 8) | array[buffer->pos];
+        buffer->pos = 0;
+        tmp = (tmp << 8) | buffer->last;  // For stuffing bit detection
+    }
+    // Now remove any stuffing bits, shifting things down as we go
     if ((tmp & 0x7FFF000000) > 0x7F8F000000) {
         tmp &= 0x7FFFFFFFFF;
         new_bits--;
@@ -176,13 +192,11 @@ static int jpeg2000_bitbuf_refill_backwards(StateVars *buffer, const uint8_t *ar
         tmp = (tmp & 0x0000007FFF) + ((tmp & 0xFFFFFF0000) >> 1);
         new_bits--;
     }
-
-    tmp >>= 8; // Remove temporary byte loaded
+    tmp >>= 8;  // Shifts away the extra byte we imported
 
     /* Add bits to the MSB of the bit buffer */
     buffer->bit_buf |= tmp << buffer->bits_left;
     buffer->bits_left += new_bits;
-    buffer->pos = FFMAX(0, position);
     return 0;
 }
 
@@ -406,6 +420,7 @@ static void recover_mag_sgn(StateVars *mag_sgn, uint8_t pos, uint16_t q, int32_t
             E[n] = 32 - ff_clz(v[pos][i] | 1);
             mu_n[n] = (v[pos][i] >> 1) + 1;
             mu_n[n] <<= pLSB;
+            mu_n[n] |= (1 << (pLSB - 1)); // Add 0.5 (reconstruction parameter = 1/2)
             mu_n[n] |= ((uint32_t) (v[pos][i] & 1)) << 31; // sign bit.
         }
     }
@@ -414,7 +429,7 @@ static void recover_mag_sgn(StateVars *mag_sgn, uint8_t pos, uint16_t q, int32_t
 static int jpeg2000_import_bit(StateVars *stream, const uint8_t *array, uint32_t length)
 {
     int cond = stream->pos < length;
-    int pos = FFMIN(stream->pos, length);
+    int pos = FFMIN(stream->pos, length - 1);
     if (stream->bits == 0) {
         stream->bits = (stream->tmp == 0xFF) ? 7 : 8;
         stream->pos += cond;
@@ -426,14 +441,22 @@ static int jpeg2000_import_bit(StateVars *stream, const uint8_t *array, uint32_t
 
 static int jpeg2000_peek_bit(StateVars *stream, const uint8_t *array, uint32_t length)
 {
+    uint8_t bit;
+
     if (stream->bits == 0) {
-        int cond = stream->pos < length;
-        int pos = FFMIN(stream->pos, length);
-        stream->bits = (stream->tmp == 0xFF) ? 7 : 8;
-        stream->pos += cond;
-        stream->tmp = cond ? array[pos] : 0xFF;
+        stream->bits = (stream->last == 0xFF) ? 7 : 8;
+        if (stream->pos < length) {
+            stream->tmp = array[stream->pos];
+            stream->pos++;
+        } else {
+            stream->tmp = 0;
+        }
+        stream->last = stream->tmp;
     }
-    return (stream->tmp >> stream->bits) & 1;
+    bit = stream->tmp & 1;
+    stream->tmp >>= 1;
+    stream->bits--;
+    return  bit;
 }
 
 static int jpeg2000_decode_mel_sym(MelDecoderState *mel_state,
@@ -994,64 +1017,61 @@ static void jpeg2000_calc_mbr(uint8_t *mbr, const uint16_t i, const uint16_t j,
                               const uint32_t mbr_info, uint8_t causal_cond,
                               uint8_t *block_states, int stride)
 {
-    int local_mbr = 0;
+    uint8_t *state_p0 = block_states + i * stride + j;
+    uint8_t *state_p1 = block_states + (i + 1) * stride + j;
+    uint8_t *state_p2 = block_states + (i + 2) * stride + j;
 
-    local_mbr |= jpeg2000_get_state(i - 1, j - 1, stride, HT_SHIFT_SIGMA, block_states);
-    local_mbr |= jpeg2000_get_state(i - 1, j + 0, stride, HT_SHIFT_SIGMA, block_states);
-    local_mbr |= jpeg2000_get_state(i - 1, j + 1, stride, HT_SHIFT_SIGMA, block_states);
-
-    local_mbr |= jpeg2000_get_state(i + 0, j - 1, stride, HT_SHIFT_SIGMA, block_states);
-    local_mbr |= jpeg2000_get_state(i + 0, j + 1, stride, HT_SHIFT_SIGMA, block_states);
-
-    local_mbr |= jpeg2000_get_state(i + 1, j - 1, stride, HT_SHIFT_SIGMA, block_states) * causal_cond;
-    local_mbr |= jpeg2000_get_state(i + 1, j + 0, stride, HT_SHIFT_SIGMA, block_states) * causal_cond;
-    local_mbr |= jpeg2000_get_state(i + 1, j + 1, stride, HT_SHIFT_SIGMA, block_states) * causal_cond;
-
-    local_mbr |= jpeg2000_get_state(i - 1, j - 1, stride, HT_SHIFT_REF, block_states) *
-                 jpeg2000_get_state(i - 1, j - 1, stride, HT_SHIFT_SCAN, block_states);
-    local_mbr |= jpeg2000_get_state(i - 1, j + 0, stride, HT_SHIFT_REF, block_states) *
-                 jpeg2000_get_state(i - 1, j - 1, stride, HT_SHIFT_SCAN, block_states);
-    local_mbr |= jpeg2000_get_state(i - 1, j + 1, stride, HT_SHIFT_REF, block_states) *
-                 jpeg2000_get_state(i - 1, j + 1, stride, HT_SHIFT_SCAN, block_states);
-
-    local_mbr |= jpeg2000_get_state(i + 0, j - 1, stride, HT_SHIFT_REF, block_states) *
-                 jpeg2000_get_state(i + 0, j - 1, stride, HT_SHIFT_SCAN, block_states);
-    local_mbr |= jpeg2000_get_state(i + 0, j + 1, stride, HT_SHIFT_REF, block_states) *
-                 jpeg2000_get_state(i + 0, j + 1, stride, HT_SHIFT_SCAN, block_states);
-
-    local_mbr |= jpeg2000_get_state(i + 1, j - 1, stride, HT_SHIFT_REF, block_states) *
-                 jpeg2000_get_state(i + 1, j - 1, stride, HT_SHIFT_SCAN, block_states) * causal_cond;
-    local_mbr |= jpeg2000_get_state(i + 1, j + 0, stride, HT_SHIFT_REF, block_states) *
-                 jpeg2000_get_state(i + 1, j + 0, stride, HT_SHIFT_SCAN, block_states) * causal_cond;
-    local_mbr |= jpeg2000_get_state(i + 1, j + 1, stride, HT_SHIFT_REF, block_states) *
-                 jpeg2000_get_state(i + 1, j + 1, stride, HT_SHIFT_SCAN, block_states) * causal_cond;
-
-    *mbr |= local_mbr;
+    uint8_t mbr0 = state_p0[0] | state_p0[1] | state_p0[2];
+    uint8_t mbr1 = state_p1[0] | state_p1[2];
+    uint8_t mbr2 = state_p2[0] | state_p2[1] | state_p2[2];
+    *mbr  = mbr0 | mbr1 | (mbr2 & causal_cond);
+    *mbr |= (mbr0 >> HT_SHIFT_REF) & (mbr0 >> HT_SHIFT_SCAN);
+    *mbr |= (mbr1 >> HT_SHIFT_REF) & (mbr1 >> HT_SHIFT_SCAN);
+    *mbr |= (mbr2 >> HT_SHIFT_REF) & (mbr2 >> HT_SHIFT_SCAN) & causal_cond;
+    *mbr &= 1;
 }
 
 static void jpeg2000_process_stripes_block(StateVars *sig_prop, int i_s, int j_s,
                                            int width, int height, int stride, int pLSB,
                                            int32_t *sample_buf, uint8_t *block_states,
-                                           uint8_t *magref_segment, uint32_t magref_length)
+                                           uint8_t *magref_segment, uint32_t magref_length,
+                                           uint8_t is_causal)
 {
     for (int j = j_s; j < j_s + width; j++) {
         uint32_t  mbr_info = 0;
         for (int i = i_s; i < i_s + height; i++) {
-            int modify_state, cond;
+            int modify_state;
             uint8_t bit;
-            uint8_t causal_cond = i != (i_s + height - 1);
+            uint8_t causal_cond = (is_causal == 0) || (i != (i_s + height - 1));
             int32_t *sp = &sample_buf[j + (i * (stride))];
             uint8_t mbr = 0;
 
-            if (jpeg2000_get_state(i, j, stride - 2, HT_SHIFT_SIGMA, block_states) == 0)
+            if (jpeg2000_get_state(i, j, stride, HT_SHIFT_SIGMA, block_states) == 0)
                 jpeg2000_calc_mbr(&mbr, i, j, mbr_info & 0x1EF, causal_cond, block_states, stride);
             mbr_info >>= 3;
-            cond = mbr != 0;
-            bit = jpeg2000_peek_bit(sig_prop, magref_segment, magref_length);
-            *sp |= (bit * cond) << pLSB;
-            sig_prop->bits -= cond;
-            modify_state = (((1 << HT_SHIFT_REF_IND) | (1 << HT_SHIFT_REF)) * cond) | 1 << HT_SHIFT_SCAN;
+
+            modify_state = block_states[(i + 1) * stride + (j + 1)];
+            modify_state |= 1 << HT_SHIFT_SCAN;
+            if (mbr != 0) {
+                modify_state |= 1 << HT_SHIFT_REF_IND;
+                bit = jpeg2000_peek_bit(sig_prop, magref_segment, magref_length);
+                modify_state |= bit << HT_SHIFT_REF;
+                *sp |= bit << pLSB;
+                *sp |= bit << (pLSB - 1); // Add 0.5 (reconstruction parameter = 1/2)
+            }
             jpeg2000_modify_state(i, j, stride, modify_state, block_states);
+        }
+    }
+    // decode sign
+    for (int j = j_s; j < j_s + width; j++) {
+        for (int i = i_s; i < i_s + height; i++) {
+            uint8_t bit;
+            int32_t *sp = &sample_buf[j + (i * (stride))];
+            uint8_t *state_p = block_states + (i + 1) * stride + (j + 1);
+            if ((state_p[0] >> HT_SHIFT_REF) & 1) {
+                bit = jpeg2000_peek_bit(sig_prop, magref_segment, magref_length);
+                *sp |= (int32_t)bit << 31;
+            }
         }
     }
 }
@@ -1074,6 +1094,7 @@ static void jpeg2000_decode_sigprop_segment(Jpeg2000Cblk *cblk, uint16_t width, 
 
     int last_width;
     uint16_t i = 0, j = 0;
+    uint8_t is_causal = cblk->modes & JPEG2000_CBLK_VSC;
 
     jpeg2000_init_zero(&sp_dec);
 
@@ -1082,14 +1103,14 @@ static void jpeg2000_decode_sigprop_segment(Jpeg2000Cblk *cblk, uint16_t width, 
         for (int n2 = 0; n2 < num_h_stripe; n2++) {
             jpeg2000_process_stripes_block(&sp_dec, i, j, b_width, b_height, stride,
                                            pLSB, sample_buf, block_states, magref_segment,
-                                           magref_length);
+                                           magref_length, is_causal);
             j += 4;
         }
         last_width = width % 4;
         if (last_width)
             jpeg2000_process_stripes_block(&sp_dec, i, j, last_width, b_height, stride,
                                            pLSB, sample_buf, block_states, magref_segment,
-                                           magref_length);
+                                           magref_length, is_causal);
         i += 4;
     }
 
@@ -1099,20 +1120,20 @@ static void jpeg2000_decode_sigprop_segment(Jpeg2000Cblk *cblk, uint16_t width, 
     for (int n2 = 0; n2 < num_h_stripe; n2++) {
         jpeg2000_process_stripes_block(&sp_dec, i, j, b_width, b_height, stride,
                                        pLSB, sample_buf, block_states, magref_segment,
-                                       magref_length);
+                                       magref_length, is_causal);
         j += 4;
     }
     last_width = width % 4;
     if (last_width)
         jpeg2000_process_stripes_block(&sp_dec, i, j, last_width, b_height, stride,
                                        pLSB, sample_buf, block_states, magref_segment,
-                                       magref_length);
+                                       magref_length, is_causal);
 }
 
 /**
  * See procedure decodeSigPropMag at Rec. ITU-T T.814, 7.5.
 */
-static int
+static void
 jpeg2000_decode_magref_segment( uint16_t width, uint16_t block_height, const int stride,
                                 uint8_t *magref_segment,uint32_t magref_length,
                                 uint8_t pLSB, int32_t *sample_buf, uint8_t *block_states)
@@ -1123,7 +1144,8 @@ jpeg2000_decode_magref_segment( uint16_t width, uint16_t block_height, const int
     uint16_t height             = 4;
     uint16_t i_start            = 0;
     int32_t *sp;
-
+    int32_t bit;
+    int32_t tmp;
     jpeg2000_init_mag_ref(&mag_ref, magref_length);
 
     for (int n1 = 0; n1 < num_v_stripe; n1++) {
@@ -1134,9 +1156,13 @@ jpeg2000_decode_magref_segment( uint16_t width, uint16_t block_height, const int
                  *  Rec. ITU-T T.814, Figure 7.
                  */
                 sp = &sample_buf[j + i * stride];
-                if (jpeg2000_get_state(i, j, width, HT_SHIFT_SIGMA, block_states) != 0) {
-                    jpeg2000_modify_state(i, j, width, 1 << HT_SHIFT_REF_IND, block_states);
-                    *sp |= jpeg2000_import_magref_bit(&mag_ref, magref_segment, magref_length) << pLSB;
+                if (jpeg2000_get_state(i, j, stride, HT_SHIFT_SIGMA, block_states) != 0) {
+                    jpeg2000_modify_state(i, j, stride, 1 << HT_SHIFT_REF_IND, block_states);
+                    bit = jpeg2000_import_magref_bit(&mag_ref, magref_segment, magref_length);
+                    tmp = 0xFFFFFFFE | (uint32_t)bit;
+                    tmp <<= pLSB;
+                    sp[0] &= tmp;
+                    sp[0] |= 1 << (pLSB - 1); // Add 0.5 (reconstruction parameter = 1/2)
                 }
             }
         }
@@ -1146,21 +1172,24 @@ jpeg2000_decode_magref_segment( uint16_t width, uint16_t block_height, const int
     for (int j = 0; j < width; j++) {
         for (int i = i_start; i < i_start + height; i++) {
             sp = &sample_buf[j + i * stride];
-            if (jpeg2000_get_state(i, j, width, HT_SHIFT_SIGMA, block_states) != 0) {
-                jpeg2000_modify_state(i, j, width, 1 << HT_SHIFT_REF_IND, block_states);
-                *sp |= jpeg2000_import_magref_bit(&mag_ref, magref_segment, magref_length) << pLSB;
+            if (jpeg2000_get_state(i, j, stride, HT_SHIFT_SIGMA, block_states) != 0) {
+                jpeg2000_modify_state(i, j, stride, 1 << HT_SHIFT_REF_IND, block_states);
+                bit = jpeg2000_import_magref_bit(&mag_ref, magref_segment, magref_length);
+                tmp = 0xFFFFFFFE | (uint32_t)bit;
+                tmp <<= pLSB;
+                sp[0] &= tmp;
+                sp[0] |= 1 << (pLSB - 1); // Add 0.5 (reconstruction parameter = 1/2)
             }
         }
     }
-    return 1;
 }
 
 
 int
 ff_jpeg2000_decode_htj2k(const Jpeg2000DecoderContext *s, Jpeg2000CodingStyle *codsty, Jpeg2000T1Context *t1, Jpeg2000Cblk *cblk,
-                         int width, int height, int magp, uint8_t roi_shift)
+                         int width, int height, int M_b, uint8_t roi_shift)
 {
-    uint8_t p0 = 0;             // Number of placeholder passes
+    uint8_t p0 = 0;             // 3 * p0 = Number of placeholder passes
     uint32_t Lcup;              // Length of HT cleanup segment
     uint32_t Lref;              // Length of Refinement segment
     uint32_t Scup;              // HT cleanup segment suffix length
@@ -1174,7 +1203,7 @@ ff_jpeg2000_decode_htj2k(const Jpeg2000DecoderContext *s, Jpeg2000CodingStyle *c
 
     int z_blk;                  // Number of ht coding pass
 
-    uint8_t empty_passes;
+    uint8_t num_plhd_passes;    // Number of placeholder passes
 
     StateVars mag_sgn;          // Magnitude and Sign
     StateVars mel;              // Adaptive run-length coding
@@ -1190,8 +1219,9 @@ ff_jpeg2000_decode_htj2k(const Jpeg2000DecoderContext *s, Jpeg2000CodingStyle *c
     uint8_t *block_states = NULL;
 
     int32_t n, val;             // Post-processing
+    const uint32_t mask  = UINT32_MAX >> (M_b + 1); // bit mask for ROI detection
 
-    int32_t M_b = magp;
+    uint8_t num_rempass;
 
     const int quad_buf_width = width + 4;
     const int quad_buf_height = height + 4;
@@ -1201,22 +1231,17 @@ ff_jpeg2000_decode_htj2k(const Jpeg2000DecoderContext *s, Jpeg2000CodingStyle *c
     av_assert0(width * height <= 4096);
     av_assert0(width * height > 0);
 
-    if (roi_shift)
-        avpriv_report_missing_feature(s->avctx, "ROI shift");
-
     memset(t1->data, 0, t1->stride * height * sizeof(*t1->data));
     memset(t1->flags, 0, t1->stride * (height + 2) * sizeof(*t1->flags));
 
     if (cblk->npasses == 0)
         return 0;
 
-    if (cblk->npasses > 3)
-        p0 = 0;
-    else if (cblk->length == 0)
-        p0 = 1;
-
-    empty_passes = p0 * 3;
-    z_blk = cblk->npasses - empty_passes;
+    num_rempass = cblk->npasses % 3;  // Number of remainder passes
+    num_plhd_passes = num_rempass ? cblk->npasses - num_rempass : cblk->npasses - 3;
+    av_assert0(num_plhd_passes % 3 == 0);
+    p0 = num_plhd_passes / 3;
+    z_blk = cblk->npasses - num_plhd_passes;
 
     if (z_blk <= 0)
         return 0; // No passes within this set, continue
@@ -1231,7 +1256,11 @@ ff_jpeg2000_decode_htj2k(const Jpeg2000DecoderContext *s, Jpeg2000CodingStyle *c
     }
     Dcup = cblk->data;
     Dref  = cblk->data + Lcup; // Dref comes after the refinement segment
+
+    cblk->data[cblk->length] = 0xFF; // an extra byte for refinement segment (buffer->last)
+
     S_blk = p0 + cblk->zbp;
+    cblk->zbp = S_blk - 1;
     pLSB  = 30 - S_blk;
 
     Scup = (Dcup[Lcup - 1] << 4) + (Dcup[Lcup - 2] & 0x0F);
@@ -1277,31 +1306,32 @@ ff_jpeg2000_decode_htj2k(const Jpeg2000DecoderContext *s, Jpeg2000CodingStyle *c
         goto free;
     }
 
-    if (cblk->npasses > 1)
+    if (z_blk > 1)
         jpeg2000_decode_sigprop_segment(cblk, width, height, quad_buf_width, Dref, Lref,
                                         pLSB - 1, sample_buf, block_states);
 
-    if (cblk->npasses > 2) {
-
-        if (Lref < 2){
-            av_log(s->avctx,AV_LOG_ERROR,"Invalid magnitude refinement length\n");
-            ret = AVERROR_INVALIDDATA;
-            goto free;
-        }
-        if ((ret = jpeg2000_decode_magref_segment(width, height, quad_buf_width, Dref, Lref,
-                                                  pLSB - 1, sample_buf, block_states)) < 0)
-            goto free;
-    }
+    if (z_blk > 2)
+        jpeg2000_decode_magref_segment(width, height, quad_buf_width, Dref, Lref,
+                                       pLSB - 1, sample_buf, block_states);
 
     pLSB = 31 - M_b;
 
     /* Reconstruct the sample values */
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
+            int32_t sign;
+
             n = x + (y * t1->stride);
             val = sample_buf[x + (y * quad_buf_width)];
+            sign = val & INT32_MIN;
+            val &= INT32_MAX;
+            /* ROI shift, if necessary */
+            if (roi_shift && (((uint32_t)val & ~mask) == 0))
+                val <<= roi_shift;
             /* Convert sign-magnitude to two's complement. */
-            val = val >> 31 ? 0x80000000 - val : val;
+            if (sign)
+                val = -val;
+            /* Shift down to 1 bit upper from decimal point for reconstruction value (= 0.5) */
             val >>= (pLSB - 1);
             t1->data[n] = val;
         }

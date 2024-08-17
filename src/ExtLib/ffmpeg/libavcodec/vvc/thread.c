@@ -40,6 +40,7 @@ typedef struct ProgressListener {
 } ProgressListener;
 
 typedef enum VVCTaskStage {
+    VVC_TASK_STAGE_INIT,                    // for CTU(0, 0) only
     VVC_TASK_STAGE_PARSE,
     VVC_TASK_STAGE_INTER,
     VVC_TASK_STAGE_RECON,
@@ -175,10 +176,14 @@ static int task_has_target_score(VVCTask *t, const VVCTaskStage stage, const uin
     uint8_t target = 0;
     VVCFrameContext *fc = t->fc;
 
+    if (stage == VVC_TASK_STAGE_INIT)
+        return 1;
+
     if (stage == VVC_TASK_STAGE_PARSE) {
-        const H266RawSPS *rsps = fc->ps.sps->r;
-        const int wpp = rsps->sps_entropy_coding_sync_enabled_flag && !is_first_row(fc, t->rx, t->ry);
-        target = 2 + wpp - 1;                           //left parse + colocation + wpp - no previous stage
+        const H266RawSPS *rsps   = fc->ps.sps->r;
+        const int wpp            = rsps->sps_entropy_coding_sync_enabled_flag && !is_first_row(fc, t->rx, t->ry);
+        const int no_prev_stage  = t->rs > 0;
+        target = 2 + wpp - no_prev_stage;                           //left parse + colocation + wpp - no_prev_stage
     } else if (stage == VVC_TASK_STAGE_INTER) {
         target = atomic_load(&t->target_inter_score);
     } else {
@@ -385,17 +390,67 @@ static int task_priority_higher(const AVTask *_a, const AVTask *_b)
     const VVCTask *a = (const VVCTask*)_a;
     const VVCTask *b = (const VVCTask*)_b;
 
-    CHECK(a->fc->decode_order, b->fc->decode_order);             //decode order
 
-    if (a->stage == VVC_TASK_STAGE_PARSE || b->stage == VVC_TASK_STAGE_PARSE) {
+    if (a->stage <= VVC_TASK_STAGE_PARSE || b->stage <= VVC_TASK_STAGE_PARSE) {
         CHECK(a->stage, b->stage);
+        CHECK(a->fc->decode_order, b->fc->decode_order);           //decode order
         CHECK(a->ry, b->ry);
         return a->rx < b->rx;
     }
 
+    CHECK(a->fc->decode_order, b->fc->decode_order);              //decode order
     CHECK(a->rx + a->ry + a->stage, b->rx + b->ry + b->stage);    //zigzag with type
     CHECK(a->rx + a->ry, b->rx + b->ry);                          //zigzag
     return a->ry < b->ry;
+}
+
+static void check_colocation(VVCContext *s, VVCTask *t)
+{
+    const VVCFrameContext *fc = t->fc;
+
+    if (fc->ps.ph.r->ph_temporal_mvp_enabled_flag || fc->ps.sps->r->sps_sbtmvp_enabled_flag) {
+        VVCFrame *col       = fc->ref->collocated_ref;
+        const int first_col = t->rx == fc->ps.pps->ctb_to_col_bd[t->rx];
+        if (col && first_col) {
+            //we depend on bottom and right boundary, do not - 1 for y
+            const int y = (t->ry << fc->ps.sps->ctb_log2_size_y);
+            add_progress_listener(col, &t->col_listener, t, s, VVC_PROGRESS_MV, y);
+            return;
+        }
+    }
+    frame_thread_add_score(s, fc->ft, t->rx, t->ry, VVC_TASK_STAGE_PARSE);
+}
+
+static void submit_entry_point(VVCContext *s, VVCFrameThread *ft, SliceContext *sc, EntryPoint *ep)
+{
+    const int rs = sc->sh.ctb_addr_in_curr_slice[ep->ctu_start];
+    VVCTask *t   = ft->tasks + rs;
+
+    frame_thread_add_score(s, ft, t->rx, t->ry, VVC_TASK_STAGE_PARSE);
+}
+
+static int run_init(VVCContext *s, VVCLocalContext *lc, VVCTask *t)
+{
+    VVCFrameContext *fc = lc->fc;
+    VVCFrameThread *ft  = fc->ft;
+    const int ret       = ff_vvc_per_frame_init(fc);
+
+    if (ret < 0)
+        return ret;
+
+    for (int i = 0; i < fc->nb_slices; i++) {
+        SliceContext *sc = fc->slices[i];
+        for (int j = 0; j < sc->nb_eps; j++) {
+            EntryPoint *ep = sc->eps + j;
+            for (int k = ep->ctu_start; k < ep->ctu_end; k++) {
+                const int rs = sc->sh.ctb_addr_in_curr_slice[k];
+                VVCTask *t   = ft->tasks + rs;
+                check_colocation(s, t);
+            }
+            submit_entry_point(s, ft, sc, ep);
+        }
+    }
+    return 0;
 }
 
 static void report_frame_progress(VVCFrameContext *fc,
@@ -546,6 +601,7 @@ static int run_alf(VVCContext *s, VVCLocalContext *lc, VVCTask *t)
 #define VVC_THREAD_DEBUG
 #ifdef VVC_THREAD_DEBUG
 const static char* task_name[] = {
+    "INIT",
     "P",
     "I",
     "R",
@@ -566,6 +622,7 @@ static void task_run_stage(VVCTask *t, VVCContext *s, VVCLocalContext *lc)
     VVCFrameThread *ft       = fc->ft;
     const VVCTaskStage stage = t->stage;
     static const run_func run[] = {
+        run_init,
         run_parse,
         run_inter,
         run_recon,
@@ -725,7 +782,7 @@ int ff_vvc_frame_thread_init(VVCFrameContext *fc)
 
     for (int rs = 0; rs < ft->ctu_count; rs++) {
         VVCTask *t = ft->tasks + rs;
-        task_init(t, VVC_TASK_STAGE_PARSE, fc, rs % ft->ctu_width, rs / ft->ctu_width);
+        task_init(t, rs ? VVC_TASK_STAGE_PARSE : VVC_TASK_STAGE_INIT, fc, rs % ft->ctu_width, rs / ft->ctu_width);
     }
 
     memset(&ft->row_progress[0], 0, sizeof(ft->row_progress));
@@ -744,59 +801,25 @@ fail:
     return AVERROR(ENOMEM);
 }
 
-static void check_colocation(VVCContext *s, VVCTask *t)
-{
-    const VVCFrameContext *fc = t->fc;
-
-    if (fc->ps.ph.r->ph_temporal_mvp_enabled_flag || fc->ps.sps->r->sps_sbtmvp_enabled_flag) {
-        VVCFrame *col       = fc->ref->collocated_ref;
-        const int first_col = t->rx == fc->ps.pps->ctb_to_col_bd[t->rx];
-        if (col && first_col) {
-            //we depend on bottom and right boundary, do not - 1 for y
-            const int y = (t->ry << fc->ps.sps->ctb_log2_size_y);
-            add_progress_listener(col, &t->col_listener, t, s, VVC_PROGRESS_MV, y);
-            return;
-        }
-    }
-    frame_thread_add_score(s, fc->ft, t->rx, t->ry, VVC_TASK_STAGE_PARSE);
-}
-
-static void submit_entry_point(VVCContext *s, VVCFrameThread *ft, SliceContext *sc, EntryPoint *ep)
-{
-    const int rs = sc->sh.ctb_addr_in_curr_slice[ep->ctu_start];
-    VVCTask *t   = ft->tasks + rs;
-
-    frame_thread_add_score(s, ft, t->rx, t->ry, VVC_TASK_STAGE_PARSE);
-}
-
 int ff_vvc_frame_submit(VVCContext *s, VVCFrameContext *fc)
 {
     VVCFrameThread *ft = fc->ft;
 
-    // We'll handle this in two passes:
-    // Pass 0 to initialize tasks with parser, this will help detect bit stream error
-    // Pass 1 to shedule location check and submit the entry point
-    for (int pass = 0; pass < 2; pass++) {
-        for (int i = 0; i < fc->nb_slices; i++) {
-            SliceContext *sc = fc->slices[i];
-            for (int j = 0; j < sc->nb_eps; j++) {
-                EntryPoint *ep = sc->eps + j;
-                for (int k = ep->ctu_start; k < ep->ctu_end; k++) {
-                    const int rs = sc->sh.ctb_addr_in_curr_slice[k];
-                    VVCTask *t   = ft->tasks + rs;
-                    if (pass) {
-                        check_colocation(s, t);
-                    } else {
-                        const int ret = task_init_parse(t, sc, ep, k);
-                        if (ret < 0)
-                            return ret;
-                    }
-                }
-                if (pass)
-                    submit_entry_point(s, ft, sc, ep);
+    for (int i = 0; i < fc->nb_slices; i++) {
+        SliceContext *sc = fc->slices[i];
+        for (int j = 0; j < sc->nb_eps; j++) {
+            EntryPoint *ep = sc->eps + j;
+            for (int k = ep->ctu_start; k < ep->ctu_end; k++) {
+                const int rs = sc->sh.ctb_addr_in_curr_slice[k];
+                VVCTask *t   = ft->tasks + rs;
+                const int ret = task_init_parse(t, sc, ep, k);
+                if (ret < 0)
+                    return ret;
             }
         }
     }
+    frame_thread_add_score(s, ft, 0, 0, VVC_TASK_STAGE_INIT);
+
     return 0;
 }
 

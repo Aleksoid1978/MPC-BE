@@ -399,7 +399,6 @@ static void store_cp_mv(const VVCLocalContext *lc, const MotionInfo *mi, const i
             const int offset = (y_cb * min_cb_width + x_cb) * MAX_CONTROL_POINTS;
 
             memcpy(&fc->tab.cp_mv[lx][offset], mi->mv[lx], sizeof(Mv) * num_cp_mv);
-            SAMPLE_CTB(fc->tab.mmi, x_cb, y_cb) = mi->motion_model_idc;
         }
     }
 }
@@ -545,6 +544,16 @@ typedef struct NeighbourContext {
     const VVCLocalContext *lc;
 } NeighbourContext;
 
+static int is_available(const VVCFrameContext *fc, const int x0, const int y0)
+{
+    const VVCSPS *sps      = fc->ps.sps;
+    const int x            = x0 >> sps->min_cb_log2_size_y;
+    const int y            = y0 >> sps->min_cb_log2_size_y;
+    const int min_cb_width = fc->ps.pps->min_cb_width;
+
+    return SAMPLE_CTB(fc->tab.cb_width[0], x, y) != 0;
+}
+
 static int is_a0_available(const VVCLocalContext *lc, const CodingUnit *cu)
 {
     const VVCFrameContext *fc   = lc->fc;
@@ -555,15 +564,11 @@ static int is_a0_available(const VVCLocalContext *lc, const CodingUnit *cu)
     if (!x0b && !lc->ctb_left_flag) {
         cand_bottom_left = 0;
     } else {
-        const int log2_min_cb_size  = sps->min_cb_log2_size_y;
-        const int min_cb_width      = fc->ps.pps->min_cb_width;
-        const int x                 = (cu->x0 - 1) >> log2_min_cb_size;
-        const int y                 = (cu->y0 + cu->cb_height) >> log2_min_cb_size;
-        const int max_y             = FFMIN(fc->ps.pps->height, ((cu->y0 >> sps->ctb_log2_size_y) + 1) << sps->ctb_log2_size_y);
+        const int max_y = FFMIN(fc->ps.pps->height, ((cu->y0 >> sps->ctb_log2_size_y) + 1) << sps->ctb_log2_size_y);
         if (cu->y0 + cu->cb_height >= max_y)
             cand_bottom_left = 0;
         else
-            cand_bottom_left = SAMPLE_CTB(fc->tab.cb_width[0], x, y) != 0;
+            cand_bottom_left = is_available(fc, cu->x0 - 1, cu->y0 + cu->cb_height);
     }
     return cand_bottom_left;
 }
@@ -608,9 +613,9 @@ static int check_available(Neighbour *n, const VVCLocalContext *lc, const int ch
     if (!n->checked) {
         n->checked = 1;
         n->available = !sps->r->sps_entropy_coding_sync_enabled_flag || ((n->x >> sps->ctb_log2_size_y) <= (cu->x0 >> sps->ctb_log2_size_y));
-        n->available &= cu->pred_mode == pred_flag_to_mode(TAB_MVF(n->x, n->y).pred_flag);
+        n->available = n->available && is_available(fc, n->x, n->y) && cu->pred_mode == pred_flag_to_mode(TAB_MVF(n->x, n->y).pred_flag);
         if (check_mer)
-            n->available &= !is_same_mer(fc, n->x, n->y, cu->x0, cu->y0);
+            n->available = n->available && !is_same_mer(fc, n->x, n->y, cu->x0, cu->y0);
     }
     return n->available;
 }
