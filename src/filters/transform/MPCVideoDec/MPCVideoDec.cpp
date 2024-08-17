@@ -1859,9 +1859,9 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 		if (SUCCEEDED(hr = m_pDecoderService->GetDecoderDeviceGuids(&cDecoderGuids, &pDecoderGuids)) && cDecoderGuids) {
 #ifdef DEBUG_OR_LOG
 			CString dbgstr;
+			dbgstr.Format(L"    => Enumerating supported DXVA2 modes[%u]:\n", cDecoderGuids);
 #endif
 			std::vector<GUID> supportedDecoderGuids;
-			DLog(L"    => Enumerating supported DXVA2 modes:");
 			for (UINT iGuid = 0; iGuid < cDecoderGuids; iGuid++) {
 				const auto& guid = pDecoderGuids[iGuid];
 

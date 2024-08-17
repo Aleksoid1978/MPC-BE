@@ -359,9 +359,8 @@ HRESULT CD3D11Decoder::FindVideoServiceConversion(AVCodecContext* c, enum AVCode
 
 #ifdef DEBUG_OR_LOG
 	CString dbgstr;
+	dbgstr.Format(L"CD3D11Decoder::FindVideoServiceConversion() : Enumerating supported D3D11 modes[%u]:\n", nProfiles);
 #endif
-
-	DLog(L"CD3D11Decoder::FindVideoServiceConversion() : Enumerating supported D3D11 modes (count: %d)", nProfiles);
 	for (UINT i = 0; i < nProfiles; i++) {
 		GUID guidProfile;
 		hr = pDeviceContext->video_device->GetVideoDecoderProfile(i, &guidProfile);
