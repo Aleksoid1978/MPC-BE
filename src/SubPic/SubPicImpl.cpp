@@ -157,13 +157,14 @@ STDMETHODIMP CSubPicImpl::GetSourceAndDest(
 				rcTemp.OffsetRect(offset);
 			}
 
-			// shift bitmap subtitles if they go beyond the right/bottom border of the frame
+			// shift bitmap subtitles if they go beyond the right/bottom border of the frame AND window
 			offset.SetPoint(0, 0);
-			if (rcTemp.right > rcTarget.right) {
-				offset.x -= (rcTemp.right - rcTarget.right);
+			const CSize szFixCrop(std::max(rcTarget.right, rcWindow.right), std::max(rcTarget.bottom, rcWindow.bottom));
+			if (rcTemp.right > szFixCrop.cx) {
+				offset.x -= (rcTemp.right - szFixCrop.cx);
 			}
-			if (rcTemp.bottom > rcTarget.bottom) {
-				offset.y -= (rcTemp.bottom - rcTarget.bottom);
+			if (rcTemp.bottom > szFixCrop.cy) {
+				offset.y -= (rcTemp.bottom - szFixCrop.cy);
 			}
 			if (offset.x != 0 || offset.y != 0) {
 				rcTemp.OffsetRect(offset);
