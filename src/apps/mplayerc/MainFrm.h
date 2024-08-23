@@ -489,6 +489,7 @@ private:
 	DVD_DOMAIN m_iDVDDomain;
 	DWORD m_iDVDTitle = 0;
 	DWORD m_iDVDTitleForHistory = 0;
+	bool m_bDVDStillOn    = false;
 	bool m_bDVDRestorePos = false;
 	std::vector<CStringW> m_RecentPaths; // used in SetupRecentFilesSubMenu and OnRecentFile
 	std::list<SessionInfo> m_FavFiles;   // used in SetupFavoritesSubMenu and OnFavoritesFile

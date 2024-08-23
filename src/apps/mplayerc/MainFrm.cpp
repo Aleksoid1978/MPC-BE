@@ -3546,6 +3546,12 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 					}
 				}
 				break;
+			case EC_DVD_STILL_ON:
+				m_bDVDStillOn = true;
+				break;
+			case EC_DVD_STILL_OFF:
+				m_bDVDStillOn = false;
+				break;
 		}
 	}
 
@@ -11707,7 +11713,7 @@ void CMainFrame::ClampWindowRect(RECT& windowRect)
 
 void CMainFrame::RepaintVideo(const bool bForceRepaint/* = false*/)
 {
-	if (!m_bDelaySetOutputRect && (bForceRepaint || GetMediaState() != State_Running)) {
+	if (!m_bDelaySetOutputRect && (bForceRepaint || GetMediaState() != State_Running) || m_bDVDStillOn) {
 		if (m_pCAP) {
 			m_pCAP->Paint(false);
 		} else if (m_pMFVDC) {
@@ -14590,6 +14596,7 @@ void CMainFrame::CloseMediaPrivate()
 
 	m_iDVDTitle = 0;
 	m_iDVDTitleForHistory = 0;
+	m_bDVDStillOn = false;
 
 	DLog(L"CMainFrame::CloseMediaPrivate() : end");
 }
