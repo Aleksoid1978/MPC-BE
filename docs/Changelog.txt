@@ -2,6 +2,16 @@
 
 1.7.3.x dev
 =============================
+MP4Splitter
+Fixed reading of some metadata.
+
+Subtitles
+Improved placement of PGS subtitles for cropped videos.
+
+Player
+Fixed display of static DVD-Video menu when minimizing/maximizing the player window.
+Various interface fixes.
+
 Updated libraries:
 	ffmpeg n7.1-dev-2293-g40dda881d6;
 	vvdec v2.3.0-28-gf8ba8fd.
