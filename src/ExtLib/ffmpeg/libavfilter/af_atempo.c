@@ -47,7 +47,7 @@
 #include "libavutil/tx.h"
 #include "avfilter.h"
 #include "audio.h"
-#include "internal.h"
+#include "filters.h"
 
 /**
  * A fragment of audio waveform

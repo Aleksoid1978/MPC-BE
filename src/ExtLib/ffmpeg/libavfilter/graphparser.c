@@ -30,7 +30,7 @@
 
 #include "avfilter.h"
 #include "avfilter_internal.h"
-#include "internal.h"
+#include "filters.h"
 
 #define WHITESPACES " \n\t\r"
 

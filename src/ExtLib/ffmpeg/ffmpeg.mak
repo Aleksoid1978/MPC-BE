@@ -180,6 +180,7 @@ SRCS_LC = \
 	libavcodec/cllc.c \
 	libavcodec/codec_desc.c \
 	libavcodec/codec_par.c \
+	libavcodec/container_fifo.c \
 	libavcodec/cook.c \
 	libavcodec/cscd.c \
 	libavcodec/d3d11va.c \

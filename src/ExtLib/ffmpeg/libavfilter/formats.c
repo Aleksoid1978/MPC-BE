@@ -22,11 +22,10 @@
 #include "libavutil/avassert.h"
 #include "libavutil/channel_layout.h"
 #include "libavutil/common.h"
-#include "libavutil/eval.h"
 #include "libavutil/mem.h"
 #include "libavutil/pixdesc.h"
 #include "avfilter.h"
-#include "internal.h"
+#include "filters.h"
 #include "formats.h"
 
 /**
@@ -932,58 +931,6 @@ int ff_default_query_formats(AVFilterContext *ctx)
         if (ret < 0)
             return ret;
     }
-
-    return 0;
-}
-
-/* internal functions for parsing audio format arguments */
-
-int ff_parse_pixel_format(enum AVPixelFormat *ret, const char *arg, void *log_ctx)
-{
-    char *tail;
-    int pix_fmt = av_get_pix_fmt(arg);
-    if (pix_fmt == AV_PIX_FMT_NONE) {
-        pix_fmt = strtol(arg, &tail, 0);
-        if (*tail || !av_pix_fmt_desc_get(pix_fmt)) {
-            av_log(log_ctx, AV_LOG_ERROR, "Invalid pixel format '%s'\n", arg);
-            return AVERROR(EINVAL);
-        }
-    }
-    *ret = pix_fmt;
-    return 0;
-}
-
-int ff_parse_sample_rate(int *ret, const char *arg, void *log_ctx)
-{
-    char *tail;
-    double srate = av_strtod(arg, &tail);
-    if (*tail || srate < 1 || (int)srate != srate || srate > INT_MAX) {
-        av_log(log_ctx, AV_LOG_ERROR, "Invalid sample rate '%s'\n", arg);
-        return AVERROR(EINVAL);
-    }
-    *ret = srate;
-    return 0;
-}
-
-int ff_parse_channel_layout(AVChannelLayout *ret, int *nret, const char *arg,
-                            void *log_ctx)
-{
-    AVChannelLayout chlayout = { 0 };
-    int res;
-
-    res = av_channel_layout_from_string(&chlayout, arg);
-    if (res < 0) {
-        av_log(log_ctx, AV_LOG_ERROR, "Invalid channel layout '%s'\n", arg);
-        return AVERROR(EINVAL);
-    }
-
-    if (chlayout.order == AV_CHANNEL_ORDER_UNSPEC && !nret) {
-        av_log(log_ctx, AV_LOG_ERROR, "Unknown channel layout '%s' is not supported.\n", arg);
-        return AVERROR(EINVAL);
-    }
-    *ret = chlayout;
-    if (nret)
-        *nret = chlayout.nb_channels;
 
     return 0;
 }

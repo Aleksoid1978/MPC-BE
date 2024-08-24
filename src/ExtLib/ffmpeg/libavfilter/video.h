@@ -22,7 +22,7 @@
 #define AVFILTER_VIDEO_H
 
 #include "avfilter.h"
-#include "internal.h"
+#include "filters.h"
 
 /**
  * An AVFilterPad array whose only entry has name "default"
@@ -44,5 +44,11 @@ AVFrame *ff_null_get_video_buffer(AVFilterLink *link, int w, int h);
  * @return      on success, an AVFrame owned by the caller, NULL on error
  */
 AVFrame *ff_get_video_buffer(AVFilterLink *link, int w, int h);
+
+/**
+ * Returns true if a pixel format is "regular YUV", which includes all pixel
+ * formats that are affected by YUV colorspace negotiation.
+ */
+int ff_fmt_is_regular_yuv(enum AVPixelFormat fmt);
 
 #endif /* AVFILTER_VIDEO_H */
