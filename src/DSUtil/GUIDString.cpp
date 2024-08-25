@@ -52,6 +52,7 @@ static const WaveStringEntry MPC_g_WaveGuidNames[] = {
 	{WAVE_FORMAT_OPUS,                "OPUS_WAVE"},
 	{WAVE_FORMAT_SPEEX_VOICE,         "SPEEX"},
 	{WAVE_FORMAT_FLAC,                "FLAC"},
+	{WAVE_FORMAT_EXTENSIBLE,          "WAVEFORMATEXTENSIBLE"}, // invalid media subtype from "AVI/WAV File Source"
 	// moreuuids.h
 	{WAVE_FORMAT_SIPR,                "SIPR_WAVE"},      //0x0130
 	{WAVE_FORMAT_ATRC,                "ATRAC3"},         //0x0270
