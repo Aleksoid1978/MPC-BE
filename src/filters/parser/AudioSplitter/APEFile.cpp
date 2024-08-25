@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2023 see Authors.txt
+ * (C) 2014-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -64,8 +64,8 @@ struct APEContext {
 	uint32_t samplerate;
 
 	/* Seektable */
-	uint32_t* seektable;
-	uint8_t*  bittable;
+	std::unique_ptr<uint32_t[]> seektable;
+	std::unique_ptr<uint8_t[]> bittable;
 };
 
 //
@@ -191,8 +191,8 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 		DLog(L"CAPEFile::Open() : Too many frames: %u", ape.totalframes);
 		return E_FAIL;
 	}
-	if (ape.seektablelength / sizeof(*ape.seektable) < ape.totalframes) {
-		DLog(L"CAPEFile::Open() : Number of seek entries is less than number of frames: %u vs. %u", ape.seektablelength / (uint32_t)sizeof(*ape.seektable), ape.totalframes);
+	if (ape.seektablelength / (uint32_t)sizeof(uint32_t) < ape.totalframes) {
+		DLog(L"CAPEFile::Open() : Number of seek entries is less than number of frames: %u vs. %u", ape.seektablelength / (uint32_t)sizeof(uint32_t), ape.totalframes);
 		return E_FAIL;
 	}
 
@@ -207,21 +207,22 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 	}
 
 	if (ape.seektablelength > 0) {
-		ape.seektable = (uint32_t*)malloc(ape.seektablelength);
+		ape.seektable.reset(new(std::nothrow) uint32_t[ape.seektablelength]);
 		if (!ape.seektable) {
 			return E_OUTOFMEMORY;
 		}
-		memset(ape.seektable, 0, ape.seektablelength);
+		memset(ape.seektable.get(), 0, ape.seektablelength);
 		for (size_t i = 0; i < ape.seektablelength / sizeof(uint32_t) && m_pFile->GetRemaining() >= 4; i++) {
 			m_pFile->ByteRead((BYTE*)&ape.seektable[i], 4);
 		}
 		if (ape.fileversion < 3810) {
-			ape.bittable = (uint8_t*)malloc(ape.totalframes);
+			ape.bittable.reset(new(std::nothrow) uint8_t[ape.totalframes]);
+
 			if (!ape.bittable) {
-				free(ape.seektable);
+				ape.seektable.reset();
 				return E_OUTOFMEMORY;
 			}
-			memset(ape.bittable, 0, ape.totalframes);
+			memset(ape.bittable.get(), 0, ape.totalframes);
 			for (size_t i = 0; i < ape.totalframes && m_pFile->GetRemaining(); i++) {
 				m_pFile->ByteRead((BYTE*)&ape.bittable[i], 1);
 			}
@@ -277,10 +278,10 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 	}
 
 	if (ape.seektable) {
-		free(ape.seektable);
+		ape.seektable.reset();
 	}
 	if (ape.bittable) {
-		free(ape.bittable);
+		ape.bittable.reset();
 	}
 
 	int total_blocks = ((ape.totalframes - 1) * ape.blocksperframe) + ape.finalframeblocks;
