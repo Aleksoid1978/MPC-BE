@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2023 see Authors.txt
+ * (C) 2017-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,10 +33,10 @@ public:
 	auto* Data() { return m_data.get(); }
 
 	// Returns the number of elements.
-	auto Size() { return m_size; }
+	auto Size() const { return m_size; }
 
 	// Returns allocated size in bytes.
-	size_t Bytes() { return m_size * sizeof(T); }
+	size_t Bytes() const { return m_size * sizeof(T); }
 
 	// Set new size. Old data will be lost.
 	void SetSize(const size_t size)
