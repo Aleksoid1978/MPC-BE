@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2020 see Authors.txt
+ * (C) 2014-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -87,10 +87,9 @@ HRESULT CTTAFile::Open(CBaseSplitterFile* pFile)
 
 	__int64 framepos = m_pFile->GetPos() + 4 * m_totalframes + 4;
 
-	m_extrasize = m_pFile->GetPos() - start_offset;
-	m_extradata = (BYTE*)malloc(m_extrasize);
+	m_extradata.SetSize(m_pFile->GetPos() - start_offset);
 	m_pFile->Seek(start_offset);
-	if (m_pFile->ByteRead(m_extradata, m_extrasize) != S_OK) {
+	if (m_pFile->ByteRead(m_extradata.Data(), m_extradata.Bytes()) != S_OK) {
 		return E_FAIL;
 	}
 

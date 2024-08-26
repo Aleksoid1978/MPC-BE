@@ -44,9 +44,6 @@ CAudioFile::~CAudioFile()
 	SAFE_DELETE(m_pAPETag);
 	SAFE_DELETE(m_pID3Tag);
 
-	if (m_extradata) {
-		free(m_extradata);
-	}
 	m_pFile = nullptr;
 }
 
@@ -135,15 +132,15 @@ bool CAudioFile::SetMediaType(CMediaType& mt)
 	mt.subtype				= m_subtype;
 	mt.SetSampleSize(256000);
 
-	WAVEFORMATEX* wfe		= (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX) + m_extrasize);
+	WAVEFORMATEX* wfe		= (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX) + m_extradata.Bytes());
 	wfe->wFormatTag			= m_wFormatTag;
 	wfe->nChannels			= m_channels;
 	wfe->nSamplesPerSec		= m_samplerate;
 	wfe->wBitsPerSample		= m_bitdepth;
 	wfe->nBlockAlign		= m_channels * m_bitdepth / 8;
 	wfe->nAvgBytesPerSec	= wfe->nSamplesPerSec * wfe->nBlockAlign;
-	wfe->cbSize				= m_extrasize;
-	memcpy(wfe + 1, m_extradata, m_extrasize);
+	wfe->cbSize				= m_extradata.Bytes();
+	memcpy(wfe + 1, m_extradata.Data(), m_extradata.Bytes());
 
 	if (!m_nAvgBytesPerSec) {
 		m_nAvgBytesPerSec	= wfe->nAvgBytesPerSec;

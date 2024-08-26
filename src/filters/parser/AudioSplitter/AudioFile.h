@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2023 see Authors.txt
+ * (C) 2014-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,6 +23,7 @@
 #include "../BaseSplitter/BaseSplitter.h"
 #include "DSUtil/ApeTag.h"
 #include "DSUtil/ID3Tag.h"
+#include "DSUtil/SimpleBuffer.h"
 #include <wmcodecdsp.h>
 #include <moreuuids.h>
 #include <stdint.h>
@@ -44,8 +45,7 @@ protected:
 
 	REFERENCE_TIME m_rtduration = 0;
 
-	BYTE* m_extradata = nullptr;
-	int   m_extrasize = 0;
+	CSimpleBlock<BYTE> m_extradata;
 
 	DWORD m_nAvgBytesPerSec = 0;
 

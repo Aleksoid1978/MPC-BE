@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2021 see Authors.txt
+ * (C) 2014-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -297,13 +297,8 @@ HRESULT CTAKFile::Open(CBaseSplitterFile* pFile)
 			}
 			m_rtduration = m_samples * UNITS / m_samplerate;
 
-			BYTE* new_extradata = (BYTE*)realloc(m_extradata, size - 3);
-			ASSERT(new_extradata);
-			if (new_extradata) {
-				m_extradata = new_extradata;
-				m_extrasize = size - 3;
-				memcpy(m_extradata, buffer, m_extrasize);
-			}
+			m_extradata.SetSize(size - 3);
+			memcpy(m_extradata.Data(), buffer, m_extradata.Bytes());
 		}
 		else if (type == TAK_METADATA_LAST_FRAME) {
 			bLastFrame				= TRUE;

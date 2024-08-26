@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2021 see Authors.txt
+ * (C) 2020-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -137,10 +137,9 @@ HRESULT CFLACFile::Open(CBaseSplitterFile* pFile)
 		return E_FAIL;
 	}
 	if (metadataend) {
-		m_extrasize = metadataend;
-		m_extradata = (BYTE*)malloc(m_extrasize);
+		m_extradata.SetSize(metadataend);
 		m_pFile->Seek(start_pos);
-		if (m_pFile->ByteRead(m_extradata, m_extrasize) != S_OK) {
+		if (m_pFile->ByteRead(m_extradata.Data(), m_extradata.Bytes()) != S_OK) {
 			return E_FAIL;
 		}
 

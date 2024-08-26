@@ -302,11 +302,10 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 	}
 	m_rtduration	= 10000000i64 * total_blocks / m_samplerate;
 
-	m_extrasize = APE_EXTRADATA_SIZE;
-	m_extradata = (BYTE*)malloc(m_extrasize);
-	memcpy(m_extradata + 0, &ape.fileversion, 2);
-	memcpy(m_extradata + 2, &ape.compressiontype, 2);
-	memcpy(m_extradata + 4, &ape.formatflags, 2);
+	m_extradata.SetSize(APE_EXTRADATA_SIZE);
+	memcpy(m_extradata.Data() + 0, &ape.fileversion, 2);
+	memcpy(m_extradata.Data() + 2, &ape.compressiontype, 2);
+	memcpy(m_extradata.Data() + 4, &ape.formatflags, 2);
 
 	m_startpos = m_pFile->GetPos();
 	m_endpos   = file_size;

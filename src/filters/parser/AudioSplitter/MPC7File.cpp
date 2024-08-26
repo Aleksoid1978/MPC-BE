@@ -72,9 +72,8 @@ HRESULT CMPC7File::Open(CBaseSplitterFile* pFile)
 		return E_FAIL;
 	}
 
-	m_extrasize = 16;
-	m_extradata = (BYTE*)malloc(m_extrasize);
-	if (m_pFile->ByteRead(m_extradata, m_extrasize) != S_OK) {
+	m_extradata.SetSize(16);
+	if (m_pFile->ByteRead(m_extradata.Data(), m_extradata.Bytes()) != S_OK) {
 		return E_FAIL;
 	}
 

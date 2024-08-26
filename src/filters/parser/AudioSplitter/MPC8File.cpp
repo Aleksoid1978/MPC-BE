@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2022 see Authors.txt
+ * (C) 2020-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -182,9 +182,8 @@ bool CMPC8File::ReadStreamHeader()
 	m_samples = ReadVarLen();
 	ReadVarLen();
 
-	m_extrasize = 2;
-	m_extradata = (BYTE*)malloc(m_extrasize);
-	if (m_pFile->ByteRead(m_extradata, m_extrasize) != S_OK) {
+	m_extradata.SetSize(2);
+	if (m_pFile->ByteRead(m_extradata.Data(), m_extradata.Bytes()) != S_OK) {
 		return false;
 	}
 

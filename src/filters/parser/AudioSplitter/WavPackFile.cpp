@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2020 see Authors.txt
+ * (C) 2014-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -348,9 +348,8 @@ HRESULT CWavPackFile::Open(CBaseSplitterFile* pFile)
 
 	m_rtduration = 10000000i64 * (m_block_idx_end - m_block_idx_start) / m_samplerate;
 
-	m_extrasize = sizeof(uint16_t);
-	m_extradata = (BYTE*)malloc(m_extrasize);
-	memcpy(m_extradata, &wv_ctx.header.version, m_extrasize);
+	m_extradata.SetSize(sizeof(uint16_t));
+	memcpy(m_extradata.Data(), &wv_ctx.header.version, m_extradata.Bytes());
 
 	m_pFile->Seek(m_startpos);
 

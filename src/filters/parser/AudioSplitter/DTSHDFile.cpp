@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2023 see Authors.txt
+ * (C) 2016-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -125,8 +125,7 @@ HRESULT CDTSHDFile::Open(CBaseSplitterFile* pFile)
 				if (size
 						&& (start + size + 40 <= end)
 						&& ParseDTSHDHeader(start + size, end - start - size, &aframe)) {
-					m_extrasize = 1;
-					m_extradata = (BYTE*)malloc(m_extrasize);
+					m_extradata.SetSize(1);
 					m_extradata[0] = (BYTE)aframe.param2;
 				}
 			}
@@ -211,7 +210,7 @@ int CDTSHDFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 CString CDTSHDFile::GetName() const {
 	CString name = L"DTS-HD";
 
-	if (m_extrasize == 1) {
+	if (m_extradata.Size() == 1) {
 		const auto profile = m_extradata[0];
 		GetDTSHDDescription(profile, name);
 	}
