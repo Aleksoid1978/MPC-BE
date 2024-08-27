@@ -118,7 +118,7 @@ private:
 
 	// === common variables
 	std::vector<VIDEO_OUTPUT_FORMATS>		m_VideoOutputFormats;
-	CDXVA2Decoder*							m_pDXVADecoder = nullptr;
+	std::unique_ptr<CDXVA2Decoder>			m_pDXVADecoder;
 	GUID									m_DXVADecoderGUID = GUID_NULL;
 	D3DFORMAT								m_DXVASurfaceFormat = D3DFMT_UNKNOWN;
 
@@ -155,7 +155,7 @@ private:
 
 	bool									m_bHighBitdepth = false;
 
-	CMSDKDecoder*							m_pMSDKDecoder   = nullptr;
+	std::unique_ptr<CMSDKDecoder>			m_pMSDKDecoder;
 	int										m_iMvcOutputMode = MVC_OUTPUT_Auto;
 	bool									m_bMvcSwapLR     = false;
 
@@ -197,7 +197,7 @@ private:
 	bool m_bHasPalette = false;
 	uint32_t m_Palette[256] = {};
 
-	CD3D11Decoder* m_pD3D11Decoder = nullptr;
+	std::unique_ptr<CD3D11Decoder> m_pD3D11Decoder;
 
 	// === Private functions
 	void			Cleanup();
@@ -356,7 +356,7 @@ private:
 
 	BOOL m_bInInit = FALSE;
 
-	CVideoDecDXVAAllocator*		m_pDXVA2Allocator;
+	CVideoDecDXVAAllocator* m_pDXVA2Allocator = nullptr;
 
 	// *** from LAV
 	// *** Re-Commit the allocator (creates surfaces and new decoder)
