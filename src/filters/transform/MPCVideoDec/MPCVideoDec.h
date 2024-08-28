@@ -54,6 +54,15 @@ class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 	, public ISpecifyPropertyPages2
 {
 private:
+	enum class HwType {
+		None,
+		DXVA2,
+		D3D11,
+		D3D11CopyBack,
+		D3D12CopyBack,
+		NVDEC
+	};
+
 	CCritSec								m_csInitDec;
 	CCritSec								m_csProps;
 	// === Persistants parameters (registry)
@@ -104,14 +113,11 @@ private:
 	double									m_dRate = 1.0;
 
 	bool									m_bUseFFmpeg = true;
-	bool									m_bUseDXVA   = true;
-	bool									m_bUseD3D11  = true;
 	CFormatConverter						m_FormatConverter;
-	CSize									m_pOutSize;				// Picture size on output pin
+	CSize									m_pOutSize; // Picture size on output pin
 
-	bool									m_bUseD3D11cb = false;
-	bool									m_bUseD3D12cb = false;
-	bool									m_bUseNVDEC = false;
+	HwType									m_hwType = {};
+
 	AVPixelFormat							m_HWPixFmt;
 	AVBufferRef*							m_HWDeviceCtx = nullptr;
 	CComPtr<ID3D11Texture2D>				m_pStagingD3D11Texture2D;
