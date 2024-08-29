@@ -84,15 +84,16 @@ static bool CheckPCID(UINT pcid, const UINT16* pPCIDs, size_t count)
 int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
 							 UINT nPCIVendor, UINT nPCIDevice, UINT64 VideoDriverVersion)
 {
-	const H264Context* h           = (H264Context*)pAVCtx->priv_data;
-	const SPS* sps                 = h264_getSPS(h);
-
-	int video_is_level51           = 0;
-	int no_level51_support         = 1;
-	int too_much_ref_frames        = 0;
-	const int max_ref_frames_dpb41 = std::min(11, 8388608/(nWidth * nHeight));
+	const H264Context* h = (H264Context*)pAVCtx->priv_data;
+	const SPS* sps = h264_getSPS(h);
+	int flags = 0;
 
 	if (sps) {
+		int video_is_level51 = 0;
+		int no_level51_support = 1;
+		int too_much_ref_frames = 0;
+		const int max_ref_frames_dpb41 = std::min(11, 8388608 / (nWidth * nHeight));
+
 		if (sps->bit_depth_luma > 8 || sps->chroma_format_idc > 1) {
 			return DXVA_HIGH_BIT;
 		}
@@ -138,17 +139,16 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 		if (sps->ref_frame_count > max_ref_frames) {
 			too_much_ref_frames = 1;
 		}
+
+		if (video_is_level51 * no_level51_support) {
+			flags |= DXVA_UNSUPPORTED_LEVEL;
+		}
+		if (too_much_ref_frames) {
+			flags |= DXVA_TOO_MANY_REF_FRAMES;
+		}
 	}
 
-	int Flags = 0;
-	if (video_is_level51 * no_level51_support) {
-		Flags |= DXVA_UNSUPPORTED_LEVEL;
-	}
-	if (too_much_ref_frames) {
-		Flags |= DXVA_TOO_MANY_REF_FRAMES;
-	}
-
-	return Flags;
+	return flags;
 }
 
 void FillAVCodecProps(struct AVCodecContext* pAVCtx, BITMAPINFOHEADER* pBMI)
