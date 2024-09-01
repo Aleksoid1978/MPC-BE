@@ -3666,8 +3666,8 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 		BYTE* pDataOut = nullptr;
 		DXVA2_ExtendedFormat dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
 
-		int w = m_pAVCtx->width;
-		int h = m_pAVCtx->height;
+		int w = frame->width;
+		int h = frame->height;
 		FixFrameSize(m_pAVCtx, w, h);
 
 		if (FAILED(hr = GetDeliveryBuffer(w, h, &pOut, GetFrameDuration(), &dxvaExtFormat)) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
