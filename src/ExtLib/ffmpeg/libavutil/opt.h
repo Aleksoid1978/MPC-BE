@@ -240,26 +240,98 @@
  * before the file is actually opened.
  */
 
+/**
+ * An option type determines:
+ * - for native access, the underlying C type of the field that an AVOption
+ *   refers to;
+ * - for foreign access, the semantics of accessing the option through this API,
+ *   e.g. which av_opt_get_*() and av_opt_set_*() functions can be called, or
+ *   what format will av_opt_get()/av_opt_set() expect/produce.
+ */
 enum AVOptionType{
+    /**
+     * Underlying C type is unsigned int.
+     */
     AV_OPT_TYPE_FLAGS = 1,
+    /**
+     * Underlying C type is int.
+     */
     AV_OPT_TYPE_INT,
+    /**
+     * Underlying C type is int64_t.
+     */
     AV_OPT_TYPE_INT64,
+    /**
+     * Underlying C type is double.
+     */
     AV_OPT_TYPE_DOUBLE,
+    /**
+     * Underlying C type is float.
+     */
     AV_OPT_TYPE_FLOAT,
+    /**
+     * Underlying C type is a uint8_t* that is either NULL or points to a C
+     * string allocated with the av_malloc() family of functions.
+     */
     AV_OPT_TYPE_STRING,
+    /**
+     * Underlying C type is AVRational.
+     */
     AV_OPT_TYPE_RATIONAL,
-    AV_OPT_TYPE_BINARY,  ///< offset must point to a pointer immediately followed by an int for the length
+    /**
+     * Underlying C type is a uint8_t* that is either NULL or points to an array
+     * allocated with the av_malloc() family of functions. The pointer is
+     * immediately followed by an int containing the array length in bytes.
+     */
+    AV_OPT_TYPE_BINARY,
+    /**
+     * Underlying C type is AVDictionary*.
+     */
     AV_OPT_TYPE_DICT,
+    /**
+     * Underlying C type is uint64_t.
+     */
     AV_OPT_TYPE_UINT64,
+    /**
+     * Special option type for declaring named constants. Does not correspond to
+     * an actual field in the object, offset must be 0.
+     */
     AV_OPT_TYPE_CONST,
-    AV_OPT_TYPE_IMAGE_SIZE, ///< offset must point to two consecutive ints
+    /**
+     * Underlying C type is two consecutive integers.
+     */
+    AV_OPT_TYPE_IMAGE_SIZE,
+    /**
+     * Underlying C type is enum AVPixelFormat.
+     */
     AV_OPT_TYPE_PIXEL_FMT,
+    /**
+     * Underlying C type is enum AVSampleFormat.
+     */
     AV_OPT_TYPE_SAMPLE_FMT,
-    AV_OPT_TYPE_VIDEO_RATE, ///< offset must point to AVRational
+    /**
+     * Underlying C type is AVRational.
+     */
+    AV_OPT_TYPE_VIDEO_RATE,
+    /**
+     * Underlying C type is int64_t.
+     */
     AV_OPT_TYPE_DURATION,
+    /**
+     * Underlying C type is uint8_t[4].
+     */
     AV_OPT_TYPE_COLOR,
+    /**
+     * Underlying C type is int.
+     */
     AV_OPT_TYPE_BOOL,
+    /**
+     * Underlying C type is AVChannelLayout.
+     */
     AV_OPT_TYPE_CHLAYOUT,
+    /**
+     * Underlying C type is unsigned int.
+     */
     AV_OPT_TYPE_UINT,
 
     /**
@@ -872,6 +944,46 @@ int av_opt_get_chlayout(void *obj, const char *name, int search_flags, AVChannel
  * be freed with av_dict_free() by the caller
  */
 int av_opt_get_dict_val(void *obj, const char *name, int search_flags, AVDictionary **out_val);
+
+/**
+ * For an array-type option, get the number of elements in the array.
+ */
+int av_opt_get_array_size(void *obj, const char *name, int search_flags,
+                          unsigned int *out_val);
+
+/**
+ * For an array-type option, retrieve the values of one or more array elements.
+ *
+ * @param start_elem index of the first array element to retrieve
+ * @param nb_elems number of array elements to retrieve; start_elem+nb_elems
+ *                 must not be larger than array size as returned by
+ *                 av_opt_get_array_size()
+ *
+ * @param out_type Option type corresponding to the desired output.
+ *
+ *                 The array elements produced by this function will
+ *                 will be as if av_opt_getX() was called for each element,
+ *                 where X is specified by out_type. E.g. AV_OPT_TYPE_STRING
+ *                 corresponds to av_opt_get().
+ *
+ *                 Typically this should be the same as the scalarized type of
+ *                 the AVOption being retrieved, but certain conversions are
+ *                 also possible - the same as those done by the corresponding
+ *                 av_opt_get*() function. E.g. any option type can be retrieved
+ *                 as a string, numeric types can be retrieved as int64, double,
+ *                 or rational, etc.
+ *
+ * @param out_val  Array with nb_elems members into which the output will be
+ *                 written. The array type must match the underlying C type as
+ *                 documented for out_type, and be zeroed on entry to this
+ *                 function.
+ *
+ *                 For dynamically allocated types (strings, binary, dicts,
+ *                 etc.), the result is owned and freed by the caller.
+ */
+int av_opt_get_array(void *obj, const char *name, int search_flags,
+                     unsigned int start_elem, unsigned int nb_elems,
+                     enum AVOptionType out_type, void *out_val);
 /**
  * @}
  */

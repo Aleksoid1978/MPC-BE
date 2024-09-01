@@ -13,7 +13,7 @@ MP4Splitter
 Различные исправления интерфейса.
 
 Обновлены библиотеки:
-	ffmpeg n7.1-dev-2293-g40dda881d6;
+	ffmpeg n7.1-dev-2357-gb5daaa1503;
 	vvdec v2.3.0-28-gf8ba8fd.
 
 
