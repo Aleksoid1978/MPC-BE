@@ -139,7 +139,7 @@ bool CAudioFile::SetMediaType(CMediaType& mt)
 	wfe->wBitsPerSample		= m_bitdepth;
 	wfe->nBlockAlign		= m_channels * m_bitdepth / 8;
 	wfe->nAvgBytesPerSec	= wfe->nSamplesPerSec * wfe->nBlockAlign;
-	wfe->cbSize				= m_extradata.Bytes();
+	wfe->cbSize				= static_cast<WORD>(m_extradata.Bytes());
 	memcpy(wfe + 1, m_extradata.Data(), m_extradata.Bytes());
 
 	if (!m_nAvgBytesPerSec) {
