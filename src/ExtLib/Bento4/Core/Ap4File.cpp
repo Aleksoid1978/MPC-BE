@@ -58,12 +58,18 @@ AP4_File::AP4_File(AP4_ByteStream& stream, bool bURL, AP4_AtomFactory& atom_fact
 {
     std::map<AP4_UI32, AP4_SidxAtom*> sidxAtoms;
     bool bBreak = false;
+    bool bFragmentsOnly = false;
     const ULONGLONG start = GetTickCount64();
     // get all atoms
     AP4_Atom* atom;
     while (!bBreak && AP4_SUCCEEDED(atom_factory.CreateAtomFromStream(stream, atom))) {
         switch (atom->GetType()) {
             case AP4_ATOM_TYPE_MOOV:
+                if (m_Movie) {
+                    bFragmentsOnly = true;
+                    delete atom;
+                    break;
+                }
                 m_Movie = new AP4_Movie(AP4_DYNAMIC_CAST(AP4_MoovAtom, atom),
                                         stream);
                 break;
@@ -83,8 +89,8 @@ AP4_File::AP4_File(AP4_ByteStream& stream, bool bURL, AP4_AtomFactory& atom_fact
                 break;
             case AP4_ATOM_TYPE_FTYP:
                 if (m_FileType) {
+                    bFragmentsOnly = true;
                     delete atom;
-                    bBreak = true;
                     break;
                 }
                 m_FileType = AP4_DYNAMIC_CAST(AP4_FtypAtom, atom);
@@ -115,16 +121,24 @@ AP4_File::AP4_File(AP4_ByteStream& stream, bool bURL, AP4_AtomFactory& atom_fact
                 }
                 break;
             default:
+                if (bFragmentsOnly) {
+                    delete atom;
+                    break;
+                }
                 m_OtherAtoms.Add(atom);
         }
     }
 
-    if (m_Movie && AP4_SUCCEEDED(m_Movie->SetSidxAtoms(sidxAtoms, stream))) {
+    if (!m_Movie) {
+        return;
+    }
+
+    if (!sidxAtoms.empty() && AP4_SUCCEEDED(m_Movie->SetSidxAtoms(sidxAtoms, stream))) {
         m_Movie->SwitchFirstMoof();
         return;
     }
 
-    if (m_Movie && m_Movie->HasFragments()) {
+    if (m_Movie->HasFragments()) {
         for (AP4_List<AP4_Track>::Item* item = m_Movie->GetTracks().FirstItem();
                 item;
                 item = item->GetNext()) {

@@ -1,6 +1,6 @@
 /*****************************************************************
 |
-|    AP4 - Movie 
+|    AP4 - Movie
 |
 |    Copyright 2002-2005 Gilles Boccon-Gibod
 |
@@ -71,7 +71,7 @@ public:
     const AP4_Array<AP4_IndexTableEntry>& GetFragmentsIndexEntries();
 
     void         ProcessMoof(AP4_ContainerAtom* moof, AP4_ByteStream& stream, AP4_Offset offset, AP4_Duration dts = 0, bool bClearSampleTable = false);
-    AP4_Result   SetSidxAtoms(std::map<AP4_UI32, AP4_SidxAtom*> sidxAtoms, AP4_ByteStream& stream);
+    AP4_Result   SetSidxAtoms(const std::map<AP4_UI32, AP4_SidxAtom*>& sidxAtoms, AP4_ByteStream& stream);
 
     AP4_Result   SelectMoof(const REFERENCE_TIME rt);
     AP4_Result   SwitchMoof(AP4_UI32 id, AP4_Cardinal index, AP4_UI64 offset, AP4_UI64 size, AP4_Duration dts);
@@ -94,6 +94,7 @@ private:
 
     AP4_ByteStream*                   m_Stream;
     std::map<AP4_UI32, fragmentsData> m_fragmentsDataEntries;
+    fragmentsData* GetFragmentsData(AP4_UI32 index);
 };
 
 #endif // _AP4_MOVIE_H_

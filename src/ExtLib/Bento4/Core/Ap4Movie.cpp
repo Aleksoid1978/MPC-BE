@@ -62,7 +62,7 @@ private:
 class AP4_TrackFinderByType : public AP4_List<AP4_Track>::Item::Finder
 {
 public:
-    AP4_TrackFinderByType(AP4_Track::Type type, AP4_Ordinal index = 0) : 
+    AP4_TrackFinderByType(AP4_Track::Type type, AP4_Ordinal index = 0) :
       m_Type(type), m_Index(index) {}
     AP4_Result Test(AP4_Track* track) const {
         if (track->GetType() == m_Type && m_Index-- == 0) {
@@ -83,9 +83,9 @@ AP4_Movie::AP4_Movie(AP4_UI32 time_scale) :
     m_Stream(NULL)
 {
     m_MoovAtom = new AP4_MoovAtom();
-    m_MvhdAtom = new AP4_MvhdAtom(0, 0, 
-                                  time_scale, 
-                                  0, 
+    m_MvhdAtom = new AP4_MvhdAtom(0, 0,
+                                  time_scale,
+                                  0,
                                   0x00010000,
                                   0x0100);
     m_MoovAtom->AddChild(m_MvhdAtom);
@@ -115,7 +115,7 @@ AP4_Movie::AP4_Movie(AP4_MoovAtom* moov, AP4_ByteStream& mdat) :
     trak_atoms = &moov->GetTrakAtoms();
     AP4_List<AP4_TrakAtom>::Item* item = trak_atoms->FirstItem();
     while (item) {
-        AP4_Track* track = new AP4_Track(*item->GetData(), 
+        AP4_Track* track = new AP4_Track(*item->GetData(),
                                          mdat,
                                          time_scale);
         // small hack for tracks with the same numbers
@@ -132,7 +132,7 @@ AP4_Movie::AP4_Movie(AP4_MoovAtom* moov, AP4_ByteStream& mdat) :
         item = item->GetNext();
     }
 }
-    
+
 /*----------------------------------------------------------------------
 |       AP4_Movie::~AP4_Movie
 +---------------------------------------------------------------------*/
@@ -141,7 +141,7 @@ AP4_Movie::~AP4_Movie()
     m_Tracks.DeleteReferences();
     delete m_MoovAtom;
 
-    for (auto [id, fragmentsData] : m_fragmentsDataEntries) {
+    for (auto& [id, fragmentsData] : m_fragmentsDataEntries) {
         auto& moof = fragmentsData.MoofAtomEntries;
         for (AP4_Cardinal i = 0; i < moof.ItemCount(); i++) {
             if (moof[i]) {
@@ -214,7 +214,7 @@ AP4_Movie::AddTrack(AP4_Track* track)
     if (m_MvhdAtom->GetDuration() < track->GetDuration()) {
         m_MvhdAtom->SetDuration(track->GetDuration());
     }
-    
+
     // attach the track as a child
     m_MoovAtom->AddChild(track->GetTrakAtom());
     m_Tracks.Add(track);
@@ -283,7 +283,9 @@ AP4_Movie::GetFragmentsDuration()
 {
     if (!m_fragmentsDataEntries.empty()) {
         const auto id = m_Tracks.FirstItem()->GetData()->GetId();
-        return m_fragmentsDataEntries[id].SidxAtom->GetDuration();
+        if (auto fragmentsData = GetFragmentsData(id)) {
+            return fragmentsData->SidxAtom->GetDuration();
+        }
     }
     return 0;
 }
@@ -296,8 +298,10 @@ AP4_Movie::GetFragmentsDurationMs()
 {
     if (!m_fragmentsDataEntries.empty()) {
         const auto id = m_Tracks.FirstItem()->GetData()->GetId();
-        const auto& sidx = m_fragmentsDataEntries[id].SidxAtom;
-        return AP4_ConvertTime(sidx->GetDuration(), sidx->GetTimeScale(), 1000);
+        if (auto fragmentsData = GetFragmentsData(id)) {
+            const auto sidx = fragmentsData->SidxAtom;
+            return AP4_ConvertTime(sidx->GetDuration(), sidx->GetTimeScale(), 1000);
+        }
     }
     return 0;
 }
@@ -310,7 +314,9 @@ AP4_Movie::HasFragmentsIndex()
 {
     if (!m_fragmentsDataEntries.empty()) {
         const auto id = m_Tracks.FirstItem()->GetData()->GetId();
-        return m_fragmentsDataEntries[id].FragmentsIndexEntries.ItemCount() > 0;
+        if (auto fragmentsData = GetFragmentsData(id)) {
+            return fragmentsData->FragmentsIndexEntries.ItemCount() > 0;
+        }
     }
 
     return false;
@@ -424,15 +430,15 @@ AP4_Movie::ProcessMoof(AP4_ContainerAtom* moof, AP4_ByteStream& stream, AP4_Offs
 |   AP4_Movie::SetSidxAtom
 +---------------------------------------------------------------------*/
 AP4_Result
-AP4_Movie::SetSidxAtoms(std::map<AP4_UI32, AP4_SidxAtom*> sidxAtoms, AP4_ByteStream& stream)
+AP4_Movie::SetSidxAtoms(const std::map<AP4_UI32, AP4_SidxAtom*>& sidxAtoms, AP4_ByteStream& stream)
 {
-    if (!m_fragmentsDataEntries.empty() || sidxAtoms.empty()) {
+    if (!m_fragmentsDataEntries.empty()) {
         return AP4_FAILURE;
     }
 
     m_Stream = &stream;
     m_Stream->AddReference();
- 
+
     for (const auto[id, sidx] : sidxAtoms) {
         auto& fragmentsData = m_fragmentsDataEntries[id];
         fragmentsData.SidxAtom = sidx;
@@ -553,8 +559,9 @@ AP4_Movie::SwitchMoof(AP4_UI32 id, AP4_Cardinal index, AP4_UI64 offset, AP4_UI64
                             }
                             delete next_atom;
                         }
+                    } else {
+                        delete next_atom;
                     }
-                    delete next_atom;
                 }
                 break;
             }
@@ -622,4 +629,14 @@ AP4_Movie::SwitchFirstMoof()
     }
 
     return AP4_FAILURE;
+}
+
+AP4_Movie::fragmentsData*
+AP4_Movie::GetFragmentsData(AP4_UI32 index)
+{
+    if (auto it = m_fragmentsDataEntries.find(index); it != m_fragmentsDataEntries.end()) {
+        return &it->second;
+    }
+
+    return nullptr;
 }
