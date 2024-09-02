@@ -89,7 +89,11 @@ AP4_File::AP4_File(AP4_ByteStream& stream, bool bURL, AP4_AtomFactory& atom_fact
                 break;
             case AP4_ATOM_TYPE_FTYP:
                 if (m_FileType) {
-                    bFragmentsOnly = true;
+                    if (m_Movie && m_Movie->HasFragments()) {
+                        bFragmentsOnly = true;
+                    } else {
+                        bBreak = true;
+                    }
                     delete atom;
                     break;
                 }
