@@ -11312,14 +11312,17 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 			m_wndView.GetClientRect(&rWnd);
 		}
 
+		const int wnd_w = rWnd.Width();
+		const int wnd_h = rWnd.Height();
+
 		OAFilterState fs = GetMediaState();
 		if (fs != State_Stopped || bForcedSetVideoRect || (fs == State_Stopped && m_bShockwaveGraph)) {
 			const CSize szVideo = GetVideoSize();
 
-			double w = rWnd.Width();
-			double h = rWnd.Height();
-			const long wy = rWnd.Width() * szVideo.cy;
-			const long hx = rWnd.Height() * szVideo.cx;
+			double w = wnd_w;
+			double h = wnd_h;
+			const long wy = wnd_w * szVideo.cy;
+			const long hx = wnd_h * szVideo.cx;
 
 			switch (m_iVideoSize) {
 			case DVS_HALF:
@@ -11387,16 +11390,18 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 				break;
 			}
 
-			w *= m_ZoomX;
-			h *= m_ZoomY;
+			const double shift2X = wnd_w * (m_PosX * 2 - 1);
+			const double shift2Y = wnd_h * (m_PosY * 2 - 1);
 
-			const double dLeft = rWnd.Width()  * m_PosX - w / 2;
-			const double dTop  = rWnd.Height() * m_PosY - h / 2;
+			const double dLeft   = ((shift2X - w) * m_ZoomX + wnd_w) / 2;
+			const double dTop    = ((shift2Y - h) * m_ZoomY + wnd_h) / 2;
+			const double dRight  = ((shift2X + w) * m_ZoomX + wnd_w) / 2;
+			const double dBottom = ((shift2Y + h) * m_ZoomY + wnd_h) / 2;
 
 			rVid.left   = std::round(dLeft);
 			rVid.top    = std::round(dTop);
-			rVid.right  = std::round(rVid.left + w);
-			rVid.bottom = std::round(rVid.top  + h);
+			rVid.right  = std::round(dRight);
+			rVid.bottom = std::round(dBottom);
 		}
 
 		if (m_pCAP) {
@@ -11405,7 +11410,7 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 			HRESULT hr;
 			hr = m_pBV->SetDefaultSourcePosition();
 			hr = m_pBV->SetDestinationPosition(rVid.left, rVid.top, rVid.Width(), rVid.Height());
-			hr = m_pVW->SetWindowPosition(rWnd.left, rWnd.top, rWnd.Width(), rWnd.Height());
+			hr = m_pVW->SetWindowPosition(rWnd.left, rWnd.top, wnd_w, wnd_h);
 
 			if (m_pMFVDC) {
 				m_pMFVDC->SetVideoPosition(nullptr, rWnd);
