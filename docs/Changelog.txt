@@ -4,12 +4,21 @@
 =============================
 MP4Splitter
 Fixed reading of some metadata.
+Improved MP4-DASH support.
+
+AudioSwitcher
+Added the ability to connect to "AVI/WAV File Source" when it gives an incorrect media subtype for audio with parameters written in WAVEFORMATEXTENSIBLE. This solves the problem with sound in AviSynth+ and VapourSynth scripts.
+
+MPPVideoDec
+Improved hardware decoding compatibility check.
+Fixed crash when changing resolution in video stream.
 
 Subtitles
 Improved placement of PGS subtitles for cropped videos.
 
 Player
 Fixed display of static DVD-Video menu when minimizing/maximizing the player window.
+Fixed video frame zooming.
 Various interface fixes.
 
 Updated libraries:
