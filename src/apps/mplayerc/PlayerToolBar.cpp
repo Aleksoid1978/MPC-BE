@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -367,7 +367,7 @@ void CPlayerToolBar::SwitchTheme()
 
 	OAFilterState fs = m_pMainFrame->GetMediaState();
 
-	TBBUTTONINFO bi;
+	TBBUTTONINFOW bi;
 	bi.cbSize = sizeof(bi);
 	bi.dwMask = TBIF_IMAGE;
 
@@ -410,7 +410,7 @@ BOOL CPlayerToolBar::PreCreateWindow(CREATESTRUCT& cs)
 
 void CPlayerToolBar::SetMute(bool fMute)
 {
-	TBBUTTONINFO bi;
+	TBBUTTONINFOW bi;
 	bi.cbSize = sizeof(bi);
 	bi.dwMask = TBIF_IMAGE;
 	bi.iImage = fMute ? 13 : 12;
@@ -422,7 +422,7 @@ void CPlayerToolBar::SetMute(bool fMute)
 
 bool CPlayerToolBar::IsMuted()
 {
-	TBBUTTONINFO bi;
+	TBBUTTONINFOW bi;
 	bi.cbSize = sizeof(bi);
 	bi.dwMask = TBIF_IMAGE;
 
@@ -827,7 +827,7 @@ BOOL CPlayerToolBar::OnPlay(UINT nID)
 	OAFilterState fs	= m_pMainFrame->GetMediaState();
 	CToolBarCtrl& tb	= GetToolBarCtrl();
 
-	TBBUTTONINFO bi;
+	TBBUTTONINFOW bi;
 	bi.cbSize = sizeof(bi);
 	bi.dwMask = TBIF_IMAGE;
 
@@ -846,7 +846,7 @@ BOOL CPlayerToolBar::OnPlay(UINT nID)
 
 BOOL CPlayerToolBar::OnStop(UINT nID)
 {
-	TBBUTTONINFO bi;
+	TBBUTTONINFOW bi;
 	bi.cbSize = sizeof(bi);
 	bi.dwMask = TBIF_IMAGE;
 	bi.iImage = 0;
@@ -860,7 +860,7 @@ BOOL CPlayerToolBar::OnPause(UINT nID)
 {
 	OAFilterState fs = m_pMainFrame->GetMediaState();
 
-	TBBUTTONINFO bi;
+	TBBUTTONINFOW bi;
 	bi.cbSize = sizeof(bi);
 	bi.dwMask = TBIF_IMAGE;
 	bi.iImage = (fs == State_Paused) ? 1 : 0;
