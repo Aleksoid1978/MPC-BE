@@ -67,6 +67,7 @@ OBJ_DIRS = $(OBJ_DIR) \
 	$(OBJ_DIR)libavcodec \
 	$(OBJ_DIR)libavcodec/bsf \
 	$(OBJ_DIR)libavcodec/aac \
+	$(OBJ_DIR)libavcodec/opus \
 	$(OBJ_DIR)libavcodec/hevc \
 	$(OBJ_DIR)libavcodec/vvc \
 	$(OBJ_DIR)libavcodec/x86 \
@@ -439,16 +440,6 @@ SRCS_LC_B = \
 	libavcodec/nvdec_vc1.c \
 	libavcodec/nvdec_vp9.c \
 	libavcodec/options.c \
-	libavcodec/opus_celt.c \
-	libavcodec/opus_parse.c \
-	libavcodec/opus_parser.c \
-	libavcodec/opus_pvq.c \
-	libavcodec/opus_rc.c \
-	libavcodec/opus_silk.c \
-	libavcodec/opusdec.c \
-	libavcodec/opusdec_celt.c \
-	libavcodec/opusdsp.c \
-	libavcodec/opustab.c \
 	libavcodec/packet.c \
 	libavcodec/parser.c \
 	libavcodec/parsers.c \
@@ -587,6 +578,20 @@ SRCS_LC_B = \
 	libavcodec/xiph.c \
 	libavcodec/xvididct.c \
 	libavcodec/zlib_wrapper.c \
+	\
+	libavcodec/opus/celt.c \
+	libavcodec/opus/dec.c \
+	libavcodec/opus/dec_celt.c \
+	libavcodec/opus/dsp.c \
+	libavcodec/opus/parse.c \
+	libavcodec/opus/parser.c \
+	libavcodec/opus/pvq.c \
+	libavcodec/opus/rc.c \
+	libavcodec/opus/silk.c \
+	libavcodec/opus/dec.c \
+	libavcodec/opus/dec_celt.c \
+	libavcodec/opus/dsp.c \
+	libavcodec/opus/tab.c \
 	\
 	libavcodec/vvc/dec.c \
 	libavcodec/vvc/dsp.c \

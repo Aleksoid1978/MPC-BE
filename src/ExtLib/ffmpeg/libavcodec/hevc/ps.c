@@ -29,6 +29,7 @@
 #include "h2645_vui.h"
 #include "data.h"
 #include "ps.h"
+#include "profiles.h"
 #include "refstruct.h"
 
 static const uint8_t default_scaling_list_intra[] = {
@@ -65,15 +66,11 @@ static void remove_sps(HEVCParamSets *s, int id)
 {
     int i;
     if (s->sps_list[id]) {
-        if (s->sps == s->sps_list[id])
-            s->sps = NULL;
-
         /* drop all PPS that depend on this SPS */
         for (i = 0; i < FF_ARRAY_ELEMS(s->pps_list); i++)
             if (s->pps_list[i] && s->pps_list[i]->sps_id == id)
                 ff_refstruct_unref(&s->pps_list[i]);
 
-        av_assert0(!(s->sps_list[id] && s->sps == s->sps_list[id]));
         ff_refstruct_unref(&s->sps_list[id]);
     }
 }
@@ -82,9 +79,6 @@ static void remove_vps(HEVCParamSets *s, int id)
 {
     int i;
     if (s->vps_list[id]) {
-        if (s->vps == s->vps_list[id])
-            s->vps = NULL;
-
         for (i = 0; i < FF_ARRAY_ELEMS(s->sps_list); i++)
             if (s->sps_list[i] && s->sps_list[i]->vps_id == id)
                 remove_sps(s, i);
@@ -244,6 +238,7 @@ int ff_hevc_decode_short_term_rps(GetBitContext *gb, AVCodecContext *avctx,
 static int decode_profile_tier_level(GetBitContext *gb, AVCodecContext *avctx,
                                       PTLCommon *ptl)
 {
+    const char *profile_name = NULL;
     int i;
 
     if (get_bits_left(gb) < 2+1+5 + 32 + 4 + 43 + 1)
@@ -252,18 +247,16 @@ static int decode_profile_tier_level(GetBitContext *gb, AVCodecContext *avctx,
     ptl->profile_space = get_bits(gb, 2);
     ptl->tier_flag     = get_bits1(gb);
     ptl->profile_idc   = get_bits(gb, 5);
-    if (ptl->profile_idc == AV_PROFILE_HEVC_MAIN)
-        av_log(avctx, AV_LOG_DEBUG, "Main profile bitstream\n");
-    else if (ptl->profile_idc == AV_PROFILE_HEVC_MAIN_10)
-        av_log(avctx, AV_LOG_DEBUG, "Main 10 profile bitstream\n");
-    else if (ptl->profile_idc == AV_PROFILE_HEVC_MAIN_STILL_PICTURE)
-        av_log(avctx, AV_LOG_DEBUG, "Main Still Picture profile bitstream\n");
-    else if (ptl->profile_idc == AV_PROFILE_HEVC_REXT)
-        av_log(avctx, AV_LOG_DEBUG, "Range Extension profile bitstream\n");
-    else if (ptl->profile_idc == AV_PROFILE_HEVC_SCC)
-        av_log(avctx, AV_LOG_DEBUG, "Screen Content Coding Extension profile bitstream\n");
-    else
-        av_log(avctx, AV_LOG_WARNING, "Unknown HEVC profile: %d\n", ptl->profile_idc);
+
+#if !CONFIG_SMALL
+    for (int i = 0; ff_hevc_profiles[i].profile != AV_PROFILE_UNKNOWN; i++)
+        if (ff_hevc_profiles[i].profile == ptl->profile_idc) {
+            profile_name = ff_hevc_profiles[i].name;
+            break;
+        }
+#endif
+    av_log(avctx, profile_name ? AV_LOG_DEBUG : AV_LOG_WARNING,
+           "%s profile bitstream\n", profile_name ? profile_name : "Unknown");
 
     for (i = 0; i < 32; i++) {
         ptl->profile_compatibility_flag[i] = get_bits1(gb);
@@ -2050,9 +2043,6 @@ void ff_hevc_ps_uninit(HEVCParamSets *ps)
         ff_refstruct_unref(&ps->sps_list[i]);
     for (i = 0; i < FF_ARRAY_ELEMS(ps->pps_list); i++)
         ff_refstruct_unref(&ps->pps_list[i]);
-
-    ps->sps = NULL;
-    ps->vps = NULL;
 }
 
 int ff_hevc_compute_poc(const HEVCSPS *sps, int pocTid0, int poc_lsb, int nal_unit_type)

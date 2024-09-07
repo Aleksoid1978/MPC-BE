@@ -570,16 +570,15 @@ int ff_hevc_cu_transquant_bypass_flag_decode(HEVCLocalContext *lc)
     return GET_CABAC(CU_TRANSQUANT_BYPASS_FLAG_OFFSET);
 }
 
-int ff_hevc_skip_flag_decode(HEVCLocalContext *lc, int x0, int y0,
-                             int x_cb, int y_cb, int min_cb_width)
+int ff_hevc_skip_flag_decode(HEVCLocalContext *lc, uint8_t *skip_flag,
+                             int x0, int y0, int x_cb, int y_cb, int min_cb_width)
 {
-    const HEVCContext *const s = lc->parent;
     int inc = 0;
 
     if (lc->ctb_left_flag || x0)
-        inc = !!SAMPLE_CTB(s->skip_flag, x_cb - 1, y_cb);
+        inc = !!SAMPLE_CTB(skip_flag, x_cb - 1, y_cb);
     if (lc->ctb_up_flag || y0)
-        inc += !!SAMPLE_CTB(s->skip_flag, x_cb, y_cb - 1);
+        inc += !!SAMPLE_CTB(skip_flag, x_cb, y_cb - 1);
 
     return GET_CABAC(SKIP_FLAG_OFFSET + inc);
 }
@@ -637,10 +636,10 @@ int ff_hevc_pred_mode_decode(HEVCLocalContext *lc)
     return GET_CABAC(PRED_MODE_FLAG_OFFSET);
 }
 
-int ff_hevc_split_coding_unit_flag_decode(HEVCLocalContext *lc, const HEVCSPS *sps,
+int ff_hevc_split_coding_unit_flag_decode(HEVCLocalContext *lc, uint8_t *tab_ct_depth,
+                                          const HEVCSPS *sps,
                                           int ct_depth, int x0, int y0)
 {
-    const HEVCContext *const s = lc->parent;
     int inc = 0, depth_left = 0, depth_top = 0;
     int x0b  = av_zero_extend(x0, sps->log2_ctb_size);
     int y0b  = av_zero_extend(y0, sps->log2_ctb_size);
@@ -648,9 +647,9 @@ int ff_hevc_split_coding_unit_flag_decode(HEVCLocalContext *lc, const HEVCSPS *s
     int y_cb = y0 >> sps->log2_min_cb_size;
 
     if (lc->ctb_left_flag || x0b)
-        depth_left = s->tab_ct_depth[(y_cb)     * sps->min_cb_width + x_cb - 1];
+        depth_left = tab_ct_depth[(y_cb)     * sps->min_cb_width + x_cb - 1];
     if (lc->ctb_up_flag || y0b)
-        depth_top  = s->tab_ct_depth[(y_cb - 1) * sps->min_cb_width + x_cb];
+        depth_top  = tab_ct_depth[(y_cb - 1) * sps->min_cb_width + x_cb];
 
     inc += (depth_left > ct_depth);
     inc += (depth_top  > ct_depth);
