@@ -28,6 +28,7 @@
 #include <moreuuids.h>
 #include "MpegSplitter.h"
 #include <basestruct.h>
+#include "DSUtil/FileHandle.h"
 
 #include "filters/reader/VTSReader/VTSReader.h"
 #include "apps/mplayerc/SettingsDefines.h"
@@ -703,8 +704,7 @@ void CMpegSplitterFilter::ReadClipInfo(LPCOLESTR pszFileName)
 
 STDMETHODIMP CMpegSplitterFilter::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt)
 {
-	CPath path(pszFileName);
-	const CString ext = path.GetExtension().MakeLower();
+	const CStringW ext = GetFileExt(pszFileName).MakeLower();
 
 	if (ext == L".iso" || ext == L".mdf") { // ignore the disk images without signature
 		return E_ABORT;

@@ -2133,7 +2133,7 @@ int CAppSettings::GetMultiInst()
 
 engine_t CAppSettings::GetFileEngine(CString path)
 {
-	CString ext = CPath(path).GetExtension().MakeLower();
+	CStringW ext = GetFileExt(path).MakeLower();
 
 	if (!ext.IsEmpty()) {
 		for (auto& mfc : m_Formats) {

@@ -26,7 +26,7 @@
 #include <moreuuids.h>
 #include "DTSAC3Source.h"
 #include "DSUtil/AudioParser.h"
-#include <atlpath.h>
+#include "DSUtil/FileHandle.h"
 #include <stdint.h>
 #include <mpc_defines.h>
 #include "DSUtil/MediaDescription.h"
@@ -196,7 +196,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			break;
 		}
 
-		const CString ext = CPath(m_file.GetFileName()).GetExtension().MakeLower();
+		const CStringW ext = GetFileExt(m_file.GetFileName()).MakeLower();
 
 		m_file.Seek(0, CFile::begin);
 		m_dataStart = 0;

@@ -316,8 +316,7 @@ void CWebServer::OnClose(CWebClientSocket* pClient)
 
 void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& body)
 {
-	CPath p(pClient->m_path);
-	CStringA ext(p.GetExtension().MakeLower());
+	CStringA ext(GetFileExt(pClient->m_path).MakeLower());
 	CStringA mime;
 	if (ext.IsEmpty()) {
 		mime = "text/html";
@@ -524,7 +523,7 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 	if (!ToLocalPath(path, redir)) {
 		return false;
 	}
-	CString ext = CPath(path).GetExtension().MakeLower();
+	CStringW ext = GetFileExt(path).MakeLower();
 	CPath dir(path);
 	dir.RemoveFileSpec();
 

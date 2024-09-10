@@ -61,7 +61,7 @@ CSaveTaskDlg::CSaveTaskDlg(const std::list<SaveItem_t>& saveItems, const CString
 
 	SetLangDefault("en");
 
-	const CStringW finalext = CPathW(dstPath).GetExtension().MakeLower();
+	const CStringW finalext = GetFileExt(dstPath).MakeLower();
 
 	m_dstPaths.resize(m_saveItems.size());
 	m_dstPaths[0] = dstPath;
@@ -386,8 +386,8 @@ void CSaveTaskDlg::SaveHTTP(const int iSubLangDefault)
 	if (m_saveItems.size() >= 2 && m_ffmpegPath.GetLength()) {
 		m_iProgress = PROGRESS_MERGING;
 
-		const CPathW finalfile(m_dstPaths.front());
-		const CStringW finalext = finalfile.GetExtension().Mid(1).MakeLower();
+		const CStringW finalfile(m_dstPaths.front());
+		const CStringW finalext = GetFileExt(finalfile).Mid(1).MakeLower();
 		const CStringW tmpfile  = finalfile + L".tmp";
 		const CStringW format =
 			(finalext == L"m4a") ? CStringW(L"mp4") :
