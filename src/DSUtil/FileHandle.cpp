@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2023 see Authors.txt
+ * (C) 2011-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -87,15 +87,25 @@ CStringW GetFileExt(LPCWSTR Path)
 	return ext;
 }
 
+
+void RenameFileExt(CStringW& Path, LPCWSTR newExt)
+{
+	LPCWSTR ext = ::PathFindExtensionW(Path.GetString());
+	const int len = (int)(ext - Path.GetString());
+	Path.Truncate(len);
+	Path.Append(newExt);
+}
+
 //
 // Exchanges one file extension for another and returns the new fiel path
 //
-CStringW RenameFileExt(LPCWSTR Path, LPCWSTR Ext)
+CStringW GetRenameFileExt(LPCWSTR Path, LPCWSTR newExt)
 {
-	CStringW cs = Path;
-	::PathRenameExtensionW(cs.GetBuffer(MAX_PATH), Ext);
-	cs.ReleaseBuffer(-1);
-	return cs;
+	LPCWSTR ext = ::PathFindExtensionW(Path);
+	const int len = (int)(ext - Path);
+	CStringW newPath(Path, len);
+	newPath.Append(newExt);
+	return newPath;
 }
 
 //

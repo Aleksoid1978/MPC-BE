@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2023 see Authors.txt
+ * (C) 2011-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,10 +24,13 @@ CStringW GetFileOnly(LPCWSTR Path);
 CStringW GetFolderOnly(LPCWSTR Path);
 CStringW AddSlash(LPCWSTR Path);
 CStringW RemoveSlash(LPCWSTR Path);
+
 CStringW GetFileExt(LPCWSTR Path);
-CStringW RenameFileExt(LPCWSTR Path, LPCWSTR Ext);
+void     RenameFileExt(CStringW& Path, LPCWSTR newExt);
+CStringW GetRenameFileExt(LPCWSTR Path, LPCWSTR newExt);
 CStringW RemoveFileExt(LPCWSTR Path);
 CStringW AddExtension(LPCWSTR Path, LPCWSTR Ext);
+
 BOOL     GetTemporaryFilePath(CStringW strExtension, CStringW& strFileName);
 CStringW CompactPath(LPCWSTR Path, UINT cchMax);
 

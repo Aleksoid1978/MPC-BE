@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2023 see Authors.txt
+ * (C) 2013-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -187,9 +187,8 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 #if(0)
 	// read cue file
-	CPath path = GetPartFilename(pAsyncReader);
-	path.RenameExtension(L".cue");
-	if (path.FileExists()) {
+	CStringW path = GetRenameFileExt(GetPartFilename(pAsyncReader), L".cue");
+	if (::PathFileExistsW(path)) {
 		CFile cuefile(path, CFile::modeRead|CFile::shareDenyNone);
 
 		if (cuefile.GetLength() <= 16384) {

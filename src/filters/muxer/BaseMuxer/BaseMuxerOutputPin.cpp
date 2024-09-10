@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,7 +23,7 @@
 #include "BaseMuxerOutputPin.h"
 
 #include <aviriff.h>
-#include <atlpath.h>
+#include "DSUtil/FileHandle.h"
 
 #include <wmcodecdsp.h>
 #include <moreuuids.h>
@@ -447,12 +447,11 @@ void CBaseMuxerRawOutputPin::MuxFooter(const CMediaType& mt)
 		if (CComQIPtr<IFileSinkFilter> pFSF = GetFilterFromPin(GetConnected())) {
 			WCHAR* fn = nullptr;
 			if (SUCCEEDED(pFSF->GetCurFile(&fn, nullptr))) {
-				CPathW p(fn);
-				p.RenameExtension(L".idx");
+				const CStringW path = GetRenameFileExt(fn, L".idx");
 				CoTaskMemFree(fn);
 
 				FILE* f;
-				if (!_wfopen_s(&f, CString((LPCWSTR)p), L"w")) {
+				if (!_wfopen_s(&f, path, L"w")) {
 					SUBTITLEINFO* si = (SUBTITLEINFO*)mt.Format();
 
 					fwprintf_s(f, L"%s\n", L"# VobSub index file, v7 (do not modify this line!)");

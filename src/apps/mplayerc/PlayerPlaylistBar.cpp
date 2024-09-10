@@ -466,7 +466,7 @@ void CPlaylistItem::AutoLoadFiles()
 	}
 
 	// cue-sheet file auto-load
-	const CString cuefn = RenameFileExt(fpath, L".cue");
+	const CString cuefn = GetRenameFileExt(fpath, L".cue");
 	if (::PathFileExistsW(cuefn)) {
 		CStringW filter;
 		std::vector<CStringW> mask;

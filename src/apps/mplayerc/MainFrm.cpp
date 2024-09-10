@@ -6007,9 +6007,9 @@ void CMainFrame::OnFileSaveAs()
 			ext = GetFileExt(out).MakeLower();
 			out = GetFileOnly(out);
 			if (ext == L".cda") {
-				out = RenameFileExt(out, L".wav");
+				RenameFileExt(out, L".wav");
 			} else if (ext == L".ifo") {
-				out = RenameFileExt(out, L".vob");
+				RenameFileExt(out, L".vob");
 			}
 		} else {
 			CString fname = L"streaming_saved";
@@ -6572,9 +6572,9 @@ void CMainFrame::OnFileSaveImage()
 	s.iThumbLevelPNG     = std::clamp(fd.m_PngCompression, 1, 9);
 	s.bSnapShotSubtitles = fd.m_bDrawSubtitles;
 
-	CString pdst = fd.GetPathName();
+	CStringW pdst = fd.GetPathName();
 	if (GetFileExt(pdst).MakeLower() != s.strSnapShotExt) {
-		pdst = RenameFileExt(pdst, s.strSnapShotExt);
+		RenameFileExt(pdst, s.strSnapShotExt);
 	}
 
 	s.strSnapShotPath = GetFolderOnly(pdst);
@@ -6668,9 +6668,9 @@ void CMainFrame::OnFileSaveThumbnails()
 	s.iThumbLevelPNG     = std::clamp(fd.m_PngCompression, 1, 9);
 	s.bSnapShotSubtitles = fd.m_bDrawSubtitles;
 
-	CString pdst = fd.GetPathName();
+	CStringW pdst = fd.GetPathName();
 	if (GetFileExt(pdst).MakeLower() != s.strSnapShotExt) {
-		pdst = RenameFileExt(pdst, s.strSnapShotExt);
+		RenameFileExt(pdst, s.strSnapShotExt);
 	}
 
 	s.strSnapShotPath = GetFolderOnly(pdst);

@@ -30,10 +30,8 @@
 
 CStringW GetIniProgramDir()
 {
-	CStringW path = GetModulePath(nullptr);
-	::PathRenameExtensionW(path.GetBuffer(MAX_PATH), L".ini");
-	path.ReleaseBuffer();
-
+	CStringW path = GetRenameFileExt(GetModulePath(nullptr), L".ini");
+	
 	return path;
 }
 
