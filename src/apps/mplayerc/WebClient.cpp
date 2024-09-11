@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -377,9 +377,9 @@ bool CWebClientSocket::OnInfo(CStringA& hdr, CStringA& body, CStringA& mime)
 
 	CString positionstring, durationstring, versionstring, sizestring;
 	versionstring.Format(L"%s", MPC_VERSION_WSTR);
-	CPath file(m_pMainFrame->m_wndPlaylistBar.GetCurFileName());
-	file.StripPath();
-	file.RemoveExtension();
+
+	CStringW file = GetFileOnly(m_pMainFrame->m_wndPlaylistBar.GetCurFileName());
+	RemoveFileExt(file);
 
 	positionstring.Format(L"%02d:%02d:%02d", (pos/3600000), (pos/60000)%60, (pos/1000)%60);
 	durationstring.Format(L"%02d:%02d:%02d", (dur/3600000), (dur/60000)%60, (dur/1000)%60);

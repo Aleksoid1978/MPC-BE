@@ -376,7 +376,7 @@ void CPlaylistItem::AutoLoadFiles()
 	}
 
 	auto curdir = GetFolderOnly(fpath);
-	auto name   = RemoveFileExt(GetFileOnly(fpath));
+	auto name   = GetRemoveFileExt(GetFileOnly(fpath));
 	auto ext    = GetFileExt(fpath);
 
 	CStringW BDLabel, empty;
@@ -4738,7 +4738,7 @@ void CPlayerPlaylistBar::TSaveSettings()
 		const auto last = m_tabs.size() - 1;
 		for (size_t i = 0; i <= last; i++) {
 			const auto& tab = m_tabs[i];
-			str.AppendFormat(L"%d;%s;%u%s%s", tab.type, RemoveFileExt(tab.mpcpl_fn.GetString()).GetString(), tab.sort, i > 0 ? CString(L";" + tab.name).GetString() : L"", i < last ? L"|" : L"");
+			str.AppendFormat(L"%d;%s;%u%s%s", tab.type, GetRemoveFileExt(tab.mpcpl_fn.GetString()).GetString(), tab.sort, i > 0 ? CString(L";" + tab.name).GetString() : L"", i < last ? L"|" : L"");
 		}
 	}
 

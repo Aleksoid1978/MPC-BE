@@ -25,10 +25,19 @@ CStringW GetFolderOnly(LPCWSTR Path);
 CStringW AddSlash(LPCWSTR Path);
 CStringW RemoveSlash(LPCWSTR Path);
 
+// gets the file extension with a dot. can also work for URLs
 CStringW GetFileExt(LPCWSTR Path);
+
+// removes file extension from path
+void     RemoveFileExt(CStringW& Path);
+// creates a new path without file extension
+CStringW GetRemoveFileExt(LPCWSTR Path);
+
+// replaces the extension of a file path
 void     RenameFileExt(CStringW& Path, LPCWSTR newExt);
+// creates a new path with a new file extension
 CStringW GetRenameFileExt(LPCWSTR Path, LPCWSTR newExt);
-CStringW RemoveFileExt(LPCWSTR Path);
+
 CStringW AddExtension(LPCWSTR Path, LPCWSTR Ext);
 
 BOOL     GetTemporaryFilePath(CStringW strExtension, CStringW& strFileName);

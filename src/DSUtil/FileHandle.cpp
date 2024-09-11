@@ -88,11 +88,29 @@ CStringW GetFileExt(LPCWSTR Path)
 }
 
 
-void RenameFileExt(CStringW& Path, LPCWSTR newExt)
+void RemoveFileExt(CStringW& Path)
 {
 	LPCWSTR ext = ::PathFindExtensionW(Path.GetString());
 	const int len = (int)(ext - Path.GetString());
 	Path.Truncate(len);
+}
+
+//
+// Removes the file name extension from a path, if one is present
+//
+CStringW GetRemoveFileExt(LPCWSTR Path)
+{
+	LPCWSTR ext = ::PathFindExtensionW(Path);
+	const int len = (int)(ext - Path);
+	CStringW newPath(Path, len);
+	return newPath;
+
+}
+
+
+void RenameFileExt(CStringW& Path, LPCWSTR newExt)
+{
+	RemoveFileExt(Path);
 	Path.Append(newExt);
 }
 
@@ -101,22 +119,9 @@ void RenameFileExt(CStringW& Path, LPCWSTR newExt)
 //
 CStringW GetRenameFileExt(LPCWSTR Path, LPCWSTR newExt)
 {
-	LPCWSTR ext = ::PathFindExtensionW(Path);
-	const int len = (int)(ext - Path);
-	CStringW newPath(Path, len);
+	CStringW newPath = GetRemoveFileExt(Path);
 	newPath.Append(newExt);
 	return newPath;
-}
-
-//
-// Removes the file name extension from a path, if one is present
-//
-CStringW RemoveFileExt(LPCWSTR Path)
-{
-	CStringW cs = Path;
-	::PathRemoveExtensionW(cs.GetBuffer(MAX_PATH));
-	cs.ReleaseBuffer(-1);
-	return cs;
 }
 
 CStringW AddExtension(LPCWSTR Path, LPCWSTR Ext)
