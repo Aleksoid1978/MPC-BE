@@ -1669,18 +1669,14 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(const CString& fn, const CTextFile::enc
 		if (pli.m_type == CPlaylistItem::file) {
 			CString fn = pli.m_fi.GetPath();
 			if (bRemovePath) {
-				CPath p(fn);
-				p.StripPath();
-				fn = (LPCWSTR)p;
+				fn = GetFileOnly(fn);
 			}
 			f.WriteString(idx + L",filename," + fn + L"\n");
 
 			for (const auto& ai : pli.m_auds) {
 				fn = ai.GetPath();
 				if (bRemovePath) {
-					CPath p(fn);
-					p.StripPath();
-					fn = (LPCWSTR)p;
+					fn = GetFileOnly(fn);
 				}
 				f.WriteString(idx + L",filename," + fn + L"\n");
 			}
@@ -1688,9 +1684,7 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(const CString& fn, const CTextFile::enc
 			for (const auto& si : pli.m_subs) {
 				fn = si.GetPath();
 				if (bRemovePath) {
-					CPath p(fn);
-					p.StripPath();
-					fn = (LPCWSTR)p;
+					fn = GetFileOnly(fn);
 				}
 				f.WriteString(idx + L",subtitle," + fn + L"\n");
 			}
@@ -3713,9 +3707,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 
 				bool fRemovePath = true;
 
-				CPath p(path);
-				p.RemoveFileSpec();
-				CString base = (LPCWSTR)p;
+				CStringW base = GetFolderOnly(path);
 
 				pos = curPlayList.GetHeadPosition();
 				while (pos && fRemovePath) {
@@ -3725,25 +3717,22 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 						fRemovePath = false;
 					} else {
 						{
-							CPathW p(pli.m_fi);
-							p.RemoveFileSpec();
-							if (base != p.m_strPath) {
+							CStringW fpath = GetFolderOnly(pli.m_fi);
+							if (base != fpath) {
 								fRemovePath = false;
 							}
 						}
 						auto it_a = pli.m_auds.begin();
 						while (it_a != pli.m_auds.end() && fRemovePath) {
-							CPathW p(*it_a++);
-							p.RemoveFileSpec();
-							if (base != p.m_strPath) {
+							CStringW apath = GetFolderOnly(*it_a++);
+							if (base != apath) {
 								fRemovePath = false;
 							}
 						}
 						auto it_s = pli.m_subs.begin();
 						while (it_s != pli.m_subs.end() && fRemovePath) {
-							CPathW p(*it_s++);
-							p.RemoveFileSpec();
-							if (base != p.m_strPath) {
+							CStringW spath = GetFolderOnly(*it_s++);
+							if (base != spath) {
 								fRemovePath = false;
 							}
 						}
@@ -3781,9 +3770,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 					CString fn = pli.m_fi;
 
 					//if (fRemovePath) {
-					//	CPath p(path);
-					//	p.StripPath();
-					//	fn = (LPCWSTR)p;
+					//	fn = GetFileOnly(fn);
 					//}
 
 					switch (idx) {

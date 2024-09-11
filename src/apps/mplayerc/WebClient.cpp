@@ -455,17 +455,13 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 				m_pMainFrame->SendMessageW(WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
 			}
 
-			CPath p(path);
-			p.RemoveFileSpec();
-			path = (LPCWSTR)p;
+			path = GetFolderOnly(path);
 		}
 	} else {
 		path = m_pMainFrame->m_wndPlaylistBar.GetCurFileName();
 
 		if (CFileGetStatus(path, fs) && !(fs.m_attribute&CFile::directory)) {
-			CPath p(path);
-			p.RemoveFileSpec();
-			path = (LPCWSTR)p;
+			path = GetFolderOnly(path);
 		}
 	}
 
@@ -585,9 +581,7 @@ bool CWebClientSocket::OnControls(CStringA& hdr, CStringA& body, CStringA& mime)
 	CString dir;
 
 	if (!path.IsEmpty()) {
-		CPath p(path);
-		p.RemoveFileSpec();
-		dir = (LPCWSTR)p;
+		dir = GetFolderOnly(path);
 	}
 
 	OAFilterState fs = m_pMainFrame->GetMediaState();
@@ -656,13 +650,8 @@ bool CWebClientSocket::OnVariables(CStringA& hdr, CStringA& body, CStringA& mime
 	CString sizestring;
 
 	if (!path.IsEmpty()) {
-		CPath p(path);
-		p.RemoveFileSpec();
-		dir = (LPCWSTR)p;
-
-		CPath p2(path);
-		p2.StripPath();
-		file = (LPCWSTR)p2;
+		dir = GetFolderOnly(path);
+		file = GetFileOnly(path);
 
 		WIN32_FIND_DATAW wfd;
 		HANDLE hFind = FindFirstFileW(path, &wfd);
@@ -776,9 +765,7 @@ bool CWebClientSocket::OnStatus(CStringA& hdr, CStringA& body, CStringA& mime)
 	/*
 	CString path = m_pMainFrame->m_wndPlaylistBar.GetCur(), dir;
 	if (!path.IsEmpty()) {
-		CPath p(path);
-		p.RemoveFileSpec();
-		dir = (LPCWSTR)p;
+		dir = GetFolderOnly(path);
 	}
 	path.Replace(L"'", L"\\'");
 	dir.Replace(L"'", L"\\'");

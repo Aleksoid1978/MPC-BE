@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -524,8 +524,7 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 		return false;
 	}
 	CStringW ext = GetFileExt(path).MakeLower();
-	CPath dir(path);
-	dir.RemoveFileSpec();
+	CStringW dir = GetFolderOnly(path);
 
 	CString cgi;
 	auto it = m_cgi.find(ext);

@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <atlpath.h>
 #include <ks.h>
 #include <ksmedia.h>
 #include <dmodshow.h>
@@ -970,9 +969,8 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 		if (palette.IsEmpty()) {
 			for (;;) {
 				if (::PathFileExistsW(fName)) {
-					CPath fname(fName);
-					fname.StripPath();
-					if (!CString(fname).Find(L"VTS_")) {
+					CStringW fname = GetFileOnly(fName);
+					if (!fname.Find(L"VTS_")) {
 						fName = fName.Left(fName.ReverseFind('.') + 1);
 						fName.TrimRight(L".0123456789") += L"0.ifo";
 

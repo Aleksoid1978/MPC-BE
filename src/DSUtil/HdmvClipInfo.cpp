@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +22,7 @@
 #include "HdmvClipInfo.h"
 #include "DSUtil.h"
 #include "GolombBuffer.h"
-#include <atlpath.h>
+#include "FileHandle.h"
 #include <sys\stat.h>
 #include <regex>
 
@@ -576,9 +576,8 @@ HRESULT CHdmvClipInfo::ReadPlaylist(const CString& strPlaylistFile, REFERENCE_TI
 		DLog(L"CHdmvClipInfo::ReadPlaylist() : '%s'", strPlaylistFile);
 
 		// Get BDMV folder
-		CPath Path(strPlaylistFile);
-		Path.RemoveFileSpec();
-		Path.RemoveFileSpec();
+		CStringW Path = GetFolderOnly(strPlaylistFile);
+		Path = GetFolderOnly(Path); // folder above
 
 		LONGLONG playlistPos = 0;
 		LONGLONG extPos = 0;
@@ -654,7 +653,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(const CString& strPlaylistFile, REFERENCE_TI
 								ReadBuffer(Buff, 9); // M2TS file name
 								if (!memcmp(&Buff[5], "M2TS", 4)) {
 									CString fileName;
-									fileName.Format(L"%s\\STREAM\\%c%c%c%c%c.M2TS", CString(Path), Buff[0], Buff[1], Buff[2], Buff[3], Buff[4]);
+									fileName.Format(L"%s\\STREAM\\%c%c%c%c%c.M2TS", Path, Buff[0], Buff[1], Buff[2], Buff[3], Buff[4]);
 									_ext_sub_path.extFileNames.emplace_back(fileName);
 								}
 
@@ -703,7 +702,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(const CString& strPlaylistFile, REFERENCE_TI
 			}
 
 			PlaylistItem Item;
-			Item.m_strFileName.Format(format, CString(Path), Buff[0], Buff[1], Buff[2], Buff[3], Buff[4]);
+			Item.m_strFileName.Format(format, Path, Buff[0], Buff[1], Buff[2], Buff[3], Buff[4]);
 			if (!::PathFileExistsW(Item.m_strFileName)) {
 				DLog(L"    ==> '%s' is missing, skip it", Item.m_strFileName);
 

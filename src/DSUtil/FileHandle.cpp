@@ -24,56 +24,52 @@
 #include "FileHandle.h"
 #include "text.h"
 
+// TODO:
+// Functions for working with file paths longer than MAX_PATH are implemented here.
+// Notes:
+// ATL CPath does not support long paths.
+// Not all Path* functions from "shlwapi.h" support long paths.
 //
-// Returns the file portion from a path
-//
+// Path* functions that work correctly with long paths:
+// PathFindExtensionW
+// PathRemoveBackslashW
+// PathRemoveFileSpecW
+// PathStripPathW
+
+
 CStringW GetFileOnly(LPCWSTR Path)
 {
 	CStringW cs = Path;
-	::PathStripPathW(cs.GetBuffer(0));
+	::PathStripPathW(cs.GetBuffer());
 	cs.ReleaseBuffer(-1);
 	return cs;
 }
 
-//
-// Returns the folder portion from a path
-//
 CStringW GetFolderOnly(LPCWSTR Path)
 {
-	CStringW cs = Path; // Force CStringW to make a copy
-	::PathRemoveFileSpecW(cs.GetBuffer(0));
+	CStringW cs = Path;
+	::PathRemoveFileSpecW(cs.GetBuffer());
 	cs.ReleaseBuffer(-1);
 	return cs;
 }
 
-//
-// Adds a backslash to the end of a path if it is needed
-//
 CStringW AddSlash(LPCWSTR Path)
 {
-	CStringW cs = Path;
-	::PathAddBackslashW(cs.GetBuffer(MAX_PATH));
-	cs.ReleaseBuffer(-1);
-	if(cs.IsEmpty()) {
-		cs = L"\\";
+	CStringW newPath = Path;
+	if (newPath.GetLength() == 0 || newPath.GetString()[newPath.GetLength() - 1] != L'\\') {
+		newPath.AppendChar(L'\\');
 	}
-	return cs;
+	return newPath;
 }
 
-//
-// Removes a backslash from the end of a path if it is there
-//
 CStringW RemoveSlash(LPCWSTR Path)
 {
-	CString cs = Path;
-	::PathRemoveBackslashW(cs.GetBuffer(MAX_PATH));
-	cs.ReleaseBuffer(-1);
-	return cs;
+	CString newPath = Path;
+	::PathRemoveBackslashW(newPath.GetBuffer());
+	newPath.ReleaseBuffer(-1);
+	return newPath;
 }
 
-//
-// Returns just the .ext part of the file path
-//
 CStringW GetFileExt(LPCWSTR Path)
 {
 	if (::PathIsURLW(Path)) {
@@ -87,7 +83,6 @@ CStringW GetFileExt(LPCWSTR Path)
 	return ext;
 }
 
-
 void RemoveFileExt(CStringW& Path)
 {
 	LPCWSTR ext = ::PathFindExtensionW(Path.GetString());
@@ -95,16 +90,12 @@ void RemoveFileExt(CStringW& Path)
 	Path.Truncate(len);
 }
 
-//
-// Removes the file name extension from a path, if one is present
-//
 CStringW GetRemoveFileExt(LPCWSTR Path)
 {
 	LPCWSTR ext = ::PathFindExtensionW(Path);
 	const int len = (int)(ext - Path);
 	CStringW newPath(Path, len);
 	return newPath;
-
 }
 
 
@@ -114,9 +105,6 @@ void RenameFileExt(CStringW& Path, LPCWSTR newExt)
 	Path.Append(newExt);
 }
 
-//
-// Exchanges one file extension for another and returns the new fiel path
-//
 CStringW GetRenameFileExt(LPCWSTR Path, LPCWSTR newExt)
 {
 	CStringW newPath = GetRemoveFileExt(Path);
