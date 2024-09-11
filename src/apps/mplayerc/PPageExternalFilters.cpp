@@ -298,7 +298,7 @@ BOOL CPPageExternalFilters::OnInitDialog()
 			if (f->fTemporary) {
 				name += L" <temporary>";
 			}
-			if (!CPath(MakeFullPath(f->path)).FileExists()) {
+			if (!::PathFileExistsW(MakeFullPath(f->path))) {
 				name += L" <not found!>";
 			}
 		}
@@ -391,7 +391,7 @@ void CPPageExternalFilters::OnAddRegistered()
 			CString name = f->name;
 
 			if (f->type == FilterOverride::EXTERNAL) {
-				if (!CPath(MakeFullPath(f->path)).FileExists()) {
+				if (!::PathFileExistsW(MakeFullPath(f->path))) {
 					name += L" <not found!>";
 				}
 			}

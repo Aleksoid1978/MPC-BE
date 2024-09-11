@@ -2734,7 +2734,7 @@ CFGManagerCustom::CFGManagerCustom(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	WORD merit_low = 1;
 
 	for (const auto& fo : s.m_ExternalFilters) {
-		if (fo->fDisabled || (fo->type == FilterOverride::EXTERNAL && !CPath(MakeFullPath(fo->path)).FileExists())) {
+		if (fo->fDisabled || (fo->type == FilterOverride::EXTERNAL && !::PathFileExistsW(MakeFullPath(fo->path)))) {
 			continue;
 		}
 

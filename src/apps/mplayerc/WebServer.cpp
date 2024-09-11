@@ -528,7 +528,7 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 
 	CString cgi;
 	auto it = m_cgi.find(ext);
-	if (it == m_cgi.end() || !CPath((*it).second).FileExists()) {
+	if (it == m_cgi.end() || !::PathFileExistsW((*it).second)) {
 		return false;
 	}
 	cgi = (*it).second;
