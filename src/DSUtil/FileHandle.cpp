@@ -19,7 +19,6 @@
  */
 
 #include "stdafx.h"
-#include <filesystem>
 #include "Log.h"
 #include "FileHandle.h"
 #include "text.h"
@@ -31,7 +30,9 @@
 // Not all Path* functions from "shlwapi.h" support long paths.
 //
 // Path* functions that work correctly with long paths:
+// PathFileExistsW
 // PathFindExtensionW
+// PathIsDirectoryW
 // PathRemoveBackslashW
 // PathRemoveFileSpecW
 // PathStripPathW
@@ -118,6 +119,23 @@ CStringW AddExtension(LPCWSTR Path, LPCWSTR Ext)
 	::PathAddExtensionW(cs.GetBuffer(MAX_PATH), Ext);
 	cs.ReleaseBuffer(-1);
 	return cs;
+}
+
+void CombineFilePath(CStringW& path, LPCWSTR file)
+{
+	if (file) {
+		if (file[0] != L'\\' && path.GetLength() && path.GetString()[path.GetLength() - 1] != L'\\') {
+			path.AppendChar(L'\\');
+		}
+		path.Append(file);
+	}
+}
+
+CStringW GetCombineFilePath(LPCWSTR dir, LPCWSTR file)
+{
+	CStringW path(dir);
+	CombineFilePath(path, file);
+	return path;
 }
 
 //

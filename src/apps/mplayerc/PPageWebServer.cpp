@@ -158,9 +158,9 @@ CString CPPageWebServer::GetCurWebRoot()
 	GetDlgItem(IDC_EDIT2)->GetWindowTextW(WebRoot);
 	WebRoot.Replace('/', '\\');
 
-	CPath path;
-	path.Combine(GetProgramDir(), WebRoot);
-	return path.IsDirectory() ? (LPCWSTR)path : L"";
+	CStringW path = GetCombineFilePath(GetProgramDir(), WebRoot);
+	
+	return ::PathIsDirectoryW(path) ? path : L"";
 }
 
 static int __stdcall BrowseCtrlCallback(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)

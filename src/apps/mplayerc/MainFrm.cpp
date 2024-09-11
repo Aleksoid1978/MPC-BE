@@ -6529,10 +6529,9 @@ CStringW CMainFrame::CreateSnapShotFileName()
 		filename = L"snapshot";
 	}
 
-	CPathW psrc;
-	psrc.Combine(path, MakeSnapshotFileName(filename));
+	CombineFilePath(path, MakeSnapshotFileName(filename));
 
-	return psrc.m_strPath;
+	return path;
 }
 
 void CMainFrame::OnFileSaveImage()
@@ -6624,7 +6623,6 @@ void CMainFrame::OnFileSaveThumbnails()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	CPath psrc(s.strSnapShotPath);
 	CStringW prefix = L"thumbs";
 	if (GetPlaybackMode() == PM_FILE) {
 		CString path = GetFileOnly(GetCurFileName());
@@ -6634,11 +6632,11 @@ void CMainFrame::OnFileSaveThumbnails()
 
 		prefix.Format(L"%s_thumbs", path);
 	}
-	psrc.Combine(s.strSnapShotPath, MakeSnapshotFileName(prefix));
+	CStringW psrc = GetCombineFilePath(s.strSnapShotPath, MakeSnapshotFileName(prefix));
 
 	CSaveThumbnailsDialog fd(
 		s.iThumbRows, s.iThumbCols, s.iThumbWidth, s.iThumbQuality, s.iThumbLevelPNG, s.bSnapShotSubtitles, m_pCurrentSubStream != nullptr,
-		nullptr, (LPCWSTR)psrc,
+		nullptr, psrc,
 		L"BMP - Windows Bitmap (*.bmp)|*.bmp|JPG - JPEG Image (*.jpg)|*.jpg|PNG - Portable Network Graphics (*.png)|*.png||", GetModalParent());
 
 	if (s.strSnapShotExt == L".bmp") {
