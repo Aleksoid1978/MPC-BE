@@ -37,6 +37,7 @@
 // PathRemoveBackslashW
 // PathRemoveFileSpecW
 // PathStripPathW
+// PathStripToRootW
 
 
 CStringW GetFileOnly(LPCWSTR Path)
@@ -151,6 +152,21 @@ CStringW GetCanonicalizeFilePath(LPCWSTR path)
 		newPath.ReleaseBufferSetLength(len);
 	}
 
+	return newPath;
+}
+
+void StripToRoot(CStringW& path)
+{
+	BOOL ret = ::PathStripToRootW(path.GetBuffer());
+	if (ret) {
+		path.ReleaseBuffer();
+	}
+}
+
+CStringW GetStripToRoot(LPCWSTR path)
+{
+	CStringW newPath(path);
+	StripToRoot(newPath);
 	return newPath;
 }
 
