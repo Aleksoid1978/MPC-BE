@@ -28,7 +28,7 @@
 #include "AudioParser.h"
 #include "NullRenderers.h"
 #include "std_helper.h"
-#include <atlpath.h>
+#include "FileHandle.h"
 #include <clsids.h>
 #include <wmcodecdsp.h>
 #include <moreuuids.h>
@@ -1549,27 +1549,23 @@ void UnloadExternalObjects()
 	s_extobjs.clear();
 }
 
-CString MakeFullPath(LPCWSTR path)
+CStringW MakeFullPath(LPCWSTR path)
 {
-	CString full(path);
+	CStringW full(path);
 	full.Replace('/', '\\');
 
-	CString fn;
-	fn.ReleaseBuffer(GetModuleFileNameW(AfxGetInstanceHandle(), fn.GetBuffer(MAX_PATH), MAX_PATH));
-	CPath p(fn);
+	CStringW base = GetProgramPath();
 
 	if (full.GetLength() >= 2 && full[0] == '\\' && full[1] != '\\') {
-		p.StripToRoot();
-		full = CString(p) + full.Mid(1);
+		StripToRoot(base);
+		full = base + full.Mid(1);
 	} else if (full.Find(L":\\") < 0) {
-		p.RemoveFileSpec();
-		p.AddBackslash();
-		full = CString(p) + full;
+		RemoveFileSpec(base);
+		full = base + L"\\" + full;
 	}
 
-	CPath c(full);
-	c.Canonicalize();
-	return CString(c);
+	CStringW c = GetCanonicalizeFilePath(full);
+	return c;
 }
 
 

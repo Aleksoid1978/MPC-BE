@@ -120,7 +120,7 @@ extern HRESULT			LoadExternalFilter(LPCWSTR path, REFCLSID clsid, IBaseFilter** 
 extern HRESULT			LoadExternalPropertyPage(IPersist* pP, REFCLSID clsid, IPropertyPage** ppPP);
 extern void				UnloadExternalObjects();
 
-extern CString			MakeFullPath(LPCWSTR path);
+extern CStringW			MakeFullPath(LPCWSTR path);
 // simple file system path detector
 extern bool				IsLikelyFilePath(const CString &str);
 
