@@ -139,6 +139,21 @@ CStringW GetCombineFilePath(LPCWSTR dir, LPCWSTR file)
 	return path;
 }
 
+CStringW GetCanonicalizeFilePath(LPCWSTR path)
+{
+	CStringW newPath;
+	DWORD buflen = ::GetFullPathNameW(path, 0, nullptr, nullptr);
+	if (buflen > 0) {
+		DWORD len = ::GetFullPathNameW(path, buflen, newPath.GetBuffer(buflen - 1), nullptr);
+		if (len > buflen) {
+			len = 0;
+		}
+		newPath.ReleaseBufferSetLength(len);
+	}
+
+	return newPath;
+}
+
 //
 // Generate temporary files with any extension
 //

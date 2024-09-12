@@ -43,6 +43,8 @@ CStringW AddExtension(LPCWSTR Path, LPCWSTR Ext);
 void CombineFilePath(CStringW& path, LPCWSTR file);
 CStringW GetCombineFilePath(LPCWSTR dir, LPCWSTR file);
 
+CStringW GetCanonicalizeFilePath(LPCWSTR path);
+
 BOOL     GetTemporaryFilePath(CStringW strExtension, CStringW& strFileName);
 CStringW CompactPath(LPCWSTR Path, UINT cchMax);
 
