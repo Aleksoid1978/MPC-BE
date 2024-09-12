@@ -576,8 +576,8 @@ HRESULT CHdmvClipInfo::ReadPlaylist(const CString& strPlaylistFile, REFERENCE_TI
 		DLog(L"CHdmvClipInfo::ReadPlaylist() : '%s'", strPlaylistFile);
 
 		// Get BDMV folder
-		CStringW Path = GetFolderOnly(strPlaylistFile);
-		Path = GetFolderOnly(Path); // folder above
+		CStringW Path = GetFolderPath(strPlaylistFile);
+		RemoveFileSpec(Path); // folder above
 
 		LONGLONG playlistPos = 0;
 		LONGLONG extPos = 0;

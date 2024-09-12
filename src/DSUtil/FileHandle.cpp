@@ -40,36 +40,51 @@
 // PathStripToRootW
 
 
-CStringW GetFileOnly(LPCWSTR Path)
+CStringW GetFileName(LPCWSTR Path)
 {
-	CStringW cs = Path;
-	::PathStripPathW(cs.GetBuffer());
-	cs.ReleaseBuffer(-1);
-	return cs;
+	CStringW fileName = Path;
+	::PathStripPathW(fileName.GetBuffer());
+	fileName.ReleaseBuffer();
+	return fileName;
 }
 
-CStringW GetFolderOnly(LPCWSTR Path)
+void RemoveFileSpec(CStringW& Path)
 {
-	CStringW cs = Path;
-	::PathRemoveFileSpecW(cs.GetBuffer());
-	cs.ReleaseBuffer(-1);
-	return cs;
+	::PathRemoveFileSpecW(Path.GetBuffer());
+	Path.ReleaseBuffer();
 }
 
-CStringW AddSlash(LPCWSTR Path)
+CStringW GetFolderPath(LPCWSTR path)
 {
-	CStringW newPath = Path;
-	if (newPath.GetLength() == 0 || newPath.GetString()[newPath.GetLength() - 1] != L'\\') {
-		newPath.AppendChar(L'\\');
-	}
+	CStringW newPath(path);
+	RemoveFileSpec(newPath);
 	return newPath;
 }
 
-CStringW RemoveSlash(LPCWSTR Path)
+void AddSlash(CStringW& path)
 {
-	CString newPath = Path;
-	::PathRemoveBackslashW(newPath.GetBuffer());
-	newPath.ReleaseBuffer(-1);
+	if (path.GetLength() == 0 || path.GetString()[path.GetLength() - 1] != L'\\') {
+		path.AppendChar(L'\\');
+	}
+}
+
+CStringW GetAddSlash(LPCWSTR path)
+{
+	CStringW newPath = path;
+	AddSlash(newPath);
+	return newPath;
+}
+
+void RemoveSlash(CStringW& path)
+{
+	::PathRemoveBackslashW(path.GetBuffer());
+	path.ReleaseBuffer();
+}
+
+CStringW GetRemoveSlash(LPCWSTR path)
+{
+	CString newPath = path;
+	RemoveSlash(newPath);
 	return newPath;
 }
 
@@ -383,7 +398,7 @@ HRESULT FileOperationDelete(const CStringW& path)
 HRESULT FileOperation(LPCWSTR source, LPCWSTR target, const UINT func, const DWORD flags)
 {
 	LPCWSTR pszNewName = PathFindFileNameW(target);
-	const CStringW destinationFolder = GetFolderOnly(target);
+	const CStringW destinationFolder = GetFolderPath(target);
 
 	return FileOperation(source, destinationFolder, pszNewName, func, flags);
 }

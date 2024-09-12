@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2023 see Authors.txt
+ * (C) 2016-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -267,7 +267,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 
 		if (filename.IsEmpty()) {
 			const CStringW filepath = m_pMainFrm->GetCurFileName();
-			filename = GetFileOnly(filepath);
+			filename = GetFileName(filepath);
 
 			WIN32_FIND_DATAW wfd;
 			HANDLE hFind = FindFirstFileW(filepath, &wfd);

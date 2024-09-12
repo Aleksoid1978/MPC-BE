@@ -287,7 +287,7 @@ COpenFileDlg::COpenFileDlg(std::vector<CString>& mask, bool fAllowDirSelection, 
 		str = s.strLastOpenFile;
 	}
 
-	str = GetFolderOnly(str);
+	RemoveFileSpec(str);
 
 	int size = std::max(1000, str.GetLength() + 1);
 	m_InitialDir = DNew WCHAR[size];

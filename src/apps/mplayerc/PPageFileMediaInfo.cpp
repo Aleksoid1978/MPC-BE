@@ -124,7 +124,7 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 	m_edMediainfo.SetFont(&m_font);
 
 	for (const auto& fn : m_files) {
-		m_cbFilename.AddString(GetFileOnly(fn));
+		m_cbFilename.AddString(GetFileName(fn));
 	}
 	m_cbFilename.SetCurSel(0);
 	if (m_cbFilename.GetCount() <= 1) {

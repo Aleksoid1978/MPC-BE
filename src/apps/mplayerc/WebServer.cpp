@@ -524,7 +524,7 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 		return false;
 	}
 	CStringW ext = GetFileExt(path).MakeLower();
-	CStringW dir = GetFolderOnly(path);
+	CStringW dir = GetFolderPath(path);
 
 	CString cgi;
 	auto it = m_cgi.find(ext);

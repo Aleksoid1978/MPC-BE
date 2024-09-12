@@ -969,7 +969,7 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 		if (palette.IsEmpty()) {
 			for (;;) {
 				if (::PathFileExistsW(fName)) {
-					CStringW fname = GetFileOnly(fName);
+					CStringW fname = GetFileName(fName);
 					if (!fname.Find(L"VTS_")) {
 						fName = fName.Left(fName.ReverseFind('.') + 1);
 						fName.TrimRight(L".0123456789") += L"0.ifo";

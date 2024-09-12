@@ -378,7 +378,7 @@ bool CWebClientSocket::OnInfo(CStringA& hdr, CStringA& body, CStringA& mime)
 	CString positionstring, durationstring, versionstring, sizestring;
 	versionstring.Format(L"%s", MPC_VERSION_WSTR);
 
-	CStringW file = GetFileOnly(m_pMainFrame->m_wndPlaylistBar.GetCurFileName());
+	CStringW file = GetFileName(m_pMainFrame->m_wndPlaylistBar.GetCurFileName());
 	RemoveFileExt(file);
 
 	positionstring.Format(L"%02d:%02d:%02d", (pos/3600000), (pos/60000)%60, (pos/1000)%60);
@@ -455,13 +455,13 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 				m_pMainFrame->SendMessageW(WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
 			}
 
-			path = GetFolderOnly(path);
+			RemoveFileSpec(path);
 		}
 	} else {
 		path = m_pMainFrame->m_wndPlaylistBar.GetCurFileName();
 
 		if (CFileGetStatus(path, fs) && !(fs.m_attribute&CFile::directory)) {
-			path = GetFolderOnly(path);
+			RemoveFileSpec(path);
 		}
 	}
 
@@ -581,7 +581,7 @@ bool CWebClientSocket::OnControls(CStringA& hdr, CStringA& body, CStringA& mime)
 	CString dir;
 
 	if (!path.IsEmpty()) {
-		dir = GetFolderOnly(path);
+		dir = GetFolderPath(path);
 	}
 
 	OAFilterState fs = m_pMainFrame->GetMediaState();
@@ -650,8 +650,8 @@ bool CWebClientSocket::OnVariables(CStringA& hdr, CStringA& body, CStringA& mime
 	CString sizestring;
 
 	if (!path.IsEmpty()) {
-		dir = GetFolderOnly(path);
-		file = GetFileOnly(path);
+		dir = GetFolderPath(path);
+		file = GetFileName(path);
 
 		WIN32_FIND_DATAW wfd;
 		HANDLE hFind = FindFirstFileW(path, &wfd);

@@ -279,7 +279,7 @@ CString CPlaylistItem::GetLabel(int i) const
 				//m_label = str.TrimRight(L'/');
 			}
 			else {
-				str = GetFileOnly(fn);
+				str = GetFileName(fn);
 			}
 		}
 	} else if (i == 1) {
@@ -374,8 +374,8 @@ void CPlaylistItem::AutoLoadFiles()
 		return;
 	}
 
-	auto curdir = GetFolderOnly(fpath);
-	auto name   = GetRemoveFileExt(GetFileOnly(fpath));
+	auto curdir = GetFolderPath(fpath);
+	auto name   = GetRemoveFileExt(GetFileName(fpath));
 	auto ext    = GetFileExt(fpath);
 
 	CStringW BDLabel, empty;
@@ -1128,11 +1128,11 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 							oldPath.TrimRight(L"\\<");
 
 							path.TrimRight(L"\\<");
-							path = GetFolderOnly(path);
+							RemoveFileSpec(path);
 							if (LastChar(path) == L':') {
 								path = L".";
 							}
-							path = AddSlash(path);
+							AddSlash(path);
 
 							curPlayList.RemoveAll();
 							TParseFolder(path);
@@ -1265,7 +1265,7 @@ static bool SearchFiles(CString path, std::list<CString>& sl, bool bSingleElemen
 	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
 
 	path.Trim();
-	path = AddSlash(path);
+	AddSlash(path);
 	const CString mask = path + L"*.*";
 
 	{
@@ -1668,14 +1668,14 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(const CString& fn, const CTextFile::enc
 		if (pli.m_type == CPlaylistItem::file) {
 			CString fn = pli.m_fi.GetPath();
 			if (bRemovePath) {
-				fn = GetFileOnly(fn);
+				fn = GetFileName(fn);
 			}
 			f.WriteString(idx + L",filename," + fn + L"\n");
 
 			for (const auto& ai : pli.m_auds) {
 				fn = ai.GetPath();
 				if (bRemovePath) {
-					fn = GetFileOnly(fn);
+					fn = GetFileName(fn);
 				}
 				f.WriteString(idx + L",filename," + fn + L"\n");
 			}
@@ -1683,7 +1683,7 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(const CString& fn, const CTextFile::enc
 			for (const auto& si : pli.m_subs) {
 				fn = si.GetPath();
 				if (bRemovePath) {
-					fn = GetFileOnly(fn);
+					fn = GetFileName(fn);
 				}
 				f.WriteString(idx + L",subtitle," + fn + L"\n");
 			}
@@ -3685,7 +3685,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 				int idx = fd.m_pOFN->nFilterIndex;
 
 				CPath path(fd.GetPathName());
-				s.strLastSavedPlaylistDir = AddSlash(GetFolderOnly(path));
+				s.strLastSavedPlaylistDir = GetAddSlash(GetFolderPath(path));
 
 				switch (idx) {
 				case 1:
@@ -3706,7 +3706,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 
 				bool fRemovePath = true;
 
-				CStringW base = GetFolderOnly(path);
+				CStringW base = GetFolderPath(path);
 
 				pos = curPlayList.GetHeadPosition();
 				while (pos && fRemovePath) {
@@ -3716,21 +3716,21 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 						fRemovePath = false;
 					} else {
 						{
-							CStringW fpath = GetFolderOnly(pli.m_fi);
+							CStringW fpath = GetFolderPath(pli.m_fi);
 							if (base != fpath) {
 								fRemovePath = false;
 							}
 						}
 						auto it_a = pli.m_auds.begin();
 						while (it_a != pli.m_auds.end() && fRemovePath) {
-							CStringW apath = GetFolderOnly(*it_a++);
+							CStringW apath = GetFolderPath(*it_a++);
 							if (base != apath) {
 								fRemovePath = false;
 							}
 						}
 						auto it_s = pli.m_subs.begin();
 						while (it_s != pli.m_subs.end() && fRemovePath) {
-							CStringW spath = GetFolderOnly(*it_s++);
+							CStringW spath = GetFolderPath(*it_s++);
 							if (base != spath) {
 								fRemovePath = false;
 							}
@@ -4524,7 +4524,7 @@ void CPlayerPlaylistBar::TParseFolder(const CString& path)
 
 	CPlaylistItem pli;
 	pli.m_bDirectory = true;
-	pli.m_fi = RemoveSlash(path) + L"<"; // Parent folder mark;
+	pli.m_fi = GetRemoveSlash(path) + L"<"; // Parent folder mark;
 	curPlayList.AddTail(pli);
 
 	const CString folder(L"_folder_");
@@ -4540,7 +4540,7 @@ void CPlayerPlaylistBar::TParseFolder(const CString& path)
 	auto& directory = curTab.directory; directory.clear();
 	auto& files = curTab.files; files.clear();
 
-	const CString mask = AddSlash(path) + L"*.*";
+	const CString mask = GetAddSlash(path) + L"*.*";
 	WIN32_FIND_DATAW FindFileData = {};
 	HANDLE hFind = FindFirstFileW(mask, &FindFileData);
 	if (hFind != INVALID_HANDLE_VALUE) {
@@ -4550,7 +4550,7 @@ void CPlayerPlaylistBar::TParseFolder(const CString& path)
 			if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 				if (!(FindFileData.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) && fileName != L"." && fileName != L"..") {
 					file_data_t file_data;
-					file_data.name = AddSlash(path) + fileName;
+					file_data.name = GetAddSlash(path) + fileName;
 					file_data.time_created.LowPart  = FindFileData.ftCreationTime.dwLowDateTime;
 					file_data.time_created.HighPart = FindFileData.ftCreationTime.dwHighDateTime;
 					file_data.time.LowPart  = FindFileData.ftLastWriteTime.dwLowDateTime;
@@ -4565,7 +4565,7 @@ void CPlayerPlaylistBar::TParseFolder(const CString& path)
 				auto mfc = mf.FindMediaByExt(ext);
 				if (ext == L".iso" || (mfc && mfc->GetFileType() != TPlaylist)) {
 					file_data_t file_data;
-					file_data.name = AddSlash(path) + fileName;
+					file_data.name = GetAddSlash(path) + fileName;
 					file_data.time_created.LowPart  = FindFileData.ftCreationTime.dwLowDateTime;
 					file_data.time_created.HighPart = FindFileData.ftCreationTime.dwHighDateTime;
 					file_data.time.LowPart  = FindFileData.ftLastWriteTime.dwLowDateTime;
@@ -4985,7 +4985,7 @@ bool CPlayerPlaylistBar::TNavigate()
 							break;
 						case IT_PARENT:
 							path.TrimRight(L"\\<");
-							path = GetFolderOnly(path);
+							RemoveFileSpec(path);
 							if (LastChar(path) == L':') {
 								path = L".";
 							}
@@ -4997,7 +4997,7 @@ bool CPlayerPlaylistBar::TNavigate()
 						default:
 							return false;
 					}
-					path = AddSlash(path);
+					AddSlash(path);
 
 					curPlayList.RemoveAll();
 					m_list.DeleteAllItems();

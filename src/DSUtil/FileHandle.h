@@ -20,12 +20,18 @@
 
 #pragma once
 
-CStringW GetFileOnly(LPCWSTR Path);
-CStringW GetFolderOnly(LPCWSTR Path);
-CStringW AddSlash(LPCWSTR Path);
-CStringW RemoveSlash(LPCWSTR Path);
+CStringW GetFileName(LPCWSTR Path);
 
-// gets the file extension with a dot. can also work for URLs
+void AddSlash(CStringW& path);
+CStringW GetAddSlash(LPCWSTR path);
+
+void RemoveSlash(CStringW& path);
+CStringW GetRemoveSlash(LPCWSTR path);
+
+void RemoveFileSpec(CStringW& path);
+CStringW GetFolderPath(LPCWSTR path);
+
+ // gets the file extension with a dot. can also work for URLs
 CStringW GetFileExt(LPCWSTR Path);
 
 // removes file extension from path
