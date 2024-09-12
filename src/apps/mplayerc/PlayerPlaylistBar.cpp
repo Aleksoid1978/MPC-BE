@@ -312,11 +312,11 @@ static bool FindFileInList(std::list<T>& sl, const CString& fn)
 	return false;
 }
 
-static void StringToPaths(const CString& curentdir, const CString& str, std::vector<CString>& paths)
+static void StringToPaths(const CStringW& curentdir, const CStringW& str, std::vector<CStringW>& paths)
 {
 	int pos = 0;
 	do {
-		CString s = str.Tokenize(L";", pos);
+		CStringW s = str.Tokenize(L";", pos);
 		if (s.GetLength() == 0) {
 			continue;
 		}
@@ -326,10 +326,9 @@ static void StringToPaths(const CString& curentdir, const CString& str, std::vec
 			continue; // the asterisk can only be in the last folder
 		}
 
-		CPath path(curentdir);
-		path.Append(s);
+		CStringW path = GetCombineFilePath(curentdir, s);
 
-		if (path.IsRoot() && path.FileExists()) {
+		if (::PathIsRootW(path) && ::PathFileExistsW(path)) {
 			paths.emplace_back(path);
 			continue;
 		}

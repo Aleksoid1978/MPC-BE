@@ -33,6 +33,7 @@
 // PathFileExistsW
 // PathFindExtensionW
 // PathIsDirectoryW
+// PathIsRootW
 // PathRemoveBackslashW
 // PathRemoveFileSpecW
 // PathStripPathW
