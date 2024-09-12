@@ -146,6 +146,7 @@ void CombineFilePath(CStringW& path, LPCWSTR file)
 		}
 		path.Append(file);
 	}
+	path = GetCanonicalizeFilePath(path);
 }
 
 CStringW GetCombineFilePath(LPCWSTR dir, LPCWSTR file)
