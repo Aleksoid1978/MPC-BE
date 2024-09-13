@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,8 +41,6 @@
 #include "stdafx_common_cfg.h"
 #include "stdafx_common_dshow.h"
 #include <qnetwork.h>
-
-#include <atlpath.h>
 
 #include <cmath>
 #include <algorithm>

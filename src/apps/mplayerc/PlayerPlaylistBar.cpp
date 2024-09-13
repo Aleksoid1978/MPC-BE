@@ -3683,29 +3683,28 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 
 				int idx = fd.m_pOFN->nFilterIndex;
 
-				CPath path(fd.GetPathName());
-				s.strLastSavedPlaylistDir = GetAddSlash(GetFolderPath(path));
+				CStringW path(fd.GetPathName());
+				CStringW base = GetFolderPath(path);
+				s.strLastSavedPlaylistDir = GetAddSlash(base);
 
 				switch (idx) {
 				case 1:
-					path.AddExtension(L".mpcpl");
+					path.Append(L".mpcpl");
 					break;
 				case 2:
-					path.AddExtension(L".pls");
+					path.Append(L".pls");
 					break;
 				case 3:
-					path.AddExtension(L".m3u");
+					path.Append(L".m3u");
 					break;
 				case 4:
-					path.AddExtension(L".asx");
+					path.Append(L".asx");
 					break;
 				default:
 					break;
 				}
 
 				bool fRemovePath = true;
-
-				CStringW base = GetFolderPath(path);
 
 				pos = curPlayList.GetHeadPosition();
 				while (pos && fRemovePath) {
