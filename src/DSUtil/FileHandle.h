@@ -54,6 +54,8 @@ CStringW GetCanonicalizeFilePath(LPCWSTR path);
 void StripToRoot(CStringW& path);
 CStringW GetStripToRoot(LPCWSTR path);
 
+CStringW GetCurrentDir();
+
 BOOL     GetTemporaryFilePath(CStringW strExtension, CStringW& strFileName);
 CStringW CompactPath(LPCWSTR Path, UINT cchMax);
 

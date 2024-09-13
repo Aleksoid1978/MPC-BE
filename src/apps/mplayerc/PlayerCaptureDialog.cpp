@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -649,7 +649,7 @@ void CPlayerCaptureDialog::InitControls()
 				}
 			} else {
 				// Use current directory
-				m_file.ReleaseBufferSetLength(GetCurrentDirectoryW(MAX_PATH, dir.GetBuffer(MAX_PATH)));
+				m_file = GetCurrentDir();
 			}
 			CoTaskMemFree(pathVideos);
 

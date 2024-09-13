@@ -159,15 +159,14 @@ CStringW GetCombineFilePath(LPCWSTR dir, LPCWSTR file)
 CStringW GetCanonicalizeFilePath(LPCWSTR path)
 {
 	CStringW newPath;
-	DWORD buflen = ::GetFullPathNameW(path, 0, nullptr, nullptr);
+	const DWORD buflen = ::GetFullPathNameW(path, 0, nullptr, nullptr);
 	if (buflen > 0) {
 		DWORD len = ::GetFullPathNameW(path, buflen, newPath.GetBuffer(buflen - 1), nullptr);
-		if (len > buflen) {
+		if (len >= buflen) {
 			len = 0;
 		}
 		newPath.ReleaseBufferSetLength(len);
 	}
-
 	return newPath;
 }
 
@@ -184,6 +183,20 @@ CStringW GetStripToRoot(LPCWSTR path)
 	CStringW newPath(path);
 	StripToRoot(newPath);
 	return newPath;
+}
+
+CStringW GetCurrentDir()
+{
+	CStringW curDir;
+	const DWORD buflen = ::GetCurrentDirectoryW(0, nullptr);
+	if (buflen > 0) {
+		DWORD len = ::GetCurrentDirectoryW(buflen, curDir.GetBuffer(buflen - 1));
+		if (len >= buflen) {
+			len = 0;
+		}
+		curDir.ReleaseBufferSetLength(len);
+	}
+	return curDir;
 }
 
 //

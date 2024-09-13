@@ -5534,8 +5534,7 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 		if (!s.slFiles.empty()) {
 			GetCDROMType(s.slFiles.front()[0], sl);
 		} else {
-			CString dir;
-			dir.ReleaseBufferSetLength(GetCurrentDirectoryW(MAX_PATH, dir.GetBuffer(MAX_PATH)));
+			CString dir = GetCurrentDir();
 
 			GetCDROMType(dir[0], sl);
 			for (WCHAR drive = 'C'; sl.empty() && drive <= 'Z'; drive++) {
@@ -12397,16 +12396,19 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		CorrectAceStream(fn);
 
 		if (SUCCEEDED(hr)) {
-			WCHAR path[MAX_PATH] = { 0 };
-			BOOL bIsDirSet       = FALSE;
-			if (!::PathIsURLW(fn) && ::GetCurrentDirectoryW(MAX_PATH, path)) {
-				bIsDirSet = ::SetCurrentDirectoryW(GetFolderPath(fn));
+			CStringW oldcurdir;
+			BOOL bIsDirSet = FALSE;
+			if (!::PathIsURLW(fn)) {
+				oldcurdir = GetCurrentDir();
+				if (oldcurdir.GetLength()) {
+					bIsDirSet = ::SetCurrentDirectoryW(GetFolderPath(fn));
+				}
 			}
 
 			hr = m_pGB->RenderFile(fn, nullptr);
 
 			if (bIsDirSet) {
-				::SetCurrentDirectoryW(path);
+				::SetCurrentDirectoryW(oldcurdir);
 			}
 		}
 
@@ -12540,10 +12542,13 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		CorrectAceStream(fn);
 
 		if (SUCCEEDED(hr)) {
-			WCHAR path[MAX_PATH] = { 0 };
-			BOOL bIsDirSet       = FALSE;
-			if (!::PathIsURLW(fn) && ::GetCurrentDirectoryW(MAX_PATH, path)) {
-				bIsDirSet = ::SetCurrentDirectoryW(GetFolderPath(fn));
+			CStringW oldcurdir;
+			BOOL bIsDirSet = FALSE;
+			if (!::PathIsURLW(fn)) {
+				oldcurdir = GetCurrentDir();
+				if (oldcurdir.GetLength()) {
+					bIsDirSet = ::SetCurrentDirectoryW(GetFolderPath(fn));
+				}
 			}
 
 			if (CComQIPtr<IGraphBuilderAudio> pGBA = m_pGB.p) {
@@ -12551,7 +12556,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 
 			if (bIsDirSet) {
-				::SetCurrentDirectoryW(path);
+				::SetCurrentDirectoryW(oldcurdir);
 			}
 		}
 	}
