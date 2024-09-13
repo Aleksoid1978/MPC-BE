@@ -44,8 +44,6 @@ void     RenameFileExt(CStringW& Path, LPCWSTR newExt);
 // creates a new path with a new file extension
 CStringW GetRenameFileExt(LPCWSTR Path, LPCWSTR newExt);
 
-CStringW AddExtension(LPCWSTR Path, LPCWSTR Ext);
-
 void CombineFilePath(CStringW& path, LPCWSTR file);
 CStringW GetCombineFilePath(LPCWSTR dir, LPCWSTR file);
 

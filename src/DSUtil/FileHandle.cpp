@@ -130,14 +130,6 @@ CStringW GetRenameFileExt(LPCWSTR Path, LPCWSTR newExt)
 	return newPath;
 }
 
-CStringW AddExtension(LPCWSTR Path, LPCWSTR Ext)
-{
-	CStringW cs = Path;
-	::PathAddExtensionW(cs.GetBuffer(MAX_PATH), Ext);
-	cs.ReleaseBuffer(-1);
-	return cs;
-}
-
 void CombineFilePath(CStringW& path, LPCWSTR file)
 {
 	if (file) {

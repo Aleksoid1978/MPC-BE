@@ -6047,8 +6047,8 @@ void CMainFrame::OnFileSaveAs()
 	}
 
 	CStringW savedFileName(fd.GetPathName());
-	if (ext.GetLength()) {
-		savedFileName = AddExtension(savedFileName, ext);
+	if (ext.GetLength() && GetFileExt(savedFileName).IsEmpty()) {
+		savedFileName.Append(ext);
 	}
 
 	OAFilterState fs = State_Stopped;
