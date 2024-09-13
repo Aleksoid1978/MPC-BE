@@ -127,21 +127,18 @@ CWebServer::CWebServer(CMainFrame* pMainFrame, int nPort)
 	m_mimes[".png"] = "image/png";
 	m_mimes[".js"] = "text/javascript";
 
-	m_webroot = CPath(GetProgramDir());
-
 	CString WebRoot = AfxGetAppSettings().strWebRoot;
 	WebRoot.Replace('/', '\\');
 	WebRoot.Trim();
-	CPath p(WebRoot);
 	if (WebRoot.Find(L":\\") < 0 && WebRoot.Find(L"\\\\") < 0) {
-		m_webroot.Append(WebRoot);
+		m_webroot = GetCombineFilePath(GetProgramDir(), WebRoot);
 	} else {
-		m_webroot = p;
+		m_webroot = GetCanonicalizeFilePath(WebRoot);
 	}
-	m_webroot.Canonicalize();
-	m_webroot.MakePretty();
-	if (!m_webroot.IsDirectory()) {
-		m_webroot = CPath();
+	::PathMakePrettyW(m_webroot.GetBuffer());
+
+	if (!::PathIsDirectoryW(m_webroot)) {
+		m_webroot.Empty();
 	}
 
 	std::list<CString> sl;
@@ -235,22 +232,19 @@ void CWebServer::Deploy(CString dir)
 
 bool CWebServer::ToLocalPath(CString& path, CString& redir)
 {
-	if (!path.IsEmpty() && m_webroot.IsDirectory()) {
+	if (!path.IsEmpty() && ::PathIsDirectoryW(m_webroot)) {
 		CString tmp = path;
 		tmp.Replace('/', '\\');
 		tmp.TrimLeft('\\');
 
-		CPath p;
-		p.Combine(m_webroot, tmp);
-		p.Canonicalize();
+		CStringW p = GetCombineFilePath(m_webroot, tmp); // Combine and Canonicalize
 
-		if (p.IsDirectory()) {
+		if (PathIsDirectoryW(p)) {
 			std::list<CString> sl;
 			Explode(AfxGetAppSettings().strWebDefIndex, sl, L';');
 			for (const auto& str : sl) {
-				CPath p2 = p;
-				p2.Append(str);
-				if (p2.FileExists()) {
+				CStringW p2 = GetCombineFilePath(p, str);
+				if (::PathFileExistsW(p2)) {
 					p = p2;
 					redir = path;
 					if (redir.GetAt(redir.GetLength()-1) != L'/') {
@@ -262,7 +256,7 @@ bool CWebServer::ToLocalPath(CString& path, CString& redir)
 			}
 		}
 
-		if (wcslen(p) > wcslen(m_webroot) && p.FileExists()) {
+		if (wcslen(p) > wcslen(m_webroot) && ::PathFileExistsW(p)) {
 			path = (LPCWSTR)p;
 			return true;
 		}
@@ -331,7 +325,7 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 
 	bool fHandled = false, fCGI = false;
 
-	if (m_webroot.IsDirectory()) {
+	if (::PathIsDirectoryW(m_webroot)) {
 		CStringA tmphdr;
 		fHandled = fCGI = CallCGI(pClient, tmphdr, body, mime);
 
@@ -383,7 +377,7 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 		}
 	}
 
-	if (!fHandled && m_webroot.IsDirectory()) {
+	if (!fHandled && ::PathIsDirectoryW(m_webroot)) {
 		fHandled = LoadPage(0, body, pClient->m_path);
 	}
 

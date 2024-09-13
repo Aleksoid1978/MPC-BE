@@ -470,11 +470,9 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 	}
 
 	if (CFileGetStatus(path, fs) && (fs.m_attribute&CFile::directory) || path.Find(L"\\") == 0) {
-		CPath p(path);
-		p.Canonicalize();
-		p.MakePretty();
-		p.AddBackslash();
-		path = (LPCWSTR)p;
+		path = GetCanonicalizeFilePath(path);
+		::PathMakePrettyW(path.GetBuffer());
+		AddSlash(path);
 	}
 
 	CStringA files;
@@ -492,13 +490,11 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 
 		path = "Root";
 	} else {
-		CString parent;
+		CStringW parent;
 
 		if (path.GetLength() > 3) {
-			CPath p(path + "..");
-			p.Canonicalize();
-			p.AddBackslash();
-			parent = (LPCWSTR)p;
+			parent = GetCanonicalizeFilePath(path + "..");
+			AddSlash(parent);
 		}
 
 		files += "<tr class=\"dir\">\r\n";
@@ -780,7 +776,7 @@ bool CWebClientSocket::OnStatus(CStringA& hdr, CStringA& body, CStringA& mime)
 	CString title;
 	m_pMainFrame->GetWindowTextW(title);
 
-	CPath file(m_pMainFrame->m_wndPlaylistBar.GetCurFileName());
+	CStringW file(m_pMainFrame->m_wndPlaylistBar.GetCurFileName());
 
 	CString status;
 	OAFilterState fs = m_pMainFrame->GetMediaState();

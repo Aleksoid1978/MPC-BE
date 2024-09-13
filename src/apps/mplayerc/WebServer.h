@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -63,7 +63,7 @@ class CWebServer
 	static const std::map<CString, CWebServer::RequestHandler> m_internalpages;
 	static const std::map<CString, UINT> m_downloads;
 	static std::map<CStringA, CStringA> m_mimes;
-	CPath m_webroot;
+	CStringW m_webroot;
 
 	std::map<CString, CString> m_cgi;
 	bool CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& body, CStringA& mime);

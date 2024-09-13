@@ -53,7 +53,7 @@ WCHAR LastChar(const CStringW& str)
 	return len > 0 ? str.GetAt(len - 1) : 0;
 }
 
-static CString MakePath(CString path)
+static CStringW MakePath(CStringW path)
 {
 	if (::PathIsURLW(path) || Youtube::CheckURL(path)) { // skip URLs
 		if (path.Left(8).MakeLower() == L"file:///") {
@@ -66,9 +66,9 @@ static CString MakePath(CString path)
 
 	path.Replace('/', '\\');
 
-	CPath c(path);
-	c.Canonicalize();
-	return CString(c);
+	CStringW c = GetCanonicalizeFilePath(path);
+
+	return c;
 }
 
 struct CUETrack {
@@ -338,9 +338,8 @@ static void StringToPaths(const CStringW& curentdir, const CStringW& str, std::v
 		if (hFind == INVALID_HANDLE_VALUE) {
 			continue;
 		} else {
-			CPath parentdir(path + L"\\..");
-			parentdir.Canonicalize();
-			parentdir.AddBackslash();
+			CStringW parentdir = GetCanonicalizeFilePath(path + L"\\..");
+			AddSlash(parentdir);
 
 			do {
 				if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && wcscmp(fd.cFileName, L".") && wcscmp(fd.cFileName, L"..")) {
@@ -1447,7 +1446,7 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 	AddItem(fns, subs);
 }
 
-static CString CombinePath(CPath base, const CString& relative)
+static CString CombinePath(CStringW base, const CStringW& relative)
 {
 	if (StartsWith(relative, L":\\", 1) || StartsWith(relative, L"\\")) {
 		return relative;
@@ -1462,7 +1461,7 @@ static CString CombinePath(CPath base, const CString& relative)
 		return CUrlParser::CombineUrl(base, relative);
 	}
 
-	base.Append(relative);
+	CombineFilePath(base, relative);
 	return base;
 }
 
@@ -1486,8 +1485,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(const CString& fn)
 		return false;
 	}
 
-	CPath base(fn);
-	base.RemoveFileSpec();
+	CStringW base = GetFolderPath(fn);
 
 	PlayList.m_nSelectedAudioTrack = PlayList.m_nSelectedSubtitleTrack = -1;
 
@@ -1715,17 +1713,18 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 		return false;
 	}
 
-	CPath base(fn);
-	if (!f.GetRedirectURL().IsEmpty()) {
-		base = (CPath)f.GetRedirectURL();
+	CStringW base;
+	if (f.GetRedirectURL().GetLength()) {
+		base = f.GetRedirectURL();
+	}
+	else {
+		base = fn;
 	}
 
 	if (fn.Find(L"://") > 0) {
-		CString tmp(base);
-		tmp.Truncate(tmp.ReverseFind('/'));
-		base = (CPath)tmp;
+		base.Truncate(base.ReverseFind('/'));
 	} else {
-		base.RemoveFileSpec();
+		RemoveFileSpec(base);
 	}
 
 	std::map<CString, CAudioItemList> audio_fns;
@@ -1891,13 +1890,13 @@ bool CPlayerPlaylistBar::ParseCUEPlayList(CString fn)
 		}
 	}
 
-	CPath base(fn);
-	base.RemoveFileSpec();
+	CStringW base = GetFolderPath(fn);
+	AddSlash(base);
 
 	INT_PTR c = curPlayList.GetCount();
 
 	for (const auto& fName : fileNames){
-		CString fullPath = MakePath(CombinePath(base, fName));
+		CString fullPath = MakePath(base + fName);
 		BOOL bExists = TRUE;
 		if (!::PathFileExistsW(fullPath)) {
 			CString ext = GetFileExt(fullPath);

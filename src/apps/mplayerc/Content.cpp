@@ -351,9 +351,7 @@ namespace Content {
 			}
 
 			if (fn2.Find(':') < 0 && fn2.Find(L"\\\\") != 0 && fn2.Find(L"//") != 0) {
-				CPath p;
-				p.Combine(dir, fn2);
-				fn2 = (LPCWSTR)p;
+				fn2 = GetCombineFilePath(dir, fn2);
 			}
 
 			if (!fn2.CompareNoCase(fn)) {
