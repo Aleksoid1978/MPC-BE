@@ -29,8 +29,10 @@ class CSaveFileDialog : public CFileDialog
 	DECLARE_DYNAMIC(CSaveFileDialog)
 
 private:
+	// CFileDialog::GetPathName does not work for long paths, use GetFilePath instead.
+	CFileDialog::GetPathName;
+
 	std::unique_ptr<WCHAR[]> m_pstrInitialDir;
-	std::unique_ptr<WCHAR[]> m_pstrFile;
 
 public:
 	CSaveFileDialog(
@@ -40,4 +42,7 @@ public:
 		LPCWSTR lpszFilter = NULL,
 		CWnd* pParentWnd = NULL);
 	virtual ~CSaveFileDialog() = default;
+
+	// Returns the file path selected for saving. Long paths are supported.
+	CStringW GetFilePath();
 };

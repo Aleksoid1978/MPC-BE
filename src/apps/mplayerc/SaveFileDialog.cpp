@@ -34,15 +34,32 @@ CSaveFileDialog::CSaveFileDialog(
 	: CFileDialog(FALSE, lpszDefExt, lpszFileName, dwFlags, lpszFilter, pParentWnd)
 {
 	CStringW dir = ::GetFolderPath(lpszFileName);
-	int size = std::max(MAX_PATH, dir.GetLength() + 1);
+	size_t size = dir.GetLength() + 1;
+
 	m_pstrInitialDir.reset(new WCHAR[size]);
 	memset(m_pstrInitialDir.get(), 0, size * sizeof(WCHAR));
 	wcscpy_s(m_pstrInitialDir.get(), size, dir.GetString());
-	m_pOFN->lpstrInitialDir = m_pstrInitialDir.get();
 
-	size += 500;
-	m_pstrFile.reset(new WCHAR[size]);
-	memset(m_pstrFile.get(), 0, size * sizeof(WCHAR));
-	m_pOFN->lpstrFile = m_pstrFile.get();
-	m_pOFN->nMaxFile = size;
+	m_pOFN->lpstrInitialDir = m_pstrInitialDir.get();
+}
+
+CStringW CSaveFileDialog::GetFilePath()
+{
+	CStringW filepath;
+
+	CComPtr<IFileSaveDialog> pFileSaveDialog = GetIFileSaveDialog();
+	if (pFileSaveDialog) {
+		CComPtr<IShellItem> pShellItem;
+		HRESULT hr = pFileSaveDialog->GetResult(&pShellItem);
+		if (SUCCEEDED(hr)) {
+			LPWSTR pszName = nullptr;
+			hr = pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &pszName);
+			if (SUCCEEDED(hr)) {
+				filepath = pszName;
+				CoTaskMemFree(pszName);
+			}
+		}
+	}
+
+	return filepath;
 }
