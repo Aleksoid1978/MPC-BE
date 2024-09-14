@@ -21,15 +21,13 @@
 
 #pragma once
 
+#include "SaveFileDialog.h"
+
 // CSaveImageDialog
 
-class CSaveImageDialog : public CFileDialog
+class CSaveImageDialog : public CSaveFileDialog
 {
 	DECLARE_DYNAMIC(CSaveImageDialog)
-
-private:
-	std::unique_ptr<WCHAR[]> m_pstrInitialDir;
-	std::unique_ptr<WCHAR[]> m_pstrFile;
 
 public:
 	CSaveImageDialog(

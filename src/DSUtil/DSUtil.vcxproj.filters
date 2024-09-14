@@ -125,6 +125,9 @@
     <ClCompile Include="ISOLang.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\apps\mplayerc\SaveFileDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DSMPropertyBag.h">
@@ -266,6 +269,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ISOLang.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\apps\mplayerc\SaveFileDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

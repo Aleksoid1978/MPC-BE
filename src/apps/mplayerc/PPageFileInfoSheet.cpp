@@ -23,6 +23,7 @@
 #include "MainFrm.h"
 #include "PPageFileInfoSheet.h"
 #include "PPageFileMediaInfo.h"
+#include "SaveFileDialog.h"
 
 IMPLEMENT_DYNAMIC(CMPCPropertySheet, CPropertySheet)
 CMPCPropertySheet::CMPCPropertySheet(LPCWSTR pszCaption, CWnd* pParentWnd, UINT iSelectPage)
@@ -147,7 +148,7 @@ void CPPageFileInfoSheet::OnSaveAs()
 
 	file += L".MediaInfo.txt";
 
-	CFileDialog filedlg (FALSE, L"*.txt", file,
+	CSaveFileDialog filedlg (L"*.txt", file,
 						 OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 						 L"Text Files (*.txt)|*.txt|All Files (*.*)|*.*||", nullptr);
 

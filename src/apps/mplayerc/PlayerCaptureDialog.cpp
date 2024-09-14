@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PlayerCaptureDialog.h"
+#include "SaveFileDialog.h"
 #include <moreuuids.h>
 #include "filters/muxer/WavDest/WavDest.h"
 #include "filters/muxer/MatroskaMuxer/MatroskaMuxer.h"
@@ -1554,9 +1555,9 @@ void CPlayerCaptureDialog::OnAudioCodecDimension()
 
 void CPlayerCaptureDialog::OnOpenFile()
 {
-	CFileDialog fd(FALSE, nullptr, nullptr,
+	CSaveFileDialog fd(nullptr, nullptr,
 				   OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_NOCHANGEDIR,
-				   L"Media files (*.avi,*.mkv,*.dsm)|*.avi;*.mkv;*.dsm|", this, 0);
+				   L"Media files (*.avi,*.mkv,*.dsm)|*.avi;*.mkv;*.dsm|", this);
 
 	if (fd.DoModal() == IDOK) {
 		CString str = fd.GetPathName();

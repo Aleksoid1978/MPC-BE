@@ -21,11 +21,12 @@
 
 #pragma once
 
+#include "SaveFileDialog.h"
 #include "Subtitles/TextFile.h"
 
 // CSaveTextFileDialog
 
-class CSaveTextFileDialog : public CFileDialog
+class CSaveTextFileDialog : public CSaveFileDialog
 {
 	BOOL m_bDisableExternalStyleCheckBox;
 	BOOL m_bSaveExternalStyleFile;
@@ -33,8 +34,6 @@ class CSaveTextFileDialog : public CFileDialog
 	DECLARE_DYNAMIC(CSaveTextFileDialog)
 
 private:
-	std::unique_ptr<WCHAR[]> m_pstrInitialDir;
-	std::unique_ptr<WCHAR[]> m_pstrFile;
 	CTextFile::enc m_e;
 
 public:

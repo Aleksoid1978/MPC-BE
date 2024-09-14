@@ -24,32 +24,19 @@
 
 // CSaveImageDialog
 
-IMPLEMENT_DYNAMIC(CSaveImageDialog, CFileDialog)
+IMPLEMENT_DYNAMIC(CSaveImageDialog, CSaveFileDialog)
 CSaveImageDialog::CSaveImageDialog(
 	const int quality, const int levelPNG,
 	const bool bSnapShotSubtitles, const bool bSubtitlesEnabled,
 	LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
 	LPCWSTR lpszFilter, CWnd* pParentWnd)
-	: CFileDialog(FALSE, lpszDefExt, lpszFileName,
+	: CSaveFileDialog(lpszDefExt, lpszFileName,
 				  OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 				  lpszFilter, pParentWnd)
 	, m_JpegQuality(std::clamp(quality, 70, 100))
 	, m_PngCompression(std::clamp(levelPNG, 1, 9))
 	, m_bDrawSubtitles(bSnapShotSubtitles)
 {
-	CStringW dir = ::GetFolderPath(lpszFileName);
-	int size = std::max(MAX_PATH, dir.GetLength() + 1);
-	m_pstrInitialDir.reset(new WCHAR[size]);
-	memset(m_pstrInitialDir.get(), 0, size * sizeof(WCHAR));
-	wcscpy_s(m_pstrInitialDir.get(), size, dir.GetString());
-	m_pOFN->lpstrInitialDir = m_pstrInitialDir.get();
-
-	size += 500;
-	m_pstrFile.reset(new WCHAR[size]);
-	memset(m_pstrFile.get(), 0, size * sizeof(WCHAR));
-	m_pOFN->lpstrFile = m_pstrFile.get();
-	m_pOFN->nMaxFile = size;
-
 	IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
 	if (pfdc) {
 		CString str;

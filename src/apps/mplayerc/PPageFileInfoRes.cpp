@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include "DSUtil/std_helper.h"
 #include "PPageFileInfoRes.h"
+#include "SaveFileDialog.h"
 #include "Misc.h"
 
 // CPPageFileInfoRes dialog
@@ -153,9 +154,9 @@ void CPPageFileInfoRes::OnSaveAs()
 		}
 	}
 
-	CFileDialog fd(FALSE, nullptr, fname,
+	CSaveFileDialog fd(nullptr, fname,
 				   OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_NOCHANGEDIR,
-				   ext_list, this, 0);
+				   ext_list, this);
 	if (fd.DoModal() == IDOK) {
 		FILE* f = nullptr;
 		if (_wfopen_s(&f, fd.GetPathName(), L"wb") == 0) {

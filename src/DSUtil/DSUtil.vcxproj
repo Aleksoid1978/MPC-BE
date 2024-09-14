@@ -52,6 +52,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\apps\mplayerc\SaveFileDialog.cpp" />
     <ClCompile Include="ApeTag.cpp" />
     <ClCompile Include="AudioParser.cpp" />
     <ClCompile Include="AudioTools.cpp" />
@@ -94,6 +95,7 @@
     <ClCompile Include="WinAPIUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\apps\mplayerc\SaveFileDialog.h" />
     <ClInclude Include="ApeTag.h" />
     <ClInclude Include="AudioParser.h" />
     <ClInclude Include="AudioTools.h" />

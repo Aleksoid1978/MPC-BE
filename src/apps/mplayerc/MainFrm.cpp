@@ -6038,9 +6038,9 @@ void CMainFrame::OnFileSaveAs()
 	}
 	ext_list.Append(ResStr(IDS_AG_ALLFILES) + L" (*.*)|*.*||");
 
-	CFileDialog fd(FALSE, ext.GetLength() ? ext.GetString() : nullptr, out,
+	CSaveFileDialog fd(ext.GetLength() ? ext.GetString() : nullptr, out,
 				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT,
-				   ext_list, GetModalParent(), 0);
+				   ext_list, GetModalParent());
 
 	if (fd.DoModal() != IDOK || !in.CompareNoCase(fd.GetPathName())) {
 		return;
@@ -6834,7 +6834,7 @@ void CMainFrame::OnFileSaveSubtitle()
 		if (auto pVSF = dynamic_cast<CVobSubFile*>(m_pCurrentSubStream.p)) {
 			// remember to set lpszDefExt to the first extension in the filter so that the save dialog autocompletes the extension
 			// and tracks attempts to overwrite in a graceful manner
-			CFileDialog fd(FALSE, L"idx", suggestedFileName,
+			CSaveFileDialog fd(L"idx", suggestedFileName,
 						   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 						   L"VobSub (*.idx, *.sub)|*.idx;*.sub||", GetModalParent());
 
