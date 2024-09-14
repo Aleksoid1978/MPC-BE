@@ -22,7 +22,7 @@ Fixed video frame zooming.
 Various interface fixes.
 
 Updated libraries:
-	ffmpeg n7.1-dev-2445-gc0666d8bed;
+	ffmpeg n7.1-dev-2559-g6229e4ac42;
 	vvdec v2.3.0-28-gf8ba8fd.
 
 

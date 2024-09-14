@@ -49,6 +49,10 @@
 #include <unistd.h>
 #endif
 
+#if HAVE_GETAUXVAL || HAVE_ELF_AUX_INFO
+#include <sys/auxv.h>
+#endif
+
 static atomic_int cpu_flags = -1;
 static atomic_int cpu_count = -1;
 
@@ -282,4 +286,21 @@ size_t av_cpu_max_align(void)
 #endif
 
     return 8;
+}
+
+unsigned long ff_getauxval(unsigned long type)
+{
+#if HAVE_GETAUXVAL
+    return getauxval(type);
+#elif HAVE_ELF_AUX_INFO
+    unsigned long aux = 0;
+    int ret = elf_aux_info(type, &aux, sizeof(aux));
+    if (ret != 0) {
+        errno = ret;
+    }
+    return aux;
+#else
+    errno = ENOSYS;
+    return 0;
+#endif
 }

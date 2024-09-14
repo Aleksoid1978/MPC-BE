@@ -22,6 +22,7 @@
 #include <stdint.h>
 
 #include "libavutil/attributes.h"
+#include "avcodec.h"
 #include "codec.h"
 #include "config.h"
 
@@ -132,7 +133,13 @@ typedef struct FFCodec {
     /**
      * Internal codec capabilities FF_CODEC_CAP_*.
      */
-    unsigned caps_internal:29;
+    unsigned caps_internal:27;
+
+    /**
+     * This field determines the video color ranges supported by an encoder.
+     * Should be set to a bitmask of AVCOL_RANGE_MPEG and AVCOL_RANGE_JPEG.
+     */
+    unsigned color_ranges:2;
 
     /**
      * This field determines the type of the codec (decoder/encoder)
@@ -165,14 +172,6 @@ typedef struct FFCodec {
      * Private codec-specific defaults.
      */
     const FFCodecDefault *defaults;
-
-    /**
-     * Initialize codec static data, called from av_codec_iterate().
-     *
-     * This is not intended for time consuming operations as it is
-     * run for every codec regardless of that codec being used.
-     */
-    void (*init_static_data)(struct FFCodec *codec);
 
     int (*init)(struct AVCodecContext *);
 
@@ -263,7 +262,33 @@ typedef struct FFCodec {
      * List of supported codec_tags, terminated by FF_CODEC_TAGS_END.
      */
     const uint32_t *codec_tags;
+
+    /**
+     * Custom callback for avcodec_get_supported_config(). If absent,
+     * ff_default_get_supported_config() will be used. `out_num_configs` will
+     * always be set to a valid pointer.
+     */
+    int (*get_supported_config)(const AVCodecContext *avctx,
+                                const AVCodec *codec,
+                                enum AVCodecConfig config,
+                                unsigned flags,
+                                const void **out_configs,
+                                int *out_num_configs);
 } FFCodec;
+
+/**
+ * Default implementation for avcodec_get_supported_config(). Will return the
+ * relevant fields from AVCodec if present, or NULL otherwise.
+ *
+ * For AVCODEC_CONFIG_COLOR_RANGE, the output will depend on the bitmask in
+ * FFCodec.color_ranges, with a value of 0 returning NULL.
+ */
+int ff_default_get_supported_config(const AVCodecContext *avctx,
+                                    const AVCodec *codec,
+                                    enum AVCodecConfig config,
+                                    unsigned flags,
+                                    const void **out_configs,
+                                    int *out_num_configs);
 
 #if CONFIG_SMALL
 #define CODEC_LONG_NAME(str) .p.long_name = NULL

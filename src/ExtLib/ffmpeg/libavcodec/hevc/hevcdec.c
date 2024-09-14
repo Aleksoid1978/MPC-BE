@@ -2611,9 +2611,9 @@ static int hls_decode_entry(HEVCContext *s, GetBitContext *gb)
 }
 
 static int hls_decode_entry_wpp(AVCodecContext *avctx, void *hevc_lclist,
-                                int job, int self_id)
+                                int job, int thread)
 {
-    HEVCLocalContext *lc = &((HEVCLocalContext*)hevc_lclist)[self_id];
+    HEVCLocalContext *lc = &((HEVCLocalContext*)hevc_lclist)[thread];
     const HEVCContext *const s = lc->parent;
     const HEVCLayerContext *const l = &s->layers[s->cur_layer];
     const HEVCPPS   *const pps = s->pps;
@@ -2623,7 +2623,6 @@ static int hls_decode_entry_wpp(AVCodecContext *avctx, void *hevc_lclist,
     int ctb_row = job;
     int ctb_addr_rs = s->sh.slice_ctb_addr_rs + ctb_row * ((sps->width + ctb_size - 1) >> sps->log2_ctb_size);
     int ctb_addr_ts = pps->ctb_addr_rs_to_ts[ctb_addr_rs];
-    int thread = ctb_row % avctx->thread_count;
 
     const uint8_t *data      = s->data + s->sh.offset[ctb_row];
     const size_t   data_size = s->sh.size[ctb_row];
@@ -2654,6 +2653,11 @@ static int hls_decode_entry_wpp(AVCodecContext *avctx, void *hevc_lclist,
             goto error;
         hls_sao_param(lc, l, pps, sps,
                       x_ctb >> sps->log2_ctb_size, y_ctb >> sps->log2_ctb_size);
+
+        l->deblock[ctb_addr_rs].beta_offset = s->sh.beta_offset;
+        l->deblock[ctb_addr_rs].tc_offset   = s->sh.tc_offset;
+        l->filter_slice_edges[ctb_addr_rs]  = s->sh.slice_loop_filter_across_slices_enabled_flag;
+
         more_data = hls_coding_quadtree(lc, l, pps, sps, x_ctb, y_ctb, sps->log2_ctb_size, 0);
 
         if (more_data < 0) {
@@ -3476,6 +3480,8 @@ static int hevc_receive_frame(AVCodecContext *avctx, AVFrame *frame)
     uint8_t *sd;
     size_t sd_size;
 
+    s->pkt_dts = AV_NOPTS_VALUE;
+
     if (ff_container_fifo_can_read(s->output_fifo))
         goto do_output;
 
@@ -3488,6 +3494,8 @@ static int hevc_receive_frame(AVCodecContext *avctx, AVFrame *frame)
         goto do_output;
     } else if (ret < 0)
         return ret;
+
+    s->pkt_dts = avpkt->dts;
 
     sd = av_packet_get_side_data(avpkt, AV_PKT_DATA_NEW_EXTRADATA, &sd_size);
     if (sd && sd_size > 0) {

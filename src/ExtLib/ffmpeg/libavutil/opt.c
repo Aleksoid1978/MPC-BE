@@ -2214,7 +2214,6 @@ int av_opt_get_array(void *obj, const char *name, int search_flags,
             double     num = 1.0;
             int        den = 1;
             int64_t intnum = 1;
-            int ret;
 
             ret = read_number(o, src, &num, &den, &intnum);
             if (ret < 0)
@@ -2260,7 +2259,7 @@ int av_opt_set_array(void *obj, const char *name, int search_flags,
     unsigned *array_size, new_size;
     size_t elem_size;
 
-    int ret;
+    int ret = 0;
 
     o = av_opt_find2(obj, name, NULL, 0, search_flags, &target_obj);
     if (!o || !target_obj)
@@ -2368,7 +2367,6 @@ int av_opt_set_array(void *obj, const char *name, int search_flags,
               val_type == AV_OPT_TYPE_FLOAT    ||
               val_type == AV_OPT_TYPE_DOUBLE   ||
               val_type == AV_OPT_TYPE_RATIONAL) {
-            int ret;
 
             switch (val_type) {
             case AV_OPT_TYPE_INT:       intnum = *(int*)src;                break;
