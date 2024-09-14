@@ -19,6 +19,7 @@ Improved placement of PGS subtitles for cropped videos.
 Player
 Fixed display of static DVD-Video menu when minimizing/maximizing the player window.
 Fixed video frame zooming.
+Added support for long paths for Windows 10 v1607 and newer. Long paths must be enabled in the registry. https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation
 Various interface fixes.
 
 Updated libraries:
