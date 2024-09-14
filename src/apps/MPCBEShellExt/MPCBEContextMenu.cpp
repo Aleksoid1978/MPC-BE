@@ -118,7 +118,7 @@ CMPCBEContextMenu::~CMPCBEContextMenu()
 	}
 }
 
-static HRESULT DragFiles(LPDATAOBJECT lpdobj, std::vector<CString>& fileNames)
+static HRESULT DragFiles(LPDATAOBJECT lpdobj, std::vector<CStringW>& fileNames)
 {
 	fileNames.clear();
 
@@ -138,7 +138,7 @@ static HRESULT DragFiles(LPDATAOBJECT lpdobj, std::vector<CString>& fileNames)
 				LPWSTR pszName = nullptr;
 				hr = psi->GetDisplayName(SIGDN_FILESYSPATH, &pszName);
 				if (hr == S_OK) {
-					CString fn(pszName);
+					CStringW fn(pszName);
 					CoTaskMemFree(pszName);
 
 					SFGAOF sfgaoAttribs;
@@ -157,7 +157,7 @@ static HRESULT DragFiles(LPDATAOBJECT lpdobj, std::vector<CString>& fileNames)
 
 			if (fileNames.size() > 1) {
 				// sort list by path
-				std::sort(fileNames.begin(), fileNames.end(), [](const CString& a, const CString& b) {
+				std::sort(fileNames.begin(), fileNames.end(), [](const CStringW& a, const CStringW& b) {
 					return StrCmpLogicalW(a, b) < 0;
 				});
 			}
@@ -205,8 +205,8 @@ STDMETHODIMP CMPCBEContextMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UI
 		return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, 0);
 	}
 
-	CString PLAY_MPC  = (GetUserDefaultUILanguage() == 1049) ? PLAY_MPC_RU	: PLAY_MPC_EN;
-	CString ADDTO_MPC = (GetUserDefaultUILanguage() == 1049) ? ADDTO_MPC_RU	: ADDTO_MPC_EN;
+	CStringW PLAY_MPC  = (GetUserDefaultUILanguage() == 1049) ? PLAY_MPC_RU  : PLAY_MPC_EN;
+	CStringW ADDTO_MPC = (GetUserDefaultUILanguage() == 1049) ? ADDTO_MPC_RU : ADDTO_MPC_EN;
 
 	CRegKey key;
 	auto ret = key.Open(HKEY_CURRENT_USER, shellExtKeyName, KEY_READ);
@@ -271,12 +271,12 @@ STDMETHODIMP CMPCBEContextMenu::Drop(LPDATAOBJECT lpdobj, DWORD grfKeyState, POI
 	return S_OK;
 }
 
-static CString GetMPCPath()
+static CStringW GetMPCPath()
 {
 	CRegKey key;
 	WCHAR buff[MAX_PATH] = {};
 	ULONG len = (ULONG)std::size(buff);
-	CString mpcPath;
+	CStringW mpcPath;
 
 	auto ret = key.Open(HKEY_CURRENT_USER, shellExtKeyName, KEY_READ);
 	if (ERROR_SUCCESS != ret) {
@@ -346,7 +346,7 @@ void CMPCBEContextMenu::SendData(const bool bAddPlaylist, const bool bCheckMulti
 	}
 
 	if (bMultipleInstances) {
-		CString mpcPath = GetMPCPath();
+		CStringW mpcPath = GetMPCPath();
 		for (auto item : m_fileNames) {
 			item = L'\"' + item + L'\"';
 			Execute(mpcPath.GetString(), item.GetString(), hMonitor);
@@ -401,7 +401,7 @@ void CMPCBEContextMenu::SendData(const bool bAddPlaylist, const bool bCheckMulti
 
 			SendData(hWnd);
 		} else {
-			const CString mpcPath = GetMPCPath();
+			const CStringW mpcPath = GetMPCPath();
 			if (!mpcPath.IsEmpty() && Execute(mpcPath.GetString(), nullptr, hMonitor)) {
 				Sleep(100);
 				int wait_count = 0;

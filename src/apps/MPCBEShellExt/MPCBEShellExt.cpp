@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2021 see Authors.txt
+ * (C) 2012-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,17 +35,17 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 	return _AtlModule.DllGetClassObject(rclsid, riid, ppv);
 }
 
-static CString GetFileOnly(LPCTSTR Path)
+CStringW GetFileName(LPCWSTR Path)
 {
-	CString cs(Path);
-	::PathStripPathW(cs.GetBuffer(0));
-	cs.ReleaseBuffer(-1);
-	return cs;
+	CStringW fileName = Path;
+	::PathStripPathW(fileName.GetBuffer());
+	fileName.ReleaseBuffer();
+	return fileName;
 }
 
-static CString GetKeyName()
+static CStringW GetKeyName()
 {
-	CString KeyName;
+	CStringW KeyName;
 
 	CRegKey key;
 	auto ret = key.Open(HKEY_CURRENT_USER, shellExtKeyName, KEY_READ);
@@ -56,7 +56,7 @@ static CString GetKeyName()
 		WCHAR path_buff[MAX_PATH] = {};
 		ULONG len = (ULONG)std::size(path_buff);
 		if (ERROR_SUCCESS == key.QueryStringValue(L"MpcPath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
-			KeyName = GetFileOnly(path_buff);
+			KeyName = GetFileName(path_buff);
 			KeyName.Truncate(KeyName.GetLength() - 4);
 		}
 		key.Close();
@@ -65,7 +65,7 @@ static CString GetKeyName()
 	return KeyName;
 }
 
-static BOOL GetKeyValue(LPCTSTR value)
+static BOOL GetKeyValue(LPCWSTR value)
 {
 	BOOL bValue = FALSE;
 
@@ -93,7 +93,7 @@ STDAPI DllRegisterServer(void)
 	HRESULT hr = _AtlModule.DllRegisterServer();
 
 	if (SUCCEEDED(hr)) {
-		CString KeyName = GetKeyName();
+		CStringW KeyName = GetKeyName();
 		if (KeyName.IsEmpty()) {
 			return E_FAIL;
 		}
@@ -115,7 +115,7 @@ STDAPI DllRegisterServer(void)
 
 				while ((lRet = reg.EnumKey(dwIndex, szSubKeyName, &cbName)) != ERROR_NO_MORE_ITEMS) {
 					if (lRet == ERROR_SUCCESS) {
-						CString key_name = szSubKeyName;
+						CStringW key_name = szSubKeyName;
 						if (!key_name.Find(KeyName)) {
 							if (bShowFiles) {
 								key.SetValue(HKEY_CLASSES_ROOT, key_name + L"\\shellex\\ContextMenuHandlers\\MPCBEShellExt\\", strWideCLSID);
@@ -149,7 +149,7 @@ STDAPI DllUnregisterServer(void)
 			key.DeleteSubKey(L"MPCBEShellExt");
 		}
 
-		CString KeyName = GetKeyName();
+		CStringW KeyName = GetKeyName();
 		if (KeyName.IsEmpty()) {
 			return hr;
 		}
@@ -163,7 +163,7 @@ STDAPI DllUnregisterServer(void)
 
 			while ((lRet = reg.EnumKey(dwIndex, szSubKeyName, &cbName)) != ERROR_NO_MORE_ITEMS) {
 				if (lRet == ERROR_SUCCESS) {
-					CString key_name = szSubKeyName;
+					CStringW key_name = szSubKeyName;
 					if (!key_name.Find(KeyName)) {
 						if (key.Open(HKEY_CLASSES_ROOT, key_name) == ERROR_SUCCESS) {
 							key.RecurseDeleteKey(L"shellex");

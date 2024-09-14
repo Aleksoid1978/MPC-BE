@@ -79,7 +79,7 @@ public:
 
 private:
 	HBITMAP m_hPlayBmp, m_hAddBmp;
-	std::vector<CString> m_fileNames;
+	std::vector<CStringW> m_fileNames;
 
 	void SendData(const bool bAddPlaylist, const bool bCheckMultipleInstances = false, HMONITOR hMonitor = nullptr);
 };
