@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,6 +33,8 @@ class CSaveTextFileDialog : public CFileDialog
 	DECLARE_DYNAMIC(CSaveTextFileDialog)
 
 private:
+	std::unique_ptr<WCHAR[]> m_pstrInitialDir;
+	std::unique_ptr<WCHAR[]> m_pstrFile;
 	CTextFile::enc m_e;
 
 public:

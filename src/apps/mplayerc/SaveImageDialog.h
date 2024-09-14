@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,6 +26,10 @@
 class CSaveImageDialog : public CFileDialog
 {
 	DECLARE_DYNAMIC(CSaveImageDialog)
+
+private:
+	std::unique_ptr<WCHAR[]> m_pstrInitialDir;
+	std::unique_ptr<WCHAR[]> m_pstrFile;
 
 public:
 	CSaveImageDialog(

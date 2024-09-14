@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,6 +37,19 @@ CSaveTextFileDialog::CSaveTextFileDialog(
 	, m_bDisableExternalStyleCheckBox(bDisableExternalStyleCheckBox)
 	, m_bSaveExternalStyleFile(bSaveExternalStyleFile)
 {
+	CStringW dir = ::GetFolderPath(lpszFileName);
+	int size = std::max(MAX_PATH, dir.GetLength() + 1);
+	m_pstrInitialDir.reset(new WCHAR[size]);
+	memset(m_pstrInitialDir.get(), 0, size * sizeof(WCHAR));
+	wcscpy_s(m_pstrInitialDir.get(), size, dir.GetString());
+	m_pOFN->lpstrInitialDir = m_pstrInitialDir.get();
+
+	size += 500;
+	m_pstrFile.reset(new WCHAR[size]);
+	memset(m_pstrFile.get(), 0, size * sizeof(WCHAR));
+	m_pOFN->lpstrFile = m_pstrFile.get();
+	m_pOFN->nMaxFile = size;
+
 	IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
 	if (pfdc) {
 		pfdc->StartVisualGroup(IDS_TEXTFILE_ENC, ResStr(IDS_TEXTFILE_ENC));
