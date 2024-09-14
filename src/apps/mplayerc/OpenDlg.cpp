@@ -287,25 +287,18 @@ COpenFileDlg::COpenFileDlg(std::vector<CString>& mask, bool fAllowDirSelection, 
 		str = s.strLastOpenFile;
 	}
 
-	RemoveFileSpec(str);
+	CStringW dir = ::GetFolderPath(lpszFileName);
+	int size = std::max(MAX_PATH, dir.GetLength() + 1);
+	m_pstrInitialDir.reset(new WCHAR[size]);
+	memset(m_pstrInitialDir.get(), 0, size * sizeof(WCHAR));
+	wcscpy_s(m_pstrInitialDir.get(), size, dir.GetString());
+	m_pOFN->lpstrInitialDir = m_pstrInitialDir.get();
 
-	int size = std::max(1000, str.GetLength() + 1);
-	m_InitialDir = DNew WCHAR[size];
-	memset(m_InitialDir, 0, size * sizeof(WCHAR));
-	wcscpy_s(m_InitialDir, size, str);
-	m_pOFN->lpstrInitialDir = m_InitialDir;
-
-	size = 100000;
-	m_buff = DNew WCHAR[size];
-	memset(m_buff, 0, size * sizeof(WCHAR));
-	m_pOFN->lpstrFile = m_buff;
-	m_pOFN->nMaxFile  = size;
-}
-
-COpenFileDlg::~COpenFileDlg()
-{
-	delete [] m_InitialDir;
-	delete [] m_buff;
+	size = 100000; // needed to receive a large number of files
+	m_pstrFile.reset(new WCHAR[size]);
+	memset(m_pstrFile.get(), 0, size * sizeof(WCHAR));
+	m_pOFN->lpstrFile = m_pstrFile.get();
+	m_pOFN->nMaxFile = size;
 }
 
 BEGIN_MESSAGE_MAP(COpenFileDlg, CFileDialog)

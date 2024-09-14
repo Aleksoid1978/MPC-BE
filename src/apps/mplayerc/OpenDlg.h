@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -68,8 +68,8 @@ class COpenFileDlg : public CFileDialog
 	DECLARE_DYNAMIC(COpenFileDlg)
 
 private:
-	WCHAR* m_buff;
-	WCHAR* m_InitialDir;
+	std::unique_ptr<WCHAR[]> m_pstrInitialDir;
+	std::unique_ptr<WCHAR[]> m_pstrFile;
 	std::vector<CString>& m_mask;
 
 public:
@@ -79,7 +79,7 @@ public:
 				 DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
 				 LPCWSTR lpszFilter = nullptr,
 				 CWnd* pParentWnd = nullptr);
-	virtual ~COpenFileDlg();
+	~COpenFileDlg() = default;
 
 	static bool m_fAllowDirSelection;
 	static WNDPROC m_wndProc;
