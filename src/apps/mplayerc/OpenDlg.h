@@ -61,11 +61,11 @@ public:
 	afx_msg void OnUpdateOk(CCmdUI* pCmdUI);
 };
 
-// COpenFileDlg
+// COpenMediaFileDlg
 
-class COpenFileDlg : public CFileDialog
+class COpenMediaFileDlg : public CFileDialog
 {
-	DECLARE_DYNAMIC(COpenFileDlg)
+	DECLARE_DYNAMIC(COpenMediaFileDlg)
 
 private:
 	std::unique_ptr<WCHAR[]> m_pstrInitialDir;
@@ -73,13 +73,13 @@ private:
 	std::vector<CString>& m_mask;
 
 public:
-	COpenFileDlg(std::vector<CString>& mask, bool fAllowDirSelection,
+	COpenMediaFileDlg(std::vector<CString>& mask, bool fAllowDirSelection,
 				 LPCWSTR lpszDefExt = nullptr,
 				 LPCWSTR lpszFileName = nullptr,
 				 DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
 				 LPCWSTR lpszFilter = nullptr,
 				 CWnd* pParentWnd = nullptr);
-	~COpenFileDlg() = default;
+	~COpenMediaFileDlg() = default;
 
 	static bool m_fAllowDirSelection;
 	static WNDPROC m_wndProc;

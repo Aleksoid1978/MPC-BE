@@ -3535,7 +3535,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 						dwFlags |= OFN_DONTADDTORECENT;
 					}
 
-					COpenFileDlg fd(mask, true, nullptr, nullptr, dwFlags, filter, this);
+					COpenMediaFileDlg fd(mask, true, nullptr, nullptr, dwFlags, filter, this);
 					if (fd.DoModal() == IDOK) {
 						std::list<CString> fns;
 

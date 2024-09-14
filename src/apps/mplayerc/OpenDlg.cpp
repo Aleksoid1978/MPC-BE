@@ -159,7 +159,7 @@ void COpenDlg::OnBnClickedBrowsebutton()
 		dwFlags |= OFN_DONTADDTORECENT;
 	}
 
-	COpenFileDlg fd(mask, true, nullptr, m_path, dwFlags, filter, this);
+	COpenMediaFileDlg fd(mask, true, nullptr, m_path, dwFlags, filter, this);
 
 	if (fd.DoModal() != IDOK) {
 		return;
@@ -208,7 +208,7 @@ void COpenDlg::OnBnClickedBrowsebutton2()
 		dwFlags |= OFN_DONTADDTORECENT;
 	}
 
-	COpenFileDlg fd(mask, false, nullptr, m_path2, dwFlags, filter, this);
+	COpenMediaFileDlg fd(mask, false, nullptr, m_path2, dwFlags, filter, this);
 
 	if (fd.DoModal() != IDOK) {
 		return;
@@ -265,15 +265,15 @@ void COpenDlg::OnUpdateOk(CCmdUI* pCmdUI)
 	pCmdUI->Enable(!CString(m_path).Trim().IsEmpty() || !CString(m_path2).Trim().IsEmpty());
 }
 
-// COpenFileDlg
+// COpenMediaFileDlg
 
 #define __DUMMY__ L"*.*"
 
-bool COpenFileDlg::m_fAllowDirSelection = false;
-WNDPROC COpenFileDlg::m_wndProc = nullptr;
+bool COpenMediaFileDlg::m_fAllowDirSelection = false;
+WNDPROC COpenMediaFileDlg::m_wndProc = nullptr;
 
-IMPLEMENT_DYNAMIC(COpenFileDlg, CFileDialog)
-COpenFileDlg::COpenFileDlg(std::vector<CString>& mask, bool fAllowDirSelection, LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
+IMPLEMENT_DYNAMIC(COpenMediaFileDlg, CFileDialog)
+COpenMediaFileDlg::COpenMediaFileDlg(std::vector<CString>& mask, bool fAllowDirSelection, LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
 						   DWORD dwFlags, LPCWSTR lpszFilter, CWnd* pParentWnd)
 	: CFileDialog(TRUE, lpszDefExt, lpszFileName, dwFlags|OFN_NOVALIDATE, lpszFilter, pParentWnd, 0)
 	, m_mask(mask)
@@ -301,13 +301,13 @@ COpenFileDlg::COpenFileDlg(std::vector<CString>& mask, bool fAllowDirSelection, 
 	m_pOFN->nMaxFile = size;
 }
 
-BEGIN_MESSAGE_MAP(COpenFileDlg, CFileDialog)
+BEGIN_MESSAGE_MAP(COpenMediaFileDlg, CFileDialog)
 	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
-// COpenFileDlg message handlers
+// COpenMediaFileDlg message handlers
 
-LRESULT CALLBACK COpenFileDlg::WindowProcNew(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK COpenMediaFileDlg::WindowProcNew(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	if (message ==  WM_COMMAND && HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDOK
 			&& m_fAllowDirSelection) {
@@ -317,10 +317,10 @@ LRESULT CALLBACK COpenFileDlg::WindowProcNew(HWND hwnd, UINT message, WPARAM wPa
 		}
 	}
 
-	return CallWindowProcW(COpenFileDlg::m_wndProc, hwnd, message, wParam, lParam);
+	return CallWindowProcW(COpenMediaFileDlg::m_wndProc, hwnd, message, wParam, lParam);
 }
 
-BOOL COpenFileDlg::OnInitDialog()
+BOOL COpenMediaFileDlg::OnInitDialog()
 {
 	CFileDialog::OnInitDialog();
 
@@ -329,7 +329,7 @@ BOOL COpenFileDlg::OnInitDialog()
 	return TRUE;
 }
 
-void COpenFileDlg::OnDestroy()
+void COpenMediaFileDlg::OnDestroy()
 {
 	int i = GetPathName().Find(__DUMMY__);
 
@@ -340,7 +340,7 @@ void COpenFileDlg::OnDestroy()
 	CFileDialog::OnDestroy();
 }
 
-BOOL COpenFileDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
+BOOL COpenMediaFileDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
 	ASSERT(pResult != nullptr);
 
@@ -363,7 +363,7 @@ BOOL COpenFileDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 	return FALSE;
 }
 
-BOOL COpenFileDlg::OnIncludeItem(OFNOTIFYEX* pOFNEx, LRESULT* pResult)
+BOOL COpenMediaFileDlg::OnIncludeItem(OFNOTIFYEX* pOFNEx, LRESULT* pResult)
 {
 	WCHAR buff[MAX_PATH];
 
