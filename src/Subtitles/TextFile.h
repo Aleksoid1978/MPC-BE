@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,7 +23,7 @@
 
 #include <afx.h>
 
-class CTextFile : protected CStdioFile
+class CTextFile
 {
 public:
 	enum enc {
@@ -42,18 +42,21 @@ private:
 	std::unique_ptr<WCHAR[]> m_wbuffer;
 	LONGLONG m_posInBuffer, m_nInBuffer;
 
+	CStdioFile m_file;
+	CStringW m_strFileName;
+	bool m_bOpened = false;
+
 public:
 	CTextFile(enc encoding = ASCII, enc defaultencoding = ASCII);
+	virtual ~CTextFile();
 
-	virtual bool Open(LPCWSTR lpszFileName);
-	virtual bool Save(LPCWSTR lpszFileName, enc e /*= ASCII*/);
-	virtual void Close() { return __super::Close(); };
+	bool Open(LPCWSTR lpszFileName);
+	bool Save(LPCWSTR lpszFileName, enc e /*= ASCII*/);
+	void Close();
 
 	void SetEncoding(enc e);
-	enc GetEncoding();
-	bool IsUnicode();
-
-	// CFile
+	enc GetEncoding() const;
+	bool IsUnicode() const;
 
 	CStringW GetFilePath() const;
 
@@ -69,12 +72,12 @@ public:
 	BOOL ReadString(CStringW& str);
 
 protected:
-	virtual bool ReopenAsText();
+	bool ReopenAsText();
 	bool FillBuffer();
 	ULONGLONG GetPositionFastBuffered() const;
 };
 
-class CWebTextFile : public CTextFile
+class CWebTextFile final : public CTextFile
 {
 	LONGLONG m_llMaxSize;
 	CStringW m_tempfn;
@@ -86,7 +89,6 @@ public:
 	~CWebTextFile();
 
 	bool Open(LPCWSTR lpszFileName);
-	bool Save(LPCWSTR lpszFileName, enc e /*= ASCII*/);
 	void Close();
 
 	const CString& GetRedirectURL() const;
