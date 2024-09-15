@@ -47,6 +47,8 @@ CTextFile::~CTextFile()
 
 bool CTextFile::OpenFile(LPCWSTR lpszFileName, LPCWSTR mode)
 {
+	Close();
+
 	FILE* f = nullptr;
 	auto err = _wfopen_s(&f, lpszFileName, mode);
 	if (err != 0 || !f) {
@@ -144,6 +146,7 @@ void CTextFile::Close()
 	if (m_pStdioFile) {
 		m_pStdioFile.reset();
 		m_pFile.reset();
+		m_strFileName.Empty();
 	}
 }
 
