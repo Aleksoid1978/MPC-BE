@@ -808,7 +808,6 @@ CPlayerPlaylistBar::CPlayerPlaylistBar(CMainFrame* pMainFrame)
 CPlayerPlaylistBar::~CPlayerPlaylistBar()
 {
 	TEnsureVisible(m_nCurPlayListIndex); // save selected tab visible
-	SavePlaylist();
 	TSaveSettings();
 
 	for (auto& pl : m_pls) {
