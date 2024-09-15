@@ -31,10 +31,7 @@ class COpenFileDialog : public CFileDialog
 	DECLARE_DYNAMIC(COpenFileDialog)
 
 private:
-	// CFileDialog::GetPathName does not work for long paths, use GetFilePath instead.
-	CFileDialog::GetPathName;
-
-	std::unique_ptr<WCHAR[]> m_pstrInitialDir;
+	CStringW m_strInitialDir;
 
 public:
 	COpenFileDialog(
@@ -46,7 +43,8 @@ public:
 	virtual ~COpenFileDialog() = default;
 
 	// Returns the file path selected for opening. Long paths are supported.
-	CStringW GetFilePath();
+	// PS: parent CFileDialog::GetPathName does not work for long paths.
+	CStringW GetPathName();
 	//std::vector<CStringW> GetFilePaths();
 };
 
@@ -59,10 +57,7 @@ class CSaveFileDialog : public CFileDialog
 	DECLARE_DYNAMIC(CSaveFileDialog)
 
 private:
-	// CFileDialog::GetPathName does not work for long paths, use GetFilePath instead.
-	CFileDialog::GetPathName;
-
-	std::unique_ptr<WCHAR[]> m_pstrInitialDir;
+	CStringW m_strInitialDir;
 
 public:
 	CSaveFileDialog(
@@ -74,5 +69,6 @@ public:
 	virtual ~CSaveFileDialog() = default;
 
 	// Returns the file path selected for saving. Long paths are supported.
-	CStringW GetFilePath();
+	// PS: parent CFileDialog::GetPathName does not work for long paths.
+	CStringW GetPathName();
 };

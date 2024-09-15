@@ -35,17 +35,12 @@ COpenFileDialog::COpenFileDialog(
 		CWnd* pParentWnd)
 	: CFileDialog(TRUE, lpszDefExt, lpszFileName, dwFlags, lpszFilter, pParentWnd)
 {
-	CStringW dir = ::GetFolderPath(lpszFileName);
-	size_t size = dir.GetLength() + 1;
+	m_strInitialDir = ::GetFolderPath(lpszFileName);
 
-	m_pstrInitialDir.reset(new WCHAR[size]);
-	memset(m_pstrInitialDir.get(), 0, size * sizeof(WCHAR));
-	wcscpy_s(m_pstrInitialDir.get(), size, dir.GetString());
-
-	m_pOFN->lpstrInitialDir = m_pstrInitialDir.get();
+	m_pOFN->lpstrInitialDir = m_strInitialDir.GetString();
 }
 
-CStringW COpenFileDialog::GetFilePath()
+CStringW COpenFileDialog::GetPathName()
 {
 	CStringW filepath;
 
@@ -112,17 +107,12 @@ CSaveFileDialog::CSaveFileDialog(
 		CWnd* pParentWnd)
 	: CFileDialog(FALSE, lpszDefExt, lpszFileName, dwFlags, lpszFilter, pParentWnd)
 {
-	CStringW dir = ::GetFolderPath(lpszFileName);
-	size_t size = dir.GetLength() + 1;
+	m_strInitialDir = ::GetFolderPath(lpszFileName);
 
-	m_pstrInitialDir.reset(new WCHAR[size]);
-	memset(m_pstrInitialDir.get(), 0, size * sizeof(WCHAR));
-	wcscpy_s(m_pstrInitialDir.get(), size, dir.GetString());
-
-	m_pOFN->lpstrInitialDir = m_pstrInitialDir.get();
+	m_pOFN->lpstrInitialDir = m_strInitialDir.GetString();
 }
 
-CStringW CSaveFileDialog::GetFilePath()
+CStringW CSaveFileDialog::GetPathName()
 {
 	CStringW filepath;
 

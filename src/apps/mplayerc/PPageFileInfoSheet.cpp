@@ -154,7 +154,7 @@ void CPPageFileInfoSheet::OnSaveAs()
 
 	if (filedlg.DoModal() == IDOK) {
 		CFile mFile;
-		if (mFile.Open(filedlg.GetFilePath(), CFile::modeCreate | CFile::modeWrite)) {
+		if (mFile.Open(filedlg.GetPathName(), CFile::modeCreate | CFile::modeWrite)) {
 			const WCHAR bom = 0xFEFF;
 			mFile.Write(&bom, sizeof(WCHAR));
 			mFile.Write(LPCWSTR(m_mi.MI_Text), m_mi.MI_Text.GetLength() * sizeof(WCHAR));

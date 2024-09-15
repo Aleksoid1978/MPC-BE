@@ -5807,7 +5807,7 @@ void CMainFrame::OnFileOpenIso()
 			return;
 		}
 
-		m_wndPlaylistBar.Open(fd.GetFilePath());
+		m_wndPlaylistBar.Open(fd.GetPathName());
 		OpenCurPlaylistItem();
 	}
 }
@@ -6045,8 +6045,8 @@ void CMainFrame::OnFileSaveAs()
 	if (fd.DoModal() != IDOK) {
 		return;
 	}
-	CStringW savedFileName(fd.GetFilePath());
-	if (in.CompareNoCase(fd.GetFilePath()) == 0) {
+	CStringW savedFileName(fd.GetPathName());
+	if (in.CompareNoCase(savedFileName) == 0) {
 		return;
 	}
 
@@ -6573,7 +6573,7 @@ void CMainFrame::OnFileSaveImage()
 	s.iThumbLevelPNG     = std::clamp(fd.m_PngCompression, 1, 9);
 	s.bSnapShotSubtitles = fd.m_bDrawSubtitles;
 
-	CStringW pdst = fd.GetFilePath();
+	CStringW pdst = fd.GetPathName();
 	if (GetFileExt(pdst).MakeLower() != s.strSnapShotExt) {
 		RenameFileExt(pdst, s.strSnapShotExt);
 	}
@@ -6668,7 +6668,7 @@ void CMainFrame::OnFileSaveThumbnails()
 	s.iThumbLevelPNG     = std::clamp(fd.m_PngCompression, 1, 9);
 	s.bSnapShotSubtitles = fd.m_bDrawSubtitles;
 
-	CStringW pdst = fd.GetFilePath();
+	CStringW pdst = fd.GetPathName();
 	if (GetFileExt(pdst).MakeLower() != s.strSnapShotExt) {
 		RenameFileExt(pdst, s.strSnapShotExt);
 	}
@@ -6843,7 +6843,7 @@ void CMainFrame::OnFileSaveSubtitle()
 
 			if (fd.DoModal() == IDOK) {
 				CAutoLock cAutoLock(&m_csSubLock);
-				pVSF->Save(fd.GetFilePath());
+				pVSF->Save(fd.GetPathName());
 			}
 
 			return;
@@ -6877,7 +6877,7 @@ void CMainFrame::OnFileSaveSubtitle()
 				s.bSubSaveExternalStyleFile = !!fd.GetSaveExternalStyleFile();
 
 				CAutoLock cAutoLock(&m_csSubLock);
-				pRTS->SaveAs(fd.GetFilePath(), types[fd.m_ofn.nFilterIndex - 1], m_pCAP->GetFPS(), m_pCAP->GetSubtitleDelay(), fd.GetEncoding(), s.bSubSaveExternalStyleFile);
+				pRTS->SaveAs(fd.GetPathName(), types[fd.m_ofn.nFilterIndex - 1], m_pCAP->GetFPS(), m_pCAP->GetSubtitleDelay(), fd.GetEncoding(), s.bSubSaveExternalStyleFile);
 			}
 
 			return;

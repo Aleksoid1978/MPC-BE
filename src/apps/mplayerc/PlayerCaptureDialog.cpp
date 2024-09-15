@@ -1560,7 +1560,7 @@ void CPlayerCaptureDialog::OnOpenFile()
 				   L"Media files (*.avi,*.mkv,*.dsm)|*.avi;*.mkv;*.dsm|", this);
 
 	if (fd.DoModal() == IDOK) {
-		CString str = fd.GetFilePath();
+		CString str = fd.GetPathName();
 
 		CString ext = str.Mid(str.ReverseFind('.')+1).MakeLower();
 		if (ext == L"avi") {

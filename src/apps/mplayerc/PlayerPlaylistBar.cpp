@@ -3682,7 +3682,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 
 				int idx = fd.m_pOFN->nFilterIndex;
 
-				CStringW path(fd.GetFilePath());
+				CStringW path(fd.GetPathName());
 				CStringW base = GetFolderPath(path);
 				s.strLastSavedPlaylistDir = GetAddSlash(base);
 
