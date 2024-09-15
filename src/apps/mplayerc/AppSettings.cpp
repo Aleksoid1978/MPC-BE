@@ -2477,32 +2477,15 @@ void CAppSettings::SaveFormats()
 	m_Formats.UpdateData(true);
 }
 
-extern BOOL AFXAPI AfxFullPath(LPTSTR lpszPathOut, LPCTSTR lpszFileIn);
-extern BOOL AFXAPI AfxComparePath(LPCTSTR lpszPath1, LPCTSTR lpszPath2);
-
 CStringW ParseFileName(const CStringW& param)
 {
 	if (param.Find(L':') < 0) {
 		// try to convert relative path to full path
 		CStringW fullPathName;
-		fullPathName.ReleaseBuffer(GetFullPathNameW(param, MAX_PATH, fullPathName.GetBuffer(MAX_PATH), nullptr));
+		fullPathName.ReleaseBuffer(GetFullPathNameW(param, 8192, fullPathName.GetBuffer(8192), nullptr));
 
-		CFileStatus fs;
-		if (!fullPathName.IsEmpty() && CFileGetStatus(fullPathName, fs)) {
+		if (::PathFileExistsW(fullPathName)) {
 			return fullPathName;
-		}
-	} else if (param.GetLength() > MAX_PATH && !::PathIsURLW(param) && !::PathIsUNCW(param)) {
-		// trying to shorten a long local path
-		CStringW longpath = StartsWith(param, EXTENDED_PATH_PREFIX) ? param : EXTENDED_PATH_PREFIX + param;
-		auto length = GetShortPathNameW(longpath, nullptr, 0);
-		if (length > 0) {
-			CStringW shortPathName;
-			length = GetShortPathNameW(longpath, shortPathName.GetBuffer(length), length);
-			if (length > 0) {
-				shortPathName.ReleaseBuffer(length);
-				shortPathName.Delete(0, 4); // remove "\\?\" prefix
-				return shortPathName;
-			}
 		}
 	}
 

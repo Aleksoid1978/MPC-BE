@@ -1101,7 +1101,7 @@ BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoi
 				UINT nFiles = ::DragQueryFileW(hDrop, UINT_MAX, nullptr, 0);
 				for (UINT iFile = 0; iFile < nFiles; iFile++) {
 					CString fn;
-					fn.ReleaseBuffer(::DragQueryFileW(hDrop, iFile, fn.GetBuffer(2048), 2048));
+					fn.ReleaseBuffer(::DragQueryFileW(hDrop, iFile, fn.GetBuffer(8192), 8192));
 					slFiles.emplace_back(ParseFileName(fn));
 				}
 				::DragFinish(hDrop);
