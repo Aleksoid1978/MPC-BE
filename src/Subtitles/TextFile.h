@@ -22,6 +22,8 @@
 #pragma once
 
 #include <afx.h>
+#include <stdio.h>
+#include <memory>
 
 class CTextFile
 {
@@ -42,9 +44,11 @@ private:
 	std::unique_ptr<WCHAR[]> m_wbuffer;
 	LONGLONG m_posInBuffer, m_nInBuffer;
 
-	CStdioFile m_file;
+	std::unique_ptr<FILE, std::integral_constant<decltype(&fclose), &fclose>> m_pFile;
+	std::unique_ptr<CStdioFile> m_pStdioFile;
 	CStringW m_strFileName;
-	bool m_bOpened = false;
+
+	bool OpenFile(LPCWSTR lpszFileName, LPCWSTR mode);
 
 public:
 	CTextFile(enc encoding = ASCII, enc defaultencoding = ASCII);
@@ -68,8 +72,8 @@ public:
 
 	void WriteString(LPCSTR lpsz/*CStringA str*/);
 	void WriteString(LPCWSTR lpsz/*CStringW str*/);
-	BOOL ReadString(CStringA& str);
-	BOOL ReadString(CStringW& str);
+	bool ReadString(CStringA& str);
+	bool ReadString(CStringW& str);
 
 protected:
 	bool ReopenAsText();

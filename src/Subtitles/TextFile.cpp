@@ -45,30 +45,35 @@ CTextFile::~CTextFile()
 	Close();
 }
 
+bool CTextFile::OpenFile(LPCWSTR lpszFileName, LPCWSTR mode)
+{
+	FILE* f = nullptr;
+	auto err = _wfopen_s(&f, lpszFileName, mode);
+	if (err != 0 || !f) {
+		return false;
+	}
+
+	m_pFile.reset(f);
+	m_pStdioFile = std::make_unique<CStdioFile>(f);
+
+	m_strFileName = lpszFileName;
+
+	return true;
+}
+
 bool CTextFile::Open(LPCWSTR lpszFileName)
 {
-	CFileException fex;
-	for (unsigned attempt = 1;; attempt++) {
-		if (!m_file.Open(lpszFileName, CStdioFile::modeRead | CStdioFile::typeBinary | CStdioFile::shareDenyNone, &fex)) {
-			if (fex.m_cause == CFileException::sharingViolation) {
-				if (attempt <= 5) {
-					Sleep(20);
-					continue;
-				}
-			}
-			return false;
-		}
-
-		break;
+	if (!OpenFile(lpszFileName, L"rb")) {
+		return false;
 	}
 
 	m_offset = 0;
 	m_nInBuffer = m_posInBuffer = 0;
 
-	if (m_file.GetLength() >= 2) {
+	if (m_pStdioFile->GetLength() >= 2) {
 		WORD w;
-		if (sizeof(w) != m_file.Read(&w, sizeof(w))) {
-			m_file.Close();
+		if (sizeof(w) != m_pStdioFile->Read(&w, sizeof(w))) {
+			Close();
 			return false;
 		}
 
@@ -78,10 +83,10 @@ bool CTextFile::Open(LPCWSTR lpszFileName)
 		} else if (w == 0xfffe) {
 			m_encoding = BE16;
 			m_offset = 2;
-		} else if (w == 0xbbef && m_file.GetLength() >= 3) {
+		} else if (w == 0xbbef && m_pStdioFile->GetLength() >= 3) {
 			BYTE b;
-			if (sizeof(b) != m_file.Read(&b, sizeof(b))) {
-				m_file.Close();
+			if (sizeof(b) != m_pStdioFile->Read(&b, sizeof(b))) {
+				Close();
 				return false;
 			}
 
@@ -99,50 +104,46 @@ bool CTextFile::Open(LPCWSTR lpszFileName)
 	} else if (m_offset == 0) { // No BOM detected, ensure the file is read from the beginning
 		Seek(0, CStdioFile::begin);
 	} else {
-		m_posInFile = m_file.GetPosition();
+		m_posInFile = m_pStdioFile->GetPosition();
 	}
-
-	m_bOpened = true;
 
 	return true;
 }
 
 bool CTextFile::ReopenAsText()
 {
-	m_bOpened = !!m_file.Open(m_strFileName, CStdioFile::modeRead | CStdioFile::typeText | CStdioFile::shareDenyNone);
-	return m_bOpened;
+	Close();
+
+	return OpenFile(m_strFileName.GetString(), L"rt");
 }
 
 bool CTextFile::Save(LPCWSTR lpszFileName, enc e)
 {
-	if (!m_file.Open(lpszFileName, CStdioFile::modeCreate | CStdioFile::modeWrite | CStdioFile::shareDenyWrite |
-					 (e == ASCII ? CStdioFile::typeText : CStdioFile::typeBinary))) {
+	if (!OpenFile(lpszFileName, e == ASCII ? L"wt" : L"wb")) {
 		return false;
 	}
 
 	if (e == UTF8) {
 		BYTE b[3] = {0xef, 0xbb, 0xbf};
-		m_file.Write(b, sizeof(b));
+		m_pStdioFile->Write(b, sizeof(b));
 	} else if (e == LE16) {
 		BYTE b[2] = {0xff, 0xfe};
-		m_file.Write(b, sizeof(b));
+		m_pStdioFile->Write(b, sizeof(b));
 	} else if (e == BE16) {
 		BYTE b[2] = {0xfe, 0xff};
-		m_file.Write(b, sizeof(b));
+		m_pStdioFile->Write(b, sizeof(b));
 	}
 
 	m_encoding = e;
-
-	m_bOpened = true;
 
 	return true;
 }
 
 void CTextFile::Close()
 {
-	if (m_bOpened) {
-		m_file.Close();
-		m_bOpened = false;
+	if (m_pStdioFile) {
+		m_pStdioFile.reset();
+		m_pFile.reset();
 	}
 }
 
@@ -170,16 +171,20 @@ CStringW CTextFile::GetFilePath() const
 
 ULONGLONG CTextFile::GetPosition() const
 {
-	return (m_file.GetPosition() - m_offset - (m_nInBuffer - m_posInBuffer));
+	return m_pStdioFile ? (m_pStdioFile->GetPosition() - m_offset - (m_nInBuffer - m_posInBuffer)) : 0ULL;
 }
 
 ULONGLONG CTextFile::GetLength() const
 {
-	return (m_file.GetLength() - m_offset);
+	return m_pStdioFile ? (m_pStdioFile->GetLength() - m_offset) : 0ULL;
 }
 
 ULONGLONG CTextFile::Seek(LONGLONG lOff, UINT nFrom)
 {
+	if (!m_pStdioFile) {
+		return 0ULL;
+	}
+
 	ULONGLONG newPos;
 
 	// Try to reuse the buffer if any
@@ -205,7 +210,7 @@ ULONGLONG CTextFile::Seek(LONGLONG lOff, UINT nFrom)
 		if (m_posInBuffer < 0 || m_posInBuffer >= m_nInBuffer) {
 			// If we would have to end up out of the buffer, we just reset it and seek normally
 			m_nInBuffer = m_posInBuffer = 0;
-			newPos = m_file.Seek(lOff + m_offset, CStdioFile::begin) - m_offset;
+			newPos = m_pStdioFile->Seek(lOff + m_offset, CStdioFile::begin) - m_offset;
 		} else { // If we can reuse the buffer, we have nothing special to do
 			newPos = ULONGLONG(lOff);
 		}
@@ -213,7 +218,7 @@ ULONGLONG CTextFile::Seek(LONGLONG lOff, UINT nFrom)
 		if (nFrom == CStdioFile::begin) {
 			lOff += m_offset;
 		}
-		newPos = m_file.Seek(lOff, nFrom) - m_offset;
+		newPos = m_pStdioFile->Seek(lOff, nFrom) - m_offset;
 	}
 
 	m_posInFile = newPos + m_offset + (m_nInBuffer - m_posInBuffer);
@@ -223,13 +228,17 @@ ULONGLONG CTextFile::Seek(LONGLONG lOff, UINT nFrom)
 
 void CTextFile::WriteString(LPCSTR lpsz/*CStringA str*/)
 {
+	if (!m_pStdioFile) {
+		return;
+	}
+
 	CStringA str(lpsz);
 
 	if (m_encoding == ASCII) {
-		m_file.WriteString(AToT(str));
+		m_pStdioFile->WriteString(AToT(str));
 	} else if (m_encoding == ANSI) {
 		str.Replace("\n", "\r\n");
-		m_file.Write(str.GetString(), str.GetLength());
+		m_pStdioFile->Write(str.GetString(), str.GetLength());
 	} else if (m_encoding == UTF8) {
 		WriteString(AToT(str));
 	} else if (m_encoding == LE16) {
@@ -241,49 +250,57 @@ void CTextFile::WriteString(LPCSTR lpsz/*CStringA str*/)
 
 void CTextFile::WriteString(LPCWSTR lpsz/*CStringW str*/)
 {
+	if (!m_pStdioFile) {
+		return;
+	}
+
 	CStringW str(lpsz);
 
 	if (m_encoding == ASCII) {
-		m_file.WriteString(str);
+		m_pStdioFile->WriteString(str);
 	} else if (m_encoding == ANSI) {
 		str.Replace(L"\n", L"\r\n");
 		CStringA stra(str); // TODO: codepage
-		m_file.Write(stra.GetString(), stra.GetLength());
+		m_pStdioFile->Write(stra.GetString(), stra.GetLength());
 	} else if (m_encoding == UTF8) {
 		str.Replace(L"\n", L"\r\n");
 		for (unsigned int i = 0, l = str.GetLength(); i < l; i++) {
 			DWORD c = (WORD)str[i];
 
 			if (c < 0x80) { // 0xxxxxxx
-				m_file.Write(&c, 1);
+				m_pStdioFile->Write(&c, 1);
 			} else if (c < 0x800) { // 110xxxxx 10xxxxxx
 				c = 0xc080 | ((c << 2) & 0x1f00) | (c & 0x003f);
-				m_file.Write((BYTE*)&c + 1, 1);
-				m_file.Write(&c, 1);
+				m_pStdioFile->Write((BYTE*)&c + 1, 1);
+				m_pStdioFile->Write(&c, 1);
 			} else if (c < 0xFFFF) { // 1110xxxx 10xxxxxx 10xxxxxx
 				c = 0xe08080 | ((c << 4) & 0x0f0000) | ((c << 2) & 0x3f00) | (c & 0x003f);
-				m_file.Write((BYTE*)&c + 2, 1);
-				m_file.Write((BYTE*)&c + 1, 1);
-				m_file.Write(&c, 1);
+				m_pStdioFile->Write((BYTE*)&c + 2, 1);
+				m_pStdioFile->Write((BYTE*)&c + 1, 1);
+				m_pStdioFile->Write(&c, 1);
 			} else {
 				c = '?';
-				m_file.Write(&c, 1);
+				m_pStdioFile->Write(&c, 1);
 			}
 		}
 	} else if (m_encoding == LE16) {
 		str.Replace(L"\n", L"\r\n");
-		m_file.Write(str.GetString(), str.GetLength() * 2);
+		m_pStdioFile->Write(str.GetString(), str.GetLength() * 2);
 	} else if (m_encoding == BE16) {
 		str.Replace(L"\n", L"\r\n");
 		for (unsigned int i = 0, l = str.GetLength(); i < l; i++) {
 			str.SetAt(i, ((str[i] >> 8) & 0x00ff) | ((str[i] << 8) & 0xff00));
 		}
-		m_file.Write(str.GetString(), str.GetLength() * 2);
+		m_pStdioFile->Write(str.GetString(), str.GetLength() * 2);
 	}
 }
 
 bool CTextFile::FillBuffer()
 {
+	if (!m_pStdioFile) {
+		return false;
+	}
+
 	if (m_posInBuffer < m_nInBuffer) {
 		m_nInBuffer -= m_posInBuffer;
 		memcpy(m_buffer.get(), &m_buffer[m_posInBuffer], (size_t)m_nInBuffer * sizeof(char));
@@ -292,36 +309,40 @@ bool CTextFile::FillBuffer()
 	}
 	m_posInBuffer = 0;
 
-	UINT nBytesRead = m_file.Read(&m_buffer[m_nInBuffer], UINT(TEXTFILE_BUFFER_SIZE - m_nInBuffer) * sizeof(char));
+	UINT nBytesRead = m_pStdioFile->Read(&m_buffer[m_nInBuffer], UINT(TEXTFILE_BUFFER_SIZE - m_nInBuffer) * sizeof(char));
 	if (nBytesRead) {
 		m_nInBuffer += nBytesRead;
 	}
-	m_posInFile = m_file.GetPosition();
+	m_posInFile = m_pStdioFile->GetPosition();
 
 	return !nBytesRead;
 }
 
 ULONGLONG CTextFile::GetPositionFastBuffered() const
 {
-	return (m_posInFile - m_offset - (m_nInBuffer - m_posInBuffer));
+	return m_pStdioFile ? (m_posInFile - m_offset - (m_nInBuffer - m_posInBuffer)) : 0ULL;
 }
 
-BOOL CTextFile::ReadString(CStringA& str)
+bool CTextFile::ReadString(CStringA& str)
 {
+	if (!m_pStdioFile) {
+		return false;
+	}
+
 	bool fEOF = true;
 
 	str.Truncate(0);
 
 	if (m_encoding == ASCII) {
 		CStringW s;
-		fEOF = !m_file.ReadString(s);
+		fEOF = !m_pStdioFile->ReadString(s);
 		str = TToA(s);
 		// For consistency with other encodings, we continue reading
 		// the file even when a NUL char is encountered.
 		char c;
-		while (fEOF && (m_file.Read(&c, sizeof(c)) == sizeof(c))) {
+		while (fEOF && (m_pStdioFile->Read(&c, sizeof(c)) == sizeof(c))) {
 			str += c;
-			fEOF = !m_file.ReadString(s);
+			fEOF = !m_pStdioFile->ReadString(s);
 			str += TToA(s);
 		}
 	} else if (m_encoding == ANSI) {
@@ -522,22 +543,26 @@ BOOL CTextFile::ReadString(CStringA& str)
 	return !fEOF;
 }
 
-BOOL CTextFile::ReadString(CStringW& str)
+bool CTextFile::ReadString(CStringW& str)
 {
+	if (!m_pStdioFile) {
+		return false;
+	}
+
 	bool fEOF = true;
 
 	str.Truncate(0);
 
 	if (m_encoding == ASCII) {
 		CStringW s;
-		fEOF = !m_file.ReadString(s);
+		fEOF = !m_pStdioFile->ReadString(s);
 		str = s;
 		// For consistency with other encodings, we continue reading
 		// the file even when a NUL char is encountered.
 		char c;
-		while (fEOF && (m_file.Read(&c, sizeof(c)) == sizeof(c))) {
+		while (fEOF && (m_pStdioFile->Read(&c, sizeof(c)) == sizeof(c))) {
 			str += c;
-			fEOF = !m_file.ReadString(s);
+			fEOF = !m_pStdioFile->ReadString(s);
 			str += s;
 		}
 	} else if (m_encoding == ANSI) {
@@ -805,11 +830,6 @@ bool CWebTextFile::Open(LPCWSTR lpszFileName)
 
 void CWebTextFile::Close()
 {
-	/*
-	if (m_pStream) {
-		__super::Close();
-	}
-	*/
 	__super::Close();
 
 	if (!m_tempfn.IsEmpty()) {
