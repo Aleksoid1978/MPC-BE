@@ -16327,8 +16327,7 @@ bool CMainFrame::LoadSubtitle(const CExtraFileItem& subItem, ISubStream **actual
 		if (subChangeNotifyThread.joinable() && !::PathIsURLW(fname)) {
 			auto it = std::find_if(m_ExtSubFiles.cbegin(), m_ExtSubFiles.cend(), [&fname](filepathtime_t fpt) { return fpt.path == fname; });
 			if (it == m_ExtSubFiles.cend()) {
-				CFileStatus status;
-				m_ExtSubFiles.emplace_back(filepathtime_t{ fname, CFileGetStatus(fname, status) ? status.m_mtime : 0 });
+				m_ExtSubFiles.emplace_back(fname, std::filesystem::last_write_time(fname.GetString()));
 			}
 
 			const CString path = GetFolderPath(fname);
@@ -19955,9 +19954,9 @@ void CMainFrame::subChangeNotifyThreadFunction()
 
 			bool bChanged = false;
 			for (auto& extSubFile : m_ExtSubFiles) {
-				CFileStatus status;
-				if (CFileGetStatus(extSubFile.path, status) && extSubFile.time != status.m_mtime) {
-					extSubFile.time = status.m_mtime;
+				auto ftime = std::filesystem::last_write_time(extSubFile.path.GetString());
+				if (ftime != extSubFile.time) {
+					extSubFile.time = ftime;
 					bChanged = true;
 				}
 			}

@@ -85,6 +85,8 @@
 #include <MediaInfo/MediaInfo.h>
 using namespace MediaInfoLib;
 
+#include <filesystem>
+
 class CFullscreenWnd;
 struct ID3DFullscreenControl;
 struct TunerScanData;
@@ -1273,7 +1275,14 @@ private:
 
 	HMODULE m_hWtsLib;
 
-	struct filepathtime_t { CStringW path; CTime time; };
+	struct filepathtime_t {
+		CStringW path;
+		std::filesystem::file_time_type time;
+		filepathtime_t(const CStringW& _path, std::filesystem::file_time_type _time)
+			: path(_path)
+			, time(_time)
+		{}
+	};
 	std::vector<filepathtime_t> m_ExtSubFiles;
 	std::vector<CStringW> m_ExtSubPaths;
 
