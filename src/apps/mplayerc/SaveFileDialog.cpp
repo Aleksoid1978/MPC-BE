@@ -22,7 +22,86 @@
 #include "SaveFileDialog.h"
 #include "DSUtil/FileHandle.h"
 
+//
+// COpenFileDialog
+//
+
+IMPLEMENT_DYNAMIC(COpenFileDialog, CFileDialog)
+COpenFileDialog::COpenFileDialog(
+		LPCWSTR lpszDefExt,
+		LPCWSTR lpszFileName,
+		DWORD dwFlags,
+		LPCWSTR lpszFilter,
+		CWnd* pParentWnd)
+	: CFileDialog(TRUE, lpszDefExt, lpszFileName, dwFlags, lpszFilter, pParentWnd)
+{
+	CStringW dir = ::GetFolderPath(lpszFileName);
+	size_t size = dir.GetLength() + 1;
+
+	m_pstrInitialDir.reset(new WCHAR[size]);
+	memset(m_pstrInitialDir.get(), 0, size * sizeof(WCHAR));
+	wcscpy_s(m_pstrInitialDir.get(), size, dir.GetString());
+
+	m_pOFN->lpstrInitialDir = m_pstrInitialDir.get();
+}
+
+CStringW COpenFileDialog::GetFilePath()
+{
+	CStringW filepath;
+
+	CComPtr<IFileOpenDialog> pFileOpenDialog = GetIFileOpenDialog();
+	if (pFileOpenDialog) {
+		CComPtr<IShellItem> pShellItem;
+		HRESULT hr = pFileOpenDialog->GetResult(&pShellItem);
+		if (SUCCEEDED(hr)) {
+			LPWSTR pszName = nullptr;
+			hr = pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &pszName);
+			if (SUCCEEDED(hr)) {
+				filepath = pszName;
+				CoTaskMemFree(pszName);
+			}
+		}
+	}
+
+	return filepath;
+}
+
+/*
+std::vector<CStringW> COpenFileDialog::GetFilePaths()
+{
+	std::vector<CStringW> filepaths;
+
+	CComPtr<IFileOpenDialog> pFileOpenDialog = GetIFileOpenDialog();
+	if (pFileOpenDialog) {
+		CComPtr<IShellItemArray> pItemArray;
+		HRESULT hr = pFileOpenDialog->GetResults(&pItemArray);
+		if (SUCCEEDED(hr)) {
+			DWORD dwNumItems = 0;
+			hr = pItemArray->GetCount(&dwNumItems);
+			if (SUCCEEDED(hr)) {
+				for (DWORD i = 0; i < dwNumItems; ++i) {
+					CComPtr<IShellItem> pItem;
+					hr = pItemArray->GetItemAt(i, &pItem);
+					if (SUCCEEDED(hr)) {
+						LPWSTR pszName = nullptr;
+						hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszName);
+						if (SUCCEEDED(hr)) {
+							filepaths.emplace_back(pszName);
+							CoTaskMemFree(pszName);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return filepaths;
+}
+*/
+
+//
 // CSaveFileDialog
+//
 
 IMPLEMENT_DYNAMIC(CSaveFileDialog, CFileDialog)
 CSaveFileDialog::CSaveFileDialog(
@@ -49,11 +128,11 @@ CStringW CSaveFileDialog::GetFilePath()
 
 	CComPtr<IFileSaveDialog> pFileSaveDialog = GetIFileSaveDialog();
 	if (pFileSaveDialog) {
-		CComPtr<IShellItem> pShellItem;
-		HRESULT hr = pFileSaveDialog->GetResult(&pShellItem);
+		CComPtr<IShellItem> pItem;
+		HRESULT hr = pFileSaveDialog->GetResult(&pItem);
 		if (SUCCEEDED(hr)) {
 			LPWSTR pszName = nullptr;
-			hr = pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &pszName);
+			hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszName);
 			if (SUCCEEDED(hr)) {
 				filepath = pszName;
 				CoTaskMemFree(pszName);

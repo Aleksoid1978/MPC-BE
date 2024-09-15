@@ -22,7 +22,37 @@
 
 #include <afxdlgs.h>
 
+//
+// COpenFileDialog
+//
+
+class COpenFileDialog : public CFileDialog
+{
+	DECLARE_DYNAMIC(COpenFileDialog)
+
+private:
+	// CFileDialog::GetPathName does not work for long paths, use GetFilePath instead.
+	CFileDialog::GetPathName;
+
+	std::unique_ptr<WCHAR[]> m_pstrInitialDir;
+
+public:
+	COpenFileDialog(
+		LPCWSTR lpszDefExt = NULL,
+		LPCWSTR lpszFileName = NULL,
+		DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
+		LPCWSTR lpszFilter = NULL,
+		CWnd* pParentWnd = NULL);
+	virtual ~COpenFileDialog() = default;
+
+	// Returns the file path selected for opening. Long paths are supported.
+	CStringW GetFilePath();
+	//std::vector<CStringW> GetFilePaths();
+};
+
+//
 // CSaveFileDialog
+//
 
 class CSaveFileDialog : public CFileDialog
 {

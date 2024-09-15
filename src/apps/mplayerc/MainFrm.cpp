@@ -5802,12 +5802,12 @@ void CMainFrame::OnFileOpenIso()
 
 		CString szFilter;
 		szFilter.Format(L"Image Files (%s)|%s||", m_DiskImage.GetExts(), m_DiskImage.GetExts());
-		CFileDialog fd(TRUE, nullptr, nullptr, dwFlags, szFilter);
+		COpenFileDialog fd(nullptr, nullptr, dwFlags, szFilter);
 		if (fd.DoModal() != IDOK) {
 			return;
 		}
 
-		m_wndPlaylistBar.Open(fd.GetPathName());
+		m_wndPlaylistBar.Open(fd.GetFilePath());
 		OpenCurPlaylistItem();
 	}
 }
