@@ -22,7 +22,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PlayerCaptureDialog.h"
-#include "SaveFileDialog.h"
+#include "FileDialogs.h"
 #include <moreuuids.h>
 #include "filters/muxer/WavDest/WavDest.h"
 #include "filters/muxer/MatroskaMuxer/MatroskaMuxer.h"

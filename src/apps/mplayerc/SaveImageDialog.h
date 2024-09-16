@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "SaveFileDialog.h"
+#include "FileDialogs.h"
 
 // CSaveImageDialog
 

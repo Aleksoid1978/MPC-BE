@@ -19,7 +19,7 @@
  */
 
 #include "stdafx.h"
-#include "SaveFileDialog.h"
+#include "FileDialogs.h"
 #include "DSUtil/FileHandle.h"
 
 //

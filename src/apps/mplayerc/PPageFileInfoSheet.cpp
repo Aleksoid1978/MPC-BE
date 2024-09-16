@@ -23,7 +23,7 @@
 #include "MainFrm.h"
 #include "PPageFileInfoSheet.h"
 #include "PPageFileMediaInfo.h"
-#include "SaveFileDialog.h"
+#include "FileDialogs.h"
 
 IMPLEMENT_DYNAMIC(CMPCPropertySheet, CPropertySheet)
 CMPCPropertySheet::CMPCPropertySheet(LPCWSTR pszCaption, CWnd* pParentWnd, UINT iSelectPage)

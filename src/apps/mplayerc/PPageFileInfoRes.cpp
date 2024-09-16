@@ -22,7 +22,7 @@
 #include "stdafx.h"
 #include "DSUtil/std_helper.h"
 #include "PPageFileInfoRes.h"
-#include "SaveFileDialog.h"
+#include "FileDialogs.h"
 #include "Misc.h"
 
 // CPPageFileInfoRes dialog

@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <afxdlgs.h>
-
 //
 // COpenFileDialog
 //
