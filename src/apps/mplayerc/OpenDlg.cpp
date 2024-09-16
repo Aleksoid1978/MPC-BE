@@ -23,8 +23,8 @@
 #include <ShlObj_core.h>
 #include <dlgs.h>
 #include "OpenDlg.h"
+#include "FileDialogs.h"
 #include "MainFrm.h"
-#include "DSUtil/Filehandle.h"
 
 //
 // COpenDlg dialog

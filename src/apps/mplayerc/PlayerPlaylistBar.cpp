@@ -29,7 +29,7 @@
 #include "DSUtil/UrlParser.h"
 #include "SaveTextFileDialog.h"
 #include "PlayerPlaylistBar.h"
-#include "OpenDlg.h"
+#include "FileDialogs.h"
 #include "Content.h"
 #include "PlaylistNameDlg.h"
 #include <ExtLib/ui/coolsb/coolscroll.h>

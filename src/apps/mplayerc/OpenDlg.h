@@ -22,7 +22,6 @@
 #pragma once
 
 #include <ExtLib/ui/ResizableLib/ResizableDialog.h>
-#include "FileDialogs.h"
 
 //
 // COpenDlg dialog
