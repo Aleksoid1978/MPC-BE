@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2023 see Authors.txt
+ * (C) 2016-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,6 +29,8 @@ HICON LoadIcon(const CString& fn, bool fSmall);
 bool  LoadType(const CString& fn, CString& type);
 bool  LoadResource(UINT resid, CStringA& str, LPCWSTR restype);
 HRESULT LoadResourceFile(UINT resid, BYTE** ppData, UINT& size);
+
+CStringW GetDragQueryFileName(HDROP hDrop, UINT iFile);
 
 WORD AssignedKeyToCmd(UINT keyValue);
 

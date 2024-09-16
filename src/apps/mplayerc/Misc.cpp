@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2023 see Authors.txt
+ * (C) 2016-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -338,6 +338,21 @@ HRESULT LoadResourceFile(UINT resid, BYTE** ppData, UINT& size)
 	}
 
 	return S_OK;
+}
+
+CStringW GetDragQueryFileName(HDROP hDrop, UINT iFile)
+{
+	CStringW fname;
+
+	if (iFile < UINT_MAX) {
+		UINT len = ::DragQueryFileW(hDrop, iFile, nullptr, 0);
+		if (len > 0) {
+			len = ::DragQueryFileW(hDrop, iFile, fname.GetBuffer(len), len+1);
+			fname.ReleaseBufferSetLength(len);
+		}
+	}
+
+	return fname;
 }
 
 WORD AssignedKeyToCmd(UINT keyValue)

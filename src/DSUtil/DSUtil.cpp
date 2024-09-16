@@ -2356,17 +2356,3 @@ inline const LONGLONG GetPerfCounter()
 		return timeGetTime() * 10000;
 	}
 }
-
-CStringW GetDragQueryFileName(HDROP hDrop, UINT iFile)
-{
-	CStringW fname;
-
-	if (iFile < UINT_MAX) {
-		auto len = ::DragQueryFileW(hDrop, iFile, nullptr, 0);
-		if (len > 0) {
-			fname.ReleaseBuffer(::DragQueryFileW(hDrop, iFile, fname.GetBuffer(len), len + 1));
-		}
-	}
-
-	return fname;
-}
