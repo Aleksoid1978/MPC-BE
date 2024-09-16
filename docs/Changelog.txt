@@ -22,6 +22,9 @@ Fixed video frame zooming.
 Added support for long paths for Windows 10 v1607 and newer. Long paths must be enabled in the registry. https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation
 Various interface fixes.
 
+Installer
+Added setting "Enable Windows 10 long paths support". The setting will be displayed when installing on Windows 10 1607 or later with long paths disabled.
+
 Updated libraries:
 	ffmpeg n7.1-dev-2559-g6229e4ac42;
 	vvdec v2.3.0-28-gf8ba8fd.

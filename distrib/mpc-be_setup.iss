@@ -189,6 +189,7 @@ Name: desktopicon\user;         Description: {cm:tsk_CurrentUser};       GroupDe
 Name: desktopicon\common;       Description: {cm:tsk_AllUsers};          GroupDescription: {cm:AdditionalIcons}; Flags: unchecked exclusive
 Name: pintotaskbar;             Description: {cm:PinToTaskBar};          GroupDescription: {cm:AdditionalIcons}; OnlyBelowVersion: 0,6.4
 
+Name: longpathsenable;          Description: {cm:tsk_LongPathsEnable};   GroupDescription: {cm:tsk_Other};       Flags: checkedonce unchecked; MinVersion: 10.0.14393; Check: not LongPathIsEnabled()
 ;;ResetSettings
 Name: reset_settings;           Description: {cm:tsk_ResetSettings};     GroupDescription: {cm:tsk_Other};       Flags: checkedonce unchecked; Check: SettingsExist()
 
@@ -432,6 +433,19 @@ begin
   Result := FileExists(ExpandConstant('{app}\{#mpcbe_ini}'));
 end;
 
+function LongPathIsEnabled(): Boolean;
+var
+  Value: Cardinal ;
+begin
+  if not RegQueryDWordValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\FileSystem', 'LongPathsEnabled', Value) then
+    Value := 0;
+
+  if Value = 0 then
+    Result := False // LongPathsEnabled not found or not enabled
+  else
+    Result := True; // is enabled
+end;
+
 // Check if settings exist
 function SettingsExist(): Boolean;
 begin
@@ -493,8 +507,11 @@ var
 begin
   if CurStep = ssPostInstall then
   begin
-     if WizardIsTaskSelected('pintotaskbar') then
+    if WizardIsTaskSelected('pintotaskbar') then
       PinToTaskbar(ExpandConstant('{app}\{#mpcbe_exe}'), True);
+
+    if WizardIsTaskSelected('longpathsenable') then
+      RegWriteDWordValue(HKLM, 'SYSTEM\CurrentControlSet\Control\FileSystem', 'LongPathsEnabled', 1);
 
     if WizardIsTaskSelected('reset_settings') then
       CleanUpSettingsAndFiles();
