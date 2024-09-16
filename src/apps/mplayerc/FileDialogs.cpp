@@ -45,11 +45,10 @@ COpenFileDialog::COpenFileDialog(
 	m_pOFN->lpstrInitialDir = m_strInitialDir.GetString();
 
 	if (dwFlags & OFN_ALLOWMULTISELECT) {
-		DWORD size = 100000; // needed to receive a large number of files
-		m_pstrFile.reset(new WCHAR[size]);
-		memset(m_pstrFile.get(), 0, size * sizeof(WCHAR));
-		m_pOFN->lpstrFile = m_pstrFile.get();
-		m_pOFN->nMaxFile = size;
+		// https://learn.microsoft.com/en-us/cpp/mfc/reference/cfiledialog-class?view=msvc-170#remarks
+		const int bufferlen = 100000; // needed to receive a large number of files
+		m_pOFN->lpstrFile = m_strFileBuffer.GetBuffer(bufferlen);
+		m_pOFN->nMaxFile  = bufferlen;
 	}
 }
 
