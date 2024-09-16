@@ -5329,11 +5329,7 @@ void CMainFrame::OnFileOpenQuick()
 	}
 
 	std::list<CString> fns;
-
-	POSITION pos = fd.GetStartPosition();
-	while (pos) {
-		fns.emplace_back(fd.GetNextPathName(pos));
-	}
+	fd.GetFilePaths(fns);
 
 	bool bMultipleFiles = false;
 
@@ -6732,10 +6728,7 @@ void CMainFrame::OnFileLoadSubtitle()
 	}
 
 	std::list<CStringW> fns;
-	POSITION pos = fd.GetStartPosition();
-	while (pos) {
-		fns.emplace_back(fd.GetNextPathName(pos));
-	}
+	fd.GetFilePaths(fns);
 
 	if (m_pDVS) {
 		if (SUCCEEDED(m_pDVS->put_FileName((LPWSTR)(LPCWSTR)(*fns.cbegin())))) {
@@ -6783,10 +6776,10 @@ void CMainFrame::OnFileLoadAudio()
 
 	CPlaylistItem* pli = m_wndPlaylistBar.GetCur();
 	if (pli && pli->m_fi.Valid()) {
-		POSITION pos = fd.GetStartPosition();
-		while (pos) {
-			CString fname = fd.GetNextPathName(pos);
+		std::list<CString> fns;
+		fd.GetFilePaths(fns);
 
+		for (const auto& fname : fns) {
 			if (!m_wndPlaylistBar.CheckAudioInCurrent(fname)) {
 				if (CComQIPtr<IGraphBuilderAudio> pGBA = m_pGB.p) {
 					HRESULT hr = pGBA->RenderAudioFile(fname);

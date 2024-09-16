@@ -3537,11 +3537,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 					COpenMediaFileDlg fd(mask, true, nullptr, nullptr, dwFlags, filter, this);
 					if (fd.DoModal() == IDOK) {
 						std::list<CString> fns;
-
-						POSITION pos = fd.GetStartPosition();
-						while (pos) {
-							fns.emplace_back(fd.GetNextPathName(pos));
-						}
+						fd.GetFilePaths(fns);
 
 						Append(fns, fns.size() > 1, nullptr);
 					}

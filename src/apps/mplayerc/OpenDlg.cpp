@@ -26,7 +26,9 @@
 #include "MainFrm.h"
 #include "DSUtil/Filehandle.h"
 
+//
 // COpenDlg dialog
+//
 
 //IMPLEMENT_DYNAMIC(COpenDlg, CResizableDialog)
 
@@ -166,19 +168,7 @@ void COpenDlg::OnBnClickedBrowsebutton()
 	}
 
 	m_fns.clear();
-
-	POSITION pos = fd.GetStartPosition();
-	while (pos) {
-		/*
-		CString str = fd.GetNextPathName(pos);
-		POSITION insertpos = m_fns.GetTailPosition();
-		while (insertpos && GetFileName(str).CompareNoCase(GetFileName(m_fns.GetAt(insertpos))) <= 0)
-			m_fns.GetPrev(insertpos);
-		if (!insertpos) m_fns.AddHead(str);
-		else m_fns.InsertAfter(insertpos, str);
-		*/
-		m_fns.emplace_back(fd.GetNextPathName(pos));
-	}
+	fd.GetFilePaths(m_fns);
 
 	if (m_fns.size() > 1
 			|| m_fns.size() == 1
@@ -215,10 +205,8 @@ void COpenDlg::OnBnClickedBrowsebutton2()
 	}
 
 	std::list<CString> dubfns;
-	POSITION pos = fd.GetStartPosition();
-	while (pos) {
-		dubfns.emplace_back(fd.GetNextPathName(pos));
-	}
+	fd.GetFilePaths(dubfns);
+
 	const CString path = Implode(dubfns, L'|');
 	m_mrucombo2.SetWindowTextW(path.GetString());
 }
@@ -265,17 +253,19 @@ void COpenDlg::OnUpdateOk(CCmdUI* pCmdUI)
 	pCmdUI->Enable(!CString(m_path).Trim().IsEmpty() || !CString(m_path2).Trim().IsEmpty());
 }
 
+//
 // COpenMediaFileDlg
+//
 
 #define __DUMMY__ L"*.*"
 
 bool COpenMediaFileDlg::m_fAllowDirSelection = false;
 WNDPROC COpenMediaFileDlg::m_wndProc = nullptr;
 
-IMPLEMENT_DYNAMIC(COpenMediaFileDlg, CFileDialog)
+IMPLEMENT_DYNAMIC(COpenMediaFileDlg, COpenFileDialog)
 COpenMediaFileDlg::COpenMediaFileDlg(std::vector<CString>& mask, bool fAllowDirSelection, LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
 						   DWORD dwFlags, LPCWSTR lpszFilter, CWnd* pParentWnd)
-	: CFileDialog(TRUE, lpszDefExt, lpszFileName, dwFlags|OFN_NOVALIDATE, lpszFilter, pParentWnd, 0)
+	: COpenFileDialog(lpszDefExt, lpszFileName, dwFlags|OFN_NOVALIDATE, lpszFilter, pParentWnd)
 	, m_mask(mask)
 {
 	CAppSettings& s = AfxGetAppSettings();
@@ -287,21 +277,14 @@ COpenMediaFileDlg::COpenMediaFileDlg(std::vector<CString>& mask, bool fAllowDirS
 		str = s.strLastOpenFile;
 	}
 
-	CStringW dir = ::GetFolderPath(lpszFileName);
-	int size = std::max(MAX_PATH, dir.GetLength() + 1);
-	m_pstrInitialDir.reset(new WCHAR[size]);
-	memset(m_pstrInitialDir.get(), 0, size * sizeof(WCHAR));
-	wcscpy_s(m_pstrInitialDir.get(), size, dir.GetString());
-	m_pOFN->lpstrInitialDir = m_pstrInitialDir.get();
-
-	size = 100000; // needed to receive a large number of files
+	DWORD size = 100000; // needed to receive a large number of files
 	m_pstrFile.reset(new WCHAR[size]);
 	memset(m_pstrFile.get(), 0, size * sizeof(WCHAR));
 	m_pOFN->lpstrFile = m_pstrFile.get();
 	m_pOFN->nMaxFile = size;
 }
 
-BEGIN_MESSAGE_MAP(COpenMediaFileDlg, CFileDialog)
+BEGIN_MESSAGE_MAP(COpenMediaFileDlg, COpenFileDialog)
 	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
@@ -322,7 +305,7 @@ LRESULT CALLBACK COpenMediaFileDlg::WindowProcNew(HWND hwnd, UINT message, WPARA
 
 BOOL COpenMediaFileDlg::OnInitDialog()
 {
-	CFileDialog::OnInitDialog();
+	COpenFileDialog::OnInitDialog();
 
 	m_wndProc = (WNDPROC)SetWindowLongPtrW(GetParent()->m_hWnd, GWLP_WNDPROC , (LONG_PTR)WindowProcNew);
 
@@ -337,7 +320,7 @@ void COpenMediaFileDlg::OnDestroy()
 		m_pOFN->lpstrFile[i] = m_pOFN->lpstrFile[i+1] = 0;
 	}
 
-	CFileDialog::OnDestroy();
+	COpenFileDialog::OnDestroy();
 }
 
 BOOL COpenMediaFileDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)

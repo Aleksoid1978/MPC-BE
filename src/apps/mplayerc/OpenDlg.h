@@ -21,10 +21,12 @@
 
 #pragma once
 
-#include <afxwin.h>
 #include <ExtLib/ui/ResizableLib/ResizableDialog.h>
+#include "FileDialogs.h"
 
+//
 // COpenDlg dialog
+//
 
 class COpenDlg : public CResizableDialog
 {
@@ -61,14 +63,15 @@ public:
 	afx_msg void OnUpdateOk(CCmdUI* pCmdUI);
 };
 
+//
 // COpenMediaFileDlg
+//
 
-class COpenMediaFileDlg : public CFileDialog
+class COpenMediaFileDlg : public COpenFileDialog
 {
 	DECLARE_DYNAMIC(COpenMediaFileDlg)
 
 private:
-	std::unique_ptr<WCHAR[]> m_pstrInitialDir;
 	std::unique_ptr<WCHAR[]> m_pstrFile;
 	std::vector<CString>& m_mask;
 
