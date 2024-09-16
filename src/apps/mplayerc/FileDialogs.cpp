@@ -61,10 +61,9 @@ CStringW COpenFileDialog::GetPathName()
 	return filepath;
 }
 
-/*
-std::vector<CStringW> COpenFileDialog::GetFilePaths()
+void COpenFileDialog::GetFilePaths(std::list<CStringW>& filepaths)
 {
-	std::vector<CStringW> filepaths;
+	filepaths.clear();
 
 	CComPtr<IFileOpenDialog> pFileOpenDialog = GetIFileOpenDialog();
 	if (pFileOpenDialog) {
@@ -89,10 +88,7 @@ std::vector<CStringW> COpenFileDialog::GetFilePaths()
 			}
 		}
 	}
-
-	return filepaths;
 }
-*/
 
 //
 // CSaveFileDialog

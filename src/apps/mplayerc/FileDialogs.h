@@ -29,6 +29,9 @@ class COpenFileDialog : public CFileDialog
 	DECLARE_DYNAMIC(COpenFileDialog)
 
 private:
+	CFileDialog::GetStartPosition;
+	CFileDialog::GetNextPathName;
+
 	CStringW m_strInitialDir;
 
 public:
@@ -43,7 +46,10 @@ public:
 	// Returns the file path selected for opening. Long paths are supported.
 	// PS: parent CFileDialog::GetPathName does not work for long paths.
 	CStringW GetPathName();
-	//std::vector<CStringW> GetFilePaths();
+
+	// Returns the file paths selected for opening. Long paths are supported.
+	// PS: parent CFileDialog::GetNextPathName does not work for long paths.
+	void GetFilePaths(std::list<CStringW>& filepaths);
 };
 
 //
