@@ -133,7 +133,7 @@ CWebServer::CWebServer(CMainFrame* pMainFrame, int nPort)
 	if (WebRoot.Find(L":\\") < 0 && WebRoot.Find(L"\\\\") < 0) {
 		m_webroot = GetCombineFilePath(GetProgramDir(), WebRoot);
 	} else {
-		m_webroot = GetCanonicalizeFilePath(WebRoot);
+		m_webroot = GetFullCannonFilePath(WebRoot);
 	}
 	::PathMakePrettyW(m_webroot.GetBuffer());
 

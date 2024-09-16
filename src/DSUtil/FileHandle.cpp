@@ -138,7 +138,7 @@ void CombineFilePath(CStringW& path, LPCWSTR file)
 		}
 		path.Append(file);
 	}
-	path = GetCanonicalizeFilePath(path);
+	path = GetFullCannonFilePath(path);
 }
 
 CStringW GetCombineFilePath(LPCWSTR dir, LPCWSTR file)
@@ -148,7 +148,7 @@ CStringW GetCombineFilePath(LPCWSTR dir, LPCWSTR file)
 	return path;
 }
 
-CStringW GetCanonicalizeFilePath(LPCWSTR path)
+CStringW GetFullCannonFilePath(LPCWSTR path)
 {
 	CStringW newPath;
 	const DWORD buflen = ::GetFullPathNameW(path, 0, nullptr, nullptr);

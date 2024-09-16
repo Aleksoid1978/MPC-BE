@@ -2481,8 +2481,7 @@ CStringW ParseFileName(const CStringW& param)
 {
 	if (param.Find(L':') < 0) {
 		// try to convert relative path to full path
-		CStringW fullPathName;
-		fullPathName.ReleaseBuffer(GetFullPathNameW(param, 8192, fullPathName.GetBuffer(8192), nullptr));
+		CStringW fullPathName = GetFullCannonFilePath(param);
 
 		if (::PathFileExistsW(fullPathName)) {
 			return fullPathName;

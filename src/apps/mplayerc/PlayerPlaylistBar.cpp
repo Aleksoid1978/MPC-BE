@@ -66,7 +66,7 @@ static CStringW MakePath(CStringW path)
 
 	path.Replace('/', '\\');
 
-	CStringW c = GetCanonicalizeFilePath(path);
+	CStringW c = GetFullCannonFilePath(path);
 
 	return c;
 }
@@ -338,7 +338,7 @@ static void StringToPaths(const CStringW& curentdir, const CStringW& str, std::v
 		if (hFind == INVALID_HANDLE_VALUE) {
 			continue;
 		} else {
-			CStringW parentdir = GetCanonicalizeFilePath(path + L"\\..");
+			CStringW parentdir = GetFullCannonFilePath(path + L"\\..");
 			AddSlash(parentdir);
 
 			do {

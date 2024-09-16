@@ -1564,7 +1564,7 @@ CStringW MakeFullPath(LPCWSTR path)
 		full = base + L"\\" + full;
 	}
 
-	CStringW c = GetCanonicalizeFilePath(full);
+	CStringW c = GetFullCannonFilePath(full);
 	return c;
 }
 

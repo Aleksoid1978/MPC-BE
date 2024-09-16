@@ -470,7 +470,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 	}
 
 	if (CFileGetStatus(path, fs) && (fs.m_attribute&CFile::directory) || path.Find(L"\\") == 0) {
-		path = GetCanonicalizeFilePath(path);
+		path = GetFullCannonFilePath(path);
 		::PathMakePrettyW(path.GetBuffer());
 		AddSlash(path);
 	}
@@ -493,7 +493,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 		CStringW parent;
 
 		if (path.GetLength() > 3) {
-			parent = GetCanonicalizeFilePath(path + "..");
+			parent = GetFullCannonFilePath(path + "..");
 			AddSlash(parent);
 		}
 

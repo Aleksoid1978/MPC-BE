@@ -47,7 +47,8 @@ CStringW GetRenameFileExt(LPCWSTR Path, LPCWSTR newExt);
 void CombineFilePath(CStringW& path, LPCWSTR file);
 CStringW GetCombineFilePath(LPCWSTR dir, LPCWSTR file);
 
-CStringW GetCanonicalizeFilePath(LPCWSTR path);
+// creates a full and canonical path
+CStringW GetFullCannonFilePath(LPCWSTR path);
 
 void StripToRoot(CStringW& path);
 CStringW GetStripToRoot(LPCWSTR path);
