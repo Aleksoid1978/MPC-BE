@@ -36,8 +36,15 @@ COpenFileDialog::COpenFileDialog(
 	: CFileDialog(TRUE, lpszDefExt, lpszFileName, dwFlags, lpszFilter, pParentWnd)
 {
 	m_strInitialDir = ::GetFolderPath(lpszFileName);
-
 	m_pOFN->lpstrInitialDir = m_strInitialDir.GetString();
+
+	if (dwFlags & OFN_ALLOWMULTISELECT) {
+		DWORD size = 100000; // needed to receive a large number of files
+		m_pstrFile.reset(new WCHAR[size]);
+		memset(m_pstrFile.get(), 0, size * sizeof(WCHAR));
+		m_pOFN->lpstrFile = m_pstrFile.get();
+		m_pOFN->nMaxFile = size;
+	}
 }
 
 CStringW COpenFileDialog::GetPathName()
@@ -104,7 +111,6 @@ CSaveFileDialog::CSaveFileDialog(
 	: CFileDialog(FALSE, lpszDefExt, lpszFileName, dwFlags, lpszFilter, pParentWnd)
 {
 	m_strInitialDir = ::GetFolderPath(lpszFileName);
-
 	m_pOFN->lpstrInitialDir = m_strInitialDir.GetString();
 }
 

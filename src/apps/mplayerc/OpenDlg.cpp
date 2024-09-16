@@ -276,12 +276,6 @@ COpenMediaFileDlg::COpenMediaFileDlg(std::vector<CString>& mask, bool fAllowDirS
 	if (s.bKeepHistory && (str.IsEmpty() || ::PathIsURLW(str))) {
 		str = s.strLastOpenFile;
 	}
-
-	DWORD size = 100000; // needed to receive a large number of files
-	m_pstrFile.reset(new WCHAR[size]);
-	memset(m_pstrFile.get(), 0, size * sizeof(WCHAR));
-	m_pOFN->lpstrFile = m_pstrFile.get();
-	m_pOFN->nMaxFile = size;
 }
 
 BEGIN_MESSAGE_MAP(COpenMediaFileDlg, COpenFileDialog)
@@ -317,7 +311,7 @@ void COpenMediaFileDlg::OnDestroy()
 	int i = GetPathName().Find(__DUMMY__);
 
 	if (i >= 0) {
-		m_pOFN->lpstrFile[i] = m_pOFN->lpstrFile[i+1] = 0;
+		//m_pOFN->lpstrFile[i] = m_pOFN->lpstrFile[i+1] = 0;
 	}
 
 	COpenFileDialog::OnDestroy();

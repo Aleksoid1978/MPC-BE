@@ -33,6 +33,7 @@ private:
 	CFileDialog::GetNextPathName;
 
 	CStringW m_strInitialDir;
+	std::unique_ptr<WCHAR[]> m_pstrFile;
 
 public:
 	COpenFileDialog(

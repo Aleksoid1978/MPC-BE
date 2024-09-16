@@ -72,7 +72,6 @@ class COpenMediaFileDlg : public COpenFileDialog
 	DECLARE_DYNAMIC(COpenMediaFileDlg)
 
 private:
-	std::unique_ptr<WCHAR[]> m_pstrFile;
 	std::vector<CString>& m_mask;
 
 public:
