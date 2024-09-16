@@ -62,38 +62,3 @@ public:
 	afx_msg void OnUpdateDub(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateOk(CCmdUI* pCmdUI);
 };
-
-//
-// COpenMediaFileDlg
-//
-
-class COpenMediaFileDlg : public COpenFileDialog
-{
-	DECLARE_DYNAMIC(COpenMediaFileDlg)
-
-private:
-	std::vector<CString>& m_mask;
-
-public:
-	COpenMediaFileDlg(std::vector<CString>& mask, bool fAllowDirSelection,
-				 LPCWSTR lpszDefExt = nullptr,
-				 LPCWSTR lpszFileName = nullptr,
-				 DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
-				 LPCWSTR lpszFilter = nullptr,
-				 CWnd* pParentWnd = nullptr);
-	~COpenMediaFileDlg() = default;
-
-	static bool m_fAllowDirSelection;
-	static WNDPROC m_wndProc;
-	static LRESULT CALLBACK WindowProcNew(HWND hwnd,UINT message, WPARAM wParam, LPARAM lParam);
-
-	virtual BOOL OnInitDialog();
-
-protected:
-	DECLARE_MESSAGE_MAP()
-	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
-	virtual BOOL OnIncludeItem(OFNOTIFYEX* pOFNEx, LRESULT* pResult);
-
-public:
-	afx_msg void OnDestroy();
-};

@@ -35,7 +35,13 @@ COpenFileDialog::COpenFileDialog(
 		CWnd* pParentWnd)
 	: CFileDialog(TRUE, lpszDefExt, lpszFileName, dwFlags, lpszFilter, pParentWnd)
 {
-	m_strInitialDir = ::GetFolderPath(lpszFileName);
+	CAppSettings& s = AfxGetAppSettings();
+	CString path(lpszFileName);
+	if (s.bKeepHistory && (path.IsEmpty() || ::PathIsURLW(path))) {
+		path = s.strLastOpenFile;
+	}
+
+	m_strInitialDir = ::GetFolderPath(path);
 	m_pOFN->lpstrInitialDir = m_strInitialDir.GetString();
 
 	if (dwFlags & OFN_ALLOWMULTISELECT) {

@@ -161,7 +161,7 @@ void COpenDlg::OnBnClickedBrowsebutton()
 		dwFlags |= OFN_DONTADDTORECENT;
 	}
 
-	COpenMediaFileDlg fd(mask, true, nullptr, m_path, dwFlags, filter, this);
+	COpenFileDialog fd(nullptr, m_path, dwFlags, filter, this);
 
 	if (fd.DoModal() != IDOK) {
 		return;
@@ -198,7 +198,7 @@ void COpenDlg::OnBnClickedBrowsebutton2()
 		dwFlags |= OFN_DONTADDTORECENT;
 	}
 
-	COpenMediaFileDlg fd(mask, false, nullptr, m_path2, dwFlags, filter, this);
+	COpenFileDialog fd(nullptr, m_path2, dwFlags, filter, this);
 
 	if (fd.DoModal() != IDOK) {
 		return;
@@ -251,138 +251,4 @@ void COpenDlg::OnUpdateOk(CCmdUI* pCmdUI)
 	UpdateData();
 
 	pCmdUI->Enable(!CString(m_path).Trim().IsEmpty() || !CString(m_path2).Trim().IsEmpty());
-}
-
-//
-// COpenMediaFileDlg
-//
-
-#define __DUMMY__ L"*.*"
-
-bool COpenMediaFileDlg::m_fAllowDirSelection = false;
-WNDPROC COpenMediaFileDlg::m_wndProc = nullptr;
-
-IMPLEMENT_DYNAMIC(COpenMediaFileDlg, COpenFileDialog)
-COpenMediaFileDlg::COpenMediaFileDlg(std::vector<CString>& mask, bool fAllowDirSelection, LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
-						   DWORD dwFlags, LPCWSTR lpszFilter, CWnd* pParentWnd)
-	: COpenFileDialog(lpszDefExt, lpszFileName, dwFlags|OFN_NOVALIDATE, lpszFilter, pParentWnd)
-	, m_mask(mask)
-{
-	CAppSettings& s = AfxGetAppSettings();
-	m_fAllowDirSelection = fAllowDirSelection;
-
-	CString str(lpszFileName);
-
-	if (s.bKeepHistory && (str.IsEmpty() || ::PathIsURLW(str))) {
-		str = s.strLastOpenFile;
-	}
-}
-
-BEGIN_MESSAGE_MAP(COpenMediaFileDlg, COpenFileDialog)
-	ON_WM_DESTROY()
-END_MESSAGE_MAP()
-
-// COpenMediaFileDlg message handlers
-
-LRESULT CALLBACK COpenMediaFileDlg::WindowProcNew(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	if (message ==  WM_COMMAND && HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDOK
-			&& m_fAllowDirSelection) {
-		CStringW path;
-		if (::GetDlgItemTextW(hwnd, cmb13, path.GetBuffer(MAX_PATH), MAX_PATH) == 0) {
-			::SendMessageW(hwnd, CDM_SETCONTROLTEXT, edt1, (LPARAM)__DUMMY__);
-		}
-	}
-
-	return CallWindowProcW(COpenMediaFileDlg::m_wndProc, hwnd, message, wParam, lParam);
-}
-
-BOOL COpenMediaFileDlg::OnInitDialog()
-{
-	COpenFileDialog::OnInitDialog();
-
-	m_wndProc = (WNDPROC)SetWindowLongPtrW(GetParent()->m_hWnd, GWLP_WNDPROC , (LONG_PTR)WindowProcNew);
-
-	return TRUE;
-}
-
-void COpenMediaFileDlg::OnDestroy()
-{
-	int i = GetPathName().Find(__DUMMY__);
-
-	if (i >= 0) {
-		//m_pOFN->lpstrFile[i] = m_pOFN->lpstrFile[i+1] = 0;
-	}
-
-	COpenFileDialog::OnDestroy();
-}
-
-BOOL COpenMediaFileDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
-{
-	ASSERT(pResult != nullptr);
-
-	OFNOTIFY* pNotify = (OFNOTIFY*)lParam;
-
-	if (__super::OnNotify(wParam, lParam, pResult)) {
-		ASSERT(pNotify->hdr.code != CDN_INCLUDEITEM);
-		return TRUE;
-	}
-
-	switch (pNotify->hdr.code) {
-		case CDN_INCLUDEITEM:
-			if (OnIncludeItem((OFNOTIFYEX*)lParam, pResult)) {
-				return TRUE;
-			}
-
-			break;
-	}
-
-	return FALSE;
-}
-
-BOOL COpenMediaFileDlg::OnIncludeItem(OFNOTIFYEX* pOFNEx, LRESULT* pResult)
-{
-	WCHAR buff[MAX_PATH];
-
-	if (!SHGetPathFromIDListW((PCIDLIST_ABSOLUTE)pOFNEx->pidl, buff)) {
-		STRRET s;
-		HRESULT hr = ((IShellFolder*)pOFNEx->psf)->GetDisplayNameOf((PCUITEMID_CHILD)pOFNEx->pidl, SHGDN_NORMAL|SHGDN_FORPARSING, &s);
-
-		if (S_OK != hr) {
-			return FALSE;
-		}
-
-		switch (s.uType) {
-			case STRRET_CSTR:
-				wcscpy_s(buff, CString(s.cStr));
-				break;
-			case STRRET_WSTR:
-				wcscpy_s(buff, s.pOleStr);
-				CoTaskMemFree(s.pOleStr);
-				break;
-			default:
-				return FALSE;
-		}
-	}
-
-	CString fn(buff);
-	/*
-		WIN32_FILE_ATTRIBUTE_DATA fad;
-		if (GetFileAttributesEx(fn, GetFileExInfoStandard, &fad)
-		&& (fad.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY))
-			return FALSE;
-	*/
-
-	int i = fn.ReverseFind('.'), j = fn.ReverseFind('\\');
-
-	if (i < 0 || i < j) {
-		return FALSE;
-	}
-
-	CString mask = m_mask[pOFNEx->lpOFN->nFilterIndex-1] + L";";
-	CString ext = fn.Mid(i).MakeLower() + L";";
-
-	*pResult = mask.Find(ext) >= 0 || mask.Find(L"*.*") >= 0;
-
-	return TRUE;
 }

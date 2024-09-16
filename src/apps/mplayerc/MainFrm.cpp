@@ -5323,7 +5323,7 @@ void CMainFrame::OnFileOpenQuick()
 		dwFlags |= OFN_DONTADDTORECENT;
 	}
 
-	COpenMediaFileDlg fd(mask, true, nullptr, nullptr, dwFlags, filter, GetModalParent());
+	COpenFileDialog fd(nullptr, nullptr, dwFlags, filter, GetModalParent());
 	if (fd.DoModal() != IDOK) {
 		return;
 	}
@@ -6720,7 +6720,7 @@ void CMainFrame::OnFileLoadSubtitle()
 		mask.emplace_back(L"*." + CString(subExt));
 	}
 
-	COpenMediaFileDlg fd(mask, false, nullptr, GetCurFileName(),
+	COpenFileDialog fd(nullptr, GetCurFileName(),
 					OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_ALLOWMULTISELECT | OFN_DONTADDTORECENT,
 					filter, GetModalParent());
 	if (fd.DoModal() != IDOK) {
@@ -6767,7 +6767,7 @@ void CMainFrame::OnFileLoadAudio()
 	std::vector<CString> mask;
 	s.m_Formats.GetAudioFilter(filter, mask);
 
-	COpenMediaFileDlg fd(mask, false, nullptr, GetCurFileName(),
+	COpenFileDialog fd(nullptr, GetCurFileName(),
 					OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_ALLOWMULTISELECT | OFN_DONTADDTORECENT,
 					filter, GetModalParent());
 	if (fd.DoModal() != IDOK) {
