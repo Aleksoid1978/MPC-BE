@@ -25,6 +25,7 @@
 #include "unrar.h"
 #include "VobSubFile.h"
 #include "RTS.h"
+#include "DSUtil/FileHandle.h"
 
 //
 
@@ -1858,13 +1859,10 @@ bool CVobSubFile::SaveScenarist(CString fn)
 	fn.Replace('\\', '/');
 	CString title = fn.Mid(fn.ReverseFind('/')+1);
 
-	WCHAR buff[MAX_PATH], * pFilePart = buff;
-	if (GetFullPathNameW(fn, MAX_PATH, buff, &pFilePart) == 0) {
-		return false;
-	}
-
-	CString fullpath = CString(buff).Left(int(pFilePart - buff));
+	CString fullpath = GetFullCannonFilePath(fn);
+	RemoveFileSpec(fullpath);
 	fullpath.TrimRight(L"\\/");
+
 	if (fullpath.IsEmpty()) {
 		return false;
 	}
@@ -2117,13 +2115,10 @@ bool CVobSubFile::SaveMaestro(CString fn)
 	fn.Replace('\\', '/');
 	CString title = fn.Mid(fn.ReverseFind('/')+1);
 
-	WCHAR buff[MAX_PATH], * pFilePart = buff;
-	if (GetFullPathNameW(fn, MAX_PATH, buff, &pFilePart) == 0) {
-		return false;
-	}
-
-	CString fullpath = CString(buff).Left(int(pFilePart - buff));
+	CString fullpath = GetFullCannonFilePath(fn);
+	RemoveFileSpec(fullpath);
 	fullpath.TrimRight(L"\\/");
+
 	if (fullpath.IsEmpty()) {
 		return false;
 	}
