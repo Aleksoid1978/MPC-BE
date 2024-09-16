@@ -1100,8 +1100,7 @@ BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoi
 				std::list<CString> slFiles;
 				UINT nFiles = ::DragQueryFileW(hDrop, UINT_MAX, nullptr, 0);
 				for (UINT iFile = 0; iFile < nFiles; iFile++) {
-					CString fn;
-					fn.ReleaseBuffer(::DragQueryFileW(hDrop, iFile, fn.GetBuffer(8192), 8192));
+					CString fn = GetDragQueryFileName(hDrop, iFile);
 					slFiles.emplace_back(ParseFileName(fn));
 				}
 				::DragFinish(hDrop);
@@ -20692,8 +20691,7 @@ const bool CMainFrame::GetFromClipboard(std::list<CString>& sl) const
 			if (HDROP hDrop = (HDROP)::GlobalLock(hglb)) {
 				UINT nFiles = ::DragQueryFileW(hDrop, UINT_MAX, nullptr, 0);
 				for (UINT iFile = 0; iFile < nFiles; iFile++) {
-					CString fn;
-					fn.ReleaseBuffer(::DragQueryFileW(hDrop, iFile, fn.GetBuffer(2048), 2048));
+					CString fn = GetDragQueryFileName(hDrop, iFile);
 					sl.emplace_back(fn);
 				}
 				GlobalUnlock(hglb);

@@ -765,11 +765,10 @@ void CPPageExternalFilters::OnDropFiles(HDROP hDropInfo)
 
 	UINT nFiles = ::DragQueryFileW(hDropInfo, (UINT)-1, nullptr, 0);
 	for (UINT iFile = 0; iFile < nFiles; iFile++) {
-		WCHAR szFileName[MAX_PATH];
-		::DragQueryFileW(hDropInfo, iFile, szFileName, MAX_PATH);
+		CString fn = GetDragQueryFileName(hDropInfo, iFile);
 
 		CFilterMapper2 fm2(false);
-		fm2.Register(szFileName);
+		fm2.Register(fn);
 
 		for (auto& f : fm2.m_filters) {
 			if (IsSupportedExternalVideoRenderer(f->clsid)) {

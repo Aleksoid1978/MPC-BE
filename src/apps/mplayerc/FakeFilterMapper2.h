@@ -123,5 +123,5 @@ public:
 
 	static IFilterMapper2* m_pFilterMapper2;
 	std::list<std::unique_ptr<FilterOverride>> m_filters;
-	void Register(CString path);
+	void Register(const CString& path);
 };

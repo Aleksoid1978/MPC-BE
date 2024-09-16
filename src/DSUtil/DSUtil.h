@@ -158,6 +158,8 @@ extern void				CorrectWaveFormatEx(CMediaType& mt);
 
 extern inline const LONGLONG GetPerfCounter();
 
+extern CStringW GetDragQueryFileName(HDROP hDrop, UINT iFile);
+
 class CPinInfo : public PIN_INFO
 {
 public:

@@ -590,7 +590,7 @@ STDMETHODIMP CFilterMapper2::NonDelegatingQueryInterface(REFIID riid, void** ppv
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
-void CFilterMapper2::Register(CString path)
+void CFilterMapper2::Register(const CString& path)
 {
 	// Load filter
 	if (HMODULE h = LoadLibraryExW(path, nullptr, LOAD_WITH_ALTERED_SEARCH_PATH)) {
