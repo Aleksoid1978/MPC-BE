@@ -379,6 +379,8 @@ void EllipsisURL(CStringW& url, const int maxlen)
 
 void EllipsisPath(CStringW& path, const int maxlen)
 {
+	ASSERT(maxlen > 10);
+
 	if (path.GetLength() > maxlen) {
 		int k = -1;
 		if (StartsWith(path, L"\\\\")) {
@@ -389,7 +391,7 @@ void EllipsisPath(CStringW& path, const int maxlen)
 				k = path.Find('\\', k + 1);
 			}
 		}
-		else if (StartsWith(path, L":\\", 1)) {
+		else if (StartsWith(path, L":\\", 3)) {
 			k = 2;
 		}
 
