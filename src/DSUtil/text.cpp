@@ -388,10 +388,10 @@ void EllipsisPath(CStringW& path, const int maxlen)
 				k = 6;
 			}
 			else {
-				k = path.Find('\\', k + 1);
+				k = path.Find('\\', 3);
 			}
 		}
-		else if (StartsWith(path, L":\\", 3)) {
+		else if (StartsWith(path, L":\\", 1)) {
 			k = 2;
 		}
 
