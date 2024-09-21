@@ -25,6 +25,8 @@ Various interface fixes.
 Installer
 Added setting "Enable Windows 10 long paths support". The setting will be displayed when installing on Windows 10 1607 or later with long paths disabled.
 
+Updated German translation (by Klaus1189).
+
 Updated libraries:
 	ffmpeg n7.1-dev-2627-g9e1682761f;
 	vvdec v2.3.0-28-gf8ba8fd.
@@ -69,7 +71,7 @@ Updated libraries:
 	Little-CMS git-lcms2.16-60-g1c9021b;
 	MediaInfo git-v24.06-10-g88f3ea4aa;
 	ResizableLib v1.5.3-8-g25a89da;
-
+	vvdec v2.3.0-24-gad8f4bb.
 
 
 1.7.2 - 2024-06-07
