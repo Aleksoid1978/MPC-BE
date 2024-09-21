@@ -26,7 +26,7 @@ Installer
 Added setting "Enable Windows 10 long paths support". The setting will be displayed when installing on Windows 10 1607 or later with long paths disabled.
 
 Updated libraries:
-	ffmpeg n7.1-dev-2559-g6229e4ac42;
+	ffmpeg n7.1-dev-2627-g9e1682761f;
 	vvdec v2.3.0-28-gf8ba8fd.
 
 
