@@ -29,6 +29,7 @@ MPCVideoDec
 
 Обновлены библиотеки:
 	ffmpeg n7.1-dev-2627-g9e1682761f;
+	rapidjson v1.1.0-753-g7c73dd7d;
 	vvdec v2.3.0-28-gf8ba8fd.
 
 
