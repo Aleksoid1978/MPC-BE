@@ -114,9 +114,11 @@ bool CTextFile::Open(LPCWSTR lpszFileName)
 
 bool CTextFile::ReopenAsText()
 {
+	auto fileName = m_strFileName;
+
 	Close();
 
-	return OpenFile(m_strFileName.GetString(), L"rt");
+	return OpenFile(fileName, L"rt");
 }
 
 bool CTextFile::Save(LPCWSTR lpszFileName, enc e)
