@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 48		"sec."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 39
 5		"Amestecător de canale"
 6		"Amestecă canalele la:"
 8		"Solicită stereo de la decodor"
@@ -451,13 +451,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 18		"Îmbunătățește sunetul"
 24		"Filtre FFmpeg"
 25		"Presetări"
-28		"Format pentru eşantionul de ieşire:"
-29		"Int16"
-30		"Int24"
-31		"Int32"
-32		"Plutitor"
-33		"Decalarea timpului audio (ms):"
-36		"Implicit"
+26		"Don't use for stereo and mono sources"
+30		"Format pentru eşantionul de ieşire:"
+31		"Int16"
+32		"Int24"
+33		"Int32"
+34		"Plutitor"
+35		"Decalarea timpului audio (ms):"
+38		"Implicit"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

@@ -272,6 +272,13 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		return E_FAIL;
 	}
 
+	bool bAFilters;
+	if (audio_channels <= 2 && m_bAudioFiltersDisableForStereo) {
+		bAFilters = false;
+	} else {
+		bAFilters = (m_afilters.size() > 0);
+	}
+
 	const WAVEFORMATEX* output_wfe = (WAVEFORMATEX*)pOutPin->CurrentMediaType().pbFormat;
 	auto        &output_samplerate    = output_wfe->nSamplesPerSec;
 	auto        &output_channels      = output_wfe->nChannels;
@@ -357,7 +364,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		}
 	}
 
-	if (m_afilters.size()) {
+	if (bAFilters) {
 		hr = S_FALSE;
 		if (!m_AudioFilter.IsInitialized()) {
 			hr = m_AudioFilter.Initialize(
@@ -437,15 +444,16 @@ void CAudioSwitcherFilter::TransformMediaType(CMediaType& mt, const bool bForce1
 		if (sampleformat == SAMPLE_FMT_NONE) {
 			return; // skip spdif/bitstream formats
 		}
-		if (m_bAutoVolumeControl || m_afilters.size()) {
+
+		const auto input_channels = wfe->nChannels;
+		const auto input_layout = (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfe->nChannels == CountBits(wfex->dwChannelMask)) ? wfex->dwChannelMask : GetDefChannelMask(wfe->nChannels);
+
+		if (m_bAutoVolumeControl || (m_afilters.size() && (input_channels > 2 || !m_bAudioFiltersDisableForStereo))) {
 			sampleformat = SAMPLE_FMT_FLT; // this transformations change the sample format to float
 		}
 
 		WORD  channels;
 		DWORD layout;
-
-		const auto input_channels = wfe->nChannels;
-		const auto input_layout = (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfe->nChannels == CountBits(wfex->dwChannelMask)) ? wfex->dwChannelMask : GetDefChannelMask(wfe->nChannels);
 		if (m_bMixer) {
 			channels = channel_mode[m_nMixerLayout].channels;
 			layout = channel_mode[m_nMixerLayout].ch_layout;
@@ -761,6 +769,12 @@ STDMETHODIMP_(int) CAudioSwitcherFilter::GetAudioFilterState()
 	} else {
 		return m_afilters.size() ? -2 : -1;
 	}
+}
+
+STDMETHODIMP CAudioSwitcherFilter::SetAudioFiltersNotForStereo(bool bDisableForStereo)
+{
+	m_bAudioFiltersDisableForStereo = bDisableForStereo;
+	return S_OK;
 }
 
 // IAMStreamSelect

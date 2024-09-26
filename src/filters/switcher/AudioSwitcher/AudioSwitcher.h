@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -58,6 +58,7 @@ class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 
 	CAudioFilter m_AudioFilter;
 	std::list<std::pair<CStringA, CStringA>> m_afilters;
+	bool	m_bAudioFiltersDisableForStereo = false;
 
 	CDitherInt16 m_DitherInt16;
 
@@ -89,17 +90,18 @@ public:
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
 	// IAudioSwitcherFilter
-	STDMETHODIMP SetChannelMixer(bool bMixer, int nLayout);
-	STDMETHODIMP SetBassRedirect(bool bBassRedirect);
-	STDMETHODIMP SetLevels(double dCenterLevel_dB, double dSurroundLevel_dB);
-	STDMETHODIMP SetAudioGain(double dGain_dB);
-	STDMETHODIMP SetAutoVolumeControl(bool bAutoVolumeControl, bool bNormBoost, int iNormLevel, int iNormRealeaseTime);
-	STDMETHODIMP SetOutputFormats(int iSampleFormats);
-	STDMETHODIMP_(REFERENCE_TIME) GetAudioTimeShift();
-	STDMETHODIMP SetAudioTimeShift(REFERENCE_TIME rtAudioTimeShift);
-	STDMETHODIMP SetAudioFilter1(const char* str_filter);
-	STDMETHODIMP_(int) GetAudioFilterState();
+	STDMETHODIMP SetChannelMixer(bool bMixer, int nLayout) override;
+	STDMETHODIMP SetBassRedirect(bool bBassRedirect) override;
+	STDMETHODIMP SetLevels(double dCenterLevel_dB, double dSurroundLevel_dB) override;
+	STDMETHODIMP SetAudioGain(double dGain_dB) override;
+	STDMETHODIMP SetAutoVolumeControl(bool bAutoVolumeControl, bool bNormBoost, int iNormLevel, int iNormRealeaseTime) override;
+	STDMETHODIMP SetOutputFormats(int iSampleFormats) override;
+	STDMETHODIMP_(REFERENCE_TIME) GetAudioTimeShift() override;
+	STDMETHODIMP SetAudioTimeShift(REFERENCE_TIME rtAudioTimeShift) override;
+	STDMETHODIMP SetAudioFilter1(const char* str_filter) override;
+	STDMETHODIMP_(int) GetAudioFilterState() override;
+	STDMETHODIMP SetAudioFiltersNotForStereo(bool bDisableForStereo) override;
 
 	// IAMStreamSelect
-	STDMETHODIMP Enable(long lIndex, DWORD dwFlags);
+	STDMETHODIMP Enable(long lIndex, DWORD dwFlags) override;
 };

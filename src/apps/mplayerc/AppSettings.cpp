@@ -647,6 +647,7 @@ void CAppSettings::ResetSettings()
 	iAudioTimeShift = 0;
 	bAudioFilters = false;
 	strAudioFilter1.Empty();
+	bAudioFiltersNotForStereo = false;
 
 	m_ExternalFilters.clear();
 
@@ -1059,6 +1060,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	} else {
 		strAudioFilter1.Empty();
 	}
+	profile.ReadBool(IDS_R_AUDIO, IDS_RS_AUDIOFILTERS_NOTFORSTEREO, bAudioFiltersNotForStereo);
 
 	{
 		m_ExternalFilters.clear();
@@ -1728,6 +1730,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_AUDIO, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift);
 	profile.WriteBool(IDS_R_AUDIO, IDS_RS_AUDIOFILTERS, bAudioFilters);
 	profile.WriteString(IDS_R_AUDIO, IDS_RS_AUDIOFILTER1, CStringW(strAudioFilter1));
+	profile.WriteBool(IDS_R_AUDIO, IDS_RS_AUDIOFILTERS_NOTFORSTEREO, bAudioFiltersNotForStereo);
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_NETWORKTIMEOUT, iNetworkTimeout);

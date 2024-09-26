@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 48		"秒"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 39
 5		"チャンネル ミキサー"
 6		"チャンネルをミックス:"
 8		"デコーダーからステレオを要求する"
@@ -451,13 +451,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 18		"音声のブースト"
 24		"FFmpeg フィルター"
 25		"プリセット"
-28		"出力サンプル形式:"
-29		"Int16"
-30		"Int24"
-31		"Int32"
-32		"Float"
-33		"音声のタイム シフト (ミリ秒):"
-36		"既定"
+26		"Don't use for stereo and mono sources"
+30		"出力サンプル形式:"
+31		"Int16"
+32		"Int24"
+33		"Int32"
+34		"Float"
+35		"音声のタイム シフト (ミリ秒):"
+38		"既定"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

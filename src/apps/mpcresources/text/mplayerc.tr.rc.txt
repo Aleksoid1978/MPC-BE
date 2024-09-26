@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 48		"sn."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 39
 5		"Kanal karıştırıcı"
 6		"Kanalları karıştır:"
 8		"Çözücüden stereo iste"
@@ -451,13 +451,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 18		"Sesi güçlendir"
 24		"FFmpeg filtreleri"
 25		"Ön ayarlar"
-28		"Çıktı örnekleme biçimi:"
-29		"Int16"
-30		"Int24"
-31		"Int32"
-32		"Float"
-33		"Ses zaman kaydırma (ms):"
-36		"Varsayılan"
+26		"Don't use for stereo and mono sources"
+30		"Çıktı örnekleme biçimi:"
+31		"Int16"
+32		"Int24"
+33		"Int32"
+34		"Float"
+35		"Ses zaman kaydırma (ms):"
+38		"Varsayılan"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

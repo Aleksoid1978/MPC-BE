@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 48		"mp."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 39
 5		"Csatornakeverő"
 6		"Keverje a csatornákat:"
 8		"Kérjen sztereót a dekódertől"
@@ -451,13 +451,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 18		"Növelt hang"
 24		"FFmpeg szűrők"
 25		"Előbeállítások"
-28		"Kimeneti minta formátum:"
-29		"Int16"
-30		"Int24"
-31		"Int32"
-32		"Float"
-33		"Audió időzítés-eltolása:\n(ezredmp)"
-36		"Alapértelmezett"
+26		"Don't use for stereo and mono sources"
+30		"Kimeneti minta formátum:"
+31		"Int16"
+32		"Int24"
+33		"Int32"
+34		"Float"
+35		"Audió időzítés-eltolása:\n(ezredmp)"
+38		"Alapértelmezett"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

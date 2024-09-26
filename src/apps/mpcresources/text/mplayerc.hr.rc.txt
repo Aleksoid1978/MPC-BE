@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 48		"sec."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 39
 5		"Mikseta kanala"
 6		"Miksaj kanale prema:"
 8		"Uputi zahtjev za stereo od dekodera"
@@ -451,13 +451,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 18		"Podizanje zvuka"
 24		"FFmpeg filteri"
 25		"Presets"
-28		"Format izlaznog uzorka:"
-29		"Int16"
-30		"Int24"
-31		"Int32"
-32		"Float"
-33		"Pomak vremena za audio (ms):"
-36		"Default"
+26		"Don't use for stereo and mono sources"
+30		"Format izlaznog uzorka:"
+31		"Int16"
+32		"Int24"
+33		"Int32"
+34		"Float"
+35		"Pomak vremena za audio (ms):"
+38		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

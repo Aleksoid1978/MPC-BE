@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 48		"Sek."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 39
 5		"Kanalmixer"
 6		"Kanäle mischen zu:"
 8		"Stereo vom Decoder anfordern"
@@ -451,13 +451,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 18		"Audio verstärken"
 24		"FFmpeg Filter"
 25		"Voreinstellungen"
-28		"Ausgabe-Sampleformat"
-29		"Int16"
-30		"Int24"
-31		"Int32"
-32		"Float"
-33		"Audioverzögerung (ms):"
-36		"Zurücksetzen"
+26		"Don't use for stereo and mono sources"
+30		"Ausgabe-Sampleformat"
+31		"Int16"
+32		"Int24"
+33		"Int32"
+34		"Float"
+35		"Audioverzögerung (ms):"
+38		"Zurücksetzen"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

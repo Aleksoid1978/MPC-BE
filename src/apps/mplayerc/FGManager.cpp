@@ -2797,6 +2797,7 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 		if (s.bAudioFilters) {
 			pASF->SetAudioFilter1(s.strAudioFilter1);
 		}
+		pASF->SetAudioFiltersNotForStereo(s.bAudioFiltersNotForStereo);
 	}
 
 	return hr;

@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2021 see Authors.txt
+ * (C) 2017-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -51,4 +51,5 @@ public IUnknown {
 	STDMETHOD(SetAudioTimeShift) (REFERENCE_TIME rtAudioTimeShift) PURE;
 	STDMETHOD(SetAudioFilter1)(const char* str_filter) PURE;
 	STDMETHOD_(int, GetAudioFilterState)() PURE;
+	STDMETHOD(SetAudioFiltersNotForStereo) (bool bDisableForStereo) PURE;
 };

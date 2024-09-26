@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 48		"초"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 39
 5		"채널 믹서"
 6		"채널 혼합 :"
 8		"디코어에서 스테레오 요청"
@@ -451,13 +451,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 18		"음량 증폭"
 24		"FFmpeg 필터"
 25		"사전 설정"
-28		"출력 포본화 형식 :"
-29		"Int16"
-30		"Int24"
-31		"Int32"
-32		"Float"
-33		"오디오 시간 조절(밀리초) :"
-36		"기본값"
+26		"Don't use for stereo and mono sources"
+30		"출력 포본화 형식 :"
+31		"Int16"
+32		"Int24"
+33		"Int32"
+34		"Float"
+35		"오디오 시간 조절(밀리초) :"
+38		"기본값"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

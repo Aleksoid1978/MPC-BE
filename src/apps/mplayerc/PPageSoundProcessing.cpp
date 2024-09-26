@@ -125,6 +125,8 @@ void CPPageSoundProcessing::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO1, m_cmbFilter1Name);
 	DDX_Control(pDX, IDC_EDIT1, m_edtFilter1Args);
 
+	DDX_Control(pDX, IDC_CHECK2, m_chkDisableProcessingStereoMono);
+
 	DDX_Control(pDX, IDC_CHECK9, m_chkInt16);
 	DDX_Control(pDX, IDC_CHECK10, m_chkInt24);
 	DDX_Control(pDX, IDC_CHECK11, m_chkInt32);
@@ -207,6 +209,7 @@ BOOL CPPageSoundProcessing::OnInitDialog()
 		}
 	}
 	OnFilter1NameChange();
+	m_chkDisableProcessingStereoMono.SetCheck(s.bAudioFiltersNotForStereo);
 
 	m_chkInt16.SetCheck((s.iAudioSampleFormats & SFMT_INT16) ? BST_CHECKED : BST_UNCHECKED);
 	m_chkInt24.SetCheck((s.iAudioSampleFormats & SFMT_INT24) ? BST_CHECKED : BST_UNCHECKED);
@@ -265,6 +268,7 @@ BOOL CPPageSoundProcessing::OnApply()
 		m_edtFilter1Args.GetWindowText(flt_args);
 		s.strAudioFilter1.Format("%S=%S", flt_name, flt_args);
 	}
+	s.bAudioFiltersNotForStereo = !!m_chkDisableProcessingStereoMono.GetCheck();
 
 	s.iAudioSampleFormats		= GetSampleFormats();
 
@@ -296,6 +300,7 @@ BOOL CPPageSoundProcessing::OnApply()
 		} else {
 			pASF->SetAudioFilter1(nullptr);
 		}
+		pASF->SetAudioFiltersNotForStereo(s.bAudioFiltersNotForStereo);
 	}
 
 	return __super::OnApply();
@@ -452,6 +457,8 @@ void CPPageSoundProcessing::OnBnClickedDefault()
 
 	m_chkAudioFilters.SetCheck(BST_UNCHECKED);
 	m_cmbFilter1Name.SetCurSel(0);
+
+	m_chkDisableProcessingStereoMono.SetCheck(BST_UNCHECKED);
 
 	m_chkInt16.SetCheck(BST_CHECKED);
 	m_chkInt24.SetCheck(BST_CHECKED);

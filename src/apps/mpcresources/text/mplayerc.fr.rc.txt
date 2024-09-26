@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 48		"sec."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 39
 5		"Mélangeur de canaux"
 6		"Mixer les canaux en :"
 8		"Demander la stéréo au décodeur"
@@ -451,13 +451,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 18		"Booster le son"
 24		"Filtres FFmpeg"
 25		"Préréglages"
-28		"Format de sortie audio :"
-29		"Int16"
-30		"Int24"
-31		"Int32"
-32		"Float"
-33		"Décalage audio (en ms) :"
-36		"Par défaut"
+26		"Don't use for stereo and mono sources"
+30		"Format de sortie audio :"
+31		"Int16"
+32		"Int24"
+33		"Int32"
+34		"Float"
+35		"Décalage audio (en ms) :"
+38		"Par défaut"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

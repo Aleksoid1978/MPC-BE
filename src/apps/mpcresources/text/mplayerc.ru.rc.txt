@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 48		"сек."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 39
 5		"Микшер каналов"
 6		"Микшировать каналы в:"
 8		"Запросить стерео у декодера"
@@ -451,13 +451,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 18		"Повышать громкость"
 24		"Фильтры FFmpeg"
 25		"Пресеты"
-28		"Формат вывода:"
-29		"Int16"
-30		"Int24"
-31		"Int32"
-32		"Float"
-33		"Смещение звука (в мс):"
-36		"По умолчанию"
+26		"Не использовать для стерео и моно источников"
+30		"Формат вывода:"
+31		"Int16"
+32		"Int24"
+33		"Int32"
+34		"Float"
+35		"Смещение звука (в мс):"
+38		"По умолчанию"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

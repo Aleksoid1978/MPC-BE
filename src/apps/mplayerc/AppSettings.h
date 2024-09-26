@@ -690,6 +690,7 @@ public:
 	int				iAudioTimeShift;
 	bool			bAudioFilters;
 	CStringA		strAudioFilter1;
+	bool			bAudioFiltersNotForStereo;
 
 	// External Filters
 	std::list<std::unique_ptr<FilterOverride>> m_ExternalFilters;

@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 48		"seg."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 39
 5		"Mezclador de Canales"
 6		"Mezclar canales a:"
 8		"Solicitar estéreo desde el decodificador"
@@ -451,13 +451,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 37
 18		"Potenciar audio"
 24		"Filtros FFmpeg"
 25		"Preajustes"
-28		"Formato de Muestra de Salida:"
-29		"Int16"
-30		"Int24"
-31		"Int32"
-32		"Float"
-33		"Desplazamiento de audio (ms):"
-36		"Predeterminado"
+26		"Don't use for stereo and mono sources"
+30		"Formato de Muestra de Salida:"
+31		"Int16"
+32		"Int24"
+33		"Int32"
+34		"Float"
+35		"Desplazamiento de audio (ms):"
+38		"Predeterminado"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
