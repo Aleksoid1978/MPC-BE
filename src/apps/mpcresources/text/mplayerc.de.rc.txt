@@ -451,7 +451,7 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 39
 18		"Audio verstärken"
 24		"FFmpeg Filter"
 25		"Voreinstellungen"
-26		"Don't use for stereo and mono sources"
+26		"Nicht für Stereo- und Monoquellen verwenden"
 30		"Ausgabe-Sampleformat"
 31		"Int16"
 32		"Int24"
