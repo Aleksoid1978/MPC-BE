@@ -451,14 +451,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
 18		"音频增强"
 24		"FFmpeg 过滤器"
 25		"预设"
-26		"Don't use for stereo and mono sources"
+26		"音源为单声道或立体声时禁用"
 30		"输出采样格式:"
 31		"Int16"
 32		"Int24"
 33		"Int32"
 34		"浮点"
 35		"音频延迟时间 (毫秒):"
-38		"Small stereo speakers"
+38		"小型立体声扬声器"
 39		"默认值"
 END
 
