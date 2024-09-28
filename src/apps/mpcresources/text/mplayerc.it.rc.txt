@@ -458,7 +458,7 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
 33		"Int32"
 34		"Float"
 35		"Spostamento audio (ms):"
-38		"Small stereo speakers"
+38		"Piccoli altoparlanti stereo"
 39		"Predefinito"
 END
 
