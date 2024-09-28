@@ -28,7 +28,7 @@ Added setting "Enable Windows 10 long paths support". The setting will be displa
 Updated German translation (by Klaus1189).
 
 Updated libraries:
-	ffmpeg n7.1-dev-2627-g9e1682761f;
+	ffmpeg n7.1-dev-2746-g01c47dd235;
 	rapidjson v1.1.0-755-g815e6e7e;
 	vvdec v2.3.0-28-gf8ba8fd.
 
