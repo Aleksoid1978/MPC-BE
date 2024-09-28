@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 48		"sec."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 39
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
 5		"Μείκτης καναλιών"
 6		"Μίξη καναλιών σε:"
 8		"Αίτηση στερεοφωνικού από τον αποκωδικοποιητή"
@@ -458,7 +458,8 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 39
 33		"Int32"
 34		"Float"
 35		"Χρονική μετατόπιση ήχου (ms):"
-38		"Προεπιλογή"
+38		"Small stereo speakers"
+39		"Προεπιλογή"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

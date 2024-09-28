@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 48		"sec."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 39
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
 5		"Amestecător de canale"
 6		"Amestecă canalele la:"
 8		"Solicită stereo de la decodor"
@@ -458,7 +458,8 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 39
 33		"Int32"
 34		"Plutitor"
 35		"Decalarea timpului audio (ms):"
-38		"Implicit"
+38		"Small stereo speakers"
+39		"Implicit"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

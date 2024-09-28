@@ -441,7 +441,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 48		"sec."
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 39
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
 5		"Mixer canali"
 6		"Miscela i canali in:"
 8		"Richiedi stereo dal decodificatore"
@@ -458,7 +458,8 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 39
 33		"Int32"
 34		"Float"
 35		"Spostamento audio (ms):"
-38		"Predefinito"
+38		"Small stereo speakers"
+39		"Predefinito"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

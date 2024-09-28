@@ -125,7 +125,7 @@ void CPPageSoundProcessing::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO1, m_cmbFilter1Name);
 	DDX_Control(pDX, IDC_EDIT1, m_edtFilter1Args);
 
-	DDX_Control(pDX, IDC_CHECK2, m_chkDisableProcessingStereoMono);
+	DDX_Control(pDX, IDC_CHECK2, m_chkFiltersNotForStereo);
 
 	DDX_Control(pDX, IDC_CHECK9, m_chkInt16);
 	DDX_Control(pDX, IDC_CHECK10, m_chkInt24);
@@ -148,6 +148,7 @@ BEGIN_MESSAGE_MAP(CPPageSoundProcessing, CPPageBase)
 	ON_BN_CLICKED(IDC_CHECK12, OnFloatCheck)
 	ON_BN_CLICKED(IDC_CHECK4, OnTimeShiftCheck)
 	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedPresets)
+	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedStereoSpeakers)
 	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedDefault)
 	ON_WM_HSCROLL()
 END_MESSAGE_MAP()
@@ -209,7 +210,7 @@ BOOL CPPageSoundProcessing::OnInitDialog()
 		}
 	}
 	OnFilter1NameChange();
-	m_chkDisableProcessingStereoMono.SetCheck(s.bAudioFiltersNotForStereo);
+	m_chkFiltersNotForStereo.SetCheck(s.bAudioFiltersNotForStereo);
 
 	m_chkInt16.SetCheck((s.iAudioSampleFormats & SFMT_INT16) ? BST_CHECKED : BST_UNCHECKED);
 	m_chkInt24.SetCheck((s.iAudioSampleFormats & SFMT_INT24) ? BST_CHECKED : BST_UNCHECKED);
@@ -268,7 +269,7 @@ BOOL CPPageSoundProcessing::OnApply()
 		m_edtFilter1Args.GetWindowText(flt_args);
 		s.strAudioFilter1.Format("%S=%S", flt_name, flt_args);
 	}
-	s.bAudioFiltersNotForStereo = !!m_chkDisableProcessingStereoMono.GetCheck();
+	s.bAudioFiltersNotForStereo = !!m_chkFiltersNotForStereo.GetCheck();
 
 	s.iAudioSampleFormats		= GetSampleFormats();
 
@@ -441,10 +442,39 @@ void CPPageSoundProcessing::OnBnClickedPresets()
 	}
 }
 
+void CPPageSoundProcessing::OnBnClickedStereoSpeakers()
+{
+	m_chkMixer.SetCheck(BST_CHECKED);
+	SelectByItemData(m_cmbMixerLayout, SPK_STEREO);
+	m_chkStereoFromDecoder.SetCheck(BST_UNCHECKED);
+	m_chkBassRedirect.SetCheck(BST_UNCHECKED);
+	m_sldCenter.SetPos(0);
+	m_sldSurround.SetPos(0);
+
+	m_sldGain.SetPos(0);
+	m_chkAutoVolumeControl.SetCheck(BST_UNCHECKED);
+
+	m_chkAudioFilters.SetCheck(BST_CHECKED);
+	const int idx = m_cmbFilter1Name.FindStringExact(1, L"compand");
+	if (idx != CB_ERR) {
+		m_cmbFilter1Name.SetCurSel(idx);
+		m_edtFilter1Args.SetWindowText(L"0|0:1|1:-90/-900|-70/-70|-30/-9|0/-3:6:0:0:0");
+		OnFilter1NameChange();
+	}
+	m_chkFiltersNotForStereo.SetCheck(BST_CHECKED);
+
+	UpdateCenterInfo();
+	UpdateSurroundInfo();
+	UpdateGainInfo();
+	OnMixerCheck();
+	OnAutoVolumeControlCheck();
+}
+
 void CPPageSoundProcessing::OnBnClickedDefault()
 {
 	m_chkMixer.SetCheck(BST_UNCHECKED);
 	SelectByItemData(m_cmbMixerLayout, SPK_STEREO);
+	m_chkStereoFromDecoder.SetCheck(BST_UNCHECKED);
 	m_chkBassRedirect.SetCheck(BST_UNCHECKED);
 	m_sldCenter.SetPos(0);
 	m_sldSurround.SetPos(0);
@@ -457,8 +487,7 @@ void CPPageSoundProcessing::OnBnClickedDefault()
 
 	m_chkAudioFilters.SetCheck(BST_UNCHECKED);
 	m_cmbFilter1Name.SetCurSel(0);
-
-	m_chkDisableProcessingStereoMono.SetCheck(BST_UNCHECKED);
+	m_chkFiltersNotForStereo.SetCheck(BST_UNCHECKED);
 
 	m_chkInt16.SetCheck(BST_CHECKED);
 	m_chkInt24.SetCheck(BST_CHECKED);
