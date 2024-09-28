@@ -451,7 +451,7 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
 18		"Potenzia l'audio"
 24		"Filtri FFmpeg"
 25		"Preimpostazioni"
-26		"Don't use for stereo and mono sources"
+26		"Non usare per sorgenti stereo e mono"
 30		"Formato di uscita del campione:"
 31		"Int16"
 32		"Int24"
