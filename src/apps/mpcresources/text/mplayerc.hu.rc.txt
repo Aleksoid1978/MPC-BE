@@ -451,14 +451,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
 18		"Növelt hang"
 24		"FFmpeg szűrők"
 25		"Előbeállítások"
-26		"Don't use for stereo and mono sources"
+26		"Ne használja sztereó és monó forrásokhoz"
 30		"Kimeneti minta formátum:"
 31		"Int16"
 32		"Int24"
 33		"Int32"
 34		"Float"
 35		"Audió időzítés-eltolása:\n(ezredmp)"
-38		"Small stereo speakers"
+38		"Kis sztereó hangszórók"
 39		"Alapértelmezett"
 END
 
