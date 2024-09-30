@@ -1614,8 +1614,8 @@ cmsInt32Number satoi(const char* b)
     if (b == NULL) return 0;
 
     n = atoi(b);
-    if (n > 0x7fffffffL) return 0x7fffffffL;
-    if (n < -0x7ffffffeL) return -0x7ffffffeL;
+    if (n > 0x7ffffff0L) return 0x7ffffff0L;
+    if (n < -0x7ffffff0L) return -0x7ffffff0L;
 
     return (cmsInt32Number)n;
 }
