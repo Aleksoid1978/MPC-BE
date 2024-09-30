@@ -179,6 +179,7 @@ ADM: Show TrackUIDs;
 AdmProfile;
 Advanced;Pokročilé
 Advanced mode;Viac detailov
+Advanced mode -->;
 Album;Album
 Album_ReplayGain_Gain;
 Album_ReplayGain_Peak;
@@ -195,12 +196,17 @@ AssistantDirector;AssistantDirector
 AssociatedVideo_FrameRate;
 at;pri
 At least one file;(Musíš najprv otvoriť súbor)
+Attachments;
 Audio;Audio
 Audio stream(s);Audio streamy
 Audio_Codec_List;Audio kodeky
+Audio_Format_List;
+Audio_Format_WithHint_List;
+Audio_Language_List;
 Audio_No;Bez audia
 Audio1;Prvý audio stream
 Audio2;Druhý audio stream
+Audio3;
 AudioComments;
 AudioCount;Počet audio streamov
 AudioDescription;
@@ -237,17 +243,22 @@ Cancel;Zrušiť
 CaptionServiceName;
 CatalogNumber;
 Channel(s);Kanál(y)
+Channel(s)_Original;
 ChannelCoded;
 ChannelConfiguration;
 ChannelFormat;
 ChannelLayout;
+ChannelLayout_Original;
 ChannelMode;
 ChannelPositions;Channel positions
+ChannelPositions_Original;
 Chapter(s);Kapitola(y)
 Chapters;Kapitoly
 Chapters stream(s);Chapters stream(s)
 Chapters_Codec_List;Chapters Codecs
 Chapters_No;No chapters
+Chapters_Pos_Begin;
+Chapters_Pos_End;
 ChaptersCount;Count of chapter streams
 CharacterSet;
 CheckNewVersion;Skontrolovať novú verziu
@@ -341,6 +352,7 @@ Date;Dátum
 Debug;Pokročilé
 Decimal point;Decimal point
 Default;
+Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;Delay
@@ -380,6 +392,7 @@ DrcSets_Effects;
 Duration;Trvanie
 Duration_End;
 Duration_End_Command;
+Duration_Source;
 Duration_Start;
 Duration_Start_Command;
 Duration_Start2End;
@@ -396,7 +409,9 @@ Enable FFmpeg plugin;
 Encoded_Application;Použitý software
 Encoded_Date;Dátum zakódovania
 Encoded_Library;Zakódoval
+Encoded_Library_Name;
 Encoded_Library_Settings;Nastavenie kodéru
+Encoded_Library_Version;
 Encoded_Original;Originál
 EncodedBy;Zakódoval
 EPG_Positions;
@@ -429,6 +444,8 @@ FileExtension;Prípona súboru
 FileName;Názov súboru
 FileNameExtension;
 FileSize;Veľkosť súboru
+Fill with a Dummy movie;
+Fill with a realistic movie;
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
 FirstFrameOfAction;
@@ -442,6 +459,7 @@ Folder_Hint;Otvoriť všetko v adresári
 FolderName;Názov adresára
 Forced;
 Format;Formát
+Format_AdditionalFeatures;
 Format_Commercial;
 Format_Commercial_IfAny;
 Format_Compression;
@@ -484,13 +502,16 @@ FpaManufacturer;
 FpaPass;
 FpaVersion;
 FrameCount;
+FrameCount_Source;
 FrameRate;Frekvencia snímok
+FrameRate_Den;
 FrameRate_Maximum;Maximálna frekvencia snímok
 FrameRate_Minimum;Minimálna frekvencia snímok
 FrameRate_Mode;Režim frekvencie snímok
 FrameRate_Mode_CFR;Konštantný
 FrameRate_Mode_VFR;Variabilný
 FrameRate_Nominal;Nominálna frekvencia snímok
+FrameRate_Num;
 FrameRate_Original;Pôvodná frekvencia snímok
 FrameRate_Real;
 FullParsing;
@@ -740,6 +761,7 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+IsStreamable;
 Keywords;Identifikujúce slová
 Known codecs;Známe kodeky
 Known formats;Známe formáty
@@ -954,6 +976,7 @@ Language_zh-tw;Čínsky (Taiwan)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;Zulu
+Languages;
 LawRating;Law rating
 LCCN;LCCN
 LfeAttenuationKnown;
@@ -1037,8 +1060,8 @@ Movie;Názov filmu
 ms; ms
 MSDI;MSDI
 MultipleStream;
-MusicBy;Hudbu zložil
 MultiView_Count;
+MusicBy;Hudbu zložil
 MuxingMode;
 MuxingMode_MoreInfo;
 MuxingMode_PackedBitstream;
@@ -1135,6 +1158,7 @@ ProductionDesigner;ProductionDesigner
 ProductionNumber;
 ProductionStudio;ProductionStudio
 ProductPlacement;
+Program name;
 Programme;
 ProgrammeHasText;
 ProgrammeTextLanguage;
@@ -1158,10 +1182,13 @@ Report;
 Resolution;Rozlíšenie
 RestoreLifetimeSubscription;
 s; sek.
+Sampled_Height;
+Sampled_Width;
 SamplePeakLevel;
 SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;
+SamplingCount_Source;
 SamplingRate;Sampling rate
 Save;Uložiť
 ScanOrder;
@@ -1178,6 +1205,7 @@ ScreenToFront;
 Season;Season
 SecondaryAudioLanguage;
 see below;pozri nižšie
+Select your directory;
 Send HeaderFile;
 Separator_Columns;Oddeľovač stĺpcov
 Separator_Lines;Oddeľovač riadkov
@@ -1227,6 +1255,7 @@ streamIdentifier;
 StreamKind;Kind of stream
 StreamKindID;
 StreamKindPos;
+StreamOrder;
 StreamSize;
 StreamSize_Demuxed;
 StreamSize_Encoded;
@@ -1269,6 +1298,9 @@ Text (HTML);Text (HTML)
 Text stream(s);Text streams
 Text streams;Text streams
 Text_Codec_List;Text codecs
+Text_Format_List;
+Text_Format_WithHint_List;
+Text_Language_List;
 Text_No;Bez textu
 Text1;Prvý text stream
 Text2;Druhý text stream
@@ -1336,9 +1368,14 @@ Video;Video
 Video stream(s);Video stream(y)
 Video_Codec_List;Video kodeky
 Video_Delay;Video delay
+Video_Format_List;
+Video_Format_WithHint_List;
+Video_Language_List;
 Video_No;Žiadne video
 Video0_Delay;Video0 delay
 Video1;Prvý video stream
+Video2;
+Video3;
 VideoComments;
 VideoCount;Počet video streamov
 View;Zobraziť
@@ -1366,5 +1403,6 @@ Written_Location;Written location
 WrittenBy;Napísal
 Yes;Áno
 Your system;Váš systém
-ZZ_Automatic_Percent;59
-ZZ_AutomaticLanguage_Percent;63
+Your translation;
+ZZ_Automatic_Percent;57
+ZZ_AutomaticLanguage_Percent;62

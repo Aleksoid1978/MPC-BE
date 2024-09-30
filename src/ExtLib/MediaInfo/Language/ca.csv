@@ -179,6 +179,7 @@ ADM: Show TrackUIDs;
 AdmProfile;
 Advanced;Avançat
 Advanced mode;Mode avançat
+Advanced mode -->;
 Album;Àlbum
 Album_ReplayGain_Gain;Ganància reproducció àlbum
 Album_ReplayGain_Peak;Ganància màxima reproducció àlbum
@@ -195,12 +196,17 @@ AssistantDirector;Assistent del director
 AssociatedVideo_FrameRate;
 at;a
 At least one file;(Has d'obrir al menys un arxiu)
+Attachments;
 Audio;Àudio
 Audio stream(s);Pistes d'àudio
 Audio_Codec_List;Còdecs d'àudio
+Audio_Format_List;
+Audio_Format_WithHint_List;
+Audio_Language_List;
 Audio_No;Sense àudio
 Audio1;Primera pista d'àudio
 Audio2;Segona pista d'àudio
+Audio3;
 AudioComments;Audiocomentaris
 AudioCount;Total de pistes d'àudio
 AudioDescription;
@@ -237,17 +243,22 @@ Cancel;Cancel·la
 CaptionServiceName;
 CatalogNumber;
 Channel(s);Canal(s)
+Channel(s)_Original;
 ChannelCoded;
 ChannelConfiguration;
 ChannelFormat;
 ChannelLayout;
+ChannelLayout_Original;
 ChannelMode;
 ChannelPositions;Posicions dels canals
+ChannelPositions_Original;
 Chapter(s);Capítol(s)
 Chapters;Capítols
 Chapters stream(s);Pista(es) de capítol(s)
 Chapters_Codec_List;Còdecs capítols
 Chapters_No;Sense capítols
+Chapters_Pos_Begin;
+Chapters_Pos_End;
 ChaptersCount;Total pistes capítols
 CharacterSet;
 CheckNewVersion;Cercar una nova versió
@@ -341,6 +352,7 @@ Date;Data
 Debug;Depuració
 Decimal point;Punt decimal
 Default;
+Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;Retard
@@ -380,6 +392,7 @@ DrcSets_Effects;
 Duration;Durada
 Duration_End;Temps final
 Duration_End_Command;
+Duration_Source;
 Duration_Start;Temps inicial
 Duration_Start_Command;
 Duration_Start2End;
@@ -396,7 +409,9 @@ Enable FFmpeg plugin;
 Encoded_Application;Aplicació
 Encoded_Date;Data de codificació
 Encoded_Library;Llibreria d'escriptura
+Encoded_Library_Name;
 Encoded_Library_Settings;Ajustos de codificació
+Encoded_Library_Version;
 Encoded_Original;Suport original
 EncodedBy;Codificat per
 EPG_Positions;Posicions EPG (internes)
@@ -429,6 +444,8 @@ FileExtension;Extensió d'arxiu
 FileName;Nom de l'arxiu
 FileNameExtension;
 FileSize;Mida de l'arxiu
+Fill with a Dummy movie;
+Fill with a realistic movie;
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
 FirstFrameOfAction;
@@ -442,6 +459,7 @@ Folder_Hint;Tria la carpeta general
 FolderName;Nom de la carpeta
 Forced;
 Format;Format
+Format_AdditionalFeatures;
 Format_Commercial;Nom comercial
 Format_Commercial_IfAny;Nom comercial
 Format_Compression;
@@ -484,13 +502,16 @@ FpaManufacturer;Fabricant FPA
 FpaPass;Passada FPA
 FpaVersion;Versió FPA
 FrameCount;Quantitat fotogrames
+FrameCount_Source;
 FrameRate;Fotogrames per segon
+FrameRate_Den;
 FrameRate_Maximum;Fotogrames per segon màxims
 FrameRate_Minimum;Fotogrames per segon mínims
 FrameRate_Mode;Mode fotogrames per segon
 FrameRate_Mode_CFR;Constant
 FrameRate_Mode_VFR;Variable
 FrameRate_Nominal;Fotogrames per segon nominals
+FrameRate_Num;
 FrameRate_Original;Fotogrames per segon originals
 FrameRate_Real;
 FullParsing;
@@ -740,6 +761,7 @@ InternetMediaType;Tipus medis Internet
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+IsStreamable;
 Keywords;Paraules clau
 Known codecs;Còdecs coneguts
 Known formats;Formats coneguts
@@ -954,6 +976,7 @@ Language_zh-tw;Xinès (Taiwan)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;Zulú
+Languages;
 LawRating;Classificació llei
 LCCN;LCCN
 LfeAttenuationKnown;
@@ -1037,8 +1060,8 @@ Movie;Nom de la pel·lícula
 ms; ms
 MSDI;MSDI
 MultipleStream;
-MusicBy;Música per
 MultiView_Count;
+MusicBy;Música per
 MuxingMode;Mode multiplexat
 MuxingMode_MoreInfo;Mode multiplexat, més info
 MuxingMode_PackedBitstream;Seqüència de bits empaquetada
@@ -1135,6 +1158,7 @@ ProductionDesigner;Disseny de producció
 ProductionNumber;Número de producció
 ProductionStudio;Estudi de producció
 ProductPlacement;Col·locació de productes
+Program name;
 Programme;
 ProgrammeHasText;El programa té text
 ProgrammeTextLanguage;Idioma text programa
@@ -1158,10 +1182,13 @@ Report;
 Resolution;Resolució
 RestoreLifetimeSubscription;
 s; s
+Sampled_Height;
+Sampled_Width;
 SamplePeakLevel;
 SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;Quantitat mostres
+SamplingCount_Source;
 SamplingRate;Freqüència de mostreig
 Save;Desa
 ScanOrder;Ordre d'escombrat
@@ -1178,6 +1205,7 @@ ScreenToFront;
 Season;Estació
 SecondaryAudioLanguage;Idioma àudio secondari
 see below;mira més avall
+Select your directory;
 Send HeaderFile;Envia'm l'arxiu Header aquí: http://sourceforge.net/projects/mediainfo/ (secció Bug)
 Separator_Columns;Separador de columnes
 Separator_Lines;Separador de línies
@@ -1227,6 +1255,7 @@ streamIdentifier;
 StreamKind;Tipus de pista
 StreamKindID;Identificador pista
 StreamKindPos;Identificador pista
+StreamOrder;
 StreamSize;Mida pista
 StreamSize_Demuxed;
 StreamSize_Encoded;Mida pista codificada
@@ -1269,6 +1298,9 @@ Text (HTML);Text (HTML)
 Text stream(s);Pistes de text
 Text streams;Pistaes de text
 Text_Codec_List;Còdecs de text
+Text_Format_List;
+Text_Format_WithHint_List;
+Text_Language_List;
 Text_No;Sense text
 Text1;Primera pista de text
 Text2;Segona pista de text
@@ -1336,9 +1368,14 @@ Video;Vídeo
 Video stream(s);Pista(es) de vídeo
 Video_Codec_List;Còdecs de vídeo
 Video_Delay;Retard de vídeo
+Video_Format_List;
+Video_Format_WithHint_List;
+Video_Language_List;
 Video_No;Sense vídeo
 Video0_Delay;Retard de vídeo
 Video1;Primera pista de vídeo
+Video2;
+Video3;
 VideoComments;Comentaris del vídeo
 VideoCount;Total de pistes de vídeo
 View;Visualitza
@@ -1366,5 +1403,6 @@ Written_Location;Ubicació escrita
 WrittenBy;Escrit per
 Yes;Sí
 Your system;El teu sistema
-ZZ_Automatic_Percent;76
-ZZ_AutomaticLanguage_Percent;79
+Your translation;
+ZZ_Automatic_Percent;74
+ZZ_AutomaticLanguage_Percent;77

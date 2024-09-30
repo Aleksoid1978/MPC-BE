@@ -179,6 +179,7 @@ ADM: Show TrackUIDs;ADM: показувати елементи TrackUID
 AdmProfile;Профіль ADM
 Advanced;Додатково
 Advanced mode;Розширений режим
+Advanced mode -->;
 Album;Альбом
 Album_ReplayGain_Gain;Вирівнювання гучності альбому
 Album_ReplayGain_Peak;Пік вирівнювання гучності альбому
@@ -195,12 +196,17 @@ AssistantDirector;Помічник режисера
 AssociatedVideo_FrameRate;Відповідна частота кадрів відео
 at;@
 At least one file;Як мінімум один файл
+Attachments;
 Audio;Аудіо
 Audio stream(s);Аудіопотік(-оки)
 Audio_Codec_List;Аудіокодеки
+Audio_Format_List;
+Audio_Format_WithHint_List;
+Audio_Language_List;
 Audio_No;Аудіопотоки відсутні
 Audio1;Перший аудіопотік
 Audio2;Другий аудіопотік
+Audio3;
 AudioComments;Голосовий коментар
 AudioCount;Кількість аудіопотоків
 AudioDescription;Аудіо опис
@@ -237,17 +243,22 @@ Cancel;Відміна
 CaptionServiceName;Підпис з ім'ям служби
 CatalogNumber;Номер за каталогом
 Channel(s);Канал(-и)
+Channel(s)_Original;
 ChannelCoded;Канальне кодування
 ChannelConfiguration;Конфігурація каналів
 ChannelFormat;Формат каналів
 ChannelLayout;Розташування каналів
+ChannelLayout_Original;
 ChannelMode;Режим каналів
 ChannelPositions;Позиції каналів
+ChannelPositions_Original;
 Chapter(s);Розділ(-и)
 Chapters;Розділи
 Chapters stream(s);Поток(-и) розділів
 Chapters_Codec_List;Кодеки розділів
 Chapters_No;Немає розділів
+Chapters_Pos_Begin;
+Chapters_Pos_End;
 ChaptersCount;Кількість розділів
 CharacterSet;Набір символів
 CheckNewVersion;Перевірити наявність нової версії
@@ -341,6 +352,7 @@ Date;Дата
 Debug;Відлагодження
 Decimal point;Десятковий роздільник
 Default;За замовчуванням
+Default translation;
 Default_Setting;Системне значення за замовчуванням
 DefaultTargetDeviceConfig;Конфігурація цільового пристрою за замовчуванням
 Delay;Затримка
@@ -349,7 +361,7 @@ Delay_Source_Container;Контейнер
 Delay_Source_Stream;«Сирий» потік
 Delete;Видалити
 Description;Опис
-Details;Докладний опис
+Details;
 dialnorm;Нормалізація мовлення
 DialogueCorrected;Корекція звуку мови
 DialogueEnhancement;Покращення звуку мови
@@ -380,6 +392,7 @@ DrcSets_Effects;Тип(и) ефектів КДД
 Duration;Тривалість
 Duration_End;Кінець
 Duration_End_Command;Кінець (команди)
+Duration_Source;
 Duration_Start;Початок
 Duration_Start_Command;Початок (команди)
 Duration_Start2End;Тривалість відтворення відео
@@ -396,7 +409,9 @@ Enable FFmpeg plugin;
 Encoded_Application;Програма кодування
 Encoded_Date;Дата кодування
 Encoded_Library;Бібліотека кодування
+Encoded_Library_Name;
 Encoded_Library_Settings;Налаштування бібліот. кодування
+Encoded_Library_Version;
 Encoded_Original;Оригінальне кодування
 EncodedBy;Закодовано
 EPG_Positions;EPG положення (внутрішні)
@@ -429,6 +444,8 @@ FileExtension;Розширення файлу
 FileName;Ім'я файлу
 FileNameExtension;Розширення імені файлу
 FileSize;Розмір файлу
+Fill with a Dummy movie;
+Fill with a realistic movie;
 FirstDisplay_Delay_Frames;Кількість кадрів до першої події
 FirstDisplay_Type;Тип першої події
 FirstFrameOfAction;Перший кадр дії
@@ -442,6 +459,7 @@ Folder_Hint;Вибір папки
 FolderName;Назва папки
 Forced;Примусово
 Format;Формат
+Format_AdditionalFeatures;
 Format_Commercial;Комерційна назва
 Format_Commercial_IfAny;Комерційна назва
 Format_Compression;Стиснення
@@ -484,13 +502,16 @@ FpaManufacturer;Виробник FPA
 FpaPass;Пароль FPA
 FpaVersion;Версія FPA
 FrameCount;Кількість кадрів
+FrameCount_Source;
 FrameRate;Частота кадрів
+FrameRate_Den;
 FrameRate_Maximum;Максимальна частота кадрів
 FrameRate_Minimum;Мінімальна частота кадрів
 FrameRate_Mode;Режим частоти кадрів
 FrameRate_Mode_CFR;Постійний
 FrameRate_Mode_VFR;Змінний
 FrameRate_Nominal;Номінальна частота кадрів
+FrameRate_Num;
 FrameRate_Original;Частота кадрів в оригіналі
 FrameRate_Real;Дійсна частота кадрів
 FullParsing;Повний аналіз
@@ -740,6 +761,7 @@ InternetMediaType;MIME-тип
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+IsStreamable;
 Keywords;Ключові слова
 Known codecs;Відомі кодеки
 Known formats;Відомі формати
@@ -954,6 +976,7 @@ Language_zh-tw;Китайська (Тайвань)
 Language_zh-TW;Китайська (Тайвань)
 Language_zh-yue;Кантонська
 Language_zu;Зулу
+Languages;
 LawRating;Обмеження за віком
 LCCN;LCCN
 LfeAttenuationKnown;Ослаблення низькочастотних ефектів (LFE)
@@ -1037,8 +1060,8 @@ Movie;Назва фільму
 ms; мс
 MSDI;MSDI
 MultipleStream;Декілька потоків
-MusicBy;Створено
 MultiView_Count;Кількість переглядів
+MusicBy;Створено
 MuxingMode;Режим мультиплексування
 MuxingMode_MoreInfo;Режим мультиплексування, додаткова інформація
 MuxingMode_PackedBitstream;Стиснутий бітовий потік
@@ -1135,6 +1158,7 @@ ProductionDesigner;Художник-постановник
 ProductionNumber;Номер постановки
 ProductionStudio;Студія
 ProductPlacement;Розміщення постановки
+Program name;
 Programme;Програма
 ProgrammeHasText;Текст у програмі
 ProgrammeTextLanguage;Мова тексту у програмі
@@ -1158,10 +1182,13 @@ Report;Повідомлення
 Resolution;Роздільна здатність
 RestoreLifetimeSubscription;Відновити довічну передплату
 s; сек.
+Sampled_Height;
+Sampled_Width;
 SamplePeakLevel;Піковий рівень семплу
 SamplePeakLevel_Album;Піковий рівень семплу (альбом)
 SamplesPerFrame;Семплів на кадр
 SamplingCount;Кількість семплів
+SamplingCount_Source;
 SamplingRate;Частота дискретизації
 Save;Зберегти
 ScanOrder;Порядок сканування
@@ -1178,6 +1205,7 @@ ScreenToFront;Екранний канал у передній канал
 Season;Сезон
 SecondaryAudioLanguage;Друга мова аудіо
 see below;див. нижче
+Select your directory;
 Send HeaderFile;Надішліть мені заголовок цього файлу на http://sourceforge.net/projects/mediainfo/ (Розділ помилок)
 Separator_Columns;Роздільник стовпців
 Separator_Lines;Роздільник рядків
@@ -1227,6 +1255,7 @@ streamIdentifier;Ідентифікатор потоку
 StreamKind;Вид потоку
 StreamKindID;Ідентифікатор потоку
 StreamKindPos;Ідентифікатор потоку
+StreamOrder;
 StreamSize;Розмір потоку
 StreamSize_Demuxed;Розмір потоку після демультиплексування
 StreamSize_Encoded;Розмір кодованого потоку
@@ -1269,6 +1298,9 @@ Text (HTML);Текст (HTML)
 Text stream(s);Текстовий(-і) потік(-оки)
 Text streams;Текстові потоки
 Text_Codec_List;Текстовий кодек
+Text_Format_List;
+Text_Format_WithHint_List;
+Text_Language_List;
 Text_No;Текст відсутній
 Text1;Перший текстовий потік
 Text2;Другий текстовий потік
@@ -1336,9 +1368,14 @@ Video;Відео
 Video stream(s);Відеопотік(-оки)
 Video_Codec_List;Відеокодеки
 Video_Delay;Затримка відносно відео
+Video_Format_List;
+Video_Format_WithHint_List;
+Video_Language_List;
 Video_No;Відео відсутнє
 Video0_Delay;Затримка відносно відео 0
 Video1;Перший відеопотік
+Video2;
+Video3;
 VideoComments;Відео коментарі
 VideoCount;Кількість відеопотоків
 View;Вигляд
@@ -1366,5 +1403,6 @@ Written_Location;Місце запису
 WrittenBy;Записано
 Yes;Так
 Your system;Ваша система
-ZZ_Automatic_Percent;99
-ZZ_AutomaticLanguage_Percent;99
+Your translation;
+ZZ_Automatic_Percent;96
+ZZ_AutomaticLanguage_Percent;96

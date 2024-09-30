@@ -673,7 +673,7 @@ void File_N19::Data_Parse()
     {
         for (auto Value : TF)
         {
-            if ((Value>=0x20 && Value<0x7F) || Value>=0xA0)
+            if ((Value>=0x20 && Value<0x7F) || (wchar_t)Value>=0xA0)
                 Line_HasContent=true;
             else
             {

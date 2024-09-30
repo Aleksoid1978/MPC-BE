@@ -89,6 +89,20 @@
 #endif
 
 //---------------------------------------------------------------------------
+//Linux
+#if defined(__LINUX__) || defined(__linux__)
+    #ifndef LINUX
+        #define LINUX
+    #endif
+    #ifndef _LINUX
+        #define _LINUX
+    #endif
+    #ifndef __LINUX__
+        #define __LINUX__ 1
+    #endif
+#endif
+
+//---------------------------------------------------------------------------
 //MacOS Classic
 #if defined(macintosh)
     #ifndef MACOS

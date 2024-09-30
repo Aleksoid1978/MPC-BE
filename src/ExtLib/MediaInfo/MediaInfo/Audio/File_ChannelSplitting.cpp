@@ -262,6 +262,9 @@ void File_ChannelSplitting::Read_Buffer_Continue()
         return;
     }
 
+    if (!Common)
+        return;
+
     //Size of buffer
     for (int c=0; c<2; c++)
         for (size_t i=0; i<Common->SplittedChannels[c].size(); i++)

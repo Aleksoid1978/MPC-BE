@@ -179,6 +179,7 @@ ADM: Show TrackUIDs;
 AdmProfile;
 Advanced;Լրացուցիչ
 Advanced mode;Ընդլայնված եղանակ
+Advanced mode -->;
 Album;Ալբոմը
 Album_ReplayGain_Gain;Ալբոմի ձայնի կարգավորիչ
 Album_ReplayGain_Peak;Ալբոմի ձայնի կարգավորիչի գագաթը
@@ -195,12 +196,17 @@ AssistantDirector;Ռեժիսորի օգնականը
 AssociatedVideo_FrameRate;
 at;ընդ.
 At least one file;Ընտրեք որևէ ֆայլ
+Attachments;
 Audio;Ձայնը
 Audio stream(s);Ձայնի հոսքը
 Audio_Codec_List;Ձայնի կոդավորիչները
+Audio_Format_List;
+Audio_Format_WithHint_List;
+Audio_Language_List;
 Audio_No;Չկա ձայն
 Audio1;Առաջին ձայնը
 Audio2;Երկրորդ ձայնը
+Audio3;
 AudioComments;
 AudioCount;Ձայների քանակը
 AudioDescription;
@@ -237,17 +243,22 @@ Cancel;Մերժել
 CaptionServiceName;
 CatalogNumber;
 Channel(s);Ալիք(ներ)
+Channel(s)_Original;
 ChannelCoded;
 ChannelConfiguration;
 ChannelFormat;
 ChannelLayout;
+ChannelLayout_Original;
 ChannelMode;
 ChannelPositions;Դիրքը
+ChannelPositions_Original;
 Chapter(s);Հոսքերը
 Chapters;Հոսքերը
 Chapters stream(s);Բաժինների հոսքերը
 Chapters_Codec_List;Բաժինների կոդ-ները
 Chapters_No;Չկան բաժիններ
+Chapters_Pos_Begin;
+Chapters_Pos_End;
 ChaptersCount;Բաժինների ք-ը
 CharacterSet;
 CheckNewVersion;Ստուգել նոր տարբերակը
@@ -341,6 +352,7 @@ Date;Ամսաթիվը
 Debug;Փոխադրիչ
 Decimal point;Տասնորդական կետ
 Default;
+Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;Հապաղում
@@ -380,6 +392,7 @@ DrcSets_Effects;
 Duration;Տևողությունը
 Duration_End;Ավարտվելու ժ-ը
 Duration_End_Command;
+Duration_Source;
 Duration_Start;Սկսվելու ժ-ը
 Duration_Start_Command;
 Duration_Start2End;
@@ -396,7 +409,9 @@ Enable FFmpeg plugin;
 Encoded_Application;Կոդավորող ծրագիրը
 Encoded_Date;Կոդավորման ամսաթիվը
 Encoded_Library;Կոդավորման շտեմարանը
+Encoded_Library_Name;
 Encoded_Library_Settings;Ծրագրի կարգավորումները
+Encoded_Library_Version;
 Encoded_Original;Օրիգինալի աղբյուրը
 EncodedBy;Կոդավորիչը
 EPG_Positions;EPG-ի դիրքը (ներքին)
@@ -429,6 +444,8 @@ FileExtension;Տեսակը
 FileName;Ֆայլի անունը
 FileNameExtension;
 FileSize;Ֆայլի չափը
+Fill with a Dummy movie;
+Fill with a realistic movie;
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
 FirstFrameOfAction;
@@ -442,6 +459,7 @@ Folder_Hint;Գործողություն թղթ-երի հետ
 FolderName;Թղթապանակի անունը
 Forced;
 Format;Տեսակը
+Format_AdditionalFeatures;
 Format_Commercial;Կոմերցիոն անվանումը
 Format_Commercial_IfAny;
 Format_Compression;
@@ -484,13 +502,16 @@ FpaManufacturer;
 FpaPass;
 FpaVersion;
 FrameCount;Կադրերի հաշվիչ
+FrameCount_Source;
 FrameRate;Կադրերի հաճախականությունը
+FrameRate_Den;
 FrameRate_Maximum;Կադրերի առավելագույն հաճախ-ը
 FrameRate_Minimum;Կադրերի նվազագույն հաճախ-ը
 FrameRate_Mode;Կադրերի հաճախականության եղանակը
 FrameRate_Mode_CFR;Մշտական
 FrameRate_Mode_VFR;Փոփոխական
 FrameRate_Nominal;Կադրերի պայմանական հաճախ-ը
+FrameRate_Num;
 FrameRate_Original;Կադրերի հաճախ-ը օրիգինալում
 FrameRate_Real;
 FullParsing;
@@ -740,6 +761,7 @@ InternetMediaType;Կրիչի ինտերնետային տեսակ
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+IsStreamable;
 Keywords;Հիմնաբառերը
 Known codecs;Հայտնի կոդավորիչները
 Known formats;Հայտնի տեսակները
@@ -954,6 +976,7 @@ Language_zh-tw;Chinese (Taiwan)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;Zulu
+Languages;
 LawRating;Իրավունքների սահ-ում
 LCCN;LCCN
 LfeAttenuationKnown;
@@ -1037,8 +1060,8 @@ Movie;Ֆիլմի անունը
 ms; մվ.
 MSDI;MSDI
 MultipleStream;
-MusicBy;Երգահանը
 MultiView_Count;
+MusicBy;Երգահանը
 MuxingMode;Խառման եղանակը
 MuxingMode_MoreInfo;Խառման եղանակը, լր. տեղեկություն
 MuxingMode_PackedBitstream;Սեղմված բիթային հոսք
@@ -1135,6 +1158,7 @@ ProductionDesigner;Դիզայնի մշակողը
 ProductionNumber;
 ProductionStudio;Դիզայնի ստուդիան
 ProductPlacement;
+Program name;
 Programme;
 ProgrammeHasText;
 ProgrammeTextLanguage;
@@ -1158,10 +1182,13 @@ Report;
 Resolution;Լուծաչափը
 RestoreLifetimeSubscription;
 s; վայր.
+Sampled_Height;
+Sampled_Width;
 SamplePeakLevel;
 SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;Նմուշների քանակը
+SamplingCount_Source;
 SamplingRate;Հաճախականությունը
 Save;Պահպանել
 ScanOrder;Ստուգման հերթը
@@ -1178,6 +1205,7 @@ ScreenToFront;
 Season;Խաղաշրջանը
 SecondaryAudioLanguage;
 see below;նայեք ներքև
+Select your directory;
 Send HeaderFile;Ուղարկեք այս ֆայլի գլխագիրը http://sourceforge.net/projects/mediainfo/ (Սխալների բաժին)
 Separator_Columns;Սյուների բաժանիչ
 Separator_Lines;Տողերի բաժանիչ
@@ -1227,6 +1255,7 @@ streamIdentifier;
 StreamKind;Հոսքի տեսակը
 StreamKindID;Հոսքի տեսակ ID-ին
 StreamKindPos;Հոսքի տեսակ ID-ի դիրքը
+StreamOrder;
 StreamSize;Հոսքի չափը
 StreamSize_Demuxed;
 StreamSize_Encoded;
@@ -1269,6 +1298,9 @@ Text (HTML);Տեքստ (HTML)
 Text stream(s);Տեքստային հոսքեր
 Text streams;Տեքստային հոսքեր
 Text_Codec_List;Տեքստային կոդավորիչները
+Text_Format_List;
+Text_Format_WithHint_List;
+Text_Language_List;
 Text_No;Չկա տեքստ
 Text1;Առաջին տեքստային հոսքը
 Text2;Երկրորդ տեքստային հոսքը
@@ -1336,9 +1368,14 @@ Video;Տեսանյութը
 Video stream(s);Տեսահոսքը
 Video_Codec_List;Տեսակոդավորիչները
 Video_Delay;Տեսանյութի դադարը
+Video_Format_List;
+Video_Format_WithHint_List;
+Video_Language_List;
 Video_No;Չկա տեսանյութ
 Video0_Delay;Տեսանյութի դադարը
 Video1;Առաջին տեսահոսքը
+Video2;
+Video3;
 VideoComments;
 VideoCount;Տեսահոսքերի ք-ը
 View;Տեսքը
@@ -1366,5 +1403,6 @@ Written_Location;Գրելու տեղը
 WrittenBy;Գրվել է՝
 Yes;Այո
 Your system;Ձեր համակարգը
-ZZ_Automatic_Percent;67
-ZZ_AutomaticLanguage_Percent;72
+Your translation;
+ZZ_Automatic_Percent;65
+ZZ_AutomaticLanguage_Percent;70

@@ -179,6 +179,7 @@ ADM: Show TrackUIDs;ADM: показывать элементы TrackUID
 AdmProfile;Профиль ADM
 Advanced;Дополнительно
 Advanced mode;Расширенный режим
+Advanced mode -->;
 Album;Альбом
 Album_ReplayGain_Gain;Нормализатор звука альбома
 Album_ReplayGain_Peak;Пик нормализатора звука альбома
@@ -195,12 +196,17 @@ AssistantDirector;Помощник режиссёра
 AssociatedVideo_FrameRate;Соответствующая частота кадров видео
 at;в
 At least one file;(Необходимо открыть по крайней мере один файл)
+Attachments;
 Audio;Аудио
 Audio stream(s);Аудиопотоки
 Audio_Codec_List;Аудиокодеки
+Audio_Format_List;
+Audio_Format_WithHint_List;
+Audio_Language_List;
 Audio_No;Нет аудио
 Audio1;Первый аудиопоток
 Audio2;Второй аудиопоток
+Audio3;
 AudioComments;Голосовой комментарий
 AudioCount;Количество аудиопотоков
 AudioDescription;Аудио описание
@@ -237,17 +243,22 @@ Cancel;Отмена
 CaptionServiceName;Подпись с именем службы
 CatalogNumber;Номер по каталогу
 Channel(s);Канал(-ы)
+Channel(s)_Original;
 ChannelCoded;Канальное кодирование
 ChannelConfiguration;Конфигурация каналов
 ChannelFormat;Формат каналов
 ChannelLayout;Расположение каналов
+ChannelLayout_Original;
 ChannelMode;Режим каналов
 ChannelPositions;Позиции каналов
+ChannelPositions_Original;
 Chapter(s);Раздел(-ы)
 Chapters;Разделы
 Chapters stream(s);Поток(-и) разделов
 Chapters_Codec_List;Кодеки разделов
 Chapters_No;Нет разделов
+Chapters_Pos_Begin;
+Chapters_Pos_End;
 ChaptersCount;Количество потоков в разделах
 CharacterSet;Набор символов
 CheckNewVersion;Проверить наличие новой версии
@@ -341,6 +352,7 @@ Date;Дата
 Debug;Отладка
 Decimal point;Десятичная точка
 Default;По умолчанию
+Default translation;
 Default_Setting;Системное значение по умолчанию
 DefaultTargetDeviceConfig;Конфигурация целевого устройства по умолчанию
 Delay;Задержка
@@ -349,7 +361,7 @@ Delay_Source_Container;Контейнер
 Delay_Source_Stream;«Сырой» поток
 Delete;Удалить
 Description;Описание
-Details;Подробное описание
+Details;
 dialnorm;Нормализация звука речи
 DialogueCorrected;Коррекция звука речи
 DialogueEnhancement;Улучшение звука речи
@@ -380,6 +392,7 @@ DrcSets_Effects;Тип(ы) эффектов УДД
 Duration;Продолжительность
 Duration_End;Время окончания
 Duration_End_Command;Время окончания (команды)
+Duration_Source;
 Duration_Start;Время начала
 Duration_Start_Command;Время начала (команды)
 Duration_Start2End;Продолжительность воспроизведения видео
@@ -396,7 +409,9 @@ Enable FFmpeg plugin;
 Encoded_Application;Программа кодирования
 Encoded_Date;Дата кодирования
 Encoded_Library;Библиотека кодирования
+Encoded_Library_Name;
 Encoded_Library_Settings;Параметры библиотеки кодирования
+Encoded_Library_Version;
 Encoded_Original;Источник оригинала
 EncodedBy;Кодирование выполнил
 EPG_Positions;Позиции EPG (внутренние)
@@ -429,6 +444,8 @@ FileExtension;Расширение файла
 FileName;Имя файла
 FileNameExtension;Расширение имени файла
 FileSize;Размер файла
+Fill with a Dummy movie;
+Fill with a realistic movie;
 FirstDisplay_Delay_Frames;Количество кадров до первого события
 FirstDisplay_Type;Тип первого события
 FirstFrameOfAction;Первый кадр действия
@@ -442,6 +459,7 @@ Folder_Hint;Операции с папками
 FolderName;Имя папки
 Forced;Принудительно
 Format;Формат
+Format_AdditionalFeatures;
 Format_Commercial;Коммерческое название
 Format_Commercial_IfAny;Коммерческое название
 Format_Compression;Сжатие
@@ -484,13 +502,16 @@ FpaManufacturer;Производитель FPA
 FpaPass;Пароль FPA
 FpaVersion;Версия FPA
 FrameCount;Счётчик кадров
+FrameCount_Source;
 FrameRate;Частота кадров
+FrameRate_Den;
 FrameRate_Maximum;Максимальная частота кадров
 FrameRate_Minimum;Минимальная частота кадров
 FrameRate_Mode;Режим частоты кадров
 FrameRate_Mode_CFR;Постоянный
 FrameRate_Mode_VFR;Переменный
 FrameRate_Nominal;Номинальная частота кадров
+FrameRate_Num;
 FrameRate_Original;Частота кадров в оригинале
 FrameRate_Real;Действительная частота кадров
 FullParsing;Полная обработка
@@ -740,6 +761,7 @@ InternetMediaType;Интернет-тип носителя
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+IsStreamable;
 Keywords;Ключевые слова
 Known codecs;Известные кодеки
 Known formats;Известные форматы
@@ -954,6 +976,7 @@ Language_zh-tw;Китайский (Тайвань)
 Language_zh-TW;Китайский (Тайвань)
 Language_zh-yue;Кантонский
 Language_zu;Зулу
+Languages;
 LawRating;Ограничение по возрасту
 LCCN;LCCN
 LfeAttenuationKnown;Ослабление низкочастотных эффектов (LFE)
@@ -1037,8 +1060,8 @@ Movie;Название фильма
 ms; мс.
 MSDI;MSDI
 MultipleStream;Несколько потоков
-MusicBy;Автор музыки
 MultiView_Count;Количество просмотров
+MusicBy;Автор музыки
 MuxingMode;Режим смешивания
 MuxingMode_MoreInfo;Режим смешивания, доп. информация
 MuxingMode_PackedBitstream;Сжатый битовый поток
@@ -1135,6 +1158,7 @@ ProductionDesigner;Художник-постановщик
 ProductionNumber;Номер постановки
 ProductionStudio;Студия-производитель
 ProductPlacement;Размещение постановки
+Program name;
 Programme;Программа
 ProgrammeHasText;Текст в программе
 ProgrammeTextLanguage;Язык текста в программе
@@ -1158,10 +1182,13 @@ Report;Сообщение
 Resolution;Разрешение
 RestoreLifetimeSubscription;Восстановить пожизненную подписку
 s; с.
+Sampled_Height;
+Sampled_Width;
 SamplePeakLevel;Пиковый уровень сэмпла
 SamplePeakLevel_Album;Пиковый уровень сэмпла (альбом)
 SamplesPerFrame;Сэмплов на кадр
 SamplingCount;Количество сэмплов
+SamplingCount_Source;
 SamplingRate;Частота дискретизации
 Save;Сохранить
 ScanOrder;Порядок развёртки
@@ -1178,6 +1205,7 @@ ScreenToFront;Экранный канал в передний канал
 Season;Сезон
 SecondaryAudioLanguage;Второй язык аудио
 see below;см. ниже
+Select your directory;
 Send HeaderFile;Отправьте мне заголовок этого файла на http://sourceforge.net/projects/mediainfo/ (Раздел ошибок)
 Separator_Columns;Разделитель столбцов
 Separator_Lines;Разделитель строк
@@ -1227,6 +1255,7 @@ streamIdentifier;Идентификатор потока
 StreamKind;Тип потока
 StreamKindID;Идентификатор потока
 StreamKindPos;Идентификатор потока
+StreamOrder;
 StreamSize;Размер потока
 StreamSize_Demuxed;Размер потока после демультиплексирования
 StreamSize_Encoded;Размер закодированного потока
@@ -1269,6 +1298,9 @@ Text (HTML);Текст (HTML)
 Text stream(s);Текстовый поток (потоки)
 Text streams;Текстовые потоки
 Text_Codec_List;Текстовые кодеки
+Text_Format_List;
+Text_Format_WithHint_List;
+Text_Language_List;
 Text_No;Нет текста
 Text1;Первый текстовый поток
 Text2;Второй текстовый поток
@@ -1336,9 +1368,14 @@ Video;Видео
 Video stream(s);Видеопоток(-и)
 Video_Codec_List;Видеокодеки
 Video_Delay;Задержка видео
+Video_Format_List;
+Video_Format_WithHint_List;
+Video_Language_List;
 Video_No;Нет видео
 Video0_Delay;Задержка видео 0
 Video1;Первый видеопоток
+Video2;
+Video3;
 VideoComments;Видео комментарии
 VideoCount;Количество видеопотоков
 View;Вид
@@ -1366,5 +1403,6 @@ Written_Location;Место записи
 WrittenBy;Запись произвёл
 Yes;Да
 Your system;Ваша система
-ZZ_Automatic_Percent;99
-ZZ_AutomaticLanguage_Percent;99
+Your translation;
+ZZ_Automatic_Percent;96
+ZZ_AutomaticLanguage_Percent;96

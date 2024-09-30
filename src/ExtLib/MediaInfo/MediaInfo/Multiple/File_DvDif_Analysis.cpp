@@ -55,6 +55,9 @@ void File_DvDif::Read_Buffer_Continue()
     if (!Analyze_Activated)
         return;
 
+    if (!Synchro_Manage()) // TODO: Synchro_Manage() should be called before Read_Buffer_Continue() in File__Analyze
+        return; //Wait for more data
+
     #if MEDIAINFO_DEMUX
         if (Demux_UnpacketizeContainer && !Synchro_Manage()) // We need to manage manually synchronization in case of demux
         {
@@ -587,6 +590,8 @@ void File_DvDif::Read_Buffer_Continue()
                     }
 
                     //Audio errors
+                    auto BlockStatus_Pos=(File_Offset+Buffer_Offset-Speed_FrameCount_StartOffset)/80;
+                    if (BlockStatus_Pos<BlockStatus_MaxSize)
                     {
                         bool Contains_8000=true; // Note: standards indicate these values so old code was using only theses values, now checking all values (except 0 or -1 as it is for silent audio)
                         bool Contains_800800=true;
@@ -631,13 +636,13 @@ void File_DvDif::Read_Buffer_Continue()
                                     Audio_Errors[Channel].resize(Dseq_Count);
                                 Audio_Errors[Channel][Dseq].Count++;
                                 Audio_Errors[Channel][Dseq].Values.insert(Value);
-                                BlockStatus[(File_Offset+Buffer_Offset-Speed_FrameCount_StartOffset)/80]=BlockStatus_NOK;
+                                BlockStatus[BlockStatus_Pos]=BlockStatus_NOK;
                             }
                             else
-                                BlockStatus[(File_Offset+Buffer_Offset-Speed_FrameCount_StartOffset)/80]=BlockStatus_OK;
+                                BlockStatus[BlockStatus_Pos]=BlockStatus_OK;
                         }
                         else
-                            BlockStatus[(File_Offset+Buffer_Offset-Speed_FrameCount_StartOffset)/80]=BlockStatus_OK;
+                            BlockStatus[BlockStatus_Pos]=BlockStatus_OK;
                     }
                 }
                 break;
@@ -684,7 +689,9 @@ void File_DvDif::Read_Buffer_Continue()
                             Video_STA_Errors_ByDseq[(Dseq<<4)|STA_Error]++;
                         }
                     }
-                    BlockStatus[(File_Offset+Buffer_Offset-Speed_FrameCount_StartOffset)/80]=STA_Error?BlockStatus_NOK:BlockStatus_OK;
+                    auto BlockStatus_Pos=(File_Offset+Buffer_Offset-Speed_FrameCount_StartOffset)/80;
+                    if (BlockStatus_Pos<BlockStatus_MaxSize)
+                        BlockStatus[BlockStatus_Pos]=STA_Error?BlockStatus_NOK:BlockStatus_OK;
                 }
                 break;
         }
@@ -1840,7 +1847,7 @@ void File_DvDif::Errors_Stats_Update()
                             if (!MoreData)
                                 MoreData=new int8u[4096] + sizeof(size_t); // TODO: more dynamic allocation
                             MoreData[MoreData_Offset++]=2+Audio_Errors[ChannelGroup][Dseq].Values.size()*2; // Size of the block
-                            MoreData[MoreData_Offset++]=1; // Audio error value par channel group per Dseq
+                            MoreData[MoreData_Offset++]=MediaInfo_Event_Analysis_Frame_AudioErrorValues; // Audio error value par channel group per Dseq
                             MoreData[MoreData_Offset++]=ChannelGroup;
                             MoreData[MoreData_Offset++]=Dseq;
                             for (std::set<int16u>::iterator Value=Audio_Errors[ChannelGroup][Dseq].Values.begin(); Value!=Audio_Errors[ChannelGroup][Dseq].Values.end(); ++Value)
@@ -1860,7 +1867,7 @@ void File_DvDif::Errors_Stats_Update()
                 if (!MoreData)
                     MoreData=new int8u[4096]+sizeof(size_t); // TODO: more dynamic allocation
                 MoreData[MoreData_Offset++]=DirectionSpeed.size();
-                MoreData[MoreData_Offset++]=2; // DirectionSpeed values
+                MoreData[MoreData_Offset++]=MediaInfo_Event_Analysis_Frame_DirectionSpeed; // DirectionSpeed values
                 for (std::vector<int8u>::iterator DirectionSpeed_Item=DirectionSpeed.begin(); DirectionSpeed_Item!=DirectionSpeed.end(); ++DirectionSpeed_Item)
                 {
                     MoreData[MoreData_Offset++]=*DirectionSpeed_Item;

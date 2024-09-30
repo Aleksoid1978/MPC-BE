@@ -114,8 +114,8 @@ const char* Iab_Channel(int32u Code)
     };
     if (Code<0x18)
         return Iab_Channel_Values[Code];
-    if (Code>=0x80 && Code<sizeof(Iab_Channel_Values)/sizeof(const char*)-0x18)
-        return Iab_Channel_Values[Code-0x18];
+    if (Code>=0x80 && Code<sizeof(Iab_Channel_Values)/sizeof(const char*)+0x68)
+        return Iab_Channel_Values[Code-0x68];
     return "";
 }
 //***************************************************************************

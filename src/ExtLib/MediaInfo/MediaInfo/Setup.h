@@ -873,6 +873,9 @@
 #if !defined(MEDIAINFO_TEXT_NO) && !defined(MEDIAINFO_KATE_NO) && !defined(MEDIAINFO_KATE_YES)
     #define MEDIAINFO_KATE_YES
 #endif
+#if !defined(MEDIAINFO_TEXT_NO) && !defined(MEDIAINFO_PAC_NO) && !defined(MEDIAINFO_PAC_YES)
+    #define MEDIAINFO_PAC_YES
+#endif
 #if !defined(MEDIAINFO_TEXT_NO) && !defined(MEDIAINFO_PDF_NO) && !defined(MEDIAINFO_PDF_YES)
     #define MEDIAINFO_PDF_YES
 #endif

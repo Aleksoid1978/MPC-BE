@@ -179,6 +179,7 @@ ADM: Show TrackUIDs;
 AdmProfile;
 Advanced;Дадаткова
 Advanced mode;Пашыраны рэжым
+Advanced mode -->;
 Album;Альбом
 Album_ReplayGain_Gain;Нармалізатар гуку альбома
 Album_ReplayGain_Peak;Пік нармалізатара гуку альбома
@@ -195,12 +196,17 @@ AssistantDirector;Памагаты рэжысёра
 AssociatedVideo_FrameRate;
 at;у
 At least one file;Як мінімум адзін файл
+Attachments;
 Audio;Аўдыё
 Audio stream(s);Аўдыёструмень(і)
 Audio_Codec_List;Аўдыёкодэкі
+Audio_Format_List;
+Audio_Format_WithHint_List;
+Audio_Language_List;
 Audio_No;Няма аўдыёструменя
 Audio1;Першы аўдыёструмень
 Audio2;Другі аўдыёструмень
+Audio3;
 AudioComments;
 AudioCount;Коль-ць аўдыёструменяў
 AudioDescription;
@@ -237,17 +243,22 @@ Cancel;Адмена
 CaptionServiceName;
 CatalogNumber;
 Channel(s);Канал(ы)
+Channel(s)_Original;
 ChannelCoded;
 ChannelConfiguration;
 ChannelFormat;
 ChannelLayout;
+ChannelLayout_Original;
 ChannelMode;
 ChannelPositions;Размяшчэнне каналаў
+ChannelPositions_Original;
 Chapter(s);Падзел(ы)
 Chapters;Падзелы
 Chapters stream(s);Струмень(і) падзелаў
 Chapters_Codec_List;Кодэкі падзелаў
 Chapters_No;Няма падзелаў
+Chapters_Pos_Begin;
+Chapters_Pos_End;
 ChaptersCount;Коль-ць падзелаў
 CharacterSet;
 CheckNewVersion;Праверыць новую версію
@@ -341,6 +352,7 @@ Date;Дата
 Debug;Адладка
 Decimal point;Дзесятковая кропка
 Default;
+Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;Затрымка
@@ -380,6 +392,7 @@ DrcSets_Effects;
 Duration;Працягласць
 Duration_End;Час канчатку
 Duration_End_Command;
+Duration_Source;
 Duration_Start;Час пачатку
 Duration_Start_Command;
 Duration_Start2End;
@@ -396,7 +409,9 @@ Enable FFmpeg plugin;
 Encoded_Application;Праграма-кадавальнік
 Encoded_Date;Дата кадавання
 Encoded_Library;Бібліятэка кадавання
+Encoded_Library_Name;
 Encoded_Library_Settings;Налады праграмы
+Encoded_Library_Version;
 Encoded_Original;Першапачаткова кадавана
 EncodedBy;Кадаваў
 EPG_Positions;EPG пазіцыіі (унутр)
@@ -429,6 +444,8 @@ FileExtension;Пашырэнне
 FileName;Імя файла
 FileNameExtension;
 FileSize;Памер файла
+Fill with a Dummy movie;
+Fill with a realistic movie;
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
 FirstFrameOfAction;
@@ -442,6 +459,7 @@ Folder_Hint;Аперацыі з тэчкамі
 FolderName;Імя тэчкі
 Forced;
 Format;Фармат
+Format_AdditionalFeatures;
 Format_Commercial;Камерцыйная назва
 Format_Commercial_IfAny;
 Format_Compression;
@@ -484,13 +502,16 @@ FpaManufacturer;
 FpaPass;
 FpaVersion;
 FrameCount;Лічыльнік кадраў
+FrameCount_Source;
 FrameRate;Частата кадраў
+FrameRate_Den;
 FrameRate_Maximum;Максімальная частата кадраў
 FrameRate_Minimum;Мінімальная частата кадраў
 FrameRate_Mode;Рэжым частаты кадраў
 FrameRate_Mode_CFR;Сталы
 FrameRate_Mode_VFR;Пераменны
 FrameRate_Nominal;Намінальная частата кадраў
+FrameRate_Num;
 FrameRate_Original;Першасная частата кадраў
 FrameRate_Real;
 FullParsing;
@@ -740,6 +761,7 @@ InternetMediaType;Інтэрнэт-тып носьбіта
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+IsStreamable;
 Keywords;Ключавыя словы
 Known codecs;Вядомыя кодэкі
 Known formats;Вядомыя фарматы
@@ -954,6 +976,7 @@ Language_zh-tw;Chinese (Taiwan)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;Zulu
+Languages;
 LawRating;Абмежаванне правоў
 LCCN;LCCN
 LfeAttenuationKnown;
@@ -1037,8 +1060,8 @@ Movie;Фільм
 ms;мс
 MSDI;MSDI
 MultipleStream;
-MusicBy;Кампазітар
 MultiView_Count;
+MusicBy;Кампазітар
 MuxingMode;Рэжым змешвання
 MuxingMode_MoreInfo;Рэжым змешвання, болей інфармацыі
 MuxingMode_PackedBitstream;Сціснуты бітавы струмень
@@ -1135,6 +1158,7 @@ ProductionDesigner;Распрацоўнік афармлення
 ProductionNumber;
 ProductionStudio;Студыя афармлення
 ProductPlacement;
+Program name;
 Programme;
 ProgrammeHasText;
 ProgrammeTextLanguage;
@@ -1158,10 +1182,13 @@ Report;
 Resolution;Вырашальнасць (Resolution)
 RestoreLifetimeSubscription;
 s;с
+Sampled_Height;
+Sampled_Width;
 SamplePeakLevel;
 SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;Колькасць узораў
+SamplingCount_Source;
 SamplingRate;Частата
 Save;Захаваць
 ScanOrder;Парадак разгорткі
@@ -1178,6 +1205,7 @@ ScreenToFront;
 Season;Сезон
 SecondaryAudioLanguage;
 see below;гл. ніжэй
+Select your directory;
 Send HeaderFile;Адправіць загаловак гэтага файла на http://sourceforge.net/projects/mediainfo/ (Падзел памылак)
 Separator_Columns;Падзельнік слупкоў
 Separator_Lines;Падзельнік радкоў
@@ -1227,6 +1255,7 @@ streamIdentifier;
 StreamKind;Тып струменя
 StreamKindID;Ідэнтыфікатар струменя
 StreamKindPos;Ідэнтыфікатар струменя
+StreamOrder;
 StreamSize;Памер струменя
 StreamSize_Demuxed;
 StreamSize_Encoded;
@@ -1269,6 +1298,9 @@ Text (HTML);Тэкст (HTML)
 Text stream(s);Тэкставы(я) струмень(і)
 Text streams;Тэкставыя струмені
 Text_Codec_List;Тэкставы кодэк
+Text_Format_List;
+Text_Format_WithHint_List;
+Text_Language_List;
 Text_No;Тэкставы струмень №
 Text1;Першы тэкставы струмень
 Text2;Другі тэкставы струмень
@@ -1336,9 +1368,14 @@ Video;Відэа
 Video stream(s);Відэапаток(і)
 Video_Codec_List;Відэакодэкі
 Video_Delay;Затрымка відэа
+Video_Format_List;
+Video_Format_WithHint_List;
+Video_Language_List;
 Video_No;Няма відэаструменя
 Video0_Delay;Затрымка відэа
 Video1;Першы відэаструмень
+Video2;
+Video3;
 VideoComments;
 VideoCount;Коль-ць відэаструменяў
 View;Прагляд
@@ -1366,5 +1403,6 @@ Written_Location;Месца напісання
 WrittenBy;Напісаў
 Yes;Так
 Your system;Ваша сістэма
-ZZ_Automatic_Percent;67
-ZZ_AutomaticLanguage_Percent;71
+Your translation;
+ZZ_Automatic_Percent;65
+ZZ_AutomaticLanguage_Percent;69

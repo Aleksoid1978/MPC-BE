@@ -137,6 +137,8 @@
     <ClInclude Include="MediaInfo\Tag\File_PropertyList.h" />
     <ClInclude Include="MediaInfo\Tag\File_Xmp.h" />
     <ClInclude Include="MediaInfo\Text\File_AribStdB24B37.h" />
+    <ClInclude Include="MediaInfo\Text\File_Pac.h" />
+    <ClInclude Include="MediaInfo\Text\File_Pac_Codepages.h" />
     <ClInclude Include="MediaInfo\Text\File_Pdf.h" />
     <ClInclude Include="MediaInfo\Text\File_Sdp.h" />
     <ClInclude Include="MediaInfo\Text\File_SubRip.h" />
@@ -426,6 +428,7 @@
     <ClCompile Include="MediaInfo\Tag\File_PropertyList.cpp" />
     <ClCompile Include="MediaInfo\Tag\File_Xmp.cpp" />
     <ClCompile Include="MediaInfo\Text\File_AribStdB24B37.cpp" />
+    <ClCompile Include="MediaInfo\Text\File_Pac.cpp" />
     <ClCompile Include="MediaInfo\Text\File_Pdf.cpp" />
     <ClCompile Include="MediaInfo\Text\File_Sdp.cpp" />
     <ClCompile Include="MediaInfo\Text\File_SubRip.cpp" />

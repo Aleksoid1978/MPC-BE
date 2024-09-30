@@ -179,6 +179,7 @@ ADM: Show TrackUIDs;ADM : Afficher les TrackUID
 AdmProfile;Profil ADM
 Advanced;Avancé
 Advanced mode;Mode avancé
+Advanced mode -->;
 Album;Album
 Album_ReplayGain_Gain;Gain en lecture de l'album
 Album_ReplayGain_Peak;Crête de gain en lecture de l'album
@@ -195,12 +196,17 @@ AssistantDirector;Assistant-directeur
 AssociatedVideo_FrameRate;Fréquence d'images de la vidéo associée
 at;à
 At least one file;(Vous devez ouvrir au minimum un fichier ou un dossier)
+Attachments;
 Audio;Audio
 Audio stream(s);Piste(s) audio
 Audio_Codec_List;Codecs audio
+Audio_Format_List;
+Audio_Format_WithHint_List;
+Audio_Language_List;
 Audio_No;Pas d'audio
 Audio1;Première piste audio
 Audio2;Deuxième piste audio
+Audio3;
 AudioComments;Commentaires audio
 AudioCount;Nombre de pistes audio
 AudioDescription;Description audio
@@ -237,17 +243,22 @@ Cancel;Annuler
 CaptionServiceName;Nom du service de sous-titre
 CatalogNumber;Numéro de catalogue
 Channel(s);Canal(aux)
+Channel(s)_Original;
 ChannelCoded;Canal codé
 ChannelConfiguration;Configuration des canaux
 ChannelFormat;Format de canal
 ChannelLayout;Agencement des canaux
+ChannelLayout_Original;
 ChannelMode;Mode des canaux
 ChannelPositions;Position des canaux
+ChannelPositions_Original;
 Chapter(s);Chapitre(s)
 Chapters;Chapitres
 Chapters stream(s);Piste(s) de chapitre
 Chapters_Codec_List;Codecs de chapitre
 Chapters_No;Pas de chapitre
+Chapters_Pos_Begin;
+Chapters_Pos_End;
 ChaptersCount;Nombre de pistes de chapitre
 CharacterSet;Jeu de caractères codés
 CheckNewVersion;Vérifier si une nouvelle version existe.
@@ -341,6 +352,7 @@ Date;Date
 Debug;Debogage
 Decimal point;Point décimal
 Default;Par défaut
+Default translation;
 Default_Setting;Paramètre par défaut
 DefaultTargetDeviceConfig;Configuration par défaut du périphérique cible
 Delay;Délai
@@ -349,7 +361,7 @@ Delay_Source_Container;Conteneur
 Delay_Source_Stream;Flux brut
 Delete;Supprimer
 Description;Description
-Details;Détails
+Details;
 dialnorm;Normalisation des dialogues
 DialogueCorrected;Dialogues corrigés
 DialogueEnhancement;Amélioration des dialogues
@@ -380,6 +392,7 @@ DrcSets_Effects;Type(s) d'effet(s) DRC
 Duration;Durée
 Duration_End;Heure de fin
 Duration_End_Command;Heure de fin (commandes)
+Duration_Source;
 Duration_Start;Heure de début
 Duration_Start_Command;Heure de début (commandes)
 Duration_Start2End;Durée du contenu visible
@@ -396,7 +409,9 @@ Enable FFmpeg plugin;Activer le plug-in FFmpeg
 Encoded_Application;Application utilisée
 Encoded_Date;Date d'encodage
 Encoded_Library;Bibliothèque utilisée
+Encoded_Library_Name;
 Encoded_Library_Settings;Paramètres d'encodage
+Encoded_Library_Version;
 Encoded_Original;Support original
 EncodedBy;Encodé par
 EPG_Positions;Positions de l'EPG (interne)
@@ -429,6 +444,8 @@ FileExtension;Extension du fichier
 FileName;Nom du fichier
 FileNameExtension;Extension du nom de fichier
 FileSize;Taille du fichier
+Fill with a Dummy movie;
+Fill with a realistic movie;
 FirstDisplay_Delay_Frames;Nombre d'images avant le premier événement
 FirstDisplay_Type;Type du premier événement
 FirstFrameOfAction;Première trame d'action
@@ -442,6 +459,7 @@ Folder_Hint;Sélectionner un dossier à étudier
 FolderName;Nom du dossier
 Forced;Mode forcé
 Format;Format
+Format_AdditionalFeatures;
 Format_Commercial;Format, Nom commercial
 Format_Commercial_IfAny;Format, Nom commercial IfAny
 Format_Compression;Format, Compression
@@ -484,13 +502,16 @@ FpaManufacturer;Fabricant FPA
 FpaPass;Validation FPA
 FpaVersion;Version FPA
 FrameCount;Nombre d'images
+FrameCount_Source;
 FrameRate;Débit im/s
+FrameRate_Den;
 FrameRate_Maximum;Débit maxi im/s
 FrameRate_Minimum;Débit mini im/s
 FrameRate_Mode;Type de débit im/s
 FrameRate_Mode_CFR;Débit im/s constant
 FrameRate_Mode_VFR;Débit im/s variable
 FrameRate_Nominal;Débit im/s nominal
+FrameRate_Num;
 FrameRate_Original;Débit im/s d'origine
 FrameRate_Real;Débit im/s réel
 FullParsing;Analyse complète
@@ -740,6 +761,7 @@ InternetMediaType;Type de média Internet
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+IsStreamable;
 Keywords;Mots clé
 Known codecs;Codecs connus
 Known formats;Formats connus
@@ -954,6 +976,7 @@ Language_zh-tw;Chinese (Taiwan)
 Language_zh-TW;Chinese (Taiwan)
 Language_zh-yue;Cantonese
 Language_zu;Zulu
+Languages;
 LawRating;Classé
 LCCN;LCCN
 LfeAttenuationKnown;Atténuation basse fréquence connue
@@ -1037,8 +1060,8 @@ Movie;Nom du film
 ms; ms
 MSDI;MSDI
 MultipleStream;Flux multiples
-MusicBy;Musique par
 MultiView_Count;Vues multiples, Nombre de vues
+MusicBy;Musique par
 MuxingMode;Type de mixage
 MuxingMode_MoreInfo;Type de mixage, Plus d'Info
 MuxingMode_PackedBitstream;Type de mixage, Flux binaire empaqueté
@@ -1135,6 +1158,7 @@ ProductionDesigner;Directeur artistique
 ProductionNumber;Numéro de série
 ProductionStudio;Studio de production
 ProductPlacement;Placement de produit
+Program name;
 Programme;Programme
 ProgrammeHasText;Le programme contient un sous-titrage
 ProgrammeTextLanguage;Langue du sous-titrage du programme
@@ -1158,10 +1182,13 @@ Report;Rapport
 Resolution;Résolution
 RestoreLifetimeSubscription;Restaurer l'abonnement à vie
 s; s
+Sampled_Height;
+Sampled_Width;
 SamplePeakLevel;Niveau crête de l'échantillon
 SamplePeakLevel_Album;Niveau crête de l'échantillon (album)
 SamplesPerFrame;Échantillons par image
 SamplingCount;Nombre d'échantillons
+SamplingCount_Source;
 SamplingRate;Échantillonnage
 Save;Sauvegarder
 ScanOrder;Ordre de balayage
@@ -1178,6 +1205,7 @@ ScreenToFront;Écran à l'avant
 Season;Saison
 SecondaryAudioLanguage;Langue audio secondaire
 see below;Voir ci-dessous
+Select your directory;
 Send HeaderFile;Merci de m'envoyer le fichier Header ici : http://sourceforge.net/projects/mediainfo/ (partie Bugs)
 Separator_Columns;Séparateur de colonnes :
 Separator_Lines;Séparateur de lignes :
@@ -1227,6 +1255,7 @@ streamIdentifier;Identifiant de flux
 StreamKind;Type de flux
 StreamKindID;Identifiant du flux
 StreamKindPos;Identifiant du flux
+StreamOrder;
 StreamSize;Taille du flux
 StreamSize_Demuxed;Taille du flux démultiplexé
 StreamSize_Encoded;Taille du flux encodé
@@ -1269,6 +1298,9 @@ Text (HTML);Texte (HTML)
 Text stream(s);Flux texte
 Text streams;Flux texte
 Text_Codec_List;Codecs texte
+Text_Format_List;
+Text_Format_WithHint_List;
+Text_Language_List;
 Text_No;Pas de flux texte
 Text1;Flux texte 1
 Text2;Flux texte 2
@@ -1336,9 +1368,14 @@ Video;Vidéo
 Video stream(s);Piste(s) vidéo
 Video_Codec_List;Codecs vidéo
 Video_Delay;Délai vidéo relatif
+Video_Format_List;
+Video_Format_WithHint_List;
+Video_Language_List;
 Video_No;Pas de vidéo
 Video0_Delay;Délai par rapport à la vidéo
 Video1;Première piste vidéo
+Video2;
+Video3;
 VideoComments;Commentaires vidéo
 VideoCount;Nombre de pistes vidéo
 View;Affichage
@@ -1366,5 +1403,6 @@ Written_Location;Lieu d'écriture
 WrittenBy;Écrit par
 Yes;Oui
 Your system;Votre système
-ZZ_Automatic_Percent;99
-ZZ_AutomaticLanguage_Percent;99
+Your translation;
+ZZ_Automatic_Percent;96
+ZZ_AutomaticLanguage_Percent;96

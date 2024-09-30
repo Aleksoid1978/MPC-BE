@@ -530,6 +530,11 @@ struct MediaInfo_Event_DvDif_Analysis_Frame_1
     MediaInfo_int32u        MoreFlags;
     const MediaInfo_int8u*  MoreData;
 };
+enum MediaInfo_Event_Analysis_Frame_Enums {
+    MediaInfo_Event_Analysis_Frame_None,
+    MediaInfo_Event_Analysis_Frame_AudioErrorValues,
+    MediaInfo_Event_Analysis_Frame_DirectionSpeed,
+};
 
 /*-------------------------------------------------------------------------*/
 /* Change in the stream config                                             */

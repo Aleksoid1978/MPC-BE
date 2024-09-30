@@ -179,6 +179,7 @@ ADM: Show TrackUIDs;
 AdmProfile;
 Advanced;Bővített
 Advanced mode;Bővített mód
+Advanced mode -->;
 Album;Album
 Album_ReplayGain_Gain;Album erősítése
 Album_ReplayGain_Peak;Album csúcserősítése
@@ -195,12 +196,17 @@ AssistantDirector;Segédrendező
 AssociatedVideo_FrameRate;
 at;, képsebesség:
 At least one file;(Legalább egy fájlt meg kell nyitni)
+Attachments;
 Audio;Hang
 Audio stream(s);Hangsávok
 Audio_Codec_List;Hangkódekek
+Audio_Format_List;
+Audio_Format_WithHint_List;
+Audio_Language_List;
 Audio_No;Nincs hang
 Audio1;Első hangsáv
 Audio2;Második hangsáv
+Audio3;
 AudioComments;
 AudioCount;Hangsávok száma
 AudioDescription;
@@ -237,17 +243,22 @@ Cancel;Mégsem
 CaptionServiceName;
 CatalogNumber;
 Channel(s);Csatornák száma
+Channel(s)_Original;
 ChannelCoded;
 ChannelConfiguration;
 ChannelFormat;
 ChannelLayout;
+ChannelLayout_Original;
 ChannelMode;
 ChannelPositions;Csatorna kiosztás
+ChannelPositions_Original;
 Chapter(s);Fejezet
 Chapters;Fejezet
 Chapters stream(s);Fejezetsávok
 Chapters_Codec_List;Fejezetkódekek
 Chapters_No;Nincs fejezet
+Chapters_Pos_Begin;
+Chapters_Pos_End;
 ChaptersCount;Fejezetsávok száma
 CharacterSet;
 CheckNewVersion;Új változat keresése
@@ -341,6 +352,7 @@ Date;Dátum
 Debug;Hibakeresés
 Decimal point;Tizedesjel
 Default;
+Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;Késleltetés
@@ -380,6 +392,7 @@ DrcSets_Effects;
 Duration;Időtartam
 Duration_End;
 Duration_End_Command;
+Duration_Source;
 Duration_Start;
 Duration_Start_Command;
 Duration_Start2End;
@@ -396,7 +409,9 @@ Enable FFmpeg plugin;
 Encoded_Application;Kódoló szoftver
 Encoded_Date;Kódolás dátuma
 Encoded_Library;Kódoló könyvtár
+Encoded_Library_Name;
 Encoded_Library_Settings;Kódoló könyvtár beállításai
+Encoded_Library_Version;
 Encoded_Original;Eredeti
 EncodedBy;Kódolta
 EPG_Positions;
@@ -429,6 +444,8 @@ FileExtension;Fájl kiterjesztés
 FileName;Fájlnév
 FileNameExtension;
 FileSize;Fájlméret
+Fill with a Dummy movie;
+Fill with a realistic movie;
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
 FirstFrameOfAction;
@@ -442,6 +459,7 @@ Folder_Hint;Adja meg a vizsgálandó mappát
 FolderName;Mappanév
 Forced;
 Format;Formátum
+Format_AdditionalFeatures;
 Format_Commercial;
 Format_Commercial_IfAny;
 Format_Compression;
@@ -484,13 +502,16 @@ FpaManufacturer;
 FpaPass;
 FpaVersion;
 FrameCount;Képkockaszám
+FrameCount_Source;
 FrameRate;Képkockasebesség
+FrameRate_Den;
 FrameRate_Maximum;Legnagyobb képkockasebesség
 FrameRate_Minimum;Legkisebb képkockasebesség
 FrameRate_Mode;Képkockasebességi mód
 FrameRate_Mode_CFR;állandó
 FrameRate_Mode_VFR;változó
 FrameRate_Nominal;Névleges képkockasebesség
+FrameRate_Num;
 FrameRate_Original;Eredeti képkockasebesség
 FrameRate_Real;
 FullParsing;
@@ -740,6 +761,7 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+IsStreamable;
 Keywords;Kulcsszavak
 Known codecs;Ismert kódekek
 Known formats;Ismert formátumok
@@ -954,6 +976,7 @@ Language_zh-tw;
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;zulu
+Languages;
 LawRating;Korhatár
 LCCN;LCCN
 LfeAttenuationKnown;
@@ -1037,8 +1060,8 @@ Movie;Film
 ms;emp
 MSDI;MSDI
 MultipleStream;
-MusicBy;Zeneszerző
 MultiView_Count;
+MusicBy;Zeneszerző
 MuxingMode;Keverési mód
 MuxingMode_MoreInfo;
 MuxingMode_PackedBitstream;adatcsomag
@@ -1135,6 +1158,7 @@ ProductionDesigner;Tervező
 ProductionNumber;
 ProductionStudio;Gyártó stúdió
 ProductPlacement;
+Program name;
 Programme;
 ProgrammeHasText;
 ProgrammeTextLanguage;
@@ -1158,10 +1182,13 @@ Report;
 Resolution;Felbontás
 RestoreLifetimeSubscription;
 s; mp
+Sampled_Height;
+Sampled_Width;
 SamplePeakLevel;
 SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;
+SamplingCount_Source;
 SamplingRate;Mintavételezési gyakoriság
 Save;Mentés
 ScanOrder;Sorváltási sorrend
@@ -1178,6 +1205,7 @@ ScreenToFront;
 Season;Évad
 SecondaryAudioLanguage;
 see below;lásd alant
+Select your directory;
 Send HeaderFile;Kérem, küdje el a fejléc fájlt ide: http://sourceforge.net/projects/mediainfo/ (Bug section)
 Separator_Columns;Oszlop elválasztó
 Separator_Lines;Sor elválasztó
@@ -1227,6 +1255,7 @@ streamIdentifier;
 StreamKind;Sáv fajtája
 StreamKindID;Sáv fajta azonosító
 StreamKindPos;Sáv fajta sorszáma
+StreamOrder;
 StreamSize;Adatfolyam mérete
 StreamSize_Demuxed;
 StreamSize_Encoded;
@@ -1269,6 +1298,9 @@ Text (HTML);Text (HTML)
 Text stream(s);Szövegsávok
 Text streams;Szövegsávok
 Text_Codec_List;Szövegkódekek
+Text_Format_List;
+Text_Format_WithHint_List;
+Text_Language_List;
 Text_No;Nincs szöveg
 Text1;Első szövegsáv
 Text2;Második szövegsáv
@@ -1336,9 +1368,14 @@ Video;Kép
 Video stream(s);Képsávok
 Video_Codec_List;Képkódekek
 Video_Delay;Videó késleltetés
+Video_Format_List;
+Video_Format_WithHint_List;
+Video_Language_List;
 Video_No;Nincs kép
 Video0_Delay;Video0 késleltetés
 Video1;Első képsáv
+Video2;
+Video3;
 VideoComments;
 VideoCount;Képsávok száma
 View;Nézet
@@ -1366,5 +1403,6 @@ Written_Location;Írás helye
 WrittenBy;Írta
 Yes;igen
 Your system;Rendszer
-ZZ_Automatic_Percent;62
-ZZ_AutomaticLanguage_Percent;69
+Your translation;
+ZZ_Automatic_Percent;61
+ZZ_AutomaticLanguage_Percent;67

@@ -179,6 +179,7 @@ ADM: Show TrackUIDs;
 AdmProfile;
 Advanced;Aurreratua
 Advanced mode;Modu aurreratua
+Advanced mode -->;
 Album;Bilduma
 Album_ReplayGain_Gain;Bilduma berrirakurketa irabazia
 Album_ReplayGain_Peak;Bilduma berrirakurketa irabazi gailurra
@@ -195,12 +196,17 @@ AssistantDirector;Laguntzaile-Zuzendaria
 AssociatedVideo_FrameRate;
 at;
 At least one file;(Agiri bat gutxienez ireki behar duzu)
+Attachments;
 Audio;Audioa
 Audio stream(s);Audio jarioak
 Audio_Codec_List;Audio kodekak
+Audio_Format_List;
+Audio_Format_WithHint_List;
+Audio_Language_List;
 Audio_No;Audiorik ez
 Audio1;Lehen audioa jarioa
 Audio2;Bigarren audioa jarioa
+Audio3;
 AudioComments;
 AudioCount;Audio jario zenbatekoa
 AudioDescription;
@@ -237,17 +243,22 @@ Cancel;Ezeztatu
 CaptionServiceName;
 CatalogNumber;
 Channel(s);Bide
+Channel(s)_Original;
 ChannelCoded;
 ChannelConfiguration;
 ChannelFormat;
 ChannelLayout;
+ChannelLayout_Original;
 ChannelMode;
 ChannelPositions;Bide kokapenak
+ChannelPositions_Original;
 Chapter(s);Atal
 Chapters;Atalak
 Chapters stream(s);Atal jarioa(k)
 Chapters_Codec_List;Atal kodekak
 Chapters_No;Atalik ez
+Chapters_Pos_Begin;
+Chapters_Pos_End;
 ChaptersCount;Atal jario zenbatekoa
 CharacterSet;
 CheckNewVersion;Egiaztatu bertsio berririk dagoen
@@ -341,6 +352,7 @@ Date;Eguna
 Debug;Garbiketa
 Decimal point;Hamarren puntua
 Default;
+Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;Atzerapena
@@ -380,6 +392,7 @@ DrcSets_Effects;
 Duration;Iraupena
 Duration_End;Amaiera denbora
 Duration_End_Command;
+Duration_Source;
 Duration_Start;Hasiera denbora
 Duration_Start_Command;
 Duration_Start2End;
@@ -396,7 +409,9 @@ Enable FFmpeg plugin;
 Encoded_Application;Idazketa aplikazioa
 Encoded_Date;Kodeaketa eguna
 Encoded_Library;Idazketa liburutegia
+Encoded_Library_Name;
 Encoded_Library_Settings;Kodeaketa ezarpenak
+Encoded_Library_Version;
 Encoded_Original;Jatorrizko sostengua
 EncodedBy;Kodeatzailea
 EPG_Positions;EPG kokapenak (barnean)
@@ -429,6 +444,8 @@ FileExtension;Agiri hedapena
 FileName;Agiri izena
 FileNameExtension;
 FileSize;Agiri neurria
+Fill with a Dummy movie;
+Fill with a realistic movie;
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
 FirstFrameOfAction;
@@ -442,6 +459,7 @@ Folder_Hint;Hautatu aztertzeko agiritegi bat
 FolderName;Agiritegi izena
 Forced;
 Format;Heuskarria
+Format_AdditionalFeatures;
 Format_Commercial;Merkatal izena
 Format_Commercial_IfAny;Merkatal izena
 Format_Compression;
@@ -484,13 +502,16 @@ FpaManufacturer;
 FpaPass;
 FpaVersion;
 FrameCount;Frame zenbatekoa
+FrameCount_Source;
 FrameRate;Frame neurria
+FrameRate_Den;
 FrameRate_Maximum;Gehienezko frame neurria
 FrameRate_Minimum;Gutxienezko frame neurria
 FrameRate_Mode;Frame neurri modua
 FrameRate_Mode_CFR;Aldagaitza
 FrameRate_Mode_VFR;Aldakorra
 FrameRate_Nominal;Frame neurria izendatua
+FrameRate_Num;
 FrameRate_Original;Jatorrizko frame neurria
 FrameRate_Real;
 FullParsing;
@@ -740,6 +761,7 @@ InternetMediaType;Internet multimedia mota
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+IsStreamable;
 Keywords;Laterteklak
 Known codecs;Ezagutu kodekak
 Known formats;Ezagutu heuskarriak
@@ -954,6 +976,7 @@ Language_zh-tw;Txinera (Taiwan)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;Zuluera
+Languages;
 LawRating;Lege maila
 LCCN;LCCN
 LfeAttenuationKnown;
@@ -1037,8 +1060,8 @@ Movie;Filma izena
 ms; sm
 MSDI;MSDI
 MultipleStream;
-MusicBy;Musikaria
 MultiView_Count;
+MusicBy;Musikaria
 MuxingMode;Nahasketa modua
 MuxingMode_MoreInfo;Nahasketa modua, argibide gehiago
 MuxingMode_PackedBitstream;Paketatutako bitjarioa
@@ -1135,6 +1158,7 @@ ProductionDesigner;Ekoizpen diseinatzailea
 ProductionNumber;
 ProductionStudio;Ekoizpen estudioa
 ProductPlacement;
+Program name;
 Programme;
 ProgrammeHasText;
 ProgrammeTextLanguage;
@@ -1158,10 +1182,13 @@ Report;
 Resolution;Bereizmena
 RestoreLifetimeSubscription;
 s;s
+Sampled_Height;
+Sampled_Width;
 SamplePeakLevel;
 SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;Lagin zenbatekoa
+SamplingCount_Source;
 SamplingRate;Laginketa neurria
 Save;Gorde
 ScanOrder;Mihaketa hurrenkera
@@ -1178,6 +1205,7 @@ ScreenToFront;
 Season;Denboraldia
 SecondaryAudioLanguage;
 see below;ikusi behean
+Select your directory;
 Send HeaderFile;Mesedez bidalidazu Idazburu agiria hona : http://sourceforge.net/projects/mediainfo/ (Akats arloa)
 Separator_Columns;Zutabe banantzailea
 Separator_Lines;Lerro banatzailea
@@ -1227,6 +1255,7 @@ streamIdentifier;
 StreamKind;Jario Mota
 StreamKindID;Jario ezagutarazlea
 StreamKindPos;Jario ezagutarazlea
+StreamOrder;
 StreamSize;Jario neurria
 StreamSize_Demuxed;
 StreamSize_Encoded;Kodeaketa jario neurria
@@ -1269,6 +1298,9 @@ Text (HTML);Idazkia (HTML)
 Text stream(s);Idazki jarioak
 Text streams;Idazki jarioak
 Text_Codec_List;Idazki kodekak
+Text_Format_List;
+Text_Format_WithHint_List;
+Text_Language_List;
 Text_No;Idazkirik ez
 Text1;Lehen idazki jarioa
 Text2;Bigarren idazki jarioa
@@ -1336,9 +1368,14 @@ Video;Bideoa
 Video stream(s);Bideo jarioa(k)
 Video_Codec_List;Bideo Kodekak
 Video_Delay;Bideoarekiko atzerapena
+Video_Format_List;
+Video_Format_WithHint_List;
+Video_Language_List;
 Video_No;Bideorik ez
 Video0_Delay;Bideo0 atzerapena
 Video1;Lehen bideo jarioa
+Video2;
+Video3;
 VideoComments;
 VideoCount;Bideo jario zenbatekoa
 View;Ikusi
@@ -1366,5 +1403,6 @@ Written_Location;Idazte helbidea
 WrittenBy;Idazlea
 Yes;Bai
 Your system;Zure sistema
-ZZ_Automatic_Percent;72
-ZZ_AutomaticLanguage_Percent;73
+Your translation;
+ZZ_Automatic_Percent;70
+ZZ_AutomaticLanguage_Percent;71

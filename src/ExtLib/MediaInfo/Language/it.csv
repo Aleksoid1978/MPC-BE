@@ -179,6 +179,7 @@ ADM: Show TrackUIDs; ADM: Visualizza TRACKUID
 AdmProfile; Profilo ADM
 Advanced;Modalità avanzata
 Advanced mode;Modalità avanzata
+Advanced mode -->;
 Album;Album
 Album_ReplayGain_Gain;Album replay gain
 Album_ReplayGain_Peak;Picco album replay gain
@@ -195,12 +196,17 @@ AssistantDirector;Assistente regista
 AssociatedVideo_FrameRate; Frequenza fotogrammi video associata
 at;a
 At least one file;(Devi aprire almeno un file)
+Attachments;
 Audio;Audio
 Audio stream(s);Tracce audio
 Audio_Codec_List;Codec audio
+Audio_Format_List;
+Audio_Format_WithHint_List;
+Audio_Language_List;
 Audio_No;Nessun audio
 Audio1;Prima traccia audio
 Audio2;Seconda traccia audio
+Audio3;
 AudioComments; Commento audio
 AudioCount;Numero tracce sonore
 AudioDescription;Descrizione audio
@@ -237,17 +243,22 @@ Cancel;Annulla
 CaptionServiceName;Titolo nome servizio
 CatalogNumber;Numero catalogo
 Channel(s);Canali
+Channel(s)_Original;
 ChannelCoded;Canale codificato
 ChannelConfiguration;Configurazione canale
 ChannelFormat;Formato canale
 ChannelLayout;Layout canale
+ChannelLayout_Original;
 ChannelMode;Modo canale
 ChannelPositions;Posizione canali
+ChannelPositions_Original;
 Chapter(s);Capitoli
 Chapters;Capitoli
 Chapters stream(s);Capitoli
 Chapters_Codec_List;Codec capitoli
 Chapters_No;Nessun capitolo
+Chapters_Pos_Begin;
+Chapters_Pos_End;
 ChaptersCount;Numero dei capitoli
 CharacterSet;Set caratteri
 CheckNewVersion;Controlla aggiornamenti programma
@@ -341,6 +352,7 @@ Date;Data
 Debug;Debug
 Decimal point;Separatore decimale
 Default;Predefinito
+Default translation;
 Default_Setting;Predefinito sistema
 DefaultTargetDeviceConfig;Configurazione predefinita dispositivo destinazione
 Delay;Ritardo
@@ -349,7 +361,7 @@ Delay_Source_Container;Contenitore
 Delay_Source_Stream;Flusso RAW
 Delete;Elimina
 Description;Descrizione
-Details;Dettagli
+Details;
 dialnorm;Finestra normalizzazione
 DialogueCorrected;Dialogo corretto
 DialogueEnhancement;Miglioramento del dialogo
@@ -380,6 +392,7 @@ DrcSets_Effects;Tipi effetti DRC
 Duration;Durata
 Duration_End;Fine
 Duration_End_Command;Fine (comando)
+Duration_Source;
 Duration_Start;Inizio
 Duration_Start_Command;Inizio (comando)
 Duration_Start2End;Durata contenuto visibile
@@ -396,7 +409,9 @@ Enable FFmpeg plugin;Abilita plugin FFmpeg
 Encoded_Application;Creato con
 Encoded_Date;Data codifica
 Encoded_Library;Compressore
+Encoded_Library_Name;
 Encoded_Library_Settings;Impostazioni compressione
+Encoded_Library_Version;
 Encoded_Original;Codificatore originale
 EncodedBy;Compresso da
 EPG_Positions;Posizioni EPG (interne)
@@ -429,6 +444,8 @@ FileExtension;Estensione file
 FileName;Nome
 FileNameExtension;Estensione nome file
 FileSize;Dimensione file
+Fill with a Dummy movie;
+Fill with a realistic movie;
 FirstDisplay_Delay_Frames;N. fotogrammi prima del primo evento
 FirstDisplay_Type;Tipo del primo evento
 FirstFrameOfAction;Primo fotogramma azione
@@ -442,6 +459,7 @@ Folder_Hint;Seleziona cartella da analizzare
 FolderName;Cartella
 Forced;Forzato
 Format;Formato
+Format_AdditionalFeatures;
 Format_Commercial;Nome commerciale
 Format_Commercial_IfAny;Nome commerciale
 Format_Compression;Compressione
@@ -484,13 +502,16 @@ FpaManufacturer;Produttore FPA
 FpaPass;Pass FPA
 FpaVersion;Versione FPA
 FrameCount;Numero fotogrammi
+FrameCount_Source;
 FrameRate;Frequenza fotogrammi
+FrameRate_Den;
 FrameRate_Maximum;Frame rate massimo
 FrameRate_Minimum;Frame rate minimo
 FrameRate_Mode;Modalità frame rate
 FrameRate_Mode_CFR;Costante
 FrameRate_Mode_VFR;Variabile
 FrameRate_Nominal;Frequenza fotogrammi nominale
+FrameRate_Num;
 FrameRate_Original;Frequenza fotogrammi originale
 FrameRate_Real;Frequenza fotogrammi reale
 FullParsing;Analisi completa
@@ -740,6 +761,7 @@ InternetMediaType;Tipo supporto internet
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+IsStreamable;
 Keywords;Parole chiavi
 Known codecs;Codec conosciuti
 Known formats;Formati conosciuti
@@ -954,6 +976,7 @@ Language_zh-tw;Cinese (Taiwan)
 Language_zh-TW;Cinese (Taiwan)
 Language_zh-yue;Cantonese
 Language_zu;Zulu
+Languages;
 LawRating;Classificazione legale
 LCCN;LCCN
 LfeAttenuationKnown;Attenuazione LFE nota
@@ -1037,8 +1060,8 @@ Movie;Film
 ms;ms
 MSDI;MSDI
 MultipleStream;Tracce multiple
-MusicBy;Composto da
 MultiView_Count;N. viste multiple
+MusicBy;Composto da
 MuxingMode;Modo muxing
 MuxingMode_MoreInfo;Informazioni aggiuntive modo muxing
 MuxingMode_PackedBitstream;Packet Bitstream
@@ -1135,6 +1158,7 @@ ProductionDesigner;Designer produzione
 ProductionNumber;N. prodotto
 ProductionStudio;Studio di registrazione
 ProductPlacement;Posizionamento prodotto
+Program name;
 Programme;Programma
 ProgrammeHasText;Il programma ha testo
 ProgrammeTextLanguage;Lingua testo programma
@@ -1158,10 +1182,13 @@ Report;Rapporto
 Resolution;Risoluzione
 RestoreLifetimeSubscription;Ripristina abbonamento a vita
 s;s
+Sampled_Height;
+Sampled_Width;
 SamplePeakLevel;Livello di picco campione
 SamplePeakLevel_Album;Livello di picco campione (album)
 SamplesPerFrame;Campioni per fotogramma
 SamplingCount;N. campioni
+SamplingCount_Source;
 SamplingRate;Frequenza campionamento
 Save;Salva
 ScanOrder;Ordine scansione
@@ -1178,6 +1205,7 @@ ScreenToFront;Schermo in primo piano
 Season;N. stagione
 SecondaryAudioLanguage;Seconda lingua audio
 see below;vedi sotto
+Select your directory;
 Send HeaderFile;Invia l'intestazione a http://sourceforge.net/projects/mediainfo/ (sezione bug)
 Separator_Columns;Separatore colonne
 Separator_Lines;Separatore linea
@@ -1227,6 +1255,7 @@ streamIdentifier;Identificatore traccia
 StreamKind;Tipo traccia
 StreamKindID;Identificatore traccia
 StreamKindPos;Identificatore traccia
+StreamOrder;
 StreamSize;Dimensione traccia
 StreamSize_Demuxed;Dim. flusso quando demuxed
 StreamSize_Encoded;Dim. traccia codificata
@@ -1269,6 +1298,9 @@ Text (HTML);Testo (HTML)
 Text stream(s);Sottotitoli
 Text streams;Sottotitoli
 Text_Codec_List;Codec sottotitoli
+Text_Format_List;
+Text_Format_WithHint_List;
+Text_Language_List;
 Text_No;Nessun sottotitolo
 Text1;Sottotitolo 1
 Text2;Sottotitolo 2
@@ -1336,9 +1368,14 @@ Video;Video
 Video stream(s);Traccia video
 Video_Codec_List;Codec video
 Video_Delay;Ritardo video
+Video_Format_List;
+Video_Format_WithHint_List;
+Video_Language_List;
 Video_No;Nessuna traccia video
 Video0_Delay;Ritardo video
 Video1;Prima traccia video
+Video2;
+Video3;
 VideoComments;Commenti video
 VideoCount;Tracce video
 View;Visualizza
@@ -1366,5 +1403,6 @@ Written_Location;Realizzato in
 WrittenBy;Realizzato da
 Yes;Si
 Your system;Info sul sistema
-ZZ_Automatic_Percent;99
-ZZ_AutomaticLanguage_Percent;99
+Your translation;
+ZZ_Automatic_Percent;96
+ZZ_AutomaticLanguage_Percent;96

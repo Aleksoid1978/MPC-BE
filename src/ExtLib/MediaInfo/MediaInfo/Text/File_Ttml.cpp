@@ -209,8 +209,12 @@ void File_Ttml::Streams_Finish()
             LastFrame--;
             Fill(Stream_Text, 0, Text_TimeCode_LastFrame, LastFrame.ToString());
         }
-        Fill(Stream_Text, 0, Text_Duration_Start, (int64s)Time_Begin.ToMilliseconds());
-        Fill(Stream_Text, 0, Text_Duration_End, (int64s)Time_End.ToMilliseconds());
+        auto Time_Begin_ms = (int64s)Time_Begin.ToMilliseconds();
+        auto Time_End_ms = (int64s)Time_End.ToMilliseconds();
+        Fill(Stream_Text, 0, Text_Duration_Start_Command, Time_Begin_ms);
+        Fill(Stream_Text, 0, Text_Duration_Start, Time_Begin_ms);
+        Fill(Stream_Text, 0, Text_Duration_End, Time_End_ms);
+        Fill(Stream_Text, 0, Text_Duration_End_Command, Time_End_ms);
     }
     Fill(Stream_Text, 0, Text_FrameRate_Mode, "CFR");
     Fill(Stream_Text, 0, Text_Events_Total, FrameCount-EmptyCount);

@@ -1501,6 +1501,7 @@ enum text
     Text_Events_PaintOn,
     Text_Lines_Count,
     Text_Lines_MaxCountPerEvent,
+    Text_Lines_MaxCharacterCount,
     Text_FirstDisplay_Delay_Frames,
     Text_FirstDisplay_Type,
 };

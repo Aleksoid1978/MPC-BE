@@ -309,6 +309,9 @@
 #if defined(MEDIAINFO_N19_YES)
     #include "MediaInfo/Text/File_N19.h"
 #endif
+#if defined(MEDIAINFO_PAC_YES)
+    #include "MediaInfo/Text/File_Pac.h"
+#endif
 #if defined(MEDIAINFO_PDF_YES)
     #include "MediaInfo/Text/File_Pdf.h"
 #endif
@@ -713,6 +716,9 @@ static File__Analyze* SelectFromExtension(const String& Parser)
     #if defined(MEDIAINFO_N19_YES)
         if (Parser==__T("N19"))         return new File_N19();
     #endif
+    #if defined(MEDIAINFO_PAC_YES)
+        if (Parser==__T("PAC"))         return new File_Pac();
+    #endif
     #if defined(MEDIAINFO_PDF_YES)
         if (Parser==__T("PDF"))         return new File_Pdf();
     #endif
@@ -1114,6 +1120,9 @@ int MediaInfo_Internal::ListFormats(const String &File_Name)
     // Text
     #if defined(MEDIAINFO_N19_YES)
         delete Info; Info=new File_N19();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+    #endif
+    #if defined(MEDIAINFO_PAC_YES)
+        delete Info; Info=new File_Pac();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_PDF_YES)
         delete Info; Info=new File_Pdf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;

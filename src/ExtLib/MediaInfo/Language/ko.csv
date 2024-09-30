@@ -179,6 +179,7 @@ ADM: Show TrackUIDs;
 AdmProfile;
 Advanced;고급
 Advanced mode;고급 모드
+Advanced mode -->;
 Album;앨범
 Album_ReplayGain_Gain;앨범 재생 게인
 Album_ReplayGain_Peak;앨범 재생 게인 피크
@@ -195,12 +196,17 @@ AssistantDirector;조감독
 AssociatedVideo_FrameRate;
 at;at
 At least one file;(최소한 하나의 파일을 열어야 합니다)
+Attachments;
 Audio;오디오
 Audio stream(s);오디오 스트림
 Audio_Codec_List;오디오 코덱
+Audio_Format_List;
+Audio_Format_WithHint_List;
+Audio_Language_List;
 Audio_No;오디오 없음
 Audio1;첫번째 오디오 스트림
 Audio2;두번째 오디오 스트림
+Audio3;
 AudioComments;
 AudioCount;오디오 스트림 개수
 AudioDescription;
@@ -237,17 +243,22 @@ Cancel;취소
 CaptionServiceName;
 CatalogNumber;
 Channel(s);채널
+Channel(s)_Original;
 ChannelCoded;
 ChannelConfiguration;
 ChannelFormat;
 ChannelLayout;
+ChannelLayout_Original;
 ChannelMode;
 ChannelPositions;채널 위치
+ChannelPositions_Original;
 Chapter(s);챕터
 Chapters;챕터
 Chapters stream(s);챕터 스트림
 Chapters_Codec_List;챕터 코덱
 Chapters_No;챕터 없음
+Chapters_Pos_Begin;
+Chapters_Pos_End;
 ChaptersCount;챕터 스트림 개수
 CharacterSet;
 CheckNewVersion;최신 버전 확인
@@ -341,6 +352,7 @@ Date;날짜
 Debug;디버그
 Decimal point;소수점
 Default;
+Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;딜레이
@@ -380,6 +392,7 @@ DrcSets_Effects;
 Duration;길이
 Duration_End;종료 시간
 Duration_End_Command;
+Duration_Source;
 Duration_Start;시작 시간
 Duration_Start_Command;
 Duration_Start2End;
@@ -396,7 +409,9 @@ Enable FFmpeg plugin;
 Encoded_Application;인코딩 프로그램
 Encoded_Date;인코딩 날짜
 Encoded_Library;인코딩 라이브러리
+Encoded_Library_Name;
 Encoded_Library_Settings;인코딩 설정
+Encoded_Library_Version;
 Encoded_Original;원본
 EncodedBy;인코딩
 EPG_Positions;EPG 포지션 (내부)
@@ -429,6 +444,8 @@ FileExtension;파일 확장자
 FileName;파일명
 FileNameExtension;
 FileSize;파일 크기
+Fill with a Dummy movie;
+Fill with a realistic movie;
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
 FirstFrameOfAction;
@@ -442,6 +459,7 @@ Folder_Hint;조사할 폴더를 선택
 FolderName;폴더명
 Forced;
 Format;포맷
+Format_AdditionalFeatures;
 Format_Commercial;
 Format_Commercial_IfAny;
 Format_Compression;
@@ -484,13 +502,16 @@ FpaManufacturer;
 FpaPass;
 FpaVersion;
 FrameCount;포맷 개수
+FrameCount_Source;
 FrameRate;프레임레이트
+FrameRate_Den;
 FrameRate_Maximum;최대 프레임레이트
 FrameRate_Minimum;최소 프레임레이트
 FrameRate_Mode;프레임레이트 모드
 FrameRate_Mode_CFR;고정
 FrameRate_Mode_VFR;변동
 FrameRate_Nominal;명목상의 프레임레이트
+FrameRate_Num;
 FrameRate_Original;원본 프레임레이트
 FrameRate_Real;
 FullParsing;
@@ -740,6 +761,7 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+IsStreamable;
 Keywords;키워드
 Known codecs;알고 있는 코덱
 Known formats;알고 있는 포맷
@@ -954,6 +976,7 @@ Language_zh-tw;Chinese (Taiwan)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;Zulu
+Languages;
 LawRating;법률 등급
 LCCN;LCCN
 LfeAttenuationKnown;
@@ -1037,8 +1060,8 @@ Movie;영화 이름
 ms;미리초
 MSDI;MSDI
 MultipleStream;
-MusicBy;음악
 MultiView_Count;
+MusicBy;음악
 MuxingMode;먹싱 모드
 MuxingMode_MoreInfo;먹싱 모드, 추가 정보
 MuxingMode_PackedBitstream;팩드 비트스트림
@@ -1135,6 +1158,7 @@ ProductionDesigner;프로덕션
 ProductionNumber;
 ProductionStudio;스튜디오
 ProductPlacement;
+Program name;
 Programme;
 ProgrammeHasText;
 ProgrammeTextLanguage;
@@ -1158,10 +1182,13 @@ Report;
 Resolution;해상도
 RestoreLifetimeSubscription;
 s;초
+Sampled_Height;
+Sampled_Width;
 SamplePeakLevel;
 SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;
+SamplingCount_Source;
 SamplingRate;샘플링레이트
 Save;저장
 ScanOrder;스캔 순서
@@ -1178,6 +1205,7 @@ ScreenToFront;
 Season;시즌
 SecondaryAudioLanguage;
 see below;아래 참고
+Select your directory;
 Send HeaderFile;여기로 헤더 파일을 보내주세요 : http://sourceforge.net/projects/mediainfo/ (Bug section)
 Separator_Columns;컬럼 구분자
 Separator_Lines;라인 구분자
@@ -1227,6 +1255,7 @@ streamIdentifier;
 StreamKind;스트림 종류
 StreamKindID;스트림 ID
 StreamKindPos;스트림 ID
+StreamOrder;
 StreamSize;스트림 크기
 StreamSize_Demuxed;
 StreamSize_Encoded;
@@ -1269,6 +1298,9 @@ Text (HTML);텍스트 (HTML)
 Text stream(s);텍스트 스트림
 Text streams;텍스트 스트팀
 Text_Codec_List;텍스트 코덱
+Text_Format_List;
+Text_Format_WithHint_List;
+Text_Language_List;
 Text_No;텍스트 없음
 Text1;첫번째 텍스트 스트림
 Text2;두번째 텍스트 스트림
@@ -1336,9 +1368,14 @@ Video;비디오
 Video stream(s);비디오 스트림
 Video_Codec_List;비디오 코덱
 Video_Delay;비디오 딜레이
+Video_Format_List;
+Video_Format_WithHint_List;
+Video_Language_List;
 Video_No;비디오 없음
 Video0_Delay;비디오0 딜레이
 Video1;첫번째 비디오 스트림
+Video2;
+Video3;
 VideoComments;
 VideoCount;비디오 스트림 개수
 View;보기
@@ -1366,5 +1403,6 @@ Written_Location;제작 장소
 WrittenBy;제작자
 Yes;예
 Your system;이 시스템
-ZZ_Automatic_Percent;66
-ZZ_AutomaticLanguage_Percent;70
+Your translation;
+ZZ_Automatic_Percent;64
+ZZ_AutomaticLanguage_Percent;68

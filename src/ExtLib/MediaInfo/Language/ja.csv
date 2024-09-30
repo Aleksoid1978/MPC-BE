@@ -179,6 +179,7 @@ ADM: Show TrackUIDs;ADM: TrackUID を表示
 AdmProfile;
 Advanced;詳細
 Advanced mode;詳細モード
+Advanced mode -->;
 Album;アルバム名
 Album_ReplayGain_Gain;アルバム リプレイゲイン
 Album_ReplayGain_Peak;アルバム リプレイゲイン ピーク
@@ -195,12 +196,17 @@ AssistantDirector;助監督
 AssociatedVideo_FrameRate;
 at;at
 At least one file;( 1つ以上のファイルを開いてください )
+Attachments;
 Audio;音声
 Audio stream(s);音声ストリーム
 Audio_Codec_List;音声コーデック
+Audio_Format_List;
+Audio_Format_WithHint_List;
+Audio_Language_List;
 Audio_No;音声なし
 Audio1;音声ストリーム 1
 Audio2;音声ストリーム 2
+Audio3;
 AudioComments;音声コメント
 AudioCount;音声ストリーム数
 AudioDescription;
@@ -237,17 +243,22 @@ Cancel;キャンセル
 CaptionServiceName;
 CatalogNumber;
 Channel(s);チャンネル
+Channel(s)_Original;
 ChannelCoded;
 ChannelConfiguration;
 ChannelFormat;
 ChannelLayout;チャンネルの配置
+ChannelLayout_Original;
 ChannelMode;
 ChannelPositions;チャンネルの位置
+ChannelPositions_Original;
 Chapter(s);チャプター
 Chapters;チャプター
 Chapters stream(s);チャプターストリーム
 Chapters_Codec_List;チャプターコーデック
 Chapters_No;チャプターなし
+Chapters_Pos_Begin;
+Chapters_Pos_End;
 ChaptersCount;チャプター数
 CharacterSet;
 CheckNewVersion;最新版のチェック
@@ -341,6 +352,7 @@ Date;日付
 Debug;デバッグ
 Decimal point;小数点
 Default;
+Default translation;
 Default_Setting;システムの規定
 DefaultTargetDeviceConfig;
 Delay;遅延
@@ -380,6 +392,7 @@ DrcSets_Effects;DRC エフェクトの種類
 Duration;長さ
 Duration_End;終了時間
 Duration_End_Command;
+Duration_Source;
 Duration_Start;開始時間
 Duration_Start_Command;
 Duration_Start2End;
@@ -396,7 +409,9 @@ Enable FFmpeg plugin;
 Encoded_Application;使用したエンコーダ
 Encoded_Date;エンコード日
 Encoded_Library;使用したライブラリ
+Encoded_Library_Name;
 Encoded_Library_Settings;エンコードの設定
+Encoded_Library_Version;
 Encoded_Original;エンコード元
 EncodedBy;エンコード者
 EPG_Positions;EPG 位置 (内部)
@@ -429,6 +444,8 @@ FileExtension;拡張子
 FileName;ファイル名
 FileNameExtension;ファイル名と拡張子
 FileSize;サイズ
+Fill with a Dummy movie;
+Fill with a realistic movie;
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
 FirstFrameOfAction;
@@ -442,6 +459,7 @@ Folder_Hint;調べるフォルダを選択
 FolderName;フォルダー名
 Forced;
 Format;形式
+Format_AdditionalFeatures;
 Format_Commercial;一般名
 Format_Commercial_IfAny;一般名
 Format_Compression;圧縮
@@ -484,13 +502,16 @@ FpaManufacturer;FPA
 FpaPass;FPAパス
 FpaVersion;FPAバージョン
 FrameCount;フレーム数
+FrameCount_Source;
 FrameRate;フレームレート
+FrameRate_Den;
 FrameRate_Maximum;最大フレームレート
 FrameRate_Minimum;最小フレームレート
 FrameRate_Mode;フレームレートの種類
 FrameRate_Mode_CFR;固定 (CFR)
 FrameRate_Mode_VFR;可変 (VFR)
 FrameRate_Nominal;フレームレート名
+FrameRate_Num;
 FrameRate_Original;元のフレームレート
 FrameRate_Real;
 FullParsing;
@@ -740,6 +761,7 @@ InternetMediaType;ネット用メディアタイプ
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+IsStreamable;
 Keywords;キーワード
 Known codecs;対応するコーデック
 Known formats;対応する形式
@@ -954,6 +976,7 @@ Language_zh-tw;中国語 (繁体)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;ズールー語
+Languages;
 LawRating;規制評価
 LCCN;LCCN
 LfeAttenuationKnown;
@@ -1037,8 +1060,8 @@ Movie;動画のタイトル
 ms;ミリ秒
 MSDI;MSDI
 MultipleStream;
-MusicBy;演奏者
 MultiView_Count;
+MusicBy;演奏者
 MuxingMode;Mux 方法
 MuxingMode_MoreInfo;Mux 方法 詳細情報
 MuxingMode_PackedBitstream;ビットストリーム パック
@@ -1135,6 +1158,7 @@ ProductionDesigner;美術監督
 ProductionNumber;製造番号
 ProductionStudio;スタジオ
 ProductPlacement;スタジオの場所
+Program name;
 Programme;
 ProgrammeHasText;プログラムの字幕の有無
 ProgrammeTextLanguage;プログラムの字幕の言語
@@ -1158,10 +1182,13 @@ Report;報告
 Resolution;解像度
 RestoreLifetimeSubscription;生涯購読の復元
 s;秒
+Sampled_Height;
+Sampled_Width;
 SamplePeakLevel;サンプルピーク
 SamplePeakLevel_Album;サンプルピーク (アルバム)
 SamplesPerFrame;フレームあたりのサンプル
 SamplingCount;サンプルカウント
+SamplingCount_Source;
 SamplingRate;サンプルレート
 Save;保存
 ScanOrder;走査順序
@@ -1178,6 +1205,7 @@ ScreenToFront;
 Season;シーズン
 SecondaryAudioLanguage;音声2の言語
 see below;詳細は下記
+Select your directory;
 Send HeaderFile;可能ならヘッダファイルを送信してください: http://sourceforge.net/projects/mediainfo/ (バグセクション)
 Separator_Columns;列の区切り
 Separator_Lines;改行
@@ -1227,6 +1255,7 @@ streamIdentifier;ストリーム識別子
 StreamKind;ストリーム種別
 StreamKindID;ID
 StreamKindPos;位置
+StreamOrder;
 StreamSize;ストリームのサイズ
 StreamSize_Demuxed;Demux 後のストリームサイズ
 StreamSize_Encoded;エンコードされたストリームサイズ
@@ -1269,6 +1298,9 @@ Text (HTML);テキスト (HTML)
 Text stream(s);字幕ストリーム
 Text streams;字幕ストリーム
 Text_Codec_List;字幕コーデック
+Text_Format_List;
+Text_Format_WithHint_List;
+Text_Language_List;
 Text_No;字幕なし
 Text1;字幕ストリーム 1
 Text2;字幕ストリーム 2
@@ -1336,9 +1368,14 @@ Video;映像
 Video stream(s);映像ストリーム
 Video_Codec_List;映像コーデック
 Video_Delay;映像遅延
+Video_Format_List;
+Video_Format_WithHint_List;
+Video_Language_List;
 Video_No;映像なし
 Video0_Delay;映像0 遅延
 Video1;映像ストリーム 1
+Video2;
+Video3;
 VideoComments;映像コメント
 VideoCount;映像ストリーム数
 View;表示
@@ -1366,5 +1403,6 @@ Written_Location;作成場所
 WrittenBy;著者
 Yes;はい
 Your system;システム情報
-ZZ_Automatic_Percent;84
-ZZ_AutomaticLanguage_Percent;85
+Your translation;
+ZZ_Automatic_Percent;82
+ZZ_AutomaticLanguage_Percent;82

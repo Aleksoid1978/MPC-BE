@@ -290,6 +290,9 @@
 #if defined(MEDIAINFO_N19_YES)
     #include "MediaInfo/Text/File_N19.h"
 #endif
+#if defined(MEDIAINFO_PAC_YES)
+    #include "MediaInfo/Text/File_Pac.h"
+#endif
 #if defined(MEDIAINFO_PDF_YES)
     #include "MediaInfo/Text/File_Pdf.h"
 #endif
@@ -700,6 +703,9 @@ File__MultipleParsing::File__MultipleParsing()
 //    #endif
     #if defined(MEDIAINFO_N19_YES)
         Parser.push_back(new File_N19());
+    #endif
+    #if defined(MEDIAINFO_PAC_YES)
+        Parser.push_back(new File_Pac());
     #endif
     #if defined(MEDIAINFO_PDF_YES)
         Parser.push_back(new File_Pdf());

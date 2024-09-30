@@ -179,6 +179,7 @@ ADM: Show TrackUIDs;
 AdmProfile;
 Advanced;Avansat
 Advanced mode;Mod avansat
+Advanced mode -->;
 Album;Album
 Album_ReplayGain_Gain;
 Album_ReplayGain_Peak;
@@ -195,12 +196,17 @@ AssistantDirector;Director asistent
 AssociatedVideo_FrameRate;
 at;la
 At least one file;(Trebuie sa fie deschis cel putin un fisier)
+Attachments;
 Audio;Audio
 Audio stream(s);Fluxuri audio
 Audio_Codec_List;Codecuri audio
+Audio_Format_List;
+Audio_Format_WithHint_List;
+Audio_Language_List;
 Audio_No;Fara sunet
 Audio1;Primul flux audio
 Audio2;Al doilea flux audia
+Audio3;
 AudioComments;
 AudioCount;Numarul de fluxuri audio
 AudioDescription;
@@ -237,17 +243,22 @@ Cancel;Anulare
 CaptionServiceName;
 CatalogNumber;
 Channel(s);Canal(e)
+Channel(s)_Original;
 ChannelCoded;
 ChannelConfiguration;
 ChannelFormat;
 ChannelLayout;
+ChannelLayout_Original;
 ChannelMode;
 ChannelPositions;Pozitia canalelor
+ChannelPositions_Original;
 Chapter(s);Capitol(e)
 Chapters;Capitole
 Chapters stream(s);Flux(uri) capitole
 Chapters_Codec_List;Codecuri capitole
 Chapters_No;Fara capitole
+Chapters_Pos_Begin;
+Chapters_Pos_End;
 ChaptersCount;Numarul de fluxuri al capitolului
 CharacterSet;
 CheckNewVersion;Verificati existenta unei vesiuni noi
@@ -341,6 +352,7 @@ Date;Data
 Debug;Depanare
 Decimal point;Punct zecimal
 Default;
+Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;Intarziere
@@ -380,6 +392,7 @@ DrcSets_Effects;
 Duration;
 Duration_End;
 Duration_End_Command;
+Duration_Source;
 Duration_Start;
 Duration_Start_Command;
 Duration_Start2End;
@@ -396,7 +409,9 @@ Enable FFmpeg plugin;
 Encoded_Application;Dezvoltator aplicatie
 Encoded_Date;Data codarii
 Encoded_Library;Dezvoltator biblioteci
+Encoded_Library_Name;
 Encoded_Library_Settings;Setari codare
+Encoded_Library_Version;
 Encoded_Original;Original
 EncodedBy;Codificat de
 EPG_Positions;
@@ -429,6 +444,8 @@ FileExtension;Extensia fisierului
 FileName;Numele fisierului
 FileNameExtension;
 FileSize;Dimensiunea fisierului
+Fill with a Dummy movie;
+Fill with a realistic movie;
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
 FirstFrameOfAction;
@@ -442,6 +459,7 @@ Folder_Hint;Selectati un director pentru analiza
 FolderName;Numele directorului
 Forced;
 Format;Format
+Format_AdditionalFeatures;
 Format_Commercial;
 Format_Commercial_IfAny;
 Format_Compression;
@@ -484,13 +502,16 @@ FpaManufacturer;
 FpaPass;
 FpaVersion;
 FrameCount;
+FrameCount_Source;
 FrameRate;Frecventa cadre
+FrameRate_Den;
 FrameRate_Maximum;
 FrameRate_Minimum;
 FrameRate_Mode;
 FrameRate_Mode_CFR;
 FrameRate_Mode_VFR;
 FrameRate_Nominal;
+FrameRate_Num;
 FrameRate_Original;
 FrameRate_Real;
 FullParsing;
@@ -740,6 +761,7 @@ InternetMediaType;
 IRCA;
 ISBN;
 ISRC;
+IsStreamable;
 Keywords;Cuvinte cheie
 Known codecs;Codecuri cunoscute
 Known formats;Formate cunoscute
@@ -954,6 +976,7 @@ Language_zh-tw;
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;
+Languages;
 LawRating;
 LCCN;
 LfeAttenuationKnown;
@@ -1037,8 +1060,8 @@ Movie;Numele filmului
 ms; ms
 MSDI;
 MultipleStream;
-MusicBy;
 MultiView_Count;
+MusicBy;
 MuxingMode;
 MuxingMode_MoreInfo;
 MuxingMode_PackedBitstream;
@@ -1135,6 +1158,7 @@ ProductionDesigner;Director productie
 ProductionNumber;
 ProductionStudio;Director studio
 ProductPlacement;
+Program name;
 Programme;
 ProgrammeHasText;
 ProgrammeTextLanguage;
@@ -1158,10 +1182,13 @@ Report;
 Resolution;Rezolutie
 RestoreLifetimeSubscription;
 s;s
+Sampled_Height;
+Sampled_Width;
 SamplePeakLevel;
 SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;
+SamplingCount_Source;
 SamplingRate;
 Save;Salveaza
 ScanOrder;
@@ -1178,6 +1205,7 @@ ScreenToFront;
 Season;Sezon
 SecondaryAudioLanguage;
 see below;vezi mai jos
+Select your directory;
 Send HeaderFile;
 Separator_Columns;separator coloane
 Separator_Lines;separator linii
@@ -1227,6 +1255,7 @@ streamIdentifier;
 StreamKind;Tipul fluxului
 StreamKindID;
 StreamKindPos;
+StreamOrder;
 StreamSize;
 StreamSize_Demuxed;
 StreamSize_Encoded;
@@ -1269,6 +1298,9 @@ Text (HTML);Text (HTLM)
 Text stream(s);Fluxuri text
 Text streams;Fluxuri text
 Text_Codec_List;Codec text
+Text_Format_List;
+Text_Format_WithHint_List;
+Text_Language_List;
 Text_No;Fara text
 Text1;Frimul flux text
 Text2;Al doilea flux text
@@ -1336,9 +1368,14 @@ Video;Video
 Video stream(s);Flux(uri) video
 Video_Codec_List;Codecuri video
 Video_Delay;Intrziere video
+Video_Format_List;
+Video_Format_WithHint_List;
+Video_Language_List;
 Video_No;Fara video
 Video0_Delay;Intrziere video
 Video1;Primul flux video
+Video2;
+Video3;
 VideoComments;
 VideoCount;Numarul de fluxuri video
 View;Vizualizare
@@ -1366,5 +1403,6 @@ Written_Location;Locul mesajului
 WrittenBy;Scris de
 Yes;Da
 Your system;Sistemul dvs
+Your translation;
 ZZ_Automatic_Percent;24
-ZZ_AutomaticLanguage_Percent;54
+ZZ_AutomaticLanguage_Percent;52

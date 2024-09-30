@@ -179,6 +179,7 @@ ADM: Show TrackUIDs;
 AdmProfile;
 Advanced;Avançado
 Advanced mode;Modo avançado
+Advanced mode -->;
 Album;Álbum
 Album_ReplayGain_Gain;Replay gain do álbum
 Album_ReplayGain_Peak;Pico do replay gain do álbum
@@ -195,12 +196,17 @@ AssistantDirector;Diretor assistente
 AssociatedVideo_FrameRate;
 at;em
 At least one file;(Você deve abrir ao menos um arquivo)
+Attachments;
 Audio;Áudio
 Audio stream(s);Faixas de áudio
 Audio_Codec_List;Codecs de áudio
+Audio_Format_List;
+Audio_Format_WithHint_List;
+Audio_Language_List;
 Audio_No;Sem áudio
 Audio1;Primeira faixa de áudio
 Audio2;Segunda faixa de áudio
+Audio3;
 AudioComments;
 AudioCount;Contagem das faixas de áudio
 AudioDescription;
@@ -237,17 +243,22 @@ Cancel;Cancelar
 CaptionServiceName;
 CatalogNumber;
 Channel(s);Nº de canais
+Channel(s)_Original;
 ChannelCoded;
 ChannelConfiguration;
 ChannelFormat;
 ChannelLayout;
+ChannelLayout_Original;
 ChannelMode;
 ChannelPositions;Posições dos canais
+ChannelPositions_Original;
 Chapter(s);Capítulo(s)
 Chapters;Capítulos
 Chapters stream(s);Faixa(s) de Capítulos
 Chapters_Codec_List;Codecs dos Capítulos
 Chapters_No;Sem capítulos
+Chapters_Pos_Begin;
+Chapters_Pos_End;
 ChaptersCount;Contagem de faixas de capítulo
 CharacterSet;
 CheckNewVersion;Procurar nova versão
@@ -341,6 +352,7 @@ Date;Data
 Debug;Depurar
 Decimal point;Ponto decimal
 Default;
+Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;Atraso
@@ -380,6 +392,7 @@ DrcSets_Effects;
 Duration;Duração
 Duration_End;Tempo de finalização
 Duration_End_Command;
+Duration_Source;
 Duration_Start;Tempo de ínicio
 Duration_Start_Command;
 Duration_Start2End;
@@ -396,7 +409,9 @@ Enable FFmpeg plugin;
 Encoded_Application;Programa usado
 Encoded_Date;Data da codificação
 Encoded_Library;Biblioteca usada
+Encoded_Library_Name;
 Encoded_Library_Settings;Configurações de codificação
+Encoded_Library_Version;
 Encoded_Original;Original
 EncodedBy;Codificado por
 EPG_Positions;Porções EGP (interno)
@@ -429,6 +444,8 @@ FileExtension;Extensão do arquivo
 FileName;Nome do arquivo
 FileNameExtension;
 FileSize;Tamanho do arquivo
+Fill with a Dummy movie;
+Fill with a realistic movie;
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
 FirstFrameOfAction;
@@ -442,6 +459,7 @@ Folder_Hint;Selecione uma pasta para examinar
 FolderName;Nome da pasta
 Forced;
 Format;Formato
+Format_AdditionalFeatures;
 Format_Commercial;
 Format_Commercial_IfAny;
 Format_Compression;
@@ -484,13 +502,16 @@ FpaManufacturer;
 FpaPass;
 FpaVersion;
 FrameCount;Número de Quadros
+FrameCount_Source;
 FrameRate;Taxa de quadros
+FrameRate_Den;
 FrameRate_Maximum;Taxa de quadros máxima
 FrameRate_Minimum;Taxa de quadros mínima
 FrameRate_Mode;Modo de taxa de quadros
 FrameRate_Mode_CFR;TConstante
 FrameRate_Mode_VFR;Variável
 FrameRate_Nominal;Taxa de quadros nominal
+FrameRate_Num;
 FrameRate_Original;Taxa de quadros original
 FrameRate_Real;
 FullParsing;
@@ -740,6 +761,7 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+IsStreamable;
 Keywords;Palavras chave
 Known codecs;Codecs conhecidos
 Known formats;Formatos
@@ -954,6 +976,7 @@ Language_zh-tw;Chinês (Taiwan)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;Zulu
+Languages;
 LawRating;Classificação
 LCCN;LCCN
 LfeAttenuationKnown;
@@ -1037,8 +1060,8 @@ Movie;Nome do Vídeo
 ms; ms
 MSDI;MSDI
 MultipleStream;
-MusicBy;Música de
 MultiView_Count;
+MusicBy;Música de
 MuxingMode;Modo de Multiplexação
 MuxingMode_MoreInfo;Modo de multiplexação, mais informações
 MuxingMode_PackedBitstream;Packed bitstream
@@ -1135,6 +1158,7 @@ ProductionDesigner;Designer de Produção
 ProductionNumber;
 ProductionStudio;Estúdio de Produção
 ProductPlacement;
+Program name;
 Programme;
 ProgrammeHasText;
 ProgrammeTextLanguage;
@@ -1158,10 +1182,13 @@ Report;
 Resolution;Resolução
 RestoreLifetimeSubscription;
 s;s
+Sampled_Height;
+Sampled_Width;
 SamplePeakLevel;
 SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;
+SamplingCount_Source;
 SamplingRate;Taxa de amostragem
 Save;Salvar
 ScanOrder;Ordem do Scan
@@ -1178,6 +1205,7 @@ ScreenToFront;
 Season;Temporada
 SecondaryAudioLanguage;
 see below;veja abaixo
+Select your directory;
 Send HeaderFile;Enviar arquivo de cabeçalho
 Separator_Columns;separador de colunas
 Separator_Lines;separador de linhas
@@ -1227,6 +1255,7 @@ streamIdentifier;
 StreamKind;Tipo da Faixa
 StreamKindID;Tipo da Faixa/ID
 StreamKindPos;Tipo da Faixa/Pos
+StreamOrder;
 StreamSize;Tamanho da Faixa
 StreamSize_Demuxed;
 StreamSize_Encoded;
@@ -1269,6 +1298,9 @@ Text (HTML);Texto (HTML)
 Text stream(s);Faixa(s) de texto
 Text streams;Faixas de texto
 Text_Codec_List;Codecs de texto
+Text_Format_List;
+Text_Format_WithHint_List;
+Text_Language_List;
 Text_No;Sem texto
 Text1;Primeira faixa de texto
 Text2;Segunda
@@ -1336,9 +1368,14 @@ Video;Vídeo
 Video stream(s);Faixa(s) de Vídeo
 Video_Codec_List;Codecs de Vídeo
 Video_Delay;Atraso do Video
+Video_Format_List;
+Video_Format_WithHint_List;
+Video_Language_List;
 Video_No;Sem Vídeo
 Video0_Delay;Atraso do Video0
 Video1;Primeira faixa de vídeo
+Video2;
+Video3;
 VideoComments;
 VideoCount;Número de faixas de vídeo
 View;Exibir
@@ -1366,5 +1403,6 @@ Written_Location;Local da escrita
 WrittenBy;Escrito por
 Yes;Sim
 Your system;Seu sistema
-ZZ_Automatic_Percent;66
-ZZ_AutomaticLanguage_Percent;70
+Your translation;
+ZZ_Automatic_Percent;64
+ZZ_AutomaticLanguage_Percent;68

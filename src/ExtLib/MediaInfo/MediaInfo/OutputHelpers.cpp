@@ -114,18 +114,23 @@ string To_XML (Node& Cur_Node, const int& Level, bool Print_Header, bool Indent)
     if (Level)
         Result+="\n";
 
+    bool CommentedNow;
     if (!Cur_Node.XmlCommentOut.empty())
     {
-        Result+=(Indent?string(Level, '\t'):string())+"<!-- "+Cur_Node.XmlCommentOut;
+        Result+=(Indent?string(Level, '\t'):string())+(Cur_Node.AlreadyCommented?"<!- ":"<!-- ")+Cur_Node.XmlCommentOut;
 
         // If the node name is empty, just print the comment
         if (Cur_Node.Name.empty())
         {
-            Result += " -->";
+            Result += Cur_Node.AlreadyCommented?" ->":" -->";
             return Result;
         }
         Result+="\n";
+        CommentedNow=!Cur_Node.AlreadyCommented;
+        Cur_Node.AlreadyCommented=true;
     }
+    else
+        CommentedNow=false;
 
     Result+=(Indent?string(Level, '\t'):string())+"<"+Cur_Node.Name;
 
@@ -142,9 +147,9 @@ string To_XML (Node& Cur_Node, const int& Level, bool Print_Header, bool Indent)
     {
         Result+=" />";
         if (!Cur_Node.XmlComment.empty() && Cur_Node.XmlCommentOut.empty())
-            Result+=" <!-- "+Cur_Node.XmlComment+" -->";
+            Result+=(Cur_Node.AlreadyCommented?" <!- ":" <!-- ")+Cur_Node.XmlComment+(Cur_Node.AlreadyCommented?" ->":" -->");
         if (Cur_Node.XmlCommentOut.size())
-            Result+="\n"+(Indent?string(Level, '\t'):string())+"-->";
+            Result+="\n"+(Indent?string(Level, '\t'):string())+((Cur_Node.AlreadyCommented && !CommentedNow)?"->":"-->");
         return Result;
     }
 
@@ -162,13 +167,14 @@ string To_XML (Node& Cur_Node, const int& Level, bool Print_Header, bool Indent)
     {
         CanDisplayXmlComment=false;
         if (!Cur_Node.XmlComment.empty() && Cur_Node.XmlCommentOut.empty())
-            Result+=" <!-- "+Cur_Node.XmlComment+" -->";
+            Result+=(Cur_Node.AlreadyCommented?" <!- ":" <!-- ")+Cur_Node.XmlComment+(Cur_Node.AlreadyCommented?" ->":" -->");
 
         for (size_t Pos=0; Pos<Cur_Node.Childs.size(); Pos++)
         {
             if (!Cur_Node.Childs[Pos])
                 continue;
 
+            Cur_Node.Childs[Pos]->AlreadyCommented=Cur_Node.AlreadyCommented;
             Result+=To_XML(*Cur_Node.Childs[Pos], Level+1, false, Indent);
             delete Cur_Node.Childs[Pos];
             Cur_Node.Childs[Pos]=NULL;
@@ -181,9 +187,9 @@ string To_XML (Node& Cur_Node, const int& Level, bool Print_Header, bool Indent)
 
     Result+="</"+Cur_Node.Name+">";
     if (Cur_Node.XmlCommentOut.size())
-        Result+="\n"+(Indent?string(Level, '\t'):string())+"-->";
+        Result+="\n"+(Indent?string(Level, '\t'):string())+((Cur_Node.AlreadyCommented && !CommentedNow)?"->":"-->");
     else if (!Cur_Node.XmlComment.empty() && CanDisplayXmlComment)
-        Result+=" <!-- "+Cur_Node.XmlComment+" -->";
+        Result+=(Cur_Node.AlreadyCommented?" <!- ":" <!-- ")+Cur_Node.XmlComment+(Cur_Node.AlreadyCommented?" ->":" -->");
     if (!Level)
         Result+="\n";
 

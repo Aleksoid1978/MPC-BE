@@ -179,6 +179,7 @@ ADM: Show TrackUIDs;
 AdmProfile;
 Advanced;Avancerat
 Advanced mode;Avancerat läge
+Advanced mode -->;
 Album;Album
 Album_ReplayGain_Gain;Uppspelningsförstärkning för album
 Album_ReplayGain_Peak;Förstärkningstopp för album
@@ -195,12 +196,17 @@ AssistantDirector;Assisterande regissör
 AssociatedVideo_FrameRate;
 at;hos
 At least one file;(Du måste öppna minst en fil)
+Attachments;
 Audio;Ljud
 Audio stream(s);Ljudströmmar
 Audio_Codec_List;Ljudavkodare
+Audio_Format_List;
+Audio_Format_WithHint_List;
+Audio_Language_List;
 Audio_No;Inget ljud
 Audio1;Första ljudströmmen
 Audio2;Andra ljudströmmen
+Audio3;
 AudioComments;Ljudkommentarer
 AudioCount;Antal ljudströmmar
 AudioDescription;
@@ -237,17 +243,22 @@ Cancel;Avbryt
 CaptionServiceName;
 CatalogNumber;
 Channel(s);Kanal(er)
+Channel(s)_Original;
 ChannelCoded;
 ChannelConfiguration;
 ChannelFormat;
 ChannelLayout;
+ChannelLayout_Original;
 ChannelMode;
 ChannelPositions;Kanalpositioner
+ChannelPositions_Original;
 Chapter(s);Kapitel
 Chapters;Kapitel
 Chapters stream(s);Kapitelströmm(ar)
 Chapters_Codec_List;Kapitelkodekar
 Chapters_No;Inga kapitel
+Chapters_Pos_Begin;
+Chapters_Pos_End;
 ChaptersCount;Antal kapitelströmmar
 CharacterSet;
 CheckNewVersion;Sök efter ny version
@@ -341,6 +352,7 @@ Date;Datum
 Debug;Felsök
 Decimal point;Decimalpunkt
 Default;
+Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;Fördröjning
@@ -380,6 +392,7 @@ DrcSets_Effects;
 Duration;Varaktighet
 Duration_End;Sluttid
 Duration_End_Command;
+Duration_Source;
 Duration_Start;Starttid
 Duration_Start_Command;
 Duration_Start2End;
@@ -396,7 +409,9 @@ Enable FFmpeg plugin;
 Encoded_Application;Skrivande program
 Encoded_Date;Kodningsdatum
 Encoded_Library;Skrivande bibliotek
+Encoded_Library_Name;
 Encoded_Library_Settings;Kodningsinställningar
+Encoded_Library_Version;
 Encoded_Original;Ursprungligt stöd
 EncodedBy;Kodad av
 EPG_Positions;EPG-positioner (interna)
@@ -429,6 +444,8 @@ FileExtension;Filändelse
 FileName;Filnamn
 FileNameExtension;
 FileSize;Filstorlek
+Fill with a Dummy movie;
+Fill with a realistic movie;
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
 FirstFrameOfAction;
@@ -442,6 +459,7 @@ Folder_Hint;Välj en mapp
 FolderName;Mappnamn
 Forced;
 Format;Format
+Format_AdditionalFeatures;
 Format_Commercial;Kommersiellt namn
 Format_Commercial_IfAny;Kommersiellt namn
 Format_Compression;
@@ -484,13 +502,16 @@ FpaManufacturer;FPA Tillverkare
 FpaPass;FPA Pass
 FpaVersion;FPA Version
 FrameCount;Antal bildrutor
+FrameCount_Source;
 FrameRate;Bildfrekvens
+FrameRate_Den;
 FrameRate_Maximum;Max. bildfrekvens
 FrameRate_Minimum;Min. bildfrekvens
 FrameRate_Mode;Bildfrekvensläge
 FrameRate_Mode_CFR;Konstant
 FrameRate_Mode_VFR;Variabelt
 FrameRate_Nominal;Nominell bildfrekvens
+FrameRate_Num;
 FrameRate_Original;Ursprunglig bildfrekvens
 FrameRate_Real;
 FullParsing;
@@ -740,6 +761,7 @@ InternetMediaType;Internetmediatyp
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+IsStreamable;
 Keywords;Nyckelord
 Known codecs;Kända kodekar
 Known formats;Kända format
@@ -954,6 +976,7 @@ Language_zh-tw;Kinesiska (Taiwan)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;Zulu
+Languages;
 LawRating;Åldersgräns
 LCCN;LCCN
 LfeAttenuationKnown;
@@ -1037,8 +1060,8 @@ Movie;Filmnamn
 ms; ms
 MSDI;MSDI
 MultipleStream;
-MusicBy;Musik av
 MultiView_Count;
+MusicBy;Musik av
 MuxingMode;Muxningsläge
 MuxingMode_MoreInfo;Muxningsläge, mer info
 MuxingMode_PackedBitstream;Paketerad bitström
@@ -1135,6 +1158,7 @@ ProductionDesigner;Produktionsdesigner
 ProductionNumber;Produktionsnummer
 ProductionStudio;Produktionsstudio
 ProductPlacement;Produktplacering
+Program name;
 Programme;
 ProgrammeHasText;Programmet har text
 ProgrammeTextLanguage;Textspråk
@@ -1158,10 +1182,13 @@ Report;
 Resolution;Upplösning
 RestoreLifetimeSubscription;
 s; sek
+Sampled_Height;
+Sampled_Width;
 SamplePeakLevel;
 SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;Antal samplingar
+SamplingCount_Source;
 SamplingRate;Samplingsfrekvens
 Save;Spara
 ScanOrder;Skannordning
@@ -1178,6 +1205,7 @@ ScreenToFront;
 Season;Säsong
 SecondaryAudioLanguage;Sekundärt ljudspråk
 see below;Se nedan
+Select your directory;
 Send HeaderFile;Skicka header-filen här: http://sourceforge.net/projects/mediainfo/ (Tickets>Bugs)
 Separator_Columns;Kolumnseparator
 Separator_Lines;Linjeseparator
@@ -1227,6 +1255,7 @@ streamIdentifier;
 StreamKind;Strömtyp
 StreamKindID;Strömidentifierare
 StreamKindPos;Strömidentifierare
+StreamOrder;
 StreamSize;Strömstorlek
 StreamSize_Demuxed;
 StreamSize_Encoded;Kodad strömstorlek
@@ -1269,6 +1298,9 @@ Text (HTML);Text (HTML)
 Text stream(s);Text strömm(ar)
 Text streams;Text strömmar
 Text_Codec_List;Textkodekar
+Text_Format_List;
+Text_Format_WithHint_List;
+Text_Language_List;
 Text_No;Ingen text
 Text1;Första textströmmen
 Text2;Andra textströmmen
@@ -1336,9 +1368,14 @@ Video;Video
 Video stream(s);Videoströmm(ar)
 Video_Codec_List;Videokodekar
 Video_Delay;Fördröjning relativt video
+Video_Format_List;
+Video_Format_WithHint_List;
+Video_Language_List;
 Video_No;Ingen video
 Video0_Delay;Video0-fördröjning
 Video1;Första videoströmmen
+Video2;
+Video3;
 VideoComments;Videokommentarer
 VideoCount;Antal videoströmmar
 View;Visa
@@ -1366,5 +1403,6 @@ Written_Location;Ort
 WrittenBy;Skrivet av
 Yes;Ja
 Your system;Ditt system
-ZZ_Automatic_Percent;77
-ZZ_AutomaticLanguage_Percent;78
+Your translation;
+ZZ_Automatic_Percent;75
+ZZ_AutomaticLanguage_Percent;76

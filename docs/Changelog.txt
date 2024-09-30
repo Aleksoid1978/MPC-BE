@@ -36,8 +36,10 @@ Updated Hungarian translation (by mickey).
 Updated libraries:
 	ffmpeg n7.1-dev-2746-g01c47dd235;
 	Little-CMS git-lcms2.16-66-g5c54a6d;
+	MediaInfo git-v24.06-31-gf24a17b41;
 	rapidjson v1.1.0-755-g815e6e7e;
-	vvdec v2.3.0-28-gf8ba8fd.
+	vvdec v2.3.0-28-gf8ba8fd;
+	ZenLib git-v0.4.41-23-g2c078a6.
 
 
 1.7.3 - 2024-08-07

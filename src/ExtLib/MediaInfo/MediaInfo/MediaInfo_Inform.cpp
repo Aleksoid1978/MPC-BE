@@ -877,6 +877,10 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                     Retour+=__T("      <tr>\n        <td class=\"Prefix\">");
                     Retour+=Prefix+Nom.TrimLeft();
                     Retour+=__T(" :</td>\n        <td>");
+                    Valeur.FindAndReplace(__T("&"), __T("&amp;"), 0, Ztring_Recursive);
+                    Valeur.FindAndReplace(__T("<"), __T("&lt;"), 0, Ztring_Recursive);
+                    Valeur.FindAndReplace(__T(">"), __T("&gt;"), 0, Ztring_Recursive);
+                    Valeur.FindAndReplace(__T("  "), __T(" &nbsp;"), 0, Ztring_Recursive);
                     Retour+=Valeur;
                     Retour+=__T("</td>\n      </tr>");
                 }

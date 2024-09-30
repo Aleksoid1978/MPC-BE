@@ -179,6 +179,7 @@ ADM: Show TrackUIDs;ADM: 显示 TrackUID
 AdmProfile;ADM 配置 (Profile)
 Advanced;高级
 Advanced mode;高级模式
+Advanced mode -->;
 Album;专辑
 Album_ReplayGain_Gain;专辑播放增益
 Album_ReplayGain_Peak;专辑播放增益峰值
@@ -195,12 +196,17 @@ AssistantDirector;副导演
 AssociatedVideo_FrameRate;关联视频帧率
 at;@
 At least one file;(至少要打开一个文件)
+Attachments;
 Audio;音频
 Audio stream(s);音频流
 Audio_Codec_List;音频解码器
+Audio_Format_List;
+Audio_Format_WithHint_List;
+Audio_Language_List;
 Audio_No;无音频
 Audio1;音频 1
 Audio2;音频 2
+Audio3;
 AudioComments;音频注释
 AudioCount;音频流总数
 AudioDescription;音频说明
@@ -237,17 +243,22 @@ Cancel;取消
 CaptionServiceName;字幕服务名称
 CatalogNumber;
 Channel(s);声道数
+Channel(s)_Original;
 ChannelCoded;声道是否编码
 ChannelConfiguration;声道配置
 ChannelFormat;声道格式
 ChannelLayout;声道布局
+ChannelLayout_Original;
 ChannelMode;声道模式
 ChannelPositions;声道位置
+ChannelPositions_Original;
 Chapter(s);章节数
 Chapters;章节
 Chapters stream(s);章节流
 Chapters_Codec_List;章节解码器
 Chapters_No;无章节
+Chapters_Pos_Begin;
+Chapters_Pos_End;
 ChaptersCount;章节流总数
 CharacterSet;
 CheckNewVersion;检查新版本
@@ -341,6 +352,7 @@ Date;日期
 Debug;调试
 Decimal point;小数点
 Default;
+Default translation;
 Default_Setting;系统默认
 DefaultTargetDeviceConfig;默认目标设备配置
 Delay;延迟
@@ -380,6 +392,7 @@ DrcSets_Effects;DRC 效果类型
 Duration;时长
 Duration_End;结束时间
 Duration_End_Command;结束时间 (命令)
+Duration_Source;
 Duration_Start;开始时间
 Duration_Start_Command;开始时间 (命令)
 Duration_Start2End;可视内容时长
@@ -396,7 +409,9 @@ Enable FFmpeg plugin;
 Encoded_Application;编码程序
 Encoded_Date;编码日期
 Encoded_Library;编码函数库
+Encoded_Library_Name;
 Encoded_Library_Settings;编码设置
+Encoded_Library_Version;
 Encoded_Original;编码源
 EncodedBy;编码者
 EPG_Positions;EPG 位置 (内部)
@@ -429,6 +444,8 @@ FileExtension;扩展名
 FileName;文件名
 FileNameExtension;文件名和扩展名
 FileSize;文件大小
+Fill with a Dummy movie;
+Fill with a realistic movie;
 FirstDisplay_Delay_Frames;第一个事件前的帧数
 FirstDisplay_Type;第一个事件的类型
 FirstFrameOfAction;动作的第一帧
@@ -442,6 +459,7 @@ Folder_Hint;选择文件夹
 FolderName;文件夹名称
 Forced;
 Format;格式
+Format_AdditionalFeatures;
 Format_Commercial;传播名
 Format_Commercial_IfAny;传播名
 Format_Compression;压缩算法
@@ -484,13 +502,16 @@ FpaManufacturer;FPA 制造商
 FpaPass;FPA 通过
 FpaVersion;FPA 版本
 FrameCount;总帧数
+FrameCount_Source;
 FrameRate;帧率
+FrameRate_Den;
 FrameRate_Maximum;最高帧率
 FrameRate_Minimum;最低帧率
 FrameRate_Mode;帧率模式
 FrameRate_Mode_CFR;恒定帧率 (CFR)
 FrameRate_Mode_VFR;动态帧率 (VFR)
 FrameRate_Nominal;额定帧率
+FrameRate_Num;
 FrameRate_Original;原始帧率
 FrameRate_Real;真实帧率
 FullParsing;
@@ -740,6 +761,7 @@ InternetMediaType;网络媒体类型
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+IsStreamable;
 Keywords;关键词
 Known codecs;已知解码器
 Known formats;已知格式
@@ -954,6 +976,7 @@ Language_zh-tw;繁体中文 (Chinese, Taiwan)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;祖鲁语 (Zulu)
+Languages;
 LawRating;分级
 LCCN;LCCN
 LfeAttenuationKnown;LFE 衰减是否已知
@@ -1037,8 +1060,8 @@ Movie;电影名称
 ms; 毫秒
 MSDI;MSDI
 MultipleStream;多个流
-MusicBy;音乐制作
 MultiView_Count;
+MusicBy;音乐制作
 MuxingMode;混流模式
 MuxingMode_MoreInfo;混流模式详细信息
 MuxingMode_PackedBitstream;Packed bitstream
@@ -1135,6 +1158,7 @@ ProductionDesigner;制作设计师
 ProductionNumber;制作编号
 ProductionStudio;出品工作室
 ProductPlacement;产品布置
+Program name;
 Programme;节目
 ProgrammeHasText;节目含有文本
 ProgrammeTextLanguage;节目文本语言
@@ -1158,10 +1182,13 @@ Report;报告
 Resolution;分辨率
 RestoreLifetimeSubscription;恢复终身订阅
 s; 秒
+Sampled_Height;
+Sampled_Width;
 SamplePeakLevel;采样峰值等级
 SamplePeakLevel_Album;采样峰值等级 (专辑)
 SamplesPerFrame;每帧采样数
 SamplingCount;采样数
+SamplingCount_Source;
 SamplingRate;采样率
 Save;保存
 ScanOrder;扫描顺序
@@ -1178,6 +1205,7 @@ ScreenToFront;Screen to front
 Season;季期
 SecondaryAudioLanguage;第二音频语言
 see below;点击展开详情
+Select your directory;
 Send HeaderFile;请将头文件发送到: http://sourceforge.net/projects/mediainfo/ (Bugs 板块)
 Separator_Columns;列分隔符
 Separator_Lines;换行符
@@ -1227,6 +1255,7 @@ streamIdentifier;流标识符
 StreamKind;流类型
 StreamKindID;流标识符
 StreamKindPos;流标识符
+StreamOrder;
 StreamSize;流大小
 StreamSize_Demuxed;分离后流大小
 StreamSize_Encoded;编码后流大小
@@ -1269,6 +1298,9 @@ Text (HTML);文本 (网页)
 Text stream(s);字幕流
 Text streams;字幕流
 Text_Codec_List;字幕解码器
+Text_Format_List;
+Text_Format_WithHint_List;
+Text_Language_List;
 Text_No;无字幕
 Text1;字幕 1
 Text2;字幕 2
@@ -1336,9 +1368,14 @@ Video;视频
 Video stream(s);视频流
 Video_Codec_List;视频解码器
 Video_Delay;相对视频的延迟
+Video_Format_List;
+Video_Format_WithHint_List;
+Video_Language_List;
 Video_No;无视频
 Video0_Delay;视频 0 延迟
 Video1;视频 1
+Video2;
+Video3;
 VideoComments;视频注释
 VideoCount;视频流总数
 View;视图
@@ -1366,5 +1403,6 @@ Written_Location;写入地点
 WrittenBy;作者
 Yes;是
 Your system;您的系统
-ZZ_Automatic_Percent;97
-ZZ_AutomaticLanguage_Percent;98
+Your translation;
+ZZ_Automatic_Percent;94
+ZZ_AutomaticLanguage_Percent;95

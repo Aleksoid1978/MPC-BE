@@ -179,6 +179,7 @@ ADM: Show TrackUIDs;
 AdmProfile;
 Advanced;進階
 Advanced mode;進階模式
+Advanced mode -->;
 Album;專輯
 Album_ReplayGain_Gain;專輯播放增益
 Album_ReplayGain_Peak;專輯播放增益尖峰值
@@ -195,12 +196,17 @@ AssistantDirector;副導演
 AssociatedVideo_FrameRate;
 at;於
 At least one file;(您最少要開啟一個檔案)
+Attachments;
 Audio;音訊
 Audio stream(s);音訊串流
 Audio_Codec_List;音訊編解碼器
+Audio_Format_List;
+Audio_Format_WithHint_List;
+Audio_Language_List;
 Audio_No;無音訊
 Audio1;第一音訊串流
 Audio2;第二音訊串流
+Audio3;
 AudioComments;
 AudioCount;音訊串流數
 AudioDescription;
@@ -237,17 +243,22 @@ Cancel;取消
 CaptionServiceName;
 CatalogNumber;
 Channel(s);聲道數
+Channel(s)_Original;
 ChannelCoded;
 ChannelConfiguration;
 ChannelFormat;
 ChannelLayout;
+ChannelLayout_Original;
 ChannelMode;
 ChannelPositions;聲道位置
+ChannelPositions_Original;
 Chapter(s);章節
 Chapters;章節
 Chapters stream(s);章節串流
 Chapters_Codec_List;章節編解碼器
 Chapters_No;無章節
+Chapters_Pos_Begin;
+Chapters_Pos_End;
 ChaptersCount;章節串流數
 CharacterSet;
 CheckNewVersion;檢查新版本
@@ -341,6 +352,7 @@ Date;日期
 Debug;偵錯
 Decimal point;小數點
 Default;
+Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
 Delay;延遲
@@ -380,6 +392,7 @@ DrcSets_Effects;
 Duration;時間長度
 Duration_End;結束時間
 Duration_End_Command;
+Duration_Source;
 Duration_Start;開始時間
 Duration_Start_Command;
 Duration_Start2End;
@@ -396,7 +409,9 @@ Enable FFmpeg plugin;
 Encoded_Application;使用編碼程式
 Encoded_Date;編碼日期
 Encoded_Library;編碼函式庫
+Encoded_Library_Name;
 Encoded_Library_Settings;編碼設定
+Encoded_Library_Version;
 Encoded_Original;來源
 EncodedBy;編碼者
 EPG_Positions;EPG 電子節目表位置 (內部)
@@ -429,6 +444,8 @@ FileExtension;副檔名
 FileName;檔案
 FileNameExtension;
 FileSize;檔案大小
+Fill with a Dummy movie;
+Fill with a realistic movie;
 FirstDisplay_Delay_Frames;
 FirstDisplay_Type;
 FirstFrameOfAction;
@@ -442,6 +459,7 @@ Folder_Hint;選擇要檢視的資料夾
 FolderName;資料夾
 Forced;
 Format;格式
+Format_AdditionalFeatures;
 Format_Commercial;
 Format_Commercial_IfAny;
 Format_Compression;
@@ -484,13 +502,16 @@ FpaManufacturer;
 FpaPass;
 FpaVersion;
 FrameCount;影格數
+FrameCount_Source;
 FrameRate;影格頻率
+FrameRate_Den;
 FrameRate_Maximum;最大影格頻率
 FrameRate_Minimum;最小影格頻率
 FrameRate_Mode;影格頻率模式
 FrameRate_Mode_CFR;常數式
 FrameRate_Mode_VFR;可變式
 FrameRate_Nominal;正常影格頻率
+FrameRate_Num;
 FrameRate_Original;原始影格頻率
 FrameRate_Real;
 FullParsing;
@@ -740,6 +761,7 @@ InternetMediaType;
 IRCA;IRCA
 ISBN;ISBN
 ISRC;ISRC
+IsStreamable;
 Keywords;關鍵字
 Known codecs;已知編解碼器
 Known formats;已知格式
@@ -954,6 +976,7 @@ Language_zh-tw;華語 (台灣) (Chinese, Taiwan)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;祖魯語 (Zulu)
+Languages;
 LawRating;分級
 LCCN;LCCN
 LfeAttenuationKnown;
@@ -1037,8 +1060,8 @@ Movie;電影名稱
 ms;毫秒
 MSDI;MSDI
 MultipleStream;
-MusicBy;配樂者
 MultiView_Count;
+MusicBy;配樂者
 MuxingMode;合成模式
 MuxingMode_MoreInfo;更多有關此合成模式的資訊
 MuxingMode_PackedBitstream;Packed bitstream
@@ -1135,6 +1158,7 @@ ProductionDesigner;美術指導
 ProductionNumber;
 ProductionStudio;製作中心
 ProductPlacement;
+Program name;
 Programme;
 ProgrammeHasText;
 ProgrammeTextLanguage;
@@ -1158,10 +1182,13 @@ Report;
 Resolution;顏色深度
 RestoreLifetimeSubscription;
 s;秒
+Sampled_Height;
+Sampled_Width;
 SamplePeakLevel;
 SamplePeakLevel_Album;
 SamplesPerFrame;
 SamplingCount;
+SamplingCount_Source;
 SamplingRate;取樣率
 Save;儲存
 ScanOrder;掃描順序
@@ -1178,6 +1205,7 @@ ScreenToFront;
 Season;季期
 SecondaryAudioLanguage;
 see below;詳見下述
+Select your directory;
 Send HeaderFile;請將標頭檔寄到這給我: http://sourceforge.net/projects/mediainfo/ (Bug section)
 Separator_Columns;換列字元
 Separator_Lines;換行字元
@@ -1227,6 +1255,7 @@ streamIdentifier;
 StreamKind;串流類型
 StreamKindID;串流識別字
 StreamKindPos;串流識別字
+StreamOrder;
 StreamSize;串流大小
 StreamSize_Demuxed;
 StreamSize_Encoded;
@@ -1269,6 +1298,9 @@ Text (HTML);文字 (網頁)
 Text stream(s);字幕串流
 Text streams;字幕串流
 Text_Codec_List;字幕編解碼器
+Text_Format_List;
+Text_Format_WithHint_List;
+Text_Language_List;
 Text_No;無字幕
 Text1;第一字幕串流
 Text2;第二字幕串流
@@ -1336,9 +1368,14 @@ Video;視訊
 Video stream(s);視訊串流
 Video_Codec_List;視訊編解碼器
 Video_Delay;視訊延遲
+Video_Format_List;
+Video_Format_WithHint_List;
+Video_Language_List;
 Video_No;無視訊
 Video0_Delay;視訊0延遲
 Video1;第一視訊串流
+Video2;
+Video3;
 VideoComments;
 VideoCount;視訊串流數
 View;檢視
@@ -1366,5 +1403,6 @@ Written_Location;撰寫地點
 WrittenBy;撰寫人
 Yes;是
 Your system;您的系統
-ZZ_Automatic_Percent;66
-ZZ_AutomaticLanguage_Percent;70
+Your translation;
+ZZ_Automatic_Percent;64
+ZZ_AutomaticLanguage_Percent;68
