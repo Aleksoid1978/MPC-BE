@@ -598,6 +598,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						fourcc = FCC('VP90');
 					} else if (CodecID == "V_AV1") {
 						fourcc = FCC('AV01');
+					} else if (CodecID == "V_MPEGI/ISO/VVC") {
+						fourcc = FCC('VVC1');
 					} else if (CodecID == "V_QUICKTIME" && pTE->CodecPrivate.size() >= 8) {
 						if (m_pFile->m_ebml.DocTypeReadVersion == 1) {
 							fourcc = GETU32(pTE->CodecPrivate.data());

@@ -1630,6 +1630,7 @@ void MediaInfo_Config_CodecID_Video_Matroska (InfoMap &Info)
     "V_MPEG4/ISO/AP;MPEG-4 Visual;;Advanced Profile;http://ffdshow-tryout.sourceforge.net/\n"
     "V_MPEG4/ISO/AVC;AVC;;;http://ffdshow-tryout.sourceforge.net/\n"
     "V_MPEGH/ISO/HEVC;HEVC\n"
+    "V_MPEGI/ISO/VVC;VVC\n"
     "V_MPEG4/MS/V2;MPEG-4 Visual;MS MPEG-4 v2;MS MPEG-4 v2;http://ffdshow-tryout.sourceforge.net/\n"
     "V_MPEG4/MS/V3;MPEG-4 Visual;MS MPEG-4 v3;MS MPEG-4 v3;http://ffdshow-tryout.sourceforge.net/\n"
     "V_MPEG1;MPEG Video;;MPEG 1 or 2 Video;http://ffdshow-tryout.sourceforge.net/\n"
