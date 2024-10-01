@@ -25,7 +25,6 @@
 
 [Messages]
 ;English
-WelcomeLabel1=[name/ver]
 en.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended that you close all other applications before continuing.
 en.WinVersionTooLowError=[name] requires Windows 7 or newer to run.
 

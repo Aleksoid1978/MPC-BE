@@ -163,7 +163,8 @@ Name: ua; MessagesFile: compiler:Languages\Ukrainian.isl
 #include ".\CustomMessages\custom_messages.iss"
 
 [Messages]
-BeveledLabel = {#BeveledLabel}
+WelcomeLabel1=[name/ver]
+BeveledLabel={#BeveledLabel}
 
 [Types]
 Name: default; Description: {cm:types_DefaultInstallation}
