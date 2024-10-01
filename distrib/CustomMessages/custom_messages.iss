@@ -1,5 +1,5 @@
 ﻿;
-; (C) 2009-2023 see Authors.txt
+; (C) 2009-2024 see Authors.txt
 ;
 ; This file is part of MPC-BE.
 ;

@@ -160,7 +160,7 @@ Name: ua; MessagesFile: compiler:Languages\Ukrainian.isl
 #endif
 
 ; Include installer's custom messages
-#include "custom_messages.iss"
+#include ".\CustomMessages\custom_messages.iss"
 
 [Messages]
 BeveledLabel = {#BeveledLabel}
