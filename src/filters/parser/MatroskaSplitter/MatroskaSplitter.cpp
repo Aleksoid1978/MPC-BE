@@ -577,6 +577,24 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 					}
 				}
+				else if (CodecID == "V_MPEGI/ISO/VVC") {
+					BITMAPINFOHEADER pbmi;
+					memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
+					pbmi.biSize        = sizeof(pbmi);
+					pbmi.biWidth       = (LONG)pTE->v.PixelWidth;
+					pbmi.biHeight      = (LONG)pTE->v.PixelHeight;
+					pbmi.biCompression = FCC('VVC1');
+					pbmi.biPlanes      = 1;
+					pbmi.biBitCount    = 24;
+
+					CSize aspect(pbmi.biWidth, pbmi.biHeight);
+					ReduceDim(aspect);
+					CreateMPEG2VISimple(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
+
+					// TODO: parse VVCDecoderConfigurationRecord structure
+
+					mts.push_back(mt);
+				}
 				else {
 					DWORD fourcc = 0;
 					WORD bitdepth = 0;
