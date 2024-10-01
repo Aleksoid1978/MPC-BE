@@ -161,6 +161,33 @@ Name: ua; MessagesFile: compiler:Languages\Ukrainian.isl
 
 ; Include installer's custom messages
 #include ".\CustomMessages\custom_messages.iss"
+#ifdef localize
+#include ".\CustomMessages\custom_messages.br.iss"
+#include ".\CustomMessages\custom_messages.by.iss"
+#include ".\CustomMessages\custom_messages.ca.iss"
+#include ".\CustomMessages\custom_messages.cz.iss"
+#include ".\CustomMessages\custom_messages.de.iss"
+#include ".\CustomMessages\custom_messages.el.iss"
+#include ".\CustomMessages\custom_messages.es.iss"
+#include ".\CustomMessages\custom_messages.eu.iss"
+#include ".\CustomMessages\custom_messages.fr.iss"
+#include ".\CustomMessages\custom_messages.he.iss"
+#include ".\CustomMessages\custom_messages.hu.iss"
+#include ".\CustomMessages\custom_messages.hy.iss"
+#include ".\CustomMessages\custom_messages.it.iss"
+#include ".\CustomMessages\custom_messages.ja.iss"
+#include ".\CustomMessages\custom_messages.kr.iss"
+#include ".\CustomMessages\custom_messages.nl.iss"
+#include ".\CustomMessages\custom_messages.pl.iss"
+#include ".\CustomMessages\custom_messages.ro.iss"
+#include ".\CustomMessages\custom_messages.ru.iss"
+#include ".\CustomMessages\custom_messages.sc.iss"
+#include ".\CustomMessages\custom_messages.sk.iss"
+#include ".\CustomMessages\custom_messages.sv.iss"
+#include ".\CustomMessages\custom_messages.tc.iss"
+#include ".\CustomMessages\custom_messages.tr.iss"
+#include ".\CustomMessages\custom_messages.ua.iss"
+#endif
 
 [Messages]
 WelcomeLabel1=[name/ver]
