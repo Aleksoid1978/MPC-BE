@@ -26,7 +26,7 @@
 [Messages]
 ;Romanian
 ro.WelcomeLabel2=Se va instala [name] pe calculatorul tău.%n%nEste recomandat să închizi toate celelalte aplicaţii înainte de a continua.
-ro.WinVersionTooLowError=[name] necesită Windows 7 sau mai nou pentru a rula.
+ro.WinVersionTooLowError=[name] necesită Windows 7 sau ceva mai nou pentru a rula.
 
 
 [CustomMessages]
@@ -55,13 +55,13 @@ ro.AssociationFormatsAV=Se configurează asocierile cu fișierele video și audi
 ro.AssociationFormats=Asociază cu fișierele video și audio
 ro.AssociationVideo=Asociază cu fișierele video
 ro.AssociationAudio=Asociază cu fișierele audio
-ro.AssociationPlaylist=Asociază cu listele de redare (playlist-urile)
+ro.AssociationPlaylist=Asociază cu listele de redare (cu playlist-urile)
 ro.AutoPlayType=Redare automată:
 ro.AssociationMPCPlayCDAudioOnArrivalF=Redare a CD-urilor audio
 ro.AssociationMPCPlayCDAudioS=CD audio
 ro.AssociationMPCPlayDVDMovieArrivalF=Redare a filmelor de pe DVD
 ro.AssociationMPCPlayDVDMovieS=Film de pe DVD
-ro.AssociationMPCPlayMusicFilesF=redare a muzicii
+ro.AssociationMPCPlayMusicFilesF=Redare a muzicii
 ro.AssociationMPCPlayMusicFilesS=Fișiere de muzică
 ro.AssociationMPCPlayVideoFilesF=Redare video
 ro.AssociationMPCPlayVideoFilesS=Fișiere video
