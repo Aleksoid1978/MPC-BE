@@ -25,7 +25,7 @@
 
 [Messages]
 ;Romanian
-ro.WelcomeLabel2=Se va instala [name] pe calculatorul dumneavoastră.%n%nEste recomandat să închideţi toate celelalte aplicaţii înainte de a continua.
+ro.WelcomeLabel2=Se va instala [name] pe calculatorul tău.%n%nEste recomandat să închizi toate celelalte aplicaţii înainte de a continua.
 ro.WinVersionTooLowError=[name] necesită Windows 7 sau mai nou pentru a rula.
 
 
@@ -37,34 +37,34 @@ ro.langid=00001048
 ro.langcode=ro
 ro.comp_mpciconlib=Bibliotecă de pictograme
 ro.comp_mpcresources=Traduceri
-ro.comp_mpcbeshellext=Install the shell extension
-ro.comp_intel_msdk=H.264 MVC 3D Decoder
-ro.msg_DeleteSettings=Doriţi de asemenea să ştergeţi setările MPC-BE?%n%nDacă doriţi a reinstala MPC-BE, atunci nu este necesar să le ştergeţi.
-ro.msg_NoD3DX9DLL_found=The latest DirectX runtime is not installed!%n%nPlease download and install the latest DirectX runtime June 2010 regardless of your operating system.
+ro.comp_mpcbeshellext=Instalează extensia shell
+ro.comp_intel_msdk=Decodorul H.264 MVC 3D
+ro.msg_DeleteSettings=Dorești de asemenea, să ştergi setările MPC-BE?%n%nDacă dorești să reinstalezi MPC-BE, atunci nu este necesar să le ştergi.
+ro.msg_NoD3DX9DLL_found=Cel mai recent runtime DirectX nu este instalat!%n%nTe rugăm să descarci și să instalezi cel mai recent DirectX runtime din iunie 2010, indiferent de sistemul tău de operare.
 ro.msg_SetupIsRunningWarning=Instalatorul MPC-BE rulează deja!
-ro.msg_simd_sse2=Această versiune de MPC-BE necesită un procesor cu suport pentru extensii SSE2.%n%nProcesorul dumneavoastră nu are aceste capacităţi.
+ro.msg_simd_sse2=Această versiune de MPC-BE necesită un procesor cu suport pentru extensii SSE2.%n%nProcesorul tău nu are aceste capacităţi.
 ro.tsk_AllUsers=Pentru toţi utilizatorii
 ro.tsk_CurrentUser=Doar pentru utilizatorul curent
 ro.tsk_Other=Alte activităţi:
-ro.tsk_LongPathsEnable=Enable Windows 10 long paths support
+ro.tsk_LongPathsEnable=Activează suportul pentru căi lungi pentru Windows 10
 ro.tsk_ResetSettings=Resetează setările
 ro.types_DefaultInstallation=Instalare implicită
 ro.types_CustomInstallation=Instalare specială
 ro.ViewChangelog=Vezi jurnalul de modificări
-ro.AssociationFormatsAV=Configuring associations with video and audio files:
-ro.AssociationFormats=Association with video and audio files
-ro.AssociationVideo=Association with video files
-ro.AssociationAudio=Association with audio files
-ro.AssociationPlaylist=Association with playlists
-ro.AutoPlayType=Auto play:
-ro.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
-ro.AssociationMPCPlayCDAudioS=Audio CD
-ro.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
-ro.AssociationMPCPlayDVDMovieS=DVD Movie
-ro.AssociationMPCPlayMusicFilesF=Play Music
-ro.AssociationMPCPlayMusicFilesS=Music Files
-ro.AssociationMPCPlayVideoFilesF=Play Video
-ro.AssociationMPCPlayVideoFilesS=Video Files
-ro.PinToTaskBar=Pin to TaskBar
-ro.ComponentWillBeDownloaded=will be downloaded
-ro.ComponentAlreadyDownloaded=already downloaded
+ro.AssociationFormatsAV=Se configurează asocierile cu fișierele video și audio:
+ro.AssociationFormats=Asociază cu fișierele video și audio
+ro.AssociationVideo=Asociază cu fișierele video
+ro.AssociationAudio=Asociază cu fișierele audio
+ro.AssociationPlaylist=Asociază cu listele de redare (playlist-urile)
+ro.AutoPlayType=Redare automată:
+ro.AssociationMPCPlayCDAudioOnArrivalF=Redare a CD-urilor audio
+ro.AssociationMPCPlayCDAudioS=CD audio
+ro.AssociationMPCPlayDVDMovieArrivalF=Redare a filmelor de pe DVD
+ro.AssociationMPCPlayDVDMovieS=Film de pe DVD
+ro.AssociationMPCPlayMusicFilesF=redare a muzicii
+ro.AssociationMPCPlayMusicFilesS=Fișiere de muzică
+ro.AssociationMPCPlayVideoFilesF=Redare video
+ro.AssociationMPCPlayVideoFilesS=Fișiere video
+ro.PinToTaskBar=Fixează la bara de activități
+ro.ComponentWillBeDownloaded=va fi descărcat
+ro.ComponentAlreadyDownloaded=deja e descărcat
