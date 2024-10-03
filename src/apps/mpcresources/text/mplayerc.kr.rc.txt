@@ -458,7 +458,7 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
 33		"Int32"
 34		"Float"
 35		"오디오 시간 조절(밀리초) :"
-38		"Small stereo speakers"
+38		"소형 스테레오 스피커"
 39		"기본값"
 END
 
@@ -1352,7 +1352,7 @@ STRING IDS_BDA_ERROR_CONNECT_TUNER_REC		"튜너와 리시버에 연결할 수 �
 STRING IDS_BDA_ERROR_CREATE_RECEIVER		"리시버를 만들 수 없습니다."
 STRING IDS_BDA_ERROR_CREATE_TUNER		"튜너를 만들 수 없습니다."
 STRING IDS_BDA_ERROR_DEMULTIPLEXER		"디멀티플렉서를 만들 수 없습니다."
-STRING IDS_BLOCK_EXTERNAL_VR		"You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
+STRING IDS_BLOCK_EXTERNAL_VR		"%s을(를) 외부 필터로 추가할 수 없습니다.\n비디오 설정 페이지에서 원하는 비디오 렌더러를 선택해야 합니다."
 STRING IDS_BRIGHTNESS_DEC		"밝기 감소"
 STRING IDS_BRIGHTNESS_INC		"밝기 증가"
 STRING IDS_CANCEL		"취소"
