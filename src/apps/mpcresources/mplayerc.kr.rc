@@ -174,7 +174,7 @@ BEGIN
     CONTROL         "오디오 시간 조절(밀리초) :",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,240,115,9
     EDITTEXT        IDC_EDIT2,129,238,46,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,174,238,12,13
-    PUSHBUTTON      "Small stereo speakers",IDC_BUTTON2,188,210,103,14
+    PUSHBUTTON      "소형 스테레오 스피커",IDC_BUTTON2,188,210,103,14
     PUSHBUTTON      "기본값",IDC_BUTTON3,235,228,56,14
 END
 
@@ -3179,7 +3179,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_BLOCK_EXTERNAL_VR   "You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
+    IDS_BLOCK_EXTERNAL_VR   "%s을(를) 외부 필터로 추가할 수 없습니다.\n비디오 설정 페이지에서 원하는 비디오 렌더러를 선택해야 합니다."
     IDS_DESC_HAALI_VR       "VMR-9과 다름없지만, 고등 차수 보간을 사용합니다."
 END
 
