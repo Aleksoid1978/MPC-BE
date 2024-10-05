@@ -451,7 +451,7 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
 18		"음량 증폭"
 24		"FFmpeg 필터"
 25		"사전 설정"
-26		"Don't use for stereo and mono sources"
+26		"스테레오 및 모노 소스에 사용 금지"
 30		"출력 포본화 형식 :"
 31		"Int16"
 32		"Int24"
