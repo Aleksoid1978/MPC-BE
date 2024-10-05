@@ -35,7 +35,7 @@ Updated Hungarian translation (by mickey).
 Updated Korean translation (by Hackjjang).
 
 Updated libraries:
-	ffmpeg n7.1-dev-2746-g01c47dd235;
+	ffmpeg n7.2-dev-183-g2705c0bd81;
 	Little-CMS git-lcms2.16-66-g5c54a6d;
 	MediaInfo git-v24.06-31-gf24a17b41;
 	rapidjson v1.1.0-755-g815e6e7e;
