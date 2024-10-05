@@ -26,6 +26,7 @@ Various interface fixes.
 
 Installer
 Added setting "Enable Windows 10 long paths support". The setting will be displayed when installing on Windows 10 1607 or later with long paths disabled.
+Updated MPC Video Renderer 0.8.7.
 
 Updated German translation (by Klaus1189).
 Updated Italian translation (by mapi68).
