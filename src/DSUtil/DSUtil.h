@@ -122,7 +122,7 @@ extern void				UnloadExternalObjects();
 
 extern CStringW			MakeFullPath(LPCWSTR path);
 // simple file system path detector
-extern bool				IsLikelyFilePath(const CString &str);
+extern bool				IsLikelyFilePath(const CStringW &str);
 
 extern GUID				GUIDFromCString(CString str);
 extern HRESULT			GUIDFromCString(CString str, GUID& guid);

@@ -1569,19 +1569,25 @@ CStringW MakeFullPath(LPCWSTR path)
 }
 
 
-bool IsLikelyFilePath(const CString& str) // simple file system path detector
+bool IsLikelyFilePath(const CStringW& str) // simple file system path detector
 {
+	auto IsLatin = [](wchar_t ch) { return (ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z'); };
+
 	if (str.GetLength() >= 4) {
-		// local file path
-		if (str[1] == ':' && str[2] == '\\' &&
-				(str[0] >= 'A' && str[0] <= 'Z' || str[0] >= 'a' && str[0] <= 'z')) {
+		// local file path 'x:\'
+		if (str[1] == ':' && str[2] == '\\' && IsLatin(str[0])) {
 			return true;
 		}
 
-		// net file path
-		if (str.GetLength() >= 7 && str[0] == '\\' && str[1] == '\\' &&
-				(str[2] == '-' || str[2] >= '0' && str[2] <= '9' ||  str[2] >= 'A' && str[2] <= 'Z' || str[2] >= 'a' && str[2] <= 'z')) {
-			return true;
+		if (str.GetLength() >= 7 && str[0] == '\\' && str[1] == '\\') {
+			// net file path '\\servername'
+			if (IsLatin(str[2]) || str[2] == '-' || str[2] >= '0' && str[2] <= '9') {
+				return true;
+			}
+			// local file path with prefix '\\?\x:\'
+			if (str[2] == '?' && str[3] == '\\' && str[5] == ':' && str[6] == '\\' && IsLatin(str[4])) {
+				return true;
+			}
 		}
 	}
 
