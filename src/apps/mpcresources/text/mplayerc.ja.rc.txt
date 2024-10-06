@@ -451,14 +451,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
 18		"音声のブースト"
 24		"FFmpeg フィルター"
 25		"プリセット"
-26		"Don't use for stereo and mono sources"
+26		"ステレオとモノラルの音源には使用しない"
 30		"出力サンプル形式:"
 31		"Int16"
 32		"Int24"
 33		"Int32"
 34		"Float"
 35		"音声のタイム シフト (ミリ秒):"
-38		"Small stereo speakers"
+38		"小型ステレオ スピーカー"
 39		"既定"
 END
 

@@ -34,6 +34,7 @@ Updated Chinese (Simplified) translation (by wushantao).
 Updated Turkish translation (by cmhrky).
 Updated Hungarian translation (by mickey).
 Updated Korean translation (by Hackjjang).
+Updated Japanese translation (by tsubasanouta).
 
 Updated libraries:
 	ffmpeg n7.2-dev-183-g2705c0bd81;
