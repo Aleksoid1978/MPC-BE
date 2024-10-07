@@ -32,6 +32,8 @@ HRESULT LoadResourceFile(UINT resid, BYTE** ppData, UINT& size);
 
 CStringW GetDragQueryFileName(HDROP hDrop, UINT iFile);
 
+void ConvertLongPath(CStringW& path);
+
 WORD AssignedKeyToCmd(UINT keyValue);
 
 enum :UINT {

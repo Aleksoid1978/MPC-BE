@@ -1365,6 +1365,9 @@ void CPlayerPlaylistBar::ResolveLinkFiles(std::list<CString> &fns)
 				}
 			}
 		}
+		else {
+			ConvertLongPath(fn);
+		}
 	}
 }
 
