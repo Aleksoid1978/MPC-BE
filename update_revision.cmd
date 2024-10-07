@@ -66,7 +66,7 @@ ECHO #define REV_BRANCH "%GIT_REV_BRANCH%" >> revision.h
 ECHO #define REV_HASH "%GIT_REV_HASH%" >> revision.h
 ECHO #define REV_NUM %GIT_REV_COUNT% >> revision.h
 
-IF EXIST %dstfile% DEL /Q %DstManifest%
+IF EXIST %DstManifest% DEL /Q %DstManifest%
 powershell -Command "(gc %SrcManifest%) -replace '_REV_NUM_', '%GIT_REV_COUNT%' | Out-File -encoding UTF8 %DstManifest%"
 
 ECHO The revision number is %GIT_REV_COUNT%.
