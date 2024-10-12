@@ -33,6 +33,7 @@
 // PathFileExistsW
 // PathFindExtensionW
 // PathIsDirectoryW
+// PathIsRelativeW
 // PathIsRootW
 // PathRemoveBackslashW
 // PathRemoveFileSpecW
@@ -133,10 +134,15 @@ CStringW GetRenameFileExt(LPCWSTR Path, LPCWSTR newExt)
 void CombineFilePath(CStringW& path, LPCWSTR file)
 {
 	if (file) {
-		if (file[0] != L'\\' && path.GetLength() && path.GetString()[path.GetLength() - 1] != L'\\') {
-			path.AppendChar(L'\\');
+		if (PathIsRelativeW(file)) {
+			if (file[0] != L'\\' && path.GetLength() && path.GetString()[path.GetLength() - 1] != L'\\') {
+				path.AppendChar(L'\\');
+			}
+			path.Append(file);
 		}
-		path.Append(file);
+		else {
+			path.SetString(file);
+		}
 	}
 	path = GetFullCannonFilePath(path);
 }

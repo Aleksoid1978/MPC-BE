@@ -2,6 +2,9 @@
 
 1.8.0.x dev
 =============================
+Player
+Fixed loading of external audio tracks and subtitles by absolute path.
+
 Updated libraries:
 	ffmpeg n7.2-dev-301-g5557c673ea.
 
