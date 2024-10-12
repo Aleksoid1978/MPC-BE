@@ -470,7 +470,7 @@ static int decode_vps_ext(GetBitContext *gb, AVCodecContext *avctx, HEVCVPS *vps
     PTL ptl_dummy;
     uint8_t max_sub_layers[HEVC_MAX_LAYERS];
 
-    int splitting_flag, dimension_id_len, view_id_len, num_add_olss,
+    int splitting_flag, dimension_id_len, view_id_len, num_add_olss, num_scalability_types,
         default_output_layer_idc, direct_dep_type_len, direct_dep_type,
         sub_layers_max_present, sub_layer_flag_info_present_flag, nb_ptl;
     unsigned non_vui_extension_length;
@@ -532,13 +532,17 @@ static int decode_vps_ext(GetBitContext *gb, AVCodecContext *avctx, HEVCVPS *vps
         return AVERROR_INVALIDDATA;
 
     splitting_flag = get_bits1(gb);
+    num_scalability_types = 0;
     for (int i = 0; i <= HEVC_SCALABILITY_MASK_MAX; i++) {
         int scalability_mask_flag = get_bits1(gb);
-        if (scalability_mask_flag != (i == HEVC_SCALABILITY_MULTIVIEW)) {
+        if (scalability_mask_flag && (i != HEVC_SCALABILITY_MULTIVIEW)) {
             av_log(avctx, AV_LOG_ERROR, "Scalability type %d not supported\n", i);
             return AVERROR_PATCHWELCOME;
         }
+        num_scalability_types += scalability_mask_flag;
     }
+    if (num_scalability_types != 1)
+        return AVERROR_INVALIDDATA;
 
     if (!splitting_flag)
         dimension_id_len = get_bits(gb, 3) + 1;
@@ -1154,6 +1158,7 @@ int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
     HEVCWindow *ow;
     int ret = 0;
     int bit_depth_chroma, num_comps, multi_layer_ext;
+    int vps_max_sub_layers;
     int i;
 
     // Coded parameters
@@ -1178,7 +1183,10 @@ int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
 
         sps->max_sub_layers = sps->vps->vps_max_sub_layers;
     }
-    if (sps->max_sub_layers > HEVC_MAX_SUB_LAYERS) {
+    vps_max_sub_layers = sps->vps ? sps->vps->vps_max_sub_layers
+                                  : FFMIN(sps->max_sub_layers, HEVC_MAX_SUB_LAYERS);
+
+    if (sps->max_sub_layers > vps_max_sub_layers) {
         av_log(avctx, AV_LOG_ERROR, "sps_max_sub_layers out of range: %d\n",
                sps->max_sub_layers);
         return AVERROR_INVALIDDATA;
@@ -1202,6 +1210,12 @@ int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
 
     if (multi_layer_ext) {
         const RepFormat *rf = &sps->vps->rep_format;
+
+        if (sps->vps->nb_layers == 1) {
+            av_log(avctx, AV_LOG_WARNING, "SPS %d references an unsupported VPS extension. Ignoring\n",
+                   *sps_id);
+            return AVERROR(ENOSYS);
+        }
 
         if (get_bits1(gb) &&    // update_rep_format_flag
             get_bits(gb, 8)) {  // sps_rep_format_idx

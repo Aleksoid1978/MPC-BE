@@ -1517,10 +1517,8 @@ FFT_SPLIT_RADIX_FN avx, 0
 FFT_SPLIT_RADIX_FN avx, 1
 FFT_SPLIT_RADIX_FN fma3, 0
 FFT_SPLIT_RADIX_FN fma3, 1
-%if HAVE_AVX2_EXTERNAL
 FFT_SPLIT_RADIX_FN avx2, 0
 FFT_SPLIT_RADIX_FN avx2, 1
-%endif
 %endif
 
 %macro FFT15_FN 2
@@ -1581,7 +1579,7 @@ cglobal fft15_ %+ %2, 4, 10, 16, ctx, out, in, stride, len, lut, tmp, tgt5, stri
     RET
 %endmacro
 
-%if ARCH_X86_64 && HAVE_AVX2_EXTERNAL
+%if ARCH_X86_64
 FFT15_FN 0, float
 FFT15_FN 1, ns_float
 %endif
@@ -1636,8 +1634,8 @@ cglobal mdct_inv_float, 4, 14, 16, 320, ctx, out, in, stride, len, lut, exp, t1,
     mulps m10, m2                    ; 1 reim * imim
     mulps m11, m3                    ; 2 reim * imim
 
-    shufps m10, m10, m10, q2301
-    shufps m11, m11, m11, q2301
+    shufps m10, m10, q2301
+    shufps m11, m11, q2301
 
     fmaddsubps m10, m12, m2, m10
     fmaddsubps m11, m13, m3, m11
@@ -1769,7 +1767,7 @@ cglobal mdct_inv_float, 4, 14, 16, 320, ctx, out, in, stride, len, lut, exp, t1,
     RET
 %endmacro
 
-%if ARCH_X86_64 && HAVE_AVX2_EXTERNAL
+%if ARCH_X86_64
 IMDCT_FN avx2
 %endif
 
@@ -1796,7 +1794,7 @@ cglobal fft_pfa_15xM_float, 4, 14, 16, 320, ctx, out, in, stride, len, lut, buf,
     mov btmpq, outq
 
     mov outq, [ctxq + AVTXContext.tmp]
-%if %2 == 0
+%if !%2
     movsxd lenq, dword [ctxq + AVTXContext.len]
     mov lutq, [ctxq + AVTXContext.map]
 %endif
@@ -1934,7 +1932,7 @@ cglobal fft_pfa_15xM_ns_float, 4, 14, 16, 320, ctx, out, in, stride, len, lut, b
 %endif
 %endmacro
 
-%if ARCH_X86_64 && HAVE_AVX2_EXTERNAL
+%if ARCH_X86_64
 PFA_15_FN avx2, 0
 PFA_15_FN avx2, 1
 %endif

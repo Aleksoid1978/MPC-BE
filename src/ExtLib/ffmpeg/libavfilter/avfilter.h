@@ -498,12 +498,32 @@ struct AVFilterContext {
      */
     int nb_threads;
 
+#if FF_API_CONTEXT_PUBLIC
+    /**
+     * @deprecated unused
+     */
+    attribute_deprecated
     struct AVFilterCommand *command_queue;
+#endif
 
     char *enable_str;               ///< enable expression string
-    void *enable;                   ///< parsed expression (AVExpr*)
-    double *var_values;             ///< variable values for the enable expression
-    int is_disabled;                ///< the enabled state from the last expression evaluation
+#if FF_API_CONTEXT_PUBLIC
+    /**
+     * @deprecated unused
+     */
+    attribute_deprecated
+    void *enable;
+    /**
+     * @deprecated unused
+     */
+    double *var_values;
+#endif
+    /**
+     * MUST NOT be accessed from outside avfilter.
+     *
+     * the enabled state from the last expression evaluation
+     */
+    int is_disabled;
 
     /**
      * For filters which will create hardware frames, sets the device the
@@ -518,12 +538,13 @@ struct AVFilterContext {
      */
     AVBufferRef *hw_device_ctx;
 
+#if FF_API_CONTEXT_PUBLIC
     /**
-     * Ready status of the filter.
-     * A non-0 value means that the filter needs activating;
-     * a higher value suggests a more urgent activation.
+     * @deprecated this field should never have been accessed by callers
      */
+    attribute_deprecated
     unsigned ready;
+#endif
 
     /**
      * Sets the number of extra hardware frames which the filter will

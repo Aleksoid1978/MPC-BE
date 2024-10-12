@@ -1348,8 +1348,9 @@ int avfilter_graph_queue_command(AVFilterGraph *graph, const char *target, const
 
     for (i = 0; i < graph->nb_filters; i++) {
         AVFilterContext *filter = graph->filters[i];
+        FFFilterContext *ctxi   = fffilterctx(filter);
         if(filter && (!strcmp(target, "all") || !strcmp(target, filter->name) || !strcmp(target, filter->filter->name))){
-            AVFilterCommand **queue = &filter->command_queue, *next;
+            AVFilterCommand **queue = &ctxi->command_queue, *next;
             while (*queue && (*queue)->time <= ts)
                 queue = &(*queue)->next;
             next = *queue;
@@ -1470,15 +1471,19 @@ int avfilter_graph_request_oldest(AVFilterGraph *graph)
 
 int ff_filter_graph_run_once(AVFilterGraph *graph)
 {
-    AVFilterContext *filter;
+    FFFilterContext *ctxi;
     unsigned i;
 
     av_assert0(graph->nb_filters);
-    filter = graph->filters[0];
-    for (i = 1; i < graph->nb_filters; i++)
-        if (graph->filters[i]->ready > filter->ready)
-            filter = graph->filters[i];
-    if (!filter->ready)
+    ctxi = fffilterctx(graph->filters[0]);
+    for (i = 1; i < graph->nb_filters; i++) {
+        FFFilterContext *ctxi_other = fffilterctx(graph->filters[i]);
+
+        if (ctxi_other->ready > ctxi->ready)
+            ctxi = ctxi_other;
+    }
+
+    if (!ctxi->ready)
         return AVERROR(EAGAIN);
-    return ff_filter_activate(filter);
+    return ff_filter_activate(&ctxi->p);
 }
