@@ -451,14 +451,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
 18		"音訊增強"
 24		"FFmpeg 濾波器"
 25		"預設集"
-26		"Don't use for stereo and mono sources"
+26		"來源是 2.0 立體聲或單聲道時停用"
 30		"輸出取樣格式："
 31		"Int16"
 32		"Int24"
 33		"Int32"
 34		"浮點"
 35		"平移音訊時間 (ms)："
-38		"Small stereo speakers"
+38		"小型立體聲喇叭"
 39		"預設值"
 END
 

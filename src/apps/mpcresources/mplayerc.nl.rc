@@ -162,7 +162,7 @@ BEGIN
     GROUPBOX        "",IDC_STATIC,5,154,285,49
     CONTROL         "FFmpeg-filters",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,153,61,10
     PUSHBUTTON      "Profielen",IDC_BUTTON1,9,166,59,14
-    CONTROL         "Don't use for stereo and mono sources",IDC_CHECK2,
+    CONTROL         "Gebruik niet voor stereo- en monobronnen",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,76,166,180,10
     COMBOBOX        IDC_COMBO1,10,184,58,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_EDIT1,72,184,214,14,ES_AUTOHSCROLL
@@ -174,7 +174,7 @@ BEGIN
     CONTROL         "Audio-tijdsverschuiving (ms):",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,240,115,9
     EDITTEXT        IDC_EDIT2,129,238,46,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,174,238,12,13
-    PUSHBUTTON      "Small stereo speakers",IDC_BUTTON2,188,210,103,14
+    PUSHBUTTON      "Kleine stereoluidsprekers",IDC_BUTTON2,188,210,103,14
     PUSHBUTTON      "Standaard",IDC_BUTTON3,235,228,56,14
 END
 

@@ -451,14 +451,14 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
 18		"Audio boosten"
 24		"FFmpeg-filters"
 25		"Profielen"
-26		"Don't use for stereo and mono sources"
+26		"Gebruik niet voor stereo- en monobronnen"
 30		"Audio-uitvoerformaat:"
 31		"Int16"
 32		"Int24"
 33		"Int32"
 34		"Float"
 35		"Audio-tijdsverschuiving (ms):"
-38		"Small stereo speakers"
+38		"Kleine stereoluidsprekers"
 39		"Standaard"
 END
 

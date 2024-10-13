@@ -5,6 +5,8 @@
 Player
 Fixed loading of external audio tracks and subtitles by absolute path.
 
+Updated Dutch and Chinese (Traditional) translation (by beter).
+
 Updated libraries:
 	ffmpeg n7.2-dev-301-g5557c673ea.
 
