@@ -25,7 +25,7 @@
 
 [Messages]
 ;Japanese
-ja.WelcomeLabel2=このプログラムはお使いのコンピューターに [name] をインストールします。%n%nセットアップを続行する前に他のすべてのアプリケーションを閉じることをお勧めします。
+ja.WelcomeLabel2=このプログラムはお使いのコンピューターに [name] をインストールします。%n%n続行する前に他のすべてのアプリケーションを閉じることをお勧めします。
 ja.WinVersionTooLowError=[name] を実行するには Windows 7 以降が必要です。
 
 
@@ -39,19 +39,19 @@ ja.comp_mpciconlib=アイコン ライブラリー
 ja.comp_mpcresources=翻訳
 ja.comp_mpcbeshellext=シェル拡張のインストール
 ja.comp_intel_msdk=H.264 MVC 3D デコーダー
-ja.msg_DeleteSettings=MPC-BE の設定を削除しますか?%n%nMPC-BE を再度インストールする場合は、設定を削除する必要はありません。
-ja.msg_NoD3DX9DLL_found=最新の DirectX ランタイムはインストールされていません!%n%nオペレーティング システムに関係なく最新の DirectX ランタイム June 2010 をダウンロードしてインストールしてください。
-ja.msg_SetupIsRunningWarning=MPC-BE のインストーラーは既に実行されています!
-ja.msg_simd_sse2=このバージョンの MPC-BE には CPU の SSE2 サポートが必要です。%n%nお使いの CPU はこの条件を満たしていません。
-ja.tsk_AllUsers=すべてのユーザーにインストールする
-ja.tsk_CurrentUser=現在実行中のユーザーにのみインストールする
+ja.msg_DeleteSettings=MPC-BE の設定も削除しますか?%n%nMPC-BE を再度インストールする場合は、設定を削除する必要はありません。
+ja.msg_NoD3DX9DLL_found=最新の DirectX ランタイムがインストールされていません!%n%nオペレーティング システムに関係なく最新の DirectX ランタイム June 2010 をダウンロードしてインストールしてください。
+ja.msg_SetupIsRunningWarning=MPC-BE のセットアップは既に実行されています!
+ja.msg_simd_sse2=このバージョンの MPC-BE には CPU の SSE2 拡張サポートが必要です。%n%nお使いの CPU はこの機能がありません。
+ja.tsk_AllUsers=すべてのユーザー向け
+ja.tsk_CurrentUser=現在実行中のユーザーにのみ
 ja.tsk_Other=他のタスク:
-ja.tsk_LongPathsEnable=Enable Windows 10 long paths support
+ja.tsk_LongPathsEnable=Windows 10 のロング パス サポートを有効にする
 ja.tsk_ResetSettings=設定を初期化する
 ja.types_DefaultInstallation=既定のインストール
 ja.types_CustomInstallation=カスタム インストール
 ja.ViewChangelog=変更履歴を表示する
-ja.AssociationFormatsAV=動画ファイルと音声ファイルとの関連付けを構成する:
+ja.AssociationFormatsAV=動画ファイルと音声ファイルとの関連付けの設定:
 ja.AssociationFormats=動画ファイルと音声ファイルに関連付け
 ja.AssociationVideo=動画ファイルに関連付け
 ja.AssociationAudio=音声ファイルに関連付け
@@ -66,5 +66,5 @@ ja.AssociationMPCPlayMusicFilesS=音楽ファイル
 ja.AssociationMPCPlayVideoFilesF=動画の再生
 ja.AssociationMPCPlayVideoFilesS=動画ファイル
 ja.PinToTaskBar=タスクバーにピン留めする
-ja.ComponentWillBeDownloaded=ダウンロードされます
-ja.ComponentAlreadyDownloaded=既にダウンロード済み
+ja.ComponentWillBeDownloaded=がダウンロードされます
+ja.ComponentAlreadyDownloaded=は既にダウンロード済みです
