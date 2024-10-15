@@ -2030,7 +2030,7 @@ void CPlayerPlaylistBar::Remove(const std::vector<int>& items, const bool bDelet
 			POSITION pos = FindPos(items[i]);
 
 			if (bDelete) {
-				const auto item = curPlayList.GetAt(pos);
+				const auto& item = curPlayList.GetAt(pos);
 				if (item.m_fi.Valid()) {
 					CStringW ext = item.m_fi.GetExt().MakeLower();
 					if (ext != L".ifo" && ext != L".bdmv" && ext != L".mpls") {
