@@ -1677,9 +1677,6 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 				}
 #else
 				m_bUseFFmpeg = IsFFMPEGEnabled(ffCodecs[i], m_VideoFilters);
-				if (m_bUseFFmpeg) {
-
-				}
 #endif
 			}
 
