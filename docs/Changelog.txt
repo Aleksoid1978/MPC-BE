@@ -2,6 +2,12 @@
 
 1.8.0.x dev
 =============================
+FLVSplitter
+Fixed rare player crash on FLV files with MP3 audio track.
+
+MPCVideoDec
+Fixed the operation of the video converter.
+
 Player
 Fixed loading of external audio tracks and subtitles by absolute path.
 
@@ -22,7 +28,7 @@ AudioSwitcher
 Added the ability to connect to "AVI/WAV File Source" when it gives an incorrect media subtype for audio with parameters written in WAVEFORMATEXTENSIBLE. This solves the problem with sound in AviSynth+ and VapourSynth scripts.
 Added "Don't use for stereo and mono sources" setting for FFmpeg audio filters.
 
-MPPVideoDec
+MPCVideoDec
 Improved hardware decoding compatibility check.
 Fixed crash when changing resolution in video stream.
 
