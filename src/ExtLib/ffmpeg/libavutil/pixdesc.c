@@ -2630,6 +2630,31 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
             { 0, 4, 0, 0, 8 },        /* V */
         },
     },
+    [AV_PIX_FMT_RGBF16BE] = {
+        .name = "rgbf16be",
+        .nb_components = 3,
+        .log2_chroma_w = 0,
+        .log2_chroma_h = 0,
+        .comp = {
+            { 0, 6, 0, 0, 16 },       /* R */
+            { 0, 6, 2, 0, 16 },       /* G */
+            { 0, 6, 4, 0, 16 },       /* B */
+        },
+        .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_RGB |
+                 AV_PIX_FMT_FLAG_FLOAT,
+    },
+    [AV_PIX_FMT_RGBF16LE] = {
+        .name = "rgbf16le",
+        .nb_components = 3,
+        .log2_chroma_w = 0,
+        .log2_chroma_h = 0,
+        .comp = {
+            { 0, 6, 0, 0, 16 },       /* R */
+            { 0, 6, 2, 0, 16 },       /* G */
+            { 0, 6, 4, 0, 16 },       /* B */
+        },
+        .flags = AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_FLOAT
+    },
     [AV_PIX_FMT_RGBAF16BE] = {
         .name = "rgbaf16be",
         .nb_components = 4,
@@ -2775,6 +2800,30 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         },
         .flags = AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_FLOAT,
     },
+    [AV_PIX_FMT_RGB96BE] = {
+        .name = "rgb96be",
+        .nb_components = 3,
+        .log2_chroma_w = 0,
+        .log2_chroma_h = 0,
+        .comp = {
+            { 0, 12, 0, 0, 32 },       /* R */
+            { 0, 12, 4, 0, 32 },       /* G */
+            { 0, 12, 8, 0, 32 },       /* B */
+        },
+        .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_RGB,
+    },
+    [AV_PIX_FMT_RGB96LE] = {
+        .name = "rgb96le",
+        .nb_components = 3,
+        .log2_chroma_w = 0,
+        .log2_chroma_h = 0,
+        .comp = {
+            { 0, 12, 0, 0, 32 },       /* R */
+            { 0, 12, 4, 0, 32 },       /* G */
+            { 0, 12, 8, 0, 32 },       /* B */
+        },
+        .flags = AV_PIX_FMT_FLAG_RGB,
+    },
     [AV_PIX_FMT_RGBAF32BE] = {
         .name = "rgbaf32be",
         .nb_components = 4,
@@ -2802,6 +2851,33 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         },
         .flags = AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_FLOAT |
                  AV_PIX_FMT_FLAG_ALPHA,
+    },
+    [AV_PIX_FMT_RGBA128BE] = {
+        .name = "rgba128be",
+        .nb_components = 4,
+        .log2_chroma_w = 0,
+        .log2_chroma_h = 0,
+        .comp = {
+            { 0, 16,  0, 0, 32 },      /* R */
+            { 0, 16,  4, 0, 32 },      /* G */
+            { 0, 16,  8, 0, 32 },      /* B */
+            { 0, 16, 12, 0, 32 },      /* A */
+        },
+        .flags = AV_PIX_FMT_FLAG_BE | AV_PIX_FMT_FLAG_RGB |
+                 AV_PIX_FMT_FLAG_ALPHA,
+    },
+    [AV_PIX_FMT_RGBA128LE] = {
+        .name = "rgba128le",
+        .nb_components = 4,
+        .log2_chroma_w = 0,
+        .log2_chroma_h = 0,
+        .comp = {
+            { 0, 16,  0, 0, 32 },      /* R */
+            { 0, 16,  4, 0, 32 },      /* G */
+            { 0, 16,  8, 0, 32 },      /* B */
+            { 0, 16, 12, 0, 32 },      /* A */
+        },
+        .flags = AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_ALPHA,
     },
     [AV_PIX_FMT_P212BE] = {
         .name = "p212be",

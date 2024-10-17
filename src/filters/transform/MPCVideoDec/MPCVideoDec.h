@@ -78,7 +78,7 @@ private:
 	bool									m_fPixFmts[PixFmt_count];
 	int										m_nSwRGBLevels = 0;
 	//
-	bool									m_VideoFilters[VDEC_COUNT] = { true, false, false, };
+	bool									m_VideoFilters[VDEC_COUNT] = {};
 
 	bool									m_bEnableHwDecoding  = true; // internal (not saved)
 	bool									m_bDXVACompatible = true;

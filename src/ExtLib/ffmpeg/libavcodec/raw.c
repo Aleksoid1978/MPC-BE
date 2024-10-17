@@ -73,6 +73,7 @@ static const PixelFormatTag raw_pix_fmt_tags[] = {
     { AV_PIX_FMT_NV12,    MKTAG('N', 'V', '1', '2') },
     { AV_PIX_FMT_NV21,    MKTAG('N', 'V', '2', '1') },
     { AV_PIX_FMT_VUYA,    MKTAG('A', 'Y', 'U', 'V') }, /* MS 4:4:4:4 */
+    { AV_PIX_FMT_XV30LE,  MKTAG('Y', '4', '1', '0') },
 
     /* nut */
     { AV_PIX_FMT_RGB555LE, MKTAG('R', 'G', 'B', 15) },
@@ -237,6 +238,10 @@ static const PixelFormatTag raw_pix_fmt_tags[] = {
     { AV_PIX_FMT_YUYV422, MKTAG('y', 'u', 'v', '2') },
     { AV_PIX_FMT_YUYV422, MKTAG('y', 'u', 'v', 's') },
     { AV_PIX_FMT_YUYV422, MKTAG('D', 'V', 'O', 'O') }, /* Digital Voodoo SD 8 Bit */
+    { AV_PIX_FMT_VYU444,  MKTAG('v', '3', '0', '8') },
+    { AV_PIX_FMT_UYVA,    MKTAG('v', '4', '0', '8') },
+    { AV_PIX_FMT_V30XLE,  MKTAG('v', '4', '1', '0') },
+    { AV_PIX_FMT_AYUV,    MKTAG('y', '4', '0', '8') },
     { AV_PIX_FMT_RGB555LE,MKTAG('L', '5', '5', '5') },
     { AV_PIX_FMT_RGB565LE,MKTAG('L', '5', '6', '5') },
     { AV_PIX_FMT_RGB565BE,MKTAG('B', '5', '6', '5') },

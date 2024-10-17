@@ -38,7 +38,7 @@ typedef enum VVCModeType {
     MODE_TYPE_INTRA,
 } VVCModeType;
 
-static void set_tb_pos(const VVCFrameContext *fc, const TransformBlock *tb)
+static void set_tb_size(const VVCFrameContext *fc, const TransformBlock *tb)
 {
     const int x_tb      = tb->x0 >> MIN_TU_LOG2;
     const int y_tb      = tb->y0 >> MIN_TU_LOG2;
@@ -50,10 +50,6 @@ static void set_tb_pos(const VVCFrameContext *fc, const TransformBlock *tb)
 
     for (int y = y_tb; y < end; y++) {
         const int off = y * fc->ps.pps->min_tu_width + x_tb;
-        for (int i = 0; i < width; i++) {
-            fc->tab.tb_pos_x0[is_chroma][off + i] = tb->x0;
-            fc->tab.tb_pos_y0[is_chroma][off + i] = tb->y0;
-        }
         memset(fc->tab.tb_width [is_chroma] + off, tb->tb_width,  width);
         memset(fc->tab.tb_height[is_chroma] + off, tb->tb_height, width);
     }
@@ -241,6 +237,7 @@ static TransformUnit* add_tu(VVCFrameContext *fc, CodingUnit *cu, const int x0, 
     tu->height = tu_height;
     tu->joint_cbcr_residual_flag = 0;
     memset(tu->coded_flag, 0, sizeof(tu->coded_flag));
+    tu->avail[LUMA] = tu->avail[CHROMA] = 0;
     tu->nb_tbs = 0;
 
     return tu;
@@ -267,6 +264,7 @@ static TransformBlock* add_tb(TransformUnit *tu, VVCLocalContext *lc,
     tb->ts = 0;
     tb->coeffs = lc->coeffs;
     lc->coeffs += tb_width * tb_height;
+    tu->avail[!!c_idx] = true;
     return tb;
 }
 
@@ -395,7 +393,7 @@ static int hls_transform_unit(VVCLocalContext *lc, int x0, int y0,int tu_width, 
             set_tb_tab(fc->tab.tu_coded_flag[tb->c_idx], tu->coded_flag[tb->c_idx], fc, tb);
         }
         if (tb->c_idx != CR)
-            set_tb_pos(fc, tb);
+            set_tb_size(fc, tb);
         if (tb->c_idx == CB)
             set_tb_tab(fc->tab.tu_joint_cbcr_residual_flag, tu->joint_cbcr_residual_flag, fc, tb);
     }
@@ -512,7 +510,7 @@ static int skipped_transform_tree(VVCLocalContext *lc, int x0, int y0,int tu_wid
         for (int i = c_start; i < c_end; i++) {
             TransformBlock *tb = add_tb(tu, lc, x0, y0, tu_width >> sps->hshift[i], tu_height >> sps->vshift[i], i);
             if (i != CR)
-                set_tb_pos(fc, tb);
+                set_tb_size(fc, tb);
         }
     }
 
@@ -1240,16 +1238,18 @@ static void set_cu_tabs(const VVCLocalContext *lc, const CodingUnit *cu)
 
     set_cb_tab(lc, fc->tab.mmi, pu->mi.motion_model_idc);
     set_cb_tab(lc, fc->tab.msf, pu->merge_subblock_flag);
-    if (cu->tree_type != DUAL_TREE_CHROMA)
+    if (cu->tree_type != DUAL_TREE_CHROMA) {
         set_cb_tab(lc, fc->tab.skip, cu->skip_flag);
+        set_cb_tab(lc, fc->tab.pcmf[LUMA], cu->bdpcm_flag[LUMA]);
+    }
+    if (cu->tree_type != DUAL_TREE_LUMA)
+        set_cb_tab(lc, fc->tab.pcmf[CHROMA], cu->bdpcm_flag[CHROMA]);
 
     while (tu) {
           for (int j = 0; j < tu->nb_tbs; j++) {
             const TransformBlock *tb = tu->tbs + j;
             if (tb->c_idx != LUMA)
                 set_qp_c_tab(lc, tu, tb);
-            if (tb->c_idx != CR && cu->bdpcm_flag[tb->c_idx])
-                set_tb_tab(fc->tab.pcmf[tb->c_idx], 1, fc, tb);
         }
         tu = tu->next;
     }
