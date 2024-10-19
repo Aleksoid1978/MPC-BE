@@ -374,10 +374,10 @@ DEFINE_MEDIATYPE_GUID(MEDIASUBTYPE_ADX_ADPCM, FCC('Sadx'));
 // {D2855FA9-61A7-4db0-B979-71F297C17A04}
 DEFINE_GUID(MEDIASUBTYPE_Ogg, 0xd2855fa9, 0x61a7, 0x4db0, 0xb9, 0x79, 0x71, 0xf2, 0x97, 0xc1, 0x7a, 0x04);
 
-// {cddca2d5-6d75-4f98-840e-737bedd5c63b}
+// {cddca2d5-6d75-4f98-840e-737bedd5c63b} deprecated, use MEDIASUBTYPE_Vorbis2
 DEFINE_GUID(MEDIASUBTYPE_Vorbis, 0xcddca2d5, 0x6d75, 0x4f98, 0x84, 0x0e, 0x73, 0x7b, 0xed, 0xd5, 0xc6, 0x3b);
 
-// {6bddfa7e-9f22-46a9-ab5e-884eff294d9f}
+// {6bddfa7e-9f22-46a9-ab5e-884eff294d9f} deprecated, use FORMAT_VorbisFormat2
 DEFINE_GUID(FORMAT_VorbisFormat, 0x6bddfa7e, 0x9f22, 0x46a9, 0xab, 0x5e, 0x88, 0x4e, 0xff, 0x29, 0x4d, 0x9f);
 
 // {8D2FD10B-5841-4a6b-8905-588FEC1ADED9}

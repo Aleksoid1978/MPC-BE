@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -64,7 +64,6 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 
 	void SetupChapters(LPCSTR lng, ChapterAtom* parent, int level = 0);
 	void InstallFonts();
-	void SendVorbisHeaderSample();
 
 	std::unique_ptr<CMatroskaNode> m_pSegment;
 	std::unique_ptr<CMatroskaNode> m_pCluster;
