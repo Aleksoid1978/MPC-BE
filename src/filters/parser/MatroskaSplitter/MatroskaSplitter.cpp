@@ -1924,6 +1924,58 @@ void CMatroskaSplitterFilter::InstallFonts()
 	}
 }
 
+void CMatroskaSplitterFilter::SendVorbisHeaderSample()
+{
+	HRESULT hr;
+	for (const auto& item : m_pTrackEntryMap) {
+		DWORD TrackNumber = item.first;
+		TrackEntry* pTE   = item.second;
+
+		CBaseSplitterOutputPin* pPin = GetOutputPin(TrackNumber);
+
+		if (!(pTE && pPin && pPin->IsConnected())) {
+			continue;
+		}
+
+		if (pTE->CodecID.ToString() == "A_VORBIS" && pPin->CurrentMediaType().subtype == MEDIASUBTYPE_Vorbis
+				&& pTE->CodecPrivate.size() > 0) {
+			BYTE* ptr = pTE->CodecPrivate.data();
+
+			std::vector<int> sizes;
+			long last = 0;
+			for (BYTE n = *ptr++; n > 0; n--) {
+				int size = 0;
+				do {
+					size += *ptr;
+				} while (*ptr++ == 0xff);
+				sizes.push_back(size);
+				last += size;
+			}
+			sizes.push_back(pTE->CodecPrivate.size() - (ptr - pTE->CodecPrivate.data()) - last);
+
+			hr = S_OK;
+
+			for (const auto& len : sizes) {
+
+				std::unique_ptr<CPacket> p(DNew CPacket());
+				p->TrackNumber	= (DWORD)pTE->TrackNumber;
+				p->rtStart		= 0;
+				p->rtStop		= 1;
+				p->bSyncPoint	= FALSE;
+
+				p->SetData(ptr, len);
+				ptr += len;
+
+				hr = DeliverPacket(std::move(p));
+			}
+
+			if (FAILED(hr)) {
+				DLog(L"MatroskaSplitterFilter::SendVorbisHeaderSample() - ERROR: Vorbis initialization failed for stream %u", TrackNumber);
+			}
+		}
+	}
+}
+
 bool CMatroskaSplitterFilter::DemuxInit()
 {
 	SetThreadName((DWORD)-1, "CMatroskaSplitterFilter");
@@ -2193,6 +2245,8 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 	if (!m_pCluster) {
 		return true;
 	}
+
+	SendVorbisHeaderSample(); // HACK: init vorbis decoder with the headers
 
 	const auto& s = m_pFile->m_segment;
 

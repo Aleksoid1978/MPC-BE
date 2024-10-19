@@ -2292,15 +2292,16 @@ void CreateVorbisMediaType(CMediaType& mt, std::vector<CMediaType>& mts, DWORD C
 
 		mts.push_back(mt);
 	}
-
-	mt.subtype         = MEDIASUBTYPE_Vorbis;
-	mt.formattype      = FORMAT_VorbisFormat;
-	VORBISFORMAT* vf   = (VORBISFORMAT*)mt.AllocFormatBuffer(sizeof(VORBISFORMAT));
-	memset(vf, 0, mt.FormatLength());
-	vf->nChannels      = Channels;
-	vf->nSamplesPerSec = SamplesPerSec;
-	vf->nMinBitsPerSec = vf->nMaxBitsPerSec = vf->nAvgBitsPerSec = DWORD_MAX;
-	mts.push_back(mt);
+	else {
+		mt.subtype    = MEDIASUBTYPE_Vorbis;
+		mt.formattype = FORMAT_VorbisFormat;
+		VORBISFORMAT* vf = (VORBISFORMAT*)mt.AllocFormatBuffer(sizeof(VORBISFORMAT));
+		memset(vf, 0, mt.FormatLength());
+		vf->nChannels      = Channels;
+		vf->nSamplesPerSec = SamplesPerSec;
+		vf->nMinBitsPerSec = vf->nMaxBitsPerSec = vf->nAvgBitsPerSec = DWORD_MAX;
+		mts.push_back(mt);
+	}
 }
 
 CStringA VobSubDefHeader(int w, int h, CStringA palette)

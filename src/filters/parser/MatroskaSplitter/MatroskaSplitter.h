@@ -64,6 +64,7 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 
 	void SetupChapters(LPCSTR lng, ChapterAtom* parent, int level = 0);
 	void InstallFonts();
+	void SendVorbisHeaderSample();
 
 	std::unique_ptr<CMatroskaNode> m_pSegment;
 	std::unique_ptr<CMatroskaNode> m_pCluster;
