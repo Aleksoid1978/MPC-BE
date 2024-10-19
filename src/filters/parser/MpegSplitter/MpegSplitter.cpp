@@ -1357,26 +1357,24 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			const auto& Item = m_Items.begin();
 			if (Item->m_pg_offset_sequence_id.size()) {
 				std::list<BYTE> pg_offsets;
-				for (auto it = Item->m_pg_offset_sequence_id.begin(); it != Item->m_pg_offset_sequence_id.end(); ++it) {
-					if (*it != 0xff) {
-						pg_offsets.push_back(*it);
+				for (const auto& pg_offset_id : Item->m_pg_offset_sequence_id) {
+					if (pg_offset_id != 0xff) {
+						pg_offsets.push_back(pg_offset_id);
 
-						CString offset; offset.Format(L"%u", *it);
+						CString offset; offset.Format(L"%u", pg_offset_id);
 						SetProperty(L"stereo_subtitle_offset_id", offset);
 					}
 				}
+
 				if (pg_offsets.size()) {
 					CString offsets;
 
 					pg_offsets.sort();
 					pg_offsets.unique();
-					for (auto it = pg_offsets.begin(); it != pg_offsets.end(); ++it) {
-						if (offsets.IsEmpty()) {
-							offsets.Format(L"%u", *it);
-						} else {
-							offsets.AppendFormat(L",%u", *it);
-						}
+					for (const auto& pg_offset : pg_offsets) {
+						offsets.AppendFormat(L"%u,", pg_offset);
 					}
+					offsets.TrimRight(L',');
 
 					SetProperty(L"stereo_subtitle_offset_ids", offsets);
 				}
@@ -1385,23 +1383,21 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			// IG offsets
 			if (Item->m_ig_offset_sequence_id.size()) {
 				std::list<BYTE> ig_offsets;
-				for (auto it = Item->m_ig_offset_sequence_id.begin(); it != Item->m_ig_offset_sequence_id.end(); ++it) {
-					if (*it != 0xff) {
-						ig_offsets.push_back(*it);
+				for (const auto& ig_offset_id : Item->m_ig_offset_sequence_id) {
+					if (ig_offset_id != 0xff) {
+						ig_offsets.push_back(ig_offset_id);
 					}
 				}
+
 				if (ig_offsets.size()) {
 					CString offsets;
 
 					ig_offsets.sort();
 					ig_offsets.unique();
-					for (auto it = ig_offsets.begin(); it != ig_offsets.end(); ++it) {
-						if (offsets.IsEmpty()) {
-							offsets.Format(L"%u", *it);
-						} else {
-							offsets.AppendFormat(L",%u", *it);
-						}
+					for (const auto& ig_offset : ig_offsets) {
+						offsets.AppendFormat(L"%u,", ig_offset);
 					}
+					offsets.TrimRight(L',');
 
 					SetProperty(L"stereo_interactive_offset_ids", offsets);
 				}
