@@ -927,23 +927,6 @@ COggVorbisOutputPin::COggVorbisOutputPin(OggVorbisIdHeader* h, LPCWSTR pName, CB
 
 	mt.InitMediaType();
 	mt.majortype  = MEDIATYPE_Audio;
-	mt.subtype    = MEDIASUBTYPE_Vorbis;
-	mt.formattype = FORMAT_VorbisFormat;
-
-	VORBISFORMAT* vf = (VORBISFORMAT*)mt.AllocFormatBuffer(sizeof(VORBISFORMAT));
-	memset(mt.Format(), 0, mt.FormatLength());
-
-	vf->nChannels      = h->audio_channels;
-	vf->nSamplesPerSec = h->audio_sample_rate;
-	vf->nAvgBitsPerSec = h->bitrate_nominal;
-	vf->nMinBitsPerSec = h->bitrate_minimum;
-	vf->nMaxBitsPerSec = h->bitrate_maximum;
-	vf->fQuality       = -1;
-	mt.SetSampleSize(8192);
-	m_mts.push_back(mt);
-
-	mt.InitMediaType();
-	mt.majortype  = MEDIATYPE_Audio;
 	mt.subtype    = MEDIASUBTYPE_Vorbis2;
 	mt.formattype = FORMAT_VorbisFormat2;
 
@@ -953,7 +936,7 @@ COggVorbisOutputPin::COggVorbisOutputPin(OggVorbisIdHeader* h, LPCWSTR pName, CB
 	vf2->Channels      = h->audio_channels;
 	vf2->SamplesPerSec = h->audio_sample_rate;
 	mt.SetSampleSize(8192);
-	m_mts.insert(m_mts.cbegin(), mt);
+	m_mts.emplace_back(mt);
 
 	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
 }
@@ -1062,15 +1045,6 @@ HRESULT COggVorbisOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_
 	HRESULT hr = __super::DeliverNewSegment(tStart, tStop, dRate);
 
 	m_lastblocksize = 0;
-
-	if (m_mt.subtype == MEDIASUBTYPE_Vorbis) {
-		for (const auto& packet : m_initpackets) {
-			std::unique_ptr<CPacket> p(DNew CPacket());
-			p->TrackNumber = packet->TrackNumber;
-			p->SetData(*packet);
-			__super::DeliverPacket(std::move(p));
-		}
-	}
 
 	return hr;
 }
