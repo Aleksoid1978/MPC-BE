@@ -159,8 +159,11 @@ CString CPPageWebServer::GetCurWebRoot()
 	WebRoot.Replace('/', '\\');
 
 	CStringW path = GetCombineFilePath(GetProgramDir(), WebRoot);
-	
-	return ::PathIsDirectoryW(path) ? path : L"";
+	if (!::PathIsDirectoryW(path)) {
+		path.Empty();
+	}
+
+	return path;
 }
 
 static int __stdcall BrowseCtrlCallback(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
