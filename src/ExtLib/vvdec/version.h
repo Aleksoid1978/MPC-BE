@@ -42,15 +42,15 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #if !defined( VVDEC_VERSION )
 
-#define VVDEC_VERSION "2.3.0"
+#define VVDEC_VERSION "3.0.0"
 
-#define VVDEC_VERSION_MAJOR 2
-#define VVDEC_VERSION_MINOR 3
+#define VVDEC_VERSION_MAJOR 3
+#define VVDEC_VERSION_MINOR 0
 #define VVDEC_VERSION_PATCH 0
 
 #ifdef _WIN32
-#define VVDEC_VS_VERSION      2,3,0
-#define VVDEC_VS_VERSION_STR "2.3.0"
+#define VVDEC_VS_VERSION      3,0,0
+#define VVDEC_VS_VERSION_STR "3.0.0"
 #endif
 
 #endif

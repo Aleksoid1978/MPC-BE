@@ -16,7 +16,8 @@ MPCVideoDec
 
 Обновлены библиотеки:
 	dav1d 1.5.0;
-	ffmpeg n7.2-dev-476-g153a6dc8fa.
+	ffmpeg n7.2-dev-476-g153a6dc8fa;
+	vvdec v3.0.0.
 
 
 1.8.0 - 2024-10-07
