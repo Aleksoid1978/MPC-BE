@@ -601,6 +601,7 @@ static void yvy2ToUV_c(uint8_t *dstU, uint8_t *dstV, const uint8_t *unused0, con
 
 y21xle_wrapper(10, 6)
 y21xle_wrapper(12, 4)
+y21xle_wrapper(16, 0)
 
 static void bswap16Y_c(uint8_t *_dst, const uint8_t *_src, const uint8_t *unused1, const uint8_t *unused2, int width,
                        uint32_t *unused, void *opq)
@@ -665,6 +666,13 @@ static void read_ayuv64le_Y_c(uint8_t *dst, const uint8_t *src, const uint8_t *u
         AV_WN16(dst + i * 2, AV_RL16(src + i * 8 + 2));
 }
 
+static void read_ayuv64be_Y_c(uint8_t *dst, const uint8_t *src, const uint8_t *unused0, const uint8_t *unused1, int width,
+                               uint32_t *unused2, void *opq)
+{
+    int i;
+    for (i = 0; i < width; i++)
+        AV_WN16(dst + i * 2, AV_RB16(src + i * 8 + 2));
+}
 
 static void read_ayuv64le_UV_c(uint8_t *dstU, uint8_t *dstV, const uint8_t *unused0, const uint8_t *src,
                                const uint8_t *unused1, int width, uint32_t *unused2, void *opq)
@@ -676,12 +684,30 @@ static void read_ayuv64le_UV_c(uint8_t *dstU, uint8_t *dstV, const uint8_t *unus
     }
 }
 
+static void read_ayuv64be_UV_c(uint8_t *dstU, uint8_t *dstV, const uint8_t *unused0, const uint8_t *src,
+                               const uint8_t *unused1, int width, uint32_t *unused2, void *opq)
+{
+    int i;
+    for (i = 0; i < width; i++) {
+        AV_WN16(dstU + i * 2, AV_RB16(src + i * 8 + 4));
+        AV_WN16(dstV + i * 2, AV_RB16(src + i * 8 + 6));
+    }
+}
+
 static void read_ayuv64le_A_c(uint8_t *dst, const uint8_t *src, const uint8_t *unused0, const uint8_t *unused1, int width,
                               uint32_t *unused2, void *opq)
 {
     int i;
     for (i = 0; i < width; i++)
         AV_WN16(dst + i * 2, AV_RL16(src + i * 8));
+}
+
+static void read_ayuv64be_A_c(uint8_t *dst, const uint8_t *src, const uint8_t *unused0, const uint8_t *unused1, int width,
+                              uint32_t *unused2, void *opq)
+{
+    int i;
+    for (i = 0; i < width; i++)
+        AV_WN16(dst + i * 2, AV_RB16(src + i * 8));
 }
 
 static void read_vuyx_UV_c(uint8_t *dstU, uint8_t *dstV, const uint8_t *unused0, const uint8_t *src,
@@ -819,6 +845,25 @@ static void read_xv36le_UV_c(uint8_t *dstU, uint8_t *dstV, const uint8_t *unused
     for (i = 0; i < width; i++) {
         AV_WN16(dstU + i * 2, AV_RL16(src + i * 8 + 0) >> 4);
         AV_WN16(dstV + i * 2, AV_RL16(src + i * 8 + 4) >> 4);
+    }
+}
+
+static void read_xv36be_Y_c(uint8_t *dst, const uint8_t *src, const uint8_t *unused0, const uint8_t *unused1, int width,
+                               uint32_t *unused2, void *opq)
+{
+    int i;
+    for (i = 0; i < width; i++)
+        AV_WN16(dst + i * 2, AV_RB16(src + i * 8 + 2) >> 4);
+}
+
+
+static void read_xv36be_UV_c(uint8_t *dstU, uint8_t *dstV, const uint8_t *unused0, const uint8_t *src,
+                               const uint8_t *unused1, int width, uint32_t *unused2, void *opq)
+{
+    int i;
+    for (i = 0; i < width; i++) {
+        AV_WN16(dstU + i * 2, AV_RB16(src + i * 8 + 0) >> 4);
+        AV_WN16(dstV + i * 2, AV_RB16(src + i * 8 + 4) >> 4);
     }
 }
 
@@ -1665,11 +1710,17 @@ av_cold void ff_sws_init_input_funcs(SwsContext *c,
     case AV_PIX_FMT_AYUV64LE:
         *chrToYV12 = read_ayuv64le_UV_c;
         break;
+    case AV_PIX_FMT_AYUV64BE:
+        *chrToYV12 = read_ayuv64be_UV_c;
+        break;
     case AV_PIX_FMT_UYVA:
         *chrToYV12 = read_uyva_UV_c;
         break;
     case AV_PIX_FMT_XV36LE:
         *chrToYV12 = read_xv36le_UV_c;
+        break;
+    case AV_PIX_FMT_XV36BE:
+        *chrToYV12 = read_xv36be_UV_c;
         break;
     case AV_PIX_FMT_P010LE:
     case AV_PIX_FMT_P210LE:
@@ -1706,6 +1757,9 @@ av_cold void ff_sws_init_input_funcs(SwsContext *c,
         break;
     case AV_PIX_FMT_Y212LE:
         *chrToYV12 = y212le_UV_c;
+        break;
+    case AV_PIX_FMT_Y216LE:
+        *chrToYV12 = y216le_UV_c;
         break;
     case AV_PIX_FMT_RGBF32LE:
         *chrToYV12 = rgbf32le_to_uv_c;
@@ -2094,8 +2148,14 @@ av_cold void ff_sws_init_input_funcs(SwsContext *c,
     case AV_PIX_FMT_AYUV64LE:
         *lumToYV12 = read_ayuv64le_Y_c;
         break;
+    case AV_PIX_FMT_AYUV64BE:
+        *lumToYV12 = read_ayuv64be_Y_c;
+        break;
     case AV_PIX_FMT_XV36LE:
         *lumToYV12 = read_xv36le_Y_c;
+        break;
+    case AV_PIX_FMT_XV36BE:
+        *lumToYV12 = read_xv36be_Y_c;
         break;
     case AV_PIX_FMT_YUYV422:
     case AV_PIX_FMT_YVYU422:
@@ -2231,6 +2291,9 @@ av_cold void ff_sws_init_input_funcs(SwsContext *c,
     case AV_PIX_FMT_Y212LE:
         *lumToYV12 = y212le_Y_c;
         break;
+    case AV_PIX_FMT_Y216LE:
+        *lumToYV12 = y216le_Y_c;
+        break;
     case AV_PIX_FMT_X2RGB10LE:
         *lumToYV12 = rgb30leToY_c;
         break;
@@ -2298,6 +2361,9 @@ av_cold void ff_sws_init_input_funcs(SwsContext *c,
             break;
         case AV_PIX_FMT_AYUV64LE:
             *alpToYV12 = read_ayuv64le_A_c;
+            break;
+        case AV_PIX_FMT_AYUV64BE:
+            *alpToYV12 = read_ayuv64be_A_c;
             break;
         case AV_PIX_FMT_PAL8 :
             *alpToYV12 = palToA_c;

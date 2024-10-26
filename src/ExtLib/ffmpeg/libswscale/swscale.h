@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2024 Niklas Haas
  * Copyright (C) 2001-2011 Michael Niedermayer <michaelni@gmx.at>
  *
  * This file is part of FFmpeg.
@@ -41,6 +42,8 @@
 #include "version.h"
 #endif
 
+typedef struct SwsContext SwsContext;
+
 /**
  * @defgroup libsws libswscale
  * Color conversion and scaling library.
@@ -60,6 +63,88 @@ const char *swscale_configuration(void);
  * Return the libswscale license.
  */
 const char *swscale_license(void);
+
+/**
+ * Get the AVClass for swsContext. It can be used in combination with
+ * AV_OPT_SEARCH_FAKE_OBJ for examining options.
+ *
+ * @see av_opt_find().
+ */
+const AVClass *sws_get_class(void);
+
+/**
+ * Allocate an empty SwsContext. This must be filled and passed to
+ * sws_init_context(). For filling see AVOptions, options.c and
+ * sws_setColorspaceDetails().
+ */
+SwsContext *sws_alloc_context(void);
+
+/**
+ * Free the context and everything associated with it, and write NULL
+ * to the provided pointer.
+ */
+void sws_free_context(SwsContext **ctx);
+
+/***************************
+ * Supported frame formats *
+ ***************************/
+
+/**
+ * Test if a given pixel format is supported.
+ *
+ * @param output  If 0, test if compatible with the source/input frame;
+ *                otherwise, with the destination/output frame.
+ * @param format  The format to check.
+ *
+ * @return A positive integer if supported, 0 otherwise.
+ */
+int sws_test_format(enum AVPixelFormat format, int output);
+
+/**
+ * Test if a given color space is supported.
+ *
+ * @param output  If 0, test if compatible with the source/input frame;
+ *                otherwise, with the destination/output frame.
+ * @param colorspace The colorspace to check.
+ *
+ * @return A positive integer if supported, 0 otherwise.
+ */
+int sws_test_colorspace(enum AVColorSpace colorspace, int output);
+
+/**
+ * Test if a given set of color primaries is supported.
+ *
+ * @param output  If 0, test if compatible with the source/input frame;
+ *                otherwise, with the destination/output frame.
+ * @param primaries The color primaries to check.
+ *
+ * @return A positive integer if supported, 0 otherwise.
+ */
+int sws_test_primaries(enum AVColorPrimaries primaries, int output);
+
+/**
+ * Test if a given color transfer function is supported.
+ *
+ * @param output  If 0, test if compatible with the source/input frame;
+ *                otherwise, with the destination/output frame.
+ * @param trc     The color transfer function to check.
+ *
+ * @return A positive integer if supported, 0 otherwise.
+ */
+int sws_test_transfer(enum AVColorTransferCharacteristic trc, int output);
+
+/**
+ * Helper function to run all sws_test_* against a frame, as well as testing
+ * the basic frame properties for sanity. Ignores irrelevant properties - for
+ * example, AVColorSpace is not checked for RGB frames.
+ */
+int sws_test_frame(const AVFrame *frame, int output);
+
+/**
+ * Check if a given conversion is a noop. Returns a positive integer if
+ * no operation needs to be performed, 0 otherwise.
+ */
+int sws_is_noop(const AVFrame *dst, const AVFrame *src);
 
 /* values for the flags, the stuff on the command line is different */
 #define SWS_FAST_BILINEAR     1
@@ -150,8 +235,6 @@ typedef struct SwsFilter {
     SwsVector *chrV;
 } SwsFilter;
 
-struct SwsContext;
-
 /**
  * Return a positive value if pix_fmt is a supported input format, 0
  * otherwise.
@@ -172,26 +255,19 @@ int sws_isSupportedOutput(enum AVPixelFormat pix_fmt);
 int sws_isSupportedEndiannessConversion(enum AVPixelFormat pix_fmt);
 
 /**
- * Allocate an empty SwsContext. This must be filled and passed to
- * sws_init_context(). For filling see AVOptions, options.c and
- * sws_setColorspaceDetails().
- */
-struct SwsContext *sws_alloc_context(void);
-
-/**
  * Initialize the swscaler context sws_context.
  *
  * @return zero or positive value on success, a negative value on
  * error
  */
 av_warn_unused_result
-int sws_init_context(struct SwsContext *sws_context, SwsFilter *srcFilter, SwsFilter *dstFilter);
+int sws_init_context(SwsContext *sws_context, SwsFilter *srcFilter, SwsFilter *dstFilter);
 
 /**
  * Free the swscaler context swsContext.
  * If swsContext is NULL, then does nothing.
  */
-void sws_freeContext(struct SwsContext *swsContext);
+void sws_freeContext(SwsContext *swsContext);
 
 /**
  * Allocate and return an SwsContext. You need it to perform
@@ -214,10 +290,10 @@ void sws_freeContext(struct SwsContext *swsContext);
  * @note this function is to be removed after a saner alternative is
  *       written
  */
-struct SwsContext *sws_getContext(int srcW, int srcH, enum AVPixelFormat srcFormat,
-                                  int dstW, int dstH, enum AVPixelFormat dstFormat,
-                                  int flags, SwsFilter *srcFilter,
-                                  SwsFilter *dstFilter, const double *param);
+SwsContext *sws_getContext(int srcW, int srcH, enum AVPixelFormat srcFormat,
+                           int dstW, int dstH, enum AVPixelFormat dstFormat,
+                           int flags, SwsFilter *srcFilter,
+                           SwsFilter *dstFilter, const double *param);
 
 /**
  * Scale the image slice in srcSlice and put the resulting scaled
@@ -245,7 +321,7 @@ struct SwsContext *sws_getContext(int srcW, int srcH, enum AVPixelFormat srcForm
  *                  the destination image
  * @return          the height of the output slice
  */
-int sws_scale(struct SwsContext *c, const uint8_t *const srcSlice[],
+int sws_scale(SwsContext *c, const uint8_t *const srcSlice[],
               const int srcStride[], int srcSliceY, int srcSliceH,
               uint8_t *const dst[], const int dstStride[]);
 
@@ -265,7 +341,7 @@ int sws_scale(struct SwsContext *c, const uint8_t *const srcSlice[],
  *
  * @return 0 on success, a negative AVERROR code on failure
  */
-int sws_scale_frame(struct SwsContext *c, AVFrame *dst, const AVFrame *src);
+int sws_scale_frame(SwsContext *c, AVFrame *dst, const AVFrame *src);
 
 /**
  * Initialize the scaling process for a given pair of source/destination frames.
@@ -292,7 +368,7 @@ int sws_scale_frame(struct SwsContext *c, AVFrame *dst, const AVFrame *src);
  *
  * @see sws_frame_end()
  */
-int sws_frame_start(struct SwsContext *c, AVFrame *dst, const AVFrame *src);
+int sws_frame_start(SwsContext *c, AVFrame *dst, const AVFrame *src);
 
 /**
  * Finish the scaling process for a pair of source/destination frames previously
@@ -302,7 +378,7 @@ int sws_frame_start(struct SwsContext *c, AVFrame *dst, const AVFrame *src);
  *
  * @param c   The scaling context
  */
-void sws_frame_end(struct SwsContext *c);
+void sws_frame_end(SwsContext *c);
 
 /**
  * Indicate that a horizontal slice of input data is available in the source
@@ -316,7 +392,7 @@ void sws_frame_end(struct SwsContext *c);
  *
  * @return a non-negative number on success, a negative AVERROR code on failure.
  */
-int sws_send_slice(struct SwsContext *c, unsigned int slice_start,
+int sws_send_slice(SwsContext *c, unsigned int slice_start,
                    unsigned int slice_height);
 
 /**
@@ -336,7 +412,7 @@ int sws_send_slice(struct SwsContext *c, unsigned int slice_start,
  *                         output can be produced
  *         another negative AVERROR code on other kinds of scaling failure
  */
-int sws_receive_slice(struct SwsContext *c, unsigned int slice_start,
+int sws_receive_slice(SwsContext *c, unsigned int slice_start,
                       unsigned int slice_height);
 
 /**
@@ -347,7 +423,7 @@ int sws_receive_slice(struct SwsContext *c, unsigned int slice_start,
  *         Slice offsets and sizes passed to sws_receive_slice() must be
  *         multiples of the value returned from this function.
  */
-unsigned int sws_receive_slice_alignment(const struct SwsContext *c);
+unsigned int sws_receive_slice_alignment(const SwsContext *c);
 
 /**
  * @param c the scaling context
@@ -362,7 +438,7 @@ unsigned int sws_receive_slice_alignment(const struct SwsContext *c);
  * @return A negative error code on error, non negative otherwise.
  *         If `LIBSWSCALE_VERSION_MAJOR < 7`, returns -1 if not supported.
  */
-int sws_setColorspaceDetails(struct SwsContext *c, const int inv_table[4],
+int sws_setColorspaceDetails(SwsContext *c, const int inv_table[4],
                              int srcRange, const int table[4], int dstRange,
                              int brightness, int contrast, int saturation);
 
@@ -370,7 +446,7 @@ int sws_setColorspaceDetails(struct SwsContext *c, const int inv_table[4],
  * @return A negative error code on error, non negative otherwise.
  *         If `LIBSWSCALE_VERSION_MAJOR < 7`, returns -1 if not supported.
  */
-int sws_getColorspaceDetails(struct SwsContext *c, int **inv_table,
+int sws_getColorspaceDetails(SwsContext *c, int **inv_table,
                              int *srcRange, int **table, int *dstRange,
                              int *brightness, int *contrast, int *saturation);
 
@@ -415,11 +491,11 @@ void sws_freeFilter(SwsFilter *filter);
  * Be warned that srcFilter and dstFilter are not checked, they
  * are assumed to remain the same.
  */
-struct SwsContext *sws_getCachedContext(struct SwsContext *context,
-                                        int srcW, int srcH, enum AVPixelFormat srcFormat,
-                                        int dstW, int dstH, enum AVPixelFormat dstFormat,
-                                        int flags, SwsFilter *srcFilter,
-                                        SwsFilter *dstFilter, const double *param);
+SwsContext *sws_getCachedContext(SwsContext *context, int srcW, int srcH,
+                                 enum AVPixelFormat srcFormat, int dstW, int dstH,
+                                 enum AVPixelFormat dstFormat, int flags,
+                                 SwsFilter *srcFilter, SwsFilter *dstFilter,
+                                 const double *param);
 
 /**
  * Convert an 8-bit paletted frame into a frame with a color depth of 32 bits.
@@ -444,14 +520,6 @@ void sws_convertPalette8ToPacked32(const uint8_t *src, uint8_t *dst, int num_pix
  * @param palette    array with [256] entries, which must match color arrangement (RGB or BGR) of src
  */
 void sws_convertPalette8ToPacked24(const uint8_t *src, uint8_t *dst, int num_pixels, const uint8_t *palette);
-
-/**
- * Get the AVClass for swsContext. It can be used in combination with
- * AV_OPT_SEARCH_FAKE_OBJ for examining options.
- *
- * @see av_opt_find().
- */
-const AVClass *sws_get_class(void);
 
 /**
  * @}
