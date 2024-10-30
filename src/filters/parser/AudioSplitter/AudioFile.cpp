@@ -122,6 +122,13 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* pFile)
 		SAFE_DELETE(pAudioFile);
 	}
 
+	if (pAudioFile && pFile->IsStreaming()) {
+		auto wavFile = dynamic_cast<CWAVFile*>(pAudioFile);
+		if (!wavFile) {
+			SAFE_DELETE(pAudioFile);
+		}
+	}
+
 	return pAudioFile;
 }
 

@@ -310,9 +310,13 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 		return E_FAIL;
 	}
 
-	m_length		-= m_length % m_nBlockAlign;
-	m_endpos		= m_startpos + m_length;
-	m_rtduration	= 10000000i64 * m_length / m_nAvgBytesPerSec;
+	if (!m_pFile->IsStreaming()) {
+		m_length -= m_length % m_nBlockAlign;
+		m_endpos = m_startpos + m_length;
+		m_rtduration = 10000000i64 * m_length / m_nAvgBytesPerSec;
+	} else {
+		m_frameDuration = 10000000i64 * m_blocksize / m_nAvgBytesPerSec;
+	}
 
 	CheckDTSAC3CD();
 
@@ -321,6 +325,10 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 
 REFERENCE_TIME CWAVFile::Seek(REFERENCE_TIME rt)
 {
+	if (m_pFile->IsStreaming()) {
+		return rt;
+	}
+
 	if (rt <= 0) {
 		m_pFile->Seek(m_startpos);
 		return 0;
@@ -337,6 +345,19 @@ REFERENCE_TIME CWAVFile::Seek(REFERENCE_TIME rt)
 
 int CWAVFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 {
+	if (m_pFile->IsStreaming()) {
+		if (!packet->SetCount(m_blocksize) || m_pFile->ByteRead(packet->data(), m_blocksize) != S_OK) {
+			return 0;
+		}
+
+		packet->rtStart = m_rtPrev;
+		packet->rtStop = m_rtPrev + m_frameDuration;
+
+		m_rtPrev = packet->rtStop;
+
+		return m_blocksize;
+	}
+
 	const __int64 start = m_pFile->GetPos();
 
 	if (start + m_nBlockAlign > m_endpos) {

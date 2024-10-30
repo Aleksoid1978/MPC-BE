@@ -137,7 +137,7 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	HRESULT hr = E_FAIL;
 
-	m_pFile.reset(DNew CBaseSplitterFile(pAsyncReader, hr, FM_FILE | FM_FILE_DL));
+	m_pFile.reset(DNew CBaseSplitterFile(pAsyncReader, hr, FM_FILE | FM_FILE_DL | FM_STREAM));
 
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
@@ -145,10 +145,6 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	if (FAILED(hr)) {
 		m_pFile.reset();
 		return hr;
-	}
-	if (m_pFile->IsStreaming()) {
-		m_pFile.reset();
-		return E_FAIL;
 	}
 	m_pFile->SetBreakHandle(GetRequestHandle());
 

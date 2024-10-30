@@ -33,6 +33,9 @@ protected:
 	WORD     m_nBlockAlign = 0;
 	int      m_blocksize   = 0;
 
+	REFERENCE_TIME m_rtPrev        = 0;
+	REFERENCE_TIME m_frameDuration = 0;
+
 	std::map<DWORD, CStringA> m_info;
 
 	struct RiffChapters : public Chapters {

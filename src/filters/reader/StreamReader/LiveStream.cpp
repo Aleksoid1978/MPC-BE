@@ -649,6 +649,8 @@ bool CLiveStream::Load(const WCHAR* fnw)
 				m_subtype = MEDIASUBTYPE_MP4;
 			} else if (contentType == L"video/x-flv") {
 				m_subtype = MEDIASUBTYPE_FLV;
+			} else if (contentType.Find(L"audio/wav") == 0) {
+				m_subtype = MEDIASUBTYPE_WAVE;
 			} else if (contentType.Find(L"audio/") == 0) {
 				m_subtype = MEDIASUBTYPE_MPEG1Audio;
 			} else if (!bIcyFound) { // other ...
