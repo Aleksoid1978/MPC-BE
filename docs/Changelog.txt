@@ -14,6 +14,7 @@ Fixed loading of external audio tracks and subtitles by absolute path.
 Updated Dutch and Chinese (Traditional) translation (by beter).
 Updated Japanese translation (by tsubasanouta).
 Updated Romanian translation (by Andrei Miloiu).
+Updated Korean translation (by Hackjjang).
 
 Updated libraries:
 	dav1d 1.5.0;
