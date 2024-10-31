@@ -19628,18 +19628,17 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 		if (s.nAudioWindowMode == 1) {
 			// load image from DSMResource to show in preview & logo;
 			std::vector<LPCWSTR> mimeStrins = {
+				// available formats
 				L"image/jpeg",
-				L"image/jpg", // non-standard?
+				L"image/jpg", // non-standard
 				L"image/png",
-				L"image/bmp"
+				L"image/bmp",
+				// additional WIC components are needed
+				L"image/webp",
+				L"image/heic",
+				L"image/avif",
+				L"image/jxl",
 			};
-			if (S_OK == WicCheckComponent(CLSID_WICHeifDecoder)) { // for the future
-				mimeStrins.emplace_back(L"image/heif");
-				mimeStrins.emplace_back(L"image/heic");
-			}
-			if (S_OK == WicCheckComponent(CLSID_WICWebpDecoder)) { // for the future
-				mimeStrins.emplace_back(L"image/webp");
-			}
 
 			BeginEnumFilters(m_pGB, pEF, pBF) {
 				if (CComQIPtr<IDSMResourceBag> pRB = pBF.p)
