@@ -234,8 +234,8 @@ BEGIN
                     "SysLink",WS_TABSTOP,30,114,200,8
     CONTROL         "<a>https://github.com/Aleksoid1978/MPC-BE</a>",IDC_GITHUB_LINK,
                     "SysLink",WS_TABSTOP,30,126,200,8
-    LTEXT           "Acesta program este gratuit și lansat sub licența GNU General Public License.",IDC_STATIC,30,138,200,18
-    LTEXT           "În 2023-2024 traducătorul e Andrei-Valentin Miloiu. În trecut, au contribuit Daniel Alămiță şi lordkag.",IDC_STATIC,30,161,200,18
+    LTEXT           "Acest program este gratuit și lansat sub licența GNU General Public License.",IDC_STATIC,30,138,200,18
+    LTEXT           "Între anii 2023-2024 traducătorul este Andrei-Valentin Miloiu. În trecut, au contribuit Daniel Alămiță şi lordkag.",IDC_STATIC,30,161,200,18
     DEFPUSHBUTTON   "OK",IDOK,185,183,50,14,WS_GROUP
 END
 
@@ -1648,7 +1648,7 @@ BEGIN
         END
         MENUITEM SEPARATOR
         MENUITEM "Pe tot ecranu&l",       ID_VIEW_FULLSCREEN
-        POPUP "&Mărire/Micșorare (Scalare)"
+        POPUP "&Mărește/Micșorează (Scalează)"
         BEGIN
             MENUITEM "&50%",                   ID_VIEW_ZOOM_50
             MENUITEM "&100%",                  ID_VIEW_ZOOM_100
@@ -1780,7 +1780,7 @@ BEGIN
         END
         MENUITEM SEPARATOR
         MENUITEM "Ecran comp&let",                ID_VIEW_FULLSCREEN
-        POPUP "&Mărire/Micșorare (Scalare)"
+        POPUP "&Mărește/Micșorează (Scalează)"
         BEGIN
             MENUITEM "&50%",                   ID_VIEW_ZOOM_50
             MENUITEM "&100%",                  ID_VIEW_ZOOM_100
@@ -1918,7 +1918,7 @@ BEGIN
             END
             MENUITEM SEPARATOR
             MENUITEM "Pe tot ecranu&l",       ID_VIEW_FULLSCREEN
-            POPUP "&Mărire/Micșorare (Scalare)"
+            POPUP "&Mărește/Micșorează (Scalează)"
             BEGIN
                 MENUITEM "&50%",                   ID_VIEW_ZOOM_50
                 MENUITEM "&100%",                  ID_VIEW_ZOOM_100
@@ -2046,8 +2046,8 @@ BEGIN
         MENUITEM "&Mărime dublă",                ID_VIEW_VF_DOUBLE
         MENUITEM "&Întinde cât fereastra",          ID_VIEW_VF_STRETCH
         MENUITEM "Atinge fereastra din &interior",   ID_VIEW_VF_FROMINSIDE
-        MENUITEM "Mărire/Micșorare (Scalare) &1",                     ID_VIEW_VF_ZOOM1
-        MENUITEM "Mărire/Micșorare (Scalare) &2",                     ID_VIEW_VF_ZOOM2
+        MENUITEM "Mărește/Micșorează (Scalează) &1",                     ID_VIEW_VF_ZOOM1
+        MENUITEM "Mărește/Micșorează (Scalează) &2",                     ID_VIEW_VF_ZOOM2
         MENUITEM "Atinge fereastra din exteri&or",  ID_VIEW_VF_FROMOUTSIDE
         MENUITEM SEPARATOR
         MENUITEM "&Menține raportul de aspect",          ID_VIEW_VF_KEEPASPECTRATIO
@@ -2068,12 +2068,12 @@ IDR_POPUP_PANSCAN MENU
 BEGIN
     POPUP ""
     BEGIN
-        MENUITEM "Mărește dimensiune",       ID_VIEW_INCSIZE
-        MENUITEM "Micșorează dimensiune",       ID_VIEW_DECSIZE
-        MENUITEM "Mărește lățime",      ID_VIEW_INCWIDTH
-        MENUITEM "Micșorează lățime",      ID_VIEW_DECWIDTH
-        MENUITEM "Mărește înălțime",     ID_VIEW_INCHEIGHT
-        MENUITEM "Micșorează înălțime",     ID_VIEW_DECHEIGHT
+        MENUITEM "Mărește dimensiunea",       ID_VIEW_INCSIZE
+        MENUITEM "Micșorează dimensiunea",       ID_VIEW_DECSIZE
+        MENUITEM "Mărește lățimea",      ID_VIEW_INCWIDTH
+        MENUITEM "Micșorează lățimea",      ID_VIEW_DECWIDTH
+        MENUITEM "Mărește înălțimea",     ID_VIEW_INCHEIGHT
+        MENUITEM "Micșorează înălțimea",     ID_VIEW_DECHEIGHT
         MENUITEM SEPARATOR
         MENUITEM "Mută spre dreapta",     ID_PANSCAN_MOVERIGHT
         MENUITEM "Mută spre stânga",      ID_PANSCAN_MOVELEFT
@@ -2083,7 +2083,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Rotește în sensul acelor de ceasornic",            ID_PANSCAN_ROTATE_CW
         MENUITEM "Rotește în sens invers acelor de ceasornic",     ID_PANSCAN_ROTATE_CCW
-        MENUITEM "Întoarce pe orizontală",           ID_PANSCAN_FLIP
+        MENUITEM "Întoarce-l pe orizontală",           ID_PANSCAN_FLIP
         MENUITEM SEPARATOR
         MENUITEM "Resetează",               ID_VIEW_RESET
     END
@@ -2131,11 +2131,11 @@ IDR_POPUP_SHADERS MENU
 BEGIN
     POPUP ""
     BEGIN
-        MENUITEM "Activează nuanțatoare pixel pre-redimensionare", ID_SHADERS_1_ENABLE
-        MENUITEM "Activează nuanțatoare pixel post-redimensionare", ID_SHADERS_2_ENABLE
-        MENUITEM "&Selectarea nuanțatoarelor...",          ID_SHADERS_SELECT
+        MENUITEM "Activează nuanțatoarele pixel pre-redimensionare", ID_SHADERS_1_ENABLE
+        MENUITEM "Activează nuanțatoarele pixel post-redimensionare", ID_SHADERS_2_ENABLE
+        MENUITEM "&Selectează nuanțatoarele...",          ID_SHADERS_SELECT
         MENUITEM SEPARATOR
-        MENUITEM "&Editarea nuanțatoarelor...",            ID_VIEW_SHADEREDITOR
+        MENUITEM "&Editează nuanțatoarele...",            ID_VIEW_SHADEREDITOR
     END
 END
 
@@ -2303,7 +2303,7 @@ STRINGTABLE
 BEGIN
     IDS_PLAYLIST_CAPTION    "Listă de redare"
     IDS_PLAYLIST_MAIN_NAME  "Principal"
-    IDS_PLAYLIST_ADD_NEW    "Adaugă listă de redare"
+    IDS_PLAYLIST_ADD_NEW    "Adaugă o listă de redare"
     IDS_PLAYLIST_ADD_PLAYLIST "Lista de redare"
 END
 
@@ -2630,7 +2630,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_AUDIO            "Audio"
-    IDS_AG_ZOOM             "Mărire/Micșorare (Scalare)"
+    IDS_AG_ZOOM             "Mărește/Micșorează (Scalează)"
     IDS_FAVORITES_ADD       "&Adăugare la favorite..."
     IDS_FAVORITES_ORGANIZE  "&Organizare favorite..."
     IDS_CONTROLS_CLOSING    "Închidere..."
@@ -2865,7 +2865,7 @@ BEGIN
     IDS_AG_VIEW_NORMAL      "Vizualizare normală"
     IDS_AG_FULLSCREEN       "Ecran complet"
     IDS_AG_FULLSCREEN_2     "Ecran complet (fără schimbarea rezoluției)"
-    IDS_AG_ZOOM_AUTO_FIT    "Autopotrivire scalare"
+    IDS_AG_ZOOM_AUTO_FIT    "Potrivește scalarea automat"
     IDS_AG_VIDFRM_HALF      "Cadru video pe jumătate"
     IDS_AG_VIDFRM_NORMAL    "Cadru video normal"
     IDS_AG_VIDFRM_DOUBLE    "Cadru video dublu"
@@ -3415,9 +3415,9 @@ BEGIN
     IDS_AG_TOGGLE_PLAYLIST  "Comută bara listă de redare"
     IDS_AG_TOGGLE_CAPTURE   "Comută bara de captură"
     IDS_AG_TOGGLE_SHADER    "Comută bara editor de nuanțator"
-    IDS_AG_ZOOM_50          "Scalare 50%"
-    IDS_AG_ZOOM_100         "Scalare 100%"
-    IDS_AG_ZOOM_200         "Scalare 200%"
+    IDS_AG_ZOOM_50          "Scalează cu 50%"
+    IDS_AG_ZOOM_100         "Scalează cu 100%"
+    IDS_AG_ZOOM_200         "Scalează cu 200%"
     IDS_AG_NEXT_AR_PRESET   "Următoarea setare prestabilită RA"
     IDS_AG_VIDFRM_STRETCH   "Cadru video întins"
     IDS_AG_VIDFRM_INSIDE    "Cadru video în interior"
@@ -3498,8 +3498,8 @@ BEGIN
     IDS_DISABLE_DXVA_FILTERS "Dezactivează filtrele DXVA"
     IDS_STRETCH_TO_WINDOW   "Întinde cât fereastra"
     IDS_TOUCH_WINDOW_FROM_INSIDE "Atinge fereastra din interior"
-    IDS_ZOOM1               "Mărire/Micșorare (Scalare) 1"
-    IDS_ZOOM2               "Mărire/Micșorare (Scalare) 2"
+    IDS_ZOOM1               "Mărește/Micșorează (Scalează) 1"
+    IDS_ZOOM2               "Mărește/Micșorează (Scalează) 2"
     IDS_TOUCH_WINDOW_FROM_OUTSIDE "Atinge fereastra din exterior"
     IDS_AUDIO_STREAM        "Audio %u/%u: %s"
     IDS_AG_REOPEN           "Redeschide fișierul"
@@ -3597,10 +3597,10 @@ BEGIN
     IDS_OSD_RS_VSYNC_OFF    "VSync: oprit"
     IDS_OSD_RS_INTERNAL_VSYNC_ON "VSync intern: pornit"
     IDS_OSD_RS_INTERNAL_VSYNC_OFF "VSync intern: oprit"
-    IDS_OSD_RS_SYNC_TO_DISPLAY_ON "Sincronizare video cu afișarea: pornită"
-    IDS_OSD_RS_SYNC_TO_DISPLAY_OFF "Sincronizare video cu afișarea: oprită"
-    IDS_OSD_RS_SYNC_TO_VIDEO_ON "Sincronizare afișare cu video: pornită"
-    IDS_OSD_RS_SYNC_TO_VIDEO_OFF "Sincronizare afișare cu video: oprită"
+    IDS_OSD_RS_SYNC_TO_DISPLAY_ON "Sincronizează videoclipul cu afișarea: pornită"
+    IDS_OSD_RS_SYNC_TO_DISPLAY_OFF "Sincronizează videoclipulo cu afișarea: oprită"
+    IDS_OSD_RS_SYNC_TO_VIDEO_ON "Sincronizează afișarea cu videoclipul: pornită"
+    IDS_OSD_RS_SYNC_TO_VIDEO_OFF "Sincronizează afișarea cu videoclipul: oprită"
     IDS_OSD_RS_PRESENT_NEAREST_ON "Prezentare la cel mai apropiat VSync: pornită"
     IDS_OSD_RS_PRESENT_NEAREST_OFF "Prezentare la cel mai apropiat VSync: oprită"
     IDS_OSD_RS_COLOR_MANAGEMENT_ON "Administrare culori: pornită"
@@ -3635,7 +3635,7 @@ STRINGTABLE
 BEGIN
     IDS_OSD_RS_NO_DESKTOP_COMP_ON "Dezactivare compoziție desktop: pornită"
     IDS_OSD_RS_NO_DESKTOP_COMP_OFF "Dezactivare compoziție desktop: oprită"
-    IDS_OSD_RS_RESET_DEFAULT "Setările randorului resetate la implicit"
+    IDS_OSD_RS_RESET_DEFAULT "Setările randorului resetate la valorile implicite"
     IDS_OSD_RS_10BIT_RBG_OUT_ON "Ieșire RGB pe 10 biți: pornită"
     IDS_OSD_RS_10BIT_RBG_OUT_OFF "Ieșire RGB pe 10 biți: oprită"
     IDS_OSD_RS_10BIT_RBG_IN_ON "Forțare intrare RGB pe 10 biți: pornită"
@@ -3649,8 +3649,8 @@ END
 STRINGTABLE
 BEGIN
     IDS_BRIGHTNESS_DEC      "Micșorare luminozitate"
-    IDS_CONTRAST_INC        "Mărire contrast"
-    IDS_CONTRAST_DEC        "Micșorare contrast"
+    IDS_CONTRAST_INC        "Mărește contrastul"
+    IDS_CONTRAST_DEC        "Micșorează contrastul"
     IDS_HUE_INC             "Nuanță +"
     IDS_HUE_DEC             "Nuanță -"
     IDS_SATURATION_INC      "Mărire saturație"
@@ -3662,7 +3662,7 @@ BEGIN
     IDS_NEW_UPDATE_AVAILABLE  "O nouă %s este disponibilă.\n\nVrei să vizitezi site-ul programului MPC-BE ca să o descarci?"
     IDS_UPDATE_ERROR_CONNECT  "Serverul pentru actualizare nu a fost găsit.\n\nVerificaţi conexiunea la internet sau încercaţi mai târziu."
     IDS_UPDATE_CLOSE        "În&chide"
-    IDS_OSD_ZOOM            "Scalare: %.0lf%%"
+    IDS_OSD_ZOOM            "Scalează: %.0lf%%"
 END
 
 STRINGTABLE
@@ -3708,9 +3708,9 @@ BEGIN
     IDS_CAPTURE_ERROR_AUDIO "audio"
     IDS_CAPTURE_ERROR_ADD_BUFFER  "Filtrul de preîncărcare %s nu poate fi adăugat la grafic."
     IDS_CAPTURE_ERROR_CONNECT_BUFF  "Filtrul de preîncărcare %s nu poate fi conectat la grafic."
-    IDS_CAPTURE_ERROR_ADD_ENCODER  "Filtrul codor %s nu poate fi adăugat la grafic."
-    IDS_CAPTURE_ERROR_CONNECT_ENC  "Filtrul codor %s nu poate fi conectat la grafic."
-    IDS_CAPTURE_ERROR_COMPRESSION  "Formatul de comprimare nu poate fi setat la filtrul codor %s."
+    IDS_CAPTURE_ERROR_ADD_ENCODER  "Filtrul de codor %s nu poate fi adăugat la grafic."
+    IDS_CAPTURE_ERROR_CONNECT_ENC  "Filtrul de codor %s nu poate fi conectat la grafic."
+    IDS_CAPTURE_ERROR_COMPRESSION  "Formatul de comprimare nu poate fi setat la filtrul de codor %s."
     IDS_CAPTURE_ERROR_MULTIPLEXER  "Fluxul %s nu poate fi conectat la filtrul multiplexor."
     IDS_CAPTURE_ERROR_VID_CAPT_PIN "Nu a fost găsit niciun pin pentru captură video."
     IDS_CAPTURE_ERROR_AUD_CAPT_PIN "Nu a fost găsit niciun pin pentru captură audio."
@@ -3745,7 +3745,7 @@ STRINGTABLE
 BEGIN
     IDS_SUBDL_DLG_DISC_COL  "Disc"
     IDS_SUBDL_DLG_TITLES_COL "Titlu(ri)"
-    IDS_SUBDL_DLG_DOWNLOADING "Descărcare subtitrare(ări), vă rugăm să aşteptaţi."
+    IDS_SUBDL_DLG_DOWNLOADING "Se descarcă subtitrarea (subtitrările), te rugăm să aştepți."
     IDS_SUBDL_DLG_PARSING   "Analizarea listei..."
     IDS_SUBDL_DLG_NOT_FOUND "Nu s-au găsit subtitrări."
     IDS_SUBDL_DLG_SUBS_AVAIL " %d subtitrare(ări) disponibilă(e)."
