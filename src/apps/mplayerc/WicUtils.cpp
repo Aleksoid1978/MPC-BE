@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2023 see Authors.txt
+ * (C) 2020-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -135,6 +135,12 @@ HRESULT WicGetCodecs(std::vector<WICCodecInfo_t>& codecs, bool bEncoder)
 				if (SUCCEEDED(hr2) && cbActual) {
 					codecInfo.fileExts.resize(cbActual);
 					hr2 = pCodecInfo->GetFileExtensions(codecInfo.fileExts.size(), codecInfo.fileExts.data(), &cbActual);
+				}
+
+				hr2 = pCodecInfo->GetMimeTypes(0, nullptr, &cbActual);
+				if (SUCCEEDED(hr2) && cbActual) {
+					codecInfo.mimeTypes.resize(cbActual);
+					hr2 = pCodecInfo->GetMimeTypes(codecInfo.mimeTypes.size(), codecInfo.mimeTypes.data(), &cbActual);
 				}
 
 				hr2 = pCodecInfo->GetPixelFormats(0, nullptr, &cbActual);

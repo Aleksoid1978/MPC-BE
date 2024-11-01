@@ -51,6 +51,7 @@ struct WICCodecInfo_t {
 	GUID containerFormat;
 	std::wstring name;
 	std::wstring fileExts;
+	std::wstring mimeTypes;
 	std::vector<WICPixelFormatGUID> pixelFmts;
 };
 
