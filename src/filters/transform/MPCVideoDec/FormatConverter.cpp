@@ -251,7 +251,7 @@ void CFormatConverter::UpdateSWSContext()
 				dstRange = 1;
 			}
 
-			if (isAnyRGB(m_pSwsContext->srcFormat) || isAnyRGB(m_pSwsContext->dstFormat)) {
+			if (isAnyRGB(m_FProps.avpixfmt) || isAnyRGB(s_sw_formats[m_out_pixfmt].av_pix_fmt)) {
 				// SWS_CS_* does not fully comply with the AVCOL_SPC_*, but it is well handled in the libswscale.
 				inv_tbl = (int *)sws_getCoefficients(m_FProps.colorspace);
 			}
