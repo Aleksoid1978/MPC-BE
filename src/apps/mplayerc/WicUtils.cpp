@@ -127,26 +127,26 @@ HRESULT WicGetCodecs(std::vector<WICCodecInfo_t>& codecs, bool bEncoder)
 
 				hr2 = pCodecInfo->GetFriendlyName(0, nullptr, &cbActual);
 				if (SUCCEEDED(hr2) && cbActual) {
-					codecInfo.name.resize(cbActual);
-					hr2 = pCodecInfo->GetFriendlyName(codecInfo.name.size(), codecInfo.name.data(), &cbActual);
+					codecInfo.name.resize(cbActual-1);
+					hr2 = pCodecInfo->GetFriendlyName(cbActual, codecInfo.name.data(), &cbActual);
 				}
 
 				hr2 = pCodecInfo->GetFileExtensions(0, nullptr, &cbActual);
 				if (SUCCEEDED(hr2) && cbActual) {
-					codecInfo.fileExts.resize(cbActual);
-					hr2 = pCodecInfo->GetFileExtensions(codecInfo.fileExts.size(), codecInfo.fileExts.data(), &cbActual);
+					codecInfo.fileExts.resize(cbActual-1);
+					hr2 = pCodecInfo->GetFileExtensions(cbActual, codecInfo.fileExts.data(), &cbActual);
 				}
 
 				hr2 = pCodecInfo->GetMimeTypes(0, nullptr, &cbActual);
 				if (SUCCEEDED(hr2) && cbActual) {
-					codecInfo.mimeTypes.resize(cbActual);
-					hr2 = pCodecInfo->GetMimeTypes(codecInfo.mimeTypes.size(), codecInfo.mimeTypes.data(), &cbActual);
+					codecInfo.mimeTypes.resize(cbActual-1);
+					hr2 = pCodecInfo->GetMimeTypes(cbActual, codecInfo.mimeTypes.data(), &cbActual);
 				}
 
 				hr2 = pCodecInfo->GetPixelFormats(0, nullptr, &cbActual);
 				if (SUCCEEDED(hr2) && cbActual) {
 					codecInfo.pixelFmts.resize(cbActual);
-					hr2 = pCodecInfo->GetPixelFormats(codecInfo.pixelFmts.size(), codecInfo.pixelFmts.data(), &cbActual);
+					hr2 = pCodecInfo->GetPixelFormats(cbActual, codecInfo.pixelFmts.data(), &cbActual);
 				}
 
 				codecs.emplace_back(codecInfo);
