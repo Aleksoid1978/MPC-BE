@@ -57,6 +57,7 @@ struct WICCodecInfo_t {
 
 HRESULT WicGetCodecs(std::vector<WICCodecInfo_t>& codecs, bool bEncoder);
 
+bool WicMatchDecoderFileExtension(const std::wstring_view fileExt);
 HRESULT WicCheckComponent(const GUID guid);
 
 HRESULT WicLoadImage(IWICBitmap** ppBitmap, const bool pma, const std::wstring_view filename);

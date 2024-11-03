@@ -212,12 +212,14 @@ void CPPageLogo::OnDeltaposSpin1(NMHDR *pNMHDR, LRESULT *pResult)
 void CPPageLogo::OnBnClickedButton2()
 {
 	CString formats(L"*.bmp;*.jpg;*.jpeg;*.png;*.gif");
-
-	if (S_OK == WicCheckComponent(CLSID_WICHeifDecoder)) {
-		formats.Append(L";*.heif;*.heic");
-	}
-	if (S_OK == WicCheckComponent(CLSID_WICWebpDecoder)) {
+	if (WicMatchDecoderFileExtension(L".webp")) {
 		formats.Append(L";*.webp");
+	}
+	if (WicMatchDecoderFileExtension(L".jxl")) {
+		formats.Append(L";*.jxl");
+	}
+	if (WicMatchDecoderFileExtension(L".heic")) {
+		formats.Append(L";*.heic");
 	}
 
 	CFileDialog dlg(TRUE, nullptr, m_logofn,

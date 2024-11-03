@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -147,13 +147,16 @@ void CChildView::LoadLogo()
 	if (FAILED(hr)) {
 		// load logo from program folder
 		std::vector<LPCWSTR> logoExts = { L"png", L"bmp", L"jpg", L"jpeg", L"gif" };
-		if (S_OK == WicCheckComponent(CLSID_WICHeifDecoder)) {
-			logoExts.emplace_back(L"heif");
-			logoExts.emplace_back(L"heic");
-		}
-		if (S_OK == WicCheckComponent(CLSID_WICWebpDecoder)) {
+		if (WicMatchDecoderFileExtension(L".webp")) {
 			logoExts.emplace_back(L"webp");
 		}
+		if (WicMatchDecoderFileExtension(L".jxl")) {
+			logoExts.emplace_back(L"jxl");
+		}
+		if (WicMatchDecoderFileExtension(L".heic")) {
+			logoExts.emplace_back(L"heic");
+		}
+
 		const CStringW path = GetProgramDir();
 
 		WIN32_FIND_DATAW wfd;

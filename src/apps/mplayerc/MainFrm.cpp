@@ -19581,12 +19581,14 @@ CStringW GetCoverImgFromPath(CStringW fullfilename)
 	};
 
 	std::vector<LPCWSTR> coverExts = { L".jpg", L".jpeg", L".png", L".bmp" };
-	if (S_OK == WicCheckComponent(CLSID_WICHeifDecoder)) {
-		coverExts.emplace_back(L".heif");
-		coverExts.emplace_back(L".heic");
-	}
-	if (S_OK == WicCheckComponent(CLSID_WICWebpDecoder)) {
+	if (WicMatchDecoderFileExtension(L".webp")) {
 		coverExts.emplace_back(L".webp");
+	}
+	if (WicMatchDecoderFileExtension(L".jxl")) {
+		coverExts.emplace_back(L".jxl");
+	}
+	if (WicMatchDecoderFileExtension(L".heic")) {
+		coverExts.emplace_back(L".heic");
 	}
 
 	for (const auto& coverName : coverNames) {
@@ -19635,9 +19637,9 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 				L"image/bmp",
 				// additional WIC components are needed
 				L"image/webp",
+				L"image/jxl",
 				L"image/heic",
 				L"image/avif",
-				L"image/jxl",
 			};
 
 			BeginEnumFilters(m_pGB, pEF, pBF) {

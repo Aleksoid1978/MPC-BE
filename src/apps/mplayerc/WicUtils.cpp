@@ -158,6 +158,58 @@ HRESULT WicGetCodecs(std::vector<WICCodecInfo_t>& codecs, bool bEncoder)
 	return hr;
 }
 
+// Get a list of all file extensions supported by the WIC decoder or encoder.
+// Extensions are separated by a comma. The list ends with a comma.
+// Extensions can be repeated.
+std::wstring WicGetAllFileExtensions(bool bEncoder)
+{
+	std::wstring fileExts;
+
+	IWICImagingFactory* pWICFactory = CWICImagingFactory::GetInstance().GetFactory();
+	if (!pWICFactory) {
+		return fileExts;
+	}
+
+	fileExts.clear();
+	CComPtr<IEnumUnknown> pEnum;
+
+	HRESULT hr = pWICFactory->CreateComponentEnumerator(bEncoder ? WICEncoder : WICDecoder, WICComponentEnumerateDefault, &pEnum);
+
+	if (SUCCEEDED(hr)) {
+		GUID containerFormat = {};
+		ULONG cbFetched = 0;
+		CComPtr<IUnknown> pElement;
+
+		while (S_OK == pEnum->Next(1, &pElement, &cbFetched)) {
+			CComQIPtr<IWICBitmapCodecInfo> pCodecInfo(pElement);
+
+			UINT cbActual = 0;
+			HRESULT hr2 = pCodecInfo->GetFileExtensions(0, nullptr, &cbActual);
+			if (SUCCEEDED(hr2) && cbActual) {
+				size_t len = fileExts.length();
+				fileExts.resize(len + cbActual);
+				hr2 = pCodecInfo->GetFileExtensions(cbActual, fileExts.data() + len, &cbActual);
+				fileExts[len + cbActual - 1] = L',';
+			}
+
+			pElement.Release();
+		}
+
+		std::transform(fileExts.begin(), fileExts.end(), fileExts.begin(), ::tolower);
+	}
+
+	return fileExts;
+}
+
+bool WicMatchDecoderFileExtension(const std::wstring_view fileExt)
+{
+	static const std::wstring fileExts = WicGetAllFileExtensions(false);
+
+	auto n = fileExts.find(std::wstring(fileExt) + L',');
+
+	return n != std::string::npos;
+}
+
 HRESULT WicCheckComponent(const GUID guid)
 {
 	IWICImagingFactory* pWICFactory = CWICImagingFactory::GetInstance().GetFactory();
