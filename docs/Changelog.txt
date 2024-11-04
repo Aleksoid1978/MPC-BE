@@ -2,6 +2,9 @@
 
 1.8.0.x dev
 =============================
+AudioSplitter
+Added support for radio broadcasts in WAV format.
+
 FLVSplitter
 Fixed rare player crash on FLV files with MP3 audio track.
 
@@ -10,6 +13,8 @@ Fixed the operation of the video converter.
 
 Player
 Fixed loading of external audio tracks and subtitles by absolute path.
+Added the ability to load images from metadata in JPEG XL and AVIF formats (requires WIC decoder installed).
+Added support for JPEG XL image files for the logo and album art (requires WIC decoder installed).
 
 Updated Dutch and Chinese (Traditional) translation (by beter).
 Updated Japanese translation (by tsubasanouta).
