@@ -4033,6 +4033,9 @@ cmsUInt32Number CMSEXPORT cmsFormatterForColorspaceOfProfile(cmsHPROFILE hProfil
     // Unsupported color space?
     if (nOutputChans < 0) return 0;
 
+    // Fix float spaces
+    nBytes &= 7;
+
     // Create a fake formatter for result
     return FLOAT_SH(Float) | COLORSPACE_SH(ColorSpaceBits) | BYTES_SH(nBytes) | CHANNELS_SH(nOutputChans);
 }
@@ -4049,6 +4052,9 @@ cmsUInt32Number CMSEXPORT cmsFormatterForPCSOfProfile(cmsHPROFILE hProfile, cmsU
 
     // Unsupported color space?
     if (nOutputChans < 0) return 0;
+
+    // Fix float spaces
+    nBytes &= 7;
 
     // Create a fake formatter for result
     return FLOAT_SH(Float) | COLORSPACE_SH(ColorSpaceBits) | BYTES_SH(nBytes) | CHANNELS_SH(nOutputChans);

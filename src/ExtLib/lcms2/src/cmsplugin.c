@@ -906,7 +906,10 @@ cmsContext CMSEXPORT cmsDupContext(cmsContext ContextID, void* NewUserData)
     if (!InitContextMutex()) return NULL;
 
     // Setup default memory allocators
-    memcpy(&ctx->DefaultMemoryManager, &src->DefaultMemoryManager, sizeof(ctx->DefaultMemoryManager));
+    if (ContextID == NULL)
+        _cmsInstallAllocFunctions(NULL, &ctx->DefaultMemoryManager);
+    else
+        memcpy(&ctx->DefaultMemoryManager, &src->DefaultMemoryManager, sizeof(ctx->DefaultMemoryManager));
 
     // Maintain the linked list
     _cmsEnterCriticalSectionPrimitive(&_cmsContextPoolHeadMutex);

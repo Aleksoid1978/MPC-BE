@@ -24,6 +24,7 @@ Updated Korean translation (by Hackjjang).
 Updated libraries:
 	dav1d 1.5.0;
 	ffmpeg n7.2-dev-526-gd6b2d08fc7;
+	Little-CMS git-lcms2.16-72-g607fe1a;
 	vvdec v3.0.0.
 
 
