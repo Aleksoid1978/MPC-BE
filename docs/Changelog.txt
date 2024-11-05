@@ -25,7 +25,9 @@ Updated libraries:
 	dav1d 1.5.0;
 	ffmpeg n7.2-dev-526-gd6b2d08fc7;
 	Little-CMS git-lcms2.16-72-g607fe1a;
-	vvdec v3.0.0.
+	MediaInfo git-v24.06-53-g6183f187f;
+	vvdec v3.0.0;
+	ZenLib git-v0.4.41-27-gb896492.
 
 
 1.8.0 - 2024-10-07

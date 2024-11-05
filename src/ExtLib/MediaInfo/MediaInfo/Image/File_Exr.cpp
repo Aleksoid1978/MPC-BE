@@ -23,10 +23,26 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Image/File_Exr.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
+#include "MediaInfo/TimeCode.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
 {
+
+
+//***************************************************************************
+// Utils
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+static unsigned BCD_to_Decimal(unsigned Value)
+{
+    int Tens=Value>>4;
+    int Units=Value&0xF;
+    if (Tens>=10 || Units>=10)
+        return (unsigned)-1;
+    return Tens*10+Units;
+}
 
 //***************************************************************************
 // Infos
@@ -233,8 +249,12 @@ void File_Exr::Data_Parse()
         dataWindow();
     else if (name=="displayWindow" && type=="box2i" && Element_Size==16)
         displayWindow();
+    else if (name=="framesPerSecond" && type=="rational" && Element_Size==8)
+        framesPerSecond();
     else if (name=="pixelAspectRatio" && type=="float" && Element_Size==4)
         pixelAspectRatio();
+    else if (name=="timeCode" && type=="timecode" && Element_Size==8)
+        timeCode();
     else
         Skip_XX(Element_Size,                                   "value");
 }
@@ -424,6 +444,18 @@ void File_Exr::displayWindow ()
 }
 
 //---------------------------------------------------------------------------
+void File_Exr::framesPerSecond()
+{
+    //Parsing
+    int32u n, d;
+    Get_L4 (n,                                                  "n");
+    Get_L4 (d,                                                  "d");
+
+    //Filling
+    Fill(StreamKind_Last, 0, "FrameRate", ((float)n)/d);
+}
+
+//---------------------------------------------------------------------------
 void File_Exr::pixelAspectRatio ()
 {
     //Parsing
@@ -433,6 +465,26 @@ void File_Exr::pixelAspectRatio ()
     //Filling
     if (Frame_Count==1)
         Fill(StreamKind_Last, 0, "PixelAspectRatio", value?value:1, 3);
+}
+
+//---------------------------------------------------------------------------
+void File_Exr::timeCode ()
+{
+    //Parsing
+    int32u timeAndFlags;
+    Get_L4 (timeAndFlags,                                       "timeAndFlags");
+    Skip_L4(                                                    "userData");
+
+    //Filling
+    //21HHhhhh0MMMmmmmfSSSsssscdFFffff
+    auto HH = BCD_to_Decimal((timeAndFlags >> 24) & 0x3F);
+    auto MM = BCD_to_Decimal((timeAndFlags >> 16) & 0x7F);
+    auto SS = BCD_to_Decimal((timeAndFlags >>  8) & 0x7F);
+    auto FF = BCD_to_Decimal((timeAndFlags      ) & 0x3F);
+    auto Field =            ((timeAndFlags >> 15 ) & 0x01);
+    auto Drop =             ((timeAndFlags >>  6 ) & 0x01);
+    TimeCode TC(HH, MM, SS, FF, 99, TimeCode::flags().DropFrame(Drop).Field(Field));
+    Fill(StreamKind_Last, 0, "TimeCode", TC.ToString());
 }
 
 } //NameSpace

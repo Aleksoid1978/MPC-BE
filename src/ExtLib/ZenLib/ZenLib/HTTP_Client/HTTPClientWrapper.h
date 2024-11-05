@@ -17,19 +17,20 @@
 #if defined(_MSC_VER)
     #pragma warning (disable: 4996) // 'function': was declared deprecated (VS 2005)
 #endif
+#if defined(_WIN32) || defined(WIN32)
+    #ifdef WINDOWS_UWP
+        #include <winsock2.h>
+    #else
+        #include <winsock.h>
+        #define _TIMEVAL_DEFINED
+    #endif
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <memory.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <time.h>
-#if defined(_WIN32) || defined(WIN32)
-    #ifdef WINDOWS_UWP
-        #include <winsock2.h>
-    #else
-        #include <winsock.h>
-    #endif
-#endif
 
 // Generic types
 typedef unsigned int                 UINT32;

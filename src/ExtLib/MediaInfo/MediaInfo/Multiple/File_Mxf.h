@@ -646,6 +646,7 @@ protected :
     //TimeCode
     struct mxftimecode
     {
+        int128u InstanceUID;
         int64u  StartTimecode;
         int16u  RoundedTimecodeBase;
         bool    DropFrame;
@@ -660,17 +661,12 @@ protected :
         {
             return RoundedTimecodeBase && StartTimecode != (int64u)-1;
         }
-        float64 Get_TimeCode_StartTimecode_Temp(const int64u& File_IgnoreEditsBefore) const
+        float64 Get_TimeCode_StartTimecode_Temp(const int64u& File_IgnoreEditsBefore, bool Is1001=false) const
         {
             if (RoundedTimecodeBase)
             {
-                float64 TimeCode_StartTimecode_Temp = ((float64)(StartTimecode + File_IgnoreEditsBefore)) / RoundedTimecodeBase;
-                if (DropFrame)
-                {
-                    TimeCode_StartTimecode_Temp *= 1001;
-                    TimeCode_StartTimecode_Temp /= 1000;
-                }
-                return TimeCode_StartTimecode_Temp;
+                TimeCode TimeCode_StartTimecode_Temp((uint64_t)(StartTimecode + File_IgnoreEditsBefore), RoundedTimecodeBase - 1, TimeCode::flags().DropFrame(DropFrame).FPS1001(Is1001));
+                return TimeCode_StartTimecode_Temp.ToSeconds();
             }
             else
                 return 0.0;
@@ -1426,9 +1422,9 @@ protected :
         essences::iterator Demux_CurrentEssence;
     #endif //MEDIAINFO_DEMUX
 
+    float64 Demux_Rate;
     #if MEDIAINFO_DEMUX || MEDIAINFO_SEEK
         size_t CountOfLocatorsToParse;
-        float64 Demux_Rate;
 
         //IndexTable
         struct indextable

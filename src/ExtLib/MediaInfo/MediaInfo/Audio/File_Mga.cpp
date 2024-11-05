@@ -241,12 +241,13 @@ void File_Mga::SerialAudioDefinitionModelMetadataPayload(int64u Length)
             size_t UncompressedData_NewMaxSize=strm.total_out*4;
             int8u* UncompressedData_New=new int8u[UncompressedData_NewMaxSize];
             memcpy(UncompressedData_New, strm.next_out-strm.total_out, strm.total_out);
-            delete[] strm.next_out; strm.next_out=UncompressedData_New;
+            delete[](strm.next_out - strm.total_out); strm.next_out=UncompressedData_New;
             strm.next_out=strm.next_out+strm.total_out;
             strm.avail_out=UncompressedData_NewMaxSize-strm.total_out;
         }
         UncompressedData=strm.next_out-strm.total_out;
         UncompressedData_Size=strm.total_out;
+        inflateEnd(&strm);
     }
 
     #if defined(MEDIAINFO_ADM_YES)

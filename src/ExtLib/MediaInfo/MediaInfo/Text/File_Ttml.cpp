@@ -34,6 +34,17 @@ using namespace std;
 
 namespace MediaInfoLib
 {
+    
+//***************************************************************************
+// Info
+//***************************************************************************
+
+static const char* Ttml_timeBase[] = {
+    "media",
+    "smpte",
+    "clock",
+};
+static const auto Ttml_timeBase_Size=sizeof(Ttml_timeBase)/sizeof(*Ttml_timeBase);
 
 //***************************************************************************
 // Utils
@@ -209,8 +220,22 @@ void File_Ttml::Streams_Finish()
             LastFrame--;
             Fill(Stream_Text, 0, Text_TimeCode_LastFrame, LastFrame.ToString());
         }
-        auto Time_Begin_ms = (int64s)Time_Begin.ToMilliseconds();
-        auto Time_End_ms = (int64s)Time_End.ToMilliseconds();
+        auto MediaTimeToMilliseconds=[&](TimeCode TC)
+        {
+            auto Is1001fps=TC.Is1001fps();
+            if (TimeBase!=timeBase_media || (!Is1001fps && !TC.DropFrame())) // https://www.w3.org/TR/2018/REC-ttml2-20181108/#semantics-media-timing
+                return TC.ToMilliseconds();
+            auto Frames=TC.GetFrames();
+            auto MS=((float)Frames)*1000/TC.GetFrameRate();
+            TC.Set1001fps(false);
+            TC.SetDropFrame(false);
+            TC.SetFrames(0);
+            auto Value=TC.ToMilliseconds();
+            Value+=float32_int64s(MS);
+            return Value;
+        };
+        auto Time_Begin_ms = (int64s)MediaTimeToMilliseconds(Time_Begin);
+        auto Time_End_ms = (int64s)MediaTimeToMilliseconds(Time_End);
         Fill(Stream_Text, 0, Text_Duration_Start_Command, Time_Begin_ms);
         Fill(Stream_Text, 0, Text_Duration_Start, Time_Begin_ms);
         Fill(Stream_Text, 0, Text_Duration_End, Time_End_ms);
@@ -376,6 +401,11 @@ void File_Ttml::Read_Buffer_Continue()
         Tt_Attribute=Root->Attribute("timeBase");
     if (Tt_Attribute && Retrieve_Const(Stream_Text, 0, "Duration_Base").empty())
     {
+        for (size_t i=0; i<Ttml_timeBase_Size; i++)
+        {
+            if (!strcmp(Tt_Attribute, Ttml_timeBase[i]))
+                TimeBase=(timeBase_t)i;
+        }
         Fill(Stream_Text, 0, "Duration_Base", Tt_Attribute);
     }
     for (const XMLAttribute* tt_attribute=Root->FirstAttribute(); tt_attribute; tt_attribute=tt_attribute->Next())

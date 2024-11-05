@@ -83,6 +83,12 @@ private :
     int64u FrameRateMultiplier_Den;
     float64 FrameRate=0;
     bool FrameRate_Is1001=false;
+    enum timeBase_t {
+        timeBase_media,
+        timeBase_smpte,
+        timeBase_clock,
+    };
+    timeBase_t TimeBase=timeBase_media;
 };
 
 } //NameSpace

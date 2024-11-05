@@ -911,6 +911,7 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
 
     //From vui_parameters
     float64 PixelAspectRatio=1;
+    float64 FrameRate=0;
     if ((*seq_parameter_set_Item)->vui_parameters)
     {
         if ((*seq_parameter_set_Item)->vui_parameters->aspect_ratio_info_present_flag)
@@ -925,7 +926,10 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
             if (!(*seq_parameter_set_Item)->vui_parameters->fixed_frame_rate_flag)
                 Fill(Stream_Video, StreamPos_Last, Video_FrameRate_Mode, "VFR");
             else if ((*seq_parameter_set_Item)->vui_parameters->timing_info_present_flag && (*seq_parameter_set_Item)->vui_parameters->time_scale && (*seq_parameter_set_Item)->vui_parameters->num_units_in_tick)
-                Fill(Stream_Video, StreamPos_Last, Video_FrameRate, (float64)(*seq_parameter_set_Item)->vui_parameters->time_scale/(*seq_parameter_set_Item)->vui_parameters->num_units_in_tick/((*seq_parameter_set_Item)->frame_mbs_only_flag?2:(((*seq_parameter_set_Item)->pic_order_cnt_type==2 && Structure_Frame/2>Structure_Field)?1:2))/FrameRate_Divider);
+            {
+                FrameRate=(float64)(*seq_parameter_set_Item)->vui_parameters->time_scale/(*seq_parameter_set_Item)->vui_parameters->num_units_in_tick/((*seq_parameter_set_Item)->frame_mbs_only_flag?2:(((*seq_parameter_set_Item)->pic_order_cnt_type==2 && Structure_Frame/2>Structure_Field)?1:2))/FrameRate_Divider;
+                Fill(Stream_Video, StreamPos_Last, Video_FrameRate, FrameRate);
+            }
         }
 
         //Colour description
@@ -1098,6 +1102,11 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
         }
     }
     Fill(Stream_Video, 0, Video_Format_Settings_GOP, GOP_Detect(PictureTypes));
+    if (Retrieve_Const(Stream_Video, 0, Video_BitRate).empty() && Retrieve_Const(Stream_Video, 0, Video_Format_Settings_GOP)==__T("N=1") && FrameRate && FrameSizes.size()==1)
+    {
+        Fill(Stream_Video, 0, Video_BitRate, FrameSizes.begin()->first*FrameRate*8, 0);
+        Fill(Stream_Video, 0, Video_BitRate_Mode, "CBR");
+    }
 
     Fill(Stream_General, 0, General_Encoded_Library, Encoded_Library);
     Fill(Stream_General, 0, General_Encoded_Library_Name, Encoded_Library_Name);
@@ -1926,7 +1935,7 @@ bool File_Avc::Header_Parser_Fill_Size()
             return false;
     }
 
-    if (Buffer[Buffer_Offset_Temp-1]==0x00)
+    if (!FrameIsAlwaysComplete && Buffer[Buffer_Offset_Temp-1]==0x00)
         Buffer_Offset_Temp--;
 
     //OK, we continue
@@ -2792,6 +2801,8 @@ void File_Avc::slice_header()
                 if (!IsSub && !Streams[(size_t)Element_Code].ShouldDuplicate && Config->ParseSpeed<1.0)
                     Finish("AVC");
             }
+            if (FrameIsAlwaysComplete && !first_mb_in_slice && FrameSizes.size()<=1)
+                FrameSizes[Buffer_Size]++;
         }
     FILLING_END();
 }

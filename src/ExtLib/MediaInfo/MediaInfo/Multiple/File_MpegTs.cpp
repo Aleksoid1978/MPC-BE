@@ -279,7 +279,7 @@ File_MpegTs::File_MpegTs()
 
     //Data
     MpegTs_JumpTo_Begin=MediaInfoLib::Config.MpegTs_MaximumOffset_Get();
-    MpegTs_JumpTo_End=MediaInfoLib::Config.MpegTs_MaximumOffset_Get()/4;
+    MpegTs_JumpTo_End=MediaInfoLib::Config.MpegTs_MaximumOffset_Get();
     MpegTs_ScanUpTo=(int64u)-1;
     Searching_TimeStamp_Start=true;
     Complete_Stream=NULL;
@@ -330,7 +330,7 @@ void File_MpegTs::Streams_Accept()
 
     //Temp
     MpegTs_JumpTo_Begin=(File_Offset_FirstSynched==(int64u)-1?0:Buffer_TotalBytes_LastSynched)+MediaInfoLib::Config.MpegTs_MaximumOffset_Get();
-    MpegTs_JumpTo_End=MediaInfoLib::Config.MpegTs_MaximumOffset_Get()/4;
+    MpegTs_JumpTo_End=MediaInfoLib::Config.MpegTs_MaximumOffset_Get();
     if (MpegTs_JumpTo_Begin==(int64u)-1 || MpegTs_JumpTo_Begin+MpegTs_JumpTo_End>=File_Size)
     {
         if (MpegTs_JumpTo_Begin+MpegTs_JumpTo_End>File_Size)
@@ -2100,8 +2100,8 @@ void File_MpegTs::Read_Buffer_AfterParsing()
                                 if (Duration) 
                                     Ratio = (27000000 * 2) / Duration; 
                                 MpegTs_JumpTo_End*=Ratio;
-                                if (MpegTs_JumpTo_End>MediaInfoLib::Config.MpegTs_MaximumOffset_Get()/4)
-                                    MpegTs_JumpTo_End=MediaInfoLib::Config.MpegTs_MaximumOffset_Get()/4;
+                                if (MpegTs_JumpTo_End>MediaInfoLib::Config.MpegTs_MaximumOffset_Get())
+                                    MpegTs_JumpTo_End=MediaInfoLib::Config.MpegTs_MaximumOffset_Get();
                                 break; //Using the first PES found
                             }
                         }

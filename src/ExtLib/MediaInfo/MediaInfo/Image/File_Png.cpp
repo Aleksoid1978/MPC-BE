@@ -448,12 +448,13 @@ void File_Png::iCCP()
             size_t UncompressedData_NewMaxSize=strm.total_out*4;
             int8u* UncompressedData_New=new int8u[UncompressedData_NewMaxSize];
             memcpy(UncompressedData_New, strm.next_out-strm.total_out, strm.total_out);
-            delete[] strm.next_out; strm.next_out=UncompressedData_New;
+            delete[](strm.next_out - strm.total_out); strm.next_out=UncompressedData_New;
             strm.next_out=strm.next_out+strm.total_out;
             strm.avail_out=UncompressedData_NewMaxSize-strm.total_out;
         }
         auto Buffer=(const char*)strm.next_out-strm.total_out;
         auto Buffer_Size=(size_t)strm.total_out;
+        inflateEnd(&strm);
         #if defined(MEDIAINFO_ICC_YES)
             File_Icc ICC_Parser;
             ICC_Parser.StreamKind=StreamKind_Last;
@@ -462,6 +463,7 @@ void File_Png::iCCP()
             Open_Buffer_Continue(&ICC_Parser, (const int8u*)Buffer, Buffer_Size);
             Open_Buffer_Finalize(&ICC_Parser);
             Merge(ICC_Parser, StreamKind_Last, 0, 0);
+            delete[] Buffer;
         #else
             Skip_XX(Element_Size-Element_Offset,                "ICC profile");
         #endif
@@ -612,16 +614,19 @@ void File_Png::Textual(bitset8 Method)
                 size_t UncompressedData_NewMaxSize=strm.total_out*4;
                 int8u* UncompressedData_New=new int8u[UncompressedData_NewMaxSize];
                 memcpy(UncompressedData_New, strm.next_out-strm.total_out, strm.total_out);
-                delete[] strm.next_out; strm.next_out=UncompressedData_New;
+                delete[](strm.next_out - strm.total_out); strm.next_out=UncompressedData_New;
                 strm.next_out=strm.next_out+strm.total_out;
                 strm.avail_out=UncompressedData_NewMaxSize-strm.total_out;
             }
             auto Buffer=(const char*)strm.next_out-strm.total_out;
             auto Buffer_Size=(size_t)strm.total_out;
+            inflateEnd(&strm);
             if (Method[IsUTF8])
                 Text.From_UTF8(Buffer, Buffer_Size);
             else
                 Text.From_ISO_8859_1(Buffer, Buffer_Size);
+            inflateEnd(&strm);
+            delete[](strm.next_out - strm.total_out);
         }
         Skip_XX(Element_Size-Element_Offset,                    "(Compressed)");
         if (!Text.empty())

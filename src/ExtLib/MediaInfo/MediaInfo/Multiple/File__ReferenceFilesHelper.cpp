@@ -567,6 +567,8 @@ void File__ReferenceFilesHelper::ParseReferences()
                         EditRate_Count++;
                     }
                 }
+        /*
+        //It was used for demux with seek, not used in practice in the open source version, and it has bad side effects so currently disabled, we should find a better way to do that
         if (EditRate_Count>1)
             //Multiple rates, using only one rate
             for (Sequences_Current=0; Sequences_Current<Sequences.size(); Sequences_Current++)
@@ -596,6 +598,7 @@ void File__ReferenceFilesHelper::ParseReferences()
                         }
                         Sequences[Sequences_Current]->Resources[Pos]->EditRate=EditRate;
                     }
+        */
 
         //Testing IDs
         std::set<int64u> StreamList;
@@ -1438,6 +1441,10 @@ void File__ReferenceFilesHelper::ParseReference_Finalize_PerStream ()
                 MI2.Config.File_IgnoreEditsAfter=Sequences[Sequences_Current]->Resources[Pos]->IgnoreEditsAfter;
             MI2.Config.File_EditRate=Sequences[Sequences_Current]->Resources[Pos]->EditRate;
             Sequences[Sequences_Current]->Resources[Pos]->FileNames.Separator_Set(0, ",");
+            if (FrameRate)
+                MI2.Option(__T("File_Demux_Rate"), Ztring::ToZtring(FrameRate));
+            else if (!Sequences[Sequences_Current]->Resources.empty() && Sequences[Sequences_Current]->Resources[0]->EditRate) //TODO: per Pos
+                MI2.Option(__T("File_Demux_Rate"), Ztring::ToZtring(Sequences[Sequences_Current]->Resources[0]->EditRate));
             size_t MiOpenResult=MI2.Open(Sequences[Sequences_Current]->Resources[Pos]->FileNames.Read());
             MI2.Option(__T("ParseSpeed"), ParseSpeed_Save); //This is a global value, need to reset it. TODO: local value
             MI2.Option(__T("Demux"), Demux_Save); //This is a global value, need to reset it. TODO: local value
@@ -1848,6 +1855,10 @@ MediaInfo_Internal* File__ReferenceFilesHelper::MI_Create()
             MI_Temp->Option(__T("File_SubFile_IDs_Set"), SubFile_IDs.Read());
         }
     #endif //MEDIAINFO_EVENTS
+    if (FrameRate)
+        MI_Temp->Option(__T("File_Demux_Rate"), Ztring::ToZtring(FrameRate));
+    else if (!Sequences[Sequences_Current]->Resources.empty() && Sequences[Sequences_Current]->Resources[0]->EditRate) //TODO: per Pos
+        MI_Temp->Option(__T("File_Demux_Rate"), Ztring::ToZtring(Sequences[Sequences_Current]->Resources[0]->EditRate));
     #if MEDIAINFO_DEMUX
         if (Config->Demux_Unpacketize_Get())
             MI_Temp->Option(__T("File_Demux_Unpacketize"), __T("1"));
@@ -1855,10 +1866,6 @@ MediaInfo_Internal* File__ReferenceFilesHelper::MI_Create()
             MI_Temp->Option(__T("File_Demux_Avc_Transcode_Iso14496_15_to_Iso14496_10"), __T("1"));
         if (Config->Demux_Hevc_Transcode_Iso14496_15_to_AnnexB_Get())
             MI_Temp->Option(__T("File_Demux_Hevc_Transcode_Iso14496_15_to_AnnexB"), __T("1"));
-        if (FrameRate)
-            MI_Temp->Option(__T("File_Demux_Rate"), Ztring::ToZtring(FrameRate));
-        else if (!Sequences[Sequences_Current]->Resources.empty() && Sequences[Sequences_Current]->Resources[0]->EditRate) //TODO: per Pos
-            MI_Temp->Option(__T("File_Demux_Rate"), Ztring::ToZtring(Sequences[Sequences_Current]->Resources[0]->EditRate));
         switch (Config->Demux_InitData_Get())
         {
             case 0 : MI_Temp->Option(__T("File_Demux_InitData"), __T("Event")); break;

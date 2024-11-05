@@ -4269,6 +4269,7 @@ void File_Aac::FillInfosHEAACv2(const Ztring& Format_Settings)
     const Ztring ChannelPositions = Infos["ChannelPositions"];
     Infos["Channel(s)"] = __T("2");
     Infos["ChannelPositions"] = __T("Front: L R");
+    Infos["ChannelLayout"] = __T("L R");
     if (MediaInfoLib::Config.LegacyStreamDisplay_Get())
     {
         const Ztring SamplingRate_Previous = Infos["SamplingRate"];

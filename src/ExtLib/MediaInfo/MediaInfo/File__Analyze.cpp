@@ -2103,7 +2103,8 @@ bool File__Analyze::FileHeader_Begin_0x000001()
 bool File__Analyze::FileHeader_Begin_XML(XMLDocument &Document)
 {
     //Element_Size
-    if (Buffer_Size<32 || (!IsSub && File_Size>16*1024*1024))
+    //IMF Composition Playlist documents can be larger than 16 MB
+    if (Buffer_Size<32 || (!IsSub && File_Size>64*1024*1024))
     {
         Reject();
         return false; //XML files are not expected to be so big

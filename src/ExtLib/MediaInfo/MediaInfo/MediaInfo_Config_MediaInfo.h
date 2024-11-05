@@ -312,6 +312,8 @@ public :
     void          Event_SubFile_Missing_Absolute(const Ztring &FileName_Absolute);
     #endif //MEDIAINFO_EVENTS
 
+    void          Demux_Rate_Set (float64 NewValue);
+    float64       Demux_Rate_Get ();
     #if MEDIAINFO_DEMUX
     void          Demux_ForceIds_Set (bool NewValue);
     bool          Demux_ForceIds_Get ();
@@ -325,8 +327,6 @@ public :
     bool          Demux_Hevc_Transcode_Iso14496_15_to_AnnexB_Get ();
     void          Demux_Unpacketize_Set (bool NewValue);
     bool          Demux_Unpacketize_Get ();
-    void          Demux_Rate_Set (float64 NewValue);
-    float64       Demux_Rate_Get ();
     void          Demux_FirstDts_Set (int64u NewValue);
     int64u        Demux_FirstDts_Get ();
     void          Demux_FirstFrameNumber_Set (int64u NewValue);
@@ -583,6 +583,7 @@ private :
     std::vector<event_delayed*> Events_TimestampShift_Delayed;
     #endif //MEDIAINFO_EVENTS
 
+    float64                 Demux_Rate;
     #if MEDIAINFO_DEMUX
     bool                    Demux_ForceIds;
     bool                    Demux_PCM_20bitTo16bit;
@@ -591,7 +592,6 @@ private :
     bool                    Demux_Hevc_Transcode_Iso14496_15_to_AnnexB;
     bool                    Demux_Unpacketize;
     bool                    Demux_SplitAudioBlocks;
-    float64                 Demux_Rate;
     int64u                  Demux_FirstDts;
     int64u                  Demux_FirstFrameNumber;
     int8u                   Demux_InitData;

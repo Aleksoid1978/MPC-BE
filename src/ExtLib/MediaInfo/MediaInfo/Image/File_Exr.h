@@ -63,7 +63,9 @@ private :
     void compression();
     void dataWindow();
     void displayWindow();
+    void framesPerSecond();
     void pixelAspectRatio();
+    void timeCode();
 
     //Temp
     std::string         name;

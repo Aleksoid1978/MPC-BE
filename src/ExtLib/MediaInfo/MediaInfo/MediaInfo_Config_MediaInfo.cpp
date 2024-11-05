@@ -864,7 +864,7 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
     }
     else if (Option_Lower==__T("file_demux_rate"))
     {
-        #if MEDIAINFO_DEMUX
+        #if 1 //MEDIAINFO_DEMUX
             Demux_Rate_Set(Ztring(Value).To_float64());
             return Ztring();
         #else //MEDIAINFO_DEMUX
@@ -2455,7 +2455,7 @@ bool MediaInfo_Config_MediaInfo::Demux_SplitAudioBlocks_Get()
 #endif //MEDIAINFO_DEMUX
 
 //---------------------------------------------------------------------------
-#if MEDIAINFO_DEMUX
+#if 1 //MEDIAINFO_DEMUX
 void MediaInfo_Config_MediaInfo::Demux_Rate_Set (float64 NewValue)
 {
     CriticalSectionLocker CSL(CS);

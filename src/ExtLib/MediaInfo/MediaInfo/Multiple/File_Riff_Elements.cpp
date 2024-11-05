@@ -3731,9 +3731,10 @@ void File_Riff::WAVE_axml()
         }
         int8u* UncompressedData=strm.next_out-strm.total_out;
         size_t UncompressedData_Size=strm.total_out;
-
+        inflateEnd(&strm);
         //Parsing
         Open_Buffer_Continue(Adm, UncompressedData, UncompressedData_Size);
+        delete[] UncompressedData;
         Skip_UTF8(Element_Size, "XML data");
     }
     else
