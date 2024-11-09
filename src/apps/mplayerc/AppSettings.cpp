@@ -926,7 +926,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USE_TIME_TOOLTIP, fUseTimeTooltip);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_TIME_TOOLTIP_POSITION, nTimeTooltipPosition, TIME_TOOLTIP_ABOVE_SEEKBAR, TIME_TOOLTIP_BELOW_SEEKBAR);
 
-	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILE, strLastOpenFile);
 	// Last Open Dir
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_DIR, strLastOpenDir);
 	// Last Saved Playlist Dir
@@ -1590,6 +1589,11 @@ void CAppSettings::SaveSettings()
 	ASSERT(pApp);
 	CProfile& profile = AfxGetProfile();
 
+	{
+		// remove problematic obsolete parameters
+		profile.DeleteValue(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILE);
+	}
+
 	CString str;
 
 	FiltersPriority.SaveSettings();
@@ -1752,7 +1756,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USE_TIME_TOOLTIP, fUseTimeTooltip);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_TIME_TOOLTIP_POSITION, nTimeTooltipPosition);
 
-	profile.WriteString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILE, strLastOpenFile);
 	// Last Open Dir
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_DIR, strLastOpenDir);
 	// Last Saved Playlist Dir

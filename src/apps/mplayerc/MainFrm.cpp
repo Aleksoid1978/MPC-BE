@@ -804,6 +804,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	AfxGetMyApp()->m_HistoryFile.GetRecentPaths(recentPath, 1);
 	if (recentPath.size()) {
 		m_wndPlaylistBar.LoadPlaylist(recentPath.front());
+		if (s.bKeepHistory) {
+			s.strLastOpenFile = recentPath.front();
+		}
 	} else {
 		m_wndPlaylistBar.LoadPlaylist(L"");
 	}

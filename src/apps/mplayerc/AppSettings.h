@@ -822,7 +822,7 @@ public:
 	bool			bPlaylistDetermineDuration;
 
 	// OTHER STATES
-	CString			strLastOpenFile;
+	CString			strLastOpenFile; // not saved
 	CString			strLastOpenDir;
 	CString			strLastSavedPlaylistDir;
 
