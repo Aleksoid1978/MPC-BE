@@ -698,7 +698,7 @@ static av_cold int initFilter(int16_t **outFilter, int32_t **filterPos,
             filterAlign = 1;
     }
 
-    if (HAVE_MMX && cpu_flags & AV_CPU_FLAG_MMX) {
+    if (HAVE_MMX && cpu_flags & AV_CPU_FLAG_MMX || have_neon(cpu_flags)) {
         // special case for unscaled vertical filtering
         if (minFilterSize == 1 && filterAlign == 2)
             filterAlign = 1;
@@ -1517,7 +1517,9 @@ static av_cold int sws_init_single_context(SwsContext *sws, SwsFilter *srcFilter
         dstFormat != AV_PIX_FMT_BGR4_BYTE &&
         dstFormat != AV_PIX_FMT_RGB4_BYTE &&
         dstFormat != AV_PIX_FMT_BGR8 &&
-        dstFormat != AV_PIX_FMT_RGB8
+        dstFormat != AV_PIX_FMT_RGB8 &&
+        dstFormat != AV_PIX_FMT_X2RGB10LE &&
+        dstFormat != AV_PIX_FMT_X2BGR10LE
     ) {
         av_log(c, AV_LOG_WARNING,
                "full chroma interpolation for destination format '%s' not yet implemented\n",

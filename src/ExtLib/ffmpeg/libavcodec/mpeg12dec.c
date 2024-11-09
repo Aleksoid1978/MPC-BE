@@ -1947,6 +1947,8 @@ static void mpeg_set_cc_format(AVCodecContext *avctx, enum Mpeg2ClosedCaptionsFo
 
         av_log(avctx, AV_LOG_DEBUG, "CC: first seen substream is %s format\n", label);
     }
+
+    avctx->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
 }
 
 static int mpeg_decode_a53_cc(AVCodecContext *avctx,
@@ -1973,7 +1975,6 @@ static int mpeg_decode_a53_cc(AVCodecContext *avctx,
             if (ret >= 0)
                 memcpy(s1->a53_buf_ref->data + old_size, p + 7, cc_count * UINT64_C(3));
 
-            avctx->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
             mpeg_set_cc_format(avctx, CC_FORMAT_A53_PART4, "A/53 Part 4");
         }
         return 1;
@@ -2023,7 +2024,6 @@ static int mpeg_decode_a53_cc(AVCodecContext *avctx,
                 }
             }
 
-            avctx->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
             mpeg_set_cc_format(avctx, CC_FORMAT_SCTE20, "SCTE-20");
         }
         return 1;
@@ -2086,7 +2086,6 @@ static int mpeg_decode_a53_cc(AVCodecContext *avctx,
                 }
             }
 
-            avctx->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
             mpeg_set_cc_format(avctx, CC_FORMAT_DVD, "DVD");
         }
         return 1;
