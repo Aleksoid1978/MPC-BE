@@ -49,7 +49,7 @@ public:
 	int          GetSize() const { return m_nSize; }
 	int          RemainingSize() const { return m_nSize - m_nBitPos; }
 	int          BitsLeft() const { return 8 * RemainingSize() + m_bitlen; }
-	bool         IsEOF() const { return m_nBitPos >= m_nSize; }
+	bool         IsEOF() const { return !m_bitlen && m_nBitPos >= m_nSize; }
 	int          GetPos() const;
 	int          GetBitsPos() const;
 	const BYTE*  GetBufferPos() const { return m_pBuffer + m_nBitPos; }
