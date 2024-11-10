@@ -7,7 +7,7 @@
 12		"Compilator FFmpeg :"
 13		"Libavcodec / Libavutil :"
 23		"Acest program este gratuit și lansat sub licența GNU General Public License."
-24		"Între anii 2023-2024 traducătorul este Andrei-Valentin Miloiu. În trecut, traducerea a fost făcută de Daniel Alămiță şi lordkag."
+24		"Între anii 2023-2024 traducătorul programului este Andrei-Valentin Miloiu. În trecut, au tradus Daniel Alămiță şi lordkag."
 25		"OK"
 END
 
@@ -15,7 +15,7 @@ BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11
 3		"Comanda de selecție"
 6		"Filtru:"
 9		"OK"
-10		"Revocare"
+10	"Revocare"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
@@ -32,7 +32,7 @@ BEGIN DIALOGEX IDD_AUTH_DLG LINES 15
 9		"Zonă restricționată"
 10		"Nume utilizator:"
 11		"Parolă:"
-14		"Ține minte parola"
+14		"Reține parola"
 END
 
 BEGIN DIALOGEX IDD_CAPTURE_DLG LINES 41
@@ -56,7 +56,7 @@ END
 
 BEGIN DIALOGEX IDD_FAVADD LINES 12
 3		"Adaugă la favorite"
-6		"Alegeți un nume pentru scurtătură:"
+6		"Alege un nume pentru scurtătură:"
 8		"Memorează poziția"
 9		"Unitate relativă"
 10		"OK"
@@ -131,19 +131,19 @@ END
 
 BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"Deschide"
-7		"Introduceți adresa unui fișier video sau audio (de pe Internet sau din calculatorul dumneavoastră) și playerul îl va deschide pentru dumneavoastră."
+7		"Introdu adresa unui fișier video sau audio (de pe Internet sau din calculatorul tău) și player-ul îl va deschide pentru tine."
 8		"Deschide:"
 10		"Răsfoire..."
 11		"Dublaj:"
 13		"Răsfoire..."
 14		"OK"
 15		"Revocare"
-16		"Adaugă la lista de redare fără a deschide"
+16		"Adaugă la lista de redare (playlist) fără a deschide"
 17		"Lipește URL-ul din clipboard"
 END
 
 BEGIN DIALOGEX IDD_PLAYLISTNAME LINES 10
-3		"Dialogul numelui listei de redare"
+3		"Dialogul pentru numele listei de redare"
 6		"OK"
 7		"Revocare"
 9		"Nume:"
@@ -224,7 +224,7 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
 12		"Audio"
 13		"Subtitrări"
 15		"Setări adiționale"
-16		"Permite subtitrări pentru persoane cu dizabilități în decodorul ""Line 21 Decoder"""
+16		"Permite subtitr. pt. pers. cu dizabilități în decodorul ""Line 21 Decoder"""
 18		"Începe redarea din Titlul principal"
 END
 
@@ -332,7 +332,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
-6		"Dacă doriți să folosiți versiunea autonomă a acestor filtre sau un înlocuitor, dezactivați-le aici. Pe filtrele scrise aldin (îngroșat) se poate da dublu-clic pentru a deschide paginile lor cu proprietăți."
+6		"Dacă dorești să folosești versiunea autonomă a acestor filtre sau un înlocuitor, dezactivează-le aici. Pe filtrele scrise aldin (îngroșat) se poate da dublu-clic pentru a deschide paginile lor cu proprietăți."
 10		"Configurația\ndespicătorului AVI"
 11		"Configurația\ndespicătorului MPEG"
 12		"Configurația\ndespicătorului Matroska"
@@ -402,7 +402,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 29		"Adaugă în plus, la lista de redare:"
 31		"Folosește un fir de execuţie secundar pentru a construi graficul filtrelor"
 33		"Raportează pinii care eșuează să randeze"
-34		"Ține minte pistele selectate în lista de redare"
+34		"Reține pistele selectate în lista de redare"
 35		"Căutare rapidă (la cadru cheie)"
 36		"Previne redarea videoclipului când este minimizat"
 END
@@ -422,10 +422,10 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 18		"Ține un istoric al ultimelor fișiere deschise"
 20		"Numărul maxim de intrări:"
 23		"Numărul maxim de fișiere recente:"
-26		"Ține minte poziția pe DVD"
-27		"Ține minte poziția în fișier"
-28		"Ține minte ultima alegere a panoramării și scanării"
-29		"Ține minte lista de redare principală"
+26		"Reține poziția pe DVD"
+27		"Reține poziția în fișier"
+28		"Reține ultima alegere a panoramării și scanării"
+29		"Reține lista de redare principală"
 31		"Afișează titlul pentru URL în fișierele recente"
 33		"Altele"
 34		"Pictogramă în zona de notificare"
