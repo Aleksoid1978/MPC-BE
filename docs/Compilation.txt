@@ -5,7 +5,7 @@
   Install Visual Studio 2019 (any edition will work fine). During installation, you must select the following components: 
    * Desktop development with C++
      * MSVC v142 - Build Tools C++ 
-     * Windows SDK 10.0.17763.0 or newer (latest).
+     * Windows SDK 10.0.19041.0 or newer (latest).
      * C++ ATL support
      * C++ MFC support
 
@@ -14,7 +14,7 @@
   Install Visual Studio 2022 (any edition will work fine). During installation, you must select the following components: 
    * Desktop development with C++
      * MSVC v143 - Build Tools C++ 
-     * Windows SDK 10.0.18362.0 or newer (latest).
+     * Windows SDK 10.0.19041.0 or newer (latest).
      * C++ ATL support
      * C++ MFC support
 
