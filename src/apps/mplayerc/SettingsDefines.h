@@ -312,10 +312,13 @@
 #define IDS_RS_NO_SEARCH_IN_FOLDER			L"DontUseSearchInFolder"
 #define IDS_RS_USE_TIME_TOOLTIP				L"UseTimeTooltip"
 #define IDS_RS_TIME_TOOLTIP_POSITION		L"TimeTooltipPosition"
-#define IDS_RS_LAST_OPEN_FILE				L"LastOpenFile"
+
+#define IDS_RS_ASSOCIATED_WITH_ICON			L"AssociatedWithIcon"
+
+#define IDS_RS_LAST_OPEN_FILE				L"LastOpenFile" // obsolete
 #define IDS_RS_LAST_OPEN_DIR				L"LastOpenDir"
 #define IDS_RS_LAST_SAVED_PLAYLIST_DIR		L"LastSavedPlaylistDir"
-#define IDS_RS_ASSOCIATED_WITH_ICON			L"AssociatedWithIcon"
+#define IDS_RS_LAST_OPEN_FILTER_DIR			L"LastOpenFilterDir"
 
 #define IDS_RS_TOGGLESHADER					L"ToggleShader"
 #define IDS_RS_TOGGLESHADERSSCREENSPACE		L"ToggleShaderScreenSpace"
@@ -343,7 +346,6 @@
 #define IDS_RS_USE_FLYBAR					L"UseFlybar"
 #define IDS_RS_USE_FLYBAR_ONTOP				L"UseFlybarOnTop"
 
-#define IDS_RS_LAST_OPEN_FILTER_DIR			L"LastOpenFilterDir"
 #define IDS_RS_DLGPROPX						L"DlgPropX"
 #define IDS_RS_DLGPROPY						L"DlgPropY"
 
