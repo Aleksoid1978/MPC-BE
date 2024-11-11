@@ -1560,8 +1560,6 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
-IDB_MEDIAINFO_LANGUAGE  FILE                    "..\\..\\ExtLib\\MediaInfo\\Language\\sk.csv"
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Toolbar
