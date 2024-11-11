@@ -152,8 +152,9 @@ Name: pl; MessagesFile: compiler:Languages\Polish.isl
 Name: ro; MessagesFile: Languages\Romanian.isl
 Name: ru; MessagesFile: compiler:Languages\Russian.isl
 Name: sc; MessagesFile: Languages\ChineseSimplified.isl
-Name: sv; MessagesFile: Languages\Swedish.isl
 Name: sk; MessagesFile: compiler:Languages\Slovak.isl
+Name: sl; MessagesFile: compiler:Languages\Slovenian.isl
+Name: sv; MessagesFile: Languages\Swedish.isl
 Name: tc; MessagesFile: Languages\ChineseTraditional.isl
 Name: tr; MessagesFile: compiler:Languages\Turkish.isl
 Name: ua; MessagesFile: compiler:Languages\Ukrainian.isl
@@ -183,6 +184,7 @@ Name: ua; MessagesFile: compiler:Languages\Ukrainian.isl
 #include ".\CustomMessages\custom_messages.ru.iss"
 #include ".\CustomMessages\custom_messages.sc.iss"
 #include ".\CustomMessages\custom_messages.sk.iss"
+#include ".\CustomMessages\custom_messages.sl.iss"
 #include ".\CustomMessages\custom_messages.sv.iss"
 #include ".\CustomMessages\custom_messages.tc.iss"
 #include ".\CustomMessages\custom_messages.tr.iss"
