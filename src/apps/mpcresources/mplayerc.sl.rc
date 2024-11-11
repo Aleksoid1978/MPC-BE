@@ -1654,7 +1654,7 @@ BEGIN
             MENUITEM "Auto Fit",   ID_VIEW_ZOOM_AUTOFIT
         END
         MENUITEM SEPARATOR
-        MENUITEM "&Jezik",                   ID_SUBMENU_LANGUAGE
+        MENUITEM "Jezik (&Language)",                   ID_SUBMENU_LANGUAGE
         MENUITEM SEPARATOR
         POPUP "Nastavitve izrisovalnika"
         BEGIN
@@ -1829,7 +1829,7 @@ BEGIN
             MENUITEM "Zajem",              ID_VIEW_CAPTURE
             MENUITEM "Shader Editor",                ID_VIEW_SHADEREDITOR
             MENUITEM "Navigacija",                   ID_VIEW_NAVIGATION
-            MENUITEM "&Jezik",           ID_SUBMENU_LANGUAGE
+            MENUITEM "Jezik (&Language)",           ID_SUBMENU_LANGUAGE
             POPUP "&Presets..."
             BEGIN
                 MENUITEM "&Minimal",           ID_VIEW_PRESETS_MINIMAL
@@ -1908,7 +1908,7 @@ BEGIN
             MENUITEM "Zajem",              ID_VIEW_CAPTURE
             MENUITEM "Shader Editor",       ID_VIEW_SHADEREDITOR
             MENUITEM "Navigacija",                   ID_VIEW_NAVIGATION
-            MENUITEM "&Jezik",           ID_SUBMENU_LANGUAGE
+            MENUITEM "Jezik (&Language)",           ID_SUBMENU_LANGUAGE
             POPUP "&Presets..."
             BEGIN
                 MENUITEM "&Minimal",           ID_VIEW_PRESETS_MINIMAL
