@@ -81,6 +81,9 @@
     <ResourceCompile Include="mplayerc.sv.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="mplayerc.sl.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
     <ResourceCompile Include="mplayerc.tc.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
