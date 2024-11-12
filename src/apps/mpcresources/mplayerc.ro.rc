@@ -170,7 +170,7 @@ BEGIN
     CONTROL         "Int16",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,218,32,9
     CONTROL         "Int24",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,52,218,32,9
     CONTROL         "Int32",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,94,218,32,9
-    CONTROL         "Plutitor",IDC_CHECK12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,137,218,32,9
+    CONTROL         "Float (Numere reale)",IDC_CHECK12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,137,218,32,9
     CONTROL         "Decalează timpul audio (ms):",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,240,115,9
     EDITTEXT        IDC_EDIT2,129,238,46,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,174,238,12,13
@@ -219,7 +219,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_MAINFRAME_ICON,5,5,21,20
     LTEXT           "MPC-BE",IDC_STATIC1,30,5,195,8,SS_NOPREFIX
-    CONTROL         "Drepturi de autor © 2002-2024 vedeți Authors.txt",IDC_AUTHORS_LINK,
+    CONTROL         "Drepturi de autor © 2002-2024 - vezi fișierul Authors.txt",IDC_AUTHORS_LINK,
                     "SysLink",WS_TABSTOP,30,17,195,8
     LTEXT           "Versiune :",IDC_VERSION,30,34,90,8
     LTEXT           "Compilator MPC-BE :",IDC_STATIC,30,66,90,8
@@ -235,7 +235,7 @@ BEGIN
     CONTROL         "<a>https://github.com/Aleksoid1978/MPC-BE</a>",IDC_GITHUB_LINK,
                     "SysLink",WS_TABSTOP,30,126,200,8
     LTEXT           "Acest program este gratuit și lansat sub licența GNU General Public License.",IDC_STATIC,30,138,200,18
-    LTEXT           "Între anii 2023-2024 traducătorul programului este Andrei-Valentin Miloiu. În trecut, au tradus Daniel Alămiță şi lordkag.",IDC_STATIC,30,161,200,18
+    LTEXT           "Între anii 2023-2024 traducătorul este Andrei-Valentin Miloiu.  În trecut, au tradus Daniel Alămiță şi lordkag.",IDC_STATIC,30,161,200,18
     DEFPUSHBUTTON   "OK",IDOK,185,183,50,14,WS_GROUP
 END
 
@@ -311,7 +311,7 @@ IDD_PPAGEDVD DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Acţiuni pentru ""Deschide DVD/BD""",IDC_STATIC,5,5,286,53
+    GROUPBOX        "Acţiuni pentru ""Deschide DVD-ul/BD-ul""",IDC_STATIC,5,5,286,53
     CONTROL         "Solicită locaţia",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,17,280,8
     CONTROL         "Deschide întotdeauna locaţia implicită:",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,29,280,8
     EDITTEXT        IDC_DVDPATH,20,41,249,13,ES_AUTOHSCROLL | WS_GROUP
@@ -418,7 +418,7 @@ BEGIN
     CONTROL         "Muzică",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,241,47,9
     CONTROL         "DVD",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,61,229,47,9
     CONTROL         "CD Audio",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,61,241,47,9
-    GROUPBOX        "Meniu contextual pentru Explorator",IDC_STATIC,117,217,118,24
+    GROUPBOX        "Meniu contextual pentru Explorator (Explorer)",IDC_STATIC,117,217,118,24
     CONTROL         "Directoare",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,122,229,50,9
     CONTROL         "Fișier(e)",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,176,229,55,9
 END
@@ -475,7 +475,7 @@ BEGIN
     CONTROL         "",IDC_SPIN10,"msctls_updown32",UDS_WRAP | UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,166,226,12,13
     CONTROL         "Umbră",IDC_CHECK_SHADOW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,224,194,46,9
     CONTROL         "Anti-aliasare",IDC_CHECK_AA,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,224,206,61,18
-    CONTROL         "Folosește facilitățile barei de activități Windows 7",IDC_CHECK_WIN7,
+    CONTROL         "Folosește facilitățile barei de activități din Windows 7",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,246,270,11
 END
 
@@ -949,7 +949,7 @@ BEGIN
     PUSHBUTTON      "Revocare",IDCANCEL,158,108,50,14
     CONTROL         337,IDC_STATIC,"Static",SS_BITMAP,0,0,213,37
     LTEXT           "Zonă restricționată",IDC_STATIC,10,40,198,11
-    LTEXT           "Nume utilizator:",IDC_STATIC,10,56,66,8
+    LTEXT           "Numele utilizatorului:",IDC_STATIC,10,56,66,8
     LTEXT           "Parolă:",IDC_STATIC,10,74,66,8
     COMBOBOX        IDC_COMBO1,79,56,129,56,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_EDIT3,79,74,129,13,ES_PASSWORD | ES_AUTOHSCROLL
@@ -1608,7 +1608,7 @@ BEGIN
         MENUITEM "&Deschide rapid un fișier...",   ID_FILE_OPENFILE
         MENUITEM SEPARATOR
         MENUITEM "De&schide fișierul...",     ID_FILE_OPENFILEURL
-        MENUITEM "Deschide DVD/&BD...",   ID_FILE_OPENDVD
+        MENUITEM "Deschide DVD-ul/&BD-ul...",   ID_FILE_OPENDVD
         MENUITEM "Deschide dis&pozitivul...",       ID_FILE_OPENDEVICE
         MENUITEM "Deschide directorul...",           ID_FILE_OPENDIRECTORY
         MENUITEM "Deschide imaginea &Iso...",          ID_FILE_OPENISO
@@ -1747,14 +1747,14 @@ BEGIN
         BEGIN
             MENUITEM "&Deschide rapid un fișier...",   ID_FILE_OPENFILE
             MENUITEM SEPARATOR
-            MENUITEM "&Deschide fișierul...",     ID_FILE_OPENFILEURL
-            MENUITEM "Deschide &DVD/BD...",   ID_FILE_OPENDVD
+            MENUITEM "D&eschide fișierul...",     ID_FILE_OPENFILEURL
+            MENUITEM "Deschide DVD-ul/&BD-ul...",   ID_FILE_OPENDVD
             MENUITEM "Deschide dis&pozitivul...",       ID_FILE_OPENDEVICE
             MENUITEM "Deschide directorul...",           ID_FILE_OPENDIRECTORY
             MENUITEM "Deschide imaginea &Iso...",          ID_FILE_OPENISO
             MENUITEM "De&schide discul",                  ID_SUBMENU_OPENDISC
             MENUITEM "Fișiere recente",                ID_SUBMENU_RECENTFILES
-            MENUITEM "&Închide",                ID_FILE_CLOSEPLAYLIST
+            MENUITEM "Înc&hide",                ID_FILE_CLOSEPLAYLIST
             MENUITEM SEPARATOR
             MENUITEM "&Salvează o copie...",             ID_FILE_SAVE_COPY
             MENUITEM "Salvează &imaginea...",              ID_FILE_SAVE_IMAGE
@@ -1878,8 +1878,8 @@ BEGIN
         BEGIN
             MENUITEM "&Deschide rapid un fișier...",   ID_FILE_OPENFILE
             MENUITEM SEPARATOR
-            MENUITEM "&Deschide fișier...",     ID_FILE_OPENFILEURL
-            MENUITEM "Deschide &DVD...",   ID_FILE_OPENDVD
+            MENUITEM "D&eschide fișier...",     ID_FILE_OPENFILEURL
+            MENUITEM "Deschide D&VD-ul...",   ID_FILE_OPENDVD
             MENUITEM "Deschide dis&pozitivul...",       ID_FILE_OPENDEVICE
             MENUITEM "Deschide directorul...",           ID_FILE_OPENDIRECTORY
             MENUITEM "Deschide imaginea &Iso...",          ID_FILE_OPENISO
@@ -2276,7 +2276,7 @@ BEGIN
     IDS_AUTOPLAY_PLAYVIDEO  "Redare video"
     IDS_AUTOPLAY_PLAYMUSIC  "Redare muzică"
     IDS_AUTOPLAY_PLAYAUDIOCD "Redare CD audio"
-    IDS_AUTOPLAY_PLAYDVDMOVIE "Redare film DVD"
+    IDS_AUTOPLAY_PLAYDVDMOVIE "Redare film de pe DVD"
     IDS_PROPSHEET_PROPERTIES "Proprietăți"
     IDS_GRAPHBUILDER_AUDIOSWITCHER "Comutator audio"
     IDS_SUBTITLES_DEFAULT_STYLE "&Stil implicit"
@@ -2313,7 +2313,7 @@ BEGIN
     IDS_PLAYLIST_RENAME_CURRENT "Redenumește lista de redare"
     IDS_PLAYLIST_DELETE_CURRENT "Șterge lista de redare"
     IDS_PLAYLIST_NAME       "Listă de redare"
-    IDS_PLAYLIST_EXPLORER_NAME "Explorator"
+    IDS_PLAYLIST_EXPLORER_NAME "Explorator (Explorer)"
     IDS_PLAYLIST_OPEN       "&Deschide"
     IDS_PLAYLIST_ADD        "A&daugă"
     IDS_PLAYLIST_REMOVE     "&Elimină"
@@ -2369,7 +2369,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_PLAYLIST_POSITION_BOTTOM "Jos"
-    IDS_PLAYLIST_POSITION_FLOAT "Plutitor"
+    IDS_PLAYLIST_POSITION_FLOAT "Float (Numere reale)"
 END
 
 STRINGTABLE
@@ -2423,7 +2423,7 @@ BEGIN
     IDS_PPAGE_OUTPUT_SYS_DEF "Implicit sistemului"
     IDS_GRAPH_INTERFACES_ERROR  "Eşuare la interogarea interfeţelor necesare pentru redare"
     IDS_GRAPH_TARGET_WND_ERROR  "Nu se poate seta fereastra ţintă pentru notificările graficului"
-    IDS_DVD_NAV_ALL_PINS_ERROR  "Eşuare la randarea tuturor pinilor filtrului DVD Navigator"
+    IDS_DVD_NAV_ALL_PINS_ERROR  "Nu s-au putut randa toți pinii filtrului Navigator DVD (DVD Navigator)"
 END
 
 STRINGTABLE
@@ -2721,7 +2721,7 @@ BEGIN
     IDS_AG_NOT_KNOWN        "Necunoscut"
     IDS_AG_OPEN_FILE        "Deschide rapid un fișier"
     IDS_AG_OPEN_FILEURL     "Deschide fișier"
-    IDS_AG_OPEN_DVD         "Deschide DVD/BD"
+    IDS_AG_OPEN_DVD         "Deschide DVD-ul/BD-ul"
 END
 
 STRINGTABLE
@@ -3017,11 +3017,11 @@ STRINGTABLE
 BEGIN
     IDS_AG_TITLE            "Titlu %d"
     IDS_MAINFRM_16          "DVD: Eroare neașteptată"
-    IDS_MAINFRM_17          "DVD: Eșec la protecția copierii"
+    IDS_MAINFRM_17          "DVD: Eroare de protecție la copiere"
     IDS_MAINFRM_18          "DVD: Disc DVD 1.x nevalid"
     IDS_MAINFRM_19          "DVD: Regiune disc nevalidă"
     IDS_MAINFRM_20          "DVD: Nivel parental scăzut"
-    IDS_MAINFRM_21          "DVD: Eșec la protecţie macroviziune"
+    IDS_MAINFRM_21          "DVD: Eroare de protecţie de macroviziune"
     IDS_MAINFRM_22          "DVD: Regiuni sistem și decodor incompatibile"
     IDS_MAINFRM_23          "DVD: Regiuni disc și decodor incompatibile"
     IDS_AG_NAVIGATE         "Navighează"
@@ -3074,7 +3074,7 @@ BEGIN
     IDS_MAINFRM_51          "GetCurrentImage a eșuat, hr = %08x"
     IDS_MAINFRM_53          "Fișierul nu poate fi creat"
     IDS_MAINFRM_54          "Nu se pot crea miniaturi pentru fișiere fără durată"
-    IDS_MAINFRM_55          "Eșec la preluarea dimensiunii cadrului video"
+    IDS_MAINFRM_55          "Nu s-a putut prelua dimensiunea cadrului video"
     IDS_MAINFRM_56          "Memorie insuficientă, du-te și cumpără-ți mai multă!"
     IDS_MAINFRM_57          "Format de imagine nevalid, nu pot fi create miniaturi din %d bpp dibs."
     IDS_MAINFRM_58          "Dimensiune fișier: %s (%s bytes)\\N"
@@ -3109,7 +3109,7 @@ BEGIN
     IDS_BALANCE_OSD         "Balans: %s"
     IDS_FULLSCREENMONITOR_CURRENT "Curent"
     IDS_MPC_CRASH           "MPC-BE s-a închis neașteptat. Pentru a ne ajuta să rezolvăm această problemă, vă rugăm să trimiți acest fișier ""%s"" către sistemul nostru de urmărire erori (bug tracker).\n\nDorești să deschizi dosarul ce conţine fişierul de imagine memorie (minidump) şi să vizitezi acum sistemul de urmărire de erori?"
-    IDS_MPC_MINIDUMP_FAIL   "Eșec la crearea fișierului de depanare ""%s"" (eroare %d)"
+    IDS_MPC_MINIDUMP_FAIL   "Nu s-a putut crea fișierul de depanare ""%s"" (eroare %d)"
     IDS_MAINFRM_DIR_TITLE   "Selectează directorul"
     IDS_MAINFRM_DIR_CHECK   "Include subdirectoare"
     IDS_AG_PAUSE            "Pauză"
@@ -3129,7 +3129,7 @@ BEGIN
     IDS_MAINFRM_91          "Tip necunoscut de fișier"
     IDS_MAINFRM_92          "Flux incompatibil"
     IDS_MAINFRM_93          "Directorul DVD nu poate fi găsit"
-    IDS_MAINFRM_94          "Filtrul DVD Navigator nu poate fi creat"
+    IDS_MAINFRM_94          "Filtrul Navigator DVD (DVD Navigator) nu poate fi creat"
     IDS_AG_FAILED           "Eșuat"
     IDS_MAINFRM_96          "Filtrul pentru captură video nu poate fi creat"
     IDS_MAINFRM_98          "Niciun filtru de captură"
@@ -3206,7 +3206,7 @@ BEGIN
     IDS_CMD_D3DFS           "/d3dfs\t\tPornește randare în mod ecran complet D3D"
     IDS_CMD_SUB             "/sub ""numele subtitrării""\tÎncarcă o subtitrare suplimentară"
     IDS_CMD_FILTER          "/filter ""nume filtru""\tÎncarcă filtre DirectShow dintr-o librărie\n\t\tcu încărcare dinamică (metacaractere permise)"
-    IDS_CMD_DVD             "/dvd\t\tRulează în mod DVD, ""cale"" înseamnă dosarul\n\t\tdvd-ului (opțional)"
+    IDS_CMD_DVD             "/dvd\t\tRulează în mod DVD, ""cale"" înseamnă dosarul\n\t\tDVD-ului (opțional)"
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tPornește redarea la titlul T, capitolul C"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tPornește redarea la titlul T, poziția hh:mm:ss"
     IDS_CMD_CD              "/cd\t\tÎncarcă toate pistele unui cd audio sau (s)vcd,\n\t\t""cale"" înseamnă calea unității (opțional)"
@@ -3684,8 +3684,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DVD_NAV_SOME_PINS_ERROR  "Eşuare la randarea unora dintre pinii filtrului DVD Navigator"
-    IDS_DVD_INTERFACES_ERROR  "Eşuare la interogarea interfeţelor necesare pentru redare DVD"
+    IDS_DVD_NAV_SOME_PINS_ERROR  "Nu s-au putut randa unii pini ai filtruluiNavigator DVD (DVD Navigator)"
+    IDS_DVD_INTERFACES_ERROR  "Nu s-au putut interogare interfeţele necesare pentru redarea DVD-ului"
     IDS_CAPTURE_LIVE        "În direct"
     IDS_CAPTURE_ERROR_VID_FILTER "Filtrul pentru captură video nu poate fi adăugat la grafic"
     IDS_CAPTURE_ERROR_AUD_FILTER "Filtrul pentru captură audio nu poate fi adăugat la grafic"
