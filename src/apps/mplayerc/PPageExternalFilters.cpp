@@ -38,7 +38,11 @@
 
 bool IsSupportedExternalVideoRenderer(CLSID clsid)
 {
+#if 1
 	return clsid == CLSID_EnhancedVideoRenderer || clsid == CLSID_MPCVR || clsid == CLSID_DXR || clsid == CLSID_madVR;
+#else
+	return false;
+#endif
 }
 
 static const std::vector<GUID> s_MajorTypes = {
