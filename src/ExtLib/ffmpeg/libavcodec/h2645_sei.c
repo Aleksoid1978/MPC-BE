@@ -26,6 +26,7 @@
 #include "config_components.h"
 
 #include "libavutil/ambient_viewing_environment.h"
+#include "libavutil/buffer.h"
 #include "libavutil/display.h"
 #include "libavutil/hdr_dynamic_metadata.h"
 #include "libavutil/film_grain_params.h"
@@ -41,6 +42,7 @@
 #include "golomb.h"
 #include "h2645_sei.h"
 #include "itut35.h"
+#include "refstruct.h"
 
 #define IS_H264(codec_id) (CONFIG_H264_SEI && CONFIG_HEVC_SEI ? codec_id == AV_CODEC_ID_H264 : CONFIG_H264_SEI)
 #define IS_HEVC(codec_id) (CONFIG_H264_SEI && CONFIG_HEVC_SEI ? codec_id == AV_CODEC_ID_HEVC : CONFIG_HEVC_SEI)
@@ -245,12 +247,7 @@ static int decode_registered_user_data(H2645SEI *h, GetByteContext *gb,
 
         provider_oriented_code = bytestream2_get_byteu(gb);
         if (provider_oriented_code == aom_grain_provider_oriented_code) {
-            if (!h->aom_film_grain) {
-                h->aom_film_grain = av_mallocz(sizeof(*h->aom_film_grain));
-                if (!h->aom_film_grain)
-                    return AVERROR(ENOMEM);
-            }
-            return ff_aom_parse_film_grain_sets(h->aom_film_grain,
+            return ff_aom_parse_film_grain_sets(&h->aom_film_grain,
                                                 gb->buffer,
                                                 bytestream2_get_bytes_left(gb));
         }
@@ -499,11 +496,10 @@ int ff_h2645_sei_message_decode(H2645SEI *h, enum SEIType type,
     case SEI_TYPE_DISPLAY_ORIENTATION:
         return decode_display_orientation(&h->display_orientation, gb);
     case SEI_TYPE_FILM_GRAIN_CHARACTERISTICS:
-        if (!h->film_grain_characteristics) {
-            h->film_grain_characteristics = av_mallocz(sizeof(*h->film_grain_characteristics));
-            if (!h->film_grain_characteristics)
-                return AVERROR(ENOMEM);
-        }
+        ff_refstruct_unref(&h->film_grain_characteristics);
+        h->film_grain_characteristics = ff_refstruct_allocz(sizeof(*h->film_grain_characteristics));
+        if (!h->film_grain_characteristics)
+            return AVERROR(ENOMEM);
         return decode_film_grain_characteristics(h->film_grain_characteristics, codec_id, gb);
     case SEI_TYPE_FRAME_PACKING_ARRANGEMENT:
         return decode_frame_packing_arrangement(&h->frame_packing, gb, codec_id);
@@ -551,6 +547,20 @@ int ff_h2645_sei_ctx_replace(H2645SEI *dst, const H2645SEI *src)
             dst->unregistered.nb_buf_ref++;
         }
     }
+
+    for (unsigned i = 0; i < FF_ARRAY_ELEMS(dst->aom_film_grain.sets); i++) {
+        ret = av_buffer_replace(&dst->aom_film_grain.sets[i],
+                                 src->aom_film_grain.sets[i]);
+        if (ret < 0)
+            return ret;
+    }
+    dst->aom_film_grain.enable = src->aom_film_grain.enable;
+
+    dst->mastering_display     = src->mastering_display;
+    dst->content_light         = src->content_light;
+
+    ff_refstruct_replace(&dst->film_grain_characteristics,
+                          src->film_grain_characteristics);
 
     return 0;
 }
@@ -894,11 +904,9 @@ FF_ENABLE_DEPRECATION_WARNINGS
     }
 
 #if CONFIG_HEVC_SEI
-    if (sei->aom_film_grain) {
-        ret = ff_aom_attach_film_grain_sets(sei->aom_film_grain, frame);
-        if (ret < 0)
-            return ret;
-    }
+    ret = ff_aom_attach_film_grain_sets(&sei->aom_film_grain, frame);
+    if (ret < 0)
+        return ret;
 #endif
 
     return 0;
@@ -926,6 +934,6 @@ void ff_h2645_sei_reset(H2645SEI *s)
     s->mastering_display.present = 0;
     s->content_light.present = 0;
 
-    av_freep(&s->film_grain_characteristics);
-    av_freep(&s->aom_film_grain);
+    ff_refstruct_unref(&s->film_grain_characteristics);
+    ff_aom_uninit_film_grain_params(&s->aom_film_grain);
 }

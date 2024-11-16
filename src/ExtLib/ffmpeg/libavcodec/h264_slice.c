@@ -437,13 +437,11 @@ int ff_h264_update_thread_context(AVCodecContext *dst,
 
     h->frame_recovered       = h1->frame_recovered;
 
-    ret = ff_h264_sei_ctx_replace(&h->sei, &h1->sei);
+    ret = ff_h2645_sei_ctx_replace(&h->sei.common, &h1->sei.common);
     if (ret < 0)
         return ret;
 
     h->sei.common.unregistered.x264_build = h1->sei.common.unregistered.x264_build;
-    h->sei.common.mastering_display = h1->sei.common.mastering_display;
-    h->sei.common.content_light = h1->sei.common.content_light;
 
     if (!h->cur_pic_ptr)
         return 0;

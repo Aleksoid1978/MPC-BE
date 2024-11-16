@@ -30,6 +30,8 @@
 #include "libavcodec/vvc/dsp.h"
 #include "libavcodec/x86/h26x/h2656dsp.h"
 
+#if ARCH_X86_64
+
 #define PUT_PROTOTYPE(name, depth, opt) \
 void ff_vvc_put_ ## name ## _ ## depth ## _##opt(int16_t *dst, const uint8_t *src, ptrdiff_t srcstride, int height, const int8_t *hf, const int8_t *vf, int width);
 
@@ -102,19 +104,29 @@ DMVR_PROTOTYPES( 8, avx2)
 DMVR_PROTOTYPES(10, avx2)
 DMVR_PROTOTYPES(12, avx2)
 
+#define OF_PROTOTYPES(bd, opt)                                                                      \
+void ff_vvc_apply_bdof_##bd##_##opt(uint8_t *dst, ptrdiff_t dst_stride,                             \
+    const int16_t *src0, const int16_t *src1, int w, int h);                                        \
+
+OF_PROTOTYPES( 8, avx2)
+OF_PROTOTYPES(10, avx2)
+OF_PROTOTYPES(12, avx2)
+
+#if ARCH_X86_64 && HAVE_AVX2_EXTERNAL
 void ff_vvc_apply_bdof_avx2(uint8_t *dst, ptrdiff_t dst_stride,                                     \
     const int16_t *src0, const int16_t *src1, int w, int h, int pixel_max);                         \
 
-#define OF_PROTOTYPES(bd, opt)                                                                      \
-static void ff_vvc_apply_bdof_##bd##_##opt(uint8_t *dst, ptrdiff_t dst_stride,                      \
+#define OF_FUNC(bd, opt)                                                                            \
+void ff_vvc_apply_bdof_##bd##_##opt(uint8_t *dst, ptrdiff_t dst_stride,                             \
     const int16_t *src0, const int16_t *src1, int w, int h)                                         \
 {                                                                                                   \
     ff_vvc_apply_bdof##_##opt(dst, dst_stride, src0, src1, w, h, (1 << bd)  - 1);                   \
 }                                                                                                   \
 
-OF_PROTOTYPES( 8, avx2)
-OF_PROTOTYPES(10, avx2)
-OF_PROTOTYPES(12, avx2)
+OF_FUNC( 8, avx2)
+OF_FUNC(10, avx2)
+OF_FUNC(12, avx2)
+#endif
 
 #define ALF_BPC_PROTOTYPES(bpc, opt)                                                                                     \
 void BF(ff_vvc_alf_filter_luma, bpc, opt)(uint8_t *dst, ptrdiff_t dst_stride,                                            \
@@ -355,6 +367,9 @@ ALF_FUNCS(16, 12, avx2)
 int ff_vvc_sad_avx2(const int16_t *src0, const int16_t *src1, int dx, int dy, int block_w, int block_h);
 #define SAD_INIT() c->inter.sad = ff_vvc_sad_avx2
 #endif
+
+
+#endif // ARCH_X86_64
 
 void ff_vvc_dsp_init_x86(VVCDSPContext *const c, const int bd)
 {
