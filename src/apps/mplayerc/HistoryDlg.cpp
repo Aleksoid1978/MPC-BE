@@ -288,6 +288,35 @@ BOOL CHistoryDlg::OnInitDialog()
 	return TRUE;
 }
 
+BOOL CHistoryDlg::PreTranslateMessage(MSG* pMsg)
+{
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN) {
+		if (pMsg->hwnd == m_list.GetSafeHwnd() && m_list.GetSelectedCount() > 0) {
+			CStringW paths;
+
+			if (POSITION pos = m_list.GetFirstSelectedItemPosition()) {
+				auto item  = m_list.GetNextSelectedItem(pos);
+				auto index = static_cast<size_t>(m_list.GetItemData(item));
+
+				if (index < m_recentSessions.size()) {
+					const auto& sesInfo = m_recentSessions[index];
+
+					auto pFrame = AfxGetMainFrame();
+					if (!pFrame->m_wndPlaylistBar.SelectFileInPlaylist(sesInfo.Path)) {
+						pFrame->m_wndPlaylistBar.Open(sesInfo.Path);
+					}
+					pFrame->OpenCurPlaylistItem();
+				}
+			}
+		}
+
+		return FALSE;
+	}
+
+	return __super::PreTranslateMessage(pMsg);
+
+}
+
 void CHistoryDlg::OnShowWindow(BOOL bShow, UINT nStatus)
 {
 	if (bShow) {

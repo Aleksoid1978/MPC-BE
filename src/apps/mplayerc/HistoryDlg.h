@@ -1,5 +1,5 @@
 /*
- * (C) 2021-2023 see Authors.txt
+ * (C) 2021-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -73,6 +73,7 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 
 	void SetupList();
 	void CopySelectedPaths();
