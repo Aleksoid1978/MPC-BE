@@ -50,6 +50,8 @@ CStringW GetCombineFilePath(LPCWSTR dir, LPCWSTR file);
 // creates a full and canonical path
 CStringW GetFullCannonFilePath(LPCWSTR path);
 
+bool ConvertFileUriToPath(CStringW& uri);
+
 void StripToRoot(CStringW& path);
 CStringW GetStripToRoot(LPCWSTR path);
 

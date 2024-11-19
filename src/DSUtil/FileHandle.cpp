@@ -168,6 +168,24 @@ CStringW GetFullCannonFilePath(LPCWSTR path)
 	return newPath;
 }
 
+bool ConvertFileUriToPath(CStringW& uri)
+{
+	if (StartsWith(uri, L"file://")) {
+		DWORD size = uri.GetLength();
+		CStringW path;
+		if (S_OK == UrlUnescapeW(uri.GetBuffer(), path.GetBuffer(size), &size, URL_ESCAPE_URI_COMPONENT)) {
+			path.ReleaseBuffer(size);
+			if (S_OK == PathCreateFromUrlW(path.GetString(), path.GetBuffer(), &size, 0)) {
+				path.ReleaseBuffer(size);
+				uri = path;
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 void StripToRoot(CStringW& path)
 {
 	BOOL ret = ::PathStripToRootW(path.GetBuffer());

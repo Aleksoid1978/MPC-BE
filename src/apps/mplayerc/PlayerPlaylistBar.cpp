@@ -47,7 +47,7 @@
 #define ID_PLSMENU_POSITION_BOTTOM 2008
 #define ID_PLSMENU_POSITION_FLOAT  2009
 
-WCHAR LastChar(const CStringW& str)
+static WCHAR LastChar(const CStringW& str)
 {
 	int len = str.GetLength();
 	return len > 0 ? str.GetAt(len - 1) : 0;
@@ -55,12 +55,11 @@ WCHAR LastChar(const CStringW& str)
 
 static CStringW MakePath(CStringW path)
 {
-	if (::PathIsURLW(path) || Youtube::CheckURL(path)) { // skip URLs
-		if (path.Left(8).MakeLower() == L"file:///") {
-			path.Delete(0, 8);
-			path.Replace('/', '\\');
-		}
+	if (ConvertFileUriToPath(path)) {
+		return path;
+	}
 
+	if (::PathIsURLW(path) || Youtube::CheckURL(path)) { // skip URLs
 		return path;
 	}
 
@@ -1450,7 +1449,7 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 
 static CString CombinePath(CStringW base, const CStringW& relative)
 {
-	if (StartsWith(relative, L":\\", 1) || StartsWith(relative, L"\\")) {
+	if (StartsWith(relative, L":\\", 1) || StartsWith(relative, L"\\") || StartsWith(relative, L"file://")) {
 		return relative;
 	}
 
@@ -2145,8 +2144,10 @@ void CPlayerPlaylistBar::Append(std::list<CString>& fns, const bool bMulti, CSub
 	}
 
 	for (auto& fn : fns) {
-		if (::PathIsURLW(fn)) {
-			fn = UrlDecode(fn);
+		if (!ConvertFileUriToPath(fn)) {
+			if (::PathIsURLW(fn)) {
+				fn = UrlDecode(fn);
+			}
 		}
 	}
 

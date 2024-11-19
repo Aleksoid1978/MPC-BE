@@ -273,9 +273,8 @@ namespace Content {
 			CString url = CString(match[k].first, match[k].length());
 			url.Trim();
 
-			if (playlist_type == PLAYLIST_RAM && StartsWith(url, L"file://")) {
-				url.Delete(0, 7);
-				url.Replace('/', '\\');
+			if (playlist_type == PLAYLIST_RAM) {
+				ConvertFileUriToPath(url);
 			}
 
 			CUrlParser dst;
@@ -345,9 +344,8 @@ namespace Content {
 			CString fn2 = CString(match[k].first, match[k].length());
 			fn2.Trim();
 
-			if (playlist_type == PLAYLIST_RAM && StartsWith(fn2, L"file://")) {
-				fn2.Delete(0, 7);
-				fn2.Replace('/', '\\');
+			if (playlist_type == PLAYLIST_RAM) {
+				ConvertFileUriToPath(fn2);
 			}
 
 			if (fn2.Find(':') < 0 && fn2.Find(L"\\\\") != 0 && fn2.Find(L"//") != 0) {
