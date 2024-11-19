@@ -880,7 +880,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REWIND, fRewind);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, nVolumeStep, 1, 10);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SPEED_STEP, nSpeedStep);
-	nSpeedStep = discard(nSpeedStep, 0, { 5, 10, 20, 25, 50, 100 });
+	nSpeedStep = discard(nSpeedStep, 0, { 1, 5, 10, 20, 25, 50, 100 });
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SPEED_NOTRESET, bSpeedNotReset);
 
 	m_VRSettings.Load();
