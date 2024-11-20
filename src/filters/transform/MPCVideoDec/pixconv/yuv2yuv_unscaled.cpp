@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  *
- *  Adaptation for MPC-BE (C) 2013-2017 v0lt & Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+ *  Adaptation for MPC-BE (C) 2013-2014 v0lt & Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
  */
 
 #include "stdafx.h"
@@ -208,18 +208,25 @@ HRESULT CFormatConverter::convert_yuv_yv(const uint8_t* const src[4], const ptrd
     _mm_sfence();
 
     // Y
-    if ((outLumaStride % 16) == 0 && ((intptr_t)dst[0] % 16u) == 0)
+    if (outLumaStride == inLumaStride)
     {
-        for (line = 0; line < height; ++line)
-        {
-            PIXCONV_MEMCPY_ALIGNED(dst[0] + outLumaStride * line, y + inLumaStride * line, width);
-        }
+        memcpy(dst[0], y, outLumaStride * height);
     }
     else
     {
-        for (line = 0; line < height; ++line)
+        if ((outLumaStride % 16) == 0 && ((intptr_t)dst[0] % 16u) == 0)
         {
-            memcpy(dst[0] + outLumaStride * line, y + inLumaStride * line, width);
+            for (line = 0; line < height; ++line)
+            {
+                PIXCONV_MEMCPY_ALIGNED(dst[0] + outLumaStride * line, y + inLumaStride * line, width);
+            }
+        }
+        else
+        {
+            for (line = 0; line < height; ++line)
+            {
+                memcpy(dst[0] + outLumaStride * line, y + inLumaStride * line, width);
+            }
         }
     }
 
@@ -261,9 +268,16 @@ HRESULT CFormatConverter::convert_yuv420_nv12(const uint8_t* const src[4], const
     _mm_sfence();
 
     // Y
-    for (line = 0; line < height; ++line)
+    if (outLumaStride == inLumaStride)
     {
-        PIXCONV_MEMCPY_ALIGNED(dst[0] + outLumaStride * line, src[0] + inLumaStride * line, width);
+        memcpy(dst[0], src[0], outLumaStride * height);
+    }
+    else
+    {
+        for (line = 0; line < height; ++line)
+        {
+            PIXCONV_MEMCPY_ALIGNED(dst[0] + outLumaStride * line, src[0] + inLumaStride * line, width);
+        }
     }
 
     // U/V
@@ -385,9 +399,16 @@ HRESULT CFormatConverter::convert_nv12_yv12(const uint8_t* const src[4], const p
     _mm_sfence();
 
     // Copy the y
-    for (line = 0; line < height; line++)
+    if (outLumaStride == inLumaStride)
     {
-        PIXCONV_MEMCPY_ALIGNED(dst[0] + outLumaStride * line, src[0] + inLumaStride * line, width);
+        memcpy(dst[0], src[0], outLumaStride * height);
+    }
+    else
+    {
+        for (line = 0; line < height; line++)
+        {
+            PIXCONV_MEMCPY_ALIGNED(dst[0] + outLumaStride * line, src[0] + inLumaStride * line, width);
+        }
     }
 
     for (line = 0; line < chromaHeight; line++)
