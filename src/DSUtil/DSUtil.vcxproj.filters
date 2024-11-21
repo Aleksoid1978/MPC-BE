@@ -9,6 +9,9 @@
       <UniqueIdentifier>{2b09c18b-87fc-47da-a366-3e14c0b9d40f}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
     </Filter>
+    <Filter Include="pixconv">
+      <UniqueIdentifier>{8a2c62ac-ed7f-4998-83c0-a29a67fadbdf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DSMPropertyBag.cpp">
@@ -267,6 +270,12 @@
     </ClInclude>
     <ClInclude Include="ISOLang.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pixconv\pixconv_sse2_templates.h">
+      <Filter>pixconv</Filter>
+    </ClInclude>
+    <ClInclude Include="pixconv\yuv420_nv12_unscaled.h">
+      <Filter>pixconv</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,5 +1,5 @@
 /*
- * (C) 2020 see Authors.txt
+ * (C) 2020-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +22,7 @@
 
 extern void CopyPlane(const UINT h, BYTE* dst, UINT dst_pitch, const BYTE* src, UINT src_pitch);
 
-extern void CopyI420toNV12(UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch);
+extern void CopyI420toNV12(UINT w, UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch);
 extern void CopyI420toYV12(UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch);
 
 extern void ConvertI420toYUY2(UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch, const bool bInterlaced);

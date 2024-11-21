@@ -17,13 +17,13 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  *
- *  Adaptation for MPC-BE (C) 2013-2017 v0lt & Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+ *  Adaptation for MPC-BE (C) 2013-2014 v0lt & Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
  */
 
 #include "stdafx.h"
 #include "FormatConverter.h"
 #include "pixconv_internal.h"
-#include "pixconv_sse2_templates.h"
+#include "DSUtil/pixconv/pixconv_sse2_templates.h"
 
 #include <ppl.h>
 

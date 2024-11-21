@@ -127,6 +127,8 @@
     <ClInclude Include="Mpeg2Def.h" />
     <ClInclude Include="NullRenderers.h" />
     <ClInclude Include="Packet.h" />
+    <ClInclude Include="pixconv\pixconv_sse2_templates.h" />
+    <ClInclude Include="pixconv\yuv420_nv12_unscaled.h" />
     <ClInclude Include="PixelUtils.h" />
     <ClInclude Include="PixelUtils_AviSynth.h" />
     <ClInclude Include="PixelUtils_VirtualDub.h" />

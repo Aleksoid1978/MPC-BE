@@ -1,5 +1,5 @@
 /*
- * (C) 2020 see Authors.txt
+ * (C) 2020-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,6 +23,8 @@
 #include "PixelUtils_VirtualDub.h"
 #include "PixelUtils.h"
 
+#include "pixconv/yuv420_nv12_unscaled.h"
+
 void CopyPlane(const UINT h, BYTE* dst, UINT dst_pitch, const BYTE* src, UINT src_pitch)
 {
 	if (dst_pitch == src_pitch) {
@@ -39,8 +41,21 @@ void CopyPlane(const UINT h, BYTE* dst, UINT dst_pitch, const BYTE* src, UINT sr
 	}
 }
 
-void CopyI420toNV12(UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch)
+void CopyI420toNV12(UINT w, UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch)
 {
+	if (!(dst_pitch % 16) && !(src_pitch % 16)) {
+		const ptrdiff_t srcStride[3] = { src_pitch, src_pitch / 2, src_pitch / 2 };
+
+		uint8_t* dstData[2] = {};
+		dstData[0] = dst;
+		dstData[1] = dstData[0] + dst_pitch * h;
+		const ptrdiff_t dstStride[] = { dst_pitch, dst_pitch };
+
+		convert_yuv420_nv12(src, srcStride, dstData, w, h, dstStride);
+
+		return;
+	}
+
 	CopyPlane(h, dst, dst_pitch, src[0], src_pitch); // Y
 
 	dst += dst_pitch * h;

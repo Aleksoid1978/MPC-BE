@@ -723,7 +723,7 @@ HRESULT CRoQVideoDecoder::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
 
 	if (bihOut.biCompression == FCC('NV12')) {
-		CopyI420toNV12(h, pDataOut, bihOut.biWidth, src, w);
+		CopyI420toNV12(w, h, pDataOut, bihOut.biWidth, src, w);
 	}
 	else if (bihOut.biCompression == FCC('YV12')) {
 		CopyI420toYV12(h, pDataOut, bihOut.biWidth, src, w);

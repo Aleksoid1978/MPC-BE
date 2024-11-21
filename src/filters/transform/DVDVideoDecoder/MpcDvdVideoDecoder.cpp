@@ -805,12 +805,11 @@ HRESULT CMpeg2DecFilter::DeliverToRenderer()
 		m_pSubpicInput->RenderSubpics(m_fb.rtStart, buf, m_fb.pitch, m_fb.h);
 	}
 
-	int w = (m_fb.w + 7)&~7;
 	BITMAPINFOHEADER bihOut;
 	ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
 
 	if (bihOut.biCompression == FCC('NV12')) {
-		CopyI420toNV12(m_fb.h, pDataOut, bihOut.biWidth, buf, m_fb.pitch);
+		CopyI420toNV12(m_fb.w, m_fb.h, pDataOut, bihOut.biWidth, buf, m_fb.pitch);
 	}
 	else if (bihOut.biCompression == FCC('YV12')) {
 		CopyI420toYV12(m_fb.h, pDataOut, bihOut.biWidth, buf, m_fb.pitch);

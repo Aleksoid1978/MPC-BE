@@ -16,7 +16,7 @@
 *  with this program; if not, write to the Free Software Foundation, Inc.,
 *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 *
-*  Adaptation for MPC-BE (C) 2016-2022 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+*  Adaptation for MPC-BE (C) 2016-2024 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
 */
 
 #include "stdafx.h"
@@ -38,7 +38,7 @@ extern "C" {
 #include "DSUtil/GolombBuffer.h"
 
 #include "../MPCVideoDec.h"
-#include "../pixconv/pixconv_sse2_templates.h"
+#include "DSUtil/pixconv/pixconv_sse2_templates.h"
 
 inline void CopyEverySecondLineSSE2(uint8_t* dst, uint8_t* src1, uint8_t* src2, ptrdiff_t linesize, unsigned lines)
 {
