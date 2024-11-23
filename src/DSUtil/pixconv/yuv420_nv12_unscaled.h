@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2024 see Authors.txt
+ * (C) 2013-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,6 +26,7 @@
 // from LAVFilters/decoder/LAVVideo/pixconv/yuv2yuv_unscaled.cpp
 //
 
+// destination must be aligned to 32
 inline void convert_yuv420_nv12(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
 {
     const ptrdiff_t inLumaStride = srcStride[0];

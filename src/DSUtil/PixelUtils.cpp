@@ -43,13 +43,10 @@ void CopyPlane(const UINT h, BYTE* dst, UINT dst_pitch, const BYTE* src, UINT sr
 
 void CopyI420toNV12(UINT w, UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch)
 {
-	if (!(dst_pitch % 16) && !(src_pitch % 16)) {
+	if (!(dst_pitch % 32) && !(src_pitch % 16)) {
 		const ptrdiff_t srcStride[3] = { src_pitch, src_pitch / 2, src_pitch / 2 };
-
-		uint8_t* dstData[2] = {};
-		dstData[0] = dst;
-		dstData[1] = dstData[0] + dst_pitch * h;
-		const ptrdiff_t dstStride[] = { dst_pitch, dst_pitch };
+		uint8_t* dstData[2]          = { dst, dst + dst_pitch * h };
+		const ptrdiff_t dstStride[2] = { dst_pitch, dst_pitch };
 
 		convert_yuv420_nv12(src, srcStride, dstData, w, h, dstStride);
 
