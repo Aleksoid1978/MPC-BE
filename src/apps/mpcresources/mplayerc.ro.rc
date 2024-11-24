@@ -100,7 +100,7 @@ BEGIN
     COMBOBOX        IDC_COMBO12,10,204,40,50,CBS_DROPDOWNLIST | CBS_SORT | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO11,52,204,65,50,CBS_DROPDOWNLIST | CBS_SORT | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,219,110,1
-    LTEXT           "Preîncărcări V/A:",IDC_STATIC,10,223,45,8
+    LTEXT           "Preîncărcări pentru V/A:",IDC_STATIC,10,223,45,8
     EDITTEXT        IDC_EDIT5,59,221,28,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT6,89,221,28,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,236,110,1
@@ -235,7 +235,7 @@ BEGIN
     CONTROL         "<a>https://github.com/Aleksoid1978/MPC-BE</a>",IDC_GITHUB_LINK,
                     "SysLink",WS_TABSTOP,30,126,200,8
     LTEXT           "Acest program este gratuit și lansat sub licența GNU General Public License.",IDC_STATIC,30,138,200,18
-    LTEXT           "Între anii 2023-2024 traducătorul este Andrei-Valentin Miloiu.  În trecut, au tradus Daniel Alămiță şi lordkag.",IDC_STATIC,30,161,200,18
+    LTEXT           "Între anii 2023-2024 traducătorul este Andrei Valentin Miloiu.  În trecut, au tradus Daniel Alămiță şi lordkag.",IDC_STATIC,30,161,200,18
     DEFPUSHBUTTON   "OK",IDOK,185,183,50,14,WS_GROUP
 END
 
@@ -322,7 +322,7 @@ BEGIN
     CONTROL         "Subtitrări",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,10,98,65,8
     LISTBOX         IDC_LIST1,79,74,208,66,WS_VSCROLL | WS_GROUP | WS_TABSTOP
     GROUPBOX        "Setări adiționale",IDC_STATIC,5,140,286,37
-    CONTROL         "Permite subtitr. pt. pers. cu dizabilități în decodorul ""Line 21 Decoder""",IDC_CHECK2,
+    CONTROL         "Permite subt. pt. pers. cu dizabilități în decodorul ""Line 21 Decoder""",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,152,220,9
     CONTROL         "Începe redarea din Titlul principal",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,164,220,9
 END
@@ -484,7 +484,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "Dimensiunea ferestrei la pornire",IDC_STATIC,5,5,286,67
-    CONTROL         "Dimensiunea standard a ferestrei",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,16,106,10
+    CONTROL         "Mărimea standard a ferestrei",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,16,106,10
     CONTROL         "Reține ultima dimensiune a ferestrei",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,30,127,10
     CONTROL         "Setează mărimea ferestrei specificată",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,10,44,118,10
     CONTROL         "Setează zona video specificată",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,10,58,118,10
@@ -647,7 +647,7 @@ BEGIN
     LTEXT           "uICE:",IDC_STATICLINK2,18,232,35,8
     EDITTEXT        IDC_EDIT2,57,230,86,13,ES_AUTOHSCROLL
     CONTROL         "Taste media globale",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,245,160,9
-    PUSHBUTTON      "Selectează toate",IDC_BUTTON1,201,221,90,14
+    PUSHBUTTON      "Selectează-le pe toate",IDC_BUTTON1,201,221,90,14
     PUSHBUTTON      "Resetează selecția",IDC_BUTTON2,201,239,90,14
 END
 
@@ -812,7 +812,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_TAB1,"SysTabControl32",WS_TABSTOP,0,0,296,246
-    LTEXT           "Dacă dorești să folosești versiunea autonomă a acestor filtre sau un înlocuitor, dezactivează-le aici. Pe filtrele scrise aldin (îngroșat) se poate da dublu-clic pentru a deschide paginile lor cu proprietăți.",IDC_STATIC,7,19,269,18
+    LTEXT           "Dacă vrei să folosești vers. autonomă a acestor filtre sau un înlocuitor, dezactivează-le aici. Pe filtrele scrise îngroșat se poate da dublu clic pentru a deschide paginile lor cu proprietăți.",IDC_STATIC,7,19,269,18
     LISTBOX         IDC_LIST1,5,41,210,200,LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     LISTBOX         IDC_LIST2,5,41,210,200,LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     LISTBOX         IDC_LIST3,5,41,210,200,LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
@@ -884,7 +884,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,79,224,10
     CONTROL         "Ieșire RGB de 10 biți",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,92,92,10
     CONTROL         "Reinițializează la schimbarea ecranului",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_TOP | WS_TABSTOP,10,65,164,9
-    LTEXT           "Preîncărcări EVR:",IDC_STATIC5,10,107,65,8
+    LTEXT           "Preîncărcări pentru EVR:",IDC_STATIC5,10,107,65,8
     EDITTEXT        IDC_EVR_BUFFERS,10,120,35,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,33,120,12,13
     LTEXT           "Formatul de suprafață:",IDC_STATIC2,115,124,72,8
@@ -1168,7 +1168,7 @@ BEGIN
     CONTROL         "Activează corecția timpului cadrelor",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,170,10
     CONTROL         "Golește memoria GPU înainte de VSync",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,14,140,10
     CONTROL         "Golește memoria GPU după Present",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,142,10
-    CONTROL         "Așteaptă pentru procesele de golire a memoriei",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,38,100,10
+    CONTROL         "Așteaptă pt. proc. golire mem.",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,38,100,10
     GROUPBOX        "Setări de sincronizare EVR Sync",IDC_STATIC2,5,67,286,117
     CONTROL         "Sincronizează video cu afișarea",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,142,8
     CONTROL         "Prezintă la cel mai apropiat VSync (Sincronizare Verticală)",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,170,8
@@ -1611,7 +1611,7 @@ BEGIN
         MENUITEM "Deschide DVD-ul/&BD-ul...",   ID_FILE_OPENDVD
         MENUITEM "Deschide dis&pozitivul...",       ID_FILE_OPENDEVICE
         MENUITEM "Deschide directorul...",           ID_FILE_OPENDIRECTORY
-        MENUITEM "Deschide imaginea &Iso...",          ID_FILE_OPENISO
+        MENUITEM "Deschide imaginea &ISO...",          ID_FILE_OPENISO
         MENUITEM "Des&chide discul",                  ID_SUBMENU_OPENDISC
         MENUITEM "Fișiere recente",                ID_SUBMENU_RECENTFILES
         MENUITEM "&Închide",                ID_FILE_CLOSEPLAYLIST
@@ -1751,7 +1751,7 @@ BEGIN
             MENUITEM "Deschide DVD-ul/&BD-ul...",   ID_FILE_OPENDVD
             MENUITEM "Deschide dis&pozitivul...",       ID_FILE_OPENDEVICE
             MENUITEM "Deschide directorul...",           ID_FILE_OPENDIRECTORY
-            MENUITEM "Deschide imaginea &Iso...",          ID_FILE_OPENISO
+            MENUITEM "Deschide imaginea &ISO...",          ID_FILE_OPENISO
             MENUITEM "De&schide discul",                  ID_SUBMENU_OPENDISC
             MENUITEM "Fișiere recente",                ID_SUBMENU_RECENTFILES
             MENUITEM "Înc&hide",                ID_FILE_CLOSEPLAYLIST
@@ -1882,7 +1882,7 @@ BEGIN
             MENUITEM "Deschide D&VD-ul...",   ID_FILE_OPENDVD
             MENUITEM "Deschide dis&pozitivul...",       ID_FILE_OPENDEVICE
             MENUITEM "Deschide directorul...",           ID_FILE_OPENDIRECTORY
-            MENUITEM "Deschide imaginea &Iso...",          ID_FILE_OPENISO
+            MENUITEM "Deschide imaginea &ISO...",          ID_FILE_OPENISO
             MENUITEM "De&schide discul",                  ID_SUBMENU_OPENDISC
             MENUITEM "Fișiere recente",                ID_SUBMENU_RECENTFILES
             MENUITEM "&Închide",                      ID_FILE_CLOSEPLAYLIST
@@ -2573,8 +2573,8 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_SHADERS_SELECT   "Selectează nuanțatoarele"
-    IDS_AG_SHADERS_1_ENABLE "Comută nuanțatoare pixel"
-    IDS_AG_SHADERS_2_ENABLE "Comută nuanțatoare pixel pentru spațiu ecran"
+    IDS_AG_SHADERS_1_ENABLE "Activează nuanțatoarele de pixeli (Pixels Shaders)"
+    IDS_AG_SHADERS_2_ENABLE "Activează nuanțatoarele de pixeli pentru spațiu ecran"
     IDS_OSD_SHADERS_1_ON    "Nuanțatoare de pixel de preredimensionare: pornit"
     IDS_OSD_SHADERS_1_OFF   "Nuanțatoare de pixel de preredimensionare: oprit"
     IDS_OSD_SHADERS_2_ON    "Nuanțatoare de pixel de postredimensionare: pornit"
@@ -2789,7 +2789,7 @@ BEGIN
     IDS_MENU_VIDEO_STREAM   "F&lux video"
     IDS_MENU_VIDEO_ANGLE    "Un&ghi video"
     IDS_RESET_SETTINGS      "Resetează setările"
-    IDS_RESET_SETTINGS_WARNING  "Sigur doriți să restaurați MPC-BE la setările implicite?\nTrebuie să știți că TOATE setările curente vor fi pierdute!"
+    IDS_RESET_SETTINGS_WARNING  "Ești sigur că vrei să restaurezi MPC-BE la setările implicite?\nTrebuie să știi că TOATE setările curente vor fi pierdute!"
     IDS_RESET_SETTINGS_MUTEX  "Închide toate instanțele programului MPC-BE pentru ca setările implicite să poată fi restaurate."
     IDS_EXPORT_SETTINGS     "Exportă setările"
     IDS_EXPORT_SETTINGS_WARNING  "Unele modificări nu au fost încă salvate.\nDoriți să le salvați înainte de exportare?"
@@ -2929,7 +2929,7 @@ STRINGTABLE
 BEGIN
     IDS_AG_NEXT_SUBTITLE    "Următoarea subtitrare"
     IDS_AG_PREV_SUBTITLE    "Subtitrarea precedentă"
-    IDS_AG_SUBTITLE_ONOFF   "Pornire/Oprire subtitrare"
+    IDS_AG_SUBTITLE_ONOFF   "(Dez)activează subtitrările"
     IDS_AG_SUBTITLE_RELOAD  "Reîncarcă subtitrările"
     IDS_AG_NEXT_VIDEO       "Următorul videoclip/Unghiul DVD"
     IDS_AG_PREV_VIDEO       "Videoclipul anterior/Unghiul DVD"
@@ -2955,7 +2955,7 @@ BEGIN
     IDS_AG_DISPLAY_STATS    "Afișează statistici"
     IDS_AG_AUDIODELAY_ONOFF "Întârziere audio Pornit/Oprit"
     IDS_AG_AUTOSAVE_DISPLAY "Salvează imaginea afișată (automat)"
-    IDS_AG_OPEN_ISO         "Deschide imaginea Iso"
+    IDS_AG_OPEN_ISO         "Deschide imaginea ISO"
     IDS_AG_OPEN_DIR         "Deschide directorul"
 END
 
@@ -3007,7 +3007,7 @@ BEGIN
     IDS_ZOOM_AUTOFITLARGE   "Potrivire automată (doar mai mare)"
     IDS_ADD_TO_PLAYLIST     "Adaugă la lista de redare a MPC-BE"
     IDS_OPEN_WITH_MPC       "Redare cu MPC-BE"
-    IDS_CANNOT_CHANGE_FORMAT  "MPC-BE nu are destule drepturi pentru a schimba asocierea cu formatele de fișiere. Dați clic pe butonul ""Modifică"" pentru a obține drepturi de administrator."
+    IDS_CANNOT_CHANGE_FORMAT  "MPC-BE nu are destule drepturi pentru a schimba asocierea cu formatele de fișiere. Dă clic pe butonul ""Modifică"" pentru a obține drepturi de administrator."
     IDS_APP_DESCRIPTION     "Unul dintre cele mai puternice și configurabile lectoare multimedia pentru sistemul de operare Windows. Creat la început de un dezvoltator maghiar cunoscut ca Gabest, această versiune are aptitudini adiționale cum ar fi mod pe tot ecranul Direct 3D și o compatibilitate mai bună cu Vista/7."
     IDS_MAINFRM_12          "canal"
     IDS_MAINFRM_13          "canale"
@@ -3060,11 +3060,11 @@ BEGIN
     IDS_MAINFRM_39          ", Mărime: %I64dMB"
     IDS_MAINFRM_40          ", Liberă: %I64dKB"
     IDS_MAINFRM_41          ", Liberă: %I64dMB"
-    IDS_MAINFRM_42          ", Preîncărcări V/A libere: %03d/%03d"
+    IDS_MAINFRM_42          ", Preîncărcări pentru V/A libere: %03d/%03d"
     IDS_AG_ERROR            "Eroare"
     IDS_SUBTITLE_STREAM_OFF "Subtitrare: oprită"
     IDS_SUBTITLE_STREAM     "Subtitrare: %s"
-    IDS_MAINFRM_46          "Selectați calea către DVD/BD:"
+    IDS_MAINFRM_46          "Selectează calea către DVD/BD:"
 END
 
 STRINGTABLE
@@ -3144,7 +3144,7 @@ BEGIN
     IDS_MAINFRM_106         "Atenție: Nu a fost găsită nicio interfață IAMTVTuner\n"
     IDS_MAINFRM_108         "Nu se poate deschide niciun dispozitiv"
     IDS_AG_SOUND            "Sunet"
-    IDS_MAINFRM_114         "%s nu a fost găsit, inserați mediul conținând acest fișier."
+    IDS_MAINFRM_114         "%s nu a fost găsit, inserează mediul care conține acest fișier."
     IDS_AG_ABORTED          "Abandonat"
     IDS_MAINFRM_116         "&Proprietăți..."
     IDS_MAINFRM_117         " (pin) proprietăți..."
@@ -3403,7 +3403,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CDDAREADER_READ_TEXT_INFO "RCitește informațiile de CD-TEXT"
+    IDS_CDDAREADER_READ_TEXT_INFO "Citește informațiile de CD-TEXT"
 END
 
 STRINGTABLE
@@ -3411,7 +3411,7 @@ BEGIN
     IDS_AG_TOGGLE_INFO      "Comută informații"
     IDS_AG_TOGGLE_STATS     "Comută statistici"
     IDS_AG_TOGGLE_STATUS    "Comută stare"
-    IDS_AG_TOGGLE_SUBRESYNC "Comută bara de resincronizarea subtitrărilor"
+    IDS_AG_TOGGLE_SUBRESYNC "Comută bara de resincronizare a subtitrărilor"
     IDS_AG_TOGGLE_PLAYLIST  "Comută bara listă de redare"
     IDS_AG_TOGGLE_CAPTURE   "Comută bara de captură"
     IDS_AG_TOGGLE_SHADER    "Comută bara editor de nuanțator"
@@ -3429,7 +3429,7 @@ STRINGTABLE
 BEGIN
     IDS_AG_VIDFRM_ZOOM1     "Cadru video - scalare 1"
     IDS_AG_VIDFRM_ZOOM2     "Cadru video - scalare 2"
-    IDS_AG_VIDFRM_SWITCHZOOM "Cadru video - comutare de scalare"
+    IDS_AG_VIDFRM_SWITCHZOOM "Schimbă scalarea cadrului video"
     IDS_ENABLE_ALL_FILTERS  "Activ&ează toate filtrele"
 END
 
@@ -3657,10 +3657,10 @@ BEGIN
     IDS_SATURATION_DEC      "Micșorare saturație"
     IDS_RESET_COLOR         "Resetează setările de culoare"
     IDS_AFTERPLAYBACK_CLOSE_FILE "După redare: închide întotdeauna fișierul"
-    IDS_UPDATE_ERROR_DATA   "Serverul pentru actualizare oferă date greșite.\n\nÎncercați mai târziu."
+    IDS_UPDATE_ERROR_DATA   "Serverul pentru actualizare oferă date greșite.\n\nÎncearcă mai târziu."
     IDS_USING_NEWER_VERSION "Deja folosești ultima versiune %s."
     IDS_NEW_UPDATE_AVAILABLE  "O nouă %s este disponibilă.\n\nVrei să vizitezi site-ul programului MPC-BE ca să o descarci?"
-    IDS_UPDATE_ERROR_CONNECT  "Serverul pentru actualizare nu a fost găsit.\n\nVerificaţi conexiunea la internet sau încercaţi mai târziu."
+    IDS_UPDATE_ERROR_CONNECT  "Serverul pentru actualizare nu a fost găsit.\n\nVerifică-ți conexiunea la internet sau încercearcă mai târziu."
     IDS_UPDATE_CLOSE        "În&chide"
     IDS_OSD_ZOOM            "Scalează: %.0lf%%"
 END
@@ -3676,9 +3676,9 @@ BEGIN
     IDS_GOTO_ERROR_PARSING_TIME "Eroare la analizarea timpului introdus!"
     IDS_GOTO_ERROR_PARSING_TEXT "Eroare la analizarea textului introdus!"
     IDS_GOTO_ERROR_PARSING_FPS "Eroare la analizarea ratei de cadre introduse!"
-    IDS_FRAME_STEP_ERROR_RENDERER  "Nu se poate face deplasare cadru cu cadru, încercați un alt randor video."
+    IDS_FRAME_STEP_ERROR_RENDERER  "Nu se poate face deplasarea cadru cu cadru, încearcă un alt randor video."
     IDS_SCREENSHOT_ERROR_SHOCKWAVE  "Funcțiile ""Salvează imagine"" și ""Salvează miniaturi"" nu funcționează pentru fișierele Shockwave."
-    IDS_SCREENSHOT_ERROR_OVERLAY  "Funcțiile ""Salvează imagine"" și ""Salvează miniaturi"" nu funcționează cu randorul video Overlay Mixer.\nSchimbați randorul video în opțiunile de ieșire ale MPC și redeschizi fișierul."
+    IDS_SCREENSHOT_ERROR_OVERLAY  "Funcțiile ""Salvează imagine"" și ""Salvează miniaturi"" nu funcționează cu randorul video Overlay Mixer.\nSchimbă randorul video în opțiunile de ieșire ale MPC și redeschizi fișierul."
     IDS_SUBDL_DLG_CONNECT_ERROR  "Nu se poate conecta la baza de subtitrări online."
 END
 
@@ -3695,7 +3695,7 @@ BEGIN
     IDS_FILTERS_VIDEO       "Decodoare video"
     IDS_FILTERS_AUDIO       "Decodoare audio"
     IDS_GOTO_ERROR_INVALID_TIME  "Timpul introdus este mai mare decât durata fişierului."
-    IDS_SCREENSHOT_ERROR_MADVR  "Funcțiile ""Salvează imagine"" și ""Salvează miniaturi"" nu funcționează cu randorul video madVR.\nSchimbați randorul video în opțiunile de ieșire ale MPC și redeschizi fișierul."
+    IDS_SCREENSHOT_ERROR_MADVR  "Funcțiile ""Salvează imagine"" și ""Salvează miniaturi"" nu funcționează cu randorul video madVR.\nSchimbă randorul video în opțiunile de ieșire ale MPC și redeschizi fișierul."
     IDS_SUBDL_DLG_FILENAME_COL "Fişier"
     IDS_SUBDL_DLG_LANGUAGE_COL "Limbă (Language)"
     IDS_SUBDL_DLG_FORMAT_COL "Format"
@@ -3718,7 +3718,7 @@ BEGIN
     IDS_CAPTURE_ERROR_AUD_OUT_FILE "Eroare la inițializarea fișierului de ieșire audio."
     IDS_SUBRESYNC_TIME_FORMAT  "Formatul de timp corect este [-]hh:mm:ss.ms (ex. 01:23:45.678)."
     IDS_EXTERNAL_FILTERS_ERROR_MT "Acest tip se află deja în listă!"
-    IDS_WEBSERVER_ERROR_TEST  "Trebuie să aplicați noile setări înainte de a le testa."
+    IDS_WEBSERVER_ERROR_TEST  "Trebuie să aplici noile setări înainte de a le testa."
 END
 
 STRINGTABLE
