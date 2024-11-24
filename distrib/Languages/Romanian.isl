@@ -61,8 +61,8 @@ WinVersionTooLowError=Acest program necesită %1 versiunea %2 sau mai nouă.
 WinVersionTooHighError=Acest program nu poate fi instalat pe %1 versiunea %2 sau mai nouă.
 AdminPrivilegesRequired=Trebuie să fii logat ca Administrator pentru instalarea acestui program.
 PowerUserPrivilegesRequired=Trebuie să fii logat ca Administrator sau ca Membru al Grupului de Utilizatori Pricepuţi ("Power Users") pentru a instala acest program.
-SetupAppRunningError=Instalatorul a detectat că %1 rulează în acest moment.%n%nÎnchide toate instanţele programului respectiv, apoi dă clic OK pentru a continua sau Anulează pentru a abandona instalarea.
-UninstallAppRunningError=Dezinstalatorul a detectat că %1 rulează în acest moment.%n%nÎnchide toate instanţele programului respectiv, apoi dă clic OK pentru a continua sau Anulează pentru a abandona dezinstalarea.
+SetupAppRunningError=Instalatorul a detectat că %1 rulează în acest moment.%n%nÎnchide toate instanţele programului respectiv, apoi dă clic pe OK pentru a continua sau Anulează pentru a abandona instalarea.
+UninstallAppRunningError=Dezinstalatorul a detectat că %1 rulează în acest moment.%n%nÎnchide toate instanţele programului respectiv, apoi dă clic pe OK pentru a continua sau Anulează pentru a abandona dezinstalarea.
 
 ; *** Startup questions
 PrivilegesRequiredOverrideTitle=Select Modul de Instalare al Instalatorului
@@ -297,7 +297,7 @@ ErrorRegWriteKey=Eroare la scrierea în cheia de registru:%n%1\%2
 ErrorIniEntry=Eroare la crearea intrării INI în fişierul "%1".
 
 ; *** File copying errors
-FileAbortRetryIgnoreSkipNotRecommended=&Sari peste această fișier (nerecomandat)
+FileAbortRetryIgnoreSkipNotRecommended=&Sari peste acest fișier (nerecomandat)
 FileAbortRetryIgnoreIgnoreNotRecommended=&Ignoră eroarea şi continuă (nerecomandat)
 SourceIsCorrupted=Fila sursă este stricată (coruptă)
 SourceDoesntExist=Fila sursă "%1" nu există
@@ -341,9 +341,9 @@ ErrorOpeningReadme=A apărut o eroare la deschiderea filei de informare (README)
 ErrorRestartingComputer=Instalatorul nu a putut reporni calculatorul. Va trebui să-l reporneşti manual.
 
 ; *** Uninstaller messages
-UninstallNotFound=Fila "%1" nu există. Dezinstalarea nu poate fi făcută.
-UninstallOpenError=Fila "%1" nu poate fi deschisă. Dezinstalarea nu poate fi făcută
-UninstallUnsupportedVer=Fila "%1" ce conţine jurnalul de dezinstalare este într-un format nerecunoscut de această versiune a dezinstalatorului. Dezinstalarea nu poate fi făcută
+UninstallNotFound=Fișierul "%1" nu există. Dezinstalarea nu poate fi făcută.
+UninstallOpenError=Fișierul "%1" nu poate fi deschis. Dezinstalarea nu poate fi făcută
+UninstallUnsupportedVer=Fișierul "%1" ce conţine jurnalul de dezinstalare este într-un format nerecunoscut de această versiune a dezinstalatorului. Dezinstalarea nu poate fi făcută
 UninstallUnknownEntry=A fost întîlnită o intrare necunoscută (%1) în jurnalul de dezinstalare
 ConfirmUninstall=Sigur vrei să înlături complet %1 şi componentele sale?
 UninstallOnlyOnWin64=Această instalare poate fi dezinstalată doar pe un sistem Windows 64-biţi.
@@ -352,11 +352,11 @@ UninstallStatusLabel=Aşteaptă ca %1 să fie înlăturat de pe calculator.
 UninstalledAll=%1 a fost înlăturat cu succes de pe calculator.
 UninstalledMost=Dezinstalare completă a %1.%n%nAnumite elemente nu au putut fi înlăturate. Acestea pot fi înlăturate manual.
 UninstalledAndNeedsRestart=Pentru a termina dezinstalarea %1, calculatorul trebuie repornit.%n%nVrei să fie repornit acum?
-UninstallDataCorrupted=Fila "%1" este stricată (coruptă). Dezinstalarea nu poate fi făcută
+UninstallDataCorrupted=Fișierul "%1" este stricat (corupt). Dezinstalarea nu poate fi făcută
 
 ; *** Uninstallation phase messages
-ConfirmDeleteSharedFileTitle=Şterg Fila Partajată?
-ConfirmDeleteSharedFile2=Sistemul indică faptul că fila partajată următoare pare să nu mai fie folosită de vreun alt program. Vrei ca Dezinstalatorul să şteargă această fișier partajată?%n%nDacă totuşi mai există programe care folosesc fila şi ea este ştearsă, acele programe ar putea să funcţioneze greşit. Dacă nu eşti sigur, alege Nu. Lăsarea filei în sistem nu va produce nici o neplăcere.
+ConfirmDeleteSharedFileTitle=Şterg fișierul partajat?
+ConfirmDeleteSharedFile2=Sistemul indică faptul că fișierul partajat următoare pare să nu mai fie folosită de vreun alt program. Vrei ca Dezinstalatorul să şteargă această fișier partajat?%n%nDacă totuşi mai există programe care folosesc fișierul şi el este şters, acele programe ar putea să funcţioneze greşit. Dacă nu eşti sigur, alege Nu. Lăsarea filei în sistem nu va produce nici o neplăcere.
 SharedFileNameLabel=Numele fișierul:
 SharedFileLocationLabel=Loc:
 WizardUninstalling=Starea dezinstalării
