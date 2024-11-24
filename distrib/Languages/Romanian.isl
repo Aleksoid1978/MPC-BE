@@ -212,27 +212,27 @@ ReadyMemoGroup=Dosarul Meniului de Start:
 ReadyMemoTasks=Sarcini Suplimentare:
 
 ; *** TDownloadWizardPage wizard page and DownloadTemporaryFile
-DownloadingLabel=Descarc file suplimentare...
+DownloadingLabel=Descarc fișiere suplimentare...
 ButtonStopDownload=O&preşte descărcarea
 StopDownload=Sigur vrei să opreşti descărcarea?
 ErrorDownloadAborted=Descărcare abandonată
 ErrorDownloadFailed=Descărcare eşuată: %1 %2
 ErrorDownloadSizeFailed=Obţinerea mărimii a eşuat: %1 %2
-ErrorFileHash1=Haşul filei a eşuat: %1
-ErrorFileHash2=Haşul filei e nevalid: aşteptat %1, găsit %2
+ErrorFileHash1=Hash-ul fișierului a eşuat: %1
+ErrorFileHash2=Hash-ul fișierului e nevalid: aşteptat %1, găsit %2
 ErrorProgress=Progres nevalid: %1 of %2
-ErrorFileSize=Mărime a filei nevalidă: aşteptată %1, găsită %2
+ErrorFileSize=Mărimea fișierului e nevalid: aşteptat %1, găsit %2
 
 ; *** "Preparing to Install" wizard page
 WizardPreparing=Pregătire pentru Instalare
 PreparingDesc=Instalatorul pregăteşte instalarea [name] pe calculator.
 PreviousInstallNotCompleted=Instalarea/dezinstalarea anterioară a unui program nu a fost terminată. Va trebui să reporneşti calculatorul pentru a termina operaţia precedentă.%n%nDupă repornirea calculatorului, rulează Instalatorul din nou pentru a realiza instalarea [name].
 CannotContinue=Instalarea nu poate continua. Dă clic pe Anulează pentru a o închide.
-ApplicationsFound=Aplicaţiile următoare folosesc file care trebuie actualizate de către Instalator. Este recomandat să permiţi Instalatorului să închidă automat aplicaţiile respective.
-ApplicationsFound2=Aplicaţiile următoare folosesc file care trebuie actualizate de către Instalator. Este recomandat să permiţi Instalatorului să închidă automat aplicaţiile respective. După ce instalarea e terminată, Instalatorul va încerca să repornească aplicaţiile.
+ApplicationsFound=Aplicaţiile următoare folosesc fișiere care trebuie actualizate de către Instalator. Este recomandat să permiţi Instalatorului să închidă automat aplicaţiile respective.
+ApplicationsFound2=Aplicaţiile următoare folosesc fișiere care trebuie actualizate de către Instalator. Este recomandat să permiţi Instalatorului să închidă automat aplicaţiile respective. După ce instalarea e terminată, Instalatorul va încerca să repornească aplicaţiile.
 CloseApplications=Închide &automat aplicaţiile
 DontCloseApplications=Nu închi&de aplicaţiile
-ErrorCloseApplications=Instalatorul nu a putut închide automat toate aplicaţiile. Înainte de a continua, e recomandat să închizi manual toate aplicaţiile care folosesc file ce trebuie actualizate de Instalator.
+ErrorCloseApplications=Instalatorul nu a putut închide automat toate aplicaţiile. Înainte de a continua, e recomandat să închizi manual toate aplicaţiile care folosesc fișiere ce trebuie actualizate de Instalator.
 PrepareToInstallNeedsRestart=Instalatorul trebuie să repornescă calculatorul. După repornire, rulează Instalatorul din nou pentru a termina instalarea [name].%n%nVrei să reporneşti acum?
 
 ; *** "Installing" wizard page
