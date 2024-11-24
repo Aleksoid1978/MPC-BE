@@ -1,0 +1,2 @@
+This folder contains unofficial translations of Inno Setup, which are available at:
+https://jrsoftware.org/files/istrans/#unofficial
