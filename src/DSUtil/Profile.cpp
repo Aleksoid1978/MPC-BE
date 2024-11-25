@@ -31,7 +31,7 @@
 CStringW GetIniProgramDir()
 {
 	CStringW path = GetRenameFileExt(GetModulePath(nullptr), L".ini");
-	
+
 	return path;
 }
 
