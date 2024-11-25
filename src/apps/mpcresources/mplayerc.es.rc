@@ -82,7 +82,7 @@ BEGIN
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | WS_DISABLED,32,45,12,13
     EDITTEXT        IDC_EDIT2,46,45,34,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | WS_DISABLED,68,45,12,13
-    PUSHBUTTON      "Fijar",IDC_BUTTON1,82,45,35,13
+    PUSHBUTTON      "Establecer",IDC_BUTTON1,82,45,35,13
     GROUPBOX        "Audio",IDC_STATIC,6,64,116,42
     COMBOBOX        IDC_COMBO3,10,74,65,116,CBS_DROPDOWNLIST | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO2,77,74,40,89,CBS_DROPDOWNLIST | CBS_SORT | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
@@ -133,7 +133,7 @@ BEGIN
     CONTROL         "Auto-carga de audio",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,113,276,9
     EDITTEXT        IDC_EDIT4,10,124,222,13,ES_AUTOHSCROLL
     PUSHBUTTON      "Reiniciar",IDC_BUTTON2,235,124,50,13
-    CONTROL         "Preferir archivos de audio externos a pistas de audio incrustadas",IDC_CHECK3,
+    CONTROL         "Preferir archivos de audio externos a pistas de audio integradas",IDC_CHECK3,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,140,273,9
 END
 
@@ -162,7 +162,7 @@ BEGIN
     GROUPBOX        "",IDC_STATIC,5,154,285,49
     CONTROL         "Filtros FFmpeg",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,153,61,10
     PUSHBUTTON      "Preajustes",IDC_BUTTON1,9,166,59,14
-    CONTROL         "Don't use for stereo and mono sources",IDC_CHECK2,
+    CONTROL         "No utilizar para fuentes estéreo y mono",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,76,166,180,10
     COMBOBOX        IDC_COMBO1,10,184,58,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_EDIT1,72,184,214,14,ES_AUTOHSCROLL
@@ -174,7 +174,7 @@ BEGIN
     CONTROL         "Desplazamiento de audio (ms):",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,240,115,9
     EDITTEXT        IDC_EDIT2,129,238,46,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,174,238,12,13
-    PUSHBUTTON      "Small stereo speakers",IDC_BUTTON2,188,210,103,14
+    PUSHBUTTON      "Altavoces estéreo pequeños",IDC_BUTTON2,188,210,103,14
     PUSHBUTTON      "Predeterminado",IDC_BUTTON3,235,228,56,14
 END
 
@@ -517,7 +517,7 @@ BEGIN
     PUSHBUTTON      "Eliminar",IDC_BUTTON2,221,21,70,14
     CONTROL         "Preferir",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,221,39,70,8
     CONTROL         "Bloquear",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,221,51,70,8
-    CONTROL         "Fijar Mérito:",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,221,63,70,8
+    CONTROL         "Establecer Mérito:",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,221,63,70,8
     EDITTEXT        IDC_EDIT1,221,75,70,13,ES_RIGHT | ES_AUTOHSCROLL | WS_GROUP
     PUSHBUTTON      "Subir",IDC_BUTTON3,221,92,33,14
     PUSHBUTTON      "Bajar",IDC_BUTTON4,258,92,33,14
@@ -625,7 +625,7 @@ BEGIN
     PUSHBUTTON      "Borrar",IDC_BUTTON3,47,76,35,12
     PUSHBUTTON      "Subir",IDC_BUTTON4,88,76,35,12
     PUSHBUTTON      "Bajar",IDC_BUTTON5,125,76,35,12
-    PUSHBUTTON      "&Fijar",IDC_BUTTON1,165,76,35,12
+    PUSHBUTTON      "&Establecer",IDC_BUTTON1,165,76,35,12
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,93,188,1
     PUSHBUTTON      "&Cancelar",IDCANCEL,49,100,50,14
     PUSHBUTTON      "&Guardar",IDOK,105,100,50,14
@@ -903,7 +903,7 @@ BEGIN
     COMBOBOX        IDC_COMBO8,88,218,124,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "No escalar al aumentar tamaño de fotograma pequeño",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,234,195,10
-    CONTROL         "No escalar al disminuir tamaño de fotograma pequeño",IDC_CHECK8,
+    CONTROL         "No escalar al reducir tamaño de fotograma pequeño",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,247,195,10
     PUSHBUTTON      "Predeterminado",IDC_BUTTON3,234,246,56,14
     LTEXT           "Modo de presentación:",IDC_STATIC6,115,107,72,8
@@ -1139,7 +1139,7 @@ IDD_PPAGECAPTURE DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Dispositivo por defecto",IDC_STATIC,5,5,286,24
+    GROUPBOX        "Dispositivo predeterminado",IDC_STATIC,5,5,286,24
     CONTROL         "Analógico",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,91,17,55,8
     CONTROL         "Digital",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,150,17,55,8
     GROUPBOX        "Configuración analógica",IDC_STATIC,5,33,286,59,WS_GROUP
@@ -1235,14 +1235,14 @@ IDD_PPAGESUBTITLES DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Renderizador de subtítulo:",IDC_STATIC,10,7,74,8
+    LTEXT           "Renderizador de subtítulos:",IDC_STATIC,10,7,74,8
     COMBOBOX        IDC_COMBO2,89,4,201,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Rutas de autocargado",IDC_STATIC,5,20,286,31
     EDITTEXT        IDC_EDIT1,10,33,224,13,ES_AUTOHSCROLL
     PUSHBUTTON      "Reiniciar",IDC_BUTTON1,237,33,50,13
     CONTROL         "Siempre predeterminar a subtítulos externos si están disponibles",IDC_CHECK1,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,55,285,9
-    CONTROL         "No cargar subtítulos incrustados",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,67,285,9
+    CONTROL         "No cargar subtítulos integrados",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,67,285,9
     CONTROL         "Recarga automática de archivos de subtítulos después de detectar la modificación",IDC_CHECK3,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,79,285,9
     CONTROL         "Usar Subresync",IDC_CHECK_SUBRESYNC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,91,285,9
@@ -2069,12 +2069,12 @@ IDR_POPUP_PANSCAN MENU
 BEGIN
     POPUP ""
     BEGIN
-        MENUITEM "Incrementar Tamaño",       ID_VIEW_INCSIZE
-        MENUITEM "Decrementar Tamaño",       ID_VIEW_DECSIZE
-        MENUITEM "Incrementar Ancho",      ID_VIEW_INCWIDTH
-        MENUITEM "Decrementar Ancho",      ID_VIEW_DECWIDTH
-        MENUITEM "Incrementar Altura",     ID_VIEW_INCHEIGHT
-        MENUITEM "Decrementar Altura",     ID_VIEW_DECHEIGHT
+        MENUITEM "Aumentar Tamaño",       ID_VIEW_INCSIZE
+        MENUITEM "Reducir Tamaño",       ID_VIEW_DECSIZE
+        MENUITEM "Aumentar Ancho",      ID_VIEW_INCWIDTH
+        MENUITEM "Reducir Ancho",      ID_VIEW_DECWIDTH
+        MENUITEM "Aumentar Altura",     ID_VIEW_INCHEIGHT
+        MENUITEM "Reducir Altura",     ID_VIEW_DECHEIGHT
         MENUITEM SEPARATOR
         MENUITEM "Mover a la Derecha",     ID_PANSCAN_MOVERIGHT
         MENUITEM "Mover a la Izquierda",      ID_PANSCAN_MOVELEFT
@@ -2353,7 +2353,7 @@ BEGIN
     IDS_PLAYLIST_SHOWTOOLTIP "Mostrar información sobre herramientas"
     IDS_PLAYLIST_SHOWSEARCHBAR "Mostrar barra de búsqueda"
     IDS_PLAYLIST_HIDEFS     "Ocultar en Pantalla Completa"
-    IDS_PLAYLIST_NEXTONERROR "Ir al siguiente en error"
+    IDS_PLAYLIST_NEXTONERROR "Ir al siguiente en caso de error"
     IDS_PLAYLIST_DETERMINEDURATION "Determinar duración al agregar"
     IDS_PLAYLIST_SKIPINVALID "Omitir elementos no válidos"
     IDS_PLAYLIST_INVALID    "Inválido"
@@ -2377,7 +2377,7 @@ STRINGTABLE
 BEGIN
     IDS_RECORD_START        "Grabar"
     IDS_RECORD_STOP         "Detener"
-    IDS_FILTERS_COPY_TO_CLIPBOARD "&Copiar lista de filtros al portapapeles"
+    IDS_FILTERS_COPY_TO_CLIPBOARD "&Copiar Lista de Filtros al Portapapeles"
     IDS_AG_COPY_IMAGE       "Copiar Imagen al Portapapeles"
     IDS_PLAYLOOPMODE_AB     "Repetir A-B: Reiniciar Posiciones"
     IDS_PLAYLOOPMODE_AB_MARK_A "Repetir A-B: Marca Posición A"
@@ -2561,7 +2561,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_EXCLUSIVE_FULLSCREEN_CHECK  "Reduce el Tearing pero impide que se muestre la barra de herramientas. Para salir de pantalla completa en este modo, presione Ctrl+C."
+    IDC_EXCLUSIVE_FULLSCREEN_CHECK  "Reduce el Parpadeo pero impide que se muestre la barra de herramientas. Para salir de pantalla completa en este modo, presione Ctrl+C."
 END
 
 STRINGTABLE
@@ -2719,7 +2719,7 @@ BEGIN
     IDS_AG_OTHER            "Otro"
     IDS_PIXELSHADERCOMPILER_0  "Imposible cargar D3DX9_xx.DLL, los sombreadores de píxel no funcionarán."
     IDS_PIXELSHADERCOMPILER_1  "Imposible encontrar las entradas de funciones necesarias en D3DX9_xx.DLL, los sombreadores de píxel no funcionarán."
-    IDS_AG_NOT_KNOWN        "No conocido"
+    IDS_AG_NOT_KNOWN        "Desconocido"
     IDS_AG_OPEN_FILE        "Abrir Archivo Rápido"
     IDS_AG_OPEN_FILEURL     "Abrir Archivo"
     IDS_AG_OPEN_DVD         "Abrir DVD"
@@ -2795,7 +2795,7 @@ BEGIN
     IDS_EXPORT_SETTINGS     "Exportar configuración"
     IDS_EXPORT_SETTINGS_WARNING  "Algunos cambios aún no se han guardado.\nDesea guardarlos antes de exportarlos?"
     IDS_EXPORT_SETTINGS_SUCCESS  "La configuración se ha exportado correctamente."
-    IDS_EXPORT_SETTINGS_FAILED  "La exportación falló! Esto puede suceder cuando no se tiene los derechos adecuados."
+    IDS_EXPORT_SETTINGS_FAILED  "La exportación falló! Esto puede suceder cuando no se tienen suficientes derechos."
     IDS_BDA_ERROR           "Error BDA"
 END
 
@@ -2811,10 +2811,10 @@ BEGIN
     IDS_AG_MENU_SUBTITLELANG "Menú Idioma de Subtítulos"
     IDS_AG_MENU_JUMPTO      "Menú Saltar a..."
     IDS_AG_MENU_AFTERPLAYBACK "Menú después de Reproducir"
-    IDS_AG_RESET_STATS      "Reestablecer estado EVR Sync"
+    IDS_AG_RESET_STATS      "Restablecer estado EVR Sync"
     IDS_VIEW_BORDERLESS     "Ocultar Bordes\tCtrl+0"
     IDS_VIEW_FRAMEONLY      "Sólo Marco\tCtrl+0"
-    IDS_VIEW_CAPTIONMENU    "Mostrar Título&&Menú\tCtrl+0"
+    IDS_VIEW_CAPTIONMENU    "Mostrar Título y &Menú\tCtrl+0"
     IDS_VIEW_HIDEMENU       "Ocultar Menú\tCtrl+0"
 END
 
@@ -2826,7 +2826,7 @@ BEGIN
     IDS_AG_AUDIODELAY_MINUS "Ajuste de Audio de -10ms"
     IDS_AG_JUMP_FORWARD_1   "Salto Adelante (pequeño)"
     IDS_AG_JUMP_BACKWARD_1  "Salto Atrás (pequeño)"
-    IDS_AG_JUMP_FORWARD_2   "Salto Adelante (medio"
+    IDS_AG_JUMP_FORWARD_2   "Salto Adelante (medio)"
     IDS_AG_JUMP_BACKWARD_2  "Salto Atrás (medio)"
     IDS_AG_JUMP_FORWARD_3   "Salto Adelante (largo)"
     IDS_AG_JUMP_BACKWARD_3  "Salto Atrás (largo)"
@@ -2916,7 +2916,7 @@ BEGIN
     IDS_AG_DVD_MENU_DOWN    "DVD Menú Abajo"
     IDS_AG_DVD_MENU_ACTIVATE "DVD Menú Activar"
     IDS_AG_DVD_MENU_BACK    "DVD Menú Regresar"
-    IDS_AG_DVD_MENU_LEAVE   "DVD Menú Dejar"
+    IDS_AG_DVD_MENU_LEAVE   "DVD Menú Salir"
     IDS_AG_BOSS_KEY         "Llave Jefe"
     IDS_AG_MENU_PLAYER_S    "Menú del Reproductor (corto)"
     IDS_AG_MENU_PLAYER_L    "Menú del Reproductor (largo)"
@@ -3008,7 +3008,7 @@ BEGIN
     IDS_ZOOM_AUTOFITLARGE   "Ajuste automático (solo más grande)"
     IDS_ADD_TO_PLAYLIST     "Agregar a la Lista de Reproducción de MPC-BE"
     IDS_OPEN_WITH_MPC       "Reproducir con MPC-BE"
-    IDS_CANNOT_CHANGE_FORMAT  "MPC-BE no tiene suficientes privilegios para cambiar las asociaciones de tipos de archivo. Por favor haga clic en el botón de ""Modificar"" para obtener derechos de administración."
+    IDS_CANNOT_CHANGE_FORMAT  "MPC-BE no tiene suficientes privilegios para cambiar las asociaciones de tipos de archivo. Por favor haga clic en el botón de ""Modificar"" para obtener derechos de administrador."
     IDS_APP_DESCRIPTION     "Uno de los reproductores multimedia mas poderosos y configurables para el sistema operativo Windows. Originalmente programado por el desarrollador Hungaro conocido como Gabest, esta versión cuenta ademas con capacidades adicionales como el modo de Pantalla Completa usando Direct3D y un mejor soporte para Windows Vista/7."
     IDS_MAINFRM_12          "Canal"
     IDS_MAINFRM_13          "Canales"
@@ -3016,7 +3016,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_TITLE            "Titulo %d"
+    IDS_AG_TITLE            "Título %d"
     IDS_MAINFRM_16          "DVD: Error inesperado"
     IDS_MAINFRM_17          "DVD: Fallo por Protección Anticopia"
     IDS_MAINFRM_18          "DVD: Disco DVD 1.x Inválido"
@@ -3038,9 +3038,9 @@ STRINGTABLE
 BEGIN
     IDS_ADDTOPLS_FROMDIR_SIMILAR "Archivos similares de la carpeta"
     IDS_ADDTOPLS_FROMDIR_ALL "Todos los archivos de la carpeta"
-    IDS_EXCLUSIVE_FS_WARNING  "Esta opción está diseñada para prevenir el tearing. Sin embargo, también evitará que MPC-BE muestre menús contextuales y cuadros de diálogo durante la reproducción.\n\nPara salir de la Pantalla Completa Exclusiva, use las teclas: Alt+Enter, Ctrl+Enter o Ctrl+C.\n\nRealmente deseas activar esta opción?"
+    IDS_EXCLUSIVE_FS_WARNING  "Esta opción está diseñada para prevenir el parpadeo. Sin embargo, también evitará que MPC-BE muestre menús contextuales y cuadros de diálogo durante la reproducción.\n\nPara salir de la Pantalla Completa Exclusiva, use las teclas: Alt+Enter, Ctrl+Enter o Ctrl+C.\n\nRealmente deseas activar esta opción?"
     IDS_MAINFRM_139         "Retraso de Subtítulos: %ld ms"
-    IDS_AG_TITLE2           "Titulo: %02d/%02d"
+    IDS_AG_TITLE2           "Título: %02d/%02d"
     IDS_THUMB_ROWNUMBER     "Filas:"
     IDS_THUMB_COLNUMBER     "Columnas:"
     IDS_THUMB_IMAGE_WIDTH   "Ancho de Imagen"
@@ -3150,31 +3150,31 @@ BEGIN
     IDS_MAINFRM_116         "&Propiedades..."
     IDS_MAINFRM_117         " Propiedades del Conector..."
     IDS_AG_UNKNOWN_STREAM   "Pista Desconocida"
-    IDS_AG_UNKNOWN          "%d Desconocida"
+    IDS_AG_UNKNOWN          "%d Desconocido"
     IDS_AG_VSYNC            "VSync (Sincronización Vertical)"
     IDS_MAINFRM_121         " (Comentario del Director N° 1)"
     IDS_MAINFRM_122         " (Comentario del Director N° 2)"
     IDS_AG_ENABLED          "Activado"
     IDS_AG_ANGLE            "Ángulo N° %d"
-    IDS_AG_VSYNCOFFSET_INCREASE "Incrementar Compensación de VSync"
+    IDS_AG_VSYNCOFFSET_INCREASE "Aumentar Compensación de VSync"
 END
 
 STRINGTABLE
 BEGIN
     IDS_AG_DISABLED         "Desactivado"
-    IDS_AG_VSYNCOFFSET_DECREASE "Decrementar Compensación de VSync"
+    IDS_AG_VSYNCOFFSET_DECREASE "Reducir Compensación de VSync"
     IDS_MAINFRM_132         "Advertencia (CMainFrame::SeekTo): Tratando de buscar en el modo de captura"
     IDS_AG_REMOVING         "Eliminando: "
     IDS_MAINFRM_134         "ADVERTENCIA: CMainFrame::CloseMedia() fue llamado dos veces o más\n"
-    IDS_MAINFRM_135         "ERROR CRITICO: ¡¡¡ Debo terminar el proceso !!!"
+    IDS_MAINFRM_135         "ERROR CRÍTICO: ¡¡¡ Debo terminar el proceso !!!"
     IDS_MAINFRM_136         "Pantalla Completa Exclusiva de MPC-BE"
     IDS_MAINFRM_137         "Formato desconocido"
     IDS_MAINFRM_138         "Compensación de Subtítulos: %ld"
     IDS_VOLUME_GAIN_INC     "Aumentar ganancia de volumen"
-    IDS_VOLUME_GAIN_DEC     "Disminuir ganancia de volumen"
+    IDS_VOLUME_GAIN_DEC     "Reducir ganancia de volumen"
     IDS_VOLUME_GAIN_OFF     "Ganancia de volumen desactivada"
     IDS_VOLUME_GAIN_MAX     "Ganancia de volumen máxima"
-    IDS_UNKNOWN_SWITCH      "Modificador(es) no conocido(s) encontrado(s) en la línea de comandos ejecutada: \n\n"
+    IDS_UNKNOWN_SWITCH      "Modificador(es) desconocido(s) encontrado(s) en la línea de comandos ejecutada: \n\n"
 END
 
 STRINGTABLE
@@ -3345,7 +3345,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_MPEG2_INTERLACE_FLAG "Fijar banderín de entrelazado en el tipo de medio de salida"
+    IDS_MPEG2_INTERLACE_FLAG "Establecer indicador de entrelazado en el tipo de soporte de salida"
     IDS_MPEG2_FORCED_SUBS   "Siempre mostrar subtítulos forzados"
     IDS_MPEG2_DEINTERLACING "Desentrelazado"
 END
@@ -3415,7 +3415,7 @@ BEGIN
     IDS_AG_TOGGLE_SUBRESYNC "Alternar Barra de Subresync"
     IDS_AG_TOGGLE_PLAYLIST  "Alternar Barra de Lista de Reproducción"
     IDS_AG_TOGGLE_CAPTURE   "Alternar Barra de Captura"
-    IDS_AG_TOGGLE_SHADER    "Alternar Barra de Editor de Shader"
+    IDS_AG_TOGGLE_SHADER    "Alternar Barra de Editor de Sombreador"
     IDS_AG_ZOOM_50          "Zoom 50%"
     IDS_AG_ZOOM_100         "Zoom 100%"
     IDS_AG_ZOOM_200         "Zoom 200%"
@@ -3649,7 +3649,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_BRIGHTNESS_DEC      "Disminuir Brillo"
+    IDS_BRIGHTNESS_DEC      "Reducir Brillo"
     IDS_CONTRAST_INC        "Aumentar Contraste"
     IDS_CONTRAST_DEC        "Disminuir Contraste"
     IDS_HUE_INC             "Tinte +"
@@ -3819,7 +3819,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_SUB_COPYTOCLIPBOARD "Copiar los subtítulos mostrados al Portapapeles"
-    IDS_SUB_SIZE_DEC        "Disminuir tamaño de texto de subtítulos"
+    IDS_SUB_SIZE_DEC        "Reducir tamaño de texto de subtítulos"
     IDS_SUB_SIZE_INC        "Aumentar tamaño de texto de subtítulos"
     IDS_SUB_SIZE            "Tamaño de texto de subtítulos: %d"
     IDS_SUB_NOT_USE         "No mostrar subtítulos"
