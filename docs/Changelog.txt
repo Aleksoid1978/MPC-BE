@@ -2,6 +2,10 @@
 
 1.8.1.x dev
 =============================
+YouTube
+Improved YouTube support in the built-in parser.
+Improved youtube-dl support.
+
 Updated Romanian translation (by Andrei Miloiu).
 Added Slovenian translation (by MatjazP72).
 Updated Spanish translation (by IPeluchito).
