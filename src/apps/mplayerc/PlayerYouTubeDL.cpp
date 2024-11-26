@@ -211,6 +211,9 @@ namespace YoutubeDL
 
 							profile->format = Youtube::yformat::y_mp4_other;
 							if (EndsWith(protocol, "m3u8") || EndsWith(protocol, "m3u8_native")) {
+								if (acodec == "none") {
+									continue;
+								}
 								profile->format = Youtube::yformat::y_stream;
 							} else if (ext == L"mp4") {
 								if (StartsWith(vcodec, "avc1")) {
@@ -345,15 +348,15 @@ namespace YoutubeDL
 									maxVideofps = std::max(maxVideofps, fps);
 
 									if (bMaxQuality) {
-										bestUrl = url;
-										bVideoOnly = false;
-
 										CStringA acodec;
-										if (getJsonValue(format, "acodec", acodec)) {
-											if (acodec == "none") {
-												bVideoOnly = true;
-											}
+										getJsonValue(format, "acodec", acodec);
+										bVideoOnly = acodec == "none";
+
+										if (bVideoOnly && (EndsWith(protocol, "m3u8") || EndsWith(protocol, "m3u8_native"))) {
+											continue;
 										}
+
+										bestUrl = url;
 									}
 								}
 							}
