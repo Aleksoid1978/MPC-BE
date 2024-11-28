@@ -40,29 +40,16 @@
 #define YOUTUBE_URL_LIVE            L"youtube.com/live/"
 #define YOUTU_BE_URL                L"youtu.be/"
 
-#define MATCH_STREAM_MAP_START      "\"url_encoded_fmt_stream_map\":\""
-#define MATCH_ADAPTIVE_FMTS_START   "\"adaptive_fmts\":\""
-#define MATCH_WIDTH_START           "meta property=\"og:video:width\" content=\""
-#define MATCH_HLSVP_START           "\"hlsvp\":\""
-#define MATCH_HLSMANIFEST_START     "\\\"hlsManifestUrl\\\":\\\""
 #define MATCH_JS_START              "\"js\":\""
-#define MATCH_MPD_START             "\"dashmpd\":\""
+#define MATCH_JS_START_2            "'PREFETCH_JS_RESOURCES': [\""
+#define MATCH_JS_START_3            "\"PLAYER_JS_URL\":\""
 #define MATCH_END                   "\""
 
 #define MATCH_PLAYLIST_ITEM_START   "<li class=\"yt-uix-scroller-scroll-unit "
 #define MATCH_PLAYLIST_ITEM_START2  "<tr class=\"pl-video yt-uix-tile "
 
-#define MATCH_STREAM_MAP_START_2    "url_encoded_fmt_stream_map="
-#define MATCH_ADAPTIVE_FMTS_START_2 "adaptive_fmts="
-#define MATCH_JS_START_2            "'PREFETCH_JS_RESOURCES': [\""
-#define MATCH_JS_START_3            "\"PLAYER_JS_URL\":\""
-#define MATCH_END_2                 "&"
-
-#define MATCH_PLAYER_RESPONSE       "\"player_response\":\""
-#define MATCH_PLAYER_RESPONSE_END   "}\""
-
-#define MATCH_PLAYER_RESPONSE_2     "ytInitialPlayerResponse = "
-#define MATCH_PLAYER_RESPONSE_END_2 "};"
+#define MATCH_PLAYER_RESPONSE       "ytInitialPlayerResponse = "
+#define MATCH_PLAYER_RESPONSE_END   "};"
 
 namespace Youtube
 {
@@ -72,13 +59,13 @@ namespace Youtube
 #if __has_include("..\..\my_google_api_key.h")
 #include "..\..\my_google_api_key.h"
 #else
-	static LPCWSTR strGoogleApiKey = L"place_your_google_api_key_here";
+	constexpr LPCWSTR strGoogleApiKey = L"place_your_google_api_key_here";
 #endif
 #endif
 
-	static LPCWSTR videoIdRegExp = L"(?:v|video_ids)=([-a-zA-Z0-9_]+)";
+	constexpr LPCWSTR videoIdRegExp = L"(?:v|video_ids)=([-a-zA-Z0-9_]+)";
 
-	const YoutubeProfile* GetProfile(int iTag)
+	static const YoutubeProfile* GetProfile(int iTag)
 	{
 		for (const auto& profile : YProfiles) {
 			if (iTag == profile.iTag) {
@@ -89,7 +76,7 @@ namespace Youtube
 		return nullptr;
 	}
 
-	const YoutubeProfile* GetAudioProfile(int iTag)
+	static const YoutubeProfile* GetAudioProfile(int iTag)
 	{
 		for (const auto& profile : YAudioProfiles) {
 			if (iTag == profile.iTag) {
@@ -139,7 +126,7 @@ namespace Youtube
 		return inStr;
 	}
 
-	static inline CStringA GetEntry(LPCSTR pszBuff, LPCSTR pszMatchStart, LPCSTR pszMatchEnd)
+	static CStringA GetEntry(LPCSTR pszBuff, LPCSTR pszMatchStart, LPCSTR pszMatchEnd)
 	{
 		LPCSTR pStart = CStringA::StrTraits::StringFindString(pszBuff, pszMatchStart);
 		if (pStart) {
@@ -154,7 +141,7 @@ namespace Youtube
 			}
 		}
 
-		return "";
+		return {};
 	}
 
 	bool CheckURL(CString url)
@@ -352,7 +339,7 @@ namespace Youtube
 		if (url.Find(YOUTUBE_URL_CLIP) != -1) {
 			urlData data;
 			if (URLReadData(url.GetString(), data)) {
-				auto jsonEntry = GetEntry(data.data(), MATCH_PLAYER_RESPONSE_2, MATCH_PLAYER_RESPONSE_END_2);
+				auto jsonEntry = GetEntry(data.data(), MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END);
 				if (!jsonEntry.IsEmpty()) {
 					jsonEntry += "}";
 
@@ -652,7 +639,7 @@ namespace Youtube
 		CString videoId = RegExpParse(url.GetString(), videoIdRegExp);
 
 		if (rtStart <= 0) {
-			BOOL bMatch = FALSE;
+			bool bMatch = false;
 
 			const std::wregex regex(L"t=(\\d+h)?(\\d{1,2}m)?(\\d{1,2}s)?", std::regex_constants::icase);
 			std::wcmatch match;
@@ -662,15 +649,15 @@ namespace Youtube
 				int s = 0;
 				if (match[1].matched) {
 					h = _wtoi(match[1].first);
-					bMatch = TRUE;
+					bMatch = true;
 				}
 				if (match[2].matched) {
 					m = _wtoi(match[2].first);
-					bMatch = TRUE;
+					bMatch = true;
 				}
 				if (match[3].matched) {
 					s = _wtoi(match[3].first);
-					bMatch = TRUE;
+					bMatch = true;
 				}
 
 				rtStart = (h * 3600 + m * 60 + s) * UNITS;
@@ -687,30 +674,14 @@ namespace Youtube
 		const auto& s = AfxGetAppSettings();
 
 		urlData data;
-		if (!URLReadData(url.GetString(), data)) {
-			return false;
-		}
+		URLReadData(url.GetString(), data);
 
 		pOFD->rtStart = rtStart;
-
-		const CString Title = AltUTF8ToWStr(GetEntry(data.data(), "<title>", "</title>"));
-		y_fields.title = FixHtmlSymbols(Title);
-
-		std::vector<std::pair<youtubeFuncType, int>> JSFuncs;
-		BOOL bJSParsed = FALSE;
-		CString JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START, MATCH_END));
-		if (JSUrl.IsEmpty()) {
-			JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START_2, MATCH_END));
-			if (JSUrl.IsEmpty()) {
-				JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START_3, MATCH_END));
-			}
-		}
-
-		rapidjson::Document player_response_jsonDocument;
 
 		CStringA strUrls;
 		std::list<CStringA> strUrlsLive;
 
+		rapidjson::Document player_response_jsonDocument;
 		urlData postData;
 		if (URLPostData(videoId.GetString(), postData)) {
 			player_response_jsonDocument.Parse(postData.data());
@@ -718,80 +689,6 @@ namespace Youtube
 
 		bool bTryAgainLiveStream = true;
 		for (;;) {
-			bool bStreamingDataExist = false;
-			if (!player_response_jsonDocument.IsNull()) {
-				if (auto streamingData = GetJsonObject(player_response_jsonDocument, "streamingData")) {
-					bStreamingDataExist = true;
-				}
-			}
-
-			if (!bStreamingDataExist) {
-				player_response_jsonDocument.SetObject();
-				auto player_response_jsonData = GetEntry(data.data(), MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END);
-				if (!player_response_jsonData.IsEmpty()) {
-					player_response_jsonData += "}";
-					player_response_jsonData.Replace(R"(\/)", "/");
-					player_response_jsonData.Replace(R"(\")", R"(")");
-					player_response_jsonData.Replace(R"(\\)", R"(\)");
-				} else {
-					player_response_jsonData = GetEntry(data.data(), MATCH_PLAYER_RESPONSE_2, MATCH_PLAYER_RESPONSE_END_2);
-					if (!player_response_jsonData.IsEmpty()) {
-						player_response_jsonData += "}";
-					}
-				}
-				if (!player_response_jsonData.IsEmpty()) {
-					player_response_jsonDocument.Parse(player_response_jsonData);
-				}
-			}
-
-			// live streaming
-			CStringA live_url = GetEntry(data.data(), MATCH_HLSVP_START, MATCH_END);
-			if (live_url.IsEmpty()) {
-				live_url = GetEntry(data.data(), MATCH_HLSMANIFEST_START, MATCH_END);
-			}
-			if (!live_url.IsEmpty()) {
-				url = UrlDecode(UrlDecode(live_url));
-				url.Replace(L"\\/", L"/");
-				DLog(L"Youtube::Parse_URL() : Downloading m3u8 information \"%s\"", url);
-				urlData m3u8Data;
-				if (URLReadData(url.GetString(), m3u8Data)) {
-					CStringA m3u8Str(m3u8Data.data());
-
-					m3u8Str.Replace("\r\n", "\n");
-					std::list<CStringA> lines;
-					Explode(m3u8Str, lines, '\n');
-					for (auto& line : lines) {
-						line.Trim();
-						if (line.IsEmpty() || (line.GetAt(0) == '#')) {
-							continue;
-						}
-
-						line.Replace("/keepalive/yes/", "/");
-						strUrlsLive.emplace_back(line);
-					}
-				}
-
-				if (strUrlsLive.empty()) {
-					pOFD->fi = url;
-					return true;
-				}
-			} else {
-				// url_encoded_fmt_stream_map
-				const CStringA stream_map = GetEntry(data.data(), MATCH_STREAM_MAP_START, MATCH_END);
-				if (!stream_map.IsEmpty()) {
-					strUrls = stream_map;
-				}
-				// adaptive_fmts
-				const CStringA adaptive_fmts = GetEntry(data.data(), MATCH_ADAPTIVE_FMTS_START, MATCH_END);
-				if (!adaptive_fmts.IsEmpty()) {
-					if (!strUrls.IsEmpty()) {
-						strUrls += ',';
-					}
-					strUrls += adaptive_fmts;
-				}
-				strUrls.Replace("\\u0026", "&");
-			}
-
 			using streamingDataFormat = std::tuple<int, CStringA, CStringA, CStringA>;
 			std::list<streamingDataFormat> streamingDataFormatList;
 			std::map<CStringA, std::list<streamingDataFormat>> streamingDataFormatListAudioWithLanguages;
@@ -917,17 +814,6 @@ namespace Youtube
 				streamingDataFormatList.splice(streamingDataFormatList.end(), it->second);
 			};
 
-			if (!JSUrl.IsEmpty()) {
-				JSUrl.Replace(L"\\/", L"/");
-				JSUrl.Trim();
-
-				if (StartsWith(JSUrl, L"//")) {
-					JSUrl = L"https:" + JSUrl;
-				} else if (JSUrl.Find(L"http://") == -1 && JSUrl.Find(L"https://") == -1) {
-					JSUrl = L"https://www.youtube.com" + JSUrl;
-				}
-			}
-
 			auto AddUrl = [](YoutubeUrllist& videoUrls, YoutubeUrllist& audioUrls, const CString& url, const int itag, const int fps = 0, LPCSTR quality_label = nullptr) {
 				if (url.Find(L"dur=0.000") > 0) {
 					return;
@@ -989,10 +875,36 @@ namespace Youtube
 				}
 			};
 
+			std::vector<std::pair<youtubeFuncType, int>> JSFuncs;
+			bool bJSParsed = false;
+
 			auto SignatureDecode = [&](CStringA& url, CStringA signature, LPCSTR format) {
-				if (!signature.IsEmpty() && !JSUrl.IsEmpty()) {
+				if (!signature.IsEmpty()) {
 					if (!bJSParsed) {
-						bJSParsed = TRUE;
+						bJSParsed = true;
+
+						CString JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START, MATCH_END));
+						if (JSUrl.IsEmpty()) {
+							JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START_2, MATCH_END));
+							if (JSUrl.IsEmpty()) {
+								JSUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_JS_START_3, MATCH_END));
+							}
+						}
+
+						if (!JSUrl.IsEmpty()) {
+							JSUrl.Replace(L"\\/", L"/");
+							JSUrl.Trim();
+
+							if (StartsWith(JSUrl, L"//")) {
+								JSUrl = L"https:" + JSUrl;
+							} else if (JSUrl.Find(L"http://") == -1 && JSUrl.Find(L"https://") == -1) {
+								JSUrl = L"https://www.youtube.com" + JSUrl;
+							}
+						}
+
+						if (JSUrl.IsEmpty()) {
+							return;
+						}
 
 						const auto JSPlayerId = RegExpParse(JSUrl.GetString(), LR"(/s/player/([a-zA-Z0-9_-]{8,})/player)");
 
@@ -1182,43 +1094,6 @@ namespace Youtube
 					url.AppendFormat(format, signature);
 				}
 			};
-
-			if (strUrlsLive.empty()) {
-				CString dashmpdUrl = UTF8ToWStr(GetEntry(data.data(), MATCH_MPD_START, MATCH_END));
-				if (!dashmpdUrl.IsEmpty()) {
-					dashmpdUrl.Replace(L"\\/", L"/");
-					if (dashmpdUrl.Find(L"/s/") > 0) {
-						CStringA url(dashmpdUrl);
-						CStringA signature = RegExpParse(url.GetString(), "/s/([0-9A-Z]+.[0-9A-Z]+)");
-						if (!signature.IsEmpty()) {
-							SignatureDecode(url, signature, "/signature/%s");
-							dashmpdUrl = url;
-						}
-					}
-
-					DLog(L"Youtube::Parse_URL() : Downloading MPD manifest \"%s\"", dashmpdUrl);
-					urlData dashmpdData;
-					if (URLReadData(dashmpdUrl.GetString(), dashmpdData)) {
-						CString xml = UTF8ToWStr(dashmpdData.data());
-						const std::wregex regex(L"<Representation(.*?)</Representation>");
-						std::wcmatch match;
-						LPCWSTR text = xml.GetBuffer();
-						while (std::regex_search(text, match, regex)) {
-							if (match.size() == 2) {
-								const CString xmlElement(match[1].first, match[1].length());
-								const CString url = RegExpParse(xmlElement.GetString(), L"<BaseURL>(.*?)</BaseURL>");
-								const int itag = _wtoi(RegExpParse(xmlElement.GetString(), L"id=\"([0-9]+)\""));
-								const int fps = _wtoi(RegExpParse(xmlElement.GetString(), L"frameRate=\"([0-9]+)\""));
-								if (url.Find(L"dur/") > 0) {
-									AddUrl(youtubeUrllist, youtubeAudioUrllist, url, itag, fps);
-								}
-							}
-
-							text = match[0].second;
-						}
-					}
-				}
-			}
 
 			CStringA chaptersStr = GetEntry(data.data(), R"({"chapteredPlayerBarRenderer":)", "}}}]");
 			if (chaptersStr.IsEmpty()) {
@@ -1613,7 +1488,7 @@ namespace Youtube
 				if (url.Find(L"/live") != -1) {
 					urlData data;
 					if (URLReadData(url.GetString(), data)) {
-						auto jsonEntry = GetEntry(data.data(), MATCH_PLAYER_RESPONSE_2, MATCH_PLAYER_RESPONSE_END_2);
+						auto jsonEntry = GetEntry(data.data(), MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END);
 						if (!jsonEntry.IsEmpty()) {
 							jsonEntry += "}";
 
