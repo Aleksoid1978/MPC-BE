@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,16 +39,16 @@ namespace MatroskaWriter
 		virtual HRESULT Write(IStream* pStream);
 	};
 
-	class CLength : public CID
+	class CLength final
 	{
 		UINT64 m_len;
 	public:
-		CLength(UINT64 len = 0) : CID(0), m_len(len) {}
+		CLength(UINT64 len = 0) : m_len(len) {}
 		operator UINT64() {
 			return m_len;
 		}
-		UINT64 Size(bool fWithHeader = false) override;
-		HRESULT Write(IStream* pStream) override;
+		UINT64 Size();
+		HRESULT Write(IStream* pStream);
 	};
 
 	class CBinary : public std::vector<BYTE>, public CID

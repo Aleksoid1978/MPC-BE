@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -246,7 +246,7 @@ HRESULT CInt::Write(IStream* pStream)
 	return pStream->Write(&val, (ULONG)l, nullptr);
 }
 
-UINT64 CLength::Size(bool fWithHeader)
+UINT64 CLength::Size()
 {
 	if (m_len == 0x00FFFFFFFFFFFFFFi64) {
 		return 8;
@@ -264,7 +264,7 @@ UINT64 CLength::Size(bool fWithHeader)
 
 HRESULT CLength::Write(IStream* pStream)
 {
-	UINT64 len = Size(false);
+	UINT64 len = Size();
 	UINT64 val = m_len;
 	bswap((BYTE*)&val, (int)len);
 	*(BYTE*)&val = ((*(BYTE*)&val) & (1 << (8 - len)) - 1) | (1 << (8 - len));
