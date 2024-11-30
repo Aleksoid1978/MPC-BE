@@ -474,7 +474,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				continue;
 			}
 
-			if (pwfe->wFormatTag == 0x706D) {
+			if (pwfe->wFormatTag == WAVE_FORMAT_FAAD_AAC) {
 				pwfe->wFormatTag = WAVE_FORMAT_RAW_AAC1;
 			}
 

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -69,7 +69,7 @@ HRESULT CAviFile::Init()
 			continue;
 		}
 		WAVEFORMATEX* wfe = (WAVEFORMATEX*)s->strf.data();
-		if (wfe->wFormatTag == 0x55 && wfe->nBlockAlign == 1152
+		if (wfe->wFormatTag == WAVE_FORMAT_MPEGLAYER3 && wfe->nBlockAlign == 1152
 				&& s->strh.dwScale == 1 && s->strh.dwRate != wfe->nSamplesPerSec) {
 			// correcting encoder bugs...
 			s->strh.dwScale = 1152;

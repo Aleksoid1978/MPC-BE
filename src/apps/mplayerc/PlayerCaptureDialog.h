@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -269,7 +269,7 @@ public:
 		}
 
 		switch (wfe->wFormatTag) {
-			case 1:
+			case WAVE_FORMAT_PCM:
 				str = L"PCM";
 				break;
 			default:
