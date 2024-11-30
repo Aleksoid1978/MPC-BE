@@ -26,6 +26,7 @@
 
 #include "config.h"
 #include "swscale.h"
+#include "graph.h"
 
 #include "libavutil/avassert.h"
 #include "libavutil/common.h"
@@ -47,6 +48,8 @@
 #define YUVRGB_TABLE_LUMA_HEADROOM 512
 
 #define MAX_FILTER_SIZE SWS_MAX_FILTER_SIZE
+
+#define SWS_MAX_THREADS 8192 /* sanity clamp */
 
 #if HAVE_BIGENDIAN
 #define ALT32_CORR (-1)
@@ -72,23 +75,6 @@ static inline SwsInternal *sws_internal(const SwsContext *sws)
 {
     return (SwsInternal *) sws;
 }
-
-typedef enum SwsDither {
-    SWS_DITHER_NONE = 0,
-    SWS_DITHER_AUTO,
-    SWS_DITHER_BAYER,
-    SWS_DITHER_ED,
-    SWS_DITHER_A_DITHER,
-    SWS_DITHER_X_DITHER,
-    SWS_DITHER_NB,
-} SwsDither;
-
-typedef enum SwsAlphaBlend {
-    SWS_ALPHA_BLEND_NONE  = 0,
-    SWS_ALPHA_BLEND_UNIFORM,
-    SWS_ALPHA_BLEND_CHECKERBOARD,
-    SWS_ALPHA_BLEND_NB,
-} SwsAlphaBlend;
 
 typedef struct Range {
     unsigned int start;
@@ -329,38 +315,19 @@ struct SwsFilterDescriptor;
 
 /* This struct should be aligned on at least a 32-byte boundary. */
 struct SwsInternal {
-    /* Currently active user-facing options. */
-    struct {
-        const AVClass *av_class;
+    /* Currently active user-facing options. Also contains AVClass */
+    SwsContext opts;
 
-        double scaler_params[2];       ///< Input parameters for scaling algorithms that need them.
-        int flags;                     ///< Flags passed by the user to select scaler algorithm, optimizations, subsampling, etc...
-        int threads;                   ///< Number of threads used for scaling
-
-        int src_w;                     ///< Width  of source      luma/alpha planes.
-        int src_h;                     ///< Height of source      luma/alpha planes.
-        int dst_w;                     ///< Width  of destination luma/alpha planes.
-        int dst_h;                     ///< Height of destination luma/alpha planes.
-        enum AVPixelFormat src_format; ///< Source      pixel format.
-        enum AVPixelFormat dst_format; ///< Destination pixel format.
-        int src_range;                 ///< 0 = MPG YUV range, 1 = JPG YUV range (source      image).
-        int dst_range;                 ///< 0 = MPG YUV range, 1 = JPG YUV range (destination image).
-        int src_h_chr_pos;
-        int dst_h_chr_pos;
-        int src_v_chr_pos;
-        int dst_v_chr_pos;
-        int gamma_flag;
-
-        SwsDither dither;
-        SwsAlphaBlend alpha_blend;
-    } opts;
-
+    /* Parent context (for slice contexts) */
     SwsContext *parent;
 
     AVSliceThread      *slicethread;
     SwsContext        **slice_ctx;
     int                *slice_err;
     int              nb_slice_ctx;
+
+    /* Scaling graph, reinitialized dynamically as needed. */
+    SwsGraph *graph[2]; /* top, bottom fields */
 
     // values passed to current sws_receive_slice() call
     int dst_slice_start;
@@ -702,6 +669,7 @@ struct SwsInternal {
     unsigned int dst_slice_align;
     atomic_int   stride_unaligned_warned;
     atomic_int   data_unaligned_warned;
+    int          color_conversion_warned;
 
     Half2FloatTables *h2f_tables;
 };
@@ -713,7 +681,7 @@ static_assert(offsetof(SwsInternal, redDither) + DITHER32_INT == offsetof(SwsInt
 #if ARCH_X86_64
 /* x86 yuv2gbrp uses the SwsInternal for yuv coefficients
    if struct offsets change the asm needs to be updated too */
-static_assert(offsetof(SwsInternal, yuv2rgb_y_offset) == 40316,
+static_assert(offsetof(SwsInternal, yuv2rgb_y_offset) == 40332,
               "yuv2rgb_y_offset must be updated in x86 asm");
 #endif
 
@@ -996,6 +964,9 @@ extern const uint8_t ff_dither_8x8_220[9][8];
 extern const int32_t ff_yuv2rgb_coeffs[11][4];
 
 extern const AVClass ff_sws_context_class;
+
+int ff_sws_init_single_context(SwsContext *sws, SwsFilter *srcFilter,
+                               SwsFilter *dstFilter);
 
 /**
  * Set c->convert_unscaled to an unscaled converter if one exists for the

@@ -42,8 +42,6 @@
 #include "version.h"
 #endif
 
-typedef struct SwsContext SwsContext;
-
 /**
  * @defgroup libsws libswscale
  * Color conversion and scaling library.
@@ -65,17 +63,174 @@ const char *swscale_configuration(void);
 const char *swscale_license(void);
 
 /**
- * Get the AVClass for swsContext. It can be used in combination with
+ * Get the AVClass for SwsContext. It can be used in combination with
  * AV_OPT_SEARCH_FAKE_OBJ for examining options.
  *
  * @see av_opt_find().
  */
 const AVClass *sws_get_class(void);
 
+/******************************
+ * Flags and quality settings *
+ ******************************/
+
+typedef enum SwsDither {
+    SWS_DITHER_NONE = 0, /* disable dithering */
+    SWS_DITHER_AUTO,     /* auto-select from preset */
+    SWS_DITHER_BAYER,    /* ordered dither matrix */
+    SWS_DITHER_ED,       /* error diffusion */
+    SWS_DITHER_A_DITHER, /* arithmetic addition */
+    SWS_DITHER_X_DITHER, /* arithmetic xor */
+    SWS_DITHER_NB,       /* not part of the ABI */
+} SwsDither;
+
+typedef enum SwsAlphaBlend {
+    SWS_ALPHA_BLEND_NONE = 0,
+    SWS_ALPHA_BLEND_UNIFORM,
+    SWS_ALPHA_BLEND_CHECKERBOARD,
+    SWS_ALPHA_BLEND_NB,  /* not part of the ABI */
+} SwsAlphaBlend;
+
+typedef enum SwsFlags {
+    /**
+     * Scaler selection options. Only one may be active at a time.
+     */
+    SWS_FAST_BILINEAR = 1 <<  0, ///< fast bilinear filtering
+    SWS_BILINEAR      = 1 <<  1, ///< bilinear filtering
+    SWS_BICUBIC       = 1 <<  2, ///< 2-tap cubic B-spline
+    SWS_X             = 1 <<  3, ///< experimental
+    SWS_POINT         = 1 <<  4, ///< nearest neighbor
+    SWS_AREA          = 1 <<  5, ///< area averaging
+    SWS_BICUBLIN      = 1 <<  6, ///< bicubic luma, bilinear chroma
+    SWS_GAUSS         = 1 <<  7, ///< gaussian approximation
+    SWS_SINC          = 1 <<  8, ///< unwindowed sinc
+    SWS_LANCZOS       = 1 <<  9, ///< 3-tap sinc/sinc
+    SWS_SPLINE        = 1 << 10, ///< cubic Keys spline
+
+    /**
+     * Return an error on underspecified conversions. Without this flag,
+     * unspecified fields are defaulted to sensible values.
+     */
+    SWS_STRICT        = 1 << 11,
+
+    /**
+     * Emit verbose log of scaling parameters.
+     */
+    SWS_PRINT_INFO    = 1 << 12,
+
+    /**
+     * Perform full chroma upsampling when upscaling to RGB.
+     *
+     * For example, when converting 50x50 yuv420p to 100x100 rgba, setting this flag
+     * will scale the chroma plane from 25x25 to 100x100 (4:4:4), and then convert
+     * the 100x100 yuv444p image to rgba in the final output step.
+     *
+     * Without this flag, the chroma plane is instead scaled to 50x100 (4:2:2),
+     * with a single chroma sample being re-used for both of the horizontally
+     * adjacent RGBA output pixels.
+     */
+    SWS_FULL_CHR_H_INT = 1 << 13,
+
+    /**
+     * Perform full chroma interpolation when downscaling RGB sources.
+     *
+     * For example, when converting a 100x100 rgba source to 50x50 yuv444p, setting
+     * this flag will generate a 100x100 (4:4:4) chroma plane, which is then
+     * downscaled to the required 50x50.
+     *
+     * Without this flag, the chroma plane is instead generated at 50x100 (dropping
+     * every other pixel), before then being downscaled to the required 50x50
+     * resolution.
+     */
+    SWS_FULL_CHR_H_INP = 1 << 14,
+
+    /**
+     * Force bit-exact output. This will prevent the use of platform-specific
+     * optimizations that may lead to slight difference in rounding, in favor
+     * of always maintaining exact bit output compatibility with the reference
+     * C code.
+     *
+     * Note: It is recommended to set both of these flags simultaneously.
+     */
+    SWS_ACCURATE_RND   = 1 << 18,
+    SWS_BITEXACT       = 1 << 19,
+
+    /**
+     * Deprecated flags.
+     */
+    SWS_DIRECT_BGR      = 1 << 15, ///< This flag has no effect
+    SWS_ERROR_DIFFUSION = 1 << 23, ///< Set `SwsContext.dither` instead
+} SwsFlags;
+
+/***********************************
+ * Context creation and management *
+ ***********************************/
+
 /**
- * Allocate an empty SwsContext. This must be filled and passed to
- * sws_init_context(). For filling see AVOptions, options.c and
- * sws_setColorspaceDetails().
+ * Main external API structure. New fields can be added to the end with
+ * minor version bumps. Removal, reordering and changes to existing fields
+ * require a major version bump. sizeof(SwsContext) is not part of the ABI.
+ */
+typedef struct SwsContext {
+    const AVClass *av_class;
+
+    /**
+     * Private data of the user, can be used to carry app specific stuff.
+     */
+    void *opaque;
+
+    /**
+     * Bitmask of SWS_*. See `SwsFlags` for details.
+     */
+    unsigned flags;
+
+    /**
+     * Extra parameters for fine-tuning certain scalers.
+     */
+    double scaler_params[2];
+
+    /**
+     * How many threads to use for processing, or 0 for automatic selection.
+     */
+    int threads;
+
+    /**
+     * Dither mode.
+     */
+    SwsDither dither;
+
+    /**
+     * Alpha blending mode. See `SwsAlphaBlend` for details.
+     */
+    SwsAlphaBlend alpha_blend;
+
+    /**
+     * Use gamma correct scaling.
+     */
+    int gamma_flag;
+
+    /**
+     * Deprecated frame property overrides, for the legacy API only.
+     *
+     * Ignored by sws_scale_frame() when used in dynamic mode, in which
+     * case all properties are instead taken from the frame directly.
+     */
+    int src_w, src_h;  ///< Width and height of the source frame
+    int dst_w, dst_h;  ///< Width and height of the destination frame
+    int src_format;    ///< Source pixel format
+    int dst_format;    ///< Destination pixel format
+    int src_range;     ///< Source is full range
+    int dst_range;     ///< Destination is full range
+    int src_v_chr_pos; ///< Source vertical chroma position in luma grid / 256
+    int src_h_chr_pos; ///< Source horizontal chroma position
+    int dst_v_chr_pos; ///< Destination vertical chroma position
+    int dst_h_chr_pos; ///< Destination horizontal chroma position
+
+    /* Remember to add new fields to graph.c:opts_equal() */
+} SwsContext;
+
+/**
+ * Allocate an empty SwsContext and set its fields to default values.
  */
 SwsContext *sws_alloc_context(void);
 
@@ -141,64 +296,60 @@ int sws_test_transfer(enum AVColorTransferCharacteristic trc, int output);
 int sws_test_frame(const AVFrame *frame, int output);
 
 /**
+ * Like `sws_scale_frame`, but without actually scaling. It will instead
+ * merely initialize internal state that *would* be required to perform the
+ * operation, as well as returning the correct error code for unsupported
+ * frame combinations.
+ *
+ * @param ctx   The scaling context.
+ * @param dst   The destination frame to consider.
+ * @param src   The source frame to consider.
+ * @return 0 on success, a negative AVERROR code on failure.
+ */
+int sws_frame_setup(SwsContext *ctx, const AVFrame *dst, const AVFrame *src);
+
+/********************
+ * Main scaling API *
+ ********************/
+
+/**
  * Check if a given conversion is a noop. Returns a positive integer if
  * no operation needs to be performed, 0 otherwise.
  */
 int sws_is_noop(const AVFrame *dst, const AVFrame *src);
 
-/* values for the flags, the stuff on the command line is different */
-#define SWS_FAST_BILINEAR     1
-#define SWS_BILINEAR          2
-#define SWS_BICUBIC           4
-#define SWS_X                 8
-#define SWS_POINT          0x10
-#define SWS_AREA           0x20
-#define SWS_BICUBLIN       0x40
-#define SWS_GAUSS          0x80
-#define SWS_SINC          0x100
-#define SWS_LANCZOS       0x200
-#define SWS_SPLINE        0x400
+/**
+ * Scale source data from `src` and write the output to `dst`.
+ *
+ * This function can be used directly on an allocated context, without setting
+ * up any frame properties or calling `sws_init_context()`. Such usage is fully
+ * dynamic and does not require reallocation if the frame properties change.
+ *
+ * Alternatively, this function can be called on a context that has been
+ * explicitly initialized. However, this is provided only for backwards
+ * compatibility. In this usage mode, all frame properties must be correctly
+ * set at init time, and may no longer change after initialization.
+ *
+ * @param ctx   The scaling context.
+ * @param dst   The destination frame. The data buffers may either be already
+ *              allocated by the caller or left clear, in which case they will
+ *              be allocated by the scaler. The latter may have performance
+ *              advantages - e.g. in certain cases some (or all) output planes
+ *              may be references to input planes, rather than copies.
+ * @param src   The source frame. If the data buffers are set to NULL, then
+ *              this function behaves identically to `sws_frame_setup`.
+ * @return 0 on success, a negative AVERROR code on failure.
+ */
+int sws_scale_frame(SwsContext *c, AVFrame *dst, const AVFrame *src);
+
+/*************************
+ * Legacy (stateful) API *
+ *************************/
 
 #define SWS_SRC_V_CHR_DROP_MASK     0x30000
 #define SWS_SRC_V_CHR_DROP_SHIFT    16
 
 #define SWS_PARAM_DEFAULT           123456
-
-#define SWS_PRINT_INFO              0x1000
-
-//the following 3 flags are not completely implemented
-
-/**
- * Perform full chroma upsampling when upscaling to RGB.
- *
- * For example, when converting 50x50 yuv420p to 100x100 rgba, setting this flag
- * will scale the chroma plane from 25x25 to 100x100 (4:4:4), and then convert
- * the 100x100 yuv444p image to rgba in the final output step.
- *
- * Without this flag, the chroma plane is instead scaled to 50x100 (4:2:2),
- * with a single chroma sample being re-used for both of the horizontally
- * adjacent RGBA output pixels.
- */
-#define SWS_FULL_CHR_H_INT    0x2000
-
-/**
- * Perform full chroma interpolation when downscaling RGB sources.
- *
- * For example, when converting a 100x100 rgba source to 50x50 yuv444p, setting
- * this flag will generate a 100x100 (4:4:4) chroma plane, which is then
- * downscaled to the required 50x50.
- *
- * Without this flag, the chroma plane is instead generated at 50x100 (dropping
- * every other pixel), before then being downscaled to the required 50x50
- * resolution.
- */
-#define SWS_FULL_CHR_H_INP    0x4000
-
-#define SWS_DIRECT_BGR        0x8000
-
-#define SWS_ACCURATE_RND      0x40000
-#define SWS_BITEXACT          0x80000
-#define SWS_ERROR_DIFFUSION  0x800000
 
 #define SWS_MAX_REDUCE_CUTOFF 0.002
 
@@ -257,6 +408,11 @@ int sws_isSupportedEndiannessConversion(enum AVPixelFormat pix_fmt);
 /**
  * Initialize the swscaler context sws_context.
  *
+ * This function is considered deprecated, and provided only for backwards
+ * compatibility with sws_scale() and sws_start_frame(). The preferred way to
+ * use libswscale is to set all frame properties correctly and call
+ * sws_scale_frame() directly, without explicitly initializing the context.
+ *
  * @return zero or positive value on success, a negative value on
  * error
  */
@@ -298,7 +454,8 @@ SwsContext *sws_getContext(int srcW, int srcH, enum AVPixelFormat srcFormat,
 /**
  * Scale the image slice in srcSlice and put the resulting scaled
  * slice in the image in dst. A slice is a sequence of consecutive
- * rows in an image.
+ * rows in an image. Requires a context that has been previously
+ * been initialized with sws_init_context().
  *
  * Slices have to be provided in sequential order, either in
  * top-bottom or bottom-top order. If slices are provided in
@@ -326,26 +483,10 @@ int sws_scale(SwsContext *c, const uint8_t *const srcSlice[],
               uint8_t *const dst[], const int dstStride[]);
 
 /**
- * Scale source data from src and write the output to dst.
- *
- * This is merely a convenience wrapper around
- * - sws_frame_start()
- * - sws_send_slice(0, src->height)
- * - sws_receive_slice(0, dst->height)
- * - sws_frame_end()
- *
- * @param c   The scaling context
- * @param dst The destination frame. See documentation for sws_frame_start() for
- *            more details.
- * @param src The source frame.
- *
- * @return 0 on success, a negative AVERROR code on failure
- */
-int sws_scale_frame(SwsContext *c, AVFrame *dst, const AVFrame *src);
-
-/**
  * Initialize the scaling process for a given pair of source/destination frames.
  * Must be called before any calls to sws_send_slice() and sws_receive_slice().
+ * Requires a context that has been previously been initialized with
+ * sws_init_context().
  *
  * This function will retain references to src and dst, so they must both use
  * refcounted buffers (if allocated by the caller, in case of dst).
@@ -416,7 +557,8 @@ int sws_receive_slice(SwsContext *c, unsigned int slice_start,
                       unsigned int slice_height);
 
 /**
- * Get the alignment required for slices
+ * Get the alignment required for slices. Requires a context that has been
+ * previously been initialized with sws_init_context().
  *
  * @param c   The scaling context
  * @return alignment required for output slices requested with sws_receive_slice().

@@ -1778,15 +1778,17 @@ static int inter_data(VVCLocalContext *lc)
         pu->general_merge_flag = ff_vvc_general_merge_flag(lc);
 
     if (pu->general_merge_flag) {
-        hls_merge_data(lc);
-    } else if (cu->pred_mode == MODE_IBC){
+        ret = hls_merge_data(lc);
+    } else if (cu->pred_mode == MODE_IBC) {
         ret = mvp_data_ibc(lc);
     } else {
         ret = mvp_data(lc);
     }
 
-    if (cu->pred_mode == MODE_IBC)
-    {
+    if (ret)
+        return ret;
+
+    if (cu->pred_mode == MODE_IBC) {
         ff_vvc_update_hmvp(lc, mi);
     } else if (!pu->merge_gpm_flag && !pu->inter_affine_flag && !pu->merge_subblock_flag) {
         refine_regular_subblock(lc);

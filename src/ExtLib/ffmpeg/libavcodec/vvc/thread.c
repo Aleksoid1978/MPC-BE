@@ -656,9 +656,9 @@ static void task_run_stage(VVCTask *t, VVCContext *s, VVCLocalContext *lc)
                 "frame %5d, %s(%3d, %3d) failed with %d\r\n",
                 (int)fc->decode_order, task_name[stage], t->rx, t->ry, ret);
         }
+        if (!ret)
+            task_stage_done(t, s);
     }
-
-    task_stage_done(t, s);
     return;
 }
 
@@ -820,6 +820,13 @@ int ff_vvc_frame_submit(VVCContext *s, VVCFrameContext *fc)
                 if (ret < 0)
                     return ret;
             }
+        }
+    }
+    for (int rs = 0; rs < ft->ctu_count; rs++) {
+        const VVCTask *t = ft->tasks + rs;
+        if (!t->sc) {
+            av_log(s->avctx, AV_LOG_ERROR, "frame %5d, CTU(%d, %d) not belong to any slice\r\n", (int)fc->decode_order, t->rx, t->ry);
+            return AVERROR_INVALIDDATA;
         }
     }
     frame_thread_add_score(s, ft, 0, 0, VVC_TASK_STAGE_INIT);

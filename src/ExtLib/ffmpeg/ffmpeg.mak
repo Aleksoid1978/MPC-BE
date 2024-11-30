@@ -812,6 +812,7 @@ SRCS_LR = \
 SRCS_LS = \
 	libswscale/alphablend.c \
 	libswscale/gamma.c \
+	libswscale/graph.c \
 	libswscale/half2float.c \
 	libswscale/hscale.c \
 	libswscale/hscale_fast_bilinear.c \

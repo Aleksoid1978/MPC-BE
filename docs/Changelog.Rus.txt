@@ -12,7 +12,7 @@ YouTube
 
 Обновлены библиотеки:
 	dav1d git-1.5.0-16-g93f12c1;
-	ffmpeg n7.2-dev-706-gecc7d5db9c.
+	ffmpeg n7.2-dev-805-g4de67e8746.
 
 
 1.8.1 - 2024-11-07
