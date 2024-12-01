@@ -1484,7 +1484,6 @@ void CMPCVideoDecFilter::GetPictSize(int& width, int& height)
 	// some codecs can reset the values width/height on initialization
 	width  = m_pAVCtx->width  ? m_pAVCtx->width  : m_pAVCtx->coded_width;
 	height = m_pAVCtx->height ? m_pAVCtx->height : m_pAVCtx->coded_height;
-	FixFrameSize(m_pAVCtx, width, height);
 }
 
 static bool IsFFMPEGEnabled(const FFMPEG_CODECS& ffcodec, const bool FFmpegFilters[VDEC_COUNT])
@@ -3671,7 +3670,6 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 		int w = frame->width;
 		int h = frame->height;
-		FixFrameSize(m_pAVCtx, w, h);
 
 		if (FAILED(hr = GetDeliveryBuffer(w, h, &pOut, GetFrameDuration(), &dxvaExtFormat)) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
 			av_frame_unref(frame);
@@ -4061,13 +4059,6 @@ void CMPCVideoDecFilter::SetThreadCount()
 			int nThreadNumber = (m_nThreadNumber > 0) ? m_nThreadNumber : CPUInfo::GetProcessorNumber();
 			m_pAVCtx->thread_count = std::clamp(nThreadNumber, 1, MAX_AUTO_THREADS);
 		}
-	}
-}
-
-void CMPCVideoDecFilter::GetOutputSize(int& w, int& h, int& arx, int& ary)
-{
-	if (m_pAVCtx) {
-		FixFrameSize(m_pAVCtx, w, h);
 	}
 }
 

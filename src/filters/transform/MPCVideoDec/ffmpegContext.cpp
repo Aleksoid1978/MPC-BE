@@ -437,22 +437,3 @@ BOOL DXVACheckFramesize(int width, int height, UINT nPCIVendor, UINT nPCIDevice,
 
 	return FALSE;
 }
-
-void FixFrameSize(enum AVPixelFormat pixfmt, int& width, int& height)
-{
-	const AVPixFmtDescriptor* av_pfdesc = av_pix_fmt_desc_get(pixfmt);
-	if (av_pfdesc) {
-		if (av_pfdesc->log2_chroma_w == 1 && (width & 1)) {
-			width += 1;
-		}
-		if (av_pfdesc->log2_chroma_h == 1 && (height & 1)) {
-			height -= 1;
-		}
-	}
-}
-
-void FixFrameSize(struct AVCodecContext* pAVCtx, int& width, int& height)
-{
-	const AVPixelFormat pixfmt = pAVCtx->sw_pix_fmt != AV_PIX_FMT_NONE ? pAVCtx->sw_pix_fmt : pAVCtx->pix_fmt;
-	FixFrameSize(pixfmt, width, height);
-}

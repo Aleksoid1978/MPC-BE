@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,6 +40,3 @@ bool IsATIUVD(UINT nPCIVendor, UINT nPCIDevice);
 
 // check frame size for DXVA for old drivers
 BOOL DXVACheckFramesize(int width, int height, UINT nPCIVendor, UINT nPCIDevice, UINT64 VideoDriverVersion);
-
-void FixFrameSize(enum AVPixelFormat pixfmt, int& width, int& height);
-void FixFrameSize(struct AVCodecContext* pAVCtx, int& width, int& height);
