@@ -159,6 +159,8 @@ static const struct {
 	{ &MEDIASUBTYPE_AES3,              AV_CODEC_ID_S302M },
 	// G.726 ADPCM
 	{ &MEDIASUBTYPE_G726_ADPCM,        AV_CODEC_ID_ADPCM_G726 },
+	// other
+	{ &MEDIASUBTYPE_ON2VP6_AUDIO,      AV_CODEC_ID_ON2AVC },
 
 	{ &MEDIASUBTYPE_None,              AV_CODEC_ID_NONE },
 };

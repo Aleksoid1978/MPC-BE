@@ -441,6 +441,8 @@ SRCS_LC_B = \
 	libavcodec/nvdec_mpeg12.c \
 	libavcodec/nvdec_vc1.c \
 	libavcodec/nvdec_vp9.c \
+	libavcodec/on2avc.c \
+	libavcodec/on2avcdata.c \
 	libavcodec/options.c \
 	libavcodec/packet.c \
 	libavcodec/parser.c \

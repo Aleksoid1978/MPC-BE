@@ -117,6 +117,7 @@ static const FFCodec * const codec_list[] = {
     &ff_mpc7_decoder,
     &ff_mpc8_decoder,
     &ff_nellymoser_decoder,
+    &ff_on2avc_decoder,
     &ff_opus_decoder,
     &ff_qdm2_decoder,
     &ff_qdmc_decoder,

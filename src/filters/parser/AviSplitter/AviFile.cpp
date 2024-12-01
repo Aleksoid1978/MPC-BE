@@ -230,7 +230,7 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 					if (S_OK != ReadAvi(strm->strh, 8)) {
 						return E_FAIL;
 					}
-					if (m_isamv) {
+ 					if (m_isamv) {
 						// First alway video, second always audio
 						strm->strh.fccType = m_strms.size() == 0 ? FCC('vids') : FCC('amva');
 						strm->strh.dwRate  = m_avih.dwReserved[0]*1000; // dwReserved[0] = fps!
@@ -249,6 +249,12 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 					strm->strf.resize(size);
 					if (S_OK != ByteRead(strm->strf.data(), size)) {
 						return E_FAIL;
+					}
+					if (strm->strh.fccType == FCC('auds')) {
+						auto pwfe = reinterpret_cast<WAVEFORMATEX*>(strm->strf.data());
+						if (!pwfe->nBlockAlign && strm->strh.dwScale) {
+							pwfe->nBlockAlign = strm->strh.dwScale;
+						}
 					}
 					if (m_isamv) {
 						if (strm->strh.fccType == FCC('vids')) {
@@ -689,7 +695,7 @@ DWORD CAviFile::strm_t::GetChunkSize(DWORD size)
 {
 	if (strh.fccType == FCC('auds')) {
 		WORD nBlockAlign = ((WAVEFORMATEX*)strf.data())->nBlockAlign;
-		size = nBlockAlign ? (size + (nBlockAlign-1)) / nBlockAlign * nBlockAlign : 0; // round up for nando's vbr hack
+		size = nBlockAlign ? (size + (nBlockAlign - 1)) / nBlockAlign * nBlockAlign : 0; // round up for nando's vbr hack
 	}
 
 	return size;

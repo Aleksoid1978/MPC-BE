@@ -147,6 +147,7 @@ static const std::map<WORD, LPCSTR> aformattags = {
 	{WAVE_FORMAT_PS2_ADPCM,             "PS2 ADPCM"},
 	{WAVE_FORMAT_SPEEX_VOICE,           "Speex"},
 	{WAVE_FORMAT_ADX_ADPCM,             "ADX ADPCM"},
+	{WAVE_FORMAT_ON2_VP6_AUDIO,         "On2 AVC"}
 };
 
 static const std::map<GUID, LPCSTR> audioguids = {
@@ -203,7 +204,7 @@ static const std::map<GUID, LPCSTR> audioguids = {
 	{MEDIASUBTYPE_ATRAC3,          "ATRAC3"},
 	{MEDIASUBTYPE_ATRAC3plus,      "ATRAC3plus"},
 	{MEDIASUBTYPE_ATRAC9,          "ATRAC9"},
-	{MEDIASUBTYPE_G726_ADPCM,      "G.726 ADPCM"}
+	{MEDIASUBTYPE_G726_ADPCM,      "G.726 ADPCM"},
 };
 
 static const std::map<GUID, LPCSTR> subtitleguids = {

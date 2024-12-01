@@ -2550,6 +2550,7 @@ CFGManagerCustom::CFGManagerCustom(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ATRAC3plus);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ATRAC9);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_INTEL_MUSIC);
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ON2VP6_AUDIO);
 		m_transform.emplace_back(pFGF);
 
 		// subtitles
