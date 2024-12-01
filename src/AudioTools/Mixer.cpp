@@ -26,7 +26,7 @@
 #pragma warning(push)
 #pragma warning(disable: 4005)
 extern "C" {
-	#include "ExtLib/ffmpeg/libswresample/swresample_internal.h"
+	#include "ExtLib/ffmpeg/libswresample/swresample.h"
 	#include "ExtLib/ffmpeg/libavutil/opt.h"
 }
 #pragma warning(pop)
@@ -338,7 +338,7 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 	int in_plane_nb   = av_sample_fmt_is_planar(m_in_avsf) ? in_ch : 1;
 	int in_plane_size = in_samples * (av_sample_fmt_is_planar(m_in_avsf) ? 1 : in_ch) * av_get_bytes_per_sample(m_in_avsf);
 
-	static BYTE* ppInput[SWR_CH_MAX];
+	static BYTE* ppInput[64/*SWR_CH_MAX*/];
 	for (int i = 0; i < in_plane_nb; i++) {
 		ppInput[i] = pInput + i * in_plane_size;
 	}

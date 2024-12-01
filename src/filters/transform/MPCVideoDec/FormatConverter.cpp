@@ -31,7 +31,7 @@
 extern "C" {
 	#include <ExtLib/ffmpeg/libavcodec/defs.h>
 	#include <ExtLib/ffmpeg/libswscale/swscale.h>
-	#include <ExtLib/ffmpeg/libswscale/swscale_internal.h>
+	#include <ExtLib/ffmpeg/libavutil/pixdesc.h>
 }
 #pragma warning(pop)
 
@@ -250,6 +250,12 @@ void CFormatConverter::UpdateSWSContext()
 			else if (m_FProps.colorrange == AVCOL_RANGE_JPEG) {
 				dstRange = 1;
 			}
+
+			auto isAnyRGB = [](enum AVPixelFormat pix_fmt) {
+				const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(pix_fmt);
+				ASSERT(desc);
+				return (desc->flags & AV_PIX_FMT_FLAG_RGB) || pix_fmt == AV_PIX_FMT_MONOBLACK || pix_fmt == AV_PIX_FMT_MONOWHITE;
+			};
 
 			if (isAnyRGB(m_FProps.avpixfmt) || isAnyRGB(s_sw_formats[m_out_pixfmt].av_pix_fmt)) {
 				// SWS_CS_* does not fully comply with the AVCOL_SPC_*, but it is well handled in the libswscale.
