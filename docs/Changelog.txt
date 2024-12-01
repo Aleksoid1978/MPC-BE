@@ -2,9 +2,23 @@
 
 1.8.1.x dev
 =============================
+MpcDvdVideoDecoder 
+Optimized I420 to NV12 conversion.
+
+RoQSplitter 
+Optimized I420 to NV12 conversion.
+
+MPCVideoDec
+Added the ability to work with incorrect YUV frames (4:2:0/4:2:2 with odd dimensions).
+
 YouTube
 Improved YouTube support in the built-in parser.
 Improved youtube-dl support.
+
+Player
+Added playback of a history entry when pressing the "Enter" key.
+Fixed opening paths written as URLs (file://).
+Fixed reading of the "Speed ​​Step" setting.
 
 Updated Romanian translation (by Andrei Miloiu).
 Added Slovenian translation (by MatjazP72).
