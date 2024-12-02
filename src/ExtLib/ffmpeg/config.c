@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2016 see Authors.txt
+ * (C) 2009-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -47,16 +47,6 @@
 	#define COMPILER_SSE " (SSSE3)"
 #elif defined(__SSE3__)
 	#define COMPILER_SSE " (SSE3)"
-#elif !ARCH_X86_64
-	#if defined(__SSE2__)
-		#define COMPILER_SSE " (SSE2)"
-	#elif defined(__SSE__)
-		#define COMPILER_SSE " (SSE)"
-	#elif defined(__MMX__)
-		#define COMPILER_SSE " (MMX)"
-	#else
-		#define COMPILER_SSE ""
-	#endif
 #else
 	#define COMPILER_SSE ""
 #endif
