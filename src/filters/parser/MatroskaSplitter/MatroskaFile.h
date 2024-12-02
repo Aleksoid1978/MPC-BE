@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -461,7 +461,8 @@ namespace MatroskaReader
 		CUInt FlagEnabled, FlagDefault, FlagLacing, FlagForced;
 		CUInt MinCache, MaxCache;
 		CUTF8 Name;
-		CANSI Language;
+		CANSI Language{ "eng" };
+		CANSI LanguageBCP47;
 		CBinary CodecID;
 		CBinary CodecPrivate;
 		CUTF8 CodecName;
@@ -488,7 +489,6 @@ namespace MatroskaReader
 			FlagForced.Set(0);
 			MinCache.Set(0);
 			TrackTimecodeScale.Set(1.0f);
-			Language.CStringA::operator = ("eng");
 			MaxBlockAdditionID.Set(0);
 			CodecDecodeAll.Set(1);
 		}
@@ -574,12 +574,10 @@ namespace MatroskaReader
 	{
 	public:
 		CUTF8 ChapString;
-		CANSI ChapLanguage;
+		CANSI ChapLanguage{ "eng" };
+		CANSI ChapLanguageBCP47;
 		CANSI ChapCountry;
 
-		ChapterDisplay() {
-			ChapLanguage.CStringA::operator = ("eng");
-		}
 		HRESULT Parse(CMatroskaNode* pMN);
 	};
 
@@ -636,12 +634,9 @@ namespace MatroskaReader
 	{
 	public:
 		CUTF8 TagName;
-		CANSI TagLanguage;
+		CANSI TagLanguage{ "und" };
+		CANSI TagLanguageBCP47;
 		CUTF8 TagString;
-
-		SimpleTag() {
-			TagLanguage.CStringA::operator = ("eng");
-		}
 
 		HRESULT Parse(CMatroskaNode* pMN);
 	};

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -460,6 +460,9 @@ HRESULT TrackEntry::Parse(CMatroskaNode* pMN0)
 		break;
 	case 0x22B59C:
 		Language.Parse(pMN);
+		break;
+	case 0x22B59D:
+		LanguageBCP47.Parse(pMN);
 		break;
 	case 0x86:
 		CodecID.Parse(pMN);
@@ -1188,6 +1191,9 @@ HRESULT ChapterDisplay::Parse(CMatroskaNode* pMN0)
 	case 0x437C:
 		ChapLanguage.Parse(pMN);
 		break;
+	case 0x437D:
+		ChapLanguageBCP47.Parse(pMN);
+		break;
 	case 0x437E:
 		ChapCountry.Parse(pMN);
 		break;
@@ -1208,6 +1214,7 @@ HRESULT Tag::Parse(CMatroskaNode* pMN0)
 	BeginChunk
 	case 0x67C8:
 		SimpleTag.Parse(pMN);
+		break;
 	case 0x63C0:
 		Targets.Parse(pMN);
 		break;
@@ -1222,6 +1229,9 @@ HRESULT SimpleTag::Parse(CMatroskaNode* pMN0)
 		break;
 	case 0x447A:
 		TagLanguage.Parse(pMN);
+		break;
+	case 0x447B:
+		TagLanguageBCP47.Parse(pMN);
 		break;
 	case 0x4487:
 		TagString.Parse(pMN);
