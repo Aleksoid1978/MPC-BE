@@ -26,7 +26,7 @@ Updated Spanish translation (by IPeluchito).
 
 Updated libraries:
 	dav1d git-1.5.0-16-g93f12c1;
-	ffmpeg n7.2-dev-805-g4de67e8746;
+	ffmpeg n7.2-dev-827-gcb27e478f7;
 	vvdec v3.0.0-7-g87f7640.
 
 
