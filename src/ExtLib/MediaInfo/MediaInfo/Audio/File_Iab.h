@@ -37,6 +37,9 @@ private :
     //Streams management
     void Streams_Fill();
 
+    //Buffer - Global
+    void Read_Buffer_Continue();
+
     //Buffer - Per element
     void Header_Parse();
     void Data_Parse();

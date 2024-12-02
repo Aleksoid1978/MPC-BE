@@ -61,6 +61,7 @@ bool File_DolbyVisionMetadata::FileHeader_Begin()
         return false;
     }
     
+    const char* Format = nullptr;
     if (!strcmp(DolbyVisionGlobalData->Name(), "gsp:DolbyVisionGlobalDataGSP"))
     {
         for (DolbyVisionGlobalData = DolbyVisionGlobalData->FirstChildElement(); DolbyVisionGlobalData; DolbyVisionGlobalData = DolbyVisionGlobalData->NextSiblingElement())
@@ -70,11 +71,7 @@ bool File_DolbyVisionMetadata::FileHeader_Begin()
             if (!strcmp(DolbyVisionGlobalData->Name(), "gsp:Track"))
                 break;
         }
-        if (!DolbyVisionGlobalData)
-        {
-            Reject("DolbyVisionMetadata");
-            return false;
-        }
+        Format = "Dolby Vision Global Data GSP";
     }
     else if (!strcmp(DolbyVisionGlobalData->Name(), "dvmd-int:DolbyVisionIntegratedData"))
     {
@@ -98,11 +95,7 @@ bool File_DolbyVisionMetadata::FileHeader_Begin()
                 break;
             }
         }
-        if (!DolbyVisionGlobalData)
-        {
-            Reject("DolbyVisionMetadata");
-            return false;
-        }
+        Format = "Dolby Vision Integrated Data";
     }
     else if (!strcmp(DolbyVisionGlobalData->Name(), "DolbyVisionIntegratedWrapper"))
     {
@@ -111,8 +104,17 @@ bool File_DolbyVisionMetadata::FileHeader_Begin()
             if (!strcmp(DolbyVisionGlobalData->Name(), "DolbyVisionGlobalData"))
                 break;
         }
+        Format = "Dolby Vision Integrated Wrapper";
     }
-    else if (strcmp(DolbyVisionGlobalData->Name(), "DolbyVisionGlobalData"))
+    else if (!strcmp(DolbyVisionGlobalData->Name(), "DolbyVisionGlobalData"))
+    {
+        Format = "Dolby Vision Global Data";
+    }
+    else if (!strcmp(DolbyVisionGlobalData->Name(), "DolbyVisionFrameData") || !strcmp(DolbyVisionGlobalData->Name(), "fw:DolbyVisionFrameData"))
+    {
+        Format = "Dolby Vision Frame Data";
+    }
+    else
         DolbyVisionGlobalData = NULL;
 
     if (!DolbyVisionGlobalData)
@@ -124,8 +126,15 @@ bool File_DolbyVisionMetadata::FileHeader_Begin()
         Version=Text;
 
     Accept("DolbyVisionMetadata");
+    Fill(Stream_General, 0, General_Format, "Dolby Vision Metadata");
     Stream_Prepare(Stream_Video);
     Fill(Stream_Video, 0, Video_HDR_Format, "Dolby Vision Metadata");
+    if (IsISXD || IsStreamData)
+    {
+        Stream_Prepare(Stream_Other);
+        if (Format)
+            Fill(Stream_Other, 0, Other_Format, Format);
+    }
     if (!Version.empty())
         Fill(Stream_Video, 0, Video_HDR_Format_Version, Version);
     if (AspectRatio)
@@ -152,7 +161,7 @@ bool File_DolbyVisionMetadata::FileHeader_Begin()
                         if (float32 TextF = Ztring().From_UTF8(Text).To_float32())
                             Fill(Stream_Video, 0, Video_DisplayAspectRatio, TextF);
                 }
-                if (!strcmp(ColorEncoding_Item->Name(), "ColorSpace"))
+                if (false) // !strcmp(ColorEncoding_Item->Name(), "ColorSpace"))
                 {
                     if (const char* Text = ColorEncoding_Item->GetText())
                     {
@@ -465,7 +474,12 @@ bool File_DolbyVisionMetadata::FileHeader_Begin()
         if (!strcmp(DolbyVisionGlobalData_Item->Name(), "TrackName"))
         {
             if (const char* Text = DolbyVisionGlobalData_Item->GetText())
-                Fill(Stream_Video, 0, Video_Title, Text);
+            {
+                if (IsISXD || IsStreamData)
+                    Fill(Stream_Other, 0, Other_Title, Text);
+                else
+                    Fill(Stream_Video, 0, Video_Title, Text);
+            }
         }
         if (!strcmp(DolbyVisionGlobalData_Item->Name(), "UniqueID"))
         {

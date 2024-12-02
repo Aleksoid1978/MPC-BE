@@ -476,6 +476,18 @@ void File_Iab::Streams_Fill()
         Fill(Stream_Audio, 0, Audio_FrameRate, Iab_FrameRate[FrameRate]);
 }
 
+
+//***************************************************************************
+// Buffer - Global
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void File_Iab::Read_Buffer_Continue()
+{
+    if (Frame_Count)
+        Skip_XX(Element_Size,                                   "Data"); // TODO: management of frame wrapped IAB
+}
+
 //***************************************************************************
 // Buffer - Per element
 //***************************************************************************
@@ -719,7 +731,7 @@ void File_Iab::ObjectDefinition()
         Skip_XX(Pos-Element_Offset,                             "AudioDescriptionText");
     }
     Skip_B1(                                                    "SubElementCount");
-    Element_ThisIsAList();
+    //Element_ThisIsAList(); // TODO: handle SubElements here
 }
 
 //---------------------------------------------------------------------------

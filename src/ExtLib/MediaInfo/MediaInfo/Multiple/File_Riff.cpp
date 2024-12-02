@@ -833,14 +833,14 @@ bool File_Riff::Header_Begin()
                     Element_Size-=BlockAlign;
                 if (Element_Size==0)
                     Element_Size=BlockAlign;
-                if (Buffer_Offset+Element_Size>Buffer_Size)
+                if (Element_Size>Buffer_Size-Buffer_Offset)
                     return false;
             }
             else
         #endif //MEDIAINFO_DEMUX
-        if (File_Offset+Buffer_Size<=Buffer_DataToParse_End)
+        if (File_Offset+Buffer_Size<Buffer_DataToParse_End)
         {
-            Element_Size=Buffer_Size; //All the buffer is used
+            Element_Size=Buffer_Size-Buffer_Offset; //All the buffer is used
             Alignement_ExtraByte=0;
         }
         else
@@ -848,9 +848,11 @@ bool File_Riff::Header_Begin()
             Element_Size=Buffer_DataToParse_End-(File_Offset+Buffer_Offset);
 
             //Alignment
-            if (Element_Size%2 && File_Offset+Buffer_Size>=Buffer_DataToParse_End && Buffer_DataToParse_End<File_Size)
+            if (Buffer_DataToParse_End%2 && Buffer_DataToParse_End<File_Size)
             {
                 Element_Size++; //Always 2-byte aligned
+                if ((size_t)Element_Size>Buffer_Size-Buffer_Offset)
+                    return false;
                 Alignement_ExtraByte=1;
             }
             else
@@ -858,9 +860,6 @@ bool File_Riff::Header_Begin()
 
             Buffer_DataToParse_End=0;
         }
-
-        if (Buffer_Offset+(size_t)Element_Size>Buffer_Size)
-            return false;
 
         // Fake header
         Element_Begin1("...Continued"); //TODO: better method
@@ -878,10 +877,6 @@ bool File_Riff::Header_Begin()
             Header_Fill_Size(Element_Size);
         Element_End();
 
-        //Alignement specific
-        if (Alignement_ExtraByte && Alignement_ExtraByte<=Element_Size)
-            Element_Size-=Alignement_ExtraByte;
-
         switch (Kind)
         {
             case Kind_Wave : WAVE_data_Continue(); break;
@@ -889,14 +884,6 @@ bool File_Riff::Header_Begin()
             case Kind_Rmp3 : RMP3_data_Continue(); break;
             case Kind_Axml : WAVE_axml_Continue(); break;
             default        : AVI__movi_xxxx();
-        }
-
-        //Alignement specific
-        if (Alignement_ExtraByte)
-        {
-            Element_Size+=Alignement_ExtraByte;
-            if (Element_Offset+Alignement_ExtraByte==Element_Size)
-                Skip_XX(Alignement_ExtraByte,                       "Alignement");
         }
 
         bool ShouldStop=false;

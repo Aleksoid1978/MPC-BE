@@ -65,11 +65,13 @@ private :
     void IHDR();
     void PLTE() {Skip_XX(Element_Size, "Data");}
     void cICP();
-    void cLLi();
+    void cLLI();
+    void cLLi() { cLLI(); }
     void iCCP();
     void iTXt() {Textual(bitset8().set(IsCompressed).set(IsUTF8));}
     void gAMA();
-    void mDCv();
+    void mDCV();
+    void mDCv() { mDCV(); }
     void pHYs();
     void sBIT();
     void tEXt() {Textual(bitset8());}

@@ -1210,7 +1210,7 @@ void File_Ffv1::Parameters()
             if (version>1)
             {
                 Fill(Stream_Video, 0, "MaxSlicesCount", num_h_slices*num_v_slices);
-                Fill_SetOptions(Stream_Video, 0, "MaxSlicesCount", "N NTN");
+                Fill_SetOptions(Stream_Video, 0, "MaxSlicesCount", "N NTY");
                 Fill(Stream_Video, 0, Video_Format_Settings_SliceCount, num_h_slices*num_v_slices);
                 if (version>=3)
                 {

@@ -208,7 +208,7 @@
 //---------------------------------------------------------------------------
 //(-1) is known to be the MAX of an unsigned int but GCC complains about it
 #ifdef __cplusplus
-    #include <new> //for size_t
+    #include <cstddef> //for size_t
 #else /* __cplusplus */
     #include <stddef.h> //for size_t
 #endif /* __cplusplus */

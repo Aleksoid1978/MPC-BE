@@ -170,6 +170,23 @@ static float32 TimeCodeToFloat(string v)
     return Value + (float32)ValueF / SampleRate;
 }
 
+static char* strnstr(const char* Str, size_t Size, const char* ToSearch)
+{
+    size_t ToSearch_Size = strlen(ToSearch);
+    if (ToSearch_Size == 0)
+        return (char *)Str;
+
+    if (ToSearch_Size > Size)
+        return NULL;
+
+    const char* LastPos = (const char *)Str + Size - ToSearch_Size;
+    for (const char* Start = Str; Start <= LastPos; Start++)
+        if (Start[0] == ToSearch[0] && !memcmp((const void*)&Start[1], (const void*)&ToSearch[1], ToSearch_Size - 1))
+            return (char*)Start;
+
+    return NULL;
+}
+
 //---------------------------------------------------------------------------
 static const char* profile_names[]=
 {
@@ -6725,7 +6742,7 @@ void File_Adm::Read_Buffer_Continue()
         static const char* ToSearch = "</audioChannelFormat>";
         const char* Nok = (const char*)Buffer - 1;
         const char* LastPos = Nok;
-        while (auto NextPos = strstr(LastPos + 1, ToSearch)) {
+        while (auto NextPos = strnstr(LastPos + 1, Buffer_Size - ((const int8u*)(LastPos + 1)-Buffer), ToSearch)) {
             LastPos = NextPos;
         }
         if (LastPos == Nok || File_Adm_Private->Resynch("audioFormatExtended")) {

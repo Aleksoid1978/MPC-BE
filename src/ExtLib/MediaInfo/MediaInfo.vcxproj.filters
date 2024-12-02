@@ -782,6 +782,9 @@
     <ClInclude Include="MediaInfo\Text\File_Pac_Codepages.h">
       <Filter>Header Files\Text</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Multiple\File_Mxf_Automated.h">
+      <Filter>Header Files\Multiple</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">

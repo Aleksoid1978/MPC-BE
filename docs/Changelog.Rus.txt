@@ -28,6 +28,7 @@ YouTube
 	dav1d git-1.5.0-16-g93f12c1;
 	Detours v4.0.1-112-gb2bf32a;
 	ffmpeg n7.2-dev-827-gcb27e478f7;
+	MediaInfo git-v24.11-25-g6a54edfce;
 	vvdec v3.0.0-7-g87f7640.
 
 

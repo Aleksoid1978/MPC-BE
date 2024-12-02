@@ -67,6 +67,17 @@ public :
             }
     };
 
+    enum type {
+        Type_Unknown,
+        Type_UI16,
+        Type_AUID,
+        Type_UUID,
+        Type_Bool,
+        Type_ISO7,
+        Type_UTF16,
+        Type_Ref,
+        Type_Refs,
+    };
 
 protected :
     //Streams management
@@ -121,6 +132,11 @@ protected :
     void Data_Parse();
 
     //Elements
+    type ItemType;
+    void UnknownElement();
+    void UnknownGroupItem();
+
+    //Elements
     void MCAChannelID();
     void MCALabelDictionaryID();
     void MCATagSymbol();
@@ -142,22 +158,21 @@ protected :
     void TextMIMEMediaType();
     void UCSEncoding();
     void Filler();
-    void Filler01() {Filler();}
-    void Filler02() {Filler();}
-    void TerminatingFiller();
-    void XmlDocumentText();
+    void FillerData() {Filler();}
+    void TerminatingFillerData();
+    void XMLDocumentText_Indirect();
     void SubDescriptors();
-    void LensUnitMetadata();
-    void CameraUnitMetadata();
+    void LensUnitAcquisitionMetadata();
+    void CameraUnitAcquisitionMetadata();
     void UserDefinedAcquisitionMetadata();
-    void DMFiller();
+    void FillerGroup();
     void Sequence();
     void SourceClip();
-    void TimecodeComponent();
+    void TimecodeGroup();
     void ContentStorage();
-    void EssenceContainerData();
-    void CDCIEssenceDescriptor();
-    void RGBAEssenceDescriptor();
+    void EssenceData();
+    void CDCIDescriptor();
+    void RGBADescriptor();
     void Preface();
     void Identification();
     void NetworkLocator();
@@ -168,69 +183,70 @@ protected :
     void EventTrack();
     void StaticTrack();
     void TimelineTrack();
-    void DMSegment();
-    void GenericSoundEssenceDescriptor();
-    void GenericDataEssenceDescriptor();
+    void DescriptiveMarker();
+    void SoundDescriptor();
+    void DataEssenceDescriptor();
     void MultipleDescriptor();
-    void DMSourceClip();
+    void DescriptiveClip();
     void AES3PCMDescriptor();
-    void WaveAudioDescriptor();
-    void MPEG2VideoDescriptor();
-    void JPEG2000PictureSubDescriptor();
-    void VbiPacketsDescriptor();
-    void AncPacketsDescriptor();
-    void MpegAudioDescriptor();
+    void WAVEPCMDescriptor();
+    void MPEGVideoDescriptor();
+    void JPEG2000SubDescriptor();
+    void VBIDataDescriptor();
+    void ANCDataDescriptor();
+    void MPEGAudioDescriptor();
     void PackageMarkerObject();
     void ApplicationPlugInObject();
     void ApplicationReferencedObject();
     void MCALabelSubDescriptor();
-    void TimedTextDescriptor();
-    void TimedTextResourceSubDescriptor();
+    void DCTimedTextDescriptor();
+    void DCTimedTextResourceSubDescriptor();
     void ContainerConstraintsSubDescriptor();
-    void Mpeg4VisualSubDescriptor();
+    void MPEG4VisualSubDescriptor();
     void AudioChannelLabelSubDescriptor();
     void SoundfieldGroupLabelSubDescriptor();
     void GroupOfSoundfieldGroupsLabelSubDescriptor();
     void AVCSubDescriptor();
     void IABEssenceDescriptor();
     void IABSoundfieldLabelSubDescriptor();
-    void OpenIncompleteHeaderPartition();
-    void ClosedIncompleteHeaderPartition();
-    void OpenCompleteHeaderPartition();
-    void ClosedCompleteHeaderPartition();
-    void OpenIncompleteBodyPartition();
-    void ClosedIncompleteBodyPartition();
-    void OpenCompleteBodyPartition();
-    void ClosedCompleteBodyPartition();
+    void HeaderPartitionOpenIncomplete();
+    void HeaderPartitionClosedIncomplete();
+    void HeaderPartitionOpenComplete();
+    void HeaderPartitionClosedComplete();
+    void BodyPartitionOpenIncomplete();
+    void BodyPartitionClosedIncomplete();
+    void BodyPartitionOpenComplete();
+    void BodyPartitionClosedComplete();
     void GenericStreamPartition();
-    void OpenIncompleteFooterPartition();
-    void ClosedIncompleteFooterPartition();
-    void OpenCompleteFooterPartition();
-    void ClosedCompleteFooterPartition();
-    void Primer();
+    void FooterPartitionOpenIncomplete();
+    void FooterPartitionClosedIncomplete();
+    void FooterPartitionOpenComplete();
+    void FooterPartitionClosedComplete();
+    void PrimerPack();
     void IndexTableSegment();
     void RandomIndexPack();
-    void SDTI_SystemMetadataPack();
-    void SDTI_PackageMetadataSet();
-    void SDTI_PictureMetadataSet();
-    void SDTI_SoundMetadataSet();
-    void SDTI_DataMetadataSet();
-    void SDTI_ControlMetadataSet();
-    void SystemScheme1();
-    void DMScheme1();
+    void SDTISystemMetadataPack();
+    void SDTIPackageMetadataSet();
+    void SDTIPictureMetadataSet();
+    void SDTISoundMetadataSet();
+    void SDTIDataMetadataSet();
+    void SDTIControlMetadataSet();
+    void SystemScheme1FirstElement();
+    void ProductionFramework();
     void TextBasedFramework();
     void GenericStreamTextBasedSet();
     void MXFGenericStreamDataElementKey_09_01();
     void GenericStreamID();
-    void AS11_AAF_Core();
-    void AS11_AAF_Segmentation();
-    void AS11_AAF_UKDPP();
+    void DM_AS_11_Core_Framework();
+    void DM_AS_11_Segmentation_Framework();
+    void DM_AS_11_UKDPP_Framework();
     void Dolby_050201000101() { MXFGenericStreamDataElementKey_09_01(); }
-    void Dolby_PHDRImageMetadataItem();
-    void Dolby_050200000000();
-    void Dolby_PHDRMetadataTrackSubDescriptor();
-    void Omneon_010201010100();
-    void Omneon_010201020100();
+    void PHDRImageMetadataItem();
+    void ISXDDataEssenceDescriptor();
+    void PHDRMetadataTrackSubDescriptor();
+    void OmneonVideoNetworksDescriptiveMetadataLinks();
+    void OmneonVideoNetworksDescriptiveMetadataData();
+    void OmneonVideoNetworksDescriptiveMetadataItems();
     void FFV1PictureSubDescriptor();
     void MGASoundEssenceDescriptor();
     void MGAAudioMetadataSubDescriptor();
@@ -246,7 +262,7 @@ protected :
     //Common
     void GenerationInterchangeObject();
     void InterchangeObject();
-    void GenericPictureEssenceDescriptor();
+    void PictureDescriptor();
     void PartitionMetadata();
     void GenericTrack();
     void GenericPackage();
@@ -262,24 +278,24 @@ protected :
     void AES3PCMDescriptor_FixedChannelStatusData();            //3D11
     void AES3PCMDescriptor_UserDataMode();                      //3D12
     void AES3PCMDescriptor_FixedUserData();                     //3D13
-    void CDCIEssenceDescriptor_ComponentDepth();                //3301
-    void CDCIEssenceDescriptor_HorizontalSubsampling();         //3302
-    void CDCIEssenceDescriptor_ColorSiting();                   //3303
-    void CDCIEssenceDescriptor_BlackRefLevel();                 //3304
-    void CDCIEssenceDescriptor_WhiteReflevel();                 //3305
-    void CDCIEssenceDescriptor_ColorRange();                    //3306
-    void CDCIEssenceDescriptor_PaddingBits();                   //3307
-    void CDCIEssenceDescriptor_VerticalSubsampling();           //3308
-    void CDCIEssenceDescriptor_AlphaSampleDepth();              //3309
-    void CDCIEssenceDescriptor_ReversedByteOrder();             //330B
+    void CDCIDescriptor_ComponentDepth();                //3301
+    void CDCIDescriptor_HorizontalSubsampling();         //3302
+    void CDCIDescriptor_ColorSiting();                   //3303
+    void CDCIDescriptor_BlackRefLevel();                 //3304
+    void CDCIDescriptor_WhiteReflevel();                 //3305
+    void CDCIDescriptor_ColorRange();                    //3306
+    void CDCIDescriptor_PaddingBits();                   //3307
+    void CDCIDescriptor_VerticalSubsampling();           //3308
+    void CDCIDescriptor_AlphaSampleDepth();              //3309
+    void CDCIDescriptor_ReversedByteOrder();             //330B
     void ContentStorage_Packages();                             //1901
-    void ContentStorage_EssenceContainerData();                 //1902
-    void DMSegment_Duration();                                  //0202 (copy of StructuralComponent_Duration) //TODO: merge with StructuralComponent_Duration
-    void DMSegment_DMFramework();                               //6101
-    void DMSegment_TrackIDs();                                  //6102
-    void EssenceContainerData_LinkedPackageUID();               //2701
-    void EssenceContainerData_IndexSID();                       //3F06
-    void EssenceContainerData_BodySID();                        //3F07
+    void ContentStorage_EssenceData();                 //1902
+    void DescriptiveMarker_Duration();                                  //0202 (copy of StructuralComponent_Duration) //TODO: merge with StructuralComponent_Duration
+    void DescriptiveMarker_DMFramework();                               //6101
+    void DescriptiveMarker_TrackIDs();                                  //6102
+    void EssenceData_LinkedPackageUID();               //2701
+    void EssenceData_IndexSID();                       //3F06
+    void EssenceData_BodySID();                        //3F07
     void EventTrack_EventEditRate();                            //4901
     void EventTrack_EventOrigin();                              //4902
     void FileDescriptor_SampleRate();                           //3001
@@ -295,46 +311,46 @@ protected :
     void GenericPackage_Tracks();                               //4403
     void GenericPackage_PackageModifiedDate();                  //4404
     void GenericPackage_PackageCreationDate();                  //4405
-    void GenericPictureEssenceDescriptor_PictureEssenceCoding();//3201
-    void GenericPictureEssenceDescriptor_StoredHeight();        //3202
-    void GenericPictureEssenceDescriptor_StoredWidth();         //3203
-    void GenericPictureEssenceDescriptor_SampledHeight();       //3204
-    void GenericPictureEssenceDescriptor_SampledWidth();        //3205
-    void GenericPictureEssenceDescriptor_SampledXOffset();      //3206
-    void GenericPictureEssenceDescriptor_SampledYOffset();      //3207
-    void GenericPictureEssenceDescriptor_DisplayHeight();       //3208
-    void GenericPictureEssenceDescriptor_DisplayWidth();        //3209
-    void GenericPictureEssenceDescriptor_DisplayXOffset();      //320A
-    void GenericPictureEssenceDescriptor_DisplayYOffset();      //320B
-    void GenericPictureEssenceDescriptor_FrameLayout();         //320C
-    void GenericPictureEssenceDescriptor_VideoLineMap();        //320D
-    void GenericPictureEssenceDescriptor_AspectRatio();         //320E
-    void GenericPictureEssenceDescriptor_AlphaTransparency();   //320F
-    void GenericPictureEssenceDescriptor_TransferCharacteristic(); //3210
-    void GenericPictureEssenceDescriptor_ImageAlignmentOffset();//3211
-    void GenericPictureEssenceDescriptor_FieldDominance();      //3212
-    void GenericPictureEssenceDescriptor_ImageStartOffset();    //3213
-    void GenericPictureEssenceDescriptor_ImageEndOffset();      //3214
-    void GenericPictureEssenceDescriptor_SignalStandard();      //3215
-    void GenericPictureEssenceDescriptor_StoredF2Offset();      //3216
-    void GenericPictureEssenceDescriptor_DisplayF2Offset();     //3217
-    void GenericPictureEssenceDescriptor_ActiveFormatDescriptor();//3218
-    void GenericPictureEssenceDescriptor_ColorPrimaries();      //3219
-    void GenericPictureEssenceDescriptor_CodingEquations();     //321A
+    void PictureDescriptor_PictureEssenceCoding();//3201
+    void PictureDescriptor_StoredHeight();        //3202
+    void PictureDescriptor_StoredWidth();         //3203
+    void PictureDescriptor_SampledHeight();       //3204
+    void PictureDescriptor_SampledWidth();        //3205
+    void PictureDescriptor_SampledXOffset();      //3206
+    void PictureDescriptor_SampledYOffset();      //3207
+    void PictureDescriptor_DisplayHeight();       //3208
+    void PictureDescriptor_DisplayWidth();        //3209
+    void PictureDescriptor_DisplayXOffset();      //320A
+    void PictureDescriptor_DisplayYOffset();      //320B
+    void PictureDescriptor_FrameLayout();         //320C
+    void PictureDescriptor_VideoLineMap();        //320D
+    void PictureDescriptor_AspectRatio();         //320E
+    void PictureDescriptor_AlphaTransparency();   //320F
+    void PictureDescriptor_TransferCharacteristic(); //3210
+    void PictureDescriptor_ImageAlignmentOffset();//3211
+    void PictureDescriptor_FieldDominance();      //3212
+    void PictureDescriptor_ImageStartOffset();    //3213
+    void PictureDescriptor_ImageEndOffset();      //3214
+    void PictureDescriptor_SignalStandard();      //3215
+    void PictureDescriptor_StoredF2Offset();      //3216
+    void PictureDescriptor_DisplayF2Offset();     //3217
+    void PictureDescriptor_ActiveFormatDescriptor();//3218
+    void PictureDescriptor_ColorPrimaries();      //3219
+    void PictureDescriptor_CodingEquations();     //321A
     void MasteringDisplayPrimaries();
     void MasteringDisplayWhitePointChromaticity();
     void MasteringDisplayMaximumLuminance();
     void MasteringDisplayMinimumLuminance();
     void TextBasedObject();
-    void GenericSoundEssenceDescriptor_QuantizationBits();      //3D01
-    void GenericSoundEssenceDescriptor_Locked();                //3D02
-    void GenericSoundEssenceDescriptor_AudioSamplingRate();     //3D03
-    void GenericSoundEssenceDescriptor_AudioRefLevel();         //3D04
-    void GenericSoundEssenceDescriptor_ElectroSpatialFormulation(); //3D05
-    void GenericSoundEssenceDescriptor_SoundEssenceCompression(); //3D06
-    void GenericSoundEssenceDescriptor_ChannelCount();          //3D07
-    void GenericSoundEssenceDescriptor_DialNorm();              //3D0C
-    void GenericDataEssenceDescriptor_DataEssenceCoding();      //3E01
+    void SoundDescriptor_QuantizationBits();      //3D01
+    void SoundDescriptor_Locked();                //3D02
+    void SoundDescriptor_AudioSamplingRate();     //3D03
+    void SoundDescriptor_AudioRefLevel();         //3D04
+    void SoundDescriptor_ElectroSpatialFormulation(); //3D05
+    void SoundDescriptor_SoundEssenceCompression(); //3D06
+    void SoundDescriptor_ChannelCount();          //3D07
+    void SoundDescriptor_DialNorm();              //3D0C
+    void DataEssenceDescriptor_DataEssenceCoding();      //3E01
     void GenericTrack_TrackID();                                //4801
     void GenericTrack_TrackName();                              //4802
     void GenericTrack_Sequence();                               //4803
@@ -359,28 +375,28 @@ protected :
     void IndexTableSegment_IndexDuration();                     //3F0D
     void IndexTableSegment_PosTableCount();                     //3F0E
     void IndexTableSegment_8002();                              //8002
-    void JPEG2000PictureSubDescriptor_Rsiz();                   //8001
-    void JPEG2000PictureSubDescriptor_Xsiz();                   //8002
-    void JPEG2000PictureSubDescriptor_Ysiz();                   //8003
-    void JPEG2000PictureSubDescriptor_XOsiz();                  //8004
-    void JPEG2000PictureSubDescriptor_YOsiz();                  //8005
-    void JPEG2000PictureSubDescriptor_XTsiz();                  //8006
-    void JPEG2000PictureSubDescriptor_YTsiz();                  //8007
-    void JPEG2000PictureSubDescriptor_XTOsiz();                 //8008
-    void JPEG2000PictureSubDescriptor_YTOsiz();                 //8009
-    void JPEG2000PictureSubDescriptor_Csiz();                   //800A
-    void JPEG2000PictureSubDescriptor_PictureComponentSizing(); //800B
-    void JPEG2000PictureSubDescriptor_CodingStyleDefault();     //
-    void JPEG2000PictureSubDescriptor_QuantizationDefault();    //
-    void FFV1PictureSubDescriptor_InitializationMetadata();     //
-    void FFV1PictureSubDescriptor_IdenticalGOP();               //
-    void FFV1PictureSubDescriptor_MaxGOP();                     //
-    void FFV1PictureSubDescriptor_MaximumBitRate();             //
-    void FFV1PictureSubDescriptor_Version();                    //
-    void FFV1PictureSubDescriptor_MicroVersion();               //
-    void MGASoundEssenceBlockAlign() {WaveAudioDescriptor_BlockAlign();};
-    void MGASoundEssenceAverageBytesPerSecond() {WaveAudioDescriptor_AvgBps();}
-    void MGASoundEssenceSequenceOffset() {WaveAudioDescriptor_SequenceOffset();};
+    void Rsiz();                   //8001
+    void Xsiz();                   //8002
+    void Ysiz();                   //8003
+    void XOsiz();                  //8004
+    void YOsiz();                  //8005
+    void XTsiz();                  //8006
+    void YTsiz();                  //8007
+    void XTOsiz();                 //8008
+    void YTOsiz();                 //8009
+    void Csiz();                   //800A
+    void PictureComponentSizing(); //800B
+    void CodingStyleDefault();     //
+    void QuantizationDefault();    //
+    void FFV1InitializationMetadata();     //
+    void FFV1IdenticalGOP();               //
+    void FFV1MaxGOP();                     //
+    void FFV1MaximumBitRate();             //
+    void FFV1Version();                    //
+    void FFV1MicroVersion();               //
+    void MGASoundEssenceBlockAlign() {WAVEPCMDescriptor_BlockAlign();};
+    void MGASoundEssenceAverageBytesPerSecond() {WAVEPCMDescriptor_AvgBps();}
+    void MGASoundEssenceSequenceOffset() {WAVEPCMDescriptor_SequenceOffset();};
     void RIFFChunkStreamID();
     void RIFFChunkID();
     void RIFFChunkUUID();
@@ -406,49 +422,53 @@ protected :
     void MGAMetadataSectionLinkID();                            //
     void SADMMetadataSectionLinkID();                           //
     void SADMProfileLevelULBatch();                             //
-    void MpegAudioDescriptor_BitRate();                         //
+    void MPEGAudioBitRate();                         //
     void MultipleDescriptor_FileDescriptors();                  //3F01
-    void RFC5646TextLanguageCode();
-    void PrimaryExtendedSpokenLanguage();                       //
-    void SecondaryExtendedSpokenLanguage();                     //
-    void OriginalExtendedSpokenLanguage();                      //
-    void SecondaryOriginalExtendedSpokenLanguage();             //
-    void RFC5646AudioLanguageCode();                            //
-    void MPEG2VideoDescriptor_SingleSequence();                 //
-    void MPEG2VideoDescriptor_ConstantBFrames();                //
-    void MPEG2VideoDescriptor_CodedContentType();               //
-    void MPEG2VideoDescriptor_LowDelay();                       //
-    void MPEG2VideoDescriptor_ClosedGOP();                      //
-    void MPEG2VideoDescriptor_IdenticalGOP();                   //
-    void MPEG2VideoDescriptor_MaxGOP();                         //
-    void MPEG2VideoDescriptor_BPictureCount();                  //
-    void MPEG2VideoDescriptor_ProfileAndLevel();                //
-    void MPEG2VideoDescriptor_BitRate();                        //
-    void Mpeg4VisualDescriptor_SingleSequence() {MPEG2VideoDescriptor_SingleSequence();}
-    void Mpeg4VisualDescriptor_ConstantBFrames() {MPEG2VideoDescriptor_ConstantBFrames();}
-    void Mpeg4VisualDescriptor_CodedContentType() {MPEG2VideoDescriptor_CodedContentType();}
-    void Mpeg4VisualDescriptor_LowDelay() {MPEG2VideoDescriptor_LowDelay();}
-    void Mpeg4VisualDescriptor_ClosedGOP() {MPEG2VideoDescriptor_ClosedGOP();}
-    void Mpeg4VisualDescriptor_IdenticalGOP() {MPEG2VideoDescriptor_IdenticalGOP();}
-    void Mpeg4VisualDescriptor_MaxGOP() {MPEG2VideoDescriptor_MaxGOP();}
-    void Mpeg4VisualDescriptor_BPictureCount() {MPEG2VideoDescriptor_BPictureCount();}
-    void Mpeg4VisualDescriptor_ProfileAndLevel();               //
-    void Mpeg4VisualDescriptor_BitRate() {MPEG2VideoDescriptor_BitRate();}
-    void AVCDescriptor_ConstantBFrames() {MPEG2VideoDescriptor_ConstantBFrames();}
-    void AVCDescriptor_CodedContentType() {MPEG2VideoDescriptor_CodedContentType();}
-    void AVCDescriptor_ClosedGOP() {MPEG2VideoDescriptor_ClosedGOP();}
-    void AVCDescriptor_IdenticalGOP() {MPEG2VideoDescriptor_IdenticalGOP();}
-    void AVCDescriptor_MaxGOP() {MPEG2VideoDescriptor_MaxGOP();}
-    void AVCDescriptor_BPictureCount() {MPEG2VideoDescriptor_BPictureCount();}
-    void AVCDescriptor_Profile();
-    void AVCDescriptor_MaximumBitRate();
-    void AVCDescriptor_ProfileConstraint();
-    void AVCDescriptor_Level();
-    void AVCDescriptor_DecodingDelay();
-    void AVCDescriptor_MaximumRefFrames();
-    void AVCDescriptor_SequenceParameterSetFlag();
-    void AVCDescriptor_PictureParameterSetFlag();
-    void AVCDescriptor_AverageBitRate();
+    void RFC5646SpokenLanguage();
+    void PrimaryExtendedSpokenLanguageCode();                   //
+    void SecondaryExtendedSpokenLanguageCode();                 //
+    void OriginalExtendedSpokenLanguageCode();                  //
+    void SecondaryOriginalExtendedSpokenLanguageCode();         //
+    void RFC5646TextLanguageCode();                             //
+    void ItemName_ISO7();
+    void ItemName();
+    void ItemValue_ISO7();
+    void ItemValue();
+    void SingleSequence();                 //
+    void ConstantBPictureCount();                //
+    void CodedContentScanning();               //
+    void LowDelay();                       //
+    void ClosedGOP();                      //
+    void IdenticalGOP();                   //
+    void MaxGOP();                         //
+    void MaxBPictureCount();                  //
+    void ProfileAndLevel();                //
+    void BitRate();                        //
+    void MPEG4VisualSingleSequence() {SingleSequence();}
+    void MPEG4VisualConstantBVOPs() {ConstantBPictureCount();}
+    void MPEG4VisualCodedContentType() {CodedContentScanning();}
+    void MPEG4VisualLowDelay() {LowDelay();}
+    void MPEG4VisualClosedGOP() {ClosedGOP();}
+    void MPEG4VisualIdenticalGOP() {IdenticalGOP();}
+    void MPEG4VisualMaxGOP() {MaxGOP();}
+    void MPEG4VisualBVOPCount() {MaxBPictureCount();}
+    void MPEG4VisualProfileAndLevel();               //
+    void MPEG4VisualBitRate() {BitRate();}
+    void AVCConstantBPictureFlag() {ConstantBPictureCount();}
+    void AVCCodedContentKind() {CodedContentScanning();}
+    void AVCClosedGOPIndicator() {ClosedGOP();}
+    void AVCIdenticalGOPIndicator() {IdenticalGOP();}
+    void AVCMaximumGOPSize() {MaxGOP();}
+    void AVCMaximumBPictureCount() {MaxBPictureCount();}
+    void AVCProfile();
+    void AVCMaximumBitRate();
+    void AVCProfileConstraint();
+    void AVCLevel();
+    void AVCDecodingDelay();
+    void AVCMaximumRefFrames();
+    void AVCSequenceParameterSetFlag();
+    void AVCPictureParameterSetFlag();
+    void AVCAverageBitRate();
     void NetworkLocator_URLString();                            //4001
     void Preface_LastModifiedDate();                            //3B02
     void Preface_ContentStorage();                              //3B03
@@ -459,14 +479,14 @@ protected :
     void Preface_OperationalPattern();                          //3B09
     void Preface_EssenceContainers();                           //3B0A
     void Preface_DMSchemes();                                   //3B0B
-    void RGBAEssenceDescriptor_PixelLayout();                   //3401
-    void RGBAEssenceDescriptor_Palette();                       //3403
-    void RGBAEssenceDescriptor_PaletteLayout();                 //3404
-    void RGBAEssenceDescriptor_ScanningDirection();             //3405
-    void RGBAEssenceDescriptor_ComponentMaxRef();               //3406
-    void RGBAEssenceDescriptor_ComponentMinRef();               //3407
-    void RGBAEssenceDescriptor_AlphaMaxRef();                   //3408
-    void RGBAEssenceDescriptor_AlphaMinRef();                   //3409
+    void RGBADescriptor_PixelLayout();                   //3401
+    void RGBADescriptor_Palette();                       //3403
+    void RGBADescriptor_PaletteLayout();                 //3404
+    void RGBADescriptor_ScanningDirection();             //3405
+    void RGBADescriptor_ComponentMaxRef();               //3406
+    void RGBADescriptor_ComponentMinRef();               //3407
+    void RGBADescriptor_AlphaMaxRef();                   //3408
+    void RGBADescriptor_AlphaMinRef();                   //3409
     void Sequence_StructuralComponents();                       //1001
     void SourceClip_SourcePackageID();                          //1101
     void SourceClip_SourceTrackID();                            //1102
@@ -485,64 +505,64 @@ protected :
     void SystemScheme1_EssenceTrackNumberBatch();               //6801
     void SystemScheme1_ContentPackageIndexArray();              //6803
     void TextLocator_LocatorName();                             //4101
-    void TimecodeComponent_StartTimecode();                     //1501
-    void TimecodeComponent_RoundedTimecodeBase();               //1502
-    void TimecodeComponent_DropFrame();                         //1503
+    void TimecodeGroup_StartTimecode();                     //1501
+    void TimecodeGroup_RoundedTimecodeBase();               //1502
+    void TimecodeGroup_DropFrame();                         //1503
     void Track_EditRate();                                      //4B01
     void Track_Origin();                                        //4B02
-    void WaveAudioDescriptor_AvgBps();                          //3D09
-    void WaveAudioDescriptor_BlockAlign();                      //3D0A
-    void WaveAudioDescriptor_SequenceOffset();                  //3D0B
-    void WaveAudioDescriptor_PeakEnvelopeVersion();             //3D29
-    void WaveAudioDescriptor_PeakEnvelopeFormat();              //3D2A
-    void WaveAudioDescriptor_PointsPerPeakValue();              //3D2B
-    void WaveAudioDescriptor_PeakEnvelopeBlockSize();           //3D2C
-    void WaveAudioDescriptor_PeakChannels();                    //3D2D
-    void WaveAudioDescriptor_PeakFrames();                      //3D2E
-    void WaveAudioDescriptor_PeakOfPeaksPosition();             //3D2F
-    void WaveAudioDescriptor_PeakEnvelopeTimestamp();           //3D30
-    void WaveAudioDescriptor_PeakEnvelopeData();                //3D31
-    void WaveAudioDescriptor_ChannelAssignment();               //3D31
-    void LensUnitMetadata_IrisFNumber();                        //8000
-    void LensUnitMetadata_FocusPositionFromImagePlane();        //8001
-    void LensUnitMetadata_FocusPositionFromFrontLensVertex();   //8002
-    void LensUnitMetadata_MacroSetting();                       //8003
-    void LensUnitMetadata_LensZoom35mmStillCameraEquivalent();  //8004
-    void LensUnitMetadata_LensZoomActualFocalLength();          //8005
-    void LensUnitMetadata_OpticalExtenderMagnification();       //8006
-    void LensUnitMetadata_LensAttributes();                     //8007
-    void LensUnitMetadata_IrisTNumber();                        //8008
-    void LensUnitMetadata_IrisRingPosition();                   //8009
-    void LensUnitMetadata_FocusRingPosition();                  //800A
-    void LensUnitMetadata_ZoomRingPosition();                   //800B
-    void CameraUnitMetadata_TransferCharacteristic();           //3210
-    void CameraUnitMetadata_ColorPrimaries();                   //3219
-    void CameraUnitMetadata_CodingEquations();                  //321A
-    void CameraUnitMetadata_AutoExposureMode();                 //8100
-    void CameraUnitMetadata_AutoFocusSensingAreaSetting();      //8101
-    void CameraUnitMetadata_ColorCorrectionFilterWheelSetting();//8102
-    void CameraUnitMetadata_NeutralDensityFilterWheelSetting(); //8103
-    void CameraUnitMetadata_ImageSensorDimensionEffectiveWidth();//8104
-    void CameraUnitMetadata_ImageSensorDimensionEffectiveHeight();//8105
-    void CameraUnitMetadata_CaptureFrameRate();                 //8106
-    void CameraUnitMetadata_ImageSensorReadoutMode();           //8107
-    void CameraUnitMetadata_ShutterSpeed_Angle();               //8108
-    void CameraUnitMetadata_ShutterSpeed_Time();                //8109
-    void CameraUnitMetadata_CameraMasterGainAdjustment();       //810A
-    void CameraUnitMetadata_ISOSensitivity();                   //810B
-    void CameraUnitMetadata_ElectricalExtenderMagnification();  //810C
-    void CameraUnitMetadata_AutoWhiteBalanceMode();             //810D
-    void CameraUnitMetadata_WhiteBalance();                     //800E
-    void CameraUnitMetadata_CameraMasterBlackLevel();           //810F
-    void CameraUnitMetadata_CameraKneePoint();                  //8110
-    void CameraUnitMetadata_CameraKneeSlope();                  //8111
-    void CameraUnitMetadata_CameraLuminanceDynamicRange();      //8112
-    void CameraUnitMetadata_CameraSettingFileURI();             //8113
-    void CameraUnitMetadata_CameraAttributes();                 //8114
-    void CameraUnitMetadata_ExposureIndexofPhotoMeter();        //8115
-    void CameraUnitMetadata_GammaForCDL();                      //8116
-    void CameraUnitMetadata_ASC_CDL_V12();                      //8117
-    void CameraUnitMetadata_ColorMatrix();                      //8118
+    void WAVEPCMDescriptor_AvgBps();                          //3D09
+    void WAVEPCMDescriptor_BlockAlign();                      //3D0A
+    void WAVEPCMDescriptor_SequenceOffset();                  //3D0B
+    void WAVEPCMDescriptor_PeakEnvelopeVersion();             //3D29
+    void WAVEPCMDescriptor_PeakEnvelopeFormat();              //3D2A
+    void WAVEPCMDescriptor_PointsPerPeakValue();              //3D2B
+    void WAVEPCMDescriptor_PeakEnvelopeBlockSize();           //3D2C
+    void WAVEPCMDescriptor_PeakChannels();                    //3D2D
+    void WAVEPCMDescriptor_PeakFrames();                      //3D2E
+    void WAVEPCMDescriptor_PeakOfPeaksPosition();             //3D2F
+    void WAVEPCMDescriptor_PeakEnvelopeTimestamp();           //3D30
+    void WAVEPCMDescriptor_PeakEnvelopeData();                //3D31
+    void WAVEPCMDescriptor_ChannelAssignment();               //3D31
+    void LensUnitAcquisitionMetadata_IrisFNumber();                        //8000
+    void LensUnitAcquisitionMetadata_FocusPositionFromImagePlane();        //8001
+    void LensUnitAcquisitionMetadata_FocusPositionFromFrontLensVertex();   //8002
+    void LensUnitAcquisitionMetadata_MacroSetting();                       //8003
+    void LensUnitAcquisitionMetadata_LensZoom35mmStillCameraEquivalent();  //8004
+    void LensUnitAcquisitionMetadata_LensZoomActualFocalLength();          //8005
+    void LensUnitAcquisitionMetadata_OpticalExtenderMagnification();       //8006
+    void LensUnitAcquisitionMetadata_LensAttributes();                     //8007
+    void LensUnitAcquisitionMetadata_IrisTNumber();                        //8008
+    void LensUnitAcquisitionMetadata_IrisRingPosition();                   //8009
+    void LensUnitAcquisitionMetadata_FocusRingPosition();                  //800A
+    void LensUnitAcquisitionMetadata_ZoomRingPosition();                   //800B
+    void CameraUnitAcquisitionMetadata_TransferCharacteristic();           //3210
+    void CameraUnitAcquisitionMetadata_ColorPrimaries();                   //3219
+    void CameraUnitAcquisitionMetadata_CodingEquations();                  //321A
+    void CameraUnitAcquisitionMetadata_AutoExposureMode();                 //8100
+    void CameraUnitAcquisitionMetadata_AutoFocusSensingAreaSetting();      //8101
+    void CameraUnitAcquisitionMetadata_ColorCorrectionFilterWheelSetting();//8102
+    void CameraUnitAcquisitionMetadata_NeutralDensityFilterWheelSetting(); //8103
+    void CameraUnitAcquisitionMetadata_ImageSensorDimensionEffectiveWidth();//8104
+    void CameraUnitAcquisitionMetadata_ImageSensorDimensionEffectiveHeight();//8105
+    void CameraUnitAcquisitionMetadata_CaptureFrameRate();                 //8106
+    void CameraUnitAcquisitionMetadata_ImageSensorReadoutMode();           //8107
+    void CameraUnitAcquisitionMetadata_ShutterSpeed_Angle();               //8108
+    void CameraUnitAcquisitionMetadata_ShutterSpeed_Time();                //8109
+    void CameraUnitAcquisitionMetadata_CameraMasterGainAdjustment();       //810A
+    void CameraUnitAcquisitionMetadata_ISOSensitivity();                   //810B
+    void CameraUnitAcquisitionMetadata_ElectricalExtenderMagnification();  //810C
+    void CameraUnitAcquisitionMetadata_AutoWhiteBalanceMode();             //810D
+    void CameraUnitAcquisitionMetadata_WhiteBalance();                     //800E
+    void CameraUnitAcquisitionMetadata_CameraMasterBlackLevel();           //810F
+    void CameraUnitAcquisitionMetadata_CameraKneePoint();                  //8110
+    void CameraUnitAcquisitionMetadata_CameraKneeSlope();                  //8111
+    void CameraUnitAcquisitionMetadata_CameraLuminanceDynamicRange();      //8112
+    void CameraUnitAcquisitionMetadata_CameraSettingFileURI();             //8113
+    void CameraUnitAcquisitionMetadata_CameraAttributes();                 //8114
+    void CameraUnitAcquisitionMetadata_ExposureIndexofPhotoMeter();        //8115
+    void CameraUnitAcquisitionMetadata_GammaForCDL();                      //8116
+    void CameraUnitAcquisitionMetadata_ASC_CDL_V12();                      //8117
+    void CameraUnitAcquisitionMetadata_ColorMatrix();                      //8118
     void UserDefinedAcquisitionMetadata_UdamSetIdentifier();    //E000
     void UserDefinedAcquisitionMetadata_Sony_8007();
     void UserDefinedAcquisitionMetadata_Sony_E101();
@@ -557,66 +577,59 @@ protected :
     void UserDefinedAcquisitionMetadata_Sony_E201();
     void UserDefinedAcquisitionMetadata_Sony_E202();
     void UserDefinedAcquisitionMetadata_Sony_E203();
-    void AS11_Core_SeriesTitle();
-    void AS11_Core_ProgrammeTitle();
-    void AS11_Core_EpisodeTitleNumber();
-    void AS11_Core_ShimName();
-    void AS11_Core_AudioTrackLayout();
-    void AS11_Core_PrimaryAudioLanguage();
-    void AS11_Core_ClosedCaptionsPresent();
-    void AS11_Core_ClosedCaptionsType();
-    void AS11_Core_ClosedCaptionsLanguage();
-    void AS11_Core_ShimVersion();
-    void AS11_Segment_PartNumber();
-    void AS11_Segment_PartTotal();
-    void AS11_UKDPP_ProductionNumber();
-    void AS11_UKDPP_Synopsis();
-    void AS11_UKDPP_Originator();
-    void AS11_UKDPP_CopyrightYear();
-    void AS11_UKDPP_OtherIdentifier();
-    void AS11_UKDPP_OtherIdentifierType();
-    void AS11_UKDPP_Genre();
-    void AS11_UKDPP_Distributor();
-    void AS11_UKDPP_PictureRatio();
-    void AS11_UKDPP_3D();
-    void AS11_UKDPP_3DType();
-    void AS11_UKDPP_ProductPlacement();
-    void AS11_UKDPP_FpaPass();
-    void AS11_UKDPP_FpaManufacturer();
-    void AS11_UKDPP_FpaVersion();
-    void AS11_UKDPP_VideoComments();
-    void AS11_UKDPP_SecondaryAudioLanguage();
-    void AS11_UKDPP_TertiaryAudioLanguage();
-    void AS11_UKDPP_AudioLoudnessStandard();
-    void AS11_UKDPP_AudioComments();
-    void AS11_UKDPP_LineUpStart();
-    void AS11_UKDPP_IdentClockStart();
-    void AS11_UKDPP_TotalNumberOfParts();
-    void AS11_UKDPP_TotalProgrammeDuration();
-    void AS11_UKDPP_AudioDescriptionPresent();
-    void AS11_UKDPP_AudioDescriptionType();
-    void AS11_UKDPP_OpenCaptionsPresent();
-    void AS11_UKDPP_OpenCaptionsType();
-    void AS11_UKDPP_OpenCaptionsLanguage();
-    void AS11_UKDPP_SigningPresent();
-    void AS11_UKDPP_SignLanguage();
-    void AS11_UKDPP_CompletionDate();
-    void AS11_UKDPP_TextlessElementsExist();
-    void AS11_UKDPP_ProgrammeHasText();
-    void AS11_UKDPP_ProgrammeTextLanguage();
-    void AS11_UKDPP_ContactEmail();
-    void AS11_UKDPP_ContactTelephoneNumber();
-    void Dolby_040000000000();
-    void Dolby_DataDefinition();
-    void Dolby_SourceTrackID();
-    void Dolby_SimplePayloadSID();
-    void Omneon_010201010100_8001();                            //8001
-    void Omneon_010201010100_8003();                            //8003
-    void Omneon_010201020100_8002();                            //8002
-    void Omneon_010201020100_8003();                            //8003
-    void Omneon_010201020100_8004();                            //8004
-    void Omneon_010201020100_8005();                            //8005
-    void Omneon_010201020100_8006();                            //8006
+    void AS_11_Series_Title();
+    void AS_11_Programme_Title();
+    void AS_11_Episode_Title_Number();
+    void AS_11_Shim_Name();
+    void AS_11_Audio_Track_Layout();
+    void AS_11_Primary_Audio_Language();
+    void AS_11_Closed_Captions_Present();
+    void AS_11_Closed_Captions_Type();
+    void AS_11_Caption_Language();
+    void AS_11_Shim_Version();
+    void AS_11_Part_Number();
+    void AS_11_Part_Total();
+    void UKDPP_Production_Number();
+    void UKDPP_Synopsis();
+    void UKDPP_Originator();
+    void UKDPP_Copyright_Year();
+    void UKDPP_Other_Identifier();
+    void UKDPP_Other_Identifier_Type();
+    void UKDPP_Genre();
+    void UKDPP_Distributor();
+    void UKDPP_Picture_Ratio();
+    void UKDPP_3D();
+    void UKDPP_3D_Type();
+    void UKDPP_Product_Placement();
+    void UKDPP_PSE_Pass();
+    void UKDPP_PSE_Manufacturer();
+    void UKDPP_PSE_Version();
+    void UKDPP_Video_Comments();
+    void UKDPP_Secondary_Audio_Language();
+    void UKDPP_Tertiary_Audio_Language();
+    void UKDPP_Audio_Loudness_Standard();
+    void UKDPP_Audio_Comments();
+    void UKDPP_Line_Up_Start();
+    void UKDPP_Ident_Clock_Start();
+    void UKDPP_Total_Number_Of_Parts();
+    void UKDPP_Total_Programme_Duration();
+    void UKDPP_Audio_Description_Present();
+    void UKDPP_Audio_Description_Type();
+    void UKDPP_Open_Captions_Present();
+    void UKDPP_Open_Captions_Type();
+    void UKDPP_Open_Captions_Language();
+    void UKDPP_Signing_Present();
+    void UKDPP_Sign_Language();
+    void UKDPP_Completion_Date();
+    void UKDPP_Textless_Elements_Exist();
+    void UKDPP_Programme_Has_Text();
+    void UKDPP_Programme_Text_Language();
+    void UKDPP_Contact_Email();
+    void UKDPP_Contact_Telephone_Number();
+    void DolbyNamespaceURI();
+    void PHDRDataDefinition();
+    void PHDRSourceTrackID();
+    void PHDRSimplePayloadSID();
 
     //Basic types
     void Get_Rational(float64 &Value);
@@ -631,15 +644,14 @@ protected :
     void Get_UL (int128u &Value, const char* Name, const char* (*Param) (int128u));
     void Skip_UL(const char* Name);
     void Get_BER(int64u &Value, const char* Name);
+    int16u          Value_UI16;
+    int8u           Value_Bool;
+    int128u         Value_UUID;
+    Ztring          Value_String;
+    vector<int128u> Value_UUIDVector;
     #if MEDIAINFO_TRACE
-    void Info_UL_01xx01_Items ();
-    void Info_UL_02xx01_Groups ();
-    void Info_UL_040101_Values ();
     #define Info_UL(_INFO, _NAME, _PARAM) int128u _INFO; Get_UL(_INFO, _NAME, _PARAM)
     #else //MEDIAINFO_TRACE
-    void Info_UL_01xx01_Items () {Element_Offset+=8;};
-    void Info_UL_02xx01_Groups () {Element_Offset+=8;};
-    void Info_UL_040101_Values () {Element_Offset+=8;};
     #define Info_UL(_INFO, _NAME, _PARAM) Skip_UL(_NAME)
     #endif //MEDIAINFO_TRACE
 
@@ -906,7 +918,7 @@ protected :
         };
         type Type;
         bool HasBFrames;
-        bool HasMPEG2VideoDescriptor;
+        bool HasMPEGVideoDescriptor;
         bool IsAes3Descriptor;
         int32u ByteRate;
         #if MEDIAINFO_ADVANCED
@@ -929,6 +941,9 @@ protected :
 
         //AudioChannelLabelSubDescriptor specific
         int128u     SoundfieldGroupLinkID;
+
+        //DescriptiveMarker
+        int32u      SID;
 
         descriptor()
         {
@@ -967,7 +982,7 @@ protected :
             FieldDominance=1; //Default is field 1 temporaly first
             Type=Type_Unknown;
             HasBFrames=false;
-            HasMPEG2VideoDescriptor=false;
+            HasMPEGVideoDescriptor=false;
             IsAes3Descriptor=false;
             ByteRate=(int32u)-1;
             #if MEDIAINFO_ADVANCED
@@ -983,6 +998,9 @@ protected :
             //AudioChannelLabelSubDescriptor specific
             SoundfieldGroupLinkID.hi=(int64u)-1;
             SoundfieldGroupLinkID.lo=(int64u)-1;
+
+            //DescriptiveMarker
+            SID=0;
         }
         descriptor(const descriptor&) = delete;
         descriptor(descriptor& b)
@@ -1068,7 +1086,7 @@ protected :
     typedef std::map<int128u, component> components; //Key is InstanceUID of the component
     components Components;
 
-    //Descriptive Metadata - DMSegments
+    //Descriptive Metadata - DescriptiveMarkers
     struct dmsegment
     {
         int128u     Framework;
@@ -1088,10 +1106,10 @@ protected :
         {
         }
     };
-    typedef std::map<int128u, dmsegment> dmsegments; //Key is InstanceUID of the DMSegment
-    dmsegments DMSegments;
+    typedef std::map<int128u, dmsegment> dmsegments; //Key is InstanceUID of the DescriptiveMarker
+    dmsegments DescriptiveMarkers;
 
-    //Descriptive Metadata - DMScheme1
+    //Descriptive Metadata - ProductionFramework
     struct dmscheme1
     {
         Ztring      PrimaryExtendedSpokenLanguage;
@@ -1104,8 +1122,8 @@ protected :
         {
         }
     };
-    typedef std::map<int128u, dmscheme1> dmscheme1s; //Key is InstanceUID of the DMScheme1
-    dmscheme1s DMScheme1s;
+    typedef std::map<int128u, dmscheme1> dmscheme1s; //Key is InstanceUID of the ProductionFramework
+    dmscheme1s ProductionFrameworks;
 
     //Descriptive Metadata - AS11
     struct as11
@@ -1207,27 +1225,29 @@ protected :
         {
         }
     };
-    typedef std::map<int128u, as11> as11s; //Key is InstanceUID of the DMScheme1
+    typedef std::map<int128u, as11> as11s; //Key is InstanceUID of the ProductionFramework
     as11s AS11s;
 
+    //Descriptive Metadata - Omneon
+    struct dmomneonlink
+    {
+        std::vector<int128u> Links;
+    };
+    typedef std::map<int128u, dmomneonlink> dmomneonlinks; //Key is InstanceUID
+    dmomneonlinks DMOmneonLinks;
+    struct dmomneon
+    {
+        Ztring      Name;
+        Ztring      Value;
+    };
+    typedef std::map<int128u, dmomneon> dmomneons; //Key is InstanceUID
+    dmomneons DMOmneons;
+    Ztring      Name;
+
     //Parsers
-    void           ChooseParser__FromEssence(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
-    void           ChooseParser__Aaf(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
-    void           ChooseParser__Aaf_CP_Picture(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
-    void           ChooseParser__Aaf_CP_Sound(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
-    void           ChooseParser__Aaf_CP_Data(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
-    void           ChooseParser__Aaf_14(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
-    void           ChooseParser__Aaf_GC_Picture(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
-    void           ChooseParser__Aaf_GC_Sound(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
-    void           ChooseParser__Aaf_GC_Data(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
-    void           ChooseParser__Aaf_GC_Compound(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
-    void           ChooseParser__Avid(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
-    void           ChooseParser__Avid_Picture(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
-    void           ChooseParser__Dolby(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
-    void           ChooseParser__Sony(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
-    void           ChooseParser__Sony_Picture(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
-    void           ChooseParser(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
-    void           ChooseParser__FromEssenceContainer(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
+    void           ChooseParser__FromCodingScheme(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
+    void           ChooseParser__FromEssenceContainer(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
+    void           ChooseParser__FromEssence(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
     void           ChooseParser_Avc(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
     void           ChooseParser_DV(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
     void           ChooseParser_Mpeg4v(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
@@ -1251,9 +1271,19 @@ protected :
     void           ChooseParser_Jpeg2000(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
     void           ChooseParser_ProRes(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
     void           ChooseParser_Ffv1(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
+    void           ChooseParser_Isxd(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
+    void           ChooseParser_Phdr(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
     void           ChooseParser_DolbyVisionFrameData(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
     void           ChooseParser_Iab(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
     void           ChooseParser_Mga(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
+    void           ChooseParser_Mxf(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
+    void           ChooseParser_Vc1(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
+    void           ChooseParser_Vbi(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
+    void           ChooseParser_Ancillary(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
+    void           ChooseParser_xAnc(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
+    void           ChooseParser_Hdcam(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
+    void           ChooseParser_Hevc(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
+    void           ChooseParser_JpegXs(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
 
     //Helpers
     int32u Vector(int32u ExpectedLength=(int32u)-1);
@@ -1322,6 +1352,7 @@ protected :
         int64u HeaderByteCount;
         int64u IndexByteCount;
         int64u BodyOffset;
+        int32u BodySID;
 
         partition()
         {
@@ -1331,6 +1362,7 @@ protected :
             HeaderByteCount=0;
             IndexByteCount=0;
             BodyOffset=0;
+            BodySID=0;
         }
 
         bool operator < (const partition& lhs) const
@@ -1348,7 +1380,7 @@ protected :
     //Config
     bool                            TimeCodeFromMaterialPackage;
 
-    //CameraUnitMetadata
+    //CameraUnitAcquisitionMetadata
     struct acquisitionmetadata
     {
         string Value;
@@ -1404,7 +1436,9 @@ protected :
     // Extra metadata
     int64u ExtraMetadata_Offset;
     std::set<int32u> ExtraMetadata_SID;
-    File_DolbyVisionMetadata* DolbyVisionMetadata;
+    std::vector<File_DolbyVisionMetadata*> DolbyVisionMetadatas;
+    std::vector<int32u> DolbyVisionMetadatas_SID;
+    std::set<int64u> MXFGenericStreamDataElementKey_Offsets;
     File_DolbyAudioMetadata* DolbyAudioMetadata;
     #if defined(MEDIAINFO_ADM_YES)
     File_Adm* Adm;

@@ -13,7 +13,9 @@
 #include "MediaInfo/File__Analyze.h"
 #include "MediaInfo/File__Duplicate.h"
 #include "MediaInfo/TimeCode.h"
+#include <bitset>
 #include <cmath>
+
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -83,6 +85,17 @@ private :
 #endif //MEDIAINFO_DEMUX
     };
 
+    enum vui_flag
+    {
+        video_signal_type_present_flag,
+        video_full_range_flag,
+        colour_description_present_flag,
+        timing_info_present_flag,
+        fixed_frame_rate_flag,
+        pic_struct_present_flag,
+        vui_flags_Max
+    };
+    typedef std::bitset<vui_flags_Max> vui_flags;
     struct seq_parameter_set_struct : public iso14496_base
     {
         struct vui_parameters_struct
@@ -166,41 +179,31 @@ private :
             xxl*    VCL;
             int32u  num_units_in_tick;
             int32u  time_scale;
+            int32u  chroma_sample_loc_type_top_field;
+            int32u  chroma_sample_loc_type_bottom_field;
             int16u  sar_width;
             int16u  sar_height;
-            int8u   aspect_ratio_idc;
             int8u   video_format;
-            int8u   video_full_range_flag;
             int8u   colour_primaries;
             int8u   transfer_characteristics;
             int8u   matrix_coefficients;
-            bool    aspect_ratio_info_present_flag;
-            bool    video_signal_type_present_flag;
-            bool    colour_description_present_flag;
-            bool    timing_info_present_flag;
-            bool    fixed_frame_rate_flag;
-            bool    pic_struct_present_flag;
+            vui_flags flags;
 
-            vui_parameters_struct(xxl* NAL_, xxl* VCL_, int32u num_units_in_tick_, int32u time_scale_, int16u  sar_width_, int16u  sar_height_, int8u aspect_ratio_idc_, int8u video_format_, int8u video_full_range_flag_, int8u colour_primaries_, int8u transfer_characteristics_, int8u matrix_coefficients_, bool aspect_ratio_info_present_flag_, bool video_signal_type_present_flag_, bool colour_description_present_flag_, bool timing_info_present_flag_, bool fixed_frame_rate_flag_, bool pic_struct_present_flag_)
+            vui_parameters_struct(xxl* NAL_, xxl* VCL_, int32u num_units_in_tick_, int32u time_scale_, int32u chroma_sample_loc_type_top_field_, int32u chroma_sample_loc_type_bottom_field_, int16u  sar_width_, int16u  sar_height_, int8u video_format_, int8u colour_primaries_, int8u transfer_characteristics_, int8u matrix_coefficients_, vui_flags flags_)
                 :
                 NAL(NAL_),
                 VCL(VCL_),
                 num_units_in_tick(num_units_in_tick_),
                 time_scale(time_scale_),
+                chroma_sample_loc_type_top_field(chroma_sample_loc_type_top_field_),
+                chroma_sample_loc_type_bottom_field(chroma_sample_loc_type_bottom_field_),
                 sar_width(sar_width_),
                 sar_height(sar_height_),
-                aspect_ratio_idc(aspect_ratio_idc_),
                 video_format(video_format_),
-                video_full_range_flag(video_full_range_flag_),
                 colour_primaries(colour_primaries_),
                 transfer_characteristics(transfer_characteristics_),
                 matrix_coefficients(matrix_coefficients_),
-                aspect_ratio_info_present_flag(aspect_ratio_info_present_flag_),
-                video_signal_type_present_flag(video_signal_type_present_flag_),
-                colour_description_present_flag(colour_description_present_flag_),
-                timing_info_present_flag(timing_info_present_flag_),
-                fixed_frame_rate_flag(fixed_frame_rate_flag_),
-                pic_struct_present_flag(pic_struct_present_flag_)
+                flags(flags_)
             {
             }
 

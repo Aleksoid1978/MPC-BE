@@ -1560,7 +1560,6 @@ bool File__Analyze::Open_Buffer_Continue_Loop ()
 
     //Parsing specific
     Read_Buffer_AfterParsing();
-    Merge_Conformance();
 
     //Jumping to the end of the file if needed
     if (!IsSub && !EOF_AlreadyDetected && Config->ParseSpeed<1 && Count_Get(Stream_General))
@@ -1942,6 +1941,7 @@ bool File__Analyze::Buffer_Parse()
         return false; //Wait for more data
 
     Buffer_TotalBytes_LastSynched=Buffer_TotalBytes+Buffer_Offset;
+    Merge_Conformance();
 
     return true;
 }

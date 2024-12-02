@@ -125,6 +125,7 @@
     <ClInclude Include="MediaInfo\Multiple\File_DcpPkl.h" />
     <ClInclude Include="MediaInfo\Multiple\File_HdsF4m.h" />
     <ClInclude Include="MediaInfo\Multiple\File_MiXml.h" />
+    <ClInclude Include="MediaInfo\Multiple\File_Mxf_Automated.h" />
     <ClInclude Include="MediaInfo\Multiple\File_Nsv.h" />
     <ClInclude Include="MediaInfo\Multiple\File_Pmp.h" />
     <ClInclude Include="MediaInfo\Multiple\File_Ptx.h" />
