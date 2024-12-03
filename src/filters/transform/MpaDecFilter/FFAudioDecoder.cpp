@@ -257,6 +257,7 @@ static bool ParseVorbisTag(const CString& field_name, const CString& vorbisTag, 
 bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 {
 	AVCodecID codec_id = AV_CODEC_ID_NONE;
+	unsigned int codec_tag = 0;
 	int samplerate     = 0;
 	int channels       = 0;
 	int bitdeph        = 0;
@@ -293,11 +294,12 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		codec_id = codecID;
 		if (mediaType->formattype == FORMAT_WaveFormatEx) {
 			WAVEFORMATEX *wfex = (WAVEFORMATEX *)mediaType->Format();
-			samplerate	= wfex->nSamplesPerSec;
-			channels	= wfex->nChannels;
-			bitdeph		= wfex->wBitsPerSample;
-			block_align	= wfex->nBlockAlign;
-			bitrate		= wfex->nAvgBytesPerSec * 8;
+			codec_tag   = wfex->wFormatTag;
+			samplerate  = wfex->nSamplesPerSec;
+			channels    = wfex->nChannels;
+			bitdeph     = wfex->wBitsPerSample;
+			block_align = wfex->nBlockAlign;
+			bitrate     = wfex->nAvgBytesPerSec * 8;
 		}
 		else if (mediaType->formattype == FORMAT_VorbisFormat2) {
 			VORBISFORMAT2 *vf2 = (VORBISFORMAT2 *)mediaType->Format();
@@ -349,6 +351,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		}
 
 		m_pAVCtx->codec_id              = codec_id;
+		m_pAVCtx->codec_tag             = codec_tag;
 		m_pAVCtx->sample_rate           = samplerate;
 		m_pAVCtx->ch_layout             = ch_layout;
 		m_pAVCtx->bits_per_coded_sample = bitdeph;
