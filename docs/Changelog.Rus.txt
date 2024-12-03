@@ -3,7 +3,7 @@
 1.8.1.x dev
 =============================
 MpaDecFilter
-Добавлена поддержка кодека "On2 Audio for Video Codec" (0x0501).
+Добавлена поддержка кодека "On2 Audio for Video Codec" (0x0500, 0x0501).
 
 MpcDvdVideoDecoder 
 Оптимизирована конвертация I420 в NV12.
