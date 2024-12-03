@@ -43,6 +43,8 @@ static const WaveStringEntry MPC_g_WaveGuidNames[] = {
 	{WAVE_FORMAT_WMAUDIO_LOSSLESS,    "WMAUDIO_LOSSLESS"},
 	{WAVE_FORMAT_INTEL_MUSIC_CODER,   "INTEL_MUSIC"},
 	{WAVE_FORMAT_INDEO_AUDIO,         "INDEO_AUDIO"},
+	{WAVE_FORMAT_ON2_VP7_AUDIO,       "ON2_VP7_AUDIO"},
+	{WAVE_FORMAT_ON2_VP6_AUDIO,       "ON2_VP6_AUDIO"},
 	{WAVE_FORMAT_DTS2,                "DTS2"},
 	{WAVE_FORMAT_MPEG_ADTS_AAC,       "MPEG_ADTS_AAC"},
 	{WAVE_FORMAT_MPEG_RAW_AAC,        "MPEG_RAW_AAC"},
@@ -62,7 +64,6 @@ static const WaveStringEntry MPC_g_WaveGuidNames[] = {
 	{WAVE_FORMAT_TTA1 ,               "TTA1"},           //0x77A1
 	{WAVE_FORMAT_PS2_PCM,             "PS2_PCM"},        //0xF521
 	{WAVE_FORMAT_PS2_ADPCM,           "PS2_ADPCM"},      //0xF522
-	{WAVE_FORMAT_ON2_VP6_AUDIO,       "On2_AVC"}
 };
 
 #define ADDENTRY(subtype) { subtype, #subtype },
@@ -118,7 +119,6 @@ static const GuidStringEntry MPC_g_GuidNames[] = {
 	ADDENTRY(FORMATTYPE_CPFilters_Processed)
 	ADDENTRY(MEDIASUBTYPE_LAV_RAWVIDEO)
 	ADDENTRY(MEDIASUBTYPE_WEBVTT)
-	ADDENTRY(MEDIASUBTYPE_ON2VP6_AUDIO)
 };
 #undef ADDENTRY
 
