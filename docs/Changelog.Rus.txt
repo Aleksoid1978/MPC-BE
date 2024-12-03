@@ -2,6 +2,9 @@
 
 1.8.1.x dev
 =============================
+MpaDecFilter
+Добавлена поддержка кодека "On2 Audio for Video Codec" (0x0501).
+
 MpcDvdVideoDecoder 
 Оптимизирована конвертация I420 в NV12.
 
@@ -26,7 +29,6 @@ YouTube
 
 Обновлены библиотеки:
 	dav1d git-1.5.0-16-g93f12c1;
-	Detours v4.0.1-112-gb2bf32a;
 	ffmpeg n7.2-dev-827-gcb27e478f7;
 	Little-CMS git-lcms2.16-77-g91abcce;
 	MediaInfo git-v24.11-25-g6a54edfce;
