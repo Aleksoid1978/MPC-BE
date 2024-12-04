@@ -1150,10 +1150,12 @@ HRESULT CStreamSwitcherOutputPin::CompleteConnect(IPin* pReceivePin)
 			&& SUCCEEDED(pIn->GetConnected()->ConnectionMediaType(&mt))) {
 		m_pSSF->TransformMediaType(mt, m_bForce16Bit);
 		if (m_mt != mt) {
-			if (pIn->GetConnected()->QueryAccept(&m_mt) == S_OK) {
-				hr = m_pFilter->ReconnectPin(pIn->GetConnected(), &m_mt);
-			} else {
-				hr = VFW_E_TYPE_NOT_ACCEPTED;
+			if (auto clsid = GetCLSID(pReceivePin); clsid != CLSID_MpcAudioRenderer && clsid != CLSID_SanearAudioRenderer) {
+				if (pIn->GetConnected()->QueryAccept(&m_mt) == S_OK) {
+					hr = m_pFilter->ReconnectPin(pIn->GetConnected(), &m_mt);
+				} else {
+					hr = VFW_E_TYPE_NOT_ACCEPTED;
+				}
 			}
 		}
 	}
