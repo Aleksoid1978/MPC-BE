@@ -850,7 +850,7 @@ bool CWebClientSocket::OnSnapShotJpeg(CStringA& hdr, CStringA& body, CStringA& m
 		}
 		size_t dstLen = body.GetAllocLength();
 
-		if (WICDIB(L".jpg", dib.Data(), AfxGetAppSettings().nWebServerQuality, (BYTE*)body.GetBuffer(), dstLen)) {
+		if (SaveDIB_WIC(L".jpg", dib.Data(), AfxGetAppSettings().nWebServerQuality, (BYTE*)body.GetBuffer(), dstLen)) {
 			std::ignore = body.GetBufferSetLength(dstLen);
 
 			hdr +=
