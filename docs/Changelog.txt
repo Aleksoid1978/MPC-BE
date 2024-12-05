@@ -23,6 +23,9 @@ Added playback of a history entry when pressing the "Enter" key.
 Fixed opening paths written as URLs (file://).
 Fixed reading of the "Speed ​​Step" setting.
 
+Installer
+Updated MPC Video Renderer 0.8.9.
+
 Updated Romanian translation (by Andrei Miloiu).
 Added Slovenian translation (by MatjazP72).
 Updated Spanish translation (by IPeluchito).
