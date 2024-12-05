@@ -26,58 +26,82 @@
 static bool SaveDIB_libpng(LPCWSTR filename, BYTE* pData, int level)
 {
 	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
-	if (bih->biCompression != BI_RGB
-			|| bih->biWidth <= 0 || bih->biHeight == 0
-			|| (bih->biBitCount != 32 && bih->biBitCount != 64)) {
+	if (bih->biCompression != BI_RGB || bih->biWidth <= 0 || bih->biHeight == 0) {
 		return false;
 	}
 
+	int bit_depth = 0; // bits per channel
+
+	switch (bih->biBitCount) {
+	case 24:
+	case 32:
+		bit_depth = 8;
+		break;
+	case 48:
+	case 64:
+		bit_depth = 16;
+		break;
+	default:
+		return false;
+	}
+
+	ASSERT(bih->biHeight < 0); // TODO
+
 	FILE* fp;
 	if (_wfopen_s(&fp, filename, L"wb") == 0) {
-		const unsigned width   = bih->biWidth;
-		const unsigned height  = abs(bih->biHeight);
-		const int bit_depth    = bih->biBitCount / 4; // bits per channel
-		const unsigned src_bpp = bih->biBitCount / 8; // bytes per pixel
-		const unsigned dst_bpp = 3 * bit_depth / 8;   // bytes per pixel
+		const unsigned width     = bih->biWidth;
+		const unsigned height    = abs(bih->biHeight);
+		const unsigned src_pitch = width * bih->biBitCount / 8;
+		const unsigned dst_pitch = width * 3 * bit_depth / 8;
 
 		png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
 		png_infop info_ptr = png_create_info_struct(png_ptr);
 		png_init_io(png_ptr, fp);
 
+		png_set_bgr(png_ptr);
+		png_set_swap(png_ptr);
 		png_set_compression_level(png_ptr, level);
 		png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, 0, 0);
 		png_write_info(png_ptr, info_ptr);
 
-		BYTE* row_ptr = new(std::nothrow) BYTE[width * dst_bpp];
-		if (row_ptr) {
-			const unsigned src_pitch = width * src_bpp;
+		std::unique_ptr<BYTE[]> row(new(std::nothrow) BYTE[dst_pitch]);
+		if (row) {
 			BYTE* src = pData + sizeof(BITMAPINFOHEADER) + src_pitch * (height - 1);
 
 			for (unsigned y = 0; y < height; ++y) {
-				if (bit_depth == 16) {
-					uint16_t* src16 = (uint16_t*)src;
-					uint16_t* dst16 = (uint16_t*)row_ptr;
-					for (unsigned x = 0; x < width; ++x) {
-						*dst16++ = _byteswap_ushort(src16[2]);
-						*dst16++ = _byteswap_ushort(src16[1]);
-						*dst16++ = _byteswap_ushort(src16[0]);
-						src16 += 4;
-					}
-				}
-				else {
+				switch (bih->biBitCount) {
+				case 24:
+				case 48:
+					memcpy(row.get(), src, src_pitch);
+					break;
+				case 32:
+				{
 					uint8_t* src8 = (uint8_t*)src;
-					uint8_t* dst8 = (uint8_t*)row_ptr;
+					uint8_t* dst8 = (uint8_t*)row.get();
 					for (unsigned x = 0; x < width; ++x) {
-						*dst8++ = src8[2];
-						*dst8++ = src8[1];
 						*dst8++ = src8[0];
+						*dst8++ = src8[1];
+						*dst8++ = src8[2];
 						src8 += 4;
 					}
+					break;
 				}
-				png_write_row(png_ptr, row_ptr);
+				case 64:
+				{
+					uint16_t* src16 = (uint16_t*)src;
+					uint16_t* dst16 = (uint16_t*)row.get();
+					for (unsigned x = 0; x < width; ++x) {
+						*dst16++ = src16[0];
+						*dst16++ = src16[1];
+						*dst16++ = src16[2];
+						src16 += 4;
+					}
+					break;
+				}
+				}
+				png_write_row(png_ptr, row.get());
 				src -= src_pitch;
 			}
-			delete[] row_ptr;
 		}
 
 		png_write_end(png_ptr, info_ptr);
