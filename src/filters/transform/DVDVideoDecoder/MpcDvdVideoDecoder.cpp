@@ -563,7 +563,7 @@ void CMpeg2DecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 			props.dwTypeSpecificFlags &= ~0x7f;
 
 			if (m_fInterlaced) {
-				if (m_dec->m_info.m_sequence->flags & SEQ_FLAG_PROGRESSIVE_SEQUENCE || m_fFilm) {
+				if (m_dec->m_info.m_sequence->flags & SEQ_FLAG_PROGRESSIVE_SEQUENCE || m_fFilm || m_fb.flags & PIC_FLAG_PROGRESSIVE_FRAME) {
 					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
 				}
 			} else {
