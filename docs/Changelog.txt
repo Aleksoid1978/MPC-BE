@@ -7,12 +7,16 @@ Added support for "On2 Audio for Video Codec" (0x0500, 0x0501).
 
 MpcDvdVideoDecoder 
 Optimized I420 to NV12 conversion.
+Fixed playback of static DVD-Video menu on old ATI/AMD video cards.
 
 RoQSplitter 
 Optimized I420 to NV12 conversion.
 
 MPCVideoDec
 Added the ability to work with incorrect YUV frames (4:2:0/4:2:2 with odd dimensions).
+
+AudioSwitcher 
+Fixed connection to MPC Audio Renderer when there is no decoder and high audio sampling rate.
 
 YouTube
 Improved YouTube support in the built-in parser.
@@ -22,6 +26,7 @@ Player
 Added playback of a history entry when pressing the "Enter" key.
 Fixed opening paths written as URLs (file://).
 Fixed reading of the "Speed ​​Step" setting.
+Fixed potential issues when saving screenshots to PNG.
 
 Installer
 Updated MPC Video Renderer 0.8.9.
