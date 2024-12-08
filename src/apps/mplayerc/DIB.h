@@ -71,18 +71,13 @@ static bool SaveDIB_libpng(LPCWSTR filename, BYTE* pData, int level)
 		png_write_info(png_ptr, info_ptr);
 		png_set_swap(png_ptr); // should be after png_write_info
 
-		BYTE* src;
-		int src_pitch;
+		BYTE* src = pData + sizeof(BITMAPINFOHEADER);
+		int src_pitch = src_linesize;
 
 		if (bih->biHeight > 0) {
 			// bottom-up bitmap
-			src = pData + sizeof(BITMAPINFOHEADER) + src_linesize * (height - 1);
+			src += src_linesize * (height - 1);
 			src_pitch = -(int)src_linesize;
-		}
-		else {
-			// top-down bitmap
-			src = pData;
-			src_pitch = src_linesize;
 		}
 
 		if (bih->biBitCount == 24) {
