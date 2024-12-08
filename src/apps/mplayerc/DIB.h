@@ -23,6 +23,12 @@
 #include <ExtLib/libpng/png.h>
 #include "WicUtils.h"
 
+inline UINT CalcDibRowPitch(const UINT width, const UINT bitcount)
+{
+	// see DIBWIDTHBYTES in amvideo.h
+	return ALIGN(width * bitcount, 32) / 8;
+}
+
 static bool SaveDIB_libpng(LPCWSTR filename, BYTE* pData, int level)
 {
 	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
@@ -49,7 +55,7 @@ static bool SaveDIB_libpng(LPCWSTR filename, BYTE* pData, int level)
 	if (_wfopen_s(&fp, filename, L"wb") == 0) {
 		const unsigned width        = bih->biWidth;
 		const unsigned height       = abs(bih->biHeight);
-		const unsigned src_linesize = width * bih->biBitCount / 8;
+		const unsigned src_linesize = CalcDibRowPitch(width, bih->biBitCount);
 		const unsigned dst_linesize = width * 3 * bit_depth / 8;
 
 		png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
@@ -145,32 +151,32 @@ static bool SaveDIB_WIC(LPCWSTR filename, BYTE* pData, int quality, BYTE* output
 		return false;
 	}
 
-	const UINT pitch = bih->biWidth * bih->biBitCount / 8;
+	const UINT dib_pitch = CalcDibRowPitch(bih->biWidth, bih->biBitCount);
 	BYTE* src = pData + sizeof(BITMAPINFOHEADER) + bih->biClrUsed * 4;
 
 	if (bih->biHeight > 0) {
-		// bottom-up bitmap
-		const UINT len = pitch * bih->biHeight;
-		BYTE* const data = new(std::nothrow) BYTE[len];
+		// bottom-up RGB bitmap
+		const UINT dib_size = dib_pitch * bih->biHeight;
+		BYTE* const data = new(std::nothrow) BYTE[dib_size];
 		if (!data) {
 			return false;
 		}
 
-		src += len - pitch;
+		src += dib_size - dib_pitch;
 		BYTE* dst = data;
 		UINT y = bih->biHeight;
 
 		while (y--) {
-			memcpy(dst, src, pitch);
-			src -= pitch;
-			dst += pitch;
+			memcpy(dst, src, dib_pitch);
+			src -= dib_pitch;
+			dst += dib_pitch;
 		}
 
 		src = data;
 	}
 
 	HRESULT hr = WicSaveImage(
-		src, pitch,
+		src, dib_pitch,
 		bih->biWidth, abs(bih->biHeight),
 		format, quality,
 		filename,
