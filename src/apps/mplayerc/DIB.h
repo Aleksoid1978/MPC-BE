@@ -62,8 +62,8 @@ static bool SaveDIB_libpng(LPCWSTR filename, BYTE* pData, int level)
 		png_infop info_ptr = png_create_info_struct(png_ptr);
 		png_init_io(png_ptr, fp);
 
-		if (bit_depth == 8) {
-			// png_set_bgr does not work correctly for 16-bit
+		if (bih->biBitCount != 48) {
+			// png_set_bgr does not work correctly for 48-bit
 			png_set_bgr(png_ptr);
 		}
 		png_set_compression_level(png_ptr, level);
@@ -162,6 +162,7 @@ static bool SaveDIB_WIC(LPCWSTR filename, BYTE* pData, int quality, BYTE* output
 	case 24: format = GUID_WICPixelFormat24bppBGR; break;
 	case 32: format = GUID_WICPixelFormat32bppBGR; break;
 	case 48: format = GUID_WICPixelFormat48bppBGR; break;
+	case 64: format = GUID_WICPixelFormat64bppBGRA; break;
 	default:
 		return false;
 	}

@@ -515,7 +515,6 @@ HRESULT WicSaveImage(
 	WICPixelFormatGUID convertFormat = {};
 	GUID containerFormat = {};
 
-
 	auto pixFmtDesc = GetPixelFormatDesc(pixelFormat);
 
 	std::wstring ext;
@@ -544,10 +543,10 @@ HRESULT WicSaveImage(
 			convertFormat = pixelFormat;
 		}
 		else if (pixFmtDesc->alpha) {
-			convertFormat = (pixFmtDesc->depth == 64) ? GUID_WICPixelFormat64bppBGRA : GUID_WICPixelFormat32bppBGRA;
+			convertFormat = (pixFmtDesc->depth >= 64) ? GUID_WICPixelFormat64bppBGRA : GUID_WICPixelFormat32bppBGRA;
 		}
 		else {
-			convertFormat = (pixFmtDesc->depth == 48) ? GUID_WICPixelFormat48bppBGR : GUID_WICPixelFormat24bppBGR;
+			convertFormat = (pixFmtDesc->depth >= 48) ? GUID_WICPixelFormat48bppBGR : GUID_WICPixelFormat24bppBGR;
 		}
 	}
 	else if (ext == L".jpg" || ext == L".jpeg") {
