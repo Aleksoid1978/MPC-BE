@@ -63,10 +63,10 @@ static bool SaveDIB_libpng(LPCWSTR filename, BYTE* pData, int level)
 		png_init_io(png_ptr, fp);
 
 		png_set_bgr(png_ptr);
-		png_set_swap(png_ptr);
 		png_set_compression_level(png_ptr, level);
 		png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, 0, 0);
 		png_write_info(png_ptr, info_ptr);
+		png_set_swap(png_ptr); // should be after png_write_info
 
 		BYTE* src;
 		int src_pitch;
