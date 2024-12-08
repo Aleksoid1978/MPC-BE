@@ -530,8 +530,12 @@ HRESULT WicSaveImage(
 				(pixFmtDesc->depth <= 4) ? GUID_WICPixelFormat4bppIndexed :
 				GUID_WICPixelFormat8bppIndexed;
 		}
+		else if (pixFmtDesc->alpha) {
+			convertFormat = GUID_WICPixelFormat32bppBGRA;
+		}
 		else {
-			convertFormat = (pixFmtDesc->alpha) ? GUID_WICPixelFormat32bppBGRA : GUID_WICPixelFormat24bppBGR;
+			// convert 32bppBGR to 24bppBGR for better compatibility and smaller size
+			convertFormat = GUID_WICPixelFormat24bppBGR;
 		}
 	}
 	else if (ext == L".png") {

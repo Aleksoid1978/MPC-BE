@@ -6346,9 +6346,11 @@ bool CMainFrame::SaveDIB(LPCWSTR fn, BYTE* pData, long size)
 	const CAppSettings& s = AfxGetAppSettings();
 
 	const CString ext = GetFileExt(fn).MakeLower();
+
+	bool bitdepth48 = (size > sizeof(BITMAPINFOHEADER) && ((BITMAPINFOHEADER*)pData)->biBitCount == 48);
 	bool ok;
 
-	if (ext == L".png") {
+	if (ext == L".png" && !bitdepth48) {
 		ok = SaveDIB_libpng(fn, pData, std::clamp(s.iThumbLevelPNG, 1, 9));
 	} else {
 		size_t dstLen = 0;
