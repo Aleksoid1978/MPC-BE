@@ -773,7 +773,7 @@ BEGIN MENU IDR_MAINFRAME LINES 138
 128		"&Zakładki"
 129		"Pomo&c"
 131		"&Strona główna"
-132		"Sprawdź &aktualizaje"
+132		"Sprawdź &aktualizacje"
 133		"Parametry wiersza &poleceń..."
 134		"Pobierz &obrazy paska narzędzi"
 136		"&O programie..."

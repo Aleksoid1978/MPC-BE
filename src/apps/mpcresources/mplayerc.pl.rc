@@ -1732,7 +1732,7 @@ BEGIN
     POPUP "Pomo&c"
     BEGIN
         MENUITEM "&Strona główna",              ID_HELP_HOMEPAGE
-        MENUITEM "Sprawdź &aktualizaje",          ID_HELP_CHECKFORUPDATE
+        MENUITEM "Sprawdź &aktualizacje",          ID_HELP_CHECKFORUPDATE
         MENUITEM "Parametry wiersza &poleceń...",       ID_HELP_SHOWCOMMANDLINESWITCHES
         MENUITEM "Pobierz &obrazy paska narzędzi",    ID_HELP_TOOLBARIMAGES
         MENUITEM SEPARATOR
