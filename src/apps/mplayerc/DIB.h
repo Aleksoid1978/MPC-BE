@@ -62,10 +62,7 @@ static bool SaveDIB_libpng(LPCWSTR filename, BYTE* pData, int level)
 		png_infop info_ptr = png_create_info_struct(png_ptr);
 		png_init_io(png_ptr, fp);
 
-		if (bih->biBitCount != 48) {
-			// png_set_bgr does not work correctly for 48-bit
-			png_set_bgr(png_ptr);
-		}
+		png_set_bgr(png_ptr);
 		png_set_compression_level(png_ptr, level);
 		png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, 0, 0);
 		png_write_info(png_ptr, info_ptr);
@@ -80,7 +77,7 @@ static bool SaveDIB_libpng(LPCWSTR filename, BYTE* pData, int level)
 			src_pitch = -(int)src_linesize;
 		}
 
-		if (bih->biBitCount == 24) {
+		if (bih->biBitCount == 24 || bih->biBitCount == 48) {
 			for (unsigned y = 0; y < height; ++y) {
 				png_write_row(png_ptr, src);
 				src += src_pitch;
@@ -98,20 +95,6 @@ static bool SaveDIB_libpng(LPCWSTR filename, BYTE* pData, int level)
 							*dst8++ = *src8++;
 							*dst8++ = *src8++;
 							src8++;
-						}
-						png_write_row(png_ptr, row.get());
-						src += src_pitch;
-					}
-				}
-				else if (bih->biBitCount == 48) {
-					for (unsigned y = 0; y < height; ++y) {
-						uint16_t* src16 = (uint16_t*)src;
-						uint16_t* dst16 = (uint16_t*)row.get();
-						for (unsigned x = 0; x < width; ++x) {
-							*dst16++ = src16[1];
-							*dst16++ = src16[0];
-							*dst16++ = src16[2];
-							src16 += 3;
 						}
 						png_write_row(png_ptr, row.get());
 						src += src_pitch;
