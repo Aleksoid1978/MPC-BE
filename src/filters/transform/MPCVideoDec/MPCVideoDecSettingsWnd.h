@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -92,8 +92,8 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CStatic		m_txtGraphicsAdapter;
 	CEdit		m_edtGraphicsAdapter;
 
-	CButton		m_grpFmtConv;
-	CStatic		m_txtSwOutputFormats;
+	CButton		m_grpSwOutputFormats;
+	CStatic		m_txtFmtConv;
 	CStatic     m_txt8bit;
 	CStatic     m_txt10bit;
 	CStatic     m_txt16bit;
