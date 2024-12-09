@@ -1499,8 +1499,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	str.Empty();
 	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_VIDEOFORMAT, str);
 	YoutubeFormat.vfmt =
-		(str == L"WEBM-VP9") ? Youtube::y_webm_vp9
-		: (str == L"MP4-AV1") ? Youtube::y_mp4_av1
+		(str == L"WEBM") ? Youtube::y_webm_vp9
+		: (str == L"AV1") ? Youtube::y_mp4_av1
 		: Youtube::y_mp4_avc;
 	profile.ReadInt(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_RESOLUTION, YoutubeFormat.res);
 	YoutubeFormat.res = discard(YoutubeFormat.res, 720, s_CommonVideoHeights);
