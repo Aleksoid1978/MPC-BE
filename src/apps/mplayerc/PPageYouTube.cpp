@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2023 see Authors.txt
+ * (C) 2012-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,15 +41,16 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 	__super::DoDataExchange(pDX);
 
 	DDX_Control(pDX, IDC_CHECK2, m_chkPageParser);
-	DDX_Control(pDX, IDC_COMBO1, m_cbFormat);
+	DDX_Control(pDX, IDC_COMBO1, m_cbVideoFormat);
 	DDX_Control(pDX, IDC_COMBO2, m_cbResolution);
 	DDX_Control(pDX, IDC_CHECK3, m_chk60fps);
 	DDX_Control(pDX, IDC_CHECK4, m_chkHdr);
-	DDX_Control(pDX, IDC_COMBO5, m_cbAudioLang);
+	DDX_Control(pDX, IDC_COMBO3, m_cbAudioFormat);
+	DDX_Control(pDX, IDC_COMBO4, m_cbAudioLang);
 	DDX_Control(pDX, IDC_CHECK1, m_chkLoadPlaylist);
 	DDX_Control(pDX, IDC_CHECK6, m_chkYDLEnable);
-	DDX_Control(pDX, IDC_COMBO4, m_cbYDLExePath);
-	DDX_Control(pDX, IDC_COMBO3, m_cbYDLMaxHeight);
+	DDX_Control(pDX, IDC_COMBO5, m_cbYDLExePath);
+	DDX_Control(pDX, IDC_COMBO6, m_cbYDLMaxHeight);
 	DDX_Control(pDX, IDC_CHECK5, m_chkYDLMaximumQuality);
 	DDX_Control(pDX, IDC_EDIT1,  m_edAceStreamAddress);
 	DDX_Control(pDX, IDC_EDIT2,  m_edTorrServerAddress);
@@ -75,10 +76,10 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	m_chkPageParser.SetCheck(s.bYoutubePageParser);
 
-	m_cbFormat.AddString(L"MP4");
-	m_cbFormat.AddString(L"WebM");
-	m_cbFormat.AddString(L"MP4-AV1");
-	m_cbFormat.SetCurSel(s.YoutubeFormat.fmt);
+	m_cbVideoFormat.AddString(L"MP4-H.264");
+	m_cbVideoFormat.AddString(L"WebM-VP9");
+	m_cbVideoFormat.AddString(L"MP4-AV1");
+	m_cbVideoFormat.SetCurSel(s.YoutubeFormat.vfmt);
 
 	static std::vector<int> resolutions;
 	if (resolutions.empty()) {
@@ -102,6 +103,9 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	m_chk60fps.SetCheck(s.YoutubeFormat.fps60 ? BST_CHECKED : BST_UNCHECKED);
 	m_chkHdr.SetCheck(s.YoutubeFormat.hdr ? BST_CHECKED : BST_UNCHECKED);
+
+	//m_cbAudioFormat.AddString(L"AAC");
+	//m_cbAudioFormat.AddString(L"Opus");
 
 	static std::vector<CStringW> langNames;
 	if (langNames.empty()) {
@@ -186,7 +190,7 @@ BOOL CPPageYoutube::OnApply()
 	CAppSettings& s = AfxGetAppSettings();
 
 	s.bYoutubePageParser	= !!m_chkPageParser.GetCheck();
-	s.YoutubeFormat.fmt		= m_cbFormat.GetCurSel();
+	s.YoutubeFormat.vfmt		= m_cbVideoFormat.GetCurSel();
 	s.YoutubeFormat.res		= GetCurItemData(m_cbResolution);
 	s.YoutubeFormat.fps60	= !!m_chk60fps.GetCheck();
 	s.YoutubeFormat.hdr		= !!m_chkHdr.GetCheck();
@@ -226,7 +230,7 @@ void CPPageYoutube::OnCheckPageParser()
 {
 	const BOOL bEnable = m_chkPageParser.GetCheck();
 	GetDlgItem(IDC_STATIC2)->EnableWindow(bEnable);
-	m_cbFormat.EnableWindow(bEnable);
+	m_cbVideoFormat.EnableWindow(bEnable);
 	m_cbResolution.EnableWindow(bEnable);
 	m_chk60fps.EnableWindow(bEnable);
 	m_chkHdr.EnableWindow(bEnable);
@@ -234,7 +238,8 @@ void CPPageYoutube::OnCheckPageParser()
 	if (bEnable) {
 		OnCheck60fps();
 	}
-
+	GetDlgItem(IDC_STATIC3)->EnableWindow(FALSE);
+	m_cbAudioFormat.EnableWindow(FALSE);
 	GetDlgItem(IDC_STATIC4)->EnableWindow(bEnable);
 	m_cbAudioLang.EnableWindow(bEnable);
 

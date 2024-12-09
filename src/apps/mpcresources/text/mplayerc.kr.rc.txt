@@ -595,21 +595,22 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"바탕화면 가장자리에 맞추기"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
 5		"유튜브"
 6		"내장된 웹 페이지 파서 사용"
-7		"우선 형식 :"
+7		"Preferred video format:"
 10		"60fps"
 11		"HDR"
-12		"선호하는 오디오 트랙 언어 :"
-14		"재생 목록 열기"
-16		"youtube-dl, yt-dlp"
-17		"실행 파일 :"
-19		"최대 영상 높이 :"
-21		"최대 fps 또는 비트 전송률 선택"
-22		"AceStream 주소 :"
-24		"MatriX(TorrServer) 주소 :"
-27		"사용자 에이전트 :"
+12		"Preferred audio format:"
+14		"선호하는 오디오 트랙 언어 :"
+16		"재생 목록 열기"
+18		"youtube-dl, yt-dlp"
+19		"실행 파일 :"
+21		"최대 영상 높이 :"
+23		"최대 fps 또는 비트 전송률 선택"
+24		"AceStream 주소 :"
+26		"MatriX(TorrServer) 주소 :"
+29		"사용자 에이전트 :"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

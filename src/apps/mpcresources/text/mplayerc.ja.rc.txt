@@ -595,21 +595,22 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"デスクトップの端にスナップさせる"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
 5		"YouTube"
 6		"内蔵のウェブ ページ パーサーを使用する"
-7		"お好みの形式:"
+7		"Preferred video format:"
 10		"60 fps"
 11		"HDR"
-12		"お好みの音声トラック言語:"
-14		"プレイリストを読み込む"
-16		"youtube-dl, yt-dlp"
-17		"実行可能ファイル:"
-19		"動画の最大縦幅:"
-21		"最大 fps またはビットレートを選択する"
-22		"AceStream アドレス:"
-24		"MatriX (TorrServer) アドレス:"
-27		"ユーザー エージェント:"
+12		"Preferred audio format:"
+14		"お好みの音声トラック言語:"
+16		"プレイリストを読み込む"
+18		"youtube-dl, yt-dlp"
+19		"実行可能ファイル:"
+21		"動画の最大縦幅:"
+23		"最大 fps またはビットレートを選択する"
+24		"AceStream アドレス:"
+26		"MatriX (TorrServer) アドレス:"
+29		"ユーザー エージェント:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

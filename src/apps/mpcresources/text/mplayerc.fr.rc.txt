@@ -595,21 +595,22 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Ancrer aux bords du bureau"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
 5		"YouTube"
 6		"Utilisez l'analyseur de pages Web intégré"
-7		"Format préféré :"
+7		"Preferred video format:"
 10		"60 fps"
 11		"HDR"
-12		"Langue préférée de la piste audio:"
-14		"Charger la Playlist"
-16		"youtube-dl, yt-dlp"
-17		"Fichier exécutable :"
-19		"Hauteur max de la vidéo :"
-21		"Selectionner le fps ou bitrate max"
-22		"Adresse AceStream :"
-24		"Adresse MatriX (TorrServer) :"
-27		"Agent utilisateur :"
+12		"Preferred audio format:"
+14		"Langue préférée de la piste audio:"
+16		"Charger la Playlist"
+18		"youtube-dl, yt-dlp"
+19		"Fichier exécutable :"
+21		"Hauteur max de la vidéo :"
+23		"Selectionner le fps ou bitrate max"
+24		"Adresse AceStream :"
+26		"Adresse MatriX (TorrServer) :"
+29		"Agent utilisateur :"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

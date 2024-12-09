@@ -595,21 +595,22 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Fixează la marginile desktop-ului (biroului)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
 5		"YouTube"
 6		"Folosește analizatorul de pagini web încorporat"
-7		"Formatul preferat:"
+7		"Preferred video format:"
 10		"60 fps"
 11		"HDR"
-12		"Limba preferată pentru pistă:"
-14		"Încarcă lista de redare"
-16		"youtube-dl, yt-dlp"
-17		"Fișier executabil:"
-19		"Înălțimea video maximă:"
-21		"Selectează numărul maxim de cadre/secundă (fps) sau rata de biți"
-22		"Adresa AceStream:"
-24		"Adresa MatriX (TorrServer):"
-27		"Agent de utilizator:"
+12		"Preferred audio format:"
+14		"Limba preferată pentru pistă:"
+16		"Încarcă lista de redare"
+18		"youtube-dl, yt-dlp"
+19		"Fișier executabil:"
+21		"Înălțimea video maximă:"
+23		"Selectează numărul maxim de cadre/secundă (fps) sau rata de biți"
+24		"Adresa AceStream:"
+26		"Adresa MatriX (TorrServer):"
+29		"Agent de utilizator:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

@@ -595,21 +595,22 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Przyciągnij do krawędzi pulpitu"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
 5		"YouTube"
 6		"Użyj wbudowanego analizatora strony internetowej"
-7		"Preferowany format:"
+7		"Preferred video format:"
 10		"60 fps"
 11		"HDR"
-12		"Preferred audio track language:"
-14		"Wgraj listę odtwarzania"
-16		"youtube-dl, yt-dlp"
-17		"Executable file:"
-19		"Max video height:"
-21		"Select max fps or bitrate"
-22		"Adres AceStream:"
-24		"Adres MatriX (TorrServer):"
-27		"User agent:"
+12		"Preferred audio format:"
+14		"Preferred audio track language:"
+16		"Wgraj listę odtwarzania"
+18		"youtube-dl, yt-dlp"
+19		"Executable file:"
+21		"Max video height:"
+23		"Select max fps or bitrate"
+24		"Adres AceStream:"
+26		"Adres MatriX (TorrServer):"
+29		"User agent:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

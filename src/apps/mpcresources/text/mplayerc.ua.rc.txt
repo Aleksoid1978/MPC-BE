@@ -595,21 +595,22 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Липнути до меж екрану"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
 5		"YouTube"
 6		"Використовувати вбудований парсер веб-сторінок"
-7		"Віддавати перевагу формату перегляду:"
+7		"Preferred video format:"
 10		"60 кадрів\с"
 11		"HDR"
-12		"Віддавати перевагу мові аудіодоріжки:"
-14		"Завантажити список відтворення"
-16		"youtube-dl, yt-dlp"
-17		"Виконуваний файл:"
-19		"Максимальна висота відео:"
-21		"Обрати макс. кількість кадрів\с або бітрейт"
-22		"Адреса AceStream:"
-24		"Адреса MatriX (TorrServer):"
-27		"User agent:"
+12		"Preferred audio format:"
+14		"Віддавати перевагу мові аудіодоріжки:"
+16		"Завантажити список відтворення"
+18		"youtube-dl, yt-dlp"
+19		"Виконуваний файл:"
+21		"Максимальна висота відео:"
+23		"Обрати макс. кількість кадрів\с або бітрейт"
+24		"Адреса AceStream:"
+26		"Адреса MatriX (TorrServer):"
+29		"User agent:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

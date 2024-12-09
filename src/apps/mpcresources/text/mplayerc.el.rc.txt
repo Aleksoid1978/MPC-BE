@@ -595,21 +595,22 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Προσκόλληση στις άκρες της επιφάνειας εργασίας"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
 5		"YouTube"
 6		"Χρήση ενσωματωμένης μορφής στην ιστοσελίδα"
-7		"Προτιμώμενη μορφή:"
+7		"Preferred video format:"
 10		"60 fps"
 11		"HDR"
-12		"Preferred audio track language:"
-14		"Φόρτωση λίστας αναπαραγωγής"
-16		"youtube-dl, yt-dlp"
-17		"Executable file:"
-19		"Μέγιστο ύψος βίντεο:"
-21		"Επιλογή μέγιστων fps ή bitrate"
-22		"Διεύθυνση AceStream:"
-24		"Διεύθυνση MatriX (TorrServer):"
-27		"User agent:"
+12		"Preferred audio format:"
+14		"Preferred audio track language:"
+16		"Φόρτωση λίστας αναπαραγωγής"
+18		"youtube-dl, yt-dlp"
+19		"Executable file:"
+21		"Μέγιστο ύψος βίντεο:"
+23		"Επιλογή μέγιστων fps ή bitrate"
+24		"Διεύθυνση AceStream:"
+26		"Διεύθυνση MatriX (TorrServer):"
+29		"User agent:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

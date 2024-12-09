@@ -805,7 +805,7 @@ void CAppSettings::ResetSettings()
 	strLastOpenFilterDir.Empty();
 
 	bYoutubePageParser = true;
-	YoutubeFormat.fmt = 0;
+	YoutubeFormat.vfmt = 0;
 	YoutubeFormat.res = 720;
 	YoutubeFormat.fps60 = false;
 	YoutubeFormat.hdr = false;
@@ -1497,7 +1497,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_PAGEPARSER, bYoutubePageParser);
 	str.Empty();
 	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_FORMAT, str);
-	YoutubeFormat.fmt =
+	YoutubeFormat.vfmt =
 		(str == L"WEBM") ? Youtube::y_webm_vp9
 		: (str == L"AV1") ? Youtube::y_mp4_av1
 		: Youtube::y_mp4_avc;
@@ -2002,8 +2002,8 @@ void CAppSettings::SaveSettings()
 	// OnlineServices
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_PAGEPARSER, bYoutubePageParser);
 	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_FORMAT,
-		(YoutubeFormat.fmt == Youtube::y_webm_vp9) ? L"WEBM"
-		: (YoutubeFormat.fmt == Youtube::y_mp4_av1) ? L"AV1"
+		(YoutubeFormat.vfmt == Youtube::y_webm_vp9) ? L"WEBM"
+		: (YoutubeFormat.vfmt == Youtube::y_mp4_av1) ? L"AV1"
 		: L"MP4");
 	profile.WriteInt(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_RESOLUTION, YoutubeFormat.res);
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_60FPS, YoutubeFormat.fps60);

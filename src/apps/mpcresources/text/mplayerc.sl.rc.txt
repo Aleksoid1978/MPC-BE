@@ -595,21 +595,22 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Pripni na robove namizja"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
 5		"YouTube"
 6		"Uporabi vgrajeni razčlenjevalnik spletnih strani"
-7		"Prednostni format:"
+7		"Preferred video format:"
 10		"60 fps"
 11		"HDR"
-12		"Prednostni jezik zvočnega zapisa:"
-14		"Naloži seznam predvajanja"
-16		"youtube-dl, yt-dlp"
-17		"Izvršljiva datoteka:"
-19		"Največja video višina:"
-21		"Izberi največji fps ali bitno hitrost"
-22		"AceStream naslov:"
-24		"MatriX (TorrServer) naslov:"
-27		"User agent:"
+12		"Preferred audio format:"
+14		"Prednostni jezik zvočnega zapisa:"
+16		"Naloži seznam predvajanja"
+18		"youtube-dl, yt-dlp"
+19		"Izvršljiva datoteka:"
+21		"Največja video višina:"
+23		"Izberi največji fps ali bitno hitrost"
+24		"AceStream naslov:"
+26		"MatriX (TorrServer) naslov:"
+29		"User agent:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

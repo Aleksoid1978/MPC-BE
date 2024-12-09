@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2023 see Authors.txt
+ * (C) 2012-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,10 +30,11 @@ class CPPageYoutube : public CPPageBase
 
 private:
 	CButton m_chkPageParser;
-	CComboBox m_cbFormat;
+	CComboBox m_cbVideoFormat;
 	CComboBox m_cbResolution;
 	CButton m_chk60fps;
 	CButton m_chkHdr;
+	CComboBox m_cbAudioFormat;
 	CComboBox m_cbAudioLang;
 	CButton m_chkLoadPlaylist;
 

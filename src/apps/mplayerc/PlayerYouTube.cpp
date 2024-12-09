@@ -513,13 +513,13 @@ namespace Youtube
 			}
 
 			size_t k = 0;
-			if (s.YoutubeFormat.fmt == y_mp4_avc) {
+			if (s.YoutubeFormat.vfmt == y_mp4_avc) {
 				k = (k_mp4 >= 0) ? k_mp4 : (k_webm >= 0) ? k_webm : 0;
 			}
-			else if (s.YoutubeFormat.fmt == y_webm_vp9) {
+			else if (s.YoutubeFormat.vfmt == y_webm_vp9) {
 				k = (k_webm >= 0) ? k_webm : (k_mp4 >= 0) ? k_mp4 : 0;
 			}
-			else if (s.YoutubeFormat.fmt == y_mp4_av1) {
+			else if (s.YoutubeFormat.vfmt == y_mp4_av1) {
 				k = (k_av1 >= 0) ? k_av1 : (k_webm >= 0) ? k_webm : 0;
 			}
 			final_item = &youtubeUrllist[k];
@@ -591,10 +591,10 @@ namespace Youtube
 			}
 
 			size_t k = 0;
-			if (s.YoutubeFormat.fmt == y_mp4_avc || s.YoutubeFormat.fmt == y_mp4_av1) {
+			if (s.YoutubeFormat.vfmt == y_mp4_avc || s.YoutubeFormat.vfmt == y_mp4_av1) {
 				k = (k_aac >= 0) ? k_aac : (k_opus >= 0) ? k_opus : 0;
 			}
-			else if (s.YoutubeFormat.fmt == y_webm_vp9) {
+			else if (s.YoutubeFormat.vfmt == y_webm_vp9) {
 				k = (k_opus >= 0) ? k_opus : (k_aac >= 0) ? k_aac : 0;
 			}
 			final_item = &youtubeAudioUrllist[k];

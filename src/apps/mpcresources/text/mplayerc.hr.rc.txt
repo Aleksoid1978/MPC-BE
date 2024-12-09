@@ -595,21 +595,22 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Prelomiti na rubovima r. površine"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
 5		"YouTube"
 6		"Koristi ugrađeni parser web-stranice"
-7		"Željeni format:"
+7		"Preferred video format:"
 10		"60 fps"
 11		"HDR"
-12		"Preferred audio track language:"
-14		"Učitaj playlistu"
-16		"youtube-dl, yt-dlp"
-17		"Izvršna datoteka:"
-19		"Maksimalna visina videa:"
-21		"Izaberi maksimalan fps ili bitrate"
-22		"AceStream adresa:"
-24		"MatriX (TorrServer) adresa:"
-27		"User agent:"
+12		"Preferred audio format:"
+14		"Preferred audio track language:"
+16		"Učitaj playlistu"
+18		"youtube-dl, yt-dlp"
+19		"Izvršna datoteka:"
+21		"Maksimalna visina videa:"
+23		"Izaberi maksimalan fps ili bitrate"
+24		"AceStream adresa:"
+26		"MatriX (TorrServer) adresa:"
+29		"User agent:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

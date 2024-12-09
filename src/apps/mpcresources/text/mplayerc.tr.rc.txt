@@ -595,21 +595,22 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Masaüstü kenarlarına yapış"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
 5		"YouTube"
 6		"Yerleşik web sayfası ayrıştırıcısını kullan"
-7		"Tercih edilen biçim:"
+7		"Preferred video format:"
 10		"60 fps"
 11		"HDR"
-12		"Tercih edilen ses parçası dili:"
-14		"Oynatma listesi yükle"
-16		"youtube-dl, yt-dlp"
-17		"Çalıştırılabilir dosya:"
-19		"Maks. video yüksekliği:"
-21		"Maksimum fps ya da bit hızı seç"
-22		"AceStream adresi:"
-24		"MatriX (TorrServer) adresi:"
-27		"Kullanıcı aracısı:"
+12		"Preferred audio format:"
+14		"Tercih edilen ses parçası dili:"
+16		"Oynatma listesi yükle"
+18		"youtube-dl, yt-dlp"
+19		"Çalıştırılabilir dosya:"
+21		"Maks. video yüksekliği:"
+23		"Maksimum fps ya da bit hızı seç"
+24		"AceStream adresi:"
+26		"MatriX (TorrServer) adresi:"
+29		"Kullanıcı aracısı:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

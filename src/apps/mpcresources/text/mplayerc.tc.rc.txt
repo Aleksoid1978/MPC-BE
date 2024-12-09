@@ -595,21 +595,22 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"貼齊到桌面邊緣"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
 5		"YouTube"
 6		"使用內部網頁剖析器"
-7		"偏好格式："
+7		"Preferred video format:"
 10		"60 fps"
 11		"HDR"
-12		"偏好音軌語言："
-14		"載入播放清單"
-16		"youtube-dl, yt-dlp"
-17		"執行檔："
-19		"最大影片高度："
-21		"選擇最高影格率或位元率"
-22		"AceStream 位址："
-24		"MatriX (TorrServer) 位址："
-27		"使用者代理字串︰"
+12		"Preferred audio format:"
+14		"偏好音軌語言："
+16		"載入播放清單"
+18		"youtube-dl, yt-dlp"
+19		"執行檔："
+21		"最大影片高度："
+23		"選擇最高影格率或位元率"
+24		"AceStream 位址："
+26		"MatriX (TorrServer) 位址："
+29		"使用者代理字串︰"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

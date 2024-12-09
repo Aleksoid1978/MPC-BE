@@ -595,21 +595,22 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Illesztés az asztal széleihez"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
 5		"YouTube"
 6		"Használja a beépített weboldal elemzőt"
-7		"Előnyben részesített formátum:"
+7		"Preferred video format:"
 10		"60 fps"
 11		"HDR"
-12		"Előnyben részesített hangsáv nyelve:"
-14		"Lejátszási lista betöltése"
-16		"youtube-dl, yt-dlp"
-17		"Futtatható fájl:"
-19		"Maximális videómagasság:"
-21		"Válassza ki a max fps vagy bitrátát"
-22		"AceStream cím:"
-24		"MatriX (TorrServer) cím:"
-27		"Hálózati kliens:"
+12		"Preferred audio format:"
+14		"Előnyben részesített hangsáv nyelve:"
+16		"Lejátszási lista betöltése"
+18		"youtube-dl, yt-dlp"
+19		"Futtatható fájl:"
+21		"Maximális videómagasság:"
+23		"Válassza ki a max fps vagy bitrátát"
+24		"AceStream cím:"
+26		"MatriX (TorrServer) cím:"
+29		"Hálózati kliens:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

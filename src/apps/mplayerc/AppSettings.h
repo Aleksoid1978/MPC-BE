@@ -849,7 +849,7 @@ public:
 	// youtube
 	bool			bYoutubePageParser;
 	struct {
-		int		fmt;
+		int		vfmt;
 		int		res;
 		bool	fps60;
 		bool	hdr;
