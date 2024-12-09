@@ -2040,7 +2040,7 @@ STRING IDS_USING_NEWER_VERSION		"Ви вже використовуєте ост
 STRING IDS_VDF_AR_MODE		"Читати пропорції з відеопотоку"
 STRING IDS_VDF_AUTO		"Автоматично"
 STRING IDS_VDF_COLOR_FMT_CONVERSION		"Перетворення форматів"
-STRING IDS_VDF_COLOR_OUTPUT_FORMATS		"Вихідні формати:"
+STRING IDS_VDF_COLOR_OUTPUT_FORMATS		"Вихідні формати"
 STRING IDS_VDF_COLOR_PRESET		"Пресет:"
 STRING IDS_VDF_COLOR_RGB_LEVELS		"Вихідні рівні RGB:"
 STRING IDS_VDF_COLOR_STANDARD		"Стандарт:"

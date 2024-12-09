@@ -2040,7 +2040,7 @@ STRING IDS_USING_NEWER_VERSION		"U bent al de laatste versie %s aan het gebruike
 STRING IDS_VDF_AR_MODE		"Lees beeldverhouding van stream"
 STRING IDS_VDF_AUTO		"Automatisch"
 STRING IDS_VDF_COLOR_FMT_CONVERSION		"Formaatconversie"
-STRING IDS_VDF_COLOR_OUTPUT_FORMATS		"Uitvoerformaten:"
+STRING IDS_VDF_COLOR_OUTPUT_FORMATS		"Uitvoerformaten"
 STRING IDS_VDF_COLOR_PRESET		"Preset:"
 STRING IDS_VDF_COLOR_RGB_LEVELS		"RGB-uitvoerniveaus:"
 STRING IDS_VDF_COLOR_STANDARD		"Kleurstandaard:"
