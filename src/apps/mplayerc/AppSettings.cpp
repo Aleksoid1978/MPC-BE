@@ -804,12 +804,13 @@ void CAppSettings::ResetSettings()
 
 	strLastOpenFilterDir.Empty();
 
-	bYoutubePageParser = true;
-	YoutubeFormat.vfmt = 0;
-	YoutubeFormat.res = 720;
-	YoutubeFormat.fps60 = false;
-	YoutubeFormat.hdr = false;
-	strYoutubeAudioLang = CPPageYoutube::GetDefaultLanguageCode();
+	bYoutubePageParser   = true;
+	YoutubeFormat.vfmt   = Youtube::y_mp4_avc;
+	YoutubeFormat.res    = 720;
+	YoutubeFormat.fps60  = false;
+	YoutubeFormat.hdr    = false;
+	YoutubeFormat.afmt   = Youtube::y_mp4_aac;
+	strYoutubeAudioLang  = CPPageYoutube::GetDefaultLanguageCode();
 	bYoutubeLoadPlaylist = false;
 
 	bYDLEnable = true;
@@ -1496,10 +1497,10 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	// OnlineServices
 	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_PAGEPARSER, bYoutubePageParser);
 	str.Empty();
-	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_FORMAT, str);
+	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_VIDEOFORMAT, str);
 	YoutubeFormat.vfmt =
-		(str == L"WEBM") ? Youtube::y_webm_vp9
-		: (str == L"AV1") ? Youtube::y_mp4_av1
+		(str == L"WEBM-VP9") ? Youtube::y_webm_vp9
+		: (str == L"MP4-AV1") ? Youtube::y_mp4_av1
 		: Youtube::y_mp4_avc;
 	profile.ReadInt(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_RESOLUTION, YoutubeFormat.res);
 	YoutubeFormat.res = discard(YoutubeFormat.res, 720, s_CommonVideoHeights);
@@ -1509,6 +1510,11 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	} else {
 		YoutubeFormat.hdr = false;
 	}
+	str.Empty();
+	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_AUDIOFORMAT, str);
+	YoutubeFormat.afmt =
+		(str == L"OPUS") ? Youtube::y_webm_opus
+		: Youtube::y_mp4_aac;
 	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_AUDIOLANGUAGE, strYoutubeAudioLang);
 	strYoutubeAudioLang.Trim();
 	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
@@ -2001,13 +2007,16 @@ void CAppSettings::SaveSettings()
 
 	// OnlineServices
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_PAGEPARSER, bYoutubePageParser);
-	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_FORMAT,
+	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_VIDEOFORMAT,
 		(YoutubeFormat.vfmt == Youtube::y_webm_vp9) ? L"WEBM"
 		: (YoutubeFormat.vfmt == Youtube::y_mp4_av1) ? L"AV1"
 		: L"MP4");
 	profile.WriteInt(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_RESOLUTION, YoutubeFormat.res);
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_60FPS, YoutubeFormat.fps60);
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_HDR, YoutubeFormat.hdr);
+	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_AUDIOFORMAT,
+		(YoutubeFormat.afmt == Youtube::y_webm_opus) ? L"OPUS"
+		: L"AAC");
 	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_AUDIOLANGUAGE, strYoutubeAudioLang);
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YDL_ENABLE, bYDLEnable);

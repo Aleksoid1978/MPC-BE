@@ -853,6 +853,7 @@ public:
 		int		res;
 		bool	fps60;
 		bool	hdr;
+		int		afmt;
 	} YoutubeFormat;
 	CStringW		strYoutubeAudioLang;
 	bool			bYoutubeLoadPlaylist;

@@ -37,12 +37,10 @@ namespace Youtube
 
 		// audiofile
 		y_mp4_aac,
-		y_webm_aud,
+		y_webm_opus,
 		y_mp4_ac3,
 		y_mp4_eac3,
 		y_mp4_dtse
-
-		// flv, 3gp are not used.
 	};
 
 	enum ytype {
@@ -128,22 +126,20 @@ namespace Youtube
 
 	static const YoutubeProfile YAudioProfiles[] = {
 		// AAC
-		{258, y_mp4_aac,  y_audio, 384, L"m4a"},
-		{256, y_mp4_aac,  y_audio, 192, L"m4a"},
-		{140, y_mp4_aac,  y_audio, 128, L"m4a"},
-		{139, y_mp4_aac,  y_audio,  48, L"m4a"}, // may be outdated and no longer supported
+		{258, y_mp4_aac,   y_audio, 384, L"m4a"},
+		{256, y_mp4_aac,   y_audio, 192, L"m4a"},
+		{140, y_mp4_aac,   y_audio, 128, L"m4a"},
+		{139, y_mp4_aac,   y_audio,  48, L"m4a"}, // may be outdated and no longer supported
 		// Opus
-		{251, y_webm_aud, y_audio, 160, L"mka"},
-		{250, y_webm_aud, y_audio,  70, L"mka"},
-		{249, y_webm_aud, y_audio,  50, L"mka"},
-		// Vorbis
-		//{249, y_webm_aud, y_audio, 128, L"webm", false, false},
+		{251, y_webm_opus, y_audio, 160, L"mka"},
+		{250, y_webm_opus, y_audio,  70, L"mka"},
+		{249, y_webm_opus, y_audio,  50, L"mka"},
 		// AC3
-		{380, y_mp4_ac3,  y_audio, 384, L"m4a"},
+		{380, y_mp4_ac3,   y_audio, 384, L"m4a"},
 		// E-AC3
-		{328, y_mp4_eac3, y_audio, 384, L"m4a"},
+		{328, y_mp4_eac3,  y_audio, 384, L"m4a"},
 		// DTS-Express
-		{325, y_mp4_dtse, y_audio, 384, L"m4a"},
+		{325, y_mp4_dtse,  y_audio, 384, L"m4a"},
 	};
 
 	struct YoutubeFields {

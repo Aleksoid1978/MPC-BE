@@ -104,8 +104,9 @@ BOOL CPPageYoutube::OnInitDialog()
 	m_chk60fps.SetCheck(s.YoutubeFormat.fps60 ? BST_CHECKED : BST_UNCHECKED);
 	m_chkHdr.SetCheck(s.YoutubeFormat.hdr ? BST_CHECKED : BST_UNCHECKED);
 
-	//m_cbAudioFormat.AddString(L"AAC");
-	//m_cbAudioFormat.AddString(L"Opus");
+	m_cbAudioFormat.AddString(L"AAC");
+	m_cbAudioFormat.AddString(L"Opus");
+	m_cbAudioFormat.SetCurSel(s.YoutubeFormat.afmt - Youtube::y_mp4_aac);
 
 	static std::vector<CStringW> langNames;
 	if (langNames.empty()) {
@@ -190,10 +191,11 @@ BOOL CPPageYoutube::OnApply()
 	CAppSettings& s = AfxGetAppSettings();
 
 	s.bYoutubePageParser	= !!m_chkPageParser.GetCheck();
-	s.YoutubeFormat.vfmt		= m_cbVideoFormat.GetCurSel();
+	s.YoutubeFormat.vfmt	= m_cbVideoFormat.GetCurSel();
 	s.YoutubeFormat.res		= GetCurItemData(m_cbResolution);
 	s.YoutubeFormat.fps60	= !!m_chk60fps.GetCheck();
 	s.YoutubeFormat.hdr		= !!m_chkHdr.GetCheck();
+	s.YoutubeFormat.afmt	= m_cbAudioFormat.GetCurSel() + Youtube::y_mp4_aac;
 	if (m_cbAudioLang.GetCurSel() >= 0) {
 		s.strYoutubeAudioLang = m_langcodes[m_cbAudioLang.GetCurSel()];
 	} else {
@@ -238,8 +240,8 @@ void CPPageYoutube::OnCheckPageParser()
 	if (bEnable) {
 		OnCheck60fps();
 	}
-	GetDlgItem(IDC_STATIC3)->EnableWindow(FALSE);
-	m_cbAudioFormat.EnableWindow(FALSE);
+	GetDlgItem(IDC_STATIC3)->EnableWindow(bEnable);
+	m_cbAudioFormat.EnableWindow(bEnable);
 	GetDlgItem(IDC_STATIC4)->EnableWindow(bEnable);
 	m_cbAudioLang.EnableWindow(bEnable);
 

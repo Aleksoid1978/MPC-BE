@@ -585,16 +585,16 @@ namespace Youtube
 				if (k_aac < 0 && format == y_mp4_aac) {
 					k_aac = i;
 				}
-				else if (k_opus < 0 && format == y_webm_aud) {
+				else if (k_opus < 0 && format == y_webm_opus) {
 					k_opus = i;
 				}
 			}
 
 			size_t k = 0;
-			if (s.YoutubeFormat.vfmt == y_mp4_avc || s.YoutubeFormat.vfmt == y_mp4_av1) {
+			if (s.YoutubeFormat.afmt == y_mp4_aac) {
 				k = (k_aac >= 0) ? k_aac : (k_opus >= 0) ? k_opus : 0;
 			}
-			else if (s.YoutubeFormat.vfmt == y_webm_vp9) {
+			else if (s.YoutubeFormat.afmt == y_webm_opus) {
 				k = (k_opus >= 0) ? k_opus : (k_aac >= 0) ? k_aac : 0;
 			}
 			final_item = &youtubeAudioUrllist[k];
@@ -862,12 +862,12 @@ namespace Youtube
 					item.url = url;
 
 					switch (audioprofile->format) {
-						case y_mp4_aac:  item.title = L"MP4/AAC";         break;
-						case y_webm_aud: item.title = L"WebM/Opus";       break;
-						case y_mp4_ac3:  item.title = L"MP4/AC3";         break;
-						case y_mp4_eac3: item.title = L"MP4/E-AC3";       break;
-						case y_mp4_dtse: item.title = L"MP4/DTS-Express"; break;
-						default:         item.title = L"unknown";         break;
+						case y_mp4_aac:   item.title = L"MP4/AAC";         break;
+						case y_webm_opus: item.title = L"WebM/Opus";       break;
+						case y_mp4_ac3:   item.title = L"MP4/AC3";         break;
+						case y_mp4_eac3:  item.title = L"MP4/E-AC3";       break;
+						case y_mp4_dtse:  item.title = L"MP4/DTS-Express"; break;
+						default:          item.title = L"unknown";         break;
 					}
 					item.title.AppendFormat(L" %dkbit/s", audioprofile->quality);
 
@@ -1442,7 +1442,7 @@ namespace Youtube
 				}
 			}
 			for (const auto& item : youtubeAudioUrllist) {
-				if (item.profile->format == Youtube::y_webm_aud) {
+				if (item.profile->format == Youtube::y_webm_opus) {
 					youtubeUrllist.emplace_back(item);
 					break;
 				}
@@ -1838,12 +1838,13 @@ namespace Youtube
 
 	const YoutubeUrllistItem* GetAudioUrl(const YoutubeProfile* vprofile, const YoutubeUrllist& youtubeAudioUrllist)
 	{
+		const CAppSettings& s = AfxGetAppSettings();
 		const YoutubeUrllistItem* audio_item = nullptr;
 
 		if (youtubeAudioUrllist.size()) {
 			for (const auto& item : youtubeAudioUrllist) {
-				if ((vprofile->format == y_mp4_avc || vprofile->format == y_mp4_av1) && item.profile->format == y_mp4_aac
-						|| (vprofile->format != y_mp4_avc && vprofile->format != y_mp4_av1) && item.profile->format != y_mp4_aac) {
+				if (s.YoutubeFormat.afmt == y_mp4_aac && item.profile->format == y_mp4_aac
+						|| s.YoutubeFormat.afmt == y_webm_opus && item.profile->format == y_webm_opus) {
 					audio_item = &item;
 					if (vprofile->type != y_video || vprofile->quality > 360) {
 						break;
