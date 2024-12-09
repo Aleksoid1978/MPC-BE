@@ -202,7 +202,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 18		"Receptor"
 END
 
-BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 28
 5		"Control al culorilor (pentru EVR, madVR și MPC VR)"
 6		"Luminozitate"
 7		"Contrast"
@@ -210,9 +210,10 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 9		"Saturație"
 18		"Resetează"
 20		"Gestionează culorile"
-21		"Tip de intrare:"
-23		"Lumină ambientală:"
-25		"Intenția de redare:"
+21		"(for EVR-CP, surface 10/16-bit)"
+22		"Tip de intrare:"
+24		"Lumină ambientală:"
+26		"Intenția de redare:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19

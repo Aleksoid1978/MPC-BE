@@ -202,7 +202,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 18		"Рісівер"
 END
 
-BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 28
 5		"Керування кольором (для EVR, madVR і MPC VR)"
 6		"Яскравість"
 7		"Контраст"
@@ -210,9 +210,10 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 9		"Насиченість"
 18		"Скинути"
 20		"Управління кольором"
-21		"Вхідний тип:"
-23		"Розсіяне освітлення:"
-25		"Призначення рендерингу:"
+21		"(for EVR-CP, surface 10/16-bit)"
+22		"Вхідний тип:"
+24		"Розсіяне освітлення:"
+26		"Призначення рендерингу:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19

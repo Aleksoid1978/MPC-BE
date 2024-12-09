@@ -202,7 +202,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 18		"Alıcı"
 END
 
-BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 28
 5		"Renk kontrolleri (GVİ, madVR ve MPC Vİ)"
 6		"Parlaklık"
 7		"Karşıtlık"
@@ -210,9 +210,10 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 9		"Doygunluk"
 18		"Sıfırla"
 20		"Renk Yönetimi"
-21		"Girdi biçimi:"
-23		"Ortam Işığı:"
-25		"Oluşturma Amacı:"
+21		"(for EVR-CP, surface 10/16-bit)"
+22		"Girdi biçimi:"
+24		"Ortam Işığı:"
+26		"Oluşturma Amacı:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19

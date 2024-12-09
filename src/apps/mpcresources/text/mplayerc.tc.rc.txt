@@ -202,7 +202,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 18		"接收器"
 END
 
-BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 28
 5		"色彩控制項（EVR 、 madVR 及 MPC VR）"
 6		"亮度"
 7		"對比"
@@ -210,9 +210,10 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 9		"飽和度"
 18		"重設"
 20		"色彩管理"
-21		"輸入類型："
-23		"環境光："
-25		"色彩對應方式："
+21		"(for EVR-CP, surface 10/16-bit)"
+22		"輸入類型："
+24		"環境光："
+26		"色彩對應方式："
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19

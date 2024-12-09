@@ -202,7 +202,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 18		"Συσκευή λήψης"
 END
 
-BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 28
 5		"Color controls (for EVR, madVR and MPC VR)"
 6		"Φωτεινότητα"
 7		"Αντίθεση"
@@ -210,9 +210,10 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 9		"Κορεσμός"
 18		"Επαναφορά"
 20		"Διαχείριση χρώματος"
-21		"Τύπος εισόδου:"
-23		"Φωτισμός χώρου:"
-25		"Πρόθεση απόδοσης:"
+21		"(for EVR-CP, surface 10/16-bit)"
+22		"Τύπος εισόδου:"
+24		"Φωτισμός χώρου:"
+26		"Πρόθεση απόδοσης:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19

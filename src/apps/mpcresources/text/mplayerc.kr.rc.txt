@@ -202,7 +202,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 18		"수신기"
 END
 
-BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 28
 5		"색 제어(EVR, madVR 및 MPC VR용)"
 6		"명도"
 7		"대비"
@@ -210,9 +210,10 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 9		"채도"
 18		"초기화"
 20		"색 관리"
-21		"입력 형식 :"
-23		"주변광 :"
-25		"렌더링 의도 :"
+21		"(for EVR-CP, surface 10/16-bit)"
+22		"입력 형식 :"
+24		"주변광 :"
+26		"렌더링 의도 :"
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19

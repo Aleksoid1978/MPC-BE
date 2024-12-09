@@ -202,7 +202,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 18		"Vevő"
 END
 
-BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 28
 5		"Színvezérlők (EVR, madVR és MPC VR esetén)"
 6		"Világosság"
 7		"Élesség"
@@ -210,9 +210,10 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 9		"Telítettség"
 18		"Visszaállítás"
 20		"Színkezelés"
-21		"Bemeneti típus:"
-23		"Háttérfény:"
-25		"Renderelési szándék:"
+21		"(for EVR-CP, surface 10/16-bit)"
+22		"Bemeneti típus:"
+24		"Háttérfény:"
+26		"Renderelési szándék:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19

@@ -202,7 +202,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 18		"Prijemnik"
 END
 
-BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 28
 5		"Kontrola boja (za EVR, madVR i MPC VR)"
 6		"Svjetlina"
 7		"Kontrast"
@@ -210,9 +210,10 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 9		"Zasićenost"
 18		"Reset"
 20		"Upravljanje bojama"
-21		"Tip unosa:"
-23		"Okolno svijetlo:"
-25		"Rendering svrha:"
+21		"(for EVR-CP, surface 10/16-bit)"
+22		"Tip unosa:"
+24		"Okolno svijetlo:"
+26		"Rendering svrha:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19

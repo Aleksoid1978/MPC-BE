@@ -202,7 +202,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 18		"Receiver:"
 END
 
-BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 28
 5		"Farbeinstellungen (für EVR, madVR und MPC VR)"
 6		"Helligkeit:"
 7		"Kontrast:"
@@ -210,9 +210,10 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 9		"Sättigung:"
 18		"Zurücksetzen"
 20		"Farbmanagement"
-21		"Eingangstyp:"
-23		"Umgebungslicht:"
-25		"Wiedergabeziel:"
+21		"(for EVR-CP, surface 10/16-bit)"
+22		"Eingangstyp:"
+24		"Umgebungslicht:"
+26		"Wiedergabeziel:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19

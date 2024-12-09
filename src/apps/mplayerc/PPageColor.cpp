@@ -142,13 +142,14 @@ BOOL CPPageColor::OnSetActive()
 	if (rs.iVideoRenderer == VIDRNDT_EVR_CP
 			&& (rs.ExtraSets.iSurfaceFormat == D3DFMT_A2R10G10B10 || rs.ExtraSets.iSurfaceFormat == D3DFMT_A16B16G16R16F)) {
 		m_chkColorManagment.EnableWindow(TRUE);
-		GetDlgItem(IDC_STATIC6)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC5)->EnableWindow(TRUE);
 		UpdateColorManagment();
 	} else {
 		m_chkColorManagment.EnableWindow(FALSE);
 		m_cbCMInputType.EnableWindow(FALSE);
 		m_cbCMAmbientLight.EnableWindow(FALSE);
 		m_cbCMRenderingIntent.EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC5)->EnableWindow(FALSE);
 		GetDlgItem(IDC_STATIC6)->EnableWindow(FALSE);
 		GetDlgItem(IDC_STATIC7)->EnableWindow(FALSE);
 		GetDlgItem(IDC_STATIC8)->EnableWindow(FALSE);
