@@ -1066,7 +1066,7 @@ BEGIN
     PUSHBUTTON      "Visszaállítás",IDC_RESET,241,88,50,14
     GROUPBOX        "",IDC_STATIC5,5,88,177,74
     CONTROL         "Színkezelés",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,88,100,10
-    LTEXT           "(for EVR-CP, surface 10/16-bit)",IDC_STATIC6,10,101,167,8
+    LTEXT           "(EVR-CP-hez, 10/16 bites felület)",IDC_STATIC6,10,101,167,8
     LTEXT           "Bemeneti típus:",IDC_STATIC7,10,116,70,8
     COMBOBOX        IDC_COMBO3,84,113,93,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Háttérfény:",IDC_STATIC8,10,133,70,8
@@ -2554,8 +2554,8 @@ STRINGTABLE
 BEGIN
     IDS_REND_NOT_INSTALLED  "**nincs telepítve**"
     IDS_PPAGE_OUTPUT_SURF_OFFSCREEN "Rendszeres offscreen sima felület"
-    IDS_PPAGE_OUTPUT_SURF_2D "2D surfaces"
-    IDS_PPAGE_OUTPUT_SURF_3D "3D surfaces (ajánlott)"
+    IDS_PPAGE_OUTPUT_SURF_2D "2D felületek"
+    IDS_PPAGE_OUTPUT_SURF_3D "3D felületek (ajánlott)"
     IDS_DOWNLOAD_SUBS       "Feliratok letöltése"
     IDS_CM_INPUT_AUTO       "Automatikus felismerés"
     IDS_CM_AMBIENTLIGHT_BRIGHT "Világos (2.2 Gamma)"
