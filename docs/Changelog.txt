@@ -2,6 +2,16 @@
 
 1.8.2.x dev
 =============================
+MPCVideoDec
+Removed RGB to YUV conversion.
+Added "Convert to RGB" setting.
+
+YouTube
+Improved yt-dlp support.
+Added "Preferred audio format" setting for the built-in YouTube parser.
+
+Player
+Added the ability to receive the displayed video frame on a 10-bit display in RGB48 format when using MPC Video Renderer 0.9.0.2326 or later.
 
 
 1.8.2 - 2024-12-07
@@ -24,7 +34,7 @@ Fixed connection to MPC Audio Renderer when there is no decoder and high audio s
 
 YouTube
 Improved YouTube support in the built-in parser.
-Improved youtube-dl support.
+Improved yt-dlp support.
 
 Player
 Added playback of a history entry when pressing the "Enter" key.
