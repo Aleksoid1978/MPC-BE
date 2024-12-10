@@ -2010,7 +2010,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_VIDEOFORMAT,
 		(YoutubeFormat.vfmt == Youtube::y_webm_vp9) ? L"WEBM"
 		: (YoutubeFormat.vfmt == Youtube::y_mp4_av1) ? L"AV1"
-		: L"MP4");
+		: L"H264");
 	profile.WriteInt(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_RESOLUTION, YoutubeFormat.res);
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_60FPS, YoutubeFormat.fps60);
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_HDR, YoutubeFormat.hdr);
