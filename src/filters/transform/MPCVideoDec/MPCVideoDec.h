@@ -76,6 +76,7 @@ private:
 	int										m_nDXVACheckCompatibility = 1;
 	int										m_nDXVA_SD = 0;
 	bool									m_fPixFmts[PixFmt_count];
+	bool									m_bSwConvertToRGB = false;
 	int										m_nSwRGBLevels = 0;
 	//
 	bool									m_VideoFilters[VDEC_COUNT] = {};
