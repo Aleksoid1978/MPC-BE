@@ -3335,10 +3335,10 @@ BEGIN
     IDS_VDF_SCANTYPE_TOP    "Top-Field First"
     IDS_VDF_SCANTYPE_BOTTOM "Bottom-Field First"
     IDS_VDF_SCANTYPE_PROGRESSIVE "Progresivno"
-    IDS_VDF_COLOR_FMT_CONVERSION "Konverzija formata"
     IDS_VDF_COLOR_OUTPUT_FORMATS "Izhodni formati"
     IDS_VDF_COLOR_PRESET    "Preset:"
     IDS_VDF_COLOR_STANDARD  "Standard:"
+    IDS_VDF_COLOR_CONVERT_TO_RGB "Convert to RGB"
     IDS_VDF_COLOR_RGB_LEVELS "RGB izhodne ravni:"
 END
 

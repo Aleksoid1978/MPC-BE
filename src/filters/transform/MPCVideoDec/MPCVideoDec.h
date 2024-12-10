@@ -296,6 +296,8 @@ public:
 	STDMETHODIMP SetSwRefresh(int nValue);
 	STDMETHODIMP SetSwPixelFormat(MPCPixelFormat pf, bool enable);
 	STDMETHODIMP_(bool) GetSwPixelFormat(MPCPixelFormat pf);
+	STDMETHODIMP SetSwConvertToRGB(bool enable);
+	STDMETHODIMP_(bool) GetSwConvertToRGB();
 	STDMETHODIMP SetSwRGBLevels(int nValue);
 	STDMETHODIMP_(int) GetSwRGBLevels();
 

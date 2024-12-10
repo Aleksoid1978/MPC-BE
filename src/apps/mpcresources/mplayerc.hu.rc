@@ -3337,10 +3337,10 @@ BEGIN
     IDS_VDF_SCANTYPE_TOP    "Felső mező az első"
     IDS_VDF_SCANTYPE_BOTTOM "Alsó mező az első"
     IDS_VDF_SCANTYPE_PROGRESSIVE "Progresszív"
-    IDS_VDF_COLOR_FMT_CONVERSION "Formátum átalakítás"
     IDS_VDF_COLOR_OUTPUT_FORMATS "Kimeneti formátumok"
     IDS_VDF_COLOR_PRESET    "Előre beállított:"
     IDS_VDF_COLOR_STANDARD  "Szabványos:"
+    IDS_VDF_COLOR_CONVERT_TO_RGB "Convert to RGB"
     IDS_VDF_COLOR_RGB_LEVELS "RGB kimeneti szintek:"
 END
 

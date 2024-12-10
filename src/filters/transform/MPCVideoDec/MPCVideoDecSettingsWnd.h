@@ -54,6 +54,8 @@ enum {
 	IDC_PP_SW_Y416,
 	IDC_PP_SW_RGB32,
 	IDC_PP_SW_RGB48,
+	IDC_PP_SWCONVERTTORGB,
+	IDC_PP_SWRGBLEVELS_TXT,
 	IDC_PP_SWRGBLEVELS,
 	IDC_PP_RESET,
 };
@@ -102,6 +104,7 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CStatic     m_txt444;
 	CStatic     m_txtRGB;
 	CButton     m_cbFormat[PixFmt_count];
+	CButton     m_chSwConvertToRGB;
 	CStatic     m_txtSwRGBLevels;
 	CComboBox   m_cbSwRGBLevels;
 
@@ -138,6 +141,7 @@ public:
 	afx_msg void OnCbnChangeHwDec();
 	afx_msg void OnBnClickedYUY2();
 	afx_msg void OnBnClickedRGB32();
+	afx_msg void OnBnClickedConvertToRGB();
 	afx_msg void OnBnClickedReset();
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);

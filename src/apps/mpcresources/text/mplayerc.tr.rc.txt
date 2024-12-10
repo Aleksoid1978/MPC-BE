@@ -2039,7 +2039,7 @@ STRING IDS_UPDATE_ERROR_DATA		"Güncelleştirme sunucusu yanlış veri veriyor.\
 STRING IDS_USING_NEWER_VERSION		"Zaten son sürümü kullanıyorsunuz: %s."
 STRING IDS_VDF_AR_MODE		"EBO bilgisini akıştan oku"
 STRING IDS_VDF_AUTO		"Oto"
-STRING IDS_VDF_COLOR_FMT_CONVERSION		"Biçim dönüşümü"
+STRING IDS_VDF_COLOR_CONVERT_TO_RGB		"Convert to RGB"
 STRING IDS_VDF_COLOR_OUTPUT_FORMATS		"Çıkış biçimleri"
 STRING IDS_VDF_COLOR_PRESET		"Önayar:"
 STRING IDS_VDF_COLOR_RGB_LEVELS		"RGB çıkış düzeyleri:"

@@ -2039,7 +2039,7 @@ STRING IDS_UPDATE_ERROR_DATA		"Сервер оновлень видає неві
 STRING IDS_USING_NEWER_VERSION		"Ви вже використовуєте останню версію v%s"
 STRING IDS_VDF_AR_MODE		"Читати пропорції з відеопотоку"
 STRING IDS_VDF_AUTO		"Автоматично"
-STRING IDS_VDF_COLOR_FMT_CONVERSION		"Перетворення форматів"
+STRING IDS_VDF_COLOR_CONVERT_TO_RGB		"Convert to RGB"
 STRING IDS_VDF_COLOR_OUTPUT_FORMATS		"Вихідні формати"
 STRING IDS_VDF_COLOR_PRESET		"Пресет:"
 STRING IDS_VDF_COLOR_RGB_LEVELS		"Вихідні рівні RGB:"

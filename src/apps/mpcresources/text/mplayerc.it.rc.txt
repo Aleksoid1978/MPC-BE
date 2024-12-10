@@ -2039,7 +2039,7 @@ STRING IDS_UPDATE_ERROR_DATA		"Il server di aggiornamento fornisce dati errati.\
 STRING IDS_USING_NEWER_VERSION		"Stai già utilizzando l'ultima versione %s"
 STRING IDS_VDF_AR_MODE		"Leggi AR dallo stream"
 STRING IDS_VDF_AUTO		"Auto"
-STRING IDS_VDF_COLOR_FMT_CONVERSION		"Conversione formato"
+STRING IDS_VDF_COLOR_CONVERT_TO_RGB		"Convert to RGB"
 STRING IDS_VDF_COLOR_OUTPUT_FORMATS		"Formati di uscita"
 STRING IDS_VDF_COLOR_PRESET		"Profili:"
 STRING IDS_VDF_COLOR_RGB_LEVELS		"Livelli di uscita RGB:"

@@ -138,10 +138,10 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_VDF_COLOR_FMT_CONVERSION "Format conversion"
     IDS_VDF_COLOR_OUTPUT_FORMATS "Output formats:"
     IDS_VDF_COLOR_PRESET         "Preset:"
     IDS_VDF_COLOR_STANDARD       "Standard:"
+    IDS_VDF_COLOR_CONVERT_TO_RGB "Convert to RGB"
     IDS_VDF_COLOR_RGB_LEVELS     "RGB output levels:"
 END
 

@@ -4761,6 +4761,19 @@ STDMETHODIMP_(bool) CMPCVideoDecFilter::GetSwPixelFormat(MPCPixelFormat pf)
 	return m_fPixFmts[pf];
 }
 
+STDMETHODIMP CMPCVideoDecFilter::SetSwConvertToRGB(bool enable)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	m_bSwConvertToRGB = enable;
+	return S_OK;
+}
+
+STDMETHODIMP_(bool) CMPCVideoDecFilter::GetSwConvertToRGB()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_bSwConvertToRGB;
+}
+
 STDMETHODIMP CMPCVideoDecFilter::SetSwRGBLevels(int nValue)
 {
 	CAutoLock cAutoLock(&m_csProps);

@@ -3337,10 +3337,10 @@ BEGIN
     IDS_VDF_SCANTYPE_TOP    "Primeiro campo superior"
     IDS_VDF_SCANTYPE_BOTTOM "Primeiro campo inferior"
     IDS_VDF_SCANTYPE_PROGRESSIVE "Progressivo"
-    IDS_VDF_COLOR_FMT_CONVERSION "Conversão de formato"
     IDS_VDF_COLOR_OUTPUT_FORMATS "Formatos de saída"
     IDS_VDF_COLOR_PRESET    "Ajustar:"
     IDS_VDF_COLOR_STANDARD  "Padrão:"
+    IDS_VDF_COLOR_CONVERT_TO_RGB "Convert to RGB"
     IDS_VDF_COLOR_RGB_LEVELS "Níveis de saída RGB:"
 END
 

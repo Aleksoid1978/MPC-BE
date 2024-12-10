@@ -2039,7 +2039,7 @@ STRING IDS_UPDATE_ERROR_DATA		"The update server gives the wrong data.\n\nPlease
 STRING IDS_USING_NEWER_VERSION		"Χρησιμοποιείτε ήδη την πιο πρόσφατη έκδοση %s."
 STRING IDS_VDF_AR_MODE		"Ανάγνωση AR από ροή"
 STRING IDS_VDF_AUTO		"Αυτόματο"
-STRING IDS_VDF_COLOR_FMT_CONVERSION		"Μετατροπή μορφής"
+STRING IDS_VDF_COLOR_CONVERT_TO_RGB		"Convert to RGB"
 STRING IDS_VDF_COLOR_OUTPUT_FORMATS		"Μορφές εξόδου"
 STRING IDS_VDF_COLOR_PRESET		"Προεπιλογή:"
 STRING IDS_VDF_COLOR_RGB_LEVELS		"Επίπεδα εξόδου RGB:"

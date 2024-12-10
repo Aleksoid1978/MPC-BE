@@ -3337,10 +3337,10 @@ BEGIN
     IDS_VDF_SCANTYPE_TOP    "İlk Üst Alan"
     IDS_VDF_SCANTYPE_BOTTOM "İlk Alt Alan"
     IDS_VDF_SCANTYPE_PROGRESSIVE "Aşamalı"
-    IDS_VDF_COLOR_FMT_CONVERSION "Biçim dönüşümü"
     IDS_VDF_COLOR_OUTPUT_FORMATS "Çıkış biçimleri"
     IDS_VDF_COLOR_PRESET    "Önayar:"
     IDS_VDF_COLOR_STANDARD  "Standart:"
+    IDS_VDF_COLOR_CONVERT_TO_RGB "Convert to RGB"
     IDS_VDF_COLOR_RGB_LEVELS "RGB çıkış düzeyleri:"
 END
 
