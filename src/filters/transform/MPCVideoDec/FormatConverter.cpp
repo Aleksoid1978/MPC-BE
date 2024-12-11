@@ -411,7 +411,7 @@ void CFormatConverter::UpdateOutput2(DWORD biCompression, LONG biWidth, LONG biH
 
 void CFormatConverter::SetOptions(int rgblevels)
 {
-	m_dstRGBRange = rgblevels == 1 ? 0 : 1;
+	m_dstRGBRange = (rgblevels == 1) ? 0 : 1;
 
 	UpdateSWSContext();
 }

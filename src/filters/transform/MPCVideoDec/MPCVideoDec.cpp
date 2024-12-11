@@ -2614,7 +2614,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 				OutList = YUV420_8;
 			}
 
-			for (int i = 0; i < PixFmt_count; i++) {
+			for (int i = 0; OutList[i] != PixFmt_None; i++) {
 				int index = OutList[i];
 				if (m_fPixFmts[index]) {
 					nSwIndex[nSwCount++] = index;
@@ -2623,7 +2623,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 		}
 	}
 
-	if (av_pfdesc->flags & (AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_PAL)) {
+	if (m_bSwConvertToRGB || av_pfdesc->flags & (AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_PAL)) {
 		if (!m_fPixFmts[PixFmt_RGB32] || nSwCount == 0) {
 			// if RGB32 has not been added yet, then add it to the end of the list
 			nSwIndex[nSwCount++] = PixFmt_RGB32;
