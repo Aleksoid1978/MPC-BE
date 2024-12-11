@@ -5069,9 +5069,11 @@ void CPlayerPlaylistBar::CopyToClipboard()
 		CString str;
 		for (const auto& item : items) {
 			CPlaylistItem& pli = curPlayList.GetAt(FindPos(item));
-			str = pli.m_fi.GetPath();
-			for (const auto& fi : pli.m_auds) {
-				str += L"\r\n" + fi.GetPath();
+			str = str.IsEmpty() ? pli.m_fi.GetPath() : str + L"\r\n" + pli.m_fi.GetPath();
+			if (items.size() == 1) {
+				for (const auto& fi : pli.m_auds) {
+					str += L"\r\n" + fi.GetPath();
+				}
 			}
 		}
 
