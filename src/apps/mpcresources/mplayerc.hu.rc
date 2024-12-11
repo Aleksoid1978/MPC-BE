@@ -916,12 +916,12 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "YouTube",IDC_STATIC,6,5,285,112
     CONTROL         "Használja a beépített weboldal elemzőt",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,16,120,10
-    LTEXT           "Preferred video format:",IDC_STATIC2,10,29,120,8
+    LTEXT           "Előnyben részesített videó formátum:",IDC_STATIC2,10,29,120,8
     COMBOBOX        IDC_COMBO1,10,39,52,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO2,66,39,50,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "60 fps",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,120,41,48,10
     CONTROL         "HDR",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,172,41,30,10
-    LTEXT           "Preferred audio format:",IDC_STATIC3,10,54,120,8
+    LTEXT           "Előnyben részesített hangformátum:",IDC_STATIC3,10,54,120,8
     COMBOBOX        IDC_COMBO3,10,64,52,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Előnyben részesített hangsáv nyelve:",IDC_STATIC4,10,78,140,8
     COMBOBOX        IDC_COMBO4,10,89,130,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -3312,7 +3312,7 @@ STRINGTABLE
 BEGIN
     IDS_VDF_SETTINGS        "Videó beállítások"
     IDS_VDF_AUTO            "Auto"
-    IDS_VDF_THREADNUMBER    "Szál számának dekódolása"
+    IDS_VDF_THREADNUMBER    "Dekódoló szálak száma"
     IDS_VDF_SKIPBFRAMES     "B-Képkockák átugrása"
 END
 
@@ -3340,7 +3340,7 @@ BEGIN
     IDS_VDF_COLOR_OUTPUT_FORMATS "Kimeneti formátumok"
     IDS_VDF_COLOR_PRESET    "Előre beállított:"
     IDS_VDF_COLOR_STANDARD  "Szabványos:"
-    IDS_VDF_COLOR_CONVERT_TO_RGB "Convert to RGB"
+    IDS_VDF_COLOR_CONVERT_TO_RGB "Átalakítás RGB-re"
     IDS_VDF_COLOR_RGB_LEVELS "RGB kimeneti szintek:"
 END
 
@@ -3352,9 +3352,9 @@ BEGIN
     IDS_VDF_STATUS_OUTPUT   "Kimeneti formátum:"
     IDS_VDF_STATUS_ADAPTER  "Grafikus adapter:"
     IDS_VDF_TT_AR           "Ellenőrizve - az AR felhasználásra kerül a stream-ről.\nUnchecked - felhasználásra kerül az AR a konténerből.\nHatározatlan - a stream-ről származó AR nem kerül felhasználásra a fájloknál az AR konténerjével (ajánlott)."
-    IDS_VDF_TT_PRESET       "Megváltoztatja a sebesség és a minőség kapcsolatát."
-    IDS_VDF_TT_STANDARD     "Ezt a beállítást csak akkor használjuk, ha a szűrő működik YCbCr<->RGB átalakítása."
-    IDS_VDF_TT_RGB_LEVELS   "Ezt a beállítást csak akkor használjuk, ha a szűrő működik YCbCr-ről RGB-re átalakítása."
+    IDS_VDF_TT_PRESET       "Megváltoztatja a sebesség és a minőség közötti kapcsolatot."
+    IDS_VDF_TT_STANDARD     "Ez a beállítás csak akkor használatos, ha a szűrő YCbCr<->RGB konverziót végez."
+    IDS_VDF_TT_RGB_LEVELS   "Ez a beállítás csak akkor használatos, ha a szűrő YCbCr-t RGB-be konvertál."
 END
 
 STRINGTABLE
