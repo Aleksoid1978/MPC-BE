@@ -916,12 +916,12 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "YouTube",IDC_STATIC,6,5,285,112
     CONTROL         "Usa l'analizzatore di pagine web integrato",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,16,120,10
-    LTEXT           "Preferred video format:",IDC_STATIC2,10,29,120,8
+    LTEXT           "Formato video preferito:",IDC_STATIC2,10,29,120,8
     COMBOBOX        IDC_COMBO1,10,39,52,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO2,66,39,50,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "60 fps",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,120,41,48,10
     CONTROL         "HDR",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,172,41,30,10
-    LTEXT           "Preferred audio format:",IDC_STATIC3,10,54,120,8
+    LTEXT           "Formato audio preferito:",IDC_STATIC3,10,54,120,8
     COMBOBOX        IDC_COMBO3,10,64,52,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Lingua preferita per la traccia audio:",IDC_STATIC4,10,78,140,8
     COMBOBOX        IDC_COMBO4,10,89,130,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -1066,7 +1066,7 @@ BEGIN
     PUSHBUTTON      "Reimposta",IDC_RESET,241,88,50,14
     GROUPBOX        "",IDC_STATIC5,5,88,177,74
     CONTROL         "Gestione colore",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,88,100,10
-    LTEXT           "(for EVR-CP, surface 10/16-bit)",IDC_STATIC6,10,101,167,8
+    LTEXT           "(per EVR-CP, superficie 10/16-bit)",IDC_STATIC6,10,101,167,8
     LTEXT           "Tipo di ingresso:",IDC_STATIC7,10,116,70,8
     COMBOBOX        IDC_COMBO3,84,113,93,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Luce ambiente:",IDC_STATIC8,10,133,70,8
@@ -3340,7 +3340,7 @@ BEGIN
     IDS_VDF_COLOR_OUTPUT_FORMATS "Formati di uscita"
     IDS_VDF_COLOR_PRESET    "Profili:"
     IDS_VDF_COLOR_STANDARD  "Standard:"
-    IDS_VDF_COLOR_CONVERT_TO_RGB "Convert to RGB"
+    IDS_VDF_COLOR_CONVERT_TO_RGB "Converti in RGB"
     IDS_VDF_COLOR_RGB_LEVELS "Livelli di uscita RGB:"
 END
 
