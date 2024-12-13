@@ -19,6 +19,7 @@ Updated Chinese (Simplified) translation (by wushantao).
 Updated Turkish translation (by cmhrky).
 Updated Italian translation (by mapi68).
 Updated Spanish translation (by IPeluchito).
+Updated Romanian translation (by Andrei Miloiu).
 
 
 1.8.2 - 2024-12-07

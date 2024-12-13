@@ -3339,8 +3339,8 @@ BEGIN
     IDS_VDF_COLOR_OUTPUT_FORMATS "Formate de ieșire"
     IDS_VDF_COLOR_PRESET    "Presetare:"
     IDS_VDF_COLOR_STANDARD  "Standard:"
-    IDS_VDF_COLOR_CONVERT_TO_RGB "Convert to RGB"
-    IDS_VDF_COLOR_RGB_LEVELS "Nivele de ieșire RGB:"
+    IDS_VDF_COLOR_CONVERT_TO_RGB "Convertește în RGB"
+    IDS_VDF_COLOR_RGB_LEVELS "Niveluri de ieșire RGB:"
 END
 
 STRINGTABLE
