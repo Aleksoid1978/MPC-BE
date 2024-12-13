@@ -74,7 +74,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	afx_msg void OnDSRendererChange();
+	afx_msg void OnVideoRendererChange();
 	afx_msg void OnResetDevice();
 	afx_msg void OnFullscreenCheck();
 	afx_msg void OnD3D9DeviceCheck();

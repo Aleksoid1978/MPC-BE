@@ -87,7 +87,7 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CPPageVideo, CPPageBase)
-	ON_CBN_SELCHANGE(IDC_VIDRND_COMBO, OnDSRendererChange)
+	ON_CBN_SELCHANGE(IDC_VIDRND_COMBO, OnVideoRendererChange)
 	ON_BN_CLICKED(IDC_D3D9DEVICE_CHECK, OnD3D9DeviceCheck)
 	ON_BN_CLICKED(IDC_RESETDEVICE, OnResetDevice)
 	ON_BN_CLICKED(IDC_EXCLUSIVE_FULLSCREEN_CHECK, OnFullscreenCheck)
@@ -215,7 +215,7 @@ BOOL CPPageVideo::OnInitDialog()
 	CreateToolTip();
 	m_wndToolTip.AddTool(GetDlgItem(IDC_VIDRND_COMBO), L"");
 
-	OnDSRendererChange();
+	OnVideoRendererChange();
 
 	AddStringData(m_cbDX9PresentMode, L"Copy", 0);
 	AddStringData(m_cbDX9PresentMode, L"Flip/FlipEx", 1);
@@ -285,16 +285,16 @@ BOOL CPPageVideo::OnApply()
 	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& rs = s.m_VRSettings;
 
-	rs.iVideoRenderer		= m_iVideoRendererType = m_iVideoRendererType_store = GetCurItemData(m_cbVideoRenderer);
-	rs.ExtraSets.iResizer				= GetCurItemData(m_cbDX9Resizer);
-	rs.ExtraSets.iDownscaler			= GetCurItemData(m_cbDownscaler);
-	rs.bExclusiveFullscreen = !!m_chkD3DFullscreen.GetCheck();
-	rs.ExtraSets.bResetDevice			= !!m_bResetDevice;
+	rs.iVideoRenderer = m_iVideoRendererType = m_iVideoRendererType_store = GetCurItemData(m_cbVideoRenderer);
+	rs.ExtraSets.iResizer        = GetCurItemData(m_cbDX9Resizer);
+	rs.ExtraSets.iDownscaler     = GetCurItemData(m_cbDownscaler);
+	rs.bExclusiveFullscreen      = !!m_chkD3DFullscreen.GetCheck();
+	rs.ExtraSets.bResetDevice    = !!m_bResetDevice;
 
-	rs.ExtraSets.iPresentMode		= (int)GetCurItemData(m_cbDX9PresentMode);
-	rs.ExtraSets.iSurfaceFormat	= (D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat);
-	rs.ExtraSets.b10BitOutput		= !!m_chk10bitOutput.GetCheck();
-	rs.ExtraSets.iEVROutputRange	= m_cbEVROutputRange.GetCurSel();
+	rs.ExtraSets.iPresentMode    = (int)GetCurItemData(m_cbDX9PresentMode);
+	rs.ExtraSets.iSurfaceFormat  = (D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat);
+	rs.ExtraSets.b10BitOutput    = !!m_chk10bitOutput.GetCheck();
+	rs.ExtraSets.iEVROutputRange = m_cbEVROutputRange.GetCurSel();
 
 	rs.ExtraSets.nEVRBuffers = m_iEvrBuffers;
 
@@ -375,7 +375,7 @@ void CPPageVideo::UpdateDownscalerList(int select)
 	m_cbDownscaler.SetRedraw(TRUE);
 }
 
-void CPPageVideo::OnDSRendererChange()
+void CPPageVideo::OnVideoRendererChange()
 {
 	int CurrentVR = (int)GetCurItemData(m_cbVideoRenderer);
 
@@ -534,6 +534,9 @@ void CPPageVideo::OnBnClickedDefault()
 
 	UpdateData(FALSE);
 
+	HRESULT hr = CheckFilterCLSID(CLSID_MPCVR);
+	SelectByItemData(m_cbVideoRenderer, (S_OK == hr) ? VIDRNDT_MPCVR : VIDRNDT_EVR_CP);
+
 	m_cbEVROutputRange.SetCurSel(0);
 
 	m_chkD3DFullscreen.SetCheck(BST_UNCHECKED);
@@ -546,6 +549,7 @@ void CPPageVideo::OnBnClickedDefault()
 
 	OnFullscreenCheck();
 	OnSurfaceFormatChange();
+	OnVideoRendererChange();
 
 	m_chkMPCVRFullscreenControl.SetCheck(BST_UNCHECKED);
 

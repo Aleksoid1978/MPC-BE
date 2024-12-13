@@ -1,5 +1,5 @@
 /*
- * (C) 2022-2023 see Authors.txt
+ * (C) 2022-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,6 +19,7 @@
  */
 
 #include "stdafx.h"
+#include <clsids.h>
 #include "VideoSettings.h"
 
 #define IDS_R_VIDEO					L"Video"
@@ -70,7 +71,12 @@
 
 void CRenderersSettings::SetDefault()
 {
-	iVideoRenderer = VIDRNDT_EVR_CP;
+	HRESULT hr = CheckFilterCLSID(CLSID_MPCVR);
+	if (S_OK == hr) {
+		iVideoRenderer = VIDRNDT_MPCVR;
+	} else {
+		iVideoRenderer = VIDRNDT_EVR_CP;
+	};
 
 	bExclusiveFullscreen = false;
 
