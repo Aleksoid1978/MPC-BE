@@ -21,55 +21,68 @@
 %include "libavutil/x86/x86util.asm"
 
 SECTION_RODATA
-
-chr_to_mult:        times 4 dw 4663, 0
-chr_to_offset:      times 4 dd -9289992
-%define chr_to_shift 12
-
-chr_from_mult:      times 4 dw 1799, 0
-chr_from_offset:    times 4 dd 4081085
-%define chr_from_shift 11
-
-lum_to_mult:        times 4 dw 19077, 0
-lum_to_offset:      times 4 dd -39057361
-%define lum_to_shift 14
-
-lum_from_mult:      times 4 dw 14071, 0
-lum_from_offset:    times 4 dd 33561947
-%define lum_from_shift 14
+pack19:             times 4 dd (1 << 19) - 1
 
 SECTION .text
-
-; NOTE: there is no need to clamp the input when converting to jpeg range
-;       (like we do in the C code) because packssdw will saturate the output.
 
 ;-----------------------------------------------------------------------------
 ; lumConvertRange
 ;
-; void ff_lumRangeToJpeg_<opt>(int16_t *dst, int width);
-; void ff_lumRangeFromJpeg_<opt>(int16_t *dst, int width);
+; void ff_lumRangeToJpeg{8,16}_<opt>(int16_t *dst, int width,
+;                                    uint32_t coeff, int64_t offset);
+; void ff_lumRangeFromJpeg{8,16}_<opt>(int16_t *dst, int width,
+;                                      uint32_t coeff, int64_t offset);
 ;
 ;-----------------------------------------------------------------------------
 
-%macro LUMCONVERTRANGE 4
-cglobal %1, 2, 2, 5, dst, width
-    shl          widthd, 1
-    VBROADCASTI128   m2, [%2]
-    VBROADCASTI128   m3, [%3]
+%macro LUMCONVERTRANGE 2
+cglobal lumRange%1Jpeg%2, 4, 4, 5, dst, width, coeff, offset
+    shl          widthd, %2 >> 3
+    movd            xm2, coeffd
+    VBROADCASTSS     m2, xm2
+%if ARCH_X86_64
+    movq            xm3, offsetq
+%else
+    movq            xm3, offsetm
+%endif
+%if %2 == 16
+    VBROADCASTSD     m3, xm3
+%ifidni %1,To
+    VBROADCASTI128   m4, [pack19]
+%endif
+%elif %2 == 8
+    VBROADCASTSS     m3, xm3
     pxor             m4, m4
+%endif ; %2 == 8/16
     add            dstq, widthq
     neg          widthq
 .loop:
     movu             m0, [dstq+widthq]
+%if %2 == 16
+    pshufd           m1, m0, 0xb1
+    pmuldq           m0, m2
+    pmuldq           m1, m2
+    paddq            m0, m3
+    paddq            m1, m3
+    psrlq            m0, 18
+    psrlq            m1, 18
+    pshufd           m0, m0, 0xd8
+    pshufd           m1, m1, 0xd8
+    punpckldq        m0, m1
+%ifidni %1,To
+    PMINSD           m0, m4, m1
+%endif
+%elif %2 == 8
     punpckhwd        m1, m0, m4
     punpcklwd        m0, m4
     pmaddwd          m0, m2
     pmaddwd          m1, m2
     paddd            m0, m3
     paddd            m1, m3
-    psrad            m0, %4
-    psrad            m1, %4
+    psrad            m0, 14
+    psrad            m1, 14
     packssdw         m0, m1
+%endif ; %2 == 8/16
     movu  [dstq+widthq], m0
     add          widthq, mmsize
     jl .loop
@@ -79,23 +92,64 @@ cglobal %1, 2, 2, 5, dst, width
 ;-----------------------------------------------------------------------------
 ; chrConvertRange
 ;
-; void ff_chrRangeToJpeg_<opt>(int16_t *dstU, int16_t *dstV, int width);
-; void ff_chrRangeFromJpeg_<opt>(int16_t *dstU, int16_t *dstV, int width);
+; void ff_chrRangeToJpeg{8,16}_<opt>(int16_t *dstU, int16_t *dstV, int width,
+;                                    uint32_t coeff, int64_t offset);
+; void ff_chrRangeFromJpeg{8,16}_<opt>(int16_t *dstU, int16_t *dstV, int width,
+;                                      uint32_t coeff, int64_t offset);
 ;
 ;-----------------------------------------------------------------------------
 
-%macro CHRCONVERTRANGE 4
-cglobal %1, 3, 3, 7, dstU, dstV, width
-    shl          widthd, 1
-    VBROADCASTI128   m4, [%2]
-    VBROADCASTI128   m5, [%3]
+%macro CHRCONVERTRANGE 2
+cglobal chrRange%1Jpeg%2, 5, 5, 7, dstU, dstV, width, coeff, offset
+    shl          widthd, %2 >> 3
+    movd            xm4, coeffd
+    VBROADCASTSS     m4, xm4
+%if ARCH_X86_64
+    movq            xm5, offsetq
+%else
+    movq            xm5, offsetm
+%endif
+%if %2 == 16
+    VBROADCASTSD     m5, xm5
+%ifidni %1,To
+    VBROADCASTI128   m6, [pack19]
+%endif
+%elif %2 == 8
+    VBROADCASTSS     m5, xm5
     pxor             m6, m6
+%endif ; %2 == 8/16
     add           dstUq, widthq
     add           dstVq, widthq
     neg          widthq
 .loop:
     movu             m0, [dstUq+widthq]
     movu             m2, [dstVq+widthq]
+%if %2 == 16
+    pshufd           m1, m0, 0xb1
+    pshufd           m3, m2, 0xb1
+    pmuldq           m0, m4
+    pmuldq           m1, m4
+    pmuldq           m2, m4
+    pmuldq           m3, m4
+    paddq            m0, m5
+    paddq            m1, m5
+    paddq            m2, m5
+    paddq            m3, m5
+    psrlq            m0, 18
+    psrlq            m1, 18
+    psrlq            m2, 18
+    psrlq            m3, 18
+    pshufd           m0, m0, 0xd8
+    pshufd           m1, m1, 0xd8
+    pshufd           m2, m2, 0xd8
+    pshufd           m3, m3, 0xd8
+    punpckldq        m0, m1
+    punpckldq        m2, m3
+%ifidni %1,To
+    PMINSD           m0, m6, m1
+    PMINSD           m2, m6, m3
+%endif
+%elif %2 == 8
     punpckhwd        m1, m0, m6
     punpckhwd        m3, m2, m6
     punpcklwd        m0, m6
@@ -108,12 +162,13 @@ cglobal %1, 3, 3, 7, dstU, dstV, width
     paddd            m1, m5
     paddd            m2, m5
     paddd            m3, m5
-    psrad            m0, %4
-    psrad            m1, %4
-    psrad            m2, %4
-    psrad            m3, %4
+    psrad            m0, 14
+    psrad            m1, 14
+    psrad            m2, 14
+    psrad            m3, 14
     packssdw         m0, m1
     packssdw         m2, m3
+%endif ; %2 == 8/16
     movu [dstUq+widthq], m0
     movu [dstVq+widthq], m2
     add          widthq, mmsize
@@ -122,15 +177,25 @@ cglobal %1, 3, 3, 7, dstU, dstV, width
 %endmacro
 
 INIT_XMM sse2
-LUMCONVERTRANGE lumRangeToJpeg,   lum_to_mult,   lum_to_offset,   lum_to_shift
-CHRCONVERTRANGE chrRangeToJpeg,   chr_to_mult,   chr_to_offset,   chr_to_shift
-LUMCONVERTRANGE lumRangeFromJpeg, lum_from_mult, lum_from_offset, lum_from_shift
-CHRCONVERTRANGE chrRangeFromJpeg, chr_from_mult, chr_from_offset, chr_from_shift
+LUMCONVERTRANGE To,    8
+CHRCONVERTRANGE To,    8
+LUMCONVERTRANGE From,  8
+CHRCONVERTRANGE From,  8
+
+INIT_XMM sse4
+LUMCONVERTRANGE To,   16
+CHRCONVERTRANGE To,   16
+LUMCONVERTRANGE From, 16
+CHRCONVERTRANGE From, 16
 
 %if HAVE_AVX2_EXTERNAL
 INIT_YMM avx2
-LUMCONVERTRANGE lumRangeToJpeg,   lum_to_mult,   lum_to_offset,   lum_to_shift
-CHRCONVERTRANGE chrRangeToJpeg,   chr_to_mult,   chr_to_offset,   chr_to_shift
-LUMCONVERTRANGE lumRangeFromJpeg, lum_from_mult, lum_from_offset, lum_from_shift
-CHRCONVERTRANGE chrRangeFromJpeg, chr_from_mult, chr_from_offset, chr_from_shift
+LUMCONVERTRANGE To,    8
+LUMCONVERTRANGE To,   16
+CHRCONVERTRANGE To,    8
+CHRCONVERTRANGE To,   16
+LUMCONVERTRANGE From,  8
+LUMCONVERTRANGE From, 16
+CHRCONVERTRANGE From,  8
+CHRCONVERTRANGE From, 16
 %endif

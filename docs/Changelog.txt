@@ -21,6 +21,9 @@ Updated Italian translation (by mapi68).
 Updated Spanish translation (by IPeluchito).
 Updated Romanian translation (by Andrei Miloiu).
 
+Updated libraries:
+	ffmpeg n7.2-dev-897-g90af8e07b0.
+
 
 1.8.2 - 2024-12-07
 =============================

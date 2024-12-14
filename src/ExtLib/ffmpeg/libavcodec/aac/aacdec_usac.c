@@ -265,6 +265,7 @@ static int decode_usac_extension(AACDecContext *ac, AACUsacElemConfig *e,
         /* No configuration needed - fallthrough (len should be 0) */
     default:
         skip_bits(gb, 8*ext_config_len);
+        e->ext.type = ID_EXT_ELE_FILL;
         break;
     };
 
@@ -917,8 +918,10 @@ static int decode_usac_stereo_info(AACDecContext *ac, AACUSACConfig *usac,
         }
 
         ret = setup_sce(ac, sce1, usac);
-        if (ret < 0)
+        if (ret < 0) {
+            ics2->max_sfb = 0;
             return ret;
+        }
 
         ret = setup_sce(ac, sce2, usac);
         if (ret < 0)

@@ -742,7 +742,7 @@ static int lmcs_derive_lut(VVCLMCS *lmcs, const H266RawAPS *rlmcs, const H266Raw
         return AVERROR_INVALIDDATA;
 
     lmcs->min_bin_idx = rlmcs->lmcs_min_bin_idx;
-    lmcs->max_bin_idx = LMCS_MAX_BIN_SIZE - 1 - rlmcs->lmcs_min_bin_idx;
+    lmcs->max_bin_idx = LMCS_MAX_BIN_SIZE - 1 - rlmcs->lmcs_delta_max_bin_idx;
 
     memset(cw, 0, sizeof(cw));
     for (int i = lmcs->min_bin_idx; i <= lmcs->max_bin_idx; i++)
@@ -1113,17 +1113,17 @@ static void scaling_derive(VVCScalingList *sl, const H266RawAPS *aps)
         //dc
         if (id >= SL_START_16x16) {
             if (!aps->scaling_list_copy_mode_flag[id] && !aps->scaling_list_pred_mode_flag[id]) {
-                sl->scaling_matrix_dc_rec[id - SL_START_16x16] = 8;
+                dc += 8;
             } else if (!aps->scaling_list_pred_id_delta[id]) {
-                sl->scaling_matrix_dc_rec[id - SL_START_16x16] = 16;
+                dc += 16;
             } else {
                 const int ref_id = id - aps->scaling_list_pred_id_delta[id];
                 if (ref_id >= SL_START_16x16)
                     dc += sl->scaling_matrix_dc_rec[ref_id - SL_START_16x16];
                 else
                     dc += sl->scaling_matrix_rec[ref_id][0];
-                sl->scaling_matrix_dc_rec[id - SL_START_16x16] = dc & 255;
             }
+            sl->scaling_matrix_dc_rec[id - SL_START_16x16] = dc & 255;
         }
 
         //ac
