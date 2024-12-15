@@ -695,7 +695,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 
 	if (SysVersion::IsWin11orLater()) {
-		GetSystemTitleColor();
 		SetColorTitle();
 	}
 	else if (s.bUseDarkTheme && s.bDarkMenu && SysVersion::IsWin10v1809orLater()) {
@@ -19217,7 +19216,6 @@ void CMainFrame::OnSessionChange(UINT nSessionState, UINT nId)
 
 void CMainFrame::OnSettingChange(UINT, LPCTSTR)
 {
-	GetSystemTitleColor();
 	SetColorTitle(true);
 }
 
@@ -20882,25 +20880,6 @@ void CMainFrame::OnUpdateRepeatForever(CCmdUI* pCmdUI)
 
 	if (pCmdUI->m_pMenu) {
 		pCmdUI->m_pMenu->CheckMenuItem(ID_REPEAT_FOREVER, MF_BYCOMMAND | (s.fLoopForever ? MF_CHECKED : MF_UNCHECKED));
-	}
-}
-
-void CMainFrame::GetSystemTitleColor()
-{
-	if (SysVersion::IsWin11orLater()) {
-		m_colTitleBkSystem = 0x00FFFFFF;
-
-		CRegKey key;
-		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\DWM", KEY_READ)) {
-			DWORD prevalenceFlag = 0;
-			key.QueryDWORDValue(L"ColorPrevalence", prevalenceFlag);
-			if (prevalenceFlag) {
-				COLORREF dwAccentColor = {};
-				if (ERROR_SUCCESS == key.QueryDWORDValue(L"AccentColor", dwAccentColor)) {
-					m_colTitleBkSystem = dwAccentColor & 0x00FFFFFF;
-				}
-			}
-		}
 	}
 }
 

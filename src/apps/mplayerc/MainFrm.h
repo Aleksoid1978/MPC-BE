@@ -252,8 +252,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	HBRUSH m_hPopupMenuBrush = nullptr;
 
 	COLORREF m_colTitleBk = {};
-	COLORREF m_colTitleBkSystem = 0x00FFFFFF;
-	void GetSystemTitleColor();
+	const COLORREF m_colTitleBkSystem = 0xFFFFFFFF;
 
 	CMenu m_popupMainMenu;
 	CMenu m_popupMenu;
