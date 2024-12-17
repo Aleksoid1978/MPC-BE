@@ -174,7 +174,7 @@ BOOL CPPageInterface::OnInitDialog()
 	m_SmartSeekVR.EnableWindow(m_fSmartSeek);
 	GetDlgItem(IDC_CHECK6)->EnableWindow(m_fSmartSeek);
 
-	if (!SysVersion::IsWin11orLater()) {
+	if (!SysVersion::IsWin10v1809orLater()) {
 		m_chkDarkTitle.EnableWindow(FALSE);
 	}
 
@@ -381,7 +381,7 @@ void CPPageInterface::OnUpdateCheck3(CCmdUI* pCmdUI)
 	GetDlgItem(IDC_STATIC_CLRFACE)->EnableWindow(m_bUseDarkTheme);
 	GetDlgItem(IDC_STATIC_CLROUTLINE)->EnableWindow(m_bUseDarkTheme);
 	m_chkDarkMenu.EnableWindow(m_bUseDarkTheme);
-	if (SysVersion::IsWin11orLater()) {
+	if (SysVersion::IsWin10v1809orLater()) {
 		m_chkDarkTitle.EnableWindow(m_bUseDarkTheme);
 	}
 }

@@ -694,23 +694,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		SetColorMenu();
 	}
 
-	if (SysVersion::IsWin11orLater()) {
-		SetColorTitle();
-	}
-	else if (s.bUseDarkTheme && s.bDarkMenu && SysVersion::IsWin10v1809orLater()) {
-		HMODULE hUser = GetModuleHandleW(L"user32.dll");
-		if (hUser) {
-			pfnSetWindowCompositionAttribute setWindowCompositionAttribute = (pfnSetWindowCompositionAttribute)GetProcAddress(hUser, "SetWindowCompositionAttribute");
-			if (setWindowCompositionAttribute) {
-				ACCENT_POLICY accent = { ACCENT_ENABLE_BLURBEHIND, 0, 0, 0 };
-				WINDOWCOMPOSITIONATTRIBDATA data;
-				data.Attrib = WCA_USEDARKMODECOLORS;
-				data.pvData = &accent;
-				data.cbData = sizeof(accent);
-				setWindowCompositionAttribute(GetSafeHwnd(), &data);
-			}
-		}
-	}
+	SetColorTitle();
 
 	m_popupMenu.LoadMenuW(IDR_POPUP);
 	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
@@ -20554,6 +20538,17 @@ void CMainFrame::SetColorTitle(const bool bSystemOnly/* = false*/)
 			}
 		} else {
 			DwmSetWindowAttribute(m_hWnd, 35 /*DWMWA_CAPTION_COLOR*/, &m_colTitleBkSystem, sizeof(m_colTitleBkSystem));
+		}
+	} else if (SysVersion::IsWin10v1809orLater()) {
+		static HMODULE hUser = GetModuleHandleW(L"user32.dll");
+		if (hUser) {
+			static auto pSetWindowCompositionAttribute = reinterpret_cast<pfnSetWindowCompositionAttribute>(GetProcAddress(hUser, "SetWindowCompositionAttribute"));
+			if (pSetWindowCompositionAttribute) {
+				const auto& s = AfxGetAppSettings();
+				ACCENT_POLICY accent = { (s.bUseDarkTheme && s.bDarkTitle ? ACCENT_ENABLE_BLURBEHIND : ACCENT_DISABLED), 0, 0, 0 };
+				WINDOWCOMPOSITIONATTRIBDATA data = { WCA_USEDARKMODECOLORS, &accent, sizeof(accent) };
+				pSetWindowCompositionAttribute(GetSafeHwnd(), &data);
+			}
 		}
 	}
 }

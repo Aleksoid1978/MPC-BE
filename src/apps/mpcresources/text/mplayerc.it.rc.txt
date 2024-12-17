@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 16		"G:"
 17		"B:"
 21		"Abilita menu scuro"
-22		"Abilita titolo scuro (Windows 11)"
+22		"Abilita titolo scuro (Windows 10 and above)"
 24		"Usa descrizione comando sul tempo:"
 26		"Usa l'anteprima nella ricerca"
 27		"Dimensioni relative alla larghezza dello schermo:"

@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 16		"G:"
 17		"B:"
 21		"Koyu menüyü etkinleştir"
-22		"Koyu başlığı etkinleştir (Windows 11)"
+22		"Koyu başlığı etkinleştir (Windows 10 and above)"
 24		"Süre bilgi ipucunu göster:"
 26		"Arama Çubuğu üzerinde ön izleme resmi göster"
 27		"Ekran genişliğine göre boyut:"

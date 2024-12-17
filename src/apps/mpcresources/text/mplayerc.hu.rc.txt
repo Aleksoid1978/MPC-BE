@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 16		"G:"
 17		"B:"
 21		"Sötét menü engedélyezése"
-22		"Sötét cím engedélyezése (Windows 11)"
+22		"Sötét cím engedélyezése (Windows 10 and above)"
 24		"Használja az időtippet:"
 26		"Használja az előnézetet a keresésben"
 27		"A képernyő szélességéhez viszonyított méret:"

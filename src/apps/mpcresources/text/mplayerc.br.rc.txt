@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 16		"G:"
 17		"B:"
 21		"Ativar menu escuro"
-22		"Enable dark title (Windows 11)"
+22		"Enable dark title (Windows 10 and above)"
 24		"Usar dica de tempo:"
 26		"Usar prévia na busca"
 27		"Tamanho relativo à largura da tela:"

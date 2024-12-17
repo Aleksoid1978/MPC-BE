@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 16		"G:"
 17		"B:"
 21		"Utiliser le menu sombre"
-22		"Utiliser la barre de titre sombre (Windows 11)"
+22		"Utiliser la barre de titre sombre (Windows 10 and above)"
 24		"Utiliser l'info-bulle temporelle :"
 26		"Utiliser l'aperçu dans la recherche"
 27		"Taille par rapport à la largeur de l'écran :"

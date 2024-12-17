@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 16		"G:"
 17		"B:"
 21		"Omogoči temno temo"
-22		"Omogoči temni naslov (Windows 11)"
+22		"Omogoči temni naslov (Windows 10 and above)"
 24		"Uporabi opis orodja za čas:"
 26		"Pri iskanju uporabi predogled"
 27		"Velikost relativna širini zaslona:"

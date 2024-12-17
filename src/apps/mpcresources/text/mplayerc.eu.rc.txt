@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 16		"O:"
 17		"U:"
 21		"Enable dark menu"
-22		"Enable dark title (Windows 11)"
+22		"Enable dark title (Windows 10 and above)"
 24		"Erabili denbora oharra:"
 26		"Erabili aurrekoa bilaketan"
 27		"Neurria ikusleiho zabaleraren arabera:"

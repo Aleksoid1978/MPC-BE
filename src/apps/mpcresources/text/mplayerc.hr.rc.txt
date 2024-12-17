@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 16		"G:"
 17		"B:"
 21		"Omogući taman izbornik"
-22		"Omogući taman naslov (Windows 11)"
+22		"Omogući taman naslov (Windows 10 and above)"
 24		"Koristi vremenski tooltip:"
 26		"Koristi pretpregled prilikom pretrage"
 27		"Veličina relativna širini ekrana:"

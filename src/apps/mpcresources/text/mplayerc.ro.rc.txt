@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 16		"G:"
 17		"B:"
 21		"Activează meniul întunecat"
-22		"Activează titlul întunecat (Windows 11)"
+22		"Activează titlul întunecat (Windows 10 and above)"
 24		"Folosește indiciu de timp:"
 26		"Folosește previzualizarea în căutare"
 27		"Dimensiunea raportată la lățimea ecranului:"

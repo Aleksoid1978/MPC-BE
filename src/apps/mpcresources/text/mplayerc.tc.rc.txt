@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 16		"G:"
 17		"B:"
 21		"啟用暗色選單"
-22		"啟用暗色標題列（Windows 11）"
+22		"啟用暗色標題列 (Windows 10 and above)"
 24		"使用時間工具提示："
 26		"搜尋列顯示預覽縮圖"
 27		"相對於螢幕寬度的縮圖大小："

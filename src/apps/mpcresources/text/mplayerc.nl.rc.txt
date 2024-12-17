@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 16		"G:"
 17		"B:"
 21		"Donker menu inschakelen"
-22		"Activeer donkere titelbalk (Windows 11)"
+22		"Activeer donkere titelbalk (Windows 10 and above)"
 24		"Toon scherminfo voor tijd:"
 26		"Activeer voorvertoning op zoekbalk"
 27		"Grootte op basis v/d schermbreedte:"
