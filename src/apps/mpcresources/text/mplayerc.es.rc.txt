@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 16		"G:"
 17		"B:"
 21		"Habilitar Menú Oscuro"
-22		"Habilitar Título Oscuro (Windows 10 and above)"
+22		"Habilitar Título Oscuro (Windows 10 y superior)"
 24		"Usar herramienta informativa de tiempo:"
 26		"Usar vista previa en la búsqueda"
 27		"Tamaño relativo al ancho de pantalla:"
