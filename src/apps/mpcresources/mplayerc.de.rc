@@ -3324,7 +3324,7 @@ BEGIN
     IDS_VDF_HW_PREFERRED_DECODER "Bevorzugter Decoder"
     IDS_VDF_HW_ADAPTER      "Grafikprozessor"
     IDS_VDF_DXVACOMPATIBILITY "DXVA-Kompatibilitätsprüfung (H.264)"
-    IDS_VDF_DXVA_FULLCHECK  "Alle Tests aktivieren"
+    IDS_VDF_DXVA_FULLCHECK  "Alle Tests"
     IDS_VDF_DXVA_SKIP_LEVELCHECK "Kein Level-Test"
     IDS_VDF_DXVA_SKIP_REFCHECK "Kein Ref.-Fr.-Test"
     IDS_VDF_DXVA_SKIP_ALLCHECK "Kein Test"
