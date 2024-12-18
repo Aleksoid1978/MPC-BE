@@ -12,8 +12,11 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Ogg">
-      <UniqueIdentifier>{bfb59093-df90-4b09-af16-d07a71483385}</UniqueIdentifier>
+    <Filter Include="ogg">
+      <UniqueIdentifier>{311db7c4-01ac-45eb-9670-3c7cc34bc3e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="share">
+      <UniqueIdentifier>{1183cb72-cbc8-4014-80cb-5420492c331b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -57,9 +60,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\private\metadata.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ia32\nasm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\private\ogg_decoder_aspect.h">
@@ -134,17 +134,11 @@
     <ClInclude Include="..\..\include\share\safe_str.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\share\windows_unicode_filenames.h">
-      <Filter>Public Header Files</Filter>
+    <ClInclude Include="ogg\crctable.h">
+      <Filter>ogg</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Ogg\bitwise.c">
-      <Filter>Ogg</Filter>
-    </ClCompile>
-    <ClCompile Include="Ogg\framing.c">
-      <Filter>Ogg</Filter>
-    </ClCompile>
     <ClCompile Include="bitmath.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -176,9 +170,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="lpc.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lpc_intrin_sse.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="lpc_intrin_sse2.c">
@@ -235,14 +226,20 @@
     <ClCompile Include="window.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="windows_unicode_filenames.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Ogg\bitwise.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Ogg\framing.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\bitwise.c">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\framing.c">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\share\win_utf8_io\win_utf8_io.c">
+      <Filter>share</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

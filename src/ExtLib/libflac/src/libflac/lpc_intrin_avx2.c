@@ -1,6 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
  * Copyright (C) 2000-2009  Josh Coalson
- * Copyright (C) 2011-2016  Xiph.Org Foundation
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -77,20 +77,20 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_avx2(const FLAC_
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_madd_epi16(q11, _mm256_loadu_si256((const __m256i*)(data+i-12)));
-						mull = _mm256_madd_epi16(q10, _mm256_loadu_si256((const __m256i*)(data+i-11))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q9,  _mm256_loadu_si256((const __m256i*)(data+i-10))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q8,  _mm256_loadu_si256((const __m256i*)(data+i-9 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q7,  _mm256_loadu_si256((const __m256i*)(data+i-8 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q6,  _mm256_loadu_si256((const __m256i*)(data+i-7 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q5,  _mm256_loadu_si256((const __m256i*)(data+i-6 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q4,  _mm256_loadu_si256((const __m256i*)(data+i-5 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q3,  _mm256_loadu_si256((const __m256i*)(data+i-4 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q2,  _mm256_loadu_si256((const __m256i*)(data+i-3 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_madd_epi16(q11, _mm256_loadu_si256((const __m256i*)(const void*)(data+i-12)));
+						mull = _mm256_madd_epi16(q10, _mm256_loadu_si256((const __m256i*)(const void*)(data+i-11))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q9,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-10))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q8,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-9 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q7,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-8 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q6,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-7 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q5,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-6 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q4,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-5 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q3,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-4 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q2,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-3 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 				else { /* order == 11 */
@@ -109,19 +109,19 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_avx2(const FLAC_
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_madd_epi16(q10, _mm256_loadu_si256((const __m256i*)(data+i-11)));
-						mull = _mm256_madd_epi16(q9,  _mm256_loadu_si256((const __m256i*)(data+i-10))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q8,  _mm256_loadu_si256((const __m256i*)(data+i-9 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q7,  _mm256_loadu_si256((const __m256i*)(data+i-8 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q6,  _mm256_loadu_si256((const __m256i*)(data+i-7 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q5,  _mm256_loadu_si256((const __m256i*)(data+i-6 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q4,  _mm256_loadu_si256((const __m256i*)(data+i-5 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q3,  _mm256_loadu_si256((const __m256i*)(data+i-4 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q2,  _mm256_loadu_si256((const __m256i*)(data+i-3 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_madd_epi16(q10, _mm256_loadu_si256((const __m256i*)(const void*)(data+i-11)));
+						mull = _mm256_madd_epi16(q9,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-10))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q8,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-9 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q7,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-8 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q6,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-7 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q5,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-6 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q4,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-5 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q3,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-4 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q2,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-3 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 			}
@@ -141,18 +141,18 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_avx2(const FLAC_
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_madd_epi16(q9,  _mm256_loadu_si256((const __m256i*)(data+i-10)));
-						mull = _mm256_madd_epi16(q8,  _mm256_loadu_si256((const __m256i*)(data+i-9 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q7,  _mm256_loadu_si256((const __m256i*)(data+i-8 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q6,  _mm256_loadu_si256((const __m256i*)(data+i-7 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q5,  _mm256_loadu_si256((const __m256i*)(data+i-6 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q4,  _mm256_loadu_si256((const __m256i*)(data+i-5 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q3,  _mm256_loadu_si256((const __m256i*)(data+i-4 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q2,  _mm256_loadu_si256((const __m256i*)(data+i-3 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_madd_epi16(q9,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-10)));
+						mull = _mm256_madd_epi16(q8,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-9 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q7,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-8 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q6,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-7 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q5,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-6 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q4,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-5 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q3,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-4 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q2,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-3 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 				else { /* order == 9 */
@@ -169,17 +169,17 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_avx2(const FLAC_
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_madd_epi16(q8,  _mm256_loadu_si256((const __m256i*)(data+i-9 )));
-						mull = _mm256_madd_epi16(q7,  _mm256_loadu_si256((const __m256i*)(data+i-8 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q6,  _mm256_loadu_si256((const __m256i*)(data+i-7 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q5,  _mm256_loadu_si256((const __m256i*)(data+i-6 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q4,  _mm256_loadu_si256((const __m256i*)(data+i-5 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q3,  _mm256_loadu_si256((const __m256i*)(data+i-4 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q2,  _mm256_loadu_si256((const __m256i*)(data+i-3 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_madd_epi16(q8,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-9 )));
+						mull = _mm256_madd_epi16(q7,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-8 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q6,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-7 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q5,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-6 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q4,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-5 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q3,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-4 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q2,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-3 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 			}
@@ -199,16 +199,16 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_avx2(const FLAC_
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_madd_epi16(q7,  _mm256_loadu_si256((const __m256i*)(data+i-8 )));
-						mull = _mm256_madd_epi16(q6,  _mm256_loadu_si256((const __m256i*)(data+i-7 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q5,  _mm256_loadu_si256((const __m256i*)(data+i-6 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q4,  _mm256_loadu_si256((const __m256i*)(data+i-5 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q3,  _mm256_loadu_si256((const __m256i*)(data+i-4 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q2,  _mm256_loadu_si256((const __m256i*)(data+i-3 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_madd_epi16(q7,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-8 )));
+						mull = _mm256_madd_epi16(q6,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-7 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q5,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-6 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q4,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-5 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q3,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-4 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q2,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-3 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 				else { /* order == 7 */
@@ -223,15 +223,15 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_avx2(const FLAC_
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_madd_epi16(q6,  _mm256_loadu_si256((const __m256i*)(data+i-7 )));
-						mull = _mm256_madd_epi16(q5,  _mm256_loadu_si256((const __m256i*)(data+i-6 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q4,  _mm256_loadu_si256((const __m256i*)(data+i-5 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q3,  _mm256_loadu_si256((const __m256i*)(data+i-4 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q2,  _mm256_loadu_si256((const __m256i*)(data+i-3 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_madd_epi16(q6,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-7 )));
+						mull = _mm256_madd_epi16(q5,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-6 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q4,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-5 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q3,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-4 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q2,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-3 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 			}
@@ -247,14 +247,14 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_avx2(const FLAC_
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_madd_epi16(q5,  _mm256_loadu_si256((const __m256i*)(data+i-6 )));
-						mull = _mm256_madd_epi16(q4,  _mm256_loadu_si256((const __m256i*)(data+i-5 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q3,  _mm256_loadu_si256((const __m256i*)(data+i-4 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q2,  _mm256_loadu_si256((const __m256i*)(data+i-3 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_madd_epi16(q5,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-6 )));
+						mull = _mm256_madd_epi16(q4,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-5 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q3,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-4 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q2,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-3 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 				else { /* order == 5 */
@@ -267,13 +267,13 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_avx2(const FLAC_
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_madd_epi16(q4,  _mm256_loadu_si256((const __m256i*)(data+i-5 )));
-						mull = _mm256_madd_epi16(q3,  _mm256_loadu_si256((const __m256i*)(data+i-4 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q2,  _mm256_loadu_si256((const __m256i*)(data+i-3 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_madd_epi16(q4,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-5 )));
+						mull = _mm256_madd_epi16(q3,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-4 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q2,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-3 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 			}
@@ -289,12 +289,12 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_avx2(const FLAC_
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_madd_epi16(q3,  _mm256_loadu_si256((const __m256i*)(data+i-4 )));
-						mull = _mm256_madd_epi16(q2,  _mm256_loadu_si256((const __m256i*)(data+i-3 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_madd_epi16(q3,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-4 )));
+						mull = _mm256_madd_epi16(q2,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-3 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 				else { /* order == 3 */
@@ -305,11 +305,11 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_avx2(const FLAC_
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_madd_epi16(q2,  _mm256_loadu_si256((const __m256i*)(data+i-3 )));
-						mull = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2 ))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_madd_epi16(q2,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-3 )));
+						mull = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2 ))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 			}
@@ -321,10 +321,10 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_avx2(const FLAC_
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2 )));
-						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_madd_epi16(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2 )));
+						mull = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1 ))); summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 				else { /* order == 1 */
@@ -333,9 +333,9 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_avx2(const FLAC_
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ;
-						summ = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1 )));
+						summ = _mm256_madd_epi16(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1 )));
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 			}
@@ -432,20 +432,20 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_avx2(const FLAC__in
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_mullo_epi32(q11, _mm256_loadu_si256((const __m256i*)(data+i-12)));
-						mull = _mm256_mullo_epi32(q10, _mm256_loadu_si256((const __m256i*)(data+i-11))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q9,  _mm256_loadu_si256((const __m256i*)(data+i-10))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q8,  _mm256_loadu_si256((const __m256i*)(data+i-9)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q7,  _mm256_loadu_si256((const __m256i*)(data+i-8)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q6,  _mm256_loadu_si256((const __m256i*)(data+i-7)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q5,  _mm256_loadu_si256((const __m256i*)(data+i-6)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q4,  _mm256_loadu_si256((const __m256i*)(data+i-5)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q3,  _mm256_loadu_si256((const __m256i*)(data+i-4)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q2,  _mm256_loadu_si256((const __m256i*)(data+i-3)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_mullo_epi32(q11, _mm256_loadu_si256((const __m256i*)(const void*)(data+i-12)));
+						mull = _mm256_mullo_epi32(q10, _mm256_loadu_si256((const __m256i*)(const void*)(data+i-11))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q9,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-10))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q8,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-9)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q7,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-8)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q6,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-7)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q5,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-6)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q4,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-5)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q3,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-4)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q2,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-3)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 				else { /* order == 11 */
@@ -464,19 +464,19 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_avx2(const FLAC__in
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_mullo_epi32(q10, _mm256_loadu_si256((const __m256i*)(data+i-11)));
-						mull = _mm256_mullo_epi32(q9,  _mm256_loadu_si256((const __m256i*)(data+i-10))); summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q8,  _mm256_loadu_si256((const __m256i*)(data+i-9)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q7,  _mm256_loadu_si256((const __m256i*)(data+i-8)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q6,  _mm256_loadu_si256((const __m256i*)(data+i-7)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q5,  _mm256_loadu_si256((const __m256i*)(data+i-6)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q4,  _mm256_loadu_si256((const __m256i*)(data+i-5)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q3,  _mm256_loadu_si256((const __m256i*)(data+i-4)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q2,  _mm256_loadu_si256((const __m256i*)(data+i-3)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_mullo_epi32(q10, _mm256_loadu_si256((const __m256i*)(const void*)(data+i-11)));
+						mull = _mm256_mullo_epi32(q9,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-10))); summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q8,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-9)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q7,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-8)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q6,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-7)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q5,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-6)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q4,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-5)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q3,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-4)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q2,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-3)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 			}
@@ -496,18 +496,18 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_avx2(const FLAC__in
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_mullo_epi32(q9,  _mm256_loadu_si256((const __m256i*)(data+i-10)));
-						mull = _mm256_mullo_epi32(q8,  _mm256_loadu_si256((const __m256i*)(data+i-9)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q7,  _mm256_loadu_si256((const __m256i*)(data+i-8)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q6,  _mm256_loadu_si256((const __m256i*)(data+i-7)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q5,  _mm256_loadu_si256((const __m256i*)(data+i-6)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q4,  _mm256_loadu_si256((const __m256i*)(data+i-5)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q3,  _mm256_loadu_si256((const __m256i*)(data+i-4)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q2,  _mm256_loadu_si256((const __m256i*)(data+i-3)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_mullo_epi32(q9,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-10)));
+						mull = _mm256_mullo_epi32(q8,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-9)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q7,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-8)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q6,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-7)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q5,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-6)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q4,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-5)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q3,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-4)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q2,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-3)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 				else { /* order == 9 */
@@ -524,17 +524,17 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_avx2(const FLAC__in
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_mullo_epi32(q8,  _mm256_loadu_si256((const __m256i*)(data+i-9)));
-						mull = _mm256_mullo_epi32(q7,  _mm256_loadu_si256((const __m256i*)(data+i-8)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q6,  _mm256_loadu_si256((const __m256i*)(data+i-7)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q5,  _mm256_loadu_si256((const __m256i*)(data+i-6)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q4,  _mm256_loadu_si256((const __m256i*)(data+i-5)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q3,  _mm256_loadu_si256((const __m256i*)(data+i-4)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q2,  _mm256_loadu_si256((const __m256i*)(data+i-3)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_mullo_epi32(q8,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-9)));
+						mull = _mm256_mullo_epi32(q7,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-8)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q6,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-7)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q5,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-6)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q4,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-5)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q3,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-4)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q2,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-3)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 			}
@@ -554,16 +554,16 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_avx2(const FLAC__in
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_mullo_epi32(q7,  _mm256_loadu_si256((const __m256i*)(data+i-8)));
-						mull = _mm256_mullo_epi32(q6,  _mm256_loadu_si256((const __m256i*)(data+i-7)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q5,  _mm256_loadu_si256((const __m256i*)(data+i-6)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q4,  _mm256_loadu_si256((const __m256i*)(data+i-5)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q3,  _mm256_loadu_si256((const __m256i*)(data+i-4)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q2,  _mm256_loadu_si256((const __m256i*)(data+i-3)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_mullo_epi32(q7,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-8)));
+						mull = _mm256_mullo_epi32(q6,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-7)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q5,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-6)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q4,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-5)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q3,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-4)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q2,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-3)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 				else { /* order == 7 */
@@ -578,15 +578,15 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_avx2(const FLAC__in
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_mullo_epi32(q6,  _mm256_loadu_si256((const __m256i*)(data+i-7)));
-						mull = _mm256_mullo_epi32(q5,  _mm256_loadu_si256((const __m256i*)(data+i-6)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q4,  _mm256_loadu_si256((const __m256i*)(data+i-5)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q3,  _mm256_loadu_si256((const __m256i*)(data+i-4)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q2,  _mm256_loadu_si256((const __m256i*)(data+i-3)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_mullo_epi32(q6,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-7)));
+						mull = _mm256_mullo_epi32(q5,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-6)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q4,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-5)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q3,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-4)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q2,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-3)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 			}
@@ -602,14 +602,14 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_avx2(const FLAC__in
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_mullo_epi32(q5,  _mm256_loadu_si256((const __m256i*)(data+i-6)));
-						mull = _mm256_mullo_epi32(q4,  _mm256_loadu_si256((const __m256i*)(data+i-5)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q3,  _mm256_loadu_si256((const __m256i*)(data+i-4)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q2,  _mm256_loadu_si256((const __m256i*)(data+i-3)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_mullo_epi32(q5,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-6)));
+						mull = _mm256_mullo_epi32(q4,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-5)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q3,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-4)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q2,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-3)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 				else { /* order == 5 */
@@ -622,13 +622,13 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_avx2(const FLAC__in
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_mullo_epi32(q4,  _mm256_loadu_si256((const __m256i*)(data+i-5)));
-						mull = _mm256_mullo_epi32(q3,  _mm256_loadu_si256((const __m256i*)(data+i-4)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q2,  _mm256_loadu_si256((const __m256i*)(data+i-3)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_mullo_epi32(q4,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-5)));
+						mull = _mm256_mullo_epi32(q3,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-4)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q2,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-3)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 			}
@@ -644,12 +644,12 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_avx2(const FLAC__in
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_mullo_epi32(q3,  _mm256_loadu_si256((const __m256i*)(data+i-4)));
-						mull = _mm256_mullo_epi32(q2,  _mm256_loadu_si256((const __m256i*)(data+i-3)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_mullo_epi32(q3,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-4)));
+						mull = _mm256_mullo_epi32(q2,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-3)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 				else { /* order == 3 */
@@ -660,11 +660,11 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_avx2(const FLAC__in
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_mullo_epi32(q2,  _mm256_loadu_si256((const __m256i*)(data+i-3)));
-						mull = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2)));  summ = _mm256_add_epi32(summ, mull);
-						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_mullo_epi32(q2,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-3)));
+						mull = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2)));  summ = _mm256_add_epi32(summ, mull);
+						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 			}
@@ -676,10 +676,10 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_avx2(const FLAC__in
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ, mull;
-						summ = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(data+i-2)));
-						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
+						summ = _mm256_mullo_epi32(q1,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-2)));
+						mull = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1)));  summ = _mm256_add_epi32(summ, mull);
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 				else { /* order == 1 */
@@ -688,9 +688,9 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_avx2(const FLAC__in
 
 					for(i = 0; i < (int)data_len-7; i+=8) {
 						__m256i summ;
-						summ = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(data+i-1)));
+						summ = _mm256_mullo_epi32(q0,  _mm256_loadu_si256((const __m256i*)(const void*)(data+i-1)));
 						summ = _mm256_sra_epi32(summ, cnt);
-						_mm256_storeu_si256((__m256i*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(data+i)), summ));
+						_mm256_storeu_si256((__m256i*)(void*)(residual+i), _mm256_sub_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(data+i)), summ));
 					}
 				}
 			}
@@ -765,7 +765,7 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_wide_intrin_avx2(const FLA
 	int i;
 	FLAC__int64 sum;
 	const __m128i cnt = _mm_cvtsi32_si128(lp_quantization);
-	const __m256i pack = _mm256_loadu_si256((const __m256i *)pack_arr);
+	const __m256i pack = _mm256_loadu_si256((const __m256i *)(const void*)pack_arr);
 
 	FLAC__ASSERT(order > 0);
 	FLAC__ASSERT(order <= 32);
@@ -791,20 +791,20 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_wide_intrin_avx2(const FLA
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m256i summ, mull;
-						summ = _mm256_mul_epi32(q11, _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-12))));
-						mull = _mm256_mul_epi32(q10, _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-11)))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q9,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-10)))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q8,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-9 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q7,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-8 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q6,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-7 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q5,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-6 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q4,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-5 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q3,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-4 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q2,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-3 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-2 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
+						summ = _mm256_mul_epi32(q11, _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-12))));
+						mull = _mm256_mul_epi32(q10, _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-11)))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q9,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-10)))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q8,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-9 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q7,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-8 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q6,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-7 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q5,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-6 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q4,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-5 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q3,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-4 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q2,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-3 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-2 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
 						summ = _mm256_permutevar8x32_epi32(_mm256_srl_epi64(summ, cnt), pack);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), _mm256_castsi256_si128(summ)));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), _mm256_castsi256_si128(summ)));
 					}
 				}
 				else { /* order == 11 */
@@ -823,19 +823,19 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_wide_intrin_avx2(const FLA
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m256i summ, mull;
-						summ = _mm256_mul_epi32(q10, _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-11))));
-						mull = _mm256_mul_epi32(q9,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-10)))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q8,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-9 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q7,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-8 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q6,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-7 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q5,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-6 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q4,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-5 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q3,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-4 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q2,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-3 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-2 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
+						summ = _mm256_mul_epi32(q10, _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-11))));
+						mull = _mm256_mul_epi32(q9,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-10)))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q8,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-9 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q7,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-8 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q6,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-7 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q5,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-6 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q4,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-5 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q3,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-4 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q2,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-3 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-2 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
 						summ = _mm256_permutevar8x32_epi32(_mm256_srl_epi64(summ, cnt), pack);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), _mm256_castsi256_si128(summ)));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), _mm256_castsi256_si128(summ)));
 					}
 				}
 			}
@@ -855,18 +855,18 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_wide_intrin_avx2(const FLA
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m256i summ, mull;
-						summ = _mm256_mul_epi32(q9,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-10))));
-						mull = _mm256_mul_epi32(q8,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-9 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q7,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-8 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q6,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-7 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q5,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-6 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q4,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-5 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q3,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-4 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q2,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-3 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-2 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
+						summ = _mm256_mul_epi32(q9,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-10))));
+						mull = _mm256_mul_epi32(q8,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-9 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q7,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-8 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q6,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-7 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q5,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-6 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q4,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-5 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q3,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-4 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q2,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-3 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-2 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
 						summ = _mm256_permutevar8x32_epi32(_mm256_srl_epi64(summ, cnt), pack);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), _mm256_castsi256_si128(summ)));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), _mm256_castsi256_si128(summ)));
 					}
 				}
 				else { /* order == 9 */
@@ -883,17 +883,17 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_wide_intrin_avx2(const FLA
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m256i summ, mull;
-						summ = _mm256_mul_epi32(q8,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-9 ))));
-						mull = _mm256_mul_epi32(q7,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-8 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q6,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-7 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q5,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-6 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q4,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-5 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q3,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-4 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q2,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-3 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-2 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
+						summ = _mm256_mul_epi32(q8,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-9 ))));
+						mull = _mm256_mul_epi32(q7,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-8 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q6,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-7 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q5,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-6 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q4,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-5 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q3,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-4 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q2,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-3 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-2 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
 						summ = _mm256_permutevar8x32_epi32(_mm256_srl_epi64(summ, cnt), pack);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), _mm256_castsi256_si128(summ)));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), _mm256_castsi256_si128(summ)));
 					}
 				}
 			}
@@ -913,16 +913,16 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_wide_intrin_avx2(const FLA
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m256i summ, mull;
-						summ = _mm256_mul_epi32(q7,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-8 ))));
-						mull = _mm256_mul_epi32(q6,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-7 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q5,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-6 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q4,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-5 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q3,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-4 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q2,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-3 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-2 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
+						summ = _mm256_mul_epi32(q7,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-8 ))));
+						mull = _mm256_mul_epi32(q6,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-7 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q5,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-6 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q4,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-5 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q3,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-4 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q2,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-3 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-2 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
 						summ = _mm256_permutevar8x32_epi32(_mm256_srl_epi64(summ, cnt), pack);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), _mm256_castsi256_si128(summ)));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), _mm256_castsi256_si128(summ)));
 					}
 				}
 				else { /* order == 7 */
@@ -937,15 +937,15 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_wide_intrin_avx2(const FLA
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m256i summ, mull;
-						summ = _mm256_mul_epi32(q6,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-7 ))));
-						mull = _mm256_mul_epi32(q5,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-6 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q4,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-5 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q3,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-4 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q2,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-3 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-2 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
+						summ = _mm256_mul_epi32(q6,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-7 ))));
+						mull = _mm256_mul_epi32(q5,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-6 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q4,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-5 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q3,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-4 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q2,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-3 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-2 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
 						summ = _mm256_permutevar8x32_epi32(_mm256_srl_epi64(summ, cnt), pack);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), _mm256_castsi256_si128(summ)));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), _mm256_castsi256_si128(summ)));
 					}
 				}
 			}
@@ -961,14 +961,14 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_wide_intrin_avx2(const FLA
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m256i summ, mull;
-						summ = _mm256_mul_epi32(q5,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-6 ))));
-						mull = _mm256_mul_epi32(q4,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-5 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q3,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-4 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q2,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-3 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-2 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
+						summ = _mm256_mul_epi32(q5,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-6 ))));
+						mull = _mm256_mul_epi32(q4,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-5 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q3,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-4 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q2,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-3 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-2 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
 						summ = _mm256_permutevar8x32_epi32(_mm256_srl_epi64(summ, cnt), pack);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), _mm256_castsi256_si128(summ)));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), _mm256_castsi256_si128(summ)));
 					}
 				}
 				else { /* order == 5 */
@@ -981,13 +981,13 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_wide_intrin_avx2(const FLA
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m256i summ, mull;
-						summ = _mm256_mul_epi32(q4,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-5 ))));
-						mull = _mm256_mul_epi32(q3,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-4 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q2,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-3 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-2 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
+						summ = _mm256_mul_epi32(q4,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-5 ))));
+						mull = _mm256_mul_epi32(q3,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-4 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q2,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-3 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-2 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
 						summ = _mm256_permutevar8x32_epi32(_mm256_srl_epi64(summ, cnt), pack);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), _mm256_castsi256_si128(summ)));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), _mm256_castsi256_si128(summ)));
 					}
 				}
 			}
@@ -1003,12 +1003,12 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_wide_intrin_avx2(const FLA
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m256i summ, mull;
-						summ = _mm256_mul_epi32(q3,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-4 ))));
-						mull = _mm256_mul_epi32(q2,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-3 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-2 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
+						summ = _mm256_mul_epi32(q3,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-4 ))));
+						mull = _mm256_mul_epi32(q2,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-3 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-2 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
 						summ = _mm256_permutevar8x32_epi32(_mm256_srl_epi64(summ, cnt), pack);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), _mm256_castsi256_si128(summ)));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), _mm256_castsi256_si128(summ)));
 					}
 				}
 				else { /* order == 3 */
@@ -1019,11 +1019,11 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_wide_intrin_avx2(const FLA
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m256i summ, mull;
-						summ = _mm256_mul_epi32(q2,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-3 ))));
-						mull = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-2 )))); summ = _mm256_add_epi64(summ, mull);
-						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
+						summ = _mm256_mul_epi32(q2,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-3 ))));
+						mull = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-2 )))); summ = _mm256_add_epi64(summ, mull);
+						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
 						summ = _mm256_permutevar8x32_epi32(_mm256_srl_epi64(summ, cnt), pack);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), _mm256_castsi256_si128(summ)));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), _mm256_castsi256_si128(summ)));
 					}
 				}
 			}
@@ -1035,10 +1035,10 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_wide_intrin_avx2(const FLA
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m256i summ, mull;
-						summ = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-2 ))));
-						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
+						summ = _mm256_mul_epi32(q1,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-2 ))));
+						mull = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-1 )))); summ = _mm256_add_epi64(summ, mull);
 						summ = _mm256_permutevar8x32_epi32(_mm256_srl_epi64(summ, cnt), pack);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), _mm256_castsi256_si128(summ)));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), _mm256_castsi256_si128(summ)));
 					}
 				}
 				else { /* order == 1 */
@@ -1047,9 +1047,9 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_wide_intrin_avx2(const FLA
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m256i summ;
-						summ = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(data+i-1 ))));
+						summ = _mm256_mul_epi32(q0,  _mm256_cvtepu32_epi64(_mm_loadu_si128((const __m128i*)(const void*)(data+i-1 ))));
 						summ = _mm256_permutevar8x32_epi32(_mm256_srl_epi64(summ, cnt), pack);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), _mm256_castsi256_si128(summ)));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), _mm256_castsi256_si128(summ)));
 					}
 				}
 			}

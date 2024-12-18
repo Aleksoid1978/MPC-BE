@@ -1,5 +1,5 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2013-2016  Xiph.org Foundation
+ * Copyright (C) 2013-2023  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -36,9 +36,18 @@
  * Unpublished debug routines from libFLAC. This should not be used from any
  * client code other than code shipped with the FLAC sources.
  */
+FLAC_API FLAC__bool FLAC__stream_encoder_disable_instruction_set(FLAC__StreamEncoder *encoder, int value);
 FLAC_API FLAC__bool FLAC__stream_encoder_disable_constant_subframes(FLAC__StreamEncoder *encoder, FLAC__bool value);
 FLAC_API FLAC__bool FLAC__stream_encoder_disable_fixed_subframes(FLAC__StreamEncoder *encoder, FLAC__bool value);
 FLAC_API FLAC__bool FLAC__stream_encoder_disable_verbatim_subframes(FLAC__StreamEncoder *encoder, FLAC__bool value);
+/*
+ * The following two routines were intended as debug routines and are not
+ * in the public headers, but SHOULD NOT CHANGE! It is known they are used
+ * in some non-audio projects needing every last bit of performance.
+ * See https://github.com/xiph/flac/issues/547 for details. These projects
+ * provide their own prototypes, so changing the signature of these
+ * functions would break building.
+ */
 FLAC_API FLAC__bool FLAC__stream_encoder_set_do_md5(FLAC__StreamEncoder *encoder, FLAC__bool value);
 FLAC_API FLAC__bool FLAC__stream_encoder_get_do_md5(const FLAC__StreamEncoder *encoder);
 

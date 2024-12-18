@@ -1,6 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
  * Copyright (C) 2001-2009  Josh Coalson
- * Copyright (C) 2011-2016  Xiph.Org Foundation
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -53,13 +53,11 @@
 #define dfprintf(file, format, ...)
 #endif
 
-#if defined FLAC__CPU_PPC
-#if defined(__linux__) || (defined(__FreeBSD__) && (__FreeBSD__ >= 12))
+#if defined(HAVE_SYS_AUXV_H)
 #include <sys/auxv.h>
 #endif
-#endif
 
-#if (defined FLAC__CPU_IA32 || defined FLAC__CPU_X86_64) && (defined FLAC__HAS_NASM || FLAC__HAS_X86INTRIN) && !defined FLAC__NO_ASM
+#if (defined FLAC__CPU_IA32 || defined FLAC__CPU_X86_64) && FLAC__HAS_X86INTRIN && !defined FLAC__NO_ASM
 
 /* these are flags in EDX of CPUID AX=00000001 */
 static const uint32_t FLAC__CPUINFO_X86_CPUID_CMOV    = 0x00008000;
@@ -78,6 +76,7 @@ static const uint32_t FLAC__CPUINFO_X86_CPUID_FMA     = 0x00001000;
 
 /* these are flags in EBX of CPUID AX=00000007 */
 static const uint32_t FLAC__CPUINFO_X86_CPUID_AVX2    = 0x00000020;
+static const uint32_t FLAC__CPUINFO_X86_CPUID_BMI2    = 0x00000100;
 
 static uint32_t
 cpu_xgetbv_x86(void)
@@ -99,8 +98,6 @@ cpu_have_cpuid(void)
 #if defined FLAC__CPU_X86_64 || defined __i686__ || defined __SSE__ || (defined _M_IX86_FP && _M_IX86_FP > 0)
 	/* target CPU does have CPUID instruction */
 	return 1;
-#elif defined FLAC__HAS_NASM
-	return FLAC__cpu_have_cpuid_asm_ia32();
 #elif defined __GNUC__ && defined HAVE_CPUID_H
 	if (__get_cpuid_max(0, 0) != 0)
 		return 1;
@@ -153,9 +150,6 @@ cpuinfo_x86(FLAC__uint32 level, FLAC__uint32 *eax, FLAC__uint32 *ebx, FLAC__uint
 		__cpuid_count(level, 0, *eax, *ebx, *ecx, *edx);
 		return;
 	}
-#elif defined FLAC__HAS_NASM && defined FLAC__CPU_IA32
-	FLAC__cpu_info_asm_ia32(level, eax, ebx, ecx, edx);
-	return;
 #endif
 	*eax = *ebx = *ecx = *edx = 0;
 }
@@ -165,7 +159,7 @@ cpuinfo_x86(FLAC__uint32 level, FLAC__uint32 *eax, FLAC__uint32 *ebx, FLAC__uint
 static void
 x86_cpu_info (FLAC__CPUInfo *info)
 {
-#if (defined FLAC__CPU_IA32 || defined FLAC__CPU_X86_64) && (defined FLAC__HAS_NASM || FLAC__HAS_X86INTRIN) && !defined FLAC__NO_ASM
+#if (defined FLAC__CPU_IA32 || defined FLAC__CPU_X86_64) && FLAC__HAS_X86INTRIN && !defined FLAC__NO_ASM
 	FLAC__bool x86_osxsave = false;
 	FLAC__bool os_avx = false;
 	FLAC__uint32 flags_eax, flags_ebx, flags_ecx, flags_edx;
@@ -193,6 +187,7 @@ x86_cpu_info (FLAC__CPUInfo *info)
 		info->x86.fma   = (flags_ecx & FLAC__CPUINFO_X86_CPUID_FMA    ) ? true : false;
 		cpuinfo_x86(7, &flags_eax, &flags_ebx, &flags_ecx, &flags_edx);
 		info->x86.avx2  = (flags_ebx & FLAC__CPUINFO_X86_CPUID_AVX2   ) ? true : false;
+		info->x86.bmi2  = (flags_ebx & FLAC__CPUINFO_X86_CPUID_BMI2   ) ? true : false;
 	}
 
 #if defined FLAC__CPU_IA32
@@ -213,6 +208,7 @@ x86_cpu_info (FLAC__CPUInfo *info)
 		dfprintf(stderr, "  AVX ........ %c\n", info->x86.avx     ? 'Y' : 'n');
 		dfprintf(stderr, "  FMA ........ %c\n", info->x86.fma     ? 'Y' : 'n');
 		dfprintf(stderr, "  AVX2 ....... %c\n", info->x86.avx2    ? 'Y' : 'n');
+		dfprintf(stderr, "  BMI2 ....... %c\n", info->x86.bmi2    ? 'Y' : 'n');
 	}
 
 	/*
@@ -235,47 +231,6 @@ x86_cpu_info (FLAC__CPUInfo *info)
 #endif
 }
 
-static void
-ppc_cpu_info (FLAC__CPUInfo *info)
-{
-#if defined FLAC__CPU_PPC
-#ifndef PPC_FEATURE2_ARCH_3_00
-#define PPC_FEATURE2_ARCH_3_00		0x00800000
-#endif
-
-#ifndef PPC_FEATURE2_ARCH_2_07
-#define PPC_FEATURE2_ARCH_2_07		0x80000000
-#endif
-
-#ifdef __linux__
-	if (getauxval(AT_HWCAP2) & PPC_FEATURE2_ARCH_3_00) {
-		info->ppc.arch_3_00 = true;
-	} else if (getauxval(AT_HWCAP2) & PPC_FEATURE2_ARCH_2_07) {
-		info->ppc.arch_2_07 = true;
-	}
-#elif defined(__FreeBSD__) && (__FreeBSD__ >= 12)
-	long hwcaps;
-	/* elf_aux_info() appeared in FreeBSD 12.0 */
-	elf_aux_info(AT_HWCAP2, &hwcaps, sizeof(hwcaps));
-	if (hwcaps & PPC_FEATURE2_ARCH_3_00) {
-		info->ppc.arch_3_00 = true;
-	} else if (hwcaps & PPC_FEATURE2_ARCH_2_07) {
-		info->ppc.arch_2_07 = true;
-	}
-#elif defined(__APPLE__)
-	/* no Mac OS X version supports CPU with Power AVI v2.07 or better */
-	info->ppc.arch_2_07 = false;
-	info->ppc.arch_3_00 = false;
-#else
-#error Unsupported platform! Please add support for reading ppc hwcaps.
-#endif
-
-#else
-	info->ppc.arch_2_07 = false;
-	info->ppc.arch_3_00 = false;
-#endif
-}
-
 void FLAC__cpu_info (FLAC__CPUInfo *info)
 {
 	memset(info, 0, sizeof(*info));
@@ -284,8 +239,6 @@ void FLAC__cpu_info (FLAC__CPUInfo *info)
 	info->type = FLAC__CPUINFO_TYPE_IA32;
 #elif defined FLAC__CPU_X86_64
 	info->type = FLAC__CPUINFO_TYPE_X86_64;
-#elif defined FLAC__CPU_PPC
-	info->type = FLAC__CPUINFO_TYPE_PPC;
 #else
 	info->type = FLAC__CPUINFO_TYPE_UNKNOWN;
 #endif
@@ -294,9 +247,6 @@ void FLAC__cpu_info (FLAC__CPUInfo *info)
 	case FLAC__CPUINFO_TYPE_IA32: /* fallthrough */
 	case FLAC__CPUINFO_TYPE_X86_64:
 		x86_cpu_info (info);
-		break;
-	case FLAC__CPUINFO_TYPE_PPC:
-		ppc_cpu_info (info);
 		break;
 	default:
 		info->use_asm = false;

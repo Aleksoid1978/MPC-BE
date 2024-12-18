@@ -1,6 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
  * Copyright (C) 2000-2009  Josh Coalson
- * Copyright (C) 2011-2016  Xiph.Org Foundation
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -50,6 +50,32 @@
 #define RESIDUAL32_RESULT(xmmN) residual[i] = data[i] - (_mm_cvtsi128_si32(xmmN) >> lp_quantization);
 #define     DATA32_RESULT(xmmN) data[i] = residual[i] + (_mm_cvtsi128_si32(xmmN) >> lp_quantization);
 
+
+FLAC__SSE_TARGET("sse2")
+void FLAC__lpc_compute_autocorrelation_intrin_sse2_lag_8(const FLAC__real data[], uint32_t data_len, uint32_t lag, double autoc[])
+{
+#undef MAX_LAG
+#define MAX_LAG 8
+#include "deduplication/lpc_compute_autocorrelation_intrin_sse2.c"
+}
+
+FLAC__SSE_TARGET("sse2")
+void FLAC__lpc_compute_autocorrelation_intrin_sse2_lag_10(const FLAC__real data[], uint32_t data_len, uint32_t lag, double autoc[])
+{
+#undef MAX_LAG
+#define MAX_LAG 10
+#include "deduplication/lpc_compute_autocorrelation_intrin_sse2.c"
+}
+
+
+FLAC__SSE_TARGET("sse2")
+void FLAC__lpc_compute_autocorrelation_intrin_sse2_lag_14(const FLAC__real data[], uint32_t data_len, uint32_t lag, double autoc[])
+{
+#undef MAX_LAG
+#define MAX_LAG 14
+#include "deduplication/lpc_compute_autocorrelation_intrin_sse2.c"
+}
+
 FLAC__SSE_TARGET("sse2")
 void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_sse2(const FLAC__int32 *data, uint32_t data_len, const FLAC__int32 qlp_coeff[], uint32_t order, int lp_quantization, FLAC__int32 residual[])
 {
@@ -80,20 +106,20 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_sse2(const FLAC_
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m128i summ, mull;
-						summ = _mm_madd_epi16(q11, _mm_loadu_si128((const __m128i*)(data+i-12)));
-						mull = _mm_madd_epi16(q10, _mm_loadu_si128((const __m128i*)(data+i-11))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q9, _mm_loadu_si128((const __m128i*)(data+i-10))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q8, _mm_loadu_si128((const __m128i*)(data+i-9))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q7, _mm_loadu_si128((const __m128i*)(data+i-8))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q6, _mm_loadu_si128((const __m128i*)(data+i-7))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q5, _mm_loadu_si128((const __m128i*)(data+i-6))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q4, _mm_loadu_si128((const __m128i*)(data+i-5))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q3, _mm_loadu_si128((const __m128i*)(data+i-4))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q2, _mm_loadu_si128((const __m128i*)(data+i-3))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(data+i-2))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
+						summ = _mm_madd_epi16(q11, _mm_loadu_si128((const __m128i*)(const void*)(data+i-12)));
+						mull = _mm_madd_epi16(q10, _mm_loadu_si128((const __m128i*)(const void*)(data+i-11))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q9, _mm_loadu_si128((const __m128i*)(const void*)(data+i-10))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q8, _mm_loadu_si128((const __m128i*)(const void*)(data+i-9))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q7, _mm_loadu_si128((const __m128i*)(const void*)(data+i-8))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q6, _mm_loadu_si128((const __m128i*)(const void*)(data+i-7))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q5, _mm_loadu_si128((const __m128i*)(const void*)(data+i-6))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q4, _mm_loadu_si128((const __m128i*)(const void*)(data+i-5))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q3, _mm_loadu_si128((const __m128i*)(const void*)(data+i-4))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q2, _mm_loadu_si128((const __m128i*)(const void*)(data+i-3))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(const void*)(data+i-2))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(const void*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
 						summ = _mm_sra_epi32(summ, cnt);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), summ));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), summ));
 					}
 				}
 				else { /* order == 11 */
@@ -112,19 +138,19 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_sse2(const FLAC_
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m128i summ, mull;
-						summ = _mm_madd_epi16(q10, _mm_loadu_si128((const __m128i*)(data+i-11)));
-						mull = _mm_madd_epi16(q9, _mm_loadu_si128((const __m128i*)(data+i-10))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q8, _mm_loadu_si128((const __m128i*)(data+i-9))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q7, _mm_loadu_si128((const __m128i*)(data+i-8))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q6, _mm_loadu_si128((const __m128i*)(data+i-7))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q5, _mm_loadu_si128((const __m128i*)(data+i-6))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q4, _mm_loadu_si128((const __m128i*)(data+i-5))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q3, _mm_loadu_si128((const __m128i*)(data+i-4))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q2, _mm_loadu_si128((const __m128i*)(data+i-3))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(data+i-2))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
+						summ = _mm_madd_epi16(q10, _mm_loadu_si128((const __m128i*)(const void*)(data+i-11)));
+						mull = _mm_madd_epi16(q9, _mm_loadu_si128((const __m128i*)(const void*)(data+i-10))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q8, _mm_loadu_si128((const __m128i*)(const void*)(data+i-9))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q7, _mm_loadu_si128((const __m128i*)(const void*)(data+i-8))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q6, _mm_loadu_si128((const __m128i*)(const void*)(data+i-7))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q5, _mm_loadu_si128((const __m128i*)(const void*)(data+i-6))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q4, _mm_loadu_si128((const __m128i*)(const void*)(data+i-5))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q3, _mm_loadu_si128((const __m128i*)(const void*)(data+i-4))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q2, _mm_loadu_si128((const __m128i*)(const void*)(data+i-3))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(const void*)(data+i-2))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(const void*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
 						summ = _mm_sra_epi32(summ, cnt);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), summ));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), summ));
 					}
 				}
 			}
@@ -144,18 +170,18 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_sse2(const FLAC_
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m128i summ, mull;
-						summ = _mm_madd_epi16(q9, _mm_loadu_si128((const __m128i*)(data+i-10)));
-						mull = _mm_madd_epi16(q8, _mm_loadu_si128((const __m128i*)(data+i-9))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q7, _mm_loadu_si128((const __m128i*)(data+i-8))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q6, _mm_loadu_si128((const __m128i*)(data+i-7))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q5, _mm_loadu_si128((const __m128i*)(data+i-6))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q4, _mm_loadu_si128((const __m128i*)(data+i-5))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q3, _mm_loadu_si128((const __m128i*)(data+i-4))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q2, _mm_loadu_si128((const __m128i*)(data+i-3))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(data+i-2))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
+						summ = _mm_madd_epi16(q9, _mm_loadu_si128((const __m128i*)(const void*)(data+i-10)));
+						mull = _mm_madd_epi16(q8, _mm_loadu_si128((const __m128i*)(const void*)(data+i-9))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q7, _mm_loadu_si128((const __m128i*)(const void*)(data+i-8))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q6, _mm_loadu_si128((const __m128i*)(const void*)(data+i-7))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q5, _mm_loadu_si128((const __m128i*)(const void*)(data+i-6))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q4, _mm_loadu_si128((const __m128i*)(const void*)(data+i-5))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q3, _mm_loadu_si128((const __m128i*)(const void*)(data+i-4))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q2, _mm_loadu_si128((const __m128i*)(const void*)(data+i-3))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(const void*)(data+i-2))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(const void*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
 						summ = _mm_sra_epi32(summ, cnt);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), summ));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), summ));
 					}
 				}
 				else { /* order == 9 */
@@ -172,17 +198,17 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_sse2(const FLAC_
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m128i summ, mull;
-						summ = _mm_madd_epi16(q8, _mm_loadu_si128((const __m128i*)(data+i-9)));
-						mull = _mm_madd_epi16(q7, _mm_loadu_si128((const __m128i*)(data+i-8))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q6, _mm_loadu_si128((const __m128i*)(data+i-7))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q5, _mm_loadu_si128((const __m128i*)(data+i-6))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q4, _mm_loadu_si128((const __m128i*)(data+i-5))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q3, _mm_loadu_si128((const __m128i*)(data+i-4))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q2, _mm_loadu_si128((const __m128i*)(data+i-3))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(data+i-2))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
+						summ = _mm_madd_epi16(q8, _mm_loadu_si128((const __m128i*)(const void*)(data+i-9)));
+						mull = _mm_madd_epi16(q7, _mm_loadu_si128((const __m128i*)(const void*)(data+i-8))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q6, _mm_loadu_si128((const __m128i*)(const void*)(data+i-7))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q5, _mm_loadu_si128((const __m128i*)(const void*)(data+i-6))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q4, _mm_loadu_si128((const __m128i*)(const void*)(data+i-5))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q3, _mm_loadu_si128((const __m128i*)(const void*)(data+i-4))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q2, _mm_loadu_si128((const __m128i*)(const void*)(data+i-3))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(const void*)(data+i-2))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(const void*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
 						summ = _mm_sra_epi32(summ, cnt);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), summ));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), summ));
 					}
 				}
 			}
@@ -202,16 +228,16 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_sse2(const FLAC_
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m128i summ, mull;
-						summ = _mm_madd_epi16(q7, _mm_loadu_si128((const __m128i*)(data+i-8)));
-						mull = _mm_madd_epi16(q6, _mm_loadu_si128((const __m128i*)(data+i-7))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q5, _mm_loadu_si128((const __m128i*)(data+i-6))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q4, _mm_loadu_si128((const __m128i*)(data+i-5))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q3, _mm_loadu_si128((const __m128i*)(data+i-4))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q2, _mm_loadu_si128((const __m128i*)(data+i-3))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(data+i-2))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
+						summ = _mm_madd_epi16(q7, _mm_loadu_si128((const __m128i*)(const void*)(data+i-8)));
+						mull = _mm_madd_epi16(q6, _mm_loadu_si128((const __m128i*)(const void*)(data+i-7))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q5, _mm_loadu_si128((const __m128i*)(const void*)(data+i-6))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q4, _mm_loadu_si128((const __m128i*)(const void*)(data+i-5))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q3, _mm_loadu_si128((const __m128i*)(const void*)(data+i-4))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q2, _mm_loadu_si128((const __m128i*)(const void*)(data+i-3))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(const void*)(data+i-2))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(const void*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
 						summ = _mm_sra_epi32(summ, cnt);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), summ));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), summ));
 					}
 				}
 				else { /* order == 7 */
@@ -226,15 +252,15 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_sse2(const FLAC_
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m128i summ, mull;
-						summ = _mm_madd_epi16(q6, _mm_loadu_si128((const __m128i*)(data+i-7)));
-						mull = _mm_madd_epi16(q5, _mm_loadu_si128((const __m128i*)(data+i-6))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q4, _mm_loadu_si128((const __m128i*)(data+i-5))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q3, _mm_loadu_si128((const __m128i*)(data+i-4))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q2, _mm_loadu_si128((const __m128i*)(data+i-3))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(data+i-2))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
+						summ = _mm_madd_epi16(q6, _mm_loadu_si128((const __m128i*)(const void*)(data+i-7)));
+						mull = _mm_madd_epi16(q5, _mm_loadu_si128((const __m128i*)(const void*)(data+i-6))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q4, _mm_loadu_si128((const __m128i*)(const void*)(data+i-5))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q3, _mm_loadu_si128((const __m128i*)(const void*)(data+i-4))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q2, _mm_loadu_si128((const __m128i*)(const void*)(data+i-3))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(const void*)(data+i-2))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(const void*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
 						summ = _mm_sra_epi32(summ, cnt);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), summ));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), summ));
 					}
 				}
 			}
@@ -250,14 +276,14 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_sse2(const FLAC_
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m128i summ, mull;
-						summ = _mm_madd_epi16(q5, _mm_loadu_si128((const __m128i*)(data+i-6)));
-						mull = _mm_madd_epi16(q4, _mm_loadu_si128((const __m128i*)(data+i-5))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q3, _mm_loadu_si128((const __m128i*)(data+i-4))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q2, _mm_loadu_si128((const __m128i*)(data+i-3))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(data+i-2))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
+						summ = _mm_madd_epi16(q5, _mm_loadu_si128((const __m128i*)(const void*)(data+i-6)));
+						mull = _mm_madd_epi16(q4, _mm_loadu_si128((const __m128i*)(const void*)(data+i-5))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q3, _mm_loadu_si128((const __m128i*)(const void*)(data+i-4))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q2, _mm_loadu_si128((const __m128i*)(const void*)(data+i-3))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(const void*)(data+i-2))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(const void*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
 						summ = _mm_sra_epi32(summ, cnt);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), summ));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), summ));
 					}
 				}
 				else { /* order == 5 */
@@ -270,13 +296,13 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_sse2(const FLAC_
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m128i summ, mull;
-						summ = _mm_madd_epi16(q4, _mm_loadu_si128((const __m128i*)(data+i-5)));
-						mull = _mm_madd_epi16(q3, _mm_loadu_si128((const __m128i*)(data+i-4))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q2, _mm_loadu_si128((const __m128i*)(data+i-3))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(data+i-2))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
+						summ = _mm_madd_epi16(q4, _mm_loadu_si128((const __m128i*)(const void*)(data+i-5)));
+						mull = _mm_madd_epi16(q3, _mm_loadu_si128((const __m128i*)(const void*)(data+i-4))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q2, _mm_loadu_si128((const __m128i*)(const void*)(data+i-3))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(const void*)(data+i-2))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(const void*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
 						summ = _mm_sra_epi32(summ, cnt);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), summ));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), summ));
 					}
 				}
 			}
@@ -292,12 +318,12 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_sse2(const FLAC_
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m128i summ, mull;
-						summ = _mm_madd_epi16(q3, _mm_loadu_si128((const __m128i*)(data+i-4)));
-						mull = _mm_madd_epi16(q2, _mm_loadu_si128((const __m128i*)(data+i-3))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(data+i-2))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
+						summ = _mm_madd_epi16(q3, _mm_loadu_si128((const __m128i*)(const void*)(data+i-4)));
+						mull = _mm_madd_epi16(q2, _mm_loadu_si128((const __m128i*)(const void*)(data+i-3))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(const void*)(data+i-2))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(const void*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
 						summ = _mm_sra_epi32(summ, cnt);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), summ));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), summ));
 					}
 				}
 				else { /* order == 3 */
@@ -308,11 +334,11 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_sse2(const FLAC_
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m128i summ, mull;
-						summ = _mm_madd_epi16(q2, _mm_loadu_si128((const __m128i*)(data+i-3)));
-						mull = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(data+i-2))); summ = _mm_add_epi32(summ, mull);
-						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
+						summ = _mm_madd_epi16(q2, _mm_loadu_si128((const __m128i*)(const void*)(data+i-3)));
+						mull = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(const void*)(data+i-2))); summ = _mm_add_epi32(summ, mull);
+						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(const void*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
 						summ = _mm_sra_epi32(summ, cnt);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), summ));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), summ));
 					}
 				}
 			}
@@ -324,10 +350,10 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_sse2(const FLAC_
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m128i summ, mull;
-						summ = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(data+i-2)));
-						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
+						summ = _mm_madd_epi16(q1, _mm_loadu_si128((const __m128i*)(const void*)(data+i-2)));
+						mull = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(const void*)(data+i-1))); summ = _mm_add_epi32(summ, mull);
 						summ = _mm_sra_epi32(summ, cnt);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), summ));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), summ));
 					}
 				}
 				else { /* order == 1 */
@@ -336,9 +362,9 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_sse2(const FLAC_
 
 					for(i = 0; i < (int)data_len-3; i+=4) {
 						__m128i summ;
-						summ = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(data+i-1)));
+						summ = _mm_madd_epi16(q0, _mm_loadu_si128((const __m128i*)(const void*)(data+i-1)));
 						summ = _mm_sra_epi32(summ, cnt);
-						_mm_storeu_si128((__m128i*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(data+i)), summ));
+						_mm_storeu_si128((__m128i*)(void*)(residual+i), _mm_sub_epi32(_mm_loadu_si128((const __m128i*)(const void*)(data+i)), summ));
 					}
 				}
 			}
@@ -404,6 +430,8 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_sse2(const FLAC_
 	}
 }
 
+#if defined FLAC__CPU_IA32 /* unused for x86_64 */
+
 FLAC__SSE_TARGET("sse2")
 void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__int32 *data, uint32_t data_len, const FLAC__int32 qlp_coeff[], uint32_t order, int lp_quantization, FLAC__int32 residual[])
 {
@@ -417,12 +445,12 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 			if(order > 10) { /* order == 11, 12 */
 				if(order == 12) {
 					__m128i xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7;
-					xmm0 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+0));  // 0  0  q[1]  q[0]
-					xmm1 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+2));  // 0  0  q[3]  q[2]
-					xmm2 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+4));  // 0  0  q[5]  q[4]
-					xmm3 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+6));  // 0  0  q[7]  q[6]
-					xmm4 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+8));  // 0  0  q[9]  q[8]
-					xmm5 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+10)); // 0  0  q[11] q[10]
+					xmm0 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+0));  // 0  0  q[1]  q[0]
+					xmm1 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+2));  // 0  0  q[3]  q[2]
+					xmm2 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+4));  // 0  0  q[5]  q[4]
+					xmm3 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+6));  // 0  0  q[7]  q[6]
+					xmm4 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+8));  // 0  0  q[9]  q[8]
+					xmm5 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+10)); // 0  0  q[11] q[10]
 
 					xmm0 = _mm_shuffle_epi32(xmm0, _MM_SHUFFLE(3,1,2,0)); // 0  q[1]  0  q[0]
 					xmm1 = _mm_shuffle_epi32(xmm1, _MM_SHUFFLE(3,1,2,0)); // 0  q[3]  0  q[2]
@@ -435,41 +463,41 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 						//sum = 0;
 						//sum += qlp_coeff[11] * data[i-12];
 						//sum += qlp_coeff[10] * data[i-11];
-						xmm7 = _mm_loadl_epi64((const __m128i*)(data+i-12));  // 0   0        d[i-11]  d[i-12]
+						xmm7 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-12));  // 0   0        d[i-11]  d[i-12]
 						xmm7 = _mm_shuffle_epi32(xmm7, _MM_SHUFFLE(2,0,3,1)); // 0  d[i-12]   0        d[i-11]
 						xmm7 = _mm_mul_epu32(xmm7, xmm5); /* we use _unsigned_ multiplication and discard high dword of the result values */
 
 						//sum += qlp_coeff[9] * data[i-10];
 						//sum += qlp_coeff[8] * data[i-9];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-10));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-10));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm4);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
 
 						//sum += qlp_coeff[7] * data[i-8];
 						//sum += qlp_coeff[6] * data[i-7];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-8));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-8));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm3);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
 
 						//sum += qlp_coeff[5] * data[i-6];
 						//sum += qlp_coeff[4] * data[i-5];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-6));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-6));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm2);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
 
 						//sum += qlp_coeff[3] * data[i-4];
 						//sum += qlp_coeff[2] * data[i-3];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-4));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-4));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm1);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
 
 						//sum += qlp_coeff[1] * data[i-2];
 						//sum += qlp_coeff[0] * data[i-1];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-2));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-2));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm0);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
@@ -480,11 +508,11 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 				}
 				else { /* order == 11 */
 					__m128i xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7;
-					xmm0 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+0));
-					xmm1 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+2));
-					xmm2 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+4));
-					xmm3 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+6));
-					xmm4 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+8));
+					xmm0 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+0));
+					xmm1 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+2));
+					xmm2 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+4));
+					xmm3 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+6));
+					xmm4 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+8));
 					xmm5 = _mm_cvtsi32_si128(qlp_coeff[10]);
 
 					xmm0 = _mm_shuffle_epi32(xmm0, _MM_SHUFFLE(3,1,2,0));
@@ -501,35 +529,35 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 
 						//sum += qlp_coeff[9] * data[i-10];
 						//sum += qlp_coeff[8] * data[i-9];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-10));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-10));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm4);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
 
 						//sum += qlp_coeff[7] * data[i-8];
 						//sum += qlp_coeff[6] * data[i-7];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-8));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-8));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm3);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
 
 						//sum += qlp_coeff[5] * data[i-6];
 						//sum += qlp_coeff[4] * data[i-5];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-6));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-6));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm2);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
 
 						//sum += qlp_coeff[3] * data[i-4];
 						//sum += qlp_coeff[2] * data[i-3];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-4));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-4));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm1);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
 
 						//sum += qlp_coeff[1] * data[i-2];
 						//sum += qlp_coeff[0] * data[i-1];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-2));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-2));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm0);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
@@ -542,11 +570,11 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 			else { /* order == 9, 10 */
 				if(order == 10) {
 					__m128i xmm0, xmm1, xmm2, xmm3, xmm4, xmm6, xmm7;
-					xmm0 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+0));
-					xmm1 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+2));
-					xmm2 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+4));
-					xmm3 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+6));
-					xmm4 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+8));
+					xmm0 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+0));
+					xmm1 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+2));
+					xmm2 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+4));
+					xmm3 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+6));
+					xmm4 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+8));
 
 					xmm0 = _mm_shuffle_epi32(xmm0, _MM_SHUFFLE(3,1,2,0));
 					xmm1 = _mm_shuffle_epi32(xmm1, _MM_SHUFFLE(3,1,2,0));
@@ -558,34 +586,34 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 						//sum = 0;
 						//sum += qlp_coeff[9] * data[i-10];
 						//sum += qlp_coeff[8] * data[i-9];
-						xmm7 = _mm_loadl_epi64((const __m128i*)(data+i-10));
+						xmm7 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-10));
 						xmm7 = _mm_shuffle_epi32(xmm7, _MM_SHUFFLE(2,0,3,1));
 						xmm7 = _mm_mul_epu32(xmm7, xmm4);
 
 						//sum += qlp_coeff[7] * data[i-8];
 						//sum += qlp_coeff[6] * data[i-7];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-8));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-8));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm3);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
 
 						//sum += qlp_coeff[5] * data[i-6];
 						//sum += qlp_coeff[4] * data[i-5];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-6));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-6));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm2);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
 
 						//sum += qlp_coeff[3] * data[i-4];
 						//sum += qlp_coeff[2] * data[i-3];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-4));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-4));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm1);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
 
 						//sum += qlp_coeff[1] * data[i-2];
 						//sum += qlp_coeff[0] * data[i-1];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-2));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-2));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm0);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
@@ -596,10 +624,10 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 				}
 				else { /* order == 9 */
 					__m128i xmm0, xmm1, xmm2, xmm3, xmm4, xmm6, xmm7;
-					xmm0 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+0));
-					xmm1 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+2));
-					xmm2 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+4));
-					xmm3 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+6));
+					xmm0 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+0));
+					xmm1 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+2));
+					xmm2 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+4));
+					xmm3 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+6));
 					xmm4 = _mm_cvtsi32_si128(qlp_coeff[8]);
 
 					xmm0 = _mm_shuffle_epi32(xmm0, _MM_SHUFFLE(3,1,2,0));
@@ -615,28 +643,28 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 
 						//sum += qlp_coeff[7] * data[i-8];
 						//sum += qlp_coeff[6] * data[i-7];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-8));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-8));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm3);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
 
 						//sum += qlp_coeff[5] * data[i-6];
 						//sum += qlp_coeff[4] * data[i-5];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-6));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-6));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm2);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
 
 						//sum += qlp_coeff[3] * data[i-4];
 						//sum += qlp_coeff[2] * data[i-3];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-4));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-4));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm1);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
 
 						//sum += qlp_coeff[1] * data[i-2];
 						//sum += qlp_coeff[0] * data[i-1];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-2));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-2));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm0);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
@@ -651,10 +679,10 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 			if(order > 6) { /* order == 7, 8 */
 				if(order == 8) {
 					__m128i xmm0, xmm1, xmm2, xmm3, xmm6, xmm7;
-					xmm0 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+0));
-					xmm1 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+2));
-					xmm2 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+4));
-					xmm3 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+6));
+					xmm0 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+0));
+					xmm1 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+2));
+					xmm2 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+4));
+					xmm3 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+6));
 
 					xmm0 = _mm_shuffle_epi32(xmm0, _MM_SHUFFLE(3,1,2,0));
 					xmm1 = _mm_shuffle_epi32(xmm1, _MM_SHUFFLE(3,1,2,0));
@@ -665,27 +693,27 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 						//sum = 0;
 						//sum += qlp_coeff[7] * data[i-8];
 						//sum += qlp_coeff[6] * data[i-7];
-						xmm7 = _mm_loadl_epi64((const __m128i*)(data+i-8));
+						xmm7 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-8));
 						xmm7 = _mm_shuffle_epi32(xmm7, _MM_SHUFFLE(2,0,3,1));
 						xmm7 = _mm_mul_epu32(xmm7, xmm3);
 
 						//sum += qlp_coeff[5] * data[i-6];
 						//sum += qlp_coeff[4] * data[i-5];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-6));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-6));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm2);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
 
 						//sum += qlp_coeff[3] * data[i-4];
 						//sum += qlp_coeff[2] * data[i-3];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-4));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-4));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm1);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
 
 						//sum += qlp_coeff[1] * data[i-2];
 						//sum += qlp_coeff[0] * data[i-1];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-2));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-2));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm0);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
@@ -696,9 +724,9 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 				}
 				else { /* order == 7 */
 					__m128i xmm0, xmm1, xmm2, xmm3, xmm6, xmm7;
-					xmm0 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+0));
-					xmm1 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+2));
-					xmm2 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+4));
+					xmm0 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+0));
+					xmm1 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+2));
+					xmm2 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+4));
 					xmm3 = _mm_cvtsi32_si128(qlp_coeff[6]);
 
 					xmm0 = _mm_shuffle_epi32(xmm0, _MM_SHUFFLE(3,1,2,0));
@@ -713,21 +741,21 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 
 						//sum += qlp_coeff[5] * data[i-6];
 						//sum += qlp_coeff[4] * data[i-5];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-6));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-6));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm2);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
 
 						//sum += qlp_coeff[3] * data[i-4];
 						//sum += qlp_coeff[2] * data[i-3];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-4));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-4));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm1);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
 
 						//sum += qlp_coeff[1] * data[i-2];
 						//sum += qlp_coeff[0] * data[i-1];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-2));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-2));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm0);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
@@ -740,9 +768,9 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 			else { /* order == 5, 6 */
 				if(order == 6) {
 					__m128i xmm0, xmm1, xmm2, xmm6, xmm7;
-					xmm0 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+0));
-					xmm1 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+2));
-					xmm2 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+4));
+					xmm0 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+0));
+					xmm1 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+2));
+					xmm2 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+4));
 
 					xmm0 = _mm_shuffle_epi32(xmm0, _MM_SHUFFLE(3,1,2,0));
 					xmm1 = _mm_shuffle_epi32(xmm1, _MM_SHUFFLE(3,1,2,0));
@@ -752,20 +780,20 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 						//sum = 0;
 						//sum += qlp_coeff[5] * data[i-6];
 						//sum += qlp_coeff[4] * data[i-5];
-						xmm7 = _mm_loadl_epi64((const __m128i*)(data+i-6));
+						xmm7 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-6));
 						xmm7 = _mm_shuffle_epi32(xmm7, _MM_SHUFFLE(2,0,3,1));
 						xmm7 = _mm_mul_epu32(xmm7, xmm2);
 
 						//sum += qlp_coeff[3] * data[i-4];
 						//sum += qlp_coeff[2] * data[i-3];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-4));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-4));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm1);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
 
 						//sum += qlp_coeff[1] * data[i-2];
 						//sum += qlp_coeff[0] * data[i-1];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-2));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-2));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm0);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
@@ -776,8 +804,8 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 				}
 				else { /* order == 5 */
 					__m128i xmm0, xmm1, xmm2, xmm6, xmm7;
-					xmm0 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+0));
-					xmm1 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+2));
+					xmm0 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+0));
+					xmm1 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+2));
 					xmm2 = _mm_cvtsi32_si128(qlp_coeff[4]);
 
 					xmm0 = _mm_shuffle_epi32(xmm0, _MM_SHUFFLE(3,1,2,0));
@@ -791,14 +819,14 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 
 						//sum += qlp_coeff[3] * data[i-4];
 						//sum += qlp_coeff[2] * data[i-3];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-4));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-4));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm1);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
 
 						//sum += qlp_coeff[1] * data[i-2];
 						//sum += qlp_coeff[0] * data[i-1];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-2));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-2));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm0);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
@@ -813,8 +841,8 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 			if(order > 2) { /* order == 3, 4 */
 				if(order == 4) {
 					__m128i xmm0, xmm1, xmm6, xmm7;
-					xmm0 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+0));
-					xmm1 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+2));
+					xmm0 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+0));
+					xmm1 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+2));
 
 					xmm0 = _mm_shuffle_epi32(xmm0, _MM_SHUFFLE(3,1,2,0));
 					xmm1 = _mm_shuffle_epi32(xmm1, _MM_SHUFFLE(3,1,2,0));
@@ -823,13 +851,13 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 						//sum = 0;
 						//sum += qlp_coeff[3] * data[i-4];
 						//sum += qlp_coeff[2] * data[i-3];
-						xmm7 = _mm_loadl_epi64((const __m128i*)(data+i-4));
+						xmm7 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-4));
 						xmm7 = _mm_shuffle_epi32(xmm7, _MM_SHUFFLE(2,0,3,1));
 						xmm7 = _mm_mul_epu32(xmm7, xmm1);
 
 						//sum += qlp_coeff[1] * data[i-2];
 						//sum += qlp_coeff[0] * data[i-1];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-2));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-2));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm0);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
@@ -840,7 +868,7 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 				}
 				else { /* order == 3 */
 					__m128i xmm0, xmm1, xmm6, xmm7;
-					xmm0 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+0));
+					xmm0 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+0));
 					xmm1 = _mm_cvtsi32_si128(qlp_coeff[2]);
 
 					xmm0 = _mm_shuffle_epi32(xmm0, _MM_SHUFFLE(3,1,2,0));
@@ -853,7 +881,7 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 
 						//sum += qlp_coeff[1] * data[i-2];
 						//sum += qlp_coeff[0] * data[i-1];
-						xmm6 = _mm_loadl_epi64((const __m128i*)(data+i-2));
+						xmm6 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-2));
 						xmm6 = _mm_shuffle_epi32(xmm6, _MM_SHUFFLE(2,0,3,1));
 						xmm6 = _mm_mul_epu32(xmm6, xmm0);
 						xmm7 = _mm_add_epi32(xmm7, xmm6);
@@ -866,14 +894,14 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 			else { /* order == 1, 2 */
 				if(order == 2) {
 					__m128i xmm0, xmm7;
-					xmm0 = _mm_loadl_epi64((const __m128i*)(qlp_coeff+0));
+					xmm0 = _mm_loadl_epi64((const __m128i*)(const void*)(qlp_coeff+0));
 					xmm0 = _mm_shuffle_epi32(xmm0, _MM_SHUFFLE(3,1,2,0));
 
 					for(i = 0; i < (int)data_len; i++) {
 						//sum = 0;
 						//sum += qlp_coeff[1] * data[i-2];
 						//sum += qlp_coeff[0] * data[i-1];
-						xmm7 = _mm_loadl_epi64((const __m128i*)(data+i-2));
+						xmm7 = _mm_loadl_epi64((const __m128i*)(const void*)(data+i-2));
 						xmm7 = _mm_shuffle_epi32(xmm7, _MM_SHUFFLE(2,0,3,1));
 						xmm7 = _mm_mul_epu32(xmm7, xmm0);
 
@@ -931,6 +959,7 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 	}
 }
 
+#endif /* FLAC__CPU_IA32 */
 #endif /* FLAC__SSE2_SUPPORTED */
 #endif /* (FLAC__CPU_IA32 || FLAC__CPU_X86_64) && FLAC__HAS_X86INTRIN */
 #endif /* FLAC__NO_ASM */

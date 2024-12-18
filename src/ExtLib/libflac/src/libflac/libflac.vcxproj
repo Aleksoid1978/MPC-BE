@@ -84,8 +84,6 @@
     <ClInclude Include="..\..\include\share\macros.h" />
     <ClInclude Include="..\..\include\share\private.h" />
     <ClInclude Include="..\..\include\share\safe_str.h" />
-    <ClInclude Include="..\..\include\share\windows_unicode_filenames.h" />
-    <ClInclude Include="ia32\nasm.h" />
     <ClInclude Include="include\private\all.h" />
     <ClInclude Include="include\private\bitmath.h" />
     <ClInclude Include="include\private\bitreader.h" />
@@ -109,8 +107,10 @@
     <ClInclude Include="include\protected\all.h" />
     <ClInclude Include="include\protected\stream_decoder.h" />
     <ClInclude Include="include\protected\stream_encoder.h" />
+    <ClInclude Include="ogg\crctable.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\share\win_utf8_io\win_utf8_io.c" />
     <ClCompile Include="bitmath.c" />
     <ClCompile Include="bitreader.c" />
     <ClCompile Include="bitwriter.c" />
@@ -123,15 +123,14 @@
     <ClCompile Include="format.c" />
     <ClCompile Include="lpc.c" />
     <ClCompile Include="lpc_intrin_avx2.c" />
-    <ClCompile Include="lpc_intrin_sse.c" />
     <ClCompile Include="lpc_intrin_sse2.c" />
     <ClCompile Include="lpc_intrin_sse41.c" />
     <ClCompile Include="md5.c" />
     <ClCompile Include="memory.c" />
     <ClCompile Include="metadata_iterators.c" />
     <ClCompile Include="metadata_object.c" />
-    <ClCompile Include="Ogg\bitwise.c" />
-    <ClCompile Include="Ogg\framing.c" />
+    <ClCompile Include="ogg\bitwise.c" />
+    <ClCompile Include="ogg\framing.c" />
     <ClCompile Include="ogg_decoder_aspect.c" />
     <ClCompile Include="ogg_encoder_aspect.c" />
     <ClCompile Include="ogg_helper.c" />
@@ -143,7 +142,6 @@
     <ClCompile Include="stream_encoder_intrin_sse2.c" />
     <ClCompile Include="stream_encoder_intrin_ssse3.c" />
     <ClCompile Include="window.c" />
-    <ClCompile Include="windows_unicode_filenames.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

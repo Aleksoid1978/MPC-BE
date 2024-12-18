@@ -1,6 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
  * Copyright (C) 2000-2009  Josh Coalson
- * Copyright (C) 2011-2016  Xiph.Org Foundation
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -67,14 +67,14 @@ void FLAC__precompute_partition_info_sums_intrin_avx2(const FLAC__int32 residual
 				end += default_partition_samples;
 
 				for( ; (int)residual_sample < (int)end-7; residual_sample+=8) {
-					__m256i res256 = _mm256_abs_epi32(_mm256_loadu_si256((const __m256i*)(residual+residual_sample)));
+					__m256i res256 = _mm256_abs_epi32(_mm256_loadu_si256((const __m256i*)(const void*)(residual+residual_sample)));
 					sum256 = _mm256_add_epi32(sum256, res256);
 				}
 
 				sum128 = _mm_add_epi32(_mm256_extracti128_si256(sum256, 1), _mm256_castsi256_si128(sum256));
 
 				for( ; (int)residual_sample < (int)end-3; residual_sample+=4) {
-					__m128i res128 = _mm_abs_epi32(_mm_loadu_si128((const __m128i*)(residual+residual_sample)));
+					__m128i res128 = _mm_abs_epi32(_mm_loadu_si128((const __m128i*)(const void*)(residual+residual_sample)));
 					sum128 = _mm_add_epi32(sum128, res128);
 				}
 
@@ -99,7 +99,7 @@ void FLAC__precompute_partition_info_sums_intrin_avx2(const FLAC__int32 residual
 				end += default_partition_samples;
 
 				for( ; (int)residual_sample < (int)end-3; residual_sample+=4) {
-					__m128i res128 = _mm_abs_epi32(_mm_loadu_si128((const __m128i*)(residual+residual_sample)));
+					__m128i res128 = _mm_abs_epi32(_mm_loadu_si128((const __m128i*)(const void*)(residual+residual_sample)));
 					__m256i res256 = _mm256_cvtepu32_epi64(res128);
 					sum256 = _mm256_add_epi64(sum256, res256);
 				}
@@ -107,7 +107,7 @@ void FLAC__precompute_partition_info_sums_intrin_avx2(const FLAC__int32 residual
 				sum128 = _mm_add_epi64(_mm256_extracti128_si256(sum256, 1), _mm256_castsi256_si128(sum256));
 
 				for( ; (int)residual_sample < (int)end-1; residual_sample+=2) {
-					__m128i res128 = _mm_abs_epi32(_mm_loadl_epi64((const __m128i*)(residual+residual_sample)));
+					__m128i res128 = _mm_abs_epi32(_mm_loadl_epi64((const __m128i*)(const void*)(residual+residual_sample)));
 					res128 = _mm_cvtepu32_epi64(res128);
 					sum128 = _mm_add_epi64(sum128, res128);
 				}
@@ -118,7 +118,7 @@ void FLAC__precompute_partition_info_sums_intrin_avx2(const FLAC__int32 residual
 				}
 
 				sum128 = _mm_add_epi64(sum128, _mm_srli_si128(sum128, 8));
-				_mm_storel_epi64((__m128i*)(abs_residual_partition_sums+partition), sum128);
+				_mm_storel_epi64((__m128i*)(void*)(abs_residual_partition_sums+partition), sum128);
 			}
 		}
 	}

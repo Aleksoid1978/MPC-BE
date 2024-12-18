@@ -1,6 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
  * Copyright (C) 2000-2009  Josh Coalson
- * Copyright (C) 2011-2016  Xiph.Org Foundation
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -54,179 +54,118 @@
 #define m128i_to_i64(dest, src) dest = _mm_cvtsi128_si64(src)
 #endif
 
+#ifdef local_abs
+#undef local_abs
+#endif
+#define local_abs(x) ((uint32_t)((x)<0? -(x) : (x)))
+
 FLAC__SSE_TARGET("sse2")
 uint32_t FLAC__fixed_compute_best_predictor_intrin_sse2(const FLAC__int32 data[], uint32_t data_len, float residual_bits_per_sample[FLAC__MAX_FIXED_ORDER + 1])
 {
 	FLAC__uint32 total_error_0, total_error_1, total_error_2, total_error_3, total_error_4;
-	uint32_t i, order;
+	FLAC__int32 i, data_len_int;
+	uint32_t order;
+	__m128i total_err0, total_err1, total_err2, total_err3, total_err4;
+	__m128i prev_err0,  prev_err1,  prev_err2,  prev_err3;
+	__m128i tempA, tempB, bitmask;
+	FLAC__int32 data_scalar[4];
+	FLAC__int32 prev_err0_scalar[4];
+	FLAC__int32 prev_err1_scalar[4];
+	FLAC__int32 prev_err2_scalar[4];
+	FLAC__int32 prev_err3_scalar[4];
+	total_err0 = _mm_setzero_si128();
+	total_err1 = _mm_setzero_si128();
+	total_err2 = _mm_setzero_si128();
+	total_err3 = _mm_setzero_si128();
+	total_err4 = _mm_setzero_si128();
+	data_len_int = data_len;
 
-	__m128i total_err0, total_err1, total_err2;
+	for(i = 0; i < 4; i++){
+		prev_err0_scalar[i] = data[-1+i*(data_len_int/4)];
+		prev_err1_scalar[i] = data[-1+i*(data_len_int/4)] - data[-2+i*(data_len_int/4)];
+		prev_err2_scalar[i] = prev_err1_scalar[i] - (data[-2+i*(data_len_int/4)] - data[-3+i*(data_len_int/4)]);
+		prev_err3_scalar[i] = prev_err2_scalar[i] - (data[-2+i*(data_len_int/4)] - 2*data[-3+i*(data_len_int/4)] + data[-4+i*(data_len_int/4)]);
+	}
+	prev_err0 = _mm_loadu_si128((const __m128i*)prev_err0_scalar);
+	prev_err1 = _mm_loadu_si128((const __m128i*)prev_err1_scalar);
+	prev_err2 = _mm_loadu_si128((const __m128i*)prev_err2_scalar);
+	prev_err3 = _mm_loadu_si128((const __m128i*)prev_err3_scalar);
+	for(i = 0; i < data_len_int / 4; i++){
+		data_scalar[0] = data[i];
+		data_scalar[1] = data[i+data_len/4];
+		data_scalar[2] = data[i+2*(data_len/4)];
+		data_scalar[3] = data[i+3*(data_len/4)];
+		tempA = _mm_loadu_si128((const __m128i*)data_scalar);
+		/* Next three intrinsics calculate tempB as abs of tempA */
+		bitmask = _mm_srai_epi32(tempA, 31);
+		tempB   = _mm_xor_si128(tempA, bitmask);
+		tempB   = _mm_sub_epi32(tempB, bitmask);
+		total_err0 = _mm_add_epi32(total_err0,tempB);
+		tempB = _mm_sub_epi32(tempA,prev_err0);
+		prev_err0 = tempA;
+		/* Next three intrinsics calculate tempA as abs of tempB */
+		bitmask = _mm_srai_epi32(tempB, 31);
+		tempA   = _mm_xor_si128(tempB, bitmask);
+		tempA   = _mm_sub_epi32(tempA, bitmask);
+		total_err1 = _mm_add_epi32(total_err1,tempA);
+		tempA = _mm_sub_epi32(tempB,prev_err1);
+		prev_err1 = tempB;
+		/* Next three intrinsics calculate tempB as abs of tempA */
+		bitmask = _mm_srai_epi32(tempA, 31);
+		tempB   = _mm_xor_si128(tempA, bitmask);
+		tempB   = _mm_sub_epi32(tempB, bitmask);
+		total_err2 = _mm_add_epi32(total_err2,tempB);
+		tempB = _mm_sub_epi32(tempA,prev_err2);
+		prev_err2 = tempA;
+		/* Next three intrinsics calculate tempA as abs of tempB */
+		bitmask = _mm_srai_epi32(tempB, 31);
+		tempA   = _mm_xor_si128(tempB, bitmask);
+		tempA   = _mm_sub_epi32(tempA, bitmask);
+		total_err3 = _mm_add_epi32(total_err3,tempA);
+		tempA = _mm_sub_epi32(tempB,prev_err3);
+		prev_err3 = tempB;
+		/* Next three intrinsics calculate tempB as abs of tempA */
+		bitmask = _mm_srai_epi32(tempA, 31);
+		tempB   = _mm_xor_si128(tempA, bitmask);
+		tempB   = _mm_sub_epi32(tempB, bitmask);
+		total_err4 = _mm_add_epi32(total_err4,tempB);
+	}
+	_mm_storeu_si128((__m128i*)data_scalar,total_err0);
+	total_error_0 = data_scalar[0] + data_scalar[1] + data_scalar[2] + data_scalar[3];
+	_mm_storeu_si128((__m128i*)data_scalar,total_err1);
+	total_error_1 = data_scalar[0] + data_scalar[1] + data_scalar[2] + data_scalar[3];
+	_mm_storeu_si128((__m128i*)data_scalar,total_err2);
+	total_error_2 = data_scalar[0] + data_scalar[1] + data_scalar[2] + data_scalar[3];
+	_mm_storeu_si128((__m128i*)data_scalar,total_err3);
+	total_error_3 = data_scalar[0] + data_scalar[1] + data_scalar[2] + data_scalar[3];
+	_mm_storeu_si128((__m128i*)data_scalar,total_err4);
+	total_error_4 = data_scalar[0] + data_scalar[1] + data_scalar[2] + data_scalar[3];
 
-	{
-		FLAC__int32 itmp;
-		__m128i last_error;
-
-		last_error = _mm_cvtsi32_si128(data[-1]);							// 0   0   0   le0
-		itmp = data[-2];
-		last_error = _mm_shuffle_epi32(last_error, _MM_SHUFFLE(2,1,0,0));
-		last_error = _mm_sub_epi32(last_error, _mm_cvtsi32_si128(itmp));	// 0   0   le0 le1
-		itmp -= data[-3];
-		last_error = _mm_shuffle_epi32(last_error, _MM_SHUFFLE(2,1,0,0));
-		last_error = _mm_sub_epi32(last_error, _mm_cvtsi32_si128(itmp));	// 0   le0 le1 le2
-		itmp -= data[-3] - data[-4];
-		last_error = _mm_shuffle_epi32(last_error, _MM_SHUFFLE(2,1,0,0));
-		last_error = _mm_sub_epi32(last_error, _mm_cvtsi32_si128(itmp));	// le0 le1 le2 le3
-
-		total_err0 = total_err1 = _mm_setzero_si128();
-		for(i = 0; i < data_len; i++) {
-			__m128i err0, err1, tmp;
-			err0 = _mm_cvtsi32_si128(data[i]);								// 0   0   0   e0
-			err1 = _mm_shuffle_epi32(err0, _MM_SHUFFLE(0,0,0,0));			// e0  e0  e0  e0
-#if 1 /* OPT_SSE */
-			err1 = _mm_sub_epi32(err1, last_error);
-			last_error = _mm_srli_si128(last_error, 4);						// 0   le0 le1 le2
-			err1 = _mm_sub_epi32(err1, last_error);
-			last_error = _mm_srli_si128(last_error, 4);						// 0   0   le0 le1
-			err1 = _mm_sub_epi32(err1, last_error);
-			last_error = _mm_srli_si128(last_error, 4);						// 0   0   0   le0
-			err1 = _mm_sub_epi32(err1, last_error);							// e1  e2  e3  e4
-#else
-			last_error = _mm_add_epi32(last_error, _mm_srli_si128(last_error, 8));	// le0  le1  le2+le0  le3+le1
-			last_error = _mm_add_epi32(last_error, _mm_srli_si128(last_error, 4));	// le0  le1+le0  le2+le0+le1  le3+le1+le2+le0
-			err1 = _mm_sub_epi32(err1, last_error);							// e1  e2  e3  e4
-#endif
-			tmp = _mm_slli_si128(err0, 12);									// e0   0   0   0
-			last_error = _mm_srli_si128(err1, 4);							//  0  e1  e2  e3
-			last_error = _mm_or_si128(last_error, tmp);						// e0  e1  e2  e3
-
-			tmp = _mm_srai_epi32(err0, 31);
-			err0 = _mm_xor_si128(err0, tmp);
-			err0 = _mm_sub_epi32(err0, tmp);
-			tmp = _mm_srai_epi32(err1, 31);
-			err1 = _mm_xor_si128(err1, tmp);
-			err1 = _mm_sub_epi32(err1, tmp);
-
-			total_err0 = _mm_add_epi32(total_err0, err0);					// 0   0   0   te0
-			total_err1 = _mm_add_epi32(total_err1, err1);					// te1 te2 te3 te4
+	/* Now the remainder of samples needs to be processed */
+	i *= 4;
+	if(data_len % 4 > 0){
+		FLAC__int32 last_error_0 = data[i-1];
+		FLAC__int32 last_error_1 = data[i-1] - data[i-2];
+		FLAC__int32 last_error_2 = last_error_1 - (data[i-2] - data[i-3]);
+		FLAC__int32 last_error_3 = last_error_2 - (data[i-2] - 2*data[i-3] + data[i-4]);
+		FLAC__int32 error, save;
+		for(; i < data_len_int; i++) {
+			error  = data[i]     ; total_error_0 += local_abs(error);                      save = error;
+			error -= last_error_0; total_error_1 += local_abs(error); last_error_0 = save; save = error;
+			error -= last_error_1; total_error_2 += local_abs(error); last_error_1 = save; save = error;
+			error -= last_error_2; total_error_3 += local_abs(error); last_error_2 = save; save = error;
+			error -= last_error_3; total_error_4 += local_abs(error); last_error_3 = save;
 		}
 	}
 
-	total_error_0 = _mm_cvtsi128_si32(total_err0);
-	total_err2 = total_err1;											// te1  te2  te3  te4
-	total_err1 = _mm_srli_si128(total_err1, 8);							//  0    0   te1  te2
-	total_error_4 = _mm_cvtsi128_si32(total_err2);
-	total_error_2 = _mm_cvtsi128_si32(total_err1);
-	total_err2 = _mm_srli_si128(total_err2,	4);							//  0   te1  te2  te3
-	total_err1 = _mm_srli_si128(total_err1, 4);							//  0    0    0   te1
-	total_error_3 = _mm_cvtsi128_si32(total_err2);
-	total_error_1 = _mm_cvtsi128_si32(total_err1);
-
-	/* prefer higher order */
-	if(total_error_0 < flac_min(flac_min(flac_min(total_error_1, total_error_2), total_error_3), total_error_4))
+	/* prefer lower order */
+	if(total_error_0 <= flac_min(flac_min(flac_min(total_error_1, total_error_2), total_error_3), total_error_4))
 		order = 0;
-	else if(total_error_1 < flac_min(flac_min(total_error_2, total_error_3), total_error_4))
+	else if(total_error_1 <= flac_min(flac_min(total_error_2, total_error_3), total_error_4))
 		order = 1;
-	else if(total_error_2 < flac_min(total_error_3, total_error_4))
+	else if(total_error_2 <= flac_min(total_error_3, total_error_4))
 		order = 2;
-	else if(total_error_3 < total_error_4)
-		order = 3;
-	else
-		order = 4;
-
-	/* Estimate the expected number of bits per residual signal sample. */
-	/* 'total_error*' is linearly related to the variance of the residual */
-	/* signal, so we use it directly to compute E(|x|) */
-	FLAC__ASSERT(data_len > 0 || total_error_0 == 0);
-	FLAC__ASSERT(data_len > 0 || total_error_1 == 0);
-	FLAC__ASSERT(data_len > 0 || total_error_2 == 0);
-	FLAC__ASSERT(data_len > 0 || total_error_3 == 0);
-	FLAC__ASSERT(data_len > 0 || total_error_4 == 0);
-
-	residual_bits_per_sample[0] = (float)((total_error_0 > 0) ? log(M_LN2 * (double)total_error_0 / (double)data_len) / M_LN2 : 0.0);
-	residual_bits_per_sample[1] = (float)((total_error_1 > 0) ? log(M_LN2 * (double)total_error_1 / (double)data_len) / M_LN2 : 0.0);
-	residual_bits_per_sample[2] = (float)((total_error_2 > 0) ? log(M_LN2 * (double)total_error_2 / (double)data_len) / M_LN2 : 0.0);
-	residual_bits_per_sample[3] = (float)((total_error_3 > 0) ? log(M_LN2 * (double)total_error_3 / (double)data_len) / M_LN2 : 0.0);
-	residual_bits_per_sample[4] = (float)((total_error_4 > 0) ? log(M_LN2 * (double)total_error_4 / (double)data_len) / M_LN2 : 0.0);
-
-	return order;
-}
-
-FLAC__SSE_TARGET("sse2")
-uint32_t FLAC__fixed_compute_best_predictor_wide_intrin_sse2(const FLAC__int32 data[], uint32_t data_len, float residual_bits_per_sample[FLAC__MAX_FIXED_ORDER + 1])
-{
-	FLAC__uint64 total_error_0, total_error_1, total_error_2, total_error_3, total_error_4;
-	uint32_t i, order;
-
-	__m128i total_err0, total_err1, total_err3;
-
-	{
-		FLAC__int32 itmp;
-		__m128i last_error, zero = _mm_setzero_si128();
-
-		last_error = _mm_cvtsi32_si128(data[-1]);							// 0   0   0   le0
-		itmp = data[-2];
-		last_error = _mm_shuffle_epi32(last_error, _MM_SHUFFLE(2,1,0,0));
-		last_error = _mm_sub_epi32(last_error, _mm_cvtsi32_si128(itmp));	// 0   0   le0 le1
-		itmp -= data[-3];
-		last_error = _mm_shuffle_epi32(last_error, _MM_SHUFFLE(2,1,0,0));
-		last_error = _mm_sub_epi32(last_error, _mm_cvtsi32_si128(itmp));	// 0   le0 le1 le2
-		itmp -= data[-3] - data[-4];
-		last_error = _mm_shuffle_epi32(last_error, _MM_SHUFFLE(2,1,0,0));
-		last_error = _mm_sub_epi32(last_error, _mm_cvtsi32_si128(itmp));	// le0 le1 le2 le3
-
-		total_err0 = total_err1 = total_err3 = _mm_setzero_si128();
-		for(i = 0; i < data_len; i++) {
-			__m128i err0, err1, tmp;
-			err0 = _mm_cvtsi32_si128(data[i]);								// 0   0   0   e0
-			err1 = _mm_shuffle_epi32(err0, _MM_SHUFFLE(0,0,0,0));			// e0  e0  e0  e0
-#if 1 /* OPT_SSE */
-			err1 = _mm_sub_epi32(err1, last_error);
-			last_error = _mm_srli_si128(last_error, 4);						// 0   le0 le1 le2
-			err1 = _mm_sub_epi32(err1, last_error);
-			last_error = _mm_srli_si128(last_error, 4);						// 0   0   le0 le1
-			err1 = _mm_sub_epi32(err1, last_error);
-			last_error = _mm_srli_si128(last_error, 4);						// 0   0   0   le0
-			err1 = _mm_sub_epi32(err1, last_error);							// e1  e2  e3  e4
-#else
-			last_error = _mm_add_epi32(last_error, _mm_srli_si128(last_error, 8));	// le0  le1  le2+le0  le3+le1
-			last_error = _mm_add_epi32(last_error, _mm_srli_si128(last_error, 4));	// le0  le1+le0  le2+le0+le1  le3+le1+le2+le0
-			err1 = _mm_sub_epi32(err1, last_error);							// e1  e2  e3  e4
-#endif
-			tmp = _mm_slli_si128(err0, 12);									// e0   0   0   0
-			last_error = _mm_srli_si128(err1, 4);							//  0  e1  e2  e3
-			last_error = _mm_or_si128(last_error, tmp);						// e0  e1  e2  e3
-
-			tmp = _mm_srai_epi32(err0, 31);
-			err0 = _mm_xor_si128(err0, tmp);
-			err0 = _mm_sub_epi32(err0, tmp);
-			tmp = _mm_srai_epi32(err1, 31);
-			err1 = _mm_xor_si128(err1, tmp);
-			err1 = _mm_sub_epi32(err1, tmp);
-
-			total_err0 = _mm_add_epi64(total_err0, err0);					//        0       te0
-			err0 = _mm_unpacklo_epi32(err1, zero);							//   0  |e3|   0  |e4|
-			err1 = _mm_unpackhi_epi32(err1, zero);							//   0  |e1|   0  |e2|
-			total_err3 = _mm_add_epi64(total_err3, err0);					//       te3      te4
-			total_err1 = _mm_add_epi64(total_err1, err1);					//       te1      te2
-		}
-	}
-
-	m128i_to_i64(total_error_0, total_err0);
-	m128i_to_i64(total_error_4, total_err3);
-	m128i_to_i64(total_error_2, total_err1);
-	total_err3 = _mm_srli_si128(total_err3,	8);							//         0      te3
-	total_err1 = _mm_srli_si128(total_err1, 8);							//         0      te1
-	m128i_to_i64(total_error_3, total_err3);
-	m128i_to_i64(total_error_1, total_err1);
-
-	/* prefer higher order */
-	if(total_error_0 < flac_min(flac_min(flac_min(total_error_1, total_error_2), total_error_3), total_error_4))
-		order = 0;
-	else if(total_error_1 < flac_min(flac_min(total_error_2, total_error_3), total_error_4))
-		order = 1;
-	else if(total_error_2 < flac_min(total_error_3, total_error_4))
-		order = 2;
-	else if(total_error_3 < total_error_4)
+	else if(total_error_3 <= total_error_4)
 		order = 3;
 	else
 		order = 4;

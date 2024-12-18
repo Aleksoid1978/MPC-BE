@@ -1,6 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
  * Copyright (C) 2001-2009  Josh Coalson
- * Copyright (C) 2011-2016  Xiph.Org Foundation
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -34,6 +34,10 @@
 #define FLAC__ASSERT_H
 
 /* we need this since some compilers (like MSVC) leave assert()s on release code (and we don't want to use their ASSERT) */
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+#define FLAC__ASSERT(x) if(!(x)) __builtin_abort();
+#define FLAC__ASSERT_DECLARATION(x) x
+#else
 #ifndef NDEBUG
 #include <assert.h>
 #define FLAC__ASSERT(x) assert(x)
@@ -41,6 +45,7 @@
 #else
 #define FLAC__ASSERT(x)
 #define FLAC__ASSERT_DECLARATION(x)
+#endif
 #endif
 
 #endif

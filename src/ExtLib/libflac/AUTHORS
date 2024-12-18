@@ -1,6 +1,6 @@
 /* FLAC - Free Lossless Audio Codec
  * Copyright (C) 2001-2009  Josh Coalson
- * Copyright (C) 2011-2016  Xiph.Org Foundation
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * This file is part the FLAC project.  FLAC is comprised of several
  * components distributed under different licenses.  The codec libraries
@@ -17,16 +17,19 @@
  * distribution.
  */
 
-Current FLAC maintainer: Erik de Castro Lopo <erikd@mega-nerd.com>
+This file lists major contributors to the FLAC project. This list is not
+exhaustive. For an exhaustive list, run the command `git shortlog -s` on
+the git repo or visit https://gitlab.xiph.org/xiph/flac/-/graphs/master
+
+For a complete list of contributions, run the command `git log` on the
+git repo, visit https://github.com/xiph/flac/commits or visit
+https://gitlab.xiph.org/xiph/flac/commits
 
 Original author: Josh Coalson <jcoalson@users.sourceforge.net>
+Maintainer 2012-2020: Erik de Castro Lopo <erikd@mega-nerd.com>
+Maintainer from 2022: Martijn van Beurden <mvanb1@gmail.com>
 
 Website : https://www.xiph.org/flac/
-
-FLAC is an Open Source lossless audio codec originally developed by Josh Coalson
-between 2001 and 2009. From 2009 to 2012 FLAC was basically unmaintained. In
-2012 the Erik de Castro Lopo became the chief maintainer as part of the
-Xiph.Org Foundation.
 
 Other major contributors and their contributions:
 
@@ -55,4 +58,3 @@ Other major contributors and their contributions:
 
 "Matt Zimmerman" <mdz@debian.org>
 * Libtool/autoconf/automake make system, flac man page
-

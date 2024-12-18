@@ -1,6 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
  * Copyright (C) 2000-2009  Josh Coalson
- * Copyright (C) 2011-2016  Xiph.Org Foundation
+ * Copyright (C) 2011-2023  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -88,7 +88,7 @@ void FLAC__precompute_partition_info_sums_intrin_sse2(const FLAC__int32 residual
 				}
 
 				for( ; residual_sample < e3; residual_sample+=4) {
-					__m128i mm_res = local_abs_epi32(_mm_loadu_si128((const __m128i*)(residual+residual_sample)));
+					__m128i mm_res = local_abs_epi32(_mm_loadu_si128((const __m128i*)(const void*)(residual+residual_sample)));
 					mm_sum = _mm_add_epi32(mm_sum, mm_res);
 				}
 
@@ -121,7 +121,7 @@ void FLAC__precompute_partition_info_sums_intrin_sse2(const FLAC__int32 residual
 				}
 
 				for( ; residual_sample < e3; residual_sample+=2) {
-					__m128i mm_res = local_abs_epi32(_mm_loadl_epi64((const __m128i*)(residual+residual_sample))); /*  0   0  |r1|   |r0| */
+					__m128i mm_res = local_abs_epi32(_mm_loadl_epi64((const __m128i*)(const void*)(residual+residual_sample))); /*  0   0  |r1|   |r0| */
 					mm_res = _mm_shuffle_epi32(mm_res, _MM_SHUFFLE(3,1,2,0)); /* 0  |r1|  0  |r0|  ==  |r1_64|  |r0_64|  */
 					mm_sum = _mm_add_epi64(mm_sum, mm_res);
 				}
@@ -132,7 +132,7 @@ void FLAC__precompute_partition_info_sums_intrin_sse2(const FLAC__int32 residual
 				}
 
 				mm_sum = _mm_add_epi64(mm_sum, _mm_srli_si128(mm_sum, 8));
-				_mm_storel_epi64((__m128i*)(abs_residual_partition_sums+partition), mm_sum);
+				_mm_storel_epi64((__m128i*)(void*)(abs_residual_partition_sums+partition), mm_sum);
 			}
 		}
 	}
