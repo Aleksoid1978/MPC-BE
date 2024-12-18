@@ -19,7 +19,7 @@
      * C++ MFC support
 
 
-2. Preparing the GCC environment (YASM is already included)
+2. Preparing the GCC environment (NASM is already included)
   2.1. Download https://github.com/Aleksoid1978/MSYS/raw/main/MSYS_MinGW-w64_GCC_1421_x86-x64.7z
   2.2. Unpack the archive to "C:\MSYS".
     Example of downloading and unpacking:
