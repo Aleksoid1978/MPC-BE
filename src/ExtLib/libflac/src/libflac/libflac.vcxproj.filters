@@ -245,9 +245,4 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <YASM Include="ia32\cpu_asm.nasm" />
-    <YASM Include="ia32\fixed_asm.nasm" />
-    <YASM Include="ia32\lpc_asm.nasm" />
-  </ItemGroup>
 </Project>

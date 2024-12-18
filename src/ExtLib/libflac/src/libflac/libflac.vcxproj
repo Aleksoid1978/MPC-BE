@@ -31,9 +31,6 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-    <Import Project="$(SolutionDir)src\YASM.props" />
-  </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(SolutionDir)src\common.props" />
@@ -148,25 +145,5 @@
     <ClCompile Include="window.c" />
     <ClCompile Include="windows_unicode_filenames.c" />
   </ItemGroup>
-  <ItemGroup>
-    <YASM Include="ia32\cpu_asm.nasm">
-      <IncludePaths>ia32</IncludePaths>
-      <Defines>OBJ_FORMAT_win32</Defines>
-      <AdditionalDependencies>ia32/%(Filename).nasm;ia32/nasm.h</AdditionalDependencies>
-    </YASM>
-    <YASM Include="ia32\fixed_asm.nasm">
-      <IncludePaths>ia32</IncludePaths>
-      <Defines>OBJ_FORMAT_win32</Defines>
-      <AdditionalDependencies>ia32/%(Filename).nasm;ia32/nasm.h</AdditionalDependencies>
-    </YASM>
-    <YASM Include="ia32\lpc_asm.nasm">
-      <IncludePaths>ia32</IncludePaths>
-      <Defines>OBJ_FORMAT_win32</Defines>
-      <AdditionalDependencies>ia32/%(Filename).nasm;ia32/nasm.h</AdditionalDependencies>
-    </YASM>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-    <Import Project="$(SolutionDir)src\YASM.targets" />
-  </ImportGroup>
 </Project>
