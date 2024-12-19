@@ -444,7 +444,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,34,53,12
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,49,53,12
     CONTROL         "Sötét menü engedélyezése",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,59,147,8,WS_EX_TRANSPARENT
-    CONTROL         "Sötét cím engedélyezése (Windows 10 and above)",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,73,206,8,WS_EX_TRANSPARENT
+    CONTROL         "Sötét cím engedélyezése (Windows 10 és felette)",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,73,206,8,WS_EX_TRANSPARENT
     GROUPBOX        "",IDC_STATIC,7,90,282,91
     CONTROL         "Használja az időtippet:",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,99,152,9
     COMBOBOX        IDC_COMBO3,170,97,115,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -3318,17 +3318,17 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_VDF_AR_MODE         "Képméretarány olvasása fájlból"
+    IDS_VDF_AR_MODE         "AR olvasása az adatfolyamból"
     IDS_VDF_HW_ACCELERATION "Hardveres gyorsítás"
     IDS_VDF_HW_CODECS       "Kodekek:"
     IDS_VDF_HW_PREFERRED_DECODER "Preferált dekóder"
     IDS_VDF_HW_ADAPTER      "Adapter"
-    IDS_VDF_DXVACOMPATIBILITY "DXVA(H.264) Kompatibilitás teszt"
-    IDS_VDF_DXVA_FULLCHECK  "Teljes teszt"
-    IDS_VDF_DXVA_SKIP_LEVELCHECK "Szint teszt kihagyása"
-    IDS_VDF_DXVA_SKIP_REFCHECK "Ref. kép teszt kihagyása"
-    IDS_VDF_DXVA_SKIP_ALLCHECK "Összes teszt kihagyása"
-    IDS_VDF_DXVA_SD         "DXVA tiltása SD videóknál"
+    IDS_VDF_DXVACOMPATIBILITY "DXVA(H.264) Kompatibilitás ellenőrzése"
+    IDS_VDF_DXVA_FULLCHECK  "Teljes ellenőrzés"
+    IDS_VDF_DXVA_SKIP_LEVELCHECK "Szintellenőrzés kihagyása"
+    IDS_VDF_DXVA_SKIP_REFCHECK "Ref keret ellenőrzésének kihagyása"
+    IDS_VDF_DXVA_SKIP_ALLCHECK "Kihagy minden ellenőrzést"
+    IDS_VDF_DXVA_SD         "DXVA letiltása SD-hez (H.264)"
 END
 
 STRINGTABLE
