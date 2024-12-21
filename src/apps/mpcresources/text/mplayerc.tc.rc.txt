@@ -210,7 +210,7 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 28
 9		"飽和度"
 18		"重設"
 20		"色彩管理"
-21		"(for EVR-CP, surface 10/16-bit)"
+21		"（適用於 EVR-CP，10/16-bit 繪圖頁）"
 22		"輸入類型："
 24		"環境光："
 26		"色彩對應方式："
@@ -299,7 +299,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
-6		"使用暗黑主題（預設）"
+6		"使用暗色主題（預設）"
 7		"亮度："
 9		"設定音量控制器色彩："
 10		"填充："
@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 55
 16		"G:"
 17		"B:"
 21		"啟用暗色選單"
-22		"啟用暗色標題列 (Windows 10 and above)"
+22		"啟用暗色標題列（Windows 10 及以上）"
 24		"使用時間工具提示："
 26		"搜尋列顯示預覽縮圖"
 27		"相對於螢幕寬度的縮圖大小："
@@ -598,10 +598,10 @@ END
 BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
 5		"YouTube"
 6		"使用內部網頁剖析器"
-7		"Preferred video format:"
+7		"偏好視訊格式："
 10		"60 fps"
 11		"HDR"
-12		"Preferred audio format:"
+12		"偏好音訊格式："
 14		"偏好音軌語言："
 16		"載入播放清單"
 18		"youtube-dl, yt-dlp"
@@ -2039,7 +2039,7 @@ STRING IDS_UPDATE_ERROR_DATA		"更新伺服器資料錯誤。\n\n請稍後再試
 STRING IDS_USING_NEWER_VERSION		"您已經使用最新的穩定版本 %s"
 STRING IDS_VDF_AR_MODE		"從串流中讀取長寬比例"
 STRING IDS_VDF_AUTO		"自動"
-STRING IDS_VDF_COLOR_CONVERT_TO_RGB		"Convert to RGB"
+STRING IDS_VDF_COLOR_CONVERT_TO_RGB		"轉換為 RGB"
 STRING IDS_VDF_COLOR_OUTPUT_FORMATS		"輸出格式："
 STRING IDS_VDF_COLOR_PRESET		"先期設定："
 STRING IDS_VDF_COLOR_RGB_LEVELS		"RGB 輸出層級："
