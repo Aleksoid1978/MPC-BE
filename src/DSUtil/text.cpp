@@ -95,13 +95,14 @@ CStringA UrlDecode(const CStringA& str_in)
 	return str_out;
 }
 
-void Unescape(CStringW& str)
+bool Unescape(CStringW& str)
 {
-	DWORD size = str.GetLength();
-	HRESULT hr = UrlUnescapeW(str.GetBuffer(), nullptr, &size, URL_ESCAPE_URI_COMPONENT | URL_UNESCAPE_INPLACE);
+	int len = str.GetLength();
+	HRESULT hr = UrlUnescapeW(str.GetBuffer(), nullptr, nullptr, URL_ESCAPE_URI_COMPONENT | URL_UNESCAPE_INPLACE);
 	if (SUCCEEDED(hr)) {
 		str.ReleaseBuffer();
 	}
+	return len != str.GetLength();
 }
 
 CStringW ExtractTag(CStringW tag, CMapStringToString& attribs, bool& fClosing)
