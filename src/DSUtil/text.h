@@ -135,9 +135,12 @@ ImplodeEsc(const std::list<T>& sl, const SEP sep, const SEP esc = '\\')
 }
 
 extern DWORD    CharSetToCodePage(DWORD dwCharSet);
+
 extern CStringA UrlEncode(const CStringA& str_in, const bool bArg = false);
 extern CStringA UrlDecode(const CStringA& str_in);
 extern CStringW UrlDecode(LPCWSTR lpWideCharStr);
+void Unescape(CStringW& str);
+
 extern CStringW ExtractTag(CStringW tag, CMapStringToString& attribs, bool& fClosing);
 extern CStringA HtmlSpecialChars(CStringA str, bool bQuotes = false);
 

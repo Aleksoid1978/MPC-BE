@@ -106,6 +106,15 @@ CStringW UrlDecode(LPCWSTR lpWideCharStr)
 	return UTF8ToWStr(utf8);
 }
 
+void Unescape(CStringW& str)
+{
+	DWORD size = str.GetLength();
+	HRESULT hr = UrlUnescapeW(str.GetBuffer(), nullptr, &size, URL_ESCAPE_URI_COMPONENT | URL_UNESCAPE_INPLACE);
+	if (SUCCEEDED(hr)) {
+		str.ReleaseBuffer();
+	}
+}
+
 CStringW ExtractTag(CStringW tag, CMapStringToString& attribs, bool& fClosing)
 {
 	tag.Trim();
