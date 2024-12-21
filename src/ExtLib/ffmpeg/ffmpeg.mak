@@ -181,7 +181,6 @@ SRCS_LC = \
 	libavcodec/cllc.c \
 	libavcodec/codec_desc.c \
 	libavcodec/codec_par.c \
-	libavcodec/container_fifo.c \
 	libavcodec/cook.c \
 	libavcodec/cscd.c \
 	libavcodec/d3d11va.c \
@@ -471,7 +470,6 @@ SRCS_LC_B = \
 	libavcodec/rangecoder.c \
 	libavcodec/raw.c \
 	libavcodec/rawdec.c \
-	libavcodec/refstruct.c \
 	libavcodec/rl.c \
 	libavcodec/rpza.c \
 	libavcodec/rv10.c \
@@ -729,6 +727,7 @@ SRCS_LU = \
 	libavutil/bprint.c \
 	libavutil/buffer.c \
 	libavutil/channel_layout.c \
+	libavutil/container_fifo.c \
 	libavutil/cpu.c \
 	libavutil/crc.c \
 	libavutil/csp.c \
@@ -771,6 +770,7 @@ SRCS_LU = \
 	libavutil/pixdesc.c \
 	libavutil/random_seed.c \
 	libavutil/rational.c \
+	libavutil/refstruct.c \
 	libavutil/reverse.c \
 	libavutil/samplefmt.c \
 	libavutil/sha.c \
