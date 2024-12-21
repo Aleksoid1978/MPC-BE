@@ -12,6 +12,12 @@ Added "Preferred audio format" setting for the built-in YouTube parser.
 
 Player
 Added the ability to receive the displayed video frame on a 10-bit display in RGB48 format when using MPC Video Renderer 0.9.0.2326 or later.
+Fixed playlist operation with clipboard.
+MPC Video Renderer will be used by default if it is installed and available.
+Fixed the "Enable dark title" setting.
+
+Installer
+MPC Video Renderer will be installed by default.
 
 Updated German translation (by Klaus1189).
 Updated Hungarian translation (by mickey).
