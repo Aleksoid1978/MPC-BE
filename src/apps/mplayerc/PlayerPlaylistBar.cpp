@@ -2146,7 +2146,7 @@ void CPlayerPlaylistBar::Append(std::list<CString>& fns, const bool bMulti, CSub
 	for (auto& fn : fns) {
 		if (!ConvertFileUriToPath(fn)) {
 			if (::PathIsURLW(fn)) {
-				fn = UrlDecode(fn);
+				Unescape(fn);
 			}
 		}
 	}

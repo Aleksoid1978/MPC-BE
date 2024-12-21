@@ -95,17 +95,6 @@ CStringA UrlDecode(const CStringA& str_in)
 	return str_out;
 }
 
-CStringW UrlDecode(LPCWSTR lpWideCharStr)
-{
-	if (wcsrchr(lpWideCharStr, L'%') == nullptr) {
-		return lpWideCharStr;
-	}
-
-	auto utf8 = WStrToUTF8(lpWideCharStr);
-	utf8 = UrlDecode(utf8);
-	return UTF8ToWStr(utf8);
-}
-
 void Unescape(CStringW& str)
 {
 	DWORD size = str.GetLength();

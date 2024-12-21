@@ -334,7 +334,7 @@ namespace Youtube
 
 	static void HandleURL(CString& url)
 	{
-		url = UrlDecode(url);
+		Unescape(url);
 
 		if (url.Find(YOUTUBE_URL_CLIP) != -1) {
 			urlData data;
