@@ -66,8 +66,8 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	CString str;
 
 	CRect rect;
-	long label_w = 224;
-	long control_w = 108;
+	long label_w = 200;
+	long control_w = 132;
 	long row_w = label_w + control_w;
 	long group_w = row_w + 8;
 
@@ -151,7 +151,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	// HW Decoder
 	CalcTextRect(rect, x1, y, label_w-24);
 	m_txtHWDecoder.Create(ResStr(IDS_VDF_HW_PREFERRED_DECODER), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
-	CalcRect(rect, x2-24, y, control_w+24, 200); rect.top -= 4;
+	CalcRect(rect, x2, y, control_w, 200); rect.top -= 4;
 	m_cbHWDecoder.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, rect, this, IDC_PP_HW_DECODER);
 	m_cbHWDecoder.AddString(L"DXVA2");
 	m_cbHWDecoder.AddString(L"D3D11, DXVA2");
@@ -171,14 +171,14 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	// D3D11 Adapter
 	CalcTextRect(rect, x1, y, label_w - 88);
 	m_txtHWAdapter.Create(ResStr(IDS_VDF_HW_ADAPTER), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
-	CalcRect(rect, x2 - 88, y, control_w + 88, 200); rect.top -= 4;
+	CalcRect(rect, x2 - 64, y, control_w + 64, 200); rect.top -= 4;
 	m_cbHWAdapter.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, rect, this, IDC_PP_HW_ADAPTER);
 	y += 28;
 
 	// DXVA Compatibility check
-	CalcTextRect(rect, x1, y, label_w);
+	CalcTextRect(rect, x1, y, label_w + 24);
 	m_txtDXVACompatibilityCheck.Create(ResStr(IDS_VDF_DXVACOMPATIBILITY), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
-	CalcRect(rect, x2, y, control_w, 200); rect.top -= 4;
+	CalcRect(rect, x2 + 24, y, control_w - 24, 200); rect.top -= 4;
 	m_cbDXVACompatibilityCheck.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, rect, this, IDC_PP_DXVA_CHECK);
 	m_cbDXVACompatibilityCheck.AddString(ResStr(IDS_VDF_DXVA_FULLCHECK));
 	m_cbDXVACompatibilityCheck.AddString(ResStr(IDS_VDF_DXVA_SKIP_LEVELCHECK));
