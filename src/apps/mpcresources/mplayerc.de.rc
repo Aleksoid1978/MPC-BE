@@ -3326,7 +3326,7 @@ BEGIN
     IDS_VDF_DXVACOMPATIBILITY "DXVA-Kompatibilitätsprüfung (H.264)"
     IDS_VDF_DXVA_FULLCHECK  "Alle Tests"
     IDS_VDF_DXVA_SKIP_LEVELCHECK "Kein Level-Test"
-    IDS_VDF_DXVA_SKIP_REFCHECK "Kein Ref.-Fr.-Test"
+    IDS_VDF_DXVA_SKIP_REFCHECK "Kein Ref.-Bild-Test"
     IDS_VDF_DXVA_SKIP_ALLCHECK "Kein Test"
     IDS_VDF_DXVA_SD         "DXVA bei Standardauflösung deaktivieren (H.264)"
 END
@@ -3334,9 +3334,9 @@ END
 STRINGTABLE
 BEGIN
     IDS_VDF_SCANTYPE        "Scantyp"
-    IDS_VDF_SCANTYPE_TOP    "Top-Field First"
-    IDS_VDF_SCANTYPE_BOTTOM "Bottom-Field First"
-    IDS_VDF_SCANTYPE_PROGRESSIVE "Progressive"
+    IDS_VDF_SCANTYPE_TOP    "Oberes Feld zuerst"
+    IDS_VDF_SCANTYPE_BOTTOM "Unteres Feld zuerst"
+    IDS_VDF_SCANTYPE_PROGRESSIVE "Vollbild"
     IDS_VDF_COLOR_OUTPUT_FORMATS "Ausgabeformate"
     IDS_VDF_COLOR_PRESET    "Voreinstellung:"
     IDS_VDF_COLOR_STANDARD  "Standard:"
