@@ -169,9 +169,9 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	y += 28;
 
 	// D3D11 Adapter
-	CalcTextRect(rect, x1, y, label_w - 88);
+	CalcTextRect(rect, x1, y, label_w - 68);
 	m_txtHWAdapter.Create(ResStr(IDS_VDF_HW_ADAPTER), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
-	CalcRect(rect, x2 - 64, y, control_w + 64, 200); rect.top -= 4;
+	CalcRect(rect, x2 - 68, y, control_w + 68, 200); rect.top -= 4;
 	m_cbHWAdapter.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, rect, this, IDC_PP_HW_ADAPTER);
 	y += 28;
 

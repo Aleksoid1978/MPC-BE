@@ -97,7 +97,7 @@ CStringA UrlDecode(const CStringA& str_in)
 
 bool Unescape(CStringW& str)
 {
-	int len = str.GetLength();
+	const int len = str.GetLength();
 	HRESULT hr = UrlUnescapeW(str.GetBuffer(), nullptr, nullptr, URL_ESCAPE_URI_COMPONENT | URL_UNESCAPE_INPLACE);
 	if (SUCCEEDED(hr)) {
 		str.ReleaseBuffer();
