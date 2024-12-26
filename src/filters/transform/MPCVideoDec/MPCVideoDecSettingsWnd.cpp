@@ -176,9 +176,9 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	y += 28;
 
 	// DXVA Compatibility check
-	CalcTextRect(rect, x1, y, label_w + 24);
+	CalcTextRect(rect, x1, y, label_w + 16);
 	m_txtDXVACompatibilityCheck.Create(ResStr(IDS_VDF_DXVACOMPATIBILITY), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
-	CalcRect(rect, x2 + 24, y, control_w - 24, 200); rect.top -= 4;
+	CalcRect(rect, x2 + 16, y, control_w - 16, 200); rect.top -= 4;
 	m_cbDXVACompatibilityCheck.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, rect, this, IDC_PP_DXVA_CHECK);
 	m_cbDXVACompatibilityCheck.AddString(ResStr(IDS_VDF_DXVA_FULLCHECK));
 	m_cbDXVACompatibilityCheck.AddString(ResStr(IDS_VDF_DXVA_SKIP_LEVELCHECK));
