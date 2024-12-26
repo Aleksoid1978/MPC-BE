@@ -3280,7 +3280,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_AVISPLITTER_NON_INTERLEAVED "Fehlerhafte Interleaved Dateien unterstützen"
-    IDS_AVISPLITTER_REINDEX_BROKEN "Beschädigte Dateien erneut indexen"
+    IDS_AVISPLITTER_REINDEX_BROKEN "Beschädigte Dateien erneut indizieren"
 END
 
 STRINGTABLE
@@ -3336,7 +3336,7 @@ BEGIN
     IDS_VDF_SCANTYPE        "Scantyp"
     IDS_VDF_SCANTYPE_TOP    "Oberes Feld zuerst"
     IDS_VDF_SCANTYPE_BOTTOM "Unteres Feld zuerst"
-    IDS_VDF_SCANTYPE_PROGRESSIVE "Vollbild"
+    IDS_VDF_SCANTYPE_PROGRESSIVE "Vollbild-Verfahren"
     IDS_VDF_COLOR_OUTPUT_FORMATS "Ausgabeformate"
     IDS_VDF_COLOR_PRESET    "Voreinstellung:"
     IDS_VDF_COLOR_STANDARD  "Standard:"
