@@ -18,6 +18,7 @@ Fixed the "Enable dark title" setting.
 
 Installer
 MPC Video Renderer will be installed by default.
+Added MPC Script Source 0.2.5.
 
 Updated German translation (by Klaus1189).
 Updated Hungarian translation (by mickey).

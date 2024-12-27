@@ -69,6 +69,7 @@
   #define VisualElementsManifest = "VisualElements\mpc-be64.VisualElementsManifest.xml"
 #endif
 #define mpcvr_desc     = "MPC Video Renderer 0.8.9"
+#define mpcscriptsrc_desc = "MPC Script Source 0.2.5"
 
 [Setup]
 #ifdef Win32Build
@@ -208,6 +209,7 @@ Name: "mpcresources";  Description: "{cm:comp_mpcresources}";   Types: default c
 Name: "mpcbeshellext"; Description: "{cm:comp_mpcbeshellext}";  Types: custom;         Flags: disablenouninstallwarning;
 Name: "intel_msdk";    Description: "{cm:comp_intel_msdk}";     Types: custom;         Flags: disablenouninstallwarning;
 Name: "mpcvr";         Description: "{#mpcvr_desc}";            Types: default custom; Flags: disablenouninstallwarning;
+Name: "mpcscriptsrc";  Description: "{#mpcscriptsrc_desc}";     Types: custom;         Flags: disablenouninstallwarning;
 
 [Tasks]
 Name: desktopicon;              Description: {cm:CreateDesktopIcon};     GroupDescription: {cm:AdditionalIcons}
@@ -244,9 +246,11 @@ Source: "{#VisualElementsManifest}";       DestDir: "{app}";                    
 #ifdef Win32Build
 Source: "MPC_components\IntelMediaSDK\libmfxsw32.dll"; DestDir: "{app}"; Flags: ignoreversion; Components: intel_msdk;
 Source: "MPC_components\MpcVideoRenderer\MpcVideoRenderer.ax"; DestDir: "{app}\Filters"; Flags: regserver; Components: mpcvr;
+Source: "MPC_components\MpcScriptSource\MpcScriptSource.ax"; DestDir: "{app}\Filters"; Flags: regserver; Components: mpcscriptsrc;
 #else
 Source: "MPC_components\IntelMediaSDK\libmfxsw64.dll"; DestDir: "{app}"; Flags: ignoreversion; Components: intel_msdk;
 Source: "MPC_components\MpcVideoRenderer\MpcVideoRenderer64.ax"; DestDir: "{app}\Filters"; Flags: regserver; Components: mpcvr;
+Source: "MPC_components\MpcScriptSource\MpcScriptSource64.ax"; DestDir: "{app}\Filters"; Flags: regserver; Components: mpcscriptsrc;
 #endif
 
 [Icons]
