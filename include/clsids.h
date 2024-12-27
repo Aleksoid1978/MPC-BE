@@ -1,5 +1,5 @@
 /*
- * (C) 2020 see Authors.txt
+ * (C) 2020-2024 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -43,6 +43,10 @@ DEFINE_GUID(CLSID_LAVSource,
 // {55C39876-FF76-4AB0-AAB0-0A46D535A26B} 3DYD Youtube Source
 DEFINE_GUID(CLSID_3DYDYoutubeSource,
 			0x55C39876, 0xFF76, 0x4AB0, 0xAA, 0xB0, 0x0A, 0x46, 0xD5, 0x35, 0xA2, 0x6B);
+
+// {7D3BBD5A-880D-4A30-A2D1-7B8C2741AFEF} MPC Script Source
+DEFINE_GUID(CLSID_MPCScriptSource,
+			0x7D3BBD5A, 0x880D, 0x4A30, 0xA2, 0xD1, 0x7B, 0x8C, 0x27, 0x41, 0xAF, 0xEF);
 
 // video decoders
 
