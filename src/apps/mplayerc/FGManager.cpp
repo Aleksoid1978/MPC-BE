@@ -495,25 +495,32 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 		}
 	}
 
-	// hack for StreamBufferSource - we need override merit from registry.
-	if (ext == L".dvr-ms" || ext == L".wtv") {
-		BOOL bIsBlocked = FALSE;
-		for (const auto& pFGF : m_override) {
-			if (pFGF->GetCLSID() == CLSID_StreamBufferSource && pFGF->GetMerit() == MERIT64_DO_NOT_USE) {
-				bIsBlocked = TRUE;
-				break;
+	// external
+	{
+		// hack for StreamBufferSource - we need override merit from registry.
+		if (ext == L".dvr-ms" || ext == L".wtv") {
+			BOOL bIsBlocked = FALSE;
+			for (const auto& pFGF : m_override) {
+				if (pFGF->GetCLSID() == CLSID_StreamBufferSource && pFGF->GetMerit() == MERIT64_DO_NOT_USE) {
+					bIsBlocked = TRUE;
+					break;
+				}
+			}
+
+			if (!bIsBlocked) {
+				CFGFilter* pFGF = LookupFilterRegistry(CLSID_StreamBufferSource, m_override);
+				pFGF->SetMerit(MERIT64_DO_USE);
+				fl.Insert(pFGF, 9);
+			}
+		}
+		// add MPC Script Source
+		else if (ext == L".avs" || ext == L".vpy") {
+			CFGFilter* pFGF = LookupFilterRegistry(CLSID_MPCScriptSource, m_override);
+			if (pFGF) {
+				fl.Insert(pFGF, 9);
 			}
 		}
 
-		if (!bIsBlocked) {
-			CFGFilter* pFGF = LookupFilterRegistry(CLSID_StreamBufferSource, m_override);
-			pFGF->SetMerit(MERIT64_DO_USE);
-			fl.Insert(pFGF, 9);
-		}
-	}
-
-	// external
-	{
 		WCHAR buff[256] = {}, buff2[256] = {};
 		ULONG len, len2;
 
