@@ -3280,7 +3280,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_AVISPLITTER_NON_INTERLEAVED "Támogatja a ""Rossz"" összesorolt fájlokat"
-    IDS_AVISPLITTER_REINDEX_BROKEN "Sérült fájlok ismételt indexelése"
+    IDS_AVISPLITTER_REINDEX_BROKEN "Sérült fájlok újraindexelése"
 END
 
 STRINGTABLE
