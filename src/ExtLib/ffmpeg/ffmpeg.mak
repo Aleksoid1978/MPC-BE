@@ -72,6 +72,7 @@ OBJ_DIRS = $(OBJ_DIR) \
 	$(OBJ_DIR)libavcodec/vvc \
 	$(OBJ_DIR)libavcodec/x86 \
 	$(OBJ_DIR)libavcodec/x86/h26x \
+	$(OBJ_DIR)libavcodec/x86/hevc \
 	$(OBJ_DIR)libavcodec/x86/vvc \
 	$(OBJ_DIR)libavfilter \
 	$(OBJ_DIR)libavfilter/x86 \
@@ -632,7 +633,6 @@ SRCS_LC_B = \
 	libavcodec/x86/h264dsp_init.c \
 	libavcodec/x86/hevc_idct_intrinsic.c \
 	libavcodec/x86/hevc_intra_intrinsic.c \
-	libavcodec/x86/hevcdsp_init.c \
 	libavcodec/x86/h264_qpel.c \
 	libavcodec/x86/hpeldsp_init.c \
 	libavcodec/x86/huffyuvdsp_init.c \
@@ -675,7 +675,9 @@ SRCS_LC_B = \
 	\
 	libavcodec/x86/h26x/h2656dsp.c \
 	\
-	libavcodec/x86/vvc/vvcdsp_init.c
+	libavcodec/x86/hevc/dsp_init.c \
+	\
+	libavcodec/x86/vvc/dsp_init.c
 
 SRCS_LC_BSF = \
 	libavcodec/bsf/aac_adtstoasc.c \
@@ -813,12 +815,15 @@ SRCS_LR = \
 
 SRCS_LS = \
 	libswscale/alphablend.c \
+	libswscale/cms.c \
+	libswscale/csputils.c \
 	libswscale/gamma.c \
 	libswscale/graph.c \
 	libswscale/half2float.c \
 	libswscale/hscale.c \
 	libswscale/hscale_fast_bilinear.c \
 	libswscale/input.c \
+	libswscale/lut3d.c \
 	libswscale/options.c \
 	libswscale/output.c \
 	libswscale/rgb2rgb.c \
@@ -865,12 +870,6 @@ SRCS_ASM_LC = \
 	libavcodec/x86/h264_qpel_8bit.asm \
 	libavcodec/x86/h264_weight.asm \
 	libavcodec/x86/h264_weight_10bit.asm \
-	libavcodec/x86/hevc_add_res.asm \
-	libavcodec/x86/hevc_deblock.asm \
-	libavcodec/x86/hevc_idct.asm \
-	libavcodec/x86/hevc_mc.asm \
-	libavcodec/x86/hevc_sao.asm \
-	libavcodec/x86/hevc_sao_10bit.asm \
 	libavcodec/x86/hpeldsp.asm \
 	libavcodec/x86/huffyuvdsp.asm \
 	libavcodec/x86/idctdsp.asm \
@@ -917,11 +916,18 @@ SRCS_ASM_LC = \
 	\
 	libavcodec/x86/h26x/h2656_inter.asm \
 	\
-	libavcodec/x86/vvc/vvc_alf.asm \
-	libavcodec/x86/vvc/vvc_dmvr.asm \
-	libavcodec/x86/vvc/vvc_mc.asm \
-	libavcodec/x86/vvc/vvc_of.asm \
-	libavcodec/x86/vvc/vvc_sad.asm
+	libavcodec/x86/hevc/add_res.asm \
+	libavcodec/x86/hevc/deblock.asm \
+	libavcodec/x86/hevc/idct.asm \
+	libavcodec/x86/hevc/mc.asm \
+	libavcodec/x86/hevc/sao.asm \
+	libavcodec/x86/hevc/sao_10bit.asm \
+	\
+	libavcodec/x86/vvc/alf.asm \
+	libavcodec/x86/vvc/dmvr.asm \
+	libavcodec/x86/vvc/mc.asm \
+	libavcodec/x86/vvc/of.asm \
+	libavcodec/x86/vvc/sad.asm
 
 SRCS_ASM_LF = 
 

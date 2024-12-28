@@ -509,6 +509,34 @@ static void gray8aToPacked24(const uint8_t *src, uint8_t *dst, int num_pixels,
     }
 }
 
+static void gray8aToPlanar8(const uint8_t *src, uint8_t *dst0, uint8_t *dst1,
+                            uint8_t *dst2, uint8_t *dstA, int num_pixels,
+                            const uint8_t *palette)
+{
+    for (int i = 0; i < num_pixels; i++) {
+        const uint8_t *rgb = &palette[src[i << 1] * 4];
+        dst0[i] = rgb[0];
+        dst1[i] = rgb[1];
+        dst2[i] = rgb[2];
+        if (dstA)
+            dstA[i] = src[(i << 1) + 1];
+    }
+}
+
+static void pal8ToPlanar8(const uint8_t *src, uint8_t *dst0, uint8_t *dst1,
+                          uint8_t *dst2, uint8_t *dstA, int num_pixels,
+                          const uint8_t *palette)
+{
+    for (int i = 0; i < num_pixels; i++) {
+        const uint8_t *rgba = &palette[src[i] * 4];
+        dst0[i] = rgba[0];
+        dst1[i] = rgba[1];
+        dst2[i] = rgba[2];
+        if (dstA)
+            dstA[i] = rgba[3];
+    }
+}
+
 static int bswap_16bpc(SwsInternal *c, const uint8_t *const src[],
                               const int srcStride[], int srcSliceY, int srcSliceH,
                               uint8_t *const dst[], const int dstStride[])
@@ -605,6 +633,45 @@ static int palToRgbWrapper(SwsInternal *c, const uint8_t *const src[], const int
             srcPtr += srcStride[0];
             dstPtr += dstStride[0];
         }
+    }
+
+    return srcSliceH;
+}
+
+static int palToGbrpWrapper(SwsInternal *c, const uint8_t *const src[],
+                            const int srcStride[], int srcSliceY, int srcSliceH,
+                            uint8_t *const dst[], const int dstStride[])
+{
+    const enum AVPixelFormat srcFormat = c->opts.src_format;
+    const enum AVPixelFormat dstFormat = c->opts.dst_format;
+    void (*conv)(const uint8_t *src, uint8_t *dstG, uint8_t *dstB, uint8_t *dstR,
+                 uint8_t *dstA, int num_pixels, const uint8_t *palette) = NULL;
+
+    const int num_planes = isALPHA(dstFormat) ? 4 : 3;
+    const uint8_t *srcPtr = src[0];
+    uint8_t *dstPtr[4] = {0};
+    for (int i = 0; i < num_planes; i++)
+        dstPtr[i] = dst[i] + dstStride[i] * srcSliceY;
+
+    if (srcFormat == AV_PIX_FMT_YA8) {
+        switch (dstFormat) {
+        case AV_PIX_FMT_GBRP:  conv = gray8aToPlanar8; break;
+        case AV_PIX_FMT_GBRAP: conv = gray8aToPlanar8; break;
+        }
+    } else if (usePal(srcFormat)) {
+        switch (dstFormat) {
+        case AV_PIX_FMT_GBRP:  conv = pal8ToPlanar8; break;
+        case AV_PIX_FMT_GBRAP: conv = pal8ToPlanar8; break;
+        }
+    }
+
+    av_assert1(conv);
+    for (int y = 0; y < srcSliceH; y++) {
+        conv(srcPtr, dstPtr[0], dstPtr[1], dstPtr[2], dstPtr[3], c->opts.src_w,
+            (uint8_t *) c->pal_rgb);
+        srcPtr += srcStride[0];
+        for (int i = 0; i < num_planes; i++)
+            dstPtr[i] += dstStride[i];
     }
 
     return srcSliceH;
@@ -2075,20 +2142,21 @@ static int packedCopyWrapper(SwsInternal *c, const uint8_t *const src[],
 
 #define DITHER_COPY(dst, dstStride, src, srcStride, bswap, dbswap)\
     unsigned shift= src_depth-dst_depth, tmp;\
+    unsigned bias = 1 << (shift - 1);\
     if (c->opts.dither == SWS_DITHER_NONE) {\
         for (i = 0; i < height; i++) {\
             for (j = 0; j < length-7; j+=8) {\
-                dst[j+0] = dbswap(bswap(src[j+0])>>shift);\
-                dst[j+1] = dbswap(bswap(src[j+1])>>shift);\
-                dst[j+2] = dbswap(bswap(src[j+2])>>shift);\
-                dst[j+3] = dbswap(bswap(src[j+3])>>shift);\
-                dst[j+4] = dbswap(bswap(src[j+4])>>shift);\
-                dst[j+5] = dbswap(bswap(src[j+5])>>shift);\
-                dst[j+6] = dbswap(bswap(src[j+6])>>shift);\
-                dst[j+7] = dbswap(bswap(src[j+7])>>shift);\
+                tmp = (bswap(src[j+0]) + bias)>>shift; dst[j+0] = dbswap(tmp - (tmp>>dst_depth));\
+                tmp = (bswap(src[j+1]) + bias)>>shift; dst[j+1] = dbswap(tmp - (tmp>>dst_depth));\
+                tmp = (bswap(src[j+2]) + bias)>>shift; dst[j+2] = dbswap(tmp - (tmp>>dst_depth));\
+                tmp = (bswap(src[j+3]) + bias)>>shift; dst[j+3] = dbswap(tmp - (tmp>>dst_depth));\
+                tmp = (bswap(src[j+4]) + bias)>>shift; dst[j+4] = dbswap(tmp - (tmp>>dst_depth));\
+                tmp = (bswap(src[j+5]) + bias)>>shift; dst[j+5] = dbswap(tmp - (tmp>>dst_depth));\
+                tmp = (bswap(src[j+6]) + bias)>>shift; dst[j+6] = dbswap(tmp - (tmp>>dst_depth));\
+                tmp = (bswap(src[j+7]) + bias)>>shift; dst[j+7] = dbswap(tmp - (tmp>>dst_depth));\
             }\
             for (; j < length; j++) {\
-                dst[j] = dbswap(bswap(src[j])>>shift);\
+                tmp = (bswap(src[j]) + bias)>>shift; dst[j] = dbswap(tmp - (tmp>>dst_depth));\
             }\
             dst += dstStride;\
             src += srcStride;\
@@ -2147,10 +2215,12 @@ static int planarCopyWrapper(SwsInternal *c, const uint8_t *const src[],
         const uint8_t *srcPtr = src[plane];
         uint8_t *dstPtr = dst[plane] + dstStride[plane] * y;
         int shiftonly = plane == 1 || plane == 2 || (!c->opts.src_range && plane == 0);
+        if (plane == 1 && isSemiPlanarYUV(c->opts.dst_format))
+            length *= 2;
 
         // ignore palette for GRAY8
-        if (plane == 1 && !dst[2]) continue;
-        if (!src[plane] || (plane == 1 && !src[2])) {
+        if (plane == 1 && desc_dst->nb_components < 3) continue;
+        if (!src[plane] || (plane == 1 && desc_src->nb_components < 3)) {
             if (is16BPS(c->opts.dst_format) || isNBPS(c->opts.dst_format)) {
                 fillPlane16(dst[plane], dstStride[plane], length, height, y,
                         plane == 3, desc_dst->comp[plane].depth,
@@ -2169,6 +2239,7 @@ static int planarCopyWrapper(SwsInternal *c, const uint8_t *const src[],
                 uint16_t *dstPtr2 = (uint16_t*)dstPtr;
 
                 if (dst_depth == 8) {
+                    av_assert1(src_depth > 8);
                     if(isBE(c->opts.src_format) == HAVE_BIGENDIAN){
                         DITHER_COPY(dstPtr, dstStride[plane], srcPtr2, srcStride[plane]/2, , )
                     } else {
@@ -2248,7 +2319,7 @@ static int planarCopyWrapper(SwsInternal *c, const uint8_t *const src[],
                         dstPtr2 += dstStride[plane]/2;
                         srcPtr2 += srcStride[plane]/2;
                     }
-                } else {
+                } else { /* src_depth > dst_depth */
                     if(isBE(c->opts.src_format) == HAVE_BIGENDIAN){
                         if(isBE(c->opts.dst_format) == HAVE_BIGENDIAN){
                             DITHER_COPY(dstPtr2, dstStride[plane]/2, srcPtr2, srcStride[plane]/2, , )
@@ -2529,8 +2600,18 @@ void ff_get_unscaled_swscale(SwsInternal *c)
         IS_DIFFERENT_ENDIANESS(srcFormat, dstFormat, AV_PIX_FMT_GBRAPF32))
         c->convert_unscaled = bswap_32bpc;
 
-    if (usePal(srcFormat) && isByteRGB(dstFormat))
-        c->convert_unscaled = palToRgbWrapper;
+    if (usePal(srcFormat)) {
+        switch (dstFormat) {
+        case AV_PIX_FMT_GBRP:
+        case AV_PIX_FMT_GBRAP:
+            c->convert_unscaled = palToGbrpWrapper;
+            break;
+        default:
+            if (isByteRGB(dstFormat))
+                c->convert_unscaled = palToRgbWrapper;
+            break;
+        }
+    }
 
     if (srcFormat == AV_PIX_FMT_YUV422P) {
         if (dstFormat == AV_PIX_FMT_YUYV422)
@@ -2584,7 +2665,7 @@ void ff_get_unscaled_swscale(SwsInternal *c)
         (isPlanarYUV(srcFormat) && isPlanarYUV(dstFormat) &&
          c->chrDstHSubSample == c->chrSrcHSubSample &&
          c->chrDstVSubSample == c->chrSrcVSubSample &&
-         !isSemiPlanarYUV(srcFormat) && !isSemiPlanarYUV(dstFormat))))
+         isSemiPlanarYUV(srcFormat) == isSemiPlanarYUV(dstFormat))))
     {
         if (isPacked(c->opts.src_format))
             c->convert_unscaled = packedCopyWrapper;

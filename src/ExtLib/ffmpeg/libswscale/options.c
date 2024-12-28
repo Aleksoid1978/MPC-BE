@@ -71,6 +71,7 @@ static const AVOption swscale_options[] = {
 
     { "sws_dither",      "set dithering algorithm",       OFFSET(dither),    AV_OPT_TYPE_INT,    { .i64  = SWS_DITHER_AUTO     }, .flags = VE, .unit = "sws_dither", .max = SWS_DITHER_NB - 1 },
         { "auto",        "automatic selection",           0,                 AV_OPT_TYPE_CONST,  { .i64  = SWS_DITHER_AUTO     }, .flags = VE, .unit = "sws_dither" },
+        { "none",        "no dithering",                  0,                 AV_OPT_TYPE_CONST,  { .i64  = SWS_DITHER_NONE     }, .flags = VE, .unit = "sws_dither" },
         { "bayer",       "ordered matrix dither",         0,                 AV_OPT_TYPE_CONST,  { .i64  = SWS_DITHER_BAYER    }, .flags = VE, .unit = "sws_dither" },
         { "ed",          "full error diffusion",          0,                 AV_OPT_TYPE_CONST,  { .i64  = SWS_DITHER_ED       }, .flags = VE, .unit = "sws_dither" },
         { "a_dither",    "arithmetic addition dither",    0,                 AV_OPT_TYPE_CONST,  { .i64  = SWS_DITHER_A_DITHER }, .flags = VE, .unit = "sws_dither" },
@@ -83,6 +84,12 @@ static const AVOption swscale_options[] = {
 
     { "threads",         "number of threads",             OFFSET(threads),   AV_OPT_TYPE_INT,   {.i64 = 1 }, .flags = VE, .unit = "threads", .max = INT_MAX },
         { "auto",        "automatic selection",           0,                 AV_OPT_TYPE_CONST, {.i64 = 0 }, .flags = VE, .unit = "threads" },
+
+    { "intent",          "color mapping intent",        OFFSET(intent), AV_OPT_TYPE_INT,    { .i64 = SWS_INTENT_RELATIVE_COLORIMETRIC }, .flags = VE, .unit = "intent", .max = SWS_INTENT_NB - 1 },
+        { "perceptual",            "perceptual tone mapping",        0, AV_OPT_TYPE_CONST,  { .i64 = SWS_INTENT_PERCEPTUAL            }, .flags = VE, .unit = "intent" },
+        { "relative_colorimetric", "relative colorimetric clipping", 0, AV_OPT_TYPE_CONST,  { .i64 = SWS_INTENT_RELATIVE_COLORIMETRIC }, .flags = VE, .unit = "intent" },
+        { "saturation",            "saturation mapping",             0, AV_OPT_TYPE_CONST,  { .i64 = SWS_INTENT_SATURATION            }, .flags = VE, .unit = "intent" },
+        { "absolute_colorimetric", "absolute colorimetric clipping", 0, AV_OPT_TYPE_CONST,  { .i64 = SWS_INTENT_ABSOLUTE_COLORIMETRIC }, .flags = VE, .unit = "intent" },
 
     { NULL }
 };

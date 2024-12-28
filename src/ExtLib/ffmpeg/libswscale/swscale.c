@@ -773,10 +773,10 @@ void ff_xyz12Torgb48(const SwsInternal *c, uint8_t *dst, int dst_stride,
                 c->xyz2rgb_matrix[2][1] * y +
                 c->xyz2rgb_matrix[2][2] * z >> 12;
 
-            // limit values to 12-bit depth
-            r = av_clip_uintp2(r, 12);
-            g = av_clip_uintp2(g, 12);
-            b = av_clip_uintp2(b, 12);
+            // limit values to 16-bit depth
+            r = av_clip_uint16(r);
+            g = av_clip_uint16(g);
+            b = av_clip_uint16(b);
 
             // convert from sRGBlinear to RGB and scale from 12bit to 16bit
             if (desc->flags & AV_PIX_FMT_FLAG_BE) {
@@ -832,10 +832,10 @@ void ff_rgb48Toxyz12(const SwsInternal *c, uint8_t *dst, int dst_stride,
                 c->rgb2xyz_matrix[2][1] * g +
                 c->rgb2xyz_matrix[2][2] * b >> 12;
 
-            // limit values to 12-bit depth
-            x = av_clip_uintp2(x, 12);
-            y = av_clip_uintp2(y, 12);
-            z = av_clip_uintp2(z, 12);
+            // limit values to 16-bit depth
+            x = av_clip_uint16(x);
+            y = av_clip_uint16(y);
+            z = av_clip_uint16(z);
 
             // convert from XYZlinear to X'Y'Z' and scale from 12bit to 16bit
             if (desc->flags & AV_PIX_FMT_FLAG_BE) {
@@ -918,6 +918,14 @@ void ff_update_palette(SwsInternal *c, const uint32_t *pal)
         case AV_PIX_FMT_RGB24:
 #endif
             c->pal_rgb[i]= a + (b<<8) + (g<<16) + ((unsigned)r<<24);
+            break;
+        case AV_PIX_FMT_GBRP:
+        case AV_PIX_FMT_GBRAP:
+#if HAVE_BIGENDIAN
+            c->pal_rgb[i]= a + (r<<8) + (b<<16) + ((unsigned)g<<24);
+#else
+            c->pal_rgb[i]= g + (b<<8) + (r<<16) + ((unsigned)a<<24);
+#endif
             break;
         case AV_PIX_FMT_RGB32:
 #if !HAVE_BIGENDIAN
@@ -1441,16 +1449,6 @@ int sws_frame_setup(SwsContext *ctx, const AVFrame *dst, const AVFrame *src)
             goto fail;
         }
 
-        /* TODO: remove once implemented */
-        if ((dst_fmt.prim != src_fmt.prim || dst_fmt.trc != src_fmt.trc) &&
-            !s->color_conversion_warned)
-        {
-            av_log(ctx, AV_LOG_WARNING, "Conversions between different primaries / "
-                   "transfer functions are not currently implemented, expect "
-                   "wrong results.\n");
-            s->color_conversion_warned = 1;
-        }
-
         if (!ff_test_fmt(&src_fmt, 0)) {
             err_msg = "Unsupported input";
             ret = AVERROR(ENOTSUP);
@@ -1487,9 +1485,9 @@ int sws_frame_setup(SwsContext *ctx, const AVFrame *dst, const AVFrame *src)
                                           " fmt:%s csp:%s prim:%s trc:%s\n",
                err_msg, av_err2str(ret),
                av_get_pix_fmt_name(src_fmt.format), av_color_space_name(src_fmt.csp),
-               av_color_primaries_name(src_fmt.prim), av_color_transfer_name(src_fmt.trc),
+               av_color_primaries_name(src_fmt.color.prim), av_color_transfer_name(src_fmt.color.trc),
                av_get_pix_fmt_name(dst_fmt.format), av_color_space_name(dst_fmt.csp),
-               av_color_primaries_name(dst_fmt.prim), av_color_transfer_name(dst_fmt.trc));
+               av_color_primaries_name(dst_fmt.color.prim), av_color_transfer_name(dst_fmt.color.trc));
 
         for (int i = 0; i < FF_ARRAY_ELEMS(s->graph); i++)
             sws_graph_free(&s->graph[i]);

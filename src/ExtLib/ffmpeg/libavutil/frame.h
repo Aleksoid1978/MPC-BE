@@ -283,6 +283,20 @@ enum AVSideDataProps {
      * a single side data array.
      */
     AV_SIDE_DATA_PROP_MULTI  = (1 << 1),
+
+    /**
+     * Side data depends on the video dimensions. Side data with this property
+     * loses its meaning when rescaling or cropping the image, unless
+     * either recomputed or adjusted to the new resolution.
+     */
+    AV_SIDE_DATA_PROP_SIZE_DEPENDENT = (1 << 2),
+
+    /**
+     * Side data depends on the video color space. Side data with this property
+     * loses its meaning when changing the video color encoding, e.g. by
+     * adapting to a different set of primaries or transfer characteristics.
+     */
+    AV_SIDE_DATA_PROP_COLOR_DEPENDENT = (1 << 3),
 };
 
 /**
@@ -1169,6 +1183,14 @@ const AVFrameSideData *av_frame_side_data_get(AVFrameSideData * const *sd,
  */
 void av_frame_side_data_remove(AVFrameSideData ***sd, int *nb_sd,
                                enum AVFrameSideDataType type);
+
+/**
+ * Remove and free all side data instances that match any of the given
+ * side data properties. (See enum AVSideDataProps)
+ */
+void av_frame_side_data_remove_by_props(AVFrameSideData ***sd, int *nb_sd,
+                                        int props);
+
 /**
  * @}
  */

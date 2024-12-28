@@ -1,20 +1,11 @@
 ﻿The following files have MPC-BE specific custom code (compared to ffmpeg):
 
-* config.h
-* config.asm
-* ffmpeg.mak
-
+* compat/atomics/win32/stdatomic.h
 * compat/w32dlfcn.h
-
-* libavcodec/x86/hevcdsp.h
-* libavcodec/x86/hevcdsp_init.c
-
-* libavcodec/vvc/vvcdec.c
+* compat/w32pthreads.h
 
 * libavcodec/aacsbr_template.c
 * libavcodec/allcodecs.c
-* libavcodec/bsf_list.c
-* libavcodec/codec_list.c
 * libavcodec/d3d12va_hevc.c
 * libavcodec/dxva2.c
 * libavcodec/dxva2_hevc.c
@@ -25,18 +16,20 @@
 * libavcodec/h264_slice.c
 * libavcodec/h264dec.c
 * libavcodec/h264dec.h
-* libavcodec/hevc_ps.c
-* libavcodec/hevcdec.c
-* libavcodec/hevcpred.c
-* libavcodec/hevcpred.h
+* libavcodec/hevc/hevcdec.c
+* libavcodec/hevc/pred.c
+* libavcodec/hevc/pred.h
+* libavcodec/hevc/ps.c
 * libavcodec/hwconfig.h
 * libavcodec/mpeg4audio.h
 * libavcodec/mpeg12dec.c
 * libavcodec/mpegaudio_parser.c
-* libavcodec/parser_list.c
 * libavcodec/vc1.h
 * libavcodec/vc1dec.c
 * libavcodec/vp9.c
+* libavcodec/vvc/dec.c
+* libavcodec/x86/hevc/dsp_init.c
+* libavcodec/x86/hevcdsp.h
 
 * libavutil/hwcontext_d3d11va.c
 * libavutil/hwcontext_d3d11va.h
@@ -47,13 +40,17 @@
 ======
 The following files are available only in MPC-BE (compared with ffmpeg):
 
+* config.asm
 * config.c
+* config.h
+* ffmpeg.mak
 
+* compat/windows/d3d12.h
+* compat/windows/d3d12video.h
 * compat/windows/dxva_av1.h
 * compat/windows/initguid.h
 
+* libavcodec/libvvdec.c
 * libavcodec/x86/hevc_idct_intrinsic.c
 * libavcodec/x86/hevc_intra_intrinsic.c
 * libavcodec/x86/hevcpred.h
-
-* libavcodec/libvvdec.c

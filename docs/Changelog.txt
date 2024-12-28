@@ -32,7 +32,7 @@ Updated Dutch and Chinese (Traditional) translation (by beter).
 Updated libraries:
 	libflac 1.4.3;
 	libogg 1.3.5;
-	ffmpeg n7.2-dev-940-g6b31e42c47.
+	ffmpeg n7.2-dev-1031-g5f38c82536.
 
 
 1.8.2 - 2024-12-07
