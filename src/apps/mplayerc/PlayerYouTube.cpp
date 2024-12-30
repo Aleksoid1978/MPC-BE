@@ -788,7 +788,7 @@ namespace Youtube
 				}
 			}
 
-			if (!streamingDataFormatListAudioWithLanguages.empty()) {
+			if (streamingDataFormatListAudioWithLanguages.size()) {
 				// Removing existing audio formats without "language" tag.
 				for (auto it = streamingDataFormatList.begin(); it != streamingDataFormatList.end();) {
 					auto itag = std::get<0>(*it);
@@ -799,16 +799,31 @@ namespace Youtube
 					}
 				}
 
-				auto it = streamingDataFormatListAudioWithLanguages.find("en");
-				if (!s.strYoutubeAudioLang.IsEmpty()) {
-					it = streamingDataFormatListAudioWithLanguages.find(WStrToUTF8(s.strYoutubeAudioLang.GetString()));
-					if (it == streamingDataFormatListAudioWithLanguages.end()) {
-						it = streamingDataFormatListAudioWithLanguages.find("en");
-					}
-				}
+				auto& audioLangs = streamingDataFormatListAudioWithLanguages;
 
-				if (it == streamingDataFormatListAudioWithLanguages.end()) {
-					it = streamingDataFormatListAudioWithLanguages.begin();
+				auto it = audioLangs.begin();
+
+				if (s.strYoutubeAudioLang.GetLength()) {
+					CStringA lang = WStrToUTF8(s.strYoutubeAudioLang.GetString());
+					auto it2 = audioLangs.find(lang);
+					if (it2 == audioLangs.end()) {
+						if (lang == "en") {
+							it2 = audioLangs.find("en-US");
+						}
+						else if (lang = "de") {
+							it2 = audioLangs.find("de-DE");
+						}
+						else if (lang = "fr") {
+							it2 = audioLangs.find("fr-FR");
+						}
+						else if (lang = "es") {
+							it2 = audioLangs.find("es-US");
+						}
+					}
+
+					if (it2 != audioLangs.end()) {
+						it = it2;
+					}
 				}
 
 				streamingDataFormatList.splice(streamingDataFormatList.end(), it->second);
