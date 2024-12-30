@@ -692,6 +692,8 @@ namespace Youtube
 			using streamingDataFormat = std::tuple<int, CStringA, CStringA, CStringA>;
 			std::list<streamingDataFormat> streamingDataFormatList;
 			std::map<CStringA, std::list<streamingDataFormat>> streamingDataFormatListAudioWithLanguages;
+			CStringA defaultAudioLang;
+
 			if (!player_response_jsonDocument.IsNull()) {
 				if (auto playabilityStatus = GetJsonObject(player_response_jsonDocument, "playabilityStatus")) {
 					CStringA status;
@@ -773,6 +775,10 @@ namespace Youtube
 										auto pos = lang_id.Find('.');
 										if (pos != -1) {
 											lang_id = lang_id.Left(pos);
+											bool audioIsDefault = false;
+											if (getJsonValue(*audioTrack, "audioIsDefault", audioIsDefault) && audioIsDefault) {
+												defaultAudioLang = lang_id;
+											};
 										}
 									}
 								}
@@ -801,7 +807,8 @@ namespace Youtube
 
 				auto& audioLangs = streamingDataFormatListAudioWithLanguages;
 
-				auto it = audioLangs.begin();
+				
+				auto it = defaultAudioLang.GetLength() ? audioLangs.find(defaultAudioLang) : audioLangs.begin();
 
 				if (s.strYoutubeAudioLang.GetLength()) {
 					CStringA lang = WStrToUTF8(s.strYoutubeAudioLang.GetString());
