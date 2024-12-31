@@ -219,6 +219,8 @@ namespace Youtube
 
 	static bool URLPostData(LPCWSTR lpszAgent, const CStringW& headers, CStringA& requestData, urlData& pData)
 	{
+		pData.clear();
+
 		if (auto hInet = InternetOpenW(lpszAgent, INTERNET_OPEN_TYPE_PRECONFIG, nullptr, nullptr, 0)) {
 			if (auto hSession = InternetConnectW(hInet, L"www.youtube.com", 443, nullptr, nullptr, INTERNET_SERVICE_HTTP, 0, 1)) {
 				if (auto hRequest = HttpOpenRequestW(hSession,
@@ -228,7 +230,6 @@ namespace Youtube
 
 					if (HttpSendRequestW(hRequest, headers.GetString(), headers.GetLength(),
 										 reinterpret_cast<LPVOID>(requestData.GetBuffer()), requestData.GetLength())) {
-						pData.clear();
 						static std::vector<char> tmp(16 * 1024);
 						for (;;) {
 							DWORD dwSizeRead = 0;
@@ -241,7 +242,6 @@ namespace Youtube
 
 						if (!pData.empty()) {
 							pData.emplace_back('\0');
-							return true;
 						}
 					}
 
@@ -252,7 +252,7 @@ namespace Youtube
 			InternetCloseHandle(hInet);
 		}
 
-		return false;
+		return !pData.empty();
 	}
 
 	static bool URLPostData(LPCWSTR videoId, urlData& pData)
@@ -807,7 +807,7 @@ namespace Youtube
 
 				auto& audioLangs = streamingDataFormatListAudioWithLanguages;
 
-				
+
 				auto it = defaultAudioLang.GetLength() ? audioLangs.find(defaultAudioLang) : audioLangs.begin();
 
 				if (s.strYoutubeAudioLang.GetLength()) {
