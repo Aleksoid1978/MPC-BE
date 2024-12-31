@@ -230,6 +230,7 @@ namespace Youtube
 
 					if (HttpSendRequestW(hRequest, headers.GetString(), headers.GetLength(),
 										 reinterpret_cast<LPVOID>(requestData.GetBuffer()), requestData.GetLength())) {
+
 						static std::vector<char> tmp(16 * 1024);
 						for (;;) {
 							DWORD dwSizeRead = 0;
@@ -775,10 +776,13 @@ namespace Youtube
 										auto pos = lang_id.Find('.');
 										if (pos != -1) {
 											lang_id = lang_id.Left(pos);
-											bool audioIsDefault = false;
-											if (getJsonValue(*audioTrack, "audioIsDefault", audioIsDefault) && audioIsDefault) {
-												defaultAudioLang = lang_id;
-											};
+
+											if (defaultAudioLang.IsEmpty()) {
+												bool audioIsDefault = false;
+												if (getJsonValue(*audioTrack, "audioIsDefault", audioIsDefault) && audioIsDefault) {
+													defaultAudioLang = lang_id;
+												};
+											}
 										}
 									}
 								}
