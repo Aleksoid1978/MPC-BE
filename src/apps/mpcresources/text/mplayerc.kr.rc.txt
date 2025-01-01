@@ -1,7 +1,7 @@
 ﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"정보"
 7		"MPC-BE"
-8		"Copyright © 2002-2024 'Authors.txt' 참조"
+8		"Copyright © 2002-2025 'Authors.txt' 참조"
 10		"버전 :"
 11		"MPC-BE 컴파일러 :"
 12		"FFmpeg 컴파일러 :"

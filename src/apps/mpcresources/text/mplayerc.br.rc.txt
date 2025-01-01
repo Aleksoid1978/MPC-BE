@@ -1,7 +1,7 @@
 ﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Sobre"
 7		"MPC-BE"
-8		"Copyright © 2002-2024 - veja o arquivo Authors.txt"
+8		"Copyright © 2002-2025 - veja o arquivo Authors.txt"
 10		"Versão :"
 11		"Compilador MPC-BE :"
 12		"Compilador FFmpeg :"

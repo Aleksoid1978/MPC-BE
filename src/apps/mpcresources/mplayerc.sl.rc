@@ -219,7 +219,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_MAINFRAME_ICON,5,5,21,20
     LTEXT           "MPC-BE",IDC_STATIC1,30,5,195,8,SS_NOPREFIX
-    CONTROL         "Avtorske pravice © 2002-2024, poglej Authors.txt",IDC_AUTHORS_LINK,
+    CONTROL         "Avtorske pravice © 2002-2025, poglej Authors.txt",IDC_AUTHORS_LINK,
                     "SysLink",WS_TABSTOP,30,17,195,8
     LTEXT           "Verzija :",IDC_VERSION,30,34,90,8
     LTEXT           "MPC-BE Prevajalnik :",IDC_STATIC,30,66,90,8
