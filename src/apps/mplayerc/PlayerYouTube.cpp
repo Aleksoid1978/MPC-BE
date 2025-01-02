@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2024 see Authors.txt
+ * (C) 2012-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -815,19 +815,19 @@ namespace Youtube
 				auto it = defaultAudioLang.GetLength() ? audioLangs.find(defaultAudioLang) : audioLangs.begin();
 
 				if (s.strYoutubeAudioLang.GetLength()) {
-					CStringA lang = WStrToUTF8(s.strYoutubeAudioLang.GetString());
+					const CStringA lang = WStrToUTF8(s.strYoutubeAudioLang.GetString());
 					auto it2 = audioLangs.find(lang);
 					if (it2 == audioLangs.end()) {
 						if (lang == "en") {
 							it2 = audioLangs.find("en-US");
 						}
-						else if (lang = "de") {
+						else if (lang == "de") {
 							it2 = audioLangs.find("de-DE");
 						}
-						else if (lang = "fr") {
+						else if (lang == "fr") {
 							it2 = audioLangs.find("fr-FR");
 						}
-						else if (lang = "es") {
+						else if (lang == "es") {
 							it2 = audioLangs.find("es-US");
 						}
 					}
