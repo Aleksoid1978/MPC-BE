@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2024 see Authors.txt
+ * (C) 2017-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,12 +20,20 @@
 
 #pragma once
 
+#include <malloc.h>
+
+#define SIMPLE_BLOCK_ALIGNMENT 16
+
 // CSimpleBlock - simple container
 template <typename T>
 class CSimpleBlock
 {
 protected:
+#if (__STDCPP_DEFAULT_NEW_ALIGNMENT__ >= SIMPLE_BLOCK_ALIGNMENT)
 	std::unique_ptr<T[]> m_data;
+#else
+	std::unique_ptr<T[], decltype(&_aligned_free)> m_data = { nullptr, &_aligned_free };
+#endif
 	size_t m_size = 0;
 
 public:
@@ -42,7 +50,11 @@ public:
 	void SetSize(const size_t size)
 	{
 		if (size != m_size) {
+#if (__STDCPP_DEFAULT_NEW_ALIGNMENT__ >= SIMPLE_BLOCK_ALIGNMENT)
 			m_data.reset(size ? new T[size] : nullptr);
+#else
+			m_data.reset(size ? static_cast<T*>(_aligned_malloc(sizeof(T) * size, SIMPLE_BLOCK_ALIGNMENT)) : nullptr);
+#endif
 			m_size = size;
 		}
 	}
@@ -71,7 +83,7 @@ public:
 	{
 		if (size > this->m_size) {
 			size_t old_bytes = this->Bytes();
-			std::unique_ptr<T[]> old_data = std::move(this->m_data);
+			auto old_data = std::move(this->m_data);
 			this->m_size = 0;
 
 			size_t newsize = ((size * sizeof(T) + 255) & ~(size_t)255) / sizeof(T); // rounded up a multiple of 256 bytes.
