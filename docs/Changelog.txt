@@ -30,6 +30,7 @@ Updated Italian translation (by mapi68).
 Updated Spanish translation (by IPeluchito).
 Updated Romanian translation (by Andrei Miloiu).
 Updated Dutch and Chinese (Traditional) translation (by beter).
+Updated Japanese translation (by tsubasanouta).
 
 Updated libraries:
 	libdivide 5.1.0;
