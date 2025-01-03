@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <malloc.h>
+#include <cstdlib>
 
 #define SIMPLE_BLOCK_ALIGNMENT 16
 
@@ -32,7 +32,7 @@ protected:
 #if (__STDCPP_DEFAULT_NEW_ALIGNMENT__ >= SIMPLE_BLOCK_ALIGNMENT)
 	std::unique_ptr<T[]> m_data;
 #else
-	std::unique_ptr<T[], decltype(&_aligned_free)> m_data = { nullptr, &_aligned_free };
+	std::unique_ptr<T[], std::integral_constant<decltype(&_aligned_free), &_aligned_free>> m_data;
 #endif
 	size_t m_size = 0;
 
@@ -68,12 +68,16 @@ public:
 template <typename T>
 class CSimpleBuffer : public CSimpleBlock<T>
 {
+	size_t CalcRoundedSize(size_t size) {
+		return ((size * sizeof(T) + 255) & ~(size_t)255) / sizeof(T); // rounded up a multiple of 256 bytes.
+	}
+
 public:
 	// Increase the size if necessary. Old data may be lost. The size will be rounded up to a multiple of 256 bytes.
 	void ExtendSize(const size_t size)
 	{
 		if (size > this->m_size) {
-			size_t newsize = ((size * sizeof(T) + 255) & ~(size_t)255) / sizeof(T); // rounded up a multiple of 256 bytes.
+			size_t newsize = CalcRoundedSize(size);
 			this->SetSize(newsize);
 		}
 	}
@@ -86,7 +90,7 @@ public:
 			auto old_data = std::move(this->m_data);
 			this->m_size = 0;
 
-			size_t newsize = ((size * sizeof(T) + 255) & ~(size_t)255) / sizeof(T); // rounded up a multiple of 256 bytes.
+			size_t newsize = CalcRoundedSize(size);
 			this->SetSize(newsize);
 
 			memcpy(this->m_data.get(), old_data.get(), old_bytes);
