@@ -815,21 +815,12 @@ namespace Youtube
 				auto it = defaultAudioLang.GetLength() ? audioLangs.find(defaultAudioLang) : audioLangs.begin();
 
 				if (s.strYoutubeAudioLang.GetLength()) {
-					const CStringA lang = WStrToUTF8(s.strYoutubeAudioLang.GetString());
+					CStringA lang = WStrToUTF8(s.strYoutubeAudioLang.GetString());
 					auto it2 = audioLangs.find(lang);
-					if (it2 == audioLangs.end()) {
-						if (lang == "en") {
-							it2 = audioLangs.find("en-US");
-						}
-						else if (lang == "de") {
-							it2 = audioLangs.find("de-DE");
-						}
-						else if (lang == "fr") {
-							it2 = audioLangs.find("fr-FR");
-						}
-						else if (lang == "es") {
-							it2 = audioLangs.find("es-US");
-						}
+					if (it2 == audioLangs.end() && lang.GetLength() == 2) {
+						// check en-US, de-DE, fr-FR, es-US, es-419, zh-Hans and other
+						lang.AppendChar('-');
+						it2 = std::find_if(audioLangs.begin(), audioLangs.end(), [&lang](const auto& pair) { return StartsWith(pair.first, lang); });
 					}
 
 					if (it2 != audioLangs.end()) {
