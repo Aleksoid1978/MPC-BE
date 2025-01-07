@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2024 see Authors.txt
+ * (C) 2016-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,6 +41,10 @@ void CALLBACK CHTTPAsync::Callback(_In_ HINTERNET hInternet,
 
 	auto pHTTPAsync   = reinterpret_cast<CHTTPAsync*>(dwContext);
 	auto pAsyncResult = reinterpret_cast<INTERNET_ASYNC_RESULT*>(lpvStatusInformation);
+
+	if (pHTTPAsync->m_bClosing) {
+		return;
+	}
 
 	switch (pHTTPAsync->m_context) {
 		case Context::CONTEXT_CONNECT:
@@ -165,6 +169,8 @@ static CString FormatErrorMessage(DWORD dwError)
 
 void CHTTPAsync::Close()
 {
+	m_bClosing = true;
+
 	ResetEvent(m_hConnectedEvent);
 	ResetEvent(m_hRequestOpenedEvent);
 	ResetEvent(m_hRequestCompleteEvent);
@@ -197,6 +203,7 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 
 	for (;;) {
 		Close();
+		m_bClosing = false;
 
 		auto url = !m_url_redirect_str.IsEmpty() ? m_url_redirect_str.GetString() : lpszURL;
 

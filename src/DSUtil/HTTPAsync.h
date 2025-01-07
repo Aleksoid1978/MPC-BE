@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2024 see Authors.txt
+ * (C) 2016-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -66,6 +66,8 @@ protected:
 	CString m_contentType;
 	CString m_contentEncoding;
 	UINT64 m_lenght = 0;
+
+	bool m_bClosing = true;
 
 	bool m_bIsCompressed = false;
 
