@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1204,7 +1204,6 @@ STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlay
 {
 	DLog(L"CFGManager::RenderFile() on thread: %u", GetCurrentThreadId());
 
-	m_bOpeningAborted = false;
 	std::unique_lock<std::mutex> lock(m_mutexRender);
 
 	CAutoLock cAutoLock(this);
@@ -2968,7 +2967,6 @@ public:
 
 STDMETHODIMP CFGManagerDVD::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPlayList)
 {
-	m_bOpeningAborted = false;
 	std::unique_lock<std::mutex> lock(m_mutexRender);
 
 	CAutoLock cAutoLock(this);

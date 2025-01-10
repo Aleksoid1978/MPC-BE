@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -958,8 +958,8 @@ void CMainFrame::OnDestroy()
 	if (m_pGraphThread) {
 		CAMMsgEvent e;
 		m_pGraphThread->PostThreadMessage(CGraphThread::TM_EXIT, 0, (LPARAM)&e);
-		if (!e.Wait(5000)) {
-			DLog(L"ERROR: Must call TerminateThread() on CMainFrame::m_pGraphThread->m_hThread");
+		if (!e.Wait(10000)) {
+			DLog(L"CRITICAL ERROR: Failed to abort graph creation.");
 			TerminateThread(m_pGraphThread->m_hThread, 0xDEAD);
 		}
 	}
@@ -12251,7 +12251,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				pOFD,
 				youtubeErrorMessage
 			);
-			if (ok) {
+			if (ok && m_pGB->ShouldOperationContinue() == S_OK) {
 				youtubeUrl = url;
 				Content::Online::Disconnect(url);
 
@@ -12262,6 +12262,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	}
 
 	if (s.bYDLEnable
+			&& m_pGB->ShouldOperationContinue() == S_OK
 			&& youtubeUrl.IsEmpty()
 			&& pOFD->auds.empty()
 			&& ::PathIsURLW(pOFD->fi)) {
@@ -12308,7 +12309,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 						m_youtubeAudioUrllist,
 						&OFD
 					);
-					if (ok) {
+					if (ok && m_pGB->ShouldOperationContinue() == S_OK) {
 						youtubeUrl = url;
 						Content::Online::Disconnect(url);
 
@@ -12319,6 +12320,10 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				}
 			}
 		}
+	}
+
+	if (m_pGB->ShouldOperationContinue() != S_OK) {
+		return ResStr(IDS_MAINFRM_82);
 	}
 
 	if (youtubeUrl.IsEmpty() && !youtubeErrorMessage.IsEmpty()) {
@@ -17670,23 +17675,19 @@ void CMainFrame::CloseMedia(BOOL bNextIsOpened/* = FALSE*/)
 			if (m_pAMOP) {
 				m_pAMOP->AbortOperation();
 			}
-			m_pGB->Abort();    // TODO: lock on graph objects somehow, this is not thread safe
+			m_pGB->Abort(); // TODO: lock on graph objects somehow, this is not thread safe
 		}
 
 		if (m_pGraphThread) {
 			BeginWaitCursor();
-			if (WaitForSingleObject(m_hGraphThreadEventOpen, 5000) == WAIT_TIMEOUT) {
+			/*
+			if (WaitForSingleObject(m_hGraphThreadEventOpen, 10000) == WAIT_TIMEOUT) {
 				MessageBeep(MB_ICONEXCLAMATION);
-				DLog(L"CRITICAL ERROR: !!! Must kill opener thread !!!");
-				TerminateThread(m_pGraphThread->m_hThread, 0xDEAD);
-
-				m_pGraphThread = (CGraphThread*)AfxBeginThread(RUNTIME_CLASS(CGraphThread));
-				if (m_pGraphThread) {
-					m_pGraphThread->SetMainFrame(this);
-				}
-
-				m_bOpenedThruThread = false;
+				DLog(L"CRITICAL ERROR: Failed to abort graph creation.");
+				TerminateProcess(GetCurrentProcess(), 0xDEAD);
 			}
+			*/
+			WaitForSingleObject(m_hGraphThreadEventOpen, INFINITE);
 			EndWaitCursor();
 
 			MSG msg;

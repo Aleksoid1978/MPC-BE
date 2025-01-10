@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2024 see Authors.txt
+ * (C) 2016-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -126,7 +126,7 @@ namespace Content {
 
 					content.raw.resize(nMinSize);
 					DWORD dwSizeRead = 0;
-					if (content.HTTPAsync->Read(content.raw.data(), nMinSize, dwSizeRead, AfxGetAppSettings().iNetworkReceiveTimeout * 1000) == S_OK) {
+					if (content.HTTPAsync->Read(content.raw.data(), nMinSize, dwSizeRead, http::readTimeout) == S_OK) {
 						content.raw.resize(dwSizeRead);
 						if (dwSizeRead) {
 							Encoding(content);
@@ -149,7 +149,7 @@ namespace Content {
 			CorrectAceStream(realPath);
 			content.realPath = realPath;
 
-			content.bHTTPConnected = (content.HTTPAsync->Connect(realPath, AfxGetAppSettings().iNetworkTimeout * 1000, L"Icy-MetaData: 1\r\n") == S_OK);
+			content.bHTTPConnected = (content.HTTPAsync->Connect(realPath, http::connectTimeout, L"Icy-MetaData: 1\r\n") == S_OK);
 			content.hdr = content.HTTPAsync->GetHeader();
 
 			GetData(content);
@@ -176,7 +176,7 @@ namespace Content {
 						nMaxSize -= old_size;
 						content.raw.resize(old_size + nMaxSize);
 						DWORD dwSizeRead = 0;
-						if (content.HTTPAsync->Read(content.raw.data() + old_size, nMaxSize, dwSizeRead, AfxGetAppSettings().iNetworkReceiveTimeout * 1000) == S_OK) {
+						if (content.HTTPAsync->Read(content.raw.data() + old_size, nMaxSize, dwSizeRead, http::readTimeout) == S_OK) {
 							content.raw.resize(old_size + dwSizeRead);
 							if (dwSizeRead) {
 								Encoding(content);
