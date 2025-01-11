@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2023 see Authors.txt
+ * (C) 2014-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -159,19 +159,12 @@ HRESULT CAudioFilter::Initialize(
 			break;
 		}
 
-		ret = avfilter_graph_create_filter(&m_pFilterBufferSink,
-			buffersink,
-			"out",
-			nullptr,
-			nullptr,
-			m_pFilterGraph);
-		if (ret < 0) {
+		m_pFilterBufferSink = avfilter_graph_alloc_filter(m_pFilterGraph, buffersink, "out");
+		if (!m_pFilterBufferSink) {
 			break;
 		}
 
-		ret = av_opt_set_bin(m_pFilterBufferSink, "sample_fmts",
-			(uint8_t*)&m_outAvSampleFmt, sizeof(m_outAvSampleFmt),
-			AV_OPT_SEARCH_CHILDREN);
+		ret = av_opt_set_array(m_pFilterBufferSink, "sample_formats", AV_OPT_SEARCH_CHILDREN, 0, 1, AV_OPT_TYPE_SAMPLE_FMT, &m_outAvSampleFmt);
 		if (ret < 0) {
 			break;
 		}
@@ -179,16 +172,18 @@ HRESULT CAudioFilter::Initialize(
 		av_bprint_init(&bp, 0, AV_BPRINT_SIZE_AUTOMATIC);
 		ch_layout = { AV_CHANNEL_ORDER_NATIVE, m_outChannels, m_outLayout };
 		av_channel_layout_describe_bprint(&ch_layout, &bp);
-		ret = av_opt_set(m_pFilterBufferSink, "ch_layouts",
-			bp.str, AV_OPT_SEARCH_CHILDREN);
+		ret = av_opt_set(m_pFilterBufferSink, "channel_layouts", bp.str, AV_OPT_SEARCH_CHILDREN);
 		av_bprint_finalize(&bp, nullptr);
 		if (ret < 0) {
 			break;
 		}
 
-		ret = av_opt_set_bin(m_pFilterBufferSink, "sample_rates",
-			(uint8_t*)&m_outSamplerate, sizeof(m_outSamplerate),
-			AV_OPT_SEARCH_CHILDREN);
+		ret = av_opt_set_array(m_pFilterBufferSink, "samplerates", AV_OPT_SEARCH_CHILDREN, 0, 1, AV_OPT_TYPE_INT, &m_outSamplerate);
+		if (ret < 0) {
+			break;
+		}
+
+		ret = avfilter_init_dict(m_pFilterBufferSink, nullptr); // initialize the filter
 		if (ret < 0) {
 			break;
 		}
