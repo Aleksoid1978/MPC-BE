@@ -137,52 +137,66 @@ HRESULT CAudioFilter::Initialize(
 
 	int ret = 0;
 	do {
-		AVBPrint bp = {};
-		av_bprint_init(&bp, 0, AV_BPRINT_SIZE_AUTOMATIC);
-		AVChannelLayout ch_layout = { AV_CHANNEL_ORDER_NATIVE, m_inChannels, m_inLayout };
-		av_channel_layout_describe_bprint(&ch_layout, &bp);
+		{
+			m_pFilterBufferSrc = avfilter_graph_alloc_filter(m_pFilterGraph, buffersrc, "in");
+			if (!m_pFilterBufferSrc) {
+				break;
+			}
 
-		char args[256] = { 0 };
-		_snprintf_s(args, sizeof(args), "time_base=1/%d:sample_rate=%d:sample_fmt=%s:channel_layout=%s",
-			m_inSamplerate,
-			m_inSamplerate,
-			av_get_sample_fmt_name(m_inAvSampleFmt),
-			bp.str);
-		av_bprint_finalize(&bp, nullptr);
-		ret = avfilter_graph_create_filter(&m_pFilterBufferSrc,
-			buffersrc,
-			"in",
-			args,
-			nullptr,
-			m_pFilterGraph);
-		if (ret < 0) {
-			break;
+			AVChannelLayout ch_layout = { AV_CHANNEL_ORDER_NATIVE, m_inChannels, m_inLayout };
+			ret = av_opt_set_chlayout(m_pFilterBufferSrc, "channel_layout", &ch_layout, AV_OPT_SEARCH_CHILDREN);
+			if (ret < 0) {
+				break;
+			}
+
+			ret = av_opt_set_sample_fmt(m_pFilterBufferSrc, "sample_fmt", m_inAvSampleFmt, AV_OPT_SEARCH_CHILDREN);
+			if (ret < 0) {
+				break;
+			}
+
+			AVRational time_base = { 1, m_inSamplerate };
+			ret = av_opt_set_q(m_pFilterBufferSrc, "time_base", time_base, AV_OPT_SEARCH_CHILDREN);
+			if (ret < 0) {
+				break;
+			}
+
+			ret = av_opt_set_int(m_pFilterBufferSrc, "sample_rate", m_inSamplerate, AV_OPT_SEARCH_CHILDREN);
+			if (ret < 0) {
+				break;
+			}
+
+			ret = avfilter_init_dict(m_pFilterBufferSrc, nullptr); // initialize the filter
+			if (ret < 0) {
+				break;
+			}
 		}
 
-		m_pFilterBufferSink = avfilter_graph_alloc_filter(m_pFilterGraph, buffersink, "out");
-		if (!m_pFilterBufferSink) {
-			break;
-		}
+		{
+			m_pFilterBufferSink = avfilter_graph_alloc_filter(m_pFilterGraph, buffersink, "out");
+			if (!m_pFilterBufferSink) {
+				break;
+			}
 
-		ret = av_opt_set_array(m_pFilterBufferSink, "sample_formats", AV_OPT_SEARCH_CHILDREN, 0, 1, AV_OPT_TYPE_SAMPLE_FMT, &m_outAvSampleFmt);
-		if (ret < 0) {
-			break;
-		}
+			ret = av_opt_set_array(m_pFilterBufferSink, "sample_formats", AV_OPT_SEARCH_CHILDREN, 0, 1, AV_OPT_TYPE_SAMPLE_FMT, &m_outAvSampleFmt);
+			if (ret < 0) {
+				break;
+			}
 
-		ch_layout = { AV_CHANNEL_ORDER_NATIVE, m_outChannels, m_outLayout };
-		ret = av_opt_set_array(m_pFilterBufferSink, "channel_layouts", AV_OPT_SEARCH_CHILDREN, 0, 1, AV_OPT_TYPE_CHLAYOUT, &ch_layout);
-		if (ret < 0) {
-			break;
-		}
+			AVChannelLayout ch_layout = { AV_CHANNEL_ORDER_NATIVE, m_outChannels, m_outLayout };
+			ret = av_opt_set_array(m_pFilterBufferSink, "channel_layouts", AV_OPT_SEARCH_CHILDREN, 0, 1, AV_OPT_TYPE_CHLAYOUT, &ch_layout);
+			if (ret < 0) {
+				break;
+			}
 
-		ret = av_opt_set_array(m_pFilterBufferSink, "samplerates", AV_OPT_SEARCH_CHILDREN, 0, 1, AV_OPT_TYPE_INT, &m_outSamplerate);
-		if (ret < 0) {
-			break;
-		}
+			ret = av_opt_set_array(m_pFilterBufferSink, "samplerates", AV_OPT_SEARCH_CHILDREN, 0, 1, AV_OPT_TYPE_INT, &m_outSamplerate);
+			if (ret < 0) {
+				break;
+			}
 
-		ret = avfilter_init_dict(m_pFilterBufferSink, nullptr); // initialize the filter
-		if (ret < 0) {
-			break;
+			ret = avfilter_init_dict(m_pFilterBufferSink, nullptr); // initialize the filter
+			if (ret < 0) {
+				break;
+			}
 		}
 
 		AVFilterContext* endFilterCtx = m_pFilterBufferSrc;
