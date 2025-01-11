@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2023 see Authors.txt
+ * (C) 2014-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -59,6 +59,11 @@ public:
 	CAudioFilter();
 	~CAudioFilter();
 
+private:
+	int InitFilterBufferSrc();
+	int InitFilterBufferSink();
+
+public:
 	HRESULT Initialize(
 		const SampleFormat in_format, const uint32_t in_layout, const int in_samplerate,
 		const SampleFormat out_format, const uint32_t out_layout, const int out_samplerate,

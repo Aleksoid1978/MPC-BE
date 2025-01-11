@@ -30,7 +30,6 @@ extern "C"
 {
 	#include <libavfilter/buffersink.h>
 	#include <libavfilter/buffersrc.h>
-	#include "libavutil/bprint.h"
 	#include <libavutil/opt.h>
 }
 
@@ -94,6 +93,84 @@ CAudioFilter::~CAudioFilter()
 	avfilter_graph_free(&m_pFilterGraph);
 }
 
+int CAudioFilter::InitFilterBufferSrc()
+{
+	ASSERT(m_pFilterGraph);
+	ASSERT(!m_pFilterBufferSrc);
+
+	const AVFilter* abuffer = avfilter_get_by_name("abuffer");
+	if (!abuffer) {
+		return AVERROR_FILTER_NOT_FOUND;
+	}
+
+	m_pFilterBufferSrc = avfilter_graph_alloc_filter(m_pFilterGraph, abuffer, "in");
+	if (!m_pFilterBufferSrc) {
+		return AVERROR(ENOMEM);
+	}
+
+	AVChannelLayout ch_layout = { AV_CHANNEL_ORDER_NATIVE, m_inChannels, m_inLayout };
+	int ret = av_opt_set_chlayout(m_pFilterBufferSrc, "channel_layout", &ch_layout, AV_OPT_SEARCH_CHILDREN);
+	if (ret < 0) {
+		return ret;
+	}
+
+	ret = av_opt_set_sample_fmt(m_pFilterBufferSrc, "sample_fmt", m_inAvSampleFmt, AV_OPT_SEARCH_CHILDREN);
+	if (ret < 0) {
+		return ret;
+	}
+
+	AVRational time_base = { 1, m_inSamplerate };
+	ret = av_opt_set_q(m_pFilterBufferSrc, "time_base", time_base, AV_OPT_SEARCH_CHILDREN);
+	if (ret < 0) {
+		return ret;
+	}
+
+	ret = av_opt_set_int(m_pFilterBufferSrc, "sample_rate", m_inSamplerate, AV_OPT_SEARCH_CHILDREN);
+	if (ret < 0) {
+		return ret;
+	}
+
+	ret = avfilter_init_dict(m_pFilterBufferSrc, nullptr); // initialize the filter
+
+	return ret;
+}
+
+int CAudioFilter::InitFilterBufferSink()
+{
+	ASSERT(m_pFilterGraph);
+	ASSERT(!m_pFilterBufferSink);
+
+	const AVFilter* abuffersink = avfilter_get_by_name("abuffersink");
+	if (!abuffersink) {
+		return AVERROR_FILTER_NOT_FOUND;
+	}
+
+	m_pFilterBufferSink = avfilter_graph_alloc_filter(m_pFilterGraph, abuffersink, "out");
+	if (!m_pFilterBufferSink) {
+		return AVERROR(ENOMEM);
+	}
+
+	int ret = av_opt_set_array(m_pFilterBufferSink, "sample_formats", AV_OPT_SEARCH_CHILDREN, 0, 1, AV_OPT_TYPE_SAMPLE_FMT, &m_outAvSampleFmt);
+	if (ret < 0) {
+		return ret;
+	}
+
+	AVChannelLayout ch_layout = { AV_CHANNEL_ORDER_NATIVE, m_outChannels, m_outLayout };
+	ret = av_opt_set_array(m_pFilterBufferSink, "channel_layouts", AV_OPT_SEARCH_CHILDREN, 0, 1, AV_OPT_TYPE_CHLAYOUT, &ch_layout);
+	if (ret < 0) {
+		return ret;
+	}
+
+	ret = av_opt_set_array(m_pFilterBufferSink, "samplerates", AV_OPT_SEARCH_CHILDREN, 0, 1, AV_OPT_TYPE_INT, &m_outSamplerate);
+	if (ret < 0) {
+		return ret;
+	}
+
+	ret = avfilter_init_dict(m_pFilterBufferSink, nullptr); // initialize the filter
+
+	return ret;
+}
+
 HRESULT CAudioFilter::Initialize(
 	const SampleFormat in_format, const uint32_t in_layout, const int in_samplerate,
 	const SampleFormat out_format, const uint32_t out_layout, const int out_samplerate,
@@ -126,77 +203,20 @@ HRESULT CAudioFilter::Initialize(
 	m_outChannels   = CountBits(out_layout);
 	m_outSamplerate = out_samplerate;
 
-	const AVFilter *buffersrc = avfilter_get_by_name("abuffer");
-	CheckPointer(buffersrc, E_FAIL);
-	const AVFilter *buffersink = avfilter_get_by_name("abuffersink");
-	CheckPointer(buffersink, E_FAIL);
-
 	m_pFilterGraph = avfilter_graph_alloc();
 	CheckPointer(m_pFilterGraph, E_FAIL);
 	avfilter_graph_set_auto_convert(m_pFilterGraph, autoconvert ? AVFILTER_AUTO_CONVERT_ALL : AVFILTER_AUTO_CONVERT_NONE);
 
 	int ret = 0;
 	do {
-		{
-			m_pFilterBufferSrc = avfilter_graph_alloc_filter(m_pFilterGraph, buffersrc, "in");
-			if (!m_pFilterBufferSrc) {
-				break;
-			}
-
-			AVChannelLayout ch_layout = { AV_CHANNEL_ORDER_NATIVE, m_inChannels, m_inLayout };
-			ret = av_opt_set_chlayout(m_pFilterBufferSrc, "channel_layout", &ch_layout, AV_OPT_SEARCH_CHILDREN);
-			if (ret < 0) {
-				break;
-			}
-
-			ret = av_opt_set_sample_fmt(m_pFilterBufferSrc, "sample_fmt", m_inAvSampleFmt, AV_OPT_SEARCH_CHILDREN);
-			if (ret < 0) {
-				break;
-			}
-
-			AVRational time_base = { 1, m_inSamplerate };
-			ret = av_opt_set_q(m_pFilterBufferSrc, "time_base", time_base, AV_OPT_SEARCH_CHILDREN);
-			if (ret < 0) {
-				break;
-			}
-
-			ret = av_opt_set_int(m_pFilterBufferSrc, "sample_rate", m_inSamplerate, AV_OPT_SEARCH_CHILDREN);
-			if (ret < 0) {
-				break;
-			}
-
-			ret = avfilter_init_dict(m_pFilterBufferSrc, nullptr); // initialize the filter
-			if (ret < 0) {
-				break;
-			}
+		ret = InitFilterBufferSrc();
+		if (ret < 0) {
+			break;
 		}
 
-		{
-			m_pFilterBufferSink = avfilter_graph_alloc_filter(m_pFilterGraph, buffersink, "out");
-			if (!m_pFilterBufferSink) {
-				break;
-			}
-
-			ret = av_opt_set_array(m_pFilterBufferSink, "sample_formats", AV_OPT_SEARCH_CHILDREN, 0, 1, AV_OPT_TYPE_SAMPLE_FMT, &m_outAvSampleFmt);
-			if (ret < 0) {
-				break;
-			}
-
-			AVChannelLayout ch_layout = { AV_CHANNEL_ORDER_NATIVE, m_outChannels, m_outLayout };
-			ret = av_opt_set_array(m_pFilterBufferSink, "channel_layouts", AV_OPT_SEARCH_CHILDREN, 0, 1, AV_OPT_TYPE_CHLAYOUT, &ch_layout);
-			if (ret < 0) {
-				break;
-			}
-
-			ret = av_opt_set_array(m_pFilterBufferSink, "samplerates", AV_OPT_SEARCH_CHILDREN, 0, 1, AV_OPT_TYPE_INT, &m_outSamplerate);
-			if (ret < 0) {
-				break;
-			}
-
-			ret = avfilter_init_dict(m_pFilterBufferSink, nullptr); // initialize the filter
-			if (ret < 0) {
-				break;
-			}
+		ret = InitFilterBufferSink();
+		if (ret < 0) {
+			break;
 		}
 
 		AVFilterContext* endFilterCtx = m_pFilterBufferSrc;
