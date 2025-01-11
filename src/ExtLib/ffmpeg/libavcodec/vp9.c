@@ -682,8 +682,12 @@ static int decode_frame_header(AVCodecContext *avctx,
     s->s.h.uvac_qdelta = get_bits1(&s->gb) ? get_sbits_inv(&s->gb, 4) : 0;
     s->s.h.lossless    = s->s.h.yac_qi == 0 && s->s.h.ydc_qdelta == 0 &&
                        s->s.h.uvdc_qdelta == 0 && s->s.h.uvac_qdelta == 0;
+#if FF_API_CODEC_PROPS
+FF_DISABLE_DEPRECATION_WARNINGS
     if (s->s.h.lossless)
         avctx->properties |= FF_CODEC_PROPERTY_LOSSLESS;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
 
     /* segmentation header info */
     if ((s->s.h.segmentation.enabled = get_bits1(&s->gb))) {
@@ -1592,6 +1596,10 @@ static int vp9_decode_frame(AVCodecContext *avctx, AVFrame *frame,
         f->flags |= AV_FRAME_FLAG_KEY;
     else
         f->flags &= ~AV_FRAME_FLAG_KEY;
+    if (s->s.h.lossless)
+        f->flags |= AV_FRAME_FLAG_LOSSLESS;
+    else
+        f->flags &= ~AV_FRAME_FLAG_LOSSLESS;
     f->pict_type = (s->s.h.keyframe || s->s.h.intraonly) ? AV_PICTURE_TYPE_I : AV_PICTURE_TYPE_P;
 
     // Non-existent frames have the implicit dimension 0x0 != CUR_FRAME

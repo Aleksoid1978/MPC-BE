@@ -2508,7 +2508,11 @@ redo_for_pal8:
             break;
         case SOF3:
             avctx->profile     = AV_PROFILE_MJPEG_HUFFMAN_LOSSLESS;
+#if FF_API_CODEC_PROPS
+FF_DISABLE_DEPRECATION_WARNINGS
             avctx->properties |= FF_CODEC_PROPERTY_LOSSLESS;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
             s->lossless    = 1;
             s->ls          = 0;
             s->progressive = 0;
@@ -2517,7 +2521,11 @@ redo_for_pal8:
             break;
         case SOF48:
             avctx->profile     = AV_PROFILE_MJPEG_JPEG_LS;
+#if FF_API_CODEC_PROPS
+FF_DISABLE_DEPRECATION_WARNINGS
             avctx->properties |= FF_CODEC_PROPERTY_LOSSLESS;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
             s->lossless    = 1;
             s->ls          = 1;
             s->progressive = 0;
@@ -2561,6 +2569,8 @@ eoi_parser:
             }
             if ((ret = av_frame_ref(frame, s->picture_ptr)) < 0)
                 return ret;
+            if (s->lossless)
+                frame->flags |= AV_FRAME_FLAG_LOSSLESS;
             *got_frame = 1;
             s->got_picture = 0;
 

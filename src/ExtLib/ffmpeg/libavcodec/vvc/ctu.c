@@ -2294,6 +2294,7 @@ static void alf_params(VVCLocalContext *lc, const int rx, const int ry)
     ALFParams *alf                = &CTB(fc->tab.alf, rx, ry);
 
     alf->ctb_flag[LUMA] = alf->ctb_flag[CB] = alf->ctb_flag[CR] = 0;
+    alf->ctb_cc_idc[0] = alf->ctb_cc_idc[1] = 0;
     if (sh->sh_alf_enabled_flag) {
         alf->ctb_flag[LUMA] = ff_vvc_alf_ctb_flag(lc, rx, ry, LUMA);
         if (alf->ctb_flag[LUMA]) {
@@ -2324,7 +2325,6 @@ static void alf_params(VVCLocalContext *lc, const int rx, const int ry)
         const uint8_t cc_enabled[] = { sh->sh_alf_cc_cb_enabled_flag, sh->sh_alf_cc_cr_enabled_flag };
         const uint8_t cc_aps_id[]  = { sh->sh_alf_cc_cb_aps_id, sh->sh_alf_cc_cr_aps_id };
         for (int i = 0; i < 2; i++) {
-            alf->ctb_cc_idc[i] = 0;
             if (cc_enabled[i]) {
                 const VVCALF *aps = fc->ps.alf_list[cc_aps_id[i]];
                 alf->ctb_cc_idc[i] = ff_vvc_alf_ctb_cc_idc(lc, rx, ry, i, aps->num_cc_filters[i]);
@@ -2393,13 +2393,19 @@ static int has_inter_luma(const CodingUnit *cu)
     return cu->pred_mode != MODE_INTRA && cu->pred_mode != MODE_PLT && cu->tree_type != DUAL_TREE_CHROMA;
 }
 
-static int pred_get_y(const int y0, const Mv *mv, const int height)
+static int pred_get_y(const VVCLocalContext *lc, const int y0, const Mv *mv, const int height)
 {
-    return FFMAX(0, y0 + (mv->y >> 4) + height);
+    const VVCPPS *pps = lc->fc->ps.pps;
+    const int idx     = lc->sc->sh.r->curr_subpic_idx;
+    const int top     = pps->subpic_y[idx];
+    const int bottom  = top + pps->subpic_height[idx];
+
+    return av_clip(y0 + (mv->y >> 4) + height, top, bottom);
 }
 
-static void cu_get_max_y(const CodingUnit *cu, int max_y[2][VVC_MAX_REF_ENTRIES], const VVCFrameContext *fc)
+static void cu_get_max_y(const CodingUnit *cu, int max_y[2][VVC_MAX_REF_ENTRIES], const VVCLocalContext *lc)
 {
+    const VVCFrameContext *fc   = lc->fc;
     const PredictionUnit *pu    = &cu->pu;
 
     if (pu->merge_gpm_flag) {
@@ -2407,7 +2413,7 @@ static void cu_get_max_y(const CodingUnit *cu, int max_y[2][VVC_MAX_REF_ENTRIES]
             const MvField *mvf  = pu->gpm_mv + i;
             const int lx        = mvf->pred_flag - PF_L0;
             const int idx       = mvf->ref_idx[lx];
-            const int y         = pred_get_y(cu->y0, mvf->mv + lx, cu->cb_height);
+            const int y         = pred_get_y(lc, cu->y0, mvf->mv + lx, cu->cb_height);
 
             max_y[lx][idx]      = FFMAX(max_y[lx][idx], y);
         }
@@ -2425,7 +2431,7 @@ static void cu_get_max_y(const CodingUnit *cu, int max_y[2][VVC_MAX_REF_ENTRIES]
                     const PredFlag mask = 1 << lx;
                     if (mvf->pred_flag & mask) {
                         const int idx   = mvf->ref_idx[lx];
-                        const int y     = pred_get_y(y0, mvf->mv + lx, sbh);
+                        const int y     = pred_get_y(lc, y0, mvf->mv + lx, sbh);
 
                         max_y[lx][idx]  = FFMAX(max_y[lx][idx], y + max_dmvr_off);
                     }
@@ -2452,7 +2458,7 @@ static void ctu_get_pred(VVCLocalContext *lc, const int rs)
 
     while (cu) {
         if (has_inter_luma(cu)) {
-            cu_get_max_y(cu, ctu->max_y, fc);
+            cu_get_max_y(cu, ctu->max_y, lc);
             ctu->has_dmvr |= cu->pu.dmvr_flag;
         }
         cu = cu->next;

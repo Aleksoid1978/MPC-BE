@@ -1949,7 +1949,11 @@ static void mpeg_set_cc_format(AVCodecContext *avctx, enum Mpeg2ClosedCaptionsFo
         av_log(avctx, AV_LOG_DEBUG, "CC: first seen substream is %s format\n", label);
     }
 
+#if FF_API_CODEC_PROPS
+FF_DISABLE_DEPRECATION_WARNINGS
     avctx->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
 }
 
 static int mpeg_decode_a53_cc(AVCodecContext *avctx,
@@ -2001,9 +2005,9 @@ static int mpeg_decode_a53_cc(AVCodecContext *avctx,
             ret = av_buffer_realloc(&s1->a53_buf_ref, new_size);
             if (ret >= 0) {
                 uint8_t field, cc1, cc2;
-                uint8_t *cap = s1->a53_buf_ref->data;
+                uint8_t *cap = s1->a53_buf_ref->data + old_size;
 
-                memset(s1->a53_buf_ref->data + old_size, 0, cc_count * 3);
+                memset(cap, 0, cc_count * 3);
                 for (i = 0; i < cc_count && get_bits_left(&gb) >= 26; i++) {
                     skip_bits(&gb, 2); // priority
                     field = get_bits(&gb, 2);
@@ -2073,7 +2077,7 @@ static int mpeg_decode_a53_cc(AVCodecContext *avctx,
             ret = av_buffer_realloc(&s1->a53_buf_ref, new_size);
             if (ret >= 0) {
                 uint8_t field1 = !!(p[4] & 0x80);
-                uint8_t *cap = s1->a53_buf_ref->data;
+                uint8_t *cap = s1->a53_buf_ref->data + old_size;
                 p += 5;
                 for (i = 0; i < cc_count; i++) {
                     cap[0] = (p[0] == 0xff && field1) ? 0xfc : 0xfd;
@@ -2139,13 +2143,14 @@ static int mpeg_decode_a53_cc(AVCodecContext *avctx,
 
             ret = av_buffer_realloc(&s1->a53_buf_ref, new_size);
             if (ret >= 0) {
-                s1->a53_buf_ref->data[0] = cc_header;
-                s1->a53_buf_ref->data[1] = cc_data[0];
-                s1->a53_buf_ref->data[2] = cc_data[1];
+                uint8_t *cap = s1->a53_buf_ref->data + old_size;
+                cap[0] = cc_header;
+                cap[1] = cc_data[0];
+                cap[2] = cc_data[1];
                 if (cc_count == 2) {
-                    s1->a53_buf_ref->data[3] = cc_header;
-                    s1->a53_buf_ref->data[4] = cc_data[2];
-                    s1->a53_buf_ref->data[5] = cc_data[3];
+                    cap[3] = cc_header;
+                    cap[4] = cc_data[2];
+                    cap[5] = cc_data[3];
                 }
             }
 
@@ -2714,7 +2719,7 @@ const FFCodec ff_mpeg1video_decoder = {
 static const AVOption mpeg2video_options[] = {
     { "cc_format", "extract a specific Closed Captions format",
        M2V_OFFSET(cc_format), AV_OPT_TYPE_INT, { .i64 = CC_FORMAT_AUTO },
-        CC_FORMAT_AUTO, CC_FORMAT_DVD, M2V_PARAM, .unit = "cc_format" },
+        CC_FORMAT_AUTO, CC_FORMAT_DVB_0502, M2V_PARAM, .unit = "cc_format" },
 
        { "auto",   "pick first seen CC substream",  0, AV_OPT_TYPE_CONST,
         { .i64 =   CC_FORMAT_AUTO },                .flags = M2V_PARAM, .unit = "cc_format" },
