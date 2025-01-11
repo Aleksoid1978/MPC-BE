@@ -169,11 +169,8 @@ HRESULT CAudioFilter::Initialize(
 			break;
 		}
 
-		av_bprint_init(&bp, 0, AV_BPRINT_SIZE_AUTOMATIC);
 		ch_layout = { AV_CHANNEL_ORDER_NATIVE, m_outChannels, m_outLayout };
-		av_channel_layout_describe_bprint(&ch_layout, &bp);
-		ret = av_opt_set(m_pFilterBufferSink, "channel_layouts", bp.str, AV_OPT_SEARCH_CHILDREN);
-		av_bprint_finalize(&bp, nullptr);
+		ret = av_opt_set_array(m_pFilterBufferSink, "channel_layouts", AV_OPT_SEARCH_CHILDREN, 0, 1, AV_OPT_TYPE_CHLAYOUT, &ch_layout);
 		if (ret < 0) {
 			break;
 		}
