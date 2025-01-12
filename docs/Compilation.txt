@@ -18,6 +18,8 @@
      * C++ ATL support
      * C++ MFC support
 
+PS: Do not use Windows SDK 10.0.26100.0. It is broken and generates bad x86 code.
+
 
 2. Preparing the GCC environment (NASM is already included)
   2.1. Download https://github.com/Aleksoid1978/MSYS/raw/main/MSYS_MinGW-w64_GCC_1421_x86-x64.7z
