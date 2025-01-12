@@ -33,7 +33,7 @@ extern "C"
 	#include <libavutil/opt.h>
 }
 
-CStringW AvError2Str(const int averror)
+static CStringW AvError2Str(const int averror)
 {
 	CStringW str;
 
@@ -61,7 +61,7 @@ CStringW AvError2Str(const int averror)
 	return str;
 }
 
-AVSampleFormat MpcToAvSampleFormat(const SampleFormat sample_fmt)
+static AVSampleFormat MpcToAvSampleFormat(const SampleFormat sample_fmt)
 {
 	switch (sample_fmt) {
 	case SAMPLE_FMT_U8:  return AV_SAMPLE_FMT_U8;
@@ -84,12 +84,14 @@ CAudioFilter::CAudioFilter()
 	av_log_set_callback(nullptr);
 #endif
 
-	m_pFrame = av_frame_alloc();
+	m_pInputFrame = av_frame_alloc();
+	m_pOutputFrame = av_frame_alloc();
 }
 
 CAudioFilter::~CAudioFilter()
 {
-	av_frame_free(&m_pFrame);
+	av_frame_free(&m_pInputFrame);
+	av_frame_free(&m_pOutputFrame);
 	avfilter_graph_free(&m_pFilterGraph);
 }
 
@@ -267,33 +269,38 @@ HRESULT CAudioFilter::Push(const std::unique_ptr<CPacket>& p)
 
 HRESULT CAudioFilter::Push(const REFERENCE_TIME time_start, BYTE* pData, const size_t size)
 {
-	if (!m_pFilterBufferSrc || !m_pFrame) {
+	if (!m_pFilterBufferSrc || !m_pInputFrame) {
 		return E_ABORT;
 	}
 	ASSERT(av_sample_fmt_is_planar(m_inAvSampleFmt) == 0);
 
 	const int nSamples = size / (m_inChannels * get_bytes_per_sample(m_inSampleFmt));
+	if (m_pInputFrame->nb_samples != nSamples) {
+		av_frame_unref(m_pInputFrame);
 
-	m_pFrame->nb_samples     = nSamples;
-	m_pFrame->format         = m_inAvSampleFmt;
-	m_pFrame->ch_layout      = { AV_CHANNEL_ORDER_NATIVE, m_inChannels, m_inLayout };
-	m_pFrame->sample_rate    = m_inSamplerate;
-	m_pFrame->pts            = av_rescale(time_start, m_time_base.den, m_time_base.num * UNITS);
-
-	int ret = av_frame_get_buffer(m_pFrame, 0);
-	if (ret < 0) {
-		return E_OUTOFMEMORY;
+		m_pInputFrame->nb_samples  = nSamples;
+		m_pInputFrame->format      = m_inAvSampleFmt;
+		m_pInputFrame->ch_layout   = { AV_CHANNEL_ORDER_NATIVE, m_inChannels, m_inLayout };
+		m_pInputFrame->sample_rate = m_inSamplerate;
 	}
+
+	if (!m_pInputFrame->data[0]) {
+		int ret = av_frame_get_buffer(m_pInputFrame, 0);
+		if (ret < 0) {
+			return E_OUTOFMEMORY;
+		}
+	}
+
+	m_pInputFrame->pts = av_rescale(time_start, m_time_base.den, m_time_base.num * UNITS);
 
 	if (m_inSampleFmt == SAMPLE_FMT_S24 && m_inAvSampleFmt == AV_SAMPLE_FMT_S32) {
-		convert_int24_to_int32((int32_t*)m_pFrame->data[0], pData, nSamples * m_inChannels);
+		convert_int24_to_int32((int32_t*)m_pInputFrame->data[0], pData, static_cast<size_t>(nSamples) * m_inChannels);
 	} else {
-		memcpy(m_pFrame->data[0], pData, size);
+		memcpy(m_pInputFrame->data[0], pData, size);
 	}
 
-	ret = av_buffersrc_write_frame(m_pFilterBufferSrc, m_pFrame);
+	auto ret = av_buffersrc_write_frame(m_pFilterBufferSrc, m_pInputFrame);
 
-	av_frame_unref(m_pFrame);
 	DLogIf(ret < 0, L"CAudioFilter::Push failed with %s", AvError2Str(ret));
 
 	return ret < 0 ? E_FAIL : S_OK;
@@ -308,7 +315,7 @@ void CAudioFilter::PushEnd()
 
 HRESULT CAudioFilter::Pull(std::unique_ptr<CPacket>& p)
 {
-	if (!m_pFilterBufferSink || !m_pFrame) {
+	if (!m_pFilterBufferSink || !m_pOutputFrame) {
 		return E_ABORT;
 	}
 	ASSERT(av_sample_fmt_is_planar(m_outAvSampleFmt) == 0);
@@ -318,23 +325,23 @@ HRESULT CAudioFilter::Pull(std::unique_ptr<CPacket>& p)
 	}
 	CheckPointer(p, E_FAIL);
 
-	const int ret = av_buffersink_get_frame(m_pFilterBufferSink, m_pFrame);
+	const int ret = av_buffersink_get_frame(m_pFilterBufferSink, m_pOutputFrame);
 	if (ret >= 0) {
-		ASSERT(m_pFrame->format == m_outAvSampleFmt && m_pFrame->ch_layout.nb_channels == m_outChannels);
+		ASSERT(m_pOutputFrame->format == m_outAvSampleFmt && m_pOutputFrame->ch_layout.nb_channels == m_outChannels);
 
-		p->rtStart = av_rescale(m_pFrame->pts, m_time_base.num * UNITS, m_time_base.den);
-		p->rtStop  = p->rtStart + llMulDiv(UNITS, m_pFrame->nb_samples, m_pFrame->sample_rate, 0);
+		p->rtStart = av_rescale(m_pOutputFrame->pts, m_time_base.num * UNITS, m_time_base.den);
+		p->rtStop  = p->rtStart + llMulDiv(UNITS, m_pOutputFrame->nb_samples, m_pOutputFrame->sample_rate, 0);
 
 		if (m_outSampleFmt == SAMPLE_FMT_S24 && m_outAvSampleFmt == AV_SAMPLE_FMT_S32) {
-			const size_t samples = m_pFrame->nb_samples * m_pFrame->ch_layout.nb_channels;
+			const size_t samples = m_pOutputFrame->nb_samples * m_pOutputFrame->ch_layout.nb_channels;
 			p->resize(samples * 3);
-			convert_int32_to_int24(p->data(), (int32_t*)m_pFrame->data[0], samples);
+			convert_int32_to_int24(p->data(), (int32_t*)m_pOutputFrame->data[0], samples);
 		} else {
-			const int buffersize = av_samples_get_buffer_size(nullptr, m_pFrame->ch_layout.nb_channels, m_pFrame->nb_samples, m_outAvSampleFmt, 1);
-			p->SetData(m_pFrame->data[0], buffersize);
+			const int buffersize = av_samples_get_buffer_size(nullptr, m_pOutputFrame->ch_layout.nb_channels, m_pOutputFrame->nb_samples, m_outAvSampleFmt, 1);
+			p->SetData(m_pOutputFrame->data[0], buffersize);
 		}
 	}
-	av_frame_unref(m_pFrame);
+	av_frame_unref(m_pOutputFrame);
 
 	return
 		ret >= 0 ? S_OK :
@@ -344,20 +351,20 @@ HRESULT CAudioFilter::Pull(std::unique_ptr<CPacket>& p)
 
 HRESULT CAudioFilter::Pull(REFERENCE_TIME& time_start, CSimpleBuffer<float>& simpleBuffer, unsigned& allsamples)
 {
-	if (m_outAvSampleFmt != AV_SAMPLE_FMT_FLT || !m_pFilterBufferSink || !m_pFrame) {
+	if (m_outAvSampleFmt != AV_SAMPLE_FMT_FLT || !m_pFilterBufferSink || !m_pOutputFrame) {
 		return E_ABORT;
 	}
 
-	const int ret = av_buffersink_get_frame(m_pFilterBufferSink, m_pFrame);
+	const int ret = av_buffersink_get_frame(m_pFilterBufferSink, m_pOutputFrame);
 	if (ret >= 0) {
-		ASSERT(m_pFrame->format == m_outAvSampleFmt && m_pFrame->ch_layout.nb_channels == m_outChannels);
+		ASSERT(m_pOutputFrame->format == m_outAvSampleFmt && m_pOutputFrame->ch_layout.nb_channels == m_outChannels);
 
-		time_start = av_rescale(m_pFrame->pts, m_time_base.num * UNITS, m_time_base.den);
-		allsamples = m_pFrame->nb_samples * m_pFrame->ch_layout.nb_channels;
+		time_start = av_rescale(m_pOutputFrame->pts, m_time_base.num * UNITS, m_time_base.den);
+		allsamples = m_pOutputFrame->nb_samples * m_pOutputFrame->ch_layout.nb_channels;
 		simpleBuffer.ExtendSize(allsamples);
-		memcpy(simpleBuffer.Data(), m_pFrame->data[0], allsamples * sizeof(float));
+		memcpy(simpleBuffer.Data(), m_pOutputFrame->data[0], allsamples * sizeof(float));
 	}
-	av_frame_unref(m_pFrame);
+	av_frame_unref(m_pOutputFrame);
 
 	return
 		ret >= 0 ? S_OK :
@@ -368,6 +375,8 @@ HRESULT CAudioFilter::Pull(REFERENCE_TIME& time_start, CSimpleBuffer<float>& sim
 void CAudioFilter::Flush()
 {
 	CAutoLock cAutoLock(&m_csFilter);
+
+	av_frame_unref(m_pInputFrame);
 
 	avfilter_graph_free(&m_pFilterGraph);
 	m_pFilterBufferSrc  = nullptr;

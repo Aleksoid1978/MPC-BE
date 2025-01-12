@@ -39,7 +39,8 @@ private:
 	AVFilterContext *m_pFilterBufferSrc  = nullptr;
 	AVFilterContext *m_pFilterBufferSink = nullptr;
 
-	AVFrame         *m_pFrame            = nullptr;
+	AVFrame         *m_pInputFrame       = nullptr;
+	AVFrame         *m_pOutputFrame      = nullptr;
 
 	SampleFormat    m_inSampleFmt        = SAMPLE_FMT_NONE;
 	AVSampleFormat  m_inAvSampleFmt      = (AVSampleFormat)-1;
