@@ -516,7 +516,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 16
 10		"외부 자막 우선"
 12		"내장 자막 불러오지 않음"
 13		"수정 감지 후 자막 자동 다시 불러오기"
-15		"하위 동기화 사용"
+15		"자막 싱크 수정 기능 사용"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
