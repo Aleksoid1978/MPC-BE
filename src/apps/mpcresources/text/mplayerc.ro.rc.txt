@@ -7,7 +7,7 @@
 12		"Compilator FFmpeg :"
 13		"Libavcodec / Libavutil :"
 23		"Acest program este gratuit și lansat sub licența GNU General Public License."
-24		"Între anii 2023-2024 traducătorul este Andrei Valentin Miloiu.  În trecut, au tradus Daniel Alămiță şi lordkag."
+24		"Între anii 2023-2025 traducătorul este Andrei Valentin Miloiu.  În trecut, au tradus Daniel Alămiță şi lordkag."
 25		"OK"
 END
 
@@ -225,7 +225,7 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
 12		"Audio"
 13		"Subtitrări"
 15		"Setări adiționale"
-16		"Permite subt. pt. pers. cu dizabilități în decodorul ""Line 21 Decoder"""
+16		"Permite sub. pt. pers. cu dizabilități în decodorul ""Line 21 Decoder"""
 18		"Începe redarea din Titlul principal"
 END
 
@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 56
 16		"G:"
 17		"B:"
 21		"Activează meniul întunecat"
-22		"Activează titlul întunecat (Windows 10 and above)"
+22		"Activează titlul întunecat (Windows 10 și versiunile ulterioare)"
 25		"Folosește indiciu de timp:"
 27		"Folosește previzualizarea în căutare"
 28		"Dimensiunea raportată la lățimea ecranului:"
@@ -333,10 +333,10 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 56
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
-6		"Dacă vrei să folosești vers. autonomă a acestor filtre sau un înlocuitor, dezactivează-le aici. Pe filtrele scrise îngroșat se poate da dublu clic pentru a deschide paginile lor cu proprietăți."
-10		"Configurația\ndespicătorului AVI"
-11		"Configurația\ndespicătorului MPEG"
-12		"Configurația\ndespicătorului Matroska"
+6		"Dacă vrei să folosești vers. autonomă a acestor filtre sau un înlocuitor, dezact. aici. Pe filtrele scrise îngroșat se poate da dublu clic pentru a deschide paginile lor cu proprietăți."
+10		"Configurația\ndespicătorului (splitter-ului) AVI"
+11		"Configurația\ndespicătorului (splitter-ului) MPEG"
+12		"Conf.\ndespicătorului (splitter-ului) Matroska"
 13		"Configurația\ncititorului CDDA"
 14		"Configurația\ncititorului VTS(IFO)"
 15		"Configurația\ndecodorului video"
