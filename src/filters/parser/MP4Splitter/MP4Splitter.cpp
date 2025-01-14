@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -316,6 +316,11 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			if (track->GetType() != AP4_Track::TYPE_VIDEO) {
 				continue;
 			}
+			if (track->GetSampleCount() == 1 && track->GetDuration() == 0) {
+				// broken video track that can't be played
+				continue;
+			}
+
 			if (!mainvideoID) {
 				mainvideoID = track->GetId();
 			}
