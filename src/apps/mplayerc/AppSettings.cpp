@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -439,28 +439,6 @@ CString CAppSettings::SelectedAudioRenderer() const
 	}
 
 	return strResult;
-}
-
-void CAppSettings::DeserializeHex(LPCWSTR strVal, BYTE* pBuffer, int nBufSize)
-{
-	long lRes;
-
-	for (int i = 0; i < nBufSize; i++) {
-		swscanf_s(strVal+(i*2), L"%02x", &lRes);
-		pBuffer[i] = (BYTE)lRes;
-	}
-}
-
-CStringW CAppSettings::SerializeHex(BYTE* pBuffer, int nBufSize) const
-{
-	CStringW str;
-	str.Preallocate(nBufSize * 2);
-
-	for (int i = 0; i < nBufSize; i++) {
-		str.AppendFormat(L"%02x", pBuffer[i]);
-	}
-
-	return str;
 }
 
 void CAppSettings::ResetSettings()

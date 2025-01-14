@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -837,9 +837,6 @@ public:
 
 	bool			ExclusiveFSAllowed() const;
 	CString			SelectedAudioRenderer() const;
-
-	void			DeserializeHex(LPCWSTR strVal, BYTE* pBuffer, int nBufSize);
-	CStringW		SerializeHex(BYTE* pBuffer, int nBufSize) const;
 
 	// list of temporary files
 	std::list<CString> slTMPFilesList;
