@@ -1666,7 +1666,7 @@ BEGIN
             MENUITEM "자동 맞춤",      ID_VIEW_ZOOM_AUTOFIT
         END
         MENUITEM SEPARATOR
-        MENUITEM "언어(&L)",                   ID_SUBMENU_LANGUAGE
+        MENUITEM "언어(&Language)",                   ID_SUBMENU_LANGUAGE
         MENUITEM SEPARATOR
         POPUP "렌더러 설정"
         BEGIN
@@ -1841,7 +1841,7 @@ BEGIN
             MENUITEM "캡처",                          ID_VIEW_CAPTURE
             MENUITEM "셰이더 편집기",                     ID_VIEW_SHADEREDITOR
             MENUITEM "내비게이션",                       ID_VIEW_NAVIGATION
-            MENUITEM "언어(&L)",                   ID_SUBMENU_LANGUAGE
+            MENUITEM "언어(&Language)",                   ID_SUBMENU_LANGUAGE
             POPUP "사전 설정(&P)..."
             BEGIN
                 MENUITEM "최소(&M)",                          ID_VIEW_PRESETS_MINIMAL
@@ -1920,7 +1920,7 @@ BEGIN
             MENUITEM "캡처",                    ID_VIEW_CAPTURE
             MENUITEM "셰이더 편집기",               ID_VIEW_SHADEREDITOR
             MENUITEM "내비게이션",                       ID_VIEW_NAVIGATION
-            MENUITEM "언어(&L)",                   ID_SUBMENU_LANGUAGE
+            MENUITEM "언어(&Language)",                   ID_SUBMENU_LANGUAGE
             POPUP "사전 설정(&P)..."
             BEGIN
                 MENUITEM "최소(&M)",                          ID_VIEW_PRESETS_MINIMAL

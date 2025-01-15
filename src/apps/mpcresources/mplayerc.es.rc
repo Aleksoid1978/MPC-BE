@@ -1666,7 +1666,7 @@ BEGIN
             MENUITEM "Auto Ajustar",           ID_VIEW_ZOOM_AUTOFIT
         END
         MENUITEM SEPARATOR
-        MENUITEM "&Idioma",                   ID_SUBMENU_LANGUAGE
+        MENUITEM "&Idioma (Language)",                   ID_SUBMENU_LANGUAGE
         MENUITEM SEPARATOR
         POPUP "Ajustes de Renderizado"
         BEGIN
@@ -1841,7 +1841,7 @@ BEGIN
             MENUITEM "Captura",                     ID_VIEW_CAPTURE
             MENUITEM "Editor de Sombreador",            ID_VIEW_SHADEREDITOR
             MENUITEM "Navegación",                  ID_VIEW_NAVIGATION
-            MENUITEM "&Idioma",                   ID_SUBMENU_LANGUAGE
+            MENUITEM "&Idioma (Language)",                   ID_SUBMENU_LANGUAGE
             POPUP "Modos..."
             BEGIN
                 MENUITEM "Mínimo",                      ID_VIEW_PRESETS_MINIMAL
@@ -1920,7 +1920,7 @@ BEGIN
             MENUITEM "Captura",               ID_VIEW_CAPTURE
             MENUITEM "Editor de Sombreador",      ID_VIEW_SHADEREDITOR
             MENUITEM "Navegación",                  ID_VIEW_NAVIGATION
-            MENUITEM "&Idioma",                   ID_SUBMENU_LANGUAGE
+            MENUITEM "&Idioma (Language)",                   ID_SUBMENU_LANGUAGE
             POPUP "Modos..."
             BEGIN
                 MENUITEM "Mínimo",                      ID_VIEW_PRESETS_MINIMAL

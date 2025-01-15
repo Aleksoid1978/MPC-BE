@@ -1666,7 +1666,7 @@ BEGIN
             MENUITEM "Automatico",             ID_VIEW_ZOOM_AUTOFIT
         END
         MENUITEM SEPARATOR
-        MENUITEM "&Lingua",                   ID_SUBMENU_LANGUAGE
+        MENUITEM "&Lingua (Language)",                   ID_SUBMENU_LANGUAGE
         MENUITEM SEPARATOR
         POPUP "Impostazioni renderer"
         BEGIN
@@ -1841,7 +1841,7 @@ BEGIN
             MENUITEM "Cattura",                     ID_VIEW_CAPTURE
             MENUITEM "Editor shader",               ID_VIEW_SHADEREDITOR
             MENUITEM "Navigazione",                 ID_VIEW_NAVIGATION
-            MENUITEM "&Lingua",                   ID_SUBMENU_LANGUAGE
+            MENUITEM "&Lingua (Language)",                   ID_SUBMENU_LANGUAGE
             POPUP "Profili vista"
             BEGIN
                 MENUITEM "Ridotta",                     ID_VIEW_PRESETS_MINIMAL
@@ -1920,7 +1920,7 @@ BEGIN
             MENUITEM "Cattura",               ID_VIEW_CAPTURE
             MENUITEM "Editor shader",         ID_VIEW_SHADEREDITOR
             MENUITEM "Navigazione",                 ID_VIEW_NAVIGATION
-            MENUITEM "&Lingua",                   ID_SUBMENU_LANGUAGE
+            MENUITEM "&Lingua (Language)",                   ID_SUBMENU_LANGUAGE
             POPUP "Profili vista"
             BEGIN
                 MENUITEM "Ridotta",                     ID_VIEW_PRESETS_MINIMAL

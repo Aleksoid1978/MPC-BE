@@ -1664,7 +1664,7 @@ BEGIN
             MENUITEM "Automatsko Prilagođavanje",                    ID_VIEW_ZOOM_AUTOFIT
         END
         MENUITEM SEPARATOR
-        MENUITEM "&Jezik",                   ID_SUBMENU_LANGUAGE
+        MENUITEM "&Jezik (Language)",                   ID_SUBMENU_LANGUAGE
         MENUITEM SEPARATOR
         POPUP "Postavke rendera"
         BEGIN
@@ -1839,7 +1839,7 @@ BEGIN
             MENUITEM "Snimanje",                     ID_VIEW_CAPTURE
             MENUITEM "Uređivač shadera",               ID_VIEW_SHADEREDITOR
             MENUITEM "Upravljanje",                  ID_VIEW_NAVIGATION
-            MENUITEM "&Jezik",                   ID_SUBMENU_LANGUAGE
+            MENUITEM "&Jezik (Language)",                   ID_SUBMENU_LANGUAGE
             POPUP "&Predpostavke..."
             BEGIN
                 MENUITEM "&Minimalno",                    ID_VIEW_PRESETS_MINIMAL
@@ -1918,7 +1918,7 @@ BEGIN
             MENUITEM "Snimanje",                     ID_VIEW_CAPTURE
             MENUITEM "Uređivač shadera",               ID_VIEW_SHADEREDITOR
             MENUITEM "Upravljanje",                  ID_VIEW_NAVIGATION
-            MENUITEM "&Jezik",                   ID_SUBMENU_LANGUAGE
+            MENUITEM "&Jezik (Language)",                   ID_SUBMENU_LANGUAGE
             POPUP "&Predpostavke..."
             BEGIN
                 MENUITEM "&Minimalno",                    ID_VIEW_PRESETS_MINIMAL
