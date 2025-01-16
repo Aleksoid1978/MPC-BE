@@ -2,6 +2,12 @@
 
 1.8.2.x dev
 =============================
+StreamReader
+Fixed freezing in some situations.
+
+MP4Splitter
+Improved ignoring of corrupted video tracks.
+
 MPCVideoDec
 Removed RGB to YUV conversion.
 Added "Convert to RGB" setting.
@@ -31,6 +37,7 @@ Updated Spanish translation (by IPeluchito).
 Updated Romanian translation (by Andrei Miloiu).
 Updated Dutch and Chinese (Traditional) translation (by beter).
 Updated Japanese translation (by tsubasanouta).
+Updated Korean translation (by midist).
 
 Updated libraries:
 	libdivide 5.1.0;
