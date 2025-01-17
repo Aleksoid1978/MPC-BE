@@ -1441,7 +1441,7 @@ void MediaInfo_Config_Format (InfoMap &Info)
     "APT-X100;;;A;Aptx100;;AUD AUE aud aue;;;Lossy\n"
     "AU;;;A;Au;uLaw/AU Audio File;au;audio/basic\n"
     "CAF;;;A;Caf;Core Audio Format;caf;audio/x-caf;https://developer.apple.com/library/content/documentation/MusicAudio/Reference/CAFSpec/CAF_overview/CAF_overview.html\n"
-    "DAT;;;A;;Digital Audio Tape;hda;;;Lossless\n"
+    "DAT;;;A;Dat;Digital Audio Tape;hda;;;Lossless\n"
     "DolbyE;;;A;Aes3;;dde\n"
     "DSDIFF;;;A;Dsdiff;Direct Stream Digital Interchange File Format;dff;;;Lossy\n"
     "DSD;;;A;;Direct Stream Digital;;;;Lossless\n"

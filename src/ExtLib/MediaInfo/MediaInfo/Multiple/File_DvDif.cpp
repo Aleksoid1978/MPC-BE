@@ -281,6 +281,7 @@ File_DvDif::File_DvDif()
     AbstBf_Previous_MaxAbst=0xFFFFFF;
     SMP=(int8u)-1;
     QU=(int8u)-1;
+    REC_IsValid=false;
     Speed_TimeCode_IsValid=false;
     Speed_Arb_IsValid=false;
     Mpeg4_stts=NULL;

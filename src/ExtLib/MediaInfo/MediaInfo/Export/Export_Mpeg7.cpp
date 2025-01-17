@@ -25,6 +25,7 @@
 #include "MediaInfo/File__Analyse_Automatic.h"
 #include "MediaInfo/OutputHelpers.h"
 #include <ctime>
+#include <cstdint>
 #include <algorithm>
 
 using namespace std;

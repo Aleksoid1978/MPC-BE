@@ -28,6 +28,7 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Audio/File_Dat.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
+#include "MediaInfo/MediaInfo_Events_Internal.h"
 #include "MediaInfo/TimeCode.h"
 using namespace ZenLib;
 using namespace std;
@@ -259,7 +260,7 @@ void File_Dat::Streams_Accept()
             Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, Dat_pack_id[Priv->Frame_First.TC_IDs[i] - 1]);
             Fill(Stream_Other, StreamPos_Last, Other_BitRate, 0);
             Fill(Stream_Other, StreamPos_Last, Other_TimeCode_FirstFrame, First.ToString());
-            Fill(Stream_Other, StreamPos_Last, Other_FrameRate, First.GetFramesMax() == 33 ? (100.0 / 3.0) : First.GetFrameRate());
+            Fill(Stream_Other, StreamPos_Last, Other_FrameRate, First.GetFramesMax() == 32 ? (100.0 / 3.0) : First.GetFrameRate());
         }
     };
 
@@ -372,8 +373,9 @@ void File_Dat::Data_Parse()
             }
             Element_End0();
         }
+        bool ipf_l, ipf_r;
         Element_Begin1("dtsubid");
-            int8u dataid, pno1, numpacks, pno2, pno3;
+            int8u dataid, pno1, numpacks, pno2, pno3, ipf;
             Skip_SB(                                            "ctrlid - Priority ID");
             Skip_SB(                                            "ctrlid - Start ID");
             Skip_SB(                                            "ctrlid - Shortening ID");
@@ -383,9 +385,9 @@ void File_Dat::Data_Parse()
             Get_S1 ( 4, numpacks,                               "numpacks");
             Get_S1 ( 4, pno2,                                   "pno (program number) - 2");
             Get_S1 ( 4, pno3,                                   "pno (program number) - 3");
-            Info_S1( 8, ipf,                                    "ipf (interpolation flags)");
-            Skip_Flags(ipf, 6,                                  "left ipf");
-            Skip_Flags(ipf, 7,                                  "right ipf");
+            Get_S1 ( 8, ipf,                                    "ipf (interpolation flags)");
+            Get_Flags (ipf, 6, ipf_l,                           "left ipf");
+            Get_Flags (ipf, 7, ipf_r,                           "right ipf");
             int16u pno = ((int16u)pno1 << 8) | (pno2 << 4) | pno3;
             auto pno_IsSpecial_Check = [](int8u pno) {
                 return pno == 0xAA || pno == 0xBB || pno == 0xEE;
@@ -399,7 +401,7 @@ void File_Dat::Data_Parse()
                 }
                 Frame.dtsubid_pno = pno;
             }
-            if (dataid || numpacks >= 8 || numpacks < numpacks_Min || !pno_IsValid) {
+            if (dataid || numpacks >= 8 || numpacks >= 8 || !pno_IsValid) {
                 Trusted_IsNot("dtsubid");
             }
         Element_End0();
@@ -456,8 +458,120 @@ void File_Dat::Data_Parse()
 
                 }
             }
-
         }
+
+        Accept(); // TEMP
+        Fill(); // TEMP
+
+        int8u MoreData[0x100];
+        #if MEDIAINFO_EVENTS
+            EVENT_BEGIN(DvDif, Change, 0)
+                Event.StreamOffset = File_Size + Buffer_Offset;
+                Event.FrameNumber = Frame_Count_NotParsedIncluded - 1;
+                Event.PTS = 30000000 * Event.FrameNumber;
+                Event.DUR = 30000000;
+                Event.VideoChromaSubsampling = (int32u)-1;
+                if (Dat_sampfreq[sampfreq])
+                {
+                    Event.AudioRate_N = Dat_sampfreq[sampfreq];
+                    Event.AudioRate_D = 1;
+                }
+                if (Dat_numchans[numchans])
+                    Event.AudioChannels = Dat_numchans[numchans];
+                if (Dat_numchans[quantization])
+                    Event.AudioBitDepth = Dat_quantization[quantization];
+                size_t MoreData_Offset = sizeof(size_t);
+                MoreData[MoreData_Offset++] = 1;
+                MoreData[MoreData_Offset++] = MediaInfo_Event_Change_MoreData_Emphasis;
+                MoreData[MoreData_Offset++] = emphasis;
+                if (Frame.dtsubid_pno != (int16u)-1)
+                {
+                    MoreData[MoreData_Offset++] = 2;
+                    MoreData[MoreData_Offset++] = MediaInfo_Event_Change_MoreData_ProgramNumber;
+                    *((uint16_t*)(MoreData + MoreData_Offset)) = Frame.dtsubid_pno;
+                    MoreData_Offset += 2;
+                }
+                if (MoreData_Offset > sizeof(size_t))
+                {
+                    *((size_t*)MoreData) = MoreData_Offset - sizeof(size_t);
+                    Event.MoreData = MoreData;
+                }
+            EVENT_END()
+
+            EVENT_BEGIN(DvDif, Analysis_Frame, 1)
+                Event.StreamOffset = File_Size + Buffer_Offset;
+                Event.FrameNumber = Frame_Count_NotParsedIncluded - 1;
+                Event.PTS = 30000000 * Event.FrameNumber;
+                Event.DUR = 30000000;
+                Event.TimeCode |= 0x7FFFF << 8;
+                Event.TimeCode |= 0x3F;
+                Event.RecordedDateTime1 |= 0x1FFFF;
+                Event.RecordedDateTime1 |= 0x7F << 17;
+                Event.RecordedDateTime2 |= 0x0F << 12;
+                Event.RecordedDateTime2 |= 0x1F << 8;
+                Event.RecordedDateTime2 |= 0x7F;
+                Event.RecordedDateTime2 |= 0x0F << 12;
+                Event.RecordedDateTime2 |= 0x1F << 6;
+                if (ipf_l || ipf_r) {
+                    if (ipf_l && ipf_r) {
+                        Event.Coherency_Flags |= 1 << 4;
+                    }
+                    if (ipf_l) {
+                        Event.MoreFlags |= 1 << 4;
+                    }
+                    if (ipf_r) {
+                        Event.MoreFlags |= 1 << 5;
+                    }
+                }
+                size_t MoreData_Offset = sizeof(size_t);
+                for (int i = 0; i < 7; i++) {
+                    switch (Frame.TC_IDs[i]) {
+                    case 2:
+                    case 3:
+                    {
+                        TimeCode Previous;
+                        TimeCode Ref;
+                        if (Frame_Count_NotParsedIncluded > 1)
+                        {
+                            Previous = Priv->Frame_Last.TCs[i];
+                            Previous.SetFramesMax(Frame.TCs[i].GetFramesMax());
+                            Ref = Previous;
+                            Ref++;
+                        }
+                        int32u Value = 0;
+                        Value |= (int32u)Frame.TCs[i].ToSeconds() << 8;
+                        Value |= Frame.TCs[i].IsDropFrame() << 7;
+                        Value |= Frame.TCs[i].GetFrames();
+                        if (Previous.IsValid())
+                        {
+                            if (Frame.TCs[i] == Previous)
+                                Value |= 1 << 31;
+                            else if (Frame.TCs[i] != Ref)
+                                Value |= 1 << 30;
+                        }
+                        MoreData[MoreData_Offset++] = 9;
+                        MoreData[MoreData_Offset++] = MediaInfo_Event_Analysis_Frame_TimeCode;
+                        *((int32u*)(MoreData + MoreData_Offset)) = Value;
+                        MoreData_Offset += 4;
+                        *((int32u*)(MoreData + MoreData_Offset)) = 0;
+                        MoreData_Offset += 4;
+                        MoreData[MoreData_Offset++] = Frame.TC_IDs[i] - 1;
+                        break;
+                    }
+                    default:;
+                    }
+                }
+                if (MoreData_Offset > sizeof(size_t))
+                {
+                    *((size_t*)MoreData) = MoreData_Offset - sizeof(size_t);
+                    Event.MoreData = MoreData;
+                }
+            EVENT_END()
+        #endif //MEDIAINFO_EVENTS
+
+        Demux(Buffer + Buffer_Offset, 5292, ContentType_MainStream);
+
+
         Priv->Frame_Last = Frame;
     FILLING_ELSE();
         if (Priv) {
@@ -499,15 +613,15 @@ void File_Dat::dttimepack(TimeCode& TC)
     Get_BCD(   s,                                               "s1", "s2");
     Get_BCD(   f,                                               "f1", "f2");
     auto FramesMax = TC.GetFramesMax();
-    auto FrameMas_Theory = pro ? (index <= 2 ? 29 : (((int32u)Dat_xrate[index]) - 1)) : 33;
+    auto FrameMas_Theory = pro ? (index <= 2 ? 29 : (((int32u)Dat_xrate[index]) - 1)) : 32;
     if (f > FrameMas_Theory && FramesMax <= FrameMas_Theory) {
         //Fill_Conformance("dttimepack", "dttimepack is indicated as pro time code but contains frame numbers as if it is non pro time code");
-        FramesMax = 33;
+        FramesMax = 32;
     }
     else if (FramesMax < FrameMas_Theory) {
         FramesMax = FrameMas_Theory;
     }
-    bool IS1001fps = FramesMax != 33 && pro && (index == 1 || index == 2);
+    bool IS1001fps = FramesMax != 32 && pro && (index == 1 || index == 2);
     TC = TimeCode(h, m, s, f, FramesMax, TimeCode::FPS1001(IS1001fps).DropFrame(IS1001fps && index == 2));
     Element_Info1(TC.ToString());
     Element_End0();
