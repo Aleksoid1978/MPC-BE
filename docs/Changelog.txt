@@ -41,11 +41,12 @@ Updated Japanese translation (by tsubasanouta).
 Updated Korean translation (by midist).
 
 Updated libraries:
+	ffmpeg n7.2-dev-1119-gb76053d8bf;
 	libdivide 5.1.0;
 	libflac 1.4.3;
 	libogg 1.3.5;
 	nanosvg git-ea6a6ac;
-	ffmpeg n7.2-dev-1119-gb76053d8bf.
+	rapidjson v1.1.0-761-gd621dc9e.
 
 
 1.8.2 - 2024-12-07
@@ -161,7 +162,6 @@ Updated libraries:
 	ffmpeg n7.2-dev-183-g2705c0bd81;
 	Little-CMS git-lcms2.16-66-g5c54a6d;
 	MediaInfo git-v24.06-31-gf24a17b41;
-	rapidjson v1.1.0-755-g815e6e7e;
 	vvdec v2.3.0-28-gf8ba8fd;
 	ZenLib git-v0.4.41-23-g2c078a6.
 

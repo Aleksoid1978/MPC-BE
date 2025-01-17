@@ -41,11 +41,12 @@ MPC Video Renderer будет устанавливаться по умолчан
 Обновлен корейский перевод (автор midist).
 
 Обновлены библиотеки:
+	ffmpeg n7.2-dev-1119-gb76053d8bf;
 	libdivide 5.1.0;
 	libflac 1.4.3;
 	libogg 1.3.5;
 	nanosvg git-ea6a6ac;
-	ffmpeg n7.2-dev-1119-gb76053d8bf.
+	rapidjson v1.1.0-761-gd621dc9e.
 
 
 1.8.2 - 2024-12-07
