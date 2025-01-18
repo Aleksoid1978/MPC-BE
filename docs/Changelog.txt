@@ -41,7 +41,7 @@ Updated Japanese translation (by tsubasanouta).
 Updated Korean translation (by midist).
 
 Updated libraries:
-	ffmpeg n7.2-dev-1119-gb76053d8bf;
+	ffmpeg n7.2-dev-1159-g4c96d6bf75;
 	libdivide 5.1.0;
 	libflac 1.4.3;
 	libogg 1.3.5;
