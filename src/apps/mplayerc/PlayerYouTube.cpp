@@ -217,7 +217,7 @@ namespace Youtube
 		return false;
 	}
 
-	static bool URLPostData(LPCWSTR lpszAgent, const CStringW& headers, CStringA& requestData, urlData& pData)
+	static bool URLPostData(LPCWSTR lpszAgent, LPCWSTR headers, CStringA& requestData, urlData& pData)
 	{
 		pData.clear();
 
@@ -228,7 +228,7 @@ namespace Youtube
 													 L"youtubei/v1/player", nullptr, nullptr, nullptr,
 													 INTERNET_FLAG_SECURE | INTERNET_FLAG_RELOAD, 1)) {
 
-					if (HttpSendRequestW(hRequest, headers.GetString(), headers.GetLength(),
+					if (HttpSendRequestW(hRequest, headers, -1,
 										 reinterpret_cast<LPVOID>(requestData.GetBuffer()), requestData.GetLength())) {
 
 						static std::vector<char> tmp(16 * 1024);
@@ -256,36 +256,64 @@ namespace Youtube
 		return !pData.empty();
 	}
 
+	static CStringW ExtractVisitorData(LPCWSTR videoId)
+	{
+		CStringW visitorData;
+
+		urlData data;
+		if (URLReadData(CStringW(L"https://www.youtube.com/watch?v=") + videoId, data)) {
+			visitorData = UTF8ToWStr(GetEntry(data.data(), R"("VISITOR_DATA":")", R"(")"));
+			if (visitorData.IsEmpty()) {
+				visitorData = UTF8ToWStr(GetEntry(data.data(), R"("visitorData":")", R"(")"));
+			}
+			if (!visitorData.IsEmpty()) {
+				Unescape(visitorData);
+			}
+		}
+
+		return visitorData;
+	}
+
 	static bool URLPostData(LPCWSTR videoId, urlData& pData)
 	{
-		constexpr auto requestStr =
+		constexpr static auto requestStr =
 			R"({"contentCheckOk": true, "context": {"client": {"clientName": "IOS", "clientVersion": "19.45.4", "deviceMake": "Apple", "deviceModel": "iPhone16,2", "hl": "en", "osName": "iPhone", "osVersion": "18.1.0.22B83", "timeZone": "UTC", "utcOffsetMinutes": 0}}, "playbackContext": {"contentPlaybackContext": {"html5Preference": "HTML5_PREF_WANTS"}}, "racyCheckOk" : true, "videoId" : "%S"})";
-
-		static const CStringW headers =
-			LR"(X-YouTube-Client-Name: 5\r\n)"
-			LR"(X-YouTube-Client-Version: 19.45.4\r\n)"
-			LR"(Origin: https://www.youtube.com\r\n)"
-			LR"(content-type: application/json\r\n)";
 
 		CStringA requestData;
 		requestData.Format(requestStr, videoId);
 
-		return URLPostData(L"com.google.ios.youtube/19.45.4 (iPhone16,2; U; CPU iOS 18_1_0 like Mac OS X;)", headers, requestData, pData);
+		CStringW headers =
+			L"X-YouTube-Client-Name: 5\r\n"
+			L"X-YouTube-Client-Version: 19.45.4\r\n"
+			L"Origin: https://www.youtube.com\r\n"
+			L"Content-Type: application/json\r\n";
+
+		auto visitorData = ExtractVisitorData(videoId);
+		if (!visitorData.IsEmpty()) {
+			headers.AppendFormat(L"X-Goog-Visitor-Id: %s\r\n", visitorData.GetString());
+		}
+
+		return URLPostData(L"com.google.ios.youtube/19.45.4 (iPhone16,2; U; CPU iOS 18_1_0 like Mac OS X;)", headers.GetString(), requestData, pData);
 	}
 
 	static bool URLPostDataForLive(LPCWSTR videoId, urlData& pData)
 	{
-		constexpr auto requestStr =
+		constexpr static auto requestStr =
 			R"({"contentCheckOk": true, "context": {"client": {"clientName": "MWEB", "clientVersion": "2.20240726.01.00", "hl": "en", "timeZone": "UTC", "utcOffsetMinutes": 0}}, "playbackContext": {"contentPlaybackContext": {"html5Preference": "HTML5_PREF_WANTS"}}, "racyCheckOk": true, "videoId": "%S"})";
-
-		static const CStringW headers =
-			LR"(X-YouTube-Client-Name: 2\r\n)"
-			LR"(X-YouTube-Client-Version: 2.20240726.01.00\r\n)"
-			LR"(Origin: https://www.youtube.com\r\n)"
-			LR"(content-type: application/json\r\n)";
 
 		CStringA requestData;
 		requestData.Format(requestStr, videoId);
+
+		CStringW headers =
+			LR"(X-YouTube-Client-Name: 2\r\n)"
+			LR"(X-YouTube-Client-Version: 2.20240726.01.00\r\n)"
+			LR"(Origin: https://www.youtube.com\r\n)"
+			LR"(Content-Type: application/json\r\n)";
+
+		auto visitorData = ExtractVisitorData(videoId);
+		if (!visitorData.IsEmpty()) {
+			headers.AppendFormat(L"X-Goog-Visitor-Id: %s\r\n", visitorData.GetString());
+		}
 
 		return URLPostData(http::userAgent.GetString(), headers, requestData, pData);
 	}
