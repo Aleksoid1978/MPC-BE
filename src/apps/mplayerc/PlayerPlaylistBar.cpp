@@ -1240,10 +1240,12 @@ void CPlayerPlaylistBar::AddItem(std::list<CString>& fns, CSubtitleItemList* sub
 
 	pli.AutoLoadFiles();
 	if (pli.m_auds.empty()) {
-		Youtube::YoutubeFields y_fields;
-		if (Youtube::Parse_URL(pli.m_fi, y_fields)) {
-			pli.m_label    = y_fields.title;
-			pli.m_duration = y_fields.duration;
+		if (!Youtube::Parse_URL(pli.m_fi, pli.m_label, pli.m_duration)) {
+			Youtube::YoutubeFields y_fields;
+			if (Youtube::Parse_URL(pli.m_fi, y_fields)) {
+				pli.m_label = y_fields.title;
+				pli.m_duration = y_fields.duration;
+			}
 		}
 	}
 

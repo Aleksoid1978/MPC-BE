@@ -256,19 +256,44 @@ namespace Youtube
 		return !pData.empty();
 	}
 
+	static CStringA ExtractYtcfg(LPCWSTR videoId)
+	{
+		constexpr LPCWSTR urls[] = {
+			L"https://www.youtube.com/embed/",
+			L"https://www.youtube.com/watch?v="
+		};
+
+		urlData data;
+		for (auto url : urls) {
+			if (URLReadData(CStringW(url) + videoId, data)) {
+				const std::regex regex(R"(ytcfg\.set\s*\(\s*(\{.+?\})\s*\)\s*;)");
+				std::cmatch match;
+				if (std::regex_search(data.data(), match, regex) && match.size() == 2) {
+					return CStringA(match[1].first, match[1].length());
+				}
+			}
+		}
+
+		return {};
+	}
+
 	static CStringW ExtractVisitorData(LPCWSTR videoId)
 	{
 		CStringW visitorData;
 
-		urlData data;
-		if (URLReadData(CStringW(L"https://www.youtube.com/watch?v=") + videoId, data)) {
-			visitorData = UTF8ToWStr(GetEntry(data.data(), R"("VISITOR_DATA":")", R"(")"));
-			if (visitorData.IsEmpty()) {
-				visitorData = UTF8ToWStr(GetEntry(data.data(), R"("visitorData":")", R"(")"));
+		if (auto ytcfg = ExtractYtcfg(videoId); !ytcfg.IsEmpty()) {
+			rapidjson::Document json;
+			if (!json.Parse(ytcfg).HasParseError()) {
+				if (!getJsonValue(json, "VISITOR_DATA", visitorData)) {
+					if (auto value = GetValueByPointer(json, "/INNERTUBE_CONTEXT/client/visitorData"); value && value->IsString()) {
+						visitorData = UTF8ToWStr(value->GetString());
+					}
+				}
 			}
-			if (!visitorData.IsEmpty()) {
-				Unescape(visitorData);
-			}
+		}
+
+		if (!visitorData.IsEmpty()) {
+			Unescape(visitorData);
 		}
 
 		return visitorData;
@@ -1871,11 +1896,49 @@ namespace Youtube
 	bool Parse_URL(CString url, YoutubeFields& y_fields)
 	{
 		bool bRet = false;
+
 		if (CheckURL(url)) {
 			HandleURL(url);
 			const CString videoId = RegExpParse(url.GetString(), videoIdRegExp);
 
 			bRet = ParseMetadata(videoId, y_fields);
+		}
+
+		return bRet;
+	}
+
+	bool Parse_URL(CString url, CString& title, REFERENCE_TIME& duration)
+	{
+		bool bRet = false;
+
+		if (CheckURL(url)) {
+			HandleURL(url);
+			const CString videoId = RegExpParse(url.GetString(), videoIdRegExp);
+
+			if (auto ytcfg = ExtractYtcfg(videoId); !ytcfg.IsEmpty()) {
+				rapidjson::Document json;
+				if (!json.Parse(ytcfg).HasParseError()) {
+					if (auto embedded_player_response = GetValueByPointer(json, "/PLAYER_VARS/embedded_player_response"); embedded_player_response && embedded_player_response->IsString()) {
+						auto str = UrlDecode(embedded_player_response->GetString());
+						if (!json.Parse(str).HasParseError()) {
+							if (auto thumbnailPreviewRenderer = GetValueByPointer(json, "/embedPreview/thumbnailPreviewRenderer"); thumbnailPreviewRenderer && thumbnailPreviewRenderer->IsObject()) {
+								if (auto title_runs = GetValueByPointer(*thumbnailPreviewRenderer, "/title/runs"); title_runs && title_runs->IsArray()) {
+									auto array = title_runs->GetArray();
+									if (!array.Empty()) {
+										getJsonValue(array[0], "text", title);
+										bRet = true;
+									}
+								}
+
+								CStringA videoDurationSeconds;
+								if (getJsonValue(*thumbnailPreviewRenderer, "videoDurationSeconds", videoDurationSeconds)) {
+									duration = atoi(videoDurationSeconds.GetString()) * UNITS;
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 
 		return bRet;
