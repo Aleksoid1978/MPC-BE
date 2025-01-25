@@ -13,12 +13,14 @@ Removed RGB to YUV conversion.
 Added "Convert to RGB" setting.
 
 YouTube
+Improved YouTube support in the built-in parser.
 Improved yt-dlp support.
 Added "Preferred audio format" setting for the built-in YouTube parser.
 Improved language track selection for region-specific languages ​​that do not have a separate setting.
 If the audio track language is not found, the default track for this video will be used.
 
 Player
+The cancellation of opening online links has been accelerated.
 Added the ability to receive the displayed video frame on a 10-bit display in RGB48 format when using MPC Video Renderer 0.9.0.2326 or later.
 Fixed playlist operation with clipboard.
 MPC Video Renderer will be used by default if it is installed and available.
