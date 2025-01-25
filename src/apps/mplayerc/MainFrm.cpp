@@ -19240,30 +19240,14 @@ void CMainFrame::WTSUnRegisterSessionNotification()
 
 void CMainFrame::EnableShaders1(bool enable)
 {
-	if (enable && !AfxGetAppSettings().ShaderList.empty()) {
-		m_bToggleShader = true;
-		SetShaders();
-	} else {
-		m_bToggleShader = false;
-		if (m_pCAP) {
-			m_pCAP->ClearPixelShaders(TARGET_FRAME);
-		}
-	}
+	m_bToggleShader = !enable;
+	OnShaderToggle1();
 }
 
 void CMainFrame::EnableShaders2(bool enable)
 {
-	CAppSettings& s = AfxGetAppSettings();
-
-	if (enable && (!s.ShaderListScreenSpace.empty() || !s.Shaders11PostScale.empty())) {
-		m_bToggleShaderScreenSpace = true;
-		SetShaders();
-	} else {
-		m_bToggleShaderScreenSpace = false;
-		if (m_pCAP) {
-			m_pCAP->ClearPixelShaders(TARGET_SCREEN);
-		}
-	}
+	m_bToggleShaderScreenSpace = !enable;
+	OnShaderToggle2();
 }
 
 BOOL CMainFrame::OpenBD(const CString& path, REFERENCE_TIME rtStart, BOOL bAddRecent)

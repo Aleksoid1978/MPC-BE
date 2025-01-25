@@ -2037,8 +2037,6 @@ STDMETHODIMP CBaseAP::ClearPixelShaders(int target)
 	}
 	m_pDevice9Ex->SetPixelShader(nullptr);
 
-	Paint(false);
-
 	return S_OK;
 }
 
