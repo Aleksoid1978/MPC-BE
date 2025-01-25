@@ -113,6 +113,7 @@ typedef struct FFV1Context {
     uint64_t (*rc_stat2[MAX_QUANT_TABLES])[32][2];
     int version;
     int micro_version;
+    int combined_version;
     int width, height;
     int chroma_planes;
     int chroma_h_shift, chroma_v_shift;
@@ -122,6 +123,7 @@ typedef struct FFV1Context {
     int key_frame;
     ProgressFrame picture, last_picture;
     uint32_t crcref;
+    enum AVPixelFormat pix_fmt;
 
     const AVFrame *cur_enc_frame;
     int plane_count;
