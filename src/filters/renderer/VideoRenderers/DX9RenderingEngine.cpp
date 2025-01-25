@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2159,6 +2159,8 @@ HRESULT CDX9RenderingEngine::ClearCustomPixelShaders(int target)
 		return E_INVALIDARG;
 	}
 	m_pDevice9Ex->SetPixelShader(nullptr);
+
+	Paint(false);
 
 	return S_OK;
 }
