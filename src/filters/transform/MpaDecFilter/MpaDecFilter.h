@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -123,7 +123,8 @@ class __declspec(uuid("3D446B6F-71DE-4437-BE15-8CE47174340F"))
 		}
 	} m_hdmi_bitstream = {};
 
-	CFFAudioDecoder m_FFAudioDec;
+	CFFAudioDecoder   m_FFAudioDec;
+	std::vector<BYTE> m_FFAudioDecodedBuffer;
 
 	BOOL            m_bNeedBitstreamCheck = TRUE;
 	BOOL            m_bHasVideo = FALSE;

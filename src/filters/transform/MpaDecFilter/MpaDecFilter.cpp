@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -791,14 +791,14 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 	if (bEOF) {
 		hr = m_FFAudioDec.SendData(nullptr, 0);
 		if (hr == S_OK) {
-			std::vector<BYTE> output;
 			SampleFormat samplefmt = SAMPLE_FMT_NONE;
 
 			REFERENCE_TIME rtStart = INVALID_TIME;
-			while (S_OK == (hr = m_FFAudioDec.ReceiveData(output, samplefmt, rtStart))) {
-				if (output.size()) {
-					hr = Deliver(output.data(), output.size(), rtStart, samplefmt, m_FFAudioDec.GetSampleRate(), m_FFAudioDec.GetChannels(), m_FFAudioDec.GetChannelMask());
-					output.clear();
+			size_t decodedSize = {};
+			while (S_OK == (hr = m_FFAudioDec.ReceiveData(m_FFAudioDecodedBuffer, decodedSize, samplefmt, rtStart))) {
+				if (decodedSize) {
+					hr = Deliver(m_FFAudioDecodedBuffer.data(), decodedSize, rtStart, samplefmt,
+								 m_FFAudioDec.GetSampleRate(), m_FFAudioDec.GetChannels(), m_FFAudioDec.GetChannelMask());
 				}
 			}
 		}
@@ -836,14 +836,14 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 
 		hr = m_FFAudioDec.SendData(p, int(end - p), &out_size);
 		if (S_OK == hr) {
-			std::vector<BYTE> output;
 			SampleFormat samplefmt = SAMPLE_FMT_NONE;
 
 			REFERENCE_TIME rtStart = INVALID_TIME;
-			while (S_OK == (hr = m_FFAudioDec.ReceiveData(output, samplefmt, rtStart))) {
-				if (output.size()) {
-					hr = Deliver(output.data(), output.size(), rtStart, samplefmt, m_FFAudioDec.GetSampleRate(), m_FFAudioDec.GetChannels(), m_FFAudioDec.GetChannelMask());
-					output.clear();
+			size_t decodedSize = {};
+			while (S_OK == (hr = m_FFAudioDec.ReceiveData(m_FFAudioDecodedBuffer, decodedSize, samplefmt, rtStart))) {
+				if (decodedSize) {
+					hr = Deliver(m_FFAudioDecodedBuffer.data(), decodedSize, rtStart, samplefmt,
+								 m_FFAudioDec.GetSampleRate(), m_FFAudioDec.GetChannels(), m_FFAudioDec.GetChannelMask());
 				}
 			}
 		} else {

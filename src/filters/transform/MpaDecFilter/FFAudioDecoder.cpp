@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2024 see Authors.txt
+ * (C) 2014-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -560,7 +560,7 @@ HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 	return hr;
 }
 
-HRESULT CFFAudioDecoder::ReceiveData(std::vector<BYTE>& BuffOut, SampleFormat& samplefmt, REFERENCE_TIME& rtStart)
+HRESULT CFFAudioDecoder::ReceiveData(std::vector<BYTE>& BuffOut, size_t& outputSize, SampleFormat& samplefmt, REFERENCE_TIME& rtStart)
 {
 	HRESULT hr = E_FAIL;
 	const int ret = avcodec_receive_frame(m_pAVCtx, m_pFrame);
@@ -572,34 +572,40 @@ HRESULT CFFAudioDecoder::ReceiveData(std::vector<BYTE>& BuffOut, SampleFormat& s
 		rtStart = m_pFrame->pkt_dts;
 		m_pFilter->ClearCacheTimeStamp();
 
+		outputSize = 0;
+
 		const size_t nSamples = m_pFrame->nb_samples;
 		if (nSamples) {
 			const WORD nChannels = m_pAVCtx->ch_layout.nb_channels;
 			samplefmt = (SampleFormat)m_pAVCtx->sample_fmt;
 			const size_t monosize = nSamples * av_get_bytes_per_sample(m_pAVCtx->sample_fmt);
 
-			auto* pBuffOut = &BuffOut;
-			std::vector<BYTE> tmp;
-			if (m_bNeedMix) {
-				pBuffOut = &tmp;
+			static std::vector<BYTE> mixBuffer;
+			auto& bufferOutput = m_bNeedMix ? mixBuffer : BuffOut;
+
+			outputSize = monosize * nChannels;
+			if (outputSize > bufferOutput.size()) {
+				bufferOutput.resize(outputSize);
 			}
-			pBuffOut->resize(monosize * nChannels);
 
 			if (av_sample_fmt_is_planar(m_pAVCtx->sample_fmt)) {
-				BYTE* pOut = pBuffOut->data();
+				BYTE* pOut = bufferOutput.data();
 				for (int ch = 0; ch < nChannels; ++ch) {
 					memcpy(pOut, m_pFrame->extended_data[ch], monosize);
 					pOut += monosize;
 				}
 			} else {
-				memcpy(pBuffOut->data(), m_pFrame->data[0], pBuffOut->size());
+				memcpy(bufferOutput.data(), m_pFrame->data[0], outputSize);
 			}
 
 			if (m_bNeedMix) {
 				samplefmt = SAMPLE_FMT_FLT;
 				auto out_samples = m_Mixer.CalcOutSamples(nSamples);
-				BuffOut.resize(static_cast<size_t>(out_samples) * m_MixerChannels * av_get_bytes_per_sample(m_pAVCtx->sample_fmt));
-				out_samples = m_Mixer.Mixing(BuffOut.data(), out_samples, tmp.data(), nSamples);
+				outputSize = static_cast<size_t>(out_samples) * m_MixerChannels * av_get_bytes_per_sample(m_pAVCtx->sample_fmt);
+				if (outputSize > BuffOut.size()) {
+					BuffOut.resize(outputSize);
+				}
+				out_samples = m_Mixer.Mixing(BuffOut.data(), out_samples, mixBuffer.data(), nSamples);
 				if (!out_samples) {
 					av_frame_unref(m_pFrame);
 					return E_INVALIDARG;

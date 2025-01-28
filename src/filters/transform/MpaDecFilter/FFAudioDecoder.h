@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2024 see Authors.txt
+ * (C) 2014-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -77,7 +77,7 @@ public:
 
 	HRESULT RealPrepare(BYTE* p, int buffsize, CPaddedBuffer& BuffOut);
 	HRESULT SendData(BYTE* p, int size, int* out_size = nullptr);
-	HRESULT ReceiveData(std::vector<BYTE>& BuffOut, SampleFormat& samplefmt, REFERENCE_TIME& rtStart);
+	HRESULT ReceiveData(std::vector<BYTE>& BuffOut, size_t& outputSize, SampleFormat& samplefmt, REFERENCE_TIME& rtStart);
 	void    FlushBuffers();
 	void    StreamFinish();
 
