@@ -380,7 +380,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,160,17,32,12,ES_CENTER | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN3,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,180,17,12,12
     LTEXT           "%",IDC_STATIC4,196,19,8,8
-    GROUPBOX        "Interval zamika",IDC_STATIC,212,5,79,28
+    GROUPBOX        "Korak zakasnitve",IDC_STATIC,212,5,79,28
     EDITTEXT        IDC_EDIT4,217,17,40,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "ms",IDC_STATIC,261,19,25,11
     GROUPBOX        "Nastavitve teksture (ponovno odpri video za ogled sprememb)",IDC_STATIC,5,37,286,68
@@ -1619,7 +1619,7 @@ BEGIN
         MENUITEM "Odpri &DVD/Blu-ray...",   ID_FILE_OPENDVD
         MENUITEM "Odpri na&pravo...",   ID_FILE_OPENDEVICE
         MENUITEM "Odpri mapo...",        ID_FILE_OPENDIRECTORY
-        MENUITEM "Odpri &Iso sliko...",          ID_FILE_OPENISO
+        MENUITEM "Odpri &ISO sliko...",          ID_FILE_OPENISO
         MENUITEM "O&dpri disk",               ID_SUBMENU_OPENDISC
         MENUITEM "Nedavne datoteke",   ID_SUBMENU_RECENTFILES
         MENUITEM "&Zapri",             ID_FILE_CLOSEPLAYLIST
@@ -1648,23 +1648,23 @@ BEGIN
         MENUITEM "Zajem",              ID_VIEW_CAPTURE
         MENUITEM "Shader Editor",         ID_VIEW_SHADEREDITOR
         MENUITEM "Navigacija",                   ID_VIEW_NAVIGATION
-        POPUP "&Presets..."
+        POPUP "&Prednastavitve..."
         BEGIN
-            MENUITEM "&Minimal",           ID_VIEW_PRESETS_MINIMAL
-            MENUITEM "&Compact",             ID_VIEW_PRESETS_COMPACT
-            MENUITEM "&Normal",           ID_VIEW_PRESETS_NORMAL
+            MENUITEM "&Minimalno",           ID_VIEW_PRESETS_MINIMAL
+            MENUITEM "&Kompaktno",             ID_VIEW_PRESETS_COMPACT
+            MENUITEM "&Normalno",           ID_VIEW_PRESETS_NORMAL
         END
         MENUITEM SEPARATOR
-        MENUITEM "Fu&ll Screen",   ID_VIEW_FULLSCREEN
+        MENUITEM "&Celozaslonsko",   ID_VIEW_FULLSCREEN
         POPUP "&Povečava"
         BEGIN
             MENUITEM "&50%",                   ID_VIEW_ZOOM_50
             MENUITEM "&100%",                  ID_VIEW_ZOOM_100
             MENUITEM "&200%",                  ID_VIEW_ZOOM_200
-            MENUITEM "Auto Fit",   ID_VIEW_ZOOM_AUTOFIT
+            MENUITEM "Samodejno prila&godi",   ID_VIEW_ZOOM_AUTOFIT
         END
         MENUITEM SEPARATOR
-        MENUITEM "Jezik (&Language)",                   ID_SUBMENU_LANGUAGE
+        MENUITEM "&Jezik (Language)",                   ID_SUBMENU_LANGUAGE
         MENUITEM SEPARATOR
         POPUP "Nastavitve izrisovalnika"
         BEGIN
@@ -1716,9 +1716,9 @@ BEGIN
             MENUITEM "A-B (Mark &B)", ID_PLAY_REPEAT_AB_MARK_B
         END
         MENUITEM SEPARATOR
-        MENUITEM "&Increase Rate",   ID_PLAY_INCRATE
-        MENUITEM "&Decrease Rate",   ID_PLAY_DECRATE
-        MENUITEM "Reset Rate",   ID_PLAY_RESETRATE
+        MENUITEM "&Povečaj hitrost",   ID_PLAY_INCRATE
+        MENUITEM "&Zmanjšaj hitrost",   ID_PLAY_DECRATE
+        MENUITEM "Ponastavi hitrost",   ID_PLAY_RESETRATE
         MENUITEM SEPARATOR
         MENUITEM "&Filters",                    ID_SUBMENU_FILTERS
         MENUITEM "S&haders",                      ID_SUBMENU_SHADERS
@@ -1760,7 +1760,7 @@ BEGIN
             MENUITEM "Odpri &DVD/Blu-ray...",   ID_FILE_OPENDVD
             MENUITEM "Odpri na&pravo...",   ID_FILE_OPENDEVICE
             MENUITEM "Odpri mapo...",        ID_FILE_OPENDIRECTORY
-            MENUITEM "Odpri &Iso sliko...",          ID_FILE_OPENISO
+            MENUITEM "Odpri &ISO sliko...",          ID_FILE_OPENISO
             MENUITEM "O&dpri disk",               ID_SUBMENU_OPENDISC
             MENUITEM "Nedavne datoteke",   ID_SUBMENU_RECENTFILES
             MENUITEM "&Zapri",             ID_FILE_CLOSEPLAYLIST
@@ -1794,7 +1794,7 @@ BEGIN
             MENUITEM "&50%",                   ID_VIEW_ZOOM_50
             MENUITEM "&100%",                  ID_VIEW_ZOOM_100
             MENUITEM "&200%",                  ID_VIEW_ZOOM_200
-            MENUITEM "Auto Fit",   ID_VIEW_ZOOM_AUTOFIT
+            MENUITEM "Samodejno prila&godi",   ID_VIEW_ZOOM_AUTOFIT
         END
         MENUITEM SEPARATOR
         MENUITEM "&Video Frame",                    ID_SUBMENU_VIDEOFRAME
@@ -1839,12 +1839,12 @@ BEGIN
             MENUITEM "Zajem",              ID_VIEW_CAPTURE
             MENUITEM "Shader Editor",                ID_VIEW_SHADEREDITOR
             MENUITEM "Navigacija",                   ID_VIEW_NAVIGATION
-            MENUITEM "Jezik (&Language)",           ID_SUBMENU_LANGUAGE
-            POPUP "&Presets..."
+            MENUITEM "&Jezik (Language)",           ID_SUBMENU_LANGUAGE
+            POPUP "&Prednastavitve..."
             BEGIN
-                MENUITEM "&Minimal",           ID_VIEW_PRESETS_MINIMAL
-                MENUITEM "&Compact",             ID_VIEW_PRESETS_COMPACT
-                MENUITEM "&Normal",           ID_VIEW_PRESETS_NORMAL
+                MENUITEM "&Minimalno",           ID_VIEW_PRESETS_MINIMAL
+                MENUITEM "&Kompaktno",             ID_VIEW_PRESETS_COMPACT
+                MENUITEM "&Normalno",           ID_VIEW_PRESETS_NORMAL
             END
         END
         MENUITEM SEPARATOR
@@ -1885,15 +1885,15 @@ BEGIN
     BEGIN
         POPUP "&Datoteka"
         BEGIN
-            MENUITEM "&Quick Open File...",   ID_FILE_OPENFILE
+            MENUITEM "&hitro odpri datoteko...",   ID_FILE_OPENFILE
             MENUITEM SEPARATOR
-            MENUITEM "&Open File/URL...",     ID_FILE_OPENFILEURL
-            MENUITEM "Open &DVD/Blu-ray...",   ID_FILE_OPENDVD
-            MENUITEM "Open De&vice...",   ID_FILE_OPENDEVICE
+            MENUITEM "&Odpri datoteko/URL...",     ID_FILE_OPENFILEURL
+            MENUITEM "Odpri &DVD/Blu-ray...",   ID_FILE_OPENDVD
+            MENUITEM "Odpri na&pravo...",   ID_FILE_OPENDEVICE
             MENUITEM "Odpri mapo...",        ID_FILE_OPENDIRECTORY
-            MENUITEM "Open &Iso image...",          ID_FILE_OPENISO
-            MENUITEM "O&pen Disc",                  ID_SUBMENU_OPENDISC
-            MENUITEM "Recent Files",   ID_SUBMENU_RECENTFILES
+            MENUITEM "Odpri &ISO sliko...",          ID_FILE_OPENISO
+            MENUITEM "O&dpri disk",                  ID_SUBMENU_OPENDISC
+            MENUITEM "Nedavne datoteke",   ID_SUBMENU_RECENTFILES
             MENUITEM "&Zapri",                   ID_FILE_CLOSEPLAYLIST
             MENUITEM SEPARATOR
             MENUITEM "&Shrani kot...",              ID_FILE_SAVE_COPY
@@ -1918,21 +1918,21 @@ BEGIN
             MENUITEM "Zajem",              ID_VIEW_CAPTURE
             MENUITEM "Shader Editor",       ID_VIEW_SHADEREDITOR
             MENUITEM "Navigacija",                   ID_VIEW_NAVIGATION
-            MENUITEM "Jezik (&Language)",           ID_SUBMENU_LANGUAGE
-            POPUP "&Presets..."
+            MENUITEM "&Jezik (Language)",           ID_SUBMENU_LANGUAGE
+            POPUP "&Prednastavitve..."
             BEGIN
-                MENUITEM "&Minimal",           ID_VIEW_PRESETS_MINIMAL
-                MENUITEM "&Compact",             ID_VIEW_PRESETS_COMPACT
-                MENUITEM "&Normal",           ID_VIEW_PRESETS_NORMAL
+                MENUITEM "&Minimalno",           ID_VIEW_PRESETS_MINIMAL
+                MENUITEM "&Kompaktno",             ID_VIEW_PRESETS_COMPACT
+                MENUITEM "&Normalno",           ID_VIEW_PRESETS_NORMAL
             END
             MENUITEM SEPARATOR
-            MENUITEM "Fu&ll Screen",   ID_VIEW_FULLSCREEN
+            MENUITEM "&Celozaslonsko",   ID_VIEW_FULLSCREEN
             POPUP "&Povečava"
             BEGIN
                 MENUITEM "&50%",                   ID_VIEW_ZOOM_50
                 MENUITEM "&100%",                  ID_VIEW_ZOOM_100
                 MENUITEM "&200%",                  ID_VIEW_ZOOM_200
-                MENUITEM "Auto Fit",   ID_VIEW_ZOOM_AUTOFIT
+                MENUITEM "Samodejno prila&godi",   ID_VIEW_ZOOM_AUTOFIT
             END
             MENUITEM SEPARATOR
             POPUP "Nastavitve izrisovalnika"
@@ -1968,7 +1968,7 @@ BEGIN
                 MENUITEM "Med predvajanjem",           ID_ONTOP_WHILEPLAYING
                 MENUITEM "While Playing Video",         ID_ONTOP_WHILEPLAYINGVIDEO
             END
-            MENUITEM "&Options...",              ID_VIEW_OPTIONS
+            MENUITEM "&Možnosti...",              ID_VIEW_OPTIONS
         END
         POPUP "&Predvajaj"
         BEGIN
@@ -1985,16 +1985,16 @@ BEGIN
                 MENUITEM "A-B (Mark &B)", ID_PLAY_REPEAT_AB_MARK_B
             END
             MENUITEM SEPARATOR
-            MENUITEM "&Increase Rate",   ID_PLAY_INCRATE
-            MENUITEM "&Decrease Rate",   ID_PLAY_DECRATE
-            MENUITEM "Reset Rate",   ID_PLAY_RESETRATE
+            MENUITEM "&Povečaj hitrost",   ID_PLAY_INCRATE
+            MENUITEM "&Zmanjšaj hitrost",   ID_PLAY_DECRATE
+            MENUITEM "Ponastavi hitrost",   ID_PLAY_RESETRATE
         END
         MENUITEM "&Navigate",                   ID_SUBMENU_NAVIGATE
         MENUITEM "Pri&ljubljene",                  ID_SUBMENU_FAVORITES
         POPUP "&Pomoč"
         BEGIN
-            MENUITEM "&Home Page",            ID_HELP_HOMEPAGE
-            MENUITEM "Check for &updates",          ID_HELP_CHECKFORUPDATE
+            MENUITEM "&Domača stran",            ID_HELP_HOMEPAGE
+            MENUITEM "Preveri za &posodobitve",          ID_HELP_CHECKFORUPDATE
             MENUITEM "&Command Line Switches", ID_HELP_SHOWCOMMANDLINESWITCHES
             MENUITEM SEPARATOR
             MENUITEM "&About...",              ID_HELP_ABOUT
@@ -2498,8 +2498,8 @@ BEGIN
     IDD_PPAGEAUDIO          "Zvok"
     IDD_PPAGESOUNDPROCESSING "Zvok::Procesiranje zvoka"
     IDD_PPAGESUBTITLES      "Podnapisi"
-    IDD_PPAGESUBRENDERING   "Podnapisi::Rendering"
-    IDD_PPAGESUBSTYLE       "Podnapisi::Default Style"
+    IDD_PPAGESUBRENDERING   "Podnapisi::Izrisovanje"
+    IDD_PPAGESUBSTYLE       "Podnapisi::Privzeti slog"
     IDD_PPAGEINTERNALFILTERS "Interni filtri"
     IDD_PPAGEEXTERNALFILTERS "Zunanji filtri"
     IDD_PPAGEFILTERSPRIORITY "Zunanji filtri::Prioriteta"
@@ -2789,7 +2789,7 @@ BEGIN
     IDS_AG_FRAMESTEP        "Framestep"
     IDS_AG_FRAMESTEP_BACK   "Framestep back"
     IDS_AG_GO_TO            "Go To"
-    IDS_AG_INCREASE_RATE    "Increase Rate"
+    IDS_AG_INCREASE_RATE    "Povečaj hitrost"
 END
 
 STRINGTABLE
@@ -2969,7 +2969,7 @@ BEGIN
     IDS_AG_DISPLAY_STATS    "Display Stats"
     IDS_AG_AUDIODELAY_ONOFF "Audio zamik Da/Ne"
     IDS_AG_AUTOSAVE_DISPLAY "Save displayed image (auto)"
-    IDS_AG_OPEN_ISO         "Odpri Iso sliko"
+    IDS_AG_OPEN_ISO         "Odpri ISO sliko"
     IDS_AG_OPEN_DIR         "Odpri mapo"
 END
 
@@ -3124,8 +3124,8 @@ BEGIN
     IDS_FULLSCREENMONITOR_CURRENT "Current"
     IDS_MPC_CRASH           "MPC-BE se je nepričakovano zaustavil. Da bi lahko rešili težavo, pošlji prosim datoteko '%s' na naš bug tracker.\n\nŽeliš zdaj odpreti mapo z minidump datoteko in obiskati bug tracker?"
     IDS_MPC_MINIDUMP_FAIL   "Napaka pri kreiranju dump datoteke v '%s' (napaka %d)"
-    IDS_MAINFRM_DIR_TITLE   "Select Directory"
-    IDS_MAINFRM_DIR_CHECK   "Include subdirectories"
+    IDS_MAINFRM_DIR_TITLE   "Izberi mapo"
+    IDS_MAINFRM_DIR_CHECK   "Vključi podmape"
     IDS_AG_PAUSE            "Premor"
     IDS_AG_TOGGLE_CAPTION   "Preklopi Caption&Meni"
     IDS_AG_TOGGLE_SEEKER    "Preklopi Seeker"
@@ -3139,7 +3139,7 @@ BEGIN
     IDS_MAINFRM_87          "Cannot load any source filter"
     IDS_MAINFRM_88          "Cannot render the file"
     IDS_MAINFRM_89          "Napačen format datoteke"
-    IDS_MAINFRM_90          "File not found"
+    IDS_MAINFRM_90          "Datoteke nisem našel"
     IDS_MAINFRM_91          "Neznan tip datoteke"
     IDS_MAINFRM_92          "Nepodprt pretok"
     IDS_MAINFRM_93          "Ne najdem DVD/Blu-ray mape"
@@ -3336,8 +3336,8 @@ BEGIN
     IDS_VDF_SCANTYPE_TOP    "Top-Field First"
     IDS_VDF_SCANTYPE_BOTTOM "Bottom-Field First"
     IDS_VDF_SCANTYPE_PROGRESSIVE "Progresivno"
-    IDS_VDF_COLOR_OUTPUT_FORMATS "Izhodni formati"
-    IDS_VDF_COLOR_PRESET    "Preset:"
+    IDS_VDF_COLOR_OUTPUT_FORMATS "Izhodni formati:"
+    IDS_VDF_COLOR_PRESET    "Prednastavitev:"
     IDS_VDF_COLOR_STANDARD  "Standard:"
     IDS_VDF_COLOR_CONVERT_TO_RGB "Convert to RGB"
     IDS_VDF_COLOR_RGB_LEVELS "RGB izhodne ravni:"
@@ -3459,7 +3459,7 @@ BEGIN
     IDS_NO_MORE_MEDIA       "No more media in the current folder."
     IDS_FIRST_IN_FOLDER     "The first file in the folder is loaded now."
     IDS_LAST_IN_FOLDER      "The last file in the folder is loaded now."
-    IDS_MERGING_FILES       "Merging files..."
+    IDS_MERGING_FILES       "Združevanje datotek..."
 END
 
 STRINGTABLE
@@ -3737,7 +3737,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AFTERPLAYBACK_CLOSE "Po predvajanju: Exit"
+    IDS_AFTERPLAYBACK_CLOSE "Po predvajanju: Izhod"
     IDS_AFTERPLAYBACK_STANDBY "Po predvajanju: V pripravljenost"
     IDS_AFTERPLAYBACK_HIBERNATE "Po predvajanju: Hibernacija"
     IDS_AFTERPLAYBACK_SHUTDOWN "Po predvajanju: Zaustavi"
