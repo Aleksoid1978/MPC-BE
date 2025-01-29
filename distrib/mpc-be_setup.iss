@@ -155,7 +155,7 @@ Name: ru; MessagesFile: compiler:Languages\Russian.isl
 Name: sc; MessagesFile: Languages\ChineseSimplified.isl
 Name: sk; MessagesFile: compiler:Languages\Slovak.isl
 Name: sl; MessagesFile: compiler:Languages\Slovenian.isl
-Name: sv; MessagesFile: Languages\Swedish.isl
+Name: sv; MessagesFile: compiler:Languages\Swedish.isl
 Name: tc; MessagesFile: Languages\ChineseTraditional.isl
 Name: tr; MessagesFile: compiler:Languages\Turkish.isl
 Name: ua; MessagesFile: compiler:Languages\Ukrainian.isl
