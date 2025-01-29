@@ -61,7 +61,7 @@ END
 
 IDD_SELECTMEDIATYPE DIALOGEX 0, 0, 225, 47
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Selectează tipul media"
+CAPTION "Selectează tipul de media"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     COMBOBOX        IDC_COMBO1,5,5,215,37,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
@@ -883,18 +883,18 @@ BEGIN
     COMBOBOX        IDC_D3D9DEVICE_COMBO,144,49,142,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Ecran complet exclusiv pe o fereastră suplimentară",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,79,224,10
-    CONTROL         "Ieșire RGB de 10 biți",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,92,92,10
-    CONTROL         "Reinițializează la schimbarea ecranului",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_TOP | WS_TABSTOP,10,65,164,9
-    LTEXT           "Preîncărcări pentru EVR:",IDC_STATIC5,10,107,65,8
+    CONTROL         "Ieșire RGB pe 10 biți",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,92,92,10
+    CONTROL         "Resetează la schimbarea ecranului",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_TOP | WS_TABSTOP,10,65,164,9
+    LTEXT           "Tampoane (Buffere) EVR:",IDC_STATIC5,10,107,65,8
     EDITTEXT        IDC_EVR_BUFFERS,10,120,35,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,33,120,12,13
-    LTEXT           "Formatul de suprafață:",IDC_STATIC2,115,124,72,8
+    LTEXT           "Formatul suprafeței:",IDC_STATIC2,115,124,72,8
     COMBOBOX        IDC_COMBO1,188,122,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Scalare:",IDC_STATIC3,115,141,72,8
+    LTEXT           "Redimensionare:",IDC_STATIC3,115,141,72,8
     COMBOBOX        IDC_DX9RESIZER_COMBO,188,139,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Reducere la scară de <50%:",IDC_STATIC10,115,158,72,8
     COMBOBOX        IDC_COMBO7,188,156,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Interval de ieșire:",IDC_STATIC4,10,141,65,8
+    LTEXT           "Intervalul de ieșire:",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Setări pentru randorul video MPC Video Renderer",IDC_STATIC,5,177,285,27
     CONTROL         "Ecran complet exclusiv pe o fereastră suplimentară (experimental)",IDC_CHECK2,
@@ -970,7 +970,7 @@ BEGIN
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,280,5,12,13
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,22,284,1
     CONTROL         "Activează comprimare",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,26,138,9
-    CONTROL         "Permite accesul numai de pe acest calculator (reţeaua internă)",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,38,285,9
+    CONTROL         "Permite accesul numai de la localhost (reţeaua internă)",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,38,285,9
     CONTROL         "Activează previzualizarea",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,50,138,9
     CONTROL         "Afișează informații de depanare",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,61,285,9
     LTEXT           "Lansează în navigator web...",IDC_STATIC1,150,26,120,8
@@ -978,7 +978,7 @@ BEGIN
     CONTROL         "Servește pagini din:",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,77,285,9
     EDITTEXT        IDC_EDIT2,15,89,167,14,ES_AUTOHSCROLL
     PUSHBUTTON      "Răsfoire...",IDC_BUTTON1,186,89,50,14
-    PUSHBUTTON      "Lansează...",IDC_BUTTON2,240,89,50,14
+    PUSHBUTTON      "Implementează...",IDC_BUTTON2,240,89,50,14
     LTEXT           "Pagina implicită:",IDC_STATIC,5,107,285,8
     EDITTEXT        IDC_EDIT9,15,119,275,14,ES_AUTOHSCROLL
     LTEXT           "Operatori CGI: (.ext1=path1;.ext2=path2;...)",IDC_STATIC,5,137,285,8
@@ -1008,16 +1008,16 @@ END
 
 IDD_SHADERCOMBINE_DLG DIALOGEX 0, 0, 215, 190
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Combinare nuanțatoare"
+CAPTION "Combină nuanțatoarele"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     COMBOBOX        IDC_COMBO2,5,4,32,120,CBS_DROPDOWNLIST | WS_TABSTOP
     COMBOBOX        IDC_COMBO1,41,4,114,120,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "&Adaugă",IDC_BUTTON2,162,3,50,14
     CONTROL         "",IDC_STATIC1,"Static",SS_ETCHEDHORZ,4,21,208,1
-    CONTROL         "Activează nuanțatoare pixel preredimensionare",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,26,150,10
+    CONTROL         "Activează nuanțatoarele de pixel de pre-redimensionare",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,26,150,10
     LISTBOX         IDC_LIST1,5,39,150,65,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Activează nuanțatoare pixel postredimensionare",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,109,150,10
+    CONTROL         "Activează nuanțatoarele de pixel de post-redimensionare",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,109,150,10
     LISTBOX         IDC_LIST2,5,122,150,65,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "&Elimină",IDC_BUTTON3,162,25,50,14
     PUSHBUTTON      "Mută în &sus",IDC_BUTTON1,162,90,50,14
@@ -1705,9 +1705,9 @@ BEGIN
     END
     POPUP "&Redare"
     BEGIN
-        MENUITEM "R&edare/Pauză",            ID_PLAY_PLAYPAUSE
+        MENUITEM "R&edare/Pauzează",            ID_PLAY_PLAYPAUSE
         MENUITEM "&Oprește",                 ID_PLAY_STOP
-        MENUITEM "Pas cad&ru",            ID_PLAY_FRAMESTEP
+        MENUITEM "Pas de cad&ru",            ID_PLAY_FRAMESTEP
         MENUITEM "&Mergi la...",             ID_PLAY_GOTO
         POPUP "&Repetare"
         BEGIN
@@ -1778,7 +1778,7 @@ BEGIN
             MENUITEM "I&eșire",                  ID_FILE_EXIT
         END
         MENUITEM SEPARATOR
-        MENUITEM "&Redare/Pauză",                 ID_PLAY_PLAYPAUSE
+        MENUITEM "&Redare/Pauzează",                 ID_PLAY_PLAYPAUSE
         MENUITEM "&Oprește",                       ID_PLAY_STOP
         POPUP "&Repetă"
         BEGIN
@@ -1973,7 +1973,7 @@ BEGIN
         END
         POPUP "&Redare"
         BEGIN
-            MENUITEM "&Redare/Pauză",            ID_PLAY_PLAYPAUSE
+            MENUITEM "&Redă/Pauzează",            ID_PLAY_PLAYPAUSE
             MENUITEM "&Oprește",                 ID_PLAY_STOP
             MENUITEM "Pas cad&ru",            ID_PLAY_FRAMESTEP
             MENUITEM "&Mergi la...",             ID_PLAY_GOTO
@@ -2141,8 +2141,8 @@ IDR_POPUP_SHADERS MENU
 BEGIN
     POPUP ""
     BEGIN
-        MENUITEM "Activează nuanțatoarele de pixel de preredimensionare", ID_SHADERS_1_ENABLE
-        MENUITEM "Activează nuanțatoarele de pixel de postredimensionare", ID_SHADERS_2_ENABLE
+        MENUITEM "Activează nuanțatoarele de pixel de pre-redimensionare", ID_SHADERS_1_ENABLE
+        MENUITEM "Activează nuanțatoarele de pixel de post-redimensionare", ID_SHADERS_2_ENABLE
         MENUITEM "&Selectează nuanțatoarele...",          ID_SHADERS_SELECT
         MENUITEM SEPARATOR
         MENUITEM "&Editează nuanțatoarele...",            ID_VIEW_SHADEREDITOR
@@ -2590,10 +2590,10 @@ BEGIN
     IDS_AG_SHADERS_SELECT   "Selectează nuanțatoarele"
     IDS_AG_SHADERS_1_ENABLE "Activează nuanțatoarele de pixeli (Pixels Shaders)"
     IDS_AG_SHADERS_2_ENABLE "Activează nuanțatoarele de pixeli pentru spațiu ecran"
-    IDS_OSD_SHADERS_1_ON    "Nuanțatoare de pixel de preredimensionare: pornit"
-    IDS_OSD_SHADERS_1_OFF   "Nuanțatoare de pixel de preredimensionare: oprit"
-    IDS_OSD_SHADERS_2_ON    "Nuanțatoare de pixel de postredimensionare: pornit"
-    IDS_OSD_SHADERS_2_OFF   "Nuanțatoare de pixel de postredimensionare: oprit"
+    IDS_OSD_SHADERS_1_ON    "Nuanțatoare de pixel de pre-redimensionare: pornit"
+    IDS_OSD_SHADERS_1_OFF   "Nuanțatoare de pixel de pre-redimensionare: oprit"
+    IDS_OSD_SHADERS_2_ON    "Nuanțatoare de pixel de post-redimensionare: pornit"
+    IDS_OSD_SHADERS_2_OFF   "Nuanțatoare de pixel de post-redimensionare: oprit"
     IDS_AG_VSYNCINTERNAL    "VSync Intern"
 END
 
@@ -2617,7 +2617,7 @@ END
 STRINGTABLE
 BEGIN
     ID_PLAY_PLAY            "Redare\nRedare"
-    ID_PLAY_PAUSE           "Pauză\nPauză"
+    ID_PLAY_PAUSE           "Pauzează\nPauzează"
     ID_PLAY_STOP            "Oprește\nOprește"
     ID_PLAY_FRAMESTEP       "Pas\nPas"
     ID_PLAY_DECRATE         "Micșorează viteza\nMicșorează viteza"
@@ -2784,8 +2784,8 @@ BEGIN
     IDS_AG_SAVE_SUBTITLE    "Salvează subtitrarea"
     IDS_AG_PROPERTIES       "Proprietăți"
     IDS_AG_EXIT             "Ieșire"
-    IDS_AG_PLAYPAUSE        "Redare/Pauză"
-    IDS_AG_PLAY             "Redare"
+    IDS_AG_PLAYPAUSE        "Redă/Pauzează"
+    IDS_AG_PLAY             "Redă"
     IDS_AG_STOP             "Oprire"
     IDS_AG_FRAMESTEP        "Deplasează cadru"
     IDS_AG_FRAMESTEP_BACK   "Deplasează cadru înapoi"
@@ -3127,7 +3127,7 @@ BEGIN
     IDS_MPC_MINIDUMP_FAIL   "Nu s-a putut crea fișierul de depanare ""%s"" (eroare %d)"
     IDS_MAINFRM_DIR_TITLE   "Selectează directorul"
     IDS_MAINFRM_DIR_CHECK   "Include subdirectoare"
-    IDS_AG_PAUSE            "Pauză"
+    IDS_AG_PAUSE            "Pauzează"
     IDS_AG_TOGGLE_CAPTION   "Comută meniu şi titlu"
     IDS_AG_TOGGLE_SEEKER    "Comută căutătorul"
     IDS_AG_TOGGLE_CONTROLS  "Comută controale"
@@ -3325,8 +3325,8 @@ BEGIN
     IDS_VDF_HW_ADAPTER      "Adaptor"
     IDS_VDF_DXVACOMPATIBILITY "Verificarea compatibilității DXVA (H.264)"
     IDS_VDF_DXVA_FULLCHECK  "Verificare completă"
-    IDS_VDF_DXVA_SKIP_LEVELCHECK "Omite verificare nivel"
-    IDS_VDF_DXVA_SKIP_REFCHECK "Omite verificare cadru ref."
+    IDS_VDF_DXVA_SKIP_LEVELCHECK "Omite verificarea nivelului"
+    IDS_VDF_DXVA_SKIP_REFCHECK "Omite verificarea cadrului de referință"
     IDS_VDF_DXVA_SKIP_ALLCHECK "Omite toate verificările"
     IDS_VDF_DXVA_SD         "Dezactivează DXVA pentru SD (H.264)"
 END
@@ -3385,7 +3385,7 @@ BEGIN
     IDS_ARS_SOUND_DEVICE    "Dispozitiv de sunet:"
     IDS_ARS_RELEASE_DEVICE_IDLE "Eliberează dispozitivul când este inactiv"
     IDS_ARS_CROSSFEED       "Activează alimentarea încrucișată stereo (pentru căști)"
-    IDS_ARS_DEVICE_PERIOD   "Tamponul dispozitivului:"
+    IDS_ARS_DEVICE_PERIOD   "Tamponul (Bufferul) dispozitivului:"
     IDS_ARS_ALT_CHECK_FORMAT "Verificare alternativă a formatului suportat"
     IDS_ARS_STATUS          "Stare"
     IDS_ARS_DEVICE          "Dispozitiv:"
@@ -3413,7 +3413,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_VTSREADER_LOAD_PGC  "Activează o alegere de Titlu"
+    IDS_VTSREADER_LOAD_PGC  "Activează o alegere a Titlului"
 END
 
 STRINGTABLE
@@ -3554,7 +3554,7 @@ BEGIN
     IDS_MFMT_OTHER          "Altul"
     IDS_MFMT_OTHER_AUDIO    "Alt Audio"
     IDS_MFMT_SWF            "Shockwave Flash"
-    IDS_MFMT_AVISYNTH       "AviSynth script"
+    IDS_MFMT_AVISYNTH       "Script AviSynth"
     IDS_MFMT_VAPOURSYNTH    "VapourSynth script"
 END
 
@@ -3584,7 +3584,7 @@ BEGIN
     IDS_MFMT_AMR            "AMR"
     IDS_MFMT_APE            "Audio Monkey"
     IDS_MFMT_AU             "AU/SND"
-    IDS_MFMT_CDA            "Pistă CD audio"
+    IDS_MFMT_CDA            "Pistă de CD-uri audio"
     IDS_MFMT_FLAC           "FLAC"
     IDS_MFMT_M4A            "Audio MPEG-4"
     IDS_MFMT_MIDI           "MIDI"
@@ -3768,7 +3768,7 @@ BEGIN
     IDS_TOOLTIP_RESTORE     "Restabilește"
     IDS_TOOLTIP_MAXIMIZE    "Maximizează"
     IDS_TOOLTIP_WINDOW      "Fereastră"
-    IDS_TOOLTIP_FULLSCREEN  "Tot ecranul"
+    IDS_TOOLTIP_FULLSCREEN  "Tot ecranul (Ecran complet)"
     IDS_TOOLTIP_LOCK        "Blochează"
     IDS_TOOLTIP_UNLOCK      "Deblochează"
 END
