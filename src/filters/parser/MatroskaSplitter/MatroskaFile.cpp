@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -271,6 +271,9 @@ HRESULT Segment::ParseMinimal(CMatroskaNode* pMN0)
 	}
 	if (Tags.empty() && (pMN = pMN0->Child(MATROSKA_ID_TAGS, false))) {
 		Tags.Parse(pMN.get());
+	}
+	if (SegmentInfo.SegmentUID.empty() && (pMN = pMN0->Child(MATROSKA_ID_INFO, false))) {
+		SegmentInfo.Parse(pMN.get());
 	}
 
 	return S_OK;

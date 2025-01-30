@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1641,7 +1641,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	Info& info = m_pFile->m_segment.SegmentInfo;
 	m_rtDuration = (REFERENCE_TIME)(info.Duration * info.TimeCodeScale / 100);
 
-	if (m_bCalcDuration && m_bHasVideo && !m_pFile->m_segment.Cues.empty()) {
+	if ((m_bCalcDuration || !m_rtDuration) && m_bHasVideo && !m_pFile->m_segment.Cues.empty()) {
 		// calculate duration from video track;
 		m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
 		m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
@@ -1716,7 +1716,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_pBlock.reset();
 
 		if (rtDur != INVALID_TIME) {
-			m_rtDuration = std::min(m_rtDuration, rtDur);
+			m_rtDuration = m_rtDuration ? std::min(m_rtDuration, rtDur) : rtDur;
 		}
 	}
 
