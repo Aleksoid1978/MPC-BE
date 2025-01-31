@@ -5,6 +5,9 @@
 StreamReader
 Fixed freezing in some situations.
 
+MatroskaSplitter
+For some files duration was not determined.
+
 MP4Splitter
 Improved ignoring of corrupted video tracks.
 
