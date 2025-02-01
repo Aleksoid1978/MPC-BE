@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1820,6 +1820,11 @@ CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int x
 void Rasterizer::FillSolidRect(SubPicDesc& spd, int x, int y, int nWidth, int nHeight, DWORD lColor) const
 {
 	ASSERT(spd.w >= x + nWidth && spd.h >= y + nHeight);
+	ASSERT(x >= 0 && y >= 0);
+	if (x < 0 || y < 0) {
+		return;
+	}
+
 	BYTE* dst = (BYTE*)((DWORD*)(spd.bits + spd.pitch * y) + x);
 	DrawInternal(m_bUseAVX2, dst, spd.pitch, BYTE(0x40), nWidth, nHeight, lColor);
 }
