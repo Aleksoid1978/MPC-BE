@@ -799,18 +799,15 @@ static int export_frame_params(VVCContext *s, const VVCFrameContext *fc)
     AVCodecContext *c = s->avctx;
     const VVCSPS *sps = fc->ps.sps;
     const VVCPPS *pps = fc->ps.pps;
-    int ret;
 
-    // Reset HW config if pix_fmt/w/h change.
-    if (s->pix_fmt != sps->pix_fmt || c->coded_width != pps->width || c->coded_height != pps->height) {
+    // Reset the format if pix_fmt/w/h change.
+    if (c->sw_pix_fmt != sps->pix_fmt || c->coded_width != pps->width || c->coded_height != pps->height) {
         c->coded_width  = pps->width;
         c->coded_height = pps->height;
-        ret = get_format(c, sps);
-        if (ret < 0)
-            return ret;
-
-        c->pix_fmt = ret;
-        s->pix_fmt = sps->pix_fmt;
+        c->sw_pix_fmt   = sps->pix_fmt;
+        c->pix_fmt      = get_format(c, sps);
+        if (c->pix_fmt < 0)
+            return AVERROR_INVALIDDATA;
     }
 
     c->width  = pps->width  - ((pps->r->pps_conf_win_left_offset + pps->r->pps_conf_win_right_offset) << sps->hshift[CHROMA]);
@@ -965,19 +962,6 @@ fail:
     return ret;
 }
 
-static int set_output_format(const VVCContext *s, const AVFrame *output)
-{
-    AVCodecContext *c = s->avctx;
-    int ret;
-
-    if (output->width != c->width || output->height != c->height) {
-        if ((ret = ff_set_dimensions(c, output->width, output->height)) < 0)
-            return ret;
-    }
-    c->pix_fmt = output->format;
-    return 0;
-}
-
 static int wait_delayed_frame(VVCContext *s, AVFrame *output, int *got_output)
 {
     VVCFrameContext *delayed = get_frame_context(s, s->fcs, s->nb_frames - s->nb_delayed);
@@ -985,9 +969,7 @@ static int wait_delayed_frame(VVCContext *s, AVFrame *output, int *got_output)
 
     if (!ret && delayed->output_frame->buf[0] && output) {
         av_frame_move_ref(output, delayed->output_frame);
-        ret = set_output_format(s, output);
-        if (!ret)
-            *got_output = 1;
+        *got_output = 1;
     }
     s->nb_delayed--;
 
@@ -1038,11 +1020,7 @@ static int get_decoded_frame(VVCContext *s, AVFrame *output, int *got_output)
         ret = ff_vvc_output_frame(s, last, output, 0, 1);
         if (ret < 0)
             return ret;
-        if (ret) {
-            *got_output = ret;
-            if ((ret = set_output_format(s, output)) < 0)
-                return ret;
-        }
+        *got_output = ret;
     }
     return 0;
 }
@@ -1160,8 +1138,6 @@ static av_cold int vvc_decode_init(AVCodecContext *avctx)
     s->eos = 1;
     GDR_SET_RECOVERED(s);
     ff_thread_once(&init_static_once, init_default_scale_m);
-
-    s->pix_fmt = AV_PIX_FMT_NONE;
 
     return 0;
 }

@@ -50,7 +50,7 @@ Updated Slovenian translation.
 
 Updated libraries:
 	dav1d 1.5.1;
-	ffmpeg n7.2-dev-1188-ge20ee9f9ae;
+	ffmpeg n7.2-dev-1227-gc6194b50b1;
 	libdivide 5.1.0;
 	libflac 1.4.3;
 	libogg 1.3.5;
