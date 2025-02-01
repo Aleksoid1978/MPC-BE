@@ -6,7 +6,7 @@ StreamReader
 Fixed freezing in some situations.
 
 MatroskaSplitter
-For some files duration was not determined.
+Fixed duration detection for some files.
 
 MP4Splitter
 Improved ignoring of corrupted video tracks.
@@ -23,11 +23,12 @@ Improved language track selection for region-specific languages ​​that do no
 If the audio track language is not found, the default track for this video will be used.
 
 Player
-The cancellation of opening online links has been accelerated.
 Added the ability to receive the displayed video frame on a 10-bit display in RGB48 format when using MPC Video Renderer 0.9.0.2326 or later.
 Fixed playlist operation with clipboard.
 MPC Video Renderer will be used by default if it is installed and available.
 Fixed the "Enable dark title" setting.
+Accelerated cancellation of opening online links.
+Fixed enabling/disabling shaders on pause in the "Shader Combiner" dialog.
 
 Installer
 MPC Video Renderer will be installed by default.
@@ -45,6 +46,7 @@ Updated Romanian translation (by Andrei Miloiu).
 Updated Dutch and Chinese (Traditional) translation (by beter).
 Updated Japanese translation (by tsubasanouta).
 Updated Korean translation (by midist).
+Updated Slovenian translation.
 
 Updated libraries:
 	dav1d 1.5.1;
