@@ -4703,8 +4703,6 @@ void CMainFrame::OnFilePostCloseMedia()
 		m_closingmsg = ResStr(IDS_CONTROLS_CLOSED);
 	}
 
-	m_wndView.SetVideoRect();
-
 	CAppSettings& s = AfxGetAppSettings();
 
 	s.nCLSwitches &= CLSW_OPEN | CLSW_PLAY | CLSW_AFTERPLAYBACK_MASK | CLSW_NOFOCUS;
@@ -14512,8 +14510,12 @@ void CMainFrame::CloseMediaPrivate()
 	}
 	m_pSubClock.Release();
 
-	//if (pVW) pVW->put_Visible(OAFALSE);
-	//if (pVW) pVW->put_MessageDrain((OAHWND)nullptr), pVW->put_Owner((OAHWND)nullptr);
+	if (m_pVW) {
+		m_pVW->put_Owner(NULL);
+		if (auto hdc = ::GetDC(m_wndView.GetSafeHwnd())) {
+			m_wndView.SendMessageW(WM_ERASEBKGND, (WPARAM)hdc, 0);
+		}
+	}
 
 	// IMPORTANT: IVMRSurfaceAllocatorNotify/IVMRSurfaceAllocatorNotify9 has to be released before the VMR/VMR9, otherwise it will crash in Release()
 	m_pMVRSR.Release();
@@ -17700,6 +17702,7 @@ void CMainFrame::CloseMedia(BOOL bNextIsOpened/* = FALSE*/)
 	m_fOpeningAborted = false;
 
 	SetLoadState(MLS_CLOSING);
+	m_wndView.SetVideoRect();
 
 	//PostMessageW(WM_LBUTTONDOWN, MK_LBUTTON, MAKELONG(0, 0));
 

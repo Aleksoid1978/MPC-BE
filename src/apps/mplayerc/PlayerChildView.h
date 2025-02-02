@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -46,7 +46,7 @@ public:
 
 	DECLARE_DYNAMIC(CChildView)
 
-	void SetVideoRect(CRect r = CRect(0,0,0,0));
+	void SetVideoRect(CRect r = {});
 
 	CRect GetVideoRect() const {
 		return(m_videoRect);
