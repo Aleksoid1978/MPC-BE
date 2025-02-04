@@ -627,6 +627,8 @@ void CAppSettings::ResetSettings()
 	strAudioFilter1.Empty();
 	bAudioFiltersNotForStereo = false;
 
+	m_VRSettings.SetDefault();
+
 	m_ExternalFilters.clear();
 
 	// Keys
