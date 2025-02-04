@@ -321,7 +321,7 @@ BEGIN
     CONTROL         "Audio",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON,10,86,65,8
     CONTROL         "Subtitrări",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,10,98,65,8
     LISTBOX         IDC_LIST1,79,74,208,66,WS_VSCROLL | WS_GROUP | WS_TABSTOP
-    GROUPBOX        "Setări adiționale",IDC_STATIC,5,140,286,37
+    GROUPBOX        "Setări suplimentare",IDC_STATIC,5,140,286,37
     CONTROL         "Permite subtitrări în „Line 21 Decoder”",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,152,220,9
     CONTROL         "Începe redarea din titlul principal",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,164,220,9
@@ -331,8 +331,8 @@ IDD_PPAGEPLAYBACK DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Redă",IDC_STATIC,5,5,129,60
-    CONTROL         "Redă",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,17,55,10
+    GROUPBOX        "Redare",IDC_STATIC,5,5,129,60
+    CONTROL         "Redă (de)",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,17,55,10
     CONTROL         "Repetă la nesfârșit",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,32,116,8
     EDITTEXT        IDC_EDIT1,65,15,20,13,ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
     LTEXT           "dată (ori)",IDC_STATIC1,90,17,40,8
@@ -431,7 +431,7 @@ BEGIN
     CONTROL         "Folosește tema ",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,5,114,8,WS_EX_TRANSPARENT
     LTEXT           "Luminozitate: ",IDC_STATIC1,14,19,46,8,0,WS_EX_TRANSPARENT
     CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,58,19,165,12
-    LTEXT           "Setarea culorii indicatorului sunetului:",IDC_STATIC2,14,31,165,8
+    LTEXT           "Setarea culorii indicatorului de sunet:",IDC_STATIC2,14,31,165,8
     LTEXT           "Umplere:",IDC_STATIC_CLRFACE,14,43,46,8,0,WS_EX_TRANSPARENT
     PUSHBUTTON      "B",IDC_BUTTON_CLRFACE,64,41,20,14
     LTEXT           "Fundal:",IDC_STATIC_CLROUTLINE,94,43,44,8,0,WS_EX_TRANSPARENT
@@ -460,7 +460,7 @@ BEGIN
     LTEXT           "Dimensiunea scrisului (fontului) listei de redare:",IDC_STATIC,13,165,110,8
     EDITTEXT        IDC_EDIT2,127,163,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,165,10,8
-    GROUPBOX        "OSD",IDC_STATIC,7,183,282,60
+    GROUPBOX        "OSD (On Screen Display/ Afișare pe ecran)",IDC_STATIC,7,183,282,60
     RTEXT           "Font:",IDC_STATIC,13,194,43,8
     COMBOBOX        IDC_COMBO1,61,191,104,64,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_EDIT3,169,191,29,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
@@ -471,12 +471,12 @@ BEGIN
     PUSHBUTTON      "G2",IDC_BUTTON_CLRGRAD2,62,226,20,14
     RTEXT           "Transparent:",IDC_STATIC,86,211,59,8
     CONTROL         "",IDC_SLIDER_OSDTRANS,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,149,210,51,12
-    RTEXT           "Dimensiunea chenarului:",IDC_STATIC,94,228,51,8
+    RTEXT           "Mărime chenar:",IDC_STATIC,94,228,51,8
     EDITTEXT        IDC_EDIT4,152,226,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN10,"msctls_updown32",UDS_WRAP | UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,166,226,12,13
     CONTROL         "Umbră",IDC_CHECK_SHADOW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,224,194,46,9
     CONTROL         "Antialiasare",IDC_CHECK_AA,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,224,206,61,18
-    CONTROL         "Folosește facilitățile barei de activități din Windows 7",IDC_CHECK_WIN7,
+    CONTROL         "Folosește funcțiile din bara de activități din Windows 7 (și versiunile ulterioare).",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,246,270,11
 END
 
@@ -487,7 +487,7 @@ BEGIN
     GROUPBOX        "Dimensiunea ferestrei la pornire",IDC_STATIC,5,5,286,67
     CONTROL         "Mărimea standard a ferestrei",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,16,106,10
     CONTROL         "Reține ultima dimensiune a ferestrei",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,30,127,10
-    CONTROL         "Setează mărimea ferestrei specificată",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,10,44,118,10
+    CONTROL         "Setează mărime fereastră specif.",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,10,44,118,10
     CONTROL         "Setează zona video specificată",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,10,58,118,10
     EDITTEXT        IDC_EDIT1,133,43,28,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
     CTEXT           "×",IDC_STATIC,162,45,8,8
@@ -743,7 +743,7 @@ BEGIN
     GROUPBOX        "Stil chenar",IDC_STATIC,5,121,105,68
     CONTROL         "Contur",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,133,95,8
     CONTROL         "Dreptunghi opac",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,145,95,8
-    LTEXT           "Lățime chenar",IDC_STATIC,10,159,56,8
+    LTEXT           "Lățime de chenar",IDC_STATIC,10,159,56,8
     EDITTEXT        IDC_EDIT1,70,157,35,13,ES_RIGHT | ES_AUTOHSCROLL
     LTEXT           "Profunzime umbră",IDC_STATIC,10,174,56,8
     EDITTEXT        IDC_EDIT2,70,172,35,13,ES_RIGHT | ES_AUTOHSCROLL
@@ -892,7 +892,7 @@ BEGIN
     COMBOBOX        IDC_COMBO1,188,122,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Redimensionare:",IDC_STATIC3,115,141,72,8
     COMBOBOX        IDC_DX9RESIZER_COMBO,188,139,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Reducere la scară de <50%:",IDC_STATIC10,115,158,72,8
+    LTEXT           "Micșorează cu <50%:",IDC_STATIC10,115,158,72,8
     COMBOBOX        IDC_COMBO7,188,156,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Intervalul de ieșire:",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -933,7 +933,7 @@ BEGIN
     COMBOBOX        IDC_COMBO5,116,130,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Înălțimea video maximă:",IDC_STATIC,10,148,104,8
     COMBOBOX        IDC_COMBO6,116,146,43,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Selectează numărul maxim de cadre/secundă (fps) sau rata de biți",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,162,196,10
+    CONTROL         "Selectează nr. maxim de cadre/sec. (fps) sau rata de biți",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,162,196,10
     LTEXT           "Adresa AceStream:",IDC_STATIC,10,183,77,8
     EDITTEXT        IDC_EDIT1,91,181,195,13,ES_AUTOHSCROLL
     LTEXT           "Adresa MatriX (TorrServer):",IDC_STATIC,10,200,103,8
@@ -1624,14 +1624,14 @@ BEGIN
         MENUITEM "Deschide imaginea &ISO...",          ID_FILE_OPENISO
         MENUITEM "Des&chide discul",                  ID_SUBMENU_OPENDISC
         MENUITEM "Fișiere recente",                ID_SUBMENU_RECENTFILES
-        MENUITEM "&Închide",                ID_FILE_CLOSEPLAYLIST
+        MENUITEM "Înc&hide",                ID_FILE_CLOSEPLAYLIST
         MENUITEM SEPARATOR
         MENUITEM "&Salvează o copie...",             ID_FILE_SAVE_COPY
         MENUITEM "Salvează &imaginea...",              ID_FILE_SAVE_IMAGE
         MENUITEM "Salvează &miniaturi...",         ID_FILE_SAVE_THUMBNAILS
         MENUITEM SEPARATOR
-        MENUITEM "&Încarcă subtitrare...",     ID_FILE_LOAD_SUBTITLE
-        MENUITEM "Salvează s&ubtitrare...",     ID_FILE_SAVE_SUBTITLE
+        MENUITEM "Î&ncarcă subtitrări...",     ID_FILE_LOAD_SUBTITLE
+        MENUITEM "Salvează s&ubtitrările...",     ID_FILE_SAVE_SUBTITLE
         MENUITEM SEPARATOR
         MENUITEM "P&roprietăți",                 ID_FILE_PROPERTIES
         MENUITEM SEPARATOR
@@ -1697,13 +1697,13 @@ BEGIN
         POPUP "În prim plan"
         BEGIN
             MENUITEM "Niciodată",                       ID_ONTOP_NEVER
-            MENUITEM "Întotdeauna",                      ID_ONTOP_ALWAYS
+            MENUITEM "Pentru totdeauna",                      ID_ONTOP_ALWAYS
             MENUITEM "În timpul redării",               ID_ONTOP_WHILEPLAYING
             MENUITEM "În timpul redării video",         ID_ONTOP_WHILEPLAYINGVIDEO
         END
         MENUITEM "&Opțiuni...",                 ID_VIEW_OPTIONS
     END
-    POPUP "&Redă"
+    POPUP "&Redare"
     BEGIN
         MENUITEM "R&edă/Pauzează",            ID_PLAY_PLAYPAUSE
         MENUITEM "&Oprește",                 ID_PLAY_STOP
@@ -1731,9 +1731,9 @@ BEGIN
         MENUITEM SEPARATOR
         POPUP "Vol&um"
         BEGIN
-            MENUITEM "&Sus",                 ID_VOLUME_UP
-            MENUITEM "&Jos",             ID_VOLUME_DOWN
-            MENUITEM "&Mut",                 ID_VOLUME_MUTE
+            MENUITEM "&Sus (Crește volumul)",                 ID_VOLUME_UP
+            MENUITEM "&Jos (Scade volumul)",             ID_VOLUME_DOWN
+            MENUITEM "&Mut (Silențios)",                 ID_VOLUME_MUTE
         END
         MENUITEM "După redare",                  ID_SUBMENU_AFTERPLAYBACK
     END
@@ -1770,8 +1770,8 @@ BEGIN
             MENUITEM "Salvează &imaginea...",              ID_FILE_SAVE_IMAGE
             MENUITEM "Salvează &miniaturi...",         ID_FILE_SAVE_THUMBNAILS
             MENUITEM SEPARATOR
-            MENUITEM "&Încarcă subtitrare...",     ID_FILE_LOAD_SUBTITLE
-            MENUITEM "Salvează s&ubtitrare...",     ID_FILE_SAVE_SUBTITLE
+            MENUITEM "Î&ncarcă subtitrări...",     ID_FILE_LOAD_SUBTITLE
+            MENUITEM "Salvează s&ubtitrările...",     ID_FILE_SAVE_SUBTITLE
             MENUITEM SEPARATOR
             MENUITEM "P&roprietăți",                 ID_FILE_PROPERTIES
             MENUITEM SEPARATOR
@@ -1824,7 +1824,7 @@ BEGIN
             POPUP "În prim plan"
             BEGIN
                 MENUITEM "Niciodată",                       ID_ONTOP_NEVER
-                MENUITEM "Întotdeauna",                      ID_ONTOP_ALWAYS
+                MENUITEM "Pentru totdeauna",                      ID_ONTOP_ALWAYS
                 MENUITEM "În timpul redării",               ID_ONTOP_WHILEPLAYING
                 MENUITEM "În timpul redării video",         ID_ONTOP_WHILEPLAYINGVIDEO
             END
@@ -1895,14 +1895,14 @@ BEGIN
             MENUITEM "Deschide imaginea &ISO...",          ID_FILE_OPENISO
             MENUITEM "De&schide discul",                  ID_SUBMENU_OPENDISC
             MENUITEM "Fișiere recente",                ID_SUBMENU_RECENTFILES
-            MENUITEM "&Închide",                      ID_FILE_CLOSEPLAYLIST
+            MENUITEM "Înc&hide",                      ID_FILE_CLOSEPLAYLIST
             MENUITEM SEPARATOR
             MENUITEM "&Salvează o copie...",             ID_FILE_SAVE_COPY
             MENUITEM "Salvează imaginea...",               ID_FILE_SAVE_IMAGE
             MENUITEM "Salvează &miniaturi...",         ID_FILE_SAVE_THUMBNAILS
             MENUITEM SEPARATOR
-            MENUITEM "&Încarcă subtitrare...",     ID_FILE_LOAD_SUBTITLE
-            MENUITEM "Salvează s&ubtitrare...",     ID_FILE_SAVE_SUBTITLE
+            MENUITEM "Î&ncarcă subtitrări...",     ID_FILE_LOAD_SUBTITLE
+            MENUITEM "Salvează s&ubtitrările...",     ID_FILE_SAVE_SUBTITLE
             MENUITEM SEPARATOR
             MENUITEM "Prop&rietăți",                 ID_FILE_PROPERTIES
         END
@@ -1965,7 +1965,7 @@ BEGIN
             POPUP "În prim plan"
             BEGIN
                 MENUITEM "Niciodată",                       ID_ONTOP_NEVER
-                MENUITEM "Întotdeauna",                      ID_ONTOP_ALWAYS
+                MENUITEM "Pentru totdeauna",                      ID_ONTOP_ALWAYS
                 MENUITEM "În timpul redării",               ID_ONTOP_WHILEPLAYING
                 MENUITEM "În timpul redării video",         ID_ONTOP_WHILEPLAYINGVIDEO
             END
@@ -1973,13 +1973,13 @@ BEGIN
         END
         POPUP "&Redare"
         BEGIN
-            MENUITEM "&Redă/Pauzează",            ID_PLAY_PLAYPAUSE
+            MENUITEM "R&edă/Pauzează",            ID_PLAY_PLAYPAUSE
             MENUITEM "&Oprește",                 ID_PLAY_STOP
-            MENUITEM "Pas cad&ru",            ID_PLAY_FRAMESTEP
+            MENUITEM "Pas de cad&ru",            ID_PLAY_FRAMESTEP
             MENUITEM "&Mergi la...",             ID_PLAY_GOTO
             POPUP "&Repetare"
             BEGIN
-                MENUITEM "Î&ntotdeauna", ID_REPEAT_FOREVER
+                MENUITEM "Pentru &totdeauna", ID_REPEAT_FOREVER
                 MENUITEM SEPARATOR
                 MENUITEM "A-B (&Resetează)", ID_PLAY_REPEAT_AB
                 MENUITEM "A-B (Marchează &A)", ID_PLAY_REPEAT_AB_MARK_A
@@ -1992,7 +1992,7 @@ BEGIN
         END
         MENUITEM "&Navigare",                   ID_SUBMENU_NAVIGATE
         MENUITEM "&Favorite",                  ID_SUBMENU_FAVORITES
-        POPUP "&Ajutor"
+        POPUP "A&jutor"
         BEGIN
             MENUITEM "&Pagină de pornire",                  ID_HELP_HOMEPAGE
             MENUITEM "Verifică pentru &actualizări",          ID_HELP_CHECKFORUPDATE
@@ -2053,14 +2053,14 @@ BEGIN
     BEGIN
         MENUITEM "&Jumătate din mărime",                  ID_VIEW_VF_HALF
         MENUITEM "&Mărime normală",                ID_VIEW_VF_NORMAL
-        MENUITEM "&Mărime dublă",                ID_VIEW_VF_DOUBLE
-        MENUITEM "&Întinde cât fereastra",          ID_VIEW_VF_STRETCH
+        MENUITEM "Mărime &dublă",                ID_VIEW_VF_DOUBLE
+        MENUITEM "Î&ntinde cât fereastra",          ID_VIEW_VF_STRETCH
         MENUITEM "Atinge fereastra din &interior",   ID_VIEW_VF_FROMINSIDE
         MENUITEM "Mărește/Micșorează (Scalează) &1",                     ID_VIEW_VF_ZOOM1
         MENUITEM "Mărește/Micșorează (Scalează) &2",                     ID_VIEW_VF_ZOOM2
         MENUITEM "Atinge fereastra din exteri&or",  ID_VIEW_VF_FROMOUTSIDE
         MENUITEM SEPARATOR
-        MENUITEM "&Menține raportul de aspect",          ID_VIEW_VF_KEEPASPECTRATIO
+        MENUITEM "Menține &raportul de aspect",          ID_VIEW_VF_KEEPASPECTRATIO
         POPUP "Suprascrie raportul de aspect"
         BEGIN
             MENUITEM "Implicit",                     ID_ASPECTRATIO_SOURCE
