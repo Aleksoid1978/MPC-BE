@@ -4309,8 +4309,8 @@ BOOL CMainFrame::OnMenu(CMenu* pMenu)
 		return FALSE;
 	}
 
-	// Do not show popup menu in D3D fullscreen it has several adverse effects.
-	if (CursorOnD3DFullScreenWindow()) {
+	// Do not show popup menu in D3D exclusive fullscreen it has several adverse effects.
+	if (m_bIsMadVRExclusiveMode || m_bIsMPCVRExclusiveMode || CursorOnD3DFullScreenWindow()) {
 		return FALSE;
 	}
 
