@@ -36,7 +36,7 @@ MPC Video Renderer будет использоваться по умолчани
 Инсталлятор
 MPC Video Renderer будет устанавливаться по умолчанию.
 Добавлен MPC Script Source 0.2.5.
-Обновлен MPC Video Renderer 0.9.1.
+Обновлен MPC Video Renderer 0.9.3.
 Для компиляции инсталлятора требуется InnoSetup 6.4.0 или новее.
 
 Обновлен немецкий перевод (автор Klaus1189).

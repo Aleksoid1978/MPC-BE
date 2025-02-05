@@ -36,7 +36,7 @@ Fixed enabling/disabling shaders on pause in the "Shader Combiner" dialog.
 Installer
 MPC Video Renderer will be installed by default.
 Added MPC Script Source 0.2.5.
-Updated MPC Video Renderer 0.9.1.
+Updated MPC Video Renderer 0.9.3.
 Compiling the installer requires InnoSetup 6.4.0 or later.
 
 Updated German translation (by Klaus1189).
