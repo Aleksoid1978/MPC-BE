@@ -346,7 +346,7 @@ BEGIN
     LTEXT           "%",IDC_STATIC3,183,95,8,8
     CONTROL         "禁止重置任务的速度",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,109,175,9
     GROUPBOX        "",IDC_STATIC,137,9,154,56
-    CONTROL         "缺省设置",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,8,100,9
+    CONTROL         "默认设置",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,8,100,9
     LTEXT           "字幕",IDC_STATIC,142,23,44,8
     EDITTEXT        IDC_EDIT2,190,21,94,13,ES_AUTOHSCROLL
     LTEXT           "音轨:",IDC_STATIC,142,39,44,8
@@ -1080,7 +1080,7 @@ IDD_PPAGEMISC DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "Tahoma", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "步进距离 (小、中、大每毫秒)",IDC_STATIC,7,5,220,34
+    GROUPBOX        "步进距离 (小、中、大，单位为毫秒)",IDC_STATIC,7,5,220,34
     EDITTEXT        IDC_EDIT1,15,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT2,64,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
@@ -3459,8 +3459,8 @@ STRINGTABLE
 BEGIN
     IDS_LOGO_AUTHOR         "作者未知。如果是您制作了此标志请联系我们！"
     IDS_NO_MORE_MEDIA       "在当前的文件夹中没有更多的媒体文件。"
-    IDS_FIRST_IN_FOLDER     "正在载入文件夹中的首个文件。"
-    IDS_LAST_IN_FOLDER      "正在载入文件夹中的最后一个文件。"
+    IDS_FIRST_IN_FOLDER     "当前文件已是文件夹内第一个。"
+    IDS_LAST_IN_FOLDER      "当前文件已是文件夹内最后一个。"
     IDS_MERGING_FILES       "合并文件..."
 END
 

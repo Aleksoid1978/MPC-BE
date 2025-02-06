@@ -41,7 +41,7 @@ Compiling the installer requires InnoSetup 6.4.0 or later.
 
 Updated German translation (by Klaus1189).
 Updated Hungarian translation (by mickey).
-Updated Chinese (Simplified) translation (by wushantao).
+Updated Chinese (Simplified) translation (by wushantao and nothingshiru).
 Updated Turkish translation (by cmhrky).
 Updated Italian translation (by mapi68).
 Updated Spanish translation (by IPeluchito).
