@@ -210,7 +210,7 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 28
 9		"채도"
 18		"초기화"
 20		"색 관리"
-21		"(for EVR-CP, surface 10/16-bit)"
+21		"(EVR-CP용, 표면 10/16비트)"
 22		"입력 형식 :"
 24		"주변광 :"
 26		"렌더링 의도 :"
@@ -516,7 +516,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 16
 10		"외부 자막 우선"
 12		"내장 자막 불러오지 않음"
 13		"수정 감지 후 자막 자동 다시 불러오기"
-15		"자막 싱크 수정 기능 사용"
+15		"자막 동기화 사용"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
@@ -598,10 +598,10 @@ END
 BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
 5		"유튜브"
 6		"내장된 웹 페이지 파서 사용"
-7		"Preferred video format:"
+7		"선호하는 비디오 형식 :"
 10		"60fps"
 11		"HDR"
-12		"Preferred audio format:"
+12		"선호하는 오디오 형식 :"
 14		"선호하는 오디오 트랙 언어 :"
 16		"재생 목록 열기"
 18		"youtube-dl, yt-dlp"
