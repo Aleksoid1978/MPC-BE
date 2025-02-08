@@ -65,12 +65,6 @@
 #endif
 
 // ==> Start patch MPC
-#if CONFIG_AV1_D3D12VA_HWACCEL || CONFIG_AV1_D3D11VA_HWACCEL || CONFIG_AV1_D3D11VA2_HWACCEL || CONFIG_AV1_DXVA2_HWACCEL
-#if !HAVE_DXVA_PICPARAMS_AV1
-#include "dxva_av1.h"
-#endif
-#endif
-
 #pragma pack(push, 1)
 typedef struct
 {
