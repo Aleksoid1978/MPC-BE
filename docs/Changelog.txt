@@ -4,6 +4,9 @@
 =============================
 Updated Korean translation (by Hackjjang).
 
+Updated libraries:
+	ffmpeg n7.2-dev-1286-g43be8d0728.
+
 
 1.8.3 - 2025-02-07
 =============================
