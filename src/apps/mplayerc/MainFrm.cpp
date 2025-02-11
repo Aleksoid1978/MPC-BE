@@ -12257,6 +12257,10 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 				m_strPlaybackRenderedPath = pOFD->fi.GetPath();
 				m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
+			} else {
+				m_youtubeFields.Empty();
+				m_youtubeUrllist.clear();
+				m_youtubeAudioUrllist.clear();
 			}
 		}
 	}
@@ -12316,6 +12320,10 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 						*pOFD = OFD;
 						m_strPlaybackRenderedPath = pOFD->fi.GetPath();
 						m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
+					} else {
+						m_youtubeFields.Empty();
+						m_youtubeUrllist.clear();
+						m_youtubeAudioUrllist.clear();
 					}
 				}
 			}
