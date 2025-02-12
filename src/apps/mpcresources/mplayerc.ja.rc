@@ -284,7 +284,7 @@ BEGIN
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,275,45,12,13
     CONTROL         "DVD の再生位置を記憶する",IDC_DVD_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,60,156,9
     CONTROL         "ファイルの再生位置を記憶する",IDC_FILE_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,72,158,9
-    CONTROL         "終了時の PnS 拡大率を記憶する",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,84,156,9
+    CONTROL         "終了時の PnS ズーム率を記憶する",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,84,156,9
     CONTROL         "メイン プレイリストを記憶する",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,96,156,9
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,129,108,158,1
     CONTROL         "最近使ったファイルの URL のタイトルを表示する",IDC_CHECK4,
@@ -631,7 +631,7 @@ BEGIN
     PUSHBUTTON      "キャンセル(&C)",IDCANCEL,49,100,50,14
     PUSHBUTTON      "保存(&S)",IDOK,105,100,50,14
     LTEXT           "位置: 0.0 → 1.0",IDC_STATIC,134,5,70,8
-    LTEXT           "拡大率: 0.2 → 5.0",IDC_STATIC,134,32,70,8
+    LTEXT           "ズーム率: 0.2 → 5.0",IDC_STATIC,134,32,70,8
 END
 
 IDD_PPAGEACCELTBL DIALOGEX 0, 0, 296, 264
@@ -1658,7 +1658,7 @@ BEGIN
         END
         MENUITEM SEPARATOR
         MENUITEM "全画面表示(&L)",        ID_VIEW_FULLSCREEN
-        POPUP "拡大(&Z)"
+        POPUP "ズーム(&Z)"
         BEGIN
             MENUITEM "&50%",                   ID_VIEW_ZOOM_50
             MENUITEM "&100%",                  ID_VIEW_ZOOM_100
@@ -1791,7 +1791,7 @@ BEGIN
         END
         MENUITEM SEPARATOR
         MENUITEM "全画面表示(&L)",                 ID_VIEW_FULLSCREEN
-        POPUP "拡大(&Z)"
+        POPUP "ズーム(&Z)"
         BEGIN
             MENUITEM "&50%",                   ID_VIEW_ZOOM_50
             MENUITEM "&100%",                  ID_VIEW_ZOOM_100
@@ -1929,7 +1929,7 @@ BEGIN
             END
             MENUITEM SEPARATOR
             MENUITEM "全画面表示(&L)",        ID_VIEW_FULLSCREEN
-            POPUP "拡大(&Z)"
+            POPUP "ズーム(&Z)"
             BEGIN
                 MENUITEM "&50%",                   ID_VIEW_ZOOM_50
                 MENUITEM "&100%",                  ID_VIEW_ZOOM_100
@@ -2057,8 +2057,8 @@ BEGIN
         MENUITEM "2 倍サイズ(&D)",                ID_VIEW_VF_DOUBLE
         MENUITEM "ウィンドウの大きさに広げる(&S)",          ID_VIEW_VF_STRETCH
         MENUITEM "ウィンドウに内接させる(&I)",   ID_VIEW_VF_FROMINSIDE
-        MENUITEM "拡大 &1",                     ID_VIEW_VF_ZOOM1
-        MENUITEM "拡大 &2",                     ID_VIEW_VF_ZOOM2
+        MENUITEM "ズーム &1",                     ID_VIEW_VF_ZOOM1
+        MENUITEM "ズーム &2",                     ID_VIEW_VF_ZOOM2
         MENUITEM "ウィンドウに外接させる(&O)",  ID_VIEW_VF_FROMOUTSIDE
         MENUITEM SEPARATOR
         MENUITEM "縦横比を保持(&K)",          ID_VIEW_VF_KEEPASPECTRATIO
@@ -2646,7 +2646,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_AUDIO            "音声(&A)"
-    IDS_AG_ZOOM             "拡大(&Z)"
+    IDS_AG_ZOOM             "ズーム(&Z)"
     IDS_FAVORITES_ADD       "お気に入りに追加(&A)..."
     IDS_FAVORITES_ORGANIZE  "お気に入りの整理(&O)..."
     IDS_CONTROLS_CLOSING    "閉じています..."
@@ -2676,8 +2676,8 @@ BEGIN
     IDS_AG_PNS_ROTATE_CW    "PnS 時計回りに回転"
     IDS_AG_TEARING_TEST     "テアリング テスト"
     IDS_SCALE_16_9          "16:9 画面に合わせる,%.3f,%.3f,%.3f,%.3f"
-    IDS_SCALE_WIDESCREEN    "ワイド画面に拡大,%.3f,%.3f,%.3f,%.3f"
-    IDS_SCALE_ULTRAWIDE     "ウルトラワイド画面に拡大,%.3f,%.3f,%.3f,%.3f"
+    IDS_SCALE_WIDESCREEN    "ワイド画面にズーム,%.3f,%.3f,%.3f,%.3f"
+    IDS_SCALE_ULTRAWIDE     "ウルトラワイド画面にズーム,%.3f,%.3f,%.3f,%.3f"
 END
 
 STRINGTABLE
@@ -2761,7 +2761,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_OSD_ZOOM_AUTO       "拡大: 自動"
+    IDS_OSD_ZOOM_AUTO       "ズーム: 自動"
     IDS_CUSTOM_CHANNEL_MAPPING "カスタム チャネル マッピングの切り替え"
     IDS_OSD_CUSTOM_CH_MAPPING_ON "カスタム チャネル マッピング: オン"
     IDS_OSD_CUSTOM_CH_MAPPING_OFF "カスタム チャネル マッピング: オフ"
@@ -2864,8 +2864,8 @@ END
 STRINGTABLE
 BEGIN
     IDS_FRAME_FROMINSIDE    "ウィンドウに内接させる"
-    IDS_FRAME_ZOOM1         "拡大 1"
-    IDS_FRAME_ZOOM2         "拡大 2"
+    IDS_FRAME_ZOOM1         "ズーム 1"
+    IDS_FRAME_ZOOM2         "ズーム 2"
     IDS_FRAME_FROMOUTSIDE   "ウィンドウに外接させる"
     IDS_CENTER_LEVEL_INC    "センター音量レベルの増加"
     IDS_CENTER_LEVEL_DEC    "センター音量レベルの減少"
@@ -2881,7 +2881,7 @@ BEGIN
     IDS_AG_VIEW_NORMAL      "標準表示"
     IDS_AG_FULLSCREEN       "全画面表示"
     IDS_AG_FULLSCREEN_2     "全画面表示 (解像度変更なし)"
-    IDS_AG_ZOOM_AUTO_FIT    "拡大 自動調整"
+    IDS_AG_ZOOM_AUTO_FIT    "ズーム 自動調整"
     IDS_AG_VIDFRM_HALF      "VidFrm 1/2"
     IDS_AG_VIDFRM_NORMAL    "VidFrm 標準"
     IDS_AG_VIDFRM_DOUBLE    "VidFrm 2 倍"
@@ -3431,9 +3431,9 @@ BEGIN
     IDS_AG_TOGGLE_PLAYLIST  "プレイリスト バーの表示"
     IDS_AG_TOGGLE_CAPTURE   "キャプチャー バーの表示"
     IDS_AG_TOGGLE_SHADER    "シェーダー編集バーの表示"
-    IDS_AG_ZOOM_50          "拡大 50%"
-    IDS_AG_ZOOM_100         "拡大 100%"
-    IDS_AG_ZOOM_200         "拡大 200%"
+    IDS_AG_ZOOM_50          "ズーム 50%"
+    IDS_AG_ZOOM_100         "ズーム 100%"
+    IDS_AG_ZOOM_200         "ズーム 200%"
     IDS_AG_NEXT_AR_PRESET   "次の縦横比プリセット"
     IDS_AG_VIDFRM_STRETCH   "VidFrm 大きさに広げる"
     IDS_AG_VIDFRM_INSIDE    "VidFrm 内接"
@@ -3443,9 +3443,9 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_VIDFRM_ZOOM1     "VidFrm 拡大 1"
-    IDS_AG_VIDFRM_ZOOM2     "VidFrm 拡大 2"
-    IDS_AG_VIDFRM_SWITCHZOOM "VidFrm 拡大設定の切り替え"
+    IDS_AG_VIDFRM_ZOOM1     "VidFrm ズーム 1"
+    IDS_AG_VIDFRM_ZOOM2     "VidFrm ズーム 2"
+    IDS_AG_VIDFRM_SWITCHZOOM "VidFrm ズーム設定の切り替え"
     IDS_ENABLE_ALL_FILTERS  "すべてのフィルターを有効にする(&E)"
 END
 
@@ -3514,8 +3514,8 @@ BEGIN
     IDS_DISABLE_DXVA_FILTERS "DXVA フィルターを無効にする"
     IDS_STRETCH_TO_WINDOW   "ウィンドウの大きさに広げる"
     IDS_TOUCH_WINDOW_FROM_INSIDE "ウィンドウに内接させる"
-    IDS_ZOOM1               "拡大 1"
-    IDS_ZOOM2               "拡大 2"
+    IDS_ZOOM1               "ズーム 1"
+    IDS_ZOOM2               "ズーム 2"
     IDS_TOUCH_WINDOW_FROM_OUTSIDE "ウィンドウに外接させる"
     IDS_AUDIO_STREAM        "音声 %u/%u: %s"
     IDS_AG_REOPEN           "ファイルを開き直す"
@@ -3678,7 +3678,7 @@ BEGIN
     IDS_NEW_UPDATE_AVAILABLE  "新しい %s を入手できます。\n\nダウンロードしに MPC-BE のウェブサイトを訪れますか?"
     IDS_UPDATE_ERROR_CONNECT  "更新サーバーが見つかりません。\n\nインターネット接続を確認して再試行してください。"
     IDS_UPDATE_CLOSE        "閉じる(&C)"
-    IDS_OSD_ZOOM            "拡大: %.0lf%%"
+    IDS_OSD_ZOOM            "ズーム: %.0lf%%"
 END
 
 STRINGTABLE
