@@ -2,7 +2,12 @@
 
 1.8.3.x dev
 =============================
+YouTube
+Minor fixes.
+
 Updated Korean translation (by Hackjjang).
+Updated Romanian translation (by Andrei Miloiu).
+Updated Japanese translation (by tsubasanouta).
 
 Updated libraries:
 	ffmpeg n7.2-dev-1286-g43be8d0728.
