@@ -1053,7 +1053,7 @@ STRING IDC_DX9RESIZER_COMBO		"Dacă nu este suport pentru Pixel nuanțator 2.0, 
 STRING IDC_EXCLUSIVE_FULLSCREEN_CHECK		"Reduce ruperea, dar împiedică afișarea barei de instrumente. Pentru a ieși din ecranul complet, în acest mod apasă Ctrl+C."
 STRING IDC_REGULARSURF		"Suprafața video va fi alocată ca o suprafață normală offscreen."
 STRING IDC_VSYNC		"Activează VSync (sincronizarea verticală) folosind Direct3D9"
-STRING IDC_VSYNC_INTERNAL		"Activează mecanismul intern al VSync (al sincronizării verticale)"
+STRING IDC_VSYNC_INTERNAL		"Activează mecanismul intern al VSync (a sincronizării verticale)"
 STRING IDD_FILEMEDIAINFO		"MediaInfo"
 STRING IDD_FILEPROPCLIP		"Clip"
 STRING IDD_FILEPROPDETAILS		"Detalii"
