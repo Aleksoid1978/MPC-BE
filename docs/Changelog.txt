@@ -5,6 +5,9 @@
 YouTube
 Minor fixes.
 
+Player
+Fixed opening of some online links.
+
 Updated Korean translation (by Hackjjang).
 Updated Romanian translation (by Andrei Miloiu).
 Updated Japanese translation (by tsubasanouta).
