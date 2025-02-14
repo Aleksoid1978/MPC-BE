@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2146,11 +2146,14 @@ void CPlayerPlaylistBar::Append(std::list<CString>& fns, const bool bMulti, CSub
 	}
 
 	for (auto& fn : fns) {
+		ConvertFileUriToPath(fn);
+		/*
 		if (!ConvertFileUriToPath(fn)) {
 			if (::PathIsURLW(fn)) {
 				Unescape(fn);
 			}
 		}
+		*/
 	}
 
 	if (bMulti) {
