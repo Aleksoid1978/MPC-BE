@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2023 see Authors.txt
+ * (C) 2009-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -100,7 +100,7 @@ public:
 	bool m_bReleased             = false;
 	HANDLE m_hReleaseTimerHandle = nullptr;
 
-	BOOL StartReleaseTimer();
+	void StartReleaseTimer();
 	void EndReleaseTimer();
 	void ReleaseDevice();
 
@@ -223,7 +223,7 @@ private:
 	bool IsFormatChanged(const WAVEFORMATEX *pWaveFormatEx, const WAVEFORMATEX *pNewWaveFormatEx);
 	bool CopyWaveFormat(const WAVEFORMATEX *pSrcWaveFormatEx, WAVEFORMATEX **ppDestWaveFormatEx);
 
-	BOOL    IsBitstream(const WAVEFORMATEX *pWaveFormatEx);
+	bool    IsBitstream(const WAVEFORMATEX *pWaveFormatEx) const;
 	HRESULT SelectFormat(const WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex);
 	void    CreateFormat(WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSample, WORD nChannels, DWORD dwChannelMask, DWORD nSamplesPerSec, WORD wValidBitsPerSample = 0);
 
@@ -325,6 +325,14 @@ private:
 	AudioFormats m_input_params, m_output_params;
 
 	void WasapiQueueAdd(std::unique_ptr<CPacket>& p);
+
+	bool IsExclusiveMode() const {
+		return m_DeviceModeCurrent == MODE_WASAPI_EXCLUSIVE || m_bIsBitstream;
+	}
+
+	bool IsExclusive(const WAVEFORMATEX* pWaveFormatEx) const {
+		return m_DeviceModeCurrent == MODE_WASAPI_EXCLUSIVE || IsBitstream(pWaveFormatEx);
+	}
 };
 
 class CMpcAudioRendererInputPin final
