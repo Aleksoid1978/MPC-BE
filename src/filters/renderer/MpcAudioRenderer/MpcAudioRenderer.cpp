@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2024 see Authors.txt
+ * (C) 2009-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1981,6 +1981,8 @@ again:
 	};
 
 	auto ReleaseAudio = [this](const bool bFull = false) {
+		m_csRender.Unlock();
+
 		m_pSyncClock->UnSlave();
 
 		PauseRendererThread();
@@ -1994,6 +1996,8 @@ again:
 			SAFE_RELEASE(m_pMMDevice);
 		}
 	};
+
+	CAutoLock cRenderLock(&m_csRender);
 
 	BOOL bInitNeed = TRUE;
 	// Compare the existing WAVEFORMATEX with the one provided
