@@ -2940,6 +2940,8 @@ void CMpcAudioRenderer::WasapiFlush()
 
 HRESULT CMpcAudioRenderer::EndFlush()
 {
+	CAutoLock cRenderLock(&m_csRender);
+
 	WasapiFlush();
 	m_AudioFilter.Flush();
 
