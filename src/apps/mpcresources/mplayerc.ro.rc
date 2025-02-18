@@ -221,9 +221,9 @@ BEGIN
     LTEXT           "MPC-BE",IDC_STATIC1,30,5,195,8,SS_NOPREFIX
     CONTROL         "Drepturi de autor © 2002-2025 - vezi fișierul Authors.txt",IDC_AUTHORS_LINK,
                     "SysLink",WS_TABSTOP,30,17,195,8
-    LTEXT           "Versiune :",IDC_VERSION,30,34,90,8
-    LTEXT           "Compilator MPC-BE :",IDC_STATIC,30,66,90,8
-    LTEXT           "Compilator FFmpeg :",IDC_STATIC,30,83,90,8
+    LTEXT           "Versiunea :",IDC_VERSION,30,34,90,8
+    LTEXT           "Compilatorul pentru MPC-BE :",IDC_STATIC,30,66,90,8
+    LTEXT           "Compilatorul FFmpeg :",IDC_STATIC,30,83,90,8
     LTEXT           "Libavcodec / Libavutil :",IDC_STATIC,30,99,90,8
     EDITTEXT        IDC_VERSION_NUMBER,120,32,110,13,ES_AUTOHSCROLL | ES_READONLY
     EDITTEXT        IDC_EDIT2,120,48,110,13,ES_AUTOHSCROLL | ES_READONLY
@@ -270,7 +270,7 @@ BEGIN
     LTEXT           "Caută textul barei",IDC_STATIC,10,107,100,8
     COMBOBOX        IDC_COMBO2,10,118,109,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Locația setărilor",IDC_STATIC,5,135,115,55
-    CONTROL         "Registru Windows",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | BS_TOP | WS_GROUP,10,148,106,10
+    CONTROL         "Registrul Windows",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | BS_TOP | WS_GROUP,10,148,106,10
     CONTROL         "Profilul utilizatorului",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,161,106,10
     CONTROL         "Dosarul playerului",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,175,106,10
     GROUPBOX        "Istoric",IDC_STATIC,124,5,167,128,WS_GROUP
@@ -346,7 +346,7 @@ BEGIN
     LTEXT           "%",IDC_STATIC3,183,95,8,8
     CONTROL         "Nu reseta viteza pentru sesiune",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,109,175,9
     GROUPBOX        "",IDC_STATIC,137,9,154,56
-    CONTROL         "Preferința pentru pistă implicită",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,8,100,9
+    CONTROL         "Preferințele pentru pista implicită",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,8,100,9
     LTEXT           "Subtitrări:",IDC_STATIC,142,23,44,8
     EDITTEXT        IDC_EDIT2,190,21,94,13,ES_AUTOHSCROLL
     LTEXT           "Audio:",IDC_STATIC,142,39,44,8
@@ -514,18 +514,18 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LISTBOX         IDC_LIST1,5,5,208,128,LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | LBS_WANTKEYBOARDINPUT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Adaugă filtru...",IDC_BUTTON1,221,5,70,14
+    PUSHBUTTON      "Adaugă un filtru...",IDC_BUTTON1,221,5,70,14
     PUSHBUTTON      "Elimină",IDC_BUTTON2,221,21,70,14
     CONTROL         "Preferă",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,221,39,70,8
     CONTROL         "Blochează",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,221,51,70,8
-    CONTROL         "Definește merit:",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,221,63,70,8
+    CONTROL         "Definește meritul:",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,221,63,70,8
     EDITTEXT        IDC_EDIT1,221,75,70,13,ES_RIGHT | ES_AUTOHSCROLL | WS_GROUP
     PUSHBUTTON      "Sus",IDC_BUTTON3,221,92,33,14
     PUSHBUTTON      "Jos",IDC_BUTTON4,258,92,33,14
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,137,283,1
     CONTROL         "",IDC_TREE2,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | WS_BORDER | WS_HSCROLL | WS_TABSTOP,5,141,208,95
     PUSHBUTTON      "Adaugă tip media...",IDC_BUTTON5,221,141,70,14
-    PUSHBUTTON      "Adaugă subtip...",IDC_BUTTON6,221,157,70,14
+    PUSHBUTTON      "Adaugă subtipul...",IDC_BUTTON6,221,157,70,14
     PUSHBUTTON      "Șterge",IDC_BUTTON7,221,179,70,14
     PUSHBUTTON      "Resetează lista",IDC_BUTTON8,221,222,70,14
 END
@@ -745,7 +745,7 @@ BEGIN
     CONTROL         "Dreptunghi opac",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,145,95,8
     LTEXT           "Lățime de chenar",IDC_STATIC,10,159,56,8
     EDITTEXT        IDC_EDIT1,70,157,35,13,ES_RIGHT | ES_AUTOHSCROLL
-    LTEXT           "Profunz. umbră",IDC_STATIC,10,174,56,8
+    LTEXT           "Profunz. umbrei",IDC_STATIC,10,174,56,8
     EDITTEXT        IDC_EDIT2,70,172,35,13,ES_RIGHT | ES_AUTOHSCROLL
     GROUPBOX        "Aliniază ecranul și marginile",IDC_STATIC,114,5,177,60
     CONTROL         "",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | WS_GROUP,119,41,10,8
@@ -819,7 +819,7 @@ BEGIN
     LISTBOX         IDC_LIST3,5,41,210,200,LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Configurația\ndespicătorului (splitter-ului) AVI",IDC_BUTTON5,220,41,70,30,BS_MULTILINE
     PUSHBUTTON      "Configurația\ndespicătorului (splitter-ului) MPEG",IDC_BUTTON1,220,76,70,30,BS_MULTILINE
-    PUSHBUTTON      "Conf.\ndespicătorului (splitter-ului) Matroska",IDC_BUTTON6,220,111,70,30,BS_MULTILINE
+    PUSHBUTTON      "Configurația\ndespicătorului (splitter-ului) Matroska",IDC_BUTTON6,220,111,70,30,BS_MULTILINE
     PUSHBUTTON      "Configurația\ncititorului CDDA",IDC_BUTTON8,220,146,70,30,BS_MULTILINE
     PUSHBUTTON      "Configurația\ncititorului VTS(IFO)",IDC_BUTTON7,220,181,70,30,BS_MULTILINE
     PUSHBUTTON      "Configurația\ndecodorului video",IDC_BUTTON2,220,41,70,30,BS_MULTILINE
@@ -828,7 +828,7 @@ BEGIN
     LTEXT           "Lungimea tamponului:",IDC_STATIC1,221,216,69,8
     EDITTEXT        IDC_EDIT1,221,228,29,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,239,228,11,13
-    LTEXT           "sec.",IDC_STATIC2,254,230,26,8
+    LTEXT           "secunde",IDC_STATIC2,254,230,26,8
 END
 
 IDD_PPAGEFILTERSPRIORITY DIALOGEX 0, 0, 296, 264
@@ -975,7 +975,7 @@ BEGIN
     CONTROL         "Afișează informații de depanare",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,61,285,9
     LTEXT           "Lansează în browserul web...",IDC_STATIC1,150,26,120,8
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,73,284,1
-    CONTROL         "Servește pagini din:",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,77,285,9
+    CONTROL         "Servește paginile din:",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,77,285,9
     EDITTEXT        IDC_EDIT2,15,89,167,14,ES_AUTOHSCROLL
     PUSHBUTTON      "Răsfoire...",IDC_BUTTON1,186,89,50,14
     PUSHBUTTON      "Lansează...",IDC_BUTTON2,240,89,50,14
@@ -1015,9 +1015,9 @@ BEGIN
     COMBOBOX        IDC_COMBO1,41,4,114,120,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "&Adaugă",IDC_BUTTON2,162,3,50,14
     CONTROL         "",IDC_STATIC1,"Static",SS_ETCHEDHORZ,4,21,208,1
-    CONTROL         "Activează nuanțatoarele de pixel de pre-redimensionare",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,26,150,10
+    CONTROL         "Activează nuanțatoarele de pixeli de pre-redimensionare",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,26,150,10
     LISTBOX         IDC_LIST1,5,39,150,65,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Activează nuanțatoarele de pixel de post-redimensionare",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,109,150,10
+    CONTROL         "Activează nuanțatoarele de pixeli de post-redimensionare",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,109,150,10
     LISTBOX         IDC_LIST2,5,122,150,65,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "&Elimină",IDC_BUTTON3,162,25,50,14
     PUSHBUTTON      "Mută în &sus",IDC_BUTTON1,162,90,50,14
@@ -1288,7 +1288,7 @@ END
 
 IDD_CMD_LINE_HELP DIALOGEX 0, 0, 309, 177
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Comutatoare în linie de comandă"
+CAPTION "Comutatoare din linia de comandă"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     ICON            "",IDC_STATIC1,7,7,20,20
@@ -1648,7 +1648,7 @@ BEGIN
         MENUITEM "Resincronizează subtitrările",             ID_VIEW_SUBRESYNC
         MENUITEM "Listă de redare (Playlist)",              ID_VIEW_PLAYLIST
         MENUITEM "Captură",               ID_VIEW_CAPTURE
-        MENUITEM "Editor de nuanțatoare",         ID_VIEW_SHADEREDITOR
+        MENUITEM "Editorul de nuanțatoare (de shadere)",         ID_VIEW_SHADEREDITOR
         MENUITEM "Navigare",                  ID_VIEW_NAVIGATION
         POPUP "Setări &prestabilite..."
         BEGIN
@@ -1684,14 +1684,14 @@ BEGIN
         MENUITEM "Panoramare și s&canare",                      ID_SUBMENU_PANSCAN
         POPUP "Modul Stereo 3D"
         BEGIN
-            MENUITEM "Auto(mat)",                        ID_STEREO3D_AUTO
+            MENUITEM "Automat (Auto)",                        ID_STEREO3D_AUTO
             MENUITEM "Mono",                        ID_STEREO3D_MONO
             MENUITEM "Rând intercalat",             ID_STEREO3D_ROW_INTERLEAVED
-            MENUITEM "Rând intercalat (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
+            MENUITEM "Rând intercalat (2x/de două ori)",        ID_STEREO3D_ROW_INTERLEAVED_2X
             MENUITEM "Jumătate peste dedesubt",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "Peste dedesubt",                   ID_STEREO3D_OVERUNDER
             MENUITEM SEPARATOR
-            MENUITEM "Schimbă stânga/dreapta",             ID_STEREO3D_SWAP_LEFTRIGHT
+            MENUITEM "Schimbă la stânga/la dreapta",             ID_STEREO3D_SWAP_LEFTRIGHT
         END
         MENUITEM SEPARATOR
         POPUP "În prim plan"
@@ -1699,7 +1699,7 @@ BEGIN
             MENUITEM "Niciodată",                       ID_ONTOP_NEVER
             MENUITEM "Pentru totdeauna",                      ID_ONTOP_ALWAYS
             MENUITEM "În timpul redării",               ID_ONTOP_WHILEPLAYING
-            MENUITEM "În timpul redării video",         ID_ONTOP_WHILEPLAYINGVIDEO
+            MENUITEM "În timpul redării videoclipului",         ID_ONTOP_WHILEPLAYINGVIDEO
         END
         MENUITEM "&Opțiuni...",                 ID_VIEW_OPTIONS
     END
@@ -1714,8 +1714,8 @@ BEGIN
             MENUITEM "&Pentru totdeauna", ID_REPEAT_FOREVER
             MENUITEM SEPARATOR
             MENUITEM "A-B (&Resetează)", ID_PLAY_REPEAT_AB
-            MENUITEM "A-B (Marchează &A)", ID_PLAY_REPEAT_AB_MARK_A
-            MENUITEM "A-B (Marchează &B)", ID_PLAY_REPEAT_AB_MARK_B
+            MENUITEM "A-B (Marchează &A-ul)", ID_PLAY_REPEAT_AB_MARK_A
+            MENUITEM "A-B (Marchează &B-ul)", ID_PLAY_REPEAT_AB_MARK_B
         END
         MENUITEM SEPARATOR
         MENUITEM "&Mărește rata",       ID_PLAY_INCRATE
@@ -1743,7 +1743,7 @@ BEGIN
     BEGIN
         MENUITEM "&Pagina de pornire",                  ID_HELP_HOMEPAGE
         MENUITEM "&Verifică pentru actualizări",          ID_HELP_CHECKFORUPDATE
-        MENUITEM "&Comutatoare în linie de comandă",      ID_HELP_SHOWCOMMANDLINESWITCHES
+        MENUITEM "&Comutatoare din linia de comandă",      ID_HELP_SHOWCOMMANDLINESWITCHES
         MENUITEM "&Donează",                     ID_HELP_DONATE
         MENUITEM "&Despre...",                   ID_HELP_ABOUT
     END
@@ -1785,8 +1785,8 @@ BEGIN
             MENUITEM "&Pentru totdeauna", ID_REPEAT_FOREVER
             MENUITEM SEPARATOR
             MENUITEM "A-B (&Resetează)", ID_PLAY_REPEAT_AB
-            MENUITEM "A-B (Marchează &A)", ID_PLAY_REPEAT_AB_MARK_A
-            MENUITEM "A-B (Marchează &B)", ID_PLAY_REPEAT_AB_MARK_B
+            MENUITEM "A-B (Marchează &A-ul)", ID_PLAY_REPEAT_AB_MARK_A
+            MENUITEM "A-B (Marchează &B-ul)", ID_PLAY_REPEAT_AB_MARK_B
         END
         MENUITEM SEPARATOR
         MENUITEM "Ecran comp&let (Pe tot ecranul)",                ID_VIEW_FULLSCREEN
@@ -1815,7 +1815,7 @@ BEGIN
         BEGIN
             MENUITEM "&Sus",                 ID_VOLUME_UP
             MENUITEM "&Jos",             ID_VOLUME_DOWN
-            MENUITEM "&Mut",                 ID_VOLUME_MUTE
+            MENUITEM "&Mut (Silențios)",                 ID_VOLUME_MUTE
         END
         MENUITEM "După redare",                  ID_SUBMENU_AFTERPLAYBACK
         MENUITEM SEPARATOR
@@ -1838,7 +1838,7 @@ BEGIN
             MENUITEM "Resincronizează subtitrările",                   ID_VIEW_SUBRESYNC
             MENUITEM "Listă de redare",                    ID_VIEW_PLAYLIST
             MENUITEM "Captură",                     ID_VIEW_CAPTURE
-            MENUITEM "Editor de nuanțatoare",               ID_VIEW_SHADEREDITOR
+            MENUITEM "Editorul de nuanțatoare (de shadere)",               ID_VIEW_SHADEREDITOR
             MENUITEM "Navigare",                  ID_VIEW_NAVIGATION
             MENUITEM "&Limbă (Language)",                   ID_SUBMENU_LANGUAGE
             POPUP "Setări &prestabilite..."
@@ -1888,7 +1888,7 @@ BEGIN
         BEGIN
             MENUITEM "&Deschide rapid un fișier...",   ID_FILE_OPENFILE
             MENUITEM SEPARATOR
-            MENUITEM "D&eschide fișier...",     ID_FILE_OPENFILEURL
+            MENUITEM "D&eschide fișierul...",     ID_FILE_OPENFILEURL
             MENUITEM "Deschide D&VD-ul...",   ID_FILE_OPENDVD
             MENUITEM "Deschide dis&pozitivul...",       ID_FILE_OPENDEVICE
             MENUITEM "Deschide directorul...",           ID_FILE_OPENDIRECTORY
@@ -1917,7 +1917,7 @@ BEGIN
             MENUITEM "Resincronizează subtitrările",             ID_VIEW_SUBRESYNC
             MENUITEM "Listă de redare (Playlist)",              ID_VIEW_PLAYLIST
             MENUITEM "Captură",               ID_VIEW_CAPTURE
-            MENUITEM "Editor de nuanțatoare",         ID_VIEW_SHADEREDITOR
+            MENUITEM "Editorul de nuanțatoare (de shadere)",         ID_VIEW_SHADEREDITOR
             MENUITEM "Navigare",                  ID_VIEW_NAVIGATION
             MENUITEM "&Limbă (Language)",                   ID_SUBMENU_LANGUAGE
             POPUP "Setări &prestabilite..."
@@ -1982,8 +1982,8 @@ BEGIN
                 MENUITEM "Pentru &totdeauna", ID_REPEAT_FOREVER
                 MENUITEM SEPARATOR
                 MENUITEM "A-B (&Resetează)", ID_PLAY_REPEAT_AB
-                MENUITEM "A-B (Marchează &A)", ID_PLAY_REPEAT_AB_MARK_A
-                MENUITEM "A-B (Marchează &B)", ID_PLAY_REPEAT_AB_MARK_B
+                MENUITEM "A-B (Marchează &A-ul)", ID_PLAY_REPEAT_AB_MARK_A
+                MENUITEM "A-B (Marchează &B-ul)", ID_PLAY_REPEAT_AB_MARK_B
             END
             MENUITEM SEPARATOR
             MENUITEM "&Mărește rata",       ID_PLAY_INCRATE
@@ -1996,7 +1996,7 @@ BEGIN
         BEGIN
             MENUITEM "&Pagina de pornire",                  ID_HELP_HOMEPAGE
             MENUITEM "Verifică pentru &actualizări",          ID_HELP_CHECKFORUPDATE
-            MENUITEM "&Comutatoare în linie de comandă",      ID_HELP_SHOWCOMMANDLINESWITCHES
+            MENUITEM "&Comutatoare din linia de comandă",      ID_HELP_SHOWCOMMANDLINESWITCHES
             MENUITEM SEPARATOR
             MENUITEM "&Despre...",                   ID_HELP_ABOUT
         END
@@ -2012,7 +2012,7 @@ BEGIN
         BEGIN
             MENUITEM "&Sus",                 ID_VOLUME_UP
             MENUITEM "&Jos",             ID_VOLUME_DOWN
-            MENUITEM "&Mut",                 ID_VOLUME_MUTE
+            MENUITEM "&Mut (Silențios)",                 ID_VOLUME_MUTE
         END
         MENUITEM "După redare",                  ID_SUBMENU_AFTERPLAYBACK
         MENUITEM SEPARATOR
@@ -2141,11 +2141,11 @@ IDR_POPUP_SHADERS MENU
 BEGIN
     POPUP ""
     BEGIN
-        MENUITEM "Activează nuanțatoarele de pixel de pre-redimensionare", ID_SHADERS_1_ENABLE
-        MENUITEM "Activează nuanțatoarele de pixel de post-redimensionare", ID_SHADERS_2_ENABLE
-        MENUITEM "&Selectează nuanțatoarele...",          ID_SHADERS_SELECT
+        MENUITEM "Activează nuanțatoarele de pixeli de pre-redimensionare", ID_SHADERS_1_ENABLE
+        MENUITEM "Activează nuanțatoarele de pixeli de post-redimensionare", ID_SHADERS_2_ENABLE
+        MENUITEM "&Selectează nuanțatoarele (shaderele)...",          ID_SHADERS_SELECT
         MENUITEM SEPARATOR
-        MENUITEM "&Editează nuanțatoarele...",            ID_VIEW_SHADEREDITOR
+        MENUITEM "&Editează nuanțatoarele (shaderele)...",            ID_VIEW_SHADEREDITOR
     END
 END
 
@@ -2409,7 +2409,7 @@ BEGIN
     IDS_DVD_FAV_ADDED       "DVD-ul a fost adăugat la favorite"
     IDS_CAPTURE_SETTINGS    "Setări pentru de captură"
     IDS_NAVIGATION_BAR      "Bară de navigare"
-    IDS_SHADER_EDITOR       "Editor de nuanțatoare"
+    IDS_SHADER_EDITOR       "Editorul de nuanțatoare (de shadere)"
     IDS_SUBRESYNC_CAPTION   "Resincronizează subtitrările"
     IDS_SUBRESYNC_CLN_TIME  "Timp"
     IDS_SUBRESYNC_CLN_END   "Sfârşit"
@@ -2587,14 +2587,14 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_SHADERS_SELECT   "Selectează nuanțatoarele"
+    IDS_AG_SHADERS_SELECT   "Selectează nuanțatoarele (shaderele)"
     IDS_AG_SHADERS_1_ENABLE "Activează nuanțatoarele de pixeli (Pixels Shaders)"
     IDS_AG_SHADERS_2_ENABLE "Activează nuanțatoarele de pixeli pentru spațiul de pe ecran"
-    IDS_OSD_SHADERS_1_ON    "Nuanțatoarele pixelilor de pre-redimensionare: pornite"
-    IDS_OSD_SHADERS_1_OFF   "Nuanțatoarele pixelilor de pre-redimensionare: oprite"
-    IDS_OSD_SHADERS_2_ON    "Nuanțatoarele pixelilor de post-redimensionare: pornite"
-    IDS_OSD_SHADERS_2_OFF   "Nuanțatoarele pixelilor de post-redimensionare: oprite"
-    IDS_AG_VSYNCINTERNAL    "VSync Intern"
+    IDS_OSD_SHADERS_1_ON    "Nuanțatoarele de pixeli de pre-redimensionare: pornite"
+    IDS_OSD_SHADERS_1_OFF   "Nuanțatoarele de pixeli de pre-redimensionare: oprite"
+    IDS_OSD_SHADERS_2_ON    "Nuanțatoarele de pixeli de post-redimensionare: pornite"
+    IDS_OSD_SHADERS_2_OFF   "Nuanțatoarele de pixeli de post-redimensionare: oprite"
+    IDS_AG_VSYNCINTERNAL    "VSync intern"
 END
 
 STRINGTABLE
@@ -2786,7 +2786,7 @@ BEGIN
     IDS_AG_EXIT             "Ieșire"
     IDS_AG_PLAYPAUSE        "Redă/Pauzează"
     IDS_AG_PLAY             "Redă"
-    IDS_AG_STOP             "Oprire"
+    IDS_AG_STOP             "Oprește"
     IDS_AG_FRAMESTEP        "Deplasează cu un cadru"
     IDS_AG_FRAMESTEP_BACK   "Deplasează-te cu un cadru înapoi"
     IDS_AG_GO_TO            "Mergi la"
@@ -2847,7 +2847,7 @@ BEGIN
     IDS_AG_JUMP_FORWARD_K   "Sari înainte (cadru cheie)"
     IDS_AG_JUMP_BACKWARD_K  "Sari înapoi (cadru cheie)"
     IDS_AG_NEXT             "Următorul"
-    IDS_AG_PREVIOUS         "Precedent"
+    IDS_AG_PREVIOUS         "Precedentul"
     IDS_AG_NEXT_FILE        "Următorul fișier"
     IDS_AG_PREVIOUS_FILE    "Fișierul precedent"
 END
@@ -3211,7 +3211,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_CMD_USAGE           "Utilizare: mpc-be.exe „cale” [comutatoare]\n\n„cale”\tFișierul sau directorul principal ce trebuie încărcat (metacaractere\n\t\tpermise)"
-    IDS_CMD_HELP            "/help /h /?\tArată ajutor pentru comutatoarele din linia de comandă"
+    IDS_CMD_HELP            "/help /h /?\tArată ajutorul pentru comutatoarele din linia de comandă"
     IDS_CMD_DUB             "/dub „numele dublajului”\tÎncarcă un fișier audio adițional"
     IDS_CMD_DUBDELAY        "/dubdelay „fișier”\tÎncarcă un fișier audio adițional decalat cu XXms (dacă\n\t\tfișierul conține „...DELAY XXms...”)"
 END
@@ -3822,7 +3822,7 @@ BEGIN
     IDS_SUBTITLES_STEREO    "Subtitrări stereoscopice"
     IDS_SUBTITLES_STEREO_DONTUSE "Nu folosi"
     IDS_SUBTITLES_STEREO_SIDEBYSIDE "Unul lângă altul"
-    IDS_SUBTITLES_STEREO_TOPANDBOTTOM "Sus și jos"
+    IDS_SUBTITLES_STEREO_TOPANDBOTTOM "În sus și în jos"
     IDS_SUB_POS_UP          "Deplasează poziția subtitrării în sus"
     IDS_SUB_POS_DOWN        "Deplasează poziția subtitrărilor în jos"
     IDS_SUB_POS_LEFT        "Deplasează poziția subtitrărilor la stânga"
