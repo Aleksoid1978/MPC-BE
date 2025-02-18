@@ -2,6 +2,10 @@
 
 1.8.3.x dev
 =============================
+MpcAudioRenderer
+Rare crashes have been fixed.
+The "Release device when idle" setting now works with Shared mode and is enabled by default. This will allow the computer to go to sleep on a timer when playback is paused.
+
 YouTube
 Minor fixes.
 
