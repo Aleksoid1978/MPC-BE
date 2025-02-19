@@ -2961,7 +2961,9 @@ void CMpcAudioRenderer::NewSegment()
 	m_rtEstimateSlavingJitter = 0;
 	m_rtCurrentRenderedTime = 0;
 
-	StartReleaseTimer();
+	if (m_filterState != State_Running) {
+		StartReleaseTimer();
+	}
 
 	m_bFlushing = FALSE;
 }
