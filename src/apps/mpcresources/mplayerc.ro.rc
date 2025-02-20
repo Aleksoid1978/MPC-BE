@@ -61,7 +61,7 @@ END
 
 IDD_SELECTMEDIATYPE DIALOGEX 0, 0, 225, 47
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Selectează tipul de fișier media"
+CAPTION "Selectează tipul de fișiere media"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     COMBOBOX        IDC_COMBO1,5,5,215,37,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
@@ -222,7 +222,7 @@ BEGIN
     CONTROL         "Drepturi de autor © 2002-2025 - vezi fișierul Authors.txt",IDC_AUTHORS_LINK,
                     "SysLink",WS_TABSTOP,30,17,195,8
     LTEXT           "Versiunea :",IDC_VERSION,30,34,90,8
-    LTEXT           "Compilator pentru MPC-BE:",IDC_STATIC,30,66,90,8
+    LTEXT           "Compilator pentru MPC-BE :",IDC_STATIC,30,66,90,8
     LTEXT           "Compilatorul FFmpeg :",IDC_STATIC,30,83,90,8
     LTEXT           "Libavcodec / Libavutil :",IDC_STATIC,30,99,90,8
     EDITTEXT        IDC_VERSION_NUMBER,120,32,110,13,ES_AUTOHSCROLL | ES_READONLY
@@ -1067,7 +1067,7 @@ BEGIN
     PUSHBUTTON      "Resetează",IDC_RESET,241,88,50,14
     GROUPBOX        "",IDC_STATIC5,5,88,177,74
     CONTROL         "Gestionează culorile",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,88,100,10
-    LTEXT           "(pentru EVR-CP, suprafață de 10 biți sau 16 biți)",IDC_STATIC6,10,101,167,8
+    LTEXT           "(pentru EVR-CP, suprafață de 10 biți sau de 16 biți)",IDC_STATIC6,10,101,167,8
     LTEXT           "Tipul de intrare:",IDC_STATIC7,10,116,70,8
     COMBOBOX        IDC_COMBO3,84,113,93,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Lumină ambientală:",IDC_STATIC8,10,133,70,8
