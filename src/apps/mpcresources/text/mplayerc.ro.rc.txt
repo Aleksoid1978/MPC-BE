@@ -3,7 +3,7 @@
 7		"MPC-BE"
 8		"Drepturi de autor © 2002-2025 - vezi fișierul Authors.txt"
 10		"Versiunea :"
-11		"Compilator pentru MPC-BE:"
+11		"Compilator pentru MPC-BE :"
 12		"Compilatorul FFmpeg :"
 13		"Libavcodec / Libavutil :"
 23		"Acest program este gratuit și lansat sub licența GNU General Public License."
@@ -210,7 +210,7 @@ BEGIN DIALOGEX IDD_PPAGECOLOR LINES 28
 9		"Saturație"
 18		"Resetează"
 20		"Gestionează culorile"
-21		"(pentru EVR-CP, suprafață de 10 biți sau 16 biți)"
+21		"(pentru EVR-CP, suprafață de 10 biți sau de 16 biți)"
 22		"Tipul de intrare:"
 24		"Lumină ambientală:"
 26		"Intenția de redare:"
@@ -632,7 +632,7 @@ BEGIN DIALOGEX IDD_SAVETHUMBSDIALOGTEMPL LINES 20
 END
 
 BEGIN DIALOGEX IDD_SELECTMEDIATYPE LINES 9
-3		"Selectează tipul de fișier media"
+3		"Selectează tipul de fișiere media"
 7		"OK"
 8		"Revocare"
 END
