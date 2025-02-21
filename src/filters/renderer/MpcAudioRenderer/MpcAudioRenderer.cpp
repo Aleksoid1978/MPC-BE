@@ -2775,15 +2775,18 @@ HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = 
 	SAFE_DELETE_ARRAY(pWaveFormatEx);
 
 	if (bFullInitialization) {
-		BeginEnumFilters(m_pGraph, pEF, pBF) {
-			CLSID clsid;
-			if (SUCCEEDED(pBF->GetClassID(&clsid)) && __uuidof(CMpaDecFilter) == clsid) {
-				if (CComQIPtr<IExFilterConfig> pEFC = pBF.p) {
-					pEFC->Flt_SetBool("check_bitstream", true);
+		bool bInfTeePresent = FindFilter(CLSID_InfTee, m_pGraph);
+		if (!bInfTeePresent) {
+			BeginEnumFilters(m_pGraph, pEF, pBF) {
+				CLSID clsid;
+				if (SUCCEEDED(pBF->GetClassID(&clsid)) && __uuidof(CMpaDecFilter) == clsid) {
+					if (CComQIPtr<IExFilterConfig> pEFC = pBF.p) {
+						pEFC->Flt_SetBool("check_bitstream", true);
+					}
 				}
 			}
+			EndEnumFilters
 		}
-		EndEnumFilters
 	}
 
 	m_bNeedReinitialize = m_bNeedReinitializeFull = FALSE;
