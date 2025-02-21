@@ -24,6 +24,7 @@
 #include "ComPropertySheet.h"
 #include "PPageAudio.h"
 #include "MainFrm.h"
+#include "clsids.h"
 
 // CPPageAudio dialog
 
@@ -70,6 +71,13 @@ END_MESSAGE_MAP()
 
 // CPPageAudio message handlers
 
+struct audioDeviceInfo_t {
+	CStringW friendlyName;
+	CLSID clsid = GUID_NULL;
+	GUID dsGuid = GUID_NULL;
+	CStringW displayName;
+};
+
 BOOL CPPageAudio::OnInitDialog()
 {
 	__super::OnInitDialog();
@@ -82,69 +90,72 @@ BOOL CPPageAudio::OnInitDialog()
 	m_iAudioRendererTypeCtrl.SetRedraw(FALSE);
 	m_iSecAudioRendererTypeCtrl.SetRedraw(FALSE);
 
-	// MPC Audio Renderer
-	m_AudioRendererDisplayNames.Add(AUDRNDT_MPC);
-	str.Format(L"0. %s", AUDRNDT_MPC);
-	m_iAudioRendererTypeCtrl.AddString(str);
-	m_iSecAudioRendererTypeCtrl.AddString(str);
+	std::vector<audioDeviceInfo_t> audioDevices;
 
-	// Default DirectSound Device
-	m_AudioRendererDisplayNames.Add(L"");
-	str.Format(L"1. DirectSound: %s", ResStr(IDS_PPAGE_OUTPUT_SYS_DEF));
-	m_iAudioRendererTypeCtrl.AddString(str);
-	m_iSecAudioRendererTypeCtrl.AddString(str);
-
-	int i = 2;
+	audioDevices.emplace_back(audioDeviceInfo_t{ AUDRNDT_MPC, CLSID_MpcAudioRenderer, GUID_NULL, AUDRNDT_MPC });
+	str.Format(L"DirectSound: %s", ResStr(IDS_PPAGE_OUTPUT_SYS_DEF));
+	audioDevices.emplace_back(audioDeviceInfo_t{ str, CLSID_DSoundRender, GUID_NULL, ""});
 
 	// other DirectSound devices
 	BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
-		LPOLESTR olestr = nullptr;
-		if (FAILED(pMoniker->GetDisplayName(0, 0, &olestr))) {
-			continue;
-		}
-
 		CComPtr<IPropertyBag> pPB;
 		if (SUCCEEDED(pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB))) {
 			CComVariant var;
-			if (pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr) == S_OK) {
-				CStringW fname = var.bstrVal;
-
-				// skip WaveOut
-				var.Clear();
-				if (pPB->Read(CComBSTR(L"WaveOutId"), &var, nullptr) == S_OK) {
-					CoTaskMemFree(olestr);
-					continue;
-				}
-
-				// skip Default DirectSound Device
-				var.Clear();
-				if (pPB->Read(CComBSTR(L"DSGuid"), &var, nullptr) == S_OK
-						&& CString(var.bstrVal) == "{00000000-0000-0000-0000-000000000000}") {
-					CoTaskMemFree(olestr);
-					continue;
-				}
-
-				m_AudioRendererDisplayNames.Add(CString(olestr));
-				str.Format(L"%d. %s", i++, fname);
-				m_iAudioRendererTypeCtrl.AddString(str);
-				m_iSecAudioRendererTypeCtrl.AddString(str);
+			// skip WaveOut
+			if (pPB->Read(CComBSTR(L"WaveOutId"), &var, nullptr) == S_OK) {
+				continue;
 			}
+
+			audioDeviceInfo_t audioDevice;
+
+			var.Clear();
+			if (pPB->Read(CComBSTR(L"CLSID"), &var, nullptr) == S_OK && var.vt == VT_BSTR) {
+				audioDevice.clsid = GUIDFromCString(var.bstrVal);
+			} else {
+				continue;
+			}
+
+			var.Clear();
+			if (pPB->Read(CComBSTR(L"DSGuid"), &var, nullptr) == S_OK && var.vt == VT_BSTR) {
+				if (CString(var.bstrVal) == "{00000000-0000-0000-0000-000000000000}") {
+					// skip Default DirectSound Device
+					continue;
+				}
+				audioDevice.dsGuid = GUIDFromCString(var.bstrVal);
+			}
+
+			var.Clear();
+			if (pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr) == S_OK && var.vt == VT_BSTR) {
+				audioDevice.friendlyName = var.bstrVal;
+				if (audioDevice.clsid == CLSID_MpcAudioRenderer) {
+					audioDevice.friendlyName.AppendFormat(L" (%s)", ResStr(IDS_EXTERNAL));
+				}
+			} else {
+				continue;
+			}
+
+			LPOLESTR olestr = nullptr;
+			if (FAILED(pMoniker->GetDisplayName(0, 0, &olestr))) {
+				continue;
+			}
+			audioDevice.displayName = olestr;
+			CoTaskMemFree(olestr);
+
+			audioDevices.emplace_back(audioDevice);
 		}
-		CoTaskMemFree(olestr);
 	}
 	EndEnumSysDev;
 
-	// Null Audio Renderer (Any)
-	m_AudioRendererDisplayNames.Add(AUDRNDT_NULL_COMP);
-	str.Format(L"%d. %s", i++, AUDRNDT_NULL_COMP);
-	m_iAudioRendererTypeCtrl.AddString(str);
-	m_iSecAudioRendererTypeCtrl.AddString(str);
+	audioDevices.emplace_back(audioDeviceInfo_t{ AUDRNDT_NULL_COMP, CLSID_NullAudioRenderer, GUID_NULL, AUDRNDT_NULL_COMP });
+	audioDevices.emplace_back(audioDeviceInfo_t{ AUDRNDT_NULL_UNCOMP, CLSID_NullUAudioRenderer, GUID_NULL, AUDRNDT_NULL_UNCOMP });
 
-	// Null Audio Renderer (Uncompressed)
-	m_AudioRendererDisplayNames.Add(AUDRNDT_NULL_UNCOMP);
-	str.Format(L"%d. %s", i++, AUDRNDT_NULL_UNCOMP);
-	m_iAudioRendererTypeCtrl.AddString(str);
-	m_iSecAudioRendererTypeCtrl.AddString(str);
+	for (unsigned i = 0; i < audioDevices.size(); i++) {
+		m_AudioRendererDisplayNames.Add(audioDevices[i].displayName);
+
+		str.Format(L"%u. %s", i, audioDevices[i].friendlyName);
+		m_iAudioRendererTypeCtrl.AddString(str);
+		m_iSecAudioRendererTypeCtrl.AddString(str);
+	}
 
 	m_iAudioRendererType = 0;
 	m_iSecAudioRendererType = 1;
