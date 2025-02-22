@@ -433,16 +433,11 @@ void SetAudioRenderer(int AudioDevNo)
 	auto pApp = AfxGetMyApp();
 	pApp->m_AudioRendererDisplayName_CL.Empty();
 
-	CStringArray m_AudioRendererDisplayNames;
-	m_AudioRendererDisplayNames.Add(AUDRNDT_MPC);
-	m_AudioRendererDisplayNames.Add(L""); // Default DirectSound Device
+	CStringArray audioRendererDisplayNames;
+	audioRendererDisplayNames.Add(AUDRNDT_MPC);
+	audioRendererDisplayNames.Add(L""); // Default DirectSound Device
 
 	BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
-		LPOLESTR olestr = nullptr;
-		if (FAILED(pMoniker->GetDisplayName(0, 0, &olestr))) {
-			continue;
-		}
-
 		CComPtr<IPropertyBag> pPB;
 		if (SUCCEEDED(pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB))) {
 			CComVariant var;
@@ -450,7 +445,6 @@ void SetAudioRenderer(int AudioDevNo)
 				// skip WaveOut
 				var.Clear();
 				if (pPB->Read(CComBSTR(L"WaveOutId"), &var, nullptr) == S_OK) {
-					CoTaskMemFree(olestr);
 					continue;
 				}
 
@@ -458,22 +452,25 @@ void SetAudioRenderer(int AudioDevNo)
 				var.Clear();
 				if (pPB->Read(CComBSTR(L"DSGuid"), &var, nullptr) == S_OK
 					&& CString(var.bstrVal) == "{00000000-0000-0000-0000-000000000000}") {
-					CoTaskMemFree(olestr);
 					continue;
 				}
 
-				m_AudioRendererDisplayNames.Add(olestr);
+				LPOLESTR olestr = nullptr;
+				if (FAILED(pMoniker->GetDisplayName(0, 0, &olestr))) {
+					continue;
+				}
+				audioRendererDisplayNames.Add(olestr);
+				CoTaskMemFree(olestr);
 			}
 		}
-		CoTaskMemFree(olestr);
 	}
 	EndEnumSysDev
 
-	m_AudioRendererDisplayNames.Add(AUDRNDT_NULL_COMP);
-	m_AudioRendererDisplayNames.Add(AUDRNDT_NULL_UNCOMP);
+	audioRendererDisplayNames.Add(AUDRNDT_NULL_COMP);
+	audioRendererDisplayNames.Add(AUDRNDT_NULL_UNCOMP);
 
-	if (AudioDevNo >= 0 && AudioDevNo < m_AudioRendererDisplayNames.GetCount()) {
-		pApp->m_AudioRendererDisplayName_CL = m_AudioRendererDisplayNames[AudioDevNo];
+	if (AudioDevNo >= 0 && AudioDevNo < audioRendererDisplayNames.GetCount()) {
+		pApp->m_AudioRendererDisplayName_CL = audioRendererDisplayNames[AudioDevNo];
 	}
 }
 
