@@ -34,6 +34,8 @@
 void ff_hevc_unref_frame(HEVCFrame *frame, int flags)
 {
     frame->flags &= ~flags;
+    if (!(frame->flags & ~HEVC_FRAME_FLAG_CORRUPT))
+        frame->flags = 0;
     if (!frame->flags) {
         ff_progress_frame_unref(&frame->tf);
         av_frame_unref(frame->frame_grain);
@@ -79,6 +81,31 @@ void ff_hevc_flush_dpb(HEVCContext *s)
     }
 }
 
+static int replace_alpha_plane(AVFrame *alpha, AVFrame *base)
+{
+    AVBufferRef *base_a = av_frame_get_plane_buffer(base, 3);
+    uintptr_t data = (uintptr_t)alpha->data[0];
+    int ret;
+
+    for (int i = 0; i < FF_ARRAY_ELEMS(alpha->buf) && alpha->buf[i]; i++) {
+        AVBufferRef *buf = alpha->buf[i];
+        uintptr_t buf_begin = (uintptr_t)buf->data;
+
+        if (data >=  buf_begin && data < buf_begin + buf->size) {
+            ret = av_buffer_replace(&alpha->buf[i], base_a);
+            if (ret < 0)
+                return ret;
+
+            alpha->linesize[0] = base->linesize[3];
+            alpha->data[0] = base->data[3];
+
+            return 0;
+        }
+    }
+
+    return AVERROR_BUG;
+}
+
 static HEVCFrame *alloc_frame(HEVCContext *s, HEVCLayerContext *l)
 {
     const HEVCVPS *vps = l->sps->vps;
@@ -103,7 +130,7 @@ static HEVCFrame *alloc_frame(HEVCContext *s, HEVCLayerContext *l)
         }
 
         // add view ID side data if it's nontrivial
-        if (vps->nb_layers > 1 || view_id) {
+        if (!ff_hevc_is_alpha_video(s) && (vps->nb_layers > 1 || view_id)) {
             HEVCSEITDRDI *tdrdi = &s->sei.tdrdi;
             AVFrameSideData *sd = av_frame_side_data_new(&frame->f->side_data,
                                                          &frame->f->nb_side_data,
@@ -162,6 +189,13 @@ static HEVCFrame *alloc_frame(HEVCContext *s, HEVCLayerContext *l)
             goto fail;
 
         frame->pps = av_refstruct_ref_c(s->pps);
+        if (l != &s->layers[0] && ff_hevc_is_alpha_video(s)) {
+            AVFrame *alpha = frame->f;
+            AVFrame *base = s->layers[0].cur_frame->f;
+            ret = replace_alpha_plane(alpha, base);
+            if (ret < 0)
+                goto fail;
+        }
 
         return frame;
 fail:
@@ -176,6 +210,7 @@ int ff_hevc_set_new_ref(HEVCContext *s, HEVCLayerContext *l, int poc)
 {
     HEVCFrame *ref;
     int i;
+    int no_output;
 
     /* check that this POC doesn't already exist */
     for (i = 0; i < FF_ARRAY_ELEMS(l->DPB); i++) {
@@ -199,7 +234,10 @@ int ff_hevc_set_new_ref(HEVCContext *s, HEVCLayerContext *l, int poc)
     ref->base_layer_frame = (l != &s->layers[0] && s->layers[0].cur_frame) ?
                             s->layers[0].cur_frame - s->layers[0].DPB : -1;
 
-    if (s->sh.pic_output_flag)
+    no_output = !IS_IRAP(s) && (s->poc < s->recovery_poc) &&
+                !(s->avctx->flags & AV_CODEC_FLAG_OUTPUT_CORRUPT) &&
+                !(s->avctx->flags2 & AV_CODEC_FLAG2_SHOW_ALL);
+    if (s->sh.pic_output_flag && !no_output)
         ref->flags = HEVC_FRAME_FLAG_OUTPUT | HEVC_FRAME_FLAG_SHORT_REF;
     else
         ref->flags = HEVC_FRAME_FLAG_SHORT_REF;
@@ -266,6 +304,8 @@ int ff_hevc_output_frames(HEVCContext *s,
             int output = !discard && (layers_active_output & (1 << min_layer));
 
             if (output) {
+                if (frame->flags & HEVC_FRAME_FLAG_CORRUPT)
+                    f->flags |= AV_FRAME_FLAG_CORRUPT;
                 f->pkt_dts = s->pkt_dts;
                 ret = av_container_fifo_write(s->output_fifo, f, AV_CONTAINER_FIFO_FLAG_REF);
             }
@@ -461,6 +501,20 @@ static int add_candidate_ref(HEVCContext *s, HEVCLayerContext *l,
 
     if (ref == s->cur_frame || list->nb_refs >= HEVC_MAX_REFS)
         return AVERROR_INVALIDDATA;
+
+    if (!IS_IRAP(s)) {
+        int ref_corrupt = !ref || ref->flags & (HEVC_FRAME_FLAG_CORRUPT |
+                                                HEVC_FRAME_FLAG_UNAVAILABLE);
+        int recovering = HEVC_IS_RECOVERING(s);
+
+        if (ref_corrupt && !recovering) {
+            if (!(s->avctx->flags & AV_CODEC_FLAG_OUTPUT_CORRUPT) &&
+                !(s->avctx->flags2 & AV_CODEC_FLAG2_SHOW_ALL))
+                return AVERROR_INVALIDDATA;
+
+            s->cur_frame->flags |= HEVC_FRAME_FLAG_CORRUPT;
+        }
+    }
 
     if (!ref) {
         ref = generate_missing_ref(s, l, poc);

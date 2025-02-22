@@ -95,6 +95,13 @@ typedef struct HEVCSEITDRDI {
     uint8_t three_dimensional_reference_displays_extension_flag;
 } HEVCSEITDRDI;
 
+typedef struct HEVCSEIRecoveryPoint {
+    int16_t recovery_poc_cnt;
+    uint8_t exact_match_flag;
+    uint8_t broken_link_flag;
+    uint8_t has_recovery_poc;
+} HEVCSEIRecoveryPoint;
+
 typedef struct HEVCSEI {
     H2645SEI common;
     HEVCSEIPictureHash picture_hash;
@@ -102,6 +109,7 @@ typedef struct HEVCSEI {
     int active_seq_parameter_set_id;
     HEVCSEITimeCode timecode;
     HEVCSEITDRDI tdrdi;
+    HEVCSEIRecoveryPoint recovery_point;
 } HEVCSEI;
 
 struct HEVCParamSets;

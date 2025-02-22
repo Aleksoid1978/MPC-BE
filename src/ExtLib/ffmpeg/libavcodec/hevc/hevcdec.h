@@ -78,6 +78,10 @@
                    (s)->nal_unit_type == HEVC_NAL_BLA_N_LP)
 #define IS_IRAP(s) ((s)->nal_unit_type >= HEVC_NAL_BLA_W_LP && (s)->nal_unit_type <= HEVC_NAL_RSV_IRAP_VCL23)
 
+#define HEVC_RECOVERY_UNSPECIFIED INT_MAX
+#define HEVC_RECOVERY_END INT_MIN
+#define HEVC_IS_RECOVERING(s) ((s)->recovery_poc != HEVC_RECOVERY_UNSPECIFIED && (s)->recovery_poc != HEVC_RECOVERY_END)
+
 enum RPSType {
     ST_CURR_BEF = 0,
     ST_CURR_AFT,
@@ -353,6 +357,7 @@ typedef struct DBParams {
 #define HEVC_FRAME_FLAG_SHORT_REF (1 << 1)
 #define HEVC_FRAME_FLAG_LONG_REF  (1 << 2)
 #define HEVC_FRAME_FLAG_UNAVAILABLE (1 << 3)
+#define HEVC_FRAME_FLAG_CORRUPT (1 << 4)
 
 typedef struct HEVCFrame {
     union {
@@ -523,6 +528,7 @@ typedef struct HEVCContext {
     int slice_idx; ///< number of the slice being currently decoded
     int eos;       ///< current packet contains an EOS/EOB NAL
     int last_eos;  ///< last packet contains an EOS/EOB NAL
+    int recovery_poc;
 
     // NoRaslOutputFlag associated with the last IRAP frame
     int no_rasl_output_flag;
@@ -713,6 +719,8 @@ void ff_hevc_hls_residual_coding(HEVCLocalContext *lc, const HEVCPPS *pps,
                                  int c_idx);
 
 void ff_hevc_hls_mvd_coding(HEVCLocalContext *lc, int x0, int y0, int log2_cb_size);
+
+int ff_hevc_is_alpha_video(const HEVCContext *s);
 
 extern const uint8_t ff_hevc_qpel_extra_before[4];
 extern const uint8_t ff_hevc_qpel_extra_after[4];

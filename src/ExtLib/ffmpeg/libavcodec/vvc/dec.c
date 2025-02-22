@@ -671,8 +671,6 @@ static int frame_context_setup(VVCFrameContext *fc, VVCContext *s)
 {
     int ret;
 
-    fc->ref = NULL;
-
     // copy refs from the last frame
     if (s->nb_frames && s->nb_fcs > 1) {
         VVCFrameContext *prev = get_frame_context(s, fc, -1);
@@ -812,7 +810,6 @@ static int export_frame_params(VVCContext *s, const VVCFrameContext *fc)
 
     c->width  = pps->width  - ((pps->r->pps_conf_win_left_offset + pps->r->pps_conf_win_right_offset) << sps->hshift[CHROMA]);
     c->height = pps->height - ((pps->r->pps_conf_win_top_offset + pps->r->pps_conf_win_bottom_offset) << sps->vshift[CHROMA]);
-    c->has_b_frames = sps->r->sps_dpb_params.dpb_max_num_reorder_pics[sps->r->sps_max_sublayers_minus1];
 
     return 0;
 }
@@ -927,6 +924,7 @@ static int decode_nal_units(VVCContext *s, VVCFrameContext *fc, AVPacket *avpkt)
     int ret = 0;
     s->last_eos = s->eos;
     s->eos = 0;
+    fc->ref = NULL;
 
     ff_cbs_fragment_reset(frame);
     ret = ff_cbs_read_packet(s->cbc, frame, avpkt);
