@@ -4251,14 +4251,21 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 		switch (nID) {
 			case ID_PLSMENU_ADD_PLAYLIST:
 				{
-					size_t cnt = 1;
-					for (size_t i = 0; i < m_tabs.size(); i++) {
-						if (m_tabs[i].type == PL_BASIC && i > 0) {
-							cnt++;
+					unsigned number = 1;
+					CString mpcpl_fn;
+					for (;;) {
+						mpcpl_fn.Format(L"Playlist%u.mpcpl", number);
+						auto it = std::find_if(m_tabs.begin(), m_tabs.end(), [&mpcpl_fn](const tab_t& tab) {
+							return tab.type == PL_BASIC && tab.mpcpl_fn == mpcpl_fn;
+						});
+						if (it == m_tabs.end()) {
+							break;
 						}
+
+						number++;
 					}
 
-					strDefName.Format(L"%s %u", ResStr(IDS_PLAYLIST_NAME).GetString(), cnt);
+					strDefName.Format(L"%s %u", ResStr(IDS_PLAYLIST_NAME).GetString(), number);
 					CPlaylistNameDlg dlg(strDefName);
 					if (dlg.DoModal() != IDOK) {
 						return;
@@ -4271,7 +4278,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 					tab_t tab;
 					tab.type = PL_BASIC;
 					tab.name = strGetName;
-					tab.mpcpl_fn.Format(L"Playlist%u.mpcpl", cnt);
+					tab.mpcpl_fn = mpcpl_fn;
 					tab.id = GetNextId();
 					m_tabs.insert(m_tabs.begin() + m_nCurPlayListIndex + 1, tab);
 
@@ -4289,13 +4296,21 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 				break;
 			case ID_PLSMENU_ADD_EXPLORER:
 				{
-					size_t cnt = 1;
-					for (size_t i = 0; i < m_tabs.size(); i++) {
-						if (m_tabs[i].type == PL_EXPLORER) {
-							cnt++;
+					unsigned number = 1;
+					CString mpcpl_fn;
+					for (;;) {
+						mpcpl_fn.Format(L"Explorer%u.mpcpl", number);
+						auto it = std::find_if(m_tabs.begin(), m_tabs.end(), [&mpcpl_fn](const tab_t& tab) {
+							return tab.type == PL_EXPLORER && tab.mpcpl_fn == mpcpl_fn;
+						});
+						if (it == m_tabs.end()) {
+							break;
 						}
+
+						number++;
 					}
-					strDefName.Format(L"%s %u", ResStr(IDS_PLAYLIST_EXPLORER_NAME).GetString(), cnt);
+
+					strDefName.Format(L"%s %u", ResStr(IDS_PLAYLIST_EXPLORER_NAME).GetString(), number);
 					CPlaylistNameDlg dlg(strDefName);
 					if (dlg.DoModal() != IDOK) {
 						return;
@@ -4308,7 +4323,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 					tab_t tab;
 					tab.type = PL_EXPLORER;
 					tab.name = strGetName;
-					tab.mpcpl_fn.Format(L"Explorer%u.mpcpl", cnt);
+					tab.mpcpl_fn = mpcpl_fn;
 					tab.id = GetNextId();
 					m_tabs.insert(m_tabs.begin() + m_nCurPlayListIndex + 1, tab);
 
@@ -5024,7 +5039,7 @@ bool CPlayerPlaylistBar::TNavigate()
 	return false;
 }
 
-bool CPlayerPlaylistBar::TSelectFolder(CString path)
+bool CPlayerPlaylistBar::TSelectFolder(const CString& path)
 {
 	if (path.IsEmpty()) {
 		return false;

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -257,10 +257,10 @@ private:
 	int TGetFirstVisible();
 	int TGetOffset();
 	int TGetPathType(const CString& path) const;
-	int m_iTFontSize = 0;
 	bool TNavigate();
-	bool TSelectFolder(CString path);
+	bool TSelectFolder(const CString& path);
 	int TGetFocusedElement() const;
+	int m_iTFontSize = 0;
 
 	unsigned m_nCurPlaybackListId = 0;
 	void CloseMedia() const;
