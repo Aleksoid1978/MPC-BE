@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2024 see Authors.txt
+ * (C) 2018-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -47,7 +47,8 @@ namespace YoutubeDL
 		YoutubeProfiles.clear();
 		pOFD->Clear();
 
-		CStringW ydl_path = GetFullExePath(ydlExePath, true);
+		const CStringW ydl_path = GetFullExePath(ydlExePath, true);
+		const CStringW ydl_fname = GetFileName(ydlExePath);
 
 		if (ydl_path.IsEmpty()) {
 			return false;
@@ -75,7 +76,7 @@ namespace YoutubeDL
 
 		PROCESS_INFORMATION proc_info = {};
 		CStringW args;
-		if (ydl_path.Mid(ydl_path.GetLength() - 10).CompareNoCase(L"yt-dlp.exe") == 0) {
+		if (ydl_fname.CompareNoCase(L"yt-dlp.exe") == 0) {
 			// yt-dlp.exe
 			args.Format(LR"(%s -j --all-subs --sub-format vtt --no-check-certificates "%s")", ydl_path.GetString(), url.GetString());
 		} else {
@@ -143,7 +144,7 @@ namespace YoutubeDL
 		GetExitCodeProcess(proc_info.hProcess, &exitcode);
 		if (exitcode && buf_err.GetLength()) {
 			if (buf_err.Find("Unsupported URL:") == -1) {
-				AfxMessageBox(CStringW(buf_err), MB_ICONERROR, 0);
+				MessageBoxW(AfxGetApp()->GetMainWnd()->m_hWnd, CStringW(buf_err), ydl_fname, MB_ICONERROR | MB_OK);
 			}
 		}
 
