@@ -15,6 +15,8 @@ Fixed opening of some online links.
 Updated Korean translation (by Hackjjang).
 Updated Romanian translation (by Andrei Miloiu).
 Updated Japanese translation (by tsubasanouta).
+Updated German translation (by Klaus1189).
+Updated Spanish translation (by IPeluchito).
 
 Updated libraries:
 	ffmpeg n7.2-dev-1357-gbb8e95b650.
