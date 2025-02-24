@@ -80,6 +80,7 @@
 #include <filters/renderer/VideoRenderers/AllocatorCommon.h>
 #include "MediaControls.h"
 #include <limits>
+#include <atomic>
 
 #define USE_MEDIAINFO_STATIC
 #include <MediaInfo/MediaInfo.h>
@@ -1199,6 +1200,7 @@ public:
 	Youtube::YoutubeUrllist m_youtubeAudioUrllist;
 	std::vector<uint8_t> m_youtubeThumbnailData;
 	bool m_bYoutubeOpened = false;
+	std::atomic_bool m_bYoutubeOpening = false;
 
 	const CString GetAltFileName();
 

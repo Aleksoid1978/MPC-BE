@@ -4392,7 +4392,9 @@ CString CMainFrame::UpdatePlayerStatus()
 
 void CMainFrame::OnUpdatePlayerStatus(CCmdUI* pCmdUI)
 {
-	pCmdUI->SetText(UpdatePlayerStatus());
+	if (!m_bYoutubeOpening) {
+		pCmdUI->SetText(UpdatePlayerStatus());
+	}
 }
 
 void CMainFrame::OnFilePostOpenMedia(std::unique_ptr<OpenMediaData>& pOMD)
@@ -12229,9 +12231,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			pOFD->subs = m_lastOMD->subs;
 
 			if (it->profile->type == Youtube::y_audio) {
-				m_youtubeFields.fname.Format(L"%s.%s", m_youtubeFields.title, it->profile->ext);
+				m_youtubeFields.fname.Format(L"%s.%s", m_youtubeFields.title.GetString(), it->profile->ext.GetString());
 			} else {
-				m_youtubeFields.fname.Format(L"%s.%dp.%s", m_youtubeFields.title, it->profile->quality, it->profile->ext);
+				m_youtubeFields.fname.Format(L"%s.%dp.%s", m_youtubeFields.title.GetString(), it->profile->quality, it->profile->ext.GetString());
 			}
 			FixFilename(m_youtubeFields.fname);
 		}
@@ -12243,6 +12245,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		auto url = pOFD->fi.GetPath();
 		bool ok = Youtube::CheckURL(url);
 		if (ok) {
+			m_bYoutubeOpening = true;
+			SetStatusMessage(ResStr(IDS_OPENING_YOUTUBE));
+
 			ok = Youtube::Parse_URL(
 				url, pOFD->rtStart,
 				m_youtubeFields,
@@ -12301,6 +12306,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				}
 
 				if (bIsHtml) {
+					m_bYoutubeOpening = true;
+					SetStatusMessage(ResStr(IDS_CALLING_YOUTUBEDL));
+
 					OpenFileData OFD;
 					ok = YoutubeDL::Parse_URL(
 						url,
@@ -12330,6 +12338,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 	}
 
+	m_bYoutubeOpening = false;
+
 	if (m_pGB->ShouldOperationContinue() != S_OK) {
 		return ResStr(IDS_MAINFRM_82);
 	}
@@ -12337,6 +12347,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	if (youtubeUrl.IsEmpty() && !youtubeErrorMessage.IsEmpty()) {
 		return youtubeErrorMessage;
 	}
+
+	UpdatePlayerStatus();
 
 	if (!::PathIsURLW(pOFD->fi)) {
 		m_FileName = GetFileName(pOFD->fi);

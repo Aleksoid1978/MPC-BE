@@ -1431,6 +1431,8 @@
 #define IDS_SUB_USE_INTERNAL            34021
 // youtube
 #define IDS_PUBLISHED                   34100
+#define IDS_OPENING_YOUTUBE             34101
+#define IDS_CALLING_YOUTUBEDL           34102
 // video files
 #define IDS_MFMT_AVI                    39001
 #define IDS_MFMT_MPEG                   39002
