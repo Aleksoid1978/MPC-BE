@@ -3844,6 +3844,8 @@ END
 STRINGTABLE
 BEGIN
     IDS_PUBLISHED           "Gepubliceerd op : "
+    IDS_OPENING_YOUTUBE     "Opening Youtube ..."
+    IDS_CALLING_YOUTUBEDL   "Calling youtube-dl ..."
 END
 
 STRINGTABLE
