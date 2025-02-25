@@ -3616,7 +3616,7 @@ LRESULT CMainFrame::OnPostOpen(WPARAM wParam, LPARAM lParam)
 
 		CloseMedia();
 
-		m_OSD.DisplayMessage(OSD_TOPLEFT, m_closingmsg, 1000);
+		m_OSD.DisplayMessage(OSD_TOPLEFT, m_closingmsg, 3000);
 
 		if (m_closingmsg != aborted) {
 
