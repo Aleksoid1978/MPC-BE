@@ -3844,8 +3844,8 @@ END
 STRINGTABLE
 BEGIN
     IDS_PUBLISHED           "发布于 :"
-    IDS_OPENING_YOUTUBE     "Opening Youtube ..."
-    IDS_CALLING_YOUTUBEDL   "Calling youtube-dl ..."
+    IDS_OPENING_YOUTUBE     "正在打开Youtube…"
+    IDS_CALLING_YOUTUBEDL   "正在调用youtube-dl…"
 END
 
 STRINGTABLE
