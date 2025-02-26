@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2024 see Authors.txt
+ * (C) 2012-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -51,19 +51,30 @@ private:
 		L"en",
 		L"ru",
 		L"ar",
+		L"cs",
+		L"da",
 		L"de",
+		L"el",
 		L"es",
+		L"fi",
+		L"fil",
 		L"fr",
 		L"hi",
 		L"id",
-		L"ko",
-		L"pt",
-		L"pt-BR",
-		L"th",
-		L"tr",
-		L"vi",
 		L"it",
 		L"ja",
+		L"ko",
+		L"ms",
+		L"nl",
+		L"pl",
+		L"pt",
+		L"pt-BR",
+		L"ro",
+		L"sv",
+		L"th",
+		L"tr",
+		L"uk",
+		L"vi",
 		L"zh",
 	};
 
