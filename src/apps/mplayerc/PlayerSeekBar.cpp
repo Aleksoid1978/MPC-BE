@@ -898,6 +898,14 @@ void CPlayerSeekBar::HideToolTip()
 void CPlayerSeekBar::UpdateToolTipPosition(CPoint point)
 {
 	if (m_pMainFrame->CanPreviewUse()) {
+		CRect r;
+		GetClientRect(&r);
+		if (point.x < r.left || point.x > r.right) {
+			// Disable processing of the cursor position to the left or right of the window.
+			// This happens when moving the mouse while holding down the left button.
+			return;
+		}
+
 		if (!m_pMainFrame->m_wndPreView.IsWindowVisible()) {
 			m_pMainFrame->m_wndPreView.SetWindowSize();
 		}
