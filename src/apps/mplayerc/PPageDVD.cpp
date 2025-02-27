@@ -226,7 +226,7 @@ BOOL CPPageDVD::OnInitDialog()
 #if 0
 			int ret = GetLocaleInfoEx(code, LOCALE_SLOCALIZEDLANGUAGENAME, buffer, std::size(buffer));
 			if (ret) {
-				AddStringData(m_lcids, buffer, lsid);
+				AddStringData(m_lcids, buffer, lcid);
 			}
 			else
 #endif
