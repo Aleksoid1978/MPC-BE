@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -57,6 +57,20 @@ void CPPageAudio::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK2, m_fAutoloadAudio);
 	DDX_Text(pDX, IDC_EDIT4, m_sAudioPaths);
 	DDX_Check(pDX, IDC_CHECK3, m_fPrioritizeExternalAudio);
+}
+
+BOOL CPPageAudio::PreTranslateMessage(MSG* pMsg)
+{
+	if (pMsg->message == WM_KEYDOWN && (pMsg->wParam == 'C' || pMsg->wParam == 'c') && GetKeyState(VK_CONTROL) < 0) {
+		if (pMsg->hwnd == m_iAudioRendererTypeCtrl.m_hWnd) {
+			CStringW text;
+			m_iAudioRendererTypeCtrl.GetWindowText(text);
+			CopyStringToClipboard(this->m_hWnd, text);
+		}
+		return TRUE;
+	}
+
+	return CPPageBase::PreTranslateMessage(pMsg);
 }
 
 BEGIN_MESSAGE_MAP(CPPageAudio, CPPageBase)
