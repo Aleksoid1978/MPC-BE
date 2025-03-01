@@ -2369,7 +2369,7 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 				CMiniDump::SetState(false);
 			}
 			else if (sw == L"audiorenderer" && next_available) {
-				SetAudioRenderer(_wtoi(*it++));
+				SetAudioRenderer(*it++);
 			}
 			else if (sw == L"reset") {
 				nCLSwitches |= CLSW_RESET;

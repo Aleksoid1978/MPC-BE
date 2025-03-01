@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2024 see Authors.txt
+ * (C) 2016-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -428,50 +428,76 @@ WORD AssignedMouseToCmd(UINT mouseValue, UINT nFlags)
 	return (WORD)mcmds.normal;
 }
 
-void SetAudioRenderer(int AudioDevNo)
+void SetAudioRenderer(const CStringW& str)
 {
 	auto pApp = AfxGetMyApp();
 	pApp->m_AudioRendererDisplayName_CL.Empty();
 
-	CStringArray audioRendererDisplayNames;
-	audioRendererDisplayNames.Add(AUDRNDT_MPC);
-	audioRendererDisplayNames.Add(L""); // Default DirectSound Device
+	if (str == AUDRNDT_MPC || str == "" || str == AUDRNDT_NULL_COMP || str == AUDRNDT_NULL_UNCOMP) {
+		pApp->m_AudioRendererDisplayName_CL = str;
+		return;
+	}
+
+	enum {
+		isFriendlyName,
+		isDisplayName,
+		isCLSID,
+	};
+
+	int type = isFriendlyName;
+	if (str.GetLength() == 38 && str[0] == '{' && str[37] == '}') {
+		type = isCLSID;
+	}
+	else if (StartsWith(str, L"@device:")) {
+		type = isDisplayName;
+	}
 
 	BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
 		CComPtr<IPropertyBag> pPB;
 		if (SUCCEEDED(pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB))) {
 			CComVariant var;
-			if (pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr) == S_OK) {
-				// skip WaveOut
-				var.Clear();
-				if (pPB->Read(CComBSTR(L"WaveOutId"), &var, nullptr) == S_OK) {
-					continue;
-				}
+			// skip WaveOut
+			if (pPB->Read(CComBSTR(L"WaveOutId"), &var, nullptr) == S_OK) {
+				continue;
+			}
 
-				// skip Default DirectSound Device
-				var.Clear();
-				if (pPB->Read(CComBSTR(L"DSGuid"), &var, nullptr) == S_OK
-					&& CString(var.bstrVal) == "{00000000-0000-0000-0000-000000000000}") {
-					continue;
-				}
+			LPOLESTR olestr = nullptr;
+			if (FAILED(pMoniker->GetDisplayName(0, 0, &olestr))) {
+				continue;
+			}
+			CStringW displayName = olestr;
+			CoTaskMemFree(olestr);
 
-				LPOLESTR olestr = nullptr;
-				if (FAILED(pMoniker->GetDisplayName(0, 0, &olestr))) {
-					continue;
+			var.Clear();
+
+			switch (type) {
+			default:
+			case isFriendlyName:
+				if (pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr) == S_OK && var.vt == VT_BSTR) {
+					if (str == var.bstrVal) {
+						pApp->m_AudioRendererDisplayName_CL = displayName;
+						return;
+					}
 				}
-				audioRendererDisplayNames.Add(olestr);
-				CoTaskMemFree(olestr);
+				break;
+			case isDisplayName:
+				if (str == displayName) {
+					pApp->m_AudioRendererDisplayName_CL = displayName;
+					return;
+				}
+				break;
+			case isCLSID:
+				if (pPB->Read(CComBSTR(L"CLSID"), &var, nullptr) == S_OK && var.vt == VT_BSTR) {
+					if (str.CompareNoCase(var.bstrVal) == 0) {
+						pApp->m_AudioRendererDisplayName_CL = displayName;
+						return;
+					}
+				}
+				break;
 			}
 		}
 	}
 	EndEnumSysDev
-
-	audioRendererDisplayNames.Add(AUDRNDT_NULL_COMP);
-	audioRendererDisplayNames.Add(AUDRNDT_NULL_UNCOMP);
-
-	if (AudioDevNo >= 0 && AudioDevNo < audioRendererDisplayNames.GetCount()) {
-		pApp->m_AudioRendererDisplayName_CL = audioRendererDisplayNames[AudioDevNo];
-	}
 }
 
 void ThemeRGB(int iR, int iG, int iB, int& iRed, int& iGreen, int& iBlue)

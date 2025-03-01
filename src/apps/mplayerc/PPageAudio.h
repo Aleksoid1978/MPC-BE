@@ -30,7 +30,14 @@ class CPPageAudio : public CPPageBase
 	DECLARE_DYNAMIC(CPPageAudio)
 
 private:
-	CStringArray m_AudioRendererDisplayNames;
+	struct audioDeviceInfo_t {
+		CStringW friendlyName;
+		CLSID clsid = GUID_NULL;
+		GUID dsGuid = GUID_NULL;
+		CStringW displayName;
+	};
+
+	std::vector<audioDeviceInfo_t> m_audioDevices;
 	int m_oldVolume = 0; //not very nice solution
 
 public:

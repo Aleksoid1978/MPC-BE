@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2024 see Authors.txt
+ * (C) 2016-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -51,7 +51,7 @@ enum :UINT {
 
 WORD AssignedMouseToCmd(UINT mouseValue, UINT nFlags);
 
-void SetAudioRenderer(int AudioDevNo);
+void SetAudioRenderer(const CStringW& str);
 void ThemeRGB(int iR, int iG, int iB, int& iRed, int& iGreen, int& iBlue);
 COLORREF ThemeRGB(const int iR, const int iG, const int iB);
 

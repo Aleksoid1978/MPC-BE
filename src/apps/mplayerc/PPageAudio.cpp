@@ -85,13 +85,6 @@ END_MESSAGE_MAP()
 
 // CPPageAudio message handlers
 
-struct audioDeviceInfo_t {
-	CStringW friendlyName;
-	CLSID clsid = GUID_NULL;
-	GUID dsGuid = GUID_NULL;
-	CStringW displayName;
-};
-
 BOOL CPPageAudio::OnInitDialog()
 {
 	__super::OnInitDialog();
@@ -104,11 +97,9 @@ BOOL CPPageAudio::OnInitDialog()
 	m_iAudioRendererTypeCtrl.SetRedraw(FALSE);
 	m_iSecAudioRendererTypeCtrl.SetRedraw(FALSE);
 
-	std::vector<audioDeviceInfo_t> audioDevices;
-
-	audioDevices.emplace_back(audioDeviceInfo_t{ AUDRNDT_MPC, CLSID_MpcAudioRenderer, GUID_NULL, AUDRNDT_MPC });
+	m_audioDevices.emplace_back(audioDeviceInfo_t{ AUDRNDT_MPC, CLSID_MpcAudioRenderer, GUID_NULL, AUDRNDT_MPC });
 	str.Format(L"DirectSound: %s", ResStr(IDS_PPAGE_OUTPUT_SYS_DEF));
-	audioDevices.emplace_back(audioDeviceInfo_t{ str, CLSID_DSoundRender, GUID_NULL, ""});
+	m_audioDevices.emplace_back(audioDeviceInfo_t{ str, CLSID_DSoundRender, GUID_NULL, ""});
 
 	// other DirectSound devices
 	BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
@@ -155,29 +146,28 @@ BOOL CPPageAudio::OnInitDialog()
 			audioDevice.displayName = olestr;
 			CoTaskMemFree(olestr);
 
-			audioDevices.emplace_back(audioDevice);
+			m_audioDevices.emplace_back(audioDevice);
 		}
 	}
 	EndEnumSysDev;
 
-	audioDevices.emplace_back(audioDeviceInfo_t{ AUDRNDT_NULL_COMP, CLSID_NullAudioRenderer, GUID_NULL, AUDRNDT_NULL_COMP });
-	audioDevices.emplace_back(audioDeviceInfo_t{ AUDRNDT_NULL_UNCOMP, CLSID_NullUAudioRenderer, GUID_NULL, AUDRNDT_NULL_UNCOMP });
+	m_audioDevices.emplace_back(audioDeviceInfo_t{ AUDRNDT_NULL_COMP, CLSID_NullAudioRenderer, GUID_NULL, AUDRNDT_NULL_COMP });
+	m_audioDevices.emplace_back(audioDeviceInfo_t{ AUDRNDT_NULL_UNCOMP, CLSID_NullUAudioRenderer, GUID_NULL, AUDRNDT_NULL_UNCOMP });
 
-	for (unsigned i = 0; i < audioDevices.size(); i++) {
-		m_AudioRendererDisplayNames.Add(audioDevices[i].displayName);
-
-		str.Format(L"%u. %s", i, audioDevices[i].friendlyName);
-		m_iAudioRendererTypeCtrl.AddString(str);
-		m_iSecAudioRendererTypeCtrl.AddString(str);
+	DLog(L"Audio devices:");
+	for (const auto audioDevice : m_audioDevices) {
+		DLog(L"%s, %s, %s, %s", CStringFromGUID(audioDevice.clsid), CStringFromGUID(audioDevice.dsGuid), audioDevice.displayName, audioDevice.friendlyName);
+		m_iAudioRendererTypeCtrl.AddString(audioDevice.friendlyName);
+		m_iSecAudioRendererTypeCtrl.AddString(audioDevice.friendlyName);
 	}
 
 	m_iAudioRendererType = 0;
 	m_iSecAudioRendererType = 1;
-	for (INT_PTR idx = 0; idx < m_AudioRendererDisplayNames.GetCount(); idx++) {
-		if (s.strAudioRendererDisplayName == m_AudioRendererDisplayNames[idx]) {
+	for (size_t idx = 0; idx < m_audioDevices.size(); idx++) {
+		if (s.strAudioRendererDisplayName == m_audioDevices[idx].displayName) {
 			m_iAudioRendererType = idx;
 		}
-		if (s.strAudioRendererDisplayName2 == m_AudioRendererDisplayNames[idx]) {
+		if (s.strAudioRendererDisplayName2 == m_audioDevices[idx].displayName) {
 			m_iSecAudioRendererType = idx;
 		}
 	}
@@ -223,11 +213,11 @@ BOOL CPPageAudio::OnApply()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.strAudioRendererDisplayName  = m_AudioRendererDisplayNames[m_iAudioRendererType];
+	s.strAudioRendererDisplayName  = m_audioDevices[m_iAudioRendererType].displayName;
 	if (m_iSecAudioRendererType == -1) {
 		s.strAudioRendererDisplayName.Empty();
 	} else {
-		s.strAudioRendererDisplayName2 = m_AudioRendererDisplayNames[m_iSecAudioRendererType];
+		s.strAudioRendererDisplayName2 = m_audioDevices[m_iSecAudioRendererType].displayName;
 	}
 	s.fDualAudioOutput             = !!m_DualAudioOutput.GetCheck();
 
@@ -286,7 +276,7 @@ void CPPageAudio::OnAudioRendererChange()
 	UpdateData();
 
 	BOOL flag = FALSE;
-	CString str_audio = m_AudioRendererDisplayNames[m_iAudioRendererType];
+	CStringW str_audio = m_audioDevices[m_iAudioRendererType].displayName;
 	if (str_audio == AUDRNDT_MPC) {
 		flag = TRUE;
 	} else {
@@ -299,7 +289,7 @@ void CPPageAudio::OnAudioRendererChange()
 			CStringW str(olestr);
 			CoTaskMemFree(olestr);
 
-			if (str == m_AudioRendererDisplayNames[m_iAudioRendererType]) {
+			if (str == m_audioDevices[m_iAudioRendererType].displayName) {
 				CComPtr<IBaseFilter> pBF;
 				HRESULT hr = pMoniker->BindToObject(nullptr, nullptr, IID_PPV_ARGS(&pBF));
 				if (SUCCEEDED(hr)) {
@@ -320,7 +310,7 @@ void CPPageAudio::OnAudioRendererChange()
 
 void CPPageAudio::OnAudioRenderPropClick()
 {
-	CString str_audio = m_AudioRendererDisplayNames[m_iAudioRendererType];
+	CStringW str_audio = m_audioDevices[m_iAudioRendererType].displayName;
 
 	if (str_audio == AUDRNDT_MPC) {
 		ShowPPage(CreateInstance<CMpcAudioRenderer>);
