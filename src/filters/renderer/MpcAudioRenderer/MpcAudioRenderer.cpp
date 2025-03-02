@@ -2740,6 +2740,7 @@ HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = 
 		m_pAudioClient->Stop();
 	}
 	m_bIsAudioClientStarted = false;
+	m_bReleased = false;
 
 	if (bFullInitialization) {
 		SAFE_RELEASE(m_pRenderClient);
