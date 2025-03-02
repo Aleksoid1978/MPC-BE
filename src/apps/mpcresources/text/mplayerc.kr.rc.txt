@@ -1357,7 +1357,7 @@ STRING IDS_BDA_ERROR_DEMULTIPLEXER		"디멀티플렉서를 만들 수 없습니�
 STRING IDS_BLOCK_EXTERNAL_VR		"%s을(를) 외부 필터로 추가할 수 없습니다.\n비디오 설정 페이지에서 원하는 비디오 렌더러를 선택해야 합니다."
 STRING IDS_BRIGHTNESS_DEC		"밝기 감소"
 STRING IDS_BRIGHTNESS_INC		"밝기 증가"
-STRING IDS_CALLING_YOUTUBEDL		"Calling youtube-dl ..."
+STRING IDS_CALLING_YOUTUBEDL		"Calling %s ..."
 STRING IDS_CANCEL		"취소"
 STRING IDS_CANNOT_CHANGE_FORMAT		"미디어 재생기 클래식 파일 형식을 바꿀 권한이 없습니다. ""수정"" 버튼을 눌러서 관리자 권한을 얻으십시오."
 STRING IDS_CAPTURE_CHANNEL_FREQ		"채널 %d(%.1f MHz)"

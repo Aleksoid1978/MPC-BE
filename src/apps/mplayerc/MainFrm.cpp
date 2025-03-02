@@ -12307,7 +12307,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 				if (bIsHtml) {
 					m_bYoutubeOpening = true;
-					SetStatusMessage(ResStr(IDS_CALLING_YOUTUBEDL));
+					CString ytdl_mesage;
+					ytdl_mesage.Format(ResStr(IDS_CALLING_YOUTUBEDL), GetFileName(s.strYDLExePath));
+					SetStatusMessage(ytdl_mesage);
 
 					OpenFileData OFD;
 					ok = YoutubeDL::Parse_URL(

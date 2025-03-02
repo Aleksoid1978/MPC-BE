@@ -1357,7 +1357,7 @@ STRING IDS_BDA_ERROR_DEMULTIPLEXER		"デマルチプレクサーを作成でき�
 STRING IDS_BLOCK_EXTERNAL_VR		"%s を外部フィルターとして追加することはできません。\n[映像] 設定ページで、お好みのビデオ レンダラーを選択する必要があります。"
 STRING IDS_BRIGHTNESS_DEC		"明るさを下げる"
 STRING IDS_BRIGHTNESS_INC		"明るさを上げる"
-STRING IDS_CALLING_YOUTUBEDL		"youtube-dl を呼び出しています..."
+STRING IDS_CALLING_YOUTUBEDL		"%s を呼び出しています..."
 STRING IDS_CANCEL		"キャンセル"
 STRING IDS_CANNOT_CHANGE_FORMAT		"MPC-BE にファイルの関連付けを変更する十分な権限がありません。管理者権限を取得するには、[変更] を押してください。"
 STRING IDS_CAPTURE_CHANNEL_FREQ		"チャンネル %d (%.1f MHz)"

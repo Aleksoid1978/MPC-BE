@@ -1357,7 +1357,7 @@ STRING IDS_BDA_ERROR_DEMULTIPLEXER		"Nem sikerült létrehozni a demultiplexert.
 STRING IDS_BLOCK_EXTERNAL_VR		"A %s nem adható hozzá külső szűrőként.\nA Videóbeállítások oldalon válassza ki a kívánt videómegjelenítőt."
 STRING IDS_BRIGHTNESS_DEC		"Fényerő csökkentése"
 STRING IDS_BRIGHTNESS_INC		"Fényerő növelése"
-STRING IDS_CALLING_YOUTUBEDL		"A youtube-dl hívása ..."
+STRING IDS_CALLING_YOUTUBEDL		"A %s hívása ..."
 STRING IDS_CANCEL		"Mégse"
 STRING IDS_CANNOT_CHANGE_FORMAT		"A MPC-BE nem rendelkezik elegendő jogosultságokkal, hogy módosítsa a fájl formátumok hozzárendelését. Kérem kattintson a ""Módosít"" gombra, hogy adminisztrátori jogosultságokat kapjon."
 STRING IDS_CAPTURE_CHANNEL_FREQ		"Csatorna %d (%.1f MHz)"

@@ -3845,7 +3845,7 @@ STRINGTABLE
 BEGIN
     IDS_PUBLISHED           "發佈時間："
     IDS_OPENING_YOUTUBE     "正在開啟 YouTube…"
-    IDS_CALLING_YOUTUBEDL   "正在呼叫 youtube-dl…"
+    IDS_CALLING_YOUTUBEDL   "正在呼叫 %s…"
 END
 
 STRINGTABLE

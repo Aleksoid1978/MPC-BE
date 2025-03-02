@@ -1357,7 +1357,7 @@ STRING IDS_BDA_ERROR_DEMULTIPLEXER		"Неможливо створити дем�
 STRING IDS_BLOCK_EXTERNAL_VR		"You can not add %s as external filter.\nYou should select your preferred video renderer on the Video settings page."
 STRING IDS_BRIGHTNESS_DEC		"Зменшення яскравості"
 STRING IDS_BRIGHTNESS_INC		"Збільшення яскравості"
-STRING IDS_CALLING_YOUTUBEDL		"Calling youtube-dl ..."
+STRING IDS_CALLING_YOUTUBEDL		"Calling %s ..."
 STRING IDS_CANCEL		"Відмінити"
 STRING IDS_CANNOT_CHANGE_FORMAT		"У MPC-BE недостатньо прав для зміни асоціацій файлів. Натисніть на кнопку ""Modify"" для виконання операції з правами адміністратора."
 STRING IDS_CAPTURE_CHANNEL_FREQ		"Канал %d (%.1f МГц)"

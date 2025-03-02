@@ -3845,7 +3845,7 @@ STRINGTABLE
 BEGIN
     IDS_PUBLISHED           "Pubblicato : "
     IDS_OPENING_YOUTUBE     "Apertura di YouTube..."
-    IDS_CALLING_YOUTUBEDL   "Chiamata per youtube-dl..."
+    IDS_CALLING_YOUTUBEDL   "Chiamata per %s ..."
 END
 
 STRINGTABLE

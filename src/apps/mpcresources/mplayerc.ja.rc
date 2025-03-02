@@ -3845,7 +3845,7 @@ STRINGTABLE
 BEGIN
     IDS_PUBLISHED           "発行 : "
     IDS_OPENING_YOUTUBE     "YouTube を開いています..."
-    IDS_CALLING_YOUTUBEDL   "youtube-dl を呼び出しています..."
+    IDS_CALLING_YOUTUBEDL   "%s を呼び出しています..."
 END
 
 STRINGTABLE
