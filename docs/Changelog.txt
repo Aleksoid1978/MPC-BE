@@ -21,6 +21,7 @@ Updated Turkish translation (by cmhrky).
 Updated Chinese (Simplified) translation (by wushantao).
 Updated Hungarian translation (by mickey).
 Updated Italian translation (by mapi68).
+Updated Dutch and Chinese (Traditional) translation (by beter).
 
 Updated libraries:
 	ffmpeg n7.2-dev-1432-ge8d4c559870.
