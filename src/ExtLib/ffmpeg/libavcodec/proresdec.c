@@ -26,8 +26,6 @@
 
 //#define DEBUG
 
-#define LONG_BITSTREAM_READER
-
 #include "config_components.h"
 
 #include "libavutil/internal.h"
@@ -134,9 +132,7 @@ static void unpack_alpha_12(GetBitContext *gb, uint16_t *dst, int num_coeffs,
 
 static av_cold int decode_init(AVCodecContext *avctx)
 {
-    int ret = 0;
     ProresContext *ctx = avctx->priv_data;
-    uint8_t idct_permutation[64];
 
     avctx->bits_per_raw_sample = 10;
 
@@ -166,36 +162,24 @@ static av_cold int decode_init(AVCodecContext *avctx)
         av_log(avctx, AV_LOG_WARNING, "Unknown prores profile %d\n", avctx->codec_tag);
     }
 
-    if (avctx->bits_per_raw_sample == 10) {
-        av_log(avctx, AV_LOG_DEBUG, "Auto bitdepth precision. Use 10b decoding based on codec tag.\n");
-    } else { /* 12b */
-        av_log(avctx, AV_LOG_DEBUG, "Auto bitdepth precision. Use 12b decoding based on codec tag.\n");
-    }
+    ctx->unpack_alpha = avctx->bits_per_raw_sample == 10 ?
+                            unpack_alpha_10 : unpack_alpha_12;
+
+    av_log(avctx, AV_LOG_DEBUG,
+           "Auto bitdepth precision. Use %db decoding based on codec tag.\n",
+           avctx->bits_per_raw_sample);
 
     ff_blockdsp_init(&ctx->bdsp);
-    ret = ff_proresdsp_init(&ctx->prodsp, avctx->bits_per_raw_sample);
-    if (ret < 0) {
-        av_log(avctx, AV_LOG_ERROR, "Fail to init proresdsp for bits per raw sample %d\n", avctx->bits_per_raw_sample);
-        return ret;
-    }
+    ff_proresdsp_init(&ctx->prodsp, avctx->bits_per_raw_sample);
 
-    ff_init_scantable_permutation(idct_permutation,
-                                  ctx->prodsp.idct_permutation_type);
-
-    ff_permute_scantable(ctx->progressive_scan, ff_prores_progressive_scan, idct_permutation);
-    ff_permute_scantable(ctx->interlaced_scan, ff_prores_interlaced_scan, idct_permutation);
+    ff_permute_scantable(ctx->progressive_scan, ff_prores_progressive_scan,
+                         ctx->prodsp.idct_permutation);
+    ff_permute_scantable(ctx->interlaced_scan,  ff_prores_interlaced_scan,
+                         ctx->prodsp.idct_permutation);
 
     ctx->pix_fmt = AV_PIX_FMT_NONE;
 
-    if (avctx->bits_per_raw_sample == 10){
-        ctx->unpack_alpha = unpack_alpha_10;
-    } else if (avctx->bits_per_raw_sample == 12){
-        ctx->unpack_alpha = unpack_alpha_12;
-    } else {
-        av_log(avctx, AV_LOG_ERROR, "Fail to set unpack_alpha for bits per raw sample %d\n", avctx->bits_per_raw_sample);
-        return AVERROR_BUG;
-    }
-    return ret;
+    return 0;
 }
 
 static int decode_frame_header(ProresContext *ctx, const uint8_t *buf,
@@ -268,6 +252,7 @@ static int decode_frame_header(ProresContext *ctx, const uint8_t *buf,
 
     if (pix_fmt != ctx->pix_fmt) {
 #define HWACCEL_MAX (CONFIG_PRORES_VIDEOTOOLBOX_HWACCEL)
+#if HWACCEL_MAX
         enum AVPixelFormat pix_fmts[HWACCEL_MAX + 2], *fmtp = pix_fmts;
         int ret;
 
@@ -283,6 +268,9 @@ static int decode_frame_header(ProresContext *ctx, const uint8_t *buf,
             return ret;
 
         avctx->pix_fmt = ret;
+#else
+        avctx->pix_fmt = ctx->pix_fmt = pix_fmt;
+#endif
     }
 
     ctx->frame->color_primaries = buf[14];
@@ -428,7 +416,7 @@ static int decode_picture_header(AVCodecContext *avctx, const uint8_t *buf, cons
         unsigned int rice_order, exp_order, switch_bits;                \
         unsigned int q, buf, bits;                                      \
                                                                         \
-        UPDATE_CACHE(re, gb);                                           \
+        UPDATE_CACHE_32(re, gb); /* We really need 32 bits */           \
         buf = GET_CACHE(re, gb);                                        \
                                                                         \
         /* number of bits to switch between rice and exp golomb */      \
@@ -440,7 +428,7 @@ static int decode_picture_header(AVCodecContext *avctx, const uint8_t *buf, cons
                                                                         \
         if (q > switch_bits) { /* exp golomb */                         \
             bits = exp_order - switch_bits + (q<<1);                    \
-            if (bits > FFMIN(MIN_CACHE_BITS, 31))                       \
+            if (bits > 31)                                              \
                 return AVERROR_INVALIDDATA;                             \
             val = SHOW_UBITS(re, gb, bits) - (1 << exp_order) +         \
                 ((switch_bits + 1) << rice_order);                      \
@@ -502,7 +490,7 @@ static av_always_inline int decode_ac_coeffs(AVCodecContext *avctx, GetBitContex
     int log2_block_count = av_log2(blocks_per_slice);
 
     OPEN_READER(re, gb);
-    UPDATE_CACHE(re, gb);                                           \
+    UPDATE_CACHE_32(re, gb);
     run   = 4;
     level = 2;
 
@@ -803,7 +791,7 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
         return ret;
     ff_thread_finish_setup(avctx);
 
-    if (avctx->hwaccel) {
+    if (HWACCEL_MAX && avctx->hwaccel) {
         const FFHWAccel *hwaccel = ffhwaccel(avctx->hwaccel);
         ret = hwaccel->start_frame(avctx, NULL, 0);
         if (ret < 0)
@@ -876,10 +864,12 @@ const FFCodec ff_prores_decoder = {
     UPDATE_THREAD_CONTEXT(update_thread_context),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_SLICE_THREADS | AV_CODEC_CAP_FRAME_THREADS,
     .p.profiles     = NULL_IF_CONFIG_SMALL(ff_prores_profiles),
+#if HWACCEL_MAX
     .hw_configs     = (const AVCodecHWConfigInternal *const []) {
 #if CONFIG_PRORES_VIDEOTOOLBOX_HWACCEL
         HWACCEL_VIDEOTOOLBOX(prores),
 #endif
         NULL
     },
+#endif
 };
