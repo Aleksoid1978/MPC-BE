@@ -3844,7 +3844,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_PUBLISHED           "Опубликовано : "
-    IDS_OPENING_YOUTUBE     "Открытие Youtube ..."
+    IDS_OPENING_YOUTUBE     "Открытие YouTube ..."
     IDS_CALLING_YOUTUBEDL   "Вызов youtube-dl ..."
 END
 

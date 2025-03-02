@@ -3843,7 +3843,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_PUBLISHED           "Publicat: "
-    IDS_OPENING_YOUTUBE     "Se deschide Youtube ..."
+    IDS_OPENING_YOUTUBE     "Se deschide YouTube ..."
     IDS_CALLING_YOUTUBEDL   "Se apelează youtube-dl ..."
 END
 
