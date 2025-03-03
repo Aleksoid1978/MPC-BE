@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1831,6 +1831,13 @@ static const struct {
 	// HEVC
 	{&DXVA2_ModeHEVC_VLD_Main,						L"HEVC"},
 	{&DXVA2_ModeHEVC_VLD_Main10,					L"HEVC 10-bit"},
+
+	{&D3D11_DECODER_PROFILE_HEVC_VLD_MAIN12,		L"HEVC 12-bit"},
+	{&D3D11_DECODER_PROFILE_HEVC_VLD_MAIN10_422,	L"HEVC 422 10-bit"},
+	{&D3D11_DECODER_PROFILE_HEVC_VLD_MAIN12_422,	L"HEVC 422 12-bit"},
+	{&D3D11_DECODER_PROFILE_HEVC_VLD_MAIN_444,		L"HEVC 444 8-bit"},
+	{&D3D11_DECODER_PROFILE_HEVC_VLD_MAIN10_444,	L"HEVC 444 10-bit"},
+	{&D3D11_DECODER_PROFILE_HEVC_VLD_MAIN12_444,	L"HEVC 444 12-bit"},
 	// VP8
 	{&DXVA2_ModeVP8_VLD,							L"VP8"},
 	// VP9
