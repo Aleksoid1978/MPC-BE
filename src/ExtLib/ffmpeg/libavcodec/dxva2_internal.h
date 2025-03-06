@@ -65,6 +65,8 @@
 #endif
 
 // ==> Start patch MPC
+#define FF_D3D11_WORKAROUND_NVIDIA_HEVC_420P12 10 ///< Work around for Nvidia Direct3D11 Hevc 420p12 decoder
+
 #pragma pack(push, 1)
 typedef struct
 {

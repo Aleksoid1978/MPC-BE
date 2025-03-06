@@ -456,8 +456,10 @@ static int dxva2_hevc_end_frame(AVCodecContext *avctx)
     struct hevc_dxva2_picture_context *ctx_pic = h->cur_frame->hwaccel_picture_private;
 // ==> Start patch MPC
     //int scale = ctx_pic->pp.dwCodingParamToolFlags & 1;
+    AVDXVAContext *ctx = DXVA_CONTEXT(avctx);
     int scale = ctx_pic->pp.main.dwCodingParamToolFlags & 1;
-    int rext = avctx->profile == AV_PROFILE_HEVC_REXT && ff_dxva2_is_d3d11(avctx);
+    int rext = avctx->profile == AV_PROFILE_HEVC_REXT && ff_dxva2_is_d3d11(avctx) &&
+               !((avctx->sw_pix_fmt == AV_PIX_FMT_YUV420P12) && (DXVA_CONTEXT_WORKAROUND(avctx, ctx) & FF_D3D11_WORKAROUND_NVIDIA_HEVC_420P12));
 // ==> End patch MPC
     int ret;
 

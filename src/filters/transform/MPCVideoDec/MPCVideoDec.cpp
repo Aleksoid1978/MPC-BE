@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2653,7 +2653,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 	if (IsDXVASupported(m_hwType == HwType::DXVA2 || m_hwType == HwType::D3D11)) {
 		if (m_hwType == HwType::D3D11 && m_CodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_REXT) {
 			switch (pix_fmt) {
-				case AV_PIX_FMT_YUV420P12: m_VideoOutputFormats.push_back(DXVA_P016); break;
+				case AV_PIX_FMT_YUV420P12: m_VideoOutputFormats.push_back(m_nPCIVendor == PCIV_nVidia ? DXVA_P010 : DXVA_P016); break;
 				case AV_PIX_FMT_YUV422P:   m_VideoOutputFormats.push_back(DXVA_YUY2); break;
 				case AV_PIX_FMT_YUV422P10: m_VideoOutputFormats.push_back(DXVA_Y210); break;
 				case AV_PIX_FMT_YUV422P12: m_VideoOutputFormats.push_back(DXVA_Y216); break;

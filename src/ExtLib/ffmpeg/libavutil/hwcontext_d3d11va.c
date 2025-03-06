@@ -114,6 +114,7 @@ static const struct {
 // ==> Start patch MPC
     { DXGI_FORMAT_P016,         AV_PIX_FMT_P016      },
     { DXGI_FORMAT_P016,         AV_PIX_FMT_YUV420P12 },
+    { DXGI_FORMAT_P010,         AV_PIX_FMT_YUV420P12 },
     { DXGI_FORMAT_YUY2,         AV_PIX_FMT_YUV422P   },
     { DXGI_FORMAT_Y210,         AV_PIX_FMT_YUV422P10 },
     { DXGI_FORMAT_Y216,         AV_PIX_FMT_YUV422P12 },
@@ -289,6 +290,41 @@ static int d3d11va_frames_init(AVHWFramesContext *ctx)
     for (i = 0; i < FF_ARRAY_ELEMS(supported_formats); i++) {
         if (ctx->sw_format == supported_formats[i].pix_fmt) {
             s->format = supported_formats[i].d3d_format;
+// ==> Start patch MPC
+            texDesc = (D3D11_TEXTURE2D_DESC){
+                .Width      = ctx->width,
+                .Height     = ctx->height,
+                .MipLevels  = 1,
+                .Format     = s->format,
+                .SampleDesc = { .Count = 1 },
+                .ArraySize  = ctx->initial_pool_size,
+                .Usage      = D3D11_USAGE_DEFAULT,
+                .BindFlags  = hwctx->BindFlags,
+                .MiscFlags  = hwctx->MiscFlags,
+            };
+
+            if (hwctx->texture) {
+                D3D11_TEXTURE2D_DESC texDesc2;
+                ID3D11Texture2D_GetDesc(hwctx->texture, &texDesc2);
+
+                if (texDesc.Width != texDesc2.Width ||
+                    texDesc.Height != texDesc2.Height ||
+                    texDesc.Format != texDesc2.Format) {
+                    av_log(ctx, AV_LOG_ERROR, "User-provided texture has mismatching parameters\n");
+                    return AVERROR(EINVAL);
+                }
+
+                ctx->initial_pool_size = texDesc2.ArraySize;
+                hwctx->BindFlags = texDesc2.BindFlags;
+                hwctx->MiscFlags = texDesc2.MiscFlags;
+            } else if (!(texDesc.BindFlags & D3D11_BIND_RENDER_TARGET) && texDesc.ArraySize > 0) {
+                hr = ID3D11Device_CreateTexture2D(device_hwctx->device, &texDesc, NULL, &hwctx->texture);
+                if (FAILED(hr)) {
+                    av_log(ctx, AV_LOG_ERROR, "Could not create the texture (%lx)\n", (long)hr);
+                    continue;
+                }
+            }
+// ==> End patch MPC
             break;
         }
     }
@@ -298,6 +334,8 @@ static int d3d11va_frames_init(AVHWFramesContext *ctx)
         return AVERROR(EINVAL);
     }
 
+// ==> Start patch MPC
+/*
     texDesc = (D3D11_TEXTURE2D_DESC){
         .Width      = ctx->width,
         .Height     = ctx->height,
@@ -331,6 +369,8 @@ static int d3d11va_frames_init(AVHWFramesContext *ctx)
             return AVERROR_UNKNOWN;
         }
     }
+*/
+// ==> End patch MPC
 
     hwctx->texture_infos = av_realloc_f(NULL, ctx->initial_pool_size, sizeof(*hwctx->texture_infos));
     if (!hwctx->texture_infos)

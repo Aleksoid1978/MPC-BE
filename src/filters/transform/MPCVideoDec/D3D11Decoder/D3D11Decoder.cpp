@@ -16,7 +16,7 @@
 *  with this program; if not, write to the Free Software Foundation, Inc.,
 *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 *
-*  Adaptation for MPC-BE (C) 2021-2023 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+*  Adaptation for MPC-BE (C) 2021-2025 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
 */
 
 #include "stdafx.h"
@@ -30,6 +30,8 @@
 #include "../DxgiUtils.h"
 
 #include <dxgi1_2.h>
+
+#define FF_D3D11_WORKAROUND_NVIDIA_HEVC_420P12 10 ///< Work around for Nvidia Direct3D11 Hevc 420p12 decoder
 
 #pragma warning(push)
 #pragma warning(disable: 4005)
@@ -93,7 +95,7 @@ static DWORD dxva_align_dimensions(AVCodecID codec, DWORD dim)
 	return FFALIGN(dim, align);
 }
 
-static DXGI_FORMAT d3d11va_map_sw_to_hw_format(enum AVPixelFormat pix_fmt)
+static DXGI_FORMAT d3d11va_map_sw_to_hw_format(enum AVPixelFormat pix_fmt, bool nvidia)
 {
 	switch (pix_fmt)
 	{
@@ -101,7 +103,7 @@ static DXGI_FORMAT d3d11va_map_sw_to_hw_format(enum AVPixelFormat pix_fmt)
 		case AV_PIX_FMT_P010:
 			return DXGI_FORMAT_P010;
 		case AV_PIX_FMT_YUV420P12:
-			return DXGI_FORMAT_P016;
+			return nvidia ? DXGI_FORMAT_P010 : DXGI_FORMAT_P016;
 		case AV_PIX_FMT_YUV422P:
 			return DXGI_FORMAT_YUY2;
 		case AV_PIX_FMT_YUV422P10:
@@ -215,7 +217,7 @@ HRESULT CD3D11Decoder::CreateD3D11Decoder(AVCodecContext* c)
 
 	// find a decoder configuration
 	GUID profileGUID = GUID_NULL;
-	DXGI_FORMAT surface_format = d3d11va_map_sw_to_hw_format(c->sw_pix_fmt);
+	DXGI_FORMAT surface_format = d3d11va_map_sw_to_hw_format(c->sw_pix_fmt, m_pFilter->m_nPCIVendor == PCIV_nVidia);
 	hr = FindVideoServiceConversion(c, c->codec_id, c->profile, surface_format, &profileGUID);
 	if (FAILED(hr)) {
 		DLog(L"CD3D11Decoder::CreateD3D11Decoder() : No video service profile found");
@@ -481,11 +483,11 @@ HRESULT CD3D11Decoder::ReInitD3D11Decoder(AVCodecContext* c)
 
 	if (m_pDecoder == nullptr || m_dwSurfaceWidth != dxva_align_dimensions(c->codec_id, c->coded_width) ||
 			m_dwSurfaceHeight != dxva_align_dimensions(c->codec_id, c->coded_height) ||
-			m_SurfaceFormat != d3d11va_map_sw_to_hw_format(c->sw_pix_fmt)) {
+			m_SurfaceFormat != d3d11va_map_sw_to_hw_format(c->sw_pix_fmt, m_pFilter->m_nPCIVendor == PCIV_nVidia)) {
 		AVD3D11VADeviceContext* pDeviceContext = (AVD3D11VADeviceContext*)((AVHWDeviceContext*)m_pDevCtx->data)->hwctx;
 		DLog(L"CD3D11Decoder::ReInitD3D11Decoder() : No D3D11 Decoder or video dimensions/format changed -> Re-Allocating resources");
 
-		const auto bChangeFormat = m_SurfaceFormat != DXGI_FORMAT_UNKNOWN && m_SurfaceFormat != d3d11va_map_sw_to_hw_format(c->sw_pix_fmt);
+		const auto bChangeFormat = m_SurfaceFormat != DXGI_FORMAT_UNKNOWN && m_SurfaceFormat != d3d11va_map_sw_to_hw_format(c->sw_pix_fmt, m_pFilter->m_nPCIVendor == PCIV_nVidia);
 
 		if (m_pDecoder)
 			avcodec_flush_buffers(c);
@@ -562,7 +564,7 @@ void CD3D11Decoder::PostInitDecoder(AVCodecContext* c)
 	}
 
 	// initialize surface format to ensure the default media type is set properly
-	m_SurfaceFormat = d3d11va_map_sw_to_hw_format(c->sw_pix_fmt);
+	m_SurfaceFormat = d3d11va_map_sw_to_hw_format(c->sw_pix_fmt, m_pFilter->m_nPCIVendor == PCIV_nVidia);
 	m_dwSurfaceWidth = dxva_align_dimensions(c->codec_id, c->coded_width);
 	m_dwSurfaceHeight = dxva_align_dimensions(c->codec_id, c->coded_height);
 }
@@ -691,6 +693,10 @@ void CD3D11Decoder::FillHWContext(AVD3D11VAContext* ctx)
 	ctx->context_mutex = pDeviceContext->lock_ctx;
 
 	ctx->workaround = 0;
+
+	if (m_pFilter->m_nPCIVendor == PCIV_nVidia) {
+		ctx->workaround = FF_D3D11_WORKAROUND_NVIDIA_HEVC_420P12;
+	}
 }
 
 void CD3D11Decoder::AdditionaDecoderInit(AVCodecContext* c)
