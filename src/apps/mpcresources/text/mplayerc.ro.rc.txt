@@ -564,7 +564,7 @@ END
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25
 5		"Ascultă pe portul:"
 7		"Calitatea imaginii %:"
-11		"Activează comprimarea"
+11		"Activează comprimarea (compresia)"
 12		"Permite accesul numai de la localhost (reţeaua internă)"
 13		"Activează previzualizarea"
 14		"Afișează informațiile de depanare"
