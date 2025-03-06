@@ -786,6 +786,7 @@ void File_Nsv::Data_Parse()
                                             if (P->AudioDelay!=numeric_limits<int64s>::min() && Retrieve(Stream_Audio, 0, Audio_Delay).empty())
                                                 Fill(Stream_Audio, 0, Audio_Delay, float64_int64s(((float64)P->AudioDelay)/1000000));
                                             break;
+						default:;
                     }
                 }
             }
@@ -837,7 +838,7 @@ void File_StarDiva::Read_Buffer_Continue()
 
 
     size_t Begin;
-    size_t End;
+    size_t End{};
 
     Element_Begin1("StarDiva time line data");
         Element_Begin1("Header");
@@ -1248,7 +1249,7 @@ void File_StarDiva::Read_Buffer_Continue()
                 // Eliminate obviously wrong catches: 1 char long but another catch has longer strings
                 size_t MinMinStringSize=(size_t)-1;
                 size_t MaxMinStringSize=0;
-                for(map<int, size_t>::iterator It=CheckOfMultiplesOfTimes2x_Values.begin(); It!=CheckOfMultiplesOfTimes2x_Values.end(); It++)
+                for(map<int, size_t>::iterator It=CheckOfMultiplesOfTimes2x_Values.begin(); It!=CheckOfMultiplesOfTimes2x_Values.end(); ++It)
                 {
                     if (MinMinStringSize>It->second)
                         MinMinStringSize=It->second;
@@ -1256,7 +1257,7 @@ void File_StarDiva::Read_Buffer_Continue()
                         MaxMinStringSize=It->second;
                 }
                 if (MinMinStringSize==1 && MaxMinStringSize>1)
-                    for(map<int, size_t>::iterator It=CheckOfMultiplesOfTimes2x_Values.begin(); It!=CheckOfMultiplesOfTimes2x_Values.end(); It++)
+                    for(map<int, size_t>::iterator It=CheckOfMultiplesOfTimes2x_Values.begin(); It!=CheckOfMultiplesOfTimes2x_Values.end(); ++It)
                     {
                         if (It->second!=1)
                         {

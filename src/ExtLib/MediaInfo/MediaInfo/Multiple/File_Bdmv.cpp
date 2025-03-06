@@ -1542,6 +1542,7 @@ void File_Bdmv::Mpls_ExtensionData_SubPath_entries()
                         for (int8u Pos=0; Pos<number_of_SubPlayItems; Pos++)
                             Mpls_PlayList_SubPlayItem(SubPath_type, Pos);
                         }
+                        break;
             default   : ;
         }
         if (SubPath_extension_End-Element_Offset)

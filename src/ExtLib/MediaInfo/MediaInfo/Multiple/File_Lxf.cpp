@@ -1552,7 +1552,7 @@ void File_Lxf::Audio_Stream(size_t Pos)
         {
             if (!Audios[Pos].Parsers[Pos2]->Status[IsAccepted] && Audios[Pos].Parsers[Pos2]->Status[IsFinished])
             {
-                delete *(Audios[Pos].Parsers.begin()+Pos2);
+                delete static_cast<MediaInfoLib::File__Analyze*>(*(Audios[Pos].Parsers.begin()+Pos2));
                 Audios[Pos].Parsers.erase(Audios[Pos].Parsers.begin()+Pos2);
                 Pos2--;
             }
@@ -1562,7 +1562,7 @@ void File_Lxf::Audio_Stream(size_t Pos)
                 for (size_t Pos3=0; Pos3<Audios[Pos].Parsers.size(); Pos3++)
                 {
                     if (Pos3!=Pos2)
-                        delete *(Audios[Pos].Parsers.begin()+Pos3);
+                        delete static_cast<MediaInfoLib::File__Analyze*>(*(Audios[Pos].Parsers.begin()+Pos3));
                 }
                 Audios[Pos].Parsers.clear();
                 Audios[Pos].Parsers.push_back(Parser);
@@ -1843,7 +1843,7 @@ void File_Lxf::Video_Stream_2()
         {
             if (!Videos[2].Parsers[Pos2]->Status[IsAccepted] && Videos[2].Parsers[Pos2]->Status[IsFinished])
             {
-                delete *(Videos[2].Parsers.begin()+Pos2);
+                delete static_cast<MediaInfoLib::File__Analyze*>(*(Videos[2].Parsers.begin()+Pos2));
                 Videos[2].Parsers.erase(Videos[2].Parsers.begin()+Pos2);
                 Pos2--;
             }
@@ -1853,7 +1853,7 @@ void File_Lxf::Video_Stream_2()
                 for (size_t Pos3=0; Pos3<Videos[2].Parsers.size(); Pos3++)
                 {
                     if (Pos3!=Pos2)
-                        delete *(Videos[2].Parsers.begin()+Pos3);
+                        delete static_cast<MediaInfoLib::File__Analyze*>(*(Videos[2].Parsers.begin()+Pos3));
                 }
                 Videos[2].Parsers.clear();
                 Videos[2].Parsers.push_back(Parser);

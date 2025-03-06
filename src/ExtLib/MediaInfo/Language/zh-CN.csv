@@ -3,7 +3,7 @@
   Author_Name;stevenlele
   Author_OldNames;chriszxl, erabbit, weiq530, nkh0472
   Language_Name;简体中文
-  Config_Text_ColumnSize;30
+  Config_Text_ColumnSize;40
   Config_Text_Separator; : 
   Config_Text_NumberTag; #
   Config_Text_FloatSeparator;.

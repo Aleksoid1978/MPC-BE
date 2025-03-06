@@ -1261,7 +1261,7 @@ static element_items audioTrackFormat_Elements =
 {
     { "audioStreamFormatIDRef"                  , { 0, 7, 0, 1, 0, 0, 1, 0, 1, 1, 0 } },
 };
-static_assert(sizeof(audioTrackFormat_Elements) / sizeof(attribute_item) == audioTrackFormat_Element_Max, IncoherencyMessage);
+static_assert(sizeof(audioTrackFormat_Elements) / sizeof(element_item) == audioTrackFormat_Element_Max, IncoherencyMessage);
 
 static attribute_items audioStreamFormat_Attributes =
 {
@@ -2141,7 +2141,10 @@ size_t Atmos_zone_Pos(const string& Name, float32* Values) {
 }
 
 string CraftName(const char* Name, bool ID = false) {
-    return (ID && !strcmp(Name, "Track")) ? "track" : ((Name && Name[0] < 'a' ? "audio" : "") + string(Name));
+    if (Name)
+        return (ID && !strcmp(Name, "Track")) ? "track" : ((Name && Name[0] < 'a' ? "audio" : "") + string(Name));
+    else
+        return "";
 }
 
 enum class E {
@@ -2197,7 +2200,7 @@ struct Item_Struct {
     void AddError(error_Type Error_Type, size_t Item_Type, size_t i, const string& NewValue, source Source = Source_ADM) {
         AddError(Error_Type, (item)Item_Type, i, NewValue, Source);
     }
-    void AddError(error_Type Error_Type, char AttEle, E Error_Value, int8u Opt0, source Source = Source_ADM) {
+    void AddError(error_Type Error_Type, int8u AttEle, E Error_Value, int8u Opt0, source Source = Source_ADM) {
         string NewValue;
         NewValue.resize((size_t)e::Max);
         NewValue[(size_t)e::ErrorType] = (char)Error_Value;
@@ -2205,7 +2208,7 @@ struct Item_Struct {
         NewValue[(size_t)e::Opt0] = (char)Opt0;
         AddError(Error_Type, NewValue, Source);
     }
-    void AddError(error_Type Error_Type, char AttEle, E Error_Value, file_adm_private* File_Adm_Private, const string& Opt0, source Source = Source_ADM);
+    void AddError(error_Type Error_Type, int8u AttEle, E Error_Value, file_adm_private* File_Adm_Private, const string& Opt0, source Source = Source_ADM);
 };
 
 struct Items_Struct {
@@ -2398,7 +2401,7 @@ public:
     file_adm_private()
     {
         auto OldLocale_Temp = setlocale(LC_NUMERIC, nullptr);
-        if (*OldLocale_Temp != 'C' || *(OldLocale_Temp + 1)) {
+        if (OldLocale_Temp && (*OldLocale_Temp != 'C' || *(OldLocale_Temp + 1))) {
             OldLocale = OldLocale_Temp;
             setlocale(LC_NUMERIC, "C");
         }
@@ -2626,7 +2629,7 @@ int tfsxml::Value() {
 
 
 //---------------------------------------------------------------------------
-void Item_Struct::AddError(error_Type Error_Type, char AttEle, E Error_Value, file_adm_private* File_Adm_Private, const string& Opt0, source Source) {
+void Item_Struct::AddError(error_Type Error_Type, int8u AttEle, E Error_Value, file_adm_private* File_Adm_Private, const string& Opt0, source Source) {
     auto& Tips = File_Adm_Private->Errors_Tips[Error_Type][Source];
     auto Tips_Size = Tips.size();
     if (Tips_Size < 255) {
@@ -2636,7 +2639,7 @@ void Item_Struct::AddError(error_Type Error_Type, char AttEle, E Error_Value, fi
         Tips_Size = 255;
         Tips[255].clear();
     }
-    AddError(Error_Type, AttEle, Error_Value, (char)Tips_Size, Source);
+    AddError(Error_Type, AttEle, Error_Value, (int8u)Tips_Size, Source);
 }
 
 //---------------------------------------------------------------------------
@@ -2827,6 +2830,8 @@ static void CheckErrors_ID_Additions(file_adm_private* File_Adm_Private, item it
 };
 
 //---------------------------------------------------------------------------
+#pragma warning( push )
+#pragma warning( disable : 26813 ) //false positive "Use 'bitwise and' to check if a flag is set."
 static void CheckErrors_formatLabelDefinition(file_adm_private* File_Adm_Private, item item_Type, size_t i, const label_info& label_Info) {
     const bool IsAtmos = File_Adm_Private->IsAtmos;
     auto& Item = File_Adm_Private->Items[item_Type].Items[i];
@@ -2892,6 +2897,7 @@ static void CheckErrors_formatLabelDefinition(file_adm_private* File_Adm_Private
         }
     }
 };
+#pragma warning( pop )
 
 //---------------------------------------------------------------------------
 static void CheckErrors_Attributes(file_adm_private* File_Adm_Private, item Item_Type, const vector<size_t>& Attributes_Counts) {
@@ -2911,27 +2917,27 @@ static void CheckErrors_Attributes(file_adm_private* File_Adm_Private, item Item
         switch (Attributes_Counts[j]) {
         case 0:
             if (!Info.Flags[Count0]) {
-                Item.AddError(Error, 0x80 | j, E::Present0, 0);
+                Item.AddError(Error, 0x80 | (int8u)j, E::Present0, 0);
                 break;
             }
             if (!Info.Flags[AdvSSE0]) {
-                Item.AddError(Error, 0x80 | j, E::Present0, 0, Source_AdvSSE_1);
+                Item.AddError(Error, 0x80 | (int8u)j, E::Present0, 0, Source_AdvSSE_1);
             }
             if (!Info.Flags[Dolby0]) {
-                Item.AddError(Error, 0x80 | j, E::Present0, 0, Source_Atmos_1_0);
+                Item.AddError(Error, 0x80 | (int8u)j, E::Present0, 0, Source_Atmos_1_0);
             }
             break;
         default:
             Item.AddError(Error, ':' + CraftName(item_Infos[Item_Type].Name) + to_string(i) + ":" + CraftName(Attribute_Infos[j].Name) + ":" + string(Attribute_Infos[j].Name) + " attribute shall be unique");
-            // Fallthrough
+            [[fallthrough]];
         case 1:
         {
             Attributes_Present[j] = true;
             if (!Info.Flags[AdvSSE1]) {
-                Item.AddError(Error, 0x80 | j, E::Present1, 0, Source_AdvSSE_1);
+                Item.AddError(Error, 0x80 | (int8u)j, E::Present1, 0, Source_AdvSSE_1);
             }
             if (!Info.Flags[Dolby1] && (/*File_Adm_Private->Schema != Schema_ebuCore_2014 ||*/ strcmp(Info.Name, "typeLabel") && strcmp(Info.Name, "typeDefinition"))) {
-                Item.AddError(Error, 0x80 | j, E::Present1, 0, Source_Atmos_1_0);
+                Item.AddError(Error, 0x80 | (int8u)j, E::Present1, 0, Source_Atmos_1_0);
             }
             const auto& Attribute = Attributes[j];
             if (Attribute.size() > 64) {
@@ -3027,7 +3033,7 @@ static void CheckErrors_Elements(file_adm_private* File_Adm_Private, item Item_T
             }
             else if (Elem.empty() && Item_Type) {
                 #define ITEM_ELEM(A,B) ((A << 8) | B)
-                switch (ITEM_ELEM(Item_Type, j)) {
+                switch (ITEM_ELEM(static_cast<size_t>(Item_Type), j)) {
                 case ITEM_ELEM(item_audioProgrammeReferenceScreen, audioProgrammeReferenceScreen_screenCentrePosition):
                 case ITEM_ELEM(item_audioProgrammeReferenceScreen, audioProgrammeReferenceScreen_screenWidth):
                 case ITEM_ELEM(item_audioBlockFormat, audioBlockFormat_headphoneVirtualise):
@@ -3130,13 +3136,13 @@ void CheckError_Language(file_adm_private* File_Adm_Private, item Item_Type, siz
         return;
     }
     if (Language.size() < 2 || Language.size() > 3 || Language.find_first_not_of("abcdefghijklmnopqrstuvwxyz") != string::npos) {
-        Item.AddError(Error, 0x80 | j, E::Form, File_Adm_Private, Language);
+        Item.AddError(Error, 0x80 | (int8u)j, E::Form, File_Adm_Private, Language);
     }
     else if (Language.size() != 3) {
-        Item.AddError(Error, 0x80 | j, E::Form, File_Adm_Private, Language, Source_AdvSSE_1);
+        Item.AddError(Error, 0x80 | (int8u)j, E::Form, File_Adm_Private, Language, Source_AdvSSE_1);
     }
     else if (Language.size() != 2) {
-        Item.AddError(Error, 0x80 | j, E::Form, File_Adm_Private, Language, Source_Atmos_1_0);
+        Item.AddError(Error, 0x80 | (int8u)j, E::Form, File_Adm_Private, Language, Source_Atmos_1_0);
     }
 }
 
@@ -3150,7 +3156,7 @@ TimeCode CheckError_Time(file_adm_private* File_Adm_Private, item Item_Type, siz
     auto& TimeInfo = Item.Attributes[j];
     TimeCode TimeInfo_TC = TimeInfo;
     if (!TimeInfo_TC.IsValid()) {
-        Item.AddError(Error, 0x80 | j, E::Form, File_Adm_Private, TimeInfo);
+        Item.AddError(Error, 0x80 | (int8u)j, E::Form, File_Adm_Private, TimeInfo);
     }
     return TimeInfo_TC;
 }
@@ -3210,7 +3216,7 @@ void loudnessMetadata_Check(file_adm_private* File_Adm_Private, item Item_Type) 
     auto& loudnessMetadata = loudnessMetadatas.back();
 
     size_t i = Programmes.size() - 1;
-    size_t j = Programme.Elements[Item_Type == item_audioProgramme ? audioProgramme_loudnessMetadata : audioContent_loudnessMetadata].size() - 1;
+    size_t j = Programme.Elements[Item_Type == item_audioProgramme ? (size_t)audioProgramme_loudnessMetadata : (size_t)audioContent_loudnessMetadata].size() - 1;
 
     if (loudnessMetadata.Elements[loudnessMetadata_integratedLoudness].empty() && loudnessMetadata.Elements[loudnessMetadata_dialogueLoudness].empty())
         Programme.AddError(Error, string(":") + item_Infos[Item_Type].Name + to_string(i) + ":loudnessMetadata" + to_string(j) + ":integratedLoudness is not present", Source_AdvSSE_1);
@@ -3413,10 +3419,10 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
     auto GetStart = [&](size_t Element_Pos) -> TimeCode {
         if (BlockFormat.Attributes_Present[Element_Pos]) {
             if (File_Adm_Private->IsLocalTimeReference != (Element_Pos == audioBlockFormat_lstart) || initializeBlockActive) {
-                BlockFormat.AddError(Error, 0x80 | Element_Pos, E::Present1, 0);
+                BlockFormat.AddError(Error, 0x80 | (int8u)Element_Pos, E::Present1, 0);
             }
             else if (Type != Type_Objects) {
-                BlockFormat.AddError(Error, 0x80 | Element_Pos, E::Present1, 0, Source_AdvSSE_1);
+                BlockFormat.AddError(Error, 0x80 | (int8u)Element_Pos, E::Present1, 0, Source_AdvSSE_1);
             }
             auto Start_TC = CheckError_Time(File_Adm_Private, item_audioBlockFormat, Element_Pos);
             if (Start_TC.IsValid() && audioBlockFormat_Count == 1) {
@@ -3436,17 +3442,17 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
             return Start_TC;
         }
         else if (File_Adm_Private->IsLocalTimeReference == (Element_Pos == audioBlockFormat_lstart) && CheckNotPresent) {
-            BlockFormat.AddError(Error, 0x80 | Element_Pos, E::Present0, 0, Source_AdvSSE_1);
+            BlockFormat.AddError(Error, 0x80 | (int8u)Element_Pos, E::Present0, 0, Source_AdvSSE_1);
         }
         return {};
     };
     auto GetDuration = [&](size_t Element_Pos) -> TimeCode {
         if (BlockFormat.Attributes_Present[Element_Pos]) {
             if (File_Adm_Private->IsLocalTimeReference != (Element_Pos == audioBlockFormat_lduration) || initializeBlockActive) {
-                BlockFormat.AddError(Error, 0x80 | Element_Pos, E::Present1, 0);
+                BlockFormat.AddError(Error, 0x80 | (int8u)Element_Pos, E::Present1, 0);
             }
             else if (Type != Type_Objects) {
-                BlockFormat.AddError(Error, 0x80 | Element_Pos, E::Present1, 0, Source_AdvSSE_1);
+                BlockFormat.AddError(Error, 0x80 | (int8u)Element_Pos, E::Present1, 0, Source_AdvSSE_1);
             }
             auto Duration_TC = CheckError_Time(File_Adm_Private, item_audioBlockFormat, Element_Pos);
             if (Duration_TC.IsValid()) {
@@ -3458,7 +3464,7 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
             return Duration_TC;
         }
         else if (File_Adm_Private->IsLocalTimeReference == (Element_Pos == audioBlockFormat_lduration) && CheckNotPresent) {
-            BlockFormat.AddError(Error, 0x80 | Element_Pos, E::Present0, 0, Source_AdvSSE_1);
+            BlockFormat.AddError(Error, 0x80 | (int8u)Element_Pos, E::Present0, 0, Source_AdvSSE_1);
         }
         return {};
     };
@@ -3478,7 +3484,7 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
     rtime = GetStart(audioBlockFormat_rtime);
     duration = GetDuration(audioBlockFormat_duration);
     if ((int8s)File_Adm_Private->Version_S < 0 && BlockFormat.Attributes_Present[audioBlockFormat_initializeBlock]) {
-        BlockFormat.AddError(Error, 0x80 | audioBlockFormat_initializeBlock, E::Present1, 0);
+        BlockFormat.AddError(Error, 0x80 | (int8u)audioBlockFormat_initializeBlock, E::Present1, 0);
     }
     lstart = GetStart(audioBlockFormat_lstart);
     lduration = GetDuration(audioBlockFormat_lduration);
@@ -3564,6 +3570,8 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
         switch (Type) {
         case Type_Objects:
             BlockFormat.AddError(Error, ":jumpPosition:jumpPosition element is not present", Source_Atmos_1_0);
+            break;
+        default:;
         }
         break;
     default:
@@ -3571,8 +3579,9 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
         case Type_DirectSpeakers:
             BlockFormat.AddError(Error, ":GeneralCompliance:jumpPosition subelement count " + to_string(jumpPositions.size()) + " is not permitted, max is 1", Source_Atmos_1_0);
             break;
+        default:;
         }
-        // Fallthrough
+        [[fallthrough]];
     case 1:
         switch (Type) {
         case Type_Objects: {
@@ -3595,7 +3604,9 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
             else {
                 BlockFormat.AddError(Error, ":jumpPosition0:interpolationLength attribute is not present", Source_Atmos_1_0);
             }
+            break;
         }
+        default:;
         }
     }
 
@@ -3678,7 +3689,7 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
         else {
             const auto& speakerLabel = BlockFormat.Elements[audioBlockFormat_speakerLabel].back();
             speakerLabel_ChannelAssignment = Atmos_audioChannelFormat_Pos(speakerLabel, true);
-            if (speakerLabel_ChannelAssignment == (size_t)-1) {
+            if (speakerLabel_ChannelAssignment == (atmos_audioChannelFormatName)-1) {
                 BlockFormat.AddError(Error, ":speakerLabel:speakerLabel element value " + speakerLabel + " is not permitted", Source_Atmos_1_0);
             }
             else {
@@ -3689,6 +3700,7 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
         }
         break;
     }
+    default:;
     }
 
     unsigned long is_cartesian;
@@ -3805,10 +3817,10 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
         for (size_t k = objectDivergence_Pos; k < objectDivergences.size(); k++) {
             auto& objectDivergence = objectDivergences[k];
             if (!objectDivergence.Attributes_Present[objectDivergence_azimuthRange]) {
-                objectDivergence.AddError(Error, 0x80 | objectDivergence_azimuthRange, E::Present0, 0);
+                objectDivergence.AddError(Error, 0x80 | (int8u)objectDivergence_azimuthRange, E::Present0, 0);
             }
             if (objectDivergence.Attributes_Present[objectDivergence_positionRange]) {
-                objectDivergence.AddError(Error, 0x80 | objectDivergence_positionRange, E::Present1, 0);
+                objectDivergence.AddError(Error, 0x80 | (int8u)objectDivergence_positionRange, E::Present1, 0);
             }
         }
     }
@@ -3847,9 +3859,9 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
                 BlockFormat.AddError(Error, ":position:coordinate:coordinate==\"" + string(1, 'X' + l) + "\" element is not present");
             }
         }
-        if (!ValuesAreNok && speakerLabel_ChannelAssignment != -1) {
+        if (!ValuesAreNok && speakerLabel_ChannelAssignment != (atmos_audioChannelFormatName)-1) {
             auto position_ChannelAssignment = Atmos_audioChannelFormat_Pos(Values[0], Values[1], Values[2], speakerLabel_ChannelAssignment);
-            if (position_ChannelAssignment == -1) {
+            if (position_ChannelAssignment == (atmos_audioChannelFormatName)-1) {
                 BlockFormat.AddError(Error, ":position:position@coordinate=\"X\" \"Y\" \"Z\" element value \"" + Ztring::ToZtring(Values[0], (Values[0] - (int)Values[0]) ? 5 : 0).To_UTF8() + "\" \"" + Ztring::ToZtring(Values[1], (Values[2] - (int)Values[2]) ? 5 : 0).To_UTF8() + "\" \"" + Ztring::ToZtring(Values[2], (Values[2] - (int)Values[2]) ? 5 : 0).To_UTF8() + "\" is not valid", Source_Atmos_1_0);
             }
             else if (position_ChannelAssignment != speakerLabel_ChannelAssignment) {
@@ -3860,10 +3872,10 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
         for (size_t k = objectDivergence_Pos; k < objectDivergences.size(); k++) {
             auto& objectDivergence = objectDivergences[k];
             if (objectDivergence.Attributes_Present[objectDivergence_azimuthRange]) {
-                objectDivergence.AddError(Error, 0x80 | objectDivergence_azimuthRange, E::Present1, 0);
+                objectDivergence.AddError(Error, 0x80 | (int8u)objectDivergence_azimuthRange, E::Present1, 0);
             }
             if (!objectDivergence.Attributes_Present[objectDivergence_positionRange]) {
-                objectDivergence.AddError(Error, 0x80 | objectDivergence_positionRange, E::Present0, 0);
+                objectDivergence.AddError(Error, 0x80 | (int8u)objectDivergence_positionRange, E::Present0, 0);
             }
         }
     }
@@ -3954,7 +3966,7 @@ void gain_Check(file_adm_private* File_Adm_Private) {
             }
         }
         if (Unit < 0) {
-            Gain.AddError(Error, 0x80 | (char)gain_gainUnit, E::Form, File_Adm_Private, Type);
+            Gain.AddError(Error, 0x80 | (int8u)gain_gainUnit, E::Form, File_Adm_Private, Type);
         }
     }
     else {
@@ -3996,7 +4008,7 @@ void coefficient_Check(file_adm_private* File_Adm_Private) {
             }
         }
         if (Unit < 0) {
-            Coefficient.AddError(Error, 0x80 | (char)coefficient_gainUnit, E::Form, File_Adm_Private, Type);
+            Coefficient.AddError(Error, 0x80 | (int8u)coefficient_gainUnit, E::Form, File_Adm_Private, Type);
         }
     }
     else {
@@ -4046,7 +4058,7 @@ void matrix_Check(file_adm_private* File_Adm_Private) {
 
     auto audioBlockFormat_Count = ChannelFormat.Elements[audioChannelFormat_audioBlockFormat].size();
     if (File_Adm_Private->ChannelFormat_Matrix_coefficients.back().size() < 0x100) { // Limit the count of different coefficients stored
-        File_Adm_Private->ChannelFormat_Matrix_coefficients.back().push_back({ audioBlockFormat_Count - 1, move(File_Adm_Private->coefficients) });
+        File_Adm_Private->ChannelFormat_Matrix_coefficients.back().push_back({ audioBlockFormat_Count - 1, std::move(File_Adm_Private->coefficients) });
     }
 }
 
@@ -4069,7 +4081,7 @@ void objectDivergence_Check(file_adm_private* File_Adm_Private) {
         char* End;
         auto Value = strtof(Element.c_str(), &End);
         if (End - Element.c_str() != Element.size()) {
-            objectDivergence.AddError(Error, 0x80 | (char)objectDivergence_azimuthRange, E::Form, File_Adm_Private, Element);
+            objectDivergence.AddError(Error, 0x80 | (int8u)objectDivergence_azimuthRange, E::Form, File_Adm_Private, Element);
         }
         else if (Value < 0 || Value > 1) {
             objectDivergence.AddError(Error, ":azimuthRange" + to_string(k) + ":GeneralCompliance:azimuthRange attribute value \"" + Element + "\" is not permitted, permitted values are [0,180]");
@@ -4082,7 +4094,7 @@ void objectDivergence_Check(file_adm_private* File_Adm_Private) {
         char* End;
         auto Value = strtof(Element.c_str(), &End);
         if (End - Element.c_str() != Element.size()) {
-            objectDivergence.AddError(Error, 0x80 | (char)objectDivergence_positionRange, E::Form, File_Adm_Private, Element);
+            objectDivergence.AddError(Error, 0x80 | (int8u)objectDivergence_positionRange, E::Form, File_Adm_Private, Element);
         }
         else if (Value < 0 || Value > 1) {
             objectDivergence.AddError(Error, ":positionRange" + to_string(k) + ":GeneralCompliance:positionRange attribute value \"" + Element + "\" is not permitted, permitted values are [0,1]");
@@ -4139,7 +4151,7 @@ void zoneExclusion_Check(file_adm_private* File_Adm_Private) {
                     }
                 }
             }
-            int is_cartesian;
+            unsigned long is_cartesian;
             if (HasXYZ.count() * 4 > HasAED.count() * 6) {
                 is_cartesian = 1;
             }
@@ -4288,13 +4300,13 @@ void frameFormat_Check(file_adm_private* File_Adm_Private) {
         for (size_t i = 0; i < type_List_Size; i++) {
             if (Type == type_List[i]) {
                 if (i > 1) {
-                    FrameFormat.AddError(Error, 0x80 | (char)frameFormat_type, E::Permitted, File_Adm_Private, Type, Source_AdvSSE_1);
+                    FrameFormat.AddError(Error, 0x80 | (int8u)frameFormat_type, E::Permitted, File_Adm_Private, Type, Source_AdvSSE_1);
                 }
                 Found = true;
             }
         }
         if (!Found) {
-            FrameFormat.AddError(Error, 0x80 | (char)frameFormat_type, E::Form, File_Adm_Private, Type);
+            FrameFormat.AddError(Error, 0x80 | (int8u)frameFormat_type, E::Form, File_Adm_Private, Type);
         }
     }
 
@@ -4306,13 +4318,13 @@ void frameFormat_Check(file_adm_private* File_Adm_Private) {
         for (size_t i = 0; i < timeReference_List_Size; i++) {
             if (Type == timeReference_List[i]) {
                 if (i != 1) {
-                    FrameFormat.AddError(Error, 0x80 | (char)frameFormat_timeReference, E::Permitted, File_Adm_Private, Type, Source_AdvSSE_1);
+                    FrameFormat.AddError(Error, 0x80 | (int8u)frameFormat_timeReference, E::Permitted, File_Adm_Private, Type, Source_AdvSSE_1);
                 }
                 Found = true;
             }
         }
         if (!Found) {
-            FrameFormat.AddError(Error, 0x80 | (char)frameFormat_timeReference, E::Form, File_Adm_Private, Type);
+            FrameFormat.AddError(Error, 0x80 | (int8u)frameFormat_timeReference, E::Form, File_Adm_Private, Type);
         }
     }
     File_Adm_Private->IsLocalTimeReference = FrameFormat.Attributes[frameFormat_timeReference] == timeReference_List[1];
@@ -4397,7 +4409,7 @@ void transportTrackFormat_Check(file_adm_private* File_Adm_Private) {
         const auto& numIDs = TransportTrackFormat.Attributes[transportTrackFormat_numIDs];
         auto numIDs_Int = strtoul(numIDs.c_str(), nullptr, 10);
         if (to_string(numIDs_Int) != numIDs) {
-            TransportTrackFormat.AddError(Error, 0x80 | transportTrackFormat_numIDs, E::Form, File_Adm_Private, numIDs);
+            TransportTrackFormat.AddError(Error, 0x80 | (int8u)transportTrackFormat_numIDs, E::Form, File_Adm_Private, numIDs);
         }
     }
 
@@ -5482,7 +5494,7 @@ void File_Adm::Streams_Fill()
                 IsAdvSSE = true;
                 IsAdvSSE_Versions.push_back(strtoul(Profile_Item.Attributes[profile_profileVersion].c_str(), nullptr, 10));
                 IsAdvSSE_Levels.push_back(strtoul(Profile_Item.Attributes[profile_profileLevel].c_str(), nullptr, 10));
-                if (IsAdvSSE_Levels.back() > 2 && (Profile == "ITU-R BS.[ADM-NGA-EMISSION]-0" || Profile == "ITU-R BS.[ADM-NGA-EMISSION]-0")) {
+                if (IsAdvSSE_Levels.back() > 2 && (Profile == "ITU-R BS.[ADM-NGA-EMISSION]-0")) {
                     Profiles.back().AddError(Error, ':' + CraftName(item_Infos[item_profile].Name) + to_string(i) + ":profileLevel:profileLevel attribute value " + Profile_Item.Attributes[profile_profileLevel] + " is not permitted, max is 2", Source_AdvSSE_1);
                 }
             }
@@ -6522,7 +6534,7 @@ void File_Adm::Streams_Fill()
                 if (ChannelFormat.Attributes_Present[audioChannelFormat_audioChannelFormatName]) {
                     const auto& ChannelFormatName = ChannelFormat.Attributes[audioChannelFormat_audioChannelFormatName];
                     ChannelAssignment = Atmos_audioChannelFormat_Pos(ChannelFormatName);
-                    if (ChannelAssignment == (size_t)-1) {
+                    if (ChannelAssignment == (atmos_audioChannelFormatName)-1) {
                         ChannelFormat.AddError(Error, ":audioChannelFormat" + to_string(i) + ":audioChannelFormatName:audioChannelFormatName \"" + ChannelFormatName + "\" is not permitted", Source_Atmos_1_0);
                     }
                 }
@@ -6814,7 +6826,7 @@ void File_Adm::chna_Move(File_Adm* Adm)
     if (!File_Adm_Private)
         File_Adm_Private = new file_adm_private();
     File_Adm_Private->Items[item_audioTrack] = Adm->File_Adm_Private->Items[item_audioTrack];
-    File_Adm_Private->OldLocale = move(Adm->File_Adm_Private->OldLocale);
+    File_Adm_Private->OldLocale = std::move(Adm->File_Adm_Private->OldLocale);
 }
 
 } //NameSpace

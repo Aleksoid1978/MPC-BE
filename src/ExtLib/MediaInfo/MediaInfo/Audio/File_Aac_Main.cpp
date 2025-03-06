@@ -723,6 +723,7 @@ void File_Aac::AudioSpecificConfig (size_t End)
                     Frame_Count=(size_t)-1; //Forcing not to parse following data anymore
                 }
             }
+            break;
         default : ;
     }
 

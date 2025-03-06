@@ -957,11 +957,11 @@ void File_Riff::AVI__exif_xxxx()
     //Filling
     switch (Element_Code)
     {
-        case Elements::AVI__exif_ecor : Fill(Stream_General, 0, "Make", Value); break;
-        case Elements::AVI__exif_emdl : Fill(Stream_General, 0, "Model", Value); break;
+        case Elements::AVI__exif_ecor : Fill(Stream_General, 0, General_Encoded_Hardware_CompanyName, Value); break;
+        case Elements::AVI__exif_emdl : Fill(Stream_General, 0, General_Encoded_Hardware_Name, Value); break;
         case Elements::AVI__exif_emnt : Fill(Stream_General, 0, "MakerNotes", Value); break;
         case Elements::AVI__exif_erel : Fill(Stream_General, 0, "RelatedImageFile", Value); break;
-        case Elements::AVI__exif_etim : Fill(Stream_General, 0, "Written_Date", Value); break;
+        case Elements::AVI__exif_etim : Fill(Stream_General, 0, General_Encoded_Date, Value); break;
         case Elements::AVI__exif_eucm : Fill(Stream_General, 0, General_Comment, Value); break;
         case Elements::AVI__exif_ever : break; //Exif version
         default:                    Fill(Stream_General, 0, Ztring().From_CC4((int32u)Element_Code).To_Local().c_str(), Value);
@@ -2169,6 +2169,7 @@ void File_Riff::AVI__hdlr_strl_vprp()
                             Fill(Stream_Video, 0, Video_ScanOrder, "TFF");
                         if (VideoYValidStartLines.size()==2 && VideoYValidStartLines[0]>VideoYValidStartLines[1])
                             Fill(Stream_Video, 0, Video_ScanOrder, "BFF");
+                        break;
             default: ;
         }
     FILLING_END();
@@ -2634,7 +2635,7 @@ void File_Riff::AVI__movi_xxxx()
             {
                 if (!StreamItem.Parsers[Pos]->Status[IsAccepted] && StreamItem.Parsers[Pos]->Status[IsFinished])
                 {
-                    delete *(StreamItem.Parsers.begin()+Pos);
+                    delete static_cast<MediaInfoLib::File__Analyze*>(*(StreamItem.Parsers.begin()+Pos));
                     StreamItem.Parsers.erase(StreamItem.Parsers.begin()+Pos);
                     Pos--;
                 }
@@ -2644,7 +2645,7 @@ void File_Riff::AVI__movi_xxxx()
                     for (size_t Pos2=0; Pos2<StreamItem.Parsers.size(); Pos2++)
                     {
                         if (Pos2!=Pos)
-                            delete *(StreamItem.Parsers.begin()+Pos2);
+                            delete static_cast<MediaInfoLib::File__Analyze*>(*(StreamItem.Parsers.begin()+Pos2));
                     }
                     StreamItem.Parsers.clear();
                     StreamItem.Parsers.push_back(Parser);
@@ -2794,7 +2795,7 @@ void File_Riff::AVI__movi_StreamJump()
     else if (Stream_Structure_Temp!=Stream_Structure.end())
     {
         do
-            Stream_Structure_Temp++;
+            ++Stream_Structure_Temp;
         while (Stream_Structure_Temp!=Stream_Structure.end() && !(Stream[(int32u)Stream_Structure_Temp->second.Name].SearchingPayload && Config->ParseSpeed<1.0));
         if (Stream_Structure_Temp!=Stream_Structure.end())
         {

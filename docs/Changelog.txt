@@ -25,7 +25,9 @@ Updated Dutch and Chinese (Traditional) translation (by beter).
 
 Updated libraries:
 	ffmpeg n7.2-dev-1432-ge8d4c559870;
-	Little-CMS git-lcms2.17-10-ge19dc49.
+	Little-CMS git-lcms2.17-10-ge19dc49;
+	MediaInfo git-v24.12-99-g9c4d87833;
+	ZenLib git-v0.4.41-54-g53cedf8.
 
 
 1.8.3 - 2025-02-07

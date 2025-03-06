@@ -217,7 +217,7 @@ private :
     void moov_trak_mdia_minf_stbl_stsd_xxxxSound();
     void moov_trak_mdia_minf_stbl_stsd_xxxxText();
     void moov_trak_mdia_minf_stbl_stsd_xxxxVideo();
-    void moov_trak_mdia_minf_stbl_stsd_xxxxOthers();
+    void moov_trak_mdia_minf_stbl_stsd_xxxxOthers(const string& CodecIDAddition);
     void moov_trak_mdia_minf_stbl_stsd_xxxx_alac();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_AALP();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_ACLR();
@@ -370,6 +370,8 @@ private :
     void moov_udta_rtng();
     void moov_udta_ptv ();
     void moov_udta_Sel0();
+    void moov_udta_smta();
+    void moov_udta_smta_mdln();
     void moov_udta_tags();
     void moov_udta_tags_meta();
     void moov_udta_tags_tseg();

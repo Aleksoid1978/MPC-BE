@@ -100,8 +100,9 @@ void Cookies::Create_Lines(std::ostream& Out)
             struct tm *Gmt=gmtime(&Cookie->second.Expires);
             #endif
 
-            if (strftime(Temp, 200, "%a, %d-%b-%Y %H:%M:%S GMT", Gmt))
-                Out << "; expires=" << Temp;
+            if (Gmt)
+                if (strftime(Temp, 200, "%a, %d-%b-%Y %H:%M:%S GMT", Gmt))
+                    Out << "; expires=" << Temp;
         }
         if (!Cookie->second.Path.empty())
         {

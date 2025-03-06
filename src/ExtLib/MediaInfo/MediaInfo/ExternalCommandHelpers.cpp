@@ -159,8 +159,8 @@ int External_Command_Run(const Ztring& Command, const ZtringList& Arguments, Ztr
     {
         if (!CreatePipe(&StdErrRead, &StdErrWrite, &Attrs, 0))
         {
-            CloseHandle(StdOutWrite);
-            CloseHandle(StdOutRead);
+            if (StdOutWrite) CloseHandle(StdOutWrite);
+            if (StdOutRead)  CloseHandle(StdOutRead);
             return -1;
         }
     }
@@ -182,15 +182,15 @@ int External_Command_Run(const Ztring& Command, const ZtringList& Arguments, Ztr
 
     if (!CreateProcessW(nullptr, (LPWSTR)CommandLine.Read().To_Unicode().c_str(), nullptr, nullptr, TRUE, CREATE_NO_WINDOW, nullptr, nullptr, &StartupInfo, &ProcessInfo))
     {
-        CloseHandle(StdOutWrite);
-        CloseHandle(StdOutRead);
-        CloseHandle(StdErrWrite);
-        CloseHandle(StdErrRead);
+        if (StdOutWrite) CloseHandle(StdOutWrite);
+        if (StdOutRead)  CloseHandle(StdOutRead);
+        if (StdErrWrite) CloseHandle(StdErrWrite);
+        if (StdErrRead)  CloseHandle(StdErrRead);
         return -1;
     }
 
-    CloseHandle(StdOutWrite);
-    CloseHandle(StdErrWrite);
+    if (StdOutWrite) CloseHandle(StdOutWrite);
+    if (StdErrWrite) CloseHandle(StdErrWrite);
 
     char Buf[128];
     if (StdOut)
@@ -214,8 +214,8 @@ int External_Command_Run(const Ztring& Command, const ZtringList& Arguments, Ztr
         }
     }
 
-    CloseHandle(StdOutRead);
-    CloseHandle(StdErrRead);
+    if (StdOutRead) CloseHandle(StdOutRead);
+    if (StdErrRead) CloseHandle(StdErrRead);
 
     WaitForSingleObject(ProcessInfo.hProcess, INFINITE);
     GetExitCodeProcess(ProcessInfo.hProcess, &ExitCode);

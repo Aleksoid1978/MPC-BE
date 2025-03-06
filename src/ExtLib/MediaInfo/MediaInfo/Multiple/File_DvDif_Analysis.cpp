@@ -620,11 +620,10 @@ void File_DvDif::Read_Buffer_Continue()
                             uint8_t Dseq=Buffer[Buffer_Offset+1]>>4;
                             bool Is16=(QU==(int8u)-1)?(Contains_8000):(QU==0);
                             int16u Value;
-                            switch (Is16)
-                            {
-                                case 0: Value=(Contains_800800_0<<4)|(Contains_800800_1>>4); break; // Only one half
-                                case 1: Value=(ToCheck_8000_0<<8)|ToCheck_8000_1; break;
-                            }
+                            if (Is16)
+                                Value=(ToCheck_8000_0<<8)|ToCheck_8000_1;
+                            else
+                                Value=(Contains_800800_0<<4)|(Contains_800800_1>>4); // Only one half
                             if (Value && Value!=(0xFFFF>>(Is16?0:4))) // 0 and -1 are often used as silence
                             {
                                 if (Channel>=Audio_Errors.size())
@@ -781,7 +780,7 @@ void File_DvDif::Errors_Stats_Update()
 
         // Coherency checking
         bool FSC_Incoherency=false;
-        if (FSC_WasSet_Sum && FSC_WasSet_Sum)
+        if (FSC_WasNotSet_Sum || FSC_WasSet_Sum)
         {
             int FSC_Diff=FSC_WasSet_Sum-FSC_WasNotSet_Sum;
             if (FSC_Diff<0)
@@ -1073,12 +1072,12 @@ void File_DvDif::Errors_Stats_Update()
             if (AbstBf_Current_Weighted.abst[j].size()>1 && !AbstBf_Current_Weighted.StoredValues.empty())
             {
                 //Difficult to trust one value other another one, we use the smallest trustable stored value
-                for (set<int32s>::iterator StoredValue=AbstBf_Current_Weighted.StoredValues.begin(); ; StoredValue++)
+                for (set<int32s>::iterator StoredValue=AbstBf_Current_Weighted.StoredValues.begin(); ; ++StoredValue)
                     if (abst<=*StoredValue)
                     {
                         abst=*StoredValue;
                         AbstBf_Current_MaxAbst=abst;
-                        for (; StoredValue!=AbstBf_Current_Weighted.StoredValues.end(); StoredValue++)
+                        for (; StoredValue!=AbstBf_Current_Weighted.StoredValues.end(); ++StoredValue)
                         {
                             if (*StoredValue>=(abst+(DSF?12:10)*(FSC_WasSet?2:1)*2)) //Max 2x the expected gap
                                 break;
@@ -1422,8 +1421,7 @@ void File_DvDif::Errors_Stats_Update()
             #if MEDIAINFO_EVENTS
                 Event.Arb|=1<<7;
             #endif //MEDIAINFO_EVENTS
-            if (Speed_Arb_Current.Value!=0xF)
-                Arb_AreDetected=true;
+            Arb_AreDetected=true;
 
             Speed_Arb_Current_Theory.IsValid=false;
         }

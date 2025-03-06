@@ -529,9 +529,8 @@ void File_Ancillary::Read_Buffer_Unsynched()
 //---------------------------------------------------------------------------
 void File_Ancillary::Header_Parse()
 {
-    switch (Format)
+    if (Format==Smpte2038)
     {
-    case Smpte2038:
         BS_Begin();
         Skip_S1(6,                                              "000000");
         Skip_SB(                                                "c_not_y_channel_flag");

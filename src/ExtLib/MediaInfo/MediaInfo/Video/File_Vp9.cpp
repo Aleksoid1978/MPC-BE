@@ -178,9 +178,9 @@ void File_Vp9::Read_Buffer_Continue()
 
     Element_Begin1("uncompressed_header");
     BS_Begin();
-    int16u width_minus_one, height_minus_one;
-    int8u FRAME_MARKER, profile, bit_depth, colorspace, subsampling;
-    bool version0, version1, version2, show_existing_frame, frame_type, show_frame, error_resilient_mode, yuv_range_flag;
+    int16u width_minus_one{}, height_minus_one{};
+    int8u FRAME_MARKER, profile, bit_depth{}, colorspace{}, subsampling{};
+    bool version0, version1, version2, show_existing_frame, frame_type, show_frame, error_resilient_mode, yuv_range_flag{};
     Get_S1(2, FRAME_MARKER,                                     "FRAME_MARKER (0b10)");
     if (FRAME_MARKER!=0x2)
         Trusted_IsNot("FRAME_MARKER is wrong");

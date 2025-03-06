@@ -100,6 +100,7 @@ namespace Elements
     const int64u moov_meta___wrn=0xA977726E;
     const int64u moov_meta___wrt=0xA9777274;
     const int64u moov_meta___xpd=0xA9787064;
+    const int64u moov_meta___xyz=0xA978797A;
     const int64u moov_meta__aART=0x61415254;
     const int64u moov_meta__akID=0x616B4944;
     const int64u moov_meta__albm=0x616C626D;
@@ -3110,6 +3111,7 @@ File_Mpeg4::method File_Mpeg4::Metadata_Get(std::string &Parameter, int64u Meta)
         case Elements::moov_meta___wrn : Parameter="Warning"; Method=Method_String; break;
         case Elements::moov_meta___wrt : Parameter="Composer"; Method=Method_String; break;
         case Elements::moov_meta___xpd : Parameter="ExecutiveProducer"; Method=Method_String; break;
+        case Elements::moov_meta___xyz : Parameter="Recorded_Location"; Method=Method_String; break;
         case Elements::moov_meta__aART : Parameter="Album/Performer"; Method=Method_String2; break;
         case Elements::moov_meta__akID : Parameter="AppleStoreAccountType"; Method=Method_Binary; break;
         case Elements::moov_meta__albm : Parameter="Album"; Method=Method_String2; break; //Has a optional track number after the NULL byte

@@ -1152,7 +1152,7 @@ void File_Ac4::Streams_Fill()
         {
             set<size_t>::iterator It=IFrames_IsVariable.begin();
             size_t Value1=*It;
-            It++;
+            ++It;
             size_t Value2=*It;
             if (Value1+1==Value2)
             {
@@ -1577,7 +1577,7 @@ void File_Ac4::Streams_Fill()
                 continue;
             size_t AudioSubstream_Pos=0;
             std::map<int8u, substream_type_t>::iterator Substream_Type_Item=Substream_Type.begin();
-            for (; Substream_Type_Item!=Substream_Type.end() && Substream_Type_Item->first!=GroupInfo.substream_index; Substream_Type_Item++)
+            for (; Substream_Type_Item!=Substream_Type.end() && Substream_Type_Item->first!=GroupInfo.substream_index; ++Substream_Type_Item)
                 if (Substream_Type_Item->second==Type_Ac4_Substream)
                     AudioSubstream_Pos++;
             if (Substream_Type_Item==Substream_Type.end())
@@ -1592,7 +1592,7 @@ void File_Ac4::Streams_Fill()
         Fill(Stream_Audio, 0, (G+" LinkedTo_Substream_Pos/String").c_str(), SubstreamNum.Read());
         Fill_SetOptions(Stream_Audio, 0, (G+" LinkedTo_Substream_Pos/String").c_str(), "Y NIN");
     }
-    for (map<int8u, audio_substream>::iterator Substream_Info=AudioSubstreams.begin(); Substream_Info!=AudioSubstreams.end(); Substream_Info++)
+    for (map<int8u, audio_substream>::iterator Substream_Info=AudioSubstreams.begin(); Substream_Info!=AudioSubstreams.end(); ++Substream_Info)
     {
         string ChannelMode, ImmersiveStereo;
         for (size_t g=0; g<Groups.size(); g++)
@@ -1670,7 +1670,7 @@ void File_Ac4::Streams_Fill()
             Summary="?";
         }
         size_t AudioSubstream_Pos=0;
-        for (std::map<int8u, substream_type_t>::iterator Substream_Type_Item=Substream_Type.begin(); Substream_Type_Item!=Substream_Type.end() && Substream_Type_Item->first!=Substream_Info->first; Substream_Type_Item++)
+        for (std::map<int8u, substream_type_t>::iterator Substream_Type_Item=Substream_Type.begin(); Substream_Type_Item!=Substream_Type.end() && Substream_Type_Item->first!=Substream_Info->first; ++Substream_Type_Item)
             if (Substream_Type_Item->second==Type_Ac4_Substream)
                 AudioSubstream_Pos++;
         string S=Ztring(__T("Substream")+Ztring::ToZtring(AudioSubstream_Pos)).To_UTF8();
@@ -1820,7 +1820,7 @@ void File_Ac4::Read_Buffer_Unsynched()
 bool File_Ac4::Synchronize()
 {
     //Synchronizing
-    size_t Buffer_Offset_Current;
+    size_t Buffer_Offset_Current{};
     while (Buffer_Offset<Buffer_Size)
     {
         Buffer_Offset_Current=Buffer_Offset;
@@ -2170,7 +2170,7 @@ void File_Ac4::ac4_toc()
     {
         //We parse only Iframes, but also the frames associated to this I-frame
         if (!AudioSubstreams.empty())
-            for (map<int8u, audio_substream>::iterator Substream_Info=AudioSubstreams.begin(); Substream_Info!=AudioSubstreams.end(); Substream_Info++)
+            for (map<int8u, audio_substream>::iterator Substream_Info=AudioSubstreams.begin(); Substream_Info!=AudioSubstreams.end(); ++Substream_Info)
                 if (Substream_Info->second.Buffer_Index)
                     NoSkip=true;
     }
@@ -3799,7 +3799,7 @@ void File_Ac4::metadata(audio_substream& AudioSubstream, size_t Substream_Index)
             Get_SB (b_discard_unknown_payload,                  "b_discard_unknown_payload");
             if (!b_discard_unknown_payload)
             {
-                bool b_payload_frame_aligned;
+                bool b_payload_frame_aligned{};
                 if (!b_smpoffst)
                 {
                     TEST_SB_GET(b_payload_frame_aligned,        "b_payload_frame_aligned");

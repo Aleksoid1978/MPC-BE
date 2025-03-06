@@ -679,7 +679,7 @@ void File_N19::Data_Parse()
             {
                 switch (Value)
                 {
-                    case 0x8A:  //EOL
+                    case (decltype(Value))0x8A:  //EOL
                                 if (Line_HasContent)
                                 {
                                     LineCount++;
@@ -705,9 +705,11 @@ void File_N19::Data_Parse()
     }
 #if MEDIAINFO_TRACE
         for (size_t i = 0; i < TF.size(); ++i)
-            switch (TF[i])
+        {
+            auto Value=TF[i];
+            switch (Value)
             {
-                case 0x8A:  //EOL
+                case (decltype(Value))0x8A:  //EOL
                             TF[i] = EOL[0]; 
                             {
                                 size_t j = 1;
@@ -720,15 +722,18 @@ void File_N19::Data_Parse()
                      || (TF[i]>=0x7F && TF[i]<0xA0))
                         TF.erase(i--, 1);
             }
+        }
         Param_Info1(TF);
     #endif //MEDIAINFO_TRACE
 
     FILLING_BEGIN();
         #if MEDIAINFO_DEMUX
             for (size_t i = 0; i < TF.size(); ++i)
-                switch (TF[i])
+            {
+                auto Value=TF[i];
+                switch (Value)
                 {
-                    case 0x8A:  //EOL
+                    case (decltype(Value))0x8A:  //EOL
                                 TF[i] = EOL[0];
                                 {
                                     size_t j = 1;
@@ -741,6 +746,7 @@ void File_N19::Data_Parse()
                          || (TF[i]>=0x7F && TF[i]<0xA0))
                             TF.erase(i--, 1);
                 }
+            }
 
             Frame_Count_NotParsedIncluded=Frame_Count;
 
@@ -826,11 +832,12 @@ void File_N19::Data_Parse()
                 }
             }
 
-            EVENT_BEGIN (Global, SimpleText, 0)
+            EVENT_BEGIN(Global, SimpleText, 0)
+                std::wstring TF_Unicode{ TF.To_Unicode() };
                 Event.DTS=((int64u)N19_HHMMSSFF_TC(TCI, FrameRate).ToMilliseconds())*1000000; // "-TCP" removed for the moment. TODO: find a way for when TCP should be removed and when it should not
                 Event.PTS=Event.DTS;
                 Event.DUR=((int64u)(N19_HHMMSSFF_TC(TCO, FrameRate)-N19_HHMMSSFF_TC(TCI, FrameRate)).ToMilliseconds())*1000000;
-                Event.Content=TF.To_Unicode().c_str();
+                Event.Content=TF_Unicode.c_str();
                 Event.Flags=0;
                 Event.MuxingMode=(int8u)-1;
                 Event.Service=(int8u)-1;

@@ -28,15 +28,7 @@
 #include "ZenLib/FileName.h"
 #ifdef WINDOWS
     #undef __TEXT
-    #if __cplusplus >= 201703L || _MSVC_LANG >= 201703L
-        namespace WindowsNamespace
-        {
-    #endif
-    #include "windows.h"
-    #if __cplusplus >= 201703L || _MSVC_LANG >= 201703L
-        }
-        using namespace WindowsNamespace;
-    #endif
+    #include "Windows.h"
 #endif //WINDOWS
 using namespace ZenLib;
 using namespace std;

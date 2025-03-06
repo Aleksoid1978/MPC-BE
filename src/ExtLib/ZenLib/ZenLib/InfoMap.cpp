@@ -38,14 +38,14 @@ const Ztring InfoMap_EmptyZtring_Const; //Use it when we can't return a referenc
 //---------------------------------------------------------------------------
 // Constructors
 InfoMap::InfoMap()
-: std::multimap<ZenLib::Ztring, ZenLib::ZtringList> ()
+: std::multimap<ZenLib::Ztring, ZenLib::ZtringList> (), Max()
 {
     Separator[0]=EOL;
     Separator[1]=__T(";");
 }
 
 InfoMap::InfoMap(const Ztring &Source)
-: std::multimap<ZenLib::Ztring, ZenLib::ZtringList> ()
+: std::multimap<ZenLib::Ztring, ZenLib::ZtringList> (), Max()
 {
     Separator[0]=EOL;
     Separator[1]=__T(";");
@@ -53,7 +53,7 @@ InfoMap::InfoMap(const Ztring &Source)
 }
 
 InfoMap::InfoMap(const Char *Source)
-: std::multimap<ZenLib::Ztring, ZenLib::ZtringList> ()
+: std::multimap<ZenLib::Ztring, ZenLib::ZtringList> (), Max()
 {
     Separator[0]=EOL;
     Separator[1]=__T(";");
@@ -62,7 +62,7 @@ InfoMap::InfoMap(const Char *Source)
 
 #ifdef _UNICODE
 InfoMap::InfoMap (const char* S)
-: std::multimap<ZenLib::Ztring, ZenLib::ZtringList> ()
+: std::multimap<ZenLib::Ztring, ZenLib::ZtringList> (), Max()
 {
     Separator[0]=EOL;
     Separator[1]=__T(";");

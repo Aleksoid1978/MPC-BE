@@ -822,7 +822,8 @@ bool File::Truncate (int64u Offset)
                     Offset=Position_Get();
                 Ztring File_Name_Sav=File_Name;
                 Close();
-                truncate(File_Name_Sav.To_Local().c_str(), Offset);
+                if (truncate(File_Name_Sav.To_Local().c_str(), Offset))
+                    return false;
                 if (!Open(File_Name_Sav, Access_Read_Write))
                     return false;
                 GoTo(0, FromEnd);

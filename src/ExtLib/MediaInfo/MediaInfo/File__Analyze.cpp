@@ -266,7 +266,7 @@ string BuildConformanceName(const string& ParserName, const char* Prefix, const 
     }
     if (Suffix) {
         Result += Suffix;
-        if (Result.empty() && Result.back() >= '0' && Result.back() <= '9') {
+        if (!Result.empty() && Result.back() >= '0' && Result.back() <= '9') {
             Result += '_';
         }
     }
@@ -362,7 +362,7 @@ void conformance::Streams_Finish_Conformance()
         auto& Conformance_Total = ConformanceErrors_Total[Level];
         if (Conformance_Total.empty())
             continue;
-        for (size_t i = Conformance_Total.size() - 1; i < Conformance_Total.size(); i--) {
+        for (size_t i = Conformance_Total.size(); i-- > 0;) {
             if (!CheckIf(Conformance_Total[i].Flags)) {
                 Conformance_Total.erase(Conformance_Total.begin() + i);
             }
@@ -397,7 +397,7 @@ void conformance::Streams_Finish_Conformance()
                 size_t Frames_HasContent, Times_HasContent, Offsets_HasContent;
                 Frames_HasContent = Times_HasContent = Offsets_HasContent = Pos_Total;
                 for (size_t i = 0; i < Pos_Total; i++) {
-                    auto FramePos = ConformanceError.FramePoss[i];
+                    auto& FramePos = ConformanceError.FramePoss[i];
                     if (FramePos.Frame_Count_Min == (int64u)-2) {
                         Frames += "conf";
                     }
@@ -1829,6 +1829,7 @@ size_t File__Analyze::Read_Buffer_Seek_OneFramePerFile (size_t Method, int64u Va
                         if (Config->Demux_Rate_Get()==0)
                             return (size_t)-1; //Not supported
                         Value=float64_int64s(((float64)Value)/1000000000*Config->Demux_Rate_Get());
+                        return 1;
                     #else //MEDIAINFO_DEMUX
                         return (size_t)-1; //Not supported
                     #endif //MEDIAINFO_DEMUX

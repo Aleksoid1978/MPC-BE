@@ -982,6 +982,7 @@ void File_Eia608::Special_14(int8u cc_data_2)
         case 0x2F : //EOC - end of Caption
                     TextMode=false;
                     StreamPos=TextMode*2+DataChannelMode;
+                    break;
         default: ;
     }
 

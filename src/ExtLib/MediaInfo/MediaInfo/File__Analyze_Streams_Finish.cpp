@@ -931,7 +931,7 @@ void File__Analyze::Streams_Finish_StreamOnly(stream_t StreamKind, size_t Pos)
                 const auto& Item=List[i];
                 if (HI_ME_Pos==(size_t)-1 && (Item==HI_ME_Text || Item==VI_ME_Text))
                     HI_ME_Pos=i;
-                if (HI_D_Pos==(size_t)-1 && (Item==HI_D_Text || Item==HI_D_Text))
+                if (HI_D_Pos==(size_t)-1 && (Item==HI_D_Text || Item==VI_D_Text))
                     HI_D_Pos=i;
             }
             if (HI_ME_Pos!=(size_t)-1 && HI_D_Pos!=(size_t)-1)
@@ -990,6 +990,168 @@ void File__Analyze::Streams_Finish_StreamOnly_General(size_t StreamPos)
         }
         if (Channels_Total)
             Fill(Stream_General, StreamPos, General_Audio_Channels_Total, Channels_Total);
+    }
+
+    //Exceptions (empiric)
+    {
+        const auto& Application_Name=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Application_Name);
+        if (Application_Name.size()>=5 && Application_Name.find(__T(", LLC"))==Application_Name.size()-5)
+        {
+            Fill(Stream_General, 0, General_Encoded_Application_CompanyName, Application_Name.substr(0, Application_Name.size()-5));
+            Clear(Stream_General, StreamPos, General_Encoded_Application_Name);
+        }
+    }
+    {
+        const auto& Application_Name=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Application_Name);
+        if (Application_Name.size()>=5 && Application_Name.rfind(__T("Mac OS X "), 0)==0)
+        {
+            Fill(Stream_General, 0, General_Encoded_Application_Version, Application_Name.substr(9), true);
+            const auto& Application_CompanyName=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Application_CompanyName);
+            if (Application_CompanyName.empty())
+                Fill(Stream_General, 0, General_Encoded_Application_CompanyName, "Apple");
+            Fill(Stream_General, StreamPos, General_Encoded_Application_Name, "Mac OS X", Unlimited, true, true);
+        }
+        if (Application_Name.size()>=5 && Application_Name.rfind(__T("Sorenson "), 0)==0)
+        {
+            auto Application_Name_Max=Application_Name.find(__T(" / "));
+            if (Application_Name_Max!=(size_t)-1)
+                Application_Name_Max-=9;
+            Fill(Stream_General, 0, General_Encoded_Application_Name, Application_Name.substr(9, Application_Name_Max), true);
+            const auto& Application_CompanyName=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Application_CompanyName);
+            if (Application_CompanyName.empty())
+                Fill(Stream_General, 0, General_Encoded_Application_CompanyName, "Sorenson");
+        }
+    }
+    {
+        const auto& Application_Name=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Application_Name);
+        const auto& OperatingSystem_Version=Retrieve_Const(Stream_General, StreamPos, General_Encoded_OperatingSystem_Version);
+        const auto& Hardware_Name=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Name);
+        if (OperatingSystem_Version.empty() && !Application_Name.empty() && Application_Name.find_first_not_of(__T("0123456789."))==string::npos && Hardware_Name.rfind(__T("iPhone "), 0)==0)
+        {
+            Fill(Stream_General, 0, General_Encoded_OperatingSystem_Version, Application_Name);
+            Fill(Stream_General, 0, General_Encoded_OperatingSystem_Name, "iOS", Unlimited, true, true);
+            const auto& OperatingSystem_CompanyName=Retrieve_Const(Stream_General, StreamPos, General_Encoded_OperatingSystem_CompanyName);
+            if (OperatingSystem_CompanyName.empty())
+                Fill(Stream_General, 0, General_Encoded_OperatingSystem_CompanyName, "Apple");
+            Clear(Stream_General, StreamPos, General_Encoded_Application_Name);
+        }
+    }
+    {
+        const auto& Hardware_CompanyName=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_CompanyName);
+        const auto& Hardware_Name=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Name);
+        if (Hardware_Name.rfind(Hardware_CompanyName+__T(' '), 0) == 0)
+            Fill(Stream_General, StreamPos, General_Encoded_Hardware_Name, Hardware_Name.substr(Hardware_CompanyName.size()+1), true);
+    }
+    if (Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Name).empty())
+    {
+        const auto& Performer=Retrieve_Const(Stream_General, StreamPos, General_Performer);
+        const auto& Hardware_CompanyName=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_CompanyName);
+        ZtringList PerformerList;
+        PerformerList.Separator_Set(0, __T(" / "));
+        PerformerList.Write(Performer);
+        set<Ztring> HardwareName_List;
+        for (size_t i=0; i<PerformerList.size(); i++)
+        {
+            const auto& PerformerItem=PerformerList[i];
+            auto ShortAndContainsHardwareCompanyName=PerformerItem.size()-Hardware_CompanyName.size()<=16 && PerformerItem.rfind(Hardware_CompanyName+__T(' '), 0)==0;
+            if (ShortAndContainsHardwareCompanyName || Hardware_CompanyName==__T("Samsung") && PerformerItem.size()<=32 && PerformerItem.rfind(__T("Galaxy "), 0)==0)
+            {
+                ZtringList Items;
+                Items.Separator_Set(0, __T(" "));
+                Items.Write(PerformerItem);
+                if (Items.size()<6)
+                {
+                    auto IsLikelyName=false;
+                    auto LastHasOnlyDigits=false;
+                    for (const auto& Item : Items)
+                    {
+                        size_t HasUpper=0;
+                        size_t HasDigit=0;
+                        for (const auto& Value : Item)
+                        {
+                            HasUpper+=IsAsciiUpper(Value);
+                            HasDigit+=IsAsciiDigit(Value);
+                        }
+                        LastHasOnlyDigits=HasDigit==Item.size();
+                        if (Item.size()==1 || HasUpper>=2 || (HasDigit && HasDigit<Item.size()))
+                            IsLikelyName=true;
+                    }
+                    if (IsLikelyName || LastHasOnlyDigits)
+                    {
+                        HardwareName_List.insert(PerformerItem.substr(ShortAndContainsHardwareCompanyName?(Hardware_CompanyName.size()+1):0));
+                        PerformerList.erase(PerformerList.begin()+i);
+                        continue;
+                    }
+                }
+            }
+        }
+        if (HardwareName_List.size()==1)
+        {
+            //Performer is likely the actual performer
+            Fill(Stream_General, StreamPos, General_Encoded_Hardware_Name, *HardwareName_List.begin());
+            Fill(Stream_General, StreamPos, General_Performer, PerformerList.Read(), true);
+        }
+    }
+    {
+        const auto& Name=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Name);
+        const auto& Model=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Model);
+        if (Name==Model)
+        {
+            //Name is actually the model (technical name), keeping only model
+            Clear(Stream_General, StreamPos, General_Encoded_Hardware_Name);
+        }
+    }
+
+    //OperatingSystem
+    if (Retrieve_Const(Stream_General, StreamPos, General_Encoded_OperatingSystem_String).empty())
+    {
+        //Filling
+        const auto& CompanyName=Retrieve_Const(Stream_General, StreamPos, General_Encoded_OperatingSystem_CompanyName);
+        const auto& Name=Retrieve_Const(Stream_General, StreamPos, General_Encoded_OperatingSystem_Name);
+        const auto& Version=Retrieve_Const(Stream_General, StreamPos, General_Encoded_OperatingSystem_Version);
+        Ztring OperatingSystem=CompanyName;
+        if (!Name.empty())
+        {
+            if (!OperatingSystem.empty())
+                OperatingSystem+=' ';
+            OperatingSystem+=Name;
+            if (!Version.empty())
+            {
+                OperatingSystem+=' ';
+                OperatingSystem+=Version;
+            }
+        }
+        Fill(Stream_General, StreamPos, General_Encoded_OperatingSystem_String, OperatingSystem);
+    }
+
+    //Hardware
+    if (Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_String).empty())
+    {
+        //Filling
+        const auto& CompanyName=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_CompanyName);
+        const auto& Name=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Name);
+        const auto& Model=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Model);
+        const auto& Version=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Version);
+        Ztring Hardware=CompanyName;
+        if (!Name.empty())
+        {
+            if (!Hardware.empty())
+                Hardware+=' ';
+            Hardware+=Name;
+        }
+        if (!Model.empty())
+        {
+            if (!Hardware.empty())
+                Hardware+=' ';
+            if (!Name.empty())
+                Hardware+='(';
+            Hardware+=Model;
+            if (!Name.empty())
+                Hardware+=')';
+        }
+        if (!Hardware.empty() && !Version.empty())
+            Hardware+=Version;
+        Fill(Stream_General, StreamPos, General_Encoded_Hardware_String, Hardware);
     }
 }
 
@@ -1153,7 +1315,7 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
                         {
                             case Video_HDR_Format_Version: Summary[j]+=__T(", Version "); break;
                             case Video_HDR_Format_Level: Summary[j]+=__T('.'); break;
-                            case Video_HDR_Format_Compression: ToAdd[j][0]+=0x20; if (ToAdd[j].size()==4) ToAdd[j].resize(2); ToAdd[j]+=__T(" metadata compression"); // Fallthrough
+                            case Video_HDR_Format_Compression: ToAdd[j][0]+=0x20; if (ToAdd[j].size()==4) ToAdd[j].resize(2); ToAdd[j]+=__T(" metadata compression"); [[fallthrough]];
                             default: Summary[j] += __T(", ");
                         }
                         Summary[j]+=ToAdd[j];
@@ -2149,14 +2311,11 @@ void File__Analyze::Streams_Finish_HumanReadable_PerStream(stream_t StreamKind, 
         Ztring Name=Retrieve(StreamKind, StreamPos, "Encoded_Application_Name");
         Ztring Version=Retrieve(StreamKind, StreamPos, "Encoded_Application_Version");
         Ztring Date=Retrieve(StreamKind, StreamPos, "Encoded_Application_Date");
-        if (!Name.empty())
+        if (!CompanyName.empty() || !Name.empty())
         {
-            Ztring String;
-            if (!CompanyName.empty())
-            {
-                String+=CompanyName;
-                String+=__T(" ");
-            }
+            Ztring String=CompanyName;
+            if (!CompanyName.empty() && !Name.empty())
+                String+=' ';
             String+=Name;
             if (!Version.empty())
             {

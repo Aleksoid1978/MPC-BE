@@ -360,10 +360,12 @@ private :
                 uint8_t* Data_ToDelete=Data;
                 Size=NewOffset;
                 Data=new int8u[Size];
-                memcpy(Data, Data_ToDelete, Offset);
+                if (Data_ToDelete)
+                    memcpy(Data, Data_ToDelete, Offset);
                 delete[] Data_ToDelete;
             }
-            memcpy(Data+Offset, BufferToAdd, SizeToAdd);
+            if (Data+Offset)
+                memcpy(Data+Offset, BufferToAdd, SizeToAdd);
             Offset=NewOffset;
         }
 

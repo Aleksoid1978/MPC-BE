@@ -212,7 +212,7 @@ const char*  AC3_ChannelLayout_lfeon[]=
 };
 
 //---------------------------------------------------------------------------
-extern const char* AC3_roomtyp[]=
+const char* AC3_roomtyp[]=
 {
     "Large",
     "Small",
@@ -220,7 +220,7 @@ extern const char* AC3_roomtyp[]=
 };
 
 //---------------------------------------------------------------------------
-extern const char* AC3_dmixmod[]=
+const char* AC3_dmixmod[]=
 {
     "Lt/Rt",
     "Lo/Ro",

@@ -1896,7 +1896,7 @@ void File_Usac::Streams_Finish_Conformance()
         auto& Conformance_Total = ConformanceErrors_Total[Level];
         if (Conformance_Total.empty())
             continue;
-        for (size_t i = Conformance_Total.size() - 1; i < Conformance_Total.size(); i--) {
+        for (size_t i = Conformance_Total.size(); i-- > 0;) {
             if (!CheckIf(Conformance_Total[i].Flags)) {
                 Conformance_Total.erase(Conformance_Total.begin() + i);
             }
@@ -2406,7 +2406,7 @@ void File_Usac::UsacDecoderConfig()
             bool AccrossCpe = false;
             for (size_t i = 0 ; i < C.usacElements.size(); i++)
             {
-                auto usacElement = C.usacElements[i];
+                auto& usacElement = C.usacElements[i];
                 switch (usacElement.usacElementType)
                 {
                     case ID_USAC_SCE                          : ChannelCount_NonLfe++; break;
@@ -2465,7 +2465,7 @@ void File_Usac::UsacDecoderConfig()
                 channelConfiguration_Orders_Pos = channelConfiguration_Orders_Max;
                 channelConfiguration_Orders_Max = channelConfiguration_Orders[i];
                 auto channelConfiguration_Orders_Base = channelConfiguration_Orders + Aac_Channels_Size_Usac;
-                for (auto usacElement : C.usacElements)
+                for (auto& usacElement : C.usacElements)
                 {
                     if (usacElement.usacElementType >= ID_USAC_EXT)
                         continue;
@@ -2477,14 +2477,14 @@ void File_Usac::UsacDecoderConfig()
                 if (!IsNotMatch)
                 {
                     string ActualOrder;
-                    for (auto usacElement : C.usacElements)
+                    for (auto& usacElement : C.usacElements)
                     {
                         if (usacElement.usacElementType >= ID_USAC_EXT)
                             continue;
                         ActualOrder += usacElementType_IdNames[usacElement.usacElementType];
                         ActualOrder += ' ';
                     }
-                    ActualOrder.pop_back();
+                    if (!ActualOrder.empty()) ActualOrder.pop_back();
                     Fill_Conformance("UsacConfig channelConfigurationIndex", ("channelConfigurationIndex " + to_string(C.channelConfigurationIndex) + " is used but the usacElementType sequence contains " + ActualOrder + ", which is the configuration indicated by channelConfigurationIndex " + to_string(i)).c_str(), bitset8(), Warning);
                     break;
                 }
@@ -2501,16 +2501,16 @@ void File_Usac::UsacDecoderConfig()
                 ExpectedOrder += usacElementType_IdNames[channelConfiguration_Orders_Base[channelConfiguration_Orders_Pos]];
                 ExpectedOrder += ' ';
             }
-            ExpectedOrder.pop_back();
+            if (!ExpectedOrder.empty()) ExpectedOrder.pop_back();
             string ActualOrder;
-            for (auto usacElement : C.usacElements)
+            for (auto& usacElement : C.usacElements)
             {
                 if (usacElement.usacElementType >= ID_USAC_EXT)
                     continue;
                 ActualOrder += usacElementType_IdNames[usacElement.usacElementType];
                 ActualOrder += ' ';
             }
-            ActualOrder.pop_back();
+            if (!ActualOrder.empty()) ActualOrder.pop_back();
             Fill_Conformance("UsacConfig channelConfigurationIndex", ("channelConfigurationIndex " + to_string(C.channelConfigurationIndex) + " implies element order " + ExpectedOrder + " but actual element order is " + ActualOrder).c_str());
         }
     #endif
@@ -2902,6 +2902,7 @@ void File_Usac::uniDrcConfigExtension()
             default:
                 Skip_BS(bitSize,                                "Unknown");
         }
+        #pragma warning (suppress : 6385) //Visual Studio fail to detect 'uniDrcConfigExtType<UNIDRCCONFEXT_Max' check when it is inside function parameter and warns about reading invalid data
         BS_Bookmark(B, uniDrcConfigExtType<UNIDRCCONFEXT_Max?string(uniDrcConfigExtType_ConfNames[uniDrcConfigExtType]):("uniDrcConfigExtType"+to_string(uniDrcConfigExtType)));
         Element_End0();
     }
@@ -3377,6 +3378,7 @@ void File_Usac::UsacConfigExtension()
                 case ID_CONFIG_EXT_STREAM_ID                  : streamId(); break;
                 default                                       : Skip_BS(usacConfigExtLength,                "Unknown");
             }
+            #pragma warning (suppress : 6385) //Visual Studio fail to detect 'usacConfigExtType<ID_CONFIG_EXT_Max' check when it is inside function parameter and warns about reading invalid data
             if (BS_Bookmark(B, usacConfigExtType<ID_CONFIG_EXT_Max?string(usacConfigExtType_ConfNames[usacConfigExtType]):("usacConfigExtType"+to_string(usacConfigExtType))))
             {
                 #if MEDIAINFO_CONFORMANCE
@@ -4489,7 +4491,7 @@ void File_Usac::UsacCoreCoderData(size_t nrChannels, bool usacIndependencyFlag)
     Element_Begin1("UsacCoreCoderData");
 
     bool coreModes[2];
-    bool tnsDataPresent[2];
+    bool tnsDataPresent[2]{};
 
     for (size_t ch=0; ch<nrChannels; ch++)
         Get_SB(coreModes[ch],                                   "core_mode");
@@ -4750,7 +4752,7 @@ void File_Usac::pvcEnvelope(bool usacIndependencyFlag)
     }
     else
     {
-        int8u num_grid_info;
+        int8u num_grid_info{};
         switch (divMode)
         {
         case 4:
@@ -5069,7 +5071,7 @@ void File_Usac::UsacSbrData(size_t nrSbrChannels, bool usacIndependencyFlag)
     int64s sampling_frequency=C.sampling_frequency;
     if (C.coreSbrFrameLengthIndex==4)
     {
-        sampling_frequency=Frequency_b/2;
+        if (Frequency_b!=0) sampling_frequency=Frequency_b/2;
         C.sbrHandler.ratio=QUAD;
     }
 
@@ -5606,7 +5608,7 @@ void File_Usac::LsbData(ec_data_type dataType, bool bsQuantCoarseXXX, int8u data
 //---------------------------------------------------------------------------
 void File_Usac::EcDataPair(ec_data_type dataType, int8u paramIdx, int8u setIdx, int8u dataBands, bool bsDataPairXXX, bool bsQuantCoarseXXX, bool usacIndependencyFlag)
 {
-    int8u numQuantSteps;
+    int8u numQuantSteps{};
     switch (dataType)
     {
     case CLD:
@@ -5944,6 +5946,7 @@ void File_Usac::UsacExtElement(size_t elemIdx, bool usacIndependencyFlag)
                 default:
                     Skip_BS(usacExtElementPayloadLength,        usacExtElementType==ID_EXT_ELE_FILL?"(Not parsed)":"Unknown");
             }
+            #pragma warning (suppress : 6385) //Visual Studio fail to detect 'usacExtElementType<ID_EXT_ELE_Max' check when it is inside function parameter and warns about reading invalid data
             BS_Bookmark(B, usacExtElementType<ID_EXT_ELE_Max?string(usacExtElementType_Names[usacExtElementType]):("usacExtElementType"+to_string(usacExtElementType)));
         }
     }

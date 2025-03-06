@@ -39,7 +39,7 @@ extern Ztring EmptyZtring;
 //---------------------------------------------------------------------------
 // Constructors
 ZtringList::ZtringList ()
-: std::vector<ZenLib::Ztring, std::allocator<ZenLib::Ztring> > ()
+: std::vector<ZenLib::Ztring, std::allocator<ZenLib::Ztring> > (), Max()
 {
     Separator[0]=__T(";");
     Quote=__T("\"");
@@ -47,7 +47,7 @@ ZtringList::ZtringList ()
 }
 
 ZtringList::ZtringList(const ZtringList &Source)
-: std::vector<ZenLib::Ztring, std::allocator<ZenLib::Ztring> > ()
+: std::vector<ZenLib::Ztring, std::allocator<ZenLib::Ztring> > (), Max()
 {
     Separator[0]=Source.Separator[0];
     Quote=Source.Quote;

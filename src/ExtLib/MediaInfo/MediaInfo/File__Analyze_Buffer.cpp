@@ -1440,6 +1440,7 @@ void File__Analyze::Get_VL(const vlc Vlc[], size_t &Info, const char* Name)
                         if (BS->GetB())
                             Value++;
                         CountOfBits++;
+                        break;
             case   0 :  ;
         }
 
@@ -2020,6 +2021,18 @@ void File__Analyze::Skip_UTF16L(int64u Bytes, const char* Name)
     INTEGRITY_SIZE_ATLEAST(Bytes);
     if (Trace_Activated && Bytes) Param(Name, Ztring().From_UTF16LE((const char*)(Buffer+Buffer_Offset+(size_t)Element_Offset), (size_t)Bytes));
     Element_Offset+=Bytes;
+}
+
+//---------------------------------------------------------------------------
+size_t File__Analyze::SizeUpTo0(size_t MaxSize)
+{
+    auto Buffer_Begin=Buffer+Buffer_Offset+(size_t)Element_Offset;
+    auto Buffer_Current=Buffer_Begin;
+    auto Remaining=(size_t)(Element_Size-Element_Offset);
+    auto Buffer_End=Buffer_Begin+(MaxSize>Remaining?Remaining:MaxSize);
+    while (Buffer_Current<Buffer_End && *Buffer_Current)
+        Buffer_Current++;
+    return Buffer_Current-Buffer_Begin;
 }
 
 //***************************************************************************

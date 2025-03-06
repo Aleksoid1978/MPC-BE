@@ -1643,7 +1643,7 @@ void File_Hevc::video_parameter_set()
     TESTELSE_SB_SKIP(                                           "vps_extension_flag");
         int8u view_id_len;
         bool splitting_flag, vps_nuh_layer_id_present_flag;
-        for (auto Bits=Data_BS_Remain()%8; Bits--; Bits)
+        for (auto Bits=(Data_BS_Remain()%8); Bits; Bits--)
             Mark_1();
         if (vps_max_layers_minus1 && vps_base_layer_internal_flag)
         {
@@ -3182,7 +3182,7 @@ void File_Hevc::sei_message_user_data_registered_itu_t_t35_B5_003C_0001_04()
     Get_B1 (application_version,                                "application_version");
     if (application_version==1)
     {
-        int32u targeted_system_display_maximum_luminance, maxscl[4], distribution_maxrgb_percentiles[16];
+        int32u targeted_system_display_maximum_luminance, maxscl[4]{}, distribution_maxrgb_percentiles[16];
         int16u fraction_bright_pixels;
         int8u num_distribution_maxrgb_percentiles, distribution_maxrgb_percentages[16], num_windows, num_bezier_curve_anchors;
         bool targeted_system_display_actual_peak_luminance_flag, mastering_display_actual_peak_luminance_flag, color_saturation_mapping_flag;

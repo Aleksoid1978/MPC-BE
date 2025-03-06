@@ -209,7 +209,7 @@ void File_ProRes::Read_Buffer_Continue()
     //Parsing
     int32u  Name, creatorID;
     int16u  hdrSize, version, frameWidth, frameHeight;
-    int8u   chrominance_factor, frame_type, primaries, transf_func, colorMatrix, alpha_info;
+    int8u   chrominance_factor{}, frame_type{}, primaries{}, transf_func{}, colorMatrix{}, alpha_info{};
     bool    IsOk=true, luma, chroma;
     Element_Begin1("Header");
         Skip_B4(                                                "Size");

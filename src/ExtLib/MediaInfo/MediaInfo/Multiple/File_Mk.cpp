@@ -1439,7 +1439,7 @@ void File_Mk::Read_Buffer_Unsynched()
     if (!File_GoTo)
         Element_Level=0;
 
-    for (std::map<int64u, stream>::iterator streamItem=Stream.begin(); streamItem!=Stream.end(); streamItem++)
+    for (std::map<int64u, stream>::iterator streamItem=Stream.begin(); streamItem!=Stream.end(); ++streamItem)
     {
         if (!File_GoTo)
             streamItem->second.PacketCount=0;
@@ -5361,7 +5361,7 @@ void File_Mk::sei_message_user_data_registered_itu_t_t35_B5_003C_0001_04()
     Get_B1 (application_version,                                "application_version");
     if (application_version<=1)
     {
-        int32u targeted_system_display_maximum_luminance, maxscl[4], distribution_maxrgb_percentiles[16];
+        int32u targeted_system_display_maximum_luminance, maxscl[4]{}, distribution_maxrgb_percentiles[16];
         int16u fraction_bright_pixels;
         int8u num_distribution_maxrgb_percentiles, distribution_maxrgb_percentages[16], num_windows, num_bezier_curve_anchors;
         bool targeted_system_display_actual_peak_luminance_flag, mastering_display_actual_peak_luminance_flag, color_saturation_mapping_flag;

@@ -333,6 +333,7 @@ int8u Mpeg4_Descriptors_ToAudioProfileLevelIndication(const profilelevel_struct&
     {
         case UnspecifiedAudio             : return 0xFE;
         case NoAudio                      : return 0xFF;
+        default:;
     }
     for (size_t i = 0; i < Mpeg4_Descriptors_AudioProfileLevelIndication_Size; i++)
         if (ToMatch == Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping[i])
@@ -545,7 +546,7 @@ void File_Mpeg4_Descriptors::Data_Parse()
 void File_Mpeg4_Descriptors::Descriptor_01()
 {
     //Parsing
-    int8u ProfileLevel[5];
+    int8u ProfileLevel[5]{};
     bool URL_Flag;
     BS_Begin();
     Skip_S2(10,                                                 "ObjectDescriptorID");

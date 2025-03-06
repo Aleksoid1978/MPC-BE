@@ -217,7 +217,7 @@ void File_Ttml::Streams_Finish()
         if (!Time_End.IsTimed() && Time_End>Time_Begin)
         {
             TimeCode LastFrame=Time_End;
-            LastFrame--;
+            --LastFrame;
             Fill(Stream_Text, 0, Text_TimeCode_LastFrame, LastFrame.ToString());
         }
         auto MediaTimeToMilliseconds=[&](TimeCode TC)
@@ -736,10 +736,11 @@ void File_Ttml::Read_Buffer_Continue()
                     Content.FindAndReplace(__T("<br/>"), EOL, 0, ZenLib::Ztring_Recursive);
                     Content.FindAndReplace(__T("<br />"), EOL, 0, ZenLib::Ztring_Recursive);
 
+                    std::wstring Content_Unicode{ Content.To_Unicode() };
                     Event.DTS=DTS_Begin;
                     Event.PTS=Event.DTS;
                     Event.DUR=DTS_End-DTS_Begin;
-                    Event.Content=Content.To_Unicode().c_str();
+                    Event.Content=Content_Unicode.c_str();
                     Event.Flags=0;
                     Event.MuxingMode=MuxingMode;
                     Event.Service=(int8u)Element_Code;

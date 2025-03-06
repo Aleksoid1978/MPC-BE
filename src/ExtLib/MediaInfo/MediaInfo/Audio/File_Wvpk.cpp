@@ -154,7 +154,7 @@ void File_Wvpk::Streams_Finish()
         int64u BitDepth=dsf?1:(Wvpk_Resolution[(resolution1?1:0)*2+(resolution0?1:0)]);
         int64u Duration=Samples*1000/SamplingRate;
         int64u CompressedSize=File_Size-TagsSize;
-        int64u UncompressedSize=Duration*(num_channels?num_channels:(mono?1:2))*BitDepth*(SamplingRate<<(3*dsf))/8/1000;
+        int64u UncompressedSize=Duration*(num_channels?num_channels:(mono?1:2))*BitDepth*(static_cast<int64u>(SamplingRate)<<(3*dsf))/8/1000;
         float32 CompressionRatio=((float32)UncompressedSize)/CompressedSize;
         Fill(Stream_Audio, 0, Audio_StreamSize, CompressedSize, 3, true);
         Fill(Stream_Audio, 0, Audio_Duration, Duration, 10, true);
@@ -576,7 +576,7 @@ void File_Wvpk::Data_Parse_Fill()
     {
         Fill(Stream_Audio, StreamPos_Last, Audio_SamplingRate, (Wvpk_SamplingRate[SamplingRate_Index]<<SamplingRate_Shift)<<(3*dsf));
         if (total_samples_FirstFrame!=(int32u)-1) //--> this is a valid value
-            Fill(Stream_Audio, 0, Audio_Duration, ((int64u)total_samples_FirstFrame)*1000/(Wvpk_SamplingRate[SamplingRate_Index]<<SamplingRate_Shift));
+            Fill(Stream_Audio, 0, Audio_Duration, ((int64u)total_samples_FirstFrame)*1000/((int64u)Wvpk_SamplingRate[SamplingRate_Index]<<SamplingRate_Shift));
     }
     Fill(Stream_Audio, 0, Audio_Encoded_Library_Settings, Encoded_Library_Settings);
     Fill(Stream_Audio, 0, Audio_BitRate_Mode, "VBR");

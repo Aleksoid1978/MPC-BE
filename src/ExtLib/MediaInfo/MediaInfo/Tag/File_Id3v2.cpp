@@ -1081,16 +1081,14 @@ void File_Id3v2::PRIV()
     //Ztring Owner;
     //Get_ISO_8859_1(Element_Size, Owner,                         "Owner identifier");
     string Owner;
-    size_t Owner_Size=0;
-    while (Element_Offset+Owner_Size<Element_Size && Buffer[Buffer_Offset+(size_t)Element_Offset+Owner_Size]!='\0')
-        Owner_Size++;
-    if (Owner_Size==0 || Element_Offset+Owner_Size>=Element_Size)
+    auto Owner_Size=SizeUpTo0();
+    if (Owner_Size==0 || Owner_Size>=Element_Size-Element_Offset)
     {
         Skip_XX(Element_Size-Element_Offset,                    "Unknown");
         return;
     }
     Get_String(Owner_Size, Owner,                               "Owner identifier");
-    Skip_B1(                                                    "Null");
+    Skip_B1(                                                    "Zero");
     if (Owner=="com.apple.streaming.transportStreamTimestamp")
     {
         //http://tools.ietf.org/html/draft-pantos-http-live-streaming-13

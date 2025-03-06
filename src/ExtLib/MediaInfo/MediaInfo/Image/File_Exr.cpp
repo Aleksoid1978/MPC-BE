@@ -224,9 +224,9 @@ void File_Exr::Header_Parse()
 
     int32u size;
     Get_String(name_End, name,                                  "name");
-    Element_Offset++; //Null byte
+    Skip_B1(                                                    "zero");
     Get_String(type_End, type,                                  "type");
-    Element_Offset++; //Null byte
+    Skip_B1(                                                    "zero");
     Get_L4 (size,                                               "size");
 
     //Filling

@@ -159,7 +159,7 @@ void File_Flac::Data_Parse()
         CASE_INFO(CUESHEET);
         CASE_INFO(PICTURE);
         case (int8u)-1: Element_Name("Frame");
-                // Fallthrough
+                [[fallthrough]];
         default : Skip_XX(Element_Size,                         "Data");
     }
 

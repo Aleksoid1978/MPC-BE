@@ -75,12 +75,14 @@ private :
         {
             delete[] Iso14496_10_Buffer;
             Iso14496_10_Buffer_Size = (size_t)(Element_Size + 4);
-            Iso14496_10_Buffer = new int8u[Iso14496_10_Buffer_Size];
-            Iso14496_10_Buffer[0] = 0x00;
-            Iso14496_10_Buffer[1] = 0x00;
-            Iso14496_10_Buffer[2] = 0x01;
-            Iso14496_10_Buffer[3] = c;
-            std::memcpy(Iso14496_10_Buffer + 4, Buffer, (size_t)Element_Size);
+            if (Iso14496_10_Buffer_Size > 3) {
+                Iso14496_10_Buffer = new int8u[Iso14496_10_Buffer_Size];
+                Iso14496_10_Buffer[0] = 0x00;
+                Iso14496_10_Buffer[1] = 0x00;
+                Iso14496_10_Buffer[2] = 0x01;
+                Iso14496_10_Buffer[3] = c;
+                std::memcpy(Iso14496_10_Buffer + 4, Buffer, (size_t)Element_Size);
+            }
         }
 #endif //MEDIAINFO_DEMUX
     };

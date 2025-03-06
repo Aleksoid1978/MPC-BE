@@ -230,10 +230,10 @@ public :
           Ztring    Input_Compressed_Get();
           #endif //MEDIAINFO_COMPRESS
           #if MEDIAINFO_FLAG1
-          bool      Flags1_Get(config_flags1 Flag) { return Flags1&(1 << Flag); }
+          bool      Flags1_Get(config_flags1 Flag) { return Flags1&(static_cast<int64u>(1) << Flag); }
           #endif //MEDIAINFO_FLAGX
           #if MEDIAINFO_FLAGX
-          bool      FlagsX_Get(config_flagsX Flag) { return FlagsX&(1 << Flag); }
+          bool      FlagsX_Get(config_flagsX Flag) { return FlagsX&(static_cast<int64u>(1) << Flag); }
           #endif //MEDIAINFO_FLAGX
 
     const Ztring   &Format_Get (const Ztring &Value, infoformat_t KindOfFormatInfo=InfoFormat_Name);

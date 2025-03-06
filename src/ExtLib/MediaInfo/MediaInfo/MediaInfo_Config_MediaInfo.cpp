@@ -3131,7 +3131,7 @@ void MediaInfo_Config_MediaInfo::Event_Send (File__Analyze* Source, const int8u*
                 New->OriginalContent=OriginalContent;
             }
         }
-        if (((*EventCode) & 0x00FFFFFF) == ((MediaInfo_Event_DvDif_Change << 8) | 0) && Data_Size == sizeof(MediaInfo_Event_DvDif_Change_0))
+        if (((*EventCode) & 0x00FFFF00) == (MediaInfo_Event_DvDif_Change << 8) && Data_Size == sizeof(MediaInfo_Event_DvDif_Change_0))
         {
             MediaInfo_Event_DvDif_Change_0* Old = (MediaInfo_Event_DvDif_Change_0*)Data_Content;
             MediaInfo_Event_DvDif_Change_0* New = (MediaInfo_Event_DvDif_Change_0*)Event->Data_Content;
@@ -3143,7 +3143,19 @@ void MediaInfo_Config_MediaInfo::Event_Send (File__Analyze* Source, const int8u*
                 New->MoreData = MoreData;
             }
         }
-        if (((*EventCode) & 0x00FFFFFF) == ((MediaInfo_Event_DvDif_Analysis_Frame << 8) | 1) && Data_Size == sizeof(MediaInfo_Event_DvDif_Analysis_Frame_0))
+        if (((*EventCode) & 0x00FFFF00) == (MediaInfo_Event_DvDif_Analysis_Frame << 8) && Data_Size >= sizeof(MediaInfo_Event_DvDif_Analysis_Frame_0))
+        {
+            MediaInfo_Event_DvDif_Analysis_Frame_1* Old = (MediaInfo_Event_DvDif_Analysis_Frame_1*)Data_Content;
+            MediaInfo_Event_DvDif_Analysis_Frame_1* New = (MediaInfo_Event_DvDif_Analysis_Frame_1*)Event->Data_Content;
+            if (New->Errors)
+            {
+                auto Errors_Size = strlen(New->Errors) + 1;
+                char* Errors = new char[Errors_Size];
+                std::memcpy(Errors, Old->Errors, Errors_Size * sizeof(char));
+                New->Errors = Errors;
+            }
+        }
+        if (((*EventCode) & 0x00FFFF00) == (MediaInfo_Event_DvDif_Analysis_Frame << 8) && Data_Size >= sizeof(MediaInfo_Event_DvDif_Analysis_Frame_1))
         {
             MediaInfo_Event_DvDif_Analysis_Frame_1* Old = (MediaInfo_Event_DvDif_Analysis_Frame_1*)Data_Content;
             MediaInfo_Event_DvDif_Analysis_Frame_1* New = (MediaInfo_Event_DvDif_Analysis_Frame_1*)Event->Data_Content;
@@ -3247,6 +3259,22 @@ void MediaInfo_Config_MediaInfo::Event_Accepted (File__Analyze* Source)
                         {
                             delete[] Old->OriginalContent; Old->OriginalContent=NULL;
                         }
+                    }
+
+                    if (((EventCode) & 0x00FFFF00) == (MediaInfo_Event_DvDif_Change << 8) && Event->second[Pos]->Data_Size >= sizeof(MediaInfo_Event_DvDif_Change_0))
+                    {
+                        MediaInfo_Event_DvDif_Change_0* New = (MediaInfo_Event_DvDif_Change_0*)Event->second[Pos]->Data_Content;
+                        delete[] New->MoreData;
+                    }
+                    if (((EventCode) & 0x00FFFF00) == (MediaInfo_Event_DvDif_Analysis_Frame << 8) && Event->second[Pos]->Data_Size >= sizeof(MediaInfo_Event_DvDif_Analysis_Frame_0))
+                    {
+                        MediaInfo_Event_DvDif_Analysis_Frame_1* New = (MediaInfo_Event_DvDif_Analysis_Frame_1*)Event->second[Pos]->Data_Content;
+                        delete[] New->Errors;
+                    }
+                    if (((EventCode) & 0x00FFFF00) == (MediaInfo_Event_DvDif_Analysis_Frame << 8) && Event->second[Pos]->Data_Size >= sizeof(MediaInfo_Event_DvDif_Analysis_Frame_1))
+                    {
+                        MediaInfo_Event_DvDif_Analysis_Frame_1* New = (MediaInfo_Event_DvDif_Analysis_Frame_1*)Event->second[Pos]->Data_Content;
+                        delete[] New->MoreData;
                     }
 
                     delete Event->second[Pos]; Event->second[Pos]=NULL;
@@ -3689,19 +3717,19 @@ Ztring MediaInfo_Config_MediaInfo::File_ProbeCaption_Set (const Ztring& NewValue
                 {
                 case 'E':
                     Value_Int <<= 10;
-                    // Fall through
+                    [[fallthrough]];
                 case 'P':
                     Value_Int <<= 10;
-                    // Fall through
+                    [[fallthrough]];
                 case 'T':
                     Value_Int <<= 10;
-                    // Fall through
+                    [[fallthrough]];
                 case 'G':
                     Value_Int <<= 10;
-                    // Fall through
+                    [[fallthrough]];
                 case 'M':
                     Value_Int <<= 10;
-                    // Fall through
+                    [[fallthrough]];
                 default:
                     Value_Int <<= 10;
                 }
@@ -3774,15 +3802,15 @@ config_probe MediaInfo_Config_MediaInfo::File_ProbeCaption_Get(const string& Par
             return {};
         const auto& Item = File_ProbeCaption[File_ProbeCaption_Pos];
         File_ProbeCaption_Pos++;
-        if (Item.Parser.empty()) {
+        if (!Item.Parser.empty()) {
             if (Item.Parser[0] == '-') {
-                if (Item.Parser.rfind(ParserName, 1) == 1) {
+                if (Item.Parser.substr(1) == ParserName) {
                     continue;
                 }
             }
-        }
-        else if (Item.Parser != ParserName) {
-            continue;
+            else if (Item.Parser != ParserName) {
+                continue;
+            }
         }
 
         return Item;

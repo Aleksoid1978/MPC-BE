@@ -2583,13 +2583,15 @@ void File_Mpeg_Descriptors::Descriptor_3F_14()
                 Complete_Stream->Streams[elementary_PID]->Infos["BitRate_Maximum"].From_Number(brat*1000000);
             if (Framerate_Numerator && Framerate_Denominator && Framerate_Denominator<=2)
             {
+                int32u Num=Framerate_Numerator;
+                int32u Den=Framerate_Denominator;
                 if (Framerate_Denominator==2)
                 {
-                    Framerate_Numerator*=1000;
-                    Framerate_Denominator=1001;
+                    Num*=1000;
+                    Den=1001;
                 }
-                Complete_Stream->Streams[elementary_PID]->Infos["FrameRate_Num"].From_Number(Framerate_Numerator);
-                Complete_Stream->Streams[elementary_PID]->Infos["FrameRate_Den"].From_Number(Framerate_Denominator);
+                Complete_Stream->Streams[elementary_PID]->Infos["FrameRate_Num"].From_Number(Num);
+                Complete_Stream->Streams[elementary_PID]->Infos["FrameRate_Den"].From_Number(Den);
             }
             if (Interlace_Mode!=3)
             {
@@ -3266,6 +3268,7 @@ void File_Mpeg_Descriptors::Descriptor_7B()
                         {
                             Complete_Stream->Streams[elementary_PID]->descriptor_tag=0x7B;
                         }
+                        break;
             default   : ;
         }
     FILLING_END();
@@ -3304,6 +3307,7 @@ void File_Mpeg_Descriptors::Descriptor_7C()
                             Complete_Stream->Streams[elementary_PID]->descriptor_tag=0x7C;
                             Complete_Stream->Streams[elementary_PID]->Infos["Format_Profile"]=Mpeg_Descriptors_MPEG_4_audio_profile_and_level(Profile_and_level);
                         }
+                        break;
             default   : ;
         }
     FILLING_END();
@@ -3497,7 +3501,7 @@ void File_Mpeg_Descriptors::Descriptor_7F_19()
         {
             Complete_Stream->Streams[elementary_PID]->StreamKind_FromDescriptor=Stream_Audio;
             size_t Infos_Pos=0;
-            for (map<int8u, Descriptor_7F_19_Info>::iterator Info=Infos.begin(); Info!=Infos.end(); Info++)
+            for (map<int8u, Descriptor_7F_19_Info>::iterator Info=Infos.begin(); Info!=Infos.end(); ++Info)
             {
                 string Prefix="Preselection"+Ztring::ToZtring(Info->first).To_UTF8();
                 if (Info->second.preselection_id!=Infos_Pos)

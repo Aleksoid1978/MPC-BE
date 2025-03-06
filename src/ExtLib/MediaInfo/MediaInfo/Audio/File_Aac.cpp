@@ -126,6 +126,7 @@ void File_Aac::Streams_Accept()
          case Mode_ADTS :
                        if (!IsSub)
                             TestContinuousFileNames();
+                       break;
         default : ;
     }
     if (Frame_Count_NotParsedIncluded==(int64u)-1)

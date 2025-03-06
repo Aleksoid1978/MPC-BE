@@ -160,7 +160,7 @@ void File_Opus::Identification()
             case 0 : // Mono/Stereo
                     if (ch_count>2)
                         break; // Not in spec
-                    // else it is as Vorbis specs, no break
+                    [[fallthrough]]; // else it is as Vorbis specs, no break
             case 1 : // Vorbis order
                     if (ch_count && ch_count<=Opus_ChannelLayout_Max)
                     {
@@ -174,6 +174,7 @@ void File_Opus::Identification()
                     if (ChannelLayout2!=Retrieve(Stream_Audio, 0, Audio_ChannelLayout))
                         Fill(Stream_Audio, 0, Audio_ChannelLayout, ChannelLayout2);
                     }
+                    break;
             default: ; //Unknown
         }
 

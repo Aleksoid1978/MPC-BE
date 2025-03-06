@@ -530,13 +530,13 @@ public:
     Dir::dirlist_t Options;
     HANDLE hFind;
     #ifdef UNICODE
-        WIN32_FIND_DATAW FindFileDataW;
+        WIN32_FIND_DATAW FindFileDataW{};
     #else
-        WIN32_FIND_DATA FindFileData;
+        WIN32_FIND_DATA FindFileData{};
     #endif //UNICODE
 
     GetAllFileNames_Private()
-        : hFind(INVALID_HANDLE_VALUE)
+        : Options(), hFind(INVALID_HANDLE_VALUE)
     {
     }
 };

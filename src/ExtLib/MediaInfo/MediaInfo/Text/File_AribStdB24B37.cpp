@@ -28,15 +28,7 @@
 #include <vector>
 #ifdef __WINDOWS__
     #undef __TEXT
-    #if __cplusplus >= 201703L || _MSVC_LANG >= 201703L
-        namespace WindowsNamespace
-        {
-    #endif
     #include "windows.h"
-    #if __cplusplus >= 201703L || _MSVC_LANG >= 201703L
-        }
-        using namespace WindowsNamespace;
-    #endif
 #endif // __WINDOWS__
 
 #if MEDIAINFO_EVENTS
@@ -748,8 +740,9 @@ void File_AribStdB24B37::caption_statement() //caption_data()
                     MuxingMode=HasCcis?7:(int8u)-1; // "CCIS" or nothing
             }
         Frame_Count_NotParsedIncluded=Frame_Count;
-        EVENT_BEGIN (Global, SimpleText, 0)
-            Event.Content=Streams[(size_t)(Element_Code-1)].Line.To_Unicode().c_str();
+        EVENT_BEGIN(Global, SimpleText, 0)
+            std::wstring Line_Unicode{ Streams[(size_t)(Element_Code - 1)].Line.To_Unicode() };
+            Event.Content=Line_Unicode.c_str();
             Event.Flags=0;
             Event.MuxingMode=MuxingMode;
             Event.Service=(int8u)Element_Code;

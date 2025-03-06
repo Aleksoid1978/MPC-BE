@@ -54,6 +54,15 @@ void Pac_Convert(Ztring& ToConvert, const codepage& CodePage) {
     }
 }
 
+//---------------------------------------------------------------------------
+enum Pac_format {
+    Format_8bit,
+    Format_Skip3,
+    Format_Skip4,
+    Format_Utf8,
+    Format_16bit,
+};
+
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -115,7 +124,7 @@ void File_Pac::Streams_Finish()
     Fill(Stream_Text, 0, Text_TimeCode_FirstFrame, Time_Start_Command.ToString());
     Fill(Stream_Text, 0, Text_Duration_End_Command, (int64s)(Time_End_Command - Offset).ToMilliseconds());
     TimeCode LastFrame = Time_End_Command;
-    LastFrame--;
+    --LastFrame;
     Fill(Stream_Text, 0, Text_TimeCode_LastFrame, LastFrame.ToString());
     if (Time_Start.IsValid()) {
         Time_Start.SetFramesMax(FrameMax);
@@ -253,104 +262,151 @@ void File_Pac::Data_Parse()
         }
     }
     ZtringList Content;
-    while (Element_Size - Element_Offset >= 1) {
-        int64u Current;
-        if (!Element_Code) {
-            int8u Start;
-            Peek_L1(Start);
-            if (Start != 0xFE) {
-                Trusted_IsNot("0xFE");
-                Skip_XX(Element_Size-Element_Offset,            "(Unknown)");
-                break;
-            }
-            Skip_L1(                                            "0xFE");
-            Skip_L1(                                            "Horizontal alignment");
-            Skip_L1(                                            "(Unknown)");
-            for (Current = Element_Offset; Current < Element_Size; Current++) {
-                if (Buffer[Buffer_Offset + Current] == 0xFE) {
+    auto NextPartIsStart = true;
+    auto NextPartFormat = Format_8bit;
+    while (Element_Offset < Element_Size) {
+        if (NextPartIsStart) {
+            if (!Element_Code) {
+                int8u Start;
+                Peek_L1(Start);
+                auto Size = Element_Size - Element_Offset;
+                if (Start != 0xFE || Size <= 2) {
+                    Trusted_IsNot("0xFE");
+                    Skip_XX(Size,                               "(Unknown)");
                     break;
                 }
+                Skip_L1(                                        "Line start marker");
+                Skip_L1(                                        "Horizontal alignment");
+                Skip_L1(                                        "(Unknown)");
             }
+            Content.resize(Content.size() + 1);
+            NextPartIsStart = false;
         }
-        else {
-            Current = Element_Size;
-        }
-        Content.resize(Content.size() + 1);
-        auto Size = Current - Element_Offset;
-        bool IsUtf8 = false;
-        bool IsW16 = false;
-        while (Size) {
-            if (Size > 2) {
-                size_t Pos = Buffer_Offset + (size_t)Element_Offset;
-                if (Buffer[Pos] == 0x1F && Buffer[Pos + 1] == 'C' && Buffer[Pos + 2] >= '0' && Buffer[Pos + 2] <= '9') {
-                    Skip_B3(                                    "(Unknown)");
-                    Size -= 3;
-                }
-            }
-            if (Size >= 5) {
-                int64u Probe;
-                Peek_B5(Probe);
-                if (Probe >> 8 == 0x1FEFBBBF) {
-                    Skip_B4(                                    "UTF-8 start");
-                    IsUtf8 = true;
-                }
-                if (Probe == 0x1F5731362ELL) {
-                    Skip_B5(                                    "W16 start");
-                    IsW16 = true;
-                }
-            }
-            if (IsUtf8) {
-                int64u End = Element_Offset;
-                for (; End < Element_Size; End++) {
-                    const auto Data = Buffer[Buffer_Offset + End];
-                    if (Data == 0x2E || Data == 0xFF) {
+
+        auto Element_Middle = Element_Offset;
+        auto Format = NextPartFormat;
+        NextPartFormat = Format_8bit;
+        for (Element_Middle = Element_Offset; Element_Middle < Element_Size; Element_Middle += Format == Format_16bit ? 2 : 1) {
+            const auto Value = Buffer[Buffer_Offset + Element_Middle];
+            if (Value == 0x1F) {
+                auto Buffer_Current = Buffer + Buffer_Offset + (size_t)Element_Middle + 1;
+                auto NextPartMaxSize = Element_Size - Element_Middle;
+                if (NextPartMaxSize >= 3) {
+                    auto Probe = BigEndian2int16u(Buffer_Current);
+                    if (Probe >= 0x4330 && Probe <= 0x4339) { // C0 - C9
+                        NextPartFormat = Format_Skip3;
                         break;
                     }
                 }
-                Get_UTF8(End - Element_Offset, Content.back(),  "Content");
-                if (Element_Offset < Element_Size) {
-                    if (Buffer[Buffer_Offset + Element_Offset] == 0xFF) {
+                if (NextPartMaxSize > 3) {
+                    auto Probe = BigEndian2int24u(Buffer_Current);
+                    if (Probe >= 0x522E30 && Probe <= 0x522E39) { // R.0 - R.9
+                        NextPartFormat = Format_Skip4;
+                        break;
+                    }
+                    if (Probe == 0xEFBBBF) {
+                        NextPartFormat = Format_Utf8;
+                        break;
+                    }
+                }
+                if (NextPartMaxSize >= 5) {
+                    auto Probe = BigEndian2int32u(Buffer_Current);
+                    if (Probe == 0x5731362E) { // W16.
+                        NextPartFormat = Format_16bit;
+                        break;
+                    }
+                }
+            }
+            if (Value == 0xFE && !Element_Code) {
+                NextPartIsStart = true;
+                break;
+            }
+        }
+
+        // Current
+        auto Size = Element_Middle - Element_Offset;
+        switch (Format) {
+        case Format_8bit: {
+            Ztring Value;
+            Get_ISO_8859_1(Size, Value,                         "Content");
+            bool Is8bit = false;
+            for (const auto& Character : Value) {
+                if ((unsigned)Character >= 0x80) {
+                    Is8bit = true;
+                }
+            }
+            if (Is8bit) {
+                Count_1byte8++;
+                for (auto i = Value.size() - 1; i; --i) {
+                    const auto Character = Value[i];
+                    if ((unsigned)Character >= 0xE0) {
+                        Value.erase(i, 1); // Content reading not supported but no need for counting
+                    }
+                }
+            }
+            else if (Size) {
+                Count_1byte7++;
+            }
+            Content.back() += Value;
+            break;
+        }
+        case Format_Skip4:
+        case Format_Skip3: {
+            break;
+        }
+        case Format_Utf8: {
+            auto Element_UTF8End = Element_Offset;
+            for (; Element_UTF8End < Element_Middle; ++Element_UTF8End) {
+                const auto Data = Buffer[Buffer_Offset + Element_UTF8End];
+                if (Data == 0x2E || Data == 0xFF) {
+                    Ztring Value;
+                    Get_UTF8(Element_UTF8End - Element_Offset, Value, "Content");
+                    Content.back() += Value;
+                    if (Data == 0xFF) {
                         Skip_L1(                                "Dot");
                         Content.back() += __T('.');
+                        continue;
                     }
-                    else { // 0x2E
-                        Skip_B1(                                "UTF-8 end");
-                        IsUtf8 = false;
-                    }
-                }
-                Count_UTF8++;
-            }
-            else if (IsW16) {
-                Skip_XX(Size,                                   "Content");
-                Content.back().resize(Size / 2);
-                Count_2byte++;
-            }
-            else {
-                Get_ISO_8859_1(Size, Content.back(),            "Content");
-                bool Is8bit = false;
-                for (const auto& Character : Content.back()) {
-                    if ((wchar_t)Character >= 0x80) {
-                        Is8bit = true;
-                    }
-                }
-                if (Is8bit) {
-                    Count_1byte8++;
-                    auto& Line = Content.back();
-                    if (Line.size() < numeric_limits<int>::max()) {
-                        int Max = (int)Line.size();
-                        for (int i = Max; i > 0; i--) {
-                            const auto Character = Line[i];
-                            if ((wchar_t)Character >= 0xE0) {
-                                Line.erase(i, 1); // Not supported but we currently don't need the real text
-                            }
-                        }
-                    }
-                }
-                else {
-                    Count_1byte7++;
+                    Skip_C1(                                    "UTF-8 end");
+                    NextPartFormat = Format_8bit;
                 }
             }
-            Size = Current - Element_Offset;
+            Count_UTF8++;
+            break;
+        }
+        case Format_16bit: {
+            auto Current = (int16u*)(Buffer + Buffer_Offset + (size_t)Element_Offset);
+            auto End = Current + Size / 2;
+            for (; Current < End; ++Current) {
+                Content.back() += (wchar_t)*Current; // Content reading not supported but no need for counting, we need only the values < 0x80
+            }
+            Skip_XX(Size,                                       "W16 content");
+            Count_2byte++;
+            break;
+        }
+        }
+
+        // Next
+        switch (NextPartFormat) {
+        case Format_8bit: {
+            break;
+        }
+        case Format_Skip3: {
+            Skip_C3(                                            "(Unknown)");
+            break;
+        }
+        case Format_Skip4: {
+            Skip_C4(                                            "(Unknown)");
+            break;
+        }
+        case Format_Utf8: {
+            Skip_C4(                                            "UTF-8 start");
+            break;
+        }
+        case Format_16bit:{
+            Skip_C5(                                            "W16 start");
+            break;
+        }
         }
     }
 
@@ -478,16 +534,18 @@ void File_Pac::Data_Parse()
                     for (const auto& Line : Content) {
                         auto CountOfCharsPerLine = Line.size();
                         size_t Pos = 0;
-                        for (;;) {
-                            Pos = Line.find('<', Pos);
-                            if (Pos == string::npos) {
-                                break;
+                        bool ItalicBeginFound = false;
+                        for (const auto& Value : Line) {
+                            if (Value < 0x20) { // Non printable
+                                CountOfCharsPerLine--;
                             }
-                            Pos = Line.find('>', Pos + 1);
-                            if (Pos == string::npos) {
-                                break;
+                            if (Value == '<') {
+                                ItalicBeginFound = true;
                             }
-                            CountOfCharsPerLine += 2; // < and > are marker of italic
+                            if (Value == '<') {
+                                CountOfCharsPerLine -= 2; // < and > are markers of italic
+                                ItalicBeginFound = false;
+                            }
                         }
                         if (MaxCountOfCharsPerLine < CountOfCharsPerLine) {
                             MaxCountOfCharsPerLine = CountOfCharsPerLine;

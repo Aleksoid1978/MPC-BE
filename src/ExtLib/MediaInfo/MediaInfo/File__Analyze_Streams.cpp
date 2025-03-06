@@ -68,7 +68,7 @@ inline void add_dec_2chars(string& In, uint8_t Value)
         Value=(uint8_t)Value100.rem;
         In+='0'+Value100.quot;
     }
-    In.append(add_dec_cache+(Value<<1), 2);
+    In.append(add_dec_cache+((size_t)Value<<1), 2);
 }
 
 //---------------------------------------------------------------------------
@@ -98,7 +98,7 @@ bool DateTime_Adapt(string& Value_)
         IsUtc = false;
     
     // Unix style
-    if (Value.size() < 4)
+    if (Value.size() < 5)
         return false;
     if (Value[4]!='-')
     {
@@ -421,7 +421,7 @@ void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_Col
 #endif
 
 //---------------------------------------------------------------------------
-extern const char* DolbyVision_Compatibility[] =
+const char* DolbyVision_Compatibility[] =
 {
     "",
     "HDR10",
@@ -504,7 +504,7 @@ static void DolbyVision_Profiles_Append(string& Profile, int8u i)
         return add_dec_2chars(Profile, i);
     Profile.append(DolbyVision_Profiles_Names+((size_t)j)*4, 4);
 }
-extern const char* DolbyVision_Compression[] =
+const char* DolbyVision_Compression[] =
 {
     "None",
     "Limited",
@@ -583,7 +583,7 @@ void File__Analyze::dvcC(bool has_dependency_pid, std::map<std::string, Ztring>*
             }
 
             string Layers;
-            if (rpu_present_flag|el_present_flag|bl_present_flag)
+            if (rpu_present_flag||el_present_flag||bl_present_flag)
             {
                 if (bl_present_flag)
                     Layers +="BL+";
@@ -665,7 +665,7 @@ void File__Analyze::Get_LightLevel(Ztring &MaxCLL, Ztring &MaxFALL, int32u Divis
 size_t File__Analyze::Stream_Prepare (stream_t KindOfStream, size_t StreamPos)
 {
     //Integrity
-    if (KindOfStream>Stream_Max)
+    if (KindOfStream<0 || KindOfStream>Stream_Max)
         return Error;
 
     //Clear
@@ -1000,7 +1000,7 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
         "ContainerExtra",
     };
     assert(sizeof(SourceValue)==StreamSource_Max*sizeof(const char*));
-    if (StreamKind==Stream_Video && ShowSource_IsInList((video)Parameter) && StreamSource<StreamSource_Max && Retrieve_Const(Stream_Video, StreamPos, Parameter+1).empty())
+    if (StreamKind==Stream_Video && ShowSource_IsInList((video)Parameter) && StreamSource>=0 && StreamSource<StreamSource_Max && Retrieve_Const(Stream_Video, StreamPos, Parameter+1).empty())
     {
         Fill(Stream_Video, StreamPos, Parameter+1, SourceValue[StreamSource]);
     }
@@ -1054,7 +1054,7 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
     if (StreamKind==Stream_Max || StreamPos>=(*Stream)[StreamKind].size())
     {
         size_t StreamKindS=(size_t)StreamKind;
-        if (StreamKind!=Stream_Max)
+        if (StreamKind>=0 && StreamKind!=Stream_Max)
         {
             //Stream kind is found, moving content
             for (size_t Pos=0; Pos<Fill_Temp[Stream_Max].size(); Pos++)
@@ -1737,7 +1737,7 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, const char* Par
     if (StreamKind==Stream_Max || StreamPos>=(*Stream)[StreamKind].size())
     {
         size_t StreamKindS=(size_t)StreamKind;
-        if (StreamKind!=Stream_Max)
+        if (StreamKind>=0 && StreamKind!=Stream_Max)
         {
             //Stream kind is found, moving content
             for (size_t Pos=0; Pos<Fill_Temp[Stream_Max].size(); Pos++)
@@ -1888,7 +1888,7 @@ void File__Analyze::Fill_SetOptions(stream_t StreamKind, size_t StreamPos, const
         return;
 
     //Handle Value before StreamKind
-    if (StreamKind==Stream_Max || StreamPos>=(*Stream)[StreamKind].size())
+    if (StreamKind>=0 && (StreamKind==Stream_Max || StreamPos>=(*Stream)[StreamKind].size()))
     {
         Fill_Temp_Options[StreamKind][Parameter]=Options;
         return; //No streams
@@ -1913,7 +1913,7 @@ const Ztring &File__Analyze::Retrieve_Const (stream_t StreamKind, size_t StreamP
      || StreamPos>=(*Stream)[StreamKind].size()
      || Parameter>=MediaInfoLib::Config.Info_Get(StreamKind).size()+(*Stream_More)[StreamKind][StreamPos].size())
     {
-        if (StreamKind<sizeof(Fill_Temp)/sizeof(vector<fill_temp_item>))
+        if ((size_t)StreamKind<sizeof(Fill_Temp)/sizeof(*Fill_Temp))
         {
             Ztring Parameter_Local;
             Parameter_Local.From_Number(Parameter);
@@ -3098,21 +3098,18 @@ void File__Analyze::Duration_Duration123(stream_t StreamKind, size_t StreamPos, 
                         if (FrameRateF>=FrameRateF_Min && FrameRateF<FrameRateF_Max)
                         {
                             // Default from user
-                            if (!DropFrame_IsValid)
-                            {
-                                #if MEDIAINFO_ADVANCED
-                                    switch (Config->File_DefaultTimeCodeDropFrame_Get())
-                                    {
-                                        case 0 :
-                                                DropFrame=false;
-                                                break;
-                                        default:
-                                                DropFrame=true;
-                                    }
-                                #else //MEDIAINFO_ADVANCED
-                                    DropFrame=true;
-                                #endif //MEDIAINFO_ADVANCED
-                            }
+                            #if MEDIAINFO_ADVANCED
+                                switch (Config->File_DefaultTimeCodeDropFrame_Get())
+                                {
+                                    case 0 :
+                                            DropFrame=false;
+                                            break;
+                                    default:
+                                            DropFrame=true;
+                                }
+                            #else //MEDIAINFO_ADVANCED
+                                DropFrame=true;
+                            #endif //MEDIAINFO_ADVANCED
                         }
                         else
                             DropFrame=false;

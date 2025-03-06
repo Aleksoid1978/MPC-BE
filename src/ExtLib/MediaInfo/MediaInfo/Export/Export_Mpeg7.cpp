@@ -220,9 +220,10 @@ Ztring Mpeg7_ContentCS_Name(int32u termID, MediaInfo_Internal &MI, size_t) //xxy
                         case 2 : return __T("Video");
                         case 3 : return __T("Graphics");
                     }
-        case 50: return __T("Text");
-        default : return MI.Get(Stream_General, 0, General_FileExtension);
+                    break;
+        case 50 : return __T("Text");
     }
+    return MI.Get(Stream_General, 0, General_FileExtension);
 }
 
 //---------------------------------------------------------------------------
@@ -2668,7 +2669,7 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI, size_t Version)
              || !MI.Get(Stream_Video, 0, Video_Language).empty()
              || (!Mpeg7_AudioPresentationCS_termID(MI, 0) && !MI.Get(Stream_Audio, 0, Audio_ChannelLayout).empty()))
                 Extended=1;
-            //fall through
+            [[fallthrough]];
         case Export_Mpeg7::Version_BestEffort_Strict:
             if (Video_Count>1
              || Audio_Count>1

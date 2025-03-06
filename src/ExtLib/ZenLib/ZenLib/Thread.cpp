@@ -304,6 +304,7 @@ Thread::returnvalue Thread::ForceTerminate()
         CriticalSectionLocker CSL(C);
 
         //Terminating (not clean)
+        #pragma warning ( suppress : 6258 ) //C6258: Using TerminateThread does not allow proper thread clean up.
         TerminateThread((HANDLE)ThreadPointer, 1);
         ThreadPointer=NULL;
 

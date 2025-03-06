@@ -316,7 +316,7 @@ void File_Png::IHDR()
             {
                 case 3:
                     Bit_depth=8; // From spec: "indexed-colour PNG images (colour type 3), in which the sample depth is always 8 bits" (sample depth is our bit depth
-                    // Fallthrough
+                    [[fallthrough]];
                 case 0 :
                 case 2:
                 case 4:
@@ -546,7 +546,7 @@ void File_Png::Textual(bitset8 Method)
     }
     Get_ISO_8859_1(Zero-Element_Offset, Keyword,                "Keyword");
     Skip_B1(                                                    "Null separator");
-    int8u Compression;
+    int8u Compression{};
     if (Method[IsCompressed])
     {
         if (Method[IsUTF8])

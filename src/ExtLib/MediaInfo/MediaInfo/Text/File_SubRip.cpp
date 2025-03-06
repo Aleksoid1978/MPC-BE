@@ -438,11 +438,12 @@ void File_SubRip::Read_Buffer_Continue()
         for (; Items_Pos<Items.size(); Items_Pos++)
         {
             Frame_Count_NotParsedIncluded=Frame_Count;
-            EVENT_BEGIN (Global, SimpleText, 0)
+            EVENT_BEGIN(Global, SimpleText, 0)
+                std::wstring Content_Unicode{ Items[Items_Pos].Content.To_Unicode() };
                 Event.DTS=Items[Items_Pos].PTS_Begin;
                 Event.PTS=Event.DTS;
                 Event.DUR=Items[Items_Pos].PTS_End-Items[Items_Pos].PTS_Begin;
-                Event.Content=Items[Items_Pos].Content.To_Unicode().c_str();
+                Event.Content=Content_Unicode.c_str();
                 Event.Flags=IsVTT?1:0;
                 Event.MuxingMode=(int8u)-1;
                 Event.Service=(int8u)-1;

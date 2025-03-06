@@ -48,6 +48,7 @@ private :
 
     //Helpers
     void dttimepack(TimeCode& TC);
+    void dtdatepack(string& Date);
     void Get_BCD(int8u& Value, const char* Name0, const char* Name1);
 
     //Temp

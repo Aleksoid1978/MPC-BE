@@ -986,15 +986,14 @@ void File_Dpx::Get_XF4(float32 &Info, const char* Name)
 void File_Dpx::Get_ASCII(size_t Size, string &Info, const char* Name)
 {
     //Looking for end of string (null byte)
-    size_t NullPos=0;
-    while (NullPos<Size && Element_Offset+NullPos<Element_Size)
-    {
-        if (!Buffer[Buffer_Offset+(size_t)Element_Offset+ NullPos])
-            break;
-        NullPos++;
-    }
-    Get_String (NullPos, Info,                                  Name);
-    Element_Offset+=Size-NullPos; //Skipping bytes including null bytes and bytes after null byte
+    auto ActualSize=SizeUpTo0(Size);
+    auto Element_Offset_Max=Element_Offset+Size;
+    Get_String (ActualSize, Info,                               Name);
+    auto Buffer_Begin=Buffer+Buffer_Offset;
+    while (Element_Offset<Element_Offset_Max && !Buffer_Begin[Element_Offset])
+        ++Element_Offset;
+    if (Element_Offset_Max>Element_Offset)
+        Skip_XX(Element_Offset_Max-Element_Offset,              "(Unknown)");
 }
 
 } //NameSpace

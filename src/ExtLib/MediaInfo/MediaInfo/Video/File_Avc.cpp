@@ -1181,7 +1181,7 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
             case Video_MasteringDisplay_Luminance:
                 if (Retrieve_Const(Stream_Video, 0, Item->first) == Item->second)
                     break;
-                // Fallthrough
+                [[fallthrough]];
             default:
                 Fill(Stream_Video, 0, Item->first, Item->second);
             }
@@ -2950,7 +2950,7 @@ void File_Avc::dec_ref_pic_marking(std::vector<int8u> &memory_management_control
                                 break;
                     case 3 :
                                 Skip_UE(                        "difference_of_pic_nums_minus1");
-                                //break; 3 --> difference_of_pic_nums_minus1 then long_term_frame_idx
+                                [[fallthrough]]; // 3 --> difference_of_pic_nums_minus1 then long_term_frame_idx
                     case 6 :
                                 Skip_UE(                        "long_term_frame_idx");
                                 break;
@@ -3160,7 +3160,7 @@ void File_Avc::sei_message_pic_timing(int32u /*payloadSize*/, int32u seq_paramet
                             n_frames=0;
                             FrameMax=0; //Unsupported type
                         }
-                        else if ((*seq_parameter_set_Item)->vui_parameters->flags[fixed_frame_rate_flag] && (*seq_parameter_set_Item)->vui_parameters->time_scale && (*seq_parameter_set_Item)->vui_parameters->time_scale && (*seq_parameter_set_Item)->vui_parameters->num_units_in_tick)
+                        else if ((*seq_parameter_set_Item)->vui_parameters->flags[fixed_frame_rate_flag] && (*seq_parameter_set_Item)->vui_parameters->time_scale && (*seq_parameter_set_Item)->vui_parameters->num_units_in_tick)
                             FrameMax=(int32u)(float64_int64s((float64)(*seq_parameter_set_Item)->vui_parameters->time_scale/(*seq_parameter_set_Item)->vui_parameters->num_units_in_tick/((*seq_parameter_set_Item)->frame_mbs_only_flag?2:(((*seq_parameter_set_Item)->pic_order_cnt_type==2 && Structure_Frame/2>Structure_Field)?1:2))/FrameRate_Divider)-1);
                         else if (n_frames>99)
                             FrameMax=n_frames;
@@ -4796,6 +4796,7 @@ void File_Avc::SPS_PPS()
                             Element_End0();
                         }
                         }
+                        break;
             default:;
         }
     }
