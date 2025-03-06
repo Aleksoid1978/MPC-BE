@@ -2358,7 +2358,7 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 	}
 
 	if (SUCCEEDED(hr)) {
-		const REFERENCE_TIME hnsPeriodicity = (IsExclusive(pWaveFormatEx) && m_WasapiMethod == WASAPI_METHOD::EVENT) ? m_hnsBufferDuration : 0;
+		hr = E_FAIL;
 
 		if (ShareMode == AUDCLNT_SHAREMODE_SHARED && m_WasapiMethod == WASAPI_METHOD::EVENT) {
 			CComPtr<IAudioClient3> pAudioClient3;
@@ -2382,6 +2382,7 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 		}
 
 		if (FAILED(hr)) {
+			const REFERENCE_TIME hnsPeriodicity = (IsExclusive(pWaveFormatEx) && m_WasapiMethod == WASAPI_METHOD::EVENT) ? m_hnsBufferDuration : 0;
 			hr = m_pAudioClient->Initialize(ShareMode,
 											StreamFlags,
 											m_hnsBufferDuration,
