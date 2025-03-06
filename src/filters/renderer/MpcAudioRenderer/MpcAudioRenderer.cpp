@@ -2359,11 +2359,35 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 
 	if (SUCCEEDED(hr)) {
 		const REFERENCE_TIME hnsPeriodicity = (IsExclusive(pWaveFormatEx) && m_WasapiMethod == WASAPI_METHOD::EVENT) ? m_hnsBufferDuration : 0;
-		hr = m_pAudioClient->Initialize(ShareMode,
-										StreamFlags,
-										m_hnsBufferDuration,
-										hnsPeriodicity,
-										pWaveFormatEx, nullptr);
+
+		if (ShareMode == AUDCLNT_SHAREMODE_SHARED && m_WasapiMethod == WASAPI_METHOD::EVENT) {
+			CComPtr<IAudioClient3> pAudioClient3;
+			hr = m_pAudioClient->QueryInterface(IID_PPV_ARGS(&pAudioClient3));
+			if (hr == S_OK) {
+				UINT32 defaultPeriodInFrames;
+				UINT32 fundamentalPeriodInFrames;
+				UINT32 minPeriodInFrames;
+				UINT32 maxPeriodInFrames;
+				hr = pAudioClient3->GetSharedModeEnginePeriod(pWaveFormatEx, &defaultPeriodInFrames, &fundamentalPeriodInFrames, &minPeriodInFrames, &maxPeriodInFrames);
+				if (SUCCEEDED(hr)) {
+					DLog(L"CMpcAudioRenderer::CreateRenderClient() - IAudioClient3 : DefaultPeriodInFrames = %u, FundamentalPeriodInFrames = %u, MinPeriodInFrames = %u, MaxPeriodInFrames = %u",
+						 defaultPeriodInFrames, fundamentalPeriodInFrames, minPeriodInFrames, maxPeriodInFrames);
+
+					hr = pAudioClient3->InitializeSharedAudioStream(AUDCLNT_STREAMFLAGS_EVENTCALLBACK, defaultPeriodInFrames, pWaveFormatEx, nullptr);
+					if (hr == S_OK) {
+						DLog(L"CMpcAudioRenderer::CreateRenderClient() - use IAudioClient3 with %u PeriodInFrames.", defaultPeriodInFrames);
+					}
+				}
+			}
+		}
+
+		if (FAILED(hr)) {
+			hr = m_pAudioClient->Initialize(ShareMode,
+											StreamFlags,
+											m_hnsBufferDuration,
+											hnsPeriodicity,
+											pWaveFormatEx, nullptr);
+		}
 	}
 
 	if (AUDCLNT_E_BUFFER_SIZE_NOT_ALIGNED == hr && IsExclusive(pWaveFormatEx)) {
