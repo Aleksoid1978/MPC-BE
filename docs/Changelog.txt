@@ -24,7 +24,8 @@ Updated Italian translation (by mapi68).
 Updated Dutch and Chinese (Traditional) translation (by beter).
 
 Updated libraries:
-	ffmpeg n7.2-dev-1432-ge8d4c559870.
+	ffmpeg n7.2-dev-1432-ge8d4c559870;
+	Little-CMS git-lcms2.17-10-ge19dc49.
 
 
 1.8.3 - 2025-02-07

@@ -1158,6 +1158,7 @@ cmsBool smooth2(cmsContext ContextID, cmsFloat32Number w[], cmsFloat32Number y[]
     cmsFloat32Number *c, *d, *e;
     cmsBool st;
 
+    if (m < 4 || lambda < MATRIX_DET_TOLERANCE) return FALSE;
 
     c = (cmsFloat32Number*) _cmsCalloc(ContextID, MAX_NODES_IN_CURVE, sizeof(cmsFloat32Number));
     d = (cmsFloat32Number*) _cmsCalloc(ContextID, MAX_NODES_IN_CURVE, sizeof(cmsFloat32Number));

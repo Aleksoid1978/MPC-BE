@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2024 Marti Maria Saguer
+//  Copyright (c) 1998-2025 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -23,7 +23,7 @@
 //
 //---------------------------------------------------------------------------------
 //
-// Version 2.17alpha0
+// Version 2.17
 //
 
 #ifndef _lcms2_H
@@ -63,6 +63,9 @@
 
 // Uncomment this to remove the "register" storage class
 // #define CMS_NO_REGISTER_KEYWORD 1
+
+// Uncomment this to remove visibility attribute when building shared objects
+// #define CMS_NO_VISIBILITY 1
 
 // ********** End of configuration toggles ******************************
 

@@ -1111,6 +1111,8 @@ void *Type_Text_Description_Read(struct _cms_typehandler_struct* self, cmsIOHAND
 
     // Read len of ASCII
     if (!_cmsReadUInt32Number(io, &AsciiCount)) return NULL;
+    if (AsciiCount > 0x7ffff) return NULL;
+
     SizeOfTag -= sizeof(cmsUInt32Number);
 
     // Check for size
@@ -1141,8 +1143,9 @@ void *Type_Text_Description_Read(struct _cms_typehandler_struct* self, cmsIOHAND
     if (!_cmsReadUInt32Number(io, &UnicodeCode)) goto Done;
     if (!_cmsReadUInt32Number(io, &UnicodeCount)) goto Done;
     SizeOfTag -= 2* sizeof(cmsUInt32Number);
-
-    if (UnicodeCount == 0 || SizeOfTag < UnicodeCount*sizeof(cmsUInt16Number)) goto Done;
+    
+    if (UnicodeCount == 0 || UnicodeCount > 0x7ffff || 
+        SizeOfTag < UnicodeCount*sizeof(cmsUInt16Number)) goto Done;
 
     UnicodeString = (wchar_t*)_cmsMallocZero(self->ContextID, (UnicodeCount + 1) * sizeof(wchar_t));
     if (UnicodeString == NULL) goto Done;
@@ -5334,7 +5337,7 @@ cmsBool ReadOneWChar(cmsIOHANDLER* io,  _cmsDICelem* e, cmsUInt32Number i, wchar
       if (!io -> Seek(io, e -> Offsets[i])) return FALSE;
 
       nChars = e ->Sizes[i] / sizeof(cmsUInt16Number);
-
+      if (nChars > 0x7ffff) return FALSE;
 
       *wcstr = (wchar_t*) _cmsMallocZero(e ->ContextID, (nChars + 1) * sizeof(wchar_t));
       if (*wcstr == NULL) return FALSE;
@@ -5613,10 +5616,8 @@ void* Type_VideoSignal_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* 
 {
     cmsVideoSignalType* cicp = NULL;
 
-    if (SizeOfTag != 8) return NULL; 
-
-    if (!_cmsReadUInt32Number(io, NULL)) return NULL;
-
+    if (SizeOfTag != 4) return NULL; 
+    
     cicp = (cmsVideoSignalType*)_cmsCalloc(self->ContextID, 1, sizeof(cmsVideoSignalType));
     if (cicp == NULL) return NULL;
 
@@ -5638,8 +5639,7 @@ static
 cmsBool Type_VideoSignal_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, void* Ptr, cmsUInt32Number nItems)
 {
     cmsVideoSignalType* cicp = (cmsVideoSignalType*)Ptr;
-
-    if (!_cmsWriteUInt32Number(io, 0)) return FALSE;
+    
     if (!_cmsWriteUInt8Number(io, cicp->ColourPrimaries)) return FALSE;
     if (!_cmsWriteUInt8Number(io, cicp->TransferCharacteristics)) return FALSE;
     if (!_cmsWriteUInt8Number(io, cicp->MatrixCoefficients)) return FALSE;

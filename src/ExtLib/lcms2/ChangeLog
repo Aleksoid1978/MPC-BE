@@ -1,4 +1,19 @@
 -----------------------
+2.17 Maintenance release
+-----------------------
+Add fuzzers foundation. Many thanks to Amir Montazery and Open Source Technology Improvement Fund (ostif.org), Google, for funding that. 
+Add ability to disable building tests in meson
+Fixed gamut warning not working on certain conditions
+Mac sequoia added to test beds
+Add the possibility of duplicating a NULL context for cloning defaults.
+Small cleanup of CGATS parser
+Change computation of profile ID to follow actual ICC spec (yes, they changed the spec!)
+Allow to apply color management on memory blocks > 4Gb
+Get rid of samples on meson compilation
+Increase coverage of premultiplied alpha.
+Bug fixing and cosmetical work on sources.
+
+-----------------------
 2.16 Featured release
 -----------------------
 New import .CUBE files as RGB devicelinks
