@@ -875,10 +875,10 @@ IDD_PPAGEVIDEO DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Randor video",IDC_STATIC,5,5,285,29
+    GROUPBOX        "Randorul video",IDC_STATIC,5,5,285,29
     COMBOBOX        IDC_VIDRND_COMBO,10,15,213,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Proprietăți",IDC_BUTTON1,226,14,60,14
-    GROUPBOX        "Setări EVR-CP și EVR Sync (sincronizare)",IDC_STATIC,5,37,285,137
+    GROUPBOX        "Setări pentru EVR-CP și pentru sincronizatorul EVR (EVR Sync)",IDC_STATIC,5,37,285,137
     CONTROL         "Selectează dispozitivul de randare D3D9",IDC_D3D9DEVICE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,120,10
     COMBOBOX        IDC_D3D9DEVICE_COMBO,144,49,142,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Ecran complet exclusiv pe o fereastră suplimentară",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
@@ -926,7 +926,7 @@ BEGIN
     COMBOBOX        IDC_COMBO3,10,64,52,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Limba preferată pentru pistă:",IDC_STATIC4,10,78,140,8
     COMBOBOX        IDC_COMBO4,10,89,130,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Încarcă lista de redare (playlist-ul)",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,104,100,10
+    CONTROL         "Încarcă lista de redare",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,104,100,10
     GROUPBOX        "",IDC_STATIC,6,119,285,57
     CONTROL         "youtube-dl, yt-dlp",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,119,74,10
     LTEXT           "Fișierul executabil:",IDC_STATIC,10,132,104,8
@@ -969,7 +969,7 @@ BEGIN
     EDITTEXT        IDC_EDIT4,250,5,30,13,ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,280,5,12,13
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,22,284,1
-    CONTROL         "Activează comprimarea",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,26,138,9
+    CONTROL         "Activează comprimarea (compresia)",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,26,138,9
     CONTROL         "Permite accesul numai de la localhost (reţeaua internă)",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,38,285,9
     CONTROL         "Activează previzualizarea",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,50,138,9
     CONTROL         "Afișează informațiile de depanare",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,61,285,9
@@ -1174,7 +1174,7 @@ BEGIN
     CONTROL         "Golește memoria GPU după Present",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,142,10
     CONTROL         "Așteaptă golirea memoriei",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,38,100,10
     GROUPBOX        "Setări de sincronizare EVR Sync",IDC_STATIC2,5,67,286,117
-    CONTROL         "Sincronizează video cu afișarea",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,142,8
+    CONTROL         "Sincronizează videoclipul cu afișarea",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,142,8
     CONTROL         "Prezintă la cel mai apropiat VSync (Sinc. verticală)",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,170,8
     LTEXT           "Ajustarea frecvenței:",IDC_STATIC5,20,93,85,8
     EDITTEXT        IDC_CYCLEDELTA,109,91,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
@@ -2689,7 +2689,7 @@ BEGIN
     IDS_SUBTITLES_OPTIONS   "&Opțiuni..."
     IDS_SUBTITLES_STYLES    "&Stiluri..."
     IDS_SUBTITLES_RELOAD    "&Reîncarcă"
-    IDS_SUBTITLES_ENABLE    "&Activează"
+    IDS_SUBTITLES_ENABLE    "&Activează-le"
     IDS_PANSCAN_EDIT        "Modificare..."
     IDS_INFOBAR_TITLE       "Titlu"
     IDS_INFOBAR_AUTHOR      "Autor"
@@ -3407,7 +3407,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Încarcă fonturi încorporate"
+    IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Încarcă fonturile încorporate"
     IDS_MKVSPLT_CALC_DURATION "Calculează durata pe baza datelor video"
 END
 
@@ -3529,33 +3529,33 @@ BEGIN
     IDS_MFMT_MPEGTS         "MPEG-TS"
     IDS_MFMT_DVDVIDEO       "DVD-Video"
     IDS_MFMT_MKV            "Matroska"
-    IDS_MFMT_WEBM           "WebM Video"
+    IDS_MFMT_WEBM           "Videoclip WebM (WebM Video)"
     IDS_MFMT_MP4            "MP4"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_MFMT_MOV            "Film QuickTime"
+    IDS_MFMT_MOV            "Film QuickTime (QuickTime Movie)"
     IDS_MFMT_3GP            "3GP"
     IDS_MFMT_3G2            "3G2"
-    IDS_MFMT_FLV            "Video Flash"
-    IDS_MFMT_OGM            "Ogg Media"
-    IDS_MFMT_RM             "Real Media"
+    IDS_MFMT_FLV            "Videoclip Flash (Flash Video)"
+    IDS_MFMT_OGM            "Fișier media Ogg (Ogg Media)"
+    IDS_MFMT_RM             "Fișier media Real (Real Media)"
     IDS_MFMT_WMV            "Windows Media Video"
-    IDS_MFMT_BINK           "Video Smacker/Bink"
-    IDS_MFMT_FLIC           "Animație FLIC"
-    IDS_MFMT_ROQ            "Id Software Game Video"
-    IDS_MFMT_DSM            "Media DirectShow"
-    IDS_MFMT_RAW_VIDEO      "Raw Video"
+    IDS_MFMT_BINK           "Videoclip Smacker/Bink (Smacker/Bink Video)"
+    IDS_MFMT_FLIC           "Animație FLIC (FLIC Animation)"
+    IDS_MFMT_ROQ            "Videoclip pentru jocuri și software Id (Id Software Game Video)"
+    IDS_MFMT_DSM            "Fișier media DirectShow (DirectShow Media)"
+    IDS_MFMT_RAW_VIDEO      "Videoclip Raw (Raw Video)"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_MFMT_OTHER          "Altul"
-    IDS_MFMT_OTHER_AUDIO    "Alt Audio"
+    IDS_MFMT_OTHER          "Altele"
+    IDS_MFMT_OTHER_AUDIO    "Alt fișier audio"
     IDS_MFMT_SWF            "Shockwave Flash"
-    IDS_MFMT_AVISYNTH       "Script AviSynth"
-    IDS_MFMT_VAPOURSYNTH    "VapourSynth script"
+    IDS_MFMT_AVISYNTH       "Script AviSynth (AviSynth script)"
+    IDS_MFMT_VAPOURSYNTH    "Script VapourSynth (VapourSynth script)"
 END
 
 STRINGTABLE
@@ -3563,13 +3563,13 @@ BEGIN
     IDS_MFMT_WAV            "WAV"
     IDS_MFMT_WMA            "Windows Media Audio"
     IDS_MFMT_WAVPACK        "WavPack"
-    IDS_MFMT_OPUS           "Codec Audio Opus"
+    IDS_MFMT_OPUS           "Codec audio Opus"
     IDS_MFMT_SPEEX          "Speex"
-    IDS_MFMT_MLP            "MLP audio"
+    IDS_MFMT_MLP            "Fișier audio MLP (MLP Audio)"
     IDS_MFMT_DVDAUDIO       "DVD-Audio"
     IDS_MFMT_DSD            "DSD"
     IDS_MFMT_DTS            "DTS/DTS-HD"
-    IDS_MFMT_WEBA           "WebM Audio"
+    IDS_MFMT_WEBA           "Fișier audio WebM (WebM Audio)"
 END
 
 STRINGTABLE
@@ -3582,28 +3582,28 @@ END
 STRINGTABLE
 BEGIN
     IDS_MFMT_AMR            "AMR"
-    IDS_MFMT_APE            "Audio Monkey"
+    IDS_MFMT_APE            "Monkey's Audio"
     IDS_MFMT_AU             "AU/SND"
-    IDS_MFMT_CDA            "Pistă de CD-uri audio"
+    IDS_MFMT_CDA            "Pistă pentru CD-uri audio"
     IDS_MFMT_FLAC           "FLAC"
-    IDS_MFMT_M4A            "Audio MPEG-4"
+    IDS_MFMT_M4A            "Fișier audio MPEG-4 (MPEG-4 Audio)"
     IDS_MFMT_MIDI           "MIDI"
-    IDS_MFMT_MKA            "Audio Matroska"
+    IDS_MFMT_MKA            "Fișier audio Matroska (Matroska Audio)"
     IDS_MFMT_MP3            "MP3"
-    IDS_MFMT_MPA            "Audio MPEG"
+    IDS_MFMT_MPA            "Fișier audio MPEG (MPEG Audio)"
     IDS_MFMT_MPC            "Musepack"
     IDS_MFMT_OFR            "OptimFROG"
     IDS_MFMT_OGG            "Ogg Vorbis"
-    IDS_MFMT_RA             "Real Audio"
+    IDS_MFMT_RA             "Fișier audio Real (Real Audio)"
     IDS_MFMT_TAK            "TAK"
-    IDS_MFMT_TTA            "True Audio"
+    IDS_MFMT_TTA            "Fișier audio True (True Audio)"
 END
 
 STRINGTABLE
 BEGIN
     IDS_MFMT_PLS            "Listă de redare (Playlist)"
     IDS_MFMT_BDPLS          "Listă de redare (Playlist) pentru Blu-ray"
-    IDS_MFMT_CUE            "Foaie cue"
+    IDS_MFMT_CUE            "Foaie Cue (Cue Sheet)"
 END
 
 STRINGTABLE
