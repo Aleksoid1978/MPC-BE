@@ -216,6 +216,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_bReal32bitSupport(FALSE)
 	, m_bs2b_active(false)
 	, m_bDVDPlayback(FALSE)
+	, m_fLowLatencyMS(0.f)
 {
 	DLog(L"CMpcAudioRenderer::CMpcAudioRenderer()");
 
@@ -1374,6 +1375,12 @@ STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetDummyChannels()
 	return m_bDummyChannels;
 }
 
+STDMETHODIMP_(float) CMpcAudioRenderer::GetLowLatencyMS()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_fLowLatencyMS;
+}
+
 void CMpcAudioRenderer::SetBalanceMask(const DWORD output_layout)
 {
 	m_dwBalanceMask = 0;
@@ -2308,6 +2315,8 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 	m_hnsBufferDuration = 0;
 	m_BitstreamMode = BITSTREAM_NONE;
 
+	m_fLowLatencyMS = 0.f;
+
 	REFERENCE_TIME hnsDefaultDevicePeriod = 0;
 	REFERENCE_TIME hnsMinimumDevicePeriod = 0;
 	hr = m_pAudioClient->GetDevicePeriod(&hnsDefaultDevicePeriod, &hnsMinimumDevicePeriod);
@@ -2375,7 +2384,8 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 
 					hr = pAudioClient3->InitializeSharedAudioStream(AUDCLNT_STREAMFLAGS_EVENTCALLBACK, defaultPeriodInFrames, pWaveFormatEx, nullptr);
 					if (hr == S_OK) {
-						DLog(L"CMpcAudioRenderer::CreateRenderClient() - use IAudioClient3 with %u PeriodInFrames.", defaultPeriodInFrames);
+						m_fLowLatencyMS = SamplesToTime(defaultPeriodInFrames, pWaveFormatEx) / 10000.;
+						DLog(L"CMpcAudioRenderer::CreateRenderClient() - use IAudioClient3 with %u PeriodInFrames (%.2f ms).", defaultPeriodInFrames, m_fLowLatencyMS);
 					}
 				}
 			}

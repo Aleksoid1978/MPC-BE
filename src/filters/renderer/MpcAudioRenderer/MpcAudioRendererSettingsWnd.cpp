@@ -305,6 +305,11 @@ void CMpcAudioRendererStatusWnd::UpdateStatus()
 			if (!method_str.IsEmpty()) {
 				modeStr.AppendFormat(L", %s", method_str);
 			}
+
+			auto lowLatencyMS = m_pMAR->GetLowLatencyMS();
+			if (lowLatencyMS > 0.1f) {
+				modeStr.AppendFormat(L", Low Latency (%.2f ms)", lowLatencyMS);
+			}
 		}
 
 		m_edtMode.SetWindowTextW(modeStr);

@@ -1,5 +1,5 @@
 /*
- * (C) 2010-2021 see Authors.txt
+ * (C) 2010-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -73,4 +73,5 @@ public IUnknown {
 	STDMETHOD_(BOOL, GetCrossFeed()) PURE;
 	STDMETHOD(SetDummyChannels(BOOL bValue)) PURE;
 	STDMETHOD_(BOOL, GetDummyChannels()) PURE;
+	STDMETHOD_(float, GetLowLatencyMS()) PURE;
 };

@@ -187,6 +187,7 @@ public:
 	STDMETHODIMP_(BOOL)           GetCrossFeed() override;
 	STDMETHODIMP                  SetDummyChannels(BOOL bValue) override;
 	STDMETHODIMP_(BOOL)           GetDummyChannels() override;
+	STDMETHODIMP_(float)          GetLowLatencyMS() override;
 
 	// CMpcAudioRenderer
 private:
@@ -261,6 +262,7 @@ private:
 	BOOL               m_bUseCrossFeed;
 	BOOL               m_bDummyChannels;
 	FILTER_STATE       m_filterState;
+	float              m_fLowLatencyMS;
 
 	CComPtr<IMMDeviceEnumerator> m_pMMDeviceEnumerator;
 
