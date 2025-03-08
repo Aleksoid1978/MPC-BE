@@ -16,21 +16,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVUTIL_ATTRIBUTES_INTERNAL_H
-#define AVUTIL_ATTRIBUTES_INTERNAL_H
+#ifndef AVUTIL_SIDE_DATA_H
+#define AVUTIL_SIDE_DATA_H
 
-#include "attributes.h"
+#include "buffer.h"
+#include "frame.h"
 
-#if (AV_GCC_VERSION_AT_LEAST(4,0) || defined(__clang__)) && (defined(__ELF__) || defined(__MACH__))
-#    define attribute_visibility_hidden __attribute__((visibility("hidden")))
-#    define FF_VISIBILITY_PUSH_HIDDEN   _Pragma("GCC visibility push(hidden)")
-#    define FF_VISIBILITY_POP_HIDDEN    _Pragma("GCC visibility pop")
-#else
-#    define attribute_visibility_hidden
-#    define FF_VISIBILITY_PUSH_HIDDEN
-#    define FF_VISIBILITY_POP_HIDDEN
-#endif
+AVFrameSideData *ff_frame_side_data_add_from_buf(AVFrameSideData ***sd,
+                                                 int *nb_sd,
+                                                 enum AVFrameSideDataType type,
+                                                 AVBufferRef *buf);
 
-#define EXTERN extern attribute_visibility_hidden
-
-#endif /* AVUTIL_ATTRIBUTES_INTERNAL_H */
+#endif // AVUTIL_SIDE_DATA_H

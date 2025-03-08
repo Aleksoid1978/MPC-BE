@@ -37,6 +37,11 @@
 #include "profiles.h"
 #include "version.h"
 
+/**
+ * Minimal fcode that a motion vector component would need.
+ */
+static uint8_t fcode_tab[MAX_MV*2+1];
+
 /* The uni_DCtab_* tables below contain unified bits+length tables to encode DC
  * differences in MPEG-4. Unified in the sense that the specification specifies
  * this encoding in several steps. */
@@ -801,8 +806,14 @@ void ff_mpeg4_encode_mb(MpegEncContext *s, int16_t block[6][64],
         const uint8_t *scan_table[6];
         int i;
 
-        for (i = 0; i < 6; i++)
-            dc_diff[i] = ff_mpeg4_pred_dc(s, i, block[i][0], &dir[i], 1);
+        for (int i = 0; i < 6; i++) {
+            int pred  = ff_mpeg4_pred_dc(s, i, &dir[i]);
+            int scale = i < 4 ? s->y_dc_scale : s->c_dc_scale;
+
+            pred = FASTDIV((pred + (scale >> 1)), scale);
+            dc_diff[i] = block[i][0] - pred;
+            s->dc_val[0][s->block_index[i]] = av_clip_uintp2(block[i][0] * scale, 11);
+        }
 
         if (s->avctx->flags & AV_CODEC_FLAG_AC_PRED) {
             s->ac_pred = decide_ac_pred(s, block, dir, scan_table, zigzag_last_index);
@@ -968,13 +979,9 @@ static void mpeg4_encode_vol_header(MpegEncContext *s,
 
     put_bits(&s->pb, 1, 0);             /* random access vol */
     put_bits(&s->pb, 8, vo_type);       /* video obj type indication */
-    if (s->workaround_bugs & FF_BUG_MS) {
-        put_bits(&s->pb, 1, 0);         /* is obj layer id= no */
-    } else {
-        put_bits(&s->pb, 1, 1);         /* is obj layer id= yes */
-        put_bits(&s->pb, 4, vo_ver_id); /* is obj layer ver id */
-        put_bits(&s->pb, 3, 1);         /* is obj layer priority */
-    }
+    put_bits(&s->pb, 1, 1);             /* is obj layer id= yes */
+    put_bits(&s->pb, 4, vo_ver_id);     /* is obj layer ver id */
+    put_bits(&s->pb, 3, 1);             /* is obj layer priority */
 
     aspect_ratio_info = ff_h263_aspect_to_info(s->avctx->sample_aspect_ratio);
 
@@ -986,14 +993,10 @@ static void mpeg4_encode_vol_header(MpegEncContext *s,
         put_bits(&s->pb, 8, s->avctx->sample_aspect_ratio.den);
     }
 
-    if (s->workaround_bugs & FF_BUG_MS) {
-        put_bits(&s->pb, 1, 0);         /* vol control parameters= no @@@ */
-    } else {
-        put_bits(&s->pb, 1, 1);         /* vol control parameters= yes */
-        put_bits(&s->pb, 2, 1);         /* chroma format YUV 420/YV12 */
-        put_bits(&s->pb, 1, s->low_delay);
-        put_bits(&s->pb, 1, 0);         /* vbv parameters= no */
-    }
+    put_bits(&s->pb, 1, 1);             /* vol control parameters= yes */
+    put_bits(&s->pb, 2, 1);             /* chroma format YUV 420/YV12 */
+    put_bits(&s->pb, 1, s->low_delay);
+    put_bits(&s->pb, 1, 0);             /* vbv parameters= no */
 
     put_bits(&s->pb, 2, RECT_SHAPE);    /* vol shape= rectangle */
     put_bits(&s->pb, 1, 1);             /* marker bit */
@@ -1059,8 +1062,7 @@ int ff_mpeg4_encode_picture_header(MpegEncContext *s)
             if (s->avctx->strict_std_compliance < FF_COMPLIANCE_VERY_STRICT || s->picture_number == 0)  // HACK, the reference sw is buggy
                 mpeg4_encode_vol_header(s, 0, 0);
         }
-        if (!(s->workaround_bugs & FF_BUG_MS))
-            mpeg4_encode_gop_header(s);
+        mpeg4_encode_gop_header(s);
     }
 
     s->partitioned_frame = s->data_partitioning && s->pict_type != AV_PICTURE_TYPE_B;
@@ -1264,6 +1266,11 @@ static av_cold void mpeg4_encode_init_static(void)
 
     init_uni_mpeg4_rl_tab(&ff_mpeg4_rl_intra, uni_mpeg4_intra_rl_bits, uni_mpeg4_intra_rl_len);
     init_uni_mpeg4_rl_tab(&ff_h263_rl_inter,  uni_mpeg4_inter_rl_bits, uni_mpeg4_inter_rl_len);
+
+    for (int f_code = MAX_FCODE; f_code > 0; f_code--) {
+        for (int mv = -(16 << f_code); mv < (16 << f_code); mv++)
+            fcode_tab[mv + MAX_MV] = f_code;
+    }
 }
 
 static av_cold int encode_init(AVCodecContext *avctx)
@@ -1283,6 +1290,7 @@ static av_cold int encode_init(AVCodecContext *avctx)
 
     ff_thread_once(&init_static_once, mpeg4_encode_init_static);
 
+    s->fcode_tab                = fcode_tab + MAX_MV;
     s->min_qcoeff               = -2048;
     s->max_qcoeff               = 2047;
     s->intra_ac_vlc_length      = uni_mpeg4_intra_rl_len;
@@ -1300,8 +1308,7 @@ static av_cold int encode_init(AVCodecContext *avctx)
             return AVERROR(ENOMEM);
         init_put_bits(&s->pb, s->avctx->extradata, 1024);
 
-        if (!(s->workaround_bugs & FF_BUG_MS))
-            mpeg4_encode_visual_object_header(s);
+        mpeg4_encode_visual_object_header(s);
         mpeg4_encode_vol_header(s, 0, 0);
 
 //            ff_mpeg4_stuffing(&s->pb); ?
@@ -1394,7 +1401,8 @@ const FFCodec ff_mpeg4_encoder = {
     .close          = ff_mpv_encode_end,
     .p.pix_fmts     = (const enum AVPixelFormat[]) { AV_PIX_FMT_YUV420P, AV_PIX_FMT_NONE },
     .color_ranges   = AVCOL_RANGE_MPEG,
-    .p.capabilities = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_SLICE_THREADS |
+    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY |
+                      AV_CODEC_CAP_SLICE_THREADS |
                       AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
     .p.priv_class   = &mpeg4enc_class,

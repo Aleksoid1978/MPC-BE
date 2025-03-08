@@ -777,11 +777,13 @@ SRCS_LU = \
 	libavutil/reverse.c \
 	libavutil/samplefmt.c \
 	libavutil/sha.c \
+	libavutil/side_data.c \
 	libavutil/slicethread.c \
 	libavutil/stereo3d.c \
 	libavutil/threadmessage.c \
 	libavutil/time.c \
 	libavutil/timecode.c \
+	libavutil/timecode_internal.c \
 	libavutil/timestamp.c \
 	libavutil/tx.c \
 	libavutil/tx_double.c \

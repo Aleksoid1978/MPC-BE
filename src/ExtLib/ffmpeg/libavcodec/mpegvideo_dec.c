@@ -97,8 +97,6 @@ int ff_mpeg_update_thread_context(AVCodecContext *dst,
         s->context_reinit        = 0;
         s->avctx                 = dst;
         s->private_ctx           = private_ctx;
-        s->bitstream_buffer      = NULL;
-        s->bitstream_buffer_size = s->allocated_bitstream_buffer_size = 0;
 
         if (s1->context_initialized) {
             if ((err = ff_mpv_common_init(s)) < 0)
@@ -134,24 +132,7 @@ int ff_mpeg_update_thread_context(AVCodecContext *dst,
            (char *) &s1->last_time_base);
 
     // B-frame info
-    s->max_b_frames = s1->max_b_frames;
     s->low_delay    = s1->low_delay;
-
-    // DivX handling (doesn't work)
-    s->divx_packed  = s1->divx_packed;
-
-    if (s1->bitstream_buffer) {
-        av_fast_padded_malloc(&s->bitstream_buffer,
-                              &s->allocated_bitstream_buffer_size,
-                              s1->bitstream_buffer_size);
-        if (!s->bitstream_buffer) {
-            s->bitstream_buffer_size = 0;
-            return AVERROR(ENOMEM);
-        }
-        s->bitstream_buffer_size = s1->bitstream_buffer_size;
-        memcpy(s->bitstream_buffer, s1->bitstream_buffer,
-               s1->bitstream_buffer_size);
-    }
 
     // MPEG-2/interlacing info
     memcpy(&s->progressive_sequence, &s1->progressive_sequence,
@@ -404,7 +385,7 @@ void ff_print_debug_info(const MpegEncContext *s, const MPVPicture *p, AVFrame *
 {
     ff_print_debug_info2(s->avctx, pict, p->mb_type,
                          p->qscale_table, p->motion_val,
-                         s->mb_width, s->mb_height, s->mb_stride, s->quarter_sample);
+                         p->mb_width, p->mb_height, p->mb_stride, s->quarter_sample);
 }
 
 int ff_mpv_export_qp_table(const MpegEncContext *s, AVFrame *f,
@@ -456,7 +437,6 @@ void ff_mpeg_flush(AVCodecContext *avctx)
 
     s->mb_x = s->mb_y = 0;
 
-    s->bitstream_buffer_size = 0;
     s->pp_time = 0;
 }
 

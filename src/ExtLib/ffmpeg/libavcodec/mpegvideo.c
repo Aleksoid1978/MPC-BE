@@ -480,7 +480,7 @@ int ff_update_duplicate_context(MpegEncContext *dst, const MpegEncContext *src)
  * The changed fields will not depend upon the
  * prior state of the MpegEncContext.
  */
-void ff_mpv_common_defaults(MpegEncContext *s)
+av_cold void ff_mpv_common_defaults(MpegEncContext *s)
 {
     s->y_dc_scale_table      =
     s->c_dc_scale_table      = ff_mpeg1_dc_scale_table;
@@ -660,8 +660,6 @@ static void clear_context(MpegEncContext *s)
     memset(&s->sc, 0, sizeof(s->sc));
 
 
-    s->bitstream_buffer = NULL;
-    s->allocated_bitstream_buffer_size = 0;
     s->p_field_mv_table_base = NULL;
     for (int i = 0; i < 2; i++)
         for (int j = 0; j < 2; j++)
@@ -776,9 +774,6 @@ void ff_mpv_common_end(MpegEncContext *s)
     ff_mpv_free_context_frame(s);
     if (s->slice_context_count > 1)
         s->slice_context_count = 1;
-
-    av_freep(&s->bitstream_buffer);
-    s->allocated_bitstream_buffer_size = 0;
 
     ff_mpv_unref_picture(&s->last_pic);
     ff_mpv_unref_picture(&s->cur_pic);

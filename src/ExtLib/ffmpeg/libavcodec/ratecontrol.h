@@ -77,7 +77,20 @@ typedef struct RateControlContext{
     int frame_count[5];
     int last_non_b_pict_type;
 
+    /**
+     * ratecontrol qmin qmax limiting method
+     * 0-> clipping, 1-> use a nice continuous function to limit qscale within qmin/qmax.
+     */
+    float qsquish;
+    float qmod_amp;
+    int   qmod_freq;
+    float initial_cplx;
+    float buffer_aggressivity;
+
+    char *rc_eq;
     struct AVExpr *rc_eq_eval;
+
+    float *cplx_tab, *bits_tab;
 }RateControlContext;
 
 struct MpegEncContext;

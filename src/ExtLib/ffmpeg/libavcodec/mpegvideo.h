@@ -204,7 +204,6 @@ typedef struct MpegEncContext {
     int adaptive_quant;         ///< use adaptive quantization
     int dquant;                 ///< qscale difference to prev qscale
     int pict_type;              ///< AV_PICTURE_TYPE_I, AV_PICTURE_TYPE_P, AV_PICTURE_TYPE_B, ...
-    int vbv_delay;
     int last_pict_type; //FIXME removes
     int last_non_b_pict_type;   ///< used for MPEG-4 gmc B-frames & ratecontrol
     int droppable;
@@ -395,9 +394,6 @@ typedef struct MpegEncContext {
 
     /* divx specific, used to workaround (many) bugs in divx5 */
     int divx_packed;
-    uint8_t *bitstream_buffer; //Divx 5.01 puts several frames in a single one, this is used to reorder them
-    int bitstream_buffer_size;
-    unsigned int allocated_bitstream_buffer_size;
 
     /* RV10 specific */
     int rv10_version; ///< RV10 version: 0 or 3
@@ -510,23 +506,9 @@ typedef struct MpegEncContext {
     me_cmp_func sse_cmp[2];
     int (*sum_abs_dctelem)(const int16_t *block);
 
-    /**
-     * ratecontrol qmin qmax limiting method
-     * 0-> clipping, 1-> use a nice continuous function to limit qscale within qmin/qmax.
-     */
-    float rc_qsquish;
-    float rc_qmod_amp;
-    int   rc_qmod_freq;
-    float rc_initial_cplx;
-    float rc_buffer_aggressivity;
     float border_masking;
     int lmin, lmax;
     int vbv_ignore_qmax;
-
-    char *rc_eq;
-
-    /* temp buffers for rate control */
-    float *cplx_tab, *bits_tab;
 
     /* flag to indicate a reinitialization is required, e.g. after
      * a frame size change */
@@ -564,7 +546,6 @@ void ff_mpv_common_defaults(MpegEncContext *s);
 
 int ff_mpv_common_init(MpegEncContext *s);
 void ff_mpv_common_init_arm(MpegEncContext *s);
-void ff_mpv_common_init_axp(MpegEncContext *s);
 void ff_mpv_common_init_neon(MpegEncContext *s);
 void ff_mpv_common_init_ppc(MpegEncContext *s);
 void ff_mpv_common_init_x86(MpegEncContext *s);

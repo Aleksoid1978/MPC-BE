@@ -25,7 +25,7 @@
 
 #include "avcodec.h"
 
-extern const uint32_t attribute_visibility_hidden ff_square_tab[512];
+EXTERN const uint32_t ff_square_tab[512];
 
 
 /* minimum alignment rules ;)
@@ -76,7 +76,6 @@ typedef struct MECmpContext {
 
 void ff_me_cmp_init(MECmpContext *c, AVCodecContext *avctx);
 void ff_me_cmp_init_aarch64(MECmpContext *c, AVCodecContext *avctx);
-void ff_me_cmp_init_alpha(MECmpContext *c, AVCodecContext *avctx);
 void ff_me_cmp_init_arm(MECmpContext *c, AVCodecContext *avctx);
 void ff_me_cmp_init_ppc(MECmpContext *c, AVCodecContext *avctx);
 void ff_me_cmp_init_riscv(MECmpContext *c, AVCodecContext *avctx);
