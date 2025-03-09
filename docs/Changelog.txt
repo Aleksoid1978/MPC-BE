@@ -2,15 +2,29 @@
 
 1.8.3.x dev
 =============================
+Standalone filters
+Fixed registration of filters from a folder with Unicode characters.
+
+MPCVideoDec
+Added support for additional D3D11 HEVC decoders. Drivers for modern Nvidia and Intel graphics adapters need to be updated.
+
 MpcAudioRenderer
-Rare crashes have been fixed.
+Fixed rare crashes when changing input format.
 The "Release device when idle" setting now works with Shared mode and is enabled by default. This will allow the computer to go to sleep on a timer when playback is paused.
+Fixed work with dual audio output.
+If possible, use the "Low Latency Audio" mode for Shared + Event settings.
 
 YouTube
-Minor fixes.
+Show more information in the status bar.
+The list of audio track languages ​​for YouTube has been expanded.
 
 Player
 Fixed opening of some online links.
+Improved work with playlists.
+OSD messages about errors opening files, URLs are now displayed for 3 seconds.
+Fixed the list of languages in the DVD-Video settings panel.
+The /audiorenderer key has been changed.
+Various interface fixes.
 
 Updated Korean translation (by Hackjjang).
 Updated Romanian translation (by Andrei Miloiu).
