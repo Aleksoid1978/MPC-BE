@@ -66,7 +66,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     COMBOBOX        IDC_COMBO1,5,5,215,37,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,116,28,50,14
-    PUSHBUTTON      "Revocare",IDCANCEL,170,28,50,14
+    PUSHBUTTON      "Anulare",IDCANCEL,170,28,50,14
 END
 
 IDD_CAPTURE_DLG DIALOGEX 0, 0, 132, 293
@@ -207,8 +207,8 @@ BEGIN
     COMBOBOX        IDC_COMBO2,10,68,188,20,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Răsfoire...",IDC_BUTTON2,200,67,50,14
     DEFPUSHBUTTON   "OK",IDOK,148,94,50,14,WS_GROUP
-    PUSHBUTTON      "Revocare",IDCANCEL,200,94,50,14
-    CONTROL         "Adaugă la lista de redare (playlist) fără a deschide",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,84,188,9
+    PUSHBUTTON      "Anulează",IDCANCEL,200,94,50,14
+    CONTROL         "Adaugă-l în lista de redare (playlist) fără să-l deschizi",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,84,188,9
     CONTROL         "Lipește URL-ul din clipboard",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,96,134,9
 END
 
@@ -270,7 +270,7 @@ BEGIN
     LTEXT           "Caută textul barei",IDC_STATIC,10,107,100,8
     COMBOBOX        IDC_COMBO2,10,118,109,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Locația setărilor",IDC_STATIC,5,135,115,55
-    CONTROL         "Registrul Windows",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | BS_TOP | WS_GROUP,10,148,106,10
+    CONTROL         "Registrul din Windows",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | BS_TOP | WS_GROUP,10,148,106,10
     CONTROL         "Profilul utilizatorului",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,161,106,10
     CONTROL         "Dosarul (Folderul) playerului",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,175,106,10
     GROUPBOX        "Istoric",IDC_STATIC,124,5,167,128,WS_GROUP
@@ -284,7 +284,7 @@ BEGIN
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,275,45,12,13
     CONTROL         "Reține poziția pe DVD",IDC_DVD_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,60,156,9
     CONTROL         "Reține poziția în fișier",IDC_FILE_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,72,158,9
-    CONTROL         "Reține ultima alegere a panoramării și scanării",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,84,156,9
+    CONTROL         "Reț. ultima alegere a panoramării și scanării",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,84,156,9
     CONTROL         "Reține lista de redare principală",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,96,156,9
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,129,108,158,1
     CONTROL         "Afișează titlul pentru URL în fișierele recente",IDC_CHECK4,
@@ -346,7 +346,7 @@ BEGIN
     LTEXT           "%",IDC_STATIC3,183,95,8,8
     CONTROL         "Nu reseta viteza pentru sesiune",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,109,175,9
     GROUPBOX        "",IDC_STATIC,137,9,154,56
-    CONTROL         "Preferințele pentru pista implicită",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,8,100,9
+    CONTROL         "Pref. pentru pista implicită",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,8,100,9
     LTEXT           "Subtitrări:",IDC_STATIC,142,23,44,8
     EDITTEXT        IDC_EDIT2,190,21,94,13,ES_AUTOHSCROLL
     LTEXT           "Audio:",IDC_STATIC,142,39,44,8
@@ -428,7 +428,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "",IDC_STATIC,7,5,282,83
-    CONTROL         "Folosește tema ",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,5,114,8,WS_EX_TRANSPARENT
+    CONTROL         "Folosește tema „întunecată” (în mod implicit)",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,5,114,8,WS_EX_TRANSPARENT
     LTEXT           "Luminozitate: ",IDC_STATIC1,14,19,46,8,0,WS_EX_TRANSPARENT
     CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,58,19,165,12
     LTEXT           "Setarea culorii indicatorului de sunet:",IDC_STATIC2,14,31,165,8
@@ -594,7 +594,7 @@ BEGIN
     CONTROL         "Memorează poziția",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,38,232,9
     CONTROL         "Unitate relativă",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,50,232,10
     DEFPUSHBUTTON   "OK",IDOK,143,62,50,14
-    PUSHBUTTON      "Revocare",IDCANCEL,197,62,50,14
+    PUSHBUTTON      "Anulare",IDCANCEL,197,62,50,14
 END
 
 IDD_FAVORGANIZE DIALOGEX 0, 0, 276, 170
@@ -628,7 +628,7 @@ BEGIN
     PUSHBUTTON      "Jos",IDC_BUTTON5,125,76,35,12
     PUSHBUTTON      "&Setează",IDC_BUTTON1,165,76,35,12
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,93,188,1
-    PUSHBUTTON      "&Revocare",IDCANCEL,49,100,50,14
+    PUSHBUTTON      "&Anulare",IDCANCEL,49,100,50,14
     PUSHBUTTON      "&Salvează",IDOK,105,100,50,14
     LTEXT           "Poziție: 0.0 -> 1.0",IDC_STATIC,134,5,70,8
     LTEXT           "Mărire: 0.2 -> 5.0",IDC_STATIC,134,32,70,8
@@ -719,7 +719,7 @@ BEGIN
     CONTROL         "",IDC_LIST2,"SysListView32",LVS_LIST | LVS_SINGLESEL | LVS_SORTASCENDING | LVS_ALIGNLEFT | WS_TABSTOP,5,5,275,154,WS_EX_CLIENTEDGE
     PUSHBUTTON      "Răsfoire...",IDC_BUTTON1,5,163,60,14
     DEFPUSHBUTTON   "OK",IDOK,177,163,50,14
-    PUSHBUTTON      "Revocare",IDCANCEL,230,163,50,14
+    PUSHBUTTON      "Anulare",IDCANCEL,230,163,50,14
 END
 
 IDD_PPAGESUBSTYLE DIALOGEX 0, 0, 296, 264
@@ -933,7 +933,7 @@ BEGIN
     COMBOBOX        IDC_COMBO5,116,130,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Înălțimea maximă a videoclipului:",IDC_STATIC,10,148,104,8
     COMBOBOX        IDC_COMBO6,116,146,43,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Selectează nr. maxim de cadre/sec. (fps) sau rata de biți",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,162,196,10
+    CONTROL         "Selectează nr. maxim de cadre/sec.(fps) sau rata de biți",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,162,196,10
     LTEXT           "Adresa AceStream:",IDC_STATIC,10,183,77,8
     EDITTEXT        IDC_EDIT1,91,181,195,13,ES_AUTOHSCROLL
     LTEXT           "Adresa MatriX (TorrServer):",IDC_STATIC,10,200,103,8
@@ -949,7 +949,7 @@ CAPTION "Este necesară autentificarea"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,106,108,50,14
-    PUSHBUTTON      "Revocare",IDCANCEL,158,108,50,14
+    PUSHBUTTON      "Anulare",IDCANCEL,158,108,50,14
     CONTROL         337,IDC_STATIC,"Static",SS_BITMAP,0,0,213,37
     LTEXT           "Zonă restricționată",IDC_STATIC,10,40,198,11
     LTEXT           "Numele utilizatorului:",IDC_STATIC,10,56,66,8
@@ -1023,7 +1023,7 @@ BEGIN
     PUSHBUTTON      "Mută în &sus",IDC_BUTTON1,162,90,50,14
     PUSHBUTTON      "Mută în &jos",IDC_BUTTON4,162,108,50,14
     DEFPUSHBUTTON   "OK",IDOK,162,153,50,14
-    PUSHBUTTON      "Revocare",IDCANCEL,162,173,50,14
+    PUSHBUTTON      "Anulare",IDCANCEL,162,173,50,14
 END
 
 IDD_SHADEREDITOR_DLG DIALOGEX 0, 0, 205, 73
@@ -1268,7 +1268,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Salvează",IDOK,129,82,50,14
-    PUSHBUTTON      "&Revocare",IDCANCEL,182,82,50,14
+    PUSHBUTTON      "&Anulare",IDCANCEL,182,82,50,14
     LTEXT           "Titlu:",IDC_STATIC,10,6,50,8
     EDITTEXT        IDC_EDIT1,10,18,219,13,ES_AUTOHSCROLL
     LTEXT           "Cale:",IDC_STATIC,10,36,50,8
@@ -1283,7 +1283,7 @@ BEGIN
     LTEXT           "Nume:",IDC_STATIC,4,5,50,8
     EDITTEXT        IDC_EDIT1,58,4,188,13,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,142,23,50,14
-    PUSHBUTTON      "Revocare",IDCANCEL,196,23,50,14
+    PUSHBUTTON      "Anulare",IDCANCEL,196,23,50,14
 END
 
 IDD_CMD_LINE_HELP DIALOGEX 0, 0, 309, 177
@@ -1302,7 +1302,7 @@ CAPTION "Dialogul pentru numele listei de redare (playlist-ului)"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,150,42,50,14
-    PUSHBUTTON      "Revocare",IDCANCEL,204,42,50,14
+    PUSHBUTTON      "Anulare",IDCANCEL,204,42,50,14
     EDITTEXT        IDC_EDIT1,94,14,159,14,ES_AUTOHSCROLL
     RTEXT           "Nume:",IDC_STATIC,7,16,84,8
 END
@@ -1316,7 +1316,7 @@ BEGIN
     EDITTEXT        IDC_EDIT1,38,5,86,13,ES_AUTOHSCROLL
     CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,5,20,275,139,WS_EX_CLIENTEDGE
     DEFPUSHBUTTON   "OK",IDOK,177,163,50,14
-    PUSHBUTTON      "Revocare",IDCANCEL,230,163,50,14
+    PUSHBUTTON      "Anulare",IDCANCEL,230,163,50,14
 END
 
 IDD_HISTORY DIALOGEX 0, 0, 276, 170
@@ -2746,7 +2746,7 @@ BEGIN
     IDS_VIDEO_STREAM        "Video: %s"
     IDS_APPLY               "Se aplică"
     IDS_CLEAR               "Goleşte"
-    IDS_CANCEL              "Revocare"
+    IDS_CANCEL              "Anulare"
     IDS_TEXTFILE_ENC        "Codare:"
     IDS_SAVE_FILE           "Se salvează fișierul"
     IDS_VOLUME_OSD_MUTE     "Volum: %d%% [Mut]"
