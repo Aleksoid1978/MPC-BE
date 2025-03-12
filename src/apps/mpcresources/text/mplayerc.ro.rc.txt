@@ -15,7 +15,7 @@ BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11
 3		"Comanda de selecție"
 6		"Filtru:"
 9		"OK"
-10		"Anulează"
+10		"Anulare"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
