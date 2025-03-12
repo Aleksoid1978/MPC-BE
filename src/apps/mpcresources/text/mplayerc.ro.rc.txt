@@ -15,20 +15,20 @@ BEGIN DIALOGEX IDD_ADDCOMMAND_DLG LINES 11
 3		"Comanda de selecție"
 6		"Filtru:"
 9		"OK"
-10		"Revocare"
+10		"Anulează"
 END
 
 BEGIN DIALOGEX IDD_ADDREGFILTER LINES 10
 3		"Alege un filtru"
 7		"Răsfoire..."
 8		"OK"
-9		"Revocare"
+9		"Anulare"
 END
 
 BEGIN DIALOGEX IDD_AUTH_DLG LINES 15
 3		"Este necesară autentificarea"
 6		"OK"
-7		"Revocare"
+7		"Anulare"
 9		"Zonă restricționată"
 10		"Numele utilizatorului:"
 11		"Parola:"
@@ -60,7 +60,7 @@ BEGIN DIALOGEX IDD_FAVADD LINES 12
 8		"Memorează poziția"
 9		"Unitate relativă"
 10		"OK"
-11		"Revocare"
+11		"Anulare"
 END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
@@ -112,7 +112,7 @@ END
 
 BEGIN DIALOGEX IDD_ITEMPROPERTIES_DIALOG LINES 11
 5		"&Salvează"
-6		"&Revocare"
+6		"&Anulare"
 7		"Titlu:"
 9		"Cale:"
 END
@@ -137,15 +137,15 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 11		"Dublaj:"
 13		"Răsfoire..."
 14		"OK"
-15		"Revocare"
-16		"Adaugă la lista de redare (playlist) fără a deschide"
+15		"Anulează"
+16		"Adaugă-l în lista de redare (playlist) fără să-l deschizi"
 17		"Lipește URL-ul din clipboard"
 END
 
 BEGIN DIALOGEX IDD_PLAYLISTNAME LINES 10
 3		"Dialogul pentru numele listei de redare (playlist-ului)"
 6		"OK"
-7		"Revocare"
+7		"Anulare"
 9		"Nume:"
 END
 
@@ -156,7 +156,7 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 14		"Sus"
 15		"Jos"
 16		"&Setează"
-18		"&Revocare"
+18		"&Anulare"
 19		"&Salvează"
 20		"Poziție: 0.0 -> 1.0"
 21		"Mărire: 0.2 -> 5.0"
@@ -299,7 +299,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 56
-6		"Folosește tema "
+6		"Folosește tema „întunecată” (în mod implicit)"
 7		"Luminozitate: "
 9		"Setarea culorii indicatorului de sunet:"
 10		"Umplere:"
@@ -394,7 +394,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 12		"Pas de volum:"
 15		"Pas de viteză:"
 18		"Nu reseta viteza pentru sesiune"
-20		"Preferințele pentru pista implicită"
+20		"Pref. pentru pista implicită"
 21		"Subtitrări:"
 23		"Audio:"
 25		"(De exemplu: rum eng jap swe)"
@@ -416,7 +416,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 9		"Textul barei de titlu"
 11		"Caută textul barei"
 13		"Locația setărilor"
-14		"Registrul Windows"
+14		"Registrul din Windows"
 15		"Profilul utilizatorului"
 16		"Dosarul (Folderul) playerului"
 17		"Istoric"
@@ -425,7 +425,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 23		"Numărul maxim de fișiere recente:"
 26		"Reține poziția pe DVD"
 27		"Reține poziția în fișier"
-28		"Reține ultima alegere a panoramării și scanării"
+28		"Reț. ultima alegere a panoramării și scanării"
 29		"Reține lista de redare principală"
 31		"Afișează titlul pentru URL în fișierele recente"
 33		"Altele"
@@ -607,7 +607,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
 18		"youtube-dl, yt-dlp"
 19		"Fișierul executabil:"
 21		"Înălțimea maximă a videoclipului:"
-23		"Selectează nr. maxim de cadre/sec. (fps) sau rata de biți"
+23		"Selectează nr. maxim de cadre/sec.(fps) sau rata de biți"
 24		"Adresa AceStream:"
 26		"Adresa MatriX (TorrServer):"
 29		"Agentul de utilizator:"
@@ -634,7 +634,7 @@ END
 BEGIN DIALOGEX IDD_SELECTMEDIATYPE LINES 9
 3		"Selectează tipul de fișiere media"
 7		"OK"
-8		"Revocare"
+8		"Anulare"
 END
 
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
@@ -646,7 +646,7 @@ BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
 15		"Mută în &sus"
 16		"Mută în &jos"
 17		"OK"
-18		"Revocare"
+18		"Anulare"
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 13
@@ -659,7 +659,7 @@ BEGIN DIALOGEX IDD_SHADERNEW_DLG LINES 10
 3		"Crează un nou nuanțator (shader)"
 6		"Nume:"
 8		"OK"
-9		"Revocare"
+9		"Anulare"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
@@ -1358,7 +1358,7 @@ STRING IDS_BLOCK_EXTERNAL_VR		"Poți adăuga %s ca un filtru extern.\nTrebuie s�
 STRING IDS_BRIGHTNESS_DEC		"Micșorează luminozitatea"
 STRING IDS_BRIGHTNESS_INC		"Mărește luminozitatea"
 STRING IDS_CALLING_YOUTUBEDL		"Se apelează %s ..."
-STRING IDS_CANCEL		"Revocare"
+STRING IDS_CANCEL		"Anulare"
 STRING IDS_CANNOT_CHANGE_FORMAT		"MPC-BE nu are destule drepturi pentru a schimba asocierea cu formatele de fișiere. Dă clic pe butonul „Modifică” pentru a obține drepturi de administrator."
 STRING IDS_CAPTURE_CHANNEL_FREQ		"Canal %d (%.1f MHz)"
 STRING IDS_CAPTURE_ERROR		"Eroare de captură"
