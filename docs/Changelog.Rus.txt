@@ -42,6 +42,7 @@ YouTube
 	Little-CMS git-lcms2.17-10-ge19dc49;
 	MediaInfo git-v24.12-99-g9c4d87833;
 	rapidjson v1.1.0-763-g24b5e7a8;
+	vvdec v3.0.0-19-ga7ebd30;
 	ZenLib git-v0.4.41-54-g53cedf8.
 
 
