@@ -254,7 +254,7 @@ BEGIN DIALOGEX IDD_PPAGEFILTERSPRIORITY LINES 26
 13		"MP4:"
 14		"FLV:"
 15		"WMV:"
-25		"Pentru a folosi această funcționalitate adaugă filtrele sursă dorite la 'Filtre externe' și dă clic pe 'Se aplică'. După aceea, Poți specifica filtrul sursă dorit pentru un format de fișier specific."
+25		"Pentru a folosi această funcționalitate adaugă filtrele sursă dorite la 'Filtre externe' și dă clic pe 'Se aplică'. După aceea, poți specifica filtrul sursă dorit pentru un format de fișier specific."
 END
 
 BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
@@ -279,7 +279,7 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
-5		"Pornește fișierele în modul ecran complet (pe tot ecranul)"
+5		"Lansează fișierele în modul ecran complet (pe tot ecranul)"
 6		"Arată controalele în modul ecran complet (pe tot ecranul) pentru"
 9		"sec."
 10		"0: ascundere automată; -1: nu ascunde"
@@ -516,7 +516,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 16
 10		"Preferă subtitrările externe în locul celor integrate"
 12		"Ignoră subtitrările integrate"
 13		"Reîncarcă automat fișierele de subtitrări după ce se detectează modificările"
-15		"Folosește Subresync"
+15		"Folosește modul de resincronizare a subtitrărilor Subresync"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
@@ -535,7 +535,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
 20		"ms"
 21		"Limite de control:"
 24		"ms"
-25		"Modificările vor avea efect după ce redarea a fost închisă și rePornită."
+25		"Modificările vor avea efect după ce redarea a fost închisă și repornită."
 END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 39
@@ -1076,7 +1076,7 @@ STRING IDD_PPAGEPLAYBACK		"Redare"
 STRING IDD_PPAGEPLAYER		"Player"
 STRING IDD_PPAGESOUNDPROCESSING		"Audio::Procesarea sunetului"
 STRING IDD_PPAGESUBRENDERING		"Subtitrări::Randare"
-STRING IDD_PPAGESUBSTYLE		"Subtitrări::Stil implicit"
+STRING IDD_PPAGESUBSTYLE		"Subtitrări::Stilul implicit"
 STRING IDD_PPAGESUBTITLES		"Subtitrări"
 STRING IDD_PPAGESYNC		"Video::Sincronizarea cadrelor"
 STRING IDD_PPAGEVIDEO		"Video"
@@ -1109,7 +1109,7 @@ STRING IDS_AG_APP_COMMAND		"Comandă aplicație"
 STRING IDS_AG_ASPECT_RATIO		"Raport de aspect"
 STRING IDS_AG_AUDIO		"Audio"
 STRING IDS_AG_AUDIODELAY_MINUS		"Întârziere audio -10ms"
-STRING IDS_AG_AUDIODELAY_ONOFF		"Întârziere audio Pornit/Oprit"
+STRING IDS_AG_AUDIODELAY_ONOFF		"Întârziere audio pornită/oprită"
 STRING IDS_AG_AUDIODELAY_PLUS		"Întârziere audio +10ms"
 STRING IDS_AG_AUDIOFILES		"Fișiere audio (toate tipurile)"
 STRING IDS_AG_AUDIOLANG		"Limba audio"
@@ -1302,7 +1302,7 @@ STRING IDS_AG_ZOOM		"Mărește/Micșorează (Scalează)"
 STRING IDS_AG_ZOOM_100		"Scalează (Mărește) cu 100%"
 STRING IDS_AG_ZOOM_200		"Scalează (Mărește) cu 200%"
 STRING IDS_AG_ZOOM_50		"Scalează (Micșorează) cu 50%"
-STRING IDS_AG_ZOOM_AUTO_FIT		"Potrivește scalarea automat"
+STRING IDS_AG_ZOOM_AUTO_FIT		"Potrivește scalarea automată"
 STRING IDS_APPLY		"Se aplică"
 STRING IDS_APP_DESCRIPTION		"Unul dintre cele mai puternice și configurabile lectoare multimedia pentru sistemul de operare Windows. Creat la început de un dezvoltator maghiar cunoscut ca Gabest, această versiune are aptitudini adiționale cum ar fi mod pe tot ecranul Direct 3D și o compatibilitate mai bună cu Vista/7."
 STRING IDS_ARS_ALT_CHECK_FORMAT		"Verificare alternativă a formatului suportat"
@@ -1354,7 +1354,7 @@ STRING IDS_BDA_ERROR_CONNECT_TUNER_REC		"Tunerul și receptorul nu pot fi conect
 STRING IDS_BDA_ERROR_CREATE_RECEIVER		"Receptorul nu poate fi creat."
 STRING IDS_BDA_ERROR_CREATE_TUNER		"Tunerul nu  poate fi creat."
 STRING IDS_BDA_ERROR_DEMULTIPLEXER		"Demultiplexorul nu poate fi creat."
-STRING IDS_BLOCK_EXTERNAL_VR		"Poți adăuga %s ca un filtru extern.\nTrebuie să vă selectezi redarea video preferat de pe pagina de setări Video."
+STRING IDS_BLOCK_EXTERNAL_VR		"Poți adăuga %s ca un filtru extern.\nTrebuie să vă selectezi redarea video preferată de pe pagina de setări Video."
 STRING IDS_BRIGHTNESS_DEC		"Micșorează luminozitatea"
 STRING IDS_BRIGHTNESS_INC		"Mărește luminozitatea"
 STRING IDS_CALLING_YOUTUBEDL		"Se apelează %s ..."
@@ -1962,7 +1962,7 @@ STRING IDS_SUBRESYNC_RESET		"&Resetează"
 STRING IDS_SUBRESYNC_SEPARATOR		"&Separator"
 STRING IDS_SUBRESYNC_TIME_FORMAT		"Formatul de timp corect este [-]hh:mm:ss.ms (ex. 01:23:45.678)."
 STRING IDS_SUBRESYNC_YES		"&Da"
-STRING IDS_SUBTITLES_DEFAULT_STYLE		"&Stil implicit"
+STRING IDS_SUBTITLES_DEFAULT_STYLE		"&Stilul implicit"
 STRING IDS_SUBTITLES_ENABLE		"&Activează-le"
 STRING IDS_SUBTITLES_ERROR		"Subtitrările nu sunt încărcate sau randorul nu este suportat."
 STRING IDS_SUBTITLES_FORCED		"&Numai forțat"
