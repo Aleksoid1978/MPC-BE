@@ -817,9 +817,6 @@ int ff_decode_receive_frame(AVCodecContext *avctx, AVFrame *frame)
     AVCodecInternal *avci = avctx->internal;
     int ret;
 
-    if (!avcodec_is_open(avctx) || !av_codec_is_decoder(avctx->codec))
-        return AVERROR(EINVAL);
-
     if (avci->buffer_frame->buf[0]) {
         av_frame_move_ref(frame, avci->buffer_frame);
     } else {
@@ -1709,7 +1706,7 @@ int ff_get_buffer(AVCodecContext *avctx, AVFrame *frame, int flags)
     int override_dimensions = 1;
     int ret;
 
-    av_assert0(av_codec_is_decoder(avctx->codec));
+    av_assert0(ff_codec_is_decoder(avctx->codec));
 
     if (avctx->codec_type == AVMEDIA_TYPE_VIDEO) {
         if ((unsigned)avctx->width > INT_MAX - STRIDE_ALIGN ||

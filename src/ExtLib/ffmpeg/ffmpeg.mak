@@ -820,6 +820,7 @@ SRCS_LS = \
 	libswscale/alphablend.c \
 	libswscale/cms.c \
 	libswscale/csputils.c \
+	libswscale/format.c \
 	libswscale/gamma.c \
 	libswscale/graph.c \
 	libswscale/half2float.c \

@@ -38,7 +38,7 @@ YouTube
 Обновлены голландский и китайский (Traditional) переводы (автор beter).
 
 Обновлены библиотеки:
-	ffmpeg n7.2-dev-1544-gf641c6846a;
+	ffmpeg n7.2-dev-1613-g2da40904f3;
 	Little-CMS git-lcms2.17-10-ge19dc49;
 	MediaInfo git-v24.12-99-g9c4d87833;
 	rapidjson v1.1.0-763-g24b5e7a8;

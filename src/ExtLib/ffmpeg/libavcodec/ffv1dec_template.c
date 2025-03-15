@@ -185,6 +185,13 @@ static int RENAME(decode_rgb_frame)(FFV1Context *f, FFV1SliceContext *sc,
                 b += g;
                 r += g;
             }
+            if (sc->remap) {
+                r = sc->fltmap[0][r & 0xFFFF];
+                g = sc->fltmap[1][g & 0xFFFF];
+                b = sc->fltmap[2][b & 0xFFFF];
+                if (transparency)
+                    a = sc->fltmap[3][a & 0xFFFF];
+            }
 
             if (lbd)
                 *((uint32_t*)(src[0] + x*4 + stride[0]*y)) = b + ((unsigned)g<<8) + ((unsigned)r<<16) + ((unsigned)a<<24);

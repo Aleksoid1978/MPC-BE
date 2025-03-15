@@ -940,14 +940,11 @@ static void av_codec_init_static(void)
 FF_DISABLE_DEPRECATION_WARNINGS
         switch (codec->p.type) {
         case AVMEDIA_TYPE_VIDEO:
-            codec->get_supported_config(NULL, &codec->p,
-                                        AV_CODEC_CONFIG_PIX_FORMAT, 0,
-                                        (const void **) &codec->p.pix_fmts,
-                                        &dummy);
-            codec->get_supported_config(NULL, &codec->p,
-                                        AV_CODEC_CONFIG_FRAME_RATE, 0,
-                                        (const void **) &codec->p.supported_framerates,
-                                        &dummy);
+            if (!codec->p.pix_fmts)
+                codec->get_supported_config(NULL, &codec->p,
+                                            AV_CODEC_CONFIG_PIX_FORMAT, 0,
+                                            (const void **) &codec->p.pix_fmts,
+                                            &dummy);
             break;
         case AVMEDIA_TYPE_AUDIO:
             codec->get_supported_config(NULL, &codec->p,
@@ -1016,12 +1013,12 @@ static const AVCodec *find_codec(enum AVCodecID id, int (*x)(const AVCodec *))
 
 const AVCodec *avcodec_find_encoder(enum AVCodecID id)
 {
-    return find_codec(id, av_codec_is_encoder);
+    return find_codec(id, ff_codec_is_encoder);
 }
 
 const AVCodec *avcodec_find_decoder(enum AVCodecID id)
 {
-    return find_codec(id, av_codec_is_decoder);
+    return find_codec(id, ff_codec_is_decoder);
 }
 
 static const AVCodec *find_codec_by_name(const char *name, int (*x)(const AVCodec *))
@@ -1044,10 +1041,10 @@ static const AVCodec *find_codec_by_name(const char *name, int (*x)(const AVCode
 
 const AVCodec *avcodec_find_encoder_by_name(const char *name)
 {
-    return find_codec_by_name(name, av_codec_is_encoder);
+    return find_codec_by_name(name, ff_codec_is_encoder);
 }
 
 const AVCodec *avcodec_find_decoder_by_name(const char *name)
 {
-    return find_codec_by_name(name, av_codec_is_decoder);
+    return find_codec_by_name(name, ff_codec_is_decoder);
 }
