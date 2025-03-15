@@ -372,7 +372,6 @@ SRCS_LC = \
 	libavcodec/mpeg4video_parser.c \
 	libavcodec/mpeg4videodec.c \
 	libavcodec/mpeg4videodsp.c \
-	libavcodec/mpeg4videoenc.c \
 	libavcodec/mpegaudio.c \
 	libavcodec/mpegaudio_parser.c \
 	libavcodec/mpegaudiodata.c \
