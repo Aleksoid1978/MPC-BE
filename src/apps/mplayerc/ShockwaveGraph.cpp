@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -207,6 +207,11 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 		vsize.cy = 480;
 	}
 
+	return S_OK;
+}
+
+STDMETHODIMP CShockwaveGraph::ShouldOperationContinue()
+{
 	return S_OK;
 }
 

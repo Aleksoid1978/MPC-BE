@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -47,6 +47,7 @@ namespace DSObjects
 	protected:
 		// IGraphBuilder
 		STDMETHODIMP RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPlayList);
+		STDMETHODIMP ShouldOperationContinue();
 
 		// IMediaControl
 		STDMETHODIMP Run();
