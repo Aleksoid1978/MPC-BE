@@ -1680,10 +1680,10 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								CBlockGroupNode bgn;
 
 								if (pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
-									bgn.Parse(pBlock.get(), true);
+									bgn.Parse(pBlock.get(), false);
 								} else if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
 									std::unique_ptr<BlockGroup> bg(DNew BlockGroup());
-									bg->Block.Parse(pBlock.get(), true);
+									bg->Block.Parse(pBlock.get(), false);
 									bgn.emplace_back(std::move(bg));
 								}
 
@@ -1994,8 +1994,6 @@ bool CMatroskaSplitterFilter::DemuxInit()
 		m_nOpenProgress = 0;
 		s.SegmentInfo.Duration.Set(0);
 
-		std::unique_ptr<Cue> pCue(DNew Cue());
-
 		do {
 			Cluster c;
 			c.ParseTimeCode(m_pCluster.get());
@@ -2003,15 +2001,23 @@ bool CMatroskaSplitterFilter::DemuxInit()
 			const auto clusterTime = s.GetRefTime(c.TimeCode);
 			const auto rtOffset = (clusterTime >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;
 
-			s.SegmentInfo.Duration.Set((float)c.TimeCode - rtOffset / 10000);
+			s.SegmentInfo.Duration.Set((float)c.TimeCode - rtOffset / 10000.f);
 
-			std::unique_ptr<CuePoint> pCuePoint(DNew CuePoint());
-			std::unique_ptr<CueTrackPosition> pCueTrackPosition(DNew CueTrackPosition());
-			pCuePoint->CueTime.Set(c.TimeCode);
-			pCueTrackPosition->CueTrack.Set(TrackNumber);
-			pCueTrackPosition->CueClusterPosition.Set(m_pCluster->m_filepos - m_pSegment->m_start);
-			pCuePoint->CueTrackPositions.emplace_back(std::move(pCueTrackPosition));
-			pCue->CuePoints.emplace_back(std::move(pCuePoint));
+			if (auto pBlock = m_pCluster->GetFirstBlock()) {
+				do {
+					if (pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
+						SimpleBlock block;
+						block.Parse(pBlock.get(), false);
+						if (TrackNumber == block.TrackNumber) {
+							if (block.Lacing & 0x80) { // KeyFrame
+								m_sps.push_back(SyncPoint{ clusterTime - rtOffset, static_cast<__int64>(m_pCluster->m_filepos) });
+							}
+
+							break;
+						}
+					}
+				} while (pBlock->NextBlock());
+			}
 
 			m_nOpenProgress = m_pFile->GetPos() * 100 / m_pFile->GetLength();
 
@@ -2028,45 +2034,14 @@ bool CMatroskaSplitterFilter::DemuxInit()
 		m_pCluster.reset();
 
 		m_nOpenProgress = 100;
-
-		if (!m_fAbort) {
-			s.Cues.emplace_back(std::move(pCue));
-		}
-
 		m_fAbort = false;
 
-		if (!s.Cues.empty()) {
-			m_rtDuration = (REFERENCE_TIME)(s.SegmentInfo.Duration * s.SegmentInfo.TimeCodeScale / 100);
-			m_rtNewStop  = m_rtStop = m_rtDuration;
+		if (!m_sps.empty()) {
+			m_rtNewStop = m_rtStop = m_rtDuration = static_cast<REFERENCE_TIME>(s.SegmentInfo.Duration * s.SegmentInfo.TimeCodeScale / 100);
 
-			UINT64 lastCueClusterPosition = ULONGLONG_MAX;
-
-			for (const auto& pCue : s.Cues) {
-				for (const auto& pCuePoint : pCue->CuePoints) {
-					for (const auto& pCueTrackPositions : pCuePoint->CueTrackPositions) {
-						if (TrackNumber != pCueTrackPositions->CueTrack) {
-							continue;
-						}
-
-						// prevent processing the same position
-						if (lastCueClusterPosition == pCueTrackPositions->CueClusterPosition) {
-							continue;
-						}
-						lastCueClusterPosition = pCueTrackPositions->CueClusterPosition;
-
-						const auto cueTime = s.GetRefTime(pCuePoint->CueTime);
-						const auto rtOffset = (cueTime >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;
-
-						m_sps.push_back(SyncPoint{cueTime - rtOffset, __int64(m_pSegment->m_start + pCueTrackPositions->CueClusterPosition)});
-					}
-				}
-			}
-
-			if (!m_sps.empty()) {
-				std::sort(m_sps.begin(), m_sps.end(), [](const SyncPoint& a, const SyncPoint& b) {
-					return (a.rt < b.rt);
-				});
-			}
+			std::sort(m_sps.begin(), m_sps.end(), [](const SyncPoint& a, const SyncPoint& b) {
+				return (a.rt < b.rt);
+			});
 		}
 	}
 
@@ -2195,10 +2170,10 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			do {
 				CBlockGroupNode bgn;
 				if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
-					bgn.Parse(m_pBlock.get(), true);
+					bgn.Parse(m_pBlock.get(), false);
 				} else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
 					std::unique_ptr<BlockGroup> bg(DNew BlockGroup());
-					bg->Block.Parse(m_pBlock.get(), true);
+					bg->Block.Parse(m_pBlock.get(), false);
 					bgn.emplace_back(std::move(bg));
 				}
 
