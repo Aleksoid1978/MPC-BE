@@ -959,7 +959,7 @@ STDMETHODIMP CMpcAudioRenderer::GetPreroll(LONGLONG* pPreroll)
 }
 
 // === IMMNotificationClient
-STDMETHODIMP CMpcAudioRenderer::OnDeviceStateChanged(LPCWSTR pwstrDeviceId, DWORD dwNewState)
+STDMETHODIMP CMpcAudioRenderer::OnDeviceStateChanged(__in LPCWSTR pwstrDeviceId, __in DWORD dwNewState)
 {
 	CheckPointer(m_hRenderThread, S_OK);
 
@@ -970,7 +970,7 @@ STDMETHODIMP CMpcAudioRenderer::OnDeviceStateChanged(LPCWSTR pwstrDeviceId, DWOR
 	return S_OK;
 }
 
-STDMETHODIMP CMpcAudioRenderer::OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWSTR pwstrDefaultDeviceId)
+STDMETHODIMP CMpcAudioRenderer::OnDefaultDeviceChanged(__in EDataFlow flow, __in ERole role, __in LPCWSTR pwstrDefaultDeviceId)
 {
 	CheckPointer(m_hRenderThread, S_OK);
 
@@ -1470,6 +1470,8 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 		return S_FALSE;
 	}
 
+	CheckPointer(m_pWaveFormatExInput, S_FALSE);
+
 	m_rtLastReceivedSampleTimeEnd = rtStart + SamplesToTime(lSize / m_pWaveFormatExInput->nBlockAlign, m_pWaveFormatExInput) / m_dRate;
 
 	if (!m_pRenderClient) {
@@ -1496,7 +1498,6 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 		}
 	}
 
-	CheckPointer(m_pWaveFormatExInput, S_FALSE);
 	CheckPointer(m_pWaveFormatExOutput, S_FALSE);
 
 	if (m_input_params.sf == SAMPLE_FMT_NONE || m_output_params.sf == SAMPLE_FMT_NONE) {
@@ -2768,9 +2769,6 @@ HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = 
 
 	CAutoLock cRenderLock(&m_csRender);
 
-	WAVEFORMATEX* pWaveFormatEx = nullptr;
-	CopyWaveFormat(m_pWaveFormatExInput, &pWaveFormatEx);
-
 	if (m_bIsAudioClientStarted && m_pAudioClient) {
 		m_pAudioClient->Stop();
 	}
@@ -2781,8 +2779,6 @@ HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = 
 		SAFE_RELEASE(m_pRenderClient);
 		SAFE_RELEASE(m_pAudioClient);
 		SAFE_RELEASE(m_pMMDevice);
-
-		SAFE_DELETE_ARRAY(m_pWaveFormatExInput);
 
 		m_wBitsPerSampleList.clear();
 		m_nChannelsList.clear();
@@ -2798,17 +2794,15 @@ HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = 
 	if (bFullInitialization) {
 		hr = CreateAudioClient();
 		if (SUCCEEDED(hr)) {
-			hr = CheckAudioClient(pWaveFormatEx);
+			hr = CheckAudioClient(m_pWaveFormatExInput);
 		}
 	} else {
-		hr = CheckAudioClient(pWaveFormatEx);
+		hr = CheckAudioClient(m_pWaveFormatExInput);
 	}
 
 	if (FAILED(hr)) {
 		DLog(L"CMpcAudioRenderer::ReinitializeAudioDevice() failed: (0x%08x)", hr);
 	}
-
-	SAFE_DELETE_ARRAY(pWaveFormatEx);
 
 	if (bFullInitialization) {
 		bool bInfTeePresent = FindFilter(CLSID_InfTee, m_pGraph);
