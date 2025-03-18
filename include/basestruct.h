@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -103,8 +103,13 @@ struct fraction64_t {
 };
 
 struct SyncPoint {
-	REFERENCE_TIME rt;
-	__int64 fp;
+	REFERENCE_TIME rt{};
+	__int64 fp{};
+
+	SyncPoint() = default;
+	explicit SyncPoint(REFERENCE_TIME _rt, __int64 _fp)
+		: rt(_rt)
+		, fp(_fp) {}
 };
 
 struct ColorSpace {

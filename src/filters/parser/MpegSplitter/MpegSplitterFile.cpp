@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -742,7 +742,7 @@ void CMpegSplitterFile::SearchStreams(const __int64 start, const __int64 stop, c
 
 				if (h.fpts) {
 					SyncPoints& sps = m_SyncPoints[TrackNum];
-					sps.emplace_back(SyncPoint{ h.pts, packet_start_pos });
+					sps.emplace_back(h.pts, packet_start_pos);
 				}
 
 				Seek(pos + h.len);
@@ -767,7 +767,7 @@ void CMpegSplitterFile::SearchStreams(const __int64 start, const __int64 stop, c
 
 					if (h2.fpts) {
 						SyncPoints& sps = m_SyncPoints[TrackNum];
-						sps.emplace_back(SyncPoint{ h2.pts, h.hdrpos });
+						sps.emplace_back(h2.pts, h.hdrpos);
 					}
 				}
 			}
@@ -790,7 +790,7 @@ void CMpegSplitterFile::SearchStreams(const __int64 start, const __int64 stop, c
 
 			if (h.fpts && TrackNum) {
 				SyncPoints& sps = m_SyncPoints[TrackNum];
-				sps.emplace_back(SyncPoint{ h.pts, h.hdrpos });
+				sps.emplace_back(h.pts, h.hdrpos);
 			}
 
 			Seek(pos + h.length);

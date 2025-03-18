@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -208,7 +208,7 @@ bool CDSMSplitterFile::Read(__int64 len, CPacket* p, bool fData)
 
 bool CDSMSplitterFile::Read(__int64 len, std::vector<SyncPoint>& sps)
 {
-	SyncPoint sp = {0, 0};
+	SyncPoint sp;
 	sps.clear();
 
 	while (len > 0) {

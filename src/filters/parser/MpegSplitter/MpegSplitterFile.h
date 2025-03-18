@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -97,7 +97,7 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 
 	BOOL m_bIMKH_CCTV;
 
-	typedef std::vector<SyncPoint> SyncPoints;
+	using SyncPoints = std::vector<SyncPoint>;
 	std::map<DWORD, SyncPoints> m_SyncPoints;
 
 	int m_tslen = 0; // transport stream packet length (188 or 192 bytes, auto-detected)

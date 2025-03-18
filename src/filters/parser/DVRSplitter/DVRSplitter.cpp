@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2024 see Authors.txt
+ * (C) 2018-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -218,8 +218,7 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 
 					if ((cnt % 3) == 0) {
-						const SyncPoint sp = {keyframe.pts * 10000ll, keyframe.pos};
-						m_sps.emplace_back(sp);
+						m_sps.emplace_back(keyframe.pts * 10000ll, keyframe.pos);
 					}
 
 					cnt++;

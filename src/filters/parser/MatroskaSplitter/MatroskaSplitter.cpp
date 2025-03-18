@@ -1841,7 +1841,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					const auto cueTime = s.GetRefTime(pCuePoint->CueTime);
 					const auto rtOffset = (cueTime >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;
 
-					m_sps.push_back(SyncPoint{cueTime - rtOffset, __int64(m_pSegment->m_start + pCueTrackPositions->CueClusterPosition)});
+					m_sps.emplace_back(cueTime - rtOffset, static_cast<__int64>(m_pSegment->m_start + pCueTrackPositions->CueClusterPosition));
 				}
 			}
 		}
@@ -2010,7 +2010,7 @@ bool CMatroskaSplitterFilter::DemuxInit()
 						block.Parse(pBlock.get(), false);
 						if (TrackNumber == block.TrackNumber) {
 							if (block.Lacing & 0x80) { // KeyFrame
-								m_sps.push_back(SyncPoint{ clusterTime - rtOffset, static_cast<__int64>(m_pCluster->m_filepos) });
+								m_sps.emplace_back(clusterTime - rtOffset, static_cast<__int64>(m_pCluster->m_filepos));
 							}
 
 							break;

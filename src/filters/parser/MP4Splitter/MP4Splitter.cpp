@@ -2223,8 +2223,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		if (movie->HasFragmentsIndex()) {
 			const AP4_Array<AP4_IndexTableEntry>& entries = movie->GetFragmentsIndexEntries();
 			for (AP4_Cardinal i = 0; i < entries.ItemCount(); ++i) {
-				const SyncPoint sp = { entries[i].m_rt - m_rtMovieOffset, __int64(entries[i].m_offset) };
-				m_sps.push_back(sp);
+				m_sps.emplace_back(entries[i].m_rt - m_rtMovieOffset, static_cast<__int64>(entries[i].m_offset));
 			}
 		} else {
 			for (const auto& tp : m_trackpos) {
@@ -2236,8 +2235,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				const AP4_Array<AP4_IndexTableEntry>& entries = track->GetIndexEntries();
 				for (AP4_Cardinal i = 0; i < entries.ItemCount(); ++i) {
-					const SyncPoint sp = { entries[i].m_rt - m_rtMovieOffset, __int64(entries[i].m_offset) };
-					m_sps.push_back(sp);
+					m_sps.emplace_back(entries[i].m_rt - m_rtMovieOffset, static_cast<__int64>(entries[i].m_offset));
 				}
 
 				break;

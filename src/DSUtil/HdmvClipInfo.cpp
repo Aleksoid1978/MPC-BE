@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -299,8 +299,7 @@ HRESULT CHdmvClipInfo::ReadCpiInfo(SyncPoints& sps)
 				const auto pts = coarse_pts + ((uint32_t)entry.fine[fine_index].pts_ep << 8);
 				const auto spn = (coarse.spn_ep & ~0x1FFFF) + entry.fine[fine_index].spn_ep;
 
-				const SyncPoint sp{llMulDiv(pts, 2000, 9, 0), (__int64)spn * 192 + 4};
-				sps.push_back(sp);
+				sps.emplace_back(llMulDiv(pts, 2000, 9, 0), static_cast<__int64>(spn * 192 + 4));
 			}
 		}
 	}

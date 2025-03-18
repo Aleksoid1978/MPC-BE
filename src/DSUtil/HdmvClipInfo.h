@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -89,7 +89,7 @@ public:
 	};
 	typedef std::vector<Stream> Streams;
 
-	typedef std::vector<SyncPoint> SyncPoints;
+	using SyncPoints = std::vector<SyncPoint>;
 
 	struct PlaylistItem {
 		PlaylistItem() = default;

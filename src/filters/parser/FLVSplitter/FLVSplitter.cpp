@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -277,8 +277,7 @@ bool CFLVSplitterFilter::ParseAMF0(UINT64 end, const CString key, std::vector<AM
 
 					if (times.size() == filepositions.size()) {
 						for (size_t i = 0; i < times.size(); i++) {
-							SyncPoint sp = {REFERENCE_TIME(times[i] * UNITS), __int64(filepositions[i] + m_SyncOffset)};
-							m_sps.push_back(sp);
+							m_sps.emplace_back(static_cast<REFERENCE_TIME>(times[i] * UNITS), static_cast<__int64>(filepositions[i] + m_SyncOffset));
 						}
 					}
 				}

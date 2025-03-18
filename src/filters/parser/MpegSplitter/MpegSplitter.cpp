@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1406,8 +1406,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		for (const auto& Item : m_Items) {
 			for (const auto& sps : Item.m_sps) {
-				SyncPoint sp = { Item.m_rtStartTime + sps.rt - Item.m_rtIn, Item.m_SizeIn + sps.fp };
-				m_sps.push_back(sp);
+				m_sps.emplace_back(Item.m_rtStartTime + sps.rt - Item.m_rtIn, Item.m_SizeIn + sps.fp);
 			}
 		}
 	}
