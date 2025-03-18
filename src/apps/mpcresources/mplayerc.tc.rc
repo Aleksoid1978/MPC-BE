@@ -3410,6 +3410,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "載入內嵌字型"
     IDS_MKVSPLT_CALC_DURATION "按視訊資料計算時間長度"
+    IDS_MKVSPLT_REINDEX             "Re-indexing if necessary"
 END
 
 STRINGTABLE

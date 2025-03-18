@@ -3410,6 +3410,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Charger les polices intégrées"
     IDS_MKVSPLT_CALC_DURATION "Calculer la durée en fonction des données vidéo"
+    IDS_MKVSPLT_REINDEX             "Re-indexing if necessary"
 END
 
 STRINGTABLE

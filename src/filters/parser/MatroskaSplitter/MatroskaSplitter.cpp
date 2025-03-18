@@ -43,6 +43,7 @@
 #define OPT_SECTION_MATROSKASplit	L"Filters\\Matroska Splitter"
 #define OPT_LoadEmbeddedFonts		L"LoadEmbeddedFonts"
 #define OPT_CalcDuration			L"CalculateDuration"
+#define OPT_Reindex					L"Reindex"
 
 #ifdef REGISTER_FILTER
 
@@ -104,6 +105,7 @@ CMatroskaSplitterFilter::CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(L"CMatroskaSplitterFilter", pUnk, phr, __uuidof(this))
 	, m_bLoadEmbeddedFonts(true)
 	, m_bCalcDuration(false)
+	, m_bReindex(true)
 	, m_hasHdmvDvbSubPin(false)
 	, m_Cluster_seek_rt(INVALID_TIME)
 	, m_Cluster_seek_pos(0)
@@ -130,11 +132,16 @@ CMatroskaSplitterFilter::CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_CalcDuration, dw)) {
 			m_bCalcDuration = !!dw;
 		}
+
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_Reindex, dw)) {
+			m_bReindex = !!dw;
+		}
 	}
 #else
 	CProfile& profile = AfxGetProfile();
 	profile.ReadBool(OPT_SECTION_MATROSKASplit, OPT_LoadEmbeddedFonts, m_bLoadEmbeddedFonts);
 	profile.ReadBool(OPT_SECTION_MATROSKASplit, OPT_CalcDuration, m_bCalcDuration);
+	profile.ReadBool(OPT_SECTION_MATROSKASplit, OPT_Reindex, m_bReindex);
 #endif
 }
 
@@ -1853,6 +1860,28 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
+	if (!m_subtitlesTrackNumbers.empty()) {
+		for (const auto& pCue : m_pFile->m_segment.Cues) {
+			for (const auto& pCuePoint : pCue->CuePoints) {
+				for (const auto& pCueTrackPositions : pCuePoint->CueTrackPositions) {
+					if (pCueTrackPositions->CueDuration && pCueTrackPositions->CueRelativePosition) {
+						m_bSupportSubtitlesCueDuration = TRUE;
+						break;
+					}
+				}
+
+				if (m_bSupportSubtitlesCueDuration) {
+					break;
+				}
+			}
+
+			if (m_bSupportSubtitlesCueDuration) {
+				break;
+			}
+		}
+	}
+
+
 	return m_pOutputs.size() > 0 ? S_OK : E_FAIL;
 }
 
@@ -1982,13 +2011,12 @@ bool CMatroskaSplitterFilter::DemuxInit()
 		return false;
 	}
 
-	auto& s = m_pFile->m_segment;
-
 	// reindex if needed
-	if (m_pFile->IsRandomAccess() && m_pFile->m_segment.Cues.empty()) {
+	if (m_bReindex && m_pFile->IsRandomAccess() && m_pFile->m_segment.Cues.empty()) {
 		m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
 		m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 
+		auto& s = m_pFile->m_segment;
 		const UINT64 TrackNumber = s.GetMasterTrack();
 
 		m_nOpenProgress = 0;
@@ -2045,27 +2073,6 @@ bool CMatroskaSplitterFilter::DemuxInit()
 		}
 	}
 
-	if (!m_subtitlesTrackNumbers.empty()) {
-		for (const auto& pCue : s.Cues) {
-			for (const auto& pCuePoint : pCue->CuePoints) {
-				for (const auto& pCueTrackPositions : pCuePoint->CueTrackPositions) {
-					if (pCueTrackPositions->CueDuration && pCueTrackPositions->CueRelativePosition) {
-						m_bSupportSubtitlesCueDuration = TRUE;
-						break;
-					}
-				}
-
-				if (m_bSupportSubtitlesCueDuration) {
-					break;
-				}
-			}
-
-			if (m_bSupportSubtitlesCueDuration) {
-				break;
-			}
-		}
-	}
-
 	return true;
 }
 
@@ -2113,6 +2120,7 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			// Plan B
 			m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 			REFERENCE_TIME seek_rt = 0;
+			UINT64 cluster_pos = 0;
 
 			do {
 				Cluster c;
@@ -2128,24 +2136,15 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 				}
 
 				seek_rt = seek_rt2;
+				cluster_pos = m_pCluster->m_filepos;
 			} while (m_pCluster->Next());
 
 			if (seek_rt > 0 && seek_rt < m_rtDuration) {
-				m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
-
-				do {
-					Cluster c;
-					if (FAILED(c.ParseTimeCode(m_pCluster.get()))) {
-						continue;
-					}
-
-					const auto clusterTime = s.GetRefTime(c.TimeCode);
-					const auto rtOffset = (clusterTime >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;
-					if ((clusterTime - rtOffset) == seek_rt) {
-						DLog(L"CMatroskaSplitterFilter::DemuxSeek(), plan B : %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
-						goto end;
-					}
-				} while (m_pCluster->Next());
+				m_pCluster->SeekTo(cluster_pos);
+				if (SUCCEEDED(m_pCluster->Parse())) {
+					DLog(L"CMatroskaSplitterFilter::DemuxSeek(), plan B : %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
+					goto end;
+				}
 			}
 		}
 
@@ -2836,11 +2835,13 @@ STDMETHODIMP CMatroskaSplitterFilter::Apply()
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_MATROSKASplit)) {
 		key.SetDWORDValue(OPT_LoadEmbeddedFonts, m_bLoadEmbeddedFonts);
 		key.SetDWORDValue(OPT_CalcDuration, m_bCalcDuration);
+		key.SetDWORDValue(OPT_Reindex, m_bReindex);
 	}
 #else
 	CProfile& profile = AfxGetProfile();
 	profile.WriteBool(OPT_SECTION_MATROSKASplit, OPT_LoadEmbeddedFonts, m_bLoadEmbeddedFonts);
 	profile.WriteBool(OPT_SECTION_MATROSKASplit, OPT_CalcDuration, m_bCalcDuration);
+	profile.WriteBool(OPT_SECTION_MATROSKASplit, OPT_Reindex, m_bReindex);
 #endif
 
 	return S_OK;
@@ -2870,6 +2871,19 @@ STDMETHODIMP_(BOOL) CMatroskaSplitterFilter::GetCalcDuration()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_bCalcDuration;
+}
+
+STDMETHODIMP CMatroskaSplitterFilter::SetReindex(BOOL nValue)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	m_bReindex = !!nValue;
+	return S_OK;
+}
+
+STDMETHODIMP_(BOOL) CMatroskaSplitterFilter::GetReindex()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_bReindex;
 }
 
 // IExFilterInfo

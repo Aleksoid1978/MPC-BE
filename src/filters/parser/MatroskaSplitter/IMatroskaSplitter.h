@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2014 see Authors.txt
+ * (C) 2011-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,4 +29,6 @@ public IUnknown {
 	STDMETHOD_(BOOL, GetLoadEmbeddedFonts()) PURE;
 	STDMETHOD(SetCalcDuration(BOOL nValue)) PURE;
 	STDMETHOD_(BOOL, GetCalcDuration()) PURE;
+	STDMETHOD(SetReindex(BOOL nValue)) PURE;
+	STDMETHOD_(BOOL, GetReindex()) PURE;
 };

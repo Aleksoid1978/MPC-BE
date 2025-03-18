@@ -3410,6 +3410,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "내장 폰트 불러옴"
     IDS_MKVSPLT_CALC_DURATION "비디오 데이터를 기반으로 기간 계산"
+    IDS_MKVSPLT_REINDEX             "Re-indexing if necessary"
 END
 
 STRINGTABLE

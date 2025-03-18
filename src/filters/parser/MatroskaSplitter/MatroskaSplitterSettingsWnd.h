@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,7 +30,7 @@ class __declspec(uuid("1996C0A9-1F4C-4538-A6FF-ED0F591BE5D6"))
 private :
 	CComQIPtr<IMatroskaSplitterFilter> m_pMSF;
 
-	CButton m_cbLoadEmbeddedFonts, m_cbCalcDuration;
+	CButton m_cbLoadEmbeddedFonts, m_cbCalcDuration, m_cbReindex;
 
 public:
 	CMatroskaSplitterSettingsWnd(void);

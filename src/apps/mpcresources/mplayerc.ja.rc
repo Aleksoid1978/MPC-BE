@@ -3410,6 +3410,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "内蔵フォントを読み込む"
     IDS_MKVSPLT_CALC_DURATION "ビデオ データに基づいて時間を計算する"
+    IDS_MKVSPLT_REINDEX             "Re-indexing if necessary"
 END
 
 STRINGTABLE

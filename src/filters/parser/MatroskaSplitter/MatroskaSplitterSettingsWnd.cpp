@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -55,10 +55,14 @@ bool CMatroskaSplitterSettingsWnd::OnActivate()
 	p.y += ScaleY(20);
 
 	m_cbCalcDuration.Create(ResStr(IDS_MKVSPLT_CALC_DURATION), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(290), m_fontheight)), this, IDC_STATIC);
+	p.y += ScaleY(20);
+
+	m_cbReindex.Create(ResStr(IDS_MKVSPLT_REINDEX), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(290), m_fontheight)), this, IDC_STATIC);
 
 	if (m_pMSF) {
 		m_cbLoadEmbeddedFonts.SetCheck(m_pMSF->GetLoadEmbeddedFonts());
 		m_cbCalcDuration.SetCheck(m_pMSF->GetCalcDuration());
+		m_cbReindex.SetCheck(m_pMSF->GetReindex());
 	}
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
@@ -81,6 +85,7 @@ bool CMatroskaSplitterSettingsWnd::OnApply()
 	if (m_pMSF) {
 		m_pMSF->SetLoadEmbeddedFonts(m_cbLoadEmbeddedFonts.GetCheck());
 		m_pMSF->SetCalcDuration(m_cbCalcDuration.GetCheck());
+		m_pMSF->SetReindex(m_cbReindex.GetCheck());
 		m_pMSF->Apply();
 	}
 

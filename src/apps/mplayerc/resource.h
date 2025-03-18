@@ -544,6 +544,7 @@
 // matroska splitter
 #define IDS_MKVSPLT_LOAD_EMBEDDED_FONTS 7700
 #define IDS_MKVSPLT_CALC_DURATION       7701
+#define IDS_MKVSPLT_REINDEX             7702
 // VTS reader
 #define IDS_VTSREADER_LOAD_PGC          7800
 // CDDA reader

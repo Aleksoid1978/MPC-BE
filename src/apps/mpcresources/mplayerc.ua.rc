@@ -3410,6 +3410,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Завантажувати вбудовані шрифти"
     IDS_MKVSPLT_CALC_DURATION "Розраховувати тривалість на основі даних відеопотоку"
+    IDS_MKVSPLT_REINDEX             "Re-indexing if necessary"
 END
 
 STRINGTABLE

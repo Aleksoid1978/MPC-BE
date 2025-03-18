@@ -3410,6 +3410,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Gertatu Barneratutako Hizkiak"
     IDS_MKVSPLT_CALC_DURATION "Kalkulatu iraupena bideoaren datuetan ohinarrituz"
+    IDS_MKVSPLT_REINDEX             "Re-indexing if necessary"
 END
 
 STRINGTABLE
