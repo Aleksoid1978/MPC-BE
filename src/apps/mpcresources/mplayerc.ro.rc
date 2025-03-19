@@ -3409,7 +3409,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Încarcă fonturile încorporate"
     IDS_MKVSPLT_CALC_DURATION "Calculează durata pe baza datelor video"
-    IDS_MKVSPLT_REINDEX             "Re-indexing if necessary"
+    IDS_MKVSPLT_REINDEX             "Se face reindexarea dacă e necesar"
 END
 
 STRINGTABLE
