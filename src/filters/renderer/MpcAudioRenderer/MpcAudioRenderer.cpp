@@ -2827,7 +2827,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 
 	UINT32 numFramesPadding = 0;
 	if ((m_DeviceModeCurrent == MODE_WASAPI_SHARED && !m_bIsBitstream) || m_WasapiMethod == WASAPI_METHOD::PUSH) {
-		m_pAudioClient->GetCurrentPadding(&numFramesPadding);
+		hr = m_pAudioClient->GetCurrentPadding(&numFramesPadding);
 		if (FAILED(hr)) {
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL > 1
 			DLog(L"CMpcAudioRenderer::RenderWasapiBuffer() - GetCurrentPadding() failed (0x%08x)", hr);
