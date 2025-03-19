@@ -373,9 +373,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 
 			CString TrackName;
-			// We do not use the "mdia/hdlr" atom, because it is useless information ("SoundHandler" and so on).
-			const auto nameAtom = dynamic_cast<AP4_DataInfoAtom*>(track->GetTrakAtom()->FindChild("udta/name"));
-			if (nameAtom) {
+			if (const auto nameAtom = dynamic_cast<AP4_DataInfoAtom*>(track->GetTrakAtom()->FindChild("udta/name"))) {
 				auto name_data = nameAtom->GetData();
 				if (name_data->GetDataSize() > 0) {
 					CStringA tmp((char*)name_data->GetData(), name_data->GetDataSize());
@@ -383,6 +381,31 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 			TrackName.Trim();
+			if (TrackName.IsEmpty()) {
+				// We use the atom "mdia/hdlr" with restrictions.
+				auto hdlrName = AltUTF8ToWStr(track->GetTrackName().c_str());
+				if (!hdlrName.IsEmpty()) {
+					constexpr static LPCWSTR restrictions[] = {
+						L"handle",
+						L"google"
+					};
+
+					auto lower(hdlrName);
+					lower.MakeLower();
+
+					bool bRestrictionFound = false;
+					for (auto restriction : restrictions) {
+						if (lower.Find(restriction) != -1) {
+							bRestrictionFound = true;
+							break;
+						}
+					}
+
+					if (!bRestrictionFound) {
+						TrackName = hdlrName;
+					}
+				}
+			}
 
 			CStringA TrackLanguage = track->GetTrackLanguage().c_str();
 			CStringW outputDesc;
