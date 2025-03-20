@@ -3410,7 +3410,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Gömülü Yazıtiplerini Yükle"
     IDS_MKVSPLT_CALC_DURATION "Süreyi video verilerine dayanarak hesapla"
-    IDS_MKVSPLT_REINDEX             "Re-indexing if necessary"
+    IDS_MKVSPLT_REINDEX             "Gerekirse yeniden indeksle"
 END
 
 STRINGTABLE
@@ -3845,8 +3845,8 @@ END
 STRINGTABLE
 BEGIN
     IDS_PUBLISHED           "Yayımlandı : "
-    IDS_OPENING_YOUTUBE     "YouTube açılıyor ..."
-    IDS_CALLING_YOUTUBEDL   "%s aranıyor ..."
+    IDS_OPENING_YOUTUBE     "YouTube açılıyor..."
+    IDS_CALLING_YOUTUBEDL   "%s aranıyor..."
 END
 
 STRINGTABLE
