@@ -299,7 +299,7 @@ HRESULT CHdmvClipInfo::ReadCpiInfo(SyncPoints& sps)
 				const auto pts = coarse_pts + ((uint32_t)entry.fine[fine_index].pts_ep << 8);
 				const auto spn = (coarse.spn_ep & ~0x1FFFF) + entry.fine[fine_index].spn_ep;
 
-				sps.emplace_back(llMulDiv(pts, 2000, 9, 0), static_cast<__int64>(spn * 192 + 4));
+				sps.emplace_back(llMulDiv(pts, 2000, 9, 0), static_cast<__int64>(spn) * 192 + 4);
 			}
 		}
 	}
