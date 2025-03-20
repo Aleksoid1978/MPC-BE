@@ -38,9 +38,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(SolutionDir)src\common.props" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros">
-    <NOMINMAX>False</NOMINMAX>
-  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <PreprocessorDefinitions>_LIB;USE_STD_STRING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
