@@ -881,7 +881,7 @@ BEGIN
     GROUPBOX        "Setări pentru EVR-CP și pentru sincronizatorul EVR (EVR Sync)",IDC_STATIC,5,37,285,137
     CONTROL         "Selectează dispozitivul de randare D3D9",IDC_D3D9DEVICE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,120,10
     COMBOBOX        IDC_D3D9DEVICE_COMBO,144,49,142,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Ecran complet exclusiv pe o fereastră suplimentară",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
+    CONTROL         "Exclusiv în modul ecran complet pe o fereastră suplimentară",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,79,224,10
     CONTROL         "Ieșire RGB pe 10 biți",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,92,92,10
     CONTROL         "Resetează la schimbarea ecranului",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_TOP | WS_TABSTOP,10,65,164,9
@@ -897,7 +897,7 @@ BEGIN
     LTEXT           "Intervalul de ieșire:",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Setări pentru randorul video MPC Video Renderer",IDC_STATIC,5,177,285,27
-    CONTROL         "Ecran complet exclusiv pe o fereastră suplimentară (experimental)",IDC_CHECK2,
+    CONTROL         "Exclusiv în modul ecran complet pe o fereastră suplimentară (experimental)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
     GROUPBOX        "Încadrare",IDC_STATIC,5,208,210,53
     LTEXT           "Modul implicit:",IDC_STATIC,10,220,74,8
@@ -1675,8 +1675,8 @@ BEGIN
             MENUITEM SEPARATOR
             POPUP "Prezentare"
             BEGIN
-                MENUITEM "Ecran complet exclusiv  (Pe tot ecranul exclusiv)",        ID_VIEW_EXCLUSIVE_FULLSCREEN
-                MENUITEM "Activează corecție de timp pentru cadru",   ID_VIEW_ENABLEFRAMETIMECORRECTION
+                MENUITEM "Exclusiv pe ecran complet (pe tot ecranul)",        ID_VIEW_EXCLUSIVE_FULLSCREEN
+                MENUITEM "Activează corecția de timp pentru cadru",   ID_VIEW_ENABLEFRAMETIMECORRECTION
             END
             MENUITEM "Revino la setările implicite ale randorului", ID_VIEW_RESET_DEFAULT
         END
@@ -1688,8 +1688,8 @@ BEGIN
             MENUITEM "Mono",                        ID_STEREO3D_MONO
             MENUITEM "Rând intercalat",             ID_STEREO3D_ROW_INTERLEAVED
             MENUITEM "Rând intercalat (2x/de două ori)",        ID_STEREO3D_ROW_INTERLEAVED_2X
-            MENUITEM "Jumătate peste dedesubt",              ID_STEREO3D_HALFOVERUNDER
-            MENUITEM "Peste dedesubt",                   ID_STEREO3D_OVERUNDER
+            MENUITEM "Jumătate peste partea de dedesubt",              ID_STEREO3D_HALFOVERUNDER
+            MENUITEM "Peste partea de dedesubt",                   ID_STEREO3D_OVERUNDER
             MENUITEM SEPARATOR
             MENUITEM "Schimbă la stânga/la dreapta",             ID_STEREO3D_SWAP_LEFTRIGHT
         END
@@ -1856,8 +1856,8 @@ BEGIN
             MENUITEM SEPARATOR
             POPUP "Prezentare"
             BEGIN
-                MENUITEM "Ecran complet exclusiv",        ID_VIEW_EXCLUSIVE_FULLSCREEN
-                MENUITEM "Activează corecție de timp pentru cadru",   ID_VIEW_ENABLEFRAMETIMECORRECTION
+                MENUITEM "Exclusiv pe ecran complet (pe tot ecranul)",        ID_VIEW_EXCLUSIVE_FULLSCREEN
+                MENUITEM "Activează corecția de timp pentru cadru",   ID_VIEW_ENABLEFRAMETIMECORRECTION
             END
             MENUITEM "Revino la setările implicite ale randorului", ID_VIEW_RESET_DEFAULT
         END
@@ -1867,8 +1867,8 @@ BEGIN
             MENUITEM "Mono",                        ID_STEREO3D_MONO
             MENUITEM "Rând intercalat",             ID_STEREO3D_ROW_INTERLEAVED
             MENUITEM "Rând intercalat (2x/de două ori)",        ID_STEREO3D_ROW_INTERLEAVED_2X
-            MENUITEM "Jumătate peste dedesubt",              ID_STEREO3D_HALFOVERUNDER
-            MENUITEM "Peste dedesubt",                   ID_STEREO3D_OVERUNDER
+            MENUITEM "Jumătate peste partea de dedesubt",              ID_STEREO3D_HALFOVERUNDER
+            MENUITEM "Peste partea de dedesubt",                   ID_STEREO3D_OVERUNDER
             MENUITEM SEPARATOR
             MENUITEM "Schimbă stânga/dreapta",             ID_STEREO3D_SWAP_LEFTRIGHT
         END
@@ -1943,8 +1943,8 @@ BEGIN
                 MENUITEM SEPARATOR
                 POPUP "Prezentare"
                 BEGIN
-                    MENUITEM "Ecran complet exclusiv",        ID_VIEW_EXCLUSIVE_FULLSCREEN
-                    MENUITEM "Activează corecție de timp pentru cadru",   ID_VIEW_ENABLEFRAMETIMECORRECTION
+                    MENUITEM "Exclusiv pe ecran complet (pe tot ecranul)",        ID_VIEW_EXCLUSIVE_FULLSCREEN
+                    MENUITEM "Activează corecția de timp pentru cadru",   ID_VIEW_ENABLEFRAMETIMECORRECTION
                 END
                 MENUITEM "Revino la setările implicite ale randorului", ID_VIEW_RESET_DEFAULT
             END
@@ -1956,8 +1956,8 @@ BEGIN
                 MENUITEM "Mono",                        ID_STEREO3D_MONO
                 MENUITEM "Rând intercalat",             ID_STEREO3D_ROW_INTERLEAVED
                 MENUITEM "Rând intercalat (2x/de două ori)",        ID_STEREO3D_ROW_INTERLEAVED_2X
-                MENUITEM "Jumătate peste dedesubt",              ID_STEREO3D_HALFOVERUNDER
-                MENUITEM "Peste dedesubt",                   ID_STEREO3D_OVERUNDER
+                MENUITEM "Jumătate peste partea de dedesubt",              ID_STEREO3D_HALFOVERUNDER
+                MENUITEM "Peste partea de dedesubt",                   ID_STEREO3D_OVERUNDER
                 MENUITEM SEPARATOR
                 MENUITEM "Schimbă stânga/dreapta",             ID_STEREO3D_SWAP_LEFTRIGHT
             END
@@ -2023,8 +2023,8 @@ BEGIN
             MENUITEM SEPARATOR
             POPUP "Prezentare"
             BEGIN
-                MENUITEM "Ecran complet exclusiv",        ID_VIEW_EXCLUSIVE_FULLSCREEN
-                MENUITEM "Activează corecție de timp pentru cadru",   ID_VIEW_ENABLEFRAMETIMECORRECTION
+                MENUITEM "Exclusiv pe ecran complet (pe tot ecranul)",        ID_VIEW_EXCLUSIVE_FULLSCREEN
+                MENUITEM "Activează corecția de timp pentru cadru",   ID_VIEW_ENABLEFRAMETIMECORRECTION
             END
             MENUITEM "Revino la setările implicite ale randorului", ID_VIEW_RESET_DEFAULT
         END
@@ -2034,8 +2034,8 @@ BEGIN
             MENUITEM "Mono",                        ID_STEREO3D_MONO
             MENUITEM "Rând intercalat",             ID_STEREO3D_ROW_INTERLEAVED
             MENUITEM "Rând intercalat (2x/de două ori)",        ID_STEREO3D_ROW_INTERLEAVED_2X
-            MENUITEM "Jumătate peste dedesubt",              ID_STEREO3D_HALFOVERUNDER
-            MENUITEM "Peste dedesubt",                   ID_STEREO3D_OVERUNDER
+            MENUITEM "Jumătate peste partea de dedesubt",              ID_STEREO3D_HALFOVERUNDER
+            MENUITEM "Peste partea de dedesubt",                   ID_STEREO3D_OVERUNDER
             MENUITEM SEPARATOR
             MENUITEM "Schimbă stânga/dreapta",             ID_STEREO3D_SWAP_LEFTRIGHT
         END
@@ -2594,7 +2594,7 @@ BEGIN
     IDS_OSD_SHADERS_1_OFF   "Nuanțatoarele (Shaderele) de pixeli de pre-redimensionare: Oprite"
     IDS_OSD_SHADERS_2_ON    "Nuanțatoarele (Shaderele) de pixeli de post-redimensionare: Pornite"
     IDS_OSD_SHADERS_2_OFF   "Nuanțatoarele (Shaderele) de pixeli de post-redimensionare: Oprite"
-    IDS_AG_VSYNCINTERNAL    "VSync intern"
+    IDS_AG_VSYNCINTERNAL    "VSync-ul intern (Sincronizarea verticală internă)"
 END
 
 STRINGTABLE
@@ -2688,7 +2688,7 @@ BEGIN
     IDS_CONTROLS_CLOSED     "Închis"
     IDS_SUBTITLES_OPTIONS   "&Opțiuni..."
     IDS_SUBTITLES_STYLES    "&Stiluri..."
-    IDS_SUBTITLES_RELOAD    "&Reîncarcă"
+    IDS_SUBTITLES_RELOAD    "&Reîncarcă-le"
     IDS_SUBTITLES_ENABLE    "&Activează-le"
     IDS_PANSCAN_EDIT        "Modificare..."
     IDS_INFOBAR_TITLE       "Titlu"
@@ -2780,7 +2780,7 @@ BEGIN
     IDS_AG_SAVE_IMAGE       "Salvează imaginea"
     IDS_AG_AUTOSAVE_IMAGE   "Salvează imaginea (automat)"
     IDS_OSD_IMAGE_SAVED     "Imagine salvată cu succes"
-    IDS_AG_LOAD_SUBTITLE    "Încarcă subtitrare"
+    IDS_AG_LOAD_SUBTITLE    "Încarcă subtitrări"
     IDS_AG_SAVE_SUBTITLE    "Salvează subtitrarea"
     IDS_AG_PROPERTIES       "Proprietăți"
     IDS_AG_EXIT             "Ieșire"
@@ -2797,8 +2797,8 @@ STRINGTABLE
 BEGIN
     IDS_OSD_RS_FT_CORRECTION_ON "Corecția timpului pentru cadre: Pornită"
     IDS_OSD_RS_FT_CORRECTION_OFF "Corecția timpului pentru cadre: Oprită"
-    IDS_OSD_RS_TARGET_VSYNC_OFFSET "Decalajul VSync țintă: %.1f"
-    IDS_OSD_RS_VSYNC_OFFSET "Decalaj VSync: %d"
+    IDS_OSD_RS_TARGET_VSYNC_OFFSET "Decalajul VSync-ului (sincronizării verticale) țintă: %.1f"
+    IDS_OSD_RS_VSYNC_OFFSET "Decalajul VSync-ului (sincronizării verticale): %d"
     IDS_OSD_SPEED           "Viteză: %sx"
     IDS_OSD_THUMBS_SAVED    "Miniaturi salvate cu succes"
     IDS_MENU_VIDEO_STREAM   "F&lux video"
@@ -2962,7 +2962,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_MPLAYERC_99         "Comută la ecran complet exclusiv"
+    IDS_MPLAYERC_99         "Comută în mod exclusiv pe ecran complet (pe tot ecranul)"
     IDS_MPLAYERC_100        "Mergi la subtitrarea anterioară"
     IDS_MPLAYERC_101        "Mergi la subtitrarea următoare"
     IDS_MPLAYERC_102        "Deplasează subtitrarea la stânga"
@@ -3077,8 +3077,8 @@ BEGIN
     IDS_MAINFRM_41          ", Liberă: %I64dMB"
     IDS_MAINFRM_42          ", Preîncărcări pentru V/A libere: %03d/%03d"
     IDS_AG_ERROR            "Eroare"
-    IDS_SUBTITLE_STREAM_OFF "Subtitrare: Oprită"
-    IDS_SUBTITLE_STREAM     "Subtitrare: %s"
+    IDS_SUBTITLE_STREAM_OFF "Subtitrări: Oprite"
+    IDS_SUBTITLE_STREAM     "Subtitrarea: %s"
     IDS_MAINFRM_46          "Selectează calea către DVD/BD:"
 END
 
@@ -3165,23 +3165,23 @@ BEGIN
     IDS_MAINFRM_117         " (fixează) proprietăți(le)..."
     IDS_AG_UNKNOWN_STREAM   "Flux necunoscut"
     IDS_AG_UNKNOWN          "Necunoscut %d"
-    IDS_AG_VSYNC            "VSync"
+    IDS_AG_VSYNC            "VSync (Sincronizare verticală)"
     IDS_MAINFRM_121         " (Comentariile regizorului 1)"
     IDS_MAINFRM_122         " (Comentariile regizorului 2)"
     IDS_AG_ENABLED          "Activat"
     IDS_AG_ANGLE            "Unghi %d"
-    IDS_AG_VSYNCOFFSET_INCREASE "Mărește decalajul VSync"
+    IDS_AG_VSYNCOFFSET_INCREASE "Mărește decalajul VSync-ului (sincronizării verticale)"
 END
 
 STRINGTABLE
 BEGIN
     IDS_AG_DISABLED         "Dezactivat"
-    IDS_AG_VSYNCOFFSET_DECREASE "Micșorează decalajul VSync"
+    IDS_AG_VSYNCOFFSET_DECREASE "Micșorează decalajul VSync-ului (sincronizării verticale)"
     IDS_MAINFRM_132         "Atenție (CMainFrame::SeekTo): Încearcă să caute în modul captură"
     IDS_AG_REMOVING         "Se șterge: "
     IDS_MAINFRM_134         "ATENȚIE: CMainFrame::CloseMedia() a fost chemat de două sau mai multe ori\n"
     IDS_MAINFRM_135         "EROARE CRITICĂ: !!! Trebuie închis forțat firul de execuție deschizător !!!"
-    IDS_MAINFRM_136         "Ecran complet exclusiv MPC-BE"
+    IDS_MAINFRM_136         "Exclusiv pe ecran complet (pe tot ecranul) MPC-BE"
     IDS_MAINFRM_137         "Format necunoscut"
     IDS_MAINFRM_138         "Decalajul subtitrărilor: %ld ms"
     IDS_VOLUME_GAIN_INC     "Crește puterea volumului"
@@ -3232,7 +3232,7 @@ BEGIN
     IDS_CMD_FULLSCREEN      "/fullscreen\tPornește în modul ecran complet"
     IDS_CMD_MINIMIZED       "/minimized\tPornește în modul minimizat"
     IDS_CMD_NEW             "/new\t\tFolosește o instanță nouă a playerului"
-    IDS_CMD_ADD             "/add\t\tAdaugă „o cale” la lista de redare (la playlist), poate fi combinat\n\t\tcu /open și /play"
+    IDS_CMD_ADD             "/add\t\tAdaugă „o cale” la lista de redare (la playlist), poate fi combinată\n\t\tcu /open și /play"
     IDS_CMD_RANDOMIZE       "/randomize\tRedă fișiere la întâmplare din lista de redare (din playlist)"
 END
 
@@ -3249,9 +3249,9 @@ BEGIN
     IDS_CMD_MONITOR         "/monitor N\tPornește redarea pe monitorul N, unde N începe de la 1"
     IDS_CMD_AUDIORENDERER   "/audiorenderer N\tPornește folosind randorul audio N, unde N începe de la 1\n\t\t(vezi setările „Ieșire”)"
     IDS_CMD_VOLUME          "/volume N\tSetează volumul, unde N este un interval de la 0 la 100"
-    IDS_CMD_CLIPBOARD       "/clipboard\t\tDeschide căile/legăturile din clipboard"
+    IDS_CMD_CLIPBOARD       "/clipboard\t\tDeschide căile/legăturile (link-urile) din clipboard"
     IDS_CMD_DEVICE          "/device\t\tDeschide dispozitivul video implicit"
-    IDS_CMD_RESET           "/reset\t\tRestaurează setări implicite"
+    IDS_CMD_RESET           "/reset\t\tRestaurează setările implicite"
 END
 
 STRINGTABLE
@@ -3609,16 +3609,16 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_OSD_RS_VSYNC_ON     "VSync: Pornit"
-    IDS_OSD_RS_VSYNC_OFF    "VSync: Oprit"
-    IDS_OSD_RS_INTERNAL_VSYNC_ON "VSync intern: Pornit"
-    IDS_OSD_RS_INTERNAL_VSYNC_OFF "VSync intern: Oprit"
+    IDS_OSD_RS_VSYNC_ON     "VSync (Sincronizare verticală): Pornită"
+    IDS_OSD_RS_VSYNC_OFF    "VSync (Sincronizare verticală): Oprit"
+    IDS_OSD_RS_INTERNAL_VSYNC_ON "VSync-ul intern (Sincronizare verticală internă): Pornit(ă)"
+    IDS_OSD_RS_INTERNAL_VSYNC_OFF "VSync-ul intern (Sincronizare verticală internă): Oprit(ă)"
     IDS_OSD_RS_SYNC_TO_DISPLAY_ON "Sincronizează videoclipul cu afișarea: Pornită"
     IDS_OSD_RS_SYNC_TO_DISPLAY_OFF "Sincronizează videoclipul cu afișarea: Oprită"
     IDS_OSD_RS_SYNC_TO_VIDEO_ON "Sincronizează afișarea cu videoclipul: Pornită"
     IDS_OSD_RS_SYNC_TO_VIDEO_OFF "Sincronizează afișarea cu videoclipul: Oprită"
-    IDS_OSD_RS_PRESENT_NEAREST_ON "Prezentare la cel mai apropiat VSync: Pornit"
-    IDS_OSD_RS_PRESENT_NEAREST_OFF "Prezentare la cel mai apropiat VSync: Oprit"
+    IDS_OSD_RS_PRESENT_NEAREST_ON "Prezentare la cel mai apropiat VSync (la cea mai apropiată sincronizare verticală): Pornită"
+    IDS_OSD_RS_PRESENT_NEAREST_OFF "Prezentare la cel mai apropiat VSync (la cea mai apropiată sincronizare verticală): Oprită"
     IDS_OSD_RS_COLOR_MANAGEMENT_ON "Administrarea culorilor: Pornită"
     IDS_OSD_RS_COLOR_MANAGEMENT_OFF "Administrarea culorilor: Oprită"
     IDS_OSD_RS_INPUT_TYPE_AUTO "Tipul de intrare: autodetecție"
@@ -3637,14 +3637,14 @@ BEGIN
     IDS_OSD_RS_REND_INTENT_SATUR "Randare îndreptată către: Saturație"
     IDS_OSD_RS_REND_INTENT_ABSOLUTE "Randare îndreptată către: Colorimetric absolut"
     IDS_OSD_RS_OUTPUT_RANGE "Interval de ieșire: %s"
-    IDS_OSD_RS_FLUSH_BEF_VSYNC_ON "Golește GPU-ul înainte de VSync: Pornit"
-    IDS_OSD_RS_FLUSH_BEF_VSYNC_OFF "Golește GPU-ul înainte de VSync: Oprit"
+    IDS_OSD_RS_FLUSH_BEF_VSYNC_ON "Golește GPU-ul înainte de VSync (Sincronizare verticală): Pornit"
+    IDS_OSD_RS_FLUSH_BEF_VSYNC_OFF "Golește GPU-ul înainte de VSync (Sincronizare verticală): Oprit"
     IDS_OSD_RS_FLUSH_AFT_PRES_ON "Golește GPU-ul după prezentare: Pornit"
     IDS_OSD_RS_FLUSH_AFT_PRES_OFF "Golește GPU-ul după prezentare: Oprit"
     IDS_OSD_RS_WAIT_ON      "Așteptarea pentru golirea GPU-ului: Pornită"
     IDS_OSD_RS_WAIT_OFF     "Așteptarea pentru golirea GPU-ului: Oprită"
-    IDS_OSD_RS_EXCLUSIVE_FSCREEN_ON "Ecran complet exclusiv: Pornit"
-    IDS_OSD_RS_EXCLUSIVE_FSCREEN_OFF "Ecran complet exclusiv: Oprit"
+    IDS_OSD_RS_EXCLUSIVE_FSCREEN_ON "Exclusiv pe ecran complet (pe tot ecranul): Pornit"
+    IDS_OSD_RS_EXCLUSIVE_FSCREEN_OFF "Exclusiv pe ecran complet (pe tot ecranul): Oprit"
 END
 
 STRINGTABLE
@@ -3850,8 +3850,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_VSYNC               "Activează VSync (sincronizarea verticală) folosind Direct3D9"
-    IDC_VSYNC_INTERNAL      "Activează mecanismul intern al VSync (a sincronizării verticale)"
+    IDC_VSYNC               "Activează VSync-ul (sincronizarea verticală) folosind Direct3D9"
+    IDC_VSYNC_INTERNAL      "Activează mecanismul intern al VSync-ului (a sincronizării verticale)"
 END
 
 /////////////////////////////////////////////////////////////////////////////
