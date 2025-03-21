@@ -13597,7 +13597,7 @@ void CMainFrame::OpenSetupAudioStream()
 			streams.emplace_back(stream);
 		}
 
-#ifdef DEBUG
+#ifdef _DEBUG
 		if (!streams.empty()) {
 			DLog(L"Audio Track list :");
 			for (size_t i = 0; i < streams.size(); i++) {

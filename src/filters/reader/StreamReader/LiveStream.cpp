@@ -772,7 +772,7 @@ HRESULT CLiveStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDW
 			&& m_pos + len > m_packets.back().m_end) {
 		m_SizeComplete = m_pos + len;
 
-#if DEBUG
+#if _DEBUG
 		DLog(L"CLiveStream::Read() : wait %llu bytes, %llu -> %llu", m_SizeComplete - m_packets.back().m_end, m_packets.back().m_end, m_SizeComplete);
 		const ULONGLONG start = GetPerfCounter();
 #endif
@@ -780,7 +780,7 @@ HRESULT CLiveStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDW
 		while (!m_bEndOfStream && !m_EventComplete.Wait(1));
 		m_SizeComplete = 0;
 
-#if DEBUG
+#if _DEBUG
 		const ULONGLONG end = GetPerfCounter();
 		DLog(L"    => do wait %0.3f ms", (end - start) / 10000.0);
 #endif

@@ -748,7 +748,7 @@ static BOOL SetHeapOptions()
 
 BOOL CMPlayerCApp::InitInstance()
 {
-#ifdef DEBUG
+#ifdef _DEBUG
 	DbgSetModuleLevel(LOG_TRACE, DWORD_MAX);
 	DbgSetModuleLevel(LOG_ERROR, DWORD_MAX);
 #endif

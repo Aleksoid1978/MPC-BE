@@ -448,7 +448,7 @@ void CMSDKDecoder::GetOffsetSideData(IMediaSample* pSample, mfxU64 timestamp, co
 
       // Erase previous GOPs when we start accessing a new one
       if (it != m_GOPs.begin()) {
-#ifdef DEBUG
+#ifdef _DEBUG
         // Check that all to-be-erased GOPs are empty
         for (auto itd = m_GOPs.begin(); itd < it; itd++) {
           if (!itd->offsets.empty()) {

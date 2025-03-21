@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2021 see Authors.txt
+ * (C) 2018-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,7 +31,7 @@ REFERENCE_TIME CAudioSyncClock::GetPrivateTime()
 {
 	CAutoLock lock(this);
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	const REFERENCE_TIME oldCounterOffset = m_counterOffset;
 #endif
 
@@ -43,7 +43,7 @@ REFERENCE_TIME CAudioSyncClock::GetPrivateTime()
 		clockTime = m_counterOffset + GetPerfCounter();
 	}
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	const REFERENCE_TIME counterOffsetDiff = m_counterOffset - oldCounterOffset;
 	if (std::abs(counterOffsetDiff) >= OneMillisecond * 5) {
 		DLog(L"CAudioSyncClock::GetPrivateTime() : jitter %.2f ms", counterOffsetDiff / 10000.0f);
