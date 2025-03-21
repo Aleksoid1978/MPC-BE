@@ -1,6 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
  * Copyright (C) 2000-2009  Josh Coalson
- * Copyright (C) 2011-2023  Xiph.Org Foundation
+ * Copyright (C) 2011-2025  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -939,23 +939,23 @@ FLAC__bool FLAC__bitreader_read_utf8_uint32(FLAC__BitReader *br, FLAC__uint32 *v
 		v = x;
 		i = 0;
 	}
-	else if(x & 0xC0 && !(x & 0x20)) { /* 110xxxxx */
+	else if((x & 0xE0) == 0xC0) { /* 110xxxxx */
 		v = x & 0x1F;
 		i = 1;
 	}
-	else if(x & 0xE0 && !(x & 0x10)) { /* 1110xxxx */
+	else if((x & 0xF0) == 0xE0) { /* 1110xxxx */
 		v = x & 0x0F;
 		i = 2;
 	}
-	else if(x & 0xF0 && !(x & 0x08)) { /* 11110xxx */
+	else if((x & 0xF8) == 0xF0) { /* 11110xxx */
 		v = x & 0x07;
 		i = 3;
 	}
-	else if(x & 0xF8 && !(x & 0x04)) { /* 111110xx */
+	else if((x & 0xFC) == 0xF8) { /* 111110xx */
 		v = x & 0x03;
 		i = 4;
 	}
-	else if(x & 0xFC && !(x & 0x02)) { /* 1111110x */
+	else if((x & 0xFE) == 0xFC) { /* 1111110x */
 		v = x & 0x01;
 		i = 5;
 	}
@@ -994,27 +994,27 @@ FLAC__bool FLAC__bitreader_read_utf8_uint64(FLAC__BitReader *br, FLAC__uint64 *v
 		v = x;
 		i = 0;
 	}
-	else if(x & 0xC0 && !(x & 0x20)) { /* 110xxxxx */
+	else if((x & 0xE0) == 0xC0) { /* 110xxxxx */
 		v = x & 0x1F;
 		i = 1;
 	}
-	else if(x & 0xE0 && !(x & 0x10)) { /* 1110xxxx */
+	else if((x & 0xF0) == 0xE0) { /* 1110xxxx */
 		v = x & 0x0F;
 		i = 2;
 	}
-	else if(x & 0xF0 && !(x & 0x08)) { /* 11110xxx */
+	else if((x & 0xF8) == 0xF0) { /* 11110xxx */
 		v = x & 0x07;
 		i = 3;
 	}
-	else if(x & 0xF8 && !(x & 0x04)) { /* 111110xx */
+	else if((x & 0xFC) == 0xF8) { /* 111110xx */
 		v = x & 0x03;
 		i = 4;
 	}
-	else if(x & 0xFC && !(x & 0x02)) { /* 1111110x */
+	else if((x & 0xFE) == 0xFC) { /* 1111110x */
 		v = x & 0x01;
 		i = 5;
 	}
-	else if(x & 0xFE && !(x & 0x01)) { /* 11111110 */
+	else if(x == 0xFE) { /* 11111110 */
 		v = 0;
 		i = 6;
 	}

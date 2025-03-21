@@ -1,6 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
  * Copyright (C) 2001-2009  Josh Coalson
- * Copyright (C) 2011-2023  Xiph.Org Foundation
+ * Copyright (C) 2011-2025  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -1102,10 +1102,21 @@ FLAC_API FLAC__bool FLAC__metadata_object_seektable_template_append_spaced_point
 		if (!FLAC__metadata_object_seektable_resize_points(object, seek_table->num_points + num))
 			return false;
 
-		for (j = 0; j < num; i++, j++) {
-			seek_table->points[i].sample_number = total_samples * (FLAC__uint64)j / (FLAC__uint64)num;
-			seek_table->points[i].stream_offset = 0;
-			seek_table->points[i].frame_samples = 0;
+		if(total_samples < UINT64_MAX / num) {
+			/* No risk of overflow */
+			for (j = 0; j < num; i++, j++) {
+				seek_table->points[i].sample_number = total_samples * (FLAC__uint64)j / (FLAC__uint64)num;
+				seek_table->points[i].stream_offset = 0;
+				seek_table->points[i].frame_samples = 0;
+			}
+		}
+		else {
+			/* Less precise, but can handle total_samples near UINT64_MAX */
+			for (j = 0; j < num; i++, j++) {
+				seek_table->points[i].sample_number = total_samples / (FLAC__uint64)num * (FLAC__uint64)j;
+				seek_table->points[i].stream_offset = 0;
+				seek_table->points[i].frame_samples = 0;
+			}
 		}
 	}
 

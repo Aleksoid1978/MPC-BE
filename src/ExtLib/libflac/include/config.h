@@ -1,4 +1,4 @@
-#define PACKAGE_VERSION "1.4.3"
+#define PACKAGE_VERSION "1.5.0"
 
 #define FLAC__HAS_X86INTRIN 1
 

@@ -1,6 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec
  * Copyright (C) 2002-2009  Josh Coalson
- * Copyright (C) 2011-2023  Xiph.Org Foundation
+ * Copyright (C) 2011-2025  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -57,6 +57,7 @@ FLAC__bool FLAC__ogg_encoder_aspect_init(FLAC__OggEncoderAspect *aspect)
 	aspect->seen_magic = false;
 	aspect->is_first_packet = true;
 	aspect->samples_written = 0;
+	aspect->last_page_granule_pos = 0;
 
 	return true;
 }
@@ -192,20 +193,43 @@ FLAC__StreamEncoderWriteStatus FLAC__ogg_encoder_aspect_write_callback_wrapper(F
 		if(ogg_stream_packetin(&aspect->stream_state, &packet) != 0)
 			return FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR;
 
-		/*@@@ can't figure out a way to pass a useful number for 'samples' to the write_callback, so we'll just pass 0 */
+		/* For a batch of write_callback calls associated with the same current_frame, pass the number of samples in the
+		 * first non-metadata page body call, and then set to zero in case there are more iterations of the while loop (so
+		 * as not to give the impression of more samples being processed).
+		 */
 		if(is_metadata) {
 			while(ogg_stream_flush(&aspect->stream_state, &aspect->page) != 0) {
+				FLAC__int64 page_granule_pos = ogg_page_granulepos(&aspect->page);
+				uint32_t samples_on_this_page;
+				if(page_granule_pos == -1) {
+					/* a granule position of -1 means no packets finish on this page */
+					samples_on_this_page = 0;
+				}
+				else {
+					samples_on_this_page = (uint32_t)(page_granule_pos - aspect->last_page_granule_pos);
+					aspect->last_page_granule_pos = page_granule_pos;
+				}
 				if(write_callback(encoder, aspect->page.header, aspect->page.header_len, 0, current_frame, client_data) != FLAC__STREAM_ENCODER_WRITE_STATUS_OK)
 					return FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR;
-				if(write_callback(encoder, aspect->page.body, aspect->page.body_len, 0, current_frame, client_data) != FLAC__STREAM_ENCODER_WRITE_STATUS_OK)
+				if(write_callback(encoder, aspect->page.body, aspect->page.body_len, samples_on_this_page, current_frame, client_data) != FLAC__STREAM_ENCODER_WRITE_STATUS_OK)
 					return FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR;
 			}
 		}
 		else {
 			while(ogg_stream_pageout(&aspect->stream_state, &aspect->page) != 0) {
+				FLAC__int64 page_granule_pos = ogg_page_granulepos(&aspect->page);
+				uint32_t samples_on_this_page;
+				if(page_granule_pos == -1) {
+					/* a granule position of -1 means no packets finish on this page */
+					samples_on_this_page = 0;
+				}
+				else {
+					samples_on_this_page = (uint32_t)(page_granule_pos - aspect->last_page_granule_pos);
+					aspect->last_page_granule_pos = page_granule_pos;
+				}
 				if(write_callback(encoder, aspect->page.header, aspect->page.header_len, 0, current_frame, client_data) != FLAC__STREAM_ENCODER_WRITE_STATUS_OK)
 					return FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR;
-				if(write_callback(encoder, aspect->page.body, aspect->page.body_len, 0, current_frame, client_data) != FLAC__STREAM_ENCODER_WRITE_STATUS_OK)
+				if(write_callback(encoder, aspect->page.body, aspect->page.body_len, samples_on_this_page, current_frame, client_data) != FLAC__STREAM_ENCODER_WRITE_STATUS_OK)
 					return FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR;
 			}
 		}

@@ -1,6 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
  * Copyright (C) 2000-2009  Josh Coalson
- * Copyright (C) 2011-2023  Xiph.Org Foundation
+ * Copyright (C) 2011-2025  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -89,8 +89,8 @@ typedef FLAC__uint64 FLAC__bwtemp;
  * next one.
  */
 static const uint32_t FLAC__BITWRITER_DEFAULT_CAPACITY = 32768u / sizeof(bwword); /* size in words */
-/* When growing, increment 4K at a time */
-static const uint32_t FLAC__BITWRITER_DEFAULT_INCREMENT = 4096u / sizeof(bwword); /* size in words */
+/* When growing, increment with 1/4th at a time */
+static const uint32_t FLAC__BITWRITER_DEFAULT_GROW_FRACTION = 2; /* means grow by >> 2 (1/4th) of current size */
 
 #define FLAC__WORDS_TO_BITS(words) ((words) * FLAC__BITS_PER_WORD)
 #define FLAC__TOTAL_BITS(bw) (FLAC__WORDS_TO_BITS((bw)->words) + (bw)->bits)
@@ -131,11 +131,11 @@ FLAC__bool bitwriter_grow_(FLAC__BitWriter *bw, uint32_t bits_to_add)
 		 * To prevent chrashing, give up */
 		return false;
 
-	/* round up capacity increase to the nearest FLAC__BITWRITER_DEFAULT_INCREMENT */
-	if((new_capacity - bw->capacity) % FLAC__BITWRITER_DEFAULT_INCREMENT)
-		new_capacity += FLAC__BITWRITER_DEFAULT_INCREMENT - ((new_capacity - bw->capacity) % FLAC__BITWRITER_DEFAULT_INCREMENT);
+	/* As reallocation can be quite expensive, grow exponentially */
+	if((new_capacity - bw->capacity) < (bw->capacity >> FLAC__BITWRITER_DEFAULT_GROW_FRACTION))
+		new_capacity = bw->capacity + (bw->capacity >> FLAC__BITWRITER_DEFAULT_GROW_FRACTION);
+
 	/* make sure we got everything right */
-	FLAC__ASSERT(0 == (new_capacity - bw->capacity) % FLAC__BITWRITER_DEFAULT_INCREMENT);
 	FLAC__ASSERT(new_capacity > bw->capacity);
 	FLAC__ASSERT(new_capacity >= bw->words + ((bw->bits + bits_to_add + FLAC__BITS_PER_WORD - 1) / FLAC__BITS_PER_WORD));
 

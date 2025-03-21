@@ -52,6 +52,11 @@
  * reflect the addition of 16 longwords of new data.  MD5Update blocks
  * the data and converts bytes into longwords for this routine.
  */
+
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+/* This tremendously speeds up undefined behaviour fuzzing */
+__attribute__((no_sanitize("unsigned-integer-overflow")))
+#endif
 static void FLAC__MD5Transform(FLAC__uint32 buf[4], FLAC__uint32 const in[16])
 {
 	register FLAC__uint32 a, b, c, d;

@@ -1,6 +1,6 @@
 /* libFLAC - Free Lossless Audio Codec library
  * Copyright (C) 2001-2009  Josh Coalson
- * Copyright (C) 2011-2023  Xiph.Org Foundation
+ * Copyright (C) 2011-2025  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -43,14 +43,6 @@
 #include <intrin.h> /* for __cpuid() and _xgetbv() */
 #elif defined __GNUC__ && defined HAVE_CPUID_H
 #include <cpuid.h> /* for __get_cpuid() and __get_cpuid_max() */
-#endif
-
-#ifndef NDEBUG
-#include <stdio.h>
-#define dfprintf fprintf
-#else
-/* This is bad practice, it should be a static void empty function */
-#define dfprintf(file, format, ...)
 #endif
 
 #if defined(HAVE_SYS_AUXV_H)
@@ -190,35 +182,11 @@ x86_cpu_info (FLAC__CPUInfo *info)
 		info->x86.bmi2  = (flags_ebx & FLAC__CPUINFO_X86_CPUID_BMI2   ) ? true : false;
 	}
 
-#if defined FLAC__CPU_IA32
-	dfprintf(stderr, "CPU info (IA-32):\n");
-#else
-	dfprintf(stderr, "CPU info (x86-64):\n");
-#endif
-	dfprintf(stderr, "  CMOV ....... %c\n", info->x86.cmov    ? 'Y' : 'n');
-	dfprintf(stderr, "  MMX ........ %c\n", info->x86.mmx     ? 'Y' : 'n');
-	dfprintf(stderr, "  SSE ........ %c\n", info->x86.sse     ? 'Y' : 'n');
-	dfprintf(stderr, "  SSE2 ....... %c\n", info->x86.sse2    ? 'Y' : 'n');
-	dfprintf(stderr, "  SSE3 ....... %c\n", info->x86.sse3    ? 'Y' : 'n');
-	dfprintf(stderr, "  SSSE3 ...... %c\n", info->x86.ssse3   ? 'Y' : 'n');
-	dfprintf(stderr, "  SSE41 ...... %c\n", info->x86.sse41   ? 'Y' : 'n');
-	dfprintf(stderr, "  SSE42 ...... %c\n", info->x86.sse42   ? 'Y' : 'n');
-
-	if (FLAC__AVX_SUPPORTED) {
-		dfprintf(stderr, "  AVX ........ %c\n", info->x86.avx     ? 'Y' : 'n');
-		dfprintf(stderr, "  FMA ........ %c\n", info->x86.fma     ? 'Y' : 'n');
-		dfprintf(stderr, "  AVX2 ....... %c\n", info->x86.avx2    ? 'Y' : 'n');
-		dfprintf(stderr, "  BMI2 ....... %c\n", info->x86.bmi2    ? 'Y' : 'n');
-	}
-
 	/*
 	 * now have to check for OS support of AVX instructions
 	 */
 	if (FLAC__AVX_SUPPORTED && info->x86.avx && x86_osxsave && (cpu_xgetbv_x86() & 0x6) == 0x6) {
 		os_avx = true;
-	}
-	if (os_avx) {
-		dfprintf(stderr, "  AVX OS sup . %c\n", info->x86.avx ? 'Y' : 'n');
 	}
 	if (!os_avx) {
 		/* no OS AVX support */
