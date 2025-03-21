@@ -40,7 +40,7 @@
     <ClCompile>
       <AdditionalOptions>/D "_USE_MATH_DEFINES" %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src\libflac\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_LIB;HAVE_CONFIG_H;FLAC__HAS_OGG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_LIB;HAVE_CONFIG_H;FLAC__HAS_OGG=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
