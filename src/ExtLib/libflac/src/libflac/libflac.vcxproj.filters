@@ -137,6 +137,9 @@
     <ClInclude Include="ogg\crctable.h">
       <Filter>ogg</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\config.h">
+      <Filter>Public Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bitmath.c">
