@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4CEFBC84-C215-11DB-8314-0800200C9A66}</ProjectGuid>
+    <RootNamespace>libflac</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>libflac</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(SolutionDir)src\platform.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)src\common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalOptions>/D "_USE_MATH_DEFINES" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src\libflac\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_LIB;HAVE_CONFIG_H;FLAC__HAS_OGG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Platform)'=='x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>ENABLE_64_BIT_WORDS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="include\config.h" />
+    <ClInclude Include="include\FLAC\all.h" />
+    <ClInclude Include="include\FLAC\assert.h" />
+    <ClInclude Include="include\FLAC\callback.h" />
+    <ClInclude Include="include\FLAC\export.h" />
+    <ClInclude Include="include\FLAC\format.h" />
+    <ClInclude Include="include\FLAC\metadata.h" />
+    <ClInclude Include="include\FLAC\ordinals.h" />
+    <ClInclude Include="include\FLAC\stream_decoder.h" />
+    <ClInclude Include="include\FLAC\stream_encoder.h" />
+    <ClInclude Include="include\share\alloc.h" />
+    <ClInclude Include="include\share\compat.h" />
+    <ClInclude Include="include\share\endswap.h" />
+    <ClInclude Include="include\share\macros.h" />
+    <ClInclude Include="include\share\private.h" />
+    <ClInclude Include="include\share\safe_str.h" />
+    <ClInclude Include="src\libflac\include\private\all.h" />
+    <ClInclude Include="src\libflac\include\private\bitmath.h" />
+    <ClInclude Include="src\libflac\include\private\bitreader.h" />
+    <ClInclude Include="src\libflac\include\private\bitwriter.h" />
+    <ClInclude Include="src\libflac\include\private\cpu.h" />
+    <ClInclude Include="src\libflac\include\private\crc.h" />
+    <ClInclude Include="src\libflac\include\private\fixed.h" />
+    <ClInclude Include="src\libflac\include\private\float.h" />
+    <ClInclude Include="src\libflac\include\private\format.h" />
+    <ClInclude Include="src\libflac\include\private\lpc.h" />
+    <ClInclude Include="src\libflac\include\private\md5.h" />
+    <ClInclude Include="src\libflac\include\private\memory.h" />
+    <ClInclude Include="src\libflac\include\private\metadata.h" />
+    <ClInclude Include="src\libflac\include\private\ogg_decoder_aspect.h" />
+    <ClInclude Include="src\libflac\include\private\ogg_encoder_aspect.h" />
+    <ClInclude Include="src\libflac\include\private\ogg_helper.h" />
+    <ClInclude Include="src\libflac\include\private\ogg_mapping.h" />
+    <ClInclude Include="src\libflac\include\private\stream_encoder.h" />
+    <ClInclude Include="src\libflac\include\private\stream_encoder_framing.h" />
+    <ClInclude Include="src\libflac\include\private\window.h" />
+    <ClInclude Include="src\libflac\include\protected\all.h" />
+    <ClInclude Include="src\libflac\include\protected\stream_decoder.h" />
+    <ClInclude Include="src\libflac\include\protected\stream_encoder.h" />
+    <ClInclude Include="src\libflac\ogg\crctable.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\share\win_utf8_io\win_utf8_io.c" />
+    <ClCompile Include="src\libflac\bitmath.c" />
+    <ClCompile Include="src\libflac\bitreader.c" />
+    <ClCompile Include="src\libflac\bitwriter.c" />
+    <ClCompile Include="src\libflac\cpu.c" />
+    <ClCompile Include="src\libflac\crc.c" />
+    <ClCompile Include="src\libflac\fixed.c" />
+    <ClCompile Include="src\libflac\fixed_intrin_sse2.c" />
+    <ClCompile Include="src\libflac\fixed_intrin_ssse3.c" />
+    <ClCompile Include="src\libflac\float.c" />
+    <ClCompile Include="src\libflac\format.c" />
+    <ClCompile Include="src\libflac\lpc.c" />
+    <ClCompile Include="src\libflac\lpc_intrin_avx2.c" />
+    <ClCompile Include="src\libflac\lpc_intrin_sse2.c" />
+    <ClCompile Include="src\libflac\lpc_intrin_sse41.c" />
+    <ClCompile Include="src\libflac\md5.c" />
+    <ClCompile Include="src\libflac\memory.c" />
+    <ClCompile Include="src\libflac\metadata_iterators.c" />
+    <ClCompile Include="src\libflac\metadata_object.c" />
+    <ClCompile Include="src\libflac\ogg\bitwise.c" />
+    <ClCompile Include="src\libflac\ogg\framing.c" />
+    <ClCompile Include="src\libflac\ogg_decoder_aspect.c" />
+    <ClCompile Include="src\libflac\ogg_encoder_aspect.c" />
+    <ClCompile Include="src\libflac\ogg_helper.c" />
+    <ClCompile Include="src\libflac\ogg_mapping.c" />
+    <ClCompile Include="src\libflac\stream_decoder.c" />
+    <ClCompile Include="src\libflac\stream_encoder.c" />
+    <ClCompile Include="src\libflac\stream_encoder_framing.c" />
+    <ClCompile Include="src\libflac\stream_encoder_intrin_avx2.c" />
+    <ClCompile Include="src\libflac\stream_encoder_intrin_sse2.c" />
+    <ClCompile Include="src\libflac\stream_encoder_intrin_ssse3.c" />
+    <ClCompile Include="src\libflac\window.c" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

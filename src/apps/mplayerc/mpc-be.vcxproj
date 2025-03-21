@@ -614,7 +614,7 @@
     <ProjectReference Include="$(SolutionDir)src\ExtLib\lcms2\lcms2.vcxproj">
       <Project>{acf5c64b-78aa-4730-91a2-24f4910fbad9}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)src\ExtLib\libflac\src\libFLAC\libflac.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\ExtLib\libflac\libflac.vcxproj">
       <Project>{4cefbc84-c215-11db-8314-0800200c9a66}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)src\ExtLib\libpng\libpng.vcxproj">

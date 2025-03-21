@@ -20,228 +20,228 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\protected\all.h">
+    <ClInclude Include="src\libflac\include\protected\all.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\all.h">
+    <ClInclude Include="src\libflac\include\private\all.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\bitmath.h">
+    <ClInclude Include="src\libflac\include\private\bitmath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\bitreader.h">
+    <ClInclude Include="src\libflac\include\private\bitreader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\bitwriter.h">
+    <ClInclude Include="src\libflac\include\private\bitwriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\cpu.h">
+    <ClInclude Include="src\libflac\include\private\cpu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\crc.h">
+    <ClInclude Include="src\libflac\include\private\crc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\fixed.h">
+    <ClInclude Include="src\libflac\include\private\fixed.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\float.h">
+    <ClInclude Include="src\libflac\include\private\float.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\format.h">
+    <ClInclude Include="src\libflac\include\private\format.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\lpc.h">
+    <ClInclude Include="src\libflac\include\private\lpc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\md5.h">
+    <ClInclude Include="src\libflac\include\private\md5.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\memory.h">
+    <ClInclude Include="src\libflac\include\private\memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\metadata.h">
+    <ClInclude Include="src\libflac\include\private\metadata.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\ogg_decoder_aspect.h">
+    <ClInclude Include="src\libflac\include\private\ogg_decoder_aspect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\ogg_encoder_aspect.h">
+    <ClInclude Include="src\libflac\include\private\ogg_encoder_aspect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\ogg_helper.h">
+    <ClInclude Include="src\libflac\include\private\ogg_helper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\ogg_mapping.h">
+    <ClInclude Include="src\libflac\include\private\ogg_mapping.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\protected\stream_decoder.h">
+    <ClInclude Include="src\libflac\include\protected\stream_decoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\protected\stream_encoder.h">
+    <ClInclude Include="src\libflac\include\protected\stream_encoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\stream_encoder.h">
+    <ClInclude Include="src\libflac\include\private\stream_encoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\stream_encoder_framing.h">
+    <ClInclude Include="src\libflac\include\private\stream_encoder_framing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\private\window.h">
+    <ClInclude Include="src\libflac\include\private\window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\FLAC\all.h">
+    <ClInclude Include="include\FLAC\all.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\FLAC\assert.h">
+    <ClInclude Include="include\FLAC\assert.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\FLAC\callback.h">
+    <ClInclude Include="include\FLAC\callback.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\FLAC\export.h">
+    <ClInclude Include="include\FLAC\export.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\FLAC\format.h">
+    <ClInclude Include="include\FLAC\format.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\FLAC\metadata.h">
+    <ClInclude Include="include\FLAC\metadata.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\FLAC\ordinals.h">
+    <ClInclude Include="include\FLAC\ordinals.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\FLAC\stream_decoder.h">
+    <ClInclude Include="include\FLAC\stream_decoder.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\FLAC\stream_encoder.h">
+    <ClInclude Include="include\FLAC\stream_encoder.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\share\alloc.h">
+    <ClInclude Include="include\share\alloc.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\share\compat.h">
+    <ClInclude Include="include\share\compat.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\share\endswap.h">
+    <ClInclude Include="include\share\endswap.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\share\macros.h">
+    <ClInclude Include="include\share\macros.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\share\private.h">
+    <ClInclude Include="include\share\private.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\share\safe_str.h">
+    <ClInclude Include="include\share\safe_str.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ogg\crctable.h">
+    <ClInclude Include="src\libflac\ogg\crctable.h">
       <Filter>ogg</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\config.h">
+    <ClInclude Include="include\config.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="bitmath.c">
+    <ClCompile Include="src\libflac\bitmath.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="bitreader.c">
+    <ClCompile Include="src\libflac\bitreader.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="bitwriter.c">
+    <ClCompile Include="src\libflac\bitwriter.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cpu.c">
+    <ClCompile Include="src\libflac\cpu.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="crc.c">
+    <ClCompile Include="src\libflac\crc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fixed.c">
+    <ClCompile Include="src\libflac\fixed.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fixed_intrin_sse2.c">
+    <ClCompile Include="src\libflac\fixed_intrin_sse2.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fixed_intrin_ssse3.c">
+    <ClCompile Include="src\libflac\fixed_intrin_ssse3.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="float.c">
+    <ClCompile Include="src\libflac\float.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="format.c">
+    <ClCompile Include="src\libflac\format.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lpc.c">
+    <ClCompile Include="src\libflac\lpc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lpc_intrin_sse2.c">
+    <ClCompile Include="src\libflac\lpc_intrin_sse2.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lpc_intrin_sse41.c">
+    <ClCompile Include="src\libflac\lpc_intrin_sse41.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lpc_intrin_avx2.c">
+    <ClCompile Include="src\libflac\lpc_intrin_avx2.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="md5.c">
+    <ClCompile Include="src\libflac\md5.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="memory.c">
+    <ClCompile Include="src\libflac\memory.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="metadata_iterators.c">
+    <ClCompile Include="src\libflac\metadata_iterators.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="metadata_object.c">
+    <ClCompile Include="src\libflac\metadata_object.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ogg_decoder_aspect.c">
+    <ClCompile Include="src\libflac\ogg_decoder_aspect.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ogg_encoder_aspect.c">
+    <ClCompile Include="src\libflac\ogg_encoder_aspect.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ogg_helper.c">
+    <ClCompile Include="src\libflac\ogg_helper.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ogg_mapping.c">
+    <ClCompile Include="src\libflac\ogg_mapping.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="stream_decoder.c">
+    <ClCompile Include="src\libflac\stream_decoder.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="stream_encoder.c">
+    <ClCompile Include="src\libflac\stream_encoder.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="stream_encoder_framing.c">
+    <ClCompile Include="src\libflac\stream_encoder_framing.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="stream_encoder_intrin_sse2.c">
+    <ClCompile Include="src\libflac\stream_encoder_intrin_sse2.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="stream_encoder_intrin_ssse3.c">
+    <ClCompile Include="src\libflac\stream_encoder_intrin_ssse3.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="stream_encoder_intrin_avx2.c">
+    <ClCompile Include="src\libflac\stream_encoder_intrin_avx2.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="window.c">
+    <ClCompile Include="src\libflac\window.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Ogg\bitwise.c">
+    <ClCompile Include="src\libflac\Ogg\bitwise.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Ogg\framing.c">
+    <ClCompile Include="src\libflac\Ogg\framing.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ogg\bitwise.c">
+    <ClCompile Include="src\libflac\ogg\bitwise.c">
       <Filter>ogg</Filter>
     </ClCompile>
-    <ClCompile Include="ogg\framing.c">
+    <ClCompile Include="src\libflac\ogg\framing.c">
       <Filter>ogg</Filter>
     </ClCompile>
-    <ClCompile Include="..\share\win_utf8_io\win_utf8_io.c">
+    <ClCompile Include="src\share\win_utf8_io\win_utf8_io.c">
       <Filter>share</Filter>
     </ClCompile>
   </ItemGroup>

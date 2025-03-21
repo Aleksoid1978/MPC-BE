@@ -123,7 +123,7 @@
     <ProjectReference Include="$(SolutionDir)src\DSUtil\DSUtil.vcxproj">
       <Project>{fc70988b-1ae5-4381-866d-4f405e28ac42}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)src\ExtLib\libflac\src\libflac\libflac.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\ExtLib\libflac\libflac.vcxproj">
       <Project>{4cefbc84-c215-11db-8314-0800200c9a66}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)src\ExtLib\BaseClasses.vcxproj">
