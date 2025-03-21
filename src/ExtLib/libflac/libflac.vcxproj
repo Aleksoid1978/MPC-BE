@@ -56,15 +56,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\config.h" />
-    <ClInclude Include="include\FLAC\all.h" />
-    <ClInclude Include="include\FLAC\assert.h" />
-    <ClInclude Include="include\FLAC\callback.h" />
-    <ClInclude Include="include\FLAC\export.h" />
-    <ClInclude Include="include\FLAC\format.h" />
-    <ClInclude Include="include\FLAC\metadata.h" />
-    <ClInclude Include="include\FLAC\ordinals.h" />
-    <ClInclude Include="include\FLAC\stream_decoder.h" />
-    <ClInclude Include="include\FLAC\stream_encoder.h" />
+    <ClInclude Include="include\flac\all.h" />
+    <ClInclude Include="include\flac\assert.h" />
+    <ClInclude Include="include\flac\callback.h" />
+    <ClInclude Include="include\flac\export.h" />
+    <ClInclude Include="include\flac\format.h" />
+    <ClInclude Include="include\flac\metadata.h" />
+    <ClInclude Include="include\flac\ordinals.h" />
+    <ClInclude Include="include\flac\stream_decoder.h" />
+    <ClInclude Include="include\flac\stream_encoder.h" />
     <ClInclude Include="include\share\alloc.h" />
     <ClInclude Include="include\share\compat.h" />
     <ClInclude Include="include\share\endswap.h" />
@@ -84,17 +84,12 @@
     <ClInclude Include="src\libflac\include\private\md5.h" />
     <ClInclude Include="src\libflac\include\private\memory.h" />
     <ClInclude Include="src\libflac\include\private\metadata.h" />
-    <ClInclude Include="src\libflac\include\private\ogg_decoder_aspect.h" />
-    <ClInclude Include="src\libflac\include\private\ogg_encoder_aspect.h" />
-    <ClInclude Include="src\libflac\include\private\ogg_helper.h" />
-    <ClInclude Include="src\libflac\include\private\ogg_mapping.h" />
     <ClInclude Include="src\libflac\include\private\stream_encoder.h" />
     <ClInclude Include="src\libflac\include\private\stream_encoder_framing.h" />
     <ClInclude Include="src\libflac\include\private\window.h" />
     <ClInclude Include="src\libflac\include\protected\all.h" />
     <ClInclude Include="src\libflac\include\protected\stream_decoder.h" />
     <ClInclude Include="src\libflac\include\protected\stream_encoder.h" />
-    <ClInclude Include="src\libflac\ogg\crctable.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\share\win_utf8_io\win_utf8_io.c" />
@@ -116,12 +111,6 @@
     <ClCompile Include="src\libflac\memory.c" />
     <ClCompile Include="src\libflac\metadata_iterators.c" />
     <ClCompile Include="src\libflac\metadata_object.c" />
-    <ClCompile Include="src\libflac\ogg\bitwise.c" />
-    <ClCompile Include="src\libflac\ogg\framing.c" />
-    <ClCompile Include="src\libflac\ogg_decoder_aspect.c" />
-    <ClCompile Include="src\libflac\ogg_encoder_aspect.c" />
-    <ClCompile Include="src\libflac\ogg_helper.c" />
-    <ClCompile Include="src\libflac\ogg_mapping.c" />
     <ClCompile Include="src\libflac\stream_decoder.c" />
     <ClCompile Include="src\libflac\stream_encoder.c" />
     <ClCompile Include="src\libflac\stream_encoder_framing.c" />

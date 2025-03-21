@@ -12,9 +12,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="ogg">
-      <UniqueIdentifier>{311db7c4-01ac-45eb-9670-3c7cc34bc3e6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="share">
       <UniqueIdentifier>{1183cb72-cbc8-4014-80cb-5420492c331b}</UniqueIdentifier>
     </Filter>
@@ -60,18 +57,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\libflac\include\private\metadata.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\libflac\include\private\ogg_decoder_aspect.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\libflac\include\private\ogg_encoder_aspect.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\libflac\include\private\ogg_helper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\libflac\include\private\ogg_mapping.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\libflac\include\protected\stream_decoder.h">
@@ -134,9 +119,6 @@
     <ClInclude Include="include\share\safe_str.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\libflac\ogg\crctable.h">
-      <Filter>ogg</Filter>
-    </ClInclude>
     <ClInclude Include="include\config.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>
@@ -196,18 +178,6 @@
     <ClCompile Include="src\libflac\metadata_object.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\libflac\ogg_decoder_aspect.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\libflac\ogg_encoder_aspect.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\libflac\ogg_helper.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\libflac\ogg_mapping.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\libflac\stream_decoder.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -228,18 +198,6 @@
     </ClCompile>
     <ClCompile Include="src\libflac\window.c">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\libflac\Ogg\bitwise.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\libflac\Ogg\framing.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\libflac\ogg\bitwise.c">
-      <Filter>ogg</Filter>
-    </ClCompile>
-    <ClCompile Include="src\libflac\ogg\framing.c">
-      <Filter>ogg</Filter>
     </ClCompile>
     <ClCompile Include="src\share\win_utf8_io\win_utf8_io.c">
       <Filter>share</Filter>
