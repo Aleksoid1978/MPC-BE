@@ -144,6 +144,16 @@ CFGManager::CFGManager(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
 {
 	m_pUnkInner.CoCreateInstance(CLSID_FilterGraph, GetOwner());
 	m_pFM.CoCreateInstance(CLSID_FilterMapper2);
+
+	if (!m_bIsPreview) {
+		CAppSettings& s = AfxGetAppSettings();
+
+		m_AudioRenderers.emplace_back(s.SelectedAudioRenderer());
+
+		if (s.fDualAudioOutput && s.strAudioRendererDisplayName2 != s.strAudioRendererDisplayName) {
+			m_AudioRenderers.emplace_back(s.strAudioRendererDisplayName2);
+		}
+	}
 }
 
 CFGManager::~CFGManager()
@@ -1508,7 +1518,7 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 			HRESULT hr = S_OK;
 
 			BOOL bInfPinTeeConnected = FALSE;
-			if (s.fDualAudioOutput) {
+			if (m_AudioRenderers.size() == 2) {
 				if (CComQIPtr<IAudioSwitcherFilter> pASF = pBF) {
 					BeginEnumMediaTypes(pPin, pEM, pmt) {
 						// Find the Audio out pin
@@ -1521,17 +1531,16 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 							hr = ConnectFilterDirect(pPin, pInfPinTee, nullptr);
 							if (SUCCEEDED(hr)) {
 								bInfPinTeeConnected = TRUE;
-								CString SelAudioRenderer = s.SelectedAudioRenderer();
-								for (int ar = 0; ar < 2; ar++) {
+								for (const auto& audioRenderer : m_AudioRenderers) {
 									IPin *infTeeFilterOutPin = GetFirstDisconnectedPin(pInfPinTee, PINDIR_OUTPUT);
 
 									BOOL bIsConnected = FALSE;
 
-									if (!SelAudioRenderer.IsEmpty()) {
+									if (audioRenderer.GetLength()) {
 
 										// looking at the list of filters
 										for (const auto& pFGF : m_transform) {
-											if (SelAudioRenderer == pFGF->GetName()) {
+											if (audioRenderer == pFGF->GetName()) {
 												hr = ConnectFilterDirect(infTeeFilterOutPin, pFGF);
 												if (SUCCEEDED(hr)) {
 													DLog(L"FGM: Connect Direct to '%s'", pFGF->GetName());
@@ -1547,7 +1556,7 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 											BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
 												CFGFilterRegistry f(pMoniker);
 
-												if (SelAudioRenderer == f.GetDisplayName()) {
+												if (audioRenderer == f.GetDisplayName()) {
 													hr = ConnectFilterDirect(infTeeFilterOutPin, &f);
 													if (SUCCEEDED(hr)) {
 														DLog(L"FGM: Connect Direct to '%s'", f.GetName());
@@ -1586,8 +1595,6 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 									if (!bIsConnected) {
 										hr = Connect(infTeeFilterOutPin, pPinIn);
 									}
-
-									SelAudioRenderer = s.strAudioRendererDisplayName2;
 								}
 							}
 							break;
@@ -2895,31 +2902,29 @@ CFGManagerPlayer::CFGManagerPlayer(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, int
 		}
 		EndEnumSysDev
 
-		CString SelAudioRenderer = s.SelectedAudioRenderer();
 		armerit += 0x100; // for the first audio output give higher priority
 
-		for (int ar = 0; ar < (s.fDualAudioOutput ? 2 : 1); ar++) {
-			if (SelAudioRenderer == AUDRNDT_NULL_COMP) {
+		for (const auto& audioRenderer : m_AudioRenderers) {
+			if (audioRenderer == AUDRNDT_NULL_COMP) {
 				pFGF = DNew CFGFilterInternal<CNullAudioRenderer>(AUDRNDT_NULL_COMP, armerit);
 				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 				m_transform.emplace_back(pFGF);
-			} else if (SelAudioRenderer == AUDRNDT_NULL_UNCOMP) {
+			} else if (audioRenderer == AUDRNDT_NULL_UNCOMP) {
 				pFGF = DNew CFGFilterInternal<CNullUAudioRenderer>(AUDRNDT_NULL_UNCOMP, armerit);
 				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 				m_transform.emplace_back(pFGF);
-			} else if (SelAudioRenderer == AUDRNDT_MPC) {
+			} else if (audioRenderer == AUDRNDT_MPC) {
 				pFGF = DNew CFGFilterInternal<CMpcAudioRenderer>(AUDRNDT_MPC, armerit);
 				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_PCM);
 				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_IEEE_FLOAT);
 				m_transform.emplace_back(pFGF);
-			} else if (SelAudioRenderer.GetLength() > 0) {
-				pFGF = DNew CFGFilterRegistry(SelAudioRenderer, armerit);
+			} else if (audioRenderer.GetLength() > 0) {
+				pFGF = DNew CFGFilterRegistry(audioRenderer, armerit);
 				pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_NULL);
 				m_transform.emplace_back(pFGF);
 			}
 
 			// second audio output
-			SelAudioRenderer = s.strAudioRendererDisplayName2;
 			armerit -= 0x100;
 		}
 	}

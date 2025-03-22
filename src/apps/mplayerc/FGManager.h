@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -134,6 +134,7 @@ protected:
 	HRESULT ConnectFilterDirect(IPin* pPinOut, CFGFilter* pFGF);
 
 	bool m_bIsPreview;
+	std::vector<CStringW> m_AudioRenderers;
 
 	bool m_bOpeningAborted = false;
 	std::mutex m_mutexRender;
