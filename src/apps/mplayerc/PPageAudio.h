@@ -46,10 +46,11 @@ public:
 
 	enum { IDD = IDD_PPAGEAUDIO };
 
-	int			m_iAudioRendererType = 0;
-	CComboBox	m_iAudioRendererTypeCtrl;
-	int			m_iSecAudioRendererType = 1;
-	CComboBox	m_iSecAudioRendererTypeCtrl;
+	int			m_iAudioRenderer = 0;
+	int			m_iSecAudioRenderer = 1;
+
+	CComboBox	m_iAudioRendererCtrl;
+	CComboBox	m_iSecAudioRendererCtrl;
 	CButton		m_audRendPropButton;
 	CButton		m_DualAudioOutput;
 

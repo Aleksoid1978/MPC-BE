@@ -42,10 +42,8 @@ void CPPageAudio::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
-	DDX_Control(pDX, IDC_AUDRND_COMBO, m_iAudioRendererTypeCtrl);
-	DDX_Control(pDX, IDC_COMBO1, m_iSecAudioRendererTypeCtrl);
-	DDX_CBIndex(pDX, IDC_AUDRND_COMBO, m_iAudioRendererType);
-	DDX_CBIndex(pDX, IDC_COMBO1, m_iSecAudioRendererType);
+	DDX_Control(pDX, IDC_AUDRND_COMBO, m_iAudioRendererCtrl);
+	DDX_Control(pDX, IDC_COMBO1, m_iSecAudioRendererCtrl);
 	DDX_Control(pDX, IDC_BUTTON1, m_audRendPropButton);
 	DDX_Control(pDX, IDC_CHECK1, m_DualAudioOutput);
 
@@ -62,9 +60,9 @@ void CPPageAudio::DoDataExchange(CDataExchange* pDX)
 BOOL CPPageAudio::PreTranslateMessage(MSG* pMsg)
 {
 	if (pMsg->message == WM_KEYDOWN && (pMsg->wParam == 'C' || pMsg->wParam == 'c') && GetKeyState(VK_CONTROL) < 0) {
-		if (pMsg->hwnd == m_iAudioRendererTypeCtrl.m_hWnd) {
+		if (pMsg->hwnd == m_iAudioRendererCtrl.m_hWnd) {
 			CStringW text;
-			m_iAudioRendererTypeCtrl.GetWindowText(text);
+			m_iAudioRendererCtrl.GetWindowText(text);
 			CopyStringToClipboard(this->m_hWnd, text);
 		}
 		return TRUE;
@@ -94,8 +92,8 @@ BOOL CPPageAudio::OnInitDialog()
 	CAppSettings& s = AfxGetAppSettings();
 	CString str;
 
-	m_iAudioRendererTypeCtrl.SetRedraw(FALSE);
-	m_iSecAudioRendererTypeCtrl.SetRedraw(FALSE);
+	m_iAudioRendererCtrl.SetRedraw(FALSE);
+	m_iSecAudioRendererCtrl.SetRedraw(FALSE);
 
 	m_audioDevices.emplace_back(audioDeviceInfo_t{ AUDRNDT_MPC, CLSID_MpcAudioRenderer, GUID_NULL, AUDRNDT_MPC });
 	str.Format(L"DirectSound: %s", ResStr(IDS_PPAGE_OUTPUT_SYS_DEF));
@@ -154,33 +152,48 @@ BOOL CPPageAudio::OnInitDialog()
 	m_audioDevices.emplace_back(audioDeviceInfo_t{ AUDRNDT_NULL_COMP, CLSID_NullAudioRenderer, GUID_NULL, AUDRNDT_NULL_COMP });
 	m_audioDevices.emplace_back(audioDeviceInfo_t{ AUDRNDT_NULL_UNCOMP, CLSID_NullUAudioRenderer, GUID_NULL, AUDRNDT_NULL_UNCOMP });
 
-	DLog(L"Audio devices:");
-	for (const auto audioDevice : m_audioDevices) {
-		DLog(L"%s, %s, %s, %s", CStringFromGUID(audioDevice.clsid), CStringFromGUID(audioDevice.dsGuid), audioDevice.displayName, audioDevice.friendlyName);
-		m_iAudioRendererTypeCtrl.AddString(audioDevice.friendlyName);
-		m_iSecAudioRendererTypeCtrl.AddString(audioDevice.friendlyName);
-	}
-
-	m_iAudioRendererType = 0;
-	m_iSecAudioRendererType = 1;
+	m_iAudioRenderer = 0;
 	for (size_t idx = 0; idx < m_audioDevices.size(); idx++) {
 		if (s.strAudioRendererDisplayName == m_audioDevices[idx].displayName) {
-			m_iAudioRendererType = idx;
-		}
-		if (s.strAudioRendererDisplayName2 == m_audioDevices[idx].displayName) {
-			m_iSecAudioRendererType = idx;
+			m_iAudioRenderer = idx;
+			break;
 		}
 	}
 
-	CorrectComboListWidth(m_iAudioRendererTypeCtrl);
-	m_iAudioRendererTypeCtrl.SetRedraw(TRUE);
-	m_iAudioRendererTypeCtrl.Invalidate();
-	m_iAudioRendererTypeCtrl.UpdateWindow();
+	m_iSecAudioRenderer = (m_iAudioRenderer == 1) ? 0 : 1;
+	for (size_t idx = 0; idx < m_audioDevices.size(); idx++) {
+		if (s.strAudioRendererDisplayName2 == m_audioDevices[idx].displayName) {
+			if (idx == m_iAudioRenderer) {
+				m_iSecAudioRenderer = (m_iAudioRenderer == 1) ? 0 : 1;
+			} else {
+				m_iSecAudioRenderer = idx;
+			}
+			break;
+		}
+	}
 
-	CorrectComboListWidth(m_iSecAudioRendererTypeCtrl);
-	m_iSecAudioRendererTypeCtrl.SetRedraw(TRUE);
-	m_iSecAudioRendererTypeCtrl.Invalidate();
-	m_iSecAudioRendererTypeCtrl.UpdateWindow();
+	DLog(L"Audio devices:");
+	for (size_t i = 0; i < m_audioDevices.size(); i++) {
+		const auto& audioDevice = m_audioDevices[i];
+		DLog(L"%s, %s, %s, %s", CStringFromGUID(audioDevice.clsid), CStringFromGUID(audioDevice.dsGuid), audioDevice.displayName, audioDevice.friendlyName);
+
+		m_iAudioRendererCtrl.AddString(audioDevice.friendlyName);
+		if (i != m_iAudioRenderer) {
+			AddStringData(m_iSecAudioRendererCtrl, audioDevice.friendlyName, i);
+		}
+	}
+	m_iAudioRendererCtrl.SetCurSel(m_iAudioRenderer);
+	SelectByItemData(m_iSecAudioRendererCtrl, m_iSecAudioRenderer);
+
+	CorrectComboListWidth(m_iAudioRendererCtrl);
+	m_iAudioRendererCtrl.SetRedraw(TRUE);
+	m_iAudioRendererCtrl.Invalidate();
+	m_iAudioRendererCtrl.UpdateWindow();
+
+	m_iSecAudioRendererCtrl.SetDroppedWidth(m_iAudioRendererCtrl.GetDroppedWidth());
+	m_iSecAudioRendererCtrl.SetRedraw(TRUE);
+	m_iSecAudioRendererCtrl.Invalidate();
+	m_iSecAudioRendererCtrl.UpdateWindow();
 
 	m_DualAudioOutput.SetCheck(s.fDualAudioOutput);
 	OnDualAudioOutputCheck();
@@ -213,12 +226,11 @@ BOOL CPPageAudio::OnApply()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.strAudioRendererDisplayName  = m_audioDevices[m_iAudioRendererType].displayName;
-	if (m_iSecAudioRendererType == -1) {
-		s.strAudioRendererDisplayName.Empty();
-	} else {
-		s.strAudioRendererDisplayName2 = m_audioDevices[m_iSecAudioRendererType].displayName;
-	}
+	m_iAudioRenderer = m_iAudioRendererCtrl.GetCurSel();
+	m_iSecAudioRenderer = (int)GetCurItemData(m_iSecAudioRendererCtrl);
+
+	s.strAudioRendererDisplayName  = m_audioDevices[m_iAudioRenderer].displayName;
+	s.strAudioRendererDisplayName2 = m_audioDevices[m_iSecAudioRenderer].displayName;
 	s.fDualAudioOutput             = !!m_DualAudioOutput.GetCheck();
 
 	s.nVolume = m_oldVolume = m_nVolume;
@@ -275,8 +287,10 @@ void CPPageAudio::OnAudioRendererChange()
 {
 	UpdateData();
 
+	m_iAudioRenderer = m_iAudioRendererCtrl.GetCurSel();
+
 	BOOL flag = FALSE;
-	CStringW str_audio = m_audioDevices[m_iAudioRendererType].displayName;
+	CStringW str_audio = m_audioDevices[m_iAudioRenderer].displayName;
 	if (str_audio == AUDRNDT_MPC) {
 		flag = TRUE;
 	} else {
@@ -289,7 +303,7 @@ void CPPageAudio::OnAudioRendererChange()
 			CStringW str(olestr);
 			CoTaskMemFree(olestr);
 
-			if (str == m_audioDevices[m_iAudioRendererType].displayName) {
+			if (str == m_audioDevices[m_iAudioRenderer].displayName) {
 				CComPtr<IBaseFilter> pBF;
 				HRESULT hr = pMoniker->BindToObject(nullptr, nullptr, IID_PPV_ARGS(&pBF));
 				if (SUCCEEDED(hr)) {
@@ -305,12 +319,27 @@ void CPPageAudio::OnAudioRendererChange()
 
 	m_audRendPropButton.EnableWindow(flag);
 
+	if (m_iAudioRenderer == m_iSecAudioRenderer) {
+		m_iSecAudioRendererCtrl.ResetContent();
+
+		m_iSecAudioRenderer = (m_iAudioRenderer == 1) ? 0 : 1;
+
+		for (size_t i = 0; i < m_audioDevices.size(); i++) {
+			const auto& audioDevice = m_audioDevices[i];
+			if (i != m_iAudioRenderer) {
+				AddStringData(m_iSecAudioRendererCtrl, audioDevice.friendlyName, i);
+			}
+		}
+
+		SelectByItemData(m_iSecAudioRendererCtrl, m_iSecAudioRenderer);
+	}
+
 	SetModified();
 }
 
 void CPPageAudio::OnAudioRenderPropClick()
 {
-	CStringW str_audio = m_audioDevices[m_iAudioRendererType].displayName;
+	CStringW str_audio = m_audioDevices[m_iAudioRenderer].displayName;
 
 	if (str_audio == AUDRNDT_MPC) {
 		ShowPPage(CreateInstance<CMpcAudioRenderer>);
@@ -375,7 +404,7 @@ void CPPageAudio::OnAudioRenderPropClick()
 
 void CPPageAudio::OnDualAudioOutputCheck()
 {
-	m_iSecAudioRendererTypeCtrl.EnableWindow(!!m_DualAudioOutput.GetCheck());
+	m_iSecAudioRendererCtrl.EnableWindow(!!m_DualAudioOutput.GetCheck());
 
 	SetModified();
 }
