@@ -3212,48 +3212,48 @@ END
 STRINGTABLE
 BEGIN
     IDS_CMD_USAGE           "Aufruf: mpc-be.exe ""Pfadname"" [Parameter]"
-    IDS_CMD_PATHNAME        """Pfadname""\tGibt Mediendatei oder Verzeichnis an\n\t\t(Wildcards sind möglich, Standardeingabe kann\n\t\tals ""-"" angegeben werden)."
+    IDS_CMD_PATHNAME        """Pfadname""\tGibt Mediendatei oder Verzeichnis an\n(Wildcards sind möglich, Standardeingabe kann\nals ""-"" angegeben werden)."
     IDS_CMD_HELP            "/help /h /?\tZeigt diese Hilfe an."
     IDS_CMD_DUB             "/dub ""dubname""\tÖffnet zusätzliche Audiodatei."
-    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tÖffnet zusätzliche Audiodatei, deren Wiedergabe\n\t\tum Xms versetzt wird (Dateiname muss\n\t\t""DELAY Xms"" enthalten)."
+    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tÖffnet zusätzliche Audiodatei, deren Wiedergabe\num Xms versetzt wird (Dateiname muss\n""DELAY Xms"" enthalten)."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_D3DFS           "/d3dfs\t\tStartet Player im Vollbild (Exclusive Mode)."
+    IDS_CMD_D3DFS           "/d3dfs\tStartet Player im Vollbild (Exclusive Mode)."
     IDS_CMD_SUB             "/sub ""Subname""\tÖffnet zusätzliche Untertiteldatei."
-    IDS_CMD_FILTER          "/filter ""F""\t\tLädt DirectShow-Filter ""F"" aus Laufzeitbibliothek\n\t\t(Wildcards sind möglich)."
-    IDS_CMD_DVD             "/dvd\t\tStartet Player im DVD-Modus (DVD-Verzeichnis\n\t\tkann als ""Pfadname"" angegeben werden)."
+    IDS_CMD_FILTER          "/filter ""F""\tLädt DirectShow-Filter ""F"" aus Laufzeitbibliothek\n(Wildcards sind möglich)."
+    IDS_CMD_DVD             "/dvd\tStartet Player im DVD-Modus (DVD-Verzeichnis\nkann als ""Pfadname"" angegeben werden)."
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tStartet DVD-Wiedergabe bei Titel T, Kapitel C."
-    IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tStartet DVD-Wiedergabe bei Titel T, Position P\n\t\t(hh:mm:ss)."
-    IDS_CMD_CD              "/cd\t\tÖffnet Audio-CD oder (S)VCD (Laufwerk kann\n\t\tals ""Pfadname"" angegeben werden)."
-    IDS_CMD_OPEN            "/open\t\tÖffnet Mediendatei und pausiert Wiedergabe."
-    IDS_CMD_PLAY            "/play\t\tÖffnet Mediendatei und startet Wiedergabe."
-    IDS_CMD_CLOSE           "/close\t\tBeendet Player (nach Wiedergabe) (in\n\t\tKombination mit ""/play"")."
+    IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tStartet DVD-Wiedergabe bei Titel T, Position P\n(hh:mm:ss)."
+    IDS_CMD_CD              "/cd\tÖffnet Audio-CD oder (S)VCD (Laufwerk kann\nals ""Pfadname"" angegeben werden)."
+    IDS_CMD_OPEN            "/open\tÖffnet Mediendatei und pausiert Wiedergabe."
+    IDS_CMD_PLAY            "/play\tÖffnet Mediendatei und startet Wiedergabe."
+    IDS_CMD_CLOSE           "/close\tBeendet Player (nach Wiedergabe) (in\nKombination mit ""/play"")."
     IDS_CMD_SHUTDOWN        "/shutdown\tFährt Computer herunter (nach Wiedergabe)."
     IDS_CMD_FULLSCREEN      "/fullscreen\tStartet Player im Vollbild."
     IDS_CMD_MINIMIZED       "/minimized\tStartet Player minimiert."
-    IDS_CMD_NEW             "/new\t\tÖffnet Mediendatei mit neuem Player."
-    IDS_CMD_ADD             "/add\t\tFügt ""Pfadname"" zur Wiedergabeliste hinzu\n\t\t(in Kombination mit ""/open"" oder ""/play"")."
-    IDS_CMD_RANDOMIZE       "/randomize\tAktiviert die Zufallswiedergabe für Einträge\n\t\tin der Wiedergabeliste"
+    IDS_CMD_NEW             "/new\tÖffnet Mediendatei mit neuem Player."
+    IDS_CMD_ADD             "/add\tFügt ""Pfadname"" zur Wiedergabeliste hinzu\n(in Kombination mit ""/open"" oder ""/play"")."
+    IDS_CMD_RANDOMIZE       "/randomize\tAktiviert die Zufallswiedergabe für Einträge\nin der Wiedergabeliste"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_REGVID          "/regvid\t\tRegistriert alle Videoformate."
-    IDS_CMD_REGAUD          "/regaud\t\tRegistriert alle Audioformate."
-    IDS_CMD_REGPL           "/regpl\t\tRegistriert alle Wiedergabelisten."
-    IDS_CMD_REGALL          "/regall\t\tRegistriert alle Medienformate."
-    IDS_CMD_UNREGALL        "/unregall\t\tDeregistriert alle Medienformate."
-    IDS_CMD_START           "/start ms\t\tStartet Wiedergabe bei ""ms""."
+    IDS_CMD_REGVID          "/regvid\tRegistriert alle Videoformate."
+    IDS_CMD_REGAUD          "/regaud\tRegistriert alle Audioformate."
+    IDS_CMD_REGPL           "/regpl\tRegistriert alle Wiedergabelisten."
+    IDS_CMD_REGALL          "/regall\tRegistriert alle Medienformate."
+    IDS_CMD_UNREGALL        "/unregall\tDeregistriert alle Medienformate."
+    IDS_CMD_START           "/start ms\tStartet Wiedergabe bei ""ms""."
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tStartet Wiedergabe bei Position (hh:mm:ss)."
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tFixiert Fenstergröße bei Breite W und Höhe H."
     IDS_CMD_MONITOR         "/monitor N\tStartet Player auf Monitor N (wobei N > 0)."
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tLädt Audiorenderer N (wobei N > 0, siehe\n\t\tAusgabe-Optionen)."
+    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tLädt Audiorenderer N (wobei N > 0, siehe\nAusgabe-Optionen)."
     IDS_CMD_VOLUME          "/volume N\tLautstärke stellen, wobei N eine Zahl im Bereich von 0 bis 100 ist."
-    IDS_CMD_CLIPBOARD       "/clipboard\t\tPfade/Links aus der Zwischenablage öffnen"
-    IDS_CMD_DEVICE          "/device\t\tStandard-Videogerät öffnen."
-    IDS_CMD_RESET           "/reset\t\tSetzt alle Programm-Einstellungen zurück."
+    IDS_CMD_CLIPBOARD       "/clipboard\tPfade/Links aus der Zwischenablage öffnen"
+    IDS_CMD_DEVICE          "/device\tStandard-Videogerät öffnen."
+    IDS_CMD_RESET           "/reset\tSetzt alle Programm-Einstellungen zurück."
 END
 
 STRINGTABLE

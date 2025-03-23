@@ -3211,48 +3211,48 @@ END
 STRINGTABLE
 BEGIN
     IDS_CMD_USAGE           "Utilizare: mpc-be.exe „cale” [comutatoare]"
-    IDS_CMD_PATHNAME        "„cale”\tFișierul sau directorul principal ce trebuie încărcat (metacaractere\n\t\tpermise)"
+    IDS_CMD_PATHNAME        "„cale”\tFișierul sau directorul principal ce trebuie încărcat (metacaractere\npermise)"
     IDS_CMD_HELP            "/help /h /?\tArată ajutorul pentru comutatoarele din linia de comandă"
     IDS_CMD_DUB             "/dub „numele dublajului”\tÎncarcă un fișier audio adițional"
-    IDS_CMD_DUBDELAY        "/dubdelay „fișier”\tÎncarcă un fișier audio adițional decalat cu XXms (dacă\n\t\tfișierul conține „...DELAY XXms...”)"
+    IDS_CMD_DUBDELAY        "/dubdelay „fișier”\tÎncarcă un fișier audio adițional decalat cu XXms (dacă\nfișierul conține „...DELAY XXms...”)"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_D3DFS           "/d3dfs\t\tPornește randarea în modul ecran complet D3D"
+    IDS_CMD_D3DFS           "/d3dfs\tPornește randarea în modul ecran complet D3D"
     IDS_CMD_SUB             "/sub „numele subtitrării”\tÎncarcă o subtitrare suplimentară"
-    IDS_CMD_FILTER          "/filter „numele filtrului”\tÎncarcă filtre DirectShow dintr-o librărie\n\t\tcu încărcare dinamică (metacaractere permise)"
-    IDS_CMD_DVD             "/dvd\t\tRulează în mod DVD, „cale” înseamnă dosarul (folderul)\n\t\tDVD-ului (opțional)"
+    IDS_CMD_FILTER          "/filter „numele filtrului”\tÎncarcă filtre DirectShow dintr-o librărie\ncu încărcare dinamică (metacaractere permise)"
+    IDS_CMD_DVD             "/dvd\tRulează în mod DVD, „cale” înseamnă dosarul (folderul)\nDVD-ului (opțional)"
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tPornește redarea la titlul T, capitolul C"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tPornește redarea la titlul T, poziția hh:mm:ss"
-    IDS_CMD_CD              "/cd\t\tÎncarcă toate pistele unui cd audio sau (s)vcd,\n\t\t„cale” înseamnă calea unității (opțional)"
-    IDS_CMD_OPEN            "/open\t\tDeschide fișierul, nu porni redarea în mod automat"
-    IDS_CMD_PLAY            "/play\t\tÎncepe redarea fișierului imediat ce playerul este\n\t\tlansat"
-    IDS_CMD_CLOSE           "/close\t\tÎnchide playerul după redare (funcționează doar când\n\t\teste folosit cu /play)"
+    IDS_CMD_CD              "/cd\tÎncarcă toate pistele unui cd audio sau (s)vcd,\n„cale” înseamnă calea unității (opțional)"
+    IDS_CMD_OPEN            "/open\tDeschide fișierul, nu porni redarea în mod automat"
+    IDS_CMD_PLAY            "/play\tÎncepe redarea fișierului imediat ce playerul este\nlansat"
+    IDS_CMD_CLOSE           "/close\tÎnchide playerul după redare (funcționează doar când\neste folosit cu /play)"
     IDS_CMD_SHUTDOWN        "/shutdown\tÎnchide sistemul după redare"
     IDS_CMD_FULLSCREEN      "/fullscreen\tPornește în modul ecran complet"
     IDS_CMD_MINIMIZED       "/minimized\tPornește în modul minimizat"
-    IDS_CMD_NEW             "/new\t\tFolosește o instanță nouă a playerului"
-    IDS_CMD_ADD             "/add\t\tAdaugă „o cale” la lista de redare (la playlist), poate fi combinată\n\t\tcu /open și /play"
+    IDS_CMD_NEW             "/new\tFolosește o instanță nouă a playerului"
+    IDS_CMD_ADD             "/add\tAdaugă „o cale” la lista de redare (la playlist), poate fi combinată\ncu /open și /play"
     IDS_CMD_RANDOMIZE       "/randomize\tRedă fișiere la întâmplare din lista de redare (din playlist)"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_REGVID          "/regvid\t\tCreează asocieri de fișiere pentru fișiere video"
-    IDS_CMD_REGAUD          "/regaud\t\tCreează asocieri de fișiere pentru fișiere audio"
-    IDS_CMD_REGPL           "/regpl\t\tCreează asocieri de fișiere pentru fișiere de listă de redare (de playlist)"
-    IDS_CMD_REGALL          "/regall\t\tCreează asocieri de fișiere pentru toate tipurile de fișiere suportate"
-    IDS_CMD_UNREGALL        "/unregall\t\tElimină toate asocierile de fișiere"
-    IDS_CMD_START           "/start ms\t\tPornește redarea la „ms” (= milisecunde)"
+    IDS_CMD_REGVID          "/regvid\tCreează asocieri de fișiere pentru fișiere video"
+    IDS_CMD_REGAUD          "/regaud\tCreează asocieri de fișiere pentru fișiere audio"
+    IDS_CMD_REGPL           "/regpl\tCreează asocieri de fișiere pentru fișiere de listă de redare (de playlist)"
+    IDS_CMD_REGALL          "/regall\tCreează asocieri de fișiere pentru toate tipurile de fișiere suportate"
+    IDS_CMD_UNREGALL        "/unregall\tElimină toate asocierile de fișiere"
+    IDS_CMD_START           "/start ms\tPornește redarea la „ms” (= milisecunde)"
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tPornește redarea la poziția hh:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tSetează o dimensiune fixă pentru fereastră"
     IDS_CMD_MONITOR         "/monitor N\tPornește redarea pe monitorul N, unde N începe de la 1"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tPornește folosind randorul audio N, unde N începe de la 1\n\t\t(vezi setările „Ieșire”)"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tPornește folosind randorul audio N, unde N începe de la 1\n(vezi setările „Ieșire”)"
     IDS_CMD_VOLUME          "/volume N\tSetează volumul, unde N este un interval de la 0 la 100"
-    IDS_CMD_CLIPBOARD       "/clipboard\t\tDeschide căile/legăturile (link-urile) din clipboard"
-    IDS_CMD_DEVICE          "/device\t\tDeschide dispozitivul video implicit"
-    IDS_CMD_RESET           "/reset\t\tRestaurează setările implicite"
+    IDS_CMD_CLIPBOARD       "/clipboard\tDeschide căile/legăturile (link-urile) din clipboard"
+    IDS_CMD_DEVICE          "/device\tDeschide dispozitivul video implicit"
+    IDS_CMD_RESET           "/reset\tRestaurează setările implicite"
 END
 
 STRINGTABLE

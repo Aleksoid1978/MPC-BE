@@ -3210,48 +3210,48 @@ END
 STRINGTABLE
 BEGIN
     IDS_CMD_USAGE           "Korištenje: mpc-be.exe ""imeputanje"" [argumenti]"
-    IDS_CMD_PATHNAME        """imeputanje""\tIme glavne mape ili datoteke za učitavanje (wildcardovi\n\t\tomogućeni)"
+    IDS_CMD_PATHNAME        """imeputanje""\tIme glavne mape ili datoteke za učitavanje (wildcardovi\nomogućeni)"
     IDS_CMD_HELP            "/help /h /?\tPrikaži pomoć pri korištenju argumenata naredbenog retka"
     IDS_CMD_DUB             "/dub ""dubname""\tUčitaj dodatnu datoteku zvuka"
-    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tUčitaj dodatnu datoteku zvuka pomaknutu s XXms (ako\n\t\tdatoteka koristi ""...KAŠNJENJE XXms..."")"
+    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tUčitaj dodatnu datoteku zvuka pomaknutu s XXms (ako\ndatoteka koristi ""...KAŠNJENJE XXms..."")"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_D3DFS           "/d3dfs\t\tZapočni očitavanje u modu s ekskluzivnim zaslonom"
+    IDS_CMD_D3DFS           "/d3dfs\tZapočni očitavanje u modu s ekskluzivnim zaslonom"
     IDS_CMD_SUB             "/sub ""subname""\tUčitaj dodatnu datoteku s podnaslovima"
-    IDS_CMD_FILTER          "/filter ""imefiltera""\tUčitaj DirectShow filtere iz dinamičke\n\t\tbiblioteke (wildcardi omogućeni)"
-    IDS_CMD_DVD             "/dvd\t\tPokreni u dvd modu, ""imeputanje"" znači dvd\n\t\tmapu (opcionalno)"
+    IDS_CMD_FILTER          "/filter ""imefiltera""\tUčitaj DirectShow filtere iz dinamičke\nbiblioteke (wildcardi omogućeni)"
+    IDS_CMD_DVD             "/dvd\tPokreni u dvd modu, ""imeputanje"" znači dvd\nmapu (opcionalno)"
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tPočni prikaz na titlu T, poglavlje C"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tPočni prikaz na titlu T, pozicija hh:mm:ss"
-    IDS_CMD_CD              "/cd\t\tUčitaj sve zapise audio cd-a ili (s)vcd-a,\n\t\t""imeputanje"" znači putanju na disku(opcionalno)"
-    IDS_CMD_OPEN            "/open\t\tOtvori datoteku, ne započinji automatski prikaz"
-    IDS_CMD_PLAY            "/play\t\tZapočni reprodukciju datoteke odmah nakon što je aplikacija\n\t\tpokrenuta"
-    IDS_CMD_CLOSE           "/close\t\tZatvori aplikaciju nakon pokretanja (radi samo uz\n\t\tkorištenje /play)"
+    IDS_CMD_CD              "/cd\tUčitaj sve zapise audio cd-a ili (s)vcd-a,\n""imeputanje"" znači putanju na disku(opcionalno)"
+    IDS_CMD_OPEN            "/open\tOtvori datoteku, ne započinji automatski prikaz"
+    IDS_CMD_PLAY            "/play\tZapočni reprodukciju datoteke odmah nakon što je aplikacija\npokrenuta"
+    IDS_CMD_CLOSE           "/close\tZatvori aplikaciju nakon pokretanja (radi samo uz\nkorištenje /play)"
     IDS_CMD_SHUTDOWN        "/shutdown\tUgasi računalo nakon reprodukcije"
     IDS_CMD_FULLSCREEN      "/fullscreen\tPokreni preko cijelog zaslona"
     IDS_CMD_MINIMIZED       "/minimized\tPokreni u smanjenom modu"
-    IDS_CMD_NEW             "/new\t\tKoristi novu instancu aplikacije"
-    IDS_CMD_ADD             "/add\t\tDodaj ""imeputanje"" u playlistu, može bit kombinirano\n\t\tuz /open i /play"
+    IDS_CMD_NEW             "/new\tKoristi novu instancu aplikacije"
+    IDS_CMD_ADD             "/add\tDodaj ""imeputanje"" u playlistu, može bit kombinirano\nuz /open i /play"
     IDS_CMD_RANDOMIZE       "/randomize\tIzmiješaj playlistu"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_REGVID          "/regvid\t\tKreiraj datotečne asocijacije za video datoteke"
-    IDS_CMD_REGAUD          "/regaud\t\tKreiraj datotečne asocijacije za datoteke zvuka"
-    IDS_CMD_REGPL           "/regpl\t\tKreiraj datotečne asocijacije za datoteke playliste"
-    IDS_CMD_REGALL          "/regall\t\tKreiraj datotečne asocijacije za sve podržane tipove datoteka"
-    IDS_CMD_UNREGALL        "/unregall\t\tUkloni sve datotečne asocijacije"
-    IDS_CMD_START           "/start ms\t\tPočni prikaz na ""ms"" (= millisekundi)"
+    IDS_CMD_REGVID          "/regvid\tKreiraj datotečne asocijacije za video datoteke"
+    IDS_CMD_REGAUD          "/regaud\tKreiraj datotečne asocijacije za datoteke zvuka"
+    IDS_CMD_REGPL           "/regpl\tKreiraj datotečne asocijacije za datoteke playliste"
+    IDS_CMD_REGALL          "/regall\tKreiraj datotečne asocijacije za sve podržane tipove datoteka"
+    IDS_CMD_UNREGALL        "/unregall\tUkloni sve datotečne asocijacije"
+    IDS_CMD_START           "/start ms\tPočni prikaz na ""ms"" (= millisekundi)"
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tPočni prikazivanje na hh:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tPostavi fiksnu veličinu prozora"
     IDS_CMD_MONITOR         "/monitor N\tPkreni aplikaciju na monitoru N, gdje N starta od 1"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tKoristi audiorender N, gdje N počinje od 1\n\t\t(vidi ""Audio"" postavke)"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tKoristi audiorender N, gdje N počinje od 1\n(vidi ""Audio"" postavke)"
     IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
-    IDS_CMD_CLIPBOARD       "/clipboard\t\tOtvori putanje/veze iz clipboarda"
-    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
-    IDS_CMD_RESET           "/reset\t\tVrati tvorničke postavke"
+    IDS_CMD_CLIPBOARD       "/clipboard\tOtvori putanje/veze iz clipboarda"
+    IDS_CMD_DEVICE          "/device\tOpen the default video device"
+    IDS_CMD_RESET           "/reset\tVrati tvorničke postavke"
 END
 
 STRINGTABLE

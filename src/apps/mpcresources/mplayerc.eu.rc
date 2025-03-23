@@ -3212,48 +3212,48 @@ END
 STRINGTABLE
 BEGIN
     IDS_CMD_USAGE           "Erabilpena: mpc-be.exe ""helburu-izena"" [aldagailuak]"
-    IDS_CMD_PATHNAME        """pathname""\tGertatzeko agiri edo zuzenbide nagusia\n\t\t(ordezhizkiak ahal dira, ""-""-k sarrera estandarra adierazten du)"
+    IDS_CMD_PATHNAME        """pathname""\tGertatzeko agiri edo zuzenbide nagusia\n(ordezhizkiak ahal dira, ""-""-k sarrera estandarra adierazten du)"
     IDS_CMD_HELP            "/help /h /?\tErakutsi komando lerro aldaketa laguntza"
     IDS_CMD_DUB             "/dub ""dubname""\tGertatu audio agiri gehigarri bat"
-    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tGertatu audio agiri gehigarri bat XXsm aldatuta\n\t\t(baldin agiriak baditu ""...ATZERAPENA XXsM..."")"
+    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tGertatu audio agiri gehigarri bat XXsm aldatuta\n(baldin agiriak baditu ""...ATZERAPENA XXsM..."")"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_D3DFS           "/d3dfs\t\tHasi aurkezpena D3D ikusleiho-osoko moduan"
+    IDS_CMD_D3DFS           "/d3dfs\tHasi aurkezpena D3D ikusleiho-osoko moduan"
     IDS_CMD_SUB             "/sub ""subname""\tGertatu azpidatzi agiri gehigarri bat"
-    IDS_CMD_FILTER          "/filter ""filtername""\tGertatu DirectShow iragazkiak lotura dinamiko\n\t\tliburutegi batetik (ordezhizkiak ahal dira)"
-    IDS_CMD_DVD             "/dvd\t\tEkin dvd moduan, ""helburu-izena"" esanahi du\n\t\tdvd agiritegia (aukerazkoa)"
+    IDS_CMD_FILTER          "/filter ""filtername""\tGertatu DirectShow iragazkiak lotura dinamiko\nliburutegi batetik (ordezhizkiak ahal dira)"
+    IDS_CMD_DVD             "/dvd\tEkin dvd moduan, ""helburu-izena"" esanahi du\ndvd agiritegia (aukerazkoa)"
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tHasi irakurketa I izenburuan, A atalean"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tHasi irakurketa I izenburuan, kokapena oo:mn:sg"
-    IDS_CMD_CD              "/cd\t\tGertatu cd edo (s)vcd audio bide guztiak,\n\t\t""helburu-izena"" esanahi du gidagailu helburua\n\t\t(aukerazkoa)"
-    IDS_CMD_OPEN            "/open\t\tIreki agiria, ez hasi irakurketa berezgaitasunez"
-    IDS_CMD_PLAY            "/play\t\tHasi agiriaren irakurketa irakurgailua abiaraziz\n\t\tbezain laister"
-    IDS_CMD_CLOSE           "/close\t\tItxi irakurgailua irakurketaren ondoren\n\t\t(bakarrik lan egiten du /irakurri erabiltzen denean)"
+    IDS_CMD_CD              "/cd\tGertatu cd edo (s)vcd audio bide guztiak,\n""helburu-izena"" esanahi du gidagailu helburua\n(aukerazkoa)"
+    IDS_CMD_OPEN            "/open\tIreki agiria, ez hasi irakurketa berezgaitasunez"
+    IDS_CMD_PLAY            "/play\tHasi agiriaren irakurketa irakurgailua abiaraziz\nbezain laister"
+    IDS_CMD_CLOSE           "/close\tItxi irakurgailua irakurketaren ondoren\n(bakarrik lan egiten du /irakurri erabiltzen denean)"
     IDS_CMD_SHUTDOWN        "/shutdown\tItzali sistema eragilea irakurketaren ondoren"
     IDS_CMD_FULLSCREEN      "/fullscreen\tHasi ikusleiho-osoko moduan"
     IDS_CMD_MINIMIZED       "/minimized\tHasi txikien moduan"
-    IDS_CMD_NEW             "/new\t\tErabili irakurgailuaren eskabide berri bat"
-    IDS_CMD_ADD             "/add\t\tGehitu ""helburu-izena"" irakur-zerrendara,\n\t\tnahastu daiteke /ireki eta /irakurrirekin"
+    IDS_CMD_NEW             "/new\tErabili irakurgailuaren eskabide berri bat"
+    IDS_CMD_ADD             "/add\tGehitu ""helburu-izena"" irakur-zerrendara,\nnahastu daiteke /ireki eta /irakurrirekin"
     IDS_CMD_RANDOMIZE       "/randomize\tRandomize the playlist"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_REGVID          "/regvid\t\tSortu agiri elkarketak bideo agirientzat"
-    IDS_CMD_REGAUD          "/regaud\t\tSortu agiri elkarketak audio agirientzat"
-    IDS_CMD_REGPL           "/regpl\t\tSortu agiri elkarketak irakur-zerrendentzat"
-    IDS_CMD_REGALL          "/regall\t\tSortu agiri elkarketak sostengatutako\n\t\tagiri mota guztientzat"
-    IDS_CMD_UNREGALL        "/unregall\t\tKendu agiri elkarketa guztiak"
-    IDS_CMD_START           "/start ms\t\tHasi irakurketa ""sm"" (= segundumilaenetan)"
+    IDS_CMD_REGVID          "/regvid\tSortu agiri elkarketak bideo agirientzat"
+    IDS_CMD_REGAUD          "/regaud\tSortu agiri elkarketak audio agirientzat"
+    IDS_CMD_REGPL           "/regpl\tSortu agiri elkarketak irakur-zerrendentzat"
+    IDS_CMD_REGALL          "/regall\tSortu agiri elkarketak sostengatutako\nagiri mota guztientzat"
+    IDS_CMD_UNREGALL        "/unregall\tKendu agiri elkarketa guztiak"
+    IDS_CMD_START           "/start ms\tHasi irakurketa ""sm"" (= segundumilaenetan)"
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tHasi irakurketa kokapen honetan oo:mn:sg"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tEzarri zuzendutako leiho neurria"
-    IDS_CMD_MONITOR         "/monitor N\tHasi irakurketa N monitorean,\n\t\tnon N hasten den 1-etik"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tHasi N audio-aurkezlea erabiliz,\n\t\tnon N hasten den 1-etik (ikusi ""Irteera"" ezarpenak)"
+    IDS_CMD_MONITOR         "/monitor N\tHasi irakurketa N monitorean,\nnon N hasten den 1-etik"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tHasi N audio-aurkezlea erabiliz,\nnon N hasten den 1-etik (ikusi ""Irteera"" ezarpenak)"
     IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
-    IDS_CMD_CLIPBOARD       "/clipboard\t\tOpen paths/links from the clipboard"
-    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
-    IDS_CMD_RESET           "/reset\t\tBerrezarri berezko ezarpenak"
+    IDS_CMD_CLIPBOARD       "/clipboard\tOpen paths/links from the clipboard"
+    IDS_CMD_DEVICE          "/device\tOpen the default video device"
+    IDS_CMD_RESET           "/reset\tBerrezarri berezko ezarpenak"
 END
 
 STRINGTABLE

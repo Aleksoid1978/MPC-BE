@@ -3220,40 +3220,40 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_D3DFS           "/d3dfs\t\tՍկսել Ամբողջ էկրանով՝ D3D եղանակով։"
+    IDS_CMD_D3DFS           "/d3dfs\tՍկսել Ամբողջ էկրանով՝ D3D եղանակով։"
     IDS_CMD_SUB             "/sub ""subname""\tԲացել լրացուցիչ տողագրեր։"
     IDS_CMD_FILTER          "/filter ""filtername""\tԲացել DirectShow ֆիլտրեր  գրադարանից։"
-    IDS_CMD_DVD             "/dvd\t\tԲացել DVD եղանակով, ""ճանապարհը"" նշանակում է DVD-ի թղթապանակը։"
+    IDS_CMD_DVD             "/dvd\tԲացել DVD եղանակով, ""ճանապարհը"" նշանակում է DVD-ի թղթապանակը։"
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tStart playback at title T, chapter C"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tStart playback at title T, position hh:mm:ss"
-    IDS_CMD_CD              "/cd\t\tԲեռնել Audio CD--ի բոլոր ֆայլերը կամ (S)VCD, ""ճանապարհը"" նշանակում է պնակի ճանապարհը։"
-    IDS_CMD_OPEN            "/open\t\tՄիայն Բացել Ֆայլը։"
-    IDS_CMD_PLAY            "/play\t\tՍկսել Վերարտադրումը՝ անմիջապես բացելիս։"
-    IDS_CMD_CLOSE           "/close\t\tՎերարտադրումը ավարտելուց հետո փակել (աշխատում է միայն /play փոխանցիչի հետ)։"
+    IDS_CMD_CD              "/cd\tԲեռնել Audio CD--ի բոլոր ֆայլերը կամ (S)VCD, ""ճանապարհը"" նշանակում է պնակի ճանապարհը։"
+    IDS_CMD_OPEN            "/open\tՄիայն Բացել Ֆայլը։"
+    IDS_CMD_PLAY            "/play\tՍկսել Վերարտադրումը՝ անմիջապես բացելիս։"
+    IDS_CMD_CLOSE           "/close\tՎերարտադրումը ավարտելուց հետո փակել (աշխատում է միայն /play փոխանցիչի հետ)։"
     IDS_CMD_SHUTDOWN        "/shutdown\tՎերարտադրումը ավարտելուց հետո անջատել համակարգիչը։"
     IDS_CMD_FULLSCREEN      "/fullscreen\tԲացել Ամբողջ էկրանով եղանակով։"
     IDS_CMD_MINIMIZED       "/minimized\tԲացել՝ էկրանի ներքևում վիճակում։"
-    IDS_CMD_NEW             "/new\t\tՕգտագործել վերարտադրիչի նոր օրինակ։"
-    IDS_CMD_ADD             "/add\t\tԱվելացնել ""ճանապարհը"" խաղացանկում, կարելի է /open և /play-ի հետ համատեղ։"
+    IDS_CMD_NEW             "/new\tՕգտագործել վերարտադրիչի նոր օրինակ։"
+    IDS_CMD_ADD             "/add\tԱվելացնել ""ճանապարհը"" խաղացանկում, կարելի է /open և /play-ի հետ համատեղ։"
     IDS_CMD_RANDOMIZE       "/randomize\tRandomize the playlist"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_REGVID          "/regvid\t\tԳրանցել տեսանյութի տեսակները։"
-    IDS_CMD_REGAUD          "/regaud\t\tԳրանցել ձայնային տեսակները։"
-    IDS_CMD_REGPL           "/regpl\t\tCreate file associations for playlist files"
-    IDS_CMD_REGALL          "/regall\t\tCreate file associations for all supported file types"
-    IDS_CMD_UNREGALL        "/unregall\t\tՀետգրանցել բոլորը։"
-    IDS_CMD_START           "/start ms\t\tՎերարտադրել ""ms"" դիրքից (= միլիվայրկյաններ)։"
+    IDS_CMD_REGVID          "/regvid\tԳրանցել տեսանյութի տեսակները։"
+    IDS_CMD_REGAUD          "/regaud\tԳրանցել ձայնային տեսակները։"
+    IDS_CMD_REGPL           "/regpl\tCreate file associations for playlist files"
+    IDS_CMD_REGALL          "/regall\tCreate file associations for all supported file types"
+    IDS_CMD_UNREGALL        "/unregall\tՀետգրանցել բոլորը։"
+    IDS_CMD_START           "/start ms\tՎերարտադրել ""ms"" դիրքից (= միլիվայրկյաններ)։"
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tStart playing at position hh:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tՀաստատել պատուհանի ֆիկսված չափ։"
     IDS_CMD_MONITOR         "/monitor N\tԲացվում է N մոնիտորի վրա, որտեղ N-ը հաշվվում է 1-ից։"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tՕգտագործել N ցուցադրիչը, որտեղ N-ը հաշվվում է 1-ից\n\t\t(նայեք ""Արտածման"" կարգավորումները)։"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tՕգտագործել N ցուցադրիչը, որտեղ N-ը հաշվվում է 1-ից\n(նայեք ""Արտածման"" կարգավորումները)։"
     IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
-    IDS_CMD_CLIPBOARD       "/clipboard\t\tOpen paths/links from the clipboard"
-    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
-    IDS_CMD_RESET           "/reset\t\tRestore default settings"
+    IDS_CMD_CLIPBOARD       "/clipboard\tOpen paths/links from the clipboard"
+    IDS_CMD_DEVICE          "/device\tOpen the default video device"
+    IDS_CMD_RESET           "/reset\tRestore default settings"
 END
 
 STRINGTABLE

@@ -3212,48 +3212,48 @@ END
 STRINGTABLE
 BEGIN
     IDS_CMD_USAGE           "Použití: mpc-be.exe ""cesta"" [parametry]"
-    IDS_CMD_PATHNAME        """cesta""\t\tSoubor nebo adresář, který má být otevřen\n\t\t(povoleny masky)"
+    IDS_CMD_PATHNAME        """cesta""\tSoubor nebo adresář, který má být otevřen\n(povoleny masky)"
     IDS_CMD_HELP            "/help /h /?\tZobrazí tento dialog"
     IDS_CMD_DUB             "/dub ""soubor""\tNačte soubor se zvukovou stopou"
-    IDS_CMD_DUBDELAY        "/dubdelay ""soubor""\tNačte soubor se zvukovou stopou posunutou\n\t\to XXms (pokud název souboru obsahuje\n\t\t""...DELAY XXms..."")"
+    IDS_CMD_DUBDELAY        "/dubdelay ""soubor""\tNačte soubor se zvukovou stopou posunutou\no XXms (pokud název souboru obsahuje\n""...DELAY XXms..."")"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_D3DFS           "/d3dfs\t\tSpustí vykreslování v D3D fullscreen režimu"
+    IDS_CMD_D3DFS           "/d3dfs\tSpustí vykreslování v D3D fullscreen režimu"
     IDS_CMD_SUB             "/sub ""soubor""\tNačte soubor s titulky"
-    IDS_CMD_FILTER          "/filter ""soubor""\tNačte DirectShow filtr (*.ax nebo *.dll, povoleny\n\t\tmasky)"
-    IDS_CMD_DVD             "/dvd\t\tSpustí MPC-BE v DVD režimu, volitelný parametr\n\t\t""cesta"" určuje DVD adresář"
+    IDS_CMD_FILTER          "/filter ""soubor""\tNačte DirectShow filtr (*.ax nebo *.dll, povoleny\nmasky)"
+    IDS_CMD_DVD             "/dvd\tSpustí MPC-BE v DVD režimu, volitelný parametr\n""cesta"" určuje DVD adresář"
     IDS_CMD_DVDPOS1         "/dvdpos T#K\tSpustí přehrávání titulu T, kapitoly K"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tSpustí přehrávání titulu T, pozice hh:mm:ss"
-    IDS_CMD_CD              "/cd\t\tNačte všechny stopy AudioCD/(S)VCD, volitelný\n\t\tparametr ""cesta"" udává písmeno CD mechaniky"
-    IDS_CMD_OPEN            "/open\t\tNačte soubor, ale nespustí přehrávání"
-    IDS_CMD_PLAY            "/play\t\tNačte soubor a přehraje ho"
-    IDS_CMD_CLOSE           "/close\t\tPo ukončení přehrávání zavře přehrávač (funkční\n\t\tjen v kombinaci s /play)"
+    IDS_CMD_CD              "/cd\tNačte všechny stopy AudioCD/(S)VCD, volitelný\nparametr ""cesta"" udává písmeno CD mechaniky"
+    IDS_CMD_OPEN            "/open\tNačte soubor, ale nespustí přehrávání"
+    IDS_CMD_PLAY            "/play\tNačte soubor a přehraje ho"
+    IDS_CMD_CLOSE           "/close\tPo ukončení přehrávání zavře přehrávač (funkční\njen v kombinaci s /play)"
     IDS_CMD_SHUTDOWN        "/shutdown\tPo ukončení přehrávání vypne počítač"
     IDS_CMD_FULLSCREEN      "/fullscreen\tSpustí přehrávač v režimu na celou obrazovku"
     IDS_CMD_MINIMIZED       "/minimized\tSpustí přehrávač minimalizovaný"
-    IDS_CMD_NEW             "/new\t\tOtevře novou instanci MPC-BE"
-    IDS_CMD_ADD             "/add\t\tPřidá ""cestu"" do playlistu, může být kombinován\n\t\ts /open a /play"
+    IDS_CMD_NEW             "/new\tOtevře novou instanci MPC-BE"
+    IDS_CMD_ADD             "/add\tPřidá ""cestu"" do playlistu, může být kombinován\ns /open a /play"
     IDS_CMD_RANDOMIZE       "/randomize\tRandomize the playlist"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_REGVID          "/regvid\t\tAsociuje MPC-BE s video formáty"
-    IDS_CMD_REGAUD          "/regaud\t\tAsociuje MPC-BE s audio formáty"
-    IDS_CMD_REGPL           "/regpl\t\tAsociuje MPC-BE se seznamy stop"
-    IDS_CMD_REGALL          "/regall\t\tAsociuje MPC-BE se všemi podporovanými formáty"
-    IDS_CMD_UNREGALL        "/unregall\t\tZruší asociaci MPC-BE se všemi formáty\n\t\t(včetně playlistů)"
-    IDS_CMD_START           "/start ms\t\tSpustí přehrávání od zadané pozice\n\t\t(ms = milisekundy)"
+    IDS_CMD_REGVID          "/regvid\tAsociuje MPC-BE s video formáty"
+    IDS_CMD_REGAUD          "/regaud\tAsociuje MPC-BE s audio formáty"
+    IDS_CMD_REGPL           "/regpl\tAsociuje MPC-BE se seznamy stop"
+    IDS_CMD_REGALL          "/regall\tAsociuje MPC-BE se všemi podporovanými formáty"
+    IDS_CMD_UNREGALL        "/unregall\tZruší asociaci MPC-BE se všemi formáty\n(včetně playlistů)"
+    IDS_CMD_START           "/start ms\tSpustí přehrávání od zadané pozice\n(ms = milisekundy)"
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tSpustí přehrávání od pozice hh:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tSpustí přehrávač se zadanou velikostí okna"
-    IDS_CMD_MONITOR         "/monitor N\tSpustí přehrávání na monitoru N, kde N\n\t\tzačíná od 1"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tPoužít audiorenderer N, kde N začíná od 1\n\t\t(viz nastavení ""Výstup"")"
+    IDS_CMD_MONITOR         "/monitor N\tSpustí přehrávání na monitoru N, kde N\nzačíná od 1"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tPoužít audiorenderer N, kde N začíná od 1\n(viz nastavení ""Výstup"")"
     IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
-    IDS_CMD_CLIPBOARD       "/clipboard\t\tOpen paths/links from the clipboard"
-    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
-    IDS_CMD_RESET           "/reset\t\tObnovit výchozí nastavení"
+    IDS_CMD_CLIPBOARD       "/clipboard\tOpen paths/links from the clipboard"
+    IDS_CMD_DEVICE          "/device\tOpen the default video device"
+    IDS_CMD_RESET           "/reset\tObnovit výchozí nastavení"
 END
 
 STRINGTABLE

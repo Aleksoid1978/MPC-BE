@@ -3212,48 +3212,48 @@ END
 STRINGTABLE
 BEGIN
     IDS_CMD_USAGE           "Kullanım: mpc-be.exe ""yol_adı"" [anahtarlar]"
-    IDS_CMD_PATHNAME        """yol_adı""\t\tYüklenecek dosya ya da klasör (özel\n\t\tkarakterler desteklenmektedir)"
+    IDS_CMD_PATHNAME        """yol_adı""\tYüklenecek dosya ya da klasör (özel\nkarakterler desteklenmektedir)"
     IDS_CMD_HELP            "/help /h /?\tKomut satırı anahtarları hakkında yardım görüntülenir"
     IDS_CMD_DUB             "/dub ""dublaj_adı""\tHarici bir ses dosyası yüklemek için"
-    IDS_CMD_DUBDELAY        "/dubdelay ""dosya""\tXXms olarak atlanacak harici bir ses dosyası yüklemek için\n\t\t(eğer dosya ""...GECİKME XXms..."" içeriyorsa)"
+    IDS_CMD_DUBDELAY        "/dubdelay ""dosya""\tXXms olarak atlanacak harici bir ses dosyası yüklemek için\n(eğer dosya ""...GECİKME XXms..."" içeriyorsa)"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_D3DFS           "/d3dfs\t\tÖzel tam ekran kipinde oynatmak için"
+    IDS_CMD_D3DFS           "/d3dfs\tÖzel tam ekran kipinde oynatmak için"
     IDS_CMD_SUB             "/sub ""alt_yazı""\tHarici bir alt yazı kullanmak için"
-    IDS_CMD_FILTER          "/filter ""süzgeç_adı""\tDeğişken bir bağlantıdan DirectShow süzgeçlerini\n\t\tyüklemek için. (özel karakterler desteklenir)"
-    IDS_CMD_DVD             "/dvd\t\tDVD modunda çalıştırmak için, ""yol_adı"" DVD klasörünü\n\t\tgösterir (isteğe bağlı)"
+    IDS_CMD_FILTER          "/filter ""süzgeç_adı""\tDeğişken bir bağlantıdan DirectShow süzgeçlerini\nyüklemek için. (özel karakterler desteklenir)"
+    IDS_CMD_DVD             "/dvd\tDVD modunda çalıştırmak için, ""yol_adı"" DVD klasörünü\ngösterir (isteğe bağlı)"
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tOynatma T başlığının, C bölümünden başlar"
     IDS_CMD_DVDPOS2         "/dvdpos T#ss:dd\tOynatma T başlığının, ss:dd:ss süresinden başlar"
-    IDS_CMD_CD              "/cd\t\tSes cd'si ya da (s)vcd'den tüm parçaları yüklemek için,\n\t\t""yol_adı"" Sürücü yolunu gösterir (isteğe bağlı)"
-    IDS_CMD_OPEN            "/open\t\tDosya açılır, ancak otomatik olarak oynatılmaz"
-    IDS_CMD_PLAY            "/play\t\tUygulama açılır açılmaz oynatma başlatılır"
-    IDS_CMD_CLOSE           "/close\t\tOynatmadan sonra uygulama kapatılır (sadece /play\n\t\tile birlikte kullanıldığında çalışır)"
+    IDS_CMD_CD              "/cd\tSes cd'si ya da (s)vcd'den tüm parçaları yüklemek için,\n""yol_adı"" Sürücü yolunu gösterir (isteğe bağlı)"
+    IDS_CMD_OPEN            "/open\tDosya açılır, ancak otomatik olarak oynatılmaz"
+    IDS_CMD_PLAY            "/play\tUygulama açılır açılmaz oynatma başlatılır"
+    IDS_CMD_CLOSE           "/close\tOynatmadan sonra uygulama kapatılır (sadece /play\nile birlikte kullanıldığında çalışır)"
     IDS_CMD_SHUTDOWN        "/shutdown\tOynatmadan sonra bilgisayar kapatılır"
     IDS_CMD_FULLSCREEN      "/fullscreen\tTam ekran modunda başlatılır"
     IDS_CMD_MINIMIZED       "/minimized\tSimge durumunda başlatılır"
-    IDS_CMD_NEW             "/new\t\tYeni bir oynatıcı penceresi kullanılır"
-    IDS_CMD_ADD             "/add\t\t""yol_adı"" oynatma listesine eklenir, bu komutlarla birlikte\n\t\tkullanılabilir: /open ve /play"
+    IDS_CMD_NEW             "/new\tYeni bir oynatıcı penceresi kullanılır"
+    IDS_CMD_ADD             "/add\t""yol_adı"" oynatma listesine eklenir, bu komutlarla birlikte\nkullanılabilir: /open ve /play"
     IDS_CMD_RANDOMIZE       "/randomize\tOynatma listesi karıştırılır"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_REGVID          "/regvid\t\tVideo biçimleri ilişkilendirilir"
-    IDS_CMD_REGAUD          "/regaud\t\tSes biçimleri ilişkilendirilir"
-    IDS_CMD_REGPL           "/regpl\t\tOynatma listesi dosyaları ilişkilendirilir"
-    IDS_CMD_REGALL          "/regall\t\tTüm desteklenen dosya biçimleri uygulamayla ilişkilendirilir"
-    IDS_CMD_UNREGALL        "/unregall\t\tTüm dosya ilişkilendirilmeleri geri alınır"
-    IDS_CMD_START           "/start ms\t\tOynatmaya buradan başlanır: ""ms"" (= mili saniye)"
+    IDS_CMD_REGVID          "/regvid\tVideo biçimleri ilişkilendirilir"
+    IDS_CMD_REGAUD          "/regaud\tSes biçimleri ilişkilendirilir"
+    IDS_CMD_REGPL           "/regpl\tOynatma listesi dosyaları ilişkilendirilir"
+    IDS_CMD_REGALL          "/regall\tTüm desteklenen dosya biçimleri uygulamayla ilişkilendirilir"
+    IDS_CMD_UNREGALL        "/unregall\tTüm dosya ilişkilendirilmeleri geri alınır"
+    IDS_CMD_START           "/start ms\tOynatmaya buradan başlanır: ""ms"" (= mili saniye)"
     IDS_CMD_STARTPOS        "/startpos ss:dd:ss\tOynatmaya ss:dd:ss süresinden başlanılır"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tSabit pencere boyutu kullanılır"
     IDS_CMD_MONITOR         "/monitor N\tN monitöründe başlatılır; N, 1'den başlar"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tSes işleyici N ile başlanılır; N, 0 ile başlar\n\t\t(""Ses"" ayarlarına bakınız)"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tSes işleyici N ile başlanılır; N, 0 ile başlar\n(""Ses"" ayarlarına bakınız)"
     IDS_CMD_VOLUME          "/volume N\tSesi Ayarlar. Burada N, 0 ile 100 arasında bir aralıktır"
-    IDS_CMD_CLIPBOARD       "/clipboard\t\tPanodan dosya yolu/URL açar (liste desteklenir)"
-    IDS_CMD_DEVICE          "/device\t\tVarsayılan video aygıtını açar"
-    IDS_CMD_RESET           "/reset\t\tVarsayılan ayarlara geri dönülür"
+    IDS_CMD_CLIPBOARD       "/clipboard\tPanodan dosya yolu/URL açar (liste desteklenir)"
+    IDS_CMD_DEVICE          "/device\tVarsayılan video aygıtını açar"
+    IDS_CMD_RESET           "/reset\tVarsayılan ayarlara geri dönülür"
 END
 
 STRINGTABLE

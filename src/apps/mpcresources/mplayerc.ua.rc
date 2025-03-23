@@ -3220,40 +3220,40 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_D3DFS           "/d3dfs\t\tСтартувати в повноекранному D3D режимі"
+    IDS_CMD_D3DFS           "/d3dfs\tСтартувати в повноекранному D3D режимі"
     IDS_CMD_SUB             "/sub ""subname""\tЗавантажити додаткові субтитри"
     IDS_CMD_FILTER          "/filter ""filtername""\tЗавантажити фільтри DirectShow з бібліотеки (дозволені маски)"
-    IDS_CMD_DVD             "/dvd\t\tЗапуск в режимі DVD, ""шлях"" вказує на вміст DVD (опціонально)"
+    IDS_CMD_DVD             "/dvd\tЗапуск в режимі DVD, ""шлях"" вказує на вміст DVD (опціонально)"
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tПочинати відтворення з заголовку T, розділу C"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tПочинати відтворення з заголовку T, позиції hh:mm:ss"
-    IDS_CMD_CD              "/cd\t\tЗавантажити всі доріжки Audio CD або (S)VCD, ""шлях"" вказує на вміст диску (опціонально)"
-    IDS_CMD_OPEN            "/open\t\tЛише відкрити файл, не відтворювати"
-    IDS_CMD_PLAY            "/play\t\tПочинати відтворення відразу після запуску"
-    IDS_CMD_CLOSE           "/close\t\tЗакрити після завершення відтворення (працює лише з /play)"
+    IDS_CMD_CD              "/cd\tЗавантажити всі доріжки Audio CD або (S)VCD, ""шлях"" вказує на вміст диску (опціонально)"
+    IDS_CMD_OPEN            "/open\tЛише відкрити файл, не відтворювати"
+    IDS_CMD_PLAY            "/play\tПочинати відтворення відразу після запуску"
+    IDS_CMD_CLOSE           "/close\tЗакрити після завершення відтворення (працює лише з /play)"
     IDS_CMD_SHUTDOWN        "/shutdown\tВимкнути комп'ютер після завершення відтворення"
     IDS_CMD_FULLSCREEN      "/fullscreen\tЗапуск в повноекранному режимі"
     IDS_CMD_MINIMIZED       "/minimized\tЗапуск в згорнутому вигляді"
-    IDS_CMD_NEW             "/new\t\tЗапускати нову копію програвача"
-    IDS_CMD_ADD             "/add\t\tДодати ""шлях"" в список відтворення, можна спільно з /open та /play"
+    IDS_CMD_NEW             "/new\tЗапускати нову копію програвача"
+    IDS_CMD_ADD             "/add\tДодати ""шлях"" в список відтворення, можна спільно з /open та /play"
     IDS_CMD_RANDOMIZE       "/randomize\tПеремішати список відтворення"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_REGVID          "/regvid\t\tЗареєструвати асоціації відеоформатів"
-    IDS_CMD_REGAUD          "/regaud\t\tЗареєструвати асоціації аудіоформатів"
-    IDS_CMD_REGPL           "/regpl\t\tЗареєструвати асоціації для файлів списків відтворення"
-    IDS_CMD_REGALL          "/regall\t\tЗареєструвати асоціації для всіх підтримуваних типів файлів"
-    IDS_CMD_UNREGALL        "/unregall\t\tВідреєструвати асоціації відеоформатів"
-    IDS_CMD_START           "/start ms\t\tВідтворювати починаючи з позиції ""ms"" (= мілісекунди)"
+    IDS_CMD_REGVID          "/regvid\tЗареєструвати асоціації відеоформатів"
+    IDS_CMD_REGAUD          "/regaud\tЗареєструвати асоціації аудіоформатів"
+    IDS_CMD_REGPL           "/regpl\tЗареєструвати асоціації для файлів списків відтворення"
+    IDS_CMD_REGALL          "/regall\tЗареєструвати асоціації для всіх підтримуваних типів файлів"
+    IDS_CMD_UNREGALL        "/unregall\tВідреєструвати асоціації відеоформатів"
+    IDS_CMD_START           "/start ms\tВідтворювати починаючи з позиції ""ms"" (= мілісекунди)"
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tПочинати відтворення з позиції hh:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tВстановити фіксований розмір вікна"
     IDS_CMD_MONITOR         "/monitor N\tЗапустити на моніторі N, нумерація з 1"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tЗапустити з аудіорендерером N, нумерація з 1\n\t\t(див. ""Вивід"" в налаштуваннях)"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tЗапустити з аудіорендерером N, нумерація з 1\n(див. ""Вивід"" в налаштуваннях)"
     IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
-    IDS_CMD_CLIPBOARD       "/clipboard\t\tВідкрити шляхи/посилання з буферу обміну"
-    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
-    IDS_CMD_RESET           "/reset\t\tВідновити типові налаштування"
+    IDS_CMD_CLIPBOARD       "/clipboard\tВідкрити шляхи/посилання з буферу обміну"
+    IDS_CMD_DEVICE          "/device\tOpen the default video device"
+    IDS_CMD_RESET           "/reset\tВідновити типові налаштування"
 END
 
 STRINGTABLE

@@ -3212,48 +3212,48 @@ END
 STRINGTABLE
 BEGIN
     IDS_CMD_USAGE           "Gebruik: mpc-be.exe ""padnaam"" [parameters]"
-    IDS_CMD_PATHNAME        """padnaam""\tHet te laden bestand of map (wildcards\n\t\ttoegestaan)"
+    IDS_CMD_PATHNAME        """padnaam""\tHet te laden bestand of map (wildcards\ntoegestaan)"
     IDS_CMD_HELP            "/help /h /?\tToon help over opdrachtregel-parameters"
     IDS_CMD_DUB             "/dub ""dubnaam""\tLaad nog een geluidsbestand"
-    IDS_CMD_DUBDELAY        "/dubdelay ""best""\tLaad nog een geluidsbestand met een\n\t\tverschuiving van XXms\n\t\t (als bestand ""..vertraging XXms.."" heeft)"
+    IDS_CMD_DUBDELAY        "/dubdelay ""best""\tLaad nog een geluidsbestand met een\nverschuiving van XXms\n (als bestand ""..vertraging XXms.."" heeft)"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_D3DFS           "/d3dfs\t\tStart renderen in exclusieve volledigschermmodus"
+    IDS_CMD_D3DFS           "/d3dfs\tStart renderen in exclusieve volledigschermmodus"
     IDS_CMD_SUB             "/sub ""ondertitel""\tLaad nog een ondertitelingsbestand"
-    IDS_CMD_FILTER          "/filter ""filternaam""\tLaad DirectShow-filters van een DLL\n\t\t(wildcards toegestaan)"
-    IDS_CMD_DVD             "/dvd\t\tStart in dvd-modus, ""padnaam"" betekent de dvd-\n\t\tmap (hoeft niet)"
+    IDS_CMD_FILTER          "/filter ""filternaam""\tLaad DirectShow-filters van een DLL\n(wildcards toegestaan)"
+    IDS_CMD_DVD             "/dvd\tStart in dvd-modus, ""padnaam"" betekent de dvd-\nmap (hoeft niet)"
     IDS_CMD_DVDPOS1         "/dvdpos T#H\tStart afspelen bij titel T, hoofdstuk H"
     IDS_CMD_DVDPOS2         "/dvdpos T#uu:mm\tStart afspelen bij titel T, positie uu:mm:ss"
-    IDS_CMD_CD              "/cd\t\tLaad alle nummers van een audio-cd of (s)vcd\n\t\t""padnaam"" betekent het stationspad (hoeft niet)"
-    IDS_CMD_OPEN            "/open\t\tOpen het bestand zonder automatisch af te spelen"
-    IDS_CMD_PLAY            "/play\t\tDirect afspelen, wanneer de speler wordt geopend"
-    IDS_CMD_CLOSE           "/close\t\tSluit de speler af na afspelen (werkt alleen samen \n\t\tmet /play)"
+    IDS_CMD_CD              "/cd\tLaad alle nummers van een audio-cd of (s)vcd\n""padnaam"" betekent het stationspad (hoeft niet)"
+    IDS_CMD_OPEN            "/open\tOpen het bestand zonder automatisch af te spelen"
+    IDS_CMD_PLAY            "/play\tDirect afspelen, wanneer de speler wordt geopend"
+    IDS_CMD_CLOSE           "/close\tSluit de speler af na afspelen (werkt alleen samen \nmet /play)"
     IDS_CMD_SHUTDOWN        "/shutdown\tWindows uitschakelen na afspelen"
     IDS_CMD_FULLSCREEN      "/fullscreen\tStart in volledigschermmodus"
     IDS_CMD_MINIMIZED       "/minimized\tStart geminimaliseerd"
-    IDS_CMD_NEW             "/new\t\tEen nieuwe speler openen"
-    IDS_CMD_ADD             "/add\t\tVoegt ""padnaam"" aan de afspeellijst toe\n\t\tKan gecombineerd worden met /open en /play"
+    IDS_CMD_NEW             "/new\tEen nieuwe speler openen"
+    IDS_CMD_ADD             "/add\tVoegt ""padnaam"" aan de afspeellijst toe\nKan gecombineerd worden met /open en /play"
     IDS_CMD_RANDOMIZE       "/randomize\tAfspeellijst in willekeurige volgorde"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_REGVID          "/regvid\t\tMaak bestandskoppelingen voor videobestanden"
-    IDS_CMD_REGAUD          "/regaud\t\tMaak bestandskoppelingen voor audiobestanden"
-    IDS_CMD_REGPL           "/regpl\t\tMaak bestandskoppelingen voor afspeellijsten"
-    IDS_CMD_REGALL          "/regall\t\tMaak bestandskoppelingen voor alle\n\t\tondersteund bestandstypen"
-    IDS_CMD_UNREGALL        "/unregall\t\tVerwijder alle bestandskoppelingen"
-    IDS_CMD_START           "/start ms\t\tStart afspelen op ""ms"" (= milliseconden)"
+    IDS_CMD_REGVID          "/regvid\tMaak bestandskoppelingen voor videobestanden"
+    IDS_CMD_REGAUD          "/regaud\tMaak bestandskoppelingen voor audiobestanden"
+    IDS_CMD_REGPL           "/regpl\tMaak bestandskoppelingen voor afspeellijsten"
+    IDS_CMD_REGALL          "/regall\tMaak bestandskoppelingen voor alle\nondersteund bestandstypen"
+    IDS_CMD_UNREGALL        "/unregall\tVerwijder alle bestandskoppelingen"
+    IDS_CMD_START           "/start ms\tStart afspelen op ""ms"" (= milliseconden)"
     IDS_CMD_STARTPOS        "/startpos uu:mm:ss\tStart afspelen op positie uu:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize B,H\tZet venstergrootte op BxH"
     IDS_CMD_MONITOR         "/monitor N\tStart op schermmonitor N (N start bij 1)"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tStart met audiorenderer N (N start bij 1)\n\t\t(zie ""Output"" instellingen)"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tStart met audiorenderer N (N start bij 1)\n(zie ""Output"" instellingen)"
     IDS_CMD_VOLUME          "/volume N\tStel volume in, waarbij N een bereik tussen 0 en 100 heeft"
-    IDS_CMD_CLIPBOARD       "/clipboard\t\tOpen paden of koppelingen vanuit het klembord"
-    IDS_CMD_DEVICE          "/device\t\tOpen het standaardvideoapparaat"
-    IDS_CMD_RESET           "/reset\t\tStandaardinstellingen terugzetten"
+    IDS_CMD_CLIPBOARD       "/clipboard\tOpen paden of koppelingen vanuit het klembord"
+    IDS_CMD_DEVICE          "/device\tOpen het standaardvideoapparaat"
+    IDS_CMD_RESET           "/reset\tStandaardinstellingen terugzetten"
 END
 
 STRINGTABLE

@@ -3212,48 +3212,48 @@ END
 STRINGTABLE
 BEGIN
     IDS_CMD_USAGE           "Uso: mpc-be.exe ""pathname"" [opções]"
-    IDS_CMD_PATHNAME        """pathname""\tO arquivo principal ou diretório a ser carregado\n\t\t(curingas permitidos)"
+    IDS_CMD_PATHNAME        """pathname""\tO arquivo principal ou diretório a ser carregado\n(curingas permitidos)"
     IDS_CMD_HELP            "/help /h /?\tMostrar ajuda sobre opção linha de comando"
     IDS_CMD_DUB             "/dub ""dubname""\tCarregar um arquivo de áudio adicional"
-    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tCarregar um arquivo de áudio adicional deslocado com\n\t\tXXms (se o arquivo contiver ""...DELAY XXms..."")"
+    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tCarregar um arquivo de áudio adicional deslocado com\nXXms (se o arquivo contiver ""...DELAY XXms..."")"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_D3DFS           "/d3dfs\t\tIniciar renderização em modo de tela cheia exclusivo"
+    IDS_CMD_D3DFS           "/d3dfs\tIniciar renderização em modo de tela cheia exclusivo"
     IDS_CMD_SUB             "/sub ""subname""\tCarregar um arquivo de legenda adicional"
-    IDS_CMD_FILTER          "/filter ""filtername""\tCarregar filtros DirectShow de um link dinâmico\n\t\t(curingas permitidos)"
-    IDS_CMD_DVD             "/dvd\t\tExecutar no modo dvd, ""pathname"" significa a pasta\n\t\tdo dvd (opcional)"
+    IDS_CMD_FILTER          "/filter ""filtername""\tCarregar filtros DirectShow de um link dinâmico\n(curingas permitidos)"
+    IDS_CMD_DVD             "/dvd\tExecutar no modo dvd, ""pathname"" significa a pasta\ndo dvd (opcional)"
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tIniciar reprodução no título T, capítulo C"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tIniciar reprodução no título T, posição hh:mm:ss"
-    IDS_CMD_CD              "/cd\t\tCarregar todas as faixas de um CD de Áudio ou (s)vcd,\n\t\t""pathname"" significa o caminho da unidade (opcional)"
-    IDS_CMD_OPEN            "/open\t\tAbrir arquivo, não iniciar automaticamente a reprodução"
-    IDS_CMD_PLAY            "/play\t\tIniciar reprodução do arquivo assim que o player for\n\t\tiniciado"
-    IDS_CMD_CLOSE           "/close\t\tFechar player após a reprodução (funciona apenas\n\t\tquando usado com /play)"
+    IDS_CMD_CD              "/cd\tCarregar todas as faixas de um CD de Áudio ou (s)vcd,\n""pathname"" significa o caminho da unidade (opcional)"
+    IDS_CMD_OPEN            "/open\tAbrir arquivo, não iniciar automaticamente a reprodução"
+    IDS_CMD_PLAY            "/play\tIniciar reprodução do arquivo assim que o player for\niniciado"
+    IDS_CMD_CLOSE           "/close\tFechar player após a reprodução (funciona apenas\nquando usado com /play)"
     IDS_CMD_SHUTDOWN        "/shutdown\tDesligar o sistema operacional após a reprodução"
     IDS_CMD_FULLSCREEN      "/fullscreen\tIniciar em modo de tela cheia"
     IDS_CMD_MINIMIZED       "/minimized\tIniciar no modo minimizado"
-    IDS_CMD_NEW             "/new\t\tUsar o player em uma nova instância"
-    IDS_CMD_ADD             "/add\t\tAdicionar ""pathname"" à lista de reprodução, pode ser\n\t\tcombinada com /open e com /play"
+    IDS_CMD_NEW             "/new\tUsar o player em uma nova instância"
+    IDS_CMD_ADD             "/add\tAdicionar ""pathname"" à lista de reprodução, pode ser\ncombinada com /open e com /play"
     IDS_CMD_RANDOMIZE       "/randomize\tRandomizar a lista de reprodução"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_REGVID          "/regvid\t\tCriar associações de arquivos para arquivos de vídeo"
-    IDS_CMD_REGAUD          "/regaud\t\tCriar associações de arquivos para arquivos de áudio"
-    IDS_CMD_REGPL           "/regpl\t\tCriar associações de arquivos para arquivos de lista de\n\t\treprodução"
-    IDS_CMD_REGALL          "/regall\t\tCriar associações de arquivos para todos os tipos de\n\t\tarquivos suportados"
-    IDS_CMD_UNREGALL        "/unregall\t\tRemover todas as associações de arquivo"
-    IDS_CMD_START           "/start ms\t\tIniciar reprodução em ""ms"" (= millisegundos)"
+    IDS_CMD_REGVID          "/regvid\tCriar associações de arquivos para arquivos de vídeo"
+    IDS_CMD_REGAUD          "/regaud\tCriar associações de arquivos para arquivos de áudio"
+    IDS_CMD_REGPL           "/regpl\tCriar associações de arquivos para arquivos de lista de\nreprodução"
+    IDS_CMD_REGALL          "/regall\tCriar associações de arquivos para todos os tipos de\narquivos suportados"
+    IDS_CMD_UNREGALL        "/unregall\tRemover todas as associações de arquivo"
+    IDS_CMD_START           "/start ms\tIniciar reprodução em ""ms"" (= millisegundos)"
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tIniciar reprodução na posição hh:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tDefinir um tamanho de janela fixo"
     IDS_CMD_MONITOR         "/monitor N\tIniciar player no monitor N, onde N inicia em 1"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tIniciar a usar o audiorenderer N, onde N inicia com 1\n\t\t(veja configurar ""Áudio"")"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tIniciar a usar o audiorenderer N, onde N inicia com 1\n(veja configurar ""Áudio"")"
     IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
-    IDS_CMD_CLIPBOARD       "/clipboard\t\tAbrir caminhos/links da área de transferência"
-    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
-    IDS_CMD_RESET           "/reset\t\tResetar configurações ao padrão"
+    IDS_CMD_CLIPBOARD       "/clipboard\tAbrir caminhos/links da área de transferência"
+    IDS_CMD_DEVICE          "/device\tOpen the default video device"
+    IDS_CMD_RESET           "/reset\tResetar configurações ao padrão"
 END
 
 STRINGTABLE

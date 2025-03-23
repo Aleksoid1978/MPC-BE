@@ -3220,40 +3220,40 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_D3DFS           "/d3dfs\t\tСтартаваць у поўнаэкранным D3D рэжыме"
+    IDS_CMD_D3DFS           "/d3dfs\tСтартаваць у поўнаэкранным D3D рэжыме"
     IDS_CMD_SUB             "/sub ""subname""\tЗагрузiць дадатковыя субтытры"
     IDS_CMD_FILTER          "/filter ""filtername""\tЗагрузiць фільтры DirectShow з бібліятэкі (дазволеныя маскі)"
-    IDS_CMD_DVD             "/dvd\t\tЗапуск у рэжыме DVD ""шлях"" азначае каталог з DVD (апцыянальна)"
+    IDS_CMD_DVD             "/dvd\tЗапуск у рэжыме DVD ""шлях"" азначае каталог з DVD (апцыянальна)"
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tStart playback at title T, chapter C"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tStart playback at title T, position hh:mm:ss"
-    IDS_CMD_CD              "/cd\t\tЗагрузіць усе дарожкі Audio CD або (S)VCD ""шлях"" азначае шлях да кружэлкі (апцыянальна)"
-    IDS_CMD_OPEN            "/open\t\tТолькi адкрыць файл"
-    IDS_CMD_PLAY            "/play\t\tПачынаць прайграванне адразу пасля запуску"
-    IDS_CMD_CLOSE           "/close\t\tЗакрыць па канчатку прайгравання (працуе толькі з перамыкачом /play)"
+    IDS_CMD_CD              "/cd\tЗагрузіць усе дарожкі Audio CD або (S)VCD ""шлях"" азначае шлях да кружэлкі (апцыянальна)"
+    IDS_CMD_OPEN            "/open\tТолькi адкрыць файл"
+    IDS_CMD_PLAY            "/play\tПачынаць прайграванне адразу пасля запуску"
+    IDS_CMD_CLOSE           "/close\tЗакрыць па канчатку прайгравання (працуе толькі з перамыкачом /play)"
     IDS_CMD_SHUTDOWN        "/shutdown\tВыключыць кампутар па канчатку прайгравання"
     IDS_CMD_FULLSCREEN      "/fullscreen\tЗапуск у поўнаэкранным рэжыме"
     IDS_CMD_MINIMIZED       "/minimized\tЗапуск у згорнутым выглядзе"
-    IDS_CMD_NEW             "/new\t\tВыкарстаць новую копію прайгравальніка"
-    IDS_CMD_ADD             "/add\t\tДадаць ""шлях"" у плэйліст можна сумесна з /open і /play"
+    IDS_CMD_NEW             "/new\tВыкарстаць новую копію прайгравальніка"
+    IDS_CMD_ADD             "/add\tДадаць ""шлях"" у плэйліст можна сумесна з /open і /play"
     IDS_CMD_RANDOMIZE       "/randomize\tRandomize the playlist"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_REGVID          "/regvid\t\tРэгістраваць відэафарматы"
-    IDS_CMD_REGAUD          "/regaud\t\tРэгістраваць аўдыёфарматы"
-    IDS_CMD_REGPL           "/regpl\t\tCreate file associations for playlist files"
-    IDS_CMD_REGALL          "/regall\t\tCreate file associations for all supported file types"
-    IDS_CMD_UNREGALL        "/unregall\t\tRemove all file associations"
-    IDS_CMD_START           "/start ms\t\tПрайграваць з пазіцыі ""ms"" (= мілісекунды)"
+    IDS_CMD_REGVID          "/regvid\tРэгістраваць відэафарматы"
+    IDS_CMD_REGAUD          "/regaud\tРэгістраваць аўдыёфарматы"
+    IDS_CMD_REGPL           "/regpl\tCreate file associations for playlist files"
+    IDS_CMD_REGALL          "/regall\tCreate file associations for all supported file types"
+    IDS_CMD_UNREGALL        "/unregall\tRemove all file associations"
+    IDS_CMD_START           "/start ms\tПрайграваць з пазіцыі ""ms"" (= мілісекунды)"
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tStart playing at position hh:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize wh\tУсталяваць фіксаваны памер акна"
     IDS_CMD_MONITOR         "/monitor N\tЗапускацца на маніторы N дзе N адлічваецца з 1"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tВыкарыстаць аўдыёрэндэр N, дзе N адлічваецца з 1\n\t\t(глядзіце налады ""Вывад"")"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tВыкарыстаць аўдыёрэндэр N, дзе N адлічваецца з 1\n(глядзіце налады ""Вывад"")"
     IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
-    IDS_CMD_CLIPBOARD       "/clipboard\t\tOpen paths/links from the clipboard"
-    IDS_CMD_DEVICE          "/device\t\tOpen the default video device"
-    IDS_CMD_RESET           "/reset\t\tRestore default settings"
+    IDS_CMD_CLIPBOARD       "/clipboard\tOpen paths/links from the clipboard"
+    IDS_CMD_DEVICE          "/device\tOpen the default video device"
+    IDS_CMD_RESET           "/reset\tRestore default settings"
 END
 
 STRINGTABLE
