@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Pouzitie: mpc-be.exe ""cesta"" [parametre]\n\n""cesta""\tHlavny subor alebo priecinok, ktoreho obsah sa nacita (zastupne znaky\n\t\tsu povolene)"
+    IDS_CMD_USAGE           "Pouzitie: mpc-be.exe ""cesta"" [parametre]"
+    IDS_CMD_PATHNAME        """cesta""\tHlavny subor alebo priecinok, ktoreho obsah sa nacita (zastupne znaky\n\t\tsu povolene)"
     IDS_CMD_HELP            "/help /h /?\tZobrazit pomocnika prepinacom na prikazovom riadku"
     IDS_CMD_DUB             "/dub ""zvukova stopa""\tNacitat pridavny zvukovy subor"
     IDS_CMD_DUBDELAY        "/dubdelay ""subor""\tNacitat pridavny zvukovy subor, oneskoreny o XXms (ak\n\t\tsubor obsahuje ""...DELAY XXms..."")"

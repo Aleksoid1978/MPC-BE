@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "使用方法: mpc-be.exe ""路径"" [开关]\n\n""路径""\t要载入的主要文件或目录。(允许通配符)"
+    IDS_CMD_USAGE           "使用方法: mpc-be.exe ""路径"" [开关]"
+    IDS_CMD_PATHNAME        """路径""\t要载入的主要文件或目录。(允许通配符)"
     IDS_CMD_HELP            "/help /h /?\t显示关于命令行开关的帮助"
     IDS_CMD_DUB             "/dub ""伴音名""\t载入额外的音频文件"
     IDS_CMD_DUBDELAY        "/dubdelay ""文件""\t载入额外的音频文件并偏移XX毫秒 (如果\n\t\t文件包含""...DELAY XXms..."")"

@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Kullanım: mpc-be.exe ""yol_adı"" [anahtarlar]\n\n""yol_adı""\t\tYüklenecek dosya ya da klasör (özel\n\t\tkarakterler desteklenmektedir)"
+    IDS_CMD_USAGE           "Kullanım: mpc-be.exe ""yol_adı"" [anahtarlar]"
+    IDS_CMD_PATHNAME        """yol_adı""\t\tYüklenecek dosya ya da klasör (özel\n\t\tkarakterler desteklenmektedir)"
     IDS_CMD_HELP            "/help /h /?\tKomut satırı anahtarları hakkında yardım görüntülenir"
     IDS_CMD_DUB             "/dub ""dublaj_adı""\tHarici bir ses dosyası yüklemek için"
     IDS_CMD_DUBDELAY        "/dubdelay ""dosya""\tXXms olarak atlanacak harici bir ses dosyası yüklemek için\n\t\t(eğer dosya ""...GECİKME XXms..."" içeriyorsa)"

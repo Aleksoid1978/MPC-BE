@@ -3209,7 +3209,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Korištenje: mpc-be.exe ""imeputanje"" [argumenti]\n\n""imeputanje""\tIme glavne mape ili datoteke za učitavanje (wildcardovi\n\t\tomogućeni)"
+    IDS_CMD_USAGE           "Korištenje: mpc-be.exe ""imeputanje"" [argumenti]"
+    IDS_CMD_PATHNAME        """imeputanje""\tIme glavne mape ili datoteke za učitavanje (wildcardovi\n\t\tomogućeni)"
     IDS_CMD_HELP            "/help /h /?\tPrikaži pomoć pri korištenju argumenata naredbenog retka"
     IDS_CMD_DUB             "/dub ""dubname""\tUčitaj dodatnu datoteku zvuka"
     IDS_CMD_DUBDELAY        "/dubdelay ""file""\tUčitaj dodatnu datoteku zvuka pomaknutu s XXms (ako\n\t\tdatoteka koristi ""...KAŠNJENJE XXms..."")"

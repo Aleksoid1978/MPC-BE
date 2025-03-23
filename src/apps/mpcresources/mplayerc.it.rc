@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Utilizzo: mpc-be.exe ""nome_percorso"" [opzioni]\n\n""nome_percorso""\tIl file o la directory principale da caricare (caratteri jolly\n\t\tammessi)"
+    IDS_CMD_USAGE           "Utilizzo: mpc-be.exe ""nome_percorso"" [opzioni]"
+    IDS_CMD_PATHNAME        """nome_percorso""\tIl file o la directory principale da caricare (caratteri jolly\n\t\tammessi)"
     IDS_CMD_HELP            "/help /h /?\tMostra la guida sulle opzioni della riga di comando"
     IDS_CMD_DUB             "/dub ""nome dub""\tCarica un file audio aggiuntivo"
     IDS_CMD_DUBDELAY        "/dubdelay ""file""\tCarica un file audio aggiuntivo spostato con XXms (se\n\t\til file contiene ""...RITARDO XXms..."")"

@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Gebruik: mpc-be.exe ""padnaam"" [parameters]\n\n""padnaam""\tHet te laden bestand of map (wildcards\n\t\ttoegestaan)"
+    IDS_CMD_USAGE           "Gebruik: mpc-be.exe ""padnaam"" [parameters]"
+    IDS_CMD_PATHNAME        """padnaam""\tHet te laden bestand of map (wildcards\n\t\ttoegestaan)"
     IDS_CMD_HELP            "/help /h /?\tToon help over opdrachtregel-parameters"
     IDS_CMD_DUB             "/dub ""dubnaam""\tLaad nog een geluidsbestand"
     IDS_CMD_DUBDELAY        "/dubdelay ""best""\tLaad nog een geluidsbestand met een\n\t\tverschuiving van XXms\n\t\t (als bestand ""..vertraging XXms.."" heeft)"

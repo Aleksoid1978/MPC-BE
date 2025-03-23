@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Erabilpena: mpc-be.exe ""helburu-izena"" [aldagailuak]\n\n""pathname""\tGertatzeko agiri edo zuzenbide nagusia\n\t\t(ordezhizkiak ahal dira, ""-""-k sarrera estandarra adierazten du)"
+    IDS_CMD_USAGE           "Erabilpena: mpc-be.exe ""helburu-izena"" [aldagailuak]"
+    IDS_CMD_PATHNAME        """pathname""\tGertatzeko agiri edo zuzenbide nagusia\n\t\t(ordezhizkiak ahal dira, ""-""-k sarrera estandarra adierazten du)"
     IDS_CMD_HELP            "/help /h /?\tErakutsi komando lerro aldaketa laguntza"
     IDS_CMD_DUB             "/dub ""dubname""\tGertatu audio agiri gehigarri bat"
     IDS_CMD_DUBDELAY        "/dubdelay ""file""\tGertatu audio agiri gehigarri bat XXsm aldatuta\n\t\t(baldin agiriak baditu ""...ATZERAPENA XXsM..."")"

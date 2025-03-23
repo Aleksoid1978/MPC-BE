@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Ús: mpc-be.exe ""ruta"" [switches]\n\n""ruta""\tL'arxiu o directori principal a cargar-se (comodins permesos)"
+    IDS_CMD_USAGE           "Ús: mpc-be.exe ""ruta"" [switches]"
+    IDS_CMD_PATHNAME        """ruta""\tL'arxiu o directori principal a cargar-se (comodins permesos)"
     IDS_CMD_HELP            "/help /h /?\tMostra l' ajuda de la línea de comandaments(no traduït)"
     IDS_CMD_DUB             "/dub ""dubname""\tLoad an additional audio file"
     IDS_CMD_DUBDELAY        "/dubdelay ""file""\tLoad an additional audio file shifted with XXms (if\n\t\tfile ambtains ""...DELAY XXms..."")"

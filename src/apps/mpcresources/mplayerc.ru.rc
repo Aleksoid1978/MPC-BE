@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Использование: mpc-be.exe ""путь"" [переключатели]\n\n""путь""\t\tФайл или каталог для загрузки (разрешены \n\t\tмаски)"
+    IDS_CMD_USAGE           "Использование: mpc-be.exe ""путь"" [переключатели]"
+    IDS_CMD_PATHNAME        """путь""\t\tФайл или каталог для загрузки (разрешены \n\t\tмаски)"
     IDS_CMD_HELP            "/help /h /?\tПоказывает эту справку"
     IDS_CMD_DUB             "/dub ""dubname""\tЗагрузить дополнительный звуковой файл"
     IDS_CMD_DUBDELAY        "/dubdelay ""file""\tЗагрузить звуковой файл со смещением XXмс\n\t\t(если файл содержит ""...DELAY XXms..."")"

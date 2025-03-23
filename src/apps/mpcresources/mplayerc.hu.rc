@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Használat: mpc-be.exe ""pathname"" [kapcsolók]\n\n""pathname""\tA fő betöltendő fájl vagy könyvtár helye (spec. helyettesítő karakterek \n\t\tengedélyezve)"
+    IDS_CMD_USAGE           "Használat: mpc-be.exe ""pathname"" [kapcsolók]"
+    IDS_CMD_PATHNAME        """pathname""\tA fő betöltendő fájl vagy könyvtár helye (spec. helyettesítő karakterek \n\t\tengedélyezve)"
     IDS_CMD_HELP            "/help /h /?\tMegmutatja a parancssori kapcsolókról szóló súgót"
     IDS_CMD_DUB             "/dub ""dubname""\tBetölt egy külön audió fájlt"
     IDS_CMD_DUBDELAY        "/dubdelay ""file""\tBetölt egy külön audió fájlt XX ms-al eltolva (ha a\n\t\tfájl tartalmaz ""...DELAY XXms..."")"

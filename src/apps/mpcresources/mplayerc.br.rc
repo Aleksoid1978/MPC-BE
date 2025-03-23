@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Uso: mpc-be.exe ""pathname"" [opções]\n\n""pathname""\tO arquivo principal ou diretório a ser carregado\n\t\t(curingas permitidos)"
+    IDS_CMD_USAGE           "Uso: mpc-be.exe ""pathname"" [opções]"
+    IDS_CMD_PATHNAME        """pathname""\tO arquivo principal ou diretório a ser carregado\n\t\t(curingas permitidos)"
     IDS_CMD_HELP            "/help /h /?\tMostrar ajuda sobre opção linha de comando"
     IDS_CMD_DUB             "/dub ""dubname""\tCarregar um arquivo de áudio adicional"
     IDS_CMD_DUBDELAY        "/dubdelay ""file""\tCarregar um arquivo de áudio adicional deslocado com\n\t\tXXms (se o arquivo contiver ""...DELAY XXms..."")"

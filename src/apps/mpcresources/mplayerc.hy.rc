@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Օգտագործվում է. mpc-be.exe ""ճանապարհը"" [փոխանցիչներ]\n\n""ճանապարհը""\tբեռնման ֆայլը կամ թղթապանակը։ "
+    IDS_CMD_USAGE           "Օգտագործվում է. mpc-be.exe ""ճանապարհը"" [փոխանցիչներ]"
+    IDS_CMD_PATHNAME        """ճանապարհը""\tբեռնման ֆայլը կամ թղթապանակը։"
     IDS_CMD_HELP            "/help /h /?\tՑույց տալ հուշում"
     IDS_CMD_DUB             "/dub ""dubname""\tԲացել լրացուցիչ ձայնային ֆայլ"
     IDS_CMD_DUBDELAY        "/dubdelay ""file""\tԲացել լրացուցիչ ձայնային ֆայլ՝ XXմվ\n(եթե ֆայլը ունի ""...DELAY XXms..."")։"

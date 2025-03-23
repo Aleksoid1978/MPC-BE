@@ -3210,7 +3210,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Utilizare: mpc-be.exe „cale” [comutatoare]\n\n„cale”\tFișierul sau directorul principal ce trebuie încărcat (metacaractere\n\t\tpermise)"
+    IDS_CMD_USAGE           "Utilizare: mpc-be.exe „cale” [comutatoare]"
+    IDS_CMD_PATHNAME        "„cale”\tFișierul sau directorul principal ce trebuie încărcat (metacaractere\n\t\tpermise)"
     IDS_CMD_HELP            "/help /h /?\tArată ajutorul pentru comutatoarele din linia de comandă"
     IDS_CMD_DUB             "/dub „numele dublajului”\tÎncarcă un fișier audio adițional"
     IDS_CMD_DUBDELAY        "/dubdelay „fișier”\tÎncarcă un fișier audio adițional decalat cu XXms (dacă\n\t\tfișierul conține „...DELAY XXms...”)"

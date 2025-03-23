@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Použití: mpc-be.exe ""cesta"" [parametry]\n\n""cesta""\t\tSoubor nebo adresář, který má být otevřen\n\t\t(povoleny masky)"
+    IDS_CMD_USAGE           "Použití: mpc-be.exe ""cesta"" [parametry]"
+    IDS_CMD_PATHNAME        """cesta""\t\tSoubor nebo adresář, který má být otevřen\n\t\t(povoleny masky)"
     IDS_CMD_HELP            "/help /h /?\tZobrazí tento dialog"
     IDS_CMD_DUB             "/dub ""soubor""\tNačte soubor se zvukovou stopou"
     IDS_CMD_DUBDELAY        "/dubdelay ""soubor""\tNačte soubor se zvukovou stopou posunutou\n\t\to XXms (pokud název souboru obsahuje\n\t\t""...DELAY XXms..."")"

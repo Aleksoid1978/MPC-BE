@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Użycie: mpc-be.exe „ścieżka” [parametry]\n\n„ścieżka”\t\tOkreśla plik lub folder do otwarcia (symbole\n\t\twieloznaczne dozwolone)"
+    IDS_CMD_USAGE           "Użycie: mpc-be.exe „ścieżka” [parametry]"
+    IDS_CMD_PATHNAME        "„ścieżka”\t\tOkreśla plik lub folder do otwarcia (symbole\n\t\twieloznaczne dozwolone)"
     IDS_CMD_HELP            "/help /h /?\tWyświetla listę parametrów wiersza poleceń"
     IDS_CMD_DUB             "/dub „plik”\tOtwiera dodatkową ścieżkę dźwiękową"
     IDS_CMD_DUBDELAY        "/dubdelay „plik”\tOtwiera dodatkową ścieżkę dźwiękową opóźnioną\n\t\to XX ms jeśli nazwa pliku zawiera ciąg\n\t\t„DELAY XXms”"

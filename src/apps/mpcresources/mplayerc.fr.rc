@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Utilisation : mpc-be.exe ""nom du fichier"" [options]\n\n""nom du fichier""\tFichier principal ou répertoire à charger (jockers\n\t\tautorisés)"
+    IDS_CMD_USAGE           "Utilisation : mpc-be.exe ""nom du fichier"" [options]"
+    IDS_CMD_PATHNAME        """nom du fichier""\tFichier principal ou répertoire à charger (jockers\n\t\tautorisés)"
     IDS_CMD_HELP            "/help /h /?\tAffiche l'aide pour les options de la ligne de commande"
     IDS_CMD_DUB             "/dub ""fichier audio""\tCharge un fichier audio supplémentaire"
     IDS_CMD_DUBDELAY        "/dubdelay ""fichier""\tCharge un fichier audio avec décalage de XXms (si\n\t\tle nom contiens ""...DELAY XXms..."")"

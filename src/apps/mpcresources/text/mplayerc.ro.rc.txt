@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Despre"
 7		"MPC-BE"
 8		"Drepturi de autor © 2002-2025 - vezi fișierul Authors.txt"
@@ -1405,6 +1405,7 @@ STRING IDS_CMD_MINIMIZED		"/minimized\tPornește în modul minimizat"
 STRING IDS_CMD_MONITOR		"/monitor N\tPornește redarea pe monitorul N, unde N începe de la 1"
 STRING IDS_CMD_NEW		"/new\t\tFolosește o instanță nouă a playerului"
 STRING IDS_CMD_OPEN		"/open\t\tDeschide fișierul, nu porni redarea în mod automat"
+STRING IDS_CMD_PATHNAME		"„cale”\tFișierul sau directorul principal ce trebuie încărcat (metacaractere\n\t\tpermise)"
 STRING IDS_CMD_PLAY		"/play\t\tÎncepe redarea fișierului imediat ce playerul este\n\t\tlansat"
 STRING IDS_CMD_RANDOMIZE		"/randomize\tRedă fișiere la întâmplare din lista de redare (din playlist)"
 STRING IDS_CMD_REGALL		"/regall\t\tCreează asocieri de fișiere pentru toate tipurile de fișiere suportate"
@@ -1417,7 +1418,7 @@ STRING IDS_CMD_START		"/start ms\t\tPornește redarea la „ms” (= milisecunde
 STRING IDS_CMD_STARTPOS		"/startpos hh:mm:ss\tPornește redarea la poziția hh:mm:ss"
 STRING IDS_CMD_SUB		"/sub „numele subtitrării”\tÎncarcă o subtitrare suplimentară"
 STRING IDS_CMD_UNREGALL		"/unregall\t\tElimină toate asocierile de fișiere"
-STRING IDS_CMD_USAGE		"Utilizare: mpc-be.exe „cale” [comutatoare]\n\n„cale”\tFișierul sau directorul principal ce trebuie încărcat (metacaractere\n\t\tpermise)"
+STRING IDS_CMD_USAGE		"Utilizare: mpc-be.exe „cale” [comutatoare]"
 STRING IDS_CMD_VOLUME		"/volume N\tSetează volumul, unde N este un interval de la 0 la 100"
 STRING IDS_CM_AMBIENTLIGHT_BRIGHT		"Luminos (2.2 Gamma)"
 STRING IDS_CM_AMBIENTLIGHT_DARK		"Întunecat (2.4 Gamma)"

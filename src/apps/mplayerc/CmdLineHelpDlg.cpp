@@ -71,10 +71,10 @@ BOOL CmdLineHelpDlg::OnInitDialog()
 
 	std::vector<std::pair<CStringW, CStringW>> commands;
 
-	commands.reserve(IDS_CMD_RESET - IDS_CMD_HELP + 1);
+	commands.reserve(IDS_CMD_RESET - IDS_CMD_PATHNAME + 1);
 	int maxcmdlen = 0;
 
-	for (int i = IDS_CMD_HELP; i <= IDS_CMD_RESET; i++) {
+	for (int i = IDS_CMD_PATHNAME; i <= IDS_CMD_RESET; i++) {
 		CString s = ResStr(i);
 		const int cmdlen = s.Find('\t');
 		if (cmdlen > 0) {

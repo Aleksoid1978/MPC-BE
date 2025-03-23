@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Выкарыстанне: mpc-be.exe ""шлях"" [перамыкачы]\n\n""шлях""\tФайл або каталог для загрузкі (дазволеныя маскі)"
+    IDS_CMD_USAGE           "Выкарыстанне: mpc-be.exe ""шлях"" [перамыкачы]"
+    IDS_CMD_PATHNAME        """шлях""\tФайл або каталог для загрузкі (дазволеныя маскі)"
     IDS_CMD_HELP            "/help /h /?\tПаказвае гэтую даведку\n"
     IDS_CMD_DUB             "/dub ""dubname""\tЗагрузiць дадатковы гукавы файл"
     IDS_CMD_DUBDELAY        "/dubdelay ""file""\tЗагрузiць дадатковы гукавы файл са зрушэннем XXмс\n(калі файл утрымлівае ""...DELAY XXms..."")"

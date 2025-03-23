@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "用法: mpc-be.exe ""路徑名稱"" [選項]\n\n""路徑名稱""\t要載入的主要檔案或資料夾 (可使用萬用字元)"
+    IDS_CMD_USAGE           "用法: mpc-be.exe ""路徑名稱"" [選項]"
+    IDS_CMD_PATHNAME        """路徑名稱""\t要載入的主要檔案或資料夾 (可使用萬用字元)"
     IDS_CMD_HELP            "/help /h /?\t顯示命令列選項的說明"
     IDS_CMD_DUB             "/dub ""音源名稱""\t載入額外的音訊檔案"
     IDS_CMD_DUBDELAY        "/dubdelay ""檔案""\t以平移 XXms 的時間載入額外的音訊檔案\n\t\t(如果檔案含有 ""...DELAY XXms..."")"

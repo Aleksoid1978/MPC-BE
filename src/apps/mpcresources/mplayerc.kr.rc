@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "사용법 : mpc-be.exe ""경로명"" [스위치]\n\n""경로명""\t불러올 파일이나 디렉터리.(와일드 카드\n\t\t사용 가능)"
+    IDS_CMD_USAGE           "사용법 : mpc-be.exe ""경로명"" [스위치]"
+    IDS_CMD_PATHNAME        """경로명""\t불러올 파일이나 디렉터리.(와일드 카드\n\t\t사용 가능)"
     IDS_CMD_HELP            "/help /h /?\t명령입력 스위치 옵션을 출력"
     IDS_CMD_DUB             "/dub ""더빙파일""\t추가적인 오디오 파일"
     IDS_CMD_DUBDELAY        "/dubdelay ""파일""\tXXms 지연된 추가적인 오디오 파일(\n\t\t파일이 다음을 포함 ""...DELAY XXms..."")"

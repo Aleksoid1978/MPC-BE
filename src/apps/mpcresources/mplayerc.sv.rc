@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Usage: mpc-be.exe ""pathname"" [switches]\n\n""pathname""\tThe main file or directory to be loaded (wildcards\n\t\tallowed)"
+    IDS_CMD_USAGE           "Usage: mpc-be.exe ""pathname"" [switches]"
+    IDS_CMD_PATHNAME        """pathname""\tThe main file or directory to be loaded (wildcards\n\t\tallowed)"
     IDS_CMD_HELP            "/help /h /?\tShow help about command line switches"
     IDS_CMD_DUB             "/dub ""dubname""\tLoad an additional audio file"
     IDS_CMD_DUBDELAY        "/dubdelay ""file""\tLoad an additional audio file shifted with XXms (if\n\t\tfile contains ""...DELAY XXms..."")"

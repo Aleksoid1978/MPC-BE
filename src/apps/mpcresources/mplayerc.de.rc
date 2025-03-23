@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Aufruf: mpc-be.exe ""Pfadname"" [Parameter]\n\n""Pfadname""\tGibt Mediendatei oder Verzeichnis an\n\t\t(Wildcards sind möglich, Standardeingabe kann\n\t\tals ""-"" angegeben werden)."
+    IDS_CMD_USAGE           "Aufruf: mpc-be.exe ""Pfadname"" [Parameter]"
+    IDS_CMD_PATHNAME        """Pfadname""\tGibt Mediendatei oder Verzeichnis an\n\t\t(Wildcards sind möglich, Standardeingabe kann\n\t\tals ""-"" angegeben werden)."
     IDS_CMD_HELP            "/help /h /?\tZeigt diese Hilfe an."
     IDS_CMD_DUB             "/dub ""dubname""\tÖffnet zusätzliche Audiodatei."
     IDS_CMD_DUBDELAY        "/dubdelay ""file""\tÖffnet zusätzliche Audiodatei, deren Wiedergabe\n\t\tum Xms versetzt wird (Dateiname muss\n\t\t""DELAY Xms"" enthalten)."

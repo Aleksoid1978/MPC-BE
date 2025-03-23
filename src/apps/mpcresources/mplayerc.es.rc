@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Uso: mpc-be.exe ""ruta"" [modificadores]\n\n""ruta""\t\tArchivo o carpeta principal a cargar (se permiten comodines)"
+    IDS_CMD_USAGE           "Uso: mpc-be.exe ""ruta"" [modificadores]"
+    IDS_CMD_PATHNAME        """ruta""\t\tArchivo o carpeta principal a cargar (se permiten comodines)"
     IDS_CMD_HELP            "/help /h /?\tMuestra ayuda sobre las opciones de la línea de comandos"
     IDS_CMD_DUB             "/dub ""doblaje""\tCarga un archivo de audio adicional"
     IDS_CMD_DUBDELAY        "/dubdelay ""archivo""\tCarga un archivo de audio adicional desplazado con XXms (si\n\t\tel archivo contiene ""...DELAY XXms..."")"

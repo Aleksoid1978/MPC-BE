@@ -3211,7 +3211,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "使用方法: mpc-be.exe ""pathname"" [switches]\n\n""pathname""\t\t読み込むメイン ファイルまたはディレクトリ (ワイルドカード使用可)"
+    IDS_CMD_USAGE           "使用方法: mpc-be.exe ""pathname"" [switches]"
+    IDS_CMD_PATHNAME        """pathname""\t\t読み込むメイン ファイルまたはディレクトリ (ワイルドカード使用可)"
     IDS_CMD_HELP            "/help /h /?\t\tコマンド ライン スイッチに関するヘルプを表示する"
     IDS_CMD_DUB             "/dub ""dubname""\t\t追加の音声ファイルを読み込む"
     IDS_CMD_DUBDELAY        "/dubdelay ""file""\t\t追加の音声ファイルを XXms シフトして読み込む\n\t\t\t(ファイルが ""...DELAY XXms..."" を含んでいる場合)"
