@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -218,10 +218,6 @@ void CMPlayerCApp::ShowCmdlnSwitches() const
 		s += ResStr(IDS_UNKNOWN_SWITCH) + Implode(sl, ' ') + L"\n\n";
 	}
 
-	for (int i = IDS_CMD_USAGE; i <= IDS_CMD_RESET; i++) {
-		s.Append(ResStr(i));
-		s.AppendChar('\n');
-	}
 
 	CmdLineHelpDlg dlg(s);
 	dlg.DoModal();

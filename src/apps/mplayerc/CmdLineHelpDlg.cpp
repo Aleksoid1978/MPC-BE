@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 
 #include "stdafx.h"
 #include "CmdLineHelpDlg.h"
-#include "SettingsDefines.h"
+#include "Misc.h"
 
 CmdLineHelpDlg::CmdLineHelpDlg(const CString& cmdLine)
 	: CResizableDialog(CmdLineHelpDlg::IDD)
@@ -49,9 +49,63 @@ BOOL CmdLineHelpDlg::OnInitDialog()
 {
 	__super::OnInitDialog();
 
+	LOGFONTW lf = {};
+	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
+	lf.lfHeight = -ScaleY(12);
+
+	UINT i = 0;
+	bool success;
+	do {
+		wcscpy_s(lf.lfFaceName, LF_FACESIZE, MonospaceFonts[i]);
+		success = IsFontInstalled(MonospaceFonts[i]) && m_font.CreateFontIndirectW(&lf);
+		i++;
+	} while (!success && i < std::size(MonospaceFonts));
+
+	GetDlgItem(IDC_EDIT1)->SetFont(&m_font);
+
 	m_icon.SetIcon(LoadIconW(nullptr, IDI_INFORMATION));
 
 	m_text = m_cmdLine;
+	m_text.Append(ResStr(IDS_CMD_USAGE));
+	m_text.Append(L"\r\n\r\n");
+
+	std::vector<std::pair<CStringW, CStringW>> commands;
+
+	commands.reserve(IDS_CMD_RESET - IDS_CMD_HELP + 1);
+	int maxcmdlen = 0;
+
+	for (int i = IDS_CMD_HELP; i <= IDS_CMD_RESET; i++) {
+		CString s = ResStr(i);
+		const int cmdlen = s.Find('\t');
+		if (cmdlen > 0) {
+			commands.emplace_back(s.Left(cmdlen), s.Mid(cmdlen + 1));
+			if (cmdlen > maxcmdlen) {
+				maxcmdlen = cmdlen;
+			}
+		}
+	}
+	maxcmdlen++;
+
+	std::vector<wchar_t> spaces(maxcmdlen, L' ');
+
+	for (const auto& [name, desc] : commands) {
+		m_text.Append(name);
+		m_text.Append(spaces.data(), maxcmdlen - name.GetLength());
+
+		auto delims = L"\n\t\r";
+		int k = 0;
+		CStringW token = desc.Tokenize(delims, k);
+		m_text.Append(token);
+		m_text.Append(L"\r\n");
+
+		token = desc.Tokenize(delims, k);
+		while (token.GetLength()) {
+			m_text.Append(spaces.data(), maxcmdlen);
+			m_text.Append(token);
+			m_text.Append(L"\r\n");
+			token = desc.Tokenize(delims, k);
+		}
+	}
 
 	UpdateData(FALSE);
 

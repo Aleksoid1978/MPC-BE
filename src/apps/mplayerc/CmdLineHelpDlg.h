@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2021 see Authors.txt
+ * (C) 2014-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,14 +21,17 @@
 #pragma once
 
 #include <afxwin.h>
+#include <HighDPI.h>
 #include "ExtLib/ui/ResizableLib/ResizableDialog.h"
 
-class CmdLineHelpDlg : public CResizableDialog
+class CmdLineHelpDlg : public CResizableDialog, public CDPI
 {
 private:
 	CStatic m_icon;
 	CString m_cmdLine;
 	CString m_text;
+
+	CFont m_font;
 
 public:
 	CmdLineHelpDlg(const CString& cmdLine);
