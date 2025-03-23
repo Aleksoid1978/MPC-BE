@@ -92,7 +92,7 @@ BOOL CmdLineHelpDlg::OnInitDialog()
 		m_text.Append(name);
 		m_text.Append(spaces.data(), maxcmdlen - name.GetLength());
 
-		auto delims = L"\n\t\r";
+		auto delims = L"\n\r";
 		int k = 0;
 		CStringW token = desc.Tokenize(delims, k);
 		m_text.Append(token);
