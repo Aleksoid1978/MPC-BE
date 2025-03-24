@@ -3253,7 +3253,7 @@ BEGIN
     IDS_CMD_VOLUME          "/volume N\tУстановить громкость, где N - число в диапазоне от 0 до 100"
     IDS_CMD_CLIPBOARD       "/clipboard\tОткрыть пути/ссылки из буфера обмена"
     IDS_CMD_DEVICE          "/device\tОткрыть видео устройство по умолчанию"
-    IDS_CMD_RESET           "/reset\tВостановить настройки по умолчанию"
+    IDS_CMD_RESET           "/reset\tВосстановить настройки по умолчанию"
 END
 
 STRINGTABLE
