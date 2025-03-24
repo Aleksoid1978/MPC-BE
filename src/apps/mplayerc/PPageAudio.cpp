@@ -160,12 +160,10 @@ BOOL CPPageAudio::OnInitDialog()
 		}
 	}
 
-	m_iSecAudioRenderer = (m_iAudioRenderer == 1) ? 0 : 1;
+	m_iSecAudioRenderer = (m_iAudioRenderer == 0) ? 1 : 0;
 	for (size_t idx = 0; idx < m_audioDevices.size(); idx++) {
 		if (s.strAudioRendererDisplayName2 == m_audioDevices[idx].displayName) {
-			if (idx == m_iAudioRenderer) {
-				m_iSecAudioRenderer = (m_iAudioRenderer == 1) ? 0 : 1;
-			} else {
+			if (idx != m_iAudioRenderer) {
 				m_iSecAudioRenderer = idx;
 			}
 			break;
@@ -290,8 +288,8 @@ void CPPageAudio::OnAudioRendererChange()
 	m_iAudioRenderer = m_iAudioRendererCtrl.GetCurSel();
 
 	BOOL flag = FALSE;
-	CStringW str_audio = m_audioDevices[m_iAudioRenderer].displayName;
-	if (str_audio == AUDRNDT_MPC) {
+	auto& displayName = m_audioDevices[m_iAudioRenderer].displayName;
+	if (displayName == AUDRNDT_MPC) {
 		flag = TRUE;
 	} else {
 		BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
@@ -319,29 +317,30 @@ void CPPageAudio::OnAudioRendererChange()
 
 	m_audRendPropButton.EnableWindow(flag);
 
-	if (m_iAudioRenderer == m_iSecAudioRenderer) {
-		m_iSecAudioRendererCtrl.ResetContent();
+	m_iSecAudioRenderer = static_cast<int>(GetCurItemData(m_iSecAudioRendererCtrl));
+	m_iSecAudioRendererCtrl.ResetContent();
 
-		m_iSecAudioRenderer = (m_iAudioRenderer == 1) ? 0 : 1;
-
-		for (size_t i = 0; i < m_audioDevices.size(); i++) {
-			const auto& audioDevice = m_audioDevices[i];
-			if (i != m_iAudioRenderer) {
-				AddStringData(m_iSecAudioRendererCtrl, audioDevice.friendlyName, i);
-			}
-		}
-
-		SelectByItemData(m_iSecAudioRendererCtrl, m_iSecAudioRenderer);
+	if (m_iSecAudioRenderer == m_iAudioRenderer) {
+		m_iSecAudioRenderer = (m_iAudioRenderer == 0) ? 1 : 0;
 	}
+
+	for (size_t i = 0; i < m_audioDevices.size(); i++) {
+		const auto& audioDevice = m_audioDevices[i];
+		if (i != m_iAudioRenderer) {
+			AddStringData(m_iSecAudioRendererCtrl, audioDevice.friendlyName, i);
+		}
+	}
+
+	SelectByItemData(m_iSecAudioRendererCtrl, m_iSecAudioRenderer);
 
 	SetModified();
 }
 
 void CPPageAudio::OnAudioRenderPropClick()
 {
-	CStringW str_audio = m_audioDevices[m_iAudioRenderer].displayName;
+	auto& displayName = m_audioDevices[m_iAudioRenderer].displayName;
 
-	if (str_audio == AUDRNDT_MPC) {
+	if (displayName == AUDRNDT_MPC) {
 		ShowPPage(CreateInstance<CMpcAudioRenderer>);
 	} else {
 		BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
@@ -353,7 +352,7 @@ void CPPageAudio::OnAudioRenderPropClick()
 			CStringW str(olestr);
 			CoTaskMemFree(olestr);
 
-			if (str == str_audio) {
+			if (str == displayName) {
 				CComPtr<IBaseFilter> pBF;
 				HRESULT hr = pMoniker->BindToObject(nullptr, nullptr, IID_PPV_ARGS(&pBF));
 				if (SUCCEEDED(hr)) {
