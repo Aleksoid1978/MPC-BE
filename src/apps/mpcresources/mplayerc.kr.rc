@@ -3411,7 +3411,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "내장 폰트 불러옴"
     IDS_MKVSPLT_CALC_DURATION "비디오 데이터를 기반으로 기간 계산"
-    IDS_MKVSPLT_REINDEX             "Re-indexing if necessary"
+    IDS_MKVSPLT_REINDEX             "필요한 경우, 다시 색인화"
 END
 
 STRINGTABLE
@@ -3468,9 +3468,9 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_UNIT_TIME_H         "h"
-    IDS_UNIT_TIME_M         "m"
-    IDS_UNIT_TIME_S         "s"
+    IDS_UNIT_TIME_H         "시"
+    IDS_UNIT_TIME_M         "분"
+    IDS_UNIT_TIME_S         "초"
     IDS_UNIT_SIZE_KB        "KB"
     IDS_UNIT_SIZE_MB        "MB"
     IDS_UNIT_SIZE_GB        "GB"
@@ -3846,8 +3846,8 @@ END
 STRINGTABLE
 BEGIN
     IDS_PUBLISHED           "게시 : "
-    IDS_OPENING_YOUTUBE     "Opening YouTube ..."
-    IDS_CALLING_YOUTUBEDL   "Calling %s ..."
+    IDS_OPENING_YOUTUBE     "유튜브를 여는 중..."
+    IDS_CALLING_YOUTUBEDL   "%s 호출 중..."
 END
 
 STRINGTABLE
