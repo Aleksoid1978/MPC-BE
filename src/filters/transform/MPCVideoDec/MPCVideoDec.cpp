@@ -1972,7 +1972,7 @@ bool CMPCVideoDecFilter::CheckDXVACompatible(const enum AVCodecID codec, const e
 			}
 			break;
 		case AV_CODEC_ID_HEVC:
-			if ((m_hwType == HwType::D3D11 || m_hwType == HwType::NVDEC) && profile == FF_PROFILE_HEVC_REXT) {
+			if (profile == FF_PROFILE_HEVC_REXT && (m_hwType == HwType::D3D11 || m_hwType == HwType::NVDEC || m_hwType == HwType::D3D11CopyBack)) {
 				return true;
 			}
 
