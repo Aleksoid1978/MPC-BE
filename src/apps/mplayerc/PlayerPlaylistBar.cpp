@@ -259,26 +259,15 @@ bool CPlaylistItem::FindFolder(LPCWSTR path) const
 
 CString CPlaylistItem::GetLabel(int i) const
 {
-	CString str;
-
 	if (i == 0) {
-		if (!m_label.IsEmpty()) {
-			str = m_label;
-		} else if (m_fi.Valid()) {
-			const auto& fn = m_fi;
-			CUrlParser urlParser;
-			if (::PathIsURLW(fn) && urlParser.Parse(fn)) {
-				str = fn.GetPath();
-				if (urlParser.GetUrlPathLength() > 1) {
-					str = urlParser.GetUrlPath(); str.TrimRight(L'/');
-					if (const int pos = str.ReverseFind(L'/'); pos != -1) {
-						str = str.Right(str.GetLength() - pos - 1);
-					}
-				}
-				//m_label = str.TrimRight(L'/');
-			}
-			else {
-				str = GetFileName(fn);
+		if (m_label.GetLength()) {
+			return m_label;
+		}
+		if (m_fi.Valid()) {
+			if (::PathIsURLW(m_fi)) {
+				return m_fi.GetPath();
+			} else {
+				return GetFileName(m_fi);
 			}
 		}
 	} else if (i == 1) {
@@ -289,14 +278,14 @@ CString CPlaylistItem::GetLabel(int i) const
 		if (m_type == file) {
 			const REFERENCE_TIME rt = m_duration;
 			if (rt > 0) {
-				str = ReftimeToString2(rt);
+				return ReftimeToString2(rt);
 			}
 		} else if (m_type == device) {
 			// TODO
 		}
 	}
 
-	return str;
+	return CString();
 }
 
 template<class T>
@@ -1246,6 +1235,38 @@ void CPlayerPlaylistBar::AddItem(std::list<CString>& fns, CSubtitleItemList* sub
 				pli.m_label = y_fields.title;
 				pli.m_duration = y_fields.duration;
 			}
+		}
+	}
+
+	if (pli.m_label.IsEmpty()) {
+		if (::PathIsURLW(pli.m_fi)) {
+			CStringW label = pli.m_fi;
+			int k = label.Find('#');
+			if (k >= 0) {
+				label.Truncate(k); // remove #fragment
+			}
+			k = label.Find('/', label.Find(L"://") + 3);
+			if (k < 0 || k + 1 == label.GetLength() || label[k+1] == '?') {
+				pli.m_label = label;
+			}
+			else {
+				k = label.Find('?');
+				if (k >= 0) {
+					label.Truncate(k); // remove ?query
+				}
+				label.TrimRight('/');
+				k = label.ReverseFind('/');
+				if (k >= 0) {
+					label.Delete(0, k + 1);
+				}
+				if (label.GetLength()) {
+					Unescape(label);
+					pli.m_label = label;
+				}
+			}
+		}
+		else {
+			pli.m_label = GetFileName(pli.m_fi);
 		}
 	}
 
