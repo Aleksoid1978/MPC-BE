@@ -239,12 +239,14 @@ CSubtitleStream::CSubtitleStream(const WCHAR* wfn, CSubtitleSource* pParent, HRE
 	m_rts.ConvertToTimeBased(25);
 	m_rts.Sort();
 
-	m_rtDuration = 0;
+	int farEnd = 0;
 	for (size_t i = 0, cnt = m_rts.GetCount(); i < cnt; i++) {
-		m_rtDuration = std::max(m_rtDuration.GetUnits(), 10000i64*m_rts[i].end);
+		if (m_rts[i].end > farEnd) {
+			farEnd = m_rts[i].end;
+		}
 	}
 
-	m_rtStop = m_rtDuration;
+	m_rtStop = m_rtDuration = 10000i64 * farEnd;
 
 	if (phr) {
 		*phr = m_rtDuration > 0 ? S_OK : E_FAIL;
