@@ -41,220 +41,8 @@
 #include "mpegutils.h"
 #include "mpegvideo.h"
 #include "mpegvideodata.h"
+#include "mpegvideo_unquantize.h"
 #include "libavutil/refstruct.h"
-
-static void dct_unquantize_mpeg1_intra_c(MpegEncContext *s,
-                                   int16_t *block, int n, int qscale)
-{
-    int i, level, nCoeffs;
-    const uint16_t *quant_matrix;
-
-    nCoeffs= s->block_last_index[n];
-
-    block[0] *= n < 4 ? s->y_dc_scale : s->c_dc_scale;
-    /* XXX: only MPEG-1 */
-    quant_matrix = s->intra_matrix;
-    for(i=1;i<=nCoeffs;i++) {
-        int j= s->intra_scantable.permutated[i];
-        level = block[j];
-        if (level) {
-            if (level < 0) {
-                level = -level;
-                level = (int)(level * qscale * quant_matrix[j]) >> 3;
-                level = (level - 1) | 1;
-                level = -level;
-            } else {
-                level = (int)(level * qscale * quant_matrix[j]) >> 3;
-                level = (level - 1) | 1;
-            }
-            block[j] = level;
-        }
-    }
-}
-
-static void dct_unquantize_mpeg1_inter_c(MpegEncContext *s,
-                                   int16_t *block, int n, int qscale)
-{
-    int i, level, nCoeffs;
-    const uint16_t *quant_matrix;
-
-    nCoeffs= s->block_last_index[n];
-
-    quant_matrix = s->inter_matrix;
-    for(i=0; i<=nCoeffs; i++) {
-        int j= s->intra_scantable.permutated[i];
-        level = block[j];
-        if (level) {
-            if (level < 0) {
-                level = -level;
-                level = (((level << 1) + 1) * qscale *
-                         ((int) (quant_matrix[j]))) >> 4;
-                level = (level - 1) | 1;
-                level = -level;
-            } else {
-                level = (((level << 1) + 1) * qscale *
-                         ((int) (quant_matrix[j]))) >> 4;
-                level = (level - 1) | 1;
-            }
-            block[j] = level;
-        }
-    }
-}
-
-static void dct_unquantize_mpeg2_intra_c(MpegEncContext *s,
-                                   int16_t *block, int n, int qscale)
-{
-    int i, level, nCoeffs;
-    const uint16_t *quant_matrix;
-
-    if (s->q_scale_type) qscale = ff_mpeg2_non_linear_qscale[qscale];
-    else                 qscale <<= 1;
-
-    nCoeffs= s->block_last_index[n];
-
-    block[0] *= n < 4 ? s->y_dc_scale : s->c_dc_scale;
-    quant_matrix = s->intra_matrix;
-    for(i=1;i<=nCoeffs;i++) {
-        int j= s->intra_scantable.permutated[i];
-        level = block[j];
-        if (level) {
-            if (level < 0) {
-                level = -level;
-                level = (int)(level * qscale * quant_matrix[j]) >> 4;
-                level = -level;
-            } else {
-                level = (int)(level * qscale * quant_matrix[j]) >> 4;
-            }
-            block[j] = level;
-        }
-    }
-}
-
-static void dct_unquantize_mpeg2_intra_bitexact(MpegEncContext *s,
-                                   int16_t *block, int n, int qscale)
-{
-    int i, level, nCoeffs;
-    const uint16_t *quant_matrix;
-    int sum=-1;
-
-    if (s->q_scale_type) qscale = ff_mpeg2_non_linear_qscale[qscale];
-    else                 qscale <<= 1;
-
-    nCoeffs= s->block_last_index[n];
-
-    block[0] *= n < 4 ? s->y_dc_scale : s->c_dc_scale;
-    sum += block[0];
-    quant_matrix = s->intra_matrix;
-    for(i=1;i<=nCoeffs;i++) {
-        int j= s->intra_scantable.permutated[i];
-        level = block[j];
-        if (level) {
-            if (level < 0) {
-                level = -level;
-                level = (int)(level * qscale * quant_matrix[j]) >> 4;
-                level = -level;
-            } else {
-                level = (int)(level * qscale * quant_matrix[j]) >> 4;
-            }
-            block[j] = level;
-            sum+=level;
-        }
-    }
-    block[63]^=sum&1;
-}
-
-static void dct_unquantize_mpeg2_inter_c(MpegEncContext *s,
-                                   int16_t *block, int n, int qscale)
-{
-    int i, level, nCoeffs;
-    const uint16_t *quant_matrix;
-    int sum=-1;
-
-    if (s->q_scale_type) qscale = ff_mpeg2_non_linear_qscale[qscale];
-    else                 qscale <<= 1;
-
-    nCoeffs= s->block_last_index[n];
-
-    quant_matrix = s->inter_matrix;
-    for(i=0; i<=nCoeffs; i++) {
-        int j= s->intra_scantable.permutated[i];
-        level = block[j];
-        if (level) {
-            if (level < 0) {
-                level = -level;
-                level = (((level << 1) + 1) * qscale *
-                         ((int) (quant_matrix[j]))) >> 5;
-                level = -level;
-            } else {
-                level = (((level << 1) + 1) * qscale *
-                         ((int) (quant_matrix[j]))) >> 5;
-            }
-            block[j] = level;
-            sum+=level;
-        }
-    }
-    block[63]^=sum&1;
-}
-
-static void dct_unquantize_h263_intra_c(MpegEncContext *s,
-                                  int16_t *block, int n, int qscale)
-{
-    int i, level, qmul, qadd;
-    int nCoeffs;
-
-    av_assert2(s->block_last_index[n]>=0 || s->h263_aic);
-
-    qmul = qscale << 1;
-
-    if (!s->h263_aic) {
-        block[0] *= n < 4 ? s->y_dc_scale : s->c_dc_scale;
-        qadd = (qscale - 1) | 1;
-    }else{
-        qadd = 0;
-    }
-    if(s->ac_pred)
-        nCoeffs=63;
-    else
-        nCoeffs= s->intra_scantable.raster_end[ s->block_last_index[n] ];
-
-    for(i=1; i<=nCoeffs; i++) {
-        level = block[i];
-        if (level) {
-            if (level < 0) {
-                level = level * qmul - qadd;
-            } else {
-                level = level * qmul + qadd;
-            }
-            block[i] = level;
-        }
-    }
-}
-
-static void dct_unquantize_h263_inter_c(MpegEncContext *s,
-                                  int16_t *block, int n, int qscale)
-{
-    int i, level, qmul, qadd;
-    int nCoeffs;
-
-    av_assert2(s->block_last_index[n]>=0);
-
-    qadd = (qscale - 1) | 1;
-    qmul = qscale << 1;
-
-    nCoeffs= s->inter_scantable.raster_end[ s->block_last_index[n] ];
-
-    for(i=0; i<=nCoeffs; i++) {
-        level = block[i];
-        if (level) {
-            if (level < 0) {
-                level = level * qmul - qadd;
-            } else {
-                level = level * qmul + qadd;
-            }
-            block[i] = level;
-        }
-    }
-}
 
 
 static void gray16(uint8_t *dst, const uint8_t *src, ptrdiff_t linesize, int h)
@@ -324,44 +112,10 @@ av_cold void ff_mpv_idct_init(MpegEncContext *s)
                          s->idsp.idct_permutation);
     ff_permute_scantable(s->permutated_intra_v_scantable, ff_alternate_vertical_scan,
                          s->idsp.idct_permutation);
-
-    s->dct_unquantize_h263_intra  = dct_unquantize_h263_intra_c;
-    s->dct_unquantize_h263_inter  = dct_unquantize_h263_inter_c;
-    s->dct_unquantize_mpeg1_intra = dct_unquantize_mpeg1_intra_c;
-    s->dct_unquantize_mpeg1_inter = dct_unquantize_mpeg1_inter_c;
-    s->dct_unquantize_mpeg2_intra = dct_unquantize_mpeg2_intra_c;
-    if (s->avctx->flags & AV_CODEC_FLAG_BITEXACT)
-        s->dct_unquantize_mpeg2_intra = dct_unquantize_mpeg2_intra_bitexact;
-    s->dct_unquantize_mpeg2_inter = dct_unquantize_mpeg2_inter_c;
-
-#if HAVE_INTRINSICS_NEON
-    ff_mpv_common_init_neon(s);
-#endif
-
-#if ARCH_ARM
-    ff_mpv_common_init_arm(s);
-#elif ARCH_PPC
-    ff_mpv_common_init_ppc(s);
-#elif ARCH_X86
-    ff_mpv_common_init_x86(s);
-#elif ARCH_MIPS
-    ff_mpv_common_init_mips(s);
-#endif
 }
 
-static int init_duplicate_context(MpegEncContext *s)
+static av_cold int init_duplicate_context(MpegEncContext *s)
 {
-    if (s->encoding) {
-        s->me.map = av_mallocz(2 * ME_MAP_SIZE * sizeof(*s->me.map));
-        if (!s->me.map)
-            return AVERROR(ENOMEM);
-        s->me.score_map = s->me.map + ME_MAP_SIZE;
-
-        if (s->noise_reduction) {
-            if (!FF_ALLOCZ_TYPED_ARRAY(s->dct_error_sum,  2))
-                return AVERROR(ENOMEM);
-        }
-    }
     if (!FF_ALLOCZ_TYPED_ARRAY(s->blocks,  1 + s->encoding))
         return AVERROR(ENOMEM);
     s->block = s->blocks[0];
@@ -383,15 +137,18 @@ static int init_duplicate_context(MpegEncContext *s)
     return 0;
 }
 
-int ff_mpv_init_duplicate_contexts(MpegEncContext *s)
+av_cold int ff_mpv_init_duplicate_contexts(MpegEncContext *s)
 {
     int nb_slices = s->slice_context_count, ret;
+    size_t slice_size = s->slice_ctx_size ? s->slice_ctx_size : sizeof(*s);
+
+    s->parent = s;
 
     /* We initialize the copies before the original so that
      * fields allocated in init_duplicate_context are NULL after
      * copying. This prevents double-frees upon allocation error. */
     for (int i = 1; i < nb_slices; i++) {
-        s->thread_context[i] = av_memdup(s, sizeof(MpegEncContext));
+        s->thread_context[i] = av_memdup(s, slice_size);
         if (!s->thread_context[i])
             return AVERROR(ENOMEM);
         if ((ret = init_duplicate_context(s->thread_context[i])) < 0)
@@ -407,26 +164,22 @@ int ff_mpv_init_duplicate_contexts(MpegEncContext *s)
     return init_duplicate_context(s);
 }
 
-static void free_duplicate_context(MpegEncContext *s)
+static av_cold void free_duplicate_context(MpegEncContext *s)
 {
     if (!s)
         return;
 
     av_freep(&s->sc.edge_emu_buffer);
     av_freep(&s->sc.scratchpad_buf);
-    s->me.temp = s->me.scratchpad =
     s->sc.obmc_scratchpad = NULL;
     s->sc.linesize = 0;
 
-    av_freep(&s->dct_error_sum);
-    av_freep(&s->me.map);
-    s->me.score_map = NULL;
     av_freep(&s->blocks);
     av_freep(&s->ac_val_base);
     s->block = NULL;
 }
 
-static void free_duplicate_contexts(MpegEncContext *s)
+static av_cold void free_duplicate_contexts(MpegEncContext *s)
 {
     for (int i = 1; i < s->slice_context_count; i++) {
         free_duplicate_context(s->thread_context[i]);
@@ -439,16 +192,10 @@ static void backup_duplicate_context(MpegEncContext *bak, MpegEncContext *src)
 {
 #define COPY(a) bak->a = src->a
     COPY(sc);
-    COPY(me.map);
-    COPY(me.score_map);
     COPY(blocks);
     COPY(block);
     COPY(start_mb_y);
     COPY(end_mb_y);
-    COPY(me.map_generation);
-    COPY(dct_error_sum);
-    COPY(dct_count[0]);
-    COPY(dct_count[1]);
     COPY(ac_val_base);
     COPY(ac_val[0]);
     COPY(ac_val[1]);
@@ -482,8 +229,6 @@ int ff_update_duplicate_context(MpegEncContext *dst, const MpegEncContext *src)
  */
 av_cold void ff_mpv_common_defaults(MpegEncContext *s)
 {
-    s->y_dc_scale_table      =
-    s->c_dc_scale_table      = ff_mpeg1_dc_scale_table;
     s->chroma_qscale_table   = ff_default_chroma_qscale_table;
     s->progressive_frame     = 1;
     s->progressive_sequence  = 1;
@@ -491,13 +236,10 @@ av_cold void ff_mpv_common_defaults(MpegEncContext *s)
 
     s->picture_number        = 0;
 
-    s->f_code                = 1;
-    s->b_code                = 1;
-
     s->slice_context_count   = 1;
 }
 
-static void free_buffer_pools(BufferPoolContext *pools)
+static av_cold void free_buffer_pools(BufferPoolContext *pools)
 {
     av_refstruct_pool_uninit(&pools->mbskip_table_pool);
     av_refstruct_pool_uninit(&pools->qscale_table_pool);
@@ -507,7 +249,7 @@ static void free_buffer_pools(BufferPoolContext *pools)
     pools->alloc_mb_height = pools->alloc_mb_width = pools->alloc_mb_stride = 0;
 }
 
-int ff_mpv_init_context_frame(MpegEncContext *s)
+av_cold int ff_mpv_init_context_frame(MpegEncContext *s)
 {
     BufferPoolContext *const pools = &s->buffer_pools;
     int y_size, c_size, yc_size, i, mb_array_size, mv_table_size, x, y;
@@ -646,17 +388,12 @@ static void clear_context(MpegEncContext *s)
 
     memset(s->thread_context, 0, sizeof(s->thread_context));
 
-    s->me.map = NULL;
-    s->me.score_map = NULL;
-    s->dct_error_sum = NULL;
     s->block = NULL;
     s->blocks = NULL;
     s->ac_val_base = NULL;
     s->ac_val[0] =
     s->ac_val[1] =
     s->ac_val[2] =NULL;
-    s->me.scratchpad = NULL;
-    s->me.temp = NULL;
     memset(&s->sc, 0, sizeof(s->sc));
 
 
@@ -744,7 +481,7 @@ av_cold int ff_mpv_common_init(MpegEncContext *s)
     return ret;
 }
 
-void ff_mpv_free_context_frame(MpegEncContext *s)
+av_cold void ff_mpv_free_context_frame(MpegEncContext *s)
 {
     free_duplicate_contexts(s);
 
@@ -769,7 +506,7 @@ void ff_mpv_free_context_frame(MpegEncContext *s)
     s->linesize = s->uvlinesize = 0;
 }
 
-void ff_mpv_common_end(MpegEncContext *s)
+av_cold void ff_mpv_common_end(MpegEncContext *s)
 {
     ff_mpv_free_context_frame(s);
     if (s->slice_context_count > 1)

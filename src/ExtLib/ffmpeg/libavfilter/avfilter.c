@@ -213,17 +213,6 @@ static void link_free(AVFilterLink **link)
     av_freep(link);
 }
 
-#if FF_API_LINK_PUBLIC
-void avfilter_link_free(AVFilterLink **link)
-{
-    link_free(link);
-}
-int avfilter_config_links(AVFilterContext *filter)
-{
-    return ff_filter_config_links(filter);
-}
-#endif
-
 static void update_link_current_pts(FilterLinkInternal *li, int64_t pts)
 {
     AVFilterLink *const link = &li->l.pub;
@@ -561,9 +550,6 @@ static int request_frame_to_filter(AVFilterLink *link)
 static const char *const var_names[] = {
     "t",
     "n",
-#if FF_API_FRAME_PKT
-    "pos",
-#endif
     "w",
     "h",
     NULL
@@ -572,9 +558,6 @@ static const char *const var_names[] = {
 enum {
     VAR_T,
     VAR_N,
-#if FF_API_FRAME_PKT
-    VAR_POS,
-#endif
     VAR_W,
     VAR_H,
     VAR_VARS_NB
@@ -1023,11 +1006,6 @@ static int evaluate_timeline_at_frame(AVFilterLink *link, const AVFrame *frame)
     AVFilterContext *dstctx = link->dst;
     FFFilterContext *dsti = fffilterctx(dstctx);
     int64_t pts = frame->pts;
-#if FF_API_FRAME_PKT
-FF_DISABLE_DEPRECATION_WARNINGS
-    int64_t pos = frame->pkt_pos;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
 
     if (!dstctx->enable_str)
         return 1;
@@ -1036,9 +1014,6 @@ FF_ENABLE_DEPRECATION_WARNINGS
     dsti->var_values[VAR_T] = pts == AV_NOPTS_VALUE ? NAN : pts * av_q2d(link->time_base);
     dsti->var_values[VAR_W] = link->w;
     dsti->var_values[VAR_H] = link->h;
-#if FF_API_FRAME_PKT
-    dsti->var_values[VAR_POS] = pos == -1 ? NAN : pos;
-#endif
 
     return fabs(av_expr_eval(dsti->enable, dsti->var_values, NULL)) >= 0.5;
 }

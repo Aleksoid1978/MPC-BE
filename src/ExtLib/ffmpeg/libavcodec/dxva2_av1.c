@@ -272,6 +272,7 @@ int ff_dxva2_av1_fill_picture_parameters(const AVCodecContext *avctx, AVDXVACont
 }
 
 static int dxva2_av1_start_frame(AVCodecContext *avctx,
+                                 av_unused const AVBufferRef *buffer_ref,
                                  av_unused const uint8_t *buffer,
                                  av_unused uint32_t size)
 {
@@ -450,7 +451,7 @@ static int dxva2_av1_end_frame(AVCodecContext *avctx)
     return ret;
 }
 
-static int dxva2_av1_uninit(AVCodecContext *avctx)
+static av_cold int dxva2_av1_uninit(AVCodecContext *avctx)
 {
     struct AV1DXVAContext *ctx = avctx->internal->hwaccel_priv_data;
 

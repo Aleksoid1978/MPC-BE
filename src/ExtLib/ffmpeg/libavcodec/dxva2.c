@@ -66,14 +66,6 @@ DEFINE_GUID(ff_DXVA2_HEVC_VLD_Main422_12_Intel, 0xC23DD857, 0x874B, 0x423C, 0xB6
 DEFINE_GUID(ff_DXVA2_HEVC_VLD_Main444_Intel,    0x41A5AF96, 0xE415, 0x4B0C, 0x9D, 0x03, 0x90, 0x78, 0x58, 0xE2, 0x3E, 0x78);
 DEFINE_GUID(ff_DXVA2_HEVC_VLD_Main444_10_Intel, 0x6A6A81BA, 0x912A, 0x485D, 0xB5, 0x7F, 0xCC, 0xD2, 0xD3, 0x7B, 0x8D, 0x94);
 DEFINE_GUID(ff_DXVA2_HEVC_VLD_Main444_12_Intel, 0x5B08E35D, 0x0C66, 0x4C51, 0xA6, 0xF1, 0x89, 0xD0, 0x0C, 0xB2, 0xC1, 0x97);
-
-DEFINE_GUID(ff_D3D11_DECODER_PROFILE_HEVC_VLD_MAIN12,     0x1a72925f, 0x0c2c, 0x4f15, 0x96, 0xfb, 0xb1, 0x7d, 0x14, 0x73, 0x60, 0x3f);
-DEFINE_GUID(ff_D3D11_DECODER_PROFILE_HEVC_VLD_MAIN10_422, 0x0bac4fe5, 0x1532, 0x4429, 0xa8, 0x54, 0xf8, 0x4d, 0xe0, 0x49, 0x53, 0xdb);
-DEFINE_GUID(ff_D3D11_DECODER_PROFILE_HEVC_VLD_MAIN12_422, 0x55bcac81, 0xf311, 0x4093, 0xa7, 0xd0, 0x1c, 0xbc, 0x0b, 0x84, 0x9b, 0xee);
-DEFINE_GUID(ff_D3D11_DECODER_PROFILE_HEVC_VLD_MAIN_444,   0x4008018f, 0xf537, 0x4b36, 0x98, 0xcf, 0x61, 0xaf, 0x8a, 0x2c, 0x1a, 0x33);
-DEFINE_GUID(ff_D3D11_DECODER_PROFILE_HEVC_VLD_MAIN10_444, 0x0dabeffa, 0x4458, 0x4602, 0xbc, 0x03, 0x07, 0x95, 0x65, 0x9d, 0x61, 0x7c);
-DEFINE_GUID(ff_D3D11_DECODER_PROFILE_HEVC_VLD_MAIN12_444, 0x9798634d, 0xfe9d, 0x48e5, 0xb4, 0xda, 0xdb, 0xec, 0x45, 0xb3, 0xdf, 0x01);
-
 // ==> End patch MPC
 
 typedef struct dxva_mode {
@@ -146,13 +138,6 @@ static const dxva_mode dxva_modes[] = {
     { &ff_DXVA2_HEVC_VLD_Main444_Intel,    AV_CODEC_ID_HEVC, prof_hevc_rext },
     { &ff_DXVA2_HEVC_VLD_Main444_10_Intel, AV_CODEC_ID_HEVC, prof_hevc_rext },
     { &ff_DXVA2_HEVC_VLD_Main444_12_Intel, AV_CODEC_ID_HEVC, prof_hevc_rext },
-
-    { &ff_D3D11_DECODER_PROFILE_HEVC_VLD_MAIN12,     AV_CODEC_ID_HEVC, prof_hevc_rext },
-    { &ff_D3D11_DECODER_PROFILE_HEVC_VLD_MAIN10_422, AV_CODEC_ID_HEVC, prof_hevc_rext },
-    { &ff_D3D11_DECODER_PROFILE_HEVC_VLD_MAIN12_422, AV_CODEC_ID_HEVC, prof_hevc_rext },
-    { &ff_D3D11_DECODER_PROFILE_HEVC_VLD_MAIN_444,   AV_CODEC_ID_HEVC, prof_hevc_rext },
-    { &ff_D3D11_DECODER_PROFILE_HEVC_VLD_MAIN10_444, AV_CODEC_ID_HEVC, prof_hevc_rext },
-    { &ff_D3D11_DECODER_PROFILE_HEVC_VLD_MAIN12_444, AV_CODEC_ID_HEVC, prof_hevc_rext },
     // ==> End patch MPC
 
     { NULL,                          0 },

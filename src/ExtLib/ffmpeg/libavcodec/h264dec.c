@@ -397,12 +397,6 @@ static av_cold int h264_decode_init(AVCodecContext *avctx)
         return AVERROR_UNKNOWN;
     }
 
-#if FF_API_TICKS_PER_FRAME
-FF_DISABLE_DEPRECATION_WARNINGS
-    avctx->ticks_per_frame = 2;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
-
     if (!avctx->internal->is_copy) {
         if (avctx->extradata_size > 0 && avctx->extradata) {
             ret = ff_h264_decode_extradata(avctx->extradata, avctx->extradata_size,
@@ -616,7 +610,8 @@ static void debug_green_metadata(const H264SEIGreenMetaData *gm, void *logctx)
     }
 }
 
-static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size)
+static int decode_nal_units(H264Context *h, AVBufferRef *buf_ref,
+                            const uint8_t *buf, int buf_size)
 {
     AVCodecContext *const avctx = h->avctx;
     int nals_needed = 0; ///< number of NALs that need decoding before the next frame thread starts
@@ -697,7 +692,8 @@ static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size)
                 }
 
                 if (h->avctx->hwaccel &&
-                    (ret = FF_HW_CALL(h->avctx, start_frame, buf, buf_size)) < 0)
+                    (ret = FF_HW_CALL(h->avctx, start_frame, buf_ref,
+                                      buf, buf_size)) < 0)
                     goto end;
             }
 
@@ -1082,7 +1078,7 @@ static int h264_decode_frame(AVCodecContext *avctx, AVFrame *pict,
                                             avctx->err_recognition, avctx);
     }
 
-    buf_index = decode_nal_units(h, buf, buf_size);
+    buf_index = decode_nal_units(h, avpkt->buf, buf, buf_size);
     if (buf_index < 0)
         return AVERROR_INVALIDDATA;
 

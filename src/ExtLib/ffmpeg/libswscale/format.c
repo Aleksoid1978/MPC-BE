@@ -226,6 +226,8 @@ static const FormatEntry format_entries[] = {
     [AV_PIX_FMT_Y216LE]         = { 1, 1 },
     [AV_PIX_FMT_X2RGB10LE]      = { 1, 1 },
     [AV_PIX_FMT_X2BGR10LE]      = { 1, 1 },
+    [AV_PIX_FMT_NV20BE]         = { 1, 1 },
+    [AV_PIX_FMT_NV20LE]         = { 1, 1 },
     [AV_PIX_FMT_P210BE]         = { 1, 1 },
     [AV_PIX_FMT_P210LE]         = { 1, 1 },
     [AV_PIX_FMT_P212BE]         = { 1, 1 },
@@ -535,12 +537,12 @@ int sws_test_transfer(enum AVColorTransferCharacteristic trc, int output)
 
 static int test_range(enum AVColorRange range)
 {
-    return range >= 0 && range < AVCOL_RANGE_NB;
+    return (unsigned)range < AVCOL_RANGE_NB;
 }
 
 static int test_loc(enum AVChromaLocation loc)
 {
-    return loc >= 0 && loc < AVCHROMA_LOC_NB;
+    return (unsigned)loc < AVCHROMA_LOC_NB;
 }
 
 int ff_test_fmt(const SwsFormat *fmt, int output)

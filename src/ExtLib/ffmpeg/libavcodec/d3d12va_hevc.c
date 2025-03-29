@@ -49,7 +49,10 @@ static void fill_slice_short(DXVA_Slice_HEVC_Short *slice, unsigned position, un
     slice->wBadSliceChopping     = 0;
 }
 
-static int d3d12va_hevc_start_frame(AVCodecContext *avctx, av_unused const uint8_t *buffer, av_unused uint32_t size)
+static int d3d12va_hevc_start_frame(AVCodecContext *avctx,
+                                    av_unused const AVBufferRef *buffer_ref,
+                                    av_unused const uint8_t *buffer,
+                                    av_unused uint32_t size)
 {
     const HEVCContext        *h       = avctx->priv_data;
     D3D12VADecodeContext     *ctx     = D3D12VA_DECODE_CONTEXT(avctx);
@@ -162,7 +165,7 @@ static int d3d12va_hevc_end_frame(AVCodecContext *avctx)
                scale ? &ctx_pic->qm : NULL, scale ? sizeof(ctx_pic->qm) : 0, update_input_arguments);
 }
 
-static int d3d12va_hevc_decode_init(AVCodecContext *avctx)
+static av_cold int d3d12va_hevc_decode_init(AVCodecContext *avctx)
 {
     D3D12VADecodeContext *ctx = D3D12VA_DECODE_CONTEXT(avctx);
     DXVA_PicParams_HEVC pp;

@@ -132,12 +132,12 @@ static int ff_vvdec_set_pix_fmt(AVCodecContext *avctx, vvdecFrame *frame)
         if (frame->bitDepth == 8) {
             avctx->pix_fmt = frame->numPlanes == 1 ?
                              AV_PIX_FMT_GRAY8 : AV_PIX_FMT_YUV420P;
-            avctx->profile = FF_PROFILE_VVC_MAIN_10;
+            avctx->profile = AV_PROFILE_VVC_MAIN_10;
             return 0;
         } else if (frame->bitDepth == 10) {
             avctx->pix_fmt = frame->numPlanes == 1 ?
                 AV_PIX_FMT_GRAY10 : AV_PIX_FMT_YUV420P10;
-            avctx->profile = FF_PROFILE_VVC_MAIN_10;
+            avctx->profile = AV_PROFILE_VVC_MAIN_10;
             return 0;
         } else {
             return AVERROR_INVALIDDATA;
@@ -147,14 +147,14 @@ static int ff_vvdec_set_pix_fmt(AVCodecContext *avctx, vvdecFrame *frame)
         if (frame->bitDepth == 8) {
             avctx->pix_fmt = frame->colorFormat == VVDEC_CF_YUV444_PLANAR ?
                              AV_PIX_FMT_YUV444P : AV_PIX_FMT_YUV422P;
-            if (avctx->profile != FF_PROFILE_VVC_MAIN_10_444)
-                avctx->profile = FF_PROFILE_VVC_MAIN_10_444;
+            if (avctx->profile != AV_PROFILE_VVC_MAIN_10_444)
+                avctx->profile = AV_PROFILE_VVC_MAIN_10_444;
             return 0;
         } else if (frame->bitDepth == 10) {
             avctx->pix_fmt = frame->colorFormat == VVDEC_CF_YUV444_PLANAR ?
                              AV_PIX_FMT_YUV444P10 : AV_PIX_FMT_YUV422P10;
-            if (avctx->profile != FF_PROFILE_VVC_MAIN_10_444)
-                avctx->profile = FF_PROFILE_VVC_MAIN_10_444;
+            if (avctx->profile != AV_PROFILE_VVC_MAIN_10_444)
+                avctx->profile = AV_PROFILE_VVC_MAIN_10_444;
             return 0;
         } else {
             return AVERROR_INVALIDDATA;

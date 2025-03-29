@@ -35,6 +35,7 @@
 #include "mpegvideo.h"
 #include "mpegvideodata.h"
 #include "mpegvideodec.h"
+#include "mpegvideo_unquantize.h"
 #include "mpeg4video.h"
 #include "mpeg4videodata.h"
 #include "mpeg4videodec.h"
@@ -3328,6 +3329,8 @@ static int decode_vop_header(Mpeg4DecContext *ctx, GetBitContext *gb,
         }
     }
 
+    s->f_code = 1;
+    s->b_code = 1;
     if (ctx->shape != BIN_ONLY_SHAPE) {
         s->chroma_qscale = s->qscale = get_bits(gb, ctx->quant_precision);
         if (s->qscale == 0) {
@@ -3344,8 +3347,7 @@ static int decode_vop_header(Mpeg4DecContext *ctx, GetBitContext *gb,
                 s->f_code = 1;
                 return AVERROR_INVALIDDATA;  // makes no sense to continue, as there is nothing left from the image then
             }
-        } else
-            s->f_code = 1;
+        }
 
         if (s->pict_type == AV_PICTURE_TYPE_B) {
             s->b_code = get_bits(gb, 3);
@@ -3355,8 +3357,7 @@ static int decode_vop_header(Mpeg4DecContext *ctx, GetBitContext *gb,
                 s->b_code=1;
                 return AVERROR_INVALIDDATA; // makes no sense to continue, as the MV decoding will break very quickly
             }
-        } else
-            s->b_code = 1;
+        }
 
         if (s->avctx->debug & FF_DEBUG_PICT_INFO) {
             av_log(s->avctx, AV_LOG_DEBUG,
@@ -3389,6 +3390,9 @@ static int decode_vop_header(Mpeg4DecContext *ctx, GetBitContext *gb,
             skip_bits(gb, 2);  // ref_select_code
         }
     }
+
+    s->dct_unquantize_intra = s->mpeg_quant ? ctx->dct_unquantize_mpeg2_intra
+                                            : ctx->dct_unquantize_h263_intra;
 
 end:
     /* detect buggy encoders which don't set the low_delay flag
@@ -3791,12 +3795,10 @@ static int mpeg4_update_thread_context(AVCodecContext *dst,
     memcpy(s->sprite_shift, s1->sprite_shift, sizeof(s1->sprite_shift));
     memcpy(s->sprite_traj,  s1->sprite_traj,  sizeof(s1->sprite_traj));
 
-    ret = av_buffer_replace(&s->bitstream_buffer, s1->bitstream_buffer);
-
     if (!init && s1->xvid_build >= 0)
         ff_xvid_idct_init(&s->m.idsp, dst);
 
-    return 0;
+    return av_buffer_replace(&s->bitstream_buffer, s1->bitstream_buffer);
 }
 
 static int mpeg4_update_thread_context_for_user(AVCodecContext *dst,
@@ -3862,6 +3864,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
     static AVOnce init_static_once = AV_ONCE_INIT;
     Mpeg4DecContext *ctx = avctx->priv_data;
     MpegEncContext *s = &ctx->m;
+    MPVUnquantDSPContext unquant_dsp_ctx;
     int ret;
 
     ctx->divx_version =
@@ -3871,6 +3874,15 @@ static av_cold int decode_init(AVCodecContext *avctx)
 
     if ((ret = ff_h263_decode_init(avctx)) < 0)
         return ret;
+
+    ff_mpv_unquantize_init(&unquant_dsp_ctx,
+                           avctx->flags & AV_CODEC_FLAG_BITEXACT, 0);
+
+    ctx->dct_unquantize_h263_intra  = unquant_dsp_ctx.dct_unquantize_h263_intra;
+    ctx->dct_unquantize_mpeg2_intra = unquant_dsp_ctx.dct_unquantize_mpeg2_intra;
+    // dct_unquantize_inter is only used with MPEG-2 quantizers,
+    // so we can already set dct_unquantize_inter here once and for all.
+    s->dct_unquantize_inter = unquant_dsp_ctx.dct_unquantize_mpeg2_inter;
 
     s->h263_pred = 1;
     s->low_delay = 0; /* default, might be overridden in the vol header during header parsing */

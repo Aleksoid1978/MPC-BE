@@ -35,17 +35,6 @@
 #include "libavutil/attributes_internal.h"
 
 #include "rl.h"
-#include "vlc.h"
-
-/* motion vector table */
-typedef struct MVTable {
-    const uint16_t *table_mv_code;
-    const uint8_t *table_mv_bits;
-    const uint8_t *table_mvx;
-    const uint8_t *table_mvy;
-    uint16_t *table_mv_index; /* encoding: convert mv to index in table_mv */
-    const VLCElem *vlc;       /* decoding: vlc */
-} MVTable;
 
 FF_VISIBILITY_PUSH_HIDDEN
 #define NB_RL_TABLES  6
@@ -59,8 +48,12 @@ extern const uint8_t ff_wmv1_y_dc_scale_table[32];
 extern const uint8_t ff_wmv1_c_dc_scale_table[32];
 extern const uint8_t ff_old_ff_y_dc_scale_table[32];
 
-#define MSMPEG4_MV_TABLES_NB_ELEMS 1099
-extern MVTable ff_mv_tables[2];
+#define MSMPEG4_MV_TABLES_NB_ELEMS 1100
+/// The entries are of the form (8 << mvx) | mvy. Escape value is zero.
+extern const uint16_t ff_msmp4_mv_table0[MSMPEG4_MV_TABLES_NB_ELEMS];
+extern const uint8_t  ff_msmp4_mv_table0_lens[MSMPEG4_MV_TABLES_NB_ELEMS];
+extern const uint16_t ff_msmp4_mv_table1[MSMPEG4_MV_TABLES_NB_ELEMS];
+extern const uint8_t  ff_msmp4_mv_table1_lens[MSMPEG4_MV_TABLES_NB_ELEMS];
 
 extern const uint8_t ff_v2_mb_type[8][2];
 extern const uint8_t ff_v2_intra_cbpc[4][2];

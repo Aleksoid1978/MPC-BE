@@ -95,6 +95,7 @@ static void *attribute_align_arg thread_worker(void *v)
     }
 }
 
+av_cold
 int avpriv_slicethread_create(AVSliceThread **pctx, void *priv,
                               void (*worker_func)(void *priv, int jobnr, int threadnr, int nb_jobs, int nb_threads),
                               void (*main_func)(void *priv),
@@ -222,15 +223,14 @@ void avpriv_slicethread_execute(AVSliceThread *ctx, int nb_jobs, int execute_mai
     }
 }
 
-void avpriv_slicethread_free(AVSliceThread **pctx)
+av_cold void avpriv_slicethread_free(AVSliceThread **pctx)
 {
-    AVSliceThread *ctx;
+    AVSliceThread *ctx = *pctx;
     int nb_workers, i;
 
-    if (!pctx || !*pctx)
+    if (!ctx)
         return;
 
-    ctx = *pctx;
     nb_workers = ctx->nb_threads;
     if (!ctx->main_func)
         nb_workers--;

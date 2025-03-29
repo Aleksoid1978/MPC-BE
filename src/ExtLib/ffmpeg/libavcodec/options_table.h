@@ -74,9 +74,6 @@ static const AVOption avcodec_options[] = {
 {"ilme", "interlaced motion estimation", 0, AV_OPT_TYPE_CONST, {.i64 = AV_CODEC_FLAG_INTERLACED_ME }, INT_MIN, INT_MAX, V|E, .unit = "flags"},
 {"cgop", "closed GOP", 0, AV_OPT_TYPE_CONST, {.i64 = AV_CODEC_FLAG_CLOSED_GOP }, INT_MIN, INT_MAX, V|E, .unit = "flags"},
 {"output_corrupt", "Output even potentially corrupted frames", 0, AV_OPT_TYPE_CONST, {.i64 = AV_CODEC_FLAG_OUTPUT_CORRUPT }, INT_MIN, INT_MAX, V|D, .unit = "flags"},
-#if FF_API_DROPCHANGED
-{"drop_changed", "Drop frames whose parameters differ from first decoded frame", 0, AV_OPT_TYPE_CONST, {.i64 = AV_CODEC_FLAG_DROPCHANGED }, INT_MIN, INT_MAX, A|V|D | AV_OPT_FLAG_DEPRECATED, .unit = "flags"},
-#endif
 {"flags2", NULL, OFFSET(flags2), AV_OPT_TYPE_FLAGS, {.i64 = DEFAULT}, 0, UINT_MAX, V|A|E|D|S, .unit = "flags2"},
 {"fast", "allow non-spec-compliant speedup tricks", 0, AV_OPT_TYPE_CONST, {.i64 = AV_CODEC_FLAG2_FAST }, INT_MIN, INT_MAX, V|E, .unit = "flags2"},
 {"noout", "skip bitstream encoding", 0, AV_OPT_TYPE_CONST, {.i64 = AV_CODEC_FLAG2_NO_OUTPUT }, INT_MIN, INT_MAX, V|E, .unit = "flags2"},
@@ -224,8 +221,8 @@ static const AVOption avcodec_options[] = {
 {"profile", NULL, OFFSET(profile), AV_OPT_TYPE_INT, {.i64 = AV_PROFILE_UNKNOWN }, INT_MIN, INT_MAX, V|A|E|CC, .unit = "avctx.profile"},
 {"unknown", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = AV_PROFILE_UNKNOWN }, INT_MIN, INT_MAX, V|A|E, .unit = "avctx.profile"},
 {"main10",  NULL, 0, AV_OPT_TYPE_CONST, {.i64 = AV_PROFILE_HEVC_MAIN_10 }, INT_MIN, INT_MAX, V|E, .unit = "avctx.profile"},
-{"level", "encoding level, usually corresponding to the profile level, codec-specific", OFFSET(level), AV_OPT_TYPE_INT, {.i64 = FF_LEVEL_UNKNOWN }, INT_MIN, INT_MAX, V|A|E|CC, .unit = "avctx.level"},
-{"unknown", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = FF_LEVEL_UNKNOWN }, INT_MIN, INT_MAX, V|A|E, .unit = "avctx.level"},
+{"level", "encoding level, usually corresponding to the profile level, codec-specific", OFFSET(level), AV_OPT_TYPE_INT, {.i64 = AV_LEVEL_UNKNOWN }, INT_MIN, INT_MAX, V|A|E|CC, .unit = "avctx.level"},
+{"unknown", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = AV_LEVEL_UNKNOWN }, INT_MIN, INT_MAX, V|A|E, .unit = "avctx.level"},
 {"lowres", "decode at 1= 1/2, 2=1/4, 3=1/8 resolutions", OFFSET(lowres), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, INT_MAX, V|A|D},
 {"cmp", "full-pel ME compare function", OFFSET(me_cmp), AV_OPT_TYPE_INT, {.i64 = DEFAULT }, INT_MIN, INT_MAX, V|E, .unit = "cmp_func"},
 {"subcmp", "sub-pel ME compare function", OFFSET(me_sub_cmp), AV_OPT_TYPE_INT, {.i64 = DEFAULT }, INT_MIN, INT_MAX, V|E, .unit = "cmp_func"},
@@ -272,9 +269,6 @@ static const AVOption avcodec_options[] = {
 {"ch_layout", NULL, OFFSET(ch_layout), AV_OPT_TYPE_CHLAYOUT, {.str = NULL }, 0, 0, A|E|D, .unit = "ch_layout"},
 {"rc_max_vbv_use", NULL, OFFSET(rc_max_available_vbv_use), AV_OPT_TYPE_FLOAT, {.dbl = 0 }, 0.0, FLT_MAX, V|E},
 {"rc_min_vbv_use", NULL, OFFSET(rc_min_vbv_overflow_use),  AV_OPT_TYPE_FLOAT, {.dbl = 3 },     0.0, FLT_MAX, V|E},
-#if FF_API_TICKS_PER_FRAME
-{"ticks_per_frame", NULL, OFFSET(ticks_per_frame), AV_OPT_TYPE_INT, {.i64 = 1 }, 1, INT_MAX, A|V|E|D},
-#endif
 {"color_primaries", "color primaries", OFFSET(color_primaries), AV_OPT_TYPE_INT, {.i64 = AVCOL_PRI_UNSPECIFIED }, 1, INT_MAX, V|E|D, .unit = "color_primaries_type"},
 {"bt709",       "BT.709",         0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_PRI_BT709 },        INT_MIN, INT_MAX, V|E|D, .unit = "color_primaries_type"},
 {"unknown",     "Unspecified",    0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_PRI_UNSPECIFIED },  INT_MIN, INT_MAX, V|E|D, .unit = "color_primaries_type"},

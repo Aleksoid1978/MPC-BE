@@ -496,16 +496,6 @@ typedef struct AVFrame {
      */
     int format;
 
-#if FF_API_FRAME_KEY
-    /**
-     * 1 -> keyframe, 0-> not
-     *
-     * @deprecated Use AV_FRAME_FLAG_KEY instead
-     */
-    attribute_deprecated
-    int key_frame;
-#endif
-
     /**
      * Picture type of the frame.
      */
@@ -576,32 +566,6 @@ typedef struct AVFrame {
      * higher-layer timing information is not available.
      */
     int repeat_pict;
-
-#if FF_API_INTERLACED_FRAME
-    /**
-     * The content of the picture is interlaced.
-     *
-     * @deprecated Use AV_FRAME_FLAG_INTERLACED instead
-     */
-    attribute_deprecated
-    int interlaced_frame;
-
-    /**
-     * If the content is interlaced, is top field displayed first.
-     *
-     * @deprecated Use AV_FRAME_FLAG_TOP_FIELD_FIRST instead
-     */
-    attribute_deprecated
-    int top_field_first;
-#endif
-
-#if FF_API_PALETTE_HAS_CHANGED
-    /**
-     * Tell user application that palette has changed from previous frame.
-     */
-    attribute_deprecated
-    int palette_has_changed;
-#endif
 
     /**
      * Sample rate of the audio data.
@@ -716,18 +680,6 @@ typedef struct AVFrame {
      */
     int64_t best_effort_timestamp;
 
-#if FF_API_FRAME_PKT
-    /**
-     * reordered pos from the last AVPacket that has been input into the decoder
-     * - encoding: unused
-     * - decoding: Read by user.
-     * @deprecated use AV_CODEC_FLAG_COPY_OPAQUE to pass through arbitrary user
-     *             data from packets to frames
-     */
-    attribute_deprecated
-    int64_t pkt_pos;
-#endif
-
     /**
      * metadata.
      * - encoding: Set by user.
@@ -747,20 +699,6 @@ typedef struct AVFrame {
 #define FF_DECODE_ERROR_MISSING_REFERENCE   2
 #define FF_DECODE_ERROR_CONCEALMENT_ACTIVE  4
 #define FF_DECODE_ERROR_DECODE_SLICES       8
-
-#if FF_API_FRAME_PKT
-    /**
-     * size of the corresponding packet containing the compressed
-     * frame.
-     * It is set to a negative value if unknown.
-     * - encoding: unused
-     * - decoding: set by libavcodec, read by user.
-     * @deprecated use AV_CODEC_FLAG_COPY_OPAQUE to pass through arbitrary user
-     *             data from packets to frames
-     */
-    attribute_deprecated
-    int pkt_size;
-#endif
 
     /**
      * For hwaccel-format frames, this should be a reference to the
@@ -801,17 +739,13 @@ typedef struct AVFrame {
      */
 
     /**
-     * AVBufferRef for internal use by a single libav* library.
+     * RefStruct reference for internal use by a single libav* library.
      * Must not be used to transfer data between libraries.
      * Has to be NULL when ownership of the frame leaves the respective library.
      *
-     * Code outside the FFmpeg libs should never check or change the contents of the buffer ref.
-     *
-     * FFmpeg calls av_buffer_unref() on it when the frame is unreferenced.
-     * av_frame_copy_props() calls create a new reference with av_buffer_ref()
-     * for the target frame's private_ref field.
+     * Code outside the FFmpeg libs must never check or change private_ref.
      */
-    AVBufferRef *private_ref;
+    void *private_ref;
 
     /**
      * Channel layout of the audio data.

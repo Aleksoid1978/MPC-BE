@@ -227,7 +227,7 @@ static void vc1_put_blocks_clamped(VC1Context *v, int put_signed)
  * @param _dmv_y Vertical differential for decoded MV
  */
 #define GET_MVDATA(_dmv_x, _dmv_y)                                      \
-    index = 1 + get_vlc2(gb, ff_vc1_mv_diff_vlc[s->mv_table_index],     \
+    index = 1 + get_vlc2(gb, ff_vc1_mv_diff_vlc[v->mv_table_index],     \
                          VC1_MV_DIFF_VLC_BITS, 2);                      \
     if (index > 36) {                                                   \
         mb_has_coeffs = 1;                                              \
@@ -549,19 +549,19 @@ static int vc1_decode_ac_coeff(VC1Context *v, int *last, int *skip,
             sign = get_bits1(gb);
         } else {
             lst = get_bits1(gb);
-            if (v->s.esc3_level_length == 0) {
+            if (v->esc3_level_length == 0) {
                 if (v->pq < 8 || v->dquantfrm) { // table 59
-                    v->s.esc3_level_length = get_bits(gb, 3);
-                    if (!v->s.esc3_level_length)
-                        v->s.esc3_level_length = get_bits(gb, 2) + 8;
+                    v->esc3_level_length = get_bits(gb, 3);
+                    if (!v->esc3_level_length)
+                        v->esc3_level_length = get_bits(gb, 2) + 8;
                 } else { // table 60
-                    v->s.esc3_level_length = get_unary(gb, 1, 6) + 2;
+                    v->esc3_level_length = get_unary(gb, 1, 6) + 2;
                 }
-                v->s.esc3_run_length = 3 + get_bits(gb, 2);
+                v->esc3_run_length = 3 + get_bits(gb, 2);
             }
-            run   = get_bits(gb, v->s.esc3_run_length);
+            run   = get_bits(gb, v->esc3_run_length);
             sign  = get_bits1(gb);
-            level = get_bits(gb, v->s.esc3_level_length);
+            level = get_bits(gb, v->esc3_level_length);
         }
     }
 
@@ -585,13 +585,12 @@ static int vc1_decode_i_block(VC1Context *v, int16_t block[64], int n,
     GetBitContext *gb = &v->s.gb;
     MpegEncContext *s = &v->s;
     int dc_pred_dir = 0; /* Direction of the DC prediction used */
-    int i;
     int16_t *dc_val;
     int16_t *ac_val, *ac_val2;
     int dcdiff, scale;
 
     /* Get DC differential */
-    dcdiff = get_vlc2(&s->gb, ff_msmp4_dc_vlc[s->dc_table_index][n >= 4],
+    dcdiff = get_vlc2(&s->gb, ff_msmp4_dc_vlc[v->dc_table_index][n >= 4],
                       MSMP4_DC_VLC_BITS, 3);
     if (dcdiff) {
         const int m = (v->pq == 1 || v->pq == 2) ? 3 - v->pq : 0;
@@ -622,7 +621,6 @@ static int vc1_decode_i_block(VC1Context *v, int16_t block[64], int n,
     scale = v->pq * 2 + v->halfpq;
 
     //AC Decoding
-    i = !!coded;
 
     if (coded) {
         int last = 0, skip, value;
@@ -637,14 +635,14 @@ static int vc1_decode_i_block(VC1Context *v, int16_t block[64], int n,
         } else
             zz_table = v->zz_8x8[1];
 
-        while (!last) {
+        for (int i = 1; !last; ++i) {
             int ret = vc1_decode_ac_coeff(v, &last, &skip, &value, codingset);
             if (ret < 0)
                 return ret;
             i += skip;
             if (i > 63)
                 break;
-            block[zz_table[i++]] = value;
+            block[zz_table[i]] = value;
         }
 
         /* apply AC prediction if needed */
@@ -696,8 +694,6 @@ static int vc1_decode_i_block(VC1Context *v, int16_t block[64], int n,
             }
         }
     }
-    if (s->ac_pred) i = 63;
-    s->block_last_index[n] = i;
 
     return 0;
 }
@@ -716,7 +712,6 @@ static int vc1_decode_i_block_adv(VC1Context *v, int16_t block[64], int n,
     GetBitContext *gb = &v->s.gb;
     MpegEncContext *s = &v->s;
     int dc_pred_dir = 0; /* Direction of the DC prediction used */
-    int i;
     int16_t *dc_val = NULL;
     int16_t *ac_val, *ac_val2;
     int dcdiff;
@@ -728,7 +723,7 @@ static int vc1_decode_i_block_adv(VC1Context *v, int16_t block[64], int n,
     int quant = FFABS(mquant);
 
     /* Get DC differential */
-    dcdiff = get_vlc2(&s->gb, ff_msmp4_dc_vlc[s->dc_table_index][n >= 4],
+    dcdiff = get_vlc2(&s->gb, ff_msmp4_dc_vlc[v->dc_table_index][n >= 4],
                       MSMP4_DC_VLC_BITS, 3);
     if (dcdiff) {
         const int m = (quant == 1 || quant == 2) ? 3 - quant : 0;
@@ -778,7 +773,6 @@ static int vc1_decode_i_block_adv(VC1Context *v, int16_t block[64], int n,
     }
 
     //AC Decoding
-    i = 1;
 
     if (coded) {
         int last = 0, skip, value;
@@ -801,14 +795,14 @@ static int vc1_decode_i_block_adv(VC1Context *v, int16_t block[64], int n,
                 zz_table = v->zzi_8x8;
         }
 
-        while (!last) {
+        for (int i = 1; !last; ++i) {
             int ret = vc1_decode_ac_coeff(v, &last, &skip, &value, codingset);
             if (ret < 0)
                 return ret;
             i += skip;
             if (i > 63)
                 break;
-            block[zz_table[i++]] = value;
+            block[zz_table[i]] = value;
         }
 
         /* apply AC prediction if needed */
@@ -880,8 +874,6 @@ static int vc1_decode_i_block_adv(VC1Context *v, int16_t block[64], int n,
             }
         }
     }
-    if (use_pred) i = 63;
-    s->block_last_index[n] = i;
 
     return 0;
 }
@@ -900,7 +892,6 @@ static int vc1_decode_intra_block(VC1Context *v, int16_t block[64], int n,
     GetBitContext *gb = &v->s.gb;
     MpegEncContext *s = &v->s;
     int dc_pred_dir = 0; /* Direction of the DC prediction used */
-    int i;
     int16_t *dc_val = NULL;
     int16_t *ac_val, *ac_val2;
     int dcdiff;
@@ -920,7 +911,7 @@ static int vc1_decode_intra_block(VC1Context *v, int16_t block[64], int n,
     s->y_dc_scale = ff_wmv3_dc_scale_table[quant];
 
     /* Get DC differential */
-    dcdiff = get_vlc2(&s->gb, ff_msmp4_dc_vlc[s->dc_table_index][n >= 4],
+    dcdiff = get_vlc2(&s->gb, ff_msmp4_dc_vlc[v->dc_table_index][n >= 4],
                       MSMP4_DC_VLC_BITS, 3);
     if (dcdiff) {
         const int m = (quant == 1 || quant == 2) ? 3 - quant : 0;
@@ -942,7 +933,6 @@ static int vc1_decode_intra_block(VC1Context *v, int16_t block[64], int n,
     block[0] = dcdiff * s->y_dc_scale;
 
     //AC Decoding
-    i = 1;
 
     /* check if AC is needed at all and adjust direction if needed */
     if (!a_avail) dc_pred_dir = 1;
@@ -973,7 +963,7 @@ static int vc1_decode_intra_block(VC1Context *v, int16_t block[64], int n,
         int last = 0, skip, value;
         int k;
 
-        while (!last) {
+        for (int i = 1; !last; ++i) {
             int ret = vc1_decode_ac_coeff(v, &last, &skip, &value, codingset);
             if (ret < 0)
                 return ret;
@@ -981,15 +971,15 @@ static int vc1_decode_intra_block(VC1Context *v, int16_t block[64], int n,
             if (i > 63)
                 break;
             if (v->fcm == PROGRESSIVE)
-                block[v->zz_8x8[0][i++]] = value;
+                block[v->zz_8x8[0][i]] = value;
             else {
                 if (use_pred && (v->fcm == ILACE_FRAME)) {
                     if (!dc_pred_dir) // top
-                        block[v->zz_8x8[2][i++]] = value;
+                        block[v->zz_8x8[2][i]] = value;
                     else // left
-                        block[v->zz_8x8[3][i++]] = value;
+                        block[v->zz_8x8[3][i]] = value;
                 } else {
-                    block[v->zzi_8x8[i++]] = value;
+                    block[v->zzi_8x8[i]] = value;
                 }
             }
         }
@@ -1033,8 +1023,6 @@ static int vc1_decode_intra_block(VC1Context *v, int16_t block[64], int n,
                 if (!v->pquantizer)
                     block[k] += (block[k] < 0) ? -quant : quant;
             }
-
-        if (use_pred) i = 63;
     } else { // no AC coeffs
         int k;
 
@@ -1082,10 +1070,8 @@ static int vc1_decode_intra_block(VC1Context *v, int16_t block[64], int n,
                         block[k << v->top_blk_sh] += (block[k << v->top_blk_sh] < 0) ? -quant : quant;
                 }
             }
-            i = 63;
         }
     }
-    s->block_last_index[n] = i;
 
     return 0;
 }
@@ -2960,7 +2946,7 @@ static void vc1_decode_skip_blocks(VC1Context *v)
 void ff_vc1_decode_blocks(VC1Context *v)
 {
 
-    v->s.esc3_level_length = 0;
+    v->esc3_level_length = 0;
     if (v->x8_type) {
         ff_intrax8_decode_picture(&v->x8, v->s.cur_pic.ptr,
                                   &v->s.gb, &v->s.mb_x, &v->s.mb_y,

@@ -38,7 +38,7 @@ Updated Italian translation (by mapi68).
 Updated Dutch and Chinese (Traditional) translation (by beter).
 
 Updated libraries:
-	ffmpeg n7.2-dev-1613-g2da40904f3;
+	ffmpeg n7.2-dev-1910-g5fac8d062d;
 	libflac 1.5.0;
 	Little-CMS git-lcms2.17-10-ge19dc49;
 	MediaInfo git-v24.12-99-g9c4d87833;

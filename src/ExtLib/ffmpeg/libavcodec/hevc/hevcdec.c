@@ -2149,7 +2149,7 @@ static void hls_prediction_unit(HEVCLocalContext *lc,
     const RefPicList *refPicList = s->cur_frame->refPicList;
     const HEVCFrame *ref0 = NULL, *ref1 = NULL;
     const int *linesize = s->cur_frame->f->linesize;
-    uint8_t *dst0 = POS(0, x0, y0);
+    uint8_t *dst0 = s->cur_frame->f->data[0] + y0 * linesize[0] + (x0 << sps->pixel_shift);
     uint8_t *dst1 = POS(1, x0, y0);
     uint8_t *dst2 = POS(2, x0, y0);
     int log2_min_cb_size = sps->log2_min_cb_size;
@@ -3433,7 +3433,10 @@ static int hevc_frame_start(HEVCContext *s, HEVCLayerContext *l,
         goto fail;
 
     if (s->avctx->hwaccel) {
-        ret = FF_HW_CALL(s->avctx, start_frame, NULL, 0);
+        AVCodecInternal *avci = s->avctx->internal;
+        AVPacket *avpkt = avci->in_pkt;
+        ret = FF_HW_CALL(s->avctx, start_frame,
+                         avpkt->buf, NULL, 0);
         if (ret < 0)
             goto fail;
     }

@@ -1,4 +1,7 @@
 /*
+ * Copyright 2005 Balatoni Denes
+ * Copyright 2006 Loren Merritt
+ *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -16,22 +19,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVUTIL_DICT_INTERNAL_H
-#define AVUTIL_DICT_INTERNAL_H
+#include "float_dsp.h"
 
-#include <stdint.h>
+float ff_scalarproduct_float_c(const float *v1, const float *v2, int len)
+{
+    float p = 0.0;
 
-#include "dict.h"
+    for (int i = 0; i < len; i++)
+        p += v1[i] * v2[i];
 
-/**
- * Set a dictionary value to an ISO-8601 compliant timestamp string.
- *
- * @param dict pointer to a pointer to a dictionary struct. If *dict is NULL
- *             a dictionary struct is allocated and put in *dict.
- * @param key metadata key
- * @param timestamp unix timestamp in microseconds
- * @return <0 on error
- */
-int avpriv_dict_set_timestamp(AVDictionary **dict, const char *key, int64_t timestamp);
-
-#endif /* AVUTIL_DICT_INTERNAL_H */
+    return p;
+}

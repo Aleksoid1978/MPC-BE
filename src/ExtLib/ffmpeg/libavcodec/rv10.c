@@ -150,7 +150,6 @@ static int rv10_decode_picture_header(MpegEncContext *s)
         mb_count = s->mb_width * s->mb_height;
     }
     skip_bits(&s->gb, 3);   /* ignored */
-    s->f_code          = 1;
 
     return mb_count;
 }
@@ -207,8 +206,8 @@ static int rv20_decode_picture_header(RVDecContext *rv, int whole_size)
                 return AVERROR_INVALIDDATA;
             }
 
-            new_w = 4 * ((uint8_t *) s->avctx->extradata)[6 + 2 * f];
-            new_h = 4 * ((uint8_t *) s->avctx->extradata)[7 + 2 * f];
+            new_w = 4 * s->avctx->extradata[6 + 2 * f];
+            new_h = 4 * s->avctx->extradata[7 + 2 * f];
         } else {
             new_w = rv->orig_width;
             new_h = rv->orig_height;
@@ -284,7 +283,6 @@ static int rv20_decode_picture_header(RVDecContext *rv, int whole_size)
         // binary decoder reads 3+2 bits here but they don't seem to be used
         skip_bits(&s->gb, 5);
 
-    s->f_code          = 1;
     s->h263_aic        = s->pict_type == AV_PICTURE_TYPE_I;
     s->modified_quant  = 1;
     if (!s->avctx->lowres)
@@ -370,8 +368,8 @@ static av_cold int rv10_decode_init(AVCodecContext *avctx)
     rv->orig_width  = avctx->coded_width;
     rv->orig_height = avctx->coded_height;
 
-    s->h263_long_vectors = ((uint8_t *) avctx->extradata)[3] & 1;
-    rv->sub_id           = AV_RB32((uint8_t *) avctx->extradata + 4);
+    s->h263_long_vectors = avctx->extradata[3] & 1;
+    rv->sub_id           = AV_RB32A(avctx->extradata + 4);
 
     major_ver = RV_GET_MAJOR_VER(rv->sub_id);
     minor_ver = RV_GET_MINOR_VER(rv->sub_id);
@@ -396,7 +394,7 @@ static av_cold int rv10_decode_init(AVCodecContext *avctx)
 
     if (avctx->debug & FF_DEBUG_PICT_INFO) {
         av_log(avctx, AV_LOG_DEBUG, "ver:%X ver0:%"PRIX32"\n", rv->sub_id,
-               ((uint32_t *) avctx->extradata)[0]);
+               AV_RL32A(avctx->extradata));
     }
 
     /* init static VLCs */

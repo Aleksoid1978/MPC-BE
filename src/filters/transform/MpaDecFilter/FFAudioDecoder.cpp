@@ -791,17 +791,17 @@ const char* CFFAudioDecoder::GetCodecName()
 {
 	if (m_pAVCtx->codec_id == AV_CODEC_ID_DTS) {
 		switch (m_pAVCtx->profile) {
-			case FF_PROFILE_DTS_ES           : return "dts-es";
-			case FF_PROFILE_DTS_96_24        : return "dts 96/24";
-			case FF_PROFILE_DTS_HD_HRA       : return "dts-hd hra";
-			case FF_PROFILE_DTS_HD_MA        : return "dts-hd ma";
-			case FF_PROFILE_DTS_HD_MA_X      : return "dts-hd ma + dts:x";
-			case FF_PROFILE_DTS_HD_MA_X_IMAX : return "dts-hd ma + dts:x imax";
-			case FF_PROFILE_DTS_EXPRESS      : return "dts express";
+			case AV_PROFILE_DTS_ES           : return "dts-es";
+			case AV_PROFILE_DTS_96_24        : return "dts 96/24";
+			case AV_PROFILE_DTS_HD_HRA       : return "dts-hd hra";
+			case AV_PROFILE_DTS_HD_MA        : return "dts-hd ma";
+			case AV_PROFILE_DTS_HD_MA_X      : return "dts-hd ma + dts:x";
+			case AV_PROFILE_DTS_HD_MA_X_IMAX : return "dts-hd ma + dts:x imax";
+			case AV_PROFILE_DTS_EXPRESS      : return "dts express";
 		}
-	} else if (m_pAVCtx->codec_id == AV_CODEC_ID_EAC3 && m_pAVCtx->profile == FF_PROFILE_EAC3_DDP_ATMOS) {
+	} else if (m_pAVCtx->codec_id == AV_CODEC_ID_EAC3 && m_pAVCtx->profile == AV_PROFILE_EAC3_DDP_ATMOS) {
 		return "eac3 + atmos";
-	} else if (m_pAVCtx->codec_id == AV_CODEC_ID_TRUEHD && m_pAVCtx->profile == FF_PROFILE_TRUEHD_ATMOS) {
+	} else if (m_pAVCtx->codec_id == AV_CODEC_ID_TRUEHD && m_pAVCtx->profile == AV_PROFILE_TRUEHD_ATMOS) {
 		return "truehd + atmos";
 	}
 

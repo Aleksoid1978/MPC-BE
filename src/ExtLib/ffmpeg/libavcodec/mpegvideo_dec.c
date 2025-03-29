@@ -32,6 +32,7 @@
 
 #include "avcodec.h"
 #include "decode.h"
+#include "h263.h"
 #include "h264chroma.h"
 #include "internal.h"
 #include "mpegutils.h"
@@ -43,7 +44,7 @@
 #include "threadprogress.h"
 #include "wmv2dec.h"
 
-int ff_mpv_decode_init(MpegEncContext *s, AVCodecContext *avctx)
+av_cold int ff_mpv_decode_init(MpegEncContext *s, AVCodecContext *avctx)
 {
     enum ThreadingStatus thread_status;
 
@@ -136,12 +137,12 @@ int ff_mpeg_update_thread_context(AVCodecContext *dst,
 
     // MPEG-2/interlacing info
     memcpy(&s->progressive_sequence, &s1->progressive_sequence,
-           (char *) &s1->rtp_mode - (char *) &s1->progressive_sequence);
+           (char *) &s1->first_field + sizeof(s1->first_field) - (char *) &s1->progressive_sequence);
 
     return 0;
 }
 
-int ff_mpv_decode_close(AVCodecContext *avctx)
+av_cold int ff_mpv_decode_close(AVCodecContext *avctx)
 {
     MpegEncContext *s = avctx->priv_data;
 
@@ -150,7 +151,7 @@ int ff_mpv_decode_close(AVCodecContext *avctx)
     return 0;
 }
 
-int ff_mpv_common_frame_size_change(MpegEncContext *s)
+av_cold int ff_mpv_common_frame_size_change(MpegEncContext *s)
 {
     int err = 0;
 
@@ -427,7 +428,7 @@ void ff_mpeg_draw_horiz_band(MpegEncContext *s, int y, int h)
                        s->first_field, s->low_delay);
 }
 
-void ff_mpeg_flush(AVCodecContext *avctx)
+av_cold void ff_mpeg_flush(AVCodecContext *avctx)
 {
     MpegEncContext *const s = avctx->priv_data;
 

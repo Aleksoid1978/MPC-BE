@@ -1947,13 +1947,13 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 }
 
 #define H264_CHECK_PROFILE(profile) \
-	(((profile) & ~FF_PROFILE_H264_CONSTRAINED) <= FF_PROFILE_H264_HIGH)
+	(((profile) & ~AV_PROFILE_H264_CONSTRAINED) <= AV_PROFILE_H264_HIGH)
 #define HEVC_CHECK_PROFILE(profile) \
-	((profile) <= FF_PROFILE_HEVC_MAIN_10)
+	((profile) <= AV_PROFILE_HEVC_MAIN_10)
 #define VP9_CHECK_PROFILE(profile) \
-	((profile) == FF_PROFILE_VP9_0 || (profile) == FF_PROFILE_VP9_2)
+	((profile) == AV_PROFILE_VP9_0 || (profile) == AV_PROFILE_VP9_2)
 #define AV1_CHECK_PROFILE(profile) \
-	((profile) == FF_PROFILE_AV1_MAIN)
+	((profile) == AV_PROFILE_AV1_MAIN)
 
 bool CMPCVideoDecFilter::CheckDXVACompatible(const enum AVCodecID codec, const enum AVPixelFormat pix_fmt, const int profile)
 {
@@ -1967,19 +1967,19 @@ bool CMPCVideoDecFilter::CheckDXVACompatible(const enum AVCodecID codec, const e
 			if (pix_fmt != AV_PIX_FMT_YUV420P && pix_fmt != AV_PIX_FMT_YUVJ420P) {
 				return false;
 			}
-			if (profile != FF_PROFILE_UNKNOWN && !H264_CHECK_PROFILE(profile)) {
+			if (profile != AV_PROFILE_UNKNOWN && !H264_CHECK_PROFILE(profile)) {
 				return false;
 			}
 			break;
 		case AV_CODEC_ID_HEVC:
-			if (profile == FF_PROFILE_HEVC_REXT && (m_hwType == HwType::D3D11 || m_hwType == HwType::NVDEC || m_hwType == HwType::D3D11CopyBack)) {
+			if (profile == AV_PROFILE_HEVC_REXT && (m_hwType == HwType::D3D11 || m_hwType == HwType::NVDEC || m_hwType == HwType::D3D11CopyBack)) {
 				return true;
 			}
 
 			if (pix_fmt != AV_PIX_FMT_YUV420P && pix_fmt != AV_PIX_FMT_YUVJ420P && pix_fmt != AV_PIX_FMT_YUV420P10) {
 				return false;
 			}
-			if (profile != FF_PROFILE_UNKNOWN && !HEVC_CHECK_PROFILE(profile)) {
+			if (profile != AV_PROFILE_UNKNOWN && !HEVC_CHECK_PROFILE(profile)) {
 				return false;
 			}
 			break;
@@ -1987,7 +1987,7 @@ bool CMPCVideoDecFilter::CheckDXVACompatible(const enum AVCodecID codec, const e
 			if (pix_fmt != AV_PIX_FMT_YUV420P && pix_fmt != AV_PIX_FMT_YUVJ420P && pix_fmt != AV_PIX_FMT_YUV420P10) {
 				return false;
 			}
-			if (profile != FF_PROFILE_UNKNOWN && !VP9_CHECK_PROFILE(profile)) {
+			if (profile != AV_PROFILE_UNKNOWN && !VP9_CHECK_PROFILE(profile)) {
 				return false;
 			}
 			break;
@@ -1995,13 +1995,13 @@ bool CMPCVideoDecFilter::CheckDXVACompatible(const enum AVCodecID codec, const e
 			if (pix_fmt != AV_PIX_FMT_YUV420P && pix_fmt != AV_PIX_FMT_YUVJ420P && pix_fmt != AV_PIX_FMT_YUV420P10) {
 				return false;
 			}
-			if (profile != FF_PROFILE_UNKNOWN && !AV1_CHECK_PROFILE(profile)) {
+			if (profile != AV_PROFILE_UNKNOWN && !AV1_CHECK_PROFILE(profile)) {
 				return false;
 			}
 			break;
 		case AV_CODEC_ID_WMV3:
 		case AV_CODEC_ID_VC1:
-			if (profile == FF_PROFILE_VC1_COMPLEX) {
+			if (profile == AV_PROFILE_VC1_COMPLEX) {
 				return false;
 			}
 	}
@@ -2332,9 +2332,9 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
 			vc_params_t params;
 			if (HEVCParser::ParseHEVCDecoderConfigurationRecord(m_pAVCtx->extradata, m_pAVCtx->extradata_size, params, false)) {
 				m_pAVCtx->profile = params.profile;
-				if (m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10) {
+				if (m_pAVCtx->profile == AV_PROFILE_HEVC_MAIN_10) {
 					m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P10LE;
-				} else if (m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN) {
+				} else if (m_pAVCtx->profile == AV_PROFILE_HEVC_MAIN) {
 					m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
 				}
 			}
@@ -2453,9 +2453,9 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
 		m_nSurfaceHeight = FFALIGN(m_pAVCtx->coded_height, m_nAlign);
 
 		const int depth = GetLumaBits(m_pAVCtx->pix_fmt);
-		m_bHighBitdepth = (depth == 10) && ((m_CodecId == AV_CODEC_ID_HEVC && (m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10 || m_pAVCtx->profile == FF_PROFILE_HEVC_REXT))
-											|| (m_CodecId == AV_CODEC_ID_VP9 && m_pAVCtx->profile == FF_PROFILE_VP9_2)
-											|| (m_CodecId == AV_CODEC_ID_AV1 && m_pAVCtx->profile == FF_PROFILE_AV1_MAIN));
+		m_bHighBitdepth = (depth == 10) && ((m_CodecId == AV_CODEC_ID_HEVC && (m_pAVCtx->profile == AV_PROFILE_HEVC_MAIN_10 || m_pAVCtx->profile == AV_PROFILE_HEVC_REXT))
+											|| (m_CodecId == AV_CODEC_ID_VP9 && m_pAVCtx->profile == AV_PROFILE_VP9_2)
+											|| (m_CodecId == AV_CODEC_ID_AV1 && m_pAVCtx->profile == AV_PROFILE_AV1_MAIN));
 
 		m_dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
 		m_dxva_pix_fmt = m_pAVCtx->pix_fmt;
@@ -2651,7 +2651,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 
 	int nPos = 0;
 	if (IsDXVASupported(m_hwType == HwType::DXVA2 || m_hwType == HwType::D3D11)) {
-		if (m_hwType == HwType::D3D11 && m_CodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_REXT) {
+		if (m_hwType == HwType::D3D11 && m_CodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == AV_PROFILE_HEVC_REXT) {
 			switch (pix_fmt) {
 				case AV_PIX_FMT_YUV420P12: m_VideoOutputFormats.push_back(m_nPCIVendor == PCIV_nVidia ? DXVA_P010 : DXVA_P016); break;
 				case AV_PIX_FMT_YUV422P:   m_VideoOutputFormats.push_back(DXVA_YUY2); break;
@@ -2853,13 +2853,13 @@ void CMPCVideoDecFilter::AllocExtradata(const CMediaType* pmt)
 
 				m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
 				int bitdepth = AV_RB8(extra + 10) >> 4;
-				if (m_pAVCtx->profile == FF_PROFILE_VP9_2) {
+				if (m_pAVCtx->profile == AV_PROFILE_VP9_2) {
 					if (bitdepth == 10) {
 						m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P10;
 					} else if (bitdepth == 12) {
 						m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P12;
 					}
-				} else if (m_pAVCtx->profile == FF_PROFILE_VP9_3) {
+				} else if (m_pAVCtx->profile == AV_PROFILE_VP9_3) {
 					if (bitdepth == 10) {
 						m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10;
 					} else if (bitdepth == 12) {
@@ -2906,15 +2906,15 @@ void CMPCVideoDecFilter::AllocExtradata(const CMediaType* pmt)
 				Dav1dPixelLayout layout = DAV1D_PIXEL_LAYOUT_I420;
 
 				switch (seq_profile) {
-					case FF_PROFILE_AV1_MAIN:
+					case AV_PROFILE_AV1_MAIN:
 						bitdepth_index = high_bitdepth ? DAV1D_10BIT : DAV1D_8BIT;
 						layout = monochrome ? DAV1D_PIXEL_LAYOUT_I400 : DAV1D_PIXEL_LAYOUT_I420;
 						break;
-					case FF_PROFILE_AV1_HIGH:
+					case AV_PROFILE_AV1_HIGH:
 						bitdepth_index = high_bitdepth ? DAV1D_10BIT : DAV1D_8BIT;
 						layout = DAV1D_PIXEL_LAYOUT_I444;
 						break;
-					case FF_PROFILE_AV1_PROFESSIONAL:
+					case AV_PROFILE_AV1_PROFESSIONAL:
 						bitdepth_index = high_bitdepth ? (twelve_bit ? DAV1D_12BIT : DAV1D_10BIT) : DAV1D_8BIT;
 						if (monochrome) {
 							layout = DAV1D_PIXEL_LAYOUT_I400;
@@ -2961,7 +2961,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 		HRESULT hr = S_OK;
 		if (IsDXVASupported(m_hwType == HwType::DXVA2 || m_hwType == HwType::D3D11)) {
 			const auto& mt = m_pOutput->CurrentMediaType();
-			if (!(m_hwType == HwType::D3D11 && m_CodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_REXT)
+			if (!(m_hwType == HwType::D3D11 && m_CodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == AV_PROFILE_HEVC_REXT)
 					&& mt.subtype != MEDIASUBTYPE_NV12 && mt.subtype != MEDIASUBTYPE_P010) {
 				DLog(L"CMPCVideoDecFilter::CompleteConnect() - wrong output media type '%s' for H/W decoding, fallback to software decoding", GetGUIDString(mt.subtype));
 
@@ -4180,7 +4180,7 @@ BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID& decoderGUID)
 		for (const auto& mode : DXVAModes) {
 			if (mode.nCodecId == m_CodecId
 					&& mode.decoderGUID == decoderGUID) {
-				if (m_pAVCtx->codec_id == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_REXT) {
+				if (m_pAVCtx->codec_id == AV_CODEC_ID_HEVC && m_pAVCtx->profile == AV_PROFILE_HEVC_REXT) {
 					if (mode.pixFormat != AV_PIX_FMT_NONE) {
 						const auto pix_fmt = (m_pAVCtx->sw_pix_fmt != AV_PIX_FMT_NONE) ? m_pAVCtx->sw_pix_fmt : m_pAVCtx->pix_fmt;
 						if (mode.pixFormat == pix_fmt) {
@@ -5053,8 +5053,8 @@ HRESULT CMPCVideoDecFilter::CheckDXVA2Decoder(AVCodecContext *c)
 		if ((m_nSurfaceWidth != FFALIGN(c->coded_width, m_nAlign) || m_nSurfaceHeight != FFALIGN(c->coded_height, m_nAlign))
 				|| ((m_CodecId == AV_CODEC_ID_HEVC || m_CodecId == AV_CODEC_ID_VP9) && m_dxva_pix_fmt != m_pAVCtx->sw_pix_fmt)) {
 			const int depth = GetLumaBits(m_pAVCtx->sw_pix_fmt);
-			const bool bHighBitdepth = (depth == 10) && ((m_CodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10)
-														  || (m_CodecId == AV_CODEC_ID_VP9 && m_pAVCtx->profile == FF_PROFILE_VP9_2));
+			const bool bHighBitdepth = (depth == 10) && ((m_CodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == AV_PROFILE_HEVC_MAIN_10)
+														  || (m_CodecId == AV_CODEC_ID_VP9 && m_pAVCtx->profile == AV_PROFILE_VP9_2));
 
 			const bool bBitdepthChanged = (m_bHighBitdepth != bHighBitdepth);
 

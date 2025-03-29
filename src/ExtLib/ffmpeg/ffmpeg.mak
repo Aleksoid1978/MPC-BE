@@ -153,7 +153,6 @@ SRCS_LC = \
 	libavcodec/av1dec.c \
 	libavcodec/avcodec.c \
 	libavcodec/avdct.c \
-	libavcodec/avfft.c \
 	libavcodec/avs3_parser.c \
 	libavcodec/bgmc.c \
 	libavcodec/bink.c \
@@ -302,7 +301,6 @@ SRCS_LC = \
 	libavcodec/hq_hqadsp.c \
 	libavcodec/hqx.c \
 	libavcodec/hqxdsp.c \
-	libavcodec/hqxvlc.c \
 	libavcodec/huffman.c \
 	libavcodec/huffyuv.c \
 	libavcodec/huffyuvdec.c \
@@ -391,6 +389,7 @@ SRCS_LC = \
 	libavcodec/mpegvideo_dec.c \
 	libavcodec/mpegvideo_motion.c \
 	libavcodec/mpegvideo_parser.c \
+	libavcodec/mpegvideo_unquantize.c \
 	libavcodec/mpegvideodata.c \
 	libavcodec/mpegvideoencdsp.c \
 	libavcodec/mqc.c \
@@ -745,6 +744,7 @@ SRCS_LU = \
 	libavutil/film_grain_params.c \
 	libavutil/fixed_dsp.c \
 	libavutil/float_dsp.c \
+	libavutil/float_scalarproduct.c \
 	libavutil/float2half.c \
 	libavutil/frame.c \
 	libavutil/half2float.c \

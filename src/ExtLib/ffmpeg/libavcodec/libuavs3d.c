@@ -79,12 +79,6 @@ static void uavs3d_output_callback(uavs3d_io_frm_t *dec_frame) {
 
     frm->pts       = dec_frame->pts;
     frm->pkt_dts   = dec_frame->dts;
-#if FF_API_FRAME_PKT
-FF_DISABLE_DEPRECATION_WARNINGS
-    frm->pkt_pos   = dec_frame->pkt_pos;
-    frm->pkt_size  = dec_frame->pkt_size;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
 
     if (dec_frame->type < 0 || dec_frame->type >= FF_ARRAY_ELEMS(ff_avs3_image_type)) {
         av_log(NULL, AV_LOG_WARNING, "Error frame type in uavs3d: %d.\n", dec_frame->type);
@@ -123,7 +117,7 @@ static int libuavs3d_on_seq_header(AVCodecContext *avctx)
         avctx->framerate.den = ff_avs3_frame_rate_tab[seqh->frame_rate_code].den;
     }
     avctx->has_b_frames = seqh->output_reorder_delay;
-    avctx->pix_fmt = seqh->bit_depth_internal == 8 ? AV_PIX_FMT_YUV420P : AV_PIX_FMT_YUV420P10LE;
+    avctx->pix_fmt = seqh->bit_depth_internal == 8 ? AV_PIX_FMT_YUV420P : AV_PIX_FMT_YUV420P10;
     ret = ff_set_dimensions(avctx, seqh->horizontal_size, seqh->vertical_size);
     if (ret < 0)
         return ret;
@@ -263,12 +257,6 @@ static int libuavs3d_decode_frame(AVCodecContext *avctx, AVFrame *frm,
         uavs3d_io_frm_t *frm_dec = &h->dec_frame;
 
         buf_end = buf + buf_size;
-#if FF_API_FRAME_PKT
-FF_DISABLE_DEPRECATION_WARNINGS
-        frm_dec->pkt_pos  = avpkt->pos;
-        frm_dec->pkt_size = avpkt->size;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
 
         while (!finish) {
             int bs_len;
