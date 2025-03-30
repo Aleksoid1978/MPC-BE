@@ -95,14 +95,6 @@ CStringA UrlDecode(const CStringA& str_in)
 	return str_out;
 }
 
-bool Unescape(CStringW& str)
-{
-	if (SysVersion::IsWin8orLater()) {
-		return UnescapeWin8(str);
-	}
-	return UnescapeWin7(str);
-}
-
 bool UnescapeWin8(CStringW& str)
 {
 	const int len = str.GetLength();
@@ -123,6 +115,14 @@ bool UnescapeWin7(CStringW& str)
 	UrlUnescapeA(utf8.GetBuffer(), nullptr, nullptr, URL_UNESCAPE_INPLACE);
 	str = UTF8ToWStr(utf8);
 	return len != str.GetLength();
+}
+
+bool Unescape(CStringW& str)
+{
+	if (SysVersion::IsWin8orLater()) {
+		return UnescapeWin8(str);
+	}
+	return UnescapeWin7(str);
 }
 
 CStringW ExtractTag(CStringW tag, CMapStringToString& attribs, bool& fClosing)

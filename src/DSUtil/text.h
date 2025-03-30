@@ -140,8 +140,6 @@ extern CStringA UrlEncode(const CStringA& str_in, const bool bArg = false);
 extern CStringA UrlDecode(const CStringA& str_in);
 
 bool Unescape(CStringW& str);
-bool UnescapeWin8(CStringW& str);
-bool UnescapeWin7(CStringW& str);
 
 extern CStringW ExtractTag(CStringW tag, CMapStringToString& attribs, bool& fClosing);
 extern CStringA HtmlSpecialChars(CStringA str, bool bQuotes = false);
