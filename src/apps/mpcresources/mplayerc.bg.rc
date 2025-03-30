@@ -16,10 +16,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Russian resources
+// Bulgarian resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
-LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_BGR)
+LANGUAGE LANG_BULGARIAN, SUBLANG_NEUTRAL
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -1570,7 +1570,7 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
-IDB_MEDIAINFO_LANGUAGE  FILE                    "..\\..\\ExtLib\\MediaInfo\\Language\\ru.csv"
+IDB_MEDIAINFO_LANGUAGE  FILE                    "..\\..\\ExtLib\\MediaInfo\\Language\\bg.csv"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -3291,7 +3291,7 @@ BEGIN
     IDS_MPEGSPLITTER_LANG_ORDER "Процедура за избор на аудио:"
     IDS_MPEGSPLITTER_SUB_ORDER "Процедура за избор на субтитри:"
     IDS_MPEGSPLITTER_TRUEHD_OUTPUT "Изходни TrueHD + AC-3 потоци"
-    IDS_MPEGSPLITTER_SUB_EMPTY_PIN "Добавяне на "празен" изход за субтитри"
+    IDS_MPEGSPLITTER_SUB_EMPTY_PIN "Добавяне на ""празен"" изход за субтитри"
     IDS_MPEGSPLITTER_SUPPORT_MVC "Поддръжка на 3D MVC Extension"
 END
 
@@ -3695,7 +3695,7 @@ BEGIN
     IDS_GOTO_ERROR_PARSING_TEXT "Текстът е написан некоректно!"
     IDS_GOTO_ERROR_PARSING_FPS "Броят на кадрите в секунда (кадрова честота) не се записва правилно!"
     IDS_FRAME_STEP_ERROR_RENDERER  "Не може да се гледа кадър по кадър, опитайте с друг рендер за видео."
-    IDS_SCREENSHOT_ERROR_SHOCKWAVE  "Функциите "Запазване на изображение" и "Запазване на миниатюри" не работят с Shockwave файлове."
+    IDS_SCREENSHOT_ERROR_SHOCKWAVE  "Функциите ""Запазване на изображение"" и ""Запазване на миниатюри"" не работят с Shockwave файлове."
     IDS_SCREENSHOT_ERROR_OVERLAY  "Функции 'Сохранить изображение' и 'Сохранить миниатюры' не работают с рендерером Overlay Mixer.\nИзмените видеорендерер и вновь откройте файл."
     IDS_SUBDL_DLG_CONNECT_ERROR  "Не може да се свърже с базата данни със субтитри."
 END
@@ -3875,7 +3875,7 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "041904b0"
+        BLOCK "040204b0"
         BEGIN
             VALUE "Comments", "Bulgarian language resource for MPC-BE"
             VALUE "CompanyName", MPC_COMP_NAME_STR
@@ -3883,21 +3883,21 @@ BEGIN
             VALUE "FileVersion", MPC_VERSION_FULL_STR
             VALUE "InternalName", "MPC-BE"
             VALUE "LegalCopyright", MPC_COPYRIGHT_STR
-            VALUE "OriginalFilename", "mpcresources.ru.dll"
+            VALUE "OriginalFilename", "mpcresources.bg.dll"
             VALUE "ProductName", "MPC-BE"
             VALUE "ProductVersion", MPC_VERSION_STR
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x419, 1200
+        VALUE "Translation", 0x402, 1200
     END
 END
 /////////////////////////////////////////////////////////////////////////////
 
 
 
-#endif    // Russian resources
+#endif    // Bulgarian resources
 /////////////////////////////////////////////////////////////////////////////
 
 
