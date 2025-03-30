@@ -132,6 +132,7 @@ SignTool=OpenSourceSign
 Name: en; MessagesFile: compiler:Default.isl
 
 #ifdef localize
+Name: bg; MessagesFile: compiler:Languages\Bulgarian.isl
 Name: br; MessagesFile: compiler:Languages\BrazilianPortuguese.isl
 Name: by; MessagesFile: Languages\Belarusian.isl
 Name: ca; MessagesFile: compiler:Languages\Catalan.isl
@@ -164,6 +165,7 @@ Name: ua; MessagesFile: compiler:Languages\Ukrainian.isl
 ; Include installer's custom messages
 #include ".\CustomMessages\custom_messages.iss"
 #ifdef localize
+#include ".\CustomMessages\custom_messages.bg.iss"
 #include ".\CustomMessages\custom_messages.br.iss"
 #include ".\CustomMessages\custom_messages.by.iss"
 #include ".\CustomMessages\custom_messages.ca.iss"
