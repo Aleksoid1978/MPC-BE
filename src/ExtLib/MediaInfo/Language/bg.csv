@@ -1,0 +1,1408 @@
+  Language_ISO639;bg
+  Author_Email;ownfilmcollection@gmail.com
+  Author_Name;ERa
+  Author_OldNames;превод на Български
+  Language_Name;Български
+  Config_Text_ColumnSize;40
+  Config_Text_Separator;:
+  Config_Text_NumberTag;#
+  Config_Text_FloatSeparator;.
+  Config_Text_ThousandsSeparator;
+ audio stream1;аудио поток
+ audio stream2;аудио поток
+ audio stream3;аудио поток
+ bit1;бит1
+ bit2;бит2
+ bit3;бит3
+ bps;бпс
+ Bps;Бпс
+ Byte1;Байт1
+ Byte2;Байт2
+ Byte3;Байт3
+ channel1;канал1
+ channel2;канал2
+ channel3;канал3
+ chapter1;дял1
+ chapter2;дял2
+ chapter3;дял3
+ chapters stream1;дял поток1
+ chapters stream2;дял поток2
+ chapters stream3;дял поток3
+ character1;
+ character2;
+ character3;
+ day1;ден1
+ day2;ден2
+ day3;ден3
+ dB0;
+ dB1;дБ1
+ dB2;дБ2
+ dB3;дБ3
+ file1;файл1
+ file2;файл2
+ file3;файл3
+ fps1;Кадър/Секунда1
+ fps2;Кадър/Секунда2
+ fps3;Кадър/Секунда3
+ frame1;кадър1
+ frame2;кадър2
+ frame3;кадър3
+ GB;ГБ
+ Gb;Гб
+ Gbps;Гб/сек
+ GBps;ГБ/сек
+ GHz;ГХц
+ GiB;ГиБ
+ GibiByte1;ГибиБайт1
+ GibiByte2;ГибиБайт2
+ GibiByte3;ГибиБайт3
+ GiBps;ГиБайт/сек
+ GigaBit1;ГигаБит1
+ GigaBit2;ГигаБит2
+ GigaBit3;ГигаБит3
+ GigaByte1;ГигаБайт1
+ GigaByte2;ГигаБайт2
+ GigaByte3;ГигаБайт3
+ hour1;час1
+ hour2;час2
+ hour3;час3
+ Hz;Херц
+ image stream1;картинен поток1
+ image stream2;картинен поток2
+ image stream3;картинен поток3
+ KB;КБ
+ Kb;Кб
+ KBps;КБ/сек
+ Kbps;Кб/сек
+ KHz;КХц
+ KiB;КиБ
+ KibiBit1;КибиБит1
+ KibiBit2;КибиБит2
+ KibiBit3;КибиБит3
+ KibiByte1;КибиБайт1
+ KibiByte2;КибиБайт2
+ KibiByte3;КибиБайт3
+ KiBps;КиБайтСек
+ KiloBit1;КилоБит1
+ KiloBit2;КилоБит2
+ KiloBit3;КилоБит3
+ KiloByte1;КилоБайт1
+ KiloByte2;КилоБайт1
+ KiloByte3;КилоБайт1
+ MB;МБ
+ Mb;Мб
+ Mbps;Мб/сек
+ MBps;МБ/сек
+ MebiBit1;МебиБит1
+ MebiBit2;МебиБит2
+ MebiBit3;МебиБит3
+ MebiByte1;МебиБайт1
+ MebiByte2;МебиБайт2
+ MebiByte3;МебиБайт3
+ MegaBit1;МегаБит1
+ MegaBit2;МегаБит2
+ MegaBit3;МегаБит3
+ MegaByte1;МегаБайт1
+ MegaByte2;МегаБайт2
+ MegaByte3;МегаБайт3
+ MHz;МХц
+ MiB;МиБ
+ Mib;Миб
+ MiBps;МиБ/сек
+ millisecond1;милисекунда1
+ millisecond2;милисекунда2
+ millisecond3;милисекунда3
+ minute1;минута1
+ minute2;минута2
+ minute3;минута3
+ month1;месец1
+ month2;месец2
+ month3;месец3
+ object1;
+ object2;
+ object3;
+ pixel1;пиксел1
+ pixel2;пиксел2
+ pixel3;пиксел3
+ second1;секунда1
+ second2;секунда2
+ second3;секунда3
+ slice per frame1;
+ slice per frame2;
+ slice per frame3;
+ text stream1;текстови поток1
+ text stream2;текстови поток2
+ text stream3;текстови поток3
+ video frames1;видео кадър1
+ video frames2;видео кадър2
+ video frames3;видео кадър3
+ video stream1;видео поток1
+ video stream2;видео поток2
+ video stream3;видео поток3
+ warppoint0;точка на изхвърляне0
+ warppoint1;точка на изхвърляне1
+ warppoint2;точка на изхвърляне2
+ warppoint3;точка на изхвърляне3
+ week1;седмица1
+ week2;седмица2
+ week3;седмица3
+ year1;година1
+ year2;година2
+ year3;година3
+, ;,
+: ;:
+3D;
+3DType;
+5.1.2ch;
+5.1.4ch;
+5.1ch;
+608_Mode;
+7.1.2ch;
+7.1ch;
+About;За
+About_Hint;За_Подсказване
+Accompaniment;Съпровод
+Active_DisplayAspectRatio;
+Active_Height;
+Active_Width;
+ActiveFormatDescription;
+ActiveFormatDescription_MuxingMode;
+Actor;Актьор
+Actor_Character;Актьор_Характер
+Add creation date to text output;
+Add version to text output;
+Added_Date;Дата_Прибавен
+Address;Адрес
+AdID;
+ADM: Show ChannelFormats;
+ADM: Show TrackUIDs;
+AdmProfile;
+Advanced;Разширен
+Advanced mode;Разширен режим
+Advanced mode -->;
+Album;Албум
+Album_ReplayGain_Gain;Албум_УсилващоПовторение_Усилване
+Album_ReplayGain_Peak;Албум_УсилващоПовторение_Връх
+Alignment;Подравняване
+Alignment_Aligned;Подравняване_Подравнен
+Alignment_Split;Подравняване_Разделен
+All;Всичко
+AlternateGroup;
+Archival_Location;Архивна_Локация
+Arranger;Подреждане
+ArtDirector;ХудожественДиректор
+AspectRatio;Съотношение
+AssistantDirector;АсистентДиректор
+AssociatedVideo_FrameRate;
+at;от
+At least one file;Най-малко един файл
+Attachments;
+Audio;Аудио
+Audio stream(s);Аудио поток(ци)
+Audio_Codec_List;Аудио_Кодек_Списък
+Audio_Format_List;
+Audio_Format_WithHint_List;
+Audio_Language_List;
+Audio_No;Аудио_№
+Audio1;Аудио1
+Audio2;Аудио2
+Audio3;
+AudioComments;
+AudioCount;АудиоБрой
+AudioDescription;
+AudioDescriptionPresent;
+AudioDescriptionType;
+AudioLoudnessStandard;
+AudioRenderingIndication;
+AudioSceneInfoID;
+AudioTrackLayout;
+Author;Автор
+Back4ToBack2;
+Balance_FrontBackListener;
+Balance_FrontBackOverheadFloor;
+BarCode;Баркод
+Basic;Основен
+Basic_Note;Основен_Забележка
+BedChannelConfiguration;
+BedChannelCount;
+BinauralRenderMode;
+BitDepth;БитДълбочина
+BitDepth_Detected;
+BitDepth_Stored;
+BitRate;БитРейт
+BitRate_Encoded;
+BitRate_Maximum;Максимален_БитРейт
+BitRate_Minimum;Минимален_БитРейт
+BitRate_Mode;Режим_БитРейт
+BitRate_Mode_CBR;Режим_БитРейт_СБР
+BitRate_Mode_VBR;Режим_БитРейт_ВБР
+BitRate_Nominal;Нормален_БитРейт
+Bits-(Pixel*Frame);Битове-(Пиксел*Кадър)
+BufferSize;
+Cancel;Откажи
+CaptionServiceName;
+CatalogNumber;
+Channel(s);Канал(и)
+Channel(s)_Original;
+ChannelCoded;
+ChannelConfiguration;
+ChannelFormat;
+ChannelLayout;
+ChannelLayout_Original;
+ChannelMode;
+ChannelPositions;КаналПозиции
+ChannelPositions_Original;
+Chapter(s);Дял(ове)
+Chapters;Дялове
+Chapters stream(s);Дялове поток(ци)
+Chapters_Codec_List;Дялове_Кодек_Списък
+Chapters_No;Дялове_Но
+Chapters_Pos_Begin;
+Chapters_Pos_End;
+ChaptersCount;ДяловеБрой
+CharacterSet;
+CheckNewVersion;ПровериНоваВерсия
+Choose custom;Избери потребителски
+Choose custom sheet;Избери потребителски формуляр
+Choose custom text;Избери потребителски текст
+Choose export format;Избери формат за експортиране
+Choose file(s);Избери файл(ове)
+Choose filename;Избери име на файл
+Choose language;Избери език
+Choreographer;Хореограф
+Chroma;Хрома
+ChromaSubsampling;ХромаПодСамплинг
+Classifier;
+ClearList;
+Close;Затвори
+Close all before open;Затвори всичко преди да отвориш
+ClosedCaptionsLanguage;
+ClosedCaptionsPresent;
+ClosedCaptionsType;
+Codec;Кодек
+Codec_Description;Кодек_Описание
+Codec_Info;Кодек_Инфо
+Codec_Profile;Кодек_Профил
+Codec_Settings;Кодек_Настройки
+Codec_Settings_BVOP;Кодек_Настройки_БВОП
+Codec_Settings_CABAC;Кодек_Настройки_КАБАК
+Codec_Settings_Endianness;Кодек_Настройки_Безкрайност
+Codec_Settings_Firm;Кодек_Настройки_Фирм
+Codec_Settings_Floor;Кодек_Настройки_Под
+Codec_Settings_GMC;Кодек_Настройки_ГМС
+Codec_Settings_ITU;Кодек_Настройки_ИТУ
+Codec_Settings_Law;Кодек_Настройки_Закон
+Codec_Settings_Matrix;Кодек_Настройки_Матрица
+Codec_Settings_PacketBitStream;Кодек_Настройки_ПакетБитПоток
+Codec_Settings_QPel;Кодек_Настройки_КюПел
+Codec_Settings_Sign;Кодек_Настройки_Подпис
+Codec_Url;Кодек_ЮРЛ
+CodecConfigurationBox;
+CodecID;КодекИД
+CodecID_Description;КодекИД_Описание
+CoDirector;
+Collection;Колекция
+Colorimetry;ЦветоваГама
+ColorSpace;ЦветовоПронстранство
+ColorTheme;
+ColorTheme_Dark;
+ColorTheme_Light;
+ColorTheme_System;
+colour_primaries;цветови_основи
+colour_range;
+Comment;Коментар
+CommissionedBy;ПоръчанОт
+Compilation;
+ComplementaryObject;
+CompleteName;ЦялосноИме
+CompletionDate;
+ComplexityIndex;
+Composer;Композитор
+Compression_Mode;
+Compression_Mode_Lossless;
+Compression_Mode_Lossy;
+Compression_Ratio;КомпресияСъотношение
+Conductor;Диригент
+ConformanceCheck;
+ConformanceErrors;
+ConformanceInfos;
+ConformanceWarnings;
+ContactEmail;
+ContactTelephoneNumber;
+Container and general information;Контейнер и главна информация
+Content;
+ContentType;КонтейнерТип
+CoProducer;Ко-Продуцент
+Copyright;ЗапазенаМарка
+CopyrightYear;
+CostumeDesigner;Дизайнер
+Count;Брой
+Country;Държава
+Cover;Калъфка
+Cover_Datas;Калъфка_Дати
+Cover_Description;Калъфка_Описание
+Cover_Mime;Калъфка_Майм
+Cover_Type;Калъфка_Тип
+Cropped;Умалена
+Custom;Потребителски
+CustomDownmixTargets;
+Customize;Нагласи
+DarkMode;
+Date;Дата
+Debug;Дебъг
+Decimal point;Децимална точка
+Default;
+Default translation;
+Default_Setting;
+DefaultTargetDeviceConfig;
+Delay;Забавяне
+Delay_Source;
+Delay_Source_Container;
+Delay_Source_Stream;
+Delete;Премахни
+Description;Описание
+Details;
+dialnorm;
+DialogueCorrected;
+DialogueEnhancement;
+DialogueNormalization;
+Digitized_Date;Дата_Дигитализиране
+Dimensions;Размери
+Director;Режисьор
+DirectorOfPhotography;Фотограф
+Disabled;
+DisplayAspectRatio;СъотношениеОбраз
+DisplayAspectRatio_CleanAperture;
+DisplayAspectRatio_Original;Оригинално_СъотношениеОбраз
+DisplayCaptions;
+DisplayCaptions_Command;
+DisplayCaptions_Content;
+DisplayCaptions_Stream;
+DistributedBy;РазпространенОт
+Distributor;
+Dolby_Atmos_Metadata;
+DolbyAtmos;
+Donate;Дари
+DotsPerInch;ДотНаИнч
+Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+DrcSets_Count;
+DrcSets_Effects;
+Duration;Продължителност
+Duration_End;Продължителност_Край
+Duration_End_Command;
+Duration_Source;
+Duration_Start;Продължителност_Начало
+Duration_Start_Command;
+Duration_Start2End;
+DynamicObject;
+DynamicRangeControl;
+Eac3DrcProfile;
+Edit;Преработи
+EditedBy;ПреработенОт
+EditorialClassification;
+ElementaryStream;
+ElementCount;
+EMail;Имейл
+Enable FFmpeg plugin;
+Encoded_Application;Енкодирана_Апликация
+Encoded_Date;Дата_Енкодиране
+Encoded_Library;Библиотека_Енкодиране
+Encoded_Library_Name;
+Encoded_Library_Settings;Библиотека_Енкодиране_Настройки
+Encoded_Library_Version;
+Encoded_Original;Оригинално_Енкодиране
+EncodedBy;ЕнкодиранОт
+EPG_Positions;ЕПГ_Позиции
+EpisodeTitleNumber;
+Error_File;ФайлЗа_Грешки
+Error_File_Write;
+Events_MinDuration;
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
+ExecutiveProducer;ГлавенПродуцент
+Exit;Излез
+Exit_Hint;Излизане_Подсказване
+Export;Експортиране
+Export_Hint;Експортиране_Подсказване
+Extensions;Екстенции
+External_Media_NotMounted;
+Family;Семеен
+Fax;Факс
+File;Файл
+File size;Големина файл
+File_Append;ФайлДобавка
+File_Created_Date;ФайлДатаСъздаване
+File_Created_Date_Local;ФайлДатаСъздаванеЛокално
+File_Hint;Файл_Подсказване
+File_Modified_Date;ФайлДатаПромяна
+File_Modified_Date_Local;ФайлДатаПромянаЛокално
+FileExtension;ФайлЕкстенция
+FileName;ИмеФайл
+FileNameExtension;
+FileSize;Големинафайл
+Fill with a Dummy movie;
+Fill with a realistic movie;
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
+FirstFrameOfAction;
+FlatPanelTv;
+FlowID;
+Folder;Папка
+Folder (R);Папка (Ч)
+Folder (R)_Hint;Папка (Ч)_Подсказване
+Folder (Recursively);Папка (Рекурсивна)
+Folder_Hint;Папка_Подсказване
+FolderName;ПапкаИме
+Forced;
+Format;Формат
+Format_AdditionalFeatures;
+Format_Commercial;
+Format_Commercial_IfAny;
+Format_Compression;
+Format_Description;Формат_Описание
+Format_Info;Формат_Инфо
+Format_Level;
+Format_Profile;Формат_Профил
+Format_Settings;Формат_Настройки
+Format_Settings_BVOP;Формат_Настройки_БВОП
+Format_Settings_CABAC;Формат_Настройки_Кабак
+Format_Settings_Emphasis;Формат_Настройки_Подчертаност
+Format_Settings_Endianness;Формат_Настройки_Безкрайност
+Format_Settings_Firm;Формат_Настройки_Фирм
+Format_Settings_Floor;Формат_Настройки_Под
+Format_Settings_FrameMode;Формат_Настройки_КадриМетод
+Format_Settings_GMC;Формат_Настройки_ГМС
+Format_Settings_GOP;Формат_Настройки_ГОП
+Format_Settings_ITU;Формат_Настройки_ИТУ
+Format_Settings_Law;Формат_Настройки_Закон
+Format_Settings_Matrix;Формат_Настройки_Матрица
+Format_Settings_Matrix_Custom;Формат_Настройки_Матрица_Потребител
+Format_Settings_Matrix_Default;Формат_Настройки_Матрица_Стандарт
+Format_Settings_Mode;Формат_Настройки_Метод
+Format_Settings_ModeExtension;Формат_Настройки_МетодЕкстенция
+Format_Settings_PacketBitStream;Формат_Настройки_ПакетБитПоток
+Format_Settings_PictureStructure;
+Format_Settings_PS;Формат_Настройки_ПС
+Format_Settings_Pulldown;Формат_Настройки_СвалящоМеню
+Format_Settings_QPel;Формат_Настройки_КюПел
+Format_Settings_RefFrames;Формат_Настройки_РефКадри
+Format_Settings_SBR;Формат_Настройки_СБР
+Format_Settings_Sign;Формат_Настройки_Подпис
+Format_Settings_SliceCount;
+Format_Settings_Wrapping;
+Format_Tier;
+Format_Url;Формат_ЮРЛ
+Format_Version;Формат_Версия
+FormatDefinition;
+FpaManufacturer;
+FpaPass;
+FpaVersion;
+FrameCount;БройКадри
+FrameCount_Source;
+FrameRate;СкоростКадри
+FrameRate_Den;
+FrameRate_Maximum;СкоростКадри_Максимум
+FrameRate_Minimum;СкоростКадри_Минимум
+FrameRate_Mode;СкоростКадри_Метод
+FrameRate_Mode_CFR;СкоростКадри_СФР
+FrameRate_Mode_VFR;СкоростКадри_ВФР
+FrameRate_Nominal;СкоростКадри_Нормално
+FrameRate_Num;
+FrameRate_Original;СкоростКадри_Оригинално
+FrameRate_Real;
+FullParsing;
+General;Генерално
+GeneralCompliance;
+Genre;Жанр
+Genre_000;
+Genre_001; Жанр_001
+Genre_002; Жанр_002
+Genre_003; Жанр_003
+Genre_004; Жанр_004
+Genre_005; Жанр_005
+Genre_006; Жанр_006
+Genre_007; Жанр_007
+Genre_008; Жанр_008
+Genre_009; Жанр_009
+Genre_010; Жанр_010
+Genre_011; Жанр_011
+Genre_012; Жанр_012
+Genre_013; Жанр_013
+Genre_014; Жанр_014
+Genre_015; Жанр_015
+Genre_016; Жанр_016
+Genre_017; Жанр_017
+Genre_018; Жанр_018
+Genre_019; Жанр_019
+Genre_020; Жанр_020
+Genre_021; Жанр_021
+Genre_022; Жанр_022
+Genre_023; Жанр_023
+Genre_024; Жанр_024
+Genre_025; Жанр_025
+Genre_026; Жанр_026
+Genre_027; Жанр_027
+Genre_028; Жанр_028
+Genre_029; Жанр_029
+Genre_030; Жанр_030
+Genre_031; Жанр_031
+Genre_032; Жанр_032
+Genre_033; Жанр_033
+Genre_034; Жанр_034
+Genre_035; Жанр_035
+Genre_036; Жанр_036
+Genre_037; Жанр_037
+Genre_038; Жанр_038
+Genre_039; Жанр_039
+Genre_040; Жанр_040
+Genre_041; Жанр_041
+Genre_042; Жанр_042
+Genre_043; Жанр_043
+Genre_044; Жанр_044
+Genre_045; Жанр_045
+Genre_046; Жанр_046
+Genre_047; Жанр_047
+Genre_048; Жанр_048
+Genre_049; Жанр_049
+Genre_050; Жанр_050
+Genre_051; Жанр_051
+Genre_052; Жанр_052
+Genre_053; Жанр_053
+Genre_054; Жанр_054
+Genre_055; Жанр_055
+Genre_056; Жанр_056
+Genre_057; Жанр_057
+Genre_058; Жанр_058
+Genre_059; Жанр_059
+Genre_060; Жанр_060
+Genre_061; Жанр_061
+Genre_062; Жанр_062
+Genre_063; Жанр_063
+Genre_064; Жанр_064
+Genre_065; Жанр_065
+Genre_066; Жанр_066
+Genre_067; Жанр_067
+Genre_068; Жанр_068
+Genre_069; Жанр_069
+Genre_070; Жанр_070
+Genre_071; Жанр_071
+Genre_072; Жанр_072
+Genre_073; Жанр_073
+Genre_074; Жанр_074
+Genre_075; Жанр_075
+Genre_076; Жанр_076
+Genre_077; Жанр_077
+Genre_078; Жанр_078
+Genre_079; Жанр_079
+Genre_080; Жанр_080
+Genre_081; Жанр_081
+Genre_082; Жанр_082
+Genre_083; Жанр_083
+Genre_084; Жанр_084
+Genre_085; Жанр_085
+Genre_086; Жанр_086
+Genre_087; Жанр_087
+Genre_088; Жанр_088
+Genre_089; Жанр_089
+Genre_090; Жанр_090
+Genre_091; Жанр_091
+Genre_092; Жанр_092
+Genre_093; Жанр_093
+Genre_094; Жанр_094
+Genre_095; Жанр_095
+Genre_096; Жанр_096
+Genre_097; Жанр_097
+Genre_098; Жанр_098
+Genre_099; Жанр_099
+Genre_100; Жанр_100
+Genre_101; Жанр_101
+Genre_102; Жанр_102
+Genre_103; Жанр_103
+Genre_104; Жанр_104
+Genre_105; Жанр_105
+Genre_106; Жанр_106
+Genre_107; Жанр_107
+Genre_108; Жанр_108
+Genre_109; Жанр_109
+Genre_110; Жанр_110
+Genre_111; Жанр_111
+Genre_112; Жанр_112
+Genre_113; Жанр_113
+Genre_114; Жанр_114
+Genre_115; Жанр_115
+Genre_116; Жанр_116
+Genre_117; Жанр_117
+Genre_118; Жанр_118
+Genre_119; Жанр_119
+Genre_120; Жанр_120
+Genre_121; Жанр_121
+Genre_122; Жанр_122
+Genre_123; Жанр_123
+Genre_124; Жанр_124
+Genre_125; Жанр_125
+Genre_126; Жанр_126
+Genre_127; Жанр_127
+Genre_128; Жанр_128
+Genre_129; Жанр_129
+Genre_130; Жанр_130
+Genre_131; Жанр_131
+Genre_132; Жанр_132
+Genre_133; Жанр_133
+Genre_134; Жанр_134
+Genre_135; Жанр_135
+Genre_136; Жанр_136
+Genre_137; Жанр_137
+Genre_138; Жанр_138
+Genre_139; Жанр_139
+Genre_140; Жанр_140
+Genre_141; Жанр_141
+Genre_142; Жанр_142
+Genre_143; Жанр_143
+Genre_144; Жанр_144
+Genre_145; Жанр_145
+Genre_146; Жанр_146
+Genre_147; Жанр_147
+Genre_148;
+Genre_149;
+Genre_150;
+Genre_151;
+Genre_152;
+Genre_153;
+Genre_154;
+Genre_155;
+Genre_156;
+Genre_157;
+Genre_158;
+Genre_159;
+Genre_160;
+Genre_161;
+Genre_162;
+Genre_163;
+Genre_164;
+Genre_165;
+Genre_166;
+Genre_167;
+Genre_168;
+Genre_169;
+Genre_170;
+Genre_171;
+Genre_172;
+Genre_173;
+Genre_174;
+Genre_175;
+Genre_176;
+Genre_177;
+Genre_178;
+Genre_179;
+Genre_180;
+Genre_181;
+Genre_182;
+Genre_183;
+Genre_184;
+Genre_185;
+Genre_186;
+Genre_187;
+Genre_188;
+Genre_189;
+Genre_190;
+Genre_191;
+Go to WebSite;Към Уебсайта
+Gop_OpenClosed;
+Gop_OpenClosed_Closed;
+Gop_OpenClosed_FirstFrame;
+Gop_OpenClosed_Open;
+Graph;
+Group;
+Grouping;
+GroupPreset;
+h;х
+HDR_Format;
+Header file;Хедър файл
+Height;Височина
+Height_CleanAperture;
+Height_Original;Оригинална_Височина
+Help;Помощ
+Hint;Подсказване
+HomeTheaterAvr;
+How many audio streams?;Колко аудио потоци?
+How many chapters streams?;Колко глави потоци?
+How many text streams?;Колко текстови потоци?
+How many video streams?;Колко видео потоци?
+HTML;HTML
+ID;ИД
+IdentClockStart;
+IFrameInterval;
+Image;Изображение
+Image stream(s);Изображение Поток(ци)
+Image_Codec_List;Изображение_Кодек_Списък
+ImageCount;ИзображениеБрой
+ImmersiveStereo;
+Info;Инфо
+Instruments;Инструменти
+IntegratedLoudness;
+IntegratedLoudness_Level;
+IntegratedLoudness_Speech;
+InteractivityEnabled;
+Interlaced_BFF;Сплетен_ВФФ
+Interlaced_Interlaced;Сплетен_Сплетен
+Interlaced_PPF;Сплетен_ППФ
+Interlaced_Progressive;Сплетен_Прогресивен
+Interlaced_TFF;Сплетен_ТФФ
+Interlacement;Сплитане
+Interleave_Duration;Разнообразен_Продължителност
+Interleave_Preload;Разнообразен_Презареден
+Interleave_VideoFrames;Разнообразен_ВидеоКадри
+Interleaved;
+InternetMediaType;
+IRCA;ИРСА
+ISBN;ИСБН
+ISRC;ИСРК
+IsStreamable;
+Keywords;Тагове
+Known codecs;Познати кодеци
+Known formats;Познати Формати
+Known parameters;Познати Параметри
+Label;Етикет
+Language;Език
+Language_aa;Език_аа
+Language_ab;Език_аб
+Language_ae;Език_ае
+Language_af;Език_аф
+Language_ak;Език_ак
+Language_am;Език_ам
+Language_an;Език_ан
+Language_ar;Език_ан
+Language_as;Език_ас
+Language_av;Език_ав
+Language_ay;Език_ай
+Language_az;Език_аз
+Language_ba;Език_ба
+Language_be;Език_бе
+Language_bg;Език_бг
+Language_bh;Език_бх
+Language_bi;Език_би
+Language_bm;Език_бм
+Language_bn;Език_бн
+Language_bo;Език_бо
+Language_br;Език_бр
+Language_bs;Език_бс
+Language_ca;Език_ка
+Language_ce;Език_ке
+Language_ch;Език_чи
+Language_cmn;
+Language_co;Език_ко
+Language_cr;Език_кр
+Language_cs;Език_че
+Language_cu;Език_ку
+Language_cv;Език_кв
+Language_cy;Език_ки
+Language_da;Език_да
+Language_de;Език_де
+Language_dv;Език_дв
+Language_dz;Език_дз
+Language_ee;Език_ее
+Language_el;Език_ел
+Language_en;Език_ен
+Language_en-gb;Език_ен–гб
+Language_en-us;Език_ен-юс
+Language_eo;Език_ео
+Language_es;Език_ес
+Language_es-419;
+Language_et;Език_ет
+Language_eu;Език_еу
+Language_fa;Език_фа
+Language_ff;Език_фф
+Language_fi;Език_фи
+Language_fil;
+Language_fj;Език_фй
+Language_fo;Език_фо
+Language_fr;Език_фр
+Language_fy;Език_фе
+Language_ga;Език_га
+Language_gd;Език_гд
+Language_gl;Език_гл
+Language_gn;Език_гн
+Language_gu;Език_гу
+Language_gv;Език_гв
+Language_ha;Език_ха
+Language_he;Език_хе
+Language_hi;Език_хи
+Language_ho;Език_хо
+Language_hr;Език_хр
+Language_ht;Език_хт
+Language_hu;Език_ху
+Language_hy;Език_хй
+Language_hy-az;
+Language_hz;Език_хз
+Language_ia;Език_иа
+Language_id;Език_ид
+Language_ie;Език_ие
+Language_ig;Език_иг
+Language_ii;Език_ии
+Language_ik;Език_ик
+Language_Info;Език_Инфо
+Language_io;Език_ио
+Language_is;Език_ис
+Language_it;Език_ит
+Language_iu;Език_иу
+Language_ja;Език_яа
+Language_jv;Език_яв
+Language_ka;Език_ка
+Language_kg;Език_кг
+Language_ki;Език_ки
+Language_kj;Език_кя
+Language_kk;Език_кк
+Language_kl;Език_кл
+Language_km;Език_км
+Language_kn;Език_кн
+Language_ko;Език_ко
+Language_kr;Език_кр
+Language_ks;Език_кс
+Language_ku;Език_ку
+Language_kv;Език_кв
+Language_kw;Език_кю
+Language_ky;Език_кя
+Language_la;Език_ла
+Language_lb;Език_лб
+Language_lg;Език_лг
+Language_li;Език_ли
+Language_ln;Език_лн
+Language_lo;Език_ло
+Language_lt;Език_лт
+Language_lu;Език_лу
+Language_lv;Език_лв
+Language_mg;Език_мг
+Language_mh;Език_мх
+Language_mi;Език_ми
+Language_mk;Език_мк
+Language_ml;Език_мл
+Language_mn;Език_мн
+Language_mn-cn;
+Language_mo;Език_мо
+Language_More;Език_Повече
+Language_mr;Език_мр
+Language_ms;Език_мс
+Language_ms-bn;
+Language_mt;Език_мт
+Language_mul;Език_мул
+Language_my;Език_мя
+Language_na;Език_на
+Language_nb;Език_нб
+Language_nd;Език_нд
+Language_ne;Език_не
+Language_ng;Език_нг
+Language_nl;Език_нл
+Language_nl-be;
+Language_nn;Език_нн
+Language_no;Език_но
+Language_nr;Език_нр
+Language_nv;Език_нв
+Language_ny;Език_ня
+Language_oc;Език_ос
+Language_oj;Език_ой
+Language_om;Език_ом
+Language_or;Език_ор
+Language_os;Език_ос
+Language_pa;Език_па
+Language_pi;Език_пи
+Language_pl;Език_пл
+Language_ps;Език_пс
+Language_pt;Език_пт
+Language_pt-br;Език_пт-бр
+Language_qu;Език_ку
+Language_rm;Език_рм
+Language_rn;Език_рн
+Language_ro;Език_ро
+Language_ru;Език_ру
+Language_rw;Език_рв
+Language_sa;Език_са
+Language_sc;Език_сц
+Language_sd;Език_сд
+Language_se;Език_се
+Language_sg;Език_сг
+Language_si;Език_си
+Language_sk;Език_ск
+Language_sl;Език_сл
+Language_sm;Език_см
+Language_smi;
+Language_sn;Език_сн
+Language_so;Език_со
+Language_sq;Език_ся
+Language_sr;Език_ср
+Language_ss;Език_сс
+Language_st;Език_ст
+Language_su;Език_су
+Language_sv;
+Language_sw;
+Language_ta;
+Language_te;
+Language_tg;
+Language_th;
+Language_ti;
+Language_tk;
+Language_tl;
+Language_tn;
+Language_to;
+Language_tr;
+Language_ts;
+Language_tt;
+Language_tw;
+Language_ty;
+Language_ug;
+Language_uk;
+Language_ur;
+Language_uz;
+Language_ve;
+Language_vi;
+Language_vo;
+Language_wa;
+Language_wo;
+Language_xh;
+Language_yi;
+Language_yo;
+Language_yue;
+Language_za;
+Language_zh;
+Language_zh-cmn;
+Language_zh-cn;
+Language_zh-CN;
+Language_zh-Hans;
+Language_zh-Hant;
+Language_zh-tw;
+Language_zh-TW;
+Language_zh-yue;
+Language_zu;
+Languages;
+LawRating;НисъкРейтинг
+LCCN;ЛССН
+LfeAttenuationKnown;
+LfeMixGain;
+Library;Библиотека
+Lifetime_Subscribe_Button;
+Lightness;Осветеност
+Lines_Count;
+Lines_MaxCountPerEvent;
+LineUpStart;
+LinkedTo_Bed_Pos;
+LinkedTo_ChannelFormat_Pos;
+LinkedTo_ComplementaryObject_Pos;
+LinkedTo_Content_Pos;
+LinkedTo_Group_Pos;
+LinkedTo_Object_Pos;
+LinkedTo_PackFormat_Pos;
+LinkedTo_SignalGroup_Pos;
+LinkedTo_StreamFormat_Pos;
+LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
+LinkedTo_TrackUID_Pos;
+List;Списък
+LongTermLoudness;
+LoRoCenterMixGain;
+LoRoSurroundMixGain;
+Loudness_Anchor;
+Loudness_Anchor_Album;
+Loudness_Count;
+Loudness_Count_Album;
+Loudness_MaximumMomentary;
+Loudness_MaximumMomentary_Album;
+Loudness_MaximumOfRange;
+Loudness_MaximumOfRange_Album;
+Loudness_MaximumShortTerm;
+Loudness_MaximumShortTerm_Album;
+Loudness_ProductionMixingLevel;
+Loudness_ProductionMixingLevel_Album;
+Loudness_Program;
+Loudness_Program_Album;
+Loudness_Range;
+Loudness_Range_Album;
+Loudness_RoomType;
+Loudness_RoomType_Album;
+LtRtCenterMixGain;
+LtRtSurroundMixGain;
+Lyricist;Поет
+Lyrics;Текстове
+Mastered_Date;Дата изработка
+MasteredBy;ИзработкаОт
+MasteringDisplay_ColorPrimaries;
+MasteringDisplay_Luminance;
+Matrix_Channel(s);
+Matrix_ChannelPositions;
+matrix_coefficients;мартица_коефициент
+Matrix_Format;
+MaxCLL;
+MaxFALL;
+MaxGain;
+MaximumMomentaryLoudness;
+MaxTruePeak;
+MD5;
+MD5_Unencoded;
+MediaInfo_About;Медиа Инфо_За
+MediaInfo_About_About;
+Menu;Меню
+Menu stream(s);Меню поток(ци)
+Menu_Codec_List;Меню_Кодек_Списък
+Menu_Hint;Меню_Подсказване
+Menu_No;Меню_Но
+MenuCount;МенюБрой
+MenuID;МенюИД
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
+MixType;
+mn;мн
+Mood;Настроение
+More;Повече
+Movie;Филм
+ms;мс
+MSDI;МСДИ
+MultipleStream;
+MultiView_Count;
+MusicBy;МузикаОт
+MuxingMode;МюксингРежим
+MuxingMode_MoreInfo;МюксингРежим_ПовечеИнфо
+MuxingMode_PackedBitstream;МюксингРежим_ПакетБитПоток
+Name;Име
+Nationality;Националност
+NetworkName;МрежаИме
+New;Нов
+Newest version;Най-новата версия
+NewVersion_Menu;НоваВерсия_Меню
+NewVersion_Question_Content;НоваВерсия_Въпрос_Съдържание
+NewVersion_Question_Title;НоваВерсия_Въпрос_Име
+No;Не
+Not yet;Още не
+NumberOfChannelFormats;
+NumberOfContents;
+NumberOfDynamicObjects;
+NumberOfElementaryStreams;
+NumberOfObjects;
+NumberOfPackFormats;
+NumberOfPresentations;
+NumberOfProgrammes;
+NumberOfStreamFormats;
+NumberOfSubstreams;
+NumberOfTrackFormats;
+NumberOfTrackUIDs;
+NumColors;НомерЦветове
+Object;
+ObjectCount;
+OK;Да
+One output file per input file;Един изходящ при един входящ файл
+Open;Отвори
+OpenCaptionsLanguage;
+OpenCaptionsPresent;
+OpenCaptionsType;
+Options;Опций
+Options_Hint;Опций_Подсказване
+Original;Оригинал
+OriginalNetworkName;ОригиналноМрежаИме
+OriginalSourceForm;ОригиналенИзточникФормуляр
+OriginalSourceMedium;ОригиналенИзточникНосител
+OriginalSourceMedium_ID;
+Originator;
+Other;Други
+OtherIdentifier;
+OtherIdentifierType;
+Output;Изходящ
+Output format;Изходящ Формат
+OverallBitRate;ОбщаБитСкорост
+OverallBitRate_Maximum;ОбщаБитСкорост_Максимум
+OverallBitRate_Minimum;ОбщаБитСкорост_Минимум
+OverallBitRate_Mode;ОбщаБитСкорост_Режим
+OverallBitRate_Nominal;ОбщаБитСкорост_Номинал
+PackageName;
+PackFormat;
+Part;Част
+Part_Count;Част_Брой
+PartNumber;
+PartTotal;
+Performer;Изпълнител
+Period;Период
+Phase90FilterInfo;
+Phase90FilterInfo2ch;
+Phone;Телефон
+PictureRatio;
+PixelAspectRatio;ПикселСъотношение
+PixelAspectRatio_CleanAperture;
+PixelAspectRatio_Original;ПикселСъотношение_Оргинал
+PlayCounter;ИзпълнителенБрояч
+Played_Count;Изпълнени_Брой
+Played_First_Date;Изпълнени_Първа_Дата
+Played_Last_Date;Изпълнени_Последна_Дата
+PlayTime;ВремеИзпълнение
+PodcastCategory;
+PortableHeadphones;
+PortableSpeakers;
+Position;Позиция
+Position_Cartesian;
+Position_Polar;
+Position_Total;Позиция_Обща
+Preferences;Настройки
+PreferredDownmix;
+Premium;
+Premium_Summary;
+PreselectionLabel;
+Presentation;
+PresentationConfig;
+PresentationConfig_ContentClassifier;
+PresentationID;
+PreviousDownmixType5ch;
+PreviousMixType2ch;
+PrimaryAudioLanguage;
+Producer;Продуцент
+ProductionDesigner;ДизайнерПродукция
+ProductionNumber;
+ProductionStudio;ПродукционноСтудио
+ProductPlacement;
+Program name;
+Programme;
+ProgrammeHasText;
+ProgrammeTextLanguage;
+ProgrammeTitle;
+Publisher;Издател
+Purchased_Date;ДатаПоръчан
+Quote character;Цитат характер
+RadioStation;РадиоСтанция
+Rating;Рейтинг
+RealtimeLoudnessCorrected;
+Recorded_Date;Запис_Дата
+Recorded_Location;Запис_Локация
+Reel;
+Released_Date;Издаден_Дата
+RemixedBy;РемиксОт
+RenderMode;
+Renew;
+ReplayGain_Gain;УсилващоПовторение_Усилване
+ReplayGain_Peak;УсилващоПовторение_Усилване_Връх
+Report;
+Resolution;Резолюция
+RestoreLifetimeSubscription;
+s;с
+Sampled_Height;
+Sampled_Width;
+SamplePeakLevel;
+SamplePeakLevel_Album;
+SamplesPerFrame;
+SamplingCount;
+SamplingCount_Source;
+SamplingRate;ВъзпроизвежданеСкорост
+Save;Запази
+ScanOrder;СканиранеРед
+ScanOrder_Original;
+ScanOrder_Stored;
+ScanOrder_StoredDisplayedInverted;
+ScanOrder_StoreMethod;
+ScanType;СканиранеТип
+ScanType_Original;
+ScanType_StoreMethod;
+ScreenplayBy;СценарийОт
+ScreenToCenter;
+ScreenToFront;
+Season;Сезон
+SecondaryAudioLanguage;
+see below;виж долу
+Select your directory;
+Send HeaderFile;Изпрати Хедер Файл
+Separator_Columns;Разделител_Колони
+Separator_Lines;Разделител_Линий
+SeriesTitle;
+ServiceChannel;СървисКанал
+ServiceKind;
+ServiceName;СървисИме
+ServiceProvider;СървисДоставчик
+ServiceType;СървисТип
+Set;Нагласи
+Set_Count;Нагласа_Брой
+Setup;Настрой
+Sharpness;Яснота
+Sheet;Формуляр
+Sheet (Complete);Формуляр (Цялостен)
+Shell extension;Шел екстенция
+Shell extension, folder;Шел екстенция, папка
+Shell InfoTip;Шел ИнфоИнфо
+ShimName;
+ShimVersion;
+Show menu;Показ меню
+Show toolbar;Показ инструментибар
+SignalGroup;
+SigningPresent;
+SignLanguage;
+Sort;Сортиране
+SoundCategory;
+SoundEngineer;ЗвукоИнжинер
+Source;
+Source_Duration;
+Source_FrameCount;
+Source_SamplingCount;
+Source_StreamSize;
+Source_StreamSize_Encoded;
+SpokenSubtitles;
+Standard;Стандарт
+StoreMethod_InterleavedFields;
+StoreMethod_SeparatedFields;
+StoreMethod_SeparatedFields_1;
+StoreMethod_SeparatedFields_2;
+Stream;Поток
+Stream_MoreInfo;Поток_ПовечеИнфо
+StreamCount;Поток_Брой
+StreamFormat;
+StreamID;ПотокИД
+streamIdentifier;
+StreamKind;ПотокВид
+StreamKindID;ПотокВидИД
+StreamKindPos;ПотокВидПоз
+StreamOrder;
+StreamSize;ПотокРазмер
+StreamSize_Demuxed;
+StreamSize_Encoded;
+StreamSize_Proportion;ПотокРазмер_Пропорций
+Subject;Относно
+Subscribe;
+Subscribe_Button;
+Subscribe_Failed;
+Subscribe_Manage;
+Subscribe_Renew;
+Subscribe_Renew_Price;
+Subscribe_Unaviable;
+Subscribe_Waiting;
+Subscription_Active;
+Subscription_Android;
+Subscription_Ended;
+Subscription_Expired;
+Subscription_Lifetime;
+Subscription_Thanks;
+Substream;
+SubTrack;СубТрак
+SubtstreamIdChannel;
+Summary;Обобщение
+Supported formats;Поддържани формати
+Supported?;Поддържан?
+SupportUs;
+SurroundAttenuationKnown;
+SwitchGroup;
+Synopsis;Резюме
+SystemId;СистемИД
+Tagged_Application;Етикет_Апликация
+Tagged_Date;Етикет_Дата
+TargetDeviceConfig;
+Technician;Техник
+TermsOfUse;УсловияНаПолзване
+TertiaryAudioLanguage;
+Text;Текст
+Text - Custom;Текст - Потребителски
+Text (HTML);Текст (HTML)
+Text stream(s);Текст поток(ци)
+Text streams;Текст потоци
+Text_Codec_List;Текст_Кодек_Списък
+Text_Format_List;
+Text_Format_WithHint_List;
+Text_Language_List;
+Text_No;Текст_Но
+Text1;Текст1
+Text2;Текст2
+Text3;Текст3
+TextCount;ТекстБрой
+TextlessElementsExist;
+ThanksTo;БлагодарениеНа
+Thousands separator;Хиляден разделител
+TimeCode;
+TimeCode_FirstFrame;
+TimeCode_LastFrame;
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
+TimeCode_Settings;
+TimeCode_Source;
+TimeCode_Stripped;
+TimeStamp;
+TimeZone;ВремеваЗона
+Title;Име
+Title_More;Име_Повече
+Top4ToTop2;
+TopBackToFront;
+TopBackToSide;
+TopFrontToBack;
+TopFrontToFront;
+TopFrontToSide;
+Total;Общо
+TotalNumberOfParts;
+TotalProgrammeDuration;
+Track;Номер
+Track_Count;Номер_Брой
+TrackFormat;
+TrackIndex;
+TrackUID;
+transfer_characteristics;трансфер_характеристики
+Translate_Reports;
+Translator;Преводач
+Transport;
+Tree;Дърво
+Tree & Text;Дърво и Текст
+Trim_Center;
+Trim_Height;
+Trim_Surround;
+TrimMode;
+TrimMode0i;
+TrimMode1i;
+TrimMode2i;
+TrimMode3i;
+TrimMode4i;
+TrimMode5i;
+TrimMode6i;
+TrimMode7i;
+TrimMode8i;
+TruePeakLevel;
+TruePeakLevel_Album;
+Type;
+TypeDefinition;
+UniqueID;
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
+Unknown;Незнаен
+Url;ЮРЛ
+Video;Видео
+Video stream(s);Видео поток(ци)
+Video_Codec_List;Видео_Кодек_Списък
+Video_Delay;Видео_Забавяне
+Video_Format_List;
+Video_Format_WithHint_List;
+Video_Language_List;
+Video_No;Видео_Но
+Video0_Delay;Видео0_Забавяне
+Video1;Видео1
+Video2;
+Video3;
+VideoComments;
+VideoCount;ВидеоБрой
+View;Преглед
+View_Hint;Преглед_Подсказване
+Views;
+Warning : more streams in the files;Предупреждение : повече потоци във файловете
+Web;Уеб
+WebSite;
+WebSite_Audio;Уебсайт_Аудио
+WebSite_Audio_More;Уебсайт_Аудио_Повече
+WebSite_General;Уебсайт_Генерално
+WebSite_General_More;Уебсайт_Генерално_Повече
+WebSite_Text;Уебсайт_Текст
+WebSite_Text_More;Уебсайт_Текст_Повече
+WebSite_Url;Уебсайт_ЮРЛ
+WebSite_Video;Уебсайт_Видео
+WebSite_Video_More;Уебсайт_Видео_Повече
+Width;Ширина
+Width_CleanAperture;
+Width_Original;Ширина_Оригинал
+WriteMe;ПишетеМи
+WriteToTranslator;ПишетеНаПреводача
+Written_Date;Написано_Дата
+Written_Location;Написано_Локация
+WrittenBy;НаписаноОт
+Yes;Да
+Your system;Вашата система
+Your translation;
+ZZ_Automatic_Percent;62
+ZZ_AutomaticLanguage_Percent;69

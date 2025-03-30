@@ -25,6 +25,14 @@
       <Configuration>Release Belarusian</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Bulgarian|Win32">
+      <Configuration>Release Bulgarian</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Bulgarian|x64">
+      <Configuration>Release Bulgarian</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release Catalan|Win32">
       <Configuration>Release Catalan</Configuration>
       <Platform>Win32</Platform>
@@ -353,6 +361,7 @@
     <TargetName Condition="'$(Configuration)'=='Release Armenian'">$(ProjectName).hy</TargetName>
     <TargetName Condition="'$(Configuration)'=='Release Basque'">$(ProjectName).eu</TargetName>
     <TargetName Condition="'$(Configuration)'=='Release Belarusian'">$(ProjectName).by</TargetName>
+    <TargetName Condition="'$(Configuration)'=='Release Bulgarian'">$(ProjectName).bg</TargetName>
     <TargetName Condition="'$(Configuration)'=='Release Catalan'">$(ProjectName).ca</TargetName>
     <TargetName Condition="'$(Configuration)'=='Release Chinese Simplified'">$(ProjectName).sc</TargetName>
     <TargetName Condition="'$(Configuration)'=='Release Chinese Traditional'">$(ProjectName).tc</TargetName>
@@ -393,6 +402,9 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ResourceCompile Include="mplayerc.bg.rc">
+      <ExcludedFromBuild Condition="'$(Configuration)'!='Release Bulgarian'">true</ExcludedFromBuild>
+    </ResourceCompile>
     <ResourceCompile Include="mplayerc.br.rc">
       <ExcludedFromBuild Condition="'$(Configuration)'!='Release Portuguese'">true</ExcludedFromBuild>
     </ResourceCompile>

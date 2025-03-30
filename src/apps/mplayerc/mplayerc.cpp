@@ -53,6 +53,7 @@ const LanguageResource CMPlayerCApp::languageResources[] = {
 	{ID_LANGUAGE_ARMENIAN,				1067,	L"Armenian",				L"hy",	L"arm"},
 	{ID_LANGUAGE_BASQUE,				1069,	L"Basque",					L"eu",	L"baq"},
 	{ID_LANGUAGE_BELARUSIAN,			1059,	L"Belarusian",				L"by",	L"bel"},
+	{ID_LANGUAGE_BULGARIAN,				1026,	L"Bulgarian",				L"bg",	L"bul"},
 	{ID_LANGUAGE_CATALAN,				1027,	L"Catalan",					L"ca",	L"cat"},
 	{ID_LANGUAGE_CHINESE_SIMPLIFIED,	2052,	L"Chinese (Simplified)",	L"sc",	L"chi"},
 	{ID_LANGUAGE_CHINESE_TRADITIONAL,	3076,	L"Chinese (Traditional)",	L"tc",	L"zht"},

@@ -15,6 +15,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="mplayerc.bg.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
     <ResourceCompile Include="mplayerc.br.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
@@ -25,9 +28,6 @@
       <Filter>Source Files</Filter>
     </ResourceCompile>
     <ResourceCompile Include="mplayerc.cz.rc">
-      <Filter>Source Files</Filter>
-    </ResourceCompile>
-    <ResourceCompile Include="mplayerc.hr.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
     <ResourceCompile Include="mplayerc.de.rc">
@@ -43,6 +43,12 @@
       <Filter>Source Files</Filter>
     </ResourceCompile>
     <ResourceCompile Include="mplayerc.fr.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="mplayerc.he.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="mplayerc.hr.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
     <ResourceCompile Include="mplayerc.hu.rc">
@@ -78,10 +84,10 @@
     <ResourceCompile Include="mplayerc.sk.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
-    <ResourceCompile Include="mplayerc.sv.rc">
+    <ResourceCompile Include="mplayerc.sl.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
-    <ResourceCompile Include="mplayerc.sl.rc">
+    <ResourceCompile Include="mplayerc.sv.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
     <ResourceCompile Include="mplayerc.tc.rc">
@@ -91,9 +97,6 @@
       <Filter>Source Files</Filter>
     </ResourceCompile>
     <ResourceCompile Include="mplayerc.ua.rc">
-      <Filter>Source Files</Filter>
-    </ResourceCompile>
-    <ResourceCompile Include="mplayerc.he.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
   </ItemGroup>
