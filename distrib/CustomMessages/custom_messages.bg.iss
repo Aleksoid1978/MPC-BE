@@ -1,4 +1,4 @@
-﻿;
+;
 ; (C) 2025 see Authors.txt
 ;
 ; This file is part of MPC-BE.
@@ -25,8 +25,8 @@
 
 [Messages]
 ;Bulgarian
-bg.WelcomeLabel2=This will install [name] on your computer.%n%nIt is recommended that you close all other applications before continuing.
-bg.WinVersionTooLowError=[name] requires Windows 7 or newer to run.
+bg.WelcomeLabel2=Това ще инсталира [name] на вашия компютър.%n%nПрепоръчително е да затворите всички други приложения, преди да продължите.
+bg.WinVersionTooLowError=[name] изисква Windows 7 или по-нова версия, за да работи.
 
 
 [CustomMessages]
@@ -35,36 +35,36 @@ bg.WinVersionTooLowError=[name] requires Windows 7 or newer to run.
 ;Bulgarian
 langid=00001026
 langcode=bg
-comp_mpciconlib=Icon Library
-comp_mpcresources=Translations
-comp_mpcbeshellext=Install the shell extension
-comp_intel_msdk=H.264 MVC 3D Decoder
-msg_DeleteSettings=Do you also want to delete MPC-BE settings?%n%nIf you plan on installing MPC-BE again then you do not have to delete them.
-msg_NoD3DX9DLL_found=The latest DirectX runtime is not installed!%n%nPlease download and install the latest DirectX runtime June 2010 regardless of your operating system.
-msg_SetupIsRunningWarning=MPC-BE setup is already running!
-msg_simd_sse2=This build of MPC-BE requires a CPU with SSE2 extension support.%n%nYour CPU does not have those capabilities.
-tsk_AllUsers=For all users
-tsk_CurrentUser=For the current user only
-tsk_Other=Other tasks:
-tsk_LongPathsEnable=Enable Windows 10 long paths support
-tsk_ResetSettings=Reset settings
-types_DefaultInstallation=Default installation
-types_CustomInstallation=Custom installation
-ViewChangelog=View Changelog
-AssociationFormatsAV=Configuring associations with video and audio files:
-AssociationFormats=Association with video and audio files
-AssociationVideo=Association with video files
-AssociationAudio=Association with audio files
-AssociationPlaylist=Association with playlists
-AutoPlayType=Auto play:
-AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
+comp_mpciconlib=Библиотека с икони
+comp_mpcresources=Локализации
+comp_mpcbeshellext=Инсталирай разширение на средата
+comp_intel_msdk=H.264 MVC 3D Декодер
+msg_DeleteSettings=Искате ли също да изтриете настройките на MPC-BE?%n%nАко планирате да инсталирате MPC-BE отново, не е нужно да ги изтривате.
+msg_NoD3DX9DLL_found=Най-новата среда за изпълнение на DirectX не е инсталирана!%n%nМоля, изтеглете и инсталирайте най-новата среда за изпълнение на DirectX от юни 2010 г., независимо от вашата операционна система.
+msg_SetupIsRunningWarning=Инсталацията на MPC-BE вече е стартирана!
+msg_simd_sse2=Тази компилация на MPC-BE изисква процесор с поддръжка на разширение SSE2.%n%nВашият процесор няма тези възможности.
+tsk_AllUsers=За всички потребители
+tsk_CurrentUser=Само за текущия потребител
+tsk_Other=Други задачи:
+tsk_LongPathsEnable=Разрешаване на поддръжката на дълги пътища за Windows 10
+tsk_ResetSettings=Нулиране на настройките
+types_DefaultInstallation=Инсталация по подразбиране
+types_CustomInstallation=Персонализирана инсталация
+ViewChangelog=Преглед на списъка с промени
+AssociationFormatsAV=Конфигуриране на асоциации с видео и аудио файлове:
+AssociationFormats=Асоциация с видео и аудио файлове
+AssociationVideo=Асоциация с видеофайлове
+AssociationAudio=Асоциация с аудиофайлове
+AssociationPlaylist=Асоциация с плейлисти
+AutoPlayType=Автоматично възпроизвеждане:
+AssociationMPCPlayCDAudioOnArrivalF=Възпроизвеждане на аудио CD
 AssociationMPCPlayCDAudioS=Audio CD
-AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
-AssociationMPCPlayDVDMovieS=DVD Movie
-AssociationMPCPlayMusicFilesF=Play Music
-AssociationMPCPlayMusicFilesS=Music Files
-AssociationMPCPlayVideoFilesF=Play Video
-AssociationMPCPlayVideoFilesS=Video Files
-PinToTaskBar=Pin to TaskBar
-ComponentWillBeDownloaded=will be downloaded
-ComponentAlreadyDownloaded=already downloaded
+AssociationMPCPlayDVDMovieArrivalF=Възпроизвеждане на DVD Видео
+AssociationMPCPlayDVDMovieS=DVD Видео
+AssociationMPCPlayMusicFilesF=Възпроизвеждане на музика
+AssociationMPCPlayMusicFilesS=Музикални файлове
+AssociationMPCPlayVideoFilesF=Възпроизвеждане на видео
+AssociationMPCPlayVideoFilesS=Видео файлове
+PinToTaskBar=Закачане към лентата на задачите
+ComponentWillBeDownloaded=ще бъдат изтеглени
+ComponentAlreadyDownloaded=вече са изтеглени
