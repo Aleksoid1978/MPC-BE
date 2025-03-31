@@ -36,6 +36,7 @@ Updated Chinese (Simplified) translation (by wushantao).
 Updated Hungarian translation (by mickey).
 Updated Italian translation (by mapi68).
 Updated Dutch and Chinese (Traditional) translation (by beter).
+Added Bulgarian translation (by jekovcar).
 
 Updated libraries:
 	ffmpeg n7.2-dev-1910-g5fac8d062d;

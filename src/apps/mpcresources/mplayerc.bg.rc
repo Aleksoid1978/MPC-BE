@@ -162,7 +162,7 @@ BEGIN
     GROUPBOX        "",IDC_STATIC,5,154,285,49
     CONTROL         "FFmpeg филтри",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,153,61,10
     PUSHBUTTON      "Предварителни настройки",IDC_BUTTON1,9,166,59,14
-    CONTROL         "Не использовать для стерео и моно источников",IDC_CHECK2,
+    CONTROL         "Не използвай за стерео и моно източници",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,76,166,180,10
     COMBOBOX        IDC_COMBO1,10,184,58,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_EDIT1,72,184,214,14,ES_AUTOHSCROLL
@@ -174,7 +174,7 @@ BEGIN
     CONTROL         "Отместване на звука (в мс):",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,240,115,9
     EDITTEXT        IDC_EDIT2,129,238,46,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,174,238,12,13
-    PUSHBUTTON      "Небольшие стерео колонки",IDC_BUTTON2,188,210,103,14
+    PUSHBUTTON      "Малки стерео колонки",IDC_BUTTON2,188,210,103,14
     PUSHBUTTON      "По подразбиране",IDC_BUTTON3,235,228,56,14
 END
 
@@ -432,7 +432,7 @@ BEGIN
     LTEXT           "Яркост:",IDC_STATIC1,14,19,46,8,0,WS_EX_TRANSPARENT
     CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,58,19,165,12
     LTEXT           "Настройка за цвят на индикатора за усилване на звука:",IDC_STATIC2,14,31,165,8
-    LTEXT           "Напълнете:",IDC_STATIC_CLRFACE,14,43,46,8,0,WS_EX_TRANSPARENT
+    LTEXT           "Запълване:",IDC_STATIC_CLRFACE,14,43,46,8,0,WS_EX_TRANSPARENT
     PUSHBUTTON      "ЗА",IDC_BUTTON_CLRFACE,64,41,20,14
     LTEXT           "Фон:",IDC_STATIC_CLROUTLINE,94,43,44,8,0,WS_EX_TRANSPARENT
     PUSHBUTTON      "Л",IDC_BUTTON_CLROUTLINE,140,41,20,14
@@ -444,7 +444,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,34,53,12
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,49,53,12
     CONTROL         "Използване на тъмно меню",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,59,147,8,WS_EX_TRANSPARENT
-    CONTROL         "Использовать тёмный заголовок (Windows 10 и выше)",IDC_CHECK5,
+    CONTROL         "Използвай тъмна заглавка (Windows 10 и нови)",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,73,238,8,WS_EX_TRANSPARENT
     GROUPBOX        "",IDC_STATIC,7,90,282,91
     CONTROL         "Показване на времето",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,99,152,9
@@ -817,14 +817,14 @@ BEGIN
     LISTBOX         IDC_LIST1,5,41,210,200,LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     LISTBOX         IDC_LIST2,5,41,210,200,LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     LISTBOX         IDC_LIST3,5,41,210,200,LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Настройка\nAVI сплиттера",IDC_BUTTON5,220,41,70,30,BS_MULTILINE
-    PUSHBUTTON      "Настройка\nMPEG сплиттера",IDC_BUTTON1,220,76,70,30,BS_MULTILINE
-    PUSHBUTTON      "Настройка\nMatroska сплиттера",IDC_BUTTON6,220,111,70,30,BS_MULTILINE
-    PUSHBUTTON      "Настройка\nCDDA ридера",IDC_BUTTON8,220,146,70,30,BS_MULTILINE
-    PUSHBUTTON      "Настройка\nVTS(IFO) ридера",IDC_BUTTON7,220,181,70,30,BS_MULTILINE
-    PUSHBUTTON      "Настройка\nвидео декодера",IDC_BUTTON2,220,41,70,30,BS_MULTILINE
+    PUSHBUTTON      "Настройка\nAVI сплитер",IDC_BUTTON5,220,41,70,30,BS_MULTILINE
+    PUSHBUTTON      "Настройка\nMPEG сплитер",IDC_BUTTON1,220,76,70,30,BS_MULTILINE
+    PUSHBUTTON      "Настройка\nMatroska сплитер",IDC_BUTTON6,220,111,70,30,BS_MULTILINE
+    PUSHBUTTON      "Настройка\nCDDA рийдър",IDC_BUTTON8,220,146,70,30,BS_MULTILINE
+    PUSHBUTTON      "Настройка\nVTS(IFO) рийдър",IDC_BUTTON7,220,181,70,30,BS_MULTILINE
+    PUSHBUTTON      "Настройка\nвидео декодер",IDC_BUTTON2,220,41,70,30,BS_MULTILINE
     PUSHBUTTON      "Настройка\nдекодера\nDVD-Video",IDC_BUTTON3,220,76,70,30,BS_MULTILINE
-    PUSHBUTTON      "Настройка\nаудио декодера",IDC_BUTTON4,220,41,70,30,BS_MULTILINE
+    PUSHBUTTON      "Настройка\nаудио декодер",IDC_BUTTON4,220,41,70,30,BS_MULTILINE
     LTEXT           "Размер на буфера:",IDC_STATIC1,221,216,69,8
     EDITTEXT        IDC_EDIT1,221,228,29,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,239,228,11,13
@@ -917,12 +917,12 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "YouTube",IDC_STATIC,6,5,285,112
     CONTROL         "Използване на вградения анализатор на Web страници",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,16,120,10
-    LTEXT           "Предпочитаемый формат видео:",IDC_STATIC2,10,29,120,8
+    LTEXT           "Предпочитан формат видео:",IDC_STATIC2,10,29,120,8
     COMBOBOX        IDC_COMBO1,10,39,52,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO2,66,39,50,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "60 fps",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,120,41,48,10
     CONTROL         "HDR",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,172,41,30,10
-    LTEXT           "Предпочитаемый формат аудио:",IDC_STATIC3,10,54,120,8
+    LTEXT           "Предпочитан формат аудио:",IDC_STATIC3,10,54,120,8
     COMBOBOX        IDC_COMBO3,10,64,52,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Предпочитан аудио език:",IDC_STATIC4,10,78,140,8
     COMBOBOX        IDC_COMBO4,10,89,130,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -1067,7 +1067,7 @@ BEGIN
     PUSHBUTTON      "Нулиране",IDC_RESET,241,88,50,14
     GROUPBOX        "",IDC_STATIC5,5,88,177,74
     CONTROL         "Управление на цветовете",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,88,100,10
-    LTEXT           "(для EVR-CP, поверхность 10/16-бит)",IDC_STATIC6,10,101,167,8
+    LTEXT           "(для EVR-CP, повърхност 10/16-бит)",IDC_STATIC6,10,101,167,8
     LTEXT           "Тип на входа:",IDC_STATIC7,10,116,70,8
     COMBOBOX        IDC_COMBO3,84,113,93,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Околна светлина:",IDC_STATIC8,10,133,70,8
@@ -1085,7 +1085,7 @@ BEGIN
     EDITTEXT        IDC_EDIT2,64,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "По подразбиране",IDC_BUTTON1,158,17,56,14
-    CONTROL         "Не использовать переход по файлам в директории по нажатию ""Шаг вперед/назад""",IDC_CHECK7,
+    CONTROL         "Не използвай навигация през файлове в директорията, като щракнете върху ""Стъпка напред/назад""",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,280,18
     CONTROL         "Без минимизиране на прозореца на допълнителен дисплей в режим цял екран",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
@@ -1198,7 +1198,7 @@ BEGIN
     EDITTEXT        IDC_EDIT1,14,27,32,13,ES_CENTER | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,35,27,12,13
     LTEXT           "сек.",IDC_STATIC1,51,29,30,8
-    LTEXT           " 0: автоскрытие; -1: не скрывать",IDC_STATIC2,85,29,195,8
+    LTEXT           " 0: автоскриване; -1: не скривай",IDC_STATIC2,85,29,195,8
     CONTROL         "Излизане от режима на цял екран след края на възпроизвеждането",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,43,276,9
     CONTROL         "Излизане от режим на цял екран, когато възпроизвеждането приключи",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,55,276,9
@@ -1218,7 +1218,7 @@ BEGIN
     LTEXT           "сек.",IDC_STATIC,267,204,19,8
     CONTROL         "Промяна режима на екрана, преди да започне възпроизвеждането",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,217,271,9
-    CONTROL         "Прилагане на режим ""По дразбиране"" при преход към формата на прозореца",IDC_CHECK3,
+    CONTROL         "Прилагане на режим ""По подразбиране"" при преход към формата на прозореца",IDC_CHECK3,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,228,270,9
     CONTROL         "Възстановяване на резолюцията след излизане от програмата",IDC_RESTORERESCHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,239,270,9
@@ -2612,30 +2612,30 @@ BEGIN
     IDC_CHECK_RELATIVETO    "Стандартното състояние е наследено от други стилове, където все още не е дефинирано."
     IDC_CHECK_ALLOW_DROPPING_SUBPIC  "Изключването на тази опция ще попречи на субтитрите да мигат, но може да доведе до пропускане на видеокадри"
     IDC_CHECK_SPCANIMWITHBUFFER  "Позволява да анимирате субтитрите, ако броят на кешираните страници е по-голям от 0. Изключване на опцията освобождава малко процесорни ресурси. Изключете, ако има трептене на субтитрите"
-    IDC_BUTTON_EXT_SET      "После нажатия этой кнопки, выбранное состояние группы форматов будет отражать реальные ассоциации файлов для MPC-BE. Добавленные расширения обычно устанавливают состояние в ""серое"", так что не забывайте выделить их опять перед закрытием диалога!"
+    IDC_BUTTON_EXT_SET      "След като щракнете върху този бутон, избраното състояние на групата формати ще отразява действителните файлови асоциации за MPC-BE. Добавените разширения обикновено задават състоянието на ""сиво"", така че не забравяйте да ги изберете отново, преди да затворите диалоговия прозорец!"
 END
 
 STRINGTABLE
 BEGIN
-    ID_PLAY_PLAY            "Воспроизведение\nВоспроизведение"
+    ID_PLAY_PLAY            "Възпроизвеждане\nВъзпроизвеждане"
     ID_PLAY_PAUSE           "Пауза\nПауза"
     ID_PLAY_STOP            "Стоп\nСтоп"
-    ID_PLAY_FRAMESTEP       "Шаг\nШаг"
-    ID_PLAY_DECRATE         "Уменьшить скорость\nУменьшить скорость"
-    ID_PLAY_INCRATE         "Увеличить скорость\nУвеличить скорость"
+    ID_PLAY_FRAMESTEP       "Стъпка\nСтъпка"
+    ID_PLAY_DECRATE         "Намали скоростта\nНамали скоростта"
+    ID_PLAY_INCRATE         "Увеличи скоростта\nвеличи скоростта"
 END
 
 STRINGTABLE
 BEGIN
-    ID_VOLUME_MUTE          "Отключить звук\nОтключить звук"
-    ID_VOLUME_MUTE_OFF      "Включить звук\nВключить звук"
-    ID_VOLUME_MUTE_DISABLED "Без звука\nБез звука"
+    ID_VOLUME_MUTE          "Изключи звука\nИзключи звук"
+    ID_VOLUME_MUTE_OFF      "Включи звука\nВключи звука"
+    ID_VOLUME_MUTE_DISABLED "Без звук\nБез звук"
 END
 
 STRINGTABLE
 BEGIN
-    ID_NAVIGATE_SKIPBACK    "Шаг назад\nШаг назад"
-    ID_NAVIGATE_SKIPFORWARD "Шаг вперед\nШаг вперед"
+    ID_NAVIGATE_SKIPBACK    "Стъпка назад\nСтъпка назад"
+    ID_NAVIGATE_SKIPFORWARD "Стъпка напред\nСтъпка напре"
 END
 
 STRINGTABLE
@@ -2805,10 +2805,10 @@ BEGIN
     IDS_MENU_VIDEO_STREAM   "&Видео поток"
     IDS_MENU_VIDEO_ANGLE    "Ъгъл на &видеото"
     IDS_RESET_SETTINGS      "Нулиране на настройките"
-    IDS_RESET_SETTINGS_WARNING  "Вы действительно хотите сбросить настройки плеера?\nИмейте в виду, что все ваши текущие настройки будут потеряны!"
+    IDS_RESET_SETTINGS_WARNING  "Сигурни ли сте, че искате да нулирате плейъра си?\nИмайте предвид, че всичките ви текущи настройки ще бъдат загубени!"
     IDS_RESET_SETTINGS_MUTEX  "Моля, затворете другите копия на MPC-BE."
     IDS_EXPORT_SETTINGS     "Експортиране на настройки"
-    IDS_EXPORT_SETTINGS_WARNING  "Некоторые настройки не были сохранены.\nВы хотите сохранить их перед экспортом?"
+    IDS_EXPORT_SETTINGS_WARNING  "Някои настройки не са запазени.\nИскате ли да ги запазите преди експортиране?"
     IDS_EXPORT_SETTINGS_SUCCESS  "Настройките са експортирани успешно."
     IDS_EXPORT_SETTINGS_FAILED  "Неуспешен експорт! Възможно е да нямате достатъчно права."
     IDS_BDA_ERROR           "BDA Грешка"
@@ -2827,10 +2827,10 @@ BEGIN
     IDS_AG_MENU_JUMPTO      "Меню Преминаване на..."
     IDS_AG_MENU_AFTERPLAYBACK "Меню След края на възпроизвеждането"
     IDS_AG_RESET_STATS      "Нулиране на EVR Sync статистиката"
-    IDS_VIEW_BORDERLESS     "Скрыть границы\tCtrl+0"
-    IDS_VIEW_FRAMEONLY      "Только видеокадр\tCtrl+0"
-    IDS_VIEW_CAPTIONMENU    "Показать заголовок и меню\tCtrl+0"
-    IDS_VIEW_HIDEMENU       "Скрыть меню\tCtrl+0"
+    IDS_VIEW_BORDERLESS     "Скрий границите\tCtrl+0"
+    IDS_VIEW_FRAMEONLY      "Само видеокадър\tCtrl+0"
+    IDS_VIEW_CAPTIONMENU    "Покажи заглавието и менюто\tCtrl+0"
+    IDS_VIEW_HIDEMENU       "Скрий менюто\tCtrl+0"
 END
 
 STRINGTABLE
@@ -3023,7 +3023,7 @@ BEGIN
     IDS_ZOOM_AUTOFITLARGE   "Побиране в голям"
     IDS_ADD_TO_PLAYLIST     "Добави към плейлиста на MPC-BC"
     IDS_OPEN_WITH_MPC       "Възпроизвеждане в MPC-BE"
-    IDS_CANNOT_CHANGE_FORMAT  "У MPC-BE недостаточно привилегий для изменения ассоциаций файлов. Нажмите на кнопку ""Изменить"" для изменения с администраторскими правами."
+    IDS_CANNOT_CHANGE_FORMAT  "MPC-BE няма достатъчно привилегии за промяна на файлови асоциации. Кликнете върху бутона ""Редактиране"", за да редактирате с администраторски права."
     IDS_APP_DESCRIPTION     "Един от най-мощните и настроиваеми мултимедийни плейъри за Windows. Първоначално е разработена от унгарски разработчик, известен като Gabest. Тази версия има допълнителни функции, като например изключителен режим на цял екран и подобрена поддръжка на Windows Vista/7."
     IDS_MAINFRM_12          "канал"
     IDS_MAINFRM_13          "канали"
@@ -3053,7 +3053,7 @@ STRINGTABLE
 BEGIN
     IDS_ADDTOPLS_FROMDIR_SIMILAR "Подобни файлове от папката"
     IDS_ADDTOPLS_FROMDIR_ALL "Всички файлове от папката"
-    IDS_EXCLUSIVE_FS_WARNING  "Эта опция служит для устранения дрожания, однако её включение препятствует отображению контекстного меню и диалогов.\n\nДля выхода из эксклюзивного полного экрана используйте клавиши Alt+Enter, Ctrl+Enter или Ctrl+C.\n\nВы действительно хотите активировать опцию?"
+    IDS_EXCLUSIVE_FS_WARNING  "Тази опция се използва за премахване на трептенето, но активирането й предотвратява показването на контекстното меню и диалоговите прозорци.\n\nЗа излизане от извънредния цял екран, използвайте Alt+Enter, Ctrl+Enter или Ctrl+C.\n\nНаистина ли искате да активирате тази опция?"
     IDS_MAINFRM_139         "Закъснение на субтитри: %ld мс"
     IDS_AG_TITLE2           "Раздел: %02d/%02d"
     IDS_THUMB_ROWNUMBER     "Редове:"
@@ -3085,7 +3085,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_MAINFRM_47          " успешно загружен"
+    IDS_MAINFRM_47          " успешно зареден"
     IDS_MAINFRM_49          "Проблем с GetDIB, hr = %08x"
     IDS_MAINFRM_51          "Проблем с GetCurrentImage, hr = %08x"
     IDS_MAINFRM_53          "Файлът не може да бъде създаден"
@@ -3093,11 +3093,11 @@ BEGIN
     IDS_MAINFRM_55          "Не може да се получи размер на видеокадъра"
     IDS_MAINFRM_56          "Няма достатъчно памет, купете още!"
     IDS_MAINFRM_57          "Неправилен формат на изображението, не може да се създадат миниатюри от растерни (*.bmp) изображения с %d bpp."
-    IDS_MAINFRM_58          "Размер файла: %s (%s байт)\\N"
-    IDS_MAINFRM_59          "{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}Имя файла: %s\\N%sРазрешение: %dx%d %s\\NДлительность: %02d:%02d:%02d"
-    IDS_MAINFRM_60          "Для загрузки субтитров вам нужно изменить тип рендера и открыть файл заново.\n"
+    IDS_MAINFRM_58          "Размер на файла: %s (%s байт)\\N"
+    IDS_MAINFRM_59          "{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}Имя файла: %s\\N%sРазрешение: %dx%d %s\\NПродължителност: %02d:%02d:%02d"
+    IDS_MAINFRM_60          "За зареждане на субтитри, трябва да промените типа на рендера и да отворите отново файла.\n"
     IDS_MAINFRM_61          "- DirectShow: EVR-CP, EVR Sync, Haali, madVR или MPC VR.\n"
-    IDS_MAINFRM_64          "- ShockWave: недоступен\n"
+    IDS_MAINFRM_64          "- ShockWave: недостъпен\n"
 END
 
 STRINGTABLE
@@ -3106,7 +3106,7 @@ BEGIN
     IDS_MAINFRM_69          "Съотношение на страните: стандартни"
     IDS_MAINFRM_70          "Закъснение на аудио: %I64dмс"
     IDS_AG_CHAPTER          "Глава %d"
-    IDS_MAINFRM_73          "Не удаётся загрузить шейдер: "
+    IDS_MAINFRM_73          "Не може да се зареди шейдър: "
     IDS_AG_SHADER           "Шейдер: "
     IDS_AG_OUT_OF_MEMORY    "Недостатъчна памет"
     IDS_MAINFRM_77          "Грешка: Изисква се Flash за IE"
@@ -3124,7 +3124,7 @@ BEGIN
     IDS_GAIN_OSD            "Усилване: %+.1f dB"
     IDS_BALANCE_OSD         "Баланс: %s"
     IDS_FULLSCREENMONITOR_CURRENT "Текущ"
-    IDS_MPC_CRASH           "Работа MPC-BE прервана. Чтобы помочь нам в решении этой проблемы, пожалуйста, отправьте файл '%s' на наш баг-трекер.\n\nХотите ли вы сейчас открыть папку, содержащую дамп-файл, и перейти на баг-трекер?"
+    IDS_MPC_CRASH           "MPC-BE спря. За да ни помогнете да разрешим този проблем, моля, изпратете файла '%s' на нашия бъг-тракер.\n\nИскате ли да отворите папката, съдържаща дъмп-файла и да отидете на бъг-тракера?"
     IDS_MPC_MINIDUMP_FAIL   "Грешка при създаване на дъмп файл '%s'  (грешка %d)"
     IDS_MAINFRM_DIR_TITLE   "Изберете папка"
     IDS_MAINFRM_DIR_CHECK   "Вкл. подпапки"
@@ -3167,8 +3167,8 @@ BEGIN
     IDS_AG_UNKNOWN_STREAM   "Неизвестен поток"
     IDS_AG_UNKNOWN          "Неизвестен %d"
     IDS_AG_VSYNC            "VSync"
-    IDS_MAINFRM_121         " (Комментарии режиссера 1)"
-    IDS_MAINFRM_122         " (Комментарии режиссера 2)"
+    IDS_MAINFRM_121         " (Коментар на режисьора 1)"
+    IDS_MAINFRM_122         " (Коментар на режисьора 2)"
     IDS_AG_ENABLED          "Включено"
     IDS_AG_ANGLE            "Ъгъл %d"
     IDS_AG_VSYNCOFFSET_INCREASE "Увеличи компенсацията на VSync"
@@ -3179,8 +3179,8 @@ BEGIN
     IDS_AG_DISABLED         "Изключено"
     IDS_AG_VSYNCOFFSET_DECREASE "Намали компенсацията на VSync"
     IDS_MAINFRM_132         "Внимание  (CMainFrame::SeekTo): Опит за търсене в режим на заснемане."
-    IDS_AG_REMOVING         "Удаляется: "
-    IDS_MAINFRM_134         "ВНИМАНИЕ: CMainFrame::CloseMedia() вызван два или больше раз\n"
+    IDS_AG_REMOVING         "Отстранени: "
+    IDS_MAINFRM_134         "ВНИМАНИЕ: CMainFrame::CloseMedia() извикан два или повече пъти\n"
     IDS_MAINFRM_135         "КРИТИЧНА ГРЕШКА: !!! Процесът на отваряне трябва да бъде премахнат!!!"
     IDS_MAINFRM_136         "MPC-BE ексклузивно на цял екран"
     IDS_MAINFRM_137         "Непознат формат"
@@ -3189,12 +3189,12 @@ BEGIN
     IDS_VOLUME_GAIN_DEC     "Намали усилването на звука"
     IDS_VOLUME_GAIN_OFF     "Усилване на звука - изключено"
     IDS_VOLUME_GAIN_MAX     "Усилване на звука - на Макс"
-    IDS_UNKNOWN_SWITCH      "В командной строке найдены нераспознанные переключатели: \n\n"
+    IDS_UNKNOWN_SWITCH      "В командния ред са намерени неразпознати превключватели: \n\n"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_BLOCK_EXTERNAL_VR   "Вы не можете добавить %s как внешний фильтр.\nВам необходимо выбрать предпочтительный видеорендерер в панели настроек Видео."
+    IDS_BLOCK_EXTERNAL_VR   "Не може да добавяте %s като външен филтър.\nТрябва да изберете предпочитан видео рендер в панела с настройки на видео."
     IDS_DESC_HAALI_VR       "Подобно на VMR-9, но използва правилно бикубично преоразмеряване."
 END
 
@@ -3211,49 +3211,49 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Использование: mpc-be.exe ""путь"" [переключатели]"
-    IDS_CMD_PATHNAME        """путь""\tФайл или каталог для загрузки (разрешены \nмаски)"
-    IDS_CMD_HELP            "/help /h /?\tПоказывает эту справку"
-    IDS_CMD_DUB             "/dub ""dubname""\tЗагрузить дополнительный звуковой файл"
-    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tЗагрузить звуковой файл со смещением XXмс\n(если файл содержит ""...DELAY XXms..."")"
+    IDS_CMD_USAGE           "Използване на: mpc-be.exe ""път"" [превключватели]"
+    IDS_CMD_PATHNAME        """путь""\tФайл или директория за изтегляне (разрешени са \nmask)"
+    IDS_CMD_HELP            "/help /h /?\tПоказва тази помощ"
+    IDS_CMD_DUB             "/dub ""dubname""\tЗареди допълнителен звуков файл"
+    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tЗареди аудио файл с отместване от XXms\n(ако файлът съдържа ""...DELAY XXms..."")"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_D3DFS           "/d3dfs\tСтартовать в эксклюзивном полноэкранном режиме"
-    IDS_CMD_SUB             "/sub ""subname""\tЗагрузить дополнительные субтитры"
-    IDS_CMD_FILTER          "/filter ""filtername""\tЗагрузить фильтры DirectShow из библиотеки\n(разрешены маски)"
-    IDS_CMD_DVD             "/dvd\tЗапуск в режиме DVD, ""путь"" означает каталог\nс DVD (опционально)"
-    IDS_CMD_DVDPOS1         "/dvdpos T#C\tНачать воспроизведение с title T, chapter C"
-    IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tНачать воспроизведение с title T, позиции\nhh:mm:ss"
-    IDS_CMD_CD              "/cd\tЗагрузить все дорожки Audio CD или (S)VCD,\n""путь"" означает путь к диску (опционально)"
-    IDS_CMD_OPEN            "/open\tТолько открыть файл"
-    IDS_CMD_PLAY            "/play\tНачинать воспроизведение сразу после запуска"
-    IDS_CMD_CLOSE           "/close\tЗакрыть по окончании воспроизведения\n(работает только с ключем /play)"
-    IDS_CMD_SHUTDOWN        "/shutdown\tВыключить компьютер по окончании\nвоспроизведения"
-    IDS_CMD_FULLSCREEN      "/fullscreen\tЗапуск в полноэкранном режиме"
-    IDS_CMD_MINIMIZED       "/minimized\tЗапуск в свернутом виде"
-    IDS_CMD_NEW             "/new\tИспользовать новую копию проигрывателя"
-    IDS_CMD_ADD             "/add\tДобавить ""путь"" в плейлист, можно совместно\nс ключами /open и /play"
-    IDS_CMD_RANDOMIZE       "/randomize\tПеремешать плейлист"
+    IDS_CMD_D3DFS           "/d3dfs\tСтартирай в ексклузивен пълноекранен режим"
+    IDS_CMD_SUB             "/sub ""subname""\tЗареди допълнителни субтитри"
+    IDS_CMD_FILTER          "/filter ""filtername""\tЗареди филтри DirectShow от библиотека\n(разрешени маски)"
+    IDS_CMD_DVD             "/dvd\tРабота в режим DVD, ""път"" означава каталог\nс DVD (опционално)"
+    IDS_CMD_DVDPOS1         "/dvdpos T#C\tСтартирай възпроизвеждане от title T, chapter C"
+    IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tЗапочни възпроизвеждане от title T, позиция\nhh:mm:ss"
+    IDS_CMD_CD              "/cd\tИзтегли всички пътеки Audio CD или (S)VCD,\n""път"" означава път към диска (опционално)"
+    IDS_CMD_OPEN            "/open\tПросто отвори файла"
+    IDS_CMD_PLAY            "/play\tЗапочни възпроизвеждането веднага след стартиране"
+    IDS_CMD_CLOSE           "/close\tЗатвори в края на възпроизвеждането\n(работи само с ключ /play)"
+    IDS_CMD_SHUTDOWN        "/shutdown\tИзключи компютъра след \nвъзпроизвеждането"
+    IDS_CMD_FULLSCREEN      "/fullscreen\tСтартирай в пълноекранен режим"
+    IDS_CMD_MINIMIZED       "/minimized\tРабота в сгънат вид"
+    IDS_CMD_NEW             "/new\tИзползвай ново копие на плейъра"
+    IDS_CMD_ADD             "/add\tДобави ""път"" към плейлиста, може заедно с\nс ключове /open и /play"
+    IDS_CMD_RANDOMIZE       "/randomize\tРазбъркай плейлиста"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_REGVID          "/regvid\tРегистрировать видеоформаты"
-    IDS_CMD_REGAUD          "/regaud\tРегистрировать аудиоформаты"
-    IDS_CMD_REGPL           "/regpl\tРегистрировать плейлисты"
-    IDS_CMD_REGALL          "/regall\tРегистрировать все поддерживыемые форматы"
-    IDS_CMD_UNREGALL        "/unregall\tРазрегистрировать все форматы"
-    IDS_CMD_START           "/start ms\tВоспроизводить с позиции ""ms""\n(миллисекунды)"
-    IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tВоспроизводить с позиции hh:mm:ss"
-    IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tУстановить фиксированный размер окна"
-    IDS_CMD_MONITOR         "/monitor N\tЗапускаться на мониторе N, где N\nотсчитывается с 1"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tИспользовать аудиорендер N, где N\nотсчитывается с 0 (смотрите настройки\n""Аудио"")"
-    IDS_CMD_VOLUME          "/volume N\tУстановить громкость, где N - число в диапазоне от 0 до 100"
-    IDS_CMD_CLIPBOARD       "/clipboard\tОткрыть пути/ссылки из буфера обмена"
-    IDS_CMD_DEVICE          "/device\tОткрыть видео устройство по умолчанию"
-    IDS_CMD_RESET           "/reset\tВосстановить настройки по умолчанию"
+    IDS_CMD_REGVID          "/regvid\tРегистрирай формати"
+    IDS_CMD_REGAUD          "/regaud\tРегистрирай аудио формати"
+    IDS_CMD_REGPL           "/regpl\tРегистрирай плейлисти"
+    IDS_CMD_REGALL          "/regall\tРегистрирай всички поддържани формати"
+    IDS_CMD_UNREGALL        "/unregall\tДерегистрирай всички формати"
+    IDS_CMD_START           "/start ms\tВъзпроизведи от позиция ""ms""\n(миллисекунды)"
+    IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tВъзпроизведи от позиция hh:mm:ss"
+    IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tЗадай фиксиран размер на прозореца"
+    IDS_CMD_MONITOR         "/monitor N\tСтартира на монитора N, където N\nсе отчита с 1"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tИзпользовай аудиорендер N, където N\nсе отчита с 0 (виж настройки\n""Аудио"")"
+    IDS_CMD_VOLUME          "/volume N\tЗадай сила на звука, где N - число в диапазона от 0 до 100"
+    IDS_CMD_CLIPBOARD       "/clipboard\tОтвори пътища/връзки от буфера данни"
+    IDS_CMD_DEVICE          "/device\tОтвори видео устройство по подразбиране"
+    IDS_CMD_RESET           "/reset\tВъзстановяви настройките по подразбиране"
 END
 
 STRINGTABLE
@@ -3339,10 +3339,10 @@ BEGIN
     IDS_VDF_SCANTYPE_TOP    "Top-Field First"
     IDS_VDF_SCANTYPE_BOTTOM "Bottom-Field First"
     IDS_VDF_SCANTYPE_PROGRESSIVE "Прогресивно"
-    IDS_VDF_COLOR_OUTPUT_FORMATS "Выходные форматы"
+    IDS_VDF_COLOR_OUTPUT_FORMATS "Изходни формати"
     IDS_VDF_COLOR_PRESET    "Пресети:"
     IDS_VDF_COLOR_STANDARD  "Стандарт:"
-    IDS_VDF_COLOR_CONVERT_TO_RGB "Преобразовать в RGB"
+    IDS_VDF_COLOR_CONVERT_TO_RGB "Преобразувай в RGB"
     IDS_VDF_COLOR_RGB_LEVELS "Изходни нива RGB:"
 END
 
@@ -3353,7 +3353,7 @@ BEGIN
     IDS_VDF_STATUS_FRAMESIZE "Размер на кадъра:"
     IDS_VDF_STATUS_OUTPUT   "Изходен формат:"
     IDS_VDF_STATUS_ADAPTER  "Графична карта:"
-    IDS_VDF_TT_AR           "Включено - пропорции кадра извлекаются из потока.\nВыключено - пропорции кадра сообщает сплиттер.\nСреднее - пропорции кадра извлекаются из потока только если их не сообщает сплиттер (рекомендуется)"
+    IDS_VDF_TT_AR           "Включено - пропорциите на кадъра се извличат от потока.\nИзключено - пропорциите на кадъра задава сплитера.\nСредно - пропорциите на кадъра се извличат от потока само ако не ги задава сплитера (препоръчано)"
     IDS_VDF_TT_PRESET       "Управлява баланса между скорост и качество."
     IDS_VDF_TT_STANDARD     "Използва се при конвертиране от YUV в RGB и обратно."
     IDS_VDF_TT_RGB_LEVELS   "Използва се при конвертиране от YUV в RGB."
@@ -3370,7 +3370,7 @@ STRINGTABLE
 BEGIN
     IDS_MPEG2_BRIGHTNESS    "Яркост"
     IDS_MPEG2_RESET         "Нулиране"
-    IDS_MPEG2_NOTE1         "Использование непланарного формата вывода, bob deinterlacer, или подстройка свойств цвета может ухудшить производительность. Фильтр ""Auto"" будет переключаться в ""Blend"" при необходимости."
+    IDS_MPEG2_NOTE1         "Използването на непланарен изходен формат, bob deinterlacer или коригиране на свойствата на цветовете може да влоши производителността. Филтърът ""Автоматично"" ще превключи на ""Смесване"", ако е необходимо."
     IDS_MPEG2_CONTRAST      "Контраст"
     IDS_MPEG2_HUE           "Нюанс"
     IDS_MPEG2_SATURATION    "Наситеност"
@@ -3403,7 +3403,7 @@ BEGIN
     IDS_ARS_CHANNELS        "Канали:"
     IDS_ARS_WASAPI_METHOD   "Метод на работа на WASAPI:"
     IDS_ARS_DUMMY_CHANNELS  "Не запълвайте каналите при възходящо смесване"
-    IDS_ARS_TIP_BITEXACT_OUTPUT  "По возможности звук будет отправлен в исходном формате.\nИначе будет использоваться формат, указанный в настройках системы."
+    IDS_ARS_TIP_BITEXACT_OUTPUT  "Ако е възможно, аудиото ще бъде изпратено в оригиналния си формат.\nВ противен случай ще се използва форматът, посочен в системните настройки."
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "Рендърът ще се опита да инициализира устройството, като пропусне някои проверки."
 END
 
@@ -3411,7 +3411,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Зареждане на вградени шрифтове"
     IDS_MKVSPLT_CALC_DURATION "Изчисляване продължителността на базата с видео данни"
-    IDS_MKVSPLT_REINDEX             "Переиндексация в случае необходимости"
+    IDS_MKVSPLT_REINDEX             "Преиндексация ако е необходимо"
 END
 
 STRINGTABLE
@@ -3675,10 +3675,10 @@ BEGIN
     IDS_SATURATION_DEC      "Намаляване на насищането"
     IDS_RESET_COLOR         "Нулиране настройките на цветовете"
     IDS_AFTERPLAYBACK_CLOSE_FILE "В края на възпроизвеждането: винаги затваряйте файла"
-    IDS_UPDATE_ERROR_DATA   "Сервер обновлений выдает неверные данные.\n\nПовторите попытку позже."
+    IDS_UPDATE_ERROR_DATA   "Сървърът за обновяване връща неправилни данни.\n\nМоля, опитайте отново по-късно."
     IDS_USING_NEWER_VERSION "Използвате последната версия на %s."
-    IDS_NEW_UPDATE_AVAILABLE  "Более новая версия %s найдена.\n\nВы хотите посетить сайт MPC-BE чтобы скачать её?"
-    IDS_UPDATE_ERROR_CONNECT  "Сервер обновлений не найден.\n\nПожалуйста, проверьте связь с интернетом и попробуйте снова."
+    IDS_NEW_UPDATE_AVAILABLE  "По-нова версия %s found.\n\nИскате ли да посетите уебсайта на MPC-BE, за да го изтеглите?"
+    IDS_UPDATE_ERROR_CONNECT  "Сървърът за актуализация не е намерен.\n\nМоля, проверете интернет връзката си и опитайте отново."
     IDS_UPDATE_CLOSE        "&Затвори"
     IDS_OSD_ZOOM            "Мащаб: %.0lf%%"
 END
@@ -3696,7 +3696,7 @@ BEGIN
     IDS_GOTO_ERROR_PARSING_FPS "Броят на кадрите в секунда (кадрова честота) не се записва правилно!"
     IDS_FRAME_STEP_ERROR_RENDERER  "Не може да се гледа кадър по кадър, опитайте с друг рендер за видео."
     IDS_SCREENSHOT_ERROR_SHOCKWAVE  "Функциите ""Запазване на изображение"" и ""Запазване на миниатюри"" не работят с Shockwave файлове."
-    IDS_SCREENSHOT_ERROR_OVERLAY  "Функции 'Сохранить изображение' и 'Сохранить миниатюры' не работают с рендерером Overlay Mixer.\nИзмените видеорендерер и вновь откройте файл."
+    IDS_SCREENSHOT_ERROR_OVERLAY  "Функциите ""Запазване на изображението"" и ""Запазване на миниатюри"" не работят с рендера на Overlay Mixer.\nПроменете програмата за изобразяване на видео и отворете файла отново."
     IDS_SUBDL_DLG_CONNECT_ERROR  "Не може да се свърже с базата данни със субтитри."
 END
 
@@ -3713,7 +3713,7 @@ BEGIN
     IDS_FILTERS_VIDEO       "Видео декодери"
     IDS_FILTERS_AUDIO       "Аудио декодери"
     IDS_GOTO_ERROR_INVALID_TIME  "Въведеното време е по-голямо от продължителността на файла."
-    IDS_SCREENSHOT_ERROR_MADVR  "Функции 'Сохранить изображение' и 'Сохранить миниатюры' не работают с рендерером madVR.\nИзмените видеорендерер и вновь откройте файл."
+    IDS_SCREENSHOT_ERROR_MADVR  "Функциите ""Запазване на изображението"" и ""Запазване на миниатюри"" не работят с renderer madVR.\nСменете видео рендера и отворете отново файла."
     IDS_SUBDL_DLG_FILENAME_COL "Файл"
     IDS_SUBDL_DLG_LANGUAGE_COL "Език"
     IDS_SUBDL_DLG_FORMAT_COL "Формат"
