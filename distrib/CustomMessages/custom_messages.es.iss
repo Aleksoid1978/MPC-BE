@@ -25,7 +25,7 @@
 
 [Messages]
 ;Spanish
-es.WelcomeLabel2=Este programa instalara [name] en tu computadora.%n%nEs recomendable que cierres todas las aplicaciones antes de continuar.
+es.WelcomeLabel2=Este programa instalará [name] en tu computadora.%n%nEs recomendable que cierres todas las aplicaciones antes de continuar.
 es.WinVersionTooLowError=[name] require Windows 7 o superior para funcionar.
 
 
@@ -37,34 +37,34 @@ es.langid=00001034
 es.langcode=es
 es.comp_mpciconlib=Librería de iconos
 es.comp_mpcresources=Traducciones
-es.comp_mpcbeshellext=Install the shell extension
-es.comp_intel_msdk=H.264 MVC 3D Decoder
-es.msg_DeleteSettings=¿Quiere eliminar también las preferencias de MPC-BE?%n%nSi planea instalar de nuevo MPC-BE no necesita eliminarlas.
+es.comp_mpcbeshellext=Instalar la extensión shell
+es.comp_intel_msdk=Decodificador MVC 3D H.264
+es.msg_DeleteSettings=¿Quieres eliminar también las preferencias de MPC-BE?%n%nSi planeas instalar de nuevo MPC-BE no necesitas eliminarlas.
 es.msg_NoD3DX9DLL_found=¡No está instalada la última versión de DirectX!%n%nPor favor descargue e instale DirectX runtime June 2010 independientemente de su sistema operativo.
 es.msg_SetupIsRunningWarning=La instalación de MPC-BE ya se esta ejecutando!
 es.msg_simd_sse2=Esta versión de MPC-BE requiere una CPU con soporte de extensiones SSE2.%n%nSu CPU carece de esta característica.
 es.tsk_AllUsers=Para todos los usuarios
 es.tsk_CurrentUser=Para el usuario actual solamente
 es.tsk_Other=Otras tareas:
-es.tsk_LongPathsEnable=Enable Windows 10 long paths support
+es.tsk_LongPathsEnable=Habilitar compatibilidad con rutas largas de Windows 10
 es.tsk_ResetSettings=Restaurar preferencias
-es.types_DefaultInstallation=Instalación por defecto
+es.types_DefaultInstallation=Instalación predeterminada
 es.types_CustomInstallation=Instalación personalizada
 es.ViewChangelog=Ver registro de cambios
-es.AssociationFormatsAV=Configuring associations with video and audio files:
-es.AssociationFormats=Association with video and audio files
-es.AssociationVideo=Association with video files
-es.AssociationAudio=Association with audio files
-es.AssociationPlaylist=Association with playlists
-es.AutoPlayType=Auto play:
-es.AssociationMPCPlayCDAudioOnArrivalF=Play Audio CD
-es.AssociationMPCPlayCDAudioS=Audio CD
-es.AssociationMPCPlayDVDMovieArrivalF=Play DVD Movie
-es.AssociationMPCPlayDVDMovieS=DVD Movie
-es.AssociationMPCPlayMusicFilesF=Play Music
-es.AssociationMPCPlayMusicFilesS=Music Files
-es.AssociationMPCPlayVideoFilesF=Play Video
-es.AssociationMPCPlayVideoFilesS=Video Files
-es.PinToTaskBar=Pin to TaskBar
-es.ComponentWillBeDownloaded=will be downloaded
-es.ComponentAlreadyDownloaded=already downloaded
+es.AssociationFormatsAV=Configuración de asociaciones con archivos de video y audio:
+es.AssociationFormats=Asociación con archivos de video y audio
+es.AssociationVideo=Asociación con archivos de video
+es.AssociationAudio=Asociación con archivos de audio
+es.AssociationPlaylist=Asociación con listas de reproducción
+es.AutoPlayType=Reproducción automática:
+es.AssociationMPCPlayCDAudioOnArrivalF=Reproducir CD de audio
+es.AssociationMPCPlayCDAudioS=CD de audio
+es.AssociationMPCPlayDVDMovieArrivalF=Reproducir película DVD
+es.AssociationMPCPlayDVDMovieS=Película DVD
+es.AssociationMPCPlayMusicFilesF=Reproducir música
+es.AssociationMPCPlayMusicFilesS=Archivos de música
+es.AssociationMPCPlayVideoFilesF=Reproducir video
+es.AssociationMPCPlayVideoFilesS=Archivos de video
+es.PinToTaskBar=Anclar a la barra de tareas
+es.ComponentWillBeDownloaded=se descargará
+es.ComponentAlreadyDownloaded=ya descargado
