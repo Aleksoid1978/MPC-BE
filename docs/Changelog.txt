@@ -5,8 +5,15 @@
 Standalone filters
 Fixed registration of filters from a folder with Unicode characters.
 
+MatroskaSplitter
+Added the setting "Re-indexing if necessary".
+Slightly sped up rewinding in the absence of indexes.
+
+MP4Splitter
+Added getting track name from "mdia/hdlr" atom for some incorrectly created files (track name should be stored in "udta/name" atom).
+
 MPCVideoDec
-Added support for additional D3D11 HEVC decoders. Drivers for modern Nvidia and Intel graphics adapters need to be updated.
+Added support for additional HEVC decoders for D3D11 and D3D11 copyback mode. Drivers for modern Nvidia and Intel graphics adapters need to be updated.
 
 MpcAudioRenderer
 Fixed rare crashes when changing input format.
@@ -24,6 +31,9 @@ Improved work with playlists.
 OSD messages about errors opening files, URLs are now displayed for 3 seconds.
 Fixed the list of languages in the DVD-Video settings panel.
 The /audiorenderer key has been changed.
+Fixed Shockwave Flash playback.
+Selecting two identical audio renderers for dual output is prohibited.
+Fixed URL decoding for Windows 7.
 Various interface fixes.
 
 Updated Korean translation (by Hackjjang).
