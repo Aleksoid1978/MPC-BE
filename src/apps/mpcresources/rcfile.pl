@@ -1,6 +1,6 @@
 #/bin/perl
 #
-# (C) 2010-2023 see Authors.txt
+# (C) 2010-2025 see Authors.txt
 #
 # This file is part of MPC-BE.
 #
@@ -39,6 +39,7 @@ my $NewFileName = "../mplayerc/mplayerc.rc";
 my $help;
 
 my %LANG_EXEPTIONS = (
+	'bg' => 'bg',
 	'br' => 'pt-BR',
 	'by' => 'be',
 	'ca' => 'ca',
