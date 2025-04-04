@@ -23,6 +23,7 @@ u_shell (Documentacion translator) - Russia
 Translators:
 -------------
 Basque                : azpidatziak - Xabier Aramendi (azpidatziak@users.sourceforge.net)
+Bulgarian             : jekovcar
 Chinese (Simplified)  : insolo, beter, wushantao
 Chinese (Traditional) : beter
 Dutch                 : beter
