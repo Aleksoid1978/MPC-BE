@@ -1670,7 +1670,7 @@ BEGIN
         MENUITEM SEPARATOR
         POPUP "Setări pentru randor"
         BEGIN
-            MENUITEM "&Test de rupere (tearing)",         ID_VIEW_TEARING_TEST
+            MENUITEM "&Test de rupere",         ID_VIEW_TEARING_TEST
             MENUITEM "&Afișează statisticile",        ID_VIEW_DISPLAYSTATS
             MENUITEM SEPARATOR
             POPUP "Prezentare"
@@ -1851,7 +1851,7 @@ BEGIN
         MENUITEM SEPARATOR
         POPUP "Setări pentru randor"
         BEGIN
-            MENUITEM "&Test de rupere (tearing)",         ID_VIEW_TEARING_TEST
+            MENUITEM "&Test de rupere",         ID_VIEW_TEARING_TEST
             MENUITEM "&Afișează statisticile",        ID_VIEW_DISPLAYSTATS
             MENUITEM SEPARATOR
             POPUP "Prezentare"
@@ -1938,7 +1938,7 @@ BEGIN
             MENUITEM SEPARATOR
             POPUP "Setări pentru randor"
             BEGIN
-                MENUITEM "&Test de rupere (tearing)",         ID_VIEW_TEARING_TEST
+                MENUITEM "&Test de rupere",         ID_VIEW_TEARING_TEST
                 MENUITEM "&Afișează statisticile",        ID_VIEW_DISPLAYSTATS
                 MENUITEM SEPARATOR
                 POPUP "Prezentare"
@@ -2018,7 +2018,7 @@ BEGIN
         MENUITEM SEPARATOR
         POPUP "Setări pentru randor"
         BEGIN
-            MENUITEM "&Test de rupere (tearing)",         ID_VIEW_TEARING_TEST
+            MENUITEM "&Test de rupere",         ID_VIEW_TEARING_TEST
             MENUITEM "&Afișează statisticile",        ID_VIEW_DISPLAYSTATS
             MENUITEM SEPARATOR
             POPUP "Prezentare"
@@ -2673,7 +2673,7 @@ BEGIN
     IDS_AG_PNS_FLIP         "Întoarce PnS-ul pe orizontală"
     IDS_AG_PNS_ROTATE_CCW   "Rotește PnS-ul în sens invers acelor de ceasornic"
     IDS_AG_PNS_ROTATE_CW    "Rotește PnS-ul în sensul acelor de ceasornic"
-    IDS_AG_TEARING_TEST     "Test de rupere (tearing)"
+    IDS_AG_TEARING_TEST     "Test de rupere"
     IDS_SCALE_16_9          "Scalează la 16:9 TV,%.3f,%.3f,%.3f,%.3f"
     IDS_SCALE_WIDESCREEN    "Scalează la Widescreen (Ecran lat),%.3f,%.3f,%.3f,%.3f"
     IDS_SCALE_ULTRAWIDE     "Scalează la Ultra-Widescreen (Ecran ultra-lat),%.3f,%.3f,%.3f,%.3f"
@@ -3052,7 +3052,7 @@ STRINGTABLE
 BEGIN
     IDS_ADDTOPLS_FROMDIR_SIMILAR "fișiere similare din dosar (din folder)"
     IDS_ADDTOPLS_FROMDIR_ALL "toate fișierele dintr-un dosar (dintr-un folder)"
-    IDS_EXCLUSIVE_FS_WARNING  "Această opțiune a fost proiectată pentru a evita ruperea (tearing). Cu toate acestea, va împiedica de asemenea MPC-BE să afișeze meniul contextual și orice căsuță de dialog în timpul redării.\n\nCa să ieși din modul ecran complet Direct3D și să oprești redarea, trebuie să apeși: Ctrl + C.\n\nEști sigur(ă) că dorești să activezi această opțiune?"
+    IDS_EXCLUSIVE_FS_WARNING  "Această opțiune a fost proiectată pentru a evita ruperea. Cu toate acestea, va împiedica de asemenea MPC-BE să afișeze meniul contextual și orice căsuță de dialog în timpul redării.\n\nCa să ieși din modul ecran complet Direct3D și să oprești redarea, trebuie să apeși: Ctrl + C.\n\nEști sigur(ă) că dorești să activezi această opțiune?"
     IDS_MAINFRM_139         "Întârzierea subtitrărilor: %ld ms"
     IDS_AG_TITLE2           "Titlu: %02d/%02d"
     IDS_THUMB_ROWNUMBER     "Rânduri:"
@@ -3495,8 +3495,8 @@ BEGIN
     IDS_FRONT_LEFT_OF_CENTER "Față stânga a centrului"
     IDS_FRONT_RIGHT_OF_CENTER "Față dreapta a centrului"
     IDS_BACK_CENTER         "Centru spate"
-    IDS_SIDE_LEFT           "Stânga lateral"
-    IDS_SIDE_RIGHT          "Dreapta lateral"
+    IDS_SIDE_LEFT           "Partea stângă"
+    IDS_SIDE_RIGHT          "Partea dreaptă"
     IDS_TOP_CENTER          "Centru sus"
     IDS_TOP_FRONT_LEFT      "Stânga față sus"
     IDS_TOP_FRONT_CENTER    "Centru față sus"
