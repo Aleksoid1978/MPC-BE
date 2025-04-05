@@ -106,15 +106,16 @@ typedef struct FFV1SliceContext {
             uint64_t (*rc_stat2[MAX_QUANT_TABLES])[32][2];
         };
     };
-    union {
-        uint16_t   bitmap  [4][65536]; //float encode
-        uint16_t   fltmap  [4][65536]; //halffloat encode & decode
-        uint32_t   fltmap32[4][65536]; //float decode
-    };
+
+    uint16_t   *bitmap  [4]; //float encode
+    uint16_t   *fltmap  [4]; //halffloat encode & decode
+    uint32_t   *fltmap32[4]; //float decode
+    unsigned int fltmap_size[4];
+    unsigned int fltmap32_size[4];
     struct Unit {
         uint32_t val; //this is unneeded if you accept a dereference on each access
         uint16_t ndx;
-    } unit[4][65536];
+    } *unit[4];
 } FFV1SliceContext;
 
 typedef struct FFV1Context {
@@ -148,7 +149,7 @@ typedef struct FFV1Context {
     int colorspace;
     int flt;
     int remap_mode;
-
+    int remap_optimizer;
 
     int use32bit;
 

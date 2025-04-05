@@ -53,7 +53,7 @@ YouTube
 Добавлен болгарский перевод (автор jekovcar).
 
 Обновлены библиотеки:
-	ffmpeg n7.2-dev-1910-g5fac8d062d;
+	ffmpeg n7.2-dev-1986-gccf073e772;
 	libflac 1.5.0;
 	Little-CMS git-lcms2.17-10-ge19dc49;
 	MediaInfo git-v24.12-99-g9c4d87833;
