@@ -38,6 +38,7 @@ YouTube
 
 Инсталлятор
 Обновлен MPC Script Source 0.2.7.
+Обновлен MPC Video Renderer 0.9.5.
 
 Обновлен корейский перевод (автор Hackjjang).
 Обновлен румынский перевод (автор Andrei Miloiu).
