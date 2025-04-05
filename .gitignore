@@ -6,6 +6,7 @@
 *.tss
 *.user
 *.vspx
+*.bak
 /.vs
 /_bin
 /environments.bat
