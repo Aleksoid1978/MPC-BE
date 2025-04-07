@@ -2497,9 +2497,9 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 
 	m_bReleased = false;
 
-	const auto bufferDuration = m_hnsBufferDuration < 1000000LL ? 2000000LL : 5000000LL;
-	m_nMaxWasapiQueueSize = TimeToSamples(bufferDuration, m_pWaveFormatExInput) * m_pWaveFormatExInput->nBlockAlign;
-	DLog(L"CMpcAudioRenderer::CreateRenderClient() - internal buffer duration = %.2f ms, size = %u", bufferDuration / 10000.0f, m_nMaxWasapiQueueSize);
+	const auto buffer_duration = m_hnsBufferDuration < 1000000LL ? 2000000LL : 5000000LL;
+	m_nMaxWasapiQueueSize = TimeToSamples(buffer_duration, m_pWaveFormatExOutput) * m_pWaveFormatExOutput->nBlockAlign;
+	DLog(L"CMpcAudioRenderer::CreateRenderClient() - internal buffer duration = %.2f ms, size = %u", buffer_duration / 10000.0f, m_nMaxWasapiQueueSize);
 
 #ifdef DEBUG_OR_LOG
 	REFERENCE_TIME hnsLatency = 0;
