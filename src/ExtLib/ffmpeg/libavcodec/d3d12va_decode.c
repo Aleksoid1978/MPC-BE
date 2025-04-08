@@ -347,6 +347,8 @@ static int d3d12va_create_decoder(AVCodecContext *avctx)
 
     ctx->reference_only_map = NULL;
     ctx->ref_only_resources = NULL;
+// ==> Start patch MPC
+/*
     if (feature.ConfigurationFlags & D3D12_VIDEO_DECODE_CONFIGURATION_FLAG_REFERENCE_ONLY_ALLOCATIONS_REQUIRED) {
         av_log(avctx, AV_LOG_VERBOSE, "Reference-Only Allocations are required for this D3D12 decoder configuration.\n");
         ctx->reference_only_map = av_calloc(ctx->max_num_ref + 1, sizeof(ReferenceFrame));
@@ -356,6 +358,8 @@ static int d3d12va_create_decoder(AVCodecContext *avctx)
             if (!ctx->ref_only_resources)
                 return AVERROR(ENOMEM);
     }
+*/
+// ==> End patch MPC
 
     desc = (D3D12_VIDEO_DECODER_DESC) {
         .NodeMask = 0,
