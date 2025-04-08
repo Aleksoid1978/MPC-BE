@@ -235,7 +235,7 @@ BEGIN
     CONTROL         "<a>https://github.com/Aleksoid1978/MPC-BE</a>",IDC_GITHUB_LINK,
                     "SysLink",WS_TABSTOP,30,126,200,8
     LTEXT           "Acest program este gratuit și lansat sub licența GNU General Public License.",IDC_STATIC,30,138,200,18
-    LTEXT           "Între anii 2023-2025 traducătorul este Andrei Valentin Miloiu.  În trecut, au tradus Daniel Alămiță şi lordkag.",IDC_STATIC,30,161,200,18
+    LTEXT           "Între anii 2023-2025 traducătorul este Andrei-Valentin Miloiu.  În trecut, au tradus Daniel Alămiță şi lordkag.",IDC_STATIC,30,161,200,18
     DEFPUSHBUTTON   "OK",IDOK,185,183,50,14,WS_GROUP
 END
 
@@ -2827,7 +2827,7 @@ BEGIN
     IDS_AG_MENU_AFTERPLAYBACK "Meniul de după lista de redare (playlist)"
     IDS_AG_RESET_STATS      "Resetează statisticile randorului Sync"
     IDS_VIEW_BORDERLESS     "Ascunde marginile\tCtrl+0"
-    IDS_VIEW_FRAMEONLY      "Doar cadru\tCtrl+0"
+    IDS_VIEW_FRAMEONLY      "Doar cadrul\tCtrl+0"
     IDS_VIEW_CAPTIONMENU    "Arată meniul și titlul\tCtrl+0"
     IDS_VIEW_HIDEMENU       "Ascunde meniul\tCtrl+0"
 END
@@ -3023,7 +3023,7 @@ BEGIN
     IDS_ADD_TO_PLAYLIST     "Adaugă la lista de redare (la playlist) a MPC-BE"
     IDS_OPEN_WITH_MPC       "Redare cu MPC-BE"
     IDS_CANNOT_CHANGE_FORMAT  "MPC-BE nu are destule drepturi pentru a schimba asocierea cu formatele de fișiere. Dă clic pe butonul „Modifică” pentru a obține drepturi de administrator."
-    IDS_APP_DESCRIPTION     "Unul dintre cele mai puternice și configurabile lectoare multimedia pentru sistemul de operare Windows. Creat la început de un dezvoltator maghiar cunoscut ca Gabest, această versiune are aptitudini adiționale cum ar fi mod pe tot ecranul Direct 3D și o compatibilitate mai bună cu Vista/7."
+    IDS_APP_DESCRIPTION     "Unul dintre cele mai puternice, configurabile playere multimedia pentru sistemul de operare Windows. Realizat inițial de un dezvoltator maghiar cunoscut sub numele de Gabest, această versiune are caracteristici suplimentare, cum ar fi modul ecran complet exclusiv și suport mai bun pentru Windows Vista/7."
     IDS_MAINFRM_12          "canal"
     IDS_MAINFRM_13          "canale"
 END
@@ -3213,8 +3213,8 @@ BEGIN
     IDS_CMD_USAGE           "Utilizare: mpc-be.exe „cale” [comutatoare]"
     IDS_CMD_PATHNAME        "„cale”\tFișierul sau directorul principal ce trebuie încărcat (metacaractere\npermise)"
     IDS_CMD_HELP            "/help /h /?\tArată ajutorul pentru comutatoarele din linia de comandă"
-    IDS_CMD_DUB             "/dub „numele dublajului”\tÎncarcă un fișier audio adițional"
-    IDS_CMD_DUBDELAY        "/dubdelay „fișier”\tÎncarcă un fișier audio adițional decalat cu XXms (dacă\nfișierul conține „...DELAY XXms...”)"
+    IDS_CMD_DUB             "/dub „numele dublajului”\tÎncarcă un fișier audio suplimentar"
+    IDS_CMD_DUBDELAY        "/dubdelay „fișier”\tÎncarcă un fișier audio suplimentar decalat cu XX ms (dacă\nfișierul conține „...DELAY XXms (întârziere de XX ms)...”)"
 END
 
 STRINGTABLE
@@ -3248,7 +3248,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tPornește redarea la poziția hh:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tSetează o dimensiune fixă pentru fereastră"
     IDS_CMD_MONITOR         "/monitor N\tPornește redarea pe monitorul N, unde N începe de la 1"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tStart using audiorenderer, where ""name"" is the name\nof the audio renderer (see ""Audio"" settings)"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""nume""\tRedă fișierul folosind randorul audio, unde ""nume"" e numele\nrandorului audio (vezi setările „Audio”)"
     IDS_CMD_VOLUME          "/volume N\tSetează volumul, unde N este un interval de la 0 la 100"
     IDS_CMD_CLIPBOARD       "/clipboard\tDeschide căile/legăturile (link-urile) din clipboard"
     IDS_CMD_DEVICE          "/device\tDeschide dispozitivul video implicit"
@@ -3351,7 +3351,7 @@ BEGIN
     IDS_VDF_STATUS_INPUT    "Formatul de intrare:"
     IDS_VDF_STATUS_FRAMESIZE "Mărimea cadrului:"
     IDS_VDF_STATUS_OUTPUT   "Formatul de ieșire:"
-    IDS_VDF_STATUS_ADAPTER  "Adaptor grafic:"
+    IDS_VDF_STATUS_ADAPTER  "Adaptorul grafic:"
     IDS_VDF_TT_AR           "Bifat - va fi folosit AR-ul pentru redarea în flux.\nNebifat - va fi folosit AR-ul din container.\nNedeterminat - AR-ul din flux nu va fi folosit pentru fișierele cu un container cu AR (recomandat)."
     IDS_VDF_TT_PRESET       "Schimbă relația dintre viteză și calitate."
     IDS_VDF_TT_STANDARD     "Aceste setări sunt folosite numai atunci când filtrul face conversia YCbCr<->RGB."

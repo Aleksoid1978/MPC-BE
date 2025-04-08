@@ -3249,7 +3249,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos ss:dd:ss\tOynatmaya ss:dd:ss süresinden başlanılır"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tSabit pencere boyutu kullanılır"
     IDS_CMD_MONITOR         "/monitor N\tN monitöründe başlatılır; N, 1'den başlar"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tStart using audiorenderer, where ""name"" is the name\nof the audio renderer (see ""Audio"" settings)"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""ad""\tBir ses işleyici kullanılacaksa burada ""ad""\nses işleyicinin adıdır (bkz. ""Ses"" ayarları)"
     IDS_CMD_VOLUME          "/volume N\tSesi Ayarlar. Burada N, 0 ile 100 arasında bir aralıktır"
     IDS_CMD_CLIPBOARD       "/clipboard\tPanodan dosya yolu/URL açar (liste desteklenir)"
     IDS_CMD_DEVICE          "/device\tVarsayılan video aygıtını açar"
