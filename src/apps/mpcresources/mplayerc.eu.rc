@@ -3249,7 +3249,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tHasi irakurketa kokapen honetan oo:mn:sg"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tEzarri zuzendutako leiho neurria"
     IDS_CMD_MONITOR         "/monitor N\tHasi irakurketa N monitorean,\nnon N hasten den 1-etik"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tHasi N audio-aurkezlea erabiliz,\nnon N hasten den 1-etik (ikusi ""Irteera"" ezarpenak)"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tStart using audiorenderer, where ""name"" is the name\nof the audio renderer (see ""Audio"" settings)"
     IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
     IDS_CMD_CLIPBOARD       "/clipboard\tOpen paths/links from the clipboard"
     IDS_CMD_DEVICE          "/device\tOpen the default video device"

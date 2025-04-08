@@ -3249,7 +3249,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tStart playing at position hh:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tNastavit fixnu sirku okna"
     IDS_CMD_MONITOR         "/monitor N\tSpustit na monitore N, pricom cislo N zacina na hodnote 1"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tSpustit pouzitim vykreslovaca zvuku N, kde N sa spusta od 1\n(pozrite si nastavenia ""Vystupu"")"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tStart using audiorenderer, where ""name"" is the name\nof the audio renderer (see ""Audio"" settings)"
     IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
     IDS_CMD_CLIPBOARD       "/clipboard\tOpen paths/links from the clipboard"
     IDS_CMD_DEVICE          "/device\tOpen the default video device"

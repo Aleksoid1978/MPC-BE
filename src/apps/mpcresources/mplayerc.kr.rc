@@ -3249,7 +3249,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\t위치 hh:mm:ss에서 재생 시작"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\t지정한 가로(w), 세로(h) 크기로 고정"
     IDS_CMD_MONITOR         "/monitor N\tN번 모니터에서 시작(N은 1이상이어야함)"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\t오디오 렌더러 N번(1부터 시작)을 사용해서 시작\n(""출력"" 설정을 참고하세요)"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tStart using audiorenderer, where ""name"" is the name\nof the audio renderer (see ""Audio"" settings)"
     IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
     IDS_CMD_CLIPBOARD       "/clipboard\tOpen 클립보드에서 경로/링크 열기"
     IDS_CMD_DEVICE          "/device\tOpen the default video device"

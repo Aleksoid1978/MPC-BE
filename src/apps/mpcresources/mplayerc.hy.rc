@@ -3249,7 +3249,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tStart playing at position hh:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tՀաստատել պատուհանի ֆիկսված չափ։"
     IDS_CMD_MONITOR         "/monitor N\tԲացվում է N մոնիտորի վրա, որտեղ N-ը հաշվվում է 1-ից։"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tՕգտագործել N ցուցադրիչը, որտեղ N-ը հաշվվում է 1-ից\n(նայեք ""Արտածման"" կարգավորումները)։"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tStart using audiorenderer, where ""name"" is the name\nof the audio renderer (see ""Audio"" settings)"
     IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
     IDS_CMD_CLIPBOARD       "/clipboard\tOpen paths/links from the clipboard"
     IDS_CMD_DEVICE          "/device\tOpen the default video device"

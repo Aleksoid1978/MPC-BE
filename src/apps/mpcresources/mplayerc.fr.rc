@@ -3249,7 +3249,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tCommencer à lecture à la position hh:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize L,H\tFixe la taille de la fenêtre vidéo à LxH"
     IDS_CMD_MONITOR         "/monitor N\tDémarre MPC-BE sur l'écran N (N à partir de 1)"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tUtiliser le rendu audio N, où N commence à partir de 1\n(cf. ""Sortie"" dans les options)"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tStart using audiorenderer, where ""name"" is the name\nof the audio renderer (see ""Audio"" settings)"
     IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
     IDS_CMD_CLIPBOARD       "/clipboard\tOuvrir paths/links from the clipboard"
     IDS_CMD_DEVICE          "/device\tOpen the default video device"

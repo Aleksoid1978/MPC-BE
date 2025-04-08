@@ -3249,7 +3249,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tΈναρξη αναπαραγωγής στη θέση hh:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tΟρίζει το μέγεθος ενός σταθερού παραθύρου"
     IDS_CMD_MONITOR         "/monitor N\tΕκκίνηση του MPC-BE στην οθόνη N (όπου το N ξεκινά από 1)"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tΈναρξη απόδοσης ήχου με χρήση του N (όπου το N ξεκινά από 1)\n(βλέπε ρυθμίσεις ""Έξοδος"")"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tStart using audiorenderer, where ""name"" is the name\nof the audio renderer (see ""Audio"" settings)"
     IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
     IDS_CMD_CLIPBOARD       "/clipboard\tΆνοιγμα διαδρομών/συνδέσεων από το πρόχειρο"
     IDS_CMD_DEVICE          "/device\tOpen the default video device"

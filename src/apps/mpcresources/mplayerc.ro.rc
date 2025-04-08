@@ -3248,7 +3248,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tPornește redarea la poziția hh:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tSetează o dimensiune fixă pentru fereastră"
     IDS_CMD_MONITOR         "/monitor N\tPornește redarea pe monitorul N, unde N începe de la 1"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tPornește folosind randorul audio N, unde N începe de la 1\n(vezi setările „Ieșire”)"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tStart using audiorenderer, where ""name"" is the name\nof the audio renderer (see ""Audio"" settings)"
     IDS_CMD_VOLUME          "/volume N\tSetează volumul, unde N este un interval de la 0 la 100"
     IDS_CMD_CLIPBOARD       "/clipboard\tDeschide căile/legăturile (link-urile) din clipboard"
     IDS_CMD_DEVICE          "/device\tDeschide dispozitivul video implicit"

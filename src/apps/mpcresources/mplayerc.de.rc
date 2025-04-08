@@ -3249,7 +3249,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tStartet Wiedergabe bei Position (hh:mm:ss)."
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tFixiert Fenstergröße bei Breite W und Höhe H."
     IDS_CMD_MONITOR         "/monitor N\tStartet Player auf Monitor N (wobei N > 0)."
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tLädt Audiorenderer N (wobei N > 0, siehe\nAusgabe-Optionen)."
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tStart using audiorenderer, where ""name"" is the name\nof the audio renderer (see ""Audio"" settings)"
     IDS_CMD_VOLUME          "/volume N\tLautstärke stellen, wobei N eine Zahl im Bereich von 0 bis 100 ist."
     IDS_CMD_CLIPBOARD       "/clipboard\tPfade/Links aus der Zwischenablage öffnen"
     IDS_CMD_DEVICE          "/device\tStandard-Videogerät öffnen."
