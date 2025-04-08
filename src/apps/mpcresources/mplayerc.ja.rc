@@ -3249,7 +3249,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\t位置 hh:mm:ss から再生を開始する"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tウィンドウ サイズを固定する"
     IDS_CMD_MONITOR         "/monitor N\tN 番目 (N は 1 から始まる) のモニターで起動する"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tN 番目 (N は 1 から始まる) の音声レンダラーを使用する\n(「音声」設定を参照)"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tStart using audiorenderer, where ""name"" is the name\nof the audio renderer (see ""Audio"" settings)"
     IDS_CMD_VOLUME          "/volume N\t音量を設定する、N は 0 から 100 の範囲で指定する"
     IDS_CMD_CLIPBOARD       "/clipboard\tクリップボードからパス/リンクを開く"
     IDS_CMD_DEVICE          "/device\t既定のビデオ デバイスを開く"

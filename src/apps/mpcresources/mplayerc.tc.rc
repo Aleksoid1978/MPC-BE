@@ -3249,7 +3249,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\t從時間 hh:mm:ss 開始播放"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\t設定固定的視窗大小"
     IDS_CMD_MONITOR         "/monitor N\t在第 N 顯示器啟動, N 從 1 開始"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\t使用第 N 音訊譜製器啟動, N 從 1 開始\n(請見 ""輸出"" 設定)"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tStart using audiorenderer, where ""name"" is the name\nof the audio renderer (see ""Audio"" settings)"
     IDS_CMD_VOLUME          "/volume N\t設定音量， N 的範圍為從 0 到 100"
     IDS_CMD_CLIPBOARD       "/clipboard\t開啟剪貼簿中的路徑或連結"
     IDS_CMD_DEVICE          "/device\t開啟預設視訊裝置"

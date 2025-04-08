@@ -3249,7 +3249,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos uu:mm:ss\tStart afspelen op positie uu:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize B,H\tZet venstergrootte op BxH"
     IDS_CMD_MONITOR         "/monitor N\tStart op schermmonitor N (N start bij 1)"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tStart met audiorenderer N (N start bij 1)\n(zie ""Output"" instellingen)"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tStart using audiorenderer, where ""name"" is the name\nof the audio renderer (see ""Audio"" settings)"
     IDS_CMD_VOLUME          "/volume N\tStel volume in, waarbij N een bereik tussen 0 en 100 heeft"
     IDS_CMD_CLIPBOARD       "/clipboard\tOpen paden of koppelingen vanuit het klembord"
     IDS_CMD_DEVICE          "/device\tOpen het standaardvideoapparaat"

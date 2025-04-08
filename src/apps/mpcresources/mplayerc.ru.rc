@@ -3249,7 +3249,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tВоспроизводить с позиции hh:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tУстановить фиксированный размер окна"
     IDS_CMD_MONITOR         "/monitor N\tЗапускаться на мониторе N, где N\nотсчитывается с 1"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer N\tИспользовать аудиорендер N, где N\nотсчитывается с 0 (смотрите настройки\n""Аудио"")"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tStart using audiorenderer, where ""name"" is the name\nof the audio renderer (see ""Audio"" settings)"
     IDS_CMD_VOLUME          "/volume N\tУстановить громкость, где N - число в диапазоне от 0 до 100"
     IDS_CMD_CLIPBOARD       "/clipboard\tОткрыть пути/ссылки из буфера обмена"
     IDS_CMD_DEVICE          "/device\tОткрыть видео устройство по умолчанию"
