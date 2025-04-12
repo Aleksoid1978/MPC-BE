@@ -3,7 +3,7 @@
 #include "libavutil/mem_internal.h"
 #include "libavutil/pixdesc.h"
 #include "libavcodec/hevc/hevc.h"
-#include "libavcodec/x86/hevcdsp.h"
+#include "libavcodec/x86/hevc/dsp.h"
 
 #ifdef __GNUC__
 #pragma GCC push_options

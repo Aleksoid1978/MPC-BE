@@ -106,15 +106,16 @@ typedef struct FFV1SliceContext {
             uint64_t (*rc_stat2[MAX_QUANT_TABLES])[32][2];
         };
     };
+    int remap_count[4];
 
-    uint16_t   *bitmap  [4]; //float encode
+    uint32_t   *bitmap  [4]; //float encode
     uint16_t   *fltmap  [4]; //halffloat encode & decode
     uint32_t   *fltmap32[4]; //float decode
     unsigned int fltmap_size[4];
     unsigned int fltmap32_size[4];
     struct Unit {
         uint32_t val; //this is unneeded if you accept a dereference on each access
-        uint16_t ndx;
+        uint32_t ndx;
     } *unit[4];
 } FFV1SliceContext;
 
@@ -199,6 +200,7 @@ int ff_ffv1_parse_header(FFV1Context *f, RangeCoder *c, uint8_t *state);
 int ff_ffv1_read_extra_header(FFV1Context *f);
 int ff_ffv1_read_quant_tables(RangeCoder *c,
                               int16_t quant_table[MAX_CONTEXT_INPUTS][256]);
+void ff_ffv1_compute_bits_per_plane(const FFV1Context *f, FFV1SliceContext *sc, int bits[4], int offset[1], int mask[4], int bits_per_raw_sample);
 int ff_ffv1_get_symbol(RangeCoder *c, uint8_t *state, int is_signed);
 
 /**

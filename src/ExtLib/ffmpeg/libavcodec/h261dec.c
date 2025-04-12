@@ -25,7 +25,6 @@
  * H.261 decoder.
  */
 
-#include "libavutil/avassert.h"
 #include "libavutil/thread.h"
 #include "avcodec.h"
 #include "codec_internal.h"
@@ -88,6 +87,12 @@ static av_cold int h261_decode_init(AVCodecContext *avctx)
     int ret;
 
     avctx->framerate = (AVRational) { 30000, 1001 };
+
+    /* The H.261 analog of intra/key frames is setting the freeze picture release flag,
+     * but this does not guarantee that the frame uses intra-only encoding,
+     * so we still need to allocate dummy frames. So set pict_type to P here
+     * for all frames and override it after having decoded the frame. */
+    s->pict_type = AV_PICTURE_TYPE_P;
 
     s->private_ctx = &h->common;
     // set defaults
@@ -458,7 +463,7 @@ intra:
  * Decode the H.261 picture header.
  * @return <0 if no startcode found
  */
-static int h261_decode_picture_header(H261DecContext *h)
+static int h261_decode_picture_header(H261DecContext *h, int *is_key)
 {
     MpegEncContext *const s = &h->s;
     int format, i;
@@ -482,7 +487,7 @@ static int h261_decode_picture_header(H261DecContext *h)
     /* PTYPE starts here */
     skip_bits1(&s->gb); /* split screen off */
     skip_bits1(&s->gb); /* camera  off */
-    skip_bits1(&s->gb); /* freeze picture release off */
+    *is_key = get_bits1(&s->gb); /* freeze picture release off */
 
     format = get_bits1(&s->gb);
 
@@ -501,11 +506,6 @@ static int h261_decode_picture_header(H261DecContext *h)
     /* PEI */
     if (skip_1stop_8data_bits(&s->gb) < 0)
         return AVERROR_INVALIDDATA;
-
-    /* H.261 has no I-frames, but if we pass AV_PICTURE_TYPE_I for the first
-     * frame, the codec crashes if it does not contain all I-blocks
-     * (e.g. when a packet is lost). */
-    s->pict_type = AV_PICTURE_TYPE_P;
 
     h->gob_number = 0;
     return 0;
@@ -545,7 +545,7 @@ static int h261_decode_frame(AVCodecContext *avctx, AVFrame *pict,
     const uint8_t *buf = avpkt->data;
     int buf_size       = avpkt->size;
     MpegEncContext *s  = &h->s;
-    int ret;
+    int ret, is_key;
 
     ff_dlog(avctx, "*****frame %"PRId64" size=%d\n", avctx->frame_num, buf_size);
     ff_dlog(avctx, "bytes=%x %x %x %x\n", buf[0], buf[1], buf[2], buf[3]);
@@ -554,7 +554,7 @@ static int h261_decode_frame(AVCodecContext *avctx, AVFrame *pict,
 
     init_get_bits(&s->gb, buf, buf_size * 8);
 
-    ret = h261_decode_picture_header(h);
+    ret = h261_decode_picture_header(h, &is_key);
 
     /* skip if the header was thrashed */
     if (ret < 0) {
@@ -575,7 +575,7 @@ static int h261_decode_frame(AVCodecContext *avctx, AVFrame *pict,
             return ret;
     }
 
-    if ((avctx->skip_frame >= AVDISCARD_NONKEY && s->pict_type != AV_PICTURE_TYPE_I) ||
+    if ((avctx->skip_frame >= AVDISCARD_NONINTRA && !is_key) ||
          avctx->skip_frame >= AVDISCARD_ALL)
         return buf_size;
 
@@ -595,7 +595,10 @@ static int h261_decode_frame(AVCodecContext *avctx, AVFrame *pict,
     }
     ff_mpv_frame_end(s);
 
-    av_assert0(s->pict_type == s->cur_pic.ptr->f->pict_type);
+    if (is_key) {
+        s->cur_pic.ptr->f->pict_type = AV_PICTURE_TYPE_I;
+        s->cur_pic.ptr->f->flags    |= AV_FRAME_FLAG_KEY;
+    }
 
     if ((ret = av_frame_ref(pict, s->cur_pic.ptr->f)) < 0)
         return ret;

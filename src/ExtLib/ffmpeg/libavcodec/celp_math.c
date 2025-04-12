@@ -23,12 +23,16 @@
 #include <stdint.h>
 
 #include "config.h"
-#include "libavutil/avassert.h"
+
+#include "libavutil/attributes.h"
+#include "libavutil/float_dsp.h"
 #include "libavutil/intmath.h"
 #include "mathops.h"
 #include "celp_math.h"
 
 #ifdef G729_BITEXACT
+#include "libavutil/avassert.h"
+
 static const uint16_t exp2a[]=
 {
      0,  1435,  2901,  4400,  5931,  7496,  9096, 10730,
@@ -107,20 +111,9 @@ int64_t ff_dot_product(const int16_t *a, const int16_t *b, int length)
     return sum;
 }
 
-float ff_dot_productf(const float* a, const float* b, int length)
+av_cold void ff_celp_math_init(CELPMContext *c)
 {
-    float sum = 0;
-    int i;
-
-    for(i=0; i<length; i++)
-        sum += a[i] * b[i];
-
-    return sum;
-}
-
-void ff_celp_math_init(CELPMContext *c)
-{
-    c->dot_productf   = ff_dot_productf;
+    c->dot_productf = ff_scalarproduct_float_c;
 
 #if HAVE_MIPSFPU
     ff_celp_math_init_mips(c);
