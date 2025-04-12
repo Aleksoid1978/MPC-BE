@@ -149,6 +149,9 @@
 #if defined(MEDIAINFO_AVSV_YES)
     #include "MediaInfo/Video/File_AvsV.h"
 #endif
+#if defined(MEDIAINFO_AVS3V_YES)
+    #include "MediaInfo/Video/File_Avs3V.h"
+#endif
 #if defined(MEDIAINFO_DIRAC_YES)
     #include "MediaInfo/Video/File_Dirac.h"
 #endif
@@ -157,6 +160,9 @@
 #endif
 #if defined(MEDIAINFO_H263_YES)
     #include "MediaInfo/Video/File_H263.h"
+#endif
+#if defined(MEDIAINFO_MXF_YES)
+    #include "MediaInfo/Video/File_HdrVividMetadata.h"
 #endif
 #if defined(MEDIAINFO_HEVC_YES)
     #include "MediaInfo/Video/File_Hevc.h"
@@ -564,6 +570,9 @@ File__MultipleParsing::File__MultipleParsing()
     // Video
     #if defined(MEDIAINFO_AVC_YES)
         Parser.push_back(new File_Avc());
+    #endif
+    #if defined(MEDIAINFO_MXF_YES)
+        Parser.push_back(new File_HdrVividMetadata());
     #endif
     #if defined(MEDIAINFO_HEVC_YES)
         Parser.push_back(new File_Hevc());

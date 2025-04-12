@@ -5356,6 +5356,15 @@ File_Adm::~File_Adm()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+void File_Adm::Streams_Accept()
+{
+    Fill(Stream_General, 0, General_Format, "ADM");
+    Stream_Prepare(Stream_Audio);
+    if (!IsSub)
+        Fill(Stream_Audio, StreamPos_Last, Audio_Format, "ADM");
+}
+
+//---------------------------------------------------------------------------
 void File_Adm::Streams_Fill()
 {
     // chna mapping
@@ -5443,10 +5452,6 @@ void File_Adm::Streams_Fill()
         Apply_SubStreams(*this, P + " LinkedTo_" FIELD "_Pos", File_Adm_Private->Items[item_##NAME].Items[i], NAME##_##VECTOR, File_Adm_Private->Items[item_##TARGET], File_Adm_Private->IsPartial || File_Adm_Private->Items[item_audioFormatExtended].Items.empty()); \
 
     //Filling
-    Stream_Prepare(Stream_Audio);
-    if (!IsSub)
-        Fill(Stream_Audio, StreamPos_Last, Audio_Format, "ADM");
-
     if ((int8_t)File_Adm_Private->Version_S >= 0)
         Fill(Stream_Audio, StreamPos_Last, "Metadata_Format", "S-ADM, Version " + Ztring::ToZtring(File_Adm_Private->Version_S).To_UTF8());
     string Version_Temp = File_Adm_Private->Version_String.empty() ? to_string(File_Adm_Private->Version) : File_Adm_Private->Version_String;

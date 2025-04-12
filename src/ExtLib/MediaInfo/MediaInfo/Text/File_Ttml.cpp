@@ -440,7 +440,7 @@ void File_Ttml::Read_Buffer_Continue()
         Fill(Stream_General, 0, General_Format_Profile, "IMSC1");
         Fill(Stream_Text, 0, Text_Format_Profile, "IMSC1");
     }
-    
+    string Rosetta_Profile, Rosetta_Version;
 
     tinyxml2::XMLElement*       div=NULL;
     #if MEDIAINFO_EVENTS
@@ -660,10 +660,33 @@ void File_Ttml::Read_Buffer_Continue()
                                     Fill(Stream_Text, 0, "CaptionServiceName", Attribute);
                             }
                         }
+                        if (!strcmp(metadata_element->Value(), "rosetta:format"))
+                        {
+                            for (auto format_element = metadata_element->FirstChild(); format_element; format_element = format_element->NextSiblingElement())
+                            {
+                                Rosetta_Profile = format_element->Value();
+                                break;
+                            }
+                        }
+                        if (!strcmp(metadata_element->Value(), "rosetta:version"))
+                        {
+                            for (auto format_element = metadata_element->FirstChild(); format_element; format_element = format_element->NextSiblingElement())
+                            {
+                                Rosetta_Version = format_element->Value();
+                                break;
+                            }
+                        }
                     }
                 }
             }
         }
+    }
+
+    if (!Rosetta_Profile.empty())
+    {
+        auto Profile = Rosetta_Profile + (Rosetta_Version.empty() ? string() : (' ' + Rosetta_Version));
+        Fill(Stream_General, 0, General_Format_Profile, Profile);
+        Fill(Stream_Text, 0, Text_Format_Profile, Profile);
     }
 
     #if MEDIAINFO_DEMUX

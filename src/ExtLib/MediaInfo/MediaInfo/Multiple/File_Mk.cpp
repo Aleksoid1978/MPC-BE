@@ -40,6 +40,9 @@
 #if defined(MEDIAINFO_AVC_YES)
     #include "MediaInfo/Video/File_Avc.h"
 #endif
+#if defined(MEDIAINFO_AVS3V_YES)
+    #include "MediaInfo/Video/File_Avs3V.h"
+#endif
 #if defined(MEDIAINFO_DVDIF_YES)
     #include "MediaInfo/Multiple/File_DvDif.h"
 #endif
@@ -4812,6 +4815,12 @@ void File_Mk::CodecID_Manage()
                 }
             #endif //MEDIAINFO_DEMUX
         }
+    }
+    #endif
+    #if defined(MEDIAINFO_AVS3V_YES)
+    else if (Format==__T("AVS3 Video"))
+    {
+        streamItem.Parser=new File_Avs3V;
     }
     #endif
     #if defined(MEDIAINFO_HUFFYUV_YES)

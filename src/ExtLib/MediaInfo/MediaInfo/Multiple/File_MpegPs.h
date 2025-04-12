@@ -283,6 +283,7 @@ private :
     File__Analyze* ChooseParser_Avc();
     File__Analyze* ChooseParser_Hevc();
     File__Analyze* ChooseParser_VC1();
+    File__Analyze* ChooseParser_Avs3V();
     File__Analyze* ChooseParser_Dirac();
     File__Analyze* ChooseParser_Mpega();
     File__Analyze* ChooseParser_Mpegh3da();

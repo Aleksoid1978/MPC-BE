@@ -268,7 +268,7 @@ Ztring& Ztring::From_Unicode (const wchar_t* S)
                 if (Size!=0 && Size!=(size_t)-1)
                 {
                     char* AnsiString=new char[Size+1];
-                    Size=wcstombs(AnsiString, S, wcslen(S));
+                    Size=wcstombs(AnsiString, S, Size+1);
                     AnsiString[Size]='\0';
                     assign (AnsiString);
                     delete[] AnsiString;
@@ -651,17 +651,13 @@ Ztring& Ztring::From_ISO_8859_1(const char* S, size_type Start, size_type Length
 
     if (Length==Error)
         Length=strlen(S+Start);
-    #ifdef _UNICODE
-        char* Temp = new char[Length+1];
-        strncpy(Temp, S +Start, Length);
-        Temp[Length] = '\0';
-        From_ISO_8859_1(Temp);
-        delete[] Temp;
-    #else
-        assign(S +Start, Length);
-        if (find(__T('\0')) != std::string::npos)
-            resize(find(__T('\0')));
-    #endif
+
+    char* Temp = new char[Length+1];
+    strncpy(Temp, S +Start, Length);
+    Temp[Length] = '\0';
+    From_ISO_8859_1(Temp);
+    delete[] Temp;
+
     return *this;
 }
 
@@ -690,17 +686,13 @@ Ztring& Ztring::From_ISO_8859_2(const char* S, size_type Start, size_type Length
 
     if (Length==Error)
         Length=strlen(S+Start);
-    #ifdef _UNICODE
-        char* Temp = new char[Length+1];
-        strncpy(Temp, S +Start, Length);
-        Temp[Length] = '\0';
-        From_ISO_8859_2(Temp);
-        delete[] Temp;
-    #else
-        assign(S +Start, Length);
-        if (find(__T('\0')) != std::string::npos)
-            resize(find(__T('\0')));
-    #endif
+
+    char* Temp = new char[Length+1];
+    strncpy(Temp, S +Start, Length);
+    Temp[Length] = '\0';
+    From_ISO_8859_2(Temp);
+    delete[] Temp;
+
     return *this;
 }
 

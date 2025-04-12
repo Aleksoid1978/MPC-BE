@@ -44,6 +44,7 @@ namespace MediaInfoLib
 namespace Elements
 {
     const int32u CUEI=0x43554549; //SCTE
+    const int32u AVSV=0x41565356; //AVSV
     const int32u GA94=0x47413934; //ATSC - Terrestrial
     const int32u HDMV=0x48444D56; //BluRay
     const int32u S14A=0x53313441; //ATSC - Satellite
@@ -121,6 +122,14 @@ const char* Mpeg_Psi_stream_type_Format(int8u stream_type, int32u format_identif
         default :
             switch (format_identifier)
             {
+                case Elements::AVSV :
+                        switch (stream_type)
+                        {
+                            case 0xD0 : return "AVS Video";
+                            case 0xD2 : return "AVS2 Video";
+                            case 0xD4 : return "AVS3 Video";
+                            default   : return "";
+                        }
                 case Elements::CUEI :
                 case Elements::SCTE : //SCTE
                 case Elements::GA94 :

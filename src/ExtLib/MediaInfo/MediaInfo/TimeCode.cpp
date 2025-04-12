@@ -902,6 +902,8 @@ std::string Date_MJD(uint16_t Date_)
 {
     //Calculating
     double Date = Date_;
+    if ((Date_ & 0x8000) == 0) 
+        Date += 0x10000;    // adjust the MJD to support dates beyond the 16 bit rollover in 2038
     int Y2 = (int)((Date - 15078.2) / 365.25);
     int M2 = (int)(((Date - 14956.1) - ((int)(Y2 * 365.25))) / 30.6001);
     int D = (int)(Date - 14956 - ((int)(Y2 * 365.25)) - ((int)(M2 * 30.6001)));

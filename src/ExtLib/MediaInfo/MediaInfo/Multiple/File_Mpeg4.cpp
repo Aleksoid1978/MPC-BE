@@ -305,6 +305,13 @@ static Ztring Mpeg4_Language_Apple(int16u Language)
 extern const char* Mpeg4_chan(int16u Ordering);
 extern const char* Mpeg4_chan_Layout(int16u Ordering);
 
+//---------------------------------------------------------------------------
+const char* Mpegv_colour_primaries(int8u colour_primaries);
+const char* Mpegv_transfer_characteristics(int8u transfer_characteristics);
+const char* Mpegv_matrix_coefficients(int8u matrix_coefficients);
+const char* Mpegv_matrix_coefficients_ColorSpace(int8u matrix_coefficients);
+const char* Avs3V_matrix_coefficients(int8u matrix_coefficients);
+
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -515,6 +522,23 @@ void File_Mpeg4::Streams_Finish()
         if (StreamKind_Last==Stream_Video && !FrameRate_Real.empty() && Retrieve_Const(Stream_Video, StreamPos_Last, Video_FrameRate_Real).empty())
         {
             Fill(Stream_Video, StreamPos_Last, Video_FrameRate_Real, FrameRate_Real);
+        }
+        if (StreamKind_Last==Stream_Video && Temp->second.Nclc)
+        {
+            const auto& Nclc=*Temp->second.Nclc;
+            Fill(Stream_Video, StreamPos_Last, Video_colour_description_present, "Yes");
+            Fill(Stream_Video, StreamPos_Last, Video_colour_primaries, Mpegv_colour_primaries(Nclc.colour_primaries));
+            Fill(Stream_Video, StreamPos_Last, Video_transfer_characteristics, Mpegv_transfer_characteristics(Nclc.transfer_characteristics));
+            const char* matrix_coefficients_String;
+            if (Retrieve_Const(Stream_Video, StreamPos_Last, Video_CodecID)==__T("avs3"))
+                matrix_coefficients_String=Avs3V_matrix_coefficients(Nclc.matrix_coefficients);
+            else
+                matrix_coefficients_String=Mpegv_matrix_coefficients(Nclc.matrix_coefficients);
+            Fill(Stream_Video, StreamPos_Last, Video_matrix_coefficients, matrix_coefficients_String);
+            if (Nclc.matrix_coefficients!=2)
+                Fill(Stream_Video, StreamPos_Last, Video_ColorSpace, Mpegv_matrix_coefficients_ColorSpace(Nclc.matrix_coefficients), Unlimited, true, true);
+            if (Nclc.HasFlags)
+                Fill(Stream_Video, StreamPos_Last, Video_colour_range, Nclc.full_range_flag?"Full":"Limited");
         }
 
         //if (Temp->second.stsz_StreamSize)

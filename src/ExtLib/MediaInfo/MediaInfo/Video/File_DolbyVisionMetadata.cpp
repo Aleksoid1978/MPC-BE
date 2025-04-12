@@ -60,6 +60,8 @@ bool File_DolbyVisionMetadata::FileHeader_Begin()
         Reject("DolbyVisionMetadata");
         return false;
     }
+
+    XMLElement* MasterElements[2] = {};
     
     const char* Format = nullptr;
     if (!strcmp(DolbyVisionGlobalData->Name(), "gsp:DolbyVisionGlobalDataGSP"))
@@ -69,7 +71,10 @@ bool File_DolbyVisionMetadata::FileHeader_Begin()
             if (!strcmp(DolbyVisionGlobalData->Name(), "gsp:Version"))
                 Version = DolbyVisionGlobalData->GetText();
             if (!strcmp(DolbyVisionGlobalData->Name(), "gsp:Track"))
+            {
+                MasterElements[1]=DolbyVisionGlobalData;
                 break;
+            }
         }
         Format = "Dolby Vision Global Data GSP";
     }
@@ -90,7 +95,10 @@ bool File_DolbyVisionMetadata::FileHeader_Begin()
                                 AspectRatio = TextF;
                     }
                     if (!strcmp(DolbyVisionGlobalData->Name(), "dvmd-int:Track"))
+                    {
+                        MasterElements[1]=DolbyVisionGlobalData;
                         break;
+                    }
                 }
                 break;
             }
@@ -102,16 +110,28 @@ bool File_DolbyVisionMetadata::FileHeader_Begin()
         for (DolbyVisionGlobalData = DolbyVisionGlobalData->FirstChildElement(); DolbyVisionGlobalData; DolbyVisionGlobalData = DolbyVisionGlobalData->NextSiblingElement())
         {
             if (!strcmp(DolbyVisionGlobalData->Name(), "DolbyVisionGlobalData"))
-                break;
+            {
+                MasterElements[0] = DolbyVisionGlobalData;
+                Format = "Dolby Vision Global Data";
+            }
+            if (!strcmp(DolbyVisionGlobalData->Name(), "DolbyVisionFrameData"))
+            {
+                Format = "Dolby Vision Frame Data";
+                MasterElements[1]=DolbyVisionGlobalData;
+                break; // Frame Data has priority over Global Data
+            }
         }
-        Format = "Dolby Vision Integrated Wrapper";
+        if (!Format)
+            Format = "Dolby Vision Integrated Wrapper";
     }
     else if (!strcmp(DolbyVisionGlobalData->Name(), "DolbyVisionGlobalData"))
     {
+        MasterElements[0] = DolbyVisionGlobalData;
         Format = "Dolby Vision Global Data";
     }
     else if (!strcmp(DolbyVisionGlobalData->Name(), "DolbyVisionFrameData") || !strcmp(DolbyVisionGlobalData->Name(), "fw:DolbyVisionFrameData"))
     {
+        MasterElements[1] = DolbyVisionGlobalData;
         Format = "Dolby Vision Frame Data";
     }
     else
@@ -129,18 +149,19 @@ bool File_DolbyVisionMetadata::FileHeader_Begin()
     Fill(Stream_General, 0, General_Format, "Dolby Vision Metadata");
     Stream_Prepare(Stream_Video);
     Fill(Stream_Video, 0, Video_HDR_Format, "Dolby Vision Metadata");
-    if (IsISXD || IsStreamData)
-    {
-        Stream_Prepare(Stream_Other);
-        if (Format)
-            Fill(Stream_Other, 0, Other_Format, Format);
-    }
+    Stream_Prepare(Stream_Other);
+    if (Format)
+        Fill(Stream_Other, 0, Other_Format, Format);
     if (!Version.empty())
         Fill(Stream_Video, 0, Video_HDR_Format_Version, Version);
     if (AspectRatio)
         Fill(Stream_Video, 0, Video_DisplayAspectRatio, AspectRatio);
 
-    for (XMLElement* DolbyVisionGlobalData_Item=DolbyVisionGlobalData->FirstChildElement(); DolbyVisionGlobalData_Item; DolbyVisionGlobalData_Item=DolbyVisionGlobalData_Item->NextSiblingElement())
+    for (auto MasterElement : MasterElements)
+    {
+    if (!MasterElement)
+        continue;
+    for (XMLElement* DolbyVisionGlobalData_Item=MasterElement->FirstChildElement(); DolbyVisionGlobalData_Item; DolbyVisionGlobalData_Item=DolbyVisionGlobalData_Item->NextSiblingElement())
     {
         if (!strcmp(DolbyVisionGlobalData_Item->Name(), "ColorEncoding"))
         {
@@ -474,23 +495,19 @@ bool File_DolbyVisionMetadata::FileHeader_Begin()
         if (!strcmp(DolbyVisionGlobalData_Item->Name(), "TrackName"))
         {
             if (const char* Text = DolbyVisionGlobalData_Item->GetText())
-            {
-                if (IsISXD || IsStreamData)
-                    Fill(Stream_Other, 0, Other_Title, Text);
-                else
-                    Fill(Stream_Video, 0, Video_Title, Text);
-            }
+                Fill(Stream_Other, 0, Other_Title, Text);
         }
         if (!strcmp(DolbyVisionGlobalData_Item->Name(), "UniqueID"))
         {
             if (const char* Text = DolbyVisionGlobalData_Item->GetText())
-                Fill(Stream_Video, 0, Video_UniqueID, Text);
+                Fill(Stream_Other, 0, Other_UniqueID, Text);
         }
         if (!strcmp(DolbyVisionGlobalData_Item->Name(), "Version"))
         {
             if (const char* Text= DolbyVisionGlobalData_Item->GetText())
                 Fill(Stream_Video, 0, Video_HDR_Format_Version, Text);
         }
+    }
     }
 
     //All should be OK...

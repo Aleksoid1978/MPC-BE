@@ -3778,6 +3778,10 @@ C(0E1F000000000000, "Barco")
 C(0E20000000000000, "Apple Inc.")
 C(0E21000000000000, "Fraunhofer")
 C(0E22000000000000, "RED")
+C(0E23000000000000, "CRIFST")
+C(0E23060701010104, "Data Definition")
+C(0E23060701010105, "Source Track ID")
+C(0E23060701010106, "Simple Payload SID")
 C(0F00000000000000, "Experimental")
 C(4300000000000000, "Legacy (315M)")
     default: return {};
@@ -3859,6 +3863,7 @@ C(0E09000000000000, "Dolby Laboratories Inc.")
 C(0E09050201000100, "ISXD Data")
 C(0E09050217000100, "ISXD Data")
 C(0E09060701000100, "PHDR Image Metadata Item")
+C(0E23060701010103, "HDR Vivid Metadata Item")
     default: return {};
     }
 }
@@ -4504,6 +4509,8 @@ C(0E1F000000000000, "Barco")
 C(0E20000000000000, "Apple Inc.")
 C(0E21000000000000, "Fraunhofer")
 C(0E22000000000000, "RED")
+C(0E23000000000000, "CRIFST")
+C(0E23060701010103, "HDR Vivid Track Sub Descriptor")
 C(0F00000000000000, "Experimental")
     default: return {};
     }
@@ -5131,6 +5138,8 @@ C(0E1F000000000000, "Barco")
 C(0E20000000000000, "Apple Inc.")
 C(0E21000000000000, "Fraunhofer")
 C(0E22000000000000, "RED")
+C(0E23000000000000, "CRIFST")
+C(0E23060701010103, "HDR Vivid Metadata Wrapping Frame")
 C(0F00000000000000, "Experimental")
     default: return {};
     }
@@ -9030,6 +9039,15 @@ U(0E0B010301010101, OmneonVideoNetworksDescriptiveMetadataItems)
 //        20 - Apple Inc.
 //        21 - Fraunhofer
 //        22 - RED
+//        23 - CRIFST
+//          06 - CRIFST 06
+//            07 - CRIFST 0607
+//              01 - CRIFST 0607.01
+//                01 - CRIFST 0607.0101
+//                  01 - CRIFST 0607.010101
+U(0E23060701010104, HdrVividDataDefinition)
+U(0E23060701010105, HdrVividSourceTrackID)
+U(0E23060701010106, HdrVividSimplePayloadSID)
 //      0F - Experimental
 //      43 - Legacy (315M)
 }
@@ -9107,6 +9125,8 @@ U(0E04030115000700, AvidTechnologyInc_VC3_Custom)
 U(0E09050201000100, FrameWrappedISXDData)
 U(0E09050217000100, FrameWrappedISXDData2)
 U(0E09060701000100, PHDRImageMetadataItem)
+//        23 - CRIFST
+U(0E23060701000100, HdrVividMetadataItem)
 }
 
 namespace GroupsPacks
@@ -9763,6 +9783,12 @@ U(0E0B010201020100, OmneonVideoNetworksDescriptiveMetadataData)
 //        20 - Apple Inc.
 //        21 - Fraunhofer
 //        22 - RED
+//        23 - CRIFST
+//          01 - CRIFST 06
+//            02 - CRIFST 0607
+//              01 - CRIFST 0607.01
+//                01 - CRIFST 0607.0101
+U(0E23060701010103, HdrVividMetadataTrackSubDescriptor)
 //      0F - Experimental
 }
 namespace Labels

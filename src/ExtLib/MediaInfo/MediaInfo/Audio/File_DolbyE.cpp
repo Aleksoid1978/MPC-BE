@@ -1066,13 +1066,13 @@ void File_DolbyE::Streams_Fill_PerProgram(size_t program)
         {
             float GuardBand_Before_Initial_Duration=GuardBand_Before_Initial*8/BitRate;
             Fill(Stream_Audio, program, "GuardBand_Before", GuardBand_Before_Initial_Duration, 9);
-            Fill(Stream_Audio, program, "GuardBand_Before/String", Ztring::ToZtring(GuardBand_Before_Initial_Duration*1000000, 0)+Ztring().From_UTF8(" \xC2xB5s")); //0xC2 0xB5 = micro sign
+            Fill(Stream_Audio, program, "GuardBand_Before/String", Ztring::ToZtring(GuardBand_Before_Initial_Duration*1000000, 0)+Ztring().From_UTF8(" \xC2\xB5s")); //0xC2 0xB5 = micro sign
             Fill_SetOptions(Stream_Audio, program, "GuardBand_Before", "N NT");
             Fill_SetOptions(Stream_Audio, program, "GuardBand_Before/String", "Y NT");
 
             float GuardBand_After_Initial_Duration=GuardBand_After_Initial*8/BitRate;
             Fill(Stream_Audio, program, "GuardBand_After", GuardBand_After_Initial_Duration, 9);
-            Fill(Stream_Audio, program, "GuardBand_After/String", Ztring::ToZtring(GuardBand_After_Initial_Duration*1000000, 0)+Ztring().From_UTF8(" \xC2xB5s")); //0xC2 0xB5 = micro sign
+            Fill(Stream_Audio, program, "GuardBand_After/String", Ztring::ToZtring(GuardBand_After_Initial_Duration*1000000, 0)+Ztring().From_UTF8(" \xC2\xB5s")); //0xC2 0xB5 = micro sign
             Fill_SetOptions(Stream_Audio, program, "GuardBand_After", "N NT");
             Fill_SetOptions(Stream_Audio, program, "GuardBand_After/String", "Y NT");
         }
@@ -1705,7 +1705,7 @@ void File_DolbyE::Data_Parse()
 
             Element_Info1(GuardBand_Before);
             float64 GuardBand_Before_Duration=((float64)GuardBand_Before)/BytesPerSecond;
-            Ztring GuardBand_Before_String=__T("GuardBand_Begin ")+Ztring::ToZtring(GuardBand_Before)+__T(" (")+Ztring::ToZtring(GuardBand_Before_Duration*1000000, 0)+Ztring().From_UTF8(" \0xC20xB5s"); //0xC20xB5 = micro sign
+            Ztring GuardBand_Before_String=__T("GuardBand_Begin ")+Ztring::ToZtring(GuardBand_Before)+__T(" (")+Ztring::ToZtring(GuardBand_Before_Duration*1000000, 0)+Ztring().From_UTF8(" \xC2\xB5s"); //0xC2 0xB5 = micro sign
             Element_Info1(GuardBand_Before_String);
             }
         }

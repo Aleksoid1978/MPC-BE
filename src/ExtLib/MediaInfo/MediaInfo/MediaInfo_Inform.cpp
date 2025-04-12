@@ -55,6 +55,9 @@
 //---------------------------------------------------------------------------
 #include <ctime>
 #include <regex>
+#if !defined(UNICODE) && !defined(_UNICODE)
+#include <codecvt>
+#endif
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -849,10 +852,21 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                      int8u Nom_Size=MediaInfoLib::Config.Language_Get(__T("  Config_Text_ColumnSize")).To_int8u();
                      if (Nom_Size==0)
                         Nom_Size=32; //Default
-                     Nom.resize(Nom_Size, ' ');
                      Ztring lang = MediaInfoLib::Config.Language_Get(__T("  Language_ISO639"));
                      if (!lang.compare(__T("ja")) || !lang.compare(__T("ko")) || !lang.compare(__T("zh-CN")) || !lang.compare(__T("zh-HK")) || !lang.compare(__T("zh-TW")))
-                        Nom = ToFullWidth(Nom); //Align Japanese, Korean and Chinese characters with ASCII characters
+                     {
+                        #if !defined(UNICODE) && !defined(_UNICODE)
+                        std::wstring_convert<std::codecvt_utf8<wchar_t>> Converter;
+                        std::wstring Nom_Wide=Converter.from_bytes(Nom);
+                        Nom_Wide.resize(Nom_Size, ' ');
+                        Nom=Ztring().From_Unicode(ToFullWidth(Nom_Wide)); //Align Japanese, Korean and Chinese characters with ASCII characters
+                        #else
+                        Nom.resize(Nom_Size, ' ');
+                        Nom=ToFullWidth(Nom); //Align Japanese, Korean and Chinese characters with ASCII characters
+                        #endif
+                     }
+                     else
+                        Nom.resize(Nom_Size, ' ');
                 }
                 Ztring Valeur=Get((stream_t)StreamKind, StreamPos, Champ_Pos, Info_Text);
 

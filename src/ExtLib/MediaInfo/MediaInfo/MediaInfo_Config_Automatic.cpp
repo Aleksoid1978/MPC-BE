@@ -1414,6 +1414,7 @@ void MediaInfo_Config_Format (InfoMap &Info)
     "AV1;;;V;Av1;AOMedia Video 1;;;http://aomedia.org/\n"
     "AVC;;;V;Avc;Advanced Video Codec;avc h264 264;video/H264;http://developers.videolan.org/x264.html\n"
     "AVS Video;;;V;AvsV;Audio Video Standard, Video part;;;http://www.avs.org.cn/;Lossy\n"
+    "AVS3 Video;;;V;Avs3V;Audio Video Standard 3, Video part;avs3;;http://www.avs.org.cn/;Lossy\n"
     "Dirac;;;V;Dirac;;drc;;http://diracvideo.org/;Lossy\n"
     "FFV1;;;V;;;;;;Lossless\n"
     "FFV2;;;V;;;;;;Lossless\n"
@@ -1529,7 +1530,7 @@ void MediaInfo_Config_Format (InfoMap &Info)
     "SAMI;;;T;Sami;;smi sami;;;Lossless\n"
     "SCC;;;T;SCC;;scc sc2;;;Lossless\n"
     "SubRip;;;T;SubRip;;srt;;http://ffdshow.sourceforge.net/tikiwiki/tiki-index.php?page=Getting+ffdshow;Lossless\n"
-    "TTML;;;T;TTML;Timed Text Markup Language;dfxp ttml;;https://en.wikipedia.org/wiki/Timed_Text_Markup_Language;Lossless\n"
+    "TTML;;;T;TTML;Timed Text Markup Language;dfxp ttml imsc imscr;;https://en.wikipedia.org/wiki/Timed_Text_Markup_Language;Lossless\n"
     "SSA;;;T;Other;;ssa;;http://ffdshow.sourceforge.net/tikiwiki/tiki-index.php?page=Getting+ffdshow;Lossless\n"
     "WebVTT;;;T;WebVTT;;vtt;;;Lossless\n"
     "Blender;;;O;Other;;blenders;;http://www.blender3d.com\n"
@@ -1621,6 +1622,9 @@ void MediaInfo_Config_CodecID_Video_Matroska (InfoMap &Info)
     Info.Write(Ztring().From_UTF8(
     "V_UNCOMPRESSED;RGB;;Raw uncompressed video frames\n"
     "V_AV1;AV1;;;http://aomedia.org/\n"
+    "V_AVS;AVS Video\n"
+    "V_AVS2;AVS2 Video\n"
+    "V_AVS3;AVS3 Video\n"
     "V_DIRAC;Dirac;;;http://diracvideo.org/\n"
     "V_FFV1;FFV1\n"
     "V_MPEG4/IS0/SP;MPEG-4 Visual;;There is a zero instead of a O, may be a problem;http://www.divx.com\n"
@@ -1654,7 +1658,7 @@ void MediaInfo_Config_CodecID_Video_Mpeg4 (InfoMap &Info)
 {
     Info.Separator_Set(0, __T("\n"));
     Info.Write(Ztring().From_UTF8(
-    "2vuy;YUV;;;;;;YUV;4:2:2\n"
+    "2vuy;YUV;;;;;;YUV;4:2:2;8\n"
     "2Vuy;YUV;;;;;;YUV;4:2:2\n"
     "8BPS;RGB;;;;;;RGB;8:8:8\n"
     "ac16;YUV;;;;;;YUV;4:2:2\n"
@@ -1709,6 +1713,7 @@ void MediaInfo_Config_CodecID_Video_Mpeg4 (InfoMap &Info)
     "AVUI;Avid Meridien Uncompressed\n"
     "avr ;JPEG\n"
     "AVrp;RGB;Avid;;;;;RGB\n"
+    "avs3;AVS3 Video\n"
     "b16g;Gray;;;;;;Y;16\n"
     "b32a;Gray/Alpha;;;;;;YA;16:16\n"
     "b48r;RGB;;;;;;RGB;16:16:16\n"

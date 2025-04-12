@@ -50,6 +50,7 @@ namespace MediaInfoLib
 namespace Elements
 {
     const int32u AC_3=0x41432D33; //Exactly AC-3
+    const int32u AVSV=0x41565356; //AVSV
     const int32u BSSD=0x42535344; //PCM
     const int32u CUEI=0x43554549; //SCTE
     const int32u DTS1=0x44545331; //DTS
@@ -733,6 +734,7 @@ stream_t Mpeg_Descriptors_registration_format_identifier_StreamKind(int32u forma
     switch (format_identifier)
     {
         case Elements::AC_3 : return Stream_Audio;
+        case Elements::AVSV : return Stream_Video;
         case Elements::BSSD : return Stream_Audio;
         case Elements::DTS1 : return Stream_Audio;
         case Elements::DTS2 : return Stream_Audio;

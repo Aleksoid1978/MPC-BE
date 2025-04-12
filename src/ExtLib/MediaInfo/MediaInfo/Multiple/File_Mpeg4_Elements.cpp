@@ -49,6 +49,9 @@ using namespace std;
 #if defined(MEDIAINFO_AVC_YES)
     #include "MediaInfo/Video/File_Avc.h"
 #endif
+#if defined(MEDIAINFO_AVS3V_YES)
+    #include "MediaInfo/Video/File_Avs3V.h"
+#endif
 #if defined(MEDIAINFO_CINEFORM_YES)
     #include "MediaInfo/Video/File_CineForm.h"
 #endif
@@ -6500,6 +6503,14 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxVideo()
                     Streams[moov_trak_tkhd_TrackID].Parsers.push_back(Parser);
                 }
             #endif
+            #if defined(MEDIAINFO_AVS3V_YES)
+                if (MediaInfoLib::Config.CodecID_Get(Stream_Video, InfoCodecID_Format_Mpeg4, Ztring().From_CC4((int32u)Element_Code), InfoCodecID_Format)==__T("AVS3 Video"))
+                {
+                    auto Parser=new File_Avs3V;
+                    Parser->FrameIsAlwaysComplete=true;
+                    Streams[moov_trak_tkhd_TrackID].Parsers.push_back(Parser);
+                }
+            #endif
             #if defined(MEDIAINFO_FFV1_YES)
                 if (MediaInfoLib::Config.CodecID_Get(Stream_Video, InfoCodecID_Format_Mpeg4, Ztring().From_CC4((int32u)Element_Code), InfoCodecID_Format)==__T("FFV1"))
                 {
@@ -7289,16 +7300,15 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclc(bool LittleEndian,
     }
 
     FILLING_BEGIN();
-        if (Retrieve(Stream_Video, StreamPos_Last, Video_colour_description_present).empty()) //Using only the first one met
+        auto& Nclc=Streams[moov_trak_tkhd_TrackID].Nclc;
+        if (!Nclc) //Using only the first one met
         {
-            Fill(Stream_Video, StreamPos_Last, Video_colour_description_present, "Yes");
-            Fill(Stream_Video, StreamPos_Last, Video_colour_primaries, Mpegv_colour_primaries((int8u)colour_primaries));
-            Fill(Stream_Video, StreamPos_Last, Video_transfer_characteristics, Mpegv_transfer_characteristics((int8u)transfer_characteristics));
-            Fill(Stream_Video, StreamPos_Last, Video_matrix_coefficients, Mpegv_matrix_coefficients((int8u)matrix_coefficients));
-            if (matrix_coefficients!=2)
-                Fill(Stream_Video, StreamPos_Last, Video_ColorSpace, Mpegv_matrix_coefficients_ColorSpace((int8u)matrix_coefficients), Unlimited, true, true);
-            if (HasFlags)
-                Fill(Stream_Video, StreamPos_Last, Video_colour_range, full_range_flag?"Full":"Limited");
+            Nclc=new stream::nclc;
+            Nclc->colour_primaries=(colour_primaries>>8)?2:(int8u)colour_primaries;
+            Nclc->transfer_characteristics=(transfer_characteristics>>8)?2:(int8u)transfer_characteristics;
+            Nclc->matrix_coefficients=(matrix_coefficients>>8)?2:(int8u)matrix_coefficients;
+            Nclc->HasFlags=HasFlags;
+            Nclc->full_range_flag=HasFlags?full_range_flag:false;
         }
     FILLING_END();
 }

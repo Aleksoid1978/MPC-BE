@@ -29,9 +29,6 @@ namespace MediaInfoLib
 class File_DolbyVisionMetadata : public File__Analyze
 {
 public:
-    bool IsISXD = false;
-    bool IsStreamData = false;
-
     //Constructor/Destructor
     File_DolbyVisionMetadata();
 

@@ -533,7 +533,7 @@ void File_MpegTs::Streams_Update_Programs()
                         {
                         Ztring Format=Retrieve(Complete_Stream->Streams[elementary_PID]->StreamKind, Complete_Stream->Streams[elementary_PID]->StreamPos, Fill_Parameter(Complete_Stream->Streams[elementary_PID]->StreamKind, Generic_Format));
                         if (Format.empty())
-                            Format=Mpeg_Psi_stream_type_Format(Complete_Stream->Streams[elementary_PID]->stream_type, Program->second.registration_format_identifier);
+                            Format=Mpeg_Psi_stream_type_Format(Complete_Stream->Streams[elementary_PID]->stream_type, Complete_Stream->Streams[elementary_PID]->registration_format_identifier?Complete_Stream->Streams[elementary_PID]->registration_format_identifier:Program->second.registration_format_identifier);
                         if (Format.empty())
                         {
                             std::map<std::string, Ztring>::iterator Format_FromInfo=Complete_Stream->Streams[elementary_PID]->Infos.find("Format");
@@ -759,7 +759,9 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
         //By the descriptors
         if (StreamKind_Last==Stream_Max && Complete_Stream->transport_stream_id_IsValid && !Temp->program_numbers.empty() && !Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs.empty())
         {
-            int32u format_identifier=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[Temp->program_numbers[0]].registration_format_identifier;
+            auto format_identifier=Temp->registration_format_identifier;
+            if (!format_identifier)
+                format_identifier=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[Temp->program_numbers[0]].registration_format_identifier;
             if (Temp->IsRegistered
              && Mpeg_Descriptors_registration_format_identifier_StreamKind(format_identifier)!=Stream_Max)
             {
@@ -782,7 +784,9 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
         //By the stream_type
         if (StreamKind_Last==Stream_Max && Complete_Stream->transport_stream_id_IsValid && !Temp->program_numbers.empty() && !Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs.empty())
         {
-            int32u format_identifier=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[Temp->program_numbers[0]].registration_format_identifier;
+            auto format_identifier=Temp->registration_format_identifier;
+            if (!format_identifier)
+                format_identifier=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[Temp->program_numbers[0]].registration_format_identifier;
             if (Mpeg_Psi_stream_type_StreamKind(Temp->stream_type, format_identifier)!=Stream_Max && (Temp->IsRegistered || ForceStreamDisplay || format_identifier==Elements::HDMV))
             {
                 StreamKind_Last=Mpeg_Psi_stream_type_StreamKind(Temp->stream_type, format_identifier);
@@ -792,9 +796,15 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
                     StreamKind_Last=Stream_Max;
                 }
                 Stream_Prepare(StreamKind_Last);
-                Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Format), Mpeg_Psi_stream_type_Format(Temp->stream_type, format_identifier));
-                Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Codec), Mpeg_Psi_stream_type_Codec(Temp->stream_type, format_identifier));
             }
+        }
+        if (StreamKind_Last!=Stream_Max && Retrieve_Const(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Format)).empty())
+        {
+            auto format_identifier=Temp->registration_format_identifier;
+            if (!format_identifier)
+                format_identifier=Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[Temp->program_numbers[0]].registration_format_identifier;
+            Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Format), Mpeg_Psi_stream_type_Format(Temp->stream_type, format_identifier));
+            Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Codec), Mpeg_Psi_stream_type_Codec(Temp->stream_type, format_identifier));
         }
 
         //By the StreamKind

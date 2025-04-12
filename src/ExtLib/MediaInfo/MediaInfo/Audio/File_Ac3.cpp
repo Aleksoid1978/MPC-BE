@@ -2413,7 +2413,7 @@ void File_Ac3::Core_Frame()
                 Skip_S1(8,                                          "langcod - Language Code");
             TEST_SB_END();
             TEST_SB_SKIP(                                           "audprodie - Audio Production Information Exists");
-                Get_S1 (8, mixlevel,                                "mixlevel - Mixing Level");
+                Get_S1 (5, mixlevel,                                "mixlevel - Mixing Level");
                 Get_S1 (2, roomtyp,                                 "roomtyp - Room Type");
             TEST_SB_END();
             if (acmod==0) //1+1 mode
@@ -2426,7 +2426,7 @@ void File_Ac3::Core_Frame()
                     Skip_S1(8,                                      "langcod2 - Language Code");
                 TEST_SB_END();
                 TEST_SB_SKIP(                                       "audprodi2e - Audio Production Information Exists");
-                    Skip_S1(8,                                      "mixlevel2 - Mixing Level");
+                    Skip_S1(5,                                      "mixlevel2 - Mixing Level");
                     Skip_S1(2,                                      "roomtyp2 - Room Type");
                 TEST_SB_END();
             }

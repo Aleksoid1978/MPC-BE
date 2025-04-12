@@ -6,13 +6,13 @@
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-// Information about Dolby Audio Metadata files
+// Information about HDR Vivid Metadata files
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef MediaInfo_File_DolbyAudioMetadataH
-#define MediaInfo_File_DolbyAudioMetadataH
+#ifndef MediaInfo_File_HdrVividMetadataH
+#define MediaInfo_File_HdrVividMetadataH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -23,35 +23,14 @@ namespace MediaInfoLib
 {
 
 //***************************************************************************
-// Class File_DolbyAudioMetadata
+// Class File_HdrVividMetadata
 //***************************************************************************
 
-class File_DolbyAudioMetadata : public File__Analyze
+class File_HdrVividMetadata : public File__Analyze
 {
-public:
-    //In
-    bool IsXML;
-    
-    //Out
-    bool HasSegment9;
-    vector<int8u> BinauralRenderModes;
-
-    //Constructor/Destructor
-    File_DolbyAudioMetadata(bool IsXml_ = false);
-
-    //Delayed
-    void Merge(File__Analyze& In, size_t StreamPos);
-
 private :
     //Buffer - File header
     bool FileHeader_Begin();
-
-    //Buffer - Global
-    void Read_Buffer_Continue();
-
-    //Elements
-    void Dolby_Atmos_Metadata_Segment();
-    void Dolby_Atmos_Supplemental_Metadata_Segment();
 };
 
 } //NameSpace

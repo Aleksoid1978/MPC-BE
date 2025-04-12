@@ -117,13 +117,13 @@ void Merge_FillTimeCode(File__Analyze& In, const string& Prefix, const TimeCode&
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-File_DolbyAudioMetadata::File_DolbyAudioMetadata()
+File_DolbyAudioMetadata::File_DolbyAudioMetadata(bool IsXML_)
 {
     //Configuration
     StreamSource=IsContainerExtra;
 
     //In
-    IsXML=false;
+    IsXML=IsXML_;
 
     //Out
     HasSegment9=false;
@@ -184,6 +184,7 @@ bool File_DolbyAudioMetadata::FileHeader_Begin()
 void File_DolbyAudioMetadata::Read_Buffer_Continue()
 {
     Accept("DolbyAudioMetadata");
+    Fill(Stream_General, 0, General_Format, "Dolby Audio Metadata");
     Stream_Prepare(Stream_Audio);
 
     //Parsing

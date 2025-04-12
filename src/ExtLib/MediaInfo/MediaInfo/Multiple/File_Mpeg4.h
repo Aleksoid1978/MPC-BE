@@ -492,6 +492,15 @@ private :
             bool   NegativeTimes;
         };
         timecode* TimeCode;
+        struct nclc
+        {
+            int8u  colour_primaries;
+            int8u  transfer_characteristics;
+            int8u  matrix_coefficients;
+            bool   HasFlags;
+            bool   full_range_flag;
+        };
+        nclc* Nclc;
         stream_t                StreamKind;
         size_t                  StreamPos;
         int32u                  hdlr_Type;
@@ -609,6 +618,7 @@ private :
         {
             MI=NULL;
             TimeCode=NULL;
+            Nclc=NULL;
             StreamKind=Stream_Max;
             StreamPos=(size_t)-1;
             hdlr_Type=0x00000000;
@@ -680,6 +690,7 @@ private :
                 delete Parsers[Pos];
             delete MI; //MI=NULL;
             delete TimeCode; //TimeCode=NULL;
+            delete Nclc; //Nclc=NULL;
         }
 
         void Parsers_Clear()

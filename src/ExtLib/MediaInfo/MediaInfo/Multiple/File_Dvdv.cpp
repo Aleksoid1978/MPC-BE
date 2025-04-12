@@ -1273,9 +1273,10 @@ void File_Dvdv::Get_Duration(TimeCode &Duration, const Ztring &Name)
         if (hh==(int8u)-1 || mm==(int8u)-1 || ss==(int8u)-1 || ff==(int8u)-1 || !IFO_PlaybackTime_FrameRate[FrameRate])
         {
             Duration=TimeCode();
+            Element_End0();
             return;
         }
-        
+
         bool Drop=IFO_PlaybackTime_FrameRate[FrameRate]==30;
         Duration=TimeCode((uint32_t)hh, (uint8_t)mm, (uint8_t)ss, (uint8_t)ff, IFO_PlaybackTime_FrameRate[FrameRate]-1);
         Element_Info1(Duration.ToString());

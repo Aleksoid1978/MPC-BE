@@ -24,6 +24,7 @@
 #include "MediaInfo/Multiple/File_Mxf.h"
 #include "MediaInfo/Multiple/File_Mxf_Automated.h"
 #include "MediaInfo/Video/File_DolbyVisionMetadata.h"
+#include "MediaInfo/Video/File_HdrVividMetadata.h"
 #include "MediaInfo/Audio/File_DolbyAudioMetadata.h"
 #if defined(MEDIAINFO_DVDIF_YES)
     #include "MediaInfo/Multiple/File_DvDif.h"
@@ -1999,8 +2000,6 @@ File_Mxf::~File_Mxf()
         delete AcquisitionMetadata_Sony_E201_Lists[ i ];
 	
     AcquisitionMetadata_Sony_E201_Lists.clear();
-    for (auto DolbyVisionMetadata : DolbyVisionMetadatas)
-        delete DolbyVisionMetadata;
     delete DolbyAudioMetadata;
     #if defined(MEDIAINFO_ADM_YES)
         delete Adm;
@@ -2373,33 +2372,43 @@ void File_Mxf::Streams_Finish()
         }
     }
 
-    //Metadata
-    size_t DolbyVisionMetadata_i = 0;
-    for (const auto DolbyVisionMetadata : DolbyVisionMetadatas)
+    for (const auto& Parser : ToMergeLater)
     {
-        if (Retrieve_Const(Stream_Video, 0, "HDR_Format").find(__T("Dolby Vision")) == string::npos) // TODO: better check when more than 1 content with Dolby Vision
-            Merge(*DolbyVisionMetadata, Stream_Video, 0, 0);
-        if (DolbyVisionMetadata->IsStreamData)
+        if (Parser->Count_Get(Stream_Video))
         {
-            Stream_Prepare(Stream_Other);
-            Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Generic Stream Data");
-            Fill(Stream_Other, StreamPos_Last, "MuxingMode_MoreInfo", "Contains additional metadata for other tracks");
-            Merge(*DolbyVisionMetadata, Stream_Other, 0, StreamPos_Last);
+            for (const auto& Elem : MXFGenericStreamDataElementKey)
+            {
+                if (Elem.second.Parser->Count_Get(Stream_Video) && Elem.second.Parser->Retrieve_Const(Stream_General, 0, General_Format)==Parser->Retrieve_Const(Stream_General, 0, General_Format))
+                    Parser->Merge(*Elem.second.Parser, Stream_Video, 0, 0);
+            }
+            if (!Count_Get(Stream_Video))
+                Stream_Prepare(Stream_Video);
+            Merge(*Parser, Stream_Video, 0, 0);
+        }
+        delete Parser;
+    }
+    ToMergeLater.clear();
 
-            if (DolbyVisionMetadata_i < DolbyVisionMetadatas_SID.size()) {
-                auto SID = DolbyVisionMetadatas_SID[DolbyVisionMetadata_i];
-                if (SID) {
-                    for (const auto& Descriptor : Descriptors) {
-                        if (Descriptor.second.SID == SID) {
-                            for (const auto& Info : Descriptor.second.Infos) {
-                                Fill(Stream_Other, StreamPos_Last, Info.first.c_str(), Info.second);
-                            }
-                        }
+    //Metadata
+    for (const auto& Elem : MXFGenericStreamDataElementKey)
+    {
+        if (!Elem.second.Parser || !Count_Get(Stream_Other))
+            continue;
+        Stream_Prepare(Stream_Other);
+        Fill(Stream_Other, StreamPos_Last, Other_MuxingMode, "Generic Stream Data");
+        Fill(Stream_Other, StreamPos_Last, "MuxingMode_MoreInfo", "Contains additional metadata for other tracks");
+        Merge(*Elem.second.Parser, Stream_Other, 0, StreamPos_Last);
+
+        auto SID = Elem.second.SID;
+        if (SID) {
+            for (const auto& Descriptor : Descriptors) {
+                if (Descriptor.second.SID == SID) {
+                    for (const auto& Info : Descriptor.second.Infos) {
+                        Fill(Stream_Other, StreamPos_Last, Info.first.c_str(), Info.second);
                     }
                 }
             }
         }
-        DolbyVisionMetadata_i++;
     }
     if (DolbyAudioMetadata) //Before ADM for having content before all ADM stuff
         Merge(*DolbyAudioMetadata, Stream_Audio, 0, 0);
@@ -2412,7 +2421,7 @@ void File_Mxf::Streams_Finish()
     {
         auto& S=*Adm_ForLaterMerge->Stream_More;
         size_t Start=(Stream_Audio<S.size() && !S[Stream_Audio].empty())?S[Stream_Audio][0].size():0;
-        Adm_ForLaterMerge->Streams_Fill_ForAdm();
+        ((File_Iab*)Adm_ForLaterMerge)->Streams_Fill_ForAdm();
         if (Adm)
         {
             //Check if compatible
@@ -2438,8 +2447,8 @@ void File_Mxf::Streams_Finish()
         }
     }
     if (DolbyAudioMetadata) //After ADM for having content inside ADM stuff
-        DolbyAudioMetadata->Merge(*this, 0);
-    if (Adm && (!DolbyAudioMetadata || !DolbyAudioMetadata->HasSegment9) && Retrieve_Const(Stream_Audio, 0, "AdmProfile_Format")==__T("Dolby Atmos Master"))
+        ((File_DolbyAudioMetadata*)DolbyAudioMetadata)->Merge(*this, 0);
+    if (Adm && (!DolbyAudioMetadata || !((File_DolbyAudioMetadata*)DolbyAudioMetadata)->HasSegment9) && Retrieve_Const(Stream_Audio, 0, "AdmProfile_Format")==__T("Dolby Atmos Master"))
     {
         Clear(Stream_Audio, 0, "AdmProfile");
         Clear(Stream_Audio, 0, "AdmProfile_Format");
@@ -2645,7 +2654,7 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
     }
     Finish(*Parser);
     StreamKind_Last=Stream_Max;
-    if ((*Parser)->Count_Get(Stream_Video) && (*Parser)->Get(Stream_General, 0, General_Format)!=__T("Dolby Vision Metadata"))
+    if ((*Parser)->Count_Get(Stream_Video) && (*Parser)->Get(Stream_General, 0, General_Format)!=__T("Dolby Vision Metadata") && (*Parser)->Get(Stream_General, 0, General_Format) != __T("HDR Vivid Metadata"))
     {
         Stream_Prepare(Stream_Video);
         if (IsSub)
@@ -3088,10 +3097,16 @@ void File_Mxf::Streams_Finish_Essence(int32u EssenceUID, int128u TrackUID)
     //Done
     Essence->second.Stream_Finish_Done=true;
 
-    if ((*Parser)->Get(Stream_General, 0, General_Format) == __T("Dolby Vision Metadata")) // TODO: avoid this hack
+    if ((*Parser))
     {
-        DolbyVisionMetadatas.push_back((File_DolbyVisionMetadata*)*Parser);
-        *Parser=nullptr;
+        // TODO: avoid this hack
+        const auto& Format = (*Parser)->Retrieve_Const(Stream_General, 0, General_Format);
+        if (Format == __T("Dolby Vision Metadata")
+         || Format == __T("HDR Vivid Metadata"))
+        {
+            ToMergeLater.push_back(*Parser);
+            *Parser = nullptr;
+        }
     }
 }
 
@@ -3192,10 +3207,32 @@ void File_Mxf::Streams_Finish_Descriptor(const int128u DescriptorUID, const int1
     }
     if (StreamPos_Last==(size_t)-1)
     {
-        if (Descriptors.size()==1)
+        auto NotSubDescriptorCount=Descriptors.size();
+        auto NotSubDescriptorID=Descriptor->first;
+        for (const auto& SearchedDescriptor : Descriptors)
+        {
+            if (Locators.empty() && Descriptor->second.StreamKind!=Stream_Max && SearchedDescriptor.second.StreamKind!=Descriptor->second.StreamKind)
+            {
+                NotSubDescriptorCount--;
+                continue;
+            }
+            auto IsSubDescriptor=false;
+            for (const auto& SearchingDescriptor : Descriptors)
+                for (const auto& SearchingDescriptor_SubID : SearchingDescriptor.second.SubDescriptors)
+                    if (SearchedDescriptor.first==SearchingDescriptor_SubID)
+                        IsSubDescriptor=true;
+            NotSubDescriptorCount-=IsSubDescriptor;
+            if (!IsSubDescriptor)
+                NotSubDescriptorID=SearchedDescriptor.first;
+        }
+        if (NotSubDescriptorCount==1 && NotSubDescriptorID==Descriptor->first)
         {
             if (Count_Get(Descriptor->second.StreamKind)==0)
+            {
                 Stream_Prepare(Descriptor->second.StreamKind);
+                if (Descriptor->second.LinkedTrackID!=(int32u)-1)
+                    Fill(StreamKind_Last, StreamPos_Last, General_ID, Descriptor->second.LinkedTrackID);
+            }
             else
                 StreamPos_Last=0;
         }
@@ -5927,13 +5964,38 @@ void File_Mxf::Data_Parse()
     auto ManageGroup = [&](method_name MethodName) {
         switch ((int8u)(Code.hi>>16))         {
         case 0x05: (this->*MethodName)(); break;
+        case 0x43:
         case 0x53:
+        case 0x63:
             while (Element_Offset < Element_Size)
             {
                 Element_Begin0();
                 Element_Begin1(                                 "Header");
-                Get_B2(Code2,                                   "Code");
-                Get_B2(Length2,                                 "Length");
+                switch (((int8u)(Code.hi>>16)) & 0xF0) {
+                case 0x40:
+                {
+                    int8u Code1;
+                    Get_B1(Code1,                               "Code");
+                    Code2 = Code1;
+                }
+                break;
+                default:
+                    Get_B2(Code2,                               "Code");
+                }
+                switch (((int8u)(Code.hi>>16)) & 0xF0) {
+                case 0x60:
+                {
+                    int32u Code4;
+                    Get_B4(Code4,                               "Length");
+                    if (Code4 >> 16) {
+                        Skip_XX(Element_Size - Element_Offset,  "(Unsupported)");
+                    }
+                    Code2 = (int16u)Code4;
+                }
+                break;
+                default:
+                    Get_B2(Length2,                             "Length");
+                }
                 Element_End0();
                 #if MEDIAINFO_TRACE
                 if (Trace_Activated) {
@@ -6738,6 +6800,7 @@ void File_Mxf::Data_Parse()
     GROUP(PHDRMetadataTrackSubDescriptor)
     GROUP(OmneonVideoNetworksDescriptiveMetadataLinks)
     GROUP(OmneonVideoNetworksDescriptiveMetadataData)
+    GROUP(HdrVividMetadataTrackSubDescriptor)
     GROUP(FFV1PictureSubDescriptor)
     GROUP(MGASoundEssenceDescriptor)
     GROUP(MGAAudioMetadataSubDescriptor)
@@ -6875,8 +6938,36 @@ void File_Mxf::UnknownGroupItem()
     }
     static const char* Name = "Value";
     switch (ItemType) {
-    case Type_UI16:             { Get_B2 (Value_UI16,           Name); Element_Info1(Value_UI16); } break;
-    case Type_Bool:             { Get_B1 (Value_Bool,           Name); Element_Info1(Value_Bool?Value_Bool>1?to_string(Value_Bool).c_str():"true":"false"); } break;
+    case Type_UInt:             {
+                                    switch (Length2) {
+                                    case 1: 
+                                        {
+                                        int8u Value;
+                                        Get_B1 (Value,          Name); Element_Info1(Value);
+                                        Value_UInt = Value;
+                                        }
+                                    break;
+                                    case 2:
+                                        {
+                                        int16u Value;
+                                        Get_B2 (Value,          Name); Element_Info1(Value);
+                                        Value_UInt = Value;
+                                        }
+                                    break;
+                                    case 3:
+                                        {
+                                        Get_B3 (Value_UInt,     Name); Element_Info1(Value_UInt);
+                                        }
+                                    break;
+                                    case 4:
+                                        {
+                                        Get_B4 (Value_UInt,     Name); Element_Info1(Value_UInt);
+                                        }
+                                    break;
+                                    default:
+                                        Skip_XX(Length2,        "(Unsupported)");
+                                    }
+                                } break;
     case Type_AUID:             { Get_UUID(Value_UUID,          Name); Element_Info1(Ztring().From_UUID(Value_UUID)); } break; // TODO: implement 16-bit Little Endian UL
     case Type_UUID:             { Get_UL(Value_UUID,            Name, nullptr); Element_Info1(int32u(Value_UUID.hi>>32)==0x060E2B34?Mxf_Param_Info((int32u)Value_UUID.hi, Value_UUID.lo):Ztring().From_UUID(Value_UUID).To_UTF8().c_str()); } break;
     case Type_UTF16:            { Get_UTF16B(Length2, Value_String, Name); Element_Info1(Value_String); } break;
@@ -7376,7 +7467,7 @@ void File_Mxf::ADMChannelMapping()
                 Adm=new File_Adm;
                 Open_Buffer_Init(Adm);
             }
-            Adm->chna_Add(ADMChannelMapping_LocalChannelID, ADMChannelMapping_ADMAudioTrackUID);
+            ((File_Adm*)Adm)->chna_Add(ADMChannelMapping_LocalChannelID, ADMChannelMapping_ADMAudioTrackUID);
             ADMChannelMapping_Presence.reset();
         }
     #endif //defined(MEDIAINFO_ADM_YES)
@@ -7970,53 +8061,70 @@ void File_Mxf::MXFGenericStreamDataElementKey_09_01()
 {
     // Check if already parsed
     auto Offset=File_Offset+Buffer_Offset+Element_Offset;
-    auto Found=MXFGenericStreamDataElementKey_Offsets.find(Offset);
-    if (Found!=MXFGenericStreamDataElementKey_Offsets.end())
+    auto Found=MXFGenericStreamDataElementKey.find(Offset);
+    if (Found!=MXFGenericStreamDataElementKey.end())
     {
         Skip_XX(Element_Size,                                   "(Already parsed)");
         return;
     }
-    MXFGenericStreamDataElementKey_Offsets.insert(Offset);
+    auto& Elem=MXFGenericStreamDataElementKey[Offset];
+    if (Partitions_Pos<Partitions.size())
+        Elem.SID=Partitions[Partitions_Pos].BodySID;
 
-    //Parsing - Dolby Vision Metadata
-    File_DolbyVisionMetadata* DolbyVisionMetadata_New=new File_DolbyVisionMetadata;
-    DolbyVisionMetadata_New->IsStreamData=true;
-    Open_Buffer_Init(DolbyVisionMetadata_New);
-    Open_Buffer_Continue(DolbyVisionMetadata_New);
-    if (DolbyVisionMetadata_New->Status[IsAccepted])
-    {
-        DolbyVisionMetadatas_SID.resize(DolbyVisionMetadatas.size());
-        DolbyVisionMetadatas.push_back(DolbyVisionMetadata_New);
-        if (!Partitions.empty() && Partitions.back().BodySID)
-            DolbyVisionMetadatas_SID.push_back(Partitions.back().BodySID);
-    }
-    Element_Offset=0;
-
-    //Parsing - ADM
+    //Preparing
+    vector<File__Analyze*> Parsers;
+    #if 1
+        Parsers.push_back(new File_DolbyVisionMetadata);
+    #endif
+    #if 1
+        Parsers.push_back(new File_HdrVividMetadata);
+    #endif
     #if defined(MEDIAINFO_ADM_YES)
-        File_Adm* Adm_New=new File_Adm;
-        Open_Buffer_Init(Adm_New);
-        Open_Buffer_Continue(Adm_New);
-        if (Adm_New->Status[IsAccepted])
-        {
-            Adm_New->chna_Move(Adm);
-            delete Adm;
-            Adm=Adm_New;
-        }
-        Element_Offset=0;
+        Parsers.push_back(new File_Adm);
+    #endif
+    #if 1
+        Parsers.push_back(new File_DolbyAudioMetadata(true));
     #endif
 
-    //Parsing - Dolby Audio Metadata
-    File_DolbyAudioMetadata* DolbyAudioMetadata_New=new File_DolbyAudioMetadata;
-    DolbyAudioMetadata_New->IsXML=true;
-    Open_Buffer_Init(DolbyAudioMetadata_New);
-    Open_Buffer_Continue(DolbyAudioMetadata_New);
-    if (DolbyAudioMetadata_New->Status[IsAccepted])
+    //Parsing
+    for (auto& Parser : Parsers)
     {
-        delete DolbyAudioMetadata;
-        DolbyAudioMetadata=DolbyAudioMetadata_New;
+        Open_Buffer_Init(Parser);
+        Open_Buffer_Continue(Parser);
+        if (!Elem.Parser && Parser->Status[IsAccepted])
+            Elem.Parser=Parser;
+        else
+            delete Parser;
+        Element_Offset=0;
     }
-    Element_Offset=0;
+    if (!Elem.Parser)
+    {
+        File__Analyze* Parser = new File_Unknown();
+        Open_Buffer_Init(Parser);
+        Parser->Stream_Prepare(Stream_Other);
+        Elem.Parser = Parser;
+    }
+
+    //Exception - ADM
+    #if defined(MEDIAINFO_ADM_YES)
+        if (Elem.Parser && Elem.Parser->Retrieve_Const(Stream_General, 0, General_Format)==__T("ADM"))
+        {
+            ((File_Adm*)Elem.Parser)->chna_Move((File_Adm*)Adm);
+            delete Adm;
+            Adm=Elem.Parser;
+            Elem.Parser=nullptr;
+        }
+    #endif
+
+    //Exception - Dolby Audio Metadata
+    #if 1
+        if (Elem.Parser && Elem.Parser->Retrieve_Const(Stream_General, 0, General_Format)==__T("Dolby Audio Metadata"))
+        {
+            delete DolbyAudioMetadata;
+            DolbyAudioMetadata=Elem.Parser;
+            Elem.Parser=nullptr;
+        }
+    #endif
 
     Skip_String(Element_Size,                                   "Data");
     Element_Show();
@@ -9070,6 +9178,44 @@ void File_Mxf::OmneonVideoNetworksDescriptiveMetadataItems()
         //Filling
         DMOmneonLinks[InstanceUID].Links.push_back(Data);
     }
+}
+
+//---------------------------------------------------------------------------
+void File_Mxf::HdrVividMetadataTrackSubDescriptor()
+{
+    ELEMENT_BEGIN()
+    ELEMENT_MIDDLE()
+    ELEM____UUID_(HdrVividDataDefinition)
+    ELEM____UUID_(HdrVividSourceTrackID)
+    ELEM____UUID_(HdrVividSimplePayloadSID)
+    ELEMENT_END()
+    GenerationInterchangeObject();
+}
+
+//---------------------------------------------------------------------------
+void File_Mxf::HdrVividDataDefinition()
+{
+    Info_UL(Data,                                               "Data", nullptr); Element_Info1(Ztring().From_UUID(Data));
+}
+
+//---------------------------------------------------------------------------
+void File_Mxf::HdrVividSourceTrackID()
+{
+    //Parsing
+    Info_B4(Data,                                               "Data"); Element_Info1(Data);
+}
+
+//---------------------------------------------------------------------------
+void File_Mxf::HdrVividSimplePayloadSID()
+{
+    //Parsing
+    Info_B4(Data,                                               "Data"); Element_Info1(Data);
+}
+
+//---------------------------------------------------------------------------
+void File_Mxf::HdrVividMetadataItem()
+{
+    Skip_XX(Element_Size,                                       "HDR Vivid data");
 }
 
 //---------------------------------------------------------------------------
@@ -14015,6 +14161,13 @@ void File_Mxf::Get_UL(int128u &Value, const char* Name, const char* (*Param) (in
             Temp = Param(V);
         }
         if (!Temp) {
+            switch ((((int32u)(V.hi)) >> 8)) {
+            case 0x024301:
+                switch (V.lo >> 8) {
+                case 0x0D010301040102: // SDTI System Metadata Pack
+                    V.lo -= V.lo & 0xFF;
+                }
+            }
             Temp = Mxf_Param_Info((int32u)V.hi, V.lo);
         }
         if (Temp) {
@@ -14515,6 +14668,7 @@ void File_Mxf::ChooseParser__FromEssence(const essences::iterator &Essence, cons
     case Essences::FrameWrappedISXDData: ChooseParser_Isxd(Essence, Descriptor); break;
     case Essences::FrameWrappedISXDData2: ChooseParser_Isxd(Essence, Descriptor); break;
     case Essences::PHDRImageMetadataItem: ChooseParser_Phdr(Essence, Descriptor); break;
+    case Essences::HdrVividMetadataItem: ChooseParser_HdrVivid(Essence, Descriptor); break;
     }
 }
 
@@ -15185,12 +15339,30 @@ void File_Mxf::ChooseParser_Phdr(const essences::iterator& Essence, const descri
 }
 
 //---------------------------------------------------------------------------
+void File_Mxf::ChooseParser_HdrVivid(const essences::iterator& Essence, const descriptors::iterator& Descriptor)
+{
+    Essence->second.StreamKind = Stream_Other;
+    Essence->second.Infos["MuxingMode_MoreInfo"] = "Contains additional metadata for other tracks";
+
+    //Filling
+    #if 1 // TODO
+        File_HdrVividMetadata* Parser=new File_HdrVividMetadata;
+    #else
+        //Filling
+        File__Analyze* Parser=new File_Unknown();
+        Open_Buffer_Init(Parser);
+        Parser->Stream_Prepare(Stream_Other);
+        Parser->Fill(Stream_Other, 0, Other_Format, "HDR Vivid Metadata");
+    #endif
+    Essence->second.Parsers.push_back(Parser);
+}
+
+//---------------------------------------------------------------------------
 void File_Mxf::ChooseParser_DolbyVisionFrameData(const essences::iterator &Essence, const descriptors::iterator &Descriptor)
 {
     //Filling
     #if 1 // TODO
         File_DolbyVisionMetadata* Parser=new File_DolbyVisionMetadata;
-        Parser->IsISXD=true;
     #else
         //Filling
         File__Analyze* Parser=new File_Unknown();

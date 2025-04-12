@@ -165,6 +165,9 @@
 #if defined(MEDIAINFO_AVSV_YES)
     #include "MediaInfo/Video/File_AvsV.h"
 #endif
+#if defined(MEDIAINFO_AVS3V_YES)
+    #include "MediaInfo/Video/File_Avs3V.h"
+#endif
 #if defined(MEDIAINFO_DIRAC_YES)
     #include "MediaInfo/Video/File_Dirac.h"
 #endif
@@ -173,6 +176,9 @@
 #endif
 #if defined(MEDIAINFO_H263_YES)
     #include "MediaInfo/Video/File_H263.h"
+#endif
+#if defined(MEDIAINFO_MXF_YES)
+    #include "MediaInfo/Video/File_HdrVividMetadata.h"
 #endif
 #if defined(MEDIAINFO_HEVC_YES)
     #include "MediaInfo/Video/File_Hevc.h"
@@ -578,6 +584,9 @@ static File__Analyze* SelectFromExtension(const String& Parser)
     #endif
     #if defined(MEDIAINFO_AVSV_YES)
         if (Parser==__T("AvsV"))        return new File_AvsV();
+    #endif
+    #if defined(MEDIAINFO_AVS3V_YES)
+        if (Parser==__T("Avs3V"))       return new File_Avs3V();
     #endif
     #if defined(MEDIAINFO_DIRAC_YES)
         if (Parser==__T("Dirac"))       return new File_Dirac();
@@ -987,11 +996,17 @@ int MediaInfo_Internal::ListFormats(const String &File_Name)
     #if defined(MEDIAINFO_AVC_YES)
         delete Info; Info=new File_Avc();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
+    #if defined(MEDIAINFO_MXF_YES)
+        delete Info; Info = new File_HdrVividMetadata(); if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name) > 0) return 1;
+    #endif
     #if defined(MEDIAINFO_HEVC_YES)
         delete Info; Info=new File_Hevc();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_AVSV_YES)
         delete Info; Info=new File_AvsV();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+    #endif
+    #if defined(MEDIAINFO_AVS3V_YES)
+        delete Info; Info=new File_Avs3V();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_DIRAC_YES)
         delete Info; Info=new File_Dirac();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;

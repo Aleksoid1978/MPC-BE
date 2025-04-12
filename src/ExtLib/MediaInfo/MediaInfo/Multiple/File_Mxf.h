@@ -31,11 +31,6 @@
 namespace MediaInfoLib
 {
 
-class File_DolbyVisionMetadata;
-class File_Adm;
-class File_Iab;
-class File_DolbyAudioMetadata;
-
 //***************************************************************************
 // Class File_Mxf
 //***************************************************************************
@@ -69,10 +64,11 @@ public :
 
     enum type {
         Type_Unknown,
-        Type_UI16,
+        Type_UInt,
+        Type_UI16 = Type_UInt,
+        Type_Bool = Type_UInt,
         Type_AUID,
         Type_UUID,
-        Type_Bool,
         Type_ISO7,
         Type_UTF16,
         Type_Ref,
@@ -247,6 +243,11 @@ protected :
     void OmneonVideoNetworksDescriptiveMetadataLinks();
     void OmneonVideoNetworksDescriptiveMetadataData();
     void OmneonVideoNetworksDescriptiveMetadataItems();
+    void HdrVividMetadataTrackSubDescriptor();
+    void HdrVividDataDefinition();
+    void HdrVividSourceTrackID();
+    void HdrVividSimplePayloadSID();
+    void HdrVividMetadataItem();
     void FFV1PictureSubDescriptor();
     void MGASoundEssenceDescriptor();
     void MGAAudioMetadataSubDescriptor();
@@ -644,8 +645,7 @@ protected :
     void Get_UL (int128u &Value, const char* Name, const char* (*Param) (int128u));
     void Skip_UL(const char* Name);
     void Get_BER(int64u &Value, const char* Name);
-    int16u          Value_UI16;
-    int8u           Value_Bool;
+    int32u          Value_UInt;
     int128u         Value_UUID;
     Ztring          Value_String;
     vector<int128u> Value_UUIDVector;
@@ -1273,6 +1273,7 @@ protected :
     void           ChooseParser_Ffv1(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
     void           ChooseParser_Isxd(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
     void           ChooseParser_Phdr(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
+    void           ChooseParser_HdrVivid(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
     void           ChooseParser_DolbyVisionFrameData(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
     void           ChooseParser_Iab(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
     void           ChooseParser_Mga(const essences::iterator& Essence, const descriptors::iterator& Descriptor);
@@ -1434,20 +1435,32 @@ protected :
     int8u AcquisitionMetadata_Sony_CalibrationType;
 
     // Extra metadata
+    struct generic_stream_data_element_key
+    {
+        File__Analyze* Parser = {};
+        int32u SID = {};
+
+        generic_stream_data_element_key() = default;
+        generic_stream_data_element_key(const generic_stream_data_element_key& Value) = delete;
+
+        ~generic_stream_data_element_key()
+        {
+            delete Parser;
+        }
+    };
+    std::map<int64u, generic_stream_data_element_key> MXFGenericStreamDataElementKey; // Key is file offset
+    std::vector<File__Analyze*> ToMergeLater;
     int64u ExtraMetadata_Offset;
     std::set<int32u> ExtraMetadata_SID;
-    std::vector<File_DolbyVisionMetadata*> DolbyVisionMetadatas;
-    std::vector<int32u> DolbyVisionMetadatas_SID;
-    std::set<int64u> MXFGenericStreamDataElementKey_Offsets;
-    File_DolbyAudioMetadata* DolbyAudioMetadata;
+    File__Analyze* DolbyAudioMetadata;
     #if defined(MEDIAINFO_ADM_YES)
-    File_Adm* Adm;
+    File__Analyze* Adm;
     int32u ADMChannelMapping_LocalChannelID;
     string ADMChannelMapping_ADMAudioTrackUID;
     std::bitset<2> ADMChannelMapping_Presence;
     #endif
     #if defined(MEDIAINFO_IAB_YES)
-    File_Iab* Adm_ForLaterMerge;
+    File__Analyze* Adm_ForLaterMerge;
     #endif
         
     //Demux
