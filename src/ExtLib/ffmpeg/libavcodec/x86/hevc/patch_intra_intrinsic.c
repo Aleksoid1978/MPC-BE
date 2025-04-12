@@ -3,7 +3,7 @@
 #include "libavutil/pixdesc.h"
 #include "libavcodec/get_bits.h"
 #include "libavcodec/hevc/hevc.h"
-#include "libavcodec/x86/hevcpred.h"
+#include "libavcodec/x86/hevc/patch_pred.h"
 
 #ifdef __GNUC__
 #pragma GCC push_options

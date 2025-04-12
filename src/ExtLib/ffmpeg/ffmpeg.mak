@@ -630,8 +630,6 @@ SRCS_LC_B = \
 	libavcodec/x86/h264_intrapred_init.c \
 	libavcodec/x86/h264chroma_init.c \
 	libavcodec/x86/h264dsp_init.c \
-	libavcodec/x86/hevc_idct_intrinsic.c \
-	libavcodec/x86/hevc_intra_intrinsic.c \
 	libavcodec/x86/h264_qpel.c \
 	libavcodec/x86/hpeldsp_init.c \
 	libavcodec/x86/huffyuvdsp_init.c \
@@ -675,6 +673,8 @@ SRCS_LC_B = \
 	libavcodec/x86/h26x/h2656dsp.c \
 	\
 	libavcodec/x86/hevc/dsp_init.c \
+	libavcodec/x86/hevc/patch_idct_intrinsic.c \
+	libavcodec/x86/hevc/patch_intra_intrinsic.c \
 	\
 	libavcodec/x86/vvc/dsp_init.c
 

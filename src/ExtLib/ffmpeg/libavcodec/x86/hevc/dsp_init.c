@@ -1288,7 +1288,7 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
 
 // ==> Start patch MPC
 #include "libavcodec/hevc/pred.h"
-#include "libavcodec/x86/hevcpred.h"
+#include "libavcodec/x86/hevc/patch_pred.h"
 
 #undef FUNC
 #define FUNC(a, depth) a ## _ ## depth ## _sse

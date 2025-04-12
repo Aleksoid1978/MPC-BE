@@ -43,14 +43,12 @@ The following files are available only in MPC-BE (compared with ffmpeg):
 * config.asm
 * config.c
 * config.h
+* config_components.h
 * ffmpeg.mak
 
-* compat/windows/d3d12.h
-* compat/windows/d3d12video.h
-* compat/windows/dxva_av1.h
 * compat/windows/initguid.h
 
 * libavcodec/libvvdec.c
-* libavcodec/x86/hevc_idct_intrinsic.c
-* libavcodec/x86/hevc_intra_intrinsic.c
-* libavcodec/x86/hevcpred.h
+* libavcodec/x86/hevc/patch_idct_intrinsic.c
+* libavcodec/x86/hevc/patch_intra_intrinsic.c
+* libavcodec/x86/hevc/patch_pred.h
