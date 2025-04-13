@@ -47,7 +47,7 @@ static const std::map<DWORD, LPCSTR> vfourcs = {
 	{FCC('MP41'), "MSMPEG4v1"},
 	{FCC('DX30'), "DivX 3"},
 	{FCC('DX50'), "DivX 5"},
-	{FCC('DIVX'), "DivX 6"},
+	{FCC('DIVX'), "DivX 4"},
 	{FCC('XVID'), "Xvid"},
 	{FCC('MP4V'), "MPEG-4"},
 	{FCC('AVC1'), "H.264/AVC"},
