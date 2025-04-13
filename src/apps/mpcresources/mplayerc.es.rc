@@ -3249,7 +3249,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tInicia la reproducción en la posición hh:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize l,a\tEstablece tamaño de ventana fijo"
     IDS_CMD_MONITOR         "/monitor N\tInicia en el monitor N, donde N empieza de 1"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tStart using audiorenderer, where ""name"" is the name\nof the audio renderer (see ""Audio"" settings)"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""nombre""\tInicia usando el renderizador de audio, donde ""nombre"" es el nombre\ndel renderizador de audio (consulte configuración de ""audio"")"
     IDS_CMD_VOLUME          "/volume N\tEstablece Volumen, donde N es un rango de 0 a 100"
     IDS_CMD_CLIPBOARD       "/clipboard\tAbre rutas/enlaces desde el portapapeles"
     IDS_CMD_DEVICE          "/device\tAbre el dispositivo de video predeterminado"
