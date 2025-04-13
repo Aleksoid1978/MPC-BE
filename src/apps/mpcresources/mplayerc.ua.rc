@@ -3215,11 +3215,11 @@ BEGIN
     IDS_CMD_PATHNAME        """шлях""\tФайл або тека для завантаження (дозволені маски)"
     IDS_CMD_HELP            "/help /h /?\tПоказати цю довідку"
     IDS_CMD_DUB             "/dub ""dubname""\tЗавантажити додатковий дубляж"
-    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tЗавантажити додатковий дубляж з затримкою XXмс\n(якщо ім'я файлу містить ""...DELAY XXms..."")"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tЗавантажити додатковий дубляж з затримкою XXмс\n(якщо ім'я файлу містить ""...DELAY XXms..."")"
     IDS_CMD_D3DFS           "/d3dfs\tСтартувати в повноекранному D3D режимі"
     IDS_CMD_SUB             "/sub ""subname""\tЗавантажити додаткові субтитри"
     IDS_CMD_FILTER          "/filter ""filtername""\tЗавантажити фільтри DirectShow з бібліотеки (дозволені маски)"
@@ -3235,11 +3235,11 @@ BEGIN
     IDS_CMD_MINIMIZED       "/minimized\tЗапуск в згорнутому вигляді"
     IDS_CMD_NEW             "/new\tЗапускати нову копію програвача"
     IDS_CMD_ADD             "/add\tДодати ""шлях"" в список відтворення, можна спільно з /open та /play"
-    IDS_CMD_RANDOMIZE       "/randomize\tПеремішати список відтворення"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_RANDOMIZE       "/randomize\tПеремішати список відтворення"
     IDS_CMD_REGVID          "/regvid\tЗареєструвати асоціації відеоформатів"
     IDS_CMD_REGAUD          "/regaud\tЗареєструвати асоціації аудіоформатів"
     IDS_CMD_REGPL           "/regpl\tЗареєструвати асоціації для файлів списків відтворення"
@@ -3411,7 +3411,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Завантажувати вбудовані шрифти"
     IDS_MKVSPLT_CALC_DURATION "Розраховувати тривалість на основі даних відеопотоку"
-    IDS_MKVSPLT_REINDEX             "Re-indexing if necessary"
+    IDS_MKVSPLT_REINDEX     "Re-indexing if necessary"
 END
 
 STRINGTABLE

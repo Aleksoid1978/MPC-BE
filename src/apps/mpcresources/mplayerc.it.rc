@@ -3215,11 +3215,11 @@ BEGIN
     IDS_CMD_PATHNAME        """nome_percorso""\tIl file o la directory principale da caricare (caratteri jolly\nammessi)"
     IDS_CMD_HELP            "/help /h /?\tMostra la guida sulle opzioni della riga di comando"
     IDS_CMD_DUB             "/dub ""nome dub""\tCarica un file audio aggiuntivo"
-    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tCarica un file audio aggiuntivo spostato con XXms (se\nil file contiene ""...RITARDO XXms..."")"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tCarica un file audio aggiuntivo spostato con XXms (se\nil file contiene ""...RITARDO XXms..."")"
     IDS_CMD_D3DFS           "/d3dfs\tAvvia il rendering in modalità a schermo intero esclusiva"
     IDS_CMD_SUB             "/sub ""subname""\tCarica un file di sottotitoli aggiuntivo"
     IDS_CMD_FILTER          "/filter ""nome filtro""\tCarica filtri DirectShow da una\nDLL (caratteri jolly consentiti)"
@@ -3235,11 +3235,11 @@ BEGIN
     IDS_CMD_MINIMIZED       "/minimized\tInizia in modalità ridotta a icona"
     IDS_CMD_NEW             "/new\tUsa una nuova istanza del lettore"
     IDS_CMD_ADD             "/add\tAggiungi ""nome_percorso"" alla playlist, può essere combinato\ncon /open e /play"
-    IDS_CMD_RANDOMIZE       "/randomize\tRendi casuale la playlist"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_RANDOMIZE       "/randomize\tRendi casuale la playlist"
     IDS_CMD_REGVID          "/regvid\tCrea associazioni di file per i file video"
     IDS_CMD_REGAUD          "/regaud\tCrea associazioni di file per i file audio"
     IDS_CMD_REGPL           "/regpl\tCrea associazioni di file per i file della playlist"
@@ -3411,7 +3411,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Carica caratteri incorporati"
     IDS_MKVSPLT_CALC_DURATION "Calcola la durata in base ai dati video"
-    IDS_MKVSPLT_REINDEX             "Reindicizza se necessario"
+    IDS_MKVSPLT_REINDEX     "Reindicizza se necessario"
 END
 
 STRINGTABLE

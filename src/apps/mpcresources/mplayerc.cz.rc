@@ -3215,11 +3215,11 @@ BEGIN
     IDS_CMD_PATHNAME        """cesta""\tSoubor nebo adresář, který má být otevřen\n(povoleny masky)"
     IDS_CMD_HELP            "/help /h /?\tZobrazí tento dialog"
     IDS_CMD_DUB             "/dub ""soubor""\tNačte soubor se zvukovou stopou"
-    IDS_CMD_DUBDELAY        "/dubdelay ""soubor""\tNačte soubor se zvukovou stopou posunutou\no XXms (pokud název souboru obsahuje\n""...DELAY XXms..."")"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_DUBDELAY        "/dubdelay ""soubor""\tNačte soubor se zvukovou stopou posunutou\no XXms (pokud název souboru obsahuje\n""...DELAY XXms..."")"
     IDS_CMD_D3DFS           "/d3dfs\tSpustí vykreslování v D3D fullscreen režimu"
     IDS_CMD_SUB             "/sub ""soubor""\tNačte soubor s titulky"
     IDS_CMD_FILTER          "/filter ""soubor""\tNačte DirectShow filtr (*.ax nebo *.dll, povoleny\nmasky)"
@@ -3235,11 +3235,11 @@ BEGIN
     IDS_CMD_MINIMIZED       "/minimized\tSpustí přehrávač minimalizovaný"
     IDS_CMD_NEW             "/new\tOtevře novou instanci MPC-BE"
     IDS_CMD_ADD             "/add\tPřidá ""cestu"" do playlistu, může být kombinován\ns /open a /play"
-    IDS_CMD_RANDOMIZE       "/randomize\tRandomize the playlist"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_RANDOMIZE       "/randomize\tRandomize the playlist"
     IDS_CMD_REGVID          "/regvid\tAsociuje MPC-BE s video formáty"
     IDS_CMD_REGAUD          "/regaud\tAsociuje MPC-BE s audio formáty"
     IDS_CMD_REGPL           "/regpl\tAsociuje MPC-BE se seznamy stop"
@@ -3411,7 +3411,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Load Embedded Fonts"
     IDS_MKVSPLT_CALC_DURATION "Calculate the duration based on the video data"
-    IDS_MKVSPLT_REINDEX             "Re-indexing if necessary"
+    IDS_MKVSPLT_REINDEX     "Re-indexing if necessary"
 END
 
 STRINGTABLE

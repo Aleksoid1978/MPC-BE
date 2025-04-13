@@ -3215,11 +3215,11 @@ BEGIN
     IDS_CMD_PATHNAME        """padnaam""\tHet te laden bestand of map (wildcards\ntoegestaan)"
     IDS_CMD_HELP            "/help /h /?\tToon help over opdrachtregel-parameters"
     IDS_CMD_DUB             "/dub ""dubnaam""\tLaad nog een geluidsbestand"
-    IDS_CMD_DUBDELAY        "/dubdelay ""best""\tLaad nog een geluidsbestand met een\nverschuiving van XXms\n (als bestand ""..vertraging XXms.."" heeft)"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_DUBDELAY        "/dubdelay ""best""\tLaad nog een geluidsbestand met een\nverschuiving van XXms\n (als bestand ""..vertraging XXms.."" heeft)"
     IDS_CMD_D3DFS           "/d3dfs\tStart renderen in exclusieve volledigschermmodus"
     IDS_CMD_SUB             "/sub ""ondertitel""\tLaad nog een ondertitelingsbestand"
     IDS_CMD_FILTER          "/filter ""filternaam""\tLaad DirectShow-filters van een DLL\n(wildcards toegestaan)"
@@ -3235,11 +3235,11 @@ BEGIN
     IDS_CMD_MINIMIZED       "/minimized\tStart geminimaliseerd"
     IDS_CMD_NEW             "/new\tEen nieuwe speler openen"
     IDS_CMD_ADD             "/add\tVoegt ""padnaam"" aan de afspeellijst toe\nKan gecombineerd worden met /open en /play"
-    IDS_CMD_RANDOMIZE       "/randomize\tAfspeellijst in willekeurige volgorde"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_RANDOMIZE       "/randomize\tAfspeellijst in willekeurige volgorde"
     IDS_CMD_REGVID          "/regvid\tMaak bestandskoppelingen voor videobestanden"
     IDS_CMD_REGAUD          "/regaud\tMaak bestandskoppelingen voor audiobestanden"
     IDS_CMD_REGPL           "/regpl\tMaak bestandskoppelingen voor afspeellijsten"
@@ -3411,7 +3411,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Laad ingesloten lettertypen"
     IDS_MKVSPLT_CALC_DURATION "Tijdsduur berekenen gebaseerd op videodata"
-    IDS_MKVSPLT_REINDEX             "Re-indexing if necessary"
+    IDS_MKVSPLT_REINDEX     "Re-indexing if necessary"
 END
 
 STRINGTABLE

@@ -3215,11 +3215,11 @@ BEGIN
     IDS_CMD_PATHNAME        "„ścieżka”\tOkreśla plik lub folder do otwarcia (symbole\nwieloznaczne dozwolone)"
     IDS_CMD_HELP            "/help /h /?\tWyświetla listę parametrów wiersza poleceń"
     IDS_CMD_DUB             "/dub „plik”\tOtwiera dodatkową ścieżkę dźwiękową"
-    IDS_CMD_DUBDELAY        "/dubdelay „plik”\tOtwiera dodatkową ścieżkę dźwiękową opóźnioną\no XX ms jeśli nazwa pliku zawiera ciąg\n„DELAY XXms”"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_DUBDELAY        "/dubdelay „plik”\tOtwiera dodatkową ścieżkę dźwiękową opóźnioną\no XX ms jeśli nazwa pliku zawiera ciąg\n„DELAY XXms”"
     IDS_CMD_D3DFS           "/d3dfs\tUruchamia odtwarzanie pełnoekranowe w D3D"
     IDS_CMD_SUB             "/sub „plik”\tWczytuje dodatkowe napisy"
     IDS_CMD_FILTER          "/filter „plik”\tWczytuje filtr DirectShow z biblioteki dll (symbole\nwieloznaczne dozwolone)"
@@ -3235,11 +3235,11 @@ BEGIN
     IDS_CMD_MINIMIZED       "/minimized\tUruchamia zminimalizowany"
     IDS_CMD_NEW             "/new\tUruchamia nowe wystąpienie programu"
     IDS_CMD_ADD             "/add\tDodaje „ścieżkę” do listy odtwarzania. Można\nłączyć z parametrami /open i /play"
-    IDS_CMD_RANDOMIZE       "/randomize\tRandomize the playlist"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_RANDOMIZE       "/randomize\tRandomize the playlist"
     IDS_CMD_REGVID          "/regvid\tRejestruje formaty wideo"
     IDS_CMD_REGAUD          "/regaud\tRejestruje formaty dźwiękowe"
     IDS_CMD_REGPL           "/regpl\tRejestruje formaty list odtwarzania"
@@ -3411,7 +3411,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Wczytaj wbudowane czcionki"
     IDS_MKVSPLT_CALC_DURATION "Oblicz czas trwania w oparciu o dane wideo"
-    IDS_MKVSPLT_REINDEX             "Re-indexing if necessary"
+    IDS_MKVSPLT_REINDEX     "Re-indexing if necessary"
 END
 
 STRINGTABLE

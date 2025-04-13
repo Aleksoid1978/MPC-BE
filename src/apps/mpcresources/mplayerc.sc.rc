@@ -3215,11 +3215,11 @@ BEGIN
     IDS_CMD_PATHNAME        """路径""\t要载入的主要文件或目录。(允许通配符)"
     IDS_CMD_HELP            "/help /h /?\t显示关于命令行开关的帮助"
     IDS_CMD_DUB             "/dub ""伴音名""\t载入额外的音频文件"
-    IDS_CMD_DUBDELAY        "/dubdelay ""文件""\t载入额外的音频文件并偏移XX毫秒 (如果\n文件包含""...DELAY XXms..."")"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_DUBDELAY        "/dubdelay ""文件""\t载入额外的音频文件并偏移XX毫秒 (如果\n文件包含""...DELAY XXms..."")"
     IDS_CMD_D3DFS           "/d3dfs\t以独占全屏幕模式开始渲染"
     IDS_CMD_SUB             "/sub ""字幕名""\t载入额外的字幕文件"
     IDS_CMD_FILTER          "/filter ""滤镜名""\t从动态链接载入 DirectShow 滤镜。(允许通配符)"
@@ -3235,11 +3235,11 @@ BEGIN
     IDS_CMD_MINIMIZED       "/minimized\t以最小化方式打开"
     IDS_CMD_NEW             "/new\t使用新的播放器实例"
     IDS_CMD_ADD             "/add\t增加""路径名""到播放列表。可以与\n/open和/play同时使用"
-    IDS_CMD_RANDOMIZE       "/randomize\t随机排序播放列表"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_RANDOMIZE       "/randomize\t随机排序播放列表"
     IDS_CMD_REGVID          "/regvid\t为视频文件建立关联"
     IDS_CMD_REGAUD          "/regaud\t为音频文件建立关联"
     IDS_CMD_REGPL           "/regpl\t为播放列表文件建立关联"
@@ -3411,7 +3411,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "加载嵌入字体"
     IDS_MKVSPLT_CALC_DURATION "计算基于视频数据的时间"
-    IDS_MKVSPLT_REINDEX             "必要时将重建索引"
+    IDS_MKVSPLT_REINDEX     "必要时将重建索引"
 END
 
 STRINGTABLE

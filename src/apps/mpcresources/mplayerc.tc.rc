@@ -3215,11 +3215,11 @@ BEGIN
     IDS_CMD_PATHNAME        """路徑名稱""\t要載入的主要檔案或資料夾 (可使用萬用字元)"
     IDS_CMD_HELP            "/help /h /?\t顯示命令列選項的說明"
     IDS_CMD_DUB             "/dub ""音源名稱""\t載入額外的音訊檔案"
-    IDS_CMD_DUBDELAY        "/dubdelay ""檔案""\t以平移 XXms 的時間載入額外的音訊檔案\n(如果檔案含有 ""...DELAY XXms..."")"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_DUBDELAY        "/dubdelay ""檔案""\t以平移 XXms 的時間載入額外的音訊檔案\n(如果檔案含有 ""...DELAY XXms..."")"
     IDS_CMD_D3DFS           "/d3dfs\t在獨佔全螢幕模式啟動繪製"
     IDS_CMD_SUB             "/sub ""字幕名稱""\t載入額外的字幕檔"
     IDS_CMD_FILTER          "/filter ""篩選器名""\t從動態連結函式庫載入 DirectShow 篩選器\n(允許萬用字元)"
@@ -3235,11 +3235,11 @@ BEGIN
     IDS_CMD_MINIMIZED       "/minimized\t以最小化模式啟動"
     IDS_CMD_NEW             "/new\t使用新的播放程式實體"
     IDS_CMD_ADD             "/add\t新增 ""路徑名稱"" 到播放清單, 可與 /open 和 /play\n合併使用"
-    IDS_CMD_RANDOMIZE       "/randomize\t隨機排序播放清單"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_RANDOMIZE       "/randomize\t隨機排序播放清單"
     IDS_CMD_REGVID          "/regvid\t建立視訊格式關聯"
     IDS_CMD_REGAUD          "/regaud\t建立音訊格式關聯"
     IDS_CMD_REGPL           "/regpl\t建立播放清單格式關聯"
@@ -3411,7 +3411,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "載入內嵌字型"
     IDS_MKVSPLT_CALC_DURATION "按視訊資料計算時間長度"
-    IDS_MKVSPLT_REINDEX             "Re-indexing if necessary"
+    IDS_MKVSPLT_REINDEX     "Re-indexing if necessary"
 END
 
 STRINGTABLE

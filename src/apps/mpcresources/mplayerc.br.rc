@@ -3215,11 +3215,11 @@ BEGIN
     IDS_CMD_PATHNAME        """pathname""\tO arquivo principal ou diretório a ser carregado\n(curingas permitidos)"
     IDS_CMD_HELP            "/help /h /?\tMostrar ajuda sobre opção linha de comando"
     IDS_CMD_DUB             "/dub ""dubname""\tCarregar um arquivo de áudio adicional"
-    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tCarregar um arquivo de áudio adicional deslocado com\nXXms (se o arquivo contiver ""...DELAY XXms..."")"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tCarregar um arquivo de áudio adicional deslocado com\nXXms (se o arquivo contiver ""...DELAY XXms..."")"
     IDS_CMD_D3DFS           "/d3dfs\tIniciar renderização em modo de tela cheia exclusivo"
     IDS_CMD_SUB             "/sub ""subname""\tCarregar um arquivo de legenda adicional"
     IDS_CMD_FILTER          "/filter ""filtername""\tCarregar filtros DirectShow de um link dinâmico\n(curingas permitidos)"
@@ -3235,11 +3235,11 @@ BEGIN
     IDS_CMD_MINIMIZED       "/minimized\tIniciar no modo minimizado"
     IDS_CMD_NEW             "/new\tUsar o player em uma nova instância"
     IDS_CMD_ADD             "/add\tAdicionar ""pathname"" à lista de reprodução, pode ser\ncombinada com /open e com /play"
-    IDS_CMD_RANDOMIZE       "/randomize\tRandomizar a lista de reprodução"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_RANDOMIZE       "/randomize\tRandomizar a lista de reprodução"
     IDS_CMD_REGVID          "/regvid\tCriar associações de arquivos para arquivos de vídeo"
     IDS_CMD_REGAUD          "/regaud\tCriar associações de arquivos para arquivos de áudio"
     IDS_CMD_REGPL           "/regpl\tCriar associações de arquivos para arquivos de lista de\nreprodução"
@@ -3411,7 +3411,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Carregar fontes incorporadas"
     IDS_MKVSPLT_CALC_DURATION "Calcular duração com base nos dados do vídeo"
-    IDS_MKVSPLT_REINDEX             "Re-indexing if necessary"
+    IDS_MKVSPLT_REINDEX     "Re-indexing if necessary"
 END
 
 STRINGTABLE

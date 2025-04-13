@@ -3215,11 +3215,11 @@ BEGIN
     IDS_CMD_PATHNAME        """pathname""\tA fő betöltendő fájl vagy könyvtár helye (spec. helyettesítő karakterek \nengedélyezve)"
     IDS_CMD_HELP            "/help /h /?\tMegmutatja a parancssori kapcsolókról szóló súgót"
     IDS_CMD_DUB             "/dub ""dubname""\tBetölt egy külön audió fájlt"
-    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tBetölt egy külön audió fájlt XX ms-al eltolva (ha a\nfájl tartalmaz ""...DELAY XXms..."")"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tBetölt egy külön audió fájlt XX ms-al eltolva (ha a\nfájl tartalmaz ""...DELAY XXms..."")"
     IDS_CMD_D3DFS           "/d3dfs\tlejátszó indítása D3D teljes képernyős módban"
     IDS_CMD_SUB             "/sub ""subname""\tBetölt egy külön felirat fájlt"
     IDS_CMD_FILTER          "/filter ""filtername""\tDirectShow szűrőket tölt be egy dynamic link\nlibrary-ból (spec. helyettesítő karakterek tengedélyezve)"
@@ -3235,11 +3235,11 @@ BEGIN
     IDS_CMD_MINIMIZED       "/minimized\tMinimalizált formában való indítás"
     IDS_CMD_NEW             "/new\tA lejátszó egy új példányának használata"
     IDS_CMD_ADD             "/add\tA ""pathname"" hozzáadása a lejátszási listához, összekombinálható \naz /open és /play kapcsolóval"
-    IDS_CMD_RANDOMIZE       "/randomize\tVéletlenszerű a lejátszási lista"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_RANDOMIZE       "/randomize\tVéletlenszerű a lejátszási lista"
     IDS_CMD_REGVID          "/regvid\tVideó formátumok beregisztrálása"
     IDS_CMD_REGAUD          "/regaud\tAudió formátumok beregisztrálása"
     IDS_CMD_REGPL           "/regpl\tFájltársítások létrehozása a lejátszási lista fájlokhoz"
@@ -3411,7 +3411,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Beágyazott betűtípusok betöltése"
     IDS_MKVSPLT_CALC_DURATION "Számítsa ki az időtartamot a videóadatok alapján"
-    IDS_MKVSPLT_REINDEX             "Szükség esetén újraindexelés"
+    IDS_MKVSPLT_REINDEX     "Szükség esetén újraindexelés"
 END
 
 STRINGTABLE

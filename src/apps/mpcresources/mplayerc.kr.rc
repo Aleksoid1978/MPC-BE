@@ -3215,11 +3215,11 @@ BEGIN
     IDS_CMD_PATHNAME        """경로명""\t불러올 파일이나 디렉터리.(와일드 카드\n사용 가능)"
     IDS_CMD_HELP            "/help /h /?\t명령입력 스위치 옵션을 출력"
     IDS_CMD_DUB             "/dub ""더빙파일""\t추가적인 오디오 파일"
-    IDS_CMD_DUBDELAY        "/dubdelay ""파일""\tXXms 지연된 추가적인 오디오 파일(\n파일이 다음을 포함 ""...DELAY XXms..."")"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_DUBDELAY        "/dubdelay ""파일""\tXXms 지연된 추가적인 오디오 파일(\n파일이 다음을 포함 ""...DELAY XXms..."")"
     IDS_CMD_D3DFS           "/d3dfs\tD3D 전체 화면 모드에서 생성"
     IDS_CMD_SUB             "/sub ""자막 파일""\t추가적인 자막 파일"
     IDS_CMD_FILTER          "/filter ""필터 파일""\tDLL파일에서 다이렉트쇼 필터를 불러옴(와일드카드사용 가능)"
@@ -3235,11 +3235,11 @@ BEGIN
     IDS_CMD_MINIMIZED       "/minimized\t최소화 모드로 재생 시작"
     IDS_CMD_NEW             "/new\t재생기 창을 하나 더 생성"
     IDS_CMD_ADD             "/add\t재생 목록에 지정한 ""경로 이름""을 추가,\n/open 과 /play 스위치와 같이 사용 가능"
-    IDS_CMD_RANDOMIZE       "/randomize\t재생 목록 무작위화"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_RANDOMIZE       "/randomize\t재생 목록 무작위화"
     IDS_CMD_REGVID          "/regvid\t비디오 파일 확장명을 MPC-BE로 연결"
     IDS_CMD_REGAUD          "/regaud\t오디오 파일 확장명을 MPC-BE로 연결"
     IDS_CMD_REGPL           "/regpl\t재생 목록 파일을 MPC-BE로 연결"
@@ -3411,7 +3411,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "내장 폰트 불러옴"
     IDS_MKVSPLT_CALC_DURATION "비디오 데이터를 기반으로 기간 계산"
-    IDS_MKVSPLT_REINDEX             "필요한 경우, 다시 색인화"
+    IDS_MKVSPLT_REINDEX     "필요한 경우, 다시 색인화"
 END
 
 STRINGTABLE

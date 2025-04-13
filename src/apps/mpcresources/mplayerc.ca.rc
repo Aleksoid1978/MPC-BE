@@ -3215,11 +3215,11 @@ BEGIN
     IDS_CMD_PATHNAME        """ruta""\tL'arxiu o directori principal a cargar-se (comodins permesos)"
     IDS_CMD_HELP            "/help /h /?\tMostra l' ajuda de la línea de comandaments(no traduït)"
     IDS_CMD_DUB             "/dub ""dubname""\tLoad an additional audio file"
-    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tLoad an additional audio file shifted with XXms (if\nfile ambtains ""...DELAY XXms..."")"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tLoad an additional audio file shifted with XXms (if\nfile ambtains ""...DELAY XXms..."")"
     IDS_CMD_D3DFS           "/d3dfs\tstart rendering in D3D Mode a Pantalla completa"
     IDS_CMD_SUB             "/sub ""subname""\tLoad an additional subtitle file"
     IDS_CMD_FILTER          "/filter ""filtername""\tLoad DirectShow filters from a dynamic link\nlibrary. (wildcards allowed)"
@@ -3235,11 +3235,11 @@ BEGIN
     IDS_CMD_MINIMIZED       "/minimized\tStart in minimized mode"
     IDS_CMD_NEW             "/new\tUse a new instance of the player"
     IDS_CMD_ADD             "/add\tAdd ""pathname"" to playlist, can be combined\nwith /open and /play"
-    IDS_CMD_RANDOMIZE       "/randomize\tRandomize the playlist"
 END
 
 STRINGTABLE
 BEGIN
+    IDS_CMD_RANDOMIZE       "/randomize\tRandomize the playlist"
     IDS_CMD_REGVID          "/regvid\tRegister Vídeo formats"
     IDS_CMD_REGAUD          "/regaud\tRegister audio formats"
     IDS_CMD_REGPL           "/regpl\tCreate file associations for playlist files"
@@ -3411,7 +3411,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Load Embedded Fonts"
     IDS_MKVSPLT_CALC_DURATION "Calculate the duration based on the video data"
-    IDS_MKVSPLT_REINDEX             "Re-indexing if necessary"
+    IDS_MKVSPLT_REINDEX     "Re-indexing if necessary"
 END
 
 STRINGTABLE
