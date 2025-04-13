@@ -3249,7 +3249,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tLejátszás a pozíciónál hh:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tFix ablakméret beállítása"
     IDS_CMD_MONITOR         "/monitor N\tIndítás az N. monitoron, ahol N egytől indul"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tKezdje el használni az audió átalakítót, ahol ""name"" a név\naz the audio rendererből (lásd ""Audio"" beállítások)"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tKezdje el használni az audió átalakítót, ahol ""name"" a név\naz audio rendererből (lásd ""Audio"" beállítások)"
     IDS_CMD_VOLUME          "/volume N\tÁllítsa be a hangerőt, ahol N egy 0 és 100 közötti tartomány"
     IDS_CMD_CLIPBOARD       "/clipboard\tNyissa meg az elérési utakat/hivatkozásokat a vágólapról"
     IDS_CMD_DEVICE          "/device\tNyissa meg az alapértelmezett videoeszközt"
