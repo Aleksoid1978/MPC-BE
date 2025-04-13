@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Despre"
 7		"MPC-BE"
 8		"Drepturi de autor © 2002-2025 - vezi fișierul Authors.txt"
@@ -1021,8 +1021,8 @@ BEGIN MENU IDR_POPUP_PANSCAN LINES 24
 END
 
 BEGIN MENU IDR_POPUP_SHADERS LINES 11
-5		"Activează nuanțatoarele de pixeli de pre-redimensionare"
-6		"Activează nuanțatoarele de pixeli de post-redimensionare"
+5		"Activează nuanțatoarele (shaderele) de pixeli de pre-redimensionare"
+6		"Activează nuanțatoarele (shaderele) de pixeli de post-redimensionare"
 7		"&Selectează nuanțatoarele (shaderele)..."
 9		"&Editează nuanțatoarele (shaderele)..."
 END
@@ -1245,8 +1245,8 @@ STRING IDS_AG_SAVE_SUBTITLE		"Salvează subtitrarea"
 STRING IDS_AG_SETTINGS		"Setări"
 STRING IDS_AG_SHADER		"nuanțator (shader): "
 STRING IDS_AG_SHADERS		"Nuanțatoare (Shadere)"
-STRING IDS_AG_SHADERS_1_ENABLE		"Activează nuanțatoarele de pixeli (Pixels Shaders)"
-STRING IDS_AG_SHADERS_2_ENABLE		"Activează nuanțatoarele de pixeli pentru spațiul de pe ecran"
+STRING IDS_AG_SHADERS_1_ENABLE		"„le (shaderele) de pixeli"
+STRING IDS_AG_SHADERS_2_ENABLE		"Activează nuanțatoarele (shaderele) de pixeli pentru spațiul de pe ecran"
 STRING IDS_AG_SHADERS_SELECT		"Selectează nuanțatoarele (shaderele)"
 STRING IDS_AG_SOUND		"Sunet"
 STRING IDS_AG_STEP		"Pas"
