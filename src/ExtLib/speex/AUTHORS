@@ -16,3 +16,6 @@ Atsuhiko Yamanaka <ymnk@jcraft.com>:
 
 Radim Kolar <hsn@cybermail.net>:
    Patch to speexenc.c for supporting more input formats
+
+Tristan Matthews <tmatth@videolan.org>
+   Bug fixes, maintenance and releases

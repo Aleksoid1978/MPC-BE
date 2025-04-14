@@ -64,9 +64,6 @@
 
 #ifndef DISABLE_WIDEBAND
 
-
-#define sqr(x) ((x)*(x))
-
 #define SUBMODE(x) st->submodes[st->submodeID]->x
 
 #ifdef FIXED_POINT
@@ -869,7 +866,7 @@ int sb_encode(void *state, void *vin, SpeexBits *bits)
          if (st->subframeSize==80)
             gc = MULT16_16_P14(QCONST16(1.4142f,14), gc);
 
-         scale = SHL32(MULT16_16(PDIV32_16(SHL32(EXTEND32(gc),SIG_SHIFT-6),filter_ratio),(1+el)),6);
+         scale = SHL32(MULT16_16(PDIV32_16(SHL32(EXTEND32(gc),SIG_SHIFT-6),MAX16(EPSILON,filter_ratio)),(1+el)),6);
 
          compute_impulse_response(st->interp_qlpc, bw_lpc1, bw_lpc2, syn_resp, st->subframeSize, st->lpcSize, stack);
 
@@ -1280,6 +1277,9 @@ int sb_decode(void *state, SpeexBits *bits, void *vout)
    /* If null mode (no transmission), just set a couple things to zero*/
    if (st->submodes[st->submodeID] == NULL)
    {
+      if (st->innov_save)
+        SPEEX_MEMSET(st->innov_save, 0, st->full_frame_size);
+
       if (dtx)
       {
          sb_decode_lost(st, out, 1, stack);
@@ -1370,7 +1370,8 @@ int sb_decode(void *state, SpeexBits *bits, void *vout)
          quant = speex_bits_unpack_unsigned(bits, 5);
          g= spx_exp(MULT16_16(QCONST16(.125f,11),(quant-10)));
 
-         g = PDIV32(g, filter_ratio);
+         /* Clamp to a minimum of epsilon to avoid division by 0 */
+         g = PDIV32(g, MAX16(EPSILON,filter_ratio));
 
          for (i=0;i<st->subframeSize;i+=2)
          {
@@ -1389,7 +1390,7 @@ int sb_decode(void *state, SpeexBits *bits, void *vout)
          if (st->subframeSize==80)
             gc = MULT16_16_P14(QCONST16(1.4142f,14),gc);
 
-         scale = SHL32(PDIV32(SHL32(MULT16_16(gc, el),3), filter_ratio),SIG_SHIFT-3);
+         scale = SHL32(PDIV32(SHL32(MULT16_16(gc, el),3), MAX16(EPSILON,filter_ratio)),SIG_SHIFT-3);
          SUBMODE(innovation_unquant)(exc, SUBMODE(innovation_params), st->subframeSize,
                                      bits, stack, &st->seed);
 

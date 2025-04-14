@@ -7,18 +7,18 @@
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-   
+
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-   
+
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-   
+
    - Neither the name of the Xiph.org Foundation nor the names of its
    contributors may be used to endorse or promote products derived from
    this software without specific prior written permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -50,7 +50,7 @@ void filter_mem16_10(const float *x, const float *_num, const float *_den, float
    mem[2] = _mm_setr_ps(_mem[8], _mem[9], 0, 0);
    num[2] = _mm_setr_ps(_num[8], _num[9], 0, 0);
    den[2] = _mm_setr_ps(_den[8], _den[9], 0, 0);
-   
+
    for (i=0;i<N;i++)
    {
       __m128 xx;
@@ -60,7 +60,7 @@ void filter_mem16_10(const float *x, const float *_num, const float *_den, float
       yy = _mm_add_ss(xx, mem[0]);
       _mm_store_ss(y+i, yy);
       yy = _mm_shuffle_ps(yy, yy, 0);
-      
+
       /* Update memory */
       mem[0] = _mm_move_ss(mem[0], mem[1]);
       mem[0] = _mm_shuffle_ps(mem[0], mem[0], 0x39);
@@ -100,7 +100,7 @@ void filter_mem16_8(const float *x, const float *_num, const float *_den, float 
       num[i] = _mm_loadu_ps(_num+4*i);
       den[i] = _mm_loadu_ps(_den+4*i);
    }
-   
+
    for (i=0;i<N;i++)
    {
       __m128 xx;
@@ -110,7 +110,7 @@ void filter_mem16_8(const float *x, const float *_num, const float *_den, float 
       yy = _mm_add_ss(xx, mem[0]);
       _mm_store_ss(y+i, yy);
       yy = _mm_shuffle_ps(yy, yy, 0);
-      
+
       /* Update memory */
       mem[0] = _mm_move_ss(mem[0], mem[1]);
       mem[0] = _mm_shuffle_ps(mem[0], mem[0], 0x39);
@@ -155,7 +155,7 @@ void iir_mem16_10(const float *x, const float *_den, float *y, int N, int ord, f
    }
    mem[2] = _mm_setr_ps(_mem[8], _mem[9], 0, 0);
    den[2] = _mm_setr_ps(_den[8], _den[9], 0, 0);
-   
+
    for (i=0;i<N;i++)
    {
       __m128 xx;
@@ -165,7 +165,7 @@ void iir_mem16_10(const float *x, const float *_den, float *y, int N, int ord, f
       yy = _mm_add_ss(xx, mem[0]);
       _mm_store_ss(y+i, yy);
       yy = _mm_shuffle_ps(yy, yy, 0);
-      
+
       /* Update memory */
       mem[0] = _mm_move_ss(mem[0], mem[1]);
       mem[0] = _mm_shuffle_ps(mem[0], mem[0], 0x39);
@@ -202,7 +202,7 @@ void iir_mem16_8(const float *x, const float *_den, float *y, int N, int ord, fl
       mem[i] = _mm_loadu_ps(_mem+4*i);
       den[i] = _mm_loadu_ps(_den+4*i);
    }
-   
+
    for (i=0;i<N;i++)
    {
       __m128 xx;
@@ -212,7 +212,7 @@ void iir_mem16_8(const float *x, const float *_den, float *y, int N, int ord, fl
       yy = _mm_add_ss(xx, mem[0]);
       _mm_store_ss(y+i, yy);
       yy = _mm_shuffle_ps(yy, yy, 0);
-      
+
       /* Update memory */
       mem[0] = _mm_move_ss(mem[0], mem[1]);
       mem[0] = _mm_shuffle_ps(mem[0], mem[0], 0x39);
@@ -253,7 +253,7 @@ void fir_mem16_10(const float *x, const float *_num, float *y, int N, int ord, f
    }
    mem[2] = _mm_setr_ps(_mem[8], _mem[9], 0, 0);
    num[2] = _mm_setr_ps(_num[8], _num[9], 0, 0);
-   
+
    for (i=0;i<N;i++)
    {
       __m128 xx;
@@ -263,7 +263,7 @@ void fir_mem16_10(const float *x, const float *_num, float *y, int N, int ord, f
       yy = _mm_add_ss(xx, mem[0]);
       _mm_store_ss(y+i, yy);
       yy = _mm_shuffle_ps(yy, yy, 0);
-      
+
       /* Update memory */
       mem[0] = _mm_move_ss(mem[0], mem[1]);
       mem[0] = _mm_shuffle_ps(mem[0], mem[0], 0x39);
@@ -299,7 +299,7 @@ void fir_mem16_8(const float *x, const float *_num, float *y, int N, int ord, fl
       mem[i] = _mm_loadu_ps(_mem+4*i);
       num[i] = _mm_loadu_ps(_num+4*i);
    }
-   
+
    for (i=0;i<N;i++)
    {
       __m128 xx;
@@ -309,7 +309,7 @@ void fir_mem16_8(const float *x, const float *_num, float *y, int N, int ord, fl
       yy = _mm_add_ss(xx, mem[0]);
       _mm_store_ss(y+i, yy);
       yy = _mm_shuffle_ps(yy, yy, 0);
-      
+
       /* Update memory */
       mem[0] = _mm_move_ss(mem[0], mem[1]);
       mem[0] = _mm_shuffle_ps(mem[0], mem[0], 0x39);

@@ -7,18 +7,18 @@
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-   
+
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-   
+
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-   
+
    - Neither the name of the Xiph.org Foundation nor the names of its
    contributors may be used to endorse or promote products derived from
    this software without specific prior written permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -39,7 +39,7 @@ int normalize16(const spx_sig_t *x, spx_word16_t *y, spx_sig_t max_scale, int le
 {
    spx_sig_t max_val=1;
    int sig_shift;
-   __asm__ 
+   __asm__
    (
    "%0 = 0;\n\t"
    "I0 = %1;\n\t"
@@ -62,7 +62,7 @@ int normalize16(const spx_sig_t *x, spx_word16_t *y, spx_sig_t max_scale, int le
       max_val >>= 1;
    }
 
-   __asm__ __volatile__ 
+   __asm__ __volatile__
    (
    "I0 = %0;\n\t"
    "L0 = 0;\n\t"
@@ -94,7 +94,7 @@ void filter_mem16(const spx_word16_t *_x, const spx_coef_t *num, const spx_coef_
 
    ALLOC(xy2, (N+1), spx_word32_t);
    ALLOC(numden_a, (2*ord+2), spx_word32_t);
-   xy = xy2+1;  
+   xy = xy2+1;
    numden = (spx_word16_t*) numden_a;
 
    for (i=0;i<ord;i++)
@@ -106,20 +106,20 @@ void filter_mem16(const spx_word16_t *_x, const spx_coef_t *num, const spx_coef_
    (
    /* Register setup */
    "R0 = %5;\n\t"      /*ord */
-   
+
    "P0 = %3;\n\t"
    "I0 = P0;\n\t"
    "B0 = P0;\n\t" /* numden */
    "L0 = 0;\n\t"
-      
+
    "P2 = %0;\n\t" /* Fused xy */
    "I2 = P2;\n\t"
    "L2 = 0;\n\t"
-   
+
    "P4 = %6;\n\t" /* mem */
    "P0 = %1;\n\t" /* _x */
    "P1 = %2;\n\t" /* _y */
-   
+
    /* First sample */
    "R1 = [P4++];\n\t"
    "R1 <<= 3;\n\t" /* shift mem */
@@ -129,7 +129,7 @@ void filter_mem16(const spx_word16_t *_x, const spx_coef_t *num, const spx_coef_
    "W[P1++] = R1;\n\t" /* store y[0] */
    "R2 = PACK(R1.L, R2.L);\n\t" /* pack x16 and y16 */
    "[P2] = R2;\n\t"
-               
+
    /* Samples 1 to ord-1 (using memory) */
    "R0 += -1;\n\t"
    "R3 = 0;\n\t"
@@ -138,7 +138,7 @@ void filter_mem16(const spx_word16_t *_x, const spx_coef_t *num, const spx_coef_
    "LOOP_BEGIN filter_start%=;\n\t"
       "R3 += 1;\n\t"
       "LC1 = R3;\n\t"
-      
+
       "R1 = [P4++];\n\t"
       "A1 = R1;\n\t"
       "A0 = 0;\n\t"
@@ -164,13 +164,13 @@ void filter_mem16(const spx_word16_t *_x, const spx_coef_t *num, const spx_coef_
 
    "LOOP_END filter_start%=;\n\t"
 
-   /* Samples ord to N*/   
+   /* Samples ord to N*/
    "R0 = %5;\n\t"
    "R0 <<= 1;\n\t"
    "I0 = B0;\n\t" /* numden */
-   "R0 <<= 1;\n\t"   
+   "R0 <<= 1;\n\t"
    "L0 = R0;\n\t"
-   
+
    "R0 = %5;\n\t" /* org */
    "R2 = %4;\n\t" /* N */
    "R2 = R2 - R0;\n\t"
@@ -242,20 +242,20 @@ void iir_mem16(const spx_word16_t *_x, const spx_coef_t *den, spx_word16_t *_y, 
    (
    /* Register setup */
    "R0 = %5;\n\t"      /*ord */
-   
+
    "P1 = %3;\n\t"
    "I1 = P1;\n\t"
    "B1 = P1;\n\t"
    "L1 = 0;\n\t"
-   
+
    "P3 = %0;\n\t"
    "I3 = P3;\n\t"
    "L3 = 0;\n\t"
-   
+
    "P4 = %6;\n\t"
    "P0 = %1;\n\t"
    "P1 = %2;\n\t"
-   
+
    /* First sample */
    "R1 = [P4++];\n\t"
    "R1 = R1 << 3 (S);\n\t"
@@ -273,7 +273,7 @@ void iir_mem16(const spx_word16_t *_x, const spx_coef_t *den, spx_word16_t *_y, 
    "LOOP_BEGIN filter_start%=;\n\t"
       "R3 += 1;\n\t"
       "LC1 = R3;\n\t"
-      
+
       "R1 = [P4++];\n\t"
       "A1 = R1;\n\t"
       "I1 = B1;\n\t"
@@ -285,7 +285,7 @@ void iir_mem16(const spx_word16_t *_x, const spx_coef_t *den, spx_word16_t *_y, 
          "R5.L = W[I3--];\n\t"
          "A1 -= R4.L*R5.L (IS);\n\t"
       "LOOP_END filter_start_inner%=;\n\t"
-   
+
       "R1 = A1;\n\t"
       "R1 <<= 3;\n\t"
       "R1.L = R1 (RND);\n\t"
@@ -295,12 +295,12 @@ void iir_mem16(const spx_word16_t *_x, const spx_coef_t *den, spx_word16_t *_y, 
       "W[P3] = R1;\n\t"
    "LOOP_END filter_start%=;\n\t"
 
-   /* Samples ord to N*/   
+   /* Samples ord to N*/
    "R0 = %5;\n\t"
    "R0 <<= 1;\n\t"
    "I1 = B1;\n\t"
    "L1 = R0;\n\t"
-   
+
    "R0 = %5;\n\t"
    "R2 = %4;\n\t"
    "R2 = R2 - R0;\n\t"
@@ -324,7 +324,7 @@ void iir_mem16(const spx_word16_t *_x, const spx_coef_t *den, spx_word16_t *_y, 
       "W[P1++] = R1;\n\t"
       "W[P3] = R1;\n\t"
    "LOOP_END filter_mid%=;\n\t"
-     
+
    /* Update memory */
    "P4 = %6;\n\t"
    "R0 = %5;\n\t"
@@ -445,7 +445,7 @@ void compute_impulse_response(const spx_coef_t *ak, const spx_coef_t *awk1, cons
    int i,j;
    VARDECL(spx_word16_t *ytmp);
    ALLOC(ytmp, N, spx_word16_t);
-   
+
    y[0] = LPC_SCALING;
    for (i=0;i<ord;i++)
       y[i+1] = awk1[i];
@@ -482,7 +482,7 @@ void filter_mem2(const spx_sig_t *_x, const spx_coef_t *num, const spx_coef_t *d
    {
       x[i] = EXTRACT16(SHR32(_x[i],SIG_SHIFT));
    }
-   
+
    for (i=0;i<ord;i++)
    {
       spx_word32_t yi = mem[i];

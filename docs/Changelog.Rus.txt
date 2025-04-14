@@ -58,6 +58,7 @@ YouTube
 	libflac 1.5.0;
 	Little-CMS git-lcms2.17-10-ge19dc49;
 	MediaInfo git-v25.03-11-g7226e32c5;
+	Speex-1.2.1-46-g3c28894;
 	rapidjson v1.1.0-763-g24b5e7a8;
 	vvdec v3.0.0-19-ga7ebd30;
 	ZenLib git-v0.4.41-62-gc5d4c83.

@@ -153,6 +153,10 @@ EXPORT void speex_encode_stereo_int(spx_int16_t *data, int frame_size, SpeexBits
    int balance_id;
 #ifdef FIXED_POINT
    int shift;
+   int sqr_shift;
+
+   /* Avoid overflows when summing squares */
+   sqr_shift = frame_size >= 512 ? 9 : 8;
 #endif
 
    /* In band marker */
@@ -162,15 +166,15 @@ EXPORT void speex_encode_stereo_int(spx_int16_t *data, int frame_size, SpeexBits
 
    for (i=0;i<frame_size;i++)
    {
-      e_left  += SHR32(MULT16_16(data[2*i],data[2*i]),8);
-      e_right += SHR32(MULT16_16(data[2*i+1],data[2*i+1]),8);
+      e_left  += SHR32(MULT16_16(data[2*i],data[2*i]),sqr_shift);
+      e_right += SHR32(MULT16_16(data[2*i+1],data[2*i+1]),sqr_shift);
 #ifdef FIXED_POINT
       /* I think this is actually unbiased */
       data[i] =  SHR16(data[2*i],1)+PSHR16(data[2*i+1],1);
 #else
       data[i] =  .5*(((float)data[2*i])+data[2*i+1]);
 #endif
-      e_tot   += SHR32(MULT16_16(data[i],data[i]),8);
+      e_tot   += SHR32(MULT16_16(data[i],data[i]),sqr_shift);
    }
    if (e_left > e_right)
    {

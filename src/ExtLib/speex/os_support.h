@@ -1,5 +1,5 @@
 /* Copyright (C) 2007 Jean-Marc Valin
-      
+
    File: os_support.h
    This is the (tiny) OS abstraction layer. Aside from math.h, this is the
    only place where system headers are allowed.
@@ -45,12 +45,12 @@
 #include "os_support_custom.h"
 #endif
 
-/** Speex wrapper for calloc. To do your own dynamic allocation, all you need to do is replace this function, speex_realloc and speex_free 
+/** Speex wrapper for calloc. To do your own dynamic allocation, all you need to do is replace this function, speex_realloc and speex_free
     NOTE: speex_alloc needs to CLEAR THE MEMORY */
 #ifndef OVERRIDE_SPEEX_ALLOC
 static inline void *speex_alloc (int size)
 {
-   /* WARNING: this is not equivalent to malloc(). If you want to use malloc() 
+   /* WARNING: this is not equivalent to malloc(). If you want to use malloc()
       or your own allocator, YOU NEED TO CLEAR THE MEMORY ALLOCATED. Otherwise
       you will experience strange bugs */
    return calloc(size,1);

@@ -275,7 +275,7 @@ EXPORT int speex_bits_unpack_signed(SpeexBits *bits, int nbBits)
    /* If number is negative */
    if (d>>(nbBits-1))
    {
-      d |= (-1)<<nbBits;
+      d |= (~0u)<<nbBits;
    }
    return d;
 }

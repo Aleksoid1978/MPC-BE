@@ -7,18 +7,18 @@
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-   
+
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-   
+
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-   
+
    - Neither the name of the Xiph.org Foundation nor the names of its
    contributors may be used to endorse or promote products derived from
    this software without specific prior written permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -144,7 +144,7 @@ static inline spx_word16_t spx_sqrt(spx_word32_t x)
    int k;
    spx_word32_t rt;
    k = spx_ilog4(x)-6;
-   x = VSHR32(x, (k<<1));
+   x = VSHR32(x, (int)((unsigned)k<<1));
    rt = ADD16(C0, MULT16_16_Q14(x, ADD16(C1, MULT16_16_Q14(x, ADD16(C2, MULT16_16_Q14(x, (C3)))))));
    rt = VSHR32(rt,7-k);
    return rt;
@@ -168,11 +168,11 @@ static inline spx_word16_t spx_acos(spx_word16_t x)
       x = NEG16(x);
    }
    x = SUB16(16384,x);
-   
+
    x = x >> 1;
    sq = MULT16_16_Q13(x, ADD16(A1, MULT16_16_Q13(x, ADD16(A2, MULT16_16_Q13(x, (A3))))));
    ret = spx_sqrt(SHL32(EXTEND32(sq),13));
-   
+
    /*ret = spx_sqrt(67108864*(-1.6129e-04 + 2.0104e+00*f + 2.7373e-01*f*f + 1.8136e-01*f*f*f));*/
    if (s)
       ret = SUB16(25736,ret);
@@ -208,7 +208,7 @@ static inline spx_word16_t spx_cos(spx_word16_t x)
 static inline spx_word16_t _spx_cos_pi_2(spx_word16_t x)
 {
    spx_word16_t x2;
-   
+
    x2 = MULT16_16_P15(x,x);
    return ADD16(1,MIN16(32766,ADD32(SUB16(L1,x2), MULT16_16_P15(x2, ADD32(L2, MULT16_16_P15(x2, ADD32(L3, MULT16_16_P15(L4, x2))))))));
 }

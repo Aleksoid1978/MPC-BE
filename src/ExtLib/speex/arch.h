@@ -7,18 +7,18 @@
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-   
+
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-   
+
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-   
+
    - Neither the name of the Xiph.org Foundation nor the names of its
    contributors may be used to endorse or promote products derived from
    this software without specific prior written permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -107,6 +107,7 @@ typedef spx_word32_t spx_sig_t;
 #define SIG_SHIFT    14
 #define GAIN_SHIFT   6
 
+#define EPSILON 1
 #define VERY_SMALL 0
 #define VERY_LARGE32 ((spx_word32_t)2147483647)
 #define VERY_LARGE16 ((spx_word16_t)32767)
@@ -148,6 +149,7 @@ typedef float spx_word32_t;
 #define GAIN_SCALING_1 1.f
 
 
+#define EPSILON 1e-15f
 #define VERY_SMALL 1e-15f
 #define VERY_LARGE32 1e15f
 #define VERY_LARGE16 1e15f
@@ -183,16 +185,13 @@ typedef float spx_word32_t;
 #define MULT16_16(a,b)     ((spx_word32_t)(a)*(spx_word32_t)(b))
 #define MAC16_16(c,a,b)     ((c)+(spx_word32_t)(a)*(spx_word32_t)(b))
 
-#define MULT16_32_Q11(a,b)     ((a)*(b))
 #define MULT16_32_Q13(a,b)     ((a)*(b))
 #define MULT16_32_Q14(a,b)     ((a)*(b))
 #define MULT16_32_Q15(a,b)     ((a)*(b))
 #define MULT16_32_P15(a,b)     ((a)*(b))
 
-#define MAC16_32_Q11(c,a,b)     ((c)+(a)*(b))
 #define MAC16_32_Q15(c,a,b)     ((c)+(a)*(b))
 
-#define MAC16_16_Q11(c,a,b)     ((c)+(a)*(b))
 #define MAC16_16_Q13(c,a,b)     ((c)+(a)*(b))
 #define MAC16_16_P13(c,a,b)     ((c)+(a)*(b))
 #define MULT16_16_Q11_32(a,b)     ((a)*(b))
@@ -215,11 +214,11 @@ typedef float spx_word32_t;
 #if defined (CONFIG_TI_C54X) || defined (CONFIG_TI_C55X)
 
 /* 2 on TI C5x DSP */
-#define BYTES_PER_CHAR 2 
+#define BYTES_PER_CHAR 2
 #define BITS_PER_CHAR 16
 #define LOG2_BITS_PER_CHAR 4
 
-#else 
+#else
 
 #define BYTES_PER_CHAR 1
 #define BITS_PER_CHAR 8

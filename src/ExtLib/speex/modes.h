@@ -7,18 +7,18 @@
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-   
+
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-   
+
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-   
+
    - Neither the name of the Xiph.org Foundation nor the names of its
    contributors may be used to endorse or promote products derived from
    this software without specific prior written permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -71,8 +71,8 @@ typedef void (*lsp_unquant_func)(spx_lsp_t *, int, SpeexBits *);
 
 
 /** Long-term predictor quantization */
-typedef int (*ltp_quant_func)(spx_word16_t *, spx_word16_t *, spx_coef_t *, spx_coef_t *, 
-                              spx_coef_t *, spx_sig_t *, const void *, int, int, spx_word16_t, 
+typedef int (*ltp_quant_func)(spx_word16_t *, spx_word16_t *, spx_coef_t *, spx_coef_t *,
+                              spx_coef_t *, spx_sig_t *, const void *, int, int, spx_word16_t,
                               int, int, SpeexBits*, char *, spx_word16_t *, spx_word16_t *, int, int, int, spx_word32_t *);
 
 /** Long-term un-quantize */
@@ -81,7 +81,7 @@ typedef void (*ltp_unquant_func)(spx_word16_t *, spx_word32_t *, int, int, spx_w
 
 
 /** Innovation quantization function */
-typedef void (*innovation_quant_func)(spx_word16_t *, spx_coef_t *, spx_coef_t *, spx_coef_t *, const void *, int, int, 
+typedef void (*innovation_quant_func)(spx_word16_t *, spx_coef_t *, spx_coef_t *, spx_coef_t *, const void *, int, int,
                                       spx_sig_t *, spx_word16_t *, SpeexBits *, char *, int, int);
 
 /** Innovation unquantization function */

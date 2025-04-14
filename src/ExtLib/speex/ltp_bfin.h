@@ -8,18 +8,18 @@
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-   
+
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-   
+
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-   
+
    - Neither the name of the Xiph.org Foundation nor the names of its
    contributors may be used to endorse or promote products derived from
    this software without specific prior written permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -118,35 +118,35 @@ static inline spx_word32_t compute_pitch_error(spx_word16_t *C, spx_word16_t *g,
    __asm__ __volatile__
          (
          "A0 = 0;\n\t"
-         
+
          "R0 = W[%1++];\n\t"
          "R1.L = %2.L*%5.L (IS);\n\t"
          "A0 += R1.L*R0.L (IS) || R0 = W[%1++];\n\t"
-         
+
          "R1.L = %3.L*%5.L (IS);\n\t"
          "A0 += R1.L*R0.L (IS) || R0 = W[%1++];\n\t"
-         
+
          "R1.L = %4.L*%5.L (IS);\n\t"
          "A0 += R1.L*R0.L (IS) || R0 = W[%1++];\n\t"
-         
+
          "R1.L = %2.L*%3.L (IS);\n\t"
          "A0 -= R1.L*R0.L (IS) || R0 = W[%1++];\n\t"
 
          "R1.L = %4.L*%3.L (IS);\n\t"
          "A0 -= R1.L*R0.L (IS) || R0 = W[%1++];\n\t"
-         
+
          "R1.L = %4.L*%2.L (IS);\n\t"
          "A0 -= R1.L*R0.L (IS) || R0 = W[%1++];\n\t"
-         
+
          "R1.L = %2.L*%2.L (IS);\n\t"
          "A0 -= R1.L*R0.L (IS) || R0 = W[%1++];\n\t"
 
          "R1.L = %3.L*%3.L (IS);\n\t"
          "A0 -= R1.L*R0.L (IS) || R0 = W[%1++];\n\t"
-         
+
          "R1.L = %4.L*%4.L (IS);\n\t"
          "A0 -= R1.L*R0.L (IS);\n\t"
-         
+
          "%0 = A0;\n\t"
    : "=&D" (sum), "=a" (C)
    : "d" (g[0]), "d" (g[1]), "d" (g[2]), "d" (pitch_control), "1" (C)
@@ -203,7 +203,7 @@ void open_loop_nbest_pitch(spx_word16_t *sw, int start, int end, int len, int *p
 "          R2 = MAX(R1,R3);\n\t"
 "eu2:      [P0++] = R2;\n\t"
        : : "d" (energy), "d" (&sw[-start-1]), "d" (&sw[-start+len-1]),
-           "a" (end-start)  
+           "a" (end-start)
        : "P0", "I1", "I2", "R0", "R1", "R2", "R3", "ASTAT" BFIN_HWLOOP1_REGS
        );
 
@@ -232,7 +232,7 @@ void open_loop_nbest_pitch(spx_word16_t *sw, int start, int end, int len, int *p
 "        P0 = %4;\n\t"                     /* P0: best pitch  */
 "        P1 = %4;\n\t"                     /* P1: counter     */
 "        LSETUP (sl1, sl2) LC1 = %3;\n\t"
-"sl1:      R0.L = W [I0++] || R1.L = W [I1++];\n\t"         
+"sl1:      R0.L = W [I0++] || R1.L = W [I1++];\n\t"
 "          R0 = R0.L * R0.L (IS);\n\t"
 "          R1   += 1;\n\t"
 "          R4   = R0.L * R3.L;\n\t"
@@ -244,7 +244,7 @@ void open_loop_nbest_pitch(spx_word16_t *sw, int start, int end, int len, int *p
 "sl2:      P1 += 1;\n\t"
 "        %0 = P0;\n\t"
        : "=&d" (pitch[0])
-       : "a" (corr16), "a" (ener16), "a" (end+1-start), "d" (start) 
+       : "a" (corr16), "a" (ener16), "a" (end+1-start), "d" (start)
        : "P0", "P1", "I0", "I1", "R0", "R1", "R2", "R3", "R4", "R5",
          "ASTAT", "CC" BFIN_HWLOOP1_REGS
        );
@@ -338,39 +338,39 @@ static int pitch_gain_search_3tap_vq(
 "          R4 += 32;\n\t"
 "          R4.H = 64;\n\t"                 /* R4.H: pitch_control    */
 
-"          R0  = B [P0++] (X);\n\t"              
+"          R0  = B [P0++] (X);\n\t"
 "          B0  = R0;\n\t"                  /* BO: gain_sum         */
-          
+
            /* compute_pitch_error() -------------------------------*/
 
 "          I1 = %3;\n\t"                   /* I1: ptr to C         */
 "          A0 = 0;\n\t"
-         
+
 "          R0.L = W[I1++];\n\t"
 "          R1.L = R2.L*R4.H (IS);\n\t"
 "          A0 += R1.L*R0.L (IS) || R0.L = W[I1++];\n\t"
-         
+
 "          R1.L = R3.L*R4.H (IS);\n\t"
 "          A0 += R1.L*R0.L (IS) || R0.L = W[I1++];\n\t"
-         
+
 "          R1.L = R4.L*R4.H (IS);\n\t"
 "          A0 += R1.L*R0.L (IS) || R0.L = W[I1++];\n\t"
-         
+
 "          R1.L = R2.L*R3.L (IS);\n\t"
 "          A0 -= R1.L*R0.L (IS) || R0.L = W[I1++];\n\t"
 
 "          R1.L = R4.L*R3.L (IS);\n\t"
 "          A0 -= R1.L*R0.L (IS) || R0.L = W[I1++];\n\t"
-         
+
 "          R1.L = R4.L*R2.L (IS);\n\t"
 "          A0 -= R1.L*R0.L (IS) || R0.L = W[I1++];\n\t"
-         
+
 "          R1.L = R2.L*R2.L (IS);\n\t"
 "          A0 -= R1.L*R0.L (IS) || R0.L = W[I1++];\n\t"
 
 "          R1.L = R3.L*R3.L (IS);\n\t"
 "          A0 -= R1.L*R0.L (IS) || R0.L = W[I1++];\n\t"
-         
+
 "          R1.L = R4.L*R4.L (IS);\n\t"
 "          R0 = (A0 -= R1.L*R0.L) (IS);\n\t"
 
@@ -393,18 +393,18 @@ static int pitch_gain_search_3tap_vq(
 "          R1 = B0\n\t"
 "          R2 = %5\n\t"
 "          R3 = %6\n\t"
-"          cc = R2 <= R1;\n\t" 
+"          cc = R2 <= R1;\n\t"
 "          if cc R0 = R3;\n\t"
 "          cc = %0 <= R0;\n\t"
 "          if cc %0 = R0;\n\t"
 "          if cc %1 = P1;\n\t"
 
 "pgs2:     P1 += 1;\n\t"
-   
-       : "=&d" (best_sum), "=&d" (best_cdbk) 
+
+       : "=&d" (best_sum), "=&d" (best_cdbk)
        : "a" (gain_cdbk), "a" (C16), "a" (gain_cdbk_size), "a" (max_gain),
          "b" (-VERY_LARGE32)
-       : "R0", "R1", "R2", "R3", "R4", "P0", 
+       : "R0", "R1", "R2", "R3", "R4", "P0",
          "P1", "I1", "L1", "A0", "B0", "CC", "ASTAT" BFIN_HWLOOP1_REGS
        );
 

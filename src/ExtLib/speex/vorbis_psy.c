@@ -340,6 +340,10 @@ VorbisPsy *vorbis_psy_init(int rate, int n)
     if(halfoc<0)halfoc=0;
     if(halfoc>=P_BANDS-1)halfoc=P_BANDS-1;
     inthalfoc=(int)halfoc;
+    /*If we hit the P_BANDS-1 clamp above, inthalfoc+1 will be out of bounds,
+       even though it will have an interpolation weight of 0.
+      Shift the interval so we don't read past the end of the array.*/
+    if(inthalfoc>=P_BANDS-2)inthalfoc=P_BANDS-2;
     del=halfoc-inthalfoc;
 
     p->noiseoffset[i]=

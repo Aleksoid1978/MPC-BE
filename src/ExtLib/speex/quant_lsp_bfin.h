@@ -8,18 +8,18 @@
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-   
+
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-   
+
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-   
+
    - Neither the name of the Xiph.org Foundation nor the names of its
    contributors may be used to endorse or promote products derived from
    this software without specific prior written permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -45,9 +45,9 @@
 */
 
 static int lsp_quant(
-  spx_word16_t      *x, 
-  const signed char *cdbk, 
-  int                nbVec, 
+  spx_word16_t      *x,
+  const signed char *cdbk,
+  int                nbVec,
   int                nbDim
 )
 {
@@ -57,23 +57,23 @@ static int lsp_quant(
 
    __asm__ __volatile__
      (
-"	%0 = 1 (X);\n\t"                       /* %0: best_dist */    
-"	%0 <<= 30;\n\t"     
+"	%0 = 1 (X);\n\t"                       /* %0: best_dist */
+"	%0 <<= 30;\n\t"
 "	%1 = 0 (X);\n\t"                       /* %1: best_i         */
 "       P2 = %3\n\t"                           /* P2: ptr to cdbk    */
 "       R5 = 0;\n\t"                           /* R5: best cb entry  */
 
 "       R0 = %5;\n\t"                          /* set up circ addr   */
 "       R0 <<= 1;\n\t"
-"       L0 = R0;\n\t"                          
+"       L0 = R0;\n\t"
 "       I0 = %2;\n\t"                          /* %2: &x[0]          */
-"       B0 = %2;\n\t"                          
+"       B0 = %2;\n\t"
 
 "       R2.L = W [I0++];\n\t"
 "	LSETUP (1f, 2f) LC0 = %4;\n\t"
 "1:	  R3 = 0;\n\t"                         /* R3: dist           */
 "	  LSETUP (3f, 4f) LC1 = %5;\n\t"
-"3:       R1 = B [P2++] (X);\n\t"            
+"3:       R1 = B [P2++] (X);\n\t"
 "	    R1 <<= 5;\n\t"
 "	    R0.L = R2.L - R1.L || R2.L = W [I0++];\n\t"
 "	    R0 = R0.L*R0.L;\n\t"
@@ -107,10 +107,10 @@ static int lsp_quant(
 */
 
 static int lsp_weight_quant(
-  spx_word16_t      *x, 
-  spx_word16_t      *weight, 
-  const signed char *cdbk, 
-  int                nbVec, 
+  spx_word16_t      *x,
+  spx_word16_t      *weight,
+  const signed char *cdbk,
+  int                nbVec,
   int                nbDim
 )
 {
@@ -120,26 +120,26 @@ static int lsp_weight_quant(
 
    __asm__ __volatile__
      (
-"	%0 = 1 (X);\n\t"                       /* %0: best_dist */    
-"	%0 <<= 30;\n\t"     
+"	%0 = 1 (X);\n\t"                       /* %0: best_dist */
+"	%0 <<= 30;\n\t"
 "	%1 = 0 (X);\n\t"                       /* %1: best_i         */
 "       P2 = %4\n\t"                           /* P2: ptr to cdbk    */
 "       R5 = 0;\n\t"                           /* R5: best cb entry  */
 
 "       R0 = %6;\n\t"                          /* set up circ addr   */
 "       R0 <<= 1;\n\t"
-"       L0 = R0;\n\t"                          
+"       L0 = R0;\n\t"
 "       L1 = R0;\n\t"
 "       I0 = %2;\n\t"                          /* %2: &x[0]          */
 "	I1 = %3;\n\t"                          /* %3: &weight[0]     */
-"       B0 = %2;\n\t"                          
-"	B1 = %3;\n\t"                          
+"       B0 = %2;\n\t"
+"	B1 = %3;\n\t"
 
 "	LSETUP (1f, 2f) LC0 = %5;\n\t"
 "1:	  R3 = 0 (X);\n\t"                     /* R3: dist           */
 "	  LSETUP (3f, 4f) LC1 = %6;\n\t"
 "3:	    R0.L = W [I0++] || R2.L = W [I1++];\n\t"
-"           R1 = B [P2++] (X);\n\t"            
+"           R1 = B [P2++] (X);\n\t"
 "	    R1 <<= 5;\n\t"
 "	    R0.L = R0.L - R1.L;\n\t"
 "           R0 = R0.L*R0.L;\n\t"
