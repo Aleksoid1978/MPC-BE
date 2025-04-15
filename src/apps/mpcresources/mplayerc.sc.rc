@@ -3249,7 +3249,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\t从hh:mm:ss开始播放"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\t设置窗口固定大小"
     IDS_CMD_MONITOR         "/monitor N\t在监视器 N 上打开播放器，N从1开始"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tStart using audiorenderer, where ""name"" is the name\nof the audio renderer (see ""Audio"" settings)"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""名称""\t开始使用音频渲染器，其中 ""名称"" 是音频渲染器的名字\n (参见 ""音频"" 设置)"
     IDS_CMD_VOLUME          "/volume N\t设置音量，其中 N 的范围是 0 到 100"
     IDS_CMD_CLIPBOARD       "/clipboard\t从剪贴板打开文件路径或链接"
     IDS_CMD_DEVICE          "/device\t打开默认的视频捕获设备"
