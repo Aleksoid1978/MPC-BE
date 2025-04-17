@@ -38,7 +38,7 @@ Various interface fixes.
 
 Installer
 Updated MPC Script Source 0.2.7.
-Updated MPC Video Renderer 0.9.5.
+Updated MPC Video Renderer 0.9.7.
 
 Updated Korean translation (by Hackjjang).
 Updated Romanian translation (by Andrei Miloiu).

@@ -1,5 +1,5 @@
 ﻿;
-; (C) 2009-2024 see Authors.txt
+; (C) 2009-2025 see Authors.txt
 ;
 ; This file is part of MPC-BE.
 ;
@@ -68,7 +68,7 @@
   #define Description  = app_name + " x64 " + app_version
   #define VisualElementsManifest = "VisualElements\mpc-be64.VisualElementsManifest.xml"
 #endif
-#define mpcvr_desc     = "MPC Video Renderer 0.9.5"
+#define mpcvr_desc     = "MPC Video Renderer 0.9.7"
 #define mpcscriptsrc_desc = "MPC Script Source 0.2.7"
 
 [Setup]
