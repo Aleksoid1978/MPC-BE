@@ -292,10 +292,10 @@ BEGIN
     GROUPBOX        "Altele",IDC_STATIC,124,135,167,84,WS_GROUP
     CONTROL         "Pictogramă în zona de notificare",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,147,156,9
     CONTROL         "Arată OSD-ul(necesită repornirea playerului)",IDC_SHOW_OSD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,159,156,9
-    CONTROL         "Afișează numele în fișierul media",IDC_CHECK14,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,138,171,148,9
+    CONTROL         "Afișează numele în fișierele media",IDC_CHECK14,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,138,171,148,9
     CONTROL         "Afișează timpul de căutare",IDC_CHECK15,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,138,183,148,9
     CONTROL         "Dezactivează meniul „Deschide discul”",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,196,156,9
-    CONTROL         "Prioritatea procesării peste normal",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,208,156,9
+    CONTROL         "Prioritatea procesării peste cea normală",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,208,156,9
     GROUPBOX        "Întreruperi de rețea",IDC_STATIC,124,222,167,41,WS_GROUP
     LTEXT           "Conexiune:",IDC_STATIC,129,233,96,8
     EDITTEXT        IDC_EDIT2,230,231,29,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
@@ -355,7 +355,7 @@ BEGIN
     GROUPBOX        "Setări pentru deschidere",IDC_STATIC,5,124,286,79
     LTEXT           "Când se deschide un fișier audio,",IDC_STATIC,10,137,99,8
     COMBOBOX        IDC_COMBO4,113,134,172,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Adaugă în plus, la lista de redare:",IDC_STATIC,10,153,139,8
+    LTEXT           "Adaugă în plus, la lista de redare (playlist):",IDC_STATIC,10,153,139,8
     COMBOBOX        IDC_COMBO5,150,150,135,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Folosește un fir de execuţie secundar pentru a construi graficul filtrelor",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,167,276,9
@@ -384,17 +384,17 @@ BEGIN
     EDITTEXT        IDC_EDIT4,217,17,40,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "ms",IDC_STATIC,261,19,25,11
     GROUPBOX        "Setările texturii (deschide fișierul video din nou pentru a vedea schimbările)",IDC_STATIC,5,37,286,68
-    LTEXT           "Imagini de subtitrare de preîncărcat:",IDC_STATIC,10,51,125,8
+    LTEXT           "Imagini de subtitrări de preîncărcat:",IDC_STATIC,10,51,125,8
     EDITTEXT        IDC_EDIT1,139,49,32,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,159,49,12,12
-    LTEXT           "Rezoluție maximă pentru textură:",IDC_STATIC,10,67,125,8
+    LTEXT           "Rezoluția maximă pentru textură:",IDC_STATIC,10,67,125,8
     COMBOBOX        IDC_COMBO1,139,65,59,45,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Permite animații când se încarcă în avans",IDC_CHECK_SPCANIMWITHBUFFER,
+    CONTROL         "Permite animațiile când se încarcă în avans",IDC_CHECK_SPCANIMWITHBUFFER,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,81,277,9
-    CONTROL         "Permite eliminarea unor imagini secundare dacă coada întârzie",IDC_CHECK_ALLOW_DROPPING_SUBPIC,
+    CONTROL         "Permite eliminarea unor imagini secundare dacă este coada în întârziere",IDC_CHECK_ALLOW_DROPPING_SUBPIC,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,93,277,9
     GROUPBOX        "Avertisment",IDC_STATIC,5,108,286,43
-    LTEXT           "Dacă anulezi și activezi antialiasarea pe ecranul complet undeva la setările plăcii video, subtitrările nu vor arăta mai bine, dar cu siguranță îți vor consuma din CPU (procesor).",IDC_STATIC,10,120,267,27
+    LTEXT           "Dacă anulezi și activezi antialiasarea pe ecranul complet (pe tot ecranul) undeva la setările plăcii video, subtitrările nu vor arăta mai bine, dar cu siguranță îți vor consuma din CPU (din procesor).",IDC_STATIC,10,120,267,27
 END
 
 IDD_PPAGEFORMATS DIALOGEX 0, 0, 296, 264
@@ -493,7 +493,7 @@ BEGIN
     CTEXT           "×",IDC_STATIC,162,45,8,8
     EDITTEXT        IDC_EDIT2,172,43,28,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "Mărimea actuală",IDC_BUTTON1,204,42,64,14
-    GROUPBOX        "După pornirea listei de redare (a playlist-ului)",IDC_STATIC,5,76,286,68
+    GROUPBOX        "După pornirea listei de redare (playlistului)",IDC_STATIC,5,76,286,68
     CONTROL         "nu schimba",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,87,64,10
     CONTROL         "scalează la mărimea videoclipului",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON,10,101,115,10
     CONTROL         "potrivește fereastra pe ecran",IDC_RADIO7,"Button",BS_AUTORADIOBUTTON,10,116,123,10
@@ -726,8 +726,8 @@ IDD_PPAGESUBSTYLE DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Font",IDC_STATIC,5,5,105,112
-    PUSHBUTTON      "Font",IDC_BUTTON1,10,17,95,13
+    GROUPBOX        "Font (Scris)",IDC_STATIC,5,5,105,112
+    PUSHBUTTON      "Font (Scris)",IDC_BUTTON1,10,17,95,13
     COMBOBOX        IDC_COMBO1,10,32,95,52,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Spațiere",IDC_STATIC,10,51,56,8
     EDITTEXT        IDC_EDIT3,70,49,35,13,ES_RIGHT | ES_AUTOHSCROLL
@@ -1093,14 +1093,14 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
     CONTROL         "Afișează zero ore în bara de stare și în OSD (On Screen Display/ Afișare pe ecran)",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
-    LTEXT           "Nu afișa 000xx.mpls mai scurt decât",IDC_STATIC,7,99,150,8
+    LTEXT           "Nu afișa 000xx.mpls dacă e mai scurt de",IDC_STATIC,7,99,150,8
     EDITTEXT        IDC_EDIT5,161,97,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,181,97,11,14
-    LTEXT           "minute",IDC_STATIC,197,99,30,8
-    CONTROL         "Activează suportul LCD pentru tastaturi Logitech",IDC_CHECK_LCD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,113,264,9
-    CONTROL         "Folosește comenzile Window Media Controls",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,125,220,9
+    LTEXT           "minut(e)",IDC_STATIC,197,99,30,8
+    CONTROL         "Activează suportul LCD pentru tastaturile Logitech",IDC_CHECK_LCD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,113,264,9
+    CONTROL         "Folosește comenzile pentru Window Media Controls",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,125,220,9
     CONTROL         "Activează MiniDump",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,137,184,9
-    LTEXT           "Fișier executabil FFmpeg:",IDC_STATIC,7,152,104,8
+    LTEXT           "Fișierul executabil FFmpeg:",IDC_STATIC,7,152,104,8
     COMBOBOX        IDC_COMBO1,113,150,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Verifică pentru actualizări",IDC_STATIC,5,167,286,40
     CONTROL         "Activează verificarea automată a actualizărilor",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,179,250,9
@@ -1697,7 +1697,7 @@ BEGIN
         POPUP "În prim plan"
         BEGIN
             MENUITEM "Niciodată",                       ID_ONTOP_NEVER
-            MENUITEM "Pentru totdeauna",                      ID_ONTOP_ALWAYS
+            MENUITEM "La nesfârșit (Pentru totdeauna)",                      ID_ONTOP_ALWAYS
             MENUITEM "În timpul redării",               ID_ONTOP_WHILEPLAYING
             MENUITEM "În timpul redării videoclipului",         ID_ONTOP_WHILEPLAYINGVIDEO
         END
@@ -1711,7 +1711,7 @@ BEGIN
         MENUITEM "&Mergi la...",             ID_PLAY_GOTO
         POPUP "&Repetare"
         BEGIN
-            MENUITEM "&Pentru totdeauna", ID_REPEAT_FOREVER
+            MENUITEM "La nesfârșit (&Pentru totdeauna)", ID_REPEAT_FOREVER
             MENUITEM SEPARATOR
             MENUITEM "A-B (&Resetează)", ID_PLAY_REPEAT_AB
             MENUITEM "A-B (Marchează &A-ul)", ID_PLAY_REPEAT_AB_MARK_A
@@ -1782,7 +1782,7 @@ BEGIN
         MENUITEM "&Oprește",                       ID_PLAY_STOP
         POPUP "&Repetă"
         BEGIN
-            MENUITEM "&Pentru totdeauna", ID_REPEAT_FOREVER
+            MENUITEM "La nesfârșit (&Pentru totdeauna)", ID_REPEAT_FOREVER
             MENUITEM SEPARATOR
             MENUITEM "A-B (&Resetează)", ID_PLAY_REPEAT_AB
             MENUITEM "A-B (Marchează &A-ul)", ID_PLAY_REPEAT_AB_MARK_A
@@ -1824,7 +1824,7 @@ BEGIN
             POPUP "În prim plan"
             BEGIN
                 MENUITEM "Niciodată",                       ID_ONTOP_NEVER
-                MENUITEM "Pentru totdeauna",                      ID_ONTOP_ALWAYS
+                MENUITEM "La nesfârșit (Pentru totdeauna)",                      ID_ONTOP_ALWAYS
                 MENUITEM "În timpul redării",               ID_ONTOP_WHILEPLAYING
                 MENUITEM "În timpul redării video",         ID_ONTOP_WHILEPLAYINGVIDEO
             END
@@ -1965,7 +1965,7 @@ BEGIN
             POPUP "În prim plan"
             BEGIN
                 MENUITEM "Niciodată",                       ID_ONTOP_NEVER
-                MENUITEM "Pentru totdeauna",                      ID_ONTOP_ALWAYS
+                MENUITEM "La nesfârșit (Pentru totdeauna)",                      ID_ONTOP_ALWAYS
                 MENUITEM "În timpul redării",               ID_ONTOP_WHILEPLAYING
                 MENUITEM "În timpul redării video",         ID_ONTOP_WHILEPLAYINGVIDEO
             END
@@ -2356,7 +2356,7 @@ BEGIN
     IDS_PLAYLIST_SORTBYSIZE "după &dimensiune"
     IDS_PLAYLIST_SORTREVERSE "invers"
     IDS_PLAYLIST_EXPLORER_REFRESH "Reîmprospătează"
-    IDS_PLAYLIST_RANDOMIZE  "&Afișează totul în ordine aleatoare"
+    IDS_PLAYLIST_RANDOMIZE  "&Afișează totul în ordine aleatoare (la întâmplare)"
     IDS_PLAYLIST_RESTORE    "R&estaurează"
     IDS_PLAYLIST_SHUFFLE    "Amestecă"
     IDS_PLAYLIST_OPENFOLDER "Deschide dosarul (folderul) conținător"
@@ -2948,9 +2948,9 @@ BEGIN
     IDS_AG_SUBTITLE_RELOAD  "Reîncarcă subtitrările"
     IDS_AG_NEXT_VIDEO       "Următorul fișier video (videoclip)/Unghiul DVD"
     IDS_AG_PREV_VIDEO       "Videoclipul anterior/Unghiul DVD-ului"
-    IDS_REPEAT_FOREVER      "Repetă pentru totdeauna"
-    IDS_REPEAT_FOREVER_OFF  "Repetă pentru totdeauna: Oprit"
-    IDS_REPEAT_FOREVER_ON   "Repetă pentru totdeauna: Pornit"
+    IDS_REPEAT_FOREVER      "Repetă la nesfârșit (Repetă pentru totdeauna)"
+    IDS_REPEAT_FOREVER_OFF  "Repetă la nesfârșit (Repetă pentru totdeauna): Oprit"
+    IDS_REPEAT_FOREVER_ON   "Repetă la nesfârșit (Repetă pentru totdeauna): Pornit"
     IDS_MPLAYERC_98         "OSD: Timp rămas"
 END
 
@@ -3035,10 +3035,10 @@ BEGIN
     IDS_MAINFRM_17          "DVD: Eroare de protecție la copiere"
     IDS_MAINFRM_18          "DVD: Disc DVD 1.x nevalid"
     IDS_MAINFRM_19          "DVD: Regiunea discului e nevalidă"
-    IDS_MAINFRM_20          "DVD: Nivel parental scăzut"
+    IDS_MAINFRM_20          "DVD: Nivelul parental e scăzut"
     IDS_MAINFRM_21          "DVD: Eroare de protecţie de macroviziune"
-    IDS_MAINFRM_22          "DVD: Regiuni de sistem și de decodor incompatibile"
-    IDS_MAINFRM_23          "DVD: Regiuni de disc și de decodor incompatibile"
+    IDS_MAINFRM_22          "DVD: Regiunile sistemului și decodorului sunt incompatibile"
+    IDS_MAINFRM_23          "DVD: Regiunile discului și decodorului sunt incompatibile"
     IDS_AG_NAVIGATE         "Navighează"
     IDS_AG_OPEN_DISC        "Deschide discul"
     IDS_AG_FILTERS          "Filtre"
@@ -3051,7 +3051,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_ADDTOPLS_FROMDIR_SIMILAR "fișiere similare din dosar (din folder)"
-    IDS_ADDTOPLS_FROMDIR_ALL "toate fișierele dintr-un dosar (dintr-un folder)"
+    IDS_ADDTOPLS_FROMDIR_ALL "toate fișierele dintr-un dosar (folder)"
     IDS_EXCLUSIVE_FS_WARNING  "Această opțiune a fost proiectată pentru a evita ruperea. Cu toate acestea, va împiedica de asemenea MPC-BE să afișeze meniul contextual și orice căsuță de dialog în timpul redării.\n\nCa să ieși din modul ecran complet Direct3D și să oprești redarea, trebuie să apeși: Ctrl + C.\n\nEști sigur(ă) că dorești să activezi această opțiune?"
     IDS_MAINFRM_139         "Întârzierea subtitrărilor: %ld ms"
     IDS_AG_TITLE2           "Titlu: %02d/%02d"
@@ -3095,7 +3095,7 @@ BEGIN
     IDS_MAINFRM_58          "Dimensiune fișier: %s (%s bytes)\\N"
     IDS_MAINFRM_59          "{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}Nume fișier: %s\\N%sRezoluție: %dx%d %s\\NDurată: %02d:%02d:%02d"
     IDS_MAINFRM_60          "Pentru a încărca subtitrări trebuie să schimbi tipul randorului video și să redeschizi fișierul.\n- DirectShow: VMR-7/VMR-9 (fără randare), EVR (CP), Sync, madVR sau Haali\n- RealMedia: Randor special pentru RealMedia sau deschizi cu DirectShow\n- QuickTime: Randor DX7 sau DX9 pentru QuickTime\n- ShockWave: indisponibil"
-    IDS_MAINFRM_61          "- DirectShow: EVR-CP, EVR Sync, Haali, madVR or MPC VR.\n"
+    IDS_MAINFRM_61          "- DirectShow: EVR-CP, EVR Sync, Haali, madVR sau MPC VR.\n"
     IDS_MAINFRM_64          "- ShockWave: n/a\n"
 END
 
@@ -3126,7 +3126,7 @@ BEGIN
     IDS_MPC_CRASH           "MPC-BE s-a închis neașteptat. Pentru a ne ajuta să rezolvăm această problemă, te rugăm să trimiți acest fișier „%s” către sistemul nostru de urmărire a erorilor (bug tracker).\n\nDorești să deschizi dosarul (folderul) ce conţine fişierul de imagine memorie (minidump) şi să vizitezi acum sistemul de urmărire de erori?"
     IDS_MPC_MINIDUMP_FAIL   "Nu s-a putut crea fișierul de depanare „%s” (eroare %d)"
     IDS_MAINFRM_DIR_TITLE   "Selectează directorul"
-    IDS_MAINFRM_DIR_CHECK   "Include subdirectoare"
+    IDS_MAINFRM_DIR_CHECK   "Include subdirectoarele"
     IDS_AG_PAUSE            "Pauzează"
     IDS_AG_TOGGLE_CAPTION   "Comută meniul şi titlul"
     IDS_AG_TOGGLE_SEEKER    "Comută căutătorul"
@@ -3181,7 +3181,7 @@ BEGIN
     IDS_AG_REMOVING         "Se șterge: "
     IDS_MAINFRM_134         "ATENȚIE: CMainFrame::CloseMedia() a fost chemat de două sau mai multe ori\n"
     IDS_MAINFRM_135         "EROARE CRITICĂ: !!! Trebuie închis forțat firul de execuție deschizător !!!"
-    IDS_MAINFRM_136         "Exclusiv pe ecran complet (pe tot ecranul) MPC-BE"
+    IDS_MAINFRM_136         "Ecran complet exclusiv pentru MPC-BE"
     IDS_MAINFRM_137         "Format necunoscut"
     IDS_MAINFRM_138         "Decalajul subtitrărilor: %ld ms"
     IDS_VOLUME_GAIN_INC     "Crește puterea volumului"
@@ -3202,7 +3202,7 @@ BEGIN
     IDS_DESC_NULLVR_ANY     "Se conectează la orice mediu de tip video și mostrele video nu vor fi trimise niciunde. Folosește-l atunci când nu ai nevoie de afișarea video și vrei să salvezi procesorul de la o muncă inutilă."
     IDS_DESC_NULLVR_UNCOMP  "La fel ca randorul normal Null, dar acesta se va conecta doar la tipurile necomprimate."
     IDS_DESC_EVR            "Randor video cu suport pentru decodare hardware."
-    IDS_DESC_EVR_CP         "La fel ca EVR, dar cu Allocator-Presenter pentru subtitrare și postprocesare."
+    IDS_DESC_EVR_CP         "La fel ca EVR, dar cu modul Alocator-Prezentator (Allocator-Presenter) pentru subtitrare și postprocesare."
     IDS_DESC_MADVR          "Randor de înaltă calitate, necesită un GPU care acceptă D3D9 sau o versiune ulterioară."
     IDS_DESC_EVR_SYNC       "La fel ca EVR (CP), dar oferă mai multe opțiuni pentru a sincroniza rata de cadre video cu rata de reîmprospătare a afișajului pentru a elimina cadrele video sărite sau duplicate."
     IDS_DESC_MPC_VR         "Randor video cu suport pentru Direct3D 11."
@@ -3238,7 +3238,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_RANDOMIZE       "/randomize\tRedă fișiere la întâmplare din lista de redare (din playlist)"
+    IDS_CMD_RANDOMIZE       "/randomize\tRedă fișiere la întâmplare (în mod aleator) din lista de redare (din playlist)"
     IDS_CMD_REGVID          "/regvid\tCreează asocieri de fișiere pentru fișiere video"
     IDS_CMD_REGAUD          "/regaud\tCreează asocieri de fișiere pentru fișiere audio"
     IDS_CMD_REGPL           "/regpl\tCreează asocieri de fișiere pentru fișiere de listă de redare (de playlist)"
@@ -3707,7 +3707,7 @@ BEGIN
     IDS_CAPTURE_ERROR_VID_FILTER "Filtrul pentru captură video nu poate fi adăugat la grafic"
     IDS_CAPTURE_ERROR_AUD_FILTER "Filtrul pentru captură audio nu poate fi adăugat la grafic"
     IDS_CAPTURE_ERROR_DEVICE "Dispozitivul de captură nu a putut fi deschis."
-    IDS_INVALID_PARAMS_ERROR "Nu se poate deschide, parametri nevalizi de intrare"
+    IDS_INVALID_PARAMS_ERROR "Nu se poate deschide, parametrii de intrare sunt nevalizi"
     IDS_FILTERS_SOURCE      "Filtre sursă"
     IDS_FILTERS_VIDEO       "Decodoare video"
     IDS_FILTERS_AUDIO       "Decodoare audio"
