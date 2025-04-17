@@ -3249,7 +3249,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\t從時間 hh:mm:ss 開始播放"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\t設定固定的視窗大小"
     IDS_CMD_MONITOR         "/monitor N\t在第 N 顯示器啟動, N 從 1 開始"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tStart using audiorenderer, where ""name"" is the name\nof the audio renderer (see ""Audio"" settings)"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""名稱""\t使用指定音訊譜製器啟動，""名稱"" 表示\n音訊譜製器名稱（詳見「音訊」設定）"
     IDS_CMD_VOLUME          "/volume N\t設定音量， N 的範圍為從 0 到 100"
     IDS_CMD_CLIPBOARD       "/clipboard\t開啟剪貼簿中的路徑或連結"
     IDS_CMD_DEVICE          "/device\t開啟預設視訊裝置"
@@ -3411,7 +3411,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "載入內嵌字型"
     IDS_MKVSPLT_CALC_DURATION "按視訊資料計算時間長度"
-    IDS_MKVSPLT_REINDEX     "Re-indexing if necessary"
+    IDS_MKVSPLT_REINDEX     "必要時重新建立索引"
 END
 
 STRINGTABLE

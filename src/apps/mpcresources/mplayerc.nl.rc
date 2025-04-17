@@ -3249,8 +3249,8 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos uu:mm:ss\tStart afspelen op positie uu:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize B,H\tZet venstergrootte op BxH"
     IDS_CMD_MONITOR         "/monitor N\tStart op schermmonitor N (N start bij 1)"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tStart using audiorenderer, where ""name"" is the name\nof the audio renderer (see ""Audio"" settings)"
-    IDS_CMD_VOLUME          "/volume N\tStel volume in, waarbij N een bereik tussen 0 en 100 heeft"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""naam""\tStart op met audiorenderer, waarbij ""naam"" de naam \nis van de audiorenderer (zie ""Audio""-instellingen)"
+    IDS_CMD_VOLUME          "/volume N\tStel volume in, waarbij N een bereik tussen 0 en \n100 heeft"
     IDS_CMD_CLIPBOARD       "/clipboard\tOpen paden of koppelingen vanuit het klembord"
     IDS_CMD_DEVICE          "/device\tOpen het standaardvideoapparaat"
     IDS_CMD_RESET           "/reset\tStandaardinstellingen terugzetten"
@@ -3411,7 +3411,7 @@ STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Laad ingesloten lettertypen"
     IDS_MKVSPLT_CALC_DURATION "Tijdsduur berekenen gebaseerd op videodata"
-    IDS_MKVSPLT_REINDEX     "Re-indexing if necessary"
+    IDS_MKVSPLT_REINDEX     "Herindexeren indien nodig"
 END
 
 STRINGTABLE
