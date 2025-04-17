@@ -1393,7 +1393,7 @@ STRING IDS_CMD_CLOSE		"/close\tZapri predvajalnik po predvajanju (only works whe
 STRING IDS_CMD_D3DFS		"/d3dfs\tZaženi izrisovalnik v ekskluzivnem celozaslonskem načinu"
 STRING IDS_CMD_DEVICE		"/device\tOdpri privzeto video napravo"
 STRING IDS_CMD_DUB		"/dub ""dubname""\tNaloži dodatno audio datoteko"
-STRING IDS_CMD_DUBDELAY		"/dubdelay ""file""\tLoad an additional audio file shifted with XXms (if\nthe file contains ""...DELAY XXms..."")"
+STRING IDS_CMD_DUBDELAY		"/dubdelay ""file""\tLoad an additional audio file shifted with XXms\n(if the file contains ""...DELAY XXms..."")"
 STRING IDS_CMD_DVD		"/dvd\tRun in dvd mode, ""pathname"" means the dvd\nfolder (optional)"
 STRING IDS_CMD_DVDPOS1		"/dvdpos T#C\tZačni predvajanje na naslovu T, poglavje C"
 STRING IDS_CMD_DVDPOS2		"/dvdpos T#hh:mm\tZačni predvajanje na naslovu T, pozicija hh:mm:ss"

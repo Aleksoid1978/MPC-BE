@@ -3217,7 +3217,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tLoad an additional audio file shifted with XXms (if\nthe file contains ""...DELAY XXms..."")"
+    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tLoad an additional audio file shifted with XXms\n(if the file contains ""...DELAY XXms..."")"
     IDS_CMD_D3DFS           "/d3dfs\tZaženi izrisovalnik v ekskluzivnem celozaslonskem načinu"
     IDS_CMD_SUB             "/sub ""subname""\tLoad an additional subtitle file"
     IDS_CMD_FILTER          "/filter ""filtername""\tLoad DirectShow filters from a dynamic link\nlibrary (wildcards allowed)"

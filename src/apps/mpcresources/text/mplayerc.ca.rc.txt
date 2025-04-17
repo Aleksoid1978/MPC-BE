@@ -1393,7 +1393,7 @@ STRING IDS_CMD_CLOSE		"/close\tClose the player after playback (only works when\
 STRING IDS_CMD_D3DFS		"/d3dfs\tstart rendering in D3D Mode a Pantalla completa"
 STRING IDS_CMD_DEVICE		"/device\tOpen the default video device"
 STRING IDS_CMD_DUB		"/dub ""dubname""\tLoad an additional audio file"
-STRING IDS_CMD_DUBDELAY		"/dubdelay ""file""\tLoad an additional audio file shifted with XXms (if\nfile ambtains ""...DELAY XXms..."")"
+STRING IDS_CMD_DUBDELAY		"/dubdelay ""file""\tLoad an additional audio file shifted with XXms\n(if file ambtains ""...DELAY XXms..."")"
 STRING IDS_CMD_DVD		"/dvd\tRun in dvd mode, ""pathname"" means the dvd\nfolder (optional)"
 STRING IDS_CMD_DVDPOS1		"/dvdpos T#C\tStart playback at title T, chapter C"
 STRING IDS_CMD_DVDPOS2		"/dvdpos T#hh:mm\tStart playback at title T, position hh:mm:ss"
