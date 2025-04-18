@@ -8,7 +8,7 @@ git submodule update --init --recursive
 
 3. Обновляем номер версии в "include/Version.h" и меняем MPC_VERSION_STATUS на 1.
 
-4. Обновляем номер версии в "src/mplayerc/res/mpc-be.exe.manifest.conf" и "src/mplayerc/res/mpc-be.exe.manifest.template"
+4. Обновляем номер версии в "src\apps\mplayerc\res\mpc-be.exe.manifest.conf" и "src\apps\mplayerc\res\mpc-be.exe.manifest.template"
 
 5. Очищаем папку "_bin" и делаем пробную сборку.
 build.bat Build All Packages
