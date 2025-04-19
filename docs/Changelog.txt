@@ -1,6 +1,6 @@
 ﻿This file includes only a short list of the changes between Media Player Classic - BE's versions.
 
-1.8.3.x dev
+1.8.4 - 2025-04-19
 =============================
 Standalone filters
 Fixed registration of filters from a folder with Unicode characters.

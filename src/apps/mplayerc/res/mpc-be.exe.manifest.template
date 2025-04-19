@@ -3,7 +3,7 @@
   <assemblyIdentity
     name="MPC-BE"
     processorArchitecture="*"
-    version="1.8.3.0"
+    version="1.8.4.0"
     type="win32"
   />
   <description>MPC-BE</description>
