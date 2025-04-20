@@ -6298,7 +6298,7 @@ HRESULT CMainFrame::RenderCurrentSubtitles(BYTE* pData)
 			spdRender.h       = abs(height);
 			spdRender.bpp     = 32;
 			spdRender.pitch   = width * 4;
-			spdRender.vidrect = {0, 0, width, height};
+			spdRender.vidrect = { 0, 0, width, spdRender.h };
 			spdRender.bits    = DNew BYTE[spdRender.pitch * spdRender.h];
 
 			REFERENCE_TIME rtNow = 0;
@@ -6312,11 +6312,11 @@ HRESULT CMainFrame::RenderCurrentSubtitles(BYTE* pData)
 			if (S_OK == hr) {
 				SubPicDesc spdTarget = {};
 				spdTarget.w       = width;
-				spdTarget.h       = height;
+				spdTarget.h       = spdRender.h;
 				spdTarget.bpp     = 32;
-				spdTarget.pitch   = -width * 4;
-				spdTarget.vidrect = {0, 0, width, height};
-				spdTarget.bits    = (BYTE*)(bih + 1) + (width * 4) * (height - 1);
+				spdTarget.pitch	  = width * 4 * (height > 0 ? -1 : 1);
+				spdTarget.vidrect = spdRender.vidrect;
+				spdTarget.bits    = (BYTE*)(bih + 1) + (height > 0 ? (width * 4) * (height - 1) : 0);
 
 				hr = memSubPic.AlphaBlt(&spdRender.vidrect, &spdTarget.vidrect, &spdTarget);
 			}
