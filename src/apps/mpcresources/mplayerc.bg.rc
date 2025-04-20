@@ -199,7 +199,7 @@ CAPTION "Отвори"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_MAINFRAME_ICON,5,5,21,20
-    LTEXT           "Введите путь медиафайла или ссылку URL\n(на вашем компьютере или в Интернете)",IDC_STATIC,35,5,213,25
+    LTEXT           "Въведете път на медиафайла или линка URL\n(на вашия компюрър или в Интернет)",IDC_STATIC,35,5,213,25
     LTEXT           "Отвори:",IDC_STATIC2,10,32,90,8
     COMBOBOX        IDC_COMBO1,10,42,188,65,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Избор...",IDC_BUTTON1,200,41,50,14
@@ -2622,7 +2622,7 @@ BEGIN
     ID_PLAY_STOP            "Стоп\nСтоп"
     ID_PLAY_FRAMESTEP       "Стъпка\nСтъпка"
     ID_PLAY_DECRATE         "Намали скоростта\nНамали скоростта"
-    ID_PLAY_INCRATE         "Увеличи скоростта\nвеличи скоростта"
+    ID_PLAY_INCRATE         "Увеличи скоростта\nУвеличи скоростта"
 END
 
 STRINGTABLE
@@ -2765,7 +2765,7 @@ BEGIN
     IDS_CUSTOM_CHANNEL_MAPPING "Потребителско разпределение на каналите: Вкл/Откл"
     IDS_OSD_CUSTOM_CH_MAPPING_ON "Потребителско разпределение на каналите: Вкл"
     IDS_OSD_CUSTOM_CH_MAPPING_OFF "Потребителско разпределение на каналите: Изкл"
-    IDS_TOGGLE_AUTOVOLUMECONTROL "Авт. управление на силата на звука: Вкл/Изкл"
+    IDS_TOGGLE_AUTOVOLUMECONTROL "Автом. регулиране на силата на звука: Вкл/Изкл"
     IDS_OSD_AUTOVOLUMECONTROL_ON "Авт. управление на силата на звука: Вкл"
     IDS_OSD_AUTOVOLUMECONTROL_OFF "Авт. управление на силата на звука: Изкл"
     IDS_REGAIN_VOLUME       "Възстановяване на силата на звука Вкл/Изкл"
@@ -2931,7 +2931,7 @@ BEGIN
     IDS_AG_DVD_MENU_DOWN    "DVD - Меню надолу"
     IDS_AG_DVD_MENU_ACTIVATE "DVD меню - Активиране"
     IDS_AG_DVD_MENU_BACK    "DVD - Меню назад"
-    IDS_AG_DVD_MENU_LEAVE   "DVD меню - напускане"
+    IDS_AG_DVD_MENU_LEAVE   "DVD меню - напусни"
     IDS_AG_BOSS_KEY         "Главен клавиш"
     IDS_AG_MENU_PLAYER_S    "Меню на плейъра (кратко)"
     IDS_AG_MENU_PLAYER_L    "Меню на плейъра (пълно)"
@@ -3040,7 +3040,7 @@ BEGIN
     IDS_MAINFRM_21          "DVD: Проблем с Macrovision."
     IDS_MAINFRM_22          "DVD: Несъвместими региони на системата и декодера."
     IDS_MAINFRM_23          "DVD: Несъвместими региони на диска и декодера."
-    IDS_AG_NAVIGATE         "Навигация"
+    IDS_AG_NAVIGATE         "Навигиране"
     IDS_AG_OPEN_DISC        "Отваряне на &диск"
     IDS_AG_FILTERS          "&Филтри"
     IDS_AG_SUBTITLES        "Субтитри"
@@ -3179,7 +3179,7 @@ BEGIN
     IDS_AG_DISABLED         "Изключено"
     IDS_AG_VSYNCOFFSET_DECREASE "Намали компенсацията на VSync"
     IDS_MAINFRM_132         "Внимание  (CMainFrame::SeekTo): Опит за търсене в режим на заснемане."
-    IDS_AG_REMOVING         "Отстранени: "
+    IDS_AG_REMOVING         "Премахва се: "
     IDS_MAINFRM_134         "ВНИМАНИЕ: CMainFrame::CloseMedia() извикан два или повече пъти\n"
     IDS_MAINFRM_135         "КРИТИЧНА ГРЕШКА: !!! Процесът на отваряне трябва да бъде премахнат!!!"
     IDS_MAINFRM_136         "MPC-BE ексклузивно на цял екран"
@@ -3245,15 +3245,15 @@ BEGIN
     IDS_CMD_REGPL           "/regpl\tРегистрирай плейлисти"
     IDS_CMD_REGALL          "/regall\tРегистрирай всички поддържани формати"
     IDS_CMD_UNREGALL        "/unregall\tДерегистрирай всички формати"
-    IDS_CMD_START           "/start ms\tВъзпроизведи от позиция ""ms""\n(миллисекунды)"
+    IDS_CMD_START           "/start ms\tВъзпроизведи от позиция ""ms""\n(милисекунды)"
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tВъзпроизведи от позиция hh:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tЗадай фиксиран размер на прозореца"
     IDS_CMD_MONITOR         "/monitor N\tСтартира на монитора N, където N\nсе отчита с 1"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tStart using audiorenderer, where ""name"" is the name\nof the audio renderer (see ""Audio"" settings)"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tИзползвай аудиорендер, където ""name"" е името на\nаудиорендерера  (вижте "Аудио"" настройки)"
     IDS_CMD_VOLUME          "/volume N\tЗадай сила на звука, где N - число в диапазона от 0 до 100"
     IDS_CMD_CLIPBOARD       "/clipboard\tОтвори пътища/връзки от буфера данни"
     IDS_CMD_DEVICE          "/device\tОтвори видео устройство по подразбиране"
-    IDS_CMD_RESET           "/reset\tВъзстановяви настройките по подразбиране"
+    IDS_CMD_RESET           "/reset\tВъзстанови настройките по подразбиране"
 END
 
 STRINGTABLE
@@ -3421,7 +3421,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CDDAREADER_READ_TEXT_INFO "Четене на данни от CD-TEXT"
+    IDS_CDDAREADER_READ_TEXT_INFO "Чети данни от CD-TEXT"
 END
 
 STRINGTABLE
