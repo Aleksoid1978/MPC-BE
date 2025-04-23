@@ -100,7 +100,7 @@ BEGIN
     COMBOBOX        IDC_COMBO12,10,204,40,50,CBS_DROPDOWNLIST | CBS_SORT | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO11,52,204,65,50,CBS_DROPDOWNLIST | CBS_SORT | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,219,110,1
-    LTEXT           "Preîncărcări pentru V/A:",IDC_STATIC,10,223,45,8
+    LTEXT           "Preîncăr. V/A:",IDC_STATIC,10,223,45,8
     EDITTEXT        IDC_EDIT5,59,221,28,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT6,89,221,28,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,236,110,1
@@ -150,7 +150,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,100,42,114,12
     RTEXT           "Static",IDC_STATIC8,9,58,87,8
     CONTROL         "",IDC_SLIDER5,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,100,58,114,12
-    GROUPBOX        "Control de volum",IDC_STATIC,5,77,286,73
+    GROUPBOX        "Controlul de volum",IDC_STATIC,5,77,286,73
     RTEXT           "Static",IDC_STATIC4,9,88,82,8
     CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,95,87,109,12
     CONTROL         "Control de volum automat",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,104,154,9
@@ -316,7 +316,7 @@ BEGIN
     CONTROL         "Deschide întotdeauna locaţia implicită:",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,29,280,8
     EDITTEXT        IDC_DVDPATH,20,41,249,13,ES_AUTOHSCROLL | WS_GROUP
     PUSHBUTTON      "...",IDC_BUTTON1,273,41,13,13
-    GROUPBOX        "Limba preferată în navigatorul DVD",IDC_STATIC,5,62,286,74
+    GROUPBOX        "Limba preferată în navigatorul DVD-ului",IDC_STATIC,5,62,286,74
     CONTROL         "Meniu",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,74,65,8
     CONTROL         "Audio",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON,10,86,65,8
     CONTROL         "Subtitrări",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,10,98,65,8
@@ -372,15 +372,15 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "",IDC_STATIC,5,5,203,28
     CONTROL         "Suprascrie așezarea",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,5,100,10
-    LTEXT           "Orizontal:",IDC_STATIC1,10,19,47,8
+    LTEXT           "Orizontală:",IDC_STATIC1,10,19,47,8
     EDITTEXT        IDC_EDIT2,60,17,32,12,ES_CENTER | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,80,17,12,12
     LTEXT           "%",IDC_STATIC2,96,19,8,8
-    LTEXT           "Vertical:",IDC_STATIC3,111,19,45,8
+    LTEXT           "Verticală:",IDC_STATIC3,111,19,45,8
     EDITTEXT        IDC_EDIT3,160,17,32,12,ES_CENTER | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN3,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,180,17,12,12
     LTEXT           "%",IDC_STATIC4,196,19,8,8
-    GROUPBOX        "Interval de întârziere",IDC_STATIC,212,5,79,28
+    GROUPBOX        "Intervalul de întârziere",IDC_STATIC,212,5,79,28
     EDITTEXT        IDC_EDIT4,217,17,40,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "ms",IDC_STATIC,261,19,25,11
     GROUPBOX        "Setările texturii (deschide fișierul video din nou pentru a vedea schimbările)",IDC_STATIC,5,37,286,68
@@ -494,7 +494,7 @@ BEGIN
     EDITTEXT        IDC_EDIT2,172,43,28,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "Mărimea actuală",IDC_BUTTON1,204,42,64,14
     GROUPBOX        "După pornirea listei de redare (playlistului)",IDC_STATIC,5,76,286,68
-    CONTROL         "nu schimba",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,87,64,10
+    CONTROL         "nu o schimba",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,87,64,10
     CONTROL         "scalează la mărimea videoclipului",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON,10,101,115,10
     CONTROL         "potrivește fereastra pe ecran",IDC_RADIO7,"Button",BS_AUTORADIOBUTTON,10,116,123,10
     COMBOBOX        IDC_COMBO1,133,99,43,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
@@ -881,7 +881,7 @@ BEGIN
     GROUPBOX        "Setări pentru EVR-CP și pentru sincronizatorul EVR (EVR Sync)",IDC_STATIC,5,37,285,137
     CONTROL         "Selectează dispozitivul de randare D3D9",IDC_D3D9DEVICE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,120,10
     COMBOBOX        IDC_D3D9DEVICE_COMBO,144,49,142,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Exclusiv în modul ecran complet pe o fereastră suplimentară",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
+    CONTROL         "Modul ecran complet exclusiv pe o fereastră suplimentară",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,79,224,10
     CONTROL         "Ieșire RGB pe 10 biți",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,92,92,10
     CONTROL         "Resetează la schimbarea ecranului",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_TOP | WS_TABSTOP,10,65,164,9
@@ -896,8 +896,8 @@ BEGIN
     COMBOBOX        IDC_COMBO7,188,156,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Intervalul de ieșire:",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Setări pentru randorul video MPC Video Renderer",IDC_STATIC,5,177,285,27
-    CONTROL         "Exclusiv în modul ecran complet pe o fereastră suplimentară (experimental)",IDC_CHECK2,
+    GROUPBOX        "Setări pentru randorul video MPC (MPC Video Renderer)",IDC_STATIC,5,177,285,27
+    CONTROL         "Modul ecran complet exclusiv pe o fereastră suplimentară (experimental)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
     GROUPBOX        "Încadrare",IDC_STATIC,5,208,210,53
     LTEXT           "Modul implicit:",IDC_STATIC,10,220,74,8
@@ -1080,7 +1080,7 @@ IDD_PPAGEMISC DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Intervale de sărire (mic, mediu, mare în ms)",IDC_STATIC,7,5,220,34
+    GROUPBOX        "Intervalele de sărire (mici, medii, mari în ms)",IDC_STATIC,7,5,220,34
     EDITTEXT        IDC_EDIT1,15,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT2,64,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
@@ -1179,10 +1179,10 @@ BEGIN
     LTEXT           "Ajustarea frecvenței:",IDC_STATIC5,20,93,85,8
     EDITTEXT        IDC_CYCLEDELTA,109,91,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,123,278,1
-    LTEXT           "Decalaj de sincronizare:",IDC_STATIC3,10,129,100,8
+    LTEXT           "Decalajul de sincronizare:",IDC_STATIC3,10,129,100,8
     EDITTEXT        IDC_TARGETSYNCOFFSET,114,127,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
     LTEXT           "ms",IDC_STATIC4,158,129,24,8
-    LTEXT           "Limite de control:",IDC_STATIC9,10,143,86,8
+    LTEXT           "Limitele de control:",IDC_STATIC9,10,143,86,8
     LTEXT           "+/-",IDC_STATIC11,100,143,10,8
     EDITTEXT        IDC_CONTROLLIMIT,114,141,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
     LTEXT           "ms",IDC_STATIC10,158,143,24,8
@@ -1239,9 +1239,9 @@ IDD_PPAGESUBTITLES DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Randor de subtitrări:",IDC_STATIC,10,7,74,8
+    LTEXT           "Randorul de subtitrări:",IDC_STATIC,10,7,74,8
     COMBOBOX        IDC_COMBO2,89,4,201,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Căi de încărcare automată",IDC_STATIC,5,20,286,31
+    GROUPBOX        "Căile pentru încărcarea automată",IDC_STATIC,5,20,286,31
     EDITTEXT        IDC_EDIT1,10,33,224,13,ES_AUTOHSCROLL
     PUSHBUTTON      "Resetează",IDC_BUTTON1,237,33,50,13
     CONTROL         "Preferă subtitrările externe în locul celor integrate",IDC_CHECK1,
@@ -1249,7 +1249,7 @@ BEGIN
     CONTROL         "Ignoră subtitrările integrate",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,67,285,9
     CONTROL         "Reîncarcă automat fișierele de subtitrări după ce se detectează modificările",IDC_CHECK3,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,79,285,9
-    CONTROL         "Folosește modul de resincronizare a subtitrărilor Subresync",IDC_CHECK_SUBRESYNC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,91,285,9
+    CONTROL         "Folosește modul de resincronizare a subtitrărilor (Subresync)",IDC_CHECK_SUBRESYNC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,91,285,9
 END
 
 IDD_UPDATE_DIALOG DIALOGEX 0, 0, 238, 60
@@ -1652,9 +1652,9 @@ BEGIN
         MENUITEM "Navigare",                  ID_VIEW_NAVIGATION
         POPUP "Setări &prestabilite..."
         BEGIN
-            MENUITEM "&Minimal",                    ID_VIEW_PRESETS_MINIMAL
-            MENUITEM "&Compact",                    ID_VIEW_PRESETS_COMPACT
-            MENUITEM "&Normal",                     ID_VIEW_PRESETS_NORMAL
+            MENUITEM "&Minimală",                    ID_VIEW_PRESETS_MINIMAL
+            MENUITEM "&Compactă",                    ID_VIEW_PRESETS_COMPACT
+            MENUITEM "&Normală",                     ID_VIEW_PRESETS_NORMAL
         END
         MENUITEM SEPARATOR
         MENUITEM "Ecran complet (Pe tot ecranu&l)",       ID_VIEW_FULLSCREEN
@@ -1675,7 +1675,7 @@ BEGIN
             MENUITEM SEPARATOR
             POPUP "Prezentare"
             BEGIN
-                MENUITEM "Exclusiv pe ecran complet (pe tot ecranul)",        ID_VIEW_EXCLUSIVE_FULLSCREEN
+                MENUITEM "Ecran complet (pe tot ecranul) exclusiv",        ID_VIEW_EXCLUSIVE_FULLSCREEN
                 MENUITEM "Activează corecția de timp pentru cadru",   ID_VIEW_ENABLEFRAMETIMECORRECTION
             END
             MENUITEM "Revino la setările implicite ale randorului", ID_VIEW_RESET_DEFAULT
@@ -1713,7 +1713,7 @@ BEGIN
         BEGIN
             MENUITEM "La nesfârșit (&Pentru totdeauna)", ID_REPEAT_FOREVER
             MENUITEM SEPARATOR
-            MENUITEM "A-B (&Resetează)", ID_PLAY_REPEAT_AB
+            MENUITEM "A-B (&Resetează-le)", ID_PLAY_REPEAT_AB
             MENUITEM "A-B (Marchează &A-ul)", ID_PLAY_REPEAT_AB_MARK_A
             MENUITEM "A-B (Marchează &B-ul)", ID_PLAY_REPEAT_AB_MARK_B
         END
@@ -1784,7 +1784,7 @@ BEGIN
         BEGIN
             MENUITEM "La nesfârșit (&Pentru totdeauna)", ID_REPEAT_FOREVER
             MENUITEM SEPARATOR
-            MENUITEM "A-B (&Resetează)", ID_PLAY_REPEAT_AB
+            MENUITEM "A-B (&Resetează-le)", ID_PLAY_REPEAT_AB
             MENUITEM "A-B (Marchează &A-ul)", ID_PLAY_REPEAT_AB_MARK_A
             MENUITEM "A-B (Marchează &B-ul)", ID_PLAY_REPEAT_AB_MARK_B
         END
@@ -1843,9 +1843,9 @@ BEGIN
             MENUITEM "&Limbă (Language)",                   ID_SUBMENU_LANGUAGE
             POPUP "Setări &prestabilite..."
             BEGIN
-                MENUITEM "&Minimal",                    ID_VIEW_PRESETS_MINIMAL
-                MENUITEM "&Compact",                    ID_VIEW_PRESETS_COMPACT
-                MENUITEM "&Normal",                     ID_VIEW_PRESETS_NORMAL
+                MENUITEM "&Minimală",                    ID_VIEW_PRESETS_MINIMAL
+                MENUITEM "&Compactă",                    ID_VIEW_PRESETS_COMPACT
+                MENUITEM "&Normală",                     ID_VIEW_PRESETS_NORMAL
             END
         END
         MENUITEM SEPARATOR
@@ -1856,7 +1856,7 @@ BEGIN
             MENUITEM SEPARATOR
             POPUP "Prezentare"
             BEGIN
-                MENUITEM "Exclusiv pe ecran complet (pe tot ecranul)",        ID_VIEW_EXCLUSIVE_FULLSCREEN
+                MENUITEM "Ecran complet (pe tot ecranul) exclusiv",        ID_VIEW_EXCLUSIVE_FULLSCREEN
                 MENUITEM "Activează corecția de timp pentru cadru",   ID_VIEW_ENABLEFRAMETIMECORRECTION
             END
             MENUITEM "Revino la setările implicite ale randorului", ID_VIEW_RESET_DEFAULT
@@ -1922,9 +1922,9 @@ BEGIN
             MENUITEM "&Limbă (Language)",                   ID_SUBMENU_LANGUAGE
             POPUP "Setări &prestabilite..."
             BEGIN
-                MENUITEM "&Minimal",                    ID_VIEW_PRESETS_MINIMAL
-                MENUITEM "&Compact",                    ID_VIEW_PRESETS_COMPACT
-                MENUITEM "&Normal",                     ID_VIEW_PRESETS_NORMAL
+                MENUITEM "&Minimală",                    ID_VIEW_PRESETS_MINIMAL
+                MENUITEM "&Compactă",                    ID_VIEW_PRESETS_COMPACT
+                MENUITEM "&Normală",                     ID_VIEW_PRESETS_NORMAL
             END
             MENUITEM SEPARATOR
             MENUITEM "Ecran complet (Pe tot ecranu&l)",       ID_VIEW_FULLSCREEN
@@ -1943,7 +1943,7 @@ BEGIN
                 MENUITEM SEPARATOR
                 POPUP "Prezentare"
                 BEGIN
-                    MENUITEM "Exclusiv pe ecran complet (pe tot ecranul)",        ID_VIEW_EXCLUSIVE_FULLSCREEN
+                    MENUITEM "Ecran complet (pe tot ecranul) exclusiv",        ID_VIEW_EXCLUSIVE_FULLSCREEN
                     MENUITEM "Activează corecția de timp pentru cadru",   ID_VIEW_ENABLEFRAMETIMECORRECTION
                 END
                 MENUITEM "Revino la setările implicite ale randorului", ID_VIEW_RESET_DEFAULT
@@ -1981,7 +1981,7 @@ BEGIN
             BEGIN
                 MENUITEM "Pentru &totdeauna", ID_REPEAT_FOREVER
                 MENUITEM SEPARATOR
-                MENUITEM "A-B (&Resetează)", ID_PLAY_REPEAT_AB
+                MENUITEM "A-B (&Resetează-le)", ID_PLAY_REPEAT_AB
                 MENUITEM "A-B (Marchează &A-ul)", ID_PLAY_REPEAT_AB_MARK_A
                 MENUITEM "A-B (Marchează &B-ul)", ID_PLAY_REPEAT_AB_MARK_B
             END
@@ -2023,7 +2023,7 @@ BEGIN
             MENUITEM SEPARATOR
             POPUP "Prezentare"
             BEGIN
-                MENUITEM "Exclusiv pe ecran complet (pe tot ecranul)",        ID_VIEW_EXCLUSIVE_FULLSCREEN
+                MENUITEM "Ecran complet (pe tot ecranul) exclusiv",        ID_VIEW_EXCLUSIVE_FULLSCREEN
                 MENUITEM "Activează corecția de timp pentru cadru",   ID_VIEW_ENABLEFRAMETIMECORRECTION
             END
             MENUITEM "Revino la setările implicite ale randorului", ID_VIEW_RESET_DEFAULT
@@ -2293,7 +2293,7 @@ BEGIN
     IDS_AUTOPLAY_PLAYAUDIOCD "Redă CD-ul audio"
     IDS_AUTOPLAY_PLAYDVDMOVIE "Redă filmul de pe DVD"
     IDS_PROPSHEET_PROPERTIES "Proprietăți"
-    IDS_GRAPHBUILDER_AUDIOSWITCHER "Comutator audio"
+    IDS_GRAPHBUILDER_AUDIOSWITCHER "Comutatorul audio"
     IDS_SUBTITLES_DEFAULT_STYLE "&Stilul implicit"
     IDS_SUBTITLES_FORCED    "&Numai forțat"
     IDS_FAVFILES            "Fișiere"
@@ -2305,7 +2305,7 @@ BEGIN
     IDS_STATSBAR_SYNC_OFFSET "Sincronizează decalajele"
     IDS_STATSBAR_SYNC_OFFSET_FORMAT "avg: %d ms, dev: %d ms"
     IDS_STATSBAR_JITTER     "Mișcare ușor neregulată (jitter/ frământare)"
-    IDS_STATSBAR_BITRATE    "Rată de biți"
+    IDS_STATSBAR_BITRATE    "Rata de biți"
     IDS_STATSBAR_BITRATE_AVG_CUR " (avg/cur)"
     IDS_AUTOPLAY_PLAYBDMOVIE "Redă discul Blu-ray"
     IDS_TEXTBAR_NOTHING     "Nimic"
@@ -2436,7 +2436,7 @@ BEGIN
     IDS_PPAGE_FS_DEFAULT    "Implicit"
     IDS_PPAGE_FS_OTHER      "Altul"
     IDS_PPAGE_OUTPUT_SYS_DEF "Implicit sistemului"
-    IDS_GRAPH_INTERFACES_ERROR  "Eşuare la interogarea interfeţelor necesare pentru redare"
+    IDS_GRAPH_INTERFACES_ERROR  "Nu s-au putut interoga interfețele necesare pentru redare"
     IDS_GRAPH_TARGET_WND_ERROR  "Nu se poate seta fereastra ţintă pentru notificările graficului"
     IDS_DVD_NAV_ALL_PINS_ERROR  "Nu s-au putut randa toți pinii filtrului navigatorului DVD-ului (DVD Navigator)"
 END
@@ -2526,14 +2526,14 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_CHECK_SUBRESYNC     "Permite să vizualizezi și să editezi subtitrările (se include codul de timp), navigarea de către subtitrare. Poate să încetinească încărcarea subtitrării."
+    IDC_CHECK_SUBRESYNC     "Permite să vizualizezi și să editezi subtitrările (se include codul de timp), navigarea de către subtitrare. Poate să încetinească în mod semnificativ, încărcarea subtitrărilor."
     IDC_BASSREDIRECT_CHECK  "Îndepărtează basul de canalele frontale și îl alimentează la subwoofer"
 END
 
 STRINGTABLE
 BEGIN
-    IDC_REGULARSURF         "Suprafața video va fi alocată ca o suprafață normală în afara ecranului."
-    IDC_DX9RESIZER_COMBO    "Dacă nu este suport pentru Pixel nuanțator 2.0, biliniar este folosit automat."
+    IDC_REGULARSURF         "Suprafața video va fi alocată ca o suprafață obișnuită în afara ecranului"
+    IDC_DX9RESIZER_COMBO    "Dacă nu există suport pentru Nuanțatoarele de pixeli 2.0 (Pixel Shader 2.0), biliniarul simplu este folosit automat."
 END
 
 STRINGTABLE
@@ -2575,7 +2575,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_EXCLUSIVE_FULLSCREEN_CHECK  "Reduce ruperea, dar împiedică afișarea barei de instrumente. Pentru a ieși din ecranul complet, în acest mod apasă Ctrl+C."
+    IDC_EXCLUSIVE_FULLSCREEN_CHECK  "Reduce ruperea, dar împiedică afișarea barei de instrumente. Pentru a ieși din ecran complet în acest mod, apasă Alt+Enter, Ctrl+Enter sau Ctrl+C."
 END
 
 STRINGTABLE
@@ -2601,7 +2601,7 @@ STRINGTABLE
 BEGIN
     IDS_SRC_MPA             "Filtru sursă pentru MP3 și AAC"
     IDS_TRA_DVD_VIDEO       "Bazat pe libmpeg2"
-    IDS_TRA_PS2AUD          "Decodează fluxurile audio din fișiere PSS"
+    IDS_TRA_PS2AUD          "Decodează fluxurile audio din fișierele PSS"
     IDS_TRA_FFMPEG          "Bazat pe FFmpeg, http://ffmpeg.org/"
     IDS_TRA_INTEL_MSDK      "Bazat pe Intel Media SDK, necesită biblioteca externă (libmfxsw32.dll/libmfxsw64.dll)"
 END
@@ -2610,7 +2610,7 @@ STRINGTABLE
 BEGIN
     IDC_CHECK_RELATIVETO    "Starea implicită va fi moștenită și de celelalte stiluri unde ea încă nu este definită."
     IDC_CHECK_ALLOW_DROPPING_SUBPIC  "Dezactivarea acestei opțiuni va preveni subtitrările de la a clipi, dar pot cauza ca redarea video să sară peste câteva cadre video."
-    IDC_CHECK_SPCANIMWITHBUFFER  "Permite animarea subtitrării când este folosită o memorie tampon de subimagini mai mare decât 0. Dezactivând această opțiune va scădea și folosirea procesorului. De asemenea, dezactivați-o dacă se întâmplă ca subtitrările să pâlpâie."
+    IDC_CHECK_SPCANIMWITHBUFFER  "Permite animarea subtitrărilor atunci când este folosită o memorie tampon (un buffer) de subimagini mai mare decât 0. Dezactivând această opțiune va scădea și folosirea procesorului. Dezactiveaz-o și dacă ai subtitrări intermitente."
     IDC_BUTTON_EXT_SET      "După ce dai clic pe acest buton, starea bifată a grupului de formate va reflecta asocierea concretă a fișierelor pentru MPC-BE. O extensie nou adăugată va fi de obicei un gri deschis, așa că nu uiți să o bifezi din nou înainte de a închide această casetă de dialog!"
 END
 
@@ -2657,7 +2657,7 @@ STRINGTABLE
 BEGIN
     IDS_AG_MENU_RECENT_FILES "Meniul fișierelor recente"
     IDS_SHOW_HISTORY        "Afișează istoricul"
-    IDS_RECENT_FILES_CLEAR  "Curăță lista"
+    IDS_RECENT_FILES_CLEAR  "Golește lista"
     IDS_RECENT_FILES        "Fișiere recente"
     IDS_RECENT_FILES_QUESTION  "Ești sigur(ă) că dorești să ștergi lista de fișiere recente?"
     IDS_HISTORY_REDUCE_QUESTION  "Fișierul tău de istoric conține %u (de) intrări. Ești sigur(ă) că vrei să reduci numărul de intrări la %u?"
@@ -2713,7 +2713,7 @@ BEGIN
     IDS_AG_TYPE             "Tip"
     IDS_AG_MOUSE            "Mouse (în fereastră)"
     IDS_AG_MOUSE_FS         "Mouse (în ecran complet)"
-    IDS_AG_APP_COMMAND      "Comandă aplicație"
+    IDS_AG_APP_COMMAND      "Comanda aplicației"
     IDS_AG_MENU_PLAYER_A    "Meniul playerului (automat)"
 END
 
@@ -2805,11 +2805,11 @@ BEGIN
     IDS_MENU_VIDEO_ANGLE    "Un&ghi video"
     IDS_RESET_SETTINGS      "Resetează setările"
     IDS_RESET_SETTINGS_WARNING  "Ești sigur(ă) că vrei să restaurezi MPC-BE la setările implicite?\nTrebuie să știi că TOATE setările curente vor fi pierdute!"
-    IDS_RESET_SETTINGS_MUTEX  "Închide toate instanțele programului MPC-BE pentru ca setările implicite să poată fi restaurate."
+    IDS_RESET_SETTINGS_MUTEX  "Te rugăm să închizi toate instanțele programului MPC-BE pentru ca setările implicite să poată fi restaurate."
     IDS_EXPORT_SETTINGS     "Exportă setările"
     IDS_EXPORT_SETTINGS_WARNING  "Unele modificări nu au fost încă salvate.\nDorești să le salvezi înainte de a le exporta?"
     IDS_EXPORT_SETTINGS_SUCCESS  "Setările au fost exportate cu succes."
-    IDS_EXPORT_SETTINGS_FAILED  "Exportarea a eșuat! Acest lucru se poate întâmpla când nu ai drepturile necesare."
+    IDS_EXPORT_SETTINGS_FAILED  "Exportarea a eșuat! Acest lucru se poate întâmpla atunci când nu ai drepturile necesare."
     IDS_BDA_ERROR           "Eroare BDA"
 END
 
@@ -2857,7 +2857,7 @@ BEGIN
     IDS_FRAME_HALF          "Jumătate din mărime"
     IDS_FRAME_NORMAL        "Mărime normală"
     IDS_FRAME_DOUBLE        "Mărime dublă"
-    IDS_FRAME_STRETCH       "Întinde cât fereastra"
+    IDS_FRAME_STRETCH       "Întinde pe toată fereastra"
 END
 
 STRINGTABLE
@@ -2962,7 +2962,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_MPLAYERC_99         "Comută în mod exclusiv pe ecran complet (pe tot ecranul)"
+    IDS_MPLAYERC_99         "Comută în modul ecran complet (pe tot ecranul) exclusiv"
     IDS_MPLAYERC_100        "Mergi la subtitrarea anterioară"
     IDS_MPLAYERC_101        "Mergi la subtitrarea următoare"
     IDS_MPLAYERC_102        "Deplasează subtitrarea la stânga"
@@ -3022,7 +3022,7 @@ BEGIN
     IDS_ZOOM_AUTOFITLARGE   "Potrivire automată (doar mai mare)"
     IDS_ADD_TO_PLAYLIST     "Adaugă la lista de redare (la playlist) a MPC-BE"
     IDS_OPEN_WITH_MPC       "Redare cu MPC-BE"
-    IDS_CANNOT_CHANGE_FORMAT  "MPC-BE nu are destule drepturi pentru a schimba asocierea cu formatele de fișiere. Dă clic pe butonul „Modifică” pentru a obține drepturi de administrator."
+    IDS_CANNOT_CHANGE_FORMAT  "MPC-BE nu are destule drepturi pentru a schimba asocierea cu formatele de fișiere. Te rugăm să dai clic pe butonul „Modifică” pentru a obține drepturi de administrator."
     IDS_APP_DESCRIPTION     "Unul dintre cele mai puternice, configurabile playere multimedia pentru sistemul de operare Windows. Realizat inițial de un dezvoltator maghiar cunoscut sub numele de Gabest, această versiune are caracteristici suplimentare, cum ar fi modul ecran complet exclusiv și suport mai bun pentru Windows Vista/7."
     IDS_MAINFRM_12          "canal"
     IDS_MAINFRM_13          "canale"
@@ -3033,7 +3033,7 @@ BEGIN
     IDS_AG_TITLE            "Titlu %d"
     IDS_MAINFRM_16          "DVD: Eroare neașteptată"
     IDS_MAINFRM_17          "DVD: Eroare de protecție la copiere"
-    IDS_MAINFRM_18          "DVD: Disc DVD 1.x nevalid"
+    IDS_MAINFRM_18          "DVD: Discul DVD 1.x e nevalid"
     IDS_MAINFRM_19          "DVD: Regiunea discului e nevalidă"
     IDS_MAINFRM_20          "DVD: Nivelul parental e scăzut"
     IDS_MAINFRM_21          "DVD: Eroare de protecţie de macroviziune"
@@ -3043,7 +3043,7 @@ BEGIN
     IDS_AG_OPEN_DISC        "Deschide discul"
     IDS_AG_FILTERS          "Filtre"
     IDS_AG_SUBTITLES        "Subtitrări"
-    IDS_AG_AUDIOLANG        "Limba audio"
+    IDS_AG_AUDIOLANG        "Limba pentru audio"
     IDS_AG_SUBTITLELANG     "Limba subtitrărilor"
     IDS_AG_VIDEO_ANGLE      "Unghi video"
 END
@@ -3059,7 +3059,7 @@ BEGIN
     IDS_THUMB_COLNUMBER     "Coloane:"
     IDS_THUMB_IMAGE_WIDTH   "Lățimea imaginii:"
     IDS_PPSDB_URLCORRECT    "URL-ul pare să fie corect!"
-    IDS_PPSDB_PROTOCOLERR   "Nepotrivire a versiunii protocolului, actualizează playerul sau alege o altă adresă!"
+    IDS_PPSDB_PROTOCOLERR   "Nepotrivire a versiunii protocolului, te rugăm să actualizezi playerul sau alege o altă adresă!"
 END
 
 STRINGTABLE
@@ -3069,13 +3069,13 @@ BEGIN
     IDS_AG_SHADERS          "Nuanțatoare (Shadere)"
     IDS_AG_VIDEO_FRAME      "Cadru video"
     IDS_AG_PANSCAN          "Panoramare și scanare"
-    IDS_AG_ASPECT_RATIO     "Raport de aspect"
+    IDS_AG_ASPECT_RATIO     "Raportul de aspect"
     IDS_MAINFRM_37          ", Total: %d, Pierdute: %d"
     IDS_MAINFRM_38          ", Mărime: %I64dKB"
     IDS_MAINFRM_39          ", Mărime: %I64dMB"
     IDS_MAINFRM_40          ", Liberă: %I64dKB"
     IDS_MAINFRM_41          ", Liberă: %I64dMB"
-    IDS_MAINFRM_42          ", Preîncărcări pentru V/A libere: %03d/%03d"
+    IDS_MAINFRM_42          ", Preîncărcări pentru V/A (Video/Audio) libere: %03d/%03d"
     IDS_AG_ERROR            "Eroare"
     IDS_SUBTITLE_STREAM_OFF "Subtitrări: Oprite"
     IDS_SUBTITLE_STREAM     "Subtitrarea: %s"
@@ -3104,7 +3104,7 @@ BEGIN
     IDS_MAINFRM_68          "Raport de aspect: %d:%d"
     IDS_MAINFRM_69          "Raport de aspect: Implicit"
     IDS_MAINFRM_70          "Întârziere audio: %I64dms"
-    IDS_AG_CHAPTER          "Capitol %d"
+    IDS_AG_CHAPTER          "Capitolul %d"
     IDS_MAINFRM_73          "Nu se poate încărca shaderul: "
     IDS_AG_SHADER           "nuanțator (shader): "
     IDS_AG_OUT_OF_MEMORY    "Memorie insuficientă"
@@ -3139,11 +3139,11 @@ BEGIN
     IDS_MAINFRM_86          "Filtrele nu pot fi conectate"
     IDS_MAINFRM_87          "Niciun filtru sursă nu poate fi încărcat"
     IDS_MAINFRM_88          "Fișierul nu poate fi redat"
-    IDS_MAINFRM_89          "Format de fișier nevalid"
+    IDS_MAINFRM_89          "Formatul de fișiere e nevalid"
     IDS_MAINFRM_90          "Fișierul nu a fost găsit"
     IDS_MAINFRM_91          "Tip necunoscut de fișiere"
-    IDS_MAINFRM_92          "Flux incompatibil"
-    IDS_MAINFRM_93          "Directorul DVD nu poate fi găsit"
+    IDS_MAINFRM_92          "Flux neacceptat"
+    IDS_MAINFRM_93          "Directorul DVD-ului nu poate fi găsit"
     IDS_MAINFRM_94          "Filtrul navigatorului DVD-ului (DVD Navigator) nu poate fi creat"
     IDS_AG_FAILED           "Eșuat"
     IDS_MAINFRM_96          "Filtrul pentru captură video nu poate fi creat"
@@ -3159,7 +3159,7 @@ BEGIN
     IDS_MAINFRM_106         "Atenție: Nu a fost găsită nicio interfață IAMTVTuner\n"
     IDS_MAINFRM_108         "Nu se poate deschide niciun dispozitiv"
     IDS_AG_SOUND            "Sunet"
-    IDS_MAINFRM_114         "%s nu a fost găsit, inserează mediul care conține acest fișier."
+    IDS_MAINFRM_114         "%s nu a fost găsit, te rugăm să inserezi mediul care conține acest fișier."
     IDS_AG_ABORTED          "Abandonat"
     IDS_MAINFRM_116         "&Proprietăți..."
     IDS_MAINFRM_117         " (fixează) proprietăți(le)..."
@@ -3169,7 +3169,7 @@ BEGIN
     IDS_MAINFRM_121         " (Comentariile regizorului 1)"
     IDS_MAINFRM_122         " (Comentariile regizorului 2)"
     IDS_AG_ENABLED          "Activat"
-    IDS_AG_ANGLE            "Unghi %d"
+    IDS_AG_ANGLE            "Unghiul %d"
     IDS_AG_VSYNCOFFSET_INCREASE "Mărește decalajul VSync-ului (sincronizării verticale)"
 END
 
@@ -3188,7 +3188,7 @@ BEGIN
     IDS_VOLUME_GAIN_DEC     "Scade puterea volumului"
     IDS_VOLUME_GAIN_OFF     "Oprește puterea volumului"
     IDS_VOLUME_GAIN_MAX     "Puterea maximă a volumului"
-    IDS_UNKNOWN_SWITCH      "Au fost găsite comutatoare nerecunoscute în șirul liniei de comandă: \n\n"
+    IDS_UNKNOWN_SWITCH      "A fost găsit un comutator nerecunoscut (Au fost găsite comutatoare nerecunoscute) în șirul liniei de comandă: \n\n"
 END
 
 STRINGTABLE
@@ -3218,11 +3218,11 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_DUBDELAY        "/dubdelay „fișier”\tÎncarcă un fișier audio suplimentar decalat cu XX ms (dacă\nfișierul conține „...DELAY XXms (întârziere de XX ms)...”)"
+    IDS_CMD_DUBDELAY        "/dubdelay „fișier”\tÎncarcă un fișier audio suplimentar decalat cu XX ms\n(dacă fișierul conține „...DELAY XXms...” („...ÎNTÂRZIERE DE XX ms...”))"
     IDS_CMD_D3DFS           "/d3dfs\tPornește randarea în modul ecran complet (pe tot ecranul) D3D"
     IDS_CMD_SUB             "/sub „numele subtitrării”\tÎncarcă o subtitrare suplimentară"
     IDS_CMD_FILTER          "/filter „numele filtrului”\tÎncarcă filtrele DirectShow dintr-o bibliotecă\ncu legături dinamice (metacaracterele sunt permise)"
-    IDS_CMD_DVD             "/dvd\tRulează în mod DVD, „numele căii” înseamnă dosarul (folderul)\nDVD-ului (opțional)"
+    IDS_CMD_DVD             "/dvd\tRulează în modul DVD, „numele căii” înseamnă dosarul (folderul)\nDVD-ului (opțional)"
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tPornește redarea la titlul T, la capitolul C"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tPornește redarea la titlul T, în poziția hh:mm:ss"
     IDS_CMD_CD              "/cd\tÎncarcă toate pistele unui cd audio sau (s)vcd,\n„numele căii” înseamnă calea unității (opțional)"
@@ -3352,7 +3352,7 @@ BEGIN
     IDS_VDF_STATUS_FRAMESIZE "Mărimea cadrului:"
     IDS_VDF_STATUS_OUTPUT   "Formatul de ieșire:"
     IDS_VDF_STATUS_ADAPTER  "Adaptorul grafic:"
-    IDS_VDF_TT_AR           "Bifat - va fi folosit AR-ul pentru redarea în flux.\nNebifat - va fi folosit AR-ul din container.\nNedeterminat - AR-ul din flux nu va fi folosit pentru fișierele cu un container cu AR (recomandat)."
+    IDS_VDF_TT_AR           "Bifat - va fi folosit AR-ul (raportul de aspect) pentru redarea în flux.\nNebifat - va fi folosit AR-ul (raportul de aspect) din container.\nNedeterminat - AR-ul (raportul de aspect) din flux nu va fi folosit pentru fișierele cu un container cu AR (recomandat)."
     IDS_VDF_TT_PRESET       "Schimbă relația dintre viteză și calitate."
     IDS_VDF_TT_STANDARD     "Aceste setări sunt folosite numai atunci când filtrul face conversia YCbCr<->RGB."
     IDS_VDF_TT_RGB_LEVELS   "Aceste setări sunt folosite numai atunci când filtrul face conversia din YCbCr în RGB."
@@ -3383,7 +3383,7 @@ BEGIN
     IDS_ARS_SHARED          "Partajat"
     IDS_ARS_BITEXACT_OUTPUT "Permite ieșirea exactă pe biți"
     IDS_ARS_SYSTEM_LAYOUT_CHANNELS "Folosește canalele de aspect al sistemului"
-    IDS_ARS_SOUND_DEVICE    "Dispozitiv de sunet:"
+    IDS_ARS_SOUND_DEVICE    "Dispozitivul de sunet:"
     IDS_ARS_RELEASE_DEVICE_IDLE "Eliberează dispozitivul când este inactiv"
     IDS_ARS_CROSSFEED       "Activează alimentarea încrucișată stereo (pentru căști)"
     IDS_ARS_DEVICE_PERIOD   "Tamponul (Bufferul) dispozitivului:"
@@ -3513,7 +3513,7 @@ BEGIN
     IDS_DISABLE_FFMPEG_FILTERS "Dezactivează filtrele FFmpeg"
     IDS_ENABLE_DXVA_FILTERS "Activează filtrele DXVA"
     IDS_DISABLE_DXVA_FILTERS "Dezactivează filtrele DXVA"
-    IDS_STRETCH_TO_WINDOW   "Întinde cât fereastra"
+    IDS_STRETCH_TO_WINDOW   "Întinde pe toată fereastra"
     IDS_TOUCH_WINDOW_FROM_INSIDE "Atinge fereastra din interior"
     IDS_ZOOM1               "Mărește/Micșorează (Scalează) 1"
     IDS_ZOOM2               "Mărește/Micșorează (Scalează) 2"
@@ -3578,7 +3578,7 @@ STRINGTABLE
 BEGIN
     IDS_MFMT_AC3            "AC-3"
     IDS_MFMT_AIFF           "AIFF"
-    IDS_MFMT_ALAC           "Apple Lossless"
+    IDS_MFMT_ALAC           "Codec audio fără pierderi Apple (Apple Lossless)"
 END
 
 STRINGTABLE
@@ -3644,8 +3644,8 @@ BEGIN
     IDS_OSD_RS_FLUSH_AFT_PRES_OFF "Golește GPU-ul după prezentare: Oprit"
     IDS_OSD_RS_WAIT_ON      "Așteptarea pentru golirea GPU-ului: Pornită"
     IDS_OSD_RS_WAIT_OFF     "Așteptarea pentru golirea GPU-ului: Oprită"
-    IDS_OSD_RS_EXCLUSIVE_FSCREEN_ON "Exclusiv pe ecran complet (pe tot ecranul): Pornit"
-    IDS_OSD_RS_EXCLUSIVE_FSCREEN_OFF "Exclusiv pe ecran complet (pe tot ecranul): Oprit"
+    IDS_OSD_RS_EXCLUSIVE_FSCREEN_ON "Ecran complet (pe tot ecranul) exclusiv: Pornit"
+    IDS_OSD_RS_EXCLUSIVE_FSCREEN_OFF "Ecran complet (pe tot ecranul) exclusiv: Oprit"
 END
 
 STRINGTABLE
@@ -3674,10 +3674,10 @@ BEGIN
     IDS_SATURATION_DEC      "Micșorează saturația"
     IDS_RESET_COLOR         "Resetează setările de culoare"
     IDS_AFTERPLAYBACK_CLOSE_FILE "După redare: închide întotdeauna fișierul"
-    IDS_UPDATE_ERROR_DATA   "Serverul pentru actualizare oferă date greșite.\n\nÎncearcă mai târziu."
+    IDS_UPDATE_ERROR_DATA   "Serverul pentru actualizare oferă date greșite.\n\nTe rugăm să încerci mai târziu."
     IDS_USING_NEWER_VERSION "Deja folosești ultima versiune %s."
     IDS_NEW_UPDATE_AVAILABLE  "O nouă %s este disponibilă.\n\nVrei să vizitezi site-ul programului MPC-BE ca să o descarci?"
-    IDS_UPDATE_ERROR_CONNECT  "Serverul pentru actualizare nu a fost găsit.\n\nVerifică-ți conexiunea la internet sau încearcă mai târziu."
+    IDS_UPDATE_ERROR_CONNECT  "Serverul pentru actualizare nu a fost găsit.\n\nTe rugăm să-ți verifici conexiunea la internet sau încearcă mai târziu."
     IDS_UPDATE_CLOSE        "În&chide"
     IDS_OSD_ZOOM            "Scalează: %.0lf%%"
 END
@@ -3796,9 +3796,9 @@ BEGIN
     IDS_HISTORY_PATH        "Cale"
     IDS_HISTORY_TITLE       "Titlu"
     IDS_HISTORY_POSITION    "Poziție"
-    IDS_HISTORY_REMOVE_SELECTED "Șterge selecția (selecțiile)"
+    IDS_HISTORY_REMOVE_SELECTED "Șterge elementul selectat (elementele selectate)"
     IDS_HISTORY_REMOVE_MISSING "Șterge fișierele lipsă"
-    IDS_HISTORY_CLEAR       "Curăță"
+    IDS_HISTORY_CLEAR       "Golește"
 END
 
 STRINGTABLE
@@ -3822,7 +3822,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_SUBTITLES_STEREO    "Subtitrări stereoscopice"
-    IDS_SUBTITLES_STEREO_DONTUSE "Nu folosi"
+    IDS_SUBTITLES_STEREO_DONTUSE "Nu le folosi"
     IDS_SUBTITLES_STEREO_SIDEBYSIDE "Unul lângă altul"
     IDS_SUBTITLES_STEREO_TOPANDBOTTOM "În sus și în jos"
     IDS_SUB_POS_UP          "Deplasează poziția subtitrării în sus"
