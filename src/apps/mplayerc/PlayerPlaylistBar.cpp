@@ -206,6 +206,7 @@ CPlaylistItem& CPlaylistItem::operator = (const CPlaylistItem& pli)
 	if (this != &pli) {
 		m_id         = pli.m_id;
 		m_label      = pli.m_label;
+		m_autolabel  = pli.m_autolabel;
 		m_fi         = pli.m_fi;
 		m_auds       = pli.m_auds;
 		m_subs       = pli.m_subs;
@@ -1268,6 +1269,8 @@ void CPlayerPlaylistBar::AddItem(std::list<CString>& fns, CSubtitleItemList* sub
 		else {
 			pli.m_label = GetFileName(pli.m_fi);
 		}
+
+		pli.m_autolabel = true;
 	}
 
 	curPlayList.Append(pli, AfxGetAppSettings().bPlaylistDetermineDuration);
@@ -1675,7 +1678,7 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(const CString& fn, const CTextFile::enc
 		str.Format(L"%d,type,%d", i, pli.m_type);
 		f.WriteString(str + L"\n");
 
-		if (!pli.m_label.IsEmpty()) {
+		if (pli.m_label.GetLength() && !pli.m_autolabel) {
 			f.WriteString(idx + L",label," + pli.m_label + L"\n");
 		}
 
@@ -3796,12 +3799,13 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 					//if (fRemovePath) {
 					//	fn = GetFileOnly(fn);
 					//}
+					LPCWSTR labelstr = (pli.m_label.GetLength() && !pli.m_autolabel) ? pli.m_label.GetString() : L"";
 
 					switch (idx) {
 					case 2:
 						str.Format(L"File%d=%s\n", i + 1, fn.GetString());
-						if (!pli.m_label.IsEmpty()) {
-							str.AppendFormat(L"Title%d=%s\n", i + 1, pli.m_label.GetString());
+						if (labelstr[0]) {
+							str.AppendFormat(L"Title%d=%s\n", i + 1, labelstr);
 						}
 						if (pli.m_duration > 0) {
 							str.AppendFormat(L"Length%d=%I64d\n", i + 1, (pli.m_duration + UNITS / 2) / UNITS);
@@ -3809,17 +3813,17 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 						break;
 					case 3:
 						str.Empty();
-						if (!pli.m_label.IsEmpty() || pli.m_duration > 0) {
+						if (labelstr[0] || pli.m_duration > 0) {
 							str.AppendFormat(L"#EXTINF:%I64d,%s\n",
 								pli.m_duration > 0 ? (pli.m_duration + UNITS / 2) / UNITS : -1LL,
-								pli.m_label.GetString());
+								labelstr);
 						}
 						str.AppendFormat(L"%s\n", fn.GetString());
 						break;
 					case 4:
 						str = L"<Entry>";
-						if (!pli.m_label.IsEmpty()) {
-							str.AppendFormat(L"<title>%s</title>", pli.m_label.GetString());
+						if (labelstr[0]) {
+							str.AppendFormat(L"<title>%s</title>", labelstr);
 						}
 						str.AppendFormat(L"<Ref href = \"%s\"/>", fn.GetString());
 						str.Append(L"</Entry>\n");
@@ -3927,6 +3931,7 @@ void CPlayerPlaylistBar::OnLvnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 	if (pDispInfo->item.iItem >= 0 && pDispInfo->item.pszText) {
 		CPlaylistItem& pli = curPlayList.GetAt((POSITION)m_list.GetItemData(pDispInfo->item.iItem));
 		pli.m_label = pDispInfo->item.pszText;
+		pli.m_autolabel = false;
 		m_list.SetItemText(pDispInfo->item.iItem, 0, pDispInfo->item.pszText);
 	}
 	m_bEdit = false;

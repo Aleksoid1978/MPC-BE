@@ -33,6 +33,7 @@ class CPlaylistItem
 public:
 	UINT m_id;
 	CString m_label;
+	bool m_autolabel = false;
 
 	CFileItem         m_fi;
 	CAudioItemList    m_auds;
