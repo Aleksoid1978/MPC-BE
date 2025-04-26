@@ -41,6 +41,8 @@
 #include "vpx_rac.h"
 
 #define VP6_MAX_HUFF_SIZE 12
+#define AC_DC_HUFF_BITS   10
+#define RUN_HUFF_BITS      8
 
 static int vp6_parse_coeff(VP56Context *s);
 static int vp6_parse_coeff_huffman(VP56Context *s);
@@ -266,7 +268,8 @@ static int vp6_huff_cmp(const void *va, const void *vb)
 }
 
 static int vp6_build_huff_tree(VP56Context *s, uint8_t coeff_model[],
-                               const uint8_t *map, unsigned size, VLC *vlc)
+                               const uint8_t *map, unsigned size,
+                               int nb_bits, VLC *vlc)
 {
     Node nodes[2*VP6_MAX_HUFF_SIZE], *tmp = &nodes[size];
     int a, b, i;
@@ -282,7 +285,7 @@ static int vp6_build_huff_tree(VP56Context *s, uint8_t coeff_model[],
 
     ff_vlc_free(vlc);
     /* then build the huffman tree according to probabilities */
-    return ff_huff_build_tree(s->avctx, vlc, size, FF_HUFFMAN_BITS,
+    return ff_huff_build_tree(s->avctx, vlc, size, nb_bits,
                               nodes, vp6_huff_cmp,
                               FF_HUFFMAN_FLAG_HNODE_FIRST);
 }
@@ -295,6 +298,7 @@ static int vp6_parse_coeff_models(VP56Context *s)
     int node, cg, ctx, pos;
     int ct;    /* code type */
     int pt;    /* plane type (0 for Y, 1 for U or V) */
+    int ret;
 
     memset(def_prob, 0x80, sizeof(def_prob));
 
@@ -332,18 +336,25 @@ static int vp6_parse_coeff_models(VP56Context *s)
 
     if (s->use_huffman) {
         for (pt=0; pt<2; pt++) {
-            if (vp6_build_huff_tree(s, model->coeff_dccv[pt],
-                                    vp6_huff_coeff_map, 12, &s->dccv_vlc[pt]))
-                return -1;
-            if (vp6_build_huff_tree(s, model->coeff_runv[pt],
-                                    vp6_huff_run_map, 9, &s->runv_vlc[pt]))
-                return -1;
+            ret = vp6_build_huff_tree(s, model->coeff_dccv[pt],
+                                      vp6_huff_coeff_map, 12, AC_DC_HUFF_BITS,
+                                      &s->dccv_vlc[pt]);
+            if (ret < 0)
+                return ret;
+            ret = vp6_build_huff_tree(s, model->coeff_runv[pt],
+                                      vp6_huff_run_map, 9, RUN_HUFF_BITS,
+                                      &s->runv_vlc[pt]);
+            if (ret < 0)
+                return ret;
             for (ct=0; ct<3; ct++)
-                for (cg = 0; cg < 6; cg++)
-                    if (vp6_build_huff_tree(s, model->coeff_ract[pt][ct][cg],
-                                            vp6_huff_coeff_map, 12,
-                                            &s->ract_vlc[pt][ct][cg]))
-                        return -1;
+                for (int cg = 0; cg < 4; cg++) {
+                    ret = vp6_build_huff_tree(s, model->coeff_ract[pt][ct][cg],
+                                              vp6_huff_coeff_map, 12,
+                                              AC_DC_HUFF_BITS,
+                                              &s->ract_vlc[pt][ct][cg]);
+                    if (ret < 0)
+                        return ret;
+                }
         }
         memset(s->nb_null, 0, sizeof(s->nb_null));
     } else {
@@ -415,7 +426,7 @@ static int vp6_parse_coeff_huffman(VP56Context *s)
     VP56Model *model = s->modelp;
     uint8_t *permute = s->idct_scantable;
     VLC *vlc_coeff;
-    int coeff, sign, coeff_idx;
+    int sign, coeff_idx;
     int b, cg, idx;
     int pt = 0;    /* plane type (0 for Y, 1 for U or V) */
 
@@ -433,11 +444,11 @@ static int vp6_parse_coeff_huffman(VP56Context *s)
             } else {
                 if (get_bits_left(&s->gb) <= 0)
                     return AVERROR_INVALIDDATA;
-                coeff = get_vlc2(&s->gb, vlc_coeff->table, FF_HUFFMAN_BITS, 3);
+                int coeff = get_vlc2(&s->gb, vlc_coeff->table, AC_DC_HUFF_BITS, 2);
                 if (coeff == 0) {
                     if (coeff_idx) {
                         int pt = (coeff_idx >= 6);
-                        run += get_vlc2(&s->gb, s->runv_vlc[pt].table, FF_HUFFMAN_BITS, 3);
+                        run += get_vlc2(&s->gb, s->runv_vlc[pt].table, RUN_HUFF_BITS, 1);
                         if (run >= 9)
                             run += get_bits(&s->gb, 6);
                     } else
@@ -704,15 +715,13 @@ static av_cold int vp6_decode_free(AVCodecContext *avctx)
 
 static av_cold void vp6_decode_free_context(VP56Context *s)
 {
-    int pt, ct, cg;
-
     ff_vp56_free_context(s);
 
-    for (pt=0; pt<2; pt++) {
+    for (int pt = 0; pt < 2; ++pt) {
         ff_vlc_free(&s->dccv_vlc[pt]);
         ff_vlc_free(&s->runv_vlc[pt]);
-        for (ct=0; ct<3; ct++)
-            for (cg=0; cg<6; cg++)
+        for (int ct = 0; ct < 3; ++ct)
+            for (int cg = 0; cg < 4; ++cg)
                 ff_vlc_free(&s->ract_vlc[pt][ct][cg]);
     }
 }

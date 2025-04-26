@@ -30,6 +30,7 @@
 #include "codec_internal.h"
 #include "decode.h"
 #include "get_bits.h"
+#include "hq_common.h"
 #include "hq_hqadata.h"
 #include "hq_hqadsp.h"
 #include "vlc.h"
@@ -57,8 +58,9 @@ typedef struct HQContext {
     DECLARE_ALIGNED(16, int16_t, block)[12][64];
 } HQContext;
 
-static VLCElem hq_ac_vlc[1184];
-static VLCElem hqa_cbp_vlc[32];
+static const int32_t *hq_quants[NUM_HQ_QUANTS][2][4];
+
+static RL_VLC_ELEM hq_ac_rvlc[1184];
 
 static inline void put_blocks(HQContext *c, AVFrame *pic,
                               int plane, int x, int y, int ilace,
@@ -76,9 +78,6 @@ static int hq_decode_block(HQContext *c, GetBitContext *gb, int16_t block[64],
                            int qsel, int is_chroma, int is_hqa)
 {
     const int32_t *q;
-    int val, pos = 1;
-
-    memset(block, 0, 64 * sizeof(*block));
 
     if (!is_hqa) {
         block[0] = get_sbits(gb, 9) * 64;
@@ -88,17 +87,22 @@ static int hq_decode_block(HQContext *c, GetBitContext *gb, int16_t block[64],
         block[0] = get_sbits(gb, 9) * 64;
     }
 
-    for (;;) {
-        val = get_vlc2(gb, hq_ac_vlc, 9, 2);
-        if (val < 0)
+    OPEN_READER(re, gb);
+    for (int pos = 0;;) {
+        int level, run;
+        UPDATE_CACHE(re, gb);
+        GET_RL_VLC(level, run, re, gb, hq_ac_rvlc, 9, 2, 0);
+        if (run == HQ_AC_INVALID_RUN) {
+            CLOSE_READER(re, gb);
             return AVERROR_INVALIDDATA;
+        }
 
-        pos += hq_ac_skips[val];
+        pos += run;
         if (pos >= 64)
             break;
-        block[ff_zigzag_direct[pos]] = (int)(hq_ac_syms[val] * (unsigned)q[pos]) >> 12;
-        pos++;
+        block[ff_zigzag_direct[pos]] = (int)(level * (unsigned)q[pos]) >> 12;
     }
+    CLOSE_READER(re, gb);
 
     return 0;
 }
@@ -108,6 +112,8 @@ static int hq_decode_mb(HQContext *c, AVFrame *pic,
 {
     int qgroup, flag;
     int i, ret;
+
+    memset(c->block, 0, 8 * sizeof(c->block[0]));
 
     qgroup = get_bits(gb, 4);
     flag = get_bits1(gb);
@@ -143,6 +149,9 @@ static int hq_decode_frame(HQContext *ctx, AVFrame *pic, GetByteContext *gbc,
         av_log(ctx->avctx, AV_LOG_VERBOSE, "HQ Profile %d\n", prof_num);
     }
 
+    if (bytestream2_get_bytes_left(gbc) < 3 * (profile->num_slices + 1))
+        return AVERROR_INVALIDDATA;
+
     ctx->avctx->coded_width         = FFALIGN(profile->width,  16);
     ctx->avctx->coded_height        = FFALIGN(profile->height, 16);
     ctx->avctx->width               = profile->width;
@@ -156,7 +165,7 @@ static int hq_decode_frame(HQContext *ctx, AVFrame *pic, GetByteContext *gbc,
 
     /* Offsets are stored from CUV position, so adjust them accordingly. */
     for (i = 0; i < profile->num_slices + 1; i++)
-        slice_off[i] = bytestream2_get_be24(gbc) - 4;
+        slice_off[i] = bytestream2_get_be24u(gbc) - 4;
 
     next_off = 0;
     for (slice = 0; slice < profile->num_slices; slice++) {
@@ -192,22 +201,19 @@ static int hqa_decode_mb(HQContext *c, AVFrame *pic, int qgroup,
                          GetBitContext *gb, int x, int y)
 {
     int flag = 0;
-    int i, ret, cbp;
+    int i, ret;
 
     if (get_bits_left(gb) < 1)
         return AVERROR_INVALIDDATA;
 
-    cbp = get_vlc2(gb, hqa_cbp_vlc, 5, 1);
-
-    for (i = 0; i < 12; i++)
-        memset(c->block[i], 0, sizeof(*c->block));
+    memset(c->block, 0, 12 * sizeof(c->block[0]));
     for (i = 0; i < 12; i++)
         c->block[i][0] = -128 * (1 << 6);
 
+    int cbp = get_vlc2(gb, ff_hq_cbp_vlc, HQ_CBP_VLC_BITS, 1);
     if (cbp) {
         flag = get_bits1(gb);
 
-        cbp |= cbp << 4;
         if (cbp & 0x3)
             cbp |= 0x500;
         if (cbp & 0xC)
@@ -258,14 +264,13 @@ static int hqa_decode_frame(HQContext *ctx, AVFrame *pic, GetByteContext *gbc, s
     const int num_slices = 8;
     uint32_t slice_off[9];
     int i, slice, ret;
-    int width, height, quant;
     const uint8_t *src = gbc->buffer;
 
     if (bytestream2_get_bytes_left(gbc) < 8 + 4*(num_slices + 1))
         return AVERROR_INVALIDDATA;
 
-    width  = bytestream2_get_be16(gbc);
-    height = bytestream2_get_be16(gbc);
+    int width  = bytestream2_get_be16u(gbc);
+    int height = bytestream2_get_be16u(gbc);
 
     ret = ff_set_dimensions(ctx->avctx, width, height);
     if (ret < 0)
@@ -278,8 +283,8 @@ static int hqa_decode_frame(HQContext *ctx, AVFrame *pic, GetByteContext *gbc, s
 
     av_log(ctx->avctx, AV_LOG_VERBOSE, "HQA Profile\n");
 
-    quant = bytestream2_get_byte(gbc);
-    bytestream2_skip(gbc, 3);
+    int quant = bytestream2_get_byteu(gbc);
+    bytestream2_skipu(gbc, 3);
     if (quant >= NUM_HQ_QUANTS) {
         av_log(ctx->avctx, AV_LOG_ERROR,
                "Invalid quantization matrix %d.\n", quant);
@@ -292,7 +297,7 @@ static int hqa_decode_frame(HQContext *ctx, AVFrame *pic, GetByteContext *gbc, s
 
     /* Offsets are stored from HQA1 position, so adjust them accordingly. */
     for (i = 0; i < num_slices + 1; i++)
-        slice_off[i] = bytestream2_get_be32(gbc) - 4;
+        slice_off[i] = bytestream2_get_be32u(gbc) - 4;
 
     for (slice = 0; slice < num_slices; slice++) {
         if (slice_off[slice] < (num_slices + 1) * 3 ||
@@ -318,29 +323,26 @@ static int hq_hqa_decode_frame(AVCodecContext *avctx, AVFrame *pic,
 {
     HQContext *ctx = avctx->priv_data;
     GetByteContext gbc0, *const gbc = &gbc0;
-    uint32_t info_tag;
     unsigned int data_size;
     int ret;
-    unsigned tag;
 
-    bytestream2_init(gbc, avpkt->data, avpkt->size);
-    if (bytestream2_get_bytes_left(gbc) < 4 + 4) {
+    if (avpkt->size < 4 + 4) {
         av_log(avctx, AV_LOG_ERROR, "Frame is too small (%d).\n", avpkt->size);
         return AVERROR_INVALIDDATA;
     }
+    bytestream2_init(gbc, avpkt->data, avpkt->size);
 
-    info_tag = bytestream2_peek_le32(gbc);
+    uint32_t info_tag = bytestream2_peek_le32u(gbc);
     if (info_tag == MKTAG('I', 'N', 'F', 'O')) {
-        int info_size;
-        bytestream2_skip(gbc, 4);
-        info_size = bytestream2_get_le32(gbc);
+        bytestream2_skipu(gbc, 4);
+        int info_size = bytestream2_get_le32u(gbc);
         if (info_size < 0 || bytestream2_get_bytes_left(gbc) < info_size) {
             av_log(avctx, AV_LOG_ERROR, "Invalid INFO size (%d).\n", info_size);
             return AVERROR_INVALIDDATA;
         }
         ff_canopus_parse_info_tag(avctx, gbc->buffer, info_size);
 
-        bytestream2_skip(gbc, info_size);
+        bytestream2_skipu(gbc, info_size);
     }
 
     data_size = bytestream2_get_bytes_left(gbc);
@@ -352,7 +354,7 @@ static int hq_hqa_decode_frame(AVCodecContext *avctx, AVFrame *pic,
     /* HQ defines dimensions and number of slices, and thus slice traversal
      * order. HQA has no size constraint and a fixed number of slices, so it
      * needs a separate scheme for it. */
-    tag = bytestream2_get_le32(gbc);
+    unsigned tag = bytestream2_get_le32u(gbc);
     if ((tag & 0x00FFFFFF) == (MKTAG('U', 'V', 'C', ' ') & 0x00FFFFFF)) {
         ret = hq_decode_frame(ctx, pic, gbc, tag >> 24, data_size);
     } else if (tag == MKTAG('H', 'Q', 'A', '1')) {
@@ -371,13 +373,33 @@ static int hq_hqa_decode_frame(AVCodecContext *avctx, AVFrame *pic,
     return avpkt->size;
 }
 
-static av_cold void hq_init_vlcs(void)
+static av_cold void hq_init_static(void)
 {
-    VLC_INIT_STATIC_TABLE(hqa_cbp_vlc, 5, FF_ARRAY_ELEMS(cbp_vlc_lens),
-                          cbp_vlc_lens, 1, 1, cbp_vlc_bits, 1, 1, 0);
+    VLC_INIT_STATIC_TABLE_FROM_LENGTHS(hq_ac_rvlc, 9, NUM_HQ_AC_ENTRIES,
+                                       hq_ac_lens, 1, hq_ac_sym, 2, 2, 0, 0);
 
-    VLC_INIT_STATIC_TABLE(hq_ac_vlc, 9, NUM_HQ_AC_ENTRIES,
-                          hq_ac_bits, 1, 1, hq_ac_codes, 2, 2, 0);
+    for (size_t i = 0; i < FF_ARRAY_ELEMS(hq_ac_rvlc); ++i) {
+        int len = hq_ac_rvlc[i].len;
+        int sym = (int16_t)hq_ac_rvlc[i].sym, level = sym;
+
+        // The invalid code has been remapped to HQ_AC_INVALID_RUN,
+        // so the VLC is complete.
+        av_assert1(len != 0);
+
+        if (len > 0) {
+            level = sym >> 7;
+            hq_ac_rvlc[i].run = sym & 0x7F;
+        }
+        hq_ac_rvlc[i].len8  = len;
+        hq_ac_rvlc[i].level = level;
+    }
+
+    for (size_t i = 0; i < FF_ARRAY_ELEMS(hq_quants); ++i) {
+        for (size_t j = 0; j < FF_ARRAY_ELEMS(hq_quants[0]); ++j) {
+            for (size_t k = 0; k < FF_ARRAY_ELEMS(hq_quants[0][0]); ++k)
+                hq_quants[i][j][k] = qmats[hq_quant_map[i][j][k]];
+        }
+    }
 }
 
 static av_cold int hq_hqa_decode_init(AVCodecContext *avctx)
@@ -388,7 +410,7 @@ static av_cold int hq_hqa_decode_init(AVCodecContext *avctx)
 
     ff_hqdsp_init(&ctx->hqhqadsp);
 
-    ff_thread_once(&init_static_once, hq_init_vlcs);
+    ff_thread_once(&init_static_once, hq_init_static);
 
     return 0;
 }

@@ -297,6 +297,7 @@ SRCS_LC = \
 	libavcodec/hap.c \
 	libavcodec/hapdec.c \
 	libavcodec/hpeldsp.c \
+	libavcodec/hq_common.c \
 	libavcodec/hq_hqa.c \
 	libavcodec/hq_hqadsp.c \
 	libavcodec/hqx.c \

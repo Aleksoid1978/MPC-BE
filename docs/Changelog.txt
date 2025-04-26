@@ -8,6 +8,9 @@ Fixed saving of video frame image with subtitles when using MPC Video Renderer.
 Updated Bulgarian translation (by jekovcar).
 Updated Romanian translation (by Andrei Miloiu).
 
+Updated libraries:
+	ffmpeg n7.2-dev-2201-g8bb682d454.
+
 
 1.8.4 - 2025-04-19
 =============================

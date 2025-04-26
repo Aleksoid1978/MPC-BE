@@ -1,8 +1,4 @@
 /*
- * MPEG-4 Audio sample rates
- * Copyright (c) 2008 Baptiste Coudurier <baptiste.coudurier@free.fr>
- * Copyright (c) 2009 Alex Converse <alex.converse@gmail.com>
- *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -20,15 +16,29 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVCODEC_MPEG4AUDIO_SAMPLE_RATES_H
-#define AVCODEC_MPEG4AUDIO_SAMPLE_RATES_H
+#include "hq_common.h"
 
-// This table contains only 13 real elements and is padded with zeroes.
-// It is used by the AAC encoder as sample rate table, so the encoder
-// needs to actually support all of these rates and it needs to have
-// a trailing zero.
-const int ff_mpeg4audio_sample_rates[16] = {
-    96000, 88200, 64000, 48000, 44100, 32000,
-    24000, 22050, 16000, 12000, 11025, 8000, 7350
+#define REPEAT(x) x x
+#define ELEM(_sym, _len) {.sym = _sym << 4 | _sym, .len = _len },
+#define LEN5(sym) ELEM(sym, 5)
+#define LEN4(sym) REPEAT(ELEM(sym, 4))
+#define LEN2(sym) REPEAT(REPEAT(REPEAT(ELEM(sym, 2))))
+
+const VLCElem ff_hq_cbp_vlc[1 << HQ_CBP_VLC_BITS] = {
+    LEN2(0xF)
+    LEN4(0x0)
+    LEN4(0xE)
+    LEN4(0xD)
+    LEN4(0xB)
+    LEN4(0x7)
+    LEN4(0x3)
+    LEN4(0xC)
+    LEN4(0x5)
+    LEN4(0xA)
+    LEN5(0x9)
+    LEN5(0x6)
+    LEN5(0x1)
+    LEN5(0x2)
+    LEN5(0x4)
+    LEN5(0x8)
 };
-#endif

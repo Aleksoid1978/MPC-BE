@@ -1,8 +1,4 @@
 /*
- * MPEG-4 Audio sample rates
- * Copyright (c) 2008 Baptiste Coudurier <baptiste.coudurier@free.fr>
- * Copyright (c) 2009 Alex Converse <alex.converse@gmail.com>
- *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -20,15 +16,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVCODEC_MPEG4AUDIO_SAMPLE_RATES_H
-#define AVCODEC_MPEG4AUDIO_SAMPLE_RATES_H
+#ifndef AVCODEC_HQ_COMMON_H
+#define AVCODEC_HQ_COMMON_H
 
-// This table contains only 13 real elements and is padded with zeroes.
-// It is used by the AAC encoder as sample rate table, so the encoder
-// needs to actually support all of these rates and it needs to have
-// a trailing zero.
-const int ff_mpeg4audio_sample_rates[16] = {
-    96000, 88200, 64000, 48000, 44100, 32000,
-    24000, 22050, 16000, 12000, 11025, 8000, 7350
-};
-#endif
+#include "vlc.h"
+#include "libavutil/attributes_internal.h"
+
+#define HQ_CBP_VLC_BITS 5
+
+EXTERN const VLCElem ff_hq_cbp_vlc[1 << HQ_CBP_VLC_BITS];
+
+#endif /* AVCODEC_HQ_COMMON_H */
