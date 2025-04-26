@@ -832,6 +832,7 @@ int CD3D11Decoder::get_d3d11_buffer(struct AVCodecContext* c, AVFrame* frame, in
 
 	if (frame->format != AV_PIX_FMT_D3D11) {
 		DLog(L"CD3D11Decoder::get_d3d11_buffer() : D3D11 buffer request, but not D3D11 pixfmt");
+		pDec->m_pFilter->m_bDXVACompatible = false;
 		return -1;
 	}
 
