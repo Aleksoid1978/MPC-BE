@@ -48,21 +48,44 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>/ignore:4217 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Filter|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>/ignore:4217 %(AdditionalOptions)</AdditionalOptions>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Filter|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>/ignore:4217 %(AdditionalOptions)</AdditionalOptions>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Filter|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>/ignore:4217 %(AdditionalOptions)</AdditionalOptions>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="MatroskaFile.cpp" />
@@ -105,6 +128,9 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)src\filters\parser\BaseSplitter\BaseSplitter.vcxproj">
       <Project>{37768b3f-89bc-4c16-b2a8-767c5da84c3f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\ExtLib\ffmpeg\ffmpeg.vcxproj">
+      <Project>{438286b7-a9f4-411d-bcc5-948c40e37d8f}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
