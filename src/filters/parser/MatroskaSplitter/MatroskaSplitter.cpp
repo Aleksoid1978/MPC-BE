@@ -35,8 +35,12 @@
 #include <IMediaSideData.h>
 
 #include <basestruct.h>
+
+extern "C" {
 #include <libavutil/pixfmt.h>
+#include <libavutil/pixdesc.h>
 #include <libavutil/intreadwrite.h>
+}
 
 // option names
 #define OPT_REGKEY_MATROSKASplit	L"Software\\MPC-BE Filters\\Matroska Splitter"
@@ -1060,13 +1064,44 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 
 							if (extra) {
+								enum VPX_CHROMA_SUBSAMPLING {
+									VPX_SUBSAMPLING_420_VERTICAL             = 0,
+									VPX_SUBSAMPLING_420_COLLOCATED_WITH_LUMA = 1,
+									VPX_SUBSAMPLING_422                      = 2,
+									VPX_SUBSAMPLING_444                      = 3,
+									VPX_SUBSAMPLING_440                      = 4,
+									VPX_SUBSAMPLING_UNKNOWN                  = -1,
+								};
+
+								auto get_vpx_chroma_subsampling = [](AVPixelFormat pixel_format,
+																	 AVChromaLocation chroma_location) {
+									int chroma_w, chroma_h;
+									if (av_pix_fmt_get_chroma_sub_sample(pixel_format, &chroma_w, &chroma_h) == 0) {
+										if (chroma_w == 1 && chroma_h == 1) {
+											return (chroma_location == AVCHROMA_LOC_LEFT)
+												? VPX_SUBSAMPLING_420_VERTICAL
+												: VPX_SUBSAMPLING_420_COLLOCATED_WITH_LUMA;
+										} else if (chroma_w == 0 && chroma_h == 1) {
+											return VPX_SUBSAMPLING_440;
+										} else if (chroma_w == 1 && chroma_h == 0) {
+											return VPX_SUBSAMPLING_422;
+										} else if (chroma_w == 0 && chroma_h == 0) {
+											return VPX_SUBSAMPLING_444;
+										}
+									}
+									return VPX_SUBSAMPLING_UNKNOWN;
+								};
+
+								auto vpx_chroma_subsampling =
+									get_vpx_chroma_subsampling(static_cast<AVPixelFormat>(m_pix_fmt), static_cast<AVChromaLocation>(m_ColorSpace->ChromaLocation));
+
 								memcpy(extra, "vpcC", 4);
 								// use code from LAV
 								AV_WB8(extra + 4, 1); // version
 								AV_WB24(extra + 5, 0); // flags
 								AV_WB8(extra + 8, m_profile);
 								AV_WB8(extra + 9, 0);
-								AV_WB8(extra + 10, m_bits << 4 | (m_ColorSpace ? m_ColorSpace->ChromaLocation : 0) << 1 | (m_ColorSpace ? m_ColorSpace->Range == AVCOL_RANGE_JPEG : 0));
+								AV_WB8(extra + 10, m_bits << 4 | vpx_chroma_subsampling << 1 | (m_ColorSpace ? m_ColorSpace->Range == AVCOL_RANGE_JPEG : 0));
 								AV_WB8(extra + 11, m_ColorSpace ? m_ColorSpace->Primaries : AVCOL_PRI_UNSPECIFIED);
 								AV_WB8(extra + 12, m_ColorSpace ? m_ColorSpace->TransferCharacteristics : AVCOL_TRC_UNSPECIFIED);
 								AV_WB8(extra + 13, m_ColorSpace ? m_ColorSpace->MatrixCoefficients : AVCOL_SPC_UNSPECIFIED);

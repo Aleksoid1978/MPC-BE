@@ -2853,18 +2853,59 @@ void CMPCVideoDecFilter::AllocExtradata(const CMediaType* pmt)
 
 				m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
 				int bitdepth = AV_RB8(extra + 10) >> 4;
-				if (m_pAVCtx->profile == AV_PROFILE_VP9_2) {
-					if (bitdepth == 10) {
-						m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P10;
-					} else if (bitdepth == 12) {
-						m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P12;
-					}
-				} else if (m_pAVCtx->profile == AV_PROFILE_VP9_3) {
-					if (bitdepth == 10) {
-						m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10;
-					} else if (bitdepth == 12) {
-						m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P12;
-					}
+
+				enum VPX_CHROMA_SUBSAMPLING {
+					VPX_SUBSAMPLING_420_VERTICAL             = 0,
+					VPX_SUBSAMPLING_420_COLLOCATED_WITH_LUMA = 1,
+					VPX_SUBSAMPLING_422                      = 2,
+					VPX_SUBSAMPLING_444                      = 3,
+					VPX_SUBSAMPLING_440                      = 4,
+					VPX_SUBSAMPLING_UNKNOWN                  = -1,
+				};
+				auto vpx_chroma_subsampling = static_cast<VPX_CHROMA_SUBSAMPLING>((AV_RB8(extra + 10) >> 1) & 0x7);
+
+				switch (bitdepth) {
+					case 8:
+						if (m_pAVCtx->colorspace == AVCOL_SPC_RGB) {
+							m_pAVCtx->pix_fmt = AV_PIX_FMT_GBRP;
+						} else if (vpx_chroma_subsampling == VPX_SUBSAMPLING_422) {
+							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;
+						} else if (vpx_chroma_subsampling == VPX_SUBSAMPLING_444) {
+							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P;
+						} else if (vpx_chroma_subsampling == VPX_SUBSAMPLING_440) {
+							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV440P;
+						}
+						break;
+					case 10:
+						if (m_pAVCtx->colorspace == AVCOL_SPC_RGB) {
+							m_pAVCtx->pix_fmt = AV_PIX_FMT_GBRP10;
+						} else if (vpx_chroma_subsampling == VPX_SUBSAMPLING_422) {
+							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10;
+						} else if (vpx_chroma_subsampling == VPX_SUBSAMPLING_444) {
+							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P10;
+						} else if (vpx_chroma_subsampling == VPX_SUBSAMPLING_440) {
+							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV440P10;
+						} else if (m_pAVCtx->profile == AV_PROFILE_VP9_2) {
+							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P10;
+						} else if (m_pAVCtx->profile == AV_PROFILE_VP9_3) {
+							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10;
+						}
+						break;
+					case 12:
+						if (m_pAVCtx->colorspace == AVCOL_SPC_RGB) {
+							m_pAVCtx->pix_fmt = AV_PIX_FMT_GBRP12;
+						} else if (vpx_chroma_subsampling == VPX_SUBSAMPLING_422) {
+							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P12;
+						} else if (vpx_chroma_subsampling == VPX_SUBSAMPLING_444) {
+							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P12;
+						} else if (vpx_chroma_subsampling == VPX_SUBSAMPLING_440) {
+							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV440P12;
+						} else if (m_pAVCtx->profile == AV_PROFILE_VP9_2) {
+							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P12;
+						} else if (m_pAVCtx->profile == AV_PROFILE_VP9_3) {
+							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P12;
+						}
+						break;
 				}
 
 				av_freep(&extra);
