@@ -2860,7 +2860,6 @@ void CMPCVideoDecFilter::AllocExtradata(const CMediaType* pmt)
 					VPX_SUBSAMPLING_422                      = 2,
 					VPX_SUBSAMPLING_444                      = 3,
 					VPX_SUBSAMPLING_440                      = 4,
-					VPX_SUBSAMPLING_UNKNOWN                  = -1,
 				};
 				auto vpx_chroma_subsampling = static_cast<VPX_CHROMA_SUBSAMPLING>((AV_RB8(extra + 10) >> 1) & 0x7);
 

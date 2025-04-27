@@ -1069,8 +1069,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									VPX_SUBSAMPLING_420_COLLOCATED_WITH_LUMA = 1,
 									VPX_SUBSAMPLING_422                      = 2,
 									VPX_SUBSAMPLING_444                      = 3,
-									VPX_SUBSAMPLING_440                      = 4,
-									VPX_SUBSAMPLING_UNKNOWN                  = -1,
+									VPX_SUBSAMPLING_440                      = 4, // not official value
 								};
 
 								auto get_vpx_chroma_subsampling = [](AVPixelFormat pixel_format,
@@ -1089,7 +1088,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 											return VPX_SUBSAMPLING_444;
 										}
 									}
-									return VPX_SUBSAMPLING_UNKNOWN;
+									return VPX_SUBSAMPLING_420_VERTICAL;
 								};
 
 								auto vpx_chroma_subsampling =
