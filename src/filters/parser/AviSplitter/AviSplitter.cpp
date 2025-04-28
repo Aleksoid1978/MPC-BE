@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,6 +24,13 @@
 #include <moreuuids.h>
 #include "AviFile.h"
 #include "AviSplitter.h"
+#include "DSUtil/GolombBuffer.h"
+
+extern "C" {
+#include <libavutil/pixfmt.h>
+#include <libavutil/pixdesc.h>
+#include <libavutil/intreadwrite.h>
+}
 
 // option names
 #define OPT_REGKEY_AVISplit  L"Software\\MPC-BE Filters\\AVI Splitter"
@@ -81,6 +88,7 @@ STDAPI DllUnregisterServer()
 }
 
 #include "filters/filters/Filters.h"
+#include "filters/ffmpeg_link_fix.h"
 
 CFilterApp theApp;
 
@@ -459,6 +467,150 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (mts.size() == 1) {
 						CBaseSplitterFileEx::avchdr h;
 						ParseHeader(h, m_pFile.get(), s, mts, AvgTimePerFrame, headerAspect);
+					}
+					break;
+				case FCC('VP90'): {
+						__int64 pos = m_pFile->GetPos();
+						if (s->cs.size()) {
+							__int64 pos = m_pFile->GetPos();
+							for (size_t i = 0; i < s->cs.size() - 1; i++) {
+								if (s->cs[i].orgsize > 8) {
+									m_pFile->Seek(s->cs[i].filepos);
+									DWORD id = 0;
+									DWORD size = 0;
+									if (S_OK != m_pFile->ReadAvi(id) || id == 0 || S_OK != m_pFile->ReadAvi(size)) {
+										break;
+									}
+									std::vector<BYTE> pData(size);
+									if (S_OK == m_pFile->ByteRead(pData.data(), pData.size())) {
+										CGolombBuffer gb(pData.data(), pData.size());
+										const BYTE marker = gb.BitRead(2);
+										if (marker == 0x2) {
+											BYTE profile = gb.BitRead(1);
+											profile |= gb.BitRead(1) << 1;
+											if (profile == 3) {
+												profile += gb.BitRead(1);
+											}
+
+											#define VP9_SYNCCODE 0x498342
+
+											AVPixelFormat pix_fmt = AV_PIX_FMT_NONE;
+											AVColorSpace colorspace = AVCOL_SPC_UNSPECIFIED;
+											AVColorRange colorRange = AVCOL_RANGE_UNSPECIFIED;
+											int bits = 0;
+
+											if (!gb.BitRead(1)) {
+												const BYTE keyframe = !gb.BitRead(1);
+												gb.BitRead(1);
+												gb.BitRead(1);
+
+												if (keyframe) {
+													if (VP9_SYNCCODE == gb.BitRead(24)) {
+														static const enum AVColorSpace colorspaces[8] = {
+															AVCOL_SPC_UNSPECIFIED, AVCOL_SPC_BT470BG, AVCOL_SPC_BT709, AVCOL_SPC_SMPTE170M,
+															AVCOL_SPC_SMPTE240M, AVCOL_SPC_BT2020_NCL, AVCOL_SPC_RESERVED, AVCOL_SPC_RGB,
+														};
+
+														bits = profile <= 1 ? 0 : 1 + gb.BitRead(1); // 0:8, 1:10, 2:12
+														colorspace = colorspaces[gb.BitRead(3)];
+														if (colorspace == AVCOL_SPC_RGB) {
+															static const enum AVPixelFormat pix_fmt_rgb[3] = {
+																AV_PIX_FMT_GBRP, AV_PIX_FMT_GBRP10, AV_PIX_FMT_GBRP12
+															};
+															colorRange = AVCOL_RANGE_JPEG;
+															pix_fmt = pix_fmt_rgb[bits];
+														} else {
+															static const enum AVPixelFormat pix_fmt_for_ss[3][2 /* v */][2 /* h */] = {
+																{ { AV_PIX_FMT_YUV444P, AV_PIX_FMT_YUV422P },
+																	{ AV_PIX_FMT_YUV440P, AV_PIX_FMT_YUV420P } },
+																{ { AV_PIX_FMT_YUV444P10, AV_PIX_FMT_YUV422P10 },
+																	{ AV_PIX_FMT_YUV440P10, AV_PIX_FMT_YUV420P10 } },
+																{ { AV_PIX_FMT_YUV444P12, AV_PIX_FMT_YUV422P12 },
+																	{ AV_PIX_FMT_YUV440P12, AV_PIX_FMT_YUV420P12 } }
+															};
+
+															colorRange = gb.BitRead(1) ? AVCOL_RANGE_JPEG : AVCOL_RANGE_MPEG;
+															if (profile & 1) {
+																const BYTE h = gb.BitRead(1);
+																const BYTE v = gb.BitRead(1);
+																pix_fmt = pix_fmt_for_ss[bits][v][h];
+															} else {
+																pix_fmt = pix_fmt_for_ss[bits][1][1];
+															}
+														}
+													}
+												}
+											}
+
+											if (pix_fmt != AV_PIX_FMT_NONE) {
+												for (const auto& item : mts) {
+													BYTE* extra = nullptr;
+													if (item.formattype == FORMAT_VideoInfo2) {
+														mt = item;
+														auto vih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + 16);
+														extra = (BYTE*)(vih2 + 1);
+													} else if (item.formattype == FORMAT_VideoInfo) {
+														mt = item;
+														auto vih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + 16);
+														extra = (BYTE*)(vih + 1);
+													}
+
+													if (extra) {
+														enum VPX_CHROMA_SUBSAMPLING {
+															VPX_SUBSAMPLING_420_VERTICAL = 0,
+															VPX_SUBSAMPLING_420_COLLOCATED_WITH_LUMA = 1,
+															VPX_SUBSAMPLING_422 = 2,
+															VPX_SUBSAMPLING_444 = 3,
+															VPX_SUBSAMPLING_440 = 4, // not official value
+														};
+
+														auto get_vpx_chroma_subsampling = [](AVPixelFormat pixel_format,
+																							 AVChromaLocation chroma_location) {
+															int chroma_w, chroma_h;
+															if (av_pix_fmt_get_chroma_sub_sample(pixel_format, &chroma_w, &chroma_h) == 0) {
+																if (chroma_w == 1 && chroma_h == 1) {
+																	return (chroma_location == AVCHROMA_LOC_LEFT)
+																		? VPX_SUBSAMPLING_420_VERTICAL
+																		: VPX_SUBSAMPLING_420_COLLOCATED_WITH_LUMA;
+																} else if (chroma_w == 0 && chroma_h == 1) {
+																	return VPX_SUBSAMPLING_440;
+																} else if (chroma_w == 1 && chroma_h == 0) {
+																	return VPX_SUBSAMPLING_422;
+																} else if (chroma_w == 0 && chroma_h == 0) {
+																	return VPX_SUBSAMPLING_444;
+																}
+															}
+															return VPX_SUBSAMPLING_420_VERTICAL;
+														};
+
+														auto vpx_chroma_subsampling =
+															get_vpx_chroma_subsampling(pix_fmt, AVCHROMA_LOC_LEFT);
+
+														memcpy(extra, "vpcC", 4);
+														// use code from LAV
+														AV_WB8(extra + 4, 1); // version
+														AV_WB24(extra + 5, 0); // flags
+														AV_WB8(extra + 8, profile);
+														AV_WB8(extra + 9, 0);
+														AV_WB8(extra + 10, (bits == 0 ? 8 : bits == 1 ? 10 : 12) << 4 | vpx_chroma_subsampling << 1 | (colorRange == AVCOL_RANGE_JPEG));
+														AV_WB8(extra + 11, AVCOL_PRI_UNSPECIFIED);
+														AV_WB8(extra + 12, AVCOL_TRC_UNSPECIFIED);
+														AV_WB8(extra + 13, colorspace);
+														AV_WB16(extra + 14, 0); // no codec init data
+
+														mts.insert(mts.cbegin(), mt);
+														break;
+													}
+												}
+											}
+										}
+									}
+
+									break;
+								}
+							}
+						}
+						m_pFile->Seek(pos);
 					}
 					break;
 			}
