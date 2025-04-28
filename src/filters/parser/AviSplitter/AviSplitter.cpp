@@ -169,8 +169,13 @@ static void ParseHeader(T& var, CAviFile* pFile, CAviFile::strm_t* s, std::vecto
 		for (size_t i = 0; i < s->cs.size() - 1; i++) {
 			if (s->cs[i].orgsize) {
 				pFile->Seek(s->cs[i].filepos);
+				DWORD id = 0;
+				DWORD size = 0;
+				if (S_OK != pFile->ReadAvi(id) || id == 0 || S_OK != pFile->ReadAvi(size)) {
+					break;
+				}
 				CMediaType mt2;
-				if (pFile->Read(var, s->cs[i].orgsize, &mt2)) {
+				if (pFile->Read(var, size, &mt2)) {
 					VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt2.pbFormat;
 					pvih->AvgTimePerFrame = AvgTimePerFrame;
 					if (headerAspect.cx && headerAspect.cy) {
