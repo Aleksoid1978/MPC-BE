@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2024 see Authors.txt
+ * (C) 2018-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -110,3 +110,10 @@ CStringT<T, StrTraitMFC<T>> RegExpParse(const T* szIn, const T* szRE)
 
 	return StringT();
 };
+
+// helper type for the visitor #4
+template<class... Ts>
+struct overloaded : Ts... { using Ts::operator()...; };
+// explicit deduction guide (not needed as of C++20)
+template<class... Ts>
+overloaded(Ts...) -> overloaded<Ts...>;

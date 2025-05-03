@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2022 see Authors.txt
+ * (C) 2012-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,18 +32,14 @@
 class CAPETag
 {
 public:
-	enum ApeType {
-		APE_TYPE_STRING,
-		APE_TYPE_BINARY
-	};
+	using binary = std::vector<BYTE>;
 
 protected:
 	size_t m_TagSize = 0;
 	size_t m_TagFields = 0;
 
-	using binary = std::vector<BYTE>;
 	using values = std::variant<CString, binary>;
-	using tagItem = std::tuple<ApeType, CString, values>;
+	using tagItem = std::pair<CString, values>;
 
 	bool LoadItems(CGolombBuffer &gb);
 	void Clear();

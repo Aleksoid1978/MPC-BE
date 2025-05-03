@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2024 see Authors.txt
+ * (C) 2020-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "MPC8File.h"
+#include "DSUtil/std_helper.h"
 
 #define MPCTAG(a, b) ((a) | ((b) << 8))
 
@@ -258,15 +259,18 @@ void CMPC8File::ReadChapter(const uint64_t size)
 			const auto tag_size = APEChapters.GetTagSize();
 			if (tag_size == (buf_size - footer_size) && APEChapters.ReadTags(ptr.get() + footer_size, tag_size)) {
 				CString track, title;
-				for (const auto& [type, key, value] : APEChapters.TagItems) {
-					if (type == CAPETag::APE_TYPE_STRING) {
-						CString tagKey(key); tagKey.MakeLower();
-						if (tagKey == L"track") {
-							track = std::get<CString>(value);
-						} else if (tagKey == L"title") {
-							title = std::get<CString>(value);
-						}
-					}
+				for (const auto& [key, value] : APEChapters.TagItems) {
+					std::visit(overloaded{
+						[&](const CStringW& tagValue) {
+							CString tagKey(key); tagKey.MakeLower();
+							if (tagKey == L"track") {
+								track = std::get<CString>(value);
+							} else if (tagKey == L"title") {
+								title = std::get<CString>(value);
+							}
+						},
+						[&](const auto& tagValue) {},
+					}, value);
 				}
 
 				CString chapterTitle;

@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2022 see Authors.txt
+ * (C) 2012-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,6 +24,7 @@
 #include "CUE.h"
 #include "DSMPropertyBag.h"
 #include "FileHandle.h"
+#include "std_helper.h"
 
 bool CAPETag::LoadItems(CGolombBuffer &gb) {
 	if ((gb.GetSize() - gb.GetPos()) < 8) {
@@ -53,7 +54,7 @@ bool CAPETag::LoadItems(CGolombBuffer &gb) {
 		if (tag_size) {
 			binary data(tag_size);
 			gb.ReadBuffer(data.data(), tag_size);
-			TagItems.emplace_back(APE_TYPE_BINARY, CString(key), std::move(data));
+			TagItems.emplace_back(CString(key), std::move(data));
 		}
 	} else {
 		auto data = std::make_unique<BYTE[]>(tag_size + 1);
@@ -61,7 +62,7 @@ bool CAPETag::LoadItems(CGolombBuffer &gb) {
 			return false;
 		}
 		gb.ReadBuffer(data.get(), tag_size);
-		TagItems.emplace_back(APE_TYPE_STRING, CString(key), UTF8ToWStr((LPCSTR)data.get()));
+		TagItems.emplace_back(CString(key), UTF8ToWStr((LPCSTR)data.get()));
 	}
 
 	return true;
@@ -137,61 +138,63 @@ void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* pAPETag)
 	}
 
 	CString Artist, Comment, Title, Year, Album;
-	for (const auto& [type, key, value] : pAPETag->TagItems) {
+	for (const auto& [key, value] : pAPETag->TagItems) {
 		CString tagKey(key); tagKey.MakeLower();
-		if (type == CAPETag::ApeType::APE_TYPE_BINARY) {
-			if (CComQIPtr<IDSMResourceBag> pRB = pBF) {
-				auto& tagValue = std::get<std::vector<BYTE>>(value);
+
+		std::visit(overloaded{
+			[&](const CAPETag::binary& tagValue) {
 				if (!tagValue.empty()) {
-					CString CoverMime;
-					if (!tagKey.IsEmpty()) {
-						const auto ext = GetFileExt(tagKey);
-						if (ext == L".jpeg" || ext == L".jpg") {
-							CoverMime = L"image/jpeg";
-						} else if (ext == L".png") {
-							CoverMime = L"image/png";
-						}
-					}
-
-					if (!CoverMime.IsEmpty()) {
-						pRB->ResAppend(key, L"cover", CoverMime, (BYTE*)tagValue.data(), (DWORD)tagValue.size(), 0);
-					}
-				}
-			}
-		} else {
-			CString sTitle, sPerformer;
-			auto& tagValue = std::get<CString>(value);
-			if (!tagValue.IsEmpty()) {
-				if (tagKey == L"cuesheet") {
-					std::list<Chapters> ChaptersList;
-					if (ParseCUESheet(tagValue, ChaptersList, sTitle, sPerformer)) {
-						if (!sTitle.IsEmpty() && Title.IsEmpty()) {
-							Title = sTitle;
-						}
-						if (!sPerformer.IsEmpty() && Artist.IsEmpty()) {
-							Artist = sPerformer;
-						}
-
-						if (CComQIPtr<IDSMChapterBag> pCB = pBF) {
-							pCB->ChapRemoveAll();
-							for (const auto& cp : ChaptersList) {
-								pCB->ChapAppend(cp.rt, cp.name);
+					if (CComQIPtr<IDSMResourceBag> pRB = pBF) {
+						CString CoverMime;
+						if (!tagKey.IsEmpty()) {
+							const auto ext = GetFileExt(tagKey);
+							if (ext == L".jpeg" || ext == L".jpg") {
+								CoverMime = L"image/jpeg";
+							} else if (ext == L".png") {
+								CoverMime = L"image/png";
 							}
 						}
+
+						if (!CoverMime.IsEmpty()) {
+							pRB->ResAppend(key, L"cover", CoverMime, (BYTE*)tagValue.data(), (DWORD)tagValue.size(), 0);
+						}
 					}
-				} else if (tagKey == L"artist") {
-					Artist = tagValue;
-				} else if (tagKey == L"comment") {
-					Comment = tagValue;
-				} else if (tagKey == L"title") {
-					Title = tagValue;
-				} else if (tagKey == L"year") {
-					Year = tagValue;
-				} else if (tagKey == L"album") {
-					Album = tagValue;
+				}
+			},
+			[&](const CStringW& tagValue) {
+				if (!tagValue.IsEmpty()) {
+					if (tagKey == L"cuesheet") {
+						std::list<Chapters> ChaptersList;
+						CString sTitle, sPerformer;
+						if (ParseCUESheet(tagValue, ChaptersList, sTitle, sPerformer)) {
+							if (!sTitle.IsEmpty() && Title.IsEmpty()) {
+								Title = sTitle;
+							}
+							if (!sPerformer.IsEmpty() && Artist.IsEmpty()) {
+								Artist = sPerformer;
+							}
+
+							if (CComQIPtr<IDSMChapterBag> pCB = pBF) {
+								pCB->ChapRemoveAll();
+								for (const auto& cp : ChaptersList) {
+									pCB->ChapAppend(cp.rt, cp.name);
+								}
+							}
+						}
+					} else if (tagKey == L"artist") {
+						Artist = tagValue;
+					} else if (tagKey == L"comment") {
+						Comment = tagValue;
+					} else if (tagKey == L"title") {
+						Title = tagValue;
+					} else if (tagKey == L"year") {
+						Year = tagValue;
+					} else if (tagKey == L"album") {
+						Album = tagValue;
+					}
 				}
 			}
-		}
+		}, value);
 	}
 
 	if (CComQIPtr<IDSMPropertyBag> pPB = pBF) {
