@@ -218,7 +218,8 @@ public:
 		AC4,
 		AES3,
 		AVS3,
-		VVC
+		VVC,
+		AV1
 	};
 
 	enum stream_type {

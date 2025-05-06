@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2024 see Authors.txt
+ * (C) 2012-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1444,7 +1444,7 @@ namespace AV1Parser {
 
 		gb.BitRead(1); // film_grain_params_present
 
-		return true;
+		return gb.RemainingSize() == 0;
 	};
 
 	static int64_t ParseOBUHeader(const BYTE* buf, const int buf_size, int64_t& obu_size, int& start_pos, uint8_t& obu_type)
@@ -1493,7 +1493,7 @@ namespace AV1Parser {
 		return ParseOBUHeader(buf, buf_size, obu_size, start_pos, obu_type);
 	}
 
-	bool ParseOBU(const BYTE* data, int size, AV1SequenceParameters& seq_params, std::vector<uint8_t>& obu_sequence_header)
+	bool ParseOBU(const BYTE* data, int size, AV1SequenceParameters& seq_params, std::vector<uint8_t>& obu_sequence_header, bool bCheckOnlySequenceHeader/* = false*/)
 	{
 		const BYTE* seq = nullptr;
 		int seq_size = 0;
@@ -1522,7 +1522,7 @@ namespace AV1Parser {
 				b_frame_found = true;
 			}
 
-			if (seq && b_frame_found) {
+			if (seq && (b_frame_found || bCheckOnlySequenceHeader)) {
 				break;
 			}
 
@@ -1530,7 +1530,7 @@ namespace AV1Parser {
 			buf += len;
 		}
 
-		if (seq && b_frame_found) {
+		if (seq && (b_frame_found || bCheckOnlySequenceHeader)) {
 			auto ret = ParseSequenceHeader(seq_params, seq, seq_size);
 			if (ret) {
 				obu_sequence_header.resize(seq_obu_size);

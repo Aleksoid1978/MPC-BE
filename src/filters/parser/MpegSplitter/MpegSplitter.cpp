@@ -302,6 +302,8 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 			DWORD CodecType = pVideoInfo2->bmiHeader.biCompression;
 			if (CodecType == FCC('WVC1')) {
 				Infos.emplace_back(L"VC-1");
+			} else if (CodecType == FCC('AV01')) {
+				Infos.emplace_back(L"AV1");
 			} else if (CodecType) {
 				WCHAR Temp[5];
 				memset(Temp, 0, sizeof(Temp));

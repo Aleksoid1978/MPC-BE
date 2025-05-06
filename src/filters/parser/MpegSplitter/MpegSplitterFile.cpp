@@ -26,6 +26,7 @@
 #include "../BaseSplitter/TimecodeAnalyzer.h"
 #include "DSUtil/AudioParser.h"
 #include "DSUtil/MP4AudioDecoderConfig.h"
+#include "DSUtil/BitsWriter.h"
 
 #include <libavutil/pixfmt.h>
 
@@ -818,6 +819,7 @@ void CMpegSplitterFile::SearchStreams(const __int64 start, const __int64 stop, c
 #define AES3_AUDIO        (1ULL << 17)
 #define AVS3_VIDEO        (1ULL << 18)
 #define VVC_VIDEO         (1ULL << 19)
+#define AV1_VIDEO         (1ULL << 20)
 
 #define PES_STREAM_TYPE_ANY (MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB | TELETEXT_SUB | DTS_EXPRESS_AUDIO)
 
@@ -879,6 +881,8 @@ static const struct StreamType {
 	{ VIDEO_STREAM_AVS3,					AVS3_VIDEO  },
 	// VVC Video
 	{ VIDEO_STREAM_VVC,						VVC_VIDEO   },
+	// AV1 Video
+	{ PES_PRIVATE,							AV1_VIDEO   },
 };
 
 static const struct {
@@ -1100,6 +1104,56 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 			auto& vvc = vvc_streams[s];
 			if (!m_streams[stream_type::video].Find(s) && Read(vvc.h, len, vvc.pData, &s.mt)) {
 				s.codec = stream_codec::VVC;
+				type = stream_type::video;
+			}
+		}
+
+		// AV1 Video
+		if (type == stream_type::unknown && (stream_type & AV1_VIDEO) && m_type == MPEG_TYPES::mpeg_ts) {
+			Seek(start);
+
+			std::vector<BYTE> buffer(len);
+			ByteRead(buffer.data(), len);
+			AV1Parser::AV1SequenceParameters seq_params;
+			std::vector<uint8_t> obu_sequence_header;
+			if (AV1Parser::ParseOBU(buffer.data(), buffer.size(), seq_params, obu_sequence_header, true)) {
+				s.mt.SetTemporalCompression(TRUE);
+				s.mt.SetVariableSize();
+				s.mt.majortype = MEDIATYPE_Video;
+				s.mt.subtype = MEDIASUBTYPE_AV01;
+				s.mt.formattype = FORMAT_VIDEOINFO2;
+
+				VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)s.mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2) + 4 + obu_sequence_header.size());
+				memset(vih2, 0, s.mt.FormatLength());
+				vih2->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+				vih2->bmiHeader.biWidth = seq_params.width;
+				vih2->bmiHeader.biHeight = seq_params.height;
+				vih2->bmiHeader.biPlanes = 1;
+				vih2->bmiHeader.biBitCount = 24;
+				vih2->bmiHeader.biCompression = FCC('AV01');
+				vih2->bmiHeader.biSizeImage = DIBSIZE(vih2->bmiHeader);
+				vih2->dwInterlaceFlags = 0;
+				vih2->rcSource = vih2->rcTarget = { 0, 0, (LONG)seq_params.width, (LONG)seq_params.height };
+
+				BYTE* extra = (BYTE*)(vih2 + 1);
+
+				CBitsWriter bw(extra, 4);
+				bw.writeBits(1, 1); // marker
+				bw.writeBits(7, 1); // version
+				bw.writeBits(3, seq_params.profile);
+				bw.writeBits(5, seq_params.level);
+				bw.writeBits(1, seq_params.tier);
+				bw.writeBits(1, seq_params.bitdepth > 8);
+				bw.writeBits(1, seq_params.bitdepth == 12);
+				bw.writeBits(1, seq_params.monochrome);
+				bw.writeBits(1, seq_params.chroma_subsampling_x);
+				bw.writeBits(1, seq_params.chroma_subsampling_y);
+				bw.writeBits(2, seq_params.chroma_sample_position);
+				bw.writeBits(8, 0); // padding
+
+				memcpy(extra + 4, obu_sequence_header.data(), obu_sequence_header.size());
+
+				s.codec = stream_codec::AV1;
 				type = stream_type::video;
 			}
 		}
