@@ -25,6 +25,7 @@
 #include "AviFile.h"
 #include "AviSplitter.h"
 #include "DSUtil/GolombBuffer.h"
+#include "DSUtil/BitsWriter.h"
 
 extern "C" {
 #include <libavutil/pixfmt.h>
@@ -472,6 +473,53 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (mts.size() == 1) {
 						CBaseSplitterFileEx::avchdr h;
 						ParseHeader(h, m_pFile.get(), s, mts, AvgTimePerFrame, headerAspect);
+					}
+					break;
+				case FCC('AV01'): {
+						__int64 pos = m_pFile->GetPos();
+						if (s->cs.size()) {
+							__int64 pos = m_pFile->GetPos();
+							for (size_t i = 0; i < s->cs.size() - 1; i++) {
+								if (s->cs[i].orgsize > 8) {
+									m_pFile->Seek(s->cs[i].filepos);
+									DWORD id = 0;
+									DWORD size = 0;
+									if (S_OK != m_pFile->ReadAvi(id) || id == 0 || S_OK != m_pFile->ReadAvi(size)) {
+										break;
+									}
+									std::vector<BYTE> pData(size);
+									if (S_OK == m_pFile->ByteRead(pData.data(), pData.size())) {
+										AV1Parser::AV1SequenceParameters seq_params;
+										std::vector<uint8_t> obu_sequence_header;
+										if (AV1Parser::ParseOBU(pData.data(), pData.size(), seq_params, obu_sequence_header)) {
+											pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + 4 + obu_sequence_header.size());
+											BYTE* extra = (BYTE*)(pvih + 1);
+
+											CBitsWriter bw(extra, 4);
+											bw.writeBits(1, 1); // marker
+											bw.writeBits(7, 1); // version
+											bw.writeBits(3, seq_params.profile);
+											bw.writeBits(5, seq_params.level);
+											bw.writeBits(1, seq_params.tier);
+											bw.writeBits(1, seq_params.bitdepth > 8);
+											bw.writeBits(1, seq_params.bitdepth == 12);
+											bw.writeBits(1, seq_params.monochrome);
+											bw.writeBits(1, seq_params.chroma_subsampling_x);
+											bw.writeBits(1, seq_params.chroma_subsampling_y);
+											bw.writeBits(2, seq_params.chroma_sample_position);
+											bw.writeBits(8, 0); // padding
+
+											memcpy(extra + 4, obu_sequence_header.data(), obu_sequence_header.size());
+
+											mts.insert(mts.cbegin(), mt);
+										}
+									}
+
+									break;
+								}
+							}
+						}
+						m_pFile->Seek(pos);
 					}
 					break;
 				case FCC('VP90'): {
