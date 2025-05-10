@@ -1178,11 +1178,17 @@ static int hls_slice_header(SliceHeader *sh, const HEVCContext *s, GetBitContext
     }
 
     ret = get_bits1(gb);
-    if (!ret) {
+    if (!ret && get_bits_left(gb) >= 0) {
         av_log(s->avctx, AV_LOG_ERROR, "alignment_bit_equal_to_one=0\n");
         return AVERROR_INVALIDDATA;
     }
     sh->data_offset = align_get_bits(gb) - gb->buffer;
+
+    if (get_bits_left(gb) < 0) {
+        av_log(s->avctx, AV_LOG_ERROR,
+               "Overread slice header by %d bits\n", -get_bits_left(gb));
+        return AVERROR_INVALIDDATA;
+    }
 
     // Inferred parameters
     sh->slice_qp = 26U + pps->pic_init_qp_minus26 + sh->slice_qp_delta;
@@ -1201,12 +1207,6 @@ static int hls_slice_header(SliceHeader *sh, const HEVCContext *s, GetBitContext
     if (sh->dependent_slice_segment_flag &&
         (!sh->slice_ctb_addr_rs || !pps->ctb_addr_rs_to_ts[sh->slice_ctb_addr_rs])) {
         av_log(s->avctx, AV_LOG_ERROR, "Impossible slice segment.\n");
-        return AVERROR_INVALIDDATA;
-    }
-
-    if (get_bits_left(gb) < 0) {
-        av_log(s->avctx, AV_LOG_ERROR,
-               "Overread slice header by %d bits\n", -get_bits_left(gb));
         return AVERROR_INVALIDDATA;
     }
 
