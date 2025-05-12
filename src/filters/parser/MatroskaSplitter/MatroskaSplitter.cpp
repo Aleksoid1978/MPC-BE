@@ -1092,19 +1092,27 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									return VPX_SUBSAMPLING_420_VERTICAL;
 								};
 
-								auto vpx_chroma_subsampling =
-									get_vpx_chroma_subsampling(static_cast<AVPixelFormat>(m_pix_fmt), static_cast<AVChromaLocation>(m_ColorSpace->ChromaLocation));
-
 								memcpy(extra, "vpcC", 4);
 								// use code from LAV
 								AV_WB8(extra + 4, 1); // version
 								AV_WB24(extra + 5, 0); // flags
 								AV_WB8(extra + 8, m_profile);
 								AV_WB8(extra + 9, 0);
-								AV_WB8(extra + 10, m_bits << 4 | vpx_chroma_subsampling << 1 | (m_ColorSpace ? m_ColorSpace->Range == AVCOL_RANGE_JPEG : 0));
-								AV_WB8(extra + 11, m_ColorSpace ? m_ColorSpace->Primaries : AVCOL_PRI_UNSPECIFIED);
-								AV_WB8(extra + 12, m_ColorSpace ? m_ColorSpace->TransferCharacteristics : AVCOL_TRC_UNSPECIFIED);
-								AV_WB8(extra + 13, m_ColorSpace ? m_ColorSpace->MatrixCoefficients : AVCOL_SPC_UNSPECIFIED);
+								if (m_ColorSpace) {
+									AV_WB8(extra + 10, m_bits << 4
+										| get_vpx_chroma_subsampling((AVPixelFormat)m_pix_fmt, (AVChromaLocation)m_ColorSpace->ChromaLocation) << 1
+										| (m_ColorSpace->Range == AVCOL_RANGE_JPEG));
+									AV_WB8(extra + 11, m_ColorSpace->Primaries);
+									AV_WB8(extra + 12, m_ColorSpace->TransferCharacteristics);
+									AV_WB8(extra + 13, m_ColorSpace->MatrixCoefficients);
+								} else {
+									AV_WB8(extra + 10, m_bits << 4
+										| get_vpx_chroma_subsampling((AVPixelFormat)m_pix_fmt, AVCHROMA_LOC_UNSPECIFIED) << 1
+										| 0);
+									AV_WB8(extra + 11, AVCOL_PRI_UNSPECIFIED);
+									AV_WB8(extra + 12, AVCOL_TRC_UNSPECIFIED);
+									AV_WB8(extra + 13, AVCOL_SPC_UNSPECIFIED);
+								}
 								AV_WB16(extra + 14, 0); // no codec init data
 
 								mts.insert(mts.cbegin(), mt);
