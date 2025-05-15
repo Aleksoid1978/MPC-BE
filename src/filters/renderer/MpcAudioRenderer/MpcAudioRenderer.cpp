@@ -2064,6 +2064,18 @@ again:
 									}
 								}
 							}
+						} else {
+							if (!m_bUseDefaultDevice) {
+								DLog(L"CMpcAudioRenderer::CheckAudioClient() - InitAudioClient() failed: (0x%08x), trying default", hr);
+
+								ReleaseAudio(true);
+								bForceUseDefaultDevice = TRUE;
+
+								goto again;
+							}
+
+							DLog(L"CMpcAudioRenderer::CheckAudioClient() - InitAudioClient() failed: (0x%08x)", hr);
+							return hr;
 						}
 					}
 
