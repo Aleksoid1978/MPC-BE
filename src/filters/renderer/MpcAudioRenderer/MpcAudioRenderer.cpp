@@ -2463,18 +2463,18 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 		WasapiFlush();
 	}
 
-	auto GetAudioPosition = [&] {
-		UINT64 deviceClockFrequency, deviceClockPosition;
-		if (SUCCEEDED(m_pAudioClock->GetFrequency(&deviceClockFrequency))
-				&& SUCCEEDED(m_pAudioClock->GetPosition(&deviceClockPosition, nullptr))) {
-			return llMulDiv(deviceClockPosition, UNITS, deviceClockFrequency, 0);
-		}
-
-		return 0LL;
-	};
-
 	m_rtEstimateSlavingJitter = 0;
-	if (m_filterState == State_Running) {
+	if (m_filterState == State_Running && m_pAudioClock) {
+		auto GetAudioPosition = [&] {
+			UINT64 deviceClockFrequency, deviceClockPosition;
+			if (SUCCEEDED(m_pAudioClock->GetFrequency(&deviceClockFrequency))
+				&& SUCCEEDED(m_pAudioClock->GetPosition(&deviceClockPosition, nullptr))) {
+				return llMulDiv(deviceClockPosition, UNITS, deviceClockFrequency, 0);
+			}
+
+			return 0LL;
+		};
+
 		if (!m_bReleased) {
 			m_rtEstimateSlavingJitter = m_rtLastReceivedSampleTimeEnd - (m_pSyncClock->GetPrivateTime() - m_rtStartTime) + GetAudioPosition();
 			if (m_rtEstimateSlavingJitter < 0 || m_rtEstimateSlavingJitter > UNITS) {
