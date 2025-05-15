@@ -785,11 +785,11 @@ void CAppSettings::ResetSettings()
 	strLastOpenFilterDir.Empty();
 
 	bYoutubePageParser   = true;
-	YoutubeFormat.vfmt   = Youtube::y_mp4_avc;
+	YoutubeFormat.vfmt   = Youtube::y_webm_vp9;
 	YoutubeFormat.res    = 720;
 	YoutubeFormat.fps60  = false;
 	YoutubeFormat.hdr    = false;
-	YoutubeFormat.afmt   = Youtube::y_mp4_aac;
+	YoutubeFormat.afmt   = Youtube::y_webm_opus;
 	strYoutubeAudioLang  = CPPageYoutube::GetDefaultLanguageCode();
 	bYoutubeLoadPlaylist = false;
 
