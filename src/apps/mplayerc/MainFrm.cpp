@@ -12231,9 +12231,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			pOFD->subs = m_lastOMD->subs;
 
 			if (it->profile->type == Youtube::y_audio) {
-				m_youtubeFields.fname.Format(L"%s.%s", m_youtubeFields.title.GetString(), it->profile->ext.GetString());
+				m_youtubeFields.fname.Format(L"%s.%s", m_youtubeFields.title.GetString(), it->profile->ext);
 			} else {
-				m_youtubeFields.fname.Format(L"%s.%dp.%s", m_youtubeFields.title.GetString(), it->profile->quality, it->profile->ext.GetString());
+				m_youtubeFields.fname.Format(L"%s.%dp.%s", m_youtubeFields.title.GetString(), it->profile->quality, it->profile->ext);
 			}
 			FixFilename(m_youtubeFields.fname);
 		}

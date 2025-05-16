@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2024 see Authors.txt
+ * (C) 2012-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -54,7 +54,7 @@ namespace Youtube
 		yformat format;
 		ytype   type;
 		int     quality;
-		CString ext;
+		LPCWSTR ext;
 		bool    fps60;
 		bool    hdr;
 	};
