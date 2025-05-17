@@ -58,7 +58,6 @@
 #include "mpegvideodec.h"
 #include "profiles.h"
 #include "startcode.h"
-#include "thread.h"
 
 #define A53_MAX_CC_COUNT 2000
 
@@ -81,8 +80,7 @@ typedef struct Mpeg1Context {
     int has_afd;
     int slice_count;
     unsigned aspect_ratio_info;
-    AVRational save_aspect;
-    int save_width, save_height, save_progressive_seq;
+    int save_width, save_height, save_progressive_seq, save_chroma_format;
     AVRational frame_rate_ext;  /* MPEG-2 specific framerate modificator */
     unsigned frame_rate_index;
     int sync;                   /* Did we reach a sync point like a GOP/SEQ/KEYFrame? */
@@ -816,28 +814,6 @@ static av_cold int mpeg_decode_init(AVCodecContext *avctx)
     return 0;
 }
 
-#if HAVE_THREADS
-static int mpeg_decode_update_thread_context(AVCodecContext *avctx,
-                                             const AVCodecContext *avctx_from)
-{
-    Mpeg1Context *ctx = avctx->priv_data, *ctx_from = avctx_from->priv_data;
-    MpegEncContext *s = &ctx->mpeg_enc_ctx, *s1 = &ctx_from->mpeg_enc_ctx;
-    int err;
-
-    if (avctx == avctx_from || !s1->context_initialized)
-        return 0;
-
-    err = ff_mpeg_update_thread_context(avctx, avctx_from);
-    if (err)
-        return err;
-
-    if (!s->context_initialized)
-        memcpy(s + 1, s1 + 1, sizeof(Mpeg1Context) - sizeof(MpegEncContext));
-
-    return 0;
-}
-#endif
-
 static const enum AVPixelFormat mpeg1_hwaccel_pixfmt_list_420[] = {
 #if CONFIG_MPEG1_NVDEC_HWACCEL
     AV_PIX_FMT_CUDA,
@@ -971,7 +947,7 @@ static int mpeg_decode_postinit(AVCodecContext *avctx)
         avctx->coded_height      != s->height               ||
         s1->save_width           != s->width                ||
         s1->save_height          != s->height               ||
-        av_cmp_q(s1->save_aspect, s->avctx->sample_aspect_ratio) ||
+        s1->save_chroma_format   != s->chroma_format        ||
         (s1->save_progressive_seq != s->progressive_sequence && FFALIGN(s->height, 16) != FFALIGN(s->height, 32)) ||
         0) {
         if (s->context_initialized)
@@ -988,10 +964,10 @@ static int mpeg_decode_postinit(AVCodecContext *avctx)
                    (s1->bit_rate != 0x3FFFF*400 || s1->vbv_delay != 0xFFFF)) {
             avctx->bit_rate = s1->bit_rate;
         }
-        s1->save_aspect          = s->avctx->sample_aspect_ratio;
         s1->save_width           = s->width;
         s1->save_height          = s->height;
         s1->save_progressive_seq = s->progressive_sequence;
+        s1->save_chroma_format   = s->chroma_format;
 
         /* low_delay may be forced, in this case we will have B-frames
          * that behave like P-frames. */
@@ -1351,9 +1327,6 @@ static int mpeg_field_start(Mpeg1Context *s1, const uint8_t *buf, int buf_size)
                 *sd->data = s1->afd;
             s1->has_afd = 0;
         }
-
-        if (HAVE_THREADS && (avctx->active_thread_type & FF_THREAD_FRAME))
-            ff_thread_finish_setup(avctx);
     } else { // second field
         second_field = 1;
         if (!s->cur_pic.ptr) {
@@ -1558,7 +1531,6 @@ static int mpeg_decode_slice(MpegEncContext *s, int mb_y,
             int left;
 
             ff_mpeg_draw_horiz_band(s, mb_size * (s->mb_y >> field_pic), mb_size);
-            ff_mpv_report_decode_progress(s);
 
             s->mb_x  = 0;
             s->mb_y += 1 << field_pic;
@@ -2699,7 +2671,6 @@ const FFCodec ff_mpeg1video_decoder = {
     .caps_internal         = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM,
     .flush                 = flush,
     .p.max_lowres          = 3,
-    UPDATE_THREAD_CONTEXT(mpeg_decode_update_thread_context),
     .hw_configs            = (const AVCodecHWConfigInternal *const []) {
 #if CONFIG_MPEG1_NVDEC_HWACCEL
                                HWACCEL_NVDEC(mpeg1),

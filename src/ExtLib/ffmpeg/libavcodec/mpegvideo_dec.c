@@ -80,36 +80,19 @@ int ff_mpeg_update_thread_context(AVCodecContext *dst,
 {
     MpegEncContext *const s1 = src->priv_data;
     MpegEncContext *const s  = dst->priv_data;
-    int ret;
+    int ret = 0;
 
     if (dst == src)
         return 0;
 
     av_assert0(s != s1);
 
-    // FIXME can parameters change on I-frames?
-    // in that case dst may need a reinit
-    if (!s->context_initialized) {
-        void *private_ctx = s->private_ctx;
-        int err;
-        memcpy(s, s1, sizeof(*s));
-
-        s->context_initialized   = 0;
-        s->context_reinit        = 0;
-        s->avctx                 = dst;
-        s->private_ctx           = private_ctx;
-
-        if (s1->context_initialized) {
-            if ((err = ff_mpv_common_init(s)) < 0)
-                return err;
-        }
-    }
-
     if (s->height != s1->height || s->width != s1->width || s->context_reinit) {
         s->height = s1->height;
         s->width  = s1->width;
         if ((ret = ff_mpv_common_frame_size_change(s)) < 0)
             return ret;
+        ret = 1;
     }
 
     s->quarter_sample       = s1->quarter_sample;
@@ -139,7 +122,7 @@ int ff_mpeg_update_thread_context(AVCodecContext *dst,
     memcpy(&s->progressive_sequence, &s1->progressive_sequence,
            (char *) &s1->first_field + sizeof(s1->first_field) - (char *) &s1->progressive_sequence);
 
-    return 0;
+    return ret;
 }
 
 av_cold int ff_mpv_decode_close(AVCodecContext *avctx)

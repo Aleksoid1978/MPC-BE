@@ -81,6 +81,15 @@ int ff_vvc_intra_luma_mpm_remainder(VVCLocalContext *lc);
 int ff_vvc_cclm_mode_flag(VVCLocalContext *lc);
 int ff_vvc_cclm_mode_idx(VVCLocalContext *lc);
 int ff_vvc_intra_chroma_pred_mode(VVCLocalContext *lc);
+int ff_vvc_palette_predictor_run(VVCLocalContext *lc);
+int ff_vvc_num_signalled_palette_entries(VVCLocalContext *lc);
+int ff_vvc_new_palette_entries(VVCLocalContext *lc, int bit_dpeth);
+bool ff_vvc_palette_escape_val_present_flag(VVCLocalContext *lc);
+bool ff_vvc_palette_transpose_flag(VVCLocalContext *lc);
+bool ff_vvc_run_copy_flag(VVCLocalContext *lc, int prev_run_type, int prev_run_position, int cur_pos);
+bool ff_vvc_copy_above_palette_indices_flag(VVCLocalContext *lc);
+int ff_vvc_palette_idx_idc(VVCLocalContext *lc, int max_palette_index, bool adjust);
+int ff_vvc_palette_escape_val(VVCLocalContext *lc);
 
 //inter
 int ff_vvc_general_merge_flag(VVCLocalContext *lc);
@@ -111,6 +120,7 @@ int ff_vvc_bcw_idx(VVCLocalContext *lc, int no_backward_pred_flag);
 int ff_vvc_tu_cb_coded_flag(VVCLocalContext *lc);
 int ff_vvc_tu_cr_coded_flag(VVCLocalContext *lc, int tu_cb_coded_flag);
 int ff_vvc_tu_y_coded_flag(VVCLocalContext *lc);
+int ff_vvc_cu_act_enabled_flag(VVCLocalContext *lc);
 int ff_vvc_cu_chroma_qp_offset_flag(VVCLocalContext *lc);
 int ff_vvc_cu_chroma_qp_offset_idx(VVCLocalContext *lc);
 int ff_vvc_tu_joint_cbcr_residual_flag(VVCLocalContext *lc, int tu_cb_coded_flag, int tu_cr_coded_flag);

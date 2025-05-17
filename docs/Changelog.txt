@@ -9,7 +9,7 @@ Updated Bulgarian translation (by jekovcar).
 Updated Romanian translation (by Andrei Miloiu).
 
 Updated libraries:
-	ffmpeg n7.2-dev-2296-g4e5523c985.
+	ffmpeg n7.2-dev-2411-ga65d028fb1.
 
 
 1.8.4 - 2025-04-19

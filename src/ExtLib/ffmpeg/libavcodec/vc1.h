@@ -314,10 +314,6 @@ typedef struct VC1Context{
     uint8_t numpanscanwin;
     uint8_t tfcntr;
     uint8_t rptfrm, tff, rff;
-    uint16_t topleftx;
-    uint16_t toplefty;
-    uint16_t bottomrightx;
-    uint16_t bottomrighty;
     uint8_t uvsamp;
     uint8_t postproc;
     int hrd_num_leaky_buckets;
@@ -365,7 +361,6 @@ typedef struct VC1Context{
     int cur_field_type;     ///< 0: top, 1: bottom
     int ref_field_type[2];  ///< forward and backward reference field type (top or bottom)
     int blocks_off, mb_off;
-    int qs_last;            ///< if qpel has been used in the previous (tr.) picture
     int bmvtype;
     int frfd, brfd;         ///< reference frame distance (forward or backward)
     int first_pic_header_flag;

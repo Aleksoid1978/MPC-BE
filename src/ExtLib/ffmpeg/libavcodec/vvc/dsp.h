@@ -106,7 +106,7 @@ struct VVCLocalContext;
 
 typedef struct VVCIntraDSPContext {
     void (*intra_cclm_pred)(const struct VVCLocalContext *lc, int x0, int y0, int w, int h);
-    void (*lmcs_scale_chroma)(struct VVCLocalContext *lc, int *dst, const int *coeff, int w, int h, int x0_cu, int y0_cu);
+    void (*lmcs_scale_chroma)(struct VVCLocalContext *lc, int *coeff, int w, int h, int x0_cu, int y0_cu);
     void (*intra_pred)(const struct VVCLocalContext *lc, int x0, int y0, int w, int h, int c_idx);
     void (*pred_planar)(uint8_t *src, const uint8_t *top, const uint8_t *left, int w, int h, ptrdiff_t stride);
     void (*pred_mip)(uint8_t *src, const uint8_t *top, const uint8_t *left, int w, int h, ptrdiff_t stride,
@@ -122,11 +122,12 @@ typedef struct VVCIntraDSPContext {
 
 typedef struct VVCItxDSPContext {
     void (*add_residual)(uint8_t *dst, const int *res, int width, int height, ptrdiff_t stride);
-    void (*add_residual_joint)(uint8_t *dst, const int *res, int width, int height, ptrdiff_t stride, int c_sign, int shift);
-    void (*pred_residual_joint)(int *buf, int width, int height, int c_sign, int shift);
+    void (*pred_residual_joint)(int *dst, const int *src, int width, int height, int c_sign, int shift);
 
     void (*itx[VVC_N_TX_TYPE][VVC_N_TX_SIZE])(int *coeffs, ptrdiff_t step, size_t nz);
     void (*transform_bdpcm)(int *coeffs, int width, int height, int vertical, int log2_transform_range);
+
+    void (*adaptive_color_transform)(int *y, int *u, int *v, int width, int height);
 } VVCItxDSPContext;
 
 typedef struct VVCLMCSDSPContext {

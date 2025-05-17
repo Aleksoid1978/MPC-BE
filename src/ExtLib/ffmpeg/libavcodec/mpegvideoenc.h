@@ -69,10 +69,15 @@ typedef struct MPVEncContext {
      */
     AVFrame *new_pic;
 
+    struct MPVMainEncContext *parent;
+
     FDCTDSPContext fdsp;
     MpegvideoEncDSPContext mpvencdsp;
     PixblockDSPContext pdsp;
     MotionEstContext me;
+
+    int f_code;                 ///< forward MV resolution
+    int b_code;                 ///< backward MV resolution for B-frames
 
     int16_t (*p_mv_table)[2];            ///< MV table (1MV per MB) P-frame
     int16_t (*b_forw_mv_table)[2];       ///< MV table (1MV per MB) forward mode B-frame
@@ -251,7 +256,7 @@ static inline const MPVMainEncContext *slice_to_mainenc(const MPVEncContext *s)
                !(s->c.avctx->codec->capabilities & AV_CODEC_CAP_SLICE_THREADS));
     return (const MPVMainEncContext*)s;
 #else
-    return s->c.encparent;
+    return s->parent;
 #endif
 }
 

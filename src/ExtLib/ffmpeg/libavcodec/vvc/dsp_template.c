@@ -45,32 +45,12 @@ static void FUNC(add_residual)(uint8_t *_dst, const int *res,
     }
 }
 
-static void FUNC(add_residual_joint)(uint8_t *_dst, const int *res,
-    const int w, const int h, const ptrdiff_t _stride, const int c_sign, const int shift)
-{
-    pixel *dst = (pixel *)_dst;
-
-    const int stride = _stride / sizeof(pixel);
-
-    for (int y = 0; y < h; y++) {
-        for (int x = 0; x < w; x++) {
-            const int r = ((*res) * c_sign) >> shift;
-            dst[x] = av_clip_pixel(dst[x] + r);
-            res++;
-        }
-        dst += stride;
-    }
-}
-
-static void FUNC(pred_residual_joint)(int *buf, const int w, const int h,
+static void FUNC(pred_residual_joint)(int *dst, const int *src, const int w, const int h,
     const int c_sign, const int shift)
 {
-    for (int y = 0; y < h; y++) {
-        for (int x = 0; x < w; x++) {
-            *buf = ((*buf) * c_sign) >> shift;
-            buf++;
-        }
-    }
+    const int size = w * h;
+    for (int i = 0; i < size; i++)
+        dst[i] = (src[i] * c_sign) >> shift;
 }
 
 static void FUNC(transform_bdpcm)(int *coeffs, const int width, const int height,
@@ -94,6 +74,24 @@ static void FUNC(transform_bdpcm)(int *coeffs, const int width, const int height
     }
 }
 
+// 8.7.4.6 Residual modification process for blocks using colour space conversion
+static void FUNC(adaptive_color_transform)(int *y, int *u, int *v, const int width, const int height)
+{
+    const int size = width * height;
+    const int bits = BIT_DEPTH + 1;
+
+    for (int i = 0; i < size; i++) {
+        const int y0 = av_clip_intp2(y[i], bits);
+        const int cg = av_clip_intp2(u[i], bits);
+        const int co = av_clip_intp2(v[i], bits);
+        const int t  = y0 - (cg >> 1);
+
+        y[i] = cg + t;
+        u[i] = t - (co >> 1);
+        v[i] = co + u[i];
+    }
+}
+
 static void FUNC(ff_vvc_itx_dsp_init)(VVCItxDSPContext *const itx)
 {
 #define VVC_ITX(TYPE, type, s)                                                  \
@@ -106,7 +104,6 @@ static void FUNC(ff_vvc_itx_dsp_init)(VVCItxDSPContext *const itx)
         VVC_ITX(TYPE, type, 32);
 
     itx->add_residual                = FUNC(add_residual);
-    itx->add_residual_joint          = FUNC(add_residual_joint);
     itx->pred_residual_joint         = FUNC(pred_residual_joint);
     itx->transform_bdpcm             = FUNC(transform_bdpcm);
     VVC_ITX(DCT2, dct2, 2)
@@ -114,6 +111,8 @@ static void FUNC(ff_vvc_itx_dsp_init)(VVCItxDSPContext *const itx)
     VVC_ITX_COMMON(DCT2, dct2)
     VVC_ITX_COMMON(DCT8, dct8)
     VVC_ITX_COMMON(DST7, dst7)
+
+    itx->adaptive_color_transform = FUNC(adaptive_color_transform);
 
 #undef VVC_ITX
 #undef VVC_ITX_COMMON

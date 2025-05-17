@@ -919,6 +919,8 @@ SRCS_ASM_LC = \
 	libavcodec/x86/xvididct.asm \
 	\
 	libavcodec/x86/h26x/h2656_inter.asm \
+	libavcodec/x86/h26x/h2656_sao.asm \
+	libavcodec/x86/h26x/h2656_sao_10bit.asm \
 	\
 	libavcodec/x86/hevc/add_res.asm \
 	libavcodec/x86/hevc/deblock.asm \
