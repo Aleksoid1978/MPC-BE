@@ -1,5 +1,5 @@
 /*
- * (C) 2023-2024 see Authors.txt
+ * (C) 2023-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -390,8 +390,8 @@ void CSaveTaskDlg::SaveHTTP(const int iSubLangDefault)
 		const CStringW finalext = GetFileExt(finalfile).Mid(1).MakeLower();
 		const CStringW tmpfile  = finalfile + L".tmp";
 		const CStringW format =
-			(finalext == L"m4a") ? CStringW(L"mp4") :
-			(finalext == L"mka") ? CStringW(L"matroska") :
+			(finalext == L"m4a")                       ? L"mp4" :
+			(finalext == L"mka" || finalext == L"mkv") ? L"matroska" :
 			finalext;
 
 		CStringW strArgs = L"-y";
