@@ -128,16 +128,18 @@ namespace Youtube
 
 	static CStringA GetEntry(LPCSTR pszBuff, LPCSTR pszMatchStart, LPCSTR pszMatchEnd)
 	{
-		LPCSTR pStart = CStringA::StrTraits::StringFindString(pszBuff, pszMatchStart);
-		if (pStart) {
-			pStart += CStringA::StrTraits::SafeStringLen(pszMatchStart);
+		if (pszBuff) {
+			LPCSTR pStart = CStringA::StrTraits::StringFindString(pszBuff, pszMatchStart);
+			if (pStart) {
+				pStart += CStringA::StrTraits::SafeStringLen(pszMatchStart);
 
-			LPCSTR pEnd = CStringA::StrTraits::StringFindString(pStart, pszMatchEnd);
-			if (pEnd) {
-				return CStringA(pStart, pEnd - pStart);
-			} else {
-				pEnd = pszBuff + CStringA::StrTraits::SafeStringLen(pszBuff);
-				return CStringA(pStart, pEnd - pStart);
+				LPCSTR pEnd = CStringA::StrTraits::StringFindString(pStart, pszMatchEnd);
+				if (pEnd) {
+					return CStringA(pStart, pEnd - pStart);
+				} else {
+					pEnd = pszBuff + CStringA::StrTraits::SafeStringLen(pszBuff);
+					return CStringA(pStart, pEnd - pStart);
+				}
 			}
 		}
 
@@ -728,7 +730,9 @@ namespace Youtube
 		const auto& s = AfxGetAppSettings();
 
 		urlData data;
-		URLReadData(url.GetString(), data);
+		if (!URLReadData(url.GetString(), data)) {
+			return false;
+		}
 
 		pOFD->rtStart = rtStart;
 
