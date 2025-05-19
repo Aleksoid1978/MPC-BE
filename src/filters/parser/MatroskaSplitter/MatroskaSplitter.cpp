@@ -2432,11 +2432,11 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 					break;
 				}
 			}
-		} while (m_pBlock->NextBlock() && SUCCEEDED(hr) && !CheckRequest(nullptr));
+		} while (m_pBlock->NextBlock() && SUCCEEDED(hr) && !CheckRequest(nullptr) && SUCCEEDED(m_pFile->GetLastReadError()));
 
 		m_pBlock.reset();
 	} while (m_pFile->GetPos() < (__int64)(m_pFile->m_segment.pos + m_pFile->m_segment.len)
-			 && m_pCluster->Next(true) && SUCCEEDED(hr) && !CheckRequest(nullptr));
+			 && m_pCluster->Next(true) && SUCCEEDED(hr) && !CheckRequest(nullptr) && SUCCEEDED(m_pFile->GetLastReadError()));
 
 	m_pCluster.reset();
 
