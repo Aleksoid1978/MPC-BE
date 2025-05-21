@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2024 see Authors.txt
+ * (C) 2016-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -288,6 +288,17 @@ bool StrToInt32(const wchar_t* str, int32_t& value)
 {
 	wchar_t* end;
 	int32_t v = wcstol(str, &end, 10);
+	if (end > str) {
+		value = v;
+		return true;
+	}
+	return false;
+}
+
+bool StrToInt32(const char* str, int32_t& value)
+{
+	char* end;
+	int32_t v = strtol(str, &end, 10);
 	if (end > str) {
 		value = v;
 		return true;

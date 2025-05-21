@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2024 see Authors.txt
+ * (C) 2016-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -103,6 +103,7 @@ bool AngleStep90(int& angle);
 // Functions to convert strings to numeric values. On error, the current value does not change and false is returned.
 
 bool StrToInt32(const wchar_t* str, int32_t& value);
+bool StrToInt32(const char* str, int32_t& value);
 bool StrToUInt32(const wchar_t* str, uint32_t& value);
 bool StrToInt64(const wchar_t* str, int64_t& value);
 bool StrToUInt64(const wchar_t* str, uint64_t& value);

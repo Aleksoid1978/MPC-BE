@@ -240,7 +240,12 @@ namespace YoutubeDL
 							profile->type = acodec == "none" ? Youtube::ytype::y_video : Youtube::ytype::y_media;
 							profile->ext = ext;
 							profile->quality = height;
-							profile->iTag = iTag++;
+
+							CStringA format_id = {};
+							if (getJsonValue(format, "format_id", format_id) && StrToInt32(format_id.GetString(), profile->iTag)) {
+							} else {
+								profile->iTag = iTag++;
+							}
 
 							Youtube::YoutubeUrllistItem item;
 							item.profile = profile;

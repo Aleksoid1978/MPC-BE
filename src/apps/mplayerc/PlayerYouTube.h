@@ -50,13 +50,13 @@ namespace Youtube
 	};
 
 	struct YoutubeProfile {
-		int     iTag;
-		yformat format;
-		ytype   type;
-		int     quality;
-		LPCWSTR ext;
-		bool    fps60;
-		bool    hdr;
+		int      iTag;
+		yformat  format;
+		ytype    type;
+		int      quality;
+		CStringW ext;
+		bool     fps60;
+		bool     hdr;
 	};
 
 	// MP4, WebM and 360p resolution or above only
