@@ -157,7 +157,9 @@ namespace YoutubeDL
 			rapidjson::Document d;
 			const int k = buf_out.Find("\n{\"id\": ", 64); // check presence of second JSON root element and ignore it
 			if (!d.Parse(buf_out.GetString(), k > 0 ? k : buf_out.GetLength()).HasParseError()) {
+				bool bIsYoutube = Youtube::CheckURL(url);
 				int iTag = 1;
+
 				if (auto formats = GetJsonArray(d, "formats")) {
 					int vid_height = 0;
 					bool bVideoOnly = false;
@@ -208,60 +210,73 @@ namespace YoutubeDL
 							CStringA acodec;
 							getJsonValue(format, "acodec", acodec);
 
-							auto profilePtr = std::make_unique<Youtube::YoutubeProfile>();
-							auto profile = profilePtr.get();
-							YoutubeProfiles.emplace_back(std::move(profilePtr));
+							Youtube::YoutubeUrllistItem item = {};
+							item.url = url;
+
+							CStringA format_id = {};
+							int itag = {};
+							if (bIsYoutube && getJsonValue(format, "format_id", format_id) && StrToInt32(format_id.GetString(), itag)) {
+								auto GetProfile = [](int iTag) -> const Youtube::YoutubeProfile* {
+									for (const auto& profile : Youtube::YProfiles) {
+										if (iTag == profile.iTag) {
+											return &profile;
+										}
+									}
+
+									return nullptr;
+								};
+
+								if (auto profile = GetProfile(itag)) {
+									item.profile = profile;
+								}
+							}
 
 							CString ext;
 							getJsonValue(format, "ext", ext);
 							CString fmt;
 							getJsonValue(format, "format", fmt);
 
-							profile->format = Youtube::yformat::y_mp4_other;
-							if (EndsWith(protocol, "m3u8") || EndsWith(protocol, "m3u8_native")) {
-								if (bIsLive && acodec == "none") {
-									continue;
-								}
-								profile->format = Youtube::yformat::y_stream;
-							} else if (ext == L"mp4") {
-								if (StartsWith(vcodec, "avc1")) {
-									profile->format = Youtube::yformat::y_mp4_avc;
-								}
-								else if (StartsWith(vcodec, "av01")) {
-									profile->format = Youtube::yformat::y_mp4_av1;
-								}
-								else {
-									profile->format = Youtube::yformat::y_mp4_other;
-								}
-							}
-							else if (ext == L"webm") {
-								profile->format = Youtube::yformat::y_webm_vp9;
-							}
-							profile->type = acodec == "none" ? Youtube::ytype::y_video : Youtube::ytype::y_media;
-							profile->ext = ext;
-							profile->quality = height;
+							if (!item.profile) {
+								auto profilePtr = std::make_unique<Youtube::YoutubeProfile>();
+								auto profile = profilePtr.get();
+								YoutubeProfiles.emplace_back(std::move(profilePtr));
 
-							CStringA format_id = {};
-							if (getJsonValue(format, "format_id", format_id) && StrToInt32(format_id.GetString(), profile->iTag)) {
-							} else {
+								profile->format = Youtube::yformat::y_mp4_other;
+								if (EndsWith(protocol, "m3u8") || EndsWith(protocol, "m3u8_native")) {
+									if (bIsLive && acodec == "none") {
+										continue;
+									}
+									profile->format = Youtube::yformat::y_stream;
+								} else if (ext == L"mp4") {
+									if (StartsWith(vcodec, "avc1")) {
+										profile->format = Youtube::yformat::y_mp4_avc;
+									} else if (StartsWith(vcodec, "av01")) {
+										profile->format = Youtube::yformat::y_mp4_av1;
+									} else {
+										profile->format = Youtube::yformat::y_mp4_other;
+									}
+								} else if (ext == L"webm") {
+									profile->format = Youtube::yformat::y_webm_vp9;
+								}
+								profile->type = acodec == "none" ? Youtube::ytype::y_video : Youtube::ytype::y_media;
+								profile->ext = ext;
+								profile->quality = height;
 								profile->iTag = iTag++;
-							}
 
-							Youtube::YoutubeUrllistItem item;
-							item.profile = profile;
-							item.url = CString(url);
+								item.profile = profile;
+							}
 
 							if (!ext.IsEmpty()) {
 								item.title = ext.MakeUpper();
 								if (!vcodec.IsEmpty()) {
-									item.title.AppendFormat(L"(%S)", vcodec);
+									item.title.AppendFormat(L"(%S)", vcodec.GetString());
 								}
 							}
 							if (!fmt.IsEmpty()) {
 								if (item.title.IsEmpty()) {
 									item.title = fmt;
 								} else {
-									item.title.AppendFormat(L" - %s", fmt);
+									item.title.AppendFormat(L" - %s", fmt.GetString());
 								}
 							}
 
