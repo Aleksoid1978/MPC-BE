@@ -489,7 +489,8 @@ CString CMediaTypeEx::GetVideoCodecName(const GUID& subtype, DWORD biCompression
 					   subtype == MEDIASUBTYPE_apcs ||
 					   subtype == MEDIASUBTYPE_apco ||
 					   subtype == MEDIASUBTYPE_ap4h ||
-					   subtype == MEDIASUBTYPE_ap4x) {
+					   subtype == MEDIASUBTYPE_ap4x ||
+					   subtype == MEDIASUBTYPE_icpf) {
 				str.Format(L"ProRes (%4.4hs)", &biCompression);
 			} else if (subtype == MEDIASUBTYPE_RGB48) {
 				str = L"RGB48";
