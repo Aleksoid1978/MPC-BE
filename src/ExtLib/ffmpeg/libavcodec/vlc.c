@@ -42,6 +42,8 @@
 {                                                           \
     const uint8_t *ptr = (const uint8_t *)table + i * wrap; \
     switch(size) {                                          \
+    default:                                                \
+        av_unreachable("Only uint8/16/32_t are used");      \
     case 1:                                                 \
         v = *(const uint8_t *)ptr;                          \
         break;                                              \
@@ -49,8 +51,6 @@
         v = *(const uint16_t *)ptr;                         \
         break;                                              \
     case 4:                                                 \
-    default:                                                \
-        av_assert1(size == 4);                              \
         v = *(const uint32_t *)ptr;                         \
         break;                                              \
     }                                                       \
@@ -260,7 +260,7 @@ int ff_vlc_init_sparse(VLC *vlc, int nb_bits, int nb_codes,
     if (ret < 0)
         return ret;
 
-    av_assert0(symbols_size <= 2 || !symbols);
+    av_assert0(symbols_size <= 2U);
     j = 0;
 #define COPY(condition)\
     for (int i = 0; i < nb_codes; i++) {                                    \

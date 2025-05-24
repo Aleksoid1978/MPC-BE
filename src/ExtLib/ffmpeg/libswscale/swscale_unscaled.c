@@ -699,7 +699,7 @@ static void packed16togbra16(const uint8_t *src, int srcStride,
                     dst[0][x] = av_bswap16(av_bswap16(*src_line++) >> shift);
                     dst[1][x] = av_bswap16(av_bswap16(*src_line++) >> shift);
                     dst[2][x] = av_bswap16(av_bswap16(*src_line++) >> shift);
-                    dst[3][x] = 0xFFFF;
+                    dst[3][x] = av_bswap16(0xFFFF >> shift);
                 }
             } else if (src_alpha) {
                 for (x = 0; x < width; x++) {
@@ -729,7 +729,7 @@ static void packed16togbra16(const uint8_t *src, int srcStride,
                     dst[0][x] = av_bswap16(*src_line++ >> shift);
                     dst[1][x] = av_bswap16(*src_line++ >> shift);
                     dst[2][x] = av_bswap16(*src_line++ >> shift);
-                    dst[3][x] = 0xFFFF;
+                    dst[3][x] = av_bswap16(0xFFFF >> shift);
                 }
             } else if (src_alpha) {
                 for (x = 0; x < width; x++) {
@@ -759,7 +759,7 @@ static void packed16togbra16(const uint8_t *src, int srcStride,
                     dst[0][x] = av_bswap16(*src_line++) >> shift;
                     dst[1][x] = av_bswap16(*src_line++) >> shift;
                     dst[2][x] = av_bswap16(*src_line++) >> shift;
-                    dst[3][x] = 0xFFFF;
+                    dst[3][x] = 0xFFFF >> shift;
                 }
             } else if (src_alpha) {
                 for (x = 0; x < width; x++) {
@@ -789,7 +789,7 @@ static void packed16togbra16(const uint8_t *src, int srcStride,
                     dst[0][x] = *src_line++ >> shift;
                     dst[1][x] = *src_line++ >> shift;
                     dst[2][x] = *src_line++ >> shift;
-                    dst[3][x] = 0xFFFF;
+                    dst[3][x] = 0xFFFF >> shift;
                 }
             } else if (src_alpha) {
                 for (x = 0; x < width; x++) {
@@ -818,6 +818,7 @@ static void packed30togbra10(const uint8_t *src, int srcStride,
     int x, h, i;
     int dst_alpha = dst[3] != NULL;
     int scale_high = bpc - 10, scale_low = 10 - scale_high;
+    uint16_t alpha_val = (1U << bpc) - 1;
     for (h = 0; h < srcSliceH; h++) {
         uint32_t *src_line = (uint32_t *)(src + srcStride * h);
         unsigned component;
@@ -834,7 +835,7 @@ static void packed30togbra10(const uint8_t *src, int srcStride,
                     dst[1][x] = av_bswap16(component << scale_high | component >> scale_low);
                     component =  p        & 0x3FF;
                     dst[2][x] = av_bswap16(component << scale_high | component >> scale_low);
-                    dst[3][x] = 0xFFFF;
+                    dst[3][x] = av_bswap16(alpha_val);
                     src_line++;
                 }
             } else {
@@ -860,7 +861,7 @@ static void packed30togbra10(const uint8_t *src, int srcStride,
                     dst[1][x] = component << scale_high | component >> scale_low;
                     component =  p        & 0x3FF;
                     dst[2][x] = component << scale_high | component >> scale_low;
-                    dst[3][x] = 0xFFFF;
+                    dst[3][x] = alpha_val;
                     src_line++;
                 }
             } else {
@@ -1377,8 +1378,15 @@ static int planarRgbToplanarRgbWrapper(SwsInternal *c,
                  dst[1], dstStride[1]);
     ff_copyPlane(src[2], srcStride[2], srcSliceY, srcSliceH, c->opts.src_w,
                  dst[2], dstStride[2]);
-    if (dst[3])
-        fillPlane(dst[3], dstStride[3], c->opts.src_w, srcSliceH, srcSliceY, 255);
+    if (dst[3]) {
+        if (is16BPS(c->opts.dst_format) || isNBPS(c->opts.dst_format)) {
+            const AVPixFmtDescriptor *desc_dst = av_pix_fmt_desc_get(c->opts.dst_format);
+            fillPlane16(dst[3], dstStride[3], c->opts.src_w, srcSliceH, srcSliceY, 1,
+                        desc_dst->comp[3].depth, isBE(c->opts.dst_format));
+        } else {
+            fillPlane(dst[3], dstStride[3], c->opts.src_w, srcSliceH, srcSliceY, 255);
+        }
+    }
 
     return srcSliceH;
 }
@@ -2221,7 +2229,7 @@ static int planarCopyWrapper(SwsInternal *c, const uint8_t *const src[],
 
         // ignore palette for GRAY8
         if (plane == 1 && desc_dst->nb_components < 3) continue;
-        if (!src[plane] || (plane == 1 && desc_src->nb_components < 3)) {
+        if (!src[plane] || (plane == 1 && desc_src->nb_components < 3) || (plane == 3 && desc_src->nb_components <= 3)) {
             if (is16BPS(c->opts.dst_format) || isNBPS(c->opts.dst_format)) {
                 fillPlane16(dst[plane], dstStride[plane], length, height, y,
                         plane == 3, desc_dst->comp[plane].depth,

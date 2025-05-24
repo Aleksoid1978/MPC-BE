@@ -80,7 +80,7 @@ typedef struct Mpeg1Context {
     int has_afd;
     int slice_count;
     unsigned aspect_ratio_info;
-    int save_width, save_height, save_progressive_seq, save_chroma_format;
+    int save_progressive_seq, save_chroma_format;
     AVRational frame_rate_ext;  /* MPEG-2 specific framerate modificator */
     unsigned frame_rate_index;
     int sync;                   /* Did we reach a sync point like a GOP/SEQ/KEYFrame? */
@@ -385,9 +385,6 @@ static inline int mpeg2_decode_block_intra(MpegEncContext *s,
     s->block_last_index[n] = i;
     return 0;
 }
-
-/******************************************/
-/* decoding */
 
 static inline int get_dmv(MpegEncContext *s)
 {
@@ -945,8 +942,6 @@ static int mpeg_decode_postinit(AVCodecContext *avctx)
     if (!s->context_initialized                             ||
         avctx->coded_width       != s->width                ||
         avctx->coded_height      != s->height               ||
-        s1->save_width           != s->width                ||
-        s1->save_height          != s->height               ||
         s1->save_chroma_format   != s->chroma_format        ||
         (s1->save_progressive_seq != s->progressive_sequence && FFALIGN(s->height, 16) != FFALIGN(s->height, 32)) ||
         0) {
@@ -964,8 +959,6 @@ static int mpeg_decode_postinit(AVCodecContext *avctx)
                    (s1->bit_rate != 0x3FFFF*400 || s1->vbv_delay != 0xFFFF)) {
             avctx->bit_rate = s1->bit_rate;
         }
-        s1->save_width           = s->width;
-        s1->save_height          = s->height;
         s1->save_progressive_seq = s->progressive_sequence;
         s1->save_chroma_format   = s->chroma_format;
 
@@ -1893,9 +1886,8 @@ static int vcr2_init_sequence(AVCodecContext *avctx)
     } else {
         s->codec_id              = s->avctx->codec_id = AV_CODEC_ID_MPEG2VIDEO;
     }
-    s1->save_width           = s->width;
-    s1->save_height          = s->height;
     s1->save_progressive_seq = s->progressive_sequence;
+    s1->save_chroma_format   = s->chroma_format;
     return 0;
 }
 
