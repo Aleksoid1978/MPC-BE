@@ -1684,14 +1684,14 @@ BEGIN
         MENUITEM "パン＆スキャン(&C)",                      ID_SUBMENU_PANSCAN
         POPUP "ステレオ 3D モード"
         BEGIN
-            MENUITEM "Auto",                        ID_STEREO3D_AUTO
-            MENUITEM "Mono",                        ID_STEREO3D_MONO
-            MENUITEM "Row Interleaved",             ID_STEREO3D_ROW_INTERLEAVED
-            MENUITEM "Row Interleaved (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
-            MENUITEM "Half OverUnder",              ID_STEREO3D_HALFOVERUNDER
-            MENUITEM "OverUnder",                   ID_STEREO3D_OVERUNDER
+            MENUITEM "自動",                        ID_STEREO3D_AUTO
+            MENUITEM "単眼",                        ID_STEREO3D_MONO
+            MENUITEM "行交互",             ID_STEREO3D_ROW_INTERLEAVED
+            MENUITEM "行交互 (2 倍)",        ID_STEREO3D_ROW_INTERLEAVED_2X
+            MENUITEM "半分上下分割",              ID_STEREO3D_HALFOVERUNDER
+            MENUITEM "上下分割",                   ID_STEREO3D_OVERUNDER
             MENUITEM SEPARATOR
-            MENUITEM "Swap Left/Right",             ID_STEREO3D_SWAP_LEFTRIGHT
+            MENUITEM "左右入れ替え",             ID_STEREO3D_SWAP_LEFTRIGHT
         END
         MENUITEM SEPARATOR
         POPUP "手前に表示"
@@ -1711,7 +1711,7 @@ BEGIN
         MENUITEM "移動(&G)...",             ID_PLAY_GOTO
         POPUP "繰り返し(&R)"
         BEGIN
-            MENUITEM "無限(&O)", ID_REPEAT_FOREVER
+            MENUITEM "常時(&O)", ID_REPEAT_FOREVER
             MENUITEM SEPARATOR
             MENUITEM "A-B 解除(&R)", ID_PLAY_REPEAT_AB
             MENUITEM "A-B 始点(&A)", ID_PLAY_REPEAT_AB_MARK_A
@@ -1783,7 +1783,7 @@ BEGIN
         MENUITEM "停止(&S)",                      ID_PLAY_STOP
         POPUP "繰り返し(&R)"
         BEGIN
-            MENUITEM "無限(&O)", ID_REPEAT_FOREVER
+            MENUITEM "常時(&O)", ID_REPEAT_FOREVER
             MENUITEM SEPARATOR
             MENUITEM "A-B 解除(&R)", ID_PLAY_REPEAT_AB
             MENUITEM "A-B 始点(&A)", ID_PLAY_REPEAT_AB_MARK_A
@@ -1864,14 +1864,14 @@ BEGIN
         END
         POPUP "ステレオ 3D モード"
         BEGIN
-            MENUITEM "Auto",                        ID_STEREO3D_AUTO
-            MENUITEM "Mono",                        ID_STEREO3D_MONO
-            MENUITEM "Row Interleaved",             ID_STEREO3D_ROW_INTERLEAVED
-            MENUITEM "Row Interleaved (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
-            MENUITEM "Half OverUnder",              ID_STEREO3D_HALFOVERUNDER
-            MENUITEM "OverUnder",                   ID_STEREO3D_OVERUNDER
+            MENUITEM "自動",                        ID_STEREO3D_AUTO
+            MENUITEM "単眼",                        ID_STEREO3D_MONO
+            MENUITEM "行交互",             ID_STEREO3D_ROW_INTERLEAVED
+            MENUITEM "行交互 (2 倍)",        ID_STEREO3D_ROW_INTERLEAVED_2X
+            MENUITEM "半分上下分割",              ID_STEREO3D_HALFOVERUNDER
+            MENUITEM "上下分割",                   ID_STEREO3D_OVERUNDER
             MENUITEM SEPARATOR
-            MENUITEM "Swap Left/Right",             ID_STEREO3D_SWAP_LEFTRIGHT
+            MENUITEM "左右入れ替え",             ID_STEREO3D_SWAP_LEFTRIGHT
         END
         MENUITEM SEPARATOR
         MENUITEM "プロパティ(&R)",                   ID_FILE_PROPERTIES
@@ -1953,14 +1953,14 @@ BEGIN
             MENUITEM "パン＆スキャン(&C)",                      ID_SUBMENU_PANSCAN
             POPUP "ステレオ 3D モード"
             BEGIN
-                MENUITEM "Auto",                        ID_STEREO3D_AUTO
-                MENUITEM "Mono",                        ID_STEREO3D_MONO
-                MENUITEM "Row Interleaved",             ID_STEREO3D_ROW_INTERLEAVED
-                MENUITEM "Row Interleaved (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
-                MENUITEM "Half OverUnder",              ID_STEREO3D_HALFOVERUNDER
-                MENUITEM "OverUnder",                   ID_STEREO3D_OVERUNDER
+                MENUITEM "自動",                        ID_STEREO3D_AUTO
+                MENUITEM "単眼",                        ID_STEREO3D_MONO
+                MENUITEM "行交互",             ID_STEREO3D_ROW_INTERLEAVED
+                MENUITEM "行交互 (2 倍)",        ID_STEREO3D_ROW_INTERLEAVED_2X
+                MENUITEM "半分上下分割",              ID_STEREO3D_HALFOVERUNDER
+                MENUITEM "上下分割",                   ID_STEREO3D_OVERUNDER
                 MENUITEM SEPARATOR
-                MENUITEM "Swap Left/Right",             ID_STEREO3D_SWAP_LEFTRIGHT
+                MENUITEM "左右入れ替え",             ID_STEREO3D_SWAP_LEFTRIGHT
             END
             MENUITEM SEPARATOR
             POPUP "手前に表示"
@@ -1980,7 +1980,7 @@ BEGIN
             MENUITEM "移動(&G)...",             ID_PLAY_GOTO
             POPUP "繰り返し(&R)"
             BEGIN
-                MENUITEM "無限(&O)", ID_REPEAT_FOREVER
+                MENUITEM "常時(&O)", ID_REPEAT_FOREVER
                 MENUITEM SEPARATOR
                 MENUITEM "A-B 解除(&R)", ID_PLAY_REPEAT_AB
                 MENUITEM "A-B 始点(&A)", ID_PLAY_REPEAT_AB_MARK_A
@@ -2031,14 +2031,14 @@ BEGIN
         END
         POPUP "ステレオ 3D モード"
         BEGIN
-            MENUITEM "Auto",                        ID_STEREO3D_AUTO
-            MENUITEM "Mono",                        ID_STEREO3D_MONO
-            MENUITEM "Row Interleaved",             ID_STEREO3D_ROW_INTERLEAVED
-            MENUITEM "Row Interleaved (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
-            MENUITEM "Half OverUnder",              ID_STEREO3D_HALFOVERUNDER
-            MENUITEM "OverUnder",                   ID_STEREO3D_OVERUNDER
+            MENUITEM "自動",                        ID_STEREO3D_AUTO
+            MENUITEM "単眼",                        ID_STEREO3D_MONO
+            MENUITEM "行交互",             ID_STEREO3D_ROW_INTERLEAVED
+            MENUITEM "行交互 (2 倍)",        ID_STEREO3D_ROW_INTERLEAVED_2X
+            MENUITEM "半分上下分割",              ID_STEREO3D_HALFOVERUNDER
+            MENUITEM "上下分割",                   ID_STEREO3D_OVERUNDER
             MENUITEM SEPARATOR
-            MENUITEM "Swap Left/Right",             ID_STEREO3D_SWAP_LEFTRIGHT
+            MENUITEM "左右入れ替え",             ID_STEREO3D_SWAP_LEFTRIGHT
         END
         MENUITEM SEPARATOR
         MENUITEM "プロパティ(&R)",                   ID_FILE_PROPERTIES
