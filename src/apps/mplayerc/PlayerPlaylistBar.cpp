@@ -1795,15 +1795,18 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 					}
 				}
 				title = str.TrimLeft();
-			} else if (StartsWith(str, L"#EXTALB:")) {
+			}
+			else if (StartsWith(str, L"#EXTALB:")) {
 				DeleteLeft(8, str);
 				album = str;
-			} else if (StartsWith(str, L"#EXT-X-STREAM-INF:")) {
+			}
+			else if (StartsWith(str, L"#EXT-X-STREAM-INF:")) {
 				DeleteLeft(18, str);
 				title = str;
 
 				audioId = RegExpParse(str.GetString(), LR"(AUDIO=\"(\S*?)\")");
-			} else if (StartsWith(str, L"#EXT-X-MEDIA:") && str.Find(L"TYPE=AUDIO") >= 13) {
+			}
+			else if (StartsWith(str, L"#EXT-X-MEDIA:") && str.Find(L"TYPE=AUDIO") >= 13) {
 				const auto id = RegExpParse(str.GetString(), LR"(GROUP-ID=\"(\S*?)\")");
 				if (!id.IsEmpty()) {
 					const auto url = RegExpParse(str.GetString(), LR"(URI=\"(.*?)\")");
@@ -1812,6 +1815,9 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 						audio_items.emplace_back(MakePath(CombinePath(base, url)));
 					}
 				}
+			}
+			else if (str == L"#EXT-X-PLAYLIST-TYPE:EVENT") {
+				return false;
 			}
 		} else {
 			const auto path = MakePath(CombinePath(base, str));
