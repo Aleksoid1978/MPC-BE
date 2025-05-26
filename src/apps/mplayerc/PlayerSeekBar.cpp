@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -970,6 +970,22 @@ void CPlayerSeekBar::UpdateToolTipText()
 		ASSERT(FALSE);
 	}
 
+	const auto& s = AfxGetAppSettings();
+
+	if (!s.bUseDarkTheme) {
+		CAutoLock lock(&m_CBLock);
+
+		if (m_pChapterBag && m_pChapterBag->ChapGetCount()) {
+			CComBSTR chapterName;
+			REFERENCE_TIME rt = m_tooltipPos;
+			m_pChapterBag->ChapLookup(&rt, &chapterName);
+
+			if (chapterName.Length() > 0) {
+				tooltipText.Format(L"%s - %s", tooltipText, chapterName);
+			}
+		}
+	}
+
 	if (!m_pMainFrame->CanPreviewUse()) {
 		m_ti.lpszText = (LPWSTR)(LPCWSTR)tooltipText;
 		m_tooltip.SendMessageW(TTM_SETTOOLINFOW, 0, (LPARAM)&m_ti);
@@ -981,8 +997,8 @@ void CPlayerSeekBar::UpdateToolTipText()
 		CAutoLock lock(&m_CBLock);
 
 		m_strChap.Empty();
-		if (AfxGetAppSettings().bUseDarkTheme
-				&& AfxGetAppSettings().fChapterMarker
+		if (s.bUseDarkTheme
+				&& s.fChapterMarker
 				&& m_pChapterBag && m_pChapterBag->ChapGetCount()) {
 
 			CComBSTR chapterName;
