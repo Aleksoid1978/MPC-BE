@@ -1816,7 +1816,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 					}
 				}
 			}
-			else if (str == L"#EXT-X-PLAYLIST-TYPE:EVENT") {
+			else if (StartsWith(str, L"#EXT-X-MEDIA-SEQUENCE:")) {
 				return false;
 			}
 		} else {
