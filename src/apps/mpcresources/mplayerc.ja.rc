@@ -1711,7 +1711,7 @@ BEGIN
         MENUITEM "移動(&G)...",             ID_PLAY_GOTO
         POPUP "繰り返し(&R)"
         BEGIN
-            MENUITEM "常時(&O)", ID_REPEAT_FOREVER
+            MENUITEM "継続(&O)", ID_REPEAT_FOREVER
             MENUITEM SEPARATOR
             MENUITEM "A-B 解除(&R)", ID_PLAY_REPEAT_AB
             MENUITEM "A-B 始点(&A)", ID_PLAY_REPEAT_AB_MARK_A
@@ -1783,7 +1783,7 @@ BEGIN
         MENUITEM "停止(&S)",                      ID_PLAY_STOP
         POPUP "繰り返し(&R)"
         BEGIN
-            MENUITEM "常時(&O)", ID_REPEAT_FOREVER
+            MENUITEM "継続(&O)", ID_REPEAT_FOREVER
             MENUITEM SEPARATOR
             MENUITEM "A-B 解除(&R)", ID_PLAY_REPEAT_AB
             MENUITEM "A-B 始点(&A)", ID_PLAY_REPEAT_AB_MARK_A
@@ -1980,7 +1980,7 @@ BEGIN
             MENUITEM "移動(&G)...",             ID_PLAY_GOTO
             POPUP "繰り返し(&R)"
             BEGIN
-                MENUITEM "常時(&O)", ID_REPEAT_FOREVER
+                MENUITEM "継続(&O)", ID_REPEAT_FOREVER
                 MENUITEM SEPARATOR
                 MENUITEM "A-B 解除(&R)", ID_PLAY_REPEAT_AB
                 MENUITEM "A-B 始点(&A)", ID_PLAY_REPEAT_AB_MARK_A
