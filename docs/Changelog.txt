@@ -2,8 +2,32 @@
 
 1.8.4.x dev
 =============================
+AviSplitter
+Improved support for VP9 and AV1 video.
+
+MatroskaSplitter
+Improved support for VP9 and Apple ProRes video.
+Improved work with unstable sources.
+
+MpegSplitter
+Added support for AV1 video.
+
+MPCVideoDec
+Improved support for VP9 video.
+
+MpcAudioRenderer
+Fixed crashes in some situations.
+Improved Push method.
+
+YouTube
+The default format is now VP9 720p + Opus.
+Fixed merging of saved VP9 and AAC streams using ffmpeg.exe.
+Added checks for availability of the URL being opened.
+Improved yt-dlp support.
+
 Player
 Fixed saving of video frame image with subtitles when using MPC Video Renderer.
+HLS M3U files are no longer processed as normal playlists, but are passed to the source filter as is.
 
 Updated Bulgarian translation (by jekovcar).
 Updated Romanian translation (by Andrei Miloiu).
