@@ -1491,27 +1491,22 @@ namespace Youtube
 		}
 
 		if (youtubeAudioUrllist.size()) {
-			CString thumbnailUrl;
 			if (!player_response_jsonDocument.IsNull()) {
 				if (auto thumbnails = GetValueByPointer(player_response_jsonDocument, "/videoDetails/thumbnail/thumbnails"); thumbnails && thumbnails->IsArray()) {
+					CStringA thumbnailUrl;
 					int maxHeight = 0;
 					for (const auto& elem : thumbnails->GetArray()) {
-						CString url;
-						if (!getJsonValue(elem, "url", url)) {
-							continue;
-						}
-
 						int height = 0;
-						if (!getJsonValue(elem, "height", height)) {
-							continue;
-						}
-
-						if (height > maxHeight) {
-							maxHeight = height;
-							thumbnailUrl = url;
+						if (getJsonValue(elem, "height", height) && height > maxHeight) {
+							if (getJsonValue(elem, "url", thumbnailUrl)) {
+								maxHeight = height;
+							}
 						}
 					}
-					y_fields.thumbnailUrl = thumbnailUrl;
+
+					if (!thumbnailUrl.IsEmpty()) {
+						y_fields.thumbnailUrl = thumbnailUrl;
+					}
 				}
 			}
 

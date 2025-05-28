@@ -543,6 +543,26 @@ namespace YoutubeDL
 								}
 							}
 						}
+
+						if (!youtubeAudioUrllist.empty()) {
+							// thumbnails
+							if (auto thumbnails = GetJsonArray(d, "thumbnails")) {
+								CStringA thumbnailUrl;
+								int maxHeight = 0;
+								for (const auto& elem : thumbnails->GetArray()) {
+									int height = 0;
+									if (getJsonValue(elem, "height", height) && height > maxHeight) {
+										if (getJsonValue(elem, "url", thumbnailUrl)) {
+											maxHeight = height;
+										}
+									}
+								}
+
+								if (!thumbnailUrl.IsEmpty()) {
+									y_fields.thumbnailUrl = thumbnailUrl;
+								}
+							}
+						}
 					}
 				}
 			}
