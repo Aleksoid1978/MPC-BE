@@ -544,7 +544,7 @@ namespace YoutubeDL
 							}
 						}
 
-						if (!youtubeAudioUrllist.empty()) {
+						if (bIsYoutube && !youtubeAudioUrllist.empty()) {
 							// thumbnails
 							if (auto thumbnails = GetJsonArray(d, "thumbnails")) {
 								CStringA thumbnailUrl;
