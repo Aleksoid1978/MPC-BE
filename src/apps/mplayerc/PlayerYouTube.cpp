@@ -65,7 +65,7 @@ namespace Youtube
 
 	constexpr LPCWSTR videoIdRegExp = L"(?:v|video_ids)=([-a-zA-Z0-9_]+)";
 
-	static const YoutubeProfile* GetProfile(int iTag)
+	const YoutubeProfile* GetProfile(int iTag)
 	{
 		for (const auto& profile : YProfiles) {
 			if (iTag == profile.iTag) {
@@ -76,7 +76,7 @@ namespace Youtube
 		return nullptr;
 	}
 
-	static const YoutubeProfile* GetAudioProfile(int iTag)
+	const YoutubeProfile* GetAudioProfile(int iTag)
 	{
 		for (const auto& profile : YAudioProfiles) {
 			if (iTag == profile.iTag) {
@@ -108,7 +108,7 @@ namespace Youtube
 		return (a->hdr > b->hdr);
 	}
 
-	static bool CompareUrllistItem(const YoutubeUrllistItem& a, const YoutubeUrllistItem& b)
+	bool CompareUrllistItem(const YoutubeUrllistItem& a, const YoutubeUrllistItem& b)
 	{
 		return CompareProfile(a.profile, b.profile);
 	}
@@ -540,7 +540,7 @@ namespace Youtube
 	};
 
 
-	static const YoutubeUrllistItem* SelectVideoStream(YoutubeUrllist& youtubeUrllist)
+	const YoutubeUrllistItem* SelectVideoStream(YoutubeUrllist& youtubeUrllist)
 	{
 		const CAppSettings& s = AfxGetAppSettings();
 		const YoutubeUrllistItem* final_item = nullptr;
@@ -622,7 +622,7 @@ namespace Youtube
 	}
 
 
-	static const YoutubeUrllistItem* SelectAudioStream(YoutubeUrllist& youtubeAudioUrllist)
+	const YoutubeUrllistItem* SelectAudioStream(YoutubeUrllist& youtubeAudioUrllist)
 	{
 		const CAppSettings& s = AfxGetAppSettings();
 		const YoutubeUrllistItem* final_item = nullptr;
@@ -1516,33 +1516,14 @@ namespace Youtube
 			}
 
 			for (const auto& item : youtubeAudioUrllist) {
-				if (item.profile->format == Youtube::y_mp4_aac) {
-					youtubeUrllist.emplace_back(item);
-					break;
-				}
-			}
-			for (const auto& item : youtubeAudioUrllist) {
-				if (item.profile->format == Youtube::y_webm_opus) {
-					youtubeUrllist.emplace_back(item);
-					break;
-				}
-			}
-			for (const auto& item : youtubeAudioUrllist) {
-				if (item.profile->format == Youtube::y_mp4_ac3) {
-					youtubeUrllist.emplace_back(item);
-					break;
-				}
-			}
-			for (const auto& item : youtubeAudioUrllist) {
-				if (item.profile->format == Youtube::y_mp4_eac3) {
-					youtubeUrllist.emplace_back(item);
-					break;
-				}
-			}
-			for (const auto& item : youtubeAudioUrllist) {
-				if (item.profile->format == Youtube::y_mp4_dtse) {
-					youtubeUrllist.emplace_back(item);
-					break;
+				switch (item.profile->format) {
+					case Youtube::y_mp4_aac:
+					case Youtube::y_webm_opus:
+					case Youtube::y_mp4_ac3:
+					case Youtube::y_mp4_eac3:
+					case Youtube::y_mp4_dtse:
+						youtubeUrllist.emplace_back(item);
+						break;
 				}
 			}
 		}

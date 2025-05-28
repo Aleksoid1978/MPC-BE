@@ -181,6 +181,12 @@ namespace Youtube
 	};
 	typedef std::vector<YoutubeUrllistItem> YoutubeUrllist;
 
+	const YoutubeProfile* GetProfile(int iTag);
+	const YoutubeProfile* GetAudioProfile(int iTag);
+	bool CompareUrllistItem(const YoutubeUrllistItem& a, const YoutubeUrllistItem& b);
+	const YoutubeUrllistItem* SelectVideoStream(YoutubeUrllist& youtubeUrllist);
+	const YoutubeUrllistItem* SelectAudioStream(YoutubeUrllist& youtubeAudioUrllist);
+
 	bool CheckURL(CString url);
 	bool CheckPlaylist(CString url);
 

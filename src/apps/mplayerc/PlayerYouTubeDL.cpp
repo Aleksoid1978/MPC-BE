@@ -216,17 +216,7 @@ namespace YoutubeDL
 							CStringA format_id = {};
 							int itag = {};
 							if (bIsYoutube && getJsonValue(format, "format_id", format_id) && StrToInt32(format_id.GetString(), itag)) {
-								auto GetProfile = [](int iTag) -> const Youtube::YoutubeProfile* {
-									for (const auto& profile : Youtube::YProfiles) {
-										if (iTag == profile.iTag) {
-											return &profile;
-										}
-									}
-
-									return nullptr;
-								};
-
-								if (auto profile = GetProfile(itag)) {
+								if (auto profile = Youtube::GetProfile(itag)) {
 									item.profile = profile;
 								}
 							}
@@ -324,17 +314,56 @@ namespace YoutubeDL
 							continue;
 						}
 
-						float tbr = 0.0f;
-						if (getJsonValue(format, "tbr", tbr)) {
-							if (aud_bitrate == 0.0f
-									|| (vid_height > 360 && tbr > aud_bitrate)
-									|| (vid_height <= 360 && tbr < aud_bitrate)
-									|| (tbr == aud_bitrate && StartsWith(protocol, "http"))) {
-								aud_bitrate = tbr;
+						CString ext;
+						getJsonValue(format, "ext", ext);
+						CString fmt;
+						getJsonValue(format, "format", fmt);
+						float tbr = -1.f;
+						getJsonValue(format, "tbr", tbr);
+
+						int itag = {};
+						if (bIsYoutube && !format_id.IsEmpty() && StrToInt32(format_id.GetString(), itag)) {
+							if (auto audioprofile = Youtube::GetAudioProfile(itag)) {
+								Youtube::YoutubeUrllistItem item;
+								item.profile = audioprofile;
+								item.url = url;
+
+								if (!ext.IsEmpty()) {
+									item.title = ext.MakeUpper();
+									if (!acodec.IsEmpty()) {
+										item.title.AppendFormat(L"(%S)", acodec.GetString());
+									}
+								}
+								if (!fmt.IsEmpty()) {
+									if (item.title.IsEmpty()) {
+										item.title = fmt;
+									} else {
+										item.title.AppendFormat(L" - %s", fmt.GetString());
+									}
+								}
+
+								if (tbr > 0.f) {
+									item.title.AppendFormat(L" %dkbit/s", lround(tbr));
+								} else {
+									item.title.AppendFormat(L" %dkbit/s", audioprofile->quality);
+								}
+
+								youtubeAudioUrllist.emplace_back(item);
+							}
+						}
+
+						if (youtubeAudioUrllist.empty()) {
+							if (tbr > 0.f) {
+								if (aud_bitrate == 0.0f
+										|| (vid_height > 360 && tbr > aud_bitrate)
+										|| (vid_height <= 360 && tbr < aud_bitrate)
+										|| (tbr == aud_bitrate && StartsWith(protocol, "http"))) {
+									aud_bitrate = tbr;
+									bestAudioUrl = url;
+								}
+							} else if (bestAudioUrl.IsEmpty()) {
 								bestAudioUrl = url;
 							}
-						} else if (bestAudioUrl.IsEmpty()) {
-							bestAudioUrl = url;
 						}
 
 						CStringA language;
@@ -347,7 +376,30 @@ namespace YoutubeDL
 					}
 
 					if (!bestUrl.IsEmpty()) {
-						if (bMaximumQuality) {
+						if (bIsYoutube) {
+							// For YouTube, we will select the quality/codec depending on the settings of the built-in parser.
+							std::sort(youtubeUrllist.begin(), youtubeUrllist.end(), Youtube::CompareUrllistItem);
+							std::sort(youtubeAudioUrllist.begin(), youtubeAudioUrllist.end(), Youtube::CompareUrllistItem);
+
+							if (auto final_item = Youtube::SelectVideoStream(youtubeUrllist)) {
+								bestUrl = final_item->url;
+							}
+							if (auto final_item = Youtube::SelectAudioStream(youtubeAudioUrllist)) {
+								bestAudioUrl = final_item->url;
+							}
+
+							for (const auto& item : youtubeAudioUrllist) {
+								switch (item.profile->format) {
+									case Youtube::y_mp4_aac:
+									case Youtube::y_webm_opus:
+									case Youtube::y_mp4_ac3:
+									case Youtube::y_mp4_eac3:
+									case Youtube::y_mp4_dtse:
+										youtubeUrllist.emplace_back(item);
+										break;
+								}
+							}
+						} else if (bMaximumQuality) {
 							float maxVideotbr = 0.0f;
 							int maxVideofps = 0;
 
@@ -437,7 +489,7 @@ namespace YoutubeDL
 							}
 						}
 
-						if (bestAudioUrl.GetLength()) {
+						if (!bIsYoutube && bestAudioUrl.GetLength()) {
 							auto profilePtr = std::make_unique<Youtube::YoutubeProfile>();
 							auto profile = profilePtr.get();
 							YoutubeProfiles.emplace_back(std::move(profilePtr));
@@ -450,7 +502,7 @@ namespace YoutubeDL
 							youtubeAudioUrllist.emplace_back(item);
 						}
 
-						if (!youtubeUrllist.empty()) {
+						if (!bIsYoutube && !youtubeUrllist.empty()) {
 							std::sort(youtubeUrllist.begin(), youtubeUrllist.end(), [](const Youtube::YoutubeUrllistItem& a, const Youtube::YoutubeUrllistItem& b) {
 								if (a.profile->format != b.profile->format) {
 									return (a.profile->format < b.profile->format);
