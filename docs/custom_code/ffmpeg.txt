@@ -6,6 +6,7 @@
 
 * libavcodec/aacsbr_template.c
 * libavcodec/allcodecs.c
+* libavcodec/cbs_av1_syntax_template.c
 * libavcodec/d3d12va_decode.c
 * libavcodec/d3d12va_hevc.c
 * libavcodec/dxva2.c

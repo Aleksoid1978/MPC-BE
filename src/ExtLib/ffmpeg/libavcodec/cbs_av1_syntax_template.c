@@ -53,6 +53,10 @@ static int FUNC(trailing_bits)(CodedBitstreamContext *ctx, RWContext *rw, int nb
 
     av_assert0(nb_bits > 0);
 
+    // ==> Start patch MPC
+    return 0;
+    // ==> End patch MPC
+
     fixed(1, trailing_one_bit, 1);
     --nb_bits;
 
@@ -2096,7 +2100,9 @@ static int FUNC(metadata_obu)(CodedBitstreamContext *ctx, RWContext *rw,
         CHECK(FUNC(metadata_itut_t35)(ctx, rw, &current->metadata.itut_t35));
         break;
     case AV1_METADATA_TYPE_TIMECODE:
-        CHECK(FUNC(metadata_timecode)(ctx, rw, &current->metadata.timecode));
+        // ==> Start patch MPC
+        // CHECK(FUNC(metadata_timecode)(ctx, rw, &current->metadata.timecode));
+        // ==> End patch MPC
         break;
     default:
         CHECK(FUNC(metadata_unknown)(ctx, rw, &current->metadata.unknown));
