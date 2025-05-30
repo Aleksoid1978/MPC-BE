@@ -728,6 +728,7 @@ public:
 	COLORREF		clrGrad1ABGR;
 	COLORREF		clrGrad2ABGR;
 
+	bool			bShowMilliSecs;
 	bool			fUseTimeTooltip;
 	int				nTimeTooltipPosition;
 	bool			fSmartSeek;

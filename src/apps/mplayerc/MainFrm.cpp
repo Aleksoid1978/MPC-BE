@@ -1385,6 +1385,7 @@ BOOL CMainFrame::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTO
 						|| labs(point.y_start - pt.y) > 5) {
 					m_touchScreen.moving = true;
 				}
+				CAppSettings& s = AfxGetAppSettings();
 
 				if (m_touchScreen.moving && m_touchScreen.Count() == 1) {
 					if (IsMoveX(pt.y, point.y_start, pt.x, point.x_start)) {
@@ -1405,7 +1406,7 @@ BOOL CMainFrame::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTO
 						}
 					} else if (m_eMediaLoadState == MLS_LOADED
 							&& IsMoveX(pt.x, point.x_start, pt.y, point.y_start)
-							&& AfxGetAppSettings().ShowOSD.SeekTime) {
+							&& s.ShowOSD.SeekTime) {
 
 						REFERENCE_TIME stop = m_wndSeekBar.GetRange();
 						if (stop > 0) {
@@ -1422,7 +1423,7 @@ BOOL CMainFrame::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTO
 									const REFERENCE_TIME rtPos = m_wndSeekBar.GetPos();
 									REFERENCE_TIME rtNewPos = rtPos + rtDiff;
 									rtNewPos = std::clamp(rtNewPos, 0LL, stop);
-									const bool bShowMilliSecs = m_bShowMilliSecs || m_wndSubresyncBar.IsWindowVisible();
+									const bool bShowMilliSecs = s.bShowMilliSecs || m_wndSubresyncBar.IsWindowVisible();
 
 									m_wndStatusBar.SetStatusTimer(rtNewPos, stop, bShowMilliSecs, GetTimeFormat());
 									m_OSD.DisplayMessage(OSD_TOPLEFT, m_wndStatusBar.GetStatusTimer(), 1000);
@@ -2476,12 +2477,14 @@ LRESULT CMainFrame::OnHotKey(WPARAM wParam, LPARAM lParam)
 
 void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 {
+	CAppSettings& s = AfxGetAppSettings();
+
 	switch (nIDEvent) {
 		case TIMER_FLYBARWINDOWHIDER:
 			if (!m_bInMenu) {
 				if (m_wndView &&
-							(AfxGetAppSettings().iCaptionMenuMode == MODE_FRAMEONLY
-							|| AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS
+							(s.iCaptionMenuMode == MODE_FRAMEONLY
+							|| s.iCaptionMenuMode == MODE_BORDERLESS
 							|| m_bFullScreen)) {
 
 					CPoint p;
@@ -2498,7 +2501,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 
 					if (r_ShowFlybar.PtInRect(p) && !m_bHideCursor && !m_wndFlyBar.IsWindowVisible()) {
 						m_wndFlyBar.ShowWindow(SW_SHOWNOACTIVATE);
-					} else if (!r_ShowFlybar.PtInRect(p) && m_wndFlyBar.IsWindowVisible() && !AfxGetAppSettings().fFlybarOnTop) {
+					} else if (!r_ShowFlybar.PtInRect(p) && m_wndFlyBar.IsWindowVisible() && !s.fFlybarOnTop) {
 						m_wndFlyBar.ShowWindow(SW_HIDE);
 					}
 					OSDBarSetPos();
@@ -2553,7 +2556,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 							m_nCurSubtitle   = -1;
 							m_lSubtitleShift = 0;
 						}
-						m_wndStatusBar.SetStatusTimer(rtNow, rtDur, m_bShowMilliSecs || m_wndSubresyncBar.IsWindowVisible(), GetTimeFormat());
+						m_wndStatusBar.SetStatusTimer(rtNow, rtDur, s.bShowMilliSecs || m_wndSubresyncBar.IsWindowVisible(), GetTimeFormat());
 						break;
 					case PM_DVD:
 						g_bExternalSubtitleTime = true;
@@ -2582,7 +2585,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 								}
 							}
 						}
-						m_wndStatusBar.SetStatusTimer(rtNow, rtDur, m_bShowMilliSecs || m_wndSubresyncBar.IsWindowVisible(), GetTimeFormat());
+						m_wndStatusBar.SetStatusTimer(rtNow, rtDur, s.bShowMilliSecs || m_wndSubresyncBar.IsWindowVisible(), GetTimeFormat());
 						break;
 					case PM_CAPTURE:
 						g_bExternalSubtitleTime = true;
@@ -6478,7 +6481,7 @@ CStringW CMainFrame::GetVidPos()
 			str.Format(L"%02d.%02d", tcNow.Minutes, tcNow.Seconds);
 		}
 
-		if (m_bShowMilliSecs) {
+		if (AfxGetAppSettings().bShowMilliSecs) {
 			str.AppendFormat(L".%03d", tcNow.Milliseconds);
 		}
 	}
@@ -8266,12 +8269,13 @@ void CMainFrame::OnPlayStop()
 
 		if (m_eMediaLoadState == MLS_LOADED) {
 			REFERENCE_TIME stop = m_wndSeekBar.GetRange();
+			CAppSettings& s = AfxGetAppSettings();
 			if (GetPlaybackMode() != PM_CAPTURE) {
-				const bool bShowMilliSecs = m_bShowMilliSecs || m_wndSubresyncBar.IsWindowVisible();
+				const bool bShowMilliSecs = s.bShowMilliSecs || m_wndSubresyncBar.IsWindowVisible();
 				m_wndStatusBar.SetStatusTimer(m_wndSeekBar.GetPosReal(), stop, bShowMilliSecs, GetTimeFormat());
 			}
 
-			SetAlwaysOnTop(AfxGetAppSettings().iOnTop);
+			SetAlwaysOnTop(s.iOnTop);
 		}
 	}
 
@@ -16803,9 +16807,10 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool bShowOSD/* = true*/)
 		if (rtPos > stop) {
 			rtPos = stop;
 		}
-		const bool bShowMilliSecs = m_bShowMilliSecs || m_wndSubresyncBar.IsWindowVisible();
+		CAppSettings& s = AfxGetAppSettings();
+		const bool bShowMilliSecs = s.bShowMilliSecs || m_wndSubresyncBar.IsWindowVisible();
 		m_wndStatusBar.SetStatusTimer(rtPos, stop, bShowMilliSecs, GetTimeFormat());
-		if (bShowOSD && stop > 0 && AfxGetAppSettings().ShowOSD.SeekTime) {
+		if (bShowOSD && stop > 0 && s.ShowOSD.SeekTime) {
 			m_OSD.DisplayMessage(OSD_TOPLEFT, m_wndStatusBar.GetStatusTimer(), 1500);
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -311,6 +311,8 @@
 #define IDS_RS_NEXT_AFTER_PB				L"SearchInDirAfterPlayBack"
 #define IDS_RS_NEXT_AFTER_PB_LOOPED			L"SearchInDirAfterPlayBackLooped"
 #define IDS_RS_NO_SEARCH_IN_FOLDER			L"DontUseSearchInFolder"
+
+#define IDS_RS_SHOW_MILLISECONDS			L"ShowMilliseconds"
 #define IDS_RS_USE_TIME_TOOLTIP				L"UseTimeTooltip"
 #define IDS_RS_TIME_TOOLTIP_POSITION		L"TimeTooltipPosition"
 

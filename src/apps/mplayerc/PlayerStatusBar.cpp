@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -473,7 +473,8 @@ void CPlayerStatusBar::OnRButtonDown(UINT nFlags, CPoint point)
 	m_pMainFrame->GetWindowPlacement(&wp);
 
 	if (m_time_rect.PtInRect(point) || m_time_rect2.PtInRect(point)) {
-		m_TimeMenu.CheckMenuItem(ID_SHOW_MILLISECONDS, m_pMainFrame->m_bShowMilliSecs ? MF_CHECKED : MF_UNCHECKED);
+		CAppSettings& s = AfxGetAppSettings();
+		m_TimeMenu.CheckMenuItem(ID_SHOW_MILLISECONDS, s.bShowMilliSecs ? MF_CHECKED : MF_UNCHECKED);
 
 		CPoint p = point;
 		::MapWindowPoints(m_hWnd, HWND_DESKTOP, &p, 1);
@@ -481,7 +482,7 @@ void CPlayerStatusBar::OnRButtonDown(UINT nFlags, CPoint point)
 		UINT id = m_TimeMenu.TrackPopupMenu(TPM_LEFTBUTTON | TPM_RETURNCMD, p.x, p.y, this);
 
 		if (id == ID_SHOW_MILLISECONDS) {
-			m_pMainFrame->m_bShowMilliSecs = !m_pMainFrame->m_bShowMilliSecs;
+			s.bShowMilliSecs = !s.bShowMilliSecs;
 		}
 
 		return;

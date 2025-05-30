@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -431,7 +431,6 @@ public:
 	bool m_bFirstFSAfterLaunchOnFullScreen;
 	bool m_bStartInD3DFullscreen;
 	bool m_bHideCursor;
-	bool m_bShowMilliSecs = false;
 
 	CComPtr<IBaseFilter> m_pRefClock; // Adjustable reference clock. GothSync
 	CComPtr<ISyncClock> m_pSyncClock;

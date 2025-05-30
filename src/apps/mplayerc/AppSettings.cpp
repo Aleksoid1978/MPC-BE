@@ -514,6 +514,7 @@ void CAppSettings::ResetSettings()
 	fNextInDirAfterPlaybackLooped = false;
 	fDontUseSearchInFolder = false;
 
+	bShowMilliSecs = false;
 	fUseTimeTooltip = true;
 	nTimeTooltipPosition = TIME_TOOLTIP_ABOVE_SEEKBAR;
 	nOSDSize = 18;
@@ -904,6 +905,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_NEXT_AFTER_PB_LOOPED, fNextInDirAfterPlaybackLooped);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_NO_SEARCH_IN_FOLDER, fDontUseSearchInFolder);
 
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SHOW_MILLISECONDS, bShowMilliSecs);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USE_TIME_TOOLTIP, fUseTimeTooltip);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_TIME_TOOLTIP_POSITION, nTimeTooltipPosition, TIME_TOOLTIP_ABOVE_SEEKBAR, TIME_TOOLTIP_BELOW_SEEKBAR);
 
@@ -1739,6 +1741,8 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_NEXT_AFTER_PB, fNextInDirAfterPlayback);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_NEXT_AFTER_PB_LOOPED, fNextInDirAfterPlaybackLooped);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_NO_SEARCH_IN_FOLDER, fDontUseSearchInFolder);
+
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SHOW_MILLISECONDS, bShowMilliSecs);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USE_TIME_TOOLTIP, fUseTimeTooltip);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_TIME_TOOLTIP_POSITION, nTimeTooltipPosition);
 
