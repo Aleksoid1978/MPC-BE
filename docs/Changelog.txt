@@ -14,6 +14,7 @@ Added support for AV1 video.
 
 MPCVideoDec
 Improved support for VP9 video.
+Added the ability to hardware decode slightly non-standard AV1 videos.
 
 MpcAudioRenderer
 Fixed crashes in some situations.
@@ -28,6 +29,7 @@ Improved yt-dlp support.
 Player
 Fixed saving of video frame image with subtitles when using MPC Video Renderer.
 HLS M3U files are no longer processed as normal playlists, but are passed to the source filter as is.
+Added the ability to save the "Show milliseconds" setting.
 
 Updated Bulgarian translation (by jekovcar).
 Updated Romanian translation (by Andrei Miloiu).
