@@ -609,6 +609,7 @@ SRCS_LC_B = \
 	libavcodec/vvc/mvs.c \
 	libavcodec/vvc/ps.c \
 	libavcodec/vvc/refs.c \
+	libavcodec/vvc/sei.c \
 	libavcodec/vvc/thread.c \
 	\
 	libavcodec/x86/aacpsdsp_init.c \

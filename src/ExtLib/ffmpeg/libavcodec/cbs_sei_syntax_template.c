@@ -224,6 +224,103 @@ SEI_FUNC(ambient_viewing_environment,
     return 0;
 }
 
+SEI_FUNC(film_grain_characteristics,
+        (CodedBitstreamContext *ctx, RWContext *rw,
+         SEIRawFilmGrainCharacteristics *current,
+         SEIMessageState *state))
+{
+    int err, c, i, j;
+
+    HEADER("Film Grain Characteristics");
+
+    flag(fg_characteristics_cancel_flag);
+    if (!current->fg_characteristics_cancel_flag) {
+        int filmGrainBitDepth[3];
+
+        u(2, fg_model_id, 0, 1);
+        flag(fg_separate_colour_description_present_flag);
+        if (current->fg_separate_colour_description_present_flag) {
+            ub(3, fg_bit_depth_luma_minus8);
+            ub(3, fg_bit_depth_chroma_minus8);
+            flag(fg_full_range_flag);
+            ub(8, fg_colour_primaries);
+            ub(8, fg_transfer_characteristics);
+            ub(8, fg_matrix_coeffs);
+        }
+
+        filmGrainBitDepth[0] = current->fg_bit_depth_luma_minus8 + 8;
+        filmGrainBitDepth[1] =
+        filmGrainBitDepth[2] = current->fg_bit_depth_chroma_minus8 + 8;
+
+        u(2, fg_blending_mode_id, 0, 1);
+        ub(4, fg_log2_scale_factor);
+        for (c = 0; c < 3; c++)
+            flags(fg_comp_model_present_flag[c], 1, c);
+
+        for (c = 0; c < 3; c++) {
+            if (current->fg_comp_model_present_flag[c]) {
+                ubs(8, fg_num_intensity_intervals_minus1[c], 1, c);
+                us(3, fg_num_model_values_minus1[c], 0, 5, 1, c);
+                for (i = 0; i <= current->fg_num_intensity_intervals_minus1[c]; i++) {
+                    ubs(8, fg_intensity_interval_lower_bound[c][i], 2, c, i);
+                    ubs(8, fg_intensity_interval_upper_bound[c][i], 2, c, i);
+                    for (j = 0; j <= current->fg_num_model_values_minus1[c]; j++)
+                        ses(fg_comp_model_value[c][i][j],  0  - current->fg_model_id * (1 << (filmGrainBitDepth[c] - 1)),
+                            ((1 << filmGrainBitDepth[c]) - 1) - current->fg_model_id * (1 << (filmGrainBitDepth[c] - 1)),
+                            3, c, i, j);
+                }
+            }
+        }
+        flag(fg_characteristics_persistence_flag);
+    }
+
+    return 0;
+}
+
+SEI_FUNC(display_orientation, (CodedBitstreamContext *ctx, RWContext *rw,
+                               SEIRawDisplayOrientation *current,
+                               SEIMessageState *state))
+{
+    int err;
+
+    HEADER("Display Orientation");
+
+    flag(display_orientation_cancel_flag);
+    if (!current->display_orientation_cancel_flag) {
+        flag(display_orientation_persistence_flag);
+        u(3, display_orientation_transform_type, 0, 7);
+        ub(3, display_orientation_reserved_zero_3bits);
+    }
+
+    return 0;
+}
+
+SEI_FUNC(frame_field_information, (CodedBitstreamContext *ctx, RWContext *rw,
+                                       SEIRawFrameFieldInformation *current,
+                                       SEIMessageState *state))
+{
+    int err;
+
+    HEADER("Frame-field information");
+
+    flag(ffi_field_pic_flag);
+    if (current->ffi_field_pic_flag) {
+        flag(ffi_bottom_field_flag);
+        flag(ffi_pairing_indicated_flag);
+        if (current->ffi_pairing_indicated_flag)
+            flag(ffi_paired_with_next_field_flag);
+    } else {
+        flag(ffi_display_fields_from_frame_flag);
+        if (current->ffi_display_fields_from_frame_flag)
+            flag(ffi_top_field_first_flag);
+        u(8, ffi_display_elemental_periods_minus1, 0, 0xff);
+    }
+    u(2, ffi_source_scan_type, 0, 3);
+    flag(ffi_duplicate_flag);
+
+    return 0;
+}
+
 static int FUNC(message)(CodedBitstreamContext *ctx, RWContext *rw,
                          SEIRawMessage *current)
 {

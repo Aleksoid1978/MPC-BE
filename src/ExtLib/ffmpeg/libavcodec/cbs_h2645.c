@@ -2310,6 +2310,28 @@ static const SEIMessageTypeDescriptor cbs_sei_h266_types[] = {
     SEI_MESSAGE_TYPE_END
 };
 
+static const SEIMessageTypeDescriptor cbs_sei_h274_types[] = {
+    {
+        SEI_TYPE_FILM_GRAIN_CHARACTERISTICS,
+        1, 0,
+        sizeof(SEIRawFilmGrainCharacteristics),
+        SEI_MESSAGE_RW(sei, film_grain_characteristics),
+    },
+    {
+        SEI_TYPE_DISPLAY_ORIENTATION,
+        1, 0,
+        sizeof(SEIRawDisplayOrientation),
+        SEI_MESSAGE_RW(sei, display_orientation)
+    },
+    {
+        SEI_TYPE_FRAME_FIELD_INFO,
+        1, 0,
+        sizeof(SEIRawFrameFieldInformation),
+        SEI_MESSAGE_RW(sei, frame_field_information)
+    },
+    SEI_MESSAGE_TYPE_END,
+};
+
 const SEIMessageTypeDescriptor *ff_cbs_sei_find_type(CodedBitstreamContext *ctx,
                                                      int payload_type)
 {
@@ -2333,6 +2355,13 @@ const SEIMessageTypeDescriptor *ff_cbs_sei_find_type(CodedBitstreamContext *ctx,
     for (i = 0; codec_list[i].type >= 0; i++) {
         if (codec_list[i].type == payload_type)
             return &codec_list[i];
+    }
+
+    if (ctx->codec->codec_id == AV_CODEC_ID_H266) {
+        for (i = 0; cbs_sei_h274_types[i].type >= 0; i++) {
+            if (cbs_sei_h274_types[i].type == payload_type)
+                return &cbs_sei_h274_types[i];
+        }
     }
 
     for (i = 0; cbs_sei_common_types[i].type >= 0; i++) {

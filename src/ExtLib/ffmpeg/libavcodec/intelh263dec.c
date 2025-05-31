@@ -19,6 +19,7 @@
  */
 
 #include "codec_internal.h"
+#include "h263.h"
 #include "mpegvideo.h"
 #include "mpegvideodec.h"
 #include "h263data.h"
@@ -56,7 +57,6 @@ int ff_intel_h263_decode_picture_header(MpegEncContext *s)
         av_log(s->avctx, AV_LOG_ERROR, "Intel H.263 free format not supported\n");
         return -1;
     }
-    s->h263_plus = 0;
 
     s->pict_type = AV_PICTURE_TYPE_I + get_bits1(&s->gb);
 
@@ -119,7 +119,9 @@ int ff_intel_h263_decode_picture_header(MpegEncContext *s)
     if (skip_1stop_8data_bits(&s->gb) < 0)
         return AVERROR_INVALIDDATA;
 
-    ff_h263_show_pict_info(s);
+    s->gob_index = H263_GOB_HEIGHT(s->height);
+
+    ff_h263_show_pict_info(s, 0);
 
     return 0;
 }

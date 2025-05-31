@@ -366,6 +366,9 @@ av_cold int ff_msmpeg4_decode_init(AVCodecContext *avctx)
     if (ff_h263_decode_init(avctx) < 0)
         return -1;
 
+    // We unquantize inter blocks as we parse them.
+    s->dct_unquantize_inter = NULL;
+
     ff_msmpeg4_common_init(s);
 
     switch (s->msmpeg4_version) {
@@ -379,6 +382,8 @@ av_cold int ff_msmpeg4_decode_init(AVCodecContext *avctx)
         break;
     case MSMP4_WMV2:
         break;
+    default:
+        av_unreachable("List contains all cases using ff_msmpeg4_decode_init()");
     }
 
     s->slice_height= s->mb_height; //to avoid 1/0 if the first frame is not a keyframe
@@ -472,6 +477,8 @@ int ff_msmpeg4_decode_picture_header(MpegEncContext * s)
             ms->dc_table_index = get_bits1(&s->gb);
             s->inter_intra_pred= 0;
             break;
+        default:
+            av_unreachable("ff_msmpeg4_decode_picture_header() only used by MSMP4V1-3, WMV1");
         }
         s->no_rounding = 1;
         if(s->avctx->debug&FF_DEBUG_PICT_INFO)
@@ -523,6 +530,8 @@ int ff_msmpeg4_decode_picture_header(MpegEncContext * s)
             s->inter_intra_pred = s->width*s->height < 320*240 &&
                                   ms->bit_rate <= II_BITRATE;
             break;
+        default:
+            av_unreachable("ff_msmpeg4_decode_picture_header() only used by MSMP4V1-3, WMV1");
         }
 
         if(s->avctx->debug&FF_DEBUG_PICT_INFO)

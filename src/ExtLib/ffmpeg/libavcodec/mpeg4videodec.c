@@ -48,7 +48,6 @@
 #include "profiles.h"
 #include "qpeldsp.h"
 #include "threadprogress.h"
-#include "xvididct.h"
 #include "unary.h"
 
 #if 0 //3IV1 is quite rare and it slows things down a tiny bit
@@ -1400,7 +1399,7 @@ static inline int mpeg4_decode_block(Mpeg4DecContext *ctx, int16_t *block,
 
         scan_table = s->intra_scantable.permutated;
 
-        if (s->mpeg_quant) {
+        if (ctx->mpeg_quant) {
             qmul = 1;
             qadd = 0;
             if (rvlc)
@@ -2156,7 +2155,7 @@ static int mpeg4_decode_studio_block(MpegEncContext *s, int32_t block[64], int n
 
     s->last_dc[cc] += dct_diff;
 
-    if (s->mpeg_quant)
+    if (ctx->mpeg_quant)
         block[0] = s->last_dc[cc] * (8 >> s->intra_dc_precision);
     else
         block[0] = s->last_dc[cc] * (8 >> s->intra_dc_precision) * (8 >> s->dct_precision);
@@ -2586,7 +2585,7 @@ static int decode_studio_vol_header(Mpeg4DecContext *ctx, GetBitContext *gb)
     skip_bits(gb, 15); /* latter_half_vbv_occupancy */
     check_marker(s->avctx, gb, "after latter_half_vbv_occupancy");
     s->low_delay  = get_bits1(gb);
-    s->mpeg_quant = get_bits1(gb); /* mpeg2_stream */
+    ctx->mpeg_quant = get_bits1(gb); /* mpeg2_stream */
 
     next_start_code_studio(gb);
     extension_and_user_data(s, gb, 2);
@@ -2768,7 +2767,7 @@ static int decode_vol_header(Mpeg4DecContext *ctx, GetBitContext *gb)
 
         // FIXME a bunch of grayscale shape things
 
-        if ((s->mpeg_quant = get_bits1(gb))) { /* vol_quant_type */
+        if ((ctx->mpeg_quant = get_bits1(gb))) { /* vol_quant_type */
             int i, v;
 
             mpeg4_load_default_matrices(s);
@@ -3416,8 +3415,10 @@ static int decode_vop_header(Mpeg4DecContext *ctx, GetBitContext *gb,
         }
     }
 
-    s->dct_unquantize_intra = s->mpeg_quant ? ctx->dct_unquantize_mpeg2_intra
-                                            : ctx->dct_unquantize_h263_intra;
+    s->dct_unquantize_intra = ctx->mpeg_quant ? ctx->dct_unquantize_mpeg2_intra
+                                              : ctx->dct_unquantize_h263_intra;
+    // The following tells ff_mpv_reconstruct_mb() to unquantize iff mpeg_quant
+    s->dct_unquantize_inter = ctx->mpeg_quant ? ctx->dct_unquantize_mpeg2_inter : NULL;
 
 end:
     /* detect buggy encoders which don't set the low_delay flag
@@ -3856,6 +3857,7 @@ static int mpeg4_update_thread_context(AVCodecContext *dst,
     s->sprite_warping_accuracy   = s1->sprite_warping_accuracy;
     s->num_sprite_warping_points = s1->num_sprite_warping_points;
     s->m.data_partitioning       = s1->m.data_partitioning;
+    s->mpeg_quant                = s1->mpeg_quant;
     s->rvlc                      = s1->rvlc;
     s->resync_marker             = s1->resync_marker;
     s->t_frame                   = s1->t_frame;
@@ -3880,9 +3882,6 @@ static int mpeg4_update_thread_context(AVCodecContext *dst,
     memcpy(s->sprite_shift, s1->sprite_shift, sizeof(s1->sprite_shift));
     memcpy(s->sprite_traj,  s1->sprite_traj,  sizeof(s1->sprite_traj));
 
-    if (!init && s1->xvid_build >= 0)
-        ff_xvid_idct_init(&s->m.idsp, dst);
-
     return av_buffer_replace(&s->bitstream_buffer, s1->bitstream_buffer);
 }
 
@@ -3901,7 +3900,6 @@ static int mpeg4_update_thread_context_for_user(AVCodecContext *dst,
 
 static av_cold void mpeg4_init_static(void)
 {
-    static uint8_t mpeg4_rvlc_rl_tables[2][2][2 * MAX_RUN + MAX_LEVEL + 3];
     static VLCElem vlc_buf[6498];
     VLCInitState state = VLC_INIT_STATE(vlc_buf);
 
@@ -3923,9 +3921,9 @@ static av_cold void mpeg4_init_static(void)
                                             0, 0);
     }
 
-    ff_mpeg4_init_rl_intra();
-    ff_rl_init(&ff_rvlc_rl_inter, mpeg4_rvlc_rl_tables[0]);
-    ff_rl_init(&ff_rvlc_rl_intra, mpeg4_rvlc_rl_tables[1]);
+    static uint8_t mpeg4_rl_intra_table[2][2 * MAX_RUN + MAX_LEVEL + 3];
+    ff_rl_init(&ff_mpeg4_rl_intra, mpeg4_rl_intra_table);
+
     INIT_FIRST_VLC_RL(ff_mpeg4_rl_intra, 554);
     VLC_INIT_RL(ff_rvlc_rl_inter, 1072);
     INIT_FIRST_VLC_RL(ff_rvlc_rl_intra, 1072);
@@ -3966,8 +3964,8 @@ static av_cold int decode_init(AVCodecContext *avctx)
     ctx->dct_unquantize_h263_intra  = unquant_dsp_ctx.dct_unquantize_h263_intra;
     ctx->dct_unquantize_mpeg2_intra = unquant_dsp_ctx.dct_unquantize_mpeg2_intra;
     // dct_unquantize_inter is only used with MPEG-2 quantizers,
-    // so we can already set dct_unquantize_inter here once and for all.
-    s->dct_unquantize_inter = unquant_dsp_ctx.dct_unquantize_mpeg2_inter;
+    // so that is all we keep.
+    ctx->dct_unquantize_mpeg2_inter = unquant_dsp_ctx.dct_unquantize_mpeg2_inter;
 
     s->y_dc_scale_table = ff_mpeg4_y_dc_scale_table;
     s->c_dc_scale_table = ff_mpeg4_c_dc_scale_table;

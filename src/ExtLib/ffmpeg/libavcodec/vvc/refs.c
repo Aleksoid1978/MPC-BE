@@ -52,6 +52,12 @@ void ff_vvc_unref_frame(VVCFrameContext *fc, VVCFrame *frame, int flags)
         frame->flags = 0;
     if (!frame->flags) {
         av_frame_unref(frame->frame);
+
+        if (frame->needs_fg) {
+            av_frame_unref(frame->frame_grain);
+            frame->needs_fg = 0;
+        }
+
         av_refstruct_unref(&frame->sps);
         av_refstruct_unref(&frame->pps);
         av_refstruct_unref(&frame->progress);
@@ -153,6 +159,14 @@ static VVCFrame *alloc_frame(VVCContext *s, VVCFrameContext *fc)
         win->bottom_offset = pps->r->pps_scaling_win_bottom_offset * (1 << sps->vshift[CHROMA]);
         frame->ref_width   = pps->r->pps_pic_width_in_luma_samples  - win->left_offset   - win->right_offset;
         frame->ref_height  = pps->r->pps_pic_height_in_luma_samples - win->bottom_offset - win->top_offset;
+
+        if (fc->sei.frame_field_info.present) {
+            if (fc->sei.frame_field_info.picture_struct == AV_PICTURE_STRUCTURE_TOP_FIELD)
+                frame->frame->flags |= AV_FRAME_FLAG_TOP_FIELD_FIRST;
+            if (fc->sei.frame_field_info.picture_struct == AV_PICTURE_STRUCTURE_TOP_FIELD ||
+                fc->sei.frame_field_info.picture_struct == AV_PICTURE_STRUCTURE_BOTTOM_FIELD)
+                frame->frame->flags |= AV_FRAME_FLAG_INTERLACED;
+        }
 
         frame->progress = alloc_progress();
         if (!frame->progress)
@@ -285,7 +299,13 @@ int ff_vvc_output_frame(VVCContext *s, VVCFrameContext *fc, AVFrame *out, const 
             if (frame->flags & VVC_FRAME_FLAG_CORRUPT)
                 frame->frame->flags |= AV_FRAME_FLAG_CORRUPT;
 
-            ret = av_frame_ref(out, frame->frame);
+            ret = av_frame_ref(out, frame->needs_fg ? frame->frame_grain : frame->frame);
+            if (ret < 0)
+                return ret;
+
+            if (!(s->avctx->export_side_data & AV_CODEC_EXPORT_DATA_FILM_GRAIN))
+                av_frame_remove_side_data(out, AV_FRAME_DATA_FILM_GRAIN_PARAMS);
+
             if (frame->flags & VVC_FRAME_FLAG_BUMPING)
                 ff_vvc_unref_frame(fc, frame, VVC_FRAME_FLAG_OUTPUT | VVC_FRAME_FLAG_BUMPING);
             else

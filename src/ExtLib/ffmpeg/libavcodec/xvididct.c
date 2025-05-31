@@ -32,7 +32,6 @@
 
 #include "config.h"
 #include "libavutil/attributes.h"
-#include "avcodec.h"
 #include "idctdsp.h"
 #include "xvididct.h"
 
@@ -330,27 +329,16 @@ static void xvid_idct_add(uint8_t *dest, ptrdiff_t line_size, int16_t *block)
     ff_add_pixels_clamped_c(block, dest, line_size);
 }
 
-av_cold void ff_xvid_idct_init(IDCTDSPContext *c, AVCodecContext *avctx)
+av_cold void ff_xvid_idct_init(IDCTDSPContext *c)
 {
-    const unsigned high_bit_depth = avctx->bits_per_raw_sample > 8;
-
-    if (high_bit_depth || avctx->lowres ||
-        !(avctx->idct_algo == FF_IDCT_AUTO ||
-          avctx->idct_algo == FF_IDCT_XVID))
-        return;
-
-    if (avctx->idct_algo == FF_IDCT_XVID) {
-        c->idct_put  = xvid_idct_put;
-        c->idct_add  = xvid_idct_add;
-        c->idct      = ff_xvid_idct;
-        c->perm_type = FF_IDCT_PERM_NONE;
-    }
+    c->idct_put  = xvid_idct_put;
+    c->idct_add  = xvid_idct_add;
+    c->idct      = ff_xvid_idct;
+    c->perm_type = FF_IDCT_PERM_NONE;
 
 #if ARCH_X86
     ff_xvid_idct_init_x86(c);
 #elif ARCH_MIPS
     ff_xvid_idct_init_mips(c);
 #endif
-
-    ff_init_scantable_permutation(c->idct_permutation, c->perm_type);
 }

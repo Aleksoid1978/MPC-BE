@@ -19,13 +19,17 @@
 #ifndef AVCODEC_PIXBLOCKDSP_H
 #define AVCODEC_PIXBLOCKDSP_H
 
+#include <stddef.h>
 #include <stdint.h>
 
-#include "avcodec.h"
+#define PIXBLOCKDSP_8BPP_GET_PIXELS_SUPPORTS_UNALIGNED \
+    !(ARCH_ARM || ARCH_MIPS || ARCH_PPC || ARCH_RISCV)
 
 typedef struct PixblockDSPContext {
     void (*get_pixels)(int16_t *restrict block /* align 16 */,
-                       const uint8_t *pixels /* align 8 */,
+                       /* align 16 for > 8 bits; align 8 for <= 8 bits
+                        * (or 1 if PIXBLOCKDSP_8BPP_GET_PIXELS_SUPPORTS_UNALIGNED is set) */
+                       const uint8_t *pixels,
                        ptrdiff_t stride);
     void (*get_pixels_unaligned)(int16_t *restrict block /* align 16 */,
                        const uint8_t *pixels,
@@ -41,18 +45,18 @@ typedef struct PixblockDSPContext {
 
 } PixblockDSPContext;
 
-void ff_pixblockdsp_init(PixblockDSPContext *c, AVCodecContext *avctx);
-void ff_pixblockdsp_init_aarch64(PixblockDSPContext *c, AVCodecContext *avctx,
+void ff_pixblockdsp_init(PixblockDSPContext *c, int bits_per_raw_sample);
+void ff_pixblockdsp_init_aarch64(PixblockDSPContext *c,
                                  unsigned high_bit_depth);
-void ff_pixblockdsp_init_arm(PixblockDSPContext *c, AVCodecContext *avctx,
+void ff_pixblockdsp_init_arm(PixblockDSPContext *c,
                              unsigned high_bit_depth);
-void ff_pixblockdsp_init_ppc(PixblockDSPContext *c, AVCodecContext *avctx,
+void ff_pixblockdsp_init_ppc(PixblockDSPContext *c,
                              unsigned high_bit_depth);
-void ff_pixblockdsp_init_riscv(PixblockDSPContext *c, AVCodecContext *avctx,
+void ff_pixblockdsp_init_riscv(PixblockDSPContext *c,
                                unsigned high_bit_depth);
-void ff_pixblockdsp_init_x86(PixblockDSPContext *c, AVCodecContext *avctx,
+void ff_pixblockdsp_init_x86(PixblockDSPContext *c,
                              unsigned high_bit_depth);
-void ff_pixblockdsp_init_mips(PixblockDSPContext *c, AVCodecContext *avctx,
+void ff_pixblockdsp_init_mips(PixblockDSPContext *c,
                               unsigned high_bit_depth);
 
 #endif /* AVCODEC_PIXBLOCKDSP_H */
