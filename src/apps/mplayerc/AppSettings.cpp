@@ -517,8 +517,6 @@ void CAppSettings::ResetSettings()
 	bShowMilliSecs = false;
 	fUseTimeTooltip = true;
 	nTimeTooltipPosition = TIME_TOOLTIP_ABOVE_SEEKBAR;
-	nOSDSize = 18;
-	strOSDFont = L"Segoe UI";
 
 	// Associated types with icon or not...
 	bAssociatedWithIcons = true;
@@ -661,6 +659,15 @@ void CAppSettings::ResetSettings()
 	nThemeBlue  = 255;
 	bDarkMenu = true;
 	bDarkTitle = true;
+
+	ShowOSD.Enable = 1;
+	bOSDRemainingTime = false;
+	bOSDLocalTime = false;
+	bOSDFileName = false;
+	strOSDFont = L"Segoe UI";
+	nOSDSize = 18;
+	bOSDFontShadow = false;
+	bOSDFontAA = true;
 	nOSDTransparent = 100;
 	nOSDBorder = 1;
 
@@ -736,7 +743,6 @@ void CAppSettings::ResetSettings()
 	bToggleShader = false;
 	bToggleShaderScreenSpace = false;
 
-	ShowOSD.Enable = 1;
 	fFastSeek = true;
 	bHideWindowedMousePointer = false;
 	nMinMPlsDuration = 3;
@@ -754,8 +760,6 @@ void CAppSettings::ResetSettings()
 	fFlybar = true;
 	iPlsFontPercent = 100;
 	fFlybarOnTop = false;
-	fFontShadow = false;
-	fFontAA = true;
 
 	// Save analog capture settings
 	iDefaultCaptureDevice = 0;
@@ -810,10 +814,6 @@ void CAppSettings::ResetSettings()
 	nUpdaterDelay = 7;
 
 	tUpdaterLastCheck = 0;
-
-	bOSDRemainingTime = false;
-	bOSDLocalTime = false;
-	bOSDFileName = false;
 
 	bPasteClipboardURL = false;
 
@@ -1244,8 +1244,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadUInt(IDS_R_OSD, IDS_RS_SHOWOSD, ShowOSD.value);
 	profile.ReadInt(IDS_R_OSD, IDS_RS_OSD_SIZE, nOSDSize, 8, 40);
 	profile.ReadString(IDS_R_OSD, IDS_RS_OSD_FONT, strOSDFont);
-	profile.ReadBool(IDS_R_OSD, IDS_RS_OSD_FONTSHADOW, fFontShadow);
-	profile.ReadBool(IDS_R_OSD, IDS_RS_OSD_FONTAA, fFontAA);
+	profile.ReadBool(IDS_R_OSD, IDS_RS_OSD_FONTSHADOW, bOSDFontShadow);
+	profile.ReadBool(IDS_R_OSD, IDS_RS_OSD_FONTAA, bOSDFontAA);
 	profile.ReadHex32(IDS_R_OSD, IDS_RS_OSD_FONTCOLOR, *(unsigned*)&clrFontABGR);
 	profile.ReadHex32(IDS_R_OSD, IDS_RS_OSD_GRADCOLOR1, *(unsigned*)&clrGrad1ABGR);
 	profile.ReadHex32(IDS_R_OSD, IDS_RS_OSD_GRADCOLOR2, *(unsigned*)&clrGrad2ABGR);
@@ -1883,8 +1883,8 @@ void CAppSettings::SaveSettings()
 	profile.WriteUInt(IDS_R_OSD, IDS_RS_SHOWOSD, ShowOSD.value);
 	profile.WriteInt(IDS_R_OSD, IDS_RS_OSD_SIZE, nOSDSize);
 	profile.WriteString(IDS_R_OSD, IDS_RS_OSD_FONT, strOSDFont);
-	profile.WriteBool(IDS_R_OSD, IDS_RS_OSD_FONTSHADOW, fFontShadow);
-	profile.WriteBool(IDS_R_OSD, IDS_RS_OSD_FONTAA, fFontAA);
+	profile.WriteBool(IDS_R_OSD, IDS_RS_OSD_FONTSHADOW, bOSDFontShadow);
+	profile.WriteBool(IDS_R_OSD, IDS_RS_OSD_FONTAA, bOSDFontAA);
 	profile.WriteHex32(IDS_R_OSD, IDS_RS_OSD_FONTCOLOR, clrFontABGR);
 	profile.WriteHex32(IDS_R_OSD, IDS_RS_OSD_GRADCOLOR1, clrGrad1ABGR);
 	profile.WriteHex32(IDS_R_OSD, IDS_RS_OSD_GRADCOLOR2, clrGrad2ABGR);

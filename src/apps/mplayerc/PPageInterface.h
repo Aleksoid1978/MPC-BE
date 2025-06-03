@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,22 +36,11 @@ public:
 	virtual ~CPPageInterface();
 
 	enum { IDD = IDD_PPAGEINTERFACE };
-	BOOL m_bUseDarkTheme    = FALSE;
 	int  m_nThemeBrightness = 0;
 	int  m_nThemeRed        = 255;
 	int  m_nThemeGreen      = 255;
 	int  m_nThemeBlue       = 255;
-	BOOL m_fUseTimeTooltip  = TRUE;
-	BOOL m_fSmartSeek       = FALSE;
-	BOOL m_bSmartSeekOnline = FALSE;
-	BOOL m_fChapterMarker   = FALSE;
-	BOOL m_fFlybar          = TRUE;
-	BOOL m_fFontShadow      = FALSE;
-	BOOL m_fFontAA          = TRUE;
-	int  m_nOSDTransparent  = 0;
-	int  m_OSDBorder        = 1;
 	BOOL m_fUseWin7TaskBar  = TRUE;
-	CString m_OSD_Font;
 
 	CButton m_UseDarkThemeCtrl;
 	CSliderCtrl m_ThemeBrightnessCtrl;
@@ -60,21 +49,27 @@ public:
 	CSliderCtrl m_ThemeBlueCtrl;
 	CButton     m_chkDarkMenu;
 	CButton     m_chkDarkTitle;
-	CIntEdit    m_edSmartSeekSize;
-	CIntEdit    m_edPlsFontPercent;
-	CIntEdit    m_edOSDFontSize;
-	CSliderCtrl m_OSDTransparentCtrl;
-	CComboBox m_TimeTooltipPosition;
-	CComboBox m_FontType;
-	CComboBox m_SmartSeekVR;
-	CSpinButtonCtrl m_spOSDFontSize;
-	CSpinButtonCtrl m_OSDBorderCtrl;
 
-	COLORREF m_clrFaceABGR    = 0x00ffffff;
-	COLORREF m_clrOutlineABGR = 0x00868686;
-	COLORREF m_clrFontABGR    = 0x00E0E0E0;
-	COLORREF m_clrGrad1ABGR   = 0x00302820;
-	COLORREF m_clrGrad2ABGR   = 0x00302820;
+	BOOL      m_fUseTimeTooltip  = TRUE;
+	CComboBox m_TimeTooltipPosition;
+	BOOL      m_fSmartSeek       = FALSE;
+	BOOL      m_bSmartSeekOnline = FALSE;
+	CIntEdit  m_edSmartSeekSize;
+	CComboBox m_SmartSeekVR;
+	BOOL      m_fChapterMarker   = FALSE;
+	BOOL      m_fFlybar          = TRUE;
+	CIntEdit  m_edPlsFontPercent;
+
+	CString         m_OSD_Font;
+	CComboBox       m_OSDFontType;
+	CIntEdit        m_edOSDFontSize;
+	CSpinButtonCtrl m_spOSDFontSize;
+	BOOL m_bOSDFontShadow  = FALSE;
+	BOOL m_bOSDFontAA      = TRUE;
+	CSliderCtrl     m_OSDTransparentCtrl;
+	int  m_nOSDTransparent = 0;
+	int  m_OSDBorder       = 1;
+	CSpinButtonCtrl m_OSDBorderCtrl;
 
 	int m_nThemeBrightness_Old;
 	int m_nThemeRed_Old;
@@ -84,6 +79,12 @@ public:
 	int m_OSDBorder_Old;
 	BOOL m_fFontShadow_Old;
 	BOOL m_fFontAA_Old;
+
+	COLORREF m_clrFaceABGR    = 0x00ffffff;
+	COLORREF m_clrOutlineABGR = 0x00868686;
+	COLORREF m_clrFontABGR    = 0x00E0E0E0;
+	COLORREF m_clrGrad1ABGR   = 0x00302820;
+	COLORREF m_clrGrad2ABGR   = 0x00302820;
 
 	COLORREF m_clrFaceABGR_Old;
 	COLORREF m_clrOutlineABGR_Old;

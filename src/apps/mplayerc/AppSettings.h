@@ -738,8 +738,8 @@ public:
 	bool			fChapterMarker;
 	bool			fFlybar;
 	int				iPlsFontPercent;
-	bool			fFontShadow;
-	bool			fFontAA;
+	bool			bOSDFontShadow;
+	bool			bOSDFontAA;
 	bool			fFlybarOnTop;
 	bool			fUseWin7TaskBar;
 	int				nOSDSize;

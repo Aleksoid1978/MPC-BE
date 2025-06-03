@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -452,7 +452,7 @@ void COSD::DrawMessage()
 		const CAppSettings& s = AfxGetAppSettings();
 
 		CRect r;
-		if (s.fFontShadow) {
+		if (s.bOSDFontShadow) {
 			r		= rectMessages;
 			r.left	+= 12;
 			r.top	+= 7;
@@ -768,14 +768,14 @@ void COSD::DisplayMessage(
 
 		if (m_OSD_FontCashed != m_OSD_Font
 				|| m_FontSizeCashed != m_FontSize
-				|| m_bFontAACashed != s.fFontAA
+				|| m_bFontAACashed != s.bOSDFontAA
 				|| !m_MainFont.GetSafeHandle()) {
 			CreateFontInternal();
 		}
 
 		m_OSD_FontCashed = m_OSD_Font;
 		m_FontSizeCashed = m_FontSize;
-		m_bFontAACashed = s.fFontAA;
+		m_bFontAACashed = s.bOSDFontAA;
 
 		if (m_pWnd) {
 			EndTimer();
@@ -917,7 +917,7 @@ void COSD::DrawWnd()
 			&& m_nMessagePosCashed == m_nMessagePos
 			&& m_OSD_FontCashed == m_OSD_Font
 			&& m_FontSizeCashed == m_FontSize
-			&& m_bFontAACashed == s.fFontAA) {
+			&& m_bFontAACashed == s.bOSDFontAA) {
 		return;
 	}
 
@@ -927,14 +927,14 @@ void COSD::DrawWnd()
 
 	if (m_OSD_FontCashed != m_OSD_Font
 			|| m_FontSizeCashed != m_FontSize
-			|| m_bFontAACashed != s.fFontAA
+			|| m_bFontAACashed != s.bOSDFontAA
 			|| !m_MainFont.GetSafeHandle()) {
 		CreateFontInternal();
 	}
 
 	m_OSD_FontCashed = m_OSD_Font;
 	m_FontSizeCashed = m_FontSize;
-	m_bFontAACashed = s.fFontAA;
+	m_bFontAACashed = s.bOSDFontAA;
 
 	CClientDC dc(this);
 
@@ -1003,7 +1003,7 @@ void COSD::DrawWnd()
 
 	CRect r;
 
-	if (s.fFontShadow) {
+	if (s.bOSDFontShadow) {
 		r			= rcBar;
 		r.left		= 12;
 		r.top		= 7;
@@ -1145,7 +1145,7 @@ void COSD::CreateFontInternal()
 	LOGFONTW lf = {};
 	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
 	lf.lfHeight = -PointsToPixels(m_FontSize);
-	lf.lfQuality = AfxGetAppSettings().fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
+	lf.lfQuality = AfxGetAppSettings().bOSDFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
 	wcscpy_s(lf.lfFaceName, LF_FACESIZE, m_OSD_Font);
 
 	m_MainFont.CreateFontIndirectW(&lf);

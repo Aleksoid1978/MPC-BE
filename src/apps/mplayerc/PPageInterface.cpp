@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,7 +40,6 @@ void CPPageInterface::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
-	DDX_Check(pDX, IDC_CHECK3, m_bUseDarkTheme);
 	DDX_Control(pDX, IDC_CHECK3, m_UseDarkThemeCtrl);
 	DDX_Slider(pDX, IDC_SLIDER1, m_nThemeBrightness);
 	DDX_Slider(pDX, IDC_SLIDER2, m_nThemeRed);
@@ -48,16 +47,15 @@ void CPPageInterface::DoDataExchange(CDataExchange* pDX)
 	DDX_Slider(pDX, IDC_SLIDER4, m_nThemeBlue);
 	DDX_Control(pDX, IDC_CHECK4, m_chkDarkMenu);
 	DDX_Control(pDX, IDC_CHECK5, m_chkDarkTitle);
-	DDX_Slider(pDX, IDC_SLIDER_OSDTRANS, m_nOSDTransparent);
+
 	DDX_Control(pDX, IDC_SLIDER1, m_ThemeBrightnessCtrl);
 	DDX_Control(pDX, IDC_SLIDER2, m_ThemeRedCtrl);
 	DDX_Control(pDX, IDC_SLIDER3, m_ThemeGreenCtrl);
 	DDX_Control(pDX, IDC_SLIDER4, m_ThemeBlueCtrl);
-	DDX_Control(pDX, IDC_SLIDER_OSDTRANS, m_OSDTransparentCtrl);
 	DDX_Check(pDX, IDC_CHECK_WIN7, m_fUseWin7TaskBar);
+
 	DDX_Check(pDX, IDC_CHECK8, m_fUseTimeTooltip);
 	DDX_Control(pDX, IDC_COMBO3, m_TimeTooltipPosition);
-	DDX_Control(pDX, IDC_COMBO1, m_FontType);
 	DDX_Check(pDX, IDC_CHECK_PRV, m_fSmartSeek);
 	DDX_Check(pDX, IDC_CHECK6, m_bSmartSeekOnline);
 	DDX_Control(pDX, IDC_EDIT1, m_edSmartSeekSize);
@@ -65,12 +63,17 @@ void CPPageInterface::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_CHM, m_fChapterMarker);
 	DDX_Check(pDX, IDC_CHECK_FLYBAR, m_fFlybar);
 	DDX_Control(pDX, IDC_EDIT2, m_edPlsFontPercent);
+
+	DDX_Check(pDX, IDC_CHECK_SHADOW, m_bOSDFontShadow);
+	DDX_Check(pDX, IDC_CHECK_AA, m_bOSDFontAA);
+
+	DDX_Control(pDX, IDC_COMBO1, m_OSDFontType);
 	DDX_Control(pDX, IDC_EDIT3, m_edOSDFontSize);
 	DDX_Control(pDX, IDC_SPIN3, m_spOSDFontSize);
+	DDX_Control(pDX, IDC_SLIDER_OSDTRANS, m_OSDTransparentCtrl);
+	DDX_Slider(pDX, IDC_SLIDER_OSDTRANS, m_nOSDTransparent);
 	DDX_Text(pDX, IDC_EDIT4, m_OSDBorder);
 	DDX_Control(pDX, IDC_SPIN10, m_OSDBorderCtrl);
-	DDX_Check(pDX, IDC_CHECK_SHADOW, m_fFontShadow);
-	DDX_Check(pDX, IDC_CHECK_AA, m_fFontAA);
 }
 
 int CALLBACK EnumFontProc(ENUMLOGFONT FAR* lf, NEWTEXTMETRIC FAR* tm, int FontType, LPARAM dwData)
@@ -97,7 +100,7 @@ BOOL CPPageInterface::OnInitDialog()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	m_bUseDarkTheme	= s.bUseDarkTheme;
+	m_UseDarkThemeCtrl.SetCheck(s.bUseDarkTheme);
 	m_nThemeBrightness		= m_nThemeBrightness_Old	= s.nThemeBrightness;
 	m_nThemeRed				= m_nThemeRed_Old			= s.nThemeRed;
 	m_nThemeGreen			= m_nThemeGreen_Old			= s.nThemeGreen;
@@ -140,24 +143,24 @@ BOOL CPPageInterface::OnInitDialog()
 	m_fFlybar			= s.fFlybar;
 	m_edPlsFontPercent.SetRange(100, 200);
 	m_edPlsFontPercent	= s.iPlsFontPercent;
-	m_fFontShadow		= m_fFontShadow_Old	= s.fFontShadow;
-	m_fFontAA			= m_fFontAA_Old		= s.fFontAA;
-	m_FontType.Clear();
+	m_bOSDFontShadow		= m_fFontShadow_Old	= s.bOSDFontShadow;
+	m_bOSDFontAA			= m_fFontAA_Old		= s.bOSDFontAA;
+	m_OSDFontType.Clear();
 	HDC dc = CreateDCW(L"DISPLAY", nullptr, nullptr, nullptr);
 	std::vector<CString> fontnames;
 	EnumFontFamiliesW(dc, nullptr, (FONTENUMPROCW)EnumFontProc, (LPARAM)&fontnames);
 	DeleteDC(dc);
 
 	for (const auto& fontname : fontnames) {
-		m_FontType.AddString(fontname);
+		m_OSDFontType.AddString(fontname);
 	}
 
-	CorrectComboListWidth(m_FontType);
-	int iSel = m_FontType.FindStringExact(0, m_OSD_Font);
+	CorrectComboListWidth(m_OSDFontType);
+	int iSel = m_OSDFontType.FindStringExact(0, m_OSD_Font);
 	if (iSel == CB_ERR) {
 		iSel = 0;
 	}
-	m_FontType.SetCurSel(iSel);
+	m_OSDFontType.SetCurSel(iSel);
 
 	m_edOSDFontSize.SetRange(8, 40);
 	m_spOSDFontSize.SetRange(8, 40);
@@ -205,7 +208,7 @@ BOOL CPPageInterface::OnApply()
 
 	auto pFrame			= AfxGetMainFrame();
 	BOOL bUseDarkTheme	= s.bUseDarkTheme;
-	s.bUseDarkTheme	= !!m_bUseDarkTheme;
+	s.bUseDarkTheme	= !!m_UseDarkThemeCtrl.GetCheck();
 	if (::IsWindow(pFrame->m_hWnd_toolbar) && (s.bUseDarkTheme != !!bUseDarkTheme)) {
 		::PostMessageW(pFrame->m_hWnd_toolbar, WM_SIZE, s.nLastWindowType, MAKELPARAM(s.szLastWindowSize.cx, s.szLastWindowSize.cx));
 		::PostMessageW(pFrame->m_hWnd,         WM_SIZE, s.nLastWindowType, MAKELPARAM(s.szLastWindowSize.cx, s.szLastWindowSize.cy));
@@ -218,7 +221,7 @@ BOOL CPPageInterface::OnApply()
 	s.nTimeTooltipPosition	= m_TimeTooltipPosition.GetCurSel();
 	s.nOSDSize				= m_edOSDFontSize;
 
-	m_FontType.GetLBText(m_FontType.GetCurSel(),s.strOSDFont);
+	m_OSDFontType.GetLBText(m_OSDFontType.GetCurSel(),s.strOSDFont);
 
 	s.fSmartSeek			= !!m_fSmartSeek;
 	s.bSmartSeekOnline		= !!m_bSmartSeekOnline;
@@ -227,8 +230,8 @@ BOOL CPPageInterface::OnApply()
 
 	s.fChapterMarker		= !!m_fChapterMarker;
 	s.fFlybar				= !!m_fFlybar;
-	s.fFontShadow			= !!m_fFontShadow;
-	s.fFontAA				= !!m_fFontAA;
+	s.bOSDFontShadow			= !!m_bOSDFontShadow;
+	s.bOSDFontAA				= !!m_bOSDFontAA;
 
 	if (s.iPlsFontPercent != m_edPlsFontPercent) {
 		s.iPlsFontPercent = m_edPlsFontPercent;
@@ -267,8 +270,8 @@ BOOL CPPageInterface::OnApply()
 	m_nThemeGreen_Old		= s.nThemeGreen;
 	m_nThemeBlue_Old		= s.nThemeBlue;
 	m_OSDBorder_Old			= s.nOSDBorder;
-	m_fFontShadow_Old		= s.fFontShadow;
-	m_fFontAA_Old			= s.fFontAA;
+	m_fFontShadow_Old		= s.bOSDFontShadow;
+	m_fFontAA_Old			= s.bOSDFontAA;
 	m_nOSDTransparent_Old	= s.nOSDTransparent;
 
 	m_clrFaceABGR_Old		= s.clrFaceABGR;
@@ -289,8 +292,8 @@ void CPPageInterface::OnCancel()
 	s.nThemeGreen		= m_nThemeGreen_Old;
 	s.nThemeBlue		= m_nThemeBlue_Old;
 	s.nOSDBorder		= m_OSDBorder_Old;
-	s.fFontShadow		= !!m_fFontShadow_Old;
-	s.fFontAA			= !!m_fFontAA_Old;
+	s.bOSDFontShadow		= !!m_fFontShadow_Old;
+	s.bOSDFontAA			= !!m_fFontAA_Old;
 	s.nOSDTransparent	= m_nOSDTransparent_Old;
 
 	s.clrFaceABGR		= m_clrFaceABGR_Old;
@@ -370,19 +373,20 @@ END_MESSAGE_MAP()
 
 void CPPageInterface::OnUpdateCheck3(CCmdUI* pCmdUI)
 {
-	GetDlgItem(IDC_STATIC1)->EnableWindow(m_bUseDarkTheme);
-	GetDlgItem(IDC_STATIC2)->EnableWindow(m_bUseDarkTheme);
-	GetDlgItem(IDC_STATIC3)->EnableWindow(m_bUseDarkTheme);
-	GetDlgItem(IDC_STATIC4)->EnableWindow(m_bUseDarkTheme);
-	GetDlgItem(IDC_STATIC5)->EnableWindow(m_bUseDarkTheme);
-	GetDlgItem(IDC_BUTTON_CLRFACE)->EnableWindow(m_bUseDarkTheme);
-	GetDlgItem(IDC_BUTTON_CLROUTLINE)->EnableWindow(m_bUseDarkTheme);
-	GetDlgItem(IDC_BUTTON_CLRDEFAULT)->EnableWindow(m_bUseDarkTheme);
-	GetDlgItem(IDC_STATIC_CLRFACE)->EnableWindow(m_bUseDarkTheme);
-	GetDlgItem(IDC_STATIC_CLROUTLINE)->EnableWindow(m_bUseDarkTheme);
-	m_chkDarkMenu.EnableWindow(m_bUseDarkTheme);
+	BOOL bUseDarkTheme = m_UseDarkThemeCtrl.GetCheck();
+	GetDlgItem(IDC_STATIC1)->EnableWindow(bUseDarkTheme);
+	GetDlgItem(IDC_STATIC2)->EnableWindow(bUseDarkTheme);
+	GetDlgItem(IDC_STATIC3)->EnableWindow(bUseDarkTheme);
+	GetDlgItem(IDC_STATIC4)->EnableWindow(bUseDarkTheme);
+	GetDlgItem(IDC_STATIC5)->EnableWindow(bUseDarkTheme);
+	GetDlgItem(IDC_BUTTON_CLRFACE)->EnableWindow(bUseDarkTheme);
+	GetDlgItem(IDC_BUTTON_CLROUTLINE)->EnableWindow(bUseDarkTheme);
+	GetDlgItem(IDC_BUTTON_CLRDEFAULT)->EnableWindow(bUseDarkTheme);
+	GetDlgItem(IDC_STATIC_CLRFACE)->EnableWindow(bUseDarkTheme);
+	GetDlgItem(IDC_STATIC_CLROUTLINE)->EnableWindow(bUseDarkTheme);
+	m_chkDarkMenu.EnableWindow(bUseDarkTheme);
 	if (SysVersion::IsWin10v1809orLater()) {
-		m_chkDarkTitle.EnableWindow(m_bUseDarkTheme);
+		m_chkDarkTitle.EnableWindow(bUseDarkTheme);
 	}
 }
 
@@ -391,11 +395,11 @@ void CPPageInterface::OnCheckShadow()
 	CAppSettings& s = AfxGetAppSettings();
 
 	UpdateData();
-	BOOL fFontShadow = s.fFontShadow;
-	s.fFontShadow = !!m_fFontShadow;
+	BOOL fFontShadow = s.bOSDFontShadow;
+	s.bOSDFontShadow = !!m_bOSDFontShadow;
 	OnChangeOSD();
 
-	s.fFontShadow = !!fFontShadow;
+	s.bOSDFontShadow = !!fFontShadow;
 }
 
 void CPPageInterface::OnCheckAA()
@@ -403,11 +407,11 @@ void CPPageInterface::OnCheckAA()
 	CAppSettings& s = AfxGetAppSettings();
 
 	UpdateData();
-	BOOL fFontAA = s.fFontAA;
-	s.fFontAA = !!m_fFontAA;
+	BOOL fFontAA = s.bOSDFontAA;
+	s.bOSDFontAA = !!m_bOSDFontAA;
 	OnChangeOSD();
 
-	s.fFontAA = !!fFontAA;
+	s.bOSDFontAA = !!fFontAA;
 }
 
 void CPPageInterface::OnUpdateOSDBorder(CCmdUI* pCmdUI)
@@ -446,8 +450,8 @@ void CPPageInterface::OnClickClrDefault()
 	s.nThemeBlue			= m_nThemeBlue			= 255;
 	s.nOSDTransparent		= m_nOSDTransparent		= 100;
 
-	m_fFontShadow = FALSE;
-	m_fFontAA = TRUE;
+	m_bOSDFontShadow = FALSE;
+	m_bOSDFontAA = TRUE;
 	m_OSDBorder = 1;
 	OnThemeChange();
 
@@ -456,8 +460,8 @@ void CPPageInterface::OnClickClrDefault()
 	m_nThemeGreen_Old		= s.nThemeGreen;
 	m_nThemeBlue_Old		= s.nThemeBlue;
 	m_OSDBorder_Old			= s.nOSDBorder;
-	m_fFontShadow_Old		= s.fFontShadow;
-	m_fFontAA_Old			= s.fFontAA;
+	m_fFontShadow_Old		= s.bOSDFontShadow;
+	m_fFontAA_Old			= s.bOSDFontAA;
 	m_nOSDTransparent_Old	= s.nOSDTransparent;
 
 	m_clrFaceABGR_Old		= s.clrFaceABGR;
@@ -621,7 +625,7 @@ void CPPageInterface::OnChangeOSD()
 	if (pFrame->m_OSD) {
 		CString str;
 		int osdFontSize = m_edOSDFontSize;
-		m_FontType.GetLBText(m_FontType.GetCurSel(), str);
+		m_OSDFontType.GetLBText(m_OSDFontType.GetCurSel(), str);
 
 		pFrame->m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_OSD_TEST), 2000, false, osdFontSize, str);
 		pFrame->m_OSD.SetLayeredWindowAttributes(RGB(255, 0, 255), 255 - AfxGetAppSettings().nOSDTransparent, LWA_ALPHA | LWA_COLORKEY);
