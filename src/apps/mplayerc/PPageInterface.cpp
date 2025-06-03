@@ -143,8 +143,8 @@ BOOL CPPageInterface::OnInitDialog()
 	m_fFlybar			= s.fFlybar;
 	m_edPlsFontPercent.SetRange(100, 200);
 	m_edPlsFontPercent	= s.iPlsFontPercent;
-	m_bOSDFontShadow		= m_fFontShadow_Old	= s.bOSDFontShadow;
-	m_bOSDFontAA			= m_fFontAA_Old		= s.bOSDFontAA;
+	m_bOSDFontShadow	= m_bOSDFontShadow_Old	= s.bOSDFontShadow;
+	m_bOSDFontAA		= m_bOSDFontAA_Old		= s.bOSDFontAA;
 	m_OSDFontType.Clear();
 	HDC dc = CreateDCW(L"DISPLAY", nullptr, nullptr, nullptr);
 	std::vector<CString> fontnames;
@@ -270,8 +270,8 @@ BOOL CPPageInterface::OnApply()
 	m_nThemeGreen_Old		= s.nThemeGreen;
 	m_nThemeBlue_Old		= s.nThemeBlue;
 	m_OSDBorder_Old			= s.nOSDBorder;
-	m_fFontShadow_Old		= s.bOSDFontShadow;
-	m_fFontAA_Old			= s.bOSDFontAA;
+	m_bOSDFontShadow_Old	= s.bOSDFontShadow;
+	m_bOSDFontAA_Old		= s.bOSDFontAA;
 	m_nOSDTransparent_Old	= s.nOSDTransparent;
 
 	m_clrFaceABGR_Old		= s.clrFaceABGR;
@@ -292,8 +292,8 @@ void CPPageInterface::OnCancel()
 	s.nThemeGreen		= m_nThemeGreen_Old;
 	s.nThemeBlue		= m_nThemeBlue_Old;
 	s.nOSDBorder		= m_OSDBorder_Old;
-	s.bOSDFontShadow		= !!m_fFontShadow_Old;
-	s.bOSDFontAA			= !!m_fFontAA_Old;
+	s.bOSDFontShadow	= !!m_bOSDFontShadow_Old;
+	s.bOSDFontAA		= !!m_bOSDFontAA_Old;
 	s.nOSDTransparent	= m_nOSDTransparent_Old;
 
 	s.clrFaceABGR		= m_clrFaceABGR_Old;
@@ -460,8 +460,8 @@ void CPPageInterface::OnClickClrDefault()
 	m_nThemeGreen_Old		= s.nThemeGreen;
 	m_nThemeBlue_Old		= s.nThemeBlue;
 	m_OSDBorder_Old			= s.nOSDBorder;
-	m_fFontShadow_Old		= s.bOSDFontShadow;
-	m_fFontAA_Old			= s.bOSDFontAA;
+	m_bOSDFontShadow_Old	= s.bOSDFontShadow;
+	m_bOSDFontAA_Old		= s.bOSDFontAA;
 	m_nOSDTransparent_Old	= s.nOSDTransparent;
 
 	m_clrFaceABGR_Old		= s.clrFaceABGR;

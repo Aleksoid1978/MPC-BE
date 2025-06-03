@@ -77,8 +77,8 @@ public:
 	int m_nThemeBlue_Old;
 	int m_nOSDTransparent_Old;
 	int m_OSDBorder_Old;
-	BOOL m_fFontShadow_Old;
-	BOOL m_fFontAA_Old;
+	BOOL m_bOSDFontShadow_Old;
+	BOOL m_bOSDFontAA_Old;
 
 	COLORREF m_clrFaceABGR    = 0x00ffffff;
 	COLORREF m_clrOutlineABGR = 0x00868686;
