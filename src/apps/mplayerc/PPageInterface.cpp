@@ -63,6 +63,7 @@ void CPPageInterface::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_CHM, m_fChapterMarker);
 	DDX_Check(pDX, IDC_CHECK_FLYBAR, m_fFlybar);
 	DDX_Control(pDX, IDC_EDIT2, m_edPlsFontPercent);
+	DDX_Control(pDX, IDC_COMBO5, m_cbToolbarSize);
 
 	DDX_Check(pDX, IDC_CHECK_SHADOW, m_bOSDFontShadow);
 	DDX_Check(pDX, IDC_CHECK_AA, m_bOSDFontAA);
@@ -143,6 +144,16 @@ BOOL CPPageInterface::OnInitDialog()
 	m_fFlybar			= s.fFlybar;
 	m_edPlsFontPercent.SetRange(100, 200);
 	m_edPlsFontPercent	= s.iPlsFontPercent;
+	
+	for (unsigned i = 24; i <= 48; i += 4) {
+		const int idx = m_cbToolbarSize.AddString(std::to_wstring(i).c_str());
+		m_cbToolbarSize.SetItemData(idx, i);
+		if (i == s.iToolbarSize) {
+			m_cbToolbarSize.SetCurSel(idx);
+		}
+	}
+	m_cbToolbarSize.ShowWindow(SW_HIDE); // TODO: delete this when controls are finished
+
 	m_bOSDFontShadow	= m_bOSDFontShadow_Old	= s.bOSDFontShadow;
 	m_bOSDFontAA		= m_bOSDFontAA_Old		= s.bOSDFontAA;
 	m_OSDFontType.Clear();
@@ -237,6 +248,8 @@ BOOL CPPageInterface::OnApply()
 		s.iPlsFontPercent = m_edPlsFontPercent;
 		pFrame->m_wndPlaylistBar.ScaleFont(); // Only the font size is changed, not the height of the lines. Need to restart the player.
 	}
+
+	s.iToolbarSize = (int)GetCurItemData(m_cbToolbarSize);
 
 	if (s.fFlybar && !pFrame->m_wndFlyBar) {
 		pFrame->CreateFlyBar();

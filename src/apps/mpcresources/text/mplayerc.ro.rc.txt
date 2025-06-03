@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Restaurează rezoluția la ieșirea din program"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 56
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 57
 6		"Folosește tema „întunecată” (în mod implicit)"
 7		"Luminozitate: "
 9		"Setarea culorii indicatorului de sunet:"
@@ -319,17 +319,17 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 56
 33		"Arată semne pentru capitole în bara de căutare"
 34		"Folosește bara pentru sărituri"
 35		"Dimensiunea scrisului (fontului) listei de redare:"
-38		"OSD (On Screen Display / Afișare pe ecran)"
-39		"Font:"
-43		"F"
-44		"Fundal:"
-45		"G1"
-46		"G2"
-47		"Transparent:"
-49		"Mărime chenar:"
-52		"Umbră"
-53		"Antialiasare"
-54		"Folosește funcțiile din bara de activități din Windows 7 (și versiunile ulterioare)."
+39		"OSD (On Screen Display / Afișare pe ecran)"
+40		"Font:"
+44		"F"
+45		"Fundal:"
+46		"G1"
+47		"G2"
+48		"Transparent:"
+50		"Mărime chenar:"
+53		"Umbră"
+54		"Antialiasare"
+55		"Folosește funcțiile din bara de activități din Windows 7 (și versiunile ulterioare)."
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

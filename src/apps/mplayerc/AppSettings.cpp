@@ -758,8 +758,9 @@ void CAppSettings::ResetSettings()
 	iSmartSeekVR = 0;
 	fChapterMarker = false;
 	fFlybar = true;
-	iPlsFontPercent = 100;
 	fFlybarOnTop = false;
+	iPlsFontPercent = 100;
+	iToolbarSize = 24;
 
 	// Save analog capture settings
 	iDefaultCaptureDevice = 0;
@@ -1433,8 +1434,10 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK_VIDEORENDERER, iSmartSeekVR, 0, 1);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_CHAPTER_MARKER, fChapterMarker);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR, fFlybar);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_PLAYLISTFONTPERCENT, iPlsFontPercent, 100, 200);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR_ONTOP, fFlybarOnTop);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_PLAYLISTFONTPERCENT, iPlsFontPercent, 100, 200);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_TOOLBAR_SIZE, iToolbarSize, 24, 48);
+	iToolbarSize -= iToolbarSize % 4;
 
 	// Save analog capture settings
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, iDefaultCaptureDevice);
@@ -1792,8 +1795,9 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK_VIDEORENDERER, iSmartSeekVR);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_CHAPTER_MARKER, fChapterMarker);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR, fFlybar);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_PLAYLISTFONTPERCENT, iPlsFontPercent);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR_ONTOP, fFlybarOnTop);
+	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_PLAYLISTFONTPERCENT, iPlsFontPercent);
+	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_TOOLBAR_SIZE, iToolbarSize);
 
 	// Save analog capture settings
 	profile.WriteInt   (IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, iDefaultCaptureDevice);

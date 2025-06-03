@@ -59,6 +59,7 @@ public:
 	BOOL      m_fChapterMarker   = FALSE;
 	BOOL      m_fFlybar          = TRUE;
 	CIntEdit  m_edPlsFontPercent;
+	CComboBox m_cbToolbarSize;
 
 	CString         m_OSD_Font;
 	CComboBox       m_OSDFontType;

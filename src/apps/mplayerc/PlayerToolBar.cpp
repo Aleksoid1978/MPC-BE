@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -207,7 +207,7 @@ void CPlayerToolBar::SwitchTheme()
 	// load toolbar image
 	if (s.bUseDarkTheme && m_svgToolbar.IsLoad()) {
 		int w = 0;
-		int h = m_pMainFrame->ScaleY(24);
+		int h = m_pMainFrame->ScaleY(s.iToolbarSize);
 		hBitmap = m_svgToolbar.Rasterize(w, h);
 		if (hBitmap) {
 			hr = S_OK;
@@ -235,7 +235,7 @@ void CPlayerToolBar::SwitchTheme()
 			bool ok = m_svgToolbar.Load(IDF_SVG_TOOLBAR);
 			if (ok) {
 				int w = 0;
-				int h = m_pMainFrame->ScaleY(24);
+				int h = m_pMainFrame->ScaleY(s.iToolbarSize);
 				hBitmap = m_svgToolbar.Rasterize(w, h);
 				if (hBitmap) {
 					hr = S_OK;

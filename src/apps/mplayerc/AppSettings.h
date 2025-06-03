@@ -738,6 +738,7 @@ public:
 	bool			fChapterMarker;
 	bool			fFlybar;
 	int				iPlsFontPercent;
+	int				iToolbarSize;
 	bool			bOSDFontShadow;
 	bool			bOSDFontAA;
 	bool			fFlybarOnTop;

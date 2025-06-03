@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Վերականգնել չափը՝ ծրագրիը փակելիս"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 56
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 57
 6		"Use the ""dark"" theme (default)"
 7		"Brightness :"
 9		"Setting the color of the indicator of sound:"
@@ -319,17 +319,17 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 56
 33		"Use chapters marker"
 34		"Use flybar"
 35		"Playlist font size:"
-38		"OSD"
-39		"Font:"
-43		"F"
-44		"Background:"
-45		"G1"
-46		"G2"
-47		"Transparent:"
-49		"Border Size:"
-52		"Shadow"
-53		"Anti-aliasing"
-54		"Use Windows 7 (and above) Taskbar features"
+39		"OSD"
+40		"Font:"
+44		"F"
+45		"Background:"
+46		"G1"
+47		"G2"
+48		"Transparent:"
+50		"Border Size:"
+53		"Shadow"
+54		"Anti-aliasing"
+55		"Use Windows 7 (and above) Taskbar features"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

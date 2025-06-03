@@ -340,6 +340,7 @@
 #define IDS_RS_SMARTSEEK_VIDEORENDERER		L"SmartSeekVideoRenderer"
 #define IDS_RS_CHAPTER_MARKER				L"ChapterMarker"
 #define IDS_RS_FILENAMEONSEEKBAR			L"FileNameOnSeekBar"
+#define IDS_RS_TOOLBAR_SIZE					L"ToolbarSize"
 
 #define IDS_RS_REMAINING_TIME				L"RemainingTime"
 #define IDS_RS_SHOW_ZERO_HOURS				L"ShowZeroHours"
