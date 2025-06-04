@@ -50,11 +50,13 @@ BOOL CPPageOSD::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	CAppSettings& s = AfxGetAppSettings();
+	const auto& s = AfxGetAppSettings();
 
-	m_bShowOSD					= s.ShowOSD.Enable;
-	m_bOSDFileName				= s.ShowOSD.FileName;
-	m_bOSDSeekTime				= s.ShowOSD.SeekTime;
+	m_bShowOSD		= s.ShowOSD.Enable;
+	m_bOSDFileName	= s.ShowOSD.FileName;
+	m_bOSDSeekTime	= s.ShowOSD.SeekTime;
+
+	UpdateData(FALSE);
 
 	return TRUE;
 }
@@ -63,7 +65,7 @@ BOOL CPPageOSD::OnApply()
 {
 	UpdateData();
 
-	CAppSettings& s = AfxGetAppSettings();
+	auto& s = AfxGetAppSettings();
 	auto pFrame = AfxGetMainFrame();
 
 	BOOL bShowOSDChanged = s.ShowOSD.Enable != m_bShowOSD;
