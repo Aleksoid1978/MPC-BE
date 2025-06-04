@@ -3119,6 +3119,8 @@ void CMpcAudioRenderer::ReleaseDevice()
 {
 	DLog(L"CMpcAudioRenderer::ReleaseDevice()");
 
+	CAutoLock cRenderLock(&m_csRender);
+
 	m_bReleased = true;
 
 	PauseRendererThread();
