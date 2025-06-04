@@ -152,7 +152,6 @@ BOOL CPPageInterface::OnInitDialog()
 			m_cbToolbarSize.SetCurSel(idx);
 		}
 	}
-	m_cbToolbarSize.ShowWindow(SW_HIDE); // TODO: delete this when controls are finished
 
 	m_bOSDFontShadow	= m_bOSDFontShadow_Old	= s.bOSDFontShadow;
 	m_bOSDFontAA		= m_bOSDFontAA_Old		= s.bOSDFontAA;

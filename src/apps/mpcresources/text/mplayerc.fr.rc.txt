@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Restaurer la résolution après la fermeture"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 57
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 58
 6		"Utiliser le thème sombre (par défaut)"
 7		"Luminosité :"
 9		"Réglage de la couleur de l'indicateur sonore :"
@@ -319,17 +319,18 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 57
 33		"Utiliser le marqueur de chapitres"
 34		"Utiliser la barre volante"
 35		"Taille de la police de la Playlist:"
-39		"OSD"
-40		"Police :"
-44		"F"
-45		"Arrière-plan :"
-46		"G1"
-47		"G2"
-48		"Transparent:"
-50		"Taille de bordure :"
-53		"Ombre "
-54		"Anti-aliasing"
-55		"Utiliser les fonctionnalités de la barre des tâches de Windows 7 (et supérieur)"
+38		"Controls size:"
+40		"OSD"
+41		"Police :"
+45		"F"
+46		"Arrière-plan :"
+47		"G1"
+48		"G2"
+49		"Transparent:"
+51		"Taille de bordure :"
+54		"Ombre "
+55		"Anti-aliasing"
+56		"Utiliser les fonctionnalités de la barre des tâches de Windows 7 (et supérieur)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

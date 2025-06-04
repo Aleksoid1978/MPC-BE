@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"離開後回復解析度"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 57
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 58
 6		"使用暗色主題（預設）"
 7		"亮度："
 9		"設定音量控制器色彩："
@@ -319,17 +319,18 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 57
 33		"搜尋列顯示章節標籤"
 34		"使用浮動工具列（flybar）"
 35		"播放清單字型大小"
-39		"OSD"
-40		"字型："
-44		"F"
-45		"背景："
-46		"G1"
-47		"G2"
-48		"透明度："
-50		"外框大小："
-53		"陰影"
-54		"去鋸齒"
-55		"使用 Windows 7 （或以上）工作列功能"
+38		"Controls size:"
+40		"OSD"
+41		"字型："
+45		"F"
+46		"背景："
+47		"G1"
+48		"G2"
+49		"透明度："
+51		"外框大小："
+54		"陰影"
+55		"去鋸齒"
+56		"使用 Windows 7 （或以上）工作列功能"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

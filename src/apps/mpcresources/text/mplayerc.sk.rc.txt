@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Po ukončení obnoviť pôvodné rozlíšenie"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 57
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 58
 6		"Použiť „tmavú“ tému (predvolená)"
 7		"Jas:"
 9		"Nastavenie farby indikátora zvuku:"
@@ -319,17 +319,18 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 57
 33		"Použiť značky kapitol"
 34		"Použiťe plávajúcu lištu"
 35		"Veľkosť písma zoznamu skladieb:"
-39		"OSD"
-40		"Písmo:"
-44		"F"
-45		"Pozadie:"
-46		"G1"
-47		"G2"
-48		"Priehľadnosť:"
-50		"Veľkosť okraja:"
-53		"Tieň"
-54		"Vyhladzovanie"
-55		"Použiť funkcie panela úloh OS Windows 7 (a vyšší)."
+38		"Controls size:"
+40		"OSD"
+41		"Písmo:"
+45		"F"
+46		"Pozadie:"
+47		"G1"
+48		"G2"
+49		"Priehľadnosť:"
+51		"Veľkosť okraja:"
+54		"Tieň"
+55		"Vyhladzovanie"
+56		"Použiť funkcie panela úloh OS Windows 7 (a vyšší)."
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

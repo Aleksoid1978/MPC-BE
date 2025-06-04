@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Ripristino risoluzione all'uscita dal programma"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 57
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 58
 6		"Usa il tema scuro (predefinito)"
 7		"Luminosità:"
 9		"Imposta il colore dell'indicatore del suono:"
@@ -319,17 +319,18 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 57
 33		"Usa marcatore capitoli"
 34		"Usa la flybar"
 35		"Dimensione carattere playlist:"
-39		"OSD"
-40		"Carattere:"
-44		"F"
-45		"Sfondo:"
-46		"G1"
-47		"G2"
-48		"Trasparente:"
-50		"Pixel bordo:"
-53		"Ombra"
-54		"Anti-aliasing"
-55		"Usa funzionalità barra delle applicazioni di Windows 7 (e versioni successive)."
+38		"Controls size:"
+40		"OSD"
+41		"Carattere:"
+45		"F"
+46		"Sfondo:"
+47		"G1"
+48		"G2"
+49		"Trasparente:"
+51		"Pixel bordo:"
+54		"Ombra"
+55		"Anti-aliasing"
+56		"Usa funzionalità barra delle applicazioni di Windows 7 (e versioni successive)."
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
