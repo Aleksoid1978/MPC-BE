@@ -319,7 +319,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 58
 33		"显示章节标记"
 34		"全屏模式时启用悬浮工具条"
 35		"播放列表字体大小:"
-38		"Controls size:"
+38		"控制按钮大小:"
 40		"屏幕显示"
 41		"字体:"
 45		"F"

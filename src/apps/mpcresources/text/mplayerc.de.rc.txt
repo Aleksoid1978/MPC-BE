@@ -319,7 +319,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 58
 33		"Kapitelmarker in der Suchleiste anzeigen"
 34		"Flybar aktivieren"
 35		"Schriftgröße der Wiedergabeliste:"
-38		"Controls size:"
+38		"Größe der Steuerelemente:"
 40		"OSD"
 41		"Schrift:"
 45		"F"
