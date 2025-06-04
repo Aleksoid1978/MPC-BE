@@ -319,7 +319,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 58
 33		"Bölüm işaretlerini göster"
 34		"Şeffaf Çubuğu göster"
 35		"Oynatma listesi yazı tipi boyutu:"
-38		"Controls size:"
+38		"Kontrollerin boyutu:"
 40		"OSD"
 41		"Yazı tipi:"
 45		"F"
