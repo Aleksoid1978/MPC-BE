@@ -385,6 +385,12 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"重設"
 END
 
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+6		"顯示 OSD （需要重新啟動）"
+7		"顯示媒體檔案名稱"
+8		"顯示搜尋時間"
+END
+
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"播放"
 6		"播放"
@@ -409,7 +415,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"最小化時暫停播放"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 46
 5		"開啟選項"
 6		"強制單一程式"
 7		"所有檔案使用同一處理程序"
@@ -431,16 +437,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 31		"在最近的檔案為網址連結顯示標題"
 33		"其他選項"
 34		"系統列（通知區域）圖示"
-35		"顯示 OSD （需要重新啟動）"
-36		"顯示媒體檔案名稱"
-37		"顯示搜尋時間"
-38		"停用「開啟光碟」選單"
-39		"程式優先順序調成標準以上"
-40		"網路逾時"
-41		"連線逾時："
-44		"秒"
-45		"接收逾時："
-48		"秒"
+35		"停用「開啟光碟」選單"
+36		"程式優先順序調成標準以上"
+37		"網路逾時"
+38		"連線逾時："
+41		"秒"
+42		"接收逾時："
+45		"秒"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
@@ -1073,6 +1076,7 @@ STRING IDD_PPAGEINTERNALFILTERS		"內部篩選器"
 STRING IDD_PPAGELOGO		"播放程式::標誌"
 STRING IDD_PPAGEMISC		"其他"
 STRING IDD_PPAGEMOUSE		"播放程式::滑鼠"
+STRING IDD_PPAGEOSD		"播放程式::OSD"
 STRING IDD_PPAGEPLAYBACK		"播放"
 STRING IDD_PPAGEPLAYER		"播放程式"
 STRING IDD_PPAGESOUNDPROCESSING		"音訊::音訊處理"

@@ -385,6 +385,12 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+6		"Erakutsi IGE (beharrezkoa berrabiaratzea)"
+7		"Erakutsi multimedia agiriaren izena"
+8		"Erakutsi bilaketa denbora
+END
+
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Irakurketa"
 6		"Irakurri"
@@ -409,7 +415,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Pausatu bideo irakurketa txikiendutakoan"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 46
 5		"Ireki aukerak"
 6		"Behartu prozesu bakarra"
 7		"Erabili prozesu berdina agiri guztientzat"
@@ -431,16 +437,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 31		"Display title for URL in recent files"
 33		"Beste"
 34		"Erretilu ikurra"
-35		"Erakutsi IGE (beharrezkoa berrabiaratzea)"
-36		"Erakutsi multimedia agiriaren izena"
-37		"Erakutsi bilaketa denbora"
-38		"Ezgaitu 'Ireki Diska' menua"
-39		"Ekinbide lehentasuna arruntetik gora"
-40		"Network timeouts"
-41		"Connection:"
-44		"sec."
-45		"Receiving data:"
-48		"sec."
+35		"Ezgaitu 'Ireki Diska' menua"
+36		"Ekinbide lehentasuna arruntetik gora"
+37		"Network timeouts"
+38		"Connection:"
+41		"sec."
+42		"Receiving data:"
+45		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
@@ -1073,6 +1076,7 @@ STRING IDD_PPAGEINTERNALFILTERS		"Barneko Iragazkiak"
 STRING IDD_PPAGELOGO		"Irakurgailua::Logoa"
 STRING IDD_PPAGEMISC		"Askotarikoa"
 STRING IDD_PPAGEMOUSE		"Irakurgailua::Mouse"
+STRING IDD_PPAGEOSD		"Irakurgailua::OSD"
 STRING IDD_PPAGEPLAYBACK		"Irakurketa"
 STRING IDD_PPAGEPLAYER		"Irakurgailua"
 STRING IDD_PPAGESOUNDPROCESSING		"Audioa::Soinu prozesapena"

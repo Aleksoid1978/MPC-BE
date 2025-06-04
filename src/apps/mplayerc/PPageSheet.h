@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -43,6 +43,7 @@
 #include "PPageSubStyle.h"
 #include "PPageSubRend.h"
 #include "PPageInterface.h"
+#include "PPageOSD.h"
 #include "PPageWindowSize.h"
 #include "PPageMisc.h"
 #include "PPageCapture.h"
@@ -78,6 +79,7 @@ private:
 	CPPageMouse           m_mouse;
 	CPPageLogo            m_logo;
 	CPPageInterface       m_interface;
+	CPPageOSD             m_osd;
 	CPPageWindowSize      m_windowsize;
 	CPPageWebServer       m_webserver;
 	CPPagePlayback        m_playback;

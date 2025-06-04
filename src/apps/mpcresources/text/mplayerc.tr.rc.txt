@@ -385,6 +385,12 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Varsayılan"
 END
 
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+6		"OSD göster"
+7		"Dosya adını göster"
+8		"Atlama zamanını göster"
+END
+
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Oynatma"
 6		"Sadece"
@@ -409,7 +415,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Küçültüldüğünde video oynatmayı duraklat"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 46
 5		"Açılış ayarları"
 6		"Tek oynatıcı için zorla"
 7		"Her dosya için benzer oynatıcı"
@@ -431,16 +437,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 31		"Son dosyalarda URL için başlığı göster"
 33		"Diğer"
 34		"Bildirim alanı simgesi göster"
-35		"OSD göster"
-36		"Dosya adını göster"
-37		"Atlama zamanını göster"
-38		"Disk Açma özelliğini devre dışı bırak"
-39		"İşlem önceliğini normalden yüksek tut"
-40		"Ağ zaman aşımları"
-41		"Bağlantı:"
-44		"sn."
-45		"Veri alma:"
-48		"sn."
+35		"Disk Açma özelliğini devre dışı bırak"
+36		"İşlem önceliğini normalden yüksek tut"
+37		"Ağ zaman aşımları"
+38		"Bağlantı:"
+41		"sn."
+42		"Veri alma:"
+45		"sn."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
@@ -1073,6 +1076,7 @@ STRING IDD_PPAGEINTERNALFILTERS		"Dahili Süzgeçler"
 STRING IDD_PPAGELOGO		"Oynatıcı::Logo"
 STRING IDD_PPAGEMISC		"Diğer"
 STRING IDD_PPAGEMOUSE		"Oynatıcı::Fare"
+STRING IDD_PPAGEOSD		"Oynatıcı::OSD"
 STRING IDD_PPAGEPLAYBACK		"Oynatma"
 STRING IDD_PPAGEPLAYER		"Oynatıcı"
 STRING IDD_PPAGESOUNDPROCESSING		"Ses::Ses İşleme"

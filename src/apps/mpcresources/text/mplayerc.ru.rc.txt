@@ -385,6 +385,12 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"По умолчанию"
 END
 
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+6		"Показать OSD"
+7		"Показывать имя файла"
+8		"Показывать время после поиска"
+END
+
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Воспроизведение"
 6		"Повторять"
@@ -409,7 +415,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Приостанавливать воспроизведение видео при сворачивании окна"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 46
 5		"Открывать файлы, используя"
 6		"всегда один процесс"
 7		"один и тот же процесс для каждого файла"
@@ -431,16 +437,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 31		"Показывать заголовок для URL в последних файлах"
 33		"Прочее"
 34		"Значок в области уведомлений"
-35		"Показать OSD"
-36		"Показывать имя файла"
-37		"Показывать время после поиска"
-38		"Отключить меню 'Открыть диск'"
-39		"Повышенный приоритет процесса"
-40		"Сетевые тайм-ауты"
-41		"Соединение:"
-44		"сек."
-45		"Получение данных:"
-48		"сек."
+35		"Отключить меню 'Открыть диск'"
+36		"Повышенный приоритет процесса"
+37		"Сетевые тайм-ауты"
+38		"Соединение:"
+41		"сек."
+42		"Получение данных:"
+45		"сек."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
@@ -1073,6 +1076,7 @@ STRING IDD_PPAGEINTERNALFILTERS		"Встроенные фильтры"
 STRING IDD_PPAGELOGO		"Проигрыватель::Логотип"
 STRING IDD_PPAGEMISC		"Разное"
 STRING IDD_PPAGEMOUSE		"Проигрыватель::Мышь"
+STRING IDD_PPAGEOSD		"Проигрыватель::OSD"
 STRING IDD_PPAGEPLAYBACK		"Воспроизведение"
 STRING IDD_PPAGEPLAYER		"Проигрыватель"
 STRING IDD_PPAGESOUNDPROCESSING		"Аудио::Обработка звука"

@@ -385,6 +385,12 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+6		"Паказаць OSD (патрабуецца перазапуск)"
+7		"Show name of media file"
+8		"Show seek time"
+END
+
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Прайграванне"
 6		"Паўтараць"
@@ -409,7 +415,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Pause the video playback when minimized"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 46
 5		"Адкрываць файлы выкарыст."
 6		"Force a single process"
 7		"Use same process for every file"
@@ -431,16 +437,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 31		"Display title for URL in recent files"
 33		"Іншае"
 34		"Значок у панэлі задач"
-35		"Паказаць OSD (патрабуецца перазапуск)"
-36		"Show name of media file"
-37		"Show seek time"
-38		"Disable 'Open Disc' menu"
-39		"Падвышаны прыярытэт працэсу"
-40		"Network timeouts"
-41		"Connection:"
-44		"sec."
-45		"Receiving data:"
-48		"sec."
+35		"Disable 'Open Disc' menu"
+36		"Падвышаны прыярытэт працэсу"
+37		"Network timeouts"
+38		"Connection:"
+41		"sec."
+42		"Receiving data:"
+45		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
@@ -1073,6 +1076,7 @@ STRING IDD_PPAGEINTERNALFILTERS		"Убудаваныя фільтры"
 STRING IDD_PPAGELOGO		"Прайгравальнік::Лагатып"
 STRING IDD_PPAGEMISC		"Рознае"
 STRING IDD_PPAGEMOUSE		"Прайгравальнік::Mouse"
+STRING IDD_PPAGEOSD		"Прайгравальнік::OSD"
 STRING IDD_PPAGEPLAYBACK		"Прайграванне"
 STRING IDD_PPAGEPLAYER		"Прайгравальнік"
 STRING IDD_PPAGESOUNDPROCESSING		"Audio::Sound processing"

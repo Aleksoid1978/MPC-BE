@@ -385,6 +385,12 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Προεπιλογή"
 END
 
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+6		"Εμφάνιση OSD (απαιτείται επανεκκίνηση)"
+7		"Εμφάνιση του ονόματος αρχείου"
+8		"Εμφάνιση χρόνου αναζήτησης"
+END
+
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Αναπαραγωγή"
 6		"Εκτέλεση"
@@ -409,7 +415,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Παύση της αναπαραγωγής βίντεο στην ελαχιστοποίηση"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 46
 5		"Επιλογές ανοίγματος"
 6		"Εξαναγκασμός μίας διεργασίας"
 7		"Χρήση του ίδιου αναπαραγωγού για κάθε αρχείο πολυμέσων"
@@ -431,16 +437,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 31		"Display title for URL in recent files"
 33		"Άλλα"
 34		"Εικονίδιο στη γραμμή ειδοποιήσεων"
-35		"Εμφάνιση OSD (απαιτείται επανεκκίνηση)"
-36		"Εμφάνιση του ονόματος αρχείου"
-37		"Εμφάνιση χρόνου αναζήτησης"
-38		"Απενεργοποίηση του μενού "" Άνοιγμα δίσκου"""
-39		"Προτεραιότητα διεργασίας πάνω από κανονική"
-40		"Network timeouts"
-41		"Connection:"
-44		"δευτ."
-45		"Receiving data:"
-48		"sec."
+35		"Απενεργοποίηση του μενού "" Άνοιγμα δίσκου"""
+36		"Προτεραιότητα διεργασίας πάνω από κανονική"
+37		"Network timeouts"
+38		"Connection:"
+41		"δευτ."
+42		"Receiving data:"
+45		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
@@ -1073,6 +1076,7 @@ STRING IDD_PPAGEINTERNALFILTERS		"Εσωτερικά φίλτρα"
 STRING IDD_PPAGELOGO		"Αναπαραγωγός::Λογότυπο"
 STRING IDD_PPAGEMISC		"Διάφορα"
 STRING IDD_PPAGEMOUSE		"Αναπαραγωγός::Mouse"
+STRING IDD_PPAGEOSD		"Αναπαραγωγός::OSD"
 STRING IDD_PPAGEPLAYBACK		"Αναπαραγωγή"
 STRING IDD_PPAGEPLAYER		"Αναπαραγωγός"
 STRING IDD_PPAGESOUNDPROCESSING		"Ήχος::Επεξεργασία ήχου"

@@ -432,6 +432,9 @@
     <ClCompile Include="FileDialogs.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="PPageOSD.cpp">
+      <Filter>Player Options</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DVBChannel.h">
@@ -844,6 +847,9 @@
     </ClInclude>
     <ClInclude Include="FileDialogs.h">
       <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="PPageOSD.h">
+      <Filter>Player Options</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -385,6 +385,12 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"По подразбиране"
 END
 
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+6		"Показване на OSD"
+7		"Показване името на файла"
+8		"Показване на времето след търсене"
+END
+
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Възпроизвеждане"
 6		"Повтаряне"
@@ -409,7 +415,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Поставяне на пауза видео възпроизвеждането при минимизиране на прозореца"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 46
 5		"Отваряй файлове, използвайки"
 6		"винаги един процес"
 7		"един и същ процес за всеки файл"
@@ -431,16 +437,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 31		"Показване на заглавие за URL адреси в последните файлове"
 33		"Други"
 34		"Икона в лентата на задачите"
-35		"Показване на OSD"
-36		"Показване името на файла"
-37		"Показване на времето след търсене"
-38		"Изключване на меню ""Отваряне на диск"""
-39		"Повишен приоритет на процеса"
-40		"Други"
-41		"Време за свързване:"
-44		"сек."
-45		"Получавани данни:"
-48		"сек."
+35		"Изключване на меню ""Отваряне на диск"""
+36		"Повишен приоритет на процеса"
+37		"Други"
+38		"Време за свързване:"
+41		"сек."
+42		"Получавани данни:"
+45		"сек."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
@@ -1073,6 +1076,7 @@ STRING IDD_PPAGEINTERNALFILTERS		"Вградени филтри"
 STRING IDD_PPAGELOGO		"Плейър::Лого"
 STRING IDD_PPAGEMISC		"Разни"
 STRING IDD_PPAGEMOUSE		"Плейър::Мишка"
+STRING IDD_PPAGEOSD		"Плейър::OSD"
 STRING IDD_PPAGEPLAYBACK		"Възпроизвеждане"
 STRING IDD_PPAGEPLAYER		"Плейър"
 STRING IDD_PPAGESOUNDPROCESSING		"Аудио::Обработка на звук"

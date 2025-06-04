@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -47,9 +47,6 @@ public:
 	BOOL m_bRecentFilesShowUrlTitle = FALSE;
 
 	BOOL m_bTrayIcon    = FALSE;
-	BOOL m_bShowOSD     = FALSE;
-	BOOL m_bOSDFileName = FALSE;
-	BOOL m_bOSDSeekTime = FALSE;
 	BOOL m_bHideCDROMsSubMenu = FALSE;
 	BOOL m_bPriority = FALSE;
 
@@ -77,5 +74,4 @@ protected:
 
 public:
 	afx_msg void OnUpdateKeepHistory(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateOSD(CCmdUI* pCmdUI);
 };

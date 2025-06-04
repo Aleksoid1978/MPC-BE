@@ -385,6 +385,12 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+6		"Show OSD"
+7		"Show name of media file"
+8		"Show seek time"
+END
+
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Playback"
 6		"Play"
@@ -409,7 +415,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Pause the video playback when minimized"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 46
 5		"Open options"
 6		"Force a single process"
 7		"Use same process for every file"
@@ -431,16 +437,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 31		"Display title for URL in recent files"
 33		"Other"
 34		"Tray icon"
-35		"Show OSD"
-36		"Show name of media file"
-37		"Show seek time"
-38		"Disable 'Open Disc' menu"
-39		"Process priority above normal"
-40		"Network timeouts"
-41		"Connection:"
-44		"sec."
-45		"Receiving data:"
-48		"sec."
+35		"Disable 'Open Disc' menu"
+36		"Process priority above normal"
+37		"Network timeouts"
+38		"Connection:"
+41		"sec."
+42		"Receiving data:"
+45		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
@@ -1073,6 +1076,7 @@ STRING IDD_PPAGEINTERNALFILTERS		"Internal Filters"
 STRING IDD_PPAGELOGO		"Player::Logo"
 STRING IDD_PPAGEMISC		"Miscellaneous"
 STRING IDD_PPAGEMOUSE		"Player::Mouse"
+STRING IDD_PPAGEOSD		"Player::OSD"
 STRING IDD_PPAGEPLAYBACK		"Playback"
 STRING IDD_PPAGEPLAYER		"Player"
 STRING IDD_PPAGESOUNDPROCESSING		"Audio::Sound processing"

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -49,6 +49,7 @@ CPPageSheet::CPPageSheet(LPCWSTR pszCaption, CWnd* pParentWnd, UINT idPage)
 	AddPage(&m_mouse);
 	AddPage(&m_logo);
 	AddPage(&m_interface);
+	AddPage(&m_osd);
 	AddPage(&m_windowsize);
 	AddPage(&m_webserver);
 	AddPage(&m_playback);

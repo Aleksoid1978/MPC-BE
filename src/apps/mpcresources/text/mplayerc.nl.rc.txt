@@ -385,6 +385,12 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Resetten"
 END
 
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+6		"Toon OSD (vereist herstart)"
+7		"Toon naam van mediabestand"
+8		"Toon gezochte tijd"
+END
+
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Afspelen"
 6		"Afspelen"
@@ -409,7 +415,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Weergave pauseren als het venster geminimaliseerd is"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 46
 5		"Opties voor openen"
 6		"Forceer een enkel proces"
 7		"Gebruik hetzelfde proces voor elk bestand"
@@ -431,16 +437,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 31		"Titel voor URL in recente bestanden weergeven"
 33		"Overige"
 34		"Pictogram in systeemvak"
-35		"Toon OSD (vereist herstart)"
-36		"Toon naam van mediabestand"
-37		"Toon gezochte tijd"
-38		"Menu ""Schijf openen"" uitschakelen"
-39		"Procesprioriteit ""hoger dan normaal"""
-40		"Netwerktime-outs"
-41		"Time-out voor verbinding:"
-44		"sec."
-45		"Time-out voor ontvangen:"
-48		"sec."
+35		"Menu ""Schijf openen"" uitschakelen"
+36		"Procesprioriteit ""hoger dan normaal"""
+37		"Netwerktime-outs"
+38		"Time-out voor verbinding:"
+41		"sec."
+42		"Time-out voor ontvangen:"
+45		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
@@ -1073,6 +1076,7 @@ STRING IDD_PPAGEINTERNALFILTERS		"Interne Filters"
 STRING IDD_PPAGELOGO		"Speler::Logo"
 STRING IDD_PPAGEMISC		"Overige"
 STRING IDD_PPAGEMOUSE		"Speler::Muis"
+STRING IDD_PPAGEOSD		"Speler::OSD"
 STRING IDD_PPAGEPLAYBACK		"Weergave"
 STRING IDD_PPAGEPLAYER		"Speler"
 STRING IDD_PPAGESOUNDPROCESSING		"Audio::Geluidsbewerking"

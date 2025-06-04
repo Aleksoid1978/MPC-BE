@@ -385,6 +385,12 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+6		"Pokaži OSD"
+8		"Pokaži ime medijske datoteke"
+8		"Pokaži vrijeme pretrage"
+END
+
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Reprodukcija"
 6		"Pusti"
@@ -409,7 +415,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Zaustavi video pregled pri minimiziranju"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 46
 5		"Mogućnosti Otvaranja"
 6		"Forsiraj kao jedan proces"
 7		"UKoristi isti proces za svaku datoteku"
@@ -431,16 +437,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 31		"Display title for URL in recent files"
 33		"Ostalo"
 34		"Tray ikona"
-35		"Pokaži OSD"
-36		"Pokaži ime medijske datoteke"
-37		"Pokaži vrijeme pretrage"
-38		"Onesposobi izbornik 'Otvori Disk'"
-39		"Procesiraj prioritet iznad normalnog"
-40		"Network timeouts"
-41		"Connection:"
-44		"sek."
-45		"Receiving data:"
-48		"sec."
+35		"Onesposobi izbornik 'Otvori Disk'"
+36		"Procesiraj prioritet iznad normalnog"
+37		"Network timeouts"
+38		"Connection:"
+41		"sek."
+42		"Receiving data:"
+45		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
@@ -1073,6 +1076,7 @@ STRING IDD_PPAGEINTERNALFILTERS		"Interni Filteri"
 STRING IDD_PPAGELOGO		"Player::Logo"
 STRING IDD_PPAGEMISC		"Razno"
 STRING IDD_PPAGEMOUSE		"Player::Miš"
+STRING IDD_PPAGEOSD		"Player::OSD"
 STRING IDD_PPAGEPLAYBACK		"Reprodukcija"
 STRING IDD_PPAGEPLAYER		"Player"
 STRING IDD_PPAGESOUNDPROCESSING		"Audio::Obrada zvuka"

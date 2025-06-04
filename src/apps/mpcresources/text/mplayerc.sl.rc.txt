@@ -385,6 +385,12 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Privzeto"
 END
 
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+6		"Prikaži OSD"
+7		"Prikaži ime medijske datoteke"
+8		"Prikaži čas iskanja"
+END
+
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Predvajanje"
 6		"Predvajaj"
@@ -409,7 +415,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Zaustavi predvajanje videa, ko je okno pomanjšano"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 46
 5		"Možnosti odpiranja"
 6		"Vsili en proces"
 7		"Uporabi isti proces za vsako datoteko"
@@ -431,16 +437,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 31		"Prikaži naslov za URL med nedavnimi datotekami"
 33		"Ostalo"
 34		"Ikona opravilne vrstice"
-35		"Prikaži OSD"
-36		"Prikaži ime medijske datoteke"
-37		"Prikaži čas iskanja"
-38		"Onemogoči menijsko izbiro 'Odpri disk'"
-39		"Obdelaj prioriteto nad običajno"
-40		"Omrežne časovne omejitve"
-41		"Povezava:"
-44		"sek."
-45		"Sprejemanje podatkov:"
-48		"sek."
+35		"Onemogoči menijsko izbiro 'Odpri disk'"
+36		"Obdelaj prioriteto nad običajno"
+37		"Omrežne časovne omejitve"
+38		"Povezava:"
+41		"sek."
+42		"Sprejemanje podatkov:"
+45		"sek."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
@@ -1073,6 +1076,7 @@ STRING IDD_PPAGEINTERNALFILTERS		"Interni filtri"
 STRING IDD_PPAGELOGO		"Predvajalnik::Logo"
 STRING IDD_PPAGEMISC		"Miscellaneous"
 STRING IDD_PPAGEMOUSE		"Predvajalnik::Miška"
+STRING IDD_PPAGEOSD		"Predvajalnik::OSD"
 STRING IDD_PPAGEPLAYBACK		"Predvajanje"
 STRING IDD_PPAGEPLAYER		"Predvajalnik"
 STRING IDD_PPAGESOUNDPROCESSING		"Zvok::Procesiranje zvoka"

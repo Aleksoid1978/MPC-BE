@@ -385,6 +385,12 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"За замовчуванням"
 END
 
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+6		"Показувати OSD"
+7		"Показувати ім'я файла"
+8		"Показувати поточну позиц.\тривалість"
+END
+
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Відтворення"
 6		"Повтор"
@@ -409,7 +415,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Призупиняти відтворення відео при згортанні вікна"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 46
 5		"При відкритті файлів"
 6		"Примусовий одновіконний режим"
 7		"Використовувати один процес для усіх файлів"
@@ -431,16 +437,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 31		"Показувати заголовок для URL у останніх відкр. файлах"
 33		"Інше"
 34		"Значок у панелі задач"
-35		"Показувати OSD"
-36		"Показувати ім'я файла"
-37		"Показувати поточну позиц.\тривалість"
-38		"Заборонити меню 'Відкрити диск'"
-39		"Підвищений пріоритет процесу"
-40		"Network timeouts"
-41		"Connection:"
-44		"сек."
-45		"Receiving data:"
-48		"sec."
+35		"Заборонити меню 'Відкрити диск'"
+36		"Підвищений пріоритет процесу"
+37		"Network timeouts"
+38		"Connection:"
+41		"сек."
+42		"Receiving data:"
+45		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
@@ -1073,6 +1076,7 @@ STRING IDD_PPAGEINTERNALFILTERS		"Вбудовані фільтри"
 STRING IDD_PPAGELOGO		"Програвач::Логотип"
 STRING IDD_PPAGEMISC		"Різне"
 STRING IDD_PPAGEMOUSE		"Програвач::Mouse"
+STRING IDD_PPAGEOSD		"Player::OSD"
 STRING IDD_PPAGEPLAYBACK		"Відтворення"
 STRING IDD_PPAGEPLAYER		"Програвач"
 STRING IDD_PPAGESOUNDPROCESSING		"Аудіо::Обробка звуку"

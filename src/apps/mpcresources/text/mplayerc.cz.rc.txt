@@ -385,6 +385,12 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+6		"Zobrazit OSD (vyžaduje restart)"
+7		"Show name of media file"
+8		"Show seek time"
+END
+
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Přehrávání"
 6		"Přehrát"
@@ -409,7 +415,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Pause the video playback when minimized"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 46
 5		"Možnosti otevírání"
 6		"Force a single process"
 7		"Use same process for every file"
@@ -431,16 +437,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 31		"Display title for URL in recent files"
 33		"Ostatní"
 34		"Ikona v oznamovací oblasti"
-35		"Zobrazit OSD (vyžaduje restart)"
-36		"Show name of media file"
-37		"Show seek time"
-38		"Zakázat nabídku Otevřít disk"
-39		"Spouštět se zvýšenou prioritou"
-40		"Network timeouts"
-41		"Connection:"
-44		"sec."
-45		"Receiving data:"
-48		"sec."
+35		"Zakázat nabídku Otevřít disk"
+36		"Spouštět se zvýšenou prioritou"
+37		"Network timeouts"
+38		"Connection:"
+41		"sec."
+42		"Receiving data:"
+45		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
@@ -1073,6 +1076,7 @@ STRING IDD_PPAGEINTERNALFILTERS		"Interní filtry"
 STRING IDD_PPAGELOGO		"Přehrávač::Logo"
 STRING IDD_PPAGEMISC		"Ostatní"
 STRING IDD_PPAGEMOUSE		"Přehrávač::Mouse"
+STRING IDD_PPAGEOSD		"Přehrávač::OSD"
 STRING IDD_PPAGEPLAYBACK		"Přehrávání"
 STRING IDD_PPAGEPLAYER		"Přehrávač"
 STRING IDD_PPAGESOUNDPROCESSING		"Audio::Sound processing"

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -45,9 +45,6 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK1,   m_bKeepHistory);
 	DDX_Check(pDX, IDC_CHECK10,  m_bHideCDROMsSubMenu);
 	DDX_Check(pDX, IDC_CHECK9,   m_bPriority);
-	DDX_Check(pDX, IDC_SHOW_OSD, m_bShowOSD);
-	DDX_Check(pDX, IDC_CHECK14,  m_bOSDFileName);
-	DDX_Check(pDX, IDC_CHECK15,  m_bOSDSeekTime);
 	DDX_Check(pDX, IDC_DVD_POS,  m_bRememberDVDPos);
 	DDX_Check(pDX, IDC_FILE_POS, m_bRememberFilePos);
 	DDX_Check(pDX, IDC_CHECK2,   m_bRememberPlaylistItems);
@@ -65,8 +62,6 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CPPagePlayer, CPPageBase)
 	ON_UPDATE_COMMAND_UI(IDC_DVD_POS, OnUpdateKeepHistory)
 	ON_UPDATE_COMMAND_UI(IDC_FILE_POS, OnUpdateKeepHistory)
-	ON_UPDATE_COMMAND_UI(IDC_CHECK14, OnUpdateOSD)
-	ON_UPDATE_COMMAND_UI(IDC_CHECK15, OnUpdateOSD)
 END_MESSAGE_MAP()
 
 // CPPagePlayer message handlers
@@ -107,9 +102,6 @@ BOOL CPPagePlayer::OnInitDialog()
 	m_bKeepHistory				= s.bKeepHistory;
 	m_bHideCDROMsSubMenu		= s.bHideCDROMsSubMenu;
 	m_bPriority					= s.dwPriority != NORMAL_PRIORITY_CLASS;
-	m_bShowOSD					= s.ShowOSD.Enable;
-	m_bOSDFileName				= s.ShowOSD.FileName;
-	m_bOSDSeekTime				= s.ShowOSD.SeekTime;
 	m_bRememberDVDPos			= s.bRememberDVDPos;
 	m_bRememberFilePos			= s.bRememberFilePos;
 	m_bRememberPlaylistItems	= s.bRememberPlaylistItems;
@@ -204,20 +196,7 @@ BOOL CPPagePlayer::OnApply()
 	s.bKeepHistory = !!m_bKeepHistory;
 	s.bHideCDROMsSubMenu = !!m_bHideCDROMsSubMenu;
 	s.dwPriority = !m_bPriority ? NORMAL_PRIORITY_CLASS : ABOVE_NORMAL_PRIORITY_CLASS;
-	BOOL bShowOSDChanged = s.ShowOSD.Enable != m_bShowOSD;
 
-	s.ShowOSD.Enable   = m_bShowOSD ? 1 : 0;
-	s.ShowOSD.FileName = m_bOSDFileName ? 1 : 0;
-	s.ShowOSD.SeekTime = m_bOSDSeekTime ? 1 : 0;
-	if (bShowOSDChanged) {
-		if (s.ShowOSD.Enable) {
-			pFrame->m_OSD.Start(pFrame->m_pOSDWnd);
-			pFrame->OSDBarSetPos();
-			pFrame->m_OSD.ClearMessage(false);
-		} else {
-			pFrame->m_OSD.Stop();
-		}
-	}
 	s.bRememberDVDPos          = !!m_bRememberDVDPos;
 	s.bRememberFilePos         = !!m_bRememberFilePos;
 	s.bRememberPlaylistItems   = !!m_bRememberPlaylistItems;
@@ -286,11 +265,4 @@ void CPPagePlayer::OnUpdateKeepHistory(CCmdUI* pCmdUI)
 	UpdateData();
 
 	pCmdUI->Enable(!!m_bKeepHistory);
-}
-
-void CPPagePlayer::OnUpdateOSD(CCmdUI* pCmdUI)
-{
-	UpdateData();
-
-	pCmdUI->Enable(!!m_bShowOSD);
 }

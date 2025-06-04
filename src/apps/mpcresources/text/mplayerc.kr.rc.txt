@@ -385,6 +385,12 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"기본값"
 END
 
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+6		"화면 표시 보이기(다시 시작 필요)"
+7		"미디어 파일명 표기"
+8		"탐색 시간 표기"
+END
+
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"재생"
 6		"파일을"
@@ -409,7 +415,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"최소화 시, 영상 재생 일시 정지"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 46
 5		"열기 옵션"
 6		"프로세스 하나만 사용"
 7		"파일을 열 때마다 같은 재생기창 사용"
@@ -431,16 +437,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 31		"최근 열람한 파일 경로를 제목 표시줄에 표기"
 33		"기타"
 34		"트레이에 아이콘 보이기"
-35		"화면 표시 보이기(다시 시작 필요)"
-36		"미디어 파일명 표기"
-37		"탐색 시간 표기"
-38		"'디스크 열기' 메뉴 사용 안 함"
-39		"프로세스 우선순위 높이기"
-40		"네트워크 시간 초과"
-41		"연결 :"
-44		"초"
-45		"데이터 수신 :"
-48		"초"
+35		"'디스크 열기' 메뉴 사용 안 함"
+36		"프로세스 우선순위 높이기"
+37		"네트워크 시간 초과"
+38		"연결 :"
+41		"초"
+42		"데이터 수신 :"
+45		"초"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
@@ -1073,6 +1076,7 @@ STRING IDD_PPAGEINTERNALFILTERS		"내장 필터"
 STRING IDD_PPAGELOGO		"재생기::로고"
 STRING IDD_PPAGEMISC		"기타"
 STRING IDD_PPAGEMOUSE		"재생기::마우스"
+STRING IDD_PPAGEOSD		"재생기::OSD"
 STRING IDD_PPAGEPLAYBACK		"재생"
 STRING IDD_PPAGEPLAYER		"재생기"
 STRING IDD_PPAGESOUNDPROCESSING		"오디오::음향 처리"

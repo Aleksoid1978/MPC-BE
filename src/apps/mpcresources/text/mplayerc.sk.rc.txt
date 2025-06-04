@@ -385,6 +385,12 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Predvolené"
 END
 
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+6		"Zobraziť OSD (vyžaduje reštart)"
+7		"Zobraziť názov mediálneho súboru"
+8		"Zobraziť čas vyhľadávania"
+END
+
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Prehrávanie"
 6		"Prehrať"
@@ -409,7 +415,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Pri minimalizovaní pozastaviť prehrávanie videa"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 46
 5		"Otvoriť nastavenia"
 6		"Vynútiť si jeden proces"
 7		"Použiť rovnaký proces pre každý súbor"
@@ -431,16 +437,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 31		"Zobraziť názov adresy URL v posledných súboroch"
 33		"Ostatné"
 34		"Ikona v lište nástrojov"
-35		"Zobraziť OSD (vyžaduje reštart)"
-36		"Zobraziť názov mediálneho súboru"
-37		"Zobraziť čas vyhľadávania"
-38		"Zablokovať ponuku 'Otvoriť disk'"
-39		"Spustiť so zvýšenou prioritou"
-40		"Časové limity siete"
-41		"Pripojenie:"
-44		"sek."
-45		"Príjem dát:"
-48		"sek."
+35		"Zablokovať ponuku 'Otvoriť disk'"
+36		"Spustiť so zvýšenou prioritou"
+37		"Časové limity siete"
+38		"Pripojenie:"
+41		"sek."
+42		"Príjem dát:"
+45		"sek."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
@@ -1073,6 +1076,7 @@ STRING IDD_PPAGEINTERNALFILTERS		"Interné filtre"
 STRING IDD_PPAGELOGO		"Prehrávač::Logo"
 STRING IDD_PPAGEMISC		"Rôzne"
 STRING IDD_PPAGEMOUSE		"Prehrávač::Myš"
+STRING IDD_PPAGEOSD		"Prehrávač::OSD"
 STRING IDD_PPAGEPLAYBACK		"Prehrávanie"
 STRING IDD_PPAGEPLAYER		"Prehrávač"
 STRING IDD_PPAGESOUNDPROCESSING		"Audio::Spracovanie zvuku"

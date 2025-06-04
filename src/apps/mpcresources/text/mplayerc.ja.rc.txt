@@ -385,6 +385,12 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"既定"
 END
 
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+6		"OSD を表示する"
+7		"メディア ファイル名を表示する"
+8		"シーク タイムを表示する"
+END
+
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"再生"
 6		"再生"
@@ -409,7 +415,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"最小化時にビデオ再生を一時停止させる"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 46
 5		"開くオプション"
 6		"複数起動を禁止する"
 7		"同じプレーヤーで開く"
@@ -431,16 +437,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 31		"最近使ったファイルの URL のタイトルを表示する"
 33		"その他"
 34		"タスクトレイ アイコン"
-35		"OSD を表示する"
-36		"メディア ファイル名を表示する"
-37		"シーク タイムを表示する"
-38		"「ディスクを開く」のメニューを無効にする"
-39		"プロセスの優先度を 通常以上 にする"
-40		"ネットワーク タイムアウト"
-41		"接続:"
-44		"秒"
-45		"データの受信:"
-48		"秒"
+35		"「ディスクを開く」のメニューを無効にする"
+36		"プロセスの優先度を 通常以上 にする"
+37		"ネットワーク タイムアウト"
+38		"接続:"
+41		"秒"
+42		"データの受信:"
+45		"秒"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
@@ -1073,6 +1076,7 @@ STRING IDD_PPAGEINTERNALFILTERS		"内部フィルター"
 STRING IDD_PPAGELOGO		"プレーヤー::ロゴ"
 STRING IDD_PPAGEMISC		"その他"
 STRING IDD_PPAGEMOUSE		"プレーヤー::マウス"
+STRING IDD_PPAGEOSD		"プレーヤー::OSD"
 STRING IDD_PPAGEPLAYBACK		"再生"
 STRING IDD_PPAGEPLAYER		"プレーヤー"
 STRING IDD_PPAGESOUNDPROCESSING		"音声::サウンド処理"

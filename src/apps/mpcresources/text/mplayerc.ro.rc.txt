@@ -385,6 +385,12 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Implicit"
 END
 
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+6		"Arată OSD-ul(necesită repornirea playerului)"
+7		"Afișează numele în fișierele media"
+8		"Afișează timpul de căutare"
+END
+
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Redare"
 6		"Redă (de)"
@@ -409,7 +415,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Previne redarea videoclipului când este minimizat"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 46
 5		"Opțiuni pentru deschidere"
 6		"Forțează un singur proces"
 7		"Folosește același player pentru fiecare fișier media"
@@ -431,16 +437,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 31		"Afișează titlul pentru URL în fișierele recente"
 33		"Altele"
 34		"Pictogramă în zona de notificare"
-35		"Arată OSD-ul(necesită repornirea playerului)"
-36		"Afișează numele în fișierele media"
-37		"Afișează timpul de căutare"
-38		"Dezactivează meniul „Deschide discul”"
-39		"Prioritatea procesării peste cea normală"
-40		"Întreruperi de rețea"
-41		"Conexiune:"
-44		"secunde"
-45		"Se primesc date:"
-48		"secunde"
+35		"Dezactivează meniul „Deschide discul”"
+36		"Prioritatea procesării peste cea normală"
+37		"Întreruperi de rețea"
+38		"Conexiune:"
+41		"secunde"
+42		"Se primesc date:"
+45		"secunde"
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
@@ -1073,6 +1076,7 @@ STRING IDD_PPAGEINTERNALFILTERS		"Filtre interne"
 STRING IDD_PPAGELOGO		"Player::Logo"
 STRING IDD_PPAGEMISC		"Diverse"
 STRING IDD_PPAGEMOUSE		"Player::Mouse"
+STRING IDD_PPAGEOSD		"Player::OSD"
 STRING IDD_PPAGEPLAYBACK		"Redare"
 STRING IDD_PPAGEPLAYER		"Player"
 STRING IDD_PPAGESOUNDPROCESSING		"Audio::Procesarea sunetului"

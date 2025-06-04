@@ -385,6 +385,12 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+6		"Visa OSD (omstart krävs)"
+7		"Show name of media file"
+8		"Show seek time"
+END
+
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Uppspelning"
 6		"Spela"
@@ -409,7 +415,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Pause the video playback when minimized"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 46
 5		"Öppna valmöjligheter"
 6		"Force a single process"
 7		"Use same process for every file"
@@ -431,16 +437,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 31		"Display title for URL in recent files"
 33		"Annat"
 34		"Visa ikon i systemfältet"
-35		"Visa OSD (omstart krävs)"
-36		"Show name of media file"
-37		"Show seek time"
-38		"Disable 'Open Disc' menu"
-39		"Process prioritet högre än normal"
-40		"Network timeouts"
-41		"Connection:"
-44		"sec."
-45		"Receiving data:"
-48		"sec."
+35		"Disable 'Open Disc' menu"
+36		"Process prioritet högre än normal"
+37		"Network timeouts"
+38		"Connection:"
+41		"sec."
+42		"Receiving data:"
+45		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
@@ -1073,6 +1076,7 @@ STRING IDD_PPAGEINTERNALFILTERS		"Interna Filter"
 STRING IDD_PPAGELOGO		"Spelare::Logo"
 STRING IDD_PPAGEMISC		"Diverse"
 STRING IDD_PPAGEMOUSE		"Spelare::Mouse"
+STRING IDD_PPAGEOSD		"Spelare::OSD"
 STRING IDD_PPAGEPLAYBACK		"Uppspelning"
 STRING IDD_PPAGEPLAYER		"Spelare"
 STRING IDD_PPAGESOUNDPROCESSING		"Audio::Sound processing"

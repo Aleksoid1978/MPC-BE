@@ -385,6 +385,12 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Predefinito"
 END
 
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+6		"Mostra OSD"
+7		"Mostra nome del file multimediale"
+8		"Mostra tempo di ricerca"
+END
+
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 5		"Riproduzione"
 6		"Riproduci"
@@ -409,7 +415,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 36		"Metti in pausa la riproduzione video quando è ridotto a icona"
 END
 
-BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
+BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 46
 5		"Opzioni di apertura"
 6		"Forza un unico processo"
 7		"Usa la stessa procedura per ogni file"
@@ -431,16 +437,13 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 49
 31		"Visualizza titolo per l'URL nei file recenti"
 33		"Altro"
 34		"Icona nell'area di notifica"
-35		"Mostra OSD"
-36		"Mostra nome del file multimediale"
-37		"Mostra tempo di ricerca"
-38		"Disabilita il menu ""Apri disco"""
-39		"Priorità del processo superiore al normale"
-40		"Timeout rete"
-41		"Connessione:"
-44		"sec."
-45		"Ricezione dati:"
-48		"sec."
+35		"Disabilita il menu ""Apri disco"""
+36		"Priorità del processo superiore al normale"
+37		"Timeout rete"
+38		"Connessione:"
+41		"sec."
+42		"Ricezione dati:"
+45		"sec."
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 40
@@ -1073,6 +1076,7 @@ STRING IDD_PPAGEINTERNALFILTERS		"Filtri interni"
 STRING IDD_PPAGELOGO		"Lettore::Logo"
 STRING IDD_PPAGEMISC		"Varie"
 STRING IDD_PPAGEMOUSE		"Lettore::Mouse"
+STRING IDD_PPAGEOSD		"Lettore::OSD"
 STRING IDD_PPAGEPLAYBACK		"Riproduzione"
 STRING IDD_PPAGEPLAYER		"Lettore"
 STRING IDD_PPAGESOUNDPROCESSING		"Audio::Elaborazione suono"
