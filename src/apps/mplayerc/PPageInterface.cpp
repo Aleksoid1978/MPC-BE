@@ -144,7 +144,7 @@ BOOL CPPageInterface::OnInitDialog()
 	m_fFlybar			= s.fFlybar;
 	m_edPlsFontPercent.SetRange(100, 200);
 	m_edPlsFontPercent	= s.iPlsFontPercent;
-	
+
 	for (unsigned i = 24; i <= 48; i += 4) {
 		const int idx = m_cbToolbarSize.AddString(std::to_wstring(i).c_str());
 		m_cbToolbarSize.SetItemData(idx, i);
@@ -240,20 +240,25 @@ BOOL CPPageInterface::OnApply()
 
 	s.fChapterMarker		= !!m_fChapterMarker;
 	s.fFlybar				= !!m_fFlybar;
-	s.bOSDFontShadow			= !!m_bOSDFontShadow;
-	s.bOSDFontAA				= !!m_bOSDFontAA;
+	s.bOSDFontShadow		= !!m_bOSDFontShadow;
+	s.bOSDFontAA			= !!m_bOSDFontAA;
 
 	if (s.iPlsFontPercent != m_edPlsFontPercent) {
 		s.iPlsFontPercent = m_edPlsFontPercent;
 		pFrame->m_wndPlaylistBar.ScaleFont(); // Only the font size is changed, not the height of the lines. Need to restart the player.
 	}
 
-	s.iToolbarSize = (int)GetCurItemData(m_cbToolbarSize);
+	auto toolbarSize = static_cast<int>(GetCurItemData(m_cbToolbarSize));
+	if (s.iToolbarSize != toolbarSize) {
+		s.iToolbarSize = toolbarSize;
+		pFrame->m_wndToolBar.ScaleToolbar();
+		pFrame->RecalcLayout();
+	}
 
 	if (s.fFlybar && !pFrame->m_wndFlyBar) {
 		pFrame->CreateFlyBar();
 
-	} else if (!s.fFlybar && pFrame->m_wndFlyBar){
+	} else if (!s.fFlybar && pFrame->m_wndFlyBar) {
 		pFrame->DestroyFlyBar();
 	}
 
@@ -396,6 +401,8 @@ void CPPageInterface::OnUpdateCheck3(CCmdUI* pCmdUI)
 	GetDlgItem(IDC_BUTTON_CLRDEFAULT)->EnableWindow(bUseDarkTheme);
 	GetDlgItem(IDC_STATIC_CLRFACE)->EnableWindow(bUseDarkTheme);
 	GetDlgItem(IDC_STATIC_CLROUTLINE)->EnableWindow(bUseDarkTheme);
+	GetDlgItem(IDC_STATIC8)->EnableWindow(bUseDarkTheme);
+	GetDlgItem(IDC_COMBO5)->EnableWindow(bUseDarkTheme);
 	m_chkDarkMenu.EnableWindow(bUseDarkTheme);
 	if (SysVersion::IsWin10v1809orLater()) {
 		m_chkDarkTitle.EnableWindow(bUseDarkTheme);
