@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2024 see Authors.txt
+ * (C) 2012-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -142,7 +142,7 @@ bool CFlyBar::UpdateButtonImages()
 {
 	if (m_pMainFrame->m_svgFlybar.IsLoad()) {
 		int w = 0;
-		int h = m_pMainFrame->ScaleY(24);
+		int h = m_pMainFrame->ScaleY(AfxGetAppSettings().iToolbarSize);
 		if (HBITMAP hBitmap = m_pMainFrame->m_svgFlybar.Rasterize(w, h)) {
 			if (w == h * 25) {
 				SAFE_DELETE(m_pButtonImages);
