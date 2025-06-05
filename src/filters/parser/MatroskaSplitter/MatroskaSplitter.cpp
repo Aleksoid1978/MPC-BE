@@ -401,8 +401,10 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mt.subtype = FOURCCMap(pvih->bmiHeader.biCompression);
 					}
 
-					pvih->bmiHeader.biSizeImage = DIBSIZE(pvih->bmiHeader);
-					mt.SetSampleSize(pvih->bmiHeader.biSizeImage); // fix frame size
+					if (pvih->bmiHeader.biCompression != FCC('v210')) {
+						pvih->bmiHeader.biSizeImage = DIBSIZE(pvih->bmiHeader);
+						mt.SetSampleSize(pvih->bmiHeader.biSizeImage); // fix frame size
+					}
 
 					mts.push_back(mt);
 
