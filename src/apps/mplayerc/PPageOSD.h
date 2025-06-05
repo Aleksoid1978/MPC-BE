@@ -32,20 +32,58 @@ class CPPageOSD : public CPPageBase
 public:
 	CPPageOSD();
 	virtual ~CPPageOSD() = default;
-
+	
+	enum { IDD = IDD_PPAGEOSD };	
+	
 	BOOL m_bShowOSD     = FALSE;
 	BOOL m_bOSDFileName = FALSE;
 	BOOL m_bOSDSeekTime = FALSE;
+	
+	CString         m_OSD_Font;
+	CComboBox       m_OSDFontType;
+	CIntEdit        m_edOSDFontSize;
+	CSpinButtonCtrl m_spOSDFontSize;
+	BOOL m_bOSDFontShadow  = FALSE;
+	BOOL m_bOSDFontAA      = TRUE;
+	CSliderCtrl     m_OSDTransparentCtrl;
+	int  m_nOSDTransparent = 0;
+	int  m_OSDBorder       = 1;
+	CSpinButtonCtrl m_OSDBorderCtrl;
 
-	enum { IDD = IDD_PPAGEOSD };
+	COLORREF m_clrFontABGR = 0x00E0E0E0;
+	COLORREF m_clrGrad1ABGR = 0x00302820;
+	COLORREF m_clrGrad2ABGR = 0x00302820;
+
+	int m_nOSDTransparent_Old;
+	int m_OSDBorder_Old;
+	BOOL m_bOSDFontShadow_Old;
+	BOOL m_bOSDFontAA_Old;
+
+	COLORREF m_clrFontABGR_Old;
+	COLORREF m_clrGrad1ABGR_Old;
+	COLORREF m_clrGrad2ABGR_Old;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 	virtual BOOL OnApply();
+	void OnCancel();
 
 	DECLARE_MESSAGE_MAP()
 
 public:
 	afx_msg void OnUpdateOSD(CCmdUI* pCmdUI);
+	
+	afx_msg void OnChangeOSD();
+	afx_msg void OnUpdateOSDTransparent(CCmdUI* pCmdUI);
+	afx_msg void OnCheckShadow();
+	afx_msg void OnCheckAA();
+	afx_msg void OnUpdateOSDBorder(CCmdUI* pCmdUI);
+	afx_msg void OnClickClrFont();
+	afx_msg void OnClickClrGrad1();
+	afx_msg void OnClickClrGrad2();
+	afx_msg void OnDeltaposSpin3(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnCustomDrawBtns(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	afx_msg void OnClickClrDefault();
 };

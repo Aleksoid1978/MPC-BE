@@ -61,37 +61,16 @@ public:
 	CIntEdit  m_edPlsFontPercent;
 	CComboBox m_cbToolbarSize;
 
-	CString         m_OSD_Font;
-	CComboBox       m_OSDFontType;
-	CIntEdit        m_edOSDFontSize;
-	CSpinButtonCtrl m_spOSDFontSize;
-	BOOL m_bOSDFontShadow  = FALSE;
-	BOOL m_bOSDFontAA      = TRUE;
-	CSliderCtrl     m_OSDTransparentCtrl;
-	int  m_nOSDTransparent = 0;
-	int  m_OSDBorder       = 1;
-	CSpinButtonCtrl m_OSDBorderCtrl;
-
 	int m_nThemeBrightness_Old;
 	int m_nThemeRed_Old;
 	int m_nThemeGreen_Old;
 	int m_nThemeBlue_Old;
-	int m_nOSDTransparent_Old;
-	int m_OSDBorder_Old;
-	BOOL m_bOSDFontShadow_Old;
-	BOOL m_bOSDFontAA_Old;
 
 	COLORREF m_clrFaceABGR    = 0x00ffffff;
 	COLORREF m_clrOutlineABGR = 0x00868686;
-	COLORREF m_clrFontABGR    = 0x00E0E0E0;
-	COLORREF m_clrGrad1ABGR   = 0x00302820;
-	COLORREF m_clrGrad2ABGR   = 0x00302820;
 
 	COLORREF m_clrFaceABGR_Old;
 	COLORREF m_clrOutlineABGR_Old;
-	COLORREF m_clrFontABGR_Old;
-	COLORREF m_clrGrad1ABGR_Old;
-	COLORREF m_clrGrad2ABGR_Old;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
@@ -105,26 +84,17 @@ protected:
 
 public:
 	afx_msg void OnUpdateCheck3(CCmdUI* pCmdUI);
-	afx_msg void OnCheckShadow();
-	afx_msg void OnCheckAA();
-	afx_msg void OnUpdateOSDBorder(CCmdUI* pCmdUI);
 	afx_msg void OnClickClrDefault();
 	afx_msg void OnClickClrFace();
 	afx_msg void OnClickClrOutline();
-	afx_msg void OnClickClrFont();
-	afx_msg void OnClickClrGrad1();
-	afx_msg void OnClickClrGrad2();
 	afx_msg void OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnDeltaposSpin3(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnUseTimeTooltipClicked();
 	afx_msg void OnUsePreview();
-	afx_msg void OnChangeOSD();
 	afx_msg void OnUseWin7TaskBar();
 	afx_msg void OnUpdateThemeBrightness(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateThemeRed(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateThemeGreen(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateThemeBlue(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateOSDTransparent(CCmdUI* pCmdUI);
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnThemeChange();
 };

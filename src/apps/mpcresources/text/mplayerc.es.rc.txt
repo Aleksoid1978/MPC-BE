@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Restaurar resolución al salir"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 58
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 42
 6		"Usar Tema ""Oscuro"" (predeterminado)"
 7		"Brillo :"
 9		"Ajuste de color del indicador de sonido:"
@@ -320,17 +320,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 58
 34		"Usar barra flotante"
 35		"Tamaño de fuente de Lista de Reproducción:"
 38		"Controls size:"
-40		"OSD"
-41		"Fuente:"
-45		"F"
-46		"Fondo:"
-47		"G1"
-48		"G2"
-49		"Transparencia:"
-51		"Borde:"
-54		"Sombra"
-55		"Suavizado"
-56		"Usar características de la Barra de tareas de Windows 7 (y superior)"
+40		"Usar características de la Barra de tareas de Windows 7 (y superior)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
@@ -385,10 +375,19 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Predeterminado"
 END
 
-BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
 6		"Mostrar OSD (requiere reinicio)"
 7		"Mostrar nombre de archivo multimedia"
 8		"Mostrar tiempo de búsqueda"
+10		"Fuente:"
+14		"F"
+15		"Fondo:"
+16		"G1"
+17		"G2"
+18		"Transparencia:"
+20		"Borde:"
+23		"Sombra"
+24		"Suavizado"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38

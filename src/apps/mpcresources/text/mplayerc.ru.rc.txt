@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Восстанавливать разрешение после выхода из программы"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 58
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 42
 6		"Использовать ""тёмную"" тему оформления (по умолчанию)"
 7		"Яркость :"
 9		"Настройка цвета индикатора громкости:"
@@ -320,17 +320,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 58
 34		"Показать панель управления поверх видео"
 35		"Размер шрифта плейлиста:"
 38		"Размер кнопок управления:"
-40		"OSD"
-41		"Шрифт:"
-45		"F"
-46		"Фон:"
-47		"G1"
-48		"G2"
-49		"Прозрачность:"
-51		"Бордюр:"
-54		"Тень"
-55		"Сглаживание"
-56		"Использовать возможности таскбара Windows 7 (и выше)"
+40		"Использовать возможности таскбара Windows 7 (и выше)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
@@ -385,10 +375,19 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"По умолчанию"
 END
 
-BEGIN DIALOGEX IDD_PPAGEOSD LINES 9
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
 6		"Показать OSD"
 7		"Показывать имя файла"
 8		"Показывать время после поиска"
+10		"Шрифт:"
+14		"F"
+15		"Фон:"
+16		"G1"
+17		"G2"
+18		"Прозрачность:"
+20		"Бордюр:"
+23		"Тень"
+24		"Сглаживание"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
