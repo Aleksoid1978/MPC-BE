@@ -458,7 +458,7 @@ BEGIN
     EDITTEXT        IDC_EDIT2,127,175,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,177,10,8
     LTEXT           "控制按钮大小:",IDC_STATIC8,14,87,99,8
-    COMBOBOX        IDC_COMBO5,113,85,22,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,86,22,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "使用 Windows 7 (或更高版本) 任务栏功能",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,196,270,11
 END
@@ -3873,6 +3873,11 @@ STRINGTABLE
 BEGIN
     IDC_VSYNC               "通过 Direct3D 9 启用垂直同步"
     IDC_VSYNC_INTERNAL      "启用内置垂直同步"
+END
+
+STRINGTABLE
+BEGIN
+    IDC_CONTROLS_SIZE_COMBO "Applies only to the built-in toolbar or external one in SVG format, and to the flybar"
 END
 
 /////////////////////////////////////////////////////////////////////////////

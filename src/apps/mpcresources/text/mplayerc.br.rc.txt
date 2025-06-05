@@ -1051,6 +1051,7 @@ STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Desativar esta opção impedirá que as
 STRING IDC_CHECK_RELATIVETO		"O estado padrão é herdado para outros estilos onde ainda é indefinido"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Permitir animação de legenda ao usar um buffer de legenda maior que 0. Desativar esta opção diminuirá o uso da CPU. Também desative se houver legendas piscando."
 STRING IDC_CHECK_SUBRESYNC		"Permitir visualizar e editar legendas (incluir código de tempo), navegação por legenda. Pode diminuir significativamente o carregamento das legendas."
+STRING IDC_CONTROLS_SIZE_COMBO		"Applies only to the built-in toolbar or external one in SVG format, and to the flybar"
 STRING IDC_D3D9DEVICE_CHECK		"Especificar adaptador gráfico para renderização. Aviso: possível trabalho incorreto na exibição conectado a outro adaptador."
 STRING IDC_DX9RESIZER_COMBO		"Se não houver suporte para Pixel Shader 2.0, o bilinear simples será usado automaticamente."
 STRING IDC_EXCLUSIVE_FULLSCREEN_CHECK		"Reduz distorção, mas impede que a barra de ferramentas seja exibida. Para sair do modo tela cheia, pressione Ctrl+C."

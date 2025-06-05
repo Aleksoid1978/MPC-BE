@@ -1051,6 +1051,7 @@ STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"このオプションを無効にする
 STRING IDC_CHECK_RELATIVETO		"未設定のスタイルには既定の状態の設定が適用されます"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"サブピクチャー バッファーを使用している時に字幕アニメーションを許可します。このオプションを無効にすると CPU 使用率が下がります。字幕が点滅する場合も無効にします。"
 STRING IDC_CHECK_SUBRESYNC		"字幕(タイム コードを含む)の表示と編集、字幕によるナビゲーションができます。字幕の読み込み時間が大幅に伸びる可能性があります。"
+STRING IDC_CONTROLS_SIZE_COMBO		"Applies only to the built-in toolbar or external one in SVG format, and to the flybar"
 STRING IDC_D3D9DEVICE_CHECK		"レンダリングに使用するグラフィック アダプターを指定します。 警告: ディスプレイが別のアダプターに接続されると誤作動の可能性があります。"
 STRING IDC_DX9RESIZER_COMBO		"ピクセル シェーダー 2.0 がサポートされていない場合は、単純な線形補間が自動的に使用されます。"
 STRING IDC_EXCLUSIVE_FULLSCREEN_CHECK		"テアリングを減らしますが、ツールバーが表示されなくなります。このモードで全画面表示を解除するには、[Alt+Enter] [Ctrl+Enter] または [Ctrl+C] を押してください。"

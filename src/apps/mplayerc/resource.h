@@ -782,6 +782,7 @@
 #define IDC_CHECK_AA                    10752
 #define IDC_VIDRND_COMBO                10753
 #define IDC_AUDRND_COMBO                10754
+#define IDC_CONTROLS_SIZE_COMBO         10755
 //
 // 11000...13999 are reserved
 //

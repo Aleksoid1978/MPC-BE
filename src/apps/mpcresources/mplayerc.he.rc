@@ -458,7 +458,7 @@ BEGIN
     EDITTEXT        IDC_EDIT2,127,175,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,177,10,8
     LTEXT           "Controls size:",IDC_STATIC8,14,87,99,8
-    COMBOBOX        IDC_COMBO5,113,85,22,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,86,22,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Use Windows 7 (and above) Taskbar features",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,196,270,11
 END
@@ -3871,6 +3871,11 @@ STRINGTABLE
 BEGIN
     IDC_VSYNC               "Enable VSync via Direct3D9"
     IDC_VSYNC_INTERNAL      "Enable internal mechanism VSync"
+END
+
+STRINGTABLE
+BEGIN
+    IDC_CONTROLS_SIZE_COMBO "Applies only to the built-in toolbar or external one in SVG format, and to the flybar"
 END
 
 /////////////////////////////////////////////////////////////////////////////

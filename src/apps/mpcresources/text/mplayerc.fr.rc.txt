@@ -1051,6 +1051,7 @@ STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Désactiver cette option empêchera les
 STRING IDC_CHECK_RELATIVETO		"L'état par défaut devient héréditaire à d'autres styles où il est encore mal défini"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Permet l'utilisation de sous-titres quand on utilise un tampon de subpicture supérieur à 0. La désactivation de cette option diminuera l'utilisation du processeur. A désactiver si vous rencontrez des clignotements de sous-titres."
 STRING IDC_CHECK_SUBRESYNC		"Permet d'afficher et d'éditer les sous-titres (inclure le time code), la navigation par sous-titre. Peut ralentir considérablement le chargement des sous-titres."
+STRING IDC_CONTROLS_SIZE_COMBO		"Applies only to the built-in toolbar or external one in SVG format, and to the flybar"
 STRING IDC_D3D9DEVICE_CHECK		"Spécifier une carte graphique pour le rendu. Attention : peut causer un affichage incorrect sur les écrans si connecté à un autre adaptateur."
 STRING IDC_DX9RESIZER_COMBO		"S'il n'y pas de support des Pixels Shaders 2.0, bilinéaire simple sera utilisé automatiquement."
 STRING IDC_EXCLUSIVE_FULLSCREEN_CHECK		"Réduit le déchirement mais empêche l'affichage de la barre d'outils. Pour quitter le plein écran dans ce mode, appuyez sur Ctrl+C."

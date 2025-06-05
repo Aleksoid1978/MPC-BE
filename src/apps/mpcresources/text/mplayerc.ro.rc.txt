@@ -1051,6 +1051,7 @@ STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Dezactivarea acestei opțiuni va preven
 STRING IDC_CHECK_RELATIVETO		"Starea implicită va fi moștenită și de celelalte stiluri unde ea încă nu este definită."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Permite animarea subtitrărilor atunci când este folosită o memorie tampon (un buffer) de subimagini mai mare decât 0. Dezactivând această opțiune va scădea și folosirea procesorului. Dezactiveaz-o și dacă ai subtitrări intermitente."
 STRING IDC_CHECK_SUBRESYNC		"Permite să vizualizezi și să editezi subtitrările (se include codul de timp), navigarea de către subtitrare. Poate să încetinească în mod semnificativ, încărcarea subtitrărilor."
+STRING IDC_CONTROLS_SIZE_COMBO		"Applies only to the built-in toolbar or external one in SVG format, and to the flybar"
 STRING IDC_D3D9DEVICE_CHECK		"Specifică un adaptor grafic pentru randare. Atenție: o posibilă treabă incorectă pe afișaje este conectată la un alt adaptor."
 STRING IDC_DX9RESIZER_COMBO		"Dacă nu există suport pentru Nuanțatoarele de pixeli 2.0 (Pixel Shader 2.0), biliniarul simplu este folosit automat."
 STRING IDC_EXCLUSIVE_FULLSCREEN_CHECK		"Reduce ruperea, dar împiedică afișarea barei de instrumente. Pentru a ieși din ecran complet în acest mod, apasă Alt+Enter, Ctrl+Enter sau Ctrl+C."

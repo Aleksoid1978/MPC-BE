@@ -1051,6 +1051,7 @@ STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Disabling this option will prevent the 
 STRING IDC_CHECK_RELATIVETO		"Стандартны стан наследуецца іншымі стылямі там, дзе ён  яшчэ не вызначаны."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Дазваляе анімацыю субтытраў, калі выкарыстоўваецца буфер subpicture болей 0. Адключэнне гэтай опцыі знізіць нагрузку на працэсар. Таксама адключыце, калі выкарыстоўваеце флэш субтытры."
 STRING IDC_CHECK_SUBRESYNC		"Allows to view and edit subtitles(include time code), navigation by subtitle. Can significantly slow down subtitle loading."
+STRING IDC_CONTROLS_SIZE_COMBO		"Applies only to the built-in toolbar or external one in SVG format, and to the flybar"
 STRING IDC_D3D9DEVICE_CHECK		"Specify a graphics adapter for rendering. Warning: possible incorrect work on the displays is connected to another adapter."
 STRING IDC_DX9RESIZER_COMBO		"Пры адсутнасці падтрымкі піксельных шэйдараў версіі 2.0 будзе аўтаматычна выкарыстаны просты білінейны метад."
 STRING IDC_EXCLUSIVE_FULLSCREEN_CHECK		"Reduces tearing but prevents the toolbar from being shown. To exit fullscreen in this mode press Ctrl+C."

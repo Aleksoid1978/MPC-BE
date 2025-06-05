@@ -1051,6 +1051,7 @@ STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"이 옵션을 비활성화하면 자막
 STRING IDC_CHECK_RELATIVETO		"기본 상태가 다른 스타일을 상속합니다."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"서브픽처 버퍼가 0보다 클 때 자막 애니메이션을 허용합니다. 이 옵션을 선택하면 CPU 사용률이 증가할 수 있습니다. 자막이 깜박이거나 비정상적으로 출력되면 이 옵션을 해제하십시오."
 STRING IDC_CHECK_SUBRESYNC		"자막(시간 코드 포함), 자막 탐색을 보고 편집할 수 있습니다. 자막 로딩 속도가 많이 늦어질 수 있습니다."
+STRING IDC_CONTROLS_SIZE_COMBO		"Applies only to the built-in toolbar or external one in SVG format, and to the flybar"
 STRING IDC_D3D9DEVICE_CHECK		"생성을 위한 그래픽 어댑터를 지정합니다. 경고 : 디스플레이에서 가능한 잘못된 작업이 다른 어댑터에 연결되어 있습니다."
 STRING IDC_DX9RESIZER_COMBO		"그래픽카드에서 픽셀셰이더 2.0을 지원하지 않으면 단순 쌍선형이 자동으로 선택됩니다."
 STRING IDC_EXCLUSIVE_FULLSCREEN_CHECK		"티어링을 줄여주지만, 도구 모음이 보이지 않게 됩니다. 전체 화면을 나가기 위해서는 Ctrl+C를 누르세요"

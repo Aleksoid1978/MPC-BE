@@ -63,7 +63,7 @@ void CPPageInterface::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_CHM, m_fChapterMarker);
 	DDX_Check(pDX, IDC_CHECK_FLYBAR, m_fFlybar);
 	DDX_Control(pDX, IDC_EDIT2, m_edPlsFontPercent);
-	DDX_Control(pDX, IDC_COMBO5, m_cbToolbarSize);
+	DDX_Control(pDX, IDC_CONTROLS_SIZE_COMBO, m_cbToolbarSize);
 }
 
 BOOL CPPageInterface::OnInitDialog()
@@ -136,6 +136,8 @@ BOOL CPPageInterface::OnInitDialog()
 	}
 
 	UpdateData(FALSE);
+
+	CreateToolTip();
 
 	return TRUE;
 }
@@ -310,7 +312,7 @@ void CPPageInterface::OnUpdateCheck3(CCmdUI* pCmdUI)
 	GetDlgItem(IDC_STATIC_CLRFACE)->EnableWindow(bUseDarkTheme);
 	GetDlgItem(IDC_STATIC_CLROUTLINE)->EnableWindow(bUseDarkTheme);
 	GetDlgItem(IDC_STATIC8)->EnableWindow(bUseDarkTheme);
-	GetDlgItem(IDC_COMBO5)->EnableWindow(bUseDarkTheme);
+	GetDlgItem(IDC_CONTROLS_SIZE_COMBO)->EnableWindow(bUseDarkTheme);
 	m_chkDarkMenu.EnableWindow(bUseDarkTheme);
 	if (SysVersion::IsWin10v1809orLater()) {
 		m_chkDarkTitle.EnableWindow(bUseDarkTheme);

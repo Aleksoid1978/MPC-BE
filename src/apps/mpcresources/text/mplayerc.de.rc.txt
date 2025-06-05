@@ -1051,6 +1051,7 @@ STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"Das Deaktivieren dieser Option wird das
 STRING IDC_CHECK_RELATIVETO		"Der Standardzustand wird von anderen Stilen übernommen, wo er noch undefiniert ist."
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Erlaubt Untertitel-Animation bei einem Puffer größer als 0. Durch Deaktivieren dieser Option wird die CPU-Auslastung verringert. Bei flackernden Untertiteln ist diese Option ebenfalls zu deaktiveren."
 STRING IDC_CHECK_SUBRESYNC		"Ermöglicht das Anzeigen, Bearbeiten und Navigieren von Untertiteln (einschließlich Zeitstempeln), kann aber deren Ladezeit erheblich verlangsamen."
+STRING IDC_CONTROLS_SIZE_COMBO		"Applies only to the built-in toolbar or external one in SVG format, and to the flybar"
 STRING IDC_D3D9DEVICE_CHECK		"Geben Sie einen Grafikprozessor für das Rendern an. Warnung: Mögliche Fehlfunktionen der Displays, die mit einem anderen Grafikprozessor verbunden sind."
 STRING IDC_DX9RESIZER_COMBO		"Wenn Pixel-Shader 2.0 nicht unterstützt wird, wird automatisch Simple Bilinear benutzt."
 STRING IDC_EXCLUSIVE_FULLSCREEN_CHECK		"Verhindert Tearing aber auch die Anzeige der Steuerelemente. Drücken Sie Strg+C um das Vollbild (Exclusive Mode) zu verlassen."

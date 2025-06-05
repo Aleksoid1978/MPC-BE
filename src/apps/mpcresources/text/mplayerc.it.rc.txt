@@ -1051,6 +1051,7 @@ STRING IDC_CHECK_ALLOW_DROPPING_SUBPIC		"La disattivazione di questa opzione evi
 STRING IDC_CHECK_RELATIVETO		"Lo stato predefinito viene ereditato in altri stili in cui non è ancora definito"
 STRING IDC_CHECK_SPCANIMWITHBUFFER		"Consente l'animazione dei sottotitoli quando si utilizza un buffer delle immagini secondarie maggiore di 0. La disattivazione di questa opzione ridurrà l'utilizzo della CPU. Disattiva anche se riscontri sottotitoli lampeggianti."
 STRING IDC_CHECK_SUBRESYNC		"Consente di visualizzare e modificare i sottotitoli (incluso il time code), la navigazione per sottotitoli. Può rallentare notevolmente il caricamento dei sottotitoli."
+STRING IDC_CONTROLS_SIZE_COMBO		"Applies only to the built-in toolbar or external one in SVG format, and to the flybar"
 STRING IDC_D3D9DEVICE_CHECK		"Specifica una scheda video per il rendering. Attenzione: potrebbe non funzionare se lo schermo viene collegato ad un altra scheda video."
 STRING IDC_DX9RESIZER_COMBO		"Se non è disponibile il supporto per Pixel Shader 2.0, viene utilizzato automaticamente il semplice bilineare."
 STRING IDC_EXCLUSIVE_FULLSCREEN_CHECK		"Riduce lo strappo ma impedisce la visualizzazione della barra degli strumenti. Per uscire dallo schermo intero in questa modalità, premi Alt+Invio, Ctrl+Invio o Ctrl+C."
