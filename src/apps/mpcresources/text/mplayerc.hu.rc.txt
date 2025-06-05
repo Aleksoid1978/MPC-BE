@@ -319,7 +319,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 58
 33		"Használjon fejezetjelölőt"
 34		"Használjon léptéket"
 35		"Lejátszási lista betüméret:"
-38		"Controls size:"
+38		"Vezérlők mérete:"
 40		"OSD"
 41		"Betűtípus:"
 45		"F"
