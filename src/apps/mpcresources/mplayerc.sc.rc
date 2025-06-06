@@ -453,7 +453,7 @@ BEGIN
     COMBOBOX        IDC_COMBO4,207,138,42,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "在线视频",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,241,125,47,9,WS_EX_TRANSPARENT
     CONTROL         "显示章节标记",IDC_CHECK_CHM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,151,182,9
-    CONTROL         "全屏模式时启用悬浮工具条",IDC_CHECK_FLYBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,164,182,9
+    CONTROL         "全屏模式时启用悬浮工具栏",IDC_CHECK_FLYBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,164,182,9
     LTEXT           "播放列表字体大小:",IDC_STATIC,13,177,110,8
     EDITTEXT        IDC_EDIT2,127,175,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,177,10,8
@@ -3877,7 +3877,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_CONTROLS_SIZE_COMBO "Applies only to the built-in toolbar or external one in SVG format, and to the flybar"
+    IDC_CONTROLS_SIZE_COMBO "仅支持内置工具栏或SVG格式的外部工具栏以及全屏下的悬浮工具栏"
 END
 
 /////////////////////////////////////////////////////////////////////////////

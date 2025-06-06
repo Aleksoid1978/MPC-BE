@@ -3877,7 +3877,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_CONTROLS_SIZE_COMBO "Applies only to the built-in toolbar or external one in SVG format, and to the flybar"
+    IDC_CONTROLS_SIZE_COMBO "Gilt nur für die integrierte oder externe Symbolleisten im SVG-Format und für die Flybar."
 END
 
 /////////////////////////////////////////////////////////////////////////////
