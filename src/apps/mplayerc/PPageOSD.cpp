@@ -328,8 +328,8 @@ void CPPageOSD::OnCustomDrawBtns(NMHDR* pNMHDR, LRESULT* pResult)
 	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
 	*pResult = CDRF_DODEFAULT;
 
-	if (pNMCD->dwItemSpec == IDC_BUTTON_CLRFONT || pNMCD->dwItemSpec == IDC_BUTTON_CLRGRAD1 || pNMCD->dwItemSpec == IDC_BUTTON_CLRGRAD2) {
-		if (pNMCD->dwDrawStage == CDDS_PREPAINT) {
+	if (pNMCD->dwDrawStage == CDDS_PREPAINT) {
+		if (pNMCD->dwItemSpec == IDC_BUTTON_CLRFONT || pNMCD->dwItemSpec == IDC_BUTTON_CLRGRAD1 || pNMCD->dwItemSpec == IDC_BUTTON_CLRGRAD2) {
 			CDC dc;
 			dc.Attach(pNMCD->hdc);
 			CRect r;
@@ -344,14 +344,16 @@ void CPPageOSD::OnCustomDrawBtns(NMHDR* pNMHDR, LRESULT* pResult)
 
 			dc.RoundRect(r.left, r.top, r.right, r.bottom, 6, 4);
 			r.DeflateRect(2, 2, 2, 2);
-			if (pNMCD->dwItemSpec == IDC_BUTTON_CLRFONT) {
+			switch (pNMCD->dwItemSpec) {
+			case IDC_BUTTON_CLRFONT:
 				dc.FillSolidRect(&r, m_clrFontABGR);
-			}
-			if (pNMCD->dwItemSpec == IDC_BUTTON_CLRGRAD1) {
+				break;
+			case IDC_BUTTON_CLRGRAD1:
 				dc.FillSolidRect(&r, m_clrGrad1ABGR);
-			}
-			if (pNMCD->dwItemSpec == IDC_BUTTON_CLRGRAD2) {
+				break;
+			case IDC_BUTTON_CLRGRAD2:
 				dc.FillSolidRect(&r, m_clrGrad2ABGR);
+				break;
 			}
 
 			dc.SelectObject(&penOld);

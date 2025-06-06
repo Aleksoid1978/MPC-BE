@@ -385,8 +385,8 @@ void CPPageInterface::OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
 	*pResult = CDRF_DODEFAULT;
 
-	if (pNMCD->dwItemSpec == IDC_BUTTON_CLRFACE || pNMCD->dwItemSpec == IDC_BUTTON_CLROUTLINE) {
-		if (pNMCD->dwDrawStage == CDDS_PREPAINT) {
+	if (pNMCD->dwDrawStage == CDDS_PREPAINT) {
+		if (pNMCD->dwItemSpec == IDC_BUTTON_CLRFACE || pNMCD->dwItemSpec == IDC_BUTTON_CLROUTLINE) {
 			CDC dc;
 			dc.Attach(pNMCD->hdc);
 			CRect r;
@@ -404,7 +404,7 @@ void CPPageInterface::OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult)
 			if (pNMCD->dwItemSpec == IDC_BUTTON_CLRFACE) {
 				dc.FillSolidRect(&r, m_clrFaceABGR);
 			}
-			if (pNMCD->dwItemSpec == IDC_BUTTON_CLROUTLINE) {
+			else if (pNMCD->dwItemSpec == IDC_BUTTON_CLROUTLINE) {
 				dc.FillSolidRect(&r, m_clrOutlineABGR);
 			}
 

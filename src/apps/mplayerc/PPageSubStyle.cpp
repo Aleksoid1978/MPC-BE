@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -319,11 +319,12 @@ void CPPageSubStyle::OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
 	*pResult = CDRF_DODEFAULT;
 
-	if (pNMCD->dwItemSpec == IDC_COLORPRI
-		|| pNMCD->dwItemSpec == IDC_COLORSEC
-		|| pNMCD->dwItemSpec == IDC_COLOROUTL
-		|| pNMCD->dwItemSpec == IDC_COLORSHAD) {
-		if (pNMCD->dwDrawStage == CDDS_PREPAINT) {
+	if (pNMCD->dwDrawStage == CDDS_PREPAINT) {
+		if (pNMCD->dwItemSpec == IDC_COLORPRI
+			|| pNMCD->dwItemSpec == IDC_COLORSEC
+			|| pNMCD->dwItemSpec == IDC_COLOROUTL
+			|| pNMCD->dwItemSpec == IDC_COLORSHAD) {
+
 			CDC dc;
 			dc.Attach(pNMCD->hdc);
 			CRect r;
@@ -338,17 +339,19 @@ void CPPageSubStyle::OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult)
 
 			dc.RoundRect(r.left, r.top, r.right, r.bottom, 6, 4);
 			r.DeflateRect(2,2,2,2);
-			if (pNMCD->dwItemSpec == IDC_COLORPRI) {
+			switch (pNMCD->dwItemSpec) {
+			case IDC_COLORPRI:
 				dc.FillSolidRect(&r, m_stss->colors[0]);
-			}
-			if (pNMCD->dwItemSpec == IDC_COLORSEC) {
+				break;
+			case IDC_COLORSEC:
 				dc.FillSolidRect(&r, m_stss->colors[1]);
-			}
-			if (pNMCD->dwItemSpec == IDC_COLOROUTL) {
+				break;
+			case IDC_COLOROUTL:
 				dc.FillSolidRect(&r, m_stss->colors[2]);
-			}
-			if (pNMCD->dwItemSpec == IDC_COLORSHAD) {
+				break;
+			case IDC_COLORSHAD:
 				dc.FillSolidRect(&r, m_stss->colors[3]);
+				break;
 			}
 
 			dc.SelectObject(&penOld);
