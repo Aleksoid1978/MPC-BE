@@ -453,20 +453,17 @@ void CPPageInterface::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		s.nThemeBrightness	= m_nThemeBrightness;
 		OnThemeChange();
 	}
-
-	if (*pScrollBar == m_ThemeRedCtrl) {
+	else if (*pScrollBar == m_ThemeRedCtrl) {
 		UpdateData();
 		s.nThemeRed			= m_nThemeRed;
 		OnThemeChange();
 	}
-
-	if (*pScrollBar == m_ThemeGreenCtrl) {
+	else if (*pScrollBar == m_ThemeGreenCtrl) {
 		UpdateData();
 		s.nThemeGreen		= m_nThemeGreen;
 		OnThemeChange();
 	}
-
-	if (*pScrollBar == m_ThemeBlueCtrl) {
+	else if (*pScrollBar == m_ThemeBlueCtrl) {
 		UpdateData();
 		s.nThemeBlue		= m_nThemeBlue;
 		OnThemeChange();
