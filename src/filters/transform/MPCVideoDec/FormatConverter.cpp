@@ -388,6 +388,11 @@ void CFormatConverter::SetConvertFunc()
 				m_pConvertFn = &CFormatConverter::convert_p010_nv12_direct_sse4;
 			}
 		}
+		else if (m_FProps.avpixfmt == AV_PIX_FMT_Y210 || m_FProps.avpixfmt == AV_PIX_FMT_Y216) {
+			if (m_out_pixfmt == PixFmt_P210 || m_out_pixfmt == PixFmt_P216) {
+				m_pConvertFn = &CFormatConverter::convert_y210_p210_direct_sse4;
+			}
+		}
 	}
 }
 
