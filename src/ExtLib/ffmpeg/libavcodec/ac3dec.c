@@ -46,142 +46,32 @@
 #include "decode.h"
 #include "kbdwin.h"
 
-/**
- * table for ungrouping 3 values in 7 bits.
- * used for exponents and bap=2 mantissas
- */
-static uint8_t ungroup_3_in_7_bits_tab[128][3];
-
-/** tables for ungrouping mantissas */
-static int b1_mantissas[32][3];
-static int b2_mantissas[128][3];
-static int b3_mantissas[8];
-static int b4_mantissas[128][2];
-static int b5_mantissas[16];
-
-/**
- * Quantization table: levels for symmetric. bits for asymmetric.
- * reference: Table 7.18 Mapping of bap to Quantizer
- */
-static const uint8_t quantization_tab[16] = {
-    0, 3, 5, 7, 11, 15,
-    5, 6, 7, 8, 9, 10, 11, 12, 14, 16
-};
-
 #if (!USE_FIXED)
 /** dynamic range table. converts codes to scale factors. */
 static float dynamic_range_tab[256];
 float ff_ac3_heavy_dynamic_range_tab[256];
-#endif
-
-/** Adjustments in dB gain */
-static const float gain_levels[9] = {
-    LEVEL_PLUS_3DB,
-    LEVEL_PLUS_1POINT5DB,
-    LEVEL_ONE,
-    LEVEL_MINUS_1POINT5DB,
-    LEVEL_MINUS_3DB,
-    LEVEL_MINUS_4POINT5DB,
-    LEVEL_MINUS_6DB,
-    LEVEL_ZERO,
-    LEVEL_MINUS_9DB
-};
-
-/** Adjustments in dB gain (LFE, +10 to -21 dB) */
-static const float gain_levels_lfe[32] = {
-    3.162275, 2.818382, 2.511886, 2.238719, 1.995261, 1.778278, 1.584893,
-    1.412536, 1.258924, 1.122018, 1.000000, 0.891251, 0.794328, 0.707946,
-    0.630957, 0.562341, 0.501187, 0.446683, 0.398107, 0.354813, 0.316227,
-    0.281838, 0.251188, 0.223872, 0.199526, 0.177828, 0.158489, 0.141253,
-    0.125892, 0.112201, 0.100000, 0.089125
-};
-
-/**
- * Table for default stereo downmixing coefficients
- * reference: Section 7.8.2 Downmixing Into Two Channels
- */
-static const uint8_t ac3_default_coeffs[8][5][2] = {
-    { { 2, 7 }, { 7, 2 },                               },
-    { { 4, 4 },                                         },
-    { { 2, 7 }, { 7, 2 },                               },
-    { { 2, 7 }, { 5, 5 }, { 7, 2 },                     },
-    { { 2, 7 }, { 7, 2 }, { 6, 6 },                     },
-    { { 2, 7 }, { 5, 5 }, { 7, 2 }, { 8, 8 },           },
-    { { 2, 7 }, { 7, 2 }, { 6, 7 }, { 7, 6 },           },
-    { { 2, 7 }, { 5, 5 }, { 7, 2 }, { 6, 7 }, { 7, 6 }, },
-};
-
-/**
- * Symmetrical Dequantization
- * reference: Section 7.3.3 Expansion of Mantissas for Symmetrical Quantization
- *            Tables 7.19 to 7.23
- */
-static inline int
-symmetric_dequant(int code, int levels)
-{
-    return ((code - (levels >> 1)) * (1 << 24)) / levels;
-}
 
 /*
  * Initialize tables at runtime.
  */
-static av_cold void ac3_tables_init(void)
+static av_cold void ac3_float_tables_init(void)
 {
-    int i;
-
-    /* generate table for ungrouping 3 values in 7 bits
-       reference: Section 7.1.3 Exponent Decoding */
-    for (i = 0; i < 128; i++) {
-        ungroup_3_in_7_bits_tab[i][0] =  i / 25;
-        ungroup_3_in_7_bits_tab[i][1] = (i % 25) / 5;
-        ungroup_3_in_7_bits_tab[i][2] = (i % 25) % 5;
-    }
-
-    /* generate grouped mantissa tables
-       reference: Section 7.3.5 Ungrouping of Mantissas */
-    for (i = 0; i < 32; i++) {
-        /* bap=1 mantissas */
-        b1_mantissas[i][0] = symmetric_dequant(ff_ac3_ungroup_3_in_5_bits_tab[i][0], 3);
-        b1_mantissas[i][1] = symmetric_dequant(ff_ac3_ungroup_3_in_5_bits_tab[i][1], 3);
-        b1_mantissas[i][2] = symmetric_dequant(ff_ac3_ungroup_3_in_5_bits_tab[i][2], 3);
-    }
-    for (i = 0; i < 128; i++) {
-        /* bap=2 mantissas */
-        b2_mantissas[i][0] = symmetric_dequant(ungroup_3_in_7_bits_tab[i][0], 5);
-        b2_mantissas[i][1] = symmetric_dequant(ungroup_3_in_7_bits_tab[i][1], 5);
-        b2_mantissas[i][2] = symmetric_dequant(ungroup_3_in_7_bits_tab[i][2], 5);
-
-        /* bap=4 mantissas */
-        b4_mantissas[i][0] = symmetric_dequant(i / 11, 11);
-        b4_mantissas[i][1] = symmetric_dequant(i % 11, 11);
-    }
-    /* generate ungrouped mantissa tables
-       reference: Tables 7.21 and 7.23 */
-    for (i = 0; i < 7; i++) {
-        /* bap=3 mantissas */
-        b3_mantissas[i] = symmetric_dequant(i, 7);
-    }
-    for (i = 0; i < 15; i++) {
-        /* bap=5 mantissas */
-        b5_mantissas[i] = symmetric_dequant(i, 15);
-    }
-
-#if (!USE_FIXED)
     /* generate dynamic range table
        reference: Section 7.7.1 Dynamic Range Control */
-    for (i = 0; i < 256; i++) {
+    for (int i = 0; i < 256; i++) {
         int v = (i >> 5) - ((i >> 7) << 3) - 5;
         dynamic_range_tab[i] = powf(2.0f, v) * ((i & 0x1F) | 0x20);
     }
 
     /* generate compr dynamic range table
        reference: Section 7.7.2 Heavy Compression */
-    for (i = 0; i < 256; i++) {
+    for (int i = 0; i < 256; i++) {
         int v = (i >> 4) - ((i >> 7) << 4) - 4;
         ff_ac3_heavy_dynamic_range_tab[i] = powf(2.0f, v) * ((i & 0xF) | 0x10);
     }
-#endif
+    ff_ac3_init_static();
 }
+#endif
 
 static void ac3_downmix(AVCodecContext *avctx)
 {
@@ -206,7 +96,6 @@ static void ac3_downmix(AVCodecContext *avctx)
  */
 static av_cold int ac3_decode_init(AVCodecContext *avctx)
 {
-    static AVOnce init_static_once = AV_ONCE_INIT;
     AC3DecodeContext *s = avctx->priv_data;
     const float scale = 1.0f;
     int i, ret;
@@ -247,7 +136,12 @@ static av_cold int ac3_decode_init(AVCodecContext *avctx)
         s->dlyptr[i] = s->delay[i];
     }
 
-    ff_thread_once(&init_static_once, ac3_tables_init);
+#if USE_FIXED
+    ff_ac3_init_static();
+#else
+    static AVOnce init_static_once = AV_ONCE_INIT;
+    ff_thread_once(&init_static_once, ac3_float_tables_init);
+#endif
 
     return 0;
 }
@@ -404,8 +298,8 @@ static int parse_frame_header(AC3DecodeContext *s)
 static int set_downmix_coeffs(AC3DecodeContext *s)
 {
     int i;
-    float cmix = gain_levels[s->  center_mix_level];
-    float smix = gain_levels[s->surround_mix_level];
+    float cmix = ff_ac3_gain_levels[s->  center_mix_level];
+    float smix = ff_ac3_gain_levels[s->surround_mix_level];
     float norm0, norm1;
     float downmix_coeffs[2][AC3_MAX_CHANNELS];
 
@@ -418,8 +312,8 @@ static int set_downmix_coeffs(AC3DecodeContext *s)
     }
 
     for (i = 0; i < s->fbw_channels; i++) {
-        downmix_coeffs[0][i] = gain_levels[ac3_default_coeffs[s->channel_mode][i][0]];
-        downmix_coeffs[1][i] = gain_levels[ac3_default_coeffs[s->channel_mode][i][1]];
+        downmix_coeffs[0][i] = ff_ac3_gain_levels[ff_ac3_default_coeffs[s->channel_mode][i][0]];
+        downmix_coeffs[1][i] = ff_ac3_gain_levels[ff_ac3_default_coeffs[s->channel_mode][i][1]];
     }
     if (s->channel_mode > 1 && s->channel_mode & 1) {
         downmix_coeffs[0][1] = downmix_coeffs[1][1] = cmix;
@@ -479,9 +373,9 @@ static int decode_exponents(AC3DecodeContext *s,
             av_log(s->avctx, AV_LOG_ERROR, "expacc %d is out-of-range\n", expacc);
             return AVERROR_INVALIDDATA;
         }
-        dexp[i++] = ungroup_3_in_7_bits_tab[expacc][0];
-        dexp[i++] = ungroup_3_in_7_bits_tab[expacc][1];
-        dexp[i++] = ungroup_3_in_7_bits_tab[expacc][2];
+        dexp[i++] = ff_ac3_ungroup_3_in_7_bits_tab[expacc][0];
+        dexp[i++] = ff_ac3_ungroup_3_in_7_bits_tab[expacc][1];
+        dexp[i++] = ff_ac3_ungroup_3_in_7_bits_tab[expacc][2];
     }
 
     /* convert to absolute exps and expand groups */
@@ -576,9 +470,9 @@ static void ac3_decode_transform_coeffs_ch(AC3DecodeContext *s, int ch_index, ma
                 mantissa = m->b1_mant[m->b1];
             } else {
                 int bits      = get_bits(gbc, 5);
-                mantissa      = b1_mantissas[bits][0];
-                m->b1_mant[1] = b1_mantissas[bits][1];
-                m->b1_mant[0] = b1_mantissas[bits][2];
+                mantissa      = ff_ac3_bap1_mantissas[bits][0];
+                m->b1_mant[1] = ff_ac3_bap1_mantissas[bits][1];
+                m->b1_mant[0] = ff_ac3_bap1_mantissas[bits][2];
                 m->b1         = 2;
             }
             break;
@@ -588,14 +482,14 @@ static void ac3_decode_transform_coeffs_ch(AC3DecodeContext *s, int ch_index, ma
                 mantissa = m->b2_mant[m->b2];
             } else {
                 int bits      = get_bits(gbc, 7);
-                mantissa      = b2_mantissas[bits][0];
-                m->b2_mant[1] = b2_mantissas[bits][1];
-                m->b2_mant[0] = b2_mantissas[bits][2];
+                mantissa      = ff_ac3_bap2_mantissas[bits][0];
+                m->b2_mant[1] = ff_ac3_bap2_mantissas[bits][1];
+                m->b2_mant[0] = ff_ac3_bap2_mantissas[bits][2];
                 m->b2         = 2;
             }
             break;
         case 3:
-            mantissa = b3_mantissas[get_bits(gbc, 3)];
+            mantissa = ff_ac3_bap3_mantissas[get_bits(gbc, 3)];
             break;
         case 4:
             if (m->b4) {
@@ -603,13 +497,13 @@ static void ac3_decode_transform_coeffs_ch(AC3DecodeContext *s, int ch_index, ma
                 mantissa = m->b4_mant;
             } else {
                 int bits   = get_bits(gbc, 7);
-                mantissa   = b4_mantissas[bits][0];
-                m->b4_mant = b4_mantissas[bits][1];
+                mantissa   = ff_ac3_bap4_mantissas[bits][0];
+                m->b4_mant = ff_ac3_bap4_mantissas[bits][1];
                 m->b4      = 1;
             }
             break;
         case 5:
-            mantissa = b5_mantissas[get_bits(gbc, 4)];
+            mantissa = ff_ac3_bap5_mantissas[get_bits(gbc, 4)];
             break;
         default: /* 6 to 15 */
             /* Shift mantissa and sign-extend it. */
@@ -617,7 +511,7 @@ static void ac3_decode_transform_coeffs_ch(AC3DecodeContext *s, int ch_index, ma
                 av_log(s->avctx, AV_LOG_ERROR, "bap %d is invalid in plain AC-3\n", bap);
                 bap = 15;
             }
-            mantissa = (unsigned)get_sbits(gbc, quantization_tab[bap]) << (24 - quantization_tab[bap]);
+            mantissa = (unsigned)get_sbits(gbc, ff_ac3_quantization_tab[bap]) << (24 - ff_ac3_quantization_tab[bap]);
             break;
         }
         coeffs[freq] = mantissa >> exps[freq];
@@ -1620,10 +1514,10 @@ dependent_frame:
             s->output_mode  = AC3_CHMODE_STEREO;
         }
 
-        s->loro_center_mix_level   = gain_levels[s->  center_mix_level];
-        s->loro_surround_mix_level = gain_levels[s->surround_mix_level];
-        s->ltrt_center_mix_level   = gain_levels[s->  center_mix_level_ltrt];
-        s->ltrt_surround_mix_level = gain_levels[s->surround_mix_level_ltrt];
+        s->loro_center_mix_level   = ff_ac3_gain_levels[s->  center_mix_level];
+        s->loro_surround_mix_level = ff_ac3_gain_levels[s->surround_mix_level];
+        s->ltrt_center_mix_level   = ff_ac3_gain_levels[s->  center_mix_level_ltrt];
+        s->ltrt_surround_mix_level = ff_ac3_gain_levels[s->surround_mix_level_ltrt];
         switch (s->preferred_downmix) {
         case AC3_DMIXMOD_LTRT:
             s->preferred_stereo_downmix = AV_DOWNMIX_TYPE_LTRT;
@@ -1862,12 +1756,12 @@ skip:
             downmix_info->preferred_downmix_type = AV_DOWNMIX_TYPE_UNKNOWN;
             break;
         }
-        downmix_info->center_mix_level        = gain_levels[s->       center_mix_level];
-        downmix_info->center_mix_level_ltrt   = gain_levels[s->  center_mix_level_ltrt];
-        downmix_info->surround_mix_level      = gain_levels[s->     surround_mix_level];
-        downmix_info->surround_mix_level_ltrt = gain_levels[s->surround_mix_level_ltrt];
+        downmix_info->center_mix_level        = ff_ac3_gain_levels[s->       center_mix_level];
+        downmix_info->center_mix_level_ltrt   = ff_ac3_gain_levels[s->  center_mix_level_ltrt];
+        downmix_info->surround_mix_level      = ff_ac3_gain_levels[s->     surround_mix_level];
+        downmix_info->surround_mix_level_ltrt = ff_ac3_gain_levels[s->surround_mix_level_ltrt];
         if (s->lfe_mix_level_exists)
-            downmix_info->lfe_mix_level       = gain_levels_lfe[s->lfe_mix_level];
+            downmix_info->lfe_mix_level       = ff_eac3_gain_levels_lfe[s->lfe_mix_level];
         else
             downmix_info->lfe_mix_level       = 0.0; // -inf dB
     }

@@ -41,7 +41,7 @@ Updated Turkish translation (by cmhrky).
 Updated Hungarian translation (by mickey).
 
 Updated libraries:
-	ffmpeg n7.2-dev-2617-g6c291232cf.
+	ffmpeg n7.2-dev-2678-gd9797544b4.
 
 
 1.8.4 - 2025-04-19
