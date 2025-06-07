@@ -74,7 +74,7 @@ BOOL CPPageInterface::OnInitDialog()
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
 	CorrectCWndWidth(&m_UseDarkThemeCtrl);
 
-	//m_chkDarkMenuBlurBehind.ShowWindow(SW_HIDE);
+	m_chkDarkMenuBlurBehind.ShowWindow(SW_HIDE);
 
 	CAppSettings& s = AfxGetAppSettings();
 
