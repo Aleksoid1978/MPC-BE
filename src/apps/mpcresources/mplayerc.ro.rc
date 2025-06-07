@@ -457,7 +457,7 @@ BEGIN
     LTEXT           "Dimensiunea scrisului (fontului) listei de redare:",IDC_STATIC,13,177,110,8
     EDITTEXT        IDC_EDIT2,127,175,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,177,10,8
-    LTEXT           "Controls size:",IDC_STATIC8,14,87,99,8
+    LTEXT           "Dimensiunea controalelor:",IDC_STATIC8,14,87,99,8
     COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,86,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Folosește funcțiile din bara de activități din Windows 7 (și versiunile ulterioare).",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,196,270,11
@@ -468,11 +468,11 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "",IDC_STATIC,7,4,167,43,WS_GROUP
-    CONTROL         "Arată OSD-ul(necesită repornirea playerului)",IDC_SHOW_OSD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,11,156,9
+    CONTROL         "Arată OSD-ul (necesită repornirea playerului)",IDC_SHOW_OSD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,11,156,9
     CONTROL         "Afișează numele în fișierele media",IDC_CHECK14,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,23,148,9
     CONTROL         "Afișează timpul de căutare",IDC_CHECK15,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,35,148,9
     GROUPBOX        "",IDC_STATIC,7,49,282,60
-    RTEXT           "Font:",IDC_STATIC,13,60,43,8
+    RTEXT           "Font (Scris):",IDC_STATIC,13,60,43,8
     COMBOBOX        IDC_COMBO1,61,57,104,64,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_EDIT3,169,57,29,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN3,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,188,57,11,13
@@ -2437,7 +2437,7 @@ BEGIN
     IDS_SUBRESYNC_CLN_FORCED "Forţat"
     IDS_SUBRESYNC_CLN_TEXT  "Text"
     IDS_SUBRESYNC_CLN_STYLE "Stil"
-    IDS_SUBRESYNC_CLN_FONT  "Font"
+    IDS_SUBRESYNC_CLN_FONT  "Font (Scris)"
 END
 
 STRINGTABLE
@@ -2500,7 +2500,7 @@ BEGIN
     IDD_PPAGEMOUSE          "Player::Mouse"
     IDD_PPAGELOGO           "Player::Logo"
     IDD_PPAGEINTERFACE      "Player::Interfață"
-    IDD_PPAGEOSD            "Player::OSD"
+    IDD_PPAGEOSD            "Player::OSD (On Screen Diplay / Afișare pe ecran)"
     IDD_PPAGEWINDOWSIZE     "Player::Dimensiunea ferestrei"
     IDD_PPAGEWEBSERVER      "Player::Interfață web"
     IDD_PPAGEPLAYBACK       "Redare"
@@ -3427,7 +3427,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Încarcă fonturile încorporate"
+    IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Încarcă fonturile (scrisurile) încorporate"
     IDS_MKVSPLT_CALC_DURATION "Calculează durata pe baza datelor video"
     IDS_MKVSPLT_REINDEX     "Se face reindexarea dacă e necesar"
 END
@@ -3489,12 +3489,12 @@ BEGIN
     IDS_UNIT_TIME_H         "h"
     IDS_UNIT_TIME_M         "m"
     IDS_UNIT_TIME_S         "s"
-    IDS_UNIT_SIZE_KB        "KB"
-    IDS_UNIT_SIZE_MB        "MB"
-    IDS_UNIT_SIZE_GB        "GB"
-    IDS_UNIT_SPEED_KB_S     "KB/s"
-    IDS_UNIT_SPEED_MB_S     "MB/s"
-    IDS_UNIT_SPEED_GB_S     "GB/s"
+    IDS_UNIT_SIZE_KB        "KB (KO)"
+    IDS_UNIT_SIZE_MB        "MB (MO)"
+    IDS_UNIT_SIZE_GB        "GB (GO)"
+    IDS_UNIT_SPEED_KB_S     "KB/s (KO/s)"
+    IDS_UNIT_SPEED_MB_S     "MB/s (MO/s)"
+    IDS_UNIT_SPEED_GB_S     "GB/s (GO/s)"
 END
 
 STRINGTABLE
@@ -3876,7 +3876,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_CONTROLS_SIZE_COMBO "Applies only to the built-in toolbar or external one in SVG format, and to the flybar"
+    IDC_CONTROLS_SIZE_COMBO "Se aplică numai barei de instrumente încorporate sau uneia externe în format SVG și barei mobile"
 END
 
 /////////////////////////////////////////////////////////////////////////////
