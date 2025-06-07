@@ -457,7 +457,7 @@ BEGIN
     LTEXT           "プレイリスト フォント サイズ:",IDC_STATIC,13,177,110,8
     EDITTEXT        IDC_EDIT2,127,175,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,177,10,8
-    LTEXT           "Controls size:",IDC_STATIC8,14,87,99,8
+    LTEXT           "コントロール サイズ:",IDC_STATIC8,14,87,99,8
     COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,86,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Windows 7 (とそれ以降) のタスク バーの機能を使用する",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,196,270,11
@@ -3238,7 +3238,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_DUBDELAY        "/dubdelay ""file""\t追加の音声ファイルを XXms ずらして読み込む\n(ファイルに ""...DELAY XXms..."" が含まれる場合)"
+    IDS_CMD_DUBDELAY        "/dubdelay ""file""\t追加の音声ファイルを XXms ずらして読み込む\n(ファイル内に ""...DELAY XXms..."" を含む場合)"
     IDS_CMD_D3DFS           "/d3dfs\t排他フルスクリーン モードでレンダリングを開始する"
     IDS_CMD_SUB             "/sub ""subname""\t追加の字幕ファイルを読み込む"
     IDS_CMD_FILTER          "/filter ""filtername""\tDLL から DirectShow フィルターを読み込む (ワイルドカード使用可)"
@@ -3267,8 +3267,8 @@ BEGIN
     IDS_CMD_START           "/start ms\t""ms"" (ミリ秒) の位置から再生を開始する"
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\thh:mm:ss の位置から再生を開始する"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tウィンドウ サイズを固定する"
-    IDS_CMD_MONITOR         "/monitor N\tモニター N でプレーヤーを起動する (N は 1 から開始）"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\t音声レンダラーの使用を開始する\n""name"" は音声 レンダラー名を指定する (「音声」設定を参照)"
+    IDS_CMD_MONITOR         "/monitor N\tモニター N でプレーヤーを起動する (N は 1 から始まる）"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\t音声レンダラーの使用を開始する\n""name"" は音声 レンダラー名 (「音声」設定を参照)"
     IDS_CMD_VOLUME          "/volume N\t音量を設定する (N は 0 から 100 の範囲)"
     IDS_CMD_CLIPBOARD       "/clipboard\tクリップボードのパス/リンクを開く"
     IDS_CMD_DEVICE          "/device\t既定のビデオ デバイスを開く"
@@ -3877,7 +3877,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_CONTROLS_SIZE_COMBO "Applies only to the built-in toolbar or external one in SVG format, and to the flybar"
+    IDC_CONTROLS_SIZE_COMBO "内蔵ツールバーまたは SVG 形式の外部ツールバー、およびフライバーにのみ適用されます"
 END
 
 /////////////////////////////////////////////////////////////////////////////
