@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2024 see Authors.txt
+ * (C) 2014-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -159,9 +159,10 @@ protected:
 	HRESULT plane_copy_sse2(CONV_FUNC_PARAMS);
 	HRESULT convert_p010_nv12_sse2(CONV_FUNC_PARAMS);
 
-	HRESULT plane_copy_direct_sse4(CONV_FUNC_PARAMS);
+	HRESULT plane_copy_direct_nv12_sse4(CONV_FUNC_PARAMS);
 	HRESULT convert_nv12_yv12_direct_sse4(CONV_FUNC_PARAMS);
 	HRESULT convert_p010_nv12_direct_sse4(CONV_FUNC_PARAMS);
+	HRESULT convert_y210_p210_direct_sse4(CONV_FUNC_PARAMS);
 
 	HRESULT convert_yuv_yv_nv12_dither_le(CONV_FUNC_PARAMS);
 	HRESULT convert_yuv420_px1x_le(CONV_FUNC_PARAMS);
