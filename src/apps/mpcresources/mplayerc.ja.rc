@@ -3254,7 +3254,7 @@ BEGIN
     IDS_CMD_FULLSCREEN      "/fullscreen\t全画面表示モードで起動する"
     IDS_CMD_MINIMIZED       "/minimized\t最小化モードで起動する"
     IDS_CMD_NEW             "/new\t新規プレーヤーを起動する"
-    IDS_CMD_ADD             "/add\t""pathname"" をプレイリストに追加する\n/open および /play と組み合わせ可能"
+    IDS_CMD_ADD             "/add\t""pathname"" をプレイリストに追加する\n(/open および /play と組み合わせ可能)"
 END
 
 STRINGTABLE
@@ -3269,7 +3269,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\thh:mm:ss の位置から再生を開始する"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tウィンドウ サイズを固定する"
     IDS_CMD_MONITOR         "/monitor N\tモニター N でプレーヤーを起動する (N は 1 から始まる）"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\t音声レンダラーの使用を開始する\n""name"" は音声 レンダラー名 (「音声」設定を参照)"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\t音声レンダラーの使用を開始する\n""name"" は音声レンダラー名 (「音声」設定を参照)"
     IDS_CMD_VOLUME          "/volume N\t音量を設定する (N は 0 から 100 の範囲)"
     IDS_CMD_CLIPBOARD       "/clipboard\tクリップボードのパス/リンクを開く"
     IDS_CMD_DEVICE          "/device\t既定のビデオ デバイスを開く"
