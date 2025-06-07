@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 16		"G:"
 17		"B:"
 21		"Dunkles Menü aktivieren"
-22		"Use Blur Behind effect (Windows 11)"
+22		"Unscharfen Hintergrund verwenden (Windows 11)"
 23		"Dunkle Titelleiste aktivieren (Windows 10 und höher)"
 26		"Zeit-Tooltip anzeigen:"
 28		"Vorschau bei der Suche anzeigen"
