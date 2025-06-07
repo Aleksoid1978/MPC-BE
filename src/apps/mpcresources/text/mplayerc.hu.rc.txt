@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Felbontás visszaállítása kilépéskor"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 42
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 6		"Használja a ""sötét"" témát (alapértelmezett)"
 7		"Fényerősség:"
 9		"A hangjelző színének beállítása:"
@@ -311,16 +311,17 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 42
 16		"G:"
 17		"B:"
 21		"Sötét menü engedélyezése"
-22		"Sötét cím engedélyezése (Windows 10 és felette)"
-25		"Használja az időtippet:"
-27		"Használja az előnézetet a keresésben"
-28		"A képernyő szélességéhez viszonyított méret:"
-32		"Online"
-33		"Használjon fejezetjelölőt"
-34		"Használjon léptéket"
-35		"Lejátszási lista betüméret:"
-38		"Vezérlők mérete:"
-40		"Használja a Windows 7 (és újabb) tálca szolgáltatásait"
+22		"Use Blur Behind effect (Windows 11)"
+23		"Sötét cím engedélyezése (Windows 10 és felette)"
+26		"Használja az időtippet:"
+28		"Használja az előnézetet a keresésben"
+29		"A képernyő szélességéhez viszonyított méret:"
+33		"Online"
+34		"Használjon fejezetjelölőt"
+35		"Használjon léptéket"
+36		"Lejátszási lista betüméret:"
+39		"Vezérlők mérete:"
+41		"Használja a Windows 7 (és újabb) tálca szolgáltatásait"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

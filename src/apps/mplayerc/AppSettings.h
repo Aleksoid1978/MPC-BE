@@ -718,6 +718,7 @@ public:
 	int				nThemeGreen;
 	int				nThemeBlue;
 	bool			bDarkMenu;
+	bool			bDarkMenuBlurBehind;
 	bool			bDarkTitle;
 	int				nOSDTransparent;
 	int				nOSDBorder;

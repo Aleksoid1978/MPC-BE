@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Leheneratu bereizmena programatik irtetzerakoan"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 42
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 6		"Erabili ""iluna"" azalgaia (berezkoa)"
 7		"Dizdira :"
 9		"Soinu adierazle margo ezarpena:"
@@ -311,16 +311,17 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 42
 16		"O:"
 17		"U:"
 21		"Enable dark menu"
-22		"Enable dark title (Windows 10 and above)"
-25		"Erabili denbora oharra:"
-27		"Erabili aurrekoa bilaketan"
-28		"Neurria ikusleiho zabaleraren arabera:"
-32		"Online"
-33		"Erabili atal markatzailea"
-34		"Erabili gainbarra"
-35		"Playlist font size:"
-38		"Controls size:"
-40		"Erabili Windows 7 (eta berriagoa) Eginkizun-barra ezaugarriak"
+22		"Use Blur Behind effect (Windows 11)"
+23		"Enable dark title (Windows 10 and above)"
+26		"Erabili denbora oharra:"
+28		"Erabili aurrekoa bilaketan"
+29		"Neurria ikusleiho zabaleraren arabera:"
+33		"Online"
+34		"Erabili atal markatzailea"
+35		"Erabili gainbarra"
+36		"Playlist font size:"
+39		"Controls size:"
+41		"Erabili Windows 7 (eta berriagoa) Eginkizun-barra ezaugarriak"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

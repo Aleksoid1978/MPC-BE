@@ -46,6 +46,7 @@ void CPPageInterface::DoDataExchange(CDataExchange* pDX)
 	DDX_Slider(pDX, IDC_SLIDER3, m_nThemeGreen);
 	DDX_Slider(pDX, IDC_SLIDER4, m_nThemeBlue);
 	DDX_Control(pDX, IDC_CHECK4, m_chkDarkMenu);
+	DDX_Control(pDX, IDC_CHECK7, m_chkDarkMenuBlurBehind);
 	DDX_Control(pDX, IDC_CHECK5, m_chkDarkTitle);
 
 	DDX_Control(pDX, IDC_SLIDER1, m_ThemeBrightnessCtrl);
@@ -73,7 +74,7 @@ BOOL CPPageInterface::OnInitDialog()
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
 	CorrectCWndWidth(&m_UseDarkThemeCtrl);
 
-	//m_chkDarkMenu.ShowWindow(SW_HIDE);
+	//m_chkDarkMenuBlurBehind.ShowWindow(SW_HIDE);
 
 	CAppSettings& s = AfxGetAppSettings();
 
@@ -83,6 +84,7 @@ BOOL CPPageInterface::OnInitDialog()
 	m_nThemeGreen			= m_nThemeGreen_Old			= s.nThemeGreen;
 	m_nThemeBlue			= m_nThemeBlue_Old			= s.nThemeBlue;
 	m_chkDarkMenu.SetCheck(s.bDarkMenu);
+	m_chkDarkMenuBlurBehind.SetCheck(s.bDarkMenuBlurBehind);
 	m_chkDarkTitle.SetCheck(s.bDarkTitle);
 
 	m_ThemeBrightnessCtrl.SetRange	(0, 100, TRUE);
@@ -165,6 +167,7 @@ BOOL CPPageInterface::OnApply()
 		::PostMessageW(pFrame->m_hWnd,         WM_SIZE, s.nLastWindowType, MAKELPARAM(s.szLastWindowSize.cx, s.szLastWindowSize.cy));
 	}
 	s.bDarkMenu = !!m_chkDarkMenu.GetCheck();
+	s.bDarkMenuBlurBehind = !!m_chkDarkMenuBlurBehind.GetCheck();
 	s.bDarkTitle = !!m_chkDarkTitle.GetCheck();
 
 	s.fUseWin7TaskBar		= !!m_fUseWin7TaskBar;
@@ -314,6 +317,7 @@ void CPPageInterface::OnUpdateCheck3(CCmdUI* pCmdUI)
 	GetDlgItem(IDC_STATIC8)->EnableWindow(bUseDarkTheme);
 	GetDlgItem(IDC_CONTROLS_SIZE_COMBO)->EnableWindow(bUseDarkTheme);
 	m_chkDarkMenu.EnableWindow(bUseDarkTheme);
+	m_chkDarkMenuBlurBehind.EnableWindow(bUseDarkTheme && m_chkDarkMenu.GetCheck());
 	if (SysVersion::IsWin10v1809orLater()) {
 		m_chkDarkTitle.EnableWindow(bUseDarkTheme);
 	}

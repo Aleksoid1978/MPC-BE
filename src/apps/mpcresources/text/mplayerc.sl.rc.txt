@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Povrni resolucijo ob izhodu iz programa"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 42
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 6		"Uporabi ""temno"" temo (default)"
 7		"Svetloba :"
 9		"Nastavi barvo indikatorja zvoka:"
@@ -311,16 +311,17 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 42
 16		"G:"
 17		"B:"
 21		"Omogoči temno temo"
-22		"Omogoči temni naslov (Windows 10 and above)"
-25		"Uporabi opis orodja za čas:"
-27		"Pri iskanju uporabi predogled"
-28		"Velikost relativna širini zaslona:"
-32		"Online"
-33		"Uporabi označevalca poglavij"
-34		"Uporabi flybar"
-35		"Velikost pisave za listo predvajanja:"
-38		"Controls size:"
-40		"Uporabi Windows 7 (in višje) možnosti opravilne vrstice"
+22		"Use Blur Behind effect (Windows 11)"
+23		"Omogoči temni naslov (Windows 10 and above)"
+26		"Uporabi opis orodja za čas:"
+28		"Pri iskanju uporabi predogled"
+29		"Velikost relativna širini zaslona:"
+33		"Online"
+34		"Uporabi označevalca poglavij"
+35		"Uporabi flybar"
+36		"Velikost pisave za listo predvajanja:"
+39		"Controls size:"
+41		"Uporabi Windows 7 (in višje) možnosti opravilne vrstice"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

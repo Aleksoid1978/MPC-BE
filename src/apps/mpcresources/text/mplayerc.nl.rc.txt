@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Herstel resolutie bij afsluiten"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 42
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 6		"Gebruik Donker thema (standaard)"
 7		"Helderheid :"
 9		"Kleur van de geluidindicator:"
@@ -311,16 +311,17 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 42
 16		"G:"
 17		"B:"
 21		"Donker menu inschakelen"
-22		"Activeer donkere titelbalk (Windows 10 en hoger)"
-25		"Toon scherminfo voor tijd:"
-27		"Activeer voorvertoning op zoekbalk"
-28		"Grootte op basis v/d schermbreedte:"
-32		"Online"
-33		"Toon hoofdstukmarkeringen op zoekbalk"
-34		"Gebruik flybar"
-35		"Tekengrootte van afspeellijst:"
-38		"Controls size:"
-40		"Gebruik mogelijkheden van Windows 7 (en hoger)-taakbalk"
+22		"Use Blur Behind effect (Windows 11)"
+23		"Activeer donkere titelbalk (Windows 10 en hoger)"
+26		"Toon scherminfo voor tijd:"
+28		"Activeer voorvertoning op zoekbalk"
+29		"Grootte op basis v/d schermbreedte:"
+33		"Online"
+34		"Toon hoofdstukmarkeringen op zoekbalk"
+35		"Gebruik flybar"
+36		"Tekengrootte van afspeellijst:"
+39		"Controls size:"
+41		"Gebruik mogelijkheden van Windows 7 (en hoger)-taakbalk"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

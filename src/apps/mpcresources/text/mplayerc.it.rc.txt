@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Ripristino risoluzione all'uscita dal programma"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 42
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 6		"Usa il tema scuro (predefinito)"
 7		"Luminosità:"
 9		"Imposta il colore dell'indicatore del suono:"
@@ -311,16 +311,17 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 42
 16		"G:"
 17		"B:"
 21		"Abilita menu scuro"
-22		"Abilita titolo scuro (Windows 10 and above)"
-25		"Usa descrizione comando sul tempo:"
-27		"Usa l'anteprima nella ricerca"
-28		"Dimensioni relative alla larghezza dello schermo:"
-32		"In linea"
-33		"Usa marcatore capitoli"
-34		"Usa la flybar"
-35		"Dimensione carattere playlist:"
-38		"Controls size:"
-40		"Usa funzionalità barra delle applicazioni di Windows 7 (e versioni successive)."
+22		"Use Blur Behind effect (Windows 11)"
+23		"Abilita titolo scuro (Windows 10 and above)"
+26		"Usa descrizione comando sul tempo:"
+28		"Usa l'anteprima nella ricerca"
+29		"Dimensioni relative alla larghezza dello schermo:"
+33		"In linea"
+34		"Usa marcatore capitoli"
+35		"Usa la flybar"
+36		"Dimensione carattere playlist:"
+39		"Controls size:"
+41		"Usa funzionalità barra delle applicazioni di Windows 7 (e versioni successive)."
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
