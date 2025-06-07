@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2010-2019 Hendrik Leppkes
+ *      Copyright (C) 2010-2021 Hendrik Leppkes
  *      http://www.1f0.de
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -440,6 +440,71 @@ HRESULT CFormatConverter::convert_p010_nv12_sse2(const uint8_t* const src[4], co
             xmm0 = _mm_packus_epi16(_mm_srli_epi16(xmm0, 8), _mm_srli_epi16(xmm1, 8));
 
             PIXCONV_PUT_STREAM(duv + (i >> 1), xmm0);
+        }
+    }
+
+    return S_OK;
+}
+
+HRESULT CFormatConverter::convert_y210_p210_sse4(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+{
+    const ptrdiff_t inStride = srcStride[0];
+    const ptrdiff_t outStride = dstStride[0];
+
+    const ptrdiff_t byteWidth = width << 2;
+
+    ptrdiff_t line, i;
+    __m128i xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7;
+    xmm7 = _mm_set1_epi32(0x0000FFFF);
+
+    for (line = 0; line < height; line++)
+    {
+        const uint8_t *srcLine = src[0] + line * inStride;
+        uint8_t *dstY = dst[0] + line * dstStride[0];
+        uint8_t *dstUV = dst[1] + line * dstStride[1];
+        for (i = 0; i < (byteWidth - 63); i += 64)
+        {
+            PIXCONV_LOAD_ALIGNED(xmm0, srcLine + i + 0); // Y0 U Y1 V
+            PIXCONV_LOAD_ALIGNED(xmm1, srcLine + i + 16);
+            PIXCONV_LOAD_ALIGNED(xmm2, srcLine + i + 32);
+            PIXCONV_LOAD_ALIGNED(xmm3, srcLine + i + 48);
+
+            // extract Y
+            xmm4 = _mm_and_si128(xmm0, xmm7);
+            xmm5 = _mm_and_si128(xmm1, xmm7);
+            xmm6 = _mm_packus_epi32(xmm4, xmm5);
+
+            xmm4 = _mm_and_si128(xmm2, xmm7);
+            xmm5 = _mm_and_si128(xmm3, xmm7);
+            xmm4 = _mm_packus_epi32(xmm4, xmm5);
+
+            PIXCONV_PUT_STREAM(dstY + (i >> 1) + 0, xmm6);
+            PIXCONV_PUT_STREAM(dstY + (i >> 1) + 16, xmm4);
+
+            // extract UV
+            xmm4 = _mm_srli_epi32(xmm0, 16);
+            xmm5 = _mm_srli_epi32(xmm1, 16);
+            xmm6 = _mm_packus_epi32(xmm4, xmm5);
+
+            xmm4 = _mm_srli_epi32(xmm2, 16);
+            xmm5 = _mm_srli_epi32(xmm3, 16);
+            xmm4 = _mm_packus_epi32(xmm4, xmm5);
+
+            PIXCONV_PUT_STREAM(dstUV + (i >> 1) + 0, xmm6);
+            PIXCONV_PUT_STREAM(dstUV + (i >> 1) + 16, xmm4);
+        }
+
+        // process left-over pixel
+        for (; i < (byteWidth - 7); i += 8)
+        {
+            const uint16_t *pixel = (const uint16_t *)(srcLine + i);
+            uint16_t *out_y = (uint16_t *)(dstY + (i >> 1));
+            uint16_t *out_uv = (uint16_t *)(dstUV + (i >> 1));
+
+            out_y [0] = pixel[0];
+            out_uv[0] = pixel[1];
+            out_y [1] = pixel[2];
+            out_uv[1] = pixel[3];
         }
     }
 

@@ -158,7 +158,9 @@ protected:
 	// optimized function
 	HRESULT plane_copy_sse2(CONV_FUNC_PARAMS);
 	HRESULT convert_p010_nv12_sse2(CONV_FUNC_PARAMS);
+	HRESULT convert_y210_p210_sse4(CONV_FUNC_PARAMS);
 
+	HRESULT plane_copy_direct_sse4(CONV_FUNC_PARAMS);
 	HRESULT plane_copy_direct_nv12_sse4(CONV_FUNC_PARAMS);
 	HRESULT convert_nv12_yv12_direct_sse4(CONV_FUNC_PARAMS);
 	HRESULT convert_p010_nv12_direct_sse4(CONV_FUNC_PARAMS);
