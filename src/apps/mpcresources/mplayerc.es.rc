@@ -457,7 +457,7 @@ BEGIN
     LTEXT           "Tamaño de fuente de Lista de Reproducción:",IDC_STATIC,13,177,110,8
     EDITTEXT        IDC_EDIT2,127,175,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,177,10,8
-    LTEXT           "Controls size:",IDC_STATIC8,14,87,99,8
+    LTEXT           "Tamaño de controles:",IDC_STATIC8,14,87,99,8
     COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,86,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Usar características de la Barra de tareas de Windows 7 (y superior)",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,196,270,11
@@ -3877,7 +3877,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_CONTROLS_SIZE_COMBO "Applies only to the built-in toolbar or external one in SVG format, and to the flybar"
+    IDC_CONTROLS_SIZE_COMBO "Sólo se aplica a la barra de herramientas integrada o a una externa en formato SVG, y a la barra flotante"
 END
 
 /////////////////////////////////////////////////////////////////////////////

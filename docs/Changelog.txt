@@ -39,6 +39,7 @@ Updated Chinese (Simplified) translation (by wushantao).
 Updated German translation (by Klaus1189).
 Updated Turkish translation (by cmhrky).
 Updated Hungarian translation (by mickey).
+Updated Spanish translation (by IPeluchito).
 
 Updated libraries:
 	ffmpeg n7.2-dev-2678-gd9797544b4.
