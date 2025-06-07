@@ -16,7 +16,7 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#if VER < EncodeVer(6,3,1)
+#if VER < EncodeVer(6,4,0)
   #error A more recent version of Inno Setup 6 is required to compile this script (6.2.2 or newer)
 #endif
 #ifndef UNICODE
@@ -68,7 +68,7 @@
   #define Description  = app_name + " x64 " + app_version
   #define VisualElementsManifest = "VisualElements\mpc-be64.VisualElementsManifest.xml"
 #endif
-#define mpcvr_desc     = "MPC Video Renderer 0.9.7"
+#define mpcvr_desc     = "MPC Video Renderer 0.9.9"
 #define mpcscriptsrc_desc = "MPC Script Source 0.2.7"
 
 [Setup]
