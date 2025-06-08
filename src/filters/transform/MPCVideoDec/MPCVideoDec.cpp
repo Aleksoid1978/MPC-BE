@@ -4030,7 +4030,7 @@ HRESULT CMPCVideoDecFilter::ChangeOutputMediaFormat(int nType)
 	return hr;
 }
 
-HRESULT CMPCVideoDecFilter::SetDXVAState()
+void CMPCVideoDecFilter::SetDXVAState()
 {
 	CString codec;
 	switch (m_CodecId) {
