@@ -76,6 +76,7 @@ enum MPCPixFmtType {
 	PFType_YUV444Px, // YUV 4:4:4, 9-16 bit
 	PFType_NV12,     // YUV 4:2:0, U/V interleaved
 	PFType_P01x,     // YUV 4:2:0, 10 to 16-bit, U/V interleaved, MSB aligned
+	PFType_Y21x,     // YUV 4:2:0, 10 to 16-bit
 };
 
 struct FrameProps {
@@ -160,6 +161,7 @@ protected:
 	HRESULT convert_p010_nv12_sse2(CONV_FUNC_PARAMS);
 	HRESULT convert_y210_p210_sse4(CONV_FUNC_PARAMS);
 
+	// optimized direct function
 	HRESULT plane_copy_direct_sse4(CONV_FUNC_PARAMS);
 	HRESULT plane_copy_direct_nv12_sse4(CONV_FUNC_PARAMS);
 	HRESULT convert_nv12_yv12_direct_sse4(CONV_FUNC_PARAMS);

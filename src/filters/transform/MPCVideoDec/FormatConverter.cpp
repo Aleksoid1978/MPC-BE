@@ -140,10 +140,17 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 		return PFType_unspecified;
 	}
 
-	if (av_pix_fmt == AV_PIX_FMT_NV12) {
+	switch (av_pix_fmt) {
+	case AV_PIX_FMT_NV12:
 		return PFType_NV12;
-	} else if (av_pix_fmt == AV_PIX_FMT_P010 || av_pix_fmt == AV_PIX_FMT_P016) {
+	case AV_PIX_FMT_P010:
+	case AV_PIX_FMT_P012:
+	case AV_PIX_FMT_P016:
 		return PFType_P01x;
+	case AV_PIX_FMT_Y210:
+	case AV_PIX_FMT_Y212 :
+	case AV_PIX_FMT_Y216:
+		return PFType_Y21x;
 	}
 
 	int lumabits = pfdesc->comp[0].depth;
@@ -388,12 +395,27 @@ void CFormatConverter::SetConvertFunc()
 				m_pConvertFn = &CFormatConverter::convert_p010_nv12_direct_sse4;
 			}
 		}
-		else if (m_FProps.avpixfmt == AV_PIX_FMT_Y210 || m_FProps.avpixfmt == AV_PIX_FMT_Y216) {
+		else if (m_FProps.pftype == PFType_Y21x) {
 			if (m_out_pixfmt == PixFmt_P210 || m_out_pixfmt == PixFmt_P216) {
 				m_pConvertFn = &CFormatConverter::convert_y210_p210_direct_sse4;
 			}
 		}
+#if (0)
+		else if (m_FProps.avpixfmt == AV_PIX_FMT_YUYV422 && m_out_pixfmt == PixFmt_YUY2) {
+			m_pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
+		}
+		else if (m_FProps.avpixfmt == AV_PIX_FMT_VUYX && m_out_pixfmt == PixFmt_AYUV) {
+			m_pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
+		}
+		else if (m_FProps.avpixfmt == AV_PIX_FMT_XV30 && m_out_pixfmt == PixFmt_Y410) {
+			m_pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
+		}
+		else if (m_FProps.avpixfmt == AV_PIX_FMT_XV36 && m_out_pixfmt == PixFmt_Y416) {
+			m_pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
+		}
+#endif
 	}
+
 }
 
 void CFormatConverter::UpdateOutput(MPCPixelFormat out_pixfmt, int dstStride, int planeHeight)
