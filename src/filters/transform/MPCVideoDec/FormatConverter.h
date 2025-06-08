@@ -148,6 +148,7 @@ protected:
 	// Conversion function pointer
 	typedef HRESULT (CFormatConverter::*ConverterFn)(CONV_FUNC_PARAMS);
 	ConverterFn m_pConvertFn = nullptr;
+	BOOL m_bDirect = FALSE;
 
 	// from LAV Filters
 	HRESULT ConvertGeneric(CONV_FUNC_PARAMS);
@@ -197,6 +198,7 @@ public:
 	MPCPixelFormat GetOutPixFormat() { return m_out_pixfmt; }
 
 	bool Converting(BYTE* dst, AVFrame* pFrame);
+	void SetDirect(BOOL bDirect) { m_bDirect = bDirect; }
 
 	void Cleanup();
 

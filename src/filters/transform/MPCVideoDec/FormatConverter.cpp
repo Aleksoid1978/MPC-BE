@@ -280,7 +280,7 @@ void CFormatConverter::SetConvertFunc()
 	m_RequiredAlignment = 16;
 
 	// optimized direct function
-	if (CPUInfo::HaveSSE4()) {
+	if (m_bDirect && CPUInfo::HaveSSE4()) {
 		if (m_FProps.pftype == PFType_NV12) {
 			if (m_out_pixfmt == PixFmt_NV12) {
 				m_pConvertFn = &CFormatConverter::plane_copy_direct_nv12_sse4;
@@ -319,6 +319,8 @@ void CFormatConverter::SetConvertFunc()
 	if (m_pConvertFn) {
 		return;
 	}
+
+	m_pConvertFn = &CFormatConverter::ConvertGeneric;
 
 	// optimized function
 	switch (m_out_pixfmt) {
@@ -448,13 +450,6 @@ void CFormatConverter::SetConvertFunc()
 		}
 		break;
 	}
-
-	if (m_pConvertFn) {
-		return;
-	}
-
-	m_pConvertFn = &CFormatConverter::ConvertGeneric;
-	m_RequiredAlignment = 16;
 }
 
 void CFormatConverter::UpdateOutput(MPCPixelFormat out_pixfmt, int dstStride, int planeHeight)

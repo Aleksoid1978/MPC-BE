@@ -3615,6 +3615,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 			if (m_pHWFrame->format == m_HWPixFmt && !DXVAState::GetState()) {
 				SetDXVAState();
+				m_FormatConverter.SetDirect(TRUE);
 			}
 		}
 
