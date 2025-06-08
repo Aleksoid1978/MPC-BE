@@ -3601,7 +3601,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 				m_hwType = HwType::None;
 
 				m_pFrame->format = m_pHWFrame->format;
-				m_pFrame->width = m_pHWFrame->width;
+				m_pFrame->width  = m_pHWFrame->width;
 				m_pFrame->height = m_pHWFrame->height;
 				av_frame_get_buffer(m_pFrame, 32);
 				ret = av_frame_copy(m_pFrame, m_pHWFrame);
@@ -3614,81 +3614,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			av_frame_copy_props(m_pFrame, m_pHWFrame);
 
 			if (m_pHWFrame->format == m_HWPixFmt && !DXVAState::GetState()) {
-				CString codec;
-				switch (m_CodecId) {
-					case AV_CODEC_ID_AV1:        codec = L"AV1";    break;
-					case AV_CODEC_ID_H264:       codec = L"H.264";  break;
-					case AV_CODEC_ID_HEVC:       codec = L"HEVC";   break;
-					case AV_CODEC_ID_MPEG2VIDEO: codec = L"MPEG-2"; break;
-					case AV_CODEC_ID_VC1:
-					case AV_CODEC_ID_WMV3:       codec = L"VC-1";   break;
-					case AV_CODEC_ID_VP9:        codec = L"VP9";    break;
-				}
-
-				auto frames_ctx = reinterpret_cast<AVHWFramesContext*>(m_pHWFrame->hw_frames_ctx->data);
-
-				CString description = m_hwType == HwType::D3D11CopyBack ? L"D3D11 Copy-back" :
-									  (m_hwType == HwType::D3D12CopyBack ? L"D3D12 Copy-back" : L"NVDEC");
-				if (!codec.IsEmpty()) {
-					if (m_hwType == HwType::NVDEC) {
-						if (frames_ctx->sw_format == AV_PIX_FMT_YUV444P || frames_ctx->sw_format == AV_PIX_FMT_YUV444P16) {
-							codec.Append(L" 444");
-						}
-					} else if (m_hwType == HwType::D3D11CopyBack) {
-						switch (frames_ctx->sw_format) {
-							case AV_PIX_FMT_YUYV422:
-							case AV_PIX_FMT_Y210:
-							case AV_PIX_FMT_Y212:
-								codec.Append(L" 422");
-								break;
-							case AV_PIX_FMT_VUYX:
-							case AV_PIX_FMT_XV30:
-							case AV_PIX_FMT_XV36:
-								codec.Append(L" 444");
-								break;
-						}
-					}
-
-					const int depth = GetLumaBits(m_pAVCtx->sw_pix_fmt);
-					if (depth > 8) {
-						codec.AppendFormat(L" %d-bit", depth);
-					}
-
-					description += L", " + codec;
-				}
-
-				DXVAState::SetActiveState(GUID_NULL, description);
-
-				if (frames_ctx->format == AV_PIX_FMT_CUDA) {
-					auto device_hwctx = reinterpret_cast<AVHWDeviceContext*>(frames_ctx->device_ctx);
-					auto cuda_hwctx = reinterpret_cast<AVCUDADeviceContext*>(device_hwctx->hwctx);
-					auto cuda_fns = cuda_hwctx->internal->cuda_dl;
-
-					char name[256] = {};
-					auto cuStatus = cuda_fns->cuDeviceGetName(name, 256, 0);
-					if (cuStatus == CUDA_SUCCESS) {
-						const auto deviceName = UTF8ToWStr(name);
-						if (!StartsWith(m_strDeviceDescription, deviceName.GetString())) {
-							m_strDeviceDescription = deviceName;
-						}
-					}
-				}
-
-				if (frames_ctx->format == AV_PIX_FMT_D3D11) {
-					auto device_hwctx = reinterpret_cast<AVD3D11VADeviceContext*>(frames_ctx->device_ctx->hwctx);
-					const auto deviceName = UTF8ToWStr(device_hwctx->device_name);
-					if (!deviceName.IsEmpty()) {
-						m_strDeviceDescription = deviceName;
-					}
-				}
-
-				if (frames_ctx->format == AV_PIX_FMT_D3D12) {
-					auto device_hwctx = reinterpret_cast<AVD3D12VADeviceContext*>(frames_ctx->device_ctx->hwctx);
-					const auto deviceName = UTF8ToWStr(device_hwctx->device_name);
-					if (!deviceName.IsEmpty()) {
-						m_strDeviceDescription = deviceName;
-					}
-				}
+				SetDXVAState();
 			}
 		}
 
@@ -4102,6 +4028,86 @@ HRESULT CMPCVideoDecFilter::ChangeOutputMediaFormat(int nType)
 	}
 
 	return hr;
+}
+
+HRESULT CMPCVideoDecFilter::SetDXVAState()
+{
+	CString codec;
+	switch (m_CodecId) {
+	case AV_CODEC_ID_AV1:        codec = L"AV1";    break;
+	case AV_CODEC_ID_H264:       codec = L"H.264";  break;
+	case AV_CODEC_ID_HEVC:       codec = L"HEVC";   break;
+	case AV_CODEC_ID_MPEG2VIDEO: codec = L"MPEG-2"; break;
+	case AV_CODEC_ID_VC1:
+	case AV_CODEC_ID_WMV3:       codec = L"VC-1";   break;
+	case AV_CODEC_ID_VP9:        codec = L"VP9";    break;
+	}
+
+	auto frames_ctx = reinterpret_cast<AVHWFramesContext*>(m_pHWFrame->hw_frames_ctx->data);
+
+	CString description = m_hwType == HwType::D3D11CopyBack ? L"D3D11 Copy-back" :
+		(m_hwType == HwType::D3D12CopyBack ? L"D3D12 Copy-back" : L"NVDEC");
+	if (!codec.IsEmpty()) {
+		if (m_hwType == HwType::NVDEC) {
+			if (frames_ctx->sw_format == AV_PIX_FMT_YUV444P || frames_ctx->sw_format == AV_PIX_FMT_YUV444P16) {
+				codec.Append(L" 444");
+			}
+		}
+		else if (m_hwType == HwType::D3D11CopyBack) {
+			switch (frames_ctx->sw_format) {
+			case AV_PIX_FMT_YUYV422:
+			case AV_PIX_FMT_Y210:
+			case AV_PIX_FMT_Y212:
+				codec.Append(L" 422");
+				break;
+			case AV_PIX_FMT_VUYX:
+			case AV_PIX_FMT_XV30:
+			case AV_PIX_FMT_XV36:
+				codec.Append(L" 444");
+				break;
+			}
+		}
+
+		const int depth = GetLumaBits(m_pAVCtx->sw_pix_fmt);
+		if (depth > 8) {
+			codec.AppendFormat(L" %d-bit", depth);
+		}
+
+		description += L", " + codec;
+	}
+
+	DXVAState::SetActiveState(GUID_NULL, description);
+
+	if (frames_ctx->format == AV_PIX_FMT_CUDA) {
+		auto device_hwctx = reinterpret_cast<AVHWDeviceContext*>(frames_ctx->device_ctx);
+		auto cuda_hwctx = reinterpret_cast<AVCUDADeviceContext*>(device_hwctx->hwctx);
+		auto cuda_fns = cuda_hwctx->internal->cuda_dl;
+
+		char name[256] = {};
+		auto cuStatus = cuda_fns->cuDeviceGetName(name, 256, 0);
+		if (cuStatus == CUDA_SUCCESS) {
+			const auto deviceName = UTF8ToWStr(name);
+			if (!StartsWith(m_strDeviceDescription, deviceName.GetString())) {
+				m_strDeviceDescription = deviceName;
+			}
+		}
+	}
+
+	if (frames_ctx->format == AV_PIX_FMT_D3D11) {
+		auto device_hwctx = reinterpret_cast<AVD3D11VADeviceContext*>(frames_ctx->device_ctx->hwctx);
+		const auto deviceName = UTF8ToWStr(device_hwctx->device_name);
+		if (!deviceName.IsEmpty()) {
+			m_strDeviceDescription = deviceName;
+		}
+	}
+
+	if (frames_ctx->format == AV_PIX_FMT_D3D12) {
+		auto device_hwctx = reinterpret_cast<AVD3D12VADeviceContext*>(frames_ctx->device_ctx->hwctx);
+		const auto deviceName = UTF8ToWStr(device_hwctx->device_name);
+		if (!deviceName.IsEmpty()) {
+			m_strDeviceDescription = deviceName;
+		}
+	}
 }
 
 void CMPCVideoDecFilter::SetThreadCount()
