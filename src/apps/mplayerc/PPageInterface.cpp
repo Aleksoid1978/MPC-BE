@@ -74,8 +74,6 @@ BOOL CPPageInterface::OnInitDialog()
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
 	CorrectCWndWidth(&m_UseDarkThemeCtrl);
 
-	m_chkDarkMenuBlurBehind.ShowWindow(SW_HIDE);
-
 	CAppSettings& s = AfxGetAppSettings();
 
 	m_UseDarkThemeCtrl.SetCheck(s.bUseDarkTheme);
@@ -135,6 +133,10 @@ BOOL CPPageInterface::OnInitDialog()
 
 	if (!SysVersion::IsWin10v1809orLater()) {
 		m_chkDarkTitle.EnableWindow(FALSE);
+	}
+
+	if (!SysVersion::IsWin11orLater()) {
+		m_chkDarkMenuBlurBehind.EnableWindow(FALSE);
 	}
 
 	UpdateData(FALSE);
@@ -317,7 +319,9 @@ void CPPageInterface::OnUpdateCheck3(CCmdUI* pCmdUI)
 	GetDlgItem(IDC_STATIC8)->EnableWindow(bUseDarkTheme);
 	GetDlgItem(IDC_CONTROLS_SIZE_COMBO)->EnableWindow(bUseDarkTheme);
 	m_chkDarkMenu.EnableWindow(bUseDarkTheme);
-	m_chkDarkMenuBlurBehind.EnableWindow(bUseDarkTheme && m_chkDarkMenu.GetCheck());
+	if (SysVersion::IsWin11orLater()) {
+		m_chkDarkMenuBlurBehind.EnableWindow(bUseDarkTheme && m_chkDarkMenu.GetCheck());
+	}
 	if (SysVersion::IsWin10v1809orLater()) {
 		m_chkDarkTitle.EnableWindow(bUseDarkTheme);
 	}
