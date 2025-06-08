@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2023 see Authors.txt
+ * (C) 2016-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,11 +21,13 @@
 #include "stdafx.h"
 #include "MFCHelper.h"
 
+#include <utility>
+
 CString ResStr(UINT nID)
 {
 	CString id;
-	if (!id.LoadString(nID)) {
-		id.LoadString(AfxGetApp()->m_hInstance, nID);
+	if (!id.LoadStringW(nID)) {
+		std::ignore = id.LoadStringW(AfxGetApp()->m_hInstance, nID);
 	}
 
 	return id;
