@@ -225,7 +225,7 @@ BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
 12		"Audio"
 13		"Subtitrări"
 15		"Setări suplimentare"
-16		"Permite subtitr. pentru pers. cu def. de auz în „Line 21 Decoder”"
+16		"Permite subtitrările pentru persoanele cu deficiențe de auz în „Line 21 Decoder”"
 18		"Începe redarea din titlul principal"
 END
 
@@ -483,8 +483,8 @@ BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 67
-5		"Font (Scris)"
-6		"Font (Scris)"
+5		"Fontul (Scrisul)"
+6		"Fontul (Scrisul))"
 8		"Spațiere"
 10		"Unghi (z,°)"
 13		"Scală (x,%)"
@@ -492,7 +492,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 67
 19		"Stilul chenarului"
 20		"Contur"
 21		"Dreptunghi opac"
-22		"Lățime de chenar"
+22		"Lățimea chenar"
 24		"Profunzi. umbrei"
 26		"Aliniază ecranul și marginile"
 36		"Stânga"
@@ -2089,8 +2089,8 @@ STRING IDS_VOLUME_GAIN_DEC		"Scade puterea volumului"
 STRING IDS_VOLUME_GAIN_INC		"Crește puterea volumului"
 STRING IDS_VOLUME_GAIN_MAX		"Puterea maximă a volumului"
 STRING IDS_VOLUME_GAIN_OFF		"Oprește puterea volumului"
-STRING IDS_VOLUME_OSD		"Volum: %d%%"
-STRING IDS_VOLUME_OSD_MUTE		"Volum: %d%% [Mut]"
+STRING IDS_VOLUME_OSD		"Volumul: %d%%"
+STRING IDS_VOLUME_OSD_MUTE		"Volumul: %d%% [Mut]"
 STRING IDS_VTSREADER_LOAD_PGC		"Activează o alegere a titlului"
 STRING IDS_WEBSERVER_ERROR_TEST		"E nevoie să aplici noile setări înainte de a le testa."
 STRING IDS_WEBUI_DISABLED_PREVIEW_MSG		"Previzualizarea este deocamdată dezactivată. O poți activa din opțiunile pentru MPC-BE."
