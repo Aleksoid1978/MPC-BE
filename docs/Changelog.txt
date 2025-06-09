@@ -15,6 +15,7 @@ Added support for AV1 video.
 MPCVideoDec
 Improved support for VP9 video.
 Added the ability to hardware decode slightly non-standard AV1 videos.
+Speeded up copying of video frames for CopyBack modes (optimizations from the LAV Filters project were used).
 
 MpcAudioRenderer
 Fixed crashes in some situations.
@@ -25,11 +26,14 @@ The default format is now VP9 720p + Opus.
 Fixed merging of saved VP9 and AAC streams using ffmpeg.exe.
 Added checks for availability of the URL being opened.
 Improved yt-dlp support.
+Added the ability to select the default language as the preferred audio track language.
 
 Player
 Fixed saving of video frame image with subtitles when using MPC Video Renderer.
 HLS M3U files are no longer processed as normal playlists, but are passed to the source filter as is.
 Added the ability to save the "Show milliseconds" setting.
+Added settings "Controls size" and "Use Blur Behind effect (Windows 11)".
+Added OSD settings panel.
 
 Installer
 Updated MPC Video Renderer 0.9.9.
@@ -43,6 +47,7 @@ Updated German translation (by Klaus1189).
 Updated Turkish translation (by cmhrky).
 Updated Hungarian translation (by mickey).
 Updated Spanish translation (by IPeluchito).
+Updated Italian translation (by mapi68).
 
 Updated libraries:
 	ffmpeg n7.2-dev-2678-gd9797544b4.
