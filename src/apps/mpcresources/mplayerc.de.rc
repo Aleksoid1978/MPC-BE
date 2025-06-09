@@ -442,7 +442,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,49,53,12
     CONTROL         "Dunkles Menü aktivieren",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,59,147,8,WS_EX_TRANSPARENT
     CONTROL         "Unscharfen Hintergrund verwenden (Windows 11)",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,197,8,WS_EX_TRANSPARENT
-    CONTROL         "Dunkle Titelleiste aktivieren (Windows 10 und höher)",IDC_CHECK5,
+    CONTROL         "Dunkle Titelleiste aktivieren (ab Windows 10)",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,8,WS_EX_TRANSPARENT
     GROUPBOX        "",IDC_STATIC,7,112,282,91
     CONTROL         "Zeit-Tooltip anzeigen:",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,121,152,9
@@ -3873,7 +3873,7 @@ BEGIN
     IDS_PUBLISHED           "Veröffentlicht: "
     IDS_OPENING_YOUTUBE     "YouTube wird geöffnet ..."
     IDS_CALLING_YOUTUBEDL   "%s wird aufgerufen ..."
-    IDS_YOUTUBE_DEFAULT_AUDIO_LANG "Default language"
+    IDS_YOUTUBE_DEFAULT_AUDIO_LANG "Originalsprache"
 END
 
 STRINGTABLE
