@@ -320,7 +320,7 @@ BEGIN
     LISTBOX         IDC_LIST1,79,74,208,66,WS_VSCROLL | WS_GROUP | WS_TABSTOP
     GROUPBOX        "Dodatkowe ustawienia",IDC_STATIC,5,140,286,37
     CONTROL         "Uwzględnianie napisów w „Dekoderze Line 21”",IDC_CHECK2,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,152,220,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,152,278,9
     CONTROL         "Rozpocznij odtwarzanie od głównego tytułu",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,164,220,9
 END
 
@@ -2290,6 +2290,11 @@ BEGIN
     0
 END
 
+IDD_PPAGEDVD AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -3865,9 +3870,9 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PUBLISHED                  "Opublikowany: "
-    IDS_OPENING_YOUTUBE            "Opening YouTube ..."
-    IDS_CALLING_YOUTUBEDL          "Calling %s ..."
+    IDS_PUBLISHED           "Opublikowany: "
+    IDS_OPENING_YOUTUBE     "Opening YouTube ..."
+    IDS_CALLING_YOUTUBEDL   "Calling %s ..."
     IDS_YOUTUBE_DEFAULT_AUDIO_LANG "Default language"
 END
 
