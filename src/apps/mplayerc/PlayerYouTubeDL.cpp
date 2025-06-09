@@ -371,6 +371,12 @@ namespace YoutubeDL
 							const auto it = audioUrls.find(language);
 							if (it == audioUrls.cend() || tbr > (*it).second.tbr) {
 								audioUrls[language] = { tbr, url };
+								if (bIsYoutube) {
+									int language_preference = 0;
+									if (getJsonValue(format, "language_preference", language_preference) && language_preference > 0) {
+										audioUrls[CStringA(Youtube::kDefaultAudioLanguage)] = { tbr, url };
+									}
+								}
 							}
 						}
 					}
