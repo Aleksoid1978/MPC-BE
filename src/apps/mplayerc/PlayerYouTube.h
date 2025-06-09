@@ -25,6 +25,8 @@
 
 namespace Youtube
 {
+	static constexpr auto kDefaultAudioLanguage = L"default";
+
 	enum yformat {
 		// videofile
 		y_mp4_avc = 0, // used in settings

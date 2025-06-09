@@ -3865,9 +3865,10 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PUBLISHED           "Опубліковано : "
-    IDS_OPENING_YOUTUBE     "Opening YouTube ..."
-    IDS_CALLING_YOUTUBEDL   "Calling %s ..."
+    IDS_PUBLISHED                  "Опубліковано : "
+    IDS_OPENING_YOUTUBE            "Opening YouTube ..."
+    IDS_CALLING_YOUTUBEDL          "Calling %s ..."
+    IDS_YOUTUBE_DEFAULT_AUDIO_LANG "Default language"
 END
 
 STRINGTABLE

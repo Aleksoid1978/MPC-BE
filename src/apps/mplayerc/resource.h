@@ -1437,6 +1437,7 @@
 #define IDS_PUBLISHED                   34100
 #define IDS_OPENING_YOUTUBE             34101
 #define IDS_CALLING_YOUTUBEDL           34102
+#define IDS_YOUTUBE_DEFAULT_AUDIO_LANG  34103
 // video files
 #define IDS_MFMT_AVI                    39001
 #define IDS_MFMT_MPEG                   39002

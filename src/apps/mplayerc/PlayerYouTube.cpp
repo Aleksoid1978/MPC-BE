@@ -868,10 +868,9 @@ namespace Youtube
 
 				auto& audioLangs = streamingDataFormatListAudioWithLanguages;
 
-
 				auto it = defaultAudioLang.GetLength() ? audioLangs.find(defaultAudioLang) : audioLangs.begin();
 
-				if (s.strYoutubeAudioLang.GetLength()) {
+				if (s.strYoutubeAudioLang.GetLength() && s.strYoutubeAudioLang != kDefaultAudioLanguage) {
 					CStringA lang = WStrToUTF8(s.strYoutubeAudioLang.GetString());
 					auto it2 = audioLangs.find(lang);
 					if (it2 == audioLangs.end() && lang.GetLength() == 2) {

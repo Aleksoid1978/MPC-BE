@@ -3865,9 +3865,10 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PUBLISHED           "게시 : "
-    IDS_OPENING_YOUTUBE     "유튜브를 여는 중..."
-    IDS_CALLING_YOUTUBEDL   "%s 호출 중..."
+    IDS_PUBLISHED                  "게시 : "
+    IDS_OPENING_YOUTUBE            "유튜브를 여는 중..."
+    IDS_CALLING_YOUTUBEDL          "%s 호출 중..."
+    IDS_YOUTUBE_DEFAULT_AUDIO_LANG "Default language"
 END
 
 STRINGTABLE

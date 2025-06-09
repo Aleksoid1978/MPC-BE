@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2024 see Authors.txt
+ * (C) 2012-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -124,11 +124,17 @@ BOOL CPPageYoutube::OnInitDialog()
 	}
 
 	bool was_added = false;
+	m_cbAudioLang.AddString(ResStr(IDS_YOUTUBE_DEFAULT_AUDIO_LANG));
+	if (s.strYoutubeAudioLang.CompareNoCase(Youtube::kDefaultAudioLanguage) == 0) {
+		was_added = true;
+		m_cbAudioLang.SetCurSel(0);
+	}
+
 	for (size_t i = 0; i < std::size(m_langcodes); i++) {
 		m_cbAudioLang.AddString(langNames[i].GetString());
 		if (!was_added && s.strYoutubeAudioLang.CompareNoCase(m_langcodes[i]) == 0) {
 			was_added = true;
-			m_cbAudioLang.SetCurSel(i);
+			m_cbAudioLang.SetCurSel(i + 1);
 		}
 	}
 	if (!was_added) {
@@ -197,7 +203,7 @@ BOOL CPPageYoutube::OnApply()
 	s.YoutubeFormat.hdr		= !!m_chkHdr.GetCheck();
 	s.YoutubeFormat.afmt	= m_cbAudioFormat.GetCurSel() + Youtube::y_mp4_aac;
 	if (m_cbAudioLang.GetCurSel() >= 0) {
-		s.strYoutubeAudioLang = m_langcodes[m_cbAudioLang.GetCurSel()];
+		s.strYoutubeAudioLang = m_cbAudioLang.GetCurSel() == 0 ? Youtube::kDefaultAudioLanguage : m_langcodes[m_cbAudioLang.GetCurSel() - 1];
 	} else {
 		s.strYoutubeAudioLang.Empty();
 	}

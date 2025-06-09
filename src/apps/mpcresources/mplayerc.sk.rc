@@ -3865,9 +3865,10 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PUBLISHED           "Zverejnené: "
-    IDS_OPENING_YOUTUBE     "Otváranie YouTube..."
-    IDS_CALLING_YOUTUBEDL   "Volanie %s ..."
+    IDS_PUBLISHED                  "Zverejnené: "
+    IDS_OPENING_YOUTUBE            "Otváranie YouTube..."
+    IDS_CALLING_YOUTUBEDL          "Volanie %s ..."
+    IDS_YOUTUBE_DEFAULT_AUDIO_LANG "Default language"
 END
 
 STRINGTABLE

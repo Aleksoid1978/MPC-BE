@@ -3865,9 +3865,10 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PUBLISHED           "发布于 :"
-    IDS_OPENING_YOUTUBE     "正在打开YouTube…"
-    IDS_CALLING_YOUTUBEDL   "正在调用%s…"
+    IDS_PUBLISHED                  "发布于 :"
+    IDS_OPENING_YOUTUBE            "正在打开YouTube…"
+    IDS_CALLING_YOUTUBEDL          "正在调用%s…"
+    IDS_YOUTUBE_DEFAULT_AUDIO_LANG "Default language"
 END
 
 STRINGTABLE

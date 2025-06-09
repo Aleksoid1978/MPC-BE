@@ -3864,9 +3864,10 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PUBLISHED           "Publicat: "
-    IDS_OPENING_YOUTUBE     "Se deschide YouTube ..."
-    IDS_CALLING_YOUTUBEDL   "Se apelează %s ..."
+    IDS_PUBLISHED                  "Publicat: "
+    IDS_OPENING_YOUTUBE            "Se deschide YouTube ..."
+    IDS_CALLING_YOUTUBEDL          "Se apelează %s ..."
+    IDS_YOUTUBE_DEFAULT_AUDIO_LANG "Default language"
 END
 
 STRINGTABLE
