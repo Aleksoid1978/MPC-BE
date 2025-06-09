@@ -284,7 +284,7 @@ BEGIN
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,275,45,12,13
     CONTROL         "Reține poziția pe DVD",IDC_DVD_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,60,156,9
     CONTROL         "Reține poziția în fișier",IDC_FILE_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,72,158,9
-    CONTROL         "Reț. ultima alegere a panoramării și scanării",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,84,156,9
+    CONTROL         "Reține ultima alegere a panoramării și scanării",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,84,156,9
     CONTROL         "Reține lista de redare (playlistul) principal(ă)",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,96,156,9
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,129,108,158,1
     CONTROL         "Afișează titlul pentru URL în fișierele recente",IDC_CHECK4,
@@ -458,7 +458,7 @@ BEGIN
     LTEXT           "Dimensiunea scrisului (fontului) listei de redare:",IDC_STATIC,13,187,110,8
     EDITTEXT        IDC_EDIT2,127,185,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,187,10,8
-    LTEXT           "Dimensiunea controalelor:",IDC_STATIC8,14,96,99,8
+    LTEXT           "Dimensiunea comenzilor:",IDC_STATIC8,14,96,99,8
     COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,95,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Folosește funcțiile din bara de activități din Windows 7 (și versiunile ulterioare).",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,206,270,11
@@ -943,7 +943,7 @@ BEGIN
     COMBOBOX        IDC_COMBO5,116,130,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Înălțimea maximă a videoclipului:",IDC_STATIC,10,148,104,8
     COMBOBOX        IDC_COMBO6,116,146,43,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Selectează nr. maxim de cadre/sec.(fps) sau rata de biți",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,162,196,10
+    CONTROL         "Selectează nr. maxim de cadre/sec. (fps) sau rata de biți",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,162,196,10
     LTEXT           "Adresa AceStream:",IDC_STATIC,10,183,77,8
     EDITTEXT        IDC_EDIT1,91,181,195,13,ES_AUTOHSCROLL
     LTEXT           "Adresa MatriX (TorrServer):",IDC_STATIC,10,200,103,8
@@ -1204,11 +1204,11 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "Lansează fișierele în modul ecran complet (pe tot ecranul)",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,3,274,9
-    CONTROL         "Arată controalele în modul ecran complet (pe tot ecranul) pentru",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,15,275,9
+    CONTROL         "Arată comenzile în modul ecran complet (pe tot ecranul) pentru",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,15,275,9
     EDITTEXT        IDC_EDIT1,14,27,32,13,ES_CENTER | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,35,27,12,13
-    LTEXT           "sec.",IDC_STATIC1,51,29,30,8
-    LTEXT           "0: ascundere automată; -1: nu ascunde",IDC_STATIC2,85,29,195,8
+    LTEXT           "secunde",IDC_STATIC1,51,29,30,8
+    LTEXT           "0: ascunde-le în mod automat; -1: nu le ascunde",IDC_STATIC2,85,29,195,8
     CONTROL         "Ieși din ecranul complet (pe tot ecranul) la sfârșitul redării",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,43,276,9
     CONTROL         "Ieși din ecranul complet (pe tot ecranul) când centrarea este pierdută",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,55,276,9
@@ -2799,7 +2799,7 @@ BEGIN
     IDS_AG_SAVE_AS          "Salvează ca"
     IDS_AG_SAVE_IMAGE       "Salvează imaginea"
     IDS_AG_AUTOSAVE_IMAGE   "Salvează imaginea (automat)"
-    IDS_OSD_IMAGE_SAVED     "Imagine salvată cu succes"
+    IDS_OSD_IMAGE_SAVED     "Imaginea a fost salvată cu succes"
     IDS_AG_LOAD_SUBTITLE    "Încarcă subtitrări"
     IDS_AG_SAVE_SUBTITLE    "Salvează subtitrarea"
     IDS_AG_PROPERTIES       "Proprietăți"
@@ -3150,7 +3150,7 @@ BEGIN
     IDS_AG_PAUSE            "Pauzează"
     IDS_AG_TOGGLE_CAPTION   "Comută subtitrările și meniul"
     IDS_AG_TOGGLE_SEEKER    "Comută căutătorul"
-    IDS_AG_TOGGLE_CONTROLS  "Comută controalele"
+    IDS_AG_TOGGLE_CONTROLS  "Comută comenzile"
 END
 
 STRINGTABLE
@@ -3774,7 +3774,7 @@ BEGIN
     IDS_OSD_HUE             "Nuanță: %s°"
     IDS_OSD_SATURATION      "Saturație: %s"
     IDS_OSD_RESET_COLOR     "Setările de culoare au fost restaurate"
-    IDS_OSD_NO_COLORCONTROL "Controalele de culoare nu sunt suportate"
+    IDS_OSD_NO_COLORCONTROL "Comenzile de culoare nu sunt suportate"
     IDS_BRIGHTNESS_INC      "Mărește luminozitatea"
 END
 
@@ -3867,7 +3867,7 @@ BEGIN
     IDS_PUBLISHED                  "Publicat: "
     IDS_OPENING_YOUTUBE            "Se deschide YouTube ..."
     IDS_CALLING_YOUTUBEDL          "Se apelează %s ..."
-    IDS_YOUTUBE_DEFAULT_AUDIO_LANG "Default language"
+    IDS_YOUTUBE_DEFAULT_AUDIO_LANG "Limba predefinită"
 END
 
 STRINGTABLE

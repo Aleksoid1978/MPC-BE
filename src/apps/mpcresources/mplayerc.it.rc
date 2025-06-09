@@ -3868,7 +3868,7 @@ BEGIN
     IDS_PUBLISHED                  "Pubblicato : "
     IDS_OPENING_YOUTUBE            "Apertura di YouTube..."
     IDS_CALLING_YOUTUBEDL          "Chiamata per %s ..."
-    IDS_YOUTUBE_DEFAULT_AUDIO_LANG "Default language"
+    IDS_YOUTUBE_DEFAULT_AUDIO_LANG "Lingua predefinita"
 END
 
 STRINGTABLE
