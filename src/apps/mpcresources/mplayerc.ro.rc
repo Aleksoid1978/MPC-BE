@@ -319,7 +319,7 @@ BEGIN
     CONTROL         "Subtitrări",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,10,98,65,8
     LISTBOX         IDC_LIST1,79,74,208,66,WS_VSCROLL | WS_GROUP | WS_TABSTOP
     GROUPBOX        "Setări suplimentare",IDC_STATIC,5,140,286,37
-    CONTROL         "Permite subtitr. pentru pers. cu def. de auz în „Line 21 Decoder”",IDC_CHECK2,
+    CONTROL         "Permite subtitrările pentru persoanele cu deficiențe de auz în „Line 21 Decoder”",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,152,278,9
     CONTROL         "Începe redarea din titlul principal",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,164,220,9
 END
@@ -736,8 +736,8 @@ IDD_PPAGESUBSTYLE DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Font (Scris)",IDC_STATIC,5,5,105,112
-    PUSHBUTTON      "Font (Scris)",IDC_BUTTON1,10,17,95,13
+    GROUPBOX        "Fontul (Scrisul)",IDC_STATIC,5,5,105,112
+    PUSHBUTTON      "Fontul (Scrisul))",IDC_BUTTON1,10,17,95,13
     COMBOBOX        IDC_COMBO1,10,32,95,52,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Spațiere",IDC_STATIC,10,51,56,8
     EDITTEXT        IDC_EDIT3,70,49,35,13,ES_RIGHT | ES_AUTOHSCROLL
@@ -753,7 +753,7 @@ BEGIN
     GROUPBOX        "Stilul chenarului",IDC_STATIC,5,121,105,68
     CONTROL         "Contur",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,133,95,8
     CONTROL         "Dreptunghi opac",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,145,95,8
-    LTEXT           "Lățime de chenar",IDC_STATIC,10,159,56,8
+    LTEXT           "Lățimea chenar",IDC_STATIC,10,159,56,8
     EDITTEXT        IDC_EDIT1,70,157,35,13,ES_RIGHT | ES_AUTOHSCROLL
     LTEXT           "Profunzi. umbrei",IDC_STATIC,10,174,56,8
     EDITTEXT        IDC_EDIT2,70,172,35,13,ES_RIGHT | ES_AUTOHSCROLL
@@ -2774,7 +2774,7 @@ BEGIN
     IDS_CANCEL              "Anulare"
     IDS_TEXTFILE_ENC        "Codare:"
     IDS_SAVE_FILE           "Se salvează fișierul"
-    IDS_VOLUME_OSD_MUTE     "Volum: %d%% [Mut]"
+    IDS_VOLUME_OSD_MUTE     "Volumul: %d%% [Mut]"
     IDS_COPY_TO_CLIPBOARD   "Copiază în clipboard"
     IDS_AUDIO_LEVEL         "Nivel (%d):"
     IDS_AUDIO_RELEASETIME   "Timp de eliberare (%d):"
@@ -3144,7 +3144,7 @@ STRINGTABLE
 BEGIN
     IDS_PPSDB_BADURL        "URL nevalid, baza de date a subtitrărilor nu a putut fi localizată!"
     IDS_AG_CHAPTER2         "Capitol: "
-    IDS_VOLUME_OSD          "Volum: %d%%"
+    IDS_VOLUME_OSD          "Volumul: %d%%"
     IDS_GAIN_OSD            "Amplificare cu: %+.1f dB"
     IDS_BALANCE_OSD         "Balans: %s"
     IDS_FULLSCREENMONITOR_CURRENT "Curent"
