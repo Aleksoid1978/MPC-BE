@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 16		"G:"
 17		"B:"
 21		"Activează meniul întunecat"
-22		"Folosește efectul de estompare în spate (Windows 10 and above)"
+22		"Folosește efectul de estompare în spate (pentru Windows 10 și versiunile ulterioare)"
 23		"Activează titlul întunecat (pentru Windows 10 și versiunile ulterioare)"
 26		"Folosește un indiciu de timp:"
 28		"Folosește previzualizarea în căutare"
