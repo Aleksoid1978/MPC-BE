@@ -457,7 +457,7 @@ static void EnableBlurBehind(HWND hwnd)
 
 	static auto pSetWindowCompositionAttribute = (BOOL(WINAPI*)(HWND, PVOID))GetProcAddress(GetModuleHandleW(L"User32"), "SetWindowCompositionAttribute");
 	if (pSetWindowCompositionAttribute) {
-		static ACCENT_POLICY accent{ ACCENT_ENABLE_BLURBEHIND, 0, 0, 0 };
+		static ACCENT_POLICY accent{ ACCENT_ENABLE_ACRYLICBLURBEHIND, 0, 0xB4000000, 0 };
 		static WINDOWCOMPOSITIONATTRIBDATA data{ WCA_ACCENT_POLICY, &accent, sizeof(accent) };
 
 		pSetWindowCompositionAttribute(hwnd, &data);
