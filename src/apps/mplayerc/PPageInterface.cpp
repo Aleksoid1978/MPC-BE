@@ -335,9 +335,6 @@ void CPPageInterface::OnClickClrDefault()
 	m_clrOutlineABGR = 0x00868686;
 	GetDlgItem(IDC_BUTTON_CLRFACE)->Invalidate();
 	GetDlgItem(IDC_BUTTON_CLROUTLINE)->Invalidate();
-	GetDlgItem(IDC_BUTTON_CLRFONT)->Invalidate();
-	GetDlgItem(IDC_BUTTON_CLRGRAD1)->Invalidate();
-	GetDlgItem(IDC_BUTTON_CLRGRAD2)->Invalidate();
 	PostMessageW(WM_COMMAND, IDC_CHECK3);
 
 	s.nThemeBrightness		= m_nThemeBrightness	= 15;
