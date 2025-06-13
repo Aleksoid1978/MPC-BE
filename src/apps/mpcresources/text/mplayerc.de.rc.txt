@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 16		"G:"
 17		"B:"
 21		"Dunkles Menü aktivieren"
-22		"Unscharfen Hintergrund verwenden (Windows 10 and above)"
+22		"Unscharfen Hintergrund verwenden (ab Windows 10)"
 23		"Dunkle Titelleiste aktivieren (ab Windows 10)"
 26		"Zeit-Tooltip anzeigen:"
 28		"Vorschau bei der Suche anzeigen"
