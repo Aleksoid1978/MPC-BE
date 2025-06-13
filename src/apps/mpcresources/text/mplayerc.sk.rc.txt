@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 16		"G:"
 17		"B:"
 21		"Povoliť tmavú ponuku"
-22		"Use Blur Behind effect (Windows 11)"
+22		"Use Blur Behind effect (Windows 10 and above)"
 23		"Povoliť tmavý názov (Windows 10 a vyšší)"
 26		"Použiť popis času:"
 28		"Pri vyhľadávaní použiť náhľad"

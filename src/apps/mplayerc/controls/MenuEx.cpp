@@ -475,10 +475,9 @@ LRESULT CALLBACK CMenuEx::MenuWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM
 				// Windows 10 SDK does not contain some parameters, so we set them with numbers.
 				int preference = 3; // DWMWCP_ROUNDSMALL
 				DwmSetWindowAttribute(hWnd, 33 /*DWMWA_WINDOW_CORNER_PREFERENCE*/, &preference, sizeof(preference));
-
-				if (AfxGetAppSettings().bDarkMenuBlurBehind) {
-					EnableBlurBehind(hWnd);
-				}
+			}
+			if (AfxGetAppSettings().bDarkMenuBlurBehind && SysVersion::IsWin10orLater()) {
+				EnableBlurBehind(hWnd);
 			}
 			break;
 		case WM_DESTROY:

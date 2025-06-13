@@ -135,7 +135,7 @@ BOOL CPPageInterface::OnInitDialog()
 		m_chkDarkTitle.EnableWindow(FALSE);
 	}
 
-	if (!SysVersion::IsWin11orLater()) {
+	if (!SysVersion::IsWin10orLater()) {
 		m_chkDarkMenuBlurBehind.EnableWindow(FALSE);
 	}
 
@@ -319,7 +319,7 @@ void CPPageInterface::OnUpdateCheck3(CCmdUI* pCmdUI)
 	GetDlgItem(IDC_STATIC8)->EnableWindow(bUseDarkTheme);
 	GetDlgItem(IDC_CONTROLS_SIZE_COMBO)->EnableWindow(bUseDarkTheme);
 	m_chkDarkMenu.EnableWindow(bUseDarkTheme);
-	if (SysVersion::IsWin11orLater()) {
+	if (SysVersion::IsWin10orLater()) {
 		m_chkDarkMenuBlurBehind.EnableWindow(bUseDarkTheme && m_chkDarkMenu.GetCheck());
 	}
 	if (SysVersion::IsWin10v1809orLater()) {

@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 16		"G:"
 17		"B:"
 21		"Utiliser le menu sombre"
-22		"Use Blur Behind effect (Windows 11)"
+22		"Use Blur Behind effect (Windows 10 and above)"
 23		"Utiliser la barre de titre sombre (Windows 10 and above)"
 26		"Utiliser l'info-bulle temporelle :"
 28		"Utiliser l'aperçu dans la recherche"

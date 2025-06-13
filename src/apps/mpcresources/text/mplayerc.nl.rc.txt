@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 16		"G:"
 17		"B:"
 21		"Donker menu inschakelen"
-22		"Use Blur Behind effect (Windows 11)"
+22		"Use Blur Behind effect (Windows 10 and above)"
 23		"Activeer donkere titelbalk (Windows 10 en hoger)"
 26		"Toon scherminfo voor tijd:"
 28		"Activeer voorvertoning op zoekbalk"

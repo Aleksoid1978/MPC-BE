@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 16		"G:"
 17		"B:"
 21		"Omogoči temno temo"
-22		"Use Blur Behind effect (Windows 11)"
+22		"Use Blur Behind effect (Windows 10 and above)"
 23		"Omogoči temni naslov (Windows 10 and above)"
 26		"Uporabi opis orodja za čas:"
 28		"Pri iskanju uporabi predogled"

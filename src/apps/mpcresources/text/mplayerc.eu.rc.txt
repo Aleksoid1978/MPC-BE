@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 16		"O:"
 17		"U:"
 21		"Enable dark menu"
-22		"Use Blur Behind effect (Windows 11)"
+22		"Use Blur Behind effect (Windows 10 and above)"
 23		"Enable dark title (Windows 10 and above)"
 26		"Erabili denbora oharra:"
 28		"Erabili aurrekoa bilaketan"

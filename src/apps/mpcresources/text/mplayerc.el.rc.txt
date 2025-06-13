@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 16		"G:"
 17		"B:"
 21		"Ενεργοποίηση σκοτεινού μενού"
-22		"Use Blur Behind effect (Windows 11)"
+22		"Use Blur Behind effect (Windows 10 and above)"
 23		"Enable dark title (Windows 10 and above)"
 26		"Χρήση συμβουλής χρόνου:"
 28		"Χρήση της προεπισκόπησης στην αναζήτηση"

@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 16		"G:"
 17		"B:"
 21		"Habilitar Menú Oscuro"
-22		"Usar efecto Desenfoque Trasero (Windows 11)"
+22		"Usar efecto Desenfoque Trasero (Windows 10 and above)"
 23		"Habilitar Título Oscuro (Windows 10 y superior)"
 26		"Usar herramienta informativa de tiempo:"
 28		"Usar vista previa en la búsqueda"
