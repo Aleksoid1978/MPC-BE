@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Restaurează rezoluția la ieșirea din program"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 6		"Folosește tema „întunecată” (în mod implicit)"
 7		"Luminozitate: "
 9		"Setarea culorii indicatorului de sunet:"
@@ -312,16 +312,16 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 17		"B:"
 21		"Activează meniul întunecat"
 22		"Folosește efectul de estompare în spate (pentru Windows 10 și versiunile ulterioare)"
-23		"Activează titlul întunecat (pentru Windows 10 și versiunile ulterioare)"
-26		"Folosește un indiciu de timp:"
-28		"Folosește previzualizarea în căutare"
-29		"Dimensiunea raportată la lățimea ecranului:"
-33		"Online"
-34		"Arată semne pentru capitole în bara de căutare"
-35		"Folosește bara pentru sărituri"
-36		"Dimensiunea scrisului (fontului) listei de redare:"
-39		"Dimensiunea comenzilor:"
-41		"Folosește funcțiile din bara de activități din Windows 7 (și versiunile ulterioare)."
+24		"Activează titlul întunecat (pentru Windows 10 și versiunile ulterioare)"
+27		"Folosește un indiciu de timp:"
+29		"Folosește previzualizarea în căutare"
+30		"Dimensiunea raportată la lățimea ecranului:"
+34		"Online"
+35		"Arată semne pentru capitole în bara de căutare"
+36		"Folosește bara pentru sărituri"
+37		"Dimensiunea scrisului (fontului) listei de redare:"
+40		"Dimensiunea comenzilor:"
+42		"Folosește funcțiile din bara de activități din Windows 7 (și versiunile ulterioare)."
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

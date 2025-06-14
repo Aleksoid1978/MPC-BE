@@ -441,7 +441,8 @@ BEGIN
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,34,53,12
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,49,53,12
     CONTROL         "Donker menu inschakelen",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,59,147,8,WS_EX_TRANSPARENT
-    CONTROL         "Activeer het vervaagde effect (Windows 10 en hoger)",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,197,8,WS_EX_TRANSPARENT
+    CONTROL         "Activeer het vervaagde effect (Windows 10 en hoger)",IDC_CHECK7,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,232,8,WS_EX_TRANSPARENT
     CONTROL         "Activeer donkere titelbalk (Windows 10 en hoger)",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,8,WS_EX_TRANSPARENT
     GROUPBOX        "",IDC_STATIC,7,112,282,91
@@ -926,7 +927,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "YouTube",IDC_STATIC,6,5,285,112
-    CONTROL         "Ingebouwde webpaginaparser gebruiken",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,16,120,10
+    CONTROL         "Ingebouwde webpaginaparser gebruiken",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,16,186,10
     LTEXT           "Voorkeursvideoformaat:",IDC_STATIC2,10,29,120,8
     COMBOBOX        IDC_COMBO1,10,39,52,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO2,66,39,50,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP

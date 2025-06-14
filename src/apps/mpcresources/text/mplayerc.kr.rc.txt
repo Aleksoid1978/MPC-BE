@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"종료 후, 해상도 복원"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 6		"다크 테마 사용(기본값)"
 7		"명도 :"
 9		"음량 조절 색 설정 :"
@@ -312,16 +312,16 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 17		"B :"
 21		"다크 메뉴 활성화"
 22		"Use Blur Behind effect (Windows 10 and above)"
-23		"다크 타이틀 활성화(윈도11)"
-26		"시간 툴팁 사용 :"
-28		"탐색 표시줄에서 미리 보기 사용"
-29		"화면 너비 대비 크기 :"
-33		"Online"
-34		"챕터 구분 표기 사용"
-35		"플라이바 사용"
-36		"재생 목록 글자 크기 :"
-39		"크기 조절 :"
-41		"(윈도7 이상) 작업 표시줄 기능 사용"
+24		"다크 타이틀 활성화(윈도11)"
+27		"시간 툴팁 사용 :"
+29		"탐색 표시줄에서 미리 보기 사용"
+30		"화면 너비 대비 크기 :"
+34		"Online"
+35		"챕터 구분 표기 사용"
+36		"플라이바 사용"
+37		"재생 목록 글자 크기 :"
+40		"크기 조절 :"
+42		"(윈도7 이상) 작업 표시줄 기능 사용"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

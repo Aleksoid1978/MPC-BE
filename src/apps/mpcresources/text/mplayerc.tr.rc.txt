@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Çıkışta çözünürlüğü geri al"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 6		"'Koyu' arayüzü kullan (varsayılan)"
 7		"Parlaklık :"
 9		"Ses göstergesi renk ayarı:"
@@ -312,16 +312,16 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 17		"B:"
 21		"Koyu menüyü etkinleştir"
 22		"Arkada Bulanıklık efektini kullan (Windows 10 and above)"
-23		"Koyu başlığı etkinleştir (Windows 10 ve üzeri)"
-26		"Süre bilgi ipucunu göster:"
-28		"Arama Çubuğu üzerinde ön izleme resmi göster"
-29		"Ekran genişliğine göre boyut:"
-33		"Çevrim içi"
-34		"Bölüm işaretlerini göster"
-35		"Şeffaf Çubuğu göster"
-36		"Oynatma listesi yazı tipi boyutu:"
-39		"Kontrollerin boyutu:"
-41		"Windows 7 (ve üzeri) Görev çubuğu özelliklerini kullan"
+24		"Koyu başlığı etkinleştir (Windows 10 ve üzeri)"
+27		"Süre bilgi ipucunu göster:"
+29		"Arama Çubuğu üzerinde ön izleme resmi göster"
+30		"Ekran genişliğine göre boyut:"
+34		"Çevrim içi"
+35		"Bölüm işaretlerini göster"
+36		"Şeffaf Çubuğu göster"
+37		"Oynatma listesi yazı tipi boyutu:"
+40		"Kontrollerin boyutu:"
+42		"Windows 7 (ve üzeri) Görev çubuğu özelliklerini kullan"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

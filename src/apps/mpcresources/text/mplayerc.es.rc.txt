@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Restaurar resolución al salir"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 6		"Usar Tema ""Oscuro"" (predeterminado)"
 7		"Brillo :"
 9		"Ajuste de color del indicador de sonido:"
@@ -312,16 +312,16 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 17		"B:"
 21		"Habilitar Menú Oscuro"
 22		"Usar efecto Desenfoque Trasero (Windows 10 and above)"
-23		"Habilitar Título Oscuro (Windows 10 y superior)"
-26		"Usar herramienta informativa de tiempo:"
-28		"Usar vista previa en la búsqueda"
-29		"Tamaño relativo al ancho de pantalla:"
-33		"En línea"
-34		"Usar marcador de capítulos"
-35		"Usar barra flotante"
-36		"Tamaño de fuente de Lista de Reproducción:"
-39		"Tamaño de controles:"
-41		"Usar características de la Barra de tareas de Windows 7 (y superior)"
+24		"Habilitar Título Oscuro (Windows 10 y superior)"
+27		"Usar herramienta informativa de tiempo:"
+29		"Usar vista previa en la búsqueda"
+30		"Tamaño relativo al ancho de pantalla:"
+34		"En línea"
+35		"Usar marcador de capítulos"
+36		"Usar barra flotante"
+37		"Tamaño de fuente de Lista de Reproducción:"
+40		"Tamaño de controles:"
+42		"Usar características de la Barra de tareas de Windows 7 (y superior)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

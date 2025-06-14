@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"退出后恢复默认分辨率"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 6		"使用暗黑主题 (默认)"
 7		"亮度:"
 9		"设置声音控制条颜色:"
@@ -312,16 +312,16 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 17		"蓝:"
 21		"使用暗黑菜单"
 22		"使用背景模糊效果 (Windows 10及以上版本)"
-23		"使用暗黑标题 (Windows 10及以上版本)"
-26		"使用时间工具提示:"
-28		"搜索时显示预览"
-29		"相对于屏幕宽度的缩略图大小:"
-33		"在线视频"
-34		"显示章节标记"
-35		"全屏模式时启用悬浮工具栏"
-36		"播放列表字体大小:"
-39		"控制按钮大小:"
-41		"使用 Windows 7 (或更高版本) 任务栏功能"
+24		"使用暗黑标题 (Windows 10及以上版本)"
+27		"使用时间工具提示:"
+29		"搜索时显示预览"
+30		"相对于屏幕宽度的缩略图大小:"
+34		"在线视频"
+35		"显示章节标记"
+36		"全屏模式时启用悬浮工具栏"
+37		"播放列表字体大小:"
+40		"控制按钮大小:"
+42		"使用 Windows 7 (或更高版本) 任务栏功能"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Restaurer la résolution après la fermeture"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 6		"Utiliser le thème sombre (par défaut)"
 7		"Luminosité :"
 9		"Réglage de la couleur de l'indicateur sonore :"
@@ -312,16 +312,16 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 17		"B:"
 21		"Utiliser le menu sombre"
 22		"Use Blur Behind effect (Windows 10 and above)"
-23		"Utiliser la barre de titre sombre (Windows 10 and above)"
-26		"Utiliser l'info-bulle temporelle :"
-28		"Utiliser l'aperçu dans la recherche"
-29		"Taille par rapport à la largeur de l'écran :"
-33		"Online"
-34		"Utiliser le marqueur de chapitres"
-35		"Utiliser la barre volante"
-36		"Taille de la police de la Playlist:"
-39		"Controls size:"
-41		"Utiliser les fonctionnalités de la barre des tâches de Windows 7 (et supérieur)"
+24		"Utiliser la barre de titre sombre (Windows 10 and above)"
+27		"Utiliser l'info-bulle temporelle :"
+29		"Utiliser l'aperçu dans la recherche"
+30		"Taille par rapport à la largeur de l'écran :"
+34		"Online"
+35		"Utiliser le marqueur de chapitres"
+36		"Utiliser la barre volante"
+37		"Taille de la police de la Playlist:"
+40		"Controls size:"
+42		"Utiliser les fonctionnalités de la barre des tâches de Windows 7 (et supérieur)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
