@@ -458,7 +458,7 @@ BEGIN
     LTEXT           "재생 목록 글자 크기 :",IDC_STATIC,13,187,110,8
     EDITTEXT        IDC_EDIT2,127,185,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,187,10,8
-    LTEXT           "Controls size:",IDC_STATIC8,14,96,99,8
+    LTEXT           "크기 조절 :",IDC_STATIC8,14,96,99,8
     COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,95,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "(윈도7 이상) 작업 표시줄 기능 사용",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,206,270,11
@@ -1747,7 +1747,7 @@ BEGIN
         BEGIN
             MENUITEM "크게(&U)",                ID_VOLUME_UP
             MENUITEM "작게(&D)",               ID_VOLUME_DOWN
-            MENUITEM "음 소거(&M)",               ID_VOLUME_MUTE
+            MENUITEM "음소거(&M)",               ID_VOLUME_MUTE
         END
         MENUITEM "재생이 끝나면",                  ID_SUBMENU_AFTERPLAYBACK
     END
@@ -1830,7 +1830,7 @@ BEGIN
         BEGIN
             MENUITEM "크게(&U)",                ID_VOLUME_UP
             MENUITEM "작게(&D)",               ID_VOLUME_DOWN
-            MENUITEM "음 소거(&M)",               ID_VOLUME_MUTE
+            MENUITEM "음소거(&M)",               ID_VOLUME_MUTE
         END
         MENUITEM "재생이 끝나면",                  ID_SUBMENU_AFTERPLAYBACK
         MENUITEM SEPARATOR
@@ -2027,7 +2027,7 @@ BEGIN
         BEGIN
             MENUITEM "크게(&U)",                ID_VOLUME_UP
             MENUITEM "작게(&D)",               ID_VOLUME_DOWN
-            MENUITEM "음 소거(&M)",               ID_VOLUME_MUTE
+            MENUITEM "음소거(&M)",               ID_VOLUME_MUTE
         END
         MENUITEM "재생이 끝나면",                  ID_SUBMENU_AFTERPLAYBACK
         MENUITEM SEPARATOR
@@ -2652,8 +2652,8 @@ END
 
 STRINGTABLE
 BEGIN
-    ID_VOLUME_MUTE          "음 소거\n음 소거"
-    ID_VOLUME_MUTE_OFF      "음 소거 해제\n음 소거 해제"
+    ID_VOLUME_MUTE          "음소거\n음소거"
+    ID_VOLUME_MUTE_OFF      "음소거 해제\n음소거 해제"
     ID_VOLUME_MUTE_DISABLED "오디오 없음\n오디오 없음"
 END
 
@@ -2775,7 +2775,7 @@ BEGIN
     IDS_CANCEL              "취소"
     IDS_TEXTFILE_ENC        "인코딩 :"
     IDS_SAVE_FILE           "파일 저장"
-    IDS_VOLUME_OSD_MUTE     "음량 : %d%% [음 소거]"
+    IDS_VOLUME_OSD_MUTE     "음량 : %d%% [음소거]"
     IDS_COPY_TO_CLIPBOARD   "클립보드에 복사"
     IDS_AUDIO_LEVEL         "레벨(%d) :"
     IDS_AUDIO_RELEASETIME   "공개 시(%d) :"
@@ -2939,7 +2939,7 @@ BEGIN
     IDS_AG_PNS_DOWNRIGHT    "퍈&&스캔 - 오른쪽 아래로"
     IDS_AG_VOLUME_UP        "음량 크게"
     IDS_AG_VOLUME_DOWN      "음량 작게"
-    IDS_AG_VOLUME_MUTE      "음 소거"
+    IDS_AG_VOLUME_MUTE      "음소거"
     IDS_AG_DVD_TITLEMENU    "DVD 타이틀 메뉴"
     IDS_AG_DVD_ROOTMENU     "DVD 루트 메뉴"
     IDS_AG_DVD_SUBPICTUREMENU "DVD 자막 메뉴"
@@ -3274,10 +3274,10 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\t위치 hh:mm:ss에서 재생 시작"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\t지정한 가로(w), 세로(h) 크기로 고정"
     IDS_CMD_MONITOR         "/monitor N\tN번 모니터에서 시작(N은 1이상이어야함)"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tStart using audiorenderer, where ""name"" is the name\nof the audio renderer (see ""Audio"" settings)"
+    IDS_CMD_AUDIORENDERER   "/audiorender “”이름“”\t오디오 렌더러 사용 시작, 여기서 “‘이름’”은 오디오 렌더러의 이름\n(“”음향“” 설정 참조)"
     IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
     IDS_CMD_CLIPBOARD       "/clipboard\tOpen 클립보드에서 경로/링크 열기"
-    IDS_CMD_DEVICE          "/device\tOpen the default video device"
+    IDS_CMD_DEVICE          "/device\t기본 영상 장치 열기"
     IDS_CMD_RESET           "/reset\t기본값으로 복구"
 END
 
@@ -3378,9 +3378,9 @@ BEGIN
     IDS_VDF_STATUS_FRAMESIZE "프레임 크기 :"
     IDS_VDF_STATUS_OUTPUT   "출력 형식 :"
     IDS_VDF_STATUS_ADAPTER  "그래픽 어댑터 :"
-    IDS_VDF_TT_AR           "체크 - 스트림으로부터 AR 사용.\n체크 해제 - 컨테이너로부터 AR 사용.\n미정 - 스트림으로부터의 AR은 컨테이너 AR을 가진 파일에는 사용 안 함(추천)."
+    IDS_VDF_TT_AR           "체크 - 스트림으로부터 AR 사용됩니다.\n체크 해제 - 컨테이너의 AR이 사용됩니다.\n미정 - 컨테이너 AR이 있는 파일에는 스트림의 AR이 사용되지 않습니다(권장)."
     IDS_VDF_TT_PRESET       "속도와 품질 간의 관계를 바꾼다."
-    IDS_VDF_TT_STANDARD     "이 설정은 필터가 YCbCr ↔ RGB 변환을 할 때만 사용합니다"
+    IDS_VDF_TT_STANDARD     "이 설정은 필터가 YCbCr ↔ RGB 변환을 할 때만 사용합니다."
     IDS_VDF_TT_RGB_LEVELS   "이 설정은 필터가 YCbCr → RGB 변환을 할 때만 사용합니다."
 END
 
@@ -3759,7 +3759,7 @@ BEGIN
     IDS_CAPTURE_ERROR_AUD_CAPT_PIN "오디오 캡처 핀을 찾을 수 없습니다."
     IDS_CAPTURE_ERROR_OUT_FILE "출력파일을 초기화하는데 에러가 발생했습니다."
     IDS_CAPTURE_ERROR_AUD_OUT_FILE "오디오 출력 파일을 초기화하는데 에러가 발생했습니다."
-    IDS_SUBRESYNC_TIME_FORMAT  "올바른 시간 형식은 다음과 같습니다 : [-]hh:mm:ss.ms(예 : 01 :23 :45.678)."
+    IDS_SUBRESYNC_TIME_FORMAT  "올바른 시간 형식은 다음과 같음 : [-]hh:mm:ss.ms(예 : 01 :23 :45.678)."
     IDS_EXTERNAL_FILTERS_ERROR_MT "이 형식은 이미 목록에 있습니다!"
     IDS_WEBSERVER_ERROR_TEST  "설정들을 테스트해 보려면 설정들을 적용해야 합니다."
 END
@@ -3873,7 +3873,7 @@ BEGIN
     IDS_PUBLISHED           "게시 : "
     IDS_OPENING_YOUTUBE     "유튜브를 여는 중..."
     IDS_CALLING_YOUTUBEDL   "%s 호출 중..."
-    IDS_YOUTUBE_DEFAULT_AUDIO_LANG "Default language"
+    IDS_YOUTUBE_DEFAULT_AUDIO_LANG "기본 언어"
 END
 
 STRINGTABLE
@@ -3884,7 +3884,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_CONTROLS_SIZE_COMBO "Applies only to the built-in toolbar or external one in SVG format, and to the flybar"
+    IDC_CONTROLS_SIZE_COMBO "SVG 형식의 내장 툴바 또는 외부 툴바와 플라이바에만 적용"
 END
 
 /////////////////////////////////////////////////////////////////////////////

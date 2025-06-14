@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 16		"緑:"
 17		"青:"
 21		"メニューに適用する"
-22		"背景ぼかし効果を使用する (Windows 10 and above)"
+22		"背景ぼかし効果を使用する (Windows 10 以降)"
 23		"タイトルに適用する (Windows 10 以降)"
 26		"タイム ツールヒントを使用する:"
 28		"検索でプレビュー機能を使用する"
@@ -321,7 +321,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 35		"フライバーを使用する"
 36		"プレイリスト フォント サイズ:"
 39		"コントロール サイズ:"
-41		"Windows 7 (とそれ以降) のタスク バーの機能を使用する"
+41		"Windows 7 以降のタスク バーの機能を使用する"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
