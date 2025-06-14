@@ -441,7 +441,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,34,53,12
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,49,53,12
     CONTROL         "啟用暗色選單",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,59,147,8,WS_EX_TRANSPARENT
-    CONTROL         "Use Blur Behind effect (Windows 10 and above)",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,197,8,WS_EX_TRANSPARENT
+    CONTROL         "啟用背後模糊效果（Windows 10 及以上）",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,197,8,WS_EX_TRANSPARENT
     CONTROL         "啟用暗色標題列（Windows 10 及以上）",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,8,WS_EX_TRANSPARENT
     GROUPBOX        "",IDC_STATIC,7,112,282,91
@@ -458,7 +458,7 @@ BEGIN
     LTEXT           "播放清單字型大小",IDC_STATIC,13,187,110,8
     EDITTEXT        IDC_EDIT2,127,185,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,187,10,8
-    LTEXT           "Controls size:",IDC_STATIC8,14,96,99,8
+    LTEXT           "控制項大小：",IDC_STATIC8,14,96,99,8
     COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,95,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "使用 Windows 7 （或以上）工作列功能",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,206,270,11
@@ -3873,7 +3873,7 @@ BEGIN
     IDS_PUBLISHED           "發佈時間："
     IDS_OPENING_YOUTUBE     "正在開啟 YouTube…"
     IDS_CALLING_YOUTUBEDL   "正在呼叫 %s…"
-    IDS_YOUTUBE_DEFAULT_AUDIO_LANG "Default language"
+    IDS_YOUTUBE_DEFAULT_AUDIO_LANG "預設語言"
 END
 
 STRINGTABLE
@@ -3884,7 +3884,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_CONTROLS_SIZE_COMBO "Applies only to the built-in toolbar or external one in SVG format, and to the flybar"
+    IDC_CONTROLS_SIZE_COMBO "只套用於浮動工具列、內置工具列圖示或 SVG 格式的外部圖示。"
 END
 
 /////////////////////////////////////////////////////////////////////////////

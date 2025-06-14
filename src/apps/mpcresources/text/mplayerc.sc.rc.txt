@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 16		"绿:"
 17		"蓝:"
 21		"使用暗黑菜单"
-22		"使用背景模糊效果 (Windows 10 and above)"
+22		"使用背景模糊效果 (Windows 10及以上版本)"
 23		"使用暗黑标题 (Windows 10及以上版本)"
 26		"使用时间工具提示:"
 28		"搜索时显示预览"

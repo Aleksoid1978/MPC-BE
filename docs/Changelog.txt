@@ -49,6 +49,7 @@ Updated Hungarian translation (by mickey).
 Updated Spanish translation (by IPeluchito).
 Updated Italian translation (by mapi68).
 Updated Korean translation (by Hackjjang).
+Updated Dutch and Chinese (Traditional) translation (by beter).
 
 Updated libraries:
 	ffmpeg n7.2-dev-2722-gfb65ecbc9b.
