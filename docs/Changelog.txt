@@ -48,9 +48,10 @@ Updated Turkish translation (by cmhrky).
 Updated Hungarian translation (by mickey).
 Updated Spanish translation (by IPeluchito).
 Updated Italian translation (by mapi68).
+Updated Korean translation (by Hackjjang).
 
 Updated libraries:
-	ffmpeg n7.2-dev-2678-gd9797544b4.
+	ffmpeg n7.2-dev-2722-gfb65ecbc9b.
 
 
 1.8.4 - 2025-04-19
