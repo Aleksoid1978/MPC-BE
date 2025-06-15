@@ -163,6 +163,16 @@ int tfsxml_init(tfsxml_string* priv, const void* buf, unsigned len, unsigned ver
         len -= 3;
     }
 
+    /* Skip leading whitespaces */
+    while (len) {
+        const char value = *buf_8;
+        if (value != '\t' && value != '\n' && value != '\r' && value != ' ') {
+            break;
+        }
+        buf_8++;
+        len--;
+    }
+
     /* Start detection */
     if (len < 1
         || buf_8[0] != '<') {
@@ -282,7 +292,7 @@ int tfsxml_next(tfsxml_string* priv, tfsxml_string* n) {
                         break;
                     }
                     if ((probe >> 40) == 0x2D2D) { /* "<!--" */
-                        n->buf = priv->buf;
+                        n->buf = priv->buf + 1;
                         probe = 0;
                         priv->buf += 4;
                         priv->len -= 4;

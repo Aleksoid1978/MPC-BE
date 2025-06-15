@@ -89,6 +89,7 @@ namespace Elements
     const int64u moov_meta___prd=0xA9707264;
     const int64u moov_meta___PRD=0xA9505244;
     const int64u moov_meta___prf=0xA9707266;
+    const int64u moov_meta___pub=0xA9707562;
     const int64u moov_meta___req=0xA9726571;
     const int64u moov_meta___sne=0xA9736E65;
     const int64u moov_meta___sol=0xA9736F6C;
@@ -161,6 +162,7 @@ namespace Elements
     const int64u moov_trak_mdia_hdlr_alis=0x616C6973;
     const int64u moov_trak_mdia_hdlr_hint=0x68696E74;
     const int64u skip=0x736B6970;
+    const int64u uuid=0x75756964;
     const int64u wide=0x77696465;
 }
 
@@ -318,7 +320,11 @@ const char* Avs3V_matrix_coefficients(int8u matrix_coefficients);
 
 //---------------------------------------------------------------------------
 File_Mpeg4::File_Mpeg4()
-:File__Analyze(), File__HasReferences()
+    :File__Analyze(), File__HasReferences(),
+    File_Buffer_Size_Hint_Pointer{}, FrameCount_MaxPerStream{}, List{}, Version_Temp{}, channelcount{}, mdat_Pos_Max{}, mdat_Pos_Temp{}, 
+    meta_iprp_ipco_Buffer_Size{}, moof_base_data_offset{}, moof_traf_default_sample_duration{}, moof_traf_default_sample_size{},
+    moov_cmov_dcom_Compressor{}, moov_meta_hdlr_Type{}, moov_trak_mdia_minf_stbl_stsd_Pos{}, moov_trak_mdia_minf_stbl_stsz_Pos{},
+    moov_trak_tkhd_DisplayAspectRatio{}, moov_trak_tkhd_Height{}, moov_trak_tkhd_Rotation{}, moov_trak_tkhd_Width{}, moov_udta_meta_keys_ilst_Pos{}
 {
     //Configuration
     ParserName="MPEG-4";
@@ -982,6 +988,7 @@ void File_Mpeg4::Streams_Finish()
             Finish(Temp->second.Parsers[0]);
             if (StreamKind_Last==Stream_General)
             {
+                Merge(*Temp->second.Parsers[0], Stream_General, 0, 0, false);
                 //Special case for TimeCode without link
                 for (std::map<int32u, stream>::iterator Target=Streams.begin(); Target!=Streams.end(); ++Target)
                     if (Target->second.StreamKind!=Stream_General)
@@ -1551,7 +1558,7 @@ void File_Mpeg4::Streams_Finish()
 
     if (File_Size_Total!=File_Size)
         Fill(Stream_General, 0, General_FileSize, File_Size_Total, 10, true);
-    if (Count_Get(Stream_Video)==0 && Count_Get(Stream_Image)==0 && Count_Get(Stream_Audio)>0)
+    if (Count_Get(Stream_Video)==0 && Count_Get(Stream_Audio)>0)
         Fill(Stream_General, 0, General_InternetMediaType, "audio/mp4", Unlimited, true, true);
 
     //Parsing sequence files
@@ -2211,6 +2218,8 @@ void File_Mpeg4::Header_Parse()
         Name=0x6D6F6F76; //moov
     if (Name==0x61766964) //avid
         Name=0x6D646174; //mdat
+    if (Name==Elements::uuid)
+        Get_UUID(Name_UUID,                                     "Name");
 
     if (Size<8)
     {
@@ -2248,7 +2257,7 @@ void File_Mpeg4::Header_Parse()
     }
 
     //Filling
-    Header_Fill_Code(Name, Ztring().From_CC4(Name));
+    Header_Fill_Code(Name, Name==Elements::uuid?Ztring().From_UUID(Name_UUID):Ztring().From_CC4(Name));
     Header_Fill_Size(Size);
 
     if (Name==0x6D6F6F76 && Buffer_Offset+Size>Buffer_Size-Buffer_Offset) //moov
@@ -2535,7 +2544,7 @@ bool File_Mpeg4::BookMark_Needed()
 
         //For each stream
         for (std::map<int32u, stream>::iterator Temp=Streams.begin(); Temp!=Streams.end(); ++Temp)
-            if (!Temp->second.Parsers.empty())
+            if (!Temp->second.Parsers.empty() && !Temp->second.Parsers.front()->Status[IsFinished])
         {
             //Limit the detection
             #if defined(MEDIAINFO_SMPTEST0337_YES) && defined(MEDIAINFO_PCM_YES)
@@ -2606,6 +2615,7 @@ bool File_Mpeg4::BookMark_Needed()
                         int64u MinimalOffset = (int64u)-1;
                         int64u MaximalOffset = 0;
                     #endif //MEDIAINFO_DEMUX
+                    auto HandleAllContent = Temp->second.TimeCode || Temp->second.IsCaption || (Temp->second.Parsers.empty() && Temp->second.StreamKind == Stream_Video) || (!Temp->second.Parsers.empty() && Temp->second.MayHaveCaption);
                     for (; stco_Current<stco_Max; ++stco_Current)
                     {
                         #if MEDIAINFO_DEMUX
@@ -2633,7 +2643,7 @@ bool File_Mpeg4::BookMark_Needed()
                                     else
                                         mdat_Pos_Temp2.Size = *stsz_Current;
                                     mdat_Pos.push_back(mdat_Pos_Temp2);
-                                    if (Temp->second.IsCaption)
+                                    if (HandleAllContent)
                                         mdat_Pos_Caption.push_back(mdat_Pos_Temp2);
                                     Chunk_Offset += *stsz_Current;
                                     stsz_Current++;
@@ -2653,7 +2663,7 @@ bool File_Mpeg4::BookMark_Needed()
                             mdat_Pos_Temp2.StreamID = Temp->first;
                             mdat_Pos_Temp2.Size = stsc_Current->SamplesPerChunk*Temp->second.stsz_Sample_Size*Temp->second.stsz_Sample_Multiplier;
                             mdat_Pos.push_back(mdat_Pos_Temp2);
-                            if (Temp->second.IsCaption)
+                            if (HandleAllContent)
                                 mdat_Pos_Caption.push_back(mdat_Pos_Temp2);
 
                             #if MEDIAINFO_DEMUX
@@ -2706,7 +2716,7 @@ bool File_Mpeg4::BookMark_Needed()
                                     if (Temp->second.FirstUsedOffset==(int64u)-1)
                                         Temp->second.FirstUsedOffset=mdat_Pos_Temp2.Offset;
                                     mdat_Pos.push_back(mdat_Pos_Temp2);
-                                    if (Temp->second.IsCaption)
+                                    if (HandleAllContent)
                                         mdat_Pos_Caption.push_back(mdat_Pos_Temp2);
                                 }
                                 Chunk_Offset += Size;
@@ -2717,7 +2727,7 @@ bool File_Mpeg4::BookMark_Needed()
                                 }
                                 Chunk_FrameCount++;
                                 }
-                            if (!Temp->second.TimeCode && !Temp->second.IsCaption && Chunk_FrameCount >= FrameCount_MaxPerStream)
+                            if (!HandleAllContent && Chunk_FrameCount >= FrameCount_MaxPerStream)
                                 break;
                         }
 
@@ -3124,6 +3134,7 @@ File_Mpeg4::method File_Mpeg4::Metadata_Get(std::string &Parameter, int64u Meta)
         case Elements::moov_meta___prd : Parameter="Producer"; Method=Method_String; break;
         case Elements::moov_meta___PRD : Parameter="Product"; Method=Method_String; break;
         case Elements::moov_meta___prf : Parameter="Performer"; Method=Method_String; break;
+        case Elements::moov_meta___pub : Parameter="Publisher"; Method=Method_String; break;
         case Elements::moov_meta___req : Parameter="Comment"; Method=Method_String; break;
         case Elements::moov_meta___sne : Parameter="SoundEngineer"; Method=Method_String; break;
         case Elements::moov_meta___sol : Parameter="Conductor"; Method=Method_String; break;
@@ -3234,6 +3245,9 @@ File_Mpeg4::method File_Mpeg4::Metadata_Get(std::string &Parameter, const std::s
     else if (Meta=="iTunNORM") Parameter.clear();
     else if (Meta=="iTunes_CDDB_IDs") Parameter.clear();
     else if (Meta=="iTunSMPB") Parameter.clear();
+    else if (Meta=="ARRANGER") Parameter="Arranger";
+    else if (Meta=="LABEL") Parameter="Label";
+    else if (Meta=="LYRICIST") Parameter="Lyricist";
     else if (Meta=="PERFORMER") Parameter="Performer";
     else if (Meta=="PUBLISHER") Parameter="Publisher";
     else Parameter=Meta;
@@ -3350,6 +3364,39 @@ void File_Mpeg4::AddCodecConfigurationBoxInfo()
     if (moov_trak_mdia_minf_stbl_stsd_Pos>1)
         return;
     Streams[moov_trak_tkhd_TrackID].CodecConfigurationBoxInfo.push_back((int32u)Element_Code);
+}
+
+//---------------------------------------------------------------------------
+void File_Mpeg4::Loop_CheckValue(int32u& Value, int64u RemainingSize, int8u MinBlockSize, const char* Name)
+{
+    if (!MinBlockSize)
+    {
+        Value = 0; // Avoiding loop when there is no data
+        return;
+    }
+    auto MaxSize = RemainingSize / MinBlockSize;
+    if (Value > MaxSize) {
+        Ztring FullName;
+        for (size_t i = 1; i <= Element_Level; i++) {
+            FullName += Ztring().From_CC4(Element[i].Code);
+            FullName += __T(' ');
+        }
+
+        Fill_Conformance((FullName.To_UTF8() + Name).c_str(), "Value " + std::to_string(Value) + " is bigger than what the box can contain " + std::to_string(MaxSize));
+        Value = MaxSize;
+    }
+}
+
+//---------------------------------------------------------------------------
+void File_Mpeg4::Loop_CheckValue(int32u& Value, int8u MinBlockSize, const char* Name)
+{
+    Loop_CheckValue(Value, Element_Size > Element_Offset ? (Element_Size - Element_Offset) : 0, MinBlockSize, Name);
+}
+
+//---------------------------------------------------------------------------
+void File_Mpeg4::Loop_CheckValue_BS(int32u& Value, int8u MinBlockSize, const char* Name)
+{
+    Loop_CheckValue(Value, Data_BS_Remain(), MinBlockSize, Name);
 }
 
 //---------------------------------------------------------------------------

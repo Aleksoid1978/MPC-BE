@@ -343,6 +343,7 @@ Cover_Datas;Omslagsinformation
 Cover_Description;Omslagsbeskrivning
 Cover_Mime;Omslagsformat
 Cover_Type;Omslagstyp
+CoverData;
 Cropped;Beskärningsstorlek
 Custom;Anpassad
 CustomDownmixTargets;
@@ -380,6 +381,7 @@ DisplayCaptions_Content;
 DisplayCaptions_Stream;
 DistributedBy;Distribuerad av
 Distributor;Distributör
+Documents;
 Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Donera
@@ -515,6 +517,7 @@ FrameRate_Num;
 FrameRate_Original;Ursprunglig bildfrekvens
 FrameRate_Real;
 FullParsing;
+Gallery;
 General;Allmänt
 GeneralCompliance;
 Genre;Genre
@@ -978,6 +981,7 @@ Language_zh-yue;
 Language_zu;Zulu
 Languages;
 LawRating;Åldersgräns
+LegacyStreamDisplay;
 LCCN;LCCN
 LfeAttenuationKnown;
 LfeMixGain;
@@ -1223,6 +1227,7 @@ Sheet;Lista
 Sheet (Complete);Lista (Komplett)
 Shell extension;Kontextmeny (Högerklicka i på en fil i Utforskaren, så visas ett MediaInfo-alternativ)
 Shell extension, folder;Även för mappar
+Shell extension, separate instance;
 Shell InfoTip;Knappbeskrivning (Hovra över en fil i Utforskaren, så visas information)
 ShimName;Shim-namn
 ShimVersion;Shim-version

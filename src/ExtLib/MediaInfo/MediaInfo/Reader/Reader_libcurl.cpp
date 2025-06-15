@@ -88,6 +88,31 @@ namespace Http
             Input           = Input.substr(0, Delimiter_Pos);
         }
     }
+    static void CutWithBracketsColon(std::string& Input, std::string& Output)
+    {
+        size_t BracketCount = 0;
+        const auto Input_Size = Input.size();
+        for (size_t i = 0; i < Input_Size; ++i) {
+            switch (Input[i])
+            {
+            case '[':
+                ++BracketCount;
+                break;
+            case ']':
+                if (!BracketCount)
+                    return;
+                --BracketCount;
+                break;
+            case ':':
+                if (!BracketCount) {
+                    Output = Input.substr(i + 1);
+                    Input.resize(i);
+                    return;
+                }
+                break;
+            }
+        }
+    }
 
     class Url
     {
@@ -101,7 +126,7 @@ namespace Http
             CutHead (Host,  User,       "@"     );
             CutTail (Host,  Path,       "/"     );
             CutTail (User,  Password,   ":"     );
-            CutTail (Host,  Port,       ":"     );
+            CutWithBracketsColon(Host, Port);
             if (User.find('/')!=(size_t)-1 && Password.empty() && Path.empty())
             {
                 // Something was weird, trying another method
@@ -112,7 +137,7 @@ namespace Http
                 CutTail (Host,  Path,       "/"     );
                 CutHead (Host,  User,       "@"     );
                 CutTail (User,  Password,   ":"     );
-                CutTail (Host,  Port,       ":"     );
+                CutWithBracketsColon(Host, Port);
                 if (Port.find_first_not_of("0123456789")!=(size_t)-1)
                 {
                     // Format not understood, putting all in Protocol
@@ -412,7 +437,7 @@ struct Reader_libcurl::curl_data
 //---------------------------------------------------------------------------
 struct Reader_libcurl_curl_data_getregion
 {
-    CURL*               Curl;
+    CURL*               Curl{};
     Ztring              File_Name;
     std::string         Amazon_AWS_Region;
 };

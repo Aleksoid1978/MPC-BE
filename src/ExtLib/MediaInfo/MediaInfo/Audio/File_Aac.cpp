@@ -67,6 +67,7 @@ File_Aac::File_Aac()
     Frame_Count_Valid=0;
     FrameIsAlwaysComplete=false;
     Mode=Mode_Unknown;
+    FromIamf=false;
     
     //Conformance
     #if MEDIAINFO_CONFORMANCE

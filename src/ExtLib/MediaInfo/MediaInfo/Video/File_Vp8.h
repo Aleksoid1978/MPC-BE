@@ -32,6 +32,7 @@ class File_Vp8 : public File__Analyze
 public :
     //In
     int64u Frame_Count_Valid;
+    stream_t StreamKind;
 
     //Constructor/Destructor
     File_Vp8();
@@ -41,7 +42,6 @@ private :
     //Streams management
     void Streams_Accept();
     void Streams_Update();
-    void Streams_Fill();
     void Streams_Finish();
 
     //Buffer - Global

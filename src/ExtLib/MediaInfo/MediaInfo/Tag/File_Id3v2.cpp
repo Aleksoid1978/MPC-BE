@@ -24,39 +24,43 @@
 #if defined(MEDIAINFO_ID3V2_YES) || defined(MEDIAINFO_FLAC_YES) || defined(MEDIAINFO_VORBISCOM_YES) || defined(MEDIAINFO_OGG_YES)
 //---------------------------------------------------------------------------
 
-#include "MediaInfo/MediaInfo_Internal.h"
 #include "ZenLib/Conf.h"
+#include <string>
 using namespace ZenLib;
 
 namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-extern const char* Id3v2_PictureType(int8u Type)
+static const char* Id3v2_PictureType_Data[] =
 {
-    switch (Type)
-    {
-        case 0x01 :
-        case 0x02 : return "File icon";
-        case 0x03 : return "Cover (front)";
-        case 0x04 : return "Cover (back)";
-        case 0x05 : return "Leaflet page";
-        case 0x06 : return "Media";
-        case 0x07 :
-        case 0x08 : return "Performer";
-        case 0x09 : return "Conductor";
-        case 0x0A : return "Performer";
-        case 0x0B : return "Composer";
-        case 0x0C : return "Lyricist";
-        case 0x0D : return "Recording Location";
-        case 0x0E : return "During recording";
-        case 0x0F : return "During performance";
-        case 0x10 : return "Screen capture";
-        case 0x12 : return "Illustration";
-        case 0x13 : return "Performer logo";
-        case 0x14 : return "Publisher logo";
-        default   : return "";
-    }
+    "Picture", // Generic
+    "FileIcon_32x32",
+    "FileIcon",
+    "Cover",
+    "Cover_Back",
+    "LeafletPage",
+    "Cover_Media",
+    "Performer_Lead",
+    "Performer",
+    "Conductor",
+    "Performer",
+    "Composer",
+    "Lyricist",
+    "RecordingLocation",
+    "DuringRecording",
+    "DuringPerformance",
+    "ScreenCapture",
+    "Illustration",
+    "PerformerLogo",
+    "PublisherLogo",
+};
+const size_t Id3v2_PictureType_Data_Size=sizeof(Id3v2_PictureType_Data)/sizeof(*Id3v2_PictureType_Data);
+extern std::string Id3v2_PictureType(int8u Type)
+{
+    if (Type>=Id3v2_PictureType_Data_Size)
+        return std::to_string(Type);
+    return Id3v2_PictureType_Data[Type];
 }
 
 } //NameSpace
@@ -974,29 +978,7 @@ void File_Id3v2::APIC()
 
     //Filling
     Fill_Name();
-    Fill(Stream_General, 0, General_Cover_Description, Description);
-    Fill(Stream_General, 0, General_Cover_Type, Id3v2_PictureType(PictureType));
-    Fill(Stream_General, 0, General_Cover_Mime, Mime);
-    MediaInfo_Internal MI;
-    Ztring Demux_Save = MI.Option(__T("Demux_Get"), __T(""));
-    MI.Option(__T("Demux"), Ztring());
-    size_t MiOpenResult = MI.Open(Buffer + (size_t)(Buffer_Offset + Element_Offset), (size_t)(Element_Size - Element_Offset), nullptr, 0, (size_t)(Element_Size - Element_Offset));
-    MI.Option(__T("Demux"), Demux_Save); //This is a global value, need to reset it. TODO: local value
-    if (MI.Count_Get(Stream_Image))
-    {
-        Stream_Prepare(Stream_Image);
-        Merge(MI, Stream_Image, 0, StreamPos_Last);
-    }
-    #if MEDIAINFO_ADVANCED
-        if (MediaInfoLib::Config.Flags1_Get(Flags_Cover_Data_base64))
-        {
-            std::string Data_Raw((const char*)(Buffer+(size_t)(Buffer_Offset+Element_Offset)), (size_t)(Element_Size-Element_Offset));
-            std::string Data_Base64(Base64::encode(Data_Raw));
-            Fill(Stream_General, 0, General_Cover_Data, Data_Base64);
-        }
-    #endif //MEDIAINFO_ADVANCED
-
-    Skip_XX(Element_Size-Element_Offset, "Data");
+    Attachment("ID3v2 APIC", Description, Id3v2_PictureType(PictureType).c_str(), Mime, true);
 }
 
 //---------------------------------------------------------------------------
@@ -1190,7 +1172,7 @@ void File_Id3v2::Fill_Name()
     switch (Element_Code)
     {
         case Elements::AENC : break;
-        case Elements::APIC : Fill(Stream_General, 0, General_Cover, "Yes"); break;
+        case Elements::APIC : break;
         case Elements::ASPI : break;
         case Elements::COMM : Fill(Stream_General, 0, Element_Values(0).To_UTF8().c_str(), Element_Values(1)); break;
         case Elements::COMR : Fill(Stream_General, 0, "Commercial frame", Element_Value); break;
@@ -1356,7 +1338,7 @@ void File_Id3v2::Fill_Name()
         case Elements::LNK  : Fill(Stream_General, 0, "Linked information,", Element_Value); break;
         case Elements::MCI  : Fill(Stream_General, 0, "MCDI", Element_Value); break;
         case Elements::MLL  : break;
-        case Elements::PIC_ : Fill(Stream_General, 0, "Cover", "Yes"); break;
+        case Elements::PIC_ : break;
         case Elements::POP  : break;
         case Elements::REV  : break;
         case Elements::RVA  : break;

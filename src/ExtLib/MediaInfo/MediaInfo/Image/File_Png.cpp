@@ -31,11 +31,29 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Image/File_Png.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
-#include "MediaInfo/Tag/File_Xmp.h"
-#include <zlib.h>
+#if defined(MEDIAINFO_JPEG_YES)
+    #include "MediaInfo/Image/File_Jpeg.h"
+#endif
+#if defined(MEDIAINFO_PSD_YES)
+    #include "MediaInfo/Image/File_Psd.h"
+#endif
+#if defined(MEDIAINFO_C2PA_YES)
+    #include "MediaInfo/Tag/File_C2pa.h"
+#endif
+#if defined(MEDIAINFO_EXIF_YES)
+    #include "MediaInfo/Tag/File_Exif.h"
+#endif
 #if defined(MEDIAINFO_ICC_YES)
     #include "MediaInfo/Tag/File_Icc.h"
 #endif
+#if defined(MEDIAINFO_IIM_YES)
+    #include "MediaInfo/Tag/File_Iim.h"
+#endif
+#if defined(MEDIAINFO_XMP_YES)
+    #include "MediaInfo/Tag/File_Xmp.h"
+#endif
+#include <zlib.h>
+#include <memory>
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -88,18 +106,36 @@ namespace Elements
     const int32u IDAT=0x49444154;
     const int32u IEND=0x49454E44;
     const int32u IHDR=0x49484452;
-    const int32u PLTE=0x506C5445;
+    const int32u JDAT=0x4A444154;
+    const int32u JHDR=0x4A484452;
+    const int32u MEND=0x4D454E44;
+    const int32u MHDR=0x4D484452;
+    const int32u PLTE=0x504C5445;
+    const int32u acTL=0x6163544C;
+    const int32u bKGD=0x624B4744;
+    const int32u caBX=0x63614258;
+    const int32u caNv=0x63614E76;
+    const int32u cHRM=0x6348524D; 
     const int32u cICP=0x63494350;
     const int32u cLLI=0x634C4C49;
     const int32u cLLi=0x634C4C69;
+    const int32u eXIf=0x65584966;
+    const int32u fcTL=0x6663544C;
+    const int32u fdAT=0x66644154;
     const int32u gAMA=0x67414D41;
+    const int32u hIST=0x68495354;
     const int32u iCCP=0x69434350;
     const int32u iTXt=0x69545874;
     const int32u mDCV=0x6D444356;
     const int32u mDCv=0x6D444376;
     const int32u pHYs=0x70485973;
     const int32u sBIT=0x73424954;
+    const int32u sPLT=0x73504C54;
+    const int32u sRGB=0x73524742;
     const int32u tEXt=0x74455874;
+    const int32u tIME=0x74494D45;
+    const int32u tRNS=0x74524E53;
+    const int32u vpAg=0x76704167;
     const int32u zTXt=0x7A545874;
 }
 
@@ -116,7 +152,7 @@ static const char* Keywords_Mapping[][2]=
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-File_Png::File_Png()
+File_Png::File_Png() : Data_Size{}, Signature{}
 {
     //Config
     #if MEDIAINFO_TRACE
@@ -125,7 +161,7 @@ File_Png::File_Png()
     StreamSource=IsStream;
 
     //In
-    StreamKind=Stream_Max;
+    StreamKind=Stream_Image;
 }
 
 //***************************************************************************
@@ -138,15 +174,26 @@ void File_Png::Streams_Accept()
     if (!IsSub)
     {
         TestContinuousFileNames();
-
-        Stream_Prepare((Config->File_Names.size()>1 || Config->File_IsReferenced_Get())?Stream_Video:Stream_Image);
-        if (File_Size!=(int64u)-1)
-            Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize), File_Size);
-        if (StreamKind_Last==Stream_Video)
+        if (Config->File_Names.size() > 1 || Config->File_IsReferenced_Get())
+            StreamKind = Stream_Video;
+        Stream_Prepare(StreamKind);
+        if (Config->File_Names.size() > 1)
             Fill(Stream_Video, StreamPos_Last, Video_FrameCount, Config->File_Names.size());
     }
     else
-        Stream_Prepare(StreamKind==Stream_Max?StreamKind_Last:StreamKind);
+        Stream_Prepare(StreamKind);
+}
+
+//---------------------------------------------------------------------------
+void File_Png::Streams_Finish()
+{
+    if (Data_Size != (int64u)-1) {
+        if (StreamKind == Stream_Video && !IsSub && File_Size != (int64u)-1 && !Config->File_Sizes.empty())
+            Fill(Stream_Video, 0, Video_StreamSize, File_Size - (File_Size - Data_Size) * Config->File_Sizes.size()); //We guess that the metadata part has a fixed size
+        if (StreamKind == Stream_Image && (IsSub || File_Size != (int64u)-1)) {
+            Fill(Stream_Image, 0, Image_StreamSize, Data_Size);
+        }
+    }
 }
 
 //***************************************************************************
@@ -165,43 +212,31 @@ bool File_Png::FileHeader_Begin()
         Reject("PNG");
         return false;
     }
+    Data_Size = 8;
 
-    switch (CC4(Buffer)) //Signature
+    auto Signature_Temp = CC4(Buffer);
+    const char* Format;
+    switch (Signature_Temp)
     {
         case 0x89504E47 :
-            Accept("PNG");
-
-            Fill(Stream_General, 0, General_Format, "PNG");
-            Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Format), "PNG");
-            Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Codec), "PNG");
-
+            Format = "PNG";
             break;
-
-        case 0x8A4E4E47 :
-            Accept("PNG");
-
-            Fill(Stream_General, 0, General_Format, "MNG");
-            Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Format), "MNG");
-            Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Codec), "MNG");
-
-            Finish("PNG");
+        case 0x8A4D4E47 :
+            StreamKind = Stream_Video;
+            Format = "MNG";
             break;
-
         case 0x8B4A4E47 :
-            Accept("PNG");
-
-            Fill(Stream_General, 0, General_Format, "JNG");
-            Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Format), "JNG");
-            Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Codec), "JNG");
-
-            Finish("PNG");
+            Format = "JNG";
             break;
-
         default:
             Reject("PNG");
+            return true;
     }
 
     //All should be OK...
+    Signature = Signature_Temp;
+    Accept("PNG");
+    Fill(Stream_General, 0, General_Format, Format);
     return true;
 }
 
@@ -255,20 +290,45 @@ void File_Png::Data_Parse()
         CASE_INFO(IDAT,                                         "Image data");
         CASE_INFO(IEND,                                         "Image trailer");
         CASE_INFO(IHDR,                                         "Image header");
+        CASE_INFO(JHDR,                                         "JNG header");
+        CASE_INFO(JDAT,                                         "JNG data");
+        CASE_INFO(MEND,                                         "MNG trailer");
+        CASE_INFO(MHDR,                                         "MNG header");
         CASE_INFO(PLTE,                                         "Palette table");
+        CASE_INFO(acTL,                                         "Animation Control Chunk");
+        CASE_INFO(bKGD,                                         "Background color"); 
+        CASE_INFO(caBX,                                         "JUMBF");
+        CASE_INFO(caNv,                                         "Canvas");
+        CASE_INFO(cHRM,                                         "Primary chromaticities and white point"); 
         CASE_INFO(cICP,                                         "Coding-independent code points");
         CASE_INFO(cLLI,                                         "Content Light Level Information");
         CASE_INFO(cLLi,                                         "Content Light Level Information");
+        CASE_INFO(eXIf,                                         "Exchangeable Image File (Exif) Profile"); 
+        CASE_INFO(fcTL,                                         "Frame Control Chunk"); 
+        CASE_INFO(fdAT,                                         "Frame Data Chunk"); 
         CASE_INFO(gAMA,                                         "Gamma");
+        CASE_INFO(hIST,                                         "Image histogram"); 
         CASE_INFO(iCCP,                                         "Embedded ICC profile");
         CASE_INFO(iTXt,                                         "International textual data");
         CASE_INFO(mDCV,                                         "Mastering Display Color Volume");
         CASE_INFO(mDCv,                                         "Mastering Display Color Volume");
         CASE_INFO(pHYs,                                         "Physical pixel dimensions");
         CASE_INFO(sBIT,                                         "Significant bits");
+        CASE_INFO(sPLT,                                         "Suggested palette");
+        CASE_INFO(sRGB,                                         "Standard RGB color space");
         CASE_INFO(tEXt,                                         "Textual data");
+        CASE_INFO(tIME,                                         "Time stamp information");
+        CASE_INFO(tRNS,                                         "Transparency");
+        CASE_INFO(vpAg,                                         "Virtual page");
         CASE_INFO(zTXt,                                         "Compressed textual data");
-        default : Skip_XX(Element_Size,                         "Unknown");
+        default :
+            if (Element_Code & 0x20000000) {
+                Skip_XX(Element_Size,                           "(Unknown)"); 
+                Data_Size = (int64u)-1;
+            }
+            else {
+                Data_Common();
+            }
     }
 
     Element_Size+=4; //For CRC
@@ -286,8 +346,47 @@ void File_Png::IDAT()
     //Parsing
     Skip_XX(Element_TotalSize_Get()-4,                          "Data");
     Param2("CRC",                                               "(Skipped) (4 bytes)");
-    if (Config->ParseSpeed<1.0)
+    Data_Common();
+    if (Retrieve_Const(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Format)).empty()) {
+        Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Format), "PNG");
+        Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Codec), "PNG");
+    }
+    if (Config->ParseSpeed < 1.0 && Signature != 0x8B4A4E47 && Config->File_Names_Pos > 1) {
+        if (Data_Size != (int64u)-1) {
+            if (File_Size == (int64u)-1) {
+                Data_Size = (int64u)-1;
+            }
+            else {
+                Data_Size += IsSub ? (Buffer_Size - (Buffer_Offset + Element_TotalSize_Get())) : (File_Size - (File_Offset + Buffer_Offset + Element_TotalSize_Get())); // We bet that there is no metadata at the end of the file
+            }
+        }
         Finish();
+    }
+}
+
+//---------------------------------------------------------------------------
+void File_Png::JDAT()
+{
+    //Parsing
+    #if defined(MEDIAINFO_JPEG_YES)
+        File_Jpeg MI;
+        MI.StreamKind = StreamKind;
+        Open_Buffer_Init(&MI);
+        Open_Buffer_Continue(&MI);
+        Open_Buffer_Finalize(&MI);
+        Merge(MI, StreamKind, 0, 0);
+        const auto& StreamSize = Retrieve_Const(StreamKind, 0, Fill_Parameter(StreamKind_Last, Generic_StreamSize));
+        if (StreamSize.empty()) {
+            Data_Size = (int64u)-1;
+        }
+        else {
+            Data_Size += Header_Size + Element_TotalSize_Get() - Element_Size + StreamSize.To_int64u();
+        }
+        Clear(StreamKind, 0, Fill_Parameter(StreamKind_Last, Generic_StreamSize));
+    #else
+        Skip_XX(Element_Size,                                   "JPEG data");
+        Data_Common();
+    #endif
 }
 
 //---------------------------------------------------------------------------
@@ -310,8 +409,10 @@ void File_Png::IHDR()
             auto Packing=Png_Colour_type_Settings(Colour_type, Bit_depth);
             Fill(StreamKind_Last, 0, "Format_Settings_Packing", Packing);
             Fill(StreamKind_Last, 0, "Format_Settings", Packing);
-            Fill(StreamKind_Last, 0, "Width", Width);
-            Fill(StreamKind_Last, 0, "Height", Height);
+            if (Signature != 0x8A4D4E47) { // Not MNG
+                Fill(StreamKind_Last, 0, "Width", Width);
+                Fill(StreamKind_Last, 0, "Height", Height);
+            }
             switch (Colour_type)
             {
                 case 3:
@@ -349,6 +450,52 @@ void File_Png::IHDR()
             Fill();
         }
     FILLING_END();
+
+    Data_Common();
+}
+
+
+//---------------------------------------------------------------------------
+void File_Png::MHDR()
+{
+    //Parsing
+    int32u Width, Height, Frequency, FrameCount, Duration;
+    Get_B4 (Width,                                              "Width");
+    Get_B4 (Height,                                             "Height");
+    Get_B4 (Frequency,                                          "Ticks per second");
+    Skip_B4(                                                    "Nominal layer count");
+    Get_B4 (FrameCount,                                         "Nominal frame count:");
+    Get_B4 (Duration,                                           "Nominal play time:");
+    Skip_B4(                                                    "Simplicity profile");
+
+    FILLING_BEGIN_PRECISE();
+        {
+            Fill(Stream_Video, 0, Video_Width, Width);
+            Fill(Stream_Video, 0, Video_Height, Height);
+            if (Frequency && Duration && Duration != (int32u)-1) {
+                Fill(Stream_Video, 0, Video_Height, ((float32)Duration) / Frequency);
+            }
+            if (FrameCount) {
+                Fill(Stream_Video, 0, Video_FrameCount, FrameCount);
+            }
+        }
+    FILLING_END();
+
+    Data_Common();
+}
+
+//---------------------------------------------------------------------------
+void File_Png::caBX()
+{
+    //Parsing
+    #if defined(MEDIAINFO_C2PA_YES)
+        File_C2pa MI;
+        Open_Buffer_Init(&MI);
+        Open_Buffer_Continue(&MI);
+        Open_Buffer_Finalize(&MI);
+        Merge(MI, Stream_General, 0, 0, false);
+        Merge(MI);
+    #endif
 }
 
 //---------------------------------------------------------------------------
@@ -374,6 +521,8 @@ void File_Png::cICP()
             Fill(StreamKind_Last, StreamPos_Last, "ColorSpace", Mpegv_matrix_coefficients_ColorSpace(MatrixCoefficients));
         Fill(StreamKind_Last, StreamPos_Last, "colour_range", Mk_Video_Colour_Range(VideoFullRangeFlag+1));
     FILLING_END()
+
+    Data_Common();
 }
 
 //---------------------------------------------------------------------------
@@ -387,6 +536,30 @@ void File_Png::cLLI()
         Fill(StreamKind_Last, StreamPos_Last, "MaxCLL", MaxCLL);
         Fill(StreamKind_Last, StreamPos_Last, "MaxFALL", MaxFALL);
     FILLING_END();
+
+    Data_Common();
+}
+
+//---------------------------------------------------------------------------
+void File_Png::eXIf()
+{
+    Element_Info1("Exif");
+
+    //Parsing
+    #if defined(MEDIAINFO_EXIF_YES)
+    File_Exif MI;
+    Open_Buffer_Init(&MI);
+    Open_Buffer_Continue(&MI);
+    Open_Buffer_Finalize(&MI);
+    Merge(MI, Stream_General, 0, 0, false);
+    Merge(MI, Stream_Image, 0, 0, false);
+    size_t Count = MI.Count_Get(Stream_Image);
+    for (size_t i = 1; i < Count; ++i) {
+        Merge(MI, Stream_Image, i, StreamPos_Last + 1, false);
+    }
+    #else
+    Skip_UTF8(Element_Size - Element_Offset,                    "EXIF Tags");
+    #endif
 }
 
 //---------------------------------------------------------------------------
@@ -399,6 +572,8 @@ void File_Png::gAMA()
     FILLING_BEGIN()
         Fill(StreamKind_Last, 0, "Gamma", Gamma/100000.0);
     FILLING_END()
+
+    Data_Common();
 }
 
 //---------------------------------------------------------------------------
@@ -474,6 +649,8 @@ void File_Png::iCCP()
     }
     else
         Skip_XX(Element_Size-Element_Offset,                    "ICC profile");
+
+    Data_Common();
 }
 
 //---------------------------------------------------------------------------
@@ -488,6 +665,8 @@ void File_Png::mDCV()
         Fill(StreamKind_Last, StreamPos_Last, "MasteringDisplay_ColorPrimaries", MasteringDisplay_ColorPrimaries);
         Fill(StreamKind_Last, StreamPos_Last, "MasteringDisplay_Luminance", MasteringDisplay_Luminance);
     FILLING_END();
+
+    Data_Common();
 }
 
 //---------------------------------------------------------------------------
@@ -506,6 +685,8 @@ void File_Png::pHYs()
             Fill(StreamKind_Last, 0, "PixelAspectRatio", ((float32)Y) / X, 3, true);
         }
     FILLING_END()
+
+    Data_Common();
 }
 
 //---------------------------------------------------------------------------
@@ -523,6 +704,44 @@ void File_Png::sBIT()
     FILLING_BEGIN()
         if (Bits.size()==1)
             Fill(StreamKind_Last, 0, "BitDepth", Bits.begin()->first, 10, true);
+    FILLING_END()
+
+    Data_Common();
+}
+
+//---------------------------------------------------------------------------
+void File_Png::tIME()
+{
+    //Parsing
+    int16u YY;
+    int8u MM, DD, hh, mm, ss;
+    Get_B2 (YY,                                             "Year");
+    Get_B1 (MM,                                             "Month");
+    Get_B1 (DD,                                             "Day");
+    Get_B1 (hh,                                             "Hour");
+    Get_B1 (mm,                                             "Minute");
+    Get_B1 (ss,                                             "Second");
+
+    FILLING_BEGIN()
+        if (MM && MM <= 12 && DD && DD < 32 && hh < 24 && mm < 61 && ss <= 61) {
+            auto MM1 = MM / 10;
+            auto MM0 = MM % 10;
+            auto DD1 = DD / 10;
+            auto DD0 = DD % 10;
+            auto hh1 = hh / 10;
+            auto hh0 = hh % 10;
+            auto mm1 = mm / 10;
+            auto mm0 = mm % 10;
+            auto ss1 = ss / 10;
+            auto ss0 = ss % 10;
+            Fill(Stream_General, 0, General_Encoded_Date,
+                std::to_string(YY) + '-' +
+                char('0' + MM1) + char('0' + MM0) + '-' +
+                char('0' + DD1) + char('0' + DD0) + 'T' +
+                char('0' + hh1) + char('0' + hh0) + ':' +
+                char('0' + mm1) + char('0' + mm0) + ':' +
+                char('0' + ss1) + char('0' + ss0) + 'Z');
+        }
     FILLING_END()
 }
 
@@ -660,19 +879,165 @@ void File_Png::Textual(bitset8 Method)
         }
         if (Keyword_UTF8=="XML:com.adobe.xmp")
         {
+            #if defined(MEDIAINFO_XMP_YES)
             auto Text_UTF8=Text.To_UTF8();
             File_Xmp MI;
             Open_Buffer_Init(&MI, Text_UTF8.size());
             Open_Buffer_Continue(&MI, (const int8u*)Text_UTF8.c_str(), Text_UTF8.size());
-            Skip_XX(Text_UTF8.size(),                           "Stream, Data");
             Open_Buffer_Finalize(&MI);
-            Merge(MI, Stream_General, 0, 0);
+            Element_Show(); //TODO: why is it needed?
+            Merge(MI, Stream_General, 0, 0, false);
+            Text.clear();
+            #endif
+        }
+        else if (Keyword_UTF8.rfind("Raw profile type ", 0) == 0)
+        {
+            Decode_RawProfile(Text.To_UTF8().c_str(), Text.To_UTF8().size(), Keyword_UTF8.substr(17));
             Text.clear();
         }
         else if (!Language.empty())
             Text.insert(0, __T('(')+Language+__T(')'));
         Fill(Stream_General, 0, Keyword_UTF8.c_str(), Text);
     FILLING_END()
+}
+
+//---------------------------------------------------------------------------
+void File_Png::Decode_RawProfile(const char* in, size_t in_len, const string& type)
+{
+#if defined(MEDIAINFO_EXIF_YES) || defined(MEDIAINFO_ICC_YES) || defined(MEDIAINFO_IIM_YES)
+    auto HexStringToBytes{
+        [](const char* src, size_t len, size_t expected_length) -> string {
+            string to_return;
+            auto end = src + len;
+            to_return.resize(expected_length);
+            size_t actual_length = 0;
+            bool is_even = true;
+            for (auto dst = &to_return[0]; actual_length < expected_length && src < end; ++src) {
+                if (*src == '\n') {
+                    continue;
+                }
+                auto c = *src;
+                if (c >= '0' && c <= '9')
+                    c -= '0';
+                else if (c >= 'A' && c <= 'F')
+                    c -= 'A' - 10;
+                else if (c >= 'a' && c <= 'f')
+                    c -= 'a' - 10;
+                else {
+                    return {};
+                }
+                *dst += c << (is_even << 2);
+                if (!is_even) {
+                    ++dst;
+                    ++actual_length;
+                }
+                is_even = !is_even;
+            }
+            if (actual_length != expected_length) {
+                return {};
+            }
+            return to_return;
+        }
+    };
+
+    if (!in || !in_len) {
+        return;
+    }
+
+    // '\n<profile name>\n<length>(%8lu)\n<hex payload>\n'
+    if (*in != '\n') {
+        return;
+    }
+    auto src = in + 1;
+
+    // skip the profile name and extract the length.
+    while (*src != '\0' && *src++ != '\n') {
+    }
+    char* end;
+    auto expected_length = strtoul(src, &end, 10);
+    if (*end != '\n') {
+        return;
+    }
+    ++end;
+
+    // 'end' now points to the profile payload.
+    auto data = HexStringToBytes(end, in_len - (end - in), expected_length);
+    if (data.empty())
+        return;
+    
+    // Parsing
+    size_t Pos = 0;
+    if (!data.compare(0, 6, "Exif\0\0", 6))
+        Pos = 6;
+
+    std::unique_ptr<File__Analyze> MI;
+#if defined(MEDIAINFO_PSD_YES)
+    if (type == "8bim" || (type == "iptc" && !data.compare(0, 4, "8bim", 4))) {
+        auto Parser = new File_Psd;
+        Parser->Step = File_Psd::Step_ImageResourcesBlock;
+        MI.reset(Parser);
+    }
+#endif //MEDIAINFO_PSD_YES
+#if defined(MEDIAINFO_EXIF_YES)
+    if (type == "APP1" || type == "exif") {
+        MI.reset(new File_Exif);
+    }
+#endif //MEDIAINFO_EXIF_YES
+#if defined(MEDIAINFO_ICC_YES)
+    if (type == "icc" || type == "icm") {
+        MI.reset(new File_Icc);
+    }
+#endif //MEDIAINFO_ICC_YES
+#if defined(MEDIAINFO_IIM_YES)
+    if (type == "iptc" && data.compare(0, 4, "8bim", 4)) {
+        MI.reset(new File_Iim);
+    }
+#endif //MEDIAINFO_IIM_YES
+#if defined(MEDIAINFO_XMP_YES)
+    if (type == "xmp") {
+        MI.reset(new File_Xmp);
+    }
+#endif //MEDIAINFO_ICC_YES
+    if (!MI) {
+        return;
+    }
+
+    auto Buffer_Save = Buffer;
+    auto Buffer_Offset_Save = Buffer_Offset;
+    auto Buffer_Size_Save = Buffer_Size;
+    auto Element_Offset_Save = Element_Offset;
+    auto Element_Size_Save = Element_Size;
+    Buffer = (const int8u*)data.c_str() + Pos;
+    Buffer_Offset = 0;
+    Buffer_Size = data.size() - Pos;
+    Element_Offset = 0;
+    Element_Size = Buffer_Size;
+
+    Open_Buffer_Init(MI.get());
+    Open_Buffer_Continue(MI.get());
+    Open_Buffer_Finalize(MI.get());
+    Merge(*MI, Stream_General, 0, 0, false);
+    Merge(*MI, Stream_Image, 0, 0, false);
+    size_t Count = MI->Count_Get(Stream_Image);
+    for (size_t i = 1; i < Count; ++i) {
+        Merge(*MI, Stream_Image, i, StreamPos_Last + 1, false);
+    }
+
+    Buffer = Buffer_Save;
+    Buffer_Offset = Buffer_Offset_Save;
+    Buffer_Size = Buffer_Size_Save;
+    Element_Offset = Element_Offset_Save;
+    Element_Size = Element_Size_Save;
+#endif
+}
+
+//---------------------------------------------------------------------------
+void File_Png::Data_Common()
+{
+    Skip_XX(Element_Size - Element_Offset,                      "(Unknown)");
+    if (Data_Size != (int64u)-1) {
+        Data_Size += Header_Size + Element_TotalSize_Get();
+    }
 }
 
 } //NameSpace

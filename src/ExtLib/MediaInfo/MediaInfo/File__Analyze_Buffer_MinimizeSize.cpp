@@ -1426,6 +1426,13 @@ void File__Analyze::Get_UTF8(int64u Bytes, Ztring &Info)
 }
 
 //---------------------------------------------------------------------------
+void File__Analyze::Peek_UTF8(int64u Bytes, Ztring& Info)
+{
+    INTEGRITY_SIZE_ATLEAST_STRING(Bytes);
+    Info.From_UTF8((const char*)(Buffer+Buffer_Offset+(size_t)Element_Offset), (size_t)Bytes);
+}
+
+//---------------------------------------------------------------------------
 void File__Analyze::Get_UTF16(int64u Bytes, Ztring &Info)
 {
     INTEGRITY_SIZE_ATLEAST_STRING(Bytes);

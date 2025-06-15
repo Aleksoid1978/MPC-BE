@@ -96,7 +96,7 @@ void File_Ogg::Streams_Fill()
     }
 
     Fill(Stream_General, 0, General_Format, "Ogg", Unlimited, true, true);
-    if (Count_Get(Stream_Video)==0 && Count_Get(Stream_Image)==0)
+    if (Count_Get(Stream_Video)==0 && Count_Get(Stream_Audio))
         Fill(Stream_General, 0, General_InternetMediaType, "audio/ogg", Unlimited, true, true);
     else
         Fill(Stream_General, 0, General_InternetMediaType, "video/ogg", Unlimited, true, true);
@@ -343,20 +343,20 @@ void File_Ogg::Data_Parse()
             Element_Info1C((continued), "Continue");
 
             //Parsing
+            int64u Size=Chunk_Sizes[Chunk_Sizes_Pos];
             if (continued || Parser->File_Offset!=Parser->File_Size)
             {
-                int64u Size=Chunk_Sizes[Chunk_Sizes_Pos];
                 if (Size>Element_Size-Element_Offset)
                     Size=Element_Size-Element_Offset; // Shcunk size is bigger than content size, buggy file
                 Open_Buffer_Continue(Parser, Buffer+Buffer_Offset+(size_t)Element_Offset, Size);
             }
+            Element_Offset+=Size;
             if (Chunk_Sizes_Pos<Chunk_Sizes.size()-1
              || (Chunk_Sizes_Pos==Chunk_Sizes.size()-1 && Chunk_Sizes_Finished))
             {
                 Open_Buffer_Continue(Parser, Buffer+Buffer_Offset, 0); //Purge old datas
             }
 
-            Element_Offset+=Chunk_Sizes[Chunk_Sizes_Pos];
             continued=false; //If there is another chunk, this can not be a continued chunk
             if (Parser->File_GoTo!=(int64u)-1)
                 Chunk_Sizes_Pos=Chunk_Sizes.size();
@@ -375,12 +375,15 @@ void File_Ogg::Data_Parse()
 
     //End of stream
     if (!Parsing_End &&
-        (StreamsToDo==0 || File_Offset+Buffer_Offset+Element_Offset>256*1024))
+        (StreamsToDo==0 || File_Offset+Buffer_Offset+Element_Size>16*1024*1024))
     {
         if (IsSub)
             Finish("OGG");
-        else
+        else if (File_Size-(File_Offset+Buffer_Offset+Element_Size)>256*1024)
+        {
+            Open_Buffer_Unsynch();
             GoToFromEnd(256*1024, "OGG");
+        }
         std::map<int64u, stream>::iterator Stream_Temp=Stream.begin();
         if (File_GoTo!=(int64u)-1)
             while (Stream_Temp!=Stream.end())

@@ -64,6 +64,7 @@ private :
     TimeCode Time_Start;
     TimeCode Time_End;
     TimeCode Time_Delay;
+    int8u FF_Max = 0;
 };
 
 } //NameSpace

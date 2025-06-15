@@ -366,8 +366,6 @@ bool File::Open (const tstring &File_Name_, access_t Access)
                         return false;
                     }
                 }
-                else
-                    Position=0;
             #else
                 DWORD dwDesiredAccess, dwShareMode, dwCreationDisposition;
                 switch (Access)
@@ -693,7 +691,7 @@ size_t File::Read (int8u* Buffer, size_t Buffer_Size_Max)
                     FAILED(Async_Read->GetResults(&Readed)))
                     return 0;
 
-                if (FAILED(Reader->ReadBytes((UINT32)Buffer_Size_Max, (BYTE*)Buffer)))
+                if (FAILED(Reader->ReadBytes(Readed, (BYTE*)Buffer)))
                     return 0;
 
                 Reader->DetachStream(&Stream);
@@ -959,8 +957,10 @@ bool File::GoTo (int64s Position_ToMove, move_t MoveMethod)
 //---------------------------------------------------------------------------
 int64u File::Position_Get ()
 {
-    if (Position!=(int64u)-1)
-        return Position;
+    #ifndef WINDOWS_UWP
+        if (Position!=(int64u)-1)
+            return Position;
+    #endif //WINDOWS_UWP
 
     ZENLIB_DEBUG1(      "File Position_Get",
                         Debug+=", File_Name="; Debug+=Ztring(File_Name).To_UTF8())

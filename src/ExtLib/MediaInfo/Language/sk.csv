@@ -343,6 +343,7 @@ Cover_Datas;Údaje obalu
 Cover_Description;Popis obalu
 Cover_Mime;
 Cover_Type;Typ obalu
+CoverData;
 Cropped;
 Custom;Vlastné
 CustomDownmixTargets;
@@ -380,6 +381,7 @@ DisplayCaptions_Content;
 DisplayCaptions_Stream;
 DistributedBy;Distribútor
 Distributor;
+Documents;
 Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Zaslat finančný dar
@@ -515,6 +517,7 @@ FrameRate_Num;
 FrameRate_Original;Pôvodná frekvencia snímok
 FrameRate_Real;
 FullParsing;
+Gallery;
 General;Hlavné parametre
 GeneralCompliance;
 Genre;žáner
@@ -978,6 +981,7 @@ Language_zh-yue;
 Language_zu;Zulu
 Languages;
 LawRating;Law rating
+LegacyStreamDisplay;
 LCCN;LCCN
 LfeAttenuationKnown;
 LfeMixGain;
@@ -1223,6 +1227,7 @@ Sheet;List
 Sheet (Complete);List (kompletný) 
 Shell extension;Integrovať do kontextového menu Prieskumníka (pravé tlačíidlo myši)
 Shell extension, folder;
+Shell extension, separate instance;
 Shell InfoTip;Integrovať do kontextového menu (pri nadídení myši na súbor)
 ShimName;
 ShimVersion;
@@ -1405,4 +1410,4 @@ Yes;Áno
 Your system;Váš systém
 Your translation;
 ZZ_Automatic_Percent;57
-ZZ_AutomaticLanguage_Percent;62
+ZZ_AutomaticLanguage_Percent;61

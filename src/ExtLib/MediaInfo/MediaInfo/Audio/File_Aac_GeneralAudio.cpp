@@ -3084,10 +3084,13 @@ void File_Aac::program_config_element()
         Infos["Format_Profile"].From_UTF8(Aac_Format_Profile(audioObjectType));
         Infos["Codec"].From_UTF8(Aac_audioObjectType(audioObjectType));
         Infos["SamplingRate"].From_Number(Aac_sampling_frequency[sampling_frequency_index]);
-        Infos["Channel(s)"].From_Number(Channels);
-        Infos["ChannelPositions"]=Channels_Positions;
-        Infos["ChannelPositions/String2"]=Channels_Positions2;
-        Infos["ChannelLayout"]=ChannelLayout;
+        if (!FromIamf)
+        {
+            Infos["Channel(s)"].From_Number(Channels);
+            Infos["ChannelPositions"]=Channels_Positions;
+            Infos["ChannelPositions/String2"]=Channels_Positions2;
+            Infos["ChannelLayout"]=ChannelLayout;
+        }
 
         if (!Infos["Format_Settings_SBR"].empty())
         {
@@ -4267,15 +4270,21 @@ void File_Aac::FillInfosHEAACv2(const Ztring& Format_Settings)
     Infos["Format_Profile"] = __T("HE-AACv2");
     const Ztring Channels = Infos["Channel(s)"];
     const Ztring ChannelPositions = Infos["ChannelPositions"];
-    Infos["Channel(s)"] = __T("2");
-    Infos["ChannelPositions"] = __T("Front: L R");
-    Infos["ChannelLayout"] = __T("L R");
+    if (!FromIamf)
+    {
+        Infos["Channel(s)"] = __T("2");
+        Infos["ChannelPositions"] = __T("Front: L R");
+        Infos["ChannelLayout"] = __T("L R");
+    }
     if (MediaInfoLib::Config.LegacyStreamDisplay_Get())
     {
         const Ztring SamplingRate_Previous = Infos["SamplingRate"];
         Infos["Format_Profile"] += __T(" / HE-AAC / LC");
-        Infos["Channel(s)"] += __T(" / ") + Channels + __T(" / ") + Channels;
-        Infos["ChannelPositions"] += __T(" / ") + ChannelPositions + __T(" / ") + ChannelPositions;
+        if (!FromIamf)
+        {
+            Infos["Channel(s)"] += __T(" / ") + Channels + __T(" / ") + Channels;
+            Infos["ChannelPositions"] += __T(" / ") + ChannelPositions + __T(" / ") + ChannelPositions;
+        }
         const int32u SamplingRate = (extension_sampling_frequency_index == (int8u)-1) ? (((int32u)Frequency_b) * 2) : extension_sampling_frequency;
         if (SamplingRate)
             Infos["SamplingRate"] = Ztring().From_Number(SamplingRate, 10) + __T(" / ") + SamplingRate_Previous;

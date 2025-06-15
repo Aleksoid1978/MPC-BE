@@ -343,6 +343,7 @@ Cover_Datas;Date de pe coperta
 Cover_Description;
 Cover_Mime;
 Cover_Type;
+CoverData;
 Cropped;
 Custom;Particularizat
 CustomDownmixTargets;
@@ -380,6 +381,7 @@ DisplayCaptions_Content;
 DisplayCaptions_Stream;
 DistributedBy;Distribuit de
 Distributor;
+Documents;
 Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Donatii
@@ -515,6 +517,7 @@ FrameRate_Num;
 FrameRate_Original;
 FrameRate_Real;
 FullParsing;
+Gallery;
 General;Generale
 GeneralCompliance;
 Genre;Gen
@@ -978,6 +981,7 @@ Language_zh-yue;
 Language_zu;
 Languages;
 LawRating;
+LegacyStreamDisplay;
 LCCN;
 LfeAttenuationKnown;
 LfeMixGain;
@@ -1223,6 +1227,7 @@ Sheet;Afisare
 Sheet (Complete);Afisare (completa)
 Shell extension; Extenise (in explorer executati click dreapta)
 Shell extension, folder;
+Shell extension, separate instance;
 Shell InfoTip;
 ShimName;
 ShimVersion;

@@ -34,19 +34,54 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* Mz_Machine(int16u Machine)
+// https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#machine-types
+struct mz_machine_data 
 {
-    switch (Machine)
-    {
-        case 0x014D : return "Intel i860";
-        case 0x014C : return "Intel i386";
-        case 0x0162 : return "MIPS R3000";
-        case 0x0166 : return "MIPS R4000";
-        case 0x0183 : return "DEC Alpha";
-        case 0x0200 : return "Intel IA64";
-        case 0x8664 : return "AMD x86-64";
-        default  : return "";
-    }
+    int16u ID;
+    const char* Name;
+};
+mz_machine_data Mz_Machine_Data[] =
+{
+    { 0x0000, "" },
+    { 0x014C, "Intel i386" },
+    { 0x014D, "Intel i860" },
+    { 0x0162, "MIPS R3000" },
+    { 0x0166, "MIPS R4000" },
+    { 0x0168, "MIPS R10000" },
+    { 0x0169, "MIPS WCE v2" },
+    { 0x0183, "DEC Alpha" },
+    { 0x0184, "DEC Alpha AXP" },
+    { 0x01A2, "Hitachi SH3" },
+    { 0x01A3, "Hitachi SH3 DSP" },
+    { 0x01A6, "Hitachi SH4" },
+    { 0x01A8, "Hitachi SH5" },
+    { 0x01C0, "ARM" },
+    { 0x01C2, "ARM Thumb" },
+    { 0x01C4, "ARM Thumb-2" },
+    { 0x01D3, "Matsushita AM33" },
+    { 0x01F0, "Power PC" },
+    { 0x01F1, "Power PC with FP" },
+    { 0x0200, "Intel IA64" },
+    { 0x0266, "MIPS16" },
+    { 0x0284, "DEC Alpha 64" },
+    { 0x0366, "MIPS with FPU" },
+    { 0x0466, "MIPS16 with FPU" },
+    { 0x0EBC, "EFI" },
+    { 0x5032, "RISC-V 32-bit address space" },
+    { 0x5064, "RISC-V 64-bit address space" },
+    { 0x5128, "RISC-V 128-bit address space" },
+    { 0x6232, "LoongArch 32-bit" },
+    { 0x6264, "LoongArch 64-bit" },
+    { 0x8664, "AMD x86-64" },
+    { 0x9041, "Mitsubishi M32R" },
+    { 0xAA64, "ARM64" },
+};
+string Mz_Machine(int16u Machine)
+{
+    for (const auto& Item : Mz_Machine_Data)
+        if (Item.ID == Machine)
+            return Item.Name;
+    return "0x" + Ztring().From_CC2(Machine).To_UTF8();
 }
 
 //***************************************************************************

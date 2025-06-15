@@ -343,6 +343,7 @@ Cover_Datas;Datos de portada
 Cover_Description;Descripción de portada
 Cover_Mime;Portada MIME
 Cover_Type;Tipo de portada
+CoverData;
 Cropped;Dimensiones de recorte
 Custom;Personalizado
 CustomDownmixTargets;
@@ -380,6 +381,7 @@ DisplayCaptions_Content;
 DisplayCaptions_Stream;
 DistributedBy;Distribuido por
 Distributor;Distribuidor
+Documents;
 Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Donación
@@ -515,6 +517,7 @@ FrameRate_Num;
 FrameRate_Original;Velocidad de fotogramas original
 FrameRate_Real;
 FullParsing;
+Gallery;
 General;General
 GeneralCompliance;
 Genre;Género
@@ -978,6 +981,7 @@ Language_zh-yue;
 Language_zu;Zulú
 Languages;
 LawRating;Ley de calificación
+LegacyStreamDisplay;
 LCCN;LCCN
 LfeAttenuationKnown;
 LfeMixGain;
@@ -1223,6 +1227,7 @@ Sheet;Hoja
 Sheet (Complete);Hoja (completa)
 Shell extension;Extensión explorador (opción en el clic derecho de archivo en el explorador de Windows)
 Shell extension, folder;También para carpetas
+Shell extension, separate instance;
 Shell InfoTip;Ayuda explorador (en el explorador de Windows, mueve el ratón sobre el archivo y la info se mostrará)
 ShimName;Nombre Shim
 ShimVersion;Versión Shim

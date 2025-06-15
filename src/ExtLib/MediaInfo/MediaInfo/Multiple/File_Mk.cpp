@@ -22,6 +22,7 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Multiple/File_Mk.h"
+#include "MediaInfo/File__MultipleParsing.h"
 #if defined(MEDIAINFO_OGG_YES)
     #include "MediaInfo/Multiple/File_Ogg.h"
 #endif
@@ -740,8 +741,6 @@ File_Mk::File_Mk()
     Segment_Info_Count=0;
     Segment_Tracks_Count=0;
     Segment_Cluster_Count=0;
-    CurrentAttachmentIsCover=false;
-    CoverIsSetFromAttachment=false;
     BlockAddIDType=0;
     Laces_Pos=0;
     IsParsingSegmentTrack_SeekBackTo=0;
@@ -2565,10 +2564,6 @@ void File_Mk::Segment_Attachments_AttachedFile_FileName()
 
     Fill(Stream_General, 0, "Attachments", Data);
     
-    //Cover is in the first file which name contains "cover"
-    if (!CoverIsSetFromAttachment && Data.MakeLowerCase().find(__T("cover")) != string::npos)
-        CurrentAttachmentIsCover=true;
-
     AttachedFile_FileName=Data.To_UTF8();
 }
 
@@ -2586,10 +2581,8 @@ void File_Mk::Segment_Attachments_AttachedFile_FileData()
 {
     Element_Name("FileData");
 
-    bool Attachments_Demux=true;
-
     //Parsing
-    if ((Attachments_Demux || !CoverIsSetFromAttachment && CurrentAttachmentIsCover) && Element_TotalSize_Get()<=16*1024*1024) //TODO: option for setting the acceptable maximum size of the attachment
+    if (Element_TotalSize_Get()<=16*1024*1024) //TODO: option for setting the acceptable maximum size of the attachment
     {
         if (!Element_IsComplete_Get())
         {
@@ -2611,29 +2604,14 @@ void File_Mk::Segment_Attachments_AttachedFile_FileData()
             }
         #endif //MEDIAINFO_TRACE
 
-        std::string Data_Raw;
-        Peek_String(Element_TotalSize_Get(), Data_Raw);
-
-        if (!CoverIsSetFromAttachment && CurrentAttachmentIsCover)
-        {
-            //Filling
-            #if MEDIAINFO_ADVANCED
-                if (MediaInfoLib::Config.Flags1_Get(Flags_Cover_Data_base64))
-                {
-                    std::string Data_Base64(Base64::encode(Data_Raw));
-                    Fill(Stream_General, 0, General_Cover_Data, Data_Base64);
-                }
-            #endif //MEDIAINFO_ADVANCED
-            Fill(Stream_General, 0, General_Cover, "Yes");
-            CoverIsSetFromAttachment=true;
-        }
+        //Filling
+        Attachment("Attachment", Ztring().From_UTF8(AttachedFile_FileName));
 
         #if MEDIAINFO_EVENTS
-            if (Attachments_Demux)
             {
                 EVENT_BEGIN(Global, AttachedFile, 0)
-                    Event.Content_Size=Data_Raw.size();
-                    Event.Content=(const int8u*)Data_Raw.c_str();
+                    Event.Content_Size=(size_t)Element_Size;
+                    Event.Content=Buffer+Buffer_Offset;
                     Event.Flags=0;
                     Event.Name=AttachedFile_FileName.c_str();
                     Event.MimeType=AttachedFile_FileMimeType.c_str();
@@ -2642,8 +2620,6 @@ void File_Mk::Segment_Attachments_AttachedFile_FileData()
             }
         #endif //MEDIAINFO_EVENTS
     }
-    
-    Element_Offset=Element_TotalSize_Get();
 }
 
 //---------------------------------------------------------------------------

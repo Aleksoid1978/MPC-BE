@@ -57,6 +57,17 @@ private :
     ZtringList Artists;
     ZtringList Accompaniments;
     ZtringList AlbumArtists;
+    struct cover
+    {
+        Ztring Mime;
+        Ztring Type;
+        Ztring Link;
+        string Data;
+    };
+    std::map<Ztring, cover> Covers;
+
+    //Utils
+    void PICTURE();
 };
 
 } //NameSpace

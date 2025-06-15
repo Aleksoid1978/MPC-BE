@@ -28,6 +28,9 @@ namespace MediaInfoLib
 
 class File_Xmp : public File__Analyze
 {
+public:
+    bool Wait = false;
+
 private :
     //Buffer - File header
     bool FileHeader_Begin();

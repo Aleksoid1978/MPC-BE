@@ -343,6 +343,7 @@ Cover_Datas;Dati copertina
 Cover_Description;Descrizione copertina
 Cover_Mime;Copertina MIME
 Cover_Type;Tipo di copertina
+CoverData;
 Cropped;Dimensioni ritaglio
 Custom;Vista personalizzata
 CustomDownmixTargets;Livello downmix personalizzato
@@ -380,6 +381,7 @@ DisplayCaptions_Content;Visualizza didascalie - contenuto
 DisplayCaptions_Stream;Visualizza didascalie - stream
 DistributedBy;Distribuito da
 Distributor;Distributore
+Documents;Documenti
 Dolby_Atmos_Metadata;Metadati Dolby Atmos
 DolbyAtmos;Dolby Atmos
 Donate;Dona
@@ -515,6 +517,7 @@ FrameRate_Num;Frequenza fotogrammi
 FrameRate_Original;Frequenza fotogrammi originale
 FrameRate_Real;Frequenza fotogrammi reale
 FullParsing;Analisi completa
+Gallery;Galleria
 General;Generale
 GeneralCompliance;Conformità generale
 Genre;Genere
@@ -978,6 +981,7 @@ Language_zh-yue;Cantonese
 Language_zu;Zulu
 Languages;Lingue
 LawRating;Classificazione legale
+LegacyStreamDisplay;
 LCCN;LCCN
 LfeAttenuationKnown;Attenuazione LFE nota
 LfeMixGain;Guadagno min LFE
@@ -1223,6 +1227,7 @@ Sheet;Scheda
 Sheet (Complete);Scheda (completa)
 Shell extension;Aggiungi 'Apri con MediaInfo' al menu contestuale
 Shell extension, folder;Anche per le cartelle
+Shell extension, separate instance;
 Shell InfoTip;Informazioni in Explorer (in Explorer, spostati sul file e verranno visualizzate le informazioni)
 ShimName;Nome shim
 ShimVersion;Versione shim
@@ -1300,7 +1305,7 @@ Text streams;Sottotitoli
 Text_Codec_List;Codec sottotitoli
 Text_Format_List;Elenco formati testo
 Text_Format_WithHint_List;Elenco formati testo con suggerimenti
-Text_Language_List;Elenco ligue testo
+Text_Language_List;Elenco lingue testo
 Text_No;Nessun sottotitolo
 Text1;Sottotitolo 1
 Text2;Sottotitolo 2
@@ -1403,6 +1408,6 @@ Written_Location;Realizzato in
 WrittenBy;Realizzato da
 Yes;Si
 Your system;Info sul sistema
-Your translation;Traduzione v. 09.11.2024 by RB
+Your translation;Traduzione v. 01.05.2025 by RB
 ZZ_Automatic_Percent;99
 ZZ_AutomaticLanguage_Percent;99

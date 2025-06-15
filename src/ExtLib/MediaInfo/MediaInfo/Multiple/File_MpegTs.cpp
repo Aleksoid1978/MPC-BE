@@ -3178,7 +3178,7 @@ void File_MpegTs::PES()
 void File_MpegTs::PES_Parse_Finish()
 {
     //Test if parsing of headers is OK
-    if (NoPatPmt && !Status[IsAccepted])
+    if (NoPatPmt && !Status[IsAccepted] && Complete_Stream->Streams[pid]->Parser->Status[IsAccepted])
         Accept("MPEG-TS");
 
     if (Complete_Stream->Streams[pid]->Parser->Status[IsUpdated])

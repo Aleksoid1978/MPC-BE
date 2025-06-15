@@ -833,7 +833,7 @@ void File__Analyze::Open_Buffer_Init (int64u File_Size_)
 
 void File__Analyze::Open_Buffer_Init (File__Analyze* Sub)
 {
-    Open_Buffer_Init(Sub, File_Size);
+    Open_Buffer_Init(Sub, File_Size == (int64u)-1 ? (int64u)-1 : (File_Size - Element_Offset));
 }
 
 void File__Analyze::Open_Buffer_Init (File__Analyze* Sub, int64u File_Size_)
@@ -1344,6 +1344,13 @@ void File__Analyze::Open_Buffer_Continue (File__Analyze* Sub, const int8u* ToAdd
     //Sub
     if (Sub->File_GoTo!=(int64u)-1)
         Sub->File_GoTo=(int64u)-1;
+    if (Sub->MustAdaptSubOffsets) {
+        auto NewOffset = File_Offset + Buffer_Offset + Element_Offset;
+        auto OldOffset = Sub->File_Offset + Sub->Buffer_Size;
+        auto DiffOffset = NewOffset - OldOffset;
+        for (size_t i = 0; i <= Sub->Element_Level; i++)
+            Sub->Element[i].Next += DiffOffset;
+    }
     Sub->File_Offset=File_Offset+Buffer_Offset+Element_Offset;
     if (Sub->File_Size!=File_Size)
     {
@@ -2773,7 +2780,7 @@ void File__Analyze::Header_Fill_Size(int64u Size)
         Element[0].Next=File_Offset+Buffer_Offset+Size;
     else if (File_Offset+Buffer_Offset+Size>Element[Element_Level-2].Next)
     {
-        if (!IsSub || (File_Offset + Buffer_Size < File_Size && File_Size - (File_Offset + Buffer_Size) >= 0x10000)) { //TODO: good support of end of TS dumps
+        if (Element_IsComplete_Get() && (!IsSub || (File_Offset + Buffer_Size < File_Size && File_Size - (File_Offset + Buffer_Size) >= 0x10000))) { //TODO: good support of end of TS dumps
             auto Name = CreateElementName();
             if (!Name.empty()) {
                 Name += ' ';
@@ -3433,7 +3440,6 @@ void File__Analyze::Accept ()
             bool MustElementBegin=Element_Level?true:false;
             if (Element_Level>0)
                 Element_End0(); //Element
-            Info(ParserName+", accepted");
             if (MustElementBegin)
                 Element_Level++;
         }
@@ -3513,7 +3519,6 @@ void File__Analyze::Fill ()
             bool MustElementBegin=Element_Level?true:false;
             if (Element_Level>0)
                 Element_End0(); //Element
-            Info(ParserName+", filling");
             if (MustElementBegin)
                 Element_Level++;
         }
@@ -3600,7 +3605,6 @@ void File__Analyze::ForceFinish ()
             bool MustElementBegin=Element_Level?true:false;
             if (Element_Level>0)
                 Element_End0(); //Element
-            Info(ParserName+", finished");
             if (MustElementBegin)
                 Element_Level++;
         }

@@ -55,7 +55,7 @@ void File_OtherText::Read_Buffer_Continue()
         #endif //WINDOWS
     if (File.size()<0x100)
     {
-        File.From_Unicode((wchar_t*)Buffer, 0, Buffer_Size/sizeof(wchar_t)); //Unicode with BOM
+        File.From_Unicode((wchar_t*)Buffer, 0, (Buffer_Size/sizeof(wchar_t))>16384?16384:(Buffer_Size/sizeof(wchar_t))); //Unicode with BOM
         //TODO: Order of bytes (big or Little endian)
         if (File.size()<0x100)
         {

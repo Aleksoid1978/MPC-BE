@@ -2093,7 +2093,7 @@ void File_Hevc::seq_parameter_set()
     TEST_SB_SKIP(                                               "vui_parameters_present_flag");
         vui_parameters(vui_parameters_Item, max_sub_layers_minus1);
     TEST_SB_END();
-    TESTELSE_SB_SKIP(                                           "sps_extension_flag");
+    TEST_SB_SKIP(                                               "sps_extension_flag");
         int8u sps_extension_4bits;
         bool sps_range_extension_flag, sps_multilayer_extension_flag, sps_3d_extension_flag, sps_scc_extension_flag;
         Get_SB (sps_range_extension_flag,                       "sps_range_extension_flag");
@@ -2168,9 +2168,8 @@ void File_Hevc::seq_parameter_set()
             RiskCalculationN++; //xxx_extension_flag is set, we can not check the end of the content, so a bit risky
             RiskCalculationD++;
         }
-    TESTELSE_SB_ELSE(                                           "sps_extension_flag");
-        rbsp_trailing_bits();
-    TESTELSE_SB_END();
+    TEST_SB_END();
+    rbsp_trailing_bits();
     BS_End();
 
     FILLING_BEGIN_PRECISE();

@@ -343,6 +343,7 @@ Cover_Datas;Borító adatai
 Cover_Description;Borító leírás
 Cover_Mime;Borító MIME
 Cover_Type;Borító típusa
+CoverData;
 Cropped;Méretek
 Custom;Egyedi
 CustomDownmixTargets;
@@ -380,6 +381,7 @@ DisplayCaptions_Content;
 DisplayCaptions_Stream;
 DistributedBy;Terjesztő
 Distributor;
+Documents;
 Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Adomány
@@ -515,6 +517,7 @@ FrameRate_Num;
 FrameRate_Original;Eredeti képkockasebesség
 FrameRate_Real;
 FullParsing;
+Gallery;
 General;Általános
 GeneralCompliance;
 Genre;Műfaj
@@ -978,6 +981,7 @@ Language_zh-yue;
 Language_zu;zulu
 Languages;
 LawRating;Korhatár
+LegacyStreamDisplay;
 LCCN;LCCN
 LfeAttenuationKnown;
 LfeMixGain;
@@ -1223,6 +1227,7 @@ Sheet;Táblázat
 Sheet (Complete);Táblázat (teljes)
 Shell extension;Rendszerhéj-kiterjesztés (az Intézőben a helyzetérzékeny menüben Media Info menüpont...)
 Shell extension, folder;
+Shell extension, separate instance;
 Shell InfoTip;Rendszerhéj tipp (ha az egérmutató az Intézőben a fájl fölé visszük, adatokat láthatunk)
 ShimName;
 ShimVersion;

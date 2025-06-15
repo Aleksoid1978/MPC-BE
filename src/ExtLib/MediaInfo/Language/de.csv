@@ -343,6 +343,7 @@ Cover_Datas;Cover-Daten
 Cover_Description;Cover-Beschreibung
 Cover_Mime;Cover-MIME
 Cover_Type;Cover-Typ
+CoverData;
 Cropped;Schnitt-Dimensionen
 Custom;Benutzerdefiniert
 CustomDownmixTargets;
@@ -380,6 +381,7 @@ DisplayCaptions_Content;
 DisplayCaptions_Stream;
 DistributedBy;Vertrieb durch
 Distributor;
+Documents;
 Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;MediaInfo unterstützen
@@ -515,6 +517,7 @@ FrameRate_Num;
 FrameRate_Original;originale Bildwiederholungsrate
 FrameRate_Real;
 FullParsing;
+Gallery;
 General;Allgemein
 GeneralCompliance;
 Genre;Genre
@@ -978,6 +981,7 @@ Language_zh-yue;
 Language_zu;Zulu
 Languages;
 LawRating;Altersfreigabe
+LegacyStreamDisplay;
 LCCN;LCCN
 LfeAttenuationKnown;
 LfeMixGain;
@@ -1223,6 +1227,7 @@ Sheet;Tabelle
 Sheet (Complete);Tabelle (komplett)
 Shell extension;Shell-Erweiterung (bei Rechtsklick im Explorer erscheint ein Media Info Eintrag...)
 Shell extension, folder;Auch für Verzeichnisse
+Shell extension, separate instance;
 Shell InfoTip;Shell InfoTip (bewege den Mauszeiger im Explorer über eine Datei und Infos werden angezeigt)
 ShimName;
 ShimVersion;

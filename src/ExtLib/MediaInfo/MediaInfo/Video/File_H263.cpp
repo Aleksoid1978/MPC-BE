@@ -243,7 +243,7 @@ bool File_H263::Synched_Test()
      || (Buffer[Buffer_Offset+2]&0xFC)!=0x80
      || (Buffer[Buffer_Offset+3]&0x03)!=0x02
      || (Buffer[Buffer_Offset+4]&0x1C)==0x00
-     || (Buffer_Size>=0x100000 && !Header_Parser_Fill_Size())) //Preventing waiting too much after a false positive sync
+     || (Buffer_Size>=0x100000 && Header_Parser_GetSize()==(size_t)-1)) //Preventing waiting too much after a false positive sync
     {
         if (Frame_Count==0 && Buffer_TotalBytes>Buffer_TotalBytes_FirstSynched_Max)
             Trusted=0;
@@ -289,11 +289,13 @@ void File_H263::Read_Buffer_Unsynched()
 void File_H263::Header_Parse()
 {
     Header_Fill_Code(0x00, "Frame");
-    Header_Parser_Fill_Size();
+    auto Data_Size=Header_Parser_GetSize();
+    if (Data_Size!=(size_t)-1)
+        Header_Fill_Size(Data_Size);
 }
 
 //---------------------------------------------------------------------------
-bool File_H263::Header_Parser_Fill_Size()
+size_t File_H263::Header_Parser_GetSize()
 {
     //Look for next Sync word
     if (Buffer_Offset_Temp==0) //Buffer_Offset_Temp is not 0 if Header_Parse_Fill_Size() has already parsed first frames
@@ -320,9 +322,9 @@ bool File_H263::Header_Parser_Fill_Size()
     }
 
     //OK, we continue
-    Header_Fill_Size(Buffer_Offset_Temp-Buffer_Offset);
+    auto Data_Size=Buffer_Offset_Temp-Buffer_Offset;
     Buffer_Offset_Temp=0;
-    return true;
+    return Data_Size;
 
 }
 

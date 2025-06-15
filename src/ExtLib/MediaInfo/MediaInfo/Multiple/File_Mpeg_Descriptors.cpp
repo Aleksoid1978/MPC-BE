@@ -2933,12 +2933,13 @@ void File_Mpeg_Descriptors::Descriptor_59()
 {
     //Parsing
     Ztring Languages;
+    int8u subtitling_type{};
     while (Element_Offset<Element_Size)
     {
         Element_Begin1("subtitle");
         int32u ISO_639_language_code;
         Get_C3 (ISO_639_language_code,                              "ISO_639_language_code");
-        Info_B1(subtitling_type,                                    "subtitling_type"); Param_Info1(Mpeg_Descriptors_component_type_O3(subtitling_type));
+        Get_B1 (subtitling_type,                                    "subtitling_type"); Param_Info1(Mpeg_Descriptors_component_type_O3(subtitling_type));
         Skip_B2(                                                    "composition_page_id");
         Skip_B2(                                                    "ancillary_page_id");
 
@@ -2974,6 +2975,7 @@ void File_Mpeg_Descriptors::Descriptor_59()
                             Complete_Stream->Streams[elementary_PID]->Infos["Language"]=Languages;
                             Complete_Stream->Streams[elementary_PID]->Infos["Format"]=__T("DVB Subtitle");
                             Complete_Stream->Streams[elementary_PID]->Infos["Codec"]=__T("DVB Subtitle");
+                            Complete_Stream->Streams[elementary_PID]->Infos["subtitling_type"].From_Number(subtitling_type);
                         }
                         break;
             default    : ;

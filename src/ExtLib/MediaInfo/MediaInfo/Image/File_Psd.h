@@ -30,12 +30,41 @@ namespace MediaInfoLib
 
 class File_Psd : public File__Analyze
 {
+public:
+    enum step
+    {
+        Step_ColorModeData,
+        Step_ImageResources,
+        Step_ImageResourcesBlock,
+        Step_LayerAndMaskInformation,
+        Step_ImageData,
+    };
+    step Step;
+
 protected :
     //Buffer - File header
     bool FileHeader_Begin();
+    void FileHeader_Parse();
+
+    //Buffer - Per element
+    void Header_Parse();
+    void Data_Parse();
 
     //Elements
-    void Read_Buffer_Continue();
+    void ColorModeData();
+    void ImageResources();
+    void ImageResourcesBlock();
+    void LayerAndMaskInformation();
+    void ImageData();
+    void CaptionDigest();
+    void IPTCNAA();
+    void JPEGQuality();
+    void Thumbnail();
+    void VersionInfo();
+    void Thumbnail_New() { Thumbnail(); }
+
+    //Temp
+    int64u Alignment_ExtraByte = 0; //Padding from the container
 };
 
 } //NameSpace

@@ -53,7 +53,6 @@ private :
 
     //Buffer - Per element
     void Header_Parse();
-    bool Header_Parser_Fill_Size();
     void Data_Parse();
 
     //Elements
@@ -64,6 +63,9 @@ private :
     int8u PAR_W;
     int8u PAR_H;
     bool  Temporal_Reference_IsValid;
+
+    //Utils
+    size_t Header_Parser_GetSize();
 };
 
 } //NameSpace

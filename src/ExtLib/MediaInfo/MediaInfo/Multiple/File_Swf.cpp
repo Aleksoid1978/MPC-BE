@@ -690,7 +690,7 @@ bool File_Swf::Decompress()
     MI.Version=Version;
     auto File_Size_Sav=File_Size;
     File_Size=Dest_Size;
-    Open_Buffer_Init(&MI);
+    Open_Buffer_Init(&MI, Dest_Size);
     MI.Open_Buffer_Continue(Dest, Dest_Size);
     MI.Open_Buffer_Finalize();
     File_Size=File_Size_Sav;

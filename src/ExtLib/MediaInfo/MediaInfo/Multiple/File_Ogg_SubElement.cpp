@@ -865,6 +865,18 @@ void File_Ogg_SubElement::Comment()
     Merge(Vorbis, Stream_General,  0, 0);
     Merge(Vorbis, StreamKind,      0, 0);
     Merge(Vorbis, Stream_Menu,     0, 0);
+    auto ImageCount = Vorbis.Count_Get(Stream_Image);
+    for (size_t i = 0; i < ImageCount; i++) {
+        Stream_Prepare(Stream_Image);
+        Merge(Vorbis, Stream_Image, i, StreamPos_Last);
+        string MuxingMode = "Vorbis Comment";
+        const auto& MuxingMode2 = Retrieve_Const(Stream_Image, StreamPos_Last, Image_MuxingMode).To_UTF8();
+        if (!MuxingMode2.empty()) {
+            MuxingMode += " / ";
+            MuxingMode += MuxingMode2;
+        }
+        Fill(Stream_Image, StreamPos_Last, Image_MuxingMode, MuxingMode, true, true);
+    }
     #else
     if (Element_Offset<Element_Size)
     {

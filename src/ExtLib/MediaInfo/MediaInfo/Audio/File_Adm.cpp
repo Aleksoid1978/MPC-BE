@@ -1745,17 +1745,17 @@ static attribute_items tag_Attributes =
 static_assert(sizeof(tag_Attributes) / sizeof(attribute_item) == tag_Attribute_Max, IncoherencyMessage);
 
 static const char* formatDefinition_List[] = { "PCM" };
-enum format
+enum format : int8s
 {
-    Format_Unknown,
+    Format_Unknown = -1,
     Format_PCM,
     Format_Max
 };
-static_assert(1 + sizeof(formatDefinition_List) / sizeof(formatDefinition_List[0]) == Format_Max, IncoherencyMessage);
+static_assert(sizeof(formatDefinition_List) / sizeof(formatDefinition_List[0]) == Format_Max, IncoherencyMessage);
 static const char* typeDefinition_List[] = { "DirectSpeakers", "Matrix", "Objects", "HOA", "Binaural" };
-enum type
+enum type : int8s
 {
-    Type_Unknown,
+    Type_Unknown = -1,
     Type_DirectSpeakers,
     Type_Matrix,
     Type_Objects,
@@ -1763,7 +1763,7 @@ enum type
     Type_Binaural,
     Type_Max
 };
-static_assert(1 + sizeof(typeDefinition_List) / sizeof(typeDefinition_List[0]) == Type_Max, IncoherencyMessage);
+static_assert(sizeof(typeDefinition_List) / sizeof(typeDefinition_List[0]) == Type_Max, IncoherencyMessage);
 enum style : int8u {
     Style_Format,
     Style_Type,
@@ -4512,7 +4512,7 @@ int file_adm_private::parse(const void* const Buffer, size_t Buffer_Size)
     #define ELEMENT_e(NAME,UP,CALL) \
                 else { \
                     string Value = tfsxml_decode(b); \
-                    if (Extra[Level].find(Value) == Extra[Level].end()) { \
+                    if (Extra[Level].find(Value) == Extra[Level].end() && Value.rfind("!--", 0)) { \
                         Extra[Level].insert(Value); \
                         Check_Elements_NotPartOfSpecs(item_##NAME, Items[item_##NAME].Items.size() - 1, b, NAME##_Content); \
                     } \

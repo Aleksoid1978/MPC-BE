@@ -56,7 +56,7 @@ const char* Elf_osabi(int8u osabi)
 }
 
 //---------------------------------------------------------------------------
-const char* Elf_type(int16u type)
+string Elf_type(int16u type)
 {
     switch (type)
     {
@@ -64,12 +64,12 @@ const char* Elf_type(int16u type)
         case   2 : return "Executable";
         case   3 : return "Shared object";
         case   4 : return "Core";
-        default  : return "";
+        default  : return std::to_string(type);
     }
 }
 
 //---------------------------------------------------------------------------
-const char* Elf_machine(int16u machine)
+string Elf_machine(int16u machine)
 {
     switch (machine)
     {
@@ -149,7 +149,8 @@ const char* Elf_machine(int16u machine)
         case  92 : return "OpenRISC 32-bit";
         case  93 : return "ARC Cores Tangent-A5";
         case  94 : return "Tensilica Xtensa";
-        default  : return "";
+        case 183 : return "ARM64";
+        default  : return std::to_string(machine);
     }
 }
 

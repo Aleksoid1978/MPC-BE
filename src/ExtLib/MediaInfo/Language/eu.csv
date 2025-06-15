@@ -343,6 +343,7 @@ Cover_Datas;Azal datuak
 Cover_Description;Azal azalpena
 Cover_Mime;Azal MIME
 Cover_Type;Azal mota
+CoverData;
 Cropped;Mozketa neurriak
 Custom;Egilea
 CustomDownmixTargets;
@@ -380,6 +381,7 @@ DisplayCaptions_Content;
 DisplayCaptions_Stream;
 DistributedBy;Banatzailea
 Distributor;
+Documents;
 Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Eman dirulaguntza bat
@@ -515,6 +517,7 @@ FrameRate_Num;
 FrameRate_Original;Jatorrizko frame neurria
 FrameRate_Real;
 FullParsing;
+Gallery;
 General;Orokorra
 GeneralCompliance;
 Genre;Mota
@@ -978,6 +981,7 @@ Language_zh-yue;
 Language_zu;Zuluera
 Languages;
 LawRating;Lege maila
+LegacyStreamDisplay;
 LCCN;LCCN
 LfeAttenuationKnown;
 LfeMixGain;
@@ -1223,6 +1227,7 @@ Sheet;Orria
 Sheet (Complete);Orria (Osoa)
 Shell extension;Explorer hedapena (Windows Explorer, eskuin klikatu agiri bat, MediaInfo aukera bat egongo da)
 Shell extension, folder;Agiritegientzat ere bai
+Shell extension, separate instance;
 Shell InfoTip;Explorer Tresnaburua (Explorerrean, mugitu sagua agiriaren gainean, argibideak erakutsiko dira)
 ShimName;
 ShimVersion;

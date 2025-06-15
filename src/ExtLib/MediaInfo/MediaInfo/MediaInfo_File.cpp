@@ -21,6 +21,13 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
+#define SAFE_DELETE(p) \
+{\
+    CS.Enter(); \
+    delete p; \
+    p=NULL; \
+    CS.Leave(); \
+}
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/MediaInfo_Internal.h"
@@ -255,6 +262,9 @@
 #if defined(MEDIAINFO_FLAC_YES)
     #include "MediaInfo/Audio/File_Flac.h"
 #endif
+#if defined(MEDIAINFO_IAMF_YES)
+    #include "MediaInfo/Audio/File_Iamf.h"
+#endif
 #if defined(MEDIAINFO_IT_YES)
     #include "MediaInfo/Audio/File_ImpulseTracker.h"
 #endif
@@ -384,11 +394,23 @@
 #if defined(MEDIAINFO_TGA_YES)
     #include "MediaInfo/Image/File_Tga.h"
 #endif
+#if defined(MEDIAINFO_WEBP_YES)
+    #include "MediaInfo/Image/File_WebP.h"
+#endif
 
 //---------------------------------------------------------------------------
 // Tag
+#if defined(MEDIAINFO_C2PA_YES)
+    #include "MediaInfo/Tag/File_C2pa.h"
+#endif
 #if defined(MEDIAINFO_ICC_YES)
     #include "MediaInfo/Tag/File_Icc.h"
+#endif
+#if defined(MEDIAINFO_SPHERICALVIDEO_YES)
+    #include "MediaInfo/Tag/File_SphericalVideo.h"
+#endif
+#if defined(MEDIAINFO_XMP_YES)
+    #include "MediaInfo/Tag/File_Xmp.h"
 #endif
 
 //---------------------------------------------------------------------------
@@ -410,6 +432,9 @@
 #endif
 #if defined(MEDIAINFO_ISO9660_YES)
     #include "MediaInfo/Archive/File_Iso9660.h"
+#endif
+#if defined(MEDIAINFO_MACHO_YES)
+    #include "MediaInfo/Archive/File_MachO.h"
 #endif
 #if defined(MEDIAINFO_MZ_YES)
     #include "MediaInfo/Archive/File_Mz.h"
@@ -668,6 +693,9 @@ static File__Analyze* SelectFromExtension(const String& Parser)
     #if defined(MEDIAINFO_FLAC_YES)
         if (Parser==__T("Flac"))        return new File_Flac();
     #endif
+    #if defined(MEDIAINFO_IAMF_YES)
+        if (Parser == __T("Iamf"))      return new File_Iamf();
+    #endif
     #if defined(MEDIAINFO_IT_YES)
         if (Parser==__T("It"))          return new File_ImpulseTracker();
     #endif
@@ -794,8 +822,14 @@ static File__Analyze* SelectFromExtension(const String& Parser)
     #if defined(MEDIAINFO_TGA_YES)
         if (Parser==__T("Tga"))         return new File_Tga();
     #endif
+    #if defined(MEDIAINFO_WEBP_YES)
+        if (Parser==__T("WebP"))        return new File_WebP();
+    #endif
 
     // Tags
+    #if defined(MEDIAINFO_C2PA_YES)
+        if (Parser==__T("C2pa"))        return new File_C2pa();
+    #endif
     #if defined(MEDIAINFO_ICC_YES)
         if (Parser==__T("Icc"))          return new File_Icc();
     #endif
@@ -821,6 +855,9 @@ static File__Analyze* SelectFromExtension(const String& Parser)
     #endif
     #if defined(MEDIAINFO_MZ_YES)
         if (Parser==__T("Mz"))          return new File_Mz();
+    #endif
+    #if defined(MEDIAINFO_MACHO_YES)
+        if (Parser==__T("MachO"))       return new File_MachO();
     #endif
     #if defined(MEDIAINFO_RAR_YES)
         if (Parser==__T("Rar"))         return new File_Rar();
@@ -860,406 +897,421 @@ int MediaInfo_Internal::ListFormats(const String &File_Name)
 {
     // Multiple
     #if defined(MEDIAINFO_AAF_YES)
-        delete Info; Info=new File_Aaf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Aaf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_BDAV_YES)
-        delete Info; Info=new File_MpegTs(); ((File_MpegTs*)Info)->BDAV_Size=4; if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
-        delete Info; Info=new File_MpegTs(); ((File_MpegTs*)Info)->BDAV_Size=4; ((File_MpegTs*)Info)->NoPatPmt=true; if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_MpegTs(); ((File_MpegTs*)Info)->BDAV_Size=4; if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_MpegTs(); ((File_MpegTs*)Info)->BDAV_Size=4; ((File_MpegTs*)Info)->NoPatPmt=true; if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_BDMV_YES)
-        delete Info; Info=new File_Bdmv();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Bdmv();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_CDXA_YES)
-        delete Info; Info=new File_Cdxa();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Cdxa();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_DASHMPD_YES)
-        delete Info; Info=new File_DashMpd();            if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_DashMpd();            if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_DCP_YES)
-        delete Info; Info=new File_DcpAm();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_DcpAm();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_DCP_YES)
-        delete Info; Info=new File_DcpCpl();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_DcpCpl();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_DCP_YES)
-        delete Info; Info=new File_DcpPkl();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_DcpPkl();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_DVDIF_YES)
-        delete Info; Info=new File_DvDif();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_DvDif();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_DVDV_YES)
-        delete Info; Info=new File_Dvdv();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Dvdv();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_DXW_YES)
-        delete Info; Info=new File_Dxw();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Dxw();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_FLV_YES)
-        delete Info; Info=new File_Flv();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Flv();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_GXF_YES)
-        delete Info; Info=new File_Gxf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Gxf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_HDSF4M_YES)
-        delete Info; Info=new File_HdsF4m();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_HdsF4m();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_HLS_YES)
-        delete Info; Info=new File_Hls();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Hls();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_IBI_YES)
-        delete Info; Info=new File_Ibi();                 if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Ibi();                 if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_ISM_YES)
-        delete Info; Info=new File_Ism();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Ism();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_IVF_YES)
-        delete Info; Info=new File_Ivf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Ivf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_LXF_YES)
-        delete Info; Info=new File_Lxf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Lxf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_MK_YES)
-        delete Info; Info=new File_Mk();                 if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Mk();                 if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_MIXML_YES)
-        delete Info; Info=new File_MiXml();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_MiXml();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_MPEG4_YES)
-        delete Info; Info=new File_Mpeg4();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Mpeg4();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_MPEGPS_YES)
-        delete Info; Info=new File_MpegPs();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_MpegPs();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_MPEGTS_YES)
-        delete Info; Info=new File_MpegTs();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
-        delete Info; Info=new File_MpegTs(); ((File_MpegTs*)Info)->NoPatPmt=true; if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_MpegTs();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_MpegTs(); ((File_MpegTs*)Info)->NoPatPmt=true; if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_MPLI_YES)
-        delete Info; Info=new File_Mpli();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Mpli();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_MXF_YES)
-        delete Info; Info=new File_Mxf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Mxf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_NSV_YES)
-        delete Info; Info=new File_Nsv();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Nsv();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_NUT_YES)
-        delete Info; Info=new File_Nut();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Nut();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_OGG_YES)
-        delete Info; Info=new File_Ogg();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Ogg();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_P2_YES)
-        delete Info; Info=new File_P2_Clip();            if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_P2_Clip();            if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_PMP_YES)
-        delete Info; Info=new File_Pmp();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Pmp();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_PTX_YES)
-        delete Info; Info=new File_Ptx();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Ptx();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_RIFF_YES)
-        delete Info; Info=new File_Riff();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Riff();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_RM_YES)
-        delete Info; Info=new File_Rm();                 if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Rm();                 if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_SEQUENCEINFO_YES)
-        delete Info; Info=new File_SequenceInfo();       if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_SequenceInfo();       if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_SKM_YES)
-        delete Info; Info=new File_Skm();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Skm();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_SWF_YES)
-        delete Info; Info=new File_Swf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Swf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_TSP_YES)
-        delete Info; Info=new File_MpegTs(); ((File_MpegTs*)Info)->TSP_Size=16; if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
-        delete Info; Info=new File_MpegTs(); ((File_MpegTs*)Info)->TSP_Size=16; ((File_MpegTs*)Info)->NoPatPmt=true; if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_MpegTs(); ((File_MpegTs*)Info)->TSP_Size=16; if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_MpegTs(); ((File_MpegTs*)Info)->TSP_Size=16; ((File_MpegTs*)Info)->NoPatPmt=true; if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_WM_YES)
-        delete Info; Info=new File_Wm();                 if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Wm();                 if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_WTV_YES)
-        delete Info; Info=new File_Wtv();                 if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Wtv();                 if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_XDCAM_YES)
-        delete Info; Info=new File_Xdcam_Clip();         if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Xdcam_Clip();         if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_DPG_YES)
-        delete Info; Info=new File_Dpg();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Dpg();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
 
     // Video
     #if defined(MEDIAINFO_AV1_YES)
-        delete Info; Info=new File_Av1();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Av1();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_AVC_YES)
-        delete Info; Info=new File_Avc();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Avc();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_MXF_YES)
-        delete Info; Info = new File_HdrVividMetadata(); if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name) > 0) return 1;
+        SAFE_DELETE(Info); Info = new File_HdrVividMetadata(); if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name) > 0) return 1;
     #endif
     #if defined(MEDIAINFO_HEVC_YES)
-        delete Info; Info=new File_Hevc();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Hevc();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_AVSV_YES)
-        delete Info; Info=new File_AvsV();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_AvsV();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_AVS3V_YES)
-        delete Info; Info=new File_Avs3V();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Avs3V();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_DIRAC_YES)
-        delete Info; Info=new File_Dirac();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Dirac();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_FLIC_YES)
-        delete Info; Info=new File_Flic();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Flic();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_H263_YES)
-        //delete Info; Info=new File_H263();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1; //At the end, too much sensible
+        //SAFE_DELETE(Info); Info=new File_H263();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1; //At the end, too much sensible
     #endif
     #if defined(MEDIAINFO_MPEG4V_YES)
-        delete Info; Info=new File_Mpeg4v();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Mpeg4v();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_MPEGV_YES)
-        delete Info; Info=new File_Mpegv();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Mpegv();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_VC1_YES)
-        delete Info; Info=new File_Vc1();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Vc1();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_VC3_YES)
-        delete Info; Info=new File_Vc3();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Vc3();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_Y4M_YES)
-        delete Info; Info=new File_Y4m();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Y4m();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
 
     // Audio
     #if defined(MEDIAINFO_AAC_YES)
-        delete Info; Info=new File_Aac();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Aac();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_AC3_YES)
-        delete Info; Info=new File_Ac3();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Ac3();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_AC4_YES)
-        delete Info; Info=new File_Ac4();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Ac4();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_SMPTEST0337_YES)
-        delete Info; Info=new File_SmpteSt0337();        if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_SmpteSt0337();        if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_ALS_YES)
-        delete Info; Info=new File_Als();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Als();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_AMR_YES)
-        delete Info; Info=new File_Amr();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Amr();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_AMV_YES)
-        delete Info; Info=new File_Amv();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Amv();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_APE_YES)
-        delete Info; Info=new File_Ape();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Ape();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_APTX100_YES)
-        delete Info; Info=new File_Aptx100();            if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Aptx100();            if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_AU_YES)
-        delete Info; Info=new File_Au();                 if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Au();                 if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_CAF_YES)
-        delete Info; Info=new File_Caf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Caf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_DSF_YES)
-        delete Info; Info=new File_Dsf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Dsf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_DSDIFF_YES)
-        delete Info; Info=new File_Dsdiff();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Dsdiff();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_DTS_YES)
-        delete Info; Info=new File_Dts();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Dts();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_DTSUHD_YES)
-        delete Info; Info=new File_DtsUhd();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_DtsUhd();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_DAT_YES)
-        delete Info; Info=new File_Dat();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Dat();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
 //    Too many false-positives
 //    #if defined(MEDIAINFO_DOLBYE_YES)
-//        delete Info; Info=new File_DolbyE();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+//       SAFE_DELETE(Info); Info=new File_DolbyE();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
 //    #endif
     #if defined(MEDIAINFO_FLAC_YES)
-        delete Info; Info=new File_Flac();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Flac();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+    #endif
+    #if defined(MEDIAINFO_IAMF_YES)
+        SAFE_DELETE(Info); Info=new File_Iamf();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_IT_YES)
-        delete Info; Info=new File_ImpulseTracker();     if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_ImpulseTracker();     if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_LA_YES)
-        delete Info; Info=new File_La();                 if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_La();                 if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_MIDI_YES)
-        delete Info; Info=new File_Midi();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Midi();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_MOD_YES)
-        delete Info; Info=new File_Module();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Module();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_MPC_YES)
-        delete Info; Info=new File_Mpc();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Mpc();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_MPCSV8_YES)
-        delete Info; Info=new File_MpcSv8();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_MpcSv8();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_OPENMG_YES)
-        delete Info; Info=new File_OpenMG();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_OpenMG();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_RKAU_YES)
-        delete Info; Info=new File_Rkau();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Rkau();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_TAK_YES)
-        delete Info; Info=new File_Tak();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Tak();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_S3M_YES)
-        delete Info; Info=new File_ScreamTracker3();     if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_ScreamTracker3();     if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_TTA_YES)
-        delete Info; Info=new File_Tta();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Tta();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_TWINVQ_YES)
-        delete Info; Info=new File_TwinVQ();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_TwinVQ();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_WVPK_YES)
-        delete Info; Info=new File_Wvpk();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Wvpk();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_XM_YES)
-        delete Info; Info=new File_ExtendedModule();     if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_ExtendedModule();     if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
 
     // Text
     #if defined(MEDIAINFO_N19_YES)
-        delete Info; Info=new File_N19();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_N19();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_PAC_YES)
-        delete Info; Info=new File_Pac();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Pac();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_PDF_YES)
-        delete Info; Info=new File_Pdf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Pdf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_SCC_YES)
-        delete Info; Info=new File_Scc();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Scc();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_SDP_YES)
-        delete Info; Info=new File_Sdp();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Sdp();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_SUBRIP_YES)
-        delete Info; Info=new File_SubRip();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_SubRip();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_TELETEXT_YES)
-        delete Info; Info=new File_Teletext();           if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Teletext();           if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_TTML_YES)
-        delete Info; Info=new File_Ttml();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Ttml();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_OTHERTEXT_YES)
-        delete Info; Info=new File_OtherText();          if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_OtherText();          if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
 
     // Image
     #if defined(MEDIAINFO_ARRIRAW_YES)
-        delete Info; Info=new File_ArriRaw();            if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_ArriRaw();            if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_BMP_YES)
-        delete Info; Info=new File_Bmp();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Bmp();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_BPG_YES)
-        delete Info; Info=new File_Bpg();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Bpg();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_DDS_YES)
-        delete Info; Info=new File_Dds();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Dds();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_DPX_YES)
-        delete Info; Info=new File_Dpx();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Dpx();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_GIF_YES)
-        delete Info; Info=new File_Gif();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Gif();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_ICO_YES)
-        delete Info; Info=new File_Ico();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Ico();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_JPEG_YES)
-        delete Info; Info=new File_Jpeg();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Jpeg();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_PCX_YES)
-        delete Info; Info=new File_Pcx();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Pcx();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_PNG_YES)
-        delete Info; Info=new File_Png();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Png();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_PSD_YES)
-        delete Info; Info=new File_Psd();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Psd();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_TIFF_YES)
-        delete Info; Info=new File_Tiff();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Tiff();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_TGA_YES)
         //delete Info; Info=new File_Tga();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1; //At the end, too much sensible
     #endif
+    #if defined(MEDIAINFO_WEBP_YES)
+        SAFE_DELETE(Info); Info=new File_WebP();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+    #endif
 
     // Archive
     #if defined(MEDIAINFO_ACE_YES)
-        delete Info; Info=new File_Ace();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Ace();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_7Z_YES)
-        delete Info; Info=new File_7z();                 if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_7z();                 if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_BZIP2_YES)
-        delete Info; Info=new File_Bzip2();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Bzip2();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_ELF_YES)
-        delete Info; Info=new File_Elf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Elf();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_GZIP_YES)
-        delete Info; Info=new File_Gzip();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Gzip();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_ISO9660_YES)
-        delete Info; Info=new File_Iso9660();            if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Iso9660();            if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+    #endif
+    #if defined(MEDIAINFO_MACHO_YES)
+        SAFE_DELETE(Info); Info=new File_MachO();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_MZ_YES)
-        delete Info; Info=new File_Mz();                 if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Mz();                 if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_RAR_YES)
-        delete Info; Info=new File_Rar();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Rar();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_TAR_YES)
-        delete Info; Info=new File_Tar();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Tar();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_ZIP_YES)
-        delete Info; Info=new File_Zip();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Zip();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
 
     // Other
     #if !defined(MEDIAINFO_OTHER_NO)
-        delete Info; Info=new File_Other();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Other();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
 
     //At the end, too much sensible
     #if defined(MEDIAINFO_MPEGA_YES)
-        delete Info; Info=new File_Mpega();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Mpega();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_TGA_YES)
-        delete Info; Info=new File_Tga();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1; //At the end, too much sensible
+        SAFE_DELETE(Info); Info=new File_Tga();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1; //At the end, too much sensible
     #endif
     #if defined(MEDIAINFO_H263_YES)
-        delete Info; Info=new File_H263();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_H263();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_ICC_YES)
-        delete Info; Info=new File_Icc();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Icc();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+    #endif
+    #if defined(MEDIAINFO_SPHERICALVIDEO_YES)
+        SAFE_DELETE(Info); Info=new File_SphericalVideo();    if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+    #endif
+    #if defined(MEDIAINFO_XMP_YES)
+        SAFE_DELETE(Info); Info=new File_Xmp();                if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
 
     //At the end, could load too much data for nothing
     #if defined(MEDIAINFO_ADM_YES)
-        delete Info; Info=new File_Adm();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Adm();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
 
     // Default (empty)
-        delete Info; Info=new File_Unknown();            if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        SAFE_DELETE(Info); Info=new File_Unknown();            if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     return 0;
 }
 #endif //!defined(MEDIAINFO_FILE_YES)
@@ -1270,10 +1322,10 @@ bool MediaInfo_Internal::LibraryIsModified ()
     #if defined(MEDIAINFO_MULTI_NO) || defined(MEDIAINFO_VIDEO_NO) || defined(MEDIAINFO_AUDIO_NO) || defined(MEDIAINFO_TEXT_NO) || defined(MEDIAINFO_IMAGE_NO) || defined(MEDIAINFO_ARCHIVE_NO) \
      || defined(MEDIAINFO_BDAV_NO) || defined(MEDIAINFO_MK_NO) || defined(MEDIAINFO_OGG_NO) || defined(MEDIAINFO_RIFF_NO) || defined(MEDIAINFO_MPEG4_NO) || defined(MEDIAINFO_MPEGPS_NO) || defined(MEDIAINFO_MPEGTS_NO) || defined(MEDIAINFO_DXW_NO) || defined(MEDIAINFO_FLV_NO) || defined(MEDIAINFO_GXF_NO) || defined(MEDIAINFO_HDSF4M_NO) || defined(MEDIAINFO_HLS_NO) || defined(MEDIAINFO_ISM_NO) || defined(MEDIAINFO_IVF_NO) || defined(MEDIAINFO_LXF_NO) || defined(MEDIAINFO_SWF_NO) || defined(MEDIAINFO_MXF_NO) || defined(MEDIAINFO_NSV_NO) || defined(MEDIAINFO_NUT_NO) || defined(MEDIAINFO_WM_NO) || defined(MEDIAINFO_WTV_NO) || defined(MEDIAINFO_QT_NO) || defined(MEDIAINFO_RM_NO) || defined(MEDIAINFO_DVDIF_NO) || defined(MEDIAINFO_DVDV_NO) || defined(MEDIAINFO_AAF_NO) || defined(MEDIAINFO_CDXA_NO) || defined(MEDIAINFO_DPG_NO) || defined(MEDIAINFO_TSP_NO) \
      || defined(MEDIAINFO_AV1_NO) || defined(MEDIAINFO_AVC_NO) || defined(MEDIAINFO_AVSV_NO) || defined(MEDIAINFO_HEVC_NO) || defined(MEDIAINFO_MPEG4V_NO) || defined(MEDIAINFO_MPEGV_NO) || defined(MEDIAINFO_FLIC_NO) || defined(MEDIAINFO_THEORA_NO) || defined(MEDIAINFO_Y4M_NO) \
-     || defined(MEDIAINFO_AC3_NO) || defined(MEDIAINFO_AC4_NO) || defined(MEDIAINFO_ADIF_NO) || defined(MEDIAINFO_ADTS_NO) || defined(MEDIAINFO_SMPTEST0337_NO) || defined(MEDIAINFO_AMR_NO) || defined(MEDIAINFO_DTS_NO) || defined(MEDIAINFO_DOLBYE_NO) || defined(MEDIAINFO_FLAC_NO) || defined(MEDIAINFO_APE_NO) || defined(MEDIAINFO_MPC_NO) || defined(MEDIAINFO_MPCSV8_NO) || defined(MEDIAINFO_MPEGA_NO) || defined(MEDIAINFO_OPENMG_NO) || defined(MEDIAINFO_TWINVQ_NO) || defined(MEDIAINFO_XM_NO) || defined(MEDIAINFO_MOD_NO) || defined(MEDIAINFO_S3M_NO) || defined(MEDIAINFO_IT_NO) || defined(MEDIAINFO_SPEEX_NO) || defined(MEDIAINFO_TAK_NO) || defined(MEDIAINFO_PS2A_NO) \
+     || defined(MEDIAINFO_AC3_NO) || defined(MEDIAINFO_AC4_NO) || defined(MEDIAINFO_ADIF_NO) || defined(MEDIAINFO_ADTS_NO) || defined(MEDIAINFO_SMPTEST0337_NO) || defined(MEDIAINFO_AMR_NO) || defined(MEDIAINFO_DTS_NO) || defined(MEDIAINFO_DOLBYE_NO) || defined(MEDIAINFO_FLAC_NO) || defined(MEDIAINFO_IAMF_NO) || defined(MEDIAINFO_APE_NO) || defined(MEDIAINFO_MPC_NO) || defined(MEDIAINFO_MPCSV8_NO) || defined(MEDIAINFO_MPEGA_NO) || defined(MEDIAINFO_OPENMG_NO) || defined(MEDIAINFO_TWINVQ_NO) || defined(MEDIAINFO_XM_NO) || defined(MEDIAINFO_MOD_NO) || defined(MEDIAINFO_S3M_NO) || defined(MEDIAINFO_IT_NO) || defined(MEDIAINFO_SPEEX_NO) || defined(MEDIAINFO_TAK_NO) || defined(MEDIAINFO_PS2A_NO) \
      || defined(MEDIAINFO_CMML_NO)  || defined(MEDIAINFO_KATE_NO)  || defined(MEDIAINFO_PGS_NO) || defined(MEDIAINFO_OTHERTEXT_NO) \
-     || defined(MEDIAINFO_ARRIRAW_NO) || defined(MEDIAINFO_BMP_NO) || defined(MEDIAINFO_DDS_NO) || defined(MEDIAINFO_DPX_NO) || defined(MEDIAINFO_EXR_NO) || defined(MEDIAINFO_GIF_NO) || defined(MEDIAINFO_ICO_NO) || defined(MEDIAINFO_JPEG_NO) || defined(MEDIAINFO_PNG_NO) || defined(MEDIAINFO_TGA_NO) || defined(MEDIAINFO_TIFF_NO) \
-     || defined(MEDIAINFO_7Z_NO) || defined(MEDIAINFO_ZIP_NO) || defined(MEDIAINFO_RAR_NO) || defined(MEDIAINFO_ACE_NO) || defined(MEDIAINFO_ELF_NO) || defined(MEDIAINFO_MZ_NO) \
+     || defined(MEDIAINFO_ARRIRAW_NO) || defined(MEDIAINFO_BMP_NO) || defined(MEDIAINFO_DDS_NO) || defined(MEDIAINFO_DPX_NO) || defined(MEDIAINFO_EXR_NO) || defined(MEDIAINFO_GIF_NO) || defined(MEDIAINFO_ICO_NO) || defined(MEDIAINFO_JPEG_NO) || defined(MEDIAINFO_PNG_NO) || defined(MEDIAINFO_TGA_NO) || defined(MEDIAINFO_TIFF_NO) || defined(MEDIAINFO_WEBP_NO) \
+     || defined(MEDIAINFO_7Z_NO) || defined(MEDIAINFO_ZIP_NO) || defined(MEDIAINFO_RAR_NO) || defined(MEDIAINFO_ACE_NO) || defined(MEDIAINFO_ELF_NO) || defined(MEDIAINFO_MACHO_NO) || defined(MEDIAINFO_MZ_NO) \
      || defined(MEDIAINFO_OTHER_NO) || defined(MEDIAINFO_DUMMY_NO)
         return true;
     #else

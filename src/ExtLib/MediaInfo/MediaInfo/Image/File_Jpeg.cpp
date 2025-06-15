@@ -12,6 +12,7 @@
 // http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 // http://www.w3.org/Graphics/JPEG/jfif3.pdf
 // http://www.sentex.net/~mwandel/jhead/
+// https://github.com/corkami/formats/blob/master/image/jpeg.md
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -33,8 +34,20 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Image/File_Jpeg.h"
+#if defined(MEDIAINFO_PSD_YES)
+    #include "MediaInfo/Image/File_Psd.h"
+#endif
+#if defined(MEDIAINFO_C2PA_YES)
+    #include "MediaInfo/Tag/File_C2pa.h"
+#endif
+#if defined(MEDIAINFO_EXIF_YES)
+    #include "MediaInfo/Tag/File_Exif.h"
+#endif
 #if defined(MEDIAINFO_ICC_YES)
     #include "MediaInfo/Tag/File_Icc.h"
+#endif
+#if defined(MEDIAINFO_XMP_YES)
+    #include "MediaInfo/Tag/File_Xmp.h"
 #endif
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #include "ZenLib/Utils.h"
@@ -54,6 +67,23 @@ namespace MediaInfoLib
 namespace Elements
 {
     const int16u TEM =0xFF01;
+    const int16u RE30=0xFF30; //JPEG 2000
+    const int16u RE31=0xFF31; //JPEG 2000
+    const int16u RE32=0xFF32; //JPEG 2000
+    const int16u RE33=0xFF33; //JPEG 2000
+    const int16u RE34=0xFF34; //JPEG 2000
+    const int16u RE35=0xFF35; //JPEG 2000
+    const int16u RE36=0xFF36; //JPEG 2000
+    const int16u RE37=0xFF37; //JPEG 2000
+    const int16u RE38=0xFF38; //JPEG 2000
+    const int16u RE39=0xFF39; //JPEG 2000
+    const int16u RE3A=0xFF3A; //JPEG 2000
+    const int16u RE3B=0xFF3B; //JPEG 2000
+    const int16u RE3C=0xFF3C; //JPEG 2000
+    const int16u RE3D=0xFF3D; //JPEG 2000
+    const int16u RE3E=0xFF3E; //JPEG 2000
+    const int16u RE3F=0xFF3F; //JPEG 2000
+    const int16u RE44=0xFF44; //JPEG 2000 Found with Kakadu
     const int16u SOC =0xFF4F; //JPEG 2000
     const int16u CAP =0xFF50; //JPEG 2000
     const int16u SIZ =0xFF51; //JPEG 2000
@@ -62,17 +92,25 @@ namespace Elements
     const int16u TLM =0xFF55; //JPEG 2000
     const int16u PLM =0xFF57; //JPEG 2000
     const int16u PLT =0xFF58; //JPEG 2000
+    const int16u CPF =0xFF59; //JPEG 2000 HT
     const int16u QCD =0xFF5C; //JPEG 2000
     const int16u QCC =0xFF5D; //JPEG 2000
     const int16u RGN =0xFF5E; //JPEG 2000
     const int16u POC =0xFF5F; //JPEG 2000
     const int16u PPM =0xFF60; //JPEG 2000
     const int16u PPT =0xFF61; //JPEG 2000
+    const int16u CRG =0xFF63; //JPEG 2000
     const int16u CME =0xFF64; //JPEG 2000
+    const int16u SEC =0xFF65; //JPEG 2000 Secure
+    const int16u EPB =0xFF66; //JPEG 2000 Wireless
+    const int16u ESD =0xFF67; //JPEG 2000 Wireless
+    const int16u EPC =0xFF68; //JPEG 2000 Wireless
+    const int16u RED =0xFF69; //JPEG 2000 Wireless
     const int16u SOT =0xFF90; //JPEG 2000
     const int16u SOP =0xFF91; //JPEG 2000
     const int16u EPH =0xFF92; //JPEG 2000
     const int16u SOD =0xFF93; //JPEG 2000
+    const int16u ISEC=0xFF94; //JPEG 2000 Secure
     const int16u SOF0=0xFFC0;
     const int16u SOF1=0xFFC1;
     const int16u SOF2=0xFFC2;
@@ -250,12 +288,6 @@ File_Jpeg::File_Jpeg()
     #endif //MEDIAINFO_DEMUX
 }
 
-//---------------------------------------------------------------------------
-File_Jpeg::~File_Jpeg()
-{
-    delete ICC_Parser;
-}
-
 //***************************************************************************
 // Streams management
 //***************************************************************************
@@ -266,14 +298,11 @@ void File_Jpeg::Streams_Accept()
     if (!IsSub)
     {
         TestContinuousFileNames();
-        if (Config->File_Names.size()>1)
-            StreamKind=Stream_Video;
-
+        if (Config->File_Names.size() > 1 || Config->File_IsReferenced_Get())
+            StreamKind = Stream_Video;
         if (!Count_Get(StreamKind))
             Stream_Prepare(StreamKind);
-        if (File_Size!=(int64u)-1)
-            Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize), File_Size);
-        if (StreamKind_Last==Stream_Video)
+        if (Config->File_Names.size() > 1)
             Fill(Stream_Video, StreamPos_Last, Video_FrameCount, Config->File_Names.size());
     }
     else
@@ -286,8 +315,30 @@ void File_Jpeg::Streams_Accept()
 //---------------------------------------------------------------------------
 void File_Jpeg::Streams_Finish()
 {
-    if (StreamKind_Last==Stream_Video && Config->ParseSpeed>=1.0)
-        Fill (Stream_Video, 0, Video_StreamSize, Buffer_TotalBytes, 10, true);
+    for (const auto& Item : XmpExt_List)
+    {
+        if (Item.second.Parser) {
+            Item.second.Parser->Finish();
+            Merge(*Item.second.Parser, Stream_General, 0, 0);
+            Merge(*Item.second.Parser, false);
+        }
+    }
+    for (const auto& Item : JpegXtExt_List)
+    {
+        if (Item.second.Parser) {
+            Item.second.Parser->Finish();
+            Merge(*Item.second.Parser, Stream_General, 0, 0);
+            Merge(*Item.second.Parser, false);
+        }
+    }
+
+    if (Data_Size != (int64u)-1) {
+        if (StreamKind == Stream_Video && !IsSub && File_Size != (int64u)-1 && !Config->File_Sizes.empty())
+            Fill(Stream_Video, 0, Video_StreamSize, File_Size - (File_Size - Data_Size) * Config->File_Sizes.size()); //We guess that the metadata part has a fixed size
+        if (StreamKind == Stream_Image && (IsSub || File_Size != (int64u)-1)) {
+            Fill(Stream_Image, 0, Image_StreamSize, Data_Size);
+        }
+    }
 }
 
 //***************************************************************************
@@ -362,6 +413,8 @@ void File_Jpeg::Synched_Init()
 {
     APP0_JFIF_Parsed=false;
     SOS_SOD_Parsed=false;
+    CME_Text_Parsed=false;
+    Data_Size=0;
     APPE_Adobe0_transform=(int8u)-1;
 }
 
@@ -468,6 +521,7 @@ bool File_Jpeg::Demux_UnpacketizeContainer_Test()
 void File_Jpeg::Read_Buffer_Unsynched()
 {
     SOS_SOD_Parsed=false;
+    Data_Size=(int64u)-1;
 
     Read_Buffer_Unsynched_OneFramePerFile();
 }
@@ -536,6 +590,22 @@ void File_Jpeg::Header_Parse()
     switch (code)
     {
         case Elements::TEM :
+        case Elements::RE30 :
+        case Elements::RE31 :
+        case Elements::RE32 :
+        case Elements::RE33 :
+        case Elements::RE34 :
+        case Elements::RE35 :
+        case Elements::RE36 :
+        case Elements::RE37 :
+        case Elements::RE38 :
+        case Elements::RE39 :
+        case Elements::RE3A :
+        case Elements::RE3B :
+        case Elements::RE3C :
+        case Elements::RE3D :
+        case Elements::RE3E :
+        case Elements::RE3F :
         case Elements::RST0 :
         case Elements::RST1 :
         case Elements::RST2 :
@@ -609,6 +679,23 @@ void File_Jpeg::Data_Parse()
     switch (Element_Code)
     {
         CASE_INFO(TEM ,                                         "TEM");
+        CASE_INFO(RE30,                                         "Reserved"); //JPEG 2000
+        CASE_INFO(RE31,                                         "Reserved"); //JPEG 2000
+        CASE_INFO(RE32,                                         "Reserved"); //JPEG 2000
+        CASE_INFO(RE33,                                         "Reserved"); //JPEG 2000
+        CASE_INFO(RE34,                                         "Reserved"); //JPEG 2000
+        CASE_INFO(RE35,                                         "Reserved"); //JPEG 2000
+        CASE_INFO(RE36,                                         "Reserved"); //JPEG 2000
+        CASE_INFO(RE37,                                         "Reserved"); //JPEG 2000
+        CASE_INFO(RE38,                                         "Reserved"); //JPEG 2000
+        CASE_INFO(RE39,                                         "Reserved"); //JPEG 2000
+        CASE_INFO(RE3A,                                         "Reserved"); //JPEG 2000
+        CASE_INFO(RE3B,                                         "Reserved"); //JPEG 2000
+        CASE_INFO(RE3C,                                         "Reserved"); //JPEG 2000
+        CASE_INFO(RE3D,                                         "Reserved"); //JPEG 2000
+        CASE_INFO(RE3E,                                         "Reserved"); //JPEG 2000
+        CASE_INFO(RE3F,                                         "Reserved"); //JPEG 2000
+        CASE_INFO(RE44,                                         "Reserved"); //JPEG 2000
         CASE_INFO(SOC ,                                         "Start of codestream"); //JPEG 2000
         CASE_INFO(CAP ,                                         "Extended capabilities"); //JPEG 2000
         CASE_INFO(SIZ ,                                         "Image and tile size"); //JPEG 2000
@@ -617,17 +704,25 @@ void File_Jpeg::Data_Parse()
         CASE_INFO(TLM ,                                         "Tile-part lengths, main header"); //JPEG 2000
         CASE_INFO(PLM ,                                         "Packet length, main header"); //JPEG 2000
         CASE_INFO(PLT ,                                         "Packet length, tile-part header"); //JPEG 2000
+        CASE_INFO(CPF ,                                         "Corresponding Profile"); //JPEG 2000 HT
         CASE_INFO(QCD ,                                         "Quantization default"); //JPEG 2000
         CASE_INFO(QCC ,                                         "Quantization component "); //JPEG 2000
         CASE_INFO(RGN ,                                         "Region-of-interest"); //JPEG 2000
         CASE_INFO(POC ,                                         "Progression order change"); //JPEG 2000
         CASE_INFO(PPM ,                                         "Packed packet headers, main header"); //JPEG 2000
         CASE_INFO(PPT ,                                         "Packed packet headers, tile-part header"); //JPEG 2000
+        CASE_INFO(CRG ,                                         "Component registration"); //JPEG 2000
         CASE_INFO(CME ,                                         "Comment and extension"); //JPEG 2000
+        CASE_INFO(SEC ,                                         "Security"); //JPEG 2000 Secure
+        CASE_INFO(EPB ,                                         "Error protection block"); //JPEG 2000 Wireless
+        CASE_INFO(ESD ,                                         "Error sensitivity descriptor"); //JPEG 2000 Wireless
+        CASE_INFO(EPC ,                                         "Error Protection Capability"); //JPEG 2000 Wireless
+        CASE_INFO(RED ,                                         "Residual error descriptor"); //JPEG 2000 Wireless
         CASE_INFO(SOT ,                                         "Start of tile-part"); //JPEG 2000
         CASE_INFO(SOP ,                                         "Start of packet"); //JPEG 2000
         CASE_INFO(EPH ,                                         "End of packet header"); //JPEG 2000
         CASE_INFO(SOD ,                                         "Start of data"); //JPEG 2000
+        CASE_INFO(ISEC,                                         "In-codestream security"); //JPEG 2000 Secure
         CASE_INFO(SOF0,                                         "Baseline DCT (Huffman)");
         CASE_INFO(SOF1,                                         "Extended sequential DCT (Huffman)");
         CASE_INFO(SOF2,                                         "Progressive DCT (Huffman)");
@@ -693,6 +788,7 @@ void File_Jpeg::Data_Parse()
         CASE_INFO(COM ,                                         "Comment");
         default : Element_Info1("Reserved");
                   Skip_XX(Element_Size,                         "Data");
+                  Data_Size = (int64u)-1;
     }
 }
 
@@ -746,6 +842,8 @@ void File_Jpeg::CAP()
         }
         Element_End0();
     }
+
+    Data_Common();
 }
 
 //---------------------------------------------------------------------------
@@ -813,6 +911,7 @@ void File_Jpeg::SIZ()
             Accept("JPEG 2000");
             Fill("JPEG 2000");
 
+            Fill(Stream_General, 0, General_Format, "JPEG 2000");
             if (Count_Get(StreamKind_Last)==0)
                 Stream_Prepare(StreamKind_Last);
             Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Format), "JPEG 2000");
@@ -859,6 +958,8 @@ void File_Jpeg::SIZ()
             }
         }
     FILLING_END();
+
+    Data_Common();
 }
 
 //---------------------------------------------------------------------------
@@ -913,6 +1014,8 @@ void File_Jpeg::COD()
             }
         }
     FILLING_END();
+
+    Data_Common();
 }
 
 //---------------------------------------------------------------------------
@@ -921,12 +1024,56 @@ void File_Jpeg::QCD()
     //Parsing
     Skip_B1(                                                    "Sqcd - Style");
     Skip_XX(Element_Size-Element_Offset,                        "QCD data");
+
+    Data_Common();
+}
+
+//---------------------------------------------------------------------------
+void File_Jpeg::CME()
+{
+    //Parsing
+    int16u Registration;
+    Get_B2 (Registration,                                       "Registration");
+    if (Registration != 1 && Element_Size >= 16) {
+        int64u Probe;
+        Peek_B8(Probe);
+        if (Probe == 0x4372656174656420) { // "Created "
+            Registration = 0x0001;
+        }
+    }
+    switch (Registration) {
+    case 0x0000: {
+        Skip_XX(Element_Size - Element_Offset,                  "Comment");
+        if (!CME_Text_Parsed) {
+            Fill(IsSub ? StreamKind_Last : Stream_General, 0, "Comment", "(Binary)");
+        }
+        break;
+        }
+    case 0x0001: {
+        string Comment;
+        Get_String(Element_Size - Element_Offset, Comment,      "Comment");
+        auto StreamKind = IsSub ? StreamKind_Last : Stream_General;
+        Fill(StreamKind, 0, "Comment", Comment, true, Comment.rfind(Retrieve_Const(StreamKind, 0, "Comment").To_UTF8(), 0) == 0);
+        break;
+    }
+    default: {
+        Skip_XX(Element_Size - Element_Offset,                  "Comment");
+        if (!CME_Text_Parsed) {
+            Fill(IsSub ? StreamKind_Last : Stream_General, 0, "Comment", "(Unknown)");
+        }
+    }
+    }
+    CME_Text_Parsed = true;
 }
 
 //---------------------------------------------------------------------------
 void File_Jpeg::SOD()
 {
     SOS_SOD_Parsed=true;
+    if (Data_Size != (int64u)-1) {
+        Data_Size += IsSub ? (Buffer_Size - (Buffer_Offset + Element_Size)) : (File_Size - (File_Offset + Buffer_Offset + Element_Size));
+    }
+    Data_Common();
     if (Interlaced)
     {
         Field_Count++;
@@ -978,6 +1125,7 @@ void File_Jpeg::SOF_()
             Accept("JPEG");
             Fill("JPEG");
 
+            Fill(Stream_General, 0, General_Format, "JPEG");
             if (Count_Get(StreamKind_Last)==0)
                 Stream_Prepare(StreamKind_Last);
             Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Format), "JPEG");
@@ -1088,6 +1236,8 @@ void File_Jpeg::SOF_()
             }
         }
     FILLING_END();
+
+    Data_Common();
 }
 
 //---------------------------------------------------------------------------
@@ -1107,6 +1257,10 @@ void File_Jpeg::SOS()
 
     FILLING_BEGIN_PRECISE();
     SOS_SOD_Parsed=true;
+    if (Data_Size != (int64u)-1) {
+        Data_Size += IsSub ? (Buffer_Size - (Buffer_Offset + Element_Size)) : (File_Size - (File_Offset + Buffer_Offset + Element_Size));
+    }
+    Data_Common();
     if (Interlaced)
     {
         Field_Count++;
@@ -1262,28 +1416,107 @@ void File_Jpeg::APP0_JFFF_3B()
 void File_Jpeg::APP1()
 {
     //Parsing
-    int64u Name;
-    Get_C6(Name,                                                "Name");
-
-    switch (Name)
-    {
-        case 0x457869660000LL : APP1_EXIF(); break; //"Exif\0\0"
-        default               : Skip_XX(Element_Size-Element_Offset, "Data");
+    if (Element_Size >= 29 && !strncmp((const char*)Buffer + Buffer_Offset, "http://ns.adobe.com/xap/1.0/", 29)) { // the char* contains a terminating \0
+        Skip_String(29,                                         "Name");
+        APP1_XMP();
+        return;
     }
+    if (Element_Size >= 29 && !strncmp((const char*)Buffer + Buffer_Offset, "http://ns.adobe.com/xmp/extension/", 35)) { // the char* contains a terminating \0
+        Skip_String(35,                                         "Name");
+        APP1_XMP_Extension();
+        return;
+    }
+    if (Element_Size >= 6 && !strncmp((const char*)Buffer + Buffer_Offset, "Exif\0", 6)) { // the char* contains a second terminating \0
+        Skip_String( 6,                                         "Name");
+        APP1_EXIF();
+        return;
+    }
+    Skip_XX(Element_Size - Element_Offset,                      "(Unknown)");
 }
 
 //---------------------------------------------------------------------------
 void File_Jpeg::APP1_EXIF()
 {
+    Accept();
+
     Element_Info1("Exif");
 
     //Parsing
-    int32u Alignment;
-    Get_C4(Alignment,                                           "Alignment");
-    if (Alignment==0x49492A00)
-        Skip_B4(                                                "First_IFD");
-    if (Alignment==0x4D4D2A00)
-        Skip_L4(                                                "First_IFD");
+    #if defined(MEDIAINFO_EXIF_YES)
+    File_Exif MI;
+    Open_Buffer_Init(&MI);
+    Open_Buffer_Continue(&MI);
+    Open_Buffer_Finalize(&MI);
+    Merge(MI, Stream_General, 0, 0, false);
+    Merge(MI, Stream_Image, 0, 0, false);
+    size_t Count = MI.Count_Get(Stream_Image);
+    for (size_t i = 1; i < Count; ++i) {
+        Merge(MI, Stream_Image, i, StreamPos_Last + 1, false);
+    }
+    #else
+    Skip_UTF8(Element_Size - Element_Offset,                    "EXIF Tags");
+    #endif
+}
+
+//---------------------------------------------------------------------------
+void File_Jpeg::APP1_XMP()
+{
+    Accept();
+
+    Element_Info1("XMP");
+
+    //Parsing
+    #if defined(MEDIAINFO_XMP_YES)
+    File_Xmp MI;
+    Open_Buffer_Init(&MI);
+    auto Element_Offset_Sav = Element_Offset;
+    Open_Buffer_Continue(&MI);
+    Element_Offset = Element_Offset_Sav;
+    Open_Buffer_Finalize(&MI);
+    Element_Show(); //TODO: why is it needed?
+    Merge(MI, Stream_General, 0, 0, false);
+    #endif
+    Skip_UTF8(Element_Size - Element_Offset,                    "XMP metadata");
+}
+
+//---------------------------------------------------------------------------
+void File_Jpeg::APP1_XMP_Extension()
+{
+    Accept();
+
+    Element_Info1("Extended XMP");
+
+    //Parsing
+    string GUID;
+    int32u Size, Offset;
+    Get_String(32, GUID,                                        "GUID");
+    Get_B4 (Size,                                               "Full length");
+    Get_B4 (Offset,                                             "Chunk offset");
+    #if defined(MEDIAINFO_XMP_YES)
+    auto Item = XmpExt_List.find(GUID);
+    if (Item == XmpExt_List.end()) {
+        if (Offset) {
+            Skip_XX(Element_Size - Element_Offset,              "(Missing start of content)");
+            return;
+        }
+        xmpext XmpExt(new File_Xmp());
+        Open_Buffer_Init(XmpExt.Parser.get());
+        Item = XmpExt_List.emplace(GUID, std::move(XmpExt)).first;
+    }
+    if (Offset != Item->second.LastOffset) {
+        Skip_XX(Element_Size - Element_Offset,                  "(Missing intermediate content)");
+        return;
+    }
+    Item->second.LastOffset += (int32u)(Element_Size - Element_Offset);
+    auto& MI = *(File_Xmp*)Item->second.Parser.get();
+    MI.Wait = Item->second.LastOffset < Size;
+    auto Element_Offset_Sav = Element_Offset;
+    Open_Buffer_Continue(&MI);
+    Element_Offset = Element_Offset_Sav;
+    Element_Show();
+    #endif
+    Skip_UTF8(Element_Size - Element_Offset,                    "XMP metadata");
+    return;
 }
 
 //---------------------------------------------------------------------------
@@ -1306,23 +1539,20 @@ void File_Jpeg::APP2_ICC_PROFILE()
         Skip_Local(12,                                          "Signature");
         Get_B1 (Pos,                                            "Chunk position");
         Get_B1 (Max,                                            "Chunk max");
-        if (Pos==1)
-        {
+        if (Pos == 1) {
             Accept("JPEG");
-            delete ICC_Parser;
-            ICC_Parser=new File_Icc();
-            ((File_Icc*)ICC_Parser)->StreamKind=StreamKind;
-            Open_Buffer_Init(ICC_Parser);
+            ICC_Parser.reset(new File_Icc());
+            ((File_Icc*)ICC_Parser.get())->StreamKind = StreamKind;
+            Open_Buffer_Init(ICC_Parser.get());
         }
-        if (ICC_Parser)
-        {
-            ((File_Icc*)ICC_Parser)->Frame_Count_Max=Max;
-            ((File_Icc*)ICC_Parser)->IsAdditional=true;
-            Open_Buffer_Continue(ICC_Parser);
-            if (Pos==Max)
-            {
-                Open_Buffer_Finalize(ICC_Parser);
-                Merge(*ICC_Parser, StreamKind, 0, 0);
+        if (ICC_Parser) {
+            ((File_Icc*)ICC_Parser.get())->Frame_Count_Max = Max;
+            ((File_Icc*)ICC_Parser.get())->IsAdditional = true;
+            Open_Buffer_Continue(ICC_Parser.get());
+            if (Pos == Max) {
+                Open_Buffer_Finalize(ICC_Parser.get());
+                Merge(*ICC_Parser.get(), StreamKind, 0, 0);
+                ICC_Parser.reset();
             }
         }
         else
@@ -1333,6 +1563,106 @@ void File_Jpeg::APP2_ICC_PROFILE()
     #else
         Skip_XX(Element_Size-Element_Offset,                    "ICC profile");
     #endif
+}
+
+//---------------------------------------------------------------------------
+void File_Jpeg::APPB()
+{
+    //Parsing
+    int16u Name;
+    Get_C2(Name,                                                "Name");
+    switch (Name)
+    {
+    case 0x4A50 : APPB_JPEGXT(); break; //"JP"
+    default     : Skip_XX(Element_Size - Element_Offset,        "Unknown");
+    }
+}
+
+//---------------------------------------------------------------------------
+void File_Jpeg::APPB_JPEGXT()
+{
+    Accept();
+
+    Element_Info1("JPEG XT");
+
+    //Parsing
+    int32u SequenceNumber, Name;
+    int16u Instance;
+    Get_B2 (Instance,                                           "Box Instance");
+    Get_B4 (SequenceNumber,                                     "Packet Sequence Number");
+
+    //Probe if likely C2PA
+    Element_Offset += 4;
+    Peek_B4(Name);
+    Element_Offset -= 4;
+
+    switch (Name)
+    {
+    case 0x6A756D62 : APPB_JPEGXT_JUMB(Instance, SequenceNumber); break; //"jumb"
+    default         : Skip_XX(Element_Size - Element_Offset, "Unknown");
+    }
+}
+
+//---------------------------------------------------------------------------
+void File_Jpeg::APPB_JPEGXT_JUMB(int16u Instance, int32u SequenceNumber)
+{
+    #if defined(MEDIAINFO_C2PA_YES)
+    auto Item = JpegXtExt_List.find(Instance);
+    if (Item == JpegXtExt_List.end()) {
+        if (SequenceNumber > 1) {
+            Skip_XX(Element_Size - Element_Offset,              "(Missing start of content)");
+            return;
+        }
+        jpegxtext JpegXtExt(new File_C2pa());
+        JpegXtExt.LastSequenceNumber = SequenceNumber;
+        int32u Size;
+        Peek_B4(Size);
+        Open_Buffer_Init(JpegXtExt.Parser.get(), Size);
+        Item = JpegXtExt_List.emplace(Instance, std::move(JpegXtExt)).first;
+    }
+    else {
+        auto TheoreticalSequenceNumber = Item->second.LastSequenceNumber + 1;
+        if (SequenceNumber != TheoreticalSequenceNumber) {
+            Skip_XX(Element_Size - Element_Offset,              "(Missing intermediate content)");
+            return;
+        }
+        Item->second.LastSequenceNumber = TheoreticalSequenceNumber;
+        Skip_B4(                                                "Total size repeated?");
+        Skip_C4(                                                "jumb repeated?");
+    }
+    auto& MI = *Item->second.Parser.get();
+    Open_Buffer_Continue(&MI);
+    #endif
+    Element_Show();
+    return;
+}
+
+//---------------------------------------------------------------------------
+void File_Jpeg::APPD()
+{
+    if (Element_Size >= 14 && !strncmp((const char*)Buffer + Buffer_Offset, "Photoshop 3.0", 14)) { // the char* contains a terminating \0
+        Element_Info1("Photoshop");
+        Skip_String(14,                                         "Name");
+
+        //Parsing
+        #if defined(MEDIAINFO_PSD_YES)
+        File_Psd MI;
+        MI.Step = File_Psd::Step_ImageResourcesBlock;
+        Open_Buffer_Init(&MI);
+        Open_Buffer_Continue(&MI);
+        Open_Buffer_Finalize(&MI);
+        Merge(MI, Stream_General, 0, 0, false);
+        Merge(MI, Stream_Image, 0, 0, false);
+        size_t Count = MI.Count_Get(Stream_Image);
+        for (size_t i = 1; i < Count; ++i) {
+            Merge(MI, Stream_Image, i, StreamPos_Last + 1, false);
+        }
+        #else
+        Skip_UTF8(Element_Size - Element_Offset,                "Photoshop Tags");
+        #endif
+    }
+    else
+        Skip_XX(Element_Size,                                   "(Unknown)");
 }
 
 //---------------------------------------------------------------------------
@@ -1369,6 +1699,34 @@ void File_Jpeg::APPE_Adobe0()
     }
     else
         Skip_XX(Element_Size-Element_Offset,                    "unknown");
+}
+
+//---------------------------------------------------------------------------
+void File_Jpeg::COM()
+{
+    //Parsing
+    string Comment;
+    Get_String(Element_Size - Element_Offset, Comment,          "Comment");
+    auto StreamKind = IsSub ? StreamKind_Last : Stream_General;
+    if (Comment.rfind("AVID", 0) == 0) {
+        Fill(StreamKind, 0, "Encoded_Application_CompanyName", "Avid");
+    }
+    else {
+        Fill(StreamKind, 0, "Comment", Comment);
+    }
+}
+
+//***************************************************************************
+// Helpers
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void File_Jpeg::Data_Common()
+{
+    Skip_XX(Element_Size - Element_Offset,                      "Data");
+    if (Data_Size != (int64u)-1) {
+        Data_Size += Header_Size + Element_Size;
+    }
 }
 
 } //NameSpace

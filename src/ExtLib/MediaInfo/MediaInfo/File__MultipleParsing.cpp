@@ -239,6 +239,9 @@
 #if defined(MEDIAINFO_FLAC_YES)
     #include "MediaInfo/Audio/File_Flac.h"
 #endif
+#if defined(MEDIAINFO_IAMF_YES)
+    #include "MediaInfo/Audio/File_Iamf.h"
+#endif
 #if defined(MEDIAINFO_IT_YES)
     #include "MediaInfo/Audio/File_ImpulseTracker.h"
 #endif
@@ -364,6 +367,12 @@
 // Tag
 #if defined(MEDIAINFO_ICC_YES)
     #include "MediaInfo/Tag/File_Icc.h"
+#endif
+#if defined(MEDIAINFO_SPHERICALVIDEO_YES)
+    #include "MediaInfo/Tag/File_SphericalVideo.h"
+#endif
+#if defined(MEDIAINFO_XMP_YES)
+    #include "MediaInfo/Tag/File_Xmp.h"
 #endif
 
 //---------------------------------------------------------------------------
@@ -596,7 +605,7 @@ File__MultipleParsing::File__MultipleParsing()
         Parser.push_back(new File_Vc1());
     #endif
     #if defined(MEDIAINFO_VC3_YES)
-        Parser.push_back(new File_Vc3());
+        //Parser.push_back(new File_Vc3());
     #endif
     #if defined(MEDIAINFO_Y4M_YES)
         Parser.push_back(new File_Y4m());
@@ -773,6 +782,14 @@ File__MultipleParsing::File__MultipleParsing()
         Parser.push_back(new File_Tiff());
     #endif
 
+    // Tag
+    #if defined(MEDIAINFO_SPHERICALVIDEO_YES)
+        Parser.push_back(new File_SphericalVideo());
+    #endif
+    #if defined(MEDIAINFO_XMP_YES)
+        Parser.push_back(new File_Xmp());
+    #endif
+
     // Archive
     #if defined(MEDIAINFO_7Z_YES)
         Parser.push_back(new File_7z());
@@ -833,6 +850,19 @@ File__MultipleParsing::~File__MultipleParsing()
 }
 
 //***************************************************************************
+// Streams management
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void File__MultipleParsing::Streams_Finish()
+{
+    if (Parser.size()==1 && Parser.front()->Status[IsAccepted])
+    {
+        Parser.front()->Finish();
+    }
+}
+
+//***************************************************************************
 // Buffer - Global
 //***************************************************************************
 
@@ -848,6 +878,7 @@ void File__MultipleParsing::Read_Buffer_Init()
         #else //MEDIAINFO_TRACE
             Parser[Pos]->Init(Config, Stream, Stream_More);
         #endif //MEDIAINFO_TRACE
+        Parser[Pos]->IsSub=IsSub;
         Parser[Pos]->File_Name=File_Name;
         Parser[Pos]->Open_Buffer_Init(File_Size);
     }

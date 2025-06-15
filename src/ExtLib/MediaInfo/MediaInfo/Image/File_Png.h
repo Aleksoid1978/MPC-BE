@@ -39,6 +39,7 @@ public :
 private :
     //Streams management
     void Streams_Accept();
+    void Streams_Finish();
 
     //Buffer - File header
     bool FileHeader_Begin();
@@ -61,21 +62,39 @@ private :
 
     //Elements
     void IDAT();
-    void IEND() {}
+    void IEND() { Data_Common(); }
     void IHDR();
-    void PLTE() {Skip_XX(Element_Size, "Data");}
+    void JDAT();
+    void JHDR() { Data_Common(); }
+    void MEND() { Data_Common(); }
+    void MHDR();
+    void PLTE() { Data_Common(); }
+    void acTL() { Data_Common(); }
+    void bKGD() { Data_Common(); }
+    void caBX();
+    void caNv() { Data_Common(); }
+    void cHRM() { Data_Common(); }
     void cICP();
     void cLLI();
     void cLLi() { cLLI(); }
-    void iCCP();
-    void iTXt() {Textual(bitset8().set(IsCompressed).set(IsUTF8));}
+    void eXIf();
+    void fcTL() { Data_Common(); }
+    void fdAT() { Data_Common(); }
     void gAMA();
+    void hIST() { Data_Common(); }
+    void iCCP();
+    void iTXt() { Textual(bitset8().set(IsCompressed).set(IsUTF8)); }
     void mDCV();
     void mDCv() { mDCV(); }
     void pHYs();
     void sBIT();
-    void tEXt() {Textual(bitset8());}
-    void zTXt() {Textual(bitset8().set(IsCompressed));}
+    void sPLT() { Data_Common(); }
+    void sRGB() { Data_Common(); }
+    void tEXt() { Textual(bitset8()); }
+    void tIME();
+    void tRNS() { Data_Common(); }
+    void vpAg() { Data_Common(); }
+    void zTXt() { Textual(bitset8().set(IsCompressed)); }
 
     //Helpers
     enum Text_Style
@@ -84,6 +103,12 @@ private :
         IsUTF8,
     };
     void Textual(bitset8 Method);
+    void Decode_RawProfile(const char* in, size_t in_len, const string& type);
+    void Data_Common();
+
+    //Temp
+    int64u Data_Size;
+    int32u Signature;
 };
 
 } //NameSpace

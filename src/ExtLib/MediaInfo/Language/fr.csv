@@ -343,6 +343,7 @@ Cover_Datas;Données de la pochette
 Cover_Description;Description de la pochette
 Cover_Mime;MIME MailExtension de la pochette
 Cover_Type;Type de la pochette
+CoverData;
 Cropped;Dimensions du retaillage
 Custom;Sortie personnalisée
 CustomDownmixTargets;Cibles de mixage réducteur personnalisé
@@ -980,6 +981,7 @@ Language_zh-yue;Cantonese
 Language_zu;Zulu
 Languages;
 LawRating;Classé
+LegacyStreamDisplay;
 LCCN;LCCN
 LfeAttenuationKnown;Atténuation basse fréquence connue
 LfeMixGain;Gain de mixage basse fréquence
@@ -1225,6 +1227,7 @@ Sheet;Tableau
 Sheet (Complete);Tableau (Complet)
 Shell extension;Extension du Shell (le clic droit sur un fichier multimédia propose un choix 'Media Info')
 Shell extension, folder;Extension du Shell pour les répertoires
+Shell extension, separate instance;
 Shell InfoTip;Bulle d'aide 'Explorateur' (survoller un fichier multimedia à la souris affichera toutes ses infos)
 ShimName;Nom de Shim
 ShimVersion;Version de Shim

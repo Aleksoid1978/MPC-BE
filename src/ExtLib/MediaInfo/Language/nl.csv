@@ -343,6 +343,7 @@ Cover_Datas;Covergegevens
 Cover_Description;Coverbeschrijving
 Cover_Mime;Cover-MIME
 Cover_Type;Coversoort
+CoverData;
 Cropped;Cropafmetingen
 Custom;Aangepast
 CustomDownmixTargets;
@@ -380,6 +381,7 @@ DisplayCaptions_Content;
 DisplayCaptions_Stream;
 DistributedBy;Gedistribueerd door
 Distributor;
+Documents;
 Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Doneren
@@ -515,6 +517,7 @@ FrameRate_Num;
 FrameRate_Original;Originele framerate
 FrameRate_Real;
 FullParsing;
+Gallery;
 General;Algemeen
 GeneralCompliance;
 Genre;Muziekstijl
@@ -978,6 +981,7 @@ Language_zh-yue;
 Language_zu;Zoeloe
 Languages;
 LawRating;Wettelijke rating
+LegacyStreamDisplay;
 LCCN;LCCN
 LfeAttenuationKnown;
 LfeMixGain;
@@ -1223,6 +1227,7 @@ Sheet;Blad
 Sheet (Complete);Blad (Compleet)
 Shell extension;Shell-extensie (in explorer-rechtsklikmenu zal een Media Info optie te zien zijn...)
 Shell extension, folder;
+Shell extension, separate instance;
 Shell InfoTip;Shell InfoTip (houd in explorer de muiscursor boven een bestand, info wordt getoond)
 ShimName;
 ShimVersion;

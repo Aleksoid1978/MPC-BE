@@ -260,6 +260,7 @@ private :
     void moov_trak_mdia_minf_stbl_stsd_xxxx_jp2h() {jp2h();}
     void moov_trak_mdia_minf_stbl_stsd_xxxx_jp2h_colr() {jp2h_colr();}
     void moov_trak_mdia_minf_stbl_stsd_xxxx_jp2h_ihdr() {jp2h_ihdr();}
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_iacb();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_lhvC();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_mdcv();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_mhaC();
@@ -330,6 +331,8 @@ private :
     void moov_trak_udta_free() { moov_udta_free(); }
     void moov_trak_udta_Xtra() { moov_udta_Xtra(); }
     void moov_trak_udta_xxxx();
+    void moov_trak_uuid();
+    void moov_trak_uuid_SphericalVideo();
     void moov_udta();
     void moov_udta_AllF();
     void moov_udta_chpl();
@@ -419,8 +422,16 @@ private :
     void Descriptors();
     void TimeCode_Associate(int32u TrackID);
     void AddCodecConfigurationBoxInfo();
+    void Loop_CheckValue(int32u& Value, int64u RemainingSize, int8u MinBlockSize, const char* Name);
+    void Loop_CheckValue(int32u& Value, int8u MinBlockSize, const char* Name);
+    void Loop_CheckValue(int16u& Value, int8u MinBlockSize, const char* Name) { int32u Value2 = Value; Loop_CheckValue(Value2, MinBlockSize, Name); Value = Value2; }
+    void Loop_CheckValue(int8u& Value, int8u MinBlockSize, const char* Name) { int32u Value2 = Value; Loop_CheckValue(Value2, MinBlockSize, Name); Value = Value2; }
+    void Loop_CheckValue_BS(int32u& Value, int8u MinBlockSize, const char* Name);
+    void Loop_CheckValue_BS(int16u& Value, int8u MinBlockSize, const char* Name) { int32u Value2 = Value; Loop_CheckValue_BS(Value2, MinBlockSize, Name); Value = Value2; }
+    void Loop_CheckValue_BS(int8u& Value, int8u MinBlockSize, const char* Name) { int32u Value2 = Value; Loop_CheckValue_BS(Value2, MinBlockSize, Name); Value = Value2; }
 
     //Temp
+    int128u                                 Name_UUID;
     bool List;
     bool                                    mdat_MustParse;
     int32u                                  moov_cmov_dcom_Compressor;
@@ -456,6 +467,9 @@ private :
     size_t                                  StreamOrder;
     int32u                                  meta_pitm_item_ID;
     std::vector<std::vector<int32u> >       meta_iprp_ipma_Entries;
+    #if MEDIAINFO_TRACE
+    int64u                                  meta_iprp_ipco_File_Offset;
+    #endif
     int8u*                                  meta_iprp_ipco_Buffer;
     size_t                                  meta_iprp_ipco_Buffer_Size; //Used as property_index if no buffer
     int16u                                  channelcount;
@@ -562,6 +576,7 @@ private :
         bool                    AllForcedSamples;
         bool                    IsImage;
         bool                    IsCaption;
+        bool                    MayHaveCaption;
         bool                    tkhd_Found;
         int32u                  TrackID;
         std::vector<mdat_Pos_Type> mdat_Pos;
@@ -661,6 +676,7 @@ private :
             AllForcedSamples=false;
             IsImage=false;
             IsCaption=false;
+            MayHaveCaption=false;
             tkhd_Found=false;
             CleanAperture_Width=0;
             CleanAperture_Height=0;

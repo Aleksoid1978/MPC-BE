@@ -343,6 +343,7 @@ Cover_Datas;封面数据
 Cover_Description;封面说明
 Cover_Mime;封面 MIME
 Cover_Type;封面类型
+CoverData;
 Cropped;裁剪信息
 Custom;自定义
 CustomDownmixTargets;自定义缩混目标
@@ -380,6 +381,7 @@ DisplayCaptions_Content;
 DisplayCaptions_Stream;
 DistributedBy;发行商
 Distributor;发行商
+Documents;
 Dolby_Atmos_Metadata;杜比全景声元数据
 DolbyAtmos;杜比全景声
 Donate;赞助
@@ -515,6 +517,7 @@ FrameRate_Num;
 FrameRate_Original;原始帧率
 FrameRate_Real;真实帧率
 FullParsing;
+Gallery;
 General;概览
 GeneralCompliance;
 Genre;流派
@@ -978,6 +981,7 @@ Language_zh-yue;
 Language_zu;祖鲁语 (Zulu)
 Languages;
 LawRating;分级
+LegacyStreamDisplay;
 LCCN;LCCN
 LfeAttenuationKnown;LFE 衰减是否已知
 LfeMixGain;LFE 混音增益
@@ -1223,6 +1227,7 @@ Sheet;表格
 Sheet (Complete);表格 (完整)
 Shell extension;文件资源管理器右键菜单 (为多媒体文件的右键菜单添加 MediaInfo 选项)
 Shell extension, folder;添加到文件夹右键菜单
+Shell extension, separate instance;
 Shell InfoTip;文件资源管理器工具提示 (将鼠标移到文件图标上会显示相关信息)
 ShimName;Shim 名称
 ShimVersion;Shim 版本

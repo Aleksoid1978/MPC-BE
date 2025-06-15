@@ -343,6 +343,7 @@ Cover_Datas;Կազմի տվյալները
 Cover_Description;Կազմի նկարագրությունը
 Cover_Mime;Կազմի MIME տեսակ
 Cover_Type;Կազմի տեսակը
+CoverData;
 Cropped;Կտրման չափերը
 Custom;Ընտրված
 CustomDownmixTargets;
@@ -380,6 +381,7 @@ DisplayCaptions_Content;
 DisplayCaptions_Stream;
 DistributedBy;Տարածողը
 Distributor;
+Documents;
 Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Օժանդակություն
@@ -515,6 +517,7 @@ FrameRate_Num;
 FrameRate_Original;Կադրերի հաճախ-ը օրիգինալում
 FrameRate_Real;
 FullParsing;
+Gallery;
 General;Ընդհանուր
 GeneralCompliance;
 Genre;Ժանրը
@@ -978,6 +981,7 @@ Language_zh-yue;
 Language_zu;Zulu
 Languages;
 LawRating;Իրավունքների սահ-ում
+LegacyStreamDisplay;
 LCCN;LCCN
 LfeAttenuationKnown;
 LfeMixGain;
@@ -1223,6 +1227,7 @@ Sheet;Աղյուսակ
 Sheet (Complete);Աղյուսակը (ամբողջական)
 Shell extension;Ինտեգրել Explorer-ում
 Shell extension, folder;Ինտեգրել թղթապանակների Explorer-ում
+Shell extension, separate instance;
 Shell InfoTip;Ցուցադրել հուշում Explorer-ում
 ShimName;
 ShimVersion;
@@ -1405,4 +1410,4 @@ Yes;Այո
 Your system;Ձեր համակարգը
 Your translation;
 ZZ_Automatic_Percent;65
-ZZ_AutomaticLanguage_Percent;70
+ZZ_AutomaticLanguage_Percent;69

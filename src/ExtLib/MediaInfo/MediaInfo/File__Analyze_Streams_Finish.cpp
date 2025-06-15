@@ -958,10 +958,12 @@ void File__Analyze::Streams_Finish_StreamOnly_General(size_t StreamPos)
     {
         const Ztring& Name=Retrieve(Stream_General, StreamPos, General_FileName);
         const Ztring& Extension=Retrieve(Stream_General, StreamPos, General_FileExtension);
-        if (!Name.empty() || !Extension.empty())
+        const Ztring& FormatName=Retrieve(Stream_General, StreamPos, General_Format);
+        auto IsMachOAndEmptyExtension = Extension.empty() && FormatName.rfind(__T("Mach-O"), 0)==0;
+        if ((!Name.empty() && !IsMachOAndEmptyExtension) || !Extension.empty())
         {
             InfoMap &FormatList=MediaInfoLib::Config.Format_Get();
-            InfoMap::iterator Format=FormatList.find(Retrieve(Stream_General, StreamPos, General_Format));
+            InfoMap::iterator Format=FormatList.find(FormatName);
             if (Format!=FormatList.end())
             {
                 ZtringList ValidExtensions;
@@ -1132,6 +1134,13 @@ void File__Analyze::Streams_Finish_StreamOnly_General(size_t StreamPos)
         const auto& Name=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Name);
         const auto& Model=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Model);
         const auto& Version=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Version);
+        if (!CompanyName.empty() && Model.rfind(CompanyName + __T(' '), 0) == 0) {
+            Fill(Stream_General, StreamPos, General_Encoded_Hardware_Model, Model.substr(CompanyName.size() + 1), true);
+        }
+        if (CompanyName == __T("NIKON CORPORATION") && Model.rfind(__T("NIKON "), 0) == 0) {
+            Fill(Stream_General, StreamPos, General_Encoded_Hardware_CompanyName, "Nikon", Unlimited, true, true);
+            Fill(Stream_General, StreamPos, General_Encoded_Hardware_Model, Model.substr(6), true);
+        }
         Ztring Hardware=CompanyName;
         if (!Name.empty())
         {
@@ -1152,6 +1161,20 @@ void File__Analyze::Streams_Finish_StreamOnly_General(size_t StreamPos)
         if (!Hardware.empty() && !Version.empty())
             Hardware+=Version;
         Fill(Stream_General, StreamPos, General_Encoded_Hardware_String, Hardware);
+    }
+
+    //Redundancy
+    if (Retrieve_Const(Stream_General, 0, General_Encoded_Application_Name).empty() && Retrieve_Const(Stream_General, 0, General_Encoded_Application).empty())
+    {
+        if (Retrieve_Const(Stream_General, 0, General_Comment) == __T("Created with GIMP") || Retrieve_Const(Stream_General, 0, General_Description) == __T("Created with GIMP"))
+            Fill(Stream_General, 0, General_Encoded_Application, "GIMP");
+    }
+    if (Retrieve_Const(Stream_General, 0, General_Encoded_Application_Name) == __T("GIMP") || Retrieve_Const(Stream_General, 0, General_Encoded_Application) == __T("GIMP") || !Retrieve_Const(Stream_General, 0, General_Encoded_Application).rfind(__T("GIMP ")))
+    {
+        if (Retrieve_Const(Stream_General, 0, General_Comment) == __T("Created with GIMP"))
+            Clear(Stream_General, StreamPos, General_Comment);
+        if (Retrieve_Const(Stream_General, 0, General_Description) == __T("Created with GIMP"))
+            Clear(Stream_General, StreamPos, General_Description);
     }
 }
 
@@ -1940,6 +1963,19 @@ void File__Analyze::Streams_Finish_StreamOnly_Image(size_t Pos)
             Fill(Stream_Image, Pos, Image_HDR_Format_Commercial, Commercial.Read());
         }
     }
+
+    if (Retrieve(Stream_Image, Pos, Image_Type_String).empty())
+    {
+        const auto& Type=Retrieve_Const(Stream_Image, Pos, Image_Type);
+        if (!Type.empty())
+        {
+            auto Type_String=__T("Type_")+Type;
+            auto Type_String2=MediaInfoLib::Config.Language_Get(Type_String);
+            if (Type_String2==Type_String)
+                Type_String2=Type;
+            Fill(Stream_Image, Pos, Image_Type_String, Type_String2);
+        }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -1992,8 +2028,9 @@ void File__Analyze::Streams_Finish_InterStreams()
         }
 
         //Filling
-        if (IsOK && StreamSize_Total>0 && StreamSize_Total<File_Size && (File_Size==StreamSize_Total || File_Size-StreamSize_Total>8)) //to avoid strange behavior due to rounding, TODO: avoid rounding
-            Fill(Stream_General, 0, General_StreamSize, File_Size-StreamSize_Total);
+        auto StreamSize=File_Size-StreamSize_Total;
+        if (IsOK && StreamSize_Total>0 && StreamSize_Total<File_Size && (File_Size==StreamSize_Total || !StreamSize || StreamSize>=4)) //to avoid strange behavior due to rounding, TODO: avoid rounding
+            Fill(Stream_General, 0, General_StreamSize, StreamSize);
     }
 
     //OverallBitRate if we have one Audio stream with bitrate
@@ -2182,7 +2219,7 @@ void File__Analyze::Streams_Finish_InterStreams()
                 else
                     StreamSizeIsValid=false;
             }
-        if (StreamSizeIsValid && (!StreamSize || StreamSize>8)) //to avoid strange behavior due to rounding, TODO: avoid rounding
+        if (StreamSizeIsValid && (!StreamSize || StreamSize>=4)) //to avoid strange behavior due to rounding, TODO: avoid rounding
             Fill(Stream_General, 0, General_StreamSize, StreamSize);
     }
 
@@ -2193,6 +2230,9 @@ void File__Analyze::Streams_Finish_InterStreams()
         bool IsCBR=true;
         bool IsVBR=false;
         for (size_t StreamKind=Stream_General+1; StreamKind<Stream_Menu; StreamKind++)
+        {
+            if (StreamKind==Stream_Image)
+                continue;
             for (size_t StreamPos=0; StreamPos<Count_Get((stream_t)StreamKind); StreamPos++)
             {
                 if (!IsValid)
@@ -2202,6 +2242,7 @@ void File__Analyze::Streams_Finish_InterStreams()
                 if (Retrieve((stream_t)StreamKind, StreamPos, Fill_Parameter((stream_t)StreamKind, Generic_BitRate_Mode))==__T("VBR"))
                     IsVBR=true;
             }
+        }
         if (IsValid)
         {
             if (IsCBR)

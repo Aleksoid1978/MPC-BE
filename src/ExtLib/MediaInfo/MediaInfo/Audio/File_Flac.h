@@ -32,6 +32,7 @@ public :
     //In
     bool NoFileHeader;
     bool VorbisHeader;
+    bool FromIamf;
 
     //Constructor/Destructor
     File_Flac();

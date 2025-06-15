@@ -447,7 +447,7 @@ Ztring ChannelLayout_2018_Rename(stream_t StreamKind, size_t Parameter, ZtringLi
     ShouldReturn=ShouldReturn_Save;
     return Info[Parameter];
 }
-Ztring ChannelLayout_2018_Rename(stream_t StreamKind, const Ztring& Parameter, const Ztring& Value, const Ztring& StreamFormat, bool &ShouldReturn)
+Ztring ChannelLayout_2018_Rename(stream_t StreamKind, const Ztring Parameter, const Ztring Value, const Ztring StreamFormat, bool &ShouldReturn)
 {
     bool ShouldReturn_Save=ShouldReturn;
     ShouldReturn=true;
@@ -1679,7 +1679,7 @@ std::bitset<32> MediaInfo_Internal::Open_Buffer_Continue (const int8u* ToAdd, si
         bool base64=MediaInfoLib::Config.FlagsX_Get(Flags_Input_base64);
         if (zlib || base64)
         {
-            if (ToAdd_Size!=Config.File_Size)
+            if (!ToAdd_Size || ToAdd_Size!=Config.File_Size)
             {
                 Info->ForceFinish(); // File must be complete when this option is used
                 return Info->Status;
@@ -1687,10 +1687,10 @@ std::bitset<32> MediaInfo_Internal::Open_Buffer_Continue (const int8u* ToAdd, si
             string Input_Cache; // In case of encoded content, this string must live up to the end of the parsing
             if (base64)
             {
-                Input_Cache.assign((const char*)ToAdd, ToAdd_Size); ;
+                Input_Cache.assign((const char*)ToAdd, ToAdd_Size);
                 Input_Cache=Base64::decode(Input_Cache);
                 ToAdd=(const int8u*)Input_Cache.c_str();
-                ToAdd_Size= Input_Cache.size();
+                ToAdd_Size=Input_Cache.size();
             }
             if (zlib)
             {

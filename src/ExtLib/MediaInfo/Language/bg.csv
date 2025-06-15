@@ -343,6 +343,7 @@ Cover_Datas;Калъфка_Дати
 Cover_Description;Калъфка_Описание
 Cover_Mime;Калъфка_Майм
 Cover_Type;Калъфка_Тип
+CoverData;
 Cropped;Умалена
 Custom;Потребителски
 CustomDownmixTargets;
@@ -380,6 +381,7 @@ DisplayCaptions_Content;
 DisplayCaptions_Stream;
 DistributedBy;РазпространенОт
 Distributor;
+Documents;
 Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Дари
@@ -515,6 +517,7 @@ FrameRate_Num;
 FrameRate_Original;СкоростКадри_Оригинално
 FrameRate_Real;
 FullParsing;
+Gallery;
 General;Генерално
 GeneralCompliance;
 Genre;Жанр
@@ -978,6 +981,7 @@ Language_zh-yue;
 Language_zu;
 Languages;
 LawRating;НисъкРейтинг
+LegacyStreamDisplay;
 LCCN;ЛССН
 LfeAttenuationKnown;
 LfeMixGain;
@@ -1223,6 +1227,7 @@ Sheet;Формуляр
 Sheet (Complete);Формуляр (Цялостен)
 Shell extension;Шел екстенция
 Shell extension, folder;Шел екстенция, папка
+Shell extension, separate instance;
 Shell InfoTip;Шел ИнфоИнфо
 ShimName;
 ShimVersion;

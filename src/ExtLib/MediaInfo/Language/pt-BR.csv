@@ -343,6 +343,7 @@ Cover_Datas;Dados da capa
 Cover_Description;Descrição da Capa
 Cover_Mime;MIME da Capa
 Cover_Type;Tipo de Capa
+CoverData;
 Cropped;Dimensões de corte
 Custom;Personalizado
 CustomDownmixTargets;
@@ -380,6 +381,7 @@ DisplayCaptions_Content;
 DisplayCaptions_Stream;
 DistributedBy;Distribuído por
 Distributor;
+Documents;
 Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Doar
@@ -515,6 +517,7 @@ FrameRate_Num;
 FrameRate_Original;Taxa de quadros original
 FrameRate_Real;
 FullParsing;
+Gallery;
 General;Geral
 GeneralCompliance;
 Genre;Gênero
@@ -978,6 +981,7 @@ Language_zh-yue;
 Language_zu;Zulu
 Languages;
 LawRating;Classificação
+LegacyStreamDisplay;
 LCCN;LCCN
 LfeAttenuationKnown;
 LfeMixGain;
@@ -1223,6 +1227,7 @@ Sheet;Formulário
 Sheet (Complete);Formulário (Completo)
 Shell extension;Extensão shell (no explorer, botão direito haverá uma opção Media Info)
 Shell extension, folder;Também para pastas
+Shell extension, separate instance;
 Shell InfoTip;Info. Shell (no explorer, mova o mouse sobre o arquivo, a info. será exibida)
 ShimName;
 ShimVersion;

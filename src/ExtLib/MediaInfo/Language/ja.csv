@@ -343,6 +343,7 @@ Cover_Datas;カバーデータ
 Cover_Description;カバー説明
 Cover_Mime;カバーの MIME
 Cover_Type;カバーの種類
+CoverData;
 Cropped;切り取り
 Custom;カスタム
 CustomDownmixTargets;
@@ -380,6 +381,7 @@ DisplayCaptions_Content;
 DisplayCaptions_Stream;
 DistributedBy;配給者
 Distributor;配給
+Documents;
 Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;寄付
@@ -515,6 +517,7 @@ FrameRate_Num;
 FrameRate_Original;元のフレームレート
 FrameRate_Real;
 FullParsing;
+Gallery;
 General;全般
 GeneralCompliance;
 Genre;ジャンル
@@ -978,6 +981,7 @@ Language_zh-yue;
 Language_zu;ズールー語
 Languages;
 LawRating;規制評価
+LegacyStreamDisplay;
 LCCN;LCCN
 LfeAttenuationKnown;
 LfeMixGain;
@@ -1223,6 +1227,7 @@ Sheet;シート
 Sheet (Complete);シート (完成)
 Shell extension;エクスプローラーに統合 (ファイルの右クリックメニューに登録)
 Shell extension, folder;フォルダーにも追加
+Shell extension, separate instance;
 Shell InfoTip;エクスプローラーでツールチップ (対応ファイル上でツールチップを表示)
 ShimName;Shim 名
 ShimVersion;Shim バージョン

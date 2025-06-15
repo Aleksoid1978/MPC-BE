@@ -343,6 +343,7 @@ Cover_Datas;Informació de la portada
 Cover_Description;Descripció de la portada
 Cover_Mime;Codificació de la portada
 Cover_Type;Tipus de portada
+CoverData;
 Cropped;Mida retallat
 Custom;Personalitzat
 CustomDownmixTargets;
@@ -380,6 +381,7 @@ DisplayCaptions_Content;
 DisplayCaptions_Stream;
 DistributedBy;Distribuït per
 Distributor;Distribuïdor
+Documents;
 Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Donació
@@ -515,6 +517,7 @@ FrameRate_Num;
 FrameRate_Original;Fotogrames per segon originals
 FrameRate_Real;
 FullParsing;
+Gallery;
 General;General
 GeneralCompliance;
 Genre;Gènere
@@ -978,6 +981,7 @@ Language_zh-yue;
 Language_zu;Zulú
 Languages;
 LawRating;Classificació llei
+LegacyStreamDisplay;
 LCCN;LCCN
 LfeAttenuationKnown;
 LfeMixGain;
@@ -1223,6 +1227,7 @@ Sheet;Fulla
 Sheet (Complete);Fulla (completa)
 Shell extension;Extensió Explorer (a Windows, clic dret a un arxiu mostrarà la opció MediaInfo)
 Shell extension, folder;També per a carpetes
+Shell extension, separate instance;
 Shell InfoTip;Consells Explorer (a Windows, mou el ratolí sobre un arxiu per mostrar info)
 ShimName;Nom de falca
 ShimVersion;Versió de falca
@@ -1404,5 +1409,5 @@ WrittenBy;Escrit per
 Yes;Sí
 Your system;El teu sistema
 Your translation;
-ZZ_Automatic_Percent;74
+ZZ_Automatic_Percent;73
 ZZ_AutomaticLanguage_Percent;77

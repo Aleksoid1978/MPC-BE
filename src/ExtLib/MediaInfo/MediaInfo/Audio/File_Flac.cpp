@@ -21,9 +21,9 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
+#include "MediaInfo/File__MultipleParsing.h"
 #include "MediaInfo/Audio/File_Flac.h"
 #include "MediaInfo/Tag/File_VorbisCom.h"
-#include "ThirdParty/base64/base64.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -34,7 +34,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-extern const char* Id3v2_PictureType(int8u Type); //In Tag/File_Id3v2.cpp
+extern std::string Id3v2_PictureType(int8u Type);
 extern std::string ExtensibleWave_ChannelMask (int32u ChannelMask); //In Multiple/File_Riff_Elements.cpp
 extern std::string ExtensibleWave_ChannelMask2 (int32u ChannelMask); //In Multiple/File_Riff_Elements.cpp
 extern std::string ExtensibleWave_ChannelMask_ChannelLayout(int32u ChannelMask); //In Multiple/File_Riff_Elements.cpp
@@ -53,6 +53,7 @@ File_Flac::File_Flac()
     //In
     NoFileHeader=false;
     VorbisHeader=false;
+    FromIamf=false;
 
     //Temp
     IsAudioFrames=false;
@@ -173,7 +174,7 @@ void File_Flac::Data_Parse()
         if (!IsSub)
             Fill(Stream_Audio, 0, Audio_StreamSize, File_Size-(File_Offset+Buffer_Offset+Element_Size));
 
-    if (Retrieve(Stream_Audio, 0, Audio_ChannelPositions).empty() && Retrieve(Stream_Audio, 0, Audio_ChannelPositions_String2).empty())
+    if (Retrieve(Stream_Audio, 0, Audio_ChannelPositions).empty() && Retrieve(Stream_Audio, 0, Audio_ChannelPositions_String2).empty() && !FromIamf)
     {
         int32u t = 0;
         int32s c = Retrieve(Stream_Audio, 0, Audio_Channel_s_).To_int32s();
@@ -225,8 +226,6 @@ void File_Flac::STREAMINFO()
             return;
         File__Tags_Helper::Accept("FLAC");
 
-        File__Tags_Helper::Streams_Fill();
-
         File__Tags_Helper::Stream_Prepare(Stream_Audio);
         Fill(Stream_Audio, 0, Audio_Format, "FLAC");
         Fill(Stream_Audio, 0, Audio_Codec, "FLAC");
@@ -235,15 +234,21 @@ void File_Flac::STREAMINFO()
          else
             Fill(Stream_Audio, 0, Audio_BitRate_Mode, "VBR");
         Fill(Stream_Audio, 0, Audio_SamplingRate, SampleRate);
-        Fill(Stream_Audio, 0, Audio_Channel_s_, Channels+1);
+        if (!FromIamf)
+            Fill(Stream_Audio, 0, Audio_Channel_s_, Channels+1);
         Fill(Stream_Audio, 0, Audio_BitDepth, BitPerSample+1);
         if (!IsSub && Samples)
             Fill(Stream_Audio, 0, Audio_SamplingCount, Samples);
-        Ztring MD5_PerItem;
-        MD5_PerItem.From_UTF8(uint128toString(MD5Stored, 16));
-        while (MD5_PerItem.size()<32)
-            MD5_PerItem.insert(MD5_PerItem.begin(), '0'); //Padding with 0, this must be a 32-byte string
-        Fill(Stream_Audio, 0, "MD5_Unencoded", MD5_PerItem);
+        if (!FromIamf || MD5Stored)
+        {
+            Ztring MD5_PerItem;
+            MD5_PerItem.From_UTF8(uint128toString(MD5Stored, 16));
+            while (MD5_PerItem.size()<32)
+                MD5_PerItem.insert(MD5_PerItem.begin(), '0'); //Padding with 0, this must be a 32-byte string
+            Fill(Stream_Audio, 0, "MD5_Unencoded", MD5_PerItem);
+        }
+
+        File__Tags_Helper::Streams_Fill();
     FILLING_END();
 }
 
@@ -302,24 +307,14 @@ void File_Flac::PICTURE()
     Get_B4 (Data_Size,                                          "Data size");
     if (Element_Offset+Data_Size>Element_Size)
         return; //There is a problem
+    auto Element_Size_Save=Element_Size;
+    Element_Size=Element_Offset+Data_Size;
 
     //Filling
-    Fill(Stream_General, 0, General_Cover, "Yes");
-    Fill(Stream_General, 0, General_Cover_Description, Description);
-    Fill(Stream_General, 0, General_Cover_Type, Id3v2_PictureType((int8u)PictureType));
-    Fill(Stream_General, 0, General_Cover_Mime, MimeType);
-    #if MEDIAINFO_ADVANCED
-        if (MediaInfoLib::Config.Flags1_Get(Flags_Cover_Data_base64))
-        {
-            std::string Data_Raw((const char*)(Buffer+(size_t)(Buffer_Offset+Element_Offset)), Data_Size);
-            std::string Data_Base64(Base64::encode(Data_Raw));
-            Fill(Stream_General, 0, General_Cover_Data, Data_Base64);
-        }
-    #endif //MEDIAINFO_ADVANCED
-
-    Skip_XX(Data_Size,                                          "Data");
-    if (Element_Offset<Element_Size)
-        Skip_XX(Element_Size-Element_Offset,                    "?");
+    Attachment("FLAC Picture", Description, Id3v2_PictureType(PictureType).c_str(), MimeType, true);
+    
+    Element_Size=Element_Size_Save;
+    Skip_XX(Element_Size-Element_Offset,                        "(Unknown)");
 }
 
 } //NameSpace

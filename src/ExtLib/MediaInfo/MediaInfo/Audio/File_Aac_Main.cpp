@@ -843,14 +843,14 @@ void File_Aac::AudioSpecificConfig_OutOfBand (int64s sampling_frequency_, int8u 
     Infos["Format"].From_UTF8(Aac_Format(audioObjectType));
     Infos["Format_Profile"].From_UTF8(Aac_Format_Profile(audioObjectType));
     Infos["Codec"].From_UTF8(Aac_audioObjectType(audioObjectType));
-    if (channelConfiguration && channelConfiguration!=(int8u)-1)
+    if (channelConfiguration && channelConfiguration!=(int8u)-1 && !FromIamf)
     {
         Infos["Channel(s)"].From_UTF8(Aac_Channels_GetString(channelConfiguration));
         Infos["ChannelPositions"].From_UTF8(Aac_ChannelConfiguration_GetString(channelConfiguration));
         Infos["ChannelPositions/String2"].From_UTF8(Aac_ChannelConfiguration2_GetString(channelConfiguration));
         Infos["ChannelLayout"].From_UTF8(Aac_ChannelLayout_GetString(channelConfiguration));
     }
-    else if (audioObjectType_==42 && Conf.IFrameParsed && Conf.numOutChannels)
+    else if (audioObjectType_==42 && Conf.IFrameParsed && Conf.numOutChannels &&!FromIamf)
     {
         Infos["Channel(s)"].From_Number(Conf.numOutChannels);
     }

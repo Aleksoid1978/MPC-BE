@@ -415,6 +415,7 @@ File_Mpeg4_Descriptors::File_Mpeg4_Descriptors()
     TrackID=(int32u)-1;
     Parser_DoNotFreeIt=false;
     SLConfig_DoNotFreeIt=false;
+    FromIamf=false;
 
     //Out
     Parser=NULL;
@@ -439,6 +440,24 @@ File_Mpeg4_Descriptors::~File_Mpeg4_Descriptors()
         delete Parser;// Parser=NULL;
     if (!SLConfig_DoNotFreeIt)
         delete SLConfig;// SLConfig=NULL;
+}
+
+//***************************************************************************
+// Streams management
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void File_Mpeg4_Descriptors::Streams_Fill()
+{
+    if (Parser && FromIamf) { //TODO: remove FromIamf test from here, it should not impact other parsers
+        Parser->Fill();
+        for (size_t StreamKind = Stream_General + 1; StreamKind < Stream_Max; StreamKind++) {
+            auto StreamCount = Parser->Count_Get((stream_t)StreamKind);
+            for (size_t StreamPos = 0; StreamPos < StreamCount; StreamPos++) {
+                Merge(*Parser, (stream_t)StreamKind, StreamPos, StreamPos, false);
+            }
+        }
+    }
 }
 
 //***************************************************************************
@@ -840,6 +859,7 @@ void File_Mpeg4_Descriptors::Descriptor_04()
                             Parser=new File_Aac;
                             ((File_Aac*)Parser)->Mode=File_Aac::Mode_AudioSpecificConfig;
                             ((File_Aac*)Parser)->FrameIsAlwaysComplete=true;
+                            ((File_Aac*)Parser)->FromIamf=FromIamf;
                             #if MEDIAINFO_CONFORMANCE
                                 ((File_Aac*)Parser)->Immediate_FramePos=stss;
                                 ((File_Aac*)Parser)->Immediate_FramePos_IsPresent=stss_IsPresent;

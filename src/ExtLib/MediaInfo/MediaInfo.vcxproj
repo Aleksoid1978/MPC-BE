@@ -51,6 +51,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="MediaInfo\Archive\File_MachO.h" />
     <ClInclude Include="MediaInfo\Audio\File_Aac.h" />
     <ClInclude Include="MediaInfo\Audio\File_Aac_GeneralAudio.h" />
     <ClInclude Include="MediaInfo\Audio\File_Aac_GeneralAudio_Sbr.h" />
@@ -78,6 +79,7 @@
     <ClInclude Include="MediaInfo\Audio\File_ExtendedModule.h" />
     <ClInclude Include="MediaInfo\Audio\File_Flac.h" />
     <ClInclude Include="MediaInfo\Audio\File_Iab.h" />
+    <ClInclude Include="MediaInfo\Audio\File_Iamf.h" />
     <ClInclude Include="MediaInfo\Audio\File_ImpulseTracker.h" />
     <ClInclude Include="MediaInfo\Audio\File_La.h" />
     <ClInclude Include="MediaInfo\Audio\File_Mga.h" />
@@ -117,6 +119,7 @@
     <ClInclude Include="MediaInfo\Image\File_Dds.h" />
     <ClInclude Include="MediaInfo\Image\File_Pcx.h" />
     <ClInclude Include="MediaInfo\Image\File_Psd.h" />
+    <ClInclude Include="MediaInfo\Image\File_WebP.h" />
     <ClInclude Include="MediaInfo\MediaInfo_Config_PerPackage.h" />
     <ClInclude Include="MediaInfo\Multiple\File_Aaf.h" />
     <ClInclude Include="MediaInfo\Multiple\File_DashMpd.h" />
@@ -134,8 +137,12 @@
     <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Resource.h" />
     <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Sequence.h" />
     <ClInclude Include="MediaInfo\OutputHelpers.h" />
+    <ClInclude Include="MediaInfo\Tag\File_C2pa.h" />
+    <ClInclude Include="MediaInfo\Tag\File_Exif.h" />
     <ClInclude Include="MediaInfo\Tag\File_Icc.h" />
+    <ClInclude Include="MediaInfo\Tag\File_Iim.h" />
     <ClInclude Include="MediaInfo\Tag\File_PropertyList.h" />
+    <ClInclude Include="MediaInfo\Tag\File_SphericalVideo.h" />
     <ClInclude Include="MediaInfo\Tag\File_Xmp.h" />
     <ClInclude Include="MediaInfo\Text\File_AribStdB24B37.h" />
     <ClInclude Include="MediaInfo\Text\File_Pac.h" />
@@ -298,6 +305,7 @@
     <ClCompile Include="MediaInfo\Archive\File_Elf.cpp" />
     <ClCompile Include="MediaInfo\Archive\File_Gzip.cpp" />
     <ClCompile Include="MediaInfo\Archive\File_Iso9660.cpp" />
+    <ClCompile Include="MediaInfo\Archive\File_MachO.cpp" />
     <ClCompile Include="MediaInfo\Archive\File_Mz.cpp" />
     <ClCompile Include="MediaInfo\Archive\File_Rar.cpp" />
     <ClCompile Include="MediaInfo\Archive\File_Tar.cpp" />
@@ -332,6 +340,7 @@
     <ClCompile Include="MediaInfo\Audio\File_ExtendedModule.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Flac.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Iab.cpp" />
+    <ClCompile Include="MediaInfo\Audio\File_Iamf.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_ImpulseTracker.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_La.cpp" />
     <ClCompile Include="MediaInfo\Audio\File_Mga.cpp" />
@@ -398,6 +407,7 @@
     <ClCompile Include="MediaInfo\Image\File_Rle.cpp" />
     <ClCompile Include="MediaInfo\Image\File_Tga.cpp" />
     <ClCompile Include="MediaInfo\Image\File_Tiff.cpp" />
+    <ClCompile Include="MediaInfo\Image\File_WebP.cpp" />
     <ClCompile Include="MediaInfo\MediaInfo.cpp" />
     <ClCompile Include="MediaInfo\MediaInfoList.cpp" />
     <ClCompile Include="MediaInfo\MediaInfoList_Internal.cpp" />
@@ -427,8 +437,12 @@
     <ClCompile Include="MediaInfo\PreComp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="MediaInfo\Tag\File_C2pa.cpp" />
+    <ClCompile Include="MediaInfo\Tag\File_Exif.cpp" />
     <ClCompile Include="MediaInfo\Tag\File_Icc.cpp" />
+    <ClCompile Include="MediaInfo\Tag\File_Iim.cpp" />
     <ClCompile Include="MediaInfo\Tag\File_PropertyList.cpp" />
+    <ClCompile Include="MediaInfo\Tag\File_SphericalVideo.cpp" />
     <ClCompile Include="MediaInfo\Tag\File_Xmp.cpp" />
     <ClCompile Include="MediaInfo\Text\File_AribStdB24B37.cpp" />
     <ClCompile Include="MediaInfo\Text\File_Pac.cpp" />

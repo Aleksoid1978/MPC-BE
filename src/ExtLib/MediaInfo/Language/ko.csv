@@ -343,6 +343,7 @@ Cover_Datas;표지 정보
 Cover_Description;표지 설명
 Cover_Mime;표지 MIME
 Cover_Type;표지 타입
+CoverData;
 Cropped;자른 영역
 Custom;커스텀
 CustomDownmixTargets;
@@ -380,6 +381,7 @@ DisplayCaptions_Content;
 DisplayCaptions_Stream;
 DistributedBy;배포
 Distributor;
+Documents;
 Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;기부하기
@@ -515,6 +517,7 @@ FrameRate_Num;
 FrameRate_Original;원본 프레임레이트
 FrameRate_Real;
 FullParsing;
+Gallery;
 General;일반
 GeneralCompliance;
 Genre;장르
@@ -978,6 +981,7 @@ Language_zh-yue;
 Language_zu;Zulu
 Languages;
 LawRating;법률 등급
+LegacyStreamDisplay;
 LCCN;LCCN
 LfeAttenuationKnown;
 LfeMixGain;
@@ -1223,6 +1227,7 @@ Sheet;시트
 Sheet (Complete);시트 (전체)
 Shell extension;쉘 익스텐션 (탐색기 마우스 오른쪽 버튼 메뉴에 Media Info를 추가합니다)
 Shell extension, folder;폴더에도 추가
+Shell extension, separate instance;
 Shell InfoTip;쉘 인포팁 (탐색기에서 파일에 마우스를 올려 놓으면 정보를 보여줍니다)
 ShimName;
 ShimVersion;

@@ -154,16 +154,6 @@ void File_Other::Read_Buffer_Continue()
         return;
     }
     else if (CC4(Buffer)==CC4("RIFF") && CC4(Buffer+8)==CC4("AMV ")) {Format=__T("AMV");}
-    else if (CC4(Buffer)==CC4("RIFF") && CC4(Buffer+8)==CC4("WEBP"))
-    {
-        Accept("WEBP");
-
-        Stream_Prepare(Stream_Image);
-        Fill(Stream_Image, 0, Image_Format, "WebP");
-
-        Finish("WEBP");
-        return;
-    }
     else if (CC4(Buffer)==0x414D5697) {Format=__T("MTV");}
     else if (CC6(Buffer)==CC6("Z\0W\0F\0"))
     {

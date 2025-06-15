@@ -343,6 +343,7 @@ Cover_Datas;Данные обложки
 Cover_Description;Описание обложки
 Cover_Mime;MIME-тип обложки
 Cover_Type;Тип обложки
+CoverData;
 Cropped;Размеры подрезки
 Custom;Выборочно
 CustomDownmixTargets;Настраиваемые форматы понижающего микширования
@@ -380,6 +381,7 @@ DisplayCaptions_Content;
 DisplayCaptions_Stream;
 DistributedBy;Распространитель
 Distributor;Распространитель
+Documents;
 Dolby_Atmos_Metadata;Метаданные Dolby Atmos
 DolbyAtmos;Dolby Atmos
 Donate;Сделать пожертвование
@@ -515,6 +517,7 @@ FrameRate_Num;
 FrameRate_Original;Частота кадров в оригинале
 FrameRate_Real;Действительная частота кадров
 FullParsing;Полная обработка
+Gallery;
 General;Общее
 GeneralCompliance;Общее соответствие
 Genre;Жанр
@@ -978,6 +981,7 @@ Language_zh-yue;Кантонский
 Language_zu;Зулу
 Languages;
 LawRating;Ограничение по возрасту
+LegacyStreamDisplay;
 LCCN;LCCN
 LfeAttenuationKnown;Ослабление низкочастотных эффектов (LFE)
 LfeMixGain;Общее усиление микса низкочастотных эффектов (LFE)
@@ -1223,6 +1227,7 @@ Sheet;Таблица
 Sheet (Complete);Таблица (полная)
 Shell extension;Расширение в проводнике (пункт в конекстном меню проводника Windows при щелчке по правой кнопке мыши)
 Shell extension, folder;Расширение в проводнике для папок
+Shell extension, separate instance;
 Shell InfoTip;Всплывающая подсказка (отображение информации при размещении указателя мыши над файлом в проводнике Windows)
 ShimName;Название прокладки
 ShimVersion;Версия прокладки

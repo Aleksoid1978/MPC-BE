@@ -484,8 +484,6 @@ private :
     typedef std::map<int64u, tagspertrack> tags;
     tags    Segment_Tags_Tag_Items;
     int64u  Segment_Tags_Tag_Targets_TagTrackUID_Value;
-    bool    CurrentAttachmentIsCover;
-    bool    CoverIsSetFromAttachment;
     string  AttachedFile_FileName;
     string  AttachedFile_FileMimeType;
     string  AttachedFile_FileDescription;

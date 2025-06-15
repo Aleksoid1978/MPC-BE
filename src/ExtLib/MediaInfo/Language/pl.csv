@@ -343,6 +343,7 @@ Cover_Datas;Dane okładki
 Cover_Description;Opis okładki
 Cover_Mime;Rozszerzenie okładki
 Cover_Type;Typ okładki
+CoverData;
 Cropped;Wymiary spadu
 Custom;Własne szablony
 CustomDownmixTargets;
@@ -380,6 +381,7 @@ DisplayCaptions_Content;
 DisplayCaptions_Stream;
 DistributedBy;Rozpowszechnianie
 Distributor;
+Documents;
 Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Donacja
@@ -515,6 +517,7 @@ FrameRate_Num;
 FrameRate_Original;Oryginalna szybkość wyświetlania klatek
 FrameRate_Real;
 FullParsing;
+Gallery;
 General;Ogólne
 GeneralCompliance;
 Genre;Rodzaj
@@ -978,6 +981,7 @@ Language_zh-yue;
 Language_zu;Zuluski
 Languages;
 LawRating;Nisko oceniany
+LegacyStreamDisplay;
 LCCN;LCCN
 LfeAttenuationKnown;
 LfeMixGain;
@@ -1223,6 +1227,7 @@ Sheet;Karta
 Sheet (Complete);Karta (komplet)
 Shell extension;Rozszerzenie powłoki (menu kontekstowe w eksploratorze)
 Shell extension, folder;Także dla folderów
+Shell extension, separate instance;
 Shell InfoTip;Informacje powłoki (w eksploratorze najedź kursorem na plik, wyświetlą się informacje)
 ShimName;
 ShimVersion;
@@ -1404,5 +1409,5 @@ WrittenBy;Napisał
 Yes;Tak
 Your system;System
 Your translation;
-ZZ_Automatic_Percent;57
+ZZ_Automatic_Percent;56
 ZZ_AutomaticLanguage_Percent;68

@@ -747,6 +747,7 @@ public :
     inline void Get_UTF16B (int64u Bytes, Ztring      &Info, const char*) {Get_UTF16B(Bytes, Info);}
     inline void Get_UTF16L (int64u Bytes, Ztring      &Info, const char*) {Get_UTF16L(Bytes, Info);}
     void Peek_Local (int64u Bytes, Ztring      &Info);
+    void Peek_UTF8  (int64u Bytes, Ztring      & Info);
     void Peek_String(int64u Bytes, std::string &Info);
     void Skip_Local (int64u Bytes,                    const char*) {if (Element_Offset+Bytes>Element_Size) {Trusted_IsNot(); return;} Element_Offset+=(size_t)Bytes;}
     void Skip_ISO_6937_2(int64u Bytes,                const char*) {if (Element_Offset+Bytes>Element_Size) {Trusted_IsNot(); return;} Element_Offset+=(size_t)Bytes;}
@@ -777,6 +778,7 @@ public :
     // Others, specialized
     //***************************************************************************
 
+    void Attachment(const char* MuxingMode, const Ztring& Description = {}, const Ztring& Type = {}, const Ztring& MimeType = {}, bool IsCover = {});
     #if defined(MEDIAINFO_AV1_YES) || defined(MEDIAINFO_AVC_YES) || defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MPEGTS_YES) || defined(MEDIAINFO_PNG_YES)
     void Get_MasteringDisplayColorVolume(Ztring& MasteringDisplay_ColorPrimaries, Ztring& MasteringDisplay_Luminance, bool FromAV1=false);
     void Get_LightLevel(Ztring &MaxCLL, Ztring &MaxFALL, int32u Divisor=1);
@@ -1228,7 +1230,6 @@ protected :
     //Save for speed improvement
     int8u           Config_Demux;
     Ztring          Config_LineSeparator;
-    bool            IsSub;
     enum stream_source
     {
         IsContainer,

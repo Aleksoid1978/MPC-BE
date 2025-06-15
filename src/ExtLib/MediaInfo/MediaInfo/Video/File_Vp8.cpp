@@ -50,7 +50,8 @@ File_Vp8::File_Vp8()
     #endif //MEDIAINFO_TRACE
 
     //In
-    Frame_Count_Valid=0;
+    Frame_Count_Valid=1;
+    StreamKind=Stream_Video;
 }
 
 //---------------------------------------------------------------------------
@@ -65,22 +66,16 @@ File_Vp8::~File_Vp8()
 //---------------------------------------------------------------------------
 void File_Vp8::Streams_Accept()
 {
-    if (!Frame_Count_Valid)
-        Frame_Count_Valid=Config->ParseSpeed>=0.3?32:(IsSub?1:4);
-
-    Stream_Prepare(Stream_Video);
+    Stream_Prepare(StreamKind);
+    Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Format), "VP8");
+    Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Codec), "VP8");
+    Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_BitDepth), 8);
+    Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_ColorSpace), "YUV");
 }
 
 //---------------------------------------------------------------------------
 void File_Vp8::Streams_Update()
 {
-}
-
-//---------------------------------------------------------------------------
-void File_Vp8::Streams_Fill()
-{
-    Fill(Stream_Video, 0, Video_Format, "VP8");
-    Fill(Stream_Video, 0, Video_Codec, "VP8");
 }
 
 //---------------------------------------------------------------------------
@@ -95,27 +90,42 @@ void File_Vp8::Streams_Finish()
 //---------------------------------------------------------------------------
 void File_Vp8::Read_Buffer_Continue()
 {
-    Accept();
-
     BS_Begin_LE(); //VP8 bitstream is Little Endian
     bool frame_type;
     Get_TB (    frame_type,                                     "frame type");
     Skip_T1( 3,                                                 "version number");
     Skip_TB(                                                    "show_frame flag");
     Skip_T4(19,                                                 "size of the first data partition");
-    BS_End();
+    BS_End_LE();
+    if (!frame_type) { //I-Frame
+        int32u start_code;
+        int16u width, height;
+        Get_B3 (start_code,                                     "start code");
+        if (start_code != 0x9D012A) {
+            Trusted_IsNot("start code");
+            return;
+        }
+        Get_L2 (width,                                          "width");
+        Get_L2 (height,                                         "height");
 
-    if (!frame_type) //I-Frame
-    {
-        Skip_B3(                                                "0x9D012A");
-        Skip_L2(                                                "Width");
-        Skip_L2(                                                "Height");
+        FILLING_BEGIN();
+            if (!Status[IsAccepted]) {
+                Accept();
+                Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Width), width & 0x3FFF);
+                Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Height), height & 0x3FFF);
+            }
+        FILLING_END();
     }
-    Skip_XX(Element_Size-Element_Offset,                        "Other data");
+    Skip_XX(Element_Size - Element_Offset,                      "(Data)");
+    if (frame_type && !Frame_Count) {
+        return;
+    }
 
-    Frame_Count++;
-    if (Frame_Count>=Frame_Count_Valid)
-        Finish();
+    FILLING_BEGIN();
+        Frame_Count++;
+        if (Frame_Count>=Frame_Count_Valid)
+            Finish();
+    FILLING_END();
 }
 
 } //NameSpace

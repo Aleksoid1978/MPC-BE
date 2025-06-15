@@ -343,6 +343,7 @@ Cover_Datas;Cover datas
 Cover_Description;
 Cover_Mime;
 Cover_Type;
+CoverData;
 Cropped;
 Custom;Προσαρμοσμένη
 CustomDownmixTargets;
@@ -380,6 +381,7 @@ DisplayCaptions_Content;
 DisplayCaptions_Stream;
 DistributedBy;Distributed by
 Distributor;
+Documents;
 Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Δωρεές
@@ -515,6 +517,7 @@ FrameRate_Num;
 FrameRate_Original;
 FrameRate_Real;
 FullParsing;
+Gallery;
 General;Γενικά
 GeneralCompliance;
 Genre;Genre
@@ -978,6 +981,7 @@ Language_zh-yue;
 Language_zu;Zulu
 Languages;
 LawRating;Law rating
+LegacyStreamDisplay;
 LCCN;LCCN
 LfeAttenuationKnown;
 LfeMixGain;
@@ -1223,6 +1227,7 @@ Sheet;Φύλλο
 Sheet (Complete);Φύλλο (Πλήρες)
 Shell extension;Shell extension (in explorer right click there will be a Media Info option)
 Shell extension, folder;
+Shell extension, separate instance;
 Shell InfoTip;Shell InfoTip (in explorer, move the mouse on file, info will be displayed)
 ShimName;
 ShimVersion;
@@ -1405,4 +1410,4 @@ Yes;Ναι
 Your system;Το σύστημά σας
 Your translation;
 ZZ_Automatic_Percent;54
-ZZ_AutomaticLanguage_Percent;59
+ZZ_AutomaticLanguage_Percent;58

@@ -32,6 +32,8 @@
 #include "MediaInfo/Text/File_Pac_Codepages.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #include "MediaInfo/TimeCode.h"
+#include <algorithm>
+#include <cmath>
 #include <limits>
 #include <map>
 #include <set>
@@ -88,23 +90,30 @@ void File_Pac::Streams_Accept()
     Fill(Stream_General, 0, General_Format, "PAC");
     Stream_Prepare(Stream_Text);
     Fill(Stream_Text, 0, Text_Format, "PAC");
-    Fill(Stream_Text, 0, Text_FrameRate, 24);
 }
 
 //---------------------------------------------------------------------------
 void File_Pac::Streams_Finish()
 {
     #if MEDIAINFO_ADVANCED
-        float64 FrameRate_F = Video_FrameRate_Rounded(Config->File_DefaultFrameRate_Get());
-        if (!FrameRate_F)
-            FrameRate_F = 24; // Files I have are all with frame rate of 24 fps
-        int64s FrameRate_Int = float64_int64s(FrameRate_F);
-        const uint32_t FrameMax = (uint32_t)(FrameRate_Int - 1);
+        const float64 FrameRate_FromConfig = Video_FrameRate_Rounded(Config->File_DefaultFrameRate_Get());
+        const auto FrameMax = (FrameRate_FromConfig && FrameRate_FromConfig >= FF_Max + 1)
+            ? ((const uint32_t)ceil(FrameRate_FromConfig) - 1)
+            : (FF_Max <= 23 ? 23 : FF_Max <= 24 ? 24 : FF_Max <= 29 ? 29 : FF_Max); // Files I have are all with frame rate of 24 fps
+        const auto FrameRate_F = FrameRate_FromConfig ? FrameRate_FromConfig : ((const float64)FrameMax + 1);
+        const auto FrameRateIsGuessed = FrameRate_FromConfig == 0;
+        const auto DropFrame = Config->File_DefaultTimeCodeDropFrame_Get() == 1;
     #else //MEDIAINFO_ADVANCED
-        const uint32_t FrameMax = 23;
+        const uint32_t FrameMax = FF_Max <= 23 ? 23 : FF_Max <= 24 ? 24 : FF_Max <= 30 ? 30 : FF_Max;
+        const auto FrameRate_F = (const float32)FrameMax + 1;
+        const auto FrameRateIsGuessed = true;
+        const auto DropFrame = false;
     #endif //MEDIAINFO_ADVANCED
+    Fill(Stream_Text, 0, Text_FrameRate, FrameRate_F, FrameRateIsGuessed?0:3); // Default without decimal as a hint that this is a guessed value
     Time_Start_Command.SetFramesMax(FrameMax);
+    Time_Start_Command.SetDropFrame(DropFrame);
     Time_End_Command.SetFramesMax(FrameMax);
+    Time_End_Command.SetDropFrame(DropFrame);
     TimeCode Delay_TC;
     TimeCode Offset;
     if (Time_Delay.IsValid()) {
@@ -128,10 +137,12 @@ void File_Pac::Streams_Finish()
     Fill(Stream_Text, 0, Text_TimeCode_LastFrame, LastFrame.ToString());
     if (Time_Start.IsValid()) {
         Time_Start.SetFramesMax(FrameMax);
+        Time_End.SetDropFrame(DropFrame);
         Fill(Stream_Text, 0, Text_Duration_Start, (int64s)(Time_Start - Offset).ToMilliseconds());
     }
     if (Time_End.IsValid()) {
         Time_End.SetFramesMax(FrameMax);
+        Time_End.SetDropFrame(DropFrame);
         Fill(Stream_Text, 0, Text_Duration_End, (int64s)(Time_End - Offset).ToMilliseconds());
     }
     if (Time_End.IsValid() && Time_Start.IsValid()) {
@@ -203,6 +214,9 @@ void File_Pac::Header_Parse()
         Get_L2 (HHMM,                                           "HHMM");
         Get_L2 (SSFF,                                           "SSFF");
         TimeCode TC(HHMM / 100, HHMM % 100, SSFF / 100, SSFF % 100, 99);
+        if (FF_Max < TC.GetFrames()) {
+            FF_Max = TC.GetFrames();
+        }
         if (!TC.IsValid()) {
             Reject();
         }

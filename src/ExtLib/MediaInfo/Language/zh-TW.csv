@@ -343,6 +343,7 @@ Cover_Datas;封面資料
 Cover_Description;封面描述
 Cover_Mime;封面 MIME
 Cover_Type;封面類型
+CoverData;
 Cropped;裁切維度
 Custom;自訂
 CustomDownmixTargets;
@@ -380,6 +381,7 @@ DisplayCaptions_Content;
 DisplayCaptions_Stream;
 DistributedBy;發布者
 Distributor;
+Documents;
 Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;贊助
@@ -515,6 +517,7 @@ FrameRate_Num;
 FrameRate_Original;原始影格頻率
 FrameRate_Real;
 FullParsing;
+Gallery;
 General;一般
 GeneralCompliance;
 Genre;類型
@@ -978,6 +981,7 @@ Language_zh-yue;
 Language_zu;祖魯語 (Zulu)
 Languages;
 LawRating;分級
+LegacyStreamDisplay;
 LCCN;LCCN
 LfeAttenuationKnown;
 LfeMixGain;
@@ -1223,6 +1227,7 @@ Sheet;表格
 Sheet (Complete);表格 (完整)
 Shell extension;快顯功能表 (在檔案總管裡, 按右鍵會出現 MediaInfo 的選項)
 Shell extension, folder;也對資料夾使用
+Shell extension, separate instance;
 Shell InfoTip;資訊提示 (在檔案總管裡, 將滑鼠移到檔案上會顯示相關訊息)
 ShimName;
 ShimVersion;

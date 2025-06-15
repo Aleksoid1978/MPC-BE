@@ -76,6 +76,7 @@ public :
     int32u   TrackID;
     bool     Parser_DoNotFreeIt; //If you want to keep the Parser
     bool     SLConfig_DoNotFreeIt; //If you want to keep the SLConfig
+    bool     FromIamf;
 
     //Out
     File__Analyze* Parser;
@@ -143,6 +144,9 @@ public :
     ~File_Mpeg4_Descriptors();
 
 private :
+    //Streams management
+    void Streams_Fill();
+
     //Buffer
     void Header_Parse();
     void Data_Parse();
