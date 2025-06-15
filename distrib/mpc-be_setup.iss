@@ -69,7 +69,7 @@
   #define VisualElementsManifest = "VisualElements\mpc-be64.VisualElementsManifest.xml"
 #endif
 #define mpcvr_desc     = "MPC Video Renderer 0.9.9"
-#define mpcscriptsrc_desc = "MPC Script Source 0.2.7"
+#define mpcscriptsrc_desc = "MPC Script Source 0.2.9"
 
 [Setup]
 #ifdef Win32Build
