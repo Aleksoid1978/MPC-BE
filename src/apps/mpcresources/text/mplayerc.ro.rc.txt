@@ -601,7 +601,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
 5		"YouTube"
-6		"Folosește analiz. pag. web încorp."
+6		"Folosește analizorul de pagini web încorporat"
 7		"Formatul video preferat:"
 10		"60 fps"
 11		"HDR"
