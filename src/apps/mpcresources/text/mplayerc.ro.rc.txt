@@ -610,7 +610,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
 16		"Încarcă lista de redare"
 18		"youtube-dl, yt-dlp"
 19		"Fișierul executabil:"
-21		"Înălțimea max. a videoclipului:"
+21		"Înălțimea maximă a videoclipului:"
 23		"Selectează nr. maxim de cadre/sec. (fps) sau rata de biți"
 24		"Adresa AceStream:"
 26		"Adresa MatriX (TorrServer):"
