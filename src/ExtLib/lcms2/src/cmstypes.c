@@ -4756,8 +4756,7 @@ cmsBool ReadMPEElem(struct _cms_typehandler_struct* self,
     }
 
     return TRUE;
-
-    cmsUNUSED_PARAMETER(SizeOfTag);
+    
     cmsUNUSED_PARAMETER(n);
 }
 
@@ -4865,9 +4864,11 @@ cmsBool Type_MPE_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, v
                  goto Error;
         }
 
+         Before = io ->Tell(io);
+
         if (!_cmsWriteUInt32Number(io, ElementSig)) goto Error;
         if (!_cmsWriteUInt32Number(io, 0)) goto Error;
-        Before = io ->Tell(io);
+ 
         if (!TypeHandler ->WritePtr(self, io, Elem, 1)) goto Error;
         if (!_cmsWriteAlignment(io)) goto Error;
 

@@ -53,7 +53,10 @@ Updated Korean translation (by Hackjjang).
 Updated Dutch and Chinese (Traditional) translation (by beter).
 
 Updated libraries:
-	ffmpeg n7.2-dev-2722-gfb65ecbc9b.
+	ffmpeg n7.2-dev-2722-gfb65ecbc9b;
+	Little-CMS git-lcms2.17-31-g9ac94ea;
+	MediaInfo git-v25.04-121-gf842d2fea;
+	ZenLib git-v0.4.41-76-gf5f6974.
 
 
 1.8.4 - 2025-04-19
