@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Despre"
 7		"MPC-BE"
 8		"Drepturi de autor © 2002-2025 - vezi fișierul Authors.txt"
@@ -304,14 +304,14 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 9		"Setarea culorii indicatorului de sunet:"
 10		"Umplere:"
 11		"B"
-12		"Fundal:"
+12		"Fundalul:"
 13		"O"
 14		"Implicit"
 15		"R:"
 16		"G:"
 17		"B:"
 21		"Activează meniul întunecat"
-22		"Folosește efectul de estompare în spate (pentru Windows 10 și versiunile ulterioare)"
+22		"Folosește efectul de estompare în spate (Windows 10 și ver. mai noi)"
 24		"Activează titlul întunecat (pentru Windows 10 și versiunile ulterioare)"
 27		"Folosește un indiciu de timp:"
 29		"Folosește previzualizarea în căutare"
@@ -345,7 +345,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 END
 
 BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
-5		"Intervalele de sărire (mici, medii, mari în ms)"
+5		"Intervalele de sărire (mici, medii, mari în ms (în milisecunde))"
 9		"Implicit"
 10		"Nu folosi „căutarea în dosar (în folder)” pentru comenzile „Sari înapoi/înainte” atunci când este numai un element în lista de redare (în playlist)"
 12		"Previne minimizarea playerului din ecran complet pe un monitor care nu este implicit"
@@ -354,7 +354,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 18		"Nu afișa 000xx.mpls dacă e mai scurt de"
 21		"minut(e)"
 22		"Activează suportul LCD pentru tastaturile Logitech"
-23		"Folosește comenzile pentru Window Media Controls"
+23		"Folosește comenzile media pentru Window Media Controls"
 24		"Activează MiniDump"
 25		"Fișierul executabil FFmpeg:"
 27		"Verifică pentru actualizări"
@@ -644,8 +644,8 @@ END
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
 3		"Combină nuanțatoarele (shaderele)"
 8		"&Adaugă"
-10		"Activ. nuanț. de pixeli de pre-redimension."
-12		"Activ. nuanț. de pixeli de post-redimension."
+10		"Activează shaderele pixelilor pentru cadre"
+12		"Activează shaderele pixelilor pt. ferestre"
 14		"&Elimină"
 15		"Mută în &sus"
 16		"Mută în &jos"
@@ -660,7 +660,7 @@ BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 13
 END
 
 BEGIN DIALOGEX IDD_SHADERNEW_DLG LINES 10
-3		"Crează un nou nuanțator (shader)"
+3		"Crează un nuanțator (un shader) nou"
 6		"Nume:"
 8		"OK"
 9		"Anulare"
@@ -2109,5 +2109,5 @@ STRING ID_PLAY_PLAY		"Redă\nRedă"
 STRING ID_PLAY_STOP		"Oprește\nOprește"
 STRING ID_SHOW_MILLISECONDS		"Afișează milisecundele"
 STRING ID_VOLUME_MUTE		"Mut\nMut"
-STRING ID_VOLUME_MUTE_DISABLED		"Fără sunet\nFără sunet"
+STRING ID_VOLUME_MUTE_DISABLED		"Fără sunet (Silențios)\nFără sunet (Silențios)"
 STRING ID_VOLUME_MUTE_OFF		"Activează sunetul\nActivează sunetul"
