@@ -431,7 +431,7 @@ BEGIN
     LTEXT           "Setarea culorii indicatorului de sunet:",IDC_STATIC2,14,31,165,8
     LTEXT           "Umplere:",IDC_STATIC_CLRFACE,14,43,46,8,0,WS_EX_TRANSPARENT
     PUSHBUTTON      "B",IDC_BUTTON_CLRFACE,64,41,20,14
-    LTEXT           "Fundal:",IDC_STATIC_CLROUTLINE,94,43,44,8,0,WS_EX_TRANSPARENT
+    LTEXT           "Fundalul:",IDC_STATIC_CLROUTLINE,94,43,44,8,0,WS_EX_TRANSPARENT
     PUSHBUTTON      "O",IDC_BUTTON_CLROUTLINE,140,41,20,14
     PUSHBUTTON      "Implicit",IDC_BUTTON_CLRDEFAULT,164,41,56,14
     RTEXT           "R:",IDC_STATIC3,224,19,10,8,0,WS_EX_TRANSPARENT
@@ -441,7 +441,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,34,53,12
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,49,53,12
     CONTROL         "Activează meniul întunecat",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,59,147,8,WS_EX_TRANSPARENT
-    CONTROL         "Folosește efectul de estompare în spate (pentru Windows 10 și versiunile ulterioare)",IDC_CHECK7,
+    CONTROL         "Folosește efectul de estompare în spate (Windows 10 și ver. mai noi)",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,232,8,WS_EX_TRANSPARENT
     CONTROL         "Activează titlul întunecat (pentru Windows 10 și versiunile ulterioare)",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,8,WS_EX_TRANSPARENT
@@ -1026,9 +1026,9 @@ BEGIN
     COMBOBOX        IDC_COMBO1,41,4,114,120,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "&Adaugă",IDC_BUTTON2,162,3,50,14
     CONTROL         "",IDC_STATIC1,"Static",SS_ETCHEDHORZ,4,21,208,1
-    CONTROL         "Activ. nuanț. de pixeli de pre-redimension.",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,26,150,10
+    CONTROL         "Activează shaderele pixelilor pentru cadre",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,26,150,10
     LISTBOX         IDC_LIST1,5,39,150,65,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Activ. nuanț. de pixeli de post-redimension.",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,109,150,10
+    CONTROL         "Activează shaderele pixelilor pt. ferestre",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,109,150,10
     LISTBOX         IDC_LIST2,5,122,150,65,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "&Elimină",IDC_BUTTON3,162,25,50,14
     PUSHBUTTON      "Mută în &sus",IDC_BUTTON1,162,90,50,14
@@ -1091,7 +1091,7 @@ IDD_PPAGEMISC DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Intervalele de sărire (mici, medii, mari în ms)",IDC_STATIC,7,5,220,34
+    GROUPBOX        "Intervalele de sărire (mici, medii, mari în ms (în milisecunde))",IDC_STATIC,7,5,220,34
     EDITTEXT        IDC_EDIT1,15,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT2,64,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
@@ -1109,7 +1109,7 @@ BEGIN
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,181,97,11,14
     LTEXT           "minut(e)",IDC_STATIC,197,99,30,8
     CONTROL         "Activează suportul LCD pentru tastaturile Logitech",IDC_CHECK_LCD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,113,264,9
-    CONTROL         "Folosește comenzile pentru Window Media Controls",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,125,220,9
+    CONTROL         "Folosește comenzile media pentru Window Media Controls",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,125,220,9
     CONTROL         "Activează MiniDump",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,137,184,9
     LTEXT           "Fișierul executabil FFmpeg:",IDC_STATIC,7,152,104,8
     COMBOBOX        IDC_COMBO1,113,150,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
@@ -1288,7 +1288,7 @@ END
 
 IDD_SHADERNEW_DLG DIALOGEX 0, 0, 250, 40
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Crează un nou nuanțator (shader)"
+CAPTION "Crează un nuanțator (un shader) nou"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "Nume:",IDC_STATIC,4,5,50,8
@@ -2654,7 +2654,7 @@ STRINGTABLE
 BEGIN
     ID_VOLUME_MUTE          "Mut\nMut"
     ID_VOLUME_MUTE_OFF      "Activează sunetul\nActivează sunetul"
-    ID_VOLUME_MUTE_DISABLED "Fără sunet\nFără sunet"
+    ID_VOLUME_MUTE_DISABLED "Fără sunet (Silențios)\nFără sunet (Silențios)"
 END
 
 STRINGTABLE
