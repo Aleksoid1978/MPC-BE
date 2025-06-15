@@ -35,33 +35,33 @@ public:
 	
 	enum { IDD = IDD_PPAGEOSD };	
 	
-	BOOL m_bShowOSD     = FALSE;
+	BOOL m_bShowOSD     = TRUE;
 	BOOL m_bOSDFileName = FALSE;
 	BOOL m_bOSDSeekTime = FALSE;
 	
-	CString         m_OSD_Font;
-	CComboBox       m_OSDFontType;
-	CIntEdit        m_edOSDFontSize;
-	CSpinButtonCtrl m_spOSDFontSize;
-	BOOL m_bOSDFontShadow  = FALSE;
-	BOOL m_bOSDFontAA      = TRUE;
-	CSliderCtrl     m_OSDTransparentCtrl;
-	int  m_nOSDTransparent = 0;
-	int  m_OSDBorder       = 1;
-	CSpinButtonCtrl m_OSDBorderCtrl;
+	CString         m_FontName;
+	CComboBox       m_cbFontName;
+	CIntEdit        m_edFontSize;
+	CSpinButtonCtrl m_spFontSize;
+	BOOL m_bFontShadow  = FALSE;
+	BOOL m_bFontAA      = TRUE;
+	int  m_nTransparent = 0;
+	CSliderCtrl m_TransparentCtrl;
+	int  m_nBorder      = 1;
+	CSpinButtonCtrl m_BorderCtrl;
 
-	COLORREF m_clrFontABGR = 0x00E0E0E0;
-	COLORREF m_clrGrad1ABGR = 0x00302820;
-	COLORREF m_clrGrad2ABGR = 0x00302820;
+	COLORREF m_colorFont  = RGB(224, 224, 224);
+	COLORREF m_colorGrad1 = RGB(32, 40, 48);
+	COLORREF m_colorGrad2 = RGB(32, 40, 48);
 
-	int m_nOSDTransparent_Old;
-	int m_OSDBorder_Old;
-	BOOL m_bOSDFontShadow_Old;
-	BOOL m_bOSDFontAA_Old;
+	int m_nTransparent_Old;
+	int m_nBorder_Old;
+	BOOL m_bFontShadow_Old;
+	BOOL m_bFontAA_Old;
 
-	COLORREF m_clrFontABGR_Old;
-	COLORREF m_clrGrad1ABGR_Old;
-	COLORREF m_clrGrad2ABGR_Old;
+	COLORREF m_colorFont_Old;
+	COLORREF m_colorGrad1_Old;
+	COLORREF m_colorGrad2_Old;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
@@ -85,5 +85,5 @@ public:
 	afx_msg void OnDeltaposSpin3(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnCustomDrawBtns(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-	afx_msg void OnClickClrDefault();
+	afx_msg void OnBnClickedDefault();
 };

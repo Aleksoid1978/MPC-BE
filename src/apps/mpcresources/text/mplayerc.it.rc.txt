@@ -376,7 +376,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Predefinito"
 END
 
-BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 26
 6		"Mostra OSD"
 7		"Mostra nome del file multimediale"
 8		"Mostra tempo di ricerca"
@@ -389,6 +389,7 @@ BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
 20		"Pixel bordo:"
 23		"Ombra"
 24		"Anti-aliasing"
+25		"Predefinito"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38

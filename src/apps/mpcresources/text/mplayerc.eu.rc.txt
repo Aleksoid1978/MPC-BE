@@ -376,7 +376,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Default"
 END
 
-BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 26
 6		"Erakutsi IGE (beharrezkoa berrabiaratzea)"
 7		"Erakutsi multimedia agiriaren izena"
 8		"Show seek time"
@@ -389,6 +389,7 @@ BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
 20		"Hertz Neurria:"
 23		"Itzala"
 24		"Hertz-lehunketa"
+25		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38

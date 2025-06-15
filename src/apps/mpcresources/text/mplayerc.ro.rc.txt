@@ -376,7 +376,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Implicit"
 END
 
-BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 26
 6		"Arată OSD-ul (necesită repornirea playerului)"
 7		"Afișează numele în fișierele media"
 8		"Afișează timpul de căutare"
@@ -389,6 +389,7 @@ BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
 20		"Mărime chenar:"
 23		"Umbră"
 24		"Antialiasare"
+25		"Implicit"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38

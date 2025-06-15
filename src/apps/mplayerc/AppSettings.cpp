@@ -674,9 +674,11 @@ void CAppSettings::ResetSettings()
 
 	clrFaceABGR = 0x00ffffff;
 	clrOutlineABGR = 0x00868686;
-	clrFontABGR = 0x00E0E0E0;
-	clrGrad1ABGR = 0x00302820;
-	clrGrad2ABGR = 0x00302820;
+
+
+	clrFontABGR  = RGB(224, 224, 224);
+	clrGrad1ABGR = RGB(32, 40, 48);
+	clrGrad2ABGR = RGB(32, 40, 48);
 
 	nJumpDistS = DEFAULT_JUMPDISTANCE_1;
 	nJumpDistM = DEFAULT_JUMPDISTANCE_2;

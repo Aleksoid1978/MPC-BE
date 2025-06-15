@@ -376,7 +376,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Predvolené"
 END
 
-BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 26
 6		"Zobraziť OSD (vyžaduje reštart)"
 7		"Zobraziť názov mediálneho súboru"
 8		"Zobraziť čas vyhľadávania"
@@ -389,6 +389,7 @@ BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
 20		"Veľkosť okraja:"
 23		"Tieň"
 24		"Vyhladzovanie"
+25		"Predvolené"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38

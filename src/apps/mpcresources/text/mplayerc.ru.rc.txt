@@ -376,7 +376,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"По умолчанию"
 END
 
-BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 26
 6		"Показать OSD"
 7		"Показывать имя файла"
 8		"Показывать время после поиска"
@@ -389,6 +389,7 @@ BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
 20		"Бордюр:"
 23		"Тень"
 24		"Сглаживание"
+25		"По умолчанию"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38

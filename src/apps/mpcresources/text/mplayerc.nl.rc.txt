@@ -376,7 +376,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Resetten"
 END
 
-BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 26
 6		"Toon OSD (vereist herstart)"
 7		"Toon naam van mediabestand"
 8		"Toon gezochte tijd"
@@ -389,6 +389,7 @@ BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
 20		"Omlijning:"
 23		"Schaduw"
 24		"Anti-aliasing"
+25		"Resetten"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38

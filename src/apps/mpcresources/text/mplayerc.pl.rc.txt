@@ -376,7 +376,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Domyślne"
 END
 
-BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 26
 6		"Menu ekranowe - OSD (wymagany restart)"
 7		"Pokaż nazwę pliku"
 8		"Pokaż czas postępu"
@@ -389,6 +389,7 @@ BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
 20		"Rozmiar obramowania:"
 23		"Cień"
 24		"Wygładzanie krawędzi"
+25		"Domyślne"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38

@@ -376,7 +376,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Par défaut"
 END
 
-BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 26
 6		"Afficher l'OSD (nécessite un redémarrage)"
 7		"Afficher le nom du fichier de média"
 8		"Afficher le temps de recherche"
@@ -389,6 +389,7 @@ BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
 20		"Taille de bordure :"
 23		"Ombre "
 24		"Anti-aliasing"
+25		"Par défaut"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38

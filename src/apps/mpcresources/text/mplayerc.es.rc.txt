@@ -376,7 +376,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Predeterminado"
 END
 
-BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 26
 6		"Mostrar OSD (requiere reinicio)"
 7		"Mostrar nombre de archivo multimedia"
 8		"Mostrar tiempo de búsqueda"
@@ -389,6 +389,7 @@ BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
 20		"Borde:"
 23		"Sombra"
 24		"Suavizado"
+25		"Predeterminado"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38

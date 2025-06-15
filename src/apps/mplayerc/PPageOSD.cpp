@@ -51,15 +51,16 @@ void CPPageOSD::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK14,  m_bOSDFileName);
 	DDX_Check(pDX, IDC_CHECK15,  m_bOSDSeekTime);
 	
-	DDX_Control(pDX, IDC_COMBO1, m_OSDFontType);
-	DDX_Control(pDX, IDC_EDIT3, m_edOSDFontSize);
-	DDX_Control(pDX, IDC_SPIN3, m_spOSDFontSize);
-	DDX_Control(pDX, IDC_SLIDER_OSDTRANS, m_OSDTransparentCtrl);
-	DDX_Slider(pDX, IDC_SLIDER_OSDTRANS, m_nOSDTransparent);
-	DDX_Text(pDX, IDC_EDIT4, m_OSDBorder);
-	DDX_Control(pDX, IDC_SPIN10, m_OSDBorderCtrl);
-	DDX_Check(pDX, IDC_CHECK_SHADOW, m_bOSDFontShadow);
-	DDX_Check(pDX, IDC_CHECK_AA, m_bOSDFontAA);
+	DDX_Control(pDX, IDC_COMBO1, m_cbFontName);
+	DDX_CBString(pDX, IDC_COMBO1, m_FontName);
+	DDX_Control(pDX, IDC_EDIT3, m_edFontSize);
+	DDX_Control(pDX, IDC_SPIN3, m_spFontSize);
+	DDX_Control(pDX, IDC_SLIDER_OSDTRANS, m_TransparentCtrl);
+	DDX_Slider(pDX, IDC_SLIDER_OSDTRANS, m_nTransparent);
+	DDX_Text(pDX, IDC_EDIT4, m_nBorder);
+	DDX_Control(pDX, IDC_SPIN10, m_BorderCtrl);
+	DDX_Check(pDX, IDC_CHECK_SHADOW, m_bFontShadow);
+	DDX_Check(pDX, IDC_CHECK_AA, m_bFontAA);
 }
 
 BEGIN_MESSAGE_MAP(CPPageOSD, CPPageBase)
@@ -77,6 +78,7 @@ BEGIN_MESSAGE_MAP(CPPageOSD, CPPageBase)
 	ON_BN_CLICKED(IDC_BUTTON_CLRFONT, OnClickClrFont)
 	ON_BN_CLICKED(IDC_BUTTON_CLRGRAD1, OnClickClrGrad1)
 	ON_BN_CLICKED(IDC_BUTTON_CLRGRAD2, OnClickClrGrad2)
+	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedDefault)
 	ON_WM_HSCROLL()
 END_MESSAGE_MAP()
 
@@ -92,20 +94,20 @@ BOOL CPPageOSD::OnInitDialog()
 	m_bOSDFileName  = s.ShowOSD.FileName;
 	m_bOSDSeekTime  = s.ShowOSD.SeekTime;
 
-	m_nOSDTransparent = m_nOSDTransparent_Old = s.nOSDTransparent;
-	m_OSDBorder       = m_OSDBorder_Old       = s.nOSDBorder;
+	m_nTransparent = m_nTransparent_Old = s.nOSDTransparent;
+	m_nBorder      = m_nBorder_Old      = s.nOSDBorder;
 
-	m_OSDTransparentCtrl.SetRange(0, 255, TRUE);
-	m_OSDBorderCtrl.SetRange32(0, 5);
+	m_TransparentCtrl.SetRange(0, 255, TRUE);
+	m_BorderCtrl.SetRange32(0, 5);
 
-	m_OSD_Font = s.strOSDFont;
+	m_FontName = s.strOSDFont;
 
-	m_OSDFontType.Clear();
-	m_bOSDFontShadow = m_bOSDFontShadow_Old = s.bOSDFontShadow;
-	m_bOSDFontAA     = m_bOSDFontAA_Old     = s.bOSDFontAA;
-	m_clrFontABGR    = m_clrFontABGR_Old    = s.clrFontABGR;
-	m_clrGrad1ABGR   = m_clrGrad1ABGR_Old   = s.clrGrad1ABGR;
-	m_clrGrad2ABGR   = m_clrGrad2ABGR_Old   = s.clrGrad2ABGR;
+	m_cbFontName.Clear();
+	m_bFontShadow = m_bFontShadow_Old = s.bOSDFontShadow;
+	m_bFontAA     = m_bFontAA_Old     = s.bOSDFontAA;
+	m_colorFont   = m_colorFont_Old   = s.clrFontABGR;
+	m_colorGrad1  = m_colorGrad1_Old  = s.clrGrad1ABGR;
+	m_colorGrad2  = m_colorGrad2_Old  = s.clrGrad2ABGR;
 
 	HDC dc = CreateDCW(L"DISPLAY", nullptr, nullptr, nullptr);
 	std::vector<CString> fontnames;
@@ -113,19 +115,19 @@ BOOL CPPageOSD::OnInitDialog()
 	DeleteDC(dc);
 
 	for (const auto& fontname : fontnames) {
-		m_OSDFontType.AddString(fontname);
+		m_cbFontName.AddString(fontname);
 	}
 
-	CorrectComboListWidth(m_OSDFontType);
-	int iSel = m_OSDFontType.FindStringExact(0, m_OSD_Font);
+	CorrectComboListWidth(m_cbFontName);
+	int iSel = m_cbFontName.FindStringExact(0, m_FontName);
 	if (iSel == CB_ERR) {
 		iSel = 0;
 	}
-	m_OSDFontType.SetCurSel(iSel);
+	m_cbFontName.SetCurSel(iSel);
 
-	m_edOSDFontSize.SetRange(8, 40);
-	m_spOSDFontSize.SetRange(8, 40);
-	m_edOSDFontSize = s.nOSDSize;
+	m_edFontSize.SetRange(8, 40);
+	m_spFontSize.SetRange(8, 40);
+	m_edFontSize = s.nOSDSize;
 	
 	UpdateData(FALSE);
 
@@ -154,25 +156,25 @@ BOOL CPPageOSD::OnApply()
 		}
 	}
 
-	s.nOSDTransparent = m_nOSDTransparent;
-	s.nOSDBorder      = m_OSDBorder;
-	s.nOSDSize        = m_edOSDFontSize;
-	m_OSDFontType.GetLBText(m_OSDFontType.GetCurSel(), s.strOSDFont);
-	s.bOSDFontShadow = !!m_bOSDFontShadow;
-	s.bOSDFontAA     = !!m_bOSDFontAA;
+	s.nOSDTransparent = m_nTransparent;
+	s.nOSDBorder      = m_nBorder;
+	s.nOSDSize        = m_edFontSize;
+	m_cbFontName.GetLBText(m_cbFontName.GetCurSel(), s.strOSDFont);
+	s.bOSDFontShadow  = !!m_bFontShadow;
+	s.bOSDFontAA      = !!m_bFontAA;
 
-	s.clrFontABGR  = m_clrFontABGR;
-	s.clrGrad1ABGR = m_clrGrad1ABGR;
-	s.clrGrad2ABGR = m_clrGrad2ABGR;
+	s.clrFontABGR  = m_colorFont;
+	s.clrGrad1ABGR = m_colorGrad1;
+	s.clrGrad2ABGR = m_colorGrad2;
 
-	m_OSDBorder_Old       = s.nOSDBorder;
-	m_bOSDFontShadow_Old  = s.bOSDFontShadow;
-	m_bOSDFontAA_Old      = s.bOSDFontAA;
-	m_nOSDTransparent_Old = s.nOSDTransparent;
+	m_nBorder_Old      = s.nOSDBorder;
+	m_bFontShadow_Old  = s.bOSDFontShadow;
+	m_bFontAA_Old      = s.bOSDFontAA;
+	m_nTransparent_Old = s.nOSDTransparent;
 
-	m_clrFontABGR_Old  = s.clrFontABGR;
-	m_clrGrad1ABGR_Old = s.clrGrad1ABGR;
-	m_clrGrad2ABGR_Old = s.clrGrad2ABGR;
+	m_colorFont_Old  = s.clrFontABGR;
+	m_colorGrad1_Old = s.clrGrad1ABGR;
+	m_colorGrad2_Old = s.clrGrad2ABGR;
 
 	return __super::OnApply();
 }
@@ -181,14 +183,14 @@ void CPPageOSD::OnCancel()
 {
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.nOSDBorder      = m_OSDBorder_Old;
-	s.bOSDFontShadow  = !!m_bOSDFontShadow_Old;
-	s.bOSDFontAA      = !!m_bOSDFontAA_Old;
-	s.nOSDTransparent = m_nOSDTransparent_Old;
+	s.nOSDBorder      = m_nBorder_Old;
+	s.bOSDFontShadow  = !!m_bFontShadow_Old;
+	s.bOSDFontAA      = !!m_bFontAA_Old;
+	s.nOSDTransparent = m_nTransparent_Old;
 
-	s.clrFontABGR  = m_clrFontABGR_Old;
-	s.clrGrad1ABGR = m_clrGrad1ABGR_Old;
-	s.clrGrad2ABGR = m_clrGrad2ABGR_Old;
+	s.clrFontABGR  = m_colorFont_Old;
+	s.clrGrad1ABGR = m_colorGrad1_Old;
+	s.clrGrad2ABGR = m_colorGrad2_Old;
 }
 
 void CPPageOSD::OnUpdateOSD(CCmdUI* pCmdUI)
@@ -203,8 +205,8 @@ void CPPageOSD::OnChangeOSD()
 	auto pFrame = AfxGetMainFrame();
 	if (pFrame->m_OSD) {
 		CString str;
-		int osdFontSize = m_edOSDFontSize;
-		m_OSDFontType.GetLBText(m_OSDFontType.GetCurSel(), str);
+		int osdFontSize = m_edFontSize;
+		m_cbFontName.GetLBText(m_cbFontName.GetCurSel(), str);
 
 		pFrame->m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_OSD_TEST), 2000, false, osdFontSize, str);
 		pFrame->m_OSD.SetLayeredWindowAttributes(RGB(255, 0, 255), 255 - AfxGetAppSettings().nOSDTransparent, LWA_ALPHA | LWA_COLORKEY);
@@ -219,7 +221,7 @@ void CPPageOSD::OnCheckShadow()
 
 	UpdateData();
 	BOOL fFontShadow = s.bOSDFontShadow;
-	s.bOSDFontShadow = !!m_bOSDFontShadow;
+	s.bOSDFontShadow = !!m_bFontShadow;
 	OnChangeOSD();
 
 	s.bOSDFontShadow = !!fFontShadow;
@@ -231,7 +233,7 @@ void CPPageOSD::OnCheckAA()
 
 	UpdateData();
 	BOOL fFontAA = s.bOSDFontAA;
-	s.bOSDFontAA = !!m_bOSDFontAA;
+	s.bOSDFontAA = !!m_bFontAA;
 	OnChangeOSD();
 
 	s.bOSDFontAA = !!fFontAA;
@@ -241,10 +243,10 @@ void CPPageOSD::OnUpdateOSDBorder(CCmdUI* pCmdUI)
 {
 	CAppSettings& s = AfxGetAppSettings();
 
-	if (s.nOSDBorder != m_OSDBorder) {
+	if (s.nOSDBorder != m_nBorder) {
 		UpdateData();
 		int nOSDBorder = s.nOSDBorder;
-		s.nOSDBorder = m_OSDBorder;
+		s.nOSDBorder = m_nBorder;
 		OnChangeOSD();
 
 		s.nOSDBorder = nOSDBorder;
@@ -260,14 +262,14 @@ void CPPageOSD::OnClickClrFont()
 {
 	CColorDialog clrpicker;
 	clrpicker.m_cc.Flags |= CC_FULLOPEN | CC_RGBINIT;
-	clrpicker.m_cc.rgbResult = m_clrFontABGR;
+	clrpicker.m_cc.rgbResult = m_colorFont;
 
 	if (clrpicker.DoModal() == IDOK) {
-		COLORREF clrFontABGR = m_clrFontABGR;
-		m_clrFontABGR = clrpicker.GetColor();
+		COLORREF clrFontABGR = m_colorFont;
+		m_colorFont = clrpicker.GetColor();
 		if (clrFontABGR != clrpicker.GetColor()) {
 			CAppSettings& s = AfxGetAppSettings();
-			s.clrFontABGR = m_clrFontABGR;
+			s.clrFontABGR = m_colorFont;
 			OnChangeOSD();
 			UpdateData(FALSE);
 		}
@@ -278,14 +280,14 @@ void CPPageOSD::OnClickClrGrad1()
 {
 	CColorDialog clrpicker;
 	clrpicker.m_cc.Flags |= CC_FULLOPEN | CC_RGBINIT;
-	clrpicker.m_cc.rgbResult = m_clrGrad1ABGR;
+	clrpicker.m_cc.rgbResult = m_colorGrad1;
 
 	if (clrpicker.DoModal() == IDOK) {
-		COLORREF clrGrad1ABGR = m_clrGrad1ABGR;
-		m_clrGrad1ABGR = clrpicker.GetColor();
+		COLORREF clrGrad1ABGR = m_colorGrad1;
+		m_colorGrad1 = clrpicker.GetColor();
 		if (clrGrad1ABGR != clrpicker.GetColor()) {
 			CAppSettings& s = AfxGetAppSettings();
-			s.clrGrad1ABGR = m_clrGrad1ABGR;
+			s.clrGrad1ABGR = m_colorGrad1;
 			OnChangeOSD();
 			UpdateData(FALSE);
 		}
@@ -296,14 +298,14 @@ void CPPageOSD::OnClickClrGrad2()
 {
 	CColorDialog clrpicker;
 	clrpicker.m_cc.Flags |= CC_FULLOPEN | CC_RGBINIT;
-	clrpicker.m_cc.rgbResult = m_clrGrad2ABGR;
+	clrpicker.m_cc.rgbResult = m_colorGrad2;
 
 	if (clrpicker.DoModal() == IDOK) {
-		COLORREF clrGrad2ABGR = m_clrGrad2ABGR;
-		m_clrGrad2ABGR = clrpicker.GetColor();
+		COLORREF clrGrad2ABGR = m_colorGrad2;
+		m_colorGrad2 = clrpicker.GetColor();
 		if (clrGrad2ABGR != clrpicker.GetColor()) {
 			CAppSettings& s = AfxGetAppSettings();
-			s.clrGrad2ABGR = m_clrGrad2ABGR;
+			s.clrGrad2ABGR = m_colorGrad2;
 			OnChangeOSD();
 			UpdateData(FALSE);
 		}
@@ -346,13 +348,13 @@ void CPPageOSD::OnCustomDrawBtns(NMHDR* pNMHDR, LRESULT* pResult)
 			r.DeflateRect(2, 2, 2, 2);
 			switch (pNMCD->dwItemSpec) {
 			case IDC_BUTTON_CLRFONT:
-				dc.FillSolidRect(&r, m_clrFontABGR);
+				dc.FillSolidRect(&r, m_colorFont);
 				break;
 			case IDC_BUTTON_CLRGRAD1:
-				dc.FillSolidRect(&r, m_clrGrad1ABGR);
+				dc.FillSolidRect(&r, m_colorGrad1);
 				break;
 			case IDC_BUTTON_CLRGRAD2:
-				dc.FillSolidRect(&r, m_clrGrad2ABGR);
+				dc.FillSolidRect(&r, m_colorGrad2);
 				break;
 			}
 
@@ -368,10 +370,10 @@ void CPPageOSD::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	CAppSettings& s = AfxGetAppSettings();
 
-	if (*pScrollBar == m_OSDTransparentCtrl) {
+	if (*pScrollBar == m_TransparentCtrl) {
 		UpdateData();
 		int nOSDTransparent = s.nOSDTransparent;
-		s.nOSDTransparent = m_nOSDTransparent;
+		s.nOSDTransparent = m_nTransparent;
 		OnChangeOSD();
 
 		s.nOSDTransparent = nOSDTransparent;
@@ -382,28 +384,35 @@ void CPPageOSD::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	__super::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
-void CPPageOSD::OnClickClrDefault()
+void CPPageOSD::OnBnClickedDefault()
 {
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.nOSDTransparent = m_nOSDTransparent = 100;
+	m_bShowOSD     = TRUE;
+	m_bOSDFileName = FALSE;
+	m_bOSDSeekTime = FALSE;
 
-	m_bOSDFontShadow = FALSE;
-	m_bOSDFontAA = TRUE;
-	m_OSDBorder = 1;
-
-	m_clrFontABGR = 0x00E0E0E0;
-	m_clrGrad1ABGR = 0x00302820;
-	m_clrGrad2ABGR = 0x00302820;
-
-	m_OSDBorder_Old       = s.nOSDBorder;
-	m_bOSDFontShadow_Old  = s.bOSDFontShadow;
-	m_bOSDFontAA_Old      = s.bOSDFontAA;
-	m_nOSDTransparent_Old = s.nOSDTransparent;
-
-	m_clrFontABGR_Old  = s.clrFontABGR;
-	m_clrGrad1ABGR_Old = s.clrGrad1ABGR;
-	m_clrGrad2ABGR_Old = s.clrGrad2ABGR;
+	m_FontName     = L"Segoe UI";
+	m_edFontSize   = 18;
+	m_bFontShadow  = FALSE;
+	m_bFontAA      = TRUE;
+	m_nTransparent = s.nOSDTransparent = 100;
+	m_nBorder      = 1;
+	m_colorFont    = RGB(224, 224, 224);
+	m_colorGrad1   = RGB(32, 40, 48);
+	m_colorGrad2   = RGB(32, 40, 48);
 
 	UpdateData(FALSE);
+
+	GetDlgItem(IDC_BUTTON_CLRFONT)->Invalidate();
+	GetDlgItem(IDC_BUTTON_CLRGRAD1)->Invalidate();
+	GetDlgItem(IDC_BUTTON_CLRGRAD2)->Invalidate();
+
+	m_bFontShadow_Old  = s.bOSDFontShadow;
+	m_bFontAA_Old      = s.bOSDFontAA;
+	m_nTransparent_Old = s.nOSDTransparent;
+	m_nBorder_Old      = s.nOSDBorder;
+	m_colorFont_Old    = s.clrFontABGR;
+	m_colorGrad1_Old   = s.clrGrad1ABGR;
+	m_colorGrad2_Old   = s.clrGrad2ABGR;
 }

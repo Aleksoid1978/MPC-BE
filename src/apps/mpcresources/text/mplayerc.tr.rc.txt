@@ -376,7 +376,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Varsayılan"
 END
 
-BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 26
 6		"OSD göster"
 7		"Dosya adını göster"
 8		"Atlama zamanını göster"
@@ -389,6 +389,7 @@ BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
 20		"Kenar Genişliği:"
 23		"Gölge"
 24		"Kenar yumuşatma"
+25		"Varsayılan"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38

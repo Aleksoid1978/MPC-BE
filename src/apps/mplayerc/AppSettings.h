@@ -720,14 +720,8 @@ public:
 	bool			bDarkMenu;
 	bool			bDarkMenuBlurBehind;
 	bool			bDarkTitle;
-	int				nOSDTransparent;
-	int				nOSDBorder;
-
 	COLORREF		clrFaceABGR;
 	COLORREF		clrOutlineABGR;
-	COLORREF		clrFontABGR;
-	COLORREF		clrGrad1ABGR;
-	COLORREF		clrGrad2ABGR;
 
 	bool			bShowMilliSecs;
 	bool			fUseTimeTooltip;
@@ -740,12 +734,19 @@ public:
 	bool			fFlybar;
 	int				iPlsFontPercent;
 	int				iToolbarSize;
-	bool			bOSDFontShadow;
-	bool			bOSDFontAA;
 	bool			fFlybarOnTop;
 	bool			fUseWin7TaskBar;
-	int				nOSDSize;
+
+	// OSD
 	CString			strOSDFont;
+	int				nOSDSize;
+	bool			bOSDFontShadow;
+	bool			bOSDFontAA;
+	int				nOSDTransparent;
+	int				nOSDBorder;
+	COLORREF		clrFontABGR;
+	COLORREF		clrGrad1ABGR;
+	COLORREF		clrGrad2ABGR;
 
 	int				iDlgPropX;
 	int				iDlgPropY;

@@ -376,7 +376,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"По подразбиране"
 END
 
-BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 26
 6		"Показване на OSD"
 7		"Показване името на файла"
 8		"Показване на времето след търсене"
@@ -389,6 +389,7 @@ BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
 20		"Контур:"
 23		"Сянка"
 24		"Изглаждане"
+25		"По подразбиране"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38

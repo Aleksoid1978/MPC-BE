@@ -376,7 +376,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Privzeto"
 END
 
-BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 26
 6		"Prikaži OSD"
 7		"Prikaži ime medijske datoteke"
 8		"Prikaži čas iskanja"
@@ -389,6 +389,7 @@ BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
 20		"Velikost okvirja:"
 23		"Senca"
 24		"Anti-aliasing"
+25		"Privzeto"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38

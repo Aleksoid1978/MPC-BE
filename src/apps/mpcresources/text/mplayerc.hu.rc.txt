@@ -376,7 +376,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Alapértelmezett"
 END
 
-BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 26
 6		"OSD megjelenítése (újraindítást igényel)"
 7		"Médiafájl nevének megjelenítése"
 8		"Keresési idő megjelenítése"
@@ -389,6 +389,7 @@ BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
 20		"Szegély mérete:"
 23		"Árnyék"
 24		"Élsimítás"
+25		"Alapértelmezett"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38

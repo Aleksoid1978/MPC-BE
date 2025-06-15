@@ -376,7 +376,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"Προεπιλογή"
 END
 
-BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 26
 6		"Εμφάνιση OSD (απαιτείται επανεκκίνηση)"
 7		"Εμφάνιση του ονόματος αρχείου"
 8		"Εμφάνιση χρόνου αναζήτησης"
@@ -389,6 +389,7 @@ BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
 20		"Περίγραμμα:"
 23		"Σκιά"
 24		"Anti-aliasing"
+25		"Προεπιλογή"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38

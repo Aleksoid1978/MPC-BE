@@ -376,7 +376,7 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
 16		"За замовчуванням"
 END
 
-BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
+BEGIN DIALOGEX IDD_PPAGEOSD LINES 26
 6		"Показувати OSD"
 7		"Показувати ім'я файла"
 8		"Показувати поточну позиц.\тривалість"
@@ -389,6 +389,7 @@ BEGIN DIALOGEX IDD_PPAGEOSD LINES 25
 20		"Розмір бордюрів:"
 23		"Тінь"
 24		"Згладжування"
+25		"За замовчуванням"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
