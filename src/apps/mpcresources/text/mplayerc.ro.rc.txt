@@ -345,7 +345,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 END
 
 BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
-5		"Intervalele de sărire (mici, medii, mari în ms (milisecunde))"
+5		"Intervalele de sărire (mici, medii, mari în ms (în milisecunde))"
 9		"Implicit"
 10		"Nu folosi „căutarea în dosar (în folder)” pentru comenzile „Sari înapoi/înainte” atunci când este numai un element în lista de redare (în playlist)"
 12		"Previne minimizarea playerului din ecran complet pe un monitor care nu e implicit"
