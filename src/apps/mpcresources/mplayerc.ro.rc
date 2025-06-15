@@ -927,7 +927,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "YouTube",IDC_STATIC,6,5,285,112
-    CONTROL         "Folosește analiz. pag. web încorp.",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,16,186,10
+    CONTROL         "Folosește analizorul de pagini web încorporat",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,16,186,10
     LTEXT           "Formatul video preferat:",IDC_STATIC2,10,29,120,8
     COMBOBOX        IDC_COMBO1,10,39,52,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO2,66,39,50,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
