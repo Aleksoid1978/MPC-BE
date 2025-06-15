@@ -321,7 +321,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 36		"フライバーを使用する"
 37		"プレイリスト フォント サイズ:"
 40		"コントロール サイズ:"
-42		"Windows 7 以降のタスク バーの機能を使用する"
+42		"Windows 7 (とそれ以降) のタスク バーの機能を使用する"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

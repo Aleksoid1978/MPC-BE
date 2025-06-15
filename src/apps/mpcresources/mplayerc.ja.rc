@@ -461,7 +461,7 @@ BEGIN
     LTEXT           "%",IDC_STATIC,154,187,10,8
     LTEXT           "コントロール サイズ:",IDC_STATIC8,14,96,99,8
     COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,95,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Windows 7 以降のタスク バーの機能を使用する",IDC_CHECK_WIN7,
+    CONTROL         "Windows 7 (とそれ以降) のタスク バーの機能を使用する",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,206,270,11
 END
 
