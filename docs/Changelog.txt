@@ -32,8 +32,10 @@ Player
 Fixed saving of video frame image with subtitles when using MPC Video Renderer.
 HLS M3U files are no longer processed as normal playlists, but are passed to the source filter as is.
 Added the ability to save the "Show milliseconds" setting.
-Added settings "Controls size" and "Use Blur Behind effect (Windows 11)".
+Added settings "Controls size" and "Use Blur Behind effect (Windows 10 and above)".
 Added OSD settings panel.
+Added a Debanding shader.
+Various interface fixes.
 
 Installer
 Updated MPC Video Renderer 0.9.9.
