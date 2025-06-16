@@ -343,7 +343,7 @@ BEGIN
     LTEXT           "%",IDC_STATIC3,183,95,8,8
     CONTROL         "Να μην μη γίνει επαναφορά της ταχύτητας για περίοδο λειτουργίας",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,109,175,9
     GROUPBOX        "",IDC_STATIC,137,9,154,56
-    CONTROL         "Προεπιλογή προτιμώμενων ιχνών",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,8,100,9
+    CONTROL         "Προεπιλογή προτιμώμενων ιχνών",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,8,120,9
     LTEXT           "Υπότιτλοι:",IDC_STATIC,142,23,44,8
     EDITTEXT        IDC_EDIT2,190,21,94,13,ES_AUTOHSCROLL
     LTEXT           "Ήχος:",IDC_STATIC,142,39,44,8
@@ -425,7 +425,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "",IDC_STATIC,7,5,282,105
-    CONTROL         "Χρήση του ""σκοτεινού"" θέματος (προεπιλογή)",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,5,114,8,WS_EX_TRANSPARENT
+    CONTROL         "Χρήση του ""σκοτεινού"" θέματος (προεπιλογή)",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,5,114,9,WS_EX_TRANSPARENT
     LTEXT           "Φωτεινότητα :",IDC_STATIC1,14,19,46,8,0,WS_EX_TRANSPARENT
     CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,58,19,165,12
     LTEXT           "Ρύθμιση του χρώματος από την ένδειξη του ήχου:",IDC_STATIC2,14,31,165,8
@@ -440,11 +440,11 @@ BEGIN
     CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,19,53,12
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,34,53,12
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,49,53,12
-    CONTROL         "Ενεργοποίηση σκοτεινού μενού",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,59,147,8,WS_EX_TRANSPARENT
+    CONTROL         "Ενεργοποίηση σκοτεινού μενού",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,59,147,9,WS_EX_TRANSPARENT
     CONTROL         "Use Blur Behind effect (Windows 10 and above)",IDC_CHECK7,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,232,8,WS_EX_TRANSPARENT
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,232,9,WS_EX_TRANSPARENT
     CONTROL         "Enable dark title (Windows 10 and above)",IDC_CHECK5,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,8,WS_EX_TRANSPARENT
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,9,WS_EX_TRANSPARENT
     GROUPBOX        "",IDC_STATIC,7,112,282,91
     CONTROL         "Χρήση συμβουλής χρόνου:",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,121,152,9
     COMBOBOX        IDC_COMBO3,170,119,115,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
