@@ -402,7 +402,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 38
 12		"Pasul de volum:"
 15		"Pasul de viteză:"
 18		"Nu reseta viteza pentru sesiune"
-20		"Pref. pentru pista implicită"
+20		"Preferințe pentru pista implicită"
 21		"Subtitrări:"
 23		"Audio:"
 25		"(De exemplu: rum eng jap swe)"
