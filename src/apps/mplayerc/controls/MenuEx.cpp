@@ -476,7 +476,7 @@ LRESULT CALLBACK CMenuEx::MenuWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM
 				int preference = 3; // DWMWCP_ROUNDSMALL
 				DwmSetWindowAttribute(hWnd, 33 /*DWMWA_WINDOW_CORNER_PREFERENCE*/, &preference, sizeof(preference));
 			}
-			if (AfxGetAppSettings().bDarkMenuBlurBehind && SysVersion::IsWin10orLater()) {
+			if (AfxGetAppSettings().bDarkMenuBlurBehind && SysVersion::IsWin10v1803orLater()) {
 				EnableBlurBehind(hWnd);
 			}
 			break;
