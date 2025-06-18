@@ -2,6 +2,7 @@
 
 1.8.5.x dev
 =============================
+Updated Romanian translation (by Andrei Miloiu).
 
 
 1.8.5 - 2025-06-17
