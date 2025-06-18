@@ -5,6 +5,9 @@
 Updated Romanian translation (by Andrei Miloiu).
 Updated Italian translation (by mapi68).
 
+Updated libraries:
+	vvdec v3.0.0-35-g2eaccd0.
+
 
 1.8.5 - 2025-06-17
 =============================
