@@ -386,7 +386,7 @@ BEGIN DIALOGEX IDD_PPAGEOSD LINES 26
 16		"G1"
 17		"G2"
 18		"Transparent:"
-20		"Mărime chenar:"
+20		"Mărimea chenarului:"
 23		"Umbră"
 24		"Antialiasare"
 25		"Implicit"
