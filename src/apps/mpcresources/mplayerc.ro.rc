@@ -938,14 +938,14 @@ BEGIN
     COMBOBOX        IDC_COMBO3,10,64,52,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Limba preferată pentru pistă:",IDC_STATIC4,10,78,140,8
     COMBOBOX        IDC_COMBO4,10,89,130,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Încarcă lista de redare",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,104,130,10
+    CONTROL         "Încarcă lista de redare (playlist-ul)",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,104,130,10
     GROUPBOX        "",IDC_STATIC,6,119,285,57
     CONTROL         "youtube-dl, yt-dlp",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,119,74,10
     LTEXT           "Fișierul executabil:",IDC_STATIC,10,132,104,8
     COMBOBOX        IDC_COMBO5,116,130,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Înălțimea maximă a videoclipului:",IDC_STATIC,10,148,104,8
     COMBOBOX        IDC_COMBO6,116,146,43,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Selectează nr. maxim de cadre/sec. (fps) sau rata de biți",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,162,218,10
+    CONTROL         "Selectează numărul maxim de cadre/sec. (fps) sau rata de biți",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,162,218,10
     LTEXT           "Adresa AceStream:",IDC_STATIC,10,183,77,8
     EDITTEXT        IDC_EDIT1,91,181,195,13,ES_AUTOHSCROLL
     LTEXT           "Adresa MatriX (TorrServer):",IDC_STATIC,10,200,103,8
@@ -1003,7 +1003,7 @@ CAPTION "Subtitrări disponibile online"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,5,5,490,157
-    CONTROL         "Înlocuiește subtitrările încărcate curent",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,169,150,9
+    CONTROL         "Înlocuiește subtitrările încărcate în prezent",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,169,150,9
     DEFPUSHBUTTON   "Descarcă și deschide",IDOK,397,166,98,14
 END
 
@@ -2444,21 +2444,21 @@ BEGIN
     IDS_SUBRESYNC_CLN_CELL_ID "ID-ul celulei"
     IDS_SUBRESYNC_CLN_FORCED "Forţat"
     IDS_SUBRESYNC_CLN_TEXT  "Text"
-    IDS_SUBRESYNC_CLN_STYLE "Stil"
-    IDS_SUBRESYNC_CLN_FONT  "Font (Scris)"
+    IDS_SUBRESYNC_CLN_STYLE "Stilul"
+    IDS_SUBRESYNC_CLN_FONT  "Fontul (Scrisul)"
 END
 
 STRINGTABLE
 BEGIN
     IDS_SUBRESYNC_CLN_CHARSET "Set de caractere"
     IDS_SUBRESYNC_CLN_UNICODE "Unicode"
-    IDS_SUBRESYNC_CLN_LAYER "Strat"
-    IDS_SUBRESYNC_CLN_ACTOR "Actor"
-    IDS_SUBRESYNC_CLN_EFFECT "Efect"
+    IDS_SUBRESYNC_CLN_LAYER "Stratul"
+    IDS_SUBRESYNC_CLN_ACTOR "Actorul"
+    IDS_SUBRESYNC_CLN_EFFECT "Efectul"
     IDS_PPAGE_FS_CLN_ON_OFF "Pornit/Oprit"
     IDS_PPAGE_FS_CLN_FROM_FPS "De la fps (cadre pe secundă)"
     IDS_PPAGE_FS_CLN_TO_FPS "La fps (cadre pe secundă)"
-    IDS_PPAGE_FS_CLN_DISPLAY_MODE "Mod afişare (Hz)"
+    IDS_PPAGE_FS_CLN_DISPLAY_MODE "Modul de afişare (Hz)"
     IDS_PPAGE_FS_DEFAULT    "Implicit"
     IDS_PPAGE_FS_OTHER      "Altul"
     IDS_PPAGE_OUTPUT_SYS_DEF "Implicit sistemului"
@@ -2478,7 +2478,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_SUBRESYNC_ORIGINAL  "&Original"
-    IDS_SUBRESYNC_CURRENT   "&Curent"
+    IDS_SUBRESYNC_CURRENT   "A&ctuale"
     IDS_SUBRESYNC_EDIT      "&Modifică"
     IDS_SUBRESYNC_YES       "&Da"
     IDS_SUBRESYNC_NO        "&Nu"
@@ -2831,7 +2831,7 @@ BEGIN
     IDS_MENU_VIDEO_STREAM   "F&lux video"
     IDS_MENU_VIDEO_ANGLE    "Un&ghi video"
     IDS_RESET_SETTINGS      "Resetează setările"
-    IDS_RESET_SETTINGS_WARNING  "Ești sigur(ă) că vrei să restaurezi MPC-BE la setările implicite?\nTrebuie să știi că TOATE setările curente vor fi pierdute!"
+    IDS_RESET_SETTINGS_WARNING  "Ești sigur(ă) că vrei să restaurezi MPC-BE la setările implicite?\nTrebuie să știi că TOATE setările actuale vor fi pierdute!"
     IDS_RESET_SETTINGS_MUTEX  "Te rugăm să închizi toate instanțele programului MPC-BE pentru ca setările implicite să poată fi restaurate."
     IDS_EXPORT_SETTINGS     "Exportă setările"
     IDS_EXPORT_SETTINGS_WARNING  "Unele modificări nu au fost încă salvate.\nDorești să le salvezi înainte de a le exporta?"
@@ -3149,7 +3149,7 @@ BEGIN
     IDS_VOLUME_OSD          "Volumul: %d%%"
     IDS_GAIN_OSD            "Amplificare cu: %+.1f dB"
     IDS_BALANCE_OSD         "Balans: %s"
-    IDS_FULLSCREENMONITOR_CURRENT "Curent"
+    IDS_FULLSCREENMONITOR_CURRENT "Actual"
     IDS_MPC_CRASH           "MPC-BE s-a închis neașteptat. Pentru a ne ajuta să rezolvăm această problemă, te rugăm să trimiți acest fișier „%s” către sistemul nostru de urmărire a erorilor (bug tracker).\n\nDorești să deschizi dosarul (folderul) ce conţine fişierul de imagine memorie (minidump) şi să vizitezi acum sistemul de urmărire de erori?"
     IDS_MPC_MINIDUMP_FAIL   "Nu s-a putut crea fișierul de depanare „%s” (eroare %d)"
     IDS_MAINFRM_DIR_TITLE   "Selectează directorul"
@@ -3486,7 +3486,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_LOGO_AUTHOR         "Autor necunoscut. Dacă ai făcut acest logo, contactează-ne!"
-    IDS_NO_MORE_MEDIA       "Nu mai există fișiere media în dosarul (folderul) curent."
+    IDS_NO_MORE_MEDIA       "Nu mai există fișiere media în dosarul (folderul) actual."
     IDS_FIRST_IN_FOLDER     "Acum este încărcat primul fișier din dosar (din folder)."
     IDS_LAST_IN_FOLDER      "Acum este încărcat ultimul fișier din dosar (din folder)."
     IDS_MERGING_FILES       "Se unesc fișierele..."
@@ -3741,8 +3741,8 @@ BEGIN
     IDS_GOTO_ERROR_INVALID_TIME  "Timpul introdus este mai mare decât durata fişierului."
     IDS_SCREENSHOT_ERROR_MADVR  "Funcțiile „Salvează imaginea” și „Salvează miniaturi” nu funcționează cu randorul video madVR.\nSchimbă randorul video în opțiunile de ieșire ale MPC și redeschide fișierul."
     IDS_SUBDL_DLG_FILENAME_COL "Fişier"
-    IDS_SUBDL_DLG_LANGUAGE_COL "Limbă (Language)"
-    IDS_SUBDL_DLG_FORMAT_COL "Format"
+    IDS_SUBDL_DLG_LANGUAGE_COL "Limbă"
+    IDS_SUBDL_DLG_FORMAT_COL "Formatul"
 END
 
 STRINGTABLE
@@ -3866,7 +3866,7 @@ BEGIN
     IDS_SUB_SIZE_INC        "Crește mărimea textului subtitrărilor"
     IDS_SUB_SIZE            "Mărimea textului subtitrărilor: %d"
     IDS_SUB_NOT_USE         "nu afișa subtitrările"
-    IDS_SUB_USE_INTERNAL    "Motor de randare intern pentru subtitrări"
+    IDS_SUB_USE_INTERNAL    "Motorul de randare intern pentru subtitrări"
 END
 
 STRINGTABLE
