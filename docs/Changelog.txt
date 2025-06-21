@@ -6,6 +6,7 @@ Updated Romanian translation (by Andrei Miloiu).
 Updated Italian translation (by mapi68).
 
 Updated libraries:
+	ffmpeg n7.2-dev-2767-g8aa6df663e;
 	vvdec v3.0.0-35-g2eaccd0.
 
 
