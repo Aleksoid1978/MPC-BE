@@ -287,6 +287,7 @@ void CFormatConverter::SetConvertFunc()
 			}
 			else if (m_out_pixfmt == PixFmt_YV12) {
 				m_pConvertFn = &CFormatConverter::convert_nv12_yv12_direct_sse4;
+				m_RequiredAlignment = 32;
 			}
 		}
 		else if (m_FProps.pftype == PFType_P01x) {
