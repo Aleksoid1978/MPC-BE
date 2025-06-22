@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 16		"G :"
 17		"B :"
 21		"다크 메뉴 활성화"
-22		"Use Blur Behind effect (Windows 10 and above)"
+22		"배경 흐리게 효과 사용(윈도10 이상)"
 24		"다크 타이틀 활성화(윈도11)"
 27		"시간 툴팁 사용 :"
 29		"탐색 표시줄에서 미리 보기 사용"
