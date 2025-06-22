@@ -303,8 +303,13 @@ void CFormatConverter::SetConvertFunc()
 				m_pConvertFn = &CFormatConverter::convert_y210_p210_direct_sse4;
 			}
 		}
-		else if (m_FProps.avpixfmt == AV_PIX_FMT_YUYV422 && m_out_pixfmt == PixFmt_YUY2) {
-			m_pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
+		else if (m_FProps.avpixfmt == AV_PIX_FMT_YUYV422) {
+			if (m_out_pixfmt == PixFmt_YUY2) {
+				m_pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
+			}
+			else if (m_out_pixfmt == PixFmt_YV16) {
+				m_pConvertFn = &CFormatConverter::convert_yuy2_yv16_direct_sse4;
+			}
 		}
 		else if (m_FProps.avpixfmt == AV_PIX_FMT_VUYX && m_out_pixfmt == PixFmt_AYUV) {
 			m_pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
