@@ -22,7 +22,7 @@
 
 #include "config_components.h"
 
-#include <../../vvdec/vvdec.h>
+#include <vvdec/vvdec.h>
 
 #include "libavutil/common.h"
 #include "libavutil/avutil.h"
