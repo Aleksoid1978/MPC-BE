@@ -2,6 +2,13 @@
 
 1.8.5.x dev
 =============================
+MPCVideoDec
+Fixed a crash when converting NV12 to YV12 when using the D3D11cb, D3D12cb or NVDEC decoder.
+
+Player
+Fixed YouTube format selection (VP9 720p + Opus) after resetting settings.
+Various interface fixes.
+
 Updated Romanian translation (by Andrei Miloiu).
 Updated Italian translation (by mapi68).
 
