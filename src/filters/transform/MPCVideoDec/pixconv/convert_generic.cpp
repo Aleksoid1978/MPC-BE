@@ -43,7 +43,7 @@ int sws_scale2(struct SwsContext *c, const uint8_t *const srcSlice[], const ptrd
     return sws_scale(c, srcSlice, srcStride2, srcSliceY, srcSliceH, dst, dstStride2);
 }
 
-HRESULT CFormatConverter::ConvertGeneric(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::ConvertGeneric(CONV_FUNC_PARAMS)
 {
     if (!m_pSwsContext) {
         InitSWSContext();
@@ -90,7 +90,7 @@ HRESULT CFormatConverter::ConvertGeneric(const uint8_t* const src[4], const ptrd
 // based on LAVFilters/decoder/LAVVideo/pixconv/convert_generic.cpp
 //
 
-HRESULT CFormatConverter::ConvertToAYUV(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::ConvertToAYUV(CONV_FUNC_PARAMS)
 {
     const BYTE *y = nullptr;
     const BYTE *u = nullptr;
@@ -165,7 +165,7 @@ HRESULT CFormatConverter::ConvertToAYUV(const uint8_t* const src[4], const ptrdi
     return S_OK;
 }
 
-HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[], int chromaVertical)
+HRESULT CFormatConverter::ConvertToPX1X(CONV_FUNC_PARAMS, int chromaVertical)
 {
     const BYTE *y = nullptr;
     const BYTE *u = nullptr;
@@ -291,7 +291,7 @@ HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const ptrdi
     out += dstStride;                                              \
     }
 
-HRESULT CFormatConverter::ConvertToY410(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::ConvertToY410(CONV_FUNC_PARAMS)
 {
     const uint16_t *y = nullptr;
     const uint16_t *u = nullptr;
@@ -355,7 +355,7 @@ HRESULT CFormatConverter::ConvertToY410(const uint8_t* const src[4], const ptrdi
     return S_OK;
 }
 
-HRESULT CFormatConverter::ConvertToY416(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::ConvertToY416(CONV_FUNC_PARAMS)
 {
     const uint16_t *y = nullptr;
     const uint16_t *u = nullptr;

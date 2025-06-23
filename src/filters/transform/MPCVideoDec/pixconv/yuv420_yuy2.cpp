@@ -266,7 +266,7 @@ static int __stdcall yuv420yuy2_dispatch(MPCPixFmtType inputFormat, int bpp, con
     return 0;
 }
 
-HRESULT CFormatConverter::convert_yuv420_yuy2(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_yuv420_yuy2(CONV_FUNC_PARAMS)
 {
     const auto& inputFormat = m_FProps.pftype;
     const auto& bpp = m_FProps.lumabits;

@@ -28,7 +28,7 @@
 // from LAVFilters/decoder/LAVVideo/pixconv/interleave.cpp
 //
 
-HRESULT CFormatConverter::convert_yuv444_y410(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_yuv444_y410(CONV_FUNC_PARAMS)
 {
     const auto& bpp = m_FProps.lumabits;
 

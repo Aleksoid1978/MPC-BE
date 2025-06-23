@@ -29,7 +29,7 @@
 // from LAVFilters/decoder/LAVVideo/pixconv/yuv2yuv_unscaled.cpp
 //
 
-HRESULT CFormatConverter::convert_yuv_yv_nv12_dither_le(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_yuv_yv_nv12_dither_le(CONV_FUNC_PARAMS)
 {
     const auto& inputFormat = m_FProps.pftype;
     const auto& bpp = m_FProps.lumabits;
@@ -123,7 +123,7 @@ HRESULT CFormatConverter::convert_yuv_yv_nv12_dither_le(const uint8_t* const src
     return S_OK;
 }
 
-HRESULT CFormatConverter::convert_yuv420_px1x_le(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_yuv420_px1x_le(CONV_FUNC_PARAMS)
 {
     const auto& bpp = m_FProps.lumabits;
 
@@ -180,7 +180,7 @@ HRESULT CFormatConverter::convert_yuv420_px1x_le(const uint8_t* const src[4], co
     return S_OK;
 }
 
-HRESULT CFormatConverter::convert_yuv_yv(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_yuv_yv(CONV_FUNC_PARAMS)
 {
     const auto& inputFormat = m_FProps.pftype;
 
@@ -251,13 +251,13 @@ HRESULT CFormatConverter::convert_yuv_yv(const uint8_t* const src[4], const ptrd
     return S_OK;
 }
 
-HRESULT CFormatConverter::convert_yuv420_nv12(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_yuv420_nv12(CONV_FUNC_PARAMS)
 {
     ::convert_yuv420_nv12(src, srcStride, dst, width, height, dstStride);
     return S_OK;
 }
 
-HRESULT CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le(CONV_FUNC_PARAMS)
 {
     // used yuy2 output and LAVDither_Ordered only
     const auto& bpp = m_FProps.lumabits;
@@ -316,7 +316,7 @@ HRESULT CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le(const uint8_t* cons
     return S_OK;
 }
 
-HRESULT CFormatConverter::convert_nv12_yv12(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_nv12_yv12(CONV_FUNC_PARAMS)
 {
     const ptrdiff_t inLumaStride = srcStride[0];
     const ptrdiff_t inChromaStride = srcStride[1];
@@ -375,7 +375,7 @@ HRESULT CFormatConverter::convert_nv12_yv12(const uint8_t* const src[4], const p
     return S_OK;
 }
 
-HRESULT CFormatConverter::convert_p010_nv12_sse2(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_p010_nv12_sse2(CONV_FUNC_PARAMS)
 {
     const ptrdiff_t inStride = srcStride[0];
     const ptrdiff_t outStride = dstStride[0];
@@ -446,7 +446,7 @@ HRESULT CFormatConverter::convert_p010_nv12_sse2(const uint8_t* const src[4], co
     return S_OK;
 }
 
-HRESULT CFormatConverter::convert_y210_p210_sse4(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_y210_p210_sse4(CONV_FUNC_PARAMS)
 {
     const ptrdiff_t inStride = srcStride[0];
     const ptrdiff_t outStride = dstStride[0];
@@ -511,7 +511,7 @@ HRESULT CFormatConverter::convert_y210_p210_sse4(const uint8_t* const src[4], co
     return S_OK;
 }
 
-HRESULT CFormatConverter::convert_yuy2_yv16_sse2(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_yuy2_yv16_sse2(CONV_FUNC_PARAMS)
 {
     const ptrdiff_t inStride = srcStride[0];
     const ptrdiff_t outStride = dstStride[0];

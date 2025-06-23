@@ -37,7 +37,7 @@ extern "C" {
 //
 
 // This function is only designed for NV12-like pixel formats, like NV12, P010, P016, ...
-HRESULT CFormatConverter::plane_copy_direct_nv12_sse4(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::plane_copy_direct_nv12_sse4(CONV_FUNC_PARAMS)
 {
     const ptrdiff_t inStride = srcStride[0];
     const ptrdiff_t outStride = dstStride[0];
@@ -108,7 +108,7 @@ HRESULT CFormatConverter::plane_copy_direct_nv12_sse4(const uint8_t* const src[4
     return S_OK;
 }
 
-HRESULT CFormatConverter::plane_copy_direct_sse4(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::plane_copy_direct_sse4(CONV_FUNC_PARAMS)
 {
     const SW_OUT_FMT& desc = s_sw_formats[m_out_pixfmt];
 
@@ -157,7 +157,7 @@ HRESULT CFormatConverter::plane_copy_direct_sse4(const uint8_t* const src[4], co
     return S_OK;
 }
 
-HRESULT CFormatConverter::convert_nv12_yv12_direct_sse4(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_nv12_yv12_direct_sse4(CONV_FUNC_PARAMS)
 {
     const ptrdiff_t inStride = srcStride[0];
     const ptrdiff_t outStride = dstStride[0];
@@ -256,7 +256,7 @@ HRESULT CFormatConverter::convert_nv12_yv12_direct_sse4(const uint8_t* const src
     return S_OK;
 }
 
-HRESULT CFormatConverter::convert_p010_nv12_direct_sse4(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_p010_nv12_direct_sse4(CONV_FUNC_PARAMS)
 {
     const ptrdiff_t inStride = srcStride[0];
     const ptrdiff_t outStride = dstStride[0];
@@ -374,7 +374,7 @@ HRESULT CFormatConverter::convert_p010_nv12_direct_sse4(const uint8_t* const src
     return S_OK;
 }
 
-HRESULT CFormatConverter::convert_y210_p210_direct_sse4(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_y210_p210_direct_sse4(CONV_FUNC_PARAMS)
 {
     const ptrdiff_t inStride = srcStride[0];
     const ptrdiff_t outStride = dstStride[0];
@@ -427,7 +427,7 @@ HRESULT CFormatConverter::convert_y210_p210_direct_sse4(const uint8_t* const src
     return S_OK;
 }
 
-HRESULT CFormatConverter::convert_yuy2_yv16_direct_sse4(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_yuy2_yv16_direct_sse4(CONV_FUNC_PARAMS)
 {
     const ptrdiff_t inStride = srcStride[0];
     const ptrdiff_t outStride = dstStride[0];

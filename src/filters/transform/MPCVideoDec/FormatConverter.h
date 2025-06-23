@@ -105,9 +105,10 @@ typedef struct _RGBCoeffs {
 
 typedef int (__stdcall *YUVRGBConversionFunc)(const uint8_t *srcY, const uint8_t *srcU, const uint8_t *srcV, uint8_t *dst, int width, int height, ptrdiff_t srcStrideY, ptrdiff_t srcStrideUV, ptrdiff_t dstStride, ptrdiff_t sliceYStart, ptrdiff_t sliceYEnd, const RGBCoeffs *coeffs, const uint16_t *dithers);
 
+#define CONV_FUNC_PARAMS const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[]
+
 class CFormatConverter
 {
-#define CONV_FUNC_PARAMS const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[]
 
 protected:
 	SwsContext*		m_pSwsContext = nullptr;
@@ -186,6 +187,7 @@ protected:
 	HRESULT convert_yuv420_yuy2(CONV_FUNC_PARAMS);
 
 	HRESULT convert_yuv_rgb(CONV_FUNC_PARAMS);
+
 	void InitRGBConvDispatcher();
 	const RGBCoeffs* getRGBCoeffs(int width, int height);
 

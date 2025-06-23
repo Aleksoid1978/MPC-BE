@@ -37,7 +37,7 @@
 
 #define YUV444_PACK_AYUV(dst) *idst++ = v[i] | (u[i] << 8) | (y[i] << 16) | (0xff << 24);
 
-HRESULT CFormatConverter::convert_yuv444_ayuv(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_yuv444_ayuv(CONV_FUNC_PARAMS)
 {
     const uint8_t *y = (const uint8_t *)src[0];
     const uint8_t *u = (const uint8_t *)src[1];
@@ -95,7 +95,7 @@ HRESULT CFormatConverter::convert_yuv444_ayuv(const uint8_t* const src[4], const
     return S_OK;
 }
 
-HRESULT CFormatConverter::convert_yuv444_ayuv_dither_le(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_yuv444_ayuv_dither_le(CONV_FUNC_PARAMS)
 {
     const auto& bpp = m_FProps.lumabits;
 

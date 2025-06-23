@@ -46,7 +46,7 @@ DECLARE_ALIGNED(16, const uint16_t, dither_8x8_256)[8][8] = {
 };
 // clang-format on
 
-HRESULT CFormatConverter::plane_copy_sse2(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::plane_copy_sse2(CONV_FUNC_PARAMS)
 {
     const SW_OUT_FMT& desc = s_sw_formats[m_out_pixfmt];
 

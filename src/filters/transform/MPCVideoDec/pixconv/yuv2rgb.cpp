@@ -574,7 +574,7 @@ static int __stdcall yuv2rgb_convert(const uint8_t *srcY, const uint8_t *srcU, c
     return 0;
 }
 
-HRESULT CFormatConverter::convert_yuv_rgb(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
+HRESULT CFormatConverter::convert_yuv_rgb(CONV_FUNC_PARAMS)
 {
     const RGBCoeffs *coeffs = getRGBCoeffs(width, height);
     if (coeffs == nullptr)
