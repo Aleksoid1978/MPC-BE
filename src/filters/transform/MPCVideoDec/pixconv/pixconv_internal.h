@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2010-2019 Hendrik Leppkes
+ *      Copyright (C) 2010-2021 Hendrik Leppkes
  *      http://www.1f0.de
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -19,14 +19,4 @@
 
 #pragma once
 
-//
-// from FFmpeg/libavutil/mem.h
-//
-
-#define DECLARE_ALIGNED(n,t,v) __declspec(align(n)) t v
-
-//
-// from LAVFilters/decoder/LAVVideo/pixconv/pixconv_internal.h
-//
-
-extern DECLARE_ALIGNED(16, const uint16_t, dither_8x8_256)[8][8];
+extern __declspec(align(16)) const uint16_t dither_8x8_256[8][8];

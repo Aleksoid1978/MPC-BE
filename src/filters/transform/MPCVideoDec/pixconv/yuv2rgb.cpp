@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2010-2019 Hendrik Leppkes
+ *      Copyright (C) 2010-2021 Hendrik Leppkes
  *      http://www.1f0.de
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -439,7 +439,7 @@ __forceinline static int yuv2rgb_convert_pixels(const uint8_t* &srcY, const uint
     {
         // RGB 24 output is terribly inefficient due to the un-aligned size of 3 bytes per pixel
         uint32_t eax;
-        DECLARE_ALIGNED(16, uint8_t, rgbbuf)[32];
+        __declspec(align(16)) uint8_t rgbbuf[32];
         *(uint32_t *)rgbbuf = _mm_cvtsi128_si32(xmm1);
         xmm1 = _mm_srli_si128(xmm1, 4);
         *(uint32_t *)(rgbbuf + 3) = _mm_cvtsi128_si32(xmm1);

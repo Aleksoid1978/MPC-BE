@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2010-2019 Hendrik Leppkes
+ *      Copyright (C) 2010-2021 Hendrik Leppkes
  *      http://www.1f0.de
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@
 // 8x8 Bayes ordered dithering table, scaled to the 0-255 range for 16->8 conversion
 // stored as 16-bit unsigned for optimized SIMD access
 // clang-format off
-DECLARE_ALIGNED(16, const uint16_t, dither_8x8_256)[8][8] = {
+__declspec(align(16)) const uint16_t dither_8x8_256[8][8] = {
   {   0, 192,  48, 240,  12, 204,  60, 252 },
   { 128,  64, 176, 112, 140,  76, 188, 124 },
   {  32, 224,  16, 208,  44, 236,  28, 220 },
