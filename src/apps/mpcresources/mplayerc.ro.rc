@@ -895,9 +895,9 @@ BEGIN
     COMBOBOX        IDC_D3D9DEVICE_COMBO,144,49,142,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Modul ecran complet exclusiv pe o fereastră suplimentară",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,79,224,10
-    CONTROL         "Ieșire RGB pe 10 biți",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,92,92,10
+    CONTROL         "Ieșirea RGB-ului pe 10 biți",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,92,92,10
     CONTROL         "Resetează la schimbarea ecranului",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_TOP | WS_TABSTOP,10,65,164,9
-    LTEXT           "Tampoane (Buffere) EVR:",IDC_STATIC5,10,107,65,8
+    LTEXT           "Buffere pentru EVR:",IDC_STATIC5,10,107,65,8
     EDITTEXT        IDC_EVR_BUFFERS,10,120,35,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,33,120,12,13
     LTEXT           "Formatul suprafeței:",IDC_STATIC2,115,124,72,8
@@ -932,7 +932,7 @@ BEGIN
     LTEXT           "Formatul video preferat:",IDC_STATIC2,10,29,120,8
     COMBOBOX        IDC_COMBO1,10,39,52,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO2,66,39,50,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "60 fps",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,120,41,48,10
+    CONTROL         "60 de fps",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,120,41,48,10
     CONTROL         "HDR",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,172,41,30,10
     LTEXT           "Formatul audio preferat:",IDC_STATIC3,10,54,120,8
     COMBOBOX        IDC_COMBO3,10,64,52,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -945,7 +945,7 @@ BEGIN
     COMBOBOX        IDC_COMBO5,116,130,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Înălțimea maximă a videoclipului:",IDC_STATIC,10,148,104,8
     COMBOBOX        IDC_COMBO6,116,146,43,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Selectează numărul maxim de cadre/sec. (fps) sau rata de biți",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,162,218,10
+    CONTROL         "Selectează numărul maxim de cadre/sec. (fps-uri) sau rata de biți",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,162,218,10
     LTEXT           "Adresa AceStream:",IDC_STATIC,10,183,77,8
     EDITTEXT        IDC_EDIT1,91,181,195,13,ES_AUTOHSCROLL
     LTEXT           "Adresa MatriX (TorrServer):",IDC_STATIC,10,200,103,8
@@ -1214,10 +1214,10 @@ BEGIN
     CONTROL         "Ieși din ecranul complet (pe tot ecranul) la sfârșitul redării",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,43,276,9
     CONTROL         "Ieși din ecranul complet (pe tot ecranul) când centrarea este pierdută",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,55,276,9
-    LTEXT           "Monitorul cu modul ecranul complet (pe tot ecranul)",IDC_STATIC,13,66,238,8
+    LTEXT           "Modul monitorului cu ecranul complet (pe tot ecranul)",IDC_STATIC,13,66,238,8
     COMBOBOX        IDC_COMBO1,13,75,273,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "",IDC_STATIC,5,92,287,158
-    CONTROL         "Folosește schimbarea automată a modului monitor de ecran complet",IDC_CHECK2,
+    CONTROL         "Folosește modul monitorului cu ecran complet cu schimbare automată",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,92,267,9
     CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,10,103,226,112
     PUSHBUTTON      "Adaugă",IDC_BUTTON1,240,103,48,16
@@ -1232,7 +1232,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,217,271,9
     CONTROL         "Aplică modul implicit pentru monitor la ieșirea din ecranul complet (pe tot ecranul)",IDC_CHECK3,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,228,270,9
-    CONTROL         "Restaurează rezoluția la ieșirea din program",IDC_RESTORERESCHECK,
+    CONTROL         "Restabilește rezoluția la ieșirea din program",IDC_RESTORERESCHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,239,270,9
 END
 
@@ -2329,7 +2329,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_STATSBAR_SYNC_OFFSET "Sincronizează decalajele"
-    IDS_STATSBAR_SYNC_OFFSET_FORMAT "avg: %d ms, dev: %d ms"
+    IDS_STATSBAR_SYNC_OFFSET_FORMAT "avg (media de): %d (de) ms, dev: %d (de) ms"
     IDS_STATSBAR_JITTER     "Mișcare ușor neregulată (jitter/frământare)"
     IDS_STATSBAR_BITRATE    "Rata de biți"
     IDS_STATSBAR_BITRATE_AVG_CUR " (avg/cur)"
@@ -2393,7 +2393,7 @@ BEGIN
     IDS_PLAYLIST_SHOWTOOLTIP "Afișează balonul cu instrumente"
     IDS_PLAYLIST_SHOWSEARCHBAR "Arată bara de căutare"
     IDS_PLAYLIST_HIDEFS     "Ascunde în modul ecran complet (pe tot ecranul)"
-    IDS_PLAYLIST_NEXTONERROR "Mergi la următorul (următoarea) în caz de eroare"
+    IDS_PLAYLIST_NEXTONERROR "Mergi la următorul fișier în caz de eroare"
     IDS_PLAYLIST_DETERMINEDURATION "Determină durata la adăugare"
     IDS_PLAYLIST_SKIPINVALID "Sari peste elementele invalide"
     IDS_PLAYLIST_INVALID    "Invalid"
@@ -2456,8 +2456,8 @@ BEGIN
     IDS_SUBRESYNC_CLN_ACTOR "Actorul"
     IDS_SUBRESYNC_CLN_EFFECT "Efectul"
     IDS_PPAGE_FS_CLN_ON_OFF "Pornit/Oprit"
-    IDS_PPAGE_FS_CLN_FROM_FPS "De la fps (cadre pe secundă)"
-    IDS_PPAGE_FS_CLN_TO_FPS "La fps (cadre pe secundă)"
+    IDS_PPAGE_FS_CLN_FROM_FPS "De la fps-uri (De la cadre pe secundă)"
+    IDS_PPAGE_FS_CLN_TO_FPS "La fps-uri (La cadre pe secundă)"
     IDS_PPAGE_FS_CLN_DISPLAY_MODE "Modul de afişare (Hz)"
     IDS_PPAGE_FS_DEFAULT    "Implicit"
     IDS_PPAGE_FS_OTHER      "Altul"
@@ -2729,7 +2729,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_CLOSE            "Închide"
-    IDS_SHADEREDITORDLG_0   "Ești sigur(ă) că dorești să ștergi acest nuanțator?"
+    IDS_SHADEREDITORDLG_0   "Ești sigur(ă) că dorești să ștergi acest nuanțator (acest shader)?"
 END
 
 STRINGTABLE
@@ -2737,9 +2737,9 @@ BEGIN
     IDS_AG_NONE             "Nimic"
     IDS_AG_COMMAND          "Comandă"
     IDS_AG_KEY              "Tastă"
-    IDS_AG_TYPE             "Tip"
+    IDS_AG_TYPE             "Tipul"
     IDS_AG_MOUSE            "Mouse (în fereastră)"
-    IDS_AG_MOUSE_FS         "Mouse (în ecran complet)"
+    IDS_AG_MOUSE_FS         "Mouse (în ecran complet / pe tot ecranul)"
     IDS_AG_APP_COMMAND      "Comanda aplicației"
     IDS_AG_MENU_PLAYER_A    "Meniul playerului (automat)"
 END
@@ -2778,7 +2778,7 @@ BEGIN
     IDS_SAVE_FILE           "Se salvează fișierul"
     IDS_VOLUME_OSD_MUTE     "Volumul: %d%% [Mut]"
     IDS_COPY_TO_CLIPBOARD   "Copiază în clipboard"
-    IDS_AUDIO_LEVEL         "Nivel (%d):"
+    IDS_AUDIO_LEVEL         "Nivelul (%d):"
     IDS_AUDIO_RELEASETIME   "Timp de eliberare (%d):"
     IDS_AUDIO_GAIN          "Zgomot (%+.1f dB):"
     IDS_SAVING_THUMBNAIL    "Se salvează miniaturile"
@@ -2875,7 +2875,7 @@ BEGIN
     IDS_AG_JUMP_BACKWARD_K  "Sari înapoi (cadru cheie)"
     IDS_AG_NEXT             "Următorul"
     IDS_AG_PREVIOUS         "Precedentul"
-    IDS_AG_NEXT_FILE        "Următorul fișier"
+    IDS_AG_NEXT_FILE        "Fișierul următor"
     IDS_AG_PREVIOUS_FILE    "Fișierul precedent"
 END
 
@@ -3026,7 +3026,7 @@ BEGIN
     IDS_DVB_CHANNEL_STOP_SCAN "Oprește"
     IDS_DVB_TVNAV_SEERADIO  "Stații radio"
     IDS_DVB_TVNAV_SEETV     "Stații TV"
-    IDS_CAPTURE_CHANNEL_FREQ "Canal %d (%.1f MHz)"
+    IDS_CAPTURE_CHANNEL_FREQ "Canalul %d (%.1f (de) MHz)"
 END
 
 STRINGTABLE
@@ -3037,7 +3037,7 @@ BEGIN
     IDS_AG_FRAMERATE        "Rata cadrelor"
     IDS_MAINFRM_6           "desenate: %d, pierdute: %d"
     IDS_AG_FRAMES           "Cadre"
-    IDS_AG_BUFFERS          "Preîncărcări"
+    IDS_AG_BUFFERS          "Buffere (Tampoane)"
     IDS_MAINFRM_9           "Volum: %02d/%02d, Titlu: %02d/%02d, Capitol: %02d/%02d"
     IDS_MAINFRM_10          "Unghi: %02d/%02d, %dx%d %dHz %d:%d"
     IDS_MAINFRM_11          "%s, %s %dHz %dbiți %d %s"
@@ -3057,7 +3057,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_TITLE            "Titlu %d"
+    IDS_AG_TITLE            "Titlul %d"
     IDS_MAINFRM_16          "DVD: Eroare neașteptată"
     IDS_MAINFRM_17          "DVD: Eroare de protecție la copiere"
     IDS_MAINFRM_18          "DVD: Discul DVD 1.x e nevalid"
@@ -3081,7 +3081,7 @@ BEGIN
     IDS_ADDTOPLS_FROMDIR_ALL "toate fișierele dintr-un dosar (folder)"
     IDS_EXCLUSIVE_FS_WARNING  "Această opțiune a fost proiectată pentru a evita ruperea. Cu toate acestea, va împiedica de asemenea MPC-BE să afișeze meniul contextual și orice căsuță de dialog în timpul redării.\n\nCa să ieși din modul ecran complet Direct3D și să oprești redarea, trebuie să apeși: Ctrl + C.\n\nEști sigur(ă) că dorești să activezi această opțiune?"
     IDS_MAINFRM_139         "Întârzierea subtitrărilor: %ld ms"
-    IDS_AG_TITLE2           "Titlu: %02d/%02d"
+    IDS_AG_TITLE2           "Titlul: %02d/%02d"
     IDS_THUMB_ROWNUMBER     "Rânduri:"
     IDS_THUMB_COLNUMBER     "Coloane:"
     IDS_THUMB_IMAGE_WIDTH   "Lățimea imaginii:"
@@ -3356,7 +3356,7 @@ BEGIN
     IDS_VDF_DXVA_SKIP_LEVELCHECK "Omite verificarea nivelului"
     IDS_VDF_DXVA_SKIP_REFCHECK "Omite verificarea cadrului de referință"
     IDS_VDF_DXVA_SKIP_ALLCHECK "Omite toate verificările"
-    IDS_VDF_DXVA_SD         "Dezactivează DXVA pentru SD (H.264)"
+    IDS_VDF_DXVA_SD         "Dezactivează DXVA-ul pentru SD (H.264)"
 END
 
 STRINGTABLE
@@ -3417,10 +3417,10 @@ BEGIN
     IDS_ARS_ALT_CHECK_FORMAT "Verificare alternativă a formatului suportat"
     IDS_ARS_STATUS          "Stare"
     IDS_ARS_DEVICE          "Dispozitiv:"
-    IDS_ARS_MODE            "Mod:"
+    IDS_ARS_MODE            "Modul:"
     IDS_ARS_INPUT           "Intrare"
     IDS_ARS_OUTPUT          "Ieșire"
-    IDS_ARS_FORMAT          "Format:"
+    IDS_ARS_FORMAT          "Formatul:"
 END
 
 STRINGTABLE
@@ -3680,10 +3680,10 @@ BEGIN
     IDS_OSD_RS_NO_DESKTOP_COMP_ON "Dezactivează compoziția desktop-ului: Pornit"
     IDS_OSD_RS_NO_DESKTOP_COMP_OFF "Dezactivează compoziția desktop-ului: Oprit"
     IDS_OSD_RS_RESET_DEFAULT "Setările randorului au fost resetate la valorile implicite"
-    IDS_OSD_RS_10BIT_RBG_OUT_ON "Ieșire RGB pe 10 biți: Pornită"
-    IDS_OSD_RS_10BIT_RBG_OUT_OFF "Ieșire RGB pe 10 biți: Oprită"
-    IDS_OSD_RS_10BIT_RBG_IN_ON "Forțează intrarea RGB pe 10 biți: Pornit"
-    IDS_OSD_RS_10BIT_RBG_IN_OFF "Forțează intrarea RGB pe 10 biți: Oprit"
+    IDS_OSD_RS_10BIT_RBG_OUT_ON "Ieșirea RGB-ului pe 10 biți: Pornită"
+    IDS_OSD_RS_10BIT_RBG_OUT_OFF "Ieșirea RGB-ului pe 10 biți: Oprită"
+    IDS_OSD_RS_10BIT_RBG_IN_ON "Forțează intrarea RGB-ului pe 10 biți: Pornit"
+    IDS_OSD_RS_10BIT_RBG_IN_OFF "Forțează intrarea RGB-ului pe 10 biți: Oprit"
     IDS_OSD_RS_FULL_FP_PROCESS_ON "Procesare completă în virgulă mobilă (pe 32 de biţi): Pornită"
     IDS_OSD_RS_FULL_FP_PROCESS_OFF "Procesare completă în virgulă mobilă (pe 32 de biţi): Oprită"
     IDS_OSD_RS_HALF_FP_PROCESS_ON "Procesare pe jumătate în virgulă mobilă (pe 16 biţi): Pornită"
@@ -3792,7 +3792,7 @@ BEGIN
     IDS_SUBDL_DLG_DOWNLOADING "Se descarcă subtitrarea (subtitrările), te rugăm să aştepți."
     IDS_SUBDL_DLG_PARSING   "Analizează lista..."
     IDS_SUBDL_DLG_NOT_FOUND "Nu s-au găsit subtitrări."
-    IDS_SUBDL_DLG_SUBS_AVAIL " %d subtitrare disponibilă / subtitrări disponibile)."
+    IDS_SUBDL_DLG_SUBS_AVAIL " %d subtitrare disponibilă / (de) subtitrări disponibile)."
     IDS_TOOLTIP_MINIMIZE    "Minimizează"
     IDS_TOOLTIP_RESTORE     "Restabilește"
     IDS_TOOLTIP_MAXIMIZE    "Maximizează"

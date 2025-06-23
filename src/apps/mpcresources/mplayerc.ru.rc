@@ -441,7 +441,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,34,53,12
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,49,53,12
     CONTROL         "Использовать тёмное меню",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,59,147,9,WS_EX_TRANSPARENT
-    CONTROL         "Blur Behind эффект (Windows 10 и выше)",IDC_CHECK7,
+    CONTROL         "Эффект размытия фона меню (Windows 10 и выше)",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,232,9,WS_EX_TRANSPARENT
     CONTROL         "Использовать тёмный заголовок (Windows 10 и выше)",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,9,WS_EX_TRANSPARENT
@@ -454,7 +454,7 @@ BEGIN
     LTEXT           "%",IDC_STATIC7,194,149,10,8
     COMBOBOX        IDC_COMBO4,207,148,42,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Онлайн",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,241,135,47,9,WS_EX_TRANSPARENT
-    CONTROL         "Использовать маркер для чаптеров",IDC_CHECK_CHM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,161,182,9
+    CONTROL         "Отображать метки глав на полосе прокрутки",IDC_CHECK_CHM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,161,182,9
     CONTROL         "Показать панель управления поверх видео",IDC_CHECK_FLYBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,174,182,9
     LTEXT           "Размер шрифта плейлиста:",IDC_STATIC,13,187,110,8
     EDITTEXT        IDC_EDIT2,127,185,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
@@ -2896,8 +2896,8 @@ BEGIN
     IDS_FRAME_FROMOUTSIDE   "Заполнить экран и обрезать кадр"
     IDS_CENTER_LEVEL_INC    "Центр. канал - увеличить"
     IDS_CENTER_LEVEL_DEC    "Центр. канал - уменьшить"
-    IDS_CENTER_LEVEL        "Центр. канал (%+.1f dB)"
-    IDS_CENTER_LEVEL_OSD    "Центр. канал: %+.1f dB"
+    IDS_CENTER_LEVEL        "Центр. канал (%+.1f дБ)"
+    IDS_CENTER_LEVEL_OSD    "Центр. канал: %+.1f дБ"
     IDS_SURROUND_LEVEL      "Окруж. звук (%+.1f dB)"
 END
 
