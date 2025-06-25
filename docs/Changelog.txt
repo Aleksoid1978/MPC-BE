@@ -12,6 +12,7 @@ Various interface fixes.
 Updated Romanian translation (by Andrei Miloiu).
 Updated Italian translation (by mapi68).
 Updated Korean translation (by Hackjjang).
+Updated Bulgarian translation (by jekovcar).
 
 Updated libraries:
 	ffmpeg n7.2-dev-2767-g8aa6df663e;

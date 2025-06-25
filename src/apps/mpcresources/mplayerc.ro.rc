@@ -150,10 +150,10 @@ BEGIN
     CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,100,42,114,12
     RTEXT           "Static",IDC_STATIC8,9,58,87,8
     CONTROL         "",IDC_SLIDER5,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,100,58,114,12
-    GROUPBOX        "Controlul de volum",IDC_STATIC,5,77,286,73
+    GROUPBOX        "Controlul de volum (Comanda de volum)",IDC_STATIC,5,77,286,73
     RTEXT           "Static",IDC_STATIC4,9,88,82,8
     CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,95,87,109,12
-    CONTROL         "Control de volum automat",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,104,154,9
+    CONTROL         "Control (Comandă) de volum automat(ă)",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,104,154,9
     CONTROL         "Îmbunătățește sunetul",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,167,104,117,9
     RTEXT           "Static",IDC_STATIC6,91,119,83,8
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,178,117,109,12
@@ -334,7 +334,7 @@ BEGIN
     EDITTEXT        IDC_EDIT1,65,15,20,13,ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
     LTEXT           "dată (ori)",IDC_STATIC1,90,17,40,8
     CONTROL         "Derulează la început la terminarea redării",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,10,45,116,18
-    GROUPBOX        "Control",IDC_STATIC,5,67,286,54
+    GROUPBOX        "Control (Comandă)",IDC_STATIC,5,67,286,54
     LTEXT           "Pasul de volum:",IDC_STATIC,10,79,108,8
     COMBOBOX        IDC_COMBOVOLUME,120,76,60,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "%",IDC_STATIC2,183,79,8,8
@@ -441,7 +441,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,34,53,12
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,49,53,12
     CONTROL         "Activează meniul întunecat",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,59,147,9,WS_EX_TRANSPARENT
-    CONTROL         "Folosește efectul de estompare în spate (Windows 10 și ver. mai noi)",IDC_CHECK7,
+    CONTROL         "Folosește efectul fundalului estompat (Windows 10 și ver. mai noi)",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,232,9,WS_EX_TRANSPARENT
     CONTROL         "Activează titlul întunecat (pentru Windows 10 și versiunile ulterioare)",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,9,WS_EX_TRANSPARENT
@@ -459,7 +459,7 @@ BEGIN
     LTEXT           "Dimensiunea scrisului (fontului) listei de redare:",IDC_STATIC,13,187,110,8
     EDITTEXT        IDC_EDIT2,127,185,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,187,10,8
-    LTEXT           "Dimensiunea comenzilor:",IDC_STATIC8,14,96,99,8
+    LTEXT           "Dimensiunea controalelor:",IDC_STATIC8,14,96,99,8
     COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,95,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Folosește funcțiile din bara de activități din Windows 7 (și versiunile ulterioare).",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,206,270,11
@@ -755,9 +755,9 @@ BEGIN
     GROUPBOX        "Stilul chenarului",IDC_STATIC,5,121,105,68
     CONTROL         "Contur",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,133,95,8
     CONTROL         "Dreptunghi opac",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,145,95,8
-    LTEXT           "Lățimea chenar",IDC_STATIC,10,159,72,8
+    LTEXT           "Lățimea chenarului",IDC_STATIC,10,159,72,8
     EDITTEXT        IDC_EDIT1,84,157,21,13,ES_RIGHT | ES_AUTOHSCROLL
-    LTEXT           "Profunzi. umbrei",IDC_STATIC,10,174,72,8
+    LTEXT           "Profunzimea umbrei",IDC_STATIC,10,174,72,8
     EDITTEXT        IDC_EDIT2,84,172,21,13,ES_RIGHT | ES_AUTOHSCROLL
     GROUPBOX        "Aliniază ecranul și marginile",IDC_STATIC,114,5,177,60
     CONTROL         "",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | WS_GROUP,119,41,10,8
@@ -793,10 +793,10 @@ BEGIN
     PUSHBUTTON      "SEC",IDC_COLORSEC,170,108,20,14
     CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,190,109,100,12
     LTEXT           "Contur",IDC_STATIC,119,127,47,8
-    PUSHBUTTON      "OUTL",IDC_COLOROUTL,170,124,20,14
+    PUSHBUTTON      "CONT",IDC_COLOROUTL,170,124,20,14
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,190,125,100,12
     LTEXT           "Umbră",IDC_STATIC,119,143,47,8
-    PUSHBUTTON      "SHAD",IDC_COLORSHAD,170,140,20,14
+    PUSHBUTTON      "UMBR",IDC_COLORSHAD,170,140,20,14
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,190,141,100,12
     CONTROL         "Unește canalele alpha (alfa)",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,157,110,10
     PUSHBUTTON      "Resetează",IDC_RESET,242,192,50,14
@@ -1063,7 +1063,7 @@ IDD_PPAGECOLOR DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Control al culorilor (pentru EVR, madVR și MPC VR)",IDC_STATIC,5,5,286,80
+    GROUPBOX        "Controlul culorilor (pentru EVR, madVR și MPC VR)",IDC_STATIC,5,5,286,80
     LTEXT           "Luminozitate",IDC_STATIC,10,19,55,8
     LTEXT           "Contrast",IDC_STATIC,10,35,55,8
     LTEXT           "Nuanță",IDC_STATIC,10,51,55,8
@@ -1097,7 +1097,7 @@ BEGIN
     EDITTEXT        IDC_EDIT2,64,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "Implicit",IDC_BUTTON1,158,17,56,14
-    CONTROL         "Nu folosi „căutarea în dosar (în folder)” pentru comenzile „Sari înapoi/înainte” atunci când este numai un element în lista de redare (în playlist)",IDC_CHECK7,
+    CONTROL         "Nu folosi „căutarea în dosar (în folder)” pentru comenzile (controalele) „Sari înapoi/înainte” atunci când este numai un element în lista de redare (în playlist)",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,280,18
     CONTROL         "Previne minimizarea playerului din ecran complet pe un monitor care nu este implicit",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
@@ -1180,14 +1180,14 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "Setări pentru prezentatorul personalizat al randorului video îmbunătățit (al EVR-ului)",IDC_STATIC,5,3,286,61
     CONTROL         "VSync (Sincronizare verticală)",IDC_VSYNC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,14,121,10
-    CONTROL         "VSync/Sincronizare vert. intern(ă)",IDC_VSYNC_INTERNAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,26,127,10
+    CONTROL         "Sincronizare verticală/VSync internă",IDC_VSYNC_INTERNAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,26,127,10
     CONTROL         "Activează corecția timpului cadrelor",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,170,10
     CONTROL         "Golește memoria GPU înainte de VSync",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,14,140,10
     CONTROL         "Golește memoria GPU-ului după Present",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,142,10
     CONTROL         "Așteaptă golirea memoriei",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,38,100,10
     GROUPBOX        "Setări de sincronizare pentru randorul video îmbunătățit EVR Sync",IDC_STATIC2,5,67,286,117
     CONTROL         "Sincronizează videoclipul cu afișarea",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,142,8
-    CONTROL         "Prezintă la cel mai apropiat VSync (Sinc. verticală)",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,274,8
+    CONTROL         "Prezintă-l la cea mai apropiată sincronizare verticală (la cel mai apropiat VSync)",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,274,8
     LTEXT           "Ajustarea frecvenței:",IDC_STATIC5,20,93,85,8
     EDITTEXT        IDC_CYCLEDELTA,109,91,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,123,278,1
@@ -1206,7 +1206,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "Lansează fișierele în modul ecran complet (pe tot ecranul)",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,3,274,9
-    CONTROL         "Arată comenzile în modul ecran complet (pe tot ecranul) pentru",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,15,275,9
+    CONTROL         "Arată comenzile (controalele) în modul ecran complet (pe tot ecranul) pentru",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,15,275,9
     EDITTEXT        IDC_EDIT1,14,27,32,13,ES_CENTER | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,35,27,12,13
     LTEXT           "secunde",IDC_STATIC1,51,29,30,8
@@ -2714,7 +2714,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_CONTROLS_STOPPED    "Oprit"
-    IDS_CONTROLS_BUFFERING  "Tamponare... (%d%%)"
+    IDS_CONTROLS_BUFFERING  "Tamponare (Bufferizare)... (%d%%)"
     IDS_CONTROLS_CAPTURING  "Capturare..."
     IDS_CONTROLS_OPENING    "Deschidere..."
     IDS_CONTROLS_CLOSED     "Închis"
@@ -3162,7 +3162,7 @@ BEGIN
     IDS_AG_PAUSE            "Pauzează"
     IDS_AG_TOGGLE_CAPTION   "Comută subtitrările și meniul"
     IDS_AG_TOGGLE_SEEKER    "Comută căutătorul"
-    IDS_AG_TOGGLE_CONTROLS  "Comută comenzile"
+    IDS_AG_TOGGLE_CONTROLS  "Comută controalele (Comută comenzile)"
 END
 
 STRINGTABLE
@@ -3786,7 +3786,7 @@ BEGIN
     IDS_OSD_HUE             "Nuanță: %s°"
     IDS_OSD_SATURATION      "Saturație: %s"
     IDS_OSD_RESET_COLOR     "Setările de culoare au fost restaurate"
-    IDS_OSD_NO_COLORCONTROL "Comenzile de culoare nu sunt suportate"
+    IDS_OSD_NO_COLORCONTROL "Controalele (Comenzile) de culoare nu sunt suportate"
     IDS_BRIGHTNESS_INC      "Mărește luminozitatea"
 END
 

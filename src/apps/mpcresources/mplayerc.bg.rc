@@ -441,7 +441,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,34,53,12
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,49,53,12
     CONTROL         "Използване на тъмно меню",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,59,147,9,WS_EX_TRANSPARENT
-    CONTROL         "Use Blur Behind effect (Windows 10 and above)",IDC_CHECK7,
+    CONTROL         "Използвай замъгляне за фон на меню (Windows 10 и нови)",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,232,9,WS_EX_TRANSPARENT
     CONTROL         "Използвай тъмна заглавка (Windows 10 и нови)",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,9,WS_EX_TRANSPARENT
@@ -3891,7 +3891,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_CONTROLS_SIZE_COMBO "Applies only to the built-in toolbar or external one in SVG format, and to the flybar"
+    IDC_CONTROLS_SIZE_COMBO "Прилага се само за вградената лента с инструменти или външна във формат SVG и за Flybar"
 END
 
 /////////////////////////////////////////////////////////////////////////////
