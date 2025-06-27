@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -398,21 +398,39 @@ HRESULT CPPageFormats::RegisterUI()
 	return hr;
 }
 
-void Execute(LPCWSTR lpszCommand, LPCWSTR lpszParameters)
+static CStringW SystemPath()
 {
-	SHELLEXECUTEINFOW ShExecInfo = {0};
-	ShExecInfo.cbSize		= sizeof(SHELLEXECUTEINFOW);
-	ShExecInfo.fMask		= SEE_MASK_NOCLOSEPROCESS;
-	ShExecInfo.hwnd			= nullptr;
-	ShExecInfo.lpVerb		= nullptr;
-	ShExecInfo.lpFile		= lpszCommand;
-	ShExecInfo.lpParameters	= lpszParameters;
-	ShExecInfo.lpDirectory	= nullptr;
-	ShExecInfo.nShow		= SWP_HIDEWINDOW;
-	ShExecInfo.hInstApp		= nullptr;
+	auto GetSystemPath = [] {
+		CString ret;
 
-	ShellExecuteExW(&ShExecInfo);
-	WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
+		PWSTR pathSystem = nullptr;
+		HRESULT hr = SHGetKnownFolderPath(FOLDERID_System, 0, nullptr, &pathSystem);
+		if (SUCCEEDED(hr)) {
+			ret.Format(L"%s\\", pathSystem);
+		}
+		CoTaskMemFree(pathSystem);
+
+		return ret;
+	};
+
+	static auto path = GetSystemPath();
+	return path;
+}
+
+static void Execute(CStringW commandLine)
+{
+	STARTUPINFOW startup_info = {};
+	startup_info.cb = sizeof(STARTUPINFO);
+	startup_info.wShowWindow = SW_HIDE;
+	PROCESS_INFORMATION proc_info = {};
+
+	if (CreateProcessW(nullptr, commandLine.GetBuffer(), nullptr, nullptr, FALSE,
+					   0, nullptr, nullptr, &startup_info, &proc_info)) {
+		WaitForSingleObject(proc_info.hProcess, INFINITE);
+
+		CloseHandle(proc_info.hProcess);
+		CloseHandle(proc_info.hThread);
+	}
 }
 
 typedef HRESULT (WINAPI *tpDllRegisterServer)();
@@ -438,7 +456,7 @@ bool CPPageFormats::RegisterShellExt(LPCWSTR lpszLibrary)
 		if (::PathFileExistsW(lpszLibrary)) {
 			CString strParameters;
 			strParameters.Format(L" /s \"%s\"", lpszLibrary);
-			Execute(L"regsvr32.exe", strParameters);
+			Execute(SystemPath() + L"regsvr32.exe" + strParameters);
 
 			return true;
 		}
@@ -469,7 +487,7 @@ bool CPPageFormats::UnRegisterShellExt(LPCWSTR lpszLibrary)
 		if (::PathFileExistsW(lpszLibrary)) {
 			CString strParameters;
 			strParameters.Format(L" /s /u \"%s\"", lpszLibrary);
-			Execute(L"regsvr32.exe", strParameters);
+			Execute(SystemPath() + L"regsvr32.exe" + strParameters);
 
 			return true;
 		}
