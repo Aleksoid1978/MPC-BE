@@ -1,5 +1,5 @@
 /*
- * (C) 2022 see Authors.txt
+ * (C) 2022-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,4 +39,5 @@ enum : UINT {
 	SETPAGEFOCUS            = WM_APP + 252,
 	EDIT_BUTTON_LEFTCLICKED = WM_APP + 842,
 	WM_MPCVR_SWITCH_FULLSCREEN = WM_APP + 4096,
+	WM_RESTORE,
 };

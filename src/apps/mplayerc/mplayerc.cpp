@@ -943,6 +943,7 @@ BOOL CMPlayerCApp::InitInstance()
 		if (result == WAIT_OBJECT_0 || result == WAIT_ABANDONED) {
 			const HWND hWnd = ::FindWindowW(MPC_WND_CLASS_NAMEW, nullptr);
 			if (hWnd) {
+				SendMessageW(hWnd, WM_RESTORE, 0, 0);
 				DWORD dwProcessId = 0;
 				if (GetWindowThreadProcessId(hWnd, &dwProcessId) && dwProcessId) {
 					VERIFY(AllowSetForegroundWindow(dwProcessId));

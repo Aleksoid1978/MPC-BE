@@ -933,6 +933,8 @@ private:
 
 	CMPC_Lcd m_Lcd;
 
+	LRESULT OnRestore(WPARAM wParam, LPARAM lParam);
+
 public:
 	afx_msg void OnFileOpenDVD();
 	afx_msg void OnFileOpenIso();

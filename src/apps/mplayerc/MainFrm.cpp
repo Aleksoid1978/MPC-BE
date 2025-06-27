@@ -155,6 +155,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_MESSAGE(WM_HANDLE_CMDLINE, HandleCmdLine)
 
+	ON_MESSAGE(WM_RESTORE, OnRestore)
+
 	ON_WM_CREATE()
 	ON_WM_DESTROY()
 	ON_WM_CLOSE()
@@ -1194,15 +1196,7 @@ LRESULT CMainFrame::OnNotifyIcon(WPARAM wParam, LPARAM lParam)
 
 	switch ((UINT)lParam) {
 		case WM_LBUTTONDOWN:
-			ShowWindow(SW_SHOW);
-			CreateThumbnailToolbar();
-			MoveVideoWindow();
-			SetForegroundWindow();
-
-			for (const auto& pDockingBar : m_dockingbarsVisible) {
-				ShowControlBar(pDockingBar, TRUE, FALSE);
-			}
-			m_dockingbarsVisible.clear();
+			PostMessageW(WM_RESTORE);
 			break;
 
 		case WM_LBUTTONDBLCLK:
@@ -5640,6 +5634,23 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 
 	UpdateThumbarButton();
 	UpdateThumbnailClip();
+
+	return 0;
+}
+
+LRESULT CMainFrame::OnRestore(WPARAM wParam, LPARAM lParam)
+{
+	if (m_bTrayIcon && !IsWindowVisible()) {
+		ShowWindow(SW_SHOW);
+		CreateThumbnailToolbar();
+		MoveVideoWindow();
+		SetForegroundWindow();
+
+		for (const auto& pDockingBar : m_dockingbarsVisible) {
+			ShowControlBar(pDockingBar, TRUE, FALSE);
+		}
+		m_dockingbarsVisible.clear();
+	}
 
 	return 0;
 }
