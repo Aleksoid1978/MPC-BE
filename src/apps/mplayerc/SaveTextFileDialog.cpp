@@ -22,20 +22,19 @@
 #include "stdafx.h"
 #include "SaveTextFileDialog.h"
 
-// CSaveTextFileDialog
+ //
+ // CSaveTextFileDialog
+ //
 
 IMPLEMENT_DYNAMIC(CSaveTextFileDialog, CSaveFileDialog)
 CSaveTextFileDialog::CSaveTextFileDialog(
 	CTextFile::enc e,
 	LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
-	LPCWSTR lpszFilter, CWnd* pParentWnd,
-	BOOL bDisableExternalStyleCheckBox, BOOL bSaveExternalStyleFile)
+	LPCWSTR lpszFilter, CWnd* pParentWnd)
 	: CSaveFileDialog(lpszDefExt, lpszFileName,
 				  OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 				  lpszFilter, pParentWnd)
 	, m_e(e)
-	, m_bDisableExternalStyleCheckBox(bDisableExternalStyleCheckBox)
-	, m_bSaveExternalStyleFile(bSaveExternalStyleFile)
 {
 	IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
 	if (pfdc) {
@@ -49,9 +48,6 @@ CSaveTextFileDialog::CSaveTextFileDialog(
 		pfdc->EndVisualGroup();
 		pfdc->MakeProminent(IDS_TEXTFILE_ENC);
 
-		pfdc->AddCheckButton(IDC_CHECK1, ResStr(IDS_SUB_SAVE_EXTERNAL_STYLE_FILE), m_bSaveExternalStyleFile);
-		pfdc->SetControlState(IDC_CHECK1, m_bDisableExternalStyleCheckBox ? CDCS_INACTIVE : CDCS_ENABLEDVISIBLE);
-
 		pfdc->Release();
 	}
 }
@@ -62,9 +58,43 @@ BOOL CSaveTextFileDialog::OnFileNameOK()
 	if (pfdc) {
 		DWORD result;
 		pfdc->GetSelectedControlItem(IDC_COMBO1, &result);
-		pfdc->GetCheckButtonState(IDC_CHECK1, &m_bSaveExternalStyleFile);
 		pfdc->Release();
 		m_e = (CTextFile::enc)result;
+	}
+
+	return __super::OnFileNameOK();
+}
+
+//
+// CSaveSubtitleFileDialog
+//
+
+IMPLEMENT_DYNAMIC(CSaveSubtitleFileDialog, CSaveTextFileDialog)
+CSaveSubtitleFileDialog::CSaveSubtitleFileDialog(
+	CTextFile::enc e,
+	LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
+	LPCWSTR lpszFilter, CWnd* pParentWnd,
+	BOOL bDisableExternalStyleCheckBox, BOOL bSaveExternalStyleFile)
+	: CSaveTextFileDialog(e, lpszDefExt, lpszFileName, lpszFilter, pParentWnd)
+	, m_bDisableExternalStyleCheckBox(bDisableExternalStyleCheckBox)
+	, m_bSaveExternalStyleFile(bSaveExternalStyleFile)
+{
+	IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
+	if (pfdc) {
+		pfdc->AddCheckButton(IDC_CHECK1, ResStr(IDS_SUB_SAVE_EXTERNAL_STYLE_FILE), m_bSaveExternalStyleFile);
+		pfdc->SetControlState(IDC_CHECK1, m_bDisableExternalStyleCheckBox ? CDCS_INACTIVE : CDCS_ENABLEDVISIBLE);
+
+		pfdc->Release();
+	}
+}
+
+BOOL CSaveSubtitleFileDialog::OnFileNameOK()
+{
+	IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
+	if (pfdc) {
+		pfdc->GetCheckButtonState(IDC_CHECK1, &m_bSaveExternalStyleFile);
+
+		pfdc->Release();
 	}
 
 	return __super::OnFileNameOK();

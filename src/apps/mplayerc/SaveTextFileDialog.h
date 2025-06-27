@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,13 +24,12 @@
 #include "FileDialogs.h"
 #include "Subtitles/TextFile.h"
 
+//
 // CSaveTextFileDialog
+//
 
 class CSaveTextFileDialog : public CSaveFileDialog
 {
-	BOOL m_bDisableExternalStyleCheckBox;
-	BOOL m_bSaveExternalStyleFile;
-
 	DECLARE_DYNAMIC(CSaveTextFileDialog)
 
 private:
@@ -40,13 +39,35 @@ public:
 	CSaveTextFileDialog(
 		CTextFile::enc e,
 		LPCWSTR lpszDefExt = nullptr, LPCWSTR lpszFileName = nullptr,
-		LPCWSTR lpszFilter = nullptr, CWnd* pParentWnd = nullptr,
-		BOOL bDisableExternalStyleCheckBox = TRUE, BOOL bSaveExternalStyleFile = FALSE);
+		LPCWSTR lpszFilter = nullptr, CWnd* pParentWnd = nullptr);
 	~CSaveTextFileDialog() = default;
 
 	CComboBox m_encoding;
 
 	CTextFile::enc GetEncoding() { return m_e; }
+
+protected:
+	virtual BOOL OnFileNameOK();
+};
+
+//
+// CSaveSubtitleFileDialog
+//
+
+class CSaveSubtitleFileDialog : public CSaveTextFileDialog
+{
+	BOOL m_bDisableExternalStyleCheckBox;
+	BOOL m_bSaveExternalStyleFile;
+
+	DECLARE_DYNAMIC(CSaveSubtitleFileDialog)
+
+public:
+	CSaveSubtitleFileDialog(
+		CTextFile::enc e,
+		LPCWSTR lpszDefExt = nullptr, LPCWSTR lpszFileName = nullptr,
+		LPCWSTR lpszFilter = nullptr, CWnd* pParentWnd = nullptr,
+		BOOL bDisableExternalStyleCheckBox = TRUE, BOOL bSaveExternalStyleFile = FALSE);
+
 	BOOL GetSaveExternalStyleFile() const { return m_bSaveExternalStyleFile; }
 
 protected:
