@@ -5640,16 +5640,20 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 
 LRESULT CMainFrame::OnRestore(WPARAM wParam, LPARAM lParam)
 {
-	if (m_bTrayIcon && !IsWindowVisible()) {
-		ShowWindow(SW_SHOW);
-		CreateThumbnailToolbar();
-		MoveVideoWindow();
-		SetForegroundWindow();
+	if (m_bTrayIcon) {
+		if (!IsWindowVisible()) {
+			ShowWindow(SW_SHOW);
+			CreateThumbnailToolbar();
+			MoveVideoWindow();
+			SetForegroundWindow();
 
-		for (const auto& pDockingBar : m_dockingbarsVisible) {
-			ShowControlBar(pDockingBar, TRUE, FALSE);
+			for (const auto& pDockingBar : m_dockingbarsVisible) {
+				ShowControlBar(pDockingBar, TRUE, FALSE);
+			}
+			m_dockingbarsVisible.clear();
+		} else {
+			SetForegroundWindow();
 		}
-		m_dockingbarsVisible.clear();
 	}
 
 	return 0;
