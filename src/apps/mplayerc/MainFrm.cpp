@@ -6870,7 +6870,7 @@ void CMainFrame::OnFileSaveSubtitle()
 			CAppSettings& s = AfxGetAppSettings();
 
 			// same thing as in the case of CVobSubFile above for lpszDefExt
-			CSaveSubtitleFileDialog fd(pRTS->m_encoding, L"srt", suggestedFileName, filter, GetModalParent(), FALSE, s.bSubSaveExternalStyleFile);
+			CSaveSubtitleFileDialog fd(pRTS->m_encoding, L"srt", suggestedFileName, filter, GetModalParent(), s.bSubSaveExternalStyleFile);
 
 			if (fd.DoModal() == IDOK) {
 				s.bSubSaveExternalStyleFile = !!fd.GetSaveExternalStyleFile();

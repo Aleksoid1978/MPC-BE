@@ -74,15 +74,13 @@ CSaveSubtitleFileDialog::CSaveSubtitleFileDialog(
 	CTextFile::enc e,
 	LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
 	LPCWSTR lpszFilter, CWnd* pParentWnd,
-	BOOL bDisableExternalStyleCheckBox, BOOL bSaveExternalStyleFile)
+	BOOL bSaveExternalStyleFile)
 	: CSaveTextFileDialog(e, lpszDefExt, lpszFileName, lpszFilter, pParentWnd)
-	, m_bDisableExternalStyleCheckBox(bDisableExternalStyleCheckBox)
 	, m_bSaveExternalStyleFile(bSaveExternalStyleFile)
 {
 	IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
 	if (pfdc) {
 		pfdc->AddCheckButton(IDC_CHECK1, ResStr(IDS_SUB_SAVE_EXTERNAL_STYLE_FILE), m_bSaveExternalStyleFile);
-		pfdc->SetControlState(IDC_CHECK1, m_bDisableExternalStyleCheckBox ? CDCS_INACTIVE : CDCS_ENABLEDVISIBLE);
 
 		pfdc->Release();
 	}

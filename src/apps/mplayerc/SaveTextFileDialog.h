@@ -56,7 +56,6 @@ protected:
 
 class CSaveSubtitleFileDialog : public CSaveTextFileDialog
 {
-	BOOL m_bDisableExternalStyleCheckBox;
 	BOOL m_bSaveExternalStyleFile;
 
 	DECLARE_DYNAMIC(CSaveSubtitleFileDialog)
@@ -66,7 +65,7 @@ public:
 		CTextFile::enc e,
 		LPCWSTR lpszDefExt = nullptr, LPCWSTR lpszFileName = nullptr,
 		LPCWSTR lpszFilter = nullptr, CWnd* pParentWnd = nullptr,
-		BOOL bDisableExternalStyleCheckBox = TRUE, BOOL bSaveExternalStyleFile = FALSE);
+		BOOL bSaveExternalStyleFile = FALSE);
 
 	BOOL GetSaveExternalStyleFile() const { return m_bSaveExternalStyleFile; }
 
