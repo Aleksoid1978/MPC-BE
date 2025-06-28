@@ -120,20 +120,6 @@ static av_cold int init_duplicate_context(MpegEncContext *s)
         return AVERROR(ENOMEM);
     s->block = s->blocks[0];
 
-    if (s->out_format == FMT_H263) {
-        int mb_height = s->msmpeg4_version == MSMP4_VC1 ?
-                            FFALIGN(s->mb_height, 2) : s->mb_height;
-        int y_size = s->b8_stride * (2 * mb_height + 1);
-        int c_size = s->mb_stride * (mb_height + 1);
-        int yc_size = y_size + 2 * c_size;
-        /* ac values */
-        if (!FF_ALLOCZ_TYPED_ARRAY(s->ac_val_base,  yc_size))
-            return AVERROR(ENOMEM);
-        s->ac_val[0] = s->ac_val_base + s->b8_stride + 1;
-        s->ac_val[1] = s->ac_val_base + y_size + s->mb_stride + 1;
-        s->ac_val[2] = s->ac_val[1] + c_size;
-    }
-
     return 0;
 }
 
@@ -173,7 +159,6 @@ static av_cold void free_duplicate_context(MpegEncContext *s)
     s->sc.linesize = 0;
 
     av_freep(&s->blocks);
-    av_freep(&s->ac_val_base);
     s->block = NULL;
 }
 
@@ -186,29 +171,24 @@ static av_cold void free_duplicate_contexts(MpegEncContext *s)
     free_duplicate_context(s);
 }
 
-static void backup_duplicate_context(MpegEncContext *bak, MpegEncContext *src)
-{
-#define COPY(a) bak->a = src->a
-    COPY(sc);
-    COPY(blocks);
-    COPY(block);
-    COPY(start_mb_y);
-    COPY(end_mb_y);
-    COPY(ac_val_base);
-    COPY(ac_val[0]);
-    COPY(ac_val[1]);
-    COPY(ac_val[2]);
-#undef COPY
-}
-
 int ff_update_duplicate_context(MpegEncContext *dst, const MpegEncContext *src)
 {
-    MpegEncContext bak;
+#define COPY(M)              \
+    M(ScratchpadContext, sc) \
+    M(void*, blocks)         \
+    M(void*, block)          \
+    M(int, start_mb_y)       \
+    M(int, end_mb_y)         \
+    M(int16_t*, dc_val)      \
+    M(void*, ac_val)
+
     int ret;
     // FIXME copy only needed parts
-    backup_duplicate_context(&bak, dst);
+#define BACKUP(T, member) T member = dst->member;
+    COPY(BACKUP)
     memcpy(dst, src, sizeof(MpegEncContext));
-    backup_duplicate_context(dst, &bak);
+#define RESTORE(T, member) dst->member = member;
+    COPY(RESTORE)
 
     ret = ff_mpv_framesize_alloc(dst->avctx, &dst->sc, dst->linesize);
     if (ret < 0) {
@@ -249,14 +229,33 @@ static av_cold void free_buffer_pools(BufferPoolContext *pools)
 
 av_cold int ff_mpv_init_context_frame(MpegEncContext *s)
 {
+    int nb_slices = (HAVE_THREADS &&
+                     s->avctx->active_thread_type & FF_THREAD_SLICE) ?
+                    s->avctx->thread_count : 1;
     BufferPoolContext *const pools = &s->buffer_pools;
-    int y_size, c_size, yc_size, i, mb_array_size, mv_table_size, x, y;
+    int y_size, c_size, yc_size, mb_array_size, mv_table_size, x, y;
     int mb_height;
+
+    if (s->encoding && s->avctx->slices)
+        nb_slices = s->avctx->slices;
 
     if (s->codec_id == AV_CODEC_ID_MPEG2VIDEO && !s->progressive_sequence)
         s->mb_height = (s->height + 31) / 32 * 2;
     else
         s->mb_height = (s->height + 15) / 16;
+
+    if (nb_slices > MAX_THREADS || (nb_slices > s->mb_height && s->mb_height)) {
+        int max_slices;
+        if (s->mb_height)
+            max_slices = FFMIN(MAX_THREADS, s->mb_height);
+        else
+            max_slices = MAX_THREADS;
+        av_log(s->avctx, AV_LOG_WARNING, "too many threads/slices (%d),"
+               " reducing to %d\n", nb_slices, max_slices);
+        nb_slices = max_slices;
+    }
+
+    s->slice_context_count = nb_slices;
 
     /* VC-1 can change from being progressive to interlaced on a per-frame
      * basis. We therefore allocate certain buffers so big that they work
@@ -336,25 +335,38 @@ av_cold int ff_mpv_init_context_frame(MpegEncContext *s)
     }
 
     if (s->h263_pred || s->h263_aic || !s->encoding) {
+        // When encoding, each slice (and therefore each thread)
+        // gets its own ac_val and dc_val buffers in order to avoid
+        // races.
+        size_t allslice_yc_size = yc_size * (s->encoding ? nb_slices : 1);
+        if (s->out_format == FMT_H263) {
+            /* ac values */
+            if (!FF_ALLOCZ_TYPED_ARRAY(s->ac_val_base, allslice_yc_size))
+                return AVERROR(ENOMEM);
+            s->ac_val = s->ac_val_base + s->b8_stride + 1;
+        }
+
         /* dc values */
         // MN: we need these for error resilience of intra-frames
         // Allocating them unconditionally for decoders also means
         // that we don't need to reinitialize when e.g. h263_aic changes.
-        if (!FF_ALLOCZ_TYPED_ARRAY(s->dc_val_base, yc_size))
+
+        // y_size and therefore yc_size is always odd; allocate one element
+        // more for each encoder slice in order to be able to align each slice's
+        // dc_val to four in order to use aligned stores when cleaning dc_val.
+        allslice_yc_size += s->encoding * nb_slices;
+        if (!FF_ALLOC_TYPED_ARRAY(s->dc_val_base, allslice_yc_size))
             return AVERROR(ENOMEM);
-        s->dc_val[0] = s->dc_val_base + s->b8_stride + 1;
-        s->dc_val[1] = s->dc_val_base + y_size + s->mb_stride + 1;
-        s->dc_val[2] = s->dc_val[1] + c_size;
-        for (i = 0; i < yc_size; i++)
+        s->dc_val = s->dc_val_base + s->b8_stride + 1;
+        for (size_t i = 0; i < allslice_yc_size; ++i)
             s->dc_val_base[i] = 1024;
     }
 
     // Note the + 1 is for a quicker MPEG-4 slice_end detection
     if (!(s->mbskip_table  = av_mallocz(mb_array_size + 2)) ||
         /* which mb is an intra block,  init macroblock skip table */
-        !(s->mbintra_table = av_malloc(mb_array_size)))
+        !(s->mbintra_table = av_mallocz(mb_array_size)))
         return AVERROR(ENOMEM);
-    memset(s->mbintra_table, 1, mb_array_size);
 
     ALLOC_POOL(qscale_table, mv_table_size, 0);
     ALLOC_POOL(mb_type, mv_table_size * sizeof(uint32_t), 0);
@@ -385,13 +397,7 @@ av_cold int ff_mpv_init_context_frame(MpegEncContext *s)
  */
 av_cold int ff_mpv_common_init(MpegEncContext *s)
 {
-    int nb_slices = (HAVE_THREADS &&
-                     s->avctx->active_thread_type & FF_THREAD_SLICE) ?
-                    s->avctx->thread_count : 1;
     int ret;
-
-    if (s->encoding && s->avctx->slices)
-        nb_slices = s->avctx->slices;
 
     if (s->avctx->pix_fmt == AV_PIX_FMT_NONE) {
         av_log(s->avctx, AV_LOG_ERROR,
@@ -415,26 +421,15 @@ av_cold int ff_mpv_common_init(MpegEncContext *s)
     if ((ret = ff_mpv_init_context_frame(s)))
         goto fail;
 
-    if (nb_slices > MAX_THREADS || (nb_slices > s->mb_height && s->mb_height)) {
-        int max_slices;
-        if (s->mb_height)
-            max_slices = FFMIN(MAX_THREADS, s->mb_height);
-        else
-            max_slices = MAX_THREADS;
-        av_log(s->avctx, AV_LOG_WARNING, "too many threads/slices (%d),"
-               " reducing to %d\n", nb_slices, max_slices);
-        nb_slices = max_slices;
-    }
-
     s->context_initialized = 1;
-    memset(s->thread_context, 0, sizeof(s->thread_context));
     s->thread_context[0]   = s;
-    s->slice_context_count = nb_slices;
 
 //     if (s->width && s->height) {
-    ret = ff_mpv_init_duplicate_contexts(s);
-    if (ret < 0)
-        goto fail;
+    if (!s->encoding) {
+        ret = ff_mpv_init_duplicate_contexts(s);
+        if (ret < 0)
+            goto fail;
+    }
 //     }
 
     return 0;
@@ -453,6 +448,7 @@ av_cold void ff_mpv_free_context_frame(MpegEncContext *s)
         for (int j = 0; j < 2; j++)
             s->p_field_mv_table[i][j] = NULL;
 
+    av_freep(&s->ac_val_base);
     av_freep(&s->dc_val_base);
     av_freep(&s->coded_block_base);
     av_freep(&s->mbintra_table);
@@ -491,24 +487,25 @@ void ff_clean_intra_table_entries(MpegEncContext *s)
 {
     int wrap = s->b8_stride;
     int xy = s->block_index[0];
-
-    s->dc_val[0][xy           ] =
-    s->dc_val[0][xy + 1       ] =
-    s->dc_val[0][xy     + wrap] =
-    s->dc_val[0][xy + 1 + wrap] = 1024;
-    /* ac pred */
-    memset(s->ac_val[0][xy       ], 0, 32 * sizeof(int16_t));
-    memset(s->ac_val[0][xy + wrap], 0, 32 * sizeof(int16_t));
     /* chroma */
-    wrap = s->mb_stride;
-    xy = s->mb_x + s->mb_y * wrap;
-    s->dc_val[1][xy] =
-    s->dc_val[2][xy] = 1024;
-    /* ac pred */
-    memset(s->ac_val[1][xy], 0, 16 * sizeof(int16_t));
-    memset(s->ac_val[2][xy], 0, 16 * sizeof(int16_t));
+    unsigned uxy = s->block_index[4];
+    unsigned vxy = s->block_index[5];
+    int16_t *dc_val = s->dc_val;
 
-    s->mbintra_table[xy]= 0;
+    AV_WN32A(dc_val + xy,        1024 << 16 | 1024);
+    AV_WN32 (dc_val + xy + wrap, 1024 << 16 | 1024);
+    dc_val[uxy] =
+    dc_val[vxy] = 1024;
+    /* ac pred */
+    int16_t (*ac_val)[16] = s->ac_val;
+    av_assume(!((uintptr_t)ac_val & 0xF));
+    // Don't reset the upper-left luma block, as it will only ever be
+    // referenced by blocks from the same macroblock.
+    memset(ac_val[xy +    1], 0,     sizeof(*ac_val));
+    memset(ac_val[xy + wrap], 0, 2 * sizeof(*ac_val));
+    /* ac pred */
+    memset(ac_val[uxy], 0, sizeof(*ac_val));
+    memset(ac_val[vxy], 0, sizeof(*ac_val));
 }
 
 void ff_init_block_index(MpegEncContext *s){ //FIXME maybe rename

@@ -78,16 +78,16 @@ static const uint16_t rv_chrom_len_count[15] = {
     1,  2,  4,  0,  8,  0, 16,  0, 32,  0,  64,  0, 128,  0, 256,
 };
 
-static VLC rv_dc_lum, rv_dc_chrom;
+static VLCElem rv_dc_lum[1472], rv_dc_chrom[992];
 
 int ff_rv_decode_dc(MpegEncContext *s, int n)
 {
     int code;
 
     if (n < 4) {
-        code = get_vlc2(&s->gb, rv_dc_lum.table, DC_VLC_BITS, 2);
+        code = get_vlc2(&s->gb, rv_dc_lum, DC_VLC_BITS, 2);
     } else {
-        code = get_vlc2(&s->gb, rv_dc_chrom.table, DC_VLC_BITS, 2);
+        code = get_vlc2(&s->gb, rv_dc_chrom, DC_VLC_BITS, 2);
         if (code < 0) {
             av_log(s->avctx, AV_LOG_ERROR, "chroma dc error\n");
             return -1;
@@ -284,7 +284,13 @@ static int rv20_decode_picture_header(RVDecContext *rv, int whole_size)
         skip_bits(&s->gb, 5);
 
     s->h263_aic        = s->pict_type == AV_PICTURE_TYPE_I;
-    s->modified_quant  = 1;
+    if (s->h263_aic) {
+        s->y_dc_scale_table =
+        s->c_dc_scale_table = ff_aic_dc_scale_table;
+    } else {
+        s->y_dc_scale_table =
+        s->c_dc_scale_table = ff_mpeg1_dc_scale_table;
+    }
     if (!s->avctx->lowres)
         s->loop_filter = 1;
 
@@ -300,7 +306,8 @@ static int rv20_decode_picture_header(RVDecContext *rv, int whole_size)
     return s->mb_width * s->mb_height - mb_pos;
 }
 
-static av_cold void rv10_build_vlc(VLC *vlc, const uint16_t len_count[15],
+static av_cold void rv10_build_vlc(VLCElem vlc[], int table_size,
+                                   const uint16_t len_count[15],
                                    const uint8_t sym_rl[][2], int sym_rl_elems)
 {
     uint16_t syms[MAX_VLC_ENTRIES];
@@ -317,32 +324,26 @@ static av_cold void rv10_build_vlc(VLC *vlc, const uint16_t len_count[15],
         for (unsigned tmp = nb_lens + len_count[i]; nb_lens < tmp; nb_lens++)
             lens[nb_lens] = i + 2;
     av_assert1(nb_lens == nb_syms);
-    ff_vlc_init_from_lengths(vlc, DC_VLC_BITS, nb_lens, lens, 1,
-                             syms, 2, 2, 0, VLC_INIT_STATIC_OVERLONG, NULL);
+    ff_vlc_init_table_from_lengths(vlc, table_size, DC_VLC_BITS, nb_lens,
+                                   lens, 1, syms, 2, 2, 0, 0);
 }
 
 static av_cold void rv10_init_static(void)
 {
-    static VLCElem table[1472 + 992];
-
-    rv_dc_lum.table             = table;
-    rv_dc_lum.table_allocated   = 1472;
-    rv10_build_vlc(&rv_dc_lum, rv_lum_len_count,
+    rv10_build_vlc(rv_dc_lum, FF_ARRAY_ELEMS(rv_dc_lum), rv_lum_len_count,
                    rv_sym_run_len, FF_ARRAY_ELEMS(rv_sym_run_len));
     for (int i = 0; i < 1 << (DC_VLC_BITS - 7 /* Length of skip prefix */); i++) {
         /* All codes beginning with 0x7F have the same length and value.
          * Modifying the table directly saves us the useless subtables. */
-        rv_dc_lum.table[(0x7F << (DC_VLC_BITS - 7)) + i].sym = 255;
-        rv_dc_lum.table[(0x7F << (DC_VLC_BITS - 7)) + i].len = 18;
+        rv_dc_lum[(0x7F << (DC_VLC_BITS - 7)) + i].sym = 255;
+        rv_dc_lum[(0x7F << (DC_VLC_BITS - 7)) + i].len = 18;
     }
-    rv_dc_chrom.table           = &table[1472];
-    rv_dc_chrom.table_allocated = 992;
-    rv10_build_vlc(&rv_dc_chrom, rv_chrom_len_count,
+    rv10_build_vlc(rv_dc_chrom, FF_ARRAY_ELEMS(rv_dc_chrom), rv_chrom_len_count,
                    rv_sym_run_len, FF_ARRAY_ELEMS(rv_sym_run_len) - 2);
     for (int i = 0; i < 1 << (DC_VLC_BITS - 9 /* Length of skip prefix */); i++) {
         /* Same as above. */
-        rv_dc_chrom.table[(0x1FE << (DC_VLC_BITS - 9)) + i].sym = 255;
-        rv_dc_chrom.table[(0x1FE << (DC_VLC_BITS - 9)) + i].len = 18;
+        rv_dc_chrom[(0x1FE << (DC_VLC_BITS - 9)) + i].sym = 255;
+        rv_dc_chrom[(0x1FE << (DC_VLC_BITS - 9)) + i].len = 18;
     }
 }
 
@@ -370,6 +371,10 @@ static av_cold int rv10_decode_init(AVCodecContext *avctx)
 
     s->h263_long_vectors = avctx->extradata[3] & 1;
     rv->sub_id           = AV_RB32A(avctx->extradata + 4);
+    if (avctx->codec_id == AV_CODEC_ID_RV20) {
+        s->modified_quant      = 1;
+        s->chroma_qscale_table = ff_h263_chroma_qscale_table;
+    }
 
     major_ver = RV_GET_MAJOR_VER(rv->sub_id);
     minor_ver = RV_GET_MINOR_VER(rv->sub_id);
@@ -467,16 +472,6 @@ static int rv10_decode_packet(AVCodecContext *avctx, const uint8_t *buf,
     }
     start_mb_x     = s->mb_x;
     s->resync_mb_y = s->mb_y;
-    if (s->h263_aic) {
-        s->y_dc_scale_table =
-        s->c_dc_scale_table = ff_aic_dc_scale_table;
-    } else {
-        s->y_dc_scale_table =
-        s->c_dc_scale_table = ff_mpeg1_dc_scale_table;
-    }
-
-    if (s->modified_quant)
-        s->chroma_qscale_table = ff_h263_chroma_qscale_table;
 
     ff_set_qscale(s, s->qscale);
 
