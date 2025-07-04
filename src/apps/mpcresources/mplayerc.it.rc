@@ -442,7 +442,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,49,53,12
     CONTROL         "Abilita menu scuro",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,59,147,9,WS_EX_TRANSPARENT
     CONTROL         "Usa effetto Sfocatura dietro (Windows 10 e versioni successive)",IDC_CHECK7,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,232,9,WS_EX_TRANSPARENT
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,265,9,WS_EX_TRANSPARENT
     CONTROL         "Abilita titolo scuro (Windows 10 and above)",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,9,WS_EX_TRANSPARENT
     GROUPBOX        "",IDC_STATIC,7,112,282,91
