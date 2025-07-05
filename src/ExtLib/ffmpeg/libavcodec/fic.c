@@ -56,7 +56,6 @@ typedef struct FICContext {
     int aligned_width, aligned_height;
     int num_slices, slice_h;
 
-    uint8_t cursor_buf[4096];
     int skip_cursor;
 } FICContext;
 
@@ -86,6 +85,7 @@ static const uint8_t fic_header[7] = { 0, 0, 1, 'F', 'I', 'C', 'V' };
 
 #define FIC_HEADER_SIZE 27
 #define CURSOR_OFFSET 59
+#define CURSOR_SIZE   4096
 
 static av_always_inline void fic_idct(int16_t *blk, int step, int shift, int rnd)
 {
@@ -214,10 +214,11 @@ static av_always_inline void fic_alpha_blend(uint8_t *dst, uint8_t *src,
         dst[i] += ((src[i] - dst[i]) * alpha[i]) >> 8;
 }
 
-static void fic_draw_cursor(AVCodecContext *avctx, int cur_x, int cur_y)
+static void fic_draw_cursor(AVCodecContext *avctx, const uint8_t cursor_buf[CURSOR_SIZE],
+                            int cur_x, int cur_y)
 {
     FICContext *ctx = avctx->priv_data;
-    uint8_t *ptr    = ctx->cursor_buf;
+    const uint8_t *ptr = cursor_buf;
     uint8_t *dstptr[3];
     uint8_t planes[4][1024];
     uint8_t chroma[3][256];
@@ -281,9 +282,6 @@ static int fic_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
     int skip_cursor = ctx->skip_cursor;
     const uint8_t *sdata;
 
-    if ((ret = ff_reget_buffer(avctx, ctx->frame, 0)) < 0)
-        return ret;
-
     /* Header + at least one slice (4) */
     if (avpkt->size < FIC_HEADER_SIZE + 4) {
         av_log(avctx, AV_LOG_ERROR, "Frame data is too small.\n");
@@ -296,10 +294,14 @@ static int fic_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
 
     /* Is it a skip frame? */
     if (src[17]) {
-        if (!ctx->final_frame) {
+        if (!ctx->final_frame->data[0]) {
             av_log(avctx, AV_LOG_WARNING, "Initial frame is skipped\n");
             return AVERROR_INVALIDDATA;
         }
+        ret = ff_reget_buffer(avctx, ctx->final_frame,
+                              FF_REGET_BUFFER_FLAG_READONLY);
+        if (ret < 0)
+            return ret;
         goto skip;
     }
 
@@ -346,9 +348,8 @@ static int fic_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
         skip_cursor = 1;
     }
 
-    if (!skip_cursor && avpkt->size < CURSOR_OFFSET + sizeof(ctx->cursor_buf)) {
+    if (!skip_cursor && avpkt->size < CURSOR_OFFSET + CURSOR_SIZE)
         skip_cursor = 1;
-    }
 
     /* Slice height for all but the last slice. */
     ctx->slice_h = 16 * (ctx->aligned_height >> 4) / nslices;
@@ -403,6 +404,9 @@ static int fic_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
         ctx->slice_data[slice].y_off    = y_off;
     }
 
+    if ((ret = ff_reget_buffer(avctx, ctx->frame, 0)) < 0)
+        return ret;
+
     if ((ret = avctx->execute(avctx, fic_decode_slice, ctx->slice_data,
                               NULL, nslices, sizeof(ctx->slice_data[0]))) < 0)
         return ret;
@@ -416,29 +420,24 @@ static int fic_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
             break;
         }
     }
-    av_frame_free(&ctx->final_frame);
-    ctx->final_frame = av_frame_clone(ctx->frame);
-    if (!ctx->final_frame) {
-        av_log(avctx, AV_LOG_ERROR, "Could not clone frame buffer.\n");
-        return AVERROR(ENOMEM);
-    }
-
-    /* Make sure we use a user-supplied buffer. */
-    if ((ret = ff_reget_buffer(avctx, ctx->final_frame, 0)) < 0) {
-        av_log(avctx, AV_LOG_ERROR, "Could not make frame writable.\n");
+    ret = av_frame_replace(ctx->final_frame, ctx->frame);
+    if (ret < 0)
         return ret;
-    }
 
-    /* Draw cursor. */
+    /* Draw cursor if needed. */
     if (!skip_cursor) {
-        memcpy(ctx->cursor_buf, src + CURSOR_OFFSET, sizeof(ctx->cursor_buf));
-        fic_draw_cursor(avctx, cur_x, cur_y);
+        /* Make frame writable. */
+        ret = ff_reget_buffer(avctx, ctx->final_frame, 0);
+        if (ret < 0)
+            return ret;
+
+        fic_draw_cursor(avctx, src + CURSOR_OFFSET, cur_x, cur_y);
     }
 
 skip:
-    *got_frame = 1;
     if ((ret = av_frame_ref(rframe, ctx->final_frame)) < 0)
         return ret;
+    *got_frame = 1;
 
     return avpkt->size;
 }
@@ -469,6 +468,9 @@ static av_cold int fic_decode_init(AVCodecContext *avctx)
     ctx->frame = av_frame_alloc();
     if (!ctx->frame)
         return AVERROR(ENOMEM);
+    ctx->final_frame = av_frame_alloc();
+    if (!ctx->final_frame)
+        return AVERROR(ENOMEM);
 
     return 0;
 }
@@ -496,4 +498,5 @@ const FFCodec ff_fic_decoder = {
     .close          = fic_decode_close,
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_SLICE_THREADS,
     .p.priv_class   = &fic_decoder_class,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

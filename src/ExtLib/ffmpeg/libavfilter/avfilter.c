@@ -1253,16 +1253,14 @@ static int forward_status_change(AVFilterContext *filter, FilterLinkInternal *li
 static int filter_activate_default(AVFilterContext *filter)
 {
     unsigned i;
+    int nb_eofs = 0;
 
-    for (i = 0; i < filter->nb_outputs; i++) {
-        FilterLinkInternal *li = ff_link_internal(filter->outputs[i]);
-        int ret = li->status_in;
-
-        if (ret) {
-            for (int j = 0; j < filter->nb_inputs; j++)
-                ff_inlink_set_status(filter->inputs[j], ret);
-            return 0;
-        }
+    for (i = 0; i < filter->nb_outputs; i++)
+        nb_eofs += ff_outlink_get_status(filter->outputs[i]) == AVERROR_EOF;
+    if (filter->nb_outputs && nb_eofs == filter->nb_outputs) {
+        for (int j = 0; j < filter->nb_inputs; j++)
+            ff_inlink_set_status(filter->inputs[j], AVERROR_EOF);
+        return 0;
     }
 
     for (i = 0; i < filter->nb_inputs; i++) {
@@ -1284,6 +1282,15 @@ static int filter_activate_default(AVFilterContext *filter)
             !li->frame_blocked_in) {
             return request_frame_to_filter(filter->outputs[i]);
         }
+    }
+    for (i = 0; i < filter->nb_outputs; i++) {
+        FilterLinkInternal * const li = ff_link_internal(filter->outputs[i]);
+        if (li->frame_wanted_out)
+            return request_frame_to_filter(filter->outputs[i]);
+    }
+    if (!filter->nb_outputs) {
+        ff_inlink_request_frame(filter->inputs[0]);
+        return 0;
     }
     return FFERROR_NOT_READY;
 }
@@ -1418,6 +1425,17 @@ static int filter_activate_default(AVFilterContext *filter)
      Rationale: checking frame_blocked_in is necessary to avoid requesting
      repeatedly on a blocked input if another is not blocked (example:
      [buffersrc1][testsrc1][buffersrc2][testsrc2]concat=v=2).
+
+   - If an output has frame_wanted_out > 0 call request_frame().
+
+     Rationale: even if all inputs are blocked an activate callback should
+     request a frame on some if its inputs if a frame is requested on any of
+     its output.
+
+   - Request a frame on the input for sinks.
+
+     Rationale: sinks using the old api have no way to request a frame on their
+     input, so we need to do it for them.
  */
 
 int ff_filter_activate(AVFilterContext *filter)

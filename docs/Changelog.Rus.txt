@@ -15,7 +15,7 @@ MPCVideoDec
 Обновлен болгарский перевод (автор jekovcar).
 
 Обновлены библиотеки:
-	ffmpeg n7.2-dev-2894-g6e8bd5dd25;
+	ffmpeg n7.2-dev-3009-g05094c1749;
 	vvdec v3.0.0-35-g2eaccd0.
 
 

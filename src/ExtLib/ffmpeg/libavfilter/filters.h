@@ -31,6 +31,7 @@
  * Special return code when activate() did not do anything.
  */
 #define FFERROR_NOT_READY FFERRTAG('N','R','D','Y')
+#define FFERROR_BUFFERSRC_EMPTY FFERRTAG('M','P','T','Y')
 
 /**
  * A filter pad used for either input or output.
@@ -693,6 +694,19 @@ static inline void ff_outlink_set_status(AVFilterLink *link, int status, int64_t
     if (ff_outlink_frame_wanted(outlink)) { \
         ff_inlink_request_frame(inlink); \
         return 0; \
+    } \
+} while (0)
+
+/**
+ * Forward the frame_wanted_out flag from any of the output links to an input link.
+ * If the flag is set on any of the outputs, this macro will return immediately.
+ */
+#define FF_FILTER_FORWARD_WANTED_ANY(filter, inlink) do { \
+    for (unsigned i = 0; i < filter->nb_outputs; i++) { \
+        if (ff_outlink_frame_wanted(filter->outputs[i])) { \
+            ff_inlink_request_frame(inlink); \
+            return 0; \
+        } \
     } \
 } while (0)
 

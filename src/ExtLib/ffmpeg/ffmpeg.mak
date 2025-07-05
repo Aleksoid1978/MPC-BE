@@ -781,6 +781,7 @@ SRCS_LU = \
 	libavutil/side_data.c \
 	libavutil/slicethread.c \
 	libavutil/stereo3d.c \
+	libavutil/tdrdi.c \
 	libavutil/threadmessage.c \
 	libavutil/time.c \
 	libavutil/timecode.c \

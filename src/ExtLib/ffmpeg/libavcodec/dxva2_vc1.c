@@ -108,7 +108,7 @@ void ff_dxva2_vc1_fill_picture_parameters(AVCodecContext *avctx,
     pp->bRcontrol               = v->rnd;
     pp->bPicSpatialResid8       = (v->panscanflag  << 7) |
                                   (v->refdist_flag << 6) |
-                                  (s->loop_filter  << 5) |
+                                  (v->loop_filter  << 5) |
                                   (v->fastuvmc     << 4) |
                                   (v->extended_mv  << 3) |
                                   (v->dquant       << 1) |
@@ -121,7 +121,7 @@ void ff_dxva2_vc1_fill_picture_parameters(AVCodecContext *avctx,
     pp->bPicExtrapolation       = (!v->interlace || v->fcm == PROGRESSIVE) ? 1 : 2;
     pp->bPicDeblocked           = ((!pp->bPicBackwardPrediction && v->overlap)        << 6) |
                                   ((v->profile != PROFILE_ADVANCED && v->rangeredfrm) << 5) |
-                                  (s->loop_filter                                     << 1);
+                                  (v->loop_filter                                     << 1);
     pp->bPicDeblockConfined     = (v->postprocflag             << 7) |
                                   (v->broadcast                << 6) |
                                   (v->interlace                << 5) |
@@ -177,7 +177,7 @@ void ff_dxva2_vc1_fill_slice(AVCodecContext *avctx, DXVA_SliceInfo *slice,
     slice->dwSliceDataLocation = position;
     slice->bStartCodeBitOffset = 0;
     slice->bReservedBits       = (s->pict_type == AV_PICTURE_TYPE_B && !v->bi_type) ? v->bfraction_lut_index + 9 : 0;
-    slice->wMBbitOffset        = v->p_frame_skipped ? 0xffff : get_bits_count(&s->gb) + (avctx->codec_id == AV_CODEC_ID_VC1 ? 32 : 0);
+    slice->wMBbitOffset        = v->p_frame_skipped ? 0xffff : get_bits_count(&v->gb) + (avctx->codec_id == AV_CODEC_ID_VC1 ? 32 : 0);
     /* XXX We store the index of the first MB and it will be fixed later */
     slice->wNumberMBsInSlice   = (s->mb_y >> v->field_mode) * s->mb_width + s->mb_x;
     slice->wQuantizerScaleCode = v->pq;

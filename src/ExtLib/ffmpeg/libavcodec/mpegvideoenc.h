@@ -31,6 +31,7 @@
 #include <float.h>
 
 #include "libavutil/avassert.h"
+#include "libavutil/mem_internal.h"
 #include "libavutil/opt.h"
 #include "fdctdsp.h"
 #include "motion_est.h"
@@ -110,6 +111,8 @@ typedef struct MPVEncContext {
 
     int coded_score[12];
 
+    int16_t (*block)[64];       ///< points into blocks below
+
     /** precomputed matrix (combine qscale and DCT renorm) */
     int (*q_intra_matrix)[64];
     int (*q_chroma_intra_matrix)[64];
@@ -125,6 +128,8 @@ typedef struct MPVEncContext {
     int dct_count[2];
     uint16_t (*dct_offset)[64];
 
+    int picture_number;
+
     /* statistics, used for 2-pass encoding */
     int mv_bits;
     int i_tex_bits;
@@ -133,11 +138,21 @@ typedef struct MPVEncContext {
     int misc_bits; ///< cbp, mb_type
     int last_bits; ///< temp var used for calculating the above vars
 
+    int mb_skip_run;
+
     /* H.263 specific */
+    int gob_index;
     int mb_info;                   ///< interval for outputting info about mb offsets as side data
     int prev_mb_info, last_mb_info;
     int mb_info_size;
     uint8_t *mb_info_ptr;
+
+    /* H.263+ specific */
+    int umvplus;                   ///< == H.263+ && unrestricted_mv
+    int h263_slice_structured;
+    int alt_inter_vlc;             ///< alternative inter vlc
+    int modified_quant;
+    int loop_filter;
 
     /* MJPEG specific */
     struct MJpegContext *mjpeg_ctx;
@@ -147,11 +162,15 @@ typedef struct MPVEncContext {
     int last_mv_dir;               ///< last mv_dir, used for B-frame encoding
 
     /* MPEG-4 specific */
+    int data_partitioning;         ///< data partitioning flag, set via option
+    int partitioned_frame;         ///< is current frame partitioned
     int mpeg_quant;
     PutBitContext tex_pb;          ///< used for data partitioned VOPs
     PutBitContext pb2;             ///< used for data partitioned VOPs
 
     /* MSMPEG4 specific */
+    int slice_height;              ///< in macroblocks
+    int flipflop_rounding;         ///< also used for MPEG-4, H.263+
     int esc3_level_length;
 
     /* RTP specific */
@@ -173,6 +192,8 @@ typedef struct MPVEncContext {
     int (*sum_abs_dctelem)(const int16_t *block);
 
     int intra_penalty;
+
+    DECLARE_ALIGNED_32(int16_t, blocks)[2][12][64]; // for HQ mode we need to keep the best block
 } MPVEncContext;
 
 typedef struct MPVMainEncContext {

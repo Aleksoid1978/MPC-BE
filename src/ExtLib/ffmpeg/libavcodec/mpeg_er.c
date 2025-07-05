@@ -51,10 +51,7 @@ void ff_mpeg_er_frame_start(MpegEncContext *s)
     set_erpic(&er->next_pic, s->next_pic.ptr);
     set_erpic(&er->last_pic, s->last_pic.ptr);
 
-    er->pp_time           = s->pp_time;
-    er->pb_time           = s->pb_time;
     er->quarter_sample    = s->quarter_sample;
-    er->partitioned_frame = s->partitioned_frame;
 
     ff_er_frame_start(er);
 }
@@ -76,7 +73,7 @@ static void mpeg_er_decode_mb(void *opaque, int ref, int mv_dir, int mv_type,
     s->mcsel      = 0;
     memcpy(s->mv, mv, sizeof(*mv));
 
-    // The following disables the IDCT.
+    // The following disables unquantizing and the IDCT.
     for (size_t i = 0; i < FF_ARRAY_ELEMS(s->block_last_index); i++)
         s->block_last_index[i] = -1;
 
@@ -93,7 +90,7 @@ static void mpeg_er_decode_mb(void *opaque, int ref, int mv_dir, int mv_type,
     if (ref)
         av_log(s->avctx, AV_LOG_DEBUG,
                "Interlaced error concealment is not fully implemented\n");
-    ff_mpv_reconstruct_mb(s, s->block);
+    ff_mpv_reconstruct_mb(s, NULL);
 }
 
 av_cold int ff_mpeg_er_init(MpegEncContext *s)

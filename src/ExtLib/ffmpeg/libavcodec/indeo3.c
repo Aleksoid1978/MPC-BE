@@ -324,7 +324,7 @@ static inline uint32_t replicate32(uint32_t a) {
 
 /* Fill n lines with 64-bit pixel value pix */
 static inline void fill_64(uint8_t *dst, const uint64_t pix, int32_t n,
-                           int32_t row_offset)
+                           ptrdiff_t row_offset)
 {
     for (; n > 0; dst += row_offset, n--)
         AV_WN64A(dst, pix);
@@ -429,30 +429,28 @@ if (*data_ptr >= last_ptr) \
 
 
 static int decode_cell_data(Indeo3DecodeContext *ctx, Cell *cell,
-                            uint8_t *block, uint8_t *ref_block,
+                            uint8_t *block, const uint8_t *ref_block,
                             ptrdiff_t row_offset, int h_zoom, int v_zoom, int mode,
                             const vqEntry *delta[2], int swap_quads[2],
                             const uint8_t **data_ptr, const uint8_t *last_ptr)
 {
     int           x, y, line, num_lines;
     int           rle_blocks = 0;
-    uint8_t       code, *dst, *ref;
     const vqEntry *delta_tab;
     unsigned int  dyad1, dyad2;
     uint64_t      pix64;
     int           skip_flag = 0, is_top_of_cell, is_first_row = 1;
-    int           blk_row_offset, line_offset;
 
-    blk_row_offset = (row_offset << (2 + v_zoom)) - (cell->width << 2);
-    line_offset    = v_zoom ? row_offset : 0;
+    const ptrdiff_t blk_row_offset = (row_offset << (2 + v_zoom)) - (cell->width << 2);
+    const ptrdiff_t line_offset    = v_zoom ? row_offset : 0;
 
     if (cell->height & v_zoom || cell->width & h_zoom)
         return IV3_BAD_DATA;
 
     for (y = 0; y < cell->height; is_first_row = 0, y += 1 + v_zoom) {
         for (x = 0; x < cell->width; x += 1 + h_zoom) {
-            ref = ref_block;
-            dst = block;
+            const uint8_t *ref = ref_block;
+            uint8_t *dst = block;
 
             if (rle_blocks > 0) {
                 if (mode <= 4) {
@@ -472,7 +470,7 @@ static int decode_cell_data(Indeo3DecodeContext *ctx, Cell *cell,
                     else
                         delta_tab = delta[1];
                     BUFFER_PRECHECK;
-                    code = bytestream_get_byte(data_ptr);
+                    uint8_t code = bytestream_get_byte(data_ptr);
                     if (code < 248) {
                         if (code < delta_tab->num_dyads) {
                             BUFFER_PRECHECK;
@@ -691,9 +689,11 @@ static int decode_cell(Indeo3DecodeContext *ctx, AVCodecContext *avctx,
             }
 
             zoom_fac = mode == 10;
-            error = decode_cell_data(ctx, cell, block, ref_block, plane->pitch,
-                                     zoom_fac, 1, mode, delta, swap_quads,
-                                     &data_ptr, last_ptr);
+            av_assert2(!ref_block);
+            error = decode_cell_data(ctx, cell, block,
+                                     block /* dummy to avoid UB pointer arithmetic */,
+                                     plane->pitch, zoom_fac, 1, mode, delta,
+                                     swap_quads, &data_ptr, last_ptr);
         }
         break;
     default:

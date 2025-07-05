@@ -97,8 +97,6 @@ int ff_mpeg_update_thread_context(AVCodecContext *dst,
 
     s->quarter_sample       = s1->quarter_sample;
 
-    s->picture_number       = s1->picture_number;
-
     ff_mpv_replace_picture(&s->cur_pic,  &s1->cur_pic);
     ff_mpv_replace_picture(&s->last_pic, &s1->last_pic);
     ff_mpv_replace_picture(&s->next_pic, &s1->next_pic);
@@ -108,7 +106,6 @@ int ff_mpeg_update_thread_context(AVCodecContext *dst,
 
     // Error/bug resilience
     s->workaround_bugs      = s1->workaround_bugs;
-    s->padding_bug_score    = s1->padding_bug_score;
 
     // MPEG-4 timing info
     memcpy(&s->last_time_base, &s1->last_time_base,
@@ -1064,7 +1061,26 @@ void mpv_reconstruct_mb_internal(MpegEncContext *s, int16_t block[12][64],
     }
 }
 
-void ff_mpv_reconstruct_mb(MpegEncContext *s, int16_t block[12][64])
+static av_cold void debug_dct_coeffs(MPVContext *s, const int16_t block[][64])
+{
+    if (!block) // happens when called via error resilience
+        return;
+
+    void *const logctx = s->avctx;
+    const uint8_t *const idct_permutation = s->idsp.idct_permutation;
+
+    /* print DCT coefficients */
+    av_log(logctx, AV_LOG_DEBUG, "DCT coeffs of MB at %dx%d:\n", s->mb_x, s->mb_y);
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 64; j++) {
+            av_log(logctx, AV_LOG_DEBUG, "%5d",
+                   block[i][idct_permutation[j]]);
+        }
+        av_log(logctx, AV_LOG_DEBUG, "\n");
+    }
+}
+
+void ff_mpv_reconstruct_mb(MPVContext *s, int16_t block[][64])
 {
     const int mb_xy = s->mb_y * s->mb_stride + s->mb_x;
     uint8_t *mbskip_ptr = &s->mbskip_table[mb_xy];
@@ -1082,17 +1098,8 @@ void ff_mpv_reconstruct_mb(MpegEncContext *s, int16_t block[12][64])
         *mbskip_ptr = 0; /* not skipped */
     }
 
-    if (s->avctx->debug & FF_DEBUG_DCT_COEFF) {
-       /* print DCT coefficients */
-       av_log(s->avctx, AV_LOG_DEBUG, "DCT coeffs of MB at %dx%d:\n", s->mb_x, s->mb_y);
-       for (int i = 0; i < 6; i++) {
-           for (int j = 0; j < 64; j++) {
-               av_log(s->avctx, AV_LOG_DEBUG, "%5d",
-                      block[i][s->idsp.idct_permutation[j]]);
-           }
-           av_log(s->avctx, AV_LOG_DEBUG, "\n");
-       }
-    }
+    if (s->avctx->debug & FF_DEBUG_DCT_COEFF)
+        debug_dct_coeffs(s, block);
 
     av_assert2((s->out_format <= FMT_H261) == (s->out_format == FMT_H261 || s->out_format == FMT_MPEG1));
     if (!s->avctx->lowres) {

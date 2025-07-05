@@ -363,7 +363,7 @@ static inline RV34VLC* choose_vlc_set(int quant, int mod, int type)
 static int rv34_decode_intra_mb_header(RV34DecContext *r, int8_t *intra_types)
 {
     MpegEncContext *s = &r->s;
-    GetBitContext *gb = &s->gb;
+    GetBitContext *const gb = &r->gb;
     int mb_pos = s->mb_x + s->mb_y * s->mb_stride;
     int t;
 
@@ -398,7 +398,7 @@ static int rv34_decode_intra_mb_header(RV34DecContext *r, int8_t *intra_types)
 static int rv34_decode_inter_mb_header(RV34DecContext *r, int8_t *intra_types)
 {
     MpegEncContext *s = &r->s;
-    GetBitContext *gb = &s->gb;
+    GetBitContext *const gb = &r->gb;
     int mb_pos = s->mb_x + s->mb_y * s->mb_stride;
     int i, t;
 
@@ -871,7 +871,7 @@ static const int num_mvs[RV34_MB_TYPES] = { 0, 0, 1, 4, 1, 1, 0, 0, 2, 2, 2, 1 }
 static int rv34_decode_mv(RV34DecContext *r, int block_type)
 {
     MpegEncContext *s = &r->s;
-    GetBitContext *gb = &s->gb;
+    GetBitContext *const gb = &r->gb;
     int i, j, k, l;
     int mv_pos = s->mb_x * 2 + s->mb_y * 2 * s->b8_stride;
     int next_bt;
@@ -1029,9 +1029,8 @@ static inline void rv34_process_block(RV34DecContext *r,
                                       uint8_t *pdst, int stride,
                                       int fc, int sc, int q_dc, int q_ac)
 {
-    MpegEncContext *s = &r->s;
-    int16_t *ptr = s->block[0];
-    int has_ac = rv34_decode_block(ptr, &s->gb, r->cur_vlcs,
+    int16_t *const ptr = r->block;
+    int has_ac = rv34_decode_block(ptr, &r->gb, r->cur_vlcs,
                                    fc, sc, q_dc, q_ac, q_ac);
     if(has_ac){
         r->rdsp.rv34_idct_add(pdst, stride, ptr);
@@ -1045,11 +1044,11 @@ static void rv34_output_i16x16(RV34DecContext *r, int8_t *intra_types, int cbp)
 {
     LOCAL_ALIGNED_16(int16_t, block16, [16]);
     MpegEncContext *s    = &r->s;
-    GetBitContext  *gb   = &s->gb;
+    GetBitContext *const gb = &r->gb;
     int             q_dc = rv34_qscale_tab[ r->luma_dc_quant_i[s->qscale] ],
                     q_ac = rv34_qscale_tab[s->qscale];
     uint8_t        *dst  = s->dest[0];
-    int16_t        *ptr  = s->block[0];
+    int16_t  *const ptr  = r->block;
     int i, j, itype, has_ac;
 
     memset(block16, 0, 16 * sizeof(*block16));
@@ -1213,9 +1212,9 @@ static int rv34_set_deblock_coef(RV34DecContext *r)
 static int rv34_decode_inter_macroblock(RV34DecContext *r, int8_t *intra_types)
 {
     MpegEncContext *s   = &r->s;
-    GetBitContext  *gb  = &s->gb;
+    GetBitContext *const gb = &r->gb;
     uint8_t        *dst = s->dest[0];
-    int16_t        *ptr = s->block[0];
+    int16_t  *const ptr = r->block;
     int          mb_pos = s->mb_x + s->mb_y * s->mb_stride;
     int cbp, cbp2;
     int q_dc, q_ac, has_ac;
@@ -1363,12 +1362,12 @@ static int check_slice_end(RV34DecContext *r, MpegEncContext *s)
     int bits;
     if(s->mb_y >= s->mb_height)
         return 1;
-    if(!s->mb_num_left)
+    if (!r->mb_num_left)
         return 1;
-    if(r->s.mb_skip_run > 1)
+    if (r->mb_skip_run > 1)
         return 0;
-    bits = get_bits_left(&s->gb);
-    if(bits <= 0 || (bits < 8 && !show_bits(&s->gb, bits)))
+    bits = get_bits_left(&r->gb);
+    if (bits <= 0 || (bits < 8 && !show_bits(&r->gb, bits)))
         return 1;
     return 0;
 }
@@ -1424,11 +1423,11 @@ static int rv34_decoder_realloc(RV34DecContext *r)
 static int rv34_decode_slice(RV34DecContext *r, int end, const uint8_t* buf, int buf_size)
 {
     MpegEncContext *s = &r->s;
-    GetBitContext *gb = &s->gb;
+    GetBitContext *const gb = &r->gb;
     int mb_pos, slice_type;
     int res;
 
-    init_get_bits(&r->s.gb, buf, buf_size*8);
+    init_get_bits(gb, buf, buf_size*8);
     res = r->parse_slice_header(r, gb, &r->si);
     if(res < 0){
         av_log(s->avctx, AV_LOG_ERROR, "Incorrect or unknown slice header\n");
@@ -1447,8 +1446,8 @@ static int rv34_decode_slice(RV34DecContext *r, int end, const uint8_t* buf, int
 
     r->si.end = end;
     s->qscale = r->si.quant;
-    s->mb_num_left = r->si.end - r->si.start;
-    r->s.mb_skip_run = 0;
+    r->mb_num_left = r->si.end - r->si.start;
+    r->mb_skip_run = 0;
 
     mb_pos = s->mb_x + s->mb_y * s->mb_width;
     if(r->si.start != mb_pos){
@@ -1493,7 +1492,7 @@ static int rv34_decode_slice(RV34DecContext *r, int end, const uint8_t* buf, int
         }
         if(s->mb_x == s->resync_mb_x)
             s->first_slice_line=0;
-        s->mb_num_left--;
+        r->mb_num_left--;
     }
     ff_er_add_slice(&s->er, s->resync_mb_x, s->resync_mb_y, s->mb_x-1, s->mb_y, ER_MB_END);
 
@@ -1580,10 +1579,7 @@ static int finish_frame(AVCodecContext *avctx, AVFrame *pict)
 
     ff_er_frame_end(&s->er, NULL);
     ff_mpv_frame_end(s);
-    s->mb_num_left = 0;
-
-    if (HAVE_THREADS && (s->avctx->active_thread_type & FF_THREAD_FRAME))
-        ff_thread_progress_report(&s->cur_pic.ptr->progress, INT_MAX);
+    r->mb_num_left = 0;
 
     if (s->pict_type == AV_PICTURE_TYPE_B) {
         if ((ret = av_frame_ref(pict, s->cur_pic.ptr->f)) < 0)
@@ -1651,8 +1647,8 @@ int ff_rv34_decode_frame(AVCodecContext *avctx, AVFrame *pict,
         av_log(avctx, AV_LOG_ERROR, "Slice offset is invalid\n");
         return AVERROR_INVALIDDATA;
     }
-    init_get_bits(&s->gb, buf+offset, (buf_size-offset)*8);
-    if(r->parse_slice_header(r, &r->s.gb, &si) < 0 || si.start){
+    init_get_bits(&r->gb, buf+offset, (buf_size-offset)*8);
+    if (r->parse_slice_header(r, &r->gb, &si) < 0 || si.start) {
         av_log(avctx, AV_LOG_ERROR, "First slice header is incorrect\n");
         return AVERROR_INVALIDDATA;
     }
@@ -1668,9 +1664,9 @@ int ff_rv34_decode_frame(AVCodecContext *avctx, AVFrame *pict,
 
     /* first slice */
     if (si.start == 0) {
-        if (s->mb_num_left > 0 && s->cur_pic.ptr) {
+        if (r->mb_num_left > 0 && s->cur_pic.ptr) {
             av_log(avctx, AV_LOG_ERROR, "New frame but still %d MB left.\n",
-                   s->mb_num_left);
+                   r->mb_num_left);
             if (!s->context_reinit)
                 ff_er_frame_end(&s->er, NULL);
             ff_mpv_frame_end(s);
@@ -1773,7 +1769,7 @@ int ff_rv34_decode_frame(AVCodecContext *avctx, AVFrame *pict,
         size = offset1 - offset;
 
         r->si.end = s->mb_width * s->mb_height;
-        s->mb_num_left = r->s.mb_x + r->s.mb_y*r->s.mb_width - r->si.start;
+        r->mb_num_left = r->s.mb_x + r->s.mb_y*r->s.mb_width - r->si.start;
 
         if(i+1 < slice_count){
             int offset2 = get_slice_offset(avctx, slices_hdr, i+2, slice_count, buf_size);
@@ -1781,8 +1777,8 @@ int ff_rv34_decode_frame(AVCodecContext *avctx, AVFrame *pict,
                 av_log(avctx, AV_LOG_ERROR, "Slice offset is invalid\n");
                 break;
             }
-            init_get_bits(&s->gb, buf+offset1, (buf_size-offset1)*8);
-            if(r->parse_slice_header(r, &r->s.gb, &si) < 0){
+            init_get_bits(&r->gb, buf+offset1, (buf_size-offset1)*8);
+            if (r->parse_slice_header(r, &r->gb, &si) < 0) {
                 size = offset2 - offset;
             }else
                 r->si.end = si.start;
@@ -1804,13 +1800,12 @@ int ff_rv34_decode_frame(AVCodecContext *avctx, AVFrame *pict,
             *got_picture_ptr = ret;
         } else if (HAVE_THREADS &&
                    (s->avctx->active_thread_type & FF_THREAD_FRAME)) {
-            av_log(avctx, AV_LOG_INFO, "marking unfished frame as finished\n");
+            av_log(avctx, AV_LOG_INFO, "marking unfinished frame as finished\n");
             /* always mark the current frame as finished, frame-mt supports
              * only complete frames */
             ff_er_frame_end(&s->er, NULL);
             ff_mpv_frame_end(s);
-            s->mb_num_left = 0;
-            ff_thread_progress_report(&s->cur_pic.ptr->progress, INT_MAX);
+            r->mb_num_left = 0;
             return AVERROR_INVALIDDATA;
         }
     }
