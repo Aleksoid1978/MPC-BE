@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 16		"G:"
 17		"B:"
 21		"Activează meniul întunecat"
-22		"Folosește efectul fundalului estompat (Windows 10 și ver. mai noi)"
+22		"Folosește efectul fundalului estompat (ptr. Windows 10 și versiunile mai noi)"
 24		"Activează titlul întunecat (pentru Windows 10 și versiunile ulterioare)"
 27		"Folosește un indiciu de timp:"
 29		"Folosește previzualizarea în căutare"
