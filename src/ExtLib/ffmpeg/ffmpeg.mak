@@ -935,7 +935,9 @@ SRCS_ASM_LC = \
 	libavcodec/x86/vvc/dmvr.asm \
 	libavcodec/x86/vvc/mc.asm \
 	libavcodec/x86/vvc/of.asm \
-	libavcodec/x86/vvc/sad.asm
+	libavcodec/x86/vvc/sad.asm \
+	libavcodec/x86/vvc/sao.asm \
+	libavcodec/x86/vvc/sao_10bit.asm
 
 SRCS_ASM_LF = 
 
