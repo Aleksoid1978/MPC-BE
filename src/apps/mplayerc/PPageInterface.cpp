@@ -194,6 +194,9 @@ BOOL CPPageInterface::OnApply()
 		s.iToolbarSize = toolbarSize;
 		pFrame->m_wndToolBar.ScaleToolbar();
 		pFrame->RecalcLayout();
+
+		pFrame->m_wndFlyBar.UpdateButtonImages();
+		pFrame->m_OSD.UpdateButtonImages();
 	}
 
 	if (s.fFlybar && !pFrame->m_wndFlyBar) {

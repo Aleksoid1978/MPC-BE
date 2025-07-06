@@ -1057,7 +1057,7 @@ bool COSD::UpdateButtonImages()
 {
 	if (m_pMainFrame->m_svgFlybar.IsLoad()) {
 		int w = 0;
-		int h = ScaleY(24);
+		int h = ScaleY(AfxGetAppSettings().iToolbarSize);
 		if (h != m_externalFlyBarHeight) {
 			m_externalFlyBarHeight = h;
 			if (HBITMAP hBitmap = m_pMainFrame->m_svgFlybar.Rasterize(w, h)) {
