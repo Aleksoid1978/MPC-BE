@@ -1711,7 +1711,14 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							AP4_DataBuffer data;
 							if (AP4_SUCCEEDED(sample.ReadData(data)) && data.GetDataSize() >= 12) {
 								audioframe_t aframe;
-								if (ParseEAC3Header(data.GetData(), &aframe, static_cast<int>(data.GetDataSize())) && aframe.param2) {
+								int size = ParseEAC3Header(data.GetData(), &aframe, static_cast<int>(data.GetDataSize()));
+								if (!size || aframe.param1 == EAC3_FRAME_TYPE_DEPENDENT) {
+									size = ParseAC3Header(data.GetData(), &aframe);
+								}
+								if (size && size + 8 <= static_cast<int>(data.GetDataSize())) {
+									ParseEAC3Header(data.GetData() + size, &aframe, static_cast<int>(data.GetDataSize()) - size);
+								}
+								if (aframe.param2) {
 									wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 1);
 									wfe->cbSize = 1;
 									(reinterpret_cast<BYTE*>(wfe + 1))[0] = 1;

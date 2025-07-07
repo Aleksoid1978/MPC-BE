@@ -407,7 +407,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					} else {
 						pvih->bmiHeader.biSizeImage = DIBSIZE(pvih->bmiHeader);
 					}
-					mt.SetSampleSize(pvih->bmiHeader.biSizeImage); 
+					mt.SetSampleSize(pvih->bmiHeader.biSizeImage);
 
 					mts.push_back(mt);
 
@@ -1195,21 +1195,20 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							size = ParseAC3Header(pData.data(), &aframe);
 						}
 						if (size) {
-							if (aframe.param2) {
-								wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 1);
-								wfe->cbSize = 1;
-								(reinterpret_cast<BYTE*>(wfe + 1))[0] = 1;
-							}
-
 							wfe->nChannels = aframe.channels;
 							wfe->nAvgBytesPerSec = size * aframe.samplerate / aframe.samples;
 							if (size + 8 <= (int)pData.size()) {
-								int size2 = ParseEAC3Header(pData.data() + size, &aframe);
+								int size2 = ParseEAC3Header(pData.data() + size, &aframe, static_cast<int>(pData.size()) - size);
 								if (size2 && aframe.param1 == EAC3_FRAME_TYPE_DEPENDENT) {
 									wfe->nChannels += aframe.channels - 2;
 									wfe->nAvgBytesPerSec = (size + size2) * aframe.samplerate / aframe.samples;
 								}
 							}
+						}
+						if (aframe.param2) {
+							wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 1);
+							wfe->cbSize = 1;
+							(reinterpret_cast<BYTE*>(wfe + 1))[0] = 1;
 						}
 					}
 
