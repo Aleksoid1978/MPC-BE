@@ -928,7 +928,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "YouTube",IDC_STATIC,6,5,285,112
-    CONTROL         "Folosește analizorul de pagini web încorporat",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,16,186,10
+    CONTROL         "Folosește analizatorul de pagini web încorporat",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,16,186,10
     LTEXT           "Formatul video preferat:",IDC_STATIC2,10,29,120,8
     COMBOBOX        IDC_COMBO1,10,39,52,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO2,66,39,50,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -945,7 +945,7 @@ BEGIN
     COMBOBOX        IDC_COMBO5,116,130,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Înălțimea maximă a videoclipului:",IDC_STATIC,10,148,104,8
     COMBOBOX        IDC_COMBO6,116,146,43,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Selectează numărul maxim de cadre/sec. (fps-uri) sau rata de biți",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,162,276,10
+    CONTROL         "Selectează numărul maxim de cadre pe secundă (fps-uri) sau rata de biți",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,162,276,10
     LTEXT           "Adresa AceStream:",IDC_STATIC,10,183,77,8
     EDITTEXT        IDC_EDIT1,91,181,195,13,ES_AUTOHSCROLL
     LTEXT           "Adresa MatriX (TorrServer):",IDC_STATIC,10,200,103,8
