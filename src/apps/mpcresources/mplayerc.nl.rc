@@ -945,7 +945,7 @@ BEGIN
     COMBOBOX        IDC_COMBO5,116,130,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Maximale videohoogte:",IDC_STATIC,10,148,104,8
     COMBOBOX        IDC_COMBO6,116,146,43,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Maximale fps of bitrate selecteren",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,162,218,10
+    CONTROL         "Maximale fps of bitrate selecteren",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,162,276,10
     LTEXT           "Adres AceStream:",IDC_STATIC,10,183,77,8
     EDITTEXT        IDC_EDIT1,91,181,195,13,ES_AUTOHSCROLL
     LTEXT           "Adres MatriX (TorrServer):",IDC_STATIC,10,200,103,8
