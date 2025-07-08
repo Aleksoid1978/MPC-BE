@@ -602,7 +602,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
 5		"YouTube"
-6		"Folosește analizorul de pagini web încorporat"
+6		"Folosește analizatorul de pagini web încorporat"
 7		"Formatul video preferat:"
 10		"60 de fps"
 11		"HDR"
@@ -612,7 +612,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
 18		"youtube-dl, yt-dlp"
 19		"Fișierul executabil:"
 21		"Înălțimea maximă a videoclipului:"
-23		"Selectează numărul maxim de cadre/sec. (fps-uri) sau rata de biți"
+23		"Selectează numărul maxim de cadre pe secundă (fps-uri) sau rata de biți"
 24		"Adresa AceStream:"
 26		"Adresa MatriX (TorrServer):"
 29		"Agentul de utilizator:"
