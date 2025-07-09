@@ -205,6 +205,7 @@ static const std::map<GUID, LPCSTR> audioguids = {
 	{MEDIASUBTYPE_ATRAC3plus,      "ATRAC3plus"},
 	{MEDIASUBTYPE_ATRAC9,          "ATRAC9"},
 	{MEDIASUBTYPE_G726_ADPCM,      "G.726 ADPCM"},
+	{MEDIASUBTYPE_DOLBY_AC4,       "AC-4"},
 };
 
 static const std::map<GUID, LPCSTR> subtitleguids = {

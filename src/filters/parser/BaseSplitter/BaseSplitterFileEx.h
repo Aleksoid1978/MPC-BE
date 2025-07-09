@@ -196,11 +196,13 @@ public:
 	struct ac4hdr
 	{
 		WORD sync;
-		BYTE bitstream_version : 2;
+		int samplerate;
+		int channels;
 
 		bool operator == (const struct ac4hdr& h) const {
 			return (sync == h.sync
-					&& bitstream_version == h.bitstream_version);
+					&& samplerate == h.samplerate)
+					&& channels == h.channels;
 		}
 
 	};

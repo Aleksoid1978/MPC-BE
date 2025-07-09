@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -771,6 +771,24 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 
 bool CBaseSplitterFileEx::Read(ac4hdr& h, int len, CMediaType* pmt)
 {
+	auto variable_bits = [this](int bits) {
+		int value = 0;
+		int read_more;
+
+		do {
+			value += BitRead(bits);
+			read_more = BitRead(1);
+			if (read_more) {
+				value <<= bits;
+				value += 1 << bits;
+			}
+		} while (read_more);
+
+		return value;
+	};
+
+	auto pos = GetPos();
+
 	memset(&h, 0, sizeof(h));
 
 	h.sync = BitRead(16);
@@ -781,7 +799,40 @@ bool CBaseSplitterFileEx::Read(ac4hdr& h, int len, CMediaType* pmt)
 	if (frame_size == 0xFFFF) {
 		Skip(3);
 	}
-	h.bitstream_version = BitRead(2);
+	int bitstream_version = BitRead(2);
+	if (bitstream_version == 3) {
+		bitstream_version += variable_bits(2);
+	}
+
+	int sequence_counter = BitRead(10);
+	if (BitRead(1)) { // b_wait_frames
+		if (BitRead(3) > 0) { // wait_frames
+			BitRead(2); // reserved
+		}
+	}
+
+	h.samplerate = BitRead(1) ? 48000 : 44100;
+	BitRead(4); // frame_rate_index
+	if (!BitRead(1)) { // iframe_global
+		if (sequence_counter > 1020) {
+			return false;
+		}
+	}
+
+	h.channels = 2; // TODO
+
+	if (pmt) {
+		WAVEFORMATEX wfe = {};
+		wfe.wFormatTag = WAVE_FORMAT_UNKNOWN;
+		wfe.nChannels = h.channels;
+		wfe.nSamplesPerSec = h.samplerate;
+		wfe.nBlockAlign = 1;
+
+		pmt->majortype = MEDIATYPE_Audio;
+		pmt->subtype = MEDIASUBTYPE_DOLBY_AC4;
+		pmt->formattype = FORMAT_WaveFormatEx;
+		pmt->SetFormat((BYTE*)&wfe, sizeof(wfe));
+	}
 
 	return true;
 }
