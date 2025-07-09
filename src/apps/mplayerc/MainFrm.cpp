@@ -9488,7 +9488,8 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 				}
 			}
 
-			if (i >= 0 && (DWORD)i < nChapters) {
+			REFERENCE_TIME rtStop = m_wndSeekBar.GetRange();
+			if (i >= 0 && (DWORD)i < nChapters && rt < rtStop) {
 				SeekTo(rt, false);
 
 				if (name.Length()) {
