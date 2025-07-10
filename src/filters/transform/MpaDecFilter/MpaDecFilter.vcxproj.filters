@@ -33,6 +33,9 @@
     <ClCompile Include="AudioDecoders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PackerMAT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IMpaDecFilter.h">
@@ -63,6 +66,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FloatingAverage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PackerMAT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
