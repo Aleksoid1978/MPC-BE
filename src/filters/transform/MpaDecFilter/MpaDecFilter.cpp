@@ -448,6 +448,8 @@ HRESULT CMpaDecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, d
 	m_DTSHDProfile = 0;
 	m_bFallBackToPCM = false;
 
+	m_bAtmos = false;
+
 	m_bUpdateTimeCache = TRUE;
 
 	return __super::NewSegment(tStart, tStop, dRate);
@@ -936,7 +938,11 @@ HRESULT CMpaDecFilter::ProcessEAC3_SPDIF(BOOL bEOF/* = FALSE*/)
 
 	while (p + 8 <= end) {
 		audioframe_t aframe;
-		int size = ParseEAC3Header(p, &aframe);
+		int size = ParseEAC3Header(p, &aframe, !m_hdmi_bitstream.EAC3State.sync ? end - p : 0);
+		if (size && !m_hdmi_bitstream.EAC3State.sync) {
+			m_hdmi_bitstream.EAC3State.sync = true;
+			m_bAtmos = aframe.param2 == 1;
+		}
 
 		bool bAC3Frame = false;
 		if (size == 0) {
@@ -1033,6 +1039,7 @@ HRESULT CMpaDecFilter::ProcessTrueHD_SPDIF()
 		int size = ParseMLPHeader(p, &aframe);
 		if (size > 0) {
 			// sync frame
+			m_bAtmos = aframe.param3 == 1;
 			m_hdmi_bitstream.TrueHDMATState.sync = syncFrame = true;
 		} else {
 			int ac3size = ParseAC3Header(p);
@@ -2508,29 +2515,39 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 		if (codecId != AV_CODEC_ID_NONE) {
 			LPCSTR codecName = m_FFAudioDec.GetCodecName();
 
-			if (codecId == AV_CODEC_ID_DTS && m_DTSHDProfile != 0) {
-				switch (m_DTSHDProfile) {
-					case DCA_PROFILE_HD_HRA:
-						codecName = "dts-hd hra";
-						break;
-					case DCA_PROFILE_HD_MA:
-						codecName = "dts-hd ma";
-						break;
-					case DCA_PROFILE_EXPRESS:
-						codecName = "dts express";
-						break;
-					case DCA_PROFILE_HD_MA_X:
-						codecName = "dts-hd ma + dts:x";
-						break;
-					case DCA_PROFILE_HD_MA_X_IMAX:
-						codecName = "dts-hd ma + dts:x imax";
-						break;
-					case DCA_PROFILE_HD_HRA_X:
-						codecName = "dts-hd hra + dts:x";
-						break;
-					case DCA_PROFILE_HD_HRA_X_IMAX:
-						codecName = "dts-hd hra + dts:x imax";
-						break;
+			if (codecId == AV_CODEC_ID_DTS) {
+				if (m_DTSHDProfile != 0) {
+					switch (m_DTSHDProfile) {
+						case DCA_PROFILE_HD_HRA:
+							codecName = "dts-hd hra";
+							break;
+						case DCA_PROFILE_HD_MA:
+							codecName = "dts-hd ma";
+							break;
+						case DCA_PROFILE_EXPRESS:
+							codecName = "dts express";
+							break;
+						case DCA_PROFILE_HD_MA_X:
+							codecName = "dts-hd ma + dts:x";
+							break;
+						case DCA_PROFILE_HD_MA_X_IMAX:
+							codecName = "dts-hd ma + dts:x imax";
+							break;
+						case DCA_PROFILE_HD_HRA_X:
+							codecName = "dts-hd hra + dts:x";
+							break;
+						case DCA_PROFILE_HD_HRA_X_IMAX:
+							codecName = "dts-hd hra + dts:x imax";
+							break;
+					}
+				}
+			} else if (codecId == AV_CODEC_ID_TRUEHD) {
+				if (m_bAtmos) {
+					codecName = "truehd + atmos";
+				}
+			} else if (codecId == AV_CODEC_ID_EAC3) {
+				if (m_bAtmos) {
+					codecName = "eac3 + atmos";
 				}
 			}
 

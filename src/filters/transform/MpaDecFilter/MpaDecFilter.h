@@ -89,6 +89,8 @@ class __declspec(uuid("3D446B6F-71DE-4437-BE15-8CE47174340F"))
 
 		// E-AC3 Bitstreaming
 		struct {
+			bool sync;
+
 			int count;
 			int repeat;
 			int samples;
@@ -128,6 +130,8 @@ class __declspec(uuid("3D446B6F-71DE-4437-BE15-8CE47174340F"))
 	BOOL            m_bNeedSyncPoint = FALSE;
 
 	BYTE            m_DTSHDProfile = 0;
+
+	bool            m_bAtmos = false;
 
 	REFERENCE_TIME  m_rtStartInput;
 	REFERENCE_TIME  m_rtStopInput;
