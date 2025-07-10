@@ -2,6 +2,9 @@
 
 1.8.5.x dev
 =============================
+MpaDecFilter
+Improve TrueHD + Atmos bitstream passthrough.
+
 MPCVideoDec
 Fixed a crash when converting NV12 to YV12 when using the D3D11cb, D3D12cb or NVDEC decoder.
 
