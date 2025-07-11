@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2023 see Authors.txt
+ * (C) 2018-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,7 +29,7 @@ namespace YoutubeDL
 		const CStringW& ydlExePath, // input parameter
 		const int maxHeightOptions, // input parameter
 		const bool bMaximumQuality, // input parameter
-		const CStringA lang,        // input parameter
+		const CStringA& lang,       // input parameter
 		Youtube::YoutubeFields& y_fields,
 		Youtube::YoutubeUrllist& youtubeUrllist,
 		Youtube::YoutubeUrllist& youtubeAudioUrllist,

@@ -12244,7 +12244,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			pOFD->fi = it->url;
 
 			if (it->profile->type == Youtube::y_video && !m_youtubeAudioUrllist.empty()) {
-				const auto audio_item = Youtube::GetAudioUrl(it->profile, m_youtubeAudioUrllist);
+				const auto audio_item = Youtube::SelectAudioStream(m_youtubeAudioUrllist);
 				pOFD->auds.emplace_back(audio_item->url);
 			}
 
@@ -12262,7 +12262,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
 	}
 	else if (s.bYoutubePageParser && pOFD->auds.empty()) {
-		auto url = pOFD->fi.GetPath();
+		auto& url = pOFD->fi.GetPath();
 		bool ok = Youtube::CheckURL(url);
 		if (ok) {
 			m_bYoutubeOpening = true;

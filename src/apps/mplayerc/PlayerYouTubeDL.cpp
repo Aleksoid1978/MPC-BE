@@ -36,7 +36,7 @@ namespace YoutubeDL
 		const CStringW& ydlExePath, // input parameter
 		const int maxHeightOptions, // input parameter
 		const bool bMaximumQuality, // input parameter
-		const CStringA lang,        // input parameter
+		const CStringA& lang,       // input parameter
 		Youtube::YoutubeFields& y_fields,
 		Youtube::YoutubeUrllist& youtubeUrllist,
 		Youtube::YoutubeUrllist& youtubeAudioUrllist,
@@ -288,6 +288,53 @@ namespace YoutubeDL
 						}
 					}
 
+					// Find default/preference audio language.
+					// yt-dlp can mark several languages as preferred, we choose the one with the highest "language_preference".
+					CStringA defaultLanguage = lang;
+					if (defaultLanguage == Youtube::kDefaultAudioLanguage) {
+						int defaultLanguagePreference = -1;
+
+						for (const auto& format : formats->GetArray()) {
+							CStringA protocol;
+							if (!GetAndCheckProtocol(format, protocol)) {
+								continue;
+							}
+							CStringA url;
+							if (!getJsonValue(format, "url", url)) {
+								continue;
+							}
+							CStringA vcodec;
+							if (!getJsonValue(format, "vcodec", vcodec) || vcodec != "none") {
+								if (!getJsonValue(format, "video_ext", vcodec) || vcodec == "none") {
+									continue;
+								}
+							}
+							CStringA acodec;
+							if (!getJsonValue(format, "acodec", acodec) || acodec == "none") {
+								if (!getJsonValue(format, "audio_ext", acodec) || acodec == "none") {
+									continue;
+								}
+							}
+							CStringA format_id;
+							if (getJsonValue(format, "format_id", format_id) && EndsWith(format_id, "-drc")) {
+								continue;
+							}
+
+							CStringA language;
+							if (getJsonValue(format, "language", language)) {
+								int language_preference = 0;
+								if (getJsonValue(format, "language_preference", language_preference)
+										&& language_preference > 0
+										&& language_preference > defaultLanguagePreference) {
+									defaultLanguage = language;
+									defaultLanguagePreference = language_preference;
+								}
+							}
+						}
+					}
+
+					std::map<CStringA, Youtube::YoutubeUrllist> youtubeAudioUrllistWithLanguages;
+
 					for (const auto& format : formats->GetArray()) {
 						CStringA protocol;
 						if (!GetAndCheckProtocol(format, protocol)) {
@@ -348,11 +395,14 @@ namespace YoutubeDL
 									item.title.AppendFormat(L" %dkbit/s", audioprofile->quality);
 								}
 
-								youtubeAudioUrllist.emplace_back(item);
+								CStringA language;
+								if (getJsonValue(format, "language", language)) {
+									youtubeAudioUrllistWithLanguages[language].emplace_back(item);
+								} else {
+									youtubeAudioUrllist.emplace_back(item);
+								}
 							}
-						}
-
-						if (youtubeAudioUrllist.empty()) {
+						} else {
 							if (tbr > 0.f) {
 								if (aud_bitrate == 0.0f
 										|| (vid_height > 360 && tbr > aud_bitrate)
@@ -364,17 +414,17 @@ namespace YoutubeDL
 							} else if (bestAudioUrl.IsEmpty()) {
 								bestAudioUrl = url;
 							}
-						}
 
-						CStringA language;
-						if (getJsonValue(format, "language", language)) {
-							const auto it = audioUrls.find(language);
-							if (it == audioUrls.cend() || tbr > (*it).second.tbr) {
-								audioUrls[language] = { tbr, url };
-								if (bIsYoutube) {
-									int language_preference = 0;
-									if (getJsonValue(format, "language_preference", language_preference) && language_preference > 0) {
-										audioUrls[CStringA(Youtube::kDefaultAudioLanguage)] = { tbr, url };
+							CStringA language;
+							if (getJsonValue(format, "language", language)) {
+								const auto it = audioUrls.find(language);
+								if (it == audioUrls.cend() || tbr > (*it).second.tbr) {
+									audioUrls[language] = { tbr, url };
+									if (bIsYoutube) {
+										int language_preference = 0;
+										if (getJsonValue(format, "language_preference", language_preference) && language_preference > 0) {
+											audioUrls[CStringA(Youtube::kDefaultAudioLanguage)] = { tbr, url };
+										}
 									}
 								}
 							}
@@ -383,6 +433,20 @@ namespace YoutubeDL
 
 					if (!bestUrl.IsEmpty()) {
 						if (bIsYoutube) {
+							if (!youtubeAudioUrllistWithLanguages.empty()) {
+								auto it = youtubeAudioUrllistWithLanguages.find(defaultLanguage);
+								if (it == youtubeAudioUrllistWithLanguages.end()) {
+									it = youtubeAudioUrllistWithLanguages.find("en");
+									if (it == youtubeAudioUrllistWithLanguages.end()) {
+										it = youtubeAudioUrllistWithLanguages.begin();
+									}
+								}
+
+								for (const auto& item : it->second) {
+									youtubeAudioUrllist.emplace_back(item);
+								}
+							}
+
 							// For YouTube, we will select the quality/codec depending on the settings of the built-in parser.
 							std::sort(youtubeUrllist.begin(), youtubeUrllist.end(), Youtube::CompareUrllistItem);
 							std::sort(youtubeAudioUrllist.begin(), youtubeAudioUrllist.end(), Youtube::CompareUrllistItem);
