@@ -229,6 +229,21 @@ float ff_scalarproduct_float_c(const float *v1, const float *v2, int len);
 double ff_scalarproduct_double_c(const double *v1, const double *v2,
                                  size_t len);
 
+// ==> Start patch MPC
+/*
+ * Calculate the entry wise product of two vectors of floats, and store the result
+ * in a vector of floats. The second vector of floats is iterated over
+ * in reverse order.
+ *
+ * @param dst  output vector
+ * @param src0 first input vector
+ * @param src1 second input vector
+ * @param len  number of elements in the input
+ */
+void ff_vector_fmul_reverse_c(float *dst, const float *src0,
+                              const float *src1, int len);
+// ==> End patch MPC
+
 void ff_float_dsp_init_aarch64(AVFloatDSPContext *fdsp);
 void ff_float_dsp_init_arm(AVFloatDSPContext *fdsp);
 void ff_float_dsp_init_ppc(AVFloatDSPContext *fdsp, int strict);

@@ -961,11 +961,6 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 
 	const auto& _streamData = m_streamData[s];
 	if (_streamData.codec != stream_codec::NONE) {
-		if (_streamData.codec == stream_codec::AC4) {
-			// skip AC-4 stream
-			m_ignore_pids.push_back(pid);
-			return s;
-		}
 		for (const auto& streamDesc : StreamDesc) {
 			if (streamDesc.codec == _streamData.codec) {
 				stream_type = streamDesc.stream_type;
@@ -1264,10 +1259,7 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 					if (Read(h, len, &s.mt)) {
 						m_ac4Valid[s].Handle(h);
 						if (m_ac4Valid[s].IsValid()) {
-							// type = stream_type::audio;
-							// skip AC-4 stream
-							m_ignore_pids.push_back(pid);
-							return s;
+							type = stream_type::audio;
 						}
 					}
 				}

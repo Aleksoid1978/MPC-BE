@@ -1917,6 +1917,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									memcpy(f, &mpeg1wf, sizeof(MPEG1WAVEFORMAT));
 								}
 							}
+						} else if (type == AP4_ATOM_TYPE_AC_4) {
+							mt.subtype = MEDIASUBTYPE_DOLBY_AC4;
 						} else if (db.GetDataSize() > 0) {
 							//always needed extra data for QDM2
 							wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + db.GetDataSize());

@@ -2317,6 +2317,12 @@ CFGManagerCustom::CFGManagerCustom(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_transform.emplace_back(pFGF);
 
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
+					(audio[ADEC_AC4]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
+					(audio[ADEC_AC4]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_DOLBY_AC4);
+		m_transform.emplace_back(pFGF);
+
+		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
 					(audio[ADEC_DTS]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
 					(audio[ADEC_DTS]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
 		pFGF->AddType(MEDIATYPE_DVD_ENCRYPTED_PACK, MEDIASUBTYPE_DTS);

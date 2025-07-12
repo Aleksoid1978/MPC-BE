@@ -120,6 +120,7 @@ SRCS_LC = \
 	libavcodec/ac3enc.c \
 	libavcodec/ac3enc_float.c \
 	libavcodec/ac3tab.c \
+	libavcodec/ac4dec.c \
 	libavcodec/acelp_filters.c \
 	libavcodec/acelp_pitch_delay.c \
 	libavcodec/acelp_vectors.c \
@@ -255,6 +256,7 @@ SRCS_LC = \
 	libavcodec/flacdec.c \
 	libavcodec/flacdsp.c \
 	libavcodec/flashsv.c \
+	libavcodec/float_fmul_reverse.c \
 	libavcodec/float2half.c \
 	libavcodec/flvdec.c \
 	libavcodec/fmtconvert.c \
@@ -746,6 +748,7 @@ SRCS_LU = \
 	libavutil/film_grain_params.c \
 	libavutil/fixed_dsp.c \
 	libavutil/float_dsp.c \
+	libavutil/float_fmul_reverse.c \
 	libavutil/float_scalarproduct.c \
 	libavutil/float2half.c \
 	libavutil/frame.c \

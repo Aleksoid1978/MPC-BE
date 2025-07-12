@@ -554,6 +554,8 @@ const AP4_Atom::Type AP4_ATOM_TYPE_SHQ4 = AP4_ATOM_TYPE('S','H','Q','4');
 const AP4_Atom::Type AP4_ATOM_TYPE_SHQ5 = AP4_ATOM_TYPE('S','H','Q','5');
 const AP4_Atom::Type AP4_ATOM_TYPE_SHQ7 = AP4_ATOM_TYPE('S','H','Q','7');
 const AP4_Atom::Type AP4_ATOM_TYPE_SHQ9 = AP4_ATOM_TYPE('S','H','Q','9');
+// AC-4
+const AP4_Atom::Type AP4_ATOM_TYPE_AC_4 = AP4_ATOM_TYPE('a','c','-','4');
 
 // fragmented atom ...
 const AP4_Atom::Type AP4_ATOM_TYPE_MVEX = AP4_ATOM_TYPE('m','v','e','x');

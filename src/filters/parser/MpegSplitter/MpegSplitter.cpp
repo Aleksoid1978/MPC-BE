@@ -385,6 +385,8 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 				Infos.emplace_back(L"MLP");
 			} else if (pMediaType->subtype == MEDIASUBTYPE_AES3) {
 				Infos.emplace_back(L"SMPTE 302M");
+			} else if (pMediaType->subtype == MEDIASUBTYPE_DOLBY_AC4) {
+				Infos.emplace_back(L"Dolby AC-4");
 			} else {
 				switch (pInfo->wFormatTag) {
 					case WAVE_FORMAT_PS2_PCM: {

@@ -24,7 +24,9 @@
 /**
  * Maximum window size for ff_kbd_window_init.
  */
-#define FF_KBD_WINDOW_MAX 1024
+// ==> Start patch MPC
+#define FF_KBD_WINDOW_MAX 2048 // 1024
+// ==> End patch MPC
 
 /**
  * Generate a Kaiser-Bessel Derived Window.

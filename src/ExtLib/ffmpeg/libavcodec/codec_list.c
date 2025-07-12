@@ -88,6 +88,7 @@ static const FFCodec * const codec_list[] = {
     &ff_aac_decoder,
     &ff_aac_latm_decoder,
     &ff_ac3_decoder,
+    &ff_ac4_decoder,
     &ff_alac_decoder,
     &ff_als_decoder,
     &ff_amrnb_decoder,

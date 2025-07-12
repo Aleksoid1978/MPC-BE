@@ -157,6 +157,7 @@ CAppSettings::CAppSettings()
 	// Internal audio decoders
 	AudioFiltersKeys[ADEC_AAC]				= L"adec_aac";
 	AudioFiltersKeys[ADEC_AC3]				= L"adec_ac3";
+	AudioFiltersKeys[ADEC_AC4]				= L"adec_ac4";
 	AudioFiltersKeys[ADEC_ALAC]				= L"adec_alac";
 	AudioFiltersKeys[ADEC_ALS]				= L"adec_als";
 	AudioFiltersKeys[ADEC_AMR]				= L"adec_amr";

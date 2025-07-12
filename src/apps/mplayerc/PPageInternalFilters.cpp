@@ -112,6 +112,7 @@ static filter_t s_video_decoders[] = {
 static filter_t s_audio_decoders[] = {
 	{L"AAC",						AUDIO_DECODER, ADEC_AAC,			0},
 	{L"AC3/E-AC3/TrueHD/MLP",		AUDIO_DECODER, ADEC_AC3,			0},
+	{L"AC-4 (Experimental)",		AUDIO_DECODER, ADEC_AC4,			0},
 	{L"ALAC",						AUDIO_DECODER, ADEC_ALAC,			0},
 	{L"ALS",						AUDIO_DECODER, ADEC_ALS,			0},
 	{L"AMR",						AUDIO_DECODER, ADEC_AMR,			0},
