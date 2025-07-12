@@ -6579,9 +6579,7 @@ static int ac4_decode_frame(AVCodecContext *avctx, AVFrame *frame,
     }
 
     av_channel_layout_copy(&avctx->ch_layout, &channel_mode_layouts[ssinfo->channel_mode]);
-    avctx->sample_rate = av_rescale(avctx->sample_rate,
-                                    s->resampling_ratio.den,
-                                    s->resampling_ratio.num);
+
     frame->nb_samples = s->frame_len_base;
     if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
