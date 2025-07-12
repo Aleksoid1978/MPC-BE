@@ -18,7 +18,7 @@ Updated Korean translation (by Hackjjang).
 Updated Bulgarian translation (by jekovcar).
 
 Updated libraries:
-	ffmpeg n7.2-dev-3009-g05094c1749;
+	ffmpeg n7.2-dev-3090-g3ce348063c;
 	vvdec v3.0.0-35-g2eaccd0.
 
 
