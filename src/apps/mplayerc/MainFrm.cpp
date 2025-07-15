@@ -396,6 +396,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_PLAY_RESETRATE, OnUpdatePlayResetRate)
 	ON_COMMAND_RANGE(ID_PLAY_AUDIODELAY_PLUS, ID_PLAY_AUDIODELAY_MINUS, OnPlayChangeAudDelay)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_PLAY_AUDIODELAY_PLUS, ID_PLAY_AUDIODELAY_MINUS, OnUpdatePlayChangeAudDelay)
+	ON_COMMAND(ID_PLAY_AUDIODELAY_ONOFF, OnAudDelayOnOff);
 	ON_COMMAND(ID_FILTERS_COPY_TO_CLIPBOARD, OnPlayFiltersCopyToClipboard)
 	ON_COMMAND_RANGE(ID_FILTERS_SUBITEM_START, ID_FILTERS_SUBITEM_END, OnPlayFilters)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_FILTERS_SUBITEM_START, ID_FILTERS_SUBITEM_END, OnUpdatePlayFilters)
@@ -8798,6 +8799,14 @@ void CMainFrame::OnPlayChangeAudDelay(UINT nID)
 void CMainFrame::OnUpdatePlayChangeAudDelay(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable(!!m_pGB /*&& !!FindFilter(__uuidof(CAudioSwitcherFilter), m_pGB)*/);
+}
+
+void CMainFrame::OnAudDelayOnOff()
+{
+	CAppSettings& s = AfxGetAppSettings();
+	s.bAudioTimeShift = !s.bAudioTimeShift;
+
+	SetAudioDelay(s.bAudioTimeShift ? 10000i64 * s.iAudioTimeShift : 0)
 }
 
 void CMainFrame::OnPlayFiltersCopyToClipboard()

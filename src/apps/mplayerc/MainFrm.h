@@ -1072,6 +1072,7 @@ public:
 	afx_msg void OnUpdatePlayResetRate(CCmdUI* pCmdUI);
 	afx_msg void OnPlayChangeAudDelay(UINT nID);
 	afx_msg void OnUpdatePlayChangeAudDelay(CCmdUI* pCmdUI);
+	afx_msg void OnAudDelayOnOff();
 	afx_msg void OnPlayFiltersCopyToClipboard();
 	afx_msg void OnPlayFilters(UINT nID);
 	afx_msg void OnUpdatePlayFilters(CCmdUI* pCmdUI);
