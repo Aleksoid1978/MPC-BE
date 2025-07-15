@@ -19,7 +19,7 @@ MPCVideoDec
 
 Обновлены библиотеки:
 	ffmpeg n7.2-dev-3090-g3ce348063c;
-	vvdec v3.0.0-35-g2eaccd0.
+	vvdec v3.0.0-37-g7e2cf0c.
 
 
 1.8.5 - 2025-06-17
