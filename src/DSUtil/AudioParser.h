@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2023 see Authors.txt
+ * (C) 2011-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,6 +39,9 @@
 #define DTS_SYNCWORD_CORE_14B_BE 0x00E8FF1F
 #define DTS_SYNCWORD_CORE_14B_LE 0xE8001FFF
 #define DTS_SYNCWORD_SUBSTREAM   0x25205864
+
+#define AC4_SYNC_WORD                0xAC40  /* 16 sync bits without CRC */
+#define AC4_SYNC_WORD_CRC            0xAC41  /* 16 sync bits with    CRC */
 
 #define EAC3_FRAME_TYPE_INDEPENDENT 0
 #define EAC3_FRAME_TYPE_DEPENDENT   1
@@ -134,3 +137,6 @@ void GetDTSHDDescription   (BYTE profile, CString& description);
 int ParseADTSAACHeader     (const BYTE* buf, audioframe_t* audioframe = nullptr);
 
 int ParseAACLatmHeader     (const BYTE* buf, int len, audioframe_t* audioframe = nullptr, std::vector<BYTE>* extra = nullptr);
+
+// need >= 8 bytes
+uint32_t ParseAC4Header(const BYTE* buf, int len, audioframe_t* audioframe = nullptr);
