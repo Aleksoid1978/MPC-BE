@@ -2002,8 +2002,11 @@ CFGManagerCustom::CFGManagerCustom(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->m_chkbytes.emplace_back(L"0,2,FFE0,FFE0");               // Mpeg Audio
 		pFGF->m_chkbytes.emplace_back(L"0,10,FFFFFF00000080808080,49443300000000000000");
 		pFGF->m_chkbytes.emplace_back(L"0,2,FFE0,56E0");               // AAC LATM
+		pFGF->m_chkbytes.emplace_back(L"0,2,,AC40");                   // AC4
+		pFGF->m_chkbytes.emplace_back(L"0,2,,AC41");                   // AC4
 		pFGF->m_extensions.emplace_back(L".mp3");
 		pFGF->m_extensions.emplace_back(L".aac");
+		pFGF->m_extensions.emplace_back(L".ac4");
 		m_source.emplace_back(pFGF);
 	}
 

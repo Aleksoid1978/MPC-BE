@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -49,10 +49,12 @@ CMpaSplitterFile::~CMpaSplitterFile()
 
 #define MPA_HEADER_SIZE  4
 #define ADTS_HEADER_SIZE 9
+#define AC4_HEADER_SIZE  7
 
 #define MOVE_TO_MPA_START_CODE(b, e)      while(b <= e - MPA_HEADER_SIZE  && ((GETU16(b) & MPA_SYNCWORD) != MPA_SYNCWORD)) b++;
 #define MOVE_TO_AAC_START_CODE(b, e)      while(b <= e - ADTS_HEADER_SIZE && ((GETU16(b) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD)) b++;
 #define MOVE_TO_AAC_LATM_START_CODE(b, e) while(b <= e - 7 && ((GETU16(b) & 0xE0FF) != 0xE056)) b++;
+#define MOVE_TO_AC4_START_CODE(b, e)      while(b <= e - AC4_HEADER_SIZE  && !(GETU16(b) == 0x40AC || GETU16(b) == 0x41AC)) b++;
 
 #define FRAMES_FLAG 0x0001
 
@@ -308,6 +310,50 @@ HRESULT CMpaSplitterFile::Init()
 				m_mode = mode::none;
 			}
 		}
+
+		if (m_mode == mode::none) {
+			BYTE* start = buffer.get();
+			const BYTE* end = start + size;
+			while (m_mode != mode::ac4) {
+				MOVE_TO_AC4_START_CODE(start, end);
+				if (start < end - AC4_HEADER_SIZE) {
+					startpos = m_startpos + (start - buffer.get());
+					int frame_size = ParseAC4Header(start, end - start);
+					if (frame_size == 0) {
+						start++;
+						continue;
+					}
+					if (start + frame_size + AC4_HEADER_SIZE > end) {
+						break;
+					}
+
+					BYTE* start2 = start + frame_size;
+					while (start2 + AC4_HEADER_SIZE <= end && valid_cnt < 10) {
+						frame_size = ParseAC4Header(start2, end - start2);
+						if (frame_size == 0) {
+							valid_cnt = 0;
+							m_mode = mode::none;
+							start++;
+							break;
+						}
+
+						valid_cnt++;
+						m_mode = mode::ac4;
+						if (start2 + frame_size >= end) {
+							break;
+						}
+
+						start2 += frame_size;
+					}
+				}
+				else {
+					break;
+				}
+			}
+			if (valid_cnt < 3) {
+				m_mode = mode::none;
+			}
+		}
 	}
 
 	if (m_mode == mode::none) {
@@ -322,8 +368,10 @@ HRESULT CMpaSplitterFile::Init()
 		Read(m_mpahdr, MPA_HEADER_SIZE, &m_mt, true);
 	} else if (m_mode == mode::mp4a) {
 		Read(m_aachdr, ADTS_HEADER_SIZE + 64, &m_mt, false);
-	} else {
+	} else if (m_mode == mode::latm) {
 		Read(m_latmhdr, 32, &m_mt);
+	} else {
+		Read(m_ac4hdr, 128, &m_mt);
 	}
 
 	if (m_mode == mode::mpa) {
@@ -363,6 +411,8 @@ HRESULT CMpaSplitterFile::Init()
 		m_coefficient = 10000000.0 * (GetLength() - m_startpos) * m_aachdr.FrameSamples / m_aachdr.Samplerate;
 	} else if (m_mode == mode::latm) {
 		m_coefficient = 10000000.0 * (GetLength() - m_startpos) * m_latmhdr.FrameSamples / m_latmhdr.samplerate;
+	} else if (m_mode == mode::ac4) {
+		m_coefficient = 10000000.0 * (GetLength() - m_startpos) * m_ac4hdr.FrameSamples / m_ac4hdr.samplerate;
 	}
 
 	int FrameSize;
@@ -455,6 +505,25 @@ bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limi
 					return true;
 				}
 			} else {
+				break;
+			}
+		}
+	} else if (m_mode == mode::ac4) {
+		while (GetPos() <= endpos - AC4_HEADER_SIZE) {
+			ac4hdr h;
+
+			auto pos = GetPos();
+			if (Read(h, (int)(endpos - GetPos()), nullptr, true)) {
+				if (m_ac4hdr == h) {
+					AdjustDuration(h.FrameSize);
+
+					FrameSize = h.FrameSize;
+					rtDuration = h.rtDuration;
+
+					return true;
+				}
+			}
+			else {
 				break;
 			}
 		}

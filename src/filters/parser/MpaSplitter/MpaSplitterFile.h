@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,13 +36,15 @@ class CMpaSplitterFile : public CBaseSplitterFileEx
 		none,
 		mpa,
 		mp4a,
-		latm
+		latm,
+		ac4
 	};
 	mode m_mode;
 
 	mpahdr m_mpahdr;
 	aachdr m_aachdr;
 	latm_aachdr m_latmhdr;
+	ac4hdr m_ac4hdr;
 
 	__int64 m_startpos = 0;
 	__int64 m_endpos   = 0;

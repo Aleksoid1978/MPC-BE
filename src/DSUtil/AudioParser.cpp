@@ -2700,13 +2700,13 @@ uint32_t ParseAC4Header(const BYTE* buf, int len, audioframe_t* audioframe)
 
 	uint32_t frameSize = READ_B16(buf + 2);
 	uint16_t headerSize = 4;
-	uint16_t crcSize = 0;
 	if (frameSize == 0xFFFF) {
 		frameSize = READ_B24(buf + 4);
 		headerSize += 3;
 	}
+	frameSize += headerSize;
 	if (syncWord == AC4_SYNC_WORD_CRC) {
-		crcSize = 2;
+		frameSize += 2;
 	}
 
 	if (audioframe) {
@@ -2730,14 +2730,36 @@ uint32_t ParseAC4Header(const BYTE* buf, int len, audioframe_t* audioframe)
 		uint8_t fsIndex = bits.BitRead(1);
 		uint8_t frameRateIndex = bits.BitRead(4);
 
+		audioframe->size = frameSize;
+		audioframe->samplerate = (fsIndex == 0) ? 44100 : 48000;
+		audioframe->channels = 2;
+
+		static const int FrameSamples[] {
+			2002,
+			2000,
+			1920,
+			1601,
+			1600,
+			1001,
+			1000,
+			960,
+			800,
+			800,
+			480,
+			400,
+			400,
+			2048
+		};
+
+		if (fsIndex == 0 && frameRateIndex == 13) {
+			audioframe->samples = 2048;
+		} else if (frameRateIndex < std::size(FrameSamples)) {
+			audioframe->samples = FrameSamples[frameRateIndex];
+		}
+
 		if (bitstreamVersion <= 1) {
 			// deprecated
-
-			audioframe->size = headerSize + frameSize + crcSize;
-			audioframe->samplerate = (fsIndex == 0) ? 44100 : 48000;
-			audioframe->channels = 2;
-
-			return (headerSize + frameSize + crcSize);
+			return frameSize;
 		}
 
 		bits.BitRead(1);
@@ -2850,9 +2872,6 @@ uint32_t ParseAC4Header(const BYTE* buf, int len, audioframe_t* audioframe)
 			audioframe->channels = channelCount;
 		}
 
-		audioframe->size = headerSize + frameSize + crcSize;
-		audioframe->samplerate = (fsIndex == 0) ? 44100 : 48000;
-
 		static const fraction_t resampling_ratios[] = {
 			{25025, 24000},
 			{25, 24},
@@ -2876,5 +2895,5 @@ uint32_t ParseAC4Header(const BYTE* buf, int len, audioframe_t* audioframe)
 		}
 	}
 
-	return (headerSize + frameSize + crcSize);
+	return frameSize;
 }

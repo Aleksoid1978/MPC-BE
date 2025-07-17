@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -199,6 +199,9 @@ public:
 		int samplerate;
 		int channels;
 
+		int FrameSize, FrameSamples;
+		REFERENCE_TIME rtDuration;
+
 		bool operator == (const struct ac4hdr& h) const {
 			return (sync == h.sync
 					&& samplerate == h.samplerate)
@@ -336,7 +339,7 @@ public:
 	bool Read(aachdr& h, int len, CMediaType* pmt = nullptr, bool find_sync = true);
 	bool Read(latm_aachdr& h, int len, CMediaType* pmt = nullptr);
 	bool Read(ac3hdr& h, int len, CMediaType* pmt = nullptr, bool find_sync = true, bool AC3CoreOnly = true);
-	bool Read(ac4hdr& h, int len, CMediaType* pmt = nullptr);
+	bool Read(ac4hdr& h, int len, CMediaType* pmt = nullptr, bool find_sync = false);
 	bool Read(dtshdr& h, int len, CMediaType* pmt = nullptr, bool find_sync = true);
 	bool Read(dtslbr_hdr& h, int len, CMediaType* pmt = nullptr);
 	bool Read(mlphdr& h, int len, CMediaType* pmt = nullptr, bool find_sync = false);

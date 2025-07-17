@@ -769,29 +769,50 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 	return true;
 }
 
-bool CBaseSplitterFileEx::Read(ac4hdr& h, int len, CMediaType* pmt)
+bool CBaseSplitterFileEx::Read(ac4hdr& h, int len, CMediaType* pmt, bool find_sync)
 {
 	h = {};
+
+	if (find_sync) {
+		uint16_t sync = BitRead(16, true);
+		for (; len >= 7 && sync != AC4_SYNC_WORD && sync != AC4_SYNC_WORD_CRC; len--) {
+			BitRead(8);
+			sync = BitRead(16, true);
+		}
+	}
+
+	if (len < 8) {
+		return false;
+	}
 
 	h.sync = BitRead(16, true);
 	if (!(h.sync == AC4_SYNC_WORD || h.sync == AC4_SYNC_WORD_CRC)) {
 		return false;
 	}
 
+	auto pos = GetPos();
+
+	len = std::min(128, len);
 	auto buffer = std::make_unique<uint8_t[]>(len);
 	if (FAILED(ByteRead(buffer.get(), len))) {
 		return false;
 	}
+
+	Seek(pos);
 
 	audioframe_t frame;
 	if (!ParseAC4Header(buffer.get(), len, &frame)) {
 		return false;
 	}
 
-	if (pmt) {
-		h.channels = frame.channels;
-		h.samplerate = frame.samplerate;
+	h.channels = frame.channels;
+	h.samplerate = frame.samplerate;
 
+	h.FrameSize = frame.size;
+	h.FrameSamples = frame.samples;
+	h.rtDuration = 10000000i64 * h.FrameSamples / h.samplerate;
+
+	if (pmt) {
 		WAVEFORMATEX wfe = {};
 		wfe.wFormatTag = WAVE_FORMAT_UNKNOWN;
 		wfe.nChannels = h.channels;
