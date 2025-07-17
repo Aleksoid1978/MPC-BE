@@ -1111,7 +1111,7 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 			ByteRead(buffer.data(), len);
 			AV1Parser::AV1SequenceParameters seq_params;
 			std::vector<uint8_t> obu_sequence_header;
-			if (AV1Parser::ParseOBU(buffer.data(), buffer.size(), seq_params, obu_sequence_header, true)) {
+			if (AV1Parser::ParseOBU(buffer.data(), buffer.size(), seq_params, obu_sequence_header)) {
 				s.mt.SetTemporalCompression(TRUE);
 				s.mt.SetVariableSize();
 				s.mt.majortype = MEDIATYPE_Video;

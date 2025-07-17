@@ -1493,7 +1493,7 @@ namespace AV1Parser {
 		return ParseOBUHeader(buf, buf_size, obu_size, start_pos, obu_type);
 	}
 
-	bool ParseOBU(const BYTE* data, int size, AV1SequenceParameters& seq_params, std::vector<uint8_t>& obu_sequence_header, bool bCheckOnlySequenceHeader/* = false*/)
+	bool ParseOBU(const BYTE* data, int size, AV1SequenceParameters& seq_params, std::vector<uint8_t>& obu_sequence_header)
 	{
 		const BYTE* seq = nullptr;
 		int seq_size = 0;
@@ -1508,7 +1508,15 @@ namespace AV1Parser {
 			int start_pos = 0;
 			uint8_t type = 0;
 			auto len = ParseOBUHeader(buf, size, obu_size, start_pos, type);
-			if (len < 0 || len > size) {
+			if (len < 0) {
+				break;
+			}
+
+			if (type == AV1_OBU_FRAME_HEADER || type == AV1_OBU_FRAME) {
+				b_frame_found = true;
+			}
+
+			if (len > size) {
 				break;
 			}
 
@@ -1518,11 +1526,9 @@ namespace AV1Parser {
 
 				seq_obu = buf;
 				seq_obu_size = len;
-			} else if (type == AV1_OBU_FRAME_HEADER || type == AV1_OBU_FRAME) {
-				b_frame_found = true;
 			}
 
-			if (seq && (b_frame_found || bCheckOnlySequenceHeader)) {
+			if (seq && b_frame_found) {
 				break;
 			}
 
@@ -1530,7 +1536,7 @@ namespace AV1Parser {
 			buf += len;
 		}
 
-		if (seq && (b_frame_found || bCheckOnlySequenceHeader)) {
+		if (seq && b_frame_found) {
 			auto ret = ParseSequenceHeader(seq_params, seq, seq_size);
 			if (ret) {
 				obu_sequence_header.resize(seq_obu_size);

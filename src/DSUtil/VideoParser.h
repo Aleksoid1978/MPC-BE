@@ -139,7 +139,7 @@ namespace AV1Parser {
 	};
 
 	int64_t ParseOBUHeaderSize(const BYTE* buf, const int buf_size, uint8_t& obu_type);
-	bool ParseOBU(const BYTE* data, int size, AV1SequenceParameters& seq_params, std::vector<uint8_t>& obu_sequence_header, bool bCheckOnlySequenceHeader = false);
+	bool ParseOBU(const BYTE* data, int size, AV1SequenceParameters& seq_params, std::vector<uint8_t>& obu_sequence_header);
 } // namespace AV1Parser
 
 namespace AVS3Parser {
