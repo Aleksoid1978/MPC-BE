@@ -2751,8 +2751,10 @@ uint32_t ParseAC4Header(const BYTE* buf, int len, audioframe_t* audioframe)
 			2048
 		};
 
-		if (fsIndex == 0 && frameRateIndex == 13) {
-			audioframe->samples = 2048;
+		if (fsIndex == 0) {
+			if (frameRateIndex == 13) {
+				audioframe->samples = 2048;
+			}
 		} else if (frameRateIndex < std::size(FrameSamples)) {
 			audioframe->samples = FrameSamples[frameRateIndex];
 		}
