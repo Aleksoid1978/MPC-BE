@@ -83,7 +83,7 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 		const bool IsValid() const { return m_nValidStream >= validCount; }
 	};
 
-	std::map<DWORD, CValidStream<latm_aachdr, 3>> m_aaclatmValid;
+	std::map<DWORD, CValidStream<latm_aachdr, 2>> m_aaclatmValid;
 	std::map<DWORD, CValidStream<aachdr>>         m_aacValid;
 	std::map<DWORD, CValidStream<ac3hdr>>         m_ac3Valid;
 	std::map<DWORD, CValidStream<ac4hdr>>         m_ac4Valid;
