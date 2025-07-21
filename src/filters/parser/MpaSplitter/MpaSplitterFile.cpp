@@ -372,6 +372,10 @@ HRESULT CMpaSplitterFile::Init()
 		Read(m_latmhdr, 32, &m_mt);
 	} else {
 		Read(m_ac4hdr, 128, &m_mt);
+		if (m_ac4hdr.objectCoding) {
+			DLog(L"CMpaSplitterFile::Init() : AC4 stream with object coding is not supported in the decoder, ignore it.");
+			return E_FAIL;
+		}
 	}
 
 	if (m_mode == mode::mpa) {

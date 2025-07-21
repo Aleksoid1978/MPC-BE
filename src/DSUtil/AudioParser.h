@@ -138,5 +138,5 @@ int ParseADTSAACHeader     (const BYTE* buf, audioframe_t* audioframe = nullptr)
 
 int ParseAACLatmHeader     (const BYTE* buf, int len, audioframe_t* audioframe = nullptr, std::vector<BYTE>* extra = nullptr);
 
-// need >= 8 bytes
+// need >= 8 bytes, param1 = Object coding (currently not supported in decoder)
 uint32_t ParseAC4Header(const BYTE* buf, int len, audioframe_t* audioframe = nullptr);

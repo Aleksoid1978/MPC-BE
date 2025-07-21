@@ -807,6 +807,7 @@ bool CBaseSplitterFileEx::Read(ac4hdr& h, int len, CMediaType* pmt, bool find_sy
 
 	h.channels = frame.channels;
 	h.samplerate = frame.samplerate;
+	h.objectCoding = !!frame.param1;
 
 	h.FrameSize = frame.size;
 	h.FrameSamples = frame.samples;

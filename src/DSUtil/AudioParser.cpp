@@ -2871,6 +2871,7 @@ uint32_t ParseAC4Header(const BYTE* buf, int len, audioframe_t* audioframe)
 			audioframe->channels = AC4::Ac4ChannelCountFromSpeakerGroupIndexMask(speakerGroupIndexMask);
 		}
 		else {
+			audioframe->param1 = 1;
 			audioframe->channels = channelCount;
 		}
 

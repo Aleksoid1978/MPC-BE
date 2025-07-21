@@ -198,14 +198,15 @@ public:
 		WORD sync;
 		int samplerate;
 		int channels;
+		bool objectCoding;
 
 		int FrameSize, FrameSamples;
 		REFERENCE_TIME rtDuration;
 
 		bool operator == (const struct ac4hdr& h) const {
-			return (sync == h.sync
-					&& samplerate == h.samplerate)
-					&& channels == h.channels;
+			return (samplerate == h.samplerate)
+					&& channels == h.channels
+					&& objectCoding == h.objectCoding;
 		}
 
 	};

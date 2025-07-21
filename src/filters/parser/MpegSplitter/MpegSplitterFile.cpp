@@ -1259,7 +1259,13 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 					if (Read(h, len, &s.mt)) {
 						m_ac4Valid[s].Handle(h);
 						if (m_ac4Valid[s].IsValid()) {
-							type = stream_type::audio;
+							if (h.objectCoding) {
+								DLog(L"CMpegSplitterFile::AddStream() : AC4 stream (pid %hu) with object coding is not supported in the decoder, ignore it.", pid);
+								m_ignore_pids.push_back(pid);
+								return s;
+							} else {
+								type = stream_type::audio;
+							}
 						}
 					}
 				}
