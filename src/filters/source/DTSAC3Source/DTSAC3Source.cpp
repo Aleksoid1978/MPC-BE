@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -259,7 +259,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 		}
 
 		m_file.Seek(m_dataStart, CFile::begin);
-		BYTE buf[40] = { 0 };
+		BYTE buf[256] = { 0 };
 		if (m_file.Read(&buf, std::size(buf)) != std::size(buf)) {
 			break;
 		}

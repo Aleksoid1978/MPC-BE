@@ -1107,7 +1107,7 @@ int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t*
 			auto end = start + gb.RemainingSize();
 			while (end - start >= 4) {
 				auto sync = GETU32(start++);
-				if (sync == 0x50080002 || sync == 0xD10040F1) {
+				if (sync == 0x50080002 || sync == 0xD10040F1 || sync == 0xD40040F1) {
 					audioframe->param2 = audioframe->param2 == DCA_PROFILE_HD_MA ? DCA_PROFILE_HD_MA_X : DCA_PROFILE_HD_HRA_X;
 					break;
 				} else if (sync == 0xD00040F1) {
