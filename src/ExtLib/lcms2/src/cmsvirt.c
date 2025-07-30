@@ -521,8 +521,14 @@ cmsHPROFILE CMSEXPORT cmsCreateLab4ProfileTHR(cmsContext ContextID, const cmsCIE
 {
     cmsHPROFILE hProfile;
     cmsPipeline* LUT = NULL;
+    cmsCIEXYZ xyz;
+    
+    if (WhitePoint == NULL)
+        xyz = *cmsD50_XYZ();
+    else
+        cmsxyY2XYZ(&xyz, WhitePoint);
 
-    hProfile = cmsCreateRGBProfileTHR(ContextID, WhitePoint == NULL ? cmsD50_xyY() : WhitePoint, NULL, NULL);
+    hProfile = cmsCreateRGBProfileTHR(ContextID, NULL, NULL, NULL);
     if (hProfile == NULL) return NULL;
 
     cmsSetProfileVersion(hProfile, 4.4);
@@ -531,6 +537,7 @@ cmsHPROFILE CMSEXPORT cmsCreateLab4ProfileTHR(cmsContext ContextID, const cmsCIE
     cmsSetColorSpace(hProfile,  cmsSigLabData);
     cmsSetPCS(hProfile,         cmsSigLabData);
 
+    if (!cmsWriteTag(hProfile, cmsSigMediaWhitePointTag, &xyz)) goto Error;
     if (!SetTextTags(hProfile, L"Lab identity built-in")) goto Error;
 
     // An empty LUTs is all we need
