@@ -3751,7 +3751,7 @@ Ztring MediaInfo_Config_MediaInfo::File_ProbeCaption_Set (const Ztring& NewValue
                     return Malformed;
                 }
                 auto Seconds = TC.ToSeconds();
-                if (Seconds <= 0) {
+                if (Seconds < 0) {
                     return Malformed;
                 }
                 if (Item.Start_Type == config_probe_none) {

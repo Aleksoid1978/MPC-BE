@@ -385,7 +385,7 @@ void File_Exr::comments ()
 
     //Filling
     if (Frame_Count==1)
-        Fill(StreamKind_Last, 0, General_Comment, value);
+        Fill(Stream_General, 0, General_Comment, value);
 }
 
 //---------------------------------------------------------------------------

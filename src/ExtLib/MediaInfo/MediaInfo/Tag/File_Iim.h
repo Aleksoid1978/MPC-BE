@@ -45,6 +45,7 @@ private :
     void Byline();
     void CopyrightNotice();
     void CaptionAbstract();
+    void PhotoMechanicPrefs();
 
     //Helpers
     void SkipString();

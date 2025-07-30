@@ -362,6 +362,10 @@
 #if defined(MEDIAINFO_TGA_YES)
     #include "MediaInfo/Image/File_Tga.h"
 #endif
+#if defined(MEDIAINFO_WEBP_YES)
+    #include "MediaInfo/Image/File_WebP.h"
+#endif
+
 
 //---------------------------------------------------------------------------
 // Tag
@@ -394,6 +398,9 @@
 #endif
 #if defined(MEDIAINFO_ISO9660_YES)
     #include "MediaInfo/Archive/File_Iso9660.h"
+#endif
+#if defined(MEDIAINFO_MACHO_YES)
+    #include "MediaInfo/Archive/File_MachO.h"
 #endif
 #if defined(MEDIAINFO_MZ_YES)
     #include "MediaInfo/Archive/File_Mz.h"
@@ -586,6 +593,9 @@ File__MultipleParsing::File__MultipleParsing()
     #if defined(MEDIAINFO_HEVC_YES)
         Parser.push_back(new File_Hevc());
     #endif
+    #if defined(MEDIAINFO_AVS3V_YES)
+        Parser.push_back(new File_Avs3V());
+#   endif
     #if defined(MEDIAINFO_AVSV_YES)
         Parser.push_back(new File_AvsV());
     #endif
@@ -670,6 +680,9 @@ File__MultipleParsing::File__MultipleParsing()
 //    #endif
     #if defined(MEDIAINFO_FLAC_YES)
         Parser.push_back(new File_Flac());
+    #endif
+    #if defined(MEDIAINFO_IAMF_YES)
+        Parser.push_back(new File_Iamf());
     #endif
     #if defined(MEDIAINFO_IT_YES)
         Parser.push_back(new File_ImpulseTracker());
@@ -781,6 +794,9 @@ File__MultipleParsing::File__MultipleParsing()
     #if defined(MEDIAINFO_TIFF_YES)
         Parser.push_back(new File_Tiff());
     #endif
+    #if defined(MEDIAINFO_WEBP_YES)
+        Parser.push_back(new File_WebP());
+    #endif
 
     // Tag
     #if defined(MEDIAINFO_SPHERICALVIDEO_YES)
@@ -808,6 +824,9 @@ File__MultipleParsing::File__MultipleParsing()
     #endif
     #if defined(MEDIAINFO_ISO9660_YES)
         Parser.push_back(new File_Iso9660());
+    #endif
+    #if defined(MEDIAINFO_MACHO_YES)
+        Parser.push_back(new File_MachO());
     #endif
     #if defined(MEDIAINFO_MZ_YES)
         Parser.push_back(new File_Mz());

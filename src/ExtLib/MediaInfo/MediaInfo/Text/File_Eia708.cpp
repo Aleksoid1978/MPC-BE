@@ -95,7 +95,7 @@ void File_Eia708::Streams_Fill()
         if (Stream || DisplayCaptions==DisplayCaptions_Stream)
         {
             auto HasCommand=Stream;
-            auto HasContent=Stream && Stream->HasContent();
+            auto HasContent=Stream && Stream->HasContent;
             if (!HasContent && DisplayCaptions==DisplayCaptions_Content)
                 continue;
 
@@ -1487,6 +1487,8 @@ void File_Eia708::Character_Fill(wchar_t Character)
 
     if (!HasContent)
         HasContent=true;
+    if (!Streams[service_number]->HasContent)
+        Streams[service_number]->HasContent=true;
 }
 
 //---------------------------------------------------------------------------

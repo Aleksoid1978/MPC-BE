@@ -23,6 +23,7 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Multiple/File_Gxf_TimeCode.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
+#include "MediaInfo/TimeCode.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -345,19 +346,19 @@ void File_Gxf_TimeCode::Read_Buffer_Continue()
             }
 
             #if MEDIAINFO_TRACE
-                string TimeCode;
-                TimeCode+=('0'+Hours_Tens);
-                TimeCode+=('0'+Hours_Units);
-                TimeCode+=':';
-                TimeCode+=('0'+Minutes_Tens);
-                TimeCode+=('0'+Minutes_Units);
-                TimeCode+=':';
-                TimeCode+=('0'+Seconds_Tens);
-                TimeCode+=('0'+Seconds_Units);
-                TimeCode+=DropFrame?';':':';
-                TimeCode+=('0'+Frames_Tens);
-                TimeCode+=('0'+Frames_Units);
-                Element_Info1(TimeCode.c_str());
+                string TimeCodeTrace;
+                TimeCodeTrace+=('0'+Hours_Tens);
+                TimeCodeTrace+=('0'+Hours_Units);
+                TimeCodeTrace+=':';
+                TimeCodeTrace+=('0'+Minutes_Tens);
+                TimeCodeTrace+=('0'+Minutes_Units);
+                TimeCodeTrace+=':';
+                TimeCodeTrace+=('0'+Seconds_Tens);
+                TimeCodeTrace+=('0'+Seconds_Units);
+                TimeCodeTrace+=DropFrame?';':':';
+                TimeCodeTrace+=('0'+Frames_Tens);
+                TimeCodeTrace+=('0'+Frames_Units);
+                Element_Info1(TimeCodeTrace.c_str());
             #endif //MEDIAINFO_TRACE
             if (IsAtc)
             {
@@ -370,6 +371,32 @@ void File_Gxf_TimeCode::Read_Buffer_Continue()
             FILLING_BEGIN();
                 if (TimeCode_FirstFrame_ms==(int64u)-1)
                     TimeCode_FirstFrame_ms=TimeCode_Ms;
+
+                #if MEDIAINFO_ADVANCED
+                    if (Config->TimeCode_Dumps)
+                    {
+                        if (id.empty())
+                            id = std::to_string(((*Config->TimeCode_Dumps).size() + 1));
+                        auto& TimeCode_Dump = (*Config->TimeCode_Dumps)[id];
+                        if (TimeCode_Dump.List.empty())
+                        {
+                            TimeCode_Dump.Attributes_First += " id=\"" + id + "\" format=\"matroska_blockadditional\"";
+                            TimeCode_Dump.FramesMax = 99;
+                        }
+                        auto Frames = Frames_Tens * 10 + Frames_Units;
+                        if (TimeCode_Dump.FramesMax == 99 && Frames <= 2 && TimeCode_Dump.LastTC.IsValid() && TimeCode_Dump.LastTC.GetFrames() >= 2) {
+                            TimeCode_Dump.FramesMax = TimeCode_Dump.LastTC.GetFrames();
+                            TimeCode_Dump.LastTC.SetFramesMax(TimeCode_Dump.FramesMax);
+                        }
+                        TimeCode CurrentTC(Hours_Tens * 10 + Hours_Units, Minutes_Tens * 10 + Minutes_Units, Seconds_Tens * 10 + Seconds_Units, Frames, TimeCode_Dump.FramesMax, TimeCode::DropFrame(DropFrame));
+                        TimeCode_Dump.List += "    <tc v=\"" + CurrentTC.ToString() + '\"';
+                        if (TimeCode_Dump.LastTC.IsValid() && TimeCode_Dump.LastTC.GetFramesMax() && CurrentTC != TimeCode_Dump.LastTC + 1)
+                            TimeCode_Dump.List += " nc=\"1\"";
+                        TimeCode_Dump.LastTC = CurrentTC;
+                        TimeCode_Dump.List += "/>\n";
+                        TimeCode_Dump.FrameCount++;
+                    }
+                #endif //MEDIAINFO_ADVANCED
             FILLING_END();
         }
         else

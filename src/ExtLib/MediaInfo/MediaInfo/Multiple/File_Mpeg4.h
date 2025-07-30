@@ -14,6 +14,7 @@
 #include "MediaInfo/File__HasReferences.h"
 #include "MediaInfo/MediaInfo_Internal.h"
 #include "MediaInfo/Multiple/File_Mpeg4_Descriptors.h"
+#include <memory>
 class File_MpegPs;
 //---------------------------------------------------------------------------
 
@@ -206,6 +207,9 @@ private :
     void moov_trak_mdia_minf_stbl_stsd_mebx_keys();
     void moov_trak_mdia_minf_stbl_stsd_mebx_keys_PHDR();
     void moov_trak_mdia_minf_stbl_stsd_mebx_keys_PHDR_keyd();
+    void moov_trak_mdia_minf_stbl_stsd_mebx_keys_xxxx();
+    void moov_trak_mdia_minf_stbl_stsd_mebx_keys_xxxx_keyd();
+    void moov_trak_mdia_minf_stbl_stsd_mebx_keys_xxxx_dtyp();
     void moov_trak_mdia_minf_stbl_stsd_stpp();
     void moov_trak_mdia_minf_stbl_stsd_stpp_btrt() {moov_trak_mdia_minf_stbl_stsd_xxxx_btrt();}
     void moov_trak_mdia_minf_stbl_stsd_text();
@@ -219,6 +223,7 @@ private :
     void moov_trak_mdia_minf_stbl_stsd_xxxxVideo();
     void moov_trak_mdia_minf_stbl_stsd_xxxxOthers(const string& CodecIDAddition);
     void moov_trak_mdia_minf_stbl_stsd_xxxx_alac();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_amve();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_AALP();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_ACLR();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_APRG();
@@ -272,6 +277,15 @@ private :
     void moov_trak_mdia_minf_stbl_stsd_xxxx_sinf_imif();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_sinf_schm();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_sinf_schi();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_st3d();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_sv3d();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_sv3d_svhd();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_sv3d_proj();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_sv3d_proj_prhd();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_sv3d_proj_cbmp();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_sv3d_proj_equi();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_sv3d_proj_mshp();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_sv3d_proj_mshp_mesh();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_udts();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_vexu();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_vexu_eyes();
@@ -337,7 +351,6 @@ private :
     void moov_udta_AllF();
     void moov_udta_chpl();
     void moov_udta_clsf();
-    void moov_udta_cprt();
     void moov_udta_date();
     void moov_udta_DcMD();
     void moov_udta_DcMD_Cmbo();
@@ -403,9 +416,6 @@ private :
     void wide();
 
     //Helpers
-    bool Element_Level_Get();
-    bool Element_Name_Get();
-    bool Element_Size_Get();
     Ztring Language_Get(int16u Language);
     bool IsQt();
     enum method
@@ -678,6 +688,7 @@ private :
             IsCaption=false;
             MayHaveCaption=false;
             tkhd_Found=false;
+            TrackID = 0;
             CleanAperture_Width=0;
             CleanAperture_Height=0;
             CleanAperture_PixelAspectRatio=0;
@@ -753,6 +764,17 @@ private :
     #if MEDIAINFO_CONFORMANCE
         bool            IsCmaf;
     #endif
+
+    //meta_idat parsing
+    struct idat_item {
+        int64u offset{};
+        int64u length{};
+        std::unique_ptr<File__Analyze> parser;
+    };
+    std::map<int16u, idat_item> idat_items;
+
+    //Gain map
+    std::shared_ptr<void> GainMap_metadata_ISO;
 };
 
 } //NameSpace

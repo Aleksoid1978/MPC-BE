@@ -959,8 +959,9 @@ void File_Ffv1::Parameters()
     Element_Begin1("Parameters");
 
     //Parsing
-    states States;
+    states States, States2[states_size];
     memset(States, 128, states_size);
+    memset(States2, 128, states_size*states_size);
     Get_RU (States, version,                                    "version");
     if ( ConfigurationRecord_IsPresent && version<=1)
     {
@@ -1127,7 +1128,7 @@ void File_Ffv1::Parameters()
                 for (size_t k = 0; k < states_size; k++)
                 {
                     int32s value;
-                    Get_RS (States, value,                  "initial_state_delta");
+                    Get_RS (States2[k], value,              "initial_state_delta");
                     if (coder_type)
                         plane_states[i][j][k] = value;
                 }

@@ -18,6 +18,7 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
 #include "MediaInfo/TimeCode.h"
+#include <memory>
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -52,6 +53,7 @@ private :
 
     //Buffer - Global
     void Read_Buffer_Unsynched();
+    void Read_Buffer_AfterParsing();
     #if MEDIAINFO_SEEK
     size_t Read_Buffer_Seek (size_t Method, int64u Value, int64u ID) {return Read_Buffer_Seek_OneFramePerFile(Method, Value, ID);}
     #endif //MEDIAINFO_SEEK
@@ -81,6 +83,8 @@ private :
     void fcTL() { Data_Common(); }
     void fdAT() { Data_Common(); }
     void gAMA();
+    void gdAT();
+    void gmAP();
     void hIST() { Data_Common(); }
     void iCCP();
     void iTXt() { Textual(bitset8().set(IsCompressed).set(IsUTF8)); }
@@ -109,6 +113,7 @@ private :
     //Temp
     int64u Data_Size;
     int32u Signature;
+    std::shared_ptr<void> GainMap_metadata_ISO;
 };
 
 } //NameSpace

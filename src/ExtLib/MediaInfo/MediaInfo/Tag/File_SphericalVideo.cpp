@@ -28,6 +28,20 @@
 namespace MediaInfoLib
 {
 
+//---------------------------------------------------------------------------
+extern const char* Mk_StereoMode(int64u StereoMode);
+struct stereomode_mapping {
+    const char* Value;
+    int8u MapTo;
+};
+static const stereomode_mapping StereoMode_Mapping[] =
+{
+    { "mono", 0 },
+    { "left-right", 1 },
+    { "top-bottom", 3 },
+};
+
+//---------------------------------------------------------------------------
 #define XML_ELEM_START \
     Result = tfsxml_enter(&p); \
     if (Result > 0) { \
@@ -61,7 +75,7 @@ namespace MediaInfoLib
         } \
     } \
 
-    //***************************************************************************
+//***************************************************************************
 // Buffer - File header
 //***************************************************************************
 
@@ -92,16 +106,33 @@ bool File_SphericalVideo::FileHeader_Begin()
                 if (Result < 0) {
                     p = p_sav;
                     XML_VALUE
-                    auto FieldName = tfsxml_decode(b);
-                    if (FieldName.find("GSpherical:", 0) == 0) {
-                        FieldName.erase(0, 11);
+                    if (!tfsxml_strncmp_charp(b, "GSpherical:", 11)) {
+                        b.buf += 11;
+                        b.len -= 11;
                     }
+                    auto Value = tfsxml_decode(v);
+                    if (!tfsxml_strcmp_charp(b, "SourceCount")) {
+                        Fill(Stream_Video, 0, Video_MultiView_Count, Value);
+                        continue;
+                    }
+                    if (!tfsxml_strcmp_charp(b, "StereoMode")) {
+                        const char* Found = nullptr;
+                        for (const auto& Mapping : StereoMode_Mapping) {
+                            if (Value == Mapping.Value) {
+                                Found = Mk_StereoMode(Mapping.MapTo);
+                                break;
+                            }
+                        }
+                        Fill(Stream_Video, 0, Video_MultiView_Layout, Found ? Found : Value);
+                        continue;
+                    }
+                    auto FieldName = tfsxml_decode(b);
                     for (auto& c : FieldName) {
                         if (!(c >= '0' && c <= '9') && !(c >= 'A' && c <= 'Z') && !(c >= 'a' && c <= 'z')) {
                             c = '_';
                         }
                     }
-                    Fill(Stream_Video, 0, ("Spatial " + FieldName).c_str(), tfsxml_decode(v));
+                    Fill(Stream_Video, 0, ("Spatial " + FieldName).c_str(), Value);
                 }
             }
         XML_ELEM_END
@@ -113,4 +144,4 @@ bool File_SphericalVideo::FileHeader_Begin()
 
 } //NameSpace
 
-#endif //MEDIAINFO_XMP_YES
+#endif //MEDIAINFO_SPHERICALVIDEO_YES

@@ -460,6 +460,11 @@ void File_Icc::desc(int32u Format, int32u Size)
         case Elements::mluc: Get_mluc(Size, Description); break;
         default:;
     }
+
+    //Filling
+    FILLING_BEGIN()
+        Fill(StreamKind_Last, StreamPos_Last, "colour_primaries_ICC_Description", Description);
+    FILLING_END()
 }
 
 //---------------------------------------------------------------------------

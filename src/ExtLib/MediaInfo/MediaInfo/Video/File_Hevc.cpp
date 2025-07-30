@@ -364,6 +364,14 @@ void File_Hevc::Streams_Fill()
     if (chroma_sample_loc_type_bottom_field != (int32u)-1 && chroma_sample_loc_type_bottom_field != chroma_sample_loc_type_top_field)
         Fill(Stream_Video, 0, "ChromaSubsampling_Position", __T("Type ") + Ztring::ToZtring(chroma_sample_loc_type_bottom_field));
     }
+    if (ambient_viewing_environment_illuminance && !ambient_viewing_environment_illuminance_string.empty()) {
+        Fill(Stream_Video, 0, "AmbientViewingEnvironment_Illuminance", ambient_viewing_environment_illuminance);
+        Fill_SetOptions(Stream_Video, 0, "AmbientViewingEnvironment_Illuminance", "N NF");
+        Fill(Stream_Video, 0, "AmbientViewingEnvironment_Illuminance/String", ambient_viewing_environment_illuminance_string);
+    }
+    if (!ambient_viewing_environment_chromaticity.empty()) {
+        Fill(Stream_Video, 0, "AmbientViewingEnvironment_Chromaticity", ambient_viewing_environment_chromaticity);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -2562,6 +2570,7 @@ void File_Hevc::sei_message(int32u &seq_parameter_set_id)
         case 137 :   sei_message_mastering_display_colour_volume(); break;
         case 144 :   sei_message_light_level(); break;
         case 147 :   sei_alternative_transfer_characteristics(); break;
+        case 148 :   sei_ambient_viewing_environment(); break;
         case 176 :   three_dimensional_reference_displays_info(payloadSize); break;
         default :
                     Element_Info1("unknown");
@@ -3176,112 +3185,10 @@ void File_Hevc::sei_message_user_data_registered_itu_t_t35_B5_003C_0001()
 void File_Hevc::sei_message_user_data_registered_itu_t_t35_B5_003C_0001_04()
 {
     Element_Info1("SMPTE ST 2094 App 4");
-    int8u application_version;
-    bool IsHDRplus=false, tone_mapping_flag;
-    Get_B1 (application_version,                                "application_version");
-    if (application_version==1)
-    {
-        int32u targeted_system_display_maximum_luminance, maxscl[4]{}, distribution_maxrgb_percentiles[16];
-        int16u fraction_bright_pixels;
-        int8u num_distribution_maxrgb_percentiles, distribution_maxrgb_percentages[16], num_windows, num_bezier_curve_anchors;
-        bool targeted_system_display_actual_peak_luminance_flag, mastering_display_actual_peak_luminance_flag, color_saturation_mapping_flag;
-        BS_Begin();
-        Get_S1 ( 2, num_windows,                                "num_windows");
 
-        for (int8u w=1; w<num_windows; w++)
-        {
-            Element_Begin1("window");
-            Skip_S2(16,                                         "window_upper_left_corner_x");
-            Skip_S2(16,                                         "window_upper_left_corner_y");
-            Skip_S2(16,                                         "window_lower_right_corner_x");
-            Skip_S2(16,                                         "window_lower_right_corner_y");
-            Skip_S2(16,                                         "center_of_ellipse_x");
-            Skip_S2(16,                                         "center_of_ellipse_y");
-            Skip_S1( 8,                                         "rotation_angle");
-            Skip_S2(16,                                         "semimajor_axis_internal_ellipse");
-            Skip_S2(16,                                         "semimajor_axis_external_ellipse");
-            Skip_S2(16,                                         "semiminor_axis_external_ellipse");
-            Skip_SB(                                            "overlap_process_option");
-            Element_End0();
-        }
-
-        Get_S4 (27, targeted_system_display_maximum_luminance,  "targeted_system_display_maximum_luminance");
-        TEST_SB_GET (targeted_system_display_actual_peak_luminance_flag, "targeted_system_display_actual_peak_luminance_flag");
-            int8u num_rows_targeted_system_display_actual_peak_luminance, num_cols_targeted_system_display_actual_peak_luminance;
-            Get_S1(5, num_rows_targeted_system_display_actual_peak_luminance, "num_rows_targeted_system_display_actual_peak_luminance");
-            Get_S1(5, num_cols_targeted_system_display_actual_peak_luminance, "num_cols_targeted_system_display_actual_peak_luminance");
-            for(int8u i=0; i<num_rows_targeted_system_display_actual_peak_luminance; i++)
-                for(int8u j=0; j<num_cols_targeted_system_display_actual_peak_luminance; j++)
-                    Skip_S1(4,                                   "targeted_system_display_actual_peak_luminance");
-        TEST_SB_END();
-
-        for (int8u w=0; w<num_windows; w++)
-        {
-            Element_Begin1("window");
-            for(int8u i=0; i<3; i++)
-            {
-                Get_S3 (17, maxscl[i],                          "maxscl"); Param_Info2(Ztring::ToZtring(((float)maxscl[i])/100000, 5), " cd/m2");
-            }
-            Get_S3 (17, maxscl[3],                              "average_maxrgb");   Param_Info2(Ztring::ToZtring(((float)maxscl[3])/100000, 5), " cd/m2");
-
-            Get_S1(4, num_distribution_maxrgb_percentiles,      "num_distribution_maxrgb_percentiles");
-            for (int8u i=0; i< num_distribution_maxrgb_percentiles; i++)
-            {
-                Element_Begin1(                                 "distribution_maxrgb");
-                Get_S1 ( 7, distribution_maxrgb_percentages[i], "distribution_maxrgb_percentages");
-                Get_S3 (17, distribution_maxrgb_percentiles[i], "distribution_maxrgb_percentiles");
-                Element_Info1(distribution_maxrgb_percentages[i]);
-                Element_Info1(distribution_maxrgb_percentiles[i]);
-                Element_End0();
-            }
-            Get_S2 (10, fraction_bright_pixels,                 "fraction_bright_pixels");
-            Element_End0();
-        }
-
-        TEST_SB_GET (mastering_display_actual_peak_luminance_flag, "mastering_display_actual_peak_luminance_flag");
-            int8u num_rows_mastering_display_actual_peak_luminance, num_cols_mastering_display_actual_peak_luminance;
-            Get_S1(5, num_rows_mastering_display_actual_peak_luminance, "num_rows_mastering_display_actual_peak_luminance");
-            Get_S1(5, num_cols_mastering_display_actual_peak_luminance, "num_cols_mastering_display_actual_peak_luminance");
-            for(int8u i=0; i< num_rows_mastering_display_actual_peak_luminance; i++)
-                for(int8u j=0; j< num_cols_mastering_display_actual_peak_luminance; j++)
-                    Skip_S1(4,                                   "mastering_display_actual_peak_luminance");
-        TEST_SB_END();
-
-        for (int8u w=0; w<num_windows; w++)
-        {
-            Element_Begin1("window");
-            TEST_SB_GET (tone_mapping_flag,                     "tone_mapping_flag");
-                Skip_S2(12,                                     "knee_point_x");
-                Skip_S2(12,                                     "knee_point_y");
-                Get_S1(4, num_bezier_curve_anchors,             "num_bezier_curve_anchors");
-                for (int8u i = 0; i < num_bezier_curve_anchors; i++)
-                    Skip_S2(10,                                 "bezier_curve_anchor");
-            TEST_SB_END();
-            Element_End0();
-        }
-        TEST_SB_GET (color_saturation_mapping_flag,             "color_saturation_mapping_flag");
-            Info_S1(6, color_saturation_weight,                 "color_saturation_weight"); Param_Info1(((float)color_saturation_weight)/8);
-        TEST_SB_END();
-        BS_End();
-
-        FILLING_BEGIN();
-            IsHDRplus=true;
-            if (num_windows!=1 || targeted_system_display_actual_peak_luminance_flag || num_distribution_maxrgb_percentiles!=9 || fraction_bright_pixels || mastering_display_actual_peak_luminance_flag || (distribution_maxrgb_percentages[2]>100 && distribution_maxrgb_percentages[2]!=0xFF) || (!tone_mapping_flag && targeted_system_display_maximum_luminance) || (tone_mapping_flag && num_bezier_curve_anchors>9) || color_saturation_mapping_flag)
-                IsHDRplus=false;
-            for(int8u i=0; i<4; i++)
-                if (maxscl[i]>100000)
-                    IsHDRplus=false;
-            if (IsHDRplus)
-                for(int8u i=0; i<9; i++)
-                {
-                    static const int8u distribution_maxrgb_percentages_List[9]={1, 5, 10, 25, 50, 75, 90, 95, 99};
-                    if (distribution_maxrgb_percentages[i]!=distribution_maxrgb_percentages_List[i])
-                        IsHDRplus=false;
-                    if (distribution_maxrgb_percentiles[i]>100000)
-                        IsHDRplus=false;
-                }
-        FILLING_END();
-    }
+    int8u application_version{};
+    bool IsHDRplus{ false }, tone_mapping_flag{};
+    Get_SMPTE_ST_2094_40(application_version, IsHDRplus, tone_mapping_flag);
 
     FILLING_BEGIN();
         auto& HDR_Format=HDR[Video_HDR_Format][HdrFormat_SmpteSt209440];
@@ -3329,7 +3236,7 @@ void File_Hevc::sei_message_user_data_registered_itu_t_t35_26_0004_0005()
     //Parsing
     int16u targeted_system_display_maximum_luminance_Max=0;
     int8u system_start_code;
-    bool color_saturation_mapping_flag;
+    bool color_saturation_mapping_enable_flag;
     Get_B1(system_start_code,                                   "system_start_code");
     if (system_start_code!=0x01)
     {
@@ -3340,30 +3247,30 @@ void File_Hevc::sei_message_user_data_registered_itu_t_t35_26_0004_0005()
     //int8u num_windows=1;
     //for (int8u w=0; w<num_windows; w++)
     {
-        Skip_S2(12,                                             "minimum_maxrgb");
-        Skip_S2(12,                                             "average_maxrgb");
-        Skip_S2(12,                                             "variance_maxrgb");
-        Skip_S2(12,                                             "maximum_maxrgb");
+        Skip_S2(12,                                             "minimum_maxrgb_pq");
+        Skip_S2(12,                                             "average_maxrgb_pq");
+        Skip_S2(12,                                             "variance_maxrgb_pq");
+        Skip_S2(12,                                             "maximum_maxrgb_pq");
     }
 
     //for (int8u w=0; w<num_windows; w++)
     {
         bool tone_mapping_enable_mode_flag;
-        Get_SB (tone_mapping_enable_mode_flag,                  "tone_mapping_mode_flag");
+        Get_SB(tone_mapping_enable_mode_flag,                   "tone_mapping_enable_mode_flag");
         if (tone_mapping_enable_mode_flag)
         {
-            bool tone_mapping_param_enable_num_b;
-            Get_SB (tone_mapping_param_enable_num_b,            "tone_mapping_param_num");
-            int tone_mapping_param_enable_num=(int)tone_mapping_param_enable_num_b; // Just for avoiding some compiler warning
-            for (int i=0; i<=tone_mapping_param_enable_num; i++)
+            int8u tone_mapping_param_enable_num;
+            Get_S1(1, tone_mapping_param_enable_num,            "tone_mapping_param_enable_num");
+            for (int i=0; i<(tone_mapping_param_enable_num+1); i++)
             {
                 Element_Begin1("tone_mapping_param");
-                int16u targeted_system_display_maximum_luminance;
+                int16u targeted_system_display_maximum_luminance_pq;
                 bool base_enable_flag, ThreeSpline_enable_flag;
-                Get_S2 (12, targeted_system_display_maximum_luminance, "targeted_system_display_maximum_luminance");
-                if (targeted_system_display_maximum_luminance_Max<targeted_system_display_maximum_luminance)
-                    targeted_system_display_maximum_luminance_Max=targeted_system_display_maximum_luminance;
-                Get_SB (    base_enable_flag,                   "base_enable_flag");
+                Get_S2(12, targeted_system_display_maximum_luminance_pq, 
+                                                                "targeted_system_display_maximum_luminance_pq");
+                if (targeted_system_display_maximum_luminance_Max<targeted_system_display_maximum_luminance_pq)
+                    targeted_system_display_maximum_luminance_Max=targeted_system_display_maximum_luminance_pq;
+                Get_SB(    base_enable_flag,                    "base_enable_flag");
                 if (base_enable_flag)
                 {
                     Skip_S2(14,                                 "base_param_m_p");
@@ -3371,50 +3278,49 @@ void File_Hevc::sei_message_user_data_registered_itu_t_t35_26_0004_0005()
                     Skip_S2(10,                                 "base_param_m_a");
                     Skip_S2(10,                                 "base_param_m_b");
                     Skip_S1( 6,                                 "base_param_m_n");
-                    Skip_S1( 2,                                 "base_param_k1");
-                    Skip_S1( 2,                                 "base_param_k2");
-                    Skip_S1( 4,                                 "base_param_k2");
+                    Skip_S1( 2,                                 "base_param_K1");
+                    Skip_S1( 2,                                 "base_param_K2");
+                    Skip_S1( 4,                                 "base_param_K3");
                     Skip_S1( 3,                                 "base_param_Delta_enable_mode");
-                    Skip_S1( 7,                                 "base_param_Delta");
-                    Get_SB (    ThreeSpline_enable_flag,        "3Spline_enable_flag");
-                    if (ThreeSpline_enable_flag)
+                    Skip_S1( 7,                                 "base_param_enable_Delta");
+                }
+                Get_SB(ThreeSpline_enable_flag,                 "3Spline_enable_flag");
+                if (ThreeSpline_enable_flag)
+                {
+                    int8u ThreeSpline_enable_num;
+                    Get_S1(1, ThreeSpline_enable_num,           "3Spline_enable_num");
+                    for (int j=0; j<(ThreeSpline_enable_num+1); j++)
                     {
-                        bool ThreeSpline_num_b;
-                        Get_SB(    ThreeSpline_num_b,           "3Spline_num");
-                        int ThreeSpline_num=(int)ThreeSpline_num_b; // Just for avoiding some compiler warning
-                        for (int j=0; j<=ThreeSpline_num; j++)
+                        Element_Begin1("3Spline");
+                        int8u ThreeSpline_TH_enable_mode;
+                        Get_S1(2, ThreeSpline_TH_enable_mode,   "3Spline_TH_enable_mode");
+                        switch (ThreeSpline_TH_enable_mode)
                         {
-                            Element_Begin1("3Spline");
-                            int8u ThreeSpline_TH_mode;
-                            Get_S1 (2, ThreeSpline_TH_mode,     "3Spline_TH_mode");
-                            switch (ThreeSpline_TH_mode)
-                            {
-                                case 0:
-                                case 2:
-                                    Skip_S1(8,                  "3Spline_TH_enable_MB");
-                                    break;
-                                default:;
-                            }
-                            Skip_S2(12,                         "3Spline_TH");
-                            Skip_S2(10,                         "3Spline_TH_Delta1");
-                            Skip_S2(10,                         "3Spline_TH_Delta2");
-                            Skip_S1( 8,                         "3Spline_enable_Strength");
-                            Element_End0();
+                            case 0:
+                            case 2:
+                                Skip_S1(8,                      "3Spline_TH_enable_MB");
+                                break;
+                            default:;
                         }
+                        Skip_S2(12,                             "3Spline_TH_enable");
+                        Skip_S2(10,                             "3Spline_TH_enable_Delta1");
+                        Skip_S2(10,                             "3Spline_TH_enable_Delta2");
+                        Skip_S1( 8,                             "3Spline_enable_Strength");
+                        Element_End0();
                     }
                 }
                 Element_End0();
             }
         }
-    }
-    Get_SB (color_saturation_mapping_flag,                      "color_saturation_mapping_flag");
-    if (color_saturation_mapping_flag)
-    {
-        int8u color_saturation_enable_num;
-        Get_S1 (3, color_saturation_enable_num,                 "color_saturation_enable_num");
-        for (int i=0; i<color_saturation_enable_num; i++)
+        Get_SB(color_saturation_mapping_enable_flag,            "color_saturation_mapping_enable_flag");
+        if (color_saturation_mapping_enable_flag)
         {
-            Skip_S1(8,                                          "color_saturation_enable_gain");
+            int8u color_saturation_enable_num;
+            Get_S1(3, color_saturation_enable_num,              "color_saturation_enable_num");
+            for (int i=0; i<color_saturation_enable_num; i++)
+            {
+                Skip_S1(8,                                      "color_saturation_enable_gain");
+            }
         }
     }
     BS_End();
@@ -3730,6 +3636,15 @@ void File_Hevc::sei_alternative_transfer_characteristics()
 
     //Parsing
     Get_B1(preferred_transfer_characteristics,                  "preferred_transfer_characteristics"); Param_Info1(Mpegv_transfer_characteristics(preferred_transfer_characteristics));
+}
+
+//---------------------------------------------------------------------------
+void File_Hevc::sei_ambient_viewing_environment()
+{
+    Element_Info1("ambient_viewing_environment");
+
+    //Parsing
+    Get_AmbientViewingEnvironment(ambient_viewing_environment_illuminance, ambient_viewing_environment_illuminance_string, ambient_viewing_environment_chromaticity);
 }
 
 //---------------------------------------------------------------------------

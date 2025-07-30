@@ -30,6 +30,7 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Image/File_Png.h"
+#include "MediaInfo/Image/File_GainMap.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #if defined(MEDIAINFO_JPEG_YES)
     #include "MediaInfo/Image/File_Jpeg.h"
@@ -123,6 +124,8 @@ namespace Elements
     const int32u fcTL=0x6663544C;
     const int32u fdAT=0x66644154;
     const int32u gAMA=0x67414D41;
+    const int32u gdAT=0x67644154;
+    const int32u gmAP=0x676D4150;
     const int32u hIST=0x68495354;
     const int32u iCCP=0x69434350;
     const int32u iTXt=0x69545874;
@@ -189,7 +192,7 @@ void File_Png::Streams_Finish()
 {
     if (Data_Size != (int64u)-1) {
         if (StreamKind == Stream_Video && !IsSub && File_Size != (int64u)-1 && !Config->File_Sizes.empty())
-            Fill(Stream_Video, 0, Video_StreamSize, File_Size - (File_Size - Data_Size) * Config->File_Sizes.size()); //We guess that the metadata part has a fixed size
+            Fill(Stream_Video, 0, Video_StreamSize, File_Size - (Config->File_Sizes.front() - Data_Size) * Config->File_Sizes.size()); //We guess that the metadata part has a fixed size
         if (StreamKind == Stream_Image && (IsSub || File_Size != (int64u)-1)) {
             Fill(Stream_Image, 0, Image_StreamSize, Data_Size);
         }
@@ -257,6 +260,15 @@ void File_Png::Read_Buffer_Unsynched()
     Read_Buffer_Unsynched_OneFramePerFile();
 }
 
+//---------------------------------------------------------------------------
+void File_Png::Read_Buffer_AfterParsing()
+{
+    //TODO: should be after the parsing of a file
+    if (Config->ParseSpeed < 1.0 && !Config->File_Sizes.empty() && File_Offset >= Config->File_Sizes.front()) {
+        Finish();
+    }
+}
+
 //***************************************************************************
 // Buffer - Per element
 //***************************************************************************
@@ -307,6 +319,8 @@ void File_Png::Data_Parse()
         CASE_INFO(fcTL,                                         "Frame Control Chunk"); 
         CASE_INFO(fdAT,                                         "Frame Data Chunk"); 
         CASE_INFO(gAMA,                                         "Gamma");
+        CASE_INFO(gdAT,                                         "Gain map image data");
+        CASE_INFO(gmAP,                                         "Gain map metadata");
         CASE_INFO(hIST,                                         "Image histogram"); 
         CASE_INFO(iCCP,                                         "Embedded ICC profile");
         CASE_INFO(iTXt,                                         "International textual data");
@@ -574,6 +588,36 @@ void File_Png::gAMA()
     FILLING_END()
 
     Data_Common();
+}
+
+//---------------------------------------------------------------------------
+void File_Png::gdAT()
+{
+    Stream_Prepare(Stream_Image);
+    Fill(Stream_Image, StreamPos_Last, Image_Type, "Gain map");
+
+    //Parsing
+    File_Png MI;
+    Open_Buffer_Init(&MI);
+    Open_Buffer_Continue(&MI);
+    Open_Buffer_Finalize(&MI);
+    Merge(MI, Stream_Image, 0, StreamPos_Last);
+    if (MI.GainMap_metadata_ISO) {
+        GainMap_metadata_ISO.reset(new GainMap_metadata());
+        *static_cast<GainMap_metadata*>(GainMap_metadata_ISO.get()) = *static_cast<GainMap_metadata*>(MI.GainMap_metadata_ISO.get());
+    }
+}
+
+//---------------------------------------------------------------------------
+void File_Png::gmAP()
+{
+    //Parsing
+    File_GainMap MI;
+    GainMap_metadata_ISO.reset(new GainMap_metadata());
+    MI.output = static_cast<GainMap_metadata*>(GainMap_metadata_ISO.get());
+    Open_Buffer_Init(&MI);
+    Open_Buffer_Continue(&MI);
+    Open_Buffer_Finalize(&MI);
 }
 
 //---------------------------------------------------------------------------

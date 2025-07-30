@@ -56,20 +56,32 @@ private :
     void metadata();
     void metadata_hdr_cll();
     void metadata_hdr_mdcv();
+    void metadata_itu_t_t35();
+    void metadata_itu_t_t35_B5();
+    void metadata_itu_t_t35_B5_003C();
+    void metadata_itu_t_t35_B5_003C_0001();
+    void metadata_itu_t_t35_B5_003C_0001_04();
+    void frame();
     void padding();
 
     //Temp
-    Ztring  MasteringDisplay_ColorPrimaries;
-    Ztring  MasteringDisplay_Luminance;
     Ztring  maximum_content_light_level;
     Ztring  maximum_frame_average_light_level;
     bool  sequence_header_Parsed;
     bool  SeenFrameHeader;
     string GOP;
+    enum hdr_format
+    {
+        HdrFormat_SmpteSt209440,
+        HdrFormat_SmpteSt2086,
+        HdrFormat_Max,
+    };
+    typedef std::map<video, Ztring[HdrFormat_Max]> hdr;
+    hdr HDR;
 
     //Helpers
     std::string GOP_Detect(std::string PictureTypes);
-	void Get_leb128(int64u& Info, const char* Name);
+    void Get_leb128(int64u& Info, const char* Name);
 };
 
 } //NameSpace

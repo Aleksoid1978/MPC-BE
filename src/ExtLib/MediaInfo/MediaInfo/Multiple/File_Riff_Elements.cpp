@@ -2339,7 +2339,7 @@ void File_Riff::AVI__INFO_xxxx()
         case Elements::AVI__INFO_ICMS : Parameter=General_CommissionedBy; break;
         case Elements::AVI__INFO_ICMT : Parameter=General_Comment; break;
         case Elements::AVI__INFO_ICNM : Parameter=General_DirectorOfPhotography; break;
-        case Elements::AVI__INFO_ICNT : Parameter=General_Movie_Country; break;
+        case Elements::AVI__INFO_ICNT : Parameter=General_Country; break;
         case Elements::AVI__INFO_ICOP : Parameter=General_Copyright; break;
         case Elements::AVI__INFO_ICRD : Parameter=General_Recorded_Date; Value.Date_From_String(Value.To_UTF8().c_str()); break;
         case Elements::AVI__INFO_ICRP : Parameter=General_Cropped; break;

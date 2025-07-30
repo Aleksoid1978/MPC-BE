@@ -129,10 +129,12 @@ private :
         };
         data Minimal;
         int8u WindowID;
+        bool HasContent;
 
         stream()
         {
             WindowID=(int8u)-1;
+            HasContent=false;
         }
 
         ~stream()
@@ -140,8 +142,6 @@ private :
             for (size_t Pos=0; Pos<Windows.size(); Pos++)
                 delete Windows[Pos]; //Windows[Pos]=NULL;
         }
-
-        bool HasContent() { return !Windows.empty(); }
     };
     std::vector<stream*> Streams;
     int8u service_number;

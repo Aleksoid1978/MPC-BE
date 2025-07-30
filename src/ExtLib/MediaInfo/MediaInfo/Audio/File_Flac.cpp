@@ -21,7 +21,6 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "MediaInfo/File__MultipleParsing.h"
 #include "MediaInfo/Audio/File_Flac.h"
 #include "MediaInfo/Tag/File_VorbisCom.h"
 //---------------------------------------------------------------------------
@@ -320,5 +319,3 @@ void File_Flac::PICTURE()
 } //NameSpace
 
 #endif //MEDIAINFO_FLAC_YES
-
-

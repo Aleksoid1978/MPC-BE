@@ -146,6 +146,7 @@ void File_ApeTag::Data_Parse()
     //Filling
     transform(Key.begin(), Key.end(), Key.begin(), (int(*)(int))toupper); //(int(*)(int)) is a patch for unix
          if (Key=="ALBUM")          Fill(Stream_General, 0, General_Album, Value);
+    else if (Key=="ALBUM ARTIST")   Fill(Stream_General, 0, General_Album_Performer, Value);
     else if (Key=="ARTIST")         Fill(Stream_General, 0, General_Performer, Value);
     else if (Key=="AUTHOR")         Fill(Stream_General, 0, General_WrittenBy, Value);
     else if (Key=="BAND")           Fill(Stream_General, 0, General_Performer, Value);
@@ -166,7 +167,10 @@ void File_ApeTag::Data_Parse()
     }
     else if (Key=="ENCODEDBY")      Fill(Stream_General, 0, General_EncodedBy, Value);
     else if (Key=="GENRE")          Fill(Stream_General, 0, General_Genre, Value);
+    else if (Key=="LYRICS")         Fill(Stream_General, 0, General_Lyrics, Value);
+    else if (Key=="LYRICIST")       Fill(Stream_General, 0, General_Lyricist, Value);
     else if (Key=="ORIGARTIST")     Fill(Stream_General, 0, General_Original_Performer, Value);
+    else if (Key=="PUBLISHER")      Fill(Stream_General, 0, General_Publisher, Value);
     else if (Key=="TITLE")          Fill(Stream_General, 0, General_Title, Value);
     else if (Key=="TRACK")
     {

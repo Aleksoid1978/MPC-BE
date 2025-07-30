@@ -718,8 +718,7 @@ void File_N19::Data_Parse()
                             };
                             break;
                 default:
-                    if ( TF[i]< 0x20
-                     || (TF[i]>=0x7F && TF[i]<0xA0))
+                    if ((unsigned)Value<0x20 || ((unsigned)Value>=0x7F && (unsigned)Value<0xA0))
                         TF.erase(i--, 1);
             }
         }
@@ -742,8 +741,7 @@ void File_N19::Data_Parse()
                                 };
                                 break;
                     default:
-                        if ( TF[i]< 0x20
-                         || (TF[i]>=0x7F && TF[i]<0xA0))
+                        if ((unsigned)Value<0x20 || ((unsigned)Value>=0x7F && (unsigned)Value<0xA0))
                             TF.erase(i--, 1);
                 }
             }

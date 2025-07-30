@@ -34,6 +34,7 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Image/File_Jpeg.h"
+#include "MediaInfo/Image/File_GainMap.h"
 #if defined(MEDIAINFO_PSD_YES)
     #include "MediaInfo/Image/File_Psd.h"
 #endif
@@ -313,32 +314,131 @@ void File_Jpeg::Streams_Accept()
 }
 
 //---------------------------------------------------------------------------
+void File_Jpeg::Streams_Accept_PerImage(const seek_item& Item)
+{
+    string Format;
+    if (Item.Mime.empty() || !Item.Mime.rfind("image/", 0)) {
+        Stream_Prepare(StreamKind);
+        if (!Item.Mime.empty()) {
+            Format = Item.Mime.substr(6);
+            if (Format == "jpeg") {
+                Format = "JPEG";
+            }
+            if (Format == "heic") {
+                Format = "HEIC";
+            }
+            if (Format == "avif") {
+                Format = "AVIF";
+            }
+        }
+    }
+    else if (!Item.Mime.rfind("video/", 0)) {
+        Stream_Prepare(Stream_Video); // the content may or may not have audio or other content, but we can not know so let's put that this way for the moment
+        Format = Item.Mime.substr(6); // Format of the container, until we parse the content
+        {
+            if (Format == "mp4") {
+                Format = "MPEG-4";
+            }
+            if (Format == "quicktime") {
+                Format = "QuickTime";
+            }
+        }
+    }
+    else {
+        Stream_Prepare(Stream_Other);
+        Format = Item.Mime;
+    }
+    Fill(StreamKind_Last, StreamPos_Last, "Format", Format);
+    Fill(StreamKind_Last, StreamPos_Last, "Type", Item.Type[0]);
+    Fill(StreamKind_Last, StreamPos_Last, "Type", Item.Type[1]);
+    Fill(StreamKind_Last, StreamPos_Last, "MuxingMode", Item.MuxingMode[0]);
+    Fill(StreamKind_Last, StreamPos_Last, "MuxingMode", Item.MuxingMode[1]);
+}
+
+//---------------------------------------------------------------------------
 void File_Jpeg::Streams_Finish()
 {
+    for (auto& Item : Seek_Items_WithoutFirstImageOffset) {
+        Data_Size -= Item.second.Size;
+    }
+
+    Streams_Finish_PerImage();
+
+    for (auto& Item : Seek_Items_WithoutFirstImageOffset) {
+        Streams_Accept_PerImage(Item.second);
+        Fill(StreamKind_Last, StreamPos_Last, "StreamSize", Item.second.Size);
+    }
+}
+
+//---------------------------------------------------------------------------
+void File_Jpeg::Streams_Finish_PerImage()
+{
+    if (Data_Size && Data_Size != (int64u)-1) {
+        if (StreamKind == Stream_Video && !IsSub && File_Size != (int64u)-1 && !Config->File_Sizes.empty())
+            Fill(Stream_Video, 0, Video_StreamSize, File_Size - (File_Size - Data_Size) * Config->File_Sizes.size()); //We guess that the metadata part has a fixed size
+        if (StreamKind == Stream_Image && (IsSub || File_Size != (int64u)-1)) {
+            Fill(Stream_Image, StreamPos_Last, Image_StreamSize, Data_Size);
+            Data_Size = 0;
+        }
+    }
+
+    auto CurrentMainStream = StreamPos_Last;
+
+    #if defined(MEDIAINFO_EXIF_YES)
+    if (Exif_Parser) {
+        if (CurrentMainStream == 0)
+            Merge(*Exif_Parser, Stream_General, 0, 0, false);
+        Merge(*Exif_Parser, StreamKind, 0, CurrentMainStream);
+        size_t Count = Exif_Parser->Count_Get(StreamKind);
+        for (size_t i = 1; i < Count; ++i) {
+            Merge(*Exif_Parser, StreamKind, i, StreamPos_Last + 1, false);
+            if (Seek_Items_PrimaryStreamPos) {
+                Fill(StreamKind, StreamPos_Last, "MuxingMode_MoreInfo", "Muxed in Image #" + to_string(Seek_Items_PrimaryStreamPos + 1));
+            }
+        }
+        Exif_Parser.reset();
+    }
+    #endif
+    #if defined(MEDIAINFO_PSD_YES)
+    if (PSD_Parser) {
+        if (CurrentMainStream == 0)
+            Merge(*PSD_Parser, Stream_General, 0, 0, false);
+        Merge(*PSD_Parser, StreamKind, 0, CurrentMainStream);
+        size_t Count = PSD_Parser->Count_Get(StreamKind);
+        for (size_t i = 1; i < Count; ++i) {
+            Merge(*PSD_Parser, StreamKind, i, StreamPos_Last + 1, false);
+        }
+        PSD_Parser.reset();
+    }
+    #endif
+    #if defined(MEDIAINFO_ICC_YES)
+    if (ICC_Parser) {
+        Merge(*ICC_Parser, StreamKind, 0, CurrentMainStream);
+        ICC_Parser.reset();
+    }
+    #endif
     for (const auto& Item : XmpExt_List)
     {
         if (Item.second.Parser) {
             Item.second.Parser->Finish();
-            Merge(*Item.second.Parser, Stream_General, 0, 0);
-            Merge(*Item.second.Parser, false);
+            if (CurrentMainStream == 0) {
+                Merge(*Item.second.Parser, Stream_General, 0, 0);
+                Merge(*Item.second.Parser, false);
+            }
         }
     }
+    XmpExt_List.clear();
     for (const auto& Item : JpegXtExt_List)
     {
         if (Item.second.Parser) {
             Item.second.Parser->Finish();
-            Merge(*Item.second.Parser, Stream_General, 0, 0);
-            Merge(*Item.second.Parser, false);
+            if (CurrentMainStream == 0) {
+                Merge(*Item.second.Parser, Stream_General, 0, 0);
+                Merge(*Item.second.Parser, false);
+            }
         }
     }
-
-    if (Data_Size != (int64u)-1) {
-        if (StreamKind == Stream_Video && !IsSub && File_Size != (int64u)-1 && !Config->File_Sizes.empty())
-            Fill(Stream_Video, 0, Video_StreamSize, File_Size - (File_Size - Data_Size) * Config->File_Sizes.size()); //We guess that the metadata part has a fixed size
-        if (StreamKind == Stream_Image && (IsSub || File_Size != (int64u)-1)) {
-            Fill(Stream_Image, 0, Image_StreamSize, Data_Size);
-        }
-    }
+    JpegXtExt_List.clear();
 }
 
 //***************************************************************************
@@ -589,6 +689,9 @@ void File_Jpeg::Header_Parse()
     Get_B2 (code,                                               "Marker");
     switch (code)
     {
+        case Elements::SOI:
+            Seek_Items_PrimaryStreamPos = StreamPos_Last == (size_t)-1 ? 0 : StreamPos_Last;
+            [[fallthrough]];
         case Elements::TEM :
         case Elements::RE30 :
         case Elements::RE31 :
@@ -616,7 +719,6 @@ void File_Jpeg::Header_Parse()
         case Elements::RST7 :
         case Elements::SOC  :
         case Elements::SOD  :
-        case Elements::SOI  :
         case Elements::EOI  :
                     size=0; break;
         default   : Get_B2 (size,                               "Fl - Frame header length");
@@ -834,7 +936,7 @@ void File_Jpeg::CAP()
                 else
                     MAGB = 74;
                 Param_Info1(MAGB);
-                Fill(StreamKind_Last, 0, "Compression_Mode", HTIRV?"Lossy":"Lossless", Unlimited, true, true); // TODO: "Lossy" not sure, spec says "can be used with irreversible transforms"
+                Fill(StreamKind_Last, StreamPos_Last, "Compression_Mode", HTIRV?"Lossy":"Lossless", Unlimited, true, true); // TODO: "Lossy" not sure, spec says "can be used with irreversible transforms"
                 BS_End();
                 }
                 break;
@@ -914,18 +1016,18 @@ void File_Jpeg::SIZ()
             Fill(Stream_General, 0, General_Format, "JPEG 2000");
             if (Count_Get(StreamKind_Last)==0)
                 Stream_Prepare(StreamKind_Last);
-            Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Format), "JPEG 2000");
-            Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Codec), "JPEG 2000");
-            Fill(StreamKind_Last, 0, "Format_Profile", Jpeg2000_Rsiz(Rsiz));
+            Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Format), "JPEG 2000");
+            Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Codec), "JPEG 2000");
+            Fill(StreamKind_Last, StreamPos_Last, "Format_Profile", Jpeg2000_Rsiz(Rsiz));
             if (StreamKind_Last==Stream_Image)
-                Fill(Stream_Image, 0, Image_Codec_String, "JPEG 2000", Unlimited, true, true); //To Avoid automatic filling
-            Fill(StreamKind_Last, 0, StreamKind_Last==Stream_Image?(size_t)Image_Width:(size_t)Video_Width, Xsiz);
-            Fill(StreamKind_Last, 0, StreamKind_Last==Stream_Image?(size_t)Image_Height:(size_t)Video_Height, Ysiz*(Interlaced?2:1)); //If image is from interlaced content, must multiply height by 2
+                Fill(Stream_Image, StreamPos_Last, Image_Codec_String, "JPEG 2000", Unlimited, true, true); //To Avoid automatic filling
+            Fill(StreamKind_Last, StreamPos_Last, StreamKind_Last==Stream_Image?(size_t)Image_Width:(size_t)Video_Width, Xsiz);
+            Fill(StreamKind_Last, StreamPos_Last, StreamKind_Last==Stream_Image?(size_t)Image_Height:(size_t)Video_Height, Ysiz*(Interlaced?2:1)); //If image is from interlaced content, must multiply height by 2
             if (Interlaced)
-                Fill(StreamKind_Last, 0, "ScanType", "Interlaced", Unlimited, true, true);
+                Fill(StreamKind_Last, StreamPos_Last, "ScanType", "Interlaced", Unlimited, true, true);
 
             if (BitDepths.size()==1)
-                Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_BitDepth), 1+BitDepths[0]);
+                Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_BitDepth), 1+BitDepths[0]);
 
             //Chroma subsampling
             if (SamplingFactors_Max)
@@ -943,17 +1045,17 @@ void File_Jpeg::SIZ()
             if (!ChromaSubsampling.empty())
             {
                 ChromaSubsampling.resize(ChromaSubsampling.size()-1);
-                Fill(StreamKind_Last, 0, "ChromaSubsampling", ChromaSubsampling);
+                Fill(StreamKind_Last, StreamPos_Last, "ChromaSubsampling", ChromaSubsampling);
 
                 //Not for sure
-                if (ChromaSubsampling==__T("4:4:4") && (Retrieve(StreamKind_Last, 0, "Format_Profile")==__T("D-Cinema 2k") || Retrieve(StreamKind_Last, 0, "Format_Profile")==__T("D-Cinema 4k")))
-                    Fill(StreamKind_Last, 0, "ColorSpace", "XYZ");
+                if (ChromaSubsampling==__T("4:4:4") && (Retrieve(StreamKind_Last, StreamPos_Last, "Format_Profile")==__T("D-Cinema 2k") || Retrieve(StreamKind_Last, StreamPos_Last, "Format_Profile")==__T("D-Cinema 4k")))
+                    Fill(StreamKind_Last, StreamPos_Last, "ColorSpace", "XYZ");
                 else if (!IsSub)
                 {
                     if (ChromaSubsampling==__T("4:2:0") || ChromaSubsampling==__T("4:2:2"))
-                        Fill(StreamKind_Last, 0, "ColorSpace", "YUV");
+                        Fill(StreamKind_Last, StreamPos_Last, "ColorSpace", "YUV");
                     else if (ChromaSubsampling==__T("4:4:4"))
-                        Fill(StreamKind_Last, 0, "ColorSpace", "RGB");
+                        Fill(StreamKind_Last, StreamPos_Last, "ColorSpace", "RGB");
                 }
             }
         }
@@ -1008,8 +1110,8 @@ void File_Jpeg::COD()
         {
             switch (MultipleComponentTransform)
             {
-                case 0x01 : Fill(StreamKind_Last, 0, "Compression_Mode", "Lossless", Unlimited, true, true); break;
-                case 0x02 : Fill(StreamKind_Last, 0, "Compression_Mode", "Lossy", Unlimited, true, true); break;
+                case 0x01 : Fill(StreamKind_Last, StreamPos_Last, "Compression_Mode", "Lossless", Unlimited, true, true); break;
+                case 0x02 : Fill(StreamKind_Last, StreamPos_Last, "Compression_Mode", "Lossy", Unlimited, true, true); break;
                 default   : ;
             }
         }
@@ -1045,21 +1147,20 @@ void File_Jpeg::CME()
     case 0x0000: {
         Skip_XX(Element_Size - Element_Offset,                  "Comment");
         if (!CME_Text_Parsed) {
-            Fill(IsSub ? StreamKind_Last : Stream_General, 0, "Comment", "(Binary)");
+            Fill(IsSub ? StreamKind_Last : Stream_General, IsSub ? StreamPos_Last : 0, "Comment", "(Binary)");
         }
         break;
         }
     case 0x0001: {
         string Comment;
         Get_String(Element_Size - Element_Offset, Comment,      "Comment");
-        auto StreamKind = IsSub ? StreamKind_Last : Stream_General;
-        Fill(StreamKind, 0, "Comment", Comment, true, Comment.rfind(Retrieve_Const(StreamKind, 0, "Comment").To_UTF8(), 0) == 0);
+        Fill(IsSub ? StreamKind_Last : Stream_General, IsSub ? StreamPos_Last : 0, "Comment", Comment, true, Comment.rfind(Retrieve_Const(IsSub ? StreamKind_Last : Stream_General, IsSub ? StreamPos_Last : 0, "Comment").To_UTF8(), 0) == 0);
         break;
     }
     default: {
         Skip_XX(Element_Size - Element_Offset,                  "Comment");
         if (!CME_Text_Parsed) {
-            Fill(IsSub ? StreamKind_Last : Stream_General, 0, "Comment", "(Unknown)");
+            Fill(IsSub ? StreamKind_Last : Stream_General, IsSub ? StreamPos_Last : 0, "Comment", "(Unknown)");
         }
     }
     }
@@ -1120,37 +1221,39 @@ void File_Jpeg::SOF_()
     }
 
     FILLING_BEGIN_PRECISE();
-        if (Frame_Count==0 && Field_Count==0)
+        if (Config->File_Names_Pos <= 1 && Field_Count % 2 == 0)
         {
             Accept("JPEG");
             Fill("JPEG");
 
-            Fill(Stream_General, 0, General_Format, "JPEG");
+            if (Retrieve_Const(Stream_General, 0, General_Format).empty()) {
+                Fill(Stream_General, 0, General_Format, "JPEG");
+            }
             if (Count_Get(StreamKind_Last)==0)
                 Stream_Prepare(StreamKind_Last);
-            Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Format), "JPEG");
-            Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_Codec), "JPEG");
+            Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Format), "JPEG");
+            Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Codec), "JPEG");
             if (StreamKind_Last==Stream_Image)
-                Fill(Stream_Image, 0, Image_Codec_String, "JPEG", Unlimited, true, true); //To Avoid automatic filling
+                Fill(Stream_Image, StreamPos_Last, Image_Codec_String, "JPEG", Unlimited, true, true); //To Avoid automatic filling
             if (StreamKind_Last==Stream_Video)
-                Fill(Stream_Video, 0, Video_InternetMediaType, "video/JPEG", Unlimited, true, true);
-            Fill(StreamKind_Last, 0, Fill_Parameter(StreamKind_Last, Generic_BitDepth), Resolution);
-            Fill(StreamKind_Last, 0, "Height", Height*(Interlaced?2:1));
-            Fill(StreamKind_Last, 0, "Width", Width);
+                Fill(Stream_Video, StreamPos_Last, Video_InternetMediaType, "video/JPEG", Unlimited, true, true);
+            Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_BitDepth), Resolution);
+            Fill(StreamKind_Last, StreamPos_Last, "Height", Height*(Interlaced?2:1));
+            Fill(StreamKind_Last, StreamPos_Last, "Width", Width);
 
             //ColorSpace from http://docs.oracle.com/javase/1.4.2/docs/api/javax/imageio/metadata/doc-files/jpeg_metadata.html
             //TODO: if APPE_Adobe0_transform is present, indicate that K is inverted, see http://halicery.com/Image/jpeg/JPEGCMYK.html
-            if (Retrieve_Const(StreamKind_Last, 0, "ColorSpace").empty())
+            if (Retrieve_Const(StreamKind_Last, StreamPos_Last, "ColorSpace").empty())
             {
             switch (APPE_Adobe0_transform)
             {
                 case 0x01 :
                             if (Count==3)
-                                Fill(StreamKind_Last, 0, "ColorSpace", "YUV");
+                                Fill(StreamKind_Last, StreamPos_Last, "ColorSpace", "YUV");
                             break;
                 case 0x02 :
                             if (Count==4)
-                                Fill(StreamKind_Last, 0, "ColorSpace", "YUVK");
+                                Fill(StreamKind_Last, StreamPos_Last, "ColorSpace", "YUVK");
                             break;
                 default   :
                             {
@@ -1161,34 +1264,34 @@ void File_Jpeg::SOF_()
 
                             switch (Count)
                             {
-                                case 1 :    Fill(StreamKind_Last, 0, "ColorSpace", "Y"); break;
-                                case 2 :    Fill(StreamKind_Last, 0, "ColorSpace", "YA"); break;
+                                case 1 :    Fill(StreamKind_Last, StreamPos_Last, "ColorSpace", "Y"); break;
+                                case 2 :    Fill(StreamKind_Last, StreamPos_Last, "ColorSpace", "YA"); break;
                                 case 3 :
                                                  if (!APP0_JFIF_Parsed && Ci['R']==1 && Ci['G']==1 && Ci['B']==1)                                                       //RGB
-                                                Fill(StreamKind_Last, 0, "ColorSpace", "RGB");
+                                                Fill(StreamKind_Last, StreamPos_Last, "ColorSpace", "RGB");
                                             else if ((Ci['Y']==1 && ((Ci['C']==1 && Ci['c']==1)                                                                         //YCc
                                                                   || Ci['C']==2))                                                                                       //YCC
                                                   || APP0_JFIF_Parsed                                                                                                   //APP0 JFIF header present so YCC
                                                   || APPE_Adobe0_transform==0                                                                                           //transform set to YCC
                                                   || (SamplingFactors[0].Ci==0 && SamplingFactors[1].Ci==1 && SamplingFactors[2].Ci==2)                                 //012
                                                   || (SamplingFactors[0].Ci==1 && SamplingFactors[1].Ci==2 && SamplingFactors[2].Ci==3))                                //123
-                                                Fill(StreamKind_Last, 0, "ColorSpace", "YUV");
+                                                Fill(StreamKind_Last, StreamPos_Last, "ColorSpace", "YUV");
                                             else if (APPE_Adobe0_transform==0 || APPE_Adobe0_transform==(int8u)-1)                                                      //transform set to RGB (it is a guess)
-                                                Fill(StreamKind_Last, 0, "ColorSpace", "RGB");
+                                                Fill(StreamKind_Last, StreamPos_Last, "ColorSpace", "RGB");
                                             break;
                                 case 4 :
                                                  if (!APP0_JFIF_Parsed && Ci['R']==1 && Ci['G']==1 && Ci['B']==1 && Ci['A']==1)                                         //RGBA
-                                                Fill(StreamKind_Last, 0, "ColorSpace", "RGBA");
+                                                Fill(StreamKind_Last, StreamPos_Last, "ColorSpace", "RGBA");
                                             else if ((Ci['Y']==1 && Ci['A']==1 && ((Ci['C']==1 && Ci['c']==1)                                                           //YCcA
                                                                                 || Ci['C']==2))                                                                         //YCCA
                                                   || APP0_JFIF_Parsed                                                                                                   //APP0 JFIF header present so YCCA
                                                   || (SamplingFactors[0].Ci==0 && SamplingFactors[1].Ci==1 && SamplingFactors[2].Ci==2 && SamplingFactors[3].Ci==3)     //0123
                                                   || (SamplingFactors[0].Ci==1 && SamplingFactors[1].Ci==2 && SamplingFactors[2].Ci==3 && SamplingFactors[3].Ci==4))    //1234
-                                                Fill(StreamKind_Last, 0, "ColorSpace", "YUVA");
+                                                Fill(StreamKind_Last, StreamPos_Last, "ColorSpace", "YUVA");
                                             else if (Ci['C']==1 && Ci['M']==1 && Ci['Y']==1 && Ci['K']==1)                                                              //CMYK
-                                                Fill(StreamKind_Last, 0, "ColorSpace", "CMYK");
+                                                Fill(StreamKind_Last, StreamPos_Last, "ColorSpace", "CMYK");
                                             else if (APPE_Adobe0_transform==0 || APPE_Adobe0_transform==(int8u)-1)                                                      //transform set to CMYK (it is a guess)
-                                                Fill(StreamKind_Last, 0, "ColorSpace", "CMYK");
+                                                Fill(StreamKind_Last, StreamPos_Last, "ColorSpace", "CMYK");
                                             break;
                                 default:    ;
                             }
@@ -1205,7 +1308,7 @@ void File_Jpeg::SOF_()
                     case 1 :
                             switch (SamplingFactors[0].Vi)
                             {
-                                case 1 : if (Retrieve(StreamKind_Last, 0, "ColorSpace").find(__T("YUV"))==0) ChromaSubsampling="4:4:4"; break;
+                                case 1 : if (Retrieve(StreamKind_Last, StreamPos_Last, "ColorSpace").find(__T("YUV"))==0) ChromaSubsampling="4:4:4"; break;
                                 default: ;
                             }
                             break;
@@ -1231,7 +1334,7 @@ void File_Jpeg::SOF_()
                 {
                     if (SamplingFactors.size()>3 && (SamplingFactors[3].Hi!=SamplingFactors[0].Hi || SamplingFactors[3].Vi!=SamplingFactors[0].Vi))
                         ChromaSubsampling+=":?";
-                    Fill(StreamKind_Last, 0, "ChromaSubsampling", ChromaSubsampling);
+                    Fill(StreamKind_Last, StreamPos_Last, "ChromaSubsampling", ChromaSubsampling);
                 }
             }
         }
@@ -1275,8 +1378,50 @@ void File_Jpeg::SOS()
     }
     if (Status[IsFilled])
         Fill();
-    if (Config->ParseSpeed<1.0)
+
+    if (GContainerItems_Offset) {
+        if (Seek_Items_PrimaryImageType != "Primary") {
+            Fill(StreamKind, Seek_Items_PrimaryStreamPos, "Type", Seek_Items_PrimaryImageType);
+        }
+        for (const auto& Item : Seek_Items_WithoutFirstImageOffset) {
+            auto& Seek_Item = Seek_Items[GContainerItems_Offset + Item.first];
+            Seek_Item.Type[1] = Item.second.Type[1];
+            Seek_Item.MuxingMode[1] = Item.second.MuxingMode[1];
+        }
+        GContainerItems_Offset = 0;
+        Seek_Items_PrimaryImageType.clear();
+        Seek_Items_WithoutFirstImageOffset.clear();
+    }
+
+    for (auto& Item : Seek_Items) {
+        if (Item.second.IsParsed) {
+            continue;
+        }
+        Item.second.IsParsed = true;
+        Data_Size -= (IsSub ? Buffer_Size : File_Size) - Item.first;
+        Streams_Finish_PerImage();
+        Streams_Accept_PerImage(Item.second);
+        for (auto& Item2 : Seek_Items) {
+            if (Item2.second.DependsOnFileOffset == Item.first) {
+                Item2.second.DependsOnStreamPos = StreamPos_Last;
+            }
+        }
+        if (Item.second.DependsOnStreamPos) {
+            Fill(StreamKind_Last, StreamPos_Last, "MuxingMode_MoreInfo", "Muxed in Image #" + to_string(Item.second.DependsOnStreamPos + 1));
+        }
+        if (!Item.second.Mime.empty() && Item.second.Mime != "image/jpeg") {
+            continue;
+        }
+        Seek_Items_PrimaryStreamPos = 0;
+        SOS_SOD_Parsed = false;
+        Synched = false;
+        GoTo(Item.first);
+        break;
+    }
+
+    if (Config->ParseSpeed < 1.0 && File_GoTo == (int64u)-1) {
         Finish("JPEG"); //No need of more
+    }
     FILLING_END();
 }
 
@@ -1329,16 +1474,16 @@ void File_Jpeg::APP0_AVI1()
 
             if (UnknownInterlacement_IsDetected)
             {
-                Fill(Stream_Video, 0, Video_ScanType, "Interlaced");
+                Fill(Stream_Video, StreamPos_Last, Video_ScanType, "Interlaced");
                 Interlaced=true;
             }
             else
             {
             switch (FieldOrder)
             {
-                case 0x00 : Fill(Stream_Video, 0, Video_Interlacement, "PPF"); Fill(Stream_Video, 0, Video_ScanType, "Progressive"); break;
-                case 0x01 : Fill(Stream_Video, 0, Video_Interlacement, "TFF"); Fill(Stream_Video, 0, Video_ScanType, "Interlaced"); Fill(Stream_Video, 0, Video_ScanOrder, "TFF"); Interlaced=true; break;
-                case 0x02 : Fill(Stream_Video, 0, Video_Interlacement, "BFF"); Fill(Stream_Video, 0, Video_ScanType, "Interlaced"); Fill(Stream_Video, 0, Video_ScanOrder, "BFF"); Interlaced=true; break;
+                case 0x00 : Fill(Stream_Video, StreamPos_Last, Video_Interlacement, "PPF"); Fill(Stream_Video, StreamPos_Last, Video_ScanType, "Progressive"); break;
+                case 0x01 : Fill(Stream_Video, StreamPos_Last, Video_Interlacement, "TFF"); Fill(Stream_Video, StreamPos_Last, Video_ScanType, "Interlaced"); Fill(Stream_Video, StreamPos_Last, Video_ScanOrder, "TFF"); Interlaced=true; break;
+                case 0x02 : Fill(Stream_Video, StreamPos_Last, Video_Interlacement, "BFF"); Fill(Stream_Video, StreamPos_Last, Video_ScanType, "Interlaced"); Fill(Stream_Video, StreamPos_Last, Video_ScanOrder, "BFF"); Interlaced=true; break;
                 default   : ;
             }
             }
@@ -1443,16 +1588,11 @@ void File_Jpeg::APP1_EXIF()
 
     //Parsing
     #if defined(MEDIAINFO_EXIF_YES)
-    File_Exif MI;
-    Open_Buffer_Init(&MI);
-    Open_Buffer_Continue(&MI);
-    Open_Buffer_Finalize(&MI);
-    Merge(MI, Stream_General, 0, 0, false);
-    Merge(MI, Stream_Image, 0, 0, false);
-    size_t Count = MI.Count_Get(Stream_Image);
-    for (size_t i = 1; i < Count; ++i) {
-        Merge(MI, Stream_Image, i, StreamPos_Last + 1, false);
-    }
+    auto MI = new File_Exif;
+    Open_Buffer_Init(MI);
+    Open_Buffer_Continue(MI);
+    Open_Buffer_Finalize(MI);
+    Exif_Parser.reset(MI);
     #else
     Skip_UTF8(Element_Size - Element_Offset,                    "EXIF Tags");
     #endif
@@ -1468,11 +1608,34 @@ void File_Jpeg::APP1_XMP()
     //Parsing
     #if defined(MEDIAINFO_XMP_YES)
     File_Xmp MI;
+    gc_items GContainerItems;
+    MI.GContainerItems = &GContainerItems;
+    GainMap_metadata_Adobe.reset(new gm_data());
+    MI.GainMapData = static_cast<gm_data*>(GainMap_metadata_Adobe.get());
     Open_Buffer_Init(&MI);
     auto Element_Offset_Sav = Element_Offset;
     Open_Buffer_Continue(&MI);
     Element_Offset = Element_Offset_Sav;
     Open_Buffer_Finalize(&MI);
+    if (!GContainerItems.empty()) {
+        int64u ImgOffset = 0;
+        bool IsNotFirst = false;
+        for (const auto& Entry : GContainerItems) {
+            if (!IsNotFirst) {
+                Seek_Items_PrimaryImageType = Entry.Semantic;
+                IsNotFirst = true;
+                continue;
+            }
+            auto& Seek_Item = Seek_Items_WithoutFirstImageOffset[ImgOffset];
+            Seek_Item.Type[1] = Entry.Semantic;
+            Seek_Item.MuxingMode[1] = "GContainer XMP";
+            Seek_Item.Mime = Entry.Mime;
+            Seek_Item.Size = Entry.Length;
+            Seek_Item.Padding = Entry.Padding;
+            ImgOffset += Entry.Length;
+            ImgOffset += Entry.Padding;
+        }
+    }
     Element_Show(); //TODO: why is it needed?
     Merge(MI, Stream_General, 0, 0, false);
     #endif
@@ -1511,7 +1674,29 @@ void File_Jpeg::APP1_XMP_Extension()
     auto& MI = *(File_Xmp*)Item->second.Parser.get();
     MI.Wait = Item->second.LastOffset < Size;
     auto Element_Offset_Sav = Element_Offset;
+    gc_items GContainerItems;
+    MI.GContainerItems = &GContainerItems;
     Open_Buffer_Continue(&MI);
+    MI.GContainerItems = nullptr;
+    if (!GContainerItems.empty()) {
+        int64u ImgOffset = 0;
+        bool IsNotFirst = false;
+        for (const auto& Entry : GContainerItems) {
+            if (!IsNotFirst) {
+                Seek_Items_PrimaryImageType = Entry.Semantic;
+                IsNotFirst = true;
+                continue;
+            }
+            auto& Seek_Item = Seek_Items_WithoutFirstImageOffset[ImgOffset];
+            Seek_Item.Type[1] = Entry.Semantic;
+            Seek_Item.MuxingMode[1] = "GContainer Extended XMP";
+            Seek_Item.Mime = Entry.Mime;
+            Seek_Item.Size = Entry.Length;
+            Seek_Item.Padding = Entry.Padding;
+            ImgOffset += Entry.Length;
+            ImgOffset += Entry.Padding;
+        }
+    }
     Element_Offset = Element_Offset_Sav;
     Element_Show();
     #endif
@@ -1523,22 +1708,52 @@ void File_Jpeg::APP1_XMP_Extension()
 void File_Jpeg::APP2()
 {
     //Parsing
-    if (Element_Size>=14 && !strncmp((const char*)Buffer+Buffer_Offset, "ICC_PROFILE", 12))
-        APP2_ICC_PROFILE();
-    else
-        Skip_XX(Element_Size,                                   "Data");
+    auto Begin = Buffer + Buffer_Offset;
+    auto Middle = Begin;
+    auto End = Begin + (size_t)Element_Size;
+    while (Middle < End && *Middle) {
+        ++Middle;
+    }
+    auto Size = Middle - Begin;
+    if (Size != Element_Size) {
+        Size++;
+        Skip_Local(Size,                                        "Signature");
+        switch (Size) {
+        case 4:
+            if (BigEndian2int32u(Buffer + Buffer_Offset) == 0x4D504600) { // "MPF"
+                APP2_MPF();
+                return;
+            }
+            break;
+        case 12:
+            if (!strncmp((const char*)Buffer + Buffer_Offset, "ICC_PROFILE", 12)) {
+                APP2_ICC_PROFILE();
+                return;
+            }
+            break;
+        case 28:
+            if (!strncmp((const char*)Buffer + Buffer_Offset, "urn:iso:std:iso:ts:21496:-1", 28)) {
+                APP2_ISO21496_1();
+                return;
+            }
+            break;
+        }
+        Element_Info1(string((const char*)Buffer + Buffer_Offset, Size - 1));
+    }
+    Skip_XX(Element_Size - Element_Offset,                      "(Unknown)");
 }
 
 //---------------------------------------------------------------------------
 void File_Jpeg::APP2_ICC_PROFILE()
 {
     Element_Info1("ICC profile");
+
+    //Parsing
     #if defined(MEDIAINFO_ICC_YES)
-        Element_Begin1("ICC profile");
         int8u Pos, Max;
-        Skip_Local(12,                                          "Signature");
         Get_B1 (Pos,                                            "Chunk position");
         Get_B1 (Max,                                            "Chunk max");
+        Element_Begin1("ICC profile");
         if (Pos == 1) {
             Accept("JPEG");
             ICC_Parser.reset(new File_Icc());
@@ -1551,8 +1766,6 @@ void File_Jpeg::APP2_ICC_PROFILE()
             Open_Buffer_Continue(ICC_Parser.get());
             if (Pos == Max) {
                 Open_Buffer_Finalize(ICC_Parser.get());
-                Merge(*ICC_Parser.get(), StreamKind, 0, 0);
-                ICC_Parser.reset();
             }
         }
         else
@@ -1562,6 +1775,74 @@ void File_Jpeg::APP2_ICC_PROFILE()
         Element_End0();
     #else
         Skip_XX(Element_Size-Element_Offset,                    "ICC profile");
+    #endif
+}
+
+//---------------------------------------------------------------------------
+void File_Jpeg::APP2_ISO21496_1()
+{
+    Element_Info1("ISO 21496-1 Gain map metadata for image conversion");
+
+    //Parsing
+    File_GainMap MI;
+    GainMap_metadata_ISO.reset(new GainMap_metadata());
+    MI.output = static_cast<GainMap_metadata*>(GainMap_metadata_ISO.get());
+    Open_Buffer_Init(&MI);
+    Open_Buffer_Continue(&MI);
+    Open_Buffer_Finalize(&MI);
+}
+
+//---------------------------------------------------------------------------
+void File_Jpeg::APP2_MPF()
+{
+    Element_Info1("Multi-Picture Format");
+
+    //Parsing
+    #if defined(MEDIAINFO_EXIF_YES)
+    mp_entries MPEntries;
+    File_Exif MI;
+    MI.MPEntries = &MPEntries;
+    const auto Offset = File_Offset + Buffer_Offset + Element_Offset;
+    Element_Begin1("Multi-Picture Format");
+    Open_Buffer_Init(&MI);
+    Open_Buffer_Continue(&MI);
+    Open_Buffer_Finalize(&MI);
+    Element_End0();
+    if (!MPEntries.empty()) {
+        vector<int64u> DependsOn;
+        DependsOn.resize(MPEntries.size());
+        size_t Pos = (size_t)-1;
+        for (const auto& Entry : MPEntries) {
+            ++Pos;
+            if (Entry.DependentImg1EntryNo && Entry.DependentImg1EntryNo <= DependsOn .size() && !DependsOn[Entry.DependentImg1EntryNo - 1]) {
+                DependsOn[Entry.DependentImg1EntryNo - 1] = Entry.ImgOffset ? (Offset + Entry.ImgOffset) : 0;
+            }
+            if (Entry.DependentImg2EntryNo && Entry.DependentImg2EntryNo <= DependsOn.size() && !DependsOn[Entry.DependentImg2EntryNo - 1]) {
+                DependsOn[Entry.DependentImg2EntryNo - 1] = Entry.ImgOffset ? (Offset + Entry.ImgOffset) : 0;
+            }
+            if (!Entry.ImgOffset) {
+                string Type = Entry.Type();
+                if (!Seek_Items_PrimaryStreamPos) {
+                    Fill(StreamKind, 0, "Type", Type);
+                }
+                continue;
+            }
+            auto& Seek_Item = Seek_Items[Offset + Entry.ImgOffset];
+            Seek_Item.Type[0] = Entry.Type();
+            Seek_Item.MuxingMode[0] = "MPF";
+            Seek_Item.Size = Entry.ImgSize;
+            Seek_Item.DependsOnStreamPos = Seek_Items_PrimaryStreamPos;
+            if (DependsOn[Pos]) {
+                Seek_Item.DependsOnFileOffset = DependsOn[Pos];
+            }
+        }
+        if (MPEntries.size() > 1) {
+            GContainerItems_Offset = Offset + MPEntries[1].ImgOffset;
+        }
+    }
+    Merge(MI, Stream_General, 0, 0, false);
+    #else
+    Skip_UTF8(Element_Size - Element_Offset,                    "Multi-Picture Format");
     #endif
 }
 
@@ -1646,17 +1927,12 @@ void File_Jpeg::APPD()
 
         //Parsing
         #if defined(MEDIAINFO_PSD_YES)
-        File_Psd MI;
-        MI.Step = File_Psd::Step_ImageResourcesBlock;
-        Open_Buffer_Init(&MI);
-        Open_Buffer_Continue(&MI);
-        Open_Buffer_Finalize(&MI);
-        Merge(MI, Stream_General, 0, 0, false);
-        Merge(MI, Stream_Image, 0, 0, false);
-        size_t Count = MI.Count_Get(Stream_Image);
-        for (size_t i = 1; i < Count; ++i) {
-            Merge(MI, Stream_Image, i, StreamPos_Last + 1, false);
-        }
+        auto MI = new File_Psd();
+        MI->Step = File_Psd::Step_ImageResourcesBlock;
+        Open_Buffer_Init(MI);
+        Open_Buffer_Continue(MI);
+        Open_Buffer_Finalize(MI);
+        PSD_Parser.reset(MI);
         #else
         Skip_UTF8(Element_Size - Element_Offset,                "Photoshop Tags");
         #endif
@@ -1709,10 +1985,10 @@ void File_Jpeg::COM()
     Get_String(Element_Size - Element_Offset, Comment,          "Comment");
     auto StreamKind = IsSub ? StreamKind_Last : Stream_General;
     if (Comment.rfind("AVID", 0) == 0) {
-        Fill(StreamKind, 0, "Encoded_Application_CompanyName", "Avid");
+        Fill(StreamKind, StreamPos_Last, "Encoded_Application_CompanyName", "Avid");
     }
     else {
-        Fill(StreamKind, 0, "Comment", Comment);
+        Fill(StreamKind, StreamPos_Last, "Comment", Comment);
     }
 }
 

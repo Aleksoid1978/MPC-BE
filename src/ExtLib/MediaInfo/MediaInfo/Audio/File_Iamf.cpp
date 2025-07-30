@@ -180,6 +180,27 @@ void File_Iamf::Streams_Accept()
 }
 
 //***************************************************************************
+// Buffer - File header
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+bool File_Iamf::FileHeader_Begin()
+{
+    //Must have enough buffer for having header
+    if (Buffer_Size<6)
+        return false; //Must wait for more data
+
+    if (!IsSub
+     && ((Buffer[0] >> 3) != 0x1F // ia_sequence_header
+      || CC4(Buffer + 2) != 0x69616D66)) {  // "iamf"
+        Reject();
+        return false;
+    }
+
+    return true;
+}
+
+//***************************************************************************
 // Buffer - Global
 //***************************************************************************
 
@@ -412,10 +433,18 @@ void File_Iamf::ia_audio_element()
     BS_End();
     Get_leb128 (        codec_config_id,                    "codec_config_id");
     Get_leb128 (        num_substreams,                     "num_substreams");
+    if (num_substreams > Element_Size) {
+        Reject();
+        return;
+    }
     for (int64u i = 0; i < num_substreams; ++i) {
         Get_leb128 (    audio_substream_id,                 "audio_substream_id");
     }
     Get_leb128 (        num_parameters,                     "num_parameters");
+    if (num_parameters > Element_Size) {
+        Reject();
+        return;
+    }
     for (int64u i = 0; i < num_parameters; ++i) {
         int64u param_definition_type;
         Get_leb128 (    param_definition_type,              "param_definition_type");
@@ -520,6 +549,10 @@ void File_Iamf::ia_mix_presentation()
     int64u mix_presentation_id, count_label, num_sub_mixes;
     Get_leb128  (       mix_presentation_id,                "mix_presentation_id");
     Get_leb128  (       count_label,                        "count_label");
+    if (count_label > Element_Size) {
+        Reject();
+        return;
+    }
     for (int64u i = 0; i < count_label; ++i) {
         Skip_String(SizeUpTo0(),                            "annotations_language");
         Skip_B1(                                            "zero");
@@ -529,9 +562,17 @@ void File_Iamf::ia_mix_presentation()
         Skip_B1(                                            "zero");
     }
     Get_leb128  (       num_sub_mixes,                      "num_sub_mixes");
+    if (num_sub_mixes > Element_Size) {
+        Reject();
+        return;
+    }
     for (int64u i = 0; i < num_sub_mixes; ++i) {
         int64u num_audio_elements;
         Get_leb128(     num_audio_elements,                 "num_audio_elements");
+        if (num_audio_elements > Element_Size) {
+            Reject();
+            return;
+        }
         for (int64u j = 0; j < num_audio_elements; ++j) {
             int64u audio_element_id;
             Get_leb128( audio_element_id,                   "audio_element_id");
@@ -558,6 +599,10 @@ void File_Iamf::ia_mix_presentation()
         Element_End0();
         int64u num_layouts;
         Get_leb128  (   num_layouts,                        "num_layouts");
+        if (num_layouts > Element_Size) {
+            Reject();
+            return;
+        }
         for (int64u j = 0; j < num_layouts; ++j) {
             Element_Begin1("loudness_layout");
                 int8u layout_type;
@@ -632,6 +677,10 @@ void File_Iamf::ParamDefinition(int64u param_definition_type)
         Get_leb128(     constant_subblock_duration,         "constant_subblock_duration");
         if (constant_subblock_duration == 0) {
             Get_leb128( num_subblocks,                      "num_subblocks");
+            if (num_subblocks > Element_Size) {
+                Reject();
+                return;
+            }
             for (int64u i = 0; i < num_subblocks; ++i) {
                 Get_leb128(subblock_duration,               "subblock_duration");
             }

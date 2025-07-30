@@ -356,7 +356,7 @@ private :
     //Buffer - Demux
     #if MEDIAINFO_DEMUX
     bool Demux_UnpacketizeContainer_Test();
-    bool Demux_Transcode_Iso14496_15_to_AnnexB;
+    bool Demux_Transcode_Iso14496_15_to_AnnexB{};
     #endif //MEDIAINFO_DEMUX
 
     //Buffer - Global
@@ -410,6 +410,7 @@ private :
     void sei_message_mastering_display_colour_volume();
     void sei_message_light_level();
     void sei_alternative_transfer_characteristics();
+    void sei_ambient_viewing_environment();
     void three_dimensional_reference_displays_info(int32u payloadSize);
 
     //Packets - SubElements
@@ -438,10 +439,10 @@ private :
             buffer_data* GA94_03;
         #endif //MEDIAINFO_DTVCCTRANSPORT_YES
 
-        int32u frame_num;
+        int32u frame_num{};
         int8u  slice_type;
-        bool   IsTop;
-        bool   IsField;
+        bool   IsTop{};
+        bool   IsField{};
 
         temporal_reference()
         {
@@ -480,8 +481,8 @@ private :
     TimeCode                            TC_Current;
 
     //Replacement of File__Analyze buffer
-    const int8u*                        Buffer_ToSave;
-    size_t                              Buffer_Size_ToSave;
+    const int8u*                        Buffer_ToSave{};
+    size_t                              Buffer_Size_ToSave{};
 
     //parameter_sets
     video_parameter_set_structs         video_parameter_sets;
@@ -495,7 +496,7 @@ private :
     int8u                               lengthSizeMinusOne;
 
     //File specific
-    size_t                              IFrame_Count;
+    size_t                              IFrame_Count{};
 
     //Temp
     Ztring                              Encoded_Library;
@@ -515,17 +516,20 @@ private :
     typedef std::map<video, Ztring[HdrFormat_Max]> hdr;
     hdr                                 HDR;
     Ztring                              EtsiTS103433;
-    int32u  chroma_format_idc;
-    int32u  slice_pic_parameter_set_id;
-    int32u  slice_type;
-    int32u  chroma_sample_loc_type_top_field;
-    int32u  chroma_sample_loc_type_bottom_field;
+    int32u  chroma_format_idc{};
+    int32u  slice_pic_parameter_set_id{};
+    int32u  slice_type{};
+    int32u  chroma_sample_loc_type_top_field{};
+    int32u  chroma_sample_loc_type_bottom_field{};
     Ztring  maximum_content_light_level;
     Ztring  maximum_frame_average_light_level;
-    int8u   nuh_layer_id;
-    int8u   preferred_transfer_characteristics;
-    bool    RapPicFlag;
-    bool    first_slice_segment_in_pic_flag;
+    int8u   nuh_layer_id{};
+    int8u   preferred_transfer_characteristics{};
+    float64 ambient_viewing_environment_illuminance{};
+    Ztring  ambient_viewing_environment_illuminance_string;
+    Ztring  ambient_viewing_environment_chromaticity;
+    bool    RapPicFlag{};
+    bool    first_slice_segment_in_pic_flag{};
 };
 
 } //NameSpace

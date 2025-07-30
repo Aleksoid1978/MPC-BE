@@ -54,6 +54,7 @@ enum basicformat
     {
         Flags_Cover_Data_base64,
         Flags_Enable_FFmpeg,
+        Flags_Enable_Mesh_Vertex_Data,
     };
 #else //MEDIAINFO_COMPRESS
     #define MEDIAINFO_FLAG1 0
@@ -218,6 +219,8 @@ public :
           #if MEDIAINFO_ADVANCED
           Ztring    Cover_Data_Set (const Ztring &NewValue);
           Ztring    Cover_Data_Get ();
+          Ztring    Flags_Enable_Mesh_Vertex_Data_Set(const Ztring &NewValue);
+          bool      Flags_Enable_Mesh_Vertex_Data_Get();
           #endif //MEDIAINFO_ADVANCED
           #if MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)
           Ztring    Enable_FFmpeg_Set (bool NewValue);

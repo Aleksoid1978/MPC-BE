@@ -449,10 +449,12 @@ void File_Psd::ImageResourcesBlock()
 
     switch (Element_Code) {
     ELEMENT_CASE(CaptionDigest);
+    ELEMENT_CASE(CopyrightFlag);
     ELEMENT_CASE(IPTCNAA);
     ELEMENT_CASE(JPEGQuality);
     ELEMENT_CASE(Thumbnail);
     ELEMENT_CASE(Thumbnail_New);
+    ELEMENT_CASE(URL);
     ELEMENT_CASE(VersionInfo);
     default: Skip_XX(Element_Size,                              "(Data)");
     }
@@ -473,6 +475,12 @@ void File_Psd::ImageData()
     Element_Name("Image data");
     Skip_XX(Element_Size,                                       "(Data)");
     Finish();
+}
+
+//---------------------------------------------------------------------------
+void File_Psd::CopyrightFlag()
+{
+    Skip_B1(                                                    "Copyright Flag");
 }
 
 //---------------------------------------------------------------------------
@@ -524,6 +532,16 @@ void File_Psd::Thumbnail()
     if (!Count_Get(Stream_General)) Stream_Prepare(Stream_General);
     if (!Count_Get(Stream_Image)) Stream_Prepare(Stream_Image);
     Attachment(IsSub?"PSD":nullptr, {}, "Thumbnail");
+}
+
+//---------------------------------------------------------------------------
+void File_Psd::URL()
+{
+    string url;
+    Get_String(Element_Size, url,                               "URL");
+    FILLING_BEGIN_PRECISE()
+        Fill(Stream_General, 0, "URL", url);
+    FILLING_END()
 }
 
 //---------------------------------------------------------------------------

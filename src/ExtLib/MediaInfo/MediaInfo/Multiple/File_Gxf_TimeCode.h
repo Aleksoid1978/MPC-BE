@@ -41,6 +41,9 @@ public :
     bool   IsAtc; // SMPTE ST 12-2
     bool   IsBigEndian;
     bool   IsTimeCodeTrack;
+    #if MEDIAINFO_ADVANCED
+    string id;
+    #endif //MEDIAINFO_ADVANCED
 
     //Out
     int64u TimeCode_FirstFrame_ms;

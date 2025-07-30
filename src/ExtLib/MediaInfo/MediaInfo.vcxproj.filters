@@ -812,6 +812,18 @@
     <ClInclude Include="MediaInfo\Tag\File_Iim.h">
       <Filter>Header Files\Tag</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Image\File_GainMap.h">
+      <Filter>Header Files\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\fmt\base.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\fmt\format.h">
+      <Filter>extra</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\fmt\format-inl.h">
+      <Filter>extra</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1563,6 +1575,9 @@
     </ClCompile>
     <ClCompile Include="MediaInfo\Tag\File_Iim.cpp">
       <Filter>Source Files\Tag</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Image\File_GainMap.cpp">
+      <Filter>Source Files\Image</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

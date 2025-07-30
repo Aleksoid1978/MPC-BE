@@ -709,7 +709,7 @@ void File_Dvdv::Audio()
     Get_BS (4, Channels,                                        "Channels"); Param_Info2(Channels+1, " channels");
     BS_End();
     Get_UTF8(3, Language,                                       "Language code");
-    if (!Language.empty() && Language[0]>=0x80)
+    if (!Language.empty() && (unsigned)Language[0]>=0x80)
         Language.clear(); //this is 0xFF...
     if (Language==__T("iw"))
         Language=__T("he"); //Hebrew patch, is "iw" in DVDs
@@ -788,7 +788,7 @@ void File_Dvdv::Text()
     BS_End();
     Skip_B1(                                                    "Reserved");
     Get_UTF8(3, Language,                                       "Language code");
-    if (!Language.empty() && Language[0]>=0x80)
+    if (!Language.empty() && (unsigned)Language[0]>=0x80)
         Language.clear(); //this is 0xFF...
     if (Language==__T("iw"))
         Language=__T("he"); //Hebrew patch, is "iw" in DVDs

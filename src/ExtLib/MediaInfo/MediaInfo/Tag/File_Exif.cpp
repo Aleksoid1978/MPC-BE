@@ -22,8 +22,21 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Tag/File_Exif.h"
+#include "MediaInfo/File__MultipleParsing.h"
 #if defined(MEDIAINFO_JPEG_YES)
     #include "MediaInfo/Image/File_Jpeg.h"
+#endif
+#if defined(MEDIAINFO_ICC_YES)
+    #include "MediaInfo/Tag/File_Icc.h"
+#endif
+#if defined(MEDIAINFO_XMP_YES)
+    #include "MediaInfo/Tag/File_Xmp.h"
+#endif
+#if defined(MEDIAINFO_PSD_YES)
+    #include "MediaInfo/Image/File_Psd.h"
+#endif
+#if defined(MEDIAINFO_IIM_YES)
+    #include "MediaInfo/Tag/File_Iim.h"
 #endif
 #include <cmath>
 #include <memory>
@@ -36,11 +49,14 @@ namespace MediaInfoLib
 // Info
 //***************************************************************************
 
+const char* Tiff_Compression_Name(int16u compression);
+
 //---------------------------------------------------------------------------
 // EXIF Data Types
 // 
-// All data types are from TIFF 6.0 specification except UTF-8 which is
-// defined independently by EXIF 3.0 specification.
+// All data types are from TIFF 6.0 specification except IFD and UTF-8 which
+// are defined in TIFF Specification Supplement 1 and independently by
+// EXIF 3.0 specification respectively.
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -57,6 +73,7 @@ namespace Exif_Type {
     const int16u SRATIONAL  = 10;
     const int16u FLOAT      = 11;
     const int16u DOUBLE     = 12;
+    const int16u IFD        = 13;
     const int16u UTF8       = 129;
 }
 
@@ -77,6 +94,7 @@ static const char* Exif_Type_Name(int16u Type)
     case Exif_Type::SRATIONAL   : return "SRATIONAL";
     case Exif_Type::FLOAT       : return "FLOAT";
     case Exif_Type::DOUBLE      : return "DOUBLE";
+    case Exif_Type::IFD         : return "IFD";
     case Exif_Type::UTF8        : return "UTF-8";
     default                     : return "";
     }
@@ -99,13 +117,14 @@ static const int8u Exif_Type_Size(int16u Type)
     case Exif_Type::SRATIONAL   : return 8;
     case Exif_Type::FLOAT       : return 4;
     case Exif_Type::DOUBLE      : return 8;
+    case Exif_Type::IFD         : return 4;
     case Exif_Type::UTF8        : return 1;
     default                     : return 0;
     }
 }
 
 //---------------------------------------------------------------------------
-// EXIF Tags
+// Tags
 //---------------------------------------------------------------------------
 
 #define ELEM(_TAG,_NAME) \
@@ -117,6 +136,10 @@ struct exif_tag_desc {
 };
 #define ELEM_TRACE(_NAME,_DESC) \
     {_NAME, _DESC}, \
+
+//---------------------------------------------------------------------------
+// EXIF Tags
+//---------------------------------------------------------------------------
 
 namespace IFD0 {
     ELEM(0x000B, ProcessingSoftware)
@@ -162,16 +185,26 @@ namespace IFD0 {
     ELEM(0x0141, HalftoneHints)
     ELEM(0x0142, TileWidth)
     ELEM(0x0143, TileLength)
-    ELEM(0x014A, A100DataOffset)
+    ELEM(0x014A, SubIFDs) // TIFF/EP
     ELEM(0x014C, InkSet)
     ELEM(0x0151, TargetPrinter)
-    ELEM(0x0201, ImageOffset)
-    ELEM(0x0202, ImageLength)
+    ELEM(0x0152, ExtraSamples)
+    ELEM(0x0153, SampleFormat)
+    ELEM(0x015B, JPEGTables) // TIFF/EP / Adobe Photoshop TIFF Technical Notes
+    ELEM(0x0200, JPEGProc) // 0x0200 - 0x0209 Defined TIFF 6.0 Section 22
+    ELEM(0x0201, JPEGInterchangeFormat)
+    ELEM(0x0202, JPEGInterchangeFormatLength)
+    ELEM(0x0203, JPEGRestartInterval)
+    ELEM(0x0205, JPEGLosslessPredictors)
+    ELEM(0x0206, JPEGPointTransforms)
+    ELEM(0x0207, JPEGQTables)
+    ELEM(0x0208, JPEGDCTables)
+    ELEM(0x0209, JPEGACTables)
     ELEM(0x0211, YCbCrCoefficients)
     ELEM(0x0212, YCbCrSubSampling)
     ELEM(0x0213, YCbCrPositioning)
     ELEM(0x0214, ReferenceBlackWhite)
-    ELEM(0x02BC, ApplicationNotes)
+    ELEM(0x02BC, XMP) // XMP Part 3
     ELEM(0x4746, Rating)
     ELEM(0x4749, RatingPercent)
     ELEM(0x5001, ResolutionXUnit) // 5001-5113 Defined Microsoft
@@ -240,21 +273,41 @@ namespace IFD0 {
     ELEM(0x5111, PixelsPerUnitX)
     ELEM(0x5112, PixelsPerUnitY)
     ELEM(0x5113, PaletteHistogram)
+    ELEM(0x828D, CFARepeatPatternDim) // TIFF/EP
+    ELEM(0x828E, CFAPattern) // TIFF/EP
+    ELEM(0x828F, BatteryLevel) // TIFF/EP
     ELEM(0x8298, Copyright)
     ELEM(0x830E, PixelScale)
-    ELEM(0x83BB, IPTC_NAA)
+    ELEM(0x83BB, IPTC_NAA) // TIFF/EP / Adobe Photoshop File Formats Specification
     ELEM(0x8480, IntergraphMatrix)
     ELEM(0x8482, ModelTiePoint)
     ELEM(0x8546, SEMInfo)
     ELEM(0x85D8, ModelTransform)
-    ELEM(0x8649, PhotoshopSettings)
+    ELEM(0x8649, PhotoshopImageResources) // Adobe Photoshop File Formats Specification
     ELEM(0x8769, IFDExif)
-    ELEM(0x8773, ICC_Profile)
+    ELEM(0x8773, ICC_Profile) // TIFF/EP / Adobe Photoshop File Formats Specification
     ELEM(0x87AF, GeoTiffDirectory)
     ELEM(0x87B0, GeoTiffDoubleParams)
     ELEM(0x87B1, GeoTiffAsciiParams)
     ELEM(0x8825, GPSInfoIFD)
-    ELEM(0x935C, ImageSourceData)
+    ELEM(0x8829, Interlace) // TIFF/EP
+    ELEM(0x882A, TimeZoneOffset) // TIFF/EP
+    ELEM(0x882B, SelfTimerMode) // TIFF/EP
+    ELEM(0x9003, DateTimeOriginal) // TIFF/EP
+    ELEM(0x920B, FlashEnergy) // TIFF/EP
+    ELEM(0x920C, SpatialFrequencyResponse) // TIFF/EP
+    ELEM(0x920D, Noise) // TIFF/EP
+    ELEM(0x920E, FocalPlaneXResolution) // TIFF/EP
+    ELEM(0x920F, FocalPlaneYResolution) // TIFF/EP
+    ELEM(0x9210, FocalPlaneResolutionUnit) // TIFF/EP
+    ELEM(0x9211, ImageNumber) // TIFF/EP
+    ELEM(0x9212, SecurityClassification) // TIFF/EP
+    ELEM(0x9213, ImageHistory) // TIFF/EP
+    ELEM(0x9214, SubjectLocation) // TIFF/EP
+    ELEM(0x9215, ExposureIndex) // TIFF/EP
+    ELEM(0x9216, TIFFEPStandardID) // TIFF/EP
+    ELEM(0x9217, SensingMethod) // TIFF/EP
+    ELEM(0x935C, ImageSourceData) // Adobe Photoshop File Formats Specification
     ELEM(0x9C9B, WinExpTitle)
     ELEM(0x9C9C, WinExpComment)
     ELEM(0x9C9D, WinExpAuthor)
@@ -262,7 +315,21 @@ namespace IFD0 {
     ELEM(0x9C9F, WinExpSubject)
     ELEM(0xA480, GDALMetadata)
     ELEM(0xA481, GDALNoData)
+    ELEM(0xC44F, Annotations) // Adobe Photoshop File Formats Specification
     ELEM(0xC4A5, PrintIM)
+    ELEM(0xC612, DNGVersion) // 0xC612 - 0xC61E Defined DNG
+    ELEM(0xC613, DNGBackwardVersion)
+    ELEM(0xC614, UniqueCameraModel)
+    ELEM(0xC615, LocalizedCameraModel)
+    ELEM(0xC616, CFAPlaneColor)
+    ELEM(0xC617, CFALayout)
+    ELEM(0xC618, LinearizationTable)
+    ELEM(0xC619, BlackLevelRepeatDim)
+    ELEM(0xC61A, BlackLevel)
+    ELEM(0xC61B, BlackLevelDeltaH)
+    ELEM(0xC61C, BlackLevelDeltaV)
+    ELEM(0xC61D, WhiteLevel)
+    ELEM(0xC61E, DefaultScale)
     ELEM(0xC634, MakerNote)
     ELEM(0xC635, MakerNoteSafety)
     ELEM(0xC65A, CalibrationIlluminant1)
@@ -318,16 +385,26 @@ exif_tag_desc Desc[] =
     ELEM_TRACE(HalftoneHints, "Halftone hints")
     ELEM_TRACE(TileWidth, "Tile width")
     ELEM_TRACE(TileLength, "Tile length")
-    ELEM_TRACE(A100DataOffset, "A100 IFD")
+    ELEM_TRACE(SubIFDs, "Sub IFDs")
     ELEM_TRACE(InkSet, "Ink set")
     ELEM_TRACE(TargetPrinter, "Target printer")
-    ELEM_TRACE(ImageOffset, "Image offset")
-    ELEM_TRACE(ImageLength, "Image byte count")
+    ELEM_TRACE(ExtraSamples, "Extra samples")
+    ELEM_TRACE(SampleFormat, "Sample format")
+    ELEM_TRACE(JPEGTables, "JPEG quantization and/or Huffman tables")
+    ELEM_TRACE(JPEGProc, "JPEG process used")
+    ELEM_TRACE(JPEGInterchangeFormat, "JPEG interchange format bitstream offset")
+    ELEM_TRACE(JPEGInterchangeFormatLength, "JPEG interchange format bitstream length")
+    ELEM_TRACE(JPEGRestartInterval, "JPEG restart interval length")
+    ELEM_TRACE(JPEGLosslessPredictors, "JPEG lossless predictor-selection values list")
+    ELEM_TRACE(JPEGPointTransforms, "JPEG point transform values")
+    ELEM_TRACE(JPEGQTables, "JPEG quantization tables offsets list")
+    ELEM_TRACE(JPEGDCTables, "JPEG DC Huffman tables offsets list")
+    ELEM_TRACE(JPEGACTables, "JPEG Huffman AC tables offsets list")
     ELEM_TRACE(YCbCrCoefficients, "Transformation matrix")
     ELEM_TRACE(YCbCrSubSampling, "Chroma subsampling")
     ELEM_TRACE(YCbCrPositioning, "Chroma positioning")
     ELEM_TRACE(ReferenceBlackWhite, "Reference black and white")
-    ELEM_TRACE(ApplicationNotes, "Application notes")
+    ELEM_TRACE(XMP, "XMP")
     ELEM_TRACE(Rating, "Rating")
     ELEM_TRACE(RatingPercent, "Rating (percent)")
     ELEM_TRACE(ResolutionXUnit, "ResolutionXUnit")
@@ -396,20 +473,40 @@ exif_tag_desc Desc[] =
     ELEM_TRACE(PixelsPerUnitX, "PixelsPerUnitX")
     ELEM_TRACE(PixelsPerUnitY, "PixelsPerUnitY")
     ELEM_TRACE(PaletteHistogram, "PaletteHistogram")
+    ELEM_TRACE(CFARepeatPatternDim, "CFA Repeat Pattern Dim")
+    ELEM_TRACE(CFAPattern, "CFA pattern")
+    ELEM_TRACE(BatteryLevel, "Battery Level")
     ELEM_TRACE(Copyright, "Copyright")
     ELEM_TRACE(PixelScale, "Pixel scale")
-    ELEM_TRACE(IPTC_NAA, "IPTC NAA")
+    ELEM_TRACE(IPTC_NAA, "IPTC-NAA")
     ELEM_TRACE(IntergraphMatrix, "Intergraph matrix")
     ELEM_TRACE(ModelTiePoint, "Model tie point")
     ELEM_TRACE(SEMInfo, "SEM info")
     ELEM_TRACE(ModelTransform, "Model transform")
-    ELEM_TRACE(PhotoshopSettings, "Photoshop settings")
+    ELEM_TRACE(PhotoshopImageResources, "Photoshop image resources (PSIR)")
     ELEM_TRACE(IFDExif, "Exif IFD")
     ELEM_TRACE(ICC_Profile, "ICC profile")
     ELEM_TRACE(GeoTiffDirectory, "GeoTiff directory")
     ELEM_TRACE(GeoTiffDoubleParams, "GeoTiff double params")
     ELEM_TRACE(GeoTiffAsciiParams, "GeoTiff ASCII params")
     ELEM_TRACE(GPSInfoIFD, "GPS IFD")
+    ELEM_TRACE(Interlace, "Interlace")
+    ELEM_TRACE(TimeZoneOffset, "Time Zone Offset")
+    ELEM_TRACE(SelfTimerMode, "Self Timer Mode")
+    ELEM_TRACE(DateTimeOriginal, "Date Time Original")
+    ELEM_TRACE(FlashEnergy, "Flash Energy")
+    ELEM_TRACE(SpatialFrequencyResponse, "Spatial Frequency Response")
+    ELEM_TRACE(Noise, "Noise")
+    ELEM_TRACE(FocalPlaneXResolution, "Focal plane X resolution")
+    ELEM_TRACE(FocalPlaneYResolution, "Focal plane Y resolution")
+    ELEM_TRACE(FocalPlaneResolutionUnit, "Focal plane resolutionUnit")
+    ELEM_TRACE(ImageNumber, "Image Number")
+    ELEM_TRACE(SecurityClassification, "Security Classification")
+    ELEM_TRACE(ImageHistory, "Image History")
+    ELEM_TRACE(SubjectLocation, "Subject location")
+    ELEM_TRACE(ExposureIndex, "Exposure index")
+    ELEM_TRACE(TIFFEPStandardID, "TIFF/EP Standard ID")
+    ELEM_TRACE(SensingMethod, "Sensing method")
     ELEM_TRACE(ImageSourceData, "Photoshop image source data")
     ELEM_TRACE(WinExpTitle, "Title (Windows Explorer)")
     ELEM_TRACE(WinExpComment, "Comment (Windows Explorer)")
@@ -418,7 +515,21 @@ exif_tag_desc Desc[] =
     ELEM_TRACE(WinExpSubject, "Subject (Windows Explorer)")
     ELEM_TRACE(GDALMetadata, "GDAL metadata")
     ELEM_TRACE(GDALNoData, "GDAL no data")
+    ELEM_TRACE(Annotations, "Annotations")
     ELEM_TRACE(PrintIM, "Print IM")
+    ELEM_TRACE(DNGVersion, "DNG Version")
+    ELEM_TRACE(DNGBackwardVersion, "DNG Backward Version")
+    ELEM_TRACE(UniqueCameraModel, "Unique Camera Model")
+    ELEM_TRACE(LocalizedCameraModel, "Localized Camera Model")
+    ELEM_TRACE(CFAPlaneColor, "CFA Plane Color")
+    ELEM_TRACE(CFALayout, "CFA Layout")
+    ELEM_TRACE(LinearizationTable, "Linearization Table")
+    ELEM_TRACE(BlackLevelRepeatDim, "Black Level Repeat Dim")
+    ELEM_TRACE(BlackLevel, "Black Level")
+    ELEM_TRACE(BlackLevelDeltaH, "Black Level Delta H")
+    ELEM_TRACE(BlackLevelDeltaV, "Black Level Delta V")
+    ELEM_TRACE(WhiteLevel, "White Level")
+    ELEM_TRACE(DefaultScale, "Default Scale")
     ELEM_TRACE(MakerNote, "Manufacturer notes")
     ELEM_TRACE(MakerNoteSafety, "Manufacturer notes safety")
     ELEM_TRACE(CalibrationIlluminant1, "Calibration illuminant 1")
@@ -489,6 +600,7 @@ namespace IFDExif {
     ELEM(0xA004, RelatedSoundFile)
     ELEM(0xA005, InteroperabilityIFD)
     ELEM(0xA20B, FlashEnergy)
+    ELEM(0xA20C, SpatialFrequencyResponse)
     ELEM(0xA20E, FocalPlaneXResolution)
     ELEM(0xA20F, FocalPlaneYResolution)
     ELEM(0xA210, FocalPlaneResolutionUnit)
@@ -602,6 +714,7 @@ exif_tag_desc Desc[] =
     ELEM_TRACE(RelatedSoundFile, "Related sound file")
     ELEM_TRACE(InteroperabilityIFD, "Interoperability IFD")
     ELEM_TRACE(FlashEnergy, "Flash energy")
+    ELEM_TRACE(SpatialFrequencyResponse, "Spatial Frequency Response")
     ELEM_TRACE(FocalPlaneXResolution, "Focal plane X resolution")
     ELEM_TRACE(FocalPlaneYResolution, "Focal plane Y resolution")
     ELEM_TRACE(FocalPlaneResolutionUnit, "Focal plane resolutionUnit")
@@ -636,7 +749,7 @@ exif_tag_desc Desc[] =
     ELEM_TRACE(RAWDevelopingSoftware, "RAW developing software")
     ELEM_TRACE(ImageEditingSoftware, "Editing software")
     ELEM_TRACE(MetadataEditingSoftware, "Metadata editing software")
-    ELEM_TRACE(CompositeImage, "Composite iImage")
+    ELEM_TRACE(CompositeImage, "Composite image")
     ELEM_TRACE(CompositeImageCount, "Composite image count")
     ELEM_TRACE(Gamma, "Gamma")
     ELEM_TRACE(Padding, "Padding")
@@ -949,6 +1062,58 @@ exif_tag_desc Desc[] =
 };
 
 //---------------------------------------------------------------------------
+// MPF Tags
+//---------------------------------------------------------------------------
+
+namespace IFDMPF {
+    ELEM(0xB000, MPFVersion)
+    ELEM(0xB001, NumberOfImages)
+    ELEM(0xB002, MPEntry)
+    ELEM(0xB003, ImageUIDList)
+    ELEM(0xB004, TotalFrames)
+    ELEM(0xB101, MPIndividualNum)
+    ELEM(0xB201, PanOrientation)
+    ELEM(0xB202, PanOverlap_H)
+    ELEM(0xB203, PanOverlap_V)
+    ELEM(0xB204, BaseViewpointNum)
+    ELEM(0xB205, ConvergenceAngle)
+    ELEM(0xB206, BaselineLength)
+    ELEM(0xB207, VerticalDivergence)
+    ELEM(0xB208, AxisDistance_X)
+    ELEM(0xB209, AxisDistance_Y)
+    ELEM(0xB20A, AxisDistance_Z)
+    ELEM(0xB20B, YawAngle)
+    ELEM(0xB20C, PitchAngle)
+    ELEM(0xB20D, RollAngle)
+
+exif_tag_desc Desc[] =
+{
+    ELEM_TRACE(MPFVersion,          "MP Format Version Number")
+    ELEM_TRACE(NumberOfImages,      "Number of Images")
+    ELEM_TRACE(MPEntry,             "MP Entry")
+    ELEM_TRACE(ImageUIDList,        "Individual Image Unique ID list")
+    ELEM_TRACE(TotalFrames,         "Total Number of Captured Frames")
+    ELEM_TRACE(MPFVersion,          "MP Format Version")
+    ELEM_TRACE(MPIndividualNum,     "MP Individual Image Number")
+    ELEM_TRACE(PanOrientation,      "Panorama Scanning Orientation")
+    ELEM_TRACE(PanOverlap_H,        "Panorama Horizontal Overlap")
+    ELEM_TRACE(PanOverlap_V,        "Panorama Vertical Overlap")
+    ELEM_TRACE(BaseViewpointNum,    "Base Viewpoint Number")
+    ELEM_TRACE(ConvergenceAngle,    "Convergence Angle")
+    ELEM_TRACE(BaselineLength,      "Baseline Length")
+    ELEM_TRACE(VerticalDivergence,  "Divergence Angle")
+    ELEM_TRACE(AxisDistance_X,      "Horizontal Axis Distance")
+    ELEM_TRACE(AxisDistance_Y,      "Vertical Axis Distance")
+    ELEM_TRACE(AxisDistance_Z,      "Collimation Axis Distance")
+    ELEM_TRACE(YawAngle,            "Yaw Angle")
+    ELEM_TRACE(PitchAngle,          "Pitch Angle")
+    ELEM_TRACE(RollAngle,           "Roll Angle")
+};
+};
+
+//---------------------------------------------------------------------------
+// Names and Descriptions
+//---------------------------------------------------------------------------
 struct exif_tag_desc_size
 {
     exif_tag_desc* Table;
@@ -958,22 +1123,38 @@ struct exif_tag_desc_size
 #define DESC_TABLE(_TABLE,_DESC) { _TABLE::Desc, sizeof(_TABLE::Desc) / sizeof(*_TABLE::Desc), _DESC },
 enum kind_of_ifd
 {
+    // Exif
     Kind_IFD0,
+    Kind_SubIFD0,
+    Kind_SubIFD1,
+    Kind_SubIFD2,
+    Kind_IFD2,
     Kind_IFD1,
     Kind_Exif,
     Kind_GPS,
     Kind_Interop,
+
+    // Exif Makernotes
     Kind_MakernoteApple,
     Kind_MakernoteNikon,
     Kind_NikonPreview,
     Kind_MakernoteSony,
     Kind_MakernoteCanon,
+
+    // MPF
+    Kind_MPF,
+
+    // Special
     Kind_ParsingThumbnail,
     Kind_ParsingNikonPreview
 };
 exif_tag_desc_size Exif_Descriptions[] =
 {
     DESC_TABLE(IFD0, "IFD0 (primary image)")
+    DESC_TABLE(IFD0, "Sub IFD")
+    DESC_TABLE(IFD0, "Sub IFD 2")
+    DESC_TABLE(IFD0, "Sub IFD 3")
+    DESC_TABLE(IFD0, "IFD2")
     DESC_TABLE(IFD0, "IFD1 (thumbnail)")
     DESC_TABLE(IFDExif, "Exif")
     DESC_TABLE(IFDGPS, "GPS")
@@ -983,6 +1164,7 @@ exif_tag_desc_size Exif_Descriptions[] =
     DESC_TABLE(IFD0, "Nikon Makernote Preview Image")
     DESC_TABLE(IFDMakernoteSony, "Sony Makernote")
     DESC_TABLE(IFDMakernoteCanon, "Canon Makernote")
+    DESC_TABLE(IFDMPF, "MPF")
 };
 static string Exif_Tag_Description(int8u NameSpace, int16u Tag_ID)
 {
@@ -995,6 +1177,10 @@ static string Exif_Tag_Description(int8u NameSpace, int16u Tag_ID)
     #endif //MEDIAINFO_TRACE
     return Ztring::ToZtring_From_CC2(Tag_ID).To_UTF8();
 }
+
+//---------------------------------------------------------------------------
+// Exif Names and Descriptions
+//---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 namespace Exif_IFD0_Orientation {
@@ -1021,68 +1207,6 @@ static const char* Exif_IFD0_Orientation_Name(int16u orientation)
     case Exif_IFD0_Orientation::Rotate90CW: return "Rotate 90 CW";
     case Exif_IFD0_Orientation::MirrorHorizontalRotate90CW: return "Mirror horizontal and rotate 90 CW";
     case Exif_IFD0_Orientation::Rotate270CW: return "Rotate 270 CW";
-    default: return "";
-    }
-}
-
-//---------------------------------------------------------------------------
-static const char* Exif_IFD0_Compression_Name(int16u compression)
-{
-    switch (compression)
-    {
-    case 1: return "Uncompressed";
-    case 2: return "CCITT 1D";
-    case 3: return "T4/Group 3 Fax";
-    case 4: return "T6/Group 4 Fax";
-    case 5: return "LZW";
-    case 6: return "JPEG (old-style)";
-    case 7: return "JPEG";
-    case 8: return "Adobe Deflate";
-    case 9: return "JBIG B&W";
-    case 10: return "JBIG Color";
-    case 99: return "JPEG";
-    case 262: return "Kodak 262";
-    case 32766: return "Next";
-    case 32767: return "Sony ARW Compressed";
-    case 32769: return "Packed RAW";
-    case 32770: return "Samsung SRW Compressed";
-    case 32771: return "CCIRLEW";
-    case 32772: return "Samsung SRW Compressed 2";
-    case 32773: return "PackBits";
-    case 32809: return "Thunderscan";
-    case 32867: return "Kodak KDC Compressed";
-    case 32895: return "IT8CTPAD";
-    case 32896: return "IT8LW";
-    case 32897: return "IT8MP";
-    case 32898: return "IT8BL";
-    case 32908: return "PixarFilm";
-    case 32909: return "PixarLog";
-    case 32946: return "Deflate";
-    case 32947: return "DCS";
-    case 33003: return "Aperio JPEG 2000 YCbCr";
-    case 33005: return "Aperio JPEG 2000 RGB";
-    case 34661: return "JBIG";
-    case 34676: return "SGILog";
-    case 34677: return "SGILog24";
-    case 34712: return "JPEG 2000";
-    case 34713: return "Nikon NEF Compressed";
-    case 34715: return "JBIG2 TIFF FX";
-    case 34718: return "Microsoft Document Imaging (MDI) Binary Level Codec";
-    case 34719: return "Microsoft Document Imaging (MDI) Progressive Transform Codec";
-    case 34720: return "Microsoft Document Imaging (MDI) Vector";
-    case 34887: return "ESRI Lerc";
-    case 34892: return "Lossy JPEG";
-    case 34925: return "LZMA2";
-    case 34926: return "Zstd (old)";
-    case 34927: return "WebP (old)";
-    case 34933: return "PNG";
-    case 34934: return "JPEG XR";
-    case 50000: return "Zstd";
-    case 50001: return "WebP";
-    case 50002: return "JPEG XL (old)";
-    case 52546: return "JPEG XL";
-    case 65000: return "Kodak DCR Compressed";
-    case 65535: return "Pentax PEF Compressed";
     default: return "";
     }
 }
@@ -1180,6 +1304,17 @@ static const char* Exif_IFDExif_WhiteBalance_Name(int16u value)
     switch (value) {
     case 0: return "Auto";
     case 1: return "Manual";
+    default: return "";
+    }
+}
+
+//---------------------------------------------------------------------------
+static const char* Exif_IFDExif_CompositeImage_Name(int16u value)
+{
+    switch (value) {
+    case 1: return "Not a Composite Image";
+    case 2: return "General Composite Image";
+    case 3: return "Composite Image Captured While Shooting";
     default: return "";
     }
 }
@@ -1325,13 +1460,48 @@ static const char* Exif_IFDMakernoteSony_WhiteBalance_Name(int32u value) {
     }
 }
 
-//***************************************************************************
-// Constructor/Destructor
-//***************************************************************************
+//---------------------------------------------------------------------------
+// MPF Names and Descriptions
+//---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-File_Exif::File_Exif() : LittleEndian{}, currentIFD(Kind_IFD0), IsMakernote{}, MakernoteOffset{}, HasFooter{}
+static string Mpf_ImageAttribute_Desc(int32u value)
 {
+    string desc;
+    if (value & 1U << 31)
+        desc += "Dependent Parent Image, ";
+    if (value & 1U << 30)
+        desc += "Dependent Child Image, ";
+    if (value & 1U << 29)
+        desc += "Representative Image, ";
+    if (!(value & ((1U << 24) | (1U << 25) | (1U << 26))))
+        desc += "JPEG, ";
+    switch (value & ((1U << 24) - 1))
+    {
+    case 0x010001: desc += "Large Thumbnail, Class 1, VGA equivalent"; break;
+    case 0x010002: desc += "Large Thumbnail, Class 2, Full HD equivalent"; break;
+    case 0x020001: desc += "Multi-Frame Image, Panorama"; break;
+    case 0x020002: desc += "Multi-Frame Image, Disparity"; break;
+    case 0x020003: desc += "Multi-Frame Image, Multi-Angle"; break;
+    case 0x030000: desc += "Baseline MP Primary Image"; break;
+    case 0x050000: desc += "Gain map"; break;
+    }
+    return desc;
+}
+
+std::string mp_entry::Type() const
+{
+    switch (ImgAttribute & ((1U << 24) - 1)) {
+    case 0x000000: return {};
+    case 0x010001:
+    case 0x010002: return "Thumbnail";
+    case 0x020001: return "Panorama"; break;
+    case 0x020002: return "Disparity"; break;
+    case 0x020003: return "Multi-Angle"; break;
+    case 0x030000: return "Primary"; break;
+    case 0x050000: return "Gain map"; break;
+    default: return Ztring::ToZtring_From_CC4(ImgAttribute).To_UTF8();
+    }
 }
 
 //***************************************************************************
@@ -1349,7 +1519,10 @@ void File_Exif::Streams_Finish()
 
     auto FillMetadata = [&](Ztring& Value, const std::pair<const int16u, ZtringList>& Item, size_t Parameter, const char* ParameterC, const string& Unit) {
         if (Value.empty()) {
-            Value = Item.second.Read();
+            Value = Item.second.size() == 1 ? Item.second.front() : Item.second.Read();
+        }
+        if (Value.empty()) {
+            return;
         }
         if (Parameter) {
             if (Parameter != (size_t)-1) {
@@ -1357,6 +1530,9 @@ void File_Exif::Streams_Finish()
             }
         }
         else if (ParameterC) {
+            if (Retrieve_Const(Stream_General, 0, ParameterC) == Value) {
+                return;
+            }
             Fill(Stream_General, 0, ParameterC, Value);
             if (!Unit.empty()) {
                 Fill_SetOptions(Stream_General, 0, ParameterC, "N NF");
@@ -1393,12 +1569,13 @@ void File_Exif::Streams_Finish()
             const char* ParameterC = nullptr;
             string ParameterS;
             switch (Item.first) {
+            case IFD0::DocumentName: Parameter = General_Title; break;
             case IFD0::ImageDescription: Parameter = General_Description; break;
             case IFD0::Make: Parameter = General_Encoded_Hardware_CompanyName; break;
             case IFD0::Model: Parameter = General_Encoded_Hardware_Model; break;
             case IFD0::Software: Parameter = General_Encoded_Application; break;
             case IFD0::DateTime: {
-                Parameter = General_Tagged_Date;
+                Parameter = General_Encoded_Date;
                 Value = MergeDateTimeSubSecOffset(Item.second, IFDExif::SubSecTime, IFDExif::OffsetTime);
                 break;
             }
@@ -1471,13 +1648,42 @@ void File_Exif::Streams_Finish()
                 Parameter = (size_t)-1;
                 break;
             case IFD0::Copyright: Parameter = General_Copyright; break;
+            case IFD0::TIFFEPStandardID: {
+                ParameterC = "TIFFEPVersion";
+                const auto TIFFEPStandardID = Infos_Image.find(IFD0::TIFFEPStandardID);
+                if (TIFFEPStandardID->second.size() == 4) {
+                    Value = TIFFEPStandardID->second.at(0) + __T(".") + TIFFEPStandardID->second.at(1) + __T(".") + TIFFEPStandardID->second.at(2) + __T(".") + TIFFEPStandardID->second.at(3);
+                }
+                break;
+            }
             case IFD0::WinExpTitle: Parameter = General_Title; break;
             case IFD0::WinExpComment: Parameter = General_Comment; break;
             case IFD0::WinExpAuthor: Parameter = General_Performer; break;
             case IFD0::WinExpKeywords: Parameter = General_Keywords; break;
             case IFD0::WinExpSubject: Parameter = General_Subject; break;
+            case IFD0::DNGVersion: {
+                ParameterC = "DNGVersion";
+                const auto DNGVersion = Infos_Image.find(IFD0::DNGVersion);
+                if (DNGVersion->second.size() == 4) {
+                    Value = DNGVersion->second.at(0) + __T(".") + DNGVersion->second.at(1) + __T(".") + DNGVersion->second.at(2) + __T(".") + DNGVersion->second.at(3);
+                }
+                break;
             }
-            FillMetadata(Value, Item, Parameter, ParameterC, ParameterS); 
+            case IFD0::DNGBackwardVersion: {
+                ParameterC = "DNGBackwardVersion";
+                const auto DNGBackwardVersion = Infos_Image.find(IFD0::DNGBackwardVersion);
+                if (DNGBackwardVersion->second.size() == 4) {
+                    Value = DNGBackwardVersion->second.at(0) + __T(".") + DNGBackwardVersion->second.at(1) + __T(".") + DNGBackwardVersion->second.at(2) + __T(".") + DNGBackwardVersion->second.at(3);
+                }
+                break;
+            }
+            }
+            FillMetadata(Value, Item, Parameter, ParameterC, ParameterS);
+            switch (Item.first) {
+            case IFD0::TIFFEPStandardID: Fill_SetOptions(Stream_General, 0, ParameterC, "N NT"); break;
+            case IFD0::DNGVersion: Fill_SetOptions(Stream_General, 0, ParameterC, "N NT"); break;
+            case IFD0::DNGBackwardVersion: Fill_SetOptions(Stream_General, 0, ParameterC, "N NT"); break;
+            }
         }
     }
 
@@ -1500,7 +1706,7 @@ void File_Exif::Streams_Finish()
                 else {
                     ShutterSpeed_Time = std::to_string(exposure_time);
                     ShutterSpeed_Time.erase(ShutterSpeed_Time.find_last_not_of('0') + 1);
-                    if (ShutterSpeed_Time[ShutterSpeed_Time.size() - 1] == '.')
+                    if (ShutterSpeed_Time.back() == '.')
                         ShutterSpeed_Time.pop_back();
                 }
                 Value = Item.second.Read();
@@ -1509,7 +1715,7 @@ void File_Exif::Streams_Finish()
             }
             case IFDExif::FNumber: ParameterC = "IrisFNumber"; Value.From_Number(Item.second.Read().To_float64(), 1); break;
             case IFDExif::ExposureProgram: ParameterC = "AutoExposureMode"; Value = Exif_IFDExif_ExposureProgram_Name(Item.second.Read().To_int16u()); break;
-            case IFDExif::PhotographicSensitivity: ParameterC = "ISOSensitivity"; break;
+            case IFDExif::PhotographicSensitivity: if (Item.second.Read().To_int16u()) ParameterC = "ISOSensitivity"; break;
             case IFDExif::SensitivityType: {
                 int16u ISOSensitivityType = 0;
                 switch (Item.second.Read().To_int16u()) {
@@ -1578,7 +1784,7 @@ void File_Exif::Streams_Finish()
                 Value = MergeDateTimeSubSecOffset(Item.second, IFDExif::SubSecTimeOriginal, IFDExif::OffsetTimeOriginal);
                 break;
             case IFDExif::DateTimeDigitized:
-                Parameter = General_Encoded_Date;
+                Parameter = General_Mastered_Date;
                 Value = MergeDateTimeSubSecOffset(Item.second, IFDExif::SubSecTimeDigitized, IFDExif::OffsetTimeDigitized);
                 break;
             case IFDExif::FlashpixVersion: {
@@ -1728,6 +1934,11 @@ void File_Exif::Streams_Finish()
                 Fill(Stream_Image, 0, Image_colour_primaries, Exif_IFDMakernoteNikon_ColorSpace_ColourPrimaries(Item.second.Read().To_int16u()));
                 Fill(Stream_Image, 0, Image_transfer_characteristics, Exif_IFDMakernoteNikon_ColorSpace_TransferCharacteristics(Item.second.Read().To_int16u()));
                 break;
+            case IFDMakernoteNikon::Quality:
+                ParameterC = "Quality";
+                Value = Item.second.Read();
+                while (Value.back() == __T(' ')) Value.pop_back();
+                break;
             }
             FillMetadata(Value, Item, Parameter, ParameterC, ParameterS);
         }
@@ -1744,10 +1955,30 @@ void File_Exif::Streams_Finish()
             string ParameterS;
             switch (Item.first) {
             case IFDMakernoteSony::WhiteBalance: ParameterC = "AutoWhiteBalanceMode"; Value = Exif_IFDMakernoteSony_WhiteBalance_Name(Item.second.Read().To_int32u()); break;
+            case IFDMakernoteSony::Quality: ParameterC = "Quality"; Value = Exif_IFDMakernoteSony_Quality_Name(Item.second.Read().To_int32u()); break;
             }
             FillMetadata(Value, Item, Parameter, ParameterC, ParameterS);
         }
     }
+
+    const auto Infos_MPF_It = Infos.find(Kind_MPF);
+    if (Infos_MPF_It != Infos.end()) {
+        currentIFD = Kind_MPF;
+        const auto& Infos_MPF = Infos_MPF_It->second;
+        for (const auto& Item : Infos_MPF) {
+            size_t Parameter = 0;
+            Ztring Value;
+            const char* ParameterC = nullptr;
+            string ParameterS;
+            switch (Item.first) {
+            }
+            FillMetadata(Value, Item, Parameter, ParameterC, ParameterS);
+        }
+    }
+
+    //ICC
+    if (ICC_Parser)
+        Merge(*ICC_Parser, Stream_Image, 0, 0);
 }
 
 //***************************************************************************
@@ -1760,17 +1991,21 @@ void File_Exif::FileHeader_Parse()
     //Parsing
     bool SkipHeader{};
     int32u Alignment;
+
+    //HEIF
     if (FromHeif) {
         int32u Size;
-        Get_B4 (Size,                                           "Size");
+        Get_B4 (Size,                                           "Exif header length");
         string Identifier;
         Get_String(Size, Identifier,                            "Identifier");
-        if (Size != 6 || strncmp(Identifier.c_str(), "Exif\0", 6)) {
+        if (!(Size == 0 || (Size == 6 && !strncmp(Identifier.c_str(), "Exif\0", 6)))) {
             Reject();
             return;
         }
-        OffsetFromContainer = 10;
+        OffsetFromContainer = static_cast<int64s>(4) + Size;
     }
+
+    //Exif Makernotes
     if (IsMakernote) {
         if (Buffer_Size >= 10 && !strncmp((const char*)Buffer, "Apple iOS", 10)) { // the char* contains a terminating \0
             int16u alignment;
@@ -1829,6 +2064,12 @@ void File_Exif::FileHeader_Parse()
             return;
         }
     }
+
+    //MPF
+    if (MPEntries) {
+        currentIFD = Kind_MPF;
+    }
+
     if (!SkipHeader) { // Some Makernotes do not have typical header
         Get_C4(Alignment,                                       "Alignment");
         if (Alignment == 0x49492A00)
@@ -1874,7 +2115,11 @@ void File_Exif::Header_Parse()
     //Handling remaining IFD data
     if (!IfdItems.empty())
     {
-        if (Buffer_Offset - OffsetFromContainer != IfdItems.begin()->first) {
+        auto Offset = Buffer_Offset - OffsetFromContainer;
+        if (!IsSub) {
+            Offset += File_Offset;
+        }
+        if (Offset != IfdItems.begin()->first) {
             IfdItems.clear(); //There was a problem during the seek, trashing remaining positions from last IFD
             Finish();
             return;
@@ -1884,7 +2129,33 @@ void File_Exif::Header_Parse()
         #else //MEDIAINFO_TRACE
         Header_Fill_Code(IfdItems.begin()->second.Tag);
         #endif //MEDIAINFO_TRACE
-        Header_Fill_Size(static_cast<int64u>(Exif_Type_Size(IfdItems.begin()->second.Type)) * IfdItems.begin()->second.Count);
+        auto SizePerBlock = Exif_Type_Size(IfdItems.begin()->second.Type);
+        auto Size = static_cast<int64u>(SizePerBlock) * IfdItems.begin()->second.Count;
+        if (IfdItems.size() > 1) {
+            // Found buggy IFD with 2 items having the right size but the second item has a buggy offset
+            auto Next = IfdItems.begin();
+            ++Next;
+            auto MaxSize = Next->first - IfdItems.begin()->first;
+            if (Size > MaxSize) {
+                bool IsCurated = false;
+                if (IfdItems.size() > 2) {
+                    auto Size1 = static_cast<int64u>(Exif_Type_Size(Next->second.Type)) * Next->second.Count;
+                    auto Next2 = Next;
+                    ++Next2;
+                    auto MaxSize2 = Next2->first - IfdItems.begin()->first;
+                    if (Size + Size1 == MaxSize2) {
+                        IfdItems[IfdItems.begin()->first + Size] = Next->second;
+                        IfdItems.erase(Next->first);
+                        IsCurated = true;
+                    }
+                }
+                if (!IsCurated) {
+                    Size = MaxSize;
+                    IfdItems.begin()->second.Count = Size / SizePerBlock;
+                }
+            }
+        }
+        Header_Fill_Size(Size);
         return;
     }
 
@@ -1922,7 +2193,17 @@ void File_Exif::Header_Parse()
     
     //Filling
     Header_Fill_Code(0xFFFFFFFF, "IFD"); //OxFFFFFFFF can not be a Tag, so using it as a magic value
-    Header_Fill_Size((currentIFD == Kind_MakernoteSony ? 2 : 6) + 12 * ((int64u)NrOfDirectories)); //2 for header + 12 per directory + 4 for next IFD offset
+    auto Size = Element_Offset;
+    if (NrOfDirectories <= 0x100) { // 
+        Size += 12 * static_cast<int64u>(NrOfDirectories); // 12 bytes per directory
+        Size += static_cast<int64u>(currentIFD != Kind_MakernoteSony) << 2; // 4 bytes for next IFD offset, Sony Makernote IFD does not have offset to next IFD
+        if (currentIFD != Kind_MakernoteSony && Size < Element_Size) { //TODO: when directory is not in full 
+            if (Buffer[Buffer_Offset + (size_t)Size - (LittleEndian ? 1 : 4)]) {
+                Size -= 4;
+            }
+        }
+    }
+    Header_Fill_Size(Size);
 }
 
 //---------------------------------------------------------------------------
@@ -1943,10 +2224,10 @@ void File_Exif::Data_Parse()
 
             //Parsing new IFD
             int32u IFDOffset{};
-            while (Element_Offset + 12 <= Element_Size)
+            while (Element_Size - Element_Offset >= 12)
                 Read_Directory();
-            if (currentIFD != Kind_MakernoteSony) // Sony Makernote IFD does not have offset to next IFD
-                Get_IFDOffset(currentIFD == Kind_IFD0 ? Kind_IFD1 : (int8u)-1);
+            if (Element_Offset < Element_Size) // Some IFD does not have offset to next IFD
+                Get_IFDOffset(currentIFD == Kind_IFD0 ? Kind_IFD1 : currentIFD == Kind_IFD1 ? Kind_IFD2 : currentIFD == Kind_MPF ? Kind_MPF : (int8u)-1);
         }
     }
     else
@@ -1974,7 +2255,7 @@ void File_Exif::Data_Parse()
             const auto Infos_Thumbnail_It = Infos.find(Kind_IFD1);
             if (Infos_Thumbnail_It != Infos.end()) {
                 const auto& Infos_Thumbnail = Infos_Thumbnail_It->second;
-                const auto ImageOffset = Infos_Thumbnail.find(IFD0::ImageOffset);
+                const auto ImageOffset = Infos_Thumbnail.find(IFD0::JPEGInterchangeFormat);
                 if (ImageOffset != Infos_Thumbnail.end() && ImageOffset->second.size() == 1) {
                     int32u IFD_Offset = ImageOffset->second.at(0).To_int32u();
                     GoToOffset(IFD_Offset);
@@ -1989,7 +2270,7 @@ void File_Exif::Data_Parse()
             const auto Infos_Thumbnail_It = Infos.find(Kind_NikonPreview);
             if (Infos_Thumbnail_It != Infos.end()) {
                 const auto& Infos_Thumbnail = Infos_Thumbnail_It->second;
-                const auto ImageOffset = Infos_Thumbnail.find(IFD0::ImageOffset);
+                const auto ImageOffset = Infos_Thumbnail.find(IFD0::JPEGInterchangeFormat);
                 if (ImageOffset != Infos_Thumbnail.end() && ImageOffset->second.size() == 1) {
                     int32u IFD_Offset = ImageOffset->second.at(0).To_int32u();
                     GoToOffset(IFD_Offset);
@@ -2052,7 +2333,14 @@ void File_Exif::Read_Directory()
     {
         int32u IFDOffset;
         Get_X4 (IFDOffset,                                      "IFD offset");
-        IfdItems[IFDOffset] = IfdItem;
+        auto IFDBase = (IsSub ? 0 : File_Offset) + (Buffer_Offset - OffsetFromContainer);
+        auto IsInsideDirectory = IFDOffset >= IFDBase && IFDOffset < IFDBase + Element_Size;
+        if (IFDOffset // Offset cannot be zero. Zero usually means no data.
+            && !IsInsideDirectory)  // Offset can not be inside the directory
+            IfdItems[IFDOffset] = IfdItem;
+        auto End = IFDOffset + Size;
+        if (ExpectedFileSize < End)
+            ExpectedFileSize = End;
     }
     Element_End0();
 }
@@ -2128,22 +2416,26 @@ void File_Exif::Thumbnail()
             }
         }
     }
+    if (!Parser) {
+        Parser.reset(new File__MultipleParsing);
+    }
 
-    if (Parser) {
-        Open_Buffer_Init(Parser.get());
-        Open_Buffer_Continue(Parser.get());
-        Open_Buffer_Finalize(Parser.get());
-        Merge(*Parser, Stream_Image, 0, StreamPos_Last, false);
-    }
-    else {
-        //No parser available, skipping
-        Skip_XX(Element_Size,                                   "(Not parsed)");
-    }
+    Open_Buffer_Init(Parser.get());
+    Open_Buffer_Continue(Parser.get());
+    Open_Buffer_Finalize(Parser.get());
+    Merge(*Parser, Stream_Image, 0, StreamPos_Last, false);
 }
 
 //---------------------------------------------------------------------------
 void File_Exif::Makernote()
 {
+    auto Buffer_Offset_Save = Buffer_Offset;
+    auto Element_Size_Save = Element_Size;
+    if (Buffer_Offset > 12 && !strncmp((const char*)Buffer + Buffer_Offset - 12, "SONY DSC \0\0", 12)) {
+        Buffer_Offset -= 12;
+        Element_Size += 12;
+    }
+
     File_Exif MI{};
     MI.IsMakernote = true;
     MI.LittleEndian = LittleEndian;
@@ -2156,8 +2448,71 @@ void File_Exif::Makernote()
     for (size_t i = 0; i < Count; ++i) {
         Merge(MI, Stream_Image, i, i, false);
     }
+
+    Buffer_Offset = Buffer_Offset_Save;
+    Element_Size = Element_Size_Save;
+    Element_Offset = Element_Size;
 }
-    
+
+//---------------------------------------------------------------------------
+void File_Exif::ICC_Profile()
+{
+    #if defined(MEDIAINFO_ICC_YES)
+    ICC_Parser.reset(new File_Icc());
+    ((File_Icc*)ICC_Parser.get())->StreamKind = Stream_Image;
+    ((File_Icc*)ICC_Parser.get())->IsAdditional = true;
+    Open_Buffer_Init(ICC_Parser.get());
+    Open_Buffer_Continue(ICC_Parser.get());
+    Open_Buffer_Finalize(ICC_Parser.get());
+    #endif
+}
+
+//---------------------------------------------------------------------------
+void File_Exif::XMP()
+{
+    #if defined(MEDIAINFO_XMP_YES)
+    File_Xmp MI{};
+    Open_Buffer_Init(&MI);
+    auto Element_Offset_Sav = Element_Offset;
+    Open_Buffer_Continue(&MI);
+    Element_Offset = Element_Offset_Sav;
+    Open_Buffer_Finalize(&MI);
+    Element_Show(); //TODO: why is it needed?
+    Merge(MI, Stream_General, 0, 0, false);
+    #endif
+    Skip_UTF8(Element_Size - Element_Offset,                    "XMP metadata");
+}
+
+//---------------------------------------------------------------------------
+void File_Exif::PhotoshopImageResources()
+{
+    #if defined(MEDIAINFO_PSD_YES)
+    File_Psd MI{};
+    MI.Step = File_Psd::Step_ImageResourcesBlock;
+    Open_Buffer_Init(&MI);
+    Open_Buffer_Continue(&MI);
+    Open_Buffer_Finalize(&MI);
+    Merge(MI, Stream_General, 0, 0, false);
+    #else
+    Skip_UTF8(Element_Size - Element_Offset,                    "Photoshop Tags");
+    #endif
+}
+
+//---------------------------------------------------------------------------
+void File_Exif::IPTC_NAA()
+{
+    //Parsing
+    #if defined(MEDIAINFO_IIM_YES)
+    File_Iim MI;
+    Open_Buffer_Init(&MI);
+    Open_Buffer_Continue(&MI);
+    Open_Buffer_Finalize(&MI);
+    Merge(MI, Stream_General, 0, 0, false);
+    #else
+    Skip_UTF8(Element_Size - Element_Offset,                    "IPTC-NAA data");
+    #endif
+}
+
 //***************************************************************************
 // Helpers
 //***************************************************************************
@@ -2194,7 +2549,9 @@ void File_Exif::Get_IFDOffset(int8u KindOfIFD)
 //---------------------------------------------------------------------------
 void File_Exif::GetValueOffsetu(ifditem &IfdItem)
 {
-    auto GetDecimalPlaces = [](int32u numerator, int32u denominator) -> int8u {
+    auto GetDecimalPlaces = [](int64s numerator, int64s denominator) -> int8u {
+        numerator = abs(numerator);
+        denominator = abs(denominator);
         if (denominator == 1)
             return 0;
         int8u count{ 1 };
@@ -2217,23 +2574,43 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
 
     ZtringList& Info = Infos[currentIFD][IfdItem.Tag]; Info.clear(); Info.Separator_Set(0, __T(" /"));
 
-    if (IfdItem.Type!=Exif_Type::ASCII && IfdItem.Type!=Exif_Type::UTF8 && IfdItem.Type!=Exif_Type::UNDEFINED && IfdItem.Count>=1000)
+    if (IfdItem.Type!=Exif_Type::BYTE && IfdItem.Type!=Exif_Type::ASCII && IfdItem.Type!=Exif_Type::UTF8 && IfdItem.Type!=Exif_Type::UNDEFINED && IfdItem.Count>=1000)
     {
         //Too many data, we don't currently need it and we skip it
         Skip_XX(static_cast<int64u>(Exif_Type_Size(IfdItem.Type))*IfdItem.Count, "Data");
         return;
     }
 
+    auto End = Element_Offset + static_cast<int64u>(Exif_Type_Size(IfdItem.Type)) * IfdItem.Count;
     switch (IfdItem.Type)
     {
     case Exif_Type::BYTE:                                       /* 8-bit unsigned integer. */
-        if (currentIFD == Kind_IFD0 && IfdItem.Tag >= IFD0::WinExpTitle && IfdItem.Tag <= IFD0::WinExpSubject) {
-            // Content is actually UTF16LE
-            Ztring Data;
-            Get_UTF16L(IfdItem.Count, Data,                     "Data");
-            Info.push_back(Data);
+        switch (currentIFD) {
+        case Kind_IFD0:
+        case Kind_IFD2:
+        case Kind_SubIFD0:
+        case Kind_SubIFD1:
+        case Kind_SubIFD2:
+            switch (IfdItem.Tag) {
+            case IFD0::XMP:
+                XMP();
+                break;
+            case IFD0::PhotoshopImageResources:
+                PhotoshopImageResources();
+                break;
+            default:
+                if (IfdItem.Tag >= IFD0::WinExpTitle && IfdItem.Tag <= IFD0::WinExpSubject) {
+                    // Content is actually UTF16LE
+                    Ztring Data;
+                    Get_UTF16L(IfdItem.Count, Data,             "Data");
+                    Info.push_back(Data);
+                }
+                break;
+            }
+            break;
         }
-        else {
+        if (Element_Offset < End) {
+            if (IfdItem.Count <= 16) {
             for (int16u Pos=0; Pos<IfdItem.Count; Pos++)
             {
                 int8u Ret8;
@@ -2252,6 +2629,7 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
                 Param_Info1C(currentIFD == Kind_GPS && IfdItem.Tag == IFDGPS::GPSAltitudeRef, Exif_IFDGPS_GPSAltitudeRef_Name(Ret8));
                 Info.push_back(Ztring::ToZtring(Ret8));
             }
+            }
         }
         break;
     case Exif_Type::ASCII:                                      /* ASCII */
@@ -2269,7 +2647,9 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
         }
         break;
     case Exif_Type::SHORT:                                      /* 16-bit (2-byte) unsigned integer. */
-        for (int16u Pos=0; Pos<IfdItem.Count; Pos++)
+        {
+        auto Count = IfdItem.Count > 16 ? 16 : IfdItem.Count;
+        for (int16u Pos=0; Pos<Count; Pos++)
         {
             int16u Ret16;
             #if MEDIAINFO_TRACE
@@ -2292,41 +2672,75 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
                 Element_Offset+=2;
             #endif //MEDIAINFO_TRACE
             Param_Info1C((currentIFD == Kind_IFD0 || currentIFD == Kind_IFD1) && IfdItem.Tag == IFD0::Orientation, Exif_IFD0_Orientation_Name(Ret16));
-            Param_Info1C((currentIFD == Kind_IFD0 || currentIFD == Kind_IFD1) && IfdItem.Tag == IFD0::Compression, Exif_IFD0_Compression_Name(Ret16));
+            Param_Info1C((currentIFD == Kind_IFD0 || currentIFD == Kind_IFD1 || currentIFD == Kind_IFD2 || currentIFD == Kind_SubIFD0 || currentIFD == Kind_SubIFD1 || currentIFD == Kind_SubIFD2) && IfdItem.Tag == IFD0::Compression, Tiff_Compression_Name(Ret16));
             Param_Info1C(currentIFD == Kind_Exif && IfdItem.Tag == IFDExif::LightSource, Exif_ExifIFD_Tag_LightSource_Name(Ret16));
             Param_Info1C(currentIFD == Kind_Exif && IfdItem.Tag == IFDExif::Flash, Exif_IFDExif_Flash_Name(Ret16));
             Param_Info1C(currentIFD == Kind_Exif && IfdItem.Tag == IFDExif::ColorSpace, Exif_IFDExif_ColorSpace_Name(Ret16));
+            Param_Info1C(currentIFD == Kind_Exif && IfdItem.Tag == IFDExif::CompositeImage, Exif_IFDExif_CompositeImage_Name(Ret16));
             Param_Info1C(currentIFD == Kind_MakernoteNikon && IfdItem.Tag == IFDMakernoteNikon::CropHiSpeed, Exif_IFDMakernoteNikon_CropHiSpeed_Name(Ret16));
             Param_Info1C(currentIFD == Kind_MakernoteNikon && IfdItem.Tag == IFDMakernoteNikon::ColorSpace, Exif_IFDMakernoteNikon_ColorSpace_Name(Ret16));
             Param_Info1C(currentIFD == Kind_MakernoteNikon && IfdItem.Tag == IFDMakernoteNikon::ActiveDLighting, Exif_IFDMakernoteNikon_ActiveDLighting_Name(Ret16));
             Info.push_back(Ztring::ToZtring(Ret16));
         }
+        if (Count != IfdItem.Count) {
+            Skip_XX((IfdItem.Count - Count) * 2,                "(Not parsed)");
+        }
+        }
         break;
+    case Exif_Type::IFD:                                        /* 32-bit (4-byte) unsigned integer IFD offset */
     case Exif_Type::LONG:                                       /* 32-bit (4-byte) unsigned integer */
-        for (int16u Pos=0; Pos<IfdItem.Count; Pos++)
-        {
-            int32u Ret32;
-            #if MEDIAINFO_TRACE
-                Get_X4 (Ret32,                                  "Data");
-                Element_Info1(Ztring::ToZtring(Ret32));
-            #else //MEDIAINFO_TRACE
-                if (Element_Offset+4>Element_Size)
-                {
-                    Trusted_IsNot();
-                    break;
+        switch (currentIFD) {
+        case Kind_IFD0:
+        case Kind_IFD2:
+        case Kind_SubIFD0:
+        case Kind_SubIFD1:
+        case Kind_SubIFD2:
+            switch (IfdItem.Tag) {
+            case IFD0::IPTC_NAA:
+                IPTC_NAA();
+                break;
+            }
+            break;
+        }
+        if (Element_Offset < End) {
+            auto Count = IfdItem.Count > 16 ? 16 : IfdItem.Count;
+            for (int16u Pos=0; Pos<Count; Pos++)
+            {
+                int32u Ret32;
+                if (currentIFD == Kind_IFD0 && IfdItem.Tag == IFD0::SubIFDs) {
+                    if (Pos < 3)
+                        Get_IFDOffset(Kind_SubIFD0 + Pos);
+                    else
+                        Get_X4(Ret32,                           "IFD Offset");
+                    continue;
                 }
-                if (LittleEndian)
-                    Ret32=LittleEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset);
-                else
-                    Ret32=BigEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset);
-                Element_Offset+=4;
-            #endif //MEDIAINFO_TRACE
-            Param_Info1C(currentIFD == Kind_MakernoteSony && IfdItem.Tag == IFDMakernoteSony::Quality, Exif_IFDMakernoteSony_Quality_Name(Ret32));
-            Param_Info1C(currentIFD == Kind_MakernoteSony && IfdItem.Tag == IFDMakernoteSony::WhiteBalance, Exif_IFDMakernoteSony_WhiteBalance_Name(Ret32));
-            Info.push_back(Ztring::ToZtring(Ret32));
+                #if MEDIAINFO_TRACE
+                    Get_X4 (Ret32, IfdItem.Type == Exif_Type::IFD ? "IFD Offset" : "Data");
+                    Element_Info1(Ztring::ToZtring(Ret32));
+                #else //MEDIAINFO_TRACE
+                    if (Element_Offset+4>Element_Size)
+                    {
+                        Trusted_IsNot();
+                        break;
+                    }
+                    if (LittleEndian)
+                        Ret32=LittleEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset);
+                    else
+                        Ret32=BigEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset);
+                    Element_Offset+=4;
+                #endif //MEDIAINFO_TRACE
+                Param_Info1C(currentIFD == Kind_MakernoteSony && IfdItem.Tag == IFDMakernoteSony::Quality, Exif_IFDMakernoteSony_Quality_Name(Ret32));
+                Param_Info1C(currentIFD == Kind_MakernoteSony && IfdItem.Tag == IFDMakernoteSony::WhiteBalance, Exif_IFDMakernoteSony_WhiteBalance_Name(Ret32));
+                Info.push_back(Ztring::ToZtring(Ret32));
+            }
+            if (Count != IfdItem.Count) {
+                Skip_XX((IfdItem.Count - Count) * 4,            "(Not parsed)");
+            }
         }
         break;
     case Exif_Type::RATIONAL:                                   /* 2x32-bit (2x4-byte) unsigned integers */
+        {
+        auto Count = IfdItem.Count > 16 ? 16 : IfdItem.Count;
         for (int16u Pos=0; Pos<IfdItem.Count; Pos++)
         {
             int32u N, D;
@@ -2344,12 +2758,12 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
                 if (LittleEndian)
                 {
                     N=LittleEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset);
-                    D=LittleEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset);
+                    D=LittleEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset+4);
                 }
                 else
                 {
                     N=BigEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset);
-                    D=BigEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset);
+                    D=BigEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset+4);
                 }
                 Element_Offset+=8;
             #endif //MEDIAINFO_TRACE
@@ -2358,8 +2772,44 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
             else
                 Info.push_back(Ztring()); // Division by zero, undefined
         }
+        if (Count != IfdItem.Count) {
+            Skip_XX((IfdItem.Count - Count) * 8,                "(Not parsed)");
+        }
+        }
+        break;
+    case Exif_Type::SSHORT:                                     /* 16-bit (2-byte) signed integer. */
+        {
+        auto Count = IfdItem.Count > 16 ? 16 : IfdItem.Count;
+        for (int16u Pos=0; Pos<IfdItem.Count; Pos++)
+        {
+            int16u Ret16u;
+            int16s Ret16;
+            #if MEDIAINFO_TRACE
+                Get_X2 (Ret16u,                                 "Data");
+                Ret16 = static_cast<int16s>(Ret16u);
+                Element_Info1(Ztring::ToZtring(Ret16));
+            #else //MEDIAINFO_TRACE
+                if (Element_Offset+2>Element_Size)
+                {
+                    Trusted_IsNot();
+                    break;
+                }
+                if (LittleEndian)
+                    Ret16=LittleEndian2int16s(Buffer+Buffer_Offset+(size_t)Element_Offset);
+                else
+                    Ret16=BigEndian2int16s(Buffer+Buffer_Offset+(size_t)Element_Offset);
+                Element_Offset+=2;
+            #endif //MEDIAINFO_TRACE
+            Info.push_back(Ztring::ToZtring(Ret16));
+        }
+        if (Count != IfdItem.Count) {
+            Skip_XX((IfdItem.Count - Count) * 2,                "(Not parsed)");
+        }
+        }
         break;
     case Exif_Type::SLONG:                                      /* 32-bit (4-byte) signed integer */
+        {
+        auto Count = IfdItem.Count > 16 ? 16 : IfdItem.Count;
         for (int16u Pos=0; Pos<IfdItem.Count; Pos++)
         {
             int32u Ret32u;
@@ -2384,8 +2834,14 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
             Param_Info1C(currentIFD == Kind_MakernoteApple && IfdItem.Tag == IFDMakernoteApple::CameraType, Exif_IFDMakernoteApple_CameraType_Name(Ret32));
             Info.push_back(Ztring::ToZtring(Ret32));
         }
+        if (Count != IfdItem.Count) {
+            Skip_XX((IfdItem.Count - Count) * 4,                "(Not parsed)");
+        }
+        }
         break;
     case Exif_Type::SRATIONAL:                                  /* 2x32-bit (2x4-byte) signed integers */
+        {
+        auto Count = IfdItem.Count > 16 ? 16 : IfdItem.Count;
         for (int16u Pos=0; Pos<IfdItem.Count; Pos++)
         {
             int32u NU, DU;
@@ -2406,12 +2862,12 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
                 if (LittleEndian)
                 {
                     N=LittleEndian2int32s(Buffer+Buffer_Offset+(size_t)Element_Offset);
-                    D=LittleEndian2int32s(Buffer+Buffer_Offset+(size_t)Element_Offset);
+                    D=LittleEndian2int32s(Buffer+Buffer_Offset+(size_t)Element_Offset+4);
                 }
                 else
                 {
                     N=BigEndian2int32s(Buffer+Buffer_Offset+(size_t)Element_Offset);
-                    D=BigEndian2int32s(Buffer+Buffer_Offset+(size_t)Element_Offset);
+                    D=BigEndian2int32s(Buffer+Buffer_Offset+(size_t)Element_Offset+4);
                 }
                 Element_Offset+=8;
             #endif //MEDIAINFO_TRACE
@@ -2420,29 +2876,93 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
             else
                 Info.push_back(Ztring()); // Division by zero, undefined
         }
+        if (Count != IfdItem.Count) {
+            Skip_XX((IfdItem.Count - Count) * 8,                "(Not parsed)");
+        }
+        }
         break;
     case Exif_Type::UNDEFINED:                                  /* Undefined */
         if (
             (currentIFD == Kind_Exif && IfdItem.Tag == IFDExif::UserComment) ||
             (currentIFD == Kind_GPS && (IfdItem.Tag == IFDGPS::GPSProcessingMethod || IfdItem.Tag == IFDGPS::GPSAreaInformation))
-            )
+            ) {
             MulticodeString(Info);
-        else if (
+            break;
+        }
+        if (
             (currentIFD == Kind_Exif && (IfdItem.Tag == IFDExif::ExifVersion || IfdItem.Tag == IFDExif::FlashpixVersion)) ||
-            (currentIFD == Kind_Interop && IfdItem.Tag == IFDInterop::InteroperabilityVersion)
+            (currentIFD == Kind_Interop && IfdItem.Tag == IFDInterop::InteroperabilityVersion) ||
+            (currentIFD == Kind_MPF && IfdItem.Tag == IFDMPF::MPFVersion)
             ) {
             string Data;
             Get_String(IfdItem.Count, Data,                     "Data"); Element_Info1(Data.c_str());
             Info.push_back(Ztring().From_UTF8(Data.c_str()));
+            break;
         }
-        else if (currentIFD == Kind_Exif && IfdItem.Tag == IFDExif::MakerNote && IfdItem.Count > 4)
-            Makernote();
-        else
-            Skip_XX(static_cast<int64u>(Exif_Type_Size(IfdItem.Type))*IfdItem.Count, "Data");
+        switch (currentIFD) {
+        case Kind_IFD0:
+        case Kind_IFD2:
+        case Kind_SubIFD0:
+        case Kind_SubIFD1:
+        case Kind_SubIFD2:
+            switch (IfdItem.Tag) {
+            case IFD0::XMP:
+                XMP();
+                break;
+            case IFD0::PhotoshopImageResources:
+                PhotoshopImageResources();
+                break;
+            case IFD0::ICC_Profile:
+                ICC_Profile();
+                break;
+            }
+            break;
+        case Kind_Exif:
+            switch (IfdItem.Tag) {
+            case IFDExif::MakerNote:
+                if (IfdItem.Count > 4)
+                    Makernote();
+                break;
+            }
+            break;
+        case Kind_MPF:
+            switch (IfdItem.Tag) {
+            case IFDMPF::MPEntry:
+            {
+                int32u num_imgs{ Infos.find(Kind_MPF)->second.find(IFDMPF::NumberOfImages)->second.Read().To_int32u() };
+                for (int32u i = 0; i < num_imgs; ++i) {
+                    Element_Begin1(("MP Entry " + std::to_string(i + 1)).c_str());
+                    mp_entry entry{};
+                    Get_X4(entry.ImgAttribute,                  "Individual image Attribute"); Param_Info1(Mpf_ImageAttribute_Desc(entry.ImgAttribute));
+                    Get_X4(entry.ImgSize,                       "Individual image Size");
+                    Get_X4(entry.ImgOffset,                     "Individual image Data Offset");
+                    Get_X2(entry.DependentImg1EntryNo,          "Dependent image 1 Entry No.");
+                    Get_X2(entry.DependentImg2EntryNo,          "Dependent image 2 Entry No.");
+                    MPEntries->push_back(entry);
+                    Element_End0();
+                }
+                break;
+            }
+            case IFDMPF::ImageUIDList:
+            {
+                int32u num_imgs{ Infos.find(Kind_MPF)->second.find(IFDMPF::NumberOfImages)->second.Read().To_int32u() };
+                for (int32u i = 0; i < num_imgs; ++i) {
+                    string Data;
+                    Get_String(33, Data,                        "Individual Image Unique ID"); Element_Info1(Data.c_str());
+                    Info.push_back(Ztring().From_UTF8(Data.c_str()));
+                }
+                break;
+            }
+            }
+            break;
+        }
         break;
-    default:                                                    // Type not yet parsed
-        Skip_XX (static_cast<int64u>(Exif_Type_Size(IfdItem.Type))*IfdItem.Count, "Data");
-        break;
+    }
+    if (Element_Offset > End) {
+        Element_Offset = End; // There was a problem during parsing
+    }
+    if (Element_Offset < End) {
+        Skip_XX(End - Element_Offset,                           "(Unknown)");
     }
 }
 
@@ -2450,6 +2970,9 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
 void File_Exif::GoToOffset(int64u GoTo_)
 {
     Element_Offset = GoTo_ - (Buffer_Offset - OffsetFromContainer);
+    if (!IsSub) {
+        Element_Offset -= File_Offset;
+    }
 }
 
 } //NameSpace

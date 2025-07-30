@@ -6,13 +6,13 @@
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-// Information about Immersive Audio Model and Formats (IAMF) files
+// Information about ISO 21496-1 Gain Map Metadata
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef MediaInfo_Iamf
-#define MediaInfo_Iamf
+#ifndef MediaInfo_File_GainMapH
+#define MediaInfo_File_GainMapH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -22,42 +22,37 @@
 namespace MediaInfoLib
 {
 
+// ISO 1496-1 Gain map metadata for image conversion
+struct GainMap_metadata {
+    int16u minimum_version;
+    int16u writer_version;
+    bool is_multichannel;
+    bool use_base_colour_space;
+    float32 base_hdr_headroom;
+    float32 alternate_hdr_headroom;
+    float32 gain_map_min[3];
+    float32 gain_map_max[3];
+    float32 gamma[3];
+    float32 base_offset[3];
+    float32 alternate_offset[3];
+};
+
 //***************************************************************************
-// Class File_Iamf
+// Class File_GainMap
 //***************************************************************************
 
-class File_Iamf : public File__Analyze
+class File_GainMap : public File__Analyze
 {
 public:
-    // Constructor/Destructor
-    File_Iamf();
-    ~File_Iamf();
+    //In
+    GainMap_metadata* output{};
+    bool fromAvif{ false };
 
-private:
-    // Streams management
-    void Streams_Accept();
-
-    //Buffer - File header
-    bool FileHeader_Begin();
-
-    // Buffer - Global
-    void Read_Buffer_OutOfBand();
-
-    // Buffer - Per element
-    void Header_Parse();
+private :
     void Data_Parse();
-
-    // Elements
-    void ia_codec_config();
-    void ia_audio_element();
-    void ia_mix_presentation();
-    void ia_sequence_header();
-    void ParamDefinition(int64u param_definition_type);
-
-    // Helpers
-    void Get_leb128(int64u& Info, const char* Name);
 };
 
 } //NameSpace
 
-#endif // !MediaInfo_Iamf
+#endif
+

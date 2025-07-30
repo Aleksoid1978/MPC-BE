@@ -4,15 +4,9 @@
  *  be found in the License.html file in the root of the source tree.
  */
 
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//
-// Information about MPEG files
-//
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
 //---------------------------------------------------------------------------
-#ifndef MediaInfo_MpegH
-#define MediaInfo_MpegH
+#ifndef MediaInfo_File__MultipleParsingH
+#define MediaInfo_File__MultipleParsingH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------

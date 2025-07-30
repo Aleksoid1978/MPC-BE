@@ -124,6 +124,7 @@ string IPTC_record_name(int8u record, int8u dataset)
     ELEMENT_CASE(2, 200, "ObjectData Preview File Format")
     ELEMENT_CASE(2, 201, "ObjectData Preview File Foramt Version")
     ELEMENT_CASE(2, 202, "ObjectData Preview Data")
+    ELEMENT_CASE(2, 221, "Photo Mechanic Preferences")
     ELEMENT_CASE(3,   0, "Record Version")
     ELEMENT_CASE(3,  10, "Picture Number")
     ELEMENT_CASE(3,  20, "Pixels Per Line")
@@ -218,6 +219,7 @@ void File_Iim::Data_Parse()
     ELEMENT_CASE(  2,  80, Byline)
     ELEMENT_CASE(  2, 116, CopyrightNotice)
     ELEMENT_CASE(  2, 120, CaptionAbstract)
+    ELEMENT_CASE(  2, 221, PhotoMechanicPrefs)
     default: Skip_XX(Element_Size,                               "(Unknown)");
     }
 }
@@ -279,6 +281,12 @@ void File_Iim::CopyrightNotice()
 
 //---------------------------------------------------------------------------
 void File_Iim::CaptionAbstract()
+{
+    SkipString();
+}
+
+//---------------------------------------------------------------------------
+void File_Iim::PhotoMechanicPrefs()
 {
     SkipString();
 }

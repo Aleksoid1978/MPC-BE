@@ -791,6 +791,12 @@ public :
     };
     void Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_ColorPrimaries, Ztring &MasteringDisplay_Luminance, mastering_metadata_2086 &Meta, bool FromAV1=false);
     #endif
+    #if defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES)
+    void Get_AmbientViewingEnvironment(float64& AmbientViewingEnvironment_Illuminance, Ztring& AmbientViewingEnvironment_Illuminance_string, Ztring& AmbientViewingEnvironment_Chromaticity);
+    #endif
+    #if defined(MEDIAINFO_AV1_YES) || defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MK_YES)
+    void Get_SMPTE_ST_2094_40(int8u& application_version, bool& IsHDRplus, bool& tone_mapping_flag);
+    #endif
     #if defined(MEDIAINFO_MPEGPS_YES) || defined(MEDIAINFO_MPEGTS_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MK_YES)
     void dvcC(bool has_dependency_pid=false, std::map<std::string, Ztring>* Infos=NULL);
     #endif
@@ -1190,6 +1196,7 @@ protected :
     void Streams_Finish_StreamOnly();
     void Streams_Finish_StreamOnly(stream_t StreamKid, size_t StreamPos);
     void Streams_Finish_StreamOnly_General(size_t StreamPos);
+    void Streams_Finish_StreamOnly_General_Curate(size_t StreamPos);
     void Streams_Finish_StreamOnly_Video(size_t StreamPos);
     void Streams_Finish_StreamOnly_Audio(size_t StreamPos);
     void Streams_Finish_StreamOnly_Text(size_t StreamPos);

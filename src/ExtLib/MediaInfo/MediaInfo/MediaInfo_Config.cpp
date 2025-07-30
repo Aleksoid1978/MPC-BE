@@ -138,7 +138,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const Char*  MediaInfo_Version=__T("MediaInfoLib - v25.04");
+const Char*  MediaInfo_Version=__T("MediaInfoLib - v25.07");
 const Char*  MediaInfo_Url=__T("http://MediaArea.net/MediaInfo");
       Ztring EmptyZtring;       //Use it when we can't return a reference to a true Ztring
 const Ztring EmptyZtring_Const; //Use it when we can't return a reference to a true Ztring, const version
@@ -1050,6 +1050,14 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
         if (Option_Lower==__T("cover_data_get"))
         {
             return Cover_Data_Get();
+        }
+        if (Option_Lower==__T("mesh_vertex_data"))
+        {
+            return Flags_Enable_Mesh_Vertex_Data_Set(Value.c_str());
+        }
+        if (Option_Lower==__T("mesh_vertex_data_get"))
+        {
+            return Flags_Enable_Mesh_Vertex_Data_Get()?__T("1"):__T("0");
         }
     #endif //MEDIAINFO_ADVANCED
     #if MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)
@@ -2720,6 +2728,34 @@ Ztring MediaInfo_Config::Cover_Data_Get ()
 }
 #endif //MEDIAINFO_ADVANCED
 
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_ADVANCED
+Ztring MediaInfo_Config::Flags_Enable_Mesh_Vertex_Data_Set (const Ztring &NewValue_)
+{
+    Ztring NewValue(NewValue_);
+    transform(NewValue.begin(), NewValue.end(), NewValue.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+    const int64u Mask=~((1<<Flags_Enable_Mesh_Vertex_Data));
+    int64u Value;
+    if (NewValue.empty())
+        Value=0;
+    else if (NewValue==__T("1"))
+        Value=(1<<Flags_Enable_Mesh_Vertex_Data);
+    else
+        return __T("Unsupported");
+
+    CriticalSectionLocker CSL(CS);
+    Flags1&=Mask;
+    Flags1|=Value;
+    return Ztring();
+}
+
+bool MediaInfo_Config::Flags_Enable_Mesh_Vertex_Data_Get()
+{
+    CriticalSectionLocker CSL(CS);
+    return Flags1&(1<< Flags_Enable_Mesh_Vertex_Data);
+}
+#endif //MEDIAINFO_ADVANCED
 
 //---------------------------------------------------------------------------
 #if MEDIAINFO_ADVANCED && defined(MEDIAINFO_FILE_YES)

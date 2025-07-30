@@ -577,6 +577,7 @@ void File_Id3v2::Data_Parse()
         int64u TotalLength=4+(int64u)DataLength;
         if (TotalLength>Element_Size-Unsynch_List.size())
         {
+            Unsynch_List.clear();
             Skip_XX(Element_Size-Element_Offset,                "Size coherency issue");
             return;
         }

@@ -2826,7 +2826,7 @@ bool File_Mpeg4::BookMark_Needed()
                         float64 Time=DBL_MAX;
                         for (std::vector<int32u>::iterator Temp=Audios.begin(); Temp!=Audios.end(); Temp++)
                         {
-                            if (StreamsTemp[*Temp].stts_Durations_Pos_Offset==0)
+                            if (StreamsTemp[*Temp].stts_Durations_Pos_Offset==0 && !Streams[*Temp].stts_Durations.empty())
                             {
                                 stream::stts_durations::iterator stts_Duration = Streams[*Temp].stts_Durations.begin() + Streams[*Temp].stts_Durations_Pos;
                                 int64u stts_Offset=stts_Duration->DTS_Begin+(((int64u)stts_Duration->SampleDuration)*(Frame_Count_NotParsedIncluded-stts_Duration->Pos_Begin));

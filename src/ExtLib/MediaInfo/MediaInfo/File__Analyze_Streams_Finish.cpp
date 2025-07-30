@@ -44,10 +44,2069 @@
 #endif //MEDIAINFO_FIXITY
 #include <algorithm>
 using namespace ZenLib;
+using namespace std;
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
 {
+
+//---------------------------------------------------------------------------
+#if __cplusplus >= 201703 || (defined(_MSC_VER) && _MSC_VER >= 1910 && _MSVC_LANG >= 201703)
+#else
+struct string_view {
+public:
+    constexpr string_view() noexcept {
+    }
+    constexpr string_view(const char* Data, size_t Size) noexcept
+        : _Data(Data), _Size(Size) {
+    }
+    constexpr const char* data() const noexcept {
+        return _Data;
+    }
+    constexpr size_t size() const noexcept {
+        return _Size;
+    }
+private:
+    const char* _Data{};
+    size_t _Size{};
+};
+#endif
+static string_view Find_Replacement(const char* Database, const string& ToFind) {
+    if (ToFind.empty() || !ToFind.front()) {
+        return {}; // Nothing to search
+    }
+    auto Current = Database;
+    for (;;) {
+        auto Location = strstr(Current, ToFind.c_str());
+        if (!Location) {
+            return { nullptr, 0 }; // No more to search
+        }
+        if ((Location != Database && Location[-1] != '\n') || Location[ToFind.size()] != ';') {
+            Current = strchr(Location, '\n') + 1;  // Note: \n is always the last character of Database so no need to check if it is not found
+            continue; // Not a full match
+        }
+        Location += ToFind.size() + 1; // Skip the key and the semicolon
+        const auto Size = static_cast<size_t>(strchr(Location, '\n') - Location); // Note: \n is always the last character of Database so no need to check if it is not found
+        return { Location, Size };
+    }
+}
+static bool IsPresent(const char* Database, const string& ToFind) {
+    if (ToFind.empty() || !ToFind.front()) {
+        return false; // Nothing to search
+    }
+    auto Current = Database;
+    for (;;) {
+        auto Location = strstr(Current, ToFind.c_str());
+        if (!Location) {
+            return false; // No more to search
+        }
+        if ((Location != Database && Location[-1] != '\n') || Location[ToFind.size()] != '\n') {
+            Current = Location + 1;
+            continue; // Not a full match
+        }
+        return true;
+    }
+}
+class NewlineRange
+{
+public:
+    class Iterator
+    {
+    public:
+        constexpr Iterator() {
+        }
+        Iterator(const char* pos) {
+            update(pos);
+        }
+
+        constexpr string_view operator*() const {
+            return { current, static_cast<size_t>(next - current) };
+        }
+
+        Iterator& operator++() {
+            if (*next) {
+                update(next + 1);
+            }
+            else {
+                current = next;
+            }
+            return *this;
+        }
+
+        constexpr bool operator!=(const Iterator&) const {
+            return *current;
+        }
+
+    private:
+        void update(const char* pos) {
+            current = pos;
+            next = pos;
+            while (*next && *next != '\n') {
+                ++next;
+            }
+        }
+        const char* current = {};
+        const char* next = {};
+    };
+
+    constexpr NewlineRange(const char* str) : begin_(str) {}
+
+    Iterator begin() const { return Iterator(begin_); }
+    constexpr Iterator end() const { return Iterator(); }
+
+private:
+    const char* begin_;
+};
+
+//---------------------------------------------------------------------------
+static const char* CompanySuffixes =
+    ".,LTD\n"
+    "5MP\n"
+    "AB\n"
+    "AG\n"
+    "CAMERA\n"
+    "CO\n"
+    "CO.\n"
+    "CO.,\n"
+    "CO.LTD.\n"
+    "COMPANY\n"
+    "COMPUTER\n"
+    "CORP\n"
+    "CORP.\n"
+    "CORPORATION\n"
+    "CORPORATION.\n"
+    "DIGITAL\n"
+    "DIGITCAM\n"
+    "DSC\n"
+    "ELEC\n"
+    "ELEC.\n"
+    "ELECTRIC\n"
+    "ELECTRONICS\n"
+    "ENTERTAINMENT\n"
+    "EUROPE\n"
+    "FILM\n"
+    "FOTOTECHNIC\n"
+    "GERMANY\n"
+    "GMBH\n"
+    "GROUP\n"
+    "IMAGING\n"
+    "INC\n"
+    "INC.\n"
+    "INTERNATIONAL\n"
+    "KOREA\n"
+    "LABORATORIES\n"
+    "LIMITED\n"
+    "LIVING\n"
+    "LTD\n"
+    "LTD.\n"
+    "MOBILE\n"
+    "MOBILITY\n"
+    "OP\n"
+    "OPTICAL\n"
+    "PHOTO\n"
+    "PRODUCTS\n"
+    "SOLUTIONS\n"
+    "SYSTEMS\n"
+    "TECH\n"
+    "TECHNOLOGIES\n"
+    "TECHNOLOGY\n"
+    "WIRELESS\n"
+;
+
+//---------------------------------------------------------------------------
+static const char* CompanyNames =
+    "ACER\n"
+    "AGFA\n"
+    "AIPTEK\n"
+    "APPLE\n"
+    "ASUS\n"
+    "ASHAMPOO\n"
+    "BENQ\n"
+    "BUSHNELL\n"
+    "CANON\n"
+    "CASIO\n"
+    "DIGILIFE\n"
+    "EPSON\n"
+    "FRAUNHOFER\n"
+    "FUJI\n"
+    "FUJIFILM\n"
+    "GATEWAY\n"
+    "GE\n"
+    "GOOGLE\n"
+    "HASSELBLAD\n"
+    "HITACHI\n"
+    "HONOR\n"
+    "HP\n"
+    "HUAWEI\n"
+    "INSTA360\n"
+    "JENOPTIK\n"
+    "KODAK\n"
+    "KONICA\n"
+    "KYOCERA\n"
+    "JENOPTIFIED\n"
+    "LEGEND\n"
+    "LEICA\n"
+    "LUMICRON\n"
+    "MAGINON\n"
+    "MAGINON\n"
+    "MAMIYA\n"
+    "MEDION\n"
+    "MICROSOFT\n"
+    "MINOLTA\n"
+    "MOTOROLA\n"
+    "MOULTRIE\n"
+    "MUSTEK\n"
+    "NIKON\n"
+    "NIKON\n"
+    "ODYS\n"
+    "OLYMPUS\n"
+    "PANTECH\n"
+    "PARROT\n"
+    "PENTACON\n"
+    "PIONEER\n"
+    "POLAROID\n"
+    "RECONYX\n"
+    "RED\n"
+    "RICOH\n"
+    "ROLLEI\n"
+    "SAGEM\n"
+    "SAMSUNG\n"
+    "SANYO\n"
+    "SEALIFE\n"
+    "SHARP\n"
+    "SIGMA\n"
+    "SKANHEX\n"
+    "SONY\n"
+    "SUNPLUS\n"
+    "SUPRA\n"
+    "T-MOBILE\n"
+    "TESCO\n"
+    "TOSHIBA\n"
+    "TRAVELER\n"
+    "TRUST\n"
+    "VISTAQUEST\n"
+    "VIVITAR\n"
+    "VIVO\n"
+    "VODAFONE\n"
+    "XIAOMI\n"
+    "YAKUMO\n"
+    "YASHICA\n"
+    "ZEISS\n"
+    "ZJMEDIA\n"
+    "ZTE\n"
+;
+
+//---------------------------------------------------------------------------
+static const char* CompanyNames_Replace =
+    "AGFA GEVAERT;Agfa\n"
+    "AGFAPHOTO;Agfa\n"
+    "BENQ;BenQ\n"
+    "BENQ-SIEMENS;BenQ\n"
+    "BLACKBERRY;BlackBerry\n"
+    "CAMERA;\n"
+    "CONCORD;Jenoptik\n"
+    "CREATIVE;Creative Labs\n"
+    "DEFAULT;\n"
+    "DOCOMO;DoCoMo\n"
+    "EASTMAN KODAK;KODAK\n"
+    "FLIR SYSTEMS;FLIR\n"
+    "FS-NIKON;Nikon\n"
+    "FUJI;FUJIFILM\n"
+    "GENERAL;GE\n"
+    "GEDSC;GE\n"
+    "GRANDTECH;Jenoptik\n"
+    "HMD GLOBAL;HMD\n"
+    "HEWLETT PACKARD;HP\n"
+    "HEWLETT-PACKARD;HP\n"
+    "JENIMAGE;JENOPTIK\n"
+    "JK;Kodak\n"
+    "KONICA MINOLTA;Konica Minolta\n"
+    "KONICA;Konica Minolta\n"
+    "LG CYON;LG\n"
+    "LG MOBILE;LG\n"
+    "LGE;LG\n"
+    "MINOLTA;Konica Minolta\n"
+    "MOTOROL;MOTOROLA\n"
+    "NORITSU KOKI;Noritsu Koki\n"
+    "NTT DOCOMO;DoCoMo\n"
+    "OC;OpenCube\n"
+    "OM;Olympus\n"
+    "PENTAX RICOH;Ricoh\n"
+    "PENTAX;Ricoh\n"
+    "PLA100Z;Polaroid\n"
+    "PRAKTICA;Pentacon\n"
+    "RESEARCH IN MOTION;BlackBerry\n"
+    "SAMSUNG ANYCALL;Samsung\n"
+    "SAMSUNG DIGITAL IMA;Samsung\n"
+    "SAMSUNG TECHWIN;Samsung\n"
+    "SAMSUNG TECHWIN CO,.;Samsung\n"
+    "SONY ERICSSON;Sony Ericsson\n"
+    "SEIKO EPSON;Epson\n"
+    "SKANHEX TECHWIN;Skanhex\n"
+    "SUPRA / MAGINON;supra / Maginon\n"
+    "T-MOBILE;T-Mobile\n"
+    "TELEDYNE FLIR;FLIR\n"
+    "THOMSON GRASS VALLEY;Grass Valley\n"
+    "VIVICAM;Vivitar\n"
+    "WWL;Polaroid\n"
+    "XIAOYI;Xiaomi\n"
+;
+
+//---------------------------------------------------------------------------
+static const char* Model_Replace_Canon = // Based on https://en.wikipedia.org/wiki/Canon_EOS and https://wiki.magiclantern.fm/camera_models_map
+    "EOS 1500D;EOS 2000D\n"
+    "EOS 200D Mark II;EOS 250D\n"
+    "EOS 3000D;EOS 4000D\n"
+    "EOS 770D;EOS 77D\n"
+    "EOS 8000D;EOS 760D\n"
+    "EOS 9000D;EOS 77D\n"
+    "EOS DIGITAL REBEL XT;EOS 350D\n"
+    "EOS DIGITAL REBEL XTI;EOS 400D\n"
+    "EOS DIGITAL REBEL;EOS 300D\n"
+    "EOS HI;EOS 1200D\n"
+    "EOS KISS DIGITAL N;EOS 350D\n"
+    "EOS KISS DIGITAL X;EOS 400D\n"
+    "EOS KISS DIGITAL;EOS 300D\n"
+    "EOS KISS F;EOS 1000D\n"
+    "EOS KISS M;EOS M50\n"
+    "EOS KISS M2;EOS M50 Mark II\n"
+    "EOS KISS M50m2;EOS M50 Mark II\n"
+    "EOS KISS X10;EOS 250D\n"
+    "EOS KISS X10I;EOS 850D\n"
+    "EOS KISS X2;EOS 450D\n"
+    "EOS KISS X3;EOS 500D\n"
+    "EOS KISS X4;EOS 550D\n"
+    "EOS KISS X5;EOS 600D\n"
+    "EOS KISS X50;EOS 1100D\n"
+    "EOS KISS X6I;EOS 650D\n"
+    "EOS KISS X7;EOS 100D\n"
+    "EOS KISS X70;EOS 1200D\n"
+    "EOS KISS X7I;EOS 700D\n"
+    "EOS KISS X80;EOS 1300D\n"
+    "EOS KISS X8I;EOS 750D\n"
+    "EOS KISS X9;EOS 200D\n"
+    "EOS KISS X90;EOS 2000D\n"
+    "EOS KISS X9I;EOS 800D\n"
+    "EOS REBEL SL1;EOS 100D\n"
+    "EOS REBEL SL2;EOS 200D\n"
+    "EOS REBEL SL3;EOS 250D\n"
+    "EOS REBEL T100;EOS 4000D\n"
+    "EOS REBEL T1I;EOS 500D\n"
+    "EOS REBEL T2I;EOS 550D\n"
+    "EOS REBEL T3;EOS 1100D\n"
+    "EOS REBEL T3I;EOS 600D\n"
+    "EOS REBEL T4I;EOS 650D\n"
+    "EOS REBEL T5;EOS 1200D\n"
+    "EOS REBEL T5I;EOS 700D\n"
+    "EOS REBEL T6;EOS 1300D\n"
+    "EOS REBEL T6I;EOS 750D\n"
+    "EOS REBEL T6S;EOS 760D\n"
+    "EOS REBEL T7;EOS 2000D\n"
+    "EOS REBEL T7I;EOS 800D\n"
+    "EOS REBEL T8I;EOS 850D\n"
+    "EOS REBEL XS;EOS 1000D\n"
+    "EOS REBEL XSI;EOS 450D\n"
+;
+
+static const char* Model_Replace_OpenCube =
+    "OCTK;Toolkit\n"
+    "TK;Toolkit\n"
+;
+
+struct FindReplaceCompany_struct {
+    const char* CompanyName;
+    const char* Find;
+    const char* Prefix;
+};
+
+static const FindReplaceCompany_struct Model_Replace[] = {
+    { "Canon", Model_Replace_Canon, {} },
+    { "OpenCube", Model_Replace_OpenCube, {} },
+}; 
+
+//---------------------------------------------------------------------------
+static const char* Model_Name_Sony =
+    "401SO;Z3\n"
+    "402SO;Z4\n"
+    "501SO;Z5\n"
+    "502SO;X Performance\n"
+    "601SO;XZ\n"
+    "602SO;XZs\n"
+    "701SO;XZ1\n"
+    "702SO;XZ2\n"
+    "801SO;XZ3\n"
+    "802SO;1\n"
+    "901SO;5\n"
+    "902SO;8\n"
+    "A001SO;10 II\n"
+    "A002SO;5 II\n"
+    "A101SO;1 III\n"
+    "A102SO;10 III\n"
+    "A103SO;5 III\n"
+    "A201SO;1 IV\n"
+    "A202SO;10 IV\n"
+    "A203SO;Ace III\n"
+    "A204SO;5 IV\n"
+    "A301SO;1 V\n"
+    "A302SO;10 V\n"
+    "A401SO;1 VI\n"
+    "A402SO;10 VI\n"
+    "C1504;E\n"
+    "C1505;E\n"
+    "C1604;E dual\n"
+    "C1605;E dual\n"
+    "C1904;M\n"
+    "C1905;M\n"
+    "C2004;M dual\n"
+    "C2005;M Dual\n"
+    "C2005;M dual\n"
+    "C2104;L\n"
+    "C2105;L\n"
+    "C2304;C\n"
+    "C2305;C\n"
+    "C5302;SP\n"
+    "C5302;SP\n"
+    "C5303;SP\n"
+    "C5303;SP\n"
+    "C5306;SP\n"
+    "C5306;SP\n"
+    "C5502;ZR\n"
+    "C5503;ZR\n"
+    "C6502;ZL\n"
+    "C6503;ZL\n"
+    "C6506;ZL\n"
+    "C6602;Z\n"
+    "C6603;Z\n"
+    "C6606;Z\n"
+    "C6616;Z\n"
+    "C6802;Z Ultra\n"
+    "C6806;Z Ultra\n"
+    "C6833;Z Ultra\n"
+    "C6843;Z Ultra\n"
+    "C6902;Z1\n"
+    "C6903;Z1\n"
+    "C6906;Z1\n"
+    "C6916;Z1s\n"
+    "C6943;Z1\n"
+    "D2004;E1\n"
+    "D2005;E1\n"
+    "D2104;E1 Dual\n"
+    "D2104;E1 dual\n"
+    "D2105;E1 Dual\n"
+    "D2105;E1 dual\n"
+    "D2114;E1\n"
+    "D2202;E3\n"
+    "D2203;E3\n"
+    "D2206;E3\n"
+    "D2212;E3 Dual\n"
+    "D2243;E3\n"
+    "D2302;M2 Dual\n"
+    "D2302;M2 dual\n"
+    "D2303;M2\n"
+    "D2305;M2\n"
+    "D2306;M2\n"
+    "D2403;M2 Aqua\n"
+    "D2406;M2 Aqua\n"
+    "D2502;C3 Dual\n"
+    "D2533;C3\n"
+    "D5102;T3\n"
+    "D5103;T3\n"
+    "D5106;T3\n"
+    "D5303;T2 Ultra\n"
+    "D5306;T2 Ultra\n"
+    "D5316;T2 Ultra\n"
+    "D5316N;T2 Ultra\n"
+    "D5322;T2 Ultra dual\n"
+    "D5322;T2 Ultra\n"
+    "D5503;Z1 Compact\n"
+    "D5788;J1 Compact\n"
+    "D5803;Z3 Compact\n"
+    "D5833;Z3 Compact\n"
+    "D6502;Z2\n"
+    "D6503;Z2\n"
+    "D6543;Z2\n"
+    "D6563;Z2a\n"
+    "D6603;Z3\n"
+    "D6616;Z3\n"
+    "D6633;Z3\n"
+    "D6643;Z3\n"
+    "D6646;Z3\n"
+    "D6653;Z3\n"
+    "D6683;Z3 Dual TD\n"
+    "D6708;Z3v\n"
+    "E2003;E4g\n"
+    "E2006;E4g\n"
+    "E2033;E4g Dual\n"
+    "E2043;E4g Dual\n"
+    "E2053;E4g\n"
+    "E2104;E4\n"
+    "E2105;E4\n"
+    "E2115;E4 Dual\n"
+    "E2124;E4 Dual\n"
+    "E2303;M4 Aqua\n"
+    "E2306;M4 Aqua\n"
+    "E2312;M4 Aqua Dual\n"
+    "E2333;M4 Aqua Dual\n"
+    "E2353;M4 Aqua\n"
+    "E2363;M4 Aqua Dual\n"
+    "E5303;C4\n"
+    "E5306;C4\n"
+    "E5333;C4 Dual\n"
+    "E5343;C4 Dual\n"
+    "E5353;C4\n"
+    "E5363;C4 Dual\n"
+    "E5506;C5 Ultra\n"
+    "E5533;C5 Ultra Dual\n"
+    "E5553;C5 Ultra\n"
+    "E5563;C5 Ultra Dual\n"
+    "E5603;M5\n"
+    "E5606;M5\n"
+    "E5633;M5 Dual\n"
+    "E5643;M5 Dual\n"
+    "E5653;M5\n"
+    "E5663;M5 Dual\n"
+    "E5803;Z5 Compact\n"
+    "E5823;Z5 Compact\n"
+    "E6508;Z4v\n"
+    "E6533;Z3+ Dual\n"
+    "E6553;Z3+\n"
+    "E6603;Z5\n"
+    "E6633;Z5 Dual\n"
+    "E6653;Z5\n"
+    "E6683;Z5 Dual\n"
+    "E6833;Z5 Premium Dual\n"
+    "E6853;Z5 Premium\n"
+    "E6883;Z5 Premium Dual\n"
+    "F3111;XA\n"
+    "F3112;XA\n"
+    "F3113;XA\n"
+    "F3115;XA\n"
+    "F3116;XA\n"
+    "F3211;XA Ultra\n"
+    "F3212;XA Ultra\n"
+    "F3213;XA Ultra\n"
+    "F3215;XA Ultra\n"
+    "F3216;XA Ultra\n"
+    "F3311;E5\n"
+    "F3313;E5\n"
+    "F5121;X\n"
+    "F5122;X\n"
+    "F5321;X Compact\n"
+    "F8131;X Performance\n"
+    "F8132;X Performance\n"
+    "F8331;XZ\n"
+    "F8332;XZ\n"
+    "G1109;Touch\n"
+    "G1209;Hello\n"
+    "G2199;R1\n"
+    "G2299;R1 Plus\n"
+    "G3112;XA1\n"
+    "G3116;XA1\n"
+    "G3121;XA1\n"
+    "G3123;XA1\n"
+    "G3125;XA1\n"
+    "G3212;XA1 Ultra\n"
+    "G3221;XA1 Ultra\n"
+    "G3223;XA1 Ultra\n"
+    "G3226;XA1 Ultra\n"
+    "G3311;L1\n"
+    "G3312;L1\n"
+    "G3313;L1\n"
+    "G3412;XA1 Plus\n"
+    "G3416;XA1 Plus\n"
+    "G3421;XA1 Plus\n"
+    "G3423;XA1 Plus\n"
+    "G3426;XA1 Plus\n"
+    "G8141;XZ Premium\n"
+    "G8142;XZ Premium Dual\n"
+    "G8188;XZ Premium\n"
+    "G8231;XZs\n"
+    "G8232;XZs Dual\n"
+    "G8341;XZ1\n"
+    "G8342;XZ1 Dual\n"
+    "G8343;XZ1\n"
+    "G8441;XZ1 Compact\n"
+    "H3113;XA2\n"
+    "H3123;XA2\n"
+    "H3133;XA2\n"
+    "H3213;XA2 Ultra\n"
+    "H3223;XA2 Ultra\n"
+    "H3311;L2\n"
+    "H3321;L2\n"
+    "H3413;XA2 Plus\n"
+    "H4113;XA2\n"
+    "H4133;XA2\n"
+    "H4213;XA2 Ultra\n"
+    "H4233;XA2 Ultra\n"
+    "H4311;L2\n"
+    "H4331;L2\n"
+    "H4413;XA2 Plus\n"
+    "H4493;XA2 Plus\n"
+    "H8116;XZ2 Premium\n"
+    "H8166;XZ2 Premium Dual\n"
+    "H8216;XZ2\n"
+    "H8266;XZ2 Dual\n"
+    "H8276;XZ2\n"
+    "H8296;XZ2 Dual\n"
+    "H8314;XZ2 Compact\n"
+    "H8324;XZ2 Compact\n"
+    "H8416;XZ3\n"
+    "H9436;XZ3\n"
+    "H9493;XZ3\n"
+    "I3312;L3\n"
+    "I4312;L3\n"
+    "I4332;L3\n"
+    "J3173;Ace\n"
+    "J3273;8 Lite\n"
+    "J8110;1\n"
+    "J8170;1\n"
+    "J8210;5\n"
+    "J8270;5\n"
+    "J9110;1 Dual\n"
+    "J9180;1\n"
+    "J9210;5 Dual\n"
+    "J9260;5 Dual\n"
+    "M35h;SP\n"
+    "M35t;SP\n"
+    "S39h;C\n"
+    "SGP311;Tablet Z\n"
+    "SGP321;Tablet Z\n"
+    "SGP341;Tablet Z\n"
+    "SGP412;Z Ultra\n"
+    "SGP511;Z2 Tablet\n"
+    "SGP512;Z2 Tablet\n"
+    "SGP521;Z2 Tablet\n"
+    "SGP541;Z2 Tablet\n"
+    "SGP551;Z2 Tablet\n"
+    "SGP561;Z2 Tablet\n"
+    "SGP611;Z3 Tablet Compact\n"
+    "SGP612;Z3 Tablet Compact\n"
+    "SGP621;Z3 Tablet Compact\n"
+    "SGP641;Z3 Tablet Compact\n"
+    "SGP712;Z4 Tablet\n"
+    "SGP771;Z4 Tablet\n"
+    "SO-01F;Z1\n"
+    "SO-01G;Z3\n"
+    "SO-01H;Z5\n"
+    "SO-01J;XZ\n"
+    "SO-01K;XZ1\n"
+    "SO-01L;XZ3\n"
+    "SO-01M;5\n"
+    "SO-02E;Z\n"
+    "SO-02F;Z1f\n"
+    "SO-02G;Z3 Compact\n"
+    "SO-02H;Z5 Compact\n"
+    "SO-02J;X Compact\n"
+    "SO-02K;XZ1 Compact\n"
+    "SO-02L;Ace\n"
+    "SO-03E;Tablet Z\n"
+    "SO-03F;Z2\n"
+    "SO-03G;Z4\n"
+    "SO-03H;Z5 Premium\n"
+    "SO-03J;XZs\n"
+    "SO-03K;XZ2\n"
+    "SO-03L;1\n"
+    "SO-04E;A\n"
+    "SO-04F;A2\n"
+    "SO-04G;A4\n"
+    "SO-04H;X Performance\n"
+    "SO-04J;XZ Premium\n"
+    "SO-04K;XZ2 Premium\n"
+    "SO-05F;Z2 Tablet\n"
+    "SO-05G;Z4 Tablet\n"
+    "SO-05K;XZ2 Compact\n"
+    "SO-41A;10 II\n"
+    "SO-41B;Ace II\n"
+    "SO-51A;1 II\n"
+    "SO-51B;1 III\n"
+    "SO-51C;1 IV\n"
+    "SO-51D;1 V\n"
+    "SO-51E;1 VI\n"
+    "SO-51F;1 VII\n"
+    "SO-52A;5 II\n"
+    "SO-52B;10 III\n"
+    "SO-52C;10 IV\n"
+    "SO-52D;10 V\n"
+    "SO-52E;10 VI\n"
+    "SO-53B;5 III\n"
+    "SO-53C;Ace III\n"
+    "SO-53D;5 V\n"
+    "SO-54C;5 IV\n"
+    "SOG01;1 II\n"
+    "SOG02;5 II\n"
+    "SOG03;1 III\n"
+    "SOG04;10 III\n"
+    "SOG05;5 III\n"
+    "SOG06;1 IV\n"
+    "SOG07;10 IV\n"
+    "SOG08;Ace III\n"
+    "SOG09;5 IV\n"
+    "SOG10;1 V\n"
+    "SOG11;10 V\n"
+    "SOG12;5 V\n"
+    "SOG13;1 VI\n"
+    "SOG14;10 VI\n"
+    "SOL23;Z1\n"
+    "SOL24;Z Ultra\n"
+    "SOL25;ZL2\n"
+    "SOL26;Z3\n"
+    "SOT21;Z2 Tablet\n"
+    "SOT31;Z4 Tablet\n"
+    "SOV31;Z4\n"
+    "SOV32;Z5\n"
+    "SOV33;X Performance\n"
+    "SOV34;XZ\n"
+    "SOV35;XZs\n"
+    "SOV36;XZ1\n"
+    "SOV37;XZ2\n"
+    "SOV38;XZ2 Premium\n"
+    "SOV39;XZ3\n"
+    "SOV40;1\n"
+    "SOV41;5\n"
+    "SOV42;8\n"
+    "SOV42-u;8\n"
+    "SOV43;10 II\n"
+    "XQ-AD51;L4\n"
+    "XQ-AD52;L4\n"
+    "XQ-AQ52;PRO\n"
+    "XQ-AQ62;PRO\n"
+    "XQ-AS42;5 II\n"
+    "XQ-AS52;5 II\n"
+    "XQ-AS62;5 II\n"
+    "XQ-AS72;5 II\n"
+    "XQ-AT42;1 II\n"
+    "XQ-AT51;1 II\n"
+    "XQ-AT52;1 II\n"
+    "XQ-AU42;10 II\n"
+    "XQ-AU51;10 II\n"
+    "XQ-AU52;10 II\n"
+    "XQ-BC42;1 IV\n"
+    "XQ-BC52;1 IV\n"
+    "XQ-BC62;1 IV\n"
+    "XQ-BC72;1 IV\n"
+    "XQ-BE42;PRO-I\n"
+    "XQ-BE52;PRO-I\n"
+    "XQ-BE62;PRO-I\n"
+    "XQ-BE72;PRO-I\n"
+    "XQ-BQ42;5 III\n"
+    "XQ-BQ52;5 III\n"
+    "XQ-BQ62;5 III\n"
+    "XQ-BQ72;5 III\n"
+    "XQ-BT44;10 III Lite\n"
+    "XQ-BT52;10 III\n"
+    "XQ-CC44;10 IV\n"
+    "XQ-CC54;10 IV\n"
+    "XQ-CC72;10 IV\n"
+    "XQ-CQ44;5 IV\n"
+    "XQ-CQ54;5 IV\n"
+    "XQ-CQ62;5 IV\n"
+    "XQ-CQ72;5 IV\n"
+    "XQ-CT44;1 IV\n"
+    "XQ-CT54;1 IV\n"
+    "XQ-CT62;1 IV\n"
+    "XQ-CT72;1 IV\n"
+    "XQ-DC44;10 V\n"
+    "XQ-DC54;10 V\n"
+    "XQ-DC72;10 V\n"
+    "XQ-DE44;5 V\n"
+    "XQ-DE54;5 V\n"
+    "XQ-DE72;5 V\n"
+    "XQ-DQ44;1 V\n"
+    "XQ-DQ54;1 V\n"
+    "XQ-DQ62;1 V\n"
+    "XQ-DQ72;1 V\n"
+    "XQ-EC44;1 VI\n"
+    "XQ-EC54;1 VI\n"
+    "XQ-EC72;1 VI\n"
+    "XQ-ES44;10 VI\n"
+    "XQ-ES54;10 VI\n"
+    "XQ-ES72;10 VI\n"
+    "XQ-FS44;1 VII\n"
+    "XQ-FS54;1 VII\n"
+    "XQ-FS72;1 VII\n"
+;
+
+static const char* Model_Name_Sony_Ericsson =
+    "E10a;X10 mini\n"
+    "E10i;X10 mini\n"
+    "IS11S;Acro\n"
+    "IS12S;acro HD\n"
+    "LT18i;arc S\n"
+    "LT22i;P\n"
+    "LT25i;V\n"
+    "LT26i;S\n"
+    "LT26ii;SL\n"
+    "LT26w;acro S\n"
+    "LT28at;ion\n"
+    "LT28h;ion\n"
+    "LT28i;ion\n"
+    "LT29i;TX\n"
+    "LT30a;T\n"
+    "LT30p;T\n"
+    "MK16a;pro\n"
+    "MK16i;pro\n"
+    "MT11a;neo V\n"
+    "MT11i;neo V\n"
+    "MT15a;neo\n"
+    "MT15i;neo\n"
+    "MT25i;neo L\n"
+    "MT27i;sola\n"
+    "R800a;PLAY\n"
+    "R800at;PLAY\n"
+    "R800i;PLAY\n"
+    "R800x;PLAY\n"
+    "S51SE;mini\n"
+    "SGPT121;Tablet S\n"
+    "SGPT122;Tablet S\n"
+    "SGPT123;Tablet S\n"
+    "SGPT131;Tablet S 3G\n"
+    "SGPT132;Tablet S 3G\n"
+    "SGPT133;Tablet S 3G\n"
+    "SK17a;mini pro\n"
+    "SK17i;mini pro\n"
+    "SO-01B;X10\n"
+    "SO-01C;Arc\n"
+    "SO-01D;PLAY\n"
+    "SO-01E;AX\n"
+    "SO-02C;Acro\n"
+    "SO-02D;S\n"
+    "SO-03C;ray\n"
+    "SO-03D;acro HD\n"
+    "SO-04D;GX\n"
+    "SO-05D;SX\n"
+    "SOL21;VL\n"
+    "SOL22;UL\n"
+    "ST15a;mini\n"
+    "ST15i;mini\n"
+    "ST17i;active\n"
+    "ST18a;ray\n"
+    "ST18i;ray\n"
+    "ST21a;tipo\n"
+    "ST21a2;tipo dual\n"
+    "ST21i;tipo\n"
+    "ST21i2;tipo\n"
+    "ST23a;miro\n"
+    "ST23i;miro\n"
+    "ST25a;U\n"
+    "ST25i;U\n"
+    "ST26a;J\n"
+    "ST26i;J\n"
+    "ST27a;Go\n"
+    "ST27i;Go\n"
+    "U20a;X10 mini pro\n"
+    "U20i;X10 mini pro\n"
+    "X10a;X10\n"
+    "X10i;X10\n"
+;
+
+static constexpr const char* Model_Name_Samsung =
+    "403SC;Tab 4 7.0\n"
+    "404SC;S6 Edge\n"
+    "EK-GC100;Camera\n"
+    "EK-GC110;Camera\n"
+    "EK-GC120;Camera\n"
+    "EK-GC200;Camera 2\n"
+    "EK-GN100;NX\n"
+    "EK-KC10;Camera\n"
+    "EK-KC12;Camera\n"
+    "GT-B533;Chat\n"
+    "GT-B551;Y Pro\n"
+    "GT-B751;Pro\n"
+    "GT-B7810;M Pro 2\n"
+    "GT-B9062;(China)\n"
+    "GT-I550;Europa\n"
+    "GT-I551;Europa\n"
+    "GT-I570;Spica\n"
+    "GT-i5700;Spica\n"
+    "GT-I580;Apollo\n"
+    "GT-I815;W\n"
+    "GT-I816;Ace 2\n"
+    "GT-I819;S3 Mini\n"
+    "GT-I820;S3 Mini Value Edition\n"
+    "GT-I8200;S3 Mini\n"
+    "GT-I8250;Beam\n"
+    "GT-I8258;M Style\n"
+    "GT-I826;Core\n"
+    "GT-I8260;Core Safe\n"
+    "GT-I8262;S3 Duos\n"
+    "GT-I8268;Duos\n"
+    "GT-I8530;Beam\n"
+    "GT-I855;Win\n"
+    "GT-I858;Core Advance\n"
+    "GT-I873;Express\n"
+    "GT-I900;S\n"
+    "GT-I901;S\n"
+    "GT-I905;S\n"
+    "GT-I906;Grand Neo\n"
+    "GT-I907;S Advance\n"
+    "GT-I908;Grand\n"
+    "GT-I910;S2\n"
+    "GT-I911;Grand\n"
+    "GT-I912;Grand\n"
+    "GT-I915;Mega\n"
+    "GT-I916;Grand Neo\n"
+    "GT-I919;S4 Mini\n"
+    "GT-I920;Mega 6.3\n"
+    "GT-I921;S2\n"
+    "GT-I922;Note\n"
+    "GT-I923;Golden\n"
+    "GT-I926;Premier\n"
+    "GT-I929;S4 Active\n"
+    "GT-I930;S3\n"
+    "GT-I950;S4\n"
+    "GT-I951;S4\n"
+    "GT-N510;Note 8.0\n"
+    "GT-N5110;Note 8.0\n"
+    "GT-N5120;Note 8.0\n"
+    "GT-N700;Note\n"
+    "GT-N710;Note 2\n"
+    "GT-N800;Note 10.1\n"
+    "GT-N801;Note 10.1\n"
+    "GT-N8020;Note 10.1\n"
+    "GT-P100;Tab\n"
+    "GT-P101;Tab\n"
+    "GT-P310;Tab 2 7.0\n"
+    "GT-P311;Tab 2 7.0\n"
+    "GT-P5100;Tab 2 10.1\n"
+    "GT-P511;Tab 2 10.1\n"
+    "GT-P5200;Tab 3 10.1\n"
+    "GT-P521;Tab 3 10.1\n"
+    "GT-P5220;Tab 3 10.1\n"
+    "GT-P620;Tab 7.0 Plus\n"
+    "GT-P621;Tab 7.0 Plus\n"
+    "GT-P6800;Tab 7.7\n"
+    "GT-P6810;Tab 7.7\n"
+    "GT-P7100;Tab 10.1 v\n"
+    "GT-P7300;Tab 8.9\n"
+    "GT-P7310;Tab 8.9\n"
+    "GT-P7320;Tab 8.9\n"
+    "GT-P750;Tab 10.1\n"
+    "GT-P7501;Tab 10.1 N\n"
+    "GT-P7510;Tab 10.1\n"
+    "GT-P7511;Tab 10.1 N\n"
+    "GT-S528;Star\n"
+    "GT-S5283B;Star Trios\n"
+    "GT-S530;Pocket\n"
+    "GT-S536;Y\n"
+    "GT-S557;Mini\n"
+    "GT-S566;Gio\n"
+    "GT-S567;Fit\n"
+    "GT-S569;Xcover\n"
+    "GT-S583;Ace\n"
+    "GT-S601;Music\n"
+    "GT-S610;Y Duos\n"
+    "GT-S6108;Y Pop\n"
+    "GT-S631;Young\n"
+    "GT-S6352;Ace Duos\n"
+    "GT-S6358;Ace\n"
+    "GT-S650;Mini2\n"
+    "GT-S679;Fame\n"
+    "GT-S6792;Fame Lite Duos\n"
+    "GT-S680;Ace Duos\n"
+    "GT-S6800;Ace Advance\n"
+    "GT-S681;Fame\n"
+    "GT-S7262;Star Plus\n"
+    "GT-S727;Ace 3\n"
+    "GT-S739;Trend\n"
+    "GT-S750;Ace Plus\n"
+    "GT-S7566;S Duos\n"
+    "GT-S7568I;Trend\n"
+    "GT-S7572;Trend Duos\n"
+    "GT-S771;Xcover 2\n"
+    "GT-S789;Trend 2\n"
+    "ISW11SC;S2 Wimax\n"
+    "SC-01C;Tab\n"
+    "SC-01D;Tab 10.1\n"
+    "SC-01E;Tab 7.7 Plus\n"
+    "SC-01F;Note 3\n"
+    "SC-01G;Note Edge\n"
+    "SC-01H;Active neo\n"
+    "SC-01J;Note7\n"
+    "SC-01K;Note8\n"
+    "SC-01L;Note9\n"
+    "SC-01M;Note10+\n"
+    "SC-02B;S\n"
+    "SC-02C;S2\n"
+    "SC-02D;Tab 7.0 Plus\n"
+    "SC-02E;Note 2\n"
+    "SC-02F;Note 3\n"
+    "SC-02G;S5 Active\n"
+    "SC-02H;S7 Edge\n"
+    "SC-02J;S8\n"
+    "SC-02K;S9\n"
+    "SC-02L;Feel2\n"
+    "SC-02M;A20\n"
+    "SC-03D;S2 LTE\n"
+    "SC-03E;S3\n"
+    "SC-03G;Tab S 8.4\n"
+    "SC-03J;S8+\n"
+    "SC-03K;S9+\n"
+    "SC-03L;S10\n"
+    "SC-04E;S4\n"
+    "SC-04F;S5\n"
+    "SC-04G;S6 Edge\n"
+    "SC-04J;Feel\n"
+    "SC-04L;S10+\n"
+    "SC-05D;Note\n"
+    "SC-05G;S6\n"
+    "SC-05L;S10+ Olympic Games Edition\n"
+    "SC-06D;S3\n"
+    "SC-41A;A41\n"
+    "SC-42A;A21\n"
+    "SC-51A;S20 5G\n"
+    "SC51Aa;S20 5G\n"
+    "SC-51B;S21 5G\n"
+    "SC-51C;S22\n"
+    "SC-51D;S23\n"
+    "SC-51E;S24\n"
+    "SC-51F;S25\n"
+    "SC-52A;S20+ 5G\n"
+    "SC-52B;S21 Ultra 5G\n"
+    "SC-52C;S22 Ultra\n"
+    "SC-52D;S23 Ultra\n"
+    "SC-52E;S24 Ultra\n"
+    "SC-52F;S25 Ultra\n"
+    "SC-53A;Note20 Ultra 5G\n"
+    "SC-53B;A52 5G\n"
+    "SC-53C;A53 5G\n"
+    "SC-53D;A54 5G\n"
+    "SC-53E;A55 5G\n"
+    "SC-53F;A25 5G\n"
+    "SC-54A;A51 5G\n"
+    "SC-54B;Z Flip3 5G\n"
+    "SC-54C;Z Flip4\n"
+    "SC-54D;Z Flip5\n"
+    "SC-54E;Z Flip6\n"
+    "SC-54F;A36 5G\n"
+    "SC-55B;Z Fold3 5G\n"
+    "SC-55C;Z Fold4\n"
+    "SC-55D;Z Fold5\n"
+    "SC-55E;Z Fold6\n"
+    "SC-56B;A22 5G\n"
+    "SC-56C;A23 5G\n"
+    "SCG01;S20 5G\n"
+    "SCG02;S20+ 5G\n"
+    "SCG03;S20 Ultra 5G\n"
+    "SCG04;Z Flip 5G\n"
+    "SCG06;Note20 Ultra 5G\n"
+    "SCG07;A51 5G\n"
+    "SCG08;A32 5G\n"
+    "SCG09;S21 5G\n"
+    "SCG10;S21+ 5G\n"
+    "SCG11;Z Fold3 5G\n"
+    "SCG12;Z Flip3 5G\n"
+    "SCG13;S22\n"
+    "SCG14;S22 Ultra\n"
+    "SCG15;A53 5G\n"
+    "SCG16;Z Fold4\n"
+    "SCG17;Z Flip4\n"
+    "SCG18;A23 5G\n"
+    "SCG19;S23\n"
+    "SCG20;S23 Ultra\n"
+    "SCG21;A54 5G\n"
+    "SCG22;Z Fold5\n"
+    "SCG23;Z Flip5\n"
+    "SCG24;S23 FE\n"
+    "SCG25;S24\n"
+    "SCG26;S24 Ultra\n"
+    "SCG27;A55 5G\n"
+    "SCG28;Z Fold6\n"
+    "SCG29;Z Flip6\n"
+    "SCG30;S24 FE\n"
+    "SCG31;S25\n"
+    "SCG32;S25 Ultra\n"
+    "SCG33;A25 5G\n"
+    "SCH-I20;Stellar\n"
+    "SCH-I400;Continuum\n"
+    "SCH-I405;Stratosphere\n"
+    "SCH-I415;Stratosphere 2\n"
+    "SCH-I43;S4 Mini\n"
+    "SCH-I500;S\n"
+    "SCH-i509;Y\n"
+    "SCH-I53;S3\n"
+    "SCH-I54;S4\n"
+    "SCH-i559;Pop\n"
+    "SCH-i569;Gio\n"
+    "SCH-i579;Ace Duos\n"
+    "SCH-I589;Ace Duos\n"
+    "SCH-I605;Note 2\n"
+    "SCH-I619;Ace\n"
+    "SCH-I629;Fame\n"
+    "SCH-I679;Ace 3\n"
+    "SCH-I705;Tab 2 7.0\n"
+    "SCH-I739;Trend2\n"
+    "SCH-I759;Infinite\n"
+    "SCH-I800;Tab\n"
+    "SCH-I815;Tab 7.7\n"
+    "SCH-I829;Style Duos\n"
+    "SCH-I869;Win\n"
+    "SCH-I879;Grand\n"
+    "SCH-i889;Note\n"
+    "SCH-I905;Tab 10.1\n"
+    "SCH-i909;S\n"
+    "SCH-I915;Tab 2 10.1\n"
+    "SCH-I92;Note 10.1\n"
+    "SCH-i929;S2 Duos\n"
+    "SCH-I93;S3\n"
+    "SCH-I959;S4\n"
+    "SCH-L710;S3\n"
+    "SCH-M828C;Precedent\n"
+    "SCH-N719;Note 2\n"
+    "SCH-P709;Mega 5.8\n"
+    "SCH-P729;Mega 6.3\n"
+    "SCH-P739;Tab 8.9\n"
+    "SCH-R53;S3\n"
+    "SCH-R740;Discover\n"
+    "SCH-R760;S2 Epic\n"
+    "SCH-R760X;S2\n"
+    "SCH-R820;Admire\n"
+    "SCH-R830;Axiom\n"
+    "SCH-R830C;Admire 2\n"
+    "SCH-R890;S4 Mini\n"
+    "SCH-R91;Indulge\n"
+    "SCH-R920;Attain\n"
+    "SCH-R930;Aviator\n"
+    "SCH-R940;Lightray\n"
+    "SCH-R950;Note 2\n"
+    "SCH-R960;Mega 6.3\n"
+    "SCH-R97;S4\n"
+    "SCH-S720C;Proclaim\n"
+    "SCH-S735;Discover\n"
+    "SCH-S738;Centura\n"
+    "SCH-S950C;S\n"
+    "SCH-S96;S3\n"
+    "SCL21;S3 Progre\n"
+    "SCL22;Note 3\n"
+    "SCL23;S5\n"
+    "SCL24;Note Edge\n"
+    "SCT21;Tab S 10.5\n"
+    "SCT22;Tab S9 FE+ 5G\n"
+    "SCV31;S6 Edge\n"
+    "SCV32;A8\n"
+    "SCV33;S7 Edge\n"
+    "SCV34;Note7\n"
+    "SCV35;S8+\n"
+    "SCV36;S8\n"
+    "SCV37;Note8\n"
+    "SCV38;S9\n"
+    "SCV39;S9+\n"
+    "SCV40;Note9\n"
+    "SCV41;S10\n"
+    "SCV42;S10+\n"
+    "SCV43;A30\n"
+    "SCV44;Fold\n"
+    "SCV45;Note10+\n"
+    "SCV46;A20\n"
+    "SCV47;Z Flip\n"
+    "SCV48;A41\n"
+    "SCV49;A21\n"
+    "SGH-I257;S4 Mini\n"
+    "SGH-I257M;S4 Mini\n"
+    "SGH-I317;Note 2\n"
+    "SGH-I337M;S4\n"
+    "SGH-I407;Amp\n"
+    "SGH-I467;Note 8.0\n"
+    "SGH-I497;Tab 2 10.1\n"
+    "SGH-I527;Mega 6.3\n"
+    "SGH-I527M;Mega 6.3\n"
+    "SGH-I537;S4 Active\n"
+    "SGH-I547;Rugby Pro\n"
+    "SGH-I547C;Rugby\n"
+    "SGH-I577;Exhilarate\n"
+    "SGH-I71;Note\n"
+    "SGH-I717;Note\n"
+    "SGH-I727;S2 Skyrocket\n"
+    "SGH-I727R;S2 LTE\n"
+    "SGH-I74;S3\n"
+    "SGH-I747;S3\n"
+    "SGH-I747Z;Pocket Neo\n"
+    "SGH-I757M;S2 HD LTE\n"
+    "SGH-I777;S2\n"
+    "SGH-I827;Ace Q\n"
+    "SGH-I896;Captivate\n"
+    "SGH-I897;Captivate\n"
+    "SGH-I927;Glide\n"
+    "SGH-I95;Tab 8.9\n"
+    "SGH-M819N;Mega 6.3\n"
+    "SGH-M91;S4\n"
+    "SGH-N037;Note7\n"
+    "SGH-N075T;J\n"
+    "SGH-S959G;S2\n"
+    "SGH-S970G;S4\n"
+    "SGH-T49;Mini\n"
+    "SGH-T58;Q\n"
+    "SGH-T59;Exhibit\n"
+    "SGH-T679;Exhibit 2\n"
+    "SGH-T679M;W\n"
+    "SGH-T699;S BlazeQ\n"
+    "SGH-T769;S Blaze\n"
+    "SGH-T779;Tab 2 10.1\n"
+    "SGH-T849;Tab\n"
+    "SGH-T859;Tab 10.1\n"
+    "SGH-T869;Tab 7.0 Plus\n"
+    "SGH-T879;Note\n"
+    "SGH-T88;Note 2\n"
+    "SGH-T95;S Vibrant\n"
+    "SGH-T959P;S Fascinate\n"
+    "SGH-T989;S2\n"
+    "SGH-T989D;S2 X\n"
+    "SGH-T99;S3\n"
+    "SHV-E110S;S2\n"
+    "SHV-E12;S2 HD LTE\n"
+    "SHV-E14;Tab 8.9\n"
+    "SHV-E16;Note\n"
+    "SHV-E17;R-Style\n"
+    "SHV-E21;S3\n"
+    "SHV-E220S;Pop\n"
+    "SHV-E23;Note 10.1\n"
+    "SHV-E25;Note 2\n"
+    "SHV-E27;Grand\n"
+    "SHV-E30;S4\n"
+    "SHV-E31;Mega 6.3\n"
+    "SHV-E33;S4\n"
+    "SHV-E330S;S4 LTE-A\n"
+    "SHV-E37;S4 Mini\n"
+    "SHV-E40;Golden\n"
+    "SHV-E470S;S4 Active\n"
+    "SHV-E50;Win\n"
+    "SHW-M100S;A\n"
+    "SHW-M110S;S\n"
+    "SHW-M130K;K\n"
+    "SHW-M130L;U\n"
+    "SHW-M18;Tab\n"
+    "SHW-M190S;S\n"
+    "SHW-M220L;Neo\n"
+    "SHW-M240;Ace\n"
+    "SHW-M25;S2\n"
+    "SHW-M29;Gio\n"
+    "SHW-M300W;Tab 10.1\n"
+    "SHW-M305W;Tab 8.9\n"
+    "SHW-M34;M Style\n"
+    "SHW-M38;Tab 10.1\n"
+    "SHW-M430W;Tab 7.0 Plus\n"
+    "SHW-M440S;S3\n"
+    "SHW-M48;Note 10.1\n"
+    "SHW-M500;Note 8.0\n"
+    "SHW-M570S;Core Advance\n"
+    "SHW-M58;Core Safe\n"
+    "SM-A013;A01 Core\n"
+    "SM-A015;A01\n"
+    "SM-A022;A02\n"
+    "SM-A025;A02s\n"
+    "SM-A032;A03 Core\n"
+    "SM-A035;A03\n"
+    "SM-A037;A03s\n"
+    "SM-A042;A04e\n"
+    "SM-A045;A04\n"
+    "SM-A047;A04s\n"
+    "SM-A055;A05\n"
+    "SM-A057;A05s\n"
+    "SM-A065;A06\n"
+    "SM-A066;A06 5G\n"
+    "SM-A102;A10e\n"
+    "SM-A105;A10\n"
+    "SM-A107;A10s\n"
+    "SM-A115;A11\n"
+    "SM-A125;A12\n"
+    "SM-A127;A12\n"
+    "SM-A135;A13\n"
+    "SM-A136;A13 5G\n"
+    "SM-A137;A13\n"
+    "SM-A145;A14\n"
+    "SM-A146;A14 5G\n"
+    "SM-A155;A15\n"
+    "SM-A156;A15 5G\n"
+    "SM-A165;A16\n"
+    "SM-A166;A16 5G\n"
+    "SM-A202;A20e\n"
+    "SM-A202K;Jean2\n"
+    "SM-A205;A20\n"
+    "SM-A205S;Wide 4\n"
+    "SM-A207;A20s\n"
+    "SM-A215;A21\n"
+    "SM-A217;A21s\n"
+    "SM-A225;A22\n"
+    "SM-A226;A22 5G\n"
+    "SM-A233;A23 5G\n"
+    "SM-A235;A23\n"
+    "SM-A236;A23 5G\n"
+    "SM-A245;A24\n"
+    "SM-A253;A25 5G\n"
+    "SM-A256;A25 5G\n"
+    "SM-A260;A2 Core\n"
+    "SM-A266;A26 5G\n"
+    "SM-A300;A3\n"
+    "SM-A305;A30\n"
+    "SM-A307;A30s\n"
+    "SM-A310;A3 (2016)\n"
+    "SM-A315;A31\n"
+    "SM-A320;A3 (2017)\n"
+    "SM-A325;A32\n"
+    "SM-A326;A32 5G\n"
+    "SM-A336;A33 5G\n"
+    "SM-A346;A34 5G\n"
+    "SM-A356;A35 5G\n"
+    "SM-A366;A36 5G\n"
+    "SM-A405;A40\n"
+    "SM-A415;A41\n"
+    "SM-A426;A42 5G\n"
+    "SM-A500;A5\n"
+    "SM-A505;A50\n"
+    "SM-A507;A50s\n"
+    "SM-A510;A5 (2016)\n"
+    "SM-A515;A51\n"
+    "SM-A516;A51 5G\n"
+    "SM-A520;A5 (2017)\n"
+    "SM-A525;A52\n"
+    "SM-A526;A52 5G\n"
+    "SM-A528;A52s 5G\n"
+    "SM-A530;A8 (2018)\n"
+    "SM-A536;A53 5G\n"
+    "SM-A556;A55 5G\n"
+    "SM-A566;A56 5G\n"
+    "SM-A600;A6\n"
+    "SM-A605;A6+\n"
+    "SM-A606;A60\n"
+    "SM-A700;A7\n"
+    "SM-A705;A70\n"
+    "SM-A707;A70s\n"
+    "SM-A710;A7 (2016)\n"
+    "SM-A715;A71\n"
+    "SM-A716;A71 5G\n"
+    "SM-A720;A7 (2017)\n"
+    "SM-A725;A72\n"
+    "SM-A730;A8+ (2018)\n"
+    "SM-A736;A73 5G\n"
+    "SM-A750;A7 (2018)\n"
+    "SM-A800;A8\n"
+    "SM-A805;A80\n"
+    "SM-A810;A8 (2016)\n"
+    "SM-A900;A9 (2016)\n"
+    "SM-A908;A90 5G\n"
+    "SM-A910;A9 Pro\n"
+    "SM-A920;A9 (2018)\n"
+    "SM-C101;S4 Zoom\n"
+    "SM-C105;S4 Zoom\n"
+    "SM-C111;K Zoom\n"
+    "SM-C115;K Zoom\n"
+    "SM-C500;C5\n"
+    "SM-C501;C5 Pro\n"
+    "SM-C5560;C55 5G\n"
+    "SM-C700;C7\n"
+    "SM-C701;C7 Pro\n"
+    "SM-C710;C8\n"
+    "SM-C710;J7+\n"
+    "SM-C900;C9 Pro\n"
+    "SM-E025;F02s\n"
+    "SM-E045;F04\n"
+    "SM-E055;F05\n"
+    "SM-E066;F06 5G\n"
+    "SM-E135;F13\n"
+    "SM-E145;F14\n"
+    "SM-E146;F14 5G\n"
+    "SM-E156;F15 5G\n"
+    "SM-E166;F16 5G\n"
+    "SM-E225;F22\n"
+    "SM-E236;F23 5G\n"
+    "SM-E346;F34 5G\n"
+    "SM-E366;F36 5G\n"
+    "SM-E426;F42 5G\n"
+    "SM-E426S;Wide 5\n"
+    "SM-E500;E5\n"
+    "SM-E526;F52 5G\n"
+    "SM-E546;F54 5G\n"
+    "SM-E556;F55 5G\n"
+    "SM-E625;F62\n"
+    "SM-E700;E7\n"
+    "SM-F127;F12\n"
+    "SM-F415;F41\n"
+    "SM-F700;Z Flip\n"
+    "SM-F707;Z Flip 5G\n"
+    "SM-F711;Z Flip3 5G\n"
+    "SM-F721;Z Flip4\n"
+    "SM-F731;Z Flip5\n"
+    "SM-F741;Z Flip6\n"
+    "SM-F761;Z Flip7 FE\n"
+    "SM-F766;Z Flip7\n"
+    "SM-F900;Fold\n"
+    "SM-F907;Fold 5G\n"
+    "SM-F916;Z Fold2 5G\n"
+    "SM-F926;Z Fold3 5G\n"
+    "SM-F936;Z Fold4\n"
+    "SM-F946;Z Fold5\n"
+    "SM-F956;Z Fold6\n"
+    "SM-F958;Z Fold Special Edition\n"
+    "SM-F966;Z Fold7\n"
+    "SM-G110;Pocket 2\n"
+    "SM-G130;Young 2\n"
+    "SM-G150;Folder\n"
+    "SM-G155;Folder\n"
+    "SM-G160;Folder2\n"
+    "SM-G165;Folder2\n"
+    "SM-G165N;Elite\n"
+    "SM-G310;Ace\n"
+    "SM-G313;Ace 4\n"
+    "SM-G313HZ;S Duos 3\n"
+    "SM-G316;Ace 4\n"
+    "SM-G316ML;Ace 4 Neo Duos\n"
+    "SM-G318;Ace 4 Lite\n"
+    "SM-G350;Core Plus\n"
+    "SM-G350;Star 2 Plus\n"
+    "SM-G351;Core LTE\n"
+    "SM-G355;Core 2\n"
+    "SM-G357;Ace\n"
+    "SM-G358;Core Lite\n"
+    "SM-G360;Core Prime\n"
+    "SM-G361;Core Prime\n"
+    "SM-G381;Win Pro\n"
+    "SM-G3812B;S3 Slim\n"
+    "SM-G3815;Express 2\n"
+    "SM-G386;Core LTE\n"
+    "SM-G386;Core\n"
+    "SM-G388;Xcover 3\n"
+    "SM-G389;Xcover 3\n"
+    "SM-G390;Xcover 4\n"
+    "SM-G398FN;XCover 4s\n"
+    "SM-G5108;Core Max\n"
+    "SM-G5108Q;Core Max Duos\n"
+    "SM-G525;XCover 5\n"
+    "SM-G530;Grand Prime\n"
+    "SM-G531;Grand Prime\n"
+    "SM-G532;J2 Prime\n"
+    "SM-G550;On5\n"
+    "SM-G550FY;On5 Pro\n"
+    "SM-G5510;On5 (2016)\n"
+    "SM-G552;On5 (2016)\n"
+    "SM-G556B;XCover7\n"
+    "SM-G570;J5 Prime\n"
+    "SM-G5700;On5 (2016)\n"
+    "SM-G600;On7\n"
+    "SM-G600FY;On7 Pro\n"
+    "SM-G600S;Wide\n"
+    "SM-G610;J7 Prime\n"
+    "SM-G610F;On Nxt\n"
+    "SM-G611;J7 Prime 2\n"
+    "SM-G615F;J7 Max\n"
+    "SM-G615FU;On Max\n"
+    "SM-G710;Grand2\n"
+    "SM-G715;XCover Pro\n"
+    "SM-G720;Grand Max\n"
+    "SM-G730;S3 Mini\n"
+    "SM-G730A;S3 Mini\n"
+    "SM-G736;Xcover 6 Pro\n"
+    "SM-G750;Mega 2\n"
+    "SM-G766;Xcover 7 Pro\n"
+    "SM-G770;S10 Lite\n"
+    "SM-G780;S20 FE\n"
+    "SM-G781;S20 FE 5G\n"
+    "SM-G800;S5 Mini\n"
+    "SM-G850;Alpha\n"
+    "SM-G860P;S5 K Sport\n"
+    "SM-G870;S5 Active\n"
+    "SM-G875;S\n"
+    "SM-G885;A8 Star\n"
+    "SM-G887;A8s\n"
+    "SM-G889;XCover Field Pro\n"
+    "SM-G890;S6 Active\n"
+    "SM-G891;S7 Active\n"
+    "SM-G892;S8 Active\n"
+    "SM-G900;S5\n"
+    "SM-G901;S5 LTE-A\n"
+    "SM-G903;S5 Neo\n"
+    "SM-G906;S5\n"
+    "SM-G910;Round\n"
+    "SM-G920;S6\n"
+    "SM-G925;S6 Edge\n"
+    "SM-G928;S6 Edge+\n"
+    "SM-G930;S7\n"
+    "SM-G935;S7 Edge\n"
+    "SM-G950;S8\n"
+    "SM-G955;S8+\n"
+    "SM-G960;S9\n"
+    "SM-G965;S9+\n"
+    "SM-G970;S10e\n"
+    "SM-G973;S10\n"
+    "SM-G975;S10+\n"
+    "SM-G977;S10 5G\n"
+    "SM-G980;S20\n"
+    "SM-G981;S20 5G\n"
+    "SM-G985;S20+\n"
+    "SM-G986;S20+ 5G\n"
+    "SM-G988;S20 Ultra 5G\n"
+    "SM-G990;S21 FE 5G\n"
+    "SM-G991;S21 5G\n"
+    "SM-G996;S21+ 5G\n"
+    "SM-G998;S21 Ultra 5G\n"
+    "SM-J100;J1\n"
+    "SM-J105;J1 Mini\n"
+    "SM-J106;J1 Mini Prime\n"
+    "SM-J110;J1 Ace\n"
+    "SM-J111;J1 Ace\n"
+    "SM-J120;J1\n"
+    "SM-J200;J2\n"
+    "SM-J210;J2 (2016)\n"
+    "SM-J250;J2 Pro\n"
+    "SM-J260;J2 Core\n"
+    "SM-J260AZ;J2 Pure\n"
+    "SM-J260T1;J2 (2018)\n"
+    "SM-J3109;J3\n"
+    "SM-J311;J3 Pro\n"
+    "SM-J320;J3\n"
+    "SM-J327;J3\n"
+    "SM-J327P;J3 Emerge\n"
+    "SM-J327V;J3 Eclipse\n"
+    "SM-J327VPP;J3 Mission\n"
+    "SM-J330;J3\n"
+    "SM-J330G;J3 Pro\n"
+    "SM-J337;J3\n"
+    "SM-J337P;J3 Achieve\n"
+    "SM-J337R4;J3 Aura\n"
+    "SM-J337T;J3 Star\n"
+    "SM-J337V;J3 V\n"
+    "SM-J337W;J3 (2018)\n"
+    "SM-J400;J4\n"
+    "SM-J410;J4 Core\n"
+    "SM-J415;J4+\n"
+    "SM-J500;J5\n"
+    "SM-J510;J5 (2016)\n"
+    "SM-J530;J5\n"
+    "SM-J600;J6\n"
+    "SM-J600GF;On6\n"
+    "SM-J610;J6+\n"
+    "SM-J700;J7\n"
+    "SM-J701;J7 Neo\n"
+    "SM-J710;J7 (2016)\n"
+    "SM-J710FN;On8\n"
+    "SM-J720;J7 Duo\n"
+    "SM-J727;J7\n"
+    "SM-J727P;J7 Perx\n"
+    "SM-J727S;Wide 2\n"
+    "SM-J727V;J7 V\n"
+    "SM-J730;J7\n"
+    "SM-J737;J7\n"
+    "SM-J737R4;J7 Aura\n"
+    "SM-J737S;Wide 3\n"
+    "SM-J737V;J7 V\n"
+    "SM-J810;J8\n"
+    "SM-J810GF;On8\n"
+    "SM-L300;Watch7\n"
+    "SM-L305;Watch7\n"
+    "SM-L310;Watch7\n"
+    "SM-L315;Watch7\n"
+    "SM-L320;Watch8\n"
+    "SM-L325;Watch8\n"
+    "SM-L330;Watch8\n"
+    "SM-L335;Watch8\n"
+    "SM-L500;Watch8 Classic\n"
+    "SM-L505U;Watch8 Classic\n"
+    "SM-L700;Watch Ultra\n"
+    "SM-L705;Watch Ultra\n"
+    "SM-M013;M01 Core\n"
+    "SM-M015;M01\n"
+    "SM-M017;M01s\n"
+    "SM-M022;M02\n"
+    "SM-M025;M02s\n"
+    "SM-M045;M04\n"
+    "SM-M055;M05\n"
+    "SM-M066;M06 5G\n"
+    "SM-M105;M10\n"
+    "SM-M107;M10s\n"
+    "SM-M115;M11\n"
+    "SM-M127;M12\n"
+    "SM-M135;M13\n"
+    "SM-M136;M13 5G\n"
+    "SM-M145;M14\n"
+    "SM-M146;M14 5G\n"
+    "SM-M156;M15 5G\n"
+    "SM-M156S;Wide 7\n"
+    "SM-M166;M16 5G\n"
+    "SM-M166S;Wide 8\n"
+    "SM-M205;M20\n"
+    "SM-M215;M21\n"
+    "SM-M215G;M21 (2021)\n"
+    "SM-M225;M22\n"
+    "SM-M236;M23 5G\n"
+    "SM-M305;M30\n"
+    "SM-M307;M30s\n"
+    "SM-M315;M31\n"
+    "SM-M317;M31s\n"
+    "SM-M325;M32\n"
+    "SM-M326;M32 5G\n"
+    "SM-M336;M33 5G\n"
+    "SM-M336K;Jump 2\n"
+    "SM-M346;M34 5G\n"
+    "SM-M356;M35 5G\n"
+    "SM-M366;M36 5G\n"
+    "SM-M366K;Jump 4\n"
+    "SM-M405;M40\n"
+    "SM-M426;M42 5G\n"
+    "SM-M446;Jump 3\n"
+    "SM-M515;M51\n"
+    "SM-M526;M52 5G\n"
+    "SM-M536;M53 5G\n"
+    "SM-M546;M54 5G\n"
+    "SM-M556;M55 5G\n"
+    "SM-M558;M55s 5G\n"
+    "SM-M566;M56 5G\n"
+    "SM-M625;M62\n"
+    "SM-N750;Note 3 Neo\n"
+    "SM-N770;Note10 Lite\n"
+    "SM-N900;Note 3\n"
+    "SM-N910;Note 4\n"
+    "SM-N915;NoteEdge\n"
+    "SM-N916;Note 4\n"
+    "SM-N920;Note5\n"
+    "SM-N930;Note7\n"
+    "SM-N935;Note Fan Edition\n"
+    "SM-N950;Note8\n"
+    "SM-N960;Note9\n"
+    "SM-N970;Note10\n"
+    "SM-N971;Note10 5G\n"
+    "SM-N975;Note10+\n"
+    "SM-N976;Note10+ 5G\n"
+    "SM-N980;Note20\n"
+    "SM-N981;Note20 5G\n"
+    "SM-N985;Note20 Ultra\n"
+    "SM-N986;Note20 Ultra 5G\n"
+    "SM-P200;Tab A with S Pen\n"
+    "SM-P205;Tab A with S Pen\n"
+    "SM-P350;Tab A 8.0\n"
+    "SM-P355;Tab A 8.0\n"
+    "SM-P550;Tab A 9.7\n"
+    "SM-P555;Tab A 9.7\n"
+    "SM-P580;Tab A (2016) with S Pen\n"
+    "SM-P583;Tab A (2016) with S Pen\n"
+    "SM-P585;Tab A (2016) with S Pen\n"
+    "SM-P587;Tab A (2016) with S Pen\n"
+    "SM-P588;Tab A (2016) with S Pen\n"
+    "SM-P600;Note 10.1 (2014)\n"
+    "SM-P601;Note 10.1\n"
+    "SM-P602;Note 10.1\n"
+    "SM-P605;Note 10.1\n"
+    "SM-P607;Note 10.1 (2014)\n"
+    "SM-P610;Tab S6 Lite\n"
+    "SM-P613;Tab S6 Lite\n"
+    "SM-P615;Tab S6 Lite\n"
+    "SM-P617;Tab S6 Lite\n"
+    "SM-P619;Tab S6 Lite\n"
+    "SM-P620;Tab S6 Lite\n"
+    "SM-P625;Tab S6 Lite\n"
+    "SM-P900;Note Pro\n"
+    "SM-P901;Note Pro 12.2\n"
+    "SM-P905;Note Pro 12.2\n"
+    "SM-P907;Note Pro 12.2\n"
+    "SM-R860;Watch4\n"
+    "SM-R861;Watch FE\n"
+    "SM-R865;Watch4\n"
+    "SM-R866;Watch FE\n"
+    "SM-R870;Watch4\n"
+    "SM-R875;Watch4\n"
+    "SM-R880;Watch4 Classic\n"
+    "SM-R885;Watch4 Classic\n"
+    "SM-R890;Watch4 Classic\n"
+    "SM-R895;Watch4 Classic\n"
+    "SM-R900;Watch5\n"
+    "SM-R905;Watch5\n"
+    "SM-R910;Watch5\n"
+    "SM-R915;Watch5\n"
+    "SM-R920;Watch5 Pro\n"
+    "SM-R925;Watch5 Pro\n"
+    "SM-R930;Watch6\n"
+    "SM-R935;Watch6\n"
+    "SM-R940;Watch6\n"
+    "SM-R945;Watch6\n"
+    "SM-R950;Watch6 Classic\n"
+    "SM-R955;Watch6 Classic\n"
+    "SM-R960;Watch6 Classic\n"
+    "SM-R965;Watch6 Classic\n"
+    "SM-S111;A01\n"
+    "SM-S124;A02s\n"
+    "SM-S134;A03s\n"
+    "SM-S236;A23 5G\n"
+    "SM-S237;A23 5G\n"
+    "SM-S260;J2\n"
+    "SM-S320;J3 (2016)\n"
+    "SM-S327;J3 Pop\n"
+    "SM-S337;J3 Pop\n"
+    "SM-S357;J3 Orbit\n"
+    "SM-S366;A36 5G\n"
+    "SM-S367;J3 Orbit\n"
+    "SM-S426;A42 5G\n"
+    "SM-S506;A50\n"
+    "SM-S536;A53 5G\n"
+    "SM-S550TL;On5\n"
+    "SM-S711;S23 FE\n"
+    "SM-S721;S24 FE\n"
+    "SM-S727VL;J7 Pop\n"
+    "SM-S737TL;J7 Sky Pro\n"
+    "SM-S757BL;J7 Crown\n"
+    "SM-S765;Ace Style\n"
+    "SM-S766;Ace Style\n"
+    "SM-S767VL;J7 Crown\n"
+    "SM-S777C;J1\n"
+    "SM-S820;Core Prime\n"
+    "SM-S901;S22\n"
+    "SM-S903VL;S5\n"
+    "SM-S906;S22+\n"
+    "SM-S906L;S6\n"
+    "SM-S907VL;S6\n"
+    "SM-S908;S22 Ultra\n"
+    "SM-S911;S23\n"
+    "SM-S916;S23+\n"
+    "SM-S918;S23 Ultra\n"
+    "SM-S920L;Grand Prime\n"
+    "SM-S921;S24\n"
+    "SM-S926;S24+\n"
+    "SM-S928;S24 Ultra\n"
+    "SM-S931;S25\n"
+    "SM-S936;S25+\n"
+    "SM-S937;S25 Edge\n"
+    "SM-S938;S25 Ultra\n"
+    "SM-S975L;S4\n"
+    "SM-S978;E5\n"
+    "SM-T110;Tab 3 Lite\n"
+    "SM-T111;Tab 3 Lite\n"
+    "SM-T113;Tab 3 Lite 7.0\n"
+    "SM-T113NU;Tab 3 V 7.0\n"
+    "SM-T116;Tab 3 VE 7.0\n"
+    "SM-T116BU;Tab Plus 7.0\n"
+    "SM-T116IR;Tab 3 Lite\n"
+    "SM-T116NQ;Tab 3 Lite 7.0\n"
+    "SM-T116NU;Tab 3 V 7.0\n"
+    "SM-T116NY;Tab 3 V 7.0\n"
+    "SM-T210;Tab 3 7.0\n"
+    "SM-T2105;Tab 3 Kids\n"
+    "SM-T210X;Tab 3 8.0\n"
+    "SM-T211;Tab 3 7.0\n"
+    "SM-T212;Tab 3 7.0\n"
+    "SM-T215;Tab 3 7.0\n"
+    "SM-T217;Tab 3 7.0\n"
+    "SM-T220;Tab A7 Lite\n"
+    "SM-T225;Tab A7 Lite\n"
+    "SM-T227;Tab A7 Lite\n"
+    "SM-T230;Tab 4 7.0\n"
+    "SM-T231;Tab 4 7.0\n"
+    "SM-T232;Tab 4 7.0\n"
+    "SM-T235;Tab 4 7.0\n"
+    "SM-T237;Tab 4 7.0\n"
+    "SM-T239;Tab 4 7.0\n"
+    "SM-T2519;Tab Q\n"
+    "SM-T255S;W\n"
+    "SM-T280;Tab A 7.0\n"
+    "SM-T285;Tab A 7.0\n"
+    "SM-T287;Tab A 7.0\n"
+    "SM-T290;Tab A Kids Edition\n"
+    "SM-T310;Tab 3 8.0\n"
+    "SM-T311;Tab 3 8.0\n"
+    "SM-T312;Tab 3 8.0\n"
+    "SM-T315;Tab 3 8.0\n"
+    "SM-T320;Tab Pro 8.4\n"
+    "SM-T325;Tab Pro 8.4\n"
+    "SM-T330;Tab 4 8.0\n"
+    "SM-T331;Tab 4 8.0\n"
+    "SM-T335;Tab 4 8.0\n"
+    "SM-T337;Tab 4 8.0\n"
+    "SM-T350;Tab A 8.0\n"
+    "SM-T355;Tab A 8.0\n"
+    "SM-T357;Tab A 8.0\n"
+    "SM-T360;Tab A\n"
+    "SM-T365;Tab A\n"
+    "SM-T375;Tab E 8.0\n"
+    "SM-T377;Tab E 8.0\n"
+    "SM-T378;Tab E 8.0\n"
+    "SM-T380;Tab A (2017)\n"
+    "SM-T385;Tab A (2017)\n"
+    "SM-T387;Tab A 8.0\n"
+    "SM-T390;Tab Active 2\n"
+    "SM-T395;Tab Active 2\n"
+    "SM-T397;Tab Active 2\n"
+    "SM-T500;Tab A7\n"
+    "SM-T503;Tab A7\n"
+    "SM-T505;Tab A7\n"
+    "SM-T507;Tab A7\n"
+    "SM-T509;Tab A7\n"
+    "SM-T510;Tab A\n"
+    "SM-T515;Tab A\n"
+    "SM-T517;Tab A\n"
+    "SM-T520;Tab Pro 10.1\n"
+    "SM-T525;Tab Pro 10.1\n"
+    "SM-T530;Tab 4 10.1\n"
+    "SM-T531;Tab 4 10.0\n"
+    "SM-T533;Tab 4 10.1\n"
+    "SM-T535;Tab 4 10.0\n"
+    "SM-T536;Tab 4 10.1\n"
+    "SM-T537;Tab 4 10.0\n"
+    "SM-T540;Tab Active Pro\n"
+    "SM-T545;Tab Active Pro\n"
+    "SM-T547;Tab Active Pro\n"
+    "SM-T550;Tab A 9.7\n"
+    "SM-T555;Tab A 9.7\n"
+    "SM-T560;Tab E 9.6\n"
+    "SM-T561;Tab E 9.6\n"
+    "SM-T562;Tab E 9.6\n"
+    "SM-T567;Tab E 9.6\n"
+    "SM-T575;Tab Active 3\n"
+    "SM-T577;Tab Active 3\n"
+    "SM-T580;Tab A 10.1\n"
+    "SM-T583;Tab Advanced 2\n"
+    "SM-T585;Tab A 10.1\n"
+    "SM-T587;Tab A 10.1\n"
+    "SM-T590;Tab A 10.5 (2018)\n"
+    "SM-T595;Tab A 10.5 (2018)\n"
+    "SM-T597;Tab A 10.5 (2018)\n"
+    "SM-T636;Tab Active 4 Pro 5G\n"
+    "SM-T638;Tab Active 4 Pro 5G\n"
+    "SM-T670;View\n"
+    "SM-T677;View\n"
+    "SM-T700;Tab S 8.4\n"
+    "SM-T705;Tab S 8.4\n"
+    "SM-T707;Tab S 8.4\n"
+    "SM-T710;Tab S2 8.0\n"
+    "SM-T713;Tab S2 8.0\n"
+    "SM-T715;Tab S2 8.0\n"
+    "SM-T719;Tab S2\n"
+    "SM-T720;Tab S5e\n"
+    "SM-T725;Tab S5e\n"
+    "SM-T727;Tab S5e\n"
+    "SM-T730;Tab S7 FE\n"
+    "SM-T733;Tab S7 FE\n"
+    "SM-T735;Tab S7 FE\n"
+    "SM-T736;Tab S7 FE 5G\n"
+    "SM-T737;Tab S7 FE\n"
+    "SM-T738;Tab S7 FE 5G\n"
+    "SM-T800;Tab S 10.5\n"
+    "SM-T805;Tab S 10.5\n"
+    "SM-T807;Tab S 10.5\n"
+    "SM-T810;Tab S2 9.7\n"
+    "SM-T813;Tab S2 9.7\n"
+    "SM-T815;Tab S2 9.7\n"
+    "SM-T817;Tab S2 9.7\n"
+    "SM-T818;Tab S2 9.7\n"
+    "SM-T819;Tab S2\n"
+    "SM-T820;Tab S3\n"
+    "SM-T825;Tab S3\n"
+    "SM-T827;Tab S3\n"
+    "SM-T830;Tab S4\n"
+    "SM-T835;Tab S4\n"
+    "SM-T837;Tab S4\n"
+    "SM-T860;Tab S6\n"
+    "SM-T865;Tab S6\n"
+    "SM-T866;Tab S6 5G\n"
+    "SM-T867;Tab S6\n"
+    "SM-T870;Tab S7\n"
+    "SM-T875;Tab S7\n"
+    "SM-T878;Tab S7 5G\n"
+    "SM-T900;Tab Pro 12.2\n"
+    "SM-T905;Tab Pro 12.2\n"
+    "SM-T927;View 2\n"
+    "SM-T970;Tab S7+\n"
+    "SM-T975;Tab S7+\n"
+    "SM-T976;Tab S7+ 5G\n"
+    "SM-T978;Tab S7+ 5G\n"
+    "SMT-i9100;Tab\n"
+    "SM-W2015;Golden 2\n"
+    "SM-X110;Tab A9\n"
+    "SM-X115;Tab A9\n"
+    "SM-X117;Tab A9\n"
+    "SM-X200;Tab A8\n"
+    "SM-X205;Tab A8\n"
+    "SM-X207;Tab A8\n"
+    "SM-X210;Tab A9+\n"
+    "SM-X216;Tab A9+ 5G\n"
+    "SM-X218;Tab A9+ 5G\n"
+    "SM-X300;Tab Active 5\n"
+    "SM-X306;Tab Active 5 5G\n"
+    "SM-X308;Tab Active 5 5G\n"
+    "SM-X350;Tab Active 5 Pro\n"
+    "SM-X356;Tab Active 5 Pro 5G\n"
+    "SM-X358;Tab Active 5 Pro 5G\n"
+    "SM-X510;Tab S9 FE\n"
+    "SM-X516;Tab S9 FE 5G\n"
+    "SM-X518;Tab S9 FE 5G\n"
+    "SM-X520;Tab S10 FE\n"
+    "SM-X526;Tab S10 FE 5G\n"
+    "SM-X528;Tab S10 FE 5G\n"
+    "SM-X610;Tab S9 FE+\n"
+    "SM-X616;Tab S9 FE+ 5G\n"
+    "SM-X620;Tab S10 FE+\n"
+    "SM-X626;Tab S10 FE+ 5G\n"
+    "SM-X700;Tab S8\n"
+    "SM-X706;Tab S8 5G\n"
+    "SM-X710;Tab S9\n"
+    "SM-X716;Tab S9 5G\n"
+    "SM-X800;Tab S8+\n"
+    "SM-X806;Tab S8+ 5G\n"
+    "SM-X808;Tab S8+ 5G\n"
+    "SM-X810;Tab S9+\n"
+    "SM-X816;Tab S9+ 5G\n"
+    "SM-X818;Tab S9+ 5G\n"
+    "SM-X820;Tab S10+\n"
+    "SM-X826;Tab S10+ 5G\n"
+    "SM-X828;Tab S10+ 5G\n"
+    "SM-X900;Tab S8 Ultra\n"
+    "SM-X906;Tab S8 Ultra 5G\n"
+    "SM-X910;Tab S9 Ultra\n"
+    "SM-X916;Tab S9 Ultra 5G\n"
+    "SM-X920;Tab S10 Ultra\n"
+    "SM-X926;Tab S10 Ultra 5G\n"
+    "SPH-D70;S Epic\n"
+    "SPH-D71;S2 Epic\n"
+    "SPH-L300;Victory\n"
+    "SPH-L520;S4 Mini\n"
+    "SPH-L600;Mega 6.3\n"
+    "SPH-L71;S3\n"
+    "SPH-L72;S4\n"
+    "SPH-L900;Note 2\n"
+    "SPH-M820;Prevail\n"
+    "SPH-M830;Rush\n"
+    "SPH-M840;Prevail 2\n"
+    "SPH-M950;Reverb\n"
+    "SPH-P100;Tab 7.0\n"
+    "SPH-P500;Tab 2 10.1\n"
+    "SPH-P600;Note 10.1\n"
+    "YP-G1;Player 4.0\n"
+    "YP-G50;Player 50\n"
+    "YP-G70;Player 5\n"
+    "YP-GB1;Player 4\n"
+    "YP-GB70;Player\n"
+    "YP-GB70D;Player 70 Plus\n"
+    "YP-GI1;Player 4.2\n"
+    "YP-GI2;070\n"
+    "YP-GP1;Player 5.8\n"
+    "YP-GS1;Player 3.6\n"
+;
+
+static const char* Model_Name_Xiaomi =
+    "21051182C;Pad 5\n"
+    "21051182G;Pad 5\n"
+    "2106118C;MIX 4\n"
+    "2107113SG;11T Pro\n"
+    "2107113SI;11T Pro\n"
+    "2107113SR;11T Pro\n"
+    "2107119DC;Mi 11 LE\n"
+    "21081111RG;11T\n"
+    "21091116I;11i\n"
+    "21091116UI;11i HyperCharge\n"
+    "2109119BC;Civi\n"
+    "2109119DG;11 Lite 5G NE\n"
+    "2109119DI;11 Lite NE\n"
+    "2112123AC;12X\n"
+    "2201122C;12 Pro\n"
+    "2201122G;12 Pro\n"
+    "2201123C;12\n"
+    "2201123G;12\n"
+    "2203121C;12S Ultra\n"
+    "2203129G;12 Lite\n"
+    "22061218C;MIX Fold 2\n"
+    "2206122SC;12S Pro\n"
+    "2206123SC;12S\n"
+    "2207117BPG;POCO M5s\n"
+    "22071212AG;12T\n"
+    "2207122MC;12 Pro Dimensity\n"
+    "22081212C;12T Pro\n"
+    "22081212R;12T Pro\n"
+    "22081212UG;12T Pro\n"
+    "22081281AC;Pad 5 Pro\n"
+    "2209129SC;Civi 2\n"
+    "2210129SG;13 Lite\n"
+    "2210132C;13 pro\n"
+    "2210132G;13 Pro\n"
+    "2211133C;13\n"
+    "2211133G;13\n"
+    "22200414R;12T Pro\n"
+    "23043RP34C;Pad 6\n"
+    "23043RP34G;Pad 6\n"
+    "23043RP34G;pad 6\n"
+    "23043RP34I;Pad 6\n"
+    "23046PNC9C;civi 3\n"
+    "23046RP50C;pad 6 Pro\n"
+    "2304FPN6DC;13 Ultra\n"
+    "2304FPN6DG;13 Ultra\n"
+    "2306EPN60G;13T\n"
+    "23078PND5G;13T Pro\n"
+    "2307BRPDCC;Pad 6 Max 14\n"
+    "23088PND5R;13T Pro\n"
+    "2308CPXD0C;MIX Fold 3\n"
+    "23116PN5BC;14 Pro\n"
+    "2311BPN23C;14 Pro\n"
+    "23127PN0CC;14\n"
+    "23127PN0CG;14\n"
+    "24018RPACG;Pad 6S Pro 12.4\n"
+    "24030PN60G;14 Ultra\n"
+    "24031PN0DC;14 Ultra\n"
+    "24053PY09C;Civi 4\n"
+    "24053PY09I;14 Civi\n"
+    "2405CPX3DC;MIX Flip\n"
+    "2405CPX3DG;MIX Flip\n"
+    "2406APNFAG;14T\n"
+    "24072PX77C;MIX Fold 4\n"
+    "2407FPN8EG;14T Pro\n"
+    "2407FPN8ER;14T Pro\n"
+    "24091RPADC;Pad 7 Pro\n"
+    "24091RPADG;Pad 7 Pro\n"
+    "2410CRP4CC;Pad 7\n"
+    "2410CRP4CG;Pad 7\n"
+    "2410CRP4CI;Pad 7\n"
+    "2410DPN6CC;15 Pro\n"
+    "24117RK2CG;POCO F7 Pro\n"
+    "24129PN74C;15\n"
+    "24129PN74G;15\n"
+    "24129PN74I;15\n"
+    "25010PN30C;15 Ultra\n"
+    "25010PN30G;15 Ultra\n"
+    "25010PN30I;15 Ultra\n"
+    "25019PNF3C;15 Ultra\n"
+    "25032RP42C;Pad 7 Ultra\n"
+    "25042PN24C;15S Pro\n"
+    "A201XM;12T Pro\n"
+    "A301XM;13T Pro\n"
+    "A402XM;14T Pro\n"
+    "M2002J9E;Mi 10 Lite zoom\n"
+    "M2002J9G;Mi 10 lite 5G\n"
+    "M2002J9S;Mi 10 lite 5G\n"
+    "M2007J17G;Mi 10T Lite\n"
+    "M2007J17I;Mi 10i\n"
+    "M2007J1SC;Mi 10 Ultra\n"
+    "M2007J3SG;Mi 10T Pro\n"
+    "M2007J3SI;Mi 10T pro\n"
+    "M2007J3SP;Mi 10T\n"
+    "M2007J3SY;Mi 10T\n"
+    "M2011J18C;Xiaomi MIX Fold\n"
+    "M2011K2C;Mi 11\n"
+    "M2011K2G;Mi 11\n"
+    "M2012K11G;Mi 11i\n"
+    "M2012K11I;Mi 11X Pro\n"
+    "M2101K9AG;Mi 11 Lite\n"
+    "M2101K9AI;Mi 11 Lite\n"
+    "M2101K9C;Mi 11 Lite 5G\n"
+    "M2101K9G;Mi 11 Lite 5G\n"
+    "M2102J2SC;Mi 10S\n"
+    "M2102K1AC;Mi 11 Pro\n"
+    "M2102K1C;Mi 11 Ultra\n"
+    "M2102K1G;Mi 11 Ultra\n"
+    "M2105K81AC;Pad 5 Pro\n"
+    "M2105K81C;Pad 5 Pro 5G\n"
+    "XIG01;Mi 10 Lite 5G\n"
+    "XIG04;13T\n"
+    "XIG07;14T\n"
+;
+
+static const FindReplaceCompany_struct Model_Name[] = {
+    { "Sony", Model_Name_Sony, "Xperia " },
+    { "Sony Ericsson", Model_Name_Sony_Ericsson, "Xperia " },
+    { "Samsung", Model_Name_Samsung, "Galaxy " },
+    { "Xiaomi", Model_Name_Xiaomi, {} },
+};
+
+//---------------------------------------------------------------------------
+static const char* VersionPrefixes =
+    ", VERSION:\n"
+    "FILE VERSION\n"
+    "RELEASE\n"
+    "V\n"
+    "VER\n"
+    "VERSION\n"
+;
 
 //---------------------------------------------------------------------------
 extern MediaInfo_Config Config;
@@ -444,6 +2503,7 @@ void File__Analyze::Streams_Finish_Global()
     Streams_Finish_StreamOnly();
     Streams_Finish_InterStreams();
     Streams_Finish_StreamOnly();
+    Streams_Finish_StreamOnly_General_Curate(0);
 
     Config->File_ExpandSubs_Update((void**)(&Stream_More));
 
@@ -1039,55 +3099,88 @@ void File__Analyze::Streams_Finish_StreamOnly_General(size_t StreamPos)
         }
     }
     {
-        const auto& Hardware_CompanyName=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_CompanyName);
-        const auto& Hardware_Name=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Name);
-        if (Hardware_Name.rfind(Hardware_CompanyName+__T(' '), 0) == 0)
-            Fill(Stream_General, StreamPos, General_Encoded_Hardware_Name, Hardware_Name.substr(Hardware_CompanyName.size()+1), true);
+        if (Retrieve_Const(Stream_General, StreamPos, General_Encoded_OperatingSystem_Name).empty()) {
+            auto Application = Retrieve_Const(Stream_General, StreamPos, General_Encoded_Application).To_UTF8();
+            auto pos = Application.rfind(" (Android)");
+            if (Application.length() >= 12) {
+            if (pos == Application.length() - 10) {
+                Application.erase(pos, 10);
+                Fill(Stream_General, 0, General_Encoded_OperatingSystem_Name, "Android");
+            }
+            pos = Application.rfind(" (Macintosh)");
+            if (pos == Application.length() - 12) {
+                Application.erase(pos, 12);
+                Fill(Stream_General, 0, General_Encoded_OperatingSystem_Name, "macOS");
+            }
+            pos = Application.rfind(" (Windows)");
+            if (pos == Application.length() - 10) {
+                Application.erase(pos, 10);
+                Fill(Stream_General, 0, General_Encoded_OperatingSystem_Name, "Windows");
+            }
+            }
+            if (Application != Retrieve_Const(Stream_General, 0, General_Encoded_Application).To_UTF8())
+                Fill(Stream_General, 0, General_Encoded_Application, Application, true, true);
+        }
+        if (Retrieve_Const(Stream_General, StreamPos, General_Encoded_OperatingSystem_CompanyName).empty()) {
+            const auto OperatingSystem = Retrieve_Const(Stream_General, StreamPos, General_Encoded_OperatingSystem_Name).To_UTF8();
+            if (OperatingSystem == "Android")
+                Fill(Stream_General, 0, General_Encoded_OperatingSystem_CompanyName, "Google");
+            if (OperatingSystem == "macOS")
+                Fill(Stream_General, 0, General_Encoded_OperatingSystem_CompanyName, "Apple");
+            if (OperatingSystem == "Windows")
+                Fill(Stream_General, 0, General_Encoded_OperatingSystem_CompanyName, "Microsoft");
+        }
+    }
+    {
+        const auto& Hardware_CompanyName = Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_CompanyName);
+        const auto& Hardware_Name = Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Name);
+        if (Hardware_Name.rfind(Hardware_CompanyName + __T(' '), 0) == 0)
+            Fill(Stream_General, StreamPos, General_Encoded_Hardware_Name, Hardware_Name.substr(Hardware_CompanyName.size() + 1), true);
     }
     if (Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Name).empty())
     {
-        const auto& Performer=Retrieve_Const(Stream_General, StreamPos, General_Performer);
-        const auto& Hardware_CompanyName=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_CompanyName);
+        const auto& Performer = Retrieve_Const(Stream_General, StreamPos, General_Performer);
+        const auto& Hardware_CompanyName = Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_CompanyName);
         ZtringList PerformerList;
         PerformerList.Separator_Set(0, __T(" / "));
         PerformerList.Write(Performer);
         set<Ztring> HardwareName_List;
-        for (size_t i=0; i<PerformerList.size(); i++)
+        for (size_t i = 0; i < PerformerList.size(); i++)
         {
-            const auto& PerformerItem=PerformerList[i];
-            auto ShortAndContainsHardwareCompanyName=PerformerItem.size()-Hardware_CompanyName.size()<=16 && PerformerItem.rfind(Hardware_CompanyName+__T(' '), 0)==0;
-            if (ShortAndContainsHardwareCompanyName || Hardware_CompanyName==__T("Samsung") && PerformerItem.size()<=32 && PerformerItem.rfind(__T("Galaxy "), 0)==0)
+            const auto& PerformerItem = PerformerList[i];
+            auto ShortAndContainsHardwareCompanyName = PerformerItem.size() - Hardware_CompanyName.size() <= 16 && PerformerItem.rfind(Hardware_CompanyName + __T(' '), 0) == 0;
+            if (ShortAndContainsHardwareCompanyName || Hardware_CompanyName == __T("Samsung") && PerformerItem.size() <= 32 && PerformerItem.rfind(__T("Galaxy "), 0) == 0)
             {
                 ZtringList Items;
                 Items.Separator_Set(0, __T(" "));
                 Items.Write(PerformerItem);
-                if (Items.size()<6)
+                if (Items.size() < 6)
                 {
-                    auto IsLikelyName=false;
-                    auto LastHasOnlyDigits=false;
+                    auto IsLikelyName = false;
+                    auto LastHasOnlyDigits = false;
                     for (const auto& Item : Items)
                     {
-                        size_t HasUpper=0;
-                        size_t HasDigit=0;
+                        size_t HasUpper = 0;
+                        size_t HasDigit = 0;
                         for (const auto& Value : Item)
                         {
-                            HasUpper+=IsAsciiUpper(Value);
-                            HasDigit+=IsAsciiDigit(Value);
+                            HasUpper += IsAsciiUpper(Value);
+                            HasDigit += IsAsciiDigit(Value);
                         }
-                        LastHasOnlyDigits=HasDigit==Item.size();
-                        if (Item.size()==1 || HasUpper>=2 || (HasDigit && HasDigit<Item.size()))
-                            IsLikelyName=true;
+                        LastHasOnlyDigits = HasDigit == Item.size();
+                        if (Item.size() == 1 || HasUpper >= 2 || (HasDigit && HasDigit < Item.size()))
+                            IsLikelyName = true;
                     }
                     if (IsLikelyName || LastHasOnlyDigits)
                     {
-                        HardwareName_List.insert(PerformerItem.substr(ShortAndContainsHardwareCompanyName?(Hardware_CompanyName.size()+1):0));
-                        PerformerList.erase(PerformerList.begin()+i);
+                        HardwareName_List.insert(PerformerItem.substr(ShortAndContainsHardwareCompanyName ? (Hardware_CompanyName.size() + 1) : 0));
+                        PerformerList.erase(PerformerList.begin() + i);
                         continue;
                     }
                 }
             }
         }
-        if (HardwareName_List.size()==1)
+        if (HardwareName_List.size() == 1)
         {
             //Performer is likely the actual performer
             Fill(Stream_General, StreamPos, General_Encoded_Hardware_Name, *HardwareName_List.begin());
@@ -1095,9 +3188,9 @@ void File__Analyze::Streams_Finish_StreamOnly_General(size_t StreamPos)
         }
     }
     {
-        const auto& Name=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Name);
-        const auto& Model=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Model);
-        if (Name==Model)
+        const auto& Name = Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Name);
+        const auto& Model = Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Model);
+        if (Name == Model)
         {
             //Name is actually the model (technical name), keeping only model
             Clear(Stream_General, StreamPos, General_Encoded_Hardware_Name);
@@ -1108,62 +3201,604 @@ void File__Analyze::Streams_Finish_StreamOnly_General(size_t StreamPos)
     if (Retrieve_Const(Stream_General, StreamPos, General_Encoded_OperatingSystem_String).empty())
     {
         //Filling
-        const auto& CompanyName=Retrieve_Const(Stream_General, StreamPos, General_Encoded_OperatingSystem_CompanyName);
-        const auto& Name=Retrieve_Const(Stream_General, StreamPos, General_Encoded_OperatingSystem_Name);
-        const auto& Version=Retrieve_Const(Stream_General, StreamPos, General_Encoded_OperatingSystem_Version);
-        Ztring OperatingSystem=CompanyName;
+        const auto& CompanyName = Retrieve_Const(Stream_General, StreamPos, General_Encoded_OperatingSystem_CompanyName);
+        const auto& Name = Retrieve_Const(Stream_General, StreamPos, General_Encoded_OperatingSystem_Name);
+        const auto& Version = Retrieve_Const(Stream_General, StreamPos, General_Encoded_OperatingSystem_Version);
+        Ztring OperatingSystem = CompanyName;
         if (!Name.empty())
         {
             if (!OperatingSystem.empty())
-                OperatingSystem+=' ';
-            OperatingSystem+=Name;
+                OperatingSystem += ' ';
+            OperatingSystem += Name;
             if (!Version.empty())
             {
-                OperatingSystem+=' ';
-                OperatingSystem+=Version;
+                OperatingSystem += ' ';
+                OperatingSystem += Version;
             }
         }
         Fill(Stream_General, StreamPos, General_Encoded_OperatingSystem_String, OperatingSystem);
     }
+}
 
-    //Hardware
-    if (Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_String).empty())
-    {
-        //Filling
-        const auto& CompanyName=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_CompanyName);
-        const auto& Name=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Name);
-        const auto& Model=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Model);
-        const auto& Version=Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Version);
-        if (!CompanyName.empty() && Model.rfind(CompanyName + __T(' '), 0) == 0) {
-            Fill(Stream_General, StreamPos, General_Encoded_Hardware_Model, Model.substr(CompanyName.size() + 1), true);
-        }
-        if (CompanyName == __T("NIKON CORPORATION") && Model.rfind(__T("NIKON "), 0) == 0) {
-            Fill(Stream_General, StreamPos, General_Encoded_Hardware_CompanyName, "Nikon", Unlimited, true, true);
-            Fill(Stream_General, StreamPos, General_Encoded_Hardware_Model, Model.substr(6), true);
-        }
-        Ztring Hardware=CompanyName;
-        if (!Name.empty())
-        {
-            if (!Hardware.empty())
-                Hardware+=' ';
-            Hardware+=Name;
-        }
-        if (!Model.empty())
-        {
-            if (!Hardware.empty())
-                Hardware+=' ';
-            if (!Name.empty())
-                Hardware+='(';
-            Hardware+=Model;
-            if (!Name.empty())
-                Hardware+=')';
-        }
-        if (!Hardware.empty() && !Version.empty())
-            Hardware+=Version;
-        Fill(Stream_General, StreamPos, General_Encoded_Hardware_String, Hardware);
+//---------------------------------------------------------------------------
+void File__Analyze::Streams_Finish_StreamOnly_General_Curate(size_t StreamPos)
+{
+    // Remove redundant content
+    if (Retrieve_Const(Stream_General, StreamPos, General_Copyright) == Retrieve_Const(Stream_General, StreamPos, General_Encoded_Library_Name)) {
+        Clear(Stream_General, StreamPos, General_Copyright);
+    }
+    if (Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_CompanyName) == Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Model)) {
+        Clear(Stream_General, StreamPos, General_Encoded_Hardware_CompanyName);
     }
 
-    //Redundancy
+    // Remove useless characters
+    auto RemoveUseless = [&](size_t Parameter) {
+        for (;;) {
+            const auto& Value = Retrieve_Const(Stream_General, StreamPos, Parameter);
+            if (Value.size() < 2) {
+                return;
+            }
+            if (Value.find_first_not_of(__T("0. ")) == string::npos) {
+                Clear(Stream_General, StreamPos, Parameter);
+                continue;
+            }
+            if (Value.front() == '[' && Value.back() == ']') {
+                Fill(Stream_General, StreamPos, Parameter, Value.substr(1, Value.size() - 2), true);
+                continue;
+            }
+            if (Value.front() == '<' && Value.back() == '>') {
+                Fill(Stream_General, StreamPos, Parameter, Value.substr(1, Value.size() - 2), true);
+                continue;
+            }
+            if (Value.rfind(__T("< "), 0) == 0 && Value.find(__T(" >"), Value.size() - 2) != string::npos) {
+                Fill(Stream_General, StreamPos, Parameter, Value.substr(2, Value.size() - 4), true);
+                continue;
+            }
+            if (Value.rfind(__T("Digital Camera "), 0) == 0) {
+                Fill(Stream_General, StreamPos, Parameter, Value.substr(15), true);
+                continue;
+            }
+            if (Value.rfind(__T("encoded by "), 0) == 0) {
+                Fill(Stream_General, StreamPos, Parameter, Value.substr(11), true);
+                continue;
+            }
+            if (Value.rfind(__T("This file was made by "), 0) == 0) {
+                Fill(Stream_General, StreamPos, Parameter, Value.substr(22), true);
+                continue;
+            }
+            if (Value.rfind(__T("made by "), 0) == 0) {
+                Fill(Stream_General, StreamPos, Parameter, Value.substr(8), true);
+                continue;
+            }
+            if (Value.rfind(__T("KODAK EASYSHARE "), 0) == 0) {
+                Fill(Stream_General, StreamPos, Parameter, __T("KODAK EasyShare") + Value.substr(15), true);
+                continue;
+            }
+            if (Value.rfind(__T("PENTAX "), 0) == 0) {
+                Fill(Stream_General, StreamPos, Parameter, __T("Pentax ") + Value.substr(7), true);
+                Fill(Stream_General, StreamPos, General_Encoded_Hardware_CompanyName, "Ricoh", Unlimited, true, true);
+                continue;
+            }
+            {
+            auto Pos = Value.find(__T("(R)"));
+            if (Pos != string::npos) {
+                Fill(Stream_General, StreamPos, Parameter, Value.substr(0, Pos) + Value.substr(Pos + 3), true);
+                continue;
+            }
+            }
+            {
+            auto Pos = Value.find(__T(" DIGITAL CAMERA"));
+            if (Pos != string::npos) {
+                Fill(Stream_General, StreamPos, Parameter, Value.substr(0, Pos) + Value.substr(Pos + 15), true);
+                continue;
+            }
+            }
+            {
+            auto Pos = Value.find(__T(" Digital Camera"));
+            if (Pos != string::npos) {
+                Fill(Stream_General, StreamPos, Parameter, Value.substr(0, Pos) + Value.substr(Pos + 15), true);
+                continue;
+            }
+            }
+            {
+            auto Pos = Value.find(__T(" Series"));
+            if (Pos != string::npos) {
+                Fill(Stream_General, StreamPos, Parameter, Value.substr(0, Pos) + Value.substr(Pos + 7), true);
+                continue;
+            }
+            }
+            {
+            auto Pos = Value.find(__T(" series"));
+            if (Pos != string::npos) {
+                Fill(Stream_General, StreamPos, Parameter, Value.substr(0, Pos) + Value.substr(Pos + 7), true);
+                continue;
+            }
+            }
+            {
+            auto Pos = Value.find(__T(" ZOOM"));
+            if (Pos != string::npos) {
+                Fill(Stream_General, StreamPos, Parameter, Value.substr(0, Pos) + __T(" Zoom") + Value.substr(Pos + 5), true);
+                continue;
+            }
+            }
+            break;
+        }
+    };
+    RemoveUseless(General_Encoded_Application);
+    RemoveUseless(General_Encoded_Application_CompanyName);
+    RemoveUseless(General_Encoded_Application_Name);
+    RemoveUseless(General_Encoded_Library);
+    RemoveUseless(General_Encoded_Library_Name);
+    RemoveUseless(General_Encoded_Hardware_CompanyName);
+    RemoveUseless(General_Encoded_Hardware_Model);
+
+    // Remove company legal suffixes and rename some company trademarks
+    auto RemoveLegal = [&](size_t Parameter) {
+        bool DoAgain;
+        do {
+            DoAgain = false;
+            const auto& CompanyName = Retrieve_Const(Stream_General, StreamPos, Parameter);
+            if (CompanyName.empty()) {
+                return;
+            }
+            auto CompanyNameU = CompanyName;
+            CompanyNameU.MakeUpperCase();
+            for (const auto& CompanySuffix : NewlineRange(CompanySuffixes)) {
+                auto len = CompanySuffix.size();
+                auto CompanySuffixU = Ztring().From_UTF8(CompanySuffix.data(), len);
+                len++;
+                if (len < CompanyNameU.size() - 1
+                    && (CompanyNameU[CompanyNameU.size() - len] == ' '
+                        || CompanyNameU[CompanyNameU.size() - len] == ','
+                        || CompanyNameU[CompanyNameU.size() - len] == '_'
+                        || CompanyNameU[CompanyNameU.size() - len] == '-')
+                    && CompanyNameU.find(CompanySuffixU, CompanyNameU.size() - len) != string::npos) {
+                    if (len < CompanyName.size() && CompanyName[CompanyName.size() - (len + 1)] == ',') {
+                        len++;
+                    }
+                    Fill(Stream_General, StreamPos, Parameter, CompanyName.substr(0, CompanyName.size() - len), true);
+                    DoAgain = true;
+                    break;
+                }
+                if (CompanyNameU == CompanySuffixU) {
+                    Clear(Stream_General, StreamPos, Parameter);
+                }
+            }
+        } while (DoAgain);
+
+        {
+            const auto& CompanyName = Retrieve_Const(Stream_General, StreamPos, Parameter);
+            auto CompanyNameU = CompanyName;
+            CompanyNameU.MakeUpperCase();
+            if (CompanyNameU.size() > 8
+                && CompanyNameU[0] == '('
+                && CompanyNameU[1] == 'C'
+                && CompanyNameU[2] == ')'
+                && CompanyNameU[3] == ' '
+                && IsAsciiDigit(CompanyNameU[4])
+                && IsAsciiDigit(CompanyNameU[5])
+                && IsAsciiDigit(CompanyNameU[6])
+                && IsAsciiDigit(CompanyNameU[7])
+                && CompanyNameU[8] == ' ') {
+                Fill(Stream_General, StreamPos, Parameter, CompanyName.substr(9), true);
+            }
+        }
+
+        const auto& CompanyName = Retrieve_Const(Stream_General, StreamPos, Parameter);
+        auto CompanyNameU = CompanyName;
+        CompanyNameU.MakeUpperCase();
+        auto CompanyNameUS = CompanyNameU.To_UTF8();
+        auto Result = Find_Replacement(CompanyNames_Replace, CompanyNameUS);
+        if (Result.data()) {
+            Fill(Stream_General, StreamPos, Parameter, Result.data(), Result.size(), true, true);
+        }
+    };
+    RemoveLegal(General_Encoded_Hardware_CompanyName);
+    RemoveLegal(General_Encoded_Library_CompanyName);
+    RemoveLegal(General_Encoded_Application_CompanyName);
+    auto General_StreamPos_Count = Count_Get(Stream_General, StreamPos);
+    for (size_t i = 0; i < General_StreamPos_Count; i++) {
+        const auto Name = Retrieve_Const(Stream_General, StreamPos, i, Info_Name).To_UTF8();
+        if (Name == "LensMake") {
+            RemoveLegal(i);
+        }
+    }
+
+    // Move versions found in name field
+    auto MoveVersion = [&](size_t Parameter_Source, size_t Parameter_Version, size_t Parameter_Name = 0) {
+        const auto& Name = Retrieve_Const(Stream_General, StreamPos, Parameter_Source);
+        if (Name.empty()) {
+            return;
+        }
+        const auto& Version = Retrieve_Const(Stream_General, StreamPos, Parameter_Version);
+
+        size_t Version_Pos = Name.size();
+        auto Extra_Pos = Version_Pos;
+        auto IsLikelyVersion = false;
+
+        // Version string
+        Ztring NameU = Name;
+        NameU.MakeUpperCase();
+        for (const auto& VersionPrefix : NewlineRange(VersionPrefixes)) {
+            Ztring Prefix;
+            Prefix.From_UTF8(VersionPrefix.data(), VersionPrefix.size());
+            auto Prefix_Pos = NameU.rfind(Prefix);
+            auto Prefix_Pos_End = Prefix_Pos + Prefix.size();
+            if (Prefix_Pos != string::npos
+             && (!Prefix_Pos
+                || Prefix.front() == ','
+                || NameU[Prefix_Pos - 1] == ' ')
+             && Prefix_Pos_End != NameU.size()
+             && (VersionPrefix.size() > 1 || NameU.find_first_of(__T(".-_")) != string::npos)
+             && (NameU[Prefix_Pos_End] == '.'
+                || NameU[Prefix_Pos_End] == ' '
+                || (NameU[Prefix_Pos_End] >= '0' && NameU[Prefix_Pos_End] <= '9'))) {
+                Version_Pos = Prefix_Pos_End;
+                if (Version_Pos < NameU.size() && NameU[Version_Pos] == '.') {
+                    Version_Pos++;
+                }
+                Extra_Pos = Prefix_Pos;
+                IsLikelyVersion = true;
+                break;
+            }
+        }
+
+        if (!IsLikelyVersion) {
+            // Is it only a version number?
+            auto Space_Pos = NameU.find(' ');
+            auto Dot_Pos = NameU.find('.');
+            auto Digit_Pos = NameU.find_first_of(__T("0123456789"));
+            auto NotDigit_Pos = NameU.find_first_not_of(__T("0123456789"));
+            auto Letter_Pos = NameU.find_first_not_of(__T("0123456789."));
+            if (Space_Pos == string::npos
+                && (Dot_Pos != string::npos || (Letter_Pos == string::npos && NotDigit_Pos != string::npos))
+                && ((Digit_Pos != string::npos && Digit_Pos > Dot_Pos)
+                    || (Letter_Pos == string::npos || Letter_Pos > Dot_Pos)
+                    || (Digit_Pos <= 1))) {
+                Version_Pos = 0;
+                Extra_Pos = 0;
+                IsLikelyVersion = true;
+            }
+        }
+
+        if (!IsLikelyVersion) {
+            // Is it a version number with only digits at the end
+            auto Space_Pos = NameU.rfind(' ');
+            if (Space_Pos == string::npos) {
+                Space_Pos = NameU.rfind('-');
+            }
+            if (Space_Pos != string::npos) {
+                auto NonDigit_Pos = NameU.find_first_not_of(__T("0123456789."), Space_Pos + 1);
+                if (NonDigit_Pos == string::npos && NameU.find('.') != string::npos) { // At least 1 dot for avoiding e.g. names with one digit
+                    if (Space_Pos) {
+                        auto NonDigit_Pos2 = NameU.find_last_not_of(__T("0123456789."), Space_Pos - 1);
+                        if (NonDigit_Pos != string::npos && NonDigit_Pos != Space_Pos - 1) {
+                            Space_Pos = NonDigit_Pos2;
+                        }
+                    }
+                    Version_Pos = Space_Pos + 1;
+                    Extra_Pos = Space_Pos;
+                    IsLikelyVersion = true;
+                }
+            }
+        }
+
+        if (!IsLikelyVersion) {
+            return;
+        }
+
+        auto Plus_Pos = Name.rfind(__T(" + "), Extra_Pos);
+        auto And_Pos = Name.rfind(__T(" & "), Extra_Pos);
+        auto Slash_Pos = Name.rfind(__T(" / "), Extra_Pos);
+        auto Comma_Pos = Extra_Pos ? Name.rfind(__T(", "), Extra_Pos - 1) : string::npos;
+        if (Plus_Pos != string::npos || And_Pos != string::npos || Comma_Pos != string::npos) {
+            return; // TODO: handle complex string e.g. with 2 versions
+        }
+
+        auto VersionFromName = Name.substr(Version_Pos);
+        if (VersionFromName != Version) {
+            Fill(Stream_General, StreamPos, Parameter_Version, VersionFromName);
+        }
+        if (!Extra_Pos) {
+            Clear(Stream_General, StreamPos, Parameter_Source);
+            return; // No name found
+        }
+        Fill(Stream_General, StreamPos, Parameter_Name ? Parameter_Name : Parameter_Source, Name.substr(0, Extra_Pos), true);
+    };
+    if (Retrieve_Const(Stream_General, StreamPos, General_Encoded_Application_Version) == __T("Unknown")) {
+        Clear(Stream_General, StreamPos, General_Encoded_Application_Version);
+    }
+    if (Retrieve_Const(Stream_General, StreamPos, General_Encoded_Application_Name).empty() && Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_CompanyName) == __T("Google")) {
+        const auto& Application = Retrieve_Const(Stream_General, StreamPos, General_Encoded_Application);
+        if (Application.rfind(__T("HDR+ "), 0) == 0) {
+            if (Retrieve_Const(Stream_General, StreamPos, General_Encoded_Application_Version).empty()) {
+                Fill(Stream_General, StreamPos, General_Encoded_Application_Version, Application.substr(5));
+            }
+            Fill(Stream_General, StreamPos, General_Encoded_Application_Name, Application.substr(0, 4));
+            if (Retrieve_Const(Stream_General, StreamPos, General_Encoded_Application_CompanyName).empty()) {
+                Fill(Stream_General, StreamPos, General_Encoded_Application_CompanyName, Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_CompanyName));
+            }
+        }
+    }
+    MoveVersion(General_Encoded_Library_Name, General_Encoded_Library_Version);
+    MoveVersion(General_Encoded_Library, General_Encoded_Library_Version, General_Encoded_Library_Name);
+    MoveVersion(General_Encoded_Application_Name, General_Encoded_Application_Version);
+    MoveVersion(General_Encoded_Application, General_Encoded_Application_Version, General_Encoded_Application_Name);
+
+    // Move company name found in name field
+    auto MoveCompanyName = [&](size_t Parameter_Search, size_t Parameter_CompanyName) {
+        const auto& CompanyName = Retrieve_Const(Stream_General, StreamPos, Parameter_CompanyName);
+        const auto& Search = Retrieve_Const(Stream_General, StreamPos, Parameter_Search);
+
+        auto CompanyNameU = CompanyName;
+        auto SearchU = Search;
+        CompanyNameU.MakeUpperCase();
+        SearchU.MakeUpperCase();
+        if (!CompanyNameU.empty() && SearchU.size() > CompanyNameU .size() && SearchU[CompanyNameU.size()] == ' ' && SearchU.rfind(CompanyNameU, 0) == 0) {
+            Fill(Stream_General, StreamPos, Parameter_Search, Search.substr(CompanyName.size() + 1), true);
+        }
+        else {
+            auto SearchUS = SearchU.To_UTF8();
+            for (const auto& ToSearch : NewlineRange(CompanyNames)) {
+                if (SearchUS.rfind(ToSearch.data(), 0, ToSearch.size()) == 0) {
+                    const auto ToSearch_Len = ToSearch.size();
+                    if (SearchUS.size() > ToSearch_Len
+                        && (SearchUS[ToSearch_Len] == ' '
+                        || SearchUS[ToSearch_Len] == '_')) {
+                        auto CompanyName = Retrieve_Const(Stream_General, StreamPos, Parameter_CompanyName);
+                        CompanyName.MakeUpperCase();
+                        auto CompanyName2 = Ztring(Search.substr(0, ToSearch_Len));
+                        CompanyName2.MakeUpperCase();
+                        if (CompanyName2 != CompanyName) {
+                            Fill(Stream_General, StreamPos, Parameter_CompanyName, Search.substr(0, ToSearch_Len));
+                        }
+                        Fill(Stream_General, StreamPos, Parameter_Search, Search.substr(ToSearch_Len + 1), true);
+                        break;
+                    }
+                    if (!SearchUS.compare(0, SearchUS.size(), ToSearch.data(), ToSearch.size())) {
+                        Fill(Stream_General, StreamPos, Parameter_CompanyName, Search);
+                        Clear(Stream_General, StreamPos, Parameter_Search);
+                    }
+                }
+            }
+        }
+    };
+    MoveCompanyName(General_Encoded_Hardware_Model, General_Encoded_Hardware_CompanyName);
+    MoveCompanyName(General_Encoded_Library_Name, General_Encoded_Library_CompanyName);
+    MoveCompanyName(General_Encoded_Application_Name, General_Encoded_Application_CompanyName);
+
+    // Remove capitalization
+    auto RemoveCapitalization = [&](size_t Parameter) {
+        const auto& CompanyName = Retrieve_Const(Stream_General, StreamPos, Parameter);
+        if (CompanyName.size() < 2) {
+            return;
+        }
+        auto CompanyNameU = CompanyName;
+        CompanyNameU.MakeUpperCase();
+        auto CompanyNameUS = CompanyNameU.To_UTF8();
+        for (const auto& ToSearch : NewlineRange(CompanyNames)) {
+            if (CompanyNameUS.size() > 3 && !CompanyNameUS.compare(0, CompanyNameUS.size(), ToSearch.data(), ToSearch.size())) {
+                auto Result = Find_Replacement(CompanyNames_Replace, CompanyNameUS);
+                if (Result.data()) {
+                    break;
+                }
+                for (size_t i = 1; i < CompanyName.size(); i++) {
+                    auto& Letter = CompanyNameUS[i];
+                    if (Letter >= 'A' && Letter <= 'Z') {
+                        CompanyNameUS[i] += 'a' - 'A';
+                    }
+                }
+                Fill(Stream_General, StreamPos, Parameter, CompanyNameUS, true, true);
+            }
+        }
+    };
+    RemoveCapitalization(General_Encoded_Hardware_CompanyName);
+    RemoveCapitalization(General_Encoded_Library_CompanyName);
+    RemoveCapitalization(General_Encoded_Application_CompanyName);
+
+    // Model is sometimes the actual name
+    auto ModelToName = [&](size_t Parameter_CompanyName, size_t Parameter_Model, size_t Parameter_Name) {
+        if (!Retrieve_Const(Stream_General, StreamPos, Parameter_Name).empty())
+            return;
+        const auto& CompanyName = Retrieve_Const(Stream_General, StreamPos, Parameter_CompanyName).To_UTF8();
+        const auto& Model = Retrieve_Const(Stream_General, StreamPos, Parameter_Model).To_UTF8();
+        if (CompanyName == "Samsung") {
+            if (Model.find("Galaxy ") == 0) {
+                Fill(Stream_General, StreamPos, Parameter_Name, Model);
+                Clear(Stream_General, StreamPos, Parameter_Model);
+            }
+        }
+        if (CompanyName == "HMD") {
+            if (Model.find("TA-") == string::npos) {
+                Fill(Stream_General, StreamPos, Parameter_Name, Model);
+                Clear(Stream_General, StreamPos, Parameter_Model);
+            }
+        }
+    };
+    ModelToName(General_Encoded_Hardware_CompanyName, General_Encoded_Hardware_Model, General_Encoded_Hardware_Name);
+
+    // Special case
+    auto Special = [&](size_t Parameter_CompanyName, size_t Parameter_Name) {
+        const auto& CompanyName = Retrieve_Const(Stream_General, StreamPos, Parameter_CompanyName).To_UTF8();
+        const auto& Name = Retrieve_Const(Stream_General, StreamPos, Parameter_Name).To_UTF8();
+        if (CompanyName == "HMD" && Name.find("Nokia ") == 0) {
+            Fill(Stream_General, StreamPos, Parameter_CompanyName, Name.substr(0, 5), true, true);
+            Fill(Stream_General, StreamPos, Parameter_Name, Name.substr(6), true, true);
+        }
+    };
+    Special(General_Encoded_Hardware_CompanyName, General_Encoded_Hardware_Name);
+
+    // Model name
+    auto FillModelName = [&](size_t Parameter_CompanyName, size_t Parameter_Model, size_t Parameter_Name) {
+        if (!Retrieve_Const(Stream_General, StreamPos, Parameter_Name).empty())
+            return;
+        const auto& CompanyName = Retrieve_Const(Stream_General, StreamPos, Parameter_CompanyName).To_UTF8();
+        const auto IsSamsung = CompanyName == "Samsung";
+        const auto& Model = Retrieve_Const(Stream_General, StreamPos, Parameter_Model).To_UTF8();
+        for (const auto& ToSearch : Model_Name) {
+            if (CompanyName == ToSearch.CompanyName) {
+                auto Model2 = Model;
+                for (;;) {
+                    bool Found{};
+                    auto Result = Find_Replacement(ToSearch.Find, Model2);
+                    if (Result.data()) {
+                        Found = true;
+                        string Result2;
+                        if (ToSearch.Prefix) {
+                            Result2 = ToSearch.Prefix;
+                        }
+                        Result2.append(Result.data(), Result.size());
+                        Fill(Stream_General, StreamPos, Parameter_Name, Result2);
+                    }
+                    if (!Found && IsSamsung && Model2.size() >= 7) {
+                        Model2.pop_back();
+                        continue;
+                    }
+                    break;
+                }
+                break;
+            }
+        }
+    };
+    FillModelName(General_Encoded_Hardware_CompanyName, General_Encoded_Hardware_Model, General_Encoded_Hardware_Name);
+
+    // Attempt to derive Samsung Galaxy model number
+    auto DetermineModel = [&](size_t Parameter_CompanyName, size_t Parameter_Name, size_t Parameter_Application, size_t Parameter_Model) {
+        if (!Retrieve_Const(Stream_General, StreamPos, Parameter_Model).empty())
+            return;
+        const auto& CompanyName = Retrieve_Const(Stream_General, StreamPos, Parameter_CompanyName).To_UTF8();
+        const auto& Application = Retrieve_Const(Stream_General, StreamPos, Parameter_Application).To_UTF8();
+        if (CompanyName == "Samsung") {
+            auto Model = "SM-" + Application.substr(0, Application.size() - 8);
+            bool Found{};
+            for (const auto& ToSearch : Model_Name) {
+                if (CompanyName == ToSearch.CompanyName) {
+                    auto Model2 = Model;
+                    for (;;) {
+                        auto Result = Find_Replacement(ToSearch.Find, Model2);
+                        if (Result.data()) {
+                            Found = true;
+                            Fill(Stream_General, StreamPos, Parameter_Model, Model);
+                        }
+                        if (!Found && Model2.size() >= 7) {
+                            Model2.pop_back();
+                            continue;
+                        }
+                        break;
+                    }
+                    break;
+                }
+            }
+        }
+        };
+    DetermineModel(General_Encoded_Hardware_CompanyName, General_Encoded_Hardware_Name, General_Encoded_Application, General_Encoded_Hardware_Model);
+
+    // Crosscheck
+    auto Crosscheck = [&](size_t Parameter_CompanyName_Source, size_t Parameter_Start, bool CheckName) {
+        const auto& CompanyName = Retrieve_Const(Stream_General, StreamPos, Parameter_CompanyName_Source);
+        if (!CompanyName.empty()) {
+            const auto Parameter = Parameter_Start;
+            const auto Parameter_String = ++Parameter_Start;
+            const auto Parameter_CompanyName = ++Parameter_Start;
+            const auto Parameter_Name = ++Parameter_Start;
+            const auto& Application_CompanyName = Retrieve_Const(Stream_General, StreamPos, Parameter_CompanyName);
+            if (Application_CompanyName.empty()) {
+                const auto& Application = Retrieve_Const(Stream_General, StreamPos, CheckName ? Parameter_Name : Parameter);
+                auto CompanyNameU = CompanyName;
+                CompanyNameU.MakeUpperCase();
+                auto ApplicationU = Application;
+                ApplicationU.MakeUpperCase();
+                if (ApplicationU.size() > CompanyNameU.size() && ApplicationU[CompanyNameU.size()] == ' ' && ApplicationU.rfind(CompanyNameU, 0) == 0) {
+                    Fill(Stream_General, StreamPos, Parameter_CompanyName, CompanyName);
+                    Fill(Stream_General, StreamPos, Parameter_Name, Application.substr(CompanyName.size() + 1), true);
+                    if (!CheckName) {
+                        Clear(Stream_General, StreamPos, Parameter);
+                    }
+                }
+            }
+        }
+    };
+    Crosscheck(General_Encoded_Hardware_CompanyName, General_Encoded_Application, false);
+    Crosscheck(General_Encoded_Hardware_CompanyName, General_Encoded_Application, true);
+    Crosscheck(General_Encoded_Hardware_CompanyName, General_Encoded_Library, false);
+    Crosscheck(General_Encoded_Hardware_CompanyName, General_Encoded_Library, true);
+    Crosscheck(General_Encoded_Library_CompanyName, General_Encoded_Application, false);
+    Crosscheck(General_Encoded_Library_CompanyName, General_Encoded_Application, true);
+
+    // Copy name from other sources
+    auto CopyName = [&](size_t IfParameter, size_t Parameter_Name, size_t Parameter_Source) {
+        const auto& If = Retrieve_Const(Stream_General, StreamPos, IfParameter);
+        if (If.empty()) {
+            return;
+        }
+        const auto& Name = Retrieve_Const(Stream_General, StreamPos, Parameter_Name);
+        if (!Name.empty()) {
+            return;
+        }
+        const auto& Source = Retrieve_Const(Stream_General, StreamPos, Parameter_Source);
+        if (Source.empty()) {
+            return;
+        }
+        Fill(Stream_General, StreamPos, Parameter_Name, Source);
+    };
+    CopyName(General_Encoded_Library_CompanyName, General_Encoded_Library_Name, General_Encoded_Hardware_Name);
+    CopyName(General_Encoded_Application_CompanyName, General_Encoded_Application_Name, General_Encoded_Library_Name);
+    if (Retrieve_Const(Stream_General, StreamPos, General_Encoded_Application_Name).empty() && !Retrieve_Const(Stream_General, StreamPos, General_Encoded_Application_Version).empty()) {
+        const auto& Model = Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Model);
+        if (Model.rfind(__T("iPhone "), 0) == 0) {
+            if (Retrieve_Const(Stream_General, StreamPos, General_Encoded_Application_CompanyName).empty()) {
+                Fill(Stream_General, StreamPos, General_Encoded_Application_CompanyName, Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_CompanyName));
+            }
+            Fill(Stream_General, StreamPos, General_Encoded_Application_Name, "iOS");
+        }
+        CopyName(General_Encoded_Hardware_Name, General_Encoded_Application_Name, General_Encoded_Hardware_Name);
+        CopyName(General_Encoded_Hardware_Model, General_Encoded_Application_Name, General_Encoded_Hardware_Model);
+    }
+    if (Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Model).rfind(__T("Pentax "), 0) == 0) {
+        if (Retrieve_Const(Stream_General, StreamPos, General_Encoded_Application_CompanyName).empty()
+            && !Retrieve_Const(Stream_General, StreamPos, General_Encoded_Application_Name).empty()) {
+            Fill(Stream_General, StreamPos, General_Encoded_Application_CompanyName, Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_CompanyName));
+        }
+        if (Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Model).substr(7) == Retrieve_Const(Stream_General, StreamPos, General_Encoded_Application_Name)) {
+            Fill(Stream_General, StreamPos, General_Encoded_Application_Name, Retrieve_Const(Stream_General, StreamPos, General_Encoded_Hardware_Model), true);
+        }
+    }
+
+    // Copy company name from other sources
+    auto CopyCompanyName = [&](size_t Parameter_CompanyName_Source, size_t Parameter_CompanyName_Dest, size_t Parameter_Name_Source, size_t Parameter_Name_Dest) {
+        const auto& CompanyName_Dest = Retrieve_Const(Stream_General, StreamPos, Parameter_CompanyName_Dest);
+        const auto& CompanyName_Source = Retrieve_Const(Stream_General, StreamPos, Parameter_CompanyName_Source);
+        const auto& Name_Dest = Retrieve_Const(Stream_General, StreamPos, Parameter_Name_Dest);
+        if (!CompanyName_Dest.empty() || CompanyName_Source.empty() || Name_Dest.empty()) {
+            return;
+        }
+        const auto& Name_Source = Retrieve_Const(Stream_General, StreamPos, Parameter_Name_Source);
+        if (Name_Source != Name_Dest) {
+            return;
+        }
+        Fill(Stream_General, StreamPos, Parameter_CompanyName_Dest, CompanyName_Source);
+    };
+    CopyCompanyName(General_Encoded_Library_CompanyName, General_Encoded_Application_CompanyName, General_Encoded_Library_Name, General_Encoded_Application_Name);
+    CopyCompanyName(General_Encoded_Application_CompanyName, General_Encoded_Library_CompanyName, General_Encoded_Application_Name, General_Encoded_Library_Name);
+    CopyCompanyName(General_Encoded_Hardware_CompanyName, General_Encoded_Application_CompanyName, General_Encoded_Hardware_Name, General_Encoded_Application_Name);
+    CopyCompanyName(General_Encoded_Hardware_CompanyName, General_Encoded_Application_CompanyName, General_Encoded_Hardware_Model, General_Encoded_Application_Name);
+
+    // Check if it is really a library
+    {
+        /*
+        const auto& Application_Name = Retrieve_Const(Stream_General, StreamPos, General_Encoded_Application_Name);
+        if (!Application_Name.empty()
+         && Application_Name == Retrieve_Const(Stream_General, StreamPos, General_Encoded_Library_Name)
+         && (Retrieve_Const(Stream_General, StreamPos, General_Encoded_Library_Version).empty() || Retrieve_Const(Stream_General, StreamPos, General_Encoded_Application_Version) == Retrieve_Const(Stream_General, StreamPos, General_Encoded_Library_Version))) {
+            Clear(Stream_General, StreamPos, General_Encoded_Library);
+            Clear(Stream_General, StreamPos, General_Encoded_Library_CompanyName);
+            Clear(Stream_General, StreamPos, General_Encoded_Library_Name);
+            Clear(Stream_General, StreamPos, General_Encoded_Library_Version);
+        }
+        */
+    }
+
+    // Redundancy
     if (Retrieve_Const(Stream_General, 0, General_Encoded_Application_Name).empty() && Retrieve_Const(Stream_General, 0, General_Encoded_Application).empty())
     {
         if (Retrieve_Const(Stream_General, 0, General_Comment) == __T("Created with GIMP") || Retrieve_Const(Stream_General, 0, General_Description) == __T("Created with GIMP"))
@@ -1176,6 +3811,64 @@ void File__Analyze::Streams_Finish_StreamOnly_General(size_t StreamPos)
         if (Retrieve_Const(Stream_General, 0, General_Description) == __T("Created with GIMP"))
             Clear(Stream_General, StreamPos, General_Description);
     }
+
+    // Remove synonyms
+    auto RemoveSynonyms = [&](size_t Parameter_CompanyName, size_t Parameter_Model) {
+        const auto& CompanyName = Retrieve_Const(Stream_General, StreamPos, Parameter_CompanyName).To_UTF8();
+        for (const auto& ToSearch : Model_Replace) {
+            if (CompanyName == ToSearch.CompanyName) {
+                const auto& Model = Ztring(Retrieve_Const(Stream_General, StreamPos, Parameter_Model)).MakeUpperCase().To_UTF8();
+                auto Result = Find_Replacement(ToSearch.Find, Model);
+                if (Result.data()) {
+                    Fill(Stream_General, StreamPos, Parameter_Model, Result.data(), Result.size(), true, true);
+                }
+            }
+        }
+        };
+    RemoveSynonyms(General_Encoded_Hardware_CompanyName, General_Encoded_Hardware_Model);
+    RemoveSynonyms(General_Encoded_Application_CompanyName, General_Encoded_Application_Name);
+
+    // Create displayed string
+    auto CreateString = [&](size_t Parameter_Start, bool HasModel = false) {
+        const auto Parameter = Parameter_Start;
+        const auto Parameter_String = ++Parameter_Start;
+        if (!Retrieve_Const(Stream_General, StreamPos, Parameter_String).empty()) {
+            return;
+        }
+        const auto Parameter_CompanyName = ++Parameter_Start;
+        const auto Parameter_Name = ++Parameter_Start;
+        const auto Parameter_Model = ++Parameter_Start;
+        const auto Parameter_Version = Parameter_Start + HasModel;
+
+        const auto& CompanyName = Retrieve_Const(Stream_General, StreamPos, Parameter_CompanyName);
+        const auto& Name = Retrieve_Const(Stream_General, StreamPos, Parameter_Name);
+        const auto& Model = Retrieve_Const(Stream_General, StreamPos, Parameter_Model);
+        const auto& Version = Retrieve_Const(Stream_General, StreamPos, Parameter_Version);
+
+        auto Value = CompanyName;
+        if (!Name.empty() && !Value.empty()) {
+            Value += ' ';
+        }
+        Value += Name;
+        if (HasModel && !Model.empty())
+        {
+            if (!Value.empty())
+                Value += ' ';
+            if (!Name.empty())
+                Value += '(';
+            Value += Model;
+            if (!Name.empty())
+                Value += ')';
+        }
+        if (!Value.empty() && !Version.empty()) {
+            Value += ' ';
+        }
+        Value += Version;
+        Fill(Stream_General, StreamPos, Parameter_String, Value, true);
+    };
+    CreateString(General_Encoded_Hardware, true);
+    CreateString(General_Encoded_Library);
+    CreateString(General_Encoded_Application);
 }
 
 //---------------------------------------------------------------------------
@@ -2015,14 +4708,15 @@ void File__Analyze::Streams_Finish_InterStreams()
         //For all streams (Generic)
         for (size_t StreamKind=Stream_Video; StreamKind<Stream_Max; StreamKind++)
         {
-            if (StreamKind!=Stream_Other && StreamKind!=Stream_Menu) //They have no big size, we never calculate them
                 for (size_t Pos=0; Pos<Count_Get((stream_t)StreamKind); Pos++)
                 {
                     if (!Retrieve((stream_t)StreamKind, Pos, Fill_Parameter((stream_t)StreamKind, Generic_StreamSize_Encoded)).empty())
                         StreamSize_Total+=Retrieve((stream_t)StreamKind, Pos, Fill_Parameter((stream_t)StreamKind, Generic_StreamSize_Encoded)).To_int64u();
+                    else if (!Retrieve((stream_t)StreamKind, Pos, Fill_Parameter((stream_t)StreamKind, Generic_Source_StreamSize)).empty())
+                        StreamSize_Total+=Retrieve((stream_t)StreamKind, Pos, Fill_Parameter((stream_t)StreamKind, Generic_Source_StreamSize)).To_int64u();
                     else if (!Retrieve((stream_t)StreamKind, Pos, Fill_Parameter((stream_t)StreamKind, Generic_StreamSize)).empty())
                         StreamSize_Total+=Retrieve((stream_t)StreamKind, Pos, Fill_Parameter((stream_t)StreamKind, Generic_StreamSize)).To_int64u();
-                    else
+                    else if (StreamKind!=Stream_Other && StreamKind!=Stream_Menu) //They have no big size, we never calculate them
                         IsOK=false; //StreamSize not available for 1 stream, we can't calculate
                 }
         }

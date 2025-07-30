@@ -60,8 +60,10 @@ private :
     void id_07();
     void id_0D();
     void id_0E();
+    void id_26();
     void id_25();
     void id_27();
+    void id_29() { id_26(); }
 
     //Temp - Technical info
     int32u total_samples_FirstFrame;

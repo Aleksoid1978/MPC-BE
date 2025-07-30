@@ -31,6 +31,9 @@ namespace MediaInfoLib
 // Infos
 //***************************************************************************
 
+const char* Mpeg4_chan(int16u Ordering);
+const char* Mpeg4_chan_Layout(int16u Ordering);
+
 //***************************************************************************
 // Constants
 //***************************************************************************
@@ -246,7 +249,51 @@ void File_Caf::info()
 void File_Caf::kuki()
 {
     //Parsing
-    Skip_XX(Element_Size,                                       "Data");
+    int8u  bitDepth, numChannels;
+    int32u avgBitRate, sampleRate, channelLayoutTag{};
+    Skip_B4(                                                    "frameLength");
+    Skip_B1(                                                    "compatibleVersion (0)");
+    Get_B1 (bitDepth,                                           "bitDepth");
+    Skip_B1(                                                    "pb");
+    Skip_B1(                                                    "mb");
+    Skip_B1(                                                    "kb");
+    Get_B1 (numChannels,                                        "numChannels");
+    Skip_B2(                                                    "maxRun");
+    Skip_B4(                                                    "maxFrameBytes");
+    Get_B4 (avgBitRate,                                         "avgBitRate");
+    Get_B4 (sampleRate,                                         "sampleRate");
+    if (Element_Size - Element_Offset >= 24) {
+        int32u size, id;
+        Peek_B4(size);
+        Element_Offset += 4;
+        Peek_B4(id);
+        Element_Offset -= 4;
+        if (size >= 24 && id == 0x6368616E) { // chan
+            Skip_B4(                                            "channelLayoutInfoSize");
+            Skip_C4(                                            "channelLayoutInfoID");
+            Skip_B4(                                            "versionFlags");
+            Get_B4 (channelLayoutTag,                           "channelLayoutTag");
+            Skip_B4(                                            "reserved1");
+            Skip_B4(                                            "reserved2");
+        }
+    }
+
+    FILLING_BEGIN_PRECISE();
+        if (bitDepth)
+            Fill(Stream_Audio, 0, Audio_BitDepth, bitDepth, 10, true);
+        if (numChannels)
+            Fill(Stream_Audio, 0, Audio_Channel_s_, numChannels, 10, true);
+        if (avgBitRate)
+            Fill(Stream_Audio, 0, Audio_BitRate_Nominal, avgBitRate, 10, true);
+        if (sampleRate)
+            Fill(Stream_Audio, 0, Audio_SamplingRate, sampleRate, 10, true);
+
+        if (channelLayoutTag > 0x10000) {
+            int16u Ordering = (channelLayoutTag & 0xFFFF0000) >> 16;
+            Fill(Stream_Audio, StreamPos_Last, Audio_ChannelPositions, Mpeg4_chan(Ordering), Unlimited, true, true);
+            Fill(Stream_Audio, StreamPos_Last, Audio_ChannelLayout, Mpeg4_chan_Layout(Ordering), Unlimited, true, true);
+        }
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------

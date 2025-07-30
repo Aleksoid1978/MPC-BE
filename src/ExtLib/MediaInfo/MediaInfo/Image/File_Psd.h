@@ -56,10 +56,12 @@ protected :
     void ImageResourcesBlock();
     void LayerAndMaskInformation();
     void ImageData();
+    void CopyrightFlag();
     void CaptionDigest();
     void IPTCNAA();
     void JPEGQuality();
     void Thumbnail();
+    void URL();
     void VersionInfo();
     void Thumbnail_New() { Thumbnail(); }
 
