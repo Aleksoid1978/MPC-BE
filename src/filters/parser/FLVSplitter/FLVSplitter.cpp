@@ -42,7 +42,7 @@
 #define FLV_AUDIO_NELLY   6 // Nellymoser
 // 7 = G.711 A-law logarithmic PCM (reserved)
 // 8 = G.711 mu-law logarithmic PCM (reserved)
-// 9 = reserved
+#define FLV_AUDIO_OPUS    9 // Opus
 #define FLV_AUDIO_AAC     10 // AAC
 #define FLV_AUDIO_SPEEX   11 // Speex
 // 14 = MP3 8 kHz (reserved)
@@ -772,10 +772,37 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						m_pFile->Seek(configOffset);
 						m_pFile->ByteRead((BYTE*)(wfe+1), configSize);
+
+						break;
 					}
+					case FLV_AUDIO_OPUS:
+						if (dataSize > 4 + 10) {
+							auto fourcc = m_pFile->BitRead(32);
+							if (fourcc == 'Opus') {
+								wfe->wFormatTag = WAVE_FORMAT_OPUS;
+								mt.subtype = MEDIASUBTYPE_OPUS;
+								wfe->nSamplesPerSec = 48000;
+								wfe->wBitsPerSample = 16;
+								wfe->nBlockAlign = 1;
+								wfe->nAvgBytesPerSec = 0;
+
+								wfe->cbSize = dataSize - 4;
+								wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + wfe->cbSize);
+								m_pFile->ByteRead((BYTE*)(wfe + 1), wfe->cbSize);
+
+								wfe->nChannels = ((BYTE*)(wfe + 1))[9];
+
+								name += L" Opus";
+							}
+						}
+						break;
 				}
-				wfe->nBlockAlign     = wfe->nChannels * wfe->wBitsPerSample / 8;
-				wfe->nAvgBytesPerSec = wfe->nSamplesPerSec * wfe->nBlockAlign;
+
+
+				if (at.SoundFormat != FLV_AUDIO_OPUS) {
+					wfe->nBlockAlign = wfe->nChannels * wfe->wBitsPerSample / 8;
+					wfe->nAvgBytesPerSec = wfe->nSamplesPerSec * wfe->nBlockAlign;
+				}
 
 				mt.SetSampleSize(wfe->wBitsPerSample * wfe->nChannels / 8);
 
@@ -1554,11 +1581,19 @@ bool CFLVSplitterFilter::DemuxLoop()
 					t.TimeStamp += vt.tsOffset;
 				}
 			}
-			if (t.TagType == FLV_AUDIODATA && at.SoundFormat == FLV_AUDIO_AAC) {
-				if (m_pFile->BitRead(8) != 1) {
-					goto NextTag;
+			if (t.TagType == FLV_AUDIODATA) {
+				switch (at.SoundFormat) {
+					case FLV_AUDIO_AAC:
+						if (m_pFile->BitRead(8) != 1) {
+							goto NextTag;
+						}
+						break;
+					case FLV_AUDIO_OPUS:
+						m_pFile->Skip(4);
+						break;
 				}
 			}
+
 			__int64 dataSize = next - m_pFile->GetPos();
 			if (dataSize <= 0) {
 				goto NextTag;
