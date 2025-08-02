@@ -56,6 +56,11 @@ static inline int get_vlc_symbol(GetBitContext *gb, VlcState *const state,
         k++;
         i += i;
     }
+    if (k > bits) {
+        ff_dlog(NULL, "k-overflow bias:%d error:%d drift:%d count:%d k:%d",
+                state->bias, state->error_sum, state->drift, state->count, k);
+        k = bits;
+    }
 
     v = get_sr_golomb(gb, k, 12, bits);
     ff_dlog(NULL, "v:%d bias:%d error:%d drift:%d count:%d k:%d",
@@ -449,11 +454,13 @@ static int decode_slice(AVCodecContext *c, void *arg)
             planes[3] =        p->data[3] + ps * x + y * p->linesize[3];
         decode_rgb_frame32(f, sc, &gb, planes, width, height, p->linesize);
     } else {
-        uint8_t *planes[4] = { p->data[0] + ps * x + y * p->linesize[0],
-                               p->data[1] + ps * x + y * p->linesize[1],
-                               p->data[2] + ps * x + y * p->linesize[2] };
-        if (f->transparency)
-            planes[3] =        p->data[3] + ps * x + y * p->linesize[3];
+        uint8_t *planes[4] = { p->data[0] + ps * x + y * p->linesize[0] };
+        if (f->avctx->bits_per_raw_sample > 8) {
+            planes[1] =        p->data[1] + ps * x + y * p->linesize[1];
+            planes[2] =        p->data[2] + ps * x + y * p->linesize[2];
+            if (f->transparency)
+                planes[3] =    p->data[3] + ps * x + y * p->linesize[3];
+        }
         decode_rgb_frame(f, sc, &gb, planes, width, height, p->linesize);
     }
     if (ac != AC_GOLOMB_RICE && f->version > 2) {

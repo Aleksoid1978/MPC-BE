@@ -188,8 +188,7 @@ static int parse_ext_v1(DOVIContext *s, GetBitContext *gb, AVDOVIDmData *dm)
             dm->l255.dm_debug[i] = get_bits(gb, 8);
         break;
     default:
-        av_log(s->logctx, AV_LOG_WARNING,
-               "Unknown Dolby Vision DM v1 level: %u\n", dm->level);
+        avpriv_request_sample(s->logctx, "Dolby Vision DM v1 level %u", dm->level);
     }
 
     return 0;
@@ -274,8 +273,7 @@ static int parse_ext_v2(DOVIContext *s, GetBitContext *gb, AVDOVIDmData *dm,
         dm->l254.dm_version_index = get_bits(gb, 8);
         break;
     default:
-        av_log(s->logctx, AV_LOG_WARNING,
-               "Unknown Dolby Vision DM v2 level: %u\n", dm->level);
+        avpriv_request_sample(s->logctx, "Dolby Vision DM v2 level %u", dm->level);
     }
 
     return 0;
@@ -328,12 +326,15 @@ static int parse_ext_blocks(DOVIContext *s, GetBitContext *gb, int ver,
         switch (ver) {
         case 1: ret = parse_ext_v1(s, gb, dm); break;
         case 2: ret = parse_ext_v2(s, gb, dm, ext_block_length); break;
-        default: return AVERROR_BUG;
+        default:
+            avpriv_request_sample(s->logctx, "Dolby Vision DM v%d", ver);
+            goto skip;
         }
 
         if (ret < 0)
             return ret;
 
+skip:
         parsed_bits = get_bits_count(gb) - start_pos;
         if (parsed_bits > ext_block_length * 8)
             return AVERROR_INVALIDDATA;
@@ -408,22 +409,6 @@ int ff_dovi_rpu_parse(DOVIContext *s, const uint8_t *rpu, size_t rpu_size,
         VALIDATE(rpu[0], 25, 25); /* NAL prefix */
         rpu++;
         rpu_size--;
-        /* Strip trailing padding bytes */
-        while (rpu_size && rpu[rpu_size - 1] == 0)
-            rpu_size--;
-    }
-
-    if (!rpu_size || rpu[rpu_size - 1] != 0x80)
-        return AVERROR_INVALIDDATA;
-
-    if (err_recognition & AV_EF_CRCCHECK) {
-        uint32_t crc = av_bswap32(av_crc(av_crc_get_table(AV_CRC_32_IEEE),
-                                  -1, rpu, rpu_size - 1)); /* exclude 0x80 */
-        if (crc) {
-            av_log(s->logctx, AV_LOG_ERROR, "RPU CRC mismatch: %X\n", crc);
-            if (err_recognition & AV_EF_EXPLODE)
-                return AVERROR_INVALIDDATA;
-        }
     }
 
     if ((ret = init_get_bits8(gb, rpu, rpu_size)) < 0)
@@ -736,6 +721,27 @@ int ff_dovi_rpu_parse(DOVIContext *s, const uint8_t *rpu, size_t rpu_size,
     } else {
         s->color = &ff_dovi_color_default;
         av_refstruct_unref(&s->ext_blocks);
+    }
+
+    align_get_bits(gb);
+    skip_bits(gb, 32); /* CRC32 */
+    if (get_bits(gb, 8) != 0x80) {
+        avpriv_request_sample(s->logctx, "Unexpected RPU format");
+        ff_dovi_ctx_unref(s);
+        return AVERROR_PATCHWELCOME;
+    }
+
+    if (err_recognition & AV_EF_CRCCHECK) {
+        rpu_size = get_bits_count(gb) / 8;
+        uint32_t crc = av_bswap32(av_crc(av_crc_get_table(AV_CRC_32_IEEE),
+                                  -1, rpu, rpu_size - 1)); /* exclude 0x80 */
+        if (crc) {
+            av_log(s->logctx, AV_LOG_ERROR, "RPU CRC mismatch: %X\n", crc);
+            if (err_recognition & AV_EF_EXPLODE) {
+                ff_dovi_ctx_unref(s);
+                return AVERROR_INVALIDDATA;
+            }
+        }
     }
 
     return 0;
