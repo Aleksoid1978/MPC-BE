@@ -18,6 +18,7 @@ MPCVideoDec
 Обновлен болгарский перевод (автор jekovcar).
 
 Обновлены библиотеки:
+	Detours v4.0.1-125-g9764ceb;
 	ffmpeg n7.2-dev-3281-g2e19e74a29;
 	Little-CMS git-lcms2.17-37-g59feb9e;
 	MediaInfo git-v25.07-6-gaeb9abbd0;
@@ -138,7 +139,7 @@ YouTube
 Добавлен болгарский перевод (автор jekovcar).
 
 Обновлены библиотеки:
-	Detours v4.0.1-121-gea6c4ae;
+
 	ffmpeg n7.2-dev-2052-g30996b7195;
 	libflac 1.5.0;
 	Little-CMS git-lcms2.17-10-ge19dc49;
