@@ -2,14 +2,36 @@
 
 1.8.5.x dev
 =============================
-MpaDecFilter
-Improve TrueHD + Atmos bitstream passthrough.
+MP4splitter
+Improved Dolby Atmos support.
+Added experimental support for Audio Dolby AC-4.
+
+Matroskasplitter
+Improved Dolby Atmos support.
+Added experimental support for Audio Dolby AC-4.
+
+Mpegsplitter
+Added experimental support for Audio Dolby AC-4.
+Improved AAC Latm support.
+
+Flvsplitter
+Added support for audio opus.
+
+Mpadecfilter
+Improved transmission TrueHD + Dolby Atmos via HDMI Passthrough.
+Added experimental support for Audio Dolby AC-4.
 
 MPCVideoDec
 Fixed a crash when converting NV12 to YV12 when using the D3D11cb, D3D12cb or NVDEC decoder.
 
+YouTube
+Fixed the selection of default format (VP9 720p + OPUS) after resetting the settings.
+Improved the choice of an audio track for yt-dlp.
+Fixed the choice of audio track format.
+
 Player
-Fixed YouTube format selection (VP9 720p + Opus) after resetting settings.
+Fixed the ending of files in which the time exceeds the total duration.
+Added the ability to turn on and turn off the sound delay using the keys.
 Various interface fixes.
 
 Updated Romanian translation (by Andrei Miloiu).
