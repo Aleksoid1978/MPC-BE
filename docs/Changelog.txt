@@ -36,6 +36,9 @@ Fixed the ending of files in which the time exceeds the total duration.
 Added the ability to turn on and turn off the sound delay using the keys.
 Various interface fixes.
 
+Installer
+Updated MPC Video Renderer 0.9.11.
+
 Updated Romanian translation (by Andrei Miloiu).
 Updated Italian translation (by mapi68).
 Updated Korean translation (by Hackjjang).
