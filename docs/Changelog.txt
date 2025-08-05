@@ -2,13 +2,15 @@
 
 1.8.5.x dev
 =============================
+MpaSplitter
+Added experimental support for Audio Dolby AC-4.
+
 MP4splitter
 Improved Dolby Atmos support.
 Added experimental support for Audio Dolby AC-4.
 
 Matroskasplitter
 Improved Dolby Atmos support.
-Added experimental support for Audio Dolby AC-4.
 
 Mpegsplitter
 Added experimental support for Audio Dolby AC-4.
