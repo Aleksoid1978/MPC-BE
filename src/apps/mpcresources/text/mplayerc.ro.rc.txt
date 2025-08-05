@@ -578,7 +578,7 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 25
 19		"Răsfoire..."
 20		"Lansează..."
 21		"Pagina implicită:"
-23		"Operatori CGI: (.ext1=path1;.ext2=path2;...)"
+23		"Operatori de tip CGI: (.ext1=path1; .ext2=path2;...) (.ext1=calea1; .ext2=calea2;...)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
@@ -643,10 +643,10 @@ BEGIN DIALOGEX IDD_SELECTMEDIATYPE LINES 9
 END
 
 BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 19
-3		"Combină nuanțatoarele (shaderele)"
+3		"Combinatorul de nuanțatoare (de shadere)"
 8		"&Adaugă"
 10		"Activează shaderele pixelilor pentru cadre"
-12		"Activează shaderele pixelilor pt. ferestre"
+12		"Activează shadere de pixeli pentru ferestre"
 14		"&Elimină"
 15		"Mută în &sus"
 16		"Mută în &jos"
@@ -1252,7 +1252,7 @@ STRING IDS_AG_SAVE_SUBTITLE		"Salvează subtitrarea"
 STRING IDS_AG_SETTINGS		"Setări"
 STRING IDS_AG_SHADER		"nuanțator (shader): "
 STRING IDS_AG_SHADERS		"Nuanțatoare (Shadere)"
-STRING IDS_AG_SHADERS_1_ENABLE		"Nuanțatoare (shaderele) de pixeli"
+STRING IDS_AG_SHADERS_1_ENABLE		"Nuanțatoare (Shaderele) de pixeli"
 STRING IDS_AG_SHADERS_2_ENABLE		"Activează nuanțatoarele (shaderele) de pixeli pentru spațiul de pe ecran"
 STRING IDS_AG_SHADERS_SELECT		"Selectează nuanțatoarele (shaderele)"
 STRING IDS_AG_SOUND		"Sunet"
@@ -1917,7 +1917,7 @@ STRING IDS_SEEKBEGIN		"Sari la început"
 STRING IDS_SHADEREDITORDLG_0		"Ești sigur(ă) că dorești să ștergi acest nuanțator (acest shader)?"
 STRING IDS_SHADER_DELETE		"Șterge"
 STRING IDS_SHADER_EDITOR		"Editorul de nuanțatoare (de shadere)"
-STRING IDS_SHADER_FOLDER		"Deschide dosarul (folderul) nuanțatorului"
+STRING IDS_SHADER_FOLDER		"Deschide dosarul (folderul) nuanțatorului (shaderului)"
 STRING IDS_SHADER_NEW		"Nou..."
 STRING IDS_SHADER_SAVE		"Salvează"
 STRING IDS_SHOW_HISTORY		"Afișează istoricul"
@@ -2112,3 +2112,4 @@ STRING ID_SHOW_MILLISECONDS		"Afișează milisecundele"
 STRING ID_VOLUME_MUTE		"Mut\nMut"
 STRING ID_VOLUME_MUTE_DISABLED		"Fără sunet (Silențios)\nFără sunet (Silențios)"
 STRING ID_VOLUME_MUTE_OFF		"Activează sunetul\nActivează sunetul"
+
