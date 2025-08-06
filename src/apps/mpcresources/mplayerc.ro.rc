@@ -993,7 +993,7 @@ BEGIN
     PUSHBUTTON      "Lansează...",IDC_BUTTON2,240,89,50,14
     LTEXT           "Pagina implicită:",IDC_STATIC,5,107,285,8
     EDITTEXT        IDC_EDIT9,15,119,275,14,ES_AUTOHSCROLL
-    LTEXT           "Operatori CGI: (.ext1=path1;.ext2=path2;...)",IDC_STATIC,5,137,285,8
+    LTEXT           "Operatori de tip CGI: (.ext1=path1; .ext2=path2;...) (.ext1=calea1; .ext2=calea2;...)",IDC_STATIC,5,137,285,8
     EDITTEXT        IDC_EDIT3,15,149,275,14,ES_AUTOHSCROLL
 END
 
@@ -1020,16 +1020,16 @@ END
 
 IDD_SHADERCOMBINE_DLG DIALOGEX 0, 0, 215, 190
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Combină nuanțatoarele (shaderele)"
+CAPTION "Combinatorul de nuanțatoare (de shadere)"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     COMBOBOX        IDC_COMBO2,5,4,32,120,CBS_DROPDOWNLIST | WS_TABSTOP
     COMBOBOX        IDC_COMBO1,41,4,114,120,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "&Adaugă",IDC_BUTTON2,162,3,50,14
     CONTROL         "",IDC_STATIC1,"Static",SS_ETCHEDHORZ,4,21,208,1
-    CONTROL         "Activează shaderele pixelilor pentru cadre",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,26,150,10
+    CONTROL         "Activează shaderele de pixeli pentru cadre",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,26,150,10
     LISTBOX         IDC_LIST1,5,39,150,65,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Activează shaderele pixelilor pt. ferestre",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,109,150,10
+    CONTROL         "Activează shadere de pixeli pentru ferestre",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,109,150,10
     LISTBOX         IDC_LIST2,5,122,150,65,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "&Elimină",IDC_BUTTON3,162,25,50,14
     PUSHBUTTON      "Mută în &sus",IDC_BUTTON1,162,90,50,14
@@ -2620,7 +2620,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_SHADERS_SELECT   "Selectează nuanțatoarele (shaderele)"
-    IDS_AG_SHADERS_1_ENABLE "Nuanțatoare (shaderele) de pixeli"
+    IDS_AG_SHADERS_1_ENABLE "Nuanțatoare (Shaderele) de pixeli"
     IDS_AG_SHADERS_2_ENABLE "Activează nuanțatoarele (shaderele) de pixeli pentru spațiul de pe ecran"
     IDS_OSD_SHADERS_1_ON    "Nuanțatoarele (Shaderele) de pixeli de pre-redimensionare: Pornite"
     IDS_OSD_SHADERS_1_OFF   "Nuanțatoarele (Shaderele) de pixeli de pre-redimensionare: Oprite"
@@ -3824,7 +3824,7 @@ BEGIN
     IDS_SHADER_SAVE         "Salvează"
     IDS_SHADER_NEW          "Nou..."
     IDS_SHADER_DELETE       "Șterge"
-    IDS_SHADER_FOLDER       "Deschide dosarul (folderul) nuanțatorului"
+    IDS_SHADER_FOLDER       "Deschide dosarul (folderul) nuanțatorului (shaderului)"
     IDS_HISTORY_PATH        "Cale"
     IDS_HISTORY_TITLE       "Titlu"
     IDS_HISTORY_POSITION    "Poziție"
