@@ -47,7 +47,7 @@
 #define MPC_VERSION_MINOR       8
 #define MPC_VERSION_PATCH       6
 
-#define MPC_VERSION_STATUS      1
+#define MPC_VERSION_STATUS      0
 // MPC_VERSION_STATUS: 0 - dev; 1 - stable
 
 #define MPC_YEAR_COMMENTS       "2002-2025"
