@@ -1042,6 +1042,12 @@ CFilterApp theApp;
 
 #endif
 
+static CStringA AVError2Str(const int errnum)
+{
+	char errBuf[AV_ERROR_MAX_STRING_SIZE] = {};
+	return CStringA(av_make_error_string(errBuf, sizeof(errBuf), errnum));
+}
+
 BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
 {
 	DWORD procId = 0;
@@ -2321,6 +2327,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
 		}
 
 		if (ret < 0) {
+			DLog("CMPCVideoDecFilter::InitDecoder() avcodec_open2 return \"%s\"", AVError2Str(ret));
 			return VFW_E_INVALIDMEDIATYPE;
 		}
 
