@@ -22,10 +22,10 @@ PS: Do not use Windows SDK 10.0.26100.0. It is broken and generates bad x86 code
 
 
 2. Preparing the GCC environment (NASM is already included)
-  2.1. Download https://github.com/Aleksoid1978/MSYS/raw/main/MSYS_MinGW-w64_GCC_1421_x86-x64.7z
+  2.1. Download https://github.com/Aleksoid1978/MSYS/raw/main/MSYS_MinGW-w64_GCC_1521_x86-x64.7z
   2.2. Unpack the archive to "C:\MSYS".
     Example of downloading and unpacking:
-      curl -sSL https://github.com/Aleksoid1978/MSYS/raw/main/MSYS_MinGW-w64_GCC_1421_x86-x64.7z -o MSYS.7z
+      curl -sSL https://github.com/Aleksoid1978/MSYS/raw/main/MSYS_MinGW-w64_GCC_1521_x86-x64.7z -o MSYS.7z
       7z x MSYS.7z -oC:\MSYS
   NOTES: If you installed the MSYS/MinGW package in an other directory you will have to use that path in the following steps.
 

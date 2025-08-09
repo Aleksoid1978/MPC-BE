@@ -37,7 +37,7 @@ jobs:
 
       - name: Prepare MSYS
         run: |
-          curl -sSL https://github.com/Aleksoid1978/MSYS/raw/main/MSYS_MinGW-w64_GCC_1421_x86-x64.7z -o MSYS.7z
+          curl -sSL https://github.com/Aleksoid1978/MSYS/raw/main/MSYS_MinGW-w64_GCC_1521_x86-x64.7z -o MSYS.7z
           7z x MSYS.7z -oC:\\MSYS
           echo '@ECHO OFF' > environments.bat
           echo 'SET "MPCBE_MSYS=C:\\MSYS"' >> environments.bat
