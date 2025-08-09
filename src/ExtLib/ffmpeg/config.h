@@ -636,5 +636,6 @@ Note: when adding a new codec, you have to:
 #define CONFIG_CBS 1
 #define CONFIG_CBS_AV1 1
 #define CONFIG_CBS_H266 1
+#define CONFIG_CBS_VP9 1
 
 #endif /* FFMPEG_CONFIG_H */

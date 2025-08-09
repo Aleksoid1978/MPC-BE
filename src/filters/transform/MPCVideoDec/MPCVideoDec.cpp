@@ -2327,7 +2327,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
 		}
 
 		if (ret < 0) {
-			DLog("CMPCVideoDecFilter::InitDecoder() avcodec_open2 return \"%s\"", AVError2Str(ret));
+			DLog("CMPCVideoDecFilter::InitDecoder() avcodec_open2 return '%s'", AVError2Str(ret));
 			return VFW_E_INVALIDMEDIATYPE;
 		}
 
