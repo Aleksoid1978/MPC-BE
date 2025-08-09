@@ -173,6 +173,7 @@ SRCS_LC = \
 	libavcodec/cbs_bsf.c \
 	libavcodec/cbs_h2645.c \
 	libavcodec/cbs_sei.c \
+	libavcodec/cbs_vp9.c \
 	libavcodec/celp_filters.c \
 	libavcodec/celp_math.c \
 	libavcodec/cfhd.c \
