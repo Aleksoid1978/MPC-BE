@@ -271,6 +271,25 @@ static int get_siz(Jpeg2000DecoderContext *s)
         return AVERROR_INVALIDDATA;
     }
 
+    for (i = 0; i < s->ncomponents; i++) {
+        if (s->cdef[i] < 0) {
+            for (i = 0; i < s->ncomponents; i++) {
+                s->cdef[i] = i + 1;
+            }
+            if ((s->ncomponents & 1) == 0)
+                s->cdef[s->ncomponents-1] = 0;
+        }
+    }
+    // after here we no longer have to consider negative cdef
+
+    int cdef_used = 0;
+    for (i = 0; i < s->ncomponents; i++)
+        cdef_used |= 1<<s->cdef[i];
+
+    // Check that the channels we have are what we expect for the number of components
+    if (cdef_used != ((int[]){0,2,3,14,15})[s->ncomponents])
+        return AVERROR_INVALIDDATA;
+
     for (i = 0; i < s->ncomponents; i++) { // Ssiz_i XRsiz_i, YRsiz_i
         uint8_t x    = bytestream2_get_byteu(&s->g);
         s->cbps[i]   = (x & 0x7f) + 1;
@@ -283,7 +302,9 @@ static int get_siz(Jpeg2000DecoderContext *s)
             av_log(s->avctx, AV_LOG_ERROR, "Invalid sample separation %d/%d\n", s->cdx[i], s->cdy[i]);
             return AVERROR_INVALIDDATA;
         }
-        log2_chroma_wh |= s->cdy[i] >> 1 << i * 4 | s->cdx[i] >> 1 << i * 4 + 2;
+        int i_remapped = s->cdef[i] ? s->cdef[i]-1 : (s->ncomponents-1);
+
+        log2_chroma_wh |= s->cdy[i] >> 1 << i_remapped * 4 | s->cdx[i] >> 1 << i_remapped * 4 + 2;
     }
 
     s->numXtiles = ff_jpeg2000_ceildiv(s->width  - s->tile_offset_x, s->tile_width);
@@ -1362,7 +1383,7 @@ static int jpeg2000_decode_packet(Jpeg2000DecoderContext *s, Jpeg2000Tile *tile,
                     }
                     bits_to_read = (uint8_t) (bits_to_read + cblk->lblock);
                     segment_bytes = get_bits(s, bits_to_read);
-                    // Write length information for HT Refinment segment
+                    // Write length information for HT Refinement segment
                     cblk->pass_lengths[1] += segment_bytes;
                 } else if (!(cblk->modes & (JPEG2000_CBLK_TERMALL | JPEG2000_CBLK_BYPASS))) {
                     // Common case for non-HT code-blocks; we have only one segment
@@ -2814,7 +2835,7 @@ static av_cold int jpeg2000_decode_init(AVCodecContext *avctx)
     Jpeg2000DecoderContext *s = avctx->priv_data;
 
     if (avctx->lowres)
-        av_log(avctx, AV_LOG_WARNING, "lowres is overriden by reduction_factor but set anyway\n");
+        av_log(avctx, AV_LOG_WARNING, "lowres is overridden by reduction_factor but set anyway\n");
     if (!s->reduction_factor && avctx->lowres < JPEG2000_MAX_RESLEVELS) {
         s->reduction_factor = avctx->lowres;
     }
@@ -2884,17 +2905,6 @@ static int jpeg2000_decode_frame(AVCodecContext *avctx, AVFrame *picture,
 
     if (ret = jpeg2000_read_bitstream_packets(s))
         goto end;
-
-    for (int x = 0; x < s->ncomponents; x++) {
-        if (s->cdef[x] < 0) {
-            for (x = 0; x < s->ncomponents; x++) {
-                s->cdef[x] = x + 1;
-            }
-            if ((s->ncomponents & 1) == 0)
-                s->cdef[s->ncomponents-1] = 0;
-            break;
-        }
-    }
 
     for (int x = 0; x < s->ncomponents && s->codsty[x].transform == FF_DWT53;)
         if (++x == s->ncomponents)

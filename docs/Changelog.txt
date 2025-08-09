@@ -4,27 +4,30 @@
 =============================
 Updated Japanese translation (by tsubasanouta).
 
+Updated libraries:
+	ffmpeg n7.2-dev-3455-g5621eee672.
+
 
 1.8.6 - 2025-08-07
 =============================
 MpaSplitter
 Added experimental support for Audio Dolby AC-4.
 
-MP4splitter
+MP4Splitter
 Improved Dolby Atmos support.
 Added experimental support for Audio Dolby AC-4.
 
-Matroskasplitter
+MatroskaSplitter
 Improved Dolby Atmos support.
 
-Mpegsplitter
+MpegSplitter
 Added experimental support for Audio Dolby AC-4.
 Improved AAC Latm support.
 
-Flvsplitter
+FlvSplitter
 Added support for audio opus.
 
-Mpadecfilter
+MpaDecFilter
 Improved transmission TrueHD + Dolby Atmos via HDMI Passthrough.
 Added experimental support for Audio Dolby AC-4.
 
