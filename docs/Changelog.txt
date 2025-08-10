@@ -5,7 +5,7 @@
 Updated Japanese translation (by tsubasanouta).
 
 Updated libraries:
-	ffmpeg n7.2-dev-3455-g5621eee672.
+	ffmpeg n7.2-dev-3483-g9895c4222c.
 
 
 1.8.6 - 2025-08-07
