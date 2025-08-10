@@ -2250,8 +2250,10 @@ LRESULT CMainFrame::OnDwmCompositionChanged(WPARAM wParam, LPARAM lParam)
 
 void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 {
+	auto fs = GetMediaState();
+
 	// Only stop screensaver if video playing; allow for audio only
-	if ((GetMediaState() == State_Running && !m_bAudioOnly) && (((nID & 0xFFF0) == SC_SCREENSAVE) || ((nID & 0xFFF0) == SC_MONITORPOWER))) {
+	if ((fs == State_Running && !m_bAudioOnly) && (((nID & 0xFFF0) == SC_SCREENSAVE) || ((nID & 0xFFF0) == SC_MONITORPOWER))) {
 		DLog(L"SC_SCREENSAVE, nID = %d, lParam = %d", nID, lParam);
 		return;
 	} else if ((nID & 0xFFF0) == SC_MINIMIZE && m_bTrayIcon) {
@@ -2267,6 +2269,14 @@ void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 			}
 		}
 		ShowWindow(SW_HIDE);
+
+		if (AfxGetAppSettings().bPauseMinimizedVideo
+				&& m_eMediaLoadState == MLS_LOADED
+				&& fs == State_Running) {
+			m_bWasPausedOnMinimizedVideo = true;
+			SendMessageW(WM_COMMAND, ID_PLAY_PAUSE);
+		}
+
 		return;
 	} else if ((nID & 0xFFF0) == SC_MINIMIZE) {
 		if (IsSomethingLoaded() && m_bAudioOnly && m_pfnDwmSetIconicLivePreviewBitmap) {
@@ -5652,6 +5662,13 @@ LRESULT CMainFrame::OnRestore(WPARAM wParam, LPARAM lParam)
 				ShowControlBar(pDockingBar, TRUE, FALSE);
 			}
 			m_dockingbarsVisible.clear();
+
+			if (m_bWasPausedOnMinimizedVideo) {
+				if (m_eMediaLoadState == MLS_LOADED) {
+					SendMessageW(WM_COMMAND, ID_PLAY_PLAY);
+				}
+				m_bWasPausedOnMinimizedVideo = false;
+			}
 		} else {
 			SetForegroundWindow();
 		}
