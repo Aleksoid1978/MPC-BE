@@ -1735,7 +1735,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 {
 	Content::Online::Disconnect(fn);
 
-	CWebTextFile f(CTextFile::UTF8, CTextFile::ANSI);
+	CWebTextFile f(CTextFile::UTF8, CTextFile::ANSI, 3 * MEGABYTE);
 	if (!f.Open(fn)) {
 		return false;
 	}
