@@ -88,6 +88,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_FILTER_SETTINGS_CAPTION    "Settings"
+    IDS_FILTER_RESET_SETTINGS      "Reset"
     IDS_ARS_WASAPI_MODE            "WASAPI mode:"
     IDS_ARS_EXCLUSIVE              "Exclusive"
     IDS_ARS_SHARED                 "Shared"
