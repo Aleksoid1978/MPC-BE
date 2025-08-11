@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -75,9 +75,6 @@ extern bool				ExtractDim(const AM_MEDIA_TYPE* pmt, int& w, int& h, int& arx, in
 
 extern CLSID			GetCLSID(IBaseFilter* pBF);
 extern CLSID			GetCLSID(IPin* pPin);
-
-extern void				ShowPPage(CString DisplayName, HWND hParentWnd);
-extern void				ShowPPage(IUnknown* pUnknown, HWND hParentWnd);
 
 extern bool				IsCLSIDRegistered(LPCWSTR clsid);
 extern bool				IsCLSIDRegistered(const CLSID& clsid);

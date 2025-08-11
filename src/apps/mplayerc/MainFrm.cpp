@@ -8844,8 +8844,6 @@ void CMainFrame::OnPlayFiltersCopyToClipboard()
 
 void CMainFrame::OnPlayFilters(UINT nID)
 {
-	//ShowPPage(m_spparray[nID - ID_FILTERS_SUBITEM_START], m_hWnd);
-
 	CComPtr<IUnknown> pUnk = m_pparray[nID - ID_FILTERS_SUBITEM_START];
 
 	CComPropertySheet ps(ResStr(IDS_PROPSHEET_PROPERTIES), GetModalParent());
