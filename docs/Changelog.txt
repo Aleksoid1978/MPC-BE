@@ -2,6 +2,13 @@
 
 1.8.6.x dev
 =============================
+MpcAudioRenderer
+Fixed interface display when used in third-party players.
+
+Player
+Increased the maximum size of downloaded M3U playlists to 3 MB.
+Fixed the behavior of the "Pause the video playback when minimized" setting when the "Tray icon" setting is active.
+
 Updated Japanese translation (by tsubasanouta).
 
 Updated libraries:
