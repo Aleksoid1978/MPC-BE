@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -266,12 +266,13 @@ CString CPPageAccelTbl::MakeAccelShortcutLabel(ACCEL& a)
 		case VK_PAUSE:      str = L"Pause";       break;
 		case VK_CAPITAL:    str = L"Capital";     break;
 		//case VK_KANA:     str = L"Kana";        break;
-		//case VK_HANGEUL:  str = L"Hangeul";     break;
 		case VK_HANGUL:     str = L"Hangul";      break;
+		case VK_IME_ON:     str = L"IME On";      break;
 		case VK_JUNJA:      str = L"Junja";       break;
 		case VK_FINAL:      str = L"Final";       break;
 		//case VK_HANJA:    str = L"Hanja";       break;
 		case VK_KANJI:      str = L"Kanji";       break;
+		case VK_IME_OFF:    str = L"IME Off";     break;
 		case VK_ESCAPE:     str = L"Escape";      break;
 		case VK_CONVERT:    str = L"Convert";     break;
 		case VK_NONCONVERT: str = L"Non Convert"; break;
@@ -411,10 +412,50 @@ CString CPPageAccelTbl::MakeAccelShortcutLabel(ACCEL& a)
 		case VK_PA1:        str = L"PA1";         break;
 		case VK_OEM_CLEAR:  str = L"OEM Clear";   break;
 		case 0x07:
+		case 0x0A:
+		case 0x0B:
+		case 0x5E:
+		case VK_NAVIGATION_VIEW:
+		case VK_NAVIGATION_MENU:
+		case VK_NAVIGATION_UP:
+		case VK_NAVIGATION_DOWN:
+		case VK_NAVIGATION_LEFT:
+		case VK_NAVIGATION_RIGHT:
+		case VK_NAVIGATION_ACCEPT:
+		case VK_NAVIGATION_CANCEL:
+		case 0xB8:
+		case 0xB9:
+		case 0xC1:
+		case 0xC2:
+		case VK_GAMEPAD_A:
+		case VK_GAMEPAD_B:
+		case VK_GAMEPAD_X:
+		case VK_GAMEPAD_Y:
+		case VK_GAMEPAD_RIGHT_SHOULDER:
+		case VK_GAMEPAD_LEFT_SHOULDER:
+		case VK_GAMEPAD_LEFT_TRIGGER:
+		case VK_GAMEPAD_RIGHT_TRIGGER:
+		case VK_GAMEPAD_DPAD_UP:
+		case VK_GAMEPAD_DPAD_DOWN:
+		case VK_GAMEPAD_DPAD_LEFT:
+		case VK_GAMEPAD_DPAD_RIGHT:
+		case VK_GAMEPAD_MENU:
+		case VK_GAMEPAD_VIEW:
+		case VK_GAMEPAD_LEFT_THUMBSTICK_BUTTON:
+		case VK_GAMEPAD_RIGHT_THUMBSTICK_BUTTON:
+		case VK_GAMEPAD_LEFT_THUMBSTICK_UP:
+		case VK_GAMEPAD_LEFT_THUMBSTICK_DOWN:
+		case VK_GAMEPAD_LEFT_THUMBSTICK_RIGHT:
+		case VK_GAMEPAD_LEFT_THUMBSTICK_LEFT:
+		case VK_GAMEPAD_RIGHT_THUMBSTICK_UP:
+		case VK_GAMEPAD_RIGHT_THUMBSTICK_DOWN:
+		case VK_GAMEPAD_RIGHT_THUMBSTICK_RIGHT:
+		case VK_GAMEPAD_RIGHT_THUMBSTICK_LEFT:
+		case 0xE0:
+			str.Format(L"Reserved (0x%02x)", (WCHAR)a.key);
+			break;
 		case 0x0E:
 		case 0x0F:
-		case 0x16:
-		case 0x1A:
 		case 0x3A:
 		case 0x3B:
 		case 0x3C:
@@ -422,47 +463,6 @@ CString CPPageAccelTbl::MakeAccelShortcutLabel(ACCEL& a)
 		case 0x3E:
 		case 0x3F:
 		case 0x40:
-			str.Format(L"Undefined (0x%02x)", (WCHAR)a.key);
-			break;
-		case 0x0A:
-		case 0x0B:
-		case 0x5E:
-		case 0xB8:
-		case 0xB9:
-		case 0xC1:
-		case 0xC2:
-		case 0xC3:
-		case 0xC4:
-		case 0xC5:
-		case 0xC6:
-		case 0xC7:
-		case 0xC8:
-		case 0xC9:
-		case 0xCA:
-		case 0xCB:
-		case 0xCC:
-		case 0xCD:
-		case 0xCE:
-		case 0xCF:
-		case 0xD0:
-		case 0xD1:
-		case 0xD2:
-		case 0xD3:
-		case 0xD4:
-		case 0xD5:
-		case 0xD6:
-		case 0xD7:
-		case 0xE0:
-			str.Format(L"Reserved (0x%02x)", (WCHAR)a.key);
-			break;
-		case 0x88:
-		case 0x89:
-		case 0x8A:
-		case 0x8B:
-		case 0x8C:
-		case 0x8D:
-		case 0x8E:
-		case 0x8F:
 		case 0x97:
 		case 0x98:
 		case 0x99:
@@ -472,9 +472,6 @@ CString CPPageAccelTbl::MakeAccelShortcutLabel(ACCEL& a)
 		case 0x9D:
 		case 0x9E:
 		case 0x9F:
-		case 0xD8:
-		case 0xD9:
-		case 0xDA:
 		case 0xE8:
 			str.Format(L"Unassigned (0x%02x)", (WCHAR)a.key);
 			break;
