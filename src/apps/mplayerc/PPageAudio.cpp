@@ -356,42 +356,10 @@ void CPPageAudio::OnAudioRenderPropClick()
 				CComPtr<IBaseFilter> pBF;
 				HRESULT hr = pMoniker->BindToObject(nullptr, nullptr, IID_PPV_ARGS(&pBF));
 				if (SUCCEEDED(hr)) {
-					ISpecifyPropertyPages *pProp = nullptr;
-					hr = pBF->QueryInterface(IID_PPV_ARGS(&pProp));
-					if (SUCCEEDED(hr)) {
-						// Get the filter's name and IUnknown pointer.
-						FILTER_INFO FilterInfo;
-						hr = pBF->QueryFilterInfo(&FilterInfo);
-						if (SUCCEEDED(hr)) {
-							IUnknown *pFilterUnk;
-							hr = pBF->QueryInterface(IID_PPV_ARGS(&pFilterUnk));
-							if (SUCCEEDED(hr)) {
-
-								// Show the page.
-								CAUUID caGUID;
-								pProp->GetPages(&caGUID);
-								pProp->Release();
-
-								OleCreatePropertyFrame(
-									this->m_hWnd,			// Parent window
-									0, 0,					// Reserved
-									FilterInfo.achName,		// Caption for the dialog box
-									1,						// Number of objects (just the filter)
-									&pFilterUnk,			// Array of object pointers.
-									caGUID.cElems,			// Number of property pages
-									caGUID.pElems,			// Array of property page CLSIDs
-									0,						// Locale identifier
-									0, nullptr				// Reserved
-								);
-
-								// Clean up.
-								CoTaskMemFree(caGUID.pElems);
-								pFilterUnk->Release();
-							}
-							if (FilterInfo.pGraph) {
-								FilterInfo.pGraph->Release();
-							}
-						}
+					if (CComQIPtr<ISpecifyPropertyPages> pSPP = pBF.p) {
+						CComPropertySheet ps(ResStr(IDS_PROPSHEET_PROPERTIES), this);
+						ps.AddPages(pSPP);
+						ps.DoModal();
 					}
 				}
 				break;
