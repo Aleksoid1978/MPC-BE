@@ -132,7 +132,7 @@ BEGIN
     GROUPBOX        "Setări pentru deschiderea audio",IDC_STATIC,5,102,285,51
     CONTROL         "Încarcă automat fișierele audio",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,113,276,9
     EDITTEXT        IDC_EDIT4,10,124,222,13,ES_AUTOHSCROLL
-    PUSHBUTTON      "Resetare",IDC_BUTTON2,235,124,50,13
+    PUSHBUTTON      "Resetează",IDC_BUTTON2,235,124,50,13
     CONTROL         "Preferă fișierele audio externe decât pista audio încorporată",IDC_CHECK3,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,140,273,9
 END
@@ -401,7 +401,7 @@ BEGIN
     GROUPBOX        "Extensii pentru fișiere",IDC_STATIC,5,5,286,181
     CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,10,16,276,149
     EDITTEXT        IDC_EDIT1,10,169,165,13,ES_AUTOHSCROLL
-    PUSHBUTTON      "Implicit",IDC_BUTTON2,179,168,54,14
+    PUSHBUTTON      "Implicite",IDC_BUTTON2,179,168,54,14
     PUSHBUTTON      "Definește",IDC_BUTTON_EXT_SET,237,168,49,14
     GROUPBOX        "Asociază",IDC_STATIC,5,189,286,26
     PUSHBUTTON      "&Video",IDC_BUTTON4,10,198,40,14
@@ -1096,7 +1096,7 @@ BEGIN
     EDITTEXT        IDC_EDIT1,15,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT2,64,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
-    PUSHBUTTON      "Implicit",IDC_BUTTON1,158,17,56,14
+    PUSHBUTTON      "Implicite",IDC_BUTTON1,158,17,56,14
     CONTROL         "Nu folosi „căutarea în dosar (în folder)” pentru comenzile (controalele) „Sari înapoi/înainte” atunci când este numai un element în lista de redare (în playlist)",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,280,18
     CONTROL         "Previne minimizarea playerului din ecran complet pe un monitor care nu este implicit",IDC_CHECK6,
@@ -2147,7 +2147,7 @@ BEGIN
         MENUITEM "Meniul pentru titluri",                 ID_NAVIGATE_TITLEMENU
         MENUITEM "Meniul p&rincipal",                  ID_NAVIGATE_ROOTMENU
         MENUITEM "Meniul pentru &subtitrări",              ID_NAVIGATE_SUBPICTUREMENU
-        MENUITEM "Meniul pentru &audio",                 ID_NAVIGATE_AUDIOMENU
+        MENUITEM "Meniul pentru pista &audio (Meniul pentru sunet)",                 ID_NAVIGATE_AUDIOMENU
         MENUITEM "Meniul pentru un&ghiuri",                 ID_NAVIGATE_ANGLEMENU
         MENUITEM "Meniul pentru &capitole",               ID_NAVIGATE_CHAPTERMENU
     END
@@ -2697,7 +2697,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_ENABLEFRAMETIMECORRECTION "Activează corecția de timp pentru cadru"
+    IDS_AG_ENABLEFRAMETIMECORRECTION "Activează corecția de timp pentru cadre"
 END
 
 STRINGTABLE
@@ -2753,7 +2753,7 @@ STRINGTABLE
 BEGIN
     IDS_AG_MEDIAFILES       "Fișiere media (de toate tipurile)"
     IDS_AG_VIDEOFILES       "Fișiere video (de toate tipurile)"
-    IDS_AG_AUDIOFILES       "Fișiere audio (toate tipurile)"
+    IDS_AG_AUDIOFILES       "Fișiere audio (de toate tipurile)"
     IDS_AG_ALLFILES         "Toate fișierele"
 END
 
@@ -2784,7 +2784,7 @@ BEGIN
     IDS_VOLUME_OSD_MUTE     "Volumul: %d%% [Mut]"
     IDS_COPY_TO_CLIPBOARD   "Copiază în clipboard"
     IDS_AUDIO_LEVEL         "Nivelul (%d):"
-    IDS_AUDIO_RELEASETIME   "Timp de eliberare (%d):"
+    IDS_AUDIO_RELEASETIME   "Timpul de eliberare (%d):"
     IDS_AUDIO_GAIN          "Zgomot (%+.1f dB):"
     IDS_SAVING_THUMBNAIL    "Se salvează miniaturile"
     IDS_SEEKBEGIN           "Sari la început"
@@ -3010,7 +3010,7 @@ STRINGTABLE
 BEGIN
     IDS_PPAGEWEBSERVER_0    "Selectarea directorului"
     IDS_AG_DEFAULT          "Implicit"
-    IDS_AG_DEFAULT_L        "implicit"
+    IDS_AG_DEFAULT_L        "implicite"
     IDS_AG_AUTO             "Auto(mat)"
     IDS_AG_RECOMMENDED      "recomandat"
     IDS_AG_NOTRECOMMENDED   "nerecomandat"
@@ -3075,7 +3075,7 @@ BEGIN
     IDS_AG_OPEN_DISC        "Deschide discul"
     IDS_AG_FILTERS          "Filtre"
     IDS_AG_SUBTITLES        "Subtitrări"
-    IDS_AG_AUDIOLANG        "Limba pentru audio"
+    IDS_AG_AUDIOLANG        "Limba pentru pista audio"
     IDS_AG_SUBTITLELANG     "Limba subtitrărilor"
     IDS_AG_VIDEO_ANGLE      "Unghi video"
 END
@@ -3133,8 +3133,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_MAINFRM_68          "Raport de aspect: %d:%d"
-    IDS_MAINFRM_69          "Raport de aspect: Implicit"
+    IDS_MAINFRM_68          "Raportul de aspect: %d:%d"
+    IDS_MAINFRM_69          "Raportul de aspect: Implicit"
     IDS_MAINFRM_70          "Întârziere audio: %I64dms"
     IDS_AG_CHAPTER          "Capitolul %d"
     IDS_MAINFRM_73          "Nu se poate încărca shaderul: "
@@ -3257,7 +3257,7 @@ BEGIN
     IDS_CMD_DVD             "/dvd\tRulează în modul DVD, „numele căii” înseamnă dosarul (folderul)\nDVD-ului (opțional)"
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tPornește redarea la titlul T, la capitolul C"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tPornește redarea la titlul T, în poziția hh:mm:ss"
-    IDS_CMD_CD              "/cd\tÎncarcă toate pistele unui cd audio sau (s)vcd,\n„numele căii” înseamnă calea unității (opțional)"
+    IDS_CMD_CD              "/cd\tÎncarcă toate pistele unui CD audio sau (s)vcd,\n„numele căii” înseamnă calea unității (opțional)"
     IDS_CMD_OPEN            "/open\tDeschide fișierul, nu porni redarea în mod automat"
     IDS_CMD_PLAY            "/play\tÎncepe redarea fișierului imediat ce playerul este\nlansat"
     IDS_CMD_CLOSE           "/close\tÎnchide playerul după redare (funcționează doar când\neste folosit cu /play (redare))"
@@ -3400,7 +3400,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_MPEG2_BRIGHTNESS    "Luminozitate"
-    IDS_MPEG2_RESET         "Resetare"
+    IDS_MPEG2_RESET         "Resetează"
     IDS_MPEG2_NOTE1         "Atenție: Folosind un format de ieșire non-planar, deîntrețesetorul bob sau ajustând proprietățile de culoare se poate degrada performanța. Deîntrețesetorul „Auto” („Automat”) se va schimba la „Blend” („Amestec”) atunci când este necesar."
     IDS_MPEG2_CONTRAST      "Contrast"
     IDS_MPEG2_HUE           "Nuanță"
@@ -3553,7 +3553,7 @@ BEGIN
     IDS_AUDIO_STREAM        "Audio %u/%u: %s"
     IDS_AG_REOPEN           "Redeschide fișierul"
     IDS_PROPERTIESFOR       "Proprietăți pentru „%s”"
-    IDS_AUDIO_ONLY          "numai audio (sunet)"
+    IDS_AUDIO_ONLY          "numai audio (numai sunet)"
 END
 
 STRINGTABLE

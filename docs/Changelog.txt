@@ -10,6 +10,7 @@ Increased the maximum size of downloaded M3U playlists to 3 MB.
 Fixed the behavior of the "Pause the video playback when minimized" setting when the "Tray icon" setting is active.
 
 Updated Japanese translation (by tsubasanouta).
+Updated Romanian translation (by Andrei Miloiu).
 
 Updated libraries:
 	ffmpeg n7.2-dev-3483-g9895c4222c.
