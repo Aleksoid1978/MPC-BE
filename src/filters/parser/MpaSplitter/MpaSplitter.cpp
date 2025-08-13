@@ -133,8 +133,8 @@ HRESULT CMpaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = m_pFile->IsStreaming() ? 0 : m_pFile->GetDuration();
 
-	SetID3TagProperties(this, m_pFile->m_pID3Tag);
-	SetAPETagProperties(this, m_pFile->m_pAPETag);
+	SetID3TagProperties(this, m_pFile->m_pID3Tag.get());
+	SetAPETagProperties(this, m_pFile->m_pAPETag.get());
 
 	return m_pOutputs.size() > 0 ? S_OK : E_FAIL;
 }

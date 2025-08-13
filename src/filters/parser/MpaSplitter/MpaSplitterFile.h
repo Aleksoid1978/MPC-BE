@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "../BaseSplitter/BaseSplitterFileEx.h"
 #include "DSUtil/ID3Tag.h"
 #include "DSUtil/ApeTag.h"
@@ -60,10 +62,10 @@ class CMpaSplitterFile : public CBaseSplitterFileEx
 
 public:
 	CMpaSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr);
-	virtual ~CMpaSplitterFile();
+	virtual ~CMpaSplitterFile() = default;
 
-	CID3Tag* m_pID3Tag;
-	CAPETag* m_pAPETag;
+	std::unique_ptr<CID3Tag> m_pID3Tag;
+	std::unique_ptr<CAPETag> m_pAPETag;
 
 	const CMediaType& GetMediaType() {
 		return m_mt;

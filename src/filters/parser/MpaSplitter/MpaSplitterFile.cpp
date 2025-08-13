@@ -33,18 +33,10 @@ CMpaSplitterFile::CMpaSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr)
 	, m_procsize(0)
 	, m_coefficient(0.0)
 	, m_bIsVBR(false)
-	, m_pID3Tag(nullptr)
-	, m_pAPETag(nullptr)
 {
 	if (SUCCEEDED(hr)) {
 		hr = Init();
 	}
-}
-
-CMpaSplitterFile::~CMpaSplitterFile()
-{
-	SAFE_DELETE(m_pID3Tag);
-	SAFE_DELETE(m_pAPETag);
 }
 
 #define MPA_HEADER_SIZE  4
@@ -112,20 +104,20 @@ HRESULT CMpaSplitterFile::Init()
 
 		// TODO: read extended header
 		if (major <= 4) {
-			BYTE* buf = DNew BYTE[size];
-			ByteRead(buf, size);
+			auto buf = std::make_unique<BYTE[]>(size);
+			if (ByteRead(buf.get(), size) == S_OK) {
+				if (!m_pID3Tag) {
+					m_pID3Tag = std::make_unique<CID3Tag>(major, flags);
+				}
 
-			if (!m_pID3Tag) {
-				m_pID3Tag = DNew CID3Tag(major, flags);
+				m_pID3Tag->ReadTagsV2(buf.get(), size);
 			}
-
-			m_pID3Tag->ReadTagsV2(buf, size);
-			delete[] buf;
 		}
 
 		Seek(m_startpos);
-		for (int i = 0; i < (1 << 20) && m_startpos < endpos && !BitRead(8); i++) {
+		for (int i = 0; i < (1 << 20) && m_startpos < endpos && !BitRead(8, true); i++) {
 			m_startpos++;
+			Seek(m_startpos);
 		}
 	}
 
@@ -137,16 +129,15 @@ HRESULT CMpaSplitterFile::Init()
 			if (BitRead(24) == 'TAG') {
 				endpos -= ID3v1_TAG_SIZE;
 
-				if (!m_pID3Tag) {
-					m_pID3Tag = DNew CID3Tag();
-				}
-
 				const size_t tag_size = ID3v1_TAG_SIZE - 3;
-				BYTE* buf = DNew BYTE[tag_size];
-				ByteRead(buf, tag_size);
-				m_pID3Tag->ReadTagsV1(buf, tag_size);
+				auto buf = std::make_unique<BYTE[]>(tag_size);
+				if (ByteRead(buf.get(), tag_size) == S_OK) {
+					if (!m_pID3Tag) {
+						m_pID3Tag = std::make_unique<CID3Tag>();
+					}
 
-				delete [] buf;
+					m_pID3Tag->ReadTagsV1(buf.get(), tag_size);
+				}
 			}
 		}
 
@@ -155,15 +146,14 @@ HRESULT CMpaSplitterFile::Init()
 
 			Seek(endpos - APE_TAG_FOOTER_BYTES);
 			if (ByteRead(buf, APE_TAG_FOOTER_BYTES) == S_OK) {
-				m_pAPETag = DNew CAPETag;
+				m_pAPETag = std::make_unique<CAPETag>();
 				if (m_pAPETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_pAPETag->GetTagSize()) {
 					const size_t tag_size = m_pAPETag->GetTagSize();
 					Seek(endpos - tag_size);
-					BYTE *p = DNew BYTE[tag_size];
-					if (ByteRead(p, tag_size) == S_OK) {
-						m_pAPETag->ReadTags(p, tag_size);
+					auto p = std::make_unique<BYTE[]>(tag_size);
+					if (ByteRead(p.get(), tag_size) == S_OK) {
+						m_pAPETag->ReadTags(p.get(), tag_size);
 					}
-					delete [] p;
 
 					endpos -= tag_size;
 				}
