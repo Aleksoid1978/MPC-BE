@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -166,7 +166,8 @@ void CWebClientSocket::Header()
 							std::list<CString> sl2;
 							Explode(item, sl2, L'=', 2);
 							if (sl2.size() == 2) {
-								m_post[sl2.front().MakeLower()] = UTF8ToWStr(UrlDecode(TToA(sl2.back())));
+								Unescape(sl2.back());
+								m_post[sl2.front().MakeLower()] = sl2.back();
 							} else {
 								m_post[sl2.front().MakeLower()].Empty();
 							}
@@ -205,7 +206,8 @@ void CWebClientSocket::Header()
 				std::list<CString> sl2;
 				Explode(item, sl2, L'=', 2);
 				if (sl2.size() == 2) {
-					m_get[sl2.front()] = UTF8ToWStr(UrlDecode(TToA(sl2.back())));
+					Unescape(sl2.back());
+					m_get[sl2.front()] = sl2.back();
 				} else {
 					m_get[sl2.front()].Empty();
 				}
