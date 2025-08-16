@@ -409,15 +409,6 @@ public:
 	CWinLircClient();
 };
 
-class CUIceClient : public CRemoteCtrlClient
-{
-protected:
-	virtual void OnCommand(CStringA str);
-
-public:
-	CUIceClient();
-};
-
 
 class CFiltersPrioritySettings {
 public:
@@ -521,9 +512,6 @@ public:
 	bool			bWinLirc;
 	CString			strWinLircAddr;
 	CWinLircClient	WinLircClient;
-	bool			bUIce;
-	CString			strUIceAddr;
-	CUIceClient		UIceClient;
 	bool			bGlobalMedia;
 	int				AccelTblColWidths[6];
 

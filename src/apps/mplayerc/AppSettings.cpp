@@ -635,8 +635,6 @@ void CAppSettings::ResetSettings()
 	// Keys
 	strWinLircAddr = L"127.0.0.1:8765";
 	bWinLirc = false;
-	strUIceAddr = L"127.0.0.1:1234";
-	bUIce = false;
 	bGlobalMedia = false;
 	ZeroMemory(AccelTblColWidths, sizeof(AccelTblColWidths));
 
@@ -1202,8 +1200,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_WINLIRCADDR, strWinLircAddr);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WINLIRC, bWinLirc);
-	profile.ReadString(IDS_R_SETTINGS, IDS_RS_UICEADDR, strUIceAddr);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_UICE, bUIce);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, bGlobalMedia);
 
 	// Mouse
@@ -1863,8 +1859,6 @@ void CAppSettings::SaveSettings()
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_WINLIRC, bWinLirc);
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_WINLIRCADDR, strWinLircAddr);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_UICE, bUIce);
-	profile.WriteString(IDS_R_SETTINGS, IDS_RS_UICEADDR, strUIceAddr);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, bGlobalMedia);
 
 	// Mouse

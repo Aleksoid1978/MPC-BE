@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -79,10 +79,6 @@ public:
 	CString m_WinLircAddr;
 	CEdit m_WinLircEdit;
 	CStaticLink m_WinLircLink;
-	BOOL m_bUIce = FALSE;
-	CString m_UIceAddr;
-	CEdit m_UIceEdit;
-	CStaticLink m_UIceLink;
 	BOOL m_bGlobalMedia = FALSE;
 
 	UINT_PTR m_nStatusTimerID = 0;
