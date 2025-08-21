@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -49,7 +49,7 @@ protected:
 public:
 	COggSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 
-	void AddComment(BYTE* p, int len);
+	void AddComment(BYTE* p, int len, bool bOverrideComment);
 	CStringW GetComment(CStringW key);
 
 	void HandlePacket(DWORD TrackNumber, BYTE* pData, int len);

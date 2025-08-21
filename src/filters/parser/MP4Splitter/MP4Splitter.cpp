@@ -2155,27 +2155,35 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							} else {
 								CStringW str = UTF8ToWStr(CStringA((LPCSTR)db->GetData(), db->GetDataSize()));
 
+								auto SetValue = [](CStringW& value, const CStringW& str) {
+									if (value.IsEmpty()) {
+										value = str;
+									} else {
+										value += L" / " + str;
+									}
+								};
+
 								switch (atom->GetType()) {
 									case AP4_ATOM_TYPE_NAM:
-										title = str;
+										SetValue(title, str);
 										break;
 									case AP4_ATOM_TYPE_ART:
-										artist = str;
+										SetValue(artist, str);
 										break;
 									case AP4_ATOM_TYPE_WRT:
-										writer = str;
+										SetValue(writer, str);
 										break;
 									case AP4_ATOM_TYPE_ALB:
-										album = str;
+										SetValue(album, str);
 										break;
 									case AP4_ATOM_TYPE_DAY:
-										year = str;
+										SetValue(year, str);
 										break;
 									case AP4_ATOM_TYPE_TOO:
-										appl = str;
+										SetValue(appl, str);
 										break;
 									case AP4_ATOM_TYPE_CMT:
-										desc = str;
+										SetValue(desc, str);
 										break;
 									case AP4_ATOM_TYPE_DESC:
 										if (desc.IsEmpty()) {
@@ -2183,10 +2191,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										}
 										break;
 									case AP4_ATOM_TYPE_GEN:
-										gen = str;
+										SetValue(gen, str);
 										break;
 									case AP4_ATOM_TYPE_CPRT:
-										copyright = str;
+										SetValue(copyright, str);
 										break;
 								}
 							}

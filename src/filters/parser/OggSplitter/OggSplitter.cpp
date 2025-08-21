@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -223,7 +223,7 @@ start:
 					streamMoreInit[page.m_hdr.bitstream_serial_number] = TRUE;
 				} else if (type == 0x81) {
 					if (COggTheoraOutputPin* pOggPin = dynamic_cast<COggTheoraOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
-						pOggPin->AddComment(page.data() + 7, page.size() - 7);
+						pOggPin->AddComment(page.data() + 7, page.size() - 7, false);
 					}
 				}
 			} else if (type == 1 && (page.m_hdr.header_type_flag & OggPageHeader::first)) {
@@ -259,7 +259,7 @@ start:
 				}
 			} else if (type == 3 && !memcmp(p, "vorbis", 6)) {
 				if (COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
-					pOggPin->AddComment(page.data() + 7, page.size() - 7);
+					pOggPin->AddComment(page.data() + 7, page.size() - 7, false);
 				}
 			} else if (type == 0x7F && page.size() > 12 && GETU32(p + 8) == FCC('fLaC')) {	// Flac
 				if (PinNotExist) {
@@ -294,7 +294,7 @@ start:
 				}
 			} else if (!memcmp(page.data(), "OpusTags", 8) && page.size() > 8) {
 				if (COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
-					pOggPin->AddComment(page.data() + 8, page.size() - 8);
+					pOggPin->AddComment(page.data() + 8, page.size() - 8, false);
 				}
 			} else if (!memcmp(page.data(), "Speex   ", 8) && page.size() > 8) {
 				if (PinNotExist) {
@@ -329,14 +329,14 @@ start:
 					case 0x02:
 						if (p[5] == 0x20) {
 							if (COggVP8OutputPin* pOggPin = dynamic_cast<COggVP8OutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
-								pOggPin->AddComment(page.data() + 7, page.size() - 7);
+								pOggPin->AddComment(page.data() + 7, page.size() - 7, false);
 							}
 						}
 						break;
 				}
 			} else if (type == 0x84) {
 				if (COggFlacOutputPin* pOggPin = dynamic_cast<COggFlacOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
-					pOggPin->AddComment(page.data() + 4, page.size() - 4);
+					pOggPin->AddComment(page.data() + 4, page.size() - 4, false);
 				}
 			} else if (!(type & 1) && streamMoreInit.empty()) {
 				break;
@@ -748,7 +748,7 @@ COggSplitterOutputPin::COggSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter
 	ResetState();
 }
 
-void COggSplitterOutputPin::AddComment(BYTE* p, int len)
+void COggSplitterOutputPin::AddComment(BYTE* p, int len, bool bOverrideComment)
 {
 	CGolombBuffer gb(p, len);
 	gb.SkipBytes(gb.ReadDwordLE());
@@ -787,20 +787,23 @@ void COggSplitterOutputPin::AddComment(BYTE* p, int len)
 			}
 		}
 
-		m_pComments[commentKey] = commentValue;
+		auto& comment = m_pComments[commentKey];
+		if (comment.IsEmpty() || bOverrideComment) {
+			comment = commentValue;
+		} else {
+			comment += L" / " + commentValue;
+		}
 	}
 }
 
 CStringW COggSplitterOutputPin::GetComment(CStringW key)
 {
 	key.MakeUpper();
-	std::list<CStringW> sl;
-	for (const auto& [_key, _value] : m_pComments) {
-		if (_key == key) {
-			sl.push_back(_value);
-		}
+	if (auto it = m_pComments.find(key); it != m_pComments.end()) {
+		return it->second;
 	}
-	return Implode(sl, ';');
+
+	return {};
 }
 
 void COggSplitterOutputPin::ResetState(DWORD seqnum/* = DWORD_MAX*/)
@@ -999,7 +1002,7 @@ HRESULT COggVorbisOutputPin::UnpackPacket(std::unique_ptr<CPacket>& p, BYTE* pDa
 		if (IsInitialized()) {
 			if (pData[0] == 3) {
 				// vorbis comment
-				AddComment(pData + 7, len - 7);
+				AddComment(pData + 7, len - 7, true);
 				m_bMetadataUpdate = true;
 			}
 			return E_FAIL; // skip Vorbis header packets ...
@@ -1114,7 +1117,7 @@ HRESULT COggFlacOutputPin::UnpackPacket(std::unique_ptr<CPacket>& p, BYTE* pData
 	if (pData[0] != 0xFF || (pData[1] & 0xFE) != 0xF8) {
 		if (len > 4 && (pData[0] & 0x7F) == 4) {
 			// flac vorbis comment
-			AddComment(pData + 4, len - 4);
+			AddComment(pData + 4, len - 4, true);
 			m_bMetadataUpdate = true;
 		}
 		return S_FALSE;
@@ -1712,7 +1715,7 @@ HRESULT COggOpusOutputPin::UnpackPacket(std::unique_ptr<CPacket>& p, BYTE* pData
 {
 	if (len > 8 && !memcmp(pData, "Opus", 4)) {
 		if (!memcmp(pData, "OpusTags", 8)) {
-			AddComment(pData + 8, len - 8);
+			AddComment(pData + 8, len - 8, true);
 			m_bMetadataUpdate = true;
 		}
 		return E_FAIL; // skip Opus header packets ...
