@@ -123,25 +123,29 @@ HRESULT CMpaSplitterFile::Init()
 
 	endpos = GetLength();
 	if (IsRandomAccess()) {
+		bool ID3v1Present = false;
 		if (endpos > ID3v1_TAG_SIZE) {
 			Seek(endpos - ID3v1_TAG_SIZE);
 
 			if (BitRead(24) == 'TAG') {
+				ID3v1Present = true;
 				endpos -= ID3v1_TAG_SIZE;
 
-				const size_t tag_size = ID3v1_TAG_SIZE - 3;
-				auto buf = std::make_unique<BYTE[]>(tag_size);
-				if (ByteRead(buf.get(), tag_size) == S_OK) {
-					if (!m_pID3Tag) {
-						m_pID3Tag = std::make_unique<CID3Tag>();
-					}
+				if (!m_pID3Tag) {
+					const size_t tag_size = ID3v1_TAG_SIZE - 3;
+					auto buf = std::make_unique<BYTE[]>(tag_size);
+					if (ByteRead(buf.get(), tag_size) == S_OK) {
+						if (!m_pID3Tag) {
+							m_pID3Tag = std::make_unique<CID3Tag>();
+						}
 
-					m_pID3Tag->ReadTagsV1(buf.get(), tag_size);
+						m_pID3Tag->ReadTagsV1(buf.get(), tag_size);
+					}
 				}
 			}
 		}
 
-		if (endpos > APE_TAG_FOOTER_BYTES) {
+		if (!ID3v1Present && (endpos > APE_TAG_FOOTER_BYTES)) {
 			BYTE buf[APE_TAG_FOOTER_BYTES] = {};
 
 			Seek(endpos - APE_TAG_FOOTER_BYTES);
@@ -149,10 +153,14 @@ HRESULT CMpaSplitterFile::Init()
 				m_pAPETag = std::make_unique<CAPETag>();
 				if (m_pAPETag->ReadFooter(buf, APE_TAG_FOOTER_BYTES) && m_pAPETag->GetTagSize()) {
 					const size_t tag_size = m_pAPETag->GetTagSize();
-					Seek(endpos - tag_size);
-					auto p = std::make_unique<BYTE[]>(tag_size);
-					if (ByteRead(p.get(), tag_size) == S_OK) {
-						m_pAPETag->ReadTags(p.get(), tag_size);
+					if (m_pID3Tag) {
+						m_pAPETag.reset();
+					} else {
+						Seek(endpos - tag_size);
+						auto p = std::make_unique<BYTE[]>(tag_size);
+						if (ByteRead(p.get(), tag_size) == S_OK) {
+							m_pAPETag->ReadTags(p.get(), tag_size);
+						}
 					}
 
 					endpos -= tag_size;
