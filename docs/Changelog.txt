@@ -13,7 +13,7 @@ Updated Japanese translation (by tsubasanouta).
 Updated Romanian translation (by Andrei Miloiu).
 
 Updated libraries:
-	ffmpeg n7.2-dev-3586-g50affd2b09.
+	ffmpeg n8.1-dev-197-g673f28b6cb.
 
 
 1.8.6 - 2025-08-07
