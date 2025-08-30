@@ -2,12 +2,22 @@
 
 1.8.6.x dev
 =============================
+MpaSplitter
+Improved work with files that have several tags of different formats.
+
+MP4Splitter
+Added support for multiple tags.
+
+OggSplitter
+Added support for multiple tags.
+
 MpcAudioRenderer
 Fixed interface display when used in third-party players.
 
 Player
 Increased the maximum size of downloaded M3U playlists to 3 MB.
 Fixed the behavior of the "Pause the video playback when minimized" setting when the "Tray icon" setting is active.
+Remote support for control of the player using uICE (does not work on Windows 7 and newer).
 
 Updated Japanese translation (by tsubasanouta).
 Updated Romanian translation (by Andrei Miloiu).
