@@ -552,6 +552,10 @@ static int exif_parse_ifd_list(void *logctx, GetByteContext *gb, int le,
     ifd->count = entries;
     av_log(logctx, AV_LOG_DEBUG, "entry count for IFD: %u\n", ifd->count);
 
+    /* empty IFD is technically legal but equivalent to no metadata present */
+    if (!ifd->count)
+        goto end;
+
     if (av_size_mult(ifd->count, sizeof(*ifd->entries), &required_size) < 0)
         return AVERROR(ENOMEM);
     temp = av_fast_realloc(ifd->entries, &ifd->size, required_size);
@@ -571,6 +575,7 @@ static int exif_parse_ifd_list(void *logctx, GetByteContext *gb, int le,
             return ret;
     }
 
+end:
     /*
      * at the end of an IFD is an pointer to the next IFD
      * or zero if there are no more IFDs, which is usually the case
@@ -695,11 +700,7 @@ int av_exif_write(void *logctx, const AVExifMetadata *ifd, AVBufferRef **buffer,
     PutByteContext pb;
     int ret, off = 0;
 
-#if AV_HAVE_BIGENDIAN
-    int le = 0;
-#else
     int le = 1;
-#endif
 
     if (*buffer)
         return AVERROR(EINVAL);
@@ -736,12 +737,8 @@ int av_exif_write(void *logctx, const AVExifMetadata *ifd, AVBufferRef **buffer,
 
     if (header_mode != AV_EXIF_ASSUME_BE && header_mode != AV_EXIF_ASSUME_LE) {
         /* these constants are be32 in both cases */
-        /* this is a #if instead of a ternary to suppress a deadcode warning */
-#if AV_HAVE_BIGENDIAN
-        bytestream2_put_be32(&pb, EXIF_MM_LONG);
-#else
+        /* le == 1 always in this case */
         bytestream2_put_be32(&pb, EXIF_II_LONG);
-#endif
         tput32(&pb, le, 8);
     }
 
@@ -996,7 +993,11 @@ static int exif_clone_entry(AVExifEntry *dst, const AVExifEntry *src)
             EXIF_COPY(dst->value.sbytes, src->value.sbytes);
             break;
         case AV_TIFF_STRING:
-            EXIF_COPY(dst->value.str, src->value.str);
+            dst->value.str = av_memdup(src->value.str, src->count+1);
+            if (!dst->value.str) {
+                ret = AVERROR(ENOMEM);
+                goto end;
+            }
             break;
     }
 
@@ -1017,7 +1018,7 @@ static int exif_get_entry(void *logctx, AVExifMetadata *ifd, uint16_t id, int de
 {
     int offset = 1;
 
-    if (!ifd || ifd->entries && !ifd->count || ifd->count && !ifd->entries || !value)
+    if (!ifd || ifd->count && !ifd->entries || !value)
         return AVERROR(EINVAL);
 
     for (size_t i = 0; i < ifd->count; i++) {
@@ -1038,9 +1039,9 @@ static int exif_get_entry(void *logctx, AVExifMetadata *ifd, uint16_t id, int de
     return 0;
 }
 
-int av_exif_get_entry(void *logctx, AVExifMetadata *ifd, uint16_t id, int recursive, AVExifEntry **value)
+int av_exif_get_entry(void *logctx, AVExifMetadata *ifd, uint16_t id, int flags, AVExifEntry **value)
 {
-    return exif_get_entry(logctx, ifd, id, recursive ? 0 : INT_MAX, value);
+    return exif_get_entry(logctx, ifd, id, (flags & AV_EXIF_FLAG_RECURSIVE) ? 0 : INT_MAX, value);
 }
 
 int av_exif_set_entry(void *logctx, AVExifMetadata *ifd, uint16_t id, enum AVTiffDataType type,
@@ -1051,7 +1052,7 @@ int av_exif_set_entry(void *logctx, AVExifMetadata *ifd, uint16_t id, enum AVTif
     AVExifEntry *entry = NULL;
     AVExifEntry src = { 0 };
 
-    if (!ifd || ifd->entries && !ifd->count || ifd->count && !ifd->entries
+    if (!ifd || ifd->count && !ifd->entries
              || ifd_lead && !ifd_offset || !ifd_lead && ifd_offset
              || !value || ifd->count == 0xFFFFu)
         return AVERROR(EINVAL);
@@ -1097,7 +1098,7 @@ static int exif_remove_entry(void *logctx, AVExifMetadata *ifd, uint16_t id, int
     int32_t index = -1;
     int ret = 0;
 
-    if (!ifd || ifd->entries && !ifd->count || ifd->count && !ifd->entries)
+    if (!ifd || ifd->count && !ifd->entries)
         return AVERROR(EINVAL);
 
     for (size_t i = 0; i < ifd->count; i++) {
@@ -1127,9 +1128,9 @@ static int exif_remove_entry(void *logctx, AVExifMetadata *ifd, uint16_t id, int
     return 1 + (ifd->count - index);
 }
 
-int av_exif_remove_entry(void *logctx, AVExifMetadata *ifd, uint16_t id, int recursive)
+int av_exif_remove_entry(void *logctx, AVExifMetadata *ifd, uint16_t id, int flags)
 {
-    return exif_remove_entry(logctx, ifd, id, recursive ? 0 : INT_MAX);
+    return exif_remove_entry(logctx, ifd, id, (flags & AV_EXIF_FLAG_RECURSIVE) ? 0 : INT_MAX);
 }
 
 AVExifMetadata *av_exif_clone_ifd(const AVExifMetadata *ifd)
