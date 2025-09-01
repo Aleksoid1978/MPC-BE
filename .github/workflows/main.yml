@@ -50,11 +50,6 @@ jobs:
           .\\build.bat Clean All NoWait
         shell: pwsh
 
-      - name: Select Windows SDK 10.0.22621.0
-        run: |
-          (Get-Content .\\src\\platform.props) | ForEach-Object { $_ -replace ">10.0<", ">10.0.22621.0<" } | Set-Content .\\src\\platform.props
-        shell: pwsh
-
       - name: Build MPC-BE
         run: |
           .\\build.bat Build Packages NoWait
