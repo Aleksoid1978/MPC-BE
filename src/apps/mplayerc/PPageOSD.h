@@ -32,13 +32,13 @@ class CPPageOSD : public CPPageBase
 public:
 	CPPageOSD();
 	virtual ~CPPageOSD() = default;
-	
-	enum { IDD = IDD_PPAGEOSD };	
-	
+
+	enum { IDD = IDD_PPAGEOSD };
+
 	BOOL m_bShowOSD     = TRUE;
 	BOOL m_bOSDFileName = FALSE;
 	BOOL m_bOSDSeekTime = FALSE;
-	
+
 	CString         m_FontName;
 	CComboBox       m_cbFontName;
 	CIntEdit        m_edFontSize;
@@ -73,7 +73,7 @@ protected:
 
 public:
 	afx_msg void OnUpdateOSD(CCmdUI* pCmdUI);
-	
+
 	afx_msg void OnChangeOSD();
 	afx_msg void OnUpdateOSDTransparent(CCmdUI* pCmdUI);
 	afx_msg void OnCheckShadow();

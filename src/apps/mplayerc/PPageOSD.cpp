@@ -50,7 +50,7 @@ void CPPageOSD::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_SHOW_OSD, m_bShowOSD);
 	DDX_Check(pDX, IDC_CHECK14,  m_bOSDFileName);
 	DDX_Check(pDX, IDC_CHECK15,  m_bOSDSeekTime);
-	
+
 	DDX_Control(pDX, IDC_COMBO1, m_cbFontName);
 	DDX_CBString(pDX, IDC_COMBO1, m_FontName);
 	DDX_Control(pDX, IDC_EDIT3, m_edFontSize);
@@ -128,7 +128,7 @@ BOOL CPPageOSD::OnInitDialog()
 	m_edFontSize.SetRange(8, 40);
 	m_spFontSize.SetRange(8, 40);
 	m_edFontSize = s.nOSDSize;
-	
+
 	UpdateData(FALSE);
 
 	return TRUE;
