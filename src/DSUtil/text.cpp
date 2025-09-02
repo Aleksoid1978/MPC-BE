@@ -31,14 +31,17 @@ UINT CharSetToCodePage(UINT dwCharSet)
 	if (dwCharSet == CP_UTF7) {
 		return CP_UTF7;
 	}
-	CHARSETINFO cs= {0};
+	CHARSETINFO cs = {};
 	::TranslateCharsetInfo((DWORD*)(DWORD_PTR)dwCharSet, &cs, TCI_SRCCHARSET);
 	return cs.ciACP;
 }
 
 UINT CodePageToCharSet(UINT codePage)
 {
-	CHARSETINFO cs = { 0 };
+	if (codePage == CP_ACP) {
+		return DEFAULT_CHARSET;
+	}
+	CHARSETINFO cs = {};
 	::TranslateCharsetInfo((DWORD*)(DWORD_PTR)codePage, &cs, TCI_SRCCODEPAGE);
 	return cs.ciCharset;
 }
