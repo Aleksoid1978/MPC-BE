@@ -23,7 +23,7 @@
 #include "SysVersion.h"
 #include "text.h"
 
-DWORD CharSetToCodePage(DWORD dwCharSet)
+UINT CharSetToCodePage(UINT dwCharSet)
 {
 	if (dwCharSet == CP_UTF8) {
 		return CP_UTF8;
@@ -34,6 +34,13 @@ DWORD CharSetToCodePage(DWORD dwCharSet)
 	CHARSETINFO cs= {0};
 	::TranslateCharsetInfo((DWORD*)(DWORD_PTR)dwCharSet, &cs, TCI_SRCCHARSET);
 	return cs.ciACP;
+}
+
+UINT CodePageToCharSet(UINT codePage)
+{
+	CHARSETINFO cs = { 0 };
+	::TranslateCharsetInfo((DWORD*)(DWORD_PTR)codePage, &cs, TCI_SRCCODEPAGE);
+	return cs.ciCharset;
 }
 
 CStringA UrlEncode(const CStringA& str_in, const bool bArg/* = false*/)
