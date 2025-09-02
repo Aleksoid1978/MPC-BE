@@ -23,16 +23,16 @@
 #include "SysVersion.h"
 #include "text.h"
 
-UINT CharSetToCodePage(UINT dwCharSet)
+UINT CharSetToCodePage(UINT ñharSet)
 {
-	if (dwCharSet == CP_UTF8) {
+	if (ñharSet == CP_UTF8) {
 		return CP_UTF8;
 	}
-	if (dwCharSet == CP_UTF7) {
+	if (ñharSet == CP_UTF7) {
 		return CP_UTF7;
 	}
 	CHARSETINFO cs = {};
-	::TranslateCharsetInfo((DWORD*)(DWORD_PTR)dwCharSet, &cs, TCI_SRCCHARSET);
+	::TranslateCharsetInfo((DWORD*)(DWORD_PTR)ñharSet, &cs, TCI_SRCCHARSET);
 	return cs.ciACP;
 }
 

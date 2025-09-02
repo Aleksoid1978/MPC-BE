@@ -249,10 +249,10 @@ int CharSetLen = std::size(CharSetList);
 
 //
 
-static UINT CharSetToCodePage(UINT dwCharSet)
+static UINT CharSetToCodePage(UINT ñharSet)
 {
-	CHARSETINFO cs = {0};
-	::TranslateCharsetInfo((DWORD*)(DWORD_PTR)dwCharSet, &cs, TCI_SRCCHARSET);
+	CHARSETINFO cs = {};
+	::TranslateCharsetInfo((DWORD*)(DWORD_PTR)ñharSet, &cs, TCI_SRCCHARSET);
 	return cs.ciACP;
 }
 
