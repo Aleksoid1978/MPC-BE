@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -367,7 +367,7 @@ static CStringW UnicodeSSAToMBCS(CStringW str, DWORD CharSet)
 	return ret;
 }
 
-static CStringW ToUnicode(CStringW str, DWORD CharSet)
+static CStringW ToUnicode(const CStringW& str, DWORD CharSet)
 {
 	CStringW ret;
 
@@ -480,7 +480,7 @@ static CStringW SubRipper2SSA(CStringW str)
 	return str;
 }
 
-CStringW WebVTTCueStrip(CStringW& str)
+static CStringW WebVTTCueStrip(CStringW& str)
 {
 	CStringW cues;
 	int p = str.Find(L'\n');

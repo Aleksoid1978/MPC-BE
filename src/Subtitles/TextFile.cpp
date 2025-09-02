@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -365,7 +365,9 @@ bool CTextFile::ReadString(CStringA& str)
 				}
 			}
 
-			str.Append(&m_buffer[m_posInBuffer], nCharsRead);
+			if (nCharsRead > 0) {
+				str.Append(&m_buffer[m_posInBuffer], nCharsRead);
+			}
 
 			m_posInBuffer += nCharsRead;
 			while (m_posInBuffer < m_nInBuffer && m_buffer[m_posInBuffer] == '\r') {
@@ -585,8 +587,10 @@ bool CTextFile::ReadString(CStringW& str)
 				}
 			}
 
-			// TODO: codepage
-			str.Append(CStringW(&m_buffer[m_posInBuffer], nCharsRead));
+			if (nCharsRead > 0) {
+				// TODO: codepage
+				str.Append(CStringW(&m_buffer[m_posInBuffer], nCharsRead));
+			}
 
 			m_posInBuffer += nCharsRead;
 			while (m_posInBuffer < m_nInBuffer && m_buffer[m_posInBuffer] == '\r') {
