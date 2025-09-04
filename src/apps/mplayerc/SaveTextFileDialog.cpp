@@ -40,10 +40,10 @@ CSaveTextFileDialog::CSaveTextFileDialog(
 	if (pfdc) {
 		pfdc->StartVisualGroup(IDS_TEXTFILE_ENC, ResStr(IDS_TEXTFILE_ENC));
 		pfdc->AddComboBox(IDC_COMBO1);
-		pfdc->AddControlItem(IDC_COMBO1, CTextFile::UTF8,  L"UTF-8");
-		pfdc->AddControlItem(IDC_COMBO1, CTextFile::LE16,  L"Unicode 16-LE");
-		pfdc->AddControlItem(IDC_COMBO1, CTextFile::BE16,  L"Unicode 16-BE");
-		pfdc->AddControlItem(IDC_COMBO1, CTextFile::ASCII, L"ANSI");
+		pfdc->AddControlItem(IDC_COMBO1, CTextFile::UTF8,    L"UTF-8");
+		pfdc->AddControlItem(IDC_COMBO1, CTextFile::UTF16LE, L"Unicode 16-LE");
+		pfdc->AddControlItem(IDC_COMBO1, CTextFile::UTF16BE, L"Unicode 16-BE");
+		pfdc->AddControlItem(IDC_COMBO1, CTextFile::ASCII,   L"ANSI");
 		pfdc->SetSelectedControlItem(IDC_COMBO1, m_e);
 		pfdc->EndVisualGroup();
 		pfdc->MakeProminent(IDS_TEXTFILE_ENC);

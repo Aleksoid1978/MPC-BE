@@ -31,10 +31,6 @@
 CTextFile::CTextFile(enc encoding/* = ASCII*/, enc defaultencoding/* = ASCII*/)
 	: m_encoding(encoding)
 	, m_defaultencoding(defaultencoding)
-	, m_offset(0)
-	, m_posInFile(0)
-	, m_posInBuffer(0)
-	, m_nInBuffer(0)
 {
 	m_buffer.reset(new(std::nothrow) char[TEXTFILE_BUFFER_SIZE]);
 	m_wbuffer.reset(new(std::nothrow) WCHAR[TEXTFILE_BUFFER_SIZE]);
@@ -80,10 +76,10 @@ bool CTextFile::Open(LPCWSTR lpszFileName)
 		}
 
 		if (w == 0xfeff) {
-			m_encoding = LE16;
+			m_encoding = UTF16LE;
 			m_offset = 2;
 		} else if (w == 0xfffe) {
-			m_encoding = BE16;
+			m_encoding = UTF16BE;
 			m_offset = 2;
 		} else if (w == 0xbbef && m_pStdioFile->GetLength() >= 3) {
 			BYTE b;
@@ -130,10 +126,10 @@ bool CTextFile::Save(LPCWSTR lpszFileName, enc e)
 	if (e == UTF8) {
 		BYTE b[3] = {0xef, 0xbb, 0xbf};
 		m_pStdioFile->Write(b, sizeof(b));
-	} else if (e == LE16) {
+	} else if (e == UTF16LE) {
 		BYTE b[2] = {0xff, 0xfe};
 		m_pStdioFile->Write(b, sizeof(b));
-	} else if (e == BE16) {
+	} else if (e == UTF16BE) {
 		BYTE b[2] = {0xfe, 0xff};
 		m_pStdioFile->Write(b, sizeof(b));
 	}
@@ -164,7 +160,7 @@ CTextFile::enc CTextFile::GetEncoding() const
 
 bool CTextFile::IsUnicode() const
 {
-	return m_encoding == UTF8 || m_encoding == LE16 || m_encoding == BE16;
+	return m_encoding == UTF8 || m_encoding == UTF16LE || m_encoding == UTF16BE;
 }
 
 CStringW CTextFile::GetFilePath() const
@@ -246,9 +242,9 @@ void CTextFile::WriteString(LPCSTR lpsz/*CStringA str*/)
 		m_pStdioFile->Write(str.GetString(), str.GetLength());
 	} else if (m_encoding == UTF8) {
 		WriteString(AToT(str));
-	} else if (m_encoding == LE16) {
+	} else if (m_encoding == UTF16LE) {
 		WriteString(AToT(str));
-	} else if (m_encoding == BE16) {
+	} else if (m_encoding == UTF16BE) {
 		WriteString(AToT(str));
 	}
 }
@@ -288,10 +284,10 @@ void CTextFile::WriteString(LPCWSTR lpsz/*CStringW str*/)
 				m_pStdioFile->Write(&c, 1);
 			}
 		}
-	} else if (m_encoding == LE16) {
+	} else if (m_encoding == UTF16LE) {
 		str.Replace(L"\n", L"\r\n");
 		m_pStdioFile->Write(str.GetString(), str.GetLength() * 2);
-	} else if (m_encoding == BE16) {
+	} else if (m_encoding == UTF16BE) {
 		str.Replace(L"\n", L"\r\n");
 		for (unsigned int i = 0, l = str.GetLength(); i < l; i++) {
 			str.SetAt(i, ((str[i] >> 8) & 0x00ff) | ((str[i] << 8) & 0xff00));
@@ -472,7 +468,7 @@ bool CTextFile::ReadString(CStringA& str)
 				}
 			}
 		} while (bValid && !bLineEndFound);
-	} else if (m_encoding == LE16) {
+	} else if (m_encoding == UTF16LE) {
 		bool bLineEndFound = false;
 		fEOF = false;
 
@@ -512,7 +508,7 @@ bool CTextFile::ReadString(CStringA& str)
 				}
 			}
 		} while (!bLineEndFound);
-	} else if (m_encoding == BE16) {
+	} else if (m_encoding == UTF16BE) {
 		bool bLineEndFound = false;
 		fEOF = false;
 
@@ -704,7 +700,7 @@ bool CTextFile::ReadString(CStringW& str)
 				}
 			}
 		} while (bValid && !bLineEndFound);
-	} else if (m_encoding == LE16) {
+	} else if (m_encoding == UTF16LE) {
 		bool bLineEndFound = false;
 		fEOF = false;
 
@@ -739,7 +735,7 @@ bool CTextFile::ReadString(CStringW& str)
 				}
 			}
 		} while (!bLineEndFound);
-	} else if (m_encoding == BE16) {
+	} else if (m_encoding == UTF16BE) {
 		bool bLineEndFound = false;
 		fEOF = false;
 

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -42,9 +42,9 @@ CCDecoder::~CCDecoder()
 	if (!m_sts.IsEmpty() && !m_fn.IsEmpty()) {
 		m_sts.Sort();
 		m_sts.SaveAs(m_fn, Subtitle::SRT, -1, CTextFile::ASCII);
-		m_sts.SaveAs(m_fn.Left(m_fn.ReverseFind('.')+1) + L"utf8.srt", Subtitle::SRT, -1, CTextFile::UTF8);
-		m_sts.SaveAs(m_fn.Left(m_fn.ReverseFind('.')+1) + L"utf16le.srt", Subtitle::SRT, -1, CTextFile::LE16);
-		m_sts.SaveAs(m_fn.Left(m_fn.ReverseFind('.')+1) + L"utf16be.srt", Subtitle::SRT, -1, CTextFile::BE16);
+		m_sts.SaveAs(m_fn.Left(m_fn.ReverseFind('.')+1) + L"utf8.srt",    Subtitle::SRT, -1, CTextFile::UTF8);
+		m_sts.SaveAs(m_fn.Left(m_fn.ReverseFind('.')+1) + L"utf16le.srt", Subtitle::SRT, -1, CTextFile::UTF16LE);
+		m_sts.SaveAs(m_fn.Left(m_fn.ReverseFind('.')+1) + L"utf16be.srt", Subtitle::SRT, -1, CTextFile::UTF16BE);
 	}
 }
 

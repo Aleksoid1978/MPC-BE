@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,18 +31,19 @@ public:
 	enum enc {
 		ASCII,
 		UTF8,
-		LE16,
-		BE16,
+		UTF16LE,
+		UTF16BE,
 		ANSI
 	};
 
 private:
 	enc m_encoding, m_defaultencoding;
-	int m_offset;
-	ULONGLONG m_posInFile;
+	int m_offset = 0;
+	ULONGLONG m_posInFile = 0;
 	std::unique_ptr<char[]> m_buffer;
 	std::unique_ptr<WCHAR[]> m_wbuffer;
-	LONGLONG m_posInBuffer, m_nInBuffer;
+	LONGLONG m_posInBuffer = 0;
+	LONGLONG m_nInBuffer = 0;
 
 	std::unique_ptr<FILE, std::integral_constant<decltype(&fclose), &fclose>> m_pFile;
 	std::unique_ptr<CStdioFile> m_pStdioFile;
