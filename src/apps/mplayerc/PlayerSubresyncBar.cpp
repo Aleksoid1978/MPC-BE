@@ -84,7 +84,6 @@ void CPlayerSubresyncBar::ReloadTranslatableResources()
 			setColumnHeaderText(COL_STYLE, ResStr(IDS_SUBRESYNC_CLN_STYLE));
 			setColumnHeaderText(COL_FONT, ResStr(IDS_SUBRESYNC_CLN_FONT));
 			setColumnHeaderText(COL_CHARSET, ResStr(IDS_SUBRESYNC_CLN_CHARSET));
-			setColumnHeaderText(COL_UNICODE, ResStr(IDS_SUBRESYNC_CLN_UNICODE));
 			setColumnHeaderText(COL_LAYER, ResStr(IDS_SUBRESYNC_CLN_LAYER));
 			setColumnHeaderText(COL_ACTOR, ResStr(IDS_SUBRESYNC_CLN_ACTOR));
 			setColumnHeaderText(COL_EFFECT, ResStr(IDS_SUBRESYNC_CLN_EFFECT));
@@ -215,7 +214,6 @@ void CPlayerSubresyncBar::ReloadSubtitle()
 		m_list.InsertColumn(COL_STYLE, ResStr(IDS_SUBRESYNC_CLN_STYLE), LVCFMT_LEFT, 80);
 		m_list.InsertColumn(COL_FONT, ResStr(IDS_SUBRESYNC_CLN_FONT), LVCFMT_LEFT, 60);
 		m_list.InsertColumn(COL_CHARSET, ResStr(IDS_SUBRESYNC_CLN_CHARSET), LVCFMT_CENTER, 20);
-		m_list.InsertColumn(COL_UNICODE, ResStr(IDS_SUBRESYNC_CLN_UNICODE), LVCFMT_CENTER, 40);
 		m_list.InsertColumn(COL_LAYER, ResStr(IDS_SUBRESYNC_CLN_LAYER), LVCFMT_CENTER, 50);
 		m_list.InsertColumn(COL_ACTOR, ResStr(IDS_SUBRESYNC_CLN_ACTOR), LVCFMT_LEFT, 80);
 		m_list.InsertColumn(COL_EFFECT, ResStr(IDS_SUBRESYNC_CLN_EFFECT), LVCFMT_LEFT, 80);
@@ -456,7 +454,6 @@ void CPlayerSubresyncBar::UpdateStrings()
 			m_list.SetItemText(i, COL_FONT, stss.fontName);
 			str.Format(L"%d", stss.charSet);
 			m_list.SetItemText(i, COL_CHARSET, str);
-			m_list.SetItemText(i, COL_UNICODE, m_sts.IsEntryUnicode(i) ? L"yes" : L"no");
 			str.Format(L"%d", m_sts[i].layer);
 			m_list.SetItemText(i, COL_LAYER, str);
 			m_list.SetItemText(i, COL_ACTOR, m_sts[i].actor);
@@ -811,7 +808,6 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 			DUPITEM, DELITEM,
 			RESETS, SETOS, SETCS, RESETE, SETOE, SETCE,
 			STYLEFIRST, STYLELAST = STYLEFIRST + 1000, STYLEEDIT,
-			UNICODEYES, UNICODENO,
 			LAYERDEC, LAYERINC,
 			ACTORFIRST, ACTORLAST = ACTORFIRST + 1000,
 			EFFECTFIRST, EFFECTLAST = EFFECTFIRST + 1000
@@ -869,13 +865,6 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 						m.AppendMenuW(MF_SEPARATOR);
 						m.AppendMenuW(MF_STRING | MF_ENABLED, STYLEEDIT, ResStr(IDS_SUBRESYNC_EDIT));
 					}
-				}
-				break;
-			case COL_UNICODE:
-				if (m_mode == TEXTSUB) {
-					m.AppendMenuW(MF_SEPARATOR);
-					m.AppendMenuW(MF_STRING | MF_ENABLED, UNICODEYES, ResStr(IDS_SUBRESYNC_YES));
-					m.AppendMenuW(MF_STRING | MF_ENABLED, UNICODENO, ResStr(IDS_SUBRESYNC_NO));
 				}
 				break;
 			case COL_LAYER:
@@ -1104,11 +1093,6 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 
 							fNeedsUpdate = true;
 						}
-					} else if (id == UNICODEYES || id == UNICODENO) {
-						m_sts.ConvertUnicode(iItem, id == UNICODEYES);
-						m_list.SetItemText(iItem, COL_TEXT, m_sts.GetStrW(iItem, true));
-						m_list.SetItemText(iItem, COL_UNICODE, m_sts.IsEntryUnicode(iItem) ? L"yes" : L"no");
-						fNeedsUpdate = true;
 					} else if (id == LAYERDEC || id == LAYERINC) {
 						int d = (id == LAYERDEC) ? -1 : 1;
 						fNeedsUpdate = true;
