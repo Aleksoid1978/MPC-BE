@@ -23,6 +23,44 @@
 #include "MainFrm.h"
 #include "PPageSubStyle.h"
 
+BYTE CharSetList[] = {
+	ANSI_CHARSET,
+	DEFAULT_CHARSET,
+	SHIFTJIS_CHARSET,
+	HANGUL_CHARSET,
+	GB2312_CHARSET,
+	CHINESEBIG5_CHARSET,
+	JOHAB_CHARSET,
+	HEBREW_CHARSET,
+	ARABIC_CHARSET,
+	GREEK_CHARSET,
+	TURKISH_CHARSET,
+	VIETNAMESE_CHARSET,
+	THAI_CHARSET,
+	EASTEUROPE_CHARSET,
+	RUSSIAN_CHARSET,
+	BALTIC_CHARSET
+};
+
+const WCHAR* CharSetNames[] = {
+	L"ANSI",
+	L"DEFAULT",
+	L"SHIFTJIS",
+	L"HANGUL",
+	L"GB2312",
+	L"CHINESEBIG5",
+	L"JOHAB",
+	L"HEBREW",
+	L"ARABIC",
+	L"GREEK",
+	L"TURKISH",
+	L"VIETNAMESE",
+	L"THAI",
+	L"EASTEUROPE",
+	L"RUSSIAN",
+	L"BALTIC",
+};
+
 // CPPageSubStyle dialog
 
 IMPLEMENT_DYNAMIC(CPPageSubStyle, CPPageBase)
@@ -162,7 +200,9 @@ void CPPageSubStyle::Init()
 	m_font.SetWindowTextW(m_stss->fontName);
 	m_iCharset = -1;
 
-	for (int i = 0; i < CharSetLen; i++) {
+	ASSERT(std::size(CharSetList) == std::size(CharSetNames));
+
+	for (size_t i = 0; i < std::size(CharSetList); i++) {
 		CString str;
 		str.Format(L"%s (%d)", CharSetNames[i], CharSetList[i]);
 		AddStringData(m_charset, str, CharSetList[i]);
