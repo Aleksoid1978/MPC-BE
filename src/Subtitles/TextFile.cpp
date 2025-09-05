@@ -26,6 +26,21 @@
 #include "DSUtil/FileHandle.h"
 #include "DSUtil/HTTPAsync.h"
 
+const static struct {
+	uint16_t codepage;
+	uint8_t  supported; // 0 or 1
+	uint8_t  size;
+	uint8_t  bom[4];
+} g_BOM_markers[] = {
+	{ CTextFile::UTF8,    1, 3, { 0xEF, 0xBB, 0xBF } },
+	{ 12000,              0, 4, { 0xFF, 0xFE, 0x00, 0x00 } }, // UTF-32LE, need to check before UTF16LE
+	{ CTextFile::UTF16LE, 1, 2, { 0xFF, 0xFE } },
+	{ CTextFile::UTF16BE, 1, 2, { 0xFE, 0xFF } },
+	{ 12001,              0, 4, { 0x00, 0x00, 0xFE, 0xFF } }, // UTF-32BE
+	{ 65000,              0, 3, { 0x2B, 0x2F, 0x76 } },       // UTF-7
+	{ 54936,              0, 4, { 0x84, 0x31, 0x95, 0x33 } }, // GB18030
+};
+
 #define TEXTFILE_BUFFER_SIZE (64 * 1024)
 
 CTextFile::CTextFile(enc encoding/* = ASCII*/, enc defaultencoding/* = ASCII*/)
@@ -68,29 +83,25 @@ bool CTextFile::Open(LPCWSTR lpszFileName)
 	m_offset = 0;
 	m_nInBuffer = m_posInBuffer = 0;
 
-	if (m_pStdioFile->GetLength() >= 2) {
-		WORD w;
-		if (sizeof(w) != m_pStdioFile->Read(&w, sizeof(w))) {
+	if (m_pStdioFile->GetLength() >= 4) {
+		uint8_t b[4] = {};
+		if (sizeof(b) != m_pStdioFile->Read(b, sizeof(b))) {
 			Close();
 			return false;
 		}
 
-		if (w == 0xfeff) {
-			m_encoding = UTF16LE;
-			m_offset = 2;
-		} else if (w == 0xfffe) {
-			m_encoding = UTF16BE;
-			m_offset = 2;
-		} else if (w == 0xbbef && m_pStdioFile->GetLength() >= 3) {
-			BYTE b;
-			if (sizeof(b) != m_pStdioFile->Read(&b, sizeof(b))) {
-				Close();
-				return false;
-			}
-
-			if (b == 0xbf) {
-				m_encoding = UTF8;
-				m_offset = 3;
+		int codepage = -1;
+		for (const auto& marker : g_BOM_markers) {
+			if (memcmp(b, marker.bom, marker.size) == 0) {
+				// encoding recognized by BOM marker
+				if (!marker.supported) {
+					//ignored encoding
+					Close();
+					return false;
+				}
+				m_encoding = (enc)marker.codepage;
+				m_offset = marker.size;
+				break;
 			}
 		}
 	}
@@ -99,9 +110,8 @@ bool CTextFile::Open(LPCWSTR lpszFileName)
 		if (!ReopenAsText()) {
 			return false;
 		}
-	} else if (m_offset == 0) { // No BOM detected, ensure the file is read from the beginning
-		Seek(0, CStdioFile::begin);
 	} else {
+		Seek(m_offset, CStdioFile::begin);
 		m_posInFile = m_pStdioFile->GetPosition();
 	}
 
@@ -146,11 +156,6 @@ void CTextFile::Close()
 		m_pFile.reset();
 		m_strFileName.Empty();
 	}
-}
-
-void CTextFile::SetEncoding(enc e)
-{
-	m_encoding = e;
 }
 
 CTextFile::enc CTextFile::GetEncoding() const

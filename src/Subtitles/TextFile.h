@@ -28,12 +28,12 @@
 class CTextFile
 {
 public:
-	enum enc {
-		ASCII,
-		UTF8,
-		UTF16LE,
-		UTF16BE,
-		ANSI
+	enum enc { // supported code pages
+		ANSI    = 0,     // CP_ACP
+		UTF16LE = 1200,
+		UTF16BE = 1201,
+		ASCII   = 20127,
+		UTF8    = 65001, // CP_UTF8
 	};
 
 private:
@@ -59,7 +59,6 @@ public:
 	bool Save(LPCWSTR lpszFileName, enc e /*= ASCII*/);
 	void Close();
 
-	void SetEncoding(enc e);
 	enc GetEncoding() const;
 	bool IsUnicode() const;
 
