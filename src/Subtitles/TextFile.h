@@ -72,7 +72,6 @@ public:
 
 	void WriteString(LPCSTR lpsz/*CStringA str*/);
 	void WriteString(LPCWSTR lpsz/*CStringW str*/);
-	bool ReadString(CStringA& str);
 	bool ReadString(CStringW& str);
 
 protected:
