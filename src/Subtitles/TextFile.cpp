@@ -111,7 +111,7 @@ bool CTextFile::Open(LPCWSTR lpszFileName)
 			return false;
 		}
 	} else {
-		Seek(m_offset, CStdioFile::begin);
+		Seek(0, CStdioFile::begin);
 		m_posInFile = m_pStdioFile->GetPosition();
 	}
 
