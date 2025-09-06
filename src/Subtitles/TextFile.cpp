@@ -90,7 +90,6 @@ bool CTextFile::Open(LPCWSTR lpszFileName)
 			return false;
 		}
 
-		int codepage = -1;
 		for (const auto& marker : g_BOM_markers) {
 			if (memcmp(b, marker.bom, marker.size) == 0) {
 				// encoding recognized by BOM marker
