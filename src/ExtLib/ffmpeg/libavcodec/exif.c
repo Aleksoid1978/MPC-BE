@@ -46,6 +46,13 @@
 #define IFD_EXTRA_SIZE         6
 
 #define EXIF_TAG_NAME_LENGTH   32
+#define MAKERNOTE_TAG          0x927c
+#define ORIENTATION_TAG        0x112
+#define EXIFIFD_TAG            0x8769
+#define IMAGE_WIDTH_TAG        0x100
+#define IMAGE_LENGTH_TAG       0x101
+#define PIXEL_X_TAG            0xa002
+#define PIXEL_Y_TAG            0xa003
 
 struct exif_tag {
     const char name[EXIF_TAG_NAME_LENGTH];
@@ -909,7 +916,7 @@ int av_exif_ifd_to_dict(void *logctx, const AVExifMetadata *ifd, AVDictionary **
     return exif_ifd_to_dict(logctx, "", ifd, metadata);
 }
 
-#if FF_API_OLD_EXIF
+#if LIBAVCODEC_VERSION_MAJOR < 63
 int avpriv_exif_decode_ifd(void *logctx, const uint8_t *buf, int size,
                            int le, int depth, AVDictionary **metadata)
 {
@@ -924,7 +931,7 @@ int avpriv_exif_decode_ifd(void *logctx, const uint8_t *buf, int size,
     av_exif_free(&ifd);
     return ret;
 }
-#endif /* FF_API_OLD_EXIF */
+#endif
 
 #define EXIF_COPY(fname, srcname) do { \
     size_t sz; \

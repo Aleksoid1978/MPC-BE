@@ -168,6 +168,7 @@ SRCS_LC = \
 	libavcodec/canopus.c \
 	libavcodec/cbrt_data.c \
 	libavcodec/cbrt_data_fixed.c \
+	libavcodec/cbrt_tablegen_common.c \
 	libavcodec/cbs.c \
 	libavcodec/cbs_av1.c \
 	libavcodec/cbs_bsf.c \

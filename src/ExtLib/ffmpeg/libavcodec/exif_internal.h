@@ -36,19 +36,11 @@
 #include "exif.h"
 #include "version_major.h"
 
-#if FF_API_OLD_EXIF
+#if LIBAVCODEC_VERSION_MAJOR < 63
 /* Used by the AVI demuxer */
 int avpriv_exif_decode_ifd(void *logctx, const uint8_t *buf, int size,
                            int le, int depth, AVDictionary **metadata);
-#endif /* FF_API_OLD_EXIF */
-
-#define MAKERNOTE_TAG          0x927c
-#define ORIENTATION_TAG        0x112
-#define EXIFIFD_TAG            0x8769
-#define IMAGE_WIDTH_TAG        0x100
-#define IMAGE_LENGTH_TAG       0x101
-#define PIXEL_X_TAG            0xa002
-#define PIXEL_Y_TAG            0xa003
+#endif
 
 /**
  * Compares values in the IFD with data in the provided AVFrame and sets the values

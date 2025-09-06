@@ -23,7 +23,7 @@ MpcAudioRenderer
 Обновлен румынский перевод (автор Andrei Miloiu).
 
 Обновлены библиотеки:
-	ffmpeg n8.1-dev-224-g2fffa01ddb.
+	ffmpeg n8.1-dev-376-g7321e4b950.
 
 
 1.8.6 - 2025-08-07

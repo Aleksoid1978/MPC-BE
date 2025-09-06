@@ -352,6 +352,11 @@ static const AVOption avcodec_options[] = {
 {"bottomleft",  "Bottom-left", 0, AV_OPT_TYPE_CONST, {.i64 = AVCHROMA_LOC_BOTTOMLEFT },  INT_MIN, INT_MAX, V|E|D, .unit = "chroma_sample_location_type"},
 {"bottom",      "Bottom",      0, AV_OPT_TYPE_CONST, {.i64 = AVCHROMA_LOC_BOTTOM },      INT_MIN, INT_MAX, V|E|D, .unit = "chroma_sample_location_type"},
 {"unspecified", "Unspecified", 0, AV_OPT_TYPE_CONST, {.i64 = AVCHROMA_LOC_UNSPECIFIED }, INT_MIN, INT_MAX, V|E|D, .unit = "chroma_sample_location_type"},
+{"alpha_mode", "alpha mode", OFFSET(alpha_mode), AV_OPT_TYPE_INT, {.i64 = AVALPHA_MODE_UNSPECIFIED }, 0, INT_MAX, V|E|D, .unit = "alpha_mode_type"},
+{"unknown",       "Unspecified",   0, AV_OPT_TYPE_CONST, {.i64 = AVALPHA_MODE_UNSPECIFIED   }, 0, 0, V|E|D, .unit = "alpha_mode_type"},
+{"unspecified",   "Unspecified",   0, AV_OPT_TYPE_CONST, {.i64 = AVALPHA_MODE_UNSPECIFIED   }, 0, 0, V|E|D, .unit = "alpha_mode_type"},
+{"premultiplied", "Premultiplied", 0, AV_OPT_TYPE_CONST, {.i64 = AVALPHA_MODE_PREMULTIPLIED }, 0, 0, V|E|D, .unit = "alpha_mode_type"},
+{"straight",      "Straight",      0, AV_OPT_TYPE_CONST, {.i64 = AVALPHA_MODE_STRAIGHT      }, 0, 0, V|E|D, .unit = "alpha_mode_type"},
 {"log_level_offset", "set the log level offset", OFFSET(log_level_offset), AV_OPT_TYPE_INT, {.i64 = 0 }, INT_MIN, INT_MAX },
 {"slices", "set the number of slices, used in parallelized encoding", OFFSET(slices), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, INT_MAX, V|E},
 {"thread_type", "select multithreading type", OFFSET(thread_type), AV_OPT_TYPE_FLAGS, {.i64 = FF_THREAD_SLICE|FF_THREAD_FRAME }, 0, INT_MAX, V|A|E|D, .unit = "thread_type"},
@@ -406,6 +411,7 @@ static const AVOption avcodec_options[] = {
     {"mastering_display_metadata",  .default_val.i64 = AV_PKT_DATA_MASTERING_DISPLAY_METADATA,  .type = AV_OPT_TYPE_CONST, .flags = A|D, .unit = "side_data_pkt" },
     {"content_light_level",         .default_val.i64 = AV_PKT_DATA_CONTENT_LIGHT_LEVEL,         .type = AV_OPT_TYPE_CONST, .flags = A|D, .unit = "side_data_pkt" },
     {"icc_profile",                 .default_val.i64 = AV_PKT_DATA_ICC_PROFILE,                 .type = AV_OPT_TYPE_CONST, .flags = A|D, .unit = "side_data_pkt" },
+    {"exif",                        .default_val.i64 = AV_PKT_DATA_EXIF,                        .type = AV_OPT_TYPE_CONST, .flags = A|D, .unit = "side_data_pkt" },
 {NULL},
 };
 

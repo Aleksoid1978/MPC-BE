@@ -303,7 +303,8 @@ static int filter_link_check_formats(void *log, AVFilterLink *link, AVFilterForm
     case AVMEDIA_TYPE_VIDEO:
         if ((ret = ff_formats_check_pixel_formats(log, cfg->formats)) < 0 ||
             (ret = ff_formats_check_color_spaces(log, cfg->color_spaces)) < 0 ||
-            (ret = ff_formats_check_color_ranges(log, cfg->color_ranges)) < 0)
+            (ret = ff_formats_check_color_ranges(log, cfg->color_ranges)) < 0 ||
+            (ret = ff_formats_check_alpha_modes(log, cfg->alpha_modes)) < 0)
             return ret;
         break;
 
@@ -418,7 +419,8 @@ static int formats_declared(AVFilterContext *f)
             return 0;
         if (f->inputs[i]->type == AVMEDIA_TYPE_VIDEO &&
             !(f->inputs[i]->outcfg.color_ranges &&
-              f->inputs[i]->outcfg.color_spaces))
+              f->inputs[i]->outcfg.color_spaces &&
+              f->inputs[i]->outcfg.alpha_modes))
             return 0;
         if (f->inputs[i]->type == AVMEDIA_TYPE_AUDIO &&
             !(f->inputs[i]->outcfg.samplerates &&
@@ -430,7 +432,8 @@ static int formats_declared(AVFilterContext *f)
             return 0;
         if (f->outputs[i]->type == AVMEDIA_TYPE_VIDEO &&
             !(f->outputs[i]->incfg.color_ranges &&
-              f->outputs[i]->incfg.color_spaces))
+              f->outputs[i]->incfg.color_spaces &&
+              f->outputs[i]->incfg.alpha_modes))
             return 0;
         if (f->outputs[i]->type == AVMEDIA_TYPE_AUDIO &&
             !(f->outputs[i]->incfg.samplerates &&
@@ -508,7 +511,7 @@ static void print_filter_formats(void *log_ctx, int level, const AVFilterContext
  */
 static int query_formats(AVFilterGraph *graph, void *log_ctx)
 {
-    int i, j, ret;
+    int i, j, k, ret;
     int converter_count = 0;
     int count_queried = 0;        /* successful calls to query_formats() */
     int count_merged = 0;         /* successful merge of formats lists */
@@ -530,14 +533,16 @@ static int query_formats(AVFilterGraph *graph, void *log_ctx)
     }
 
     /* go through and merge as many format lists as possible */
+retry:
     for (i = 0; i < graph->nb_filters; i++) {
         AVFilterContext *filter = graph->filters[i];
 
         for (j = 0; j < filter->nb_inputs; j++) {
             AVFilterLink *link = filter->inputs[j];
             const AVFilterNegotiation *neg;
-            unsigned neg_step;
-            int convert_needed = 0;
+            AVFilterContext *conv[4];
+            const char *conv_filters[4], *conv_opts[4] = {0};
+            unsigned neg_step, num_conv = 0;
 
             if (!link)
                 continue;
@@ -549,8 +554,17 @@ static int query_formats(AVFilterGraph *graph, void *log_ctx)
                 void *a = FF_FIELD_AT(void *, m->offset, link->incfg);
                 void *b = FF_FIELD_AT(void *, m->offset, link->outcfg);
                 if (a && b && a != b && !m->can_merge(a, b)) {
-                    convert_needed = 1;
-                    break;
+                    for (k = 0; k < num_conv; k++) {
+                        if (conv_filters[k] == m->conversion_filter)
+                            break;
+                    }
+                    if (k == num_conv) {
+                        av_assert1(num_conv < FF_ARRAY_ELEMS(conv_filters));
+                        conv_filters[num_conv] = m->conversion_filter;
+                        if (m->conversion_opts_offset)
+                            conv_opts[num_conv] = FF_FIELD_AT(char *, m->conversion_opts_offset, *graph);
+                        num_conv++;
+                    }
                 }
             }
             for (neg_step = 0; neg_step < neg->nb_mergers; neg_step++) {
@@ -561,22 +575,28 @@ static int query_formats(AVFilterGraph *graph, void *log_ctx)
                     count_delayed++;
                 } else if (a == b) {
                     count_already_merged++;
-                } else if (!convert_needed) {
+                } else if (!num_conv) {
                     count_merged++;
                     ret = m->merge(a, b);
                     if (ret < 0)
                         return ret;
-                    if (!ret)
-                        convert_needed = 1;
+                    if (!ret) {
+                        conv_filters[num_conv] = m->conversion_filter;
+                        if (m->conversion_opts_offset)
+                            conv_opts[num_conv] = FF_FIELD_AT(char *, m->conversion_opts_offset, *graph);
+                        num_conv++;
+                    }
                 }
             }
 
-            if (convert_needed) {
-                AVFilterContext *convert;
+            /**
+             * Couldn't merge format lists; auto-insert conversion filters
+             * in reverse order to keep the order consistent with the list
+             * of mergers, since they are prepended onto the existing link
+             */
+            for (k = num_conv - 1; k >= 0; k--) {
                 const AVFilter *filter;
-                AVFilterLink *inlink, *outlink;
                 char inst_name[30];
-                const char *opts;
 
                 if (fffiltergraph(graph)->disable_auto_convert) {
                     av_log(log_ctx, AV_LOG_ERROR,
@@ -587,28 +607,30 @@ static int query_formats(AVFilterGraph *graph, void *log_ctx)
                     return AVERROR(EINVAL);
                 }
 
-                /* couldn't merge format lists. auto-insert conversion filter */
-                if (!(filter = avfilter_get_by_name(neg->conversion_filter))) {
+                if (!(filter = avfilter_get_by_name(conv_filters[k]))) {
                     av_log(log_ctx, AV_LOG_ERROR,
                            "'%s' filter not present, cannot convert formats.\n",
-                           neg->conversion_filter);
+                           conv_filters[k]);
                     print_link_formats(log_ctx, AV_LOG_ERROR, link);
                     return AVERROR(EINVAL);
                 }
                 snprintf(inst_name, sizeof(inst_name), "auto_%s_%d",
-                         neg->conversion_filter, converter_count++);
-                opts = FF_FIELD_AT(char *, neg->conversion_opts_offset, *graph);
-                ret = avfilter_graph_create_filter(&convert, filter, inst_name, opts, NULL, graph);
+                         conv_filters[k], converter_count++);
+                ret = avfilter_graph_create_filter(&conv[k], filter, inst_name,
+                                                   conv_opts[k], NULL, graph);
                 if (ret < 0)
                     return ret;
-                if ((ret = avfilter_insert_filter(link, convert, 0, 0)) < 0)
+                if ((ret = avfilter_insert_filter(link, conv[k], 0, 0)) < 0)
                     return ret;
 
-                if ((ret = filter_query_formats(convert)) < 0)
+                if ((ret = filter_query_formats(conv[k])) < 0)
                     return ret;
+            }
 
-                inlink  = convert->inputs[0];
-                outlink = convert->outputs[0];
+            /* preemptively settle formats of auto filters */
+            for (k = 0; k < num_conv; k++) {
+                AVFilterLink *inlink  = conv[k]->inputs[0];
+                AVFilterLink *outlink = conv[k]->outputs[0];
                 av_assert0( inlink->incfg.formats->refcount > 0);
                 av_assert0( inlink->outcfg.formats->refcount > 0);
                 av_assert0(outlink->incfg.formats->refcount > 0);
@@ -622,6 +644,10 @@ static int query_formats(AVFilterGraph *graph, void *log_ctx)
                     av_assert0( inlink->outcfg.color_ranges->refcount > 0);
                     av_assert0(outlink-> incfg.color_ranges->refcount > 0);
                     av_assert0(outlink->outcfg.color_ranges->refcount > 0);
+                    av_assert0( inlink-> incfg.alpha_modes->refcount > 0);
+                    av_assert0( inlink->outcfg.alpha_modes->refcount > 0);
+                    av_assert0(outlink-> incfg.alpha_modes->refcount > 0);
+                    av_assert0(outlink->outcfg.alpha_modes->refcount > 0);
                 } else if (outlink->type == AVMEDIA_TYPE_AUDIO) {
                     av_assert0( inlink-> incfg.samplerates->refcount > 0);
                     av_assert0( inlink->outcfg.samplerates->refcount > 0);
@@ -632,11 +658,15 @@ static int query_formats(AVFilterGraph *graph, void *log_ctx)
                     av_assert0(outlink-> incfg.channel_layouts->refcount > 0);
                     av_assert0(outlink->outcfg.channel_layouts->refcount > 0);
                 }
+
 #define MERGE(merger, link)                                                  \
     ((merger)->merge(FF_FIELD_AT(void *, (merger)->offset, (link)->incfg),   \
                      FF_FIELD_AT(void *, (merger)->offset, (link)->outcfg)))
+
                 for (neg_step = 0; neg_step < neg->nb_mergers; neg_step++) {
                     const AVFilterFormatsMerger *m = &neg->mergers[neg_step];
+                    if (m->conversion_filter != conv_filters[k])
+                        continue;
                     if ((ret = MERGE(m,  inlink)) <= 0 ||
                         (ret = MERGE(m, outlink)) <= 0) {
                         if (ret < 0)
@@ -646,9 +676,17 @@ static int query_formats(AVFilterGraph *graph, void *log_ctx)
                                "'%s' and the filter '%s'\n", link->src->name, link->dst->name);
                         print_link_formats(log_ctx, AV_LOG_ERROR, link);
                         return AVERROR(ENOSYS);
+                    } else {
+                        count_merged += 2;
                     }
                 }
             }
+
+            /* if there is more than one auto filter, we may need another round
+             * to fully settle formats due to possible cross-incompatibilities
+             * between the auto filters themselves */
+            if (num_conv > 1)
+                goto retry;
         }
     }
 
@@ -789,8 +827,8 @@ static int pick_format(AVFilterLink *link, AVFilterLink *ref)
             swfmt = AV_PIX_FMT_YUV420P;
         }
 
+        const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(swfmt);
         if (!ff_fmt_is_regular_yuv(swfmt)) {
-            const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(swfmt);
             /* These fields are explicitly documented as affecting YUV only,
              * so set them to sane values for other formats. */
             if (desc->flags & AV_PIX_FMT_FLAG_FLOAT)
@@ -824,6 +862,19 @@ static int pick_format(AVFilterLink *link, AVFilterLink *ref)
                 link->incfg.color_ranges->nb_formats = 1;
                 link->color_range = link->incfg.color_ranges->formats[0];
             }
+        }
+
+        if (desc->flags & AV_PIX_FMT_FLAG_ALPHA) {
+            if (!link->incfg.alpha_modes->nb_formats) {
+                av_log(link->src, AV_LOG_ERROR, "Cannot select alpha mode for"
+                       " the link between filters %s and %s.\n", link->src->name,
+                       link->dst->name);
+                return AVERROR(EINVAL);
+            }
+            link->incfg.alpha_modes->nb_formats = 1;
+            link->alpha_mode = link->incfg.alpha_modes->formats[0];
+        } else {
+            link->alpha_mode = AVALPHA_MODE_UNSPECIFIED;
         }
     } else if (link->type == AVMEDIA_TYPE_AUDIO) {
         int ret;
@@ -863,6 +914,8 @@ static int pick_format(AVFilterLink *link, AVFilterLink *ref)
     ff_formats_unref(&link->outcfg.color_spaces);
     ff_formats_unref(&link->incfg.color_ranges);
     ff_formats_unref(&link->outcfg.color_ranges);
+    ff_formats_unref(&link->incfg.alpha_modes);
+    ff_formats_unref(&link->outcfg.alpha_modes);
 
     return 0;
 }
@@ -915,6 +968,8 @@ static int reduce_formats_on_filter(AVFilterContext *filter)
     REDUCE_FORMATS(int,      AVFilterFormats,        color_spaces,    formats,
                    nb_formats, ff_add_format);
     REDUCE_FORMATS(int,      AVFilterFormats,        color_ranges,    formats,
+                   nb_formats, ff_add_format);
+    REDUCE_FORMATS(int,      AVFilterFormats,        alpha_modes,     formats,
                    nb_formats, ff_add_format);
 
     /* reduce channel layouts */

@@ -1859,20 +1859,22 @@ static int mjpeg_decode_app(MJpegDecodeContext *s)
     int len, id, i;
 
     len = get_bits(&s->gb, 16);
-    if (len < 6) {
-        if (s->bayer) {
-            // Pentax K-1 (digital camera) JPEG images embedded in DNG images contain unknown APP0 markers
-            av_log(s->avctx, AV_LOG_WARNING, "skipping APPx (len=%"PRId32") for bayer-encoded image\n", len);
-            skip_bits(&s->gb, len);
-            return 0;
-        } else
+    if (len < 2)
+        return AVERROR_INVALIDDATA;
+    len -= 2;
+
+    if (len < 4) {
+        if (s->avctx->err_recognition & AV_EF_EXPLODE)
             return AVERROR_INVALIDDATA;
+        av_log(s->avctx, AV_LOG_VERBOSE, "skipping APPx stub (len=%" PRId32 ")\n", len);
+        goto out;
     }
+
     if (8 * len > get_bits_left(&s->gb))
         return AVERROR_INVALIDDATA;
 
     id   = get_bits_long(&s->gb, 32);
-    len -= 6;
+    len -= 4;
 
     if (s->avctx->debug & FF_DEBUG_STARTCODE)
         av_log(s->avctx, AV_LOG_DEBUG, "APPx (%s / %8X) len=%d\n",
@@ -1934,7 +1936,7 @@ static int mjpeg_decode_app(MJpegDecodeContext *s)
     }
 
     if (   id == AV_RB32("Adob")
-        && len >= 7
+        && len >= 8
         && show_bits(&s->gb, 8) == 'e'
         && show_bits_long(&s->gb, 32) != AV_RB32("e_CM")) {
         skip_bits(&s->gb,  8); /* 'e' */
@@ -1944,7 +1946,7 @@ static int mjpeg_decode_app(MJpegDecodeContext *s)
         s->adobe_transform = get_bits(&s->gb,  8);
         if (s->avctx->debug & FF_DEBUG_PICT_INFO)
             av_log(s->avctx, AV_LOG_INFO, "mjpeg: Adobe header found, transform=%d\n", s->adobe_transform);
-        len -= 7;
+        len -= 8;
         goto out;
     }
 
@@ -2153,7 +2155,7 @@ out:
     if (len < 0)
         av_log(s->avctx, AV_LOG_ERROR,
                "mjpeg: error, decode_app parser read over the end\n");
-    while (--len > 0)
+    while (len-- > 0)
         skip_bits(&s->gb, 8);
 
     return 0;

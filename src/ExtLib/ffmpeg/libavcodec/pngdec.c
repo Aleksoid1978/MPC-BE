@@ -998,6 +998,11 @@ static int decode_idat_chunk(AVCodecContext *avctx, PNGDecContext *s,
             s->bpp += byte_depth;
         }
 
+        /* PNG spec mandates independent alpha channel */
+        if (s->color_type == PNG_COLOR_TYPE_RGB_ALPHA ||
+            s->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+            avctx->alpha_mode = AVALPHA_MODE_STRAIGHT;
+
         ff_progress_frame_unref(&s->picture);
         if (s->dispose_op == APNG_DISPOSE_OP_PREVIOUS) {
             /* We only need a buffer for the current picture. */
@@ -1753,15 +1758,12 @@ exit_loop:
     if (s->exif_data) {
         // we swap because ff_decode_exif_attach_buffer adds to p->metadata
         FFSWAP(AVDictionary *, p->metadata, s->frame_metadata);
-        ret = ff_decode_exif_attach_buffer(avctx, p, s->exif_data, AV_EXIF_TIFF_HEADER);
+        ret = ff_decode_exif_attach_buffer(avctx, p, &s->exif_data, AV_EXIF_TIFF_HEADER);
         FFSWAP(AVDictionary *, p->metadata, s->frame_metadata);
         if (ret < 0) {
             av_log(avctx, AV_LOG_WARNING, "unable to attach EXIF buffer\n");
             return ret;
         }
-        // ff_decode_exif_attach_buffer takes ownership so
-        // we do not want to call av_buffer_unref here
-        s->exif_data = NULL;
     }
 
     if (s->color_type == PNG_COLOR_TYPE_PALETTE && avctx->codec_id == AV_CODEC_ID_APNG) {

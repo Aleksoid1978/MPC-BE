@@ -147,15 +147,15 @@ get_next:
         } else {
 #if CONFIG_AAC_PARSER
             AACADTSHeaderInfo hdr;
-            GetBitContext gb;
 
-            init_get_bits8(&gb, buf, buf_size);
             if (buf_size < AV_AAC_ADTS_HEADER_SIZE ||
-                ff_adts_header_parse(&gb, &hdr) < 0)
+                ff_adts_header_parse_buf(buf, &hdr) < 0)
                 return i;
 
-            avctx->profile = hdr.object_type - 1;
-            s1->key_frame = (avctx->profile == AV_PROFILE_AAC_USAC) ? get_bits1(&gb) : 1;
+            if (avctx->profile == AV_PROFILE_UNKNOWN)
+                avctx->profile = hdr.object_type - 1;
+            /* ADTS does not support USAC */
+            s1->key_frame = 1;
             bit_rate = hdr.bit_rate;
 #endif
         }

@@ -23,11 +23,13 @@
 #ifndef AVCODEC_CBRT_TABLEGEN_H
 #define AVCODEC_CBRT_TABLEGEN_H
 
+#include <assert.h>
 #include <stdint.h>
 #include <math.h>
 #include "libavutil/attributes.h"
 #include "libavutil/intfloat.h"
 #include "libavcodec/aac_defines.h"
+#include "cbrt_data.h"
 
 #if USE_FIXED
 #define CBRT(x) lrint((x) * 8192)
@@ -35,39 +37,30 @@
 #define CBRT(x) av_float2int((float)(x))
 #endif
 
-uint32_t AAC_RENAME(ff_cbrt_tab)[1 << 13];
+union CBRT AAC_RENAME(ff_cbrt_tab_internal);
 
 av_cold void AAC_RENAME(ff_cbrt_tableinit)(void)
 {
-    static double cbrt_tab_dbl[1 << 13];
-    if (!AAC_RENAME(ff_cbrt_tab)[(1<<13) - 1]) {
-        int i, j, k;
-        double cbrt_val;
+    static_assert(2 * sizeof(AAC_RENAME(ff_cbrt_tab_internal).cbrt_tab[0])
+                  >= sizeof(AAC_RENAME(ff_cbrt_tab_internal).tmp[0]),
+                  "unexpected sizeofs");
+    // We reuse ff_cbrt_tab_internal.tmp as a LUT (of doubles) for the roots
+    // of the odd integers: tmp[idx] contains (2 * idx + 1)^{4/3}.
+    ff_cbrt_dbl_tableinit(AAC_RENAME(ff_cbrt_tab_internal).tmp);
 
-        for (i = 1; i < 1<<13; i++)
-            cbrt_tab_dbl[i] = 1;
-
-        /* have to take care of non-squarefree numbers */
-        for (i = 2; i < 90; i++) {
-            if (cbrt_tab_dbl[i] == 1) {
-                cbrt_val = i * cbrt(i);
-                for (k = i; k < 1<<13; k *= i)
-                    for (j = k; j < 1<<13; j += k)
-                        cbrt_tab_dbl[j] *= cbrt_val;
-            }
+    double cbrt_2 = 2 * cbrt(2);
+    for (int idx = TMP_LUT_SIZE - 1; idx >= 0; --idx) {
+        double cbrt_val = AAC_RENAME(ff_cbrt_tab_internal).tmp[idx];
+        // Due to i * sizeof(ff_cbrt_tab_internal.cbrt_tab[0]) >=
+        // 2 * idx * sizeof(ff_cbrt_tab_internal.cbrt_tab[0])  >= idx * sizeof(double)
+        // we don't clobber the double-LUT entries with index < idx
+        // in the loop below. This is why we process idx in descending order.
+        for (int i = 2 * idx + 1; i < LUT_SIZE; i *= 2) {
+            AAC_RENAME(ff_cbrt_tab_internal).cbrt_tab[i] = CBRT(cbrt_val);
+            cbrt_val *= cbrt_2;
         }
-
-        for (i = 91; i <= 8191; i+= 2) {
-            if (cbrt_tab_dbl[i] == 1) {
-                cbrt_val = i * cbrt(i);
-                for (j = i; j < 1<<13; j += i)
-                    cbrt_tab_dbl[j] *= cbrt_val;
-            }
-        }
-
-        for (i = 0; i < 1<<13; i++)
-            AAC_RENAME(ff_cbrt_tab)[i] = CBRT(cbrt_tab_dbl[i]);
     }
+    AAC_RENAME(ff_cbrt_tab_internal).cbrt_tab[0] = CBRT(0);
 }
 
 #endif /* AVCODEC_CBRT_TABLEGEN_H */
