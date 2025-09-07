@@ -50,7 +50,7 @@ BEGIN DIALOGEX IDD_CAPTURE_DLG LINES 41
 END
 
 BEGIN DIALOGEX IDD_CMD_LINE_HELP LINES 9
-3		"Comutatoare din linia de comandă"
+3		"Comutatoarele din linia de comandă (din CLI)"
 8		"OK"
 END
 
@@ -522,7 +522,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 12		"Ignoră subtitrările integrate"
 13		"Reîncarcă automat fișierele de subtitrări după ce se detectează modificările"
 15		"Folosește modul de resincronizare a subtitrărilor (Subresync)"
-16		"Default code page:"
+16		"Pagina de codificare implicită:"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
@@ -736,7 +736,7 @@ BEGIN MENU IDR_MAINFRAME LINES 137
 60		"&Test de rupere"
 61		"&Afișează statisticile"
 63		"Prezentare"
-65		"Ecran complet (pe tot ecranul) exclusiv"
+65		"Ecran complet (Pe tot ecranul) exclusiv"
 66		"Activează corecția de timp pentru cadru"
 68		"Revino la setările implicite ale randorului"
 70		"Cadru &video"
@@ -782,7 +782,7 @@ BEGIN MENU IDR_MAINFRAME LINES 137
 129		"A&jutor"
 131		"&Pagina de pornire"
 132		"&Verifică pentru actualizări"
-133		"&Comutatoare din linia de comandă"
+133		"&Comutatoarele din linia de comandă (din CLI)"
 134		"&Donează"
 135		"&Despre..."
 END
@@ -854,7 +854,7 @@ BEGIN MENU IDR_POPUP LINES 130
 103		"&Test de rupere"
 104		"&Afișează statisticile"
 106		"Prezentare"
-108		"Ecran complet (pe tot ecranul) exclusiv"
+108		"Ecran complet (Pe tot ecranul) exclusiv"
 109		"Activează corecția de timp pentru cadru"
 111		"Revino la setările implicite ale randorului"
 113		"Modul Stereo 3D"
@@ -911,7 +911,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 59		"&Test de rupere"
 60		"&Afișează statisticile"
 62		"Prezentare"
-64		"Ecran complet (pe tot ecranul) exclusiv"
+64		"Ecran complet (Pe tot ecranul) exclusiv"
 65		"Activează corecția de timp pentru cadru"
 67		"Revino la setările implicite ale randorului"
 69		"Cadru &video"
@@ -948,7 +948,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 113		"A&jutor"
 115		"&Pagina de pornire"
 116		"Verifică pentru &actualizări"
-117		"&Comutatoare din linia de comandă"
+117		"&Comutatoarele din linia de comandă (din CLI)"
 119		"&Despre..."
 122		"&Filtre"
 123		"N&uanțatoare (S&hadere)"
@@ -963,7 +963,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 139		"&Test de rupere"
 140		"&Afișează statisticile"
 142		"Prezentare"
-144		"Ecran complet (pe tot ecranul) exclusiv"
+144		"Ecran complet (Pe tot ecranul) exclusiv"
 145		"Activează corecția de timp pentru cadru"
 147		"Revino la setările implicite ale randorului"
 149		"Modul Stereo 3D"
@@ -2113,3 +2113,4 @@ STRING ID_SHOW_MILLISECONDS		"Afișează milisecundele"
 STRING ID_VOLUME_MUTE		"Mut\nMut"
 STRING ID_VOLUME_MUTE_DISABLED		"Fără sunet (Silențios)\nFără sunet (Silențios)"
 STRING ID_VOLUME_MUTE_OFF		"Activează sunetul\nActivează sunetul"
+
