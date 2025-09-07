@@ -1262,8 +1262,8 @@ BEGIN
     CONTROL         "Berez-birgertatu azpidatzi agiriak aldaketa atzeman ondoren",IDC_CHECK3,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,79,285,9
     CONTROL         "Erabili Azpberraldb",IDC_CHECK_SUBRESYNC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,91,285,9
-    LTEXT           "Default code page:",IDC_STATIC,5,106,120,8
-    COMBOBOX        IDC_COMBO3,128,104,162,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Default code page:",IDC_STATIC,10,107,120,8
+    COMBOBOX        IDC_COMBO3,10,119,280,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
 END
 
 IDD_UPDATE_DIALOG DIALOGEX 0, 0, 238, 60

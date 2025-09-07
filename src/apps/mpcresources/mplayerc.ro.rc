@@ -1262,8 +1262,8 @@ BEGIN
     CONTROL         "Reîncarcă automat fișierele de subtitrări după ce se detectează modificările",IDC_CHECK3,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,79,285,9
     CONTROL         "Folosește modul de resincronizare a subtitrărilor (Subresync)",IDC_CHECK_SUBRESYNC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,91,285,9
-    LTEXT           "Default code page:",IDC_STATIC,5,106,120,8
-    COMBOBOX        IDC_COMBO3,128,104,162,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Pagina de codificare implicită:",IDC_STATIC,10,107,120,8
+    COMBOBOX        IDC_COMBO3,10,119,280,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
 END
 
 IDD_UPDATE_DIALOG DIALOGEX 0, 0, 238, 60
@@ -1302,7 +1302,7 @@ END
 
 IDD_CMD_LINE_HELP DIALOGEX 0, 0, 309, 177
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Comutatoare din linia de comandă"
+CAPTION "Comutatoarele din linia de comandă (din CLI)"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     ICON            "",IDC_STATIC1,7,7,20,20
@@ -1698,7 +1698,7 @@ BEGIN
             MENUITEM SEPARATOR
             POPUP "Prezentare"
             BEGIN
-                MENUITEM "Ecran complet (pe tot ecranul) exclusiv",        ID_VIEW_EXCLUSIVE_FULLSCREEN
+                MENUITEM "Ecran complet (Pe tot ecranul) exclusiv",        ID_VIEW_EXCLUSIVE_FULLSCREEN
                 MENUITEM "Activează corecția de timp pentru cadru",   ID_VIEW_ENABLEFRAMETIMECORRECTION
             END
             MENUITEM "Revino la setările implicite ale randorului", ID_VIEW_RESET_DEFAULT
@@ -1766,7 +1766,7 @@ BEGIN
     BEGIN
         MENUITEM "&Pagina de pornire",                  ID_HELP_HOMEPAGE
         MENUITEM "&Verifică pentru actualizări",          ID_HELP_CHECKFORUPDATE
-        MENUITEM "&Comutatoare din linia de comandă",      ID_HELP_SHOWCOMMANDLINESWITCHES
+        MENUITEM "&Comutatoarele din linia de comandă (din CLI)",      ID_HELP_SHOWCOMMANDLINESWITCHES
         MENUITEM "&Donează",                     ID_HELP_DONATE
         MENUITEM "&Despre...",                   ID_HELP_ABOUT
     END
@@ -1879,7 +1879,7 @@ BEGIN
             MENUITEM SEPARATOR
             POPUP "Prezentare"
             BEGIN
-                MENUITEM "Ecran complet (pe tot ecranul) exclusiv",        ID_VIEW_EXCLUSIVE_FULLSCREEN
+                MENUITEM "Ecran complet (Pe tot ecranul) exclusiv",        ID_VIEW_EXCLUSIVE_FULLSCREEN
                 MENUITEM "Activează corecția de timp pentru cadru",   ID_VIEW_ENABLEFRAMETIMECORRECTION
             END
             MENUITEM "Revino la setările implicite ale randorului", ID_VIEW_RESET_DEFAULT
@@ -1966,7 +1966,7 @@ BEGIN
                 MENUITEM SEPARATOR
                 POPUP "Prezentare"
                 BEGIN
-                    MENUITEM "Ecran complet (pe tot ecranul) exclusiv",        ID_VIEW_EXCLUSIVE_FULLSCREEN
+                    MENUITEM "Ecran complet (Pe tot ecranul) exclusiv",        ID_VIEW_EXCLUSIVE_FULLSCREEN
                     MENUITEM "Activează corecția de timp pentru cadru",   ID_VIEW_ENABLEFRAMETIMECORRECTION
                 END
                 MENUITEM "Revino la setările implicite ale randorului", ID_VIEW_RESET_DEFAULT
@@ -2019,7 +2019,7 @@ BEGIN
         BEGIN
             MENUITEM "&Pagina de pornire",                  ID_HELP_HOMEPAGE
             MENUITEM "Verifică pentru &actualizări",          ID_HELP_CHECKFORUPDATE
-            MENUITEM "&Comutatoare din linia de comandă",      ID_HELP_SHOWCOMMANDLINESWITCHES
+            MENUITEM "&Comutatoarele din linia de comandă (din CLI)",      ID_HELP_SHOWCOMMANDLINESWITCHES
             MENUITEM SEPARATOR
             MENUITEM "&Despre...",                   ID_HELP_ABOUT
         END
@@ -2046,7 +2046,7 @@ BEGIN
             MENUITEM SEPARATOR
             POPUP "Prezentare"
             BEGIN
-                MENUITEM "Ecran complet (pe tot ecranul) exclusiv",        ID_VIEW_EXCLUSIVE_FULLSCREEN
+                MENUITEM "Ecran complet (Pe tot ecranul) exclusiv",        ID_VIEW_EXCLUSIVE_FULLSCREEN
                 MENUITEM "Activează corecția de timp pentru cadru",   ID_VIEW_ENABLEFRAMETIMECORRECTION
             END
             MENUITEM "Revino la setările implicite ale randorului", ID_VIEW_RESET_DEFAULT

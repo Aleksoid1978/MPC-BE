@@ -522,7 +522,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 12		"Eingebettete Untertitel nicht verwenden"
 13		"Untertitel bei erkannten Veränderungen neu laden"
 15		"Subresync verwenden"
-16		"Default code page:"
+16		"Standard-Codepage:"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
