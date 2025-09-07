@@ -207,210 +207,16 @@ static std::wstring SSAColorTagCS(std::wstring arg, CStringW ctag = L"c") {
 
 //
 
-static UINT CharSetToCodePage(UINT charSet)
-{
-	CHARSETINFO cs = {};
-	::TranslateCharsetInfo((DWORD*)(DWORD_PTR)charSet, &cs, TCI_SRCCHARSET);
-	return cs.ciACP;
-}
-
-static int FindChar(CStringW str, WCHAR c, int pos, bool fUnicode, int CharSet)
-{
-	if (fUnicode) {
-		return str.Find(c, pos);
-	}
-
-	int fStyleMod = 0;
-
-	UINT cp = CharSetToCodePage(CharSet);
-	int OrgCharSet = CharSet;
-
-	for (int i = 0, j = str.GetLength(), k; i < j; i++) {
-		WCHAR c2 = str[i];
-
-		if (IsDBCSLeadByteEx(cp, (BYTE)c2)) {
-			i++;
-		} else if (i >= pos) {
-			if (c2 == c) {
-				return i;
-			}
-		}
-
-		if (c2 == L'{') {
-			fStyleMod++;
-		} else if (fStyleMod > 0) {
-			if (c2 == L'}') {
-				fStyleMod--;
-			} else if (c2 == L'e' && i >= 3 && i < j-1 && str.Mid(i-2, 3) == L"\\fe") {
-				CharSet = 0;
-				for (k = i+1; _istdigit(str[k]); k++) {
-					CharSet = CharSet*10 + (str[k] - '0');
-				}
-				if (k == i+1) {
-					CharSet = OrgCharSet;
-				}
-
-				cp = CharSetToCodePage(CharSet);
-			}
-		}
-	}
-
-	return -1;
-}
-
-static CStringW ToMBCS(CStringW str, DWORD CharSet)
-{
-	CStringW ret;
-
-	UINT cp = CharSetToCodePage(CharSet);
-
-	for (int i = 0, j = str.GetLength(); i < j; i++) {
-		WCHAR wc = str.GetAt(i);
-		char c[8];
-
-		int len;
-		if ((len = WideCharToMultiByte(cp, 0, &wc, 1, c, 8, NULL, NULL)) > 0) {
-			for (ptrdiff_t k = 0; k < len; k++) {
-				ret += (WCHAR)(BYTE)c[k];
-			}
-		} else {
-			ret += L'?';
-		}
-	}
-
-	return ret;
-}
-
-static CStringW UnicodeSSAToMBCS(CStringW str, DWORD CharSet)
-{
-	CStringW ret;
-
-	int OrgCharSet = CharSet;
-
-	for (int j = 0; j < str.GetLength(); ) {
-		j = str.Find(L'{', j);
-		if (j >= 0) {
-			ret += ToMBCS(str.Left(j), CharSet);
-			str = str.Mid(j);
-
-			j = str.Find(L'}');
-			if (j < 0) {
-				ret += ToMBCS(str, CharSet);
-				break;
-			} else {
-				int k = str.Find(L"\\fe");
-				if (k >= 0 && k < j) {
-					CharSet = 0;
-					int l = k+3;
-					for (; _istdigit(str[l]); l++) {
-						CharSet = CharSet*10 + (str[l] - '0');
-					}
-					if (l == k+3) {
-						CharSet = OrgCharSet;
-					}
-				}
-
-				j++;
-
-				ret += ToMBCS(str.Left(j), OrgCharSet);
-				str = str.Mid(j);
-				j = 0;
-			}
-		} else {
-			ret += ToMBCS(str, CharSet);
-			break;
-		}
-	}
-
-	return ret;
-}
-
-static CStringW ToUnicode(const CStringW& str, UINT CharSet)
-{
-	CStringW ret;
-
-	UINT cp = CharSetToCodePage(CharSet);
-
-	for (int i = 0, j = str.GetLength(); i < j; i++) {
-		WCHAR wc = str.GetAt(i);
-		char c = wc&0xff;
-
-		if (IsDBCSLeadByteEx(cp, (BYTE)wc)) {
-			i++;
-
-			if (i < j) {
-				char cc[2];
-				cc[0] = c;
-				cc[1] = (char)str.GetAt(i);
-
-				MultiByteToWideChar(cp, 0, cc, 2, &wc, 1);
-			}
-		} else {
-			MultiByteToWideChar(cp, 0, &c, 1, &wc, 1);
-		}
-
-		ret += wc;
-	}
-
-	return ret;
-}
-
-static CStringW MBCSSSAToUnicode(CStringW str, int CharSet)
-{
-	CStringW ret;
-
-	int OrgCharSet = CharSet;
-
-	for (int j = 0; j < str.GetLength(); ) {
-		j = FindChar(str, L'{', 0, false, CharSet);
-
-		if (j >= 0) {
-			ret += ToUnicode(str.Left(j), CharSet);
-			str = str.Mid(j);
-
-			j = FindChar(str, L'}', 0, false, CharSet);
-
-			if (j < 0) {
-				ret += ToUnicode(str, CharSet);
-				break;
-			} else {
-				int k = str.Find(L"\\fe");
-				if (k >= 0 && k < j) {
-					CharSet = 0;
-					int l = k+3;
-					for (; _istdigit(str[l]); l++) {
-						CharSet = CharSet*10 + (str[l] - '0');
-					}
-					if (l == k+3) {
-						CharSet = OrgCharSet;
-					}
-				}
-
-				j++;
-
-				ret += ToUnicode(str.Left(j), OrgCharSet);
-				str = str.Mid(j);
-				j = 0;
-			}
-		} else {
-			ret += ToUnicode(str, CharSet);
-			break;
-		}
-	}
-
-	return ret;
-}
-
-static CStringW RemoveSSATags(CStringW str, bool fUnicode, int CharSet)
+static CStringW RemoveSSATags(CStringW str)
 {
 	str.Replace (L"{\\i1}", L"<i>");
 	str.Replace (L"{\\i}", L"</i>");
 
 	for (int i = 0, j; i < str.GetLength(); ) {
-		if ((i = FindChar(str, L'{', i, fUnicode, CharSet)) < 0) {
+		if ((i = str.Find(L'{', i)) < 0) {
 			break;
 		}
-		if ((j = FindChar(str, L'}', i, fUnicode, CharSet)) < 0) {
+		if ((j = str.Find(L'}', i)) < 0) {
 			break;
 		}
 		str.Delete(i, j-i+1);
@@ -792,7 +598,6 @@ static bool OpenVTT(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet) {
 
 			if (lastStr != str || lastBuff != buff) { //discard repeated subs
 				ret.Add(str,
-					file->IsUnicode(),
 					(((hh1 * 60i64 + mm1) * 60i64) + ss1) * 1000i64 + ms1,
 					(((hh2 * 60i64 + mm2) * 60i64) + ss2) * 1000i64 + ms2);
 			}
@@ -860,7 +665,6 @@ static bool OpenSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 
 			ret.Add(
 				SubRipper2SSA(str),
-				file->IsUnicode(),
 				(((hh1*60 + mm1)*60) + ss1)*1000 + ms1,
 				(((hh2*60 + mm2)*60) + ss2)*1000 + ms2);
 			first_line_success = true;
@@ -885,7 +689,7 @@ static bool OpenOldSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int Char
 		}
 
 		for (int i = 0; i < buff.GetLength(); i++) {
-			if ((i = FindChar(buff, L'|', i, file->IsUnicode(), CharSet)) < 0) {
+			if ((i = buff.Find(L'|', i)) < 0) {
 				break;
 			}
 			buff.SetAt(i, L'\n');
@@ -897,7 +701,6 @@ static bool OpenOldSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int Char
 		if (c == 6) {
 			ret.Add(
 				buff.Mid(buff.Find(L'}', buff.Find(L'}')+1)+1),
-				file->IsUnicode(),
 				(((hh1*60 + mm1)*60) + ss1)*1000,
 				(((hh2*60 + mm2)*60) + ss2)*1000);
 		} else if (c != EOF) { // might be another format
@@ -970,7 +773,7 @@ static bool OpenLRC(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 
 	for (const auto& line : lrc_lines) {
 		if (line.text.GetLength() && line.start < line.end) {
-			ret.Add(line.text, file->IsUnicode(), line.start, line.end);
+			ret.Add(line.text, line.start, line.end);
 		}
 	}
 
@@ -1123,7 +926,7 @@ static bool OpenTTML(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 						if (time_begin != -1 && time_end > time_begin) {
 							auto text = RegExpParse(line.GetString(), LR"(>(.+))");
 							if (!text.IsEmpty()) {
-								ret.Add(TTML2SSA(text), file->IsUnicode(), time_begin, time_end);
+								ret.Add(TTML2SSA(text), time_begin, time_end);
 							}
 						}
 					}
@@ -1236,7 +1039,6 @@ static bool OpenSubViewer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 			}
 
 			ret.Add(str,
-					file->IsUnicode(),
 					(((hh1*60 + mm1)*60) + ss1)*1000 + hs1*10,
 					(((hh2*60 + mm2)*60) + ss2)*1000 + hs2*10);
 		} else if (c != EOF) { // might be another format
@@ -1311,7 +1113,7 @@ static STSStyle* GetMicroDVDStyle(CString str, int CharSet)
 	return ret;
 }
 
-static CStringW MicroDVD2SSA(CStringW str, bool fUnicode, int CharSet)
+static CStringW MicroDVD2SSA(CStringW str)
 {
 	CStringW ret;
 
@@ -1331,7 +1133,7 @@ static CStringW MicroDVD2SSA(CStringW str, bool fUnicode, int CharSet)
 	memset(fRestore, 0, sizeof(bool)*fRestoreLen);
 
 	for (int pos = 0, eol; pos < str.GetLength(); pos++) {
-		if ((eol = FindChar(str, L'|', pos, fUnicode, CharSet)) < 0) {
+		if ((eol = str.Find(L'|', pos)) < 0) {
 			eol = str.GetLength();
 		}
 
@@ -1340,7 +1142,7 @@ static CStringW MicroDVD2SSA(CStringW str, bool fUnicode, int CharSet)
 		pos = eol;
 
 		for (int i = 0, j, k, len = line.GetLength(); i < len; i++) {
-			if ((j = FindChar(line, L'{', i, fUnicode, CharSet)) < 0) {
+			if ((j = line.Find(L'{', i)) < 0) {
 				j = str.GetLength();
 			}
 
@@ -1350,7 +1152,7 @@ static CStringW MicroDVD2SSA(CStringW str, bool fUnicode, int CharSet)
 				break;
 			}
 
-			if ((k = FindChar(line, L'}', j, fUnicode, CharSet)) < 0) {
+			if ((k = line.Find(L'}', j)) < 0) {
 				k = len;
 			}
 
@@ -1516,8 +1318,7 @@ static bool OpenMicroDVD(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 			}
 
 			ret.Add(
-				MicroDVD2SSA(buff.Mid(buff.Find(L'}', buff.Find(L'}')+1)+1), file->IsUnicode(), CharSet),
-				file->IsUnicode(),
+				MicroDVD2SSA(buff.Mid(buff.Find(L'}', buff.Find(L'}')+1)+1)),
 				start, end,
 				style);
 
@@ -1716,7 +1517,6 @@ static bool OpenSami(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 					if (end_time > start_time) {
 						ret.Add(
 							SMI2SSA(samiBuff, CharSet),
-							file->IsUnicode(),
 							start_time, end_time);
 					}
 				}
@@ -1745,7 +1545,7 @@ static bool OpenVPlayer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 		}
 
 		for (int i = 0; i < buff.GetLength(); i++) {
-			if ((i = FindChar(buff, L'|', i, file->IsUnicode(), CharSet)) < 0) {
+			if ((i = buff.Find(L'|', i)) < 0) {
 				break;
 			}
 			buff.SetAt(i, L'\n');
@@ -1757,7 +1557,6 @@ static bool OpenVPlayer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 		if (c == 3) {
 			CStringW str = buff.Mid(buff.Find(':', buff.Find(':', buff.Find(':')+1)+1)+1);
 			ret.Add(str,
-					file->IsUnicode(),
 					(((hh*60 + mm)*60) + ss)*1000,
 					(((hh*60 + mm)*60) + ss)*1000 + 1000 + 50*str.GetLength());
 		} else if (c != EOF) { // might be another format
@@ -2018,7 +1817,6 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 					}
 
 					ret.Add(pszBuff,
-							file->IsUnicode(),
 							(((hh1*60 + mm1)*60) + ss1)*1000 + ms1_div10*10,
 							(((hh2*60 + mm2)*60) + ss2)*1000 + ms2_div10*10,
 							Style, Actor, Effect,
@@ -2330,7 +2128,6 @@ static bool OpenXombieSub(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 				}
 
 				ret.Add(pszBuff,
-						file->IsUnicode(),
 						(((hh1*60 + mm1)*60) + ss1)*1000 + ms1,
 						(((hh2*60 + mm2)*60) + ss2)*1000 + ms2,
 						Style, Actor, L"",
@@ -2364,7 +2161,7 @@ static bool OpenUSF(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 	return false;
 }
 
-static CStringW MPL22SSA(CStringW str, bool fUnicode, int CharSet)
+static CStringW MPL22SSA(CStringW str)
 {
 	// Convert MPL2 italic tags to MicroDVD italic tags
 	if (str[0] == L'/') {
@@ -2372,7 +2169,7 @@ static CStringW MPL22SSA(CStringW str, bool fUnicode, int CharSet)
 	}
 	str.Replace(L"|/", L"|{y:i}");
 
-	return MicroDVD2SSA(str, fUnicode, CharSet);
+	return MicroDVD2SSA(str);
 }
 
 static bool OpenMPL2(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
@@ -2389,8 +2186,7 @@ static bool OpenMPL2(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 
 		if (c == 2) {
 			ret.Add(
-				MPL22SSA(buff.Mid(buff.Find(L']', buff.Find(']')+1)+1), file->IsUnicode(), CharSet),
-				file->IsUnicode(),
+				MPL22SSA(buff.Mid(buff.Find(L']', buff.Find(']')+1)+1)),
 				start*100, end*100);
 		} else if (c != EOF) { // might be another format
 			return false;
@@ -2560,7 +2356,7 @@ static bool SegmentCompStart(const STSSegment& segment, int start)
 	return (segment.start < start);
 }
 
-void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, int start, int end, CString style, CString actor, CString effect, const CRect& marginRect, int layer, int readorder)
+void CSimpleTextSubtitle::Add(CStringW str, int start, int end, CString style, CString actor, CString effect, const CRect& marginRect, int layer, int readorder)
 {
 	FastTrim(str);
 	if (str.IsEmpty() || start > end) {
@@ -2585,7 +2381,6 @@ void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, int start, int end, C
 
 	STSEntry sub;
 	sub.str = str;
-	sub.fUnicode = fUnicode;
 	sub.style = style;
 	sub.actor = actor;
 	sub.effect = effect;
@@ -3072,31 +2867,6 @@ int CSimpleTextSubtitle::GetCharSet(int i)
 	return stss ? stss->charSet : DEFAULT_CHARSET;
 }
 
-bool CSimpleTextSubtitle::IsEntryUnicode(int i)
-{
-	return GetAt(i).fUnicode;
-}
-
-void CSimpleTextSubtitle::ConvertUnicode(int i, bool fUnicode)
-{
-	STSEntry& stse = GetAt(i);
-
-	if (stse.fUnicode ^ fUnicode) {
-		int CharSet = GetCharSet(i);
-
-		stse.str = fUnicode
-				   ? MBCSSSAToUnicode(stse.str, CharSet)
-				   : UnicodeSSAToMBCS(stse.str, CharSet);
-
-		stse.fUnicode = fUnicode;
-	}
-}
-
-CStringA CSimpleTextSubtitle::GetStrA(int i, bool fSSA)
-{
-	return TToA(GetStrWA(i, fSSA));
-}
-
 static CString RemoveHtmlSpecialChars(CString str)
 {
 	str.Replace(L"&gt;", L">");
@@ -3109,6 +2879,18 @@ static CString RemoveHtmlSpecialChars(CString str)
 	return str;
 }
 
+CStringA CSimpleTextSubtitle::GetStrA(int i, UINT CodePage, bool fSSA)
+{
+	CStringW wstr = GetStrW(i, fSSA);
+
+	CStringA str;
+	int len = WideCharToMultiByte(CodePage, 0, wstr, -1, nullptr, 0, nullptr, nullptr) - 1;
+	if (len > 0) {
+		str.ReleaseBuffer(WideCharToMultiByte(CodePage, 0, wstr, -1, str.GetBuffer(len), len + 1, nullptr, nullptr) - 1);
+	}
+	return str;
+}
+
 CStringW CSimpleTextSubtitle::GetStrW(int i, bool fSSA)
 {
 	STSEntry const& stse = GetAt(i);
@@ -3116,12 +2898,8 @@ CStringW CSimpleTextSubtitle::GetStrW(int i, bool fSSA)
 
 	CStringW str = stse.str;
 
-	if (!stse.fUnicode) {
-		str = MBCSSSAToUnicode(str, CharSet);
-	}
-
 	if (!fSSA) {
-		str = RemoveSSATags(str, true, CharSet);
+		str = RemoveSSATags(str);
 	}
 
 	str = RemoveHtmlSpecialChars(str);
@@ -3129,42 +2907,18 @@ CStringW CSimpleTextSubtitle::GetStrW(int i, bool fSSA)
 	return str;
 }
 
-CStringW CSimpleTextSubtitle::GetStrWA(int i, bool fSSA)
+void CSimpleTextSubtitle::SetStr(int i, CStringA str, UINT CodePage)
 {
-	STSEntry const& stse = GetAt(i);
-	int CharSet = GetCharSet(i);
-
-	CStringW str = stse.str;
-
-	if (stse.fUnicode) {
-		str = UnicodeSSAToMBCS(str, CharSet);
-	}
-
-	if (!fSSA) {
-		str = RemoveSSATags(str, false, CharSet);
-	}
-
-	return str;
+	SetStr(i, ConvertToWStr(str, CodePage));
 }
 
-void CSimpleTextSubtitle::SetStr(int i, CStringA str, bool fUnicode)
-{
-	SetStr(i, AToT(str), false);
-}
-
-void CSimpleTextSubtitle::SetStr(int i, CStringW str, bool fUnicode)
+void CSimpleTextSubtitle::SetStr(int i, CStringW str)
 {
 	STSEntry& stse = GetAt(i);
 
 	str.Replace(L"\n", L"\\N");
 
-	if (stse.fUnicode && !fUnicode) {
-		stse.str = MBCSSSAToUnicode(str, GetCharSet(i));
-	} else if (!stse.fUnicode && fUnicode) {
-		stse.str = UnicodeSSAToMBCS(str, GetCharSet(i));
-	} else {
-		stse.str = str;
-	}
+	stse.str = str;
 }
 
 void CSimpleTextSubtitle::CodeToCharacter(CString& str)
@@ -3288,11 +3042,11 @@ void CSimpleTextSubtitle::CreateSegments()
 	*/
 }
 
-bool CSimpleTextSubtitle::Open(CString fn, int CharSet, CString name, CString videoName)
+bool CSimpleTextSubtitle::Open(CString fn, UINT codePage, CString name, CString videoName)
 {
 	Empty();
 
-	CWebTextFile f(CP_UTF8);
+	CWebTextFile f(CP_UTF8, codePage);
 	if (!f.Open(fn)) {
 		return false;
 	}
@@ -3301,7 +3055,7 @@ bool CSimpleTextSubtitle::Open(CString fn, int CharSet, CString name, CString vi
 		name = Subtitle::GuessSubtitleName(fn, videoName);
 	}
 
-	return Open(&f, CharSet, name);
+	return Open(&f, name);
 }
 
 static size_t CountLines(CTextFile* f, ULONGLONG from, ULONGLONG to, CString& s)
@@ -3314,14 +3068,15 @@ static size_t CountLines(CTextFile* f, ULONGLONG from, ULONGLONG to, CString& s)
 	return n;
 }
 
-bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
+bool CSimpleTextSubtitle::Open(CTextFile* f, CString name)
 {
 	Empty();
 
+	const UINT charSet = CodePageToCharSet(f->GetEncoding());
 	ULONGLONG pos = f->GetPosition();
 
 	for (const auto& OpenFunct : s_OpenFuncts) {
-		if (!OpenFunct.open(f, *this, CharSet)) {
+		if (!OpenFunct.open(f, *this, charSet)) {
 			if (!IsEmpty()) {
 				CString lastLine;
 				size_t n = CountLines(f, pos, f->GetPosition(), lastLine);
@@ -3347,11 +3102,11 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
 
 		CWebTextFile f2(CP_UTF8);
 		if (f2.Open(f->GetFilePath() + L".style")) {
-			OpenSubStationAlpha(&f2, *this, CharSet);
+			OpenSubStationAlpha(&f2, *this, charSet);
 			f2.Close();
 		}
 
-		CreateDefaultStyle(CharSet);
+		CreateDefaultStyle(charSet);
 
 		ChangeUnknownStylesToDefault();
 
@@ -3550,9 +3305,7 @@ bool CSimpleTextSubtitle::SaveAs(CString fn, Subtitle::SubType type, double fps,
 		int ss2 = (t2/1000)%60;
 		int ms2 = (t2)%1000;
 
-		CStringW str = f.IsUnicode()
-					   ? GetStrW(i, type == Subtitle::SSA || type == Subtitle::ASS)
-					   : GetStrWA(i, type == Subtitle::SSA || type == Subtitle::ASS);
+		CStringW str = GetStrW(i, type == Subtitle::SSA || type == Subtitle::ASS);
 
 		CStringW str2;
 
@@ -3850,7 +3603,6 @@ static bool OpenRealText(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 	for (auto i = crRealText.m_mapLines.cbegin(); i != crRealText.m_mapLines.cend(); ++i) {
 		ret.Add(
 			SubRipper2SSA(i->second.c_str()),
-			file->IsUnicode(),
 			i->first.first,
 			i->first.second);
 	}

@@ -90,7 +90,6 @@ public:
 
 struct STSEntry {
 	CStringW str;
-	bool fUnicode;
 	CString style, actor, effect;
 	CRect marginRect;
 	int layer;
@@ -173,12 +172,12 @@ public:
 
 	void Append(CSimpleTextSubtitle& sts, int timeoff = -1);
 
-	bool Open(CString fn, int CharSet, CString name = L"", CString videoName = L"");
-	bool Open(CTextFile* f, int CharSet, CString name);
+	bool Open(CString fn, UINT codePage, CString name = L"", CString videoName = L"");
+	bool Open(CTextFile* f, CString name);
 	bool Open(BYTE* data, int len, int CharSet, CString name);
 	bool SaveAs(CString fn, Subtitle::SubType type, double fps = -1, int delay = 0, UINT e = CP_ASCII, bool bCreateExternalStyleFile = true);
 
-	void Add(CStringW str, bool fUnicode, int start, int end, CString style = L"Default", CString actor = L"", CString effect = L"", const CRect& marginRect = CRect(0,0,0,0), int layer = 0, int readorder = -1);
+	void Add(CStringW str, int start, int end, CString style = L"Default", CString actor = L"", CString effect = L"", const CRect& marginRect = CRect(0,0,0,0), int layer = 0, int readorder = -1);
 	STSStyle* CreateDefaultStyle(int CharSet);
 	void ChangeUnknownStylesToDefault();
 	void AddStyle(CString name, STSStyle* style); // style will be stored and freed in Empty() later
@@ -205,15 +204,12 @@ public:
 	bool GetStyle(int i, STSStyle& stss);
 	bool GetStyle(CString styleName, STSStyle& stss);
 	int GetCharSet(int i);
-	bool IsEntryUnicode(int i);
-	void ConvertUnicode(int i, bool fUnicode);
 
-	CStringA GetStrA(int i, bool fSSA = false);
+	CStringA GetStrA(int i, UINT CodePage, bool fSSA = false);
 	CStringW GetStrW(int i, bool fSSA = false);
-	CStringW GetStrWA(int i, bool fSSA = false);
 
-	void SetStr(int i, CStringA str, bool fUnicode /* ignored */);
-	void SetStr(int i, CStringW str, bool fUnicode);
+	void SetStr(int i, CStringA str, UINT CodePage);
+	void SetStr(int i, CStringW str);
 
 	void CodeToCharacter(CString& str);
 };

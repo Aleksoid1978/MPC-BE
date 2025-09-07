@@ -84,8 +84,6 @@ BOOL CPPageSubtitles::OnInitDialog()
 	m_fUseSybresync					= s.fUseSybresync;
 	m_szAutoloadPaths				= s.strSubtitlePaths;
 
-	m_cbDefaultEncoding.ShowWindow(SW_HIDE); // TODO remove it
-
 	CStringW str;
 	str.Format(L"System code page - %u", GetACP());
 	AddStringData(m_cbDefaultEncoding, str, CP_ACP);

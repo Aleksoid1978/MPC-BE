@@ -104,7 +104,7 @@ void CCDecoder::SaveDisp(__int64 time)
 		return;
 	}
 
-	m_sts.Add(str, true, (int)m_time, (int)time);
+	m_sts.Add(str, (int)m_time, (int)time);
 }
 
 void CCDecoder::DecodeCC(BYTE* buff, int len, __int64 time)

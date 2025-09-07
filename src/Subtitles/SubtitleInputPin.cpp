@@ -428,12 +428,13 @@ REFERENCE_TIME CSubtitleInputPin::DecodeSample(const std::unique_ptr<SubtitleSam
 				if (tag == __GAB1_LANGUAGE__) {
 					pRTS->m_name = ptr;
 				} else if (tag == __GAB1_ENTRY__) {
-					pRTS->Add(AToT(&ptr[8]), false, *(int*)ptr, *(int*)(ptr+4));
+					CStringW wstr = ConvertToWStr(ptr+8, CP_ACP); // TODO: code page?
+					pRTS->Add(wstr, *(int*)ptr, *(int*)(ptr+4));
 					bInvalidate = true;
 				} else if (tag == __GAB1_LANGUAGE_UNICODE__) {
 					pRTS->m_name = (WCHAR*)ptr;
 				} else if (tag == __GAB1_ENTRY_UNICODE__) {
-					pRTS->Add((WCHAR*)(ptr+8), true, *(int*)ptr, *(int*)(ptr+4));
+					pRTS->Add((WCHAR*)(ptr+8), *(int*)ptr, *(int*)(ptr+4));
 					bInvalidate = true;
 				}
 
@@ -465,7 +466,8 @@ REFERENCE_TIME CSubtitleInputPin::DecodeSample(const std::unique_ptr<SubtitleSam
 			str.Trim();
 
 			if (!str.IsEmpty()) {
-				pRTS->Add(AToT(str), false, (int)(tStart / 10000), (int)(tStop / 10000));
+				CStringW wstr = ConvertToWStr(str, CP_ACP); // TODO: code page?
+				pRTS->Add(wstr, (int)(tStart / 10000), (int)(tStop / 10000));
 				bInvalidate = true;
 			}
 		}
@@ -481,7 +483,7 @@ REFERENCE_TIME CSubtitleInputPin::DecodeSample(const std::unique_ptr<SubtitleSam
 			CStringW str = UTF8ToWStr(CStringA((LPCSTR)pData, nLen));
 			FastTrim(str);
 			if (!str.IsEmpty()) {
-				pRTS->Add(str, true, (int)(tStart / 10000), (int)(tStop / 10000));
+				pRTS->Add(str, (int)(tStart / 10000), (int)(tStop / 10000));
 				bInvalidate = true;
 				if (pRTS->m_subtitleType == Subtitle::VTT) {
 					pRTS->m_webvtt_allow_clear = true;
@@ -516,7 +518,7 @@ REFERENCE_TIME CSubtitleInputPin::DecodeSample(const std::unique_ptr<SubtitleSam
 				}
 
 				if (!stse.str.IsEmpty()) {
-					pRTS->Add(stse.str, true, (int)(tStart / 10000), (int)(tStop / 10000),
+					pRTS->Add(stse.str, (int)(tStart / 10000), (int)(tStop / 10000),
 							  stse.style, stse.actor, stse.effect, stse.marginRect, stse.layer, stse.readorder);
 					bInvalidate = true;
 				}

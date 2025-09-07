@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2024 see Authors.txt
+ * (C) 2016-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -192,10 +192,10 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 		CStringW str;
 		str.Format(L"{\\an7\\1c&Hffffff&\\4a&Hb0&\\bord1\\shad4\\be1}{\\p1}m %d %d l %d %d %d %d %d %d{\\p}",
 				   r.left, r.top, r.right, r.top, r.right, r.bottom, r.left, r.bottom);
-		rts.Add(str, true, 0, 1, L"thumbs");
+		rts.Add(str, 0, 1, L"thumbs");
 		str.Format(L"{\\an3\\1c&Hffffff&\\3c&H000000&\\alpha&H80&\\fs16\\b1\\bord2\\shad0\\pos(%d,%d)}%s",
 				   r.right - 5, r.bottom - 3, strTime);
-		rts.Add(str, true, 1, 2, L"thumbs");
+		rts.Add(str, 1, 2, L"thumbs");
 
 		rts.Render(spd, 0, 25, bbox);
 
@@ -255,7 +255,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 		CStringW str;
 		str.Format(L"{\\an9\\fs%d\\b1\\bord0\\shad0\\1c&Hffffff&}%s", infoheight - 10, width >= 550 ? L"MPC-BE" : L"MPC");
 
-		rts.Add(str, true, 0, 1, L"thumbs", L"", L"", CRect(0, 0, 0, 0), -1);
+		rts.Add(str, 0, 1, L"thumbs", L"", L"", CRect(0, 0, 0, 0), -1);
 
 		CStringW ar;
 		if (dar.cx > 0 && dar.cy > 0 && dar != framesize) {
@@ -291,7 +291,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 				   framesize.cx, framesize.cy, ar,
 				   tc.Hours, tc.Minutes, tc.Seconds);
 
-		rts.Add(str, true, 0, 1, L"thumbs");
+		rts.Add(str, 0, 1, L"thumbs");
 		rts.Render(spd, 0, 25, bbox);
 	}
 

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -177,7 +177,7 @@ void CPlayerSubresyncBar::ReloadSubtitle()
 		for (size_t i = 0, j = sp.size(); i < j; i++) {
 			CString str;
 			str.Format(L"%d,%d,%d,%Iu", sp[i].vobid, sp[i].cellid, sp[i].bForced, i);
-			m_sts.Add(str, false, (int)sp[i].start, (int)sp[i].stop);
+			m_sts.Add(str, (int)sp[i].start, (int)sp[i].stop);
 		}
 
 		m_sts.CreateDefaultStyle(DEFAULT_CHARSET);
@@ -733,7 +733,7 @@ void CPlayerSubresyncBar::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 					if (str != pItem->pszText) {
 						fNeedsUpdate = true;
-						m_sts.SetStr(pItem->iItem, CString(pItem->pszText), true);
+						m_sts.SetStr(pItem->iItem, pItem->pszText);
 						m_list.SetItemText(pItem->iItem, pItem->iSubItem, m_sts.GetStrW(pItem->iItem, true));
 					}
 				}

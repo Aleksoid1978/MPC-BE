@@ -355,43 +355,6 @@ bool CTextFile::ReadString(CStringW& str)
 			str += s;
 		}
 	}
-	else if (m_encoding == CP_ACP) {
-		bool bLineEndFound = false;
-		fEOF = false;
-
-		do {
-			int nCharsRead;
-
-			for (nCharsRead = 0; m_posInBuffer + nCharsRead < m_nInBuffer; nCharsRead++) {
-				if (m_buffer[m_posInBuffer + nCharsRead] == '\n') {
-					break;
-				} else if (m_buffer[m_posInBuffer + nCharsRead] == '\r') {
-					break;
-				}
-			}
-
-			if (nCharsRead > 0) {
-				// TODO: codepage
-				str.Append(CStringW(&m_buffer[m_posInBuffer], nCharsRead));
-			}
-
-			m_posInBuffer += nCharsRead;
-			while (m_posInBuffer < m_nInBuffer && m_buffer[m_posInBuffer] == '\r') {
-				m_posInBuffer++;
-			}
-			if (m_posInBuffer < m_nInBuffer && m_buffer[m_posInBuffer] == '\n') {
-				bLineEndFound = true; // Stop at end of line
-				m_posInBuffer++;
-			}
-
-			if (!bLineEndFound) {
-				bLineEndFound = FillBuffer();
-				if (!nCharsRead) {
-					fEOF = bLineEndFound;
-				}
-			}
-		} while (!bLineEndFound);
-	}
 	else if (m_encoding == CP_UTF8) {
 		ULONGLONG lineStartPos = GetPositionFastBuffered();
 		bool bValid = true;
@@ -544,6 +507,49 @@ bool CTextFile::ReadString(CStringW& str)
 			}
 
 			str.Append(m_wbuffer.get(), nCharsRead);
+
+			if (!bLineEndFound) {
+				bLineEndFound = FillBuffer();
+				if (!nCharsRead) {
+					fEOF = bLineEndFound;
+				}
+			}
+		} while (!bLineEndFound);
+	}
+	else {
+		bool bLineEndFound = false;
+		fEOF = false;
+
+		do {
+			int nCharsRead;
+
+			for (nCharsRead = 0; m_posInBuffer + nCharsRead < m_nInBuffer; nCharsRead++) {
+				if (m_buffer[m_posInBuffer + nCharsRead] == '\n') {
+					break;
+				}
+				else if (m_buffer[m_posInBuffer + nCharsRead] == '\r') {
+					break;
+				}
+			}
+
+			if (nCharsRead > 0) {
+				CStringW line;
+				int len = MultiByteToWideChar(m_encoding, 0, &m_buffer[m_posInBuffer], nCharsRead, nullptr, 0);
+				if (len > 0) {
+					line.ReleaseBuffer(MultiByteToWideChar(m_encoding, 0, &m_buffer[m_posInBuffer], nCharsRead, line.GetBuffer(len), len));
+				}
+
+				str.Append(line);
+			}
+
+			m_posInBuffer += nCharsRead;
+			while (m_posInBuffer < m_nInBuffer && m_buffer[m_posInBuffer] == '\r') {
+				m_posInBuffer++;
+			}
+			if (m_posInBuffer < m_nInBuffer && m_buffer[m_posInBuffer] == '\n') {
+				bLineEndFound = true; // Stop at end of line
+				m_posInBuffer++;
+			}
 
 			if (!bLineEndFound) {
 				bLineEndFound = FillBuffer();
