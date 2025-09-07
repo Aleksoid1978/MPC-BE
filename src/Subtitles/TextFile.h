@@ -25,19 +25,26 @@
 #include <stdio.h>
 #include <memory>
 
+// https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers
+// The windows SDK already declares the CP_ACP and CP_UTF-8 code pages.
+// We declare others that we use frequently.
+
+#ifndef CP_UTF16LE
+#define CP_UTF16LE 1200
+#endif
+
+#ifndef CP_UTF16BE
+#define CP_UTF16BE 1201
+#endif
+
+#ifndef CP_ASCII
+#define CP_ASCII 20127
+#endif
+
 class CTextFile
 {
-public:
-	enum enc { // supported code pages
-		ANSI    = 0,     // CP_ACP
-		UTF16LE = 1200,
-		UTF16BE = 1201,
-		ASCII   = 20127,
-		UTF8    = 65001, // CP_UTF8
-	};
-
 private:
-	enc m_encoding, m_defaultencoding;
+	UINT m_encoding, m_defaultencoding;
 	int m_offset = 0;
 	ULONGLONG m_posInFile = 0;
 	std::unique_ptr<char[]> m_buffer;
@@ -52,14 +59,14 @@ private:
 	bool OpenFile(LPCWSTR lpszFileName, LPCWSTR mode);
 
 public:
-	CTextFile(enc encoding = ASCII, enc defaultencoding = ASCII);
+	CTextFile(UINT encoding = CP_ASCII, UINT defaultencoding = CP_ASCII);
 	virtual ~CTextFile();
 
 	bool Open(LPCWSTR lpszFileName);
-	bool Save(LPCWSTR lpszFileName, enc e /*= ASCII*/);
+	bool Save(LPCWSTR lpszFileName, UINT e /*= ASCII*/);
 	void Close();
 
-	enc GetEncoding() const;
+	UINT GetEncoding() const;
 	bool IsUnicode() const;
 
 	CStringW GetFilePath() const;
@@ -88,7 +95,7 @@ class CWebTextFile final : public CTextFile
 	CString m_url_redirect_str;
 
 public:
-	CWebTextFile(enc encoding = ASCII, enc defaultencoding = ASCII, LONGLONG llMaxSize = 1024 * 1024);
+	CWebTextFile(UINT encoding = CP_ASCII, UINT defaultencoding = CP_ASCII, LONGLONG llMaxSize = 1024 * 1024);
 	~CWebTextFile();
 
 	bool Open(LPCWSTR lpszFileName);

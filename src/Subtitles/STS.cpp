@@ -2435,7 +2435,7 @@ CSimpleTextSubtitle::CSimpleTextSubtitle()
 	, m_defaultWrapStyle(0)
 	, m_collisions(0)
 	, m_fScaledBAS(false)
-	, m_encoding(CTextFile::ASCII)
+	, m_encoding(CP_ASCII)
 	, m_lcid(0)
 	, m_ePARCompensationType(EPCTDisabled)
 	, m_dPARCompensation(1.0)
@@ -3292,7 +3292,7 @@ bool CSimpleTextSubtitle::Open(CString fn, int CharSet, CString name, CString vi
 {
 	Empty();
 
-	CWebTextFile f(CTextFile::UTF8);
+	CWebTextFile f(CP_UTF8);
 	if (!f.Open(fn)) {
 		return false;
 	}
@@ -3345,7 +3345,7 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
 
 		// No need to call Sort() or CreateSegments(), everything is done on the fly
 
-		CWebTextFile f2(CTextFile::UTF8);
+		CWebTextFile f2(CP_UTF8);
 		if (f2.Open(f->GetFilePath() + L".style")) {
 			OpenSubStationAlpha(&f2, *this, CharSet);
 			f2.Close();
@@ -3401,7 +3401,7 @@ bool CSimpleTextSubtitle::Open(BYTE* data, int len, int CharSet, CString name)
 	return fRet;
 }
 
-bool CSimpleTextSubtitle::SaveAs(CString fn, Subtitle::SubType type, double fps, int delay, CTextFile::enc e, bool bCreateExternalStyleFile)
+bool CSimpleTextSubtitle::SaveAs(CString fn, Subtitle::SubType type, double fps, int delay, UINT e, bool bCreateExternalStyleFile)
 {
 	LPCWSTR ext = Subtitle::GetSubtitleFileExt(type);
 	if (fn.Mid(fn.ReverseFind('.') + 1).CompareNoCase(ext)) {

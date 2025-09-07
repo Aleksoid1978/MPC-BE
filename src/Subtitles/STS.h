@@ -137,7 +137,7 @@ public:
 	LCID m_lcid;
 	Subtitle::SubType m_subtitleType;
 	tmode m_mode;
-	CTextFile::enc m_encoding;
+	UINT m_encoding;
 	CString m_path;
 
 	CSize m_dstScreenSize;
@@ -176,7 +176,7 @@ public:
 	bool Open(CString fn, int CharSet, CString name = L"", CString videoName = L"");
 	bool Open(CTextFile* f, int CharSet, CString name);
 	bool Open(BYTE* data, int len, int CharSet, CString name);
-	bool SaveAs(CString fn, Subtitle::SubType type, double fps = -1, int delay = 0, CTextFile::enc = CTextFile::ASCII, bool bCreateExternalStyleFile = true);
+	bool SaveAs(CString fn, Subtitle::SubType type, double fps = -1, int delay = 0, UINT e = CP_ASCII, bool bCreateExternalStyleFile = true);
 
 	void Add(CStringW str, bool fUnicode, int start, int end, CString style = L"Default", CString actor = L"", CString effect = L"", const CRect& marginRect = CRect(0,0,0,0), int layer = 0, int readorder = -1);
 	STSStyle* CreateDefaultStyle(int CharSet);

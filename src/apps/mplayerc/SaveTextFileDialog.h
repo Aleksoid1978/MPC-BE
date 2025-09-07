@@ -33,18 +33,18 @@ class CSaveTextFileDialog : public CSaveFileDialog
 	DECLARE_DYNAMIC(CSaveTextFileDialog)
 
 private:
-	CTextFile::enc m_e;
+	UINT m_e;
 
 public:
 	CSaveTextFileDialog(
-		CTextFile::enc e,
+		UINT e,
 		LPCWSTR lpszDefExt = nullptr, LPCWSTR lpszFileName = nullptr,
 		LPCWSTR lpszFilter = nullptr, CWnd* pParentWnd = nullptr);
 	~CSaveTextFileDialog() = default;
 
 	CComboBox m_encoding;
 
-	CTextFile::enc GetEncoding() { return m_e; }
+	UINT GetEncoding() { return m_e; }
 
 protected:
 	virtual BOOL OnFileNameOK();
@@ -62,7 +62,7 @@ class CSaveSubtitleFileDialog : public CSaveTextFileDialog
 
 public:
 	CSaveSubtitleFileDialog(
-		CTextFile::enc e,
+		UINT e,
 		LPCWSTR lpszDefExt = nullptr, LPCWSTR lpszFileName = nullptr,
 		LPCWSTR lpszFilter = nullptr, CWnd* pParentWnd = nullptr,
 		BOOL bSaveExternalStyleFile = FALSE);

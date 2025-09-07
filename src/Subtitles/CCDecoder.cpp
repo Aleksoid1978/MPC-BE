@@ -41,10 +41,10 @@ CCDecoder::~CCDecoder()
 {
 	if (!m_sts.IsEmpty() && !m_fn.IsEmpty()) {
 		m_sts.Sort();
-		m_sts.SaveAs(m_fn, Subtitle::SRT, -1, CTextFile::ASCII);
-		m_sts.SaveAs(m_fn.Left(m_fn.ReverseFind('.')+1) + L"utf8.srt",    Subtitle::SRT, -1, CTextFile::UTF8);
-		m_sts.SaveAs(m_fn.Left(m_fn.ReverseFind('.')+1) + L"utf16le.srt", Subtitle::SRT, -1, CTextFile::UTF16LE);
-		m_sts.SaveAs(m_fn.Left(m_fn.ReverseFind('.')+1) + L"utf16be.srt", Subtitle::SRT, -1, CTextFile::UTF16BE);
+		m_sts.SaveAs(m_fn, Subtitle::SRT, -1, CP_ASCII);
+		m_sts.SaveAs(m_fn.Left(m_fn.ReverseFind('.')+1) + L"utf8.srt",    Subtitle::SRT, -1, CP_UTF8);
+		m_sts.SaveAs(m_fn.Left(m_fn.ReverseFind('.')+1) + L"utf16le.srt", Subtitle::SRT, -1, CP_UTF16LE);
+		m_sts.SaveAs(m_fn.Left(m_fn.ReverseFind('.')+1) + L"utf16be.srt", Subtitle::SRT, -1, CP_UTF16BE);
 	}
 }
 

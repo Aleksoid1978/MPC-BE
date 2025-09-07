@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -643,7 +643,7 @@ HRESULT CSubtitleSourceSSA::GetMediaType(CMediaType* pmt)
 	_wremove(fn);
 	wcscat_s(fn, L".ssa");
 
-	if (!sts.SaveAs(fn, Subtitle::SSA, -1, 0, CTextFile::UTF8, false) || !f.Open(fn, CFile::modeRead)) {
+	if (!sts.SaveAs(fn, Subtitle::SSA, -1, 0, CP_UTF8, false) || !f.Open(fn, CFile::modeRead)) {
 		return E_FAIL;
 	}
 
@@ -694,7 +694,7 @@ HRESULT CSubtitleSourceASS::GetMediaType(CMediaType* pmt)
 
 	wcscat_s(fn, L".ass");
 
-	if (!sts.SaveAs(fn, Subtitle::ASS, -1, CTextFile::UTF8) || !f.Open(fn, CFile::modeRead)) {
+	if (!sts.SaveAs(fn, Subtitle::ASS, -1, CP_UTF8) || !f.Open(fn, CFile::modeRead)) {
 		return E_FAIL;
 	}
 

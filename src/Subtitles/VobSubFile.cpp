@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -920,7 +920,7 @@ bool CVobSubFile::ReadIfo(CString fn)
 bool CVobSubFile::WriteIdx(CString fn)
 {
 	CTextFile f;
-	if (!f.Save(fn, CTextFile::ASCII)) {
+	if (!f.Save(fn, CP_ASCII)) {
 		return false;
 	}
 

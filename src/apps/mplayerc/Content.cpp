@@ -314,7 +314,7 @@ namespace Content {
 	{
 		CString body;
 
-		CTextFile f(CTextFile::UTF8, CTextFile::ANSI);
+		CTextFile f(CP_UTF8, CP_ACP);
 		if (f.Open(fn)) {
 			for (CString tmp; f.ReadString(tmp); body += tmp + '\n');
 		}

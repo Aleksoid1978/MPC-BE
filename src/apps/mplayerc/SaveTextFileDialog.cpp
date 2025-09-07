@@ -28,7 +28,7 @@
 
 IMPLEMENT_DYNAMIC(CSaveTextFileDialog, CSaveFileDialog)
 CSaveTextFileDialog::CSaveTextFileDialog(
-	CTextFile::enc e,
+	UINT e,
 	LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
 	LPCWSTR lpszFilter, CWnd* pParentWnd)
 	: CSaveFileDialog(lpszDefExt, lpszFileName,
@@ -40,10 +40,10 @@ CSaveTextFileDialog::CSaveTextFileDialog(
 	if (pfdc) {
 		pfdc->StartVisualGroup(IDS_TEXTFILE_ENC, ResStr(IDS_TEXTFILE_ENC));
 		pfdc->AddComboBox(IDC_COMBO1);
-		pfdc->AddControlItem(IDC_COMBO1, CTextFile::UTF8,    L"UTF-8");
-		pfdc->AddControlItem(IDC_COMBO1, CTextFile::UTF16LE, L"Unicode 16-LE");
-		pfdc->AddControlItem(IDC_COMBO1, CTextFile::UTF16BE, L"Unicode 16-BE");
-		pfdc->AddControlItem(IDC_COMBO1, CTextFile::ASCII,   L"ANSI");
+		pfdc->AddControlItem(IDC_COMBO1, CP_UTF8,    L"UTF-8");
+		pfdc->AddControlItem(IDC_COMBO1, CP_UTF16LE, L"Unicode 16-LE");
+		pfdc->AddControlItem(IDC_COMBO1, CP_UTF16BE, L"Unicode 16-BE");
+		pfdc->AddControlItem(IDC_COMBO1, CP_ASCII,   L"ANSI");
 		pfdc->SetSelectedControlItem(IDC_COMBO1, m_e);
 		pfdc->EndVisualGroup();
 		pfdc->MakeProminent(IDS_TEXTFILE_ENC);
@@ -59,7 +59,7 @@ BOOL CSaveTextFileDialog::OnFileNameOK()
 		DWORD result;
 		pfdc->GetSelectedControlItem(IDC_COMBO1, &result);
 		pfdc->Release();
-		m_e = (CTextFile::enc)result;
+		m_e = result;
 	}
 
 	return __super::OnFileNameOK();
@@ -71,7 +71,7 @@ BOOL CSaveTextFileDialog::OnFileNameOK()
 
 IMPLEMENT_DYNAMIC(CSaveSubtitleFileDialog, CSaveTextFileDialog)
 CSaveSubtitleFileDialog::CSaveSubtitleFileDialog(
-	CTextFile::enc e,
+	UINT e,
 	LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
 	LPCWSTR lpszFilter, CWnd* pParentWnd,
 	BOOL bSaveExternalStyleFile)

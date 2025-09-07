@@ -88,7 +88,7 @@ struct CUETrack {
 
 static bool ParseCUESheetFile(CString fn, std::list<CUETrack> &CUETrackList, CString& Title, CString& Performer)
 {
-	CTextFile f(CTextFile::UTF8, CTextFile::ANSI);
+	CTextFile f(CP_UTF8, CP_ACP);
 	if (!f.Open(fn) || f.GetLength() > 32 * 1024) {
 		return false;
 	}
@@ -1504,7 +1504,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(const CString& fn)
 	auto& PlayList = GetCurPlayList();
 	auto& curTab = GetCurTab();
 
-	CWebTextFile f(CTextFile::UTF8, CTextFile::ANSI);
+	CWebTextFile f(CP_UTF8, CP_ACP);
 	if (!f.Open(fn) || f.GetLength() > 10 * MEGABYTE || !f.ReadString(str) || str != L"MPCPLAYLIST") {
 		if (curTab.type == PL_EXPLORER) {
 			TParseFolder(L".\\");
@@ -1649,7 +1649,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(const CString& fn)
 	return pli.size() > 0;
 }
 
-bool CPlayerPlaylistBar::SaveMPCPlayList(const CString& fn, const CTextFile::enc e, const bool bRemovePath)
+bool CPlayerPlaylistBar::SaveMPCPlayList(const CString& fn, const UINT e, const bool bRemovePath)
 {
 	CTextFile f;
 	if (!f.Save(fn, e)) {
@@ -1735,7 +1735,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 {
 	Content::Online::Disconnect(fn);
 
-	CWebTextFile f(CTextFile::UTF8, CTextFile::ANSI, 3 * MEGABYTE);
+	CWebTextFile f(CP_UTF8, CP_ACP, 3 * MEGABYTE);
 	if (!f.Open(fn)) {
 		return false;
 	}
@@ -2680,7 +2680,7 @@ void CPlayerPlaylistBar::SavePlaylist()
 				::CreateDirectoryW(base, nullptr);
 			}
 
-			SaveMPCPlayList(file, CTextFile::UTF8, false);
+			SaveMPCPlayList(file, CP_UTF8, false);
 		}
 		else if (::PathFileExistsW(file)) {
 			::DeleteFileW(file);
@@ -3701,7 +3701,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		case M_SAVEAS: {
 			if (curTab.type == PL_BASIC) {
 				CSaveTextFileDialog fd(
-					CTextFile::UTF8, nullptr, nullptr,
+					CP_UTF8, nullptr, nullptr,
 					L"MPC-BE playlist (*.mpcpl)|*.mpcpl|Playlist (*.pls)|*.pls|Winamp playlist (*.m3u)|*.m3u|Windows Media playlist (*.asx)|*.asx||",
 					this);
 
@@ -3710,9 +3710,9 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 					break;
 				}
 
-				CTextFile::enc encoding = (CTextFile::enc)fd.GetEncoding();
-				if (encoding == CTextFile::ASCII) {
-					encoding = CTextFile::ANSI;
+				UINT encoding = fd.GetEncoding();
+				if (encoding == CP_ASCII) {
+					encoding = CP_ACP;
 				}
 
 				int idx = fd.m_pOFN->nFilterIndex;

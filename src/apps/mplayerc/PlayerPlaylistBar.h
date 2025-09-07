@@ -134,7 +134,7 @@ private:
 	void ResolveLinkFiles(std::list<CString> &fns);
 
 	bool ParseMPCPlayList(const CString& fn);
-	bool SaveMPCPlayList(const CString& fn, const CTextFile::enc e, const bool bRemovePath);
+	bool SaveMPCPlayList(const CString& fn, const UINT e, const bool bRemovePath);
 
 	bool ParseM3UPlayList(CString fn);
 	bool ParseCUEPlayList(CString fn);

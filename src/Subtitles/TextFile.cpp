@@ -32,18 +32,18 @@ const static struct {
 	uint8_t  size;
 	uint8_t  bom[4];
 } g_BOM_markers[] = {
-	{ CTextFile::UTF8,    1, 3, { 0xEF, 0xBB, 0xBF } },
-	{ 12000,              0, 4, { 0xFF, 0xFE, 0x00, 0x00 } }, // UTF-32LE, need to check before UTF16LE
-	{ CTextFile::UTF16LE, 1, 2, { 0xFF, 0xFE } },
-	{ CTextFile::UTF16BE, 1, 2, { 0xFE, 0xFF } },
-	{ 12001,              0, 4, { 0x00, 0x00, 0xFE, 0xFF } }, // UTF-32BE
-	{ 65000,              0, 3, { 0x2B, 0x2F, 0x76 } },       // UTF-7
-	{ 54936,              0, 4, { 0x84, 0x31, 0x95, 0x33 } }, // GB18030
+	{ CP_UTF8,    1, 3, { 0xEF, 0xBB, 0xBF } },
+	{ 12000,      0, 4, { 0xFF, 0xFE, 0x00, 0x00 } }, // UTF-32LE, need to check before CP_UTF16LE
+	{ CP_UTF16LE, 1, 2, { 0xFF, 0xFE } },
+	{ CP_UTF16BE, 1, 2, { 0xFE, 0xFF } },
+	{ 12001,      0, 4, { 0x00, 0x00, 0xFE, 0xFF } }, // UTF-32BE
+	{ 65000,      0, 3, { 0x2B, 0x2F, 0x76 } },       // UTF-7
+	{ 54936,      0, 4, { 0x84, 0x31, 0x95, 0x33 } }, // GB18030
 };
 
 #define TEXTFILE_BUFFER_SIZE (64 * 1024)
 
-CTextFile::CTextFile(enc encoding/* = ASCII*/, enc defaultencoding/* = ASCII*/)
+CTextFile::CTextFile(UINT encoding/* = ASCII*/, UINT defaultencoding/* = ASCII*/)
 	: m_encoding(encoding)
 	, m_defaultencoding(defaultencoding)
 {
@@ -98,14 +98,14 @@ bool CTextFile::Open(LPCWSTR lpszFileName)
 					Close();
 					return false;
 				}
-				m_encoding = (enc)marker.codepage;
+				m_encoding = marker.codepage;
 				m_offset = marker.size;
 				break;
 			}
 		}
 	}
 
-	if (m_encoding == ASCII) {
+	if (m_encoding == CP_ASCII) {
 		if (!ReopenAsText()) {
 			return false;
 		}
@@ -126,19 +126,19 @@ bool CTextFile::ReopenAsText()
 	return OpenFile(fileName, L"rt");
 }
 
-bool CTextFile::Save(LPCWSTR lpszFileName, enc e)
+bool CTextFile::Save(LPCWSTR lpszFileName, UINT e)
 {
-	if (!OpenFile(lpszFileName, e == ASCII ? L"wt" : L"wb")) {
+	if (!OpenFile(lpszFileName, e == CP_ASCII ? L"wt" : L"wb")) {
 		return false;
 	}
 
-	if (e == UTF8) {
+	if (e == CP_UTF8) {
 		BYTE b[3] = {0xef, 0xbb, 0xbf};
 		m_pStdioFile->Write(b, sizeof(b));
-	} else if (e == UTF16LE) {
+	} else if (e == CP_UTF16LE) {
 		BYTE b[2] = {0xff, 0xfe};
 		m_pStdioFile->Write(b, sizeof(b));
-	} else if (e == UTF16BE) {
+	} else if (e == CP_UTF16BE) {
 		BYTE b[2] = {0xfe, 0xff};
 		m_pStdioFile->Write(b, sizeof(b));
 	}
@@ -157,14 +157,14 @@ void CTextFile::Close()
 	}
 }
 
-CTextFile::enc CTextFile::GetEncoding() const
+UINT CTextFile::GetEncoding() const
 {
 	return m_encoding;
 }
 
 bool CTextFile::IsUnicode() const
 {
-	return m_encoding == UTF8 || m_encoding == UTF16LE || m_encoding == UTF16BE;
+	return m_encoding == CP_UTF8 || m_encoding == CP_UTF16LE || m_encoding == CP_UTF16BE;
 }
 
 CStringW CTextFile::GetFilePath() const
@@ -239,16 +239,16 @@ void CTextFile::WriteString(LPCSTR lpsz/*CStringA str*/)
 
 	CStringA str(lpsz);
 
-	if (m_encoding == ASCII) {
+	if (m_encoding == CP_ASCII) {
 		m_pStdioFile->WriteString(AToT(str));
-	} else if (m_encoding == ANSI) {
+	} else if (m_encoding == CP_ACP) {
 		str.Replace("\n", "\r\n");
 		m_pStdioFile->Write(str.GetString(), str.GetLength());
-	} else if (m_encoding == UTF8) {
+	} else if (m_encoding == CP_UTF8) {
 		WriteString(AToT(str));
-	} else if (m_encoding == UTF16LE) {
+	} else if (m_encoding == CP_UTF16LE) {
 		WriteString(AToT(str));
-	} else if (m_encoding == UTF16BE) {
+	} else if (m_encoding == CP_UTF16BE) {
 		WriteString(AToT(str));
 	}
 }
@@ -261,13 +261,15 @@ void CTextFile::WriteString(LPCWSTR lpsz/*CStringW str*/)
 
 	CStringW str(lpsz);
 
-	if (m_encoding == ASCII) {
+	if (m_encoding == CP_ASCII) {
 		m_pStdioFile->WriteString(str);
-	} else if (m_encoding == ANSI) {
+	}
+	else if (m_encoding == CP_ACP) {
 		str.Replace(L"\n", L"\r\n");
 		CStringA stra(str); // TODO: codepage
 		m_pStdioFile->Write(stra.GetString(), stra.GetLength());
-	} else if (m_encoding == UTF8) {
+	}
+	else if (m_encoding == CP_UTF8) {
 		str.Replace(L"\n", L"\r\n");
 		for (unsigned int i = 0, l = str.GetLength(); i < l; i++) {
 			DWORD c = (WORD)str[i];
@@ -288,10 +290,12 @@ void CTextFile::WriteString(LPCWSTR lpsz/*CStringW str*/)
 				m_pStdioFile->Write(&c, 1);
 			}
 		}
-	} else if (m_encoding == UTF16LE) {
+	}
+	else if (m_encoding == CP_UTF16LE) {
 		str.Replace(L"\n", L"\r\n");
 		m_pStdioFile->Write(str.GetString(), str.GetLength() * 2);
-	} else if (m_encoding == UTF16BE) {
+	}
+	else if (m_encoding == CP_UTF16BE) {
 		str.Replace(L"\n", L"\r\n");
 		for (unsigned int i = 0, l = str.GetLength(); i < l; i++) {
 			str.SetAt(i, ((str[i] >> 8) & 0x00ff) | ((str[i] << 8) & 0xff00));
@@ -338,7 +342,7 @@ bool CTextFile::ReadString(CStringW& str)
 
 	str.Truncate(0);
 
-	if (m_encoding == ASCII) {
+	if (m_encoding == CP_ASCII) {
 		CStringW s;
 		fEOF = !m_pStdioFile->ReadString(s);
 		str = s;
@@ -350,7 +354,8 @@ bool CTextFile::ReadString(CStringW& str)
 			fEOF = !m_pStdioFile->ReadString(s);
 			str += s;
 		}
-	} else if (m_encoding == ANSI) {
+	}
+	else if (m_encoding == CP_ACP) {
 		bool bLineEndFound = false;
 		fEOF = false;
 
@@ -386,7 +391,8 @@ bool CTextFile::ReadString(CStringW& str)
 				}
 			}
 		} while (!bLineEndFound);
-	} else if (m_encoding == UTF8) {
+	}
+	else if (m_encoding == CP_UTF8) {
 		ULONGLONG lineStartPos = GetPositionFastBuffered();
 		bool bValid = true;
 		bool bLineEndFound = false;
@@ -482,7 +488,8 @@ bool CTextFile::ReadString(CStringW& str)
 				}
 			}
 		} while (bValid && !bLineEndFound);
-	} else if (m_encoding == UTF16LE) {
+	}
+	else if (m_encoding == CP_UTF16LE) {
 		bool bLineEndFound = false;
 		fEOF = false;
 
@@ -517,7 +524,8 @@ bool CTextFile::ReadString(CStringW& str)
 				}
 			}
 		} while (!bLineEndFound);
-	} else if (m_encoding == UTF16BE) {
+	}
+	else if (m_encoding == CP_UTF16BE) {
 		bool bLineEndFound = false;
 		fEOF = false;
 
@@ -553,7 +561,7 @@ bool CTextFile::ReadString(CStringW& str)
 // CWebTextFile
 //
 
-CWebTextFile::CWebTextFile(CTextFile::enc encoding/* = ASCII*/, CTextFile::enc defaultencoding/* = ASCII*/, LONGLONG llMaxSize)
+CWebTextFile::CWebTextFile(UINT encoding/* = ASCII*/, UINT defaultencoding/* = ASCII*/, LONGLONG llMaxSize)
 	: CTextFile(encoding, defaultencoding)
 	, m_llMaxSize(llMaxSize)
 {

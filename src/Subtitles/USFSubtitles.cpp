@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -299,7 +299,7 @@ bool CUSFSubtitles::Read(LPCWSTR fn)
 bool CUSFSubtitles::ConvertToSTS(CSimpleTextSubtitle& sts)
 {
 	sts.m_name = metadata.language.text;
-	sts.m_encoding = CTextFile::UTF8;
+	sts.m_encoding = CP_UTF8;
 	sts.m_dstScreenSize = CSize(640, 480);
 	sts.m_fScaledBAS = true;
 	sts.m_defaultWrapStyle = 1;
