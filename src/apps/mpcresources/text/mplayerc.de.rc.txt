@@ -523,7 +523,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 13		"Untertitel bei erkannten Veränderungen neu laden"
 15		"Subresync verwenden"
 17		"Standard-Codepage:"
-19		"Automatically detect code page"
+19		"Codepage automatisch erkennen"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
@@ -2114,3 +2114,4 @@ STRING ID_SHOW_MILLISECONDS		"Millisekunden anzeigen"
 STRING ID_VOLUME_MUTE		"Ton aus\nTon aus"
 STRING ID_VOLUME_MUTE_DISABLED		"Kein Audio\nKein Audio"
 STRING ID_VOLUME_MUTE_OFF		"Ton ein\nTon ein"
+
