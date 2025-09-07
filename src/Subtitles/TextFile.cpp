@@ -33,12 +33,17 @@ const static struct {
 	uint8_t  bom[4];
 } g_BOM_markers[] = {
 	{ CP_UTF8,    1, 3, { 0xEF, 0xBB, 0xBF } },
-	{ 12000,      0, 4, { 0xFF, 0xFE, 0x00, 0x00 } }, // UTF-32LE, need to check before CP_UTF16LE
+	{ 12000,      0, 4, { 0xFF, 0xFE, 0x00, 0x00 } }, // UTF-32LE, ignored. Need to check before CP_UTF16LE
 	{ CP_UTF16LE, 1, 2, { 0xFF, 0xFE } },
 	{ CP_UTF16BE, 1, 2, { 0xFE, 0xFF } },
-	{ 12001,      0, 4, { 0x00, 0x00, 0xFE, 0xFF } }, // UTF-32BE
-	{ 65000,      0, 3, { 0x2B, 0x2F, 0x76 } },       // UTF-7
+	{ 12001,      0, 4, { 0x00, 0x00, 0xFE, 0xFF } }, // UTF-32BE, ignored
 	{ 54936,      1, 4, { 0x84, 0x31, 0x95, 0x33 } }, // GB18030
+	// other ignored encodings with BOM marker
+	{ 65000,      0, 3, { 0x2B, 0x2F, 0x76 } },       // UTF-7
+	{ -1,         0, 3, { 0xF7, 0x64, 0x4C } },       // UTF-1
+	{ -1,         0, 4, { 0xDD, 0x73, 0x66, 0x73 } }, // UTF-EBCDIC
+	{ -1,         0, 3, { 0x0E, 0xFE, 0xFF } },       // SCSU
+	{ -1,         0, 3, { 0xFB, 0xEE, 0x28 } },       // BOCU-1
 };
 
 #define TEXTFILE_BUFFER_SIZE (64 * 1024)
