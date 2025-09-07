@@ -690,6 +690,7 @@ public:
 	bool			fDisableInternalSubtitles;
 	bool			fAutoReloadExtSubtitles;
 	bool			fUseSybresync;
+	int				iSubtitleDefaultCodePage;
 
 	// Subtitles - Rendering
 	bool			fOverridePlacement;

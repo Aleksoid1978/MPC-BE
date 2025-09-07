@@ -48,6 +48,7 @@
 #define IDS_RS_AUTORELOADEXTSUBTITLES		L"AutoReloadExtSubtitles"
 #define IDS_RS_USE_SUBRESYNC				L"UseSubresync"
 #define IDS_RS_SUBTITLEPATHS				L"SubtitlePaths"
+#define IDS_RS_SUBTITLE_DEFAULT_CODEPAGE	L"SubtitleDefaultCodePage"
 #define IDS_RS_USEDEFAULTSUBTITLESSTYLE		L"UseDefaultsubtitlesStyle"
 #define IDS_RS_THUMBWIDTH					L"ThumbWidth"
 
