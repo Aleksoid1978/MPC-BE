@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,6 +22,25 @@
 #include <clsids.h>
 #include "MainFrm.h"
 #include "PPageSubtitles.h"
+
+const static uint16_t codepages[] = {
+	1250,
+	1251,
+	1253,
+	1252,
+	1254,
+	1255,
+	1256,
+	1257,
+	1258,
+	1361,
+	874,
+	932,
+	936,
+	949,
+	950,
+	54936,
+};
 
 // CPPageSubtitles dialog
 
@@ -46,6 +65,7 @@ void CPPageSubtitles::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK3, m_fAutoReloadExtSubtitles);
 	DDX_Check(pDX, IDC_CHECK_SUBRESYNC, m_fUseSybresync);
 	DDX_Text(pDX, IDC_EDIT1, m_szAutoloadPaths);
+	DDX_Control(pDX, IDC_COMBO3, m_cbDefaultEncoding);
 }
 
 BOOL CPPageSubtitles::OnInitDialog()
@@ -63,6 +83,20 @@ BOOL CPPageSubtitles::OnInitDialog()
 	m_fAutoReloadExtSubtitles		= s.fAutoReloadExtSubtitles;
 	m_fUseSybresync					= s.fUseSybresync;
 	m_szAutoloadPaths				= s.strSubtitlePaths;
+
+	m_cbDefaultEncoding.ShowWindow(SW_HIDE); // TODO remove it
+
+	CStringW str;
+	str.Format(L"System code page - %u", GetACP());
+	AddStringData(m_cbDefaultEncoding, str, CP_ACP);
+
+	CPINFOEX cpinfoex;
+	for (const auto& codepage : codepages) {
+		if (GetCPInfoExW(codepage, 0, &cpinfoex)) {
+			AddStringData(m_cbDefaultEncoding, cpinfoex.CodePageName, codepage);
+		}
+	}
+	SelectByItemData(m_cbDefaultEncoding, s.iSubtitleDefaultCodePage);
 
 	UpdateData(FALSE);
 
@@ -85,6 +119,7 @@ BOOL CPPageSubtitles::OnApply()
 	s.fAutoReloadExtSubtitles		= !!m_fAutoReloadExtSubtitles;
 	s.fUseSybresync					= !!m_fUseSybresync;
 	s.strSubtitlePaths				= m_szAutoloadPaths;
+	s.iSubtitleDefaultCodePage		= GetCurItemData(m_cbDefaultEncoding);
 
 	if (fAutoReloadExtSubtitles != s.fAutoReloadExtSubtitles) {
 		auto pFrame = AfxGetMainFrame();

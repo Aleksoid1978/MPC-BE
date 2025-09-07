@@ -514,7 +514,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 67
 66		"Berrezarri"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 16
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 5		"Azpidatzi aurkeztzailea:"
 7		"Berez-gertatu helburuak"
 9		"Berrezarri"
@@ -522,6 +522,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 16
 12		"Ezikusi barneratutako azpidatziak"
 13		"Berez-birgertatu azpidatzi agiriak aldaketa atzeman ondoren"
 15		"Erabili Azpberraldb"
+16		"Default code page:"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26

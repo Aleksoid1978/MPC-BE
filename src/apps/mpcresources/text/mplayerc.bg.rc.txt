@@ -514,7 +514,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 67
 66		"Нулиране"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 16
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 5		"Рендеринг - субтитри:"
 7		"Път за външни субтитри"
 9		"Нулиране"
@@ -522,6 +522,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 16
 12		"Да не се използват вградени субтитри"
 13		"Автоматично повторно отваряне на файлове със субтитри, ако са променени"
 15		"Использовать редактор ""Синхронизация субтитров"""
+16		"Default code page:"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26

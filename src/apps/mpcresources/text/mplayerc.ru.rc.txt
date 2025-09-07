@@ -514,7 +514,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 67
 66		"Сброс"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 16
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 5		"Рендерер субтитров:"
 7		"Путь для внешних субтитров"
 9		"Сброс"
@@ -522,6 +522,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 16
 12		"Не использовать встроенные субтитры"
 13		"Автоматическое переоткрытие файлов с субтитрами в случае изменения"
 15		"Использовать редактор ""Синхронизация субтитров"""
+16		"Кодовая страница по умолчанию:"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26

@@ -514,7 +514,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 67
 66		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 16
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 5		"Renderer podnaslova:"
 7		"Automatsko učitanje putanja"
 9		"Reset"
@@ -522,6 +522,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 16
 12		"Ignoriraj ugrađene podnaslove"
 13		"Automatski nanovo učitaj podnaslove nakon detekcije izmjena"
 15		"Koristi Subresync"
+16		"Default code page:"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26

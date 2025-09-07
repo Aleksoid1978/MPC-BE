@@ -514,7 +514,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 67
 66		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 16
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 5		"Subtitle renderer:"
 7		"Autoload paths"
 9		"Reset"
@@ -522,6 +522,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 16
 12		"Ignore embedded subtitles"
 13		"Auto-reload subtitle files after detecting modification"
 15		"Use Subresync"
+16		"Default code page:"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26

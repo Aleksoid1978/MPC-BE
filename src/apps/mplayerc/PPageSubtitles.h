@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,6 +40,7 @@ public:
 	BOOL m_fAutoReloadExtSubtitles      = FALSE;
 	BOOL m_fUseSybresync                = FALSE;
 	CString m_szAutoloadPaths;
+	CComboBox m_cbDefaultEncoding;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

@@ -514,7 +514,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 67
 66		"Ponastavi"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 16
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 5		"Izrisovalnik podnapisov:"
 7		"Poti za samodejno nalaganje"
 9		"Ponastavi"
@@ -522,6 +522,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 16
 12		"Prezri vgrajene podnapise"
 13		"Samodejno naloži datoteke s podnapisi ob zaznavi sprememb."
 15		"Uporabi Subresync"
+16		"Default code page:"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
