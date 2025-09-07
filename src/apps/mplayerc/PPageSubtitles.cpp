@@ -66,6 +66,7 @@ void CPPageSubtitles::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_SUBRESYNC, m_fUseSybresync);
 	DDX_Text(pDX, IDC_EDIT1, m_szAutoloadPaths);
 	DDX_Control(pDX, IDC_COMBO3, m_cbDefaultEncoding);
+	DDX_Check(pDX, IDC_CHECK5, m_bAutoDetect—odePage);
 }
 
 BOOL CPPageSubtitles::OnInitDialog()
@@ -78,11 +79,11 @@ BOOL CPPageSubtitles::OnInitDialog()
 
 	UpdateSubRenderersList(s.iSubtitleRenderer);
 
-	m_fPrioritizeExternalSubtitles	= s.fPrioritizeExternalSubtitles;
-	m_fDisableInternalSubtitles		= s.fDisableInternalSubtitles;
-	m_fAutoReloadExtSubtitles		= s.fAutoReloadExtSubtitles;
-	m_fUseSybresync					= s.fUseSybresync;
-	m_szAutoloadPaths				= s.strSubtitlePaths;
+	m_fPrioritizeExternalSubtitles = s.fPrioritizeExternalSubtitles;
+	m_fDisableInternalSubtitles    = s.fDisableInternalSubtitles;
+	m_fAutoReloadExtSubtitles      = s.fAutoReloadExtSubtitles;
+	m_fUseSybresync                = s.fUseSybresync;
+	m_szAutoloadPaths              = s.strSubtitlePaths;
 
 	CStringW str;
 	str.Format(L"System code page - %u", GetACP());
@@ -95,6 +96,9 @@ BOOL CPPageSubtitles::OnInitDialog()
 		}
 	}
 	SelectByItemData(m_cbDefaultEncoding, s.iSubtitleDefaultCodePage);
+
+	m_bAutoDetect—odePage = s.bSubtitleAutoDetect—odePage;
+	GetDlgItem(IDC_CHECK5)->ShowWindow(SW_HIDE); // TODO: remove it
 
 	UpdateData(FALSE);
 
@@ -111,13 +115,14 @@ BOOL CPPageSubtitles::OnApply()
 
 	const bool fAutoReloadExtSubtitles = s.fAutoReloadExtSubtitles;
 
-	s.iSubtitleRenderer				= m_cbSubtitleRenderer.GetCurSel();
-	s.fPrioritizeExternalSubtitles	= !!m_fPrioritizeExternalSubtitles;
-	s.fDisableInternalSubtitles		= !!m_fDisableInternalSubtitles;
-	s.fAutoReloadExtSubtitles		= !!m_fAutoReloadExtSubtitles;
-	s.fUseSybresync					= !!m_fUseSybresync;
-	s.strSubtitlePaths				= m_szAutoloadPaths;
-	s.iSubtitleDefaultCodePage		= GetCurItemData(m_cbDefaultEncoding);
+	s.iSubtitleRenderer            = m_cbSubtitleRenderer.GetCurSel();
+	s.fPrioritizeExternalSubtitles = !!m_fPrioritizeExternalSubtitles;
+	s.fDisableInternalSubtitles    = !!m_fDisableInternalSubtitles;
+	s.fAutoReloadExtSubtitles      = !!m_fAutoReloadExtSubtitles;
+	s.fUseSybresync                = !!m_fUseSybresync;
+	s.strSubtitlePaths             = m_szAutoloadPaths;
+	s.iSubtitleDefaultCodePage     = GetCurItemData(m_cbDefaultEncoding);
+	s.bSubtitleAutoDetect—odePage  = !!m_bAutoDetect—odePage;
 
 	if (fAutoReloadExtSubtitles != s.fAutoReloadExtSubtitles) {
 		auto pFrame = AfxGetMainFrame();

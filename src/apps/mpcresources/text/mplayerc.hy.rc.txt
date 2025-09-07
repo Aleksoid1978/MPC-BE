@@ -514,7 +514,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 67
 66		"Reset"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 5		"Subtitle renderer:"
 7		"Տողագրերի ճանապարհը"
 9		"Ետարկել"
@@ -522,7 +522,8 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 12		"Չօգտագործել ներքին տողագրերը"
 13		"Auto-reload subtitle files after detecting modification"
 15		"Use Subresync"
-16		"Default code page:"
+17		"Default code page:"
+19		"Automatically detect code page"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26

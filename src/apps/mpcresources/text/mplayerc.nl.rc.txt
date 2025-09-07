@@ -514,7 +514,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 67
 66		"Resetten"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 5		"Ondertitelingsrenderer:"
 7		"Automatisch geladen locaties"
 9		"Resetten"
@@ -522,7 +522,8 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 12		"Geïntegreerde ondertiteling niet laden"
 13		"Herlaad ondertitel-bestanden automatisch als er wijzigingen worden gedetecteerd"
 15		"Activeer ondertitelings-resync"
-16		"Default code page:"
+17		"Default code page:"
+19		"Automatically detect code page"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26

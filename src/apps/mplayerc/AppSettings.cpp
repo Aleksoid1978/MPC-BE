@@ -602,6 +602,7 @@ void CAppSettings::ResetSettings()
 	fUseSybresync = false;
 	strSubtitlePaths = DEFAULT_SUBTITLE_PATHS;
 	iSubtitleDefaultCodePage = CP_ACP;
+	bSubtitleAutoDetect—odePage = false;
 
 	fUseDefaultSubtitlesStyle = false;
 
@@ -1003,6 +1004,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USE_SUBRESYNC, fUseSybresync);
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_SUBTITLEPATHS, strSubtitlePaths);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SUBTITLE_DEFAULT_CODEPAGE, iSubtitleDefaultCodePage);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SUBTITLE_AUTODETECT—ODEPAGE, bSubtitleAutoDetect—odePage);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USEDEFAULTSUBTITLESSTYLE, fUseDefaultSubtitlesStyle);
 
@@ -1708,6 +1710,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_SUBTITLEPATHS, strSubtitlePaths);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_SUBTITLE_DEFAULT_CODEPAGE, iSubtitleDefaultCodePage);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USEDEFAULTSUBTITLESSTYLE, fUseDefaultSubtitlesStyle);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SUBTITLE_AUTODETECT—ODEPAGE, bSubtitleAutoDetect—odePage);
 
 	// Audio
 	profile.WriteInt(IDS_R_AUDIO, IDS_RS_VOLUME, nVolume);

@@ -514,7 +514,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 67
 66		"Скинути"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 5		"Рендерер субтитрів:"
 7		"Шлях автозавантаження зовнішніх субтитрів"
 9		"Скинути"
@@ -522,7 +522,8 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 12		"Не завантажувати вбудовані субтитри"
 13		"Автоматично перезавантажувати файли субтитрів у випадку змін"
 15		"Використовувати редактор "
-16		"Default code page:"
+17		"Default code page:"
+19		"Automatically detect code page"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26

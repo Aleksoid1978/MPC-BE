@@ -514,7 +514,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 67
 66		"Visszaállítás"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 5		"Felirat megjelenítő:"
 7		"Útvonalak automatikus betöltése"
 9		"Visszaállítás"
@@ -522,7 +522,8 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 12		"Ne töltsön beágyazott feliratokat"
 13		"A feliratfájlok automatikus újratöltése a módosítás észlelése után"
 15		"A Subresync használata"
-16		"Default code page:"
+17		"Default code page:"
+19		"Automatically detect code page"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26

@@ -514,7 +514,7 @@ BEGIN DIALOGEX IDD_PPAGESUBSTYLE LINES 67
 66		"Zurücksetzen"
 END
 
-BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
+BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 5		"Untertitelrenderer:"
 7		"Pfade für externe Untertitel"
 9		"Zurücksetzen"
@@ -522,7 +522,8 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 18
 12		"Eingebettete Untertitel nicht verwenden"
 13		"Untertitel bei erkannten Veränderungen neu laden"
 15		"Subresync verwenden"
-16		"Standard-Codepage:"
+17		"Standard-Codepage:"
+19		"Automatically detect code page"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
