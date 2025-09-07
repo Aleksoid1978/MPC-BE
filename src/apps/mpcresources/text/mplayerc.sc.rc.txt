@@ -522,7 +522,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 12		"不载入内嵌字幕"
 13		"发现字幕改动后自动重加载文件"
 15		"启用字幕同步编辑器"
-17		"Default code page:"
+17		"默认代码页:"
 19		"Automatically detect code page"
 END
 
