@@ -134,8 +134,8 @@ ImplodeEsc(const std::list<T>& sl, const SEP sep, const SEP esc = '\\')
 	return ret;
 }
 
-extern UINT CharSetToCodePage(UINT charSet);
-extern UINT CodePageToCharSet(UINT codePage);
+extern UINT CharSetToCodePage(const UINT charSet);
+extern UINT CodePageToCharSet(const UINT codePage);
 
 extern CStringA UrlEncode(const CStringA& str_in, const bool bArg = false);
 extern CStringA UrlDecode(const CStringA& str_in);

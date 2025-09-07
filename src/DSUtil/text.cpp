@@ -23,7 +23,7 @@
 #include "SysVersion.h"
 #include "text.h"
 
-UINT CharSetToCodePage(UINT charSet)
+UINT CharSetToCodePage(const UINT charSet)
 {
 	if (charSet == CP_UTF8) {
 		return CP_UTF8;
@@ -36,7 +36,7 @@ UINT CharSetToCodePage(UINT charSet)
 	return cs.ciACP;
 }
 
-UINT CodePageToCharSet(UINT codePage)
+UINT CodePageToCharSet(const UINT codePage)
 {
 	if (codePage == CP_ACP) {
 		return DEFAULT_CHARSET;
