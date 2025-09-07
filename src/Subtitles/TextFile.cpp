@@ -38,7 +38,7 @@ const static struct {
 	{ CP_UTF16BE, 1, 2, { 0xFE, 0xFF } },
 	{ 12001,      0, 4, { 0x00, 0x00, 0xFE, 0xFF } }, // UTF-32BE
 	{ 65000,      0, 3, { 0x2B, 0x2F, 0x76 } },       // UTF-7
-	{ 54936,      0, 4, { 0x84, 0x31, 0x95, 0x33 } }, // GB18030
+	{ 54936,      1, 4, { 0x84, 0x31, 0x95, 0x33 } }, // GB18030
 };
 
 #define TEXTFILE_BUFFER_SIZE (64 * 1024)
