@@ -3042,7 +3042,7 @@ void CSimpleTextSubtitle::CreateSegments()
 	*/
 }
 
-bool CSimpleTextSubtitle::Open(CString fn, UINT codePage, bool bAutoDetectCodePage, CString name, CString videoName)
+bool CSimpleTextSubtitle::Open(const CString& fn, UINT codePage, bool bAutoDetectCodePage, CString name, CString videoName)
 {
 	Empty();
 
@@ -3068,7 +3068,7 @@ static size_t CountLines(CTextFile* f, ULONGLONG from, ULONGLONG to, CString& s)
 	return n;
 }
 
-bool CSimpleTextSubtitle::Open(CTextFile* f, CString name)
+bool CSimpleTextSubtitle::Open(CTextFile* f, const CString& name)
 {
 	Empty();
 
@@ -3135,7 +3135,7 @@ bool CSimpleTextSubtitle::Open(BYTE* data, int len, int CharSet, CString name)
 	}
 
 	FILE* tmp = nullptr;
-	if (_wfopen_s(&tmp, fn, L"wb")) {
+	if (_wfopen_s(&tmp, fn, L"wb") || !tmp) {
 		return false;
 	}
 

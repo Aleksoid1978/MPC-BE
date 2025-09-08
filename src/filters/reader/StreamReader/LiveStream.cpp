@@ -214,7 +214,7 @@ static void GetType(const BYTE* buf, int size, GUID& subtype)
 
 bool CLiveStream::ParseM3U8(const CString& url, CString& realUrl)
 {
-	CWebTextFile f(CP_UTF8, CP_ACP, 10 * MEGABYTE);
+	CWebTextFile f(CP_UTF8, CP_ACP, false, 10 * MEGABYTE);
 	if (!f.Open(url)) {
 		return false;
 	}
