@@ -523,7 +523,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 13		"Reîncarcă automat fișierele de subtitrări după ce se detectează modificările"
 15		"Folosește modul de resincronizare a subtitrărilor (Subresync)"
 17		"Pagina de codificare implicită:"
-19		"Automatically detect code page"
+19		"Detectează în mod automat pagina de codificare"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
