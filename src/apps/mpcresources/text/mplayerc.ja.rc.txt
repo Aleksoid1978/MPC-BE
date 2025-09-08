@@ -522,8 +522,8 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 12		"内蔵字幕を無視する"
 13		"修正検知後に字幕ファイルを自動で再読み込みする"
 15		"Subresync を使用する"
-17		"Default code page:"
-19		"Automatically detect code page"
+17		"既定の文字コード:"
+19		"文字コードを自動判別する"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26

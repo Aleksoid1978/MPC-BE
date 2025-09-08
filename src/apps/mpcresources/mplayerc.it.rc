@@ -1263,9 +1263,9 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,79,285,9
     CONTROL         "Usa subresync",IDC_CHECK_SUBRESYNC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,91,285,9
     GROUPBOX        "",IDC_STATIC,4,103,286,47
-    LTEXT           "Default code page:",IDC_STATIC,10,108,120,8
+    LTEXT           "Tabella codici predefinita:",IDC_STATIC,10,108,120,8
     COMBOBOX        IDC_COMBO3,10,120,277,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Automatically detect code page",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,135,178,10
+    CONTROL         "Rileva automaticamente la codifica",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,135,178,10
 END
 
 IDD_UPDATE_DIALOG DIALOGEX 0, 0, 238, 60
