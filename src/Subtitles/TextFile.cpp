@@ -312,24 +312,9 @@ void CTextFile::WriteString(LPCWSTR lpsz/*CStringW str*/)
 	}
 	else if (m_encoding == CP_UTF8) {
 		str.Replace(L"\n", L"\r\n");
-		for (unsigned int i = 0, l = str.GetLength(); i < l; i++) {
-			DWORD c = (WORD)str[i];
-
-			if (c < 0x80) { // 0xxxxxxx
-				m_pStdioFile->Write(&c, 1);
-			} else if (c < 0x800) { // 110xxxxx 10xxxxxx
-				c = 0xc080 | ((c << 2) & 0x1f00) | (c & 0x003f);
-				m_pStdioFile->Write((BYTE*)&c + 1, 1);
-				m_pStdioFile->Write(&c, 1);
-			} else if (c < 0xFFFF) { // 1110xxxx 10xxxxxx 10xxxxxx
-				c = 0xe08080 | ((c << 4) & 0x0f0000) | ((c << 2) & 0x3f00) | (c & 0x003f);
-				m_pStdioFile->Write((BYTE*)&c + 2, 1);
-				m_pStdioFile->Write((BYTE*)&c + 1, 1);
-				m_pStdioFile->Write(&c, 1);
-			} else {
-				c = '?';
-				m_pStdioFile->Write(&c, 1);
-			}
+		auto utf8 = WStrToUTF8(str.GetString());
+		if (!utf8.IsEmpty()) {
+			m_pStdioFile->Write(utf8.GetString(), utf8.GetLength());
 		}
 	}
 	else if (m_encoding == CP_UTF16LE) {
