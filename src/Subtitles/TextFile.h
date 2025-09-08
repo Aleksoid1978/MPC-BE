@@ -45,6 +45,7 @@ class CTextFile
 {
 private:
 	UINT m_encoding, m_defaultencoding;
+	bool m_bAutoDetectCodePage;
 	int m_offset = 0;
 	ULONGLONG m_posInFile = 0;
 	std::unique_ptr<char[]> m_buffer;
@@ -59,7 +60,7 @@ private:
 	bool OpenFile(LPCWSTR lpszFileName, LPCWSTR mode);
 
 public:
-	CTextFile(UINT encoding = CP_ASCII, UINT defaultencoding = CP_ASCII);
+	CTextFile(UINT encoding = CP_ASCII, UINT defaultencoding = CP_ASCII, bool bAutoDetectCodePage = false);
 	virtual ~CTextFile();
 
 	bool Open(LPCWSTR lpszFileName);
@@ -95,7 +96,7 @@ class CWebTextFile final : public CTextFile
 	CString m_url_redirect_str;
 
 public:
-	CWebTextFile(UINT encoding = CP_ASCII, UINT defaultencoding = CP_ASCII, LONGLONG llMaxSize = 1024 * 1024);
+	CWebTextFile(UINT encoding = CP_ASCII, UINT defaultencoding = CP_ASCII, bool bAutoDetectCodePage = false, LONGLONG llMaxSize = 1024 * 1024);
 	~CWebTextFile();
 
 	bool Open(LPCWSTR lpszFileName);

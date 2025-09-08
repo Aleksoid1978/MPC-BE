@@ -172,7 +172,7 @@ public:
 
 	void Append(CSimpleTextSubtitle& sts, int timeoff = -1);
 
-	bool Open(CString fn, UINT codePage, CString name = L"", CString videoName = L"");
+	bool Open(CString fn, UINT codePage, bool bAutoDetectCodePage, CString name, CString videoName);
 	bool Open(CTextFile* f, CString name);
 	bool Open(BYTE* data, int len, int CharSet, CString name);
 	bool SaveAs(CString fn, Subtitle::SubType type, double fps = -1, int delay = 0, UINT e = CP_ASCII, bool bCreateExternalStyleFile = true);

@@ -691,7 +691,7 @@ public:
 	bool			fAutoReloadExtSubtitles;
 	bool			fUseSybresync;
 	int				iSubtitleDefaultCodePage;
-	bool			bSubtitleAutoDetect—odePage;
+	bool			bSubtitleAutoDetectCodePage;
 
 	// Subtitles - Rendering
 	bool			fOverridePlacement;

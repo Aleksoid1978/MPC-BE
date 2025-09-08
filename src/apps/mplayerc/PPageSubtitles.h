@@ -41,7 +41,7 @@ public:
 	BOOL m_fUseSybresync                = FALSE;
 	CString m_szAutoloadPaths;
 	CComboBox m_cbDefaultEncoding;
-	BOOL m_bAutoDetect—odePage          = FALSE;
+	BOOL m_bAutoDetectCodePage          = FALSE;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

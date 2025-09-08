@@ -26,6 +26,8 @@
 #include "DSUtil/FileHandle.h"
 #include "DSUtil/HTTPAsync.h"
 
+#include "compact_enc_det/compact_enc_det.h"
+
 const static struct {
 	uint16_t codepage;
 	uint8_t  supported; // 0 or 1
@@ -48,9 +50,10 @@ const static struct {
 
 #define TEXTFILE_BUFFER_SIZE (64 * 1024)
 
-CTextFile::CTextFile(UINT encoding/* = ASCII*/, UINT defaultencoding/* = ASCII*/)
+CTextFile::CTextFile(UINT encoding/* = ASCII*/, UINT defaultencoding/* = ASCII*/, bool bAutoDetectCodePage/* = false*/)
 	: m_encoding(encoding)
 	, m_defaultencoding(defaultencoding)
+	, m_bAutoDetectCodePage(bAutoDetectCodePage)
 {
 	m_buffer.reset(new(std::nothrow) char[TEXTFILE_BUFFER_SIZE]);
 	m_wbuffer.reset(new(std::nothrow) WCHAR[TEXTFILE_BUFFER_SIZE]);
@@ -107,6 +110,39 @@ bool CTextFile::Open(LPCWSTR lpszFileName)
 				m_offset = marker.size;
 				break;
 			}
+		}
+	}
+
+	if (!m_offset && m_bAutoDetectCodePage && FillBuffer()) {
+		bool is_reliable;
+		int bytes_consumed;
+		auto encoding = CompactEncDet::DetectEncoding(
+			m_buffer.get(), m_nInBuffer,
+			nullptr, nullptr, nullptr,
+			UNKNOWN_ENCODING,
+			UNKNOWN_LANGUAGE,
+			CompactEncDet::QUERY_CORPUS,
+			false,
+			&bytes_consumed,
+			&is_reliable);
+		switch (encoding) {
+			// TODO - Add more encodings to the list.
+			case MSFT_CP1250:    m_encoding = 1250;  break;
+			case RUSSIAN_CP1251: m_encoding = 1251;  break;
+			case RUSSIAN_KOI8_R: m_encoding = 21866; break;
+			case RUSSIAN_CP866:  m_encoding = 866;   break;
+			case MSFT_CP1252:    m_encoding = 1252;  break;
+			case MSFT_CP1253:    m_encoding = 1253;  break;
+			case MSFT_CP1254:    m_encoding = 1254;  break;
+			case MSFT_CP1255:    m_encoding = 1255;  break;
+			case MSFT_CP1256:    m_encoding = 1256;  break;
+			case MSFT_CP1257:    m_encoding = 1257;  break;
+			case MSFT_CP874:     m_encoding = 874;   break;
+			case JAPANESE_CP932: m_encoding = 932;   break;
+			case CHINESE_GB:     m_encoding = 936;   break;
+			case KOREAN_EUC_KR:  m_encoding = 949;   break;
+			case CHINESE_BIG5:   m_encoding = 950;   break;
+			case GB18030:        m_encoding = 54936; break;
 		}
 	}
 
@@ -329,7 +365,7 @@ bool CTextFile::FillBuffer()
 	}
 	m_posInFile = m_pStdioFile->GetPosition();
 
-	return !nBytesRead;
+	return nBytesRead > 0;
 }
 
 ULONGLONG CTextFile::GetPositionFastBuffered() const
@@ -435,7 +471,7 @@ bool CTextFile::ReadString(CStringW& str)
 				str.Append(m_wbuffer.get(), nCharsRead);
 
 				if (!bLineEndFound) {
-					bLineEndFound = FillBuffer();
+					bLineEndFound = !FillBuffer();
 					if (!nCharsRead) {
 						fEOF = bLineEndFound;
 					}
@@ -486,7 +522,7 @@ bool CTextFile::ReadString(CStringW& str)
 			}
 
 			if (!bLineEndFound) {
-				bLineEndFound = FillBuffer();
+				bLineEndFound = !FillBuffer();
 				if (!nCharsRead) {
 					fEOF = bLineEndFound;
 				}
@@ -514,7 +550,7 @@ bool CTextFile::ReadString(CStringW& str)
 			str.Append(m_wbuffer.get(), nCharsRead);
 
 			if (!bLineEndFound) {
-				bLineEndFound = FillBuffer();
+				bLineEndFound = !FillBuffer();
 				if (!nCharsRead) {
 					fEOF = bLineEndFound;
 				}
@@ -557,7 +593,7 @@ bool CTextFile::ReadString(CStringW& str)
 			}
 
 			if (!bLineEndFound) {
-				bLineEndFound = FillBuffer();
+				bLineEndFound = !FillBuffer();
 				if (!nCharsRead) {
 					fEOF = bLineEndFound;
 				}
@@ -572,8 +608,8 @@ bool CTextFile::ReadString(CStringW& str)
 // CWebTextFile
 //
 
-CWebTextFile::CWebTextFile(UINT encoding/* = ASCII*/, UINT defaultencoding/* = ASCII*/, LONGLONG llMaxSize)
-	: CTextFile(encoding, defaultencoding)
+CWebTextFile::CWebTextFile(UINT encoding/* = ASCII*/, UINT defaultencoding/* = ASCII*/, bool bAutoDetectCodePage/* = false*/, LONGLONG llMaxSize)
+	: CTextFile(encoding, defaultencoding, bAutoDetectCodePage)
 	, m_llMaxSize(llMaxSize)
 {
 }

@@ -3383,5 +3383,5 @@ STDMETHODIMP CRenderedTextSubtitle::Reload()
 	if (!::PathFileExistsW(m_path)) {
 		return E_FAIL;
 	}
-	return !m_path.IsEmpty() && Open(m_path, DEFAULT_CHARSET, m_name) ? S_OK : E_FAIL;
+	return !m_path.IsEmpty() && Open(m_path, DEFAULT_CHARSET, false, m_name, {}) ? S_OK : E_FAIL;
 }

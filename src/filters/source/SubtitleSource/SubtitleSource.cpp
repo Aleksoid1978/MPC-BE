@@ -228,7 +228,7 @@ CSubtitleStream::CSubtitleStream(const WCHAR* wfn, CSubtitleSource* pParent, HRE
 
 	CString fn(wfn);
 
-	if (!m_rts.Open(fn, DEFAULT_CHARSET)) {
+	if (!m_rts.Open(fn, DEFAULT_CHARSET, false, {}, {})) {
 		if (phr) {
 			*phr = E_FAIL;
 		}
@@ -631,7 +631,7 @@ HRESULT CSubtitleSourceSSA::GetMediaType(CMediaType* pmt)
 	pmt->SetFormatType(&FORMAT_SubtitleInfo);
 
 	CSimpleTextSubtitle sts;
-	sts.Open(CString(m_fn), DEFAULT_CHARSET);
+	sts.Open(m_fn, DEFAULT_CHARSET, false, {}, {});
 	sts.RemoveAll();
 
 	CFile f;
@@ -681,7 +681,7 @@ HRESULT CSubtitleSourceASS::GetMediaType(CMediaType* pmt)
 	pmt->SetFormatType(&FORMAT_SubtitleInfo);
 
 	CSimpleTextSubtitle sts;
-	sts.Open(CString(m_fn), DEFAULT_CHARSET);
+	sts.Open(m_fn, DEFAULT_CHARSET, false, {}, {});
 	sts.RemoveAll();
 
 	CFile f;

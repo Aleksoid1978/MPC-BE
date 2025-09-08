@@ -3042,11 +3042,11 @@ void CSimpleTextSubtitle::CreateSegments()
 	*/
 }
 
-bool CSimpleTextSubtitle::Open(CString fn, UINT codePage, CString name, CString videoName)
+bool CSimpleTextSubtitle::Open(CString fn, UINT codePage, bool bAutoDetectCodePage, CString name, CString videoName)
 {
 	Empty();
 
-	CWebTextFile f(CP_UTF8, codePage);
+	CWebTextFile f(CP_UTF8, codePage, bAutoDetectCodePage);
 	if (!f.Open(fn)) {
 		return false;
 	}
@@ -3149,7 +3149,7 @@ bool CSimpleTextSubtitle::Open(BYTE* data, int len, int CharSet, CString name)
 
 	fclose(tmp);
 
-	bool fRet = Open(fn, CharSet, name);
+	bool fRet = Open(fn, CharSet, false, name, {});
 
 	_wremove(fn);
 

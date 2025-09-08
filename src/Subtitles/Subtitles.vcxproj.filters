@@ -9,6 +9,21 @@
       <UniqueIdentifier>{405fa87b-b576-4329-99eb-f6c49c3a84be}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
     </Filter>
+    <Filter Include="compact_enc_det">
+      <UniqueIdentifier>{53d6d220-5725-4969-b322-388d22714000}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="compact_enc_det\compact_enc_det">
+      <UniqueIdentifier>{f36ee2b3-73bc-4b2a-baa0-dbeb050b92a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="compact_enc_det\util">
+      <UniqueIdentifier>{a9ec19a9-c951-404b-9c05-b6b347d464fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="compact_enc_det\util\encodings">
+      <UniqueIdentifier>{eb15d31d-d784-46d3-b218-abca76d4af35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="compact_enc_det\util\languages">
+      <UniqueIdentifier>{a8792e9d-bef1-4d2b-a2fb-33c4d1cc4634}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseSub.cpp">
@@ -76,6 +91,18 @@
     </ClCompile>
     <ClCompile Include="RegexUtil.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="compact_enc_det\util\encodings\encodings.cc">
+      <Filter>compact_enc_det\util\encodings</Filter>
+    </ClCompile>
+    <ClCompile Include="compact_enc_det\util\languages\languages.cc">
+      <Filter>compact_enc_det\util\languages</Filter>
+    </ClCompile>
+    <ClCompile Include="compact_enc_det\compact_enc_det\compact_enc_det.cc">
+      <Filter>compact_enc_det\compact_enc_det</Filter>
+    </ClCompile>
+    <ClCompile Include="compact_enc_det\compact_enc_det\compact_enc_det_hint_code.cc">
+      <Filter>compact_enc_det\compact_enc_det</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -148,5 +175,55 @@
     <ClInclude Include="RegexUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="compact_enc_det\util\basictypes.h">
+      <Filter>compact_enc_det\util</Filter>
+    </ClInclude>
+    <ClInclude Include="compact_enc_det\util\case_insensitive_hash.h">
+      <Filter>compact_enc_det\util</Filter>
+    </ClInclude>
+    <ClInclude Include="compact_enc_det\util\commandlineflags.h">
+      <Filter>compact_enc_det\util</Filter>
+    </ClInclude>
+    <ClInclude Include="compact_enc_det\util\logging.h">
+      <Filter>compact_enc_det\util</Filter>
+    </ClInclude>
+    <ClInclude Include="compact_enc_det\util\port.h">
+      <Filter>compact_enc_det\util</Filter>
+    </ClInclude>
+    <ClInclude Include="compact_enc_det\util\string_util.h">
+      <Filter>compact_enc_det\util</Filter>
+    </ClInclude>
+    <ClInclude Include="compact_enc_det\util\varsetter.h">
+      <Filter>compact_enc_det\util</Filter>
+    </ClInclude>
+    <ClInclude Include="compact_enc_det\util\encodings\encodings.h">
+      <Filter>compact_enc_det\util\encodings</Filter>
+    </ClInclude>
+    <ClInclude Include="compact_enc_det\util\encodings\encodings.pb.h">
+      <Filter>compact_enc_det\util\encodings</Filter>
+    </ClInclude>
+    <ClInclude Include="compact_enc_det\util\languages\languages.h">
+      <Filter>compact_enc_det\util\languages</Filter>
+    </ClInclude>
+    <ClInclude Include="compact_enc_det\util\languages\languages.pb.h">
+      <Filter>compact_enc_det\util\languages</Filter>
+    </ClInclude>
+    <ClInclude Include="compact_enc_det\compact_enc_det\compact_enc_det.h">
+      <Filter>compact_enc_det\compact_enc_det</Filter>
+    </ClInclude>
+    <ClInclude Include="compact_enc_det\compact_enc_det\compact_enc_det_generated_tables.h">
+      <Filter>compact_enc_det\compact_enc_det</Filter>
+    </ClInclude>
+    <ClInclude Include="compact_enc_det\compact_enc_det\compact_enc_det_generated_tables2.h">
+      <Filter>compact_enc_det\compact_enc_det</Filter>
+    </ClInclude>
+    <ClInclude Include="compact_enc_det\compact_enc_det\compact_enc_det_hint_code.h">
+      <Filter>compact_enc_det\compact_enc_det</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="compact_enc_det\compact_enc_det\detail_head_string.inc">
+      <Filter>compact_enc_det\compact_enc_det</Filter>
+    </None>
   </ItemGroup>
 </Project>

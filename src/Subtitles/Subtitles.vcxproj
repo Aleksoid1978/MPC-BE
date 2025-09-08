@@ -41,7 +41,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)src;./compact_enc_det;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -51,6 +51,34 @@
     <ClCompile Include="BaseSub.cpp" />
     <ClCompile Include="CCDecoder.cpp" />
     <ClCompile Include="ColorConvert.cpp" />
+    <ClCompile Include="compact_enc_det\compact_enc_det\compact_enc_det.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="compact_enc_det\compact_enc_det\compact_enc_det_hint_code.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="compact_enc_det\util\encodings\encodings.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="compact_enc_det\util\languages\languages.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="CompositionObject.cpp" />
     <ClCompile Include="DVBSub.cpp" />
     <ClCompile Include="Ellipse.cpp" />
@@ -77,6 +105,21 @@
     <ClInclude Include="BaseSub.h" />
     <ClInclude Include="CCDecoder.h" />
     <ClInclude Include="ColorConvert.h" />
+    <ClInclude Include="compact_enc_det\compact_enc_det\compact_enc_det.h" />
+    <ClInclude Include="compact_enc_det\compact_enc_det\compact_enc_det_generated_tables.h" />
+    <ClInclude Include="compact_enc_det\compact_enc_det\compact_enc_det_generated_tables2.h" />
+    <ClInclude Include="compact_enc_det\compact_enc_det\compact_enc_det_hint_code.h" />
+    <ClInclude Include="compact_enc_det\util\basictypes.h" />
+    <ClInclude Include="compact_enc_det\util\case_insensitive_hash.h" />
+    <ClInclude Include="compact_enc_det\util\commandlineflags.h" />
+    <ClInclude Include="compact_enc_det\util\encodings\encodings.h" />
+    <ClInclude Include="compact_enc_det\util\encodings\encodings.pb.h" />
+    <ClInclude Include="compact_enc_det\util\languages\languages.h" />
+    <ClInclude Include="compact_enc_det\util\languages\languages.pb.h" />
+    <ClInclude Include="compact_enc_det\util\logging.h" />
+    <ClInclude Include="compact_enc_det\util\port.h" />
+    <ClInclude Include="compact_enc_det\util\string_util.h" />
+    <ClInclude Include="compact_enc_det\util\varsetter.h" />
     <ClInclude Include="CompositionObject.h" />
     <ClInclude Include="DVBSub.h" />
     <ClInclude Include="Ellipse.h" />
@@ -97,6 +140,9 @@
     <ClInclude Include="VobSubFile.h" />
     <ClInclude Include="VobSubImage.h" />
     <ClInclude Include="XSUBSubtitle.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="compact_enc_det\compact_enc_det\detail_head_string.inc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
