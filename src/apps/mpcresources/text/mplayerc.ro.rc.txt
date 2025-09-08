@@ -1,4 +1,4 @@
-BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
+﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Despre"
 7		"MPC-BE"
 8		"Drepturi de autor © 2002-2025 - vezi fișierul Authors.txt"
@@ -2114,4 +2114,3 @@ STRING ID_SHOW_MILLISECONDS		"Afișează milisecundele"
 STRING ID_VOLUME_MUTE		"Mut\nMut"
 STRING ID_VOLUME_MUTE_DISABLED		"Fără sunet (Silențios)\nFără sunet (Silențios)"
 STRING ID_VOLUME_MUTE_OFF		"Activează sunetul\nActivează sunetul"
-
