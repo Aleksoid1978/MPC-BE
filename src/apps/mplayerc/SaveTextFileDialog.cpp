@@ -44,6 +44,9 @@ CSaveTextFileDialog::CSaveTextFileDialog(
 		pfdc->AddControlItem(IDC_COMBO1, CP_UTF16LE, L"Unicode 16-LE");
 		pfdc->AddControlItem(IDC_COMBO1, CP_UTF16BE, L"Unicode 16-BE");
 		pfdc->AddControlItem(IDC_COMBO1, CP_ASCII,   L"ANSI");
+		if (m_e != CP_UTF8 && m_e != CP_UTF16LE && m_e != CP_UTF16BE && m_e != CP_ASCII) {
+			m_e = CP_UTF8;
+		}
 		pfdc->SetSelectedControlItem(IDC_COMBO1, m_e);
 		pfdc->EndVisualGroup();
 		pfdc->MakeProminent(IDS_TEXTFILE_ENC);
