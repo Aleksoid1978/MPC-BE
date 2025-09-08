@@ -523,7 +523,7 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 13		"发现字幕改动后自动重加载文件"
 15		"启用字幕同步编辑器"
 17		"默认代码页:"
-19		"Automatically detect code page"
+19		"自动检测代码页"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
