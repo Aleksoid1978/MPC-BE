@@ -311,7 +311,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 16		"G:"
 17		"B:"
 21		"Koyu menüyü etkinleştir"
-22		"Arkada Bulanıklık efektini kullan (Windows 10 and above)"
+22		"Arkada Bulanıklık efektini kullan (Windows 10 ve üzeri)"
 24		"Koyu başlığı etkinleştir (Windows 10 ve üzeri)"
 27		"Süre bilgi ipucunu göster:"
 29		"Arama Çubuğu üzerinde ön izleme resmi göster"
@@ -522,8 +522,8 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 12		"Gömülü alt yazıları yükleme"
 13		"Alt yazıda değişiklik algılanırsa oto-yeniden yükle"
 15		"Alt yazı Eşzamanlama kullan"
-17		"Default code page:"
-19		"Automatically detect code page"
+17		"Varsayılan kod sayfası:"
+19		"Kod sayfasını otomatik olarak algıla"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26

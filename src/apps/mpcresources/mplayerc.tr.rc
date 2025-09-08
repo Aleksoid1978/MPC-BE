@@ -441,7 +441,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,34,53,12
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,49,53,12
     CONTROL         "Koyu menüyü etkinleştir",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,59,147,9,WS_EX_TRANSPARENT
-    CONTROL         "Arkada Bulanıklık efektini kullan (Windows 10 and above)",IDC_CHECK7,
+    CONTROL         "Arkada Bulanıklık efektini kullan (Windows 10 ve üzeri)",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,265,9,WS_EX_TRANSPARENT
     CONTROL         "Koyu başlığı etkinleştir (Windows 10 ve üzeri)",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,9,WS_EX_TRANSPARENT
@@ -1263,9 +1263,9 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,79,285,9
     CONTROL         "Alt yazı Eşzamanlama kullan",IDC_CHECK_SUBRESYNC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,91,285,9
     GROUPBOX        "",IDC_STATIC,4,103,286,47
-    LTEXT           "Default code page:",IDC_STATIC,10,108,120,8
+    LTEXT           "Varsayılan kod sayfası:",IDC_STATIC,10,108,120,8
     COMBOBOX        IDC_COMBO3,10,120,277,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Automatically detect code page",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,135,178,10
+    CONTROL         "Kod sayfasını otomatik olarak algıla",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,135,178,10
 END
 
 IDD_UPDATE_DIALOG DIALOGEX 0, 0, 238, 60
