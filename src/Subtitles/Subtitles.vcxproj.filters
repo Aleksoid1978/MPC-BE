@@ -221,9 +221,4 @@
       <Filter>compact_enc_det\compact_enc_det</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="compact_enc_det\compact_enc_det\detail_head_string.inc">
-      <Filter>compact_enc_det\compact_enc_det</Filter>
-    </None>
-  </ItemGroup>
 </Project>
