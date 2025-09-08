@@ -874,7 +874,8 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						name += L" H.263";
 
 						break;
-					case FLV_VIDEO_SCREEN: {
+					case FLV_VIDEO_SCREEN:
+					case FLV_VIDEO_SCREEN2: {
 						m_pFile->BitRead(4);
 						vih->bmiHeader.biWidth  = (LONG)m_pFile->BitRead(12);
 						m_pFile->BitRead(4);
@@ -894,7 +895,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vih->bmiHeader.biBitCount = 24;
 						vih->bmiHeader.biSizeImage = DIBSIZE(vih->bmiHeader);
 
-						mt.subtype = FOURCCMap(vih->bmiHeader.biCompression = '1VSF');
+						mt.subtype = FOURCCMap(vt.CodecID == FLV_VIDEO_SCREEN ? vih->bmiHeader.biCompression = '1VSF' : vih->bmiHeader.biCompression = '2VSF');
 						name += L" Screen";
 
 						break;

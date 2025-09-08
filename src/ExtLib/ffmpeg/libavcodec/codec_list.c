@@ -18,6 +18,7 @@ static const FFCodec * const codec_list[] = {
     &ff_ffvhuff_decoder,
     &ff_fic_decoder,
     &ff_flashsv_decoder,
+    &ff_flashsv2_decoder,
     &ff_flv_decoder,
     &ff_fraps_decoder,
     &ff_g2m_decoder,
