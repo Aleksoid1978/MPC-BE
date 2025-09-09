@@ -88,8 +88,6 @@ void CPPageSubStyle::DoDataExchange(CDataExchange* pDX)
 	CPPageBase::DoDataExchange(pDX);
 
 	DDX_Control(pDX, IDC_BUTTON1, m_font);
-	DDX_CBIndex(pDX, IDC_COMBO1, m_iCharset);
-	DDX_Control(pDX, IDC_COMBO1, m_charset);
 	DDX_Control(pDX, IDC_EDIT3, m_spacing);
 	DDX_Control(pDX, IDC_EDIT4, m_angle);
 	DDX_Control(pDX, IDC_SPIN10, m_anglespin);
@@ -182,17 +180,6 @@ BOOL CPPageSubStyle::OnInitDialog()
 void CPPageSubStyle::Init()
 {
 	m_font.SetWindowTextW(m_stss->fontName);
-	m_iCharset = -1;
-
-	for (size_t i = 0; i < std::size(s_CharSetTable); i++) {
-		CString str;
-		str.Format(L"%s (%d)", s_CharSetTable[i].name, s_CharSetTable[i].charSet);
-		AddStringData(m_charset, str, s_CharSetTable[i].charSet);
-
-		if (m_stss->charSet == s_CharSetTable[i].charSet) {
-			m_iCharset = i;
-		}
-	}
 
 	// TODO: allow floats in these edit boxes
 	m_spacing = m_stss->fontSpacing;
@@ -232,10 +219,6 @@ void CPPageSubStyle::Init()
 BOOL CPPageSubStyle::OnApply()
 {
 	UpdateData();
-
-	if (m_iCharset >= 0) {
-		m_stss->charSet = m_charset.GetItemData(m_iCharset);
-	}
 
 	m_stss->fontSpacing   = m_spacing;
 	m_stss->fontAngleZ    = m_angle;
@@ -279,8 +262,6 @@ void CPPageSubStyle::OnBnClickedButton1()
 		}
 
 		m_font.SetWindowTextW(str);
-
-		SelectByItemData(m_charset, lf.lfCharSet);
 
 		*m_stss = lf;
 
