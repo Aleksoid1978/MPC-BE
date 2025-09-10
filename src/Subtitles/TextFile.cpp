@@ -173,15 +173,22 @@ bool CTextFile::Save(LPCWSTR lpszFileName, UINT e)
 		return false;
 	}
 
-	if (e == CP_UTF8) {
-		BYTE b[3] = {0xef, 0xbb, 0xbf};
-		m_pStdioFile->Write(b, sizeof(b));
-	} else if (e == CP_UTF16LE) {
-		BYTE b[2] = {0xff, 0xfe};
-		m_pStdioFile->Write(b, sizeof(b));
-	} else if (e == CP_UTF16BE) {
-		BYTE b[2] = {0xfe, 0xff};
-		m_pStdioFile->Write(b, sizeof(b));
+	switch (e) {
+		case CP_UTF8: {
+				BYTE b[3] = { 0xef, 0xbb, 0xbf };
+				m_pStdioFile->Write(b, sizeof(b));
+			}
+			break;
+		case CP_UTF16LE: {
+				BYTE b[2] = { 0xff, 0xfe };
+				m_pStdioFile->Write(b, sizeof(b));
+			}
+			break;
+		case CP_UTF16BE: {
+				BYTE b[2] = { 0xfe, 0xff };
+				m_pStdioFile->Write(b, sizeof(b));
+			}
+			break;
 	}
 
 	m_encoding = e;
@@ -280,17 +287,19 @@ void CTextFile::WriteString(LPCSTR lpsz/*CStringA str*/)
 
 	CStringA str(lpsz);
 
-	if (m_encoding == CP_ASCII) {
-		m_pStdioFile->WriteString(AToT(str));
-	} else if (m_encoding == CP_ACP) {
-		str.Replace("\n", "\r\n");
-		m_pStdioFile->Write(str.GetString(), str.GetLength());
-	} else if (m_encoding == CP_UTF8) {
-		WriteString(AToT(str));
-	} else if (m_encoding == CP_UTF16LE) {
-		WriteString(AToT(str));
-	} else if (m_encoding == CP_UTF16BE) {
-		WriteString(AToT(str));
+	switch (m_encoding) {
+		case CP_ASCII:
+			m_pStdioFile->WriteString(AToT(str));
+			break;
+		case CP_ACP:
+			str.Replace("\n", "\r\n");
+			m_pStdioFile->Write(str.GetString(), str.GetLength());
+			break;
+		case CP_UTF8:
+		case CP_UTF16LE:
+		case CP_UTF16BE:
+			WriteString(AToT(str));
+			break;
 	}
 }
 
@@ -302,31 +311,35 @@ void CTextFile::WriteString(LPCWSTR lpsz/*CStringW str*/)
 
 	CStringW str(lpsz);
 
-	if (m_encoding == CP_ASCII) {
-		m_pStdioFile->WriteString(str);
-	}
-	else if (m_encoding == CP_ACP) {
-		str.Replace(L"\n", L"\r\n");
-		CStringA stra(str); // TODO: codepage
-		m_pStdioFile->Write(stra.GetString(), stra.GetLength());
-	}
-	else if (m_encoding == CP_UTF8) {
-		str.Replace(L"\n", L"\r\n");
-		auto utf8 = WStrToUTF8(str.GetString());
-		if (!utf8.IsEmpty()) {
-			m_pStdioFile->Write(utf8.GetString(), utf8.GetLength());
-		}
-	}
-	else if (m_encoding == CP_UTF16LE) {
-		str.Replace(L"\n", L"\r\n");
-		m_pStdioFile->Write(str.GetString(), str.GetLength() * 2);
-	}
-	else if (m_encoding == CP_UTF16BE) {
-		str.Replace(L"\n", L"\r\n");
-		for (unsigned int i = 0, l = str.GetLength(); i < l; i++) {
-			str.SetAt(i, ((str[i] >> 8) & 0x00ff) | ((str[i] << 8) & 0xff00));
-		}
-		m_pStdioFile->Write(str.GetString(), str.GetLength() * 2);
+	switch (m_encoding) {
+		case CP_ASCII:
+			m_pStdioFile->WriteString(str);
+			break;
+		case CP_ACP: {
+				str.Replace(L"\n", L"\r\n");
+				CStringA stra(str); // TODO: codepage
+				m_pStdioFile->Write(stra.GetString(), stra.GetLength());
+			}
+			break;
+		case CP_UTF8: {
+				str.Replace(L"\n", L"\r\n");
+				auto utf8 = WStrToUTF8(str.GetString());
+				if (!utf8.IsEmpty()) {
+					m_pStdioFile->Write(utf8.GetString(), utf8.GetLength());
+				}
+			}
+			break;
+		case CP_UTF16LE:
+			str.Replace(L"\n", L"\r\n");
+			m_pStdioFile->Write(str.GetString(), str.GetLength() * 2);
+			break;
+		case CP_UTF16BE:
+			str.Replace(L"\n", L"\r\n");
+			for (unsigned int i = 0, l = str.GetLength(); i < l; i++) {
+				str.SetAt(i, ((str[i] >> 8) & 0x00ff) | ((str[i] << 8) & 0xff00));
+			}
+			m_pStdioFile->Write(str.GetString(), str.GetLength() * 2);
+			break;
 	}
 }
 
@@ -368,222 +381,234 @@ bool CTextFile::ReadString(CStringW& str)
 
 	str.Truncate(0);
 
-	if (m_encoding == CP_ASCII) {
-		CStringW s;
-		fEOF = !m_pStdioFile->ReadString(s);
-		str = s;
-		// For consistency with other encodings, we continue reading
-		// the file even when a NUL char is encountered.
-		char c;
-		while (fEOF && (m_pStdioFile->Read(&c, sizeof(c)) == sizeof(c))) {
-			str += c;
-			fEOF = !m_pStdioFile->ReadString(s);
-			str += s;
-		}
-	}
-	else if (m_encoding == CP_UTF8) {
-		ULONGLONG lineStartPos = GetPositionFastBuffered();
-		bool bValid = true;
-		bool bLineEndFound = false;
-		fEOF = false;
+	switch (m_encoding) {
+		case CP_ASCII: {
+				CStringW s;
+				fEOF = !m_pStdioFile->ReadString(s);
+				str = s;
+				// For consistency with other encodings, we continue reading
+				// the file even when a NUL char is encountered.
+				char c;
+				while (fEOF && (m_pStdioFile->Read(&c, sizeof(c)) == sizeof(c))) {
+					str += c;
+					fEOF = !m_pStdioFile->ReadString(s);
+					str += s;
+				}
+			}
+			break;
+		case CP_UTF8: {
+				ULONGLONG lineStartPos = GetPositionFastBuffered();
+				bool bValid = true;
+				bool bLineEndFound = false;
+				fEOF = false;
 
-		do {
-			int nCharsRead;
+				do {
+					int nCharsRead;
 
-			for (nCharsRead = 0; m_posInBuffer < m_nInBuffer; m_posInBuffer++, nCharsRead++) {
-				if (Utf8::isSingleByte(m_buffer[m_posInBuffer])) { // 0xxxxxxx
-					m_wbuffer[nCharsRead] = m_buffer[m_posInBuffer] & 0x7f;
-				} else if (Utf8::isFirstOfMultibyte(m_buffer[m_posInBuffer])) {
-					int nContinuationBytes = Utf8::continuationBytes(m_buffer[m_posInBuffer]);
-					bValid = true;
+					for (nCharsRead = 0; m_posInBuffer < m_nInBuffer; m_posInBuffer++, nCharsRead++) {
+						if (Utf8::isSingleByte(m_buffer[m_posInBuffer])) { // 0xxxxxxx
+							m_wbuffer[nCharsRead] = m_buffer[m_posInBuffer] & 0x7f;
+						} else if (Utf8::isFirstOfMultibyte(m_buffer[m_posInBuffer])) {
+							int nContinuationBytes = Utf8::continuationBytes(m_buffer[m_posInBuffer]);
+							bValid = true;
 
-					if (m_posInBuffer + nContinuationBytes >= m_nInBuffer) {
-						// If we are at the end of the file, the buffer won't be full
-						// and we won't be able to read any more continuation bytes.
-						bValid = (m_nInBuffer == TEXTFILE_BUFFER_SIZE);
-						break;
-					} else {
-						for (int j = 1; j <= nContinuationBytes; j++) {
-							if (!Utf8::isContinuation(m_buffer[m_posInBuffer + j])) {
-								bValid = false;
-							}
-						}
-
-						switch (nContinuationBytes) {
-							case 0: // 0xxxxxxx
-								m_wbuffer[nCharsRead] = m_buffer[m_posInBuffer] & 0x7f;
+							if (m_posInBuffer + nContinuationBytes >= m_nInBuffer) {
+								// If we are at the end of the file, the buffer won't be full
+								// and we won't be able to read any more continuation bytes.
+								bValid = (m_nInBuffer == TEXTFILE_BUFFER_SIZE);
 								break;
-							case 1: // 110xxxxx 10xxxxxx
-								m_wbuffer[nCharsRead] = (m_buffer[m_posInBuffer] & 0x1f) << 6 | (m_buffer[m_posInBuffer + 1] & 0x3f);
-								break;
-							case 2: // 1110xxxx 10xxxxxx 10xxxxxx
-								m_wbuffer[nCharsRead] = (m_buffer[m_posInBuffer] & 0x0f) << 12 | (m_buffer[m_posInBuffer + 1] & 0x3f) << 6 | (m_buffer[m_posInBuffer + 2] & 0x3f);
-								break;
-							case 3: // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-								{
-									const auto* Z = &m_buffer[m_posInBuffer];
-									const auto u32 = ((uint32_t)(*Z & 0x0F) << 18) | ((uint32_t)(*(Z + 1) & 0x3F) << 12) | ((uint32_t)(*(Z + 2) & 0x3F) << 6) | ((uint32_t) * (Z + 3) & 0x3F);
-									if (u32 <= UINT16_MAX) {
-										m_wbuffer[nCharsRead] = (wchar_t)u32;
-									} else {
-										m_wbuffer[nCharsRead++] = (wchar_t)((((u32 - 0x010000) & 0x000FFC00) >> 10) | 0xD800);
-										m_wbuffer[nCharsRead]   = (wchar_t)((u32 & 0x000003FF) | 0xDC00);
+							} else {
+								for (int j = 1; j <= nContinuationBytes; j++) {
+									if (!Utf8::isContinuation(m_buffer[m_posInBuffer + j])) {
+										bValid = false;
 									}
 								}
-								break;
+
+								switch (nContinuationBytes) {
+									case 0: // 0xxxxxxx
+										m_wbuffer[nCharsRead] = m_buffer[m_posInBuffer] & 0x7f;
+										break;
+									case 1: // 110xxxxx 10xxxxxx
+										m_wbuffer[nCharsRead] = (m_buffer[m_posInBuffer] & 0x1f) << 6 | (m_buffer[m_posInBuffer + 1] & 0x3f);
+										break;
+									case 2: // 1110xxxx 10xxxxxx 10xxxxxx
+										m_wbuffer[nCharsRead] = (m_buffer[m_posInBuffer] & 0x0f) << 12 | (m_buffer[m_posInBuffer + 1] & 0x3f) << 6 | (m_buffer[m_posInBuffer + 2] & 0x3f);
+										break;
+									case 3: // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+										{
+											const auto* Z = &m_buffer[m_posInBuffer];
+											const auto u32 = ((uint32_t)(*Z & 0x0F) << 18) | ((uint32_t)(*(Z + 1) & 0x3F) << 12) | ((uint32_t)(*(Z + 2) & 0x3F) << 6) | ((uint32_t) * (Z + 3) & 0x3F);
+											if (u32 <= UINT16_MAX) {
+												m_wbuffer[nCharsRead] = (wchar_t)u32;
+											} else {
+												m_wbuffer[nCharsRead++] = (wchar_t)((((u32 - 0x010000) & 0x000FFC00) >> 10) | 0xD800);
+												m_wbuffer[nCharsRead] = (wchar_t)((u32 & 0x000003FF) | 0xDC00);
+											}
+										}
+										break;
+								}
+								m_posInBuffer += nContinuationBytes;
+							}
+						} else {
+							bValid = false;
 						}
-						m_posInBuffer += nContinuationBytes;
+
+						if (!bValid) {
+							m_wbuffer[nCharsRead] = L'?';
+							m_posInBuffer++;
+							nCharsRead++;
+							break;
+						} else if (m_wbuffer[nCharsRead] == L'\n') {
+							bLineEndFound = true; // Stop at end of line
+							m_posInBuffer++;
+							break;
+						} else if (m_wbuffer[nCharsRead] == L'\r') {
+							nCharsRead--; // Skip \r
+						}
 					}
-				} else {
-					bValid = false;
-				}
 
-				if (!bValid) {
-					m_wbuffer[nCharsRead] = L'?';
-					m_posInBuffer++;
-					nCharsRead++;
-					break;
-				} else if (m_wbuffer[nCharsRead] == L'\n') {
-					bLineEndFound = true; // Stop at end of line
-					m_posInBuffer++;
-					break;
-				} else if (m_wbuffer[nCharsRead] == L'\r') {
-					nCharsRead--; // Skip \r
-				}
-			}
+					if (bValid || m_offset) {
+						if (nCharsRead > 0) {
+							str.Append(m_wbuffer.get(), nCharsRead);
+						}
 
-			if (bValid || m_offset) {
-				str.Append(m_wbuffer.get(), nCharsRead);
+						if (!bLineEndFound) {
+							bLineEndFound = !FillBuffer();
+							if (!nCharsRead) {
+								fEOF = bLineEndFound;
+							}
+						}
+					} else {
+						// Switch to text and read again
+						m_encoding = m_defaultencoding;
+						// Stop using the buffer
+						m_posInBuffer = m_nInBuffer = 0;
 
-				if (!bLineEndFound) {
-					bLineEndFound = !FillBuffer();
-					if (!nCharsRead) {
-						fEOF = bLineEndFound;
+						fEOF = !ReopenAsText();
+
+						if (!fEOF) {
+							// Seek back to the beginning of the line where we stopped
+							Seek(lineStartPos, CStdioFile::begin);
+
+							fEOF = !ReadString(str);
+						}
 					}
-				}
-			} else {
-				// Switch to text and read again
-				m_encoding = m_defaultencoding;
-				// Stop using the buffer
-				m_posInBuffer = m_nInBuffer = 0;
-
-				fEOF = !ReopenAsText();
-
-				if (!fEOF) {
-					// Seek back to the beginning of the line where we stopped
-					Seek(lineStartPos, CStdioFile::begin);
-
-					fEOF = !ReadString(str);
-				}
+				} while (bValid && !bLineEndFound);
 			}
-		} while (bValid && !bLineEndFound);
-	}
-	else if (m_encoding == CP_UTF16LE) {
-		bool bLineEndFound = false;
-		fEOF = false;
+			break;
+		case CP_UTF16LE: {
+				bool bLineEndFound = false;
+				fEOF = false;
 
-		do {
-			int nCharsRead;
-			WCHAR* wbuffer = (WCHAR*)&m_buffer[m_posInBuffer];
+				do {
+					int nCharsRead;
+					WCHAR* wbuffer = (WCHAR*)&m_buffer[m_posInBuffer];
 
-			for (nCharsRead = 0; m_posInBuffer + 1 < m_nInBuffer; nCharsRead++, m_posInBuffer += sizeof(WCHAR)) {
-				if (wbuffer[nCharsRead] == L'\n') {
-					break; // Stop at end of line
-				} else if (wbuffer[nCharsRead] == L'\r') {
-					break; // Skip \r
-				}
+					for (nCharsRead = 0; m_posInBuffer + 1 < m_nInBuffer; nCharsRead++, m_posInBuffer += sizeof(WCHAR)) {
+						if (wbuffer[nCharsRead] == L'\n') {
+							break; // Stop at end of line
+						} else if (wbuffer[nCharsRead] == L'\r') {
+							break; // Skip \r
+						}
+					}
+
+					if (nCharsRead > 0) {
+						str.Append(wbuffer, nCharsRead);
+					}
+
+					while (m_posInBuffer + 1 < m_nInBuffer && wbuffer[nCharsRead] == L'\r') {
+						nCharsRead++;
+						m_posInBuffer += sizeof(WCHAR);
+					}
+					if (m_posInBuffer + 1 < m_nInBuffer && wbuffer[nCharsRead] == L'\n') {
+						bLineEndFound = true; // Stop at end of line
+						nCharsRead++;
+						m_posInBuffer += sizeof(WCHAR);
+					}
+
+					if (!bLineEndFound) {
+						bLineEndFound = !FillBuffer();
+						if (!nCharsRead) {
+							fEOF = bLineEndFound;
+						}
+					}
+				} while (!bLineEndFound);
 			}
+			break;
+		case CP_UTF16BE: {
+				bool bLineEndFound = false;
+				fEOF = false;
 
-			str.Append(wbuffer, nCharsRead);
+				do {
+					int nCharsRead;
 
-			while (m_posInBuffer + 1 < m_nInBuffer && wbuffer[nCharsRead] == L'\r') {
-				nCharsRead++;
-				m_posInBuffer += sizeof(WCHAR);
+					for (nCharsRead = 0; m_posInBuffer + 1 < m_nInBuffer; nCharsRead++, m_posInBuffer += sizeof(WCHAR)) {
+						m_wbuffer[nCharsRead] = ((WCHAR(m_buffer[m_posInBuffer]) << 8) & 0xff00) | (WCHAR(m_buffer[m_posInBuffer + 1]) & 0x00ff);
+						if (m_wbuffer[nCharsRead] == L'\n') {
+							bLineEndFound = true; // Stop at end of line
+							m_posInBuffer += sizeof(WCHAR);
+							break;
+						} else if (m_wbuffer[nCharsRead] == L'\r') {
+							nCharsRead--; // Skip \r
+						}
+					}
+
+					if (nCharsRead > 0) {
+						str.Append(m_wbuffer.get(), nCharsRead);
+					}
+
+					if (!bLineEndFound) {
+						bLineEndFound = !FillBuffer();
+						if (!nCharsRead) {
+							fEOF = bLineEndFound;
+						}
+					}
+				} while (!bLineEndFound);
 			}
-			if (m_posInBuffer + 1 < m_nInBuffer && wbuffer[nCharsRead] == L'\n') {
-				bLineEndFound = true; // Stop at end of line
-				nCharsRead++;
-				m_posInBuffer += sizeof(WCHAR);
+			break;
+		default: {
+				bool bLineEndFound = false;
+				fEOF = false;
+
+				do {
+					int nCharsRead;
+
+					for (nCharsRead = 0; m_posInBuffer + nCharsRead < m_nInBuffer; nCharsRead++) {
+						if (m_buffer[m_posInBuffer + nCharsRead] == '\n') {
+							break;
+						} else if (m_buffer[m_posInBuffer + nCharsRead] == '\r') {
+							break;
+						}
+					}
+
+					if (nCharsRead > 0) {
+						CStringW line;
+						int len = MultiByteToWideChar(m_encoding, 0, &m_buffer[m_posInBuffer], nCharsRead, nullptr, 0);
+						if (len > 0) {
+							line.ReleaseBuffer(MultiByteToWideChar(m_encoding, 0, &m_buffer[m_posInBuffer], nCharsRead, line.GetBuffer(len), len));
+						}
+
+						str.Append(line);
+					}
+
+					m_posInBuffer += nCharsRead;
+					while (m_posInBuffer < m_nInBuffer && m_buffer[m_posInBuffer] == '\r') {
+						m_posInBuffer++;
+					}
+					if (m_posInBuffer < m_nInBuffer && m_buffer[m_posInBuffer] == '\n') {
+						bLineEndFound = true; // Stop at end of line
+						m_posInBuffer++;
+					}
+
+					if (!bLineEndFound) {
+						bLineEndFound = !FillBuffer();
+						if (!nCharsRead) {
+							fEOF = bLineEndFound;
+						}
+					}
+				} while (!bLineEndFound);
 			}
-
-			if (!bLineEndFound) {
-				bLineEndFound = !FillBuffer();
-				if (!nCharsRead) {
-					fEOF = bLineEndFound;
-				}
-			}
-		} while (!bLineEndFound);
-	}
-	else if (m_encoding == CP_UTF16BE) {
-		bool bLineEndFound = false;
-		fEOF = false;
-
-		do {
-			int nCharsRead;
-
-			for (nCharsRead = 0; m_posInBuffer + 1 < m_nInBuffer; nCharsRead++, m_posInBuffer += sizeof(WCHAR)) {
-				m_wbuffer[nCharsRead] = ((WCHAR(m_buffer[m_posInBuffer]) << 8) & 0xff00) | (WCHAR(m_buffer[m_posInBuffer + 1]) & 0x00ff);
-				if (m_wbuffer[nCharsRead] == L'\n') {
-					bLineEndFound = true; // Stop at end of line
-					m_posInBuffer += sizeof(WCHAR);
-					break;
-				} else if (m_wbuffer[nCharsRead] == L'\r') {
-					nCharsRead--; // Skip \r
-				}
-			}
-
-			str.Append(m_wbuffer.get(), nCharsRead);
-
-			if (!bLineEndFound) {
-				bLineEndFound = !FillBuffer();
-				if (!nCharsRead) {
-					fEOF = bLineEndFound;
-				}
-			}
-		} while (!bLineEndFound);
-	}
-	else {
-		bool bLineEndFound = false;
-		fEOF = false;
-
-		do {
-			int nCharsRead;
-
-			for (nCharsRead = 0; m_posInBuffer + nCharsRead < m_nInBuffer; nCharsRead++) {
-				if (m_buffer[m_posInBuffer + nCharsRead] == '\n') {
-					break;
-				}
-				else if (m_buffer[m_posInBuffer + nCharsRead] == '\r') {
-					break;
-				}
-			}
-
-			if (nCharsRead > 0) {
-				CStringW line;
-				int len = MultiByteToWideChar(m_encoding, 0, &m_buffer[m_posInBuffer], nCharsRead, nullptr, 0);
-				if (len > 0) {
-					line.ReleaseBuffer(MultiByteToWideChar(m_encoding, 0, &m_buffer[m_posInBuffer], nCharsRead, line.GetBuffer(len), len));
-				}
-
-				str.Append(line);
-			}
-
-			m_posInBuffer += nCharsRead;
-			while (m_posInBuffer < m_nInBuffer && m_buffer[m_posInBuffer] == '\r') {
-				m_posInBuffer++;
-			}
-			if (m_posInBuffer < m_nInBuffer && m_buffer[m_posInBuffer] == '\n') {
-				bLineEndFound = true; // Stop at end of line
-				m_posInBuffer++;
-			}
-
-			if (!bLineEndFound) {
-				bLineEndFound = !FillBuffer();
-				if (!nCharsRead) {
-					fEOF = bLineEndFound;
-				}
-			}
-		} while (!bLineEndFound);
+			break;
 	}
 
 	return !fEOF;
@@ -606,11 +631,12 @@ CWebTextFile::~CWebTextFile()
 
 bool CWebTextFile::Open(LPCWSTR lpszFileName)
 {
-	CStringW fn(lpszFileName);
-
-	if (fn.Find(L"http://") != 0 && fn.Find(L"https://") != 0) {
+	CUrlParser urlParser;
+	if (!urlParser.Parse(lpszFileName)) {
 		return __super::Open(lpszFileName);
 	}
+
+	CStringW fn(lpszFileName);
 
 	CHTTPAsync HTTPAsync;
 	if (SUCCEEDED(HTTPAsync.Connect(lpszFileName, http::connectTimeout))) {
