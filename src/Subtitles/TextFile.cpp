@@ -127,22 +127,23 @@ bool CTextFile::Open(LPCWSTR lpszFileName)
 			&is_reliable);
 		switch (encoding) {
 			// TODO - Add more encodings to the list.
-			case MSFT_CP1250:    m_encoding = 1250;  break;
-			case RUSSIAN_CP1251: m_encoding = 1251;  break;
-			case RUSSIAN_KOI8_R: m_encoding = 21866; break;
-			case RUSSIAN_CP866:  m_encoding = 866;   break;
-			case MSFT_CP1252:    m_encoding = 1252;  break;
-			case MSFT_CP1253:    m_encoding = 1253;  break;
-			case MSFT_CP1254:    m_encoding = 1254;  break;
-			case MSFT_CP1255:    m_encoding = 1255;  break;
-			case MSFT_CP1256:    m_encoding = 1256;  break;
-			case MSFT_CP1257:    m_encoding = 1257;  break;
-			case MSFT_CP874:     m_encoding = 874;   break;
-			case JAPANESE_CP932: m_encoding = 932;   break;
-			case CHINESE_GB:     m_encoding = 936;   break;
-			case KOREAN_EUC_KR:  m_encoding = 949;   break;
-			case CHINESE_BIG5:   m_encoding = 950;   break;
-			case GB18030:        m_encoding = 54936; break;
+			case MSFT_CP1250:        m_encoding = 1250;  break;
+			case RUSSIAN_CP1251:     m_encoding = 1251;  break;
+			case RUSSIAN_KOI8_R:     m_encoding = 21866; break;
+			case RUSSIAN_CP866:      m_encoding = 866;   break;
+			case MSFT_CP1252:        m_encoding = 1252;  break;
+			case MSFT_CP1253:        m_encoding = 1253;  break;
+			case MSFT_CP1254:        m_encoding = 1254;  break;
+			case MSFT_CP1255:        m_encoding = 1255;  break;
+			case MSFT_CP1256:        m_encoding = 1256;  break;
+			case MSFT_CP1257:        m_encoding = 1257;  break;
+			case MSFT_CP874:         m_encoding = 874;   break;
+			case JAPANESE_CP932:     m_encoding = 932;   break;
+			case CHINESE_GB:         m_encoding = 936;   break;
+			case KOREAN_EUC_KR:      m_encoding = 949;   break;
+			case CHINESE_BIG5:       m_encoding = 950;   break;
+			case GB18030:            m_encoding = 54936; break;
+			case JAPANESE_SHIFT_JIS: m_encoding = 932;   break;
 		}
 	}
 
