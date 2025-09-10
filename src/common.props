@@ -59,7 +59,8 @@
     </ResourceCompile>
     <Link>
       <ImageHasSafeExceptionHandlers Condition="'$(Platform)'=='Win32'">false</ImageHasSafeExceptionHandlers>
-      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
+      <GenerateDebugInformation Condition="'$(VisualStudioVersion)' != '18.0'">DebugFastLink</GenerateDebugInformation>
+      <GenerateDebugInformation Condition="'$(VisualStudioVersion)' == '18.0'">true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="$(Configuration.Contains('Release'))">
