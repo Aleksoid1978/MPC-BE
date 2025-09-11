@@ -522,8 +522,8 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 12		"Ne töltsön beágyazott feliratokat"
 13		"A feliratfájlok automatikus újratöltése a módosítás észlelése után"
 15		"A Subresync használata"
-17		"Default code page:"
-19		"Automatically detect code page"
+17		"Alapértelmezett kódlap:"
+19		"Kódlap automatikus észlelése"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
