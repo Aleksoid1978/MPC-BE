@@ -14,10 +14,14 @@ Added support for multiple tags.
 MpcAudioRenderer
 Fixed interface display when used in third-party players.
 
+Subtitles
+Improved and optimized work with text in different encodings.
+
 Player
 Increased the maximum size of downloaded M3U playlists to 3 MB.
 Fixed the behavior of the "Pause the video playback when minimized" setting when the "Tray icon" setting is active.
 Remote support for control of the player using uICE (does not work on Windows 7 and newer).
+Added "Default code page" and "Automatically detect code page" settings to the "Subtitles" settings panel.
 
 Updated Japanese translation (by tsubasanouta).
 Updated Romanian translation (by Andrei Miloiu).
