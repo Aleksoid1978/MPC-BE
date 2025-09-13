@@ -33,7 +33,7 @@ Updated Turkish translation (by cmhrky).
 Updated Hungarian translation (by mickey).
 
 Updated libraries:
-	ffmpeg n8.1-dev-376-g7321e4b950.
+	ffmpeg n8.1-dev-415-ga4fd3f27f4.
 
 
 1.8.6 - 2025-08-07

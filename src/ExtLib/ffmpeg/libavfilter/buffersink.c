@@ -181,7 +181,7 @@ static av_cold int common_init(AVFilterContext *ctx)
 
     if (ctx->input_pads[0].type == AVMEDIA_TYPE_VIDEO) {
         if ((buf->pixel_fmts_size || buf->color_spaces_size || buf->color_ranges_size || buf->alpha_modes_size) &&
-            (buf->nb_pixel_formats || buf->nb_colorspaces || buf->nb_colorranges)) {
+            (buf->nb_pixel_formats || buf->nb_colorspaces || buf->nb_colorranges || buf->nb_alphamodes)) {
             av_log(ctx, AV_LOG_ERROR, "Cannot combine old and new format lists\n");
             return AVERROR(EINVAL);
         }
@@ -400,7 +400,7 @@ static int vsink_query_formats(const AVFilterContext *ctx,
     int ret;
 
 #if FF_API_BUFFERSINK_OPTS
-    if (buf->nb_pixel_formats || buf->nb_colorspaces || buf->nb_colorranges) {
+    if (buf->nb_pixel_formats || buf->nb_colorspaces || buf->nb_colorranges || buf->nb_alphamodes) {
 #endif
         if (buf->nb_pixel_formats) {
             ret = ff_set_common_formats_from_list2(ctx, cfg_in, cfg_out, buf->pixel_formats);
@@ -531,7 +531,6 @@ static const AVOption buffersink_options[] = {
     { "pix_fmts", "set the supported pixel formats",    OFFSET(pixel_fmts),   AV_OPT_TYPE_BINARY, .flags = FLAGS | AV_OPT_FLAG_DEPRECATED },
     { "color_spaces", "set the supported color spaces", OFFSET(color_spaces), AV_OPT_TYPE_BINARY, .flags = FLAGS | AV_OPT_FLAG_DEPRECATED },
     { "color_ranges", "set the supported color ranges", OFFSET(color_ranges), AV_OPT_TYPE_BINARY, .flags = FLAGS | AV_OPT_FLAG_DEPRECATED },
-    { "alpha_modes", "set the supported alpha modes",   OFFSET(alpha_modes),  AV_OPT_TYPE_BINARY, .flags = FLAGS | AV_OPT_FLAG_DEPRECATED },
 #endif
 
     { "pixel_formats",  "array of supported pixel formats", OFFSET(pixel_formats),
