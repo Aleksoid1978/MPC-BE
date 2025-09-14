@@ -438,7 +438,7 @@ static void WebVTT2SSA(CStringW& str) {
 	WebVTT2SSA(str, discard, discardMap);
 }
 
-static bool OpenVTT(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet) {
+static bool OpenVTT(CTextFile* file, CSimpleTextSubtitle& ret) {
 	CStringW buff;
 	file->ReadString(buff);
 	if (buff.Left(6).Compare(L"WEBVTT") != 0) {
@@ -614,7 +614,7 @@ static bool OpenVTT(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet) {
 	return true;
 }
 
-static bool OpenSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
+static bool OpenSubRipper(CTextFile* file, CSimpleTextSubtitle& ret)
 {
 	CStringW buff;
 	bool first_line_success = false;
@@ -679,7 +679,7 @@ static bool OpenSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 	return !ret.IsEmpty();
 }
 
-static bool OpenOldSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
+static bool OpenOldSubRipper(CTextFile* file, CSimpleTextSubtitle& ret)
 {
 	CStringW buff;
 	while (file->ReadString(buff)) {
@@ -711,7 +711,7 @@ static bool OpenOldSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int Char
 	return !ret.IsEmpty();
 }
 
-static bool OpenLRC(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
+static bool OpenLRC(CTextFile* file, CSimpleTextSubtitle& ret)
 {
 	CString buff;
 
@@ -812,7 +812,7 @@ static CString TTML2SSA(CString str)
 	return str;
 }
 
-static bool OpenTTML(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
+static bool OpenTTML(CTextFile* file, CSimpleTextSubtitle& ret)
 {
 	CString buff;
 
@@ -940,7 +940,7 @@ static bool OpenTTML(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 	return !ret.IsEmpty();
 }
 
-static bool OpenSubViewer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
+static bool OpenSubViewer(CTextFile* file, CSimpleTextSubtitle& ret)
 {
 	STSStyle def;
 	CStringW font, color, size;
@@ -1049,7 +1049,7 @@ static bool OpenSubViewer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 	return !ret.IsEmpty();
 }
 
-static STSStyle* GetMicroDVDStyle(CString str, int CharSet)
+static STSStyle* GetMicroDVDStyle(CString str)
 {
 	STSStyle* ret = DNew STSStyle();
 	if (!ret) {
@@ -1273,7 +1273,7 @@ static CStringW MicroDVD2SSA(CStringW str)
 	return ret;
 }
 
-static bool OpenMicroDVD(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
+static bool OpenMicroDVD(CTextFile* file, CSimpleTextSubtitle& ret)
 {
 	bool fCheck = false, fCheck2 = false;
 
@@ -1298,13 +1298,12 @@ static bool OpenMicroDVD(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 		if (c != 2) {
 			int i;
 			if (buff.Find(L'{') == 0 && (i = buff.Find(L'}')) > 1 && i < buff.GetLength()) {
-				if (STSStyle* s = GetMicroDVDStyle(buff.Mid(i+1), CharSet)) {
+				if (STSStyle* s = GetMicroDVDStyle(buff.Mid(i+1))) {
 					style = buff.Mid(1, i-1);
 					if (style.GetLength()) {
 						style = style.Left(1).MakeUpper() + style.Mid(1).MakeLower();
 					}
 					ret.AddStyle(style, s);
-					CharSet = s->charSet;
 					continue;
 				}
 			}
@@ -1371,7 +1370,7 @@ static int FindNoCase(LPCWSTR pszString, LPCWSTR pszSearch)
 	return -1;
 }
 
-static CStringW SMI2SSA(CStringW str, int CharSet)
+static CStringW SMI2SSA(CStringW str)
 {
 	ReplaceNoCase(str, L"&nbsp;", L" ");
 	ReplaceNoCase(str, L"&quot;", L"\"");
@@ -1458,7 +1457,7 @@ static CStringW SMI2SSA(CStringW str, int CharSet)
 	return str;
 }
 
-static bool OpenSami(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
+static bool OpenSami(CTextFile* file, CSimpleTextSubtitle& ret)
 {
 	CStringW buff, samiBuff;
 
@@ -1516,7 +1515,7 @@ static bool OpenSami(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 
 					if (end_time > start_time) {
 						ret.Add(
-							SMI2SSA(samiBuff, CharSet),
+							SMI2SSA(samiBuff),
 							start_time, end_time);
 					}
 				}
@@ -1535,7 +1534,7 @@ static bool OpenSami(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 	return true;
 }
 
-static bool OpenVPlayer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
+static bool OpenVPlayer(CTextFile* file, CSimpleTextSubtitle& ret)
 {
 	CStringW buff;
 	while (file->ReadString(buff)) {
@@ -1753,7 +1752,7 @@ static bool LoadUUEFont(CTextFile* file)
 	return cnt ? true : false;
 }
 
-static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
+static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret)
 {
 	bool bRet = false;
 
@@ -1904,7 +1903,8 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 
 					ret.AddStyle(StyleName, style);
 				} catch (...) {
-					ret.CreateDefaultStyle(CharSet);
+					UINT charSet = CodePageToCharSet(file->GetEncoding());
+					ret.CreateDefaultStyle(charSet);
 				}
 			}
 		} else if (entry == L"playresx") {
@@ -2004,7 +2004,7 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 	return bRet;
 }
 
-static bool OpenXombieSub(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
+static bool OpenXombieSub(CTextFile* file, CSimpleTextSubtitle& ret)
 {
 	//	CMapStringToPtr stylemap;
 
@@ -2144,7 +2144,7 @@ static bool OpenXombieSub(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 	return !ret.IsEmpty();
 }
 
-static bool OpenUSF(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
+static bool OpenUSF(CTextFile* file, CSimpleTextSubtitle& ret)
 {
 	CString str;
 	while (file->ReadString(str)) {
@@ -2172,7 +2172,7 @@ static CStringW MPL22SSA(CStringW str)
 	return MicroDVD2SSA(str);
 }
 
-static bool OpenMPL2(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
+static bool OpenMPL2(CTextFile* file, CSimpleTextSubtitle& ret)
 {
 	CStringW buff;
 	while (file->ReadString(buff)) {
@@ -2196,9 +2196,9 @@ static bool OpenMPL2(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 	return !ret.IsEmpty();
 }
 
-typedef bool (*STSOpenFunct)(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet);
+typedef bool (*STSOpenFunct)(CTextFile* file, CSimpleTextSubtitle& ret);
 
-static bool OpenRealText(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet);
+static bool OpenRealText(CTextFile* file, CSimpleTextSubtitle& ret);
 
 struct OpenFunctStruct {
 	Subtitle::SubType type;
@@ -3076,7 +3076,7 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, const CString& name)
 	ULONGLONG pos = f->GetPosition();
 
 	for (const auto& OpenFunct : s_OpenFuncts) {
-		if (!OpenFunct.open(f, *this, charSet)) {
+		if (!OpenFunct.open(f, *this)) {
 			if (!IsEmpty()) {
 				CString lastLine;
 				size_t n = CountLines(f, pos, f->GetPosition(), lastLine);
@@ -3102,7 +3102,7 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, const CString& name)
 
 		CWebTextFile f2(CP_UTF8);
 		if (f2.Open(f->GetFilePath() + L".style")) {
-			OpenSubStationAlpha(&f2, *this, charSet);
+			OpenSubStationAlpha(&f2, *this);
 			f2.Close();
 		}
 
@@ -3579,7 +3579,7 @@ STSStyle& operator <<= (STSStyle& s, const CString& style)
 	return s;
 }
 
-static bool OpenRealText(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
+static bool OpenRealText(CTextFile* file, CSimpleTextSubtitle& ret)
 {
 	std::wstring szFile;
 	CStringW buff;
