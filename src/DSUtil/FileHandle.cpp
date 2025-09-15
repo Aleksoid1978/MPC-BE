@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2024 see Authors.txt
+ * (C) 2011-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -388,6 +388,20 @@ bool CFileGetStatus(LPCWSTR lpszFileName, CFileStatus& status)
 		e->Delete();
 		return false;
 	}
+}
+
+CStringW GetDriveLabel(WCHAR drive)
+{
+	CStringW label;
+
+	WCHAR path[] = { drive , L':', L'\\', 0 };
+	WCHAR VolumeNameBuffer[MAX_PATH + 1];
+
+	if (GetVolumeInformationW(path, VolumeNameBuffer, std::size(VolumeNameBuffer), nullptr, nullptr, nullptr, nullptr, 0)) {
+		label = VolumeNameBuffer;
+	}
+
+	return label;
 }
 
 /////

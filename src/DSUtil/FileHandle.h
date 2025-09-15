@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2024 see Authors.txt
+ * (C) 2011-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -82,6 +82,8 @@ CStringW GetFullExePath(const CStringW exePath, const bool bLookAppPaths);
 void CleanPath(CStringW& path);
 
 bool CFileGetStatus(LPCWSTR lpszFileName, CFileStatus& status);
+
+CStringW GetDriveLabel(WCHAR drive);
 
 /////
 

@@ -918,23 +918,6 @@ cdrom_t GetCDROMType(WCHAR drive, std::list<CString>& files)
 	return CDROM_NotFound;
 }
 
-CString GetDriveLabel(WCHAR drive)
-{
-	CString label;
-
-	CString path;
-	path.Format(L"%c:\\", drive);
-	WCHAR VolumeNameBuffer[MAX_PATH], FileSystemNameBuffer[MAX_PATH];
-	DWORD VolumeSerialNumber, MaximumComponentLength, FileSystemFlags;
-	if (GetVolumeInformationW(path,
-							 VolumeNameBuffer, MAX_PATH, &VolumeSerialNumber, &MaximumComponentLength,
-							 &FileSystemFlags, FileSystemNameBuffer, MAX_PATH)) {
-		label = VolumeNameBuffer;
-	}
-
-	return label;
-}
-
 TimeCode_t ReftimeToTimecode(REFERENCE_TIME rt)
 {
 	TimeCode_t timecode;

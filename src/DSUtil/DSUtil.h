@@ -95,7 +95,6 @@ enum cdrom_t {
 	CDROM_Unknown
 };
 extern cdrom_t			GetCDROMType(WCHAR drive, std::list<CString>& files);
-extern CString			GetDriveLabel(WCHAR drive);
 
 inline bool				HourOrMore(const REFERENCE_TIME rt) { return (rt > UNITS * 3600); };
 TimeCode_t				ReftimeToTimecode(const REFERENCE_TIME rt);
