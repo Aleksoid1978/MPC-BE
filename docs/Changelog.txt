@@ -23,6 +23,10 @@ Fixed the behavior of the "Pause the video playback when minimized" setting when
 Remote support for control of the player using uICE (does not work on Windows 7 and newer).
 Added "Default code page" and "Automatically detect code page" settings to the "Subtitles" settings panel.
 
+Installer
+Updated MPC Video Renderer 0.9.13.
+Updated MPC Script Source 0.2.11.
+
 Updated Japanese translation (by tsubasanouta).
 Updated Romanian translation (by Andrei Miloiu).
 Updated German translation (by Klaus1189).

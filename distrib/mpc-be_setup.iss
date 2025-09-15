@@ -68,8 +68,8 @@
   #define Description  = app_name + " x64 " + app_version
   #define VisualElementsManifest = "VisualElements\mpc-be64.VisualElementsManifest.xml"
 #endif
-#define mpcvr_desc     = "MPC Video Renderer 0.9.11"
-#define mpcscriptsrc_desc = "MPC Script Source 0.2.9"
+#define mpcvr_desc     = "MPC Video Renderer 0.9.13"
+#define mpcscriptsrc_desc = "MPC Script Source 0.2.11"
 
 [Setup]
 #ifdef Win32Build
