@@ -21,7 +21,6 @@
 
 #include "stdafx.h"
 #include <Vfw.h>
-#include <winddk/ntddcdrm.h>
 #include "DSUtil.h"
 #include "Mpeg2Def.h"
 #include "AudioParser.h"
@@ -815,107 +814,6 @@ CString BinToCString(const BYTE* ptr, size_t len)
 	}
 
 	return ret;
-}
-
-static void FindFiles(CString fn, std::list<CString>& files)
-{
-	CString path = fn;
-	path.Replace('/', '\\');
-	path.Truncate(path.ReverseFind('\\')+1);
-
-	WIN32_FIND_DATA findData;
-	HANDLE h = FindFirstFileW(fn, &findData);
-	if (h != INVALID_HANDLE_VALUE) {
-		do {
-			files.push_back(path + findData.cFileName);
-		} while (FindNextFileW(h, &findData));
-
-		FindClose(h);
-	}
-}
-
-cdrom_t GetCDROMType(WCHAR drive, std::list<CString>& files)
-{
-	files.clear();
-
-	CString path;
-	path.Format(L"%c:", drive);
-
-	if (GetDriveTypeW(path + L"\\") == DRIVE_CDROM) {
-		// Check if it contains a disc
-		HANDLE hDevice = CreateFileW(LR"(\\.\)" + path, FILE_READ_ATTRIBUTES,
-									 FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
-		if (hDevice == INVALID_HANDLE_VALUE) {
-			return CDROM_Unknown;
-		}
-		DWORD cbBytesReturned = {};
-		BOOL bSuccess = DeviceIoControl(hDevice, IOCTL_STORAGE_CHECK_VERIFY2,
-										nullptr, 0, nullptr, 0, &cbBytesReturned, nullptr);
-		CloseHandle(hDevice);
-		if (!bSuccess) {
-			return CDROM_Unknown;
-		}
-
-		// CDROM_DVDVideo
-		FindFiles(path + L"\\VIDEO_TS\\VIDEO_TS.IFO", files);
-		if (files.size() > 0) {
-			return CDROM_DVDVideo;
-		}
-
-		// CDROM_DVDAudio
-		FindFiles(path + L"\\AUDIO_TS\\ATS_0?_0.IFO", files);
-		if (files.size() > 0) {
-			return CDROM_DVDAudio;
-		}
-
-		// CDROM_BD
-		FindFiles(path + L"\\BDMV\\index.bdmv", files);
-		if (!files.empty()) {
-			return CDROM_BDVideo;
-		}
-
-		// CDROM_VideoCD
-		FindFiles(path + L"\\mpegav\\avseq??.dat", files);
-		FindFiles(path + L"\\mpegav\\avseq??.mpg", files);
-		FindFiles(path + L"\\mpegav\\music??.dat", files);
-		FindFiles(path + L"\\mpegav\\music??.mpg", files);
-		FindFiles(path + L"\\mpeg2\\avseq??.dat",  files);
-		FindFiles(path + L"\\mpeg2\\avseq??.mpg",  files);
-		FindFiles(path + L"\\mpeg2\\music??.dat",  files);
-		FindFiles(path + L"\\mpeg2\\music??.mpg",  files);
-		if (files.size() > 0) {
-			return CDROM_VideoCD;
-		}
-
-		// CDROM_Audio
-		HANDLE hDrive = CreateFileW(CString(L"\\\\.\\") + path, GENERIC_READ, FILE_SHARE_READ, nullptr,
-								   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)nullptr);
-		if (hDrive != INVALID_HANDLE_VALUE) {
-			DWORD BytesReturned;
-			CDROM_TOC TOC;
-			if (DeviceIoControl(hDrive, IOCTL_CDROM_READ_TOC, nullptr, 0, &TOC, sizeof(TOC), &BytesReturned, 0)) {
-				for (int i = TOC.FirstTrack; i <= TOC.LastTrack; i++) {
-					// MMC-3 Draft Revision 10g: Table 222 - Q Sub-channel control field
-					TOC.TrackData[i-1].Control &= 5;
-					if (TOC.TrackData[i-1].Control == 0 || TOC.TrackData[i-1].Control == 1) {
-						CString fn;
-						fn.Format(L"%s\\track%02d.cda", path, i);
-						files.push_back(fn);
-					}
-				}
-			}
-
-			CloseHandle(hDrive);
-		}
-		if (files.size() > 0) {
-			return CDROM_Audio;
-		}
-
-		// it is a cdrom but nothing special
-		return CDROM_Unknown;
-	}
-
-	return CDROM_NotFound;
 }
 
 TimeCode_t ReftimeToTimecode(REFERENCE_TIME rt)

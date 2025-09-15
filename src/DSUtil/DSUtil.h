@@ -85,17 +85,6 @@ extern HRESULT			CheckFilterCLSID(const CLSID& clsid);
 extern void				CStringToBin(CString str, std::vector<BYTE>& data);
 extern CString			BinToCString(const BYTE* ptr, size_t len);
 
-enum cdrom_t {
-	CDROM_NotFound,
-	CDROM_Audio,
-	CDROM_VideoCD,
-	CDROM_DVDVideo,
-	CDROM_BDVideo,
-	CDROM_DVDAudio,
-	CDROM_Unknown
-};
-extern cdrom_t			GetCDROMType(WCHAR drive, std::list<CString>& files);
-
 inline bool				HourOrMore(const REFERENCE_TIME rt) { return (rt > UNITS * 3600); };
 TimeCode_t				ReftimeToTimecode(const REFERENCE_TIME rt);
 TimeCode_t				ReftimeToHMS(const REFERENCE_TIME rt); // seconds rounded to the nearest value

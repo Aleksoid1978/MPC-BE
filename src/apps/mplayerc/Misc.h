@@ -58,6 +58,17 @@ COLORREF ThemeRGB(const int iR, const int iG, const int iB);
 const LPCWSTR MonospaceFonts[] = {L"Consolas", L"Lucida Console", L"Courier New", L"" };
 bool IsFontInstalled(LPCWSTR lpszFont);
 
+enum cdrom_t {
+	CDROM_NotFound,
+	CDROM_Audio,
+	CDROM_VideoCD,
+	CDROM_DVDVideo,
+	CDROM_BDVideo,
+	CDROM_DVDAudio,
+	CDROM_Unknown
+};
+cdrom_t GetCDROMType(const WCHAR drive, std::list<CStringW>& files);
+
 //
 // CMPCGradient
 //
