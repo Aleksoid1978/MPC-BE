@@ -34,7 +34,6 @@
 #include "DSUtil/FileHandle.h"
 #include "DSUtil/FileVersion.h"
 #include "DSUtil/GUIDString.h"
-#include <winddk/ntddcdvd.h>
 #include <ExtLib/Detours/src/detours.h>
 #include <afxsock.h>
 #include "UpdateChecker.h"
