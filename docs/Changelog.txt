@@ -16,6 +16,7 @@ Fixed interface display when used in third-party players.
 
 Subtitles
 Improved and optimized work with text in different encodings.
+Fixed backward navigation for external PGS subtitles.
 
 Player
 Increased the maximum size of downloaded M3U playlists to 3 MB.
