@@ -1262,7 +1262,7 @@ namespace AV1Parser {
 	constexpr auto AVCOL_SPC_RGB            = 0;
 	constexpr auto AVCOL_SPC_UNSPECIFIED    = 2;
 
-	bool ParseSequenceHeader(AV1SequenceParameters& seq_params, const BYTE* buf, const int buf_size) {
+	static bool ParseSequenceHeader(AV1SequenceParameters& seq_params, const BYTE* buf, const int buf_size) {
 		auto uvlc = [](CGolombBuffer& gb) {
 			auto leading_zeros = 0u;
 
@@ -1444,7 +1444,8 @@ namespace AV1Parser {
 
 		gb.BitRead(1); // film_grain_params_present
 
-		return gb.RemainingSize() == 0;
+		auto remainingSize = gb.RemainingSize();
+		return (remainingSize == 0 || remainingSize == 1);
 	};
 
 	static int64_t ParseOBUHeader(const BYTE* buf, const int buf_size, int64_t& obu_size, int& start_pos, uint8_t& obu_type)
