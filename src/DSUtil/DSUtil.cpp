@@ -695,15 +695,6 @@ void ExtractMediaTypes(IPin* pPin, std::list<CMediaType>& mts)
 	EndEnumMediaTypes(pmt)
 }
 
-int Eval_Exception(int n_except)
-{
-	if (n_except == STATUS_ACCESS_VIOLATION) {
-		AfxMessageBox(L"The property page of this filter has just caused a\nmemory access violation. The application will gently die now :)");
-	}
-
-	return EXCEPTION_CONTINUE_SEARCH;
-}
-
 CLSID GetCLSID(IBaseFilter* pBF)
 {
 	CLSID clsid = GUID_NULL;
