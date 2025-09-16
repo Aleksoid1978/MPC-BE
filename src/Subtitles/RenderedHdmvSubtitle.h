@@ -77,5 +77,7 @@ private :
 	bool m_bStopParsing = false;
 	std::thread m_parsingThread;
 
+	bool m_bLoadFromFile = false;
+
 	void ParseFile(const CString& fn);
 };

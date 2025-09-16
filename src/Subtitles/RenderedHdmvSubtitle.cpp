@@ -57,6 +57,7 @@ CRenderedHdmvSubtitle::CRenderedHdmvSubtitle(CCritSec* pLock)
 	, m_lcid(0)
 	, m_nType(ST_HDMV)
 	, m_pSub(nullptr)
+	, m_bLoadFromFile(true)
 {
 }
 
@@ -122,7 +123,10 @@ STDMETHODIMP CRenderedHdmvSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 	CAutoLock cAutoLock(&m_csCritSec);
 
 	const HRESULT hr = m_pSub->Render(spd, rt, bbox);
-	m_pSub->CleanOld(rt - 60*10000000i64); // Cleanup subtitles older than 1 minute ...
+
+	if (!m_bLoadFromFile) {
+		m_pSub->CleanOld(rt - 60*10000000i64); // Cleanup subtitles older than 1 minute ...
+	}
 
 	return hr;
 }
