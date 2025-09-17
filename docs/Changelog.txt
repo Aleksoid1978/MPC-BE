@@ -1,6 +1,6 @@
 ﻿This file includes only a short list of the changes between Media Player Classic - BE's versions.
 
-1.8.6.x dev
+1.8.7 - 2025-09-17
 =============================
 MpaSplitter
 Improved work with files that have several tags of different formats.
