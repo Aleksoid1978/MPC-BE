@@ -49,6 +49,7 @@ extern "C" {
 #define MPC_FAVORITES_FILENAME "favorites.mpc_lst"
 
 const LanguageResource CMPlayerCApp::languageResources[] = {
+	{ID_LANGUAGE_ARABIC,				1025,	L"Arabic",					L"ar",	L"ara"},
 	{ID_LANGUAGE_ARMENIAN,				1067,	L"Armenian",				L"hy",	L"arm"},
 	{ID_LANGUAGE_BASQUE,				1069,	L"Basque",					L"eu",	L"baq"},
 	{ID_LANGUAGE_BELARUSIAN,			1059,	L"Belarusian",				L"by",	L"bel"},

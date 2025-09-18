@@ -1,5 +1,5 @@
 @ECHO OFF
-REM (C) 2009-2024 see Authors.txt
+REM (C) 2009-2025 see Authors.txt
 REM
 REM This file is part of MPC-BE.
 REM
@@ -316,7 +316,7 @@ IF /I "%BUILDCFG%" == "Debug" (
 EXIT /B
 )
 
-FOR %%A IN ("Armenian" "Basque" "Belarusian" "Bulgarian" "Catalan" "Chinese Simplified"
+FOR %%A IN ("Arabic" "Armenian" "Basque" "Belarusian" "Bulgarian" "Catalan" "Chinese Simplified"
  "Chinese Traditional" "Czech" "Croatian" "Dutch" "French" "German" "Greek" "Hebrew" "Hungarian"
  "Italian" "Japanese" "Korean" "Polish" "Portuguese" "Romanian" "Russian" "Slovak" "Slovenian" "Spanish"
  "Swedish" "Turkish" "Ukrainian"

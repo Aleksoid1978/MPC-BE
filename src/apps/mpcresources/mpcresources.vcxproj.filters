@@ -15,6 +15,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="mplayerc.ar.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
     <ResourceCompile Include="mplayerc.bg.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
