@@ -45,9 +45,9 @@ BEGIN
     "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
     "\r\n"
     "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
-    "LANGUAGE LANG_POLISH, SUBLANG_DEFAULT\r\n"
-    "#pragma code_page(1250)\r\n"
-    "#include ""afxres.rc""   // Standard components\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""afxres.rc""     // Standard components\r\n"
     "#endif\0"
 END
 
@@ -3965,9 +3965,9 @@ END
 #define _AFX_NO_PROPERTY_RESOURCES
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
-#pragma code_page(1250)
-#include "afxres.rc"   // Standard components
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "afxres.rc"     // Standard components
 #endif
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
