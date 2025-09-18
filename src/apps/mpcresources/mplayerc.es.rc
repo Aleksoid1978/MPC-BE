@@ -16,10 +16,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Spanish (Neutral) resources
+// Spanish resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESN)
-LANGUAGE LANG_SPANISH, SUBLANG_NEUTRAL
+LANGUAGE LANG_SPANISH, SUBLANG_DEFAULT
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

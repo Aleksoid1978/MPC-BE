@@ -16,10 +16,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Catalan (unknown sub-lang: 0x0) resources
+// Catalan resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CAT)
-LANGUAGE LANG_CATALAN, 0x0
+LANGUAGE LANG_CATALAN, SUBLANG_DEFAULT
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

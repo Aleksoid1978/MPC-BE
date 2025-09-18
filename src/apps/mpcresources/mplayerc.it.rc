@@ -16,10 +16,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Italian (Neutral) resources
+// Italian resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ITA)
-LANGUAGE LANG_ITALIAN, SUBLANG_NEUTRAL
+LANGUAGE LANG_ITALIAN, SUBLANG_DEFAULT
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

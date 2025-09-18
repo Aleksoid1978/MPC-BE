@@ -19,7 +19,7 @@
 // Bulgarian resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_BGR)
-LANGUAGE LANG_BULGARIAN, SUBLANG_NEUTRAL
+LANGUAGE LANG_BULGARIAN, SUBLANG_DEFAULT
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

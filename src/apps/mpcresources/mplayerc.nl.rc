@@ -16,10 +16,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Dutch (Neutral) resources
+// Dutch resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLD)
-LANGUAGE LANG_DUTCH, SUBLANG_NEUTRAL
+LANGUAGE LANG_DUTCH, SUBLANG_DEFAULT
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
