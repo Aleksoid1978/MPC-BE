@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -48,7 +48,7 @@ void CRegFilterChooserDlg::AddToList(IMoniker* pMoniker)
 		CComVariant var;
 		if (SUCCEEDED(pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr))) {
 			CComVariant var2;
-			if (SUCCEEDED(pPB->Read(_T("CLSID"), &var2, nullptr))) {
+			if (SUCCEEDED(pPB->Read(L"CLSID", &var2, nullptr))) {
 				CStringW clsid(var2.bstrVal);
 				if (!clsid.IsEmpty() && IsSupportedExternalVideoRenderer(GUIDFromCString(clsid))) {
 					return;
