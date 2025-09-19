@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2024 see Authors.txt
+ * (C) 2012-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,12 +25,7 @@
 
 static String mi_get_lang_file()
 {
-	HINSTANCE mpcres = nullptr;
-	int lang = AfxGetAppSettings().iLanguage;
-
-	if (lang) {
-		mpcres = LoadLibraryW(CMPlayerCApp::GetSatelliteDll(lang));
-	}
+	HINSTANCE mpcres = LoadLibraryW(CMPlayerCApp::GetSatelliteDll(AfxGetAppSettings().iLanguage));
 
 	String str = L"  Config_Text_ColumnSize;30";
 	if (mpcres) {
