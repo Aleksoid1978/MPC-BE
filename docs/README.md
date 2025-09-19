@@ -42,6 +42,7 @@ MPC-BE makes use of the following 3rd party code:
 | Bento4            | GPLv2               | https://www.bento4.com/                               |
 | CFileVersionInfo  |                     |                                                       |
 | CLineNumberEdit   |                     |                                                       |
+| compact_enc_det   | Apache-2.0 license  | https://github.com/google/compact_enc_det             |
 | coolsb            |                     | https://www.codeproject.com/KB/dialog/coolscroll.aspx |
 | CSizingControlBar | GPLv2               | http://datamekanix.com/sizecbar/                      |
 | Detours           | MIT License         | https://github.com/microsoft/detours/                 |
