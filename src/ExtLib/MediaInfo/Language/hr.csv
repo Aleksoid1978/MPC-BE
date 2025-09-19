@@ -1,0 +1,1426 @@
+  Language_ISO639;hr
+  Author_Email;domazd@mail.ru
+  Author_Name;Dominko Aždajić
+  Author_OldNames;Dominko Aždajić
+  Language_Name;Hrvatski
+  Config_Text_ColumnSize;40
+  Config_Text_Separator; : 
+  Config_Text_NumberTag; #
+  Config_Text_FloatSeparator;,
+  Config_Text_ThousandsSeparator; .
+ audio stream1; protok zvuka
+ audio stream2; protoka zvuka
+ audio stream3; protoci zvuka
+ bit1; bit
+ bit2; bita
+ bit3; bita
+ bps; b/s
+ Bps; B/s
+ Byte1; bajt
+ Byte2; bajta
+ Byte3; bajta
+ channel1; kanal
+ channel2; kanala
+ channel3; kanala
+ chapter1; poglavlje
+ chapter2; poglavlja
+ chapter3; poglavlja
+ chapters stream1; tok poglavlja
+ chapters stream2; toka poglavlja
+ chapters stream3; tokova poglavlja
+ character1;
+ character2;
+ character3;
+ day1; dan
+ day2; dana
+ day3; dana
+ dB0;
+ dB1; dB
+ dB2; dB
+ dB3; dB
+ file1; datoteka
+ file2; datoteke
+ file3; datoteke
+ fps1; FPS
+ fps2; FPS
+ fps3; FPS
+ frame1; sličica
+ frame2; sličice
+ frame3; sličice
+ GB; GB
+ Gb; Gb
+ Gbps; Gb/s
+ GBps; GB/s
+ GHz; GHz
+ GiB; GiB
+ GibiByte1; GibiBytes
+ GibiByte2; GibiBytes
+ GibiByte3; GibiBytes
+ GiBps; GiB/s
+ GigaBit1; GigaBit
+ GigaBit2; GigaBits
+ GigaBit3; GigaBits
+ GigaByte1; GigaByte
+ GigaByte2; GigaBytes
+ GigaByte3; GigaBytes
+ hour1; sat
+ hour2; sata
+ hour3; sata
+ Hz; Hz
+ image stream1; tok slike
+ image stream2; toka slike
+ image stream3; toka slike
+ KB; kB
+ Kb; kb
+ KBps; kB/s
+ Kbps; kb/s
+ KHz; kHz
+ KiB; KiB
+ KibiBit1; KibiBit
+ KibiBit2; KibiBits
+ KibiBit3; KibiBits
+ KibiByte1; KibiByte
+ KibiByte2; KibiBytes
+ KibiByte3; KibiBytes
+ KiBps; KiB/s
+ KiloBit1; KiloBit
+ KiloBit2; KiloBits
+ KiloBit3; KiloBits
+ KiloByte1; KiloByte
+ KiloByte2; KiloBytes
+ KiloByte3; KiloBytes
+ MB; MB
+ Mb; Mb
+ Mbps; Mb/s
+ MBps; MebiBytes
+ MebiBit1; MebiBit
+ MebiBit2; MebiBits
+ MebiBit3; MebiBits
+ MebiByte1; MebiByte
+ MebiByte2; MebiBytes
+ MebiByte3; MebiBytes
+ MegaBit1; MegaBit
+ MegaBit2; MegaBits
+ MegaBit3; MegaBits
+ MegaByte1; MegaByte
+ MegaByte2; MegaBytes
+ MegaByte3; MegaBytes
+ MHz; MHz
+ MiB; MiB
+ Mib; Mib
+ MiBps; MiB/s
+ millisecond1; millisecond
+ millisecond2; milliseconds
+ millisecond3; milliseconds
+ minute1; minuta
+ minute2; minute
+ minute3; minute
+ month1; mjesec
+ month2; mjeseca
+ month3; mjeseca
+ object1;
+ object2;
+ object3;
+ pixel1; piksel
+ pixel2; piksela
+ pixel3; piksela
+ second1; sekunda
+ second2; seekunde
+ second3; sekunde
+ slice per frame1;
+ slice per frame2;
+ slice per frame3;
+ text stream1; protok teksta
+ text stream2; protoka teksta
+ text stream3; protoci teksta
+ video frames1; video-sličica
+ video frames2; video-sličice
+ video frames3; video-sličice
+ video stream1; tok slike
+ video stream2; toka slike
+ video stream3; toka slike
+ warppoint0;Nema točki izobličavanja
+ warppoint1; točka izobličavanja
+ warppoint2; točke izobličavanja
+ warppoint3; točke izobličavanja
+ week1; tjedan
+ week2; tjedna
+ week3; tjedna
+ year1; godina
+ year2; godine
+ year3; godine
+, ;, 
+: ;: 
+3D;
+3DType;
+5.1.2ch;
+5.1.4ch;
+5.1ch;
+608_Mode;
+7.1.2ch;
+7.1ch;
+About;O programu...
+About_Hint;Kontakt i pronalaženje posljednje inačice
+Accompaniment;Pratnja
+Active_DisplayAspectRatio;
+Active_Height;
+Active_Width;
+ActiveFormatDescription;
+ActiveFormatDescription_MuxingMode;
+Actor;Glumac
+Actor_Character;Uloga
+Add creation date to text output;
+Add version to text output;
+Added_Date;Dodano dana
+Address;Adresa
+AdID;
+ADM: Show ChannelFormats;
+ADM: Show TrackUIDs;
+AdmProfile;
+Advanced;Prošireno
+Advanced mode;Prošireni način
+Advanced mode -->;
+Album;Album
+Album_ReplayGain_Gain;Pojačavanje izvedbe albuma
+Album_ReplayGain_Peak;Vrhunac pojačanog zvuka izvedbe albuma
+Alignment;Usmjerenje
+Alignment_Aligned;Usmjerenje sukladno čimbeniku 'interleave'
+Alignment_Split;Rasporediti preko interleavea
+All;Sve
+AlternateGroup;
+App_About;Više o aplikaciji MediaInfo
+App_Hide;Sakrij MediaInfo
+App_Quit;Zatvori MediaInfo
+Archival_Location;Mjesto pohranjivanja
+Arranger;Aranžer
+ArtDirector;Umjetnički ravnatelj
+AspectRatio;Omjer stranica slike
+AssistantDirector;Pomoćnik ravnatelja
+AssociatedVideo_FrameRate;
+at;pri
+At least one file;(Morate otvoriti bar jednu datoteku)
+Attachments;
+Audio;Audio
+Audio stream(s);Tokovi zvuka
+Audio_Codec_List;Kôdeki zvuka
+Audio_Format_List;
+Audio_Format_WithHint_List;
+Audio_Language_List;
+Audio_No;Nečujno
+Audio1;Prvi zvučni tok
+Audio2;Drugi zvučni tok
+Audio3;
+AudioComments;
+AudioCount;Broj zvučnih tokova
+AudioDescription;
+AudioDescriptionPresent;
+AudioDescriptionType;
+AudioLoudnessStandard;
+AudioRenderingIndication;
+AudioSceneInfoID;
+AudioTrackLayout;
+Author;Autor
+Back4ToBack2;
+Balance_FrontBackListener;
+Balance_FrontBackOverheadFloor;
+BarCode;Crtičasti kôd
+Basic;Osnovno
+Basic_Note;Napomena: za više informacija o ovoj datoteci morate odabrati različite prikaze (tabela, stablo...)
+BedChannelConfiguration;
+BedChannelCount;
+BinauralRenderMode;
+BitDepth;
+BitDepth_Detected;
+BitDepth_Stored;
+BitRate;Stopa protoka podataka
+BitRate_Encoded;
+BitRate_Maximum;Maksimum protoka podataka
+BitRate_Minimum;Minimum protoka podataka
+BitRate_Mode;Način protoka podataka
+BitRate_Mode_CBR;Ustaljeno
+BitRate_Mode_VBR;Promjenjivo
+BitRate_Nominal;Nominalni protok podataka
+Bits-(Pixel*Frame);Bita/(piksela*sličica)
+Bring All to Front;Postavi sve naprijed
+BufferSize;
+Cancel;Poništiti
+CaptionServiceName;
+CatalogNumber;
+Channel(s);Kanali
+Channel(s)_Original;
+ChannelCoded;
+ChannelConfiguration;
+ChannelFormat;
+ChannelLayout;
+ChannelLayout_Original;
+ChannelMode;
+ChannelPositions;Položaj kanala
+ChannelPositions_Original;
+Chapter(s);Poglavlja
+Chapters;Poglavlja
+Chapters stream(s);Tokovi poglavlja
+Chapters_Codec_List;Kôdeki poglavlja
+Chapters_No;Bez poglavlja
+Chapters_Pos_Begin;
+Chapters_Pos_End;
+ChaptersCount;Broj tokova poglavlja
+CharacterSet;
+CheckNewVersion;Provjeriti dostupnost nove inačice
+Choose custom;Izbor po želji zadanih stavki
+Choose custom sheet;Odaberite tabelu
+Choose custom text;Odaberite tekst
+Choose export format;Odaberite izvozni oblik datoteka
+Choose file(s);Odaberite datoteke za otvoriti
+Choose filename;Odaberite naziv datoteke
+Choose language;Odaberite jezik
+Choreographer;Koreograf
+Chroma;Kromatizam
+ChromaSubsampling;
+Classifier;
+ClearList;
+Close;Zatvoriti
+Close all before open;Prije otvaranja sve ostale zatvoriti
+ClosedCaptionsLanguage;
+ClosedCaptionsPresent;
+ClosedCaptionsType;
+CloseWindow;Zatvori prozor
+Codec;Kôdek
+Codec_Description;Opis kôdeka
+Codec_Info;Pojedinosti o kôdeku
+Codec_Profile;Profili kôdeka
+Codec_Settings;Postavke kôdeka
+Codec_Settings_BVOP;Postavke kôdeka za BVOP
+Codec_Settings_CABAC;Postavke kôdeka za CABAC
+Codec_Settings_Endianness;Postavke kôdeka za Endianness
+Codec_Settings_Firm;Postavke kôdeka za Firm
+Codec_Settings_Floor;Postavke kôdeka za Floor
+Codec_Settings_GMC;Postavke kôdeka za GMC
+Codec_Settings_ITU;Postavke kôdeka za ITU
+Codec_Settings_Law;Postavke kôdeka za Law
+Codec_Settings_Matrix;Postavke kôdeka za Matrix
+Codec_Settings_PacketBitStream;Postavke kôdeka za usredotočeni protok podataka
+Codec_Settings_QPel;Postavke kôdeka za QPel
+Codec_Settings_Sign;Postavke kôdeka za Sign
+Codec_Url;Spletna poveznica kôdeka
+CodecConfigurationBox;
+CodecID;ID kôdeka
+CodecID_Description;Opis kôdeka
+CoDirector;
+Collection;Zbirka
+Colorimetry;Kolorimetrija
+ColorSpace;
+ColorTheme;
+ColorTheme_Dark;
+ColorTheme_Light;
+ColorTheme_System;
+colour_primaries;
+colour_range;
+Comment;Komentar
+CommissionedBy;Prema nalogu
+Compilation;
+ComplementaryObject;
+CompleteName;Potpuni naziv
+CompletionDate;
+ComplexityIndex;
+Composer;Skladatelj
+Compression_Mode;
+Compression_Mode_Lossless;
+Compression_Mode_Lossy;
+Compression_Ratio;Omjer sažimanja
+Conductor;Ravnatelj
+ConformanceCheck;
+ConformanceErrors;
+ConformanceInfos;
+ConformanceWarnings;
+ContactEmail;
+ContactTelephoneNumber;
+Container and general information;Oblik spremnika i opće informacije
+Content;
+ContentType;Vrsta sadržaja
+CoProducer;Koproducent
+Copy;Kopiraj
+Copyright;Zaštićeno autorsko pravo
+CopyrightYear;
+CostumeDesigner;Kostimograf
+Count;Broj
+Country;Zemlja
+Cover;Omot
+Cover_Datas;Podatci na omotu
+Cover_Description;Opis omota
+Cover_Mime;MIME omota
+Cover_Type;Vrsta omota
+CoverData;
+Cropped;Omjer reza
+Custom;Vlastito
+CustomDownmixTargets;
+Customize;Prilagoditi
+DarkMode;
+Date;Nadnevak
+Debug;Uklanjanje pogreški
+Decimal point;Decimalna točka
+Default;
+Default translation;
+Default_Setting;
+DefaultTargetDeviceConfig;
+Delay;Zaostajanje
+Delay_Source;
+Delay_Source_Container;
+Delay_Source_Stream;
+Delete;Izbrisati
+Description;Opis
+Details;
+dialnorm;
+DialogueCorrected;
+DialogueEnhancement;
+DialogueNormalization;
+Digitized_Date;Nadnevak digitaliziranja
+Dimensions;Dimenzije
+Director;Režiser
+DirectorOfPhotography;Ravnatelj fotografije
+Disabled;
+DisplayAspectRatio;Omjer slike
+DisplayAspectRatio_CleanAperture;
+DisplayAspectRatio_Original;Izvorni omjer slike
+DisplayCaptions;
+DisplayCaptions_Command;
+DisplayCaptions_Content;
+DisplayCaptions_Stream;
+DistributedBy;Distribucija
+Distributor;
+Documents;
+Dolby_Atmos_Metadata;
+DolbyAtmos;
+Donate;Potpora razvoju MediaInfo
+DotsPerInch;Točaka po palcu (DPI)
+Downmix;
+Downmix_5.1.x;
+Downmix_5to2;
+DrcSets_Count;
+DrcSets_Effects;
+Duration;Trajanje
+Duration_End;Vrijeme svršetka
+Duration_End_Command;
+Duration_Source;
+Duration_Start;Vrijeme početka
+Duration_Start_Command;
+Duration_Start2End;
+DynamicObject;
+DynamicRangeControl;
+Eac3DrcProfile;
+Edit;Uređivanje
+EditedBy;Uredio
+EditorialClassification;
+ElementaryStream;
+ElementCount;
+EMail;E-pošta
+Enable FFmpeg plugin;
+Encoded_Application;Kodirajući program
+Encoded_Date;Nadnevak kodiranja
+Encoded_Library;Kodirano pomoću knjižnice
+Encoded_Library_Name;
+Encoded_Library_Settings;Postavke kodiranja
+Encoded_Library_Version;
+Encoded_Original;Original podržava
+EncodedBy;Kodirao
+EPG_Positions;Položaj EPG-a
+EpisodeTitleNumber;
+Error_File;Pogreška tijekom učitavanja datoteke
+Error_File_Write;
+Events_MinDuration;
+Events_PaintOn;
+Events_PopOn;
+Events_RollUp;
+Events_Total;
+ExecutiveProducer;Izvršni producent
+Exit;Svršetak
+Exit_Hint;Okončati program
+Export;Izvoz
+Export_Hint;Izvoz u odabranom obliku
+Extensions;Uobičajeni nastavci naziva datoteke
+External_Media_NotMounted;
+Family;Obitelj
+Fax;Faks
+File;Datoteka
+File size;Veličina datoteke
+File_Append;Dodati u postojeću datoteku (Pozor: Pripazite na istovjetne parametere!)
+File_Created_Date;Nadnevak stvaranja datoteke
+File_Created_Date_Local;Nadnevak nastanka datoteke (mjesni)
+File_Hint;Odaberite multimedijalnu datoteku za proučiti
+File_Modified_Date;Nadnevak posljednje izmjene datoteke
+File_Modified_Date_Local;Nadnevak zadnje izmjene datoteke (mjesni)
+FileExtension;Nastavak naziva datoteke
+FileName;Naziv datoteke
+FileNameExtension;
+FileSize;Veličina datoteke
+Fill with a Dummy movie;
+Fill with a realistic movie;
+FirstDisplay_Delay_Frames;
+FirstDisplay_Type;
+FirstFrameOfAction;
+FlatPanelTv;
+FlowID;
+Folder;Mapa
+Folder (R);Mapa (R)
+Folder (R)_Hint;Odaberite mapu za promatranje (rekurzivno sa svim mapama)
+Folder (Recursively);Mapa (rekurzivno)
+Folder_Hint;Odaberite mapu za promatranje
+FolderName;Naziv mape
+Forced;
+Format;Oblik datoteke
+Format_AdditionalFeatures;
+Format_Commercial;
+Format_Commercial_IfAny;
+Format_Compression;
+Format_Description;Opis oblika datoteke
+Format_Info;Pojedinosti oblika datoteke
+Format_Level;
+Format_Profile;Profil oblika datoteke
+Format_Settings;Postavke oblika datoteke
+Format_Settings_BVOP;Postavke oblika datoteke za BVOP
+Format_Settings_CABAC;Postavke oblika datoteke za CABAC
+Format_Settings_Emphasis;
+Format_Settings_Endianness;Postavke oblika datoteke za Endianness
+Format_Settings_Firm;Postavke oblika datoteke za Firm
+Format_Settings_Floor;Postavke oblika datoteke za Floor
+Format_Settings_FrameMode;
+Format_Settings_GMC;Postavke oblika datoteke za GMC
+Format_Settings_GOP;
+Format_Settings_ITU;Postavke oblika datoteke za ITU
+Format_Settings_Law;Postavke oblika datoteke za Law
+Format_Settings_Matrix;Postavke oblika datoteke za Matrix
+Format_Settings_Matrix_Custom;Vlastito
+Format_Settings_Matrix_Default;Polazno
+Format_Settings_Mode;
+Format_Settings_ModeExtension;
+Format_Settings_PacketBitStream;Postavke oblika datoteke za paket bitstream
+Format_Settings_PictureStructure;
+Format_Settings_PS;Postavke oblika datoteke za PS
+Format_Settings_Pulldown;Postavke oblika datoteke za Pulldown
+Format_Settings_QPel;Postavke oblika datoteke za QPel
+Format_Settings_RefFrames;Postavke oblika datoteke za RefFrames
+Format_Settings_SBR;Postavke oblika datoteke za SBR
+Format_Settings_Sign;Postavke oblika datoteke za Sign
+Format_Settings_SliceCount;
+Format_Settings_Wrapping;
+Format_Tier;
+Format_Url;Spletna poveznica oblika datoteke
+Format_Version;Inačica oblika datoteke
+FormatDefinition;
+FpaManufacturer;
+FpaPass;
+FpaVersion;
+FrameCount;Broj sličica
+FrameCount_Source;
+FrameRate;Protok sličica
+FrameRate_Den;
+FrameRate_Maximum;Maksimalna stopa protoka sličica
+FrameRate_Minimum;Minimalna stopa protoka sličica
+FrameRate_Mode;Način protoka sličica
+FrameRate_Mode_CFR;Ustaljeno
+FrameRate_Mode_VFR;Izmjenjivo
+FrameRate_Nominal;Nominalna stopa protoka sličica
+FrameRate_Num;
+FrameRate_Original;Izvorna stopa protoka sličica
+FrameRate_Real;
+FullParsing;
+Gallery;
+General;Općenito
+GeneralCompliance;
+Genre;Glazbeni smjer
+Genre_000;Blues
+Genre_001;Klasični rock
+Genre_002;Country
+Genre_003;Dance
+Genre_004;Disco
+Genre_005;Funk
+Genre_006;Grunge
+Genre_007;Hip-Hop
+Genre_008;Jazz
+Genre_009;Metal
+Genre_010;New Age
+Genre_011;Stare stvari
+Genre_012;Ostalo
+Genre_013;Pop
+Genre_014;R&B
+Genre_015;Rap
+Genre_016;Reggae
+Genre_017;Rock
+Genre_018;Techno
+Genre_019;Industrial
+Genre_020;Alternativa
+Genre_021;Ska
+Genre_022;Death Metal
+Genre_023;Pranks
+Genre_024;Soundtrack
+Genre_025;Euro-Techno
+Genre_026;Ambient
+Genre_027;Trip-Hop
+Genre_028;Vocal
+Genre_029;Jazz+Funk
+Genre_030;Fusion
+Genre_031;Trance
+Genre_032;Klasično
+Genre_033;Instrumentalno
+Genre_034;Acid
+Genre_035;House
+Genre_036;Igra
+Genre_037;Sound Clip
+Genre_038;Gospel
+Genre_039;Šum
+Genre_040;AlternRock
+Genre_041;Bass
+Genre_042;Soul
+Genre_043;Punk
+Genre_044;Space
+Genre_045;Meditativno
+Genre_046;Instrumentalni pop
+Genre_047;Instrumentalni rock
+Genre_048;Ethnic
+Genre_049;Gothic
+Genre_050;Darkwave
+Genre_051;Techno-Industrial
+Genre_052;Elektroničko
+Genre_053;Pop-Folk
+Genre_054;Eurodance
+Genre_055;Dream
+Genre_056;Southern Rock
+Genre_057;Komedija
+Genre_058;Cult
+Genre_059;Gangsta
+Genre_060;Top 40
+Genre_061;Christian Rap
+Genre_062;Pop/Funk
+Genre_063;Jungle
+Genre_064;Native American
+Genre_065;Kabaret
+Genre_066;New Wave
+Genre_067;Psychadelic
+Genre_068;Rave
+Genre_069;Priredbene melodije
+Genre_070;Trailer
+Genre_071;Lo-Fi
+Genre_072;Tribal
+Genre_073;Acid Punk
+Genre_074;Acid Jazz
+Genre_075;Polka
+Genre_076;Retro
+Genre_077;Musical
+Genre_078;Rock & Roll
+Genre_079;Hard Rock
+Genre_080;Folk
+Genre_081;Folk-Rock
+Genre_082;National Folk
+Genre_083;Swing
+Genre_084;Fast Fusion
+Genre_085;Bebob
+Genre_086;Latin
+Genre_087;Revival
+Genre_088;Celtic
+Genre_089;Bluegrass
+Genre_090;Avantgarda
+Genre_091;Gotični rock
+Genre_092;Progresivni rock
+Genre_093;Psihodelični rock
+Genre_094;Simfonijski rock
+Genre_095;Lagani rock
+Genre_096;Big Band
+Genre_097;Zbor
+Genre_098;Umirujuće slušanje
+Genre_099;Akustično
+Genre_100;Humoristično
+Genre_101;Govor
+Genre_102;Šansona
+Genre_103;Opera
+Genre_104;Komorna glazba
+Genre_105;Sonata
+Genre_106;Simfonija
+Genre_107;Pojačani bas
+Genre_108;Primus
+Genre_109;Porn Groove
+Genre_110;Satira
+Genre_111;Slow Jam
+Genre_112;Club
+Genre_113;Tango
+Genre_114;Samba
+Genre_115;Folklor
+Genre_116;Balada
+Genre_117;Naglašena balada
+Genre_118;Ritmični Soul
+Genre_119;Slobodni stil
+Genre_120;Duet
+Genre_121;Punk Rock
+Genre_122;Solo udaraljki
+Genre_123;A capella
+Genre_124;Euro-House
+Genre_125;Dance Hall
+Genre_126;Goa
+Genre_127;Udaraljke i bas
+Genre_128;Club-House
+Genre_129;Hardcore
+Genre_130;Terror
+Genre_131;Indie
+Genre_132;Britpop
+Genre_133;Negerpunk
+Genre_134;Polsk Punk
+Genre_135;Beat
+Genre_136;Christian Gangsta Rap
+Genre_137;Heavy Metal
+Genre_138;Black Metal
+Genre_139;Crossover
+Genre_140;Contemporary Christian
+Genre_141;Christian Rock
+Genre_142;Merengue
+Genre_143;Salsa
+Genre_144;Trash Metal
+Genre_145;Anime
+Genre_146;JPop
+Genre_147;Synthpop
+Genre_148;
+Genre_149;
+Genre_150;
+Genre_151;
+Genre_152;
+Genre_153;
+Genre_154;
+Genre_155;
+Genre_156;
+Genre_157;
+Genre_158;
+Genre_159;
+Genre_160;
+Genre_161;
+Genre_162;
+Genre_163;
+Genre_164;
+Genre_165;
+Genre_166;
+Genre_167;
+Genre_168;
+Genre_169;
+Genre_170;
+Genre_171;
+Genre_172;
+Genre_173;
+Genre_174;
+Genre_175;
+Genre_176;
+Genre_177;
+Genre_178;
+Genre_179;
+Genre_180;
+Genre_181;
+Genre_182;
+Genre_183;
+Genre_184;
+Genre_185;
+Genre_186;
+Genre_187;
+Genre_188;
+Genre_189;
+Genre_190;
+Genre_191;
+Go to WebSite;Prijeći na spletni sadržaj
+Gop_OpenClosed;
+Gop_OpenClosed_Closed;
+Gop_OpenClosed_FirstFrame;Agrupamento
+Gop_OpenClosed_Open;
+Graph;
+Group;
+Grouping;
+GroupPreset;
+h; h
+HDR_Format;
+Header file;Kreirati zaglavnu datoteku
+Height;Visina
+Height_CleanAperture;
+Height_Original;
+Help;Pomoć
+HideOthers;Sakrij ostalo
+Hint;Naznaka
+HomeTheaterAvr;
+How many audio streams?;Koliko zvučnih tokova?
+How many chapters streams?;Koliko tokova poglavlja?
+How many text streams?;Koliko tokova teksta?
+How many video streams?;Koliko tokova video-snimke?
+HTML;HTML
+ID;ID
+IdentClockStart;
+IFrameInterval;
+Image;Slika
+Image stream(s);Tokovi slike
+Image_Codec_List;Slikovni kôdeki
+ImageCount;Broj slikovnih tokova
+ImmersiveStereo;
+Info;Informacija
+Instruments;Instrumenti
+IntegratedLoudness;
+IntegratedLoudness_Level;
+IntegratedLoudness_Speech;
+InteractivityEnabled;
+Interlaced_BFF;Najprije donje polje
+Interlaced_Interlaced;Interlaced
+Interlaced_PPF;Progresivno
+Interlaced_Progressive;Progresivno
+Interlaced_TFF;Najprije gornje polje
+Interlacement;Interlace
+Interleave_Duration;Interleave, trajanje
+Interleave_Preload;Interleave, trajanje predučitavanja
+Interleave_VideoFrames;Interleave, trajanje
+Interleaved;
+InternetMediaType;
+IRCA;IRCA
+ISBN;ISBN
+ISRC;ISRC
+IsStreamable;
+Keywords;Ključne riječi
+Known codecs;Poznati kôdeki
+Known formats;Poznati oblici datoteka
+Known parameters;Poznati parametri
+Label;Znamka
+Language;Jezik
+Language_aa;Afarski
+Language_ab;Abhaski
+Language_ae;Avestanski
+Language_af;Afrikaanski
+Language_ak;Akanski
+Language_am;Amharski
+Language_an;Aragonski
+Language_ar;Arapski
+Language_as;Asamski
+Language_av;Avarski
+Language_ay;Ajmarski
+Language_az;Azerbejđžanski
+Language_ba;Baškirski
+Language_be;Bjeloruski
+Language_bg;Bugarski
+Language_bh;Biharski
+Language_bi;Bislamski
+Language_bm;Bambarski
+Language_bn;Bengalski
+Language_bo;Tibetanski
+Language_br;Bretonski
+Language_bs;Bošnjački
+Language_ca;Katalanski
+Language_ce;Čečenski
+Language_ch;Čamoro
+Language_cmn;
+Language_co;Korzikanski
+Language_cr;Cree
+Language_cs;Češki
+Language_cu;Slavenski
+Language_cv;Čuvaški
+Language_cy;Velški
+Language_da;Danski
+Language_de;Njemački
+Language_dv;Diveheški
+Language_dz;Dzongkha
+Language_ee;Ewe
+Language_el;Grčki
+Language_en;Engleski
+Language_en-gb;Engleski (Velika Britanija)
+Language_en-us;Engleski (Sjedinjene Države)
+Language_eo;Esperanto
+Language_es;Španjolski
+Language_es-419;
+Language_et;Estonski
+Language_eu;Baskijski
+Language_fa;Perzijski
+Language_ff;Fulah
+Language_fi;Finski
+Language_fil;
+Language_fj;Fidži
+Language_fo;Jezik Ovčjih otoka
+Language_fr;Francuski
+Language_fy;Frizijski
+Language_ga;Irski
+Language_gd;Galski
+Language_gl;Galicijski
+Language_gn;Gvarani
+Language_gu;Gujarati
+Language_gv;Manx
+Language_ha;Hausa
+Language_he;Hebrejski
+Language_hi;Hindu
+Language_ho;Hiri Motu
+Language_hr;Hrvatski
+Language_ht;Haićanski
+Language_hu;Madžarski
+Language_hy;Armenski
+Language_hy-az;
+Language_hz;Herero
+Language_ia;Udruga za pomoćne jezike
+Language_id;Indonezijski
+Language_ie;Interlingue
+Language_ig;Igbo
+Language_ii;Sičuanski Yi
+Language_ik;Inupiaq
+Language_Info;Jezična informacija
+Language_io;Ido
+Language_is;Islandski
+Language_it;Talijanski
+Language_iu;Inuktitut
+Language_ja;Japanski
+Language_jv;Javanski
+Language_ka;Gruzijski
+Language_kg;Kongo
+Language_ki;Kikuyu
+Language_kj;Kuanyama
+Language_kk;Kazaški
+Language_kl;Kalaallisut
+Language_km;Kmerski
+Language_kn;Kanađanski
+Language_ko;Korejski
+Language_kr;Kanuri
+Language_ks;Kašmirski
+Language_ku;Kurdski
+Language_kv;Komi
+Language_kw;Korniški
+Language_ky;Kirgiski
+Language_la;Latinski
+Language_lb;Luksemburški
+Language_lg;Ganda
+Language_li;Limburški
+Language_ln;Lingala
+Language_lo;Laoški
+Language_lt;Litvanski
+Language_lu;Luba-Katanga
+Language_lv;Latvijski
+Language_mg;Malagaški
+Language_mh;Maršalski
+Language_mi;Maorski
+Language_mk;Makedonski
+Language_ml;Malayalam
+Language_mn;Mongolski
+Language_mn-cn;
+Language_mo;Moldavski
+Language_More;Jezik, podrobnije
+Language_mr;Marathi
+Language_ms;Malajski
+Language_ms-bn;
+Language_mt;Malteški
+Language_mul;Višestruki jezici
+Language_my;Burmeški
+Language_na;Nauru
+Language_nb;Norveški Bokmal
+Language_nd;Ndebele
+Language_ne;Nepalski
+Language_ng;Ndonga
+Language_nl;Nizozemski
+Language_nl-be;
+Language_nn;Norveški Bokmal
+Language_no;Norveški
+Language_nr;Ndebele
+Language_nv;Navaho
+Language_ny;Nyanja
+Language_oc;Occitan
+Language_oj;Ojibwa
+Language_om;Oromo
+Language_or;Oriya
+Language_os;Osetijski
+Language_pa;Pandžabski
+Language_pi;Pali
+Language_pl;Poljski
+Language_ps;Pushto
+Language_pt;Portugalski
+Language_pt-br;Portugalski (Brazil)
+Language_qu;Kečuanski
+Language_rm;Reto-romanski
+Language_rn;Rundi
+Language_ro;Rumunjski
+Language_ru;Ruski
+Language_rw;Kinyarwanda
+Language_sa;Sanskrt
+Language_sc;Sardinijski
+Language_sd;Sindhi
+Language_se;Sjevernosâmski
+Language_sg;Sango
+Language_si;Singaleški
+Language_sk;Slovački
+Language_sl;Slovenski
+Language_sm;Samoanski
+Language_smi;
+Language_sn;Shona
+Language_so;Somalijski
+Language_sq;Albanski
+Language_sr;Srpski
+Language_ss;Swati
+Language_st;Sotho
+Language_su;Sundaneski
+Language_sv;Švedski
+Language_sw;Swahili
+Language_ta;Tamilski
+Language_te;Telugu
+Language_tg;Tadžički
+Language_th;Tajski
+Language_ti;Tigrinijski
+Language_tk;Turkmenski
+Language_tl;Tagalog
+Language_tn;Tswana
+Language_to;Tonga
+Language_tr;Turski
+Language_ts;Tsonga
+Language_tt;Tatarski
+Language_tw;Twi
+Language_ty;Tahićanski
+Language_ug;Ujgurski
+Language_uk;Ukrajinski
+Language_ur;Urdu
+Language_uz;Uzbečki
+Language_ve;Venda
+Language_vi;Vijetnamski
+Language_vo;Volapuk
+Language_wa;Walloon
+Language_wo;Wolof
+Language_xh;Xhosa
+Language_yi;Jidiš
+Language_yo;Yoruba
+Language_yue;
+Language_za;Zhuang
+Language_zh;Kineski
+Language_zh-cmn;
+Language_zh-cn;Kineski (Kina)
+Language_zh-CN;
+Language_zh-Hans;
+Language_zh-Hant;
+Language_zh-tw;Kineski (Taiwan)
+Language_zh-TW;
+Language_zh-yue;
+Language_zu;Zulu
+Languages;
+LawRating;Dopušteno za mladež od
+LegacyStreamDisplay;
+LCCN;LCCN
+LfeAttenuationKnown;
+LfeMixGain;
+Library;Knjižnica multipleksera
+Lifetime_Subscribe_Button;
+Lightness;Svjetlina
+Lines_Count;
+Lines_MaxCountPerEvent;
+LineUpStart;
+LinkedTo_Bed_Pos;
+LinkedTo_ChannelFormat_Pos;
+LinkedTo_ComplementaryObject_Pos;
+LinkedTo_Content_Pos;
+LinkedTo_Group_Pos;
+LinkedTo_Object_Pos;
+LinkedTo_PackFormat_Pos;
+LinkedTo_SignalGroup_Pos;
+LinkedTo_StreamFormat_Pos;
+LinkedTo_Substream_Pos;
+LinkedTo_TrackFormat_Pos;
+LinkedTo_TrackUID_Pos;
+List;Spisak
+LongTermLoudness;
+LoRoCenterMixGain;
+LoRoSurroundMixGain;
+Loudness_Anchor;
+Loudness_Anchor_Album;
+Loudness_Count;
+Loudness_Count_Album;
+Loudness_MaximumMomentary;
+Loudness_MaximumMomentary_Album;
+Loudness_MaximumOfRange;
+Loudness_MaximumOfRange_Album;
+Loudness_MaximumShortTerm;
+Loudness_MaximumShortTerm_Album;
+Loudness_ProductionMixingLevel;
+Loudness_ProductionMixingLevel_Album;
+Loudness_Program;
+Loudness_Program_Album;
+Loudness_Range;
+Loudness_Range_Album;
+Loudness_RoomType;
+Loudness_RoomType_Album;
+LtRtCenterMixGain;
+LtRtSurroundMixGain;
+Lyricist;Tekstopisac
+Lyrics;Tekst pjesme
+Mastered_Date;Nadnevak glavne snimke
+MasteredBy;Glavnu snimku napravio
+MasteringDisplay_ColorPrimaries;
+MasteringDisplay_Luminance;
+Matrix_Channel(s);
+Matrix_ChannelPositions;
+matrix_coefficients;
+Matrix_Format;
+MaxCLL;
+MaxFALL;
+MaxGain;
+MaximumMomentaryLoudness;
+MaxTruePeak;
+MD5;
+MD5_Unencoded;
+MediaInfo_About;Pruža vrlo podrobne informacije\r\no multimedijalnim datotekama:\r\nMatroska, OGG (uključujući OGM)\r\nMPEG1 (uključujući VCD)\r\nMPEG2 (uključujući DVD i SVCD)\r\nMPEG4 (uključujući Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (uključujući WMV, WMA)\r\nMicrosoft RIFF (uključujući AVI, WAV)\r\nSamo zvukovnim oblicima (AC3, DTS, AAC, AU, AIFF...)
+MediaInfo_About_About;
+Menu;Izbornik
+Menu stream(s);Izbornik - tokovi
+Menu_Codec_List;Izbornik - kôdeksi
+Menu_Hint;Dodatne mogućnosti
+Menu_No;Bez izbornika
+MenuCount;Broj izborničkih tokova
+MenuID;Izbornički ID
+Metadata_Format;
+Metadata_Format_Type;
+Metadata_MuxingMode;
+Minimize;Smanji
+MixType;
+mn; min
+Mood;Raspoloženje
+More;Više...
+Movie;Naslov filma
+ms; ms
+MSDI;MSDI
+MultipleStream;
+MultiView_Count;
+MusicBy;Glazba
+MuxingMode;Način rada multipleksera
+MuxingMode_MoreInfo;Više informacija o radu multipleksera
+MuxingMode_PackedBitstream;Usredotočeni protok podataka
+Name;Ime
+Nationality;Nacionalnost
+NetworkName;Naziv mreže
+New;Novo
+Newest version;Provjera dostupnosti nove inačice (iziskuje vezu s Internetom)
+NewVersion_Menu;Raspoloživa je novija inačica
+NewVersion_Question_Content;Raspoloživa je novija inačica (v%Version%)! Da li bi ste je željeli preuzeti?
+NewVersion_Question_Title;Objavljena je nova inačica!
+No;Ne
+Not yet;Još ne
+NumberOfChannelFormats;
+NumberOfContents;
+NumberOfDynamicObjects;
+NumberOfElementaryStreams;
+NumberOfObjects;
+NumberOfPackFormats;
+NumberOfPresentations;
+NumberOfProgrammes;
+NumberOfStreamFormats;
+NumberOfSubstreams;
+NumberOfTrackFormats;
+NumberOfTrackUIDs;
+NumColors;Broj boja
+Object;
+ObjectCount;
+OK;U redu
+One output file per input file;Po jedna izlazna datoteka na jednu ulaznu
+Open;Otvoriti
+OpenCaptionsLanguage;
+OpenCaptionsPresent;
+OpenCaptionsType;
+Options;Mogućnosti
+Options_Hint;Prilagodbe
+Original;Izvorno
+OriginalNetworkName;Izvorni naziv mreže
+OriginalSourceForm;Prvobitni oblik izvora
+OriginalSourceMedium;Prvobitni medij izvora
+OriginalSourceMedium_ID;
+Originator;
+Other;Ostalo
+OtherIdentifier;
+OtherIdentifierType;
+Output;Izlaz
+Output format;Izlazni oblik
+OverallBitRate;Ukupni protok podataka
+OverallBitRate_Maximum;Maksimum ukupnog protoka podataka
+OverallBitRate_Minimum;Minimum ukupnog protoka podataka
+OverallBitRate_Mode;Način ukupnog protoka podataka
+OverallBitRate_Nominal;Nominalni ukupni protok podataka
+PackageName;
+PackFormat;
+Part;Dio
+Part_Count;Ukupni broj
+PartNumber;
+PartTotal;
+Performer;Izvođač
+Period;Razdoblje
+Phase90FilterInfo;
+Phase90FilterInfo2ch;
+Phone;Telefon
+PictureRatio;
+PixelAspectRatio;Omjer piksela
+PixelAspectRatio_CleanAperture;
+PixelAspectRatio_Original;Izvorni omjer piksela
+PlayCounter;Brojač izvedbi
+Played_Count;puta izvedeno
+Played_First_Date;prvi put izvođeno
+Played_Last_Date;posljednji put izvođeno
+PlayTime;Trajanje izvedbe
+PodcastCategory;
+PortableHeadphones;
+PortableSpeakers;
+Position;položaj
+Position_Cartesian;
+Position_Polar;
+Position_Total;ukupno
+Preferences;Prilagodbe
+PreferredDownmix;
+Premium;
+Premium_Summary;
+PreselectionLabel;
+Presentation;
+PresentationConfig;
+PresentationConfig_ContentClassifier;
+PresentationID;
+PreviousDownmixType5ch;
+PreviousMixType2ch;
+PrimaryAudioLanguage;
+Producer;Producent
+ProductionDesigner;Designer proizvodnje
+ProductionNumber;
+ProductionStudio;Proizvodni studio
+ProductPlacement;
+Program name;
+Programme;
+ProgrammeHasText;
+ProgrammeTextLanguage;
+ProgrammeTitle;
+Publisher;Nakladnik
+Purchased_Date;Nadnevak kupovine
+Quote character;Znaci navoda
+RadioStation;Radijska postaja
+Rating;Vrjednovanje
+RealtimeLoudnessCorrected;
+Recorded_Date;Nadnevak snimanja
+Recorded_Location;Mjesto snimanja
+Reel;
+Released_Date;Nadnevak objavljivanja
+RemixedBy;Remixed by
+RenderMode;
+Renew;
+ReplayGain_Gain;Pojačavanje zvuka izvedbe
+ReplayGain_Peak;Vrhunac pojačanog zvuka izvedbe
+Report;
+Resolution;Razlučivost
+RestoreLifetimeSubscription;
+s;s
+Sampled_Height;
+Sampled_Width;
+SamplePeakLevel;
+SamplePeakLevel_Album;
+SamplesPerFrame;
+SamplingCount;
+SamplingCount_Source;
+SamplingRate;Učestalost uzorkovanja
+Save;Pohraniti
+ScanOrder;Redoslijed pregledavanja
+ScanOrder_Original;
+ScanOrder_Stored;
+ScanOrder_StoredDisplayedInverted;
+ScanOrder_StoreMethod;
+ScanType;Vrsta pregledavanja
+ScanType_Original;
+ScanType_StoreMethod;
+ScreenplayBy;Scenarij
+ScreenToCenter;
+ScreenToFront;
+Season;Razdoblje
+SecondaryAudioLanguage;
+see below;pogledati dolje
+Select your directory;
+SelectAll;Odaberi sve
+Send HeaderFile;Molim zaglavnu datoteku poslati ovamo: http://sourceforge.net/projects/mediainfo/ (Bug section)
+Separator_Columns;Razdjelnik redaka
+Separator_Lines;Razdjelnik crta
+SeriesTitle;
+ServiceChannel;Broj uslužnog kanala
+ServiceKind;
+ServiceName;Naziv usluge
+ServiceProvider;Pružatelj usluge
+Services;Usluge
+ServiceType;Vrsta usluge
+Set;Medijalni sklop
+Set_Count;Broj u medijalnom sklopu
+Setup;Postavljanje
+Sharpness;Oštrost
+Sheet;Tablica
+Sheet (Complete);Tablica (potpuna)
+Shell extension;Proširenje ljuske sustava (desnim klikom u Pregledniku će se pojaviti mogućnosti Media Info)
+Shell extension, folder;Za mape također
+Shell extension, separate instance;
+Shell InfoTip;Info-naznaka (prelaskom miša preko neke datoteke u Pregledniku će se prikazati informacije o njoj)
+ShimName;
+ShimVersion;
+Show menu;Prikazati izbornik
+Show toolbar;Prikazati alatnu traku
+ShowAll;Prikaži sve
+SignalGroup;
+SigningPresent;
+SignLanguage;
+Sort;Poređano prema
+SoundCategory;
+SoundEngineer;Tonski tehničar
+Source;
+Source_Duration;
+Source_FrameCount;
+Source_SamplingCount;
+Source_StreamSize;
+Source_StreamSize_Encoded;
+SpokenSubtitles;
+Standard;Standardno
+StoreMethod_InterleavedFields;
+StoreMethod_SeparatedFields;
+StoreMethod_SeparatedFields_1;
+StoreMethod_SeparatedFields_2;
+Stream;Tok
+Stream_MoreInfo;Više informacija o tom toku
+StreamCount;Broj tokova te vrste
+StreamFormat;
+StreamID;Prepoznavanje toka
+streamIdentifier;
+StreamKind;Vrsta toka
+StreamKindID;Prepoznavatelj toka
+StreamKindPos;Položaj prepoznavatelja toka
+StreamOrder;
+StreamSize;Veličina toka
+StreamSize_Demuxed;
+StreamSize_Encoded;
+StreamSize_Proportion;Omjeri dotičnog toka
+Subject;Sadržaj
+Subscribe;
+Subscribe_Button;
+Subscribe_Failed;
+Subscribe_Manage;
+Subscribe_Renew;
+Subscribe_Renew_Price;
+Subscribe_Unaviable;
+Subscribe_Waiting;
+Subscription_Active;
+Subscription_Android;
+Subscription_Ended;
+Subscription_Expired;
+Subscription_Lifetime;
+Subscription_Thanks;
+Substream;
+SubTrack;Podsnimka
+SubtstreamIdChannel;
+Summary;Sveukupno
+Supported formats;Podržavani oblici datoteka
+Supported?;Podržavano?
+SupportUs;
+SurroundAttenuationKnown;
+SwitchGroup;
+Synopsis;Sažetak
+SystemId;ID
+Tagged_Application;Označeno aplikacijom
+Tagged_Date;Nadnevak označavanja
+TargetDeviceConfig;
+Technician;Tehničar
+TermsOfUse;Uvjeti korištenja
+TertiaryAudioLanguage;
+Text;Tekst
+Text - Custom;Vlastiti tekst
+Text (HTML);Tekst (HTML)
+Text stream(s);Tokovi teksta
+Text streams;Tokovi teksta
+Text_Codec_List;Kôdeki teksta
+Text_Format_List;
+Text_Format_WithHint_List;
+Text_Language_List;
+Text_No;Bez teksta
+Text1;Prvi tok teksta
+Text2;Drugi tok teksta
+Text3;Treći tok teksta
+TextCount;Broj tok teksta
+TextlessElementsExist;
+ThanksTo;Zahvala
+Thousands separator;Razdjelnik tisuća
+TimeCode;
+TimeCode_FirstFrame;
+TimeCode_LastFrame;
+TimeCode_MaxFrameNumber;
+TimeCode_MaxFrameNumber_Theory;
+TimeCode_Settings;
+TimeCode_Source;
+TimeCode_Stripped;
+TimeStamp;
+TimeZone;
+Title;Naslov
+Title_More;Više podataka o naslovu
+Top4ToTop2;
+TopBackToFront;
+TopBackToSide;
+TopFrontToBack;
+TopFrontToFront;
+TopFrontToSide;
+Total;Ukupno
+TotalNumberOfParts;
+TotalProgrammeDuration;
+Track;Naziv snimke
+Track_Count;Broj snimke
+TrackFormat;
+TrackIndex;
+TrackUID;
+transfer_characteristics;
+Translate_Reports;
+Translator;Prevoditelj
+Transport;
+Tree;Stablo
+Tree & Text;Stablo i tekst
+Trim_Center;
+Trim_Height;
+Trim_Surround;
+TrimMode;
+TrimMode0i;
+TrimMode1i;
+TrimMode2i;
+TrimMode3i;
+TrimMode4i;
+TrimMode5i;
+TrimMode6i;
+TrimMode7i;
+TrimMode8i;
+TruePeakLevel;
+TruePeakLevel_Album;
+Type;
+TypeDefinition;
+UniqueID;
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
+Unknown;Nepoznato
+Url;URL
+Video;Video
+Video stream(s);Video tok(-ovi)
+Video_Codec_List;Video-kôdeki
+Video_Delay;Zaostajanje prikaza video-slike
+Video_Format_List;
+Video_Format_WithHint_List;
+Video_Language_List;
+Video_No;Bez prikaza video-slike
+Video0_Delay;Zaostajanje video0-slike
+Video1;Prvi tok video-slike
+Video2;
+Video3;
+VideoComments;
+VideoCount;Broj tokova video-slike
+View;Prikaz
+View_Hint;Mijenja mogućnosti prikaza informacije
+Views;
+Warning : more streams in the files;Pozor!: U datotekama se nalazi više tokova!
+Web;Internet
+WebSite;
+WebSite_Audio;Prijeći na spletnu stranicu ovog kôdeka
+WebSite_Audio_More;Prijeći na spletnu sadržaj (%Url%) za pronalaženje tog audio-kôdeka
+WebSite_General;Prijeći na spletni sadržaj nekog programa za izvođenje ove datoteke
+WebSite_General_More;Prijeći na spletni sadržaj nekog programa za izvođenje ove datoteke
+WebSite_Text;Prijeći na spletnu stranicu tog tekstualnog kôdeka
+WebSite_Text_More;Prijeći na spletni sadržaj (%Url%) za pronalaženje tog tekstualnog kôdeka
+WebSite_Url;http://MediaArea.net/MediaInfo
+WebSite_Video;Prijeći na spletnu stranicu tog video-kôdeka
+WebSite_Video_More;Prijeći na spletni sadržaj (%Url%) za pronalaženje tog video-kôdeka
+Width;Širina
+Width_CleanAperture;
+Width_Original;
+Window;Prozor
+WriteMe;Poruka autoru
+WriteToTranslator;Poruka prevoditelju
+Written_Date;Nadnevak početka pisanja
+Written_Location;Mjesto početka pisanja
+WrittenBy;Napisao
+Yes;Da
+Your system;Informacije o Vašem sustavu
+Your translation;
+Zoom;Zumiraj
+ZZ_Automatic_Percent;64
+ZZ_AutomaticLanguage_Percent;68
