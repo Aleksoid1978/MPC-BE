@@ -919,6 +919,7 @@ SRCS_ASM_LC = \
 	libavcodec/x86/vp9intrapred_16bpp.asm \
 	libavcodec/x86/vp9itxfm.asm \
 	libavcodec/x86/vp9itxfm_16bpp.asm \
+	libavcodec/x86/vp9itxfm_avx2.asm \
 	libavcodec/x86/vp9lpf.asm \
 	libavcodec/x86/vp9lpf_16bpp.asm \
 	libavcodec/x86/vp9mc.asm \

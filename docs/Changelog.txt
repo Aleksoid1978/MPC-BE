@@ -5,6 +5,9 @@
 Updated Korean translation (by Hackjjang).
 Updated Arabic translation (by Alhlhli).
 
+Updated libraries:
+	ffmpeg n8.1-dev-519-g82b5a0faba.
+
 
 1.8.7 - 2025-09-17
 =============================

@@ -47,7 +47,7 @@
 #include "libavutil/time.h"
 #include "libavutil/wchar_filename.h"
 
-typedef struct pthread_t {
+typedef struct w32pthread_t {
     void *handle;
     void *(*func)(void* arg);
     void *arg;
@@ -86,7 +86,7 @@ static av_unused int pthread_create(pthread_t *thread, const void *unused_attr,
 {
     pthread_t ret;
 
-    ret = av_mallocz(sizeof(*ret));
+    ret = (pthread_t)av_mallocz(sizeof(*ret));
     if (!ret)
         return EAGAIN;
 

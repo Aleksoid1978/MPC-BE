@@ -477,7 +477,7 @@ static int exif_decode_tag(void *logctx, GetByteContext *gb, int le,
                                  "payload: %" PRIu32 "\n", entry->id, type, count, tell, payload);
 
     /* AV_TIFF_IFD is the largest, numerically */
-    if (type > AV_TIFF_IFD)
+    if (type > AV_TIFF_IFD || count >= INT_MAX/8U)
         return AVERROR_INVALIDDATA;
 
     is_ifd = type == AV_TIFF_IFD || ff_tis_ifd(entry->id) || entry->id == MAKERNOTE_TAG;
@@ -950,6 +950,8 @@ static int exif_clone_entry(AVExifEntry *dst, const AVExifEntry *src)
 {
     int ret = 0;
 
+    memset(dst, 0, sizeof(*dst));
+
     dst->count = src->count;
     dst->id = src->id;
     dst->type = src->type;
@@ -1151,7 +1153,7 @@ AVExifMetadata *av_exif_clone_ifd(const AVExifMetadata *ifd)
         size_t required_size;
         if (av_size_mult(ret->count, sizeof(*ret->entries), &required_size) < 0)
             goto fail;
-        ret->entries = av_fast_realloc(NULL, &ret->size, required_size);
+        av_fast_mallocz(&ret->entries, &ret->size, required_size);
         if (!ret->entries)
             goto fail;
     }

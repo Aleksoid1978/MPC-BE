@@ -18,12 +18,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavutil/attributes.h"
 #include "libavutil/avassert.h"
 #include "libavutil/channel_layout.h"
 #include "libavutil/emms.h"
 #include "libavutil/frame.h"
-#include "libavutil/imgutils.h"
 #include "libavutil/internal.h"
 #include "libavutil/mem.h"
 #include "libavutil/pixdesc.h"
@@ -357,8 +355,6 @@ static int encode_receive_packet_internal(AVCodecContext *avctx, AVPacket *avpkt
     if (avctx->codec->type == AVMEDIA_TYPE_VIDEO) {
         if ((avctx->flags & AV_CODEC_FLAG_PASS1) && avctx->stats_out)
             avctx->stats_out[0] = '\0';
-        if (av_image_check_size2(avctx->width, avctx->height, avctx->max_pixels, AV_PIX_FMT_NONE, 0, avctx))
-            return AVERROR(EINVAL);
     }
 
     if (ffcodec(avctx->codec)->cb_type == FF_CODEC_CB_TYPE_RECEIVE_PACKET) {
@@ -551,7 +547,7 @@ static int encode_preinit_video(AVCodecContext *avctx)
     const enum AVPixelFormat *pix_fmts;
     int ret, i, num_pix_fmts;
 
-    if (!av_get_pix_fmt_name(avctx->pix_fmt)) {
+    if (!pixdesc) {
         av_log(avctx, AV_LOG_ERROR, "Invalid video pixel format: %d\n",
                avctx->pix_fmt);
         return AVERROR(EINVAL);
@@ -841,24 +837,12 @@ int ff_encode_alloc_frame(AVCodecContext *avctx, AVFrame *frame)
 {
     int ret;
 
-    switch (avctx->codec->type) {
-    case AVMEDIA_TYPE_VIDEO:
-        frame->format = avctx->pix_fmt;
-        if (frame->width <= 0 || frame->height <= 0) {
-            frame->width  = FFMAX(avctx->width,  avctx->coded_width);
-            frame->height = FFMAX(avctx->height, avctx->coded_height);
-        }
+    av_assert1(avctx->codec_type == AVMEDIA_TYPE_VIDEO);
 
-        break;
-    case AVMEDIA_TYPE_AUDIO:
-        frame->sample_rate = avctx->sample_rate;
-        frame->format      = avctx->sample_fmt;
-        if (!frame->ch_layout.nb_channels) {
-            ret = av_channel_layout_copy(&frame->ch_layout, &avctx->ch_layout);
-            if (ret < 0)
-                return ret;
-        }
-        break;
+    frame->format = avctx->pix_fmt;
+    if (frame->width <= 0 || frame->height <= 0) {
+        frame->width  = avctx->width;
+        frame->height = avctx->height;
     }
 
     ret = avcodec_default_get_buffer2(avctx, frame, 0);
