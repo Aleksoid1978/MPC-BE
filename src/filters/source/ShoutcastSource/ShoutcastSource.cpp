@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -125,6 +125,7 @@ STDMETHODIMP CShoutcastSource::NonDelegatingQueryInterface(REFIID riid, void** p
 		QI(IAMFilterMiscFlags)
 		QI(IAMOpenProgress)
 		QI2(IAMMediaContent)
+		QI(IExFilterConfig)
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
@@ -227,6 +228,21 @@ STDMETHODIMP CShoutcastSource::QueryFilterInfo(FILTER_INFO* pInfo)
 	return S_OK;
 }
 
+STDMETHODIMP CShoutcastSource::Flt_SetInt(LPCSTR field, int value)
+{
+	if (strcmp(field, "codePage") == 0) {
+		
+		if (m_iPins == 1) {
+			static_cast<CShoutcastStream*>(m_paStreams[0])->SetCodePage(value);
+			return S_OK;
+		}
+
+		return E_ABORT;
+	}
+
+	return E_INVALIDARG;
+}
+
 // CShoutcastStream
 
 CShoutcastStream::CShoutcastStream(const WCHAR* wfn, CShoutcastSource* pParent, HRESULT* phr)
@@ -311,6 +327,12 @@ LONGLONG CShoutcastStream::GetBufferFullness()
 	}
 	LONGLONG ret = 100i64*(m_queue.GetDuration()) / AVGBUFFERLENGTH;
 	return std::min(ret, 100LL);
+}
+
+void CShoutcastStream::SetCodePage(const UINT codePage)
+{
+	CAutoLock cAutoLock(&m_queue);
+	m_codePage = codePage;
 }
 
 CString CShoutcastStream::GetTitle()
@@ -506,6 +528,8 @@ UINT CShoutcastStream::SocketThreadProc()
 	soc.Attach(m_hSocket);
 	soc = m_socket;
 
+	soc.SetCodePage(m_codePage);
+
 	m_title       = soc.m_title;
 	m_description = soc.m_description;
 
@@ -694,6 +718,11 @@ HRESULT CShoutcastStream::SetName(LPCWSTR pName)
 
 //
 
+void CShoutcastStream::CShoutcastSocket::SetCodePage(const UINT codePage)
+{
+	m_codepage = codePage;
+}
+
 int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nFlags)
 {
 	if (nFlags & MSG_PEEK) {
@@ -712,12 +741,12 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 	if ((m_nBytesRead += len) == m_metaint) {
 		m_nBytesRead = 0;
 
-		static BYTE buff[255*16], b = 0;
+		static BYTE buff[255*16*10], b = 0;
 		memset(buff, 0, sizeof(buff));
 		if (1 == __super::Receive(&b, 1) && b && b*16 == __super::Receive(buff, b*16)) {
 			int len = decode_html_entities_utf8((char*)buff, nullptr);
 
-			CStringW str = UTF8orLocalToWStr((LPCSTR)buff);
+			CStringW str = UTF8orLocalToWStr((LPCSTR)buff, m_codepage);
 
 			DLog(L"CShoutcastStream(): Metainfo: %s", str);
 

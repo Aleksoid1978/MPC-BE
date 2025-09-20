@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -44,6 +44,7 @@ class __declspec(uuid("68F540E9-766F-44d2-AB07-E26CC6D27A79"))
 	, public IAMFilterMiscFlags
 	, public IAMOpenProgress
 	, public IAMMediaContent
+	, public CExFilterConfigImpl
 {
 	CStringW m_fn;
 
@@ -116,6 +117,9 @@ public:
 
 	// CBaseFilter
 	STDMETHODIMP QueryFilterInfo(FILTER_INFO* pInfo);
+
+	// IExFilterConfig
+	STDMETHODIMP Flt_SetInt(LPCSTR field, int value);
 };
 
 class CShoutcastStream : public CSourceStream
@@ -159,7 +163,8 @@ class CShoutcastStream : public CSourceStream
 			SetTimeOut(3000, 3000);
 		}
 
-		int Receive(void* lpBuf, int nBufLen, int nFlags = 0);
+		void SetCodePage(const UINT codePage);
+		int Receive(void* lpBuf, int nBufLen, int nFlags = 0) override;
 
 		StreamFormat m_Format	= AUDIO_NONE;
 		unsigned m_metaint		= 0;
@@ -169,6 +174,7 @@ class CShoutcastStream : public CSourceStream
 		unsigned m_framesize	= 0;
 		unsigned m_aacprofile	= 0;
 
+		UINT m_codepage = CP_ACP;
 		CStringW m_title;
 		CStringW m_url;
 		CStringW m_description;
@@ -186,6 +192,7 @@ class CShoutcastStream : public CSourceStream
 			m_aacprofile	= soc.m_aacprofile;
 			m_nBytesRead	= soc.m_nBytesRead;
 
+			m_codepage		= soc.m_codepage;
 			m_title			= soc.m_title;
 			m_url			= soc.m_url;
 			m_description	= soc.m_description;
@@ -201,6 +208,7 @@ class CShoutcastStream : public CSourceStream
 	CUrlParser m_urlParser;
 
 	bool m_bBuffering = false;
+	UINT m_codePage = CP_ACP;
 	CString m_title;
 	CString m_description;
 
@@ -214,6 +222,9 @@ public:
 
 	void EmptyBuffer();
 	LONGLONG GetBufferFullness();
+
+	void SetCodePage(const UINT codePage);
+
 	CString GetTitle();
 	CString GetDescription();
 
