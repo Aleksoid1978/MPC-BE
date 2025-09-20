@@ -741,7 +741,7 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 	if ((m_nBytesRead += len) == m_metaint) {
 		m_nBytesRead = 0;
 
-		static BYTE buff[255*16*10], b = 0;
+		static BYTE buff[255*16], b = 0;
 		memset(buff, 0, sizeof(buff));
 		if (1 == __super::Receive(&b, 1) && b && b*16 == __super::Receive(buff, b*16)) {
 			int len = decode_html_entities_utf8((char*)buff, nullptr);
@@ -775,7 +775,7 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 								else if (d.HasMember(L"title") && d[L"title"].IsString()) {
 									m_title = d[L"title"].GetString();
 								}
-								if (d.HasMember(L"status")) {
+								else if (d.HasMember(L"status")) {
 									m_title.Empty();
 								}
 							}
