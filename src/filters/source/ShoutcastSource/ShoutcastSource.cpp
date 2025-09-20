@@ -746,6 +746,9 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 								else if (d.HasMember(L"title") && d[L"title"].IsString()) {
 									m_title = d[L"title"].GetString();
 								}
+								if (d.HasMember(L"status")) {
+									m_title.Empty();
+								}
 							}
 						}
 					}
