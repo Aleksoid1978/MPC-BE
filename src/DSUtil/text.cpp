@@ -307,11 +307,11 @@ CStringW AltUTF8ToWStr(LPCSTR lpUTF8Str) // Use if MultiByteToWideChar() functio
 	return str;
 }
 
-CStringW UTF8orLocalToWStr(LPCSTR lpMultiByteStr)
+CStringW UTF8orLocalToWStr(LPCSTR lpMultiByteStr, UINT CodePage/* = CP_ACP*/)
 {
 	CStringW str = AltUTF8ToWStr(lpMultiByteStr);
 	if (str.IsEmpty()) {
-		str = ConvertToWStr(lpMultiByteStr, CP_ACP); // Trying Local...
+		str = ConvertToWStr(lpMultiByteStr, CodePage); // Trying Local...
 	}
 
 	return str;

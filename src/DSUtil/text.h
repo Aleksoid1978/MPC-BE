@@ -150,7 +150,7 @@ extern CStringA WStrToUTF8(LPCWSTR lpWideCharStr);
 extern CStringW ConvertToWStr(LPCSTR lpMultiByteStr, UINT CodePage);
 extern CStringW UTF8ToWStr(LPCSTR lpUTF8Str);
 extern CStringW AltUTF8ToWStr(LPCSTR lpUTF8Str);
-extern CStringW UTF8orLocalToWStr(LPCSTR lpMultiByteStr);
+extern CStringW UTF8orLocalToWStr(LPCSTR lpMultiByteStr, UINT CodePage = CP_ACP);
 
 void FixFilename(CStringW& str);
 void EllipsisText(CStringW& text, const int maxlen);
