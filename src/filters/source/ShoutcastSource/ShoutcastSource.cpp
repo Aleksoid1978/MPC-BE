@@ -139,7 +139,7 @@ STDMETHODIMP CShoutcastSource::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* 
 
 	HRESULT hr = E_OUTOFMEMORY;
 
-	if (!(DNew CShoutcastStream(pszFileName, this, &hr)) || FAILED(hr)) {
+	if (!(DNew CShoutcastStream(pszFileName, this, m_codePage, &hr)) || FAILED(hr)) {
 		return hr;
 	}
 
@@ -231,13 +231,8 @@ STDMETHODIMP CShoutcastSource::QueryFilterInfo(FILTER_INFO* pInfo)
 STDMETHODIMP CShoutcastSource::Flt_SetInt(LPCSTR field, int value)
 {
 	if (strcmp(field, "codePage") == 0) {
-		
-		if (m_iPins == 1) {
-			static_cast<CShoutcastStream*>(m_paStreams[0])->SetCodePage(value);
-			return S_OK;
-		}
-
-		return E_ABORT;
+		CAutoLock cAutoLock(pStateLock());
+		m_codePage = value;
 	}
 
 	return E_INVALIDARG;
@@ -245,7 +240,7 @@ STDMETHODIMP CShoutcastSource::Flt_SetInt(LPCSTR field, int value)
 
 // CShoutcastStream
 
-CShoutcastStream::CShoutcastStream(const WCHAR* wfn, CShoutcastSource* pParent, HRESULT* phr)
+CShoutcastStream::CShoutcastStream(const WCHAR* wfn, CShoutcastSource* pParent, const UINT codePage, HRESULT* phr)
 	: CSourceStream(L"ShoutcastStream", phr, pParent, L"Output")
 {
 	ASSERT(phr);
@@ -271,6 +266,7 @@ redirect:
 	}
 
 	m_socket.SetUserAgent("MPC ShoutCast Source");
+	m_socket.SetCodePage(codePage);
 
 	CString redirectUrl;
 	if (!m_socket.Connect(m_urlParser, redirectUrl)) {
@@ -327,12 +323,6 @@ LONGLONG CShoutcastStream::GetBufferFullness()
 	}
 	LONGLONG ret = 100i64*(m_queue.GetDuration()) / AVGBUFFERLENGTH;
 	return std::min(ret, 100LL);
-}
-
-void CShoutcastStream::SetCodePage(const UINT codePage)
-{
-	CAutoLock cAutoLock(&m_queue);
-	m_codePage = codePage;
 }
 
 CString CShoutcastStream::GetTitle()
@@ -528,8 +518,6 @@ UINT CShoutcastStream::SocketThreadProc()
 	soc.Attach(m_hSocket);
 	soc = m_socket;
 
-	soc.SetCodePage(m_codePage);
-
 	m_title       = soc.m_title;
 	m_description = soc.m_description;
 
@@ -716,7 +704,7 @@ HRESULT CShoutcastStream::SetName(LPCWSTR pName)
 	return S_OK;
 }
 
-//
+// CShoutcastSocket
 
 void CShoutcastStream::CShoutcastSocket::SetCodePage(const UINT codePage)
 {
@@ -931,13 +919,13 @@ bool CShoutcastStream::CShoutcastSocket::Connect(const CUrlParser& urlParser, CS
 				metaint = atoi(value);
 			}
 			else if (param == "icy-name") {
-				m_title = UTF8orLocalToWStr(value);
+				m_title = UTF8orLocalToWStr(value, m_codepage);
 			}
 			else if (param == "icy-url") {
 				m_url = value;
 			}
 			else if (param == "icy-description") {
-				m_description = UTF8orLocalToWStr(value);
+				m_description = UTF8orLocalToWStr(value, m_codepage);
 			}
 		}
 

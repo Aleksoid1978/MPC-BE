@@ -47,6 +47,7 @@ class __declspec(uuid("68F540E9-766F-44d2-AB07-E26CC6D27A79"))
 	, public CExFilterConfigImpl
 {
 	CStringW m_fn;
+	UINT m_codePage = CP_ACP;
 
 public:
 	CShoutcastSource(LPUNKNOWN lpunk, HRESULT* phr);
@@ -208,22 +209,19 @@ class CShoutcastStream : public CSourceStream
 	CUrlParser m_urlParser;
 
 	bool m_bBuffering = false;
-	UINT m_codePage = CP_ACP;
+	bool m_bExitThread = false;;
+
 	CString m_title;
 	CString m_description;
 
-	bool m_bExitThread = false;;
-
 public:
-	CShoutcastStream(const WCHAR* wfn, CShoutcastSource* pParent, HRESULT* phr);
+	CShoutcastStream(const WCHAR* wfn, CShoutcastSource* pParent, const UINT codePage, HRESULT* phr);
 	virtual ~CShoutcastStream();
 
 	UINT SocketThreadProc();
 
 	void EmptyBuffer();
 	LONGLONG GetBufferFullness();
-
-	void SetCodePage(const UINT codePage);
 
 	CString GetTitle();
 	CString GetDescription();

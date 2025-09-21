@@ -14372,7 +14372,6 @@ bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 				if (pIExFilterConfig = pBF) {
 					pIExFilterConfig->Flt_SetInt("queueDuration", s.iBufferDuration);
 					//pIExFilterConfig->SetInt("networkTimeout", s.iNetworkTimeout);
-					pIExFilterConfig->Flt_SetInt("codePage", s.iSubtitleDefaultCodePage);
 				}
 			}
 			EndEnumFilters;
