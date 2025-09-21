@@ -2451,6 +2451,15 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_FRAME_HALF          "Μισό μέγεθος"
+    IDS_FRAME_NORMAL        "Κανονικό μέγεθος"
+    IDS_FRAME_DOUBLE        "Διπλό μέγεθος"
+    IDS_FRAME_STRETCH       "Επέκταση στο παράθυρο"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FILE_FAV_ADDED      "Το αρχείο προστέθηκε στα αγαπημένα"
     IDS_DVD_FAV_ADDED       "Το DVD προστέθηκε στα αγαπημένα"
     IDS_CAPTURE_SETTINGS    "Ρυθμίσεις καταγραφής"
@@ -2897,14 +2906,6 @@ BEGIN
     IDS_AG_PREVIOUS         "Προηγούμενο"
     IDS_AG_NEXT_FILE        "Επόμενο αρχείο"
     IDS_AG_PREVIOUS_FILE    "Προηγούμενο αρχείο"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_FRAME_HALF          "Μισό μέγεθος"
-    IDS_FRAME_NORMAL        "Κανονικό μέγεθος"
-    IDS_FRAME_DOUBLE        "Διπλό μέγεθος"
-    IDS_FRAME_STRETCH       "Επέκταση στο παράθυρο"
 END
 
 STRINGTABLE

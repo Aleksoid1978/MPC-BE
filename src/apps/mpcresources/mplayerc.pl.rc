@@ -2451,6 +2451,15 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_FRAME_HALF          "50%"
+    IDS_FRAME_NORMAL        "100%"
+    IDS_FRAME_DOUBLE        "200%"
+    IDS_FRAME_STRETCH       "Dopasowanie do rozmiaru okna"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FILE_FAV_ADDED      "Dodano plik do ulubionych"
     IDS_DVD_FAV_ADDED       "Dodano DVD do ulubionych"
     IDS_CAPTURE_SETTINGS    "Ustawienia przechwytywania"
@@ -2897,14 +2906,6 @@ BEGIN
     IDS_AG_PREVIOUS         "Przejdź wstecz"
     IDS_AG_NEXT_FILE        "Następny plik"
     IDS_AG_PREVIOUS_FILE    "Poprzedni plik"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_FRAME_HALF          "50%"
-    IDS_FRAME_NORMAL        "100%"
-    IDS_FRAME_DOUBLE        "200%"
-    IDS_FRAME_STRETCH       "Dopasowanie do rozmiaru okna"
 END
 
 STRINGTABLE

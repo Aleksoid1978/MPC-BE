@@ -2451,6 +2451,15 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_FRAME_HALF          "절반 크기"
+    IDS_FRAME_NORMAL        "원래 크기"
+    IDS_FRAME_DOUBLE        "두 배 크기"
+    IDS_FRAME_STRETCH       "창 크기/모양대로 늘리기"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FILE_FAV_ADDED      "즐겨찾기에 추가된 파일"
     IDS_DVD_FAV_ADDED       "즐겨찾기에 추가된 DVD"
     IDS_CAPTURE_SETTINGS    "캡처 설정"
@@ -2897,14 +2906,6 @@ BEGIN
     IDS_AG_PREVIOUS         "이전"
     IDS_AG_NEXT_FILE        "다음 파일"
     IDS_AG_PREVIOUS_FILE    "이전 파일"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_FRAME_HALF          "절반 크기"
-    IDS_FRAME_NORMAL        "원래 크기"
-    IDS_FRAME_DOUBLE        "두 배 크기"
-    IDS_FRAME_STRETCH       "창 크기/모양대로 늘리기"
 END
 
 STRINGTABLE

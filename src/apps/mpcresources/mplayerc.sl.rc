@@ -2449,6 +2449,15 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_FRAME_HALF          "Polovična velikost"
+    IDS_FRAME_NORMAL        "Normalna velikost"
+    IDS_FRAME_DOUBLE        "Dvojna velikost"
+    IDS_FRAME_STRETCH       "Stretch To Window"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FILE_FAV_ADDED      "Datoteka dodana priljubljenim"
     IDS_DVD_FAV_ADDED       "DVD dodan med priljubljene"
     IDS_CAPTURE_SETTINGS    "Nastavitve zajema"
@@ -2895,14 +2904,6 @@ BEGIN
     IDS_AG_PREVIOUS         "Previous"
     IDS_AG_NEXT_FILE        "Naslednja datoteka"
     IDS_AG_PREVIOUS_FILE    "Previous File"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_FRAME_HALF          "Polovična velikost"
-    IDS_FRAME_NORMAL        "Normalna velikost"
-    IDS_FRAME_DOUBLE        "Dvojna velikost"
-    IDS_FRAME_STRETCH       "Stretch To Window"
 END
 
 STRINGTABLE

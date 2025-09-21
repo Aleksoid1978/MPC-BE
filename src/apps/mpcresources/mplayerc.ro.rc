@@ -2450,6 +2450,15 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_FRAME_HALF          "Jumătate din mărime"
+    IDS_FRAME_NORMAL        "Mărime normală"
+    IDS_FRAME_DOUBLE        "Mărime dublă"
+    IDS_FRAME_STRETCH       "Întinde pe toată fereastra"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FILE_FAV_ADDED      "Fişier adăugat la favorite"
     IDS_DVD_FAV_ADDED       "DVD-ul a fost adăugat la favorite"
     IDS_CAPTURE_SETTINGS    "Setări pentru de captură"
@@ -2896,14 +2905,6 @@ BEGIN
     IDS_AG_PREVIOUS         "Precedentul"
     IDS_AG_NEXT_FILE        "Fișierul următor"
     IDS_AG_PREVIOUS_FILE    "Fișierul precedent"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_FRAME_HALF          "Jumătate din mărime"
-    IDS_FRAME_NORMAL        "Mărime normală"
-    IDS_FRAME_DOUBLE        "Mărime dublă"
-    IDS_FRAME_STRETCH       "Întinde pe toată fereastra"
 END
 
 STRINGTABLE

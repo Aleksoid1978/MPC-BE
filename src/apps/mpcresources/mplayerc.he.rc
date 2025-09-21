@@ -2449,6 +2449,15 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_FRAME_HALF          "חצי גודל"
+    IDS_FRAME_NORMAL        "גודל רגיל"
+    IDS_FRAME_DOUBLE        "גודל כפול"
+    IDS_FRAME_STRETCH       "מתח לחלון"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FILE_FAV_ADDED      "File added to favorites"
     IDS_DVD_FAV_ADDED       "DVD added to favorites"
     IDS_CAPTURE_SETTINGS    "Capture Settings"
@@ -2895,14 +2904,6 @@ BEGIN
     IDS_AG_PREVIOUS         "הקודם"
     IDS_AG_NEXT_FILE        "הקובץ הבא"
     IDS_AG_PREVIOUS_FILE    "Previous File"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_FRAME_HALF          "חצי גודל"
-    IDS_FRAME_NORMAL        "גודל רגיל"
-    IDS_FRAME_DOUBLE        "גודל כפול"
-    IDS_FRAME_STRETCH       "מתח לחלון"
 END
 
 STRINGTABLE

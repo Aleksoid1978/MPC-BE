@@ -2451,6 +2451,15 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_FRAME_HALF          "Neurri Erdia"
+    IDS_FRAME_NORMAL        "Neurri Arrunta"
+    IDS_FRAME_DOUBLE        "Neurri Bikoitza"
+    IDS_FRAME_STRETCH       "Luzatu Leihora"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FILE_FAV_ADDED      "Agiria gogokoenetara gehituta"
     IDS_DVD_FAV_ADDED       "DVD-a gogokoenetara gehituta"
     IDS_CAPTURE_SETTINGS    "Harpen Ezarpenak"
@@ -2897,14 +2906,6 @@ BEGIN
     IDS_AG_PREVIOUS         "Aurrekoa"
     IDS_AG_NEXT_FILE        "Hurrengo Agiria"
     IDS_AG_PREVIOUS_FILE    "Aurreko Agiria"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_FRAME_HALF          "Neurri Erdia"
-    IDS_FRAME_NORMAL        "Neurri Arrunta"
-    IDS_FRAME_DOUBLE        "Neurri Bikoitza"
-    IDS_FRAME_STRETCH       "Luzatu Leihora"
 END
 
 STRINGTABLE

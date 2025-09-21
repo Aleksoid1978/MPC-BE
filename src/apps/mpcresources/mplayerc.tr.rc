@@ -2451,6 +2451,15 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_FRAME_HALF          "Yarım Boyut"
+    IDS_FRAME_NORMAL        "Normal Boyut"
+    IDS_FRAME_DOUBLE        "İki Katı Boyut"
+    IDS_FRAME_STRETCH       "Pencereye Uzat"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FILE_FAV_ADDED      "Dosya sık kullanılanlara eklendi"
     IDS_DVD_FAV_ADDED       "DVD sık kullanılanlara eklendi"
     IDS_CAPTURE_SETTINGS    "Yakalama Ayarları"
@@ -2897,14 +2906,6 @@ BEGIN
     IDS_AG_PREVIOUS         "Önceki"
     IDS_AG_NEXT_FILE        "Sonraki Dosya"
     IDS_AG_PREVIOUS_FILE    "Önceki Dosya"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_FRAME_HALF          "Yarım Boyut"
-    IDS_FRAME_NORMAL        "Normal Boyut"
-    IDS_FRAME_DOUBLE        "İki Katı Boyut"
-    IDS_FRAME_STRETCH       "Pencereye Uzat"
 END
 
 STRINGTABLE

@@ -1595,6 +1595,8 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
+IDB_MEDIAINFO_LANGUAGE  FILE                    "..\\..\\ExtLib\\MediaInfo\\Language\\ar.csv"
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Toolbar
@@ -2449,6 +2451,15 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_FRAME_HALF          "نصف"
+    IDS_FRAME_NORMAL        "أصلي"
+    IDS_FRAME_DOUBLE        "مضاعف"
+    IDS_FRAME_STRETCH       "ضبط للنافذة"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FILE_FAV_ADDED      "تمت إضافة الملف إلى المفضلة"
     IDS_DVD_FAV_ADDED       "تمت إضافة DVD إلى المفضلة"
     IDS_CAPTURE_SETTINGS    "إعدادات الالتقاط"
@@ -2895,14 +2906,6 @@ BEGIN
     IDS_AG_PREVIOUS         "سابق"
     IDS_AG_NEXT_FILE        "الملف التالي"
     IDS_AG_PREVIOUS_FILE    "الملف السابق"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_FRAME_HALF          "نصف"
-    IDS_FRAME_NORMAL        "أصلي"
-    IDS_FRAME_DOUBLE        "مضاعف"
-    IDS_FRAME_STRETCH       "ضبط للنافذة"
 END
 
 STRINGTABLE

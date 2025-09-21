@@ -2451,6 +2451,15 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_FRAME_HALF          "一半大小"
+    IDS_FRAME_NORMAL        "正常大小"
+    IDS_FRAME_DOUBLE        "兩倍大小"
+    IDS_FRAME_STRETCH       "伸展至視窗大小"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FILE_FAV_ADDED      "檔案已加入到我的最愛"
     IDS_DVD_FAV_ADDED       "DVD 已加入到我的最愛"
     IDS_CAPTURE_SETTINGS    "擷取設定"
@@ -2897,14 +2906,6 @@ BEGIN
     IDS_AG_PREVIOUS         "上一段"
     IDS_AG_NEXT_FILE        "次一檔案"
     IDS_AG_PREVIOUS_FILE    "前一檔案"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_FRAME_HALF          "一半大小"
-    IDS_FRAME_NORMAL        "正常大小"
-    IDS_FRAME_DOUBLE        "兩倍大小"
-    IDS_FRAME_STRETCH       "伸展至視窗大小"
 END
 
 STRINGTABLE

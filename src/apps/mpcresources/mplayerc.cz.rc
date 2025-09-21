@@ -2451,6 +2451,15 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_FRAME_HALF          "Poloviční velikost"
+    IDS_FRAME_NORMAL        "Standardní velikost"
+    IDS_FRAME_DOUBLE        "Dvojnásobná velikost"
+    IDS_FRAME_STRETCH       "Roztáhnout do okna"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FILE_FAV_ADDED      "Soubor byl přidán mezi oblíbené"
     IDS_DVD_FAV_ADDED       "DVD bylo přidáno mezi oblíbené"
     IDS_CAPTURE_SETTINGS    "Nastavení záznamu"
@@ -2897,14 +2906,6 @@ BEGIN
     IDS_AG_PREVIOUS         "Předchozí"
     IDS_AG_NEXT_FILE        "Další soubor"
     IDS_AG_PREVIOUS_FILE    "Předchozí soubor"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_FRAME_HALF          "Poloviční velikost"
-    IDS_FRAME_NORMAL        "Standardní velikost"
-    IDS_FRAME_DOUBLE        "Dvojnásobná velikost"
-    IDS_FRAME_STRETCH       "Roztáhnout do okna"
 END
 
 STRINGTABLE

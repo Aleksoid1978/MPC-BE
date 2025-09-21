@@ -2451,6 +2451,15 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_FRAME_HALF          "Halbe Größe"
+    IDS_FRAME_NORMAL        "Normale Größe"
+    IDS_FRAME_DOUBLE        "Doppelte Größe"
+    IDS_FRAME_STRETCH       "Auf Fenstergröße strecken"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FILE_FAV_ADDED      "Die Datei wurde zu den Favoriten hinzugefügt"
     IDS_DVD_FAV_ADDED       "Die DVD wurde zu den Favoriten hinzugefügt"
     IDS_CAPTURE_SETTINGS    "Aufnahmeeinstellungen"
@@ -2897,14 +2906,6 @@ BEGIN
     IDS_AG_PREVIOUS         "Rückwärts springen"
     IDS_AG_NEXT_FILE        "Nächste Datei"
     IDS_AG_PREVIOUS_FILE    "Vorherige Datei"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_FRAME_HALF          "Halbe Größe"
-    IDS_FRAME_NORMAL        "Normale Größe"
-    IDS_FRAME_DOUBLE        "Doppelte Größe"
-    IDS_FRAME_STRETCH       "Auf Fenstergröße strecken"
 END
 
 STRINGTABLE

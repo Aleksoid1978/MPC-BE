@@ -1595,8 +1595,6 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
-IDB_MEDIAINFO_LANGUAGE  FILE                    "..\\..\\ExtLib\\MediaInfo\\Language\\hr.csv"
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Toolbar
@@ -2451,6 +2449,15 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_FRAME_HALF          "Upola Veličine"
+    IDS_FRAME_NORMAL        "Normalna Veličina"
+    IDS_FRAME_DOUBLE        "Dvostruka Veličina"
+    IDS_FRAME_STRETCH       "Rastegni Do Prozora"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FILE_FAV_ADDED      "Datoteka dodana u favorite"
     IDS_DVD_FAV_ADDED       "DVD dodan u favorite"
     IDS_CAPTURE_SETTINGS    "Postavke snimanja"
@@ -2897,14 +2904,6 @@ BEGIN
     IDS_AG_PREVIOUS         "Prethodno"
     IDS_AG_NEXT_FILE        "Sljedeće Datoteka"
     IDS_AG_PREVIOUS_FILE    "Prethodna Datoteka"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_FRAME_HALF          "Upola Veličine"
-    IDS_FRAME_NORMAL        "Normalna Veličina"
-    IDS_FRAME_DOUBLE        "Dvostruka Veličina"
-    IDS_FRAME_STRETCH       "Rastegni Do Prozora"
 END
 
 STRINGTABLE

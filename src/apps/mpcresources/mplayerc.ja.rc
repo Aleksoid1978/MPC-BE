@@ -2451,6 +2451,15 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_FRAME_HALF          "1/2 サイズ"
+    IDS_FRAME_NORMAL        "標準サイズ"
+    IDS_FRAME_DOUBLE        "2 倍サイズ"
+    IDS_FRAME_STRETCH       "ウィンドウの大きさに広げる"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FILE_FAV_ADDED      "ファイルをお気に入りに追加しました"
     IDS_DVD_FAV_ADDED       "DVD をお気に入りに追加しました"
     IDS_CAPTURE_SETTINGS    "キャプチャー設定"
@@ -2897,14 +2906,6 @@ BEGIN
     IDS_AG_PREVIOUS         "前へ"
     IDS_AG_NEXT_FILE        "次のファイル"
     IDS_AG_PREVIOUS_FILE    "前のファイル"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_FRAME_HALF          "1/2 サイズ"
-    IDS_FRAME_NORMAL        "標準サイズ"
-    IDS_FRAME_DOUBLE        "2 倍サイズ"
-    IDS_FRAME_STRETCH       "ウィンドウの大きさに広げる"
 END
 
 STRINGTABLE

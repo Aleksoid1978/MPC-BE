@@ -2451,6 +2451,15 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_FRAME_HALF          "Halva Storleken"
+    IDS_FRAME_NORMAL        "Normala Storleken"
+    IDS_FRAME_DOUBLE        "Dubbla Storleken"
+    IDS_FRAME_STRETCH       "Sträck Till Fönster"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FILE_FAV_ADDED      "File added to favorites"
     IDS_DVD_FAV_ADDED       "DVD added to favorites"
     IDS_CAPTURE_SETTINGS    "Capture Settings"
@@ -2897,14 +2906,6 @@ BEGIN
     IDS_AG_PREVIOUS         "Föregående"
     IDS_AG_NEXT_FILE        "Next File"
     IDS_AG_PREVIOUS_FILE    "Previous File"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_FRAME_HALF          "Halva Storleken"
-    IDS_FRAME_NORMAL        "Normala Storleken"
-    IDS_FRAME_DOUBLE        "Dubbla Storleken"
-    IDS_FRAME_STRETCH       "Sträck Till Fönster"
 END
 
 STRINGTABLE

@@ -2451,6 +2451,15 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_FRAME_HALF          "Mitad de Tamaño"
+    IDS_FRAME_NORMAL        "Tamaño Original"
+    IDS_FRAME_DOUBLE        "Doble de Tamaño"
+    IDS_FRAME_STRETCH       "Ajustar a la Ventana"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FILE_FAV_ADDED      "Archivo agregado a Favoritos"
     IDS_DVD_FAV_ADDED       "DVD agregado a Favoritos"
     IDS_CAPTURE_SETTINGS    "Configuración de Captura"
@@ -2897,14 +2906,6 @@ BEGIN
     IDS_AG_PREVIOUS         "Anterior"
     IDS_AG_NEXT_FILE        "Archivo Siguiente"
     IDS_AG_PREVIOUS_FILE    "Archivo Anterior"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_FRAME_HALF          "Mitad de Tamaño"
-    IDS_FRAME_NORMAL        "Tamaño Original"
-    IDS_FRAME_DOUBLE        "Doble de Tamaño"
-    IDS_FRAME_STRETCH       "Ajustar a la Ventana"
 END
 
 STRINGTABLE

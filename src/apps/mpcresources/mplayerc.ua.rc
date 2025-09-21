@@ -2451,6 +2451,15 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_FRAME_HALF          "Половинного розміру"
+    IDS_FRAME_NORMAL        "Нормального розміру"
+    IDS_FRAME_DOUBLE        "Подвійного розміру"
+    IDS_FRAME_STRETCH       "Розтягнути до розміру вікна"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FILE_FAV_ADDED      "Файл додано до закладок"
     IDS_DVD_FAV_ADDED       "DVD додано до закладок"
     IDS_CAPTURE_SETTINGS    "Налаштування захоплення"
@@ -2897,14 +2906,6 @@ BEGIN
     IDS_AG_PREVIOUS         "Попередній"
     IDS_AG_NEXT_FILE        "Наступний файл"
     IDS_AG_PREVIOUS_FILE    "Попередній файл"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_FRAME_HALF          "Половинного розміру"
-    IDS_FRAME_NORMAL        "Нормального розміру"
-    IDS_FRAME_DOUBLE        "Подвійного розміру"
-    IDS_FRAME_STRETCH       "Розтягнути до розміру вікна"
 END
 
 STRINGTABLE
