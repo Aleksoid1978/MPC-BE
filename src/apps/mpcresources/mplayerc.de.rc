@@ -2451,7 +2451,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "Systemcodepage - %u"
     IDS_FRAME_HALF          "Halbe Größe"
     IDS_FRAME_NORMAL        "Normale Größe"
     IDS_FRAME_DOUBLE        "Doppelte Größe"

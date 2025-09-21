@@ -2115,4 +2115,3 @@ STRING ID_SHOW_MILLISECONDS		"Millisekunden anzeigen"
 STRING ID_VOLUME_MUTE		"Ton aus\nTon aus"
 STRING ID_VOLUME_MUTE_DISABLED		"Kein Audio\nKein Audio"
 STRING ID_VOLUME_MUTE_OFF		"Ton ein\nTon ein"
-
