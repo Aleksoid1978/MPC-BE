@@ -572,7 +572,8 @@ UINT CShoutcastStream::SocketThreadProc()
 					break;
 				}
 
-				int size = ParseMPAHeader(pos);
+				audioframe_t aframe;
+				int size = ParseMPAHeader(pos, &aframe);
 				if (size == 0) {
 					pos++;
 					continue;
@@ -582,7 +583,7 @@ UINT CShoutcastStream::SocketThreadProc()
 				}
 
 				if (pos + size + MPA_HEADER_SIZE <= end) {
-					int size2 = ParseMPAHeader(pos + size);
+					int size2 = ParseMPAHeader(pos + size, &aframe);
 					if (size2 == 0) {
 						pos++;
 						continue;
@@ -591,7 +592,7 @@ UINT CShoutcastStream::SocketThreadProc()
 
 				std::unique_ptr<CShoutCastPacket> p2(DNew CShoutCastPacket(pos, size));
 				p2->rtStart = rtSampleTime;
-				p2->rtStop  = rtSampleTime + (10000000i64 * size * 8/soc.m_bitrate);
+				p2->rtStop  = rtSampleTime + (10000000i64 * aframe.samples / aframe.samplerate);
 				rtSampleTime = p2->rtStop;
 				p2->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
 
@@ -633,7 +634,7 @@ UINT CShoutcastStream::SocketThreadProc()
 
 				std::unique_ptr<CShoutCastPacket> p2(DNew CShoutCastPacket(pos + aframe.param1, size - aframe.param1));
 				p2->rtStart = rtSampleTime;
-				p2->rtStop  = rtSampleTime + (10000000i64 * size * 8/soc.m_bitrate);
+				p2->rtStop  = rtSampleTime + (10000000i64 * aframe.samples / aframe.samplerate);
 				rtSampleTime = p2->rtStop;
 				p2->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
 
