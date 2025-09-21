@@ -49,7 +49,7 @@ protected:
 public:
 	COggSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 
-	void AddComment(BYTE* p, int len, bool bOverrideComment);
+	void AddComment(BYTE* p, int len, bool bFromUnpackPacket);
 	CStringW GetComment(CStringW key);
 
 	void HandlePacket(DWORD TrackNumber, BYTE* pData, int len);

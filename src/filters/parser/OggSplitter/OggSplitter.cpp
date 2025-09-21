@@ -748,7 +748,7 @@ COggSplitterOutputPin::COggSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter
 	ResetState();
 }
 
-void COggSplitterOutputPin::AddComment(BYTE* p, int len, bool bOverrideComment)
+void COggSplitterOutputPin::AddComment(BYTE* p, int len, bool bFromUnpackPacket)
 {
 	CGolombBuffer gb(p, len);
 	gb.SkipBytes(gb.ReadDwordLE());
@@ -788,10 +788,16 @@ void COggSplitterOutputPin::AddComment(BYTE* p, int len, bool bOverrideComment)
 		}
 
 		auto& comment = m_pComments[commentKey];
-		if (comment.IsEmpty() || bOverrideComment) {
-			comment = commentValue;
+		if (bFromUnpackPacket) {
+			if (comment.Find(commentValue) == -1) {
+				comment = commentValue;
+			}
 		} else {
-			comment += L" / " + commentValue;
+			if (comment.IsEmpty()) {
+				comment = commentValue;
+			} else {
+				comment += L" / " + commentValue;
+			}
 		}
 	}
 }
