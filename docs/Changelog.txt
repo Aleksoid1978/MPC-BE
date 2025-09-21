@@ -5,6 +5,7 @@
 Updated Korean translation (by Hackjjang).
 Updated Arabic translation (by Alhlhli).
 Updated German translation (by Klaus1189).
+Updated Romanian translation (by Andrei Miloiu).
 
 Updated libraries:
 	ffmpeg n8.1-dev-519-g82b5a0faba.

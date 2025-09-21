@@ -2450,7 +2450,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "Pagina de codificare a sistemului - %u"
     IDS_FRAME_HALF          "Jumătate din mărime"
     IDS_FRAME_NORMAL        "Mărime normală"
     IDS_FRAME_DOUBLE        "Mărime dublă"
