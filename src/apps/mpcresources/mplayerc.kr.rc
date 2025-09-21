@@ -2451,7 +2451,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "시스템 코드 페이지 - %u"
     IDS_FRAME_HALF          "절반 크기"
     IDS_FRAME_NORMAL        "원래 크기"
     IDS_FRAME_DOUBLE        "두 배 크기"
