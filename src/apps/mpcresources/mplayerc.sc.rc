@@ -2451,7 +2451,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "系统代码页 - %u"
     IDS_FRAME_HALF          "半数尺寸"
     IDS_FRAME_NORMAL        "正常尺寸"
     IDS_FRAME_DOUBLE        "双倍尺寸"
