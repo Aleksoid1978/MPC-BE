@@ -1024,6 +1024,9 @@ bool CShoutcastStream::CShoutcastSocket::FindSync()
 				m_samplerate	= aframe.samplerate;
 				m_channels		= aframe.channels;
 				m_aacprofile	= aframe.param2;
+				if (m_bitrate == 0) {
+					m_bitrate = CalcBitrate(aframe);
+				}
 
 				return true;
 			}
