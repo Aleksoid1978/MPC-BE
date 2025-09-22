@@ -583,7 +583,8 @@ UINT CShoutcastStream::SocketThreadProc()
 				}
 
 				if (pos + size + MPA_HEADER_SIZE <= end) {
-					int size2 = ParseMPAHeader(pos + size, &aframe);
+					// additional check of the next packet
+					int size2 = ParseMPAHeader(pos + size);
 					if (size2 == 0) {
 						pos++;
 						continue;
@@ -627,7 +628,8 @@ UINT CShoutcastStream::SocketThreadProc()
 				}
 
 				if (pos + size + ADTS_HEADER_SIZE <= end) {
-					int size2 = ParseADTSAACHeader(pos + size, &aframe);
+					// additional check of the next packet
+					int size2 = ParseADTSAACHeader(pos + size);
 					if (size2 == 0) {
 						pos++;
 						continue;
