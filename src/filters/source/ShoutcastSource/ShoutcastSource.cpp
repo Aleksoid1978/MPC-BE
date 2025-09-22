@@ -215,6 +215,18 @@ STDMETHODIMP CShoutcastSource::get_Description(BSTR* pbstrDescription)
 	return E_UNEXPECTED;
 }
 
+STDMETHODIMP CShoutcastSource::get_BaseURL(BSTR* pbstrBaseURL)
+{
+	CheckPointer(pbstrBaseURL, E_POINTER);
+
+	if (m_iPins == 1) {
+		*pbstrBaseURL = (static_cast<CShoutcastStream*>(m_paStreams[0]))->GetBaseURL().AllocSysString();
+		return S_OK;
+	}
+
+	return E_UNEXPECTED;
+}
+
 STDMETHODIMP CShoutcastSource::QueryFilterInfo(FILTER_INFO* pInfo)
 {
 	CheckPointer(pInfo, E_POINTER);
@@ -338,6 +350,12 @@ CStringW CShoutcastStream::GetDescription()
 {
 	CAutoLock cAutoLock(&m_queue);
 	return m_Description;
+}
+
+CStringW CShoutcastStream::GetBaseURL()
+{
+	CAutoLock cAutoLock(&m_queue);
+	return m_StationUrl;
 }
 
 HRESULT CShoutcastStream::DecideBufferSize(IMemAllocator* pAlloc, ALLOCATOR_PROPERTIES* pProperties)
@@ -522,6 +540,7 @@ UINT CShoutcastStream::SocketThreadProc()
 	soc = m_socket;
 
 	m_StationName = soc.m_title;
+	m_StationUrl  = soc.m_url;
 	m_Description = soc.m_description;
 
 	int64_t total_samples = 0;
@@ -600,7 +619,7 @@ UINT CShoutcastStream::SocketThreadProc()
 				total_samples += aframe.samples;
 				p2->rtStop  = 10000000i64 * total_samples / aframe.samplerate;
 
-				p2->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
+				p2->title = soc.m_title;
 
 				{
 					CAutoLock cAutoLock(&m_queue);
@@ -645,7 +664,7 @@ UINT CShoutcastStream::SocketThreadProc()
 				total_samples += aframe.samples;
 				p2->rtStop  = 10000000i64 * total_samples / aframe.samplerate;
 
-				p2->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
+				p2->title = soc.m_title;
 
 				{
 					CAutoLock cAutoLock(&m_queue);
@@ -744,7 +763,7 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 		if (1 == __super::Receive(&b, 1) && b && b*16 == __super::Receive(buff, b*16)) {
 			int len = decode_html_entities_utf8((char*)buff, nullptr);
 
-			CStringW str = UTF8orLocalToWStr((LPCSTR)buff, m_codepage);
+			const CStringW str = UTF8orLocalToWStr((LPCSTR)buff, m_codepage);
 
 			DLog(L"CShoutcastStream(): Metainfo: %s", str);
 
@@ -784,6 +803,7 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 				DLog(L"CShoutcastStream(): StreamTitle is missing");
 			}
 
+			/*
 			i = str.Find(L"StreamUrl='");
 			if (i >= 0) {
 				i += 11;
@@ -792,12 +812,10 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 					j = str.ReverseFind('\'');
 				}
 				if (j > i) {
-					str = str.Mid(i, j - i);
-					if (!str.IsEmpty()) {
-						m_url = str;
-					}
+					m_url = str.Mid(i, j - i);
 				}
 			}
+			*/
 		}
 	} else if (m_metaint > 0) {
 		char* p = (char*)lpBuf;

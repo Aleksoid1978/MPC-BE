@@ -91,9 +91,7 @@ public:
 	STDMETHODIMP get_Copyright(BSTR* pbstrCopyright) {
 		return E_NOTIMPL;
 	}
-	STDMETHODIMP get_BaseURL(BSTR* pbstrBaseURL) {
-		return E_NOTIMPL;
-	}
+	STDMETHODIMP get_BaseURL(BSTR* pbstrBaseURL);
 	STDMETHODIMP get_LogoURL(BSTR* pbstrLogoURL) {
 		return E_NOTIMPL;
 	}
@@ -212,8 +210,11 @@ class CShoutcastStream : public CSourceStream
 	bool m_bExitThread = false;;
 
 	CStringW m_StationName;
-	CStringW m_StreamTitle;
+	CStringW m_StationUrl;
 	CStringW m_Description;
+
+	CStringW m_StreamTitle;
+	//CStringW m_StreamUrl;
 
 public:
 	CShoutcastStream(const WCHAR* wfn, CShoutcastSource* pParent, const UINT codePage, HRESULT* phr);
@@ -226,6 +227,7 @@ public:
 
 	CStringW GetTitle();
 	CStringW GetDescription();
+	CStringW GetBaseURL();
 
 	HRESULT DecideBufferSize(IMemAllocator* pIMemAlloc, ALLOCATOR_PROPERTIES* pProperties);
 	HRESULT FillBuffer(IMediaSample* pSample);
