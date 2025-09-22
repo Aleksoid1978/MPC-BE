@@ -521,7 +521,7 @@ UINT CShoutcastStream::SocketThreadProc()
 	m_title       = soc.m_title;
 	m_description = soc.m_description;
 
-	REFERENCE_TIME rtSampleTime = 0;
+	int64_t total_samples = 0;
 	CSimpleBuffer<BYTE> buffer;
 	size_t bufdatalen = 0;
 
@@ -591,9 +591,11 @@ UINT CShoutcastStream::SocketThreadProc()
 				}
 
 				std::unique_ptr<CShoutCastPacket> p2(DNew CShoutCastPacket(pos, size));
-				p2->rtStart = rtSampleTime;
-				p2->rtStop  = rtSampleTime + (10000000i64 * aframe.samples / aframe.samplerate);
-				rtSampleTime = p2->rtStop;
+
+				p2->rtStart = 10000000i64 * total_samples / aframe.samplerate;
+				total_samples += aframe.samples;
+				p2->rtStop  = 10000000i64 * total_samples / aframe.samplerate;
+
 				p2->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
 
 				{
@@ -633,9 +635,11 @@ UINT CShoutcastStream::SocketThreadProc()
 				}
 
 				std::unique_ptr<CShoutCastPacket> p2(DNew CShoutCastPacket(pos + aframe.param1, size - aframe.param1));
-				p2->rtStart = rtSampleTime;
-				p2->rtStop  = rtSampleTime + (10000000i64 * aframe.samples / aframe.samplerate);
-				rtSampleTime = p2->rtStop;
+
+				p2->rtStart = 10000000i64 * total_samples / aframe.samplerate;
+				total_samples += aframe.samples;
+				p2->rtStop  = 10000000i64 * total_samples / aframe.samplerate;
+
 				p2->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
 
 				{
