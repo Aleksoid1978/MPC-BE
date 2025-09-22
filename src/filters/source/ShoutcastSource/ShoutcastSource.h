@@ -211,7 +211,8 @@ class CShoutcastStream : public CSourceStream
 	bool m_bBuffering = false;
 	bool m_bExitThread = false;;
 
-	CStringW m_Title;
+	CStringW m_StationName;
+	CStringW m_StreamTitle;
 	CStringW m_Description;
 
 public:

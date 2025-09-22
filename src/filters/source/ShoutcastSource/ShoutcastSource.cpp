@@ -328,7 +328,10 @@ LONGLONG CShoutcastStream::GetBufferFullness()
 CStringW CShoutcastStream::GetTitle()
 {
 	CAutoLock cAutoLock(&m_queue);
-	return m_Title;
+	if (m_StreamTitle.GetLength()) {
+		return m_StreamTitle;
+	}
+	return m_StationName;
 }
 
 CStringW CShoutcastStream::GetDescription()
@@ -415,7 +418,7 @@ HRESULT CShoutcastStream::FillBuffer(IMediaSample* pSample)
 			memcpy(pData, p->data.get(), len);
 			pSample->SetActualDataLength(len);
 			pSample->SetTime(&p->rtStart, &p->rtStop);
-			m_Title = p->title;
+			m_StreamTitle = p->title;
 		}
 	}
 
@@ -518,7 +521,7 @@ UINT CShoutcastStream::SocketThreadProc()
 	soc.Attach(m_hSocket);
 	soc = m_socket;
 
-	m_Title       = soc.m_title;
+	m_StationName = soc.m_title;
 	m_Description = soc.m_description;
 
 	int64_t total_samples = 0;
