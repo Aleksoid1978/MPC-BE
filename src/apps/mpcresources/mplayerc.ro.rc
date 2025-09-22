@@ -740,15 +740,15 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "Fontul (Scrisul)",IDC_STATIC,5,5,105,98
     PUSHBUTTON      "Fontul (Scrisul))",IDC_BUTTON1,10,17,95,13
-    LTEXT           "Spațiere",IDC_STATIC,10,37,56,8
+    LTEXT           "Spațierea",IDC_STATIC,10,37,56,8
     EDITTEXT        IDC_EDIT3,70,35,35,13,ES_RIGHT | ES_AUTOHSCROLL
-    LTEXT           "Unghi (z,°)",IDC_STATIC,10,54,56,8
+    LTEXT           "Unghiul (z,°)",IDC_STATIC,10,54,56,8
     EDITTEXT        IDC_EDIT4,70,52,35,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN10,"msctls_updown32",UDS_WRAP | UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,93,52,12,13
-    LTEXT           "Scală (x,%)",IDC_STATIC,10,71,56,8
+    LTEXT           "Scala (x,%)",IDC_STATIC,10,71,56,8
     EDITTEXT        IDC_EDIT5,70,69,35,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN4,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,93,69,12,13
-    LTEXT           "Scală (y,%)",IDC_STATIC,10,88,56,8
+    LTEXT           "Scala (y,%)",IDC_STATIC,10,88,56,8
     EDITTEXT        IDC_EDIT6,70,86,35,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN5,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,93,86,12,13
     GROUPBOX        "Stilul chenarului",IDC_STATIC,5,106,105,68
@@ -782,7 +782,7 @@ BEGIN
     CONTROL         "",IDC_SPIN9,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,271,35,12,14
     CONTROL         "Poziționează subtitrările relativ la cadrul video",IDC_CHECK_RELATIVETO,
                     "Button",BS_AUTO3STATE | WS_TABSTOP,119,53,170,9
-    GROUPBOX        "Culori și transparență",IDC_STATIC,114,69,177,120
+    GROUPBOX        "Culorile și transparența",IDC_STATIC,114,69,177,120
     LTEXT           "100%",IDC_STATIC,270,81,20,8
     LTEXT           "0%",IDC_STATIC,190,81,20,8
     LTEXT           "Primar",IDC_STATIC,119,95,47,8
@@ -791,10 +791,10 @@ BEGIN
     LTEXT           "Secundar",IDC_STATIC,119,111,47,8
     PUSHBUTTON      "SEC",IDC_COLORSEC,170,108,20,14
     CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,190,109,100,12
-    LTEXT           "Contur",IDC_STATIC,119,127,47,8
+    LTEXT           "Conturul",IDC_STATIC,119,127,47,8
     PUSHBUTTON      "CONT",IDC_COLOROUTL,170,124,20,14
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,190,125,100,12
-    LTEXT           "Umbră",IDC_STATIC,119,143,47,8
+    LTEXT           "Umbra",IDC_STATIC,119,143,47,8
     PUSHBUTTON      "UMBR",IDC_COLORSHAD,170,140,20,14
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,190,141,100,12
     CONTROL         "Unește canalele alpha (alfa)",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,157,110,10
@@ -836,7 +836,7 @@ BEGIN
     PUSHBUTTON      "Configurația\ndecodorului video",IDC_BUTTON2,220,41,70,30,BS_MULTILINE
     PUSHBUTTON      "Configurația\ndecodorului\nDVD-Video",IDC_BUTTON3,220,76,70,30,BS_MULTILINE
     PUSHBUTTON      "Configurația\ndecodorului audio",IDC_BUTTON4,220,41,70,30,BS_MULTILINE
-    LTEXT           "Lungimea tamponului:",IDC_STATIC1,221,216,69,8
+    LTEXT           "Lungimea bufferului:",IDC_STATIC1,221,216,69,8
     EDITTEXT        IDC_EDIT1,221,228,29,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,239,228,11,13
     LTEXT           "secunde",IDC_STATIC2,254,230,26,8
@@ -1851,7 +1851,7 @@ BEGIN
                 MENUITEM "Niciodată",                       ID_ONTOP_NEVER
                 MENUITEM "La nesfârșit (Pentru totdeauna)",                      ID_ONTOP_ALWAYS
                 MENUITEM "În timpul redării",               ID_ONTOP_WHILEPLAYING
-                MENUITEM "În timpul redării video",         ID_ONTOP_WHILEPLAYINGVIDEO
+                MENUITEM "În timpul redării videoclipului",         ID_ONTOP_WHILEPLAYINGVIDEO
             END
             MENUITEM SEPARATOR
             MENUITEM "Meniu și subtitrări",               ID_VIEW_CAPTIONMENU
@@ -1992,7 +1992,7 @@ BEGIN
                 MENUITEM "Niciodată",                       ID_ONTOP_NEVER
                 MENUITEM "La nesfârșit (Pentru totdeauna)",                      ID_ONTOP_ALWAYS
                 MENUITEM "În timpul redării",               ID_ONTOP_WHILEPLAYING
-                MENUITEM "În timpul redării video",         ID_ONTOP_WHILEPLAYINGVIDEO
+                MENUITEM "În timpul redării videoclipului",         ID_ONTOP_WHILEPLAYINGVIDEO
             END
             MENUITEM "&Opțiuni...",                 ID_VIEW_OPTIONS
         END
@@ -2079,7 +2079,7 @@ BEGIN
         MENUITEM "&Jumătate din mărime",                  ID_VIEW_VF_HALF
         MENUITEM "&Mărime normală",                ID_VIEW_VF_NORMAL
         MENUITEM "Mărime &dublă",                ID_VIEW_VF_DOUBLE
-        MENUITEM "Î&ntinde cât fereastra",          ID_VIEW_VF_STRETCH
+        MENUITEM "Î&ntinde pe toată fereastra",          ID_VIEW_VF_STRETCH
         MENUITEM "Atinge fereastra din &interior",   ID_VIEW_VF_FROMINSIDE
         MENUITEM "Mărește/Micșorează (Scalează) &1",                     ID_VIEW_VF_ZOOM1
         MENUITEM "Mărește/Micșorează (Scalează) &2",                     ID_VIEW_VF_ZOOM2
@@ -2095,7 +2095,7 @@ BEGIN
             MENUITEM "2.35:1",                      ID_ASPECTRATIO_235_100
             MENUITEM "1.85:1",                      ID_ASPECTRATIO_185_100
         END
-        MENUITEM "Corectează diferența raportului de aspect (AR-ului/ RA-ului) pentru monitor/ desktop", ID_VIEW_VF_COMPMONDESKARDIFF
+        MENUITEM "Corectează diferența raportului de aspect (AR-ului/ RA-ului) pentru monitor/desktop", ID_VIEW_VF_COMPMONDESKARDIFF
     END
 END
 
@@ -2462,7 +2462,7 @@ BEGIN
     IDS_FILE_FAV_ADDED      "Fişier adăugat la favorite"
     IDS_DVD_FAV_ADDED       "DVD-ul a fost adăugat la favorite"
     IDS_CAPTURE_SETTINGS    "Setări pentru de captură"
-    IDS_NAVIGATION_BAR      "Bară de navigare"
+    IDS_NAVIGATION_BAR      "Bara de navigare"
     IDS_SHADER_EDITOR       "Editorul de nuanțatoare (de shadere)"
     IDS_SUBRESYNC_CAPTION   "Resincronizează subtitrările"
     IDS_SUBRESYNC_CLN_TIME  "Timp"
@@ -2525,7 +2525,7 @@ BEGIN
     IDS_AG_SUBDELAY_DEC     "Întârzie subtitrarea -"
     IDS_AG_SUBDELAY_INC     "Întârzie subtitrarea +"
     IDS_FILE_SAVE_THUMBNAILS "Salvează miniaturi"
-    IDS_OSD_TEST            "Test OSD (On Screen Diplay / Afișare pe ecran)"
+    IDS_OSD_TEST            "Test pentru OSD (On Screen Diplay / Afișare pe ecran)"
 END
 
 STRINGTABLE
@@ -2790,7 +2790,7 @@ BEGIN
     IDS_PIXELSHADERCOMPILER_1  "Punctele de intrare necesare ale funcției nu pot fi găsite în D3DX9_xx.dll, nuanțatoarele de pixeli nu vor funcționa."
     IDS_AG_NOT_KNOWN        "Necunoscut"
     IDS_AG_OPEN_FILE        "Deschide rapid un fișier"
-    IDS_AG_OPEN_FILEURL     "Deschide fișier"
+    IDS_AG_OPEN_FILEURL     "Deschide fișierul"
     IDS_AG_OPEN_DVD         "Deschide DVD-ul/BD-ul"
 END
 
@@ -2820,8 +2820,8 @@ BEGIN
     IDS_OSD_CUSTOM_CH_MAPPING_ON "Repartizare particularizată a canalelor: Pornită"
     IDS_OSD_CUSTOM_CH_MAPPING_OFF "Repartizare particularizată a canalelor: Oprită"
     IDS_TOGGLE_AUTOVOLUMECONTROL "Comută controlul automat al volumului"
-    IDS_OSD_AUTOVOLUMECONTROL_ON "Control al volumului automat: Pornit"
-    IDS_OSD_AUTOVOLUMECONTROL_OFF "Control automat al volumului: Oprit"
+    IDS_OSD_AUTOVOLUMECONTROL_ON "Controlul volumului automat: Pornit"
+    IDS_OSD_AUTOVOLUMECONTROL_OFF "Controlul automat al volumului: Oprit"
     IDS_REGAIN_VOLUME       "Comută restabilirea volumului"
     IDS_OSD_REGAIN_VOLUME_ON "Restabileşte volumul: Pornit"
     IDS_OSD_REGAIN_VOLUME_OFF "Restabileşte volumul: Oprit"
@@ -2854,8 +2854,8 @@ BEGIN
     IDS_OSD_RS_FT_CORRECTION_OFF "Corecția timpului pentru cadre: Oprită"
     IDS_OSD_RS_TARGET_VSYNC_OFFSET "Decalajul VSync-ului (sincronizării verticale) țintă: %.1f"
     IDS_OSD_RS_VSYNC_OFFSET "Decalajul VSync-ului (sincronizării verticale): %d"
-    IDS_OSD_SPEED           "Viteză: %sx"
-    IDS_OSD_THUMBS_SAVED    "Miniaturi salvate cu succes"
+    IDS_OSD_SPEED           "Viteza: %sx"
+    IDS_OSD_THUMBS_SAVED    "Miniaturile au fost salvate cu succes"
     IDS_MENU_VIDEO_STREAM   "F&lux video"
     IDS_MENU_VIDEO_ANGLE    "Un&ghi video"
     IDS_RESET_SETTINGS      "Resetează setările"
@@ -2912,7 +2912,7 @@ BEGIN
     IDS_FRAME_FROMINSIDE    "Atinge fereastra din interior"
     IDS_FRAME_ZOOM1         "(Mărește/Micșorează) Scalează 1"
     IDS_FRAME_ZOOM2         "(Mărește/Micșorează) Scalează 2"
-    IDS_FRAME_FROMOUTSIDE   "Atinge fereastra din exteri&or"
+    IDS_FRAME_FROMOUTSIDE   "Atinge fereastra din exterior"
     IDS_CENTER_LEVEL_INC    "Crește nivelul central"
     IDS_CENTER_LEVEL_DEC    "Scade nivelul central"
     IDS_CENTER_LEVEL        "Nivel central (%+.1f dB)"
@@ -2991,14 +2991,14 @@ STRINGTABLE
 BEGIN
     IDS_AG_NEXT_SUBTITLE    "Următoarea subtitrare"
     IDS_AG_PREV_SUBTITLE    "Subtitrarea precedentă"
-    IDS_AG_SUBTITLE_ONOFF   "(Dez)activează subtitrările"
+    IDS_AG_SUBTITLE_ONOFF   "Activează/Dezactivează subtitrările"
     IDS_AG_SUBTITLE_RELOAD  "Reîncarcă subtitrările"
     IDS_AG_NEXT_VIDEO       "Următorul fișier video (videoclip) / Unghiul DVD-ului"
     IDS_AG_PREV_VIDEO       "Videoclipul anterior / Unghiul DVD-ului"
     IDS_REPEAT_FOREVER      "Repetă la nesfârșit (Repetă pentru totdeauna)"
     IDS_REPEAT_FOREVER_OFF  "Repetă la nesfârșit (Repetă pentru totdeauna): Oprit"
     IDS_REPEAT_FOREVER_ON   "Repetă la nesfârșit (Repetă pentru totdeauna): Pornit"
-    IDS_MPLAYERC_98         "OSD: Timp rămas"
+    IDS_MPLAYERC_98         "OSD: Timpul rămas"
 END
 
 STRINGTABLE
@@ -3150,14 +3150,14 @@ STRINGTABLE
 BEGIN
     IDS_MAINFRM_68          "Raportul de aspect: %d:%d"
     IDS_MAINFRM_69          "Raportul de aspect: Implicit"
-    IDS_MAINFRM_70          "Întârziere audio: %I64dms"
+    IDS_MAINFRM_70          "Întârzierea audio: %I64dms"
     IDS_AG_CHAPTER          "Capitolul %d"
     IDS_MAINFRM_73          "Nu se poate încărca shaderul: "
     IDS_AG_SHADER           "nuanțator (shader): "
     IDS_AG_OUT_OF_MEMORY    "Memorie insuficientă"
     IDS_MAINFRM_77          "Eroare: Este necesar Flash pentru IE"
     IDS_MAINFRM_80          "Obiectul pentru graficul filtrelor nu a putut fi creat"
-    IDS_MAINFRM_81          "Argument nevalid"
+    IDS_MAINFRM_81          "Argumentul nu e valid"
     IDS_MAINFRM_82          "Deschidere abandonată"
     IDS_MAINFRM_83          "Fișierul nu a putut fi redat"
 END
@@ -3188,7 +3188,7 @@ BEGIN
     IDS_MAINFRM_88          "Fișierul nu poate fi redat"
     IDS_MAINFRM_89          "Formatul de fișiere e nevalid"
     IDS_MAINFRM_90          "Fișierul nu a fost găsit"
-    IDS_MAINFRM_91          "Tip necunoscut de fișiere"
+    IDS_MAINFRM_91          "Tipul de fișiere e necunoscut"
     IDS_MAINFRM_92          "Flux neacceptat"
     IDS_MAINFRM_93          "Directorul DVD-ului nu poate fi găsit"
     IDS_MAINFRM_94          "Filtrul navigatorului DVD-ului (DVD Navigator) nu poate fi creat"
@@ -3334,10 +3334,10 @@ END
 STRINGTABLE
 BEGIN
     IDS_MPEGSPLITTER_SUB_FORCING "Încarcă forțat toate subtitrările"
-    IDS_MPEGSPLITTER_LANG_ORDER "Ordinea limbilor audio:"
+    IDS_MPEGSPLITTER_LANG_ORDER "Ordinea limbilor pentru audio:"
     IDS_MPEGSPLITTER_SUB_ORDER "Ordinea limbilor pentru subtitrare:"
     IDS_MPEGSPLITTER_TRUEHD_OUTPUT "Ieşire pentru fluxuri TrueHD + AC-3"
-    IDS_MPEGSPLITTER_SUB_EMPTY_PIN "Ieșirea pinului de subtitrare gol"
+    IDS_MPEGSPLITTER_SUB_EMPTY_PIN "Ieșirea pinului de subtitrare să fie liberă"
     IDS_MPEGSPLITTER_SUPPORT_MVC "Suportă extensia 3D MVC"
 END
 
@@ -3351,7 +3351,7 @@ BEGIN
     IDS_MPADEC_STEREO       "Stereo"
     IDS_MPADEC_SPDIF        "Trece prin (S/PDIF, HDMI)"
     IDS_MPADEC_AC3ENCODE    "Codifică în AC-3"
-    IDS_MPADEC_AV_SYNC      "Corecție A/V Sync"
+    IDS_MPADEC_AV_SYNC      "Corecție pentru A/V Sync"
     IDS_MPADEC_STATUS       "Stare"
     IDS_MPADEC_NOTACTIVE    "Decodorul nu este activ."
 END
@@ -3680,11 +3680,11 @@ BEGIN
     IDS_OSD_RS_AMBIENT_LIGHT_BRIGHT "Lumină ambientală: Luminos (2.2 Gamma)"
     IDS_OSD_RS_AMBIENT_LIGHT_DIM "Lumină ambientală: Estompat (2.35 Gamma)"
     IDS_OSD_RS_AMBIENT_LIGHT_DARK "Lumină ambientală: Întunecat (2.4 Gamma)"
-    IDS_OSD_RS_REND_INTENT_PERCEPT "Randare îndreptată către: Perceptual"
-    IDS_OSD_RS_REND_INTENT_RELATIVE "Randare îndreptată către: Colorimetric relativ"
-    IDS_OSD_RS_REND_INTENT_SATUR "Randare îndreptată către: Saturație"
-    IDS_OSD_RS_REND_INTENT_ABSOLUTE "Randare îndreptată către: Colorimetric absolut"
-    IDS_OSD_RS_OUTPUT_RANGE "Interval de ieșire: %s"
+    IDS_OSD_RS_REND_INTENT_PERCEPT "Randarea să fie îndreptată către: Perceptuală"
+    IDS_OSD_RS_REND_INTENT_RELATIVE "Randarea să fie îndreptată către: Colorimetrică relativă"
+    IDS_OSD_RS_REND_INTENT_SATUR "Randarea să fie îndreptată către: Saturație"
+    IDS_OSD_RS_REND_INTENT_ABSOLUTE "Randarea să fie îndreptată către: Colorimetrică absolută"
+    IDS_OSD_RS_OUTPUT_RANGE "Intervalul de ieșire: %s"
     IDS_OSD_RS_FLUSH_BEF_VSYNC_ON "Golește GPU-ul înainte de VSync (Sincronizare verticală): Pornit"
     IDS_OSD_RS_FLUSH_BEF_VSYNC_OFF "Golește GPU-ul înainte de VSync (Sincronizare verticală): Oprit"
     IDS_OSD_RS_FLUSH_AFT_PRES_ON "Golește GPU-ul după prezentare: Pornit"
@@ -3796,10 +3796,10 @@ BEGIN
     IDS_AFTERPLAYBACK_EXIT  "După redare: Închide programul întotdeauna"
     IDS_AFTERPLAYBACK_DONOTHING "După redare: nicio acțiune"
     IDS_AFTERPLAYBACK_NEXT  "După redare: se redă următorul fișier din dosar (din folder)"
-    IDS_OSD_BRIGHTNESS      "Luminozitate: %s"
+    IDS_OSD_BRIGHTNESS      "Luminozitatea: %s"
     IDS_OSD_CONTRAST        "Contrast: %s"
-    IDS_OSD_HUE             "Nuanță: %s°"
-    IDS_OSD_SATURATION      "Saturație: %s"
+    IDS_OSD_HUE             "Nuanța: %s°"
+    IDS_OSD_SATURATION      "Saturația: %s"
     IDS_OSD_RESET_COLOR     "Setările de culoare au fost restaurate"
     IDS_OSD_NO_COLORCONTROL "Controalele (Comenzile) de culoare nu sunt suportate"
     IDS_BRIGHTNESS_INC      "Mărește luminozitatea"
