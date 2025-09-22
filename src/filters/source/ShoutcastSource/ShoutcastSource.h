@@ -130,7 +130,7 @@ class CShoutcastStream : public CSourceStream
 	public:
 		std::unique_ptr<BYTE[]> data;
 		size_t size = 0;
-		CString title;
+		CStringW title;
 		REFERENCE_TIME rtStart = INVALID_TIME;
 		REFERENCE_TIME rtStop = INVALID_TIME;
 		CShoutCastPacket(const void* ptr, int len)
@@ -167,7 +167,7 @@ class CShoutcastStream : public CSourceStream
 		void SetCodePage(const UINT codePage);
 		int Receive(void* lpBuf, int nBufLen, int nFlags = 0) override;
 
-		StreamFormat m_Format	= AUDIO_NONE;
+		StreamFormat m_format	= AUDIO_NONE;
 		unsigned m_metaint		= 0;
 		unsigned m_bitrate		= 0;
 		unsigned m_samplerate	= 0;
@@ -180,11 +180,11 @@ class CShoutcastStream : public CSourceStream
 		CStringW m_url;
 		CStringW m_description;
 
-		bool Connect(const CUrlParser& urlParser, CString& redirectUrl);
+		bool Connect(const CUrlParser& urlParser, CStringW& redirectUrl);
 		bool FindSync();
 
 		CShoutcastSocket& operator = (const CShoutcastSocket& soc) {
-			m_Format		= soc.m_Format;
+			m_format		= soc.m_format;
 			m_metaint		= soc.m_metaint;
 			m_bitrate		= soc.m_bitrate;
 			m_samplerate	= soc.m_samplerate;
@@ -211,8 +211,8 @@ class CShoutcastStream : public CSourceStream
 	bool m_bBuffering = false;
 	bool m_bExitThread = false;;
 
-	CString m_title;
-	CString m_description;
+	CStringW m_Title;
+	CStringW m_Description;
 
 public:
 	CShoutcastStream(const WCHAR* wfn, CShoutcastSource* pParent, const UINT codePage, HRESULT* phr);
@@ -223,8 +223,8 @@ public:
 	void EmptyBuffer();
 	LONGLONG GetBufferFullness();
 
-	CString GetTitle();
-	CString GetDescription();
+	CStringW GetTitle();
+	CStringW GetDescription();
 
 	HRESULT DecideBufferSize(IMemAllocator* pIMemAlloc, ALLOCATOR_PROPERTIES* pProperties);
 	HRESULT FillBuffer(IMediaSample* pSample);
