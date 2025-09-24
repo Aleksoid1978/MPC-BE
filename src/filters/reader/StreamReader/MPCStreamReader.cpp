@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -171,7 +171,7 @@ STDMETHODIMP CUDPReader::get_Title(BSTR* pbstrTitle)
 {
 	CheckPointer(pbstrTitle, E_POINTER);
 
-	if (!m_stream.GetTitle().IsEmpty()) {
+	if (m_stream.GetTitle().GetLength()) {
 		*pbstrTitle = m_stream.GetTitle().AllocSysString();
 		return S_OK;
 	}
@@ -183,8 +183,20 @@ STDMETHODIMP CUDPReader::get_Description(BSTR* pbstrDescription)
 {
 	CheckPointer(pbstrDescription, E_POINTER);
 
-	if (!m_stream.GetDescription().IsEmpty()) {
+	if (m_stream.GetDescription().GetLength()) {
 		*pbstrDescription = m_stream.GetDescription().AllocSysString();
+		return S_OK;
+	}
+
+	return E_UNEXPECTED;
+}
+
+STDMETHODIMP CUDPReader::get_BaseURL(BSTR* pbstrBaseURL)
+{
+	CheckPointer(pbstrBaseURL, E_POINTER);
+
+	if (m_stream.GetUrl().GetLength()) {
+		*pbstrBaseURL = m_stream.GetUrl().AllocSysString();
 		return S_OK;
 	}
 

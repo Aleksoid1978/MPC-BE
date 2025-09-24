@@ -131,11 +131,11 @@ HRESULT CLiveStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, DWORD& dwSizeRe
 							j = str.ReverseFind('\'');
 						}
 						if (j > i) {
-							m_icydata.name = str.Mid(i, j - i);
+							m_icydata.streamTitle = str.Mid(i, j - i);
 
 							// special code for 101.ru - it's use json format in MetaInfo
-							if (!m_icydata.name.IsEmpty() && m_icydata.name.GetAt(0) == L'{') {
-								CString tmp(m_icydata.name);
+							if (m_icydata.streamTitle.GetLength() && m_icydata.streamTitle.GetAt(0) == L'{') {
+								CString tmp(m_icydata.streamTitle);
 								const auto pos = tmp.ReverseFind(L'}');
 								if (pos > 0) {
 									tmp.Delete(pos + 1, tmp.GetLength() - pos);
@@ -143,10 +143,13 @@ HRESULT CLiveStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, DWORD& dwSizeRe
 									rapidjson::GenericDocument<rapidjson::UTF16<>> d;
 									if (!d.Parse(tmp.GetString()).HasParseError()) {
 										if (d.HasMember(L"t") && d[L"t"].IsString()) {
-											m_icydata.name = d[L"t"].GetString();
+											m_icydata.streamTitle = d[L"t"].GetString();
 										}
 										else if (d.HasMember(L"title") && d[L"title"].IsString()) {
-											m_icydata.name = d[L"title"].GetString();
+											m_icydata.streamTitle = d[L"title"].GetString();
+										}
+										else if (d.HasMember(L"status")) {
+											m_icydata.streamTitle.Empty();
 										}
 									}
 								}
@@ -156,6 +159,7 @@ HRESULT CLiveStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, DWORD& dwSizeRe
 						DLog(L"CLiveStream::HTTPRead(): StreamTitle is missing");
 					}
 
+					/*
 					i = str.Find(L"StreamUrl='");
 					if (i >= 0) {
 						i += 11;
@@ -164,12 +168,10 @@ HRESULT CLiveStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, DWORD& dwSizeRe
 							j = str.ReverseFind('\'');
 						}
 						if (j > i) {
-							str = str.Mid(i, j - i);
-							if (!str.IsEmpty()) {
-								m_icydata.url = str;
-							}
+							m_icydata.streamUrl = str.Mid(i, j - i);
 						}
 					}
+					*/
 				}
 			}
 		}
@@ -617,11 +619,11 @@ bool CLiveStream::Load(const WCHAR* fnw)
 				if (param == L"icy-metaint") {
 					m_icydata.metaint = static_cast<DWORD>(_wtol(value));
 				} else if (param == L"icy-name") {
-					m_icydata.name = value;
+					m_icydata.stationName = value;
 				} else if (param == L"icy-genre") {
 					m_icydata.genre = value;
 				} else if (param == L"icy-url") {
-					m_icydata.url = value;
+					m_icydata.stationUrl = value;
 				} else if (param == L"icy-description") {
 					m_icydata.description = value;
 				}
@@ -846,6 +848,14 @@ void CLiveStream::Lock()
 void CLiveStream::Unlock()
 {
 	m_csLock.Unlock();
+}
+
+CString CLiveStream::GetTitle() const
+{
+	if (m_icydata.streamTitle.GetLength()) {
+		return m_icydata.streamTitle;
+	}
+	return m_icydata.stationName;
 }
 
 inline const ULONGLONG CLiveStream::GetPacketsSize()

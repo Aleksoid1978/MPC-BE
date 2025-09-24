@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2023 see Authors.txt
+ * (C) 2020-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -77,10 +77,12 @@ private:
 
 	struct {
 		DWORD metaint = 0;
-		CString name;
+		CString stationName;
 		CString genre;
 		CString description;
-		CString url;
+		CString stationUrl;
+		CString streamTitle;
+		//CString streamUrl;
 	} m_icydata;
 
 	struct hlsData_t {
@@ -142,6 +144,7 @@ public:
 	GUID GetSubtype() const { return m_subtype; }
 	protocol GetProtocol() const { return m_protocol; }
 
-	CString GetTitle() const { return m_icydata.name.IsEmpty() ? m_icydata.url : m_icydata.name; }
-	CString GetDescription() const { return m_icydata.description; }
+	CStringW CLiveStream::GetTitle() const;
+	CStringW GetDescription() const { return m_icydata.description; }
+	CStringW GetUrl() const { return m_icydata.stationUrl; }
 };
