@@ -119,7 +119,7 @@ HRESULT CLiveStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, DWORD& dwSizeRe
 				if (S_OK == m_HTTPAsync.Read(buff, b * 16, _dwSizeRead, dwTimeOut) && _dwSizeRead == b * 16) {
 					int len = decode_html_entities_utf8((char*)buff, nullptr);
 
-					CString str = UTF8orLocalToWStr((LPCSTR)buff);
+					CStringW str = UTF8orLocalToWStr((LPCSTR)buff);
 
 					DLog(L"CLiveStream::HTTPRead(): Metainfo: %s", str);
 
@@ -135,7 +135,7 @@ HRESULT CLiveStream::HTTPRead(PBYTE pBuffer, DWORD dwSizeToRead, DWORD& dwSizeRe
 
 							// special code for 101.ru - it's use json format in MetaInfo
 							if (m_icydata.streamTitle.GetLength() && m_icydata.streamTitle.GetAt(0) == L'{') {
-								CString tmp(m_icydata.streamTitle);
+								CStringW tmp(m_icydata.streamTitle);
 								const auto pos = tmp.ReverseFind(L'}');
 								if (pos > 0) {
 									tmp.Delete(pos + 1, tmp.GetLength() - pos);
@@ -214,21 +214,21 @@ static void GetType(const BYTE* buf, int size, GUID& subtype)
 	}
 }
 
-bool CLiveStream::ParseM3U8(const CString& url, CString& realUrl)
+bool CLiveStream::ParseM3U8(const CStringW& url, CStringW& realUrl)
 {
 	CWebTextFile f(CP_UTF8, CP_ACP, false, 10 * MEGABYTE);
 	if (!f.Open(url)) {
 		return false;
 	}
 
-	CString str;
+	CStringW str;
 	if (!f.ReadString(str) || str != L"#EXTM3U") {
 		return false;
 	}
 
 	realUrl = url;
 
-	CString base(url);
+	CStringW base(url);
 	if (!f.GetRedirectURL().IsEmpty()) {
 		base = f.GetRedirectURL();
 	}
@@ -245,11 +245,11 @@ bool CLiveStream::ParseM3U8(const CString& url, CString& realUrl)
 	auto segmentsCount = m_hlsData.Segments.size();
 
 	int32_t bandwidth = {};
-	std::list<std::pair<uint32_t, CString>> PlaylistItems;
+	std::list<std::pair<uint32_t, CStringW>> PlaylistItems;
 
 	m_hlsData.PlaylistDuration = {};
 
-	auto CombinePath = [](const CString& base, const CString& relative) {
+	auto CombinePath = [](const CStringW& base, const CStringW& relative) {
 		CUrlParser urlParser(relative.GetString());
 		if (urlParser.IsValid()) {
 			return relative;
@@ -306,9 +306,9 @@ bool CLiveStream::ParseM3U8(const CString& url, CString& realUrl)
 			if (!m_hlsData.bInit) {
 				DeleteLeft(11, str);
 
-				CString method, uri, iv;
+				CStringW method, uri, iv;
 
-				std::list<CString> attributes;
+				std::list<CStringW> attributes;
 				Explode(str, attributes, L',');
 				for (const auto& attribute : attributes) {
 					const auto pos = attribute.Find(L'=');
@@ -371,7 +371,7 @@ bool CLiveStream::ParseM3U8(const CString& url, CString& realUrl)
 		} else if (StartsWith(str, L"#EXT-X-MAP:")) {
 			if (!m_hlsData.bInit) {
 				DeleteLeft(11, str);
-				std::list<CString> attributes;
+				std::list<CStringW> attributes;
 				Explode(str, attributes, L',');
 				for (const auto& attribute : attributes) {
 					const auto pos = attribute.Find(L'=');
@@ -467,7 +467,7 @@ bool CLiveStream::ParseM3U8(const CString& url, CString& realUrl)
 		PlaylistItems.sort([](const auto& itemleft, const auto& itemright) {
 			return itemleft.first > itemright.first;
 		});
-		CString newUrl = PlaylistItems.front().second;
+		CStringW newUrl = PlaylistItems.front().second;
 		return ParseM3U8(newUrl, realUrl);
 	}
 
@@ -496,7 +496,7 @@ bool CLiveStream::Load(const WCHAR* fnw)
 
 	m_url_str = fnw;
 	CUrlParser urlParser;
-	CString str_protocol;
+	CStringW str_protocol;
 
 	if (StartsWith(m_url_str, L"pipe:")) {
 		str_protocol = L"pipe";
@@ -850,7 +850,7 @@ void CLiveStream::Unlock()
 	m_csLock.Unlock();
 }
 
-CString CLiveStream::GetTitle() const
+CStringW CLiveStream::GetTitle() const
 {
 	if (m_icydata.streamTitle.GetLength()) {
 		return m_icydata.streamTitle;
@@ -901,7 +901,7 @@ DWORD CLiveStream::ThreadProc()
 	SYSTEMTIME st;
 	::GetLocalTime(&st);
 
-	CString dump_filename;
+	CStringW dump_filename;
 	dump_filename.Format(L"%s__%04u_%02u_%02u__%02u_%02u_%02u.dump", prefix, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
 
 	FILE* dump_file = nullptr;
