@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2024 Marti Maria Saguer
+//  Copyright (c) 1998-2025 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -484,16 +484,20 @@ cmsHPROFILE CMSEXPORT cmsCreateLab2ProfileTHR(cmsContext ContextID, const cmsCIE
     cmsSetColorSpace(hProfile,  cmsSigLabData);
     cmsSetPCS(hProfile,         cmsSigLabData);
 
-    if (!SetTextTags(hProfile, L"Lab identity built-in")) return NULL;
+    if (!SetTextTags(hProfile, L"Lab identity built-in"))
+        goto Error;
 
     // An identity LUT is all we need
     LUT = cmsPipelineAlloc(ContextID, 3, 3);
-    if (LUT == NULL) goto Error;
+    if (LUT == NULL) 
+        goto Error;
 
     if (!cmsPipelineInsertStage(LUT, cmsAT_BEGIN, _cmsStageAllocIdentityCLut(ContextID, 3)))
         goto Error;
 
-    if (!cmsWriteTag(hProfile, cmsSigAToB0Tag, LUT)) goto Error;
+    if (!cmsWriteTag(hProfile, cmsSigAToB0Tag, LUT)) 
+        goto Error;
+
     cmsPipelineFree(LUT);
 
     return hProfile;
@@ -907,25 +911,24 @@ cmsHPROFILE CMSEXPORT cmsCreateBCHSWabstractProfileTHR(cmsContext ContextID,
 
     for (i=0; i < MAX_INPUT_DIMENSIONS; i++) Dimensions[i] = nLUTPoints;
     CLUT = cmsStageAllocCLut16bitGranular(ContextID, Dimensions, 3, 3, NULL);
-    if (CLUT == NULL) goto Error;
-
-
-    if (!cmsStageSampleCLut16bit(CLUT, bchswSampler, (void*) &bchsw, 0)) {
-
-        // Shouldn't reach here
+    if (CLUT == NULL) 
         goto Error;
-    }
 
-    if (!cmsPipelineInsertStage(Pipeline, cmsAT_END, CLUT)) {
+    if (!cmsStageSampleCLut16bit(CLUT, bchswSampler, (void*) &bchsw, 0)) 
         goto Error;
-    }
-
+    
+    if (!cmsPipelineInsertStage(Pipeline, cmsAT_END, CLUT)) 
+        goto Error;
+    
     // Create tags
-    if (!SetTextTags(hICC, L"BCHS built-in")) return NULL;
+    if (!SetTextTags(hICC, L"BCHS built-in")) 
+        goto Error;
 
-    cmsWriteTag(hICC, cmsSigMediaWhitePointTag, (void*) cmsD50_XYZ());
+    if (!cmsWriteTag(hICC, cmsSigMediaWhitePointTag, (void*)cmsD50_XYZ()))
+        goto Error;
 
-    cmsWriteTag(hICC, cmsSigAToB0Tag, (void*) Pipeline);
+    if (!cmsWriteTag(hICC, cmsSigAToB0Tag, (void*)Pipeline))
+        goto Error;
 
     // Pipeline is already on virtual profile
     cmsPipelineFree(Pipeline);

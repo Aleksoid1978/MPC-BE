@@ -22,7 +22,8 @@ OggSplitter
 Обновлен китайский (Simplified) перевод (автор wushantao).
 
 Обновлены библиотеки:
-	ffmpeg n8.1-dev-519-g82b5a0faba.
+	ffmpeg n8.1-dev-519-g82b5a0faba;
+	Little-CMS git-lcms2.17-41-g8e8a8c4.
 
 
 1.8.7 - 2025-09-17

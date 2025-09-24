@@ -1042,17 +1042,17 @@ cmsSEQ* CMSEXPORT cmsDupProfileSequenceDescription(const cmsSEQ* pseq)
     if (pseq == NULL)
         return NULL;
 
-    NewSeq = (cmsSEQ*) _cmsMalloc(pseq -> ContextID, sizeof(cmsSEQ));
+    NewSeq = (cmsSEQ*)_cmsMallocZero(pseq->ContextID, sizeof(cmsSEQ));
     if (NewSeq == NULL) return NULL;
 
+    NewSeq->ContextID = pseq->ContextID;
 
-    NewSeq -> seq      = (cmsPSEQDESC*) _cmsCalloc(pseq ->ContextID, pseq ->n, sizeof(cmsPSEQDESC));
-    if (NewSeq ->seq == NULL) goto Error;
+    NewSeq->seq = (cmsPSEQDESC*)_cmsCalloc(pseq->ContextID, pseq->n, sizeof(cmsPSEQDESC));
+    if (NewSeq->seq == NULL) goto Error;
 
-    NewSeq -> ContextID = pseq ->ContextID;
-    NewSeq -> n        = pseq ->n;
+    NewSeq->n = pseq->n;
 
-    for (i=0; i < pseq->n; i++) {
+    for (i = 0; i < pseq->n; i++) {
 
         memmove(&NewSeq ->seq[i].attributes, &pseq ->seq[i].attributes, sizeof(cmsUInt64Number));
 

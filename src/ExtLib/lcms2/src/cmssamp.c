@@ -326,7 +326,7 @@ cmsFloat64Number RootOfLeastSquaresFitQuadraticCurve(int n, cmsFloat64Number x[]
     if (fabs(a) < 1.0E-10) {
     
         if (fabs(b) < 1.0E-10) return 0;
-        return cmsmin(0, cmsmax(50, -c/b ));
+        return cmsmax(0, cmsmin(50, -c/b ));
     }
     else {
 
