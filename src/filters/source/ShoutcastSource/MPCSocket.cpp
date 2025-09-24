@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2023 see Authors.txt
+ * (C) 2012-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,10 +35,10 @@ CMPCSocket::CMPCSocket()
 				&& ERROR_SUCCESS == key.QueryStringValue(L"ProxyServer", m_sProxyServer.GetBufferSetLength(MAX_PATH), &len)) {
 			m_sProxyServer.ReleaseBufferSetLength(len);
 
-			std::list<CString> sl;
+			std::list<CStringW> sl;
 			m_sProxyServer = Explode(m_sProxyServer, sl, L';');
 			for (const auto& item : sl) {
-				std::list<CString> sl2;
+				std::list<CStringW> sl2;
 				if (!Explode(item, sl2, L'=', 2).CompareNoCase(L"http") && sl2.size() == 2) {
 					m_sProxyServer = sl2.back();
 					break;
@@ -57,7 +57,7 @@ CMPCSocket::CMPCSocket()
 	}
 }
 
-BOOL CMPCSocket::Connect(const CString& url, const BOOL bConnectOnly/* = FALSE*/)
+BOOL CMPCSocket::Connect(const CStringW& url, const BOOL bConnectOnly/* = FALSE*/)
 {
 	CUrlParser urlParser;
 
@@ -193,7 +193,7 @@ BOOL CMPCSocket::SendRequest()
 	return ret;
 }
 
-void CMPCSocket::SetProxy(const CString& ProxyServer, const DWORD ProxyPort)
+void CMPCSocket::SetProxy(const CStringW& ProxyServer, const DWORD ProxyPort)
 {
 	if (!ProxyServer.IsEmpty() && ProxyPort) {
 		m_bProxyEnable	= TRUE;

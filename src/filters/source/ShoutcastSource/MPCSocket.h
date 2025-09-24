@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2023 see Authors.txt
+ * (C) 2012-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,7 +29,7 @@ protected:
 	int			m_nTimerID = 0;
 
 	BOOL		m_bProxyEnable = FALSE;
-	CString		m_sProxyServer;
+	CStringW	m_sProxyServer;
 	DWORD		m_nProxyPort = 0;
 
 	CStringA	m_sUserAgent = "MPC-BE";
@@ -51,7 +51,7 @@ public:
 		KillTimeOut();
 	}
 
-	BOOL Connect(const CString& url, const BOOL bConnectOnly = FALSE);
+	BOOL Connect(const CStringW& url, const BOOL bConnectOnly = FALSE);
 	BOOL Connect(const CUrlParser& urlParser, const BOOL bConnectOnly = FALSE);
 
 	void SetTimeOut(const UINT uConnectTimeOut, const UINT uReceiveTimeOut);
@@ -61,7 +61,7 @@ public:
 	BOOL SendRequest();
 	CStringA GetHeader() { return m_Hdr; };
 
-	void SetProxy(const CString& ProxyServer, const DWORD ProxyPort);
+	void SetProxy(const CStringW& ProxyServer, const DWORD ProxyPort);
 	void SetUserAgent(const CStringA& UserAgent);
 
 	void AddHeaderParams(const CStringA& sHeaderParam);

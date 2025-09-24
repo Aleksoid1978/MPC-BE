@@ -34,7 +34,7 @@ class __declspec(uuid("0E49B128-9547-4423-88F9-897837E298F5"))
 	, public IAMMediaContent
 {
 	CLiveStream m_stream;
-	CString    m_fn;
+	CStringW    m_fn;
 
 public:
 	CUDPReader(IUnknown* pUnk, HRESULT* phr);
