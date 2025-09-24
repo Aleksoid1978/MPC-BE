@@ -23,7 +23,8 @@ OggSplitter
 
 Обновлены библиотеки:
 	ffmpeg n8.1-dev-519-g82b5a0faba;
-	Little-CMS git-lcms2.17-41-g8e8a8c4.
+	Little-CMS git-lcms2.17-41-g8e8a8c4;
+	MediaInfo git-v25.07-39-g88c3226ca.
 
 
 1.8.7 - 2025-09-17

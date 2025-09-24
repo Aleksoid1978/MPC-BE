@@ -188,6 +188,9 @@ Alignment_Aligned;Uitgelijnd op interleaves
 Alignment_Split;Gesplitst over interleaves
 All;Alles
 AlternateGroup;
+App_About;Over MediaInfo
+App_Hide;Verberg MediaInfo
+App_Quit;Stop MediaInfo
 Archival_Location;Archieflocatie
 Arranger;Arrangeur
 ArtDirector;Artdirector
@@ -238,6 +241,7 @@ BitRate_Mode_CBR;Constant
 BitRate_Mode_VBR;Variabel
 BitRate_Nominal;Nominale bitrate
 Bits-(Pixel*Frame);Bits/(Pixel*Frame)
+Bring All to Front;Alles op voorgrond
 BufferSize;
 Cancel;Annuleren
 CaptionServiceName;
@@ -279,6 +283,7 @@ Close all before open;Sluit alle alvorens te openen
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
+CloseWindow;Venster sluiten
 Codec;Codec
 Codec_Description;Codecbeschrijving
 Codec_Info;Details voor codec
@@ -333,6 +338,7 @@ Container and general information;Container en algemene informatie
 Content;
 ContentType;Inhoudstype
 CoProducer;Coproducent
+Copy;Kopieer
 Copyright;Auteursrecht
 CopyrightYear;
 CostumeDesigner;Kostuumontwerper
@@ -729,6 +735,7 @@ Height;Hoogte
 Height_CleanAperture;
 Height_Original;
 Help;Help
+HideOthers;Anderen verbergen
 Hint;Hint
 HomeTheaterAvr;
 How many audio streams?;Hoeveel audiostromen?
@@ -1056,6 +1063,7 @@ MenuID;Menu-ID
 Metadata_Format;
 Metadata_Format_Type;
 Metadata_MuxingMode;
+Minimize;Minimaliseer
 MixType;
 mn; min
 Mood;Stemming
@@ -1210,6 +1218,7 @@ Season;Seizoen
 SecondaryAudioLanguage;
 see below;zie onder
 Select your directory;
+SelectAll;Alles selecteren
 Send HeaderFile;A.u.b het Header-bestand hierheen sturen : http://sourceforge.net/projects/mediainfo/ (Bug-sectie)
 Separator_Columns;scheidingsteken kolommen
 Separator_Lines;scheidingsteken regels
@@ -1218,6 +1227,7 @@ ServiceChannel;Servicekanaalnummer
 ServiceKind;
 ServiceName;Servicenaam
 ServiceProvider;Serviceprovider
+Services;Diensten
 ServiceType;Servicesoort
 Set;Set
 Set_Count;Settelling
@@ -1233,6 +1243,7 @@ ShimName;
 ShimVersion;
 Show menu;Menu tonen
 Show toolbar;Werkbalk tonen
+ShowAll;Toon alle
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1401,6 +1412,7 @@ WebSite_Video_More;Ga naar de website (%Url%) om deze videocodec te vinden
 Width;Breedte
 Width_CleanAperture;
 Width_Original;
+Window;Venster
 WriteMe;Schrijf mij
 WriteToTranslator;Schrijf naar vertaler
 Written_Date;Datum van schrijven
@@ -1409,5 +1421,6 @@ WrittenBy;Geschreven door
 Yes;Ja
 Your system;Uw systeem
 Your translation;
+Zoom;Vergroot/verklein
 ZZ_Automatic_Percent;63
 ZZ_AutomaticLanguage_Percent;67

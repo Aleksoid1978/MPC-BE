@@ -188,6 +188,9 @@ Alignment_Aligned;对齐交错
 Alignment_Split;分割交错
 All;全部
 AlternateGroup;组别
+App_About;关于 MediaInfo
+App_Hide;隐藏 MediaInfo
+App_Quit;退出 MediaInfo
 Archival_Location;归档位置
 Arranger;编曲
 ArtDirector;艺术指导
@@ -238,6 +241,7 @@ BitRate_Mode_CBR;恒定码率 (CBR)
 BitRate_Mode_VBR;动态码率 (VBR)
 BitRate_Nominal;额定码率
 Bits-(Pixel*Frame);数据密度 [码率/(像素*帧率)]
+Bring All to Front;前置全部窗口
 BufferSize;缓冲大小
 Cancel;取消
 CaptionServiceName;字幕服务名称
@@ -279,6 +283,7 @@ Close all before open;打开新文件前关闭其他文件
 ClosedCaptionsLanguage;隐藏式字幕语言
 ClosedCaptionsPresent;含有隐藏式字幕
 ClosedCaptionsType;隐藏式字幕类型
+CloseWindow;关闭窗口
 Codec;编解码器
 Codec_Description;编解码器说明
 Codec_Info;编解码器详情
@@ -333,6 +338,7 @@ Container and general information;容器格式和一般信息
 Content;内容
 ContentType;内容类型
 CoProducer;联合制片人
+Copy;拷贝
 Copyright;版权
 CopyrightYear;版权年份
 CostumeDesigner;服装设计
@@ -729,6 +735,7 @@ Height;高度
 Height_CleanAperture;干净光圈高度
 Height_Original;原始高度
 Help;帮助
+HideOthers;隐藏其他
 Hint;提示
 HomeTheaterAvr;家庭影院 AVR
 How many audio streams?;有多少个音频流？
@@ -1056,6 +1063,7 @@ MenuID;菜单 ID
 Metadata_Format;元数据格式
 Metadata_Format_Type;元数据帧类型
 Metadata_MuxingMode;元数据复用模式
+Minimize;最小化
 MixType;混音类型
 mn; 分
 Mood;情绪
@@ -1210,6 +1218,7 @@ Season;季期
 SecondaryAudioLanguage;第二音频语言
 see below;点击展开详情
 Select your directory;
+SelectAll;全选
 Send HeaderFile;请将头文件发送到: http://sourceforge.net/projects/mediainfo/ (Bugs 板块)
 Separator_Columns;列分隔符
 Separator_Lines;换行符
@@ -1218,6 +1227,7 @@ ServiceChannel;服务频道号码
 ServiceKind;服务类别
 ServiceName;服务名称
 ServiceProvider;服务提供商
+Services;服务
 ServiceType;服务类型
 Set;集合
 Set_Count;集合数目
@@ -1233,6 +1243,7 @@ ShimName;Shim 名称
 ShimVersion;Shim 版本
 Show menu;显示菜单
 Show toolbar;显示工具栏
+ShowAll;全部显示
 SignalGroup;信号组
 SigningPresent;含有签名
 SignLanguage;签名语言
@@ -1401,6 +1412,7 @@ WebSite_Video_More;访问网站 (%Url%) 查找此视频解码器
 Width;宽度
 Width_CleanAperture;干净光圈宽度
 Width_Original;原始宽度
+Window;窗口
 WriteMe;给作者发邮件
 WriteToTranslator;给翻译发邮件
 Written_Date;写入日期
@@ -1409,5 +1421,6 @@ WrittenBy;作者
 Yes;是
 Your system;您的系统
 Your translation;
+Zoom;缩放
 ZZ_Automatic_Percent;94
 ZZ_AutomaticLanguage_Percent;95

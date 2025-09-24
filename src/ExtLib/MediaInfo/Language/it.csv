@@ -188,6 +188,9 @@ Alignment_Aligned;Audio allineato
 Alignment_Split;Audio suddiviso
 All;Tutti
 AlternateGroup; Gruppo alternativo
+App_About;Informazione su MediaInfo
+App_Hide;Nascondi MediaInfo
+App_Quit;Esci da MediaInfo
 Archival_Location;Posizione dell'archivio
 Arranger;Compositore
 ArtDirector;Regista
@@ -238,6 +241,7 @@ BitRate_Mode_CBR;Costante
 BitRate_Mode_VBR;Variabile
 BitRate_Nominal;Bitrate nominale
 Bits-(Pixel*Frame);Bit/(pixel*frame)
+Bring All to Front;Porta tutto in primo piano
 BufferSize; Dim. buffer
 Cancel;Annulla
 CaptionServiceName;Titolo nome servizio
@@ -279,6 +283,7 @@ Close all before open;Chiudi tutto prima di aprire
 ClosedCaptionsLanguage;Lingua finestre chiusura
 ClosedCaptionsPresent;Finestre chiusra presenti
 ClosedCaptionsType;Tipo finestre chiusura
+CloseWindow;Chiudi finestra
 Codec;Codec
 Codec_Description;Descrizione codec
 Codec_Info;Dettagli codec
@@ -333,6 +338,7 @@ Container and general information;Tipo di file e informazioni generali
 Content;Contenuto
 ContentType;Tipo contenuto
 CoProducer;Coproduttore
+Copy;Copia
 Copyright;Copyright
 CopyrightYear;Anno copyright
 CostumeDesigner;Costumista
@@ -343,7 +349,7 @@ Cover_Datas;Dati copertina
 Cover_Description;Descrizione copertina
 Cover_Mime;Copertina MIME
 Cover_Type;Tipo di copertina
-CoverData;
+CoverData;Includi immagini copertina HTML, XML e JSON
 Cropped;Dimensioni ritaglio
 Custom;Vista personalizzata
 CustomDownmixTargets;Livello downmix personalizzato
@@ -729,6 +735,7 @@ Height;Altezza
 Height_CleanAperture;Altezza apertura pulita
 Height_Original;Altezza originale
 Help;?
+HideOthers;Nascondi altri
 Hint;Suggerimento
 HomeTheaterAvr;AVR Home Thater
 How many audio streams?;Quante sono le tracce audio?
@@ -981,7 +988,7 @@ Language_zh-yue;Cantonese
 Language_zu;Zulu
 Languages;Lingue
 LawRating;Classificazione legale
-LegacyStreamDisplay;
+LegacyStreamDisplay;Per i flussi video, audio e HD HD/HE 3D/HDR visualizza info compatibilità
 LCCN;LCCN
 LfeAttenuationKnown;Attenuazione LFE nota
 LfeMixGain;Guadagno min LFE
@@ -1056,6 +1063,7 @@ MenuID;ID menu
 Metadata_Format;Formato metadati
 Metadata_Format_Type;Tipo fotogramma metadati
 Metadata_MuxingMode;Modo muxing metadati
+Minimize;Riduci a icona
 MixType;Tipo mix
 mn;min
 Mood;Disposizione
@@ -1210,6 +1218,7 @@ Season;N. stagione
 SecondaryAudioLanguage;Seconda lingua audio
 see below;vedi sotto
 Select your directory;Seleziona cartella
+SelectAll;Seleziona tutto
 Send HeaderFile;Invia l'intestazione a http://sourceforge.net/projects/mediainfo/ (sezione bug)
 Separator_Columns;Separatore colonne
 Separator_Lines;Separatore linea
@@ -1218,6 +1227,7 @@ ServiceChannel;Numero canale di servizio
 ServiceKind;Tipo servizio
 ServiceName;Nome servizio
 ServiceProvider;Fornitore servizio
+Services;Servizi
 ServiceType;Tipo servizio
 Set;Imposta
 Set_Count;Imposta contatore
@@ -1227,12 +1237,13 @@ Sheet;Scheda
 Sheet (Complete);Scheda (completa)
 Shell extension;Aggiungi 'Apri con MediaInfo' al menu contestuale
 Shell extension, folder;Anche per le cartelle
-Shell extension, separate instance;
+Shell extension, separate instance;Apri ogni elemento in un'istanza separata
 Shell InfoTip;Informazioni in Explorer (in Explorer, spostati sul file e verranno visualizzate le informazioni)
 ShimName;Nome shim
 ShimVersion;Versione shim
 Show menu;Visualizza menu
 Show toolbar;Visualizza barra strumenti
+ShowAll;Mostra tutti
 SignalGroup;Gruppo segnale
 SigningPresent;Firma presente
 SignLanguage;Lingua firma
@@ -1401,6 +1412,7 @@ WebSite_Video_More;Per info su questo video vai al sito web (%Url%)
 Width;Larghezza
 Width_CleanAperture;larghezza apertura
 Width_Original;Larghezza originale
+Window;Finestra
 WriteMe;Invia email all'autore
 WriteToTranslator;Invia email al traduttore
 Written_Date;Data
@@ -1408,6 +1420,7 @@ Written_Location;Realizzato in
 WrittenBy;Realizzato da
 Yes;Si
 Your system;Info sul sistema
-Your translation;Traduzione v. 01.05.2025 by RB
+Your translation;Traduzione v. 02.08.2025 by RB
+Zoom;Ridimensiona
 ZZ_Automatic_Percent;99
 ZZ_AutomaticLanguage_Percent;99

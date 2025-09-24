@@ -188,6 +188,9 @@ Alignment_Aligned;
 Alignment_Split;
 All;Όλα
 AlternateGroup;
+App_About;Πληροφορίες για το MediaInfo
+App_Hide;Απόκρυψη MediaInfo
+App_Quit;Τερματισμός MediaInfo
 Archival_Location;Archival location
 Arranger;Arranger
 ArtDirector;ArtDirector
@@ -238,6 +241,7 @@ BitRate_Mode_CBR;
 BitRate_Mode_VBR;
 BitRate_Nominal;
 Bits-(Pixel*Frame);Bits/(Εικονοστοιχείο*Πλαίσιο)
+Bring All to Front;Μεταφορά όλων σε πρώτο πλάνο
 BufferSize;
 Cancel;Άκυρο
 CaptionServiceName;
@@ -279,6 +283,7 @@ Close all before open;Κλείστε όλα τα ανοιχτά αρχεία π�
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
+CloseWindow;Κλείσιμο παραθύρου
 Codec;Συμπιεστής
 Codec_Description;
 Codec_Info;Λεπτομέρειες του συμπιεστή
@@ -333,6 +338,7 @@ Container and general information;Container και γενικές πληροφο
 Content;
 ContentType;Είδος περιεχόμενου
 CoProducer;Συμπαραγωγός
+Copy;Αντιγραφή
 Copyright;Πνευματικά Δικαιώματα
 CopyrightYear;
 CostumeDesigner;Costume designer
@@ -729,6 +735,7 @@ Height;Ύψος
 Height_CleanAperture;
 Height_Original;
 Help;Βοήθεια
+HideOthers;Απόκρυψη άλλων
 Hint;
 HomeTheaterAvr;
 How many audio streams?;Πόσες ροές ήχου?
@@ -1056,6 +1063,7 @@ MenuID;
 Metadata_Format;
 Metadata_Format_Type;
 Metadata_MuxingMode;
+Minimize;Ελαχιστοποίηση
 MixType;
 mn; min
 Mood;Mood
@@ -1210,6 +1218,7 @@ Season;Season
 SecondaryAudioLanguage;
 see below;δείτε παρακάτω
 Select your directory;
+SelectAll;Επιλογή όλων
 Send HeaderFile;
 Separator_Columns;διαχωριστής στηλών
 Separator_Lines;διαχωριστής γραμμών
@@ -1218,6 +1227,7 @@ ServiceChannel;
 ServiceKind;
 ServiceName;
 ServiceProvider;
+Services;Υπηρεσίες
 ServiceType;
 Set;Set
 Set_Count;Set count
@@ -1233,6 +1243,7 @@ ShimName;
 ShimVersion;
 Show menu;Εμφάνιση μενού
 Show toolbar;Εμφάνιση εργαλειοθήκης
+ShowAll;Εμφάνιση όλων
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1401,6 +1412,7 @@ WebSite_Video_More;Πήγαινε στην ιστοσελίδα (%Url%) to find 
 Width;Πλάτος
 Width_CleanAperture;
 Width_Original;
+Window;Παράθυρο
 WriteMe;Επικοινωνία μαζί μου
 WriteToTranslator;Επικοινωνία με τον μεταφραστή
 Written_Date;Ημερομηνία καταγραφής
@@ -1409,5 +1421,6 @@ WrittenBy;Γραμμένο από
 Yes;Ναι
 Your system;Το σύστημά σας
 Your translation;
+Zoom;Ζουμ
 ZZ_Automatic_Percent;54
 ZZ_AutomaticLanguage_Percent;58

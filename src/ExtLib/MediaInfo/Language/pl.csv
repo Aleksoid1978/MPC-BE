@@ -188,6 +188,9 @@ Alignment_Aligned;Wyrównane w przeplocie
 Alignment_Split;Rozdzielone w przeplocie
 All;Wszystkie
 AlternateGroup;
+App_About;O MediaInfo
+App_Hide;Ukryj MediaInfo
+App_Quit;Zakończ MediaInfo
 Archival_Location;Lokalizacja archiwalna
 Arranger;Aranżer
 ArtDirector;Dyrektor artystyczny
@@ -238,6 +241,7 @@ BitRate_Mode_CBR;Stała
 BitRate_Mode_VBR;Zmienna
 BitRate_Nominal;Nominalna przepływaność
 Bits-(Pixel*Frame);bity/(piksele*ramki)
+Bring All to Front;Umieść wszystko na wierzchu
 BufferSize;
 Cancel;Anuluj
 CaptionServiceName;
@@ -279,6 +283,7 @@ Close all before open;Zamykaj wszystko przed otwarciem pliku
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
+CloseWindow;Zamknij okno
 Codec;Kodek
 Codec_Description;Opis kodeka
 Codec_Info;Szczegóły kodeka
@@ -333,6 +338,7 @@ Container and general information;Zawartość i informacje ogólne
 Content;
 ContentType;Rodzaj zawartosci
 CoProducer;Koproducent
+Copy;Kopiuj
 Copyright;Prawa autorskie
 CopyrightYear;
 CostumeDesigner;Kostiumy
@@ -729,6 +735,7 @@ Height;Wysokość
 Height_CleanAperture;
 Height_Original;
 Help;Pomoc
+HideOthers;Ukryj pozostałe
 Hint;Wskazówka
 HomeTheaterAvr;
 How many audio streams?;Ile strumieni audio?
@@ -1056,6 +1063,7 @@ MenuID;ID menu
 Metadata_Format;
 Metadata_Format_Type;
 Metadata_MuxingMode;
+Minimize;Minimalizuj okno
 MixType;
 mn; min
 Mood;Nastrój
@@ -1210,6 +1218,7 @@ Season;Seria
 SecondaryAudioLanguage;
 see below;zobacz poniżej
 Select your directory;
+SelectAll;Zaznacz wszystko
 Send HeaderFile;Proszę przesłać plik nagłówka pod adres:http://sourceforge.net/projects/mediainfo/ (sekcja błędów)
 Separator_Columns;Separator kolumn
 Separator_Lines;Separator wierszy
@@ -1218,6 +1227,7 @@ ServiceChannel;Numer kanału usługowego
 ServiceKind;
 ServiceName;Nazwa usługi
 ServiceProvider;Dostawca usługi
+Services;Usługi
 ServiceType;Rodzaj usługi
 Set;Zestaw
 Set_Count;Liczba zestawu
@@ -1233,6 +1243,7 @@ ShimName;
 ShimVersion;
 Show menu;Pokaż menu
 Show toolbar;Pokaż pasek narzędzi
+ShowAll;Pokaż wszystkie
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1401,6 +1412,7 @@ WebSite_Video_More;Odwiedź witrynę (%Url%) aby poszukać kodeka wideo
 Width;Szerokość
 Width_CleanAperture;
 Width_Original;
+Window;Okno
 WriteMe;Napisz do mnie
 WriteToTranslator;Napisz do tłumacza
 Written_Date;Data
@@ -1409,5 +1421,6 @@ WrittenBy;Napisał
 Yes;Tak
 Your system;System
 Your translation;
+Zoom;Zoom
 ZZ_Automatic_Percent;56
 ZZ_AutomaticLanguage_Percent;68

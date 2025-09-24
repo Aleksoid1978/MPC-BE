@@ -188,6 +188,9 @@ Alignment_Aligned;
 Alignment_Split;
 All;Toate
 AlternateGroup;
+App_About;Despre MediaInfo
+App_Hide;Ascunde MediaInfo
+App_Quit;Termină MediaInfo
 Archival_Location;Locul arhivei
 Arranger;Regizor
 ArtDirector;Director artistic
@@ -238,6 +241,7 @@ BitRate_Mode_CBR;
 BitRate_Mode_VBR;
 BitRate_Nominal;
 Bits-(Pixel*Frame);
+Bring All to Front;Adu tot în față
 BufferSize;
 Cancel;Anulare
 CaptionServiceName;
@@ -279,6 +283,7 @@ Close all before open;Inchideti tot inainte de a deschide
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
+CloseWindow;Închide fereastra
 Codec;Codec
 Codec_Description;
 Codec_Info;Detalii despre codec
@@ -333,6 +338,7 @@ Container and general information;Container si informatii generale
 Content;
 ContentType;Tip continut
 CoProducer;Coproducator
+Copy;Copiază
 Copyright;Drept autor
 CopyrightYear;
 CostumeDesigner;Costume
@@ -729,6 +735,7 @@ Height;Inaltime
 Height_CleanAperture;
 Height_Original;
 Help;Ajutor
+HideOthers;Ascunde restul
 Hint;
 HomeTheaterAvr;
 How many audio streams?;Cate fluxuri audio?
@@ -1056,6 +1063,7 @@ MenuID;
 Metadata_Format;
 Metadata_Format_Type;
 Metadata_MuxingMode;
+Minimize;Minimizează
 MixType;
 mn; min
 Mood;Mod
@@ -1210,6 +1218,7 @@ Season;Sezon
 SecondaryAudioLanguage;
 see below;vezi mai jos
 Select your directory;
+SelectAll;Selectează tot
 Send HeaderFile;
 Separator_Columns;separator coloane
 Separator_Lines;separator linii
@@ -1218,6 +1227,7 @@ ServiceChannel;
 ServiceKind;
 ServiceName;
 ServiceProvider;
+Services;Servicii
 ServiceType;
 Set;Seteaza
 Set_Count;Seteaza numaratorul
@@ -1233,6 +1243,7 @@ ShimName;
 ShimVersion;
 Show menu;Afisare meniu
 Show toolbar;Afisare toolbar
+ShowAll;Afișează tot
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1401,6 +1412,7 @@ WebSite_Video_More;Accesati site-ul web (%Url%) pentru a gasii acest codec video
 Width;Latime
 Width_CleanAperture;
 Width_Original;
+Window;Fereastră
 WriteMe;Scrieti-mi
 WriteToTranslator;Scrieti-i traducatorului
 Written_Date;Data mesajului
@@ -1409,5 +1421,6 @@ WrittenBy;Scris de
 Yes;Da
 Your system;Sistemul dvs
 Your translation;
+Zoom;Zoom
 ZZ_Automatic_Percent;24
 ZZ_AutomaticLanguage_Percent;52

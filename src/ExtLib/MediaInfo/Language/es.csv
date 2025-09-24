@@ -188,6 +188,9 @@ Alignment_Aligned;Alineación intercalados
 Alignment_Split;Dividir a través intercalados
 All;Todo
 AlternateGroup;
+App_About;Acerca de MediaInfo
+App_Hide;Ocultar MediaInfo
+App_Quit;Salir de MediaInfo
 Archival_Location;Ubicación de archivado
 Arranger;Adaptador
 ArtDirector;Director de arte
@@ -238,6 +241,7 @@ BitRate_Mode_CBR;Constante
 BitRate_Mode_VBR;Variable
 BitRate_Nominal;Tasa de bits nominal
 Bits-(Pixel*Frame);Bits/(píxel*fotograma)
+Bring All to Front;Traer todo al frente
 BufferSize;Tamaño búfer
 Cancel;Cancelar
 CaptionServiceName;
@@ -279,6 +283,7 @@ Close all before open;Cerrar todo antes de abrir
 ClosedCaptionsLanguage;Idioma subtítulos
 ClosedCaptionsPresent;Subtítulos presentes
 ClosedCaptionsType;Tipo subtítulos
+CloseWindow;Cerrar ventana
 Codec;Códec
 Codec_Description;Descripción del códec
 Codec_Info;Detalles del códec
@@ -333,6 +338,7 @@ Container and general information;Información general
 Content;
 ContentType;Tipo de contenido
 CoProducer;Coproductor
+Copy;Copiar
 Copyright;Derechos de copia
 CopyrightYear;Año copyright
 CostumeDesigner;Diseñador de vestuario
@@ -729,6 +735,7 @@ Height;Alto
 Height_CleanAperture;Altura abertura limpia
 Height_Original;Altura original
 Help;Ayuda
+HideOthers;Ocultar otros
 Hint;Consejo
 HomeTheaterAvr;
 How many audio streams?;¿Cuántas pistas de audio?
@@ -1056,6 +1063,7 @@ MenuID;ID menú
 Metadata_Format;
 Metadata_Format_Type;
 Metadata_MuxingMode;
+Minimize;Minimizar
 MixType;
 mn; min
 Mood;Humor
@@ -1210,6 +1218,7 @@ Season;Temporada
 SecondaryAudioLanguage;Idioma secundario audio
 see below;ver más abajo
 Select your directory;
+SelectAll;Seleccionar todo
 Send HeaderFile;Por favor, envíame el archivo Header aquí: http://sourceforge.net/projects/mediainfo/ (sección Bug)
 Separator_Columns;separador columnas
 Separator_Lines;separador líneas
@@ -1218,6 +1227,7 @@ ServiceChannel;Número del canal de servicio
 ServiceKind;
 ServiceName;Nombre del servicio
 ServiceProvider;Proveedor de servicios
+Services;Servicios
 ServiceType;Tipo de servicio
 Set;Unidades
 Set_Count;Número de unidades
@@ -1233,6 +1243,7 @@ ShimName;Nombre Shim
 ShimVersion;Versión Shim
 Show menu;Mostrar menú
 Show toolbar;Mostrar barra de herramientas
+ShowAll;Mostrar todo
 SignalGroup;
 SigningPresent;Registro presente
 SignLanguage;Idioma registro
@@ -1401,6 +1412,7 @@ WebSite_Video_More;Ir al sitio web (%Url%) para buscar este códec de vídeo
 Width;Ancho
 Width_CleanAperture;Ancho abertura limpia
 Width_Original;Ancho original
+Window;Ventana
 WriteMe;Escribir un mail al autor
 WriteToTranslator;Escribir al traductor
 Written_Date;Escrito el
@@ -1409,5 +1421,6 @@ WrittenBy;Escrito por
 Yes;Sí
 Your system;Tu sistema
 Your translation;
+Zoom;Zoom
 ZZ_Automatic_Percent;66
 ZZ_AutomaticLanguage_Percent;77

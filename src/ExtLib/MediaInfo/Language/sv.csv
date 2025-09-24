@@ -188,6 +188,9 @@ Alignment_Aligned;Justerad efter interfoliering
 Alignment_Split;Uppdelad över interfoliering
 All;Alla
 AlternateGroup;
+App_About;Om MediaInfo
+App_Hide;Göm MediaInfo
+App_Quit;Avsluta MediaInfo
 Archival_Location;Arkiveringsplats
 Arranger;Arrangör
 ArtDirector;Formgivare
@@ -238,6 +241,7 @@ BitRate_Mode_CBR;Konstant
 BitRate_Mode_VBR;Variabelt
 BitRate_Nominal;Nominellt dataflöde
 Bits-(Pixel*Frame);Bitar/(Pixlar*bildruta)
+Bring All to Front;Lägg alla överst
 BufferSize;Buffertstorlek
 Cancel;Avbryt
 CaptionServiceName;
@@ -279,6 +283,7 @@ Close all before open;Stäng alla före öppna
 ClosedCaptionsLanguage;Undertextspråk
 ClosedCaptionsPresent;Tillgängliga undertexter
 ClosedCaptionsType;Undertexttyp
+CloseWindow;Stäng fönster
 Codec;Kodek
 Codec_Description;Kodekbeskrivning
 Codec_Info;Kodekdetaljer
@@ -333,6 +338,7 @@ Container and general information;Behållare och allmän information
 Content;
 ContentType;Innehållstyp
 CoProducer;Medproducent
+Copy;Kopiera
 Copyright;Copyright
 CopyrightYear;Copyright-år
 CostumeDesigner;Kostymdesigner
@@ -729,6 +735,7 @@ Height;Höjd
 Height_CleanAperture;
 Height_Original;Ursprunglig höjd
 Help;Hjälp
+HideOthers;Göm övriga
 Hint;Tips
 HomeTheaterAvr;
 How many audio streams?;Hur många ljudströmmar?
@@ -1056,6 +1063,7 @@ MenuID;Meny-ID
 Metadata_Format;
 Metadata_Format_Type;
 Metadata_MuxingMode;
+Minimize;Minimera
 MixType;
 mn; min
 Mood;Läge
@@ -1210,6 +1218,7 @@ Season;Säsong
 SecondaryAudioLanguage;Sekundärt ljudspråk
 see below;Se nedan
 Select your directory;
+SelectAll;Markera allt
 Send HeaderFile;Skicka header-filen här: http://sourceforge.net/projects/mediainfo/ (Tickets>Bugs)
 Separator_Columns;Kolumnseparator
 Separator_Lines;Linjeseparator
@@ -1218,6 +1227,7 @@ ServiceChannel;Kanalnummer
 ServiceKind;
 ServiceName;Tjänstnamn
 ServiceProvider;Tjänstleverantör
+Services;Tjänster
 ServiceType;Tjänsttyp
 Set;Uppsättning
 Set_Count;Antal uppsättningar
@@ -1233,6 +1243,7 @@ ShimName;Shim-namn
 ShimVersion;Shim-version
 Show menu;Visa meny
 Show toolbar;Visa verktygsfält
+ShowAll;Visa alla
 SignalGroup;
 SigningPresent;Signaturer
 SignLanguage;Signaturspråk
@@ -1401,6 +1412,7 @@ WebSite_Video_More;Gå till webbsidan (%Url%) för att hitta denna videokodek
 Width;Bredd
 Width_CleanAperture;
 Width_Original;Ursprunglig bredd
+Window;Fönster
 WriteMe;Kontakta utvecklaren
 WriteToTranslator;Kontakta översättaren
 Written_Date;Datum
@@ -1409,5 +1421,6 @@ WrittenBy;Skrivet av
 Yes;Ja
 Your system;Ditt system
 Your translation;
+Zoom;Zooma
 ZZ_Automatic_Percent;75
 ZZ_AutomaticLanguage_Percent;76

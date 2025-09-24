@@ -188,6 +188,9 @@ Alignment_Aligned;Alinhado intercalado
 Alignment_Split;Dividir entre as intercalações
 All;Todos
 AlternateGroup;
+App_About;Sobre o MediaInfo
+App_Hide;Ocultar MediaInfo
+App_Quit;Encerrar MediaInfo
 Archival_Location;Local de arquivamento
 Arranger;Arranjador
 ArtDirector;Diretor de Arte
@@ -238,6 +241,7 @@ BitRate_Mode_CBR;Constante
 BitRate_Mode_VBR;Variável
 BitRate_Nominal;Taxa de bits nominal
 Bits-(Pixel*Frame);Bits/(Pixels*Quadros)
+Bring All to Front;Trazer Todas Para a Frente
 BufferSize;
 Cancel;Cancelar
 CaptionServiceName;
@@ -279,6 +283,7 @@ Close all before open;Fechar tudo antes de abrir
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
+CloseWindow;Fechar janela
 Codec;Codec
 Codec_Description;Descrição do codec
 Codec_Info;Detalhes do codec
@@ -333,6 +338,7 @@ Container and general information;Container e informações gerais
 Content;
 ContentType;Conteúdo
 CoProducer;Co-Produtor
+Copy;Copiar
 Copyright;Copyright
 CopyrightYear;
 CostumeDesigner;Figurinista
@@ -729,6 +735,7 @@ Height;Altura
 Height_CleanAperture;
 Height_Original;
 Help;Ajuda
+HideOthers;Ocultar Outros
 Hint;Dica
 HomeTheaterAvr;
 How many audio streams?;Quantas faixas de áudio?
@@ -1056,6 +1063,7 @@ MenuID;ID no Menu
 Metadata_Format;
 Metadata_Format_Type;
 Metadata_MuxingMode;
+Minimize;Minimizar
 MixType;
 mn; min
 Mood;Descrição
@@ -1210,6 +1218,7 @@ Season;Temporada
 SecondaryAudioLanguage;
 see below;veja abaixo
 Select your directory;
+SelectAll;Selecionar Tudo
 Send HeaderFile;Enviar arquivo de cabeçalho
 Separator_Columns;separador de colunas
 Separator_Lines;separador de linhas
@@ -1218,6 +1227,7 @@ ServiceChannel;Número do canal do serviço
 ServiceKind;
 ServiceName;Nome do serviço
 ServiceProvider;Provedor do serviço
+Services;Serviços
 ServiceType;Tipo de serviço
 Set;Ajustar
 Set_Count;Ajustar contador
@@ -1233,6 +1243,7 @@ ShimName;
 ShimVersion;
 Show menu;Exibir menu
 Show toolbar;Exibir barra de ferramentas
+ShowAll;Mostrar Tudo
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1401,6 +1412,7 @@ WebSite_Video_More;No site (%Url%) você encontra este codec de vídeo
 Width;Largura
 Width_CleanAperture;
 Width_Original;
+Window;Janela
 WriteMe;Me escreva
 WriteToTranslator;Escreva para o tradutor
 Written_Date;Data da escrita
@@ -1409,5 +1421,6 @@ WrittenBy;Escrito por
 Yes;Sim
 Your system;Seu sistema
 Your translation;
+Zoom;Ampliar/Reduzir
 ZZ_Automatic_Percent;64
 ZZ_AutomaticLanguage_Percent;68

@@ -186,8 +186,13 @@ Album_ReplayGain_Peak;Crête de gain en lecture de l'album
 Alignment;Alignement
 Alignment_Aligned;Aligné sur les entrelacements
 Alignment_Split;Eparpillé à travers les entrelacements
+AllFields;Tous les Champs
 All;Tout
 AlternateGroup;Groupe alternatif
+AnalyzeServicesMenu;Analyser avec MediaInfo
+App_About;À propos de MediaInfo
+App_Hide;Masquer MediaInfo
+App_Quit;Quitter MediaInfo
 Archival_Location;Archivé à
 Arranger;Arrangement
 ArtDirector;Directeur artistique
@@ -238,6 +243,7 @@ BitRate_Mode_CBR;Constant
 BitRate_Mode_VBR;Variable
 BitRate_Nominal;Débit nominal
 Bits-(Pixel*Frame);Bits/(Pixel*Image)
+Bring All to Front;Tout ramener au premier plan
 BufferSize;Taille du tampon
 Cancel;Annuler
 CaptionServiceName;Nom du service de sous-titre
@@ -276,9 +282,12 @@ Classifier;Classificateur de contenu
 ClearList;Vider la liste
 Close;Fermer
 Close all before open;Tout fermer avant d'ouvrir
+CloseAll;Fermer tous les fichiers
 ClosedCaptionsLanguage;Langue des textes pour malentendants
 ClosedCaptionsPresent;Présence de textes pour malentendants
 ClosedCaptionsType;Type de textes pour malentendants
+CloseFile;Fermer le fichier
+CloseWindow;Fermer la fenêtre
 Codec;Codec
 Codec_Description;Description du codec
 Codec_Info;Infos sur le Codec
@@ -312,6 +321,8 @@ colour_primaries;Coordonnées de chromaticité
 colour_range;Gamme de couleurs
 Comment;Commentaire
 CommissionedBy;Commanditaire
+CompareView;Comparer (Fonctionnalité premium)
+Compare;Comparer
 Compilation;Compilation
 ComplementaryObject;Objet complémentaire
 CompleteName;Nom complet
@@ -335,6 +346,7 @@ ContentType;Type de contenu
 CoProducer;Coproducteur
 Copyright;Copyright
 CopyrightYear;Année du Copyright
+Copy;Copier
 CostumeDesigner;Responsable des costumes
 Count;Nombre
 Country;Pays
@@ -356,6 +368,7 @@ Default;Par défaut
 Default translation;
 Default_Setting;Paramètre par défaut
 DefaultTargetDeviceConfig;Configuration par défaut du périphérique cible
+DefaultView;Vue par défaut :
 Delay;Délai
 Delay_Source;Délai, origine
 Delay_Source_Container;Conteneur
@@ -386,6 +399,8 @@ Dolby_Atmos_Metadata;Métadonnées Dolby Atmos
 DolbyAtmos;Dolby Atmos
 Donate;Faire un don
 DotsPerInch;Point par pouce
+DownloadFile;Téléchargement du fichier %INDEX% de %COUNT% ...
+DownloadFileError;Impossible de télécharger %FILE%
 Downmix;Mixage réducteur
 Downmix_5.1.x;Mixage réducteur 5.1 et 5.1.x
 Downmix_5to2;Mixage réducteur 5.1 à 2.0 (stéréo)
@@ -420,6 +435,9 @@ EPG_Positions;Positions de l'EPG (interne)
 EpisodeTitleNumber;Numéro de titre d'épisode
 Error_File;Erreur lors de la lecture du fichier
 Error_File_Write;Erreur lors de l'écriture du fichier
+Error_Open;Impossible d'ouvrir le(s) fichier(s)
+Error_Save;Impossible d'enregistrer le fichier
+Error;Erreur
 Events_MinDuration;Durée minimale d'un événement
 Events_PaintOn;Événements PaintOn
 Events_PopOn;Événements PopOn
@@ -434,6 +452,11 @@ Extensions;Extensions utilisées
 External_Media_NotMounted;Le stockage externe n'est pas accessible
 Family;Famille
 Fax;Fax
+Feature_AdvancedMode;Mode avancé
+Feature_FilesCompare;Comparaison de fichiers
+Feature_More;Et d'autres fonctionnalités à venir
+Feature_SelectView;Sélection de la vue par défaut
+Field;Champ
 File;Fichier
 File size;Taille du fichier
 File_Append;Ajouter à un fichier déjà existant (Faites attention à ce que les paramètres soient identiques)
@@ -516,6 +539,7 @@ FrameRate_Nominal;Débit im/s nominal
 FrameRate_Num;
 FrameRate_Original;Débit im/s d'origine
 FrameRate_Real;Débit im/s réel
+FullParsingTips;Sortie plus complète (plus lent)
 FullParsing;Analyse complète
 Gallery;Gallerie
 General;Général
@@ -729,6 +753,7 @@ Height;Hauteur
 Height_CleanAperture;Hauteur ouverture propre
 Height_Original;Hauteur originale
 Help;Aide
+HideOthers;Masquer les autres
 Hint;Indice
 HomeTheaterAvr;Home cinéma AVR
 How many audio streams?;Nombre de flux audio :
@@ -979,6 +1004,7 @@ Language_zh-tw;Chinese (Taiwan)
 Language_zh-TW;Chinese (Taiwan)
 Language_zh-yue;Cantonese
 Language_zu;Zulu
+LanguageChanges;Les changements prendront effet au redémarrage de l'application
 Languages;
 LawRating;Classé
 LegacyStreamDisplay;
@@ -1029,6 +1055,7 @@ LtRtCenterMixGain;Gain de mixage central LtRt
 LtRtSurroundMixGain;Gain de mixage surround LtRt
 Lyricist;Parolier
 Lyrics;Paroles
+MacCreatedBy;GUI crée par Max Pozdeev
 Mastered_Date;Date de création
 MasteredBy;Créé par
 MasteringDisplay_ColorPrimaries;Coordonnées de chromaticité de l'écran de référence
@@ -1046,6 +1073,7 @@ MD5;MD5
 MD5_Unencoded;MD5 du contenu non codé
 MediaInfo_About;MediaInfo fournit des informations techniques ainsi que les tags concernant vos fichiers Audio et Vidéo.\r\nExcepté l'interface graphique de l'App Store Mac, c'est un logiciel libre, ce qui signifie qu'il est gratuit pour l'utilisateur final et que les développeurs ont la liberté de l'étudier, de l'améliorer et de le redistribuer (licence BSD)
 MediaInfo_About_About;MediaInfo v%MI_VERSION% basé sur MediaInfoLib v%MIL_VERSION%
+MediaInfo_WebSite;Site web de MediaInfo
 Menu;Menu
 Menu stream(s);Menu piste(s)
 Menu_Codec_List;Menu codecs
@@ -1056,6 +1084,7 @@ MenuID;Identifiant de menu
 Metadata_Format;Métadonnées, Format
 Metadata_Format_Type;Métadonnées, Type
 Metadata_MuxingMode;Métadonnées, Mode de multiplexage
+Minimize;Minimiser
 MixType;Type de mixage
 mn; min
 Mood;Humeur
@@ -1096,10 +1125,15 @@ Object;Objet
 ObjectCount;Nombre d'objets
 OK;OK
 One output file per input file;Erreur de lecture du fichier
+OnlyDiffer;Seulement les champs avec des différences
+OnlyIdentical;Seulement les champs identiques
 Open;Ouvrir
 OpenCaptionsLanguage;Langue de sous-titres ouverts
 OpenCaptionsPresent;Présence de sous-titres ouverts
 OpenCaptionsType;Type de sous-titres ouverts
+OpenFile;Ouverture du fichier %INDEX% de %COUNT% ...
+OpenFileError;Impossible d'ouvrir %FILE%
+OpenRecent;Récemment ouvert
 Options;Options
 Options_Hint;Préférences
 Original;Original
@@ -1111,6 +1145,7 @@ Originator;Initiateur
 Other;Autre
 OtherIdentifier;Autre identifiant
 OtherIdentifierType;Autre type d'identifiant
+OtherViews;Autres vues
 Output;Sortie
 Output format;Format de sortie
 OverallBitRate;Débit global
@@ -1148,6 +1183,7 @@ Position_Total;Total
 Preferences;Préférences
 PreferredDownmix;Mixage réducteur préféré
 Premium;Premium
+Premium_Feature;Fonctionalité premium
 Premium_Summary;Fonctionnalités pour les abonnés premium
 PreselectionLabel;Étiquiquette de présélection
 Presentation;Présentation
@@ -1169,6 +1205,7 @@ ProgrammeTextLanguage;Langue du sous-titrage du programme
 ProgrammeTitle;
 Publisher;Publicateur
 Purchased_Date;Date d'achat
+PurchaseInformation;Informations à propos des achats in-app
 Quote character;Caractère de citation :
 RadioStation;Station de radio
 Rating;Note
@@ -1185,6 +1222,7 @@ ReplayGain_Peak;Crête de gain en lecture
 Report;Rapport
 Resolution;Résolution
 RestoreLifetimeSubscription;Restaurer l'abonnement à vie
+Retry;Réessayer
 s; s
 Sampled_Height;
 Sampled_Width;
@@ -1210,6 +1248,7 @@ Season;Saison
 SecondaryAudioLanguage;Langue audio secondaire
 see below;Voir ci-dessous
 Select your directory;
+SelectAll;Tout sélectionner
 Send HeaderFile;Merci de m'envoyer le fichier Header ici : http://sourceforge.net/projects/mediainfo/ (partie Bugs)
 Separator_Columns;Séparateur de colonnes :
 Separator_Lines;Séparateur de lignes :
@@ -1219,6 +1258,7 @@ ServiceKind;Genre de service
 ServiceName;Nom du service
 ServiceProvider;Fournisseur du service
 ServiceType;Type de service
+Services;Services
 Set;Ensemble
 Set_Count;Nombre de réglages
 Setup;Configuration
@@ -1233,6 +1273,9 @@ ShimName;Nom de Shim
 ShimVersion;Version de Shim
 Show menu;Afficher la barre des menus
 Show toolbar;Afficher la barre d'outils
+ShowAll;Tout montrer
+ShowMore;Afficher plus de données dans la sortie, y compris différents formats de temps ou de durée
+Show;Montrer:
 SignalGroup;Groupe de signal
 SigningPresent;Signature présente
 SignLanguage;Langue des signes
@@ -1251,6 +1294,7 @@ StoreMethod_InterleavedFields;Trames entrelacées
 StoreMethod_SeparatedFields;Trames séparées
 StoreMethod_SeparatedFields_1;Trames séparées (1 trame par bloc)
 StoreMethod_SeparatedFields_2;Trames séparées (2 trames par bloc)
+Streams;Flux
 Stream;Type de flux
 Stream_MoreInfo;Plus d'info au sujet de ce flux
 StreamCount;Nombre de pistes de ce type
@@ -1270,6 +1314,7 @@ Subscribe;S'abonner
 Subscribe_Button;S'abonner (%PRICE% pour un an)
 Subscribe_Failed;Achat annulé ou échoué
 Subscribe_Manage;Gérer l'abonnement
+Subscribe_Premium;S'abonner aux fonctionnalités premium
 Subscribe_Renew;Renouveler l'abonnement ?
 Subscribe_Renew_Price;Renouveler l'abonnement (%PRICE% pour un an)
 Subscribe_Unaviable;Impossible de récupérer les détails de l'abonnement.
@@ -1286,6 +1331,7 @@ SubtstreamIdChannel;Identité de début de sous-flux et index de canal
 Summary;Résumé
 Supported formats;Formats supportés
 Supported?;Supporté ?
+SupportUs2;Soutenez-nous et Obtenez des fonctionnalités exclusives.
 SupportUs;Nous Soutenir, Et obtenir le thème sombre ainsi que d'autres fonctionnalités à venir.
 SurroundAttenuationKnown;Atténuation surround connue
 SwitchGroup;Changer de groupe
@@ -1369,6 +1415,7 @@ UniversalAdID_Registry;Registre d'Ad ID universelle
 UniversalAdID_Value;Valeur d'Ad ID universelle
 Unknown;Inconnu
 Url;Page Internet
+Value;Valeur
 Video;Vidéo
 Video stream(s);Piste(s) vidéo
 Video_Codec_List;Codecs vidéo
@@ -1401,6 +1448,7 @@ WebSite_Video_More;Visiter la page Internet (%Url%) du codec vidéo
 Width;Largeur
 Width_CleanAperture;Largeur ouverture propre
 Width_Original;Largeur originale
+Window;Fenêtre
 WriteMe;Écrire à l'auteur
 WriteToTranslator;Écrire au traducteur
 Written_Date;Date d'écriture
@@ -1409,5 +1457,6 @@ WrittenBy;Écrit par
 Yes;Oui
 Your system;Votre système
 Your translation;
+Zoom;Zoom
 ZZ_Automatic_Percent;96
 ZZ_AutomaticLanguage_Percent;96

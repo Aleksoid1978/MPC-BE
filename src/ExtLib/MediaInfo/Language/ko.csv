@@ -188,6 +188,9 @@ Alignment_Aligned;인터리브에 정렬
 Alignment_Split;인터리브로 분할
 All;전체
 AlternateGroup;
+App_About;MediaInfo에 관하여
+App_Hide;MediaInfo 가리기
+App_Quit;MediaInfo 종료
 Archival_Location;기록 장소
 Arranger;편곡자
 ArtDirector;미술 감독
@@ -238,6 +241,7 @@ BitRate_Mode_CBR;고정
 BitRate_Mode_VBR;변동
 BitRate_Nominal;명목상의 비트레이트
 Bits-(Pixel*Frame);비트/(픽셀*프레임)
+Bring All to Front;모두 앞으로 가져오기
 BufferSize;
 Cancel;취소
 CaptionServiceName;
@@ -276,6 +280,7 @@ Classifier;
 ClearList;
 Close;닫기
 Close all before open;열기 전에 모두 닫기
+CloseWindow;창 닫기
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
@@ -333,6 +338,7 @@ Container and general information;컨테이너와 일반 정보
 Content;
 ContentType;내용 종류
 CoProducer;공동 제작자
+Copy;복사하기
 Copyright;저작권
 CopyrightYear;
 CostumeDesigner;의상 디자이너
@@ -729,6 +735,7 @@ Height;높이
 Height_CleanAperture;
 Height_Original;
 Help;도움말
+HideOthers;기타 가리기
 Hint;힌트
 HomeTheaterAvr;
 How many audio streams?;몇 개의 오디오 스트림?
@@ -1056,6 +1063,7 @@ MenuID;메뉴 ID
 Metadata_Format;
 Metadata_Format_Type;
 Metadata_MuxingMode;
+Minimize;최소화
 MixType;
 mn;분
 Mood;무드
@@ -1210,6 +1218,7 @@ Season;시즌
 SecondaryAudioLanguage;
 see below;아래 참고
 Select your directory;
+SelectAll;전체 선택
 Send HeaderFile;여기로 헤더 파일을 보내주세요 : http://sourceforge.net/projects/mediainfo/ (Bug section)
 Separator_Columns;컬럼 구분자
 Separator_Lines;라인 구분자
@@ -1218,6 +1227,7 @@ ServiceChannel;서비스 채널 번호
 ServiceKind;
 ServiceName;서비스 이름
 ServiceProvider;서비스 제공자
+Services;서비스
 ServiceType;서비스 종류
 Set;세트
 Set_Count;세트 개수
@@ -1233,6 +1243,7 @@ ShimName;
 ShimVersion;
 Show menu;메뉴 보기
 Show toolbar;도구 모음 보기
+ShowAll;모두 보기
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1401,6 +1412,7 @@ WebSite_Video_More;이 비디오 코덱을 찾기 위한 웹사이트(%Url%)로 
 Width;폭
 Width_CleanAperture;
 Width_Original;
+Window;윈도우
 WriteMe;제작자에게 메일쓰기
 WriteToTranslator;번역자에게 메일쓰기
 Written_Date;제작일
@@ -1409,5 +1421,6 @@ WrittenBy;제작자
 Yes;예
 Your system;이 시스템
 Your translation;
+Zoom;확대/축소
 ZZ_Automatic_Percent;64
 ZZ_AutomaticLanguage_Percent;68

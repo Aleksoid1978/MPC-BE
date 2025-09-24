@@ -167,7 +167,7 @@ public :
     #endif //MEDIAINFO_ADVANCED
 
     #if MEDIAINFO_ADVANCED
-        void          File_DefaultFrameRate_Set (float64 NewValue);
+        void          File_DefaultFrameRate_Set (const Ztring& NewValue);
         float64       File_DefaultFrameRate_Get ();
         void          File_DefaultTimeCode_Set (string NewValue);
         string        File_DefaultTimeCode_Get ();

@@ -188,6 +188,9 @@ Alignment_Aligned;對齊交錯訊號
 Alignment_Split;橫越交錯訊號
 All;全部
 AlternateGroup;
+App_About;關於 MediaInfo
+App_Hide;隱藏 MediaInfo
+App_Quit;結束 MediaInfo
 Archival_Location;檔案位置
 Arranger;編曲
 ArtDirector;藝術指導
@@ -238,6 +241,7 @@ BitRate_Mode_CBR;常數式
 BitRate_Mode_VBR;可變式
 BitRate_Nominal;正常流量
 Bits-(Pixel*Frame);位元/(像素*影格)
+Bring All to Front;將此程式所有視窗移至最前
 BufferSize;
 Cancel;取消
 CaptionServiceName;
@@ -279,6 +283,7 @@ Close all before open;開啟前關閉其它檔案
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
+CloseWindow;關閉視窗
 Codec;編解碼器
 Codec_Description;編解碼器描述
 Codec_Info;編解碼器詳細資訊
@@ -333,6 +338,7 @@ Container and general information;容器格式與一般訊息
 Content;
 ContentType;內容型態
 CoProducer;製作協力
+Copy;拷貝
 Copyright;著作權
 CopyrightYear;
 CostumeDesigner;服裝設計
@@ -729,6 +735,7 @@ Height;畫面高度
 Height_CleanAperture;
 Height_Original;
 Help;說明
+HideOthers;隱藏其他
 Hint;提示
 HomeTheaterAvr;
 How many audio streams?;有多少音訊串流?
@@ -1056,6 +1063,7 @@ MenuID;選單ID
 Metadata_Format;
 Metadata_Format_Type;
 Metadata_MuxingMode;
+Minimize;縮到最小
 MixType;
 mn;分
 Mood;情緒
@@ -1210,6 +1218,7 @@ Season;季期
 SecondaryAudioLanguage;
 see below;詳見下述
 Select your directory;
+SelectAll;全選
 Send HeaderFile;請將標頭檔寄到這給我: http://sourceforge.net/projects/mediainfo/ (Bug section)
 Separator_Columns;換列字元
 Separator_Lines;換行字元
@@ -1218,6 +1227,7 @@ ServiceChannel;服務頻道
 ServiceKind;
 ServiceName;服務名稱
 ServiceProvider;服務提供者
+Services;服務
 ServiceType;服務類型
 Set;集合
 Set_Count;集合數
@@ -1233,6 +1243,7 @@ ShimName;
 ShimVersion;
 Show menu;顯示選單
 Show toolbar;顯示工具列
+ShowAll;顯示全部
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1401,6 +1412,7 @@ WebSite_Video_More;前往網站 (%Url%) 找尋此視訊編解碼器
 Width;畫面寬度
 Width_CleanAperture;
 Width_Original;
+Window;視窗
 WriteMe;寫信給作者
 WriteToTranslator;寫信給譯者
 Written_Date;撰寫日期
@@ -1409,5 +1421,6 @@ WrittenBy;撰寫人
 Yes;是
 Your system;您的系統
 Your translation;
+Zoom;縮放
 ZZ_Automatic_Percent;64
 ZZ_AutomaticLanguage_Percent;68

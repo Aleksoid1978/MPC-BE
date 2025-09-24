@@ -334,6 +334,7 @@ private :
     void WAVE_axml_Continue ();
     void WAVE_bext ();
     void WAVE_bxml () {WAVE_axml();}
+    void WAVE_C2PA();
     void WAVE_chna();
     void WAVE_cset() { AVI__CSET(); }
     void WAVE_CSET() { AVI__CSET(); }

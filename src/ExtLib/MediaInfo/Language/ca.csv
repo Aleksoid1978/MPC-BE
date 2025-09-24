@@ -188,6 +188,9 @@ Alignment_Aligned;Alineament a intercalats
 Alignment_Split;Dividir a través intercalats
 All;Tot
 AlternateGroup;
+App_About;Sobre MediaInfo
+App_Hide;Ocultar MediaInfo
+App_Quit;Sortir de MediaInfo
 Archival_Location;Arxivat a
 Arranger;Arranjador
 ArtDirector;Director artístic
@@ -238,6 +241,7 @@ BitRate_Mode_CBR;Constant
 BitRate_Mode_VBR;Variable
 BitRate_Nominal;Taxa de bits nominal
 Bits-(Pixel*Frame);Bits/(píxel*fotograma)
+Bring All to Front;Portar-ho tot a primer pla
 BufferSize;Mida búfer
 Cancel;Cancel·la
 CaptionServiceName;
@@ -279,6 +283,7 @@ Close all before open;Tanca tot abans d'obrir
 ClosedCaptionsLanguage;Idioma subtítols incrustats
 ClosedCaptionsPresent;Subtítols incrustats presents
 ClosedCaptionsType;Tipus subtítols incrustats
+CloseWindow;Tancar la finestra
 Codec;Còdec
 Codec_Description;Descripció del còdec
 Codec_Info;Detalls del còdec
@@ -333,6 +338,7 @@ Container and general information;Contenidor i informació general
 Content;
 ContentType;Tipus de contingut
 CoProducer;Coproductor
+Copy;Copiar
 Copyright;Drets d'autor
 CopyrightYear;Any copyright
 CostumeDesigner;Costume designer
@@ -729,6 +735,7 @@ Height;Alçada
 Height_CleanAperture;Alçada obertura neta
 Height_Original;Alçada original
 Help;Ajuda
+HideOthers;Ocultar la resta
 Hint;Consell
 HomeTheaterAvr;
 How many audio streams?;Quantes pistes d'àudio?
@@ -1056,6 +1063,7 @@ MenuID;ID menú
 Metadata_Format;
 Metadata_Format_Type;
 Metadata_MuxingMode;
+Minimize;Minimitzar
 MixType;
 mn; min
 Mood;Humor
@@ -1210,6 +1218,7 @@ Season;Estació
 SecondaryAudioLanguage;Idioma àudio secondari
 see below;mira més avall
 Select your directory;
+SelectAll;Seleccionar-ho tot
 Send HeaderFile;Envia'm l'arxiu Header aquí: http://sourceforge.net/projects/mediainfo/ (secció Bug)
 Separator_Columns;Separador de columnes
 Separator_Lines;Separador de línies
@@ -1218,6 +1227,7 @@ ServiceChannel;Canal servei
 ServiceKind;
 ServiceName;Nom servei
 ServiceProvider;Proveïdor servei
+Services;Serveis
 ServiceType;Tipus servei
 Set;Grup
 Set_Count;Quantitat grups
@@ -1233,6 +1243,7 @@ ShimName;Nom de falca
 ShimVersion;Versió de falca
 Show menu;Mostra el menú
 Show toolbar;Mostra la barra d'eines
+ShowAll;Mostrar-ho tot
 SignalGroup;
 SigningPresent;Signatura present
 SignLanguage;Idioma signatura
@@ -1401,6 +1412,7 @@ WebSite_Video_More;Vés al web (%Url%) per trobar aquest còdec de vídeo
 Width;Amplada
 Width_CleanAperture;Amplada obertura neta
 Width_Original;Amplada original
+Window;Finestra
 WriteMe;Escriu un correu a l'autor
 WriteToTranslator;Escriu al traductor
 Written_Date;Data escrita
@@ -1409,5 +1421,6 @@ WrittenBy;Escrit per
 Yes;Sí
 Your system;El teu sistema
 Your translation;
+Zoom;Zoom
 ZZ_Automatic_Percent;73
 ZZ_AutomaticLanguage_Percent;77

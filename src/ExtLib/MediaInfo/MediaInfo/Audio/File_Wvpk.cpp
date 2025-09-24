@@ -347,11 +347,12 @@ void File_Wvpk::Data_Parse()
         while (Element_Offset<Element_Size)
         {
             int32u total_samples=(int32u)-1, block_index=(int32u)-1, block_samples=0, flags, blocksize=(int32u)-1;
+            int8u block_index_u8=0, total_samples_u8=0;
             bool initial_block=true, final_block=true;
             if (!FromMKV)
             {
-                Skip_L1(                                            "track_no");
-                Skip_L1(                                            "index_no");
+                Get_L1 (block_index_u8,                             "block_index_u8");
+                Get_L1 (total_samples_u8,                           "total_samples_u8");
                 Get_L4 (total_samples,                              "total_samples");
                 Get_L4 (block_index,                                "block_index");
             }
@@ -362,10 +363,10 @@ void File_Wvpk::Data_Parse()
                 if (!FromMKV)
                 {
                     if (block_index==0) //Only the frame with block_index==0
-                        total_samples_FirstFrame=total_samples; //Note: total_samples is not trustable for a cutted file
+                        total_samples_FirstFrame=((int64u)total_samples_u8<<32)-total_samples_u8+total_samples; //Note: total_samples is not trustable for a cutted file
+                    block_index_LastFrame=((int64u)block_index_u8<<32)+block_index;
                     if (Frame_Count==1)
-                        block_index_FirstFrame=block_index; //Save the block_index of the first block
-                    block_index_LastFrame=block_index;
+                        block_index_FirstFrame=block_index_LastFrame; //Save the block_index of the first block
                     block_samples_LastFrame=block_samples;
                 }
                 Get_L4 (flags,                                      "flags");

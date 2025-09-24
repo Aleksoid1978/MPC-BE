@@ -66,9 +66,9 @@ private :
     void id_29() { id_26(); }
 
     //Temp - Technical info
-    int32u total_samples_FirstFrame;
-    int32u block_index_FirstFrame;
-    int32u block_index_LastFrame;
+    int64u total_samples_FirstFrame;
+    int64u block_index_FirstFrame;
+    int64u block_index_LastFrame;
     int32u block_samples_LastFrame;
     bool   resolution0;
     bool   resolution1;

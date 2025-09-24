@@ -297,13 +297,13 @@ bool File_DolbyVisionMetadata::FileHeader_Begin()
                 {
                     if (const char* Text = Level6_Item->GetText())
                         if (Ztring().From_UTF8(Text).To_float32())
-                            Fill(Stream_Video, 0, Video_MaxCLL, Ztring(Text) + __T(" cd/m2"));
+                            Fill(Stream_Video, 0, Video_MaxCLL, Ztring(Text));
                 }
                 if (!strcmp(Level6_Item->Name(), "MaxFALL"))
                 {
                     if (const char* Text = Level6_Item->GetText())
                         if (Ztring().From_UTF8(Text).To_float32())
-                            Fill(Stream_Video, 0, Video_MaxFALL, Ztring(Text) + __T(" cd/m2"));
+                            Fill(Stream_Video, 0, Video_MaxFALL, Ztring(Text));
                 }
             }
         }

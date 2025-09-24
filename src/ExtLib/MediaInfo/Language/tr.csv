@@ -188,6 +188,9 @@ Alignment_Aligned;Boşluklarda sıraya dizilmiş
 Alignment_Split;Boşlukları karşılıklı böl
 All;Tümü
 AlternateGroup;Dönüşümlü grup
+App_About;MediaInfo hakkında
+App_Hide;MediaInfo’i Gizle
+App_Quit;MediaInfo’dan Çık
 Archival_Location;Arşiv konumu
 Arranger;Düzenleyici
 ArtDirector;Sanat Yönetmeni
@@ -238,6 +241,7 @@ BitRate_Mode_CBR;Sabit
 BitRate_Mode_VBR;Değişken
 BitRate_Nominal;Düşük bit oranı
 Bits-(Pixel*Frame);Bit/(Piksel*Kare)
+Bring All to Front;Tümünü En Öne Getir
 BufferSize;Arabellek boyutu
 Cancel;İptal
 CaptionServiceName;
@@ -279,6 +283,7 @@ Close all before open;Açmadan önce tümünü kapat
 ClosedCaptionsLanguage;Kapalı Açıklamalı Alt Yazı Dili
 ClosedCaptionsPresent;Kapalı Açıklamalı Alt Yazı Sunumu
 ClosedCaptionsType;Kapalı Açıklamalı Alt Yazı Türü
+CloseWindow;Pencereyi Kapat
 Codec;Kodek
 Codec_Description;Kodek açıklaması
 Codec_Info;Kodek ayrıntıları
@@ -333,6 +338,7 @@ Container and general information;Kapsayıcı ve genel bilgiler
 Content;
 ContentType;İçerik Türü
 CoProducer;Yardımcı yapımcı
+Copy;Kopyala
 Copyright;Telif Hakkı
 CopyrightYear;Telif Hakkı Yılı
 CostumeDesigner;Kıyafet tasarımcısı
@@ -729,6 +735,7 @@ Height;Yükseklik
 Height_CleanAperture;Temiz diyafram yüksekliği
 Height_Original;Orijinal yükseklik
 Help;Yardım
+HideOthers;Diğerlerini Gizle
 Hint;İpucu
 HomeTheaterAvr;
 How many audio streams?;Kaç tane seslendirme akışı?
@@ -1056,6 +1063,7 @@ MenuID;Menü ID
 Metadata_Format;
 Metadata_Format_Type;
 Metadata_MuxingMode;
+Minimize;Simge Durumuna Küçült
 MixType;
 mn; dk
 Mood;Mizaç
@@ -1210,6 +1218,7 @@ Season;Sezon
 SecondaryAudioLanguage;İkincil Ses Dili
 see below;aşağı bakın
 Select your directory;
+SelectAll;Tümünü Seç
 Send HeaderFile;Lütfen Header dosyasını buraya gönderin : http://sourceforge.net/projects/mediainfo/ (Bug bölümü)
 Separator_Columns;sütun ayırıcı
 Separator_Lines;satır ayırıcı
@@ -1218,6 +1227,7 @@ ServiceChannel;Hizmet kanal numarası
 ServiceKind;Hizmet çeşidi
 ServiceName;Hizmet adı
 ServiceProvider;Hizmet sağlayıcısı
+Services;Servisler
 ServiceType;Hizmet türü
 Set;Ayar
 Set_Count;Ayar sayısı
@@ -1233,6 +1243,7 @@ ShimName;Dolgu Adı
 ShimVersion;Dolgu Sürümü
 Show menu;Menüyü göster
 Show toolbar;Araç çubuğunu göster
+ShowAll;Tümünü göster
 SignalGroup;
 SigningPresent;İşaretle Sunum
 SignLanguage;İşaret Dili
@@ -1401,6 +1412,7 @@ WebSite_Video_More;Bu görüntü kodek'ini bulmak için (%Url%) web sitesine git
 Width;Genişlik
 Width_CleanAperture;Temiz diyafram genişliği
 Width_Original;Orijinal genişlik
+Window;Pencere
 WriteMe;Bana yazın
 WriteToTranslator;Çevirmene yazın
 Written_Date;Yazıldığı tarih
@@ -1409,5 +1421,6 @@ WrittenBy;Yazan
 Yes;Evet
 Your system;Sisteminiz
 Your translation;
+Zoom;Büyült/Küçült
 ZZ_Automatic_Percent;77
 ZZ_AutomaticLanguage_Percent;78

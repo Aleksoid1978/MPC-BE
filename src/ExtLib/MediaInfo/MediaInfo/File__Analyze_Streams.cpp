@@ -44,6 +44,8 @@ namespace MediaInfoLib
     //---------------------------------------------------------------------------
     extern MediaInfo_Config Config;
     const char* Mpegv_colour_primaries(int8u colour_primaries);
+    const char* Mpegv_transfer_characteristics(int8u transfer_characteristics);
+    const char* Mpegv_matrix_coefficients(int8u matrix_coefficients);
     //---------------------------------------------------------------------------
 
     //***************************************************************************
@@ -943,6 +945,14 @@ void File__Analyze::dvcC(bool has_dependency_pid, std::map<std::string, Ztring>*
                 else
                     Fill(Stream_Video, StreamPos_Last, Video_HDR_Format_Compatibility, Compatibility);
             }
+            if (dv_profile == 5) {
+                // VUI information is optional for a profile 5 bitstream.
+                if (Retrieve_Const(Stream_Video, StreamPos_Last, Video_colour_primaries).empty() && Retrieve_Const(Stream_Video, StreamPos_Last, Video_transfer_characteristics).empty() && Retrieve_Const(Stream_Video, StreamPos_Last, Video_matrix_coefficients).empty()) {
+                    Fill(Stream_Video, StreamPos_Last, Video_colour_primaries, Mpegv_colour_primaries(9));
+                    Fill(Stream_Video, StreamPos_Last, Video_transfer_characteristics, Mpegv_transfer_characteristics(16));
+                    Fill(Stream_Video, StreamPos_Last, Video_matrix_coefficients, Mpegv_matrix_coefficients(15));
+                }
+            }
         }
         else
             if (Infos)
@@ -966,9 +976,9 @@ void File__Analyze::Get_LightLevel(Ztring &MaxCLL, Ztring &MaxFALL, int32u Divis
 
         auto Decimals=to_string(Divisor).size()-1;
         if (maximum_content_light_level)
-            MaxCLL=Ztring::ToZtring(((float32)maximum_content_light_level)/Divisor, Decimals)+__T(" cd/m2");
+            MaxCLL=Ztring::ToZtring(((float32)maximum_content_light_level)/Divisor, Decimals);
         if (maximum_frame_average_light_level)
-            MaxFALL=Ztring::ToZtring(((float32)maximum_frame_average_light_level)/Divisor, Decimals)+__T(" cd/m2");
+            MaxFALL=Ztring::ToZtring(((float32)maximum_frame_average_light_level)/Divisor, Decimals);
     }
     else
     {
@@ -977,9 +987,9 @@ void File__Analyze::Get_LightLevel(Ztring &MaxCLL, Ztring &MaxFALL, int32u Divis
         Get_B2 (maximum_frame_average_light_level,              "maximum_frame_average_light_level");
 
         if (maximum_content_light_level)
-            MaxCLL=Ztring::ToZtring(maximum_content_light_level)+__T(" cd/m2");
+            MaxCLL=Ztring::ToZtring(maximum_content_light_level);
         if (maximum_frame_average_light_level)
-            MaxFALL=Ztring::ToZtring(maximum_frame_average_light_level)+__T(" cd/m2");
+            MaxFALL=Ztring::ToZtring(maximum_frame_average_light_level);
     }
 }
 #endif
@@ -1287,10 +1297,15 @@ size_t File__Analyze::Stream_Erase (stream_t KindOfStream, size_t StreamPos)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-bool ShowSource_IsInList(video Value)
+size_t ShowSource_IsInList(video Value)
 {
+    size_t Offset = 0;
     switch (Value)
     {
+        case Video_MaxCLL:
+        case Video_MaxFALL:
+            Offset++;
+            [[fallthrough]];
         case Video_colour_description_present:
         case Video_colour_range:
         case Video_colour_primaries:
@@ -1298,12 +1313,12 @@ bool ShowSource_IsInList(video Value)
         case Video_transfer_characteristics:
         case Video_MasteringDisplay_ColorPrimaries:
         case Video_MasteringDisplay_Luminance:
-        case Video_MaxCLL:
-        case Video_MaxFALL:
-            return true;
-        default:
-            return false;
+            Offset++;
+            [[fallthrough]];
+        default:;
     }
+
+    return Offset;
 }
 
 //---------------------------------------------------------------------------
@@ -1459,9 +1474,11 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
         "ContainerExtra",
     };
     assert(sizeof(SourceValue)==StreamSource_Max*sizeof(const char*));
-    if (StreamKind==Stream_Video && ShowSource_IsInList((video)Parameter) && StreamSource>=0 && StreamSource<StreamSource_Max && Retrieve_Const(Stream_Video, StreamPos, Parameter+1).empty())
+    if (StreamKind==Stream_Video && StreamSource>=0 && StreamSource<StreamSource_Max)
     {
-        Fill(Stream_Video, StreamPos, Parameter+1, SourceValue[StreamSource]);
+        auto ShowSource_Offset=ShowSource_IsInList((video)Parameter);
+        if (ShowSource_Offset && Retrieve_Const(Stream_Video, StreamPos, Parameter+ShowSource_Offset).empty())
+            Fill(Stream_Video, StreamPos, Parameter+ShowSource_Offset, SourceValue[StreamSource]);
     }
 
     //Format_Profile split (see similar code in MediaInfo_Inform.cpp, dedicated to MIXML)
@@ -2874,30 +2891,34 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
         const Ztring &ToFill_Value=ToAdd.Get(StreamKind, StreamPos_From, Pos);
         if (StreamKind==Stream_Video && ShowSource_IsInList((video)Pos))
         {
+            auto ShowSource_Offset=ShowSource_IsInList((video)Pos);
+            auto Pos1=Pos+ShowSource_Offset;
             const Ztring &ToFill_FromContainer=Get(StreamKind, StreamPos_To, Pos);
-            if (!ToAdd.Retrieve_Const(StreamKind, StreamPos_From, Pos+1).empty())
+            if (!ToAdd.Retrieve_Const(StreamKind, StreamPos_From, Pos1).empty())
             {
-                if (!Retrieve_Const(StreamKind, StreamPos_To, Pos+1).empty())
+                if (!Retrieve_Const(StreamKind, StreamPos_To, Pos1).empty())
                 {
                     if (ToFill_Value==ToFill_FromContainer)
                     {
-                        if (Retrieve_Const(StreamKind, StreamPos_To, Pos+1)!=ToAdd.Retrieve_Const(StreamKind, StreamPos_From, Pos+1))
-                            Fill(StreamKind, StreamPos_To, Pos+1, Retrieve_Const(StreamKind, StreamPos_To, Pos+1)+MediaInfoLib::Config.TagSeparator_Get()+ToAdd.Retrieve_Const(StreamKind, StreamPos_From, Pos+1), true);
+                        if (Retrieve_Const(StreamKind, StreamPos_To, Pos1)!=ToAdd.Retrieve_Const(StreamKind, StreamPos_From, Pos1))
+                            Fill(StreamKind, StreamPos_To, Pos1, Retrieve_Const(StreamKind, StreamPos_To, Pos1)+MediaInfoLib::Config.TagSeparator_Get()+ToAdd.Retrieve_Const(StreamKind, StreamPos_From, Pos1), true);
                     }
                     else
                     {
-                        Fill(StreamKind, StreamPos_To, Pos+3, ToAdd.Retrieve_Const(StreamKind, StreamPos_From, Pos+1));
-                        Fill(StreamKind, StreamPos_To, Pos+2, ToFill_Value);
+                        auto Pos2=Pos1+1;
+                        auto Pos3=Pos2+1;
+                        Fill(StreamKind, StreamPos_To, Pos3, ToAdd.Retrieve_Const(StreamKind, StreamPos_From, Pos1));
+                        Fill(StreamKind, StreamPos_To, Pos2, ToFill_Value);
                     }
                 }
                 else
                 {
-                    Fill(StreamKind, StreamPos_To, Pos+1, ToAdd.Retrieve_Const(StreamKind, StreamPos_From, Pos+1));
+                    Fill(StreamKind, StreamPos_To, Pos1, ToAdd.Retrieve_Const(StreamKind, StreamPos_From, Pos1));
                     Fill(StreamKind, StreamPos_To, Pos, ToFill_Value);
                 }
             }
         }
-        else if (StreamKind==Stream_Video && Pos && ShowSource_IsInList((video)(Pos-1)))
+        else if (StreamKind==Stream_Video && Pos>1 && (ShowSource_IsInList((video)(Pos-1))==1 || ShowSource_IsInList((video)(Pos-2))==2))
         {
             //Ignore
         }

@@ -387,7 +387,7 @@ void File_Eia608::Read_Buffer_Continue()
             cc_data_1_Old=0x00;
             cc_data_2_Old=0x00;
             size_t StreamPos=TextMode*2+DataChannelMode; // From previous parsing
-            if (StreamPos<Streams.size() && Streams[StreamPos] && Streams[StreamPos]->Duration_End_Command_WasJustUpdated && FrameInfo.DTS!=(int64u)-1 && FrameInfo.DUR!=(int64u)-1 )
+            if (StreamPos<Streams.size() && Streams[StreamPos] && Streams[StreamPos]->Duration_End_Command_WasJustUpdated && FrameInfo.DTS!=(int64u)-1)
             {
                 Streams[StreamPos]->Duration_End_Command=(FrameInfo.DTS)/1000000.0;
                 Streams[StreamPos]->Duration_End_Command_WasJustUpdated=false;
@@ -1119,9 +1119,9 @@ void File_Eia608::Special_14(int8u cc_data_2)
                     break; //EOC - End of Caption
         default   : Illegal(0x14, cc_data_2);
     }
-    if (FrameInfo.DTS!=(int64u)-1 && FrameInfo.DUR!=(int64u)-1)
+    if (FrameInfo.DTS!=(int64u)-1)
     {
-        Stream.Duration_End_Command=(FrameInfo.DTS)/1000000.0;
+        Stream.Duration_End_Command=(FrameInfo.DTS+FrameInfo.DUR)/1000000.0;
         Stream.Duration_End_Command_WasJustUpdated=true;
     }
 }

@@ -188,6 +188,9 @@ Alignment_Aligned;
 Alignment_Split;
 All;Všetko
 AlternateGroup;
+App_About;O aplikácii MediaInfo
+App_Hide;Skryť MediaInfo
+App_Quit;Ukončiť MediaInfo
 Archival_Location;Archival location
 Arranger;Arranger
 ArtDirector;ArtDirector
@@ -238,6 +241,7 @@ BitRate_Mode_CBR;Konštantný dátový tok
 BitRate_Mode_VBR;Variabilný dátový tok
 BitRate_Nominal;
 Bits-(Pixel*Frame);Bitov/(Bod*Snímka)
+Bring All to Front;Presunúť všetky do popredia
 BufferSize;
 Cancel;Zrušiť
 CaptionServiceName;
@@ -279,6 +283,7 @@ Close all before open;Zatvoriť všetko pred otvorením nového
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
+CloseWindow;Zatvoriť okno
 Codec;Kodek
 Codec_Description;Popis kodeku
 Codec_Info;Detaily kodeku
@@ -334,6 +339,7 @@ Content;
 ContentType;Typ obsahu
 CoProducer;sPoluproducent
 Copyright;Autorské práva
+Copy;Kopírovať
 CopyrightYear;
 CostumeDesigner;Costume designer
 Count;Count
@@ -729,6 +735,7 @@ Height;Výška
 Height_CleanAperture;
 Height_Original;Pôvodná výška
 Help;Pomocník
+HideOthers;Skryť ostatné
 Hint;
 HomeTheaterAvr;
 How many audio streams?;How many audio streams?
@@ -1056,6 +1063,7 @@ MenuID;Označenie menu
 Metadata_Format;
 Metadata_Format_Type;
 Metadata_MuxingMode;
+Minimize;Minimalizovať
 MixType;
 mn; min
 Mood;Mood
@@ -1210,6 +1218,7 @@ Season;Season
 SecondaryAudioLanguage;
 see below;pozri nižšie
 Select your directory;
+SelectAll;Označiť všetko
 Send HeaderFile;
 Separator_Columns;Oddeľovač stĺpcov
 Separator_Lines;Oddeľovač riadkov
@@ -1218,6 +1227,7 @@ ServiceChannel;
 ServiceKind;
 ServiceName;
 ServiceProvider;
+Services;Služby
 ServiceType;
 Set;Nastaviť
 Set_Count;Set count
@@ -1233,6 +1243,7 @@ ShimName;
 ShimVersion;
 Show menu;Zobraziť menu
 Show toolbar;Zobraziť nástrojovú lištu
+ShowAll;Zobraziť všetky
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1401,6 +1412,7 @@ WebSite_Video_More;Vyhľadaj tento videokodek na webstránke (%Url%)
 Width;Šírka
 Width_CleanAperture;
 Width_Original;
+Window;Okno
 WriteMe;Napíš autorovi
 WriteToTranslator;Napíš prekladateľovi
 Written_Date;Written date
@@ -1409,5 +1421,6 @@ WrittenBy;Napísal
 Yes;Áno
 Your system;Váš systém
 Your translation;
+Zoom;Zmeniť veľkosť
 ZZ_Automatic_Percent;57
 ZZ_AutomaticLanguage_Percent;61

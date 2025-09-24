@@ -188,6 +188,9 @@ Alignment_Aligned;インターリーブで整列
 Alignment_Split;インターリーブで分割
 All;すべて
 AlternateGroup;代替グループ
+App_About;MediaInfoについて
+App_Hide;MediaInfoを隠す
+App_Quit;MediaInfoを終了
 Archival_Location;作成された場所
 Arranger;編曲者
 ArtDirector;美術監督
@@ -238,6 +241,7 @@ BitRate_Mode_CBR;固定 (CBR)
 BitRate_Mode_VBR;可変 (VBR)
 BitRate_Nominal;ビットレート名
 Bits-(Pixel*Frame);ビット/(ピクセル*フレーム)
+Bring All to Front;すべてを手前に移動
 BufferSize;バッファサイズ
 Cancel;キャンセル
 CaptionServiceName;
@@ -279,6 +283,7 @@ Close all before open;すべて閉じてから開く
 ClosedCaptionsLanguage;クローズドキャプションの言語
 ClosedCaptionsPresent;クローズドキャプションの有無
 ClosedCaptionsType;クローズドキャプションの種類
+CloseWindow;ウィンドウを閉じる
 Codec;コーデック
 Codec_Description;コーデックの説明
 Codec_Info;コーデックの詳細
@@ -333,6 +338,7 @@ Container and general information;コンテナと全般情報
 Content;
 ContentType;コンテンツ種別
 CoProducer;共同製作
+Copy;コピー
 Copyright;著作
 CopyrightYear;著作年
 CostumeDesigner;衣装デザイナー
@@ -729,6 +735,7 @@ Height;高さ
 Height_CleanAperture;表示される高さ (Clean aperture)
 Height_Original;元の高さ
 Help;ヘルプ
+HideOthers;ほかを隠す
 Hint;ヒント
 HomeTheaterAvr;
 How many audio streams?;音声ストリームは何個にしますか？
@@ -1056,6 +1063,7 @@ MenuID;メニュー ID
 Metadata_Format;
 Metadata_Format_Type;
 Metadata_MuxingMode;
+Minimize;しまう
 MixType;
 mn;分
 Mood;気分
@@ -1210,6 +1218,7 @@ Season;シーズン
 SecondaryAudioLanguage;音声2の言語
 see below;詳細は下記
 Select your directory;
+SelectAll;すべてを選択
 Send HeaderFile;可能ならヘッダファイルを送信してください: http://sourceforge.net/projects/mediainfo/ (バグセクション)
 Separator_Columns;列の区切り
 Separator_Lines;改行
@@ -1218,6 +1227,7 @@ ServiceChannel;チャンネル
 ServiceKind;サービス種別
 ServiceName;サービス名
 ServiceProvider;サービスプロバイダ
+Services;サービス
 ServiceType;サービス種別
 Set;セット
 Set_Count;セット数
@@ -1233,6 +1243,7 @@ ShimName;Shim 名
 ShimVersion;Shim バージョン
 Show menu;メニューを表示
 Show toolbar;ツールバーを表示
+ShowAll;すべてを表示
 SignalGroup;
 SigningPresent;Sign 有無
 SignLanguage;Sign の言語
@@ -1401,6 +1412,7 @@ WebSite_Video_More; (%Url%) を開きこの映像コーデックを探す
 Width;幅
 Width_CleanAperture;表示される幅 (Clean aperture)
 Width_Original;元の幅
+Window;ウインドウ
 WriteMe;開発者にメール送信
 WriteToTranslator;翻訳者
 Written_Date;作成日
@@ -1409,5 +1421,6 @@ WrittenBy;著者
 Yes;はい
 Your system;システム情報
 Your translation;
+Zoom;拡大／縮小
 ZZ_Automatic_Percent;82
 ZZ_AutomaticLanguage_Percent;82

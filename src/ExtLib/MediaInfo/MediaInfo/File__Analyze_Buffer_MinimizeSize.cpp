@@ -284,9 +284,9 @@ void File__Analyze::Get_BFP4_(int8u  Bits, float32 &Info)
     int32s Integer=(int32s)BS->Get4(Bits);
     int32u Fraction=BS->Get4(32-Bits);
     BS_End();
-    if (Integer>=(1<<Bits)/2)
+    if (Bits && Integer>=(1<<Bits)/2)
         Integer-=1<<Bits;
-    Info=Integer+((float32)Fraction)/(1<<(32-Bits));
+    Info=Integer+((float32)Fraction)/(1LL<<(32-Bits));
 }
 
 //---------------------------------------------------------------------------

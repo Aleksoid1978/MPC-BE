@@ -1194,7 +1194,7 @@ void File_Jpeg::SOD()
 }
 
 //---------------------------------------------------------------------------
-void File_Jpeg::SOF_()
+void File_Jpeg::SOF_(int8u Encoding)
 {
     //Parsing
     vector<Jpeg_samplingfactor> SamplingFactors;
@@ -1240,6 +1240,17 @@ void File_Jpeg::SOF_()
             Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_BitDepth), Resolution);
             Fill(StreamKind_Last, StreamPos_Last, "Height", Height*(Interlaced?2:1));
             Fill(StreamKind_Last, StreamPos_Last, "Width", Width);
+
+            switch (Encoding) {
+            case 0x3:
+            case 0x7:
+            case 0xB:
+            case 0xF:
+                Fill(StreamKind_Last, StreamPos_Last, Image_Compression_Mode, "Lossless", Unlimited, true, true);
+                break;
+            default:
+                break;
+            }
 
             //ColorSpace from http://docs.oracle.com/javase/1.4.2/docs/api/javax/imageio/metadata/doc-files/jpeg_metadata.html
             //TODO: if APPE_Adobe0_transform is present, indicate that K is inverted, see http://halicery.com/Image/jpeg/JPEGCMYK.html

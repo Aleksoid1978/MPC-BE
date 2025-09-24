@@ -188,6 +188,9 @@ Alignment_Aligned;
 Alignment_Split;
 All;Vše
 AlternateGroup;
+App_About;O aplikaci MediaInfo
+App_Hide;Skrýt MediaInfo
+App_Quit;Ukončit MediaInfo
 Archival_Location;Archival location
 Arranger;Arranger
 ArtDirector;ArtDirector
@@ -238,6 +241,7 @@ BitRate_Mode_CBR;
 BitRate_Mode_VBR;
 BitRate_Nominal;
 Bits-(Pixel*Frame);Bits/(Pixel*Frame)
+Bring All to Front;Převést vše do popředí
 BufferSize;
 Cancel;Zrušit
 CaptionServiceName;
@@ -279,6 +283,7 @@ Close all before open;Zavřít vše před otevřením nového
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
+CloseWindow;Zavřít okno
 Codec;
 Codec_Description;
 Codec_Info;Details for codec
@@ -333,6 +338,7 @@ Container and general information;Hlavní informace
 Content;
 ContentType;ContentType
 CoProducer;Coproducer
+Copy;Kopírovat
 Copyright;Copyright
 CopyrightYear;
 CostumeDesigner;Costume designer
@@ -729,6 +735,7 @@ Height;Výška
 Height_CleanAperture;
 Height_Original;
 Help;Nápověda
+HideOthers;Skrýt ostatní
 Hint;
 HomeTheaterAvr;
 How many audio streams?;How many audio streams?
@@ -1056,6 +1063,7 @@ MenuID;
 Metadata_Format;
 Metadata_Format_Type;
 Metadata_MuxingMode;
+Minimize;Minimalizovat
 MixType;
 mn; min
 Mood;Mood
@@ -1210,10 +1218,12 @@ Season;Season
 SecondaryAudioLanguage;
 see below;see below
 Select your directory;
+SelectAll;Vybrat vše
 Send HeaderFile;
 Separator_Columns;columns separator
 Separator_Lines;lines separator
 SeriesTitle;
+Services;Služby
 ServiceChannel;
 ServiceKind;
 ServiceName;
@@ -1233,6 +1243,7 @@ ShimName;
 ShimVersion;
 Show menu;Zobrazit menu
 Show toolbar;Zobrazit nástrojovou lištu
+ShowAll;Zobrazit vše
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1401,6 +1412,7 @@ WebSite_Video_More;Go to the web site (%Url%) to find this video codec
 Width;Šířka
 Width_CleanAperture;
 Width_Original;
+Window;Okno
 WriteMe;Napiš autorovi
 WriteToTranslator;Napiš překladateli
 Written_Date;Written date
@@ -1409,5 +1421,6 @@ WrittenBy;Napsal
 Yes;Ano
 Your system;Instalované kodeky
 Your translation;
+Zoom;Přepnout velikost
 ZZ_Automatic_Percent;53
 ZZ_AutomaticLanguage_Percent;58

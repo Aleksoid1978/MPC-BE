@@ -45,9 +45,9 @@ private :
     struct seek_item {
         string Type[2];
         string MuxingMode[2];
-        string Mime;
-        int64u Size;
-        int64u Padding;
+        string Mime{};
+        int64u Size{};
+        int64u Padding{};
         int64u DependsOnFileOffset = 0;
         size_t DependsOnStreamPos = 0;
         bool IsParsed = false;
@@ -130,23 +130,23 @@ private :
     void EPH () { Data_Common(); };
     void SOD ();
     void ISEC() { Data_Common(); };
-    void SOF_();
-    void SOF0() {SOF_();};
-    void SOF1() {SOF_();};
-    void SOF2() {SOF_();};
-    void SOF3() {SOF_();}
+    void SOF_(int8u Encoding);
+    void SOF0() {SOF_(0x0);};
+    void SOF1() {SOF_(0x1);};
+    void SOF2() {SOF_(0x2);};
+    void SOF3() {SOF_(0x3);}
     void DHT () { Data_Common(); };
-    void SOF5() {SOF_();}
-    void SOF6() {SOF_();}
-    void SOF7() {SOF_();}
+    void SOF5() {SOF_(0x5);}
+    void SOF6() {SOF_(0x6);}
+    void SOF7() {SOF_(0x7);}
     void JPG () { Data_Common(); };
-    void SOF9() {SOF_();}
-    void SOFA() {SOF_();}
-    void SOFB() {SOF_();}
+    void SOF9() {SOF_(0x9);}
+    void SOFA() {SOF_(0xA);}
+    void SOFB() {SOF_(0xB);}
     void DAC () { Data_Common(); };
-    void SOFD() {SOF_();}
-    void SOFE() {SOF_();}
-    void SOFF() {SOF_();}
+    void SOFD() {SOF_(0xD);}
+    void SOFE() {SOF_(0xE);}
+    void SOFF() {SOF_(0xF);}
     void RST0() { Data_Common(); };
     void RST1() { Data_Common(); };
     void RST2() { Data_Common(); };

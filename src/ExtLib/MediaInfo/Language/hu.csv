@@ -188,6 +188,9 @@ Alignment_Aligned;igazított
 Alignment_Split;osztott
 All;Mind
 AlternateGroup;
+App_About;A MediaInfo névjegye
+App_Hide;MediaInfo elrejtése
+App_Quit;Kilépés a MediaInfoból
 Archival_Location;Arhiválás helye
 Arranger;Szerkesztő
 ArtDirector;Művészeti vezető
@@ -238,6 +241,7 @@ BitRate_Mode_CBR;állandó
 BitRate_Mode_VBR;változó
 BitRate_Nominal;Névleges adatsebesség
 Bits-(Pixel*Frame);Bit/(képpont*képkocka)
+Bring All to Front;Összes előtérbe hozása
 BufferSize;
 Cancel;Mégsem
 CaptionServiceName;
@@ -279,6 +283,7 @@ Close all before open;Mindent bezár megnyitás előtt
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
+CloseWindow;Ablak bezárása
 Codec;kódek
 Codec_Description;Kódek leírás
 Codec_Info;A kódek részletei
@@ -333,6 +338,7 @@ Container and general information;Gyűjtő és általános adatok
 Content;
 ContentType;Tartalom típusa
 CoProducer;Gyártó
+Copy;Másolás
 Copyright;Jogok
 CopyrightYear;
 CostumeDesigner;Jelmeztervező
@@ -729,6 +735,7 @@ Height;Magasság
 Height_CleanAperture;
 Height_Original;
 Help;Súgó
+HideOthers;A többi elrejtése
 Hint;Tipp
 HomeTheaterAvr;
 How many audio streams?;Hány hangsáv?
@@ -1056,6 +1063,7 @@ MenuID;Menü azonosító
 Metadata_Format;
 Metadata_Format_Type;
 Metadata_MuxingMode;
+Minimize;Kis méretűvé tesz
 MixType;
 mn; perc
 Mood;Hangnem
@@ -1210,6 +1218,7 @@ Season;Évad
 SecondaryAudioLanguage;
 see below;lásd alant
 Select your directory;
+SelectAll;Az összes kijelölése
 Send HeaderFile;Kérem, küdje el a fejléc fájlt ide: http://sourceforge.net/projects/mediainfo/ (Bug section)
 Separator_Columns;Oszlop elválasztó
 Separator_Lines;Sor elválasztó
@@ -1218,6 +1227,7 @@ ServiceChannel;Szolgáltatás csatornája
 ServiceKind;
 ServiceName;Szolgáltatás neve
 ServiceProvider;Szolgáltató
+Services;Szolgáltatások
 ServiceType;Szolgáltatás típusa
 Set;Sorszám
 Set_Count;Összesen
@@ -1233,6 +1243,7 @@ ShimName;
 ShimVersion;
 Show menu;Menü mutatása
 Show toolbar;Eszköztár mutatása
+ShowAll;Összes megjelenítése
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1401,6 +1412,7 @@ WebSite_Video_More;Látogassa meg a képkódek weblapját (%Url%)
 Width;Szélesség
 Width_CleanAperture;
 Width_Original;
+Window;Ablak
 WriteMe;Írjon
 WriteToTranslator;Írjon a fordítónak
 Written_Date;Írás dátuma
@@ -1409,5 +1421,6 @@ WrittenBy;Írta
 Yes;igen
 Your system;Rendszer
 Your translation;
+Zoom;Nagyítás
 ZZ_Automatic_Percent;61
 ZZ_AutomaticLanguage_Percent;67
