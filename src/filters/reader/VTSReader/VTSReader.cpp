@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -153,7 +153,8 @@ STDMETHODIMP CVTSReader::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYPE* pmt)
 
 	ChapRemoveAll();
 	for (size_t i = 0; i < m_stream.GetChaptersCount(); i++) {
-		CString chap; chap.Format(ResStr(IDS_AG_CHAPTER), i + 1);
+		CStringW chap;
+		chap.Format(ResStr(IDS_AG_CHAPTER), i + 1);
 		ChapAppend(m_stream.GetChapterTime(i), chap);
 	}
 

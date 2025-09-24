@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -78,8 +78,10 @@ public:
 	CCDDAStream();
 	virtual ~CCDDAStream();
 
-	CString m_discTitle, m_trackTitle;
-	CString m_discArtist, m_trackArtist;
+	CStringW m_discTitle;
+	CStringW m_trackTitle;
+	CStringW m_discArtist;
+	CStringW m_trackArtist;
 
 	bool Load(const WCHAR* fnw, bool bReadTextInfo);
 

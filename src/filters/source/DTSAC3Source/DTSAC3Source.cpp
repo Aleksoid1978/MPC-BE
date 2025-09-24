@@ -176,7 +176,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 	, m_dts_hd_profile(0)
 {
 	CAutoLock cAutoLock(&m_cSharedState);
-	CString fn(wfn);
+	CStringW fn(wfn);
 	CFileException ex;
 	HRESULT hr = E_FAIL;
 	m_AvgTimePerFrame = 0;

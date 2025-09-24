@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -158,7 +158,7 @@ CFLICStream::CFLICStream(const WCHAR* wfn, CFLICSource* pParent, HRESULT* phr)
 {
 	CAutoLock cAutoLock(&m_cSharedState);
 
-	CString fn(wfn);
+	CStringW fn(wfn);
 
 	if (!m_flic.Open(fn, CFile::modeRead|CFile::shareDenyNone)) {
 		if (phr) *phr = E_FAIL;

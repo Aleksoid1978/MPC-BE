@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -248,7 +248,7 @@ bool CCDXAStream::Load(const WCHAR* fnw)
 		m_hFile = INVALID_HANDLE_VALUE;
 	}
 
-	m_hFile = CreateFileW(CString(fnw), GENERIC_READ, FILE_SHARE_READ, nullptr,
+	m_hFile = CreateFileW(CStringW(fnw), GENERIC_READ, FILE_SHARE_READ, nullptr,
 						 OPEN_EXISTING, FILE_ATTRIBUTE_READONLY|FILE_FLAG_SEQUENTIAL_SCAN, (HANDLE)nullptr);
 	if (m_hFile == INVALID_HANDLE_VALUE) {
 		return false;
@@ -445,7 +445,7 @@ bool CCDXAStream::LookForMediaSubType()
 	m_llPosition = 0;
 
 	CRegKey majorkey;
-	CString majortype = L"\\Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}";
+	CStringW majortype = L"\\Media Type\\{e436eb83-524f-11ce-9f53-0020af0ba770}";
 	if (ERROR_SUCCESS == majorkey.Open(HKEY_CLASSES_ROOT, majortype, KEY_READ)) {
 		WCHAR subtype[256];
 		DWORD len = 256;
@@ -465,7 +465,7 @@ bool CCDXAStream::LookForMediaSubType()
 					break;
 				}
 
-				CString p = pattern;
+				CStringW p = pattern;
 				p += ',';
 
 				__int64 offset = 0;
@@ -475,7 +475,7 @@ bool CCDXAStream::LookForMediaSubType()
 				int nMatches = 0, nTries = 0;
 
 				for (int k = 0, l; nTries >= 0 && (l = p.Find(',', k)) >= 0; k = l+1, nTries++) {
-					CString s = p.Mid(k, l-k);
+					CStringW s = p.Mid(k, l-k);
 					DLog(s);
 
 					WCHAR* end = nullptr;

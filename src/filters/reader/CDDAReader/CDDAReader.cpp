@@ -200,7 +200,7 @@ STDMETHODIMP CCDDAReader::Invoke(DISPID dispidMember, REFIID riid, LCID lcid, WO
 STDMETHODIMP CCDDAReader::get_AuthorName(BSTR* pbstrAuthorName)
 {
 	CheckPointer(pbstrAuthorName, E_POINTER);
-	CString str = m_stream.m_trackArtist;
+	CStringW str = m_stream.m_trackArtist;
 	if (str.IsEmpty()) {
 		str = m_stream.m_discArtist;
 	}
@@ -211,7 +211,7 @@ STDMETHODIMP CCDDAReader::get_AuthorName(BSTR* pbstrAuthorName)
 STDMETHODIMP CCDDAReader::get_Title(BSTR* pbstrTitle)
 {
 	CheckPointer(pbstrTitle, E_POINTER);
-	CString str = m_stream.m_trackTitle;
+	CStringW str = m_stream.m_trackTitle;
 	if (str.IsEmpty()) {
 		str = m_stream.m_discTitle;
 	}
@@ -384,10 +384,10 @@ enum PacketTypes {
 
 bool CCDDAStream::Load(const WCHAR* fnw, bool bReadTextInfo)
 {
-	const CString path(fnw);
+	const CStringW path(fnw);
 
 	int iDriveLetter = path.Find(L":\\") - 1;
-	int iTrackIndex = CString(path).MakeLower().Find(L".cda") - 1;
+	int iTrackIndex = CStringW(path).MakeLower().Find(L".cda") - 1;
 	if (iDriveLetter < 0 || iTrackIndex <= iDriveLetter) {
 		return false;
 	}
@@ -404,7 +404,7 @@ bool CCDDAStream::Load(const WCHAR* fnw, bool bReadTextInfo)
 		m_hDrive = INVALID_HANDLE_VALUE;
 	}
 
-	CString drive = CString(L"\\\\.\\") + path[iDriveLetter] + L":";
+	CStringW drive = CStringW(L"\\\\.\\") + path[iDriveLetter] + L":";
 
 	m_hDrive = CreateFileW(drive, GENERIC_READ, FILE_SHARE_READ, nullptr,
 						  OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
@@ -488,9 +488,9 @@ bool CCDDAStream::Load(const WCHAR* fnw, bool bReadTextInfo)
 				UINT nOffset = 0;
 				UCHAR nTrack = pCDTextBlock->TrackNumber;
 				while (nTrack <= cdrom_TOC.LastTrack && nLengthRemaining > 0 && nOffset < nMaxLength) {
-					CString Text = pCDTextBlock->Unicode
-						? CString((WCHAR*)pCDTextBlock->WText + nOffset, nLengthRemaining)
-						: CString(CStringA((CHAR*)pCDTextBlock->Text + nOffset, nLengthRemaining));
+					CStringW Text = pCDTextBlock->Unicode
+						? CStringW((WCHAR*)pCDTextBlock->WText + nOffset, nLengthRemaining)
+						: CStringW(CStringA((CHAR*)pCDTextBlock->Text + nOffset, nLengthRemaining));
 					CDTextStrings[pCDTextBlock->PackType][nTrack] += Text;
 					nOffset += Text.GetLength() + 1;
 					nLengthRemaining -= (Text.GetLength() + 1);
