@@ -123,9 +123,9 @@ CHTTPAsync::~CHTTPAsync()
 	}
 }
 
-static CString FormatErrorMessage(DWORD dwError)
+static CStringW FormatErrorMessage(DWORD dwError)
 {
-	CString errMsg;
+	CStringW errMsg;
 
 	LPVOID lpMsgBuf = nullptr;
 	if (FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS |
@@ -139,7 +139,7 @@ static CString FormatErrorMessage(DWORD dwError)
 	}
 
 	if (dwError == ERROR_INTERNET_EXTENDED_ERROR) {
-		CString internetInfo;
+		CStringW internetInfo;
 		DWORD   dwLen = 0;
 		if (!InternetGetLastResponseInfoW(&dwError, nullptr, &dwLen) && dwLen) {
 			const DWORD dwLastError = GetLastError();
@@ -217,7 +217,7 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 
 		m_url_str = url;
 		m_host = urlParser.GetHostName();
-		m_path = CString(urlParser.GetUrlPath()) + CString(urlParser.GetExtraInfo());
+		m_path = CStringW(urlParser.GetUrlPath()) + CStringW(urlParser.GetExtraInfo());
 		m_nPort = urlParser.GetPortNumber();
 		m_nScheme = urlParser.GetScheme();
 		m_schemeName = urlParser.GetSchemeName();
@@ -364,7 +364,7 @@ HRESULT CHTTPAsync::SendRequest(LPCWSTR lpszCustomHeader/* = L""*/, DWORD dwTime
 
 		bool bNewRequestPath = false;
 
-		CString lpszHeaders = L"Accept: */*\r\n";
+		CStringW lpszHeaders = L"Accept: */*\r\n";
 		lpszHeaders += lpszCustomHeader;
 		for (;;) {
 			if (!HttpSendRequestW(m_hRequest,
@@ -519,7 +519,7 @@ HRESULT CHTTPAsync::SeekInternal(UINT64 position)
 		return E_FAIL;
 	}
 
-	CString customHeader; customHeader.Format(L"Range: bytes=%I64u-\r\n", position);
+	CStringW customHeader; customHeader.Format(L"Range: bytes=%I64u-\r\n", position);
 	return SendRequest(customHeader);
 }
 
@@ -533,7 +533,7 @@ HRESULT CHTTPAsync::RangeInternal(UINT64 start, UINT64 end)
 		return E_FAIL;
 	}
 
-	CString customHeader; customHeader.Format(L"Range: bytes=%I64u-%I64u\r\n", start, end);
+	CStringW customHeader; customHeader.Format(L"Range: bytes=%I64u-%I64u\r\n", start, end);
 	return SendRequest(customHeader);
 }
 
@@ -635,7 +635,7 @@ UINT64 CHTTPAsync::GetLenght() const
 	return m_lenght;
 }
 
-const CString& CHTTPAsync::GetRedirectURL() const
+const CStringW& CHTTPAsync::GetRedirectURL() const
 {
 	return m_url_redirect_str;
 }

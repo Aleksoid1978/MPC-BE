@@ -52,12 +52,12 @@ protected:
 	HINTERNET m_hConnect  = nullptr;
 	HINTERNET m_hRequest  = nullptr;
 
-	CString m_url_str;
-	CString m_host;
-	CString m_path;
-	CString m_schemeName;
+	CStringW m_url_str;
+	CStringW m_host;
+	CStringW m_path;
+	CStringW m_schemeName;
 
-	CString m_url_redirect_str;
+	CStringW m_url_redirect_str;
 
 	INTERNET_PORT m_nPort     = 0;
 	INTERNET_SCHEME m_nScheme = INTERNET_SCHEME_HTTP;
@@ -124,6 +124,6 @@ public:
 
 	UINT64 GetLenght() const;
 
-	const CString& GetRedirectURL() const;
+	const CStringW& GetRedirectURL() const;
 };
 
