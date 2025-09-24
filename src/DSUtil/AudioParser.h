@@ -131,7 +131,7 @@ int ParseDTSHDHeader       (const BYTE* buf, const int buffsize = 0, audioframe_
 
 // need >= 4 bytes, param1 = bitdepth, param2 = bytes per frame
 int ParseHdmvLPCMHeader    (const BYTE* buf, audioframe_t* audioframe = nullptr);
-void GetDTSHDDescription   (BYTE profile, CString& description);
+void GetDTSHDDescription   (BYTE profile, CStringW& description);
 
 // need >= 7 bytes, param1 = header size, param2 = MPEG-4 Audio Object Type
 int ParseADTSAACHeader     (const BYTE* buf, audioframe_t* audioframe = nullptr);

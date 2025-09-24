@@ -93,7 +93,7 @@ class CWebTextFile final : public CTextFile
 	LONGLONG m_llMaxSize;
 	CStringW m_tempfn;
 
-	CString m_url_redirect_str;
+	CStringW m_url_redirect_str;
 
 public:
 	CWebTextFile(UINT encoding = CP_ASCII, UINT defaultencoding = CP_ASCII, bool bAutoDetectCodePage = false, LONGLONG llMaxSize = 1024 * 1024);
@@ -102,7 +102,7 @@ public:
 	bool Open(LPCWSTR lpszFileName);
 	void Close();
 
-	const CString& GetRedirectURL() const;
+	const CStringW& GetRedirectURL() const;
 };
 
 extern CStringW AToT(CStringA str);

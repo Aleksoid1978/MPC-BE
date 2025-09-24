@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,8 +24,8 @@
 class CFontInstaller
 {
 	std::list<HANDLE> m_fonts;
-	std::list<CString> m_files;
-	std::list<CString> m_tempfiles;
+	std::list<CStringW> m_files;
+	std::list<CStringW> m_tempfiles;
 
 public:
 	CFontInstaller();

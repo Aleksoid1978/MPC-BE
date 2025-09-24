@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2022 see Authors.txt
+ * (C) 2020-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -85,13 +85,13 @@ void CUrlParser::Clear()
 	m_nScheme = INTERNET_SCHEME_UNKNOWN;
 }
 
-CString CUrlParser::CombineUrl(CString strBase, const CString& strRelative)
+CStringW CUrlParser::CombineUrl(CStringW strBase, const CStringW& strRelative)
 {
 	if (strBase.GetAt(strBase.GetLength() - 1) != L'/') {
 		strBase += L'/';
 	}
 	auto dwLength = static_cast<DWORD>(strBase.GetLength() + strRelative.GetLength() + 1);
-	CString combined;
+	CStringW combined;
 	auto hr = UrlCombineW(strBase.GetString(),
 						  strRelative.GetString(),
 						  combined.GetBuffer(dwLength),

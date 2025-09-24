@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2024 see Authors.txt
+ * (C) 2014-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -239,7 +239,7 @@ bool CMixer::Init()
 	}
 
 #ifdef DEBUG_OR_LOG
-	CString matrix_str = L"CMixer::Init() : matrix";
+	CStringW matrix_str = L"CMixer::Init() : matrix";
 	double k = 0.0;
 	for (int j = 0; j < out_ch; j++) {
 		matrix_str.AppendFormat(L"\n    %d:", j + 1);

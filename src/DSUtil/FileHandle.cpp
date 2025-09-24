@@ -84,7 +84,7 @@ void RemoveSlash(CStringW& path)
 
 CStringW GetRemoveSlash(LPCWSTR path)
 {
-	CString newPath = path;
+	CStringW newPath = path;
 	RemoveSlash(newPath);
 	return newPath;
 }

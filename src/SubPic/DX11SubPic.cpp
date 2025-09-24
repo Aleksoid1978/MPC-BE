@@ -1,5 +1,5 @@
 /*
- * (C) 2022-2024 see Authors.txt
+ * (C) 2022-2025 see Authors.txt
  * This file is part of MPC-BE.
  *
  * MPC-BE is free software; you can redistribute it and/or modify
@@ -584,7 +584,7 @@ HRESULT CDX11SubPicAllocator::Render(const MemPic_t& memPic, const CRect& dirtyR
 #if _DEBUG & ENABLE_DUMP_SUBPIC
 	{
 		static int counter = 0;
-		CString filepath;
+		CStringW filepath;
 		filepath.Format(L"C:\\Temp\\subpictex%04d.bmp", counter++);
 		DumpTexture2D(pDeviceContext, m_pOutputTexture, filepath);
 	}

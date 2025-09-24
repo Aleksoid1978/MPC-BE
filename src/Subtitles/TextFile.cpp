@@ -692,7 +692,7 @@ void CWebTextFile::Close()
 	}
 }
 
-const CString& CWebTextFile::GetRedirectURL() const
+const CStringW& CWebTextFile::GetRedirectURL() const
 {
 	return m_url_redirect_str;
 }

@@ -1123,7 +1123,7 @@ int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t*
 	return 0;
 }
 
-void GetDTSHDDescription(BYTE profile, CString& description)
+void GetDTSHDDescription(BYTE profile, CStringW& description)
 {
 	switch (profile) {
 		case DCA_PROFILE_HD_HRA:

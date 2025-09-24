@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2022 see Authors.txt
+ * (C) 2020-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -67,5 +67,5 @@ public:
 
 	BOOL IsValid() const { return !m_szUrl.IsEmpty(); }
 
-	static CString CombineUrl(CString strBase, const CString& strRelative);
+	static CStringW CombineUrl(CStringW strBase, const CStringW& strRelative);
 };
