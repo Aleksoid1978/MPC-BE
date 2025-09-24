@@ -172,7 +172,7 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 					mt.pbFormat[dwOffset+2] = 0xbf;
 				}
 
-				pRTS->Open(mt.pbFormat + dwOffset, mt.cbFormat - dwOffset, DEFAULT_CHARSET, pRTS->m_name);
+				pRTS->Open(mt.pbFormat + dwOffset, mt.cbFormat - dwOffset, CP_ACP, pRTS->m_name);
 			}
 		} else if (m_mt.subtype == MEDIASUBTYPE_VOBSUB) {
 			if (!(m_pSubStream = DNew CVobSubStream(m_pSubLock))) {
