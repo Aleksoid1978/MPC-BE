@@ -590,20 +590,20 @@ bool CLiveStream::Load(const WCHAR* fnw)
 			return false;
 		}
 
-		DLog(L"CLiveStream::Load() - HTTP content type: %s", m_HTTPAsync.GetContentType());
+		DLog(L"CLiveStream::Load() - HTTP content type: %S", m_HTTPAsync.GetContentType());
 
 		BOOL bConnected = FALSE;
 
 		if (!m_HTTPAsync.GetLenght()) { // only streams without content length
 			BOOL bIcyFound = FALSE;
-			const CString& hdr = m_HTTPAsync.GetHeader();
+			const CStringW hdr = UTF8orLocalToWStr(m_HTTPAsync.GetHeader());
 			DLog(L"CLiveStream::Load() - HTTP hdr:\n%s", hdr);
 
-			std::list<CString> sl;
+			std::list<CStringW> sl;
 			Explode(hdr, sl, '\n');
 
 			for (const auto& hdrline : sl) {
-				CString param, value;
+				CStringW param, value;
 				int k = hdrline.Find(':');
 				if (k > 0 && k + 1 < hdrline.GetLength()) {
 					param = hdrline.Left(k).Trim().MakeLower();
@@ -614,24 +614,24 @@ bool CLiveStream::Load(const WCHAR* fnw)
 					bIcyFound = TRUE;
 				}
 
-				if (param == "icy-metaint") {
+				if (param == L"icy-metaint") {
 					m_icydata.metaint = static_cast<DWORD>(_wtol(value));
-				} else if (param == "icy-name") {
+				} else if (param == L"icy-name") {
 					m_icydata.name = value;
-				} else if (param == "icy-genre") {
+				} else if (param == L"icy-genre") {
 					m_icydata.genre = value;
-				} else if (param == "icy-url") {
+				} else if (param == L"icy-url") {
 					m_icydata.url = value;
-				} else if (param == "icy-description") {
+				} else if (param == L"icy-description") {
 					m_icydata.description = value;
 				}
 			}
 
 			bConnected = TRUE;
-			CString contentType = m_HTTPAsync.GetContentType();
+			CStringA contentType = m_HTTPAsync.GetContentType();
 
-			if (contentType == L"application/octet-stream"
-					|| contentType == L"video/unknown" || contentType == L"none"
+			if (contentType == "application/octet-stream"
+					|| contentType == "video/unknown" || contentType == "none"
 					|| contentType.IsEmpty()) {
 				BYTE buf[1024] = {};
 				DWORD dwSizeRead = 0;
@@ -639,19 +639,19 @@ bool CLiveStream::Load(const WCHAR* fnw)
 					GetType(buf, dwSizeRead, m_subtype);
 					Append(buf, dwSizeRead);
 				}
-			} else if (contentType == L"video/mp2t" || contentType == L"video/mpeg") {
+			} else if (contentType == "video/mp2t" || contentType == "video/mpeg") {
 				m_subtype = MEDIASUBTYPE_MPEG2_TRANSPORT;
-			} else if (contentType == L"application/x-ogg" || contentType == L"application/ogg" || contentType == L"audio/ogg") {
+			} else if (contentType == "application/x-ogg" || contentType == "application/ogg" || contentType == "audio/ogg") {
 				m_subtype = MEDIASUBTYPE_Ogg;
-			} else if (contentType == L"video/webm") {
+			} else if (contentType == "video/webm") {
 				m_subtype = MEDIASUBTYPE_Matroska;
-			} else if (contentType == L"video/mp4" || contentType == L"video/3gpp") {
+			} else if (contentType == "video/mp4" || contentType == "video/3gpp") {
 				m_subtype = MEDIASUBTYPE_MP4;
-			} else if (contentType == L"video/x-flv") {
+			} else if (contentType == "video/x-flv") {
 				m_subtype = MEDIASUBTYPE_FLV;
-			} else if (contentType.Find(L"audio/wav") == 0) {
+			} else if (contentType.Find("audio/wav") == 0) {
 				m_subtype = MEDIASUBTYPE_WAVE;
-			} else if (contentType.Find(L"audio/") == 0) {
+			} else if (contentType.Find("audio/") == 0) {
 				m_subtype = MEDIASUBTYPE_MPEG1Audio;
 			} else if (!bIcyFound) { // other ...
 					// not supported content-type
@@ -659,8 +659,8 @@ bool CLiveStream::Load(const WCHAR* fnw)
 			}
 		}
 
-		if (!bConnected && (m_HTTPAsync.GetLenght() || m_HTTPAsync.GetContentType().Find(L"mpegurl") > 0)) {
-			DLog(L"CLiveStream::Load() - HTTP hdr:\n%s", m_HTTPAsync.GetHeader());
+		if (!bConnected && (m_HTTPAsync.GetLenght() || m_HTTPAsync.GetContentType().Find("mpegurl") > 0)) {
+			DLog(L"CLiveStream::Load() - HTTP hdr:\n%s", UTF8orLocalToWStr(m_HTTPAsync.GetHeader()));
 
 			bool ret = {};
 			if (m_HTTPAsync.IsCompressed()) {

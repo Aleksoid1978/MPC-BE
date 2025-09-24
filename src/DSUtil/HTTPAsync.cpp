@@ -73,16 +73,16 @@ void CALLBACK CHTTPAsync::Callback(_In_ HINTERNET hInternet,
 	}
 }
 
-CString CHTTPAsync::QueryInfoStr(DWORD dwInfoLevel) const
+CStringA CHTTPAsync::QueryInfoStr(DWORD dwInfoLevel) const
 {
-	CheckPointer(m_hRequest, L"");
+	CheckPointer(m_hRequest, "");
 
-	CString queryInfo;
+	CStringA queryInfo;
 	DWORD   dwLen = 0;
-	if (!HttpQueryInfoW(m_hRequest, dwInfoLevel, nullptr, &dwLen, nullptr) && dwLen) {
+	if (!HttpQueryInfoA(m_hRequest, dwInfoLevel, nullptr, &dwLen, nullptr) && dwLen) {
 		const DWORD dwError = GetLastError();
 		if (dwError == ERROR_INSUFFICIENT_BUFFER
-				&& HttpQueryInfoW(m_hRequest, dwInfoLevel, (LPVOID)queryInfo.GetBuffer(dwLen), &dwLen, nullptr)) {
+				&& HttpQueryInfoA(m_hRequest, dwInfoLevel, (LPVOID)queryInfo.GetBuffer(dwLen), &dwLen, nullptr)) {
 			queryInfo.ReleaseBuffer(dwLen);
 		}
 	}
@@ -283,27 +283,27 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	}
 
 	m_header = QueryInfoStr(HTTP_QUERY_RAW_HEADERS_CRLF);
-	m_header.Trim(L"\r\n ");
+	m_header.Trim("\r\n ");
 #if 0
-	DLog(L"CHTTPAsync::Connect() : return header:\n%s", m_header);
+	DLog(L"CHTTPAsync::Connect() : return header:\n%s", UTF8orLocalToWStr(m_header));
 #endif
 
 	m_contentType = QueryInfoStr(HTTP_QUERY_CONTENT_TYPE).MakeLower();
 	m_contentEncoding = QueryInfoStr(HTTP_QUERY_CONTENT_ENCODING).MakeLower();
 	m_bSupportsRanges = QueryInfoStr(HTTP_QUERY_ACCEPT_RANGES).MakeLower() == L"bytes";
 
-	m_bIsCompressed = !m_contentEncoding.IsEmpty() && (StartsWith(m_contentEncoding, L"gzip") || StartsWith(m_contentEncoding, L"deflate"));
+	m_bIsCompressed = !m_contentEncoding.IsEmpty() && (StartsWith(m_contentEncoding, "gzip") || StartsWith(m_contentEncoding, "deflate"));
 
-	const CString queryInfo = QueryInfoStr(HTTP_QUERY_CONTENT_LENGTH);
+	const CStringA queryInfo = QueryInfoStr(HTTP_QUERY_CONTENT_LENGTH);
 	if (!queryInfo.IsEmpty()) {
 		UINT64 val = 0;
-		if (1 == swscanf_s(queryInfo, L"%I64u", &val)) {
+		if (1 == sscanf_s(queryInfo, "%I64u", &val)) {
 			m_lenght = val;
 		}
 	}
 
 	m_bIsGoogleMedia = EndsWith(m_host, L"googlevideo.com") && StartsWith(m_path, L"/videoplayback?") &&
-					   (StartsWith(m_contentType, L"video") || StartsWith(m_contentType, L"audio"));
+					   (StartsWith(m_contentType, "video") || StartsWith(m_contentType, "audio"));
 
 	if (m_lenght && m_bSupportsRanges && m_bIsGoogleMedia) {
 		m_http_chunk.end = m_http_chunk.size = std::min(m_lenght, googlemedia_maximum_chunk_size);
@@ -600,17 +600,17 @@ bool CHTTPAsync::GetUncompressed(std::vector<BYTE>& buffer)
 	return !buffer.empty();
 }
 
-const CString& CHTTPAsync::GetHeader() const
+const CStringA& CHTTPAsync::GetHeader() const
 {
 	return m_header;
 }
 
-const CString& CHTTPAsync::GetContentType() const
+const CStringA& CHTTPAsync::GetContentType() const
 {
 	return m_contentType;
 }
 
-const CString& CHTTPAsync::GetContentEncoding() const
+const CStringA& CHTTPAsync::GetContentEncoding() const
 {
 	return m_contentEncoding;
 }

@@ -62,9 +62,9 @@ protected:
 	INTERNET_PORT m_nPort     = 0;
 	INTERNET_SCHEME m_nScheme = INTERNET_SCHEME_HTTP;
 
-	CString m_header;
-	CString m_contentType;
-	CString m_contentEncoding;
+	CStringA m_header;
+	CStringA m_contentType;
+	CStringA m_contentEncoding;
 	UINT64 m_lenght = 0;
 
 	bool m_bClosing = true;
@@ -89,7 +89,7 @@ protected:
 								  __in_opt LPVOID lpvStatusInformation,
 								  __in DWORD dwStatusInformationLength);
 
-	CString QueryInfoStr(DWORD dwInfoLevel) const;
+	CStringA QueryInfoStr(DWORD dwInfoLevel) const;
 	DWORD QueryInfoDword(DWORD dwInfoLevel) const;
 
 	HRESULT SeekInternal(UINT64 position);
@@ -109,12 +109,12 @@ public:
 
 	HRESULT Seek(UINT64 position);
 
-	const CString& GetHeader() const;
+	const CStringA& GetHeader() const;
 
 	// get content type in lowercase
-	const CString& GetContentType() const;
+	const CStringA& GetContentType() const;
 	// get content encoding in lowercase
-	const CString& GetContentEncoding() const;
+	const CStringA& GetContentEncoding() const;
 
 	const bool IsSupportsRanges() const;
 	const bool IsGoogleMedia() const;
