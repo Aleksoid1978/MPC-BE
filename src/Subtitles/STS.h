@@ -174,7 +174,7 @@ public:
 
 	bool Open(const CString& fn, UINT codePage, bool bAutoDetectCodePage, CString name, CString videoName);
 	bool Open(CTextFile* f, const CString& name);
-	bool Open(BYTE* data, int len, int CharSet, CString name);
+	bool Open(BYTE* data, int len, UINT codePage, CString name);
 	bool SaveAs(CString fn, Subtitle::SubType type, double fps = -1, int delay = 0, UINT e = CP_ASCII, bool bCreateExternalStyleFile = true);
 
 	void Add(CStringW str, int start, int end, CString style = L"Default", CString actor = L"", CString effect = L"", const CRect& marginRect = CRect(0,0,0,0), int layer = 0, int readorder = -1);

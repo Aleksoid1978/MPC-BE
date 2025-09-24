@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -453,7 +453,7 @@ REFERENCE_TIME CSubtitleInputPin::DecodeSample(const std::unique_ptr<SubtitleSam
 				if (tag == __GAB1_LANGUAGE_UNICODE__) {
 					pRTS->m_name = (WCHAR*)ptr;
 				} else if (tag == __GAB1_RAWTEXTSUBTITLE__) {
-					pRTS->Open((BYTE*)ptr, size, DEFAULT_CHARSET, pRTS->m_name);
+					pRTS->Open((BYTE*)ptr, size, CP_ACP, pRTS->m_name);
 					bInvalidate = true;
 				}
 

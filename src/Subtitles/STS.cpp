@@ -3122,7 +3122,7 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, const CString& name)
 	return false;
 }
 
-bool CSimpleTextSubtitle::Open(BYTE* data, int len, int CharSet, CString name)
+bool CSimpleTextSubtitle::Open(BYTE* data, int len, UINT codePage, CString name)
 {
 	WCHAR path[MAX_PATH];
 	if (!GetTempPathW(MAX_PATH, path)) {
@@ -3149,7 +3149,7 @@ bool CSimpleTextSubtitle::Open(BYTE* data, int len, int CharSet, CString name)
 
 	fclose(tmp);
 
-	bool fRet = Open(fn, CharSet, false, name, {});
+	bool fRet = Open(fn, codePage, false, name, {});
 
 	_wremove(fn);
 

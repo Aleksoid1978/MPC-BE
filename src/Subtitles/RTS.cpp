@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -3383,5 +3383,5 @@ STDMETHODIMP CRenderedTextSubtitle::Reload()
 	if (!::PathFileExistsW(m_path)) {
 		return E_FAIL;
 	}
-	return !m_path.IsEmpty() && Open(m_path, DEFAULT_CHARSET, false, m_name, {}) ? S_OK : E_FAIL;
+	return !m_path.IsEmpty() && Open(m_path, CP_ACP, false, m_name, {}) ? S_OK : E_FAIL;
 }
