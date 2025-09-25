@@ -39,7 +39,6 @@ my $NewFileName = "../mplayerc/mplayerc.rc";
 my $help;
 
 my %LANG_EXEPTIONS = (
-	'ar' => 'ar',
 	'bg' => 'bg',
 	'br' => 'pt-BR',
 	'by' => 'be',
