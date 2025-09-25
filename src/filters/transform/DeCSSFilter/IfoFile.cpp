@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -481,7 +481,7 @@ bool CIfoFile::OpenVOB(CVobFile* vobfile)
 	}
 
 	CStringW fn = m_ifoFilename.Left(m_ifoFilename.GetLength() - 5);
-	std::list<CString> vobs;
+	std::list<CStringW> vobs;
 	for(int i = 1; i < 9; i++) { // skip VTS_xx_0.VOB
 		CStringW vob;
 		if (m_bAOB) {
@@ -582,7 +582,7 @@ bool CIfoFile::OpenVOB(CVobFile* vobfile)
 
 BSTR CIfoFile::GetTrackName(UINT aTrackIdx) const
 {
-	CString TrackName;
+	CStringW TrackName;
 	auto it = m_pStream_Lang.find(aTrackIdx);
 	if (it != m_pStream_Lang.cend()) {
 		TrackName = (*it).second;

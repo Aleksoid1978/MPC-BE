@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -188,11 +188,11 @@ void CDSMMuxerFilter::MuxInit()
 
 void CDSMMuxerFilter::MuxHeader(IBitStream* pBS)
 {
-	CString muxer;
+	CStringW muxer;
 	muxer.Format(L"DSM Muxer (%S)", __TIMESTAMP__);
 
-	SetProperty(L"MUXR", CStringW(muxer));
-	SetProperty(L"DATE", CStringW(CTime::GetCurrentTime().FormatGmt(L"%Y-%m-%d %H:%M:%S")));
+	SetProperty(L"MUXR", muxer);
+	SetProperty(L"DATE", CTime::GetCurrentTime().FormatGmt(L"%Y-%m-%d %H:%M:%S"));
 
 	MuxFileInfo(pBS);
 

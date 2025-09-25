@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -464,8 +464,8 @@ void CBaseMuxerRawOutputPin::MuxFooter(const CMediaType& mt)
 					}
 					fwprintf_s(f, L"\nlangidx: 0\n\nid: %S, index: 0\n", iso6391.GetString());
 
-					CString alt = CString(CStringW(si->TrackName));
-					if (!alt.IsEmpty()) {
+					CStringW alt = si->TrackName;
+					if (alt.GetLength()) {
 						fwprintf_s(f, L"alt: %s\n", alt.GetString());
 					}
 

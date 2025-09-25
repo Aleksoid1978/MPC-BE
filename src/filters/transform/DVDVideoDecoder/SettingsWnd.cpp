@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -173,7 +173,7 @@ bool CMpeg2DecSettingsWnd::OnApply()
 
 void CMpeg2DecSettingsWnd::UpdateProcampValues()
 {
-	CString str;
+	CStringW str;
 
 	str.Format(L"%d", m_procamp_slider[0].GetPos());
 	m_procamp_value[0].SetWindowTextW(str);

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -574,9 +574,9 @@ HRESULT CStreamSwitcherInputPin::CompleteConnect(IPin* pReceivePin)
 	m_bCanBlock = false;
 	bool bForkedSomewhere = false;
 
-	CString fileName;
-	CString pinName;
-	CString trackName;
+	CStringW fileName;
+	CStringW pinName;
+	CStringW trackName;
 
 	IPin* pPin = (IPin*)this;
 	IBaseFilter* pBF = (IBaseFilter*)m_pFilter;
@@ -646,7 +646,7 @@ HRESULT CStreamSwitcherInputPin::CompleteConnect(IPin* pReceivePin)
 					/*
 					} else {
 						fileName.Replace('\\', '/');
-						CString fn = fileName.Mid(fileName.ReverseFind('/') + 1);
+						CStringW fn = fileName.Mid(fileName.ReverseFind('/') + 1);
 						if (!fn.IsEmpty()) {
 							fileName = fn;
 						}

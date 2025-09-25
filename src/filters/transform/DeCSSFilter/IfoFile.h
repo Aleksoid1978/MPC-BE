@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,7 +38,7 @@ class CIfoFile
 		UINT32 title:16, track:8;
 	};
 
-	std::map<DWORD, CString> m_pStream_Lang;
+	std::map<DWORD, CStringW> m_pStream_Lang;
 	std::vector<chapter_t> m_pChapters;
 
 	REFERENCE_TIME	m_rtDuration = 0;

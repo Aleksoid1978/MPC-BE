@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -48,8 +48,8 @@ bool CDVDSession::Open(LPCWSTR path)
 {
 	Close();
 
-	CString fn = path;
-	CString drive = L"\\\\.\\" + fn.Left(fn.Find(':')+1);
+	CStringW fn = path;
+	CStringW drive = L"\\\\.\\" + fn.Left(fn.Find(':')+1);
 
 	m_hDrive = CreateFileW(drive, GENERIC_READ, FILE_SHARE_READ, nullptr,
 						  OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_SEQUENTIAL_SCAN, (HANDLE)nullptr);
@@ -375,7 +375,7 @@ CVobFile::~CVobFile()
 	Close();
 }
 
-bool CVobFile::OpenVOBs(const std::list<CString>& vobs)
+bool CVobFile::OpenVOBs(const std::list<CStringW>& vobs)
 {
 	Close();
 
@@ -409,7 +409,7 @@ bool CVobFile::OpenVOBs(const std::list<CString>& vobs)
 				m_fHasDiscKey = GetDiscKey();
 				EndSession();
 			} else {
-				CString fn = m_files[0].fn;
+				CStringW fn = m_files[0].fn;
 				fn.MakeLower();
 
 				if (fn.Find(L":\\video_ts") == 1 && GetDriveTypeW(fn.Left(3)) == DRIVE_CDROM) {
