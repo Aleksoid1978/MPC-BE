@@ -42,6 +42,8 @@
 #include "filters/Lock.h"
 #include <FilterInterfaces.h>
 
+#include "mvrInterfaces.h"
+
 #include "DxgiUtils.h"
 
 #pragma warning(push)
@@ -3001,6 +3003,8 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 	if (direction == PINDIR_OUTPUT) {
 		DLog(L"CMPCVideoDecFilter::CompleteConnect() - PINDIR_OUTPUT");
 
+		m_OutputFilterClsid = GetCLSID(pReceivePin);
+
 		HRESULT hr = S_OK;
 		if (IsDXVASupported(m_hwType == HwType::DXVA2 || m_hwType == HwType::D3D11)) {
 			const auto& mt = m_pOutput->CurrentMediaType();
@@ -3017,16 +3021,23 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 
 				hr = VFW_E_TYPE_NOT_ACCEPTED;
 			} else if (IsDXVASupported(m_hwType == HwType::D3D11)) {
-				hr = m_pD3D11Decoder->PostConnect(m_pAVCtx, pReceivePin);
-				if (SUCCEEDED(hr)) {
-					m_nDecoderMode = MODE_D3D11;
-					DXVAState::SetActiveState(GUID_NULL, L"D3D11 Native");
-
-					auto adapterDesc = m_pD3D11Decoder->GetAdapterDesc();
-					m_nPCIVendor = adapterDesc->VendorId;
-					m_nPCIDevice = adapterDesc->DeviceId;
-					m_strDeviceDescription.Format(L"%s (%04X:%04X)", adapterDesc->Description, m_nPCIVendor, m_nPCIDevice);
+				if (m_OutputFilterClsid == CLSID_madVR && (mt.subtype == MEDIASUBTYPE_Y410 || mt.subtype == MEDIASUBTYPE_Y416)) {
+					DLog(L"CMPCVideoDecFilter::CompleteConnect() - madVR don't support media type '%s' for D3D11 H/W decoding, fallback to software decoding", GetGUIDString(mt.subtype));
+					hr = E_FAIL;
 				} else {
+					hr = m_pD3D11Decoder->PostConnect(m_pAVCtx, pReceivePin);
+					if (SUCCEEDED(hr)) {
+						m_nDecoderMode = MODE_D3D11;
+						DXVAState::SetActiveState(GUID_NULL, L"D3D11 Native");
+
+						auto adapterDesc = m_pD3D11Decoder->GetAdapterDesc();
+						m_nPCIVendor = adapterDesc->VendorId;
+						m_nPCIDevice = adapterDesc->DeviceId;
+						m_strDeviceDescription.Format(L"%s (%04X:%04X)", adapterDesc->Description, m_nPCIVendor, m_nPCIDevice);
+					}
+				}
+
+				if (FAILED(hr)) {
 					m_nDecoderMode = MODE_SOFTWARE;
 					DXVAState::ClearState();
 					m_hwType = HwType::DXVA2;
@@ -3132,7 +3143,6 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 			EndEnumFilters;
 		}
 
-		m_OutputFilterClsid = GetCLSID(pReceivePin);
 		m_bReinit = false;
 	}
 
