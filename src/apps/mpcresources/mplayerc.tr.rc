@@ -2451,7 +2451,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "Sistem kod sayfası - %u"
     IDS_FRAME_HALF          "Yarım Boyut"
     IDS_FRAME_NORMAL        "Normal Boyut"
     IDS_FRAME_DOUBLE        "İki Katı Boyut"
