@@ -1,5 +1,5 @@
 /*
- * (C) 2024 see Authors.txt
+ * (C) 2024-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,7 +36,7 @@ COpenFileDialog::COpenFileDialog(
 	: CFileDialog(TRUE, lpszDefExt, lpszFileName, dwFlags, lpszFilter, pParentWnd)
 {
 	CAppSettings& s = AfxGetAppSettings();
-	CString path(lpszFileName);
+	CStringW path(lpszFileName);
 	if (s.bKeepHistory && (path.IsEmpty() || ::PathIsURLW(path))) {
 		path = s.strLastOpenFile;
 	}

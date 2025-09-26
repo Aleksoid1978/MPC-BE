@@ -23,7 +23,7 @@
 #include "CmdLineHelpDlg.h"
 #include "Misc.h"
 
-CmdLineHelpDlg::CmdLineHelpDlg(const CString& cmdLine)
+CmdLineHelpDlg::CmdLineHelpDlg(const CStringW& cmdLine)
 	: CResizableDialog(CmdLineHelpDlg::IDD)
 	, m_cmdLine(cmdLine)
 {
@@ -75,7 +75,7 @@ BOOL CmdLineHelpDlg::OnInitDialog()
 	int maxcmdlen = 0;
 
 	for (int i = IDS_CMD_PATHNAME; i <= IDS_CMD_RESET; i++) {
-		CString s = ResStr(i);
+		CStringW s = ResStr(i);
 		const int cmdlen = s.Find('\t');
 		if (cmdlen > 0) {
 			commands.emplace_back(s.Left(cmdlen), s.Mid(cmdlen + 1));

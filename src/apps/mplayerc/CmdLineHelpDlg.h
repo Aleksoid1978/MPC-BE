@@ -28,13 +28,13 @@ class CmdLineHelpDlg : public CResizableDialog, public CDPI
 {
 private:
 	CStatic m_icon;
-	CString m_cmdLine;
-	CString m_text;
+	CStringW m_cmdLine;
+	CStringW m_text;
 
 	CFont m_font;
 
 public:
-	CmdLineHelpDlg(const CString& cmdLine);
+	CmdLineHelpDlg(const CStringW& cmdLine);
 	virtual ~CmdLineHelpDlg();
 
 	enum { IDD = IDD_CMD_LINE_HELP };

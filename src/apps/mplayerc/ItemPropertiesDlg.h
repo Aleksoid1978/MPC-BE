@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2021 see Authors.txt
+ * (C) 2015-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -45,8 +45,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 private:
-	CString m_PropertyName;
-	CString m_PropertyPath;
+	CStringW m_PropertyName;
+	CStringW m_PropertyPath;
 
 	CButton m_okButton;
 	CButton m_cancelButton;

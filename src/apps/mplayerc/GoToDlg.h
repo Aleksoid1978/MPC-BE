@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,8 +37,8 @@ public:
 	CGoToDlg(REFERENCE_TIME time = -1, REFERENCE_TIME maxTime = -1, double fps = 0, CWnd* pParent = nullptr);
 	virtual ~CGoToDlg();
 
-	CString m_timestr;
-	CString m_framestr;
+	CStringW m_timestr;
+	CStringW m_framestr;
 	CMFCMaskedEdit m_timeedit;
 	CEdit m_frameedit;
 

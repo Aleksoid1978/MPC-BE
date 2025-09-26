@@ -1,5 +1,5 @@
 /*
- * (C) 2021-2024 see Authors.txt
+ * (C) 2021-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -433,7 +433,7 @@ void CHistoryDlg::OnKeydownList(NMHDR* pNMHDR, LRESULT* pResult)
 	NMLVKEYDOWN* pLVKeyDow = (NMLVKEYDOWN*)pNMHDR;
 
 	if ((pLVKeyDow->flags & KF_EXTENDED) && pLVKeyDow->wVKey == VK_DELETE) {
-		CString str;
+		CStringW str;
 		str.Format(ResStr(IDS_REMOVEFROMLISTQUESTION), (int)m_list.GetSelectedCount());
 		if (IDYES == AfxMessageBox(str, MB_ICONQUESTION | MB_YESNO)) {
 			RemoveSelected();

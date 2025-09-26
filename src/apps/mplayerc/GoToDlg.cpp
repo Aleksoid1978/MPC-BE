@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,7 +33,7 @@ CGoToDlg::CGoToDlg(REFERENCE_TIME time, REFERENCE_TIME maxTime, double fps, CWnd
 	, m_showHours(maxTime >= 3600 * 1000 * 10000i64)
 {
 	if (m_fps == 0) {
-		CString str = L"0";
+		CStringW str = L"0";
 		AfxGetProfile().ReadString(IDS_R_DLG_GOTO, IDS_RS_DLG_GOTO_FPS, str);
 
 		if (float fps; swscanf_s(str, L"%f", &fps) == 1) {

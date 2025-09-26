@@ -149,7 +149,7 @@ void CRegFilterChooserDlg::OnBnClickedButton1()
 	dlg.m_ofn.lpstrInitialDir = s.strLastOpenFilterDir;
 
 	if (dlg.DoModal() == IDOK) {
-		CString fname = dlg.GetPathName();
+		CStringW fname = dlg.GetPathName();
 		s.strLastOpenFilterDir = GetAddSlash(GetFolderPath(fname));
 
 		CFilterMapper2 fm2(false);

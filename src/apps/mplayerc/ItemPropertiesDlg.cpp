@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2021 see Authors.txt
+ * (C) 2015-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -55,7 +55,7 @@ BOOL CItemPropertiesDlg::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	CString caption;
+	CStringW caption;
 	caption.Format(ResStr(IDS_PROPERTIESFOR), m_PropertyName);
 	SetWindowTextW(caption);
 

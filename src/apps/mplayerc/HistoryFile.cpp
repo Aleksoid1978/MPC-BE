@@ -1,5 +1,5 @@
 /*
- * (C) 2021-2024 see Authors.txt
+ * (C) 2021-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -832,7 +832,7 @@ void CPlaylistConfigFile::AddLostBasicPlaylists()
 	if (hFile != INVALID_HANDLE_VALUE) {
 		do {
 			if (!BasicPlsContains(wfd.cFileName)) {
-				CString title(wfd.cFileName, wcslen(wfd.cFileName) - 6);
+				CStringW title(wfd.cFileName, wcslen(wfd.cFileName) - 6);
 				PlaylistInfo plsInfo = { PLS_Basic, wfd.cFileName, title };
 				m_PlaylistInfos.emplace_back(plsInfo);
 			}

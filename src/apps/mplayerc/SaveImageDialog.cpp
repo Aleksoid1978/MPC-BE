@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,7 +39,7 @@ CSaveImageDialog::CSaveImageDialog(
 {
 	IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
 	if (pfdc) {
-		CString str;
+		CStringW str;
 
 		pfdc->StartVisualGroup(IDS_AG_OPTIONS, ResStr(IDS_AG_OPTIONS));
 		pfdc->AddText(IDS_THUMB_QUALITY, ResStr(IDS_THUMB_QUALITY));
@@ -153,7 +153,7 @@ CSaveThumbnailsDialog::CSaveThumbnailsDialog(
 {
 	IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
 	if (pfdc) {
-		CString str;
+		CStringW str;
 
 		pfdc->StartVisualGroup(IDS_THUMB_THUMBNAILS, ResStr(IDS_THUMB_THUMBNAILS));
 		pfdc->AddText(IDS_THUMB_ROWNUMBER, ResStr(IDS_THUMB_ROWNUMBER));

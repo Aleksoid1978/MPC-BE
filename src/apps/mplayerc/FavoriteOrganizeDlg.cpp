@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -223,7 +223,7 @@ void CFavoriteOrganizeDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStr
 		pDC->FillRect(rcItem, &b);
 	}
 
-	CString str;
+	CStringW str;
 	pDC->SetTextColor(0);
 
 	str = m_list.GetItemText(nItem, 0);
@@ -390,8 +390,8 @@ void CFavoriteOrganizeDlg::OnUpdateDeleteBn(CCmdUI* pCmdUI)
 void CFavoriteOrganizeDlg::MoveItem(int nItem, int offset)
 {
 	DWORD_PTR data = m_list.GetItemData(nItem);
-	CString strName = m_list.GetItemText(nItem, 0);
-	CString strPos = m_list.GetItemText(nItem, 1);
+	CStringW strName = m_list.GetItemText(nItem, 0);
+	CStringW strPos = m_list.GetItemText(nItem, 1);
 
 	m_list.DeleteItem(nItem);
 

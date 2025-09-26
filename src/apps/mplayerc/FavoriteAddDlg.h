@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,17 +30,17 @@ class CFavoriteAddDlg : public CCmdUIDialog
 	DECLARE_DYNAMIC(CFavoriteAddDlg)
 
 private:
-	CString m_fullname;
-	std::list<CString> m_shortnames;
+	CStringW m_fullname;
+	std::list<CStringW> m_shortnames;
 
 public:
-	CFavoriteAddDlg(std::list<CString>& shortnames, CString fullname, BOOL bShowRelativeDrive = TRUE, CWnd* pParent = nullptr);
+	CFavoriteAddDlg(std::list<CStringW>& shortnames, CStringW fullname, BOOL bShowRelativeDrive = TRUE, CWnd* pParent = nullptr);
 	virtual ~CFavoriteAddDlg();
 
 	enum { IDD = IDD_FAVADD };
 
 	CComboBox m_namectrl;
-	CString m_name;
+	CStringW m_name;
 	BOOL m_bRememberPos = TRUE;
 	BOOL m_bRelativeDrive = FALSE;
 
