@@ -2634,6 +2634,62 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("ADPCM Sanyo"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
+    {
+        .id        = AV_CODEC_ID_ADPCM_IMA_HVQM4,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_ima_hvqm4",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA HVQM4"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_IMA_PDA,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_ima_pda",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA PlayDate"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_N64,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_n64",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM Silicon Graphics N64"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_IMA_HVQM2,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_ima_hvqm2",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA HVQM2"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_IMA_MAGIX,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_ima_magix",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA Magix"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_PSXC,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_psxc",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM Playstation C"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_CIRCUS,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_circus",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM Circus"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_IMA_ESCAPE,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_ima_escape",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA Acorn Escape"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
 
     /* AMR */
     {
@@ -3493,6 +3549,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_AUDIO,
         .name      = "g728",
         .long_name = NULL_IF_CONFIG_SMALL("G.728"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_AHX,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "ahx",
+        .long_name = NULL_IF_CONFIG_SMALL("CRI AHX"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
 

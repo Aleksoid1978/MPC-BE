@@ -73,7 +73,7 @@ typedef CONDITION_VARIABLE pthread_cond_t;
 #define THREADFUNC_RETTYPE unsigned
 #endif
 
-static av_unused THREADFUNC_RETTYPE
+av_unused static THREADFUNC_RETTYPE
 __stdcall attribute_align_arg win32thread_worker(void *arg)
 {
     pthread_t h = (pthread_t)arg;
@@ -81,7 +81,7 @@ __stdcall attribute_align_arg win32thread_worker(void *arg)
     return 0;
 }
 
-static av_unused int pthread_create(pthread_t *thread, const void *unused_attr,
+av_unused static int pthread_create(pthread_t *thread, const void *unused_attr,
                                     void *(*start_routine)(void*), void *arg)
 {
     pthread_t ret;
@@ -110,7 +110,7 @@ static av_unused int pthread_create(pthread_t *thread, const void *unused_attr,
     return 0;
 }
 
-static av_unused int pthread_join(pthread_t thread, void **value_ptr)
+av_unused static int pthread_join(pthread_t thread, void **value_ptr)
 {
     DWORD ret = WaitForSingleObject(thread->handle, INFINITE);
     if (ret != WAIT_OBJECT_0) {
@@ -150,7 +150,7 @@ static inline int pthread_mutex_unlock(pthread_mutex_t *m)
 typedef INIT_ONCE pthread_once_t;
 #define PTHREAD_ONCE_INIT INIT_ONCE_STATIC_INIT
 
-static av_unused int pthread_once(pthread_once_t *once_control, void (*init_routine)(void))
+av_unused static int pthread_once(pthread_once_t *once_control, void (*init_routine)(void))
 {
     BOOL pending = FALSE;
     InitOnceBeginInitialize(once_control, 0, &pending, NULL);

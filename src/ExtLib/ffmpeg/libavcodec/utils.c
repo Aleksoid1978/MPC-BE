@@ -465,6 +465,7 @@ int av_get_exact_bits_per_sample(enum AVCodecID codec_id)
     case AV_CODEC_ID_ADPCM_IMA_APC:
     case AV_CODEC_ID_ADPCM_IMA_APM:
     case AV_CODEC_ID_ADPCM_IMA_EA_SEAD:
+    case AV_CODEC_ID_ADPCM_IMA_MAGIX:
     case AV_CODEC_ID_ADPCM_IMA_OKI:
     case AV_CODEC_ID_ADPCM_IMA_WS:
     case AV_CODEC_ID_ADPCM_IMA_SSI:
@@ -487,6 +488,7 @@ int av_get_exact_bits_per_sample(enum AVCodecID codec_id)
     case AV_CODEC_ID_CBD2_DPCM:
     case AV_CODEC_ID_DERF_DPCM:
     case AV_CODEC_ID_WADY_DPCM:
+    case AV_CODEC_ID_ADPCM_CIRCUS:
         return 8;
     case AV_CODEC_ID_PCM_S16BE:
     case AV_CODEC_ID_PCM_S16BE_PLANAR:
@@ -665,16 +667,27 @@ static int get_audio_frame_duration(enum AVCodecID id, int sr, int ch, int ba,
                 return (frame_bytes - 4 * ch) / (128 * ch) * 256;
             case AV_CODEC_ID_ADPCM_AFC:
                 return frame_bytes / (9 * ch) * 16;
+            case AV_CODEC_ID_ADPCM_N64:
+                frame_bytes /= 9 * ch;
+                if (frame_bytes > INT_MAX / 16)
+                    return 0;
+                return frame_bytes * 16;
             case AV_CODEC_ID_ADPCM_PSX:
             case AV_CODEC_ID_ADPCM_DTK:
                 frame_bytes /= 16 * ch;
                 if (frame_bytes > INT_MAX / 28)
                     return 0;
                 return frame_bytes * 28;
+            case AV_CODEC_ID_ADPCM_PSXC:
+                frame_bytes = (frame_bytes - 1) / ch;
+                if (frame_bytes > INT_MAX / 2)
+                    return 0;
+                return frame_bytes * 2;
             case AV_CODEC_ID_ADPCM_4XM:
             case AV_CODEC_ID_ADPCM_IMA_ACORN:
             case AV_CODEC_ID_ADPCM_IMA_DAT4:
             case AV_CODEC_ID_ADPCM_IMA_ISS:
+            case AV_CODEC_ID_ADPCM_IMA_PDA:
                 return (frame_bytes - 4 * ch) * 2 / ch;
             case AV_CODEC_ID_ADPCM_IMA_SMJPEG:
                 return (frame_bytes - 4) * 2 / ch;

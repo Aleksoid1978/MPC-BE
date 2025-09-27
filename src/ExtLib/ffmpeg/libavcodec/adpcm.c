@@ -261,6 +261,7 @@ static av_cold int adpcm_decode_init(AVCodecContext * avctx)
 
     switch(avctx->codec->id) {
     case AV_CODEC_ID_ADPCM_IMA_AMV:
+    case AV_CODEC_ID_ADPCM_N64:
         max_channels = 1;
         break;
     case AV_CODEC_ID_ADPCM_SANYO:
@@ -289,6 +290,11 @@ static av_cold int adpcm_decode_init(AVCodecContext * avctx)
         max_channels = 8;
         if (avctx->ch_layout.nb_channels <= 0 ||
             avctx->block_align % (16 * avctx->ch_layout.nb_channels))
+            return AVERROR_INVALIDDATA;
+        break;
+    case AV_CODEC_ID_ADPCM_PSXC:
+        max_channels = 8;
+        if (avctx->ch_layout.nb_channels <= 0)
             return AVERROR_INVALIDDATA;
         break;
     case AV_CODEC_ID_ADPCM_IMA_DAT4:
@@ -348,10 +354,12 @@ static av_cold int adpcm_decode_init(AVCodecContext * avctx)
     case AV_CODEC_ID_ADPCM_AFC:
     case AV_CODEC_ID_ADPCM_DTK:
     case AV_CODEC_ID_ADPCM_PSX:
+    case AV_CODEC_ID_ADPCM_PSXC:
     case AV_CODEC_ID_ADPCM_SANYO:
     case AV_CODEC_ID_ADPCM_MTAF:
     case AV_CODEC_ID_ADPCM_ARGO:
     case AV_CODEC_ID_ADPCM_IMA_MOFLEX:
+    case AV_CODEC_ID_ADPCM_N64:
         avctx->sample_fmt = AV_SAMPLE_FMT_S16P;
         break;
     case AV_CODEC_ID_ADPCM_IMA_WS:
@@ -410,6 +418,29 @@ static inline int16_t adpcm_agm_expand_nibble(ADPCMChannelStatus *c, int8_t nibb
     c->step = av_clip(c->step, 127, 24576);
     c->predictor = pred;
     return pred;
+}
+
+static inline int16_t adpcm_ima_escape_expand_nibble(ADPCMChannelStatus *c, int8_t nibble)
+{
+    int step_index;
+    int predictor;
+    int sign, delta, diff, step;
+
+    step = ff_adpcm_step_table[c->step_index];
+    step_index = c->step_index + ff_adpcm_index_table[(unsigned)nibble];
+    step_index = av_clip(step_index, 0, 88);
+
+    sign = nibble & 8;
+    delta = nibble & 7;
+    diff = (delta * step) >> 2;
+    predictor = c->predictor;
+    if (sign) predictor -= diff;
+    else predictor += diff;
+
+    c->predictor = av_clip_int16(predictor);
+    c->step_index = step_index;
+
+    return (int16_t)c->predictor;
 }
 
 static inline int16_t adpcm_ima_expand_nibble(ADPCMChannelStatus *c, int8_t nibble, int shift)
@@ -509,7 +540,9 @@ static inline int16_t adpcm_ima_wav_expand_nibble(ADPCMChannelStatus *c, GetBitC
 
     sign = nibble & (1 << shift);
     delta = av_zero_extend(nibble, shift);
-    diff = ((2 * delta + 1) * step) >> shift;
+    diff = step >> shift;
+    for (int i = 0; i < shift; i++)
+        diff += (step >> (shift-1-i)) * !!(delta & (1 << i));
     predictor = c->predictor;
     if (sign) predictor -= diff;
     else predictor += diff;
@@ -544,6 +577,86 @@ int16_t ff_adpcm_ima_qt_expand_nibble(ADPCMChannelStatus *c, int nibble)
     c->step_index = step_index;
 
     return c->predictor;
+}
+
+static void decode_adpcm_ima_hvqm2(AVCodecContext *avctx, int16_t *outbuf, int samples_to_do,
+                                   int frame_format, GetByteContext *gb)
+{
+    ADPCMDecodeContext *c = avctx->priv_data;
+    int st = avctx->ch_layout.nb_channels == 2;
+    uint8_t nibble;
+
+    for (int ch = 0; ch < avctx->ch_layout.nb_channels; ch++) {
+        unsigned tmp;
+
+        switch (frame_format) {
+        case 0: /* combined hist+index */
+            tmp = bytestream2_get_be16(gb);
+            c->status[ch].predictor  = sign_extend(tmp & 0xFF80, 16);
+            c->status[ch].step_index = tmp & 0x7f;
+            *outbuf++ = c->status[ch].predictor;
+            samples_to_do--;
+            break;
+        default:
+            break;
+        }
+
+        c->status[ch].step_index = av_clip(c->status[ch].step_index, 0, 88);
+    }
+
+    for (int i = 0; i < samples_to_do; i++) {
+        if (!(i&1)) {
+            nibble = bytestream2_get_byte(gb);
+            *outbuf++ = ff_adpcm_ima_qt_expand_nibble(&c->status[st], nibble >>  4);
+        } else {
+            *outbuf++ = ff_adpcm_ima_qt_expand_nibble(&c->status[ 0], nibble & 0xF);
+        }
+    }
+
+    bytestream2_seek(gb, 0, SEEK_END);
+}
+
+static void decode_adpcm_ima_hvqm4(AVCodecContext *avctx, int16_t *outbuf, int samples_to_do,
+                                   int frame_format, GetByteContext *gb)
+{
+    ADPCMDecodeContext *c = avctx->priv_data;
+    int st = avctx->ch_layout.nb_channels == 2;
+    unsigned tmp;
+
+    for (int ch = 0; ch < avctx->ch_layout.nb_channels; ch++) {
+        switch (frame_format) {
+        case 1: /* combined hist+index */
+            tmp = bytestream2_get_be16(gb);
+            c->status[ch].predictor  = sign_extend(tmp & 0xFF80, 16);
+            c->status[ch].step_index = tmp & 0x7f;
+            break;
+        case 2:  /* no hist/index (continues from previous frame) */
+        default:
+            break;
+        case 3: /* separate hist+index */
+            tmp = bytestream2_get_be16(gb);
+            c->status[ch].predictor  = sign_extend(tmp, 16);
+            c->status[ch].step_index = bytestream2_get_byte(gb);
+            break;
+        }
+
+        c->status[ch].step_index = av_clip(c->status[ch].step_index, 0, 88);
+    }
+
+    if (frame_format == 1 || frame_format == 3) {
+        for (int ch = 0; ch < avctx->ch_layout.nb_channels; ch++)
+            *outbuf++ = (int16_t)c->status[st - ch].predictor;
+        samples_to_do--;
+    }
+
+    for (int i = 0; i < samples_to_do; i += 1+(!st)) {
+        uint8_t nibble = bytestream2_get_byte(gb);
+
+        *outbuf++ = ff_adpcm_ima_qt_expand_nibble(&c->status[st], nibble & 0xF);
+        *outbuf++ = ff_adpcm_ima_qt_expand_nibble(&c->status[ 0], nibble >>  4);
+    }
+
+    bytestream2_seek(gb, 0, SEEK_END);
 }
 
 static inline int16_t adpcm_ms_expand_nibble(ADPCMChannelStatus *c, int nibble)
@@ -648,6 +761,27 @@ static inline int16_t adpcm_mtaf_expand_nibble(ADPCMChannelStatus *c, uint8_t ni
     c->step += ff_adpcm_index_table[nibble];
     c->step = av_clip_uintp2(c->step, 5);
     return c->predictor;
+}
+
+static inline int16_t adpcm_circus_expand_nibble(ADPCMChannelStatus *c, uint8_t nibble)
+{
+    int32_t sample = c->predictor;
+    int32_t scale = c->step;
+    int32_t code = sign_extend(nibble, 8);
+
+    sample += code * (1 << scale);
+    if (code == 0) {
+        scale--;
+    } else if (code == 127 || code == -128) {
+        scale++;
+    }
+    scale = av_clip(scale, 0, 8);
+    sample = av_clip_int16(sample);
+
+    c->predictor = sample;
+    c->step = scale;
+
+    return sample;
 }
 
 static inline int16_t adpcm_zork_expand_nibble(ADPCMChannelStatus *c, uint8_t nibble)
@@ -1052,11 +1186,15 @@ static int get_nb_samples(AVCodecContext *avctx, GetByteContext *gb,
             return 0;
         nb_samples = 64;
         break;
+    case AV_CODEC_ID_ADPCM_N64:
+        nb_samples = (buf_size / 9) * 16;
+        break;
     /* simple 4-bit adpcm */
     case AV_CODEC_ID_ADPCM_CT:
     case AV_CODEC_ID_ADPCM_IMA_APC:
     case AV_CODEC_ID_ADPCM_IMA_CUNNING:
     case AV_CODEC_ID_ADPCM_IMA_EA_SEAD:
+    case AV_CODEC_ID_ADPCM_IMA_ESCAPE:
     case AV_CODEC_ID_ADPCM_IMA_OKI:
     case AV_CODEC_ID_ADPCM_IMA_WS:
     case AV_CODEC_ID_ADPCM_YAMAHA:
@@ -1078,6 +1216,7 @@ static int get_nb_samples(AVCodecContext *avctx, GetByteContext *gb,
         case AV_CODEC_ID_ADPCM_AGM:
         case AV_CODEC_ID_ADPCM_IMA_ACORN:
         case AV_CODEC_ID_ADPCM_IMA_DAT4:
+        case AV_CODEC_ID_ADPCM_IMA_MAGIX:
         case AV_CODEC_ID_ADPCM_IMA_MOFLEX:
         case AV_CODEC_ID_ADPCM_IMA_ISS:     header_size = 4 * ch;      break;
         case AV_CODEC_ID_ADPCM_IMA_SMJPEG:  header_size = 4 * ch;      break;
@@ -1101,6 +1240,23 @@ static int get_nb_samples(AVCodecContext *avctx, GetByteContext *gb,
         *coded_samples  = bytestream2_get_le32(gb);
         *coded_samples -= *coded_samples % 28;
         nb_samples      = (buf_size - 12) / (ch == 2 ? 30 : 15) * 28;
+        break;
+    case AV_CODEC_ID_ADPCM_IMA_HVQM2:
+        nb_samples = ((bytestream2_peek_be64(gb) >> 16) & 0xFFFF);
+        break;
+    case AV_CODEC_ID_ADPCM_IMA_HVQM4:
+        {
+            int frame_format = bytestream2_get_be16(gb);
+            int skip = 6;
+
+            if (frame_format == 1)
+                skip += 2 * ch;
+            if (frame_format == 3)
+                skip += 3 * ch;
+
+            nb_samples = (buf_size - skip) * 2 / ch;
+            bytestream2_seek(gb, 0, SEEK_SET);
+        }
         break;
     case AV_CODEC_ID_ADPCM_IMA_EA_EACS:
         has_coded_samples = 1;
@@ -1148,6 +1304,11 @@ static int get_nb_samples(AVCodecContext *avctx, GetByteContext *gb,
         nb_samples = 1 + (buf_size - 4 * ch) * 2 / ch;
         break;
     case AV_CODEC_ID_ADPCM_IMA_RAD:
+        if (avctx->block_align > 0)
+            buf_size = FFMIN(buf_size, avctx->block_align);
+        nb_samples = (buf_size - 4 * ch) * 2 / ch;
+        break;
+    case AV_CODEC_ID_ADPCM_IMA_PDA:
         if (avctx->block_align > 0)
             buf_size = FFMIN(buf_size, avctx->block_align);
         nb_samples = (buf_size - 4 * ch) * 2 / ch;
@@ -1243,9 +1404,13 @@ static int get_nb_samples(AVCodecContext *avctx, GetByteContext *gb,
     case AV_CODEC_ID_ADPCM_PSX:
         nb_samples = buf_size / (16 * ch) * 28;
         break;
+    case AV_CODEC_ID_ADPCM_PSXC:
+        nb_samples = ((buf_size - 1) / ch) * 2;
+        break;
     case AV_CODEC_ID_ADPCM_ARGO:
         nb_samples = buf_size / avctx->block_align * 32;
         break;
+    case AV_CODEC_ID_ADPCM_CIRCUS:
     case AV_CODEC_ID_ADPCM_ZORK:
         nb_samples = buf_size / ch;
         break;
@@ -1386,8 +1551,8 @@ static int adpcm_decode_frame(AVCodecContext *avctx, AVFrame *frame,
                     samples = &samples_p[i][1 + n * 8];
                     for (int m = 0; m < 8; m += 2) {
                         int v = bytestream2_get_byteu(&gb);
-                        samples[m    ] = adpcm_ima_expand_nibble(cs, v & 0x0F, 3);
-                        samples[m + 1] = adpcm_ima_expand_nibble(cs, v >> 4  , 3);
+                        samples[m    ] = ff_adpcm_ima_qt_expand_nibble(cs, v & 0x0F);
+                        samples[m + 1] = ff_adpcm_ima_qt_expand_nibble(cs, v >> 4);
                     }
                 }
             }
@@ -1619,6 +1784,28 @@ static int adpcm_decode_frame(AVCodecContext *avctx, AVFrame *frame,
         if ((bytestream2_tell(&gb) & 1))
             bytestream2_skip(&gb, 1);
         ) /* End of CASE */
+    CASE(ADPCM_IMA_MAGIX,
+        for (int channel = 0; channel < channels; channel++) {
+            ADPCMChannelStatus *cs = &c->status[channel];
+            cs->predictor  = sign_extend(bytestream2_get_le16u(&gb), 16);
+            cs->step_index = sign_extend(bytestream2_get_le16u(&gb), 16);
+            if (cs->step_index > 88u){
+                av_log(avctx, AV_LOG_ERROR, "ERROR: step_index[%d] = %i\n",
+                       channel, cs->step_index);
+                return AVERROR_INVALIDDATA;
+            }
+        }
+
+        for (int m = 0; m < avctx->block_align-8; m += 8) {
+            uint32_t v0 = bytestream2_get_le32u(&gb);
+            uint32_t v1 = bytestream2_get_le32u(&gb);
+
+            for (int n = 8; n > 0; n--, v0 >>= 4, v1 >>= 4, samples += 2) {
+                samples[0] = adpcm_ima_expand_nibble(&c->status[0], v0 & 15, 3);
+                samples[1] = adpcm_ima_expand_nibble(&c->status[1], v1 & 15, 3);
+            }
+        }
+        ) /* End of CASE */
     CASE(ADPCM_IMA_ISS,
         for (int channel = 0; channel < channels; channel++) {
             ADPCMChannelStatus *cs = &c->status[channel];
@@ -1687,6 +1874,18 @@ static int adpcm_decode_frame(AVCodecContext *avctx, AVFrame *frame,
             *samples++ = adpcm_ima_expand_nibble(&c->status[0],  v >> 4  , 3);
             *samples++ = adpcm_ima_expand_nibble(&c->status[st], v & 0x0F, 3);
         }
+        ) /* End of CASE */
+    CASE(ADPCM_IMA_HVQM2,
+        int format = bytestream2_get_be16(&gb);
+
+        bytestream2_skip(&gb, 4);
+        decode_adpcm_ima_hvqm2(avctx, samples, nb_samples, format, &gb);
+        ) /* End of CASE */
+    CASE(ADPCM_IMA_HVQM4,
+        int format = bytestream2_get_be16(&gb);
+
+        bytestream2_skip(&gb, 4);
+        decode_adpcm_ima_hvqm4(avctx, samples, nb_samples, format, &gb);
         ) /* End of CASE */
     CASE(ADPCM_IMA_SSI,
         for (int n = nb_samples >> (1 - st); n > 0; n--) {
@@ -1838,6 +2037,13 @@ static int adpcm_decode_frame(AVCodecContext *avctx, AVFrame *frame,
         bytes_remaining = bytestream2_get_bytes_left(&gb);
         if (bytes_remaining > 0) {
             bytestream2_skip(&gb, bytes_remaining);
+        }
+        ) /* End of CASE */
+    CASE(ADPCM_IMA_ESCAPE,
+        for (int n = nb_samples >> (1 - st); n > 0; n--) {
+            int byte = bytestream2_get_byteu(&gb);
+            *samples++ = adpcm_ima_escape_expand_nibble(&c->status[0],  byte >> 4);
+            *samples++ = adpcm_ima_escape_expand_nibble(&c->status[st], byte & 0xF);
         }
         ) /* End of CASE */
     CASE(ADPCM_IMA_EA_EACS,
@@ -2141,6 +2347,25 @@ static int adpcm_decode_frame(AVCodecContext *avctx, AVFrame *frame,
             }
         }
         ) /* End of CASE */
+    CASE(ADPCM_IMA_PDA,
+        for (int i = 0; i < channels; i++) {
+            c->status[i].predictor = sign_extend(bytestream2_get_le16u(&gb), 16);
+            c->status[i].step_index = bytestream2_get_byteu(&gb);
+            bytestream2_skipu(&gb, 1);
+            if (c->status[i].step_index > 88u) {
+                av_log(avctx, AV_LOG_ERROR, "ERROR: step_index = %i\n",
+                       c->status[i].step_index);
+                return AVERROR_INVALIDDATA;
+            }
+        }
+
+        for (int n = nb_samples >> (1 - st); n > 0; n--) {
+            int v = bytestream2_get_byteu(&gb);
+
+            *samples++ = ff_adpcm_ima_qt_expand_nibble(&c->status[0 ], v >> 4 );
+            *samples++ = ff_adpcm_ima_qt_expand_nibble(&c->status[st], v & 0xf);
+        }
+        ) /* End of CASE */
     CASE(ADPCM_IMA_SMJPEG,
         for (int i = 0; i < channels; i++) {
             c->status[i].predictor = sign_extend(bytestream2_get_be16u(&gb), 16);
@@ -2406,6 +2631,89 @@ static int adpcm_decode_frame(AVCodecContext *avctx, AVFrame *frame,
                 bytestream2_seek(&gb, 0, SEEK_SET);
         }
         ) /* End of CASE */
+    CASE(ADPCM_N64,
+        ADPCMChannelStatus *cs = &c->status[0];
+        int coefs[8*2*8] = { 0 };
+
+        if (avctx->extradata) {
+            int version, order, entries;
+            GetByteContext cb;
+
+            bytestream2_init(&cb, avctx->extradata, avctx->extradata_size);
+
+            version = bytestream2_get_be16(&cb);
+            order = bytestream2_get_be16(&cb);
+            entries = bytestream2_get_be16(&cb);
+            if (version != 1 || order != 2 || entries > 8)
+                return AVERROR_INVALIDDATA;
+
+            for (int n = 0; n < order * entries * 8; n++)
+                coefs[n] = sign_extend(bytestream2_get_be16(&cb), 16);
+        }
+
+        for (int block = 0; block < avpkt->size / 9; block++) {
+            int scale, index, codes[16];
+            int16_t hist[8] = { 0 };
+            const int order = 2;
+            int16_t out[16];
+
+            hist[6] = cs->sample2;
+            hist[7] = cs->sample1;
+
+            samples = samples_p[0] + block * 16;
+
+            scale = (buf[0] >> 4) & 0xF;
+            index = (buf[0] >> 0) & 0xF;
+            scale = 1 << scale;
+            index = FFMIN(index, 8);
+
+            for (int i = 0, j = 0; i < 16; i += 2, j++) {
+                int n0 = (buf[j+1] >> 4) & 0xF;
+                int n1 = (buf[j+1] >> 0) & 0xF;
+
+                if (n0 & 8)
+                    n0 = n0 - 16;
+                if (n1 & 8)
+                    n1 = n1 - 16;
+
+                codes[i+0] = n0 * scale;
+                codes[i+1] = n1 * scale;
+            }
+
+            for (int j = 0; j < 2; j++) {
+                int *sf_codes = &codes[j*8];
+                int16_t *sf_out = &out[j*8];
+
+                for (int i = 0; i < 8; i++) {
+                    int sample, delta = 0;
+
+                    for (int o = 0; o < order; o++)
+                        delta += coefs[o*8 + i] * hist[(8 - order) + o];
+
+                    for (int k = i-1; k > -1; k--) {
+                        for (int o = 1; o < order; o++)
+                            delta += sf_codes[(i-1) - k] * coefs[(o*8) + k];
+                    }
+
+                    sample = sf_codes[i] * 2048;
+                    sample = (sample + delta) / 2048;
+                    sample = av_clip_int16(sample);
+                    sf_out[i] = sample;
+                }
+
+                for (int i = 8 - order; i < 8; i++)
+                    hist[i] = sf_out[i];
+            }
+
+            memcpy(samples, out, sizeof(out));
+
+            cs->sample2 = hist[6];
+            cs->sample1 = hist[7];
+
+            buf += 9;
+        }
+        bytestream2_seek(&gb, 0, SEEK_END);
+        ) /* End of CASE */
     CASE(ADPCM_PSX,
         for (int block = 0; block < avpkt->size / FFMAX(avctx->block_align, 16 * channels); block++) {
             int nb_samples_per_block = 28 * FFMAX(avctx->block_align, 16 * channels) / (16 * channels);
@@ -2443,6 +2751,40 @@ static int adpcm_decode_frame(AVCodecContext *avctx, AVFrame *frame,
                         c->status[channel].sample2 = c->status[channel].sample1;
                         c->status[channel].sample1 = sample;
                     }
+                }
+            }
+        }
+        ) /* End of CASE */
+    CASE(ADPCM_PSXC,
+        for (int block = 0; block < avpkt->size / avctx->block_align; block++) {
+            int nb_samples_per_block = ((avctx->block_align - 1) / channels) * 2;
+            for (int channel = 0; channel < channels; channel++) {
+                int filter, shift, byte;
+
+                samples = samples_p[channel] + block * nb_samples_per_block;
+                av_assert0((block + 1) * nb_samples_per_block <= nb_samples);
+
+                filter = bytestream2_get_byteu(&gb);
+                shift  = filter & 0xf;
+                filter = filter >> 4;
+                if (filter >= FF_ARRAY_ELEMS(xa_adpcm_table))
+                    return AVERROR_INVALIDDATA;
+
+                for (int n = 0; n < nb_samples_per_block; n++) {
+                    int sample = 0, scale;
+
+                    if (n & 1) {
+                        scale = sign_extend(byte >> 4, 4);
+                    } else {
+                        byte  = bytestream2_get_byteu(&gb);
+                        scale = sign_extend(byte & 0xF, 4);
+                    }
+
+                    scale  = scale * (1 << 12);
+                    sample = (int)((scale >> shift) + (c->status[channel].sample1 * xa_adpcm_table[filter][0] + c->status[channel].sample2 * xa_adpcm_table[filter][1]) / 64);
+                    *samples++ = av_clip_int16(sample);
+                    c->status[channel].sample2 = c->status[channel].sample1;
+                    c->status[channel].sample1 = sample;
                 }
             }
         }
@@ -2504,6 +2846,14 @@ static int adpcm_decode_frame(AVCodecContext *avctx, AVFrame *frame,
                     *samples++ = ff_adpcm_argo_expand_nibble(cs, sample >> 4, shift, control & 0x04);
                     *samples++ = ff_adpcm_argo_expand_nibble(cs, sample >> 0, shift, control & 0x04);
                 }
+            }
+        }
+        ) /* End of CASE */
+    CASE(ADPCM_CIRCUS,
+        for (int n = 0; n < nb_samples; n++) {
+            for (int ch = 0; ch < channels; ch++) {
+                int v = bytestream2_get_byteu(&gb);
+                *samples++ = adpcm_circus_expand_nibble(&c->status[ch], v);
             }
         }
         ) /* End of CASE */
@@ -2620,6 +2970,7 @@ ADPCM_DECODER(ADPCM_AFC,         sample_fmts_s16p, adpcm_afc,         "ADPCM Nin
 ADPCM_DECODER(ADPCM_AGM,         sample_fmts_s16,  adpcm_agm,         "ADPCM AmuseGraphics Movie")
 ADPCM_DECODER(ADPCM_AICA,        sample_fmts_s16p, adpcm_aica,        "ADPCM Yamaha AICA")
 ADPCM_DECODER(ADPCM_ARGO,        sample_fmts_s16p, adpcm_argo,        "ADPCM Argonaut Games")
+ADPCM_DECODER(ADPCM_CIRCUS,      sample_fmts_s16,  adpcm_circus,      "ADPCM Circus")
 ADPCM_DECODER(ADPCM_CT,          sample_fmts_s16,  adpcm_ct,          "ADPCM Creative Technology")
 ADPCM_DECODER(ADPCM_DTK,         sample_fmts_s16p, adpcm_dtk,         "ADPCM Nintendo Gamecube DTK")
 ADPCM_DECODER(ADPCM_EA,          sample_fmts_s16,  adpcm_ea,          "ADPCM Electronic Arts")
@@ -2638,10 +2989,15 @@ ADPCM_DECODER(ADPCM_IMA_DK3,     sample_fmts_s16,  adpcm_ima_dk3,     "ADPCM IMA
 ADPCM_DECODER(ADPCM_IMA_DK4,     sample_fmts_s16,  adpcm_ima_dk4,     "ADPCM IMA Duck DK4")
 ADPCM_DECODER(ADPCM_IMA_EA_EACS, sample_fmts_s16,  adpcm_ima_ea_eacs, "ADPCM IMA Electronic Arts EACS")
 ADPCM_DECODER(ADPCM_IMA_EA_SEAD, sample_fmts_s16,  adpcm_ima_ea_sead, "ADPCM IMA Electronic Arts SEAD")
+ADPCM_DECODER(ADPCM_IMA_ESCAPE,  sample_fmts_s16,  adpcm_ima_escape,  "ADPCM IMA Acorn Escape")
+ADPCM_DECODER(ADPCM_IMA_HVQM2,   sample_fmts_s16,  adpcm_ima_hvqm2,   "ADPCM IMA HVQM2")
+ADPCM_DECODER(ADPCM_IMA_HVQM4,   sample_fmts_s16,  adpcm_ima_hvqm4,   "ADPCM IMA HVQM4")
 ADPCM_DECODER(ADPCM_IMA_ISS,     sample_fmts_s16,  adpcm_ima_iss,     "ADPCM IMA Funcom ISS")
+ADPCM_DECODER(ADPCM_IMA_MAGIX,   sample_fmts_s16,  adpcm_ima_magix,   "ADPCM IMA Magix")
 ADPCM_DECODER(ADPCM_IMA_MOFLEX,  sample_fmts_s16p, adpcm_ima_moflex,  "ADPCM IMA MobiClip MOFLEX")
 ADPCM_DECODER(ADPCM_IMA_MTF,     sample_fmts_s16,  adpcm_ima_mtf,     "ADPCM IMA Capcom's MT Framework")
 ADPCM_DECODER(ADPCM_IMA_OKI,     sample_fmts_s16,  adpcm_ima_oki,     "ADPCM IMA Dialogic OKI")
+ADPCM_DECODER(ADPCM_IMA_PDA,     sample_fmts_s16,  adpcm_ima_pda,     "ADPCM IMA PlayDate")
 ADPCM_DECODER(ADPCM_IMA_QT,      sample_fmts_s16p, adpcm_ima_qt,      "ADPCM IMA QuickTime")
 ADPCM_DECODER(ADPCM_IMA_RAD,     sample_fmts_s16,  adpcm_ima_rad,     "ADPCM IMA Radical")
 ADPCM_DECODER(ADPCM_IMA_SSI,     sample_fmts_s16,  adpcm_ima_ssi,     "ADPCM IMA Simon & Schuster Interactive")
@@ -2652,7 +3008,9 @@ ADPCM_DECODER(ADPCM_IMA_WS,      sample_fmts_both, adpcm_ima_ws,      "ADPCM IMA
 ADPCM_DECODER(ADPCM_IMA_XBOX,    sample_fmts_s16p, adpcm_ima_xbox,    "ADPCM IMA Xbox")
 ADPCM_DECODER(ADPCM_MS,          sample_fmts_both, adpcm_ms,          "ADPCM Microsoft")
 ADPCM_DECODER(ADPCM_MTAF,        sample_fmts_s16p, adpcm_mtaf,        "ADPCM MTAF")
+ADPCM_DECODER(ADPCM_N64,         sample_fmts_s16p, adpcm_n64,         "ADPCM Silicon Graphics N64")
 ADPCM_DECODER(ADPCM_PSX,         sample_fmts_s16p, adpcm_psx,         "ADPCM Playstation")
+ADPCM_DECODER(ADPCM_PSXC,        sample_fmts_s16p, adpcm_psxc,        "ADPCM Playstation C")
 ADPCM_DECODER(ADPCM_SANYO,       sample_fmts_s16p, adpcm_sanyo,       "ADPCM Sanyo")
 ADPCM_DECODER(ADPCM_SBPRO_2,     sample_fmts_s16,  adpcm_sbpro_2,     "ADPCM Sound Blaster Pro 2-bit")
 ADPCM_DECODER(ADPCM_SBPRO_3,     sample_fmts_s16,  adpcm_sbpro_3,     "ADPCM Sound Blaster Pro 2.6-bit")

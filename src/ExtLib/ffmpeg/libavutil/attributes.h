@@ -40,8 +40,16 @@
 #    define AV_HAS_BUILTIN(x) 0
 #endif
 
+#if defined(__cplusplus) && defined(__has_cpp_attribute)
+#    define AV_HAS_STD_ATTRIBUTE(x) __has_cpp_attribute(x)
+#elif !defined(__cplusplus) && defined(__has_c_attribute)
+#    define AV_HAS_STD_ATTRIBUTE(x) __has_c_attribute(x)
+#else
+#    define AV_HAS_STD_ATTRIBUTE(x) 0
+#endif
+
 #ifndef av_always_inline
-#if AV_GCC_VERSION_AT_LEAST(3,1)
+#if AV_GCC_VERSION_AT_LEAST(3,1) || defined(__clang__)
 #    define av_always_inline __attribute__((always_inline)) inline
 #elif defined(_MSC_VER)
 #    define av_always_inline __forceinline
@@ -58,13 +66,15 @@
 #endif
 #endif
 
-#if AV_GCC_VERSION_AT_LEAST(3,4)
+#if AV_HAS_STD_ATTRIBUTE(nodiscard)
+#    define av_warn_unused_result [[nodiscard]]
+#elif AV_GCC_VERSION_AT_LEAST(3,4) || defined(__clang__)
 #    define av_warn_unused_result __attribute__((warn_unused_result))
 #else
 #    define av_warn_unused_result
 #endif
 
-#if AV_GCC_VERSION_AT_LEAST(3,1)
+#if AV_GCC_VERSION_AT_LEAST(3,1) || defined(__clang__)
 #    define av_noinline __attribute__((noinline))
 #elif defined(_MSC_VER)
 #    define av_noinline __declspec(noinline)
@@ -96,7 +106,9 @@
 #    define av_flatten
 #endif
 
-#if AV_GCC_VERSION_AT_LEAST(3,1)
+#if AV_HAS_STD_ATTRIBUTE(deprecated)
+#    define attribute_deprecated [[deprecated]]
+#elif AV_GCC_VERSION_AT_LEAST(3,1) || defined(__clang__)
 #    define attribute_deprecated __attribute__((deprecated))
 #elif defined(_MSC_VER)
 #    define attribute_deprecated __declspec(deprecated)
@@ -127,7 +139,9 @@
 #endif
 #endif
 
-#if defined(__GNUC__) || defined(__clang__)
+#if AV_HAS_STD_ATTRIBUTE(maybe_unused)
+#    define av_unused [[maybe_unused]]
+#elif defined(__GNUC__) || defined(__clang__)
 #    define av_unused __attribute__((unused))
 #else
 #    define av_unused
@@ -166,7 +180,9 @@
 #    define av_scanf_format(fmtpos, attrpos)
 #endif
 
-#if AV_GCC_VERSION_AT_LEAST(2,5) || defined(__clang__)
+#if AV_HAS_STD_ATTRIBUTE(noreturn)
+#    define av_noreturn [[noreturn]]
+#elif AV_GCC_VERSION_AT_LEAST(2,5) || defined(__clang__)
 #    define av_noreturn __attribute__((noreturn))
 #else
 #    define av_noreturn
