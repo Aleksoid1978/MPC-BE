@@ -909,8 +909,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vih2->bmiHeader.biSize			= sizeof(vih2->bmiHeader);
 						vih2->bmiHeader.biWidth			= (LONG)vse->GetWidth();
 						vih2->bmiHeader.biHeight		= (LONG)vse->GetHeight();
-						vih2->bmiHeader.biCompression	= fourcc;
+						vih2->bmiHeader.biPlanes		= 1;
 						vih2->bmiHeader.biBitCount		= (LONG)vse->GetDepth();
+						vih2->bmiHeader.biCompression	= fourcc;
 						vih2->bmiHeader.biSizeImage		= DIBSIZE(vih2->bmiHeader);
 						vih2->rcSource					= vih2->rcTarget = CRect(0, 0, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight);
 						vih2->AvgTimePerFrame			= AvgTimePerFrame;
@@ -1505,7 +1506,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										}
 									}
 								}
-
 								break;
 						}
 
