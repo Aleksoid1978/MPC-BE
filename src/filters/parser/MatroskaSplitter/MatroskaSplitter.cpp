@@ -643,7 +643,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						} else {
 							fourcc = GETU32(pTE->CodecPrivate.data() + 4);
 							if (fourcc == FCC('apv1')) {
-								// ñonvert to uppercase for compatibility with LAV Video Decoder 0.80.0-9
+								// convert to uppercase for compatibility with LAV Video Decoder 0.80.0-9
 								fourcc = FCC('APV1');
 							}
 						}
