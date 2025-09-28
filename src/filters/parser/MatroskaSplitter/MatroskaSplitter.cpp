@@ -642,6 +642,10 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							fourcc = GETU32(pTE->CodecPrivate.data());
 						} else {
 							fourcc = GETU32(pTE->CodecPrivate.data() + 4);
+							if (fourcc == FCC('apv1')) {
+								// ñonvert to uppercase for compatibility with LAV Video Decoder 0.80.0-9
+								fourcc = FCC('APV1');
+							}
 						}
 					} else if (StartsWith(CodecID, "V_REAL/RV") && CodecID.GetLength() >= 11) {
 						fourcc = CodecID[7] + (CodecID[8] << 8) + (CodecID[9] << 16) + (CodecID[10] << 24);
