@@ -423,6 +423,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_CLLI:
         case AP4_ATOM_TYPE_NAME:
         case AP4_ATOM_TYPE_VVCC:
+        case AP4_ATOM_TYPE_apvC:
             atom = new AP4_DataInfoAtom(type, size, stream);
             break;
 
@@ -523,6 +524,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_ICOD:
         case AP4_ATOM_TYPE_AVdn:
         case AP4_ATOM_TYPE_AVdh:
+        case AP4_ATOM_TYPE_apv1:
         case AP4_ATOM_TYPE_FFV1:
         case AP4_ATOM_TYPE_OVC1:
         case AP4_ATOM_TYPE_VC1:

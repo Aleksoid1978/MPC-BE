@@ -491,6 +491,9 @@ const AP4_Atom::Type AP4_ATOM_TYPE_AP4X = AP4_ATOM_TYPE('a','p','4','x');
 // Avid DNxHD
 const AP4_Atom::Type AP4_ATOM_TYPE_AVdn = AP4_ATOM_TYPE('A','V','d','n');
 const AP4_Atom::Type AP4_ATOM_TYPE_AVdh = AP4_ATOM_TYPE('A','V','d','h');
+// APV
+const AP4_Atom::Type AP4_ATOM_TYPE_apv1 = AP4_ATOM_TYPE('a','p','v','1');
+const AP4_Atom::Type AP4_ATOM_TYPE_apvC = AP4_ATOM_TYPE('a','p','v','C');
 // FFV1
 const AP4_Atom::Type AP4_ATOM_TYPE_FFV1 = AP4_ATOM_TYPE('F','F','V','1');
 // VC-1
