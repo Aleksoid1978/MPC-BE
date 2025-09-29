@@ -2468,6 +2468,12 @@ bool CMP4SplitterFilter::DemuxLoop()
 					}
 				}
 			}
+			else if (mt.subtype == MEDIASUBTYPE_APV1) {
+				if (data.GetDataSize() > 4) {
+					auto size = AV_RB32(data.GetData());
+					p->SetData(data.GetData() + 4, size);
+				}
+			}
 			else {
 				p->SetData(data.GetData(), data.GetDataSize());
 			}
