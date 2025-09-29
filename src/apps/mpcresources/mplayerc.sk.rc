@@ -441,7 +441,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,34,53,12
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,49,53,12
     CONTROL         "Povoliť tmavú ponuku",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,59,147,9,WS_EX_TRANSPARENT
-    CONTROL         "Use Blur Behind effect (Windows 10 and above)",IDC_CHECK7,
+    CONTROL         "Použiť efekt rozostrenia (Windows 10 a vyšší)",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,265,9,WS_EX_TRANSPARENT
     CONTROL         "Povoliť tmavý názov (Windows 10 a vyšší)",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,9,WS_EX_TRANSPARENT
@@ -459,7 +459,7 @@ BEGIN
     LTEXT           "Veľkosť písma zoznamu skladieb:",IDC_STATIC,13,187,110,8
     EDITTEXT        IDC_EDIT2,127,185,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,187,10,8
-    LTEXT           "Controls size:",IDC_STATIC8,14,96,99,8
+    LTEXT           "Veľkosť ovládacích prvkov:",IDC_STATIC8,14,96,99,8
     COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,95,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Použiť funkcie panela úloh OS Windows 7 (a vyšší).",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,206,270,11
@@ -1113,7 +1113,7 @@ BEGIN
     CONTROL         "Povoliť MiniDump",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,137,184,9
     LTEXT           "Spustiteľný súbor FFmpeg:",IDC_STATIC,7,152,104,8
     COMBOBOX        IDC_COMBO1,113,150,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Update check",IDC_STATIC,5,167,286,40
+    GROUPBOX        "Kontrola aktualizácií",IDC_STATIC,5,167,286,40
     CONTROL         "Povoliť automatickú kontrolu aktualizácií",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,179,250,9
     LTEXT           "Oneskorenie medzi jednotlivými kontrolami:",IDC_STATIC5,10,192,110,8
     EDITTEXT        IDC_EDIT4,120,190,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
@@ -1126,7 +1126,7 @@ END
 
 IDD_TUNER_SCAN DIALOGEX 0, 0, 407, 246
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Ladenie tuneru"
+CAPTION "Ladenie tunera"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "Štart",ID_START,244,227,50,14
@@ -1262,9 +1262,9 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,79,285,9
     CONTROL         "Použiť opätovnú synchr.titulkov",IDC_CHECK_SUBRESYNC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,91,285,9
     GROUPBOX        "",IDC_STATIC,4,103,286,47
-    LTEXT           "Default code page:",IDC_STATIC,10,108,120,8
+    LTEXT           "Predvolená kódová stránka:",IDC_STATIC,10,108,120,8
     COMBOBOX        IDC_COMBO3,10,120,277,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Automatically detect code page",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,135,178,10
+    CONTROL         "Automaticky zistiť kódovú stránku",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,135,178,10
 END
 
 IDD_UPDATE_DIALOG DIALOGEX 0, 0, 238, 60
@@ -2451,7 +2451,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "Kódová stránka systému - %u"
     IDS_FRAME_HALF          "Polovičná veľkosť"
     IDS_FRAME_NORMAL        "Normálna veľkosť"
     IDS_FRAME_DOUBLE        "Dvojitá veľkosť"
@@ -3070,7 +3070,7 @@ BEGIN
     IDS_ZOOM_AUTOFITLARGE   "Automaticky prispôsobiť (iba väčšie)"
     IDS_ADD_TO_PLAYLIST     "Pridať do playlistu programu MPC-BE"
     IDS_OPEN_WITH_MPC       "Prehrať programom MPC-BE"
-    IDS_CANNOT_CHANGE_FORMAT  "Program MPC-BE nemá oprávnenia, dostatočné na zmenu asociácií k formátom. Kliknite prosím na tlačidlo ""Modifikovať"" a preberte práva administrátora PC."
+    IDS_CANNOT_CHANGE_FORMAT  "Program MPC-BE nemá dostatočné oprávnenia na zmenu asociácií k formátom. Kliknite prosím na tlačidlo ""Modifikovať"" a preberte práva administrátora PC."
     IDS_APP_DESCRIPTION     "Jeden z najvýkonnejších, konfigurovateľných multimediálnych prehrávačov pre OS Windows. Pôvodne vyvinutý maďarským vývojárom známym pod prezývkou Gabest. Táto verzia má pridané aj niektoré nové funkcie, ako napríklad celoobrazovkový režim Direct 3D a lepšiu podporu OS Windows Vista/7."
     IDS_MAINFRM_12          "kanál"
     IDS_MAINFRM_13          "kanálov"
@@ -3328,7 +3328,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AVISPLITTER_NON_INTERLEAVED "Support ""Bad"" Interleaved files"
+    IDS_AVISPLITTER_NON_INTERLEAVED "Podpora ""Zlých"" prekladaných súborov"
     IDS_AVISPLITTER_REINDEX_BROKEN "Preindexovať poškodené súbory"
 END
 
@@ -3634,7 +3634,7 @@ BEGIN
     IDS_MFMT_AMR            "AMR"
     IDS_MFMT_APE            "Monkey's Audio"
     IDS_MFMT_AU             "AU/SND"
-    IDS_MFMT_CDA            "Audio CD track"
+    IDS_MFMT_CDA            "Audio CD stopa"
     IDS_MFMT_FLAC           "FLAC"
     IDS_MFMT_M4A            "MPEG-4 Audio"
     IDS_MFMT_MIDI           "MIDI"
@@ -3653,12 +3653,12 @@ STRINGTABLE
 BEGIN
     IDS_MFMT_PLS            "Zoznam skladieb"
     IDS_MFMT_BDPLS          "Blu-ray playlist"
-    IDS_MFMT_CUE            "Cue sheet"
+    IDS_MFMT_CUE            "Záznamník"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_OSD_RS_VSYNC_ON     "VSync: zapnutá"
+    IDS_OSD_RS_VSYNC_ON     "VSync: Zap"
     IDS_OSD_RS_VSYNC_OFF    "VSync: Vyp"
     IDS_OSD_RS_INTERNAL_VSYNC_ON "Interná VSync: Zap"
     IDS_OSD_RS_INTERNAL_VSYNC_OFF "Interná VSync: Vyp"
@@ -3895,7 +3895,7 @@ BEGIN
     IDS_PUBLISHED           "Zverejnené: "
     IDS_OPENING_YOUTUBE     "Otváranie YouTube..."
     IDS_CALLING_YOUTUBEDL   "Volanie %s ..."
-    IDS_YOUTUBE_DEFAULT_AUDIO_LANG "Default language"
+    IDS_YOUTUBE_DEFAULT_AUDIO_LANG "Predvolený jazyk"
 END
 
 STRINGTABLE
@@ -3906,7 +3906,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_CONTROLS_SIZE_COMBO "Applies only to the built-in toolbar or external one in SVG format, and to the flybar"
+    IDC_CONTROLS_SIZE_COMBO "Vzťahuje sa len na vstavaný panel s nástrojmi alebo externý vo formáte SVG a na plávajúci panel."
 END
 
 /////////////////////////////////////////////////////////////////////////////
