@@ -3259,29 +3259,29 @@ END
 STRINGTABLE
 BEGIN
     IDS_CMD_USAGE           "Utilizzo: mpc-be.exe ""nome_percorso"" [opzioni]"
-    IDS_CMD_PATHNAME        """nome_percorso""\tIl file o la directory principale da caricare (caratteri jolly\nammessi)"
+    IDS_CMD_PATHNAME        """nome_percorso""\tIl file o la directory principale da caricare (caratteri jolly consentiti)"
     IDS_CMD_HELP            "/help /h /?\tMostra la guida sulle opzioni della riga di comando"
     IDS_CMD_DUB             "/dub ""nome dub""\tCarica un file audio aggiuntivo"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tCarica un file audio aggiuntivo spostato con XXms (se\nil file contiene ""...RITARDO XXms..."")"
+    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tCarica un file audio aggiuntivo spostato con XXms (se il file contiene ""...DELAY XXms..."")"
     IDS_CMD_D3DFS           "/d3dfs\tAvvia il rendering in modalità a schermo intero esclusiva"
     IDS_CMD_SUB             "/sub ""subname""\tCarica un file di sottotitoli aggiuntivo"
-    IDS_CMD_FILTER          "/filter ""nome filtro""\tCarica filtri DirectShow da una\nDLL (caratteri jolly consentiti)"
-    IDS_CMD_DVD             "/dvd\tEsegui in modalità dvd, ""nome del percorso"" indica la cartella dvd\n (opzionale)"
+    IDS_CMD_FILTER          "/filter ""nome filtro""\tCarica filtri DirectShow da una DLL (caratteri jolly consentiti)"
+    IDS_CMD_DVD             "/dvd\tEsegui in modalità dvd, ""nome_percorso"" indica la cartella dvd (opzionale)"
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tAvvia la riproduzione dal titolo T, capitolo C"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tAvvia la riproduzione dal titolo T, posizione hh:mm:ss"
-    IDS_CMD_CD              "/cd\tCarica tutte le tracce di un cd audio o (s)vcd,\n""nome_percorso"" indica il percorso dell'unità (opzionale)"
+    IDS_CMD_CD              "/cd\tCarica tutte le tracce di un cd audio o (s)vcd, ""nome_percorso"" indica il percorso dell'unità (opzionale)"
     IDS_CMD_OPEN            "/open\tApri il file, non avviare automaticamente la riproduzione"
-    IDS_CMD_PLAY            "/play\tInizia a riprodurre il file non appena il lettore viene\nlanciato"
-    IDS_CMD_CLOSE           "/close\tChiudi il lettore dopo la riproduzione (funziona solo quando\n\utilizzato con /play)"
+    IDS_CMD_PLAY            "/play\tInizia la riproduzione del file all'avvio del lettore.	"
+    IDS_CMD_CLOSE           "/close\tChiudi il lettore dopo la riproduzione (funziona solo quando utilizzato con /play)"
     IDS_CMD_SHUTDOWN        "/shutdown\tSpegni il sistema operativo dopo la riproduzione"
     IDS_CMD_FULLSCREEN      "/fullscreen\tAvvia in modalità a schermo intero"
     IDS_CMD_MINIMIZED       "/minimized\tInizia in modalità ridotta a icona"
     IDS_CMD_NEW             "/new\tUsa una nuova istanza del lettore"
-    IDS_CMD_ADD             "/add\tAggiungi ""nome_percorso"" alla playlist, può essere combinato\ncon /open e /play"
+    IDS_CMD_ADD             "/add\tAggiungi ""nome_percorso"" alla playlist, può essere combinato con /open e /play"
 END
 
 STRINGTABLE
@@ -3296,7 +3296,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tInizia la riproduzione alla posizione hh:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tImposta una dimensione fissa della finestra"
     IDS_CMD_MONITOR         "/monitor N\tAvvia il lettore sul monitor N, dove N inizia da 1"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tInizia a usare il renderer audio, dove ""name"" è il nome del\nrenderer audio (vedi impostazioni ""Audio"")"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tInizia a usare il renderer audio, dove ""name"" è il nome del renderer audio (vedi impostazioni ""Audio"")"
     IDS_CMD_VOLUME          "/volume N\tImposta volume, il valore di N è tra 0 e 100"
     IDS_CMD_CLIPBOARD       "/clipboard\tApri percorsi/collegamenti dagli appunti"
     IDS_CMD_DEVICE          "/device\tApri il dispositivo video predefinito"

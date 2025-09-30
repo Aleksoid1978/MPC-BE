@@ -522,8 +522,8 @@ BEGIN DIALOGEX IDD_PPAGESUBTITLES LINES 20
 12		"No cargar subtítulos integrados"
 13		"Recarga automática de archivos de subtítulos después de detectar la modificación"
 15		"Usar Subresync"
-17		"Default code page:"
-19		"Automatically detect code page"
+17		"Página de códigos predeterminada:"
+19		"Detectar automáticamente la página de códigos"
 END
 
 BEGIN DIALOGEX IDD_PPAGESYNC LINES 26
@@ -1984,7 +1984,7 @@ STRING IDS_SUBTITLES_STEREO_DONTUSE		"No usar"
 STRING IDS_SUBTITLES_STEREO_SIDEBYSIDE		"Lado a Lado"
 STRING IDS_SUBTITLES_STEREO_TOPANDBOTTOM		"Superior e Inferior"
 STRING IDS_SUBTITLES_STYLES		"&Estilos..."
-STRING IDS_SUBTITLES_SYSTEM_CODEPAGE		"System code page - %u"
+STRING IDS_SUBTITLES_SYSTEM_CODEPAGE		"Página de códigos del sistema - %u"
 STRING IDS_SUBTITLE_STREAM		"Subtítulo: %s"
 STRING IDS_SUBTITLE_STREAM_OFF		"Subtítulo: Apagado"
 STRING IDS_SUB_COPYTOCLIPBOARD		"Copiar los subtítulos mostrados al Portapapeles"
