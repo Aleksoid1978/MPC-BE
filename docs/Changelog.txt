@@ -35,6 +35,7 @@ Updated Hungarian translation (by mickey).
 Updated Slovak translation.
 Updated Italian translation (by mapi68).
 Updated Spanish translation (by IPeluchito).
+Updated Japanese translation (by tsubasanouta).
 
 Updated libraries:
 	ffmpeg n8.1-dev-629-g8a34faa250;
