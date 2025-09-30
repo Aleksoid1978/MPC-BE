@@ -12,6 +12,15 @@ Fixed display of Icecast radio station names.
 OggSplitter
 Fixed support for multiple tags.
 
+MP4Splitter
+Added support for Advanced Professional Video (APV).
+
+MatroskaSplitter
+Added support for Advanced Professional Video (APV).
+
+MPCVideoDec
+The D3D11 hardware decoder for HEVC 4:4:4 10/16 bit will not be used for madVR because the renderer does not support it.
+
 Player
 Various interface fixes.
 
@@ -23,6 +32,7 @@ Updated Chinese (Simplified) translation (by wushantao).
 Updated Chinese (Traditional) and Dutch translation (by beter).
 Updated Turkish translation (by cmhrky).
 Updated Hungarian translation (by mickey).
+Updated Slovak translation.
 Updated Italian translation (by mapi68).
 Updated Spanish translation (by IPeluchito).
 
