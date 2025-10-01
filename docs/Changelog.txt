@@ -24,6 +24,9 @@ The D3D11 hardware decoder for HEVC 4:4:4 10/16 bit will not be used for madVR b
 Player
 Various interface fixes.
 
+Installer
+Updated MPC Video Renderer 0.9.15.
+
 Updated Korean translation (by Hackjjang).
 Added Arabic translation (by Alhlhli).
 Updated German translation (by Klaus1189).
