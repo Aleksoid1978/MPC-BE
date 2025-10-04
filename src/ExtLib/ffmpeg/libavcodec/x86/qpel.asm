@@ -25,76 +25,21 @@
 
 SECTION .text
 
-%macro op_avgh 3
-    movh   %3, %2
-    pavgb  %1, %3
-    movh   %2, %1
-%endmacro
-
 %macro op_avg 2
     pavgb  %1, %2
     mova   %2, %1
-%endmacro
-
-%macro op_puth 2-3
-    movh   %2, %1
 %endmacro
 
 %macro op_put 2
     mova   %2, %1
 %endmacro
 
-; void ff_put/avg_pixels4_l2_mmxext(uint8_t *dst, uint8_t *src1, uint8_t *src2,
-;                                   int dstStride, int src1Stride, int h)
-%macro PIXELS4_L2 1
-%define OP op_%1h
-cglobal %1_pixels4_l2, 6,6
-    movsxdifnidn r3, r3d
-    movsxdifnidn r4, r4d
-    test        r5d, 1
-    je        .loop
-    movd         m0, [r1]
-    movd         m1, [r2]
-    add          r1, r4
-    add          r2, 4
-    pavgb        m0, m1
-    OP           m0, [r0], m3
-    add          r0, r3
-    dec         r5d
-.loop:
-    mova         m0, [r1]
-    mova         m1, [r1+r4]
-    lea          r1, [r1+2*r4]
-    pavgb        m0, [r2]
-    pavgb        m1, [r2+4]
-    OP           m0, [r0], m3
-    OP           m1, [r0+r3], m3
-    lea          r0, [r0+2*r3]
-    mova         m0, [r1]
-    mova         m1, [r1+r4]
-    lea          r1, [r1+2*r4]
-    pavgb        m0, [r2+8]
-    pavgb        m1, [r2+12]
-    OP           m0, [r0], m3
-    OP           m1, [r0+r3], m3
-    lea          r0, [r0+2*r3]
-    add          r2, 16
-    sub         r5d, 4
-    jne       .loop
-    RET
-%endmacro
-
-INIT_MMX mmxext
-PIXELS4_L2 put
-PIXELS4_L2 avg
-
-; void ff_put/avg_pixels8_l2_mmxext(uint8_t *dst, uint8_t *src1, uint8_t *src2,
-;                                   int dstStride, int src1Stride, int h)
 %macro PIXELS8_L2 1
 %define OP op_%1
-cglobal %1_pixels8_l2, 6,6
-    movsxdifnidn r3, r3d
-    movsxdifnidn r4, r4d
+%ifidn %1, put
+; void ff_put_pixels8_l2_mmxext(uint8_t *dst, uint8_t *src1, uint8_t *src2,
+;                               ptrdiff_t dstStride, ptrdiff_t src1Stride, int h)
+cglobal put_pixels8_l2, 6,6
     test        r5d, 1
     je        .loop
     mova         m0, [r1]
@@ -105,6 +50,12 @@ cglobal %1_pixels8_l2, 6,6
     OP           m0, [r0]
     add          r0, r3
     dec         r5d
+%else
+; void ff_avg_pixels8_l2_mmxext(uint8_t *dst, uint8_t *src1, uint8_t *src2,
+;                               ptrdiff_t dstStride, ptrdiff_t src1Stride)
+cglobal avg_pixels8_l2, 5,6
+    mov         r5d, 8
+%endif
 .loop:
     mova         m0, [r1]
     mova         m1, [r1+r4]
@@ -132,13 +83,12 @@ INIT_MMX mmxext
 PIXELS8_L2 put
 PIXELS8_L2 avg
 
-; void ff_put/avg_pixels16_l2_mmxext(uint8_t *dst, uint8_t *src1, uint8_t *src2,
-;                                    int dstStride, int src1Stride, int h)
 %macro PIXELS16_L2 1
 %define OP op_%1
-cglobal %1_pixels16_l2, 6,6
-    movsxdifnidn r3, r3d
-    movsxdifnidn r4, r4d
+%ifidn %1, put
+; void ff_put_pixels16_l2_mmxext(uint8_t *dst, uint8_t *src1, uint8_t *src2,
+;                                ptrdiff_t dstStride, ptrdiff_t src1Stride, int h)
+cglobal put_pixels16_l2, 6,6
     test        r5d, 1
     je        .loop
     mova         m0, [r1]
@@ -151,6 +101,12 @@ cglobal %1_pixels16_l2, 6,6
     OP           m1, [r0+8]
     add          r0, r3
     dec         r5d
+%else
+; void ff_avg_pixels16_l2_mmxext(uint8_t *dst, uint8_t *src1, uint8_t *src2,
+;                                ptrdiff_t dstStride, ptrdiff_t src1Stride)
+cglobal avg_pixels16_l2, 5,6
+    mov         r5d, 16
+%endif
 .loop:
     mova         m0, [r1]
     mova         m1, [r1+8]
