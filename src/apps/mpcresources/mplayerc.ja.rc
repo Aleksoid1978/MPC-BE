@@ -330,7 +330,7 @@ FONT 9, "MS UI Gothic", 400, 0, 0x1
 BEGIN
     GROUPBOX        "再生",IDC_STATIC,5,5,129,60
     CONTROL         "再生",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,17,55,10
-    CONTROL         "繰り返し再生",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,32,116,8
+    CONTROL         "常時リピート",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,32,116,8
     EDITTEXT        IDC_EDIT1,65,15,20,13,ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
     LTEXT           "回",IDC_STATIC1,90,17,40,8
     CONTROL         "再生完了時に巻き戻す",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,10,45,116,18
@@ -1713,7 +1713,7 @@ BEGIN
             MENUITEM "単眼",                        ID_STEREO3D_MONO
             MENUITEM "行交互",             ID_STEREO3D_ROW_INTERLEAVED
             MENUITEM "行交互 (2 倍)",        ID_STEREO3D_ROW_INTERLEAVED_2X
-            MENUITEM "上下分割(縦圧縮)",              ID_STEREO3D_HALFOVERUNDER
+            MENUITEM "上下分割 (縦圧縮)",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "上下分割",                   ID_STEREO3D_OVERUNDER
             MENUITEM SEPARATOR
             MENUITEM "左右入れ替え",             ID_STEREO3D_SWAP_LEFTRIGHT
@@ -1734,9 +1734,9 @@ BEGIN
         MENUITEM "停止(&S)",                ID_PLAY_STOP
         MENUITEM "コマ送り(&R)",               ID_PLAY_FRAMESTEP
         MENUITEM "移動(&G)...",             ID_PLAY_GOTO
-        POPUP "繰り返し(&R)"
+        POPUP "リピート(&R)"
         BEGIN
-            MENUITEM "継続(&O)", ID_REPEAT_FOREVER
+            MENUITEM "常時(&O)", ID_REPEAT_FOREVER
             MENUITEM SEPARATOR
             MENUITEM "A-B 解除(&R)", ID_PLAY_REPEAT_AB
             MENUITEM "A-B 始点(&A)", ID_PLAY_REPEAT_AB_MARK_A
@@ -1806,9 +1806,9 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "再生/一時停止(&P)",                 ID_PLAY_PLAYPAUSE
         MENUITEM "停止(&S)",                      ID_PLAY_STOP
-        POPUP "繰り返し(&R)"
+        POPUP "リピート(&R)"
         BEGIN
-            MENUITEM "継続(&O)", ID_REPEAT_FOREVER
+            MENUITEM "常時(&O)", ID_REPEAT_FOREVER
             MENUITEM SEPARATOR
             MENUITEM "A-B 解除(&R)", ID_PLAY_REPEAT_AB
             MENUITEM "A-B 始点(&A)", ID_PLAY_REPEAT_AB_MARK_A
@@ -1893,7 +1893,7 @@ BEGIN
             MENUITEM "単眼",                        ID_STEREO3D_MONO
             MENUITEM "行交互",             ID_STEREO3D_ROW_INTERLEAVED
             MENUITEM "行交互 (2 倍)",        ID_STEREO3D_ROW_INTERLEAVED_2X
-            MENUITEM "上下分割(縦圧縮)",              ID_STEREO3D_HALFOVERUNDER
+            MENUITEM "上下分割 (縦圧縮)",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "上下分割",                   ID_STEREO3D_OVERUNDER
             MENUITEM SEPARATOR
             MENUITEM "左右入れ替え",             ID_STEREO3D_SWAP_LEFTRIGHT
@@ -1982,7 +1982,7 @@ BEGIN
                 MENUITEM "単眼",                        ID_STEREO3D_MONO
                 MENUITEM "行交互",             ID_STEREO3D_ROW_INTERLEAVED
                 MENUITEM "行交互 (2 倍)",        ID_STEREO3D_ROW_INTERLEAVED_2X
-                MENUITEM "上下分割(縦圧縮)",              ID_STEREO3D_HALFOVERUNDER
+                MENUITEM "上下分割 (縦圧縮)",              ID_STEREO3D_HALFOVERUNDER
                 MENUITEM "上下分割",                   ID_STEREO3D_OVERUNDER
                 MENUITEM SEPARATOR
                 MENUITEM "左右入れ替え",             ID_STEREO3D_SWAP_LEFTRIGHT
@@ -2003,9 +2003,9 @@ BEGIN
             MENUITEM "停止(&S)",                ID_PLAY_STOP
             MENUITEM "コマ送り(&R)",               ID_PLAY_FRAMESTEP
             MENUITEM "移動(&G)...",             ID_PLAY_GOTO
-            POPUP "繰り返し(&R)"
+            POPUP "リピート(&R)"
             BEGIN
-                MENUITEM "継続(&O)", ID_REPEAT_FOREVER
+                MENUITEM "常時(&O)", ID_REPEAT_FOREVER
                 MENUITEM SEPARATOR
                 MENUITEM "A-B 解除(&R)", ID_PLAY_REPEAT_AB
                 MENUITEM "A-B 始点(&A)", ID_PLAY_REPEAT_AB_MARK_A
@@ -2060,7 +2060,7 @@ BEGIN
             MENUITEM "単眼",                        ID_STEREO3D_MONO
             MENUITEM "行交互",             ID_STEREO3D_ROW_INTERLEAVED
             MENUITEM "行交互 (2 倍)",        ID_STEREO3D_ROW_INTERLEAVED_2X
-            MENUITEM "上下分割(縦圧縮)",              ID_STEREO3D_HALFOVERUNDER
+            MENUITEM "上下分割 (縦圧縮)",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "上下分割",                   ID_STEREO3D_OVERUNDER
             MENUITEM SEPARATOR
             MENUITEM "左右入れ替え",             ID_STEREO3D_SWAP_LEFTRIGHT
@@ -2996,9 +2996,9 @@ BEGIN
     IDS_AG_SUBTITLE_RELOAD  "字幕の再読み込み"
     IDS_AG_NEXT_VIDEO       "次の ビデオ/DVD アングル"
     IDS_AG_PREV_VIDEO       "前の ビデオ/DVD アングル"
-    IDS_REPEAT_FOREVER      "繰り返し再生"
-    IDS_REPEAT_FOREVER_OFF  "繰り返し再生: オフ"
-    IDS_REPEAT_FOREVER_ON   "繰り返し再生: オン"
+    IDS_REPEAT_FOREVER      "常時リピート"
+    IDS_REPEAT_FOREVER_OFF  "常時リピート: オフ"
+    IDS_REPEAT_FOREVER_ON   "常時リピート: オン"
     IDS_MPLAYERC_98         "OSD: 残り時間"
 END
 
