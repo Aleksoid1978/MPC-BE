@@ -1713,7 +1713,7 @@ BEGIN
             MENUITEM "単眼",                        ID_STEREO3D_MONO
             MENUITEM "行交互",             ID_STEREO3D_ROW_INTERLEAVED
             MENUITEM "行交互 (2 倍)",        ID_STEREO3D_ROW_INTERLEAVED_2X
-            MENUITEM "半分上下分割",              ID_STEREO3D_HALFOVERUNDER
+            MENUITEM "上下分割(縦圧縮)",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "上下分割",                   ID_STEREO3D_OVERUNDER
             MENUITEM SEPARATOR
             MENUITEM "左右入れ替え",             ID_STEREO3D_SWAP_LEFTRIGHT
@@ -1893,7 +1893,7 @@ BEGIN
             MENUITEM "単眼",                        ID_STEREO3D_MONO
             MENUITEM "行交互",             ID_STEREO3D_ROW_INTERLEAVED
             MENUITEM "行交互 (2 倍)",        ID_STEREO3D_ROW_INTERLEAVED_2X
-            MENUITEM "半分上下分割",              ID_STEREO3D_HALFOVERUNDER
+            MENUITEM "上下分割(縦圧縮)",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "上下分割",                   ID_STEREO3D_OVERUNDER
             MENUITEM SEPARATOR
             MENUITEM "左右入れ替え",             ID_STEREO3D_SWAP_LEFTRIGHT
@@ -1982,7 +1982,7 @@ BEGIN
                 MENUITEM "単眼",                        ID_STEREO3D_MONO
                 MENUITEM "行交互",             ID_STEREO3D_ROW_INTERLEAVED
                 MENUITEM "行交互 (2 倍)",        ID_STEREO3D_ROW_INTERLEAVED_2X
-                MENUITEM "半分上下分割",              ID_STEREO3D_HALFOVERUNDER
+                MENUITEM "上下分割(縦圧縮)",              ID_STEREO3D_HALFOVERUNDER
                 MENUITEM "上下分割",                   ID_STEREO3D_OVERUNDER
                 MENUITEM SEPARATOR
                 MENUITEM "左右入れ替え",             ID_STEREO3D_SWAP_LEFTRIGHT
@@ -2060,7 +2060,7 @@ BEGIN
             MENUITEM "単眼",                        ID_STEREO3D_MONO
             MENUITEM "行交互",             ID_STEREO3D_ROW_INTERLEAVED
             MENUITEM "行交互 (2 倍)",        ID_STEREO3D_ROW_INTERLEAVED_2X
-            MENUITEM "半分上下分割",              ID_STEREO3D_HALFOVERUNDER
+            MENUITEM "上下分割(縦圧縮)",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "上下分割",                   ID_STEREO3D_OVERUNDER
             MENUITEM SEPARATOR
             MENUITEM "左右入れ替え",             ID_STEREO3D_SWAP_LEFTRIGHT
