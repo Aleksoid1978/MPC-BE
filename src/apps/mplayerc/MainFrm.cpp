@@ -4983,7 +4983,11 @@ void CMainFrame::OnStreamSub(UINT nID)
 					CString	strMessage;
 
 					if (iSelected < (nLangs - 1)) {
-						m_pDVS->put_SelectedLanguage(iSelected);
+						if (CComQIPtr<IAMStreamSelect> pSSDVS = m_pDVS) {
+							pSSDVS->Enable(iSelected + 1, AMSTREAMSELECTENABLE_ENABLE);
+						} else {
+							m_pDVS->put_SelectedLanguage(iSelected);
+						}
 						m_pDVS->get_LanguageName(iSelected, &pName);
 
 						strMessage.Format(ResStr(IDS_SUBTITLE_STREAM), pName);
@@ -5031,7 +5035,11 @@ void CMainFrame::OnStreamSub(UINT nID)
 				int iSelected = 0;
 				m_pDVS->get_SelectedLanguage(&iSelected);
 				iSelected = (iSelected + (nID == 0 ? 1 : nLangs - 1)) % nLangs;
-				m_pDVS->put_SelectedLanguage(iSelected);
+				if (CComQIPtr<IAMStreamSelect> pSSDVS = m_pDVS) {
+					pSSDVS->Enable(iSelected + 1, AMSTREAMSELECTENABLE_ENABLE);
+				} else {
+					m_pDVS->put_SelectedLanguage(iSelected);
+				}
 
 				WCHAR* pName = nullptr;
 				m_pDVS->get_LanguageName(iSelected, &pName);
@@ -9867,7 +9875,11 @@ void CMainFrame::SelectSubtilesAMStream(UINT id)
 
 				if (nLangs > 1) {
 					if (i < (nLangs-1)) {
-						m_pDVS->put_SelectedLanguage(i);
+						if (CComQIPtr<IAMStreamSelect> pSSDVS = m_pDVS) {
+							pSSDVS->Enable(i + 1, AMSTREAMSELECTENABLE_ENABLE);
+						} else {
+							m_pDVS->put_SelectedLanguage(i);
+						}
 						return;
 					} else {
 						m_pDVS->put_SelectedLanguage(nLangs - 1);
@@ -9896,7 +9908,11 @@ void CMainFrame::SelectSubtilesAMStream(UINT id)
 			}
 
 			if (i <= (nLangs - 1)) {
-				m_pDVS->put_SelectedLanguage(i);
+				if (CComQIPtr<IAMStreamSelect> pSSDVS = m_pDVS) {
+					pSSDVS->Enable(i + 1, AMSTREAMSELECTENABLE_ENABLE);
+				} else {
+					m_pDVS->put_SelectedLanguage(i);
+				}
 			}
 		}
 
