@@ -820,7 +820,7 @@ namespace Youtube
 							getJsonValue(adaptiveFormat, "itag", std::get<0>(element));
 							getJsonValue(adaptiveFormat, "qualityLabel", std::get<3>(element));
 							if (getJsonValue(adaptiveFormat, "url", std::get<1>(element))
-								|| getJsonValue(adaptiveFormat, "cipher", std::get<2>(element)) || getJsonValue(adaptiveFormat, "signatureCipher", std::get<2>(element))) {
+									|| getJsonValue(adaptiveFormat, "cipher", std::get<2>(element)) || getJsonValue(adaptiveFormat, "signatureCipher", std::get<2>(element))) {
 
 								if (std::get<1>(element).Find("xtags=drc") > 0) {
 									// DRC audio
@@ -829,6 +829,12 @@ namespace Youtube
 
 								CStringA lang_id;
 								if (auto audioTrack = GetJsonObject(adaptiveFormat, "audioTrack")) {
+									bool isAutoDubbed = false;
+									if (getJsonValue(*audioTrack, "isAutoDubbed", isAutoDubbed) && isAutoDubbed) {
+										// Translated by AI
+										continue;
+									}
+
 									if (getJsonValue(*audioTrack, "id", lang_id)) {
 										auto pos = lang_id.Find('.');
 										if (pos != -1) {
