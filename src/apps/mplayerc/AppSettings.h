@@ -786,6 +786,7 @@ public:
 	// After Playback
 	bool			fExitAfterPlayback;
 	bool			bCloseFileAfterPlayback;
+	bool			bCloseFileAfterPlaybackAndMinimize;
 	bool			fNextInDirAfterPlayback;
 	bool			fNextInDirAfterPlaybackLooped;
 

@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"יציאה"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"-------- פעם אחת --------"
 6		"צא מנגן"
 7		"העבר להמתנה"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"-------- כל פעם ---------"
 14		"צא מנגן"
 15		"Close file"
-16		"נגן את הבא בתיקייה"
-17		"Play next in the folder (looped)"
-18		"Do Nothing"
+16		"Close file and minimize player"
+17		"נגן את הבא בתיקייה"
+18		"Play next in the folder (looped)"
+19		"Do Nothing"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"similar files from folder"
 STRING IDS_ADD_TO_PLAYLIST		"הוסף לרשימת ההשמעה של MPC-BE"
 STRING IDS_AFTERPLAYBACK_CLOSE		"לאחר הניגון: יציאה"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"After Playback: Always close file"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"לאחר הניגון: אל תעשה כלום"
 STRING IDS_AFTERPLAYBACK_EXIT		"לאחר הניגון: צא תמיד "
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"לאחר הניגון: מצב שינה"

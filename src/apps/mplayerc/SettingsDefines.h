@@ -311,6 +311,7 @@
 #define IDS_RS_WIN7TASKBAR					L"UseWin7TaskBar"
 #define IDS_RS_EXIT_AFTER_PB				L"ExitAfterPlayBack"
 #define IDS_RS_CLOSE_FILE_AFTER_PB			L"CloseFileAfterPlayBack"
+#define IDS_RS_CLOSE_FILE_AFTER_PB_AND_MINIMIZE L"CloseFileAfterPlayBackAndMinimize"
 #define IDS_RS_NEXT_AFTER_PB				L"SearchInDirAfterPlayBack"
 #define IDS_RS_NEXT_AFTER_PB_LOOPED			L"SearchInDirAfterPlayBackLooped"
 #define IDS_RS_NO_SEARCH_IN_FOLDER			L"DontUseSearchInFolder"

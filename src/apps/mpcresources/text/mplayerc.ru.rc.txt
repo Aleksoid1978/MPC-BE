@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"В&ыход"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"-------- Один раз --------"
 6		"Закрыть программу"
 7		"Перейти в режим ожидания"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"------- Каждый раз -------"
 14		"Закрыть программу"
 15		"Закрыть файл"
-16		"Перейти к след. в каталоге"
-17		"Перейти к след. в каталоге (зациклить)"
-18		"Ничего не делать"
+16		"Закрыть файл и свернуть плеер"
+17		"Перейти к след. в каталоге"
+18		"Перейти к след. в каталоге (зациклить)"
+19		"Ничего не делать"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"похожие файлы из папки"
 STRING IDS_ADD_TO_PLAYLIST		"Добавить в плейлист MPC-BE"
 STRING IDS_AFTERPLAYBACK_CLOSE		"По окончании воспроизведения: закрыть плеер"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"По окончании воспроизведения: всегда закрыть файл"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"По окончании воспроизведения: всегда закрыть файл и сворачивать плеер"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"По окончании воспроизведения: ничего не делать"
 STRING IDS_AFTERPLAYBACK_EXIT		"По окончании воспроизведения: всегда закрывать плеер"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"По окончании воспроизведения: перейти в режим сна"

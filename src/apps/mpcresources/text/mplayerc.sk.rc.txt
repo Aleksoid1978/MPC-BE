@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"U&končiť"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"----- Jednorázovo -----"
 6		"Zatvoriť"
 7		"Uviesť do pohotovostného režimu"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"------ Zakaždým ------"
 14		"Zatvoriť"
 15		"Zatvoriť súbor"
-16		"Prehrať ďalší v priečinku"
-17		"Prehrať ďalší v priečinku (ako v slučke)"
-18		"Nerobiť nič"
+16		"Close file and minimize player"
+17		"Prehrať ďalší v priečinku"
+18		"Prehrať ďalší v priečinku (ako v slučke)"
+19		"Nerobiť nič"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"podobné súbory z priečinka"
 STRING IDS_ADD_TO_PLAYLIST		"Pridať do playlistu programu MPC-BE"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Po prehratí: Ukončiť"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"Po prehratí: Vždy zatvoriť súbor"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"Po prehratí: Neurobiť nič"
 STRING IDS_AFTERPLAYBACK_EXIT		"Po prehratí: Vždy ukončiť"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"Po prehratí: Hibernácia"

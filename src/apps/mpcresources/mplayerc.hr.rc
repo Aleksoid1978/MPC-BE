@@ -2138,6 +2138,7 @@ BEGIN
         MENUITEM "------ Svaki puta ------",    ID_AFTERPLAYBACK_EVERYTIME
         MENUITEM "Izlaz",                        ID_AFTERPLAYBACK_EXIT
         MENUITEM "Zatvori datoteku",                  ID_AFTERPLAYBACK_CLOSE_FILE
+        MENUITEM "Close file and minimize player", ID_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE
         MENUITEM "Prikaži sljedeće u mapi",     ID_AFTERPLAYBACK_NEXT
         MENUITEM "Prikaži sljedeće u mapi (unedogled)", ID_AFTERPLAYBACK_NEXT_LOOPED
         MENUITEM "Bez interakcije",                  ID_AFTERPLAYBACK_EVERYTIMEDONOTHING
@@ -3720,6 +3721,7 @@ BEGIN
     IDS_SATURATION_DEC      "Zasićenje Smanji"
     IDS_RESET_COLOR         "Reset postavki boja"
     IDS_AFTERPLAYBACK_CLOSE_FILE "Nakon Playbacka: Uvijek zatvori datoteku"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "After Playback: Always close file and minimize player"
     IDS_UPDATE_ERROR_DATA   "The update server gives the wrong data.\n\nPlease try later."
     IDS_USING_NEWER_VERSION "Već koristite zadnju verziju %s."
     IDS_NEW_UPDATE_AVAILABLE  "A new version %s is available.\n\nDo you want to visit MPC-BE's website to download it?"

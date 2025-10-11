@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"В&ыхад"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"------ Аднаразова ------"
 6		"Закрыць праграму"
 7		"Перайсці ў рэжым чакання"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"------ Кожны раз -------"
 14		"Закрыць праграму"
 15		"Close file"
-16		"Прайграць наступны ў тэчцы"
-17		"Play next in the folder (looped)"
-18		"Do Nothing"
+16		"Close file and minimize player"
+17		"Прайграць наступны ў тэчцы"
+18		"Play next in the folder (looped)"
+19		"Do Nothing"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"similar files from folder"
 STRING IDS_ADD_TO_PLAYLIST		"Дадаць у плэйліст MPC-BE"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Пасля прайгрвання: Выйсці"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"After Playback: Always close file"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"Пасля прайгрвання: Нічога не рабіць"
 STRING IDS_AFTERPLAYBACK_EXIT		"Пасля прайгрвання: Заўсёды выхадзіць"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"Пасля прайгрвання: Перайсці ў рэжым сну"

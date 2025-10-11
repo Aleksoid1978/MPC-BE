@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"&خروج"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"--------- لمرة واحدة ---------"
 6		"إغلاق البرنامج"
 7		"الإسبات"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"------ طوال الوقت ------"
 14		"إغلاق البرنامج"
 15		"إغلاق الملف"
-16		"تشغيل الملف التالي في المجلد"
-17		"تشغيل التالي في المجلد (تكرار)"
-18		"لا تفعل شيئاً"
+16		"Close file and minimize player"
+17		"تشغيل الملف التالي في المجلد"
+18		"تشغيل التالي في المجلد (تكرار)"
+19		"لا تفعل شيئاً"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"ملفات مشابهة في المجلد"
 STRING IDS_ADD_TO_PLAYLIST		"إضافة إلى قائمة تشغيل MPC-BE"
 STRING IDS_AFTERPLAYBACK_CLOSE		"بعد انتهاء التشغيل: إغلاق البرنامج"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"بعد انتهاء التشغيل: إغلاق الملف دائمًا"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"بعد انتهاء التشغيل: لا تفعل شيئًا"
 STRING IDS_AFTERPLAYBACK_EXIT		"بعد انتهاء التشغيل: إغلاق البرنامج دائمًا"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"بعد انتهاء التشغيل: السبات (Hibernate)"

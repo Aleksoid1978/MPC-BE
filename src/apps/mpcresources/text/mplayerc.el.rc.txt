@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"Έ&ξοδος"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"----------- Μόνο τώρα ----------"
 6		"Έξοδος"
 7		"Αναμονή"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"----------- Κάθε φορά -----------"
 14		"Έξοδος"
 15		"Κλείσιμο αρχείου"
-16		"Αναπαραγωγή επόμενου στο φάκελο"
-17		"Αναπ/γωγή επόμενου στο φάκελο (κυκλικά)"
-18		"Καμία ενέργεια"
+16		"Close file and minimize player"
+17		"Αναπαραγωγή επόμενου στο φάκελο"
+18		"Αναπ/γωγή επόμενου στο φάκελο (κυκλικά)"
+19		"Καμία ενέργεια"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"similar files from folder"
 STRING IDS_ADD_TO_PLAYLIST		"Προσθήκη στη λίστα αναπαραγωγής του MPC-BE"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Μετά την αναπαραγωγή: Έξοδος"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"Μετά την αναπαραγωγή: Πάντα κλείσιμο αρχείου"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"Μετά την αναπαραγωγή: Καμία ενέργεια"
 STRING IDS_AFTERPLAYBACK_EXIT		"Μετά την αναπαραγωγή: Πάντα έξοδος"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"Μετά την αναπαραγωγή: Αδρανοποίηση"

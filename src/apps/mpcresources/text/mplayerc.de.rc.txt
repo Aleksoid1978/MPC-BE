@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"Beenden"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"---------------- Einmalige Aktion ---------------"
 6		"App &beenden"
 7		"&Standby-Modus"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"---------------- Standard-Aktion ----------------"
 14		"App &beenden"
 15		"&Datei schließen"
-16		"N&ächste Datei im Ordner wiedergeben"
-17		"Nächste Datei im Ordner wiedergeben (Schle&ife)"
-18		"&Keine Aktion"
+16		"Close file and minimize player"
+17		"N&ächste Datei im Ordner wiedergeben"
+18		"Nächste Datei im Ordner wiedergeben (Schle&ife)"
+19		"&Keine Aktion"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"Ähnliche Dateien aus dem Ordner"
 STRING IDS_ADD_TO_PLAYLIST		"Zur MPC-BE-Wiedergabeliste hinzufügen"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Nach Wiedergabe: App beenden"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"Nach Wiedergabe: Immer Datei schließen"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"Nach Wiedergabe: Keine Aktion"
 STRING IDS_AFTERPLAYBACK_EXIT		"Nach Wiedergabe: Immer App beenden"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"Nach Wiedergabe: Ruhezustand"

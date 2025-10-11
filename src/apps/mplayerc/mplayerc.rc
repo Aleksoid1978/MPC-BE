@@ -2137,6 +2137,7 @@ BEGIN
         MENUITEM "------ Every time ------",    ID_AFTERPLAYBACK_EVERYTIME
         MENUITEM "Exit",                        ID_AFTERPLAYBACK_EXIT
         MENUITEM "Close file",                  ID_AFTERPLAYBACK_CLOSE_FILE
+        MENUITEM "Close file and minimize player", ID_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE
         MENUITEM "Play next in the folder",     ID_AFTERPLAYBACK_NEXT
         MENUITEM "Play next in the folder (looped)", ID_AFTERPLAYBACK_NEXT_LOOPED
         MENUITEM "Do Nothing",                  ID_AFTERPLAYBACK_EVERYTIMEDONOTHING
@@ -3740,6 +3741,7 @@ BEGIN
     IDS_SATURATION_DEC      "Saturation decrease"
     IDS_RESET_COLOR         "Reset color settings"
     IDS_AFTERPLAYBACK_CLOSE_FILE "After Playback: Always close file"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "After Playback: Always close file and minimize player"
     IDS_UPDATE_ERROR_DATA   "The update server gives the wrong data.\n\nPlease try later."
     IDS_USING_NEWER_VERSION "You are already using the latest version %s."
     IDS_NEW_UPDATE_AVAILABLE 

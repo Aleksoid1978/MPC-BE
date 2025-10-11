@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"&Esci"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"------------- Adesso -------------"
 6		"Chiudi MPC-BE"
 7		"Sospendi"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"------------- Sempre -------------"
 14		"Esci"
 15		"Chiudi file"
-16		"Riproduci successivo nella cartella"
-17		"Riproduci successivo nella cartella (in loop)"
-18		"Non fare niente"
+16		"Close file and minimize player"
+17		"Riproduci successivo nella cartella"
+18		"Riproduci successivo nella cartella (in loop)"
+19		"Non fare niente"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"file simili dalla cartella"
 STRING IDS_ADD_TO_PLAYLIST		"Aggiungi alla playlist MPC-BE"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Dopo la riproduzione: Esci"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"Dopo la riproduzione: Chiude sempre il file"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"Dopo la riproduzione: Non fare niente"
 STRING IDS_AFTERPLAYBACK_EXIT		"Dopo la riproduzione: Esci sempre"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"Dopo la riproduzione: Iberna"

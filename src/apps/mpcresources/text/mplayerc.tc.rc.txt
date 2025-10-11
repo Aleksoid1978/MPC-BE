@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"離開(&X)"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"--------- 單次 ---------"
 6		"離開"
 7		"待命"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"--------- 每次 ---------"
 14		"離開"
 15		"關閉檔案"
-16		"播放資料夾內的下一段"
-17		"播放資料夾內的下一段（循環）"
-18		"什麼都不做"
+16		"Close file and minimize player"
+17		"播放資料夾內的下一段"
+18		"播放資料夾內的下一段（循環）"
+19		"什麼都不做"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"同一資料夾的相似檔案"
 STRING IDS_ADD_TO_PLAYLIST		"加到 MPC-BE 的播放清單"
 STRING IDS_AFTERPLAYBACK_CLOSE		"播放完後：離開"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"播放完後：總是關閉檔案"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"播放完後：什麼都不做"
 STRING IDS_AFTERPLAYBACK_EXIT		"播放完後：總是離開"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"播放完後：休眠"

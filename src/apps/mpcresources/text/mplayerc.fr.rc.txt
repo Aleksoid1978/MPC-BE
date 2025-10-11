@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"Q&uitter"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"--------- Une fois ---------"
 6		"Fermer le programme"
 7		"Mettre en veille"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"------ Tout le temps ------"
 14		"Fermer le programme"
 15		"Fermer le fichier"
-16		"Lecture du fichier suivant dans le répertoire"
-17		"Jouer le suivant dans le dossier (en boucle)"
-18		"Ne rien faire"
+16		"Close file and minimize player"
+17		"Lecture du fichier suivant dans le répertoire"
+18		"Jouer le suivant dans le dossier (en boucle)"
+19		"Ne rien faire"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"fichiers similaires du dossier"
 STRING IDS_ADD_TO_PLAYLIST		"Ajouter à la liste de lecture de MPC-BE"
 STRING IDS_AFTERPLAYBACK_CLOSE		"En fin de lecture : Fermer le programme"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"En fin de lecture : Toujours fermer le fichier"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"En fin de lecture : Ne rien faire"
 STRING IDS_AFTERPLAYBACK_EXIT		"En fin de lecture : Toujours fermer le programme"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"En fin de lecture : Mettre en veille prolongée"

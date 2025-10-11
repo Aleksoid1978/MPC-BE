@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"В&ихід"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"------- Лише раз -------"
 6		"Закрити програму"
 7		"Перейти в режим очікування"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"-------- Щоразу --------"
 14		"Закрити програму"
 15		"Закрити файл"
-16		"Відтворити наступний файл в теці"
-17		"Відтворити наступний файл в теці (у циклі)"
-18		"Нічого не робити"
+16		"Close file and minimize player"
+17		"Відтворити наступний файл в теці"
+18		"Відтворити наступний файл в теці (у циклі)"
+19		"Нічого не робити"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"подібні файли з теки"
 STRING IDS_ADD_TO_PLAYLIST		"Додати до списка відтворення MPC-BE"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Наприкінці відтворення: Закрити програму"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"Наприкінці відтворення: Завжди закривати файл"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"Наприкінці відтворення: Нічого не робити"
 STRING IDS_AFTERPLAYBACK_EXIT		"Наприкінці відтворення: Завжди закривати програму"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"Наприкінці відтворення: Перейти в режим сну"

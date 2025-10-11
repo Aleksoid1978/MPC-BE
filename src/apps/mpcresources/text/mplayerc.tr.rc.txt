@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"Ç&ıkış"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"-------- Bir Kez --------"
 6		"Çıkış"
 7		"Askıya Al"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"------- Her Zaman -------"
 14		"Çıkış"
 15		"Dosyayı Kapat"
-16		"Klasörde Sonrakini Oynat"
-17		"Klasörde Sonrakini Oynat (Klasörü Tekrarla)"
-18		"Bir İşlem Yapma"
+16		"Close file and minimize player"
+17		"Klasörde Sonrakini Oynat"
+18		"Klasörde Sonrakini Oynat (Klasörü Tekrarla)"
+19		"Bir İşlem Yapma"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"Klasördeki benzer dosyalar"
 STRING IDS_ADD_TO_PLAYLIST		"MPC-BE Oynatma Listesine Ekle"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Oynatmadan Sonra: Çıkış"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"Oynatmadan Sonra: Her Zaman Dosyayı Kapat"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"Oynatmadan Sonra: Bir İşlem Yapma"
 STRING IDS_AFTERPLAYBACK_EXIT		"Oynatmadan Sonra: Her Zaman Çıkış"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"Oynatmadan Sonra: Hazırda Beklet"

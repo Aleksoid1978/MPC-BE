@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"Sai&r"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"-------- Uma vez -------"
 6		"Sair"
 7		"Em espera"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"-------- Sempre --------"
 14		"Sair"
 15		"Fechar arquivo"
-16		"Reproduzir próximo na pasta"
-17		"Reproduzir próximo na pasta (em loop)"
-18		"Não fazer nada"
+16		"Close file and minimize player"
+17		"Reproduzir próximo na pasta"
+18		"Reproduzir próximo na pasta (em loop)"
+19		"Não fazer nada"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"arquivos semelhantes da pasta"
 STRING IDS_ADD_TO_PLAYLIST		"Adicionar à lista de reprodução do MPC-BE"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Após reprodução: Sair"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"Após reprodução: Sempre fechar arquivo"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"Após reprodução: Não fazer nada"
 STRING IDS_AFTERPLAYBACK_EXIT		"Após reprodução: Sempre sair"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"Após reprodução: Hibernar"

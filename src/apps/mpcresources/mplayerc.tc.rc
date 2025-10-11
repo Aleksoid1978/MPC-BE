@@ -2140,6 +2140,7 @@ BEGIN
         MENUITEM "--------- 每次 ---------",    ID_AFTERPLAYBACK_EVERYTIME
         MENUITEM "離開",                        ID_AFTERPLAYBACK_EXIT
         MENUITEM "關閉檔案",                  ID_AFTERPLAYBACK_CLOSE_FILE
+        MENUITEM "Close file and minimize player", ID_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE
         MENUITEM "播放資料夾內的下一段",     ID_AFTERPLAYBACK_NEXT
         MENUITEM "播放資料夾內的下一段（循環）", ID_AFTERPLAYBACK_NEXT_LOOPED
         MENUITEM "什麼都不做",                  ID_AFTERPLAYBACK_EVERYTIMEDONOTHING
@@ -3722,6 +3723,7 @@ BEGIN
     IDS_SATURATION_DEC      "減少飽和度"
     IDS_RESET_COLOR         "重設色彩設定"
     IDS_AFTERPLAYBACK_CLOSE_FILE "播放完後：總是關閉檔案"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "After Playback: Always close file and minimize player"
     IDS_UPDATE_ERROR_DATA   "更新伺服器資料錯誤。\n\n請稍後再試。"
     IDS_USING_NEWER_VERSION "您已經使用最新的穩定版本 %s"
     IDS_NEW_UPDATE_AVAILABLE  "新版本 %s 已經發佈。\n\n您要前往 MPC-BE 網站下載嗎？"

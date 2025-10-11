@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"Za&kończ"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"------ Jednorazowo ------"
 6		"&Zakończenie programu"
 7		"Przejście w stan &wstrzymania"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"------ Każdorazowo ------"
 14		"Za&kończenie programu"
 15		"Zamknij plik"
-16		"Odtworzenie następnego nagrania z &folderu"
-17		"Odtworzenie następnego nagrania z &folderu (zapętl)"
-18		"Nie rób nic"
+16		"Close file and minimize player"
+17		"Odtworzenie następnego nagrania z &folderu"
+18		"Odtworzenie następnego nagrania z &folderu (zapętl)"
+19		"Nie rób nic"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1098,6 +1099,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"podobne pliki z folderu"
 STRING IDS_ADD_TO_PLAYLIST		"Dodaj do listy odtwarzania MPC-BE"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Po zakończeniu odtwarzania: Zakończenie programu"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"Po zakończeniu odtwarzania: Zawsze zamknij plik"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"Po zakończeniu odtwarzania: Brak działania"
 STRING IDS_AFTERPLAYBACK_EXIT		"Po zakończeniu odtwarzania: Każdorazowe zakończenie programu"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"Po zakończeniu odtwarzania: Przejście w stan hibernacji"

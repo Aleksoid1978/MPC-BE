@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"Konec"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"-------- Jednou --------"
 6		"Zavřít přehrávač"
 7		"Pohotovostní režim"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"--------- Vždy ---------"
 14		"Zavřít přehrávač"
 15		"Close file"
-16		"Přehrát následující v adresáři"
-17		"Play next in the folder (looped)"
-18		"Do Nothing"
+16		"Close file and minimize player"
+17		"Přehrát následující v adresáři"
+18		"Play next in the folder (looped)"
+19		"Do Nothing"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"similar files from folder"
 STRING IDS_ADD_TO_PLAYLIST		"Přidat do playlistu MPC-BE"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Po přehrání: Zavřít přehrávač"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"After Playback: Always close file"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"Po přehrání: Nedělat nic"
 STRING IDS_AFTERPLAYBACK_EXIT		"Po přehrání: Vždy zavřít přehrávač"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"Po přehrání: Režim spánku"

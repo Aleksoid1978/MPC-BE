@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"I&eșire"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"-------- O dată --------"
 6		"Închide programul"
 7		"Intră în repaus"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"------ Întotdeauna -----"
 14		"Închide programul"
 15		"Închide fișierul"
-16		"Redă următorul fișier din dosar (din folder)"
-17		"Redă următorul fișier din dosar (din folder) (în buclă)"
-18		"Nu face nimic"
+16		"Close file and minimize player"
+17		"Redă următorul fișier din dosar (din folder)"
+18		"Redă următorul fișier din dosar (din folder) (în buclă)"
+19		"Nu face nimic"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"fișiere similare din dosar (din folder)"
 STRING IDS_ADD_TO_PLAYLIST		"Adaugă la lista de redare (la playlist) a MPC-BE"
 STRING IDS_AFTERPLAYBACK_CLOSE		"După redare: închide programul"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"După redare: închide întotdeauna fișierul"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"După redare: nicio acțiune"
 STRING IDS_AFTERPLAYBACK_EXIT		"După redare: Închide programul întotdeauna"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"După redare: Intră în hibernare"

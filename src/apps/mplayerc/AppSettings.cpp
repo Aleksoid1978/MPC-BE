@@ -512,6 +512,7 @@ void CAppSettings::ResetSettings()
 
 	fExitAfterPlayback = false;
 	bCloseFileAfterPlayback = false;
+	bCloseFileAfterPlaybackAndMinimize = false;
 	fNextInDirAfterPlayback = false;
 	fNextInDirAfterPlaybackLooped = false;
 	fDontUseSearchInFolder = false;
@@ -907,6 +908,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_EXIT_AFTER_PB, fExitAfterPlayback);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_CLOSE_FILE_AFTER_PB, bCloseFileAfterPlayback);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_CLOSE_FILE_AFTER_PB_AND_MINIMIZE, bCloseFileAfterPlaybackAndMinimize);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_NEXT_AFTER_PB, fNextInDirAfterPlayback);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_NEXT_AFTER_PB_LOOPED, fNextInDirAfterPlaybackLooped);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_NO_SEARCH_IN_FOLDER, fDontUseSearchInFolder);
@@ -1751,7 +1753,8 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_WIN7TASKBAR, fUseWin7TaskBar);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_EXIT_AFTER_PB, fExitAfterPlayback);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_CLOSE_FILE_AFTER_PB, bCloseFileAfterPlayback);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_NEXT_AFTER_PB, fNextInDirAfterPlayback);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_CLOSE_FILE_AFTER_PB_AND_MINIMIZE, bCloseFileAfterPlaybackAndMinimize);
+		profile.WriteBool(IDS_R_SETTINGS, IDS_RS_NEXT_AFTER_PB, fNextInDirAfterPlayback);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_NEXT_AFTER_PB_LOOPED, fNextInDirAfterPlaybackLooped);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_NO_SEARCH_IN_FOLDER, fDontUseSearchInFolder);
 

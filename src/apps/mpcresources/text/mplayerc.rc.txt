@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"E&xit"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"--------- Once ---------"
 6		"Exit"
 7		"Stand By"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"------ Every time ------"
 14		"Exit"
 15		"Close file"
-16		"Play next in the folder"
-17		"Play next in the folder (looped)"
-18		"Do Nothing"
+16		"Close file and minimize player"
+17		"Play next in the folder"
+18		"Play next in the folder (looped)"
+19		"Do Nothing"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"similar files from folder"
 STRING IDS_ADD_TO_PLAYLIST		"Add to MPC-BE Playlist"
 STRING IDS_AFTERPLAYBACK_CLOSE		"After Playback: Exit"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"After Playback: Always close file"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"After Playback: Do Nothing"
 STRING IDS_AFTERPLAYBACK_EXIT		"After Playback: Always exit"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"After Playback: Hibernate"

@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"I&rten"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"--------- Behin ---------"
 6		"Irten"
 7		"Egoneratu"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"------ Betik ------"
 14		"Irten"
 15		"Close file"
-16		"Irakurri agiritegiko hurrena"
-17		"Irakurri agiritegiko hurrena (bigizta)"
-18		"Ezer ez"
+16		"Close file and minimize player"
+17		"Irakurri agiritegiko hurrena"
+18		"Irakurri agiritegiko hurrena (bigizta)"
+19		"Ezer ez"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"similar files from folder"
 STRING IDS_ADD_TO_PLAYLIST		"Gehitu MPC-BE Irakur-zerrendara"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Irakurketa Ondoren: Irten"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"After Playback: Always close file"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"Irakurketa Ondoren: Ezer Ez"
 STRING IDS_AFTERPLAYBACK_EXIT		"Irakurketa Ondoren: Betik Irten"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"Irakurketa Ondoren: Neguratu"

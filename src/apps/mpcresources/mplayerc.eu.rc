@@ -2140,6 +2140,7 @@ BEGIN
         MENUITEM "------ Betik ------",    ID_AFTERPLAYBACK_EVERYTIME
         MENUITEM "Irten",                        ID_AFTERPLAYBACK_EXIT
         MENUITEM "Close file",                  ID_AFTERPLAYBACK_CLOSE_FILE
+        MENUITEM "Close file and minimize player", ID_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE
         MENUITEM "Irakurri agiritegiko hurrena",     ID_AFTERPLAYBACK_NEXT
         MENUITEM "Irakurri agiritegiko hurrena (bigizta)", ID_AFTERPLAYBACK_NEXT_LOOPED
         MENUITEM "Ezer ez",                  ID_AFTERPLAYBACK_EVERYTIMEDONOTHING
@@ -3722,6 +3723,7 @@ BEGIN
     IDS_SATURATION_DEC      "Margoasetasuna gutxitu"
     IDS_RESET_COLOR         "Berrezarri margo ezarpenak"
     IDS_AFTERPLAYBACK_CLOSE_FILE "After Playback: Always close file"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "After Playback: Always close file and minimize player"
     IDS_UPDATE_ERROR_DATA   "The update server gives the wrong data.\n\nPlease try later."
     IDS_USING_NEWER_VERSION "Jadanik azken %s erabiltzen ari zara"
     IDS_NEW_UPDATE_AVAILABLE  "%s berri bat eskuragarri dago.\n\nNahi duzu MPC-BE-ren webgunea ikusi eta hura jeistea?"

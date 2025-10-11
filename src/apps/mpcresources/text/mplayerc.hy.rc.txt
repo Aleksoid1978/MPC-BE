@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"Դ&ուրս գալ"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"--------- Մեկ անգամ ---------"
 6		"Փակել ծրագիրը"
 7		"Անցնել դադարի եղանակի"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"------ Ամեն անգամ ------"
 14		"Փակել ծրագիրը"
 15		"Close file"
-16		"Անցնել ցանկում հաջորդին"
-17		"Play next in the folder (looped)"
-18		"Do Nothing"
+16		"Close file and minimize player"
+17		"Անցնել ցանկում հաջորդին"
+18		"Play next in the folder (looped)"
+19		"Do Nothing"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"similar files from folder"
 STRING IDS_ADD_TO_PLAYLIST		"Ավելացնել MPC-BE-ի խաղացանկին"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Վերարտադրելուց հետո. Փակել"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"After Playback: Always close file"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"Վերարտադրելուց հետո. Ոչինչ չանել"
 STRING IDS_AFTERPLAYBACK_EXIT		"Վերարտադրելուց հետո. Միշտ փակել"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"Վերարտադրելուց հետո. Քնեցում"

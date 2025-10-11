@@ -2140,6 +2140,7 @@ BEGIN
         MENUITEM "------ Zakaždým ------",    ID_AFTERPLAYBACK_EVERYTIME
         MENUITEM "Zatvoriť",                        ID_AFTERPLAYBACK_EXIT
         MENUITEM "Zatvoriť súbor",                  ID_AFTERPLAYBACK_CLOSE_FILE
+        MENUITEM "Close file and minimize player", ID_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE
         MENUITEM "Prehrať ďalší v priečinku",     ID_AFTERPLAYBACK_NEXT
         MENUITEM "Prehrať ďalší v priečinku (ako v slučke)", ID_AFTERPLAYBACK_NEXT_LOOPED
         MENUITEM "Nerobiť nič",                  ID_AFTERPLAYBACK_EVERYTIMEDONOTHING
@@ -3722,6 +3723,7 @@ BEGIN
     IDS_SATURATION_DEC      "Znížiť sýtosť"
     IDS_RESET_COLOR         "Obnoviť nastavenia farby"
     IDS_AFTERPLAYBACK_CLOSE_FILE "Po prehratí: Vždy zatvoriť súbor"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "After Playback: Always close file and minimize player"
     IDS_UPDATE_ERROR_DATA   "Aktualizačný server poskytuje nesprávne údaje.\n\nSkúste to neskôr."
     IDS_USING_NEWER_VERSION "Už používate najnovšiu verziu %s."
     IDS_NEW_UPDATE_AVAILABLE  "K dispozícii je nový %s.\n\nChcete navštíviť webovú stránku MPC-BE a stiahnuť si ho?"

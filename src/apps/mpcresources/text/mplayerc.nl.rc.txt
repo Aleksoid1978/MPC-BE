@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"Afsluiten"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"------- Eenmalig -------"
 6		"Venster afsluiten"
 7		"Standby"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"-------- Altijd --------"
 14		"Venster afsluiten"
 15		"Bestand sluiten"
-16		"Volgende in de map afspelen"
-17		"Volgende in de map afspelen (in lus)"
-18		"Niets doen"
+16		"Close file and minimize player"
+17		"Volgende in de map afspelen"
+18		"Volgende in de map afspelen (in lus)"
+19		"Niets doen"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"Dergelijke bestanden in de map"
 STRING IDS_ADD_TO_PLAYLIST		"Aan afspeellijst van MPC-BE toevoegen"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Na weergave: Venster afsluiten"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"Na weergave: Altijd bestand sluiten"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"Na weergave: Niets doen"
 STRING IDS_AFTERPLAYBACK_EXIT		"Na weergave: Altijd venster afsluiten"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"Na weergave: Sluimerstand"

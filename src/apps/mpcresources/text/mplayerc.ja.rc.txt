@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"終了(&X)"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"──── 今回のみ ────"
 6		"終了"
 7		"スタンバイ"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"───── 毎回 ─────"
 14		"終了"
 15		"ファイルを閉じる"
-16		"フォルダー内を順次再生"
-17		"フォルダー内を順次再生 (ループ)"
-18		"何もしない"
+16		"Close file and minimize player"
+17		"フォルダー内を順次再生"
+18		"フォルダー内を順次再生 (ループ)"
+19		"何もしない"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"フォルダーから類似ファイル"
 STRING IDS_ADD_TO_PLAYLIST		"MPC-BE プレイリストに追加"
 STRING IDS_AFTERPLAYBACK_CLOSE		"再生終了後: 終了"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"再生終了後: 常にファイルを閉じる"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"再生終了後: 何もしない"
 STRING IDS_AFTERPLAYBACK_EXIT		"再生終了後: 常に終了"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"再生終了後: 休止状態"

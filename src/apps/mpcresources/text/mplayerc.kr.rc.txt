@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"종료(&X)"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"--------- 이번 재생 시만 ---------"
 6		"종료 "
 7		"대기 모드"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"------ 모든 재생 시 ------"
 14		"종료"
 15		"파일 닫기"
-16		"폴더의 다음 파일 재생"
-17		"폴더의 다음 파일 재생(반복)"
-18		"작업 안 함"
+16		"Close file and minimize player"
+17		"폴더의 다음 파일 재생"
+18		"폴더의 다음 파일 재생(반복)"
+19		"작업 안 함"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"폴더 내 유사 파일"
 STRING IDS_ADD_TO_PLAYLIST		"MPC-BE 재생 목록에 추가"
 STRING IDS_AFTERPLAYBACK_CLOSE		"재생이 끝나면 : 종료"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"재생이 끝나면 : 항상 파일 닫기"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"재생이 끝나면 : 아무것도 하지 않음"
 STRING IDS_AFTERPLAYBACK_EXIT		"재생이 끝나면 : 항상 종료"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"재생이 끝나면 : 컴퓨터 대기 모드"

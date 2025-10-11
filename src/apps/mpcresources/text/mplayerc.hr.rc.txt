@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"I&zlaz"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"--------- Jedanput ---------"
 6		"Izlaz"
 7		"Pripravno"
@@ -992,9 +992,10 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"------ Svaki puta ------"
 14		"Izlaz"
 15		"Zatvori datoteku"
-16		"Prikaži sljedeće u mapi"
-17		"Prikaži sljedeće u mapi (unedogled)"
-18		"Bez interakcije"
+16		"Close file and minimize player"
+17		"Prikaži sljedeće u mapi"
+18		"Prikaži sljedeće u mapi (unedogled)"
+19		"Bez interakcije"
 END
 
 BEGIN MENU IDR_POPUP_NAVIGATE LINES 16
@@ -1101,6 +1102,7 @@ STRING IDS_ADDTOPLS_FROMDIR_SIMILAR		"slične datoteke iz mape"
 STRING IDS_ADD_TO_PLAYLIST		"Dodaj u MPC-BE Playlistu"
 STRING IDS_AFTERPLAYBACK_CLOSE		"Nakon Reprodukcije: Izlaz"
 STRING IDS_AFTERPLAYBACK_CLOSE_FILE		"Nakon Playbacka: Uvijek zatvori datoteku"
+STRING IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE		"After Playback: Always close file and minimize player"
 STRING IDS_AFTERPLAYBACK_DONOTHING		"Nakon Reprodukcije: Bez interakcije"
 STRING IDS_AFTERPLAYBACK_EXIT		"Nakon Reprodukcije: Uvijek izlaz"
 STRING IDS_AFTERPLAYBACK_HIBERNATE		"Nakon Reprodukcije: Hibernacija"

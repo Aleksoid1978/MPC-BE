@@ -3067,6 +3067,10 @@ bool CMainFrame::DoAfterPlaybackEvent()
 	} else if (s.bCloseFileAfterPlayback) {
 		SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 		return true;
+	} else if (s.bCloseFileAfterPlaybackAndMinimize) {
+		SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+		ShowWindow(SW_MINIMIZE);
+		return true;
 	}
 
 	return bExit;
@@ -9411,6 +9415,7 @@ void CMainFrame::OnAfterplayback(UINT nID)
 		case ID_AFTERPLAYBACK_NEXT:
 			s.fExitAfterPlayback = false;
 			s.bCloseFileAfterPlayback = false;
+			s.bCloseFileAfterPlaybackAndMinimize = false;
 			s.fNextInDirAfterPlayback = true;
 			s.fNextInDirAfterPlaybackLooped = false;
 			osdMsg = ResStr(IDS_AFTERPLAYBACK_NEXT);
@@ -9418,6 +9423,7 @@ void CMainFrame::OnAfterplayback(UINT nID)
 		case ID_AFTERPLAYBACK_NEXT_LOOPED:
 			s.fExitAfterPlayback = false;
 			s.bCloseFileAfterPlayback = false;
+			s.bCloseFileAfterPlaybackAndMinimize = false;
 			s.fNextInDirAfterPlayback = true;
 			s.fNextInDirAfterPlaybackLooped = true;
 			osdMsg = ResStr(IDS_AFTERPLAYBACK_NEXT);
@@ -9425,6 +9431,7 @@ void CMainFrame::OnAfterplayback(UINT nID)
 		case ID_AFTERPLAYBACK_EXIT:
 			s.fExitAfterPlayback = true;
 			s.bCloseFileAfterPlayback = false;
+			s.bCloseFileAfterPlaybackAndMinimize = false;
 			s.fNextInDirAfterPlayback = false;
 			s.fNextInDirAfterPlaybackLooped = false;
 			osdMsg = ResStr(IDS_AFTERPLAYBACK_EXIT);
@@ -9432,13 +9439,23 @@ void CMainFrame::OnAfterplayback(UINT nID)
 		case ID_AFTERPLAYBACK_CLOSE_FILE:
 			s.fExitAfterPlayback = false;
 			s.bCloseFileAfterPlayback = true;
+			s.bCloseFileAfterPlaybackAndMinimize = false;
 			s.fNextInDirAfterPlayback = false;
 			s.fNextInDirAfterPlaybackLooped = false;
 			osdMsg = ResStr(IDS_AFTERPLAYBACK_CLOSE_FILE);
 			break;
+		case ID_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE:
+			s.fExitAfterPlayback = false;
+			s.bCloseFileAfterPlayback = false;
+			s.bCloseFileAfterPlaybackAndMinimize = true;
+			s.fNextInDirAfterPlayback = false;
+			s.fNextInDirAfterPlaybackLooped = false;
+			osdMsg = ResStr(IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE);
+			break;
 		case ID_AFTERPLAYBACK_EVERYTIMEDONOTHING:
 			s.fExitAfterPlayback = false;
 			s.bCloseFileAfterPlayback = false;
+			s.bCloseFileAfterPlaybackAndMinimize = false;
 			s.fNextInDirAfterPlayback = false;
 			s.fNextInDirAfterPlaybackLooped = false;
 			osdMsg = ResStr(IDS_AFTERPLAYBACK_DONOTHING);
@@ -9480,6 +9497,9 @@ void CMainFrame::OnUpdateAfterplayback(CCmdUI* pCmdUI)
 			break;
 		case ID_AFTERPLAYBACK_CLOSE_FILE:
 			bChecked = !!s.bCloseFileAfterPlayback;
+			break;
+		case ID_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE:
+			bChecked = !!s.bCloseFileAfterPlaybackAndMinimize;
 			break;
 		case ID_AFTERPLAYBACK_NEXT:
 			bChecked = !!s.fNextInDirAfterPlayback && !s.fNextInDirAfterPlaybackLooped;
