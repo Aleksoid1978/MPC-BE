@@ -4138,7 +4138,7 @@ static int hevc_sei_to_context(AVCodecContext *avctx, HEVCSEI *sei)
 {
     int ret;
 
-    if (sei->tdrdi.num_ref_displays) {
+    if (sei->tdrdi.present) {
         AVBufferRef *buf;
         size_t size;
         AV3DReferenceDisplaysInfo *tdrdi = av_tdrdi_alloc(sei->tdrdi.num_ref_displays, &size);

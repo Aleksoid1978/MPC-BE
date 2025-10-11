@@ -40,6 +40,12 @@
 #    define AV_HAS_BUILTIN(x) 0
 #endif
 
+#ifdef __has_attribute
+#    define AV_HAS_ATTRIBUTE(x) __has_attribute(x)
+#else
+#    define AV_HAS_ATTRIBUTE(x) 0
+#endif
+
 #if defined(__cplusplus) && defined(__has_cpp_attribute)
 #    define AV_HAS_STD_ATTRIBUTE(x) __has_cpp_attribute(x)
 #elif !defined(__cplusplus) && defined(__has_c_attribute)
@@ -172,11 +178,36 @@
 
 #if defined(__GNUC__) || defined(__clang__)
 #    define av_builtin_constant_p __builtin_constant_p
-#    define av_printf_format(fmtpos, attrpos) __attribute__((__format__(__printf__, fmtpos, attrpos)))
-#    define av_scanf_format(fmtpos, attrpos) __attribute__((__format__(__scanf__, fmtpos, attrpos)))
 #else
 #    define av_builtin_constant_p(x) 0
+#endif
+
+// for __MINGW_PRINTF_FORMAT and __MINGW_SCANF_FORMAT
+#ifdef __MINGW32__
+#    include <stdio.h>
+#endif
+
+#ifdef __MINGW_PRINTF_FORMAT
+#    define AV_PRINTF_FMT __MINGW_PRINTF_FORMAT
+#elif AV_HAS_ATTRIBUTE(format)
+#    define AV_PRINTF_FMT __printf__
+#endif
+
+#ifdef __MINGW_SCANF_FORMAT
+#    define AV_SCANF_FMT __MINGW_SCANF_FORMAT
+#elif AV_HAS_ATTRIBUTE(format)
+#    define AV_SCANF_FMT __scanf__
+#endif
+
+#ifdef AV_PRINTF_FMT
+#    define av_printf_format(fmtpos, attrpos) __attribute__((format(AV_PRINTF_FMT, fmtpos, attrpos)))
+#else
 #    define av_printf_format(fmtpos, attrpos)
+#endif
+
+#ifdef AV_SCANF_FMT
+#    define av_scanf_format(fmtpos, attrpos) __attribute__((format(AV_SCANF_FMT, fmtpos, attrpos)))
+#else
 #    define av_scanf_format(fmtpos, attrpos)
 #endif
 
