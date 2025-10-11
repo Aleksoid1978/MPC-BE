@@ -21,6 +21,12 @@ Added support for Advanced Professional Video (APV).
 MPCVideoDec
 The D3D11 hardware decoder for HEVC 4:4:4 10/16 bit will not be used for madVR because the renderer does not support it.
 
+YouTube
+The built-in parser now ignores audio tracks with automatic machine translation.
+
+Subtitles
+Implemented a workaround for a bug in some VSFilters where it resets the selected subtitle track after changing one of the subtitle files.
+
 Player
 Various interface fixes.
 
