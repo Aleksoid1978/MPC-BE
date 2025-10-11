@@ -1765,8 +1765,8 @@ STRING IDS_OSD_RS_AMBIENT_LIGHT_DARK		"Lumină ambientală: Întunecat (2.4 Gamm
 STRING IDS_OSD_RS_AMBIENT_LIGHT_DIM		"Lumină ambientală: Estompat (2.35 Gamma)"
 STRING IDS_OSD_RS_COLOR_MANAGEMENT_OFF		"Administrarea culorilor: Oprită"
 STRING IDS_OSD_RS_COLOR_MANAGEMENT_ON		"Administrarea culorilor: Pornită"
-STRING IDS_OSD_RS_EXCLUSIVE_FSCREEN_OFF		"Ecran complet exclusiv (pe tot ecranul exclusiv): Oprit"
-STRING IDS_OSD_RS_EXCLUSIVE_FSCREEN_ON		"Ecran complet exclusiv (pe tot ecranul exclusiv): Pornit"
+STRING IDS_OSD_RS_EXCLUSIVE_FSCREEN_OFF		"Ecran complet exclusiv (Pe tot ecranul exclusiv): Oprit"
+STRING IDS_OSD_RS_EXCLUSIVE_FSCREEN_ON		"Ecran complet exclusiv (Pe tot ecranul exclusiv): Pornit"
 STRING IDS_OSD_RS_FLUSH_AFT_PRES_OFF		"Golește GPU-ul după prezentare: Oprit"
 STRING IDS_OSD_RS_FLUSH_AFT_PRES_ON		"Golește GPU-ul după prezentare: Pornit"
 STRING IDS_OSD_RS_FLUSH_BEF_VSYNC_OFF		"Golește GPU-ul înainte de VSync (Sincronizare verticală): Oprit"
@@ -2117,4 +2117,5 @@ STRING ID_SHOW_MILLISECONDS		"Afișează milisecundele"
 STRING ID_VOLUME_MUTE		"Mut\nMut"
 STRING ID_VOLUME_MUTE_DISABLED		"Fără sunet (Silențios)\nFără sunet (Silențios)"
 STRING ID_VOLUME_MUTE_OFF		"Activează sunetul\nActivează sunetul"
+
 
