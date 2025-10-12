@@ -359,7 +359,7 @@ BEGIN
     CONTROL         "Oluşturulamayan bağlantıları rapor et",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,179,276,9
     CONTROL         "Oynatma listesindeki seçili parçaları hatırla",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,191,276,9
     CONTROL         "Hızlı arama (ref. karede)",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,209,264,9
-    CONTROL         "Küçültüldüğünde video oynatmayı duraklat",IDC_CHECK5,
+    CONTROL         "Simge durumuna küçültüldüğünde oynatmayı duraklat",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,221,280,9
 END
 
@@ -2140,7 +2140,7 @@ BEGIN
         MENUITEM "------- Her Zaman -------",    ID_AFTERPLAYBACK_EVERYTIME
         MENUITEM "Çıkış",                        ID_AFTERPLAYBACK_EXIT
         MENUITEM "Dosyayı Kapat",                  ID_AFTERPLAYBACK_CLOSE_FILE
-        MENUITEM "Close file and minimize player", ID_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE
+        MENUITEM "Dosyayı Kapat ve Oynatıcıyı Simge Durumuna Küçült", ID_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE
         MENUITEM "Klasörde Sonrakini Oynat",     ID_AFTERPLAYBACK_NEXT
         MENUITEM "Klasörde Sonrakini Oynat (Klasörü Tekrarla)", ID_AFTERPLAYBACK_NEXT_LOOPED
         MENUITEM "Bir İşlem Yapma",                  ID_AFTERPLAYBACK_EVERYTIMEDONOTHING
@@ -3723,7 +3723,7 @@ BEGIN
     IDS_SATURATION_DEC      "Doygunluğu Azalt"
     IDS_RESET_COLOR         "Renk Ayarlarını Sıfırla"
     IDS_AFTERPLAYBACK_CLOSE_FILE "Oynatmadan Sonra: Her Zaman Dosyayı Kapat"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "After Playback: Always close file and minimize player"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "Oynatmadan Sonra: Dosyayı Kapat ve Oynatıcıyı Simge Durumuna Küçült"
     IDS_UPDATE_ERROR_DATA   "Güncelleştirme sunucusu yanlış veri veriyor.\n\nLütfen daha sonra deneyin."
     IDS_USING_NEWER_VERSION "Zaten son sürümü kullanıyorsunuz: %s."
     IDS_NEW_UPDATE_AVAILABLE  "Yeni %s mevcut.\n\nYeni sürümü indirmek için MPC-BE sitesini ziyaret etmek istiyor musunuz?"
@@ -3798,7 +3798,7 @@ BEGIN
     IDS_AFTERPLAYBACK_LOCK  "Oynatmadan Sonra: Kilitle"
     IDS_AFTERPLAYBACK_EXIT  "Oynatmadan Sonra: Her Zaman Çıkış"
     IDS_AFTERPLAYBACK_DONOTHING "Oynatmadan Sonra: Bir İşlem Yapma"
-    IDS_AFTERPLAYBACK_NEXT  "Oynatmadan Sonra: Klasörde Sıradakini Oynat"
+    IDS_AFTERPLAYBACK_NEXT  "Oynatmadan Sonra: Klasörde Sonrakini Oynat"
     IDS_OSD_BRIGHTNESS      "Parlaklık: %s"
     IDS_OSD_CONTRAST        "Karşıtlık: %s"
     IDS_OSD_HUE             "Tonlama: %s°"
