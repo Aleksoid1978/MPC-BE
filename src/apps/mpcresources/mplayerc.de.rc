@@ -2140,7 +2140,7 @@ BEGIN
         MENUITEM "---------------- Standard-Aktion ----------------",    ID_AFTERPLAYBACK_EVERYTIME
         MENUITEM "App &beenden",                        ID_AFTERPLAYBACK_EXIT
         MENUITEM "&Datei schließen",                  ID_AFTERPLAYBACK_CLOSE_FILE
-        MENUITEM "Close file and minimize player", ID_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE
+        MENUITEM "Datei schließen und App minimieren", ID_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE
         MENUITEM "N&ächste Datei im Ordner wiedergeben",     ID_AFTERPLAYBACK_NEXT
         MENUITEM "Nächste Datei im Ordner wiedergeben (Schle&ife)", ID_AFTERPLAYBACK_NEXT_LOOPED
         MENUITEM "&Keine Aktion",                  ID_AFTERPLAYBACK_EVERYTIMEDONOTHING
@@ -2452,7 +2452,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_SUBTITLES_SYSTEM_CODEPAGE "Systemcodepage - %u"
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "Codepage des Systems - %u"
     IDS_FRAME_HALF          "Halbe Größe"
     IDS_FRAME_NORMAL        "Normale Größe"
     IDS_FRAME_DOUBLE        "Doppelte Größe"
@@ -3723,7 +3723,7 @@ BEGIN
     IDS_SATURATION_DEC      "Sättigung verringern"
     IDS_RESET_COLOR         "Farbeinstellungen zurücksetzen"
     IDS_AFTERPLAYBACK_CLOSE_FILE "Nach Wiedergabe: Immer Datei schließen"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "After Playback: Always close file and minimize player"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "Nach Wiedergabe: Immer Datei schließen und App minimieren"
     IDS_UPDATE_ERROR_DATA   "Der Update-Server hat falsche Daten ausgegeben.\n\nBitte versuchen Sie es später erneut."
     IDS_USING_NEWER_VERSION "Sie verwenden bereits die aktuelle Version %s"
     IDS_NEW_UPDATE_AVAILABLE  "Eine neue Version %s ist verfügbar.\n\nWollen Sie die Webseite von MPC-BE aufrufen, um die neue Version herunterzuladen?"

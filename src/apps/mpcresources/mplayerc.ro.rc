@@ -1700,7 +1700,7 @@ BEGIN
             MENUITEM SEPARATOR
             POPUP "Prezentare"
             BEGIN
-                MENUITEM "Ecran complet (Pe tot ecranul) exclusiv",        ID_VIEW_EXCLUSIVE_FULLSCREEN
+                MENUITEM "Ecran complet exclusiv (Pe tot ecranul exclusiv)",        ID_VIEW_EXCLUSIVE_FULLSCREEN
                 MENUITEM "Activează corecția de timp pentru cadru",   ID_VIEW_ENABLEFRAMETIMECORRECTION
             END
             MENUITEM "Revino la setările implicite ale randorului", ID_VIEW_RESET_DEFAULT
@@ -1881,7 +1881,7 @@ BEGIN
             MENUITEM SEPARATOR
             POPUP "Prezentare"
             BEGIN
-                MENUITEM "Ecran complet (Pe tot ecranul) exclusiv",        ID_VIEW_EXCLUSIVE_FULLSCREEN
+                MENUITEM "Ecran complet exclusiv (Pe tot ecranul exclusiv)",        ID_VIEW_EXCLUSIVE_FULLSCREEN
                 MENUITEM "Activează corecția de timp pentru cadru",   ID_VIEW_ENABLEFRAMETIMECORRECTION
             END
             MENUITEM "Revino la setările implicite ale randorului", ID_VIEW_RESET_DEFAULT
@@ -1968,7 +1968,7 @@ BEGIN
                 MENUITEM SEPARATOR
                 POPUP "Prezentare"
                 BEGIN
-                    MENUITEM "Ecran complet (Pe tot ecranul) exclusiv",        ID_VIEW_EXCLUSIVE_FULLSCREEN
+                    MENUITEM "Ecran complet exclusiv (Pe tot ecranul exclusiv)",        ID_VIEW_EXCLUSIVE_FULLSCREEN
                     MENUITEM "Activează corecția de timp pentru cadru",   ID_VIEW_ENABLEFRAMETIMECORRECTION
                 END
                 MENUITEM "Revino la setările implicite ale randorului", ID_VIEW_RESET_DEFAULT
@@ -2048,7 +2048,7 @@ BEGIN
             MENUITEM SEPARATOR
             POPUP "Prezentare"
             BEGIN
-                MENUITEM "Ecran complet (Pe tot ecranul) exclusiv",        ID_VIEW_EXCLUSIVE_FULLSCREEN
+                MENUITEM "Ecran complet exclusiv (Pe tot ecranul exclusiv)",        ID_VIEW_EXCLUSIVE_FULLSCREEN
                 MENUITEM "Activează corecția de timp pentru cadru",   ID_VIEW_ENABLEFRAMETIMECORRECTION
             END
             MENUITEM "Revino la setările implicite ale randorului", ID_VIEW_RESET_DEFAULT
@@ -2139,7 +2139,7 @@ BEGIN
         MENUITEM "------ Întotdeauna -----",    ID_AFTERPLAYBACK_EVERYTIME
         MENUITEM "Închide programul",                        ID_AFTERPLAYBACK_EXIT
         MENUITEM "Închide fișierul",                  ID_AFTERPLAYBACK_CLOSE_FILE
-        MENUITEM "Close file and minimize player", ID_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE
+        MENUITEM "Închide fișierul și minimizează playerul", ID_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE
         MENUITEM "Redă următorul fișier din dosar (din folder)",     ID_AFTERPLAYBACK_NEXT
         MENUITEM "Redă următorul fișier din dosar (din folder) (în buclă)", ID_AFTERPLAYBACK_NEXT_LOOPED
         MENUITEM "Nu face nimic",                  ID_AFTERPLAYBACK_EVERYTIMEDONOTHING
@@ -3010,7 +3010,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_MPLAYERC_99         "Comută în modul ecran complet (pe tot ecranul) exclusiv"
+    IDS_MPLAYERC_99         "Comută în modul ecran complet exclusiv (pe tot ecranul exclusiv)"
     IDS_MPLAYERC_100        "Mergi la subtitrarea anterioară"
     IDS_MPLAYERC_101        "Mergi la subtitrarea următoare"
     IDS_MPLAYERC_102        "Deplasează subtitrarea la stânga"
@@ -3692,8 +3692,8 @@ BEGIN
     IDS_OSD_RS_FLUSH_AFT_PRES_OFF "Golește GPU-ul după prezentare: Oprit"
     IDS_OSD_RS_WAIT_ON      "Așteptarea pentru golirea GPU-ului: Pornită"
     IDS_OSD_RS_WAIT_OFF     "Așteptarea pentru golirea GPU-ului: Oprită"
-    IDS_OSD_RS_EXCLUSIVE_FSCREEN_ON "Ecran complet (pe tot ecranul) exclusiv: Pornit"
-    IDS_OSD_RS_EXCLUSIVE_FSCREEN_OFF "Ecran complet (pe tot ecranul) exclusiv: Oprit"
+    IDS_OSD_RS_EXCLUSIVE_FSCREEN_ON "Ecran complet exclusiv (Pe tot ecranul exclusiv): Pornit"
+    IDS_OSD_RS_EXCLUSIVE_FSCREEN_OFF "Ecran complet exclusiv (Pe tot ecranul exclusiv): Oprit"
 END
 
 STRINGTABLE
@@ -3722,7 +3722,7 @@ BEGIN
     IDS_SATURATION_DEC      "Micșorează saturația"
     IDS_RESET_COLOR         "Resetează setările de culoare"
     IDS_AFTERPLAYBACK_CLOSE_FILE "După redare: închide întotdeauna fișierul"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "After Playback: Always close file and minimize player"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "După redare: întotdeauna închide fișierul și minimizează playerul"
     IDS_UPDATE_ERROR_DATA   "Serverul pentru actualizare oferă date greșite.\n\nTe rugăm să încerci mai târziu."
     IDS_USING_NEWER_VERSION "Deja folosești ultima versiune %s."
     IDS_NEW_UPDATE_AVAILABLE  "O nouă %s este disponibilă.\n\nVrei să vizitezi site-ul programului MPC-BE ca să o descarci?"
