@@ -9508,7 +9508,7 @@ void CMainFrame::OnUpdateAfterplayback(CCmdUI* pCmdUI)
 			bChecked = !!s.fNextInDirAfterPlayback && !!s.fNextInDirAfterPlaybackLooped;
 			break;
 		case ID_AFTERPLAYBACK_EVERYTIMEDONOTHING:
-			bChecked = !s.fExitAfterPlayback && !s.fNextInDirAfterPlayback && !s.bCloseFileAfterPlayback;
+			bChecked = !s.fExitAfterPlayback && !s.fNextInDirAfterPlayback && !s.bCloseFileAfterPlayback && !s.bCloseFileAfterPlaybackAndMinimize;
 			break;
 	}
 
