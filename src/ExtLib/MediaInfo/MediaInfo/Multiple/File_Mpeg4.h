@@ -251,6 +251,7 @@ private :
     void moov_trak_mdia_minf_stbl_stsd_xxxx_ddts();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_dfLa();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_dmlp();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_dOps();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_dvc1();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_dvcC();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_dvvC() {moov_trak_mdia_minf_stbl_stsd_xxxx_dvcC();}
@@ -292,6 +293,7 @@ private :
     void moov_trak_mdia_minf_stbl_stsd_xxxx_vexu_eyes_hero();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_vexu_eyes_stri();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_vexu_must();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_vpcC();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_vvcC();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_wave();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_wave_acbf();

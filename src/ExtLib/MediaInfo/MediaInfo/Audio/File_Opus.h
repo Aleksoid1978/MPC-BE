@@ -33,6 +33,10 @@ class File_Opus : public File__Analyze
 public :
     File_Opus();
 
+    //In
+    bool FromMP4{};
+    bool FromIamf{};
+
 private :
     //Buffer - Per element
     void Header_Parse();
@@ -41,6 +45,11 @@ private :
     //Elements
     void Identification();
     void Stream();
+
+    //Helpers
+    void Get_X2(int16u& Info, const char* Name);
+    void Get_X4(int32u& Info, const char* Name);
+    void Skip_X2(const char* Name);
 
     //Temp
     bool Identification_Done;

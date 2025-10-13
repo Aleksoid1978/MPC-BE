@@ -183,6 +183,35 @@ static const sized_array_string Ac4_content_classifier=
     "Associate", //Generic "Associate"
 };
 
+static string Ac4_Language(const string& language_tag_bytes) {
+    if (language_tag_bytes == "qaa") {
+        return "Original version";
+    }
+    return MediaInfoLib::Config.Iso639_Translate(Ztring().From_UTF8(language_tag_bytes)).To_UTF8();
+}
+
+static const char* Ac4_content_classifier_ext(const string& language_tag_bytes)
+{
+    if (language_tag_bytes.size() != 3) {
+        return nullptr;
+    }
+    #define CC3(_A,_B,_C) ((_A<<16)|(_B<<8)|(_C))
+    auto Language = CC3(language_tag_bytes[0], language_tag_bytes[1], language_tag_bytes[2]);
+    const char* ToAdd;
+    #define CC3_MAP(_A,_B,_C,_D) case CC3(_A, _B, _C): return _D;
+    switch (Language) {
+        CC3_MAP('q', 'a', 's', "audio description with spoken subtitles, decoder mix");
+        CC3_MAP('q', 't', 'x', "audio description with spoken subtitles, premix");
+        CC3_MAP('q', 'a', 'd', "audio description, decoder mix");
+        CC3_MAP('q', 'a', 'x', "audio description, premix");
+        CC3_MAP('q', 's', 's', "spoken subtitles, decoder mix");
+        CC3_MAP('q', 's', 'x', "spoken subtitles, premix");
+        CC3_MAP('q', 'e', 'i', "audio emergency information, decoder mix");
+        CC3_MAP('q', 'e', 'x', "audio emergency information, premix");
+        default: return nullptr;
+    }
+}
+
 static const sized_array_string Ac4_ch_mode_String=
 {
     (const char*)16,
@@ -1195,6 +1224,18 @@ void File_Ac4::Streams_Fill()
         Fill(Stream_Audio, 0, "NumberOfGroups", Groups.size());
     if (!AudioSubstreams.empty())
         Fill(Stream_Audio, 0, "NumberOfSubstreams", AudioSubstreams.size());
+    auto BitstreamLevel = 7;
+    const auto numPresentations = Presentations.size();
+    if (numPresentations <= 64)
+    {
+        for (const auto& Presentation : Presentations) {
+            if ((Presentation.b_multi_pid_PresentAndValue && Presentation.b_multi_pid_PresentAndValue != (int8u)-1) || Presentation.mdcompat > 4) {
+                continue;
+            }
+            BitstreamLevel = min(Presentation.mdcompat == 4 ? 4 : 3, BitstreamLevel);
+        }
+    }
+    Fill(Stream_Audio, 0, "BitstreamLevel", BitstreamLevel);
 
     for (size_t p=0; p<Presentations.size(); p++)
     {
@@ -1281,9 +1322,32 @@ void File_Ac4::Streams_Fill()
         //Summary language
         if (!Presentation_Current.Language.empty())
         {
-            Summary+=" (";
-            Summary+=MediaInfoLib::Config.Iso639_Translate(Ztring().From_UTF8(Presentation_Current.Language)).To_UTF8();
-            Summary+=')';
+            string LanguageString;
+            LanguageString+=" (";
+            LanguageString+=Ac4_Language(Presentation_Current.Language);
+            LanguageString+=')';
+            auto MainPos=Summary.find("Main");
+            auto DialoguePos=Summary.find("Dialogue");
+            auto AssociatePos=Summary.find("Associate");
+            size_t InsertPoint;
+            if (MainPos!=string::npos)
+                InsertPoint=MainPos+4;
+            else if (DialoguePos!=string::npos)
+                InsertPoint=MainPos+8;
+            else
+                InsertPoint=Summary.size();
+            Summary.insert(InsertPoint, LanguageString);
+            if (AssociatePos!=string::npos && !Presentation_Current.substream_group_info_specifiers.empty())
+            {
+                const group& Group=Groups[Presentation_Current.substream_group_info_specifiers.back()];
+                auto ClassifierExt=Ac4_content_classifier_ext(Group.ContentInfo.language_tag_bytes);
+                if (ClassifierExt)
+                {
+                    Summary+=" (";
+                    Summary+=ClassifierExt;
+                    Summary+=')';
+                }
+            }
         }
         if (Summary.empty())
             Summary='?';
@@ -1297,6 +1361,8 @@ void File_Ac4::Streams_Fill()
         Fill_SetOptions(Stream_Audio, 0, (P+" Index").c_str(), "N NIY");
         if (Presentation_Current.presentation_id!=(int32u)-1)
             Fill(Stream_Audio, 0, (P+" PresentationID").c_str(), Presentation_Current.presentation_id);
+        if (Presentation_Current.mdcompat != (int8u)-1)
+            Fill(Stream_Audio, 0, (P+" PresentationLevel").c_str(), Presentation_Current.mdcompat);
         if (!ChannelMode.empty())
         {
             Fill(Stream_Audio, 0, (P+" ChannelMode").c_str(), ChannelMode);
@@ -1319,7 +1385,7 @@ void File_Ac4::Streams_Fill()
         if (!Presentation_Current.Language.empty())
         {
             Fill(Stream_Audio, 0, (P+" Language").c_str(), Presentation_Current.Language);
-            Fill(Stream_Audio, 0, (P+" Language/String").c_str(), MediaInfoLib::Config.Iso639_Translate(Ztring().From_UTF8(Presentation_Current.Language)));
+            Fill(Stream_Audio, 0, (P+" Language/String").c_str(), Ac4_Language(Presentation_Current.Language));
             Fill_SetOptions(Stream_Audio, 0, (P+" Language").c_str(), "N NTY");
             Fill_SetOptions(Stream_Audio, 0, (P+" Language/String").c_str(), "Y NTN");
         }
@@ -1511,15 +1577,31 @@ void File_Ac4::Streams_Fill()
                 Summary+=" / ";
             Summary+=*PresentationConfig;
         }
+        bool SkipLanguage = false;
+        if (!Group.ContentInfo.language_tag_bytes.empty()) {
+            auto ClassifierExt = Ac4_content_classifier_ext(Group.ContentInfo.language_tag_bytes);
+            Summary += " (";
+            if (ClassifierExt) {
+                Summary += ClassifierExt;
+                SkipLanguage = true;
+            }
+            else {
+                Summary += Ac4_Language(Group.ContentInfo.language_tag_bytes);
+            }
+            Summary += ')';
+        }
         Fill(Stream_Audio, 0, G.c_str(), Summary);
         Fill(Stream_Audio, 0, (G+" Pos").c_str(), g);
         Fill_SetOptions(Stream_Audio, 0, (G+" Pos").c_str(), "N NIY");
         if (Group.ContentInfo.content_classifier!=(int8u)-1)
-            Fill(Stream_Audio, 0, (G+" Classifier").c_str(), Value(Ac4_content_classifier, Group.ContentInfo.content_classifier));
-        if (!Group.ContentInfo.language_tag_bytes.empty())
+        {
+            auto Classifier = Value(Ac4_content_classifier, Group.ContentInfo.content_classifier);
+            Fill(Stream_Audio, 0, (G+" Classifier").c_str(), Classifier);
+        }
+        if (!Group.ContentInfo.language_tag_bytes.empty() && !SkipLanguage)
         {
             Fill(Stream_Audio, 0, (G+" Language").c_str(), Group.ContentInfo.language_tag_bytes);
-            Fill(Stream_Audio, 0, (G+" Language/String").c_str(), MediaInfoLib::Config.Iso639_Translate(Ztring().From_UTF8(Group.ContentInfo.language_tag_bytes)));
+            Fill(Stream_Audio, 0, (G+" Language/String").c_str(), Ac4_Language(Group.ContentInfo.language_tag_bytes));
             Fill_SetOptions(Stream_Audio, 0, (G+" Language").c_str(), "N NTY");
             Fill_SetOptions(Stream_Audio, 0, (G+" Language/String").c_str(), "Y NTN");
         }
@@ -2376,7 +2458,7 @@ void File_Ac4::ac4_presentation_info(presentation& P)
     }
     else
     {
-        Skip_S1(3,                                              "mdcompat");
+        Get_S1 (3, P.mdcompat,                                  "mdcompat");
 
         TEST_SB_SKIP(                                           "b_presentation_id");
             Get_V4 (2, P.presentation_id,                       "presentation_id");
@@ -2494,7 +2576,7 @@ void File_Ac4::ac4_presentation_v1_info(presentation& P)
     else
     {
         if (bitstream_version!=1)
-            Skip_S1(3,                                          "mdcompat");
+            Get_S1 (3, P.mdcompat,                              "mdcompat");
         TEST_SB_SKIP(                                           "b_presentation_id");
             Get_V4 (2, P.presentation_id,                       "presentation_id");
         TEST_SB_END();
@@ -4865,7 +4947,7 @@ void File_Ac4::ac4_presentation_v1_dsi(presentation& P)
         if (P.presentation_config==0x1F)
             P.presentation_config=(int8u)-1; // 0x1F means not present
         int8u dsi_frame_rate_multiply_info, dsi_frame_rate_fraction_info;
-        Skip_S1(3,                                              "mdcompat");
+        Get_S1 (3, P.mdcompat,                                  "mdcompat");
         TEST_SB_SKIP(                                           "b_presentation_id");
             Get_S4 (5, P.presentation_id,                       "presentation_id");
         TEST_SB_END();

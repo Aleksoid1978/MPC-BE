@@ -161,6 +161,7 @@
 7.1ch;
 About;Info
 About_Hint;Hoe neemt u contact met mij op en vindt u de nieuwste versie
+AC3_Metadata;
 Accompaniment;Begeleiding
 Active_DisplayAspectRatio;
 Active_Height;
@@ -187,7 +188,9 @@ Alignment; Uitlijning
 Alignment_Aligned;Uitgelijnd op interleaves
 Alignment_Split;Gesplitst over interleaves
 All;Alles
+AllFields;
 AlternateGroup;
+AnalyzeServicesMenu;
 App_About;Over MediaInfo
 App_Hide;Verberg MediaInfo
 App_Quit;Stop MediaInfo
@@ -241,6 +244,7 @@ BitRate_Mode_CBR;Constant
 BitRate_Mode_VBR;Variabel
 BitRate_Nominal;Nominale bitrate
 Bits-(Pixel*Frame);Bits/(Pixel*Frame)
+BitstreamLevel;
 Bring All to Front;Alles op voorgrond
 BufferSize;
 Cancel;Annuleren
@@ -280,9 +284,11 @@ Classifier;
 ClearList;
 Close;Sluiten
 Close all before open;Sluit alle alvorens te openen
+CloseAll;
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
+CloseFile;
 CloseWindow;Venster sluiten
 Codec;Codec
 Codec_Description;Codecbeschrijving
@@ -317,6 +323,8 @@ colour_primaries;
 colour_range;
 Comment;Commentaar
 CommissionedBy;In opdracht van
+Compare;
+CompareView;
 Compilation;
 ComplementaryObject;
 CompleteName;Volledige naam
@@ -327,6 +335,7 @@ Compression_Mode;
 Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;Compressieverhouding
+comprprof;
 Conductor;Dirigent
 ConformanceCheck;
 ConformanceErrors;
@@ -362,6 +371,7 @@ Default;
 Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
+DefaultView;
 Delay;Vertraging
 Delay_Source;
 Delay_Source_Container;
@@ -392,6 +402,8 @@ Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Doneren
 DotsPerInch;Punten per inch
+DownloadFile;
+DownloadFileError;
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
@@ -406,6 +418,7 @@ Duration_Start_Command;
 Duration_Start2End;
 DynamicObject;
 DynamicRangeControl;
+dynrngprof;
 Eac3DrcProfile;
 Edit;Bewerken
 EditedBy;Bewerkt door
@@ -416,6 +429,7 @@ EMail;E-Mail
 Enable FFmpeg plugin;
 Encoded_Application;Gebruikt programma
 Encoded_Date;Datum codering
+Encoded_Hardware;
 Encoded_Library;Gebruikte encoderbibliotheek
 Encoded_Library_Name;
 Encoded_Library_Settings;Instellingen codering
@@ -424,8 +438,11 @@ Encoded_Original;Origineel
 EncodedBy;Gecodeerd door
 EPG_Positions;
 EpisodeTitleNumber;
+Error;
 Error_File;Fout tijdens lezen bestand
 Error_File_Write;
+Error_Open;
+Error_Save;
 Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
@@ -440,6 +457,11 @@ Extensions;Gebruikelijke extensies
 External_Media_NotMounted;
 Family;Familie
 Fax;Fax
+Feature_AdvancedMode;
+Feature_FilesCompare;
+Feature_More;
+Feature_SelectView;
+Field;
 File;Bestand
 File size;Bestandsgrootte
 File_Append;Toevoegen aan bestaande bestand (Waarschuwing : gebruik dezelfde parameters)
@@ -523,6 +545,7 @@ FrameRate_Num;
 FrameRate_Original;Originele framerate
 FrameRate_Real;
 FullParsing;
+FullParsingTips;
 Gallery;
 General;Algemeen
 GeneralCompliance;
@@ -986,10 +1009,11 @@ Language_zh-tw;Chinees (Taiwan)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;Zoeloe
+LanguageChanges;
 Languages;
 LawRating;Wettelijke rating
-LegacyStreamDisplay;
 LCCN;LCCN
+LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
 Library;Muxingbibliotheek
@@ -1036,6 +1060,7 @@ LtRtCenterMixGain;
 LtRtSurroundMixGain;
 Lyricist;Tekstschrijver
 Lyrics;Tekst
+MacCreatedBy;
 Mastered_Date;Datum van master
 MasteredBy;Gemastered door
 MasteringDisplay_ColorPrimaries;
@@ -1053,6 +1078,7 @@ MD5;
 MD5_Unencoded;
 MediaInfo_About;Levert zeer gedetailleerde informatie\r\nover multimediabestanden:\r\nMatroska, OGG (inclusief OGM)\r\nMPEG1 (inclusief VCD)\r\nMPEG2 (inclusief DVD en SVCD)\r\nMPEG4 (inclusief Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (inclusief WMV, WMA)\r\nMicrosoft RIFF (inclusief AVI, WAV)\r\nGeluidsformaten (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
+MediaInfo_WebSite;
 Menu;Menu
 Menu stream(s);Menustromen
 Menu_Codec_List;Menucodecs
@@ -1104,10 +1130,15 @@ Object;
 ObjectCount;
 OK;OK
 One output file per input file;Eén exportbestand per invoerbestand
+OnlyDiffer;
+OnlyIdentical;
 Open;Open
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
+OpenFile;
+OpenFileError;
+OpenRecent;
 Options;Opties
 Options_Hint;Voorkeuren
 Original;Origineel
@@ -1119,6 +1150,7 @@ Originator;
 Other;Ander
 OtherIdentifier;
 OtherIdentifierType;
+OtherViews;
 Output;Uitvoer
 Output format;Uitvoerformaat
 OverallBitRate;Totale bitrate
@@ -1130,6 +1162,7 @@ PackageName;
 PackFormat;
 Part;Deel
 Part_Count;Totale telling
+PartialParsing;
 PartNumber;
 PartTotal;
 Performer;Artiest
@@ -1156,12 +1189,14 @@ Position_Total;Totaal
 Preferences;Voorkeuren
 PreferredDownmix;
 Premium;
+Premium_Feature;
 Premium_Summary;
 PreselectionLabel;
 Presentation;
 PresentationConfig;
 PresentationConfig_ContentClassifier;
 PresentationID;
+PresentationLevel;
 PreviousDownmixType5ch;
 PreviousMixType2ch;
 PrimaryAudioLanguage;
@@ -1177,6 +1212,7 @@ ProgrammeTextLanguage;
 ProgrammeTitle;
 Publisher;Uitgever
 Purchased_Date;Aankoopdatum
+PurchaseInformation;
 Quote character;Aanhalingsteken
 RadioStation;Radiostation
 Rating;Waardering
@@ -1193,6 +1229,7 @@ ReplayGain_Peak;Replay gain piek
 Report;
 Resolution;Resolutie
 RestoreLifetimeSubscription;
+Retry;
 s;s
 Sampled_Height;
 Sampled_Width;
@@ -1241,9 +1278,11 @@ Shell extension, separate instance;
 Shell InfoTip;Shell InfoTip (houd in explorer de muiscursor boven een bestand, info wordt getoond)
 ShimName;
 ShimVersion;
+Show;
 Show menu;Menu tonen
 Show toolbar;Werkbalk tonen
 ShowAll;Toon alle
+ShowMore;
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1272,6 +1311,7 @@ StreamKind;Soort stroom
 StreamKindID;Stroomidentifier
 StreamKindPos;Stroomidentifier
 StreamOrder;
+Streams;
 StreamSize;Stroomgrootte
 StreamSize_Demuxed;
 StreamSize_Encoded;
@@ -1281,6 +1321,7 @@ Subscribe;
 Subscribe_Button;
 Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Premium;
 Subscribe_Renew;
 Subscribe_Renew_Price;
 Subscribe_Unaviable;
@@ -1298,6 +1339,7 @@ Summary;Samenvatting
 Supported formats;Ondersteunde formaten
 Supported?;Ondersteund?
 SupportUs;
+SupportUs2;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Samenvatting
@@ -1308,6 +1350,7 @@ TargetDeviceConfig;
 Technician;Technicus
 TermsOfUse;Gebruiksvoorwaarden
 TertiaryAudioLanguage;
+TestContinuousFileNames;
 Text;Tekst
 Text - Custom;Tekst - Aangepast
 Text (HTML);Tekst (HTML)
@@ -1373,6 +1416,26 @@ TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
+Type_Composer;
+Type_Conductor;
+Type_Cover;
+Type_Cover_Back;
+Type_Cover_Media;
+Type_DuringPerformance;
+Type_DuringRecording;
+Type_FileIcon;
+Type_FileIcon_32x32;
+Type_Illustration;
+Type_LeafletPage;
+Type_Lyricist;
+Type_Performer;
+Type_Performer_Lead;
+Type_PerformerLogo;
+Type_Picture;
+Type_PublisherLogo;
+Type_RecordingLocation;
+Type_ScreenCapture;
+Type_Thumbnail;
 TypeDefinition;
 UniqueID;
 UniversalAdID;
@@ -1380,6 +1443,7 @@ UniversalAdID_Registry;
 UniversalAdID_Value;
 Unknown;Onbekend
 Url;Url
+Value;
 Video;Video
 Video stream(s);Videostroom(en)
 Video_Codec_List;Videocodecs
@@ -1422,5 +1486,5 @@ Yes;Ja
 Your system;Uw systeem
 Your translation;
 Zoom;Vergroot/verklein
-ZZ_Automatic_Percent;63
-ZZ_AutomaticLanguage_Percent;67
+ZZ_Automatic_Percent;60
+ZZ_AutomaticLanguage_Percent;64

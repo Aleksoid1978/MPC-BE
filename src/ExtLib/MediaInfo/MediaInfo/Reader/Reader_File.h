@@ -25,7 +25,7 @@
 #if MEDIAINFO_READTHREAD
     #ifdef WINDOWS
         #undef __TEXT
-        #include "Windows.h"
+        #include <windows.h>
     #endif //WINDOWS
 #endif //MEDIAINFO_READTHREAD
 //---------------------------------------------------------------------------

@@ -179,7 +179,7 @@ bool File_Xmp::FileHeader_Begin()
                 auto Buffer_Size_Save = Buffer_Size;
                 auto Element_Offset_Save = Element_Offset;
                 auto Element_Size_Save = Element_Size;
-                Buffer = (const int8u*)Data_Raw.c_str();
+                Buffer = reinterpret_cast<const int8u*>(Data_Raw.c_str());
                 Buffer_Offset = 0;
                 Buffer_Size = Data_Raw.size();
                 Element_Offset = 0;

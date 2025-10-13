@@ -161,6 +161,7 @@
 7.1ch;
 About;정보
 About_Hint;연락처와 최신 버전 확인
+AC3_Metadata;
 Accompaniment;반주
 Active_DisplayAspectRatio;
 Active_Height;
@@ -187,7 +188,9 @@ Alignment;정렬
 Alignment_Aligned;인터리브에 정렬
 Alignment_Split;인터리브로 분할
 All;전체
+AllFields;
 AlternateGroup;
+AnalyzeServicesMenu;
 App_About;MediaInfo에 관하여
 App_Hide;MediaInfo 가리기
 App_Quit;MediaInfo 종료
@@ -241,6 +244,7 @@ BitRate_Mode_CBR;고정
 BitRate_Mode_VBR;변동
 BitRate_Nominal;명목상의 비트레이트
 Bits-(Pixel*Frame);비트/(픽셀*프레임)
+BitstreamLevel;
 Bring All to Front;모두 앞으로 가져오기
 BufferSize;
 Cancel;취소
@@ -280,10 +284,12 @@ Classifier;
 ClearList;
 Close;닫기
 Close all before open;열기 전에 모두 닫기
-CloseWindow;창 닫기
+CloseAll;
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
+CloseFile;
+CloseWindow;창 닫기
 Codec;코덱
 Codec_Description;코덱 설명
 Codec_Info;코덱에 대한 상세 정보
@@ -317,6 +323,8 @@ colour_primaries;
 colour_range;
 Comment;주석
 CommissionedBy;의뢰
+Compare;
+CompareView;
 Compilation;
 ComplementaryObject;
 CompleteName;전체 이름
@@ -327,6 +335,7 @@ Compression_Mode;
 Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;압축률
+comprprof;
 Conductor;지휘자
 ConformanceCheck;
 ConformanceErrors;
@@ -362,6 +371,7 @@ Default;
 Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
+DefaultView;
 Delay;딜레이
 Delay_Source;
 Delay_Source_Container;
@@ -392,6 +402,8 @@ Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;기부하기
 DotsPerInch;인치당 도트
+DownloadFile;
+DownloadFileError;
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
@@ -406,6 +418,7 @@ Duration_Start_Command;
 Duration_Start2End;
 DynamicObject;
 DynamicRangeControl;
+dynrngprof;
 Eac3DrcProfile;
 Edit;편집
 EditedBy;편집
@@ -416,6 +429,7 @@ EMail;이메일
 Enable FFmpeg plugin;
 Encoded_Application;인코딩 프로그램
 Encoded_Date;인코딩 날짜
+Encoded_Hardware;
 Encoded_Library;인코딩 라이브러리
 Encoded_Library_Name;
 Encoded_Library_Settings;인코딩 설정
@@ -424,8 +438,11 @@ Encoded_Original;원본
 EncodedBy;인코딩
 EPG_Positions;EPG 포지션 (내부)
 EpisodeTitleNumber;
+Error;
 Error_File;파일을 읽는 중 에러
 Error_File_Write;
+Error_Open;
+Error_Save;
 Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
@@ -440,6 +457,11 @@ Extensions;일반적인 확장자
 External_Media_NotMounted;
 Family;가족
 Fax;팩스
+Feature_AdvancedMode;
+Feature_FilesCompare;
+Feature_More;
+Feature_SelectView;
+Field;
 File;파일
 File size;파일 크기
 File_Append;존재하는 파일에 이어쓰기 (경고 : 같은 파라미터인지 주의하세요)
@@ -523,6 +545,7 @@ FrameRate_Num;
 FrameRate_Original;원본 프레임레이트
 FrameRate_Real;
 FullParsing;
+FullParsingTips;
 Gallery;
 General;일반
 GeneralCompliance;
@@ -986,10 +1009,11 @@ Language_zh-tw;Chinese (Taiwan)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;Zulu
+LanguageChanges;
 Languages;
 LawRating;법률 등급
-LegacyStreamDisplay;
 LCCN;LCCN
+LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
 Library;Muxing 라이브러리
@@ -1036,6 +1060,7 @@ LtRtCenterMixGain;
 LtRtSurroundMixGain;
 Lyricist;작사가
 Lyrics;가사
+MacCreatedBy;
 Mastered_Date;마스터 날짜
 MasteredBy;마스터
 MasteringDisplay_ColorPrimaries;
@@ -1053,6 +1078,7 @@ MD5;
 MD5_Unencoded;
 MediaInfo_About;미디어 파일에 대한\r\n상세한 정보를 제공:\r\nMatroska, OGG (OGM 포함)\r\nMPEG1 (VCD 포함)\r\nMPEG2 (DVD와 SVCD 포함)\r\nMPEG4 (Itunes M4A 포함)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (WMV, WMA 포함)\r\nMicrosoft RIFF (AVI, WAV 포함)\r\n음악 포맷 (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
+MediaInfo_WebSite;
 Menu;메뉴
 Menu stream(s);메뉴 스트림
 Menu_Codec_List;메뉴 코덱
@@ -1104,10 +1130,15 @@ Object;
 ObjectCount;
 OK;확인
 One output file per input file;입력 파일 마다 하나의 출력 파일
+OnlyDiffer;
+OnlyIdentical;
 Open;열기
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
+OpenFile;
+OpenFileError;
+OpenRecent;
 Options;옵션
 Options_Hint;환경 설정
 Original;원본
@@ -1119,6 +1150,7 @@ Originator;
 Other;기타
 OtherIdentifier;
 OtherIdentifierType;
+OtherViews;
 Output;출력
 Output format;출력 형식
 OverallBitRate;총 비트레이트
@@ -1130,6 +1162,7 @@ PackageName;
 PackFormat;
 Part;파트
 Part_Count;총계
+PartialParsing;
 PartNumber;
 PartTotal;
 Performer;연기자
@@ -1156,12 +1189,14 @@ Position_Total;전체
 Preferences;환경 설정
 PreferredDownmix;
 Premium;
+Premium_Feature;
 Premium_Summary;
 PreselectionLabel;
 Presentation;
 PresentationConfig;
 PresentationConfig_ContentClassifier;
 PresentationID;
+PresentationLevel;
 PreviousDownmixType5ch;
 PreviousMixType2ch;
 PrimaryAudioLanguage;
@@ -1177,6 +1212,7 @@ ProgrammeTextLanguage;
 ProgrammeTitle;
 Publisher;발행자
 Purchased_Date;구매일
+PurchaseInformation;
 Quote character;인용 문자
 RadioStation;라디오 스테이션
 Rating;등급
@@ -1193,6 +1229,7 @@ ReplayGain_Peak;재생 게인 피크
 Report;
 Resolution;해상도
 RestoreLifetimeSubscription;
+Retry;
 s;초
 Sampled_Height;
 Sampled_Width;
@@ -1241,9 +1278,11 @@ Shell extension, separate instance;
 Shell InfoTip;쉘 인포팁 (탐색기에서 파일에 마우스를 올려 놓으면 정보를 보여줍니다)
 ShimName;
 ShimVersion;
+Show;
 Show menu;메뉴 보기
 Show toolbar;도구 모음 보기
 ShowAll;모두 보기
+ShowMore;
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1272,6 +1311,7 @@ StreamKind;스트림 종류
 StreamKindID;스트림 ID
 StreamKindPos;스트림 ID
 StreamOrder;
+Streams;
 StreamSize;스트림 크기
 StreamSize_Demuxed;
 StreamSize_Encoded;
@@ -1281,6 +1321,7 @@ Subscribe;
 Subscribe_Button;
 Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Premium;
 Subscribe_Renew;
 Subscribe_Renew_Price;
 Subscribe_Unaviable;
@@ -1298,6 +1339,7 @@ Summary;요약
 Supported formats;지원하는 포맷
 Supported?;지원?
 SupportUs;
+SupportUs2;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;시놉시스
@@ -1308,6 +1350,7 @@ TargetDeviceConfig;
 Technician;기술자
 TermsOfUse;사용권한
 TertiaryAudioLanguage;
+TestContinuousFileNames;
 Text;텍스트
 Text - Custom;텍스트 - 커스텀
 Text (HTML);텍스트 (HTML)
@@ -1373,6 +1416,26 @@ TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
+Type_Composer;
+Type_Conductor;
+Type_Cover;
+Type_Cover_Back;
+Type_Cover_Media;
+Type_DuringPerformance;
+Type_DuringRecording;
+Type_FileIcon;
+Type_FileIcon_32x32;
+Type_Illustration;
+Type_LeafletPage;
+Type_Lyricist;
+Type_Performer;
+Type_Performer_Lead;
+Type_PerformerLogo;
+Type_Picture;
+Type_PublisherLogo;
+Type_RecordingLocation;
+Type_ScreenCapture;
+Type_Thumbnail;
 TypeDefinition;
 UniqueID;
 UniversalAdID;
@@ -1380,6 +1443,7 @@ UniversalAdID_Registry;
 UniversalAdID_Value;
 Unknown;알 수 없음
 Url;Url
+Value;
 Video;비디오
 Video stream(s);비디오 스트림
 Video_Codec_List;비디오 코덱
@@ -1422,5 +1486,5 @@ Yes;예
 Your system;이 시스템
 Your translation;
 Zoom;확대/축소
-ZZ_Automatic_Percent;64
-ZZ_AutomaticLanguage_Percent;68
+ZZ_Automatic_Percent;61
+ZZ_AutomaticLanguage_Percent;65

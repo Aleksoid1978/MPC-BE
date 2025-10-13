@@ -38,6 +38,24 @@ extern std::string ExtensibleWave_ChannelMask (int32u ChannelMask); //In Multipl
 extern std::string ExtensibleWave_ChannelMask2 (int32u ChannelMask); //In Multiple/File_Riff_Elements.cpp
 extern std::string ExtensibleWave_ChannelMask_ChannelLayout(int32u ChannelMask); //In Multiple/File_Riff_Elements.cpp
 
+#if MEDIAINFO_TRACE
+static void CRC16_Init(int16u* Table, int16u Polynomial)
+{
+    for (size_t Pos = 0; Pos < 256; ++Pos)
+    {
+        Table[Pos] = static_cast<int16u>(Pos) << 8;
+
+        for (int8u bit = 0; bit < 8; ++bit)
+        {
+            if (Table[Pos] & 0x8000)
+                Table[Pos] = (Table[Pos] << 1) ^ Polynomial;
+            else
+                Table[Pos] <<= 1;
+        }
+    }
+}
+#endif // MEDIAINFO_TRACE
+
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -55,6 +73,7 @@ File_Flac::File_Flac()
     FromIamf=false;
 
     //Temp
+    Last_metadata_block=false;
     IsAudioFrames=false;
 }
 
@@ -68,7 +87,7 @@ bool File_Flac::FileHeader_Begin()
     if (NoFileHeader)
         return true;
 
-    if (NoFileHeader || !File__Tags_Helper::FileHeader_Begin())
+    if (!File__Tags_Helper::FileHeader_Begin())
         return false;
 
     //Element_Size
@@ -118,15 +137,52 @@ void File_Flac::Header_Parse()
         BLOCK_TYPE=(int8u)-1;
         int16u sync;
         bool blocking_strategy;
+        int8u blocksizebits, sampleratebits, crc;
         Get_S2 (15, sync,                                       "0b111111111111100");
-        Get_SB (    blocking_strategy,                          "blocking strategy");
-        Skip_S1( 4,                                             "Blocksize");
-        Skip_S1( 4,                                             "Sample rate");
-        Skip_S1( 4,                                             "Channels");
-        Skip_S1( 3,                                             "Bit depth");
-        Skip_SB(                                                "Reserved");
+        Get_SB (    blocking_strategy,                          "blocking strategy bit"); Param_Info1(blocking_strategy ? "variable block size" : "fixed block size");
+        Get_S1 ( 4, blocksizebits,                              "Block Size Bits");
+        Get_S1 ( 4, sampleratebits,                             "Sample Rate Bits");
+        Skip_S1( 4,                                             "Channels Bits");
+        Skip_S1( 3,                                             "Bit Depth Bits");
+        Skip_S1( 1,                                             "Reserved");
         BS_End();
-        Skip_B1(                                                "Frame header CRC");
+        int8u peek;
+        int8u coded_size{};
+        Peek_B1(peek);
+        for (int8u i = 8; i > 0; --i) {
+            if ((peek >> (i - 1) & 1) == 0)
+                break;
+            ++coded_size;
+        }
+        if (coded_size == 0)
+            coded_size = 1;
+        Skip_XX(coded_size,                                     "Coded Number");
+        if (blocksizebits == 0b0110)
+            Skip_B1(                                            "Uncommon Block Size");
+        else if (blocksizebits == 0b0111)
+            Skip_B2(                                            "Uncommon Block Size");
+        if (sampleratebits == 0b1100)
+            Skip_B1(                                            "Uncommon Sample Rate");
+        else if (sampleratebits == 0b1101 || sampleratebits == 0b1110)
+            Skip_B2(                                            "Uncommon Sample Rate");
+        Get_B1(crc,                                             "Frame Header CRC");
+        #if MEDIAINFO_TRACE
+        if (Trace_Activated) {
+            int8u CRC_8 = 0;
+            const int8u polynomial = 0x07; // x^8 + x^2 + x^1 + x^0
+            const int8u* CRC_8_Buffer = Buffer + Buffer_Offset;
+            while (CRC_8_Buffer < Buffer + Buffer_Offset + Element_Offset - 1) {
+                CRC_8 ^= *CRC_8_Buffer++;
+                for (int8u i = 0; i < 8; ++i) {
+                    if (CRC_8 & 0x80)
+                        CRC_8 = (CRC_8 << 1) ^ polynomial;
+                    else
+                        CRC_8 <<= 1;
+                }
+            }
+            Param_Info1(CRC_8 == crc ? "OK" : "NOK");
+        }
+        #endif // MEDIAINFO_TRACE
         Length=IsSub?(Element_Size-Element_Offset):0; // Unknown if raw, else full frame
     }
     else
@@ -158,15 +214,37 @@ void File_Flac::Data_Parse()
         CASE_INFO(VORBIS_COMMENT);
         CASE_INFO(CUESHEET);
         CASE_INFO(PICTURE);
-        case (int8u)-1: Element_Name("Frame");
-                [[fallthrough]];
+        case (int8u)-1: Element_Name("Frame"); break;
         default : Skip_XX(Element_Size,                         "Data");
     }
 
     if (Element_Code==(int8u)-1)
     {
+        if (IsSub && Element_Size > 2) {
+            Skip_XX(Element_Size - 2,                           "Subframes");
+            Element_Begin1("Frame Footer");
+            int16u crc;
+            Get_B2(crc,                                         "CRC");
+            #if MEDIAINFO_TRACE
+            if (Trace_Activated) {
+                if (!CRC_16_Table) {
+                    CRC_16_Table.reset(new int16u[256]);
+                    CRC16_Init(CRC_16_Table.get(), 0x8005); // x^16 + x^15 + x^2 + x^0
+                }
+                int16u CRC_16 = 0x0000;
+                const int8u* CRC_16_Buffer = Buffer;
+                while (CRC_16_Buffer < Buffer + Buffer_Offset + Element_Offset - 2) {
+                    CRC_16 = (CRC_16 << 8) ^ CRC_16_Table[(CRC_16 >> 8) ^ (*CRC_16_Buffer++)];
+                }
+                Param_Info1(CRC_16 == crc ? "OK" : "NOK");
+            }
+            #endif // MEDIAINFO_TRACE
+            Element_End0();
+        }
+
         //No more need data
-        File__Tags_Helper::Finish("Flac");
+        if (!FromIamf)
+            File__Tags_Helper::Finish("Flac");
     }
     else if (Last_metadata_block)
     {

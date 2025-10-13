@@ -912,6 +912,18 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
                     }
                     else
                     {
+                        if (First.size() >= 31 && First.find(" PreselectionLabel", First.size() - 18) == First.size() - 18)
+                        {
+                            auto message_id = strtoul(Info->second.To_UTF8().c_str(), nullptr, 16);
+                            const auto& message_ids = Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].message_ids;
+                            auto PerId = message_ids.find(message_id);
+                            if (PerId != message_ids.end()) {
+                                for (const auto& PerLanguage : PerId->second) {
+                                    Fill((stream_t)StreamKind, StreamPos, First.c_str(), __T('(') + Ztring().From_CC3(PerLanguage.first) + __T(") ") + PerLanguage.second, true);
+                                }
+                            }
+                        }
+                        else
                         Fill((stream_t)StreamKind, StreamPos, First.c_str(), Info->second, true);
                         std::map<std::string, ZenLib::Ztring>::iterator Option=Temp->Infos_Option.find(First.c_str());
                         if (Option!=Temp->Infos_Option.end())

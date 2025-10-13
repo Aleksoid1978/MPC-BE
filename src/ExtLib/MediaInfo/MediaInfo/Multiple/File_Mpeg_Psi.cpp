@@ -939,6 +939,20 @@ void File_Mpeg_Psi::Data_Parse()
 
     switch (table_id)
     {
+    case 0x00:
+    case 0x42:
+    case 0x46:
+    case 0xC8:
+    case 0xC9:
+        transport_stream_id = table_id_extension;
+        break;
+    case 0x01:
+        program_number = table_id_extension;
+        break;
+    }
+
+    switch (table_id)
+    {
         ELEMENT_CASE(00, "program_association_section");
         ELEMENT_CASE(01, "conditional_access_section");
         ELEMENT_CASE(02, "TS_program_map_section");

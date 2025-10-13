@@ -161,6 +161,7 @@
 7.1ch;7.1
 About;Про програму
 About_Hint;Контакти та пошук нової версії
+AC3_Metadata;
 Accompaniment;Супровід
 Active_DisplayAspectRatio;Актуальне співвідношення сторін дисплея
 Active_Height;Актальна висота
@@ -187,7 +188,9 @@ Alignment;Вирівнювання
 Alignment_Aligned;Вирівнювання по проміжкам
 Alignment_Split;Розділення по проміжкам
 All;Все
+AllFields;
 AlternateGroup;
+AnalyzeServicesMenu;
 App_About;Про MediaInfo
 App_Hide;Сховати MediaInfo
 App_Quit;Завершити MediaInfo
@@ -241,6 +244,7 @@ BitRate_Mode_CBR;Постійний (CBR)
 BitRate_Mode_VBR;Змінний (VBR)
 BitRate_Nominal;Номінальний бітрейт
 Bits-(Pixel*Frame);Біт/(Пікселі*Кадри)
+BitstreamLevel;
 Bring All to Front;Всі наперед
 BufferSize;Розмір буфера
 Cancel;Відміна
@@ -280,9 +284,11 @@ Classifier;Класифікатор вмісту
 ClearList;Очистити список
 Close;Закрити
 Close all before open;Закривати все перед відкриттям
+CloseAll;
 ClosedCaptionsLanguage;Мова субтитрів
 ClosedCaptionsPresent;Наявність субтитрів
 ClosedCaptionsType;Тип субтитрів
+CloseFile;
 CloseWindow;Закрити вікно
 Codec;Кодек
 Codec_Description;Опис кодеку
@@ -317,6 +323,8 @@ colour_primaries;Основні кольори
 colour_range;Діапазон кольору
 Comment;Примітка
 CommissionedBy;Поручитель
+Compare;
+CompareView;
 Compilation;Компіляція
 ComplementaryObject;Додатковий об'єкт
 CompleteName;Повна назва
@@ -327,6 +335,7 @@ Compression_Mode;Тип стиснення
 Compression_Mode_Lossless;Без втрат
 Compression_Mode_Lossy;Із втратами
 Compression_Ratio;Ступінь стиснення
+comprprof;
 Conductor;Диригент
 ConformanceCheck;Перевірка відповідності
 ConformanceErrors;Ошибки відповідності
@@ -362,6 +371,7 @@ Default;За замовчуванням
 Default translation;
 Default_Setting;Системне значення за замовчуванням
 DefaultTargetDeviceConfig;Конфігурація цільового пристрою за замовчуванням
+DefaultView;
 Delay;Затримка
 Delay_Source;Затримка, початкова
 Delay_Source_Container;Контейнер
@@ -392,6 +402,8 @@ Dolby_Atmos_Metadata;Метадані Dolby Atmos
 DolbyAtmos;Dolby Atmos
 Donate;Пожертвування
 DotsPerInch;Точок на дюйм
+DownloadFile;
+DownloadFileError;
 Downmix;Понижуюче мікшування
 Downmix_5.1.x;Зведення 5.1 та 5.1.x
 Downmix_5to2;Зведення 5.1 у 2.0
@@ -406,6 +418,7 @@ Duration_Start_Command;Початок (команди)
 Duration_Start2End;Тривалість відтворення відео
 DynamicObject;Динамічний об'єкт
 DynamicRangeControl;Контроль динамічного діапазону
+dynrngprof;
 Eac3DrcProfile;Профіль КДД E-AC3
 Edit;Редагувати
 EditedBy;Змінено
@@ -416,6 +429,7 @@ EMail;Е-mail
 Enable FFmpeg plugin;
 Encoded_Application;Програма кодування
 Encoded_Date;Дата кодування
+Encoded_Hardware;
 Encoded_Library;Бібліотека кодування
 Encoded_Library_Name;
 Encoded_Library_Settings;Налаштування бібліот. кодування
@@ -424,8 +438,11 @@ Encoded_Original;Оригінальне кодування
 EncodedBy;Закодовано
 EPG_Positions;EPG положення (внутрішні)
 EpisodeTitleNumber;Номер заголовку епізоду
+Error;
 Error_File;Помилка читання файлу
 Error_File_Write;Помилка запису файлу
+Error_Open;
+Error_Save;
 Events_MinDuration;Мінімальна тривалість кожної події
 Events_PaintOn;Кількість подій PaintOn
 Events_PopOn;Кількість подій PopOn
@@ -440,6 +457,11 @@ Extensions;Розширення, що використ.
 External_Media_NotMounted;Зовнішній носій недоступний
 Family;Родина
 Fax;Факс
+Feature_AdvancedMode;
+Feature_FilesCompare;
+Feature_More;
+Feature_SelectView;
+Field;
 File;Файл
 File size;Розмір файлу
 File_Append;Додати до існуючого файлу (Попередження: переконайтеся у відповідності параметрів)
@@ -523,6 +545,7 @@ FrameRate_Num;
 FrameRate_Original;Частота кадрів в оригіналі
 FrameRate_Real;Дійсна частота кадрів
 FullParsing;Повний аналіз
+FullParsingTips;
 Gallery;
 General;Загальна інформація
 GeneralCompliance;Загальна відповідність
@@ -986,10 +1009,11 @@ Language_zh-tw;Китайська (Тайвань)
 Language_zh-TW;Китайська (Тайвань)
 Language_zh-yue;Кантонська
 Language_zu;Зулу
+LanguageChanges;
 Languages;
 LawRating;Обмеження за віком
-LegacyStreamDisplay;
 LCCN;LCCN
+LegacyStreamDisplay;
 LfeAttenuationKnown;Ослаблення низькочастотних ефектів (LFE)
 LfeMixGain;Загальне посилення міксу низькочастотних ефектів (LFE)
 Library;Бібліотека мультиплексування
@@ -1036,6 +1060,7 @@ LtRtCenterMixGain;Загальне посилення міксу централ�
 LtRtSurroundMixGain;Загальне посилення міксу об'ємного каналу методом LtRt
 Lyricist;Автор тексту
 Lyrics;Текст
+MacCreatedBy;
 Mastered_Date;Дата мастерингу
 MasteredBy;Мастеринг
 MasteringDisplay_ColorPrimaries;Мастеринг основних кольорів дисплея
@@ -1053,6 +1078,7 @@ MD5;MD5
 MD5_Unencoded;MD5 незакодованого вмісту
 MediaInfo_About;Відображає докладну інформацію \r\nпро медіафайли:\r\nMatroska, OGG (включаючи OGM)\r\nMPEG1 (включаючи VCD)\r\nMPEG2 (включаючи DVD and SVCD)\r\nMPEG4 (включаючи Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (включаючи WMV, WMA)\r\nMicrosoft RIFF (включаючи AVI, WAV)\r\nАудіоформати (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;MediaInfo v%MI_VERSION% використовує MediaInfoLib v%MIL_VERSION%
+MediaInfo_WebSite;
 Menu;Меню
 Menu stream(s);Меню потоків
 Menu_Codec_List;Меню кодеків
@@ -1104,10 +1130,15 @@ Object;Об'єкт
 ObjectCount;Число об'єктів
 OK;OK
 One output file per input file;Один вихідний на кожний вхідний файл
+OnlyDiffer;
+OnlyIdentical;
 Open;Відкрити
 OpenCaptionsLanguage;Мова титрів
 OpenCaptionsPresent;Наявність титрів
 OpenCaptionsType;Тип титрів
+OpenFile;
+OpenFileError;
+OpenRecent;
 Options;Опції
 Options_Hint;Налаштування програми
 Original;Оригінал
@@ -1119,6 +1150,7 @@ Originator;Творець
 Other;Інше
 OtherIdentifier;Інший ідентифікатор
 OtherIdentifierType;Тип іншого ідентифікатора
+OtherViews;
 Output;Вивід
 Output format;Формат виводу
 OverallBitRate;Загальний бітрейт
@@ -1130,6 +1162,7 @@ PackageName;Ім'я пакету
 PackFormat;Формат групи каналів
 Part;Частина
 Part_Count;Кількість частин
+PartialParsing;
 PartNumber;Номер частини
 PartTotal;Всього частин
 Performer;Виконавець
@@ -1156,12 +1189,14 @@ Position_Total;Всього
 Preferences;Налаштування
 PreferredDownmix;Переважне понижуюче мікшування
 Premium;Преміум
+Premium_Feature;
 Premium_Summary;Функції для преміум-підписки
 PreselectionLabel;Підпис попереднього вибору
 Presentation;Презентація
 PresentationConfig;Конфігурація презентації
 PresentationConfig_ContentClassifier;Конфігурація презентації від класифікаторів вмісту
 PresentationID;Ідентифікатор презентації
+PresentationLevel;
 PreviousDownmixType5ch;Попередній тип 5-канального понижуючого мікшування
 PreviousMixType2ch;Попередній тип 2-канального понижуючого мікшування
 PrimaryAudioLanguage;Основна мова аудіо
@@ -1177,6 +1212,7 @@ ProgrammeTextLanguage;Мова тексту у програмі
 ProgrammeTitle;Заголовок програми
 Publisher;Видавець
 Purchased_Date;Дата придбання
+PurchaseInformation;
 Quote character;Символ лапок
 RadioStation;Радіостанція
 Rating;Рейтинг
@@ -1193,6 +1229,7 @@ ReplayGain_Peak;Пік вирівнювання гучності
 Report;Повідомлення
 Resolution;Роздільна здатність
 RestoreLifetimeSubscription;Відновити довічну передплату
+Retry;
 s; сек.
 Sampled_Height;
 Sampled_Width;
@@ -1241,9 +1278,11 @@ Shell extension, separate instance;
 Shell InfoTip;Підказка провідника (відображення інформації при розміщенні вказівника миші над файлом у провіднику Windows)
 ShimName;Назва прокладки
 ShimVersion;Версія прокладки
+Show;
 Show menu;Відображати меню
 Show toolbar;Відображати панель
 ShowAll;Показати всі
+ShowMore;
 SignalGroup;Група сигналів
 SigningPresent;Наявність підпису
 SignLanguage;Мова підпису
@@ -1272,6 +1311,7 @@ StreamKind;Вид потоку
 StreamKindID;Ідентифікатор потоку
 StreamKindPos;Ідентифікатор потоку
 StreamOrder;
+Streams;
 StreamSize;Розмір потоку
 StreamSize_Demuxed;Розмір потоку після демультиплексування
 StreamSize_Encoded;Розмір кодованого потоку
@@ -1281,6 +1321,7 @@ Subscribe;Оформити передплату
 Subscribe_Button;Оформити передплату (%PRICE% за один рік)
 Subscribe_Failed;Збій або скасування передплати
 Subscribe_Manage;Керування передплатою
+Subscribe_Premium;
 Subscribe_Renew;Оновити передплату?
 Subscribe_Renew_Price;Оновити передплату (%PRICE% за один рік)
 Subscribe_Unaviable;Не вдалося отримати дані про передплату.
@@ -1298,6 +1339,7 @@ Summary;Підсумок
 Supported formats;Формати, що підтримуються
 Supported?;Підтримується?
 SupportUs;Підтримайте наш проект. Планується розробка темної теми інтерфейсу та безлічі інших цікавих функцій.
+SupportUs2;
 SurroundAttenuationKnown;Ослаблення об'ємного каналу
 SwitchGroup;Група перемикання
 Synopsis;Короткий огляд
@@ -1308,6 +1350,7 @@ TargetDeviceConfig;Конфігурація цільового пристрою
 Technician;Технік
 TermsOfUse;Умови використання
 TertiaryAudioLanguage;Третя мова аудіо
+TestContinuousFileNames;
 Text;Текст
 Text - Custom;Текст - звичайний
 Text (HTML);Текст (HTML)
@@ -1373,6 +1416,26 @@ TrimMode8i;Режим обрізки для 7.1.4
 TruePeakLevel;Справжній піковий рівень
 TruePeakLevel_Album;Справжній піковий рівень (альбом)
 Type;Тип
+Type_Composer;
+Type_Conductor;
+Type_Cover;
+Type_Cover_Back;
+Type_Cover_Media;
+Type_DuringPerformance;
+Type_DuringRecording;
+Type_FileIcon;
+Type_FileIcon_32x32;
+Type_Illustration;
+Type_LeafletPage;
+Type_Lyricist;
+Type_Performer;
+Type_Performer_Lead;
+Type_PerformerLogo;
+Type_Picture;
+Type_PublisherLogo;
+Type_RecordingLocation;
+Type_ScreenCapture;
+Type_Thumbnail;
 TypeDefinition;Визначення типу
 UniqueID;Унікальний ID
 UniversalAdID;Универсальный рекламный идентификатор
@@ -1380,6 +1443,7 @@ UniversalAdID_Registry;Реєстр універсального рекламн�
 UniversalAdID_Value;Значення універсального рекламного ідентифікатора
 Unknown;Невідомо
 Url;Посилання
+Value;
 Video;Відео
 Video stream(s);Відеопотік(-оки)
 Video_Codec_List;Відеокодеки
@@ -1422,5 +1486,5 @@ Yes;Так
 Your system;Ваша система
 Your translation;
 Zoom;Оптимізувати
-ZZ_Automatic_Percent;96
-ZZ_AutomaticLanguage_Percent;96
+ZZ_Automatic_Percent;92
+ZZ_AutomaticLanguage_Percent;92

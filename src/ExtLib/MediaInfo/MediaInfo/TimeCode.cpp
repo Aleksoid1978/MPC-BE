@@ -699,7 +699,7 @@ int TimeCode::FromSeconds(double Seconds, bool Truncate, bool TimeIsDropFrame)
 
     // Seconds to frames
     double FrameCountF = Seconds * ((int64_t)GetFramesMax() + 1) / ((!TimeIsDropFrame && Is1001fps()) ? 1.001 : 1) + (Truncate ? 0.0 : 0.5);
-    if (FrameCountF > numeric_limits<int64_t>::max() || FrameCountF < numeric_limits<int64_t>::min())
+    if (FrameCountF > (double)numeric_limits<int64_t>::max() || FrameCountF < (double)numeric_limits<int64_t>::min())
     {
         *this = TimeCode();
         return 1;

@@ -39,7 +39,7 @@ public:
         Step_LayerAndMaskInformation,
         Step_ImageData,
     };
-    step Step;
+    step Step{ Step_ColorModeData };
 
 protected :
     //Buffer - File header

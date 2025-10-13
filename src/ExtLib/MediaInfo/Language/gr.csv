@@ -161,6 +161,7 @@
 7.1ch;
 About;Πληροφορίες
 About_Hint;Πως θα επικοινωνήσετε μαζί μου και θα βρείτε νεότερη έκδoση
+AC3_Metadata;
 Accompaniment;Συνοδεία
 Active_DisplayAspectRatio;
 Active_Height;
@@ -187,7 +188,9 @@ Alignment;
 Alignment_Aligned;
 Alignment_Split;
 All;Όλα
+AllFields;
 AlternateGroup;
+AnalyzeServicesMenu;
 App_About;Πληροφορίες για το MediaInfo
 App_Hide;Απόκρυψη MediaInfo
 App_Quit;Τερματισμός MediaInfo
@@ -241,6 +244,7 @@ BitRate_Mode_CBR;
 BitRate_Mode_VBR;
 BitRate_Nominal;
 Bits-(Pixel*Frame);Bits/(Εικονοστοιχείο*Πλαίσιο)
+BitstreamLevel;
 Bring All to Front;Μεταφορά όλων σε πρώτο πλάνο
 BufferSize;
 Cancel;Άκυρο
@@ -280,9 +284,11 @@ Classifier;
 ClearList;
 Close;Κλείσιμο
 Close all before open;Κλείστε όλα τα ανοιχτά αρχεία πριν το άνοιγμα νέων
+CloseAll;
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
+CloseFile;
 CloseWindow;Κλείσιμο παραθύρου
 Codec;Συμπιεστής
 Codec_Description;
@@ -317,6 +323,8 @@ colour_primaries;
 colour_range;
 Comment;Σχόλιο
 CommissionedBy;Commissioned by
+Compare;
+CompareView;
 Compilation;
 ComplementaryObject;
 CompleteName;Πλήρες όνομα
@@ -327,6 +335,7 @@ Compression_Mode;
 Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;
+comprprof;
 Conductor;Conductor
 ConformanceCheck;
 ConformanceErrors;
@@ -362,6 +371,7 @@ Default;
 Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
+DefaultView;
 Delay;Καθυστέρηση
 Delay_Source;
 Delay_Source_Container;
@@ -392,6 +402,8 @@ Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Δωρεές
 DotsPerInch;
+DownloadFile;
+DownloadFileError;
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
@@ -406,6 +418,7 @@ Duration_Start_Command;
 Duration_Start2End;
 DynamicObject;
 DynamicRangeControl;
+dynrngprof;
 Eac3DrcProfile;
 Edit;Επεξεργασία
 EditedBy;Τροποποιημένο από
@@ -416,6 +429,7 @@ EMail;E-Mail
 Enable FFmpeg plugin;
 Encoded_Application;Εφαρμογή εγγραφής
 Encoded_Date;Ημερομηνία κωδικοποίησης
+Encoded_Hardware;
 Encoded_Library;Βιβλιοθήκη κωδικοποιητή
 Encoded_Library_Name;
 Encoded_Library_Settings;Ρυθμίσεις κωδικοποιητή
@@ -424,8 +438,11 @@ Encoded_Original;Original
 EncodedBy;Κωδικοποιημένο από
 EPG_Positions;
 EpisodeTitleNumber;
+Error;
 Error_File;Παρουσιάστηκε σφάλμα κατά το διάβασμα του αρχείου
 Error_File_Write;
+Error_Open;
+Error_Save;
 Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
@@ -440,6 +457,11 @@ Extensions;Συνήθεις επεκτάσεις
 External_Media_NotMounted;
 Family;
 Fax;Fax
+Feature_AdvancedMode;
+Feature_FilesCompare;
+Feature_More;
+Feature_SelectView;
+Field;
 File;Αρχείο
 File size;Μέγεθος αρχείου
 File_Append;Πρόσθεση στο τέλος υπάρχοντος αρχείου (Προειδοποίηση : πρέπει να έχουν όμοιους παραμέτρους)
@@ -523,6 +545,7 @@ FrameRate_Num;
 FrameRate_Original;
 FrameRate_Real;
 FullParsing;
+FullParsingTips;
 Gallery;
 General;Γενικά
 GeneralCompliance;
@@ -986,10 +1009,11 @@ Language_zh-tw;
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;Zulu
+LanguageChanges;
 Languages;
 LawRating;Law rating
-LegacyStreamDisplay;
 LCCN;LCCN
+LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
 Library;Muxing library
@@ -1036,6 +1060,7 @@ LtRtCenterMixGain;
 LtRtSurroundMixGain;
 Lyricist;Lyricist
 Lyrics;
+MacCreatedBy;
 Mastered_Date;Mastered date
 MasteredBy;Mastered by
 MasteringDisplay_ColorPrimaries;
@@ -1053,6 +1078,7 @@ MD5;
 MD5_Unencoded;
 MediaInfo_About;Παρέχει λεπτομερείς πληροφορίες\r\nγια αρχεία πολυμέσων:\r\nMatroska, OGG (συμπεριλαμβάνεται OGM)\r\nMPEG1 (συμπεριλαμβάνεται VCD)\r\nMPEG2 (συμπεριλαμβάνεται DVD και SVCD)\r\nMPEG4 (συμπεριλαμβάνεται Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (συμπεριλαμβάνεται WMV, WMA)\r\nMicrosoft RIFF (συμπεριλαμβάνεται AVI, WAV)\r\nΜορφοποιήσεις ήχου (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
+MediaInfo_WebSite;
 Menu;Μενού
 Menu stream(s);Ροές μενού
 Menu_Codec_List;Συμπιεστές μενού
@@ -1104,10 +1130,15 @@ Object;
 ObjectCount;
 OK;OK
 One output file per input file;Ένα αρχείο εξόδου για κάθε αρχείο εισόδου
+OnlyDiffer;
+OnlyIdentical;
 Open;Άνοιγμα
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
+OpenFile;
+OpenFileError;
+OpenRecent;
 Options;Επιλογές
 Options_Hint;Προτιμήσεις
 Original;Original
@@ -1119,6 +1150,7 @@ Originator;
 Other;Άλλος
 OtherIdentifier;
 OtherIdentifierType;
+OtherViews;
 Output;Έξοδος
 Output format;Μορφοποίηση εξόδου
 OverallBitRate;Συνολικό BitRate
@@ -1130,6 +1162,7 @@ PackageName;
 PackFormat;
 Part;Μέρος
 Part_Count;Συνολικός αριθμός
+PartialParsing;
 PartNumber;
 PartTotal;
 Performer;Performer
@@ -1156,12 +1189,14 @@ Position_Total;
 Preferences;Επιλογές/Προτιμήσεις
 PreferredDownmix;
 Premium;
+Premium_Feature;
 Premium_Summary;
 PreselectionLabel;
 Presentation;
 PresentationConfig;
 PresentationConfig_ContentClassifier;
 PresentationID;
+PresentationLevel;
 PreviousDownmixType5ch;
 PreviousMixType2ch;
 PrimaryAudioLanguage;
@@ -1177,6 +1212,7 @@ ProgrammeTextLanguage;
 ProgrammeTitle;
 Publisher;Εκδώτης
 Purchased_Date;Ημερομηνία αγοράς
+PurchaseInformation;
 Quote character;Quote character
 RadioStation;Ραδιοφωνικός σταθμός
 Rating;Αξιολόγηση
@@ -1193,6 +1229,7 @@ ReplayGain_Peak;
 Report;
 Resolution;Ανάλυση
 RestoreLifetimeSubscription;
+Retry;
 s;s
 Sampled_Height;
 Sampled_Width;
@@ -1241,9 +1278,11 @@ Shell extension, separate instance;
 Shell InfoTip;Shell InfoTip (in explorer, move the mouse on file, info will be displayed)
 ShimName;
 ShimVersion;
+Show;
 Show menu;Εμφάνιση μενού
 Show toolbar;Εμφάνιση εργαλειοθήκης
 ShowAll;Εμφάνιση όλων
+ShowMore;
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1272,6 +1311,7 @@ StreamKind;Τύπος/Είδος Ροής
 StreamKindID;
 StreamKindPos;
 StreamOrder;
+Streams;
 StreamSize;
 StreamSize_Demuxed;
 StreamSize_Encoded;
@@ -1281,6 +1321,7 @@ Subscribe;
 Subscribe_Button;
 Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Premium;
 Subscribe_Renew;
 Subscribe_Renew_Price;
 Subscribe_Unaviable;
@@ -1298,6 +1339,7 @@ Summary;Περίληψη
 Supported formats;Υποστηριζόμενες μορφοποιήσεις
 Supported?;Υποστηρίζεται?
 SupportUs;
+SupportUs2;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Σύνοψη
@@ -1308,6 +1350,7 @@ TargetDeviceConfig;
 Technician;Τεχνικός
 TermsOfUse;Όροι χρήσης
 TertiaryAudioLanguage;
+TestContinuousFileNames;
 Text;Κείμενο
 Text - Custom;Κείμενο - Προσαρμοσμένο
 Text (HTML);Κείμενο (HTML)
@@ -1373,6 +1416,26 @@ TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
+Type_Composer;
+Type_Conductor;
+Type_Cover;
+Type_Cover_Back;
+Type_Cover_Media;
+Type_DuringPerformance;
+Type_DuringRecording;
+Type_FileIcon;
+Type_FileIcon_32x32;
+Type_Illustration;
+Type_LeafletPage;
+Type_Lyricist;
+Type_Performer;
+Type_Performer_Lead;
+Type_PerformerLogo;
+Type_Picture;
+Type_PublisherLogo;
+Type_RecordingLocation;
+Type_ScreenCapture;
+Type_Thumbnail;
 TypeDefinition;
 UniqueID;
 UniversalAdID;
@@ -1380,6 +1443,7 @@ UniversalAdID_Registry;
 UniversalAdID_Value;
 Unknown;Άγνωστο
 Url;Url
+Value;
 Video;Video
 Video stream(s);Video stream(s)
 Video_Codec_List;Συμπιεστές Video
@@ -1422,5 +1486,5 @@ Yes;Ναι
 Your system;Το σύστημά σας
 Your translation;
 Zoom;Ζουμ
-ZZ_Automatic_Percent;54
-ZZ_AutomaticLanguage_Percent;58
+ZZ_Automatic_Percent;52
+ZZ_AutomaticLanguage_Percent;56

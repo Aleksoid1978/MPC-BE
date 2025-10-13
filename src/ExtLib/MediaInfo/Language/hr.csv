@@ -161,6 +161,7 @@
 7.1ch;
 About;O programu...
 About_Hint;Kontakt i pronalaženje posljednje inačice
+AC3_Metadata;
 Accompaniment;Pratnja
 Active_DisplayAspectRatio;
 Active_Height;
@@ -187,7 +188,9 @@ Alignment;Usmjerenje
 Alignment_Aligned;Usmjerenje sukladno čimbeniku 'interleave'
 Alignment_Split;Rasporediti preko interleavea
 All;Sve
+AllFields;
 AlternateGroup;
+AnalyzeServicesMenu;
 App_About;Više o aplikaciji MediaInfo
 App_Hide;Sakrij MediaInfo
 App_Quit;Zatvori MediaInfo
@@ -241,6 +244,7 @@ BitRate_Mode_CBR;Ustaljeno
 BitRate_Mode_VBR;Promjenjivo
 BitRate_Nominal;Nominalni protok podataka
 Bits-(Pixel*Frame);Bita/(piksela*sličica)
+BitstreamLevel;
 Bring All to Front;Postavi sve naprijed
 BufferSize;
 Cancel;Poništiti
@@ -280,9 +284,11 @@ Classifier;
 ClearList;
 Close;Zatvoriti
 Close all before open;Prije otvaranja sve ostale zatvoriti
+CloseAll;
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
+CloseFile;
 CloseWindow;Zatvori prozor
 Codec;Kôdek
 Codec_Description;Opis kôdeka
@@ -317,6 +323,8 @@ colour_primaries;
 colour_range;
 Comment;Komentar
 CommissionedBy;Prema nalogu
+Compare;
+CompareView;
 Compilation;
 ComplementaryObject;
 CompleteName;Potpuni naziv
@@ -327,6 +335,7 @@ Compression_Mode;
 Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;Omjer sažimanja
+comprprof;
 Conductor;Ravnatelj
 ConformanceCheck;
 ConformanceErrors;
@@ -362,6 +371,7 @@ Default;
 Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
+DefaultView;
 Delay;Zaostajanje
 Delay_Source;
 Delay_Source_Container;
@@ -392,6 +402,8 @@ Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Potpora razvoju MediaInfo
 DotsPerInch;Točaka po palcu (DPI)
+DownloadFile;
+DownloadFileError;
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
@@ -406,6 +418,7 @@ Duration_Start_Command;
 Duration_Start2End;
 DynamicObject;
 DynamicRangeControl;
+dynrngprof;
 Eac3DrcProfile;
 Edit;Uređivanje
 EditedBy;Uredio
@@ -416,6 +429,7 @@ EMail;E-pošta
 Enable FFmpeg plugin;
 Encoded_Application;Kodirajući program
 Encoded_Date;Nadnevak kodiranja
+Encoded_Hardware;
 Encoded_Library;Kodirano pomoću knjižnice
 Encoded_Library_Name;
 Encoded_Library_Settings;Postavke kodiranja
@@ -424,8 +438,11 @@ Encoded_Original;Original podržava
 EncodedBy;Kodirao
 EPG_Positions;Položaj EPG-a
 EpisodeTitleNumber;
+Error;
 Error_File;Pogreška tijekom učitavanja datoteke
 Error_File_Write;
+Error_Open;
+Error_Save;
 Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
@@ -440,6 +457,11 @@ Extensions;Uobičajeni nastavci naziva datoteke
 External_Media_NotMounted;
 Family;Obitelj
 Fax;Faks
+Feature_AdvancedMode;
+Feature_FilesCompare;
+Feature_More;
+Feature_SelectView;
+Field;
 File;Datoteka
 File size;Veličina datoteke
 File_Append;Dodati u postojeću datoteku (Pozor: Pripazite na istovjetne parametere!)
@@ -523,6 +545,7 @@ FrameRate_Num;
 FrameRate_Original;Izvorna stopa protoka sličica
 FrameRate_Real;
 FullParsing;
+FullParsingTips;
 Gallery;
 General;Općenito
 GeneralCompliance;
@@ -986,10 +1009,11 @@ Language_zh-tw;Kineski (Taiwan)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;Zulu
+LanguageChanges;
 Languages;
 LawRating;Dopušteno za mladež od
-LegacyStreamDisplay;
 LCCN;LCCN
+LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
 Library;Knjižnica multipleksera
@@ -1036,6 +1060,7 @@ LtRtCenterMixGain;
 LtRtSurroundMixGain;
 Lyricist;Tekstopisac
 Lyrics;Tekst pjesme
+MacCreatedBy;
 Mastered_Date;Nadnevak glavne snimke
 MasteredBy;Glavnu snimku napravio
 MasteringDisplay_ColorPrimaries;
@@ -1053,6 +1078,7 @@ MD5;
 MD5_Unencoded;
 MediaInfo_About;Pruža vrlo podrobne informacije\r\no multimedijalnim datotekama:\r\nMatroska, OGG (uključujući OGM)\r\nMPEG1 (uključujući VCD)\r\nMPEG2 (uključujući DVD i SVCD)\r\nMPEG4 (uključujući Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (uključujući WMV, WMA)\r\nMicrosoft RIFF (uključujući AVI, WAV)\r\nSamo zvukovnim oblicima (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
+MediaInfo_WebSite;
 Menu;Izbornik
 Menu stream(s);Izbornik - tokovi
 Menu_Codec_List;Izbornik - kôdeksi
@@ -1104,10 +1130,15 @@ Object;
 ObjectCount;
 OK;U redu
 One output file per input file;Po jedna izlazna datoteka na jednu ulaznu
+OnlyDiffer;
+OnlyIdentical;
 Open;Otvoriti
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
+OpenFile;
+OpenFileError;
+OpenRecent;
 Options;Mogućnosti
 Options_Hint;Prilagodbe
 Original;Izvorno
@@ -1119,6 +1150,7 @@ Originator;
 Other;Ostalo
 OtherIdentifier;
 OtherIdentifierType;
+OtherViews;
 Output;Izlaz
 Output format;Izlazni oblik
 OverallBitRate;Ukupni protok podataka
@@ -1130,6 +1162,7 @@ PackageName;
 PackFormat;
 Part;Dio
 Part_Count;Ukupni broj
+PartialParsing;
 PartNumber;
 PartTotal;
 Performer;Izvođač
@@ -1156,12 +1189,14 @@ Position_Total;ukupno
 Preferences;Prilagodbe
 PreferredDownmix;
 Premium;
+Premium_Feature;
 Premium_Summary;
 PreselectionLabel;
 Presentation;
 PresentationConfig;
 PresentationConfig_ContentClassifier;
 PresentationID;
+PresentationLevel;
 PreviousDownmixType5ch;
 PreviousMixType2ch;
 PrimaryAudioLanguage;
@@ -1177,6 +1212,7 @@ ProgrammeTextLanguage;
 ProgrammeTitle;
 Publisher;Nakladnik
 Purchased_Date;Nadnevak kupovine
+PurchaseInformation;
 Quote character;Znaci navoda
 RadioStation;Radijska postaja
 Rating;Vrjednovanje
@@ -1193,6 +1229,7 @@ ReplayGain_Peak;Vrhunac pojačanog zvuka izvedbe
 Report;
 Resolution;Razlučivost
 RestoreLifetimeSubscription;
+Retry;
 s;s
 Sampled_Height;
 Sampled_Width;
@@ -1241,9 +1278,11 @@ Shell extension, separate instance;
 Shell InfoTip;Info-naznaka (prelaskom miša preko neke datoteke u Pregledniku će se prikazati informacije o njoj)
 ShimName;
 ShimVersion;
+Show;
 Show menu;Prikazati izbornik
 Show toolbar;Prikazati alatnu traku
 ShowAll;Prikaži sve
+ShowMore;
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1272,6 +1311,7 @@ StreamKind;Vrsta toka
 StreamKindID;Prepoznavatelj toka
 StreamKindPos;Položaj prepoznavatelja toka
 StreamOrder;
+Streams;
 StreamSize;Veličina toka
 StreamSize_Demuxed;
 StreamSize_Encoded;
@@ -1281,6 +1321,7 @@ Subscribe;
 Subscribe_Button;
 Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Premium;
 Subscribe_Renew;
 Subscribe_Renew_Price;
 Subscribe_Unaviable;
@@ -1298,6 +1339,7 @@ Summary;Sveukupno
 Supported formats;Podržavani oblici datoteka
 Supported?;Podržavano?
 SupportUs;
+SupportUs2;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Sažetak
@@ -1308,6 +1350,7 @@ TargetDeviceConfig;
 Technician;Tehničar
 TermsOfUse;Uvjeti korištenja
 TertiaryAudioLanguage;
+TestContinuousFileNames;
 Text;Tekst
 Text - Custom;Vlastiti tekst
 Text (HTML);Tekst (HTML)
@@ -1373,6 +1416,26 @@ TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
+Type_Composer;
+Type_Conductor;
+Type_Cover;
+Type_Cover_Back;
+Type_Cover_Media;
+Type_DuringPerformance;
+Type_DuringRecording;
+Type_FileIcon;
+Type_FileIcon_32x32;
+Type_Illustration;
+Type_LeafletPage;
+Type_Lyricist;
+Type_Performer;
+Type_Performer_Lead;
+Type_PerformerLogo;
+Type_Picture;
+Type_PublisherLogo;
+Type_RecordingLocation;
+Type_ScreenCapture;
+Type_Thumbnail;
 TypeDefinition;
 UniqueID;
 UniversalAdID;
@@ -1380,6 +1443,7 @@ UniversalAdID_Registry;
 UniversalAdID_Value;
 Unknown;Nepoznato
 Url;URL
+Value;
 Video;Video
 Video stream(s);Video tok(-ovi)
 Video_Codec_List;Video-kôdeki
@@ -1422,5 +1486,5 @@ Yes;Da
 Your system;Informacije o Vašem sustavu
 Your translation;
 Zoom;Zumiraj
-ZZ_Automatic_Percent;64
-ZZ_AutomaticLanguage_Percent;68
+ZZ_Automatic_Percent;61
+ZZ_AutomaticLanguage_Percent;65

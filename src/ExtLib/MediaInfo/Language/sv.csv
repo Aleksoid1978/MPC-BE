@@ -161,6 +161,7 @@
 7.1ch;
 About;Om
 About_Hint;Kontakt - och versionsinformation
+AC3_Metadata;
 Accompaniment;Ackompanjemang
 Active_DisplayAspectRatio;
 Active_Height;
@@ -187,7 +188,9 @@ Alignment;Justering
 Alignment_Aligned;Justerad efter interfoliering
 Alignment_Split;Uppdelad över interfoliering
 All;Alla
+AllFields;
 AlternateGroup;
+AnalyzeServicesMenu;
 App_About;Om MediaInfo
 App_Hide;Göm MediaInfo
 App_Quit;Avsluta MediaInfo
@@ -241,6 +244,7 @@ BitRate_Mode_CBR;Konstant
 BitRate_Mode_VBR;Variabelt
 BitRate_Nominal;Nominellt dataflöde
 Bits-(Pixel*Frame);Bitar/(Pixlar*bildruta)
+BitstreamLevel;
 Bring All to Front;Lägg alla överst
 BufferSize;Buffertstorlek
 Cancel;Avbryt
@@ -280,9 +284,11 @@ Classifier;
 ClearList;
 Close;Stäng
 Close all before open;Stäng alla före öppna
+CloseAll;
 ClosedCaptionsLanguage;Undertextspråk
 ClosedCaptionsPresent;Tillgängliga undertexter
 ClosedCaptionsType;Undertexttyp
+CloseFile;
 CloseWindow;Stäng fönster
 Codec;Kodek
 Codec_Description;Kodekbeskrivning
@@ -317,6 +323,8 @@ colour_primaries;Primärfärger
 colour_range;Färgskala
 Comment;Kommentar
 CommissionedBy;På uppdrag av
+Compare;
+CompareView;
 Compilation;Kompilering
 ComplementaryObject;
 CompleteName;Fullständigt namn
@@ -327,6 +335,7 @@ Compression_Mode;Komprimeringsläge
 Compression_Mode_Lossless;Förlustfri
 Compression_Mode_Lossy;Förstörande
 Compression_Ratio;Komprimeringsförhållande
+comprprof;
 Conductor;Dirigent
 ConformanceCheck;
 ConformanceErrors;
@@ -362,6 +371,7 @@ Default;
 Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
+DefaultView;
 Delay;Fördröjning
 Delay_Source;Fördröjning, orig.
 Delay_Source_Container;Behållare
@@ -392,6 +402,8 @@ Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Donera
 DotsPerInch;Punkter per inch
+DownloadFile;
+DownloadFileError;
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
@@ -406,6 +418,7 @@ Duration_Start_Command;
 Duration_Start2End;
 DynamicObject;
 DynamicRangeControl;
+dynrngprof;
 Eac3DrcProfile;
 Edit;Redigera
 EditedBy;Redigerad av
@@ -416,6 +429,7 @@ EMail;E-post
 Enable FFmpeg plugin;
 Encoded_Application;Skrivande program
 Encoded_Date;Kodningsdatum
+Encoded_Hardware;
 Encoded_Library;Skrivande bibliotek
 Encoded_Library_Name;
 Encoded_Library_Settings;Kodningsinställningar
@@ -424,8 +438,11 @@ Encoded_Original;Ursprungligt stöd
 EncodedBy;Kodad av
 EPG_Positions;EPG-positioner (interna)
 EpisodeTitleNumber;Episodnummer
+Error;
 Error_File;Fel vid inläsning av fil
 Error_File_Write;
+Error_Open;
+Error_Save;
 Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
@@ -440,6 +457,11 @@ Extensions;Vanliga filändelser
 External_Media_NotMounted;
 Family;Familj
 Fax;Fax
+Feature_AdvancedMode;
+Feature_FilesCompare;
+Feature_More;
+Feature_SelectView;
+Field;
 File;Fil
 File size;Filstorlek
 File_Append;Lägg till i den befintliga filen (Varning! Använd samma parametrar!)
@@ -523,6 +545,7 @@ FrameRate_Num;
 FrameRate_Original;Ursprunglig bildfrekvens
 FrameRate_Real;
 FullParsing;
+FullParsingTips;
 Gallery;
 General;Allmänt
 GeneralCompliance;
@@ -986,10 +1009,11 @@ Language_zh-tw;Kinesiska (Taiwan)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;Zulu
+LanguageChanges;
 Languages;
 LawRating;Åldersgräns
-LegacyStreamDisplay;
 LCCN;LCCN
+LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
 Library;Muxningsbibliotek
@@ -1036,6 +1060,7 @@ LtRtCenterMixGain;
 LtRtSurroundMixGain;
 Lyricist;Texter från
 Lyrics;Texter
+MacCreatedBy;
 Mastered_Date;Master-datum
 MasteredBy;Mastrad av
 MasteringDisplay_ColorPrimaries;
@@ -1053,6 +1078,7 @@ MD5;
 MD5_Unencoded;
 MediaInfo_About;MediaInfo tillhandahåller enkel tillgång till teknisk information, och tagginformation, om video- och ljudfiler.\r\nFörutom Mac App Stores grafiska användargränsnitt, är mjukvaran öppen källkod. Det innebär att den är kostnadsfri för slutanvändaren och att andra utvecklare tillåts studera, förbättra och återdistribuera programmet (BSD-licens).
 MediaInfo_About_About;
+MediaInfo_WebSite;
 Menu;Meny
 Menu stream(s);Menyströmmar
 Menu_Codec_List;Menykodekar
@@ -1104,10 +1130,15 @@ Object;
 ObjectCount;
 OK;OK
 One output file per input file;En utdatafil per indatafil
+OnlyDiffer;
+OnlyIdentical;
 Open;Öppna
 OpenCaptionsLanguage;Öppet textspråk
 OpenCaptionsPresent;Aktuella öppna texter
 OpenCaptionsType;Öppen texttyp
+OpenFile;
+OpenFileError;
+OpenRecent;
 Options;Alternativ
 Options_Hint;Inställningar
 Original;Original
@@ -1119,6 +1150,7 @@ Originator;Upphovsman
 Other;Annat
 OtherIdentifier;Annan identifierare
 OtherIdentifierType;Annan identifieringstyp
+OtherViews;
 Output;Utdata
 Output format;Utdataformat
 OverallBitRate;Sammanlagt dataflöde
@@ -1130,6 +1162,7 @@ PackageName;
 PackFormat;
 Part;Del
 Part_Count;Totalt antal
+PartialParsing;
 PartNumber;Delnummer
 PartTotal;Antal delar
 Performer;Artist
@@ -1156,12 +1189,14 @@ Position_Total;Totalt
 Preferences;Inställningar
 PreferredDownmix;
 Premium;
+Premium_Feature;
 Premium_Summary;
 PreselectionLabel;
 Presentation;
 PresentationConfig;
 PresentationConfig_ContentClassifier;
 PresentationID;
+PresentationLevel;
 PreviousDownmixType5ch;
 PreviousMixType2ch;
 PrimaryAudioLanguage;Primärt ljudspråk
@@ -1177,6 +1212,7 @@ ProgrammeTextLanguage;Textspråk
 ProgrammeTitle;Programtitel
 Publisher;Utgivare
 Purchased_Date;Inköpsdatum
+PurchaseInformation;
 Quote character;Citationstecken
 RadioStation;Radiokanal
 Rating;Betyg
@@ -1193,6 +1229,7 @@ ReplayGain_Peak;Replay gain peak
 Report;
 Resolution;Upplösning
 RestoreLifetimeSubscription;
+Retry;
 s; sek
 Sampled_Height;
 Sampled_Width;
@@ -1241,9 +1278,11 @@ Shell extension, separate instance;
 Shell InfoTip;Knappbeskrivning (Hovra över en fil i Utforskaren, så visas information)
 ShimName;Shim-namn
 ShimVersion;Shim-version
+Show;
 Show menu;Visa meny
 Show toolbar;Visa verktygsfält
 ShowAll;Visa alla
+ShowMore;
 SignalGroup;
 SigningPresent;Signaturer
 SignLanguage;Signaturspråk
@@ -1272,6 +1311,7 @@ StreamKind;Strömtyp
 StreamKindID;Strömidentifierare
 StreamKindPos;Strömidentifierare
 StreamOrder;
+Streams;
 StreamSize;Strömstorlek
 StreamSize_Demuxed;
 StreamSize_Encoded;Kodad strömstorlek
@@ -1281,6 +1321,7 @@ Subscribe;
 Subscribe_Button;
 Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Premium;
 Subscribe_Renew;
 Subscribe_Renew_Price;
 Subscribe_Unaviable;
@@ -1298,6 +1339,7 @@ Summary;Sammanfattning
 Supported formats;Format som stöds
 Supported?;Stöd?
 SupportUs;
+SupportUs2;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Sammandrag
@@ -1308,6 +1350,7 @@ TargetDeviceConfig;
 Technician;Tekniker
 TermsOfUse;Användarvillkor
 TertiaryAudioLanguage;Tertiärt ljudspråk
+TestContinuousFileNames;
 Text;Text
 Text - Custom;Text - Anpassad
 Text (HTML);Text (HTML)
@@ -1373,6 +1416,26 @@ TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;Typ
+Type_Composer;
+Type_Conductor;
+Type_Cover;
+Type_Cover_Back;
+Type_Cover_Media;
+Type_DuringPerformance;
+Type_DuringRecording;
+Type_FileIcon;
+Type_FileIcon_32x32;
+Type_Illustration;
+Type_LeafletPage;
+Type_Lyricist;
+Type_Performer;
+Type_Performer_Lead;
+Type_PerformerLogo;
+Type_Picture;
+Type_PublisherLogo;
+Type_RecordingLocation;
+Type_ScreenCapture;
+Type_Thumbnail;
 TypeDefinition;
 UniqueID;Unikt ID
 UniversalAdID;
@@ -1380,6 +1443,7 @@ UniversalAdID_Registry;
 UniversalAdID_Value;
 Unknown;Okänd
 Url;URL
+Value;
 Video;Video
 Video stream(s);Videoströmm(ar)
 Video_Codec_List;Videokodekar
@@ -1422,5 +1486,5 @@ Yes;Ja
 Your system;Ditt system
 Your translation;
 Zoom;Zooma
-ZZ_Automatic_Percent;75
-ZZ_AutomaticLanguage_Percent;76
+ZZ_Automatic_Percent;72
+ZZ_AutomaticLanguage_Percent;73

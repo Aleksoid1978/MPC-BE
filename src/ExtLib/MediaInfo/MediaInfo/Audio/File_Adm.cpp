@@ -69,6 +69,7 @@ namespace MediaInfoLib
 static const char* ADM_Atmos_1_0 = " (additional constraint from Dolby Atmos Master ADM Profile v1.0)";
 static const char* ADM_Atmos_1_1 = " (additional constraint from Dolby Atmos Master ADM Profile v1.1)";
 static const char* ADM_AdvSSE_1 = " (additional constraint from AdvSS Emission v1)";
+static const char* ADM_DolbyE_1_2 = " (additional constraint from Dolby E Profile for emission v1.2)";
 
 static const uint8_t Version_Max = 3;
 
@@ -279,26 +280,54 @@ enum check_flags_items {
     Count0,
     Count1,
     Count2,
-    Dolby0,
-    Dolby1,
-    Dolby2,
+    CountReserved,
+    Atmos0,
+    Atmos1,
+    Atmos2,
+    AtmosReserved,
     AdvSSE0,
     AdvSSE1,
     AdvSSE2,
-    Reserved9,
+    AdvSSEReserved,
+    DolbyE0,
+    DolbyE1,
+    DolbyE2,
+    DolbyE2Reserved,
     Version_Max0,
     Version_Max1,
     Version_Max2,
+    Version_MaxReserved,
     Version_Min0,
     Version_Min1,
     Version_Min3,
+    Version_MinReserved,
     flags_Max
 };
+auto Info_Flag_Max = Version_Max0 >> 2;
 class check_flags : public bitset<flags_Max> {
 public:
     consteval check_flags(unsigned long val) : bitset(val) {}
-    consteval check_flags(unsigned long min, unsigned long max, unsigned long val0, unsigned long val1, unsigned long val2, unsigned long val3, unsigned long val4, unsigned long val5, unsigned long val6, unsigned long val7, unsigned long val8)
-    : check_flags((val0 << 0) | (val1 << 1) | (val2 << 2) | (val3 << 3) | (val4 << 4) | (val5 << 5) | (val6 << 6) | (val7 << 7) | (val8 << 8) | (min << Version_Min0) | (max << Version_Max0)) {}
+    consteval check_flags(unsigned long min, unsigned long max,
+                         unsigned long Flag_Count0, unsigned long Flag_Count1, unsigned long Flag_Count2,
+                          unsigned long Flag_Atmos0, unsigned long Flag_Atmos1, unsigned long Flag_Atmos2,
+                          unsigned long Flag_AdvSSE0, unsigned long Flag_AdvSSE1, unsigned long Flag_AdvSSE2,
+                          unsigned long Flag_DolbyE0 = 1, unsigned long Flag_DolbyE1 = 1, unsigned long Flag_DolbyE2 = 1,
+                          unsigned long = 1)
+    : check_flags(((Flag_Count0) << Count0)
+                | ((Flag_Count1) << Count1)
+                | ((Flag_Count2) << Count2)
+                | ((Flag_Atmos0 | !Flag_Count0) << Atmos0)
+                | ((Flag_Atmos1 | !Flag_Count1) << Atmos1)
+                | ((Flag_Atmos2 | !Flag_Count2) << Atmos2)
+                | ((Flag_AdvSSE0 | !Flag_Count0) << AdvSSE0)
+                | ((Flag_AdvSSE1 | !Flag_Count1) << AdvSSE1)
+                | ((Flag_AdvSSE2 | !Flag_Count2) << AdvSSE2)
+                | ((Flag_DolbyE0 | !Flag_Count0 | !Flag_AdvSSE0) << DolbyE0)
+                | ((Flag_DolbyE1 | !Flag_Count1 | !Flag_AdvSSE1) << DolbyE1)
+                | ((Flag_DolbyE2 | !Flag_Count2 | !Flag_AdvSSE2) << DolbyE2)
+                | (min << Version_Min0)
+                | (max << Version_Max0)
+                ) {}
 };
 
 struct attribute_item {
@@ -378,10 +407,27 @@ enum item {
     item_profile,
     item_tagGroup,
     item_tag,
+    item_profileList_audioFormatExtended,
+    item_profileList_frameHeader,
+    item_profile_audioFormatExtended,
+    item_profile_frameHeader,
+    item_dbmd,
+    item_metadataSegment,
+    item_dolbyE,
+    item_ac3Program,
+    item_encodeParameters,
+    item_programInfo,
+    item_langCode,
+    item_audioProdInfo,
+    item_extBsi1e,
+    item_extBsi2e,
+    item_compr1,
+    item_dynRng1,
     item_Max
 };
 
 enum root_Attribute {
+    root_version,
     root_Attribute_Max
 };
 
@@ -584,6 +630,24 @@ enum profileList_Attribute {
 enum profileList_Element {
     profileList_profile,
     profileList_Element_Max
+};
+
+enum profileList_audioFormatExtended_Attribute {
+    profileList_audioFormatExtended_Attribute_Max
+};
+
+enum profileList_audioFormatExtended_Element {
+    profileList_audioFormatExtended_profile,
+    profileList_audioFormatExtended_Element_Max
+};
+
+enum profileList_frameHeader_Attribute {
+    profileList_frameHeader_Attribute_Max
+};
+
+enum profileList_frameHeader_Element {
+    profileList_frameHeader_profile,
+    profileList_frameHeader_Element_Max
 };
 
 enum tagList_Attribute {
@@ -1032,6 +1096,153 @@ enum tagGroup_Element {
     tagGroup_Element_Max
 };
 
+enum dbmd_Attribute {
+    dbmd_Attribute_Max
+};
+
+enum dbmd_Element {
+    dbmd_metadataSegment,
+    dbmd_Element_Max
+};
+
+enum metadataSegment_Attribute {
+    metadataSegment_ID,
+    metadataSegment_Attribute_Max
+};
+
+enum metadataSegment_Element {
+    metadataSegment_dolbyE,
+    metadataSegment_ac3Program,
+    metadataSegment_encodeParameters,
+    metadataSegment_Element_Max
+};
+
+enum dolbyE_Attribute {
+    dolbyE_ID,
+    dolbyE_Attribute_Max
+};
+
+enum dolbyE_Element {
+    dolbyE_programConfig,
+    dolbyE_frameRateCode,
+    dolbyE_smpteTimeCode,
+    dolbyE_Element_Max
+};
+
+enum ac3Program_Attribute {
+    ac3Program_ID,
+    ac3Program_Attribute_Max
+};
+
+enum ac3Program_Element {
+    ac3Program_programInfo,
+    ac3Program_cMixLev,
+    ac3Program_surMixLev,
+    ac3Program_dSurMod,
+    ac3Program_dialNorm,
+    ac3Program_copyRightB,
+    ac3Program_origBs,
+    ac3Program_langCode,
+    ac3Program_audioProdInfo,
+    ac3Program_extBsi1e,
+    ac3Program_extBsi2e,
+    ac3Program_compr1,
+    ac3Program_dynRng1,
+    ac3Program_programDescriptionText,
+    ac3Program_Element_Max
+};
+
+enum encodeParameters_Attribute {
+    encodeParameters_ID,
+    encodeParameters_Attribute_Max
+};
+
+enum encodeParameters_Element {
+    encodeParameters_hpFOn,
+    encodeParameters_bwLpFOn,
+    encodeParameters_lfeLpFOn,
+    encodeParameters_sur90On,
+    encodeParameters_surAttOn,
+    encodeParameters_rfPremphOn,
+    encodeParameters_Element_Max
+};
+
+enum programInfo_Attribute {
+    programInfo_Attribute_Max
+};
+
+enum programInfo_Element {
+    programInfo_acMod,
+    programInfo_bsMod,
+    programInfo_lfeOn,
+    programInfo_Element_Max
+};
+
+enum langCode_Attribute {
+    langCode_exists,
+    langCode_Attribute_Max
+};
+
+enum langCode_Element {
+    langCode_langCod,
+    langCode_Element_Max
+};
+
+enum audioProdInfo_Attribute {
+    audioProdInfo_exists,
+    audioProdInfo_Attribute_Max
+};
+
+enum audioProdInfo_Element {
+    audioProdInfo_mixLevel,
+    audioProdInfo_roomTyp,
+    audioProdInfo_Element_Max
+};
+
+enum extBsi1e_Attribute {
+    extBsi1e_exists,
+    extBsi1e_Attribute_Max
+};
+
+enum extBsi1e_Element {
+    extBsi1e_loRoCMixLev,
+    extBsi1e_loRoSurMixLev,
+    extBsi1e_ltRtCMixLev,
+    extBsi1e_ltRtSurMixLev,
+    extBsi1e_dMixMod,
+    extBsi1e_Element_Max
+};
+
+enum extBsi2e_Attribute {
+    extBsi2e_exists,
+    extBsi2e_Attribute_Max
+};
+
+enum extBsi2e_Element {
+    extBsi2e_dSurExMod,
+    extBsi2e_dHeadPhonMod,
+    extBsi2e_adConvTyp,
+    extBsi2e_Element_Max
+};
+
+enum compr1_Attribute {
+    compr1_exists,
+    compr1_Attribute_Max
+};
+
+enum compr1_Element {
+    compr1_Element_Max
+};
+
+enum dynRng1_Attribute {
+    dynRng1_exists,
+    dynRng1_Attribute_Max
+};
+
+enum dynRng1_Element {
+    dynRng1_Element_Max
+};
+
 enum error_Type {
     Error,
     Warning,
@@ -1042,15 +1253,18 @@ enum error_Type {
 enum source {
     Source_ADM,
     Source_Atmos_1_0,
-    Source_Atmos_1_1,
     Source_AdvSSE_1,
+    Source_DolbyE_1_2,
+    // Minor update, not in the common checks
+    Source_Atmos_1_1,
     source_Max,
 };
 static const char* Source_Strings[] = {
     "",
     ADM_Atmos_1_0,
-    ADM_Atmos_1_1,
     ADM_AdvSSE_1,
+    ADM_DolbyE_1_2,
+    ADM_Atmos_1_1,
 };
 static_assert(sizeof(Source_Strings) / sizeof(Source_Strings[0]) == source_Max, "");
 
@@ -1076,673 +1290,830 @@ static constexpr size_t schema_String_Size = sizeof(schema_String) / sizeof(sche
 static_assert(schema_String_Size + 1 == Schema_Max, IncoherencyMessage);
 
 
-                                                 // Ver  |Count|Atmos   |AdvSS-E
-                                                 // m  M |0  2+|0  1  2+|0  1  2+
+                                                 // Ver  |Count   |Atmos   |AdvSS-E |DolbyE
+                                                 // m  M |0  1  2+|0  1  2+|0  1  2+|0  1  2+
+static attribute_items root_Attributes =
+{
+    { "version"                                 , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0 } },
+};
+static_assert(sizeof(root_Attributes) / sizeof(attribute_item) == root_Attribute_Max, IncoherencyMessage);
+
 static constexpr element_items root_Elements =
 {
-    { "frameHeader"                             , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 }, item_frameHeader },
-    { "audioFormatExtended"                     , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 }, item_audioFormatExtended },
+    { "frameHeader"                             , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 }, item_frameHeader },
+    { "audioFormatExtended"                     , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 }, item_audioFormatExtended },
 };
 static_assert(sizeof(root_Elements) / sizeof(element_item) == root_Element_Max, IncoherencyMessage);
 
 static element_items audioFormatExtended_Elements =
 {
-    { "audioProgramme"                          , { 0, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1 }, item_audioProgramme },
-    { "audioContent"                            , { 0, 7, 1, 1, 1, 1, 1, 1, 0, 1, 1 }, item_audioContent },
-    { "audioObject"                             , { 0, 7, 1, 1, 1, 1, 1, 1, 0, 1, 1 }, item_audioObject },
-    { "audioPackFormat"                         , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_audioPackFormat },
-    { "audioChannelFormat"                      , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_audioChannelFormat },
-    { "audioTrackUID"                           , { 0, 7, 1, 1, 1, 1, 1, 1, 0, 1, 1 }, item_audioTrackUID },
-    { "audioTrackFormat"                        , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 0, 0 }, item_audioTrackFormat },
-    { "audioStreamFormat"                       , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 0, 0 }, item_audioStreamFormat },
-    { "profileList"                             , { 3, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0 }, item_profileList },
-    { "tagList"                                 , { 3, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 }, item_tagList },
+    { "audioProgramme"                          , { 0, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1 }, item_audioProgramme },
+    { "audioContent"                            , { 0, 7, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1 }, item_audioContent },
+    { "audioObject"                             , { 0, 7, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1 }, item_audioObject },
+    { "audioPackFormat"                         , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0 }, item_audioPackFormat },
+    { "audioChannelFormat"                      , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0 }, item_audioChannelFormat },
+    { "audioTrackUID"                           , { 0, 7, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1 }, item_audioTrackUID },
+    { "audioTrackFormat"                        , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0 }, item_audioTrackFormat },
+    { "audioStreamFormat"                       , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0 }, item_audioStreamFormat },
+    { "profileList"                             , { 3, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0 }, item_profileList },
+    { "tagList"                                 , { 3, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0 }, item_tagList },
 };
 static_assert(sizeof(audioFormatExtended_Elements) / sizeof(element_item) == audioFormatExtended_Element_Max, IncoherencyMessage);
 
 static attribute_items audioProgramme_Attributes =
 {
-    { "audioProgrammeID"                        , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "audioProgrammeName"                      , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "audioProgrammeLanguage"                  , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0 } },
-    { "start"                                   , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 0, 0 } },
-    { "end"                                     , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 0, 0 } },
-    { "typeLabel"                               , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "typeDefinition"                          , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "typeLink"                                , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "typeLanguage"                            , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "formatLabel"                             , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "formatDefinition"                        , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "formatLink"                              , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "formatLanguage"                          , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "maxDuckingDepth"                         , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "audioProgrammeID"                        , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "audioProgrammeName"                      , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "audioProgrammeLanguage"                  , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "start"                                   , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "end"                                     , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "typeLabel"                               , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "typeDefinition"                          , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "typeLink"                                , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "typeLanguage"                            , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "formatLabel"                             , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "formatDefinition"                        , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "formatLink"                              , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "formatLanguage"                          , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "maxDuckingDepth"                         , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(audioProgramme_Attributes) / sizeof(attribute_item) == audioProgramme_Attribute_Max, IncoherencyMessage);
 
 static element_items audioProgramme_Elements =
 {
-    { "audioProgrammeLabel"                     , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1 }, item_audioProgrammeLabel },
-    { "audioContentIDRef"                       , { 0, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1 } },
-    { "loudnessMetadata"                        , { 0, 7, 1, 1, 1, 1, 1, 0, 0, 1, 0 }, item_loudnessMetadata },
-    { "audioProgrammeReferenceScreen"           , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 }, item_audioProgrammeReferenceScreen },
-    { "authoringInformation"                    , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 }, item_authoringInformation },
-    { "alternativeValueSetIDRef"                , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1 } },
+    { "audioProgrammeLabel"                     , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0 }, item_audioProgrammeLabel },
+    { "audioContentIDRef"                       , { 0, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0 } },
+    { "loudnessMetadata"                        , { 0, 7, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0 }, item_loudnessMetadata },
+    { "audioProgrammeReferenceScreen"           , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 }, item_audioProgrammeReferenceScreen },
+    { "authoringInformation"                    , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 }, item_authoringInformation },
+    { "alternativeValueSetIDRef"                , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0 } },
 };
 static_assert(sizeof(audioProgramme_Elements) / sizeof(element_item) == audioProgramme_Element_Max, IncoherencyMessage);
 
 static attribute_items audioContent_Attributes =
 {
-    { "audioContentID"                          , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "audioContentName"                        , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "audioContentLanguage"                    , { 0, 7, 1, 1, 0, 1, 0, 0, 0, 1, 0 } },
-    { "typeLabel"                               , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } }, // TODO
+    { "audioContentID"                          , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "audioContentName"                        , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "audioContentLanguage"                    , { 0, 7, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0 } },
+    { "typeLabel"                               , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } }, // TODO
 };
 static_assert(sizeof(audioContent_Attributes) / sizeof(attribute_item) == audioContent_Attribute_Max, IncoherencyMessage);
 
 static element_items audioContent_Elements =
 {
-    { "audioContentLabel"                       , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1 }, item_audioContentLabel },
-    { "audioObjectIDRef"                        , { 0, 7, 0, 1, 1, 0, 1, 1, 0, 1, 0 } },
-    { "loudnessMetadata"                        , { 0, 7, 1, 1, 1, 1, 0, 0, 0, 1, 0 }, item_loudnessMetadata },
-    { "dialogue"                                , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "alternativeValueSetIDRef"                , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 0, 1 } },
+    { "audioContentLabel"                       , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0 }, item_audioContentLabel },
+    { "audioObjectIDRef"                        , { 0, 7, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0 } },
+    { "loudnessMetadata"                        , { 0, 7, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0 }, item_loudnessMetadata },
+    { "dialogue"                                , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "alternativeValueSetIDRef"                , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0 } },
 };
 static_assert(sizeof(audioContent_Elements) / sizeof(element_item) == audioContent_Element_Max, IncoherencyMessage);
 
 static attribute_items audioObject_Attributes =
 {
-    { "audioObjectID"                           , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "audioObjectName"                         , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "start"                                   , { 1, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "startTime"                               , { 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "duration"                                , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 0, 0 } },
-    { "dialogue"                                , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "importance"                              , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "interact"                                , { 0, 7, 1, 1, 0, 1, 0, 0, 0, 1, 0 } },
-    { "disableDucking"                          , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "typeLabel"                               , { 0, 0, 1,1,  0, 1, 0, 0, 1, 0, 0 } }, // TODO
+    { "audioObjectID"                           , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "audioObjectName"                         , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "start"                                   , { 1, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "startTime"                               , { 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "duration"                                , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "dialogue"                                , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "importance"                              , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "interact"                                , { 0, 7, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0 } },
+    { "disableDucking"                          , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "typeLabel"                               , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } }, // TODO
 };
 static_assert(sizeof(audioObject_Attributes) / sizeof(attribute_item) == audioObject_Attribute_Max, IncoherencyMessage);
 
 static element_items audioObject_Elements =
 {
-    { "audioPackFormatIDRef"                    , { 0, 7, 1, 1, 1, 0, 1, 0, 1, 1, 0 } },
-    { "audioObjectIDRef"                        , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1 } },
-    { "audioObjectLabel"                        , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 }, item_audioObjectLabel },
-    { "audioComplementaryObjectGroupLabel"      , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1 }, item_audioComplementaryObjectGroupLabel },
-    { "audioComplementaryObjectIDRef"           , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1 } },
-    { "audioTrackUIDRef"                        , { 0, 7, 1, 1, 1, 0, 1, 1, 1, 1, 1 } },
-    { "audioObjectInteraction"                  , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 }, item_audioObjectInteraction },
-    { "gain"                                    , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 }, item_gain },
-    { "headLocked"                              , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "positionOffset"                          , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 }, item_positionOffset },
-    { "mute"                                    , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "alternativeValueSet"                     , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1 }, item_alternativeValueSet },
+    { "audioPackFormatIDRef"                    , { 0, 7, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0 } },
+    { "audioObjectIDRef"                        , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0 } },
+    { "audioObjectLabel"                        , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0 }, item_audioObjectLabel },
+    { "audioComplementaryObjectGroupLabel"      , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0 }, item_audioComplementaryObjectGroupLabel },
+    { "audioComplementaryObjectIDRef"           , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0 } },
+    { "audioTrackUIDRef"                        , { 0, 7, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1 } },
+    { "audioObjectInteraction"                  , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0 }, item_audioObjectInteraction },
+    { "gain"                                    , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0 }, item_gain },
+    { "headLocked"                              , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "positionOffset"                          , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0 }, item_positionOffset },
+    { "mute"                                    , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "alternativeValueSet"                     , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0 }, item_alternativeValueSet },
 };
 static_assert(sizeof(audioObject_Elements) / sizeof(element_item) == audioObject_Element_Max, IncoherencyMessage);
 
 static attribute_items audioPackFormat_Attributes =
 {
-    { "audioPackFormatID"                       , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "audioPackFormatName"                     , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "typeDefinition"                          , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "typeLabel"                               , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "typeLink"                                , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "typeLanguage"                            , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "importance"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "audioPackFormatID"                       , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "audioPackFormatName"                     , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "typeDefinition"                          , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "typeLabel"                               , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "typeLink"                                , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0 } },
+    { "typeLanguage"                            , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0 } },
+    { "importance"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioPackFormat_Attributes) / sizeof(attribute_item) == audioPackFormat_Attribute_Max, IncoherencyMessage);
 
 static element_items audioPackFormat_Elements =
 {
-    { "audioChannelFormatIDRef"                 , { 0, 7, 1, 1, 1, 0, 1, 1, 0, 1, 1 } },
-    { "audioPackFormatIDRef"                    , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "absoluteDistance"                        , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "encodePackFormatIDRef"                   , { 1, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "decodePackFormatIDRef"                   , { 1, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "inputPackFormatIDRef"                    , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
-    { "outputPackFormatIDRef"                   , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
-    { "normalization"                           , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "nfcRefDist"                              , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "screenRef"                               , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "audioChannelFormatIDRef"                 , { 0, 7, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1 } },
+    { "audioPackFormatIDRef"                    , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1 } },
+    { "absoluteDistance"                        , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1 } },
+    { "encodePackFormatIDRef"                   , { 1, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1 } },
+    { "decodePackFormatIDRef"                   , { 1, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1 } },
+    { "inputPackFormatIDRef"                    , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1 } },
+    { "outputPackFormatIDRef"                   , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1 } },
+    { "normalization"                           , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1 } },
+    { "nfcRefDist"                              , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1 } },
+    { "screenRef"                               , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1 } },
 };
 static_assert(sizeof(audioPackFormat_Elements) / sizeof(element_item) == audioPackFormat_Element_Max, IncoherencyMessage);
 
 static attribute_items audioChannelFormat_Attributes =
 {
-    { "audioChannelFormatID"                    , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "audioChannelFormatName"                  , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "typeDefinition"                          , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "typeLabel"                               , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "typeLink"                                , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "typeLanguage"                            , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "audioChannelFormatID"                    , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "audioChannelFormatName"                  , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "typeDefinition"                          , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "typeLabel"                               , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "typeLink"                                , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0 } },
+    { "typeLanguage"                            , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioChannelFormat_Attributes) / sizeof(attribute_item) == audioChannelFormat_Attribute_Max, IncoherencyMessage);
 
 static element_items audioChannelFormat_Elements =
 {
-    { "audioBlockFormat"                        , { 0, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1 }, item_audioBlockFormat },
-    { "frequency"                               , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 0, 1 }, item_frequency },
+    { "audioBlockFormat"                        , { 0, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1 }, item_audioBlockFormat },
+    { "frequency"                               , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1 }, item_frequency },
 };
 static_assert(sizeof(audioChannelFormat_Elements) / sizeof(element_item) == audioChannelFormat_Element_Max, IncoherencyMessage);
 
 static attribute_items audioTrackUID_Attributes =
 {
-    { "UID"                                     , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "sampleRate"                              , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
-    { "bitDepth"                                , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
-    { "typeLabel"                               , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } }, // TODO
+    { "UID"                                     , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "sampleRate"                              , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "bitDepth"                                , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "typeLabel"                               , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } }, // TODO
 };
 static_assert(sizeof(audioTrackUID_Attributes) / sizeof(attribute_item) == audioTrackUID_Attribute_Max, IncoherencyMessage);
 
 static element_items audioTrackUID_Elements =
 {
-    { "audioMXFLookUp"                          , { 0, 2, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "audioTrackFormatIDRef"                   , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 0, 0 } },
-    { "audioChannelFormatIDRef"                 , { 2, 7, 1, 1, 0, 1, 0, 0, 0, 1, 0 } },
-    { "audioPackFormatIDRef"                    , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "audioMXFLookUp"                          , { 0, 2, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "audioTrackFormatIDRef"                   , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "audioChannelFormatIDRef"                 , { 2, 7, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0 } },
+    { "audioPackFormatIDRef"                    , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
 };
 static_assert(sizeof(audioTrackUID_Elements) / sizeof(element_item) == audioTrackUID_Element_Max, IncoherencyMessage);
 
 static attribute_items audioTrackFormat_Attributes =
 {
-    { "audioTrackFormatID"                      , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "audioTrackFormatName"                    , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "typeLabel"                               , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } }, // TODO: present in some Atmos files
-    { "typeDefinition"                          , { 7, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } }, // TODO: present in some Atmos files
-    { "formatLabel"                             , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
-    { "formatDefinition"                        , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
-    { "formatLink"                              , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
-    { "formatLanguage"                          , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
+    { "audioTrackFormatID"                      , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "audioTrackFormatName"                    , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "typeLabel"                               , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0 } }, // TODO: present in some Atmos files
+    { "typeDefinition"                          , { 7, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0 } }, // TODO: present in some Atmos files
+    { "formatLabel"                             , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "formatDefinition"                        , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "formatLink"                              , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0 } },
+    { "formatLanguage"                          , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioTrackFormat_Attributes) / sizeof(attribute_item) == audioTrackFormat_Attribute_Max, IncoherencyMessage);
 
 static element_items audioTrackFormat_Elements =
 {
-    { "audioStreamFormatIDRef"                  , { 0, 7, 0, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "audioStreamFormatIDRef"                  , { 0, 7, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioTrackFormat_Elements) / sizeof(element_item) == audioTrackFormat_Element_Max, IncoherencyMessage);
 
 static attribute_items audioStreamFormat_Attributes =
 {
-    { "audioStreamFormatID"                     , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "audioStreamFormatName"                   , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "typeLabel"                               , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0 } }, // TODO: present in some Atmos files
-    { "typeDefinition"                          , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0 } }, // TODO: present in some Atmos files
-    { "formatLabel"                             , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
-    { "formatDefinition"                        , { 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
-    { "formatLink"                              , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
-    { "formatLanguage"                          , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
+    { "audioStreamFormatID"                     , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "audioStreamFormatName"                   , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "typeLabel"                               , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0 } }, // TODO: present in some Atmos files
+    { "typeDefinition"                          , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0 } }, // TODO: present in some Atmos files
+    { "formatLabel"                             , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "formatDefinition"                        , { 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "formatLink"                              , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0 } },
+    { "formatLanguage"                          , { 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioStreamFormat_Attributes) / sizeof(attribute_item) == audioStreamFormat_Attribute_Max, IncoherencyMessage);
 
 static element_items audioStreamFormat_Elements =
 {
-    { "audioChannelFormatIDRef"                 , { 0, 7, 1, 1, 1, 0, 1, 0, 1, 1, 1 } },
-    { "audioPackFormatIDRef"                    , { 0, 7, 1, 1, 1, 0, 1, 0, 1, 1, 1 } },
-    { "audioTrackFormatIDRef"                   , { 0, 7, 1, 1, 1, 0, 1, 0, 1, 1, 1 } },
+    { "audioChannelFormatIDRef"                 , { 0, 7, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1 } },
+    { "audioPackFormatIDRef"                    , { 0, 7, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1 } },
+    { "audioTrackFormatIDRef"                   , { 0, 7, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1 } },
 };
 static_assert(sizeof(audioStreamFormat_Elements) / sizeof(element_item) == audioStreamFormat_Element_Max, IncoherencyMessage);
 
 static element_items profileList_Elements =
 {
-    { "profile"                                 , { 3, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1 } },
+    { "profile"                                 , { 3, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1 } },
 };
 static_assert(sizeof(profileList_Elements) / sizeof(element_item) == profileList_Element_Max, IncoherencyMessage);
 
 static element_items tagList_Elements =
 {
-    { "tagGroup"                                , { 3, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1 } },
+    { "tagGroup"                                , { 3, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1 } },
 };
 static_assert(sizeof(tagList_Elements) / sizeof(element_item) == tagList_Element_Max, IncoherencyMessage);
 
 static element_items frameHeader_Elements =
 {
-    { "profileList"                             , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0 }, item_profileList },
-    { "frameFormat"                             , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 }, item_frameFormat },
-    { "transportTrackFormat"                    , { 0, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1 }, item_transportTrackFormat },
+    { "profileList"                             , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0 }, item_profileList },
+    { "frameFormat"                             , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 }, item_frameFormat },
+    { "transportTrackFormat"                    , { 0, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1 }, item_transportTrackFormat },
 };
 static_assert(sizeof(frameHeader_Elements) / sizeof(element_item) == frameHeader_Element_Max, IncoherencyMessage);
 
 static attribute_items frameFormat_Attributes =
 {
-    { "frameFormatID"                           , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "start"                                   , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "duration"                                , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "type"                                    , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "timeReference"                           , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0 } },
-    { "flowID"                                  , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "countToFull"                             , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "numMetadataChunks"                       , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "countToSameChunk"                        , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "frameFormatID"                           , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "start"                                   , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "duration"                                , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "type"                                    , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "timeReference"                           , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "flowID"                                  , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "countToFull"                             , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "numMetadataChunks"                       , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "countToSameChunk"                        , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(frameFormat_Attributes) / sizeof(attribute_item) == frameFormat_Attribute_Max, IncoherencyMessage);
 
 static element_items frameFormat_Elements =
 {
-    { "changedIDs"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "chunkAdmElement"                         , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0 } },
+    { "changedIDs"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "chunkAdmElement"                         , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(frameFormat_Elements) / sizeof(element_item) == frameFormat_Element_Max, IncoherencyMessage);
 
 static attribute_items transportTrackFormat_Attributes =
 {
-    { "transportID"                             , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "transportName"                           , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0 } },
-    { "numTracks"                               , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0 } },
-    { "numIDs"                                  , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0 } },
+    { "transportID"                             , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "transportName"                           , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "numTracks"                               , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "numIDs"                                  , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
 };
 static_assert(sizeof(transportTrackFormat_Attributes) / sizeof(attribute_item) == transportTrackFormat_Attribute_Max, IncoherencyMessage);
 
 static element_items transportTrackFormat_Elements =
 {
-    { "audioTrack"                              , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_audioTrack },
+    { "audioTrack"                              , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1 }, item_audioTrack },
 };
 static_assert(sizeof(transportTrackFormat_Elements) / sizeof(element_item) == transportTrackFormat_Element_Max, IncoherencyMessage);
 
 static attribute_items audioTrack_Attributes =
 {
-    { "trackID"                                 , { 0, 7, 0, 1, 0, 1, 0, 0, 0, 1, 0 } },
-    { "formatLabel"                             , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0 } },
-    { "formatDefinition"                        , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0 } },
+    { "trackID"                                 , { 0, 7, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0 } },
+    { "formatLabel"                             , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "formatDefinition"                        , { 0, 7, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
 };
 static_assert(sizeof(audioTrack_Attributes) / sizeof(attribute_item) == audioTrack_Attribute_Max, IncoherencyMessage);
 
 static element_items audioTrack_Elements =
 {
-    { "audioTrackUIDRef"                        , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 } },
+    { "audioTrackUIDRef"                        , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
 };
 static_assert(sizeof(audioTrack_Elements) / sizeof(element_item) == audioTrack_Element_Max, IncoherencyMessage);
 
 static attribute_items audioProgrammeLabel_Attributes =
 {
-    { "language"                                , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "language"                                , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioProgrammeLabel_Attributes) / sizeof(attribute_item) == audioProgrammeLabel_Attribute_Max, IncoherencyMessage);
 
 static attribute_items loudnessMetadata_Attributes =
 {
-    { "loudnessMethod"                          , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "loudnessRecType"                         , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "loudnessCorrectionType"                  , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "loudnessMethod"                          , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "loudnessRecType"                         , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "loudnessCorrectionType"                  , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(loudnessMetadata_Attributes) / sizeof(attribute_item) == loudnessMetadata_Attribute_Max, IncoherencyMessage);
 
 static element_items loudnessMetadata_Elements =
 {
-    { "integratedLoudness"                      , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "loudnessRange"                           , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "maxTruePeak"                             , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "maxMomentary"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "maxShortTerm"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "dialogueLoudness"                        , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "renderer"                                , { 3, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 }, item_renderer },
+    { "integratedLoudness"                      , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "loudnessRange"                           , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "maxTruePeak"                             , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "maxMomentary"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "maxShortTerm"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "dialogueLoudness"                        , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0 } },
+    { "renderer"                                , { 3, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 }, item_renderer },
 };
 static_assert(sizeof(loudnessMetadata_Elements) / sizeof(element_item) == loudnessMetadata_Element_Max, IncoherencyMessage);
 
 static attribute_items renderer_Attributes =
 {
-    { "uri"                                     , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
-    { "name"                                    , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
-    { "version"                                 , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
-    { "coordinateMode"                          , { 3, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "uri"                                     , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "name"                                    , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "version"                                 , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "coordinateMode"                          , { 3, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(renderer_Attributes) / sizeof(attribute_item) == renderer_Attribute_Max, IncoherencyMessage);
 
 static element_items renderer_Elements =
 {
-    { "audioPackFormatIDRef"                    , { 3, 7, 1, 1, 1, 1, 1, 1, 1, 1, 0 } },
-    { "audioObjectIDRef"                        , { 3, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 } },
+    { "audioPackFormatIDRef"                    , { 3, 7, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0 } },
+    { "audioObjectIDRef"                        , { 3, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 } },
 };
 static_assert(sizeof(renderer_Elements) / sizeof(element_item) == renderer_Element_Max, IncoherencyMessage);
 
 static attribute_items audioProgrammeReferenceScreen_Attributes =
 {
-    { "aspectRatio"                             , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "aspectRatio"                             , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioProgrammeReferenceScreen_Attributes) / sizeof(attribute_item) == audioProgrammeReferenceScreen_Attribute_Max, IncoherencyMessage);
 
 static element_items audioProgrammeReferenceScreen_Elements =
 {
-    { "screenCentrePosition"                    , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1 }, item_screenCentrePosition },
-    { "screenWidth"                             , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 1, 1 }, item_screenWidth },
+    { "screenCentrePosition"                    , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1 }, item_screenCentrePosition },
+    { "screenWidth"                             , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1 }, item_screenWidth },
 };
 static_assert(sizeof(audioProgrammeReferenceScreen_Elements) / sizeof(element_item) == audioProgrammeReferenceScreen_Element_Max, IncoherencyMessage);
 
 static attribute_items screenCentrePosition_Attributes =
 {
-    { "coordinate"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } }, // TODO: clarify coordinate="X" or X=
-    { "azimuth"                                 , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "elevation"                               , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "distance"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "X"                                       , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "Y"                                       , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "Z"                                       , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "coordinate"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } }, // TODO: clarify coordinate="X" or X=
+    { "azimuth"                                 , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "elevation"                               , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "distance"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "X"                                       , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "Y"                                       , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "Z"                                       , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(screenCentrePosition_Attributes) / sizeof(attribute_item) == screenCentrePosition_Attribute_Max, IncoherencyMessage);
 
 static attribute_items screenWidth_Attributes =
 {
-    { "coordinate"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } }, // TODO: clarify coordinate="X" or X=
-    { "azimuth"                                 , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "X"                                       , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "coordinate"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } }, // TODO: clarify coordinate="X" or X=
+    { "azimuth"                                 , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "X"                                       , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(screenWidth_Attributes) / sizeof(attribute_item) == screenWidth_Attribute_Max, IncoherencyMessage);
 
 static element_items authoringInformation_Elements =
 {
-    { "referenceLayout"                         , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1 }, item_referenceLayout },
-    { "renderer"                                , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1 }, item_renderer },
+    { "referenceLayout"                         , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1 }, item_referenceLayout },
+    { "renderer"                                , { 2, 7, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1 }, item_renderer },
 };
 static_assert(sizeof(authoringInformation_Elements) / sizeof(element_item) == authoringInformation_Element_Max, IncoherencyMessage);
 
 static element_items referenceLayout_Elements =
 {
-    { "audioPackFormatIDRef"                    , { 2, 7, 0, 1, 0, 1, 0, 0, 0, 1, 0 } },
+    { "audioPackFormatIDRef"                    , { 2, 7, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(referenceLayout_Elements) / sizeof(element_item) == referenceLayout_Element_Max, IncoherencyMessage);
 
 static attribute_items audioContentLabel_Attributes =
 {
-    { "language"                                , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "language"                                , { 0, 7, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioContentLabel_Attributes) / sizeof(attribute_item) == audioContentLabel_Attribute_Max, IncoherencyMessage);
 
 static attribute_items dialogue_Attributes =
 {
-    { "nonDialogueContentKind"                  , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "dialogueContentKind"                     , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "mixedContentKind"                        , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "nonDialogueContentKind"                  , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "dialogueContentKind"                     , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "mixedContentKind"                        , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(dialogue_Attributes) / sizeof(attribute_item) == dialogue_Attribute_Max, IncoherencyMessage);
 
 static attribute_items audioObjectLabel_Attributes =
 {
-    { "language"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "language"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioObjectLabel_Attributes) / sizeof(attribute_item) == audioObjectLabel_Attribute_Max, IncoherencyMessage);
 
 static attribute_items audioComplementaryObjectGroupLabel_Attributes =
 {
-    { "language"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "language"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioComplementaryObjectGroupLabel_Attributes) / sizeof(attribute_item) == audioComplementaryObjectGroupLabel_Attribute_Max, IncoherencyMessage);
 
 static attribute_items audioObjectInteraction_Attributes =
 {
-    { "onOffInteract"                           , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "gainInteract"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "positionInteract"                        , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "onOffInteract"                           , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "gainInteract"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "positionInteract"                        , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioObjectInteraction_Attributes) / sizeof(attribute_item) == audioObjectInteraction_Attribute_Max, IncoherencyMessage);
 
 static element_items audioObjectInteraction_Elements =
 {
-    { "gainInteractionRange"                    , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_gainInteractionRange },
-    { "positionInteractionRange"                , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_positionInteractionRange },
+    { "gainInteractionRange"                    , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_gainInteractionRange },
+    { "positionInteractionRange"                , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_positionInteractionRange },
 };
 static_assert(sizeof(audioObjectInteraction_Elements) / sizeof(element_item) == audioObjectInteraction_Element_Max, IncoherencyMessage);
 
 static attribute_items gainInteractionRange_Attributes =
 {
-    { "gainUnit"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "bound"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "gainUnit"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "bound"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(gainInteractionRange_Attributes) / sizeof(attribute_item) == gainInteractionRange_Attribute_Max, IncoherencyMessage);
 
 static attribute_items positionInteractionRange_Attributes =
 {
-    { "coordinate"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "bound"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "coordinate"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "bound"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(positionInteractionRange_Attributes) / sizeof(attribute_item) == positionInteractionRange_Attribute_Max, IncoherencyMessage);
 
 static attribute_items audioBlockFormat_Attributes =
 {
-    { "audioBlockFormatID"                      , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "rtime"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "duration"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "lstart"                                  , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
-    { "lduration"                               , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
-    { "initializeBlock"                         , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
+    { "audioBlockFormatID"                      , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "rtime"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "duration"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "lstart"                                  , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0 } },
+    { "lduration"                               , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0 } },
+    { "initializeBlock"                         , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(audioBlockFormat_Attributes) / sizeof(attribute_item) == audioBlockFormat_Attribute_Max, IncoherencyMessage);
 
 static element_items audioBlockFormat_DirectSpeakers_Elements =
 {
-    { "gain"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 }, item_gain },
-    { "importance"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "jumpPosition"                            , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "headLocked"                              , { 2, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "headphoneVirtualise"                     , { 2, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "speakerLabel"                            , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0 } },
-    { "position"                                , { 0, 7, 0, 0, 1, 0, 0, 1, 0, 0, 1 }, item_position },
-    { "outputChannelFormatIDRef"                , { 1, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "outputChannelIDRef,"                     , { 1, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "matrix"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "width"                                   , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "height"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "depth"                                   , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "cartesian"                               , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "diffuse"                                 , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "channelLock"                             , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "objectDivergence"                        , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "zoneExclusion"                           , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "equation"                                , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "order"                                   , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "degree"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "normalization"                           , { 1, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "nfcRefDist"                              , { 1, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "screenRef"                               , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "gain"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 }, item_gain },
+    { "importance"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "jumpPosition"                            , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "headLocked"                              , { 2, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "headphoneVirtualise"                     , { 2, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "speakerLabel"                            , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "position"                                , { 0, 7, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1 }, item_position },
+    { "outputChannelFormatIDRef"                , { 1, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "outputChannelIDRef,"                     , { 1, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "matrix"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "width"                                   , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "height"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "depth"                                   , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "cartesian"                               , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "diffuse"                                 , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "channelLock"                             , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "objectDivergence"                        , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "zoneExclusion"                           , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "equation"                                , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "order"                                   , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "degree"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "normalization"                           , { 1, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "nfcRefDist"                              , { 1, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "screenRef"                               , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(audioBlockFormat_DirectSpeakers_Elements) / sizeof(element_item) == audioBlockFormat_Element_Max, IncoherencyMessage);
 
 static element_items audioBlockFormat_Matrix_Elements =
 {
-    { "gain"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 }, item_gain },
-    { "importance"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "jumpPosition"                            , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "headLocked"                              , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "headphoneVirtualise"                     , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 }, item_headphoneVirtualise },
-    { "speakerLabel"                            , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0 } },
-    { "position"                                , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "outputChannelFormatIDRef"                , { 1, 7, 1, 1, 0, 1, 0, 0, 0, 1, 0 } },
-    { "outputChannelIDRef,"                     , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "matrix"                                  , { 0, 7, 0, 1, 1, 1, 0, 0, 0, 1, 0 }, item_matrix },
-    { "width"                                   , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "height"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "depth"                                   , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "cartesian"                               , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "diffuse"                                 , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "channelLock"                             , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "objectDivergence"                        , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "zoneExclusion"                           , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "equation"                                , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "order"                                   , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "degree"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "normalization"                           , { 1, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "nfcRefDist"                              , { 1, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "screenRef"                               , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "gain"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 }, item_gain },
+    { "importance"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "jumpPosition"                            , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "headLocked"                              , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "headphoneVirtualise"                     , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 }, item_headphoneVirtualise },
+    { "speakerLabel"                            , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "position"                                , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "outputChannelFormatIDRef"                , { 1, 7, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0 } },
+    { "outputChannelIDRef,"                     , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "matrix"                                  , { 0, 7, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0 }, item_matrix },
+    { "width"                                   , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "height"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "depth"                                   , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "cartesian"                               , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "diffuse"                                 , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "channelLock"                             , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "objectDivergence"                        , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "zoneExclusion"                           , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "equation"                                , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "order"                                   , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "degree"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "normalization"                           , { 1, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "nfcRefDist"                              , { 1, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "screenRef"                               , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(audioBlockFormat_Matrix_Elements) / sizeof(element_item) == audioBlockFormat_Element_Max, IncoherencyMessage);
 
 static element_items audioBlockFormat_Object_Elements =
 {
-    { "gain"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 }, item_gain },
-    { "importance"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "jumpPosition"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 }, item_jumpPosition },
-    { "headLocked"                              , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "headphoneVirtualise"                     , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 }, item_headphoneVirtualise },
-    { "speakerLabel"                            , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "position"                                , { 0, 7, 1, 1, 1, 0, 1, 1, 1, 1, 1 }, item_position },
-    { "outputChannelFormatIDRef"                , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "outputChannelIDRef,"                     , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "matrix"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
-    { "width"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "height"                                  , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "depth"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "cartesian"                               , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "diffuse"                                 , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0 } },
-    { "channelLock"                             , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0 }, item_channelLock },
-    { "objectDivergence"                        , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 }, item_objectDivergence },
-    { "zoneExclusion"                           , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 }, item_zoneExclusion },
-    { "equation"                                , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "order"                                   , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "degree"                                  , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "normalization"                           , { 1, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "nfcRefDist"                              , { 1, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "screenRef"                               , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "gain"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 }, item_gain },
+    { "importance"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "jumpPosition"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 }, item_jumpPosition },
+    { "headLocked"                              , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "headphoneVirtualise"                     , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 }, item_headphoneVirtualise },
+    { "speakerLabel"                            , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "position"                                , { 0, 7, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1 }, item_position },
+    { "outputChannelFormatIDRef"                , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "outputChannelIDRef,"                     , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "matrix"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "width"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "height"                                  , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "depth"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "cartesian"                               , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "diffuse"                                 , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "channelLock"                             , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0 }, item_channelLock },
+    { "objectDivergence"                        , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0 }, item_objectDivergence },
+    { "zoneExclusion"                           , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 }, item_zoneExclusion },
+    { "equation"                                , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "order"                                   , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "degree"                                  , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "normalization"                           , { 1, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "nfcRefDist"                              , { 1, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "screenRef"                               , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(audioBlockFormat_Object_Elements) / sizeof(element_item) == audioBlockFormat_Element_Max, IncoherencyMessage);
 
 static element_items audioBlockFormat_Elements =
 {
-    { "gain"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 }, item_gain },
-    { "importance"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "jumpPosition"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 }, item_jumpPosition },
-    { "headLocked"                              , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "headphoneVirtualise"                     , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 }, item_headphoneVirtualise },
-    { "speakerLabel"                            , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0 } },
-    { "position"                                , { 0, 7, 1, 1, 1, 0, 1, 1, 1, 1, 1 }, item_position },
-    { "outputChannelFormatIDRef"                , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 } },
-    { "outputChannelIDRef,"                     , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "matrix"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 1, 0 }, item_matrix },
-    { "width"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "height"                                  , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "depth"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "cartesian"                               , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "diffuse"                                 , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0 } },
-    { "channelLock"                             , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0 }, item_channelLock },
-    { "objectDivergence"                        , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0 }, item_objectDivergence },
-    { "zoneExclusion"                           , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 }, item_zoneExclusion },
-    { "equation"                                , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "order"                                   , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "degree"                                  , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "normalization"                           , { 1, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "nfcRefDist"                              , { 1, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0 } },
-    { "screenRef"                               , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "gain"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 }, item_gain },
+    { "importance"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "jumpPosition"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 }, item_jumpPosition },
+    { "headLocked"                              , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "headphoneVirtualise"                     , { 2, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 }, item_headphoneVirtualise },
+    { "speakerLabel"                            , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "position"                                , { 0, 7, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1 }, item_position },
+    { "outputChannelFormatIDRef"                , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0 } },
+    { "outputChannelIDRef,"                     , { 1, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "matrix"                                  , { 0, 7, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0 }, item_matrix },
+    { "width"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "height"                                  , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "depth"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "cartesian"                               , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "diffuse"                                 , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "channelLock"                             , { 0, 7, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0 }, item_channelLock },
+    { "objectDivergence"                        , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0 }, item_objectDivergence },
+    { "zoneExclusion"                           , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 }, item_zoneExclusion },
+    { "equation"                                , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "order"                                   , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "degree"                                  , { 0, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "normalization"                           , { 1, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "nfcRefDist"                              , { 1, 7, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "screenRef"                               , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(audioBlockFormat_Elements) / sizeof(element_item) == audioBlockFormat_Element_Max, IncoherencyMessage);
 
 static attribute_items gain_Attributes =
 {
-    { "gainUnit"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "gainUnit"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(gain_Attributes) / sizeof(attribute_item) == gain_Attribute_Max, IncoherencyMessage);
 
 static attribute_items headphoneVirtualise_Attributes =
 {
-    { "bypass"                                  , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "DRR"                                     , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "bypass"                                  , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "DRR"                                     , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(headphoneVirtualise_Attributes) / sizeof(attribute_item) == headphoneVirtualise_Attribute_Max, IncoherencyMessage);
 
 static attribute_items position_Attributes =
 {
-    { "coordinate"                              , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "bound"                                   , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
-    { "screenEdgeLock"                          , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "coordinate"                              , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0 } },
+    { "bound"                                   , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
+    { "screenEdgeLock"                          , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(position_Attributes) / sizeof(attribute_item) == position_Attribute_Max, IncoherencyMessage);
 
 static attribute_items positionOffset_Attributes =
 {
-    { "coordinate"                              , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "coordinate"                              , { 0, 7, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
 };
 static_assert(sizeof(position_Attributes) / sizeof(attribute_item) == position_Attribute_Max, IncoherencyMessage);
 
 static attribute_items channelLock_Attributes =
 {
-    { "maxDistance"                             , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "maxDistance"                             , { 0, 7, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(channelLock_Attributes) / sizeof(attribute_item) == channelLock_Attribute_Max, IncoherencyMessage);
 
 static attribute_items objectDivergence_Attributes =
 {
-    { "azimuthRange"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "positionRange"                           , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "azimuthRange"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "positionRange"                           , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(objectDivergence_Attributes) / sizeof(attribute_item) == objectDivergence_Attribute_Max, IncoherencyMessage);
 
 static attribute_items jumpPosition_Attributes =
 {
-    { "interpolationLength"                     , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "interpolationLength"                     , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(jumpPosition_Attributes) / sizeof(attribute_item) == jumpPosition_Attribute_Max, IncoherencyMessage);
 
 static element_items zoneExclusion_Elements =
 {
-    { "zone"                                    , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_zone },
+    { "zone"                                    , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_zone },
 };
 static_assert(sizeof(zoneExclusion_Elements) / sizeof(element_item) == zoneExclusion_Element_Max, IncoherencyMessage);
 
 static attribute_items zone_Attributes =
 {
-    { "minX"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "maxX"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "minY"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "maxY"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "minZ"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "maxZ"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "minElevation"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "maxElevation"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "minAzimuth"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "maxAzimuth"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "minX"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "maxX"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "minY"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "maxY"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "minZ"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "maxZ"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "minElevation"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "maxElevation"                            , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "minAzimuth"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "maxAzimuth"                              , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(zone_Attributes) / sizeof(attribute_item) == zone_Attribute_Max, IncoherencyMessage);
 
 static element_items matrix_Elements =
 {
-    { "coefficient"                             , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_coefficient },
+    { "coefficient"                             , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_coefficient },
 };
 static_assert(sizeof(matrix_Elements) / sizeof(element_item) == matrix_Element_Max, IncoherencyMessage);
 
 static attribute_items coefficient_Attributes =
 {
-    { "gainUnit"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "gain"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
-    { "gainVar"                                 , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "phase"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "phaseVar"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "delay"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
-    { "delayVar"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0 } },
+    { "gainUnit"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "gain"                                    , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "gainVar"                                 , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "phase"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "phaseVar"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "delay"                                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
+    { "delayVar"                                , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0 } },
 };
 static_assert(sizeof(coefficient_Attributes) / sizeof(attribute_item) == coefficient_Attribute_Max, IncoherencyMessage);
 
 static attribute_items alternativeValueSet_Attributes =
 {
-    { "alternativeValueSetID"                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "alternativeValueSetID"                   , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(alternativeValueSet_Attributes) / sizeof(attribute_item) == alternativeValueSet_Attribute_Max, IncoherencyMessage);
 
 static attribute_items frequency_Attributes =
 {
-    { "typeDefinition"                          , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
+    { "typeDefinition"                          , { 0, 7, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0 } },
 };
 static_assert(sizeof(frequency_Attributes) / sizeof(attribute_item) == frequency_Attribute_Max, IncoherencyMessage);
 
 static attribute_items profile_Attributes =
 {
-    { "profileName"                             , { 3, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "profileVersion"                          , { 3, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
-    { "profileLevel"                            , { 3, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "profileName"                             , { 3, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "profileVersion"                          , { 3, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "profileLevel"                            , { 3, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
 };
 static_assert(sizeof(profile_Attributes) / sizeof(attribute_item) == profile_Attribute_Max, IncoherencyMessage);
 
 static element_items tagGroup_Elements =
 {
-    { "tag"                                     , { 3, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1 } },
-    { "audioProgrammeIDRef"                     , { 3, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 } },
-    { "audioContentIDRef"                       , { 3, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 } },
-    { "audioObjectIDRef"                        , { 3, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1 } },
+    { "tag"                                     , { 3, 7, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1 } },
+    { "audioProgrammeIDRef"                     , { 3, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 } },
+    { "audioContentIDRef"                       , { 3, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 } },
+    { "audioObjectIDRef"                        , { 3, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 } },
 };
 static_assert(sizeof(tagGroup_Elements) / sizeof(element_item) == tagGroup_Element_Max, IncoherencyMessage);
 
 static attribute_items tag_Attributes =
 {
-    { "class"                                   , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
+    { "class"                                   , { 0, 7, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 } },
 };
 static_assert(sizeof(tag_Attributes) / sizeof(attribute_item) == tag_Attribute_Max, IncoherencyMessage);
+
+static element_items dbmd_Elements =
+{
+    { "metadataSegment"                         , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_metadataSegment },
+};
+static_assert(sizeof(dbmd_Elements) / sizeof(element_item) == dbmd_Element_Max, IncoherencyMessage);
+
+static attribute_items metadataSegment_Attributes =
+{
+    { "ID"                                      , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+};
+static_assert(sizeof(metadataSegment_Attributes) / sizeof(attribute_item) == metadataSegment_Attribute_Max, IncoherencyMessage);
+
+static element_items metadataSegment_Elements =
+{
+    { "dolbyE"                                  , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 }, item_dolbyE },
+    { "ac3Program"                              , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_ac3Program },
+    { "encodeParameters"                        , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, item_encodeParameters },
+};
+static_assert(sizeof(metadataSegment_Elements) / sizeof(element_item) == metadataSegment_Element_Max, IncoherencyMessage);
+
+static attribute_items dolbyE_Attributes =
+{
+    { "ID"                                      , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+};
+static_assert(sizeof(dolbyE_Attributes) / sizeof(attribute_item) == dolbyE_Attribute_Max, IncoherencyMessage);
+
+static element_items dolbyE_Elements =
+{
+    { "programConfig"                           , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "frameRateCode"                           , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "smpteTimeCode"                           , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+};
+static_assert(sizeof(dolbyE_Elements) / sizeof(element_item) == dolbyE_Element_Max, IncoherencyMessage);
+
+static attribute_items ac3Program_Attributes =
+{
+    { "ID"                                      , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+};
+static_assert(sizeof(ac3Program_Attributes) / sizeof(attribute_item) == ac3Program_Attribute_Max, IncoherencyMessage);
+
+static element_items ac3Program_Elements =
+{
+    { "programInfo"                             , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 }, item_programInfo },
+    { "cMixLev"                                 , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "surMixLev"                               , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "dSurMod"                                 , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "dialNorm"                                , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 } },
+    { "copyRightB"                              , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "origBs"                                  , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "langCode"                                , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 }, item_langCode },
+    { "audioProdInfo"                           , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 }, item_audioProdInfo },
+    { "extBsi1e"                                , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 }, item_extBsi1e },
+    { "extBsi2e"                                , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 }, item_extBsi2e },
+    { "compr1"                                  , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 }, item_compr1 },
+    { "dynRng1"                                 , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 }, item_dynRng1 },
+    { "programDescriptionText"                  , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 } },
+};
+static_assert(sizeof(ac3Program_Elements) / sizeof(element_item) == ac3Program_Element_Max, IncoherencyMessage);
+
+static attribute_items encodeParameters_Attributes =
+{
+    { "ID"                                      , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+};
+static_assert(sizeof(encodeParameters_Attributes) / sizeof(attribute_item) == encodeParameters_Attribute_Max, IncoherencyMessage);
+
+static element_items encodeParameters_Elements =
+{
+    { "hpFOn"                                   , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "bwLpFOn"                                 , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "lfeLpFOn"                                , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "sur90On"                                 , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "surAttOn"                                , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "rfPremphOn"                              , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+};
+static_assert(sizeof(encodeParameters_Elements) / sizeof(element_item) == encodeParameters_Element_Max, IncoherencyMessage);
+
+static element_items programInfo_Elements =
+{
+    { "acMod"                                   , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "bsMod"                                   , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "lfeOn"                                   , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+};
+static_assert(sizeof(programInfo_Elements) / sizeof(element_item) == programInfo_Element_Max, IncoherencyMessage);
+
+static attribute_items langCode_Attributes =
+{
+    { "exists"                                  , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+};
+static_assert(sizeof(langCode_Attributes) / sizeof(attribute_item) == langCode_Attribute_Max, IncoherencyMessage);
+
+static element_items langCode_Elements =
+{
+    { "langCod"                                 , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+};
+static_assert(sizeof(langCode_Elements) / sizeof(element_item) == langCode_Element_Max, IncoherencyMessage);
+
+static attribute_items audioProdInfo_Attributes =
+{
+    { "exists"                                  , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+};
+static_assert(sizeof(audioProdInfo_Attributes) / sizeof(attribute_item) == audioProdInfo_Attribute_Max, IncoherencyMessage);
+
+static element_items audioProdInfo_Elements =
+{
+    { "mixLevel"                                , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "roomTyp"                                 , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+};
+static_assert(sizeof(audioProdInfo_Elements) / sizeof(element_item) == audioProdInfo_Element_Max, IncoherencyMessage);
+
+static attribute_items extBsi1e_Attributes =
+{
+    { "exists"                                  , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+};
+static_assert(sizeof(extBsi1e_Attributes) / sizeof(attribute_item) == extBsi1e_Attribute_Max, IncoherencyMessage);
+
+static element_items extBsi1e_Elements =
+{
+    { "loRoCMixLev"                             , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "loRoSurMixLev"                           , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "ltRtCMixLev"                             , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "ltRtSurMixLev"                           , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "dMixMod"                                 , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+};
+static_assert(sizeof(extBsi1e_Elements) / sizeof(element_item) == extBsi1e_Element_Max, IncoherencyMessage);
+
+static attribute_items extBsi2e_Attributes =
+{
+    { "exists"                                  , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+};
+static_assert(sizeof(extBsi2e_Attributes) / sizeof(attribute_item) == extBsi2e_Attribute_Max, IncoherencyMessage);
+
+static element_items extBsi2e_Elements =
+{
+    { "dSurExMod"                               , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "dHeadPhonMod"                            , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+    { "adConvTyp"                               , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+};
+static_assert(sizeof(extBsi2e_Elements) / sizeof(element_item) == extBsi2e_Element_Max, IncoherencyMessage);
+
+static attribute_items compr1_Attributes =
+{
+    { "exists"                                  , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+};
+static_assert(sizeof(compr1_Attributes) / sizeof(attribute_item) == compr1_Attribute_Max, IncoherencyMessage);
+
+static attribute_items dynRng1_Attributes =
+{
+    { "exists"                                  , { 0, 7, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0 } },
+};
+static_assert(sizeof(dynRng1_Attributes) / sizeof(attribute_item) == dynRng1_Attribute_Max, IncoherencyMessage);
 
 static const char* formatDefinition_List[] = { "PCM" };
 enum format : int8s
@@ -1800,7 +2171,7 @@ typedef item_info item_infos[];
 #define D(_0,_1,_2,_3,_4,_5,_6,_7) {_0,_1,_2,_3,_4,_5,_6,_7}
 #define F(_0) (1 << item_info::Flags_##_0)
 static const item_infos item_Infos = {
-    { nullptr, (element_items*)&root_Elements, nullptr, nullptr, 0, (int8u)-1, 0 },
+    { (attribute_items*)&root_Attributes, (element_items*)&root_Elements, nullptr, nullptr, 0, (int8u)-1, 0 },
     { nullptr, (element_items*)&audioFormatExtended_Elements, nullptr, nullptr, 0, (int8u)-1, 0 },
     { (attribute_items*)&audioProgramme_Attributes, (element_items*)&audioProgramme_Elements, "Programme", "APR", F(ID_W), audioProgramme_audioProgrammeID, 0 },
     { (attribute_items*)&audioContent_Attributes, (element_items*)&audioContent_Elements, "Content", "ACO", F(ID_W), audioContent_audioContentID, 0 },
@@ -1849,6 +2220,22 @@ static const item_infos item_Infos = {
     { (attribute_items*)&profile_Attributes, nullptr, "profile", nullptr, 0, (int8u)-1, 0xFFF},
     { nullptr, (element_items*)&tagGroup_Elements, "tagGroup", nullptr, 0, (int8u)-1, 0xFFF},
     { (attribute_items*)&tag_Attributes, nullptr, "tag", nullptr, 0, (int8u)-1, 0xFFF},
+    { nullptr, (element_items*)&profileList_Elements, "profileList", nullptr, 0, (int8u)-1, 0xFFF},
+    { nullptr, (element_items*)&profileList_Elements, "profileList", nullptr, 0, (int8u)-1, 0xFFF},
+    { (attribute_items*)&profile_Attributes, nullptr, "profile", nullptr, 0, (int8u)-1, 0xFFF},
+    { (attribute_items*)&profile_Attributes, nullptr, "profile", nullptr, 0, (int8u)-1, 0xFFF},
+    { nullptr, (element_items*)&dbmd_Elements, "dbmd", nullptr, 0, (int8u)-1, 0xFFF},
+    { (attribute_items*)&metadataSegment_Attributes, (element_items*)&metadataSegment_Elements, "metadataSegment", nullptr, 0, (int8u)-1, 0xFFF},
+    { (attribute_items*)&dolbyE_Attributes, (element_items*)&dolbyE_Elements, "dolbyE", nullptr, 0, (int8u)-1, 0xFFF},
+    { (attribute_items*)&ac3Program_Attributes, (element_items*)&ac3Program_Elements, "ac3Program", nullptr, 0, (int8u)-1, 0xFFF},
+    { (attribute_items*)&encodeParameters_Attributes, (element_items*)&encodeParameters_Elements, "encodeParameters", nullptr, 0, (int8u)-1, 0xFFF},
+    { nullptr, (element_items*)&programInfo_Elements, "programInfo", nullptr, 0, (int8u)-1, 0xFFF},
+    { (attribute_items*)&langCode_Attributes, (element_items*)&langCode_Elements, "langCode", nullptr, 0, (int8u)-1, 0xFFF},
+    { (attribute_items*)&audioProdInfo_Attributes, (element_items*)&audioProdInfo_Elements, "audioProdInfo", nullptr, 0, (int8u)-1, 0xFFF},
+    { (attribute_items*)&extBsi1e_Attributes, (element_items*)&extBsi1e_Elements, "extBsi1e", nullptr, 0, (int8u)-1, 0xFFF},
+    { (attribute_items*)&extBsi2e_Attributes, (element_items*)&extBsi2e_Elements, "extBsi2e", nullptr, 0, (int8u)-1, 0xFFF},
+    { (attribute_items*)&compr1_Attributes, nullptr, "compr1", nullptr, 0, (int8u)-1, 0xFFF},
+    { (attribute_items*)&dynRng1_Attributes, nullptr, "dynRng1", nullptr, 0, (int8u)-1, 0xFFF},
 };
 #undef D
 #undef F
@@ -2227,8 +2614,8 @@ struct Items_Struct {
     }
 
     vector<Item_Struct> Items;
-    size_t Attributes_Size;
-    size_t Elements_Size;
+    size_t Attributes_Size{};
+    size_t Elements_Size{};
 };
 
 static string Apply_Init(File__Analyze& F, const char* Name, size_t i, const Items_Struct& audioProgramme_List, Ztring Summary) {
@@ -2315,6 +2702,66 @@ static void Apply_SubStreams(File__Analyze& F, const string& P_And_LinkedTo, Ite
     F.Fill_SetOptions(Stream_Audio, 0, (P_And_LinkedTo + "/String").c_str(), "Y NIN");
 }
 
+void CheckInt(const string& Value, size_t Min, size_t Max, Item_Struct& Item, const char* Name, source Source)
+{
+    char* End;
+    auto Value_Int = strtoul(Value.c_str(), &End, 10);
+    if (to_string(Value_Int) != Value) {
+        Item.AddError(Error, string(1, ':') + Name + ':' + Name + " attribute value \"" + Value + "\" is malformed", Source);
+    }
+    else if (Min <= Max && (Value_Int < Min || Value_Int > Max)) {
+        Item.AddError(Error, string(1, ':') + Name + ':' + Name + " attribute value \"" + Value + "\" is not permitted, permitted value is " + to_string(Min) + (Min != Max ? (" to " + to_string(Max)) : string()), Source);
+    }
+}
+
+void CheckInt(const vector<string>& Values, size_t Min, size_t Max, Item_Struct& Item, const char* Name, source Source, bool LastOnly = false)
+{
+    for (size_t i = LastOnly ? (Values.size() - 1) : 0; i < Values.size(); i++) {
+        auto& Value = Values[i];
+        char* End;
+        auto Value_Int = strtoul(Value.c_str(), &End, 10);
+        if (to_string(Value_Int) != Value) {
+            Item.AddError(Error, string(1, ':') + Name + ':' + Name + " element value \"" + Value + "\" is malformed", Source);
+        }
+        else if (Min <= Max && (Value_Int < Min || Value_Int > Max)) {
+            Item.AddError(Error, string(1, ':') + Name + ':' + Name + " element value \"" + Value + "\" is not permitted, permitted value is " + to_string(Min) + (Min != Max ? (" to " + to_string(Max)) : string()), Source);
+        }
+    }
+}
+
+void CheckInt(const vector<string>& Values, const int8u* List, Item_Struct& Item, const char* Name, source Source)
+{
+    for (size_t i = 0; i < Values.size(); i++) {
+        auto& Value = Values[i];
+        char* End;
+        auto Value_Int = strtoul(Value.c_str(), &End, 10);
+        if (to_string(Value_Int) != Value) {
+            Item.AddError(Error, string(1, ':') + Name + ':' + Name + " element value \"" + Value + "\" is malformed", Source);
+            return;
+        }
+        auto IsValid = false;
+        const auto Size = List[0];
+        if (!Size) {
+            return;
+        }
+        List++;
+        for (size_t i = 0; i < Size; i++) {
+            if (List[i] == Value_Int) {
+                IsValid = true;
+            }
+        }
+        if (!IsValid) {
+            string ListString;
+            for (size_t i = 0; i < Size; i++) {
+                ListString += to_string(List[i]);
+                ListString += ", ";
+            }
+            ListString.pop_back();
+            ListString.pop_back();
+            Item.AddError(Error, string(1, ':') + Name + ':' + Name + " element value \"" + Value + "\" is not permitted, permitted values are " + ListString, Source);
+        }
+    }
+}
 
 //***************************************************************************
 // Private class
@@ -2370,7 +2817,7 @@ class file_adm_private : public tfsxml
 {
 public:
     // In
-    bool IsSub;
+    bool IsSub{};
 
     // Out
     Items_Struct Items[item_Max];
@@ -2458,6 +2905,20 @@ public:
         STRUCTS(profile);
         STRUCTS(tagGroup);
         STRUCTS(tag);
+        STRUCTS(profileList_audioFormatExtended);
+        STRUCTS(profileList_frameHeader);
+        STRUCTS(dbmd);
+        STRUCTS(metadataSegment);
+        STRUCTS(dolbyE);
+        STRUCTS(ac3Program);
+        STRUCTS(encodeParameters);
+        STRUCTS(programInfo);
+        STRUCTS(langCode);
+        STRUCTS(audioProdInfo);
+        STRUCTS(extBsi1e);
+        STRUCTS(extBsi2e);
+        STRUCTS(compr1);
+        STRUCTS(dynRng1);
     }
 
     ~file_adm_private()
@@ -2499,6 +2960,7 @@ public:
     int coreMetadata();
     int format();
     int audioFormatExtended();
+    int dbmd();
     int frameHeader();
 
     // Common definitions
@@ -2914,31 +3376,21 @@ static void CheckErrors_Attributes(file_adm_private* File_Adm_Private, item Item
     auto& Attributes_Present = Item.Attributes_Present;
     for (size_t j = 0; j < Attributes.size(); j++) {
         const auto& Info = Attribute_Infos[j];
-        switch (Attributes_Counts[j]) {
-        case 0:
-            if (!Info.Flags[Count0]) {
-                Item.AddError(Error, 0x80 | (int8u)j, E::Present0, 0);
-                break;
-            }
-            if (!Info.Flags[AdvSSE0]) {
-                Item.AddError(Error, 0x80 | (int8u)j, E::Present0, 0, Source_AdvSSE_1);
-            }
-            if (!Info.Flags[Dolby0]) {
-                Item.AddError(Error, 0x80 | (int8u)j, E::Present0, 0, Source_Atmos_1_0);
-            }
-            break;
-        default:
+        const auto Count = Attributes_Counts[j];
+        auto Count_Max1 = Count ? 1 : Count;
+        if (Count > 1) {
             Item.AddError(Error, ':' + CraftName(item_Infos[Item_Type].Name) + to_string(i) + ":" + CraftName(Attribute_Infos[j].Name) + ":" + string(Attribute_Infos[j].Name) + " attribute shall be unique");
-            [[fallthrough]];
-        case 1:
-        {
+        }
+        if (!Count_Max1 || Info.Flags[Atmos1] || (/*File_Adm_Private->Schema != Schema_ebuCore_2014 ||*/ strcmp(Info.Name, "typeLabel") && strcmp(Info.Name, "typeDefinition"))) {
+            // Handling generic errors from arrays
+            for (int k = 0; k < Info_Flag_Max; k++) {
+                if (!Info.Flags[Count0 + Count_Max1 + (k << 2)]) {
+                    Item.AddError(Error, 0x80 | (int8u)j, E((unsigned)E::Present0 + Count_Max1), 0, (source)k);
+                }
+            }
+        }
+        if (Count) {
             Attributes_Present[j] = true;
-            if (!Info.Flags[AdvSSE1]) {
-                Item.AddError(Error, 0x80 | (int8u)j, E::Present1, 0, Source_AdvSSE_1);
-            }
-            if (!Info.Flags[Dolby1] && (/*File_Adm_Private->Schema != Schema_ebuCore_2014 ||*/ strcmp(Info.Name, "typeLabel") && strcmp(Info.Name, "typeDefinition"))) {
-                Item.AddError(Error, 0x80 | (int8u)j, E::Present1, 0, Source_Atmos_1_0);
-            }
             const auto& Attribute = Attributes[j];
             if (Attribute.size() > 64) {
                 auto Attribute_Unicode = Ztring().From_UTF8(Attribute).To_Unicode();
@@ -2952,7 +3404,6 @@ static void CheckErrors_Attributes(file_adm_private* File_Adm_Private, item Item
                     Item.AddError(Warning, Item_Type, i, ':' + string(Info.Name) + ':' + string(Info.Name) + " attribute is present but empty");
                 }
             }
-        }
         }
     }
 };
@@ -2980,46 +3431,13 @@ static void CheckErrors_Elements(file_adm_private* File_Adm_Private, item Item_T
     for (size_t j = 0; j < Elements.size(); j++) {
         const auto& Element = Elements[j];
         const auto& Info = Element_Infos[j];
-        const auto Element_Size = Element.size();
-        switch (Element.size()) {
-        case 0:
-            if (!Info.Flags[Count0]) {
-                Item.AddError(Error, j, E::Present0, 0);
-                break;
-            }
-            else {
-                if (!Info.Flags[AdvSSE0]) {
-                    Item.AddError(Error, j, E::Present0, 0, Source_AdvSSE_1);
-                }
-                if (!Info.Flags[Dolby0]) {
-                    Item.AddError(Error, j, E::Present0, 0, Source_Atmos_1_0);
-                }
-            }
-            break;
-        case 1:
-            if (!Info.Flags[Count1]) {
-                Item.AddError(Error, j, E::Present1, 0);
-            }
-            else {
-                if (!Info.Flags[AdvSSE1]) {
-                    Item.AddError(Error, j, E::Present1, 0, Source_AdvSSE_1);
-                }
-                if (!Info.Flags[Dolby1]) {
-                    Item.AddError(Error, j, E::Present1, 0, Source_Atmos_1_0);
-                }
-            }
-            break;
-        default:
-            if (!Info.Flags[Count2]) {
-                Item.AddError(Error, j, E::Present2, (int8u)Element_Size);
-                break;
-            }
-            else {
-                if (!Info.Flags[AdvSSE2]) {
-                    Item.AddError(Error, j, E::Present2, (int8u)Element_Size, Source_AdvSSE_1);
-                }
-                if (!Info.Flags[Dolby2]) {
-                    Item.AddError(Error, j, E::Present2, (int8u)Element_Size, Source_Atmos_1_0);
+        const auto Count = Element.size();
+        auto Count_Max2 = Count > 2 ? 2 : Count;
+        if (true) {
+            // Handling generic errors from arrays
+            for (int k = 0; k < Info_Flag_Max; k++) {
+                if (!Info.Flags[Count0 + Count_Max2 + (k << 2)]) {
+                    Item.AddError(Error, j, E((unsigned)E::Present0 + Count_Max2), Count <= (int8u)-1 ? (int8u)Count : (int8u)-1, (source)k);
                 }
             }
         }
@@ -3037,6 +3455,8 @@ static void CheckErrors_Elements(file_adm_private* File_Adm_Private, item Item_T
                 case ITEM_ELEM(item_audioProgrammeReferenceScreen, audioProgrammeReferenceScreen_screenCentrePosition):
                 case ITEM_ELEM(item_audioProgrammeReferenceScreen, audioProgrammeReferenceScreen_screenWidth):
                 case ITEM_ELEM(item_audioBlockFormat, audioBlockFormat_headphoneVirtualise):
+                case ITEM_ELEM(item_ac3Program, ac3Program_compr1):
+                case ITEM_ELEM(item_ac3Program, ac3Program_dynRng1):
                 #undef ITEM_ELEM
                     break;
                 default:
@@ -3295,6 +3715,21 @@ void audioProgramme_Check(file_adm_private* File_Adm_Private) {
 
     CheckError_Language(File_Adm_Private, item_audioProgramme, audioProgramme_audioProgrammeLanguage);
 
+    const auto& Name = Programme.Attributes[audioProgramme_audioProgrammeName];
+    if (!Name.empty()) {
+        if (Name.size() <= 10
+            || Name.rfind("Programme ", 0) != 0
+            || Name[10] < '1'
+            || Name[10] > '4'
+            || (Name.size() != 11
+                && (Name.size() == 12
+                    || Name[11] != ' '
+                    || Name[12] != '('
+                    || Name[Name.size() - 1] != ')'))) {
+            Programme.AddError(Error, string(1, ':') + (*item_Infos[item_audioProgramme].Attribute_Infos)[audioProgramme_audioProgrammeName].Name + ':' + (*item_Infos[item_audioProgramme].Attribute_Infos)[audioProgramme_audioProgrammeName].Name + " attribute value \"" + Name + "\" is not in the form \"Programme n\" or \"Programme n (description)\" (n = 1 to 4)", Source_DolbyE_1_2);
+        }
+    }
+
     MoveErrors(File_Adm_Private, item_audioProgramme);
 
     if (!File_Adm_Private->IsAtmos && Programme.Attributes[audioProgramme_audioProgrammeName] == "Atmos_Master") {
@@ -3311,6 +3746,16 @@ void audioContent_Check(file_adm_private* File_Adm_Private) {
     size_t i = Contents.size() - 1;
 
     CheckError_Language(File_Adm_Private, item_audioContent, audioContent_audioContentLanguage);
+
+    const auto& Name = Content.Attributes[audioContent_audioContentName];
+    if (!Name.empty()) {
+        if (Name.size() != 9
+            || Name.rfind("Content ", 0) != 0
+            || Name[8] < '1'
+            || Name[8] > '4') {
+            Content.AddError(Error, string(1, ':') + (*item_Infos[item_audioContent].Attribute_Infos)[audioContent_audioContentName].Name + ':' + (*item_Infos[item_audioContent].Attribute_Infos)[audioContent_audioContentName].Name + " attribute value \"" + Name + "\" is not in the form \"Content n\" (n = 1 to 4)", Source_DolbyE_1_2);
+        }
+    }
 
     const auto& ID = Content.Attributes[audioContent_audioContentID];
     const auto& audioObjectIDRefs = Content.Elements[audioContent_audioObjectIDRef];
@@ -3360,9 +3805,23 @@ void audioComplementaryObjectGroupLabel_Check(file_adm_private* File_Adm_Private
 
 //---------------------------------------------------------------------------
 void audioObject_Check(file_adm_private* File_Adm_Private) {
+    auto& Items = File_Adm_Private->Items;
+    auto& Objects = Items[item_audioObject].Items;
+    auto& Object = Objects.back();
+
     CheckError_Time(File_Adm_Private, item_audioObject, audioObject_start);
     CheckError_Time(File_Adm_Private, item_audioObject, audioObject_startTime);
     CheckError_Time(File_Adm_Private, item_audioObject, audioObject_duration);
+
+    const auto& Name = Object.Attributes[audioObject_audioObjectName];
+    if (!Name.empty()) {
+        if (Name.size() != 8
+            || Name.rfind("Object ", 0) != 0
+            || Name[7] < '1'
+            || Name[7] > '4') {
+            Object.AddError(Error, string(1, ':') + (*item_Infos[item_audioObject].Attribute_Infos)[audioObject_audioObjectName].Name + ':' + (*item_Infos[item_audioObject].Attribute_Infos)[audioObject_audioObjectName].Name + " attribute value \"" + Name + "\" is not in the form \"Object n\" (n = 1 to 4)", Source_DolbyE_1_2);
+        }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -3608,6 +4067,7 @@ void audioBlockFormat_Check(file_adm_private* File_Adm_Private) {
         }
         default:;
         }
+        break;
     }
 
     if (Type == Type_DirectSpeakers) {
@@ -4260,6 +4720,204 @@ void profileList_Check(file_adm_private* File_Adm_Private) {
 }
 
 //---------------------------------------------------------------------------
+void metadataSegment_Check(file_adm_private* File_Adm_Private) {
+    MoveErrors(File_Adm_Private, item_metadataSegment);
+}
+
+//---------------------------------------------------------------------------
+void dolbyE_Check(file_adm_private* File_Adm_Private) {
+    auto& Items = File_Adm_Private->Items;
+    auto& dolbyEs = Items[item_dolbyE].Items;
+    auto& dolbyE = dolbyEs.back();
+    auto& metadataSegment = Items[item_metadataSegment].Items.back();
+
+    if (metadataSegment.Attributes_Present[metadataSegment_ID]) {
+        CheckInt(metadataSegment.Attributes[metadataSegment_ID], 1, 1, metadataSegment, metadataSegment_Attributes[metadataSegment_ID].Name, Source_DolbyE_1_2);
+    }
+    if (dolbyE.Attributes_Present[dolbyE_ID]) {
+        CheckInt(dolbyE.Attributes[dolbyE_ID], 0, 0, dolbyE, dolbyE_Attributes[dolbyE_ID].Name, Source_DolbyE_1_2);
+    }
+    static const int8u programConfig_List[] = { 4, 0, 6, 11, 19 };
+    CheckInt(dolbyE.Elements[dolbyE_programConfig], programConfig_List, dolbyE, dolbyE_Elements[dolbyE_programConfig].Name, Source_DolbyE_1_2);
+    CheckInt(dolbyE.Elements[dolbyE_frameRateCode], 1, 5, dolbyE, dolbyE_Elements[dolbyE_frameRateCode].Name, Source_DolbyE_1_2);
+    for (size_t i = 0; i < dolbyE.Elements[dolbyE_smpteTimeCode].size(); i++) {
+        const auto& Value = dolbyE.Elements[dolbyE_smpteTimeCode][i];
+        TimeCode TC(Value);
+        if (!TC.IsValid()) {
+            const auto Name = dolbyE_Elements[dolbyE_smpteTimeCode].Name;
+            dolbyE.AddError(Error, string(1, ':') + Name + ':' + Name + " element value \"" + Value + "\" is malformed", Source_DolbyE_1_2);
+        }
+    }
+
+    MoveErrors(File_Adm_Private, item_dolbyE);
+}
+
+//---------------------------------------------------------------------------
+void ac3Program_Check(file_adm_private* File_Adm_Private) {
+    auto& Items = File_Adm_Private->Items;
+    auto& ac3Programs = Items[item_ac3Program].Items;
+    auto& ac3Program = ac3Programs.back();
+    auto& metadataSegment = Items[item_metadataSegment].Items.back();
+
+    if (metadataSegment.Attributes_Present[metadataSegment_ID]) {
+        CheckInt(metadataSegment.Attributes[metadataSegment_ID], 3, 3, metadataSegment, metadataSegment_Attributes[metadataSegment_ID].Name, Source_DolbyE_1_2);
+    }
+    if (ac3Program.Attributes_Present[ac3Program_ID]) {
+        CheckInt(ac3Program.Attributes[ac3Program_ID], 0, 7, ac3Program, ac3Program_Attributes[ac3Program_ID].Name, Source_DolbyE_1_2);
+    }
+    CheckInt(ac3Program.Elements[ac3Program_cMixLev], 0, 3, ac3Program, ac3Program_Elements[ac3Program_cMixLev].Name, Source_DolbyE_1_2);
+    CheckInt(ac3Program.Elements[ac3Program_surMixLev], 0, 3, ac3Program, ac3Program_Elements[ac3Program_surMixLev].Name, Source_DolbyE_1_2);
+    CheckInt(ac3Program.Elements[ac3Program_dSurMod], 0, 3, ac3Program, ac3Program_Elements[ac3Program_dSurMod].Name, Source_DolbyE_1_2);
+    CheckInt(ac3Program.Elements[ac3Program_dialNorm], 0, 31, ac3Program, ac3Program_Elements[ac3Program_dialNorm].Name, Source_DolbyE_1_2);
+    CheckInt(ac3Program.Elements[ac3Program_copyRightB], 0, 1, ac3Program, ac3Program_Elements[ac3Program_copyRightB].Name, Source_DolbyE_1_2);
+    CheckInt(ac3Program.Elements[ac3Program_origBs], 0, 1, ac3Program, ac3Program_Elements[ac3Program_origBs].Name, Source_DolbyE_1_2);
+    for (size_t i = 0; i < ac3Program.Elements[ac3Program_programDescriptionText].size(); i++) {
+        const auto& Value = ac3Program.Elements[ac3Program_programDescriptionText][i];
+        if (Value.size() > 32) {
+            const auto Name = ac3Program_Elements[ac3Program_programDescriptionText].Name;
+            ac3Program.AddError(Error, string(1, ':') + Name + ':' + Name + " element value \"" + Value + "\" length is more than 32", Source_DolbyE_1_2);
+        }
+    }
+    
+
+    MoveErrors(File_Adm_Private, item_ac3Program);
+}
+
+//---------------------------------------------------------------------------
+void encodeParameters_Check(file_adm_private* File_Adm_Private) {
+    auto& Items = File_Adm_Private->Items;
+    auto& encodeParameterss = Items[item_encodeParameters].Items;
+    auto& encodeParameters = encodeParameterss.back();
+    auto& metadataSegment = Items[item_metadataSegment].Items.back();
+
+    if (metadataSegment.Attributes_Present[metadataSegment_ID]) {
+        CheckInt(metadataSegment.Attributes[metadataSegment_ID], 11, 11, metadataSegment, metadataSegment_Attributes[metadataSegment_ID].Name, Source_DolbyE_1_2);
+    }
+    if (encodeParameters.Attributes_Present[encodeParameters_ID]) {
+        CheckInt(encodeParameters.Attributes[encodeParameters_ID], 0, 7, encodeParameters, ac3Program_Attributes[encodeParameters_ID].Name, Source_DolbyE_1_2);
+    }
+    CheckInt(encodeParameters.Elements[encodeParameters_hpFOn], 0, 1, encodeParameters, encodeParameters_Elements[encodeParameters_hpFOn].Name, Source_DolbyE_1_2);
+    CheckInt(encodeParameters.Elements[encodeParameters_bwLpFOn], 0, 1, encodeParameters, encodeParameters_Elements[encodeParameters_bwLpFOn].Name, Source_DolbyE_1_2);
+    CheckInt(encodeParameters.Elements[encodeParameters_lfeLpFOn], 0, 1, encodeParameters, encodeParameters_Elements[encodeParameters_lfeLpFOn].Name, Source_DolbyE_1_2);
+    CheckInt(encodeParameters.Elements[encodeParameters_sur90On], 0, 1, encodeParameters, encodeParameters_Elements[encodeParameters_sur90On].Name, Source_DolbyE_1_2);
+    CheckInt(encodeParameters.Elements[encodeParameters_surAttOn], 0, 1, encodeParameters, encodeParameters_Elements[encodeParameters_surAttOn].Name, Source_DolbyE_1_2);
+    CheckInt(encodeParameters.Elements[encodeParameters_rfPremphOn], 0, 1, encodeParameters, encodeParameters_Elements[encodeParameters_rfPremphOn].Name, Source_DolbyE_1_2);
+
+    MoveErrors(File_Adm_Private, item_encodeParameters);
+}
+
+//---------------------------------------------------------------------------
+void programInfo_Check(file_adm_private* File_Adm_Private) {
+    auto& Items = File_Adm_Private->Items;
+    auto& programInfos = Items[item_programInfo].Items;
+    auto& programInfo = programInfos.back();
+ 
+    CheckInt(programInfo.Elements[programInfo_acMod], 2, 7, programInfo, programInfo_Elements[programInfo_acMod].Name, Source_DolbyE_1_2);
+    CheckInt(programInfo.Elements[programInfo_bsMod], 0, 7, programInfo, programInfo_Elements[programInfo_bsMod].Name, Source_DolbyE_1_2);
+    CheckInt(programInfo.Elements[programInfo_lfeOn], 0, 1, programInfo, programInfo_Elements[programInfo_lfeOn].Name, Source_DolbyE_1_2);
+
+    MoveErrors(File_Adm_Private, item_programInfo);
+}
+
+//---------------------------------------------------------------------------
+void langCode_Check(file_adm_private* File_Adm_Private) {
+    auto& Items = File_Adm_Private->Items;
+    auto& langCodes = Items[item_langCode].Items;
+    auto& langCode = langCodes.back();
+
+    if (langCode.Attributes_Present[langCode_exists]) {
+        CheckInt(langCode.Attributes[langCode_exists], 0, 1, langCode, langCode_Attributes[langCode_exists].Name, Source_DolbyE_1_2);
+    }
+    CheckInt(langCode.Elements[langCode_langCod], 0, 127, langCode, langCode_Elements[langCode_langCod].Name, Source_DolbyE_1_2);
+
+    MoveErrors(File_Adm_Private, item_langCode);
+}
+
+//---------------------------------------------------------------------------
+void audioProdInfo_Check(file_adm_private* File_Adm_Private) {
+    auto& Items = File_Adm_Private->Items;
+    auto& audioProdInfos = Items[item_audioProdInfo].Items;
+    auto& audioProdInfo = audioProdInfos.back();
+ 
+    if (audioProdInfo.Attributes_Present[audioProdInfo_exists]) {
+        CheckInt(audioProdInfo.Attributes[audioProdInfo_exists], 0, 1, audioProdInfo, audioProdInfo_Attributes[audioProdInfo_exists].Name, Source_DolbyE_1_2);
+    }
+    CheckInt(audioProdInfo.Elements[audioProdInfo_mixLevel], 0, 31, audioProdInfo, audioProdInfo_Elements[audioProdInfo_mixLevel].Name, Source_DolbyE_1_2);
+    CheckInt(audioProdInfo.Elements[audioProdInfo_roomTyp], 0, 3, audioProdInfo, audioProdInfo_Elements[audioProdInfo_roomTyp].Name, Source_DolbyE_1_2);
+
+    MoveErrors(File_Adm_Private, item_audioProdInfo);
+}
+
+//---------------------------------------------------------------------------
+void extBsi1e_Check(file_adm_private* File_Adm_Private) {
+    auto& Items = File_Adm_Private->Items;
+    auto& extBsi1es = Items[item_extBsi1e].Items;
+    auto& extBsi1e = extBsi1es.back();
+
+    if (extBsi1e.Attributes_Present[extBsi1e_exists]) {
+        CheckInt(extBsi1e.Attributes[extBsi1e_exists], 0, 1, extBsi1e, extBsi1e_Attributes[extBsi1e_exists].Name, Source_DolbyE_1_2);
+    }
+    CheckInt(extBsi1e.Elements[extBsi1e_loRoCMixLev], 0, 7, extBsi1e, extBsi1e_Elements[extBsi1e_loRoCMixLev].Name, Source_DolbyE_1_2);
+    CheckInt(extBsi1e.Elements[extBsi1e_loRoSurMixLev], 0, 7, extBsi1e, extBsi1e_Elements[extBsi1e_loRoSurMixLev].Name, Source_DolbyE_1_2);
+    CheckInt(extBsi1e.Elements[extBsi1e_ltRtCMixLev], 0, 7, extBsi1e, extBsi1e_Elements[extBsi1e_ltRtCMixLev].Name, Source_DolbyE_1_2);
+    CheckInt(extBsi1e.Elements[extBsi1e_ltRtSurMixLev], 0, 7, extBsi1e, extBsi1e_Elements[extBsi1e_ltRtSurMixLev].Name, Source_DolbyE_1_2);
+    CheckInt(extBsi1e.Elements[extBsi1e_dMixMod], 0, 3, extBsi1e, extBsi1e_Elements[extBsi1e_dMixMod].Name, Source_DolbyE_1_2);
+
+    MoveErrors(File_Adm_Private, item_extBsi1e);
+}
+
+//---------------------------------------------------------------------------
+void extBsi2e_Check(file_adm_private* File_Adm_Private) {
+    auto& Items = File_Adm_Private->Items;
+    auto& extBsi2es = Items[item_extBsi2e].Items;
+    auto& extBsi2e = extBsi2es.back();
+
+    if (extBsi2e.Attributes_Present[extBsi2e_exists]) {
+        CheckInt(extBsi2e.Attributes[extBsi2e_exists], 0, 1, extBsi2e, extBsi2e_Attributes[extBsi2e_exists].Name, Source_DolbyE_1_2);
+    }
+    CheckInt(extBsi2e.Elements[extBsi2e_dSurExMod], 0, 3, extBsi2e, extBsi2e_Elements[extBsi2e_dSurExMod].Name, Source_DolbyE_1_2);
+    CheckInt(extBsi2e.Elements[extBsi2e_dHeadPhonMod], 0, 3, extBsi2e, extBsi2e_Elements[extBsi2e_dHeadPhonMod].Name, Source_DolbyE_1_2);
+    CheckInt(extBsi2e.Elements[extBsi2e_adConvTyp], 0, 1, extBsi2e, extBsi2e_Elements[extBsi2e_adConvTyp].Name, Source_DolbyE_1_2);
+
+    MoveErrors(File_Adm_Private, item_extBsi2e);
+}
+
+//---------------------------------------------------------------------------
+void compr1_Check(file_adm_private* File_Adm_Private) {
+    auto& Items = File_Adm_Private->Items;
+    auto& compr1s = Items[item_compr1].Items;
+    auto& compr1 = compr1s.back();
+    auto& ac3Program = Items[item_ac3Program].Items.back();
+    
+
+    if (compr1.Attributes_Present[compr1_exists]) {
+        CheckInt(compr1.Attributes[compr1_exists], 0, 1, compr1, compr1_Attributes[compr1_exists].Name, Source_DolbyE_1_2);
+        if (compr1.Attributes[compr1_exists] == "1" || !ac3Program.Elements[ac3Program_compr1].back().empty()) {
+            CheckInt(ac3Program.Elements[ac3Program_compr1], 0, 5, ac3Program, ac3Program_Elements[ac3Program_compr1].Name, Source_DolbyE_1_2, true);
+        }
+    }
+
+    MoveErrors(File_Adm_Private, item_compr1);
+}
+
+//---------------------------------------------------------------------------
+void dynRng1_Check(file_adm_private* File_Adm_Private) {
+    auto& Items = File_Adm_Private->Items;
+    auto& dynRng1s = Items[item_dynRng1].Items;
+    auto& dynRng1 = dynRng1s.back();
+    auto& ac3Program = Items[item_ac3Program].Items.back();
+
+    if (dynRng1.Attributes_Present[dynRng1_exists]) {
+        CheckInt(dynRng1.Attributes[dynRng1_exists], 0, 1, dynRng1, dynRng1_Attributes[dynRng1_exists].Name, Source_DolbyE_1_2);
+        if (dynRng1.Attributes[compr1_exists] == "1" || !ac3Program.Elements[ac3Program_dynRng1].back().empty()) {
+            CheckInt(ac3Program.Elements[ac3Program_dynRng1], 0, 5, ac3Program, ac3Program_Elements[ac3Program_dynRng1].Name, Source_DolbyE_1_2, true);
+        }
+    }
+
+    MoveErrors(File_Adm_Private, item_dynRng1);
+}
+
+//---------------------------------------------------------------------------
 void frameFormat_Check(file_adm_private* File_Adm_Private) {
     auto& Items = File_Adm_Private->Items;
     auto& FrameFormats = Items[item_frameFormat].Items;
@@ -4592,9 +5250,23 @@ int file_adm_private::parse(const void* const Buffer, size_t Buffer_Size)
     }
 
     XML_ELEM_START
-        if (!tfsxml_strcmp_charp(b, "audioFormatExtended"))
+        else if (!tfsxml_strcmp_charp(b, "audioFormatCustom")) {
+            XML_ELEM_START
+                if (!tfsxml_strcmp_charp(b, "audioFormatCustomSet")) {
+                    XML_ELEM_START
+                        if (!tfsxml_strcmp_charp(b, "dbmd")) {
+                            XML_SUB(dbmd());
+                        }
+                    XML_ELEM_END
+                }
+            XML_ELEM_END
+        }
+        else if (!tfsxml_strcmp_charp(b, "audioFormatExtended"))
         {
             XML_SUB(audioFormatExtended())
+
+            Items[item_profileList_audioFormatExtended] = std::move(Items[item_profileList]);
+            Items[item_profile_audioFormatExtended] = std::move(Items[item_profile]);
         }
         if (!tfsxml_strcmp_charp(b, "ebuCoreMain"))
         {
@@ -4623,8 +5295,10 @@ int file_adm_private::parse(const void* const Buffer, size_t Buffer_Size)
                 clear();
                 Version_S = 0;
             }
+            auto version_Present = false;
             XML_ATTR_START
                 if (!tfsxml_strcmp_charp(b, "version")) {
+                    version_Present = true;
                     if (!tfsxml_strncmp_charp(v, "ITU-R_BS.2125-", 14) && v.len == 15 && v.buf[14] >= '0' && v.buf[14] <= '9') {
                         Version_S = v.buf[14] - '0';
                     }
@@ -4635,6 +5309,10 @@ int file_adm_private::parse(const void* const Buffer, size_t Buffer_Size)
                 }
             XML_ATTR_END
             XML_SUB(format());
+            if (!version_Present) {
+                auto& Root = Items[item_root].Items;
+                Root[0].AddError(Error, 0x80 | root_version, E::Present0, 0, Source_DolbyE_1_2);
+            }
         }
         if (!tfsxml_strcmp_charp(b, "format"))
         {
@@ -4715,15 +5393,24 @@ int file_adm_private::format()
                             }
                         XML_ELEM_END
                     }
+                    if (!tfsxml_strcmp_charp(b, "dbmd")) {
+                        XML_SUB(dbmd());
+                    }
                 XML_ELEM_END
             }
         XML_ELEM_END
     }
     else if (!tfsxml_strcmp_charp(b, "audioFormatExtended")) {
         XML_SUB(audioFormatExtended());
+
+        Items[item_profileList_audioFormatExtended] = std::move(Items[item_profileList]);
+        Items[item_profile_audioFormatExtended] = std::move(Items[item_profile]);
     }
     else if (!tfsxml_strcmp_charp(b, "frameHeader")) {
         XML_SUB(frameHeader());
+
+        Items[item_profileList_frameHeader] = std::move(Items[item_profileList]);
+        Items[item_profile_frameHeader] = std::move(Items[item_profile]);
     }
     XML_ELEM_END
     XML_END
@@ -5160,10 +5847,108 @@ int file_adm_private::audioFormatExtended()
                 ATTRIBUTE(tag, class)
                 ELEMENT_M(tag)
                 ELEMENT_E(tag, tagGroup)
+            ELEMENT__(tagGroup, audioProgrammeIDRef)
+            ELEMENT__(tagGroup, audioContentIDRef)
+            ELEMENT__(tagGroup, audioObjectIDRef)
             ELEMENT_E(tagGroup, tagList)
         ELEMENT_E(tagList, audioFormatExtended)
     XML_ELEM_END
     CheckErrors_Elements(this, item_audioFormatExtended);
+    XML_END
+}
+
+int file_adm_private::dbmd()
+{
+    if (IsInit()) {
+        if (Items[item_root].Items.empty()) {
+            Items[item_root].New();
+        }
+        Items[item_dbmd].New();
+    }
+
+    Item_Struct& dbmd_Content = Items[item_dbmd].Items.back();
+    auto& Items_dbmd = Items[item_dbmd].Items;
+    auto& Items_Up = Items_dbmd;
+    XML_BEGIN
+    XML_ATTR_START
+    XML_ATTR_END
+    XML_ELEM_START
+    ELEMENT_S(dbmd, metadataSegment)
+        ATTRIBUTE(metadataSegment, ID)
+        ELEMENT_M(metadataSegment)
+        ELEMENT_S(metadataSegment, dolbyE)
+            ATTRIBUTE(dolbyE, ID)
+            ELEMENT_M(dolbyE)
+            ELEMENT__(dolbyE, frameRateCode)
+            ELEMENT__(dolbyE, programConfig)
+            ELEMENT__(dolbyE, smpteTimeCode)
+            ELEMENT_e(dolbyE, metadataSegment, dolbyE_Check(this))
+        ELEMENT_S(metadataSegment, ac3Program)
+            ATTRIBUTE(ac3Program, ID)
+            ELEMENT_M(ac3Program)
+            ELEMENT_S(ac3Program, programInfo)
+                ELEMENT_M(programInfo)
+                ELEMENT__(programInfo, acMod)
+                ELEMENT__(programInfo, bsMod)
+                ELEMENT__(programInfo, lfeOn)
+                ELEMENT_e(programInfo, ac3Program, programInfo_Check(this))
+            ELEMENT__(ac3Program, cMixLev)
+            ELEMENT__(ac3Program, surMixLev)
+            ELEMENT__(ac3Program, dSurMod)
+            ELEMENT__(ac3Program, dialNorm)
+            ELEMENT__(ac3Program, copyRightB)
+            ELEMENT__(ac3Program, origBs)
+            ELEMENT_S(ac3Program, langCode)
+                ATTRIBUTE(langCode, exists)
+                ELEMENT_M(langCode)
+                ELEMENT__(langCode, langCod)
+                ELEMENT_e(langCode, ac3Program, langCode_Check(this))
+            ELEMENT_S(ac3Program, audioProdInfo)
+                ATTRIBUTE(audioProdInfo, exists)
+                ELEMENT_M(audioProdInfo)
+                ELEMENT__(audioProdInfo, mixLevel)
+                ELEMENT__(audioProdInfo, roomTyp)
+                ELEMENT_e(audioProdInfo, ac3Program, audioProdInfo_Check(this))
+            ELEMENT_S(ac3Program, extBsi1e)
+                ATTRIBUTE(extBsi1e, exists)
+                ELEMENT_M(extBsi1e)
+                ELEMENT__(extBsi1e, loRoCMixLev)
+                ELEMENT__(extBsi1e, loRoSurMixLev)
+                ELEMENT__(extBsi1e, ltRtCMixLev)
+                ELEMENT__(extBsi1e, ltRtSurMixLev)
+                ELEMENT__(extBsi1e, dMixMod)
+                ELEMENT_e(extBsi1e, ac3Program, extBsi1e_Check(this))
+            ELEMENT_S(ac3Program, extBsi2e)
+                ATTRIBUTE(extBsi2e, exists)
+                ELEMENT_M(extBsi2e)
+                ELEMENT__(extBsi2e, dSurExMod)
+                ELEMENT__(extBsi2e, dHeadPhonMod)
+                ELEMENT__(extBsi2e, adConvTyp)
+                ELEMENT_e(extBsi2e, ac3Program, extBsi2e_Check(this))
+            ELEMENT_S(ac3Program, compr1)
+                ATTRIBUTE(compr1, exists)
+                ELEMENT_M(compr1)
+                ELEMENT_e(compr1, ac3Program, compr1_Check(this))
+            ELEMENT_S(ac3Program, dynRng1)
+                ATTRIBUTE(dynRng1, exists)
+                ELEMENT_M(dynRng1)
+                ELEMENT_e(dynRng1, ac3Program, dynRng1_Check(this))
+            ELEMENT__(ac3Program, programDescriptionText)
+            ELEMENT_e(ac3Program, metadataSegment, ac3Program_Check(this))
+        ELEMENT_S(metadataSegment, encodeParameters)
+            ATTRIBUTE(encodeParameters, ID)
+            ELEMENT_M(encodeParameters)
+            ELEMENT__(encodeParameters, hpFOn)
+            ELEMENT__(encodeParameters, bwLpFOn)
+            ELEMENT__(encodeParameters, lfeLpFOn)
+            ELEMENT__(encodeParameters, sur90On)
+            ELEMENT__(encodeParameters, surAttOn)
+            ELEMENT__(encodeParameters, rfPremphOn)
+            ELEMENT_e(encodeParameters, metadataSegment, encodeParameters_Check(this))
+        ELEMENT_e(metadataSegment, audioFormatExtended, metadataSegment_Check(this))
+    XML_ELEM_END
+    CheckErrors_Elements(this, item_dbmd);
+    MoveErrors(this, item_dbmd);
     XML_END
 }
 
@@ -5228,12 +6013,13 @@ int file_adm_private::frameHeader()
 }
 
 //---------------------------------------------------------------------------
-static void FillErrors(file_adm_private* File_Adm_Private, const item item_Type, size_t i, const char* Name, vector<string>* Errors_Field, vector<string>* Errors_Value, bool WarningError, size_t* Error_Count_Per_Type, bool IsAdvSSE)
+static void FillErrors(file_adm_private* File_Adm_Private, const item item_Type, size_t i, const char* Name, vector<string>* Errors_Field, vector<string>* Errors_Value, bool WarningError, size_t* Error_Count_Per_Type, bool IsAdvSSE, bool IsDolbyE)
 {
     const bool IsAtmos = File_Adm_Private->IsAtmos;
     for (size_t k = 0; k < error_Type_Max; k++) {
     for (size_t l = 0; l < source_Max; l++) {
         if ((!IsAtmos && (l == Source_Atmos_1_0 || l == Source_Atmos_1_1))
+         || (!IsDolbyE && l == Source_DolbyE_1_2)
          || (!IsAdvSSE && l == Source_AdvSSE_1)) {
             continue;
         }
@@ -5468,10 +6254,12 @@ void File_Adm::Streams_Fill()
             File_Adm_Private->profileInfos.back().Strings[1] = "1";
     }
     vector<profile_info>& profileInfos = File_Adm_Private->profileInfos;
-    auto& ProfileList = File_Adm_Private->Items[item_profileList].Items;
-    auto& Profiles = File_Adm_Private->Items[item_profile].Items;
+    auto ProfileFrom_frameHeader = File_Adm_Private->Items[item_profileList_audioFormatExtended].Items.empty();
+    auto& ProfileList = File_Adm_Private->Items[item_profileList_audioFormatExtended + ProfileFrom_frameHeader].Items;
+    auto& Profiles = File_Adm_Private->Items[item_profile_audioFormatExtended + ProfileFrom_frameHeader].Items;
     size_t Profiles_Pos = 0;
     bool IsAdvSSE = false;
+    bool IsDolbyE = false;
     vector<int8u> IsAdvSSE_Versions;
     vector<int8u> IsAdvSSE_Levels;
     for (size_t i = 0; i < ProfileList.size(); i++) {
@@ -5494,6 +6282,7 @@ void File_Adm::Streams_Fill()
                 continue;
             }
             if (Profile_Item.Attributes[profile_profileName] == "Advanced sound system: ADM and S-ADM Profile for emission"
+                || Profile_Item.Attributes[profile_profileName] == "Advanced sound system: ADM and S-ADM profile for emission"
                 || Profile_Item.Attributes[profile_profileName] == "AdvSS Emission S-ADM Profile") {
                 ProfileInfo.Strings[0] = "AdvSS Emission";
                 IsAdvSSE = true;
@@ -5503,6 +6292,20 @@ void File_Adm::Streams_Fill()
                     Profiles.back().AddError(Error, ':' + CraftName(item_Infos[item_profile].Name) + to_string(i) + ":profileLevel:profileLevel attribute value " + Profile_Item.Attributes[profile_profileLevel] + " is not permitted, max is 2", Source_AdvSSE_1);
                 }
             }
+            else if (Profile_Item.Attributes[profile_profileName] == "Dolby E ADM and S-ADM Profile for emission"
+                || ProfileList_Item.Elements[profileList_profile][j] == "Dolby E ADM and S-ADM Profile for emission") {
+                ProfileInfo.Strings[0] = "Dolby E Emission";
+                IsDolbyE = true;
+                if (ProfileList_Item.Elements[profileList_profile][j] != "Dolby E ADM and S-ADM Profile for emission") {
+                    Profile_Item.AddError(Error, ':' + CraftName(item_Infos[item_profile].Name) + to_string(j) + ":profile element value \"" + ProfileList_Item.Elements[profileList_profile][i] + "\" is not permitted", Source_DolbyE_1_2);
+                }
+                if (Profile_Item.Attributes[profile_profileName] != "Dolby E ADM and S-ADM Profile for emission") {
+                    Profile_Item.AddError(Error, ':' + CraftName(item_Infos[item_profile].Name) + to_string(j) + ":profileName attribute value \"" + Profile_Item.Attributes[profile_profileName] + "\" is not permitted", Source_DolbyE_1_2);
+                }
+                if (!Profile_Item.Attributes[profile_profileLevel].empty() && Profile_Item.Attributes[profile_profileLevel] != "1") {
+                    Profile_Item.AddError(Error, ':' + CraftName(item_Infos[item_profile].Name) + to_string(j) + ":profileLevel:profileLevel attribute value " + Profile_Item.Attributes[profile_profileLevel] + " is not permitted, permitted value is 1", Source_DolbyE_1_2);
+                }
+            }
             else {
                 ProfileInfo.Strings[0] = Profile_Item.Attributes[profile_profileName];
             }
@@ -5510,6 +6313,50 @@ void File_Adm::Streams_Fill()
             ProfileInfo.Strings[3] = Profile_Item.Attributes[profile_profileLevel];
             profileInfos.insert(profileInfos.begin(), ProfileInfo);
         }
+    }
+    auto& ProfileLists_audioFormatExtended = File_Adm_Private->Items[item_profile_audioFormatExtended].Items;
+    auto& ProfileLists_frameHeader = File_Adm_Private->Items[item_profile_frameHeader].Items;
+    auto& Profiles_audioFormatExtended = File_Adm_Private->Items[item_profile_audioFormatExtended].Items;
+    auto& Profiles_frameHeader = File_Adm_Private->Items[item_profile_frameHeader].Items;
+    if (!Profiles_audioFormatExtended.empty() && !Profiles_frameHeader.empty()) {
+        set<size_t> Profiles_frameHeader_Checked;
+        for (size_t i = 0; i < Profiles_audioFormatExtended.size(); i++) {
+            const auto& Profile1 = Profiles_audioFormatExtended[i];
+            auto Found = false;
+            for (size_t j = 0; j < Profiles_frameHeader.size(); j++) {
+                auto Different = false;
+                const auto& Profile2 = Profiles_frameHeader[j];
+                if (Profile2.Attributes_Present != Profile1.Attributes_Present) {
+                    Different = true;
+                }
+                for (size_t k = 0; k < Profile1.Attributes.size(); k++) {
+                    if (Profile2.Attributes[k] != Profile1.Attributes[k]) {
+                        Different = true;
+                    }
+                }
+                if (!Different) {
+                    Found = true;
+                    Profiles_frameHeader_Checked.insert(j);
+                    break;
+                }
+            }
+            if (!Found) {
+                Profiles_audioFormatExtended[i].AddError(Error, ':' + CraftName(item_Infos[item_profile].Name) + to_string(i) + ":No profile \"" + Profile1.Attributes[profile_profileName] + "\" found in frameHeader", Source_DolbyE_1_2);
+            }
+        }
+        auto Checked = Profiles_frameHeader_Checked.begin();
+        for (size_t j = 0; j < Profiles_frameHeader.size(); j++) {
+            auto Profile_frameHeader = Profiles_frameHeader[j];
+            if (Checked == Profiles_frameHeader_Checked.end() || j != *Checked) {
+                Profile_frameHeader.AddError(Error, ':' + CraftName(item_Infos[item_profile].Name) + to_string(j) + ":No profile \"" + Profile_frameHeader.Attributes[profile_profileName] + "\" found in audioFormatExtended", Source_DolbyE_1_2);
+            }
+            else {
+                ++Checked;
+            }
+        }
+    }
+    if (IsDolbyE && !IsAdvSSE) {
+        Profiles.back().AddError(Error, ':' + CraftName(item_Infos[item_profile].Name) + ":Dolby E Emission profile requires AdvSS Emission profile", Source_DolbyE_1_2);
     }
     if (!profileInfos.empty())
     {
@@ -6001,6 +6848,65 @@ void File_Adm::Streams_Fill()
                 Items[MaxCounts[item_Type]].AddError(Error, ':' + CraftName(item_Infos[item_Type].Name) + to_string(MaxCounts[item_Type]) + ":GeneralCompliance:" + CraftName(item_Infos[item_Type].Name) + " element count " + to_string(Items.size()) + " is not permitted, max is " + to_string(MaxCounts[item_Type]) + "", Source_Atmos_1_0);
             }
         }
+        if (IsDolbyE) {
+            static const int8u MinCounts[] = { 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2 };
+            if (item_Type < sizeof(MinCounts) / sizeof(MinCounts[0]) && MinCounts[item_Type] && !Items.empty() && Items.size() < MinCounts[item_Type]) {
+                Items[Items.size() - 1].AddError(Error, ':' + CraftName(item_Infos[item_Type].Name) + to_string(MinCounts[item_Type] - 1) + ":GeneralCompliance:" + CraftName(item_Infos[item_Type].Name) + " element count " + to_string(Items.size()) + " is not permitted, min is " + to_string(MinCounts[item_Type]) + "", Source_DolbyE_1_2);
+            }
+            static const int8u MaxCounts[] = { 0, 0, 4, 4, 4, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 8 };
+            if (item_Type < sizeof(MaxCounts) / sizeof(MaxCounts[0]) && MaxCounts[item_Type] && Items.size() > MaxCounts[item_Type]) {
+                Items[MaxCounts[item_Type]].AddError(Error, ':' + CraftName(item_Infos[item_Type].Name) + to_string(MaxCounts[item_Type]) + ":GeneralCompliance:" + CraftName(item_Infos[item_Type].Name) + " element count " + to_string(Items.size()) + " is not permitted, max is " + to_string(MaxCounts[item_Type]) + "", Source_DolbyE_1_2);
+            }
+            if (item_Type == item_audioObject) {
+                for (auto& Object : Items) {
+                    auto TrackUIDRef_Count = Object.Elements[audioObject_audioTrackUIDRef].size();
+                    if (TrackUIDRef_Count <= 1 || TrackUIDRef_Count > 6) {
+                        Object.AddError(Error, ':' + CraftName(item_Infos[item_Type].Name) + to_string(MaxCounts[item_Type]) + ":GeneralCompliance:" + "audioTrackUIDRef" + " element count " + to_string(TrackUIDRef_Count) + " is not permitted, min is 2 and max is 6", Source_DolbyE_1_2);
+                    }
+                }
+            }
+            if (item_Type == item_transportTrackFormat) {
+                for (auto& transportTrackFormat : Items) {
+                    auto TrackUIDRef_Count = transportTrackFormat.Elements[transportTrackFormat_audioTrack].size();
+                    if (TrackUIDRef_Count <= 1 || TrackUIDRef_Count > 8) {
+                        transportTrackFormat.AddError(Error, ':' + CraftName(item_Infos[item_Type].Name) + to_string(MaxCounts[item_Type]) + ":GeneralCompliance:" + "audioTrack" + " element count " + to_string(TrackUIDRef_Count) + " is not permitted, min is 2 and max is 8", Source_DolbyE_1_2);
+                    }
+                }
+            }
+            if (item_Type == item_metadataSegment) {
+                bool metadataSegmentPerElement[metadataSegment_Element_Max] = {};
+                for (size_t i = 0; i < Items.size(); i++) {
+                    auto& Item = Items[i];
+                    auto ChoiceCount = false;
+                    for (size_t j = 0; j < metadataSegment_Element_Max; j++) {
+                        auto& Elements = Item.Elements[j];
+                        if (!Elements.empty()) {
+                            if (ChoiceCount) {
+                                Items[0].AddError(Error, ':' + CraftName(item_Infos[item_metadataSegment].Name) + to_string(i) + ":GeneralCompliance:" + "only one of encodeParameters, ac3Program, dolbyE is permitted", Source_DolbyE_1_2);
+                                break;
+                            }
+                            ChoiceCount = true;
+                            switch (j) {
+                            case metadataSegment_encodeParameters:
+                            case metadataSegment_ac3Program:
+                                if (Elements.size() > 8) {
+                                    Items[0].AddError(Error, ':' + CraftName(item_Infos[item_metadataSegment].Name) + to_string(i) + ":GeneralCompliance:" + metadataSegment_Elements[j].Name + " element count " + to_string(Elements.size()) + " is not permitted, max is 8", Source_DolbyE_1_2);
+                                }
+                            }
+                            if (metadataSegmentPerElement[j]) {
+                                Items[0].AddError(Error, ':' + CraftName(item_Infos[item_metadataSegment].Name) + to_string(i) + ":GeneralCompliance:" + "only one metadataSegment element with encodeParameters, ac3Program, dolbyE is permitted", Source_DolbyE_1_2);
+                            }
+                            metadataSegmentPerElement[j] = true;
+                        }
+                    }
+                }
+                for (size_t j = 0; j < metadataSegment_Element_Max; j++) {
+                    if (!metadataSegmentPerElement[j]) {
+                        Items[0].AddError(Error, ':' + CraftName(item_Infos[item_metadataSegment].Name) + ":GeneralCompliance:" + metadataSegment_Elements[j].Name + " is missing", Source_DolbyE_1_2);
+                    }
+                }
+            }
+        }
         set<string> PreviousIDs;
         set<string> PreviousIDs_Forbidden;
         for (size_t i = 0; i < Items.size(); i++) {
@@ -6110,6 +7016,16 @@ void File_Adm::Streams_Fill()
                 Programme.AddError(Error, ":audioProgramme" + to_string(i) + ":audioContentIDRef:audioContentIDRef element count " + to_string(Programme.Elements[audioProgramme_audioContentIDRef].size()) + " is not permitted, max is 123", Source_Atmos_1_0);
             }
         }
+        if (IsDolbyE) {
+            const auto& audioProgrammeID = Programme.Attributes[audioProgramme_audioProgrammeID];
+            if (!CheckErrors_ID(File_Adm_Private, audioProgrammeID, item_Infos[item_audioProgramme])) {
+                auto audioProgrammeID_wwww = audioProgrammeID.substr(4, 4);
+                auto Value = strtoul(audioProgrammeID_wwww.c_str(), nullptr, 16);
+                if (Value != 0x1001 + i) {
+                    Programme.AddError(Error, ":audioProgramme" + to_string(i) + ":audioProgrammeID:audioProgrammeID attribute wwww value \"" + audioProgrammeID_wwww + "\" is not permitted, permitted value is \"" + Ztring().From_CC2(0x1001 + i).To_UTF8() + '\"', Source_DolbyE_1_2);
+                }
+            }
+        }
     }
 
     // Errors - audioContent
@@ -6156,13 +7072,13 @@ void File_Adm::Streams_Fill()
                 }
             }
         }
-        if (IsAtmos) {
+        if (IsAtmos || IsDolbyE) {
             auto Item_ID = Content.Attributes[audioContent_audioContentID];
             if (!CheckErrors_ID(File_Adm_Private, Item_ID, item_Infos[item_audioContent])) {
-                char* End;
-                auto Value = strtoul(Item_ID.c_str() + 4, &End, 16);
+                auto Value = strtoul(Item_ID.c_str() + 4, nullptr, 16);
                 if (Value != 0x1001 + i) {
-                    Content.AddError(Error, ":audioContent" + to_string(i) + ":audioContentID:audioContentID attribute wwww value \"" + Item_ID.substr(4) + "\" is not permitted, permitted value is \"" + Ztring::ToZtring(0x1001 + i, 16).To_UTF8() + "\"", Source_Atmos_1_0);
+                    Content.AddError(Error, ":audioContent" + to_string(i) + ":audioContentID:audioContentID attribute wwww value \"" + Item_ID.substr(4) + "\" is not permitted, permitted value is \"" + Ztring().From_CC2(0x1001 + i).To_UTF8() + "\"", Source_Atmos_1_0);
+                    Content.AddError(Error, ":audioContent" + to_string(i) + ":audioContentID:audioContentID attribute wwww value \"" + Item_ID.substr(4) + "\" is not permitted, permitted value is \"" + Ztring().From_CC2(0x1001 + i).To_UTF8() + "\"", Source_DolbyE_1_2);
                 }
             }
         }
@@ -6253,6 +7169,12 @@ void File_Adm::Streams_Fill()
                 Object.AddError(Error, ":audioObject" + to_string(i) + ":disableDucking:disableDucking attribute value \"" + disableDucking + "\" is not permitted, permitted value is \"1\"", Source_Atmos_1_0);
             }
         }
+        if (IsDolbyE) {
+            const auto& interact = Object.Attributes[audioObject_interact];
+            if (!interact.empty() && interact != "0") {
+                Object.AddError(Error, ":audioObject" + to_string(i) + ":interact:interact attribute value \"" + interact + "\" is not permitted, permitted value is \"0\"", Source_DolbyE_1_2);
+            }
+        }
         for (const auto& audioPackFormatIDRef : Object.Elements[audioObject_audioPackFormatIDRef]) {
             for (const auto& audioPackFormat : PackFormats) {
                 if (audioPackFormat.Attributes[audioChannelFormat_audioChannelFormatID] == audioPackFormatIDRef && (audioPackFormat.Attributes[audioChannelFormat_typeLabel] == "0003" || audioPackFormat.Attributes[audioChannelFormat_typeDefinition] == "Objects")) {
@@ -6265,6 +7187,15 @@ void File_Adm::Streams_Fill()
             if (audioTrackUID_Used_Current.find(audioTrackUIDRef) == audioTrackUID_Used_Current.end()) {
                 audioTrackUID_Used_Current.insert(audioTrackUIDRef);
                 audioTrackUID_Used[audioTrackUIDRef]++;
+            }
+        }
+        if (IsDolbyE) {
+            auto Item_ID = Object.Attributes[audioObject_audioObjectID];
+            if (!CheckErrors_ID(File_Adm_Private, Item_ID, item_Infos[item_audioObject])) {
+                auto Value = strtoul(Item_ID.c_str() + 3, nullptr, 16);
+                if (Value != 0x1001 + i) {
+                    Object.AddError(Error, ":audioObject" + to_string(i) + ":audioObjectID:audioObjectID attribute wwww value \"" + Item_ID.substr(3) + "\" is not permitted, permitted value is \"" + Ztring().From_CC2(0x1001 + i).To_UTF8() + "\"", Source_DolbyE_1_2);
+                }
             }
         }
     }
@@ -6653,11 +7584,65 @@ void File_Adm::Streams_Fill()
                 char* End;
                 auto Value = strtoul(Item_ID.c_str() + 8, &End, 16);
                 if (Value != 0x00000001 + i) {
-                    auto ExpectedValue = Ztring::ToZtring(0x00000001 + i, 16).To_UTF8();
-                    if (ExpectedValue.size() < 8) {
-                        ExpectedValue.insert(ExpectedValue.begin(), 8 - ExpectedValue.size(), '0');
+                    TrackUID.AddError(Error, ":audioTrackUID" + to_string(i) + ":UID:UID attribute vvvvvvvv value \"" + Item_ID.substr(4) + "\" is not permitted, permitted value is \"0000" + Ztring().From_CC2(0x0001 + i).To_UTF8() + "\"", Source_Atmos_1_0);
+                }
+            }
+        }
+
+        if (IsDolbyE) {
+            const auto& Item_ID = TrackUID.Attributes[audioTrackUID_UID];
+            if (!CheckErrors_ID(File_Adm_Private, Item_ID, item_Infos[item_audioTrackUID])) {
+                auto Value = strtoul(Item_ID.c_str() + 4, nullptr, 16);
+                if (Value != 0x00000001 + i) {
+                    TrackUID.AddError(Error, ":TrackUID" + to_string(i) + ":UID:UID attribute vvvvvvvv value \"" + Item_ID.substr(4) + "\" is not permitted, permitted value is \"0000" + Ztring().From_CC2(0x0001 + i).To_UTF8() + '\"', Source_DolbyE_1_2);
+                }
+            }
+            const auto& audioChannelFormatIDRefs = TrackUID.Elements[audioTrackUID_audioChannelFormatIDRef];
+            for (size_t j = 0; j < audioChannelFormatIDRefs.size(); j++) {
+                const auto& audioChannelFormatIDRef = audioChannelFormatIDRefs[j];
+                if (!CheckErrors_ID(File_Adm_Private, audioChannelFormatIDRef, item_Infos[item_audioChannelFormat])) {
+                    auto audioChannelFormatIDRef_xxxx = audioChannelFormatIDRef.substr(3, 4);
+                    auto Value = strtoul(audioChannelFormatIDRef_xxxx.c_str(), nullptr, 16);
+                    switch (Value) {
+                    case 1: {
+                        auto audioChannelFormatIDRef_yyyy = audioChannelFormatIDRef.substr(7, 4);
+                        auto Value_yyyy = strtoul(audioChannelFormatIDRef_yyyy.c_str(), nullptr, 16);
+                        if (Value_yyyy & 0x0800) {
+                            Value_yyyy -= 0x0800;
+                        }
+                        if (!Value_yyyy || Value_yyyy > 6) {
+                            TrackUID.AddError(Error, ":audioTrackUID" + to_string(i) + ":audioChannelFormatIDRef:audioChannelFormatIDRef attribute yyyy value \"" + audioChannelFormatIDRef_yyyy + "\" is not permitted, permitted value is \"" + Ztring().From_CC2(0x0001 + i).To_UTF8() + "\" or \"" + Ztring().From_CC2(0x0801 + i).To_UTF8() + "\"", Source_DolbyE_1_2);
+                        }
+                        break;
                     }
-                    TrackUID.AddError(Error, ":audioTrackUID" + to_string(i) + ":UID:UID attribute vvvvvvvv value \"" + Item_ID.substr(4) + "\" is not permitted, permitted value is \"" + ExpectedValue + "\"", Source_Atmos_1_0);
+                    case 3:
+                        TrackUID.AddError(Error, ":audioTrackUID" + to_string(i) + ":audioChannelFormatIDRef:audioChannelFormatIDRef attribute xxxx value \"" + audioChannelFormatIDRef_xxxx + "\" is not permitted, permitted value is \"0001\"", Source_DolbyE_1_2);
+                        break;
+                    }
+                }
+            }
+            const auto& audioPackFormatIDRefs = TrackUID.Elements[audioTrackUID_audioPackFormatIDRef];
+            for (size_t j = 0; j < audioPackFormatIDRefs.size(); j++) {
+                const auto& audioPackFormatIDRef = audioPackFormatIDRefs[j];
+                if (!CheckErrors_ID(File_Adm_Private, audioPackFormatIDRef, item_Infos[item_audioPackFormat])) {
+                    auto audioPackFormatIDRef_xxxx = audioPackFormatIDRef.substr(3, 4);
+                    auto Value = strtoul(audioPackFormatIDRef_xxxx.c_str(), nullptr, 16);
+                    switch (Value) {
+                    case 1: {
+                        auto audioPackFormatIDRef_yyyy = audioPackFormatIDRef.substr(7, 4);
+                        auto Value_yyyy = strtoul(audioPackFormatIDRef_yyyy.c_str(), nullptr, 16);
+                        if (Value_yyyy & 0x0800) {
+                            Value_yyyy -= 0x0800;
+                        }
+                        if (Value_yyyy - 2 >= 2) {
+                            TrackUID.AddError(Error, ":audioTrackUID" + to_string(i) + ":audioPackFormatIDRef:audioPackFormatIDRef attribute yyyy value \"" + audioPackFormatIDRef_yyyy + "\" is not permitted, permitted value is \"" + Ztring().From_CC2(0x0001 + i).To_UTF8() + "\" or \"" + Ztring().From_CC2(0x0801 + i).To_UTF8() + "\"", Source_DolbyE_1_2);
+                        }
+                        break;
+                    }
+                    case 3:
+                        TrackUID.AddError(Error, ":audioTrackUID" + to_string(i) + ":audioPackFormatIDRef:audioPackFormatIDRef attribute xxxx value \"" + audioPackFormatIDRef_xxxx + "\" is not permitted, permitted values are \"0001\" or \"0003\"", Source_DolbyE_1_2);
+                        break;
+                    }
                 }
             }
         }
@@ -6681,7 +7666,7 @@ void File_Adm::Streams_Fill()
     for (size_t t = 0; t < item_Max; t++) {
         size_t Error_Count_Per_Type[error_Type_Max] = {};
         for (size_t i = 0; i < File_Adm_Private->Items[t].Items.size(); i++) {
-            FillErrors(File_Adm_Private, (item)t, i, item_Infos[t].Name, &Errors_Field[0], &Errors_Value[0], WarningError, &Error_Count_Per_Type[0], IsAdvSSE);
+            FillErrors(File_Adm_Private, (item)t, i, item_Infos[t].Name, &Errors_Field[0], &Errors_Value[0], WarningError, &Error_Count_Per_Type[0], IsAdvSSE, IsDolbyE);
         }
     }
 
@@ -6717,6 +7702,12 @@ void File_Adm::Streams_Fill()
     #endif // MEDIAINFO_CONFORMANCE
 
     File_Adm_Private->clear();
+}
+
+//---------------------------------------------------------------------------
+void File_Adm::Streams_Finish()
+{
+    Streams_Finish_Conformance();
 }
 
 //***************************************************************************

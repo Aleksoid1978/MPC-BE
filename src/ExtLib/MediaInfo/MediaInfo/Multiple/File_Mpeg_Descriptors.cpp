@@ -509,6 +509,13 @@ const char* Mpeg_Descriptors_dvb_service_type(int8u service_type)
         case 0x19 : return "advanced codec HD digital television";
         case 0x1A : return "advanced codec HD NVOD time-shifted";
         case 0x1B : return "advanced codec HD NVOD reference";
+        case 0x1C : return "advanced codec frame compatible plano-stereoscopic HD";
+        case 0x1D : return "advanced codec frame compatible plano-stereoscopic HD NVOD time-shifted";
+        case 0x1E : return "advanced codec frame compatible plano-stereoscopic HD NVOD reference";
+        case 0x1F : return "HEVC digital television";
+        case 0x20 : return "HEVC UHD";
+        case 0x21 : return "VVC digital television";
+        case 0x22 : return "AVS3 digital television";
         case 0xFF : return "reserved for future use";
         default   :
             if (service_type>=0x80)
@@ -529,6 +536,9 @@ const char* Mpeg_Descriptors_stream_content(int8u stream_content)
         case 0x05 : return "AVC";
         case 0x06 : return "HE-AAC";
         case 0x07 : return "DTS";
+        case 0x08 : return "DVB SRM and CPCM";
+        case 0x09 : return "UHD Video and NGA";
+        case 0x0B : return "HDR flags";
         default   :
             if (stream_content>=0x0C)
                     return "user defined";
@@ -662,6 +672,139 @@ const char* Mpeg_Descriptors_component_type_O7(int8u)
     return "Defined by DTS";
 }
 
+const char* Mpeg_Descriptors_component_type_O8(int8u component_type)
+{
+    switch (component_type)
+    {
+        case 0x00 : return "reserved for future use";
+        case 0x01 : return "DVB System Renewability Message (SRM)";
+        default :
+            return "reserved for future use for DVB Content Protection Copy Management (CPCM)";
+    }
+}
+
+
+const char* Mpeg_Descriptors_component_type_O9_ext_00(int8u component_type)
+{
+    switch (component_type)
+    {
+        case 0x00: return "HEVC Main Profile HD (50hz)";
+        case 0x01: return "HEVC Main 10 Profile HD (50Hz)";
+        case 0x02: return "HEVC Main Profile HD (60hz)";
+        case 0x03: return "HEVC Main 10 Profile HD (60Hz)";
+        case 0x04: return "HEVC UHD (4k)";
+        case 0x05: return "HEVC UHD (4k) PQ10";
+        case 0x06: return "HEVC UHD (4k) HLG10";
+        case 0x07: return "HEVC UHD (4k) PQ10";
+        case 0x08: return "HEVC UHD (8k)";
+        case 0x10: return "VVC Main 10 UHD (4k)";
+        case 0x11: return "VVC Main 10 UHD (4k) HFR";
+        case 0x12: return "VVC Main 10 UHD (8k)";
+        case 0x13: return "VVC Main 10 UHD (8k) HFR";
+
+        case 0x20: return "AVS3 High 10 UHD (4k)";
+        case 0x21: return "AVS3 High 10 UHD (4k) HFR";
+        case 0x22: return "AVS3 High 10 UHD (8k)";
+        case 0x23: return "AVS3 High 10 UHD (8k) HFR";
+        default : 
+            if (component_type >= 0x09 && component_type <= 0x0F)
+                return "reserved for future use for HEVC";
+            else if (component_type >= 0x14 && component_type <= 0x1F)
+                return "reserved for future use for VVC";
+            else if (component_type >= 0x24 && component_type <= 0x2F)
+                return "reserved for future use for AVS3";
+            else 
+                return "reserved for future use";
+    }
+
+}
+
+const char* Mpeg_Descriptors_component_type_O9_ext_01(int8u component_type)
+{
+    switch (component_type)
+    {
+        case 0x00 : return "AC-4 main audio, mono";
+        case 0x01 : return "AC-4 main audio, mono, dialogue enhancement enabled";
+        case 0x02 : return "AC-4 main audio, stereo";
+        case 0x03 : return "AC-4 main audio, stereo, dialogue enhancement enabled";
+        case 0x04 : return "AC-4 main audio, multichannel";
+        case 0x05 : return "AC-4 main audio, multichannel, dialogue enhancement enabled";
+        case 0x06 : return "AC-4 broadcast-mix audio description, mono, for the visually impaired";
+        case 0x07 : return "AC-4 broadcast-mix audio description, mono, for the visually impaired, dialogue enhancement enabled";
+        case 0x08 : return "AC-4 broadcast-mix audio description, stereo, for the visually impaired";
+        case 0x09 : return "AC-4 broadcast-mix audio description, stereo, for the visually impaired, dialogue enhancement enabled";
+        case 0x0A : return "AC-4 broadcast-mix audio description, multichannel, for the visually impaired";
+        case 0x0B : return "AC-4 broadcast-mix audio description, multichannel, for the visually impaired, dialogue enhancement enabled";
+        case 0x0C : return "AC-4 receiver-mix audio description, mono, for the visually impaired";
+        case 0x0D : return "AC-4 receiver-mix audio description, stereo, for the visually impaired";
+        case 0x0E : return "AC-4 Part-2";
+        case 0x0F : return "MPEG-H Audio Low Complexity (LC) Profile";
+        case 0x10 : return "DTS-UHD main audio, mono";
+        case 0x11 : return "DTS-UHD main audio, mono, dialogue enhancement enabled";
+        case 0x12 : return "DTS-UHD main audio, stereo";
+        case 0x13 : return "DTS-UHD main audio, stereo, dialogue enhancement enabled";
+        case 0x14 : return "DTS-UHD main audio, multichannel";
+        case 0x15 : return "DTS-UHD main audio, multichannel, dialogue enhancement enabled";
+        case 0x16 : return "DTS-UHD broadcast-mix audio description, mono, for the visually impaired";
+        case 0x17 : return "DTS-UHD broadcast-mix audio description, mono, for the visually impaired, dialogue enhancement enabled";
+        case 0x18 : return "DTS-UHD broadcast-mix audio description, stereo, for the visually impaired";
+        case 0x19 : return "DTS-UHD broadcast-mix audio description, stereo, for the visually impaired, dialogue enhancement enabled";
+        case 0x1A : return "DTS-UHD broadcast-mix audio description, multichannel, for the visually impaired";
+        case 0x1B : return "DTS-UHD broadcast-mix audio description, multichannel, for the visually impaired, dialogue enhancement enabled";
+        case 0x1C : return "DTS-UHD receiver-mix audio description, mono, for the visually impaired";
+        case 0x1D : return "DTS-UHD receiver-mix audio description, stereo, for the visually impaired";
+        case 0x1E : return "DTS-UHD Next Generation Audio (NGA) Audio";
+        case 0x20 : return "AVS3-P3 Next Generation Audio (NGA)";
+        case 0x21 : return "AVS3-P3 broadcast-mix accessibility components";
+        case 0x22 : return "AVS3-P3 receiver-mix accessibility components";
+        default:
+            return "reserved for future use";
+    }
+}
+
+const char* Mpeg_Descriptors_component_type_O9(int8u stream_content_ext, int8u component_type)
+{
+    switch (stream_content_ext)
+    {
+        case 0x00 : return Mpeg_Descriptors_component_type_O9_ext_00(component_type);
+        case 0x01 : return Mpeg_Descriptors_component_type_O9_ext_01(component_type);
+        case 0x02 : return "Timed Text Markup Language (TTML) subtitles";
+        default :
+            return "reserved for future use";
+    }
+}
+
+
+const char* Mpeg_Descriptors_component_type_OB_ext_0F(int8u component_type)
+{
+    switch (component_type)
+    {
+        case 0x00 : return "less than 16:9 aspect ratio";
+        case 0x01 : return "16:9 aspect ratio";
+        case 0x02 : return "greater than 16:9 aspect ratio";
+        case 0x03 : return "plano-stereoscopic top and bottom (TaB) frame-packing";
+        case 0x04 : return "HLG10 HDR";
+        case 0x05 : return "HEVC HFR temporal video subset";
+        case 0x06 : return "SMPTE ST 2094-10 DMI (Dolvy Vision)";
+        case 0x07 : return "SL-HDR2 DMI";
+        case 0x08 : return "SMPTE ST 2094-40 DMI (HDR10+)";
+        case 0x09 : return "PQ10 HDR";
+        case 0x0A : return "T/UWA 005 DMI (HDR Vivid)";
+        default:
+            return "reserved for future use";
+    }
+}
+
+static string Mpeg_Descriptors_component_type_OB(int8u stream_content_ext, int8u component_type)
+{
+    switch (stream_content_ext)
+    {
+        case 0x0F : return Mpeg_Descriptors_component_type_OB_ext_0F(component_type);
+        default:
+            return "reserved for future use";
+    }
+}
+
 const char* Mpeg_Descriptors_codepage_1(int8u codepage)
 {
     switch (codepage)
@@ -686,8 +829,9 @@ const char* Mpeg_Descriptors_codepage_1(int8u codepage)
     }
 }
 
-const char* Mpeg_Descriptors_component_type(int8u stream_content, int8u component_type)
+static string Mpeg_Descriptors_component_type(int8u stream_content, int8u stream_content_ext, int8u component_type)
 {
+     // case of (component_type stream_content == 0x0B && stream_content_ext == 0x0E) is handled in NGA_component()
     switch (stream_content)
     {
         case 0x01 : return Mpeg_Descriptors_component_type_O1(component_type);
@@ -697,11 +841,15 @@ const char* Mpeg_Descriptors_component_type(int8u stream_content, int8u componen
         case 0x05 : return Mpeg_Descriptors_component_type_O5(component_type);
         case 0x06 : return Mpeg_Descriptors_component_type_O6(component_type);
         case 0x07 : return Mpeg_Descriptors_component_type_O7(component_type);
+        case 0x08 : return Mpeg_Descriptors_component_type_O8(component_type);
+        case 0x09 : return Mpeg_Descriptors_component_type_O9(stream_content_ext, component_type);
+        case 0x0B : return Mpeg_Descriptors_component_type_OB(stream_content_ext, component_type);
+
         default   :
             if (component_type>=0xB0 && component_type<=0xFE)
-                    return "user defined";
+                return "user defined";
             else
-                    return "reserved for future use";
+                return "reserved for future use";
     }
 }
 
@@ -838,6 +986,52 @@ const char* Mpeg_Descriptors_stream_Codec(int8u descriptor_tag, int32u format_id
                         }
             }
     }
+}
+
+static const char* Mpeg_Descriptors_descriptor_tag_extension_Array[] = {
+    "image_icon_descriptor",
+    "cpcm_delivery_signalling_descriptor",
+    "CP_descriptor",
+    "CP_identifier_descriptor",
+    "T2_delivery_system_descriptor",
+    "SH_delivery_system_descriptor",
+    "supplementary_audio_descriptor",
+    "network_change_notify_descriptor",
+    "message_descriptor",
+    "target_region_descriptor",
+    "target_region_name_descriptor",
+    "service_relocated_descriptor-",
+    "XAIT_PID_descriptor",
+    "C2_delivery_system_descriptor",
+    "DTS-HD_descriptor",
+    "DTS_Neural_descriptor",
+    "video_depth_range_descriptor",
+    "T2MI_descriptor",
+    nullptr,
+    "URI_linkage_descriptor",
+    "CI_ancillary_data_descriptor",
+    "AC-4_descriptor (see annex D)",
+    "C2_bundle_delivery_system_descriptor",
+    "S2X_satellite_delivery_system_descriptor",
+    "protection_message_descriptor",
+    "audio_preselection_descriptor",
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    "TTML_subtitling_descriptor",
+    "DTS-UHD_descriptor ",
+};
+static const auto Mpeg_Descriptors_descriptor_tag_extension_Array_Size = sizeof(Mpeg_Descriptors_descriptor_tag_extension_Array) / sizeof(*Mpeg_Descriptors_descriptor_tag_extension_Array);
+static string Mpeg_Descriptors_descriptor_tag_extension(int8u descriptor_tag_extension)
+{
+    const auto Name = descriptor_tag_extension < Mpeg_Descriptors_descriptor_tag_extension_Array_Size ? Mpeg_Descriptors_descriptor_tag_extension_Array[descriptor_tag_extension] : nullptr;
+    if (Name) {
+        return Name;
+    }
+    return to_string(descriptor_tag_extension);
 }
 
 stream_t Mpeg_Descriptors_stream_Kind(int8u descriptor_tag, int32u format_identifier)
@@ -1470,6 +1664,14 @@ const int16u DVB_Text_00[96]=
 };
 
 //---------------------------------------------------------------------------
+static const char* NGA_component_preferred_reproduction[] =
+{
+    "stereo",
+    "two-dimensional",
+    "three-dimensional",
+};
+
+//---------------------------------------------------------------------------
 extern const size_t DolbyVision_Compatibility_Size;
 extern const char* DolbyVision_Compatibility[];
 
@@ -1770,8 +1972,8 @@ void File_Mpeg_Descriptors::Data_Parse()
             ELEMENT_CASE(7A, "DVB - enhanced_AC-3_descriptor");
             ELEMENT_CASE(7B, "DVB - DTS descriptor");
             ELEMENT_CASE(7C, "DVB - AAC descriptor");
-            ELEMENT_CASE(7D, "DVB - reserved for future use");
-            ELEMENT_CASE(7E, "DVB - reserved for future use");
+            ELEMENT_CASE(7D, "DVB - XAIT_location_descriptor");
+            ELEMENT_CASE(7E, "DVB - FTA_content_management_descriptor");
             ELEMENT_CASE(7F, "DVB - extension descriptor");
             default: if (Element_Code>=0x40)
                         Element_Info1("user private");
@@ -2392,8 +2594,8 @@ void File_Mpeg_Descriptors::Descriptor_39()
     Skip_SB(                                                    "VVC_24hr_picture_present_flag");
     Skip_S1(5,                                                  "reserved");
     Get_S1 (2, HDR_WCG_idc,                                     "HDR_WCG_idc");
-    Skip_S1(4,                                                  "reserved");
-    Get_S1 (2, video_properties_tag,                            "video_properties_tag");
+    Skip_S1(2,                                                  "reserved");
+    Get_S1 (4, video_properties_tag,                            "video_properties_tag");
     if (temporal_layer_subset_flag)
     {
         Skip_S1(5,                                              "reserved");
@@ -2762,16 +2964,37 @@ void File_Mpeg_Descriptors::Descriptor_4D()
 }
 
 //---------------------------------------------------------------------------
+void File_Mpeg_Descriptors::NGA_component()
+{
+    Element_Begin1("component_type");
+    BS_Begin();
+    // see Table 27 of DVB A038 / ETSI EN 300 468
+    Skip_SB(                                                "reserved_zero_future_use");
+    Info_SB(b6,                                             "content is pre-rendered for consumption with headphones"); Element_Info1C(b6, "content is pre-rendered for consumption with headphones");
+    Info_SB(b5,                                             "content enables interactivity"); Element_Info1C(b5, "content enables interactivity");
+    Info_SB(b4,                                             "content enables dialogue enhancement"); Element_Info1C(b4, "content enables dialogue enhancement");
+    Info_SB(b3,                                             "content contains spoken subtitles"); Element_Info1C(b3, "content contains spoken subtitles");
+    Info_SB(b2,                                             "content contains audio description"); Element_Info1C(b2, "content contains audio description");
+    Info_S1(2, b10,                                         "preferred reproduction channel layout"); Element_Info1C(b10, NGA_component_preferred_reproduction[b10-1]);
+    BS_End();
+    Element_End0();
+}
+
+//---------------------------------------------------------------------------
 void File_Mpeg_Descriptors::Descriptor_50()
 {
     //Parsing
     int32u ISO_639_language_code;
-    int8u stream_content;
+    int8u stream_content_ext, stream_content;
     BS_Begin();
-    Skip_S1(4,                                                  "reserved_future_use");
+    Get_S1 (4, stream_content_ext,                              "stream_content_ext");
     Get_S1 (4, stream_content,                                  "stream_content"); Param_Info1(Mpeg_Descriptors_stream_content(stream_content)); Element_Info1(Mpeg_Descriptors_stream_content(stream_content));
     BS_End();
-    Info_B1(component_type,                                     "component_type"); Param_Info1(Mpeg_Descriptors_component_type(stream_content, component_type)); Element_Info1(Mpeg_Descriptors_component_type(stream_content, component_type));
+    if (stream_content == 0x0B && stream_content_ext == 0x0E)
+        NGA_component();
+    else {
+        Info_B1(component_type,                                 "component_type"); Param_Info1(Mpeg_Descriptors_component_type(stream_content, stream_content_ext, component_type)); Element_Info1(Mpeg_Descriptors_component_type(stream_content, stream_content_ext, component_type));
+    }
     Info_B1(component_tag,                                      "component_tag");
     Get_C3 (ISO_639_language_code,                              "ISO_639_language_code");
     Skip_DVB_Text(Element_Size-Element_Offset, ISO_639_language_code, "text");
@@ -3322,10 +3545,11 @@ void File_Mpeg_Descriptors::Descriptor_7F()
 {
     //Parsing
     int8u descriptor_tag_extension;
-    Get_B1(descriptor_tag_extension,                            "descriptor_tag_extension");
+    Get_B1(descriptor_tag_extension, "descriptor_tag_extension"); Param_Info1(Mpeg_Descriptors_descriptor_tag_extension(descriptor_tag_extension)); Element_Info1(Mpeg_Descriptors_descriptor_tag_extension(descriptor_tag_extension));
     switch (descriptor_tag_extension)
     {
         case 0x06 : Descriptor_7F_06(); break;
+        case 0x08 : Descriptor_7F_08(); break;
         case 0x0F : Descriptor_7F_0F(); break;
         case 0x15 : Descriptor_7F_15(); break;
         case 0x19 : Descriptor_7F_19(); break;
@@ -3374,6 +3598,22 @@ void File_Mpeg_Descriptors::Descriptor_7F_06()
                 Complete_Stream->Streams[elementary_PID]->Infos["Language/String"]=MediaInfoLib::Config.Iso639_Translate(Language);
             }
         }
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Mpeg_Descriptors::Descriptor_7F_08()
+{
+    //Parsing
+    Ztring text_char;
+    int32u ISO_639_language_code;
+    int8u message_id;
+    Get_B1 (message_id,                                         "message_id");
+    Get_C3 (ISO_639_language_code,                              "ISO_639_language_code");
+    Get_DVB_Text(Element_Size-Element_Offset, ISO_639_language_code, text_char,  "text_char");
+
+    FILLING_BEGIN();
+        Complete_Stream->Transport_Streams[transport_stream_id].message_ids[message_id][ISO_639_language_code]=text_char;
     FILLING_END();
 }
 
@@ -3440,8 +3680,6 @@ const char* audio_rendering_indication[audio_rendering_indication_Size]=
 void File_Mpeg_Descriptors::Descriptor_7F_19()
 {
     //Parsing
-    Param_Info1("audio_preselection_descriptor");
-    Element_Info1("audio_preselection_descriptor");
     int8u num_preselections;
     map<int8u, Descriptor_7F_19_Info> Infos;
     BS_Begin();

@@ -161,6 +161,7 @@
 7.1ch;
 About;À propos de
 About_Hint;Comment contacter l'auteur ? Comment trouver la dernière version ?
+AC3_Metadata;
 Accompaniment;Accompagnement
 Active_DisplayAspectRatio;Format actif à l'écran
 Active_Height;Hauteur active
@@ -186,8 +187,8 @@ Album_ReplayGain_Peak;Crête de gain en lecture de l'album
 Alignment;Alignement
 Alignment_Aligned;Aligné sur les entrelacements
 Alignment_Split;Eparpillé à travers les entrelacements
-AllFields;Tous les Champs
 All;Tout
+AllFields;Tous les Champs
 AlternateGroup;Groupe alternatif
 AnalyzeServicesMenu;Analyser avec MediaInfo
 App_About;À propos de MediaInfo
@@ -243,6 +244,7 @@ BitRate_Mode_CBR;Constant
 BitRate_Mode_VBR;Variable
 BitRate_Nominal;Débit nominal
 Bits-(Pixel*Frame);Bits/(Pixel*Image)
+BitstreamLevel;
 Bring All to Front;Tout ramener au premier plan
 BufferSize;Taille du tampon
 Cancel;Annuler
@@ -321,8 +323,8 @@ colour_primaries;Coordonnées de chromaticité
 colour_range;Gamme de couleurs
 Comment;Commentaire
 CommissionedBy;Commanditaire
-CompareView;Comparer (Fonctionnalité premium)
 Compare;Comparer
+CompareView;Comparer (Fonctionnalité premium)
 Compilation;Compilation
 ComplementaryObject;Objet complémentaire
 CompleteName;Nom complet
@@ -333,6 +335,7 @@ Compression_Mode;Mode de compression
 Compression_Mode_Lossless;Sans perte
 Compression_Mode_Lossy;Avec perte
 Compression_Ratio;Taux de compression
+comprprof;
 Conductor;Chef d'orchestre
 ConformanceCheck;Contrôle de conformité
 ConformanceErrors;Erreurs de conformité
@@ -344,9 +347,9 @@ Container and general information;Conteneur et informations générales
 Content;Contenu
 ContentType;Type de contenu
 CoProducer;Coproducteur
+Copy;Copier
 Copyright;Copyright
 CopyrightYear;Année du Copyright
-Copy;Copier
 CostumeDesigner;Responsable des costumes
 Count;Nombre
 Country;Pays
@@ -415,6 +418,7 @@ Duration_Start_Command;Heure de début (commandes)
 Duration_Start2End;Durée du contenu visible
 DynamicObject;Objet dynamique
 DynamicRangeControl;Contrôle dynamique de la plage
+dynrngprof;
 Eac3DrcProfile;Profil E-AC-3 DRC
 Edit;Modifier
 EditedBy;Monté par
@@ -425,6 +429,7 @@ EMail;e-mail
 Enable FFmpeg plugin;Activer le plug-in FFmpeg
 Encoded_Application;Application utilisée
 Encoded_Date;Date d'encodage
+Encoded_Hardware;
 Encoded_Library;Bibliothèque utilisée
 Encoded_Library_Name;
 Encoded_Library_Settings;Paramètres d'encodage
@@ -433,11 +438,11 @@ Encoded_Original;Support original
 EncodedBy;Encodé par
 EPG_Positions;Positions de l'EPG (interne)
 EpisodeTitleNumber;Numéro de titre d'épisode
+Error;Erreur
 Error_File;Erreur lors de la lecture du fichier
 Error_File_Write;Erreur lors de l'écriture du fichier
 Error_Open;Impossible d'ouvrir le(s) fichier(s)
 Error_Save;Impossible d'enregistrer le fichier
-Error;Erreur
 Events_MinDuration;Durée minimale d'un événement
 Events_PaintOn;Événements PaintOn
 Events_PopOn;Événements PopOn
@@ -539,8 +544,8 @@ FrameRate_Nominal;Débit im/s nominal
 FrameRate_Num;
 FrameRate_Original;Débit im/s d'origine
 FrameRate_Real;Débit im/s réel
-FullParsingTips;Sortie plus complète (plus lent)
 FullParsing;Analyse complète
+FullParsingTips;Sortie plus complète (plus lent)
 Gallery;Gallerie
 General;Général
 GeneralCompliance;Conformité générale
@@ -1007,8 +1012,8 @@ Language_zu;Zulu
 LanguageChanges;Les changements prendront effet au redémarrage de l'application
 Languages;
 LawRating;Classé
-LegacyStreamDisplay;
 LCCN;LCCN
+LegacyStreamDisplay;
 LfeAttenuationKnown;Atténuation basse fréquence connue
 LfeMixGain;Gain de mixage basse fréquence
 Library;Bibliothèques utilisées
@@ -1157,6 +1162,7 @@ PackageName;Nom du paquet
 PackFormat;Format de paquet
 Part;Partie
 Part_Count;Nombre de parties
+PartialParsing;
 PartNumber;Numéro de la partie
 PartTotal;Nombre total de parties
 Performer;Interprète
@@ -1190,6 +1196,7 @@ Presentation;Présentation
 PresentationConfig;Config de présentation
 PresentationConfig_ContentClassifier;Config de présentation des classificateurs de contenu
 PresentationID;ID de présentation
+PresentationLevel;
 PreviousDownmixType5ch;Type de mixage réducteur précédent 5 canaux
 PreviousMixType2ch;Type de mix précédent 2 canaux
 PrimaryAudioLanguage;Langue audio principale
@@ -1257,8 +1264,8 @@ ServiceChannel;Canal du service
 ServiceKind;Genre de service
 ServiceName;Nom du service
 ServiceProvider;Fournisseur du service
-ServiceType;Type de service
 Services;Services
+ServiceType;Type de service
 Set;Ensemble
 Set_Count;Nombre de réglages
 Setup;Configuration
@@ -1271,11 +1278,11 @@ Shell extension, separate instance;
 Shell InfoTip;Bulle d'aide 'Explorateur' (survoller un fichier multimedia à la souris affichera toutes ses infos)
 ShimName;Nom de Shim
 ShimVersion;Version de Shim
+Show;Montrer:
 Show menu;Afficher la barre des menus
 Show toolbar;Afficher la barre d'outils
 ShowAll;Tout montrer
 ShowMore;Afficher plus de données dans la sortie, y compris différents formats de temps ou de durée
-Show;Montrer:
 SignalGroup;Groupe de signal
 SigningPresent;Signature présente
 SignLanguage;Langue des signes
@@ -1294,7 +1301,6 @@ StoreMethod_InterleavedFields;Trames entrelacées
 StoreMethod_SeparatedFields;Trames séparées
 StoreMethod_SeparatedFields_1;Trames séparées (1 trame par bloc)
 StoreMethod_SeparatedFields_2;Trames séparées (2 trames par bloc)
-Streams;Flux
 Stream;Type de flux
 Stream_MoreInfo;Plus d'info au sujet de ce flux
 StreamCount;Nombre de pistes de ce type
@@ -1305,6 +1311,7 @@ StreamKind;Type de flux
 StreamKindID;Identifiant du flux
 StreamKindPos;Identifiant du flux
 StreamOrder;
+Streams;Flux
 StreamSize;Taille du flux
 StreamSize_Demuxed;Taille du flux démultiplexé
 StreamSize_Encoded;Taille du flux encodé
@@ -1331,8 +1338,8 @@ SubtstreamIdChannel;Identité de début de sous-flux et index de canal
 Summary;Résumé
 Supported formats;Formats supportés
 Supported?;Supporté ?
-SupportUs2;Soutenez-nous et Obtenez des fonctionnalités exclusives.
 SupportUs;Nous Soutenir, Et obtenir le thème sombre ainsi que d'autres fonctionnalités à venir.
+SupportUs2;Soutenez-nous et Obtenez des fonctionnalités exclusives.
 SurroundAttenuationKnown;Atténuation surround connue
 SwitchGroup;Changer de groupe
 Synopsis;Synopsis
@@ -1343,6 +1350,7 @@ TargetDeviceConfig;Configuration de l'appareil cible
 Technician;Technicien
 TermsOfUse;Conditions d'utilisation
 TertiaryAudioLanguage;Langue audio tertiaire
+TestContinuousFileNames;
 Text;Texte
 Text - Custom;Personnaliser les textes
 Text (HTML);Texte (HTML)
@@ -1408,6 +1416,26 @@ TrimMode8i;Mode de coupe 7.1.4ch
 TruePeakLevel;Niveau de crête réel
 TruePeakLevel_Album;Niveau de crête réel (album)
 Type;Type
+Type_Composer;
+Type_Conductor;
+Type_Cover;
+Type_Cover_Back;
+Type_Cover_Media;
+Type_DuringPerformance;
+Type_DuringRecording;
+Type_FileIcon;
+Type_FileIcon_32x32;
+Type_Illustration;
+Type_LeafletPage;
+Type_Lyricist;
+Type_Performer;
+Type_Performer_Lead;
+Type_PerformerLogo;
+Type_Picture;
+Type_PublisherLogo;
+Type_RecordingLocation;
+Type_ScreenCapture;
+Type_Thumbnail;
 TypeDefinition;Définition du type
 UniqueID;Identifiant unique
 UniversalAdID;Ad ID universelle
@@ -1458,5 +1486,5 @@ Yes;Oui
 Your system;Votre système
 Your translation;
 Zoom;Zoom
-ZZ_Automatic_Percent;96
-ZZ_AutomaticLanguage_Percent;96
+ZZ_Automatic_Percent;94
+ZZ_AutomaticLanguage_Percent;94

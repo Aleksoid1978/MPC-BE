@@ -161,6 +161,7 @@
 7.1ch;
 About;このソフトの情報
 About_Hint;連絡方法と最新版チェック
+AC3_Metadata;
 Accompaniment;伴奏
 Active_DisplayAspectRatio;
 Active_Height;
@@ -187,7 +188,9 @@ Alignment;アラインメント
 Alignment_Aligned;インターリーブで整列
 Alignment_Split;インターリーブで分割
 All;すべて
+AllFields;
 AlternateGroup;代替グループ
+AnalyzeServicesMenu;
 App_About;MediaInfoについて
 App_Hide;MediaInfoを隠す
 App_Quit;MediaInfoを終了
@@ -241,6 +244,7 @@ BitRate_Mode_CBR;固定 (CBR)
 BitRate_Mode_VBR;可変 (VBR)
 BitRate_Nominal;ビットレート名
 Bits-(Pixel*Frame);ビット/(ピクセル*フレーム)
+BitstreamLevel;
 Bring All to Front;すべてを手前に移動
 BufferSize;バッファサイズ
 Cancel;キャンセル
@@ -280,9 +284,11 @@ Classifier;
 ClearList;一覧のクリア
 Close;閉じる
 Close all before open;すべて閉じてから開く
+CloseAll;
 ClosedCaptionsLanguage;クローズドキャプションの言語
 ClosedCaptionsPresent;クローズドキャプションの有無
 ClosedCaptionsType;クローズドキャプションの種類
+CloseFile;
 CloseWindow;ウィンドウを閉じる
 Codec;コーデック
 Codec_Description;コーデックの説明
@@ -317,6 +323,8 @@ colour_primaries;原色
 colour_range;色の範囲
 Comment;コメント
 CommissionedBy;委託
+Compare;
+CompareView;
 Compilation;コンピレーション
 ComplementaryObject;
 CompleteName;完全なパス
@@ -327,6 +335,7 @@ Compression_Mode;圧縮方法
 Compression_Mode_Lossless;無劣化
 Compression_Mode_Lossy;非可逆
 Compression_Ratio;圧縮比
+comprprof;
 Conductor;指揮
 ConformanceCheck;適合性の確認
 ConformanceErrors;
@@ -362,6 +371,7 @@ Default;
 Default translation;
 Default_Setting;システムの規定
 DefaultTargetDeviceConfig;
+DefaultView;
 Delay;遅延
 Delay_Source;元の遅延
 Delay_Source_Container;コンテナ
@@ -392,6 +402,8 @@ Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;寄付
 DotsPerInch;ドット/インチ
+DownloadFile;
+DownloadFileError;
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
@@ -406,6 +418,7 @@ Duration_Start_Command;
 Duration_Start2End;
 DynamicObject;
 DynamicRangeControl;
+dynrngprof;
 Eac3DrcProfile;
 Edit;編集
 EditedBy;編集者
@@ -416,6 +429,7 @@ EMail;電子メール
 Enable FFmpeg plugin;
 Encoded_Application;使用したエンコーダ
 Encoded_Date;エンコード日
+Encoded_Hardware;
 Encoded_Library;使用したライブラリ
 Encoded_Library_Name;
 Encoded_Library_Settings;エンコードの設定
@@ -424,8 +438,11 @@ Encoded_Original;エンコード元
 EncodedBy;エンコード者
 EPG_Positions;EPG 位置 (内部)
 EpisodeTitleNumber;エピソードのタイトル数
+Error;
 Error_File;ファイル読み込みエラー
 Error_File_Write;ファイル書き込みエラー
+Error_Open;
+Error_Save;
 Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
@@ -440,6 +457,11 @@ Extensions;よく使われる拡張子
 External_Media_NotMounted;外部メディアが挿入されていません
 Family;ファミリー
 Fax;Fax
+Feature_AdvancedMode;
+Feature_FilesCompare;
+Feature_More;
+Feature_SelectView;
+Field;
 File;ファイル
 File size;ファイルサイズ
 File_Append;既存のファイルの末尾に追加 (警告 : 設定値が同じになるよう注意してください)
@@ -523,6 +545,7 @@ FrameRate_Num;
 FrameRate_Original;元のフレームレート
 FrameRate_Real;
 FullParsing;
+FullParsingTips;
 Gallery;
 General;全般
 GeneralCompliance;
@@ -986,10 +1009,11 @@ Language_zh-tw;中国語 (繁体)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;ズールー語
+LanguageChanges;
 Languages;
 LawRating;規制評価
-LegacyStreamDisplay;
 LCCN;LCCN
+LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
 Library;Mux ライブラリ
@@ -1036,6 +1060,7 @@ LtRtCenterMixGain;
 LtRtSurroundMixGain;
 Lyricist;作詞
 Lyrics;歌詞
+MacCreatedBy;
 Mastered_Date;マスタリング日
 MasteredBy;マスタリング者
 MasteringDisplay_ColorPrimaries;マスタリングディスプレイの原色
@@ -1053,6 +1078,7 @@ MD5;
 MD5_Unencoded;
 MediaInfo_About;MediaInfo により、動画ファイルや音声ファイルの技術情報やタグ情報に簡単にアクセスできます。\r\nMac App Store のグラフィカルユーザーインターフェース以外は、オープンソースのソフトウェアです。つまりこのプログラムは最終利用者に無償で提供され、開発者は自由にプログラムを研究、改良、再配布できます (BSDライセンス)。
 MediaInfo_About_About;MediaInfo v%MI_VERSION% (MediaInfoLib v%MIL_VERSION%)
+MediaInfo_WebSite;
 Menu;メニュー
 Menu stream(s);メニューストリーム
 Menu_Codec_List;メニュー コーデック
@@ -1104,10 +1130,15 @@ Object;
 ObjectCount;
 OK;OK
 One output file per input file;入力ファイルごとに単一ファイルで出力
+OnlyDiffer;
+OnlyIdentical;
 Open;開く
 OpenCaptionsLanguage;オープンキャプションの言語
 OpenCaptionsPresent;オープンキャプションの有無
 OpenCaptionsType;オープンキャプションの種類
+OpenFile;
+OpenFileError;
+OpenRecent;
 Options;オプション
 Options_Hint;設定
 Original;オリジナル
@@ -1119,6 +1150,7 @@ Originator;発起人
 Other;その他
 OtherIdentifier;他の識別子
 OtherIdentifierType;他の識別子の種別
+OtherViews;
 Output;出力
 Output format;出力形式
 OverallBitRate;総ビットレート
@@ -1130,6 +1162,7 @@ PackageName;パッケージ名
 PackFormat;
 Part;パート
 Part_Count;合計
+PartialParsing;
 PartNumber;パート数
 PartTotal;合計パート
 Performer;出演者
@@ -1156,12 +1189,14 @@ Position_Total;合計
 Preferences;設定
 PreferredDownmix;
 Premium;プレミアム
+Premium_Feature;
 Premium_Summary;プレミアム概要
 PreselectionLabel;
 Presentation;
 PresentationConfig;
 PresentationConfig_ContentClassifier;
 PresentationID;
+PresentationLevel;
 PreviousDownmixType5ch;
 PreviousMixType2ch;
 PrimaryAudioLanguage;音声1の言語
@@ -1177,6 +1212,7 @@ ProgrammeTextLanguage;プログラムの字幕の言語
 ProgrammeTitle;プログラムのタイトル
 Publisher;発行者
 Purchased_Date;購入日
+PurchaseInformation;
 Quote character;クオート文字
 RadioStation;ラジオ局
 Rating;評価
@@ -1193,6 +1229,7 @@ ReplayGain_Peak;リプレイゲイン ピーク
 Report;報告
 Resolution;解像度
 RestoreLifetimeSubscription;生涯購読の復元
+Retry;
 s;秒
 Sampled_Height;
 Sampled_Width;
@@ -1241,9 +1278,11 @@ Shell extension, separate instance;
 Shell InfoTip;エクスプローラーでツールチップ (対応ファイル上でツールチップを表示)
 ShimName;Shim 名
 ShimVersion;Shim バージョン
+Show;
 Show menu;メニューを表示
 Show toolbar;ツールバーを表示
 ShowAll;すべてを表示
+ShowMore;
 SignalGroup;
 SigningPresent;Sign 有無
 SignLanguage;Sign の言語
@@ -1272,6 +1311,7 @@ StreamKind;ストリーム種別
 StreamKindID;ID
 StreamKindPos;位置
 StreamOrder;
+Streams;
 StreamSize;ストリームのサイズ
 StreamSize_Demuxed;Demux 後のストリームサイズ
 StreamSize_Encoded;エンコードされたストリームサイズ
@@ -1281,6 +1321,7 @@ Subscribe;購読
 Subscribe_Button;購読 (1年間 %PRICE%)
 Subscribe_Failed;購入はキャンセルまたは失敗しました
 Subscribe_Manage;購読の管理
+Subscribe_Premium;
 Subscribe_Renew;購読を更新しますか?
 Subscribe_Renew_Price;購読の更新 (1年間 %PRICE%)
 Subscribe_Unaviable;購読の詳細を取得できません
@@ -1298,6 +1339,7 @@ Summary;概要
 Supported formats;対応する形式
 Supported?;対応？
 SupportUs;私たちを支援してください。ダークテーマやさらなる機能につなげましょう。
+SupportUs2;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;概要
@@ -1308,6 +1350,7 @@ TargetDeviceConfig;
 Technician;技術者
 TermsOfUse;使用許諾
 TertiaryAudioLanguage;音声3の言語
+TestContinuousFileNames;
 Text;テキスト
 Text - Custom;テキスト - カスタム
 Text (HTML);テキスト (HTML)
@@ -1373,6 +1416,26 @@ TrimMode8i;
 TruePeakLevel;トゥルーピーク
 TruePeakLevel_Album;トゥルーピーク (アルバム)
 Type;種類
+Type_Composer;
+Type_Conductor;
+Type_Cover;
+Type_Cover_Back;
+Type_Cover_Media;
+Type_DuringPerformance;
+Type_DuringRecording;
+Type_FileIcon;
+Type_FileIcon_32x32;
+Type_Illustration;
+Type_LeafletPage;
+Type_Lyricist;
+Type_Performer;
+Type_Performer_Lead;
+Type_PerformerLogo;
+Type_Picture;
+Type_PublisherLogo;
+Type_RecordingLocation;
+Type_ScreenCapture;
+Type_Thumbnail;
 TypeDefinition;
 UniqueID;固有ID
 UniversalAdID;ユニバーサル広告ID
@@ -1380,6 +1443,7 @@ UniversalAdID_Registry;ユニバーサル広告ID登録
 UniversalAdID_Value;ユニバーサル広告IDの値
 Unknown;不明
 Url;URL
+Value;
 Video;映像
 Video stream(s);映像ストリーム
 Video_Codec_List;映像コーデック
@@ -1422,5 +1486,5 @@ Yes;はい
 Your system;システム情報
 Your translation;
 Zoom;拡大／縮小
-ZZ_Automatic_Percent;82
-ZZ_AutomaticLanguage_Percent;82
+ZZ_Automatic_Percent;78
+ZZ_AutomaticLanguage_Percent;79

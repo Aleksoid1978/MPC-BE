@@ -161,6 +161,7 @@
 7.1ch;
 About;Hakkında
 About_Hint;Bana nasıl ulaşacak ve son sürümü nasıl bulacaksınız
+AC3_Metadata;
 Accompaniment;Eşlik eden
 Active_DisplayAspectRatio;
 Active_Height;
@@ -187,7 +188,9 @@ Alignment;Hizalama
 Alignment_Aligned;Boşluklarda sıraya dizilmiş
 Alignment_Split;Boşlukları karşılıklı böl
 All;Tümü
+AllFields;
 AlternateGroup;Dönüşümlü grup
+AnalyzeServicesMenu;
 App_About;MediaInfo hakkında
 App_Hide;MediaInfo’i Gizle
 App_Quit;MediaInfo’dan Çık
@@ -241,6 +244,7 @@ BitRate_Mode_CBR;Sabit
 BitRate_Mode_VBR;Değişken
 BitRate_Nominal;Düşük bit oranı
 Bits-(Pixel*Frame);Bit/(Piksel*Kare)
+BitstreamLevel;
 Bring All to Front;Tümünü En Öne Getir
 BufferSize;Arabellek boyutu
 Cancel;İptal
@@ -280,9 +284,11 @@ Classifier;
 ClearList;
 Close;Kapat
 Close all before open;Açmadan önce tümünü kapat
+CloseAll;
 ClosedCaptionsLanguage;Kapalı Açıklamalı Alt Yazı Dili
 ClosedCaptionsPresent;Kapalı Açıklamalı Alt Yazı Sunumu
 ClosedCaptionsType;Kapalı Açıklamalı Alt Yazı Türü
+CloseFile;
 CloseWindow;Pencereyi Kapat
 Codec;Kodek
 Codec_Description;Kodek açıklaması
@@ -317,6 +323,8 @@ colour_primaries;Renk öncelikleri
 colour_range;Renk aralığı
 Comment;Yorum
 CommissionedBy;Görevlendiren
+Compare;
+CompareView;
 Compilation;Derleme
 ComplementaryObject;
 CompleteName;Tam ad
@@ -327,6 +335,7 @@ Compression_Mode;Sıkıştırma kipi
 Compression_Mode_Lossless;Kayıpsız
 Compression_Mode_Lossy;Kayıplı
 Compression_Ratio;Sıkıştırma oranı
+comprprof;
 Conductor;Orkestra şefi
 ConformanceCheck;
 ConformanceErrors;
@@ -362,6 +371,7 @@ Default;
 Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
+DefaultView;
 Delay;Gecikme
 Delay_Source;Gecikme, kaynağı
 Delay_Source_Container;Kapsayıcı
@@ -392,6 +402,8 @@ Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Bağış
 DotsPerInch;İnç başına nokta
+DownloadFile;
+DownloadFileError;
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
@@ -406,6 +418,7 @@ Duration_Start_Command;
 Duration_Start2End;
 DynamicObject;
 DynamicRangeControl;
+dynrngprof;
 Eac3DrcProfile;
 Edit;Düzenle
 EditedBy;Düzenleyen
@@ -416,6 +429,7 @@ EMail;E-Posta
 Enable FFmpeg plugin;
 Encoded_Application;Yazma uygulaması
 Encoded_Date;Kodlanma tarihi
+Encoded_Hardware;
 Encoded_Library;Yazma kütüphanesi
 Encoded_Library_Name;
 Encoded_Library_Settings;Kodlama ayarları
@@ -424,8 +438,11 @@ Encoded_Original;Orijinal destek
 EncodedBy;Kodlayan
 EPG_Positions;EPG konumları (dahili)
 EpisodeTitleNumber;Bölüm Başlık Numarası
+Error;
 Error_File;Dosya okunurken hata
 Error_File_Write;
+Error_Open;
+Error_Save;
 Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
@@ -440,6 +457,11 @@ Extensions;Genellikle kullanılan uzantılar
 External_Media_NotMounted;
 Family;Aile
 Fax;Faks
+Feature_AdvancedMode;
+Feature_FilesCompare;
+Feature_More;
+Feature_SelectView;
+Field;
 File;Dosya
 File size;Dosya boyutu
 File_Append;Mevcut dosyaya ekle (Uyarı : aynı parametlere sahip olmak için dikkatli olun)
@@ -523,6 +545,7 @@ FrameRate_Num;
 FrameRate_Original;Orijinal kare hızı
 FrameRate_Real;
 FullParsing;
+FullParsingTips;
 Gallery;
 General;Genel
 GeneralCompliance;
@@ -986,10 +1009,11 @@ Language_zh-tw;Çince (Tayvan)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;Zulu
+LanguageChanges;
 Languages;
 LawRating;Kanun oranı
-LegacyStreamDisplay;
 LCCN;LCCN
+LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
 Library;Çoklama kütüphanesi
@@ -1036,6 +1060,7 @@ LtRtCenterMixGain;
 LtRtSurroundMixGain;
 Lyricist;Söz yazarı
 Lyrics;Şarkı Sözleri
+MacCreatedBy;
 Mastered_Date;Elden geçirildiği tarihi
 MasteredBy;Elden geçiren
 MasteringDisplay_ColorPrimaries;Ekran renk önceliklerini elden geçirme
@@ -1053,6 +1078,7 @@ MD5;
 MD5_Unencoded;
 MediaInfo_About;MediaInfo, görüntü ve ses dosyaları hakkında teknik ve etiket bilgilerine kolay erişim sağlar.\r\nMac App Store grafik kullanıcı arayüzü dışında, açık kaynak kodlu yazılımdır, bu da çalışma özgürlüğüne sahip, geliştirmek ve programı yeniden dağıtmak için (BSD lisansı) son kullanıcıya ve geliştiricilere ücretsiz olduğu anlamına gelir.
 MediaInfo_About_About;
+MediaInfo_WebSite;
 Menu;Menü
 Menu stream(s);Menü akışları
 Menu_Codec_List;Menü kodekleri
@@ -1104,10 +1130,15 @@ Object;
 ObjectCount;
 OK;TAMAM
 One output file per input file;Girdi dosyası başına bir çıktı dosyası
+OnlyDiffer;
+OnlyIdentical;
 Open;Aç
 OpenCaptionsLanguage;Açık Açıklamalı Alt Yazı Dili
 OpenCaptionsPresent;Açık Açıklamalı Alt Yazı Sunumu
 OpenCaptionsType;Açık Açıklamalı Alt Yazı Türü
+OpenFile;
+OpenFileError;
+OpenRecent;
 Options;Seçenekler
 Options_Hint;Tercihler
 Original;Orijinal
@@ -1119,6 +1150,7 @@ Originator;Oluşturan
 Other;Diğer
 OtherIdentifier;Diğer Tanımlayıcı
 OtherIdentifierType;Diğer Tanımlayıcı Türü
+OtherViews;
 Output;Çıktı
 Output format;Çıktı biçimi
 OverallBitRate;Kapsamlı bit hızı
@@ -1130,6 +1162,7 @@ PackageName;Paket adı
 PackFormat;
 Part;Parça
 Part_Count;Toplam sayı
+PartialParsing;
 PartNumber;Parça Numarası
 PartTotal;Parça Toplamı
 Performer;Sanatçı
@@ -1156,12 +1189,14 @@ Position_Total;Toplam
 Preferences;Tercihler
 PreferredDownmix;
 Premium;
+Premium_Feature;
 Premium_Summary;
 PreselectionLabel;
 Presentation;
 PresentationConfig;
 PresentationConfig_ContentClassifier;
 PresentationID;
+PresentationLevel;
 PreviousDownmixType5ch;
 PreviousMixType2ch;
 PrimaryAudioLanguage;Birincil Ses Dili
@@ -1177,6 +1212,7 @@ ProgrammeTextLanguage;Program Metin Dili
 ProgrammeTitle;Program Başlığı
 Publisher;Yayıncı
 Purchased_Date;satın alma tarihi
+PurchaseInformation;
 Quote character;Alıntı bölümü
 RadioStation;Radyo istasyonu
 Rating;İzlenme oranı
@@ -1193,6 +1229,7 @@ ReplayGain_Peak;Tekrar oynatma kazancı ucu
 Report;
 Resolution;Çözünürlük
 RestoreLifetimeSubscription;
+Retry;
 s; s
 Sampled_Height;
 Sampled_Width;
@@ -1241,9 +1278,11 @@ Shell extension, separate instance;
 Shell InfoTip;Gezgin Araç İpucu (Windows Gezgini'nde, fare dosya üzerine hareket ettirildiğinde, bilgi görüntülenecektir)
 ShimName;Dolgu Adı
 ShimVersion;Dolgu Sürümü
+Show;
 Show menu;Menüyü göster
 Show toolbar;Araç çubuğunu göster
 ShowAll;Tümünü göster
+ShowMore;
 SignalGroup;
 SigningPresent;İşaretle Sunum
 SignLanguage;İşaret Dili
@@ -1272,6 +1311,7 @@ StreamKind;Akış çeşidi
 StreamKindID;Akış tanımlayıcısı
 StreamKindPos;Akış tanımlayıcısı
 StreamOrder;
+Streams;
 StreamSize;Akış boyutu
 StreamSize_Demuxed;Çoklama ayrıldığındaki akış boyutu
 StreamSize_Encoded;Kodlanmış akış boyutu
@@ -1281,6 +1321,7 @@ Subscribe;
 Subscribe_Button;
 Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Premium;
 Subscribe_Renew;
 Subscribe_Renew_Price;
 Subscribe_Unaviable;
@@ -1298,6 +1339,7 @@ Summary;Özet
 Supported formats;Desteklenen biçimler
 Supported?;Desteklenen mi?
 SupportUs;
+SupportUs2;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Özet
@@ -1308,6 +1350,7 @@ TargetDeviceConfig;
 Technician;Teknisyen
 TermsOfUse;Kullanım şarları
 TertiaryAudioLanguage;Üçüncül Ses Dili
+TestContinuousFileNames;
 Text;Metin
 Text - Custom;Metin - Özel
 Text (HTML);Metin (HTML)
@@ -1373,6 +1416,26 @@ TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;Tür
+Type_Composer;
+Type_Conductor;
+Type_Cover;
+Type_Cover_Back;
+Type_Cover_Media;
+Type_DuringPerformance;
+Type_DuringRecording;
+Type_FileIcon;
+Type_FileIcon_32x32;
+Type_Illustration;
+Type_LeafletPage;
+Type_Lyricist;
+Type_Performer;
+Type_Performer_Lead;
+Type_PerformerLogo;
+Type_Picture;
+Type_PublisherLogo;
+Type_RecordingLocation;
+Type_ScreenCapture;
+Type_Thumbnail;
 TypeDefinition;
 UniqueID;Benzersiz ID
 UniversalAdID;Evrensel Ad ID
@@ -1380,6 +1443,7 @@ UniversalAdID_Registry;Evrensel Ad ID kayıt defteri
 UniversalAdID_Value;Evrensel Ad ID değeri
 Unknown;Bilinmiyor
 Url;Url
+Value;
 Video;Görüntü
 Video stream(s);Görüntü akış(lar)ı
 Video_Codec_List;Görüntü kodekleri
@@ -1422,5 +1486,5 @@ Yes;Evet
 Your system;Sisteminiz
 Your translation;
 Zoom;Büyült/Küçült
-ZZ_Automatic_Percent;77
-ZZ_AutomaticLanguage_Percent;78
+ZZ_Automatic_Percent;74
+ZZ_AutomaticLanguage_Percent;75

@@ -1306,18 +1306,27 @@ Ztring& Ztring::Date_From_Seconds_1970 (const int32s Value)
 Ztring& Ztring::Date_From_Seconds_1970 (const int64s Value)
 {
     time_t Time=(time_t)Value;
-    #if defined(HAVE_GMTIME_R)
-    struct tm Gmt_Temp;
-    struct tm *Gmt=gmtime_r(&Time, &Gmt_Temp);
-    #elif defined(_MSC_VER)
-    struct tm Gmt_Temp;
-    errno_t gmtime_s_Result=gmtime_s(&Gmt_Temp , &Time);
-    struct tm* Gmt=gmtime_s_Result?NULL:&Gmt_Temp;
+    #if defined(_WIN32)
+        #if _CRT_USE_CONFORMING_ANNEX_K_TIME || (__STDC_WANT_LIB_EXT1__ && defined(__STDC_LIB_EXT1__))
+        // C11 standard version on MSVC or other compilers
+        tm Gmt_Temp;
+        tm* Gmt = gmtime_s(&Time, &Gmt_Temp);
+        #else
+        // MSVC and MinGW-w64 argument order and return value differs from C11 standard
+        tm Gmt_Temp;
+        errno_t gmtime_s_Result = gmtime_s(&Gmt_Temp, &Time);
+        tm* Gmt = gmtime_s_Result ? nullptr : &Gmt_Temp;
+        #endif
+    #elif defined(HAVE_GMTIME_R)
+        // POSIX or C23
+        tm Gmt_Temp;
+        tm *Gmt = gmtime_r(&Time, &Gmt_Temp);
     #else
-    #ifdef __GNUC__
-    #warning "This version of ZenLib is not thread safe"
-    #endif
-    struct tm *Gmt=gmtime(&Time);
+        // Fallback: not thread-safe, but prevents compile errors
+        #ifdef __GNUC__
+        #warning "This version of ZenLib is not thread safe"
+        #endif
+        tm *Gmt = gmtime(&Time);
     #endif
     if (!Gmt)
     {
@@ -1349,18 +1358,27 @@ Ztring& Ztring::Date_From_Seconds_1970 (const int64s Value)
 Ztring& Ztring::Date_From_Seconds_1970_Local (const int32u Value)
 {
     time_t Time=(time_t)Value;
-    #if defined(HAVE_LOCALTIME_R)
-    struct tm Gmt_Temp;
-    struct tm *Gmt=localtime_r(&Time, &Gmt_Temp);
-    #elif defined(_MSC_VER)
-    struct tm Gmt_Temp;
-    errno_t localtime_s_Result=localtime_s(&Gmt_Temp , &Time);
-    struct tm* Gmt=localtime_s_Result?NULL:&Gmt_Temp;
+    #if defined(_WIN32)
+        #if _CRT_USE_CONFORMING_ANNEX_K_TIME || (__STDC_WANT_LIB_EXT1__ && defined(__STDC_LIB_EXT1__))
+        // C11 standard version on MSVC or other compilers
+        tm Gmt_Temp;
+        tm* Gmt = localtime_s(&Time, &Gmt_Temp);
+        #else
+        // MSVC and MinGW-w64 argument order and return value differs from C11 standard
+        tm Gmt_Temp;
+        errno_t localtime_s_Result = localtime_s(&Gmt_Temp, &Time);
+        tm* Gmt = localtime_s_Result ? nullptr : &Gmt_Temp;
+        #endif
+    #elif defined(HAVE_GMTIME_R)
+        // POSIX or C23
+        tm Gmt_Temp;
+        tm *Gmt = localtime_r(&Time, &Gmt_Temp);
     #else
-    #ifdef __GNUC__
-    #warning "This version of ZenLib is not thread safe"
-    #endif
-    struct tm *Gmt=localtime(&Time);
+        // Fallback: not thread-safe, but prevents compile errors
+        #ifdef __GNUC__
+        #warning "This version of ZenLib is not thread safe"
+        #endif
+        tm *Gmt = localtime(&Time);
     #endif
     Ztring DateT;
     Ztring Date;

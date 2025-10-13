@@ -28,7 +28,7 @@
 #include "ZenLib/FileName.h"
 #ifdef WINDOWS
     #undef __TEXT
-    #include "Windows.h"
+    #include <windows.h>
 #endif //WINDOWS
 using namespace ZenLib;
 using namespace std;

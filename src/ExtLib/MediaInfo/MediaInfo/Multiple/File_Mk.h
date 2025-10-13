@@ -353,6 +353,7 @@ private :
     enum hdr_format
     {
         HdrFormat_SmpteSt209440,
+        HdrFormat_T_UWA005,
         HdrFormat_SmpteSt2086,
         HdrFormat_Max,
     };
@@ -363,6 +364,10 @@ private :
     void sei_message_user_data_registered_itu_t_t35_B5_003C();
     void sei_message_user_data_registered_itu_t_t35_B5_003C_0001();
     void sei_message_user_data_registered_itu_t_t35_B5_003C_0001_04();
+
+    void sei_message_user_data_registered_itu_t_t35_26();
+    void sei_message_user_data_registered_itu_t_t35_26_0004();
+    void sei_message_user_data_registered_itu_t_t35_26_0004_0005();
 
     struct stream
     {

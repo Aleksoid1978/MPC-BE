@@ -97,6 +97,7 @@ void File_Iso9660::Streams_Finish()
         for (size_t StreamKind=Stream_General+1; StreamKind<Stream_Max; StreamKind++)
             for (size_t Pos=MI_Offsets[i][StreamKind]; Pos<Count_Get((stream_t)StreamKind); Pos++)
                 Fill((stream_t)StreamKind, Pos, "Source", MI_MasterFile.first);
+        #pragma warning(suppress : 6385, justification : "code analysis does not handle pointer to array")
         for (size_t Pos=MI_Offsets[i][Stream_Menu]; Pos<Count_Get(Stream_Menu); Pos++)
             for (auto& Field : FieldsToOffset)
             {

@@ -161,6 +161,7 @@
 7.1ch;
 About;Quant a...
 About_Hint;Com contactar-me i trobar l'última versió
+AC3_Metadata;
 Accompaniment;Acompanyament
 Active_DisplayAspectRatio;
 Active_Height;
@@ -187,7 +188,9 @@ Alignment;Alineació
 Alignment_Aligned;Alineament a intercalats
 Alignment_Split;Dividir a través intercalats
 All;Tot
+AllFields;
 AlternateGroup;
+AnalyzeServicesMenu;
 App_About;Sobre MediaInfo
 App_Hide;Ocultar MediaInfo
 App_Quit;Sortir de MediaInfo
@@ -241,6 +244,7 @@ BitRate_Mode_CBR;Constant
 BitRate_Mode_VBR;Variable
 BitRate_Nominal;Taxa de bits nominal
 Bits-(Pixel*Frame);Bits/(píxel*fotograma)
+BitstreamLevel;
 Bring All to Front;Portar-ho tot a primer pla
 BufferSize;Mida búfer
 Cancel;Cancel·la
@@ -280,9 +284,11 @@ Classifier;
 ClearList;
 Close;Tanca
 Close all before open;Tanca tot abans d'obrir
+CloseAll;
 ClosedCaptionsLanguage;Idioma subtítols incrustats
 ClosedCaptionsPresent;Subtítols incrustats presents
 ClosedCaptionsType;Tipus subtítols incrustats
+CloseFile;
 CloseWindow;Tancar la finestra
 Codec;Còdec
 Codec_Description;Descripció del còdec
@@ -317,6 +323,8 @@ colour_primaries;Primàries de color
 colour_range;Gama de color
 Comment;Comentari
 CommissionedBy;Commissionat per
+Compare;
+CompareView;
 Compilation;Compilació
 ComplementaryObject;
 CompleteName;Nom complet
@@ -327,6 +335,7 @@ Compression_Mode;Mode compressió
 Compression_Mode_Lossless;Sense pèrdua
 Compression_Mode_Lossy;Amb pèrdua
 Compression_Ratio;Proporció compressió
+comprprof;
 Conductor;Conductor
 ConformanceCheck;
 ConformanceErrors;
@@ -362,6 +371,7 @@ Default;
 Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
+DefaultView;
 Delay;Retard
 Delay_Source;Retard, origen
 Delay_Source_Container;Contenidor
@@ -392,6 +402,8 @@ Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Donació
 DotsPerInch;Punts per polçada
+DownloadFile;
+DownloadFileError;
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
@@ -406,6 +418,7 @@ Duration_Start_Command;
 Duration_Start2End;
 DynamicObject;
 DynamicRangeControl;
+dynrngprof;
 Eac3DrcProfile;
 Edit;Edita
 EditedBy;Editat per
@@ -416,6 +429,7 @@ EMail;Correu
 Enable FFmpeg plugin;
 Encoded_Application;Aplicació
 Encoded_Date;Data de codificació
+Encoded_Hardware;
 Encoded_Library;Llibreria d'escriptura
 Encoded_Library_Name;
 Encoded_Library_Settings;Ajustos de codificació
@@ -424,8 +438,11 @@ Encoded_Original;Suport original
 EncodedBy;Codificat per
 EPG_Positions;Posicions EPG (internes)
 EpisodeTitleNumber;Número títol episodi
+Error;
 Error_File;Error en llegir l'arxiu
 Error_File_Write;
+Error_Open;
+Error_Save;
 Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
@@ -440,6 +457,11 @@ Extensions;Extensions emprades generalment
 External_Media_NotMounted;
 Family;Família
 Fax;Fax
+Feature_AdvancedMode;
+Feature_FilesCompare;
+Feature_More;
+Feature_SelectView;
+Field;
 File;Arxiu
 File size;Mida d'arxiu
 File_Append;Annexar a l'arxiu existent (atenció: tingues cura. Han de ser els mateixos paràmetres)
@@ -523,6 +545,7 @@ FrameRate_Num;
 FrameRate_Original;Fotogrames per segon originals
 FrameRate_Real;
 FullParsing;
+FullParsingTips;
 Gallery;
 General;General
 GeneralCompliance;
@@ -986,10 +1009,11 @@ Language_zh-tw;Xinès (Taiwan)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;Zulú
+LanguageChanges;
 Languages;
 LawRating;Classificació llei
-LegacyStreamDisplay;
 LCCN;LCCN
+LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
 Library;Llibreria multiplexat
@@ -1036,6 +1060,7 @@ LtRtCenterMixGain;
 LtRtSurroundMixGain;
 Lyricist;Lletrista
 Lyrics;Lletra
+MacCreatedBy;
 Mastered_Date;Data de masterització
 MasteredBy;Masteritzat per
 MasteringDisplay_ColorPrimaries;Primàries color monitor masterització
@@ -1053,6 +1078,7 @@ MD5;
 MD5_Unencoded;
 MediaInfo_About;MediaInfo proporciona informació tècnica d'arxius de vídeo i àudio.\r\nExcepte la interfaç gràfica a la Mac App Store, és de codi obert, el que significa que és gratuït per als usuaris i els desenvolupadors tenen accés lliure per a estudiar-lo, millorar-lo i redistribuir-lo (llicència BSD)
 MediaInfo_About_About;
+MediaInfo_WebSite;
 Menu;Menú
 Menu stream(s);Menú de pistes
 Menu_Codec_List;Menú de codecs
@@ -1104,10 +1130,15 @@ Object;
 ObjectCount;
 OK;D'acord
 One output file per input file;Un arxiu de sortida per arxiu d'entrada
+OnlyDiffer;
+OnlyIdentical;
 Open;Obre
 OpenCaptionsLanguage;Idioma subtítols incrustats
 OpenCaptionsPresent;Subtítols incrustats presents
 OpenCaptionsType;Tipus subtítols incrustats
+OpenFile;
+OpenFileError;
+OpenRecent;
 Options;Opcions
 Options_Hint;Preferències
 Original;Original
@@ -1119,6 +1150,7 @@ Originator;Creador
 Other;Altres
 OtherIdentifier;Altre identificador
 OtherIdentifierType;Tipus altre identificador
+OtherViews;
 Output;Sortida
 Output format;Format de sortida
 OverallBitRate;Velocitat bits general
@@ -1130,6 +1162,7 @@ PackageName;
 PackFormat;
 Part;Part
 Part_Count;Quantitat total
+PartialParsing;
 PartNumber;Codi sèrie
 PartTotal;Codi publicació
 Performer;Intèrpret
@@ -1156,12 +1189,14 @@ Position_Total;Total
 Preferences;Preferències
 PreferredDownmix;
 Premium;
+Premium_Feature;
 Premium_Summary;
 PreselectionLabel;
 Presentation;
 PresentationConfig;
 PresentationConfig_ContentClassifier;
 PresentationID;
+PresentationLevel;
 PreviousDownmixType5ch;
 PreviousMixType2ch;
 PrimaryAudioLanguage;Idioma àudio primari
@@ -1177,6 +1212,7 @@ ProgrammeTextLanguage;Idioma text programa
 ProgrammeTitle;Títol del programa
 Publisher;Publicista
 Purchased_Date;Data de compra
+PurchaseInformation;
 Quote character;Caràcter cita
 RadioStation;Emissora de ràdio
 Rating;Valoració
@@ -1193,6 +1229,7 @@ ReplayGain_Peak;Límit ganància reproducció
 Report;
 Resolution;Resolució
 RestoreLifetimeSubscription;
+Retry;
 s; s
 Sampled_Height;
 Sampled_Width;
@@ -1241,9 +1278,11 @@ Shell extension, separate instance;
 Shell InfoTip;Consells Explorer (a Windows, mou el ratolí sobre un arxiu per mostrar info)
 ShimName;Nom de falca
 ShimVersion;Versió de falca
+Show;
 Show menu;Mostra el menú
 Show toolbar;Mostra la barra d'eines
 ShowAll;Mostrar-ho tot
+ShowMore;
 SignalGroup;
 SigningPresent;Signatura present
 SignLanguage;Idioma signatura
@@ -1272,6 +1311,7 @@ StreamKind;Tipus de pista
 StreamKindID;Identificador pista
 StreamKindPos;Identificador pista
 StreamOrder;
+Streams;
 StreamSize;Mida pista
 StreamSize_Demuxed;
 StreamSize_Encoded;Mida pista codificada
@@ -1281,6 +1321,7 @@ Subscribe;
 Subscribe_Button;
 Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Premium;
 Subscribe_Renew;
 Subscribe_Renew_Price;
 Subscribe_Unaviable;
@@ -1298,6 +1339,7 @@ Summary;Resum
 Supported formats;Formats compatibles
 Supported?;Compatible?
 SupportUs;
+SupportUs2;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Sinopsi
@@ -1308,6 +1350,7 @@ TargetDeviceConfig;
 Technician;Tècnic
 TermsOfUse;Condicions d'ús
 TertiaryAudioLanguage;Idoma àudio terciari
+TestContinuousFileNames;
 Text;Text
 Text - Custom;Tex: personalitzat
 Text (HTML);Text (HTML)
@@ -1373,6 +1416,26 @@ TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;Tipus
+Type_Composer;
+Type_Conductor;
+Type_Cover;
+Type_Cover_Back;
+Type_Cover_Media;
+Type_DuringPerformance;
+Type_DuringRecording;
+Type_FileIcon;
+Type_FileIcon_32x32;
+Type_Illustration;
+Type_LeafletPage;
+Type_Lyricist;
+Type_Performer;
+Type_Performer_Lead;
+Type_PerformerLogo;
+Type_Picture;
+Type_PublisherLogo;
+Type_RecordingLocation;
+Type_ScreenCapture;
+Type_Thumbnail;
 TypeDefinition;
 UniqueID;ID únic
 UniversalAdID;
@@ -1380,6 +1443,7 @@ UniversalAdID_Registry;
 UniversalAdID_Value;
 Unknown;Desconegut
 Url;URL
+Value;
 Video;Vídeo
 Video stream(s);Pista(es) de vídeo
 Video_Codec_List;Còdecs de vídeo
@@ -1422,5 +1486,5 @@ Yes;Sí
 Your system;El teu sistema
 Your translation;
 Zoom;Zoom
-ZZ_Automatic_Percent;73
-ZZ_AutomaticLanguage_Percent;77
+ZZ_Automatic_Percent;70
+ZZ_AutomaticLanguage_Percent;73

@@ -2007,7 +2007,7 @@ void File_Exif::FileHeader_Parse()
 
     //Exif Makernotes
     if (IsMakernote) {
-        if (Buffer_Size >= 10 && !strncmp((const char*)Buffer, "Apple iOS", 10)) { // the char* contains a terminating \0
+        if (Buffer_Size >= 10 && !strncmp(reinterpret_cast<const char*>(Buffer), "Apple iOS", 10)) { // the char* contains a terminating \0
             int16u alignment;
             Skip_String(10,                                     "Identifier");
             Skip_XX(2,                                          "(Unknown)");
@@ -2022,7 +2022,7 @@ void File_Exif::FileHeader_Parse()
             SkipHeader = true;
             IFD_Offsets[Element_Offset] = currentIFD;
         }
-        else if (Buffer_Size >= 6 && !strncmp((const char*)Buffer, "Nikon", 6)) { // the char* contains a terminating \0
+        else if (Buffer_Size >= 6 && !strncmp(reinterpret_cast<const char*>(Buffer), "Nikon", 6)) { // the char* contains a terminating \0
             Skip_String(6,                                      "Identifier");
             Skip_B2(                                            "Version");
             Skip_XX(2,                                          "(Unknown)");
@@ -2030,9 +2030,9 @@ void File_Exif::FileHeader_Parse()
             OffsetFromContainer = 10;
         }
         else if (Buffer_Size >= 12 &&
-            (!strncmp((const char*)Buffer, "SONY DSC \0\0", 12)) || // the char* contains another terminating \0
-            (!strncmp((const char*)Buffer, "SONY CAM \0\0", 12)) || // the char* contains another terminating \0
-            (!strncmp((const char*)Buffer, "SONY MOBILE", 12))      // the char* contains a terminating \0
+            (!strncmp(reinterpret_cast<const char*>(Buffer), "SONY DSC \0\0", 12)) || // the char* contains another terminating \0
+            (!strncmp(reinterpret_cast<const char*>(Buffer), "SONY CAM \0\0", 12)) || // the char* contains another terminating \0
+            (!strncmp(reinterpret_cast<const char*>(Buffer), "SONY MOBILE", 12))      // the char* contains a terminating \0
             ) {
             Skip_String(12,                                     "Identifier");
             currentIFD = Kind_MakernoteSony;
@@ -2041,8 +2041,8 @@ void File_Exif::FileHeader_Parse()
             IFD_Offsets[MakernoteOffset + Element_Offset] = currentIFD;
         }
         else if (Buffer_Size > 26 && 
-            (!strncmp((const char*)Buffer + Buffer_Size - 8, "\x49\x49\x2A\x00", 4)) || // Canon Makernote footer
-            (!strncmp((const char*)Buffer + Buffer_Size - 8, "\x4D\x4D\x00\x2A", 4))
+            (!strncmp(reinterpret_cast<const char*>(Buffer) + Buffer_Size - 8, "\x49\x49\x2A\x00", 4)) || // Canon Makernote footer
+            (!strncmp(reinterpret_cast<const char*>(Buffer) + Buffer_Size - 8, "\x4D\x4D\x00\x2A", 4))
             ) {
             Element_Offset = Buffer_Size - 8;
             int32u makernote_offset;
@@ -2431,7 +2431,7 @@ void File_Exif::Makernote()
 {
     auto Buffer_Offset_Save = Buffer_Offset;
     auto Element_Size_Save = Element_Size;
-    if (Buffer_Offset > 12 && !strncmp((const char*)Buffer + Buffer_Offset - 12, "SONY DSC \0\0", 12)) {
+    if (Buffer_Offset > 12 && !strncmp(reinterpret_cast<const char*>(Buffer) + Buffer_Offset - 12, "SONY DSC \0\0", 12)) {
         Buffer_Offset -= 12;
         Element_Size += 12;
     }
@@ -2459,8 +2459,8 @@ void File_Exif::ICC_Profile()
 {
     #if defined(MEDIAINFO_ICC_YES)
     ICC_Parser.reset(new File_Icc());
-    ((File_Icc*)ICC_Parser.get())->StreamKind = Stream_Image;
-    ((File_Icc*)ICC_Parser.get())->IsAdditional = true;
+    static_cast<File_Icc*>(ICC_Parser.get())->StreamKind = Stream_Image;
+    static_cast<File_Icc*>(ICC_Parser.get())->IsAdditional = true;
     Open_Buffer_Init(ICC_Parser.get());
     Open_Buffer_Continue(ICC_Parser.get());
     Open_Buffer_Finalize(ICC_Parser.get());
@@ -2683,7 +2683,7 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
             Info.push_back(Ztring::ToZtring(Ret16));
         }
         if (Count != IfdItem.Count) {
-            Skip_XX((IfdItem.Count - Count) * 2,                "(Not parsed)");
+            Skip_XX((IfdItem.Count - static_cast<int64u>(Count)) * 2, "(Not parsed)");
         }
         }
         break;
@@ -2734,14 +2734,14 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
                 Info.push_back(Ztring::ToZtring(Ret32));
             }
             if (Count != IfdItem.Count) {
-                Skip_XX((IfdItem.Count - Count) * 4,            "(Not parsed)");
+                Skip_XX((IfdItem.Count - static_cast<int64u>(Count)) * 4, "(Not parsed)");
             }
         }
         break;
     case Exif_Type::RATIONAL:                                   /* 2x32-bit (2x4-byte) unsigned integers */
         {
         auto Count = IfdItem.Count > 16 ? 16 : IfdItem.Count;
-        for (int16u Pos=0; Pos<IfdItem.Count; Pos++)
+        for (int16u Pos=0; Pos<Count; Pos++)
         {
             int32u N, D;
             #if MEDIAINFO_TRACE
@@ -2773,14 +2773,14 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
                 Info.push_back(Ztring()); // Division by zero, undefined
         }
         if (Count != IfdItem.Count) {
-            Skip_XX((IfdItem.Count - Count) * 8,                "(Not parsed)");
+            Skip_XX((IfdItem.Count - static_cast<int64u>(Count)) * 8, "(Not parsed)");
         }
         }
         break;
     case Exif_Type::SSHORT:                                     /* 16-bit (2-byte) signed integer. */
         {
         auto Count = IfdItem.Count > 16 ? 16 : IfdItem.Count;
-        for (int16u Pos=0; Pos<IfdItem.Count; Pos++)
+        for (int16u Pos=0; Pos<Count; Pos++)
         {
             int16u Ret16u;
             int16s Ret16;
@@ -2803,14 +2803,14 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
             Info.push_back(Ztring::ToZtring(Ret16));
         }
         if (Count != IfdItem.Count) {
-            Skip_XX((IfdItem.Count - Count) * 2,                "(Not parsed)");
+            Skip_XX((IfdItem.Count - static_cast<int64u>(Count)) * 2, "(Not parsed)");
         }
         }
         break;
     case Exif_Type::SLONG:                                      /* 32-bit (4-byte) signed integer */
         {
         auto Count = IfdItem.Count > 16 ? 16 : IfdItem.Count;
-        for (int16u Pos=0; Pos<IfdItem.Count; Pos++)
+        for (int16u Pos=0; Pos<Count; Pos++)
         {
             int32u Ret32u;
             int32s Ret32;
@@ -2835,14 +2835,14 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
             Info.push_back(Ztring::ToZtring(Ret32));
         }
         if (Count != IfdItem.Count) {
-            Skip_XX((IfdItem.Count - Count) * 4,                "(Not parsed)");
+            Skip_XX((IfdItem.Count - static_cast<int64u>(Count)) * 4, "(Not parsed)");
         }
         }
         break;
     case Exif_Type::SRATIONAL:                                  /* 2x32-bit (2x4-byte) signed integers */
         {
         auto Count = IfdItem.Count > 16 ? 16 : IfdItem.Count;
-        for (int16u Pos=0; Pos<IfdItem.Count; Pos++)
+        for (int16u Pos=0; Pos<Count; Pos++)
         {
             int32u NU, DU;
             int32s N, D;
@@ -2877,7 +2877,7 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
                 Info.push_back(Ztring()); // Division by zero, undefined
         }
         if (Count != IfdItem.Count) {
-            Skip_XX((IfdItem.Count - Count) * 8,                "(Not parsed)");
+            Skip_XX((IfdItem.Count - static_cast<int64u>(Count)) * 8, "(Not parsed)");
         }
         }
         break;

@@ -86,20 +86,28 @@ void Cookies::Create_Lines(std::ostream& Out)
         if (Cookie->second.Expires!=(time_t)-1)
         {
             char Temp[200];
-            #if defined(HAVE_GMTIME_R)
-            struct tm Gmt_Temp;
-            struct tm *Gmt=gmtime_r(&Cookie->second.Expires, &Gmt_Temp);
-            #elif defined(_MSC_VER)
-            struct tm Gmt_Temp;
-            errno_t gmtime_s_Result=gmtime_s(&Gmt_Temp , &Cookie->second.Expires);
-            struct tm* Gmt=gmtime_s_Result?NULL:&Gmt_Temp;
+            #if defined(_WIN32)
+                #if _CRT_USE_CONFORMING_ANNEX_K_TIME || (__STDC_WANT_LIB_EXT1__ && defined(__STDC_LIB_EXT1__))
+                // C11 standard version on MSVC or other compilers
+                tm Gmt_Temp;
+                tm* Gmt = gmtime_s(&Cookie->second.Expires, &Gmt_Temp);
+                #else
+                // MSVC and MinGW-w64 argument order and return value differs from C11 standard
+                tm Gmt_Temp;
+                errno_t gmtime_s_Result = gmtime_s(&Gmt_Temp, &Cookie->second.Expires);
+                tm* Gmt = gmtime_s_Result ? nullptr : &Gmt_Temp;
+                #endif
+            #elif defined(HAVE_GMTIME_R)
+                // POSIX or C23
+                tm Gmt_Temp;
+                tm *Gmt = gmtime_r(&Cookie->second.Expires, &Gmt_Temp);
             #else
-            #ifdef __GNUC__
-            #warning "This version of ZenLib is not thread safe"
+                // Fallback: not thread-safe, but prevents compile errors
+                #ifdef __GNUC__
+                #warning "This version of ZenLib is not thread safe"
+                #endif
+                tm *Gmt = gmtime(&Cookie->second.Expires);
             #endif
-            struct tm *Gmt=gmtime(&Cookie->second.Expires);
-            #endif
-
             if (Gmt)
                 if (strftime(Temp, 200, "%a, %d-%b-%Y %H:%M:%S GMT", Gmt))
                     Out << "; expires=" << Temp;

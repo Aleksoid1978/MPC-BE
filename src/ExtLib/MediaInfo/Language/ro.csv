@@ -161,6 +161,7 @@
 7.1ch;
 About;Despre
 About_Hint;Sfaturi
+AC3_Metadata;
 Accompaniment;Acompaniament
 Active_DisplayAspectRatio;
 Active_Height;
@@ -187,7 +188,9 @@ Alignment;
 Alignment_Aligned;
 Alignment_Split;
 All;Toate
+AllFields;
 AlternateGroup;
+AnalyzeServicesMenu;
 App_About;Despre MediaInfo
 App_Hide;Ascunde MediaInfo
 App_Quit;Termină MediaInfo
@@ -241,6 +244,7 @@ BitRate_Mode_CBR;
 BitRate_Mode_VBR;
 BitRate_Nominal;
 Bits-(Pixel*Frame);
+BitstreamLevel;
 Bring All to Front;Adu tot în față
 BufferSize;
 Cancel;Anulare
@@ -280,9 +284,11 @@ Classifier;
 ClearList;
 Close;Inchideti
 Close all before open;Inchideti tot inainte de a deschide
+CloseAll;
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
+CloseFile;
 CloseWindow;Închide fereastra
 Codec;Codec
 Codec_Description;
@@ -317,6 +323,8 @@ colour_primaries;
 colour_range;
 Comment;Comentariu
 CommissionedBy;
+Compare;
+CompareView;
 Compilation;
 ComplementaryObject;
 CompleteName;Nume complet
@@ -327,6 +335,7 @@ Compression_Mode;
 Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;
+comprprof;
 Conductor;
 ConformanceCheck;
 ConformanceErrors;
@@ -362,6 +371,7 @@ Default;
 Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
+DefaultView;
 Delay;Intarziere
 Delay_Source;
 Delay_Source_Container;
@@ -392,6 +402,8 @@ Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Donatii
 DotsPerInch;
+DownloadFile;
+DownloadFileError;
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
@@ -406,6 +418,7 @@ Duration_Start_Command;
 Duration_Start2End;
 DynamicObject;
 DynamicRangeControl;
+dynrngprof;
 Eac3DrcProfile;
 Edit;Editare
 EditedBy;Editat de
@@ -416,6 +429,7 @@ EMail;E-mail
 Enable FFmpeg plugin;
 Encoded_Application;Dezvoltator aplicatie
 Encoded_Date;Data codarii
+Encoded_Hardware;
 Encoded_Library;Dezvoltator biblioteci
 Encoded_Library_Name;
 Encoded_Library_Settings;Setari codare
@@ -424,8 +438,11 @@ Encoded_Original;Original
 EncodedBy;Codificat de
 EPG_Positions;
 EpisodeTitleNumber;
+Error;
 Error_File;Eroare la citirea fisierului
 Error_File_Write;
+Error_Open;
+Error_Save;
 Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
@@ -440,6 +457,11 @@ Extensions;Extensia folosita in mod curent
 External_Media_NotMounted;
 Family;
 Fax;Fax
+Feature_AdvancedMode;
+Feature_FilesCompare;
+Feature_More;
+Feature_SelectView;
+Field;
 File;Fisier
 File size;Dimensiune fisier
 File_Append;Adaugare la fisierul existent
@@ -523,6 +545,7 @@ FrameRate_Num;
 FrameRate_Original;
 FrameRate_Real;
 FullParsing;
+FullParsingTips;
 Gallery;
 General;Generale
 GeneralCompliance;
@@ -986,10 +1009,11 @@ Language_zh-tw;
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;
+LanguageChanges;
 Languages;
 LawRating;
-LegacyStreamDisplay;
 LCCN;
+LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
 Library;Biblioteca muxing
@@ -1036,6 +1060,7 @@ LtRtCenterMixGain;
 LtRtSurroundMixGain;
 Lyricist;Textier
 Lyrics;
+MacCreatedBy;
 Mastered_Date;Data realizarii
 MasteredBy;Realizat de
 MasteringDisplay_ColorPrimaries;
@@ -1053,6 +1078,7 @@ MD5;
 MD5_Unencoded;
 MediaInfo_About;Furnizeaza informatii foarte detaliate\r\n despre un fisier multimedia
 MediaInfo_About_About;
+MediaInfo_WebSite;
 Menu;Meniu
 Menu stream(s);
 Menu_Codec_List;
@@ -1104,10 +1130,15 @@ Object;
 ObjectCount;
 OK;OK
 One output file per input file;Un fisier destinatie pentru fiecare fisier sursa
+OnlyDiffer;
+OnlyIdentical;
 Open;Deschide
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
+OpenFile;
+OpenFileError;
+OpenRecent;
 Options;Optiuni
 Options_Hint;Preferinte
 Original;Original
@@ -1119,6 +1150,7 @@ Originator;
 Other;Altele
 OtherIdentifier;
 OtherIdentifierType;
+OtherViews;
 Output;Iesire
 Output format;Format iesire
 OverallBitRate;BitRate general
@@ -1130,6 +1162,7 @@ PackageName;
 PackFormat;
 Part;Parte
 Part_Count;
+PartialParsing;
 PartNumber;
 PartTotal;
 Performer;Cantaret
@@ -1156,12 +1189,14 @@ Position_Total;
 Preferences;Preferinte
 PreferredDownmix;
 Premium;
+Premium_Feature;
 Premium_Summary;
 PreselectionLabel;
 Presentation;
 PresentationConfig;
 PresentationConfig_ContentClassifier;
 PresentationID;
+PresentationLevel;
 PreviousDownmixType5ch;
 PreviousMixType2ch;
 PrimaryAudioLanguage;
@@ -1177,6 +1212,7 @@ ProgrammeTextLanguage;
 ProgrammeTitle;
 Publisher;
 Purchased_Date;Data achizitionarii
+PurchaseInformation;
 Quote character;Citate
 RadioStation;Statia radio
 Rating;Rating
@@ -1193,6 +1229,7 @@ ReplayGain_Peak;
 Report;
 Resolution;Rezolutie
 RestoreLifetimeSubscription;
+Retry;
 s;s
 Sampled_Height;
 Sampled_Width;
@@ -1241,9 +1278,11 @@ Shell extension, separate instance;
 Shell InfoTip;
 ShimName;
 ShimVersion;
+Show;
 Show menu;Afisare meniu
 Show toolbar;Afisare toolbar
 ShowAll;Afișează tot
+ShowMore;
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1272,6 +1311,7 @@ StreamKind;Tipul fluxului
 StreamKindID;
 StreamKindPos;
 StreamOrder;
+Streams;
 StreamSize;
 StreamSize_Demuxed;
 StreamSize_Encoded;
@@ -1281,6 +1321,7 @@ Subscribe;
 Subscribe_Button;
 Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Premium;
 Subscribe_Renew;
 Subscribe_Renew_Price;
 Subscribe_Unaviable;
@@ -1298,6 +1339,7 @@ Summary;Sumar
 Supported formats;Formate acceptate
 Supported?;Acceptat?
 SupportUs;
+SupportUs2;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;
@@ -1308,6 +1350,7 @@ TargetDeviceConfig;
 Technician;Tehnician
 TermsOfUse;Condifiile de utilizare
 TertiaryAudioLanguage;
+TestContinuousFileNames;
 Text;Text
 Text - Custom;Text - particularizat
 Text (HTML);Text (HTLM)
@@ -1373,6 +1416,26 @@ TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
+Type_Composer;
+Type_Conductor;
+Type_Cover;
+Type_Cover_Back;
+Type_Cover_Media;
+Type_DuringPerformance;
+Type_DuringRecording;
+Type_FileIcon;
+Type_FileIcon_32x32;
+Type_Illustration;
+Type_LeafletPage;
+Type_Lyricist;
+Type_Performer;
+Type_Performer_Lead;
+Type_PerformerLogo;
+Type_Picture;
+Type_PublisherLogo;
+Type_RecordingLocation;
+Type_ScreenCapture;
+Type_Thumbnail;
 TypeDefinition;
 UniqueID;
 UniversalAdID;
@@ -1380,6 +1443,7 @@ UniversalAdID_Registry;
 UniversalAdID_Value;
 Unknown;Necunoscut
 Url;
+Value;
 Video;Video
 Video stream(s);Flux(uri) video
 Video_Codec_List;Codecuri video
@@ -1422,5 +1486,5 @@ Yes;Da
 Your system;Sistemul dvs
 Your translation;
 Zoom;Zoom
-ZZ_Automatic_Percent;24
-ZZ_AutomaticLanguage_Percent;52
+ZZ_Automatic_Percent;23
+ZZ_AutomaticLanguage_Percent;50

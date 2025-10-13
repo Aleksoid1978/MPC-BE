@@ -360,7 +360,7 @@ void File_Tiff::Streams_Finish()
     Info = Infos[0].find(Tiff_Tag::StripOffsets);
     if (Info != Infos[0].end())
     {
-        size_t ExpectedFileSize_Pos=(int64u)-1;
+        size_t ExpectedFileSize_Pos=static_cast<size_t>(-1);
         for (size_t i=0; i<Info->second.size(); i++)
         {
             auto Offset=Info->second[i].To_int64u();
@@ -370,7 +370,7 @@ void File_Tiff::Streams_Finish()
                 ExpectedFileSize_Pos=i;
             }
         }
-        if (ExpectedFileSize!=(int64u)-1)
+        if (ExpectedFileSize!=static_cast<int64u>(-1))
         {
             Info = Infos[0].find(Tiff_Tag::StripByteCounts);
             if (Info != Infos[0].end() && ExpectedFileSize_Pos<Info->second.size())

@@ -161,6 +161,7 @@
 7.1ch;
 About;Ծրագրի մասին
 About_Hint;Կապնվել ծրագրի հեղինակի հետ կամ բացել ծրագրի կայքը
+AC3_Metadata;
 Accompaniment;Ուղեկցումը
 Active_DisplayAspectRatio;
 Active_Height;
@@ -187,7 +188,12 @@ Alignment;Հավասարեցումը
 Alignment_Aligned;Միացում դադարներով
 Alignment_Split;Բաժանում դադարներով
 All;Բոլորը
+AllFields;
 AlternateGroup;
+AnalyzeServicesMenu;
+App_About;
+App_Hide;
+App_Quit;
 Archival_Location;Տեղադրությունը
 Arranger;Կազմակերպիչը
 ArtDirector;ArtDirector
@@ -238,6 +244,8 @@ BitRate_Mode_CBR;Մշտական
 BitRate_Mode_VBR;Փոփոխական
 BitRate_Nominal;Նոմինալ բիթրեյթը
 Bits-(Pixel*Frame);Բիթ/(Փիքսել*Կադր)
+BitstreamLevel;
+Bring All to Front;
 BufferSize;Պահոցի չափը
 Cancel;Մերժել
 CaptionServiceName;
@@ -276,9 +284,12 @@ Classifier;
 ClearList;
 Close;Փակել
 Close all before open;Բացելուց առաջ փակել բոլորը
+CloseAll;
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
+CloseFile;
+CloseWindow;
 Codec;Կոդավորիչը
 Codec_Description;Կոդավորիչի նկարագր-ը
 Codec_Info;Մանրամասներ կոդավորիչի մասին
@@ -312,6 +323,8 @@ colour_primaries;Հիմնական գույները
 colour_range;
 Comment;Մեկնաբանություն
 CommissionedBy;Երաշխավորող
+Compare;
+CompareView;
 Compilation;
 ComplementaryObject;
 CompleteName;Ամբողջական անունը
@@ -322,6 +335,7 @@ Compression_Mode;Սեղման եղանակը
 Compression_Mode_Lossless;Առանց կորստի
 Compression_Mode_Lossy;Կորստով
 Compression_Ratio;Սեղման աստիճանը
+comprprof;
 Conductor;Դիրիժորը
 ConformanceCheck;
 ConformanceErrors;
@@ -333,6 +347,7 @@ Container and general information;Ընդհանուր տեղեկությունը
 Content;
 ContentType;Պարունակության տեսակը
 CoProducer;Համառեժիսոր
+Copy;
 Copyright;Հեղ. իրավունքը
 CopyrightYear;
 CostumeDesigner;Հագուստի դիզայնը
@@ -356,6 +371,7 @@ Default;
 Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
+DefaultView;
 Delay;Հապաղում
 Delay_Source;Հապաղում օրիգինալում
 Delay_Source_Container;Փաթեթը
@@ -386,6 +402,8 @@ Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Օժանդակություն
 DotsPerInch;Կետեր դյույմի վրա
+DownloadFile;
+DownloadFileError;
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
@@ -400,6 +418,7 @@ Duration_Start_Command;
 Duration_Start2End;
 DynamicObject;
 DynamicRangeControl;
+dynrngprof;
 Eac3DrcProfile;
 Edit;Փոփոխել
 EditedBy;Փոփոխվել է
@@ -410,6 +429,7 @@ EMail;Փոստը
 Enable FFmpeg plugin;
 Encoded_Application;Կոդավորող ծրագիրը
 Encoded_Date;Կոդավորման ամսաթիվը
+Encoded_Hardware;
 Encoded_Library;Կոդավորման շտեմարանը
 Encoded_Library_Name;
 Encoded_Library_Settings;Ծրագրի կարգավորումները
@@ -418,8 +438,11 @@ Encoded_Original;Օրիգինալի աղբյուրը
 EncodedBy;Կոդավորիչը
 EPG_Positions;EPG-ի դիրքը (ներքին)
 EpisodeTitleNumber;
+Error;
 Error_File;Սխալ ֆայլում
 Error_File_Write;
+Error_Open;
+Error_Save;
 Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
@@ -434,6 +457,11 @@ Extensions;Օգտագործվում է՝
 External_Media_NotMounted;
 Family;Խումբը
 Fax;Ֆաքս
+Feature_AdvancedMode;
+Feature_FilesCompare;
+Feature_More;
+Feature_SelectView;
+Field;
 File;Ֆայլ
 File size;Ֆայլի չափը
 File_Append;Ավելացնել ֆայլին
@@ -517,6 +545,7 @@ FrameRate_Num;
 FrameRate_Original;Կադրերի հաճախ-ը օրիգինալում
 FrameRate_Real;
 FullParsing;
+FullParsingTips;
 Gallery;
 General;Ընդհանուր
 GeneralCompliance;
@@ -729,6 +758,7 @@ Height;Բարձր-ը
 Height_CleanAperture;
 Height_Original;Օրիգինալի բարձր-ը
 Help;Օգնություն
+HideOthers;
 Hint;Հուշում
 HomeTheaterAvr;
 How many audio streams?;Ձայնի հոսքերը.
@@ -979,10 +1009,11 @@ Language_zh-tw;Chinese (Taiwan)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;Zulu
+LanguageChanges;
 Languages;
 LawRating;Իրավունքների սահ-ում
-LegacyStreamDisplay;
 LCCN;LCCN
+LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
 Library;Շտեմարանը
@@ -1029,6 +1060,7 @@ LtRtCenterMixGain;
 LtRtSurroundMixGain;
 Lyricist;Երգի տեքստը
 Lyrics;Երգերի տեքստը
+MacCreatedBy;
 Mastered_Date;Օրիգինալի ամսաթիվը
 MasteredBy;Օրիգինալը՝
 MasteringDisplay_ColorPrimaries;
@@ -1046,6 +1078,7 @@ MD5;
 MD5_Unencoded;
 MediaInfo_About;Ցուցադրում է մանրամասն տեղեկություններ\r\nմուլտիմեդիային ֆայլեր Matroska-ի, OGG-ի (ներառյալ OGM)\r\nMPEG1-ի (ներառյալ VCD), MPEG2-ի (ներառյալ DVD և SVCD), MPEG4-ի (ներառյալ iTunes M4A)\r\nQuicktime-ի\r\nRealMedia-ի\r\nWindowsMedia-ի (ներառյալ WMV, WMA)\r\nMicrosoft RIFF-ի (ներառյալ AVI, WAV, DivX)\r\nձայնային ֆայլերի (AC3, DTS, SSC, AU, AIFF) վերաբերյալ
 MediaInfo_About_About;
+MediaInfo_WebSite;
 Menu;Ընտրացանկը
 Menu stream(s);Հոսքերի ընտրացանկը
 Menu_Codec_List;Կոդավորիչների ընտրացանկը
@@ -1056,6 +1089,7 @@ MenuID;Ընտրացանկի ID-ին
 Metadata_Format;
 Metadata_Format_Type;
 Metadata_MuxingMode;
+Minimize;
 MixType;
 mn; ր.
 Mood;Կարգավորված
@@ -1096,10 +1130,15 @@ Object;
 ObjectCount;
 OK;ԼԱՎ
 One output file per input file;Նոր ֆայլ յուրաքանչյուրի համար
+OnlyDiffer;
+OnlyIdentical;
 Open;Բացել
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
+OpenFile;
+OpenFileError;
+OpenRecent;
 Options;Ընտրանքներ
 Options_Hint;Ծրագրի կարգավորումները
 Original;Բնօրինակը
@@ -1111,6 +1150,7 @@ Originator;
 Other;Այլ
 OtherIdentifier;
 OtherIdentifierType;
+OtherViews;
 Output;Արտածում
 Output format;Արտածման տեսակը
 OverallBitRate;Ընդհանուր հոսքը
@@ -1122,6 +1162,7 @@ PackageName;
 PackFormat;
 Part;Մաս
 Part_Count;Ժամերի ք-ը.
+PartialParsing;
 PartNumber;
 PartTotal;
 Performer;Կատարողը
@@ -1148,12 +1189,14 @@ Position_Total;Ընդամենը
 Preferences;Կարգավորումներ
 PreferredDownmix;
 Premium;
+Premium_Feature;
 Premium_Summary;
 PreselectionLabel;
 Presentation;
 PresentationConfig;
 PresentationConfig_ContentClassifier;
 PresentationID;
+PresentationLevel;
 PreviousDownmixType5ch;
 PreviousMixType2ch;
 PrimaryAudioLanguage;
@@ -1169,6 +1212,7 @@ ProgrammeTextLanguage;
 ProgrammeTitle;
 Publisher;Թողարկողը
 Purchased_Date;Գնման ամսաթիվը
+PurchaseInformation;
 Quote character;Չակերտների նշանը
 RadioStation;Ռադիոկայանը
 Rating;Վարկանիշը
@@ -1185,6 +1229,7 @@ ReplayGain_Peak;Ձայնի կարգավորման գագաթը
 Report;
 Resolution;Լուծաչափը
 RestoreLifetimeSubscription;
+Retry;
 s; վայր.
 Sampled_Height;
 Sampled_Width;
@@ -1210,6 +1255,7 @@ Season;Խաղաշրջանը
 SecondaryAudioLanguage;
 see below;նայեք ներքև
 Select your directory;
+SelectAll;
 Send HeaderFile;Ուղարկեք այս ֆայլի գլխագիրը http://sourceforge.net/projects/mediainfo/ (Սխալների բաժին)
 Separator_Columns;Սյուների բաժանիչ
 Separator_Lines;Տողերի բաժանիչ
@@ -1218,6 +1264,7 @@ ServiceChannel;Ծառայության ալիքի համարը
 ServiceKind;
 ServiceName;Ծառայության անունը
 ServiceProvider;Ծառայության մատակարարը
+Services;
 ServiceType;Ծառայության տեսակը
 Set;Տեղակայում
 Set_Count;Տեղակայումների ք-ը
@@ -1231,8 +1278,11 @@ Shell extension, separate instance;
 Shell InfoTip;Ցուցադրել հուշում Explorer-ում
 ShimName;
 ShimVersion;
+Show;
 Show menu;Ցուցադրել ընտրացանկը
 Show toolbar;Ցուցադրել վահանակը
+ShowAll;
+ShowMore;
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1261,6 +1311,7 @@ StreamKind;Հոսքի տեսակը
 StreamKindID;Հոսքի տեսակ ID-ին
 StreamKindPos;Հոսքի տեսակ ID-ի դիրքը
 StreamOrder;
+Streams;
 StreamSize;Հոսքի չափը
 StreamSize_Demuxed;
 StreamSize_Encoded;
@@ -1270,6 +1321,7 @@ Subscribe;
 Subscribe_Button;
 Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Premium;
 Subscribe_Renew;
 Subscribe_Renew_Price;
 Subscribe_Unaviable;
@@ -1287,6 +1339,7 @@ Summary;Համառոտ
 Supported formats;Աջակցվող տեսակները
 Supported?;Աջակցվու՞մ է
 SupportUs;
+SupportUs2;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Համառոտ
@@ -1297,6 +1350,7 @@ TargetDeviceConfig;
 Technician;Տեխնիկը
 TermsOfUse;Օգտագ. կանոնները
 TertiaryAudioLanguage;
+TestContinuousFileNames;
 Text;Տեքստ
 Text - Custom;Տեքստ - Ընտրովի
 Text (HTML);Տեքստ (HTML)
@@ -1362,6 +1416,26 @@ TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
+Type_Composer;
+Type_Conductor;
+Type_Cover;
+Type_Cover_Back;
+Type_Cover_Media;
+Type_DuringPerformance;
+Type_DuringRecording;
+Type_FileIcon;
+Type_FileIcon_32x32;
+Type_Illustration;
+Type_LeafletPage;
+Type_Lyricist;
+Type_Performer;
+Type_Performer_Lead;
+Type_PerformerLogo;
+Type_Picture;
+Type_PublisherLogo;
+Type_RecordingLocation;
+Type_ScreenCapture;
+Type_Thumbnail;
 TypeDefinition;
 UniqueID;Բացառիկ ID-ին
 UniversalAdID;
@@ -1369,6 +1443,7 @@ UniversalAdID_Registry;
 UniversalAdID_Value;
 Unknown;Անհայտ է
 Url;Հղումը
+Value;
 Video;Տեսանյութը
 Video stream(s);Տեսահոսքը
 Video_Codec_List;Տեսակոդավորիչները
@@ -1401,6 +1476,7 @@ WebSite_Video_More;Բացել (%Url%) կայքը՝ այս տեսակոդավոր
 Width;Լայն-ը
 Width_CleanAperture;
 Width_Original;Օրիգինալի լայն-ը
+Window;
 WriteMe;Նամակ հեղինակին
 WriteToTranslator;Նամակ թարգմանչին
 Written_Date;Գրելու ամսաթիվը
@@ -1409,5 +1485,6 @@ WrittenBy;Գրվել է՝
 Yes;Այո
 Your system;Ձեր համակարգը
 Your translation;
-ZZ_Automatic_Percent;65
-ZZ_AutomaticLanguage_Percent;69
+Zoom;
+ZZ_Automatic_Percent;62
+ZZ_AutomaticLanguage_Percent;66

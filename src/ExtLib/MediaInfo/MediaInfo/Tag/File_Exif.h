@@ -49,14 +49,14 @@ public:
 
 protected :
     //Streams management
-    void Streams_Finish();
+    void Streams_Finish() override;
 
     //Buffer - File header
-    void FileHeader_Parse();
+    void FileHeader_Parse() override;
 
     //Buffer - Per element
-    void Header_Parse();
-    void Data_Parse();
+    void Header_Parse() override;
+    void Data_Parse() override;
 
     //Elements
     void Read_Directory();

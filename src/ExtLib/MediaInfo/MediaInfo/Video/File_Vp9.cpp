@@ -51,6 +51,8 @@ static const char* Vp9_Feature[] =
 };
 
 //---------------------------------------------------------------------------
+const char* Mpegv_colour_primaries(int8u colour_primaries);
+const char* Mpegv_transfer_characteristics(int8u transfer_characteristics);
 const char* Mpegv_matrix_coefficients_ColorSpace(int8u matrix_coefficients);
 const char* Mpegv_matrix_coefficients(int8u transfer_characteristics);
 static const int8u Vp9_ColorSpace[8] =
@@ -134,6 +136,44 @@ void File_Vp9::Streams_Accept()
 void File_Vp9::Read_Buffer_OutOfBand()
 {
     Accept();
+
+    if (fromMP4) {
+        //Parsing
+        Element_Begin1("VPCodecConfigurationRecord");
+        int8u profile, level, bitDepth, chromaSubsampling, colourPrimaries, transferCharacteristics, matrixCoefficients;
+        bool videoFullRangeFlag;
+        int16u codecInitializationDataSize;
+        Get_B1 (    profile,                                        "profile");
+        Get_B1 (    level,                                          "level"); Param_Info3((float)level / 10, nullptr, 1);
+        BS_Begin();
+        Get_S1 ( 4, bitDepth,                                       "bitDepth");
+        Get_S1 ( 3, chromaSubsampling,                              "chromaSubsampling"); Param_Info1(Vp9_ChromaSubsampling[Vp9_ChromaSubsampling_OutOfBand[chromaSubsampling]]);
+        Get_SB (    videoFullRangeFlag,                             "videoFullRangeFlag"); Param_Info1(Vp9_ColorRange[videoFullRangeFlag]);
+        BS_End();
+        Get_B1 (    colourPrimaries,                                "colourPrimaries"); Param_Info1(Mpegv_colour_primaries(colourPrimaries));
+        Get_B1 (    transferCharacteristics,                        "transferCharacteristics"); Param_Info1(Mpegv_transfer_characteristics(transferCharacteristics));
+        Get_B1 (    matrixCoefficients,                             "matrixCoefficients"); Param_Info1(Mpegv_matrix_coefficients(matrixCoefficients));
+        Get_B2 (    codecInitializationDataSize,                    "codecInitializationDataSize");
+        Skip_XX(    codecInitializationDataSize,                    "codecInitializationData");
+        Element_End0();
+
+        //Filling
+        FILLING_BEGIN_PRECISE();
+        Fill(Stream_Video, 0, Video_Format_Profile, profile);
+        Fill(Stream_Video, 0, Video_Format_Level, (float)level / 10, 1);
+        Fill(Stream_Video, 0, Video_BitDepth, bitDepth);
+        Fill(Stream_Video, 0, Video_ChromaSubsampling, Vp9_ChromaSubsampling[Vp9_ChromaSubsampling_OutOfBand[chromaSubsampling]]);
+        if (chromaSubsampling < 2)
+            Fill(Stream_Video, 0, Video_ChromaSubsampling_Position, "Type " + std::to_string(chromaSubsampling));
+        Fill(Stream_Video, 0, Video_colour_range, Vp9_ColorRange[videoFullRangeFlag]);
+        Fill(Stream_Video, 0, Video_colour_primaries, Mpegv_colour_primaries(colourPrimaries));
+        Fill(Stream_Video, 0, Video_transfer_characteristics, Mpegv_transfer_characteristics(transferCharacteristics));
+        Fill(Stream_Video, 0, Video_matrix_coefficients, Mpegv_matrix_coefficients(matrixCoefficients));
+        FILLING_END();
+
+        return;
+    }
+
     while (Element_Offset<Element_Size)
     {
         Element_Begin1("Feature");
@@ -305,11 +345,11 @@ void File_Vp9::Read_Buffer_Continue()
                     Fill(Stream_Video, 0, Video_Format_Profile, profile, 10, true);
                     Fill(Stream_Video, 0, Video_BitDepth, bit_depth, 10, true);
                     Fill(Stream_Video, 0, Video_ColorSpace, Mpegv_matrix_coefficients_ColorSpace(colorspace));
-                    Fill(Stream_Video, 0, Video_matrix_coefficients, Mpegv_matrix_coefficients(colorspace));
+                    Fill(Stream_Video, 0, Video_matrix_coefficients, Mpegv_matrix_coefficients(colorspace), Unlimited, true, true);
                     if (colorspace)
                     {
                         Fill(Stream_Video, 0, Video_ChromaSubsampling, Vp9_ChromaSubsampling[subsampling], Unlimited, true, true);
-                        Fill(Stream_Video, 0, Video_colour_range, Vp9_ColorRange[yuv_range_flag]);
+                        Fill(Stream_Video, 0, Video_colour_range, Vp9_ColorRange[yuv_range_flag], Unlimited, true, true);
                     }
                 }
             }

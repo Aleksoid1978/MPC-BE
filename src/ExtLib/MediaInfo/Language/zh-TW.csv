@@ -161,6 +161,7 @@
 7.1ch;
 About;關於
 About_Hint;如何聯絡作者以及尋找最新版
+AC3_Metadata;
 Accompaniment;伴奏
 Active_DisplayAspectRatio;
 Active_Height;
@@ -187,7 +188,9 @@ Alignment;排列方式
 Alignment_Aligned;對齊交錯訊號
 Alignment_Split;橫越交錯訊號
 All;全部
+AllFields;
 AlternateGroup;
+AnalyzeServicesMenu;
 App_About;關於 MediaInfo
 App_Hide;隱藏 MediaInfo
 App_Quit;結束 MediaInfo
@@ -241,6 +244,7 @@ BitRate_Mode_CBR;常數式
 BitRate_Mode_VBR;可變式
 BitRate_Nominal;正常流量
 Bits-(Pixel*Frame);位元/(像素*影格)
+BitstreamLevel;
 Bring All to Front;將此程式所有視窗移至最前
 BufferSize;
 Cancel;取消
@@ -280,9 +284,11 @@ Classifier;
 ClearList;
 Close;關閉
 Close all before open;開啟前關閉其它檔案
+CloseAll;
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
+CloseFile;
 CloseWindow;關閉視窗
 Codec;編解碼器
 Codec_Description;編解碼器描述
@@ -317,6 +323,8 @@ colour_primaries;色彩原色
 colour_range;
 Comment;註釋
 CommissionedBy;委託
+Compare;
+CompareView;
 Compilation;
 ComplementaryObject;
 CompleteName;完整檔名
@@ -327,6 +335,7 @@ Compression_Mode;
 Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;壓縮比
+comprprof;
 Conductor;指揮
 ConformanceCheck;
 ConformanceErrors;
@@ -362,6 +371,7 @@ Default;
 Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
+DefaultView;
 Delay;延遲
 Delay_Source;
 Delay_Source_Container;
@@ -392,6 +402,8 @@ Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;贊助
 DotsPerInch;每吋點數 (DPI)
+DownloadFile;
+DownloadFileError;
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
@@ -406,6 +418,7 @@ Duration_Start_Command;
 Duration_Start2End;
 DynamicObject;
 DynamicRangeControl;
+dynrngprof;
 Eac3DrcProfile;
 Edit;編輯
 EditedBy;編輯者
@@ -416,6 +429,7 @@ EMail;電子信箱
 Enable FFmpeg plugin;
 Encoded_Application;使用編碼程式
 Encoded_Date;編碼日期
+Encoded_Hardware;
 Encoded_Library;編碼函式庫
 Encoded_Library_Name;
 Encoded_Library_Settings;編碼設定
@@ -424,8 +438,11 @@ Encoded_Original;來源
 EncodedBy;編碼者
 EPG_Positions;EPG 電子節目表位置 (內部)
 EpisodeTitleNumber;
+Error;
 Error_File;讀取檔案錯誤
 Error_File_Write;
+Error_Open;
+Error_Save;
 Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
@@ -440,6 +457,11 @@ Extensions;格式副檔名
 External_Media_NotMounted;
 Family;族系
 Fax;傳真
+Feature_AdvancedMode;
+Feature_FilesCompare;
+Feature_More;
+Feature_SelectView;
+Field;
 File;檔案
 File size;檔案大小
 File_Append;接在現存的檔案之後 (注意: 同參數時要小心)
@@ -523,6 +545,7 @@ FrameRate_Num;
 FrameRate_Original;原始影格頻率
 FrameRate_Real;
 FullParsing;
+FullParsingTips;
 Gallery;
 General;一般
 GeneralCompliance;
@@ -986,10 +1009,11 @@ Language_zh-tw;華語 (台灣) (Chinese, Taiwan)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;祖魯語 (Zulu)
+LanguageChanges;
 Languages;
 LawRating;分級
-LegacyStreamDisplay;
 LCCN;LCCN
+LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
 Library;合成函式庫
@@ -1036,6 +1060,7 @@ LtRtCenterMixGain;
 LtRtSurroundMixGain;
 Lyricist;作詞者
 Lyrics;歌詞
+MacCreatedBy;
 Mastered_Date;後製日期
 MasteredBy;後製者
 MasteringDisplay_ColorPrimaries;
@@ -1053,6 +1078,7 @@ MD5;
 MD5_Unencoded;
 MediaInfo_About;支援非常詳盡的多媒體檔案資訊:\r\nMatroska, OGG (包含 OGM)\r\nMPEG-1 (包含 VCD)\r\nMPEG-2 (包含 DVD, SVCD)\r\nMPEG-4 (包含 iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (包含 WMV, WMA)\r\nMicrosoft RIFF (包含 AVI, WAV)\r\n純聲音格式 (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
+MediaInfo_WebSite;
 Menu;選單
 Menu stream(s);選單串流
 Menu_Codec_List;選單編解碼器
@@ -1104,10 +1130,15 @@ Object;
 ObjectCount;
 OK;確認
 One output file per input file;一個輸入檔對應一個輸出檔
+OnlyDiffer;
+OnlyIdentical;
 Open;開啟
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
+OpenFile;
+OpenFileError;
+OpenRecent;
 Options;選項
 Options_Hint;偏好設定
 Original;來源
@@ -1119,6 +1150,7 @@ Originator;
 Other;其它
 OtherIdentifier;
 OtherIdentifierType;
+OtherViews;
 Output;輸出
 Output format;輸出格式
 OverallBitRate;整體流量
@@ -1130,6 +1162,7 @@ PackageName;
 PackFormat;
 Part;部分
 Part_Count;總數
+PartialParsing;
 PartNumber;
 PartTotal;
 Performer;演出者
@@ -1156,12 +1189,14 @@ Position_Total;總數
 Preferences;偏好設定
 PreferredDownmix;
 Premium;
+Premium_Feature;
 Premium_Summary;
 PreselectionLabel;
 Presentation;
 PresentationConfig;
 PresentationConfig_ContentClassifier;
 PresentationID;
+PresentationLevel;
 PreviousDownmixType5ch;
 PreviousMixType2ch;
 PrimaryAudioLanguage;
@@ -1177,6 +1212,7 @@ ProgrammeTextLanguage;
 ProgrammeTitle;
 Publisher;發布者
 Purchased_Date;購買日期
+PurchaseInformation;
 Quote character;引號字元
 RadioStation;電台
 Rating;分級
@@ -1193,6 +1229,7 @@ ReplayGain_Peak;播放增益尖峰值
 Report;
 Resolution;顏色深度
 RestoreLifetimeSubscription;
+Retry;
 s;秒
 Sampled_Height;
 Sampled_Width;
@@ -1241,9 +1278,11 @@ Shell extension, separate instance;
 Shell InfoTip;資訊提示 (在檔案總管裡, 將滑鼠移到檔案上會顯示相關訊息)
 ShimName;
 ShimVersion;
+Show;
 Show menu;顯示選單
 Show toolbar;顯示工具列
 ShowAll;顯示全部
+ShowMore;
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1272,6 +1311,7 @@ StreamKind;串流類型
 StreamKindID;串流識別字
 StreamKindPos;串流識別字
 StreamOrder;
+Streams;
 StreamSize;串流大小
 StreamSize_Demuxed;
 StreamSize_Encoded;
@@ -1281,6 +1321,7 @@ Subscribe;
 Subscribe_Button;
 Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Premium;
 Subscribe_Renew;
 Subscribe_Renew_Price;
 Subscribe_Unaviable;
@@ -1298,6 +1339,7 @@ Summary;摘要
 Supported formats;支援格式
 Supported?;是否支援?
 SupportUs;
+SupportUs2;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;摘要
@@ -1308,6 +1350,7 @@ TargetDeviceConfig;
 Technician;技師
 TermsOfUse;使用條款
 TertiaryAudioLanguage;
+TestContinuousFileNames;
 Text;文字
 Text - Custom;文字 - 自訂
 Text (HTML);文字 (網頁)
@@ -1373,6 +1416,26 @@ TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
+Type_Composer;
+Type_Conductor;
+Type_Cover;
+Type_Cover_Back;
+Type_Cover_Media;
+Type_DuringPerformance;
+Type_DuringRecording;
+Type_FileIcon;
+Type_FileIcon_32x32;
+Type_Illustration;
+Type_LeafletPage;
+Type_Lyricist;
+Type_Performer;
+Type_Performer_Lead;
+Type_PerformerLogo;
+Type_Picture;
+Type_PublisherLogo;
+Type_RecordingLocation;
+Type_ScreenCapture;
+Type_Thumbnail;
 TypeDefinition;
 UniqueID;
 UniversalAdID;
@@ -1380,6 +1443,7 @@ UniversalAdID_Registry;
 UniversalAdID_Value;
 Unknown;未知
 Url;相關網址
+Value;
 Video;視訊
 Video stream(s);視訊串流
 Video_Codec_List;視訊編解碼器
@@ -1422,5 +1486,5 @@ Yes;是
 Your system;您的系統
 Your translation;
 Zoom;縮放
-ZZ_Automatic_Percent;64
-ZZ_AutomaticLanguage_Percent;68
+ZZ_Automatic_Percent;61
+ZZ_AutomaticLanguage_Percent;65

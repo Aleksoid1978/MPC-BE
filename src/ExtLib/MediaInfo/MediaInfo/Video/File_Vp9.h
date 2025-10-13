@@ -24,7 +24,8 @@ class File_Vp9 : public File__Analyze
 {
 public :
     //In
-    int64u Frame_Count_Valid;
+    int64u Frame_Count_Valid{};
+    bool fromMP4{};
 
     //Constructor/Destructor
     File_Vp9();

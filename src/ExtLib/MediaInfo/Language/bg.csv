@@ -161,6 +161,7 @@
 7.1ch;
 About;За
 About_Hint;За_Подсказване
+AC3_Metadata;
 Accompaniment;Съпровод
 Active_DisplayAspectRatio;
 Active_Height;
@@ -187,7 +188,12 @@ Alignment;Подравняване
 Alignment_Aligned;Подравняване_Подравнен
 Alignment_Split;Подравняване_Разделен
 All;Всичко
+AllFields;
 AlternateGroup;
+AnalyzeServicesMenu;
+App_About;
+App_Hide;
+App_Quit;
 Archival_Location;Архивна_Локация
 Arranger;Подреждане
 ArtDirector;ХудожественДиректор
@@ -238,6 +244,8 @@ BitRate_Mode_CBR;Режим_БитРейт_СБР
 BitRate_Mode_VBR;Режим_БитРейт_ВБР
 BitRate_Nominal;Нормален_БитРейт
 Bits-(Pixel*Frame);Битове-(Пиксел*Кадър)
+BitstreamLevel;
+Bring All to Front;
 BufferSize;
 Cancel;Откажи
 CaptionServiceName;
@@ -276,9 +284,12 @@ Classifier;
 ClearList;
 Close;Затвори
 Close all before open;Затвори всичко преди да отвориш
+CloseAll;
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
+CloseFile;
+CloseWindow;
 Codec;Кодек
 Codec_Description;Кодек_Описание
 Codec_Info;Кодек_Инфо
@@ -312,6 +323,8 @@ colour_primaries;цветови_основи
 colour_range;
 Comment;Коментар
 CommissionedBy;ПоръчанОт
+Compare;
+CompareView;
 Compilation;
 ComplementaryObject;
 CompleteName;ЦялосноИме
@@ -322,6 +335,7 @@ Compression_Mode;
 Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;КомпресияСъотношение
+comprprof;
 Conductor;Диригент
 ConformanceCheck;
 ConformanceErrors;
@@ -333,6 +347,7 @@ Container and general information;Контейнер и главна инфор�
 Content;
 ContentType;КонтейнерТип
 CoProducer;Ко-Продуцент
+Copy;
 Copyright;ЗапазенаМарка
 CopyrightYear;
 CostumeDesigner;Дизайнер
@@ -356,6 +371,7 @@ Default;
 Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
+DefaultView;
 Delay;Забавяне
 Delay_Source;
 Delay_Source_Container;
@@ -386,6 +402,8 @@ Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Дари
 DotsPerInch;ДотНаИнч
+DownloadFile;
+DownloadFileError;
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
@@ -400,6 +418,7 @@ Duration_Start_Command;
 Duration_Start2End;
 DynamicObject;
 DynamicRangeControl;
+dynrngprof;
 Eac3DrcProfile;
 Edit;Преработи
 EditedBy;ПреработенОт
@@ -410,6 +429,7 @@ EMail;Имейл
 Enable FFmpeg plugin;
 Encoded_Application;Енкодирана_Апликация
 Encoded_Date;Дата_Енкодиране
+Encoded_Hardware;
 Encoded_Library;Библиотека_Енкодиране
 Encoded_Library_Name;
 Encoded_Library_Settings;Библиотека_Енкодиране_Настройки
@@ -418,8 +438,11 @@ Encoded_Original;Оригинално_Енкодиране
 EncodedBy;ЕнкодиранОт
 EPG_Positions;ЕПГ_Позиции
 EpisodeTitleNumber;
+Error;
 Error_File;ФайлЗа_Грешки
 Error_File_Write;
+Error_Open;
+Error_Save;
 Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
@@ -434,6 +457,11 @@ Extensions;Екстенции
 External_Media_NotMounted;
 Family;Семеен
 Fax;Факс
+Feature_AdvancedMode;
+Feature_FilesCompare;
+Feature_More;
+Feature_SelectView;
+Field;
 File;Файл
 File size;Големина файл
 File_Append;ФайлДобавка
@@ -517,6 +545,7 @@ FrameRate_Num;
 FrameRate_Original;СкоростКадри_Оригинално
 FrameRate_Real;
 FullParsing;
+FullParsingTips;
 Gallery;
 General;Генерално
 GeneralCompliance;
@@ -729,6 +758,7 @@ Height;Височина
 Height_CleanAperture;
 Height_Original;Оригинална_Височина
 Help;Помощ
+HideOthers;
 Hint;Подсказване
 HomeTheaterAvr;
 How many audio streams?;Колко аудио потоци?
@@ -979,10 +1009,11 @@ Language_zh-tw;
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;
+LanguageChanges;
 Languages;
 LawRating;НисъкРейтинг
-LegacyStreamDisplay;
 LCCN;ЛССН
+LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
 Library;Библиотека
@@ -1029,6 +1060,7 @@ LtRtCenterMixGain;
 LtRtSurroundMixGain;
 Lyricist;Поет
 Lyrics;Текстове
+MacCreatedBy;
 Mastered_Date;Дата изработка
 MasteredBy;ИзработкаОт
 MasteringDisplay_ColorPrimaries;
@@ -1046,6 +1078,7 @@ MD5;
 MD5_Unencoded;
 MediaInfo_About;Медиа Инфо_За
 MediaInfo_About_About;
+MediaInfo_WebSite;
 Menu;Меню
 Menu stream(s);Меню поток(ци)
 Menu_Codec_List;Меню_Кодек_Списък
@@ -1056,6 +1089,7 @@ MenuID;МенюИД
 Metadata_Format;
 Metadata_Format_Type;
 Metadata_MuxingMode;
+Minimize;
 MixType;
 mn;мн
 Mood;Настроение
@@ -1096,10 +1130,15 @@ Object;
 ObjectCount;
 OK;Да
 One output file per input file;Един изходящ при един входящ файл
+OnlyDiffer;
+OnlyIdentical;
 Open;Отвори
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
+OpenFile;
+OpenFileError;
+OpenRecent;
 Options;Опций
 Options_Hint;Опций_Подсказване
 Original;Оригинал
@@ -1111,6 +1150,7 @@ Originator;
 Other;Други
 OtherIdentifier;
 OtherIdentifierType;
+OtherViews;
 Output;Изходящ
 Output format;Изходящ Формат
 OverallBitRate;ОбщаБитСкорост
@@ -1122,6 +1162,7 @@ PackageName;
 PackFormat;
 Part;Част
 Part_Count;Част_Брой
+PartialParsing;
 PartNumber;
 PartTotal;
 Performer;Изпълнител
@@ -1148,12 +1189,14 @@ Position_Total;Позиция_Обща
 Preferences;Настройки
 PreferredDownmix;
 Premium;
+Premium_Feature;
 Premium_Summary;
 PreselectionLabel;
 Presentation;
 PresentationConfig;
 PresentationConfig_ContentClassifier;
 PresentationID;
+PresentationLevel;
 PreviousDownmixType5ch;
 PreviousMixType2ch;
 PrimaryAudioLanguage;
@@ -1169,6 +1212,7 @@ ProgrammeTextLanguage;
 ProgrammeTitle;
 Publisher;Издател
 Purchased_Date;ДатаПоръчан
+PurchaseInformation;
 Quote character;Цитат характер
 RadioStation;РадиоСтанция
 Rating;Рейтинг
@@ -1185,6 +1229,7 @@ ReplayGain_Peak;УсилващоПовторение_Усилване_Връх
 Report;
 Resolution;Резолюция
 RestoreLifetimeSubscription;
+Retry;
 s;с
 Sampled_Height;
 Sampled_Width;
@@ -1210,6 +1255,7 @@ Season;Сезон
 SecondaryAudioLanguage;
 see below;виж долу
 Select your directory;
+SelectAll;
 Send HeaderFile;Изпрати Хедер Файл
 Separator_Columns;Разделител_Колони
 Separator_Lines;Разделител_Линий
@@ -1218,6 +1264,7 @@ ServiceChannel;СървисКанал
 ServiceKind;
 ServiceName;СървисИме
 ServiceProvider;СървисДоставчик
+Services;
 ServiceType;СървисТип
 Set;Нагласи
 Set_Count;Нагласа_Брой
@@ -1231,8 +1278,11 @@ Shell extension, separate instance;
 Shell InfoTip;Шел ИнфоИнфо
 ShimName;
 ShimVersion;
+Show;
 Show menu;Показ меню
 Show toolbar;Показ инструментибар
+ShowAll;
+ShowMore;
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1261,6 +1311,7 @@ StreamKind;ПотокВид
 StreamKindID;ПотокВидИД
 StreamKindPos;ПотокВидПоз
 StreamOrder;
+Streams;
 StreamSize;ПотокРазмер
 StreamSize_Demuxed;
 StreamSize_Encoded;
@@ -1270,6 +1321,7 @@ Subscribe;
 Subscribe_Button;
 Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Premium;
 Subscribe_Renew;
 Subscribe_Renew_Price;
 Subscribe_Unaviable;
@@ -1287,6 +1339,7 @@ Summary;Обобщение
 Supported formats;Поддържани формати
 Supported?;Поддържан?
 SupportUs;
+SupportUs2;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Резюме
@@ -1297,6 +1350,7 @@ TargetDeviceConfig;
 Technician;Техник
 TermsOfUse;УсловияНаПолзване
 TertiaryAudioLanguage;
+TestContinuousFileNames;
 Text;Текст
 Text - Custom;Текст - Потребителски
 Text (HTML);Текст (HTML)
@@ -1362,6 +1416,26 @@ TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
+Type_Composer;
+Type_Conductor;
+Type_Cover;
+Type_Cover_Back;
+Type_Cover_Media;
+Type_DuringPerformance;
+Type_DuringRecording;
+Type_FileIcon;
+Type_FileIcon_32x32;
+Type_Illustration;
+Type_LeafletPage;
+Type_Lyricist;
+Type_Performer;
+Type_Performer_Lead;
+Type_PerformerLogo;
+Type_Picture;
+Type_PublisherLogo;
+Type_RecordingLocation;
+Type_ScreenCapture;
+Type_Thumbnail;
 TypeDefinition;
 UniqueID;
 UniversalAdID;
@@ -1369,6 +1443,7 @@ UniversalAdID_Registry;
 UniversalAdID_Value;
 Unknown;Незнаен
 Url;ЮРЛ
+Value;
 Video;Видео
 Video stream(s);Видео поток(ци)
 Video_Codec_List;Видео_Кодек_Списък
@@ -1401,6 +1476,7 @@ WebSite_Video_More;Уебсайт_Видео_Повече
 Width;Ширина
 Width_CleanAperture;
 Width_Original;Ширина_Оригинал
+Window;
 WriteMe;ПишетеМи
 WriteToTranslator;ПишетеНаПреводача
 Written_Date;Написано_Дата
@@ -1409,5 +1485,6 @@ WrittenBy;НаписаноОт
 Yes;Да
 Your system;Вашата система
 Your translation;
-ZZ_Automatic_Percent;62
-ZZ_AutomaticLanguage_Percent;69
+Zoom;
+ZZ_Automatic_Percent;59
+ZZ_AutomaticLanguage_Percent;65

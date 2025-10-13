@@ -161,6 +161,7 @@
 7.1ch;
 About;Névjegy
 About_Hint;Hogyan léphet velem kapcsolatba, illetve a legfrissebb változat lelőhelye
+AC3_Metadata;
 Accompaniment;Kíséret
 Active_DisplayAspectRatio;
 Active_Height;
@@ -187,7 +188,9 @@ Alignment;Igazítás
 Alignment_Aligned;igazított
 Alignment_Split;osztott
 All;Mind
+AllFields;
 AlternateGroup;
+AnalyzeServicesMenu;
 App_About;A MediaInfo névjegye
 App_Hide;MediaInfo elrejtése
 App_Quit;Kilépés a MediaInfoból
@@ -241,6 +244,7 @@ BitRate_Mode_CBR;állandó
 BitRate_Mode_VBR;változó
 BitRate_Nominal;Névleges adatsebesség
 Bits-(Pixel*Frame);Bit/(képpont*képkocka)
+BitstreamLevel;
 Bring All to Front;Összes előtérbe hozása
 BufferSize;
 Cancel;Mégsem
@@ -280,9 +284,11 @@ Classifier;
 ClearList;
 Close;Bezárás
 Close all before open;Mindent bezár megnyitás előtt
+CloseAll;
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
+CloseFile;
 CloseWindow;Ablak bezárása
 Codec;kódek
 Codec_Description;Kódek leírás
@@ -317,6 +323,8 @@ colour_primaries;
 colour_range;
 Comment;Megjegyzés
 CommissionedBy;Megbízó
+Compare;
+CompareView;
 Compilation;
 ComplementaryObject;
 CompleteName;Teljes név
@@ -327,6 +335,7 @@ Compression_Mode;
 Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;Tömörítési arány
+comprprof;
 Conductor;Vezényel
 ConformanceCheck;
 ConformanceErrors;
@@ -362,6 +371,7 @@ Default;
 Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
+DefaultView;
 Delay;Késleltetés
 Delay_Source;
 Delay_Source_Container;
@@ -392,6 +402,8 @@ Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Adomány
 DotsPerInch;
+DownloadFile;
+DownloadFileError;
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
@@ -406,6 +418,7 @@ Duration_Start_Command;
 Duration_Start2End;
 DynamicObject;
 DynamicRangeControl;
+dynrngprof;
 Eac3DrcProfile;
 Edit;Szerkesztés
 EditedBy;Szerkesztő
@@ -416,6 +429,7 @@ EMail;Email
 Enable FFmpeg plugin;
 Encoded_Application;Kódoló szoftver
 Encoded_Date;Kódolás dátuma
+Encoded_Hardware;
 Encoded_Library;Kódoló könyvtár
 Encoded_Library_Name;
 Encoded_Library_Settings;Kódoló könyvtár beállításai
@@ -424,8 +438,11 @@ Encoded_Original;Eredeti
 EncodedBy;Kódolta
 EPG_Positions;
 EpisodeTitleNumber;
+Error;
 Error_File;Fájlolvasási hiba
 Error_File_Write;
+Error_Open;
+Error_Save;
 Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
@@ -440,6 +457,11 @@ Extensions;Általában használatos kiterjesztések
 External_Media_NotMounted;
 Family;Család
 Fax;fax
+Feature_AdvancedMode;
+Feature_FilesCompare;
+Feature_More;
+Feature_SelectView;
+Field;
 File;Fájl
 File size;Fájlméret
 File_Append;Meglévő fájlhoz hozzáfűzés (Figyelem: ügyeljünk az azonos paraméterekre)
@@ -523,6 +545,7 @@ FrameRate_Num;
 FrameRate_Original;Eredeti képkockasebesség
 FrameRate_Real;
 FullParsing;
+FullParsingTips;
 Gallery;
 General;Általános
 GeneralCompliance;
@@ -986,10 +1009,11 @@ Language_zh-tw;
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;zulu
+LanguageChanges;
 Languages;
 LawRating;Korhatár
-LegacyStreamDisplay;
 LCCN;LCCN
+LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
 Library;Keverőkönyvtár
@@ -1036,6 +1060,7 @@ LtRtCenterMixGain;
 LtRtSurroundMixGain;
 Lyricist;Szövegíró
 Lyrics;Dalszöveg
+MacCreatedBy;
 Mastered_Date;Mesterpéldány kelte
 MasteredBy;Mesterpéldány
 MasteringDisplay_ColorPrimaries;
@@ -1053,6 +1078,7 @@ MD5;
 MD5_Unencoded;
 MediaInfo_About;Igen részletes adatok az alábbi\r\nmultimédia fájlokról:\r\nMatroska, OGG (OGM is)\r\nMPEG1 (VCD is)\r\nMPEG2 (DVD és SVCD is)\r\nMPEG4 (Itunes M4A is)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (WMV, WMA is)\r\nMicrosoft RIFF (AVI, WAV is)\r\nCsak hangot tartalmazó fájlok (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
+MediaInfo_WebSite;
 Menu;Menü
 Menu stream(s);Menüsáv
 Menu_Codec_List;Menükódek lista
@@ -1104,10 +1130,15 @@ Object;
 ObjectCount;
 OK;OK
 One output file per input file;Bemeneti fájlonként egy kimeneti fájl
+OnlyDiffer;
+OnlyIdentical;
 Open;Megnyit
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
+OpenFile;
+OpenFileError;
+OpenRecent;
 Options;Beállítások
 Options_Hint;Beállítások
 Original;Eredeti
@@ -1119,6 +1150,7 @@ Originator;
 Other;Egyéb
 OtherIdentifier;
 OtherIdentifierType;
+OtherViews;
 Output;Kimenet
 Output format;Kimeneti formátum
 OverallBitRate;Teljes adatsebesség
@@ -1130,6 +1162,7 @@ PackageName;
 PackFormat;
 Part;Rész
 Part_Count;Részek száma
+PartialParsing;
 PartNumber;
 PartTotal;
 Performer;Előadó
@@ -1156,12 +1189,14 @@ Position_Total;
 Preferences;Beállítások
 PreferredDownmix;
 Premium;
+Premium_Feature;
 Premium_Summary;
 PreselectionLabel;
 Presentation;
 PresentationConfig;
 PresentationConfig_ContentClassifier;
 PresentationID;
+PresentationLevel;
 PreviousDownmixType5ch;
 PreviousMixType2ch;
 PrimaryAudioLanguage;
@@ -1177,6 +1212,7 @@ ProgrammeTextLanguage;
 ProgrammeTitle;
 Publisher;Kiadó
 Purchased_Date;Vásárlás dátuma
+PurchaseInformation;
 Quote character;Idézőjel karakter
 RadioStation;Rádióállomás
 Rating;Értékelés
@@ -1193,6 +1229,7 @@ ReplayGain_Peak;Visszajátszás csúcserősítése
 Report;
 Resolution;Felbontás
 RestoreLifetimeSubscription;
+Retry;
 s; mp
 Sampled_Height;
 Sampled_Width;
@@ -1241,9 +1278,11 @@ Shell extension, separate instance;
 Shell InfoTip;Rendszerhéj tipp (ha az egérmutató az Intézőben a fájl fölé visszük, adatokat láthatunk)
 ShimName;
 ShimVersion;
+Show;
 Show menu;Menü mutatása
 Show toolbar;Eszköztár mutatása
 ShowAll;Összes megjelenítése
+ShowMore;
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1272,6 +1311,7 @@ StreamKind;Sáv fajtája
 StreamKindID;Sáv fajta azonosító
 StreamKindPos;Sáv fajta sorszáma
 StreamOrder;
+Streams;
 StreamSize;Adatfolyam mérete
 StreamSize_Demuxed;
 StreamSize_Encoded;
@@ -1281,6 +1321,7 @@ Subscribe;
 Subscribe_Button;
 Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Premium;
 Subscribe_Renew;
 Subscribe_Renew_Price;
 Subscribe_Unaviable;
@@ -1298,6 +1339,7 @@ Summary;Kivonat
 Supported formats;Támogatott formátumok
 Supported?;Támogatott?
 SupportUs;
+SupportUs2;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Áttekintés
@@ -1308,6 +1350,7 @@ TargetDeviceConfig;
 Technician;Technikus
 TermsOfUse;Felhasználási feltételek
 TertiaryAudioLanguage;
+TestContinuousFileNames;
 Text;Szöveg
 Text - Custom;Szöveg - egyedi
 Text (HTML);Text (HTML)
@@ -1373,6 +1416,26 @@ TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
+Type_Composer;
+Type_Conductor;
+Type_Cover;
+Type_Cover_Back;
+Type_Cover_Media;
+Type_DuringPerformance;
+Type_DuringRecording;
+Type_FileIcon;
+Type_FileIcon_32x32;
+Type_Illustration;
+Type_LeafletPage;
+Type_Lyricist;
+Type_Performer;
+Type_Performer_Lead;
+Type_PerformerLogo;
+Type_Picture;
+Type_PublisherLogo;
+Type_RecordingLocation;
+Type_ScreenCapture;
+Type_Thumbnail;
 TypeDefinition;
 UniqueID;
 UniversalAdID;
@@ -1380,6 +1443,7 @@ UniversalAdID_Registry;
 UniversalAdID_Value;
 Unknown;Ismeretlen
 Url;Url
+Value;
 Video;Kép
 Video stream(s);Képsávok
 Video_Codec_List;Képkódekek
@@ -1422,5 +1486,5 @@ Yes;igen
 Your system;Rendszer
 Your translation;
 Zoom;Nagyítás
-ZZ_Automatic_Percent;61
-ZZ_AutomaticLanguage_Percent;67
+ZZ_Automatic_Percent;58
+ZZ_AutomaticLanguage_Percent;64

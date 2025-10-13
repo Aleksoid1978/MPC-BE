@@ -161,6 +161,7 @@
 7.1ch;
 About;O programu
 About_Hint;O programu
+AC3_Metadata;
 Accompaniment;Accompaniment
 Active_DisplayAspectRatio;
 Active_Height;
@@ -187,7 +188,9 @@ Alignment;
 Alignment_Aligned;
 Alignment_Split;
 All;Vše
+AllFields;
 AlternateGroup;
+AnalyzeServicesMenu;
 App_About;O aplikaci MediaInfo
 App_Hide;Skrýt MediaInfo
 App_Quit;Ukončit MediaInfo
@@ -241,6 +244,7 @@ BitRate_Mode_CBR;
 BitRate_Mode_VBR;
 BitRate_Nominal;
 Bits-(Pixel*Frame);Bits/(Pixel*Frame)
+BitstreamLevel;
 Bring All to Front;Převést vše do popředí
 BufferSize;
 Cancel;Zrušit
@@ -280,9 +284,11 @@ Classifier;
 ClearList;
 Close;Zavřít
 Close all before open;Zavřít vše před otevřením nového
+CloseAll;
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
+CloseFile;
 CloseWindow;Zavřít okno
 Codec;
 Codec_Description;
@@ -317,6 +323,8 @@ colour_primaries;
 colour_range;
 Comment;Komentář
 CommissionedBy;Commissioned by
+Compare;
+CompareView;
 Compilation;
 ComplementaryObject;
 CompleteName;Celý název a cesta
@@ -327,6 +335,7 @@ Compression_Mode;
 Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;
+comprprof;
 Conductor;Conductor
 ConformanceCheck;
 ConformanceErrors;
@@ -362,6 +371,7 @@ Default;
 Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
+DefaultView;
 Delay;Delay
 Delay_Source;
 Delay_Source_Container;
@@ -392,6 +402,8 @@ Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Zaslat finanční dar
 DotsPerInch;
+DownloadFile;
+DownloadFileError;
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
@@ -406,6 +418,7 @@ Duration_Start_Command;
 Duration_Start2End;
 DynamicObject;
 DynamicRangeControl;
+dynrngprof;
 Eac3DrcProfile;
 Edit;Upravit
 EditedBy;Upravil
@@ -416,6 +429,7 @@ EMail;E-Mail
 Enable FFmpeg plugin;
 Encoded_Application;Použitý software
 Encoded_Date;Encoded date
+Encoded_Hardware;
 Encoded_Library;Enkódoval
 Encoded_Library_Name;
 Encoded_Library_Settings;Nastavení enkoderu
@@ -424,8 +438,11 @@ Encoded_Original;Originál
 EncodedBy;Enkódoval
 EPG_Positions;
 EpisodeTitleNumber;
+Error;
 Error_File;Error while reading file
 Error_File_Write;
+Error_Open;
+Error_Save;
 Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
@@ -440,6 +457,11 @@ Extensions;Extensions usually used
 External_Media_NotMounted;
 Family;
 Fax;Fax
+Feature_AdvancedMode;
+Feature_FilesCompare;
+Feature_More;
+Feature_SelectView;
+Field;
 File;Soubor
 File size;Velikost souboru
 File_Append;Append to the existing file (Warning : be careful to have the same parameters)
@@ -523,6 +545,7 @@ FrameRate_Num;
 FrameRate_Original;
 FrameRate_Real;
 FullParsing;
+FullParsingTips;
 Gallery;
 General;Hlavní
 GeneralCompliance;
@@ -986,10 +1009,11 @@ Language_zh-tw;
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;Zulu
+LanguageChanges;
 Languages;
 LawRating;Law rating
-LegacyStreamDisplay;
 LCCN;LCCN
+LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
 Library;Muxing library
@@ -1036,6 +1060,7 @@ LtRtCenterMixGain;
 LtRtSurroundMixGain;
 Lyricist;Lyricist
 Lyrics;
+MacCreatedBy;
 Mastered_Date;Mastered date
 MasteredBy;Mastered by
 MasteringDisplay_ColorPrimaries;
@@ -1053,6 +1078,7 @@ MD5;
 MD5_Unencoded;
 MediaInfo_About;Supply very detailled information\r\nabout a multimedia file:\r\nMatroska, OGG (including OGM)\r\nMPEG1 (including VCD)\r\nMPEG2 (including DVD and SVCD)\r\nMPEG4 (including Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (including WMV, WMA)\r\nMicrosoft RIFF (including AVI, WAV)\r\nSound-only formats (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
+MediaInfo_WebSite;
 Menu;Menu
 Menu stream(s);Menu streams
 Menu_Codec_List;
@@ -1104,10 +1130,15 @@ Object;
 ObjectCount;
 OK;OK
 One output file per input file;One output file per input file
+OnlyDiffer;
+OnlyIdentical;
 Open;Otevřít
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
+OpenFile;
+OpenFileError;
+OpenRecent;
 Options;Nastavení
 Options_Hint;Předvolby
 Original;Originál
@@ -1119,6 +1150,7 @@ Originator;
 Other;Různé
 OtherIdentifier;
 OtherIdentifierType;
+OtherViews;
 Output;Výstup
 Output format;Zobrazit jako
 OverallBitRate;Celkový BitRate
@@ -1130,6 +1162,7 @@ PackageName;
 PackFormat;
 Part;Část
 Part_Count;Total count
+PartialParsing;
 PartNumber;
 PartTotal;
 Performer;Performer
@@ -1156,12 +1189,14 @@ Position_Total;
 Preferences;Předvolby
 PreferredDownmix;
 Premium;
+Premium_Feature;
 Premium_Summary;
 PreselectionLabel;
 Presentation;
 PresentationConfig;
 PresentationConfig_ContentClassifier;
 PresentationID;
+PresentationLevel;
 PreviousDownmixType5ch;
 PreviousMixType2ch;
 PrimaryAudioLanguage;
@@ -1177,6 +1212,7 @@ ProgrammeTextLanguage;
 ProgrammeTitle;
 Publisher;Publisher
 Purchased_Date;purchased date
+PurchaseInformation;
 Quote character;Quote character
 RadioStation;Radio station
 Rating;Hodnocení
@@ -1193,6 +1229,7 @@ ReplayGain_Peak;
 Report;
 Resolution;Rozlišení
 RestoreLifetimeSubscription;
+Retry;
 s; s
 Sampled_Height;
 Sampled_Width;
@@ -1223,11 +1260,11 @@ Send HeaderFile;
 Separator_Columns;columns separator
 Separator_Lines;lines separator
 SeriesTitle;
-Services;Služby
 ServiceChannel;
 ServiceKind;
 ServiceName;
 ServiceProvider;
+Services;Služby
 ServiceType;
 Set;Nastavit
 Set_Count;Set count
@@ -1241,9 +1278,11 @@ Shell extension, separate instance;
 Shell InfoTip;Integrovat do kontextového menu (při najetí myši na soubor)
 ShimName;
 ShimVersion;
+Show;
 Show menu;Zobrazit menu
 Show toolbar;Zobrazit nástrojovou lištu
 ShowAll;Zobrazit vše
+ShowMore;
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1272,6 +1311,7 @@ StreamKind;Kind of stream
 StreamKindID;
 StreamKindPos;
 StreamOrder;
+Streams;
 StreamSize;
 StreamSize_Demuxed;
 StreamSize_Encoded;
@@ -1281,6 +1321,7 @@ Subscribe;
 Subscribe_Button;
 Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Premium;
 Subscribe_Renew;
 Subscribe_Renew_Price;
 Subscribe_Unaviable;
@@ -1298,6 +1339,7 @@ Summary;Summary
 Supported formats;Supported formats
 Supported?;Supported?
 SupportUs;
+SupportUs2;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Synopsis
@@ -1308,6 +1350,7 @@ TargetDeviceConfig;
 Technician;Technician
 TermsOfUse;Terms of use
 TertiaryAudioLanguage;
+TestContinuousFileNames;
 Text;Text
 Text - Custom;Text - Vlastní
 Text (HTML);Text (HTML)
@@ -1373,6 +1416,26 @@ TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
+Type_Composer;
+Type_Conductor;
+Type_Cover;
+Type_Cover_Back;
+Type_Cover_Media;
+Type_DuringPerformance;
+Type_DuringRecording;
+Type_FileIcon;
+Type_FileIcon_32x32;
+Type_Illustration;
+Type_LeafletPage;
+Type_Lyricist;
+Type_Performer;
+Type_Performer_Lead;
+Type_PerformerLogo;
+Type_Picture;
+Type_PublisherLogo;
+Type_RecordingLocation;
+Type_ScreenCapture;
+Type_Thumbnail;
 TypeDefinition;
 UniqueID;
 UniversalAdID;
@@ -1380,6 +1443,7 @@ UniversalAdID_Registry;
 UniversalAdID_Value;
 Unknown;Neznámý
 Url;Url
+Value;
 Video;Video
 Video stream(s);Video stream(s)
 Video_Codec_List;Video kodeky
@@ -1422,5 +1486,5 @@ Yes;Ano
 Your system;Instalované kodeky
 Your translation;
 Zoom;Přepnout velikost
-ZZ_Automatic_Percent;53
-ZZ_AutomaticLanguage_Percent;58
+ZZ_Automatic_Percent;52
+ZZ_AutomaticLanguage_Percent;56

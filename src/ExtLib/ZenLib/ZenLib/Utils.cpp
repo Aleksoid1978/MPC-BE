@@ -19,6 +19,7 @@
 #include "ZenLib/Utils.h"
 #include <cmath>
 #include <complex>
+#include <limits>
 //---------------------------------------------------------------------------
 
 namespace ZenLib
@@ -972,16 +973,16 @@ void   int64u_int32u (int64u BigInt, int32u &High, int32u &Low)
 int32s float32_int32s (float32 F, bool Rounded)
 {
     //Out of boundaries
-    if (F>=(int32s)0x7FFFFFFF)
-        return (int32s)0x7FFFFFFF;
-    if (F<=(int32s)0x80000000)
-        return (int32s)0x80000000;
+    if (F>=(float32)std::numeric_limits<int32s>::max())
+        return std::numeric_limits<int32s>::max();
+    if (F<=(float32)std::numeric_limits<int32s>::min())
+        return std::numeric_limits<int32s>::min();
 
     //Not rounded
     if (!Rounded)
         return (int32s)F;
     //Rounded
-    int I1=(int)F;
+    int32s I1=(int32s)F;
     if (F-I1>=0.5f)
         return I1+1;
     else
@@ -991,16 +992,16 @@ int32s float32_int32s (float32 F, bool Rounded)
 int64s float32_int64s (float32 F, bool Rounded)
 {
     //Out of boundaries
-    if (F>=(int64s)0x7FFFFFFFFFFFFFFFLL)
-        return (int64s)0x7FFFFFFFFFFFFFFFLL;
-    if (F<=(int64s)0x8000000000000000LL)
-        return (int64s)0x8000000000000000LL;
+    if (F>=(float32)std::numeric_limits<int64s>::max())
+        return std::numeric_limits<int64s>::max();
+    if (F<=(float32)std::numeric_limits<int64s>::min())
+        return std::numeric_limits<int64s>::min();
 
     //Not rounded
     if (!Rounded)
         return (int64s)F;
     //Rounded
-    int I1=(int)F;
+    int64s I1=(int64s)F;
     if (F-I1>=0.5f)
         return I1+1;
     else
@@ -1010,10 +1011,10 @@ int64s float32_int64s (float32 F, bool Rounded)
 int32s float64_int32s (float64 F, bool Rounded)
 {
     //Out of boundaries
-    if (F>=(int32s)0x7FFFFFFF)
-        return (int32s)0x7FFFFFFF;
-    if (F<=(int32s)0x80000000)
-        return (int32s)0x80000000;
+    if (F>=(float64)std::numeric_limits<int32s>::max())
+        return std::numeric_limits<int32s>::max();
+    if (F<=(float64)std::numeric_limits<int32s>::min())
+        return std::numeric_limits<int32s>::min();
 
     //Not rounded
     if (!Rounded)
@@ -1029,10 +1030,10 @@ int32s float64_int32s (float64 F, bool Rounded)
 int64s float64_int64s (float64 F, bool Rounded)
 {
     //Out of boundaries
-    if (F>=(int64s)0x7FFFFFFFFFFFFFFFLL)
-        return (int64s)0x7FFFFFFFFFFFFFFFLL;
-    if (F<=(int64s)0x8000000000000000LL)
-        return (int64s)0x8000000000000000LL;
+    if (F>=(float64)std::numeric_limits<int64s>::max())
+        return std::numeric_limits<int64s>::max();
+    if (F<=(float64)std::numeric_limits<int64s>::min())
+        return std::numeric_limits<int64s>::min();
 
     //Not rounded
     if (!Rounded)

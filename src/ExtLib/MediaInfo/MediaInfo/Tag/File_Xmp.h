@@ -41,9 +41,9 @@ struct gm_data
     bool BaseRenditionIsHDR{ false };
     bool Multichannel{ false };
     float32 HDRCapacityMin{ 0 };
-    float32 HDRCapacityMax;
+    float32 HDRCapacityMax{};
     float32 GainMapMin[3]{ 0, 0, 0 };
-    float32 GainMapMax[3];
+    float32 GainMapMax[3]{};
     float32 Gamma[3]{ 1, 1, 1 };
     float32 OffsetSDR[3]{ 1.0f / 64, 1.0f / 64, 1.0f / 64 };
     float32 OffsetHDR[3]{ 1.0f / 64, 1.0f / 64, 1.0f / 64 };
@@ -62,7 +62,9 @@ public:
 
 private :
     //Buffer - File header
-    bool FileHeader_Begin();
+    bool FileHeader_Begin() override;
+
+    //Element namespaces
     void dc(const string& name, const string& value);
     void exif(const string& name, const string& value);
     void GIMP(const string& name, const string& value);

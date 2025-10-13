@@ -111,19 +111,19 @@ bool File_SphericalVideo::FileHeader_Begin()
                         b.len -= 11;
                     }
                     auto Value = tfsxml_decode(v);
-                    if (!tfsxml_strcmp_charp(b, "SourceCount")) {
-                        Fill(Stream_Video, 0, Video_MultiView_Count, Value);
-                        continue;
-                    }
                     if (!tfsxml_strcmp_charp(b, "StereoMode")) {
-                        const char* Found = nullptr;
+                        size_t Found = (size_t)-1;
                         for (const auto& Mapping : StereoMode_Mapping) {
                             if (Value == Mapping.Value) {
-                                Found = Mk_StereoMode(Mapping.MapTo);
+                                Found = Mapping.MapTo;
                                 break;
                             }
                         }
-                        Fill(Stream_Video, 0, Video_MultiView_Layout, Found ? Found : Value);
+                        if (Found) {
+                            Fill(Stream_Video, 0, Video_MultiView_Count, 2);
+                            auto Text = Mk_StereoMode(Found);
+                            Fill(Stream_Video, 0, Video_MultiView_Layout, Text ? Text : Value);
+                        }
                         continue;
                     }
                     auto FieldName = tfsxml_decode(b);

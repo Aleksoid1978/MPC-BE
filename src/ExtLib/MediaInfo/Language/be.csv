@@ -161,6 +161,7 @@
 7.1ch;7.1
 About;Пра праграму
 About_Hint;Кантакты і пошук новай версіі
+AC3_Metadata;
 Accompaniment;Суправаджэнне
 Active_DisplayAspectRatio;Актуальныя суадносіны бакоў дысплея
 Active_Height;Актуальная вышыня
@@ -187,7 +188,12 @@ Alignment;Выраўноўванне
 Alignment_Aligned;Выраўноўванне па прамежках
 Alignment_Split;Падзел па прамежках
 All;Усё
+AllFields;
 AlternateGroup;Альтэрнатыўная група
+AnalyzeServicesMenu;
+App_About;
+App_Hide;
+App_Quit;
 Archival_Location;Месца захоўвання
 Arranger;Аранжыроўшчык
 ArtDirector;Арт-дырэктар
@@ -238,6 +244,8 @@ BitRate_Mode_CBR;Пастаянны
 BitRate_Mode_VBR;Пераменны
 BitRate_Nominal;Намінальны бітрэйт
 Bits-(Pixel*Frame);Біт/(Пікселі*Кадры)
+BitstreamLevel;
+Bring All to Front;
 BufferSize;Памер буфера
 Cancel;Скасаваць
 CaptionServiceName;
@@ -276,9 +284,12 @@ Classifier;Класіфікатар змесціва
 ClearList;Ачысціць спіс
 Close;Закрыць
 Close all before open;Закрываць усё перад адкрыццём новых файлаў
+CloseAll;
 ClosedCaptionsLanguage;Мова субцітраў
 ClosedCaptionsPresent;Наяўнасць субцітраў
 ClosedCaptionsType;Тып субцітраў
+CloseFile;
+CloseWindow;
 Codec;Кодэк
 Codec_Description;Апісанне кодэка
 Codec_Info;Падрабязна аб кодэку
@@ -312,6 +323,8 @@ colour_primaries;Асноўныя колеры
 colour_range;Колеравы дыяпазон
 Comment;Каментарый
 CommissionedBy;Паручыцель
+Compare;
+CompareView;
 Compilation;Кампіляцыя
 ComplementaryObject;
 CompleteName;Поўнае імя
@@ -322,6 +335,7 @@ Compression_Mode;Метад сціску
 Compression_Mode_Lossless;Без страт
 Compression_Mode_Lossy;Са стратамі
 Compression_Ratio;Ступень сціску
+comprprof;
 Conductor;Дырыжор
 ConformanceCheck;
 ConformanceErrors;
@@ -333,6 +347,7 @@ Container and general information;Агульная інфармацыя
 Content;
 ContentType;Тып змесціва
 CoProducer;Супрадзюсар
+Copy;
 Copyright;Аўтарскае права
 CopyrightYear;
 CostumeDesigner;Дызайнер касцюмаў
@@ -356,6 +371,7 @@ Default;
 Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
+DefaultView;
 Delay;Затрымка
 Delay_Source;Затрымка ў арыгінале
 Delay_Source_Container;Кантэйнер
@@ -386,6 +402,8 @@ Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Ахвяраваць
 DotsPerInch;Пунктаў на цалю
+DownloadFile;
+DownloadFileError;
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
@@ -400,6 +418,7 @@ Duration_Start_Command;Час пачатку (каманды)
 Duration_Start2End;
 DynamicObject;
 DynamicRangeControl;
+dynrngprof;
 Eac3DrcProfile;
 Edit;Змяніць
 EditedBy;Зменена
@@ -410,6 +429,7 @@ EMail;Пошта
 Enable FFmpeg plugin;
 Encoded_Application;Праграма кадзіравання
 Encoded_Date;Дата кадзіравання
+Encoded_Hardware;
 Encoded_Library;Бібліятэка кадзіравання
 Encoded_Library_Name;
 Encoded_Library_Settings;Параметры бібліятэкі кадзіравання
@@ -418,8 +438,11 @@ Encoded_Original;Крыніца арыгінала
 EncodedBy;Кадзіраванне выканаў
 EPG_Positions;Пазіцыі EPG (унутраныя)
 EpisodeTitleNumber;
+Error;
 Error_File;Памылка чытання файла
 Error_File_Write;Памылка запісу файла
+Error_Open;
+Error_Save;
 Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
@@ -434,6 +457,11 @@ Extensions;Пашырэнні, якія часта выкарыстоўваюц�
 External_Media_NotMounted;Знешні носьбіт недаступны
 Family;Сямейства
 Fax;Факс
+Feature_AdvancedMode;
+Feature_FilesCompare;
+Feature_More;
+Feature_SelectView;
+Field;
 File;Файл
 File size;Памер файла
 File_Append;Дадаць да існуючага файла (Папярэджанне: пераканайцеся ў адпаведнасці параметраў)
@@ -517,6 +545,7 @@ FrameRate_Num;
 FrameRate_Original;Частата кадраў у арыгінале
 FrameRate_Real;
 FullParsing;
+FullParsingTips;
 Gallery;
 General;Агульная
 GeneralCompliance;Агульная адпаведнасць
@@ -729,6 +758,7 @@ Height;Вышыня
 Height_CleanAperture;
 Height_Original;
 Help;Даведка
+HideOthers;
 Hint;Падказка
 HomeTheaterAvr;
 How many audio streams?;Колькі аўдыяпатокаў?
@@ -979,10 +1009,11 @@ Language_zh-tw;Chinese (Taiwan)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;Zulu
+LanguageChanges;
 Languages;
 LawRating;Абмежаванне па ўзросце
-LegacyStreamDisplay;
 LCCN;LCCN
+LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
 Library;Бібліятэка мультыплексавання
@@ -1029,6 +1060,7 @@ LtRtCenterMixGain;
 LtRtSurroundMixGain;
 Lyricist;Аўтар тэксту
 Lyrics;Тэкст песен
+MacCreatedBy;
 Mastered_Date;Дата майстарынгу
 MasteredBy;Майстарынг
 MasteringDisplay_ColorPrimaries;
@@ -1046,6 +1078,7 @@ MD5;
 MD5_Unencoded;
 MediaInfo_About;MediaInfo дазваляе атрымаць доступ да падрабязнай інфармацыі\r\nпра мультымедыя-файлы Matroska, OGG (уключаючы OGM)\r\nMPEG1 (уключаючы VCD), MPEG2 (уключаючы DVD і SVCD), MPEG4 (уключаючы iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (уключаючы WMV, WMA)\r\nMicrosoft RIFF (уключаючы AVI, WAV, DivX)\r\nгукавыя фарматы (AC3, DTS, SSC, AU, AIFF)
 MediaInfo_About_About;MediaInfo v%MI_VERSION% выкарыстоўвае MediaInfoLib v%MIL_VERSION%
+MediaInfo_WebSite;
 Menu;Меню
 Menu stream(s);Меню патокаў
 Menu_Codec_List;Меню кодэкаў
@@ -1056,6 +1089,7 @@ MenuID;Ідэнтыфікатар меню
 Metadata_Format;
 Metadata_Format_Type;
 Metadata_MuxingMode;
+Minimize;
 MixType;
 mn;хв.
 Mood;Настрой
@@ -1096,10 +1130,15 @@ Object;
 ObjectCount;
 OK;OK
 One output file per input file;Новы файл для кожнага зыходнага файла
+OnlyDiffer;
+OnlyIdentical;
 Open;Адкрыць
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
+OpenFile;
+OpenFileError;
+OpenRecent;
 Options;Параметры
 Options_Hint;Параметры праграмы
 Original;Арыгінал
@@ -1111,6 +1150,7 @@ Originator;
 Other;Іншае
 OtherIdentifier;
 OtherIdentifierType;
+OtherViews;
 Output;Вывад
 Output format;Фармат вываду
 OverallBitRate;Агульны бітрэйт
@@ -1122,6 +1162,7 @@ PackageName;
 PackFormat;
 Part;Частка
 Part_Count;Колькасць частак
+PartialParsing;
 PartNumber;
 PartTotal;
 Performer;Выканаўца
@@ -1148,12 +1189,14 @@ Position_Total;Усяго
 Preferences;Параметры
 PreferredDownmix;
 Premium;
+Premium_Feature;
 Premium_Summary;
 PreselectionLabel;
 Presentation;
 PresentationConfig;
 PresentationConfig_ContentClassifier;
 PresentationID;
+PresentationLevel;
 PreviousDownmixType5ch;
 PreviousMixType2ch;
 PrimaryAudioLanguage;
@@ -1169,6 +1212,7 @@ ProgrammeTextLanguage;
 ProgrammeTitle;
 Publisher;Выдавец
 Purchased_Date;Дата пакупкі
+PurchaseInformation;
 Quote character;Сімвал двукоссяў
 RadioStation;Радыёстанцыя
 Rating;Рэйтынг
@@ -1185,6 +1229,7 @@ ReplayGain_Peak;Пік нармалізатара гука
 Report;
 Resolution;Раздзяляльнасць
 RestoreLifetimeSubscription;
+Retry;
 s;с
 Sampled_Height;
 Sampled_Width;
@@ -1210,6 +1255,7 @@ Season;Сезон
 SecondaryAudioLanguage;
 see below;гл. ніжэй
 Select your directory;
+SelectAll;
 Send HeaderFile;Адпраўце мне загаловак гэтага файла на http://sourceforge.net/projects/mediainfo/ (Раздзел памылак)
 Separator_Columns;Раздзяляльнік слупкоў
 Separator_Lines;Раздзяляльнік радкоў
@@ -1218,6 +1264,7 @@ ServiceChannel;Нумар канала сэрвісу
 ServiceKind;
 ServiceName;Назва сэрвісу
 ServiceProvider;Пастаўшчык сэрвісу
+Services;
 ServiceType;Тып сэрвісу
 Set;Канфігурацыя
 Set_Count;Колькасць канфігурацый
@@ -1231,8 +1278,11 @@ Shell extension, separate instance;
 Shell InfoTip;Усплывальная падказка (паказваць інфармацыю пры размяшчэнні паказальніка мышы над файлам у правадніку Windows)
 ShimName;
 ShimVersion;
+Show;
 Show menu;Паказваць меню
 Show toolbar;Паказваць панэль
+ShowAll;
+ShowMore;
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1261,6 +1311,7 @@ StreamKind;Тып патоку
 StreamKindID;Ідэнтыфікатар патоку
 StreamKindPos;Ідэнтыфікатар патоку
 StreamOrder;
+Streams;
 StreamSize;Памер патоку
 StreamSize_Demuxed;
 StreamSize_Encoded;
@@ -1270,6 +1321,7 @@ Subscribe;
 Subscribe_Button;
 Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Premium;
 Subscribe_Renew;
 Subscribe_Renew_Price;
 Subscribe_Unaviable;
@@ -1287,6 +1339,7 @@ Summary;Зводка
 Supported formats;Фарматы, што падтрымліваюцца
 Supported?;Падтрымліваецца?
 SupportUs;
+SupportUs2;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Коратка
@@ -1297,6 +1350,7 @@ TargetDeviceConfig;
 Technician;Тэхнік
 TermsOfUse;Умовы выкарыстання
 TertiaryAudioLanguage;
+TestContinuousFileNames;
 Text;Тэкст
 Text - Custom;Тэкст - выбарачна
 Text (HTML);Тэкст (HTML)
@@ -1362,6 +1416,26 @@ TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
+Type_Composer;
+Type_Conductor;
+Type_Cover;
+Type_Cover_Back;
+Type_Cover_Media;
+Type_DuringPerformance;
+Type_DuringRecording;
+Type_FileIcon;
+Type_FileIcon_32x32;
+Type_Illustration;
+Type_LeafletPage;
+Type_Lyricist;
+Type_Performer;
+Type_Performer_Lead;
+Type_PerformerLogo;
+Type_Picture;
+Type_PublisherLogo;
+Type_RecordingLocation;
+Type_ScreenCapture;
+Type_Thumbnail;
 TypeDefinition;
 UniqueID;Унікальны ідэнтыфікатар
 UniversalAdID;
@@ -1369,6 +1443,7 @@ UniversalAdID_Registry;
 UniversalAdID_Value;
 Unknown;Невядома
 Url;URL-адрас
+Value;
 Video;Відэа
 Video stream(s);Відэапаток(і)
 Video_Codec_List;Відэакодэкі
@@ -1401,6 +1476,7 @@ WebSite_Video_More;Перайсці на сайт (%Url%) для пошуку г
 Width;Шырыня
 Width_CleanAperture;
 Width_Original;
+Window;
 WriteMe;Напісаць аўтару
 WriteToTranslator;Напісаць перакладчыку
 Written_Date;Дата запісу
@@ -1409,5 +1485,6 @@ WrittenBy;Запісана
 Yes;Так
 Your system;Ваша сістэма
 Your translation;
-ZZ_Automatic_Percent;71
-ZZ_AutomaticLanguage_Percent;75
+Zoom;
+ZZ_Automatic_Percent;67
+ZZ_AutomaticLanguage_Percent;71

@@ -3234,6 +3234,7 @@ void File_Hevc::sei_message_user_data_registered_itu_t_t35_26_0004()
 void File_Hevc::sei_message_user_data_registered_itu_t_t35_26_0004_0005()
 {
     //Parsing
+    Element_Info1("T/UWA 005 (HDR Vivid)");
     int16u targeted_system_display_maximum_luminance_Max=0;
     int8u system_start_code;
     bool color_saturation_mapping_enable_flag;

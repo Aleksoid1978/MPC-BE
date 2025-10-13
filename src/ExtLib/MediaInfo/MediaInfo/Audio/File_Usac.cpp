@@ -4699,6 +4699,7 @@ void File_Usac::sbrDtdf(size_t ch, bool usacIndependencyFlag)
         C.sbrHandler.bs_df_noise[ch][0]=false;
 
     for (int8u n=1; n<C.sbrHandler.bs_num_noise[ch]; n++)
+        #pragma warning(suppress : 6385, justification : "bs_num_noise will not exceed size of bs_df_noise")
         Get_S1(1, C.sbrHandler.bs_df_noise[ch][n],               "bs_df_noise[ch][noise]");
 
     Element_End0();

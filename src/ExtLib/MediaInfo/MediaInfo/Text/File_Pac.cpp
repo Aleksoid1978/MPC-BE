@@ -349,6 +349,14 @@ void File_Pac::Data_Parse()
         switch (Format) {
         case Format_8bit: {
             Ztring Value;
+            if (Size) {
+                int8u Probe;
+                Peek_B1(Probe);
+                if (!Probe) {
+                    Skip_B1(                                    "Null?");
+                    Size--;
+                }
+            }
             Get_ISO_8859_1(Size, Value,                         "Content");
             bool Is8bit = false;
             for (const auto& Character : Value) {

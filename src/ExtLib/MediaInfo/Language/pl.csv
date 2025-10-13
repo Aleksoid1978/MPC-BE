@@ -161,6 +161,7 @@
 7.1ch;
 About;O programie
 About_Hint;Kontakt i informacje o nowych wersjach
+AC3_Metadata;
 Accompaniment;Akompaniament
 Active_DisplayAspectRatio;
 Active_Height;
@@ -187,7 +188,9 @@ Alignment;Wyrównanie
 Alignment_Aligned;Wyrównane w przeplocie
 Alignment_Split;Rozdzielone w przeplocie
 All;Wszystkie
+AllFields;
 AlternateGroup;
+AnalyzeServicesMenu;
 App_About;O MediaInfo
 App_Hide;Ukryj MediaInfo
 App_Quit;Zakończ MediaInfo
@@ -241,6 +244,7 @@ BitRate_Mode_CBR;Stała
 BitRate_Mode_VBR;Zmienna
 BitRate_Nominal;Nominalna przepływaność
 Bits-(Pixel*Frame);bity/(piksele*ramki)
+BitstreamLevel;
 Bring All to Front;Umieść wszystko na wierzchu
 BufferSize;
 Cancel;Anuluj
@@ -280,9 +284,11 @@ Classifier;
 ClearList;
 Close;Zamknij
 Close all before open;Zamykaj wszystko przed otwarciem pliku
+CloseAll;
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
+CloseFile;
 CloseWindow;Zamknij okno
 Codec;Kodek
 Codec_Description;Opis kodeka
@@ -317,6 +323,8 @@ colour_primaries;
 colour_range;
 Comment;Komentarz
 CommissionedBy;Powierzony przez
+Compare;
+CompareView;
 Compilation;
 ComplementaryObject;
 CompleteName;Pełna ścieżka
@@ -327,6 +335,7 @@ Compression_Mode;
 Compression_Mode_Lossless;
 Compression_Mode_Lossy;
 Compression_Ratio;Stopień kompresji
+comprprof;
 Conductor;Dyrygent
 ConformanceCheck;
 ConformanceErrors;
@@ -362,6 +371,7 @@ Default;
 Default translation;
 Default_Setting;
 DefaultTargetDeviceConfig;
+DefaultView;
 Delay;Opóźnienie
 Delay_Source;
 Delay_Source_Container;
@@ -392,6 +402,8 @@ Dolby_Atmos_Metadata;
 DolbyAtmos;
 Donate;Donacja
 DotsPerInch;punktów na cal
+DownloadFile;
+DownloadFileError;
 Downmix;
 Downmix_5.1.x;
 Downmix_5to2;
@@ -406,6 +418,7 @@ Duration_Start_Command;
 Duration_Start2End;
 DynamicObject;
 DynamicRangeControl;
+dynrngprof;
 Eac3DrcProfile;
 Edit;Edytuj
 EditedBy;Edytowany przez
@@ -416,6 +429,7 @@ EMail;email
 Enable FFmpeg plugin;
 Encoded_Application;Aplikacja zapisująca
 Encoded_Date;Zdekodowana data
+Encoded_Hardware;
 Encoded_Library;Biblioteka zapisująca
 Encoded_Library_Name;
 Encoded_Library_Settings;Ustawienia kodowania
@@ -424,8 +438,11 @@ Encoded_Original;Oryginalny
 EncodedBy;Kodowane przez
 EPG_Positions;Pozycje EPG (wewnętrzne)
 EpisodeTitleNumber;
+Error;
 Error_File;Błąd przy odczycie pliku
 Error_File_Write;
+Error_Open;
+Error_Save;
 Events_MinDuration;
 Events_PaintOn;
 Events_PopOn;
@@ -440,6 +457,11 @@ Extensions;Zwykle używane rozszerzenia
 External_Media_NotMounted;
 Family;Rodzina
 Fax;Fax
+Feature_AdvancedMode;
+Feature_FilesCompare;
+Feature_More;
+Feature_SelectView;
+Field;
 File;Plik
 File size;Rozmiar pliku
 File_Append;Dołącz do istniejacego pliku (Ostrzeżenie: Upewnij się, że ma takie same parametry)
@@ -523,6 +545,7 @@ FrameRate_Num;
 FrameRate_Original;Oryginalna szybkość wyświetlania klatek
 FrameRate_Real;
 FullParsing;
+FullParsingTips;
 Gallery;
 General;Ogólne
 GeneralCompliance;
@@ -986,10 +1009,11 @@ Language_zh-tw;Chiński (Tajwan)
 Language_zh-TW;
 Language_zh-yue;
 Language_zu;Zuluski
+LanguageChanges;
 Languages;
 LawRating;Nisko oceniany
-LegacyStreamDisplay;
 LCCN;LCCN
+LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
 Library;Bibloteka multipleksująca
@@ -1036,6 +1060,7 @@ LtRtCenterMixGain;
 LtRtSurroundMixGain;
 Lyricist;Autor słów
 Lyrics;Słowa
+MacCreatedBy;
 Mastered_Date;Data nagrania
 MasteredBy;Nagrane przez
 MasteringDisplay_ColorPrimaries;
@@ -1053,6 +1078,7 @@ MD5;
 MD5_Unencoded;
 MediaInfo_About;Dostarcza bardzo szczegółowe informacje\r\no pliku multimedialnym:\r\nMatroska, OGG (wraz z OGM)\r\nMPEG1 (wraz z VCD)\r\nMPEG2 (wraz z DVD i SVCD)\r\nMPEG4 (wraz z iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (wraz z  WMV, WMA)\r\nMicrosoft RIFF (wraz z AVI, WAV)\r\nFormaty dźwiekowe (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
+MediaInfo_WebSite;
 Menu;Menu
 Menu stream(s);Strumienie menu
 Menu_Codec_List;Kodeki menu
@@ -1104,10 +1130,15 @@ Object;
 ObjectCount;
 OK;Ok
 One output file per input file;Jeden plik wyjściowy na wejściowy
+OnlyDiffer;
+OnlyIdentical;
 Open;Otwórz
 OpenCaptionsLanguage;
 OpenCaptionsPresent;
 OpenCaptionsType;
+OpenFile;
+OpenFileError;
+OpenRecent;
 Options;Opcje
 Options_Hint;Preferencje
 Original;Oryginalny
@@ -1119,6 +1150,7 @@ Originator;
 Other;Inny
 OtherIdentifier;
 OtherIdentifierType;
+OtherViews;
 Output;Wyjście
 Output format;Wyjściowy format
 OverallBitRate;Całkowita przepływność bitów
@@ -1130,6 +1162,7 @@ PackageName;
 PackFormat;
 Part;Część
 Part_Count;Ogółem
+PartialParsing;
 PartNumber;
 PartTotal;
 Performer;Wykonawca
@@ -1156,12 +1189,14 @@ Position_Total;Nagrań
 Preferences;Preferencje
 PreferredDownmix;
 Premium;
+Premium_Feature;
 Premium_Summary;
 PreselectionLabel;
 Presentation;
 PresentationConfig;
 PresentationConfig_ContentClassifier;
 PresentationID;
+PresentationLevel;
 PreviousDownmixType5ch;
 PreviousMixType2ch;
 PrimaryAudioLanguage;
@@ -1177,6 +1212,7 @@ ProgrammeTextLanguage;
 ProgrammeTitle;
 Publisher;Wydawca
 Purchased_Date;Data zakupu
+PurchaseInformation;
 Quote character;Cudzysłów
 RadioStation;Radiostacja
 Rating;Ocena
@@ -1193,6 +1229,7 @@ ReplayGain_Peak;Współczynnik wzmocnienia
 Report;
 Resolution;Rozdzielczość
 RestoreLifetimeSubscription;
+Retry;
 s;s
 Sampled_Height;
 Sampled_Width;
@@ -1241,9 +1278,11 @@ Shell extension, separate instance;
 Shell InfoTip;Informacje powłoki (w eksploratorze najedź kursorem na plik, wyświetlą się informacje)
 ShimName;
 ShimVersion;
+Show;
 Show menu;Pokaż menu
 Show toolbar;Pokaż pasek narzędzi
 ShowAll;Pokaż wszystkie
+ShowMore;
 SignalGroup;
 SigningPresent;
 SignLanguage;
@@ -1272,6 +1311,7 @@ StreamKind;Rodzaj strumienia
 StreamKindID;Identyfikator strumienia
 StreamKindPos;Identyfikator strumienia
 StreamOrder;
+Streams;
 StreamSize;Rozmiar strumienia
 StreamSize_Demuxed;
 StreamSize_Encoded;
@@ -1281,6 +1321,7 @@ Subscribe;
 Subscribe_Button;
 Subscribe_Failed;
 Subscribe_Manage;
+Subscribe_Premium;
 Subscribe_Renew;
 Subscribe_Renew_Price;
 Subscribe_Unaviable;
@@ -1298,6 +1339,7 @@ Summary;Podsumowanie
 Supported formats;Obsługiwane formaty
 Supported?;Obsługiwane?
 SupportUs;
+SupportUs2;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Streszczenie
@@ -1308,6 +1350,7 @@ TargetDeviceConfig;
 Technician;Technik
 TermsOfUse;Zasady korzystania
 TertiaryAudioLanguage;
+TestContinuousFileNames;
 Text;Tekst
 Text - Custom;Tekst - własny
 Text (HTML);Tekst (HTML)
@@ -1373,6 +1416,26 @@ TrimMode8i;
 TruePeakLevel;
 TruePeakLevel_Album;
 Type;
+Type_Composer;
+Type_Conductor;
+Type_Cover;
+Type_Cover_Back;
+Type_Cover_Media;
+Type_DuringPerformance;
+Type_DuringRecording;
+Type_FileIcon;
+Type_FileIcon_32x32;
+Type_Illustration;
+Type_LeafletPage;
+Type_Lyricist;
+Type_Performer;
+Type_Performer_Lead;
+Type_PerformerLogo;
+Type_Picture;
+Type_PublisherLogo;
+Type_RecordingLocation;
+Type_ScreenCapture;
+Type_Thumbnail;
 TypeDefinition;
 UniqueID;
 UniversalAdID;
@@ -1380,6 +1443,7 @@ UniversalAdID_Registry;
 UniversalAdID_Value;
 Unknown;Nieznany
 Url;url
+Value;
 Video;Wideo
 Video stream(s);Strumień(ie) wideo
 Video_Codec_List;Kodeki wideo
@@ -1422,5 +1486,5 @@ Yes;Tak
 Your system;System
 Your translation;
 Zoom;Zoom
-ZZ_Automatic_Percent;56
-ZZ_AutomaticLanguage_Percent;68
+ZZ_Automatic_Percent;54
+ZZ_AutomaticLanguage_Percent;65

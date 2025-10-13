@@ -28,7 +28,7 @@
 #include <vector>
 #ifdef __WINDOWS__
     #undef __TEXT
-    #include "windows.h"
+    #include <windows.h>
 #endif // __WINDOWS__
 
 #if MEDIAINFO_EVENTS
