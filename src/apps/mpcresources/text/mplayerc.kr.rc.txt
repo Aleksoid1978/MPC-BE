@@ -316,7 +316,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 27		"시간 툴팁 사용 :"
 29		"탐색 표시줄에서 미리 보기 사용"
 30		"화면 너비 대비 크기 :"
-34		"온라인인"
+34		"온라인"
 35		"챕터 구분 표기 사용"
 36		"플라이바 사용"
 37		"재생 목록 글자 크기 :"
@@ -2117,4 +2117,5 @@ STRING ID_SHOW_MILLISECONDS		"밀리초 표기"
 STRING ID_VOLUME_MUTE		"음소거\n음소거"
 STRING ID_VOLUME_MUTE_DISABLED		"오디오 없음\n오디오 없음"
 STRING ID_VOLUME_MUTE_OFF		"음소거 해제\n음소거 해제"
+
 
