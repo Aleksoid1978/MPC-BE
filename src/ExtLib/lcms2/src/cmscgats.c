@@ -870,6 +870,11 @@ void InSymbol(cmsIT8* it8)
                     sign = -1;
                     NextCh(it8);
                 }
+                else
+                    if (it8->ch == '+') {
+                        sign = +1;
+                        NextCh(it8);
+                    }
 
                 it8->inum = 0;
                 it8->sy   = SINUM;
