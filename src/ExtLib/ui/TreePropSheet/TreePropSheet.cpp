@@ -761,10 +761,6 @@ BOOL CTreePropSheet::OnInitDialog()
 	pTab->GetWindowRect(rectFrame);
 	ScreenToClient(rectFrame);
 
-	CRect	rectFrame2(rectFrame);
-	rectFrame2.bottom += 1;
-	pTab->MoveWindow(rectFrame2);
-
 	m_pFrame = CreatePageFrame();
 	if (!m_pFrame)
 	{
@@ -772,7 +768,7 @@ BOOL CTreePropSheet::OnInitDialog()
 		AfxThrowMemoryException();
 	}
 
-	m_pFrame->Create(WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS, rectFrame2, this, 0xFFFF);
+	m_pFrame->Create(WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS, rectFrame, this, 0xFFFF);
 	m_pFrame->ShowCaption(m_bPageCaption);
 
 	// Lets make place for the tree ctrl
@@ -791,27 +787,33 @@ BOOL CTreePropSheet::OnInitDialog()
 	CRect	rectTree(rectFrame);
 	rectTree.right = rectTree.left + nTreeWidth - nTreeSpace;
 
-	// calculate caption height
-	CTabCtrl wndTabCtrl;
-	wndTabCtrl.Create(WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS, rectFrame, this, 0x1234);
-	wndTabCtrl.InsertItem(0, _T(""));
-	CRect rectFrameCaption;
-	wndTabCtrl.GetItemRect(0, rectFrameCaption);
-	wndTabCtrl.DestroyWindow();
-	auto frameCaptionHeight = rectFrameCaption.Height();
-
-	if (CDPI* pDpi = dynamic_cast<CDPI*>(AfxGetMainWnd())) {
-		frameCaptionHeight = pDpi->ScaleY(frameCaptionHeight);
-	} else {
+	bool bDeletepDpi = false;
+	auto pDpi = dynamic_cast<CDPI*>(AfxGetMainWnd());
+	if (!pDpi) {
+		bDeletepDpi = true;
 		pDpi = new CDPI();
-		frameCaptionHeight = pDpi->ScaleY(frameCaptionHeight);
+		pDpi->UseCurentMonitorDPI(GetParent()->GetSafeHwnd());
+	}
+
+	int frameCaptionHeight = 0;
+	if (pDpi->GetDPIScalePercent() > 100) {
+		frameCaptionHeight = pDpi->ScaleY(21);
+	} else {
+		// calculate caption height
+		CTabCtrl wndTabCtrl;
+		wndTabCtrl.Create(WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS, rectFrame, this, 0x1234);
+		wndTabCtrl.InsertItem(0, L"");
+		CRect rectFrameCaption;
+		wndTabCtrl.GetItemRect(0, rectFrameCaption);
+		wndTabCtrl.DestroyWindow();
+
+		frameCaptionHeight = rectFrameCaption.Height();
+	}
+
+	if (bDeletepDpi) {
 		delete pDpi;
 	}
 
-	if (frameCaptionHeight > 32) {
-		// I don't know why, but the caption height limit is 32 pixels
-		frameCaptionHeight = 32;
-	}
 	m_pFrame->SetCaptionHeight(frameCaptionHeight);
 
 	// if no caption should be displayed, make the window smaller in

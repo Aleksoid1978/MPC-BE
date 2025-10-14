@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2019 see Authors.txt
+ * (C) 2015-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -104,7 +104,6 @@ public:
         return ScaleSystemToMonitorX(::GetSystemMetrics(nIndex));
     }
 
-protected:
     void UseCurentMonitorDPI(HWND hWindow)
     {
         if (SysVersion::IsWin8orLater()) {
@@ -122,6 +121,7 @@ protected:
         }
     }
 
+protected:
     void OverrideDPI(int dpix, int dpiy)
     {
         m_dpiX = dpix;

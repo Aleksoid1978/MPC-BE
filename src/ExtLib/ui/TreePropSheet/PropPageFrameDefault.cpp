@@ -96,6 +96,9 @@ public:
 	HRESULT DrawThemeBackground(HTHEME hTheme, HDC hdc, int iPartId, int iStateId, const RECT *pRect, OPTIONAL const RECT *pClipRect) const
 	{THEMECALL(DrawThemeBackground)(hTheme, hdc, iPartId, iStateId, pRect, pClipRect);}
 
+	HRESULT DrawThemeEdge(HTHEME hTheme, HDC hdc, int iPartId, int iStateId, const RECT *pRect, UINT uEdge, UINT uFlags, OPTIONAL const RECT * pContentRect) const
+	{THEMECALL(DrawThemeEdge)(hTheme, hdc, iPartId, iStateId, pRect, uEdge, uFlags, pContentRect);}
+
 // function pointers
 private:
 #ifdef XPSUPPORT
@@ -113,6 +116,9 @@ private:
 
 	THEMEAPITYPE(DrawThemeBackground)(HTHEME hTheme, HDC hdc, int iPartId, int iStateId, const RECT *pRect, OPTIONAL const RECT *pClipRect);
 	THEMEAPIPTR(DrawThemeBackground);
+
+	THEMEAPITYPE(DrawThemeEdge)(HTHEME hTheme, HDC hdc, int iPartId, int iStateId, const RECT* pRect, UINT uEdge, UINT uFlags, OPTIONAL const RECT* pContentRect);
+	THEMEAPIPTR(DrawThemeEdge);
 #endif
 
 // properties
@@ -140,6 +146,7 @@ CThemeLib::CThemeLib()
 	GETTHEMECALL(CloseThemeData);
 	GETTHEMECALL(GetThemeBackgroundContentRect);
 	GETTHEMECALL(DrawThemeBackground);
+	GETTHEMECALL(DrawThemeEdge);
 #endif
 }
 
@@ -314,18 +321,21 @@ void CPropPageFrameDefault::DrawCaption(CDC *pDc, CRect rect, LPCTSTR lpszCaptio
 	int				nBkStyle = pDc->SetBkMode(TRANSPARENT);
 	CFont			*pFont = (CFont*)pDc->SelectStockObject(SYSTEM_FONT);
 
-	CFont* pSysFont = pDc->GetCurrentFont();
-	LOGFONT lf;
-	pSysFont->GetLogFont(&lf);
-	lf.lfHeight = -(rect.Height() * 72 / 96);
-	lf.lfWidth = 0;
 	// <MPC-BE Custom Code>
-	CString face = _T("Segoe UI");
-	_tcscpy_s(lf.lfFaceName, face);
-	// <MPC-BE Custom Code>
+	auto GetNonClientMetrics = [](NONCLIENTMETRICSW* ncm) {
+		ncm->cbSize = sizeof(NONCLIENTMETRICSW);
+		VERIFY(SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, ncm->cbSize, ncm, 0));
+	};
+
+	NONCLIENTMETRICSW ncm{};
+	GetNonClientMetrics(&ncm);
+	auto& lf = ncm.lfMessageFont;
+	lf.lfHeight = static_cast<long>(-.8f * rect.Height());
+	lf.lfWeight = FW_BOLD;
+
 	CFont f;
 	f.CreateFontIndirectW(&lf);
-	pDc->SelectObject(&f);
+	pFont = pDc->SelectObject(&f);
 
 	TEXTMETRICW GDIMetrics;
 	GetTextMetricsW(pDc->GetSafeHdc(), &GDIMetrics);
@@ -337,9 +347,10 @@ void CPropPageFrameDefault::DrawCaption(CDC *pDc, CRect rect, LPCTSTR lpszCaptio
 		pDc->SelectObject(&f);
 		GetTextMetricsW(pDc->GetSafeHdc(), &GDIMetrics);
 	}
-	rect.top -= GDIMetrics.tmDescent / 2;
+	rect.top -= GDIMetrics.tmDescent - 1;
+	// <MPC-BE Custom Code>
 
-	pDc->DrawTextW(lpszCaption, rect, DT_LEFT|DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS);
+	pDc->DrawTextW(lpszCaption, rect, DT_LEFT | DT_SINGLELINE | DT_END_ELLIPSIS);
 
 	pDc->SetTextColor(clrPrev);
 	pDc->SetBkMode(nBkStyle);
@@ -401,7 +412,8 @@ BOOL CPropPageFrameDefault::OnEraseBkgnd(CDC* pDC)
 		{
 			CRect	rect;
 			GetClientRect(rect);
-			g_ThemeLib.DrawThemeBackground(hTheme, pDC->m_hDC, TABP_PANE, 0, rect, NULL);
+			g_ThemeLib.DrawThemeBackground(hTheme, pDC->m_hDC, TABP_BODY, 0, rect, NULL);
+			g_ThemeLib.DrawThemeEdge(hTheme, pDC->m_hDC, TABP_BODY, 0, rect, BDR_SUNKENOUTER, BF_FLAT | BF_RECT, NULL);
 
 			g_ThemeLib.CloseThemeData(hTheme);
 		}
