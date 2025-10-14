@@ -453,7 +453,7 @@ BEGIN
     EDITTEXT        IDC_EDIT1,166,148,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC7,194,149,10,8
     COMBOBOX        IDC_COMBO4,207,148,42,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Online",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,241,135,47,9,WS_EX_TRANSPARENT
+    CONTROL         "온라인",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,241,135,47,9,WS_EX_TRANSPARENT
     CONTROL         "챕터 구분 표기 사용",IDC_CHECK_CHM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,161,182,9
     CONTROL         "플라이바 사용",IDC_CHECK_FLYBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,174,182,9
     LTEXT           "재생 목록 글자 크기 :",IDC_STATIC,13,187,110,8
@@ -2140,7 +2140,7 @@ BEGIN
         MENUITEM "------ 모든 재생 시 ------",    ID_AFTERPLAYBACK_EVERYTIME
         MENUITEM "종료",                        ID_AFTERPLAYBACK_EXIT
         MENUITEM "파일 닫기",                  ID_AFTERPLAYBACK_CLOSE_FILE
-        MENUITEM "Close file and minimize player", ID_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE
+        MENUITEM "파일 닫기 및 플레이어 최소화", ID_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE
         MENUITEM "폴더의 다음 파일 재생",     ID_AFTERPLAYBACK_NEXT
         MENUITEM "폴더의 다음 파일 재생(반복)", ID_AFTERPLAYBACK_NEXT_LOOPED
         MENUITEM "작업 안 함",                  ID_AFTERPLAYBACK_EVERYTIMEDONOTHING
@@ -2784,7 +2784,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_SUBTITLEFILES    "Subtitle files"
+    IDS_AG_SUBTITLEFILES    "자막 파일"
     IDS_AG_AUDIO_FILE       "오디오 파일"
     IDS_AG_PLAYLIST_FILE    "재생 목록"
     IDS_AG_OTHER            "기타"
@@ -3296,7 +3296,7 @@ BEGIN
     IDS_CMD_START           "/start ms\t지정한 ""ms""(=밀리초)위치에서 재생 시작"
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\t위치 hh:mm:ss에서 재생 시작"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\t지정한 가로(w), 세로(h) 크기로 고정"
-    IDS_CMD_MONITOR         "/monitor N\tN번 모니터에서 시작(N은 1이상이어야함)"
+    IDS_CMD_MONITOR         "/monitor N\tN번 모니터에서 시작(N은 1 이상이어야 함)"
     IDS_CMD_AUDIORENDERER   "/audiorender “”이름“”\t오디오 렌더러 사용 시작, 여기서 “‘이름’”은 오디오 렌더러의 이름\n(“”음향“” 설정 참조)"
     IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
     IDS_CMD_CLIPBOARD       "/clipboard\tOpen 클립보드에서 경로/링크 열기"
@@ -3723,7 +3723,7 @@ BEGIN
     IDS_SATURATION_DEC      "채도 감소"
     IDS_RESET_COLOR         "색 설정 초기화"
     IDS_AFTERPLAYBACK_CLOSE_FILE "재생이 끝나면 : 항상 파일 닫기"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "After Playback: Always close file and minimize player"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "재생 후 : 항상 파일을 닫고 재생기기를 최소화"
     IDS_UPDATE_ERROR_DATA   "업데이트 서버 데이터에 오류가 있습니다.\n\n잠시 후 다시 시도하세요."
     IDS_USING_NEWER_VERSION "이미 최신 버전 %s 사용 중입니다."
     IDS_NEW_UPDATE_AVAILABLE  "새 버전 %s이 있습니다.\n\n  MPC-BE 웹사이트로 가서 내려받으시겠습니까?"
