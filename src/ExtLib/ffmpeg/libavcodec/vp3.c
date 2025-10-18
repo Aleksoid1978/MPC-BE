@@ -325,7 +325,7 @@ typedef struct Vp3DecodeContext {
     HuffTable huffman_table[5 * 16];
 
     uint8_t filter_limit_values[64];
-    DECLARE_ALIGNED(8, int, bounding_values_array)[256 + 2];
+    DECLARE_ALIGNED(16, int, bounding_values_array)[256 + 4];
 
     VP4Predictor * dc_pred_row; /* dc_pred_row[y_superblock_width * 4] */
 } Vp3DecodeContext;
@@ -2031,7 +2031,7 @@ static int vp4_mc_loop_filter(Vp3DecodeContext *s, int plane, int motion_x, int 
              plane_height);
 
 #define safe_loop_filter(name, ptr, stride, bounding_values) \
-    if ((uintptr_t)(ptr) & 7) \
+    if (VP3_LOOP_FILTER_NO_UNALIGNED_SUPPORT && (uintptr_t)(ptr) & 7) \
         s->vp3dsp.name##_unaligned(ptr, stride, bounding_values); \
     else \
         s->vp3dsp.name(ptr, stride, bounding_values);
@@ -2385,7 +2385,7 @@ static av_cold int vp3_decode_init(AVCodecContext *avctx)
     avctx->chroma_sample_location = AVCHROMA_LOC_CENTER;
     ff_hpeldsp_init(&s->hdsp, avctx->flags | AV_CODEC_FLAG_BITEXACT);
     ff_videodsp_init(&s->vdsp, 8);
-    ff_vp3dsp_init(&s->vp3dsp, avctx->flags);
+    ff_vp3dsp_init(&s->vp3dsp);
 
     for (int i = 0; i < 64; i++) {
 #define TRANSPOSE(x) (((x) >> 3) | (((x) & 7) << 3))

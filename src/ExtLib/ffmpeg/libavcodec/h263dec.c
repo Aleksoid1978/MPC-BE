@@ -201,10 +201,12 @@ static int decode_slice(H263DecContext *const h)
 
     ff_set_qscale(&h->c, h->c.qscale);
 
+#if CONFIG_MPEG4_DECODER
     if (h->c.studio_profile) {
         if ((ret = ff_mpeg4_decode_studio_slice_header(h)) < 0)
             return ret;
     }
+#endif
 
     if (h->c.avctx->hwaccel) {
         const uint8_t *start = h->gb.buffer + get_bits_count(&h->gb) / 8;
@@ -215,12 +217,15 @@ static int decode_slice(H263DecContext *const h)
         return ret;
     }
 
+#if CONFIG_MPEG4_DECODER
     if (h->partitioned_frame) {
         const int qscale = h->c.qscale;
 
-        if (CONFIG_MPEG4_DECODER && h->c.codec_id == AV_CODEC_ID_MPEG4)
-            if ((ret = ff_mpeg4_decode_partitions(h)) < 0)
-                return ret;
+        av_assert1(h->c.codec_id == AV_CODEC_ID_MPEG4);
+
+        ret = ff_mpeg4_decode_partitions(h);
+        if (ret < 0)
+            return ret;
 
         /* restore variables which were modified */
         h->c.first_slice_line = 1;
@@ -228,6 +233,7 @@ static int decode_slice(H263DecContext *const h)
         h->c.mb_y             = h->c.resync_mb_y;
         ff_set_qscale(&h->c, qscale);
     }
+#endif
 
     for (; h->c.mb_y < h->c.mb_height; h->c.mb_y++) {
         /* per-row end of slice checks */
@@ -496,13 +502,15 @@ int ff_h263_decode_frame(AVCodecContext *avctx, AVFrame *pict,
 
     avctx->has_b_frames = !h->c.low_delay;
 
-    if (CONFIG_MPEG4_DECODER && avctx->codec_id == AV_CODEC_ID_MPEG4) {
+#if CONFIG_MPEG4_DECODER
+    if (avctx->codec_id == AV_CODEC_ID_MPEG4) {
         if (h->c.pict_type != AV_PICTURE_TYPE_B && h->c.mb_num/2 > get_bits_left(&h->gb))
             return AVERROR_INVALIDDATA;
         ff_mpeg4_workaround_bugs(avctx);
         if (h->c.studio_profile != (h->c.idsp.idct == NULL))
             ff_mpv_idct_init(s);
     }
+#endif
 
     /* After H.263 & MPEG-4 header decode we have the height, width,
      * and other parameters. So then we could init the picture. */
@@ -611,8 +619,10 @@ frame_end:
 
     ff_mpv_frame_end(s);
 
-    if (CONFIG_MPEG4_DECODER && avctx->codec_id == AV_CODEC_ID_MPEG4)
+#if CONFIG_MPEG4_DECODER
+    if (avctx->codec_id == AV_CODEC_ID_MPEG4)
         ff_mpeg4_frame_end(avctx, avpkt);
+#endif
 
     av_assert1(h->c.pict_type == h->c.cur_pic.ptr->f->pict_type);
     if (h->c.pict_type == AV_PICTURE_TYPE_B || h->c.low_delay) {

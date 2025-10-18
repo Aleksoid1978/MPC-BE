@@ -23,10 +23,9 @@
 
 %include "libavutil/x86/x86util.asm"
 
-SECTION_RODATA
-
 cextern pb_1
 cextern pb_80
+cextern pw_2
 
 SECTION .text
 
@@ -468,22 +467,25 @@ HF_NOISE 16
 ;---------------------------------------------------------------------------------------
 ;int ff_sad_<opt>(MPVEncContext *v, const uint8_t *pix1, const uint8_t *pix2, ptrdiff_t stride, int h);
 ;---------------------------------------------------------------------------------------
-;%1 = 8/16
-%macro SAD 1
-cglobal sad%1, 5, 5, 3, v, pix1, pix2, stride, h
+;%1 = 8/16, %2 = a/u (whether pix1 is aligned or not)
+%macro SAD 1-2
+%ifidn %2, u
+cglobal sad%1u, 5, 5, 5, v, pix1, pix2, stride, h
+%else
+cglobal sad%1,  5, 5, 3, v, pix1, pix2, stride, h
+%endif
     movu      m2, [pix2q]
     movu      m1, [pix2q+strideq]
+%ifidn %2, u
+    movu      m0, [pix1q]
+    movu      m3, [pix1q+strideq]
+    psadbw    m2, m0
+    psadbw    m1, m3
+%else
     psadbw    m2, [pix1q]
     psadbw    m1, [pix1q+strideq]
-    paddw     m2, m1
-%if %1 != mmsize
-    movu      m0, [pix2q+8]
-    movu      m1, [pix2q+strideq+8]
-    psadbw    m0, [pix1q+8]
-    psadbw    m1, [pix1q+strideq+8]
-    paddw     m2, m0
-    paddw     m2, m1
 %endif
+    paddw     m2, m1
     sub       hd, 2
 
 align 16
@@ -492,18 +494,17 @@ align 16
     lea    pix2q, [pix2q+strideq*2]
     movu      m0, [pix2q]
     movu      m1, [pix2q+strideq]
+%ifidn %2, u
+    movu      m3, [pix1q]
+    movu      m4, [pix1q+strideq]
+    psadbw    m0, m3
+    psadbw    m1, m4
+%else
     psadbw    m0, [pix1q]
     psadbw    m1, [pix1q+strideq]
-    paddw     m2, m0
-    paddw     m2, m1
-%if %1 != mmsize
-    movu      m0, [pix2q+8]
-    movu      m1, [pix2q+strideq+8]
-    psadbw    m0, [pix1q+8]
-    psadbw    m1, [pix1q+strideq+8]
-    paddw     m2, m0
-    paddw     m2, m1
 %endif
+    paddw     m2, m0
+    paddw     m2, m1
     sub       hd, 2
     jg .loop
 %if mmsize == 16
@@ -516,9 +517,9 @@ align 16
 
 INIT_MMX mmxext
 SAD 8
-SAD 16
 INIT_XMM sse2
 SAD 16
+SAD 16, u
 
 ;------------------------------------------------------------------------------------------
 ;int ff_sad_x2_<opt>(MPVEncContext *v, const uint8_t *pix1, const uint8_t *pix2, ptrdiff_t stride, int h);
@@ -540,16 +541,6 @@ cglobal sad%1_x2, 5, 5, 5, v, pix1, pix2, stride, h
     psadbw    m0, [pix1q]
     psadbw    m2, [pix1q+strideq]
     paddw     m0, m2
-%if %1 != mmsize
-    movu      m1, [pix2q+8]
-    movu      m2, [pix2q+strideq+8]
-    pavgb     m1, [pix2q+9]
-    pavgb     m2, [pix2q+strideq+9]
-    psadbw    m1, [pix1q+8]
-    psadbw    m2, [pix1q+strideq+8]
-    paddw     m0, m1
-    paddw     m0, m2
-%endif
     sub       hd, 2
 
 align 16
@@ -571,16 +562,6 @@ align 16
     psadbw    m2, [pix1q+strideq]
     paddw     m0, m1
     paddw     m0, m2
-%if %1 != mmsize
-    movu      m1, [pix2q+8]
-    movu      m2, [pix2q+strideq+8]
-    pavgb     m1, [pix2q+9]
-    pavgb     m2, [pix2q+strideq+9]
-    psadbw    m1, [pix1q+8]
-    psadbw    m2, [pix1q+strideq+8]
-    paddw     m0, m1
-    paddw     m0, m2
-%endif
     sub       hd, 2
     jg .loop
 %if mmsize == 16
@@ -593,7 +574,6 @@ align 16
 
 INIT_MMX mmxext
 SAD_X2 8
-SAD_X2 16
 INIT_XMM sse2
 SAD_X2 16
 
@@ -612,18 +592,6 @@ cglobal sad%1_y2, 5, 5, 4, v, pix1, pix2, stride, h
     psadbw    m0, [pix1q+strideq]
     paddw     m0, m1
     mova      m1, m3
-%if %1 != mmsize
-    movu      m4, [pix2q+8]
-    movu      m5, [pix2q+strideq+8]
-    movu      m6, [pix2q+2*strideq+8]
-    pavgb     m4, m5
-    pavgb     m5, m6
-    psadbw    m4, [pix1q+8]
-    psadbw    m5, [pix1q+strideq+8]
-    paddw     m0, m4
-    paddw     m0, m5
-    mova      m4, m6
-%endif
     add    pix2q, strideq
     sub       hd, 2
 
@@ -640,17 +608,6 @@ align 16
     paddw     m0, m1
     paddw     m0, m2
     mova      m1, m3
-%if %1 != mmsize
-    movu      m5, [pix2q+8]
-    movu      m6, [pix2q+strideq+8]
-    pavgb     m4, m5
-    pavgb     m5, m6
-    psadbw    m4, [pix1q+8]
-    psadbw    m5, [pix1q+strideq+8]
-    paddw     m0, m4
-    paddw     m0, m5
-    mova      m4, m6
-%endif
     sub       hd, 2
     jg .loop
 %if mmsize == 16
@@ -663,9 +620,104 @@ align 16
 
 INIT_MMX mmxext
 SAD_Y2 8
-SAD_Y2 16
 INIT_XMM sse2
 SAD_Y2 16
+
+;------------------------------------------------------------------------------------------
+;int ff_sad_xy2_<opt>(MPVEncContext *v, const uint8_t *pix1, const uint8_t *pix2, ptrdiff_t stride, int h);
+;------------------------------------------------------------------------------------------
+
+;%1 = 8/16, %2 = aligned mov, %3 = unaligned mov
+%macro SAD_XY2 3
+cglobal sad%1_xy2, 5, 5, mmsize == 16 ? 8 + ARCH_X86_64 : 7, v, pix1, pix2, stride, h
+    mov%3     m2, [pix2q]
+    mov%3     m3, [pix2q+1]
+%if %1 == mmsize
+%if ARCH_X86_64
+    mova      m8, [pw_2]
+    %define PW_2 m8
+%else
+    %define PW_2 [pw_2]
+%endif
+%else ; %1 != mmsize
+    mova      m6, [pw_2]
+    %define PW_2 m6
+%endif
+    pxor      m1, m1
+    add    pix2q, strideq
+%if %1 != mmsize/2
+    mova      m6, m2
+    mova      m7, m3
+    punpckhbw m6, m1
+    punpckhbw m7, m1
+    paddw     m6, m7
+%endif
+    punpcklbw m2, m1
+    punpcklbw m3, m1
+    paddw     m2, m3
+    mova      m0, m1
+
+.loop:
+    mov%3     m3, [pix2q]
+    mov%3     m4, [pix2q+1]
+%if %1 != mmsize/2
+    mova      m5, m3
+    mova      m7, m4
+    punpckhbw m5, m1
+    punpckhbw m7, m1
+    paddw     m7, m5
+    paddw     m7, PW_2
+    paddw     m6, m7
+    psraw     m6, 2
+%endif
+    mov%2     m5, [pix1q]
+    punpcklbw m3, m1
+    punpcklbw m4, m1
+    paddw     m3, m4
+    paddw     m3, PW_2
+    paddw     m2, m3
+    psraw     m2, 2
+    packuswb  m2, m6
+    psadbw    m2, m5
+    paddw     m0, m2
+
+    mov%3     m2, [pix2q+strideq]
+    mov%3     m4, [pix2q+strideq+1]
+%if %1 != mmsize/2
+    mova      m5, m2
+    mova      m6, m4
+    punpckhbw m5, m1
+    punpckhbw m6, m1
+    paddw     m6, m5
+    paddw     m7, m6
+    psraw     m7, 2
+%endif
+    mov%2     m5, [pix1q+strideq]
+    punpcklbw m2, m1
+    punpcklbw m4, m1
+    paddw     m2, m4
+    paddw     m3, m2
+    psraw     m3, 2
+    packuswb  m3, m7
+    psadbw    m3, m5
+    paddw     m0, m3
+
+    sub       hd, 2
+    lea    pix1q, [pix1q+2*strideq]
+    lea    pix2q, [pix2q+2*strideq]
+    jnz    .loop
+
+%if %1 == 16
+    movhlps   m1, m0
+    paddw     m0, m1
+%endif
+    movd     eax, m0
+    RET
+%endmacro
+
+INIT_XMM sse2
+SAD_XY2  8, h, h
+SAD_XY2 16, a, u
 
 ;-------------------------------------------------------------------------------------------
 ;int ff_sad_approx_xy2_<opt>(MPVEncContext *v, const uint8_t *pix1, const uint8_t *pix2, ptrdiff_t stride, int h);
@@ -696,22 +748,6 @@ cglobal sad%1_approx_xy2, 5, 5, 7, v, pix1, pix2, stride, h
     psadbw    m0, [pix1q+strideq]
     paddw     m0, m1
     mova      m1, m3
-%if %1 != mmsize
-    movu      m5, [pix2q+8]
-    movu      m6, [pix2q+strideq+8]
-    movu      m7, [pix2q+2*strideq+8]
-    pavgb     m5, [pix2q+1+8]
-    pavgb     m6, [pix2q+strideq+1+8]
-    pavgb     m7, [pix2q+2*strideq+1+8]
-    psubusb   m6, m4
-    pavgb     m5, m6
-    pavgb     m6, m7
-    psadbw    m5, [pix1q+8]
-    psadbw    m6, [pix1q+strideq+8]
-    paddw     m0, m5
-    paddw     m0, m6
-    mova      m5, m7
-%endif
     add    pix2q, strideq
     sub       hd, 2
 
@@ -738,20 +774,6 @@ align 16
     paddw     m0, m1
     paddw     m0, m2
     mova      m1, m3
-%if %1 != mmsize
-    movu      m6, [pix2q+8]
-    movu      m7, [pix2q+strideq+8]
-    pavgb     m6, [pix2q+8+1]
-    pavgb     m7, [pix2q+strideq+8+1]
-    psubusb   m6, m4
-    pavgb     m5, m6
-    pavgb     m6, m7
-    psadbw    m5, [pix1q+8]
-    psadbw    m6, [pix1q+strideq+8]
-    paddw     m0, m5
-    paddw     m0, m6
-    mova      m5, m7
-%endif
     sub       hd, 2
     jg .loop
 %if mmsize == 16
@@ -764,7 +786,6 @@ align 16
 
 INIT_MMX mmxext
 SAD_APPROX_XY2 8
-SAD_APPROX_XY2 16
 INIT_XMM sse2
 SAD_APPROX_XY2 16
 
@@ -772,46 +793,26 @@ SAD_APPROX_XY2 16
 ;int ff_vsad_intra(MPVEncContext *v, const uint8_t *pix1, const uint8_t *pix2,
 ;                  ptrdiff_t line_size, int h);
 ;--------------------------------------------------------------------
-; %1 = 8/16
-%macro VSAD_INTRA 1
-cglobal vsad_intra%1, 5, 5, 3, v, pix1, pix2, lsize, h
-    mova      m0, [pix1q]
-%if %1 == mmsize
-    mova      m2, [pix1q+lsizeq]
-    psadbw    m0, m2
+; %1 = 8/16, %2 = a/u (whether pix1 is aligned or not)
+%macro VSAD_INTRA 2
+%ifidn %2, u
+cglobal vsad_intra%1u, 5, 5, 3, v, pix1, pix2, lsize, h
 %else
-    mova      m2, [pix1q+lsizeq]
-    mova      m3, [pix1q+8]
-    mova      m4, [pix1q+lsizeq+8]
-    psadbw    m0, m2
-    psadbw    m3, m4
-    paddw     m0, m3
+cglobal vsad_intra%1,  5, 5, 3, v, pix1, pix2, lsize, h
 %endif
+    mov%2     m0, [pix1q]
+    mov%2     m2, [pix1q+lsizeq]
+    psadbw    m0, m2
     sub       hd, 2
 
 .loop:
     lea    pix1q, [pix1q + 2*lsizeq]
-%if %1 == mmsize
-    mova      m1, [pix1q]
+    mov%2     m1, [pix1q]
     psadbw    m2, m1
     paddw     m0, m2
-    mova      m2, [pix1q+lsizeq]
+    mov%2     m2, [pix1q+lsizeq]
     psadbw    m1, m2
     paddw     m0, m1
-%else
-    mova      m1, [pix1q]
-    mova      m3, [pix1q+8]
-    psadbw    m2, m1
-    psadbw    m4, m3
-    paddw     m0, m2
-    paddw     m0, m4
-    mova      m2, [pix1q+lsizeq]
-    mova      m4, [pix1q+lsizeq+8]
-    psadbw    m1, m2
-    psadbw    m3, m4
-    paddw     m0, m1
-    paddw     m0, m3
-%endif
     sub       hd, 2
     jg     .loop
 
@@ -824,22 +825,25 @@ cglobal vsad_intra%1, 5, 5, 3, v, pix1, pix2, lsize, h
 %endmacro
 
 INIT_MMX mmxext
-VSAD_INTRA 8
-VSAD_INTRA 16
+VSAD_INTRA  8, a
 INIT_XMM sse2
-VSAD_INTRA 16
+VSAD_INTRA 16, a
+VSAD_INTRA 16, u
 
 ;---------------------------------------------------------------------
 ;int ff_vsad_approx(MPVEncContext *v, const uint8_t *pix1, const uint8_t *pix2,
 ;                   ptrdiff_t line_size, int h);
 ;---------------------------------------------------------------------
-; %1 = 8/16
-%macro VSAD_APPROX 1
-cglobal vsad%1_approx, 5, 5, 5, v, pix1, pix2, lsize, h
+; %1 = 8/16, %2 = a/u (whether pix1 is aligned or not)
+%macro VSAD_APPROX 2
+%ifidn %2, u
+cglobal vsad%1u_approx, 5, 5, 5, v, pix1, pix2, lsize, h
+%else
+cglobal vsad%1_approx,  5, 5, 5, v, pix1, pix2, lsize, h
+%endif
     mova   m1, [pb_80]
-    mova   m0, [pix1q]
-%if %1 == mmsize ; vsad8_mmxext, vsad16_sse2
-    mova   m4, [pix1q+lsizeq]
+    mov%2  m0, [pix1q]
+    mov%2  m4, [pix1q+lsizeq]
 %if mmsize == 16
     movu   m3, [pix2q]
     movu   m2, [pix2q+lsizeq]
@@ -852,29 +856,12 @@ cglobal vsad%1_approx, 5, 5, 5, v, pix1, pix2, lsize, h
     pxor   m0, m1
     pxor   m4, m1
     psadbw m0, m4
-%else ; vsad16_mmxext
-    mova   m3, [pix1q+8]
-    psubb  m0, [pix2q]
-    psubb  m3, [pix2q+8]
-    pxor   m0, m1
-    pxor   m3, m1
-    mova   m4, [pix1q+lsizeq]
-    mova   m5, [pix1q+lsizeq+8]
-    psubb  m4, [pix2q+lsizeq]
-    psubb  m5, [pix2q+lsizeq+8]
-    pxor   m4, m1
-    pxor   m5, m1
-    psadbw m0, m4
-    psadbw m3, m5
-    paddw  m0, m3
-%endif
     sub    hd, 2
 
 .loop:
     lea pix1q, [pix1q + 2*lsizeq]
     lea pix2q, [pix2q + 2*lsizeq]
-    mova   m2, [pix1q]
-%if %1 == mmsize ; vsad8_mmxext, vsad16_sse2
+    mov%2  m2, [pix1q]
 %if mmsize == 16
     movu   m3, [pix2q]
     psubb  m2, m3
@@ -884,33 +871,12 @@ cglobal vsad%1_approx, 5, 5, 5, v, pix1, pix2, lsize, h
     pxor   m2, m1
     psadbw m4, m2
     paddw  m0, m4
-    mova   m4, [pix1q+lsizeq]
+    mov%2  m4, [pix1q+lsizeq]
     movu   m3, [pix2q+lsizeq]
     psubb  m4, m3
     pxor   m4, m1
     psadbw m2, m4
     paddw  m0, m2
-%else ; vsad16_mmxext
-    mova   m3, [pix1q+8]
-    psubb  m2, [pix2q]
-    psubb  m3, [pix2q+8]
-    pxor   m2, m1
-    pxor   m3, m1
-    psadbw m4, m2
-    psadbw m5, m3
-    paddw  m0, m4
-    paddw  m0, m5
-    mova   m4, [pix1q+lsizeq]
-    mova   m5, [pix1q+lsizeq+8]
-    psubb  m4, [pix2q+lsizeq]
-    psubb  m5, [pix2q+lsizeq+8]
-    pxor   m4, m1
-    pxor   m5, m1
-    psadbw m2, m4
-    psadbw m3, m5
-    paddw  m0, m2
-    paddw  m0, m3
-%endif
     sub    hd, 2
     jg  .loop
 
@@ -923,7 +889,7 @@ cglobal vsad%1_approx, 5, 5, 5, v, pix1, pix2, lsize, h
 %endmacro
 
 INIT_MMX mmxext
-VSAD_APPROX 8
-VSAD_APPROX 16
+VSAD_APPROX 8,  a
 INIT_XMM sse2
-VSAD_APPROX 16
+VSAD_APPROX 16, a
+VSAD_APPROX 16, u
