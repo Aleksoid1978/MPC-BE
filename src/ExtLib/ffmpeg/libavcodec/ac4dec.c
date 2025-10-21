@@ -598,7 +598,7 @@ static const AVChannelLayout channel_mode_layouts[] = {
     {
         .nb_channels = 12,
         .order = AV_CHANNEL_ORDER_NATIVE,
-        .u.mask = AV_CH_LAYOUT_7POINT0_FRONT | AV_CH_LOW_FREQUENCY |
+        .u.mask = AV_CH_LAYOUT_7POINT0 | AV_CH_LOW_FREQUENCY |
                   AV_CH_TOP_FRONT_LEFT | AV_CH_TOP_FRONT_RIGHT |
                   AV_CH_TOP_BACK_LEFT | AV_CH_TOP_BACK_RIGHT,
     },
@@ -890,38 +890,17 @@ static int emdf_payloads_substream_info(AC4DecodeContext *s, EMDFInfo *e)
 static int emdf_protection(AC4DecodeContext *s, EMDFInfo *e)
 {
     GetBitContext *gb = &s->gbc;
-    int first, second;
+    int first, second, skip = 0;
 
     first = get_bits(gb, 2);
     second = get_bits(gb, 2);
 
-    switch (first) {
-    case 0:
-        break;
-    case 1:
-        skip_bits(gb, 8);
-        break;
-    case 2:
-        skip_bits_long(gb, 32);
-        break;
-    case 3:
-        skip_bits_long(gb, 128);
-        break;
-    }
+    if (first > 0)
+        skip += 1 << (2 * (first - 1));
+    if (second > 0)
+        skip += 1 << (2 * (second - 1));
 
-    switch (second) {
-    case 0:
-        break;
-    case 1:
-        skip_bits(gb, 8);
-        break;
-    case 2:
-        skip_bits_long(gb, 32);
-        break;
-    case 3:
-        skip_bits_long(gb, 128);
-        break;
-    }
+    skip_bits_long(gb, 8 * skip);
 
     return 0;
 }
@@ -1508,6 +1487,7 @@ static int ac4_presentation_v1_info(AC4DecodeContext *s, PresentationInfo *p)
 
     if (single_substream_group != 1 && p->presentation_config == 6) {
         p->add_emdf_substreams = 1;
+        av_log(s->avctx, AV_LOG_DEBUG, "add_emdf_substreams\n");
     } else {
         if (s->version != 1)
             p->mdcompat = get_bits(gb, 3);
@@ -1524,6 +1504,7 @@ static int ac4_presentation_v1_info(AC4DecodeContext *s, PresentationInfo *p)
 
         if (single_substream_group == 1) {
             ac4_sgi_specifier(s, &s->ssgroup[0]);
+            av_log(s->avctx, AV_LOG_DEBUG, "single substream group\n");
             p->n_substream_groups = 1;
         } else {
             p->multi_pid = get_bits1(gb);
@@ -4134,7 +4115,7 @@ static int mono_data(AC4DecodeContext *s, Substream *ss,
 }
 
 static int two_channel_data(AC4DecodeContext *s, Substream *ss,
-                            uint8_t ch_id[2], int x, int iframe)
+                            const uint8_t ch_id[2], int x, int iframe)
 {
     SubstreamChannel *ssch0 = &ss->ssch[ch_id[0]];
     SubstreamChannel *ssch1 = &ss->ssch[ch_id[1]];
@@ -4227,23 +4208,47 @@ static int three_channel_data(AC4DecodeContext *s, Substream *ss,
 
 static int immers_cfg(AC4DecodeContext *s, Substream *ss)
 {
-    if (ss->codec_mode != IM_SCPL)
+    if (ss->im_codec_mode != IM_SCPL)
         aspx_config(s, ss);
 
-    if (ss->codec_mode == IM_ASPX_ACPL_1)
+    if (ss->im_codec_mode == IM_ASPX_ACPL_1)
         acpl_config_1ch(s, ss, ACPL_PARTIAL);
 
-    if (ss->codec_mode == IM_ASPX_ACPL_2)
+    if (ss->im_codec_mode == IM_ASPX_ACPL_2)
         acpl_config_1ch(s, ss, ACPL_FULL);
 
     return 0;
 }
+
+static const uint8_t immersive_ch_index[2][2][2] = {
+    {
+        { 0, 1 },
+        { 3, 4 },
+    },
+    {
+        { 0, 3 },
+        { 1, 4 },
+    },
+};
 
 static int immersive_channel_element(AC4DecodeContext *s, int lfe, int fronts, int iframe)
 {
     GetBitContext *gb = &s->gbc;
     Substream *ss = &s->substream;
     int ret;
+
+    s->ch_map[AV_CHAN_FRONT_LEFT]      = 0;
+    s->ch_map[AV_CHAN_FRONT_RIGHT]     = 1;
+    s->ch_map[AV_CHAN_FRONT_CENTER]    = 2;
+    s->ch_map[AV_CHAN_LOW_FREQUENCY]   = 7;
+    s->ch_map[AV_CHAN_SIDE_LEFT]       = 3;
+    s->ch_map[AV_CHAN_SIDE_RIGHT]      = 4;
+    s->ch_map[AV_CHAN_BACK_LEFT]       = 5;
+    s->ch_map[AV_CHAN_BACK_RIGHT]      = 6;
+    s->ch_map[AV_CHAN_TOP_FRONT_LEFT]  = 8;
+    s->ch_map[AV_CHAN_TOP_FRONT_RIGHT] = 9;
+    s->ch_map[AV_CHAN_TOP_BACK_LEFT]   = 10;
+    s->ch_map[AV_CHAN_TOP_BACK_RIGHT]  = 11;
 
     ss->im_codec_mode = get_bits1(gb);
     if (!ss->im_codec_mode)
@@ -4269,13 +4274,13 @@ static int immersive_channel_element(AC4DecodeContext *s, int lfe, int fronts, i
     switch (ss->core_5ch_grouping) {
     case 0:
         ss->mode_2ch = get_bits1(gb);
-        ret = two_channel_data(s, ss, (uint8_t []){0, 1}, 0, iframe);
+        ret = two_channel_data(s, ss, immersive_ch_index[ss->mode_2ch][0], 0, iframe);
         if (ret < 0)
             return ret;
-        ret = two_channel_data(s, ss, (uint8_t []){2, 3}, 1, iframe);
+        ret = two_channel_data(s, ss, immersive_ch_index[ss->mode_2ch][1], 1, iframe);
         if (ret < 0)
             return ret;
-        ret = mono_data(s, ss, 4, 0, iframe);
+        ret = mono_data(s, ss, 2, 0, iframe);
         break;
     case 1:
         ret = three_channel_data(s, ss, (uint8_t []){0, 1, 2}, iframe);
@@ -4309,11 +4314,11 @@ static int immersive_channel_element(AC4DecodeContext *s, int lfe, int fronts, i
             ret = chparam_info(s, ss, 6);
             if (ret < 0)
                 return ret;
-
-            ret = two_channel_data(s, ss, (uint8_t []){5, 6}, 2, iframe);
-            if (ret < 0)
-                return ret;
         }
+
+        ret = two_channel_data(s, ss, (uint8_t []){5, 6}, 2, iframe);
+        if (ret < 0)
+            return ret;
     }
 
     if (ss->im_codec_mode == IM_ASPX_SCPL) {
@@ -4350,17 +4355,17 @@ static int immersive_channel_element(AC4DecodeContext *s, int lfe, int fronts, i
         ret = aspx_data_2ch(s, ss, (uint8_t []){0, 1}, iframe);
         if (ret < 0)
             return ret;
-        ret = aspx_data_2ch(s, ss, (uint8_t []){2, 3}, iframe);
+        ret = aspx_data_2ch(s, ss, (uint8_t []){3, 4}, iframe);
         if (ret < 0)
             return ret;
 
         if (ss->im_codec_mode != IM_ASPX_AJCC) {
-            ret = aspx_data_2ch(s, ss, (uint8_t []){4, 5}, iframe);
+            ret = aspx_data_2ch(s, ss, (uint8_t []){5, 6}, iframe);
             if (ret < 0)
                 return ret;
         }
 
-        ret = aspx_data_1ch(s, ss, 6, iframe);
+        ret = aspx_data_1ch(s, ss, 2, iframe);
         if (ret < 0)
             return ret;
     }

@@ -566,11 +566,7 @@ HRESULT CFFAudioDecoder::ReceiveData(std::vector<BYTE>& BuffOut, size_t& outputS
 {
 	HRESULT hr = E_FAIL;
 	const int ret = avcodec_receive_frame(m_pAVCtx, m_pFrame);
-	if (m_pAVCtx->ch_layout.nb_channels > 8 && !m_bNeedMix) {
-		// sometimes avcodec_receive_frame() cannot identify the garbage and produces incorrect data.
-		// this code does not solve the problem, it only reduces the likelihood of crash.
-		// do it better!
-	} else if (ret >= 0) {
+	if (ret >= 0) {
 		rtStart = m_pFrame->pkt_dts;
 		m_pFilter->ClearCacheTimeStamp();
 
