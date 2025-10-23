@@ -385,11 +385,21 @@ typedef struct SubstreamInfo {
     int     back_channels_present;
     int     centre_present;
     int     top_channels_present;
+
+    int lfe;
+    int static_dmx;
+    int audio_ndot[4];
+    int n_fullband_dmx_signals;
+    int n_fullband_upmix_signals;
+
+    int n_objects;
+
     Metadata meta;
 } SubstreamInfo;
 
 typedef struct SubstreamGroupInfo {
     int           channel_coded;
+    int           ajoc;
     int           group_index;
     SubstreamInfo ssinfo;
 } SubstreamGroupInfo;
@@ -413,7 +423,7 @@ typedef struct PresentationInfo {
     int     hsf_ext;
     EMDFInfo emdf[32];
     PresentationSubstreamInfo psinfo;
-    SubstreamInfo ssinfo;
+    SubstreamInfo ssinfo[4];
 } PresentationInfo;
 
 typedef struct AC4DecodeContext {
@@ -463,8 +473,8 @@ typedef struct AC4DecodeContext {
     DECLARE_ALIGNED(32, float, cos_stab)[MAX_QMF_BANDS*2][MAX_QMF_BANDS];
     DECLARE_ALIGNED(32, float, sin_stab)[MAX_QMF_BANDS*2][MAX_QMF_BANDS];
 
-    PresentationInfo   pinfo[8];
-    SubstreamGroupInfo ssgroup[8];
+    PresentationInfo   pinfo[16];
+    SubstreamGroupInfo ssgroup[16];
     Substream          substream;
 } AC4DecodeContext;
 
@@ -539,25 +549,6 @@ enum ACPLDataType {
     GAMMA4,
     GAMMA5,
     GAMMA6,
-};
-
-static const AVRational resampling_ratios[] = {
-    {25025, 24000},
-    {25, 24},
-    {15, 16},
-    {25025, 24000},
-    {25, 24},
-    {25025, 24000},
-    {25, 24},
-    {15, 16},
-    {25025, 24000},
-    {25, 24},
-    {15, 16},
-    {25025, 24000},
-    {25, 24},
-    {1, 1},
-    {1, 1},
-    {1, 1},
 };
 
 static const uint16_t decode_delays[] = {
@@ -1028,9 +1019,9 @@ static int ac4_presentation_info(AC4DecodeContext *s, PresentationInfo *p)
     p->single_substream = get_bits1(gb);
     if (p->single_substream != 1) {
         p->presentation_config = get_bits(gb, 3);
-        if (p->presentation_config == 0x7) {
+        if (p->presentation_config == 7)
             p->presentation_config += variable_bits(gb, 2);
-        }
+        av_log(s->avctx, AV_LOG_DEBUG, "presentation config: %d\n", p->presentation_config);
     }
 
     p->presentation_version = get_unary(gb, 0, 31);
@@ -1051,22 +1042,31 @@ static int ac4_presentation_info(AC4DecodeContext *s, PresentationInfo *p)
         emdf_info(s, &p->emdf[0]);
 
         if (p->single_substream == 1) {
-            ret = ac4_substream_info(s, p, &p->ssinfo);
+            ret = ac4_substream_info(s, p, &p->ssinfo[0]);
             if (ret < 0)
                 return ret;
         } else {
             p->hsf_ext = get_bits1(gb);
             switch (p->presentation_config) {
             case 0:
-                ret = ac4_substream_info(s, p, &p->ssinfo);
+                ret = ac4_substream_info(s, p, &p->ssinfo[0]);
                 if (ret < 0)
                     return ret;
-                ret = ac4_hsf_ext_substream_info(s, &p->ssinfo, 1);
+                if (p->hsf_ext) {
+                    ret = ac4_hsf_ext_substream_info(s, &p->ssinfo[0], 1);
+                    if (ret < 0)
+                        return ret;
+                }
+                ret = ac4_substream_info(s, p, &p->ssinfo[1]);
                 if (ret < 0)
                     return ret;
-                ret = ac4_substream_info(s, p, &p->ssinfo);
-                if (ret < 0)
-                    return ret;
+                break;
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+                //FIXME
                 break;
             default:
                 presentation_config_ext_info(s);
@@ -1295,28 +1295,27 @@ static void ac4_oamd_common_data(AC4DecodeContext *s)
 static int ac4_substream_info_ajoc(AC4DecodeContext *s, SubstreamInfo *ssi, int substreams_present)
 {
     GetBitContext *gb = &s->gbc;
-    int n_fullband_dmx_signals;
-    int n_fullband_upmix_signals;
 
-    skip_bits1(gb); //b_lfe
+    ssi->lfe = get_bits1(gb);
+    ssi->static_dmx = get_bits1(gb);
 
-    if (get_bits1(gb)) { // b_static_dmx
-        n_fullband_dmx_signals = 5;
+    if (ssi->static_dmx) {
+        ssi->n_fullband_dmx_signals = 5;
     } else {
-        n_fullband_dmx_signals = get_bits(gb, 4) + 1;
-        ac4_bed_dyn_obj_assignment(s, n_fullband_dmx_signals);
+        ssi->n_fullband_dmx_signals = get_bits(gb, 4) + 1;
+        ac4_bed_dyn_obj_assignment(s, ssi->n_fullband_dmx_signals);
     }
 
     if (get_bits1(gb)) //b_oamd_common_data_present
         ac4_oamd_common_data(s);
 
-    n_fullband_upmix_signals = get_bits(gb, 4) + 1;
-    if (n_fullband_upmix_signals == 16)
-        n_fullband_upmix_signals += variable_bits(gb, 3);
-    if (n_fullband_upmix_signals > 4096) /* arbitary value to prevent slowdowns */
+    ssi->n_fullband_upmix_signals = get_bits(gb, 4) + 1;
+    if (ssi->n_fullband_upmix_signals == 16)
+        ssi->n_fullband_upmix_signals += variable_bits(gb, 3);
+    if (ssi->n_fullband_upmix_signals > 4096) /* arbitary value to prevent slowdowns */
         return AVERROR_INVALIDDATA;
 
-    ac4_bed_dyn_obj_assignment(s, n_fullband_upmix_signals);
+    ac4_bed_dyn_obj_assignment(s, ssi->n_fullband_upmix_signals);
 
     if (s->fs_index == 1) {
         if (get_bits1(gb)) //b_sf_multiplier;
@@ -1326,9 +1325,8 @@ static int ac4_substream_info_ajoc(AC4DecodeContext *s, SubstreamInfo *ssi, int 
     if (get_bits1(gb)) //b_bitrate_info;
         ssi->bitrate_indicator = get_vlc2(gb, bitrate_indicator_vlc.table, bitrate_indicator_vlc.bits, 1);
 
-    for (int i = 0; i < s->pinfo[0].frame_rate_factor; i++) {
-        skip_bits1(gb); //b_audio_ndot
-    }
+    for (int i = 0; i < s->pinfo[0].frame_rate_factor; i++)
+        ssi->audio_ndot[i] = get_bits1(gb);
 
     if (substreams_present) {
        ssi->substream_index = get_bits(gb, 2);
@@ -1339,11 +1337,25 @@ static int ac4_substream_info_ajoc(AC4DecodeContext *s, SubstreamInfo *ssi, int 
     return 0;
 }
 
-static void ac4_substream_info_obj(AC4DecodeContext *s, SubstreamInfo *ssi, int substreams_present)
+static int ac4_substream_info_obj(AC4DecodeContext *s, SubstreamInfo *ssi, int substreams_present)
 {
     GetBitContext *gb = &s->gbc;
+    int n_objects_code;
 
-    skip_bits(gb, 3); //n_objects_code
+    n_objects_code = get_bits(gb, 3);
+    switch (n_objects_code) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+        ssi->n_objects = ssi->lfe + n_objects_code;
+        break;
+    case 4:
+        ssi->n_objects = ssi->lfe + 5;
+        break;
+    default:
+        return AVERROR_INVALIDDATA;
+    }
 
     if (get_bits1(gb)) { //b_dynamic_objects;
         skip_bits1(gb); //b_lfe
@@ -1389,6 +1401,8 @@ static void ac4_substream_info_obj(AC4DecodeContext *s, SubstreamInfo *ssi, int 
        if (ssi->substream_index == 3)
            ssi->substream_index += variable_bits(gb, 2);
     }
+
+    return 0;
 }
 
 static int ac4_substream_group_info(AC4DecodeContext *s,
@@ -1415,6 +1429,7 @@ static int ac4_substream_group_info(AC4DecodeContext *s,
     }
 
     g->channel_coded = get_bits1(gb);
+    g->ajoc = 0;
     if (g->channel_coded) {
         for (int sus = 0; sus < n_lf_substreams; sus++) {
             if (s->version == 1) {
@@ -1434,6 +1449,7 @@ static int ac4_substream_group_info(AC4DecodeContext *s,
             oamd_substream_info(s, g, substreams_present);
         for (int sus = 0; sus < n_lf_substreams; sus++) {
             if (get_bits1(gb)) {
+                g->ajoc = 1;
                 if ((ret = ac4_substream_info_ajoc(s, &g->ssinfo, substreams_present)) < 0)
                     return ret;
             } else {
@@ -1668,7 +1684,7 @@ static int ac4_toc(AC4DecodeContext *s)
                 return ret;
         }
 
-        if (s->total_groups > FF_ARRAY_ELEMS(s->ssgroup))
+        if (s->total_groups + 1 >= FF_ARRAY_ELEMS(s->ssgroup))
             return AVERROR_INVALIDDATA;
 
         av_log(s->avctx, AV_LOG_DEBUG, "total_groups: %d\n", s->total_groups + 1);
@@ -4789,7 +4805,9 @@ static int audio_data(AC4DecodeContext *s, int channel_mode, int iframe)
     return ret;
 }
 
-static int ac4_substream(AC4DecodeContext *s, SubstreamInfo *ssinfo,
+static int ac4_substream(AC4DecodeContext *s,
+                         SubstreamGroupInfo *ssginfo,
+                         SubstreamInfo *ssinfo,
                          int substream_size)
 {
     GetBitContext *gb = &s->gbc;
@@ -4809,7 +4827,17 @@ static int ac4_substream(AC4DecodeContext *s, SubstreamInfo *ssinfo,
     align_get_bits(gb);
 
     offset = get_bits_count(gb) >> 3;
-    ret = audio_data(s, ssinfo->channel_mode, ssinfo->iframe[0]);
+    if (ssginfo->channel_coded) {
+        ret = audio_data(s, ssinfo->channel_mode, ssinfo->iframe[0]);
+    } else {
+        if (ssginfo->ajoc) {
+            //audio_data_ajoc();
+        } else {
+            //audio_data_objs();
+        }
+
+        ret = AVERROR_PATCHWELCOME;
+    }
     if (ret < 0)
         return ret;
 
@@ -6575,7 +6603,7 @@ static int ac4_decode_frame(AVCodecContext *avctx, AVFrame *frame,
     }
 
     presentation = FFMIN(s->target_presentation, FFMAX(0, s->nb_presentations - 1));
-    ssinfo = s->version == 2 ? &s->ssgroup[0].ssinfo : &s->pinfo[presentation].ssinfo;
+    ssinfo = s->version == 2 ? &s->ssgroup[0].ssinfo : &s->pinfo[presentation].ssinfo[0];
     avctx->sample_rate = s->fs_index ? 48000 : 44100;
 
     if (ssinfo->channel_mode >= FF_ARRAY_ELEMS(channel_mode_layouts)) {
@@ -6598,7 +6626,7 @@ static int ac4_decode_frame(AVCodecContext *avctx, AVFrame *frame,
 
         switch (substream_type) {
         case ST_SUBSTREAM:
-            ret = ac4_substream(s, ssinfo, s->substream_size[i]);
+            ret = ac4_substream(s, &s->ssgroup[0], ssinfo, s->substream_size[i]);
             break;
         case ST_PRESENTATION:
             skip_bits_long(gb, s->substream_size[i] * 8);
