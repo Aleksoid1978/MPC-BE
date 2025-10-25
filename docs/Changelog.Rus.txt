@@ -48,7 +48,7 @@ YouTube
 Обновлен японский перевод (автор tsubasanouta).
 
 Обновлены библиотеки:
-	ffmpeg n8.1-dev-839-ged007ad427;
+	ffmpeg n8.1-dev-878-g7b5b29910a;
 	Little-CMS git-lcms2.17-46-g5cdf304;
 	MediaInfo git-v25.09-31-gc75d2c8ad;
 	ZenLib git-v0.4.41-85-g490e242.
