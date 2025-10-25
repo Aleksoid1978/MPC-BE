@@ -3035,8 +3035,13 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 bool CMainFrame::DoAfterPlaybackEvent()
 {
 	const CAppSettings& s = AfxGetAppSettings();
-
 	bool bExit = (s.nCLSwitches & CLSW_CLOSE) || s.fExitAfterPlayback;
+
+	auto ExitFullScreen = [&] {
+		if ((m_bFullScreen || IsD3DFullScreenMode()) && s.fExitFullScreenAtTheEnd) {
+			OnViewFullscreen();
+		}
+	};
 
 	if (s.nCLSwitches & CLSW_STANDBY) {
 		SetPrivilege(SE_SHUTDOWN_NAME);
@@ -3065,9 +3070,11 @@ bool CMainFrame::DoAfterPlaybackEvent()
 	if (bExit) {
 		SendMessageW(WM_COMMAND, ID_FILE_EXIT);
 	} else if (s.bCloseFileAfterPlayback) {
+		ExitFullScreen();
 		SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 		return true;
 	} else if (s.bCloseFileAfterPlaybackAndMinimize) {
+		ExitFullScreen();
 		SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 		ShowWindow(SW_MINIMIZE);
 		return true;
