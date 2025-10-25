@@ -6,7 +6,7 @@ the Software are granted under this license.
 
 The Clear BSD License
 
-Copyright (c) 2018-2024, Fraunhofer-Gesellschaft zur Förderung der angewandten Forschung e.V. & The VVdeC Authors.
+Copyright (c) 2018-2025, Fraunhofer-Gesellschaft zur Förderung der angewandten Forschung e.V. & The VVdeC Authors.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -408,7 +408,9 @@ typedef struct vvdecSeqInfo
 
   void*    reservedPtr_1;              // reserved space for future use
   void*    reservedPtr_2;              // ...
-  int64_t  reserved_1;                 // ...
+  uint32_t maxLatencyIncreasePlus1;    // max latency increase plus 1 across all temporal layers
+  uint8_t  maxNumReorderPics;          // max reorder pics across all temporal layers
+  int8_t   reserved_1[3];              // reserved (maintains 8-byte alignment)
   int64_t  reserved_2;                 // ...
 } vvdecSeqInfo;
 
