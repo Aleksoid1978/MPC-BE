@@ -18,6 +18,9 @@ Added support for Advanced Professional Video (APV).
 MatroskaSplitter
 Added support for Advanced Professional Video (APV).
 
+MpaDecFilter
+Updated AC-4 decoder.
+
 MPCVideoDec
 The D3D11 hardware decoder for HEVC 4:4:4 10/16 bit will not be used for madVR because the renderer does not support it.
 
@@ -28,6 +31,7 @@ Subtitles
 Implemented a workaround for a bug in some VSFilters where it resets the selected subtitle track after changing one of the subtitle files.
 
 Player
+Added the command "After Playback: Close file and minimize player"
 Various interface fixes.
 
 Installer
