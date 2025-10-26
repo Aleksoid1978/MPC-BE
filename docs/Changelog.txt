@@ -1,6 +1,6 @@
 ﻿This file includes only a short list of the changes between Media Player Classic - BE's versions.
 
-1.8.7.x dev
+1.8.8 - 2025-10-26
 =============================
 ShoutcastSource
 Fixed the display of radio station names.
