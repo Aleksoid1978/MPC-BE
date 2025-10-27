@@ -980,7 +980,7 @@ BEGIN MENU IDR_POPUPMAIN LINES 166
 164		"И&зход"
 END
 
-BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
+BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 21
 5		"-------- Веднъж --------"
 6		"Затвори програмата"
 7		"Премини в режим на изчакване (Стендбай)"
@@ -992,7 +992,7 @@ BEGIN MENU IDR_POPUP_AFTERPLAYBACK LINES 20
 13		"------- Всеки път -------"
 14		"Затвори програмата"
 15		"Затвори файла"
-16		"Затвори файла и минимизирай плеъра"
+16		"Close file and minimize player"
 17		"Премини към следващия в папката"
 18		"Премини към следващия в папката (цикъл)"
 19		"Не прави нищо"

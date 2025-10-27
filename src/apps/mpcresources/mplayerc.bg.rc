@@ -219,7 +219,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_MAINFRAME_ICON,5,5,21,20
     LTEXT           "MPC-BE",IDC_STATIC1,30,5,195,8,SS_NOPREFIX
-    CONTROL         "Copyright © 2002-2025, смотрите файл Authors.txt",IDC_AUTHORS_LINK,
+    CONTROL         "Copyright © 2002-2025, вижте файла Authors.txt",IDC_AUTHORS_LINK,
                     "SysLink",WS_TABSTOP,30,17,195,8
     LTEXT           "Версия:",IDC_VERSION,30,34,90,8
     LTEXT           "Компилатор MPC-BE:",IDC_STATIC,30,66,90,8
@@ -2452,7 +2452,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_SUBTITLES_SYSTEM_CODEPAGE "System code page - %u"
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "Системна кодова страница - %u"
     IDS_FRAME_HALF          "Половин размер"
     IDS_FRAME_NORMAL        "Нормален размер"
     IDS_FRAME_DOUBLE        "Двоен размер"
@@ -3431,7 +3431,7 @@ BEGIN
     IDS_ARS_EXCLUSIVE       "Ексклузивни"
     IDS_ARS_SHARED          "Споделени"
     IDS_ARS_BITEXACT_OUTPUT "Използване на побитов изход"
-    IDS_ARS_SYSTEM_LAYOUT_CHANNELS "Използване системна подредба на каналите"
+    IDS_ARS_SYSTEM_LAYOUT_CHANNELS "Използвай системна подредба на каналите"
     IDS_ARS_SOUND_DEVICE    "Звукова система:"
     IDS_ARS_RELEASE_DEVICE_IDLE "Отключване на устройството по време на изчакване"
     IDS_ARS_CROSSFEED       "Включено стерео crossfeed (за слушалки)"
@@ -3723,7 +3723,7 @@ BEGIN
     IDS_SATURATION_DEC      "Намаляване на насищането"
     IDS_RESET_COLOR         "Нулиране настройките на цветовете"
     IDS_AFTERPLAYBACK_CLOSE_FILE "В края на възпроизвеждането: винаги затваряйте файла"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "After Playback: Always close file and minimize player"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "След възпроизвеждане: винаги затваряй файла и минимизирай плеъра"
     IDS_UPDATE_ERROR_DATA   "Сървърът за обновяване връща неправилни данни.\n\nМоля, опитайте отново по-късно."
     IDS_USING_NEWER_VERSION "Използвате последната версия на %s."
     IDS_NEW_UPDATE_AVAILABLE  "По-нова версия %s found.\n\nИскате ли да посетите уебсайта на MPC-BE, за да го изтеглите?"

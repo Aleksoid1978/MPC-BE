@@ -2,6 +2,7 @@
 
 1.8.8.x dev
 =============================
+Updated Bulgarian translation (by jekovcar).
 
 
 1.8.8 - 2025-10-26
