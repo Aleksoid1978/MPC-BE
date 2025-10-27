@@ -436,7 +436,9 @@ namespace YoutubeDL
 							if (!youtubeAudioUrllistWithLanguages.empty()) {
 								auto it = youtubeAudioUrllistWithLanguages.find(defaultLanguage);
 								if (it == youtubeAudioUrllistWithLanguages.end()) {
-									it = youtubeAudioUrllistWithLanguages.find("en");
+									it = std::find_if(youtubeAudioUrllistWithLanguages.begin(), youtubeAudioUrllistWithLanguages.end(), [](const auto& pair){
+										return pair.first == "en-US" || pair.first == "en";
+									});
 									if (it == youtubeAudioUrllistWithLanguages.end()) {
 										it = youtubeAudioUrllistWithLanguages.begin();
 									}
