@@ -36,7 +36,7 @@ namespace YoutubeDL
 		const CStringW& ydlExePath, // input parameter
 		const int maxHeightOptions, // input parameter
 		const bool bMaximumQuality, // input parameter
-		const CStringA& lang,       // input parameter
+		CStringA lang,              // input parameter
 		Youtube::YoutubeFields& y_fields,
 		Youtube::YoutubeUrllist& youtubeUrllist,
 		Youtube::YoutubeUrllist& youtubeAudioUrllist,
@@ -291,7 +291,7 @@ namespace YoutubeDL
 					// Find default/preference audio language.
 					// yt-dlp can mark several languages as preferred, we choose the one with the highest "language_preference".
 					CStringA defaultLanguage = lang;
-					if (defaultLanguage == Youtube::kDefaultAudioLanguage) {
+					if (bIsYoutube) {
 						int defaultLanguagePreference = -1;
 
 						for (const auto& format : formats->GetArray()) {
@@ -434,13 +434,29 @@ namespace YoutubeDL
 					if (!bestUrl.IsEmpty()) {
 						if (bIsYoutube) {
 							if (!youtubeAudioUrllistWithLanguages.empty()) {
-								auto it = youtubeAudioUrllistWithLanguages.find(defaultLanguage);
+								if (lang == Youtube::kDefaultAudioLanguage) {
+									lang = defaultLanguage;
+								}
+
+								auto it = youtubeAudioUrllistWithLanguages.find(lang);
 								if (it == youtubeAudioUrllistWithLanguages.end()) {
-									it = std::find_if(youtubeAudioUrllistWithLanguages.begin(), youtubeAudioUrllistWithLanguages.end(), [](const auto& pair){
-										return pair.first == "en-US" || pair.first == "en";
+									lang.AppendChar('-');
+									it = std::find_if(youtubeAudioUrllistWithLanguages.begin(), youtubeAudioUrllistWithLanguages.end(), [&lang](const auto& pair) {
+										return StartsWith(pair.first, lang);
 									});
 									if (it == youtubeAudioUrllistWithLanguages.end()) {
-										it = youtubeAudioUrllistWithLanguages.begin();
+										if (lang != defaultLanguage) {
+											it = youtubeAudioUrllistWithLanguages.find(defaultLanguage);
+										}
+
+										if (it == youtubeAudioUrllistWithLanguages.end()) {
+											it = std::find_if(youtubeAudioUrllistWithLanguages.begin(), youtubeAudioUrllistWithLanguages.end(), [](const auto& pair) {
+												return pair.first == "en-US" || pair.first == "en";
+											});
+											if (it == youtubeAudioUrllistWithLanguages.end()) {
+												it = youtubeAudioUrllistWithLanguages.begin();
+											}
+										}
 									}
 								}
 
