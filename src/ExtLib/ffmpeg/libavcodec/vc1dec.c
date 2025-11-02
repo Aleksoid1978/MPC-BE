@@ -468,9 +468,6 @@ av_cold int ff_vc1_decode_init(AVCodecContext *avctx)
     if (ret < 0)
         return ret;
 
-    ff_permute_scantable(s->intra_scantable.permutated, ff_wmv1_scantable[1],
-                         s->idsp.idct_permutation);
-
     ret = vc1_decode_init_alloc_tables(v);
     if (ret < 0) {
         vc1_decode_reset(avctx);
@@ -835,8 +832,11 @@ static int vc1_decode_frame(AVCodecContext *avctx, AVFrame *pict,
     if(s->avctx->flags & AV_CODEC_FLAG_LOW_DELAY)
         s->low_delay = 1;
 
+    if (buf_size >= 4 && AV_RB32(&buf[buf_size-4]) == VC1_CODE_ENDOFSEQ)
+        buf_size -= 4;
+
     /* no supplementary picture */
-    if (buf_size == 0 || (buf_size == 4 && AV_RB32(buf) == VC1_CODE_ENDOFSEQ)) {
+    if (buf_size == 0) {
         /* special case for last picture */
         if (s->low_delay == 0 && s->next_pic.ptr) {
             if ((ret = av_frame_ref(pict, s->next_pic.ptr->f)) < 0)
@@ -1380,12 +1380,7 @@ image:
     }
 
 end:
-    av_free(buf2);
-    for (i = 0; i < n_slices; i++)
-        av_free(slices[i].buf);
-    av_free(slices);
-    return buf_size;
-
+    ret = buf_size;
 err:
     av_free(buf2);
     for (i = 0; i < n_slices; i++)

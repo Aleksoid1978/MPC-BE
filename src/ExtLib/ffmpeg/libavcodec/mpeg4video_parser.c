@@ -27,6 +27,7 @@
 #include "mpegvideo.h"
 #include "mpeg4videodec.h"
 #include "mpeg4videodefs.h"
+#include "parser_internal.h"
 
 struct Mp4vParseContext {
     ParseContext pc;
@@ -155,10 +156,10 @@ static int mpeg4video_parse(AVCodecParserContext *s,
     return next;
 }
 
-const AVCodecParser ff_mpeg4video_parser = {
-    .codec_ids      = { AV_CODEC_ID_MPEG4 },
+const FFCodecParser ff_mpeg4video_parser = {
+    PARSER_CODEC_LIST(AV_CODEC_ID_MPEG4),
     .priv_data_size = sizeof(struct Mp4vParseContext),
-    .parser_init    = mpeg4video_parse_init,
-    .parser_parse   = mpeg4video_parse,
-    .parser_close   = ff_parse_close,
+    .init           = mpeg4video_parse_init,
+    .parse          = mpeg4video_parse,
+    .close          = ff_parse_close,
 };

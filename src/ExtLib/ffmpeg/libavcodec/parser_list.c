@@ -1,4 +1,4 @@
-static const AVCodecParser * const parser_list[] = {
+static const FFCodecParser * const parser_list[] = {
     &ff_aac_latm_parser,
     &ff_ac3_parser,
     &ff_adx_parser,

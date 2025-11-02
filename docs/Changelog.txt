@@ -4,6 +4,9 @@
 =============================
 Updated Bulgarian translation (by jekovcar).
 
+Updated libraries:
+	ffmpeg n8.1-dev-985-g7770c0bf0d.
+
 
 1.8.8 - 2025-10-26
 =============================

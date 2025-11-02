@@ -251,7 +251,7 @@ static int decode_frame_header(ProresContext *ctx, const uint8_t *buf,
     }
 
     if (pix_fmt != ctx->pix_fmt) {
-#define HWACCEL_MAX (CONFIG_PRORES_VIDEOTOOLBOX_HWACCEL)
+#define HWACCEL_MAX (CONFIG_PRORES_VIDEOTOOLBOX_HWACCEL + CONFIG_PRORES_VULKAN_HWACCEL)
 #if HWACCEL_MAX
         enum AVPixelFormat pix_fmts[HWACCEL_MAX + 2], *fmtp = pix_fmts;
         int ret;
@@ -260,6 +260,9 @@ static int decode_frame_header(ProresContext *ctx, const uint8_t *buf,
 
 #if CONFIG_PRORES_VIDEOTOOLBOX_HWACCEL
         *fmtp++ = AV_PIX_FMT_VIDEOTOOLBOX;
+#endif
+#if CONFIG_PRORES_VULKAN_HWACCEL
+        *fmtp++ = AV_PIX_FMT_VULKAN;
 #endif
         *fmtp++ = ctx->pix_fmt;
         *fmtp = AV_PIX_FMT_NONE;
@@ -273,10 +276,10 @@ static int decode_frame_header(ProresContext *ctx, const uint8_t *buf,
 #endif
     }
 
-    ctx->frame->color_primaries = buf[14];
-    ctx->frame->color_trc       = buf[15];
-    ctx->frame->colorspace      = buf[16];
-    ctx->frame->color_range     = AVCOL_RANGE_MPEG;
+    avctx->color_primaries = buf[14];
+    avctx->color_trc       = buf[15];
+    avctx->colorspace      = buf[16];
+    avctx->color_range     = AVCOL_RANGE_MPEG;
 
     ptr   = buf + 20;
     flags = buf[19];
@@ -335,6 +338,9 @@ static int decode_picture_header(AVCodecContext *avctx, const uint8_t *buf, cons
         return AVERROR_INVALIDDATA;
     }
 
+    ctx->slice_mb_width  = 1 << log2_slice_mb_width;
+    ctx->slice_mb_height = 1 << log2_slice_mb_height;
+
     ctx->mb_width  = (avctx->width  + 15) >> 4;
     if (ctx->frame_type)
         ctx->mb_height = (avctx->height + 31) >> 5;
@@ -344,7 +350,7 @@ static int decode_picture_header(AVCodecContext *avctx, const uint8_t *buf, cons
     // QT ignores the written value
     // slice_count = AV_RB16(buf + 5);
     slice_count = ctx->mb_height * ((ctx->mb_width >> log2_slice_mb_width) +
-                                    av_popcount(ctx->mb_width & (1 << log2_slice_mb_width) - 1));
+                                    av_popcount(ctx->mb_width & ctx->slice_mb_width - 1));
 
     if (ctx->slice_count != slice_count || !ctx->slices) {
         av_freep(&ctx->slices);
@@ -367,7 +373,7 @@ static int decode_picture_header(AVCodecContext *avctx, const uint8_t *buf, cons
     index_ptr = buf + hdr_size;
     data_ptr  = index_ptr + slice_count*2;
 
-    slice_mb_count = 1 << log2_slice_mb_width;
+    slice_mb_count = ctx->slice_mb_width;
     mb_x = 0;
     mb_y = 0;
 
@@ -392,7 +398,7 @@ static int decode_picture_header(AVCodecContext *avctx, const uint8_t *buf, cons
 
         mb_x += slice_mb_count;
         if (mb_x == ctx->mb_width) {
-            slice_mb_count = 1 << log2_slice_mb_width;
+            slice_mb_count = ctx->slice_mb_width;
             mb_x = 0;
             mb_y++;
         }
@@ -756,6 +762,7 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
     const uint8_t *buf = avpkt->data;
     int buf_size = avpkt->size;
     int frame_hdr_size, pic_size, ret;
+    int i;
 
     if (buf_size < 28 || AV_RL32(buf + 4) != AV_RL32("icpf")) {
         av_log(avctx, AV_LOG_ERROR, "invalid frame header\n");
@@ -772,26 +779,21 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
     if (frame_hdr_size < 0)
         return frame_hdr_size;
 
+    if (avctx->skip_frame == AVDISCARD_ALL)
+        return 0;
+
     buf += frame_hdr_size;
     buf_size -= frame_hdr_size;
 
     if ((ret = ff_thread_get_buffer(avctx, frame, 0)) < 0)
         return ret;
-    ff_thread_finish_setup(avctx);
 
-    if (HWACCEL_MAX && avctx->hwaccel) {
-        const FFHWAccel *hwaccel = ffhwaccel(avctx->hwaccel);
-        ret = hwaccel->start_frame(avctx, avpkt->buf, avpkt->data, avpkt->size);
-        if (ret < 0)
-            return ret;
-        ret = hwaccel->decode_slice(avctx, avpkt->data, avpkt->size);
-        if (ret < 0)
-            return ret;
-        ret = hwaccel->end_frame(avctx);
-        if (ret < 0)
-            return ret;
-        goto finish;
-    }
+    av_refstruct_unref(&ctx->hwaccel_picture_private);
+
+    if ((ret = ff_hwaccel_frame_priv_alloc(avctx, &ctx->hwaccel_picture_private)) < 0)
+        return ret;
+
+    ff_thread_finish_setup(avctx);
 
  decode_picture:
     pic_size = decode_picture_header(avctx, buf, buf_size);
@@ -800,7 +802,23 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
         return pic_size;
     }
 
-    if ((ret = decode_picture(avctx)) < 0) {
+    if (HWACCEL_MAX && avctx->hwaccel) {
+        const FFHWAccel *hwaccel = ffhwaccel(avctx->hwaccel);
+
+        ret = hwaccel->start_frame(avctx, avpkt->buf, avpkt->data, avpkt->size);
+        if (ret < 0)
+            return ret;
+
+        for (i = 0; i < ctx->slice_count; ++i) {
+            ret = hwaccel->decode_slice(avctx, ctx->slices[i].data, ctx->slices[i].data_size);
+            if (ret < 0)
+                return ret;
+        }
+
+        ret = hwaccel->end_frame(avctx);
+        if (ret < 0)
+            return ret;
+    } else if ((ret = decode_picture(avctx)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "error decoding picture\n");
         return ret;
     }
@@ -813,7 +831,8 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
         goto decode_picture;
     }
 
-finish:
+    av_refstruct_unref(&ctx->hwaccel_picture_private);
+
     *got_frame      = 1;
 
     return avpkt->size;
@@ -824,6 +843,7 @@ static av_cold int decode_close(AVCodecContext *avctx)
     ProresContext *ctx = avctx->priv_data;
 
     av_freep(&ctx->slices);
+    av_refstruct_unref(&ctx->hwaccel_picture_private);
 
     return 0;
 }
@@ -851,11 +871,15 @@ const FFCodec ff_prores_decoder = {
     FF_CODEC_DECODE_CB(decode_frame),
     UPDATE_THREAD_CONTEXT(update_thread_context),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_SLICE_THREADS | AV_CODEC_CAP_FRAME_THREADS,
+    .caps_internal  = FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM,
     .p.profiles     = NULL_IF_CONFIG_SMALL(ff_prores_profiles),
 #if HWACCEL_MAX
     .hw_configs     = (const AVCodecHWConfigInternal *const []) {
 #if CONFIG_PRORES_VIDEOTOOLBOX_HWACCEL
         HWACCEL_VIDEOTOOLBOX(prores),
+#endif
+#if CONFIG_PRORES_VULKAN_HWACCEL
+        HWACCEL_VULKAN(prores),
 #endif
         NULL
     },

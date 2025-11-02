@@ -31,6 +31,7 @@
 #include "libavutil/mem.h"
 
 #include "get_bits.h"
+#include "parser_internal.h"
 #include "xiph.h"
 #include "vorbis_parser_internal.h"
 
@@ -335,10 +336,10 @@ static av_cold void vorbis_parser_close(AVCodecParserContext *ctx)
     av_vorbis_parse_free(&s->vp);
 }
 
-const AVCodecParser ff_vorbis_parser = {
-    .codec_ids      = { AV_CODEC_ID_VORBIS },
+const FFCodecParser ff_vorbis_parser = {
+    PARSER_CODEC_LIST(AV_CODEC_ID_VORBIS),
     .priv_data_size = sizeof(VorbisParseContext),
-    .parser_parse   = vorbis_parse,
-    .parser_close   = vorbis_parser_close,
+    .parse          = vorbis_parse,
+    .close          = vorbis_parser_close,
 };
 #endif /* CONFIG_VORBIS_PARSER */

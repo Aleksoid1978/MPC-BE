@@ -25,6 +25,7 @@
 
 #include "golomb.h"
 #include "hevc.h"
+#include "parser_internal.h"
 #include "parse.h"
 #include "ps.h"
 #include "sei.h"
@@ -352,9 +353,9 @@ static void hevc_parser_close(AVCodecParserContext *s)
     av_freep(&ctx->pc.buffer);
 }
 
-const AVCodecParser ff_hevc_parser = {
-    .codec_ids      = { AV_CODEC_ID_HEVC },
+const FFCodecParser ff_hevc_parser = {
+    PARSER_CODEC_LIST(AV_CODEC_ID_HEVC),
     .priv_data_size = sizeof(HEVCParserContext),
-    .parser_parse   = hevc_parse,
-    .parser_close   = hevc_parser_close,
+    .parse          = hevc_parse,
+    .close          = hevc_parser_close,
 };

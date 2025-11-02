@@ -1,0 +1,1 @@
+%define CONFIG_RV40_DECODER 1
