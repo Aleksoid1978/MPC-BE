@@ -357,7 +357,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 23		"Folosește comenzile media pentru Window Media Controls"
 24		"Activează MiniDump"
 25		"Fișierul executabil FFmpeg:"
-27		"Verifică pentru actualizări"
+27		"Verifică dacă au apărut actualizări"
 28		"Activează verificarea automată a actualizărilor"
 29		"Întârziere între fiecare verificare:"
 32		"zi (zile)"
@@ -690,7 +690,7 @@ BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25
 END
 
 BEGIN DIALOGEX IDD_UPDATE_DIALOG LINES 10
-3		"Verifică pentru actualizări"
+3		"Verifică dacă au apărut actualizări"
 6		"&Da"
 7		"&Nu"
 END
@@ -782,7 +782,7 @@ BEGIN MENU IDR_MAINFRAME LINES 137
 128		"F&avorite"
 129		"A&jutor"
 131		"&Pagina de pornire"
-132		"&Verifică pentru actualizări"
+132		"&Verifică dacă au apărut actualizări"
 133		"&Comutatoarele din linia de comandă (din CLI)"
 134		"&Donează"
 135		"&Despre..."
@@ -2117,3 +2117,4 @@ STRING ID_SHOW_MILLISECONDS		"Afișează milisecundele"
 STRING ID_VOLUME_MUTE		"Mut\nMut"
 STRING ID_VOLUME_MUTE_DISABLED		"Fără sunet (Silențios)\nFără sunet (Silențios)"
 STRING ID_VOLUME_MUTE_OFF		"Activează sunetul\nActivează sunetul"
+
