@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Despre"
 7		"MPC-BE"
 8		"Drepturi de autor © 2002-2025 - vezi fișierul Authors.txt"
@@ -357,7 +357,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 23		"Folosește comenzile media pentru Window Media Controls"
 24		"Activează MiniDump"
 25		"Fișierul executabil FFmpeg:"
-27		"Verifică dacă au apărut actualizări"
+27		"Verifică actualizările"
 28		"Activează verificarea automată a actualizărilor"
 29		"Întârziere între fiecare verificare:"
 32		"zi (zile)"
@@ -690,7 +690,7 @@ BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25
 END
 
 BEGIN DIALOGEX IDD_UPDATE_DIALOG LINES 10
-3		"Verifică dacă au apărut actualizări"
+3		"Verifică actualizările"
 6		"&Da"
 7		"&Nu"
 END
@@ -782,7 +782,7 @@ BEGIN MENU IDR_MAINFRAME LINES 137
 128		"F&avorite"
 129		"A&jutor"
 131		"&Pagina de pornire"
-132		"&Verifică dacă au apărut actualizări"
+132		"&Verifică actualizările"
 133		"&Comutatoarele din linia de comandă (din CLI)"
 134		"&Donează"
 135		"&Despre..."
