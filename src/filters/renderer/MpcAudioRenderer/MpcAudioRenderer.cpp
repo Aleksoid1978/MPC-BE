@@ -1576,6 +1576,7 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 			lSize = out_samples * m_output_params.channels * get_bytes_per_sample(m_output_params.sf);
 
 			if (delay && rtStart != INVALID_TIME) {
+				delay /= m_dRate;
 				rtStart -= delay;
 				rtStop  -= delay;
 			}
@@ -1664,7 +1665,21 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 		if (SUCCEEDED(hr)) {
 			hr = m_AudioFilter.Push(p);
 			if (SUCCEEDED(hr)) {
+				if (m_rtNextFilteredSampleTime != INVALID_TIME) {
+					const auto rtTimeDelta = p->rtStart - m_rtNextFilteredSampleTime;
+					if (std::abs(rtTimeDelta) > 200) {
+						m_rtFilteredSampleTimeOffset += rtTimeDelta;
+#if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL
+						DLog(L"CMpcAudioRenderer::Transform() - Discontinuity detected while filtering, we are correcting timestamp by %I64d", rtTimeDelta);
+#endif
+					}
+				}
+
+				m_rtNextFilteredSampleTime = p->rtStart + SamplesToTime(p->size() / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput) / m_dRate;
+
 				while (SUCCEEDED(m_AudioFilter.Pull(p))) {
+					p->rtStart += m_rtFilteredSampleTimeOffset;
+					p->rtStop += m_rtFilteredSampleTimeOffset;
 					PushToQueue(p);
 				}
 			}
@@ -1723,7 +1738,7 @@ HRESULT CMpcAudioRenderer::SetupAudioFilter()
 	}
 
 	if (m_dRate == 1.0 || m_dRate < 0.25 || m_dRate > 100.0) {
-		m_AudioFilter.Flush();
+		FlushAudioFilter();
 		return E_INVALIDARG;
 	}
 
@@ -1748,6 +1763,13 @@ HRESULT CMpcAudioRenderer::SetupAudioFilter()
 	}
 
 	return hr;
+}
+
+void CMpcAudioRenderer::FlushAudioFilter()
+{
+	m_rtNextFilteredSampleTime = INVALID_TIME;
+	m_rtFilteredSampleTimeOffset = 0;
+	m_AudioFilter.Flush();
 }
 
 HRESULT CMpcAudioRenderer::GetAudioDevice(const BOOL bForceUseDefaultDevice)
@@ -2217,7 +2239,7 @@ again:
 	}
 
 	if (SUCCEEDED(hr)) {
-		m_AudioFilter.Flush();
+		FlushAudioFilter();
 	}
 
 	m_bs2b_active = false;
@@ -2903,7 +2925,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 				if (std::abs(rtTimeDelta) > 200) {
 					m_pSyncClock->OffsetAudioClock(rtTimeDelta);
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL
-					DLog(L"CMpcAudioRenderer::RenderWasapiBuffer() - Discontinuity detected, Correct reference clock by %.2f ms", rtTimeDelta / 10000.0f);
+					DLog(L"CMpcAudioRenderer::RenderWasapiBuffer() - Discontinuity detected, we are correcting reference clock by %.2f ms", rtTimeDelta / 10000.0f);
 #endif
 				}
 				m_rtNextRenderedSampleTime = m_CurrentPacket->rtStart + SamplesToTime(m_CurrentPacket->size() / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput);
@@ -2979,7 +3001,8 @@ HRESULT CMpcAudioRenderer::EndFlush()
 	CAutoLock cRenderLock(&m_csRender);
 
 	WasapiFlush();
-	m_AudioFilter.Flush();
+
+	FlushAudioFilter();
 
 	HRESULT hr = CBaseRenderer::EndFlush();
 
