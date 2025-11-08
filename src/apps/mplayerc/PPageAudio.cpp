@@ -389,7 +389,13 @@ void CPPageAudio::OnBalanceTextDblClk()
 
 void CPPageAudio::OnBnClickedResetAudioPaths()
 {
+	CAppSettings& s = AfxGetAppSettings();
+
 	m_sAudioPaths = DEFAULT_AUDIO_PATHS;
+	if (s.iCurrentLanguage == CMPlayerCApp::GetLanguageIndex(ID_LANGUAGE_RUSSIAN)) {
+		// experimental
+		m_sAudioPaths.Append(L".\\rus sound\\*;");
+	}
 
 	UpdateData(FALSE);
 
