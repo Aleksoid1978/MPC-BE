@@ -471,6 +471,7 @@ namespace YoutubeDL
 
 							if (auto final_item = Youtube::SelectVideoStream(youtubeUrllist)) {
 								bestUrl = final_item->url;
+								bVideoOnly = final_item->profile->type == Youtube::y_video;
 							}
 							if (auto final_item = Youtube::SelectAudioStream(youtubeAudioUrllist)) {
 								bestAudioUrl = final_item->url;
@@ -486,6 +487,11 @@ namespace YoutubeDL
 										youtubeUrllist.emplace_back(item);
 										break;
 								}
+							}
+
+							pOFD->fi = CStringW(bestUrl);
+							if (bVideoOnly && !bestAudioUrl.IsEmpty()) {
+								pOFD->auds.emplace_back(CStringW(bestAudioUrl));
 							}
 						} else if (bMaximumQuality) {
 							float maxVideotbr = 0.0f;
@@ -558,52 +564,52 @@ namespace YoutubeDL
 							}
 						}
 
-						pOFD->fi = CStringW(bestUrl);
-						if (bVideoOnly) {
-							if (audioUrls.size() > 1) {
-								auto select = audioUrls.begin();
+						if (!bIsYoutube) {
+							pOFD->fi = CStringW(bestUrl);
+							if (bVideoOnly) {
+								if (audioUrls.size() > 1) {
+									auto select = audioUrls.begin();
 
-								if (auto it = audioUrls.find(lang); it != audioUrls.end()) {
-									select = it;
-								}
-								else if (auto it = audioUrls.find("en"); it != audioUrls.end()) {
-									select = it;
-								}
+									if (auto it = audioUrls.find(lang); it != audioUrls.end()) {
+										select = it;
+									} else if (auto it = audioUrls.find("en"); it != audioUrls.end()) {
+										select = it;
+									}
 
-								pOFD->auds.emplace_back(CStringW(select->second.url), CStringW(select->first), select->first);
+									pOFD->auds.emplace_back(CStringW(select->second.url), CStringW(select->first), select->first);
+								} else if (bestAudioUrl.GetLength()) {
+									pOFD->auds.emplace_back(CStringW(bestAudioUrl));
+								}
 							}
-							else if (bestAudioUrl.GetLength()) {
-								pOFD->auds.emplace_back(CStringW(bestAudioUrl));
+
+							if (!bestAudioUrl.IsEmpty()) {
+								auto profilePtr = std::make_unique<Youtube::YoutubeProfile>();
+								auto profile = profilePtr.get();
+								YoutubeProfiles.emplace_back(std::move(profilePtr));
+
+								profile->type = Youtube::ytype::y_audio;
+
+								Youtube::YoutubeUrllistItem item;
+								item.profile = profile;
+								item.url = CString(bestAudioUrl);
+								youtubeAudioUrllist.emplace_back(item);
 							}
-						}
 
-						if (!bIsYoutube && bestAudioUrl.GetLength()) {
-							auto profilePtr = std::make_unique<Youtube::YoutubeProfile>();
-							auto profile = profilePtr.get();
-							YoutubeProfiles.emplace_back(std::move(profilePtr));
+							if (!youtubeUrllist.empty()) {
+								std::sort(youtubeUrllist.begin(), youtubeUrllist.end(), [](const Youtube::YoutubeUrllistItem& a, const Youtube::YoutubeUrllistItem& b) {
+									if (a.profile->format != b.profile->format) {
+										return (a.profile->format < b.profile->format);
+									}
+									if (a.profile->ext != b.profile->ext) {
+										return (a.profile->ext < b.profile->ext);
+									}
+									if (a.profile->quality != b.profile->quality) {
+										return (a.profile->quality > b.profile->quality);
+									}
 
-							profile->type = Youtube::ytype::y_audio;
-
-							Youtube::YoutubeUrllistItem item;
-							item.profile = profile;
-							item.url = CString(bestAudioUrl);
-							youtubeAudioUrllist.emplace_back(item);
-						}
-
-						if (!bIsYoutube && !youtubeUrllist.empty()) {
-							std::sort(youtubeUrllist.begin(), youtubeUrllist.end(), [](const Youtube::YoutubeUrllistItem& a, const Youtube::YoutubeUrllistItem& b) {
-								if (a.profile->format != b.profile->format) {
-									return (a.profile->format < b.profile->format);
-								}
-								if (a.profile->ext != b.profile->ext) {
-									return (a.profile->ext < b.profile->ext);
-								}
-								if (a.profile->quality != b.profile->quality) {
-									return (a.profile->quality > b.profile->quality);
-								}
-
-								return false;
-							});
+									return false;
+								});
+							}
 						}
 
 						// subtitles
