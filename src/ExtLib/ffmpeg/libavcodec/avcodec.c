@@ -23,6 +23,8 @@
  * AVCodecContext functions for libavcodec
  */
 
+#include <assert.h>
+
 #include "config.h"
 #include "libavutil/avassert.h"
 #include "libavutil/avstring.h"
@@ -30,7 +32,6 @@
 #include "libavutil/channel_layout.h"
 #include "libavutil/common.h"
 #include "libavutil/emms.h"
-#include "libavutil/fifo.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/mem.h"
 #include "libavutil/opt.h"
@@ -41,12 +42,10 @@
 #include "codec_desc.h"
 #include "codec_internal.h"
 #include "decode.h"
-#include "encode.h"
 #include "frame_thread_encoder.h"
 #include "hwconfig.h"
 #include "internal.h"
 #include "libavutil/refstruct.h"
-#include "thread.h"
 
 /**
  * Maximum size in bytes of extradata.
@@ -717,39 +716,44 @@ int attribute_align_arg avcodec_receive_frame(AVCodecContext *avctx, AVFrame *fr
     return ff_encode_receive_frame(avctx, frame);
 }
 
-#define WRAP_CONFIG(allowed_type, field, field_type, terminator)            \
+#define WRAP_CONFIG(allowed_type, field, var, field_type, sentinel_check)   \
     do {                                                                    \
-        static const field_type end = terminator;                           \
         if (codec->type != (allowed_type))                                  \
             return AVERROR(EINVAL);                                         \
-        *out_configs = (field);                                             \
-        if (out_num_configs) {                                              \
+        const field_type *ptr = codec->field;                               \
+        *out_configs = ptr;                                                 \
+        if (ptr) {                                                          \
             for (int i = 0;; i++) {                                         \
-                if (!(field) || !memcmp(&(field)[i], &end, sizeof(end))) {  \
+                const field_type var = ptr[i];                              \
+                if (sentinel_check) {                                       \
                     *out_num_configs = i;                                   \
                     break;                                                  \
                 }                                                           \
             }                                                               \
-        }                                                                   \
+        } else                                                              \
+            *out_num_configs = 0;                                           \
         return 0;                                                           \
     } while (0)
 
-static const enum AVColorRange color_range_jpeg[] = {
-    AVCOL_RANGE_JPEG, AVCOL_RANGE_UNSPECIFIED
+static const enum AVColorRange color_range_tab[] = {
+    AVCOL_RANGE_MPEG, AVCOL_RANGE_JPEG, AVCOL_RANGE_UNSPECIFIED,
+    AVCOL_RANGE_MPEG, AVCOL_RANGE_UNSPECIFIED,
 };
 
-static const enum AVColorRange color_range_mpeg[] = {
-    AVCOL_RANGE_MPEG, AVCOL_RANGE_UNSPECIFIED
+static const enum AVAlphaMode alpha_mode_tab[] = {
+    AVALPHA_MODE_PREMULTIPLIED, AVALPHA_MODE_STRAIGHT, AVALPHA_MODE_UNSPECIFIED,
+    AVALPHA_MODE_PREMULTIPLIED, AVALPHA_MODE_UNSPECIFIED
 };
 
-static const enum AVColorRange color_range_all[] = {
-    AVCOL_RANGE_MPEG, AVCOL_RANGE_JPEG, AVCOL_RANGE_UNSPECIFIED
-};
+static_assert((int)AVCOL_RANGE_MPEG == (int)AVALPHA_MODE_PREMULTIPLIED, "unexpected enum values");
+static_assert((int)AVCOL_RANGE_JPEG == (int)AVALPHA_MODE_STRAIGHT, "unexpected enum values");
+static_assert(AVCOL_RANGE_UNSPECIFIED == 0 && AVALPHA_MODE_UNSPECIFIED == 0, "unexpected enum values");
+static_assert(AVCOL_RANGE_NB == 3 && AVALPHA_MODE_NB == 3, "unexpected enum values");
 
-static const enum AVColorRange *color_range_table[] = {
-    [AVCOL_RANGE_MPEG] = color_range_mpeg,
-    [AVCOL_RANGE_JPEG] = color_range_jpeg,
-    [AVCOL_RANGE_MPEG | AVCOL_RANGE_JPEG] = color_range_all,
+static const uint8_t offset_tab[] = {
+    [AVCOL_RANGE_MPEG] = 3,
+    [AVCOL_RANGE_JPEG] = 1,
+    [AVCOL_RANGE_MPEG | AVCOL_RANGE_JPEG] = 0,
 };
 
 int ff_default_get_supported_config(const AVCodecContext *avctx,
@@ -764,33 +768,43 @@ int ff_default_get_supported_config(const AVCodecContext *avctx,
     switch (config) {
 FF_DISABLE_DEPRECATION_WARNINGS
     case AV_CODEC_CONFIG_PIX_FORMAT:
-        WRAP_CONFIG(AVMEDIA_TYPE_VIDEO, codec->pix_fmts, enum AVPixelFormat, AV_PIX_FMT_NONE);
+        WRAP_CONFIG(AVMEDIA_TYPE_VIDEO, pix_fmts, pix_fmt, enum AVPixelFormat, pix_fmt == AV_PIX_FMT_NONE);
     case AV_CODEC_CONFIG_FRAME_RATE:
-        WRAP_CONFIG(AVMEDIA_TYPE_VIDEO, codec->supported_framerates, AVRational, {0});
+        WRAP_CONFIG(AVMEDIA_TYPE_VIDEO, supported_framerates, framerate, AVRational, framerate.num == 0);
     case AV_CODEC_CONFIG_SAMPLE_RATE:
-        WRAP_CONFIG(AVMEDIA_TYPE_AUDIO, codec->supported_samplerates, int, 0);
+        WRAP_CONFIG(AVMEDIA_TYPE_AUDIO, supported_samplerates, samplerate, int, samplerate == 0);
     case AV_CODEC_CONFIG_SAMPLE_FORMAT:
-        WRAP_CONFIG(AVMEDIA_TYPE_AUDIO, codec->sample_fmts, enum AVSampleFormat, AV_SAMPLE_FMT_NONE);
+        WRAP_CONFIG(AVMEDIA_TYPE_AUDIO, sample_fmts, sample_fmt, enum AVSampleFormat, sample_fmt == AV_SAMPLE_FMT_NONE);
     case AV_CODEC_CONFIG_CHANNEL_LAYOUT:
-        WRAP_CONFIG(AVMEDIA_TYPE_AUDIO, codec->ch_layouts, AVChannelLayout, {0});
+        WRAP_CONFIG(AVMEDIA_TYPE_AUDIO, ch_layouts, ch_layout, AVChannelLayout, ch_layout.nb_channels == 0);
 FF_ENABLE_DEPRECATION_WARNINGS
 
     case AV_CODEC_CONFIG_COLOR_RANGE:
         if (codec->type != AVMEDIA_TYPE_VIDEO)
             return AVERROR(EINVAL);
-        *out_configs = color_range_table[ffcodec(codec)->color_ranges];
-        if (out_num_configs)
-            *out_num_configs = av_popcount(ffcodec(codec)->color_ranges);
+        unsigned color_ranges = codec2->color_ranges;
+        if (color_ranges)
+            *out_configs = color_range_tab + offset_tab[color_ranges];
+        else
+            *out_configs = NULL;
+        *out_num_configs = av_popcount(color_ranges);
         return 0;
 
     case AV_CODEC_CONFIG_COLOR_SPACE:
         *out_configs = NULL;
-        if (out_num_configs)
-            *out_num_configs = 0;
+        *out_num_configs = 0;
         return 0;
 
     case AV_CODEC_CONFIG_ALPHA_MODE:
-        WRAP_CONFIG(AVMEDIA_TYPE_VIDEO, codec2->alpha_modes, enum AVAlphaMode, AVALPHA_MODE_UNSPECIFIED);
+        if (codec->type != AVMEDIA_TYPE_VIDEO)
+            return AVERROR(EINVAL);
+        unsigned alpha_modes = codec2->alpha_modes;
+        if (alpha_modes)
+            *out_configs = alpha_mode_tab + offset_tab[alpha_modes];
+        else
+            *out_configs = NULL;
+        *out_num_configs = av_popcount(alpha_modes);
+        return 0;
 
     default:
         return AVERROR(EINVAL);

@@ -91,10 +91,6 @@ static const LegacyFormatEntry legacy_format_entries[] = {
     [AV_PIX_FMT_GRAY14LE]       = { 1, 1 },
     [AV_PIX_FMT_GRAY16BE]       = { 1, 1 },
     [AV_PIX_FMT_GRAY16LE]       = { 1, 1 },
-    [AV_PIX_FMT_GRAY10MSBBE]    = { 1, 1 },
-    [AV_PIX_FMT_GRAY10MSBLE]    = { 1, 1 },
-    [AV_PIX_FMT_GRAY12MSBBE]    = { 1, 1 },
-    [AV_PIX_FMT_GRAY12MSBLE]    = { 1, 1 },
     [AV_PIX_FMT_YUV440P]        = { 1, 1 },
     [AV_PIX_FMT_YUVJ440P]       = { 1, 1 },
     [AV_PIX_FMT_YUV440P10LE]    = { 1, 1 },
@@ -159,10 +155,6 @@ static const LegacyFormatEntry legacy_format_entries[] = {
     [AV_PIX_FMT_YUV420P12LE]    = { 1, 1 },
     [AV_PIX_FMT_YUV420P14BE]    = { 1, 1 },
     [AV_PIX_FMT_YUV420P14LE]    = { 1, 1 },
-    [AV_PIX_FMT_YUV420P10MSBBE] = { 1, 1 },
-    [AV_PIX_FMT_YUV420P10MSBLE] = { 1, 1 },
-    [AV_PIX_FMT_YUV420P12MSBBE] = { 1, 1 },
-    [AV_PIX_FMT_YUV420P12MSBLE] = { 1, 1 },
     [AV_PIX_FMT_YUV422P9BE]     = { 1, 1 },
     [AV_PIX_FMT_YUV422P9LE]     = { 1, 1 },
     [AV_PIX_FMT_YUV422P10BE]    = { 1, 1 },
@@ -171,10 +163,6 @@ static const LegacyFormatEntry legacy_format_entries[] = {
     [AV_PIX_FMT_YUV422P12LE]    = { 1, 1 },
     [AV_PIX_FMT_YUV422P14BE]    = { 1, 1 },
     [AV_PIX_FMT_YUV422P14LE]    = { 1, 1 },
-    [AV_PIX_FMT_YUV422P10MSBBE] = { 1, 1 },
-    [AV_PIX_FMT_YUV422P10MSBLE] = { 1, 1 },
-    [AV_PIX_FMT_YUV422P12MSBBE] = { 1, 1 },
-    [AV_PIX_FMT_YUV422P12MSBLE] = { 1, 1 },
     [AV_PIX_FMT_YUV444P9BE]     = { 1, 1 },
     [AV_PIX_FMT_YUV444P9LE]     = { 1, 1 },
     [AV_PIX_FMT_YUV444P10BE]    = { 1, 1 },
@@ -749,10 +737,6 @@ static int fmt_shift(enum AVPixelFormat fmt)
     case AV_PIX_FMT_P210LE:
     case AV_PIX_FMT_Y210BE:
     case AV_PIX_FMT_Y210LE:
-    case AV_PIX_FMT_YUV420P10MSBBE:
-    case AV_PIX_FMT_YUV420P10MSBLE:
-    case AV_PIX_FMT_YUV422P10MSBBE:
-    case AV_PIX_FMT_YUV422P10MSBLE:
     case AV_PIX_FMT_YUV444P10MSBBE:
     case AV_PIX_FMT_YUV444P10MSBLE:
     case AV_PIX_FMT_GBRP10MSBBE:
@@ -768,10 +752,6 @@ static int fmt_shift(enum AVPixelFormat fmt)
     case AV_PIX_FMT_XV36LE:
     case AV_PIX_FMT_XYZ12BE:
     case AV_PIX_FMT_XYZ12LE:
-    case AV_PIX_FMT_YUV420P12MSBBE:
-    case AV_PIX_FMT_YUV420P12MSBLE:
-    case AV_PIX_FMT_YUV422P12MSBBE:
-    case AV_PIX_FMT_YUV422P12MSBLE:
     case AV_PIX_FMT_YUV444P12MSBBE:
     case AV_PIX_FMT_YUV444P12MSBLE:
     case AV_PIX_FMT_GBRP12MSBBE:
@@ -999,10 +979,6 @@ static int fmt_read_write(enum AVPixelFormat fmt, SwsReadWriteOp *rw_op,
     case AV_PIX_FMT_GRAY14LE:
     case AV_PIX_FMT_GRAY16BE:
     case AV_PIX_FMT_GRAY16LE:
-    case AV_PIX_FMT_GRAY10MSBBE:
-    case AV_PIX_FMT_GRAY10MSBLE:
-    case AV_PIX_FMT_GRAY12MSBBE:
-    case AV_PIX_FMT_GRAY12MSBLE:
     //case AV_PIX_FMT_GRAYF16BE: TODO
     //case AV_PIX_FMT_GRAYF16LE:
     //case AV_PIX_FMT_YAF16BE:

@@ -513,10 +513,14 @@ int ff_formats_check_color_ranges(void *log, const AVFilterFormats *fmts);
  */
 int ff_formats_check_alpha_modes(void *log, const AVFilterFormats *fmts);
 
+struct AVBPrint;
+
 typedef struct AVFilterFormatMerger {
+    const char *name;
     unsigned offset;
     int (*merge)(void *a, void *b);
     int (*can_merge)(const void *a, const void *b);
+    void (*print_list)(struct AVBPrint *bp, const void *fmts);
     const char *conversion_filter;
     unsigned conversion_opts_offset;
 } AVFilterFormatsMerger;
@@ -611,6 +615,6 @@ typedef struct AVFilterNegotiation {
     const AVFilterFormatsMerger *mergers;
 } AVFilterNegotiation;
 
-const AVFilterNegotiation *ff_filter_get_negotiation(AVFilterLink *link);
+const AVFilterNegotiation *ff_filter_get_negotiation(const AVFilterLink *link);
 
 #endif /* AVFILTER_FORMATS_H */

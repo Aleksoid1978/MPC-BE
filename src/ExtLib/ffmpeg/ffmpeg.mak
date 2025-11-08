@@ -337,7 +337,6 @@ SRCS_LC = \
 	libavcodec/lagarith.c \
 	libavcodec/lagarithrac.c \
 	libavcodec/latm_parser.c \
-	libavcodec/lcevcdec.c \
 	libavcodec/libdav1d.c \
 	libavcodec/libfdk-aacdec.c \
 	libavcodec/libspeexdec.c \

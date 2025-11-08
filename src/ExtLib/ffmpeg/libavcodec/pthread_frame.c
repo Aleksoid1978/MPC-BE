@@ -376,6 +376,8 @@ FF_ENABLE_DEPRECATION_WARNINGS
         dst->bits_per_raw_sample = src->bits_per_raw_sample;
         dst->color_primaries     = src->color_primaries;
 
+        dst->alpha_mode  = src->alpha_mode;
+
         dst->color_trc   = src->color_trc;
         dst->colorspace  = src->colorspace;
         dst->color_range = src->color_range;
@@ -401,7 +403,6 @@ FF_ENABLE_DEPRECATION_WARNINGS
         dst->hwaccel_flags = src->hwaccel_flags;
 
         av_refstruct_replace(&dst->internal->pool, src->internal->pool);
-        ff_decode_internal_sync(dst, src);
     }
 
     if (for_user) {
