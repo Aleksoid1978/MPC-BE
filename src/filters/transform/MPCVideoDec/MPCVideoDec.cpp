@@ -3613,15 +3613,14 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 		if (m_HWPixFmt != AV_PIX_FMT_NONE) {
 			if (m_pHWFrame->format != m_HWPixFmt) {
+				m_FormatConverter.Clear();
 				DXVAState::ClearState();
 				m_HWPixFmt = AV_PIX_FMT_NONE;
 				m_hwType = HwType::None;
+				InitDecoder(&m_pCurrentMediaType);
+				ChangeOutputMediaFormat(2);
 
-				m_pFrame->format = m_pHWFrame->format;
-				m_pFrame->width  = m_pHWFrame->width;
-				m_pFrame->height = m_pHWFrame->height;
-				av_frame_get_buffer(m_pFrame, 32);
-				ret = av_frame_copy(m_pFrame, m_pHWFrame);
+				return S_FALSE;
 			}
 
 			if (ret < 0) {
