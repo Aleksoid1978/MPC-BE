@@ -2528,6 +2528,7 @@ BEGIN
     IDS_AG_SUBDELAY_INC     "Délai des sous-titres +"
     IDS_FILE_SAVE_THUMBNAILS "Enregistrer les miniatures"
     IDS_OSD_TEST            "OSD Test"
+    IDS_ADDITIONAL_AUDIO_PATHS ".\\fandub;"
 END
 
 STRINGTABLE
@@ -3723,7 +3724,7 @@ BEGIN
     IDS_SATURATION_DEC      "Diminuer la saturation"
     IDS_RESET_COLOR         "Réinitialiser les paramètres de couleur"
     IDS_AFTERPLAYBACK_CLOSE_FILE "En fin de lecture : Toujours fermer le fichier"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "After Playback: Always close file and minimize player"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "After Playback: Always close file and minimize player"
     IDS_UPDATE_ERROR_DATA   "Le serveur de mise à jour donne des données erronées.\n\nVeuillez réessayer plus tard."
     IDS_USING_NEWER_VERSION "Vous utilisez déjà la dernière version %s."
     IDS_NEW_UPDATE_AVAILABLE  "Une nouvelle version %s est disponible.\n\nVoulez-vous visiter le site Web de  MPC-BE pour la télécharger ?"

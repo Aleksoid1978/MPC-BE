@@ -2528,6 +2528,7 @@ BEGIN
     IDS_AG_SUBDELAY_INC     "Felirat késleltetés +"
     IDS_FILE_SAVE_THUMBNAILS "Ikonképek mentése"
     IDS_OSD_TEST            "OSD Teszt"
+    IDS_ADDITIONAL_AUDIO_PATHS ".\\fandub;"
 END
 
 STRINGTABLE
@@ -3723,7 +3724,7 @@ BEGIN
     IDS_SATURATION_DEC      "Telítettség csökkenése"
     IDS_RESET_COLOR         "Színbeállítások visszaállítása"
     IDS_AFTERPLAYBACK_CLOSE_FILE "Lejátszás után: Mindig zárja be a fájlt"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "Lejátszás után: Mindig zárja be a fájlt és minimalizálja a lejátszót"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "Lejátszás után: Mindig zárja be a fájlt és minimalizálja a lejátszót"
     IDS_UPDATE_ERROR_DATA   "A frissítési szerver rossz adatokat ad meg.\n\nKérjük, próbálja később."
     IDS_USING_NEWER_VERSION "Már használja a legújabb verziót %s."
     IDS_NEW_UPDATE_AVAILABLE  "Egy új %s elérhető.\n\nSzeretné meglátogatni MPC-BE weboldalt a letöltéshez?"

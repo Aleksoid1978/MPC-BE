@@ -2528,6 +2528,7 @@ BEGIN
     IDS_AG_SUBDELAY_INC     "Alt Yazı Gecikmesi +"
     IDS_FILE_SAVE_THUMBNAILS "Küçük Resimler Kaydet"
     IDS_OSD_TEST            "OSD Test"
+    IDS_ADDITIONAL_AUDIO_PATHS ".\\fandub;"
 END
 
 STRINGTABLE
@@ -3723,7 +3724,7 @@ BEGIN
     IDS_SATURATION_DEC      "Doygunluğu Azalt"
     IDS_RESET_COLOR         "Renk Ayarlarını Sıfırla"
     IDS_AFTERPLAYBACK_CLOSE_FILE "Oynatmadan Sonra: Her Zaman Dosyayı Kapat"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "Oynatmadan Sonra: Dosyayı Kapat ve Oynatıcıyı Simge Durumuna Küçült"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "Oynatmadan Sonra: Dosyayı Kapat ve Oynatıcıyı Simge Durumuna Küçült"
     IDS_UPDATE_ERROR_DATA   "Güncelleştirme sunucusu yanlış veri veriyor.\n\nLütfen daha sonra deneyin."
     IDS_USING_NEWER_VERSION "Zaten son sürümü kullanıyorsunuz: %s."
     IDS_NEW_UPDATE_AVAILABLE  "Yeni %s mevcut.\n\nYeni sürümü indirmek için MPC-BE sitesini ziyaret etmek istiyor musunuz?"

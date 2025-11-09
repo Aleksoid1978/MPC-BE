@@ -2528,6 +2528,7 @@ BEGIN
     IDS_AG_SUBDELAY_INC     "字幕の遅延増加"
     IDS_FILE_SAVE_THUMBNAILS "サムネイルを保存"
     IDS_OSD_TEST            "OSD テスト"
+    IDS_ADDITIONAL_AUDIO_PATHS ".\\fandub;"
 END
 
 STRINGTABLE
@@ -3723,7 +3724,7 @@ BEGIN
     IDS_SATURATION_DEC      "彩度を下げる"
     IDS_RESET_COLOR         "カラー設定をリセット"
     IDS_AFTERPLAYBACK_CLOSE_FILE "再生終了後: 常にファイルを閉じる"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "再生終了後: 常にファイルを閉じてプレーヤーを最小化"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "再生終了後: 常にファイルを閉じてプレーヤーを最小化"
     IDS_UPDATE_ERROR_DATA   "更新サーバーが間違ったデータを提供します。\n\n後で試してください。"
     IDS_USING_NEWER_VERSION "既に最新版の %s を使用しています。"
     IDS_NEW_UPDATE_AVAILABLE  "新しい %s を入手できます。\n\nダウンロードしに MPC-BE のウェブサイトを訪れますか?"

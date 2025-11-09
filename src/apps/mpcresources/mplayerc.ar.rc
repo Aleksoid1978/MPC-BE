@@ -2526,6 +2526,7 @@ BEGIN
     IDS_AG_SUBDELAY_INC     "تأخير الترجمات +"
     IDS_FILE_SAVE_THUMBNAILS "حفظ الصور المصغرة"
     IDS_OSD_TEST            "اختبار OSD"
+    IDS_ADDITIONAL_AUDIO_PATHS ".\\fandub;"
 END
 
 STRINGTABLE
@@ -3721,7 +3722,7 @@ BEGIN
     IDS_SATURATION_DEC      "تقليل التشبع"
     IDS_RESET_COLOR         "إعادة تعيين إعدادات الألوان"
     IDS_AFTERPLAYBACK_CLOSE_FILE "بعد انتهاء التشغيل: إغلاق الملف دائمًا"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "After Playback: Always close file and minimize player"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "After Playback: Always close file and minimize player"
     IDS_UPDATE_ERROR_DATA   "خادم التحديث يعطي بيانات خاطئة.\n\nيرجى المحاولة مرة أخرى لاحقًا."
     IDS_USING_NEWER_VERSION "أنت تستخدم بالفعل الإصدار الأحدث %s."
     IDS_NEW_UPDATE_AVAILABLE  "الإصدار %s الجديد متوفر.\n\nهل تريد زيارة موقع MPC-BE لتنزيله؟"

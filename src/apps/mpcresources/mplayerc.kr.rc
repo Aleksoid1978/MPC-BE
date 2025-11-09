@@ -2528,6 +2528,7 @@ BEGIN
     IDS_AG_SUBDELAY_INC     "자막 싱크 느리게"
     IDS_FILE_SAVE_THUMBNAILS "썸네일 저장"
     IDS_OSD_TEST            "OSD 시험"
+    IDS_ADDITIONAL_AUDIO_PATHS ".\\fandub;"
 END
 
 STRINGTABLE
@@ -3723,7 +3724,7 @@ BEGIN
     IDS_SATURATION_DEC      "채도 감소"
     IDS_RESET_COLOR         "색 설정 초기화"
     IDS_AFTERPLAYBACK_CLOSE_FILE "재생이 끝나면 : 항상 파일 닫기"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "재생 후 : 항상 파일을 닫고 재생기기를 최소화"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "재생 후 : 항상 파일을 닫고 재생기기를 최소화"
     IDS_UPDATE_ERROR_DATA   "업데이트 서버 데이터에 오류가 있습니다.\n\n잠시 후 다시 시도하세요."
     IDS_USING_NEWER_VERSION "이미 최신 버전 %s 사용 중입니다."
     IDS_NEW_UPDATE_AVAILABLE  "새 버전 %s이 있습니다.\n\n  MPC-BE 웹사이트로 가서 내려받으시겠습니까?"

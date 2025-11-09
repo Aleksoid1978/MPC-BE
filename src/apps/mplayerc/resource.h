@@ -990,6 +990,7 @@
 #define IDS_FILE_SAVE_THUMBNAILS        24005
 #define IDC_MAINFRAME_ICON              24006
 #define IDS_OSD_TEST                    24007
+#define IDS_ADDITIONAL_AUDIO_PATHS      24010
 #define IDS_BLOCK_EXTERNAL_VR           31000
 #define IDS_DESC_HAALI_VR               31007
 #define IDS_DESC_NULLVR_ANY             31008

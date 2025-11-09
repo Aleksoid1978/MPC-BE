@@ -2528,6 +2528,7 @@ BEGIN
     IDS_AG_SUBDELAY_INC     "Затримка субтитрів +"
     IDS_FILE_SAVE_THUMBNAILS "Зберегти мініатюри"
     IDS_OSD_TEST            "Тестове OSD"
+    IDS_ADDITIONAL_AUDIO_PATHS ".\\fandub;"
 END
 
 STRINGTABLE
@@ -3723,7 +3724,7 @@ BEGIN
     IDS_SATURATION_DEC      "Зменшення насиченості"
     IDS_RESET_COLOR         "Скинути налаштування щодо управління кольором"
     IDS_AFTERPLAYBACK_CLOSE_FILE "Наприкінці відтворення: Завжди закривати файл"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "After Playback: Always close file and minimize player"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "After Playback: Always close file and minimize player"
     IDS_UPDATE_ERROR_DATA   "Сервер оновлень видає невірні дані.\n\nБудь ласка, спробуйте пізніше."
     IDS_USING_NEWER_VERSION "Ви вже використовуєте останню версію v%s"
     IDS_NEW_UPDATE_AVAILABLE  "Доступна нова версія v%s.\n\nВи хочете відвідати сайт MPC-BE щоб завантажити її?"

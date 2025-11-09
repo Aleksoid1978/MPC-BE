@@ -2527,6 +2527,7 @@ BEGIN
     IDS_AG_SUBDELAY_INC     "Întârzie subtitrarea +"
     IDS_FILE_SAVE_THUMBNAILS "Salvează miniaturi"
     IDS_OSD_TEST            "Test pentru OSD (On Screen Diplay / Afișare pe ecran)"
+    IDS_ADDITIONAL_AUDIO_PATHS ".\\fandub;"
 END
 
 STRINGTABLE
@@ -3722,7 +3723,7 @@ BEGIN
     IDS_SATURATION_DEC      "Micșorează saturația"
     IDS_RESET_COLOR         "Resetează setările de culoare"
     IDS_AFTERPLAYBACK_CLOSE_FILE "După redare: închide întotdeauna fișierul"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE "După redare: întotdeauna închide fișierul și minimizează playerul"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "După redare: întotdeauna închide fișierul și minimizează playerul"
     IDS_UPDATE_ERROR_DATA   "Serverul pentru actualizare oferă date greșite.\n\nTe rugăm să încerci mai târziu."
     IDS_USING_NEWER_VERSION "Deja folosești ultima versiune %s."
     IDS_NEW_UPDATE_AVAILABLE  "O nouă %s este disponibilă.\n\nVrei să vizitezi site-ul programului MPC-BE ca să o descarci?"
