@@ -394,7 +394,7 @@ void CPPageAudio::OnBnClickedResetAudioPaths()
 	m_sAudioPaths = DEFAULT_AUDIO_PATHS;
 	if (s.iCurrentLanguage == CMPlayerCApp::GetLanguageIndex(ID_LANGUAGE_RUSSIAN)) {
 		// experimental
-		m_sAudioPaths.Append(L".\\rus sound\\*;");
+		m_sAudioPaths.Append(L".\\rus sound*;.\\rus sound\\*;");
 	}
 
 	UpdateData(FALSE);
