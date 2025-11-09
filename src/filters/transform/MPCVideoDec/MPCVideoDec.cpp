@@ -1764,6 +1764,7 @@ void CMPCVideoDecFilter::CleanupFFmpeg()
 
 	av_frame_free(&m_pFrame);
 	av_frame_free(&m_pHWFrame);
+	av_packet_free(&m_pPacket);
 
 	m_FormatConverter.Cleanup();
 
@@ -2216,6 +2217,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
 		CheckPointer(m_pFrame, E_POINTER);
 		m_pHWFrame = av_frame_alloc();
 		CheckPointer(m_pHWFrame, E_POINTER);
+		m_pPacket = av_packet_alloc();
+		CheckPointer(m_pPacket, E_POINTER);
 
 		BITMAPINFOHEADER* pBMI = nullptr;
 		bool bInterlacedFieldPerSample = false;
@@ -3504,20 +3507,25 @@ static inline BOOL GOPFound(BYTE *buf, int len)
 	return FALSE;
 }
 
-HRESULT CMPCVideoDecFilter::FillAVPacket(AVPacket *avpkt, const BYTE *buffer, int buflen)
+HRESULT CMPCVideoDecFilter::FillAVPacket(const BYTE *buffer, int buflen)
 {
+	av_packet_unref(m_pPacket);
+
 	int size = buflen;
 	if (m_CodecId == AV_CODEC_ID_PRORES) {
 		// code from ffmpeg/libavutil/mem.c -> av_fast_realloc()
 		size = (buflen + AV_INPUT_BUFFER_PADDING_SIZE) + (buflen + AV_INPUT_BUFFER_PADDING_SIZE) / 16 + 32;
 	}
 
-	if (av_new_packet(avpkt, size) < 0) {
-		return E_OUTOFMEMORY;
-	}
-	memcpy(avpkt->data, buffer, buflen);
 	if (size > buflen) {
-		memset(avpkt->data + buflen, 0, size - buflen);
+		if (av_new_packet(m_pPacket, size) < 0) {
+			return E_OUTOFMEMORY;
+		}
+		memcpy(m_pPacket->data, buffer, buflen);
+		memset(m_pPacket->data + buflen, 0, size - buflen);
+	} else {
+		m_pPacket->data = const_cast<uint8_t*>(buffer);
+		m_pPacket->size = buflen;
 	}
 
 	return S_OK;
@@ -3935,17 +3943,13 @@ HRESULT CMPCVideoDecFilter::ParseInternal(const BYTE *buffer, int buflen, REFERE
 		}
 
 		if (pOutLen > 0) {
-			AVPacket *avpkt = av_packet_alloc();
-			if (FAILED(hr = FillAVPacket(avpkt, pOutBuffer, pOutLen))) {
-				av_packet_free(&avpkt);
+			if (FAILED(hr = FillAVPacket(pOutBuffer, pOutLen))) {
 				break;
 			}
 
-			avpkt->pts = rtStart;
+			m_pPacket->pts = rtStart;
 
-			hr = DecodeInternal(avpkt, rtStartIn, rtStopIn, bPreroll);
-
-			av_packet_free(&avpkt);
+			hr = DecodeInternal(m_pPacket, rtStartIn, rtStopIn, bPreroll);
 
 			if (FAILED(hr)) {
 				break;
@@ -3976,21 +3980,17 @@ HRESULT CMPCVideoDecFilter::Decode(const BYTE *buffer, int buflen, REFERENCE_TIM
 			return DecodeInternal(nullptr, INVALID_TIME, INVALID_TIME);
 		}
 
-		AVPacket *avpkt = av_packet_alloc();
-		if (FAILED(FillAVPacket(avpkt, buffer, buflen))) {
-			av_packet_free(&avpkt);
+		if (FAILED(FillAVPacket(buffer, buflen))) {
 			return E_OUTOFMEMORY;
 		}
 
-		avpkt->pts  = rtStartIn;
+		m_pPacket->pts  = rtStartIn;
 		if (rtStartIn != INVALID_TIME && rtStopIn != INVALID_TIME) {
-			avpkt->duration = rtStopIn - rtStartIn;
+			m_pPacket->duration = rtStopIn - rtStartIn;
 		}
-		avpkt->flags = bSyncPoint ? AV_PKT_FLAG_KEY : 0;
+		m_pPacket->flags = bSyncPoint ? AV_PKT_FLAG_KEY : 0;
 
-		hr = DecodeInternal(avpkt, rtStartIn, rtStopIn, bPreroll);
-
-		av_packet_free(&avpkt);
+		hr = DecodeInternal(m_pPacket, rtStartIn, rtStopIn, bPreroll);
 	}
 
 	return hr;

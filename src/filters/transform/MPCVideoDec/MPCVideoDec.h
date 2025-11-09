@@ -91,6 +91,7 @@ private:
 	AVCodecParserContext*					m_pParser  = nullptr;
 	AVFrame*								m_pFrame   = nullptr;
 	AVFrame*								m_pHWFrame = nullptr;
+	AVPacket*								m_pPacket = nullptr;
 	enum AVCodecID							m_CodecId;
 	REFERENCE_TIME							m_rtAvrTimePerFrame = 0;
 	bool									m_bCalculateStopTime = false;
@@ -217,7 +218,7 @@ private:
 	void			DetectVideoCard(HWND hWnd);
 	void			BuildOutputFormat();
 
-	HRESULT			FillAVPacket(AVPacket *avpkt, const BYTE *buffer, int buflen);
+	HRESULT			FillAVPacket(const BYTE *buffer, int buflen);
 	HRESULT			DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn, BOOL bPreroll = FALSE);
 	HRESULT			ParseInternal(const BYTE *buffer, int buflen, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn, BOOL bPreroll);
 	HRESULT			Decode(const BYTE *buffer, int buflen, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn, BOOL bSyncPoint = FALSE, BOOL bPreroll = FALSE);
