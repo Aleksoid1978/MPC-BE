@@ -1215,24 +1215,24 @@ BEGIN
     CONTROL         "Bij focus verliezen, volledig scherm verlaten",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,55,276,9
     LTEXT           "Volledigscherm-monitor",IDC_STATIC,13,66,238,8
     COMBOBOX        IDC_COMBO1,13,75,273,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "",IDC_STATIC,5,92,287,158
+    GROUPBOX        "",IDC_STATIC,5,92,287,169
     CONTROL         "Wijzig weergavemodus automatisch in volledig scherm",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,92,267,9
-    CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,10,103,226,112
+    CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,10,103,226,121
     PUSHBUTTON      "Toevoegen",IDC_BUTTON1,240,103,48,16
     PUSHBUTTON      "Verwijderen",IDC_BUTTON2,240,121,48,16
     PUSHBUTTON      "Omhoog",IDC_BUTTON3,240,144,48,16
     PUSHBUTTON      "Omlaag",IDC_BUTTON4,240,162,48,16
-    LTEXT           "Vertraging:",IDC_STATIC,242,190,46,8
-    EDITTEXT        IDC_EDIT2,240,202,24,12,ES_RIGHT | ES_AUTOHSCROLL
-    CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_HOTTRACK,254,203,10,8
-    LTEXT           "sec.",IDC_STATIC,267,204,19,8
+    LTEXT           "Vertraging:",IDC_STATIC,242,200,46,8
+    EDITTEXT        IDC_EDIT2,240,212,24,12,ES_RIGHT | ES_AUTOHSCROLL
+    CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_HOTTRACK,254,213,10,8
+    LTEXT           "sec.",IDC_STATIC,267,214,19,8
     CONTROL         "Weergavemodus vóór de weergave veranderen",IDC_CHECK7,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,217,271,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,227,271,9
     CONTROL         "Standaardmonitormodus toepassen bij verlaten van volledig scherm",IDC_CHECK3,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,228,270,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,238,270,9
     CONTROL         "Herstel resolutie bij afsluiten",IDC_RESTORERESCHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,239,270,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,249,270,9
 END
 
 IDD_NAVIGATION_DLG DIALOGEX 0, 0, 150, 305
