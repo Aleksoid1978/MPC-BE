@@ -1215,18 +1215,18 @@ BEGIN
     CONTROL         "Salir de pantalla completa cuando se pierda el enfoque",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,55,276,9
     LTEXT           "Monitor en Pantalla Completa",IDC_STATIC,13,66,238,8
     COMBOBOX        IDC_COMBO1,13,75,273,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "",IDC_STATIC,5,92,287,169
+    GROUPBOX        "",IDC_STATIC,5,91,287,169
     CONTROL         "Usar modo de monitor de cambio automático de pantalla completa",IDC_CHECK2,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,92,267,9
-    CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,10,103,226,121
-    PUSHBUTTON      "Agregar",IDC_BUTTON1,240,103,48,16
-    PUSHBUTTON      "Borrar",IDC_BUTTON2,240,121,48,16
-    PUSHBUTTON      "Subir",IDC_BUTTON3,240,144,48,16
-    PUSHBUTTON      "Bajar",IDC_BUTTON4,240,162,48,16
-    LTEXT           "Retraso:",IDC_STATIC,242,200,46,8
-    EDITTEXT        IDC_EDIT2,240,212,24,12,ES_RIGHT | ES_AUTOHSCROLL
-    CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_HOTTRACK,254,213,10,8
-    LTEXT           "seg.",IDC_STATIC,267,214,19,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,90,267,9
+    CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,10,101,226,124
+    PUSHBUTTON      "Agregar",IDC_BUTTON1,240,101,48,16
+    PUSHBUTTON      "Borrar",IDC_BUTTON2,240,119,48,16
+    PUSHBUTTON      "Subir",IDC_BUTTON3,240,142,48,16
+    PUSHBUTTON      "Bajar",IDC_BUTTON4,240,160,48,16
+    LTEXT           "Retraso:",IDC_STATIC,242,201,46,8
+    EDITTEXT        IDC_EDIT2,240,213,24,12,ES_RIGHT | ES_AUTOHSCROLL
+    CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_HOTTRACK,254,214,10,8
+    LTEXT           "seg.",IDC_STATIC,267,215,19,8
     CONTROL         "Cambia modo de visualización antes de iniciar la reproducción",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,227,271,9
     CONTROL         "Aplicar modo monitor por defecto al salir de pantalla completa",IDC_CHECK3,
