@@ -112,8 +112,8 @@ LicenseFile=..\LICENSE.txt
 OutputDir=.
 SetupIconFile=..\src\apps\mplayerc\res\icon.ico
 AppReadmeFile={app}\Readme.md
-WizardImageFile=WizardImageFile.bmp
-WizardSmallImageFile=WizardSmallImageFile.bmp
+WizardImageFile=WizardImageFile.png
+WizardSmallImageFile=WizardSmallImageFile.png
 #if VER >= EncodeVer(6,6,0)
 WizardStyle=modern dynamic
 #endif
