@@ -114,6 +114,9 @@ SetupIconFile=..\src\apps\mplayerc\res\icon.ico
 AppReadmeFile={app}\Readme.md
 WizardImageFile=WizardImageFile.bmp
 WizardSmallImageFile=WizardSmallImageFile.bmp
+#if VER >= EncodeVer(6,6,0)
+WizardStyle=modern dynamic
+#endif
 Compression=lzma2/ultra
 InternalCompressLevel=ultra
 SolidCompression=yes
