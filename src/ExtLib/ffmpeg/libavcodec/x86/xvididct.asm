@@ -24,7 +24,7 @@
 ;
 ; More details at http://skal.planet-d.net/coding/dct.html
 ;
-; =======     MMX and XMM forward discrete cosine transform     =======
+; ===========     XMM forward discrete cosine transform     ===========
 ;
 ; Copyright(C) 2001 Peter Ross <pross@xvid.org>
 ;
@@ -67,7 +67,6 @@
 %include "libavutil/x86/x86util.asm"
 
 SECTION_RODATA
-; Similar to tg_1_16 in MMX code
 tan1:   times 8 dw 13036
 tan2:   times 8 dw 27146
 tan3:   times 8 dw 43790
@@ -91,7 +90,6 @@ iTab4:  dw 0x4b42, 0x6254, 0xb4be, 0x9dac, 0x4b42, 0xd746, 0x4b42, 0xd746
         dw 0x3b21, 0x14c3, 0x587e, 0xeb3d, 0x14c3, 0x587e, 0x14c3, 0xc4df
         dw 0x6862, 0x587e, 0x979e, 0xc4df, 0x3b21, 0x979e, 0x587e, 0x979e
 
-; Similar to rounder_0 in MMX code
 ; 4 first similar, then: 4*8->6*16  5*8->4*16  6/7*8->5*16
 walkenIdctRounders: times 4 dd 65536
                     times 4 dd  3597
@@ -99,9 +97,6 @@ walkenIdctRounders: times 4 dd 65536
                     times 4 dd  1203
                     times 4 dd   120
                     times 4 dd   512
-                    times 2 dd     0
-
-pb_127: times 8 db 127
 
 SECTION .text
 
@@ -167,36 +162,47 @@ SECTION .text
 %define TAN1  xmm2
 %endif
 
-%macro JZ  2
-    test      %1, %1
+%macro JZ  3
+    test    %1%3, %1%3
     jz       .%2
 %endmacro
 
-%macro JNZ  2
-    test      %1, %1
+%macro JNZ  3
+    test    %1%3, %1%3
     jnz      .%2
 %endmacro
 
 %macro TEST_ONE_ROW 4 ; src, reg, clear, arg
     %3        %4
-    movq     mm1, [%1]
-    por      mm1, [%1 + 8]
-    paddusb  mm1, mm0
-    pmovmskb  %2, mm1
+    mova       m1, [%1]
+    ; due to signed saturation, m1 is all zero iff m1 is all zero after packing
+    packsswb   m1, m1
+%if ARCH_X86_64
+    movq       %2, m1
+%else
+    packsswb   m1, m1
+    movd       %2, m1
+%endif
 %endmacro
 
 ;row1, row2, reg1, reg2, clear1, arg1, clear2, arg2
 %macro  TEST_TWO_ROWS  8
     %5         %6
     %7         %8
-    movq      mm1, [%1 + 0]
-    por       mm1, [%1 + 8]
-    movq      mm2, [%2 + 0]
-    por       mm2, [%2 + 8]
-    paddusb   mm1, mm0
-    paddusb   mm2, mm0
-    pmovmskb   %3, mm1
-    pmovmskb   %4, mm2
+    mova       m1, [%1]
+    packsswb   m1, [%2]
+    packsswb   m1, m1
+%if ARCH_X86_64
+    movq       %4, m1
+    mov       %3d, %4d
+    shr       %4q, 32
+%else
+    packsswb   m1, m1
+    movd       %3, m1
+    mov        %4, %3
+    shr        %4, 16
+    and        %3, 0xFFFF
+%endif
 %endmacro
 
 ; IDCT pass on rows.
@@ -499,16 +505,16 @@ SECTION .text
 
 %macro IDCT_SSE2 1 ; 0=normal  1=put  2=add
 %if %1 == 0 || ARCH_X86_32
-    %define GPR0  r1d
-    %define GPR1  r2d
-    %define GPR2  r3d
-    %define GPR3  r4d
+    %define GPR0  r1
+    %define GPR1  r2
+    %define GPR2  r3
+    %define GPR3  r4
     %define NUM_GPRS 5
 %else
-    %define GPR0  r3d
-    %define GPR1  r4d
-    %define GPR2  r5d
-    %define GPR3  r6d
+    %define GPR0  r3
+    %define GPR1  r4
+    %define GPR2  r5
+    %define GPR3  r6
     %define NUM_GPRS 7
 %endif
 %if %1 == 0
@@ -527,34 +533,33 @@ cglobal xvid_idct_add, 0, NUM_GPRS, 8+7*ARCH_X86_64, dest, stride, block
     %xdefine BLOCK r0q
     %endif
 %endif
-    movq           mm0, [pb_127]
     iMTX_MULT      BLOCK + 0*16, iTab1, PUT_EVEN, ROW0, 0*16
     iMTX_MULT      BLOCK + 1*16, iTab2, PUT_ODD, ROW1,  1*16
     iMTX_MULT      BLOCK + 2*16, iTab3, PUT_EVEN, ROW2, 2*16
 
     TEST_TWO_ROWS  BLOCK + 3*16, BLOCK + 4*16, GPR0, GPR1, CLEAR_ODD, ROW3, CLEAR_EVEN, ROW4 ; a, c
-    JZ   GPR0, col1
+    JZ   GPR0, col1, d
     iMTX_MULT      BLOCK + 3*16, iTab4, PUT_ODD, ROW3,  3*16
 .col1:
     TEST_TWO_ROWS  BLOCK + 5*16, BLOCK + 6*16, GPR0, GPR2, CLEAR_ODD, ROW5, CLEAR_EVEN, ROW6 ; a, d
     TEST_ONE_ROW   BLOCK + 7*16, GPR3, CLEAR_ODD, ROW7 ; esi
 
     iLLM_HEAD
-    JNZ  GPR1, 2
-    JNZ  GPR0, 3
-    JNZ  GPR2, 4
-    JNZ  GPR3, 5
+    JNZ  GPR1, 2, d
+    JNZ  GPR0, 3, d
+    JNZ  GPR2, 4, d
+    JNZ  GPR3, 5, q
     iLLM_PASS_SPARSE BLOCK, %1
     jmp .6
 .2:
     iMTX_MULT     BLOCK + 4*16, iTab1, PUT_EVEN, ROW4
 .3:
     iMTX_MULT     BLOCK + 5*16, iTab4, PUT_ODD, ROW5,  4*16
-    JZ   GPR2, col2
+    JZ   GPR2, col2, d
 .4:
     iMTX_MULT     BLOCK + 6*16, iTab3, PUT_EVEN, ROW6, 5*16
 .col2:
-    JZ   GPR3, col3
+    JZ   GPR3, col3, q
 .5:
     iMTX_MULT     BLOCK + 7*16, iTab2, PUT_ODD, ROW7,  5*16
 .col3:
