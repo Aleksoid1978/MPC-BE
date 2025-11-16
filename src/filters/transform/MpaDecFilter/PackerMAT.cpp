@@ -177,31 +177,31 @@ void CPackerMAT::WriteHeader()
   m_buffer.resize(MAT_BUFFER_SIZE);
 
   // reserve size for the IEC header and the MAT start code
-  const size_t size = BURST_HEADER_SIZE + mat_start_code.size();
+  static constexpr size_t reserveSize = BURST_HEADER_SIZE + mat_start_code.size();
 
   // write MAT start code. IEC header written later, skip space only
   memcpy(m_buffer.data() + BURST_HEADER_SIZE, mat_start_code.data(), mat_start_code.size());
-  m_bufferCount = size;
+  m_bufferCount = reserveSize;
 
   // unless the start code falls into the padding, it's considered part of the current MAT frame
   // Note that audio frames are not always aligned with MAT frames, so we might already have a partial
   // frame at this point
-  m_state.matFramesize += size;
+  m_state.matFramesize += reserveSize;
 
   // The MAT metadata counts as padding, if we're scheduled to write any, which mean the start bytes
   // should reduce any further padding.
   if (m_state.padding > 0)
   {
     // if the header fits into the padding of the last frame, just reduce the amount of needed padding
-    if (m_state.padding > size)
+    if (m_state.padding > reserveSize)
     {
-      m_state.padding -= size;
+      m_state.padding -= reserveSize;
       m_state.matFramesize = 0;
     }
     else
     {
       // otherwise, consume all padding and set the size of the next MAT frame to the remaining data
-      m_state.matFramesize = (size - m_state.padding);
+      m_state.matFramesize = (reserveSize - m_state.padding);
       m_state.padding = 0;
     }
   }

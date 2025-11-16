@@ -10750,7 +10750,8 @@ void CMainFrame::SetDefaultFullscreenState()
 	CAppSettings& s = AfxGetAppSettings();
 
 	// Waffs : fullscreen command line
-	if (!(s.nCLSwitches & CLSW_ADD) && (s.nCLSwitches & CLSW_FULLSCREEN) && !s.slFiles.empty()) {
+	if (!(s.nCLSwitches & CLSW_ADD) && (s.nCLSwitches & CLSW_FULLSCREEN) &&
+			(!s.slFiles.empty() || ((s.nCLSwitches & CLSW_PLAY) && m_wndPlaylistBar.GetCount(true) > 0))) {
 		if (s.ExclusiveFSAllowed()) {
 			m_bStartInD3DFullscreen = true;
 		} else {
