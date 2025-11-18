@@ -95,7 +95,13 @@ AP4_TrunAtom::AP4_TrunAtom(AP4_Size         size,
     }
 
     int record_fields_count = (int)ComputeRecordFieldsCount(m_Flags);
-    if (record_fields_count > 0 && (bytes_left / (record_fields_count * 4) < sample_count)) {
+    if (!record_fields_count) {
+        // nothing to read
+        return;
+    }
+
+    if ((bytes_left / (record_fields_count * 4) < sample_count)) {
+        // not enough data for all samples, the format is invalid
         return;
     }
 
