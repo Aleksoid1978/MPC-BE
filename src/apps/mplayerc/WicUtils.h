@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2024 see Authors.txt
+ * (C) 2020-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,11 +28,9 @@ class CWICImagingFactory
 {
 // http://www.nuonsoft.com/blog/2011/10/17/introduction-to-wic-how-to-use-wic-to-load-an-image-and-draw-it-with-gdi/
 public:
-	inline static CWICImagingFactory& GetInstance()
-	{
-		if (nullptr == m_pInstance.get())
-			m_pInstance.reset(new CWICImagingFactory());
-		return *m_pInstance;
+	static CWICImagingFactory& GetInstance() {
+		static CWICImagingFactory instance;
+		return instance;
 	}
 
 	IWICImagingFactory* GetFactory() const;
@@ -41,8 +39,7 @@ protected:
 	CComPtr<IWICImagingFactory> m_pWICImagingFactory;
 
 private:
-	CWICImagingFactory();   // Private because singleton
-	inline static std::unique_ptr<CWICImagingFactory> m_pInstance;
+	CWICImagingFactory(); // Private because singleton
 };
 
 /////////////////////
