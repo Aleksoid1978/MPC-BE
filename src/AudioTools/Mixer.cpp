@@ -201,7 +201,7 @@ bool CMixer::Init()
 		}
 
 		// if back channels do not have sound, then divide side channels for the back and side
-		if (m_out_layout == AV_CH_LAYOUT_7POINT1) {
+		if ((m_in_layout & (AV_CH_BACK_LEFT | AV_CH_BACK_RIGHT)) == 0 && m_out_layout == AV_CH_LAYOUT_7POINT1) {
 			bool back_no_sound = true;
 			for (int i = 0; i < in_ch * 2; i++) {
 				if (m_matrix_dbl[4 * in_ch + i] != 0.0) {
