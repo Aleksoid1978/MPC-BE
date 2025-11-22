@@ -1542,7 +1542,7 @@ LPCWSTR CMainFrame::GetTextForBar(int style)
 
 void CMainFrame::UpdateTitle()
 {
-	if (m_eMediaLoadState == MLS_LOADED && m_bUpdateTitle && m_pAMMC[0]) {
+	if (m_eMediaLoadState == MLS_LOADED && m_PlaybackInfo.bUpdateTitle && m_pAMMC[0]) {
 		for (const auto& pAMMC : m_pAMMC) {
 			if (pAMMC) {
 				CComBSTR bstr;
@@ -6033,7 +6033,7 @@ void CMainFrame::OnFileSaveAs()
 
 	CStringW ext;
 	CStringW ext_list;
-	CStringW in = m_strPlaybackRenderedPath;
+	CStringW in = m_PlaybackInfo.RenderedPath;
 	CStringW out = in;
 
 	if (!m_youtubeFields.fname.IsEmpty()) {
@@ -6959,7 +6959,7 @@ void CMainFrame::OnFileProperties()
 
 			if (files.empty()) {
 				ASSERT(0);
-				files.emplace_back(m_strPlaybackRenderedPath);
+				files.emplace_back(m_PlaybackInfo.RenderedPath);
 			}
 		}
 	}
@@ -8179,7 +8179,7 @@ void CMainFrame::OnPlayPlay()
 						MakeBDLabel(GetCurFileName(), strOSD);
 					}
 
-					strOSD.AppendFormat(L" (%s)", GetFileName(m_strPlaybackRenderedPath));
+					strOSD.AppendFormat(L" (%s)", GetFileName(m_PlaybackInfo.RenderedPath));
 				} else if (strOSD.GetLength() > 0) {
 					strOSD.TrimRight('/');
 					strOSD.Replace('\\', '/');
@@ -9749,7 +9749,7 @@ void CMainFrame::OnNavigateSkipFile(UINT nID)
 	if (m_bIsBDPlay && m_wndPlaylistBar.GetCount() == 1) {
 		if (!m_BDPlaylists.empty()) {
 			auto it = std::find_if(m_BDPlaylists.cbegin(), m_BDPlaylists.cend(), [&](const CHdmvClipInfo::PlaylistItem& item) {
-				return item.m_strFileName == m_strPlaybackRenderedPath;
+				return item.m_strFileName == m_PlaybackInfo.RenderedPath;
 			});
 
 			if (nID == ID_NAVIGATE_SKIPBACKFILE) {
@@ -10023,7 +10023,7 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 		if (id < m_BDPlaylists.size()) {
 			UINT idx = 0;
 			for (const auto& item : m_BDPlaylists) {
-				if (idx == id && item.m_strFileName != m_strPlaybackRenderedPath) {
+				if (idx == id && item.m_strFileName != m_PlaybackInfo.RenderedPath) {
 					m_bNeedUnmountImage = FALSE;
 					SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 					m_bIsBDPlay = TRUE;
@@ -10042,7 +10042,7 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 		if (m_youtubeUrllist.size() > 1 && id < m_youtubeUrllist.size()) {
 			UINT idx = 0;
 			for (const auto& item : m_youtubeUrllist) {
-				if (idx == id && item.url != m_strPlaybackRenderedPath) {
+				if (idx == id && item.url != m_PlaybackInfo.RenderedPath) {
 					const int tagSelected = item.profile->iTag;
 					m_bYoutubeOpened = true;
 
@@ -10312,8 +10312,8 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 	sesInfo.CleanPosition();
 
 	std::list<CString> descList;
-	if (m_FileName.GetLength()) {
-		descList.emplace_back(m_FileName);
+	if (m_PlaybackInfo.FileName.GetLength()) {
+		descList.emplace_back(m_PlaybackInfo.FileName);
 	}
 	if (m_SessionInfo.Title.GetLength()) {
 		descList.emplace_back(m_SessionInfo.Title);
@@ -12292,8 +12292,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	m_strPlaybackRenderedPath.Empty();
-
 	CString youtubeUrl;
 	CString youtubeErrorMessage;
 
@@ -12326,7 +12324,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			FixFilename(m_youtubeFields.fname);
 		}
 
-		m_strPlaybackRenderedPath = pOFD->fi.GetPath();
+		m_PlaybackInfo.RenderedPath = pOFD->fi.GetPath();
 		m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
 	}
 	else if (s.bYoutubePageParser && pOFD->auds.empty()) {
@@ -12348,7 +12346,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				youtubeUrl = url;
 				Content::Online::Disconnect(url);
 
-				m_strPlaybackRenderedPath = pOFD->fi.GetPath();
+				m_PlaybackInfo.RenderedPath = pOFD->fi.GetPath();
 				m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
 			} else {
 				m_youtubeFields.Empty();
@@ -12416,7 +12414,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 						Content::Online::Disconnect(url);
 
 						*pOFD = OFD;
-						m_strPlaybackRenderedPath = pOFD->fi.GetPath();
+						m_PlaybackInfo.RenderedPath = pOFD->fi.GetPath();
 						m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
 					} else {
 						m_youtubeFields.Empty();
@@ -12441,10 +12439,10 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	UpdatePlayerStatus();
 
 	if (!::PathIsURLW(pOFD->fi)) {
-		m_FileName = GetFileName(pOFD->fi);
+		m_PlaybackInfo.FileName = GetFileName(pOFD->fi);
 	}
 	else if (youtubeUrl.IsEmpty()) {
-		m_bUpdateTitle = true;
+		m_PlaybackInfo.bUpdateTitle = true;
 	}
 
 	auto AddCustomChapters = [&](const auto& chaplist) {
@@ -12603,14 +12601,14 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		if (youtubeUrl.GetLength()) {
 			fn = youtubeUrl;
 		}
-		if (m_strPlaybackRenderedPath.IsEmpty()) {
-			m_strPlaybackRenderedPath = fn;
+		if (m_PlaybackInfo.RenderedPath.IsEmpty()) {
+			m_PlaybackInfo.RenderedPath = fn;
 		}
 		if (s.bKeepHistory && pOFD->bAddRecent && IsLikelyFilePath(fn)) {
 			// there should not be a URL, otherwise explorer dirtied HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts
 			SHAddToRecentDocs(SHARD_PATHW, fn); // remember the last open files (system) through the drag-n-drop
 		}
-		pOFD->title = m_strPlaybackRenderedPath;
+		pOFD->title = m_PlaybackInfo.RenderedPath;
 	}
 
 	for (auto& aud : pOFD->auds) {
@@ -13157,7 +13155,6 @@ CString CMainFrame::OpenCapture(OpenDeviceData* pODD)
 
 	pODD->title = ResStr(IDS_CAPTURE_LIVE);
 
-	ClearPlaybackInfo();
 	m_SessionInfo.Title = ResStr(IDS_CAPTURE_LIVE);
 
 	SetPlaybackMode(PM_CAPTURE);
@@ -14539,9 +14536,7 @@ void CMainFrame::CloseMediaPrivate()
 
 	auto& s = AfxGetAppSettings();
 
-	if (s.bKeepHistory) {
-		SaveHistory();
-	}
+	SaveHistory();
 
 	if (s.bRememberSelectedTracks && m_bRememberSelectedTracks) {
 		m_wndPlaylistBar.curPlayList.m_nSelectedAudioTrack = GetAudioTrackIdx();
@@ -14550,9 +14545,7 @@ void CMainFrame::CloseMediaPrivate()
 
 	m_ExternalSubstreams.clear();
 
-	ClearPlaybackInfo();
-
-	m_strPlaybackRenderedPath.Empty();
+	m_PlaybackInfo.Clear();
 
 	if (!m_bYoutubeOpened) {
 		m_youtubeFields.Empty();
@@ -15595,7 +15588,7 @@ void CMainFrame::SetupNavChaptersSubMenu()
 				}
 				mline++;
 
-				if (Item.m_strFileName == m_strPlaybackRenderedPath) {
+				if (Item.m_strFileName == m_PlaybackInfo.RenderedPath) {
 					flags |= MF_CHECKED | MFT_RADIOCHECK;
 				}
 
@@ -15606,7 +15599,7 @@ void CMainFrame::SetupNavChaptersSubMenu()
 			for (size_t i = 0; i < m_youtubeUrllist.size(); i++) {
 				UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 
-				if (m_youtubeUrllist[i].url == m_strPlaybackRenderedPath) {
+				if (m_youtubeUrllist[i].url == m_PlaybackInfo.RenderedPath) {
 					flags |= MF_CHECKED | MFT_RADIOCHECK;
 				}
 
@@ -19784,7 +19777,7 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 
 			if (!bLoadRes) {
 				// try to load image from file in the same dir that media file to show in preview & logo;
-				CString img_fname = GetCoverImgFromPath(m_strPlaybackRenderedPath);
+				CString img_fname = GetCoverImgFromPath(m_PlaybackInfo.RenderedPath);
 
 				if (!img_fname.IsEmpty()) {
 					hr = WicLoadImage(&m_pMainBitmap, true, img_fname.GetString());
@@ -20188,7 +20181,7 @@ void CMainFrame::MakeDVDLabel(CString path, CString& label, CString* pDVDlabel)
 
 CString CMainFrame::GetCurFileName()
 {
-	CString fn = !m_youtubeFields.fname.IsEmpty() ? m_wndPlaylistBar.GetCurFileName() : m_strPlaybackRenderedPath;
+	CString fn = !m_youtubeFields.fname.IsEmpty() ? m_wndPlaylistBar.GetCurFileName() : m_PlaybackInfo.RenderedPath;
 
 	if (fn.IsEmpty() && m_pMainFSF) {
 		LPOLESTR pFN = nullptr;
@@ -20976,8 +20969,12 @@ void CMainFrame::OnUpdateRepeatForever(CCmdUI* pCmdUI)
 
 void CMainFrame::SaveHistory()
 {
-	auto& historyFile = AfxGetMyApp()->m_HistoryFile;
 	auto& s = AfxGetAppSettings();
+	if (!s.bKeepHistory) {
+		return;
+	}
+
+	auto& historyFile = AfxGetMyApp()->m_HistoryFile;
 
 	if (GetPlaybackMode() == PM_FILE) {
 		if (s.bRememberFilePos && !m_bGraphEventComplete) {

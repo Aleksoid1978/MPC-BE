@@ -486,7 +486,22 @@ private:
 	double m_ZoomX, m_ZoomY, m_PosX, m_PosY;
 	int m_iDefRotation;
 
-	SessionInfo m_SessionInfo;
+	struct {
+		SessionInfo Session;           // data for history
+
+		CStringW FileName;             // file name without path
+		CStringW RenderedPath;         // real path to media data (relevant for YouTube and others)
+		bool     bUpdateTitle = false; // radio broadcast is possible and the title change should be checked
+
+		void Clear() {
+			Session.NewPath(L"");
+			FileName.Empty();
+			RenderedPath.Empty();
+			bUpdateTitle = false;
+		}
+	} m_PlaybackInfo;
+	SessionInfo& m_SessionInfo = m_PlaybackInfo.Session; // data for history
+
 	DVD_DOMAIN m_iDVDDomain;
 	DWORD m_iDVDTitle = 0;
 	DWORD m_iDVDTitleForHistory = 0;
@@ -496,28 +511,18 @@ private:
 	std::list<SessionInfo> m_FavFiles;   // used in SetupFavoritesSubMenu and OnFavoritesFile
 	std::list<SessionInfo> m_FavDVDs;    // used in SetupFavoritesSubMenu and OnFavoritesDVD
 
-	CStringW m_FileName;
-	bool m_bUpdateTitle = false;
-	void ClearPlaybackInfo()
-	{
-		m_SessionInfo.NewPath("");
-		m_FileName.Empty();
-		m_bUpdateTitle = false;
-	}
 	LPCWSTR GetFileNameOrTitleOrPath() {
 		return
-			m_FileName.GetLength() ? m_FileName.GetString() :
+			m_PlaybackInfo.FileName.GetLength() ? m_PlaybackInfo.FileName.GetString() :
 			m_SessionInfo.Title.GetLength() ? m_SessionInfo.Title.GetString() :
 			m_SessionInfo.Path.GetString();
 	}
 	LPCWSTR GetTitleOrFileNameOrPath() {
 		return
 			m_SessionInfo.Title.GetLength() ? m_SessionInfo.Title.GetString() :
-			m_FileName.GetLength() ? m_FileName.GetString() :
+			m_PlaybackInfo.FileName.GetLength() ? m_PlaybackInfo.FileName.GetString() :
 			m_SessionInfo.Path.GetString();
 	}
-
-	CString m_strPlaybackRenderedPath;
 
 	bool m_bOpening = false;
 
