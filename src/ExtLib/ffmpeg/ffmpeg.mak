@@ -547,7 +547,7 @@ SRCS_LC_B = \
 	libavcodec/vp5.c \
 	libavcodec/vp56.c \
 	libavcodec/vp56data.c \
-	libavcodec/vp56dsp.c \
+	libavcodec/vp5dsp.c \
 	libavcodec/vp6.c \
 	libavcodec/vp6dsp.c \
 	libavcodec/vp8.c \
