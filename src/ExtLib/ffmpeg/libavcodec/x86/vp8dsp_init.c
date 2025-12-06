@@ -26,24 +26,9 @@
 #include "libavutil/x86/cpu.h"
 #include "libavcodec/vp8dsp.h"
 
-#if HAVE_X86ASM
-
 /*
  * MC functions
  */
-void ff_put_vp8_epel4_h4_mmxext(uint8_t *dst, ptrdiff_t dststride,
-                                const uint8_t *src, ptrdiff_t srcstride,
-                                int height, int mx, int my);
-void ff_put_vp8_epel4_h6_mmxext(uint8_t *dst, ptrdiff_t dststride,
-                                const uint8_t *src, ptrdiff_t srcstride,
-                                int height, int mx, int my);
-void ff_put_vp8_epel4_v4_mmxext(uint8_t *dst, ptrdiff_t dststride,
-                                const uint8_t *src, ptrdiff_t srcstride,
-                                int height, int mx, int my);
-void ff_put_vp8_epel4_v6_mmxext(uint8_t *dst, ptrdiff_t dststride,
-                                const uint8_t *src, ptrdiff_t srcstride,
-                                int height, int mx, int my);
-
 void ff_put_vp8_epel8_h4_sse2  (uint8_t *dst, ptrdiff_t dststride,
                                 const uint8_t *src, ptrdiff_t srcstride,
                                 int height, int mx, int my);
@@ -82,9 +67,6 @@ void ff_put_vp8_epel8_v6_ssse3 (uint8_t *dst, ptrdiff_t dststride,
                                 const uint8_t *src, ptrdiff_t srcstride,
                                 int height, int mx, int my);
 
-void ff_put_vp8_bilinear4_h_mmxext(uint8_t *dst, ptrdiff_t dststride,
-                                   const uint8_t *src, ptrdiff_t srcstride,
-                                   int height, int mx, int my);
 void ff_put_vp8_bilinear8_h_sse2  (uint8_t *dst, ptrdiff_t dststride,
                                    const uint8_t *src, ptrdiff_t srcstride,
                                    int height, int mx, int my);
@@ -95,9 +77,6 @@ void ff_put_vp8_bilinear8_h_ssse3 (uint8_t *dst, ptrdiff_t dststride,
                                    const uint8_t *src, ptrdiff_t srcstride,
                                    int height, int mx, int my);
 
-void ff_put_vp8_bilinear4_v_mmxext(uint8_t *dst, ptrdiff_t dststride,
-                                   const uint8_t *src, ptrdiff_t srcstride,
-                                   int height, int mx, int my);
 void ff_put_vp8_bilinear8_v_sse2  (uint8_t *dst, ptrdiff_t dststride,
                                    const uint8_t *src, ptrdiff_t srcstride,
                                    int height, int mx, int my);
@@ -109,7 +88,7 @@ void ff_put_vp8_bilinear8_v_ssse3 (uint8_t *dst, ptrdiff_t dststride,
                                    int height, int mx, int my);
 
 
-void ff_put_vp8_pixels8_mmx (uint8_t *dst, ptrdiff_t dststride,
+void ff_put_vp8_pixels8_sse2(uint8_t *dst, ptrdiff_t dststride,
                              const uint8_t *src, ptrdiff_t srcstride,
                              int height, int mx, int my);
 void ff_put_vp8_pixels16_sse(uint8_t *dst, ptrdiff_t dststride,
@@ -125,16 +104,6 @@ static void ff_put_vp8_ ## FILTERTYPE ## 16_ ## TAPTYPE ## _ ## OPT( \
         dst,     dststride, src,     srcstride, height, mx, my); \
     ff_put_vp8_ ## FILTERTYPE ## 8_ ## TAPTYPE ## _ ## OPT( \
         dst + 8, dststride, src + 8, srcstride, height, mx, my); \
-}
-#define TAP_W8(OPT, FILTERTYPE, TAPTYPE) \
-static void ff_put_vp8_ ## FILTERTYPE ## 8_ ## TAPTYPE ## _ ## OPT( \
-    uint8_t *dst,  ptrdiff_t dststride, uint8_t *src, \
-    ptrdiff_t srcstride, int height, int mx, int my) \
-{ \
-    ff_put_vp8_ ## FILTERTYPE ## 4_ ## TAPTYPE ## _ ## OPT( \
-        dst,     dststride, src,     srcstride, height, mx, my); \
-    ff_put_vp8_ ## FILTERTYPE ## 4_ ## TAPTYPE ## _ ## OPT( \
-        dst + 4, dststride, src + 4, srcstride, height, mx, my); \
 }
 
 TAP_W16(sse2,  epel, h6)
@@ -160,14 +129,6 @@ static void ff_put_vp8_epel ## SIZE ## _h ## TAPNUMX ## v ## TAPNUMY ## _ ## OPT
     ff_put_vp8_epel ## SIZE ## _v ## TAPNUMY ## _ ## OPT( \
         dst, dststride, tmpptr, SIZE,      height,               mx, my); \
 }
-
-#define HVTAPMMX(x, y) \
-HVTAP(mmxext, 8, x, y,  4,  8)
-
-HVTAPMMX(4, 4)
-HVTAPMMX(4, 6)
-HVTAPMMX(6, 4)
-HVTAPMMX(6, 6)
 
 #define HVTAPSSE2(x, y, w) \
 HVTAP(sse2,  16, x, y, w, 16) \
@@ -196,7 +157,6 @@ static void ff_put_vp8_bilinear ## SIZE ## _hv_ ## OPT( \
         dst, dststride, tmp, SIZE,      height,     mx, my); \
 }
 
-HVBILIN(mmxext,  8,  4,  8)
 HVBILIN(sse2,  8,  8, 16)
 HVBILIN(sse2,  8, 16, 16)
 HVBILIN(ssse3, 8,  4,  8)
@@ -254,8 +214,6 @@ DECLARE_LOOP_FILTER(sse2)
 DECLARE_LOOP_FILTER(ssse3)
 DECLARE_LOOP_FILTER(sse4)
 
-#endif /* HAVE_X86ASM */
-
 #define VP8_LUMA_MC_FUNC(IDX, SIZE, OPT) \
     c->put_vp8_epel_pixels_tab[IDX][0][2] = ff_put_vp8_epel ## SIZE ## _h6_ ## OPT; \
     c->put_vp8_epel_pixels_tab[IDX][2][0] = ff_put_vp8_epel ## SIZE ## _v6_ ## OPT; \
@@ -282,20 +240,7 @@ DECLARE_LOOP_FILTER(sse4)
 
 av_cold void ff_vp78dsp_init_x86(VP8DSPContext *c)
 {
-#if HAVE_X86ASM
     int cpu_flags = av_get_cpu_flags();
-
-    if (EXTERNAL_MMX(cpu_flags)) {
-        c->put_vp8_epel_pixels_tab[1][0][0]     =
-        c->put_vp8_bilinear_pixels_tab[1][0][0] = ff_put_vp8_pixels8_mmx;
-    }
-
-    /* note that 4-tap width=16 functions are missing because w=16
-     * is only used for luma, and luma is always a copy or sixtap. */
-    if (EXTERNAL_MMXEXT(cpu_flags)) {
-        VP8_MC_FUNC(2, 4, mmxext);
-        VP8_BILINEAR_MC_FUNC(2, 4, mmxext);
-    }
 
     if (EXTERNAL_SSE(cpu_flags)) {
         c->put_vp8_epel_pixels_tab[0][0][0]     =
@@ -303,12 +248,16 @@ av_cold void ff_vp78dsp_init_x86(VP8DSPContext *c)
     }
 
     if (EXTERNAL_SSE2_SLOW(cpu_flags)) {
+        c->put_vp8_epel_pixels_tab[1][0][0]     =
+        c->put_vp8_bilinear_pixels_tab[1][0][0] = ff_put_vp8_pixels8_sse2;
         VP8_LUMA_MC_FUNC(0, 16, sse2);
         VP8_MC_FUNC(1, 8, sse2);
         VP8_BILINEAR_MC_FUNC(0, 16, sse2);
         VP8_BILINEAR_MC_FUNC(1, 8, sse2);
     }
 
+    /* note that 4-tap width=16 functions are missing because w=16
+     * is only used for luma, and luma is always a copy or sixtap. */
     if (EXTERNAL_SSSE3(cpu_flags)) {
         VP8_LUMA_MC_FUNC(0, 16, ssse3);
         VP8_MC_FUNC(1, 8, ssse3);
@@ -317,12 +266,10 @@ av_cold void ff_vp78dsp_init_x86(VP8DSPContext *c)
         VP8_BILINEAR_MC_FUNC(1, 8, ssse3);
         VP8_BILINEAR_MC_FUNC(2, 4, ssse3);
     }
-#endif /* HAVE_X86ASM */
 }
 
 av_cold void ff_vp8dsp_init_x86(VP8DSPContext *c)
 {
-#if HAVE_X86ASM
     int cpu_flags = av_get_cpu_flags();
 
     if (EXTERNAL_MMX(cpu_flags)) {
@@ -379,5 +326,4 @@ av_cold void ff_vp8dsp_init_x86(VP8DSPContext *c)
         c->vp8_h_loop_filter16y       = ff_vp8_h_loop_filter16y_mbedge_sse4;
         c->vp8_h_loop_filter8uv       = ff_vp8_h_loop_filter8uv_mbedge_sse4;
     }
-#endif /* HAVE_X86ASM */
 }

@@ -645,14 +645,15 @@ int ff_decode_receive_frame_internal(AVCodecContext *avctx, AVFrame *frame)
     return ret;
 }
 
-static int decode_receive_frame_internal(AVCodecContext *avctx, AVFrame *frame)
+static int decode_receive_frame_internal(AVCodecContext *avctx, AVFrame *frame,
+                                         unsigned flags)
 {
     AVCodecInternal *avci = avctx->internal;
     DecodeContext     *dc = decode_ctx(avci);
     int ret, ok;
 
     if (avctx->active_thread_type & FF_THREAD_FRAME)
-        ret = ff_thread_receive_frame(avctx, frame);
+        ret = ff_thread_receive_frame(avctx, frame, flags);
     else
         ret = ff_decode_receive_frame_internal(avctx, frame);
 
@@ -730,7 +731,7 @@ int attribute_align_arg avcodec_send_packet(AVCodecContext *avctx, const AVPacke
         dc->draining_started = 1;
 
     if (!avci->buffer_frame->buf[0] && !dc->draining_started) {
-        ret = decode_receive_frame_internal(avctx, avci->buffer_frame);
+        ret = decode_receive_frame_internal(avctx, avci->buffer_frame, 0);
         if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF)
             return ret;
     }
@@ -747,8 +748,8 @@ static int apply_cropping(AVCodecContext *avctx, AVFrame *frame)
         (frame->crop_top + frame->crop_bottom) >= frame->height) {
         av_log(avctx, AV_LOG_WARNING,
                "Invalid cropping information set by a decoder: "
-               "%"SIZE_SPECIFIER"/%"SIZE_SPECIFIER"/%"SIZE_SPECIFIER"/%"SIZE_SPECIFIER" "
-               "(frame size %dx%d). This is a bug, please report it\n",
+               "%zu/%zu/%zu/%zu (frame size %dx%d). "
+               "This is a bug, please report it\n",
                frame->crop_left, frame->crop_right, frame->crop_top, frame->crop_bottom,
                frame->width, frame->height);
         frame->crop_left   = 0;
@@ -792,7 +793,7 @@ fail:
     return AVERROR_BUG;
 }
 
-int ff_decode_receive_frame(AVCodecContext *avctx, AVFrame *frame)
+int ff_decode_receive_frame(AVCodecContext *avctx, AVFrame *frame, unsigned flags)
 {
     AVCodecInternal *avci = avctx->internal;
     int ret;
@@ -800,7 +801,7 @@ int ff_decode_receive_frame(AVCodecContext *avctx, AVFrame *frame)
     if (avci->buffer_frame->buf[0]) {
         av_frame_move_ref(frame, avci->buffer_frame);
     } else {
-        ret = decode_receive_frame_internal(avctx, frame);
+        ret = decode_receive_frame_internal(avctx, frame, flags);
         if (ret < 0)
             return ret;
     }
@@ -2270,7 +2271,7 @@ int ff_copy_palette(void *dst, const AVPacket *src, void *logctx)
         return 1;
     } else if (pal) {
         av_log(logctx, AV_LOG_ERROR,
-               "Palette size %"SIZE_SPECIFIER" is wrong\n", size);
+               "Palette size %zu is wrong\n", size);
     }
     return 0;
 }

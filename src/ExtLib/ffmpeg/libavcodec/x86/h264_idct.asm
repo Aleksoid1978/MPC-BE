@@ -51,11 +51,23 @@ scan8_mem: db  4+ 1*8, 5+ 1*8, 4+ 2*8, 5+ 2*8
 %endif
 
 cextern pw_32
-cextern pw_1
 
 SECTION .text
 
-; %1=uint8_t *dst, %2=int16_t *block, %3=int stride
+; %1=callee, %2=dst to jump to if tail call is impossible (can be empty,
+; then no jmp is performed), %3=current iteration, %4=last iteration
+%macro TAIL_CALL_IF_LAST 4
+%if (%3 == %4) && !has_epilogue
+    jmp         %1
+%else
+    call        %1
+    %ifnempty %2
+        jmp      %2
+    %endif
+%endif
+%endmacro
+
+; %1=uint8_t *dst, %2=int16_t *block, %3=ptrdiff_t stride
 %macro IDCT4_ADD 3
     ; Load dct coeffs
     movq         m0, [%2]
@@ -77,10 +89,15 @@ SECTION .text
     paddw        m0, m6
     IDCT4_1D      w, 0, 1, 2, 3, 4, 5
     pxor         m7, m7
-    movq    [%2+ 0], m7
-    movq    [%2+ 8], m7
-    movq    [%2+16], m7
-    movq    [%2+24], m7
+    %if mmsize == 16
+        mova    [%2+ 0], m7
+        mova    [%2+16], m7
+    %else
+        movq    [%2+ 0], m7
+        movq    [%2+ 8], m7
+        movq    [%2+16], m7
+        movq    [%2+24], m7
+    %endif
 
     STORE_DIFFx2 m0, m1, m4, m5, m7, 6, %1, %3
     lea          %1, [%1+%3*2]
@@ -145,62 +162,7 @@ SECTION .text
     IDCT8_1D   [%1], [%1+ 64]
 %endmacro
 
-; %1=int16_t *block, %2=int16_t *dstblock
-%macro IDCT8_ADD_MMX_START 2
-    IDCT8_1D_FULL %1
-    mova       [%1], m7
-    TRANSPOSE4x4W 0, 1, 2, 3, 7
-    mova         m7, [%1]
-    mova    [%2   ], m0
-    mova    [%2+16], m1
-    mova    [%2+32], m2
-    mova    [%2+48], m3
-    TRANSPOSE4x4W 4, 5, 6, 7, 3
-    mova    [%2+ 8], m4
-    mova    [%2+24], m5
-    mova    [%2+40], m6
-    mova    [%2+56], m7
-%endmacro
-
-; %1=uint8_t *dst, %2=int16_t *block, %3=int stride
-%macro IDCT8_ADD_MMX_END 3-4
-    IDCT8_1D_FULL %2
-    mova    [%2   ], m5
-    mova    [%2+16], m6
-    mova    [%2+32], m7
-
-    pxor         m7, m7
-%if %0 == 4
-    movq   [%4+  0], m7
-    movq   [%4+  8], m7
-    movq   [%4+ 16], m7
-    movq   [%4+ 24], m7
-    movq   [%4+ 32], m7
-    movq   [%4+ 40], m7
-    movq   [%4+ 48], m7
-    movq   [%4+ 56], m7
-    movq   [%4+ 64], m7
-    movq   [%4+ 72], m7
-    movq   [%4+ 80], m7
-    movq   [%4+ 88], m7
-    movq   [%4+ 96], m7
-    movq   [%4+104], m7
-    movq   [%4+112], m7
-    movq   [%4+120], m7
-%endif
-    STORE_DIFFx2 m0, m1, m5, m6, m7, 6, %1, %3
-    lea          %1, [%1+%3*2]
-    STORE_DIFFx2 m2, m3, m5, m6, m7, 6, %1, %3
-    mova         m0, [%2   ]
-    mova         m1, [%2+16]
-    mova         m2, [%2+32]
-    lea          %1, [%1+%3*2]
-    STORE_DIFFx2 m4, m0, m5, m6, m7, 6, %1, %3
-    lea          %1, [%1+%3*2]
-    STORE_DIFFx2 m1, m2, m5, m6, m7, 6, %1, %3
-%endmacro
-
-; %1=uint8_t *dst, %2=int16_t *block, %3=int stride
+; %1=uint8_t *dst, %2=int16_t *block, %3=ptrdiff_t stride
 %macro IDCT8_ADD_SSE 4
     IDCT8_1D_FULL %2
 %if ARCH_X86_64
@@ -371,30 +333,6 @@ INIT_XMM cpuname
     RET
 
 INIT_MMX mmx
-h264_idct_add8_mmx_plane:
-    movsxdifnidn r3, r3d
-.nextblock:
-    movzx        r6, byte [scan8+r5]
-    movzx        r6, byte [r4+r6]
-    or          r6w, word [r2]
-    test         r6, r6
-    jz .skipblock
-%if ARCH_X86_64
-    mov         r0d, dword [r1+r5*4]
-    add          r0, [dst2q]
-%else
-    mov          r0, r1m ; XXX r1m here is actually r0m of the calling func
-    mov          r0, [r0]
-    add          r0, dword [r1+r5*4]
-%endif
-    IDCT4_ADD    r0, r2, r3
-.skipblock:
-    inc          r5
-    add          r2, 32
-    test         r5, 3
-    jnz .nextblock
-    rep ret
-
 cglobal h264_idct_add8_422_8, 5, 8 + npicregs, 0, dst1, block_offset, block, stride, nnzc, cntr, coeff, dst2, picreg
 ; dst1, block_offset, block, stride, nnzc, cntr, coeff, dst2, picreg
     movsxdifnidn r3, r3d
@@ -423,13 +361,34 @@ cglobal h264_idct_add8_422_8, 5, 8 + npicregs, 0, dst1, block_offset, block, str
 
     call         h264_idct_add8_mmx_plane
     add r5, 4
-    call         h264_idct_add8_mmx_plane
+    TAIL_CALL    h264_idct_add8_mmx_plane, 0
 
-    RET ; TODO: check rep ret after a function call
+h264_idct_add8_mmx_plane:
+.nextblock:
+    movzx       r6d, byte [scan8+r5]
+    movzx       r6d, byte [r4+r6]
+    or          r6w, word [r2]
+    test        r6d, r6d
+    jz .skipblock
+%if ARCH_X86_64
+    mov         r0d, dword [r1+r5*4]
+    add          r0, [dst2q]
+%else
+    mov          r0, r1m ; XXX r1m here is actually r0m of the calling func
+    mov          r0, [r0]
+    add          r0, dword [r1+r5*4]
+%endif
+    IDCT4_ADD    r0, r2, r3
+.skipblock:
+    inc         r5d
+    add          r2, 32
+    test        r5d, 3
+    jnz .nextblock
+    rep ret
 
-; r0 = uint8_t *dst, r2 = int16_t *block, r3 = int stride, r6=clobbered
+
+; r0 = uint8_t *dst, r2 = int16_t *block, r3 = ptrdiff_t stride, r6=clobbered
 h264_idct_dc_add8_mmxext:
-    movsxdifnidn r3, r3d
     movd         m0, [r2   ]          ;  0 0 X D
     mov word [r2+ 0], 0
     punpcklwd    m0, [r2+32]          ;  x X d D
@@ -448,9 +407,8 @@ h264_idct_dc_add8_mmxext:
 
 ALIGN 16
 INIT_XMM sse2
-; r0 = uint8_t *dst (clobbered), r2 = int16_t *block, r3 = int stride
+; r0 = uint8_t *dst (clobbered), r2 = int16_t *block, r3 = ptrdiff_t stride
 h264_add8x4_idct_sse2:
-    movsxdifnidn r3, r3d
     movq   m0, [r2+ 0]
     movq   m1, [r2+ 8]
     movq   m2, [r2+16]
@@ -483,7 +441,7 @@ h264_add8x4_idct_sse2:
 %else
     add         r0, r0m
 %endif
-    call        h264_add8x4_idct_sse2
+    TAIL_CALL_IF_LAST h264_add8x4_idct_sse2, , %1, 7
 .cycle%1end:
 %if %1 < 7
     add         r2, 64
@@ -520,8 +478,7 @@ RET
 %else
     add         r0, r0m
 %endif
-    call        h264_add8x4_idct_sse2
-    jmp .cycle%1end
+    TAIL_CALL_IF_LAST h264_add8x4_idct_sse2, .cycle%1end, %1, 7
 .try%1dc:
     movsx       r0, word [r2   ]
     or         r0w, word [r2+32]
@@ -532,7 +489,7 @@ RET
 %else
     add         r0, r0m
 %endif
-    call        h264_idct_dc_add8_mmxext
+    TAIL_CALL_IF_LAST h264_idct_dc_add8_mmxext, , %1, 7
 .cycle%1end:
 %if %1 < 7
     add         r2, 64
@@ -569,8 +526,7 @@ RET
     mov         r0, [r0]
     add         r0, dword [r1+(%1&1)*8+64*(1+(%1>>1))]
 %endif
-    call        h264_add8x4_idct_sse2
-    jmp .cycle%1end
+    TAIL_CALL_IF_LAST h264_add8x4_idct_sse2, .cycle%1end, %1, 3
 .try%1dc:
     movsx       r0, word [r2   ]
     or         r0w, word [r2+32]
@@ -583,7 +539,7 @@ RET
     mov         r0, [r0]
     add         r0, dword [r1+(%1&1)*8+64*(1+(%1>>1))]
 %endif
-    call        h264_idct_dc_add8_mmxext
+    TAIL_CALL_IF_LAST h264_idct_dc_add8_mmxext, , %1, 3
 .cycle%1end:
 %if %1 == 1
     add         r2, 384+64
@@ -612,7 +568,7 @@ cglobal h264_idct_add8_8, 5, 7 + ARCH_X86_64, 8
     add8_sse2_cycle 3, 0x64
 RET
 
-;void ff_h264_luma_dc_dequant_idct_mmx(int16_t *output, int16_t *input, int qmul)
+;void ff_h264_luma_dc_dequant_idct_sse2(int16_t *output, int16_t *input, int qmul)
 
 %macro WALSH4_1D 5
     SUMSUB_BADC w, %4, %3, %2, %1, %5
@@ -620,111 +576,92 @@ RET
     SWAP %1, %4, %3
 %endmacro
 
-%macro DEQUANT 1-3
-%if cpuflag(sse2)
-    movd      xmm4, t3d
-    movq      xmm5, [pw_1]
-    pshufd    xmm4, xmm4, 0
-    movq2dq   xmm0, m0
-    movq2dq   xmm1, m1
-    movq2dq   xmm2, m2
-    movq2dq   xmm3, m3
-    punpcklwd xmm0, xmm5
-    punpcklwd xmm1, xmm5
-    punpcklwd xmm2, xmm5
-    punpcklwd xmm3, xmm5
-    pmaddwd   xmm0, xmm4
-    pmaddwd   xmm1, xmm4
-    pmaddwd   xmm2, xmm4
-    pmaddwd   xmm3, xmm4
-    psrad     xmm0, %1
-    psrad     xmm1, %1
-    psrad     xmm2, %1
-    psrad     xmm3, %1
-    packssdw  xmm0, xmm1
-    packssdw  xmm2, xmm3
-%else
-    mova        m7, [pw_1]
-    mova        m4, %1
-    punpcklwd   %1, m7
-    punpckhwd   m4, m7
-    mova        m5, %2
-    punpcklwd   %2, m7
-    punpckhwd   m5, m7
-    movd        m7, t3d
-    punpckldq   m7, m7
-    pmaddwd     %1, m7
-    pmaddwd     %2, m7
-    pmaddwd     m4, m7
-    pmaddwd     m5, m7
-    psrad       %1, %3
-    psrad       %2, %3
-    psrad       m4, %3
-    psrad       m5, %3
-    packssdw    %1, m4
-    packssdw    %2, m5
-%endif
+; requires m5 to contain pw_1
+%macro DEQUANT 1
+    movd        m4, t3d
+    pshufd      m4, m4, 0
+    punpcklwd   m0, m5
+    punpcklwd   m1, m5
+    punpcklwd   m2, m5
+    punpcklwd   m3, m5
+    pmaddwd     m0, m4
+    pmaddwd     m1, m4
+    pmaddwd     m2, m4
+    pmaddwd     m3, m4
+    psrad       m0, %1
+    psrad       m1, %1
+    psrad       m2, %1
+    psrad       m3, %1
 %endmacro
 
-%macro STORE_WORDS 5-9
-%if cpuflag(sse)
-    movd  t0d, %1
-    psrldq  %1, 4
-    movd  t1d, %1
-    psrldq  %1, 4
-    mov [t2+%2*32], t0w
-    mov [t2+%4*32], t1w
-    shr   t0d, 16
-    shr   t1d, 16
+%macro STORE_WORDS 10
+%if ARCH_X86_64
+    movq        t0, %1
+    movq        t1, %2
+    psrldq      %1, 8
+    psrldq      %2, 8
     mov [t2+%3*32], t0w
-    mov [t2+%5*32], t1w
-    movd  t0d, %1
-    psrldq  %1, 4
-    movd  t1d, %1
-    mov [t2+%6*32], t0w
+    mov [t2+%7*32], t1w
+    shr         t0, 32
+    shr         t1, 32
+    mov [t2+%4*32], t0w
     mov [t2+%8*32], t1w
-    shr   t0d, 16
-    shr   t1d, 16
-    mov [t2+%7*32], t0w
+    movq        t0, %1
+    movq        t1, %2
+    mov [t2+%5*32], t0w
     mov [t2+%9*32], t1w
+    shr         t0, 32
+    shr         t1, 32
+    mov [t2+%6*32], t0w
+    mov [t2+%10*32], t1w
 %else
-    movd  t0d, %1
-    psrlq  %1, 32
-    movd  t1d, %1
-    mov [t2+%2*32], t0w
-    mov [t2+%4*32], t1w
-    shr   t0d, 16
-    shr   t1d, 16
+    movd       t0d, %1
+    movd       t1d, %2
+    psrldq      %1, 4
+    psrldq      %2, 4
     mov [t2+%3*32], t0w
-    mov [t2+%5*32], t1w
+    mov [t2+%7*32], t1w
+    movd       t0d, %1
+    movd       t1d, %2
+    psrldq      %1, 4
+    psrldq      %2, 4
+    mov [t2+%4*32], t0w
+    mov [t2+%8*32], t1w
+    movd       t0d, %1
+    movd       t1d, %2
+    psrldq      %1, 4
+    psrldq      %2, 4
+    mov [t2+%5*32], t0w
+    mov [t2+%9*32], t1w
+    movd       t0d, %1
+    movd       t1d, %2
+    mov [t2+%6*32], t0w
+    mov [t2+%10*32], t1w
 %endif
 %endmacro
 
 %macro DEQUANT_STORE 1
-%if cpuflag(sse2)
     DEQUANT     %1
-    STORE_WORDS xmm0,  0,  1,  4,  5,  2,  3,  6,  7
-    STORE_WORDS xmm2,  8,  9, 12, 13, 10, 11, 14, 15
-%else
-    DEQUANT     m0, m1, %1
-    STORE_WORDS m0,  0,  1,  4,  5
-    STORE_WORDS m1,  2,  3,  6,  7
-
-    DEQUANT     m2, m3, %1
-    STORE_WORDS m2,  8,  9, 12, 13
-    STORE_WORDS m3, 10, 11, 14, 15
-%endif
+    STORE_WORDS m0, m1,  0,  1,  4,  5,  2,  3,  6,  7
+    STORE_WORDS m2, m3,  8,  9, 12, 13, 10, 11, 14, 15
 %endmacro
 
 INIT_XMM sse2
 cglobal h264_luma_dc_dequant_idct, 3, 4, 7
-INIT_MMX cpuname
     movq        m3, [r1+24]
     movq        m2, [r1+16]
     movq        m1, [r1+ 8]
     movq        m0, [r1+ 0]
     WALSH4_1D    0,1,2,3,4
-    TRANSPOSE4x4W 0,1,2,3,4
+    punpcklwd   m0, m1
+    punpcklwd   m2, m3
+    mova        m4, m0
+    pcmpeqw     m5, m5
+    punpckldq   m0, m2
+    punpckhdq   m4, m2
+    movhlps     m1, m0
+    movhlps     m3, m4
+    SWAP 2, 4
     WALSH4_1D    0,1,2,3,4
 
 ; shift, tmp, output, qmul
@@ -737,6 +674,7 @@ INIT_MMX cpuname
 %else
     DECLARE_REG_TMP 1,3,0,2
 %endif
+    psrlw       m5, 15
 
     cmp        t3d, 32767
     jg .big_qmul
@@ -752,8 +690,8 @@ INIT_MMX cpuname
     inc        t1d
     shr        t3d, t0b
     sub        t1d, t0d
-    movd      xmm6, t1d
-    DEQUANT_STORE xmm6
+    movd        m6, t1d
+    DEQUANT_STORE m6
     RET
 
 %ifdef __NASM_VER__

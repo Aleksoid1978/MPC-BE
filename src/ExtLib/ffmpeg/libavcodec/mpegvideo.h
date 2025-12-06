@@ -38,6 +38,8 @@
 #include "qpeldsp.h"
 #include "videodsp.h"
 
+#include "libavutil/mem_internal.h"
+
 #define MAX_THREADS 32
 
 /**
@@ -57,6 +59,8 @@ enum OutputFormat {
     FMT_SPEEDHQ,
 };
 
+typedef struct MpegEncContext MPVContext;
+
 /**
  * MpegEncContext.
  */
@@ -70,11 +74,11 @@ typedef struct MpegEncContext {
 
     /* scantables */
     ScanTable inter_scantable; ///< if inter == intra then intra should be used to reduce the cache usage
+    ScanTable intra_scantable;
 
     /* WARNING: changes above this line require updates to hardcoded
      *          offsets used in ASM. */
 
-    ScanTable intra_scantable;
     uint8_t permutated_intra_h_scantable[64];
     uint8_t permutated_intra_v_scantable[64];
 
@@ -200,10 +204,10 @@ typedef struct MpegEncContext {
     int *mb_index2xy;        ///< mb_index -> mb_x + mb_y*mb_stride
 
     /** matrix transmitted in the bitstream */
-    uint16_t intra_matrix[64];
-    uint16_t chroma_intra_matrix[64];
-    uint16_t inter_matrix[64];
-    uint16_t chroma_inter_matrix[64];
+    DECLARE_ALIGNED(16, uint16_t, intra_matrix)[64];
+    DECLARE_ALIGNED(16, uint16_t, chroma_intra_matrix)[64];
+    DECLARE_ALIGNED(16, uint16_t, inter_matrix)[64];
+    DECLARE_ALIGNED(16, uint16_t, chroma_inter_matrix)[64];
 
     /* error concealment / resync */
     int resync_mb_x;                 ///< x position of last resync marker
@@ -271,10 +275,10 @@ typedef struct MpegEncContext {
     int interlaced_dct;
     int first_field;         ///< is 1 for the first field of a field picture 0 otherwise
 
-    void (*dct_unquantize_intra)(struct MpegEncContext *s, // unquantizer to use (MPEG-4 can use both)
-                           int16_t *block/*align 16*/, int n, int qscale);
-    void (*dct_unquantize_inter)(struct MpegEncContext *s, // unquantizer to use (MPEG-4 can use both)
-                           int16_t *block/*align 16*/, int n, int qscale);
+    void (*dct_unquantize_intra)(const MPVContext *s, // unquantizer to use (MPEG-4 can use both)
+                                 int16_t *block/*align 16*/, int n, int qscale);
+    void (*dct_unquantize_inter)(const MPVContext *s, // unquantizer to use (MPEG-4 can use both)
+                                 int16_t *block/*align 16*/, int n, int qscale);
 
     /* flag to indicate a reinitialization is required, e.g. after
      * a frame size change */
@@ -285,8 +289,6 @@ typedef struct MpegEncContext {
 
     ERContext er;
 } MpegEncContext;
-
-typedef MpegEncContext MPVContext;
 
 /**
  * Set the given MpegEncContext to common defaults (same for encoding

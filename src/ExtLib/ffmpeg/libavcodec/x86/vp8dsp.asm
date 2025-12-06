@@ -1,5 +1,5 @@
 ;******************************************************************************
-;* VP8 MMXEXT optimizations
+;* VP8 ASM optimizations
 ;* Copyright (c) 2010 Ronald S. Bultje <rsbultje@gmail.com>
 ;* Copyright (c) 2010 Fiona Glaser <fiona@x264.com>
 ;*
@@ -24,43 +24,43 @@
 
 SECTION_RODATA
 
-fourtap_filter_hw_m: times 4 dw  -6, 123
-                     times 4 dw  12,  -1
-                     times 4 dw  -9,  93
-                     times 4 dw  50,  -6
-                     times 4 dw  -6,  50
-                     times 4 dw  93,  -9
-                     times 4 dw  -1,  12
-                     times 4 dw 123,  -6
+fourtap_filter4_b_m: times 4 db  -6, 123
+                     times 4 db  12,  -1
+                     times 4 db  -9,  93
+                     times 4 db  50,  -6
+                     times 4 db  -6,  50
+                     times 4 db  93,  -9
+                     times 4 db  -1,  12
+                     times 4 db 123,  -6
 
-sixtap_filter_hw_m:  times 4 dw   2, -11
-                     times 4 dw 108,  36
-                     times 4 dw  -8,   1
-                     times 4 dw   3, -16
-                     times 4 dw  77,  77
-                     times 4 dw -16,   3
-                     times 4 dw   1,  -8
-                     times 4 dw  36, 108
-                     times 4 dw -11,   2
+sixtap_filter4_hb_m: times 8 db   2, -11
+                     times 4 db 108,  -8
+                     times 4 db  36,   1
+                     times 8 db   3, -16
+                     times 4 db  77, -16
+                     times 4 db  77,   3
+                     times 8 db   1,  -8
+                     times 4 db  36, -11
+                     times 4 db 108,   2
 
-fourtap_filter_hb_m: times 8 db  -6, 123
-                     times 8 db  12,  -1
-                     times 8 db  -9,  93
-                     times 8 db  50,  -6
-                     times 8 db  -6,  50
-                     times 8 db  93,  -9
-                     times 8 db  -1,  12
-                     times 8 db 123,  -6
+fourtap_filter_b_m:  times 8 db  -6,  12
+                     times 8 db 123,  -1
+                     times 8 db  -9,  50
+                     times 8 db  93,  -6
+                     times 8 db  -6,  93
+                     times 8 db  50,  -9
+                     times 8 db  -1, 123
+                     times 8 db  12,  -6
 
-sixtap_filter_hb_m:  times 8 db   2,   1
-                     times 8 db -11, 108
-                     times 8 db  36,  -8
-                     times 8 db   3,   3
-                     times 8 db -16,  77
-                     times 8 db  77, -16
-                     times 8 db   1,   2
-                     times 8 db  -8,  36
-                     times 8 db 108, -11
+sixtap_filter_b_m:   times 8 db   2,  36
+                     times 8 db -11,  -8
+                     times 8 db 108,   1
+                     times 8 db   3,  77
+                     times 8 db -16, -16
+                     times 8 db  77,   3
+                     times 8 db   1, 108
+                     times 8 db  -8, -11
+                     times 8 db  36,   2
 
 fourtap_filter_v_m:  times 8 dw  -6
                      times 8 dw 123
@@ -115,20 +115,20 @@ bilinear_filter_vb_m: times 8 db 7, 1
                       times 8 db 1, 7
 
 %if PIC
-%define fourtap_filter_hw  picregq
-%define sixtap_filter_hw   picregq
-%define fourtap_filter_hb  picregq
-%define sixtap_filter_hb   picregq
+%define fourtap_filter_b   picregq
+%define fourtap_filter4_b  picregq
+%define sixtap_filter_b    picregq
+%define sixtap_filter4_hb  picregq
 %define fourtap_filter_v   picregq
 %define sixtap_filter_v    picregq
 %define bilinear_filter_vw picregq
 %define bilinear_filter_vb picregq
 %define npicregs 1
 %else
-%define fourtap_filter_hw  fourtap_filter_hw_m
-%define sixtap_filter_hw   sixtap_filter_hw_m
-%define fourtap_filter_hb  fourtap_filter_hb_m
-%define sixtap_filter_hb   sixtap_filter_hb_m
+%define fourtap_filter_b   fourtap_filter_b_m
+%define fourtap_filter4_b  fourtap_filter4_b_m
+%define sixtap_filter_b    sixtap_filter_b_m
+%define sixtap_filter4_hb  sixtap_filter4_hb_m
 %define fourtap_filter_v   fourtap_filter_v_m
 %define sixtap_filter_v    sixtap_filter_v_m
 %define bilinear_filter_vw bilinear_filter_vw_m
@@ -136,12 +136,17 @@ bilinear_filter_vb_m: times 8 db 7, 1
 %define npicregs 0
 %endif
 
-filter_h2_shuf:  db 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5,  6, 6,  7,  7,  8
-filter_h4_shuf:  db 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7,  8, 8,  9,  9, 10
+filter4_h4_shuf: db 0, 1, 1, 2, 2, 3, 3, 4, 2, 3, 3,  4, 4,  5, 5,  6
+filter4_h6_shuf: db 1, 3, 2, 4, 3, 5, 4, 6, 2, 4, 3,  5, 4,  6, 5,  7
 
-filter_h6_shuf1: db 0, 5, 1, 6, 2, 7, 3, 8, 4, 9, 5, 10, 6, 11,  7, 12
-filter_h6_shuf2: db 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6,  7, 7,  8,  8,  9
-filter_h6_shuf3: db 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8,  9, 9, 10, 10, 11
+filter_h4_shuf1: db 0, 2, 1, 3, 2, 4, 3, 5, 4, 6, 5,  7, 6,  8, 7,  9
+filter_h4_shuf2: db 1, 3, 2, 4, 3, 5, 4, 6, 5, 7, 6,  8, 7,  9, 8, 10
+
+filter_h6_shuf1: db 0, 3, 1, 4, 2, 5, 3, 6, 4, 7, 5,  8, 6,  9, 7, 10
+filter_h6_shuf2: db 1, 4, 2, 5, 3, 6, 4, 7, 5, 8, 6,  9, 7, 10, 8, 11
+filter_h6_shuf3: db 2, 5, 3, 6, 4, 7, 5, 8, 6, 9, 7, 10, 8, 11, 9, 12
+
+filter_h2_shuf:  db 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5,  6, 6,  7, 7,  8
 
 pw_20091: times 4 dw 20091
 pw_17734: times 4 dw 17734
@@ -162,72 +167,109 @@ SECTION .text
 ;-------------------------------------------------------------------------------
 
 %macro FILTER_SSSE3 1
-cglobal put_vp8_epel%1_h6, 6, 6 + npicregs, 8, dst, dststride, src, srcstride, height, mx, picreg
+%if %1 == 4
+%define MOV movd
+%else
+%define MOV movq
+%endif
+
+cglobal put_vp8_epel%1_h6, 6, 6 + npicregs, 6+2*(%1==8), dst, dststride, src, srcstride, height, mx, picreg
+%if %1 == 4
+    mova      m3, [filter4_h6_shuf]
+%if PIC
+    lea  picregq, [sixtap_filter4_hb_m]
+%endif
+    shl      mxd, 4
+    mova      m4, [sixtap_filter4_hb+mxq-32]
+    mova      m5, [sixtap_filter4_hb+mxq-16]
+%else
     lea      mxd, [mxq*3]
     mova      m3, [filter_h6_shuf2]
     mova      m4, [filter_h6_shuf3]
 %if PIC
-    lea  picregq, [sixtap_filter_hb_m]
+    lea  picregq, [sixtap_filter_b_m]
 %endif
-    mova      m5, [sixtap_filter_hb+mxq*8-48] ; set up 6tap filter in bytes
-    mova      m6, [sixtap_filter_hb+mxq*8-32]
-    mova      m7, [sixtap_filter_hb+mxq*8-16]
+    mova      m5, [sixtap_filter_b+mxq*8-48] ; set up 6tap filter in bytes
+    mova      m6, [sixtap_filter_b+mxq*8-32]
+    mova      m7, [sixtap_filter_b+mxq*8-16]
+%endif
 
 .nextrow:
+%if %1 == 4
+    ; we need nine bytes, so two loads
+    movq      m1, [srcq-1]
+    movq      m0, [srcq-2]
+    punpcklbw m0, m1
+    pshufb    m1, m3
+    pmaddubsw m1, m5
+    pmaddubsw m0, m4
+    movhlps   m2, m1
+%else
     movu      m0, [srcq-2]
     mova      m1, m0
     mova      m2, m0
-%if mmsize == 8
-; For epel4, we need 9 bytes, but only 8 get loaded; to compensate, do the
-; shuffle with a memory operand
-    punpcklbw m0, [srcq+3]
-%else
     pshufb    m0, [filter_h6_shuf1]
-%endif
     pshufb    m1, m3
     pshufb    m2, m4
     pmaddubsw m0, m5
     pmaddubsw m1, m6
     pmaddubsw m2, m7
-    paddsw    m0, m1
+%endif
+    add     srcq, srcstrideq
+    paddw     m0, m1
     paddsw    m0, m2
     pmulhrsw  m0, [pw_256]
     packuswb  m0, m0
-    movh  [dstq], m0        ; store
+    MOV   [dstq], m0        ; store
 
     ; go to next line
     add     dstq, dststrideq
-    add     srcq, srcstrideq
     dec  heightd            ; next row
     jg .nextrow
     RET
 
-cglobal put_vp8_epel%1_h4, 6, 6 + npicregs, 7, dst, dststride, src, srcstride, height, mx, picreg
-    shl      mxd, 4
+cglobal put_vp8_epel%1_h4, 6, 6 + npicregs, 6+!!(%1 == 8), dst, dststride, src, srcstride, height, mx, picreg
     mova      m2, [pw_256]
-    mova      m3, [filter_h2_shuf]
-    mova      m4, [filter_h4_shuf]
+%if %1 == 8
+    shl      mxd, 4
+    mova      m3, [filter_h4_shuf1]
+    mova      m4, [filter_h4_shuf2]
 %if PIC
-    lea  picregq, [fourtap_filter_hb_m]
+    lea  picregq, [fourtap_filter_b_m]
 %endif
-    mova      m5, [fourtap_filter_hb+mxq-16] ; set up 4tap filter in bytes
-    mova      m6, [fourtap_filter_hb+mxq]
+    mova      m5, [fourtap_filter_b+mxq-16] ; set up 4tap filter in bytes
+    mova      m6, [fourtap_filter_b+mxq]
+%else
+    shl      mxd, 3
+    mova      m3, [filter4_h4_shuf]
+%if PIC
+    lea  picregq, [fourtap_filter4_b_m]
+%endif
+    mova      m5, [fourtap_filter4_b+mxq-8]
+%endif
 
 .nextrow:
+%if %1 == 4
+    movq      m0, [srcq-1]
+    pshufb    m0, m3
+    pmaddubsw m0, m5
+    movhlps   m1, m0
+%else
     movu      m0, [srcq-1]
     mova      m1, m0
     pshufb    m0, m3
     pshufb    m1, m4
     pmaddubsw m0, m5
     pmaddubsw m1, m6
+%endif
+    add     srcq, srcstrideq
     paddsw    m0, m1
     pmulhrsw  m0, m2
     packuswb  m0, m0
-    movh  [dstq], m0        ; store
+    MOV   [dstq], m0        ; store
 
     ; go to next line
     add     dstq, dststrideq
-    add     srcq, srcstrideq
     dec  heightd            ; next row
     jg .nextrow
     RET
@@ -235,71 +277,124 @@ cglobal put_vp8_epel%1_h4, 6, 6 + npicregs, 7, dst, dststride, src, srcstride, h
 cglobal put_vp8_epel%1_v4, 7, 7, 8, dst, dststride, src, srcstride, height, picreg, my
     shl      myd, 4
 %if PIC
-    lea  picregq, [fourtap_filter_hb_m]
+    lea  picregq, [fourtap_filter_b_m]
 %endif
-    mova      m5, [fourtap_filter_hb+myq-16]
-    mova      m6, [fourtap_filter_hb+myq]
+    mova      m5, [fourtap_filter_b+myq-16]
+    mova      m6, [fourtap_filter_b+myq]
     mova      m7, [pw_256]
 
     ; read 3 lines
-    sub     srcq, srcstrideq
-    movh      m0, [srcq]
-    movh      m1, [srcq+  srcstrideq]
-    movh      m2, [srcq+2*srcstrideq]
-    add     srcq, srcstrideq
+    mov  picregq, srcstrideq
+    neg  picregq
+    MOV       m0, [srcq+picregq]
+    MOV       m1, [srcq]
+    MOV       m2, [srcq+srcstrideq]
+    lea     srcq, [srcq+2*srcstrideq]
+    punpcklbw m0, m2
 
+%if %1 == 4
+.next2rows:
+    movd       m3, [srcq]
+    movd       m4, [srcq+srcstrideq]
+    punpcklbw  m1, m3
+    punpcklqdq m0, m1
+    punpcklbw  m2, m4
+    pmaddubsw  m0, m5
+    punpcklqdq m1, m2
+    pmaddubsw  m1, m6
+    lea     srcq, [srcq+2*srcstrideq]
+    paddsw     m1, m0
+    pmulhrsw   m1, m7
+    mova       m0, m2
+    packuswb   m1, m1
+    movd   [dstq], m1
+    mova       m2, m4
+    psrldq     m1, 4
+    movd [dstq+dststrideq], m1
+    mova       m1, m3
+    lea      dstq, [dstq+2*dststrideq]
+    sub   heightd, 2
+    jg .next2rows
+%else
 .nextrow:
-    movh      m3, [srcq+2*srcstrideq]      ; read new row
-    mova      m4, m0
+    movh      m3, [srcq]      ; read new row
+    pmaddubsw m0, m5
+    punpcklbw m1, m3
+    pmaddubsw m4, m1, m6
+    add     srcq, srcstrideq
+    paddsw    m4, m0
     mova      m0, m1
-    punpcklbw m4, m1
-    mova      m1, m2
-    punpcklbw m2, m3
-    pmaddubsw m4, m5
-    pmaddubsw m2, m6
-    paddsw    m4, m2
-    mova      m2, m3
     pmulhrsw  m4, m7
+    mova      m1, m2
     packuswb  m4, m4
+    mova      m2, m3
     movh  [dstq], m4
 
     ; go to next line
     add      dstq, dststrideq
-    add      srcq, srcstrideq
     dec   heightd                          ; next row
     jg .nextrow
+%endif
     RET
 
 cglobal put_vp8_epel%1_v6, 7, 7, 8, dst, dststride, src, srcstride, height, picreg, my
     lea      myd, [myq*3]
 %if PIC
-    lea  picregq, [sixtap_filter_hb_m]
+    lea  picregq, [sixtap_filter_b_m]
 %endif
-    lea      myq, [sixtap_filter_hb+myq*8]
+    lea      myq, [sixtap_filter_b+myq*8]
 
     ; read 5 lines
-    sub     srcq, srcstrideq
-    sub     srcq, srcstrideq
-    movh      m0, [srcq]
-    movh      m1, [srcq+srcstrideq]
-    movh      m2, [srcq+srcstrideq*2]
+    mov  picregq, srcstrideq
+    neg  picregq
+    MOV       m0, [srcq+2*picregq]
+    MOV       m1, [srcq+picregq]
+    MOV       m2, [srcq]
+    MOV       m3, [srcq+srcstrideq]
+    MOV       m4, [srcq+2*srcstrideq]
     lea     srcq, [srcq+srcstrideq*2]
-    add     srcq, srcstrideq
-    movh      m3, [srcq]
-    movh      m4, [srcq+srcstrideq]
+    punpcklbw m0, m3
+    punpcklbw m1, m4
+%if %1 == 4
+    punpcklqdq m0, m1
+
+.next2rows:
+    movd       m5, [srcq+srcstrideq]
+    movd       m6, [srcq+2*srcstrideq]
+    pmaddubsw  m0, [myq-48]
+    punpcklbw  m2, m5
+    punpcklqdq m1, m2
+    pmaddubsw  m1, [myq-32]
+    punpcklbw  m3, m6
+    punpcklqdq m2, m3
+    paddw      m0, m1
+    pmaddubsw  m1, m2, [myq-16]
+    lea      srcq, [srcq+2*srcstrideq]
+    paddsw     m1, m0
+    mova       m0, m2
+    pmulhrsw   m1, [pw_256]
+    mova       m2, m4
+    packuswb   m1, m1
+    movd   [dstq], m1
+    mova       m4, m6
+    psrldq     m1, 4
+    movd [dstq+dststrideq], m1
+    lea      dstq, [dstq+2*dststrideq]
+    mova       m1, m3
+    mova       m3, m5
+    sub   heightd, 2
+    jg .next2rows
+%else
 
 .nextrow:
-    movh      m5, [srcq+2*srcstrideq]      ; read new row
-    mova      m6, m0
-    punpcklbw m6, m5
+    movh      m5, [srcq+srcstrideq]      ; read new row
+    pmaddubsw m0, [myq-48]
+    punpcklbw m2, m5
+    pmaddubsw m6, m1, [myq-32]
+    pmaddubsw m7, m2, [myq-16]
+    add     srcq, srcstrideq
+    paddw     m6, m0
     mova      m0, m1
-    punpcklbw m1, m2
-    mova      m7, m3
-    punpcklbw m7, m4
-    pmaddubsw m6, [myq-48]
-    pmaddubsw m1, [myq-32]
-    pmaddubsw m7, [myq-16]
-    paddsw    m6, m1
     paddsw    m6, m7
     mova      m1, m2
     mova      m2, m3
@@ -311,122 +406,15 @@ cglobal put_vp8_epel%1_v6, 7, 7, 8, dst, dststride, src, srcstride, height, picr
 
     ; go to next line
     add      dstq, dststrideq
-    add      srcq, srcstrideq
     dec   heightd                          ; next row
     jg .nextrow
+%endif
     RET
 %endmacro
 
-INIT_MMX ssse3
-FILTER_SSSE3 4
 INIT_XMM ssse3
+FILTER_SSSE3 4
 FILTER_SSSE3 8
-
-; 4x4 block, H-only 4-tap filter
-INIT_MMX mmxext
-cglobal put_vp8_epel4_h4, 6, 6 + npicregs, 0, dst, dststride, src, srcstride, height, mx, picreg
-    shl       mxd, 4
-%if PIC
-    lea   picregq, [fourtap_filter_hw_m]
-%endif
-    movq      mm4, [fourtap_filter_hw+mxq-16] ; set up 4tap filter in words
-    movq      mm5, [fourtap_filter_hw+mxq]
-    movq      mm7, [pw_64]
-    pxor      mm6, mm6
-
-.nextrow:
-    movq      mm1, [srcq-1]                ; (ABCDEFGH) load 8 horizontal pixels
-
-    ; first set of 2 pixels
-    movq      mm2, mm1                     ; byte ABCD..
-    punpcklbw mm1, mm6                     ; byte->word ABCD
-    pshufw    mm0, mm2, 9                  ; byte CDEF..
-    punpcklbw mm0, mm6                     ; byte->word CDEF
-    pshufw    mm3, mm1, 0x94               ; word ABBC
-    pshufw    mm1, mm0, 0x94               ; word CDDE
-    pmaddwd   mm3, mm4                     ; multiply 2px with F0/F1
-    movq      mm0, mm1                     ; backup for second set of pixels
-    pmaddwd   mm1, mm5                     ; multiply 2px with F2/F3
-    paddd     mm3, mm1                     ; finish 1st 2px
-
-    ; second set of 2 pixels, use backup of above
-    punpckhbw mm2, mm6                     ; byte->word EFGH
-    pmaddwd   mm0, mm4                     ; multiply backed up 2px with F0/F1
-    pshufw    mm1, mm2, 0x94               ; word EFFG
-    pmaddwd   mm1, mm5                     ; multiply 2px with F2/F3
-    paddd     mm0, mm1                     ; finish 2nd 2px
-
-    ; merge two sets of 2 pixels into one set of 4, round/clip/store
-    packssdw  mm3, mm0                     ; merge dword->word (4px)
-    paddsw    mm3, mm7                     ; rounding
-    psraw     mm3, 7
-    packuswb  mm3, mm6                     ; clip and word->bytes
-    movd   [dstq], mm3                     ; store
-
-    ; go to next line
-    add      dstq, dststrideq
-    add      srcq, srcstrideq
-    dec   heightd                          ; next row
-    jg .nextrow
-    RET
-
-; 4x4 block, H-only 6-tap filter
-INIT_MMX mmxext
-cglobal put_vp8_epel4_h6, 6, 6 + npicregs, 0, dst, dststride, src, srcstride, height, mx, picreg
-    lea       mxd, [mxq*3]
-%if PIC
-    lea   picregq, [sixtap_filter_hw_m]
-%endif
-    movq      mm4, [sixtap_filter_hw+mxq*8-48] ; set up 4tap filter in words
-    movq      mm5, [sixtap_filter_hw+mxq*8-32]
-    movq      mm6, [sixtap_filter_hw+mxq*8-16]
-    movq      mm7, [pw_64]
-    pxor      mm3, mm3
-
-.nextrow:
-    movq      mm1, [srcq-2]                ; (ABCDEFGH) load 8 horizontal pixels
-
-    ; first set of 2 pixels
-    movq      mm2, mm1                     ; byte ABCD..
-    punpcklbw mm1, mm3                     ; byte->word ABCD
-    pshufw    mm0, mm2, 0x9                ; byte CDEF..
-    punpckhbw mm2, mm3                     ; byte->word EFGH
-    punpcklbw mm0, mm3                     ; byte->word CDEF
-    pshufw    mm1, mm1, 0x94               ; word ABBC
-    pshufw    mm2, mm2, 0x94               ; word EFFG
-    pmaddwd   mm1, mm4                     ; multiply 2px with F0/F1
-    pshufw    mm3, mm0, 0x94               ; word CDDE
-    movq      mm0, mm3                     ; backup for second set of pixels
-    pmaddwd   mm3, mm5                     ; multiply 2px with F2/F3
-    paddd     mm1, mm3                     ; add to 1st 2px cache
-    movq      mm3, mm2                     ; backup for second set of pixels
-    pmaddwd   mm2, mm6                     ; multiply 2px with F4/F5
-    paddd     mm1, mm2                     ; finish 1st 2px
-
-    ; second set of 2 pixels, use backup of above
-    movd      mm2, [srcq+3]                ; byte FGHI (prevent overreads)
-    pmaddwd   mm0, mm4                     ; multiply 1st backed up 2px with F0/F1
-    pmaddwd   mm3, mm5                     ; multiply 2nd backed up 2px with F2/F3
-    paddd     mm0, mm3                     ; add to 2nd 2px cache
-    pxor      mm3, mm3
-    punpcklbw mm2, mm3                     ; byte->word FGHI
-    pshufw    mm2, mm2, 0xE9               ; word GHHI
-    pmaddwd   mm2, mm6                     ; multiply 2px with F4/F5
-    paddd     mm0, mm2                     ; finish 2nd 2px
-
-    ; merge two sets of 2 pixels into one set of 4, round/clip/store
-    packssdw  mm1, mm0                     ; merge dword->word (4px)
-    paddsw    mm1, mm7                     ; rounding
-    psraw     mm1, 7
-    packuswb  mm1, mm3                     ; clip and word->bytes
-    movd   [dstq], mm1                     ; store
-
-    ; go to next line
-    add      dstq, dststrideq
-    add      srcq, srcstrideq
-    dec   heightd                          ; next row
-    jg .nextrow
-    RET
 
 INIT_XMM sse2
 cglobal put_vp8_epel8_h4, 6, 6 + npicregs, 10, dst, dststride, src, srcstride, height, mx, picreg
@@ -461,17 +449,17 @@ cglobal put_vp8_epel8_h4, 6, 6 + npicregs, 10, dst, dststride, src, srcstride, h
     pmullw    m2, [mxq+32]
     pmullw    m3, [mxq+48]
 %endif
-    paddsw    m0, m1
-    paddsw    m2, m3
+    add     srcq, srcstrideq
+    paddw     m0, m1
+    paddw     m2, m3
+    paddw     m0, m4
     paddsw    m0, m2
-    paddsw    m0, m4
     psraw     m0, 7
     packuswb  m0, m7
     movh  [dstq], m0        ; store
 
     ; go to next line
     add     dstq, dststrideq
-    add     srcq, srcstrideq
     dec  heightd            ; next row
     jg .nextrow
     RET
@@ -522,26 +510,26 @@ cglobal put_vp8_epel8_h6, 6, 6 + npicregs, 14, dst, dststride, src, srcstride, h
     pmullw    m4, [mxq+64]
     pmullw    m5, [mxq+80]
 %endif
-    paddsw    m1, m4
-    paddsw    m0, m5
-    paddsw    m1, m2
-    paddsw    m0, m3
+    add     srcq, srcstrideq
+    paddw     m1, m4
+    paddw     m0, m5
+    paddw     m1, m2
+    paddw     m0, m3
+    paddw     m1, m6
     paddsw    m0, m1
-    paddsw    m0, m6
     psraw     m0, 7
     packuswb  m0, m7
     movh  [dstq], m0        ; store
 
     ; go to next line
     add     dstq, dststrideq
-    add     srcq, srcstrideq
     dec  heightd            ; next row
     jg .nextrow
     RET
 
-%macro FILTER_V 1
+INIT_XMM sse2
 ; 4x4 block, V-only 4-tap filter
-cglobal put_vp8_epel%1_v4, 7, 7, 8, dst, dststride, src, srcstride, height, picreg, my
+cglobal put_vp8_epel8_v4, 7, 7, 8, dst, dststride, src, srcstride, height, picreg, my
     shl      myd, 5
 %if PIC
     lea  picregq, [fourtap_filter_v_m]
@@ -568,33 +556,33 @@ cglobal put_vp8_epel%1_v4, 7, 7, 8, dst, dststride, src, srcstride, height, picr
     mova      m3, m4
     pmullw    m0, [myq+0]
     pmullw    m4, m5
-    paddsw    m4, m0
+    paddw     m4, m0
 
     ; then calculate positive taps
     mova      m0, m1
     pmullw    m1, [myq+16]
-    paddsw    m4, m1
+    paddw     m4, m1
     mova      m1, m2
     pmullw    m2, [myq+32]
+    paddw     m4, m6
+    add     srcq, srcstrideq
     paddsw    m4, m2
     mova      m2, m3
 
     ; round/clip/store
-    paddsw    m4, m6
     psraw     m4, 7
     packuswb  m4, m7
     movh  [dstq], m4
 
     ; go to next line
     add     dstq, dststrideq
-    add     srcq, srcstrideq
     dec  heightd                           ; next row
     jg .nextrow
     RET
 
 
 ; 4x4 block, V-only 6-tap filter
-cglobal put_vp8_epel%1_v6, 7, 7, 8, dst, dststride, src, srcstride, height, picreg, my
+cglobal put_vp8_epel8_v6, 7, 7, 8, dst, dststride, src, srcstride, height, picreg, my
     shl      myd, 4
     lea      myq, [myq*3]
 %if PIC
@@ -604,15 +592,14 @@ cglobal put_vp8_epel%1_v6, 7, 7, 8, dst, dststride, src, srcstride, height, picr
     pxor      m7, m7
 
     ; read 5 lines
-    sub     srcq, srcstrideq
-    sub     srcq, srcstrideq
-    movh      m0, [srcq]
-    movh      m1, [srcq+srcstrideq]
-    movh      m2, [srcq+srcstrideq*2]
+    mov  picregq, srcstrideq
+    neg  picregq
+    movh      m0, [srcq+2*picregq]
+    movh      m1, [srcq+picregq]
+    movh      m2, [srcq]
+    movh      m3, [srcq+srcstrideq]
+    movh      m4, [srcq+2*srcstrideq]
     lea     srcq, [srcq+srcstrideq*2]
-    add     srcq, srcstrideq
-    movh      m3, [srcq]
-    movh      m4, [srcq+srcstrideq]
     punpcklbw m0, m7
     punpcklbw m1, m7
     punpcklbw m2, m7
@@ -625,19 +612,21 @@ cglobal put_vp8_epel%1_v6, 7, 7, 8, dst, dststride, src, srcstride, height, picr
     pmullw    m5, [myq+16]
     mova      m6, m4
     pmullw    m6, [myq+64]
-    paddsw    m6, m5
+    paddw     m6, m5
 
     ; then calculate positive taps
-    movh      m5, [srcq+2*srcstrideq]      ; read new row
+    movh      m5, [srcq+srcstrideq]      ; read new row
     punpcklbw m5, m7
     pmullw    m0, [myq+0]
-    paddsw    m6, m0
+    paddw     m6, [pw_64]
+    paddw     m6, m0
     mova      m0, m1
     mova      m1, m2
     pmullw    m2, [myq+32]
-    paddsw    m6, m2
+    paddw     m6, m2
     mova      m2, m3
     pmullw    m3, [myq+48]
+    add     srcq, srcstrideq
     paddsw    m6, m3
     mova      m3, m4
     mova      m4, m5
@@ -645,23 +634,15 @@ cglobal put_vp8_epel%1_v6, 7, 7, 8, dst, dststride, src, srcstride, height, picr
     paddsw    m6, m5
 
     ; round/clip/store
-    paddsw    m6, [pw_64]
     psraw     m6, 7
     packuswb  m6, m7
     movh  [dstq], m6
 
     ; go to next line
     add     dstq, dststrideq
-    add     srcq, srcstrideq
     dec  heightd                           ; next row
     jg .nextrow
     RET
-%endmacro
-
-INIT_MMX mmxext
-FILTER_V 4
-INIT_XMM sse2
-FILTER_V 8
 
 %macro FILTER_BILINEAR 1
 %if cpuflag(ssse3)
@@ -672,14 +653,15 @@ cglobal put_vp8_bilinear%1_v, 7, 7, 5, dst, dststride, src, srcstride, height, p
 %endif
     pxor      m4, m4
     mova      m3, [bilinear_filter_vb+myq-16]
-.nextrow:
     movh      m0, [srcq+srcstrideq*0]
+.nextrow:
     movh      m1, [srcq+srcstrideq*1]
     movh      m2, [srcq+srcstrideq*2]
     punpcklbw m0, m1
     punpcklbw m1, m2
     pmaddubsw m0, m3
     pmaddubsw m1, m3
+    lea     srcq, [srcq+srcstrideq*2]
     psraw     m0, 2
     psraw     m1, 2
     pavgw     m0, m4
@@ -694,6 +676,7 @@ cglobal put_vp8_bilinear%1_v, 7, 7, 5, dst, dststride, src, srcstride, height, p
     movh   [dstq+dststrideq*0], m0
     movhps [dstq+dststrideq*1], m0
 %endif
+    mova      m0, m2
 %else ; cpuflag(ssse3)
 cglobal put_vp8_bilinear%1_v, 7, 7, 7, dst, dststride, src, srcstride, height, picreg, my
     shl      myd, 4
@@ -716,26 +699,19 @@ cglobal put_vp8_bilinear%1_v, 7, 7, 7, dst, dststride, src, srcstride, height, p
     pmullw    m1, m5
     pmullw    m2, m4
     pmullw    m3, m5
-    paddsw    m0, m1
-    paddsw    m2, m3
+    lea     srcq, [srcq+srcstrideq*2]
+    paddw     m0, m1
+    paddw     m2, m3
     psraw     m0, 2
     psraw     m2, 2
     pavgw     m0, m6
     pavgw     m2, m6
-%if mmsize == 8
-    packuswb  m0, m0
-    packuswb  m2, m2
-    movh   [dstq+dststrideq*0], m0
-    movh   [dstq+dststrideq*1], m2
-%else
     packuswb  m0, m2
     movh   [dstq+dststrideq*0], m0
     movhps [dstq+dststrideq*1], m0
-%endif
 %endif ; cpuflag(ssse3)
 
     lea     dstq, [dstq+dststrideq*2]
-    lea     srcq, [srcq+srcstrideq*2]
     sub  heightd, 2
     jg .nextrow
     RET
@@ -756,6 +732,7 @@ cglobal put_vp8_bilinear%1_h, 6, 6 + npicregs, 5, dst, dststride, src, srcstride
     pshufb    m1, m2
     pmaddubsw m0, m3
     pmaddubsw m1, m3
+    lea     srcq, [srcq+srcstrideq*2]
     psraw     m0, 2
     psraw     m1, 2
     pavgw     m0, m4
@@ -793,33 +770,24 @@ cglobal put_vp8_bilinear%1_h, 6, 6 + npicregs, 7, dst, dststride, src, srcstride
     pmullw    m1, m5
     pmullw    m2, m4
     pmullw    m3, m5
-    paddsw    m0, m1
-    paddsw    m2, m3
+    lea     srcq, [srcq+srcstrideq*2]
+    paddw     m0, m1
+    paddw     m2, m3
     psraw     m0, 2
     psraw     m2, 2
     pavgw     m0, m6
     pavgw     m2, m6
-%if mmsize == 8
-    packuswb  m0, m0
-    packuswb  m2, m2
-    movh   [dstq+dststrideq*0], m0
-    movh   [dstq+dststrideq*1], m2
-%else
     packuswb  m0, m2
     movh   [dstq+dststrideq*0], m0
     movhps [dstq+dststrideq*1], m0
-%endif
 %endif ; cpuflag(ssse3)
 
     lea     dstq, [dstq+dststrideq*2]
-    lea     srcq, [srcq+srcstrideq*2]
     sub  heightd, 2
     jg .nextrow
     RET
 %endmacro
 
-INIT_MMX mmxext
-FILTER_BILINEAR 4
 INIT_XMM sse2
 FILTER_BILINEAR 8
 INIT_MMX ssse3
@@ -827,14 +795,22 @@ FILTER_BILINEAR 4
 INIT_XMM ssse3
 FILTER_BILINEAR 8
 
-INIT_MMX mmx
-cglobal put_vp8_pixels8, 5, 5, 0, dst, dststride, src, srcstride, height
+INIT_XMM sse2
+cglobal put_vp8_pixels8, 5, 5+2*ARCH_X86_64, 2, dst, dststride, src, srcstride, height
 .nextrow:
-    movq    mm0, [srcq+srcstrideq*0]
-    movq    mm1, [srcq+srcstrideq*1]
+%if ARCH_X86_64
+    mov     r5q, [srcq+srcstrideq*0]
+    mov     r6q, [srcq+srcstrideq*1]
     lea    srcq, [srcq+srcstrideq*2]
-    movq [dstq+dststrideq*0], mm0
-    movq [dstq+dststrideq*1], mm1
+    mov [dstq+dststrideq*0], r5q
+    mov [dstq+dststrideq*1], r6q
+%else
+    movq     m0, [srcq+srcstrideq*0]
+    movq     m1, [srcq+srcstrideq*1]
+    lea    srcq, [srcq+srcstrideq*2]
+    movq [dstq+dststrideq*0], m0
+    movq [dstq+dststrideq*1], m1
+%endif
     lea    dstq, [dstq+dststrideq*2]
     sub heightd, 2
     jg .nextrow
