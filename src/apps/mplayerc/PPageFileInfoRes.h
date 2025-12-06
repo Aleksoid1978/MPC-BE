@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -58,6 +58,6 @@ protected:
 	DECLARE_MESSAGE_MAP()
 	CRect  m_rCrt;
 public:
+	afx_msg void OnItemchangedList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnSaveAs();
-	afx_msg void OnUpdateSaveAs(CCmdUI* pCmdUI);
 };

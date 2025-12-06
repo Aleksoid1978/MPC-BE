@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -81,8 +81,8 @@ void CPPageFileInfoRes::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CPPageFileInfoRes, CPPageBase)
 	ON_WM_SIZE()
+	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST1, OnItemchangedList)
 	ON_BN_CLICKED(IDC_BUTTON1, OnSaveAs)
-	ON_UPDATE_COMMAND_UI(IDC_BUTTON1, OnUpdateSaveAs)
 	ON_MESSAGE(SETPAGEFOCUS, OnSetPageFocus)
 END_MESSAGE_MAP()
 
@@ -108,9 +108,26 @@ BOOL CPPageFileInfoRes::OnInitDialog()
 		m_list.SetItemData(iItem, (DWORD_PTR)&resource);
 	}
 
+	GetDlgItem(IDC_BUTTON1)->EnableWindow(FALSE);
+
 	UpdateData(FALSE);
 
 	return TRUE;
+}
+
+void CPPageFileInfoRes::OnItemchangedList(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
+
+	if (pNMLV->uChanged & LVIF_STATE) {
+		if (pNMLV->uNewState & (LVIS_SELECTED | LVNI_FOCUSED)) {
+			GetDlgItem(IDC_BUTTON1)->EnableWindow(TRUE);
+		} else {
+			GetDlgItem(IDC_BUTTON1)->EnableWindow(FALSE);
+		}
+	}
+
+	*pResult = 0;
 }
 
 void CPPageFileInfoRes::OnSaveAs()
@@ -137,20 +154,35 @@ void CPPageFileInfoRes::OnSaveAs()
 	CString ext_list = L"All files|*.*|";
 	CString mime((*it).mime);
 	mime.MakeLower();
+	
 	if (mime == L"application/x-truetype-font" || mime == L"application/x-font-ttf") {
 		ext_list = L"TrueType Font (*.ttf)|*.ttf|";
 		if (ext.IsEmpty()) {
 			fname += L".ttf";
 		}
-	} else if (mime == L"image/jpeg" || mime == L"image/jpg") {
-		ext_list = L"JPG - JPEG Image (*.jpg)|*.jpg|";
+	}
+	else if (mime == L"application/vnd.ms-opentype") {
+		ext_list = L"OpenType Font (*.otf)|*.otf|";
+		if (ext.IsEmpty()) {
+			fname += L".ttf";
+		}
+	}
+	else if (mime == L"image/jpeg" || mime == L"image/jpg") {
+		ext_list = L"JPEG Image (*.jpg)|*.jpg|";
 		if (ext.IsEmpty()) {
 			fname += L".jpg";
 		}
-	} else if (mime == L"image/png") {
+	}
+	else if (mime == L"image/png") {
 		ext_list = L"PNG - Portable Network Graphics (*.png)|*.png|";
 		if (ext.IsEmpty()) {
 			fname += L".png";
+		}
+	}
+	else if (mime == L"image/webp") {
+		ext_list = L"WebP (*.webp)|*.webp|";
+		if (ext.IsEmpty()) {
+			fname += L".webp";
 		}
 	}
 
@@ -164,11 +196,6 @@ void CPPageFileInfoRes::OnSaveAs()
 			fclose(f);
 		}
 	}
-}
-
-void CPPageFileInfoRes::OnUpdateSaveAs(CCmdUI* pCmdUI)
-{
-	pCmdUI->Enable(m_list.GetSelectedCount());
 }
 
 void CPPageFileInfoRes::OnSize(UINT nType, int cx, int cy)
