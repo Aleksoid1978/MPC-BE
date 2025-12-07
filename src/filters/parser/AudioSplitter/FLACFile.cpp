@@ -81,9 +81,7 @@ void CFLACFile::SetProperties(IBaseFilter* pBF)
 	if (m_covers.size()) {
 		if (CComQIPtr<IDSMResourceBag> pRB = pBF) {
 			for (auto& cover : m_covers) {
-				CStringW name;
-				name.Format(L"cover.%s", cover.mime == L"image/png" ? L"png" : L"jpg");
-				pRB->ResAppend(name, L"cover", cover.mime, cover.picture.data(), (DWORD)cover.picture.size(), 0);
+				pRB->ResAppend(cover.name, cover.desc, cover.mime, cover.picture.data(), (DWORD)cover.picture.size(), 0);
 			}
 		}
 	}
@@ -284,6 +282,16 @@ void CFLACFile::UpdateFromMetadata(void* pBuffer)
 		const auto& pic = pMetadata->data.picture;
 		if (pic.data_length && pic.mime_type) {
 			CoverInfo_t cover;
+			switch (pic.type) {
+			case 2: cover.name = "Icon"; break;
+			case 3: cover.name = "Front cover"; break;
+			case 4: cover.name = "Back cover"; break;
+			case 7: cover.name = "Lead artist"; break;
+			case 8: cover.name = "Artist"; break;
+			}
+			if (pic.description) {
+				cover.desc = AltUTF8ToWStr((char*)pic.description);
+			}
 			cover.mime = pic.mime_type;
 			cover.picture.resize(pic.data_length);
 			memcpy(cover.picture.data(), pic.data, pic.data_length);

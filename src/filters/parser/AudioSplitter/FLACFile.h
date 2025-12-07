@@ -42,6 +42,8 @@ class CFLACFile : public CAudioFile
 	std::list<Chapters> m_chapters;
 
 	struct CoverInfo_t {
+		CStringW name;
+		CStringW desc;
 		CStringW mime;
 		std::vector<BYTE> picture;
 	};
