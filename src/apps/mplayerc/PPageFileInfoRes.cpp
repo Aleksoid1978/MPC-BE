@@ -107,6 +107,7 @@ BOOL CPPageFileInfoRes::OnInitDialog()
 	m_list.InsertColumn(1, L"Name", LVCFMT_LEFT, m_pSheetDpi->ScaleX(150));
 	m_list.InsertColumn(2, L"Mime Type", LVCFMT_LEFT, m_pSheetDpi->ScaleX(150));
 	m_list.InsertColumn(3, L"Description", LVCFMT_LEFT, m_pSheetDpi->ScaleX(60));
+	m_list.InsertColumn(4, L"-", LVCFMT_LEFT, m_pSheetDpi->ScaleX(20)); // dummy column
 
 	int n = 0;
 	for (const auto& resource : m_resources) {
@@ -114,8 +115,12 @@ BOOL CPPageFileInfoRes::OnInitDialog()
 		m_list.SetItemText(iItem, 1, resource.name);
 		m_list.SetItemText(iItem, 2, resource.mime);
 		m_list.SetItemText(iItem, 3, resource.desc);
-		m_list.SetItemData(iItem, (DWORD_PTR)&resource);
 	}
+
+	for (int iCol = 0; iCol < 4; iCol++) {
+		m_list.SetColumnWidth(iCol, LVSCW_AUTOSIZE_USEHEADER);
+	}
+	m_list.DeleteColumn(4); // delete the dummy column
 
 	GetDlgItem(IDC_BUTTON1)->EnableWindow(FALSE);
 
@@ -126,6 +131,8 @@ BOOL CPPageFileInfoRes::OnInitDialog()
 
 const CDSMResource* CPPageFileInfoRes::GetResource(int idx)
 {
+	ASSERT(m_list.GetItemCount() == (int)m_resources.size());
+
 	if (idx < 0 || idx >= (int)m_resources.size()) {
 		return nullptr;
 	}
@@ -271,7 +278,7 @@ void CPPageFileInfoRes::OnSize(UINT nType, int cx, int cy)
 
 	HDWP hDWP = ::BeginDeferWindowPos(1);
 	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != nullptr; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
-		if (pChild->SendMessageW(WM_GETDLGCODE) & DLGC_BUTTON) {
+		if (pChild->SendMessageW(WM_GETDLGCODE) & DLGC_BUTTON || pChild == GetDlgItem(IDC_STATIC1)) {
 			pChild->GetWindowRect(&r);
 			ScreenToClient(&r);
 			r.top += dy;
