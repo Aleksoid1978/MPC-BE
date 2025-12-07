@@ -25,6 +25,7 @@
 #include "PPageFileInfoRes.h"
 #include "FileDialogs.h"
 #include "Misc.h"
+#include "WicUtils.h"
 
 // CPPageFileInfoRes dialog
 
@@ -79,6 +80,7 @@ void CPPageFileInfoRes::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_DEFAULTICON, m_icon);
 	DDX_Text(pDX, IDC_EDIT1, m_fn);
 	DDX_Control(pDX, IDC_LIST1, m_list);
+	DDX_Control(pDX, IDC_STATIC1, m_picPreview);
 }
 
 BEGIN_MESSAGE_MAP(CPPageFileInfoRes, CPPageBase)
@@ -122,6 +124,18 @@ BOOL CPPageFileInfoRes::OnInitDialog()
 	return TRUE;
 }
 
+const CDSMResource* CPPageFileInfoRes::GetResource(int idx)
+{
+	if (idx < 0 || idx >= (int)m_resources.size()) {
+		return nullptr;
+	}
+
+	auto it = m_resources.cbegin();
+	std::advance(it, idx);
+
+	return &(*it);
+}
+
 void CPPageFileInfoRes::OnItemchangedList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
@@ -129,8 +143,54 @@ void CPPageFileInfoRes::OnItemchangedList(NMHDR* pNMHDR, LRESULT* pResult)
 	if (pNMLV->uChanged & LVIF_STATE) {
 		if (pNMLV->uNewState & (LVIS_SELECTED | LVNI_FOCUSED)) {
 			GetDlgItem(IDC_BUTTON1)->EnableWindow(TRUE);
-		} else {
+
+			HRESULT hr = E_NOT_SET;
+			CComPtr<IWICBitmap> pBitmap;
+			CComPtr<IWICBitmap> pBitmapScaled;
+
+			auto resource = GetResource(pNMLV->iItem);
+			if (resource && StartsWith(resource->mime, L"image/")) {
+				UINT bm_w, bm_h;
+
+				hr = WicLoadImage(&pBitmap, true, const_cast<BYTE*>(resource->data.data()), resource->data.size());
+				if (SUCCEEDED(hr)) {
+					hr = pBitmap->GetSize(&bm_w, &bm_h);
+				}
+
+				if (SUCCEEDED(hr)) {
+					CRect rect = {};
+					m_picPreview.GetClientRect(&rect);
+					UINT w = rect.Width();
+					UINT h = rect.Height();
+
+					if (bm_w > w || bm_h > h) {
+						UINT wy = w * bm_h;
+						UINT hx = h * bm_w;
+						if (wy > hx) {
+							w = hx / bm_h;
+						}
+						else {
+							h = wy / bm_w;
+						}
+
+						hr = WicCreateBitmapScaled(&pBitmapScaled, w, h, pBitmap);
+						pBitmap.Release();
+					}
+				}
+			}
+
+			HBITMAP hBitmap = nullptr;
+			if (SUCCEEDED(hr)) {
+				hr = WicCreateDibSecton(hBitmap, pBitmapScaled ? pBitmapScaled : pBitmap);
+			}
+			hBitmap = m_picPreview.SetBitmap(hBitmap);
+			DeleteObject(hBitmap);
+		}
+		else {
 			GetDlgItem(IDC_BUTTON1)->EnableWindow(FALSE);
+
+			HBITMAP hBitmap = m_picPreview.SetBitmap(nullptr);
+			DeleteObject(hBitmap);
 		}
 	}
 
@@ -139,27 +199,16 @@ void CPPageFileInfoRes::OnItemchangedList(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CPPageFileInfoRes::OnSaveAs()
 {
-	int i = m_list.GetSelectionMark();
-
-	if (i < 0) {
+	auto resource = GetResource(m_list.GetSelectionMark());
+	if (!resource) {
 		return;
 	}
 
-	if (m_list.GetItemData(i) == NULL) {
-		return;
-	}
-
-	auto it = FindInListByPointer(m_resources, (CDSMResource*)m_list.GetItemData(i));
-	if (it == m_resources.end()) {
-		ASSERT(0);
-		return;
-	}
-
-	CString fname((*it).name);
+	CString fname(resource->name);
 	CString ext = ::PathFindExtensionW(fname);
 
 	CString ext_list = L"All files|*.*|";
-	CString mime((*it).mime);
+	CString mime(resource->mime);
 	mime.MakeLower();
 	
 	if (mime == L"application/x-truetype-font" || mime == L"application/x-font-ttf") {
@@ -199,7 +248,7 @@ void CPPageFileInfoRes::OnSaveAs()
 	if (fd.DoModal() == IDOK) {
 		FILE* f = nullptr;
 		if (_wfopen_s(&f, fd.GetPathName(), L"wb") == 0) {
-			fwrite((*it).data.data(), 1, (*it).data.size(), f);
+			fwrite(resource->data.data(), 1, resource->data.size(), f);
 			fclose(f);
 		}
 	}

@@ -42,6 +42,9 @@ private:
 	CString   m_fn;
 	CString   m_fullfn;
 	CListCtrl m_list;
+	CStatic   m_picPreview;
+
+	const CDSMResource* GetResource(int idx);
 
 public:
 	CPPageFileInfoRes(const CString& fn, IFilterGraph* pFG, CDPI* pSheetDpi);
