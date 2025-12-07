@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "DSUtil/std_helper.h"
+#include <HighDPI.h>
 #include "PPageFileInfoRes.h"
 #include "FileDialogs.h"
 #include "Misc.h"
@@ -28,10 +29,11 @@
 // CPPageFileInfoRes dialog
 
 IMPLEMENT_DYNAMIC(CPPageFileInfoRes, CPPageBase)
-CPPageFileInfoRes::CPPageFileInfoRes(const CString& fn, IFilterGraph* pFG)
+CPPageFileInfoRes::CPPageFileInfoRes(const CString& fn, IFilterGraph* pFG, CDPI* pSheetDpi)
 	: CPPageBase(CPPageFileInfoRes::IDD, CPPageFileInfoRes::IDD)
 	, m_fn(fn)
 	, m_fullfn(fn)
+	, m_pSheetDpi(pSheetDpi)
 {
 	m_fn.TrimRight('/');
 	int i = std::max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
@@ -99,12 +101,17 @@ BOOL CPPageFileInfoRes::OnInitDialog()
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT);
 
-	m_list.InsertColumn(0, L"Name", LVCFMT_LEFT, 187);
-	m_list.InsertColumn(1, L"Mime Type", LVCFMT_LEFT, 127);
+	m_list.InsertColumn(0, L"#", LVCFMT_RIGHT, m_pSheetDpi->ScaleX(20));
+	m_list.InsertColumn(1, L"Name", LVCFMT_LEFT, m_pSheetDpi->ScaleX(150));
+	m_list.InsertColumn(2, L"Mime Type", LVCFMT_LEFT, m_pSheetDpi->ScaleX(150));
+	m_list.InsertColumn(3, L"Description", LVCFMT_LEFT, m_pSheetDpi->ScaleX(60));
 
+	int n = 0;
 	for (const auto& resource : m_resources) {
-		int iItem = m_list.InsertItem(m_list.GetItemCount(), resource.name);
-		m_list.SetItemText(iItem, 1, resource.mime);
+		int iItem = m_list.InsertItem(m_list.GetItemCount(), std::to_wstring(++n).c_str());
+		m_list.SetItemText(iItem, 1, resource.name);
+		m_list.SetItemText(iItem, 2, resource.mime);
+		m_list.SetItemText(iItem, 3, resource.desc);
 		m_list.SetItemData(iItem, (DWORD_PTR)&resource);
 	}
 

@@ -36,6 +36,7 @@ class CPPageFileInfoRes : public CPPageBase
 private:
 	HICON     m_hIcon = nullptr;
 	std::list<CDSMResource> m_resources;
+	CDPI* m_pSheetDpi;
 
 	CStatic   m_icon;
 	CString   m_fn;
@@ -43,7 +44,7 @@ private:
 	CListCtrl m_list;
 
 public:
-	CPPageFileInfoRes(const CString& fn, IFilterGraph* pFG);
+	CPPageFileInfoRes(const CString& fn, IFilterGraph* pFG, CDPI* pSheetDpi);
 	virtual ~CPPageFileInfoRes();
 
 	enum { IDD = IDD_FILEPROPRES };

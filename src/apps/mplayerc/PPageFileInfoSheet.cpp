@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,7 +38,7 @@ CPPageFileInfoSheet::CPPageFileInfoSheet(const std::list<CString>& files, CMainF
 	: CMPCPropertySheet(ResStr(IDS_PROPSHEET_PROPERTIES), pParentWnd, 0)
 	, m_clip(files.front(), pMainFrame->m_pGB)
 	, m_details(files.front(), pMainFrame->m_pGB, pMainFrame->m_pCAP, pMainFrame->m_pDVDI)
-	, m_res(files.front(), pMainFrame->m_pGB)
+	, m_res(files.front(), pMainFrame->m_pGB, (CDPI*)this)
 	, m_mi(files, (CDPI*)this)
 {
 	if (!bOnlyMI) {
