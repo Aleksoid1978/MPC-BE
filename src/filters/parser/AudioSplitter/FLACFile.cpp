@@ -282,12 +282,15 @@ void CFLACFile::UpdateFromMetadata(void* pBuffer)
 		const auto& pic = pMetadata->data.picture;
 		if (pic.data_length && pic.mime_type) {
 			CoverInfo_t cover;
-			switch (pic.type) {
-			case 2: cover.name = "Icon"; break;
+			switch (pic.type) { // https://www.rfc-editor.org/rfc/rfc9639.html#table13
+			default: 
+			case 0: cover.name = "Other";       break;
+			case 1:
+			case 2: cover.name = "Icon";        break;
 			case 3: cover.name = "Front cover"; break;
-			case 4: cover.name = "Back cover"; break;
+			case 4: cover.name = "Back cover";  break;
 			case 7: cover.name = "Lead artist"; break;
-			case 8: cover.name = "Artist"; break;
+			case 8: cover.name = "Artist";      break;
 			}
 			if (pic.description) {
 				cover.desc = AltUTF8ToWStr((char*)pic.description);
