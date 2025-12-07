@@ -1,5 +1,5 @@
 /*
- * (C) 2020 see Authors.txt
+ * (C) 2020-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,8 +41,11 @@ class CFLACFile : public CAudioFile
 
 	std::list<Chapters> m_chapters;
 
-	std::vector<BYTE> m_cover;
-	CString           m_covermime;
+	struct CoverInfo_t {
+		CStringW mime;
+		std::vector<BYTE> picture;
+	};
+	std::vector<CoverInfo_t> m_covers;
 
 public:
 	CFLACFile();

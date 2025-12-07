@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2024 see Authors.txt
+ * (C) 2020-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -78,10 +78,13 @@ void CFLACFile::SetProperties(IBaseFilter* pBF)
 		}
 	}
 
-	if (m_cover.size()) {
+	if (m_covers.size()) {
 		if (CComQIPtr<IDSMResourceBag> pRB = pBF) {
-			CString cover; cover.Format(L"cover.%s", m_covermime == L"image/png" ? L"png" : L"jpg");
-			pRB->ResAppend(cover, L"cover", m_covermime, m_cover.data(), (DWORD)m_cover.size(), 0);
+			for (auto& cover : m_covers) {
+				CStringW name;
+				name.Format(L"cover.%s", cover.mime == L"image/png" ? L"png" : L"jpg");
+				pRB->ResAppend(name, L"cover", cover.mime, cover.picture.data(), (DWORD)cover.picture.size(), 0);
+			}
 		}
 	}
 
@@ -279,11 +282,12 @@ void CFLACFile::UpdateFromMetadata(void* pBuffer)
 		}
 	} else if (pMetadata->type == FLAC__METADATA_TYPE_PICTURE) {
 		const auto& pic = pMetadata->data.picture;
-
-		if (m_cover.empty() && pic.data_length) {
-			m_covermime = pic.mime_type;
-			m_cover.resize(pic.data_length);
-			memcpy(m_cover.data(), pic.data, pic.data_length);
+		if (pic.data_length && pic.mime_type) {
+			CoverInfo_t cover;
+			cover.mime = pic.mime_type;
+			cover.picture.resize(pic.data_length);
+			memcpy(cover.picture.data(), pic.data, pic.data_length);
+			m_covers.emplace_back(cover);
 		}
 	} else if (pMetadata->type == FLAC__METADATA_TYPE_CUESHEET) {
 		if (!m_chapters.empty()) {
