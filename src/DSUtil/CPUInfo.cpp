@@ -69,19 +69,16 @@ static int GetCPUFeatures()
 		if (nBuff[2] & CPUID_SSE41) nCPUFeatures |= CPUInfo::CPU_SSE4;
 		if (nBuff[2] & CPUID_SSE42) nCPUFeatures |= CPUInfo::CPU_SSE42;
 
-		// Intel specific:
-		if (nCPUType == CPUInfo::PROCESSOR_INTEL) {
-			if ((nBuff[2] & CPUID_AVX) == CPUID_AVX) {
-				// Check for OS support
-				const unsigned long long xcrFeatureMask = _xgetbv(_XCR_XFEATURE_ENABLED_MASK);
-				if ((xcrFeatureMask & 0x6) == 0x6) {
-					nCPUFeatures |= CPUInfo::CPU_AVX;
+		if ((nBuff[2] & CPUID_AVX) == CPUID_AVX) {
+			// Check for OS support
+			const unsigned long long xcrFeatureMask = _xgetbv(_XCR_XFEATURE_ENABLED_MASK);
+			if ((xcrFeatureMask & 0x6) == 0x6) {
+				nCPUFeatures |= CPUInfo::CPU_AVX;
 
-					if (nHighestFeature >= 7) {
-						__cpuid(nBuff, 7);
-						if ((nBuff[1] & CPUID_AVX2) == CPUID_AVX2) {
-							nCPUFeatures |= CPUInfo::CPU_AVX2;
-						}
+				if (nHighestFeature >= 7) {
+					__cpuid(nBuff, 7);
+					if ((nBuff[1] & CPUID_AVX2) == CPUID_AVX2) {
+						nCPUFeatures |= CPUInfo::CPU_AVX2;
 					}
 				}
 			}
