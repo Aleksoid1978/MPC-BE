@@ -42,6 +42,7 @@ bool CAPETag::LoadItems(CGolombBuffer &gb) {
 	}
 
 	if (flags & APE_TAG_FLAG_IS_BINARY) {
+		const CString desc(key);
 		key.Empty();
 		b = gb.ReadByte();
 		tag_size--;
@@ -54,7 +55,7 @@ bool CAPETag::LoadItems(CGolombBuffer &gb) {
 		if (tag_size) {
 			binary data(tag_size);
 			gb.ReadBuffer(data.data(), tag_size);
-			TagItems.emplace_back(CString(key), std::move(data));
+			TagItems.emplace_back(CString(key), desc, std::move(data));
 		}
 	} else {
 		auto data = std::make_unique<BYTE[]>(tag_size + 1);
@@ -62,7 +63,7 @@ bool CAPETag::LoadItems(CGolombBuffer &gb) {
 			return false;
 		}
 		gb.ReadBuffer(data.get(), tag_size);
-		TagItems.emplace_back(CString(key), UTF8ToWStr((LPCSTR)data.get()));
+		TagItems.emplace_back(CString(key), L"", UTF8ToWStr((LPCSTR)data.get()));
 	}
 
 	return true;
@@ -138,7 +139,7 @@ void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* pAPETag)
 	}
 
 	CString Artist, Comment, Title, Year, Album;
-	for (const auto& [key, value] : pAPETag->TagItems) {
+	for (const auto& [key, desc, value] : pAPETag->TagItems) {
 		CString tagKey(key); tagKey.MakeLower();
 
 		std::visit(overloaded{
@@ -156,7 +157,7 @@ void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* pAPETag)
 						}
 
 						if (!CoverMime.IsEmpty()) {
-							pRB->ResAppend(key, L"cover", CoverMime, (BYTE*)tagValue.data(), (DWORD)tagValue.size(), 0);
+							pRB->ResAppend(key, !desc.IsEmpty() ? desc : L"cover", CoverMime, (BYTE*)tagValue.data(), (DWORD)tagValue.size(), 0);
 						}
 					}
 				}

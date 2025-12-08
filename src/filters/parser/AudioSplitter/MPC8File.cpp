@@ -259,7 +259,7 @@ void CMPC8File::ReadChapter(const uint64_t size)
 			const auto tag_size = APEChapters.GetTagSize();
 			if (tag_size == (buf_size - footer_size) && APEChapters.ReadTags(ptr.get() + footer_size, tag_size)) {
 				CString track, title;
-				for (const auto& [key, value] : APEChapters.TagItems) {
+				for (const auto& [key, desc, value] : APEChapters.TagItems) {
 					std::visit(overloaded{
 						[&](const CStringW& tagValue) {
 							CString tagKey(key); tagKey.MakeLower();

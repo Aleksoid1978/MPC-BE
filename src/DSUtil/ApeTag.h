@@ -39,7 +39,7 @@ protected:
 	size_t m_TagFields = 0;
 
 	using values = std::variant<CString, binary>;
-	using tagItem = std::pair<CString, values>;
+	using tagItem = std::tuple<CString, CString, values>;
 
 	bool LoadItems(CGolombBuffer &gb);
 	void Clear();
