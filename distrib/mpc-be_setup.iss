@@ -16,8 +16,8 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#if VER < EncodeVer(6,4,0)
-  #error A more recent version of Inno Setup 6 is required to compile this script (6.2.2 or newer)
+#if VER < EncodeVer(6,5,2)
+  #error A more recent version of Inno Setup 6 is required to compile this script (6.5.2 or newer)
 #endif
 #ifndef UNICODE
   #error Use the Unicode Inno Setup
