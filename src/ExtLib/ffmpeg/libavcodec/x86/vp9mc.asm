@@ -53,66 +53,81 @@ times 8 dw %5, %6
 times 8 dw %7, %8
 %endmacro
 
-%macro FILTER 1
-const filters_%1 ; smooth
-                    F8_TAPS -3, -1,  32,  64,  38,   1, -3,  0
-                    F8_TAPS -2, -2,  29,  63,  41,   2, -3,  0
-                    F8_TAPS -2, -2,  26,  63,  43,   4, -4,  0
-                    F8_TAPS -2, -3,  24,  62,  46,   5, -4,  0
-                    F8_TAPS -2, -3,  21,  60,  49,   7, -4,  0
-                    F8_TAPS -1, -4,  18,  59,  51,   9, -4,  0
-                    F8_TAPS -1, -4,  16,  57,  53,  12, -4, -1
-                    F8_TAPS -1, -4,  14,  55,  55,  14, -4, -1
-                    F8_TAPS -1, -4,  12,  53,  57,  16, -4, -1
-                    F8_TAPS  0, -4,   9,  51,  59,  18, -4, -1
-                    F8_TAPS  0, -4,   7,  49,  60,  21, -3, -2
-                    F8_TAPS  0, -4,   5,  46,  62,  24, -3, -2
-                    F8_TAPS  0, -4,   4,  43,  63,  26, -2, -2
-                    F8_TAPS  0, -3,   2,  41,  63,  29, -2, -2
-                    F8_TAPS  0, -3,   1,  38,  64,  32, -1, -3
-                    ; regular
-                    F8_TAPS  0,  1,  -5, 126,   8,  -3,  1,  0
-                    F8_TAPS -1,  3, -10, 122,  18,  -6,  2,  0
-                    F8_TAPS -1,  4, -13, 118,  27,  -9,  3, -1
-                    F8_TAPS -1,  4, -16, 112,  37, -11,  4, -1
-                    F8_TAPS -1,  5, -18, 105,  48, -14,  4, -1
-                    F8_TAPS -1,  5, -19,  97,  58, -16,  5, -1
-                    F8_TAPS -1,  6, -19,  88,  68, -18,  5, -1
-                    F8_TAPS -1,  6, -19,  78,  78, -19,  6, -1
-                    F8_TAPS -1,  5, -18,  68,  88, -19,  6, -1
-                    F8_TAPS -1,  5, -16,  58,  97, -19,  5, -1
-                    F8_TAPS -1,  4, -14,  48, 105, -18,  5, -1
-                    F8_TAPS -1,  4, -11,  37, 112, -16,  4, -1
-                    F8_TAPS -1,  3,  -9,  27, 118, -13,  4, -1
-                    F8_TAPS  0,  2,  -6,  18, 122, -10,  3, -1
-                    F8_TAPS  0,  1,  -3,   8, 126,  -5,  1,  0
-                    ; sharp
-                    F8_TAPS -1,  3,  -7, 127,   8,  -3,  1,  0
-                    F8_TAPS -2,  5, -13, 125,  17,  -6,  3, -1
-                    F8_TAPS -3,  7, -17, 121,  27, -10,  5, -2
-                    F8_TAPS -4,  9, -20, 115,  37, -13,  6, -2
-                    F8_TAPS -4, 10, -23, 108,  48, -16,  8, -3
-                    F8_TAPS -4, 10, -24, 100,  59, -19,  9, -3
-                    F8_TAPS -4, 11, -24,  90,  70, -21, 10, -4
-                    F8_TAPS -4, 11, -23,  80,  80, -23, 11, -4
-                    F8_TAPS -4, 10, -21,  70,  90, -24, 11, -4
-                    F8_TAPS -3,  9, -19,  59, 100, -24, 10, -4
-                    F8_TAPS -3,  8, -16,  48, 108, -23, 10, -4
-                    F8_TAPS -2,  6, -13,  37, 115, -20,  9, -4
-                    F8_TAPS -2,  5, -10,  27, 121, -17,  7, -3
-                    F8_TAPS -1,  3,  -6,  17, 125, -13,  5, -2
-                    F8_TAPS  0,  1,  -3,   8, 127,  -7,  3, -1
+%macro FILTER 0-1
+%if %0 > 0
+%1 %+ _smooth:
+%endif
+    ; smooth
+    F8_TAPS -3, -1,  32,  64,  38,   1, -3,  0
+    F8_TAPS -2, -2,  29,  63,  41,   2, -3,  0
+    F8_TAPS -2, -2,  26,  63,  43,   4, -4,  0
+    F8_TAPS -2, -3,  24,  62,  46,   5, -4,  0
+    F8_TAPS -2, -3,  21,  60,  49,   7, -4,  0
+    F8_TAPS -1, -4,  18,  59,  51,   9, -4,  0
+    F8_TAPS -1, -4,  16,  57,  53,  12, -4, -1
+    F8_TAPS -1, -4,  14,  55,  55,  14, -4, -1
+    F8_TAPS -1, -4,  12,  53,  57,  16, -4, -1
+    F8_TAPS  0, -4,   9,  51,  59,  18, -4, -1
+    F8_TAPS  0, -4,   7,  49,  60,  21, -3, -2
+    F8_TAPS  0, -4,   5,  46,  62,  24, -3, -2
+    F8_TAPS  0, -4,   4,  43,  63,  26, -2, -2
+    F8_TAPS  0, -3,   2,  41,  63,  29, -2, -2
+    F8_TAPS  0, -3,   1,  38,  64,  32, -1, -3
+%if %0 > 0
+%1 %+ _regular:
+%endif
+    ; regular
+    F8_TAPS  0,  1,  -5, 126,   8,  -3,  1,  0
+    F8_TAPS -1,  3, -10, 122,  18,  -6,  2,  0
+    F8_TAPS -1,  4, -13, 118,  27,  -9,  3, -1
+    F8_TAPS -1,  4, -16, 112,  37, -11,  4, -1
+    F8_TAPS -1,  5, -18, 105,  48, -14,  4, -1
+    F8_TAPS -1,  5, -19,  97,  58, -16,  5, -1
+    F8_TAPS -1,  6, -19,  88,  68, -18,  5, -1
+    F8_TAPS -1,  6, -19,  78,  78, -19,  6, -1
+    F8_TAPS -1,  5, -18,  68,  88, -19,  6, -1
+    F8_TAPS -1,  5, -16,  58,  97, -19,  5, -1
+    F8_TAPS -1,  4, -14,  48, 105, -18,  5, -1
+    F8_TAPS -1,  4, -11,  37, 112, -16,  4, -1
+    F8_TAPS -1,  3,  -9,  27, 118, -13,  4, -1
+    F8_TAPS  0,  2,  -6,  18, 122, -10,  3, -1
+    F8_TAPS  0,  1,  -3,   8, 126,  -5,  1,  0
+%if %0 > 0
+%1 %+ _sharp:
+%endif
+    ; sharp
+    F8_TAPS -1,  3,  -7, 127,   8,  -3,  1,  0
+    F8_TAPS -2,  5, -13, 125,  17,  -6,  3, -1
+    F8_TAPS -3,  7, -17, 121,  27, -10,  5, -2
+    F8_TAPS -4,  9, -20, 115,  37, -13,  6, -2
+    F8_TAPS -4, 10, -23, 108,  48, -16,  8, -3
+    F8_TAPS -4, 10, -24, 100,  59, -19,  9, -3
+    F8_TAPS -4, 11, -24,  90,  70, -21, 10, -4
+    F8_TAPS -4, 11, -23,  80,  80, -23, 11, -4
+    F8_TAPS -4, 10, -21,  70,  90, -24, 11, -4
+    F8_TAPS -3,  9, -19,  59, 100, -24, 10, -4
+    F8_TAPS -3,  8, -16,  48, 108, -23, 10, -4
+    F8_TAPS -2,  6, -13,  37, 115, -20,  9, -4
+    F8_TAPS -2,  5, -10,  27, 121, -17,  7, -3
+    F8_TAPS -1,  3,  -6,  17, 125, -13,  5, -2
+    F8_TAPS  0,  1,  -3,   8, 127,  -7,  3, -1
 %endmacro
 
 %define F8_TAPS F8_SSSE3_TAPS
 ; int8_t ff_filters_ssse3[3][15][4][32]
-FILTER ssse3
+const filters_ssse3
+FILTER
 %define F8_TAPS F8_SSE2_TAPS
 ; int16_t ff_filters_sse2[3][15][8][8]
-FILTER sse2
+const filters_sse2
+FILTER
 %define F8_TAPS F8_16BPP_TAPS
 ; int16_t ff_filters_16bpp[3][15][4][16]
-FILTER 16bpp
+const filters_16bpp
+FILTER
+
+filter4_h_perm0: db 0, 1, 1, 2, 2, 3, 3, 4, 2, 3, 3, 4, 4, 5, 5, 6
+filter4_h_perm1: db 1, 2, 2, 3, 3, 4, 4, 5, 3, 4, 4, 5, 5, 6, 6, 7
 
 %if HAVE_AVX512ICL_EXTERNAL && ARCH_X86_64
 ALIGN 64
@@ -145,51 +160,11 @@ spel_h_shufB:   db  4,  5,  6,  7,  5,  6,  7,  8,  6,  7,  8,  9,  7,  8,  9, 1
 %define spel_h_shufA (spel_h_perm16+ 0)
 %define spel_h_shufC (spel_h_perm16+16)
 
-vp9_spel_filter_regular: db   0,   1,  -5, 126,   8,  -3,   1,   0
-                         db  -1,   3, -10, 122,  18,  -6,   2,   0
-                         db  -1,   4, -13, 118,  27,  -9,   3,  -1
-                         db  -1,   4, -16, 112,  37, -11,   4,  -1
-                         db  -1,   5, -18, 105,  48, -14,   4,  -1
-                         db  -1,   5, -19,  97,  58, -16,   5,  -1
-                         db  -1,   6, -19,  88,  68, -18,   5,  -1
-                         db  -1,   6, -19,  78,  78, -19,   6,  -1
-                         db  -1,   5, -18,  68,  88, -19,   6,  -1
-                         db  -1,   5, -16,  58,  97, -19,   5,  -1
-                         db  -1,   4, -14,  48, 105, -18,   5,  -1
-                         db  -1,   4, -11,  37, 112, -16,   4,  -1
-                         db  -1,   3,  -9,  27, 118, -13,   4,  -1
-                         db   0,   2,  -6,  18, 122, -10,   3,  -1
-                         db   0,   1,  -3,   8, 126,  -5,   1,   0
-vp9_spel_filter_sharp:   db  -1,   3,  -7, 127,   8,  -3,   1,   0
-                         db  -2,   5, -13, 125,  17,  -6,   3,  -1
-                         db  -3,   7, -17, 121,  27, -10,   5,  -2
-                         db  -4,   9, -20, 115,  37, -13,   6,  -2
-                         db  -4,  10, -23, 108,  48, -16,   8,  -3
-                         db  -4,  10, -24, 100,  59, -19,   9,  -3
-                         db  -4,  11, -24,  90,  70, -21,  10,  -4
-                         db  -4,  11, -23,  80,  80, -23,  11,  -4
-                         db  -4,  10, -21,  70,  90, -24,  11,  -4
-                         db  -3,   9, -19,  59, 100, -24,  10,  -4
-                         db  -3,   8, -16,  48, 108, -23,  10,  -4
-                         db  -2,   6, -13,  37, 115, -20,   9,  -4
-                         db  -2,   5, -10,  27, 121, -17,   7,  -3
-                         db  -1,   3,  -6,  17, 125, -13,   5,  -2
-                         db   0,   1,  -3,   8, 127,  -7,   3,  -1
-vp9_spel_filter_smooth:  db  -3,  -1,  32,  64,  38,   1,  -3,   0
-                         db  -2,  -2,  29,  63,  41,   2,  -3,   0
-                         db  -2,  -2,  26,  63,  43,   4,  -4,   0
-                         db  -2,  -3,  24,  62,  46,   5,  -4,   0
-                         db  -2,  -3,  21,  60,  49,   7,  -4,   0
-                         db  -1,  -4,  18,  59,  51,   9,  -4,   0
-                         db  -1,  -4,  16,  57,  53,  12,  -4,  -1
-                         db  -1,  -4,  14,  55,  55,  14,  -4,  -1
-                         db  -1,  -4,  12,  53,  57,  16,  -4,  -1
-                         db   0,  -4,   9,  51,  59,  18,  -4,  -1
-                         db   0,  -4,   7,  49,  60,  21,  -3,  -2
-                         db   0,  -4,   5,  46,  62,  24,  -3,  -2
-                         db   0,  -4,   4,  43,  63,  26,  -2,  -2
-                         db   0,  -3,   2,  41,  63,  29,  -2,  -2
-                         db   0,  -3,   1,  38,  64,  32,  -1,  -3
+%macro F8_AVX512_TAPS 8
+db %1, %2, %3, %4, %5, %6, %7, %8
+%endmacro
+%define F8_TAPS F8_AVX512_TAPS
+FILTER vp9_spel_filter
 
 pb_02461357:    db  0,  2,  4,  6,  1,  3,  5,  7
 pd_64:          dd 64
@@ -205,7 +180,7 @@ cglobal vp9_%1_8tap_1d_h_ %+ %%px %+ _8, 6, 6, 15, dst, dstride, src, sstride, h
     pxor        m5, m5
     mova        m6, [pw_64]
     mova        m7, [filteryq+  0]
-%if ARCH_X86_64 && mmsize > 8
+%if ARCH_X86_64
     mova        m8, [filteryq+ 16]
     mova        m9, [filteryq+ 32]
     mova       m10, [filteryq+ 48]
@@ -226,7 +201,7 @@ cglobal vp9_%1_8tap_1d_h_ %+ %%px %+ _8, 6, 6, 15, dst, dstride, src, sstride, h
     punpcklbw   m3, m5
     punpcklbw   m4, m5
     pmullw      m0, m7
-%if ARCH_X86_64 && mmsize > 8
+%if ARCH_X86_64
     pmullw      m1, m8
     pmullw      m2, m9
     pmullw      m3, m10
@@ -247,7 +222,7 @@ cglobal vp9_%1_8tap_1d_h_ %+ %%px %+ _8, 6, 6, 15, dst, dstride, src, sstride, h
     punpcklbw   m1, m5
     punpcklbw   m3, m5
     punpcklbw   m4, m5
-%if ARCH_X86_64 && mmsize > 8
+%if ARCH_X86_64
     pmullw      m1, m12
     pmullw      m3, m13
     pmullw      m4, m14
@@ -276,20 +251,55 @@ cglobal vp9_%1_8tap_1d_h_ %+ %%px %+ _8, 6, 6, 15, dst, dstride, src, sstride, h
     RET
 %endmacro
 
-INIT_MMX mmxext
-filter_sse2_h_fn put
-filter_sse2_h_fn avg
-
 INIT_XMM sse2
 filter_sse2_h_fn put
 filter_sse2_h_fn avg
+
+%macro filter4_h_fn 2
+cglobal vp9_%1_8tap_1d_h_4_8, 6, 6, %2, dst, dstride, src, sstride, h, filtery
+    mova        m2, [filter4_h_perm0]
+    mova        m3, [filter4_h_perm1]
+    pcmpeqw     m4, m4
+    movu        m5, [filteryq+24]
+    movu        m6, [filteryq+88]
+    psllw       m4, 6   ; pw_m64
+.loop:
+    movq        m0, [srcq-3]
+    movq        m1, [srcq+0]
+    pshufb      m0, m2
+    pshufb      m1, m3
+    pmaddubsw   m0, m5
+    pmaddubsw   m1, m6
+%ifidn %1, avg
+    movd        m7, [dstq]
+%endif
+    add       srcq, sstrideq
+    paddw       m0, m1
+    movhlps     m1, m0
+    psubw       m0, m4
+    paddsw      m0, m1
+    psraw       m0, 7
+    packuswb    m0, m0
+%ifidn %1, avg
+    pavgb       m0, m7
+%endif
+    movd    [dstq], m0
+    add       dstq, dstrideq
+    sub         hd, 1
+    jg .loop
+    RET
+%endmacro
+
+INIT_XMM ssse3
+filter4_h_fn put, 7
+filter4_h_fn avg, 8
 
 %macro filter_h_fn 1
 %assign %%px mmsize/2
 cglobal vp9_%1_8tap_1d_h_ %+ %%px %+ _8, 6, 6, 11, dst, dstride, src, sstride, h, filtery
     mova        m6, [pw_256]
     mova        m7, [filteryq+ 0]
-%if ARCH_X86_64 && mmsize > 8
+%ifdef m8
     mova        m8, [filteryq+32]
     mova        m9, [filteryq+64]
     mova       m10, [filteryq+96]
@@ -309,7 +319,7 @@ cglobal vp9_%1_8tap_1d_h_ %+ %%px %+ _8, 6, 6, 11, dst, dstride, src, sstride, h
     punpcklbw   m4, m5
     punpcklbw   m1, m3
     pmaddubsw   m0, m7
-%if ARCH_X86_64 && mmsize > 8
+%ifdef m8
     pmaddubsw   m2, m8
     pmaddubsw   m4, m9
     pmaddubsw   m1, m10
@@ -335,10 +345,6 @@ cglobal vp9_%1_8tap_1d_h_ %+ %%px %+ _8, 6, 6, 11, dst, dstride, src, sstride, h
     jg .loop
     RET
 %endmacro
-
-INIT_MMX ssse3
-filter_h_fn put
-filter_h_fn avg
 
 INIT_XMM ssse3
 filter_h_fn put
@@ -421,7 +427,7 @@ cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _8, 4, 7, 15, dst, dstride, src, sstride, f
     lea      src4q, [srcq+sstrideq]
     sub       srcq, sstride3q
     mova        m7, [filteryq+  0]
-%if ARCH_X86_64 && mmsize > 8
+%ifdef m8
     mova        m8, [filteryq+ 16]
     mova        m9, [filteryq+ 32]
     mova       m10, [filteryq+ 48]
@@ -446,7 +452,7 @@ cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _8, 4, 7, 15, dst, dstride, src, sstride, f
     punpcklbw   m3, m5
     punpcklbw   m4, m5
     pmullw      m0, m7
-%if ARCH_X86_64 && mmsize > 8
+%ifdef m8
     pmullw      m1, m8
     pmullw      m2, m9
     pmullw      m3, m10
@@ -467,7 +473,7 @@ cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _8, 4, 7, 15, dst, dstride, src, sstride, f
     punpcklbw   m1, m5
     punpcklbw   m3, m5
     punpcklbw   m4, m5
-%if ARCH_X86_64 && mmsize > 8
+%ifdef m8
     pmullw      m1, m12
     pmullw      m3, m13
     pmullw      m4, m14
@@ -496,20 +502,88 @@ cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _8, 4, 7, 15, dst, dstride, src, sstride, f
     RET
 %endmacro
 
-INIT_MMX mmxext
-filter_sse2_v_fn put
-filter_sse2_v_fn avg
-
 INIT_XMM sse2
 filter_sse2_v_fn put
 filter_sse2_v_fn avg
 
-%macro filter_v_fn 1
-%assign %%px mmsize/2
+%macro filter4_v_fn 1
 %if ARCH_X86_64
-cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _8, 6, 8, 11, dst, dstride, src, sstride, h, filtery, src4, sstride3
+cglobal vp9_%1_8tap_1d_v_4_8, 6, 7, 8, dst, dstride, src, sstride, h, filtery, sstride3
 %else
-cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _8, 4, 7, 11, dst, dstride, src, sstride, filtery, src4, sstride3
+cglobal vp9_%1_8tap_1d_v_4_8, 4, 5, 8, dst, dstride, src, sstride, filtery
+%define hd r4mp
+%define sstride3q filteryq
+%endif
+    lea  sstride3q, [sstrideq*3]
+    sub       srcq, sstride3q
+    movd        m0, [srcq]
+    movd        m1, [srcq+sstrideq]
+    movd        m2, [srcq+sstrideq*2]
+    movd        m3, [srcq+sstride3q]
+    lea       srcq, [srcq+sstrideq*4]
+    movd        m4, [srcq]
+    movd        m5, [srcq+sstrideq]
+    punpcklbw   m0, m1
+    punpcklbw   m1, m2
+    punpcklbw   m2, m3
+    punpcklbw   m3, m4
+    punpcklqdq  m0, m1
+    movd        m1, [srcq+sstrideq*2]
+    add       srcq, sstride3q
+%if ARCH_X86_32
+    mov   filteryq, r5mp
+%endif
+    punpcklqdq  m2, m3
+    punpcklbw   m4, m5
+    punpcklbw   m5, m1
+    punpcklqdq  m4, m5
+.loop:
+    pmaddubsw   m0, [filteryq]
+    movd        m3, [srcq]
+    movd        m5, [srcq+sstrideq]
+    pmaddubsw   m7, m4, [filteryq+64]
+    pmaddubsw   m6, m2, [filteryq+32]
+    punpcklbw   m1, m3
+    punpcklbw   m3, m5
+    punpcklqdq  m1, m3
+    pmaddubsw   m3, m1, [filteryq+96]
+    paddw       m0, [pw_64]
+    lea       srcq, [srcq+2*sstrideq]
+    paddw       m7, m0
+    mova        m0, m2
+    mova        m2, m4
+%ifidn %1, avg
+    movd        m4, [dstq]
+%endif
+    paddw       m6, m3
+%ifidn %1, avg
+    movd        m3, [dstq+dstrideq]
+%endif
+    paddsw      m6, m7
+    psraw       m6, 7
+    packuswb    m6, m6
+    pshuflw     m7, m6, 0xE
+%ifidn %1, avg
+    pavgb       m6, m4
+%endif
+    movd    [dstq], m6
+    mova        m4, m1
+%ifidn %1, avg
+    pavgb       m7, m3
+%endif
+    movd [dstq+dstrideq], m7
+    lea       dstq, [dstq+2*dstrideq]
+    mova        m1, m5
+    sub         hd, 2
+    jg .loop
+    RET
+%endmacro
+
+%macro filter_v_fn 1
+%if ARCH_X86_64
+cglobal vp9_%1_8tap_1d_v_8_8, 6, 8, 11, dst, dstride, src, sstride, h, filtery, src4, sstride3
+%else
+cglobal vp9_%1_8tap_1d_v_8_8, 4, 7, 11, dst, dstride, src, sstride, filtery, src4, sstride3
     mov   filteryq, r5mp
 %define hd r4mp
 %endif
@@ -518,7 +592,7 @@ cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _8, 4, 7, 11, dst, dstride, src, sstride, f
     lea      src4q, [srcq+sstrideq]
     sub       srcq, sstride3q
     mova        m7, [filteryq+ 0]
-%if ARCH_X86_64 && mmsize > 8
+%if ARCH_X86_64
     mova        m8, [filteryq+32]
     mova        m9, [filteryq+64]
     mova       m10, [filteryq+96]
@@ -541,7 +615,7 @@ cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _8, 4, 7, 11, dst, dstride, src, sstride, f
     punpcklbw   m4, m5
     punpcklbw   m1, m3
     pmaddubsw   m0, m7
-%if ARCH_X86_64 && mmsize > 8
+%if ARCH_X86_64
     pmaddubsw   m2, m8
     pmaddubsw   m4, m9
     pmaddubsw   m1, m10
@@ -568,9 +642,9 @@ cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _8, 4, 7, 11, dst, dstride, src, sstride, f
     RET
 %endmacro
 
-INIT_MMX ssse3
-filter_v_fn put
-filter_v_fn avg
+INIT_XMM ssse3
+filter4_v_fn put
+filter4_v_fn avg
 
 INIT_XMM ssse3
 filter_v_fn put

@@ -35,7 +35,7 @@ Updated Bulgarian translation (by jekovcar).
 Updated Chinese (Traditional) and Dutch translation (by beter).
 
 Updated libraries:
-	ffmpeg n8.1-dev-1391-g6a14a93af5.
+	ffmpeg n8.1-dev-1483-gec0173ab59.
 
 
 1.8.8 - 2025-10-26

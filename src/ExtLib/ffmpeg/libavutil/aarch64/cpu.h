@@ -29,9 +29,14 @@
 #define have_i8mm(flags)    CPUEXT(flags, I8MM)
 #define have_sve(flags)     CPUEXT(flags, SVE)
 #define have_sve2(flags)    CPUEXT(flags, SVE2)
+#define have_sme(flags)     CPUEXT(flags, SME)
 
 #if HAVE_SVE
 int ff_aarch64_sve_length(void);
+#endif
+
+#if HAVE_SME
+int ff_aarch64_sme_length(void);
 #endif
 
 #endif /* AVUTIL_AARCH64_CPU_H */
