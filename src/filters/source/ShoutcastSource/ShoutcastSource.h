@@ -207,7 +207,7 @@ class CShoutcastStream : public CSourceStream
 	CUrlParser m_urlParser;
 
 	bool m_bBuffering = false;
-	bool m_bExitThread = false;;
+	volatile bool m_bExitThread = false;;
 
 	CStringW m_StationName;
 	CStringW m_StationUrl;
