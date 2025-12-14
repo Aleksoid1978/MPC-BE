@@ -3072,10 +3072,12 @@ namespace VVCParser {
 		params.profile = sps->profile_tier_level.general_profile_idc;
 		params.level = sps->profile_tier_level.general_level_idc;
 
-		params.sar.num = params.sar.num = 1;
 		if (sps->vui.vui_sar_width && sps->vui.vui_sar_height) {
 			params.sar.num = sps->vui.vui_sar_width;
 			params.sar.den = sps->vui.vui_sar_height;
+		} else {
+			params.sar.num = 1;
+			params.sar.den = 1;
 		}
 
 		if (sps->sps_ptl_dpb_hrd_params_present_flag && sps->sps_timing_hrd_params_present_flag) {
