@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -49,6 +49,12 @@ CVobSubImage::CVobSubImage()
 CVobSubImage::~CVobSubImage()
 {
 	Free();
+}
+
+void CVobSubImage::Invalidate()
+{
+	nLang = -1;
+	nIdx = -1;
 }
 
 bool CVobSubImage::Alloc(int w, int h)

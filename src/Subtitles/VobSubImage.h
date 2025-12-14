@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -74,7 +74,7 @@ public:
 	CVobSubImage();
 	virtual ~CVobSubImage();
 
-	void Invalidate() { nLang = nIdx = -1; }
+	void Invalidate();
 
 	void GetPacketInfo(const BYTE* lpData, int packetSize, int dataSize, int t = INT_MAX);
 	bool Decode(BYTE* lpData, int packetSize, int dataSize, int t,
