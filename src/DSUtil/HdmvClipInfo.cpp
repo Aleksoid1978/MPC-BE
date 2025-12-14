@@ -47,7 +47,7 @@ HRESULT CHdmvClipInfo::CloseFile(HRESULT hr)
 	return hr;
 }
 
-void CHdmvClipInfo::ReadBuffer(BYTE* pBuff, DWORD nLen)
+void CHdmvClipInfo::ReadBuffer(void* pBuff, DWORD nLen)
 {
 	DWORD dwRead;
 	ReadFile(m_hFile, pBuff, nLen, &dwRead, nullptr);
@@ -56,7 +56,7 @@ void CHdmvClipInfo::ReadBuffer(BYTE* pBuff, DWORD nLen)
 DWORD CHdmvClipInfo::ReadDword()
 {
 	DWORD value;
-	ReadBuffer((BYTE*)&value, sizeof(value));
+	ReadBuffer(&value, sizeof(value));
 
 	return _byteswap_ulong(value);
 }
@@ -64,7 +64,7 @@ DWORD CHdmvClipInfo::ReadDword()
 SHORT CHdmvClipInfo::ReadShort()
 {
 	WORD value;
-	ReadBuffer((BYTE*)&value, sizeof(value));
+	ReadBuffer(&value, sizeof(value));
 
 	return _byteswap_ushort(value);
 }
@@ -72,7 +72,7 @@ SHORT CHdmvClipInfo::ReadShort()
 BYTE CHdmvClipInfo::ReadByte()
 {
 	BYTE value;
-	ReadBuffer((BYTE*)&value, sizeof(value));
+	ReadBuffer(&value, sizeof(value));
 
 	return value;
 }
@@ -101,7 +101,7 @@ BOOL CHdmvClipInfo::SetPos(LONGLONG Pos, DWORD dwMoveMethod/* = FILE_BEGIN*/)
 
 HRESULT CHdmvClipInfo::ReadLang(Stream& s)
 {
-	ReadBuffer((BYTE*)s.m_LanguageCode, 3);
+	ReadBuffer(s.m_LanguageCode, 3);
 	s.m_LCID = ISO6392ToLcid(s.m_LanguageCode);
 
 	return S_OK;

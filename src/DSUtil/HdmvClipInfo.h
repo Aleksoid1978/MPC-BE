@@ -182,7 +182,7 @@ private :
 		Streams m_Streams;
 	} stn;
 
-	void    ReadBuffer(BYTE* pBuff, DWORD nLen);
+	void    ReadBuffer(void* pBuff, DWORD nLen);
 	DWORD   ReadDword();
 	SHORT   ReadShort();
 	BYTE    ReadByte();
