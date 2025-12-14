@@ -981,7 +981,7 @@ void CPlayerSeekBar::UpdateToolTipText()
 			m_pChapterBag->ChapLookup(&rt, &chapterName);
 
 			if (chapterName.Length() > 0) {
-				tooltipText.Format(L"%s - %s", tooltipText, chapterName);
+				tooltipText.AppendFormat(L" - %s", chapterName);
 			}
 		}
 	}
