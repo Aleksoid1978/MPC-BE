@@ -476,9 +476,8 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 					break;
 				case FCC('AV01'): {
-						__int64 pos = m_pFile->GetPos();
+						const __int64 pos = m_pFile->GetPos();
 						if (s->cs.size()) {
-							__int64 pos = m_pFile->GetPos();
 							for (size_t i = 0; i < s->cs.size() - 1; i++) {
 								if (s->cs[i].orgsize > 8) {
 									m_pFile->Seek(s->cs[i].filepos);
@@ -523,9 +522,8 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 					break;
 				case FCC('VP90'): {
-						__int64 pos = m_pFile->GetPos();
+						const __int64 pos = m_pFile->GetPos();
 						if (s->cs.size()) {
-							__int64 pos = m_pFile->GetPos();
 							for (size_t i = 0; i < s->cs.size() - 1; i++) {
 								if (s->cs[i].orgsize > 8) {
 									m_pFile->Seek(s->cs[i].filepos);
