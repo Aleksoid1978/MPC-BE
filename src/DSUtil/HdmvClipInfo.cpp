@@ -652,7 +652,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(const CString& strPlaylistFile, REFERENCE_TI
 								ReadBuffer(Buff, 9); // M2TS file name
 								if (!memcmp(&Buff[5], "M2TS", 4)) {
 									CString fileName;
-									fileName.Format(L"%s\\STREAM\\%c%c%c%c%c.M2TS", Path, Buff[0], Buff[1], Buff[2], Buff[3], Buff[4]);
+									fileName.Format(L"%s\\STREAM\\%.5hs.M2TS", Path, (char*)&Buff[0]);
 									_ext_sub_path.extFileNames.emplace_back(fileName);
 								}
 
@@ -695,13 +695,13 @@ HRESULT CHdmvClipInfo::ReadPlaylist(const CString& strPlaylistFile, REFERENCE_TI
 				return CloseFile(VFW_E_INVALID_FILE_FORMAT);
 			}
 
-			LPCWSTR format = L"%s\\STREAM\\%c%c%c%c%c.M2TS";
+			LPCWSTR format = L"%s\\STREAM\\%.5hs.M2TS";
 			if (bHaveMVCExtension) {
-				format = L"%s\\STREAM\\SSIF\\%c%c%c%c%c.SSIF";
+				format = L"%s\\STREAM\\SSIF\\%.5hs.SSIF";
 			}
 
 			PlaylistItem Item;
-			Item.m_strFileName.Format(format, Path, Buff[0], Buff[1], Buff[2], Buff[3], Buff[4]);
+			Item.m_strFileName.Format(format, Path, (char*)&Buff[0]);
 			if (!::PathFileExistsW(Item.m_strFileName)) {
 				DLog(L"    ==> '%s' is missing, skip it", Item.m_strFileName);
 

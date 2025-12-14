@@ -492,7 +492,7 @@ CString CMediaTypeEx::GetVideoCodecName(const GUID& subtype, DWORD biCompression
 					   subtype == MEDIASUBTYPE_ap4h ||
 					   subtype == MEDIASUBTYPE_ap4x ||
 					   subtype == MEDIASUBTYPE_icpf) {
-				str.Format(L"ProRes (%4.4hs)", &biCompression);
+				str.Format(L"ProRes (%.4hs)", (char*)&biCompression);
 			} else if (subtype == MEDIASUBTYPE_RGB48) {
 				str = L"RGB48";
 			} else if (subtype == FOURCCMap(BI_RLE8)) { // fake subtype for RLE 8-bit
@@ -500,7 +500,7 @@ CString CMediaTypeEx::GetVideoCodecName(const GUID& subtype, DWORD biCompression
 			} else if (biCompression < 256) {
 				str.Format(L"%u", biCompression);
 			} else {
-				str.Format(L"%4.4hs", &biCompression);
+				str = FourccToWStr(biCompression);
 			}
 		}
 	} else {

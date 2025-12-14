@@ -16295,7 +16295,7 @@ void CMainFrame::AddTextPassThruFilter()
 
 			CComQIPtr<IBaseFilter> pTPTF = DNew CTextPassThruFilter(this);
 			CStringW name;
-			name.Format(L"TextPassThru%08zx", pTPTF.p);
+			name.Format(L"TextPassThru%p", pTPTF.p);
 			if (FAILED(m_pGB->AddFilter(pTPTF, name))) {
 				continue;
 			}
