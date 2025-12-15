@@ -2375,7 +2375,7 @@ void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
 					HMODULE hModule;
 					DWORD cbNeeded;
 
-					if (EnumProcessModules(hProcess, &hModule, sizeof(hModule), &cbNeeded)) {
+					if (EnumProcessModulesEx(hProcess, &hModule, sizeof(hModule), &cbNeeded, LIST_MODULES_DEFAULT)) {
 						module.ReleaseBufferSetLength(GetModuleFileNameExW(hProcess, hModule, module.GetBuffer(MAX_PATH), MAX_PATH));
 					}
 
