@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -69,7 +69,7 @@ void CBaseMuxerFilter::AddInput()
 
 	CStringW name;
 
-	name.Format(L"Input %u", m_pInputs.size() + 1);
+	name.Format(L"Input %zu", m_pInputs.size() + 1);
 
 	CBaseMuxerInputPin* pInputPin = nullptr;
 	if (FAILED(CreateInput(name, &pInputPin)) || !pInputPin) {
@@ -78,7 +78,7 @@ void CBaseMuxerFilter::AddInput()
 	}
 	std::unique_ptr<CBaseMuxerInputPin> pAutoPtrInputPin(pInputPin);
 
-	name.Format(L"~Output %u", m_pRawOutputs.size() + 1);
+	name.Format(L"~Output %zu", m_pRawOutputs.size() + 1);
 
 	CBaseMuxerRawOutputPin* pRawOutputPin = nullptr;
 	if (FAILED(CreateRawOutput(name, &pRawOutputPin)) || !pRawOutputPin) {

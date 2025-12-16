@@ -1804,7 +1804,7 @@ bool CVobSubFile::SaveWinSubMux(CString fn)
 		}
 
 		CString bmpfn;
-		bmpfn.Format(L"%s_%06u.bmp", fn, i+1);
+		bmpfn.Format(L"%s_%06zu.bmp", fn, i+1);
 
 		CString str;
 		str.Format(L"%s\t%02d:%02d:%02d:%02d %02d:%02d:%02d:%02d\t%03d %03d %03d %03d %d %d %d %d\n",
@@ -1994,7 +1994,7 @@ bool CVobSubFile::SaveScenarist(CString fn)
 		}
 
 		CString bmpfn;
-		bmpfn.Format(L"%s_%04u.bmp", fn, i+1);
+		bmpfn.Format(L"%s_%04zu.bmp", fn, i+1);
 		title = bmpfn.Mid(bmpfn.ReverseFind('/')+1);
 
 		// E1, E2, P, Bg
@@ -2076,7 +2076,7 @@ bool CVobSubFile::SaveScenarist(CString fn)
 			continue;
 		}
 
-		str.Format(L"%04u\t%02d:%02d:%02d:%02d\t%02d:%02d:%02d:%02d\t%s\n",
+		str.Format(L"%04zu\t%02d:%02d:%02d:%02d\t%02d:%02d:%02d:%02d\t%s\n",
 				   ++k,
 				   h1, m1, s1, f1,
 				   h2, m2, s2, f2,
@@ -2221,7 +2221,7 @@ bool CVobSubFile::SaveMaestro(CString fn)
 		}
 
 		CString bmpfn;
-		bmpfn.Format(L"%s_%04d.bmp", fn, i+1);
+		bmpfn.Format(L"%s_%04zu.bmp", fn, i+1);
 		title = bmpfn.Mid(bmpfn.ReverseFind('/')+1);
 
 		// E1, E2, P, Bg
@@ -2301,7 +2301,7 @@ bool CVobSubFile::SaveMaestro(CString fn)
 			continue;
 		}
 
-		str.Format(L"%04u\t%02d:%02d:%02d:%02d\t%02d:%02d:%02d:%02d\t%s\n",
+		str.Format(L"%04zu\t%02d:%02d:%02d:%02d\t%02d:%02d:%02d:%02d\t%s\n",
 				   ++k,
 				   h1, m1, s1, f1,
 				   h2, m2, s2, f2,

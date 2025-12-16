@@ -760,9 +760,9 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		//stop check this pin. Not sure the reason exactly. but it happens.
 		//If you know why, please emailto: tomasen@gmail.com
 		if (s->strn.IsEmpty()) {
-			name.Format(L"%s %u", label, i);
+			name.Format(L"%s %zu", label, i);
 		} else {
-			name.Format(L"%s (%s %u)", UTF8orLocalToWStr(s->strn), label, i);
+			name.Format(L"%s (%s %zu)", UTF8orLocalToWStr(s->strn), label, i);
 		}
 
 		HRESULT hr;

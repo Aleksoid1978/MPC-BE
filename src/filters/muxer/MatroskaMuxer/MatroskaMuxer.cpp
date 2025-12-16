@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -125,7 +125,7 @@ void CMatroskaMuxerFilter::AddInput()
 	}
 
 	CStringW name;
-	name.Format(L"Track %u", m_pInputs.size() + 1);
+	name.Format(L"Track %zu", m_pInputs.size() + 1);
 
 	HRESULT hr;
 	m_pInputs.emplace_back(DNew CMatroskaMuxerInputPin(name, this, this, &hr));

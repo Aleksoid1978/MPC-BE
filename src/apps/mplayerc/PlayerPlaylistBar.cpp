@@ -4771,7 +4771,7 @@ void CPlayerPlaylistBar::TSaveSettings()
 
 	if (!m_tabs.empty()) {
 		// the first stroke has only saved last active playlist index and tabs offset (first visible tab on tabbar)
-		str.AppendFormat(L"%d;%d;|", m_nCurPlayListIndex, m_cntOffset);
+		str.AppendFormat(L"%zu;%zu;|", m_nCurPlayListIndex, m_cntOffset);
 		const auto last = m_tabs.size() - 1;
 		for (size_t i = 0; i <= last; i++) {
 			const auto& tab = m_tabs[i];

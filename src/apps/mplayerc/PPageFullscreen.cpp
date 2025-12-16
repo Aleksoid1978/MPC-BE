@@ -509,7 +509,7 @@ void CPPageFullscreen::ModesUpdate()
 
 				CString str;
 				if (nItem > 0) {
-					str.Format(L"%02u", n);
+					str.Format(L"%02zu", n);
 				} else {
 					str = L"Default";
 				}
