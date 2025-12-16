@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -521,7 +521,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		CRMFile::subtitle& s = *it++;
 
 		CStringW name;
-		name.Format(L"Subtitle %02d", stream);
+		name.Format(L"Subtitle %02u", stream);
 		if (!s.name.IsEmpty()) {
 			name += L" (" + CString(s.name) + L')';
 		}

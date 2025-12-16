@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2023 see Authors.txt
+ * (C) 2014-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -332,7 +332,7 @@ WCHAR CDiskImage::MountWin8(LPCWSTR pathName)
 														  nullptr)) {
 
 										CString tmp_physicalDriveName;
-										tmp_physicalDriveName.Format(L"\\\\.\\CDROM%d", deviceInfo.DeviceNumber);
+										tmp_physicalDriveName.Format(L"\\\\.\\CDROM%u", deviceInfo.DeviceNumber);
 										if (physicalDriveName == tmp_physicalDriveName) {
 											volumeNameBuffer[len - 1] = '\\';
 											WCHAR VolumeName[MAX_PATH] = L"";

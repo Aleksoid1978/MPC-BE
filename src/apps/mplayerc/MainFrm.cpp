@@ -2253,7 +2253,7 @@ void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 
 	// Only stop screensaver if video playing; allow for audio only
 	if ((fs == State_Running && !m_bAudioOnly) && (((nID & 0xFFF0) == SC_SCREENSAVE) || ((nID & 0xFFF0) == SC_MONITORPOWER))) {
-		DLog(L"SC_SCREENSAVE, nID = %d, lParam = %d", nID, lParam);
+		DLog(L"SC_SCREENSAVE, nID = %u, lParam = %Id", nID, lParam);
 		return;
 	} else if ((nID & 0xFFF0) == SC_MINIMIZE && m_bTrayIcon) {
 		if (m_wndFlyBar && m_wndFlyBar.IsWindowVisible()) {
@@ -3197,7 +3197,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				DLog(L"OnGraphNotify: EC_ERRORABORT -> hr = %08x", (HRESULT)evParam1);
 				break;
 			case EC_BUFFERING_DATA:
-				DLog(L"OnGraphNotify: EC_BUFFERING_DATA -> %d, %d", evParam1, evParam2);
+				DLog(L"OnGraphNotify: EC_BUFFERING_DATA -> %Id, %Id", evParam1, evParam2);
 
 				m_bBuffering = ((HRESULT)evParam1 != S_OK);
 				break;
@@ -3447,7 +3447,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				break;
 			case EC_DVD_ERROR:
 				if (m_pDVDC) {
-					DLog(L"OnGraphNotify: EC_DVD_ERROR -> %d, %d", evParam1, evParam2);
+					DLog(L"OnGraphNotify: EC_DVD_ERROR -> %Id, %Id", evParam1, evParam2);
 
 					CString err;
 
@@ -3489,7 +3489,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				break;
 			case EC_DVD_WARNING:
 				if (m_pDVDC) {
-					DLog(L"OnGraphNotify: EC_DVD_WARNING -> %d, %d", evParam1, evParam2);
+					DLog(L"OnGraphNotify: EC_DVD_WARNING -> %Id, %Id", evParam1, evParam2);
 				}
 				break;
 			case EC_VIDEO_SIZE_CHANGED: {
@@ -18485,7 +18485,7 @@ void CMainFrame::SendNowPlayingToApi()
 
 					// build string
 					// DVD - xxxxx|currenttitle|numberofchapters|currentchapter|titleduration
-					author.Format(L"%d", Location.TitleNum);
+					author.Format(L"%u", Location.TitleNum);
 					description.Format(L"%u", ulNumOfChapters);
 					label.Format(L"%u", Location.ChapterNum);
 				}

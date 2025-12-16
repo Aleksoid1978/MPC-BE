@@ -1995,7 +1995,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				if (outputDesc.GetLength()) {
 					pinName.Append(outputDesc);
 				} else {
-					pinName.AppendFormat(L"Output %d", id);
+					pinName.AppendFormat(L"Output %u", id);
 				}
 			}
 

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2014,7 +2014,7 @@ void CDX9AllocatorPresenter::DrawStats()
 		}
 
 		if (iDetailedStats > 1) {
-			strText.AppendFormat(L"\nBuffering    : Buffered %3d    Free %3d    Current Surface %3u", m_nUsedBuffer, m_nSurfaces - m_nUsedBuffer, m_iCurSurface);
+			strText.AppendFormat(L"\nBuffering    : Buffered %3d    Free %3u    Current Surface %3u", m_nUsedBuffer, m_nSurfaces - m_nUsedBuffer, m_iCurSurface);
 		} else {
 			strText.AppendFormat(L"\nBuffered     : %3d", m_nUsedBuffer);
 		}

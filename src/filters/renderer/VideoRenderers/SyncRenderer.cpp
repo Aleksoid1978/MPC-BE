@@ -1695,7 +1695,7 @@ void CBaseAP::DrawStats()
 				strText.AppendFormat(L"  paint time correction: %3d ms  Hysteresis: %d", m_lShiftToNearest, (int)(m_llHysteresis / 10000));
 			}
 
-			strText.AppendFormat(L"\nBuffering    : Buffered %3d    Free %3d    Current Surface %3u", m_nUsedBuffer, m_nSurfaces - m_nUsedBuffer, m_iCurSurface);
+			strText.AppendFormat(L"\nBuffering    : Buffered %3d    Free %3u    Current Surface %3u", m_nUsedBuffer, m_nSurfaces - m_nUsedBuffer, m_iCurSurface);
 
 			strText.Append(L"\nSettings     : ");
 			if (m_bIsFullscreen) {

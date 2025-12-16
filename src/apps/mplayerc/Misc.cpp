@@ -123,7 +123,7 @@ CString GetLastErrorMsg(LPWSTR lpszFunction, DWORD dw/* = GetLastError()*/)
 		(wcslen((LPCWSTR)lpMsgBuf) + wcslen((LPCWSTR)lpszFunction) + 40) * sizeof(WCHAR));
 	StringCchPrintfW((LPWSTR)lpDisplayBuf,
 		LocalSize(lpDisplayBuf) / sizeof(WCHAR),
-		L"Function '%s' failed with error %d: %s",
+		L"Function '%s' failed with error %u: %s",
 		lpszFunction, dw, lpMsgBuf);
 
 	CString ret = (LPCWSTR)lpDisplayBuf;
