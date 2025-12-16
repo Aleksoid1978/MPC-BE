@@ -1857,7 +1857,7 @@ void CAppSettings::SaveSettings()
 		if (wc.IsModified()) {
 			str.Format(L"CommandMod%u", n);
 			CString str2;
-			str2.Format(L"%d %x %x \"%S\" %d %u %u %u",
+			str2.Format(L"%d %x %x \"%hs\" %d %u %u %u",
 						wc.cmd, wc.fVirt, wc.key,
 						wc.rmcmd, wc.rmrepcnt,
 						wc.mouse, wc.appcmd, wc.mouseFS);

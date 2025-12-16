@@ -355,7 +355,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				outputDesc.Format(L"Video %d", nVideo);
 
 				if (VideoTrackPins.size()) {
-					DLog(L"CMatroskaSplitterFilter::CreateOutputs() :Additional video stream '%S' (%I64u) is ignored", CodecID, (UINT64)pTE->TrackType);
+					DLog(L"CMatroskaSplitterFilter::CreateOutputs() :Additional video stream '%hs' (%I64u) is ignored", CodecID, (UINT64)pTE->TrackType);
 					continue;
 				}
 
@@ -1617,7 +1617,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 
 			if (mts.empty()) {
-				DLog(L"CMatroskaSplitterFilter::CreateOutputs() : Unsupported TrackType '%S' (%I64u)", CodecID, (UINT64)pTE->TrackType);
+				DLog(L"CMatroskaSplitterFilter::CreateOutputs() : Unsupported TrackType '%hs' (%I64u)", CodecID, (UINT64)pTE->TrackType);
 				continue;
 			}
 

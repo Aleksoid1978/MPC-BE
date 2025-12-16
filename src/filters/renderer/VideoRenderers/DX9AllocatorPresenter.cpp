@@ -2388,13 +2388,13 @@ void CDX9AllocatorPresenter::OnChangeInput(CComPtr<IPin> pPin)
 				DXVA2_ExtendedFormat exfmt;
 				exfmt.value = vih2->dwControlFlags;
 				if (s_nominalrange[exfmt.NominalRange]) {
-					m_strInputFmt.AppendFormat(L", %S", s_nominalrange[exfmt.NominalRange]);
+					m_strInputFmt.AppendFormat(L", %hs", s_nominalrange[exfmt.NominalRange]);
 				}
 				if (s_transfermatrix[exfmt.VideoTransferMatrix]) {
-					m_strInputFmt.AppendFormat(L", %S", s_transfermatrix[exfmt.VideoTransferMatrix]);
+					m_strInputFmt.AppendFormat(L", %hs", s_transfermatrix[exfmt.VideoTransferMatrix]);
 				}
 				if (s_transferfunction[exfmt.VideoTransferFunction]) {
-					m_strInputFmt.AppendFormat(L", %S", s_transferfunction[exfmt.VideoTransferFunction]);
+					m_strInputFmt.AppendFormat(L", %hs", s_transferfunction[exfmt.VideoTransferFunction]);
 				}
 			}
 		}

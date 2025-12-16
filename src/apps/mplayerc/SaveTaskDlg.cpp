@@ -419,7 +419,7 @@ void CSaveTaskDlg::SaveHTTP(const int iSubLangDefault)
 			if (item.type == 's') {
 				LPCSTR lang = ISO6391To6392(item.lang);
 				if (lang[0]) {
-					metadata.AppendFormat(LR"( -metadata:s:s:%u language="%S")", isub, lang);
+					metadata.AppendFormat(LR"( -metadata:s:s:%u language="%hs")", isub, lang);
 				}
 				if (item.title.GetLength()) {
 					if (item.title != ISO6391ToLanguage(item.lang)) {

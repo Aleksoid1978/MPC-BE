@@ -502,7 +502,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		if (mts.empty()) {
-			DLog(L"Unsupported RealMedia stream (%u): %S", (UINT32)pmp->stream, pmp->mime);
+			DLog(L"Unsupported RealMedia stream (%u): %hs", (UINT32)pmp->stream, pmp->mime);
 			continue;
 		}
 

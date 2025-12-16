@@ -308,7 +308,7 @@ start:
 					memcpy(lang.GetBuffer(16), page.data() + 32, 16);
 					lang.ReleaseBuffer();
 
-					name.Format(L"Kate %d (%hS)", streamId++, lang);
+					name.Format(L"Kate %d (%hs)", streamId++, lang);
 					pPinOut.reset(DNew COggKateOutputPin((OggStreamHeader*)p, name, this, this, &hr));
 					// TODO
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);

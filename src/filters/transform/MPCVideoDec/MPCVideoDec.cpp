@@ -1278,7 +1278,7 @@ void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
 				// fix bug in GetAdapterIdentifier()
 				m_VideoDriverVersion = (m_VideoDriverVersion & 0xffff000000000000) | ((m_VideoDriverVersion & 0xffff0000) << 16) | 0xffffffff;
 			}
-			m_strDeviceDescription.Format(L"%S (%04X:%04X)", AdapID9.Description, m_nPCIVendor, m_nPCIDevice);
+			m_strDeviceDescription.Format(L"%hs (%04X:%04X)", AdapID9.Description, m_nPCIVendor, m_nPCIDevice);
 		}
 
 		pD3D9->Release();
@@ -4559,7 +4559,7 @@ HRESULT CMPCVideoDecFilter::DetectVideoCard_EVR(IPin *pPin)
 									// fix bug in GetAdapterIdentifier()
 									m_VideoDriverVersion = (m_VideoDriverVersion & 0xffff000000000000) | ((m_VideoDriverVersion & 0xffff0000) << 16) | 0xffffffff;
 								}
-								m_strDeviceDescription.Format(L"%S (%04X:%04X)", AdapID9.Description, m_nPCIVendor, m_nPCIDevice);
+								m_strDeviceDescription.Format(L"%hs (%04X:%04X)", AdapID9.Description, m_nPCIVendor, m_nPCIDevice);
 							}
 						}
 						pD3D9->Release();

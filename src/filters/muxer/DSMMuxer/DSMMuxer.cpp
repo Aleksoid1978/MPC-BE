@@ -189,7 +189,7 @@ void CDSMMuxerFilter::MuxInit()
 void CDSMMuxerFilter::MuxHeader(IBitStream* pBS)
 {
 	CStringW muxer;
-	muxer.Format(L"DSM Muxer (%S)", __TIMESTAMP__);
+	muxer.Format(L"DSM Muxer (%hs)", __TIMESTAMP__);
 
 	SetProperty(L"MUXR", muxer);
 	SetProperty(L"DATE", CTime::GetCurrentTime().FormatGmt(L"%Y-%m-%d %H:%M:%S"));

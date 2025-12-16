@@ -259,7 +259,7 @@ namespace YoutubeDL
 							if (!ext.IsEmpty()) {
 								item.title = ext.MakeUpper();
 								if (!vcodec.IsEmpty()) {
-									item.title.AppendFormat(L"(%S)", vcodec.GetString());
+									item.title.AppendFormat(L"(%hs)", vcodec.GetString());
 								}
 							}
 							if (!fmt.IsEmpty()) {
@@ -378,7 +378,7 @@ namespace YoutubeDL
 								if (!ext.IsEmpty()) {
 									item.title = ext.MakeUpper();
 									if (!acodec.IsEmpty()) {
-										item.title.AppendFormat(L"(%S)", acodec.GetString());
+										item.title.AppendFormat(L"(%hs)", acodec.GetString());
 									}
 								}
 								if (!fmt.IsEmpty()) {
@@ -543,7 +543,7 @@ namespace YoutubeDL
 						if (getJsonValue(d, "title", y_fields.title)) {
 							CStringA ext;
 							if (getJsonValue(d, "ext", ext)) {
-								y_fields.fname.Format(L"%s.%S", y_fields.title.GetString(), ext.GetString());
+								y_fields.fname.Format(L"%s.%hs", y_fields.title.GetString(), ext.GetString());
 							}
 						}
 

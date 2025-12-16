@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,7 +40,7 @@ inline void ff_log(void* ptr, int level, const char *fmt, va_list valist)
 			line[len - 1] = 0;
 		}
 
-		DLog(L"FF_LOG : %S", line);
+		DLog(L"FF_LOG : %hs", line);
 	}
 }
 

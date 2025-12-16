@@ -671,7 +671,7 @@ void CMediaTypeEx::Dump(std::list<CString>& sl)
 					"sRGB", "2.8 gamma", "Log100", "Log316", "Symmetric BT.709", "Constant luminance BT.2020", "Non-constant luminance BT.2020",
 					"2.6 gamma", "SMPTE ST 2084 (PQ)", "ARIB STD-B67 (HLG)"};
 
-#define ADD_PARAM_DESC(str, parameter, descs) if (parameter < std::size(descs) && descs[parameter]) str.AppendFormat(L" (%hS)", descs[parameter])
+#define ADD_PARAM_DESC(str, parameter, descs) if (parameter < std::size(descs) && descs[parameter]) str.AppendFormat(L" (%hs)", descs[parameter])
 
 				DXVA2_ExtendedFormat exfmt;
 				exfmt.value = vih2.dwControlFlags;

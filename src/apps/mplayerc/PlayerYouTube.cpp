@@ -304,7 +304,7 @@ namespace Youtube
 	static bool URLPostData(LPCWSTR videoId, urlData& pData)
 	{
 		constexpr static auto requestStr =
-			R"({"contentCheckOk": true, "context": {"client": {"clientName": "IOS", "clientVersion": "19.45.4", "deviceMake": "Apple", "deviceModel": "iPhone16,2", "hl": "en", "osName": "iPhone", "osVersion": "18.1.0.22B83", "timeZone": "UTC", "utcOffsetMinutes": 0}}, "playbackContext": {"contentPlaybackContext": {"html5Preference": "HTML5_PREF_WANTS"}}, "racyCheckOk" : true, "videoId" : "%S"})";
+			R"({"contentCheckOk": true, "context": {"client": {"clientName": "IOS", "clientVersion": "19.45.4", "deviceMake": "Apple", "deviceModel": "iPhone16,2", "hl": "en", "osName": "iPhone", "osVersion": "18.1.0.22B83", "timeZone": "UTC", "utcOffsetMinutes": 0}}, "playbackContext": {"contentPlaybackContext": {"html5Preference": "HTML5_PREF_WANTS"}}, "racyCheckOk" : true, "videoId" : "%ls"})";
 
 		CStringA requestData;
 		requestData.Format(requestStr, videoId);
@@ -326,7 +326,7 @@ namespace Youtube
 	static bool URLPostDataForLive(LPCWSTR videoId, urlData& pData)
 	{
 		constexpr static auto requestStr =
-			R"({"contentCheckOk": true, "context": {"client": {"clientName": "MWEB", "clientVersion": "2.20240726.01.00", "hl": "en", "timeZone": "UTC", "utcOffsetMinutes": 0}}, "playbackContext": {"contentPlaybackContext": {"html5Preference": "HTML5_PREF_WANTS"}}, "racyCheckOk": true, "videoId": "%S"})";
+			R"({"contentCheckOk": true, "context": {"client": {"clientName": "MWEB", "clientVersion": "2.20240726.01.00", "hl": "en", "timeZone": "UTC", "utcOffsetMinutes": 0}}, "playbackContext": {"contentPlaybackContext": {"html5Preference": "HTML5_PREF_WANTS"}}, "racyCheckOk": true, "videoId": "%ls"})";
 
 		CStringA requestData;
 		requestData.Format(requestStr, videoId);
@@ -912,7 +912,7 @@ namespace Youtube
 					}
 
 					if (quality_label) {
-						item.title.AppendFormat(L" %S", quality_label);
+						item.title.AppendFormat(L" %hs", quality_label);
 						if (profile->type == y_video) {
 							item.title.Append(L" dash");
 						}
@@ -1797,7 +1797,7 @@ namespace Youtube
 					moreStr.Empty();
 					if (!moreUrl.IsEmpty()) {
 						moreUrl.Replace("&amp;", "&"); moreUrl += "&disable_polymer=true";
-						url.Format(L"https://www.youtube.com/%S", moreUrl);
+						url.Format(L"https://www.youtube.com/%hs", moreUrl);
 
 						DLog(L"Youtube::Parse_Playlist() : downloading #%u playlist '%s'", ++index, url);
 						if (URLReadData(url.GetString(), data, L"x-youtube-client-name: 1\r\nx-youtube-client-version: 1.20200609.04.02\r\n")) {

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -921,7 +921,7 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 	for (const auto& pType : ValidMixerTypes) {
 		// Step 3. Adjust the mixer's type to match our requirements.
 
-		TRACE_EVR("EVR: Trying mixer output type: %ws\n", GetMediaTypeFormatDesc(pType));
+		TRACE_EVR("EVR: Trying mixer output type: %ls\n", GetMediaTypeFormatDesc(pType));
 
 		// Step 5. Try to set the media type on ourselves.
 		hr = SetMediaType(pType);

@@ -884,7 +884,7 @@ bool CShoutcastStream::CShoutcastSocket::Connect(const CUrlParser& urlParser, CS
 		m_bitrate = 0;
 
 		CStringA hdr = GetHeader();
-		DLog(L"CShoutcastSocket::Connect() - HTTP hdr:\n%S", hdr);
+		DLog(L"CShoutcastSocket::Connect() - HTTP hdr:\n%hs", hdr);
 
 		std::list<CStringA> sl;
 		Explode(hdr, sl, '\n');

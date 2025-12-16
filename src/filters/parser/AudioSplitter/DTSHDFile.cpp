@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2024 see Authors.txt
+ * (C) 2016-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -134,7 +134,7 @@ HRESULT CDTSHDFile::Open(CBaseSplitterFile* pFile)
 			if (chunk.size < 32 * KILOBYTE) { // set limit for 'FILEINFO' chunk
 				CStringA info;
 				if (S_OK == m_pFile->ByteRead((BYTE*)info.GetBufferSetLength(chunk.size), chunk.size)) {
-					DLog(L"CCDTSHDFile::Open() : 'FILEINFO' = %S", info);
+					DLog(L"CCDTSHDFile::Open() : 'FILEINFO' = %hs", info);
 				}
 			}
 		}

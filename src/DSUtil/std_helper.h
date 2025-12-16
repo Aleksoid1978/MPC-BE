@@ -104,7 +104,7 @@ CStringT<T, StrTraitMFC<T>> RegExpParse(const T* szIn, const T* szRE)
 		}
 	} catch (const std::regex_error& e) {
 		UNREFERENCED_PARAMETER(e);
-		DLog(L"RegExpParse(): regex error - '%S'", e.what());
+		DLog(L"RegExpParse(): regex error - '%hs'", e.what());
 		ASSERT(FALSE);
 	}
 

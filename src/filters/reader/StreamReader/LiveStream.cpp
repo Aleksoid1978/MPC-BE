@@ -592,7 +592,7 @@ bool CLiveStream::Load(const WCHAR* fnw)
 			return false;
 		}
 
-		DLog(L"CLiveStream::Load() - HTTP content type: %S", m_HTTPAsync.GetContentType());
+		DLog(L"CLiveStream::Load() - HTTP content type: %hs", m_HTTPAsync.GetContentType());
 
 		BOOL bConnected = FALSE;
 

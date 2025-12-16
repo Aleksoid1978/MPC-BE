@@ -1952,7 +1952,7 @@ static void Descriptor_56(CGolombBuffer& gb, int descriptor_length, LPSTR ISO_63
 	if (!tlxPages.empty()) {
 		DLog(L"ReadPMT() : found %Iu teletext pages", tlxPages.size());
 		for (auto& tlxPage : tlxPages) {
-			DLog(L"    => 0x%03x - '%S', %s", tlxPage.page, tlxPage.iso_639_codes, tlxPage.bSubtitle ? L"subtitle" : L"teletext");
+			DLog(L"    => 0x%03x - '%hs', %s", tlxPage.page, tlxPage.iso_639_codes, tlxPage.bSubtitle ? L"subtitle" : L"teletext");
 		}
 	}
 #endif

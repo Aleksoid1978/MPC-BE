@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2024 see Authors.txt
+ * (C) 2017-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -267,7 +267,7 @@ BOOL CPPageSoundProcessing::OnApply()
 		CStringW flt_args;
 		m_cmbFilter1Name.GetWindowText(flt_name);
 		m_edtFilter1Args.GetWindowText(flt_args);
-		s.strAudioFilter1.Format("%S=%S", flt_name, flt_args);
+		s.strAudioFilter1.Format("%ls=%ls", flt_name, flt_args);
 	}
 	s.bAudioFiltersNotForStereo = !!m_chkFiltersNotForStereo.GetCheck();
 

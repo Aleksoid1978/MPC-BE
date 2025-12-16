@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -518,7 +518,7 @@ BOOL CVolumeCtrl::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 		if (i > 0) {
 			no_sound_str = no_sound_str.Left(i);
 		}
-		str.AppendFormat(L" [%ws]", no_sound_str);
+		str.AppendFormat(L" [%s]", no_sound_str);
 	}
 
 	wcscpy_s(pTTT->szText, str);

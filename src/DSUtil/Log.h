@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2022 see Authors.txt
+ * (C) 2011-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -89,7 +89,7 @@ namespace Logger
 				std::unique_ptr<char[]> buf(new(std::nothrow) char[size]);
 				if (buf) {
 					_snprintf_s(buf.get(), size, _TRUNCATE, fmt, args ...);
-					fwprintf_s(f, L"%s : %S\n", GetLocalTime(), buf.get());
+					fwprintf_s(f, L"%s : %hs\n", GetLocalTime(), buf.get());
 				}
 			}
 			fclose(f);

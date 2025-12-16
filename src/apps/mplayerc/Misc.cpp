@@ -170,8 +170,8 @@ HICON LoadIcon(const CString& fn, bool fSmall)
 		CRegKey key;
 		ULONG len;
 
-		CString RegPathAssociated;
-		RegPathAssociated.Format(L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\%ws\\UserChoice", ext);
+		CStringW RegPathAssociated;
+		RegPathAssociated.Format(L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\%s\\UserChoice", ext);
 
 		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, RegPathAssociated, KEY_READ)) {
 			len = std::size(buff);

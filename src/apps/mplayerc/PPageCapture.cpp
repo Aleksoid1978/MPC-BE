@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -461,7 +461,7 @@ void CPPageCapture::FindAnalogDevices()
 		}
 
 		CString str;
-		str.Format(L"%ld - %S - %S", s_countrycodes[j].code, s_countrycodes[j].str, standard);
+		str.Format(L"%ld - %hs - %hs", s_countrycodes[j].code, s_countrycodes[j].str, standard);
 
 		int i = m_cbAnalogCountry.AddString(str);
 		m_cbAnalogCountry.SetItemDataPtr(i, &s_countrycodes[j]);

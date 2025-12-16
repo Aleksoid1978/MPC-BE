@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2024 see Authors.txt
+ * (C) 2014-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -58,7 +58,7 @@ BOOL CAboutDlg::OnInitDialog()
 	m_strVersionNumber.Append(L", Debug");
 #endif
 #ifdef REV_HASH
-	m_strGitInfo.AppendFormat(L"git %S - %S", REV_DATE, REV_HASH);
+	m_strGitInfo.AppendFormat(L"git %hs - %hs", REV_DATE, REV_HASH);
 #endif
 
 #if defined(_MSC_VER)

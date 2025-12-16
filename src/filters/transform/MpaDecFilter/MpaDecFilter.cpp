@@ -2553,7 +2553,7 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 				}
 			}
 
-			infostr.Format(L"Codec: %hS", codecName);
+			infostr.Format(L"Codec: %hs", codecName);
 			const WORD bitdeph = m_FFAudioDec.GetCoddedBitdepth();
 			if (bitdeph) {
 				infostr.AppendFormat(L", %u-bit", bitdeph);
@@ -2634,7 +2634,7 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 					channels--;
 					lfe = 1;
 				}
-				infostr.AppendFormat(L"Channels: %u.%u  [%hS]\r\n", channels, lfe, str);
+				infostr.AppendFormat(L"Channels: %u.%u  [%hs]\r\n", channels, lfe, str);
 			}
 			else {
 				infostr.AppendFormat(L"Channels: %u\r\n", channels);
@@ -2644,7 +2644,7 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 		// Output
 		infostr += L"Output:";
 		if (m_InternalSampleFormat != SAMPLE_FMT_NONE) {
-			infostr.AppendFormat(L" %hS", SampleFormatToStringA(m_InternalSampleFormat));
+			infostr.AppendFormat(L" %hs", SampleFormatToStringA(m_InternalSampleFormat));
 		}
 
 		if (WAVEFORMATEX* wfeout = (WAVEFORMATEX*)m_pOutput->CurrentMediaType().Format()) {
@@ -2696,7 +2696,7 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 			if (outPCM) {
 				const char* outsf = SampleFormatToStringA(GetSampleFormat(wfeout));
 				if (outsf != SampleFormatToStringA(m_InternalSampleFormat)) {
-					infostr.AppendFormat(L" -> %hS", outsf);
+					infostr.AppendFormat(L" -> %hs", outsf);
 				}
 			}
 
