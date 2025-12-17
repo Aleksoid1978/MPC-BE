@@ -802,14 +802,6 @@ CPlayerPlaylistBar::~CPlayerPlaylistBar()
 	for (auto& pl : m_pls) {
 		SAFE_DELETE(pl);
 	}
-
-	for (auto&[key, icon] : m_icons) {
-		DestroyIcon(icon);
-	}
-
-	for (auto&[key, icon] : m_icons_large) {
-		DestroyIcon(icon);
-	}
 }
 
 BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
@@ -2988,7 +2980,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 
 		HICON hIcon = nullptr;
 		if (bfsFolder) { // draw Folder Icon
-			hIcon = w > 24 ? m_icons_large[L"_folder_"] : m_icons[L"_folder_"];
+			hIcon = w > 24 ? m_icons_large[L"_folder_"].get() : m_icons[L"_folder_"].get();
 		}
 		else { // draw Files Icon
 			CString path;
@@ -3004,7 +2996,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 				ext = path;
 			}
 
-			hIcon = w > 24 ? m_icons_large[ext] : m_icons[ext];
+			hIcon = w > 24 ? m_icons_large[ext].get() : m_icons[ext].get();
 		}
 
 		DrawIconEx(pDC->m_hDC, rcItem.left + 2, rcItem.top + 2, hIcon, w, w, 0, nullptr, DI_NORMAL);
@@ -4558,10 +4550,10 @@ void CPlayerPlaylistBar::TParseFolder(const CString& path)
 
 				if (m_icons.find(strDrive) == m_icons.cend()) {
 					SHGetFileInfoW(strDrive, 0, &shFileInfo, sizeof(SHFILEINFOW), uFlags);
-					m_icons[strDrive] = shFileInfo.hIcon;
+					m_icons.emplace(strDrive, shFileInfo.hIcon);
 
 					SHGetFileInfoW(strDrive, 0, &shFileInfo, sizeof(SHFILEINFOW), uFlagsLargeIcon);
-					m_icons_large[strDrive] = shFileInfo.hIcon;
+					m_icons_large.emplace(strDrive, shFileInfo.hIcon);
 				}
 			}
 			dwDriveList >>= 1;
@@ -4581,10 +4573,10 @@ void CPlayerPlaylistBar::TParseFolder(const CString& path)
 	const CString folder(L"_folder_");
 	if (m_icons.find(folder) == m_icons.cend()) {
 		SHGetFileInfoW(folder, FILE_ATTRIBUTE_DIRECTORY, &shFileInfo, sizeof(SHFILEINFOW), uFlags | SHGFI_USEFILEATTRIBUTES);
-		m_icons[folder] = shFileInfo.hIcon;
+		m_icons.emplace(folder, shFileInfo.hIcon);
 
 		SHGetFileInfoW(folder, FILE_ATTRIBUTE_DIRECTORY, &shFileInfo, sizeof(SHFILEINFOW), uFlagsLargeIcon | SHGFI_USEFILEATTRIBUTES);
-		m_icons_large[folder] = shFileInfo.hIcon;
+		m_icons_large.emplace(folder, shFileInfo.hIcon);
 	}
 
 	auto& curTab = GetCurTab();
@@ -4713,11 +4705,11 @@ void CPlayerPlaylistBar::TFillPlaylist(const bool bFirst/* = false*/)
 			if (m_icons.find(ext) == m_icons.cend()) {
 				SHFILEINFOW shFileInfo = {};
 
-				SHGetFileInfoW(file.name, 0, &shFileInfo, sizeof(SHFILEINFOW), SHGFI_ICON | SHGFI_SMALLICON);
-				m_icons[ext] = shFileInfo.hIcon;
+				SHGetFileInfoW(file.name, 0, &shFileInfo, sizeof(SHFILEINFOW), SHGFI_ICON | SHGFI_SMALLICON | SHGFI_USEFILEATTRIBUTES);
+				m_icons.emplace(ext, shFileInfo.hIcon);
 
-				SHGetFileInfoW(file.name, 0, &shFileInfo, sizeof(SHFILEINFOW), SHGFI_ICON | SHGFI_LARGEICON);
-				m_icons_large[ext] = shFileInfo.hIcon;
+				SHGetFileInfoW(file.name, 0, &shFileInfo, sizeof(SHFILEINFOW), SHGFI_ICON | SHGFI_LARGEICON | SHGFI_USEFILEATTRIBUTES);
+				m_icons_large.emplace(ext, shFileInfo.hIcon);
 			}
 		}
 	}

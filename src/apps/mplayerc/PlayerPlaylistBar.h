@@ -226,11 +226,20 @@ private:
 	tab_button_t m_tab_buttons[3] = {
 		{L"<"},
 		{L">"},
-		{L"::", CRect(), true}
+		{L"::", {}, true}
 	};
 
-	std::map<CString, HICON> m_icons;
-	std::map<CString, HICON> m_icons_large;
+	struct HICONDeleter {
+		void operator()(HICON icon) const noexcept {
+			if (icon) {
+				DestroyIcon(icon);
+			}
+		}
+	};
+	using HICONPtr = std::unique_ptr<std::remove_pointer<HICON>::type, HICONDeleter>;
+
+	std::map<CString, HICONPtr> m_icons;
+	std::map<CString, HICONPtr> m_icons_large;
 
 	void TDrawBar();
 	void TDrawSearchBar();
