@@ -1,5 +1,5 @@
 /*
- * (C) 2023-2024 see Authors.txt
+ * (C) 2023-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -49,7 +49,7 @@ private:
 	CStringW m_ffmpegPath;
 	int m_iSubLangDefault = -1;
 
-	HICON m_hIcon;
+	HICON m_hIcon = nullptr;
 
 	CComPtr<IGraphBuilder>   m_pGB;
 	CComQIPtr<IMediaControl> m_pMC;
