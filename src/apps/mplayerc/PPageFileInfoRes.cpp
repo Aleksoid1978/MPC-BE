@@ -27,6 +27,37 @@
 #include "Misc.h"
 #include "WicUtils.h"
 
+struct mime_info_t {
+	const char* mime;
+	const char* name;
+	const char* ext;
+};
+
+static const mime_info_t s_image_mime_info[] = {
+	{"image/jpeg", "JPEG",    "jpg" },
+	{"image/jpg",  "JPEG",    "jpg" }, // non standart mime type
+	{"image/png",  "PNG",     "png" },
+	{"image/gif",  "GIF",     "gif" },
+	{"image/bmp",  "BMP",     "bmp" },
+	{"image/webp", "WebP",    "webp"},
+	{"image/heic", "HEIC",    "heic"},
+	{"image/avif", "AVIF",    "avif"},
+	{"image/jxl",  "JPEG XL", "jxl" },
+	{"image/jls",  "JPEG-LS", "jls" },
+};
+
+static const mime_info_t s_font_mime_info[] = {
+	{"application/x-truetype-font", "TrueType", "ttf"},
+	{"application/x-font-ttf",      "TrueType", "ttf"},
+	{"font/ttf",                    "TrueType", "ttf"},
+	{"application/vnd.ms-opentype", "OpenType", "otf"},
+	{"font/otf",                    "OpenType", "otf"},
+};
+
+static const mime_info_t s_other_mime_info[] = {
+	{"font/collection", "TrueType Collection", "ttc" },
+};
+
 // CPPageFileInfoRes dialog
 
 IMPLEMENT_DYNAMIC(CPPageFileInfoRes, CPPageBase)
@@ -211,47 +242,57 @@ void CPPageFileInfoRes::OnSaveAs()
 		return;
 	}
 
-	CString fname(resource->name);
-	CString ext = ::PathFindExtensionW(fname);
+	CStringW fname(resource->name);
+	CStringW ext = ::PathFindExtensionW(fname);
 
-	CString ext_list = L"All files|*.*|";
-	CString mime(resource->mime);
+	CStringA mime(resource->mime);
 	mime.MakeLower();
+	CStringW ext_list;
 	
-	if (mime == L"application/x-truetype-font" || mime == L"application/x-font-ttf") {
-		ext_list = L"TrueType Font (*.ttf)|*.ttf|";
-		if (ext.IsEmpty()) {
-			fname += L".ttf";
+	if (StartsWith(mime, "image/")) {
+		for (const auto& mime_info : s_image_mime_info) {
+			if (mime == mime_info.mime) {
+				ext_list.Format(L"%hs image (*.%hs)|*.%hs|", mime_info.name, mime_info.ext, mime_info.ext);
+				if (ext.IsEmpty()) {
+					fname += L"." + CStringW(mime_info.ext);
+				}
+				break;
+			}
 		}
 	}
-	else if (mime == L"application/vnd.ms-opentype") {
-		ext_list = L"OpenType Font (*.otf)|*.otf|";
-		if (ext.IsEmpty()) {
-			fname += L".ttf";
+
+	if (ext_list.IsEmpty()) {
+		for (const auto& mime_info : s_font_mime_info) {
+			if (mime == mime_info.mime) {
+				ext_list.Format(L"%hs font (*.%hs)|*.%hs|", mime_info.name, mime_info.ext, mime_info.ext);
+				if (ext.IsEmpty()) {
+					fname += L"." + CStringW(mime_info.ext);
+				}
+				break;
+			}
 		}
 	}
-	else if (mime == L"image/jpeg" || mime == L"image/jpg") {
-		ext_list = L"JPEG Image (*.jpg)|*.jpg|";
-		if (ext.IsEmpty()) {
-			fname += L".jpg";
+
+	if (ext_list.IsEmpty()) {
+		for (const auto& mime_info : s_other_mime_info) {
+			if (mime == mime_info.mime) {
+				ext_list.Format(L"%hs (*.%hs)|*.%hs|", mime_info.name, mime_info.ext, mime_info.ext);
+				if (ext.IsEmpty()) {
+					fname += L"." + CStringW(mime_info.ext);
+				}
+				break;
+			}
 		}
 	}
-	else if (mime == L"image/png") {
-		ext_list = L"PNG - Portable Network Graphics (*.png)|*.png|";
-		if (ext.IsEmpty()) {
-			fname += L".png";
-		}
-	}
-	else if (mime == L"image/webp") {
-		ext_list = L"WebP (*.webp)|*.webp|";
-		if (ext.IsEmpty()) {
-			fname += L".webp";
-		}
+
+	if (ext_list.IsEmpty()) {
+		ext_list = L"All files|*.*|";
 	}
 
 	CSaveFileDialog fd(nullptr, fname,
 				   OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_NOCHANGEDIR,
 				   ext_list, this);
+
 	if (fd.DoModal() == IDOK) {
 		FILE* f = nullptr;
 		if (_wfopen_s(&f, fd.GetPathName(), L"wb") == 0) {
