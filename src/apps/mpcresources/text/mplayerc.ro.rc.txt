@@ -2118,5 +2118,3 @@ STRING ID_SHOW_MILLISECONDS		"Afișează milisecundele"
 STRING ID_VOLUME_MUTE		"Mut\nMut"
 STRING ID_VOLUME_MUTE_DISABLED		"Fără sunet (Silențios)\nFără sunet (Silențios)"
 STRING ID_VOLUME_MUTE_OFF		"Activează sunetul\nActivează sunetul"
-
-
