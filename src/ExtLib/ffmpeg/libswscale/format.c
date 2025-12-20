@@ -1157,15 +1157,16 @@ static bool trc_is_hdr(enum AVColorTransferCharacteristic trc)
 }
 
 static int fmt_dither(SwsContext *ctx, SwsOpList *ops,
-                      const SwsPixelType type, const SwsFormat fmt)
+                      const SwsPixelType type,
+                      const SwsFormat src, const SwsFormat dst)
 {
     SwsDither mode = ctx->dither;
     SwsDitherOp dither;
+    const int bpc = dst.desc->comp[0].depth;
 
     if (mode == SWS_DITHER_AUTO) {
         /* Visual threshold of perception: 12 bits for SDR, 14 bits for HDR */
-        const int jnd_bits = trc_is_hdr(fmt.color.trc) ? 14 : 12;
-        const int bpc = fmt.desc->comp[0].depth;
+        const int jnd_bits = trc_is_hdr(dst.color.trc) ? 14 : 12;
         mode = bpc >= jnd_bits ? SWS_DITHER_NONE : SWS_DITHER_BAYER;
     }
 
@@ -1195,6 +1196,28 @@ static int fmt_dither(SwsContext *ctx, SwsOpList *ops,
         dither.matrix = generate_bayer_matrix(dither.size_log2);
         if (!dither.matrix)
             return AVERROR(ENOMEM);
+
+        /* Brute-forced offsets; minimizes quantization error across a 16x16
+         * bayer dither pattern for standard RGBA and YUVA pixel formats */
+        const int offsets_16x16[4] = {0, 3, 2, 5};
+        for (int i = 0; i < 4; i++)
+            dither.y_offset[i] = offsets_16x16[i];
+
+        if (src.desc->nb_components < 3 && bpc >= 8) {
+            /**
+             * For high-bit-depth sources without chroma, use same matrix
+             * offset for all color channels. This prevents introducing color
+             * noise in grayscale images; and also allows optimizing the dither
+             * operation. Skipped for low bit depth (<8 bpc) as the loss in
+             * PSNR, from the inability to diffuse error among all three
+             * channels, can be substantial.
+             *
+             * This shifts: { X, Y, Z, W } -> { X, X, X, Y }
+             */
+            dither.y_offset[3] = dither.y_offset[1];
+            dither.y_offset[1] = dither.y_offset[2] = dither.y_offset[0];
+        }
+
         return ff_sws_op_list_append(ops, &(SwsOp) {
             .op     = SWS_OP_DITHER,
             .type   = type,
@@ -1312,11 +1335,12 @@ int ff_sws_decode_colors(SwsContext *ctx, SwsPixelType type,
 }
 
 int ff_sws_encode_colors(SwsContext *ctx, SwsPixelType type,
-                         SwsOpList *ops, const SwsFormat fmt, bool *incomplete)
+                         SwsOpList *ops, const SwsFormat src,
+                         const SwsFormat dst, bool *incomplete)
 {
-    const AVLumaCoefficients *c = av_csp_luma_coeffs_from_avcsp(fmt.csp);
+    const AVLumaCoefficients *c = av_csp_luma_coeffs_from_avcsp(dst.csp);
 
-    switch (fmt.csp) {
+    switch (dst.csp) {
     case AVCOL_SPC_RGB:
         break;
     case AVCOL_SPC_UNSPECIFIED:
@@ -1379,20 +1403,20 @@ int ff_sws_encode_colors(SwsContext *ctx, SwsPixelType type,
     RET(ff_sws_op_list_append(ops, &(SwsOp) {
         .type = type,
         .op   = SWS_OP_LINEAR,
-        .lin  = fmt_encode_range(fmt, incomplete),
+        .lin  = fmt_encode_range(dst, incomplete),
     }));
 
-    if (!(fmt.desc->flags & AV_PIX_FMT_FLAG_FLOAT)) {
+    if (!(dst.desc->flags & AV_PIX_FMT_FLAG_FLOAT)) {
         SwsConst range = {0};
 
-        const bool is_ya = fmt.desc->nb_components == 2;
-        for (int i = 0; i < fmt.desc->nb_components; i++) {
+        const bool is_ya = dst.desc->nb_components == 2;
+        for (int i = 0; i < dst.desc->nb_components; i++) {
             /* Clamp to legal pixel range */
             const int idx = i * (is_ya ? 3 : 1);
-            range.q4[idx] = Q((1 << fmt.desc->comp[i].depth) - 1);
+            range.q4[idx] = Q((1 << dst.desc->comp[i].depth) - 1);
         }
 
-        RET(fmt_dither(ctx, ops, type, fmt));
+        RET(fmt_dither(ctx, ops, type, src, dst));
         RET(ff_sws_op_list_append(ops, &(SwsOp) {
             .op   = SWS_OP_MAX,
             .type = type,
@@ -1409,7 +1433,7 @@ int ff_sws_encode_colors(SwsContext *ctx, SwsPixelType type,
     return ff_sws_op_list_append(ops, &(SwsOp) {
         .type       = type,
         .op         = SWS_OP_CONVERT,
-        .convert.to = fmt_pixel_type(fmt.format),
+        .convert.to = fmt_pixel_type(dst.format),
     });
 }
 
