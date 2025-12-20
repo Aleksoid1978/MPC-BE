@@ -19704,19 +19704,6 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 
 		if (s.nAudioWindowMode == 1) {
 			// load image from DSMResource to show in preview & logo;
-			std::vector<LPCWSTR> mimeStrins = {
-				// available formats
-				L"image/jpeg",
-				L"image/jpg", // non-standard
-				L"image/png",
-				L"image/bmp",
-				// additional WIC components are needed
-				L"image/webp",
-				L"image/jxl",
-				L"image/heic",
-				L"image/avif",
-			};
-
 			BeginEnumFilters(m_pGB, pEF, pBF) {
 				if (CComQIPtr<IDSMResourceBag> pRB = pBF.p)
 					if (pRB && CheckMainFilter(pBF) && pRB->ResGetCount() > 0) {
@@ -19726,9 +19713,9 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 							DWORD len = 0;
 							if (SUCCEEDED(pRB->ResGet(i, &name, &desc, &mime, &pData, &len, nullptr))) {
 								CString mimeStr(mime);
-								mimeStr.Trim();
+								mimeStr.TrimLeft();
 
-								if (std::find(mimeStrins.cbegin(), mimeStrins.cend(), mimeStr) != mimeStrins.cend()) {
+								if (StartsWith(mimeStr, L"image/")) {
 									hr = WicLoadImage(&m_pMainBitmap, true, pData, len);
 									if (SUCCEEDED(hr)) {
 										bLoadRes = true;
