@@ -12692,12 +12692,36 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 						}
 					}
 				}
-
-				if (m_SessionInfo.Title.IsEmpty()) {
-					CPlaylistItem pli;
-					if (m_wndPlaylistBar.GetCur(pli) && pli.m_fi.Valid() && pli.m_label.GetLength() && !pli.m_autolabel) {
-						m_SessionInfo.Title = pli.m_label;
+			}
+			else if (m_pGB) {
+				BeginEnumFilters(m_pGB, pEF, pBF) {
+					if (!CheckMainFilter(pBF)) {
+						continue;
 					}
+
+					if (CComQIPtr<IWMHeaderInfo> pWMHI = pBF.p) {
+						WORD streamNum = 0;
+						WMT_ATTR_DATATYPE type;
+						WORD length;
+						std::vector<BYTE> value;
+
+						HRESULT hr = pWMHI->GetAttributeByName(&streamNum, L"Title", &type, nullptr, &length);
+						if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length) {
+							value.resize(length);
+							hr = pWMHI->GetAttributeByName(&streamNum, L"Title", &type, value.data(), &length);
+							if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length) {
+								m_SessionInfo.Title.SetString((LPCWSTR)value.data(), length / sizeof(wchar_t));
+							}
+						}
+					}
+				}
+				EndEnumFilters;
+			}
+
+			if (m_SessionInfo.Title.IsEmpty()) {
+				CPlaylistItem pli;
+				if (m_wndPlaylistBar.GetCur(pli) && pli.m_fi.Valid() && pli.m_label.GetLength() && !pli.m_autolabel) {
+					m_SessionInfo.Title = pli.m_label;
 				}
 			}
 
