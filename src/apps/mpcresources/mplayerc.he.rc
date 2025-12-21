@@ -3092,6 +3092,19 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_PROPSHEET_NAME      "Name"
+    IDS_PROPSHEET_MIME      "MIME type"
+    IDS_PROPSHEET_DESC      "Description"
+    IDS_PROPSHEET_FILE_IMAGE "%hs image"
+    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_AUDIOWINDOW_NONE    "do not change the window size"
+    IDS_AUDIOWINDOW_COVER   "display album art/cover pictures"
+    IDS_AUDIOWINDOW_HIDE    "hide the video area"
+    IDS_ADDTOPLS_FROMDIR_NONE "nothing"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_TITLE            "כותר %d"
     IDS_MAINFRM_16          "די.וי.די: שגיאה לא צפוייה"
     IDS_MAINFRM_17          "די.וי.די: כשלון הגנת-העתקה"
@@ -3320,14 +3333,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_SETTINGS         "הגדרות"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_AUDIOWINDOW_NONE    "do not change the window size"
-    IDS_AUDIOWINDOW_COVER   "display album art/cover pictures"
-    IDS_AUDIOWINDOW_HIDE    "hide the video area"
-    IDS_ADDTOPLS_FROMDIR_NONE "nothing"
 END
 
 STRINGTABLE
@@ -3735,14 +3740,27 @@ BEGIN
     IDS_SATURATION_INC      "הגברת הרוויה"
     IDS_SATURATION_DEC      "הפחתת הרוויה"
     IDS_RESET_COLOR         "איפוס הגדרות צבע"
-    IDS_AFTERPLAYBACK_CLOSE_FILE "After Playback: Always close file"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "After Playback: Always close file and minimize player"
     IDS_UPDATE_ERROR_DATA   "The update server gives the wrong data.\n\nPlease try later."
     IDS_USING_NEWER_VERSION "You are already using the latest version %s."
     IDS_NEW_UPDATE_AVAILABLE  "A new %s is available.\n\nDo you want to visit MPC-BE's website to download it?"
     IDS_UPDATE_ERROR_CONNECT  "Update server not found.\n\nPlease check your internet connection or try again later."
     IDS_UPDATE_CLOSE        "&Close"
     IDS_OSD_ZOOM            "Zoom: %.0lf%%"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AFTERPLAYBACK_CLOSE "לאחר הניגון: יציאה"
+    IDS_AFTERPLAYBACK_STANDBY "לאחר הניגון: מצב המתנה"
+    IDS_AFTERPLAYBACK_HIBERNATE "לאחר הניגון: מצב שינה"
+    IDS_AFTERPLAYBACK_SHUTDOWN "לאחר הניגון: כבה"
+    IDS_AFTERPLAYBACK_LOGOFF "לאחר הניגון: צא ממשתמש"
+    IDS_AFTERPLAYBACK_LOCK  "לאחר הניגון: נעילה"
+    IDS_AFTERPLAYBACK_EXIT  "לאחר הניגון: צא תמיד "
+    IDS_AFTERPLAYBACK_DONOTHING "לאחר הניגון: אל תעשה כלום"
+    IDS_AFTERPLAYBACK_NEXT  "לאחר הניגון: נגן הבא בתיקייה"
+    IDS_AFTERPLAYBACK_CLOSE_FILE "After Playback: Always close file"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "After Playback: Always close file and minimize player"
 END
 
 STRINGTABLE
@@ -3803,15 +3821,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AFTERPLAYBACK_CLOSE "לאחר הניגון: יציאה"
-    IDS_AFTERPLAYBACK_STANDBY "לאחר הניגון: מצב המתנה"
-    IDS_AFTERPLAYBACK_HIBERNATE "לאחר הניגון: מצב שינה"
-    IDS_AFTERPLAYBACK_SHUTDOWN "לאחר הניגון: כבה"
-    IDS_AFTERPLAYBACK_LOGOFF "לאחר הניגון: צא ממשתמש"
-    IDS_AFTERPLAYBACK_LOCK  "לאחר הניגון: נעילה"
-    IDS_AFTERPLAYBACK_EXIT  "לאחר הניגון: צא תמיד "
-    IDS_AFTERPLAYBACK_DONOTHING "לאחר הניגון: אל תעשה כלום"
-    IDS_AFTERPLAYBACK_NEXT  "לאחר הניגון: נגן הבא בתיקייה"
     IDS_OSD_BRIGHTNESS      "בהירות: %s"
     IDS_OSD_CONTRAST        "ניגודיות: %s"
     IDS_OSD_HUE             "גוון: %s°"

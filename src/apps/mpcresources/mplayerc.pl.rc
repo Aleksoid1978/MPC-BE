@@ -3094,6 +3094,19 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_PROPSHEET_NAME      "Name"
+    IDS_PROPSHEET_MIME      "MIME type"
+    IDS_PROPSHEET_DESC      "Description"
+    IDS_PROPSHEET_FILE_IMAGE "%hs image"
+    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_AUDIOWINDOW_NONE    "nie zmieniaj rozmiaru okna"
+    IDS_AUDIOWINDOW_COVER   "wyświetl zdjęcie lub okładkę"
+    IDS_AUDIOWINDOW_HIDE    "ukryj obszar wideo"
+    IDS_ADDTOPLS_FROMDIR_NONE "nic"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_TITLE            "Tytuł %d"
     IDS_MAINFRM_16          "DVD: nieoczekiwany błąd"
     IDS_MAINFRM_17          "DVD: błąd zabezpieczenia kopiowania"
@@ -3322,14 +3335,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_SETTINGS         "Ustawienia"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_AUDIOWINDOW_NONE    "nie zmieniaj rozmiaru okna"
-    IDS_AUDIOWINDOW_COVER   "wyświetl zdjęcie lub okładkę"
-    IDS_AUDIOWINDOW_HIDE    "ukryj obszar wideo"
-    IDS_ADDTOPLS_FROMDIR_NONE "nic"
 END
 
 STRINGTABLE
@@ -3737,14 +3742,27 @@ BEGIN
     IDS_SATURATION_INC      "Zwiększono nasycenie"
     IDS_SATURATION_DEC      "Zmniejszono nasycenie"
     IDS_RESET_COLOR         "Resetuj ustawienia kolorów"
-    IDS_AFTERPLAYBACK_CLOSE_FILE "Po zakończeniu odtwarzania: Zawsze zamknij plik"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "After Playback: Always close file and minimize player"
     IDS_UPDATE_ERROR_DATA   "The update server gives the wrong data.\n\nPlease try later."
     IDS_USING_NEWER_VERSION "Używasz aktualnej wersji %s."
     IDS_NEW_UPDATE_AVAILABLE  "Dostepna %s jest nowa aktualizacja.\n\nCzy chcesz przejść na stronę MPC-BE, aby ją pobrać?"
     IDS_UPDATE_ERROR_CONNECT  "Serwer aktualizacji jest niedostępny.\n\nSprawdź swoje połączenie internetowe lub spróbuj ponownie później."
     IDS_UPDATE_CLOSE        "&Zamknij"
     IDS_OSD_ZOOM            "Rozmiar okna: %.0lf%%"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AFTERPLAYBACK_CLOSE "Po zakończeniu odtwarzania: Zakończenie programu"
+    IDS_AFTERPLAYBACK_STANDBY "Po zakończeniu odtwarzania: Przejście w stan wstrzymania"
+    IDS_AFTERPLAYBACK_HIBERNATE "Po zakończeniu odtwarzania: Przejście w stan hibernacji"
+    IDS_AFTERPLAYBACK_SHUTDOWN "Po zakończeniu odtwarzania: Wyłączenie komputera"
+    IDS_AFTERPLAYBACK_LOGOFF "Po zakończeniu odtwarzania: Wylogowanie użytkownika"
+    IDS_AFTERPLAYBACK_LOCK  "Po zakończeniu odtwarzania: Zablokowanie komputera"
+    IDS_AFTERPLAYBACK_EXIT  "Po zakończeniu odtwarzania: Każdorazowe zakończenie programu"
+    IDS_AFTERPLAYBACK_DONOTHING "Po zakończeniu odtwarzania: Brak działania"
+    IDS_AFTERPLAYBACK_NEXT  "Po zakończeniu odtwarzania: Odtworzenie następnego nagrania z folderu"
+    IDS_AFTERPLAYBACK_CLOSE_FILE "Po zakończeniu odtwarzania: Zawsze zamknij plik"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "After Playback: Always close file and minimize player"
 END
 
 STRINGTABLE
@@ -3805,15 +3823,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AFTERPLAYBACK_CLOSE "Po zakończeniu odtwarzania: Zakończenie programu"
-    IDS_AFTERPLAYBACK_STANDBY "Po zakończeniu odtwarzania: Przejście w stan wstrzymania"
-    IDS_AFTERPLAYBACK_HIBERNATE "Po zakończeniu odtwarzania: Przejście w stan hibernacji"
-    IDS_AFTERPLAYBACK_SHUTDOWN "Po zakończeniu odtwarzania: Wyłączenie komputera"
-    IDS_AFTERPLAYBACK_LOGOFF "Po zakończeniu odtwarzania: Wylogowanie użytkownika"
-    IDS_AFTERPLAYBACK_LOCK  "Po zakończeniu odtwarzania: Zablokowanie komputera"
-    IDS_AFTERPLAYBACK_EXIT  "Po zakończeniu odtwarzania: Każdorazowe zakończenie programu"
-    IDS_AFTERPLAYBACK_DONOTHING "Po zakończeniu odtwarzania: Brak działania"
-    IDS_AFTERPLAYBACK_NEXT  "Po zakończeniu odtwarzania: Odtworzenie następnego nagrania z folderu"
     IDS_OSD_BRIGHTNESS      "Jasność: %s"
     IDS_OSD_CONTRAST        "Kontrast: %s"
     IDS_OSD_HUE             "Odcień: %s°"

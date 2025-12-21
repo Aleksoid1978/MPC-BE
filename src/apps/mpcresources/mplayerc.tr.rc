@@ -3094,6 +3094,19 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_PROPSHEET_NAME      "Name"
+    IDS_PROPSHEET_MIME      "MIME type"
+    IDS_PROPSHEET_DESC      "Description"
+    IDS_PROPSHEET_FILE_IMAGE "%hs image"
+    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_AUDIOWINDOW_NONE    "pencere boyutunu değiştirme."
+    IDS_AUDIOWINDOW_COVER   "albüm kapak resmini göster."
+    IDS_AUDIOWINDOW_HIDE    "video alanını gizle."
+    IDS_ADDTOPLS_FROMDIR_NONE "Ekleme"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_TITLE            "Başlık %d"
     IDS_MAINFRM_16          "DVD: Beklenilmeyen hata"
     IDS_MAINFRM_17          "DVD: Kopyalama Koruması Hatası"
@@ -3322,14 +3335,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_SETTINGS         "Ayarlar"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_AUDIOWINDOW_NONE    "pencere boyutunu değiştirme."
-    IDS_AUDIOWINDOW_COVER   "albüm kapak resmini göster."
-    IDS_AUDIOWINDOW_HIDE    "video alanını gizle."
-    IDS_ADDTOPLS_FROMDIR_NONE "Ekleme"
 END
 
 STRINGTABLE
@@ -3737,14 +3742,27 @@ BEGIN
     IDS_SATURATION_INC      "Doygunluğu Arttır"
     IDS_SATURATION_DEC      "Doygunluğu Azalt"
     IDS_RESET_COLOR         "Renk Ayarlarını Sıfırla"
-    IDS_AFTERPLAYBACK_CLOSE_FILE "Oynatmadan Sonra: Her Zaman Dosyayı Kapat"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "Oynatmadan Sonra: Dosyayı Kapat ve Oynatıcıyı Simge Durumuna Küçült"
     IDS_UPDATE_ERROR_DATA   "Güncelleştirme sunucusu yanlış veri veriyor.\n\nLütfen daha sonra deneyin."
     IDS_USING_NEWER_VERSION "Zaten son sürümü kullanıyorsunuz: %s."
     IDS_NEW_UPDATE_AVAILABLE  "Yeni %s mevcut.\n\nYeni sürümü indirmek için MPC-BE sitesini ziyaret etmek istiyor musunuz?"
     IDS_UPDATE_ERROR_CONNECT  "Güncelleştirme sunucusu bulunamadı.\n\nLütfen internet bağlantınızı kontrol ediniz ya da daha sonra yeniden deneyiniz."
     IDS_UPDATE_CLOSE        "&Kapat"
     IDS_OSD_ZOOM            "Büyütme: %.0lf%%"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AFTERPLAYBACK_CLOSE "Oynatmadan Sonra: Çıkış"
+    IDS_AFTERPLAYBACK_STANDBY "Oynatmadan Sonra: Askıya Al"
+    IDS_AFTERPLAYBACK_HIBERNATE "Oynatmadan Sonra: Hazırda Beklet"
+    IDS_AFTERPLAYBACK_SHUTDOWN "Oynatmadan Sonra: Bilgisayarı Kapat"
+    IDS_AFTERPLAYBACK_LOGOFF "Oynatmadan Sonra: Oturumu Kapat"
+    IDS_AFTERPLAYBACK_LOCK  "Oynatmadan Sonra: Kilitle"
+    IDS_AFTERPLAYBACK_EXIT  "Oynatmadan Sonra: Her Zaman Çıkış"
+    IDS_AFTERPLAYBACK_DONOTHING "Oynatmadan Sonra: Bir İşlem Yapma"
+    IDS_AFTERPLAYBACK_NEXT  "Oynatmadan Sonra: Klasörde Sonrakini Oynat"
+    IDS_AFTERPLAYBACK_CLOSE_FILE "Oynatmadan Sonra: Her Zaman Dosyayı Kapat"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "Oynatmadan Sonra: Dosyayı Kapat ve Oynatıcıyı Simge Durumuna Küçült"
 END
 
 STRINGTABLE
@@ -3805,15 +3823,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AFTERPLAYBACK_CLOSE "Oynatmadan Sonra: Çıkış"
-    IDS_AFTERPLAYBACK_STANDBY "Oynatmadan Sonra: Askıya Al"
-    IDS_AFTERPLAYBACK_HIBERNATE "Oynatmadan Sonra: Hazırda Beklet"
-    IDS_AFTERPLAYBACK_SHUTDOWN "Oynatmadan Sonra: Bilgisayarı Kapat"
-    IDS_AFTERPLAYBACK_LOGOFF "Oynatmadan Sonra: Oturumu Kapat"
-    IDS_AFTERPLAYBACK_LOCK  "Oynatmadan Sonra: Kilitle"
-    IDS_AFTERPLAYBACK_EXIT  "Oynatmadan Sonra: Her Zaman Çıkış"
-    IDS_AFTERPLAYBACK_DONOTHING "Oynatmadan Sonra: Bir İşlem Yapma"
-    IDS_AFTERPLAYBACK_NEXT  "Oynatmadan Sonra: Klasörde Sonrakini Oynat"
     IDS_OSD_BRIGHTNESS      "Parlaklık: %s"
     IDS_OSD_CONTRAST        "Karşıtlık: %s"
     IDS_OSD_HUE             "Tonlama: %s°"

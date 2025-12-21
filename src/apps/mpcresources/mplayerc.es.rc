@@ -3094,6 +3094,19 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_PROPSHEET_NAME      "Name"
+    IDS_PROPSHEET_MIME      "MIME type"
+    IDS_PROPSHEET_DESC      "Description"
+    IDS_PROPSHEET_FILE_IMAGE "%hs image"
+    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_AUDIOWINDOW_NONE    "No cambiar el tamaño de ventana"
+    IDS_AUDIOWINDOW_COVER   "Mostrar carátulas/imágenes de portada"
+    IDS_AUDIOWINDOW_HIDE    "Ocultar el área de video"
+    IDS_ADDTOPLS_FROMDIR_NONE "Nada"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_TITLE            "Título %d"
     IDS_MAINFRM_16          "DVD: Error inesperado"
     IDS_MAINFRM_17          "DVD: Fallo por Protección Anticopia"
@@ -3322,14 +3335,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_SETTINGS         "Opciones"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_AUDIOWINDOW_NONE    "No cambiar el tamaño de ventana"
-    IDS_AUDIOWINDOW_COVER   "Mostrar carátulas/imágenes de portada"
-    IDS_AUDIOWINDOW_HIDE    "Ocultar el área de video"
-    IDS_ADDTOPLS_FROMDIR_NONE "Nada"
 END
 
 STRINGTABLE
@@ -3737,14 +3742,27 @@ BEGIN
     IDS_SATURATION_INC      "Aumentar Saturación"
     IDS_SATURATION_DEC      "Disminuir Saturación"
     IDS_RESET_COLOR         "Restablecer la configuración de color"
-    IDS_AFTERPLAYBACK_CLOSE_FILE "Después de Reproducir: Siempre cerrar archivo"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "After Playback: Always close file and minimize player"
     IDS_UPDATE_ERROR_DATA   "El servidor de actualización proporciona datos incorrectos.\n\nPor favor inténtelo más tarde."
     IDS_USING_NEWER_VERSION "Ya estás usando la última versión %s."
     IDS_NEW_UPDATE_AVAILABLE  "Una nueva %s está disponible.\n\nDeseas visitar el sitio web de MPC-BE para descargarlo?"
     IDS_UPDATE_ERROR_CONNECT  "Servidor de actualización no encontrado.\n\nPor favor compruebe su conexión a internet o vuelva a intentarlo más tarde."
     IDS_UPDATE_CLOSE        "&Cerrar"
     IDS_OSD_ZOOM            "Zoom: %.0lf%%"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AFTERPLAYBACK_CLOSE "Después de Reproducir: Salir"
+    IDS_AFTERPLAYBACK_STANDBY "Después de Reproducir: Esperar"
+    IDS_AFTERPLAYBACK_HIBERNATE "Después de Reproducir: Hibernar"
+    IDS_AFTERPLAYBACK_SHUTDOWN "Después de Reproducir: Apagar"
+    IDS_AFTERPLAYBACK_LOGOFF "Después de Reproducir: Cerrar sesión"
+    IDS_AFTERPLAYBACK_LOCK  "Después de Reproducir: Bloquear"
+    IDS_AFTERPLAYBACK_EXIT  "Después de Reproducir: Siempre salir"
+    IDS_AFTERPLAYBACK_DONOTHING "Después de Reproducir: No hacer nada"
+    IDS_AFTERPLAYBACK_NEXT  "Después de Reproducir: Reproducir siguiente en la carpeta"
+    IDS_AFTERPLAYBACK_CLOSE_FILE "Después de Reproducir: Siempre cerrar archivo"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "After Playback: Always close file and minimize player"
 END
 
 STRINGTABLE
@@ -3805,15 +3823,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AFTERPLAYBACK_CLOSE "Después de Reproducir: Salir"
-    IDS_AFTERPLAYBACK_STANDBY "Después de Reproducir: Esperar"
-    IDS_AFTERPLAYBACK_HIBERNATE "Después de Reproducir: Hibernar"
-    IDS_AFTERPLAYBACK_SHUTDOWN "Después de Reproducir: Apagar"
-    IDS_AFTERPLAYBACK_LOGOFF "Después de Reproducir: Cerrar sesión"
-    IDS_AFTERPLAYBACK_LOCK  "Después de Reproducir: Bloquear"
-    IDS_AFTERPLAYBACK_EXIT  "Después de Reproducir: Siempre salir"
-    IDS_AFTERPLAYBACK_DONOTHING "Después de Reproducir: No hacer nada"
-    IDS_AFTERPLAYBACK_NEXT  "Después de Reproducir: Reproducir siguiente en la carpeta"
     IDS_OSD_BRIGHTNESS      "Brillo: %s"
     IDS_OSD_CONTRAST        "Contraste: %s"
     IDS_OSD_HUE             "Tinte: %s°"

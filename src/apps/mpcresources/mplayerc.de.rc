@@ -3094,6 +3094,19 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_PROPSHEET_NAME      "Name"
+    IDS_PROPSHEET_MIME      "MIME type"
+    IDS_PROPSHEET_DESC      "Description"
+    IDS_PROPSHEET_FILE_IMAGE "%hs image"
+    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_AUDIOWINDOW_NONE    "Fenstergröße nicht ändern"
+    IDS_AUDIOWINDOW_COVER   "Album-Cover/Titelbilder anzeigen"
+    IDS_AUDIOWINDOW_HIDE    "Videobereich ausblenden"
+    IDS_ADDTOPLS_FROMDIR_NONE "Nichts"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_TITLE            "Titel %d"
     IDS_MAINFRM_16          "DVD: Unerwarteter Fehler"
     IDS_MAINFRM_17          "DVD: Fehler mit dem Kopierschutz"
@@ -3322,14 +3335,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_SETTINGS         "Einstellungen"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_AUDIOWINDOW_NONE    "Fenstergröße nicht ändern"
-    IDS_AUDIOWINDOW_COVER   "Album-Cover/Titelbilder anzeigen"
-    IDS_AUDIOWINDOW_HIDE    "Videobereich ausblenden"
-    IDS_ADDTOPLS_FROMDIR_NONE "Nichts"
 END
 
 STRINGTABLE
@@ -3737,14 +3742,27 @@ BEGIN
     IDS_SATURATION_INC      "Sättigung erhöhen"
     IDS_SATURATION_DEC      "Sättigung verringern"
     IDS_RESET_COLOR         "Farbeinstellungen zurücksetzen"
-    IDS_AFTERPLAYBACK_CLOSE_FILE "Nach Wiedergabe: Immer Datei schließen"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "Nach Wiedergabe: Immer Datei schließen und App minimieren"
     IDS_UPDATE_ERROR_DATA   "Der Update-Server hat falsche Daten ausgegeben.\n\nBitte versuchen Sie es später erneut."
     IDS_USING_NEWER_VERSION "Sie verwenden bereits die aktuelle Version %s"
     IDS_NEW_UPDATE_AVAILABLE  "Eine neue Version %s ist verfügbar.\n\nWollen Sie die Webseite von MPC-BE aufrufen, um die neue Version herunterzuladen?"
     IDS_UPDATE_ERROR_CONNECT  "Es konnte keine Verbindung mit dem Update-Server hergestellt werden.\nÜberprüfen Sie Ihre Internetverbindung und versuchen Sie es später erneut."
     IDS_UPDATE_CLOSE        "&Schließen"
     IDS_OSD_ZOOM            "Zoom: %.0lf%%"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AFTERPLAYBACK_CLOSE "Nach Wiedergabe: App beenden"
+    IDS_AFTERPLAYBACK_STANDBY "Nach Wiedergabe: Standby-Modus"
+    IDS_AFTERPLAYBACK_HIBERNATE "Nach Wiedergabe: Ruhezustand"
+    IDS_AFTERPLAYBACK_SHUTDOWN "Nach Wiedergabe: Computer herunterfahren"
+    IDS_AFTERPLAYBACK_LOGOFF "Nach Wiedergabe: Benutzer abmelden"
+    IDS_AFTERPLAYBACK_LOCK  "Nach Wiedergabe: Computer sperren"
+    IDS_AFTERPLAYBACK_EXIT  "Nach Wiedergabe: Immer App beenden"
+    IDS_AFTERPLAYBACK_DONOTHING "Nach Wiedergabe: Keine Aktion"
+    IDS_AFTERPLAYBACK_NEXT  "Nach Wiedergabe: Nächste Datei im Ordner wiedergeben"
+    IDS_AFTERPLAYBACK_CLOSE_FILE "Nach Wiedergabe: Immer Datei schließen"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "Nach Wiedergabe: Immer Datei schließen und App minimieren"
 END
 
 STRINGTABLE
@@ -3805,15 +3823,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AFTERPLAYBACK_CLOSE "Nach Wiedergabe: App beenden"
-    IDS_AFTERPLAYBACK_STANDBY "Nach Wiedergabe: Standby-Modus"
-    IDS_AFTERPLAYBACK_HIBERNATE "Nach Wiedergabe: Ruhezustand"
-    IDS_AFTERPLAYBACK_SHUTDOWN "Nach Wiedergabe: Computer herunterfahren"
-    IDS_AFTERPLAYBACK_LOGOFF "Nach Wiedergabe: Benutzer abmelden"
-    IDS_AFTERPLAYBACK_LOCK  "Nach Wiedergabe: Computer sperren"
-    IDS_AFTERPLAYBACK_EXIT  "Nach Wiedergabe: Immer App beenden"
-    IDS_AFTERPLAYBACK_DONOTHING "Nach Wiedergabe: Keine Aktion"
-    IDS_AFTERPLAYBACK_NEXT  "Nach Wiedergabe: Nächste Datei im Ordner wiedergeben"
     IDS_OSD_BRIGHTNESS      "Helligkeit: %s"
     IDS_OSD_CONTRAST        "Kontrast: %s"
     IDS_OSD_HUE             "Farbton: %s°"

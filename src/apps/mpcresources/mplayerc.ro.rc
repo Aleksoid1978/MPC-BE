@@ -3093,6 +3093,19 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_PROPSHEET_NAME      "Name"
+    IDS_PROPSHEET_MIME      "MIME type"
+    IDS_PROPSHEET_DESC      "Description"
+    IDS_PROPSHEET_FILE_IMAGE "%hs image"
+    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_AUDIOWINDOW_NONE    "nu schimba dimensiunea ferestrei"
+    IDS_AUDIOWINDOW_COVER   "afișează arta albumului / pozele de pe copertă"
+    IDS_AUDIOWINDOW_HIDE    "ascunde zona video"
+    IDS_ADDTOPLS_FROMDIR_NONE "nimic"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_TITLE            "Titlul %d"
     IDS_MAINFRM_16          "DVD: Eroare neașteptată"
     IDS_MAINFRM_17          "DVD: Eroare de protecție la copiere"
@@ -3321,14 +3334,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_SETTINGS         "Setări"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_AUDIOWINDOW_NONE    "nu schimba dimensiunea ferestrei"
-    IDS_AUDIOWINDOW_COVER   "afișează arta albumului / pozele de pe copertă"
-    IDS_AUDIOWINDOW_HIDE    "ascunde zona video"
-    IDS_ADDTOPLS_FROMDIR_NONE "nimic"
 END
 
 STRINGTABLE
@@ -3736,14 +3741,27 @@ BEGIN
     IDS_SATURATION_INC      "Mărește saturația"
     IDS_SATURATION_DEC      "Micșorează saturația"
     IDS_RESET_COLOR         "Resetează setările de culoare"
-    IDS_AFTERPLAYBACK_CLOSE_FILE "După redare: închide întotdeauna fișierul"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "După redare: întotdeauna închide fișierul și minimizează playerul"
     IDS_UPDATE_ERROR_DATA   "Serverul pentru actualizare oferă date greșite.\n\nTe rugăm să încerci mai târziu."
     IDS_USING_NEWER_VERSION "Deja folosești ultima versiune %s."
     IDS_NEW_UPDATE_AVAILABLE  "O nouă %s este disponibilă.\n\nVrei să vizitezi site-ul programului MPC-BE ca să o descarci?"
     IDS_UPDATE_ERROR_CONNECT  "Serverul pentru actualizare nu a fost găsit.\n\nTe rugăm să-ți verifici conexiunea la internet sau încearcă mai târziu."
     IDS_UPDATE_CLOSE        "În&chide"
     IDS_OSD_ZOOM            "Scalează: %.0lf%%"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AFTERPLAYBACK_CLOSE "După redare: închide programul"
+    IDS_AFTERPLAYBACK_STANDBY "După redare: intră în repaus"
+    IDS_AFTERPLAYBACK_HIBERNATE "După redare: Intră în hibernare"
+    IDS_AFTERPLAYBACK_SHUTDOWN "După redare: închide calculatorul"
+    IDS_AFTERPLAYBACK_LOGOFF "După redare: închide sesiunea"
+    IDS_AFTERPLAYBACK_LOCK  "După redare: blochează desktop-ul"
+    IDS_AFTERPLAYBACK_EXIT  "După redare: Închide întotdeauna programul"
+    IDS_AFTERPLAYBACK_DONOTHING "După redare: nicio acțiune"
+    IDS_AFTERPLAYBACK_NEXT  "După redare: se redă următorul fișier din dosar (din folder)"
+    IDS_AFTERPLAYBACK_CLOSE_FILE "După redare: închide întotdeauna fișierul"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "După redare: întotdeauna închide fișierul și minimizează playerul"
 END
 
 STRINGTABLE
@@ -3804,15 +3822,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AFTERPLAYBACK_CLOSE "După redare: închide programul"
-    IDS_AFTERPLAYBACK_STANDBY "După redare: intră în repaus"
-    IDS_AFTERPLAYBACK_HIBERNATE "După redare: Intră în hibernare"
-    IDS_AFTERPLAYBACK_SHUTDOWN "După redare: închide calculatorul"
-    IDS_AFTERPLAYBACK_LOGOFF "După redare: închide sesiunea"
-    IDS_AFTERPLAYBACK_LOCK  "După redare: blochează desktop-ul"
-    IDS_AFTERPLAYBACK_EXIT  "După redare: Închide întotdeauna programul"
-    IDS_AFTERPLAYBACK_DONOTHING "După redare: nicio acțiune"
-    IDS_AFTERPLAYBACK_NEXT  "După redare: se redă următorul fișier din dosar (din folder)"
     IDS_OSD_BRIGHTNESS      "Luminozitatea: %s"
     IDS_OSD_CONTRAST        "Contrast: %s"
     IDS_OSD_HUE             "Nuanța: %s°"

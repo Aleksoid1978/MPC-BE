@@ -135,9 +135,9 @@ BOOL CPPageFileInfoRes::OnInitDialog()
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT);
 
 	m_list.InsertColumn(0, L"#", LVCFMT_RIGHT, m_pSheetDpi->ScaleX(20));
-	m_list.InsertColumn(1, L"Name", LVCFMT_LEFT, m_pSheetDpi->ScaleX(150));
-	m_list.InsertColumn(2, L"Mime Type", LVCFMT_LEFT, m_pSheetDpi->ScaleX(150));
-	m_list.InsertColumn(3, L"Description", LVCFMT_LEFT, m_pSheetDpi->ScaleX(60));
+	m_list.InsertColumn(1, ResStr(IDS_PROPSHEET_NAME), LVCFMT_LEFT, m_pSheetDpi->ScaleX(150));
+	m_list.InsertColumn(2, ResStr(IDS_PROPSHEET_MIME), LVCFMT_LEFT, m_pSheetDpi->ScaleX(150));
+	m_list.InsertColumn(3, ResStr(IDS_PROPSHEET_DESC), LVCFMT_LEFT, m_pSheetDpi->ScaleX(60));
 	m_list.InsertColumn(4, L"-", LVCFMT_LEFT, m_pSheetDpi->ScaleX(20)); // dummy column
 
 	int n = 0;
@@ -252,7 +252,8 @@ void CPPageFileInfoRes::OnSaveAs()
 	if (StartsWith(mime, "image/")) {
 		for (const auto& mime_info : s_image_mime_info) {
 			if (mime == mime_info.mime) {
-				ext_list.Format(L"%hs image (*.%hs)|*.%hs|", mime_info.name, mime_info.ext, mime_info.ext);
+				ext_list.Format(IDS_PROPSHEET_FILE_IMAGE, mime_info.name);
+				ext_list.AppendFormat(L" (*.%hs)|*.%hs|", mime_info.ext, mime_info.ext);
 				if (ext.IsEmpty()) {
 					fname += L"." + CStringW(mime_info.ext);
 				}
@@ -264,7 +265,8 @@ void CPPageFileInfoRes::OnSaveAs()
 	if (ext_list.IsEmpty()) {
 		for (const auto& mime_info : s_font_mime_info) {
 			if (mime == mime_info.mime) {
-				ext_list.Format(L"%hs font (*.%hs)|*.%hs|", mime_info.name, mime_info.ext, mime_info.ext);
+				ext_list.Format(IDS_PROPSHEET_FILE_FONT, mime_info.name);
+				ext_list.AppendFormat(L" (*.%hs)|*.%hs|", mime_info.ext, mime_info.ext);
 				if (ext.IsEmpty()) {
 					fname += L"." + CStringW(mime_info.ext);
 				}

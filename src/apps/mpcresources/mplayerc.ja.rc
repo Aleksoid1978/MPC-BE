@@ -3094,6 +3094,19 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_PROPSHEET_NAME      "Name"
+    IDS_PROPSHEET_MIME      "MIME type"
+    IDS_PROPSHEET_DESC      "Description"
+    IDS_PROPSHEET_FILE_IMAGE "%hs image"
+    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_AUDIOWINDOW_NONE    "ウィンドウ サイズを変更しない"
+    IDS_AUDIOWINDOW_COVER   "アルバムの アート/カバー 画像を表示する"
+    IDS_AUDIOWINDOW_HIDE    "映像領域を隠す"
+    IDS_ADDTOPLS_FROMDIR_NONE "なし"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_TITLE            "タイトル %d"
     IDS_MAINFRM_16          "DVD: 予期しないエラー"
     IDS_MAINFRM_17          "DVD: コピープロテクトによる失敗"
@@ -3322,14 +3335,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_SETTINGS         "設定"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_AUDIOWINDOW_NONE    "ウィンドウ サイズを変更しない"
-    IDS_AUDIOWINDOW_COVER   "アルバムの アート/カバー 画像を表示する"
-    IDS_AUDIOWINDOW_HIDE    "映像領域を隠す"
-    IDS_ADDTOPLS_FROMDIR_NONE "なし"
 END
 
 STRINGTABLE
@@ -3737,14 +3742,27 @@ BEGIN
     IDS_SATURATION_INC      "彩度を上げる"
     IDS_SATURATION_DEC      "彩度を下げる"
     IDS_RESET_COLOR         "カラー設定をリセット"
-    IDS_AFTERPLAYBACK_CLOSE_FILE "再生終了後: 常にファイルを閉じる"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "再生終了後: 常にファイルを閉じてプレーヤーを最小化"
     IDS_UPDATE_ERROR_DATA   "更新サーバーが間違ったデータを提供します。\n\n後で試してください。"
     IDS_USING_NEWER_VERSION "既に最新版の %s を使用しています。"
     IDS_NEW_UPDATE_AVAILABLE  "新しい %s を入手できます。\n\nダウンロードしに MPC-BE のウェブサイトを訪れますか?"
     IDS_UPDATE_ERROR_CONNECT  "更新サーバーが見つかりません。\n\nインターネット接続を確認して再試行してください。"
     IDS_UPDATE_CLOSE        "閉じる(&C)"
     IDS_OSD_ZOOM            "ズーム: %.0lf%%"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AFTERPLAYBACK_CLOSE "再生終了後: 終了"
+    IDS_AFTERPLAYBACK_STANDBY "再生終了後: スタンバイ"
+    IDS_AFTERPLAYBACK_HIBERNATE "再生終了後: 休止状態"
+    IDS_AFTERPLAYBACK_SHUTDOWN "再生終了後: シャットダウン"
+    IDS_AFTERPLAYBACK_LOGOFF "再生終了後: ログオフ"
+    IDS_AFTERPLAYBACK_LOCK  "再生終了後: ロック"
+    IDS_AFTERPLAYBACK_EXIT  "再生終了後: 常に終了"
+    IDS_AFTERPLAYBACK_DONOTHING "再生終了後: 何もしない"
+    IDS_AFTERPLAYBACK_NEXT  "再生終了後: フォルダー内を順次再生"
+    IDS_AFTERPLAYBACK_CLOSE_FILE "再生終了後: 常にファイルを閉じる"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "再生終了後: 常にファイルを閉じてプレーヤーを最小化"
 END
 
 STRINGTABLE
@@ -3805,15 +3823,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AFTERPLAYBACK_CLOSE "再生終了後: 終了"
-    IDS_AFTERPLAYBACK_STANDBY "再生終了後: スタンバイ"
-    IDS_AFTERPLAYBACK_HIBERNATE "再生終了後: 休止状態"
-    IDS_AFTERPLAYBACK_SHUTDOWN "再生終了後: シャットダウン"
-    IDS_AFTERPLAYBACK_LOGOFF "再生終了後: ログオフ"
-    IDS_AFTERPLAYBACK_LOCK  "再生終了後: ロック"
-    IDS_AFTERPLAYBACK_EXIT  "再生終了後: 常に終了"
-    IDS_AFTERPLAYBACK_DONOTHING "再生終了後: 何もしない"
-    IDS_AFTERPLAYBACK_NEXT  "再生終了後: フォルダー内を順次再生"
     IDS_OSD_BRIGHTNESS      "明るさ: %s"
     IDS_OSD_CONTRAST        "コントラスト: %s"
     IDS_OSD_HUE             "色相: %s°"

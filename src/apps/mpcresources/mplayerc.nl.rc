@@ -3094,6 +3094,19 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_PROPSHEET_NAME      "Name"
+    IDS_PROPSHEET_MIME      "MIME type"
+    IDS_PROPSHEET_DESC      "Description"
+    IDS_PROPSHEET_FILE_IMAGE "%hs image"
+    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_AUDIOWINDOW_NONE    "Venstergrootte niet veranderen"
+    IDS_AUDIOWINDOW_COVER   "albumhoezen/coverafbeeldingen tonen"
+    IDS_AUDIOWINDOW_HIDE    "Videogebied verbergen"
+    IDS_ADDTOPLS_FROMDIR_NONE "Niets"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_TITLE            "Titel %d"
     IDS_MAINFRM_16          "DVD: Onverwachte fout"
     IDS_MAINFRM_17          "DVD: Kopieerbeveiligingsfout"
@@ -3322,14 +3335,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_SETTINGS         "Instellingen"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_AUDIOWINDOW_NONE    "Venstergrootte niet veranderen"
-    IDS_AUDIOWINDOW_COVER   "albumhoezen/coverafbeeldingen tonen"
-    IDS_AUDIOWINDOW_HIDE    "Videogebied verbergen"
-    IDS_ADDTOPLS_FROMDIR_NONE "Niets"
 END
 
 STRINGTABLE
@@ -3737,14 +3742,27 @@ BEGIN
     IDS_SATURATION_INC      "Verzadiging vermeerderen"
     IDS_SATURATION_DEC      "Verzadiging verminderen"
     IDS_RESET_COLOR         "Kleurinstellingen resetten"
-    IDS_AFTERPLAYBACK_CLOSE_FILE "Na weergave: Altijd bestand sluiten"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "Na weergave: Altijd bestand sluiten en de speler minimaliseren"
     IDS_UPDATE_ERROR_DATA   "De updateserver geeft verkeerde gegevens.\n\nProbeer het later."
     IDS_USING_NEWER_VERSION "U bent al de laatste versie %s aan het gebruiken."
     IDS_NEW_UPDATE_AVAILABLE  "Een nieuw %s is beschikbaar.\n\nWilt u MPC-BE's website bezoeken om te downloaden?"
     IDS_UPDATE_ERROR_CONNECT  "Updateserver niet gevonden.\n\nControleer uw internetverbinding of probeer later opnieuw a.u.b."
     IDS_UPDATE_CLOSE        "Sl&uiten"
     IDS_OSD_ZOOM            "Zoom: %.0lf%%"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AFTERPLAYBACK_CLOSE "Na weergave: Venster afsluiten"
+    IDS_AFTERPLAYBACK_STANDBY "Na weergave: Standby"
+    IDS_AFTERPLAYBACK_HIBERNATE "Na weergave: Sluimerstand"
+    IDS_AFTERPLAYBACK_SHUTDOWN "Na weergave: Computer uitschakelen"
+    IDS_AFTERPLAYBACK_LOGOFF "Na weergave: Afmelden"
+    IDS_AFTERPLAYBACK_LOCK  "Na weergave: Vergrendelen"
+    IDS_AFTERPLAYBACK_EXIT  "Na weergave: Altijd venster afsluiten"
+    IDS_AFTERPLAYBACK_DONOTHING "Na weergave: Niets doen"
+    IDS_AFTERPLAYBACK_NEXT  "Na weergave: Volgende in de map afspelen"
+    IDS_AFTERPLAYBACK_CLOSE_FILE "Na weergave: Altijd bestand sluiten"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "Na weergave: Altijd bestand sluiten en de speler minimaliseren"
 END
 
 STRINGTABLE
@@ -3805,15 +3823,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AFTERPLAYBACK_CLOSE "Na weergave: Venster afsluiten"
-    IDS_AFTERPLAYBACK_STANDBY "Na weergave: Standby"
-    IDS_AFTERPLAYBACK_HIBERNATE "Na weergave: Sluimerstand"
-    IDS_AFTERPLAYBACK_SHUTDOWN "Na weergave: Computer uitschakelen"
-    IDS_AFTERPLAYBACK_LOGOFF "Na weergave: Afmelden"
-    IDS_AFTERPLAYBACK_LOCK  "Na weergave: Vergrendelen"
-    IDS_AFTERPLAYBACK_EXIT  "Na weergave: Altijd venster afsluiten"
-    IDS_AFTERPLAYBACK_DONOTHING "Na weergave: Niets doen"
-    IDS_AFTERPLAYBACK_NEXT  "Na weergave: Volgende in de map afspelen"
     IDS_OSD_BRIGHTNESS      "Helderheid: %s"
     IDS_OSD_CONTRAST        "Contrast: %s"
     IDS_OSD_HUE             "Tint: %s°"

@@ -3094,6 +3094,19 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_PROPSHEET_NAME      "Name"
+    IDS_PROPSHEET_MIME      "MIME type"
+    IDS_PROPSHEET_DESC      "Description"
+    IDS_PROPSHEET_FILE_IMAGE "%hs image"
+    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_AUDIOWINDOW_NONE    "不變更視窗大小"
+    IDS_AUDIOWINDOW_COVER   "顯示專輯封面圖片"
+    IDS_AUDIOWINDOW_HIDE    "隱藏影格部份"
+    IDS_ADDTOPLS_FROMDIR_NONE "無"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_TITLE            "標題 %d"
     IDS_MAINFRM_16          "DVD: 非預期錯誤"
     IDS_MAINFRM_17          "DVD: 因防拷而無法播放"
@@ -3322,14 +3335,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_SETTINGS         "設定"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_AUDIOWINDOW_NONE    "不變更視窗大小"
-    IDS_AUDIOWINDOW_COVER   "顯示專輯封面圖片"
-    IDS_AUDIOWINDOW_HIDE    "隱藏影格部份"
-    IDS_ADDTOPLS_FROMDIR_NONE "無"
 END
 
 STRINGTABLE
@@ -3737,14 +3742,27 @@ BEGIN
     IDS_SATURATION_INC      "增加飽和度"
     IDS_SATURATION_DEC      "減少飽和度"
     IDS_RESET_COLOR         "重設色彩設定"
-    IDS_AFTERPLAYBACK_CLOSE_FILE "播放完後：總是關閉檔案"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "播放完後：總是關閉檔案並最小化播放器"
     IDS_UPDATE_ERROR_DATA   "更新伺服器資料錯誤。\n\n請稍後再試。"
     IDS_USING_NEWER_VERSION "您已經使用最新的穩定版本 %s"
     IDS_NEW_UPDATE_AVAILABLE  "新版本 %s 已經發佈。\n\n您要前往 MPC-BE 網站下載嗎？"
     IDS_UPDATE_ERROR_CONNECT  "找不到更新伺服器。\n\n請檢查您的連線狀態或稍後再嘗試。"
     IDS_UPDATE_CLOSE        "關閉(&C)"
     IDS_OSD_ZOOM            "縮放：%.0lf%%"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AFTERPLAYBACK_CLOSE "播放完後：離開"
+    IDS_AFTERPLAYBACK_STANDBY "播放完後：待命"
+    IDS_AFTERPLAYBACK_HIBERNATE "播放完後：休眠"
+    IDS_AFTERPLAYBACK_SHUTDOWN "播放完後：關機"
+    IDS_AFTERPLAYBACK_LOGOFF "播放完後：登出"
+    IDS_AFTERPLAYBACK_LOCK  "播放完後：鎖定"
+    IDS_AFTERPLAYBACK_EXIT  "播放完後：總是離開"
+    IDS_AFTERPLAYBACK_DONOTHING "播放完後：什麼都不做"
+    IDS_AFTERPLAYBACK_NEXT  "播放完後：播放資料夾內的下一段"
+    IDS_AFTERPLAYBACK_CLOSE_FILE "播放完後：總是關閉檔案"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "播放完後：總是關閉檔案並最小化播放器"
 END
 
 STRINGTABLE
@@ -3805,15 +3823,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AFTERPLAYBACK_CLOSE "播放完後：離開"
-    IDS_AFTERPLAYBACK_STANDBY "播放完後：待命"
-    IDS_AFTERPLAYBACK_HIBERNATE "播放完後：休眠"
-    IDS_AFTERPLAYBACK_SHUTDOWN "播放完後：關機"
-    IDS_AFTERPLAYBACK_LOGOFF "播放完後：登出"
-    IDS_AFTERPLAYBACK_LOCK  "播放完後：鎖定"
-    IDS_AFTERPLAYBACK_EXIT  "播放完後：總是離開"
-    IDS_AFTERPLAYBACK_DONOTHING "播放完後：什麼都不做"
-    IDS_AFTERPLAYBACK_NEXT  "播放完後：播放資料夾內的下一段"
     IDS_OSD_BRIGHTNESS      "亮度：%s"
     IDS_OSD_CONTRAST        "對比：%s"
     IDS_OSD_HUE             "色調：%s°"

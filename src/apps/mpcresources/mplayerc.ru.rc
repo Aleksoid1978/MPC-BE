@@ -3094,6 +3094,19 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_PROPSHEET_NAME      "Name"
+    IDS_PROPSHEET_MIME      "MIME type"
+    IDS_PROPSHEET_DESC      "Description"
+    IDS_PROPSHEET_FILE_IMAGE "%hs image"
+    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_AUDIOWINDOW_NONE    "не менять размер окна"
+    IDS_AUDIOWINDOW_COVER   "показывать обложки дисков"
+    IDS_AUDIOWINDOW_HIDE    "скрывать видеообласть"
+    IDS_ADDTOPLS_FROMDIR_NONE "ничего"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_TITLE            "Раздел %d"
     IDS_MAINFRM_16          "DVD: Непредвиденная ошибка."
     IDS_MAINFRM_17          "DVD: проблема с защитой от копирования."
@@ -3322,14 +3335,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_SETTINGS         "Настройки"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_AUDIOWINDOW_NONE    "не менять размер окна"
-    IDS_AUDIOWINDOW_COVER   "показывать обложки дисков"
-    IDS_AUDIOWINDOW_HIDE    "скрывать видеообласть"
-    IDS_ADDTOPLS_FROMDIR_NONE "ничего"
 END
 
 STRINGTABLE
@@ -3737,14 +3742,27 @@ BEGIN
     IDS_SATURATION_INC      "Насыщенность увеличить"
     IDS_SATURATION_DEC      "Насыщенность уменьшить"
     IDS_RESET_COLOR         "Сбросить настройки цвета"
-    IDS_AFTERPLAYBACK_CLOSE_FILE "По окончании воспроизведения: всегда закрыть файл"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "По окончании воспроизведения: всегда закрыть файл и сворачивать плеер"
     IDS_UPDATE_ERROR_DATA   "Сервер обновлений выдает неверные данные.\n\nПовторите попытку позже."
     IDS_USING_NEWER_VERSION "Вы используете последнюю версию %s."
     IDS_NEW_UPDATE_AVAILABLE  "Более новая версия %s найдена.\n\nВы хотите посетить сайт MPC-BE чтобы скачать её?"
     IDS_UPDATE_ERROR_CONNECT  "Сервер обновлений не найден.\n\nПожалуйста, проверьте связь с интернетом и попробуйте снова."
     IDS_UPDATE_CLOSE        "&Закрыть"
     IDS_OSD_ZOOM            "Масштаб: %.0lf%%"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AFTERPLAYBACK_CLOSE "По окончании воспроизведения: закрыть плеер"
+    IDS_AFTERPLAYBACK_STANDBY "По окончании воспроизведения: перейти в режим ожидания"
+    IDS_AFTERPLAYBACK_HIBERNATE "По окончании воспроизведения: перейти в режим сна"
+    IDS_AFTERPLAYBACK_SHUTDOWN "По окончании воспроизведения: выключить компьютер"
+    IDS_AFTERPLAYBACK_LOGOFF "По окончании воспроизведения: завершить сеанс"
+    IDS_AFTERPLAYBACK_LOCK  "По окончании воспроизведения: блокировать компьютер"
+    IDS_AFTERPLAYBACK_EXIT  "По окончании воспроизведения: всегда закрывать плеер"
+    IDS_AFTERPLAYBACK_DONOTHING "По окончании воспроизведения: ничего не делать"
+    IDS_AFTERPLAYBACK_NEXT  "По окончании воспроизведения: перейти к след. в каталоге"
+    IDS_AFTERPLAYBACK_CLOSE_FILE "По окончании воспроизведения: всегда закрыть файл"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "По окончании воспроизведения: всегда закрыть файл и сворачивать плеер"
 END
 
 STRINGTABLE
@@ -3805,15 +3823,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AFTERPLAYBACK_CLOSE "По окончании воспроизведения: закрыть плеер"
-    IDS_AFTERPLAYBACK_STANDBY "По окончании воспроизведения: перейти в режим ожидания"
-    IDS_AFTERPLAYBACK_HIBERNATE "По окончании воспроизведения: перейти в режим сна"
-    IDS_AFTERPLAYBACK_SHUTDOWN "По окончании воспроизведения: выключить компьютер"
-    IDS_AFTERPLAYBACK_LOGOFF "По окончании воспроизведения: завершить сеанс"
-    IDS_AFTERPLAYBACK_LOCK  "По окончании воспроизведения: блокировать компьютер"
-    IDS_AFTERPLAYBACK_EXIT  "По окончании воспроизведения: всегда закрывать плеер"
-    IDS_AFTERPLAYBACK_DONOTHING "По окончании воспроизведения: ничего не делать"
-    IDS_AFTERPLAYBACK_NEXT  "По окончании воспроизведения: перейти к след. в каталоге"
     IDS_OSD_BRIGHTNESS      "Яркость: %s"
     IDS_OSD_CONTRAST        "Контрастность: %s"
     IDS_OSD_HUE             "Оттенок: %s°"

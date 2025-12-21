@@ -3094,6 +3094,19 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_PROPSHEET_NAME      "Name"
+    IDS_PROPSHEET_MIME      "MIME type"
+    IDS_PROPSHEET_DESC      "Description"
+    IDS_PROPSHEET_FILE_IMAGE "%hs image"
+    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_AUDIOWINDOW_NONE    "μην αλλάξει το μέγεθος του παραθύρου"
+    IDS_AUDIOWINDOW_COVER   "εμφάνιση εικόνων γραφικών/εξωφύλλου άλμπουμ"
+    IDS_AUDIOWINDOW_HIDE    "απόκρυψη της περιοχής βίντεο"
+    IDS_ADDTOPLS_FROMDIR_NONE "nothing"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_TITLE            "Τίτλος %d"
     IDS_MAINFRM_16          "DVD: Μη αναμενόμενο σφάλμα"
     IDS_MAINFRM_17          "DVD: Σφάλμα στην προστασία αντιγραφής"
@@ -3322,14 +3335,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_SETTINGS         "Ρυθμίσεις"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_AUDIOWINDOW_NONE    "μην αλλάξει το μέγεθος του παραθύρου"
-    IDS_AUDIOWINDOW_COVER   "εμφάνιση εικόνων γραφικών/εξωφύλλου άλμπουμ"
-    IDS_AUDIOWINDOW_HIDE    "απόκρυψη της περιοχής βίντεο"
-    IDS_ADDTOPLS_FROMDIR_NONE "nothing"
 END
 
 STRINGTABLE
@@ -3737,14 +3742,27 @@ BEGIN
     IDS_SATURATION_INC      "Αύξηση κορεσμού"
     IDS_SATURATION_DEC      "Μείωση κορεσμού"
     IDS_RESET_COLOR         "Επαναφορά ρυθμίσεων χρώματος"
-    IDS_AFTERPLAYBACK_CLOSE_FILE "Μετά την αναπαραγωγή: Πάντα κλείσιμο αρχείου"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "After Playback: Always close file and minimize player"
     IDS_UPDATE_ERROR_DATA   "The update server gives the wrong data.\n\nPlease try later."
     IDS_USING_NEWER_VERSION "Χρησιμοποιείτε ήδη την πιο πρόσφατη έκδοση %s."
     IDS_NEW_UPDATE_AVAILABLE  "Μια νέα %s είναι διαθέσιμη.\n\nΘέλεις να επισκεφτείς την ιστοσελίδα του MPC-BE's για λήψη;"
     IDS_UPDATE_ERROR_CONNECT  "Ο διακομιστής ενημερώσεων δεν βρέθηκε.\n\nΠαρακαλώ ελέγξτε τη σύνδεση διαδικτύου σας ή προσπαθήστε πάλι αργότερα."
     IDS_UPDATE_CLOSE        "&Κλείσιμο"
     IDS_OSD_ZOOM            "Εστίαση: %.0lf%%"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AFTERPLAYBACK_CLOSE "Μετά την αναπαραγωγή: Έξοδος"
+    IDS_AFTERPLAYBACK_STANDBY "Μετά την αναπαραγωγή: Σε αναμονή"
+    IDS_AFTERPLAYBACK_HIBERNATE "Μετά την αναπαραγωγή: Αδρανοποίηση"
+    IDS_AFTERPLAYBACK_SHUTDOWN "Μετά την αναπαραγωγή: Τερματισμός λειτουργίας"
+    IDS_AFTERPLAYBACK_LOGOFF "Μετά την αναπαραγωγή: Αποσύνδεση"
+    IDS_AFTERPLAYBACK_LOCK  "Μετά την αναπαραγωγή: Κλείδωμα"
+    IDS_AFTERPLAYBACK_EXIT  "Μετά την αναπαραγωγή: Πάντα έξοδος"
+    IDS_AFTERPLAYBACK_DONOTHING "Μετά την αναπαραγωγή: Καμία ενέργεια"
+    IDS_AFTERPLAYBACK_NEXT  "Μετά την αναπαραγωγή: Αναπ/γή επόμενου στο φάκελο"
+    IDS_AFTERPLAYBACK_CLOSE_FILE "Μετά την αναπαραγωγή: Πάντα κλείσιμο αρχείου"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "After Playback: Always close file and minimize player"
 END
 
 STRINGTABLE
@@ -3805,15 +3823,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AFTERPLAYBACK_CLOSE "Μετά την αναπαραγωγή: Έξοδος"
-    IDS_AFTERPLAYBACK_STANDBY "Μετά την αναπαραγωγή: Σε αναμονή"
-    IDS_AFTERPLAYBACK_HIBERNATE "Μετά την αναπαραγωγή: Αδρανοποίηση"
-    IDS_AFTERPLAYBACK_SHUTDOWN "Μετά την αναπαραγωγή: Τερματισμός λειτουργίας"
-    IDS_AFTERPLAYBACK_LOGOFF "Μετά την αναπαραγωγή: Αποσύνδεση"
-    IDS_AFTERPLAYBACK_LOCK  "Μετά την αναπαραγωγή: Κλείδωμα"
-    IDS_AFTERPLAYBACK_EXIT  "Μετά την αναπαραγωγή: Πάντα έξοδος"
-    IDS_AFTERPLAYBACK_DONOTHING "Μετά την αναπαραγωγή: Καμία ενέργεια"
-    IDS_AFTERPLAYBACK_NEXT  "Μετά την αναπαραγωγή: Αναπ/γή επόμενου στο φάκελο"
     IDS_OSD_BRIGHTNESS      "Φωτεινότητα : %s"
     IDS_OSD_CONTRAST        "Αντίθεση : %s"
     IDS_OSD_HUE             "Απόχρωση : %s°"

@@ -3094,6 +3094,19 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_PROPSHEET_NAME      "Name"
+    IDS_PROPSHEET_MIME      "MIME type"
+    IDS_PROPSHEET_DESC      "Description"
+    IDS_PROPSHEET_FILE_IMAGE "%hs image"
+    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_AUDIOWINDOW_NONE    "창 크기 변경 안 함"
+    IDS_AUDIOWINDOW_COVER   "앨범 아트/표지 사진 표시"
+    IDS_AUDIOWINDOW_HIDE    "비디오 영역 숨기기"
+    IDS_ADDTOPLS_FROMDIR_NONE "안 함"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_TITLE            "타이틀 %d"
     IDS_MAINFRM_16          "DVD : 예상치 못한 에러"
     IDS_MAINFRM_17          "DVD : 복사 방지 에러"
@@ -3322,14 +3335,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_SETTINGS         "설정"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_AUDIOWINDOW_NONE    "창 크기 변경 안 함"
-    IDS_AUDIOWINDOW_COVER   "앨범 아트/표지 사진 표시"
-    IDS_AUDIOWINDOW_HIDE    "비디오 영역 숨기기"
-    IDS_ADDTOPLS_FROMDIR_NONE "안 함"
 END
 
 STRINGTABLE
@@ -3737,14 +3742,27 @@ BEGIN
     IDS_SATURATION_INC      "채도 증가"
     IDS_SATURATION_DEC      "채도 감소"
     IDS_RESET_COLOR         "색 설정 초기화"
-    IDS_AFTERPLAYBACK_CLOSE_FILE "재생이 끝나면 : 항상 파일 닫기"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "재생 후 : 항상 파일을 닫고 재생기기를 최소화"
     IDS_UPDATE_ERROR_DATA   "업데이트 서버 데이터에 오류가 있습니다.\n\n잠시 후 다시 시도하세요."
     IDS_USING_NEWER_VERSION "이미 최신 버전 %s 사용 중입니다."
     IDS_NEW_UPDATE_AVAILABLE  "새 버전 %s이 있습니다.\n\n  MPC-BE 웹사이트로 가서 내려받으시겠습니까?"
     IDS_UPDATE_ERROR_CONNECT  "업데이트 서버를 찾을 수 없습니다.\n\n인터넷 연결을 확인하고 다시 시도하세요."
     IDS_UPDATE_CLOSE        "종료(&C)"
     IDS_OSD_ZOOM            "확대/축소 : %.0lf%%"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AFTERPLAYBACK_CLOSE "재생이 끝나면 : 종료"
+    IDS_AFTERPLAYBACK_STANDBY "재생이 끝나면 : 대기"
+    IDS_AFTERPLAYBACK_HIBERNATE "재생이 끝나면 : 컴퓨터 대기 모드"
+    IDS_AFTERPLAYBACK_SHUTDOWN "재생이 끝나면 : 컴퓨터 종료"
+    IDS_AFTERPLAYBACK_LOGOFF "재생이 끝나면 : 사용자 로그 오프"
+    IDS_AFTERPLAYBACK_LOCK  "재생이 끝나면 : 컴퓨터 잠금 모드"
+    IDS_AFTERPLAYBACK_EXIT  "재생이 끝나면 : 항상 종료"
+    IDS_AFTERPLAYBACK_DONOTHING "재생이 끝나면 : 아무것도 하지 않음"
+    IDS_AFTERPLAYBACK_NEXT  "재생이 끝나면 : 폴더의 다음 파일 재생"
+    IDS_AFTERPLAYBACK_CLOSE_FILE "재생이 끝나면 : 항상 파일 닫기"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "재생 후 : 항상 파일을 닫고 재생기기를 최소화"
 END
 
 STRINGTABLE
@@ -3805,15 +3823,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AFTERPLAYBACK_CLOSE "재생이 끝나면 : 종료"
-    IDS_AFTERPLAYBACK_STANDBY "재생이 끝나면 : 대기"
-    IDS_AFTERPLAYBACK_HIBERNATE "재생이 끝나면 : 컴퓨터 대기 모드"
-    IDS_AFTERPLAYBACK_SHUTDOWN "재생이 끝나면 : 컴퓨터 종료"
-    IDS_AFTERPLAYBACK_LOGOFF "재생이 끝나면 : 사용자 로그 오프"
-    IDS_AFTERPLAYBACK_LOCK  "재생이 끝나면 : 컴퓨터 잠금 모드"
-    IDS_AFTERPLAYBACK_EXIT  "재생이 끝나면 : 항상 종료"
-    IDS_AFTERPLAYBACK_DONOTHING "재생이 끝나면 : 아무것도 하지 않음"
-    IDS_AFTERPLAYBACK_NEXT  "재생이 끝나면 : 폴더의 다음 파일 재생"
     IDS_OSD_BRIGHTNESS      "명도 : %s%%"
     IDS_OSD_CONTRAST        "명암 : %s%%"
     IDS_OSD_HUE             "색조 : %s°"

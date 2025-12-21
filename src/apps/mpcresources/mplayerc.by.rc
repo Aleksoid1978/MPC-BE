@@ -3094,6 +3094,19 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_PROPSHEET_NAME      "Name"
+    IDS_PROPSHEET_MIME      "MIME type"
+    IDS_PROPSHEET_DESC      "Description"
+    IDS_PROPSHEET_FILE_IMAGE "%hs image"
+    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_AUDIOWINDOW_NONE    "do not change the window size"
+    IDS_AUDIOWINDOW_COVER   "display album art/cover pictures"
+    IDS_AUDIOWINDOW_HIDE    "hide the video area"
+    IDS_ADDTOPLS_FROMDIR_NONE "nothing"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_TITLE            "Назва %d"
     IDS_MAINFRM_16          "DVD: Неспадзяваная памылка."
     IDS_MAINFRM_17          "DVD: праблема з абаронай ад капіявання."
@@ -3322,14 +3335,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_SETTINGS         "Налады"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_AUDIOWINDOW_NONE    "do not change the window size"
-    IDS_AUDIOWINDOW_COVER   "display album art/cover pictures"
-    IDS_AUDIOWINDOW_HIDE    "hide the video area"
-    IDS_ADDTOPLS_FROMDIR_NONE "nothing"
 END
 
 STRINGTABLE
@@ -3737,14 +3742,27 @@ BEGIN
     IDS_SATURATION_INC      "Насычанасць павялічыць"
     IDS_SATURATION_DEC      "Насычанасць паменьшыць"
     IDS_RESET_COLOR         "Скінуць налады колеру"
-    IDS_AFTERPLAYBACK_CLOSE_FILE "After Playback: Always close file"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "After Playback: Always close file and minimize player"
     IDS_UPDATE_ERROR_DATA   "The update server gives the wrong data.\n\nPlease try later."
     IDS_USING_NEWER_VERSION "You are already using the latest version %s."
     IDS_NEW_UPDATE_AVAILABLE  "A new %s is available.\n\nDo you want to visit MPC-BE's website to download it?"
     IDS_UPDATE_ERROR_CONNECT  "Update server not found.\n\nPlease check your internet connection or try again later."
     IDS_UPDATE_CLOSE        "&Close"
     IDS_OSD_ZOOM            "Zoom: %.0lf%%"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AFTERPLAYBACK_CLOSE "Пасля прайгрвання: Выйсці"
+    IDS_AFTERPLAYBACK_STANDBY "Пасля прайгрвання: Перайсці ў рэжым чакання"
+    IDS_AFTERPLAYBACK_HIBERNATE "Пасля прайгрвання: Перайсці ў рэжым сну"
+    IDS_AFTERPLAYBACK_SHUTDOWN "Пасля прайгрвання: Выключыць"
+    IDS_AFTERPLAYBACK_LOGOFF "Пасля прайгрвання: Завяршыць сеанс"
+    IDS_AFTERPLAYBACK_LOCK  "Пасля прайгрвання: Блакаваць"
+    IDS_AFTERPLAYBACK_EXIT  "Пасля прайгрвання: Заўсёды выхадзіць"
+    IDS_AFTERPLAYBACK_DONOTHING "Пасля прайгрвання: Нічога не рабіць"
+    IDS_AFTERPLAYBACK_NEXT  "Пасля прайгрвання: Прайгаць наступны"
+    IDS_AFTERPLAYBACK_CLOSE_FILE "After Playback: Always close file"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "After Playback: Always close file and minimize player"
 END
 
 STRINGTABLE
@@ -3805,15 +3823,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AFTERPLAYBACK_CLOSE "Пасля прайгрвання: Выйсці"
-    IDS_AFTERPLAYBACK_STANDBY "Пасля прайгрвання: Перайсці ў рэжым чакання"
-    IDS_AFTERPLAYBACK_HIBERNATE "Пасля прайгрвання: Перайсці ў рэжым сну"
-    IDS_AFTERPLAYBACK_SHUTDOWN "Пасля прайгрвання: Выключыць"
-    IDS_AFTERPLAYBACK_LOGOFF "Пасля прайгрвання: Завяршыць сеанс"
-    IDS_AFTERPLAYBACK_LOCK  "Пасля прайгрвання: Блакаваць"
-    IDS_AFTERPLAYBACK_EXIT  "Пасля прайгрвання: Заўсёды выхадзіць"
-    IDS_AFTERPLAYBACK_DONOTHING "Пасля прайгрвання: Нічога не рабіць"
-    IDS_AFTERPLAYBACK_NEXT  "Пасля прайгрвання: Прайгаць наступны"
     IDS_OSD_BRIGHTNESS      "Brightness: %s"
     IDS_OSD_CONTRAST        "Contrast: %s"
     IDS_OSD_HUE             "Hue: %s°"

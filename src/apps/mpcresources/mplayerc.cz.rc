@@ -3094,6 +3094,19 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_PROPSHEET_NAME      "Name"
+    IDS_PROPSHEET_MIME      "MIME type"
+    IDS_PROPSHEET_DESC      "Description"
+    IDS_PROPSHEET_FILE_IMAGE "%hs image"
+    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_AUDIOWINDOW_NONE    "do not change the window size"
+    IDS_AUDIOWINDOW_COVER   "display album art/cover pictures"
+    IDS_AUDIOWINDOW_HIDE    "hide the video area"
+    IDS_ADDTOPLS_FROMDIR_NONE "nothing"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_TITLE            "Titul %d"
     IDS_MAINFRM_16          "DVD: Neočekávaná chyba"
     IDS_MAINFRM_17          "DVD: Selhání ochrany proti kopírování"
@@ -3322,14 +3335,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_SETTINGS         "Nastavení"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_AUDIOWINDOW_NONE    "do not change the window size"
-    IDS_AUDIOWINDOW_COVER   "display album art/cover pictures"
-    IDS_AUDIOWINDOW_HIDE    "hide the video area"
-    IDS_ADDTOPLS_FROMDIR_NONE "nothing"
 END
 
 STRINGTABLE
@@ -3737,14 +3742,27 @@ BEGIN
     IDS_SATURATION_INC      "Zvýšení sytosti"
     IDS_SATURATION_DEC      "Snížení sytosti"
     IDS_RESET_COLOR         "Obnovit výchozí"
-    IDS_AFTERPLAYBACK_CLOSE_FILE "After Playback: Always close file"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "After Playback: Always close file and minimize player"
     IDS_UPDATE_ERROR_DATA   "The update server gives the wrong data.\n\nPlease try later."
     IDS_USING_NEWER_VERSION "You are already using the latest version %s."
     IDS_NEW_UPDATE_AVAILABLE  "A new %s is available.\n\nDo you want to visit MPC-BE's website to download it?"
     IDS_UPDATE_ERROR_CONNECT  "Aktualizační server nebyl nalezen.\n\nZkontrolujte připojení k Internetu a akci zopakujte později."
     IDS_UPDATE_CLOSE        "&Zavřít"
     IDS_OSD_ZOOM            "Velikost: %.0lf%%"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AFTERPLAYBACK_CLOSE "Po přehrání: Zavřít přehrávač"
+    IDS_AFTERPLAYBACK_STANDBY "Po přehrání: Pohotovostní režim"
+    IDS_AFTERPLAYBACK_HIBERNATE "Po přehrání: Režim spánku"
+    IDS_AFTERPLAYBACK_SHUTDOWN "Po přehrání: Vypnout počítač"
+    IDS_AFTERPLAYBACK_LOGOFF "Po přehrání: Odhlásit uživatele"
+    IDS_AFTERPLAYBACK_LOCK  "Po přehrání: Uzamknout počítač"
+    IDS_AFTERPLAYBACK_EXIT  "Po přehrání: Vždy zavřít přehrávač"
+    IDS_AFTERPLAYBACK_DONOTHING "Po přehrání: Nedělat nic"
+    IDS_AFTERPLAYBACK_NEXT  "Po přehrání: Přehrát následující v adresáři"
+    IDS_AFTERPLAYBACK_CLOSE_FILE "After Playback: Always close file"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "After Playback: Always close file and minimize player"
 END
 
 STRINGTABLE
@@ -3805,15 +3823,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AFTERPLAYBACK_CLOSE "Po přehrání: Zavřít přehrávač"
-    IDS_AFTERPLAYBACK_STANDBY "Po přehrání: Pohotovostní režim"
-    IDS_AFTERPLAYBACK_HIBERNATE "Po přehrání: Režim spánku"
-    IDS_AFTERPLAYBACK_SHUTDOWN "Po přehrání: Vypnout počítač"
-    IDS_AFTERPLAYBACK_LOGOFF "Po přehrání: Odhlásit uživatele"
-    IDS_AFTERPLAYBACK_LOCK  "Po přehrání: Uzamknout počítač"
-    IDS_AFTERPLAYBACK_EXIT  "Po přehrání: Vždy zavřít přehrávač"
-    IDS_AFTERPLAYBACK_DONOTHING "Po přehrání: Nedělat nic"
-    IDS_AFTERPLAYBACK_NEXT  "Po přehrání: Přehrát následující v adresáři"
     IDS_OSD_BRIGHTNESS      "Jas: %s"
     IDS_OSD_CONTRAST        "Kontrast: %s"
     IDS_OSD_HUE             "Odstín: %s°"

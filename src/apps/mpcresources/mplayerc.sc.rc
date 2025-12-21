@@ -3094,6 +3094,19 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_PROPSHEET_NAME      "Name"
+    IDS_PROPSHEET_MIME      "MIME type"
+    IDS_PROPSHEET_DESC      "Description"
+    IDS_PROPSHEET_FILE_IMAGE "%hs image"
+    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_AUDIOWINDOW_NONE    "不改变窗口大小"
+    IDS_AUDIOWINDOW_COVER   "显示专辑封面图片"
+    IDS_AUDIOWINDOW_HIDE    "隐藏视频框"
+    IDS_ADDTOPLS_FROMDIR_NONE "无"
+END
+
+STRINGTABLE
+BEGIN
     IDS_AG_TITLE            "标题 %d"
     IDS_MAINFRM_16          "DVD: 未预料的错误"
     IDS_MAINFRM_17          "DVD: 复制保护失败"
@@ -3322,14 +3335,6 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_SETTINGS         "设置"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_AUDIOWINDOW_NONE    "不改变窗口大小"
-    IDS_AUDIOWINDOW_COVER   "显示专辑封面图片"
-    IDS_AUDIOWINDOW_HIDE    "隐藏视频框"
-    IDS_ADDTOPLS_FROMDIR_NONE "无"
 END
 
 STRINGTABLE
@@ -3737,14 +3742,27 @@ BEGIN
     IDS_SATURATION_INC      "增加饱和度"
     IDS_SATURATION_DEC      "降低饱和度"
     IDS_RESET_COLOR         "重置颜色设置"
-    IDS_AFTERPLAYBACK_CLOSE_FILE "回放结束后: 总是关闭文件"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "播放结束后：始终关闭文件并最小化播放器"
     IDS_UPDATE_ERROR_DATA   "更新服务器返回了错误数据。\n\n请稍后再试。"
     IDS_USING_NEWER_VERSION "您当前使用的版本，%s 已是最新的版本。"
     IDS_NEW_UPDATE_AVAILABLE  "有可用的新版本 %s 。\n\n请访问 MPC-BE 主页下载。"
     IDS_UPDATE_ERROR_CONNECT  "没有找到升级服务器。\n\n请检查您的网络连接或稍后重试。"
     IDS_UPDATE_CLOSE        "关闭(&C)"
     IDS_OSD_ZOOM            "缩放: %.0lf%%"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_AFTERPLAYBACK_CLOSE "回放结束后: 退出"
+    IDS_AFTERPLAYBACK_STANDBY "回放结束后: 待机"
+    IDS_AFTERPLAYBACK_HIBERNATE "回放结束后: 休眠"
+    IDS_AFTERPLAYBACK_SHUTDOWN "回放结束后: 关机"
+    IDS_AFTERPLAYBACK_LOGOFF "回放结束后: 注销"
+    IDS_AFTERPLAYBACK_LOCK  "回放结束后: 锁定"
+    IDS_AFTERPLAYBACK_EXIT  "回放结束后: 总是退出"
+    IDS_AFTERPLAYBACK_DONOTHING "回放结束后: 什么都不做"
+    IDS_AFTERPLAYBACK_NEXT  "回放结束后: 播放文件夹中的下一个文件"
+    IDS_AFTERPLAYBACK_CLOSE_FILE "回放结束后: 总是关闭文件"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "播放结束后：始终关闭文件并最小化播放器"
 END
 
 STRINGTABLE
@@ -3805,15 +3823,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AFTERPLAYBACK_CLOSE "回放结束后: 退出"
-    IDS_AFTERPLAYBACK_STANDBY "回放结束后: 待机"
-    IDS_AFTERPLAYBACK_HIBERNATE "回放结束后: 休眠"
-    IDS_AFTERPLAYBACK_SHUTDOWN "回放结束后: 关机"
-    IDS_AFTERPLAYBACK_LOGOFF "回放结束后: 注销"
-    IDS_AFTERPLAYBACK_LOCK  "回放结束后: 锁定"
-    IDS_AFTERPLAYBACK_EXIT  "回放结束后: 总是退出"
-    IDS_AFTERPLAYBACK_DONOTHING "回放结束后: 什么都不做"
-    IDS_AFTERPLAYBACK_NEXT  "回放结束后: 播放文件夹中的下一个文件"
     IDS_OSD_BRIGHTNESS      "亮度: %s"
     IDS_OSD_CONTRAST        "对比度: %s"
     IDS_OSD_HUE             "色调: %s°"
