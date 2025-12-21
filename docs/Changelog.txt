@@ -26,6 +26,9 @@ Added the IDS_ADDITIONAL_AUDIO_PATHS parameter, which allows translators to spec
 Standard frequencies for display auto-switching have been expanded to 120 fps.
 Fixed launching the player with the "/play /fullscreen" keys without specifying a video file on the command line (the file from the current playlist will be opened).
 Added preview of embedded images in Properties > Resources.
+Minor change to hotkeys.
+Support for embedded images in audio files has been expanded. This requires support in Windows Imaging Component (WIC).
+Added retrieval of metadata from the "WM ASF Reader" filter.
 
 Installer
 Compiling the installer requires InnoSetup 6.5.2 or later.
