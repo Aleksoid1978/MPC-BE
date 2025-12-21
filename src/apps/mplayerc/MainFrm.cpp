@@ -54,6 +54,7 @@
 #include <moreuuids.h>
 #include <clsids.h>
 #include <psapi.h>
+#include <wmsdkidl.h>
 
 #include "GraphThread.h"
 #include "FGManager.h"
@@ -13362,35 +13363,37 @@ void CMainFrame::OpenSetupCaptureBar()
 void CMainFrame::OpenSetupInfoBar()
 {
 	if (GetPlaybackMode() == PM_FILE) {
-		bool fEmpty = true;
+		HRESULT hr = E_NOT_SET;
+		bool filled = false;
+
 		for (const auto& pAMMC : m_pAMMC) {
 			if (pAMMC) {
 				CComBSTR bstr;
 				if (SUCCEEDED(pAMMC->get_Title(&bstr))) {
 					m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_TITLE), bstr.m_str);
 					if (bstr.Length()) {
-						fEmpty = false;
+						filled = true;
 					}
 					bstr.Empty();
 				}
 				if (SUCCEEDED(pAMMC->get_AuthorName(&bstr))) {
 					m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_AUTHOR), bstr.m_str);
 					if (bstr.Length()) {
-						fEmpty = false;
+						filled = true;
 					}
 					bstr.Empty();
 				}
 				if (SUCCEEDED(pAMMC->get_Copyright(&bstr))) {
 					m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_COPYRIGHT), bstr.m_str);
 					if (bstr.Length()) {
-						fEmpty = false;
+						filled = true;
 					}
 					bstr.Empty();
 				}
 				if (SUCCEEDED(pAMMC->get_Rating(&bstr))) {
 					m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_RATING), bstr.m_str);
 					if (bstr.Length()) {
-						fEmpty = false;
+						filled = true;
 					}
 					bstr.Empty();
 				}
@@ -13404,21 +13407,62 @@ void CMainFrame::OpenSetupInfoBar()
 					}
 					m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_DESCRIPTION), str);
 					if (bstr.Length()) {
-						fEmpty = false;
+						filled = true;
 					}
 					bstr.Empty();
 				}
-				if (!fEmpty) {
-					RecalcLayout();
+				if (filled) {
 					break;
 				}
 			}
 		}
 
+		if (!filled && m_pGB) {
+			BeginEnumFilters(m_pGB, pEF, pBF) {
+				if (!CheckMainFilter(pBF)) {
+					continue;
+				}
+
+				if (CComQIPtr<IWMHeaderInfo> pWMHI = pBF.p) {
+					WORD streamNum = 0;
+					WMT_ATTR_DATATYPE type;
+					WORD length;
+					std::vector<BYTE> value;
+
+					hr = pWMHI->GetAttributeByName(&streamNum, L"Title", &type, nullptr, &length);
+					if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length) {
+						value.resize(length);
+						hr = pWMHI->GetAttributeByName(&streamNum, L"Title", &type, value.data(), &length);
+						if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length) {
+							CStringW str((LPCWSTR)value.data(), length / sizeof(wchar_t));
+							m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_TITLE), str);
+						}
+					}
+					hr = pWMHI->GetAttributeByName(&streamNum, L"Author", &type, nullptr, &length);
+					if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length) {
+						value.resize(length);
+						hr = pWMHI->GetAttributeByName(&streamNum, L"Author", &type, value.data(), &length);
+						if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length) {
+							CStringW str((LPCWSTR)value.data(), length / sizeof(wchar_t));
+							m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_AUTHOR), str);
+							
+						}
+					}
+				}
+			}
+			EndEnumFilters;
+		}
+
 		if (!m_youtubeFields.title.IsEmpty()) {
 			m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_TITLE), m_youtubeFields.title);
+			filled = true;
 		}
-	} else if (GetPlaybackMode() == PM_DVD) {
+
+		if (filled) {
+			RecalcLayout();
+		}
+	}
+	else if (GetPlaybackMode() == PM_DVD) {
 		CString info('-');
 		m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_DOMAIN), info);
 		m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_LOCATION), info);
