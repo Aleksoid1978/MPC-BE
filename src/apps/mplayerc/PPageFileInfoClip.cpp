@@ -96,18 +96,18 @@ CPPageFileInfoClip::CPPageFileInfoClip(const CStringW& fn, IFilterGraph* pFG)
 			std::vector<BYTE> value;
 
 			hr = pWMHI->GetAttributeByName(&streamNum, L"Title", &type, nullptr, &length);
-			if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length) {
+			if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length > 2) {
 				value.resize(length);
 				hr = pWMHI->GetAttributeByName(&streamNum, L"Title", &type, value.data(), &length);
-				if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length) {
+				if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length > 2) {
 					m_clip.SetString((LPCWSTR)value.data(), length / sizeof(wchar_t));
 				}
 			}
 			hr = pWMHI->GetAttributeByName(&streamNum, L"Author", &type, nullptr, &length);
-			if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length) {
+			if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length > 2) {
 				value.resize(length);
 				hr = pWMHI->GetAttributeByName(&streamNum, L"Author", &type, value.data(), &length);
-				if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length) {
+				if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length > 2) {
 					m_author.SetString((LPCWSTR)value.data(), length / sizeof(wchar_t));
 				}
 			}
