@@ -62,7 +62,7 @@ static String mi_get_lang_file()
 // CPPageFileMediaInfo dialog
 
 IMPLEMENT_DYNAMIC(CPPageFileMediaInfo, CPropertyPage)
-CPPageFileMediaInfo::CPPageFileMediaInfo(const std::list<CString>& files, CDPI* pSheetDpi)
+CPPageFileMediaInfo::CPPageFileMediaInfo(const std::list<CStringW>& files, CDPI* pSheetDpi)
 	: CPropertyPage(CPPageFileMediaInfo::IDD, CPPageFileMediaInfo::IDD)
 	, m_files(files)
 	, m_pSheetDpi(pSheetDpi)

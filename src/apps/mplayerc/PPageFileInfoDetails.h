@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,20 +34,20 @@ class CPPageFileInfoDetails : public CPropertyPage
 private:
 	HICON   m_hIcon = nullptr;
 
-	CStatic m_icon;
-	CString m_fn;
-	CString m_type;
-	CString m_size;
-	CString m_time;
-	CString m_resolution;
-	CString m_created;
-	CString m_encodingText;
-	CEdit   m_encoding;
+	CStatic  m_icon;
+	CStringW m_fn;
+	CStringW m_type;
+	CStringW m_size;
+	CStringW m_time;
+	CStringW m_resolution;
+	CStringW m_created;
+	CStringW m_encodingText;
+	CEdit    m_encoding;
 
 	void InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI);
 
 public:
-	CPPageFileInfoDetails(const CString& fn, IFilterGraph* pFG, IAllocatorPresenter* pCAP, IDvdInfo2* pDVDI);
+	CPPageFileInfoDetails(const CStringW& fn, IFilterGraph* pFG, IAllocatorPresenter* pCAP, IDvdInfo2* pDVDI);
 	virtual ~CPPageFileInfoDetails();
 
 	enum { IDD = IDD_FILEPROPDETAILS };

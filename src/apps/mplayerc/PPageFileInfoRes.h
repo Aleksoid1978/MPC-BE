@@ -39,15 +39,15 @@ private:
 	CDPI* m_pSheetDpi;
 
 	CStatic   m_icon;
-	CString   m_fn;
-	CString   m_fullfn;
+	CStringW  m_fn;
+	CStringW  m_fullfn;
 	CListCtrl m_list;
 	CStatic   m_picPreview;
 
 	const CDSMResource* GetResource(int idx);
 
 public:
-	CPPageFileInfoRes(const CString& fn, IFilterGraph* pFG, CDPI* pSheetDpi);
+	CPPageFileInfoRes(const CStringW& fn, IFilterGraph* pFG, CDPI* pSheetDpi);
 	virtual ~CPPageFileInfoRes();
 
 	enum { IDD = IDD_FILEPROPRES };

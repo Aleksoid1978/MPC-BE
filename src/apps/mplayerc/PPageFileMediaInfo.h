@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2024 see Authors.txt
+ * (C) 2012-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,7 +37,7 @@ private:
 	int m_fileindex = -1;
 
 public:
-	CPPageFileMediaInfo(const std::list<CString>& files, CDPI* pSheetDpi);
+	CPPageFileMediaInfo(const std::list<CStringW>& files, CDPI* pSheetDpi);
 	virtual ~CPPageFileMediaInfo() = default;
 
 	enum { IDD = IDD_FILEMEDIAINFO };

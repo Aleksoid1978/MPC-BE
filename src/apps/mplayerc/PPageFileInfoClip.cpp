@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,7 +27,7 @@
 // CPPageFileInfoClip dialog
 
 IMPLEMENT_DYNAMIC(CPPageFileInfoClip, CPropertyPage)
-CPPageFileInfoClip::CPPageFileInfoClip(const CString& fn, IFilterGraph* pFG)
+CPPageFileInfoClip::CPPageFileInfoClip(const CStringW& fn, IFilterGraph* pFG)
 	: CPropertyPage(CPPageFileInfoClip::IDD, CPPageFileInfoClip::IDD)
 	, m_fn(fn)
 	, m_clip(ResStr(IDS_AG_NONE))
@@ -40,11 +40,11 @@ CPPageFileInfoClip::CPPageFileInfoClip(const CString& fn, IFilterGraph* pFG)
 	auto pFrame = AfxGetMainFrame();
 
 	BeginEnumFilters(pFG, pEF, pBF) {
-		if (CComQIPtr<IPropertyBag> pPB = pBF.p) {
-			if (!pFrame->CheckMainFilter(pBF)) {
-				continue;
-			}
+		if (!pFrame->CheckMainFilter(pBF)) {
+			continue;
+		}
 
+		if (CComQIPtr<IPropertyBag> pPB = pBF.p) {
 			CComVariant var;
 			if (SUCCEEDED(pPB->Read(CComBSTR(L"ALBUM"), &var, nullptr))) {
 				m_album = var.bstrVal;
@@ -60,11 +60,12 @@ CPPageFileInfoClip::CPPageFileInfoClip(const CString& fn, IFilterGraph* pFG)
 		}
 
 		if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF.p) {
-			if (!pFrame->CheckMainFilter(pBF)) {
-				continue;
-			}
-
 			CComBSTR bstr;
+			if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
+				m_clip = bstr.m_str;
+				bstr.Empty();
+				break;
+			}
 			if (SUCCEEDED(pAMMC->get_AuthorName(&bstr)) && bstr.Length()) {
 				m_author = bstr.m_str;
 				bstr.Empty();
@@ -85,11 +86,6 @@ CPPageFileInfoClip::CPPageFileInfoClip(const CString& fn, IFilterGraph* pFG)
 				m_descText.Replace(L";", L"\r\n");
 				bstr.Empty();
 			}
-			if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
-				m_clip = bstr.m_str;
-				bstr.Empty();
-				break;
-			}
 		}
 	}
 	EndEnumFilters;
@@ -105,7 +101,7 @@ CPPageFileInfoClip::~CPPageFileInfoClip()
 BOOL CPPageFileInfoClip::PreTranslateMessage(MSG* pMsg)
 {
 	if (pMsg->message == WM_LBUTTONDBLCLK && pMsg->hwnd == m_location.m_hWnd && !m_location_str.IsEmpty()) {
-		CString path = m_location_str;
+		CStringW path = m_location_str;
 
 		if (path[path.GetLength() - 1] != '\\') {
 			path += L"\\";

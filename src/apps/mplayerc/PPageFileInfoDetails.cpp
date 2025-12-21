@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,13 +39,13 @@ static bool GetProperty(IFilterGraph* pFG, LPCOLESTR propName, VARIANT* vt)
 	return false;
 }
 
-static CString FormatDateTime(FILETIME tm)
+static CStringW FormatDateTime(FILETIME tm)
 {
 	SYSTEMTIME st;
 	FileTimeToSystemTime(&tm, &st);
 	WCHAR buff[256];
 	GetDateFormatW(LOCALE_USER_DEFAULT, DATE_LONGDATE, &st, nullptr, buff, 256);
-	CString ret(buff);
+	CStringW ret(buff);
 	ret += L" ";
 	GetTimeFormatW(LOCALE_USER_DEFAULT, 0, &st, nullptr, buff, 256);
 	ret += buff;
@@ -55,7 +55,7 @@ static CString FormatDateTime(FILETIME tm)
 // CPPageFileInfoDetails dialog
 
 IMPLEMENT_DYNAMIC(CPPageFileInfoDetails, CPropertyPage)
-CPPageFileInfoDetails::CPPageFileInfoDetails(const CString& fn, IFilterGraph* pFG, IAllocatorPresenter* pCAP, IDvdInfo2* pDVDI)
+CPPageFileInfoDetails::CPPageFileInfoDetails(const CStringW& fn, IFilterGraph* pFG, IAllocatorPresenter* pCAP, IDvdInfo2* pDVDI)
 	: CPropertyPage(CPPageFileInfoDetails::IDD, CPPageFileInfoDetails::IDD)
 	, m_fn(fn)
 	, m_type(ResStr(IDS_AG_NOT_KNOWN))
@@ -66,7 +66,7 @@ CPPageFileInfoDetails::CPPageFileInfoDetails(const CString& fn, IFilterGraph* pF
 {
 	CComVariant vt;
 
-	CString createdDate;
+	CStringW createdDate;
 	if (::GetProperty(pFG, L"CurFile.TimeCreated", &vt)) {
 		if (V_VT(&vt) == VT_UI8) {
 			ULARGE_INTEGER uli;
@@ -90,7 +90,7 @@ CPPageFileInfoDetails::CPPageFileInfoDetails(const CString& fn, IFilterGraph* pF
 		const int MAX_FILE_SIZE_BUFFER = 65;
 		WCHAR szFileSize[MAX_FILE_SIZE_BUFFER];
 		StrFormatByteSizeW(size, szFileSize, MAX_FILE_SIZE_BUFFER);
-		CString szByteSize;
+		CStringW szByteSize;
 		szByteSize.Format(L"%I64d", size);
 		m_size.Format(L"%s (%s bytes)", szFileSize, FormatNumber(szByteSize));
 
@@ -157,7 +157,7 @@ CPPageFileInfoDetails::CPPageFileInfoDetails(const CString& fn, IFilterGraph* pF
 		ReduceDim(arxy);
 
 		if (arxy.cx > 0 && arxy.cy > 0 && arxy.cx*wh.cy != arxy.cy*wh.cx) {
-			CString ar;
+			CStringW ar;
 			ar.Format(L" (AR %d:%d)", arxy.cx, arxy.cy);
 			m_resolution += ar;
 		}
@@ -203,7 +203,7 @@ BOOL CPPageFileInfoDetails::OnInitDialog()
 		m_icon.SetIcon(m_hIcon);
 	}
 
-	CString ext = m_fn.Left(m_fn.Find(L"://") + 1).TrimRight(':');
+	CStringW ext = m_fn.Left(m_fn.Find(L"://") + 1).TrimRight(':');
 
 	if (ext.IsEmpty() || !ext.CompareNoCase(L"file")) {
 		ext = L"." + m_fn.Mid(m_fn.ReverseFind('.')+1);
@@ -216,7 +216,7 @@ BOOL CPPageFileInfoDetails::OnInitDialog()
 	m_fn.TrimRight('/');
 	m_fn.Replace('\\', '/');
 
-	CString tmpStr;
+	CStringW tmpStr;
 	if (m_fn.Find(L"://") > 0) {
 		if (m_fn.Find(L"/", m_fn.Find(L"://") + 3) < 0) {
 			tmpStr = m_fn;
@@ -252,8 +252,8 @@ LRESULT CPPageFileInfoDetails::OnSetPageFocus(WPARAM wParam, LPARAM lParam)
 
 void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 {
-	std::list<CString> videoStreams;
-	std::list<CString> otherStreams;
+	std::list<CStringW> videoStreams;
+	std::list<CStringW> otherStreams;
 
 	BeginEnumFilters(pFG, pEF, pBF) {
 		CComPtr<IBaseFilter> pUSBF = GetUpStreamFilter(pBF);
@@ -288,7 +288,7 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 				WCHAR* pszName = nullptr;
 				if (SUCCEEDED(pSS->Info(i, &pmt, nullptr, nullptr, nullptr, &pszName, nullptr, nullptr)) && pmt) {
 					CMediaTypeEx mt(*pmt);
-					CString str = mt.ToString();
+					CStringW str = mt.ToString();
 					if (!str.IsEmpty()) {
 						if (pszName && wcslen(pszName)) {
 							str.AppendFormat(L" [%s]", pszName);
@@ -316,7 +316,7 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 					continue;
 				}
 
-				CString str = mt.ToString();
+				CStringW str = mt.ToString();
 				if (!str.IsEmpty()) {
 					str.AppendFormat(L" [%s]", GetPinName(pPin));
 					if (mt.majortype == MEDIATYPE_Video || mt.subtype == MEDIASUBTYPE_MPEG2_VIDEO) {
@@ -350,7 +350,7 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 						continue;
 					}
 
-					CString str;
+					CStringW str;
 					if (Language) {
 						int len = GetLocaleInfoW(Language, LOCALE_SENGLANGUAGE, str.GetBuffer(256), 256);
 						str.ReleaseBufferSetLength(std::max(len-1, 0));
@@ -378,11 +378,11 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 								break;
 						}
 
-						CString format = AfxGetMainFrame()->GetDVDAudioFormatName(ATR);
+						CStringW format = AfxGetMainFrame()->GetDVDAudioFormatName(ATR);
 
 						if (!format.IsEmpty()) {
 							str.Format(ResStr(IDS_MAINFRM_11),
-									   CString(str),
+									   CStringW(str),
 									   format,
 									   ATR.dwFrequency,
 									   ATR.bQuantization,
@@ -408,7 +408,7 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 						continue;
 					}
 
-					CString str;
+					CStringW str;
 					if (Language) {
 						int len = GetLocaleInfoW(Language, LOCALE_SENGLANGUAGE, str.GetBuffer(256), 256);
 						str.ReleaseBufferSetLength(std::max(len - 1, 0));

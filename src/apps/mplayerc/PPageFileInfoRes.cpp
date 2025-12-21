@@ -47,11 +47,11 @@ static const mime_info_t s_image_mime_info[] = {
 };
 
 static const mime_info_t s_font_mime_info[] = {
+	{"font/ttf",                    "TrueType", "ttf"},
 	{"application/x-truetype-font", "TrueType", "ttf"},
 	{"application/x-font-ttf",      "TrueType", "ttf"},
-	{"font/ttf",                    "TrueType", "ttf"},
-	{"application/vnd.ms-opentype", "OpenType", "otf"},
 	{"font/otf",                    "OpenType", "otf"},
+	{"application/vnd.ms-opentype", "OpenType", "otf"},
 };
 
 static const mime_info_t s_other_mime_info[] = {
@@ -61,7 +61,7 @@ static const mime_info_t s_other_mime_info[] = {
 // CPPageFileInfoRes dialog
 
 IMPLEMENT_DYNAMIC(CPPageFileInfoRes, CPPageBase)
-CPPageFileInfoRes::CPPageFileInfoRes(const CString& fn, IFilterGraph* pFG, CDPI* pSheetDpi)
+CPPageFileInfoRes::CPPageFileInfoRes(const CStringW& fn, IFilterGraph* pFG, CDPI* pSheetDpi)
 	: CPPageBase(CPPageFileInfoRes::IDD, CPPageFileInfoRes::IDD)
 	, m_fn(fn)
 	, m_fullfn(fn)

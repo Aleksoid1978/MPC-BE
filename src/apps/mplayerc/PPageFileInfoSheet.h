@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -82,7 +82,7 @@ private:
 	int     m_nMinCY = 0;
 
 public:
-	CPPageFileInfoSheet(const std::list<CString>& files, CMainFrame* pMainFrame, CWnd* pParentWnd, const bool bOnlyMI = false);
+	CPPageFileInfoSheet(const std::list<CStringW>& files, CMainFrame* pMainFrame, CWnd* pParentWnd, const bool bOnlyMI = false);
 	virtual ~CPPageFileInfoSheet();
 
 	afx_msg void OnSaveAs();
