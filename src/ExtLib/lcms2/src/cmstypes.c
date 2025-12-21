@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2024 Marti Maria Saguer
+//  Copyright (c) 1998-2026 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -5713,11 +5713,11 @@ void Type_MHC2_Free(struct _cms_typehandler_struct* self, void* Ptr)
 
 void* Type_MHC2_Dup(struct _cms_typehandler_struct* self, const void* Ptr, cmsUInt32Number n)
 {
-    cmsMHC2Type* mhc2 = _cmsDupMem(self->ContextID, Ptr, sizeof(cmsMHC2Type));
+    cmsMHC2Type* mhc2 = (cmsMHC2Type*)_cmsDupMem(self->ContextID, Ptr, sizeof(cmsMHC2Type));
 
-    mhc2->RedCurve = _cmsDupMem(self->ContextID,   mhc2->RedCurve, mhc2->CurveEntries*sizeof(cmsFloat64Number));
-    mhc2->GreenCurve = _cmsDupMem(self->ContextID, mhc2->GreenCurve, mhc2->CurveEntries * sizeof(cmsFloat64Number));
-    mhc2->BlueCurve = _cmsDupMem(self->ContextID,  mhc2->BlueCurve, mhc2->CurveEntries * sizeof(cmsFloat64Number));
+    mhc2->RedCurve = (cmsFloat64Number*) _cmsDupMem(self->ContextID,   mhc2->RedCurve, mhc2->CurveEntries*sizeof(cmsFloat64Number));
+    mhc2->GreenCurve = (cmsFloat64Number*) _cmsDupMem(self->ContextID, mhc2->GreenCurve, mhc2->CurveEntries * sizeof(cmsFloat64Number));
+    mhc2->BlueCurve = (cmsFloat64Number*) _cmsDupMem(self->ContextID,  mhc2->BlueCurve, mhc2->CurveEntries * sizeof(cmsFloat64Number));
 
     if (mhc2->RedCurve == NULL ||
         mhc2->GreenCurve == NULL ||
@@ -5754,8 +5754,7 @@ cmsBool Type_MHC2_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, 
     cmsUInt32Number TablesOffsetPos;
     cmsUInt32Number MatrixOffset;
     cmsUInt32Number OffsetRedTable, OffsetGreenTable, OffsetBlueTable;
-
-    if (!_cmsWriteUInt32Number(io, 0)) return FALSE;
+    
     if (!_cmsWriteUInt32Number(io, mhc2->CurveEntries)) return FALSE;
 
     if (!_cmsWrite15Fixed16Number(io, mhc2->MinLuminance)) return FALSE;
@@ -5780,10 +5779,20 @@ cmsBool Type_MHC2_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, 
     }
 
     OffsetRedTable = io->Tell(io) - BaseOffset;
+
+    if(!_cmsWriteUInt32Number(io, cmsSigS15Fixed16ArrayType)) return FALSE;
+    if(!_cmsWriteUInt32Number(io, 0)) return FALSE;   
+
     if (!WriteDoubles(io, mhc2->CurveEntries, mhc2->RedCurve)) return FALSE;
+
     OffsetGreenTable = io->Tell(io) - BaseOffset;
+    if (!_cmsWriteUInt32Number(io, cmsSigS15Fixed16ArrayType)) return FALSE;
+    if (!_cmsWriteUInt32Number(io, 0)) return FALSE;
     if (!WriteDoubles(io, mhc2->CurveEntries, mhc2->GreenCurve)) return FALSE;
+
     OffsetBlueTable = io->Tell(io) - BaseOffset;
+    if (!_cmsWriteUInt32Number(io, cmsSigS15Fixed16ArrayType)) return FALSE;
+    if (!_cmsWriteUInt32Number(io, 0)) return FALSE;
     if (!WriteDoubles(io, mhc2->CurveEntries, mhc2->BlueCurve)) return FALSE;
 
     if (!io->Seek(io, TablesOffsetPos)) return FALSE;
@@ -5826,9 +5835,7 @@ void* Type_MHC2_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, cms
     cmsUInt32Number BaseOffset = io->Tell(io) - sizeof(_cmsTagBase);
     cmsUInt32Number MatrixOffset;
     cmsUInt32Number OffsetRedTable, OffsetGreenTable, OffsetBlueTable;
-    
-    if (!_cmsReadUInt32Number(io, NULL)) return NULL;
-
+        
     mhc2 = (cmsMHC2Type*)_cmsCalloc(self->ContextID, 1, sizeof(cmsMHC2Type));
     if (mhc2 == NULL) return NULL;
 
@@ -5859,9 +5866,10 @@ void* Type_MHC2_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, cms
         if (!ReadDoublesAt(io, BaseOffset + MatrixOffset, 3*4, &mhc2->XYZ2XYZmatrix[0][0])) goto Error;
     }
 
-    if (!ReadDoublesAt(io, BaseOffset + OffsetRedTable, mhc2->CurveEntries, mhc2->RedCurve)) goto Error;
-    if (!ReadDoublesAt(io, BaseOffset + OffsetGreenTable, mhc2->CurveEntries, mhc2->GreenCurve)) goto Error;
-    if (!ReadDoublesAt(io, BaseOffset + OffsetBlueTable, mhc2->CurveEntries, mhc2->BlueCurve)) goto Error;
+    // Skip sf32 tag and filler (8bytes)
+    if (!ReadDoublesAt(io, BaseOffset + OffsetRedTable + 8, mhc2->CurveEntries, mhc2->RedCurve)) goto Error;
+    if (!ReadDoublesAt(io, BaseOffset + OffsetGreenTable + 8, mhc2->CurveEntries, mhc2->GreenCurve)) goto Error;
+    if (!ReadDoublesAt(io, BaseOffset + OffsetBlueTable + 8, mhc2->CurveEntries, mhc2->BlueCurve)) goto Error;
     
     // Success
     *nItems = 1;
