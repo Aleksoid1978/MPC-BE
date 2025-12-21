@@ -3094,11 +3094,11 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PROPSHEET_NAME      "Name"
-    IDS_PROPSHEET_MIME      "MIME type"
-    IDS_PROPSHEET_DESC      "Description"
-    IDS_PROPSHEET_FILE_IMAGE "%hs image"
-    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_PROPSHEET_NAME      "Имя"
+    IDS_PROPSHEET_MIME      "MIME-тип"
+    IDS_PROPSHEET_DESC      "Описание"
+    IDS_PROPSHEET_FILE_IMAGE "Изображение %hs"
+    IDS_PROPSHEET_FILE_FONT "Шрифт %hs"
     IDS_AUDIOWINDOW_NONE    "не менять размер окна"
     IDS_AUDIOWINDOW_COVER   "показывать обложки дисков"
     IDS_AUDIOWINDOW_HIDE    "скрывать видеообласть"
