@@ -14,8 +14,8 @@
  bit1; bit
  bit2; bits
  bit3; bits
- bps; b/s
  Bps; B/s
+ bps; b/s
  Byte1; Byte
  Byte2; Bytes
  Byte3; Bytes
@@ -49,8 +49,8 @@
  frame3;
  GB; GB
  Gb; Gb
- Gbps; Gb/s
  GBps; GB/s
+ Gbps; Gb/s
  GHz; GHz
  GiB; GiB
  GibiByte1; GibiBytes
@@ -91,8 +91,8 @@
  KiloByte3; KiloBytes
  MB; MB
  Mb; Mb
- Mbps; Mb/s
  MBps; MebiBytes
+ Mbps; Mb/s
  MebiBit1; MebiBit
  MebiBit2; MebiBits
  MebiBit3; MebiBits
@@ -163,6 +163,7 @@ About;Πληροφορίες
 About_Hint;Πως θα επικοινωνήσετε μαζί μου και θα βρείτε νεότερη έκδoση
 AC3_Metadata;
 Accompaniment;Συνοδεία
+acmod;
 Active_DisplayAspectRatio;
 Active_Height;
 Active_Width;
@@ -178,9 +179,9 @@ AdID;
 ADM: Show ChannelFormats;
 ADM: Show TrackUIDs;
 AdmProfile;
-Advanced;Για προχωρημένους
-Advanced mode;Κατάσταση λειτουργίας για προχωρημένους
 Advanced mode -->;
+Advanced mode;Κατάσταση λειτουργίας για προχωρημένους
+Advanced;Για προχωρημένους
 Album;Album
 Album_ReplayGain_Gain;
 Album_ReplayGain_Peak;
@@ -200,11 +201,12 @@ ArtDirector;ArtDirector
 AspectRatio;Λόγος εικόνας
 AssistantDirector;AssistantDirector
 AssociatedVideo_FrameRate;
-at;at
 At least one file;(Πρέπει να ανοίξετε τουλάχιστον ένα αρχείο)
+at;at
 Attachments;
-Audio;Ήχος
 Audio stream(s);Ροές ήχου
+Audio;Ήχος
+Audio_Channels_Total;
 Audio_Codec_List;Κωδικοποιητές ήχου
 Audio_Format_List;
 Audio_Format_WithHint_List;
@@ -246,6 +248,7 @@ BitRate_Nominal;
 Bits-(Pixel*Frame);Bits/(Εικονοστοιχείο*Πλαίσιο)
 BitstreamLevel;
 Bring All to Front;Μεταφορά όλων σε πρώτο πλάνο
+bsid;
 BufferSize;
 Cancel;Άκυρο
 CaptionServiceName;
@@ -261,8 +264,8 @@ ChannelMode;
 ChannelPositions;Θέσεις καναλιών
 ChannelPositions_Original;
 Chapter(s);Κεφάλαιο(α)
-Chapters;Κεφάλαια
 Chapters stream(s);Ροές κεφαλαίων
+Chapters;Κεφάλαια
 Chapters_Codec_List;Συμπιεστές κεφαλαίων
 Chapters_No;Χωρίς κεφάλαια
 Chapters_Pos_Begin;
@@ -270,9 +273,9 @@ Chapters_Pos_End;
 ChaptersCount;Αριθμός των κεφαλαίων
 CharacterSet;
 CheckNewVersion; Έλεγχoς για ενημερωμένες εκδώσεις
-Choose custom;Επιλέξτε προσαρμοσμένο:
 Choose custom sheet;Επιλέξτε το επιθυμητό προσαρμοσμένο φύλλο
 Choose custom text;Επιλέξτε το επιθυμητό προσαρμοσμένο κείμενο
+Choose custom;Επιλέξτε προσαρμοσμένο:
 Choose export format;Επιλέξτε your desired export format
 Choose file(s);Επιλέξτε το αρχείο για άνοιγμα
 Choose filename;Επιλέξτε το επιθυμητό όνομα αρχείου
@@ -282,14 +285,15 @@ Chroma;Χρώμα
 ChromaSubsampling;
 Classifier;
 ClearList;
-Close;Κλείσιμο
 Close all before open;Κλείστε όλα τα ανοιχτά αρχεία πριν το άνοιγμα νέων
+Close;Κλείσιμο
 CloseAll;
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
 CloseFile;
 CloseWindow;Κλείσιμο παραθύρου
+cmixlev;
 Codec;Συμπιεστής
 Codec_Description;
 Codec_Info;Λεπτομέρειες του συμπιεστή
@@ -319,8 +323,12 @@ ColorTheme;
 ColorTheme_Dark;
 ColorTheme_Light;
 ColorTheme_System;
+colour_description_present;
+colour_description_present_Source;
 colour_primaries;
+colour_primaries_Source;
 colour_range;
+colour_range_Source;
 Comment;Σχόλιο
 CommissionedBy;Commissioned by
 Compare;
@@ -359,6 +367,7 @@ Cover_Description;
 Cover_Mime;
 Cover_Type;
 CoverData;
+CreatedOn;
 Cropped;
 Custom;Προσαρμοσμένη
 CustomDownmixTargets;
@@ -367,8 +376,8 @@ DarkMode;
 Date;Ημερομηνία
 Debug;Αποσφαλμάτωση
 Decimal point;Decimal point
-Default;
 Default translation;
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 DefaultView;
@@ -380,6 +389,10 @@ Delete;Διαγραφή
 Description;Περιγραφή
 Details;
 dialnorm;
+dialnorm_Average;
+dialnorm_Count;
+dialnorm_Maximum;
+dialnorm_Minimum;
 DialogueCorrected;
 DialogueEnhancement;
 DialogueNormalization;
@@ -428,6 +441,8 @@ ElementCount;
 EMail;E-Mail
 Enable FFmpeg plugin;
 Encoded_Application;Εφαρμογή εγγραφής
+Encoded_Application_Name;
+Encoded_Application_Version;
 Encoded_Date;Ημερομηνία κωδικοποίησης
 Encoded_Hardware;
 Encoded_Library;Βιβλιοθήκη κωδικοποιητή
@@ -462,8 +477,8 @@ Feature_FilesCompare;
 Feature_More;
 Feature_SelectView;
 Field;
-File;Αρχείο
 File size;Μέγεθος αρχείου
+File;Αρχείο
 File_Append;Πρόσθεση στο τέλος υπάρχοντος αρχείου (Προειδοποίηση : πρέπει να έχουν όμοιους παραμέτρους)
 File_Created_Date;
 File_Created_Date_Local;
@@ -481,10 +496,10 @@ FirstDisplay_Type;
 FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
-Folder;Φάκελος
 Folder (R);Φάκελος (R)
 Folder (R)_Hint;Επιλέξτε έναν φάκελο για εξέταση (με τους υποφακέλους αναδρομικά)
 Folder (Recursively);Φάκελος (Αναδρομικά)
+Folder;Φάκελος
 Folder_Hint;Επιλέξτε έναν φάκελο για εξέταση
 FolderName;Όνομα φακέλου
 Forced;
@@ -769,8 +784,8 @@ HTML;HTML
 ID;ID
 IdentClockStart;
 IFrameInterval;
-Image;Εικόνα
 Image stream(s);Ροές εικόνας
+Image;Εικόνα
 Image_Codec_List;Συμπιεστές εικόνας
 ImageCount;Αριθμός των ροών εικόνας
 ImmersiveStereo;
@@ -1001,12 +1016,12 @@ Language_yue;
 Language_za;Zhuang
 Language_zh;Chinese
 Language_zh-cmn;
-Language_zh-cn;
 Language_zh-CN;
+Language_zh-cn;
 Language_zh-Hans;
 Language_zh-Hant;
-Language_zh-tw;
 Language_zh-TW;
+Language_zh-tw;
 Language_zh-yue;
 Language_zu;Zulu
 LanguageChanges;
@@ -1016,6 +1031,7 @@ LCCN;LCCN
 LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
+lfeon;
 Library;Muxing library
 Lifetime_Subscribe_Button;
 Lightness;
@@ -1068,6 +1084,7 @@ MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;
+matrix_coefficients_Source;
 Matrix_Format;
 MaxCLL;
 MaxFALL;
@@ -1079,8 +1096,8 @@ MD5_Unencoded;
 MediaInfo_About;Παρέχει λεπτομερείς πληροφορίες\r\nγια αρχεία πολυμέσων:\r\nMatroska, OGG (συμπεριλαμβάνεται OGM)\r\nMPEG1 (συμπεριλαμβάνεται VCD)\r\nMPEG2 (συμπεριλαμβάνεται DVD και SVCD)\r\nMPEG4 (συμπεριλαμβάνεται Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (συμπεριλαμβάνεται WMV, WMA)\r\nMicrosoft RIFF (συμπεριλαμβάνεται AVI, WAV)\r\nΜορφοποιήσεις ήχου (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
 MediaInfo_WebSite;
-Menu;Μενού
 Menu stream(s);Ροές μενού
+Menu;Μενού
 Menu_Codec_List;Συμπιεστές μενού
 Menu_Hint;Περισσότερες πιθανότητες
 Menu_No;Χωρίς μενού
@@ -1151,13 +1168,15 @@ Other;Άλλος
 OtherIdentifier;
 OtherIdentifierType;
 OtherViews;
-Output;Έξοδος
 Output format;Μορφοποίηση εξόδου
+Output;Έξοδος
 OverallBitRate;Συνολικό BitRate
 OverallBitRate_Maximum;
 OverallBitRate_Minimum;
 OverallBitRate_Mode;
 OverallBitRate_Nominal;
+OverallBitRate_Precision_Max;
+OverallBitRate_Precision_Min;
 PackageName;
 PackFormat;
 Part;Μέρος
@@ -1227,6 +1246,7 @@ Renew;
 ReplayGain_Gain;
 ReplayGain_Peak;
 Report;
+ReportBy;
 Resolution;Ανάλυση
 RestoreLifetimeSubscription;
 Retry;
@@ -1270,17 +1290,17 @@ Set;Set
 Set_Count;Set count
 Setup;Ρυθμίσεις
 Sharpness;
-Sheet;Φύλλο
 Sheet (Complete);Φύλλο (Πλήρες)
-Shell extension;Shell extension (in explorer right click there will be a Media Info option)
+Sheet;Φύλλο
 Shell extension, folder;
 Shell extension, separate instance;
+Shell extension;Shell extension (in explorer right click there will be a Media Info option)
 Shell InfoTip;Shell InfoTip (in explorer, move the mouse on file, info will be displayed)
 ShimName;
 ShimVersion;
-Show;
 Show menu;Εμφάνιση μενού
 Show toolbar;Εμφάνιση εργαλειοθήκης
+Show;
 ShowAll;Εμφάνιση όλων
 ShowMore;
 SignalGroup;
@@ -1297,6 +1317,7 @@ Source_StreamSize;
 Source_StreamSize_Encoded;
 SpokenSubtitles;
 Standard;Στάνταρ
+Stored_Height;
 StoreMethod_InterleavedFields;
 StoreMethod_SeparatedFields;
 StoreMethod_SeparatedFields_1;
@@ -1340,6 +1361,7 @@ Supported formats;Υποστηριζόμενες μορφοποιήσεις
 Supported?;Υποστηρίζεται?
 SupportUs;
 SupportUs2;
+surmixlev;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Σύνοψη
@@ -1351,11 +1373,11 @@ Technician;Τεχνικός
 TermsOfUse;Όροι χρήσης
 TertiaryAudioLanguage;
 TestContinuousFileNames;
-Text;Κείμενο
 Text - Custom;Κείμενο - Προσαρμοσμένο
 Text (HTML);Κείμενο (HTML)
 Text stream(s);Ροές κειμένου
 Text streams;Ροές κειμένου
+Text;Κείμενο
 Text_Codec_List;Συμπιεστές κειμένου
 Text_Format_List;
 Text_Format_WithHint_List;
@@ -1395,11 +1417,12 @@ TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;
+transfer_characteristics_Source;
 Translate_Reports;
 Translator;Μεταφραστής
 Transport;
-Tree;Δένδρο
 Tree & Text;Δένδρο & Κείμενο
+Tree;Δένδρο
 Trim_Center;
 Trim_Height;
 Trim_Surround;
@@ -1444,8 +1467,8 @@ UniversalAdID_Value;
 Unknown;Άγνωστο
 Url;Url
 Value;
-Video;Video
 Video stream(s);Video stream(s)
+Video;Video
 Video_Codec_List;Συμπιεστές Video
 Video_Delay;Καθηστέριση video
 Video_Format_List;
@@ -1486,5 +1509,5 @@ Yes;Ναι
 Your system;Το σύστημά σας
 Your translation;
 Zoom;Ζουμ
-ZZ_Automatic_Percent;52
-ZZ_AutomaticLanguage_Percent;56
+ZZ_Automatic_Percent;51
+ZZ_AutomaticLanguage_Percent;55

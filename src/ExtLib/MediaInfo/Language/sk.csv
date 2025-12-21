@@ -14,8 +14,8 @@
  bit1; bit
  bit2; bity
  bit3; bitov
- bps; b/s
  Bps; B/s
+ bps; b/s
  Byte1; Byte
  Byte2; Byty
  Byte3; Bytov
@@ -49,8 +49,8 @@
  frame3;snímok
  GB; GB
  Gb; Gb
- Gbps; Gb/s
  GBps; GB/s
+ Gbps; Gb/s
  GHz; GHz
  GiB; GiB
  GibiByte1; GibiBytes
@@ -91,8 +91,8 @@
  KiloByte3; kiloBytov
  MB; MB
  Mb; Mb
- Mbps; Mb/s
  MBps; MebiBytov
+ Mbps; Mb/s
  MebiBit1; MebiBit
  MebiBit2; MebiBitov
  MebiBit3; MebiBitov
@@ -163,6 +163,7 @@ About;O programe
 About_Hint;O programe
 AC3_Metadata;
 Accompaniment;Accompaniment
+acmod;
 Active_DisplayAspectRatio;
 Active_Height;
 Active_Width;
@@ -178,9 +179,9 @@ AdID;
 ADM: Show ChannelFormats;
 ADM: Show TrackUIDs;
 AdmProfile;
-Advanced;Pokročilé
-Advanced mode;Viac detailov
 Advanced mode -->;
+Advanced mode;Viac detailov
+Advanced;Pokročilé
 Album;Album
 Album_ReplayGain_Gain;
 Album_ReplayGain_Peak;
@@ -200,11 +201,12 @@ ArtDirector;ArtDirector
 AspectRatio;Pomer strán
 AssistantDirector;AssistantDirector
 AssociatedVideo_FrameRate;
-at;pri
 At least one file;(Musíš najprv otvoriť súbor)
+at;pri
 Attachments;
-Audio;Audio
 Audio stream(s);Audio streamy
+Audio;Audio
+Audio_Channels_Total;
 Audio_Codec_List;Audio kodeky
 Audio_Format_List;
 Audio_Format_WithHint_List;
@@ -246,6 +248,7 @@ BitRate_Nominal;
 Bits-(Pixel*Frame);Bitov/(Bod*Snímka)
 BitstreamLevel;
 Bring All to Front;Presunúť všetky do popredia
+bsid;
 BufferSize;
 Cancel;Zrušiť
 CaptionServiceName;
@@ -261,8 +264,8 @@ ChannelMode;
 ChannelPositions;Channel positions
 ChannelPositions_Original;
 Chapter(s);Kapitola(y)
-Chapters;Kapitoly
 Chapters stream(s);Chapters stream(s)
+Chapters;Kapitoly
 Chapters_Codec_List;Chapters Codecs
 Chapters_No;No chapters
 Chapters_Pos_Begin;
@@ -270,9 +273,9 @@ Chapters_Pos_End;
 ChaptersCount;Count of chapter streams
 CharacterSet;
 CheckNewVersion;Skontrolovať novú verziu
-Choose custom;Výber užívateľa
 Choose custom sheet;Vyberte požadovaný formát zobrazení
 Choose custom text;Vyberte vlastné nastavenie textu
+Choose custom;Výber užívateľa
 Choose export format;Vyberte požadovaný exportný formát
 Choose file(s);Vyberte súbor pre otvorenie
 Choose filename;Vyberte požadovaný názov súboru
@@ -282,14 +285,15 @@ Chroma;Chroma
 ChromaSubsampling;
 Classifier;
 ClearList;
-Close;Zatvoriť
 Close all before open;Zatvoriť všetko pred otvorením nového
+Close;Zatvoriť
 CloseAll;
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
 CloseFile;
 CloseWindow;Zatvoriť okno
+cmixlev;
 Codec;Kodek
 Codec_Description;Popis kodeku
 Codec_Info;Detaily kodeku
@@ -319,8 +323,12 @@ ColorTheme;
 ColorTheme_Dark;
 ColorTheme_Light;
 ColorTheme_System;
+colour_description_present;
+colour_description_present_Source;
 colour_primaries;
+colour_primaries_Source;
 colour_range;
+colour_range_Source;
 Comment;Komentár
 CommissionedBy;Commissioned by
 Compare;
@@ -359,6 +367,7 @@ Cover_Description;Popis obalu
 Cover_Mime;
 Cover_Type;Typ obalu
 CoverData;
+CreatedOn;
 Cropped;
 Custom;Vlastné
 CustomDownmixTargets;
@@ -367,8 +376,8 @@ DarkMode;
 Date;Dátum
 Debug;Pokročilé
 Decimal point;Decimal point
-Default;
 Default translation;
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 DefaultView;
@@ -380,6 +389,10 @@ Delete;Odstrániť
 Description;Popis
 Details;
 dialnorm;
+dialnorm_Average;
+dialnorm_Count;
+dialnorm_Maximum;
+dialnorm_Minimum;
 DialogueCorrected;
 DialogueEnhancement;
 DialogueNormalization;
@@ -428,6 +441,8 @@ ElementCount;
 EMail;E-Mail
 Enable FFmpeg plugin;
 Encoded_Application;Použitý software
+Encoded_Application_Name;
+Encoded_Application_Version;
 Encoded_Date;Dátum zakódovania
 Encoded_Hardware;
 Encoded_Library;Zakódoval
@@ -462,8 +477,8 @@ Feature_FilesCompare;
 Feature_More;
 Feature_SelectView;
 Field;
-File;Súbor
 File size;Veľkosť súboru
+File;Súbor
 File_Append;Pripojiť k existujúcemu súboru (Upozornenie : buďte si istý rovnakými parametrami)
 File_Created_Date;Dátum vytvorenia súboru
 File_Created_Date_Local;Dátum (miestny) vytvorenia súboru
@@ -481,10 +496,10 @@ FirstDisplay_Type;
 FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
-Folder;Adresár
 Folder (R);Adresár (R)
 Folder (R)_Hint;Select a folder to study (with all folders recursively)
 Folder (Recursively);Adresár (Recursively)
+Folder;Adresár
 Folder_Hint;Otvoriť všetko v adresári
 FolderName;Názov adresára
 Forced;
@@ -769,8 +784,8 @@ HTML;HTML
 ID;ID
 IdentClockStart;
 IFrameInterval;
-Image;Obrázok
 Image stream(s);Image streams
+Image;Obrázok
 Image_Codec_List;Codecs Image
 ImageCount;Count of image streams
 ImmersiveStereo;
@@ -1001,12 +1016,12 @@ Language_yue;
 Language_za;Zhuang
 Language_zh;Čínsky
 Language_zh-cmn;
-Language_zh-cn;Čínsky (Čína)
 Language_zh-CN;
+Language_zh-cn;Čínsky (Čína)
 Language_zh-Hans;
 Language_zh-Hant;
-Language_zh-tw;Čínsky (Taiwan)
 Language_zh-TW;
+Language_zh-tw;Čínsky (Taiwan)
 Language_zh-yue;
 Language_zu;Zulu
 LanguageChanges;
@@ -1016,6 +1031,7 @@ LCCN;LCCN
 LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
+lfeon;
 Library;Muxing library
 Lifetime_Subscribe_Button;
 Lightness;
@@ -1068,6 +1084,7 @@ MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;
+matrix_coefficients_Source;
 Matrix_Format;
 MaxCLL;
 MaxFALL;
@@ -1079,8 +1096,8 @@ MD5_Unencoded;
 MediaInfo_About;Supply very detailled information\r\nabout a multimedia file:\r\nMatroska, OGG (including OGM)\r\nMPEG1 (including VCD)\r\nMPEG2 (including DVD and SVCD)\r\nMPEG4 (including Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (including WMV, WMA)\r\nMicrosoft RIFF (including AVI, WAV)\r\nSound-only formats (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
 MediaInfo_WebSite;
-Menu;Menu
 Menu stream(s);Menu streams
+Menu;Menu
 Menu_Codec_List;
 Menu_Hint;More possibilities
 Menu_No;Žiadne menu
@@ -1151,13 +1168,15 @@ Other;Rôzne
 OtherIdentifier;
 OtherIdentifierType;
 OtherViews;
-Output;Výstup
 Output format;Zobraziť ako
+Output;Výstup
 OverallBitRate;Celkový dátový tok
 OverallBitRate_Maximum;
 OverallBitRate_Minimum;
 OverallBitRate_Mode;
 OverallBitRate_Nominal;
+OverallBitRate_Precision_Max;
+OverallBitRate_Precision_Min;
 PackageName;
 PackFormat;
 Part;Časť
@@ -1227,6 +1246,7 @@ Renew;
 ReplayGain_Gain;
 ReplayGain_Peak;
 Report;
+ReportBy;
 Resolution;Rozlíšenie
 RestoreLifetimeSubscription;
 Retry;
@@ -1270,17 +1290,17 @@ Set;Nastaviť
 Set_Count;Set count
 Setup;Hlavné
 Sharpness;
-Sheet;List
 Sheet (Complete);List (kompletný) 
-Shell extension;Integrovať do kontextového menu Prieskumníka (pravé tlačíidlo myši)
+Sheet;List
 Shell extension, folder;
 Shell extension, separate instance;
+Shell extension;Integrovať do kontextového menu Prieskumníka (pravé tlačíidlo myši)
 Shell InfoTip;Integrovať do kontextového menu (pri nadídení myši na súbor)
 ShimName;
 ShimVersion;
-Show;
 Show menu;Zobraziť menu
 Show toolbar;Zobraziť nástrojovú lištu
+Show;
 ShowAll;Zobraziť všetky
 ShowMore;
 SignalGroup;
@@ -1297,6 +1317,7 @@ Source_StreamSize;
 Source_StreamSize_Encoded;
 SpokenSubtitles;
 Standard;Štandard
+Stored_Height;
 StoreMethod_InterleavedFields;
 StoreMethod_SeparatedFields;
 StoreMethod_SeparatedFields_1;
@@ -1340,6 +1361,7 @@ Supported formats;Podporované formáty
 Supported?;Podporovaný?
 SupportUs;
 SupportUs2;
+surmixlev;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Synopsis
@@ -1351,11 +1373,11 @@ Technician;Technician
 TermsOfUse;Terms of use
 TertiaryAudioLanguage;
 TestContinuousFileNames;
-Text;Text
 Text - Custom;Text - Vlastný
 Text (HTML);Text (HTML)
 Text stream(s);Text streams
 Text streams;Text streams
+Text;Text
 Text_Codec_List;Text codecs
 Text_Format_List;
 Text_Format_WithHint_List;
@@ -1395,11 +1417,12 @@ TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;
+transfer_characteristics_Source;
 Translate_Reports;
 Translator;Preložil
 Transport;
-Tree;Strom
 Tree & Text;Strom a text
+Tree;Strom
 Trim_Center;
 Trim_Height;
 Trim_Surround;
@@ -1444,8 +1467,8 @@ UniversalAdID_Value;
 Unknown;Neznámy
 Url;Url
 Value;
-Video;Video
 Video stream(s);Video stream(y)
+Video;Video
 Video_Codec_List;Video kodeky
 Video_Delay;Video delay
 Video_Format_List;
@@ -1486,5 +1509,5 @@ Yes;Áno
 Your system;Váš systém
 Your translation;
 Zoom;Zmeniť veľkosť
-ZZ_Automatic_Percent;55
-ZZ_AutomaticLanguage_Percent;59
+ZZ_Automatic_Percent;54
+ZZ_AutomaticLanguage_Percent;58

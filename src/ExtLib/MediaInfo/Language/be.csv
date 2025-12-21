@@ -14,8 +14,8 @@
  bit1; біт
  bit2; біты
  bit3; біт
- bps; біт/сек
  Bps; байт/сек
+ bps; біт/сек
  Byte1; байт
  Byte2; байты
  Byte3; байт
@@ -49,8 +49,8 @@
  frame3; кадраў
  GB; ГБ
  Gb; Гбіт
- Gbps; Гбіт/сек
  GBps; ГБ/сек
+ Gbps; Гбіт/сек
  GHz; ГГц
  GiB; ГіБ
  GibiByte1; Гібібайт
@@ -91,8 +91,8 @@
  KiloByte3; Кілабайт
  MB; МБ
  Mb; Мбіт
- Mbps; Мбіт/сек
  MBps; МБ/сек
+ Mbps; Мбіт/сек
  MebiBit1; Мебiбiт
  MebiBit2; Мебiбiты
  MebiBit3; Мебiбiт
@@ -163,6 +163,7 @@ About;Пра праграму
 About_Hint;Кантакты і пошук новай версіі
 AC3_Metadata;
 Accompaniment;Суправаджэнне
+acmod;
 Active_DisplayAspectRatio;Актуальныя суадносіны бакоў дысплея
 Active_Height;Актуальная вышыня
 Active_Width;Актуальная шырыня
@@ -178,9 +179,9 @@ AdID;Паказальнік рэкламнага ідэнтыфікатара
 ADM: Show ChannelFormats;ADM: паказваць элементы ChannelFormat
 ADM: Show TrackUIDs;ADM: паказваць элементы TrackUID
 AdmProfile;Профіль ADM
-Advanced;Дадаткова
-Advanced mode;Пашыраны рэжым
 Advanced mode -->;
+Advanced mode;Пашыраны рэжым
+Advanced;Дадаткова
 Album;Альбом
 Album_ReplayGain_Gain;Нармалізатар гуку альбома
 Album_ReplayGain_Peak;Пік нармалізатара гуку альбома
@@ -200,11 +201,12 @@ ArtDirector;Арт-дырэктар
 AspectRatio;Суадносіны
 AssistantDirector;Памочнік рэжысёра
 AssociatedVideo_FrameRate;Адпаведная частата кадраў відэа
-at;у
 At least one file;(Трэба адкрыць як мінімум адзін файл)
+at;у
 Attachments;
-Audio;Аўдыя
 Audio stream(s);Аўдыяпаток(-і)
+Audio;Аўдыя
+Audio_Channels_Total;
 Audio_Codec_List;Аўдыякодэкі
 Audio_Format_List;
 Audio_Format_WithHint_List;
@@ -246,6 +248,7 @@ BitRate_Nominal;Намінальны бітрэйт
 Bits-(Pixel*Frame);Біт/(Пікселі*Кадры)
 BitstreamLevel;
 Bring All to Front;
+bsid;
 BufferSize;Памер буфера
 Cancel;Скасаваць
 CaptionServiceName;
@@ -261,8 +264,8 @@ ChannelMode;
 ChannelPositions;Размяшчэнне каналаў
 ChannelPositions_Original;
 Chapter(s);Раздзел(ы)
-Chapters;Раздзелы
 Chapters stream(s);Паток(і) раздзелаў
+Chapters;Раздзелы
 Chapters_Codec_List;Кодэкі раздзелаў
 Chapters_No;Няма раздзелаў
 Chapters_Pos_Begin;
@@ -270,9 +273,9 @@ Chapters_Pos_End;
 ChaptersCount;Колькасць раздзелаў
 CharacterSet;
 CheckNewVersion;Праверыць наяўнасць новай версіі
-Choose custom;Выбраць
 Choose custom sheet;Выбраць табліцу
 Choose custom text;Выбраць тэкст
+Choose custom;Выбраць
 Choose export format;Выберыце фармат вываду
 Choose file(s);Выбраць файл(ы)
 Choose filename;Выбраць назву файла
@@ -282,14 +285,15 @@ Chroma;Колернасць
 ChromaSubsampling;Колеравая субдыскрэтызацыя
 Classifier;Класіфікатар змесціва
 ClearList;Ачысціць спіс
-Close;Закрыць
 Close all before open;Закрываць усё перад адкрыццём новых файлаў
+Close;Закрыць
 CloseAll;
 ClosedCaptionsLanguage;Мова субцітраў
 ClosedCaptionsPresent;Наяўнасць субцітраў
 ClosedCaptionsType;Тып субцітраў
 CloseFile;
 CloseWindow;
+cmixlev;
 Codec;Кодэк
 Codec_Description;Апісанне кодэка
 Codec_Info;Падрабязна аб кодэку
@@ -319,8 +323,12 @@ ColorTheme;Тэма
 ColorTheme_Dark;Цёмная
 ColorTheme_Light;Светлая
 ColorTheme_System;Сістэмная
+colour_description_present;
+colour_description_present_Source;
 colour_primaries;Асноўныя колеры
+colour_primaries_Source;
 colour_range;Колеравы дыяпазон
+colour_range_Source;
 Comment;Каментарый
 CommissionedBy;Паручыцель
 Compare;
@@ -359,6 +367,7 @@ Cover_Description;Апісанне вокладкі
 Cover_Mime;MIME-тып вокладкі
 Cover_Type;Тып вокладкі
 CoverData;
+CreatedOn;
 Cropped;Памеры падрэзкі
 Custom;Выбарачна
 CustomDownmixTargets;Наладжвальныя фарматы паніжальнага міксавання
@@ -367,8 +376,8 @@ DarkMode;Цёмны рэжым
 Date;Дата
 Debug;Адладка
 Decimal point;Дзесятковая кропка
-Default;
 Default translation;
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 DefaultView;
@@ -380,6 +389,10 @@ Delete;Выдаліць
 Description;Апісанне
 Details;
 dialnorm;
+dialnorm_Average;
+dialnorm_Count;
+dialnorm_Maximum;
+dialnorm_Minimum;
 DialogueCorrected;
 DialogueEnhancement;
 DialogueNormalization;
@@ -428,6 +441,8 @@ ElementCount;
 EMail;Пошта
 Enable FFmpeg plugin;
 Encoded_Application;Праграма кадзіравання
+Encoded_Application_Name;
+Encoded_Application_Version;
 Encoded_Date;Дата кадзіравання
 Encoded_Hardware;
 Encoded_Library;Бібліятэка кадзіравання
@@ -462,8 +477,8 @@ Feature_FilesCompare;
 Feature_More;
 Feature_SelectView;
 Field;
-File;Файл
 File size;Памер файла
+File;Файл
 File_Append;Дадаць да існуючага файла (Папярэджанне: пераканайцеся ў адпаведнасці параметраў)
 File_Created_Date;Дата стварэння файла
 File_Created_Date_Local;Дата стварэння файла (лакальная)
@@ -481,10 +496,10 @@ FirstDisplay_Type;
 FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
-Folder;Папка
 Folder (R);Папка (R)
 Folder (R)_Hint;Выберыце папку для апрацоўкі (з усімі ўкладзенымі папкамі)
 Folder (Recursively);Папка (рэкурсіўна)
+Folder;Папка
 Folder_Hint;Выберыце папку для апрацоўкі
 FolderName;Назва папкі
 Forced;Прымусова
@@ -769,8 +784,8 @@ HTML;HTML
 ID;Ідэнтыфікатар
 IdentClockStart;
 IFrameInterval;
-Image;Відарысы
 Image stream(s);Паток(і) відарысаў
+Image;Відарысы
 Image_Codec_List;Кодэкі відарысаў
 ImageCount;Колькасць патокаў відарысаў
 ImmersiveStereo;
@@ -1001,12 +1016,12 @@ Language_yue;
 Language_za;Zhuang
 Language_zh;Chinese
 Language_zh-cmn;
-Language_zh-cn;Chinese (China)
 Language_zh-CN;
+Language_zh-cn;Chinese (China)
 Language_zh-Hans;
 Language_zh-Hant;
-Language_zh-tw;Chinese (Taiwan)
 Language_zh-TW;
+Language_zh-tw;Chinese (Taiwan)
 Language_zh-yue;
 Language_zu;Zulu
 LanguageChanges;
@@ -1016,6 +1031,7 @@ LCCN;LCCN
 LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
+lfeon;
 Library;Бібліятэка мультыплексавання
 Lifetime_Subscribe_Button;
 Lightness;Яркасць
@@ -1068,6 +1084,7 @@ MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;Каэфіцыенты матрыцы
+matrix_coefficients_Source;
 Matrix_Format;
 MaxCLL;
 MaxFALL;
@@ -1079,8 +1096,8 @@ MD5_Unencoded;
 MediaInfo_About;MediaInfo дазваляе атрымаць доступ да падрабязнай інфармацыі\r\nпра мультымедыя-файлы Matroska, OGG (уключаючы OGM)\r\nMPEG1 (уключаючы VCD), MPEG2 (уключаючы DVD і SVCD), MPEG4 (уключаючы iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (уключаючы WMV, WMA)\r\nMicrosoft RIFF (уключаючы AVI, WAV, DivX)\r\nгукавыя фарматы (AC3, DTS, SSC, AU, AIFF)
 MediaInfo_About_About;MediaInfo v%MI_VERSION% выкарыстоўвае MediaInfoLib v%MIL_VERSION%
 MediaInfo_WebSite;
-Menu;Меню
 Menu stream(s);Меню патокаў
+Menu;Меню
 Menu_Codec_List;Меню кодэкаў
 Menu_Hint;Дадатковыя магчымасці
 Menu_No;Няма меню
@@ -1151,13 +1168,15 @@ Other;Іншае
 OtherIdentifier;
 OtherIdentifierType;
 OtherViews;
-Output;Вывад
 Output format;Фармат вываду
+Output;Вывад
 OverallBitRate;Агульны бітрэйт
 OverallBitRate_Maximum;Максімальны агульны бітрэйт
 OverallBitRate_Minimum;Мінімальны агульны бітрэйт
 OverallBitRate_Mode;Рэжым агульнага бітрэйту
 OverallBitRate_Nominal;Намінальны агульны бітрэйт
+OverallBitRate_Precision_Max;
+OverallBitRate_Precision_Min;
 PackageName;
 PackFormat;
 Part;Частка
@@ -1227,6 +1246,7 @@ Renew;
 ReplayGain_Gain;Нармалізатар гука
 ReplayGain_Peak;Пік нармалізатара гука
 Report;
+ReportBy;
 Resolution;Раздзяляльнасць
 RestoreLifetimeSubscription;
 Retry;
@@ -1270,17 +1290,17 @@ Set;Канфігурацыя
 Set_Count;Колькасць канфігурацый
 Setup;Наладжванне
 Sharpness;Рэзкасць
-Sheet;Табліца
 Sheet (Complete);Табліца (поўная)
-Shell extension;Пашырэнне ў правадніку (пункт у кантэкстным меню правадніка Windows пры націску правай кнопкі мышы)
+Sheet;Табліца
 Shell extension, folder;Пашырэнне ў правадніку для папак
 Shell extension, separate instance;
+Shell extension;Пашырэнне ў правадніку (пункт у кантэкстным меню правадніка Windows пры націску правай кнопкі мышы)
 Shell InfoTip;Усплывальная падказка (паказваць інфармацыю пры размяшчэнні паказальніка мышы над файлам у правадніку Windows)
 ShimName;
 ShimVersion;
-Show;
 Show menu;Паказваць меню
 Show toolbar;Паказваць панэль
+Show;
 ShowAll;
 ShowMore;
 SignalGroup;
@@ -1297,6 +1317,7 @@ Source_StreamSize;
 Source_StreamSize_Encoded;
 SpokenSubtitles;
 Standard;Стандарт вяшчання
+Stored_Height;
 StoreMethod_InterleavedFields;
 StoreMethod_SeparatedFields;
 StoreMethod_SeparatedFields_1;
@@ -1340,6 +1361,7 @@ Supported formats;Фарматы, што падтрымліваюцца
 Supported?;Падтрымліваецца?
 SupportUs;
 SupportUs2;
+surmixlev;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Коратка
@@ -1351,11 +1373,11 @@ Technician;Тэхнік
 TermsOfUse;Умовы выкарыстання
 TertiaryAudioLanguage;
 TestContinuousFileNames;
-Text;Тэкст
 Text - Custom;Тэкст - выбарачна
 Text (HTML);Тэкст (HTML)
 Text stream(s);Тэкставы(я) паток(і)
 Text streams;Тэкставыя патокі
+Text;Тэкст
 Text_Codec_List;Тэкставы кодэк
 Text_Format_List;
 Text_Format_WithHint_List;
@@ -1395,11 +1417,12 @@ TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;Характарыстыкі трансферу
+transfer_characteristics_Source;
 Translate_Reports;
 Translator;Перакладчык
 Transport;
-Tree;Дрэва
 Tree & Text;Дрэва і тэкст
+Tree;Дрэва
 Trim_Center;
 Trim_Height;
 Trim_Surround;
@@ -1444,8 +1467,8 @@ UniversalAdID_Value;
 Unknown;Невядома
 Url;URL-адрас
 Value;
-Video;Відэа
 Video stream(s);Відэапаток(і)
+Video;Відэа
 Video_Codec_List;Відэакодэкі
 Video_Delay;Затрымка відэа
 Video_Format_List;
@@ -1486,5 +1509,5 @@ Yes;Так
 Your system;Ваша сістэма
 Your translation;
 Zoom;
-ZZ_Automatic_Percent;67
-ZZ_AutomaticLanguage_Percent;71
+ZZ_Automatic_Percent;66
+ZZ_AutomaticLanguage_Percent;70

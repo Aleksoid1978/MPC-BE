@@ -97,6 +97,7 @@ public :
         Mode_ADIF,
         Mode_ADTS,
         Mode_LATM,
+        Mode_HEAACWAVEFORMAT,
     };
     mode   Mode;
     bool   FromIamf;
@@ -128,6 +129,7 @@ protected :
     void Read_Buffer_Init();
     void Read_Buffer_Continue ();
     void Read_Buffer_Continue_AudioSpecificConfig();
+    void Read_Buffer_Continue_HEAACWAVEFORMAT();
     void Read_Buffer_Continue_payload();
     void Read_Buffer_Unsynched();
 

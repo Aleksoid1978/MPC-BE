@@ -1444,6 +1444,8 @@ void File_Riff::AVI__hdlr_strl_strf_auds()
         }
         else if (Codec==__T("AAC") || Codec==__T("FF") || Codec==__T("8180"))
             AVI__hdlr_strl_strf_auds_Aac();
+        else if (FormatTag==0x1610) // HEAACWAVEFORMAT
+            AVI__hdlr_strl_strf_auds_Aac(true);
         else if (FormatTag==0x566F) //Vorbis with Config in this chunk
             AVI__hdlr_strl_strf_auds_Vorbis();
         else if (FormatTag==0x6750) //Vorbis with Config in this chunk
@@ -1484,18 +1486,16 @@ void File_Riff::AVI__hdlr_strl_strf_auds_Mpega()
 }
 
 //---------------------------------------------------------------------------
-void File_Riff::AVI__hdlr_strl_strf_auds_Aac()
+void File_Riff::AVI__hdlr_strl_strf_auds_Aac(bool IsHEAACWAVEFORMAT)
 {
     //Parsing
     Element_Begin1("AAC options");
     #if defined(MEDIAINFO_AAC_YES)
         File_Aac* MI=new File_Aac();
-        MI->Mode=File_Aac::Mode_AudioSpecificConfig;
+        MI->Mode=IsHEAACWAVEFORMAT?File_Aac::Mode_HEAACWAVEFORMAT:File_Aac::Mode_AudioSpecificConfig;
         Open_Buffer_Init(MI);
         Open_Buffer_Continue(MI);
-        Finish(MI);
-        Merge(*MI, StreamKind_Last, 0, StreamPos_Last);
-        delete MI; //MI=NULL;
+        Stream[Stream_ID].Parsers.push_back(MI);
     #else //MEDIAINFO_MPEG4_YES
         Skip_XX(Element_Size-Element_Offset,                    "(AudioSpecificConfig)");
     #endif

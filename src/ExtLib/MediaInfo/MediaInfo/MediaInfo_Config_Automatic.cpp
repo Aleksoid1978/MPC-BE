@@ -2982,6 +2982,7 @@ void MediaInfo_Config_CodecID_Audio_Riff (InfoMap &Info)
     "1400;Norris;;Norris Communications, Inc.\n"
     "1401;ISIAudio\n"
     "1500;MUSICOMPRESS;;Soundspace Music Compression\n"
+    "1610;AAC;Microsoft;MPEG-2 AAC or MPEG-4 HE-AAC v1/v2\n"
     "181C;RT24;VoxWare\n"
     "181E;AX24000P;Lucent elemedia\n"
     "1971;SonicFoundry;;Lossless\n"

@@ -14,8 +14,8 @@
  bit1; бит
  bit2; бита
  bit3; бит
- bps; бит/сек
  Bps; байт/сек
+ bps; бит/сек
  Byte1; байт
  Byte2; байта
  Byte3; байт
@@ -49,8 +49,8 @@
  frame3; кадров
  GB; ГБ
  Gb; Гб
- Gbps; Гбит/сек
  GBps; Гбайт/сек
+ Gbps; Гбит/сек
  GHz; ГГц
  GiB; Гбайт
  GibiByte1; Гибибайт
@@ -91,8 +91,8 @@
  KiloByte3; Килобайт
  MB; МБ
  Mb; Мб
- Mbps; Мбит/сек
  MBps; Мбайт/сек
+ Mbps; Мбит/сек
  MebiBit1; Мебибит
  MebiBit2; Мебибита
  MebiBit3; Мебибит
@@ -163,6 +163,7 @@ About;О программе
 About_Hint;Контакты и поиск новой версии
 AC3_Metadata;Метаданные AC-3
 Accompaniment;Сопровождение
+acmod;
 Active_DisplayAspectRatio;Актуальное соотношение сторон
 Active_Height;Актуальная высота
 Active_Width;Актуальная ширина
@@ -178,9 +179,9 @@ AdID;Рекламный идентификатор
 ADM: Show ChannelFormats;ADM: показывать форматы каналов
 ADM: Show TrackUIDs;ADM: показывать идентификаторы дорожек
 AdmProfile;Профиль ADM
-Advanced;Дополнительно
-Advanced mode;Расширенный режим
 Advanced mode -->;Расширенный режим -->
+Advanced mode;Расширенный режим
+Advanced;Дополнительно
 Album;Альбом
 Album_ReplayGain_Gain;Нормализатор звука альбома
 Album_ReplayGain_Peak;Пик нормализатора звука альбома
@@ -200,11 +201,12 @@ ArtDirector;Арт-директор
 AspectRatio;Соотношение сторон
 AssistantDirector;Помощник режиссёра
 AssociatedVideo_FrameRate;Соответствующая частота кадров видео
-at;в
 At least one file;(Необходимо открыть по крайней мере один файл)
+at;в
 Attachments;Вложения
-Audio;Аудио
 Audio stream(s);Аудиопотоки
+Audio;Аудио
+Audio_Channels_Total;
 Audio_Codec_List;Аудиокодеки
 Audio_Format_List;Аудиоформаты
 Audio_Format_WithHint_List;Аудиоформаты с подсказкой
@@ -246,6 +248,7 @@ BitRate_Nominal;Номинальный битрейт
 Bits-(Pixel*Frame);Бит/(Пиксели*Кадры)
 BitstreamLevel;Уровень битового потока
 Bring All to Front;Все окна — на передний план
+bsid;
 BufferSize;Размер буфера
 Cancel;Отмена
 CaptionServiceName;Название службы титров
@@ -261,8 +264,8 @@ ChannelMode;Режим каналов
 ChannelPositions;Позиции каналов
 ChannelPositions_Original;Позиции каналов оригинала
 Chapter(s);Разделы
-Chapters;Разделы
 Chapters stream(s);Потоки разделов
+Chapters;Разделы
 Chapters_Codec_List;Кодеки разделов
 Chapters_No;Нет разделов
 Chapters_Pos_Begin;В начале
@@ -270,9 +273,9 @@ Chapters_Pos_End;В конце
 ChaptersCount;Количество потоков в разделах
 CharacterSet;Набор символов
 CheckNewVersion;Проверить наличие новой версии
-Choose custom;Выбрать
 Choose custom sheet;Выбрать таблицу
 Choose custom text;Выбрать текст
+Choose custom;Выбрать
 Choose export format;Выберите формат вывода
 Choose file(s);Выберите файлы
 Choose filename;Выберите имя файла
@@ -282,14 +285,15 @@ Chroma;Цветность
 ChromaSubsampling;Цветовая субдискретизация
 Classifier;Классификатор содержимого
 ClearList;Очистить список
-Close;Закрыть
 Close all before open;Закрывать всё перед открытием новых файлов
+Close;Закрыть
 CloseAll;Закрыть все файлы
 ClosedCaptionsLanguage;Язык субтитров
 ClosedCaptionsPresent;Наличие субтитров
 ClosedCaptionsType;Тип субтитров
 CloseFile;Закрыть файл
 CloseWindow;Закрыть окно
+cmixlev;
 Codec;Кодек
 Codec_Description;Описание кодека
 Codec_Info;Подробно о кодеке
@@ -319,8 +323,12 @@ ColorTheme;Тема
 ColorTheme_Dark;Тёмная
 ColorTheme_Light;Светлая
 ColorTheme_System;Системная
+colour_description_present;
+colour_description_present_Source;
 colour_primaries;Основные цвета
+colour_primaries_Source;
 colour_range;Цветовой диапазон
+colour_range_Source;
 Comment;Примечание
 CommissionedBy;Поручитель
 Compare;Сравнить
@@ -359,6 +367,7 @@ Cover_Description;Описание обложки
 Cover_Mime;MIME-тип обложки
 Cover_Type;Тип обложки
 CoverData;Включать обложки в HTML, XML и JSON
+CreatedOn;
 Cropped;Размеры подрезки
 Custom;Выборочно
 CustomDownmixTargets;Настраиваемые форматы понижающего сведения
@@ -367,8 +376,8 @@ DarkMode;Тёмный режим
 Date;Дата
 Debug;Отладка
 Decimal point;Десятичная точка
-Default;По умолчанию
 Default translation;Перевод по умолчанию
+Default;По умолчанию
 Default_Setting;Системное значение по умолчанию
 DefaultTargetDeviceConfig;Конфигурация целевого устройства по умолчанию
 DefaultView;Вид по умолчанию:
@@ -380,6 +389,10 @@ Delete;Удалить
 Description;Описание
 Details;Подробное описание
 dialnorm;Нормализация звука речи
+dialnorm_Average;
+dialnorm_Count;
+dialnorm_Maximum;
+dialnorm_Minimum;
 DialogueCorrected;Коррекция звука речи
 DialogueEnhancement;Улучшение звука речи
 DialogueNormalization;Нормализация звука речи
@@ -428,6 +441,8 @@ ElementCount;Число элементов
 EMail;Почта
 Enable FFmpeg plugin;Использовать модуль FFmpeg
 Encoded_Application;Программа кодирования
+Encoded_Application_Name;
+Encoded_Application_Version;
 Encoded_Date;Дата кодирования
 Encoded_Hardware;Аппаратура кодирования
 Encoded_Library;Библиотека кодирования
@@ -462,8 +477,8 @@ Feature_FilesCompare;Сравнение файлов
 Feature_More;Скоро ещё больше
 Feature_SelectView;Вид по умолчанию
 Field;Поле
-File;Файл
 File size;Размер файла
+File;Файл
 File_Append;Добавить к существующему файлу (внимание: убедитесь в соответствии параметров)
 File_Created_Date;Дата создания файла
 File_Created_Date_Local;Дата создания файла (местная)
@@ -481,10 +496,10 @@ FirstDisplay_Type;Тип первого события
 FirstFrameOfAction;Первый кадр действия
 FlatPanelTv;Телевизор с плоским экраном
 FlowID;Идентификатор потока
-Folder;Папка
 Folder (R);Папка (R)
 Folder (R)_Hint;Выберите папку для обработки (со всеми вложенными папками)
 Folder (Recursively);Папка (рекурсивно)
+Folder;Папка
 Folder_Hint;Операции с папками
 FolderName;Имя папки
 Forced;Принудительно
@@ -769,8 +784,8 @@ HTML;HTML
 ID;Идентификатор
 IdentClockStart;Начало идентификации
 IFrameInterval;Интервал I-кадра
-Image;Изображение
 Image stream(s);Потоки изображений
+Image;Изображение
 Image_Codec_List;Кодеки изображений
 ImageCount;Количество потоков изображений
 ImmersiveStereo;Иммерсивное стерео
@@ -1001,12 +1016,12 @@ Language_yue;Кантонский
 Language_za;Чжуанский
 Language_zh;Китайский
 Language_zh-cmn;Севернокитайский
-Language_zh-cn;Китайский (Китай)
 Language_zh-CN;Китайский (Китай)
+Language_zh-cn;Китайский (Китай)
 Language_zh-Hans;Китайский (упрощённый)
 Language_zh-Hant;Китайский (традиционный)
-Language_zh-tw;Китайский (Тайвань)
 Language_zh-TW;Китайский (Тайвань)
+Language_zh-tw;Китайский (Тайвань)
 Language_zh-yue;Кантонский
 Language_zu;Зулу
 LanguageChanges;Смена языка произойдёт при следующем запуске программы
@@ -1016,6 +1031,7 @@ LCCN;LCCN
 LegacyStreamDisplay;Показывать информацию об обратной совместимости для HD/HE аудио- и 3D/HDR видеопотоков
 LfeAttenuationKnown;Ослабление низкочастотных эффектов (LFE)
 LfeMixGain;Общее усиление микса низкочастотных эффектов (LFE)
+lfeon;
 Library;Библиотека сведения
 Lifetime_Subscribe_Button;Пожизненная подписка за %PRICE%
 Lightness;Яркость
@@ -1068,6 +1084,7 @@ MasteringDisplay_Luminance;Мастеринг яркости дисплея
 Matrix_Channel(s);Каналы кодирования матрицы
 Matrix_ChannelPositions;Позиции каналов кодирования матрицы
 matrix_coefficients;Коэффициенты матрицы
+matrix_coefficients_Source;
 Matrix_Format;Формат кодирования матрицы
 MaxCLL;Максимальный уровень яркости содержимого
 MaxFALL;Максимальный уровень средней яркости кадра
@@ -1079,8 +1096,8 @@ MD5_Unencoded;MD5 некодированного содержимого
 MediaInfo_About;MediaInfo позволяет получить доступ к подробной информации\r\nо следующих медиафайлах:\r\nMatroska,\r\nOGG (включая OGM),\r\nMPEG1 (включая VCD),\r\nMPEG2 (включая DVD и SVCD),\r\nMPEG4 (включая iTunes M4A),\r\nQuicktime,\r\nRealMedia,\r\nWindowsMedia (включая WMV, WMA),\r\nMicrosoft RIFF (включая AVI, WAV, DivX),\r\nзвуковых форматах (AC3, DTS, SSC, AU, AIFF).\r\n\r\nЗа исключением графического пользовательского интерфейса Mac App Store, это программное обеспечение с открытым исходным кодом, что означает, что оно является бесплатным для конечного пользователя, а разработчики могут свободно изучать, улучшать и распространять программу (лицензия BSD).
 MediaInfo_About_About;MediaInfo v%MI_VERSION% использует MediaInfoLib v%MIL_VERSION%
 MediaInfo_WebSite;Сайт MediaInfo
-Menu;Меню
 Menu stream(s);Меню потоков
+Menu;Меню
 Menu_Codec_List;Меню кодеков
 Menu_Hint;Дополнительные возможности
 Menu_No;Нет меню
@@ -1151,13 +1168,15 @@ Other;Прочее
 OtherIdentifier;Другой идентификатор
 OtherIdentifierType;Тип другого идентификатора
 OtherViews;Другие виды
-Output;Вывод
 Output format;Формат вывода
+Output;Вывод
 OverallBitRate;Общий битрейт
 OverallBitRate_Maximum;Максимальный общий битрейт
 OverallBitRate_Minimum;Минимальный общий битрейт
 OverallBitRate_Mode;Режим общего битрейта
 OverallBitRate_Nominal;Номинальный общий битрейт
+OverallBitRate_Precision_Max;
+OverallBitRate_Precision_Min;
 PackageName;Имя пакета
 PackFormat;Формат группы каналов
 Part;Часть
@@ -1227,6 +1246,7 @@ Renew;Обновить
 ReplayGain_Gain;Нормализатор звука
 ReplayGain_Peak;Пик нормализатора звука
 Report;Сообщение
+ReportBy;
 Resolution;Разрешение
 RestoreLifetimeSubscription;Восстановить пожизненную подписку
 Retry;Повторить
@@ -1270,17 +1290,17 @@ Set;Установка
 Set_Count;Количество установок
 Setup;Настройка
 Sharpness;Резкость
-Sheet;Таблица
 Sheet (Complete);Таблица (полная)
-Shell extension;Расширение Проводника (пункт в меню по правой кнопке)
+Sheet;Таблица
 Shell extension, folder;Расширение Проводника для папок
 Shell extension, separate instance;Открывать каждый объект в отдельном окне
+Shell extension;Расширение Проводника (пункт в меню по правой кнопке)
 Shell InfoTip;Всплывающая подсказка в Проводнике
 ShimName;Название прокладки
 ShimVersion;Версия прокладки
-Show;Показать:
 Show menu;Показывать меню
 Show toolbar;Показывать панель
+Show;Показать:
 ShowAll;Показать все
 ShowMore;Показывать больше информации в выводе, включая различные форматы времени или продолжительности
 SignalGroup;Группа сигналов
@@ -1297,6 +1317,7 @@ Source_StreamSize;Размер потока оригинала
 Source_StreamSize_Encoded;Закодированный размер потока оригинала
 SpokenSubtitles;Голосовые субтитры
 Standard;Стандарт вещания
+Stored_Height;
 StoreMethod_InterleavedFields;Чередующиеся поля
 StoreMethod_SeparatedFields;Раздельные поля
 StoreMethod_SeparatedFields_1;Раздельные поля (1 поле на блок)
@@ -1340,6 +1361,7 @@ Supported formats;Поддерживаемые форматы
 Supported?;Поддерживается?
 SupportUs;Поддержите наш проект. Планируется разработка тёмной темы интерфейса и множества других интересных функций.
 SupportUs2;Поддержите нас подпиской и получите эксклюзивные функции.
+surmixlev;
 SurroundAttenuationKnown;Ослабление объёмного канала
 SwitchGroup;Группа переключения
 Synopsis;Сводка
@@ -1351,11 +1373,11 @@ Technician;Техник
 TermsOfUse;Условия использования
 TertiaryAudioLanguage;Третий язык аудио
 TestContinuousFileNames;Обнаружение непрерывных имён файлов
-Text;Текст
 Text - Custom;Текст - выборочно
 Text (HTML);Текст (HTML)
 Text stream(s);Текстовые потоки
 Text streams;Текстовые потоки
+Text;Текст
 Text_Codec_List;Текстовые кодеки
 Text_Format_List;Текстовые форматы
 Text_Format_WithHint_List;Текстовые форматы с подсказкой
@@ -1395,11 +1417,12 @@ TrackFormat;Формат дорожки
 TrackIndex;Индекс дорожки
 TrackUID;Идентификатор дорожки
 transfer_characteristics;Характеристики трансфера
+transfer_characteristics_Source;
 Translate_Reports;Перевод сообщений
 Translator;Переводчик
 Transport;Транспорт
-Tree;Дерево
 Tree & Text;Дерево и текст
+Tree;Дерево
 Trim_Center;Обрезка центрального канала
 Trim_Height;Обрезка потолочного канала
 Trim_Surround;Обрезка объёмного канала
@@ -1444,8 +1467,8 @@ UniversalAdID_Value;Значение универсального рекламн
 Unknown;Неизвестно
 Url;Ссылка
 Value;Значение
-Video;Видео
 Video stream(s);Видеопотоки
+Video;Видео
 Video_Codec_List;Видеокодеки
 Video_Delay;Задержка видео
 Video_Format_List;Видеоформаты
@@ -1486,5 +1509,5 @@ Yes;Да
 Your system;Ваша система
 Your translation;Ваш перевод
 Zoom;Изменить масштаб
-ZZ_Automatic_Percent;100
-ZZ_AutomaticLanguage_Percent;100
+ZZ_Automatic_Percent;98
+ZZ_AutomaticLanguage_Percent;98

@@ -14,8 +14,8 @@
  bit1; bit
  bit2; bit
  bit3; bit
- bps; bps
  Bps; Bps
+ bps; bps
  Byte1; Byte
  Byte2; Byte
  Byte3; Byte
@@ -49,8 +49,8 @@
  frame3; fotograma
  GB; GB
  Gb; Gb
- Gbps; Gbs-ko
  GBps; GBs-ko
+ Gbps; Gbs-ko
  GHz; GHz
  GiB; GiB
  GibiByte1; GibiByte
@@ -91,8 +91,8 @@
  KiloByte3; KiloByte
  MB; MB
  Mb; Mb
- Mbps; Mbps
  MBps; MBps
+ Mbps; Mbps
  MebiBit1; MebiBit
  MebiBit2; MebiBit
  MebiBit3; MebiBit
@@ -163,6 +163,7 @@ About;Honi buruz
 About_Hint;Nola jarri harremanetan nirekin eta azken bertsioa aurkitu
 AC3_Metadata;
 Accompaniment;Laguntza
+acmod;
 Active_DisplayAspectRatio; Aspektu-ratioa
 Active_Height; Altuera
 Active_Width; Zabalera
@@ -178,9 +179,9 @@ AdID;
 ADM: Show ChannelFormats;
 ADM: Show TrackUIDs;
 AdmProfile;
-Advanced;Aurreratua
-Advanced mode;Modu aurreratua
 Advanced mode -->;
+Advanced mode;Modu aurreratua
+Advanced;Aurreratua
 Album;Bilduma
 Album_ReplayGain_Gain;Bilduma berrirakurketa irabazia
 Album_ReplayGain_Peak;Bilduma berrirakurketa irabazi gailurra
@@ -200,11 +201,12 @@ ArtDirector;Arte-Zuzendaria
 AspectRatio;Aspektu-ratioa
 AssistantDirector;Zuzendari-laguntzailea
 AssociatedVideo_FrameRate;
-at;
 At least one file;(Gutxienez fitxategi bat ireki behar duzu)
+at;
 Attachments;Eranskinak
-Audio;Audioa
 Audio stream(s);Audio jarioak
+Audio;Audioa
+Audio_Channels_Total;
 Audio_Codec_List;Audio kodekak
 Audio_Format_List;Audio formatuak
 Audio_Format_WithHint_List;
@@ -246,6 +248,7 @@ BitRate_Nominal;Bit-ratio nominala
 Bits-(Pixel*Frame);Bit/(Pixel*Fotograma)
 BitstreamLevel;
 Bring All to Front;
+bsid;
 BufferSize;Buffer neurria
 Cancel;Utzi
 CaptionServiceName;
@@ -261,8 +264,8 @@ ChannelMode;
 ChannelPositions;Kanalen kokapenak
 ChannelPositions_Original;
 Chapter(s);Kapituluak
-Chapters;Kapituluak
 Chapters stream(s);Kapitulu-jarioa(k)
+Chapters;Kapituluak
 Chapters_Codec_List;Kapitulu kodekak
 Chapters_No;Kapitulurik ez
 Chapters_Pos_Begin;
@@ -270,9 +273,9 @@ Chapters_Pos_End;
 ChaptersCount;Kapitulu jario zenbatekoa
 CharacterSet;
 CheckNewVersion;Egiaztatu bertsio berririk dagoen
-Choose custom;Hautatu egilea
 Choose custom sheet;Hautatu gogoko duzun egile orria
 Choose custom text;Hautatu gogoko duzun egile testua
+Choose custom;Hautatu egilea
 Choose export format;Hautatu gogoko duzun esportazio formatua
 Choose file(s);Hautatu irekitzeko fitxategiak
 Choose filename;Hautatu gogoko duzun fitxategi-izena
@@ -282,14 +285,15 @@ Chroma;Margoa
 ChromaSubsampling;Kolore azpilaginketa
 Classifier;
 ClearList;
-Close;Itxi
 Close all before open;Itxi dena ireki aurretik
+Close;Itxi
 CloseAll;
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
 CloseFile;
 CloseWindow;
+cmixlev;
 Codec;Kodeka
 Codec_Description;Kodek azalpena
 Codec_Info;Kodekaren xehetasunak
@@ -319,8 +323,12 @@ ColorTheme;
 ColorTheme_Dark;
 ColorTheme_Light;
 ColorTheme_System;
+colour_description_present;
+colour_description_present_Source;
 colour_primaries;Kolore lehenak
+colour_primaries_Source;
 colour_range;kolore tartea
+colour_range_Source;
 Comment;Iruzkina
 CommissionedBy;Eskatzailea
 Compare;
@@ -359,6 +367,7 @@ Cover_Description;Azalaren deskripzioa
 Cover_Mime;Azalaren MIME
 Cover_Type;Azal mota
 CoverData;
+CreatedOn;
 Cropped;Mozketa neurriak
 Custom;Pertsonalizatua
 CustomDownmixTargets;
@@ -367,8 +376,8 @@ DarkMode;Modu iluna
 Date;Eguna
 Debug;Garbiketa
 Decimal point;Hamartarren puntua
-Default;Lehenetsia
 Default translation;
+Default;Lehenetsia
 Default_Setting;
 DefaultTargetDeviceConfig;
 DefaultView;
@@ -380,6 +389,10 @@ Delete;Ezabatu
 Description;Deskribapena
 Details;Xehetasunak
 dialnorm;
+dialnorm_Average;
+dialnorm_Count;
+dialnorm_Maximum;
+dialnorm_Minimum;
 DialogueCorrected;
 DialogueEnhancement;
 DialogueNormalization;
@@ -428,6 +441,8 @@ ElementCount;
 EMail;Post@
 Enable FFmpeg plugin;
 Encoded_Application;Kodeketa aplikazioa
+Encoded_Application_Name;
+Encoded_Application_Version;
 Encoded_Date;Kodeketa data
 Encoded_Hardware;
 Encoded_Library;Kodeketa liburutegia
@@ -462,8 +477,8 @@ Feature_FilesCompare;
 Feature_More;
 Feature_SelectView;
 Field;
-File;Fitxategia
 File size;Fitxategiaren tamaina
+File;Fitxategia
 File_Append;Gehitu dagoen fitxategiari (Kontuz : zaindu parametroak berdinak izatea)
 File_Created_Date;Fitxategiaren sortze eguna
 File_Created_Date_Local;Fitxategiaren sortze eguna (tokikoa)
@@ -481,10 +496,10 @@ FirstDisplay_Type;
 FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
-Folder;Karpeta
 Folder (R);Karpeta (R)
 Folder (R)_Hint;Hautatu aztertzeko karpeta bat (karpeta guztiak jarraian)
 Folder (Recursively);Karpeta (errekurtsiboa)
+Folder;Karpeta
 Folder_Hint;Hautatu aztertzeko karpeta bat
 FolderName;Karpetaren izena
 Forced;
@@ -769,8 +784,8 @@ HTML;HTML
 ID;IDa
 IdentClockStart;
 IFrameInterval;
-Image;Irudia
 Image stream(s);Irudi jarioak
+Image;Irudia
 Image_Codec_List;Irudi kodeka
 ImageCount;Irudi jario zenbatekoa
 ImmersiveStereo;
@@ -1001,12 +1016,12 @@ Language_yue;
 Language_za;Zhuangera
 Language_zh;Txinera
 Language_zh-cmn;
-Language_zh-cn;Txinera (Txina)
 Language_zh-CN;
+Language_zh-cn;Txinera (Txina)
 Language_zh-Hans;
 Language_zh-Hant;
-Language_zh-tw;Txinera (Taiwan)
 Language_zh-TW;
+Language_zh-tw;Txinera (Taiwan)
 Language_zh-yue;
 Language_zu;Zuluera
 LanguageChanges;
@@ -1016,6 +1031,7 @@ LCCN;LCCN
 LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
+lfeon;
 Library;Nahasketa liburutegia
 Lifetime_Subscribe_Button;
 Lightness;Argitasuna
@@ -1068,6 +1084,7 @@ MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;Matrize ezaugarriak
+matrix_coefficients_Source;
 Matrix_Format;
 MaxCLL;
 MaxFALL;
@@ -1079,8 +1096,8 @@ MD5_Unencoded;
 MediaInfo_About;MediaInfo-k sarbide erraza eskaintzen du bideo eta audio agirien argibide teknikoetara eta etiketara.\r\nSoftware askea da, honek esanahi du dohainekoa dela erabiltzaileentzat eta garatzaileek askatasuna dutela ikertzeko, hobetzeko eta programa birbanatzeko (BSD baimena)
 MediaInfo_About_About;
 MediaInfo_WebSite;
-Menu;Menua
 Menu stream(s);Menu jarioak
+Menu;Menua
 Menu_Codec_List;Menu kodekak
 Menu_Hint;Aukera gehiago
 Menu_No;Menurik ez
@@ -1151,13 +1168,15 @@ Other;Besterik
 OtherIdentifier;
 OtherIdentifierType;
 OtherViews;
-Output;Irteera
 Output format;Irteera formatua
+Output;Irteera
 OverallBitRate;Bit-ratioa guztira
 OverallBitRate_Maximum;Gehienezko bit-ratio guztira
 OverallBitRate_Minimum;Gutxienezko bit-ratio guztira
 OverallBitRate_Mode;Bit-ratio modua guztira
 OverallBitRate_Nominal;Bit-ratio nominala guztira
+OverallBitRate_Precision_Max;
+OverallBitRate_Precision_Min;
 PackageName;
 PackFormat;
 Part;Zatia
@@ -1227,6 +1246,7 @@ Renew;
 ReplayGain_Gain;Errepikapenaren irabazia
 ReplayGain_Peak;Errepikapenaren irabazi gailurra
 Report;
+ReportBy;
 Resolution;Bereizmena
 RestoreLifetimeSubscription;
 Retry;
@@ -1270,17 +1290,17 @@ Set;Ezarri
 Set_Count;Ezarri kopurua
 Setup;Ezarpenak
 Sharpness;Garbitasuna
-Sheet;Orria
 Sheet (Complete);Orria (Osoa)
-Shell extension;Arakatzailearen hedapena (eskuin-klik egin fitxategian, MediaInfo aukera bat egongo da)
+Sheet;Orria
 Shell extension, folder;Karpetentzat ere bai
 Shell extension, separate instance;
+Shell extension;Arakatzailearen hedapena (eskuin-klik egin fitxategian, MediaInfo aukera bat egongo da)
 Shell InfoTip;Explorer Tresnaburua (Explorerrean, mugitu sagua agiriaren gainean, argibideak erakutsiko dira)
 ShimName;
 ShimVersion;
-Show;
 Show menu;Erakutsi menua
 Show toolbar;Erakutsi tresna-barra
+Show;
 ShowAll;
 ShowMore;
 SignalGroup;
@@ -1297,6 +1317,7 @@ Source_StreamSize;Iturburu jario neurria
 Source_StreamSize_Encoded;Iturburu kodeaketa jario neurria
 SpokenSubtitles;
 Standard;Estandarra
+Stored_Height;
 StoreMethod_InterleavedFields;
 StoreMethod_SeparatedFields;
 StoreMethod_SeparatedFields_1;
@@ -1340,6 +1361,7 @@ Supported formats;Onartutako formatuak
 Supported?;Onartua?
 SupportUs;
 SupportUs2;
+surmixlev;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Laburpena
@@ -1351,11 +1373,11 @@ Technician;Teknikaria
 TermsOfUse;Erabilpen baldintzak
 TertiaryAudioLanguage;
 TestContinuousFileNames;
-Text;Testua
 Text - Custom;Testua - Egilea
 Text (HTML);Testua (HTML)
 Text stream(s);Testu jarioak
 Text streams;Testu jarioak
+Text;Testua
 Text_Codec_List;Testu kodekak
 Text_Format_List;
 Text_Format_WithHint_List;
@@ -1395,11 +1417,12 @@ TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;Eskualdaketa ezaugarriak
+transfer_characteristics_Source;
 Translate_Reports;
 Translator;Itzultzailea
 Transport;
-Tree;Zuhaitza
 Tree & Text;Zuhaitza eta Testua
+Tree;Zuhaitza
 Trim_Center;
 Trim_Height;
 Trim_Surround;
@@ -1444,8 +1467,8 @@ UniversalAdID_Value;
 Unknown;Ezezaguna
 Url;Url-a
 Value;
-Video;Bideoa
 Video stream(s);Bideo jarioa(k)
+Video;Bideoa
 Video_Codec_List;Bideo Kodekak
 Video_Delay;Bideoarekiko atzerapena
 Video_Format_List;
@@ -1486,5 +1509,5 @@ Yes;Bai
 Your system;Zure sistema
 Your translation;Zure itzulpena
 Zoom;
-ZZ_Automatic_Percent;68
-ZZ_AutomaticLanguage_Percent;69
+ZZ_Automatic_Percent;67
+ZZ_AutomaticLanguage_Percent;68

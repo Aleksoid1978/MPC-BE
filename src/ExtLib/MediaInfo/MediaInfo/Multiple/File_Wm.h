@@ -41,6 +41,7 @@ private :
     void Header_StreamProperties();
     void Header_StreamProperties_Audio();
     void Header_StreamProperties_Audio_WMA();
+    void Header_StreamProperties_Audio_HEAac();
     void Header_StreamProperties_Audio_AMR();
     void Header_StreamProperties_Video();
     void Header_StreamProperties_JFIF();

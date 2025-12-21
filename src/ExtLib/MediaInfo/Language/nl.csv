@@ -14,8 +14,8 @@
  bit1; bit
  bit2; bits
  bit3; bits
- bps; b/s
  Bps; B/s
+ bps; b/s
  Byte1; Byte
  Byte2; Bytes
  Byte3; Bytes
@@ -49,8 +49,8 @@
  frame3; frames
  GB; GB
  Gb; Gb
- Gbps; Gb/s
  GBps; GB/s
+ Gbps; Gb/s
  GHz; GHz
  GiB; GiB
  GibiByte1; GibiBytes
@@ -91,8 +91,8 @@
  KiloByte3; KiloBytes
  MB; MB
  Mb; Mb
- Mbps; Mb/s
  MBps; MebiBytes
+ Mbps; Mb/s
  MebiBit1; MebiBit
  MebiBit2; MebiBits
  MebiBit3; MebiBits
@@ -163,6 +163,7 @@ About;Info
 About_Hint;Hoe neemt u contact met mij op en vindt u de nieuwste versie
 AC3_Metadata;
 Accompaniment;Begeleiding
+acmod;
 Active_DisplayAspectRatio;
 Active_Height;
 Active_Width;
@@ -178,9 +179,9 @@ AdID;
 ADM: Show ChannelFormats;
 ADM: Show TrackUIDs;
 AdmProfile;
-Advanced;Geavanceerd
-Advanced mode;Geavanceerde modus
 Advanced mode -->;
+Advanced mode;Geavanceerde modus
+Advanced;Geavanceerd
 Album;Album
 Album_ReplayGain_Gain;Album replay gain
 Album_ReplayGain_Peak;Album replay gain piek
@@ -200,11 +201,12 @@ ArtDirector;Artdirector
 AspectRatio;Beeldverhouding
 AssistantDirector;Assistant-regisseur
 AssociatedVideo_FrameRate;
-at;met
 At least one file;(U moet tenminste één bestand openen)
+at;met
 Attachments;
-Audio;Audio
 Audio stream(s);Audiostromen
+Audio;Audio
+Audio_Channels_Total;
 Audio_Codec_List;Audiocodecs
 Audio_Format_List;
 Audio_Format_WithHint_List;
@@ -246,6 +248,7 @@ BitRate_Nominal;Nominale bitrate
 Bits-(Pixel*Frame);Bits/(Pixel*Frame)
 BitstreamLevel;
 Bring All to Front;Alles op voorgrond
+bsid;
 BufferSize;
 Cancel;Annuleren
 CaptionServiceName;
@@ -261,8 +264,8 @@ ChannelMode;
 ChannelPositions;Kanaalposities
 ChannelPositions_Original;
 Chapter(s);Hoofdstuk(ken)
-Chapters;Hoofdstukken
 Chapters stream(s);Hoofdstukkenstroom(en)
+Chapters;Hoofdstukken
 Chapters_Codec_List;Hoofdstukkencodecs
 Chapters_No;Geen hoofdstukken
 Chapters_Pos_Begin;
@@ -270,9 +273,9 @@ Chapters_Pos_End;
 ChaptersCount;Telling van hoofdstukkenstromen
 CharacterSet;
 CheckNewVersion;Controleer op versie
-Choose custom;Kies aangepast
 Choose custom sheet;Kies uw gewenste aangepaste blad
 Choose custom text;Kies uw gewenste aangepaste tekst
+Choose custom;Kies aangepast
 Choose export format;Kies uw gewenste exportformaat
 Choose file(s);Kies de te openen bestanden
 Choose filename;Kies uw gewenste bestandsnaam
@@ -282,14 +285,15 @@ Chroma;Chroma
 ChromaSubsampling;
 Classifier;
 ClearList;
-Close;Sluiten
 Close all before open;Sluit alle alvorens te openen
+Close;Sluiten
 CloseAll;
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
 CloseFile;
 CloseWindow;Venster sluiten
+cmixlev;
 Codec;Codec
 Codec_Description;Codecbeschrijving
 Codec_Info;Details voor codec
@@ -319,8 +323,12 @@ ColorTheme;
 ColorTheme_Dark;
 ColorTheme_Light;
 ColorTheme_System;
+colour_description_present;
+colour_description_present_Source;
 colour_primaries;
+colour_primaries_Source;
 colour_range;
+colour_range_Source;
 Comment;Commentaar
 CommissionedBy;In opdracht van
 Compare;
@@ -359,6 +367,7 @@ Cover_Description;Coverbeschrijving
 Cover_Mime;Cover-MIME
 Cover_Type;Coversoort
 CoverData;
+CreatedOn;
 Cropped;Cropafmetingen
 Custom;Aangepast
 CustomDownmixTargets;
@@ -367,8 +376,8 @@ DarkMode;
 Date;Datum
 Debug;Debug
 Decimal point;Decimale punt
-Default;
 Default translation;
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 DefaultView;
@@ -380,6 +389,10 @@ Delete;Verwijderen
 Description;Beschrijving
 Details;
 dialnorm;
+dialnorm_Average;
+dialnorm_Count;
+dialnorm_Maximum;
+dialnorm_Minimum;
 DialogueCorrected;
 DialogueEnhancement;
 DialogueNormalization;
@@ -428,6 +441,8 @@ ElementCount;
 EMail;E-Mail
 Enable FFmpeg plugin;
 Encoded_Application;Gebruikt programma
+Encoded_Application_Name;
+Encoded_Application_Version;
 Encoded_Date;Datum codering
 Encoded_Hardware;
 Encoded_Library;Gebruikte encoderbibliotheek
@@ -462,8 +477,8 @@ Feature_FilesCompare;
 Feature_More;
 Feature_SelectView;
 Field;
-File;Bestand
 File size;Bestandsgrootte
+File;Bestand
 File_Append;Toevoegen aan bestaande bestand (Waarschuwing : gebruik dezelfde parameters)
 File_Created_Date;Aanmaakdatum bestand
 File_Created_Date_Local;
@@ -481,10 +496,10 @@ FirstDisplay_Type;
 FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
-Folder;Map
 Folder (R);Map (R)
 Folder (R)_Hint;Kies een te onderzoeken map (inclusief onderliggende mappen)
 Folder (Recursively);Map (Recursief)
+Folder;Map
 Folder_Hint;Kies een te onderzoeken map
 FolderName;Mapnaam
 Forced;
@@ -769,8 +784,8 @@ HTML;HTML
 ID;ID
 IdentClockStart;
 IFrameInterval;
-Image;Video
 Image stream(s);Videostromen
+Image;Video
 Image_Codec_List;Videocodecs
 ImageCount;Telling van videostromen
 ImmersiveStereo;
@@ -1001,12 +1016,12 @@ Language_yue;
 Language_za;Zhuang
 Language_zh;Chinees
 Language_zh-cmn;
-Language_zh-cn;Chinees (China)
 Language_zh-CN;
+Language_zh-cn;Chinees (China)
 Language_zh-Hans;
 Language_zh-Hant;
-Language_zh-tw;Chinees (Taiwan)
 Language_zh-TW;
+Language_zh-tw;Chinees (Taiwan)
 Language_zh-yue;
 Language_zu;Zoeloe
 LanguageChanges;
@@ -1016,6 +1031,7 @@ LCCN;LCCN
 LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
+lfeon;
 Library;Muxingbibliotheek
 Lifetime_Subscribe_Button;
 Lightness;Helderheid
@@ -1068,6 +1084,7 @@ MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;
+matrix_coefficients_Source;
 Matrix_Format;
 MaxCLL;
 MaxFALL;
@@ -1079,8 +1096,8 @@ MD5_Unencoded;
 MediaInfo_About;Levert zeer gedetailleerde informatie\r\nover multimediabestanden:\r\nMatroska, OGG (inclusief OGM)\r\nMPEG1 (inclusief VCD)\r\nMPEG2 (inclusief DVD en SVCD)\r\nMPEG4 (inclusief Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (inclusief WMV, WMA)\r\nMicrosoft RIFF (inclusief AVI, WAV)\r\nGeluidsformaten (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
 MediaInfo_WebSite;
-Menu;Menu
 Menu stream(s);Menustromen
+Menu;Menu
 Menu_Codec_List;Menucodecs
 Menu_Hint;Meer mogelijkheden
 Menu_No;Geen menu
@@ -1151,13 +1168,15 @@ Other;Ander
 OtherIdentifier;
 OtherIdentifierType;
 OtherViews;
-Output;Uitvoer
 Output format;Uitvoerformaat
+Output;Uitvoer
 OverallBitRate;Totale bitrate
 OverallBitRate_Maximum;Maximale Totale bitrate
 OverallBitRate_Minimum;Minimale Totale bitrate
 OverallBitRate_Mode;Totale bitratemodus
 OverallBitRate_Nominal;Nominale Totale bitrate
+OverallBitRate_Precision_Max;
+OverallBitRate_Precision_Min;
 PackageName;
 PackFormat;
 Part;Deel
@@ -1227,6 +1246,7 @@ Renew;
 ReplayGain_Gain;Replay gain
 ReplayGain_Peak;Replay gain piek
 Report;
+ReportBy;
 Resolution;Resolutie
 RestoreLifetimeSubscription;
 Retry;
@@ -1270,17 +1290,17 @@ Set;Set
 Set_Count;Settelling
 Setup;Setup
 Sharpness;Scherpte
-Sheet;Blad
 Sheet (Complete);Blad (Compleet)
-Shell extension;Shell-extensie (in explorer-rechtsklikmenu zal een Media Info optie te zien zijn...)
+Sheet;Blad
 Shell extension, folder;
 Shell extension, separate instance;
+Shell extension;Shell-extensie (in explorer-rechtsklikmenu zal een Media Info optie te zien zijn...)
 Shell InfoTip;Shell InfoTip (houd in explorer de muiscursor boven een bestand, info wordt getoond)
 ShimName;
 ShimVersion;
-Show;
 Show menu;Menu tonen
 Show toolbar;Werkbalk tonen
+Show;
 ShowAll;Toon alle
 ShowMore;
 SignalGroup;
@@ -1297,6 +1317,7 @@ Source_StreamSize;
 Source_StreamSize_Encoded;
 SpokenSubtitles;
 Standard;Standaard
+Stored_Height;
 StoreMethod_InterleavedFields;
 StoreMethod_SeparatedFields;
 StoreMethod_SeparatedFields_1;
@@ -1340,6 +1361,7 @@ Supported formats;Ondersteunde formaten
 Supported?;Ondersteund?
 SupportUs;
 SupportUs2;
+surmixlev;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Samenvatting
@@ -1351,11 +1373,11 @@ Technician;Technicus
 TermsOfUse;Gebruiksvoorwaarden
 TertiaryAudioLanguage;
 TestContinuousFileNames;
-Text;Tekst
 Text - Custom;Tekst - Aangepast
 Text (HTML);Tekst (HTML)
 Text stream(s);Tekststromen
 Text streams;Tekststromen
+Text;Tekst
 Text_Codec_List;Tekstcodecs
 Text_Format_List;
 Text_Format_WithHint_List;
@@ -1395,11 +1417,12 @@ TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;
+transfer_characteristics_Source;
 Translate_Reports;
 Translator;Vertaler
 Transport;
-Tree;Boomstructuur
 Tree & Text;Boomstructuur & Tekst
+Tree;Boomstructuur
 Trim_Center;
 Trim_Height;
 Trim_Surround;
@@ -1444,8 +1467,8 @@ UniversalAdID_Value;
 Unknown;Onbekend
 Url;Url
 Value;
-Video;Video
 Video stream(s);Videostroom(en)
+Video;Video
 Video_Codec_List;Videocodecs
 Video_Delay;Video vertraging
 Video_Format_List;
@@ -1486,5 +1509,5 @@ Yes;Ja
 Your system;Uw systeem
 Your translation;
 Zoom;Vergroot/verklein
-ZZ_Automatic_Percent;60
-ZZ_AutomaticLanguage_Percent;64
+ZZ_Automatic_Percent;59
+ZZ_AutomaticLanguage_Percent;63

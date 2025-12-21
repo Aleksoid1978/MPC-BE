@@ -14,8 +14,8 @@
  bit1; 비트
  bit2; 비트
  bit3; 비트
- bps; bps
  Bps; Bps
+ bps; bps
  Byte1; 바이트
  Byte2; 바이트
  Byte3; 바이트
@@ -49,8 +49,8 @@
  frame3; 프레임
  GB; GB
  Gb; Gb
- Gbps; Gbps
  GBps; GBps
+ Gbps; Gbps
  GHz; GHz
  GiB; GiB
  GibiByte1; GibiBytes
@@ -91,8 +91,8 @@
  KiloByte3; KiloBytes
  MB; MB
  Mb; Mb
- Mbps; Mbps
  MBps; MebiBytes
+ Mbps; Mbps
  MebiBit1; MebiBit
  MebiBit2; MebiBits
  MebiBit3; MebiBits
@@ -163,6 +163,7 @@ About;정보
 About_Hint;연락처와 최신 버전 확인
 AC3_Metadata;
 Accompaniment;반주
+acmod;
 Active_DisplayAspectRatio;
 Active_Height;
 Active_Width;
@@ -178,9 +179,9 @@ AdID;
 ADM: Show ChannelFormats;
 ADM: Show TrackUIDs;
 AdmProfile;
-Advanced;고급
-Advanced mode;고급 모드
 Advanced mode -->;
+Advanced mode;고급 모드
+Advanced;고급
 Album;앨범
 Album_ReplayGain_Gain;앨범 재생 게인
 Album_ReplayGain_Peak;앨범 재생 게인 피크
@@ -200,11 +201,12 @@ ArtDirector;미술 감독
 AspectRatio;종횡비
 AssistantDirector;조감독
 AssociatedVideo_FrameRate;
-at;at
 At least one file;(최소한 하나의 파일을 열어야 합니다)
+at;at
 Attachments;
-Audio;오디오
 Audio stream(s);오디오 스트림
+Audio;오디오
+Audio_Channels_Total;
 Audio_Codec_List;오디오 코덱
 Audio_Format_List;
 Audio_Format_WithHint_List;
@@ -246,6 +248,7 @@ BitRate_Nominal;명목상의 비트레이트
 Bits-(Pixel*Frame);비트/(픽셀*프레임)
 BitstreamLevel;
 Bring All to Front;모두 앞으로 가져오기
+bsid;
 BufferSize;
 Cancel;취소
 CaptionServiceName;
@@ -261,8 +264,8 @@ ChannelMode;
 ChannelPositions;채널 위치
 ChannelPositions_Original;
 Chapter(s);챕터
-Chapters;챕터
 Chapters stream(s);챕터 스트림
+Chapters;챕터
 Chapters_Codec_List;챕터 코덱
 Chapters_No;챕터 없음
 Chapters_Pos_Begin;
@@ -270,9 +273,9 @@ Chapters_Pos_End;
 ChaptersCount;챕터 스트림 개수
 CharacterSet;
 CheckNewVersion;최신 버전 확인
-Choose custom;커스텀 선택
 Choose custom sheet;원하는 커스텀 시트를 선택하세요
 Choose custom text;원하는 커스텀 텍스트를 선택하세요
+Choose custom;커스텀 선택
 Choose export format;원하는 내보내기 형식을 선택하세요
 Choose file(s);열기 원하는 파일을 선택하세요
 Choose filename;원하는 파일명을 선택하세요
@@ -282,14 +285,15 @@ Chroma;색차
 ChromaSubsampling;
 Classifier;
 ClearList;
-Close;닫기
 Close all before open;열기 전에 모두 닫기
+Close;닫기
 CloseAll;
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
 CloseFile;
 CloseWindow;창 닫기
+cmixlev;
 Codec;코덱
 Codec_Description;코덱 설명
 Codec_Info;코덱에 대한 상세 정보
@@ -319,8 +323,12 @@ ColorTheme;테마
 ColorTheme_Dark;어둠
 ColorTheme_Light;밝음
 ColorTheme_System;시스템 설정 사용
+colour_description_present;
+colour_description_present_Source;
 colour_primaries;
+colour_primaries_Source;
 colour_range;
+colour_range_Source;
 Comment;주석
 CommissionedBy;의뢰
 Compare;
@@ -359,6 +367,7 @@ Cover_Description;표지 설명
 Cover_Mime;표지 MIME
 Cover_Type;표지 타입
 CoverData;
+CreatedOn;
 Cropped;자른 영역
 Custom;커스텀
 CustomDownmixTargets;
@@ -367,8 +376,8 @@ DarkMode;
 Date;날짜
 Debug;디버그
 Decimal point;소수점
-Default;
 Default translation;
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 DefaultView;
@@ -380,6 +389,10 @@ Delete;삭제
 Description;설명
 Details;
 dialnorm;
+dialnorm_Average;
+dialnorm_Count;
+dialnorm_Maximum;
+dialnorm_Minimum;
 DialogueCorrected;
 DialogueEnhancement;
 DialogueNormalization;
@@ -428,6 +441,8 @@ ElementCount;
 EMail;이메일
 Enable FFmpeg plugin;
 Encoded_Application;인코딩 프로그램
+Encoded_Application_Name;
+Encoded_Application_Version;
 Encoded_Date;인코딩 날짜
 Encoded_Hardware;
 Encoded_Library;인코딩 라이브러리
@@ -462,8 +477,8 @@ Feature_FilesCompare;
 Feature_More;
 Feature_SelectView;
 Field;
-File;파일
 File size;파일 크기
+File;파일
 File_Append;존재하는 파일에 이어쓰기 (경고 : 같은 파라미터인지 주의하세요)
 File_Created_Date;파일 만든 날짜
 File_Created_Date_Local;파일 만든 날짜 (로컬)
@@ -481,10 +496,10 @@ FirstDisplay_Type;
 FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
-Folder;폴더
 Folder (R);폴더 (R)
 Folder (R)_Hint;조사할 폴더를 선택 (모든 하위 폴더를 포함)
 Folder (Recursively);폴더 (하위 포함)
+Folder;폴더
 Folder_Hint;조사할 폴더를 선택
 FolderName;폴더명
 Forced;
@@ -769,8 +784,8 @@ HTML;HTML
 ID;ID
 IdentClockStart;
 IFrameInterval;
-Image;이미지
 Image stream(s);이미지 스트림
+Image;이미지
 Image_Codec_List;이미지 코덱
 ImageCount;이미지 스트림 개수
 ImmersiveStereo;
@@ -1001,12 +1016,12 @@ Language_yue;
 Language_za;Zhuang
 Language_zh;Chinese
 Language_zh-cmn;
-Language_zh-cn;Chinese (China)
 Language_zh-CN;
+Language_zh-cn;Chinese (China)
 Language_zh-Hans;
 Language_zh-Hant;
-Language_zh-tw;Chinese (Taiwan)
 Language_zh-TW;
+Language_zh-tw;Chinese (Taiwan)
 Language_zh-yue;
 Language_zu;Zulu
 LanguageChanges;
@@ -1016,6 +1031,7 @@ LCCN;LCCN
 LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
+lfeon;
 Library;Muxing 라이브러리
 Lifetime_Subscribe_Button;
 Lightness;밝기
@@ -1068,6 +1084,7 @@ MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;
+matrix_coefficients_Source;
 Matrix_Format;
 MaxCLL;
 MaxFALL;
@@ -1079,8 +1096,8 @@ MD5_Unencoded;
 MediaInfo_About;미디어 파일에 대한\r\n상세한 정보를 제공:\r\nMatroska, OGG (OGM 포함)\r\nMPEG1 (VCD 포함)\r\nMPEG2 (DVD와 SVCD 포함)\r\nMPEG4 (Itunes M4A 포함)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (WMV, WMA 포함)\r\nMicrosoft RIFF (AVI, WAV 포함)\r\n음악 포맷 (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
 MediaInfo_WebSite;
-Menu;메뉴
 Menu stream(s);메뉴 스트림
+Menu;메뉴
 Menu_Codec_List;메뉴 코덱
 Menu_Hint;더 자세히
 Menu_No;메뉴 없음
@@ -1151,13 +1168,15 @@ Other;기타
 OtherIdentifier;
 OtherIdentifierType;
 OtherViews;
-Output;출력
 Output format;출력 형식
+Output;출력
 OverallBitRate;총 비트레이트
 OverallBitRate_Maximum;최대 총 비트레이트
 OverallBitRate_Minimum;최소 총 비트레이트
 OverallBitRate_Mode;총 비트레이트 모드
 OverallBitRate_Nominal;명목상의 총 비트레이트
+OverallBitRate_Precision_Max;
+OverallBitRate_Precision_Min;
 PackageName;
 PackFormat;
 Part;파트
@@ -1227,6 +1246,7 @@ Renew;
 ReplayGain_Gain;재생 게인
 ReplayGain_Peak;재생 게인 피크
 Report;
+ReportBy;
 Resolution;해상도
 RestoreLifetimeSubscription;
 Retry;
@@ -1270,17 +1290,17 @@ Set;세트
 Set_Count;세트 개수
 Setup;설정
 Sharpness;샤프니스
-Sheet;시트
 Sheet (Complete);시트 (전체)
-Shell extension;쉘 익스텐션 (탐색기 마우스 오른쪽 버튼 메뉴에 Media Info를 추가합니다)
+Sheet;시트
 Shell extension, folder;폴더에도 추가
 Shell extension, separate instance;
+Shell extension;쉘 익스텐션 (탐색기 마우스 오른쪽 버튼 메뉴에 Media Info를 추가합니다)
 Shell InfoTip;쉘 인포팁 (탐색기에서 파일에 마우스를 올려 놓으면 정보를 보여줍니다)
 ShimName;
 ShimVersion;
-Show;
 Show menu;메뉴 보기
 Show toolbar;도구 모음 보기
+Show;
 ShowAll;모두 보기
 ShowMore;
 SignalGroup;
@@ -1297,6 +1317,7 @@ Source_StreamSize;
 Source_StreamSize_Encoded;
 SpokenSubtitles;
 Standard;표준
+Stored_Height;
 StoreMethod_InterleavedFields;
 StoreMethod_SeparatedFields;
 StoreMethod_SeparatedFields_1;
@@ -1340,6 +1361,7 @@ Supported formats;지원하는 포맷
 Supported?;지원?
 SupportUs;
 SupportUs2;
+surmixlev;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;시놉시스
@@ -1351,11 +1373,11 @@ Technician;기술자
 TermsOfUse;사용권한
 TertiaryAudioLanguage;
 TestContinuousFileNames;
-Text;텍스트
 Text - Custom;텍스트 - 커스텀
 Text (HTML);텍스트 (HTML)
 Text stream(s);텍스트 스트림
 Text streams;텍스트 스트팀
+Text;텍스트
 Text_Codec_List;텍스트 코덱
 Text_Format_List;
 Text_Format_WithHint_List;
@@ -1395,11 +1417,12 @@ TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;
+transfer_characteristics_Source;
 Translate_Reports;
 Translator;번역
 Transport;
-Tree;트리
 Tree & Text;트리 & 텍스트
+Tree;트리
 Trim_Center;
 Trim_Height;
 Trim_Surround;
@@ -1444,8 +1467,8 @@ UniversalAdID_Value;
 Unknown;알 수 없음
 Url;Url
 Value;
-Video;비디오
 Video stream(s);비디오 스트림
+Video;비디오
 Video_Codec_List;비디오 코덱
 Video_Delay;비디오 딜레이
 Video_Format_List;
@@ -1486,5 +1509,5 @@ Yes;예
 Your system;이 시스템
 Your translation;
 Zoom;확대/축소
-ZZ_Automatic_Percent;61
-ZZ_AutomaticLanguage_Percent;65
+ZZ_Automatic_Percent;60
+ZZ_AutomaticLanguage_Percent;64

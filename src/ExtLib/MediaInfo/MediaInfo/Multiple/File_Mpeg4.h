@@ -415,6 +415,8 @@ private :
     void REOB();
     void skip();
     void sidx();
+    void uuid();
+    void uuid_C2PA();
     void wide();
 
     //Helpers

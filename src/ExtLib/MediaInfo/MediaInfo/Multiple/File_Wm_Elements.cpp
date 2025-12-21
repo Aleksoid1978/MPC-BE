@@ -40,6 +40,9 @@
 #if defined(MEDIAINFO_MPEGA_YES)
     #include "MediaInfo/Audio/File_Mpega.h"
 #endif
+#if defined(MEDIAINFO_AAC_YES)
+    #include "MediaInfo/Audio/File_Aac.h"
+#endif
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #if MEDIAINFO_DEMUX
     #include "ThirdParty/base64/base64.h"
@@ -391,6 +394,7 @@ void File_Wm::Header_StreamProperties_Audio ()
             case 0x0161 :
             case 0x0162 :
             case 0x0163 : Header_StreamProperties_Audio_WMA(); break;
+            case 0x1610 : Header_StreamProperties_Audio_HEAac(); break;
             case 0x7A21 :
             case 0x7A22 : Header_StreamProperties_Audio_AMR(); break;
             default     : Skip_XX(Data_Size,                    "Unknown");
@@ -428,6 +432,21 @@ void File_Wm::Header_StreamProperties_Audio_WMA ()
     Skip_L4(                                                    "SamplesPerBlock");
     Skip_L2(                                                    "EncodeOptions");
     Skip_L4(                                                    "SuperBlockAlign");
+}
+
+//---------------------------------------------------------------------------
+void File_Wm::Header_StreamProperties_Audio_HEAac()
+{
+    //Parsing
+    #if defined(MEDIAINFO_AAC_YES)
+        File_Aac* MI=new File_Aac();
+        MI->Mode=File_Aac::Mode_HEAACWAVEFORMAT;
+        Open_Buffer_Init(MI);
+        Open_Buffer_Continue(MI);
+        Stream[Stream_Number].Parser=MI;
+    #else //MEDIAINFO_AAC_YES
+        Skip_XX(Element_Size-Element_Offset,                    "HEAACWAVEFORMAT");
+    #endif
 }
 
 //---------------------------------------------------------------------------

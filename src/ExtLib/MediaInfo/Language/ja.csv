@@ -14,8 +14,8 @@
  bit1; ビット
  bit2; ビット
  bit3; ビット
- bps; bps
  Bps; Bps
+ bps; bps
  Byte1; バイト
  Byte2; バイト
  Byte3; バイト
@@ -49,8 +49,8 @@
  frame3; フレーム
  GB; GB
  Gb; Gb
- Gbps; Gb/秒
  GBps; GB/秒
+ Gbps; Gb/秒
  GHz; GHz
  GiB; GiB
  GibiByte1; GibiBytes
@@ -91,8 +91,8 @@
  KiloByte3; KiloBytes
  MB; MB
  Mb; Mb
- Mbps; Mbps
  MBps; MebiBytes
+ Mbps; Mbps
  MebiBit1; MebiBit
  MebiBit2; MebiBits
  MebiBit3; MebiBits
@@ -163,6 +163,7 @@ About;このソフトの情報
 About_Hint;連絡方法と最新版チェック
 AC3_Metadata;
 Accompaniment;伴奏
+acmod;
 Active_DisplayAspectRatio;
 Active_Height;
 Active_Width;
@@ -178,9 +179,9 @@ AdID;広告ID識別子
 ADM: Show ChannelFormats;ADM: ChannelFormat を表示
 ADM: Show TrackUIDs;ADM: TrackUID を表示
 AdmProfile;
-Advanced;詳細
-Advanced mode;詳細モード
 Advanced mode -->;
+Advanced mode;詳細モード
+Advanced;詳細
 Album;アルバム名
 Album_ReplayGain_Gain;アルバム リプレイゲイン
 Album_ReplayGain_Peak;アルバム リプレイゲイン ピーク
@@ -200,11 +201,12 @@ ArtDirector;美術監督
 AspectRatio;アスペクト比
 AssistantDirector;助監督
 AssociatedVideo_FrameRate;
-at;at
 At least one file;( 1つ以上のファイルを開いてください )
+at;at
 Attachments;
-Audio;音声
 Audio stream(s);音声ストリーム
+Audio;音声
+Audio_Channels_Total;
 Audio_Codec_List;音声コーデック
 Audio_Format_List;
 Audio_Format_WithHint_List;
@@ -246,6 +248,7 @@ BitRate_Nominal;ビットレート名
 Bits-(Pixel*Frame);ビット/(ピクセル*フレーム)
 BitstreamLevel;
 Bring All to Front;すべてを手前に移動
+bsid;
 BufferSize;バッファサイズ
 Cancel;キャンセル
 CaptionServiceName;
@@ -261,8 +264,8 @@ ChannelMode;
 ChannelPositions;チャンネルの位置
 ChannelPositions_Original;
 Chapter(s);チャプター
-Chapters;チャプター
 Chapters stream(s);チャプターストリーム
+Chapters;チャプター
 Chapters_Codec_List;チャプターコーデック
 Chapters_No;チャプターなし
 Chapters_Pos_Begin;
@@ -270,9 +273,9 @@ Chapters_Pos_End;
 ChaptersCount;チャプター数
 CharacterSet;
 CheckNewVersion;最新版のチェック
-Choose custom;カスタム選択
 Choose custom sheet;編集するシートを選択してください
 Choose custom text;編集するテキストを選択してください
+Choose custom;カスタム選択
 Choose export format;出力形式を選択してください
 Choose file(s);開くファイルを選択してください
 Choose filename;ファイル名を入力してください
@@ -282,14 +285,15 @@ Chroma;クロマ
 ChromaSubsampling;クロマサブサンプリング
 Classifier;
 ClearList;一覧のクリア
-Close;閉じる
 Close all before open;すべて閉じてから開く
+Close;閉じる
 CloseAll;
 ClosedCaptionsLanguage;クローズドキャプションの言語
 ClosedCaptionsPresent;クローズドキャプションの有無
 ClosedCaptionsType;クローズドキャプションの種類
 CloseFile;
 CloseWindow;ウィンドウを閉じる
+cmixlev;
 Codec;コーデック
 Codec_Description;コーデックの説明
 Codec_Info;コーデックの詳細
@@ -319,8 +323,12 @@ ColorTheme;
 ColorTheme_Dark;
 ColorTheme_Light;
 ColorTheme_System;
+colour_description_present;
+colour_description_present_Source;
 colour_primaries;原色
+colour_primaries_Source;
 colour_range;色の範囲
+colour_range_Source;
 Comment;コメント
 CommissionedBy;委託
 Compare;
@@ -359,6 +367,7 @@ Cover_Description;カバー説明
 Cover_Mime;カバーの MIME
 Cover_Type;カバーの種類
 CoverData;
+CreatedOn;
 Cropped;切り取り
 Custom;カスタム
 CustomDownmixTargets;
@@ -367,8 +376,8 @@ DarkMode;ダークモード
 Date;日付
 Debug;デバッグ
 Decimal point;小数点
-Default;
 Default translation;
+Default;
 Default_Setting;システムの規定
 DefaultTargetDeviceConfig;
 DefaultView;
@@ -380,6 +389,10 @@ Delete;削除
 Description;詳細説明
 Details;
 dialnorm;
+dialnorm_Average;
+dialnorm_Count;
+dialnorm_Maximum;
+dialnorm_Minimum;
 DialogueCorrected;
 DialogueEnhancement;
 DialogueNormalization;
@@ -428,6 +441,8 @@ ElementCount;要素数
 EMail;電子メール
 Enable FFmpeg plugin;
 Encoded_Application;使用したエンコーダ
+Encoded_Application_Name;
+Encoded_Application_Version;
 Encoded_Date;エンコード日
 Encoded_Hardware;
 Encoded_Library;使用したライブラリ
@@ -462,8 +477,8 @@ Feature_FilesCompare;
 Feature_More;
 Feature_SelectView;
 Field;
-File;ファイル
 File size;ファイルサイズ
+File;ファイル
 File_Append;既存のファイルの末尾に追加 (警告 : 設定値が同じになるよう注意してください)
 File_Created_Date;ファイル作成日
 File_Created_Date_Local;ファイル作成日 (現地時間)
@@ -481,10 +496,10 @@ FirstDisplay_Type;
 FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
-Folder;フォルダー
 Folder (R);フォルダー(R)
 Folder (R)_Hint;フォルダーを選択 (サブフォルダーもすべて読み込みます)
 Folder (Recursively);フォルダー (サブフォルダー含む)
+Folder;フォルダー
 Folder_Hint;調べるフォルダを選択
 FolderName;フォルダー名
 Forced;
@@ -769,8 +784,8 @@ HTML;HTML
 ID;ID
 IdentClockStart;Ident Clock 開始
 IFrameInterval;
-Image;画像
 Image stream(s);画像ストリーム
+Image;画像
 Image_Codec_List;画像コーデック
 ImageCount;画像ストリームの数
 ImmersiveStereo;
@@ -1001,12 +1016,12 @@ Language_yue;
 Language_za;チワン語
 Language_zh;中国語
 Language_zh-cmn;
-Language_zh-cn;中国語 (簡体)
 Language_zh-CN;
+Language_zh-cn;中国語 (簡体)
 Language_zh-Hans;
 Language_zh-Hant;
-Language_zh-tw;中国語 (繁体)
 Language_zh-TW;
+Language_zh-tw;中国語 (繁体)
 Language_zh-yue;
 Language_zu;ズールー語
 LanguageChanges;
@@ -1016,6 +1031,7 @@ LCCN;LCCN
 LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
+lfeon;
 Library;Mux ライブラリ
 Lifetime_Subscribe_Button;生涯の購読料は %PRICE%
 Lightness;明るさ
@@ -1068,6 +1084,7 @@ MasteringDisplay_Luminance;マスタリングディスプレイの輝度
 Matrix_Channel(s);マトリックスエンコーディングのチャンネル
 Matrix_ChannelPositions;マトリックスエンコーディングのチャンネルの位置
 matrix_coefficients;マトリックス係数
+matrix_coefficients_Source;
 Matrix_Format;マトリックスエンコーディングの形式
 MaxCLL;コンテンツの最大明るさの度合い (MaxCLL)
 MaxFALL;フレームの平均明るさの度合い (MaxFALL)
@@ -1079,8 +1096,8 @@ MD5_Unencoded;
 MediaInfo_About;MediaInfo により、動画ファイルや音声ファイルの技術情報やタグ情報に簡単にアクセスできます。\r\nMac App Store のグラフィカルユーザーインターフェース以外は、オープンソースのソフトウェアです。つまりこのプログラムは最終利用者に無償で提供され、開発者は自由にプログラムを研究、改良、再配布できます (BSDライセンス)。
 MediaInfo_About_About;MediaInfo v%MI_VERSION% (MediaInfoLib v%MIL_VERSION%)
 MediaInfo_WebSite;
-Menu;メニュー
 Menu stream(s);メニューストリーム
+Menu;メニュー
 Menu_Codec_List;メニュー コーデック
 Menu_Hint;もっと存在する可能性あり
 Menu_No;メニューなし
@@ -1151,13 +1168,15 @@ Other;その他
 OtherIdentifier;他の識別子
 OtherIdentifierType;他の識別子の種別
 OtherViews;
-Output;出力
 Output format;出力形式
+Output;出力
 OverallBitRate;総ビットレート
 OverallBitRate_Maximum;最大総ビットレート
 OverallBitRate_Minimum;最小総ビットレート
 OverallBitRate_Mode;総ビットレートの種類
 OverallBitRate_Nominal;総ビットレート名
+OverallBitRate_Precision_Max;
+OverallBitRate_Precision_Min;
 PackageName;パッケージ名
 PackFormat;
 Part;パート
@@ -1227,6 +1246,7 @@ Renew;更新
 ReplayGain_Gain;リプレイゲイン ゲイン
 ReplayGain_Peak;リプレイゲイン ピーク
 Report;報告
+ReportBy;
 Resolution;解像度
 RestoreLifetimeSubscription;生涯購読の復元
 Retry;
@@ -1270,17 +1290,17 @@ Set;セット
 Set_Count;セット数
 Setup;基本
 Sharpness;シャープネス
-Sheet;シート
 Sheet (Complete);シート (完成)
-Shell extension;エクスプローラーに統合 (ファイルの右クリックメニューに登録)
+Sheet;シート
 Shell extension, folder;フォルダーにも追加
 Shell extension, separate instance;
+Shell extension;エクスプローラーに統合 (ファイルの右クリックメニューに登録)
 Shell InfoTip;エクスプローラーでツールチップ (対応ファイル上でツールチップを表示)
 ShimName;Shim 名
 ShimVersion;Shim バージョン
-Show;
 Show menu;メニューを表示
 Show toolbar;ツールバーを表示
+Show;
 ShowAll;すべてを表示
 ShowMore;
 SignalGroup;
@@ -1297,6 +1317,7 @@ Source_StreamSize;元のストリームサイズ
 Source_StreamSize_Encoded;元のエンコードされたストリームサイズ
 SpokenSubtitles;
 Standard;標準化
+Stored_Height;
 StoreMethod_InterleavedFields;
 StoreMethod_SeparatedFields;
 StoreMethod_SeparatedFields_1;
@@ -1340,6 +1361,7 @@ Supported formats;対応する形式
 Supported?;対応？
 SupportUs;私たちを支援してください。ダークテーマやさらなる機能につなげましょう。
 SupportUs2;
+surmixlev;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;概要
@@ -1351,11 +1373,11 @@ Technician;技術者
 TermsOfUse;使用許諾
 TertiaryAudioLanguage;音声3の言語
 TestContinuousFileNames;
-Text;テキスト
 Text - Custom;テキスト - カスタム
 Text (HTML);テキスト (HTML)
 Text stream(s);字幕ストリーム
 Text streams;字幕ストリーム
+Text;テキスト
 Text_Codec_List;字幕コーデック
 Text_Format_List;
 Text_Format_WithHint_List;
@@ -1395,11 +1417,12 @@ TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;転送特性
+transfer_characteristics_Source;
 Translate_Reports;
 Translator;翻訳者
 Transport;
-Tree;ツリー
 Tree & Text;ツリーとテキスト
+Tree;ツリー
 Trim_Center;
 Trim_Height;
 Trim_Surround;
@@ -1444,8 +1467,8 @@ UniversalAdID_Value;ユニバーサル広告IDの値
 Unknown;不明
 Url;URL
 Value;
-Video;映像
 Video stream(s);映像ストリーム
+Video;映像
 Video_Codec_List;映像コーデック
 Video_Delay;映像遅延
 Video_Format_List;
@@ -1486,5 +1509,5 @@ Yes;はい
 Your system;システム情報
 Your translation;
 Zoom;拡大／縮小
-ZZ_Automatic_Percent;78
-ZZ_AutomaticLanguage_Percent;79
+ZZ_Automatic_Percent;77
+ZZ_AutomaticLanguage_Percent;78

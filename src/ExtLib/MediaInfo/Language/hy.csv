@@ -14,8 +14,8 @@
  bit1; բիթ
  bit2; բիթ
  bit3; բիթ
- bps; բիթ/վայր.
  Bps; բայթ/վայր.
+ bps; բիթ/վայր.
  Byte1; բայթ
  Byte2; բայթ
  Byte3; բայթ
@@ -49,8 +49,8 @@
  frame3; կադրեր
  GB; ԳԲ
  Gb; Գբիթ
- Gbps; Գբիթ/վայր.
  GBps; Գբայթ/վայր.
+ Gbps; Գբիթ/վայր.
  GHz; ԳՀց
  GiB; Գբայթ
  GibiByte1;Գիբիբայթ
@@ -91,8 +91,8 @@
  KiloByte3; Կիլոբայթ
  MB; ՄԲ
  Mb; Մբ
- Mbps; Մբիթ/վայր.
  MBps; Մբայթ/վայր.
+ Mbps; Մբիթ/վայր.
  MebiBit1; Մեբիբիթ
  MebiBit2; Մեբիբիթ
  MebiBit3; Մեբիբիթ
@@ -163,6 +163,7 @@ About;Ծրագրի մասին
 About_Hint;Կապնվել ծրագրի հեղինակի հետ կամ բացել ծրագրի կայքը
 AC3_Metadata;
 Accompaniment;Ուղեկցումը
+acmod;
 Active_DisplayAspectRatio;
 Active_Height;
 Active_Width;
@@ -178,9 +179,9 @@ AdID;
 ADM: Show ChannelFormats;
 ADM: Show TrackUIDs;
 AdmProfile;
-Advanced;Լրացուցիչ
-Advanced mode;Ընդլայնված եղանակ
 Advanced mode -->;
+Advanced mode;Ընդլայնված եղանակ
+Advanced;Լրացուցիչ
 Album;Ալբոմը
 Album_ReplayGain_Gain;Ալբոմի ձայնի կարգավորիչ
 Album_ReplayGain_Peak;Ալբոմի ձայնի կարգավորիչի գագաթը
@@ -200,11 +201,12 @@ ArtDirector;ArtDirector
 AspectRatio;Հարաբերակցությունը
 AssistantDirector;Ռեժիսորի օգնականը
 AssociatedVideo_FrameRate;
-at;ընդ.
 At least one file;Ընտրեք որևէ ֆայլ
+at;ընդ.
 Attachments;
-Audio;Ձայնը
 Audio stream(s);Ձայնի հոսքը
+Audio;Ձայնը
+Audio_Channels_Total;
 Audio_Codec_List;Ձայնի կոդավորիչները
 Audio_Format_List;
 Audio_Format_WithHint_List;
@@ -246,6 +248,7 @@ BitRate_Nominal;Նոմինալ բիթրեյթը
 Bits-(Pixel*Frame);Բիթ/(Փիքսել*Կադր)
 BitstreamLevel;
 Bring All to Front;
+bsid;
 BufferSize;Պահոցի չափը
 Cancel;Մերժել
 CaptionServiceName;
@@ -261,8 +264,8 @@ ChannelMode;
 ChannelPositions;Դիրքը
 ChannelPositions_Original;
 Chapter(s);Հոսքերը
-Chapters;Հոսքերը
 Chapters stream(s);Բաժինների հոսքերը
+Chapters;Հոսքերը
 Chapters_Codec_List;Բաժինների կոդ-ները
 Chapters_No;Չկան բաժիններ
 Chapters_Pos_Begin;
@@ -270,9 +273,9 @@ Chapters_Pos_End;
 ChaptersCount;Բաժինների ք-ը
 CharacterSet;
 CheckNewVersion;Ստուգել նոր տարբերակը
-Choose custom;Ընտրել
 Choose custom sheet;Ընտրել աղյուսակը
 Choose custom text;Ընտրել տեքստը
+Choose custom;Ընտրել
 Choose export format;Ընտրեք արտածման եղանակը
 Choose file(s);Ընտրեք ֆայլը
 Choose filename;Ընտրեք ֆայլի անունը
@@ -282,14 +285,15 @@ Chroma;Գույնայնությունը
 ChromaSubsampling;Գույների ընտրություն
 Classifier;
 ClearList;
-Close;Փակել
 Close all before open;Բացելուց առաջ փակել բոլորը
+Close;Փակել
 CloseAll;
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
 CloseFile;
 CloseWindow;
+cmixlev;
 Codec;Կոդավորիչը
 Codec_Description;Կոդավորիչի նկարագր-ը
 Codec_Info;Մանրամասներ կոդավորիչի մասին
@@ -319,8 +323,12 @@ ColorTheme;
 ColorTheme_Dark;
 ColorTheme_Light;
 ColorTheme_System;
+colour_description_present;
+colour_description_present_Source;
 colour_primaries;Հիմնական գույները
+colour_primaries_Source;
 colour_range;
+colour_range_Source;
 Comment;Մեկնաբանություն
 CommissionedBy;Երաշխավորող
 Compare;
@@ -359,6 +367,7 @@ Cover_Description;Կազմի նկարագրությունը
 Cover_Mime;Կազմի MIME տեսակ
 Cover_Type;Կազմի տեսակը
 CoverData;
+CreatedOn;
 Cropped;Կտրման չափերը
 Custom;Ընտրված
 CustomDownmixTargets;
@@ -367,8 +376,8 @@ DarkMode;
 Date;Ամսաթիվը
 Debug;Փոխադրիչ
 Decimal point;Տասնորդական կետ
-Default;
 Default translation;
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 DefaultView;
@@ -380,6 +389,10 @@ Delete;Ջնջել
 Description;Նկարագրությունը
 Details;
 dialnorm;
+dialnorm_Average;
+dialnorm_Count;
+dialnorm_Maximum;
+dialnorm_Minimum;
 DialogueCorrected;
 DialogueEnhancement;
 DialogueNormalization;
@@ -428,6 +441,8 @@ ElementCount;
 EMail;Փոստը
 Enable FFmpeg plugin;
 Encoded_Application;Կոդավորող ծրագիրը
+Encoded_Application_Name;
+Encoded_Application_Version;
 Encoded_Date;Կոդավորման ամսաթիվը
 Encoded_Hardware;
 Encoded_Library;Կոդավորման շտեմարանը
@@ -462,8 +477,8 @@ Feature_FilesCompare;
 Feature_More;
 Feature_SelectView;
 Field;
-File;Ֆայլ
 File size;Ֆայլի չափը
+File;Ֆայլ
 File_Append;Ավելացնել ֆայլին
 File_Created_Date;Ֆայլի ամսաթիվը
 File_Created_Date_Local;Ֆայլի ամսաթիվը (տեղային)
@@ -481,10 +496,10 @@ FirstDisplay_Type;
 FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
-Folder;Թղթապանակը
 Folder (R);Թղթապանակը (R)
 Folder (R)_Hint;Ընտրեք թղթապանակը (բոլոր ենթաթղթապանակներով)
 Folder (Recursively);Թղթապանակը (նվազմամբ)...
+Folder;Թղթապանակը
 Folder_Hint;Գործողություն թղթ-երի հետ
 FolderName;Թղթապանակի անունը
 Forced;
@@ -769,8 +784,8 @@ HTML;HTML
 ID;ID-ին
 IdentClockStart;
 IFrameInterval;
-Image;Պատկերը
 Image stream(s);Պատկերների հոսքերը
+Image;Պատկերը
 Image_Codec_List;Պատկերների կոդավորիչները
 ImageCount;Պատկերների հոսքերի քանակը
 ImmersiveStereo;
@@ -1001,12 +1016,12 @@ Language_yue;
 Language_za;Zhuang
 Language_zh;Chinese
 Language_zh-cmn;
-Language_zh-cn;Chinese (China)
 Language_zh-CN;
+Language_zh-cn;Chinese (China)
 Language_zh-Hans;
 Language_zh-Hant;
-Language_zh-tw;Chinese (Taiwan)
 Language_zh-TW;
+Language_zh-tw;Chinese (Taiwan)
 Language_zh-yue;
 Language_zu;Zulu
 LanguageChanges;
@@ -1016,6 +1031,7 @@ LCCN;LCCN
 LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
+lfeon;
 Library;Շտեմարանը
 Lifetime_Subscribe_Button;
 Lightness;Պայծառությունը
@@ -1068,6 +1084,7 @@ MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;Կետացանցի գործակիցը
+matrix_coefficients_Source;
 Matrix_Format;
 MaxCLL;
 MaxFALL;
@@ -1079,8 +1096,8 @@ MD5_Unencoded;
 MediaInfo_About;Ցուցադրում է մանրամասն տեղեկություններ\r\nմուլտիմեդիային ֆայլեր Matroska-ի, OGG-ի (ներառյալ OGM)\r\nMPEG1-ի (ներառյալ VCD), MPEG2-ի (ներառյալ DVD և SVCD), MPEG4-ի (ներառյալ iTunes M4A)\r\nQuicktime-ի\r\nRealMedia-ի\r\nWindowsMedia-ի (ներառյալ WMV, WMA)\r\nMicrosoft RIFF-ի (ներառյալ AVI, WAV, DivX)\r\nձայնային ֆայլերի (AC3, DTS, SSC, AU, AIFF) վերաբերյալ
 MediaInfo_About_About;
 MediaInfo_WebSite;
-Menu;Ընտրացանկը
 Menu stream(s);Հոսքերի ընտրացանկը
+Menu;Ընտրացանկը
 Menu_Codec_List;Կոդավորիչների ընտրացանկը
 Menu_Hint;Լրացուցիչ հնարավորություններ
 Menu_No;Չկա Ընտրացանկ
@@ -1151,13 +1168,15 @@ Other;Այլ
 OtherIdentifier;
 OtherIdentifierType;
 OtherViews;
-Output;Արտածում
 Output format;Արտածման տեսակը
+Output;Արտածում
 OverallBitRate;Ընդհանուր հոսքը
 OverallBitRate_Maximum;Առավելագույն ընդ. բիթրեյթը
 OverallBitRate_Minimum;Նվազագույն ընդ. բիթրեյթը
 OverallBitRate_Mode;Բիթրեյթի ընդ. եղանակը
 OverallBitRate_Nominal;Բիթրեյթի պայմ. եղանակը
+OverallBitRate_Precision_Max;
+OverallBitRate_Precision_Min;
 PackageName;
 PackFormat;
 Part;Մաս
@@ -1227,6 +1246,7 @@ Renew;
 ReplayGain_Gain;Ձայնի կարգավորիչ
 ReplayGain_Peak;Ձայնի կարգավորման գագաթը
 Report;
+ReportBy;
 Resolution;Լուծաչափը
 RestoreLifetimeSubscription;
 Retry;
@@ -1270,17 +1290,17 @@ Set;Տեղակայում
 Set_Count;Տեղակայումների ք-ը
 Setup;Կարգավորում
 Sharpness;Սրությունը
-Sheet;Աղյուսակ
 Sheet (Complete);Աղյուսակը (ամբողջական)
-Shell extension;Ինտեգրել Explorer-ում
+Sheet;Աղյուսակ
 Shell extension, folder;Ինտեգրել թղթապանակների Explorer-ում
 Shell extension, separate instance;
+Shell extension;Ինտեգրել Explorer-ում
 Shell InfoTip;Ցուցադրել հուշում Explorer-ում
 ShimName;
 ShimVersion;
-Show;
 Show menu;Ցուցադրել ընտրացանկը
 Show toolbar;Ցուցադրել վահանակը
+Show;
 ShowAll;
 ShowMore;
 SignalGroup;
@@ -1297,6 +1317,7 @@ Source_StreamSize;
 Source_StreamSize_Encoded;
 SpokenSubtitles;
 Standard;Ստանդարտ
+Stored_Height;
 StoreMethod_InterleavedFields;
 StoreMethod_SeparatedFields;
 StoreMethod_SeparatedFields_1;
@@ -1340,6 +1361,7 @@ Supported formats;Աջակցվող տեսակները
 Supported?;Աջակցվու՞մ է
 SupportUs;
 SupportUs2;
+surmixlev;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Համառոտ
@@ -1351,11 +1373,11 @@ Technician;Տեխնիկը
 TermsOfUse;Օգտագ. կանոնները
 TertiaryAudioLanguage;
 TestContinuousFileNames;
-Text;Տեքստ
 Text - Custom;Տեքստ - Ընտրովի
 Text (HTML);Տեքստ (HTML)
 Text stream(s);Տեքստային հոսքեր
 Text streams;Տեքստային հոսքեր
+Text;Տեքստ
 Text_Codec_List;Տեքստային կոդավորիչները
 Text_Format_List;
 Text_Format_WithHint_List;
@@ -1395,11 +1417,12 @@ TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;Փոխանցման բնութագրումը
+transfer_characteristics_Source;
 Translate_Reports;
 Translator;Hrant Ohanyan
 Transport;
-Tree;Ծառի տեսքով
 Tree & Text;Ծառի տեսքով և տեքստ
+Tree;Ծառի տեսքով
 Trim_Center;
 Trim_Height;
 Trim_Surround;
@@ -1444,8 +1467,8 @@ UniversalAdID_Value;
 Unknown;Անհայտ է
 Url;Հղումը
 Value;
-Video;Տեսանյութը
 Video stream(s);Տեսահոսքը
+Video;Տեսանյութը
 Video_Codec_List;Տեսակոդավորիչները
 Video_Delay;Տեսանյութի դադարը
 Video_Format_List;
@@ -1486,5 +1509,5 @@ Yes;Այո
 Your system;Ձեր համակարգը
 Your translation;
 Zoom;
-ZZ_Automatic_Percent;62
-ZZ_AutomaticLanguage_Percent;66
+ZZ_Automatic_Percent;61
+ZZ_AutomaticLanguage_Percent;65

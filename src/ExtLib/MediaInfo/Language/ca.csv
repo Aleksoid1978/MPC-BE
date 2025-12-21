@@ -14,8 +14,8 @@
  bit1; bit
  bit2; bits
  bit3; bits
- bps; b/s
  Bps; B/s
+ bps; b/s
  Byte1; Byte
  Byte2; Bytes
  Byte3; Bytes
@@ -49,8 +49,8 @@
  frame3; fotogrames
  GB; GB
  Gb; Gb
- Gbps; Gb/s
  GBps; GB/s
+ Gbps; Gb/s
  GHz; GHz
  GiB; GiB
  GibiByte1; GibiBytes
@@ -91,8 +91,8 @@
  KiloByte3; KiloBytes
  MB; MB
  Mb; Mb
- Mbps; Mb/s
  MBps; MebiBytes
+ Mbps; Mb/s
  MebiBit1; MebiBit
  MebiBit2; MebiBits
  MebiBit3; MebiBits
@@ -163,6 +163,7 @@ About;Quant a...
 About_Hint;Com contactar-me i trobar l'última versió
 AC3_Metadata;
 Accompaniment;Acompanyament
+acmod;
 Active_DisplayAspectRatio;
 Active_Height;
 Active_Width;
@@ -178,9 +179,9 @@ AdID;
 ADM: Show ChannelFormats;
 ADM: Show TrackUIDs;
 AdmProfile;
-Advanced;Avançat
-Advanced mode;Mode avançat
 Advanced mode -->;
+Advanced mode;Mode avançat
+Advanced;Avançat
 Album;Àlbum
 Album_ReplayGain_Gain;Ganància reproducció àlbum
 Album_ReplayGain_Peak;Ganància màxima reproducció àlbum
@@ -200,11 +201,12 @@ ArtDirector;Director artístic
 AspectRatio;Relació d'aspecte
 AssistantDirector;Assistent del director
 AssociatedVideo_FrameRate;
-at;a
 At least one file;(Has d'obrir al menys un arxiu)
+at;a
 Attachments;
-Audio;Àudio
 Audio stream(s);Pistes d'àudio
+Audio;Àudio
+Audio_Channels_Total;
 Audio_Codec_List;Còdecs d'àudio
 Audio_Format_List;
 Audio_Format_WithHint_List;
@@ -246,6 +248,7 @@ BitRate_Nominal;Taxa de bits nominal
 Bits-(Pixel*Frame);Bits/(píxel*fotograma)
 BitstreamLevel;
 Bring All to Front;Portar-ho tot a primer pla
+bsid;
 BufferSize;Mida búfer
 Cancel;Cancel·la
 CaptionServiceName;
@@ -261,8 +264,8 @@ ChannelMode;
 ChannelPositions;Posicions dels canals
 ChannelPositions_Original;
 Chapter(s);Capítol(s)
-Chapters;Capítols
 Chapters stream(s);Pista(es) de capítol(s)
+Chapters;Capítols
 Chapters_Codec_List;Còdecs capítols
 Chapters_No;Sense capítols
 Chapters_Pos_Begin;
@@ -270,9 +273,9 @@ Chapters_Pos_End;
 ChaptersCount;Total pistes capítols
 CharacterSet;
 CheckNewVersion;Cercar una nova versió
-Choose custom;Tria personalitzat
 Choose custom sheet;Tria les etiquetes desitjades
 Choose custom text;Tria el text personal
+Choose custom;Tria personalitzat
 Choose export format;Tria el format a exportar
 Choose file(s);Tria els arxius a obrir
 Choose filename;Tria el nom d'arxiu
@@ -282,14 +285,15 @@ Chroma;Croma
 ChromaSubsampling;Submostreig croma
 Classifier;
 ClearList;
-Close;Tanca
 Close all before open;Tanca tot abans d'obrir
+Close;Tanca
 CloseAll;
 ClosedCaptionsLanguage;Idioma subtítols incrustats
 ClosedCaptionsPresent;Subtítols incrustats presents
 ClosedCaptionsType;Tipus subtítols incrustats
 CloseFile;
 CloseWindow;Tancar la finestra
+cmixlev;
 Codec;Còdec
 Codec_Description;Descripció del còdec
 Codec_Info;Detalls del còdec
@@ -319,8 +323,12 @@ ColorTheme;
 ColorTheme_Dark;
 ColorTheme_Light;
 ColorTheme_System;
+colour_description_present;
+colour_description_present_Source;
 colour_primaries;Primàries de color
+colour_primaries_Source;
 colour_range;Gama de color
+colour_range_Source;
 Comment;Comentari
 CommissionedBy;Commissionat per
 Compare;
@@ -359,6 +367,7 @@ Cover_Description;Descripció de la portada
 Cover_Mime;Codificació de la portada
 Cover_Type;Tipus de portada
 CoverData;
+CreatedOn;
 Cropped;Mida retallat
 Custom;Personalitzat
 CustomDownmixTargets;
@@ -367,8 +376,8 @@ DarkMode;
 Date;Data
 Debug;Depuració
 Decimal point;Punt decimal
-Default;
 Default translation;
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 DefaultView;
@@ -380,6 +389,10 @@ Delete;Esborra
 Description;Descripció
 Details;
 dialnorm;
+dialnorm_Average;
+dialnorm_Count;
+dialnorm_Maximum;
+dialnorm_Minimum;
 DialogueCorrected;
 DialogueEnhancement;
 DialogueNormalization;
@@ -428,6 +441,8 @@ ElementCount;
 EMail;Correu
 Enable FFmpeg plugin;
 Encoded_Application;Aplicació
+Encoded_Application_Name;
+Encoded_Application_Version;
 Encoded_Date;Data de codificació
 Encoded_Hardware;
 Encoded_Library;Llibreria d'escriptura
@@ -462,8 +477,8 @@ Feature_FilesCompare;
 Feature_More;
 Feature_SelectView;
 Field;
-File;Arxiu
 File size;Mida d'arxiu
+File;Arxiu
 File_Append;Annexar a l'arxiu existent (atenció: tingues cura. Han de ser els mateixos paràmetres)
 File_Created_Date;Data creació arxiu
 File_Created_Date_Local;Data creació arxiu (local)
@@ -481,10 +496,10 @@ FirstDisplay_Type;
 FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
-Folder;Carpeta
 Folder (R);Carpeta (R)
 Folder (R)_Hint;Tria una carpeta (i les seves subcarpetes)
 Folder (Recursively);Carpeta general
+Folder;Carpeta
 Folder_Hint;Tria la carpeta general
 FolderName;Nom de la carpeta
 Forced;
@@ -769,8 +784,8 @@ HTML;HTML
 ID;ID
 IdentClockStart;Inici rellotge ident
 IFrameInterval;
-Image;Imatge
 Image stream(s);Pistes d'imatge
+Image;Imatge
 Image_Codec_List;Llista de còdecs
 ImageCount;Comptador de pistes d'imatge
 ImmersiveStereo;
@@ -1001,12 +1016,12 @@ Language_yue;
 Language_za;Zhuang
 Language_zh;Xinès
 Language_zh-cmn;
-Language_zh-cn;Xinès (Xina)
 Language_zh-CN;
+Language_zh-cn;Xinès (Xina)
 Language_zh-Hans;
 Language_zh-Hant;
-Language_zh-tw;Xinès (Taiwan)
 Language_zh-TW;
+Language_zh-tw;Xinès (Taiwan)
 Language_zh-yue;
 Language_zu;Zulú
 LanguageChanges;
@@ -1016,6 +1031,7 @@ LCCN;LCCN
 LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
+lfeon;
 Library;Llibreria multiplexat
 Lifetime_Subscribe_Button;
 Lightness;Lleugeresa
@@ -1068,6 +1084,7 @@ MasteringDisplay_Luminance;Lluminància monitor masterització
 Matrix_Channel(s);Codificació matriu, canal(s)
 Matrix_ChannelPositions;Codificació matriu, posició canals
 matrix_coefficients;Coeficients matriu
+matrix_coefficients_Source;
 Matrix_Format;Codificació matriu, format
 MaxCLL;Nivell leuger contingut màxim
 MaxFALL;Nivell leuger mitjana fotogrames màxim
@@ -1079,8 +1096,8 @@ MD5_Unencoded;
 MediaInfo_About;MediaInfo proporciona informació tècnica d'arxius de vídeo i àudio.\r\nExcepte la interfaç gràfica a la Mac App Store, és de codi obert, el que significa que és gratuït per als usuaris i els desenvolupadors tenen accés lliure per a estudiar-lo, millorar-lo i redistribuir-lo (llicència BSD)
 MediaInfo_About_About;
 MediaInfo_WebSite;
-Menu;Menú
 Menu stream(s);Menú de pistes
+Menu;Menú
 Menu_Codec_List;Menú de codecs
 Menu_Hint;Més possibilitats
 Menu_No;Sense menú
@@ -1151,13 +1168,15 @@ Other;Altres
 OtherIdentifier;Altre identificador
 OtherIdentifierType;Tipus altre identificador
 OtherViews;
-Output;Sortida
 Output format;Format de sortida
+Output;Sortida
 OverallBitRate;Velocitat bits general
 OverallBitRate_Maximum;Velocitat màxima bits general
 OverallBitRate_Minimum;Velocitat mínima bits general
 OverallBitRate_Mode;Mode general velocitat bits
 OverallBitRate_Nominal;Velocitat de bits nominal
+OverallBitRate_Precision_Max;
+OverallBitRate_Precision_Min;
 PackageName;
 PackFormat;
 Part;Part
@@ -1227,6 +1246,7 @@ Renew;
 ReplayGain_Gain;Ganància reproducció
 ReplayGain_Peak;Límit ganància reproducció
 Report;
+ReportBy;
 Resolution;Resolució
 RestoreLifetimeSubscription;
 Retry;
@@ -1270,17 +1290,17 @@ Set;Grup
 Set_Count;Quantitat grups
 Setup;Configura
 Sharpness;Nitidesa
-Sheet;Fulla
 Sheet (Complete);Fulla (completa)
-Shell extension;Extensió Explorer (a Windows, clic dret a un arxiu mostrarà la opció MediaInfo)
+Sheet;Fulla
 Shell extension, folder;També per a carpetes
 Shell extension, separate instance;
+Shell extension;Extensió Explorer (a Windows, clic dret a un arxiu mostrarà la opció MediaInfo)
 Shell InfoTip;Consells Explorer (a Windows, mou el ratolí sobre un arxiu per mostrar info)
 ShimName;Nom de falca
 ShimVersion;Versió de falca
-Show;
 Show menu;Mostra el menú
 Show toolbar;Mostra la barra d'eines
+Show;
 ShowAll;Mostrar-ho tot
 ShowMore;
 SignalGroup;
@@ -1297,6 +1317,7 @@ Source_StreamSize;Mida pista original
 Source_StreamSize_Encoded;Mida pista codificada original
 SpokenSubtitles;
 Standard;Estàndard
+Stored_Height;
 StoreMethod_InterleavedFields;Camps intercalats
 StoreMethod_SeparatedFields;Camps separats
 StoreMethod_SeparatedFields_1;Camps separats (1 camp per bloc)
@@ -1340,6 +1361,7 @@ Supported formats;Formats compatibles
 Supported?;Compatible?
 SupportUs;
 SupportUs2;
+surmixlev;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Sinopsi
@@ -1351,11 +1373,11 @@ Technician;Tècnic
 TermsOfUse;Condicions d'ús
 TertiaryAudioLanguage;Idoma àudio terciari
 TestContinuousFileNames;
-Text;Text
 Text - Custom;Tex: personalitzat
 Text (HTML);Text (HTML)
 Text stream(s);Pistes de text
 Text streams;Pistaes de text
+Text;Text
 Text_Codec_List;Còdecs de text
 Text_Format_List;
 Text_Format_WithHint_List;
@@ -1395,11 +1417,12 @@ TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;Característiques transferència
+transfer_characteristics_Source;
 Translate_Reports;
 Translator;Traductor
 Transport;
-Tree;Arbre
 Tree & Text;Arbre i text
+Tree;Arbre
 Trim_Center;
 Trim_Height;
 Trim_Surround;
@@ -1444,8 +1467,8 @@ UniversalAdID_Value;
 Unknown;Desconegut
 Url;URL
 Value;
-Video;Vídeo
 Video stream(s);Pista(es) de vídeo
+Video;Vídeo
 Video_Codec_List;Còdecs de vídeo
 Video_Delay;Retard de vídeo
 Video_Format_List;
@@ -1486,5 +1509,5 @@ Yes;Sí
 Your system;El teu sistema
 Your translation;
 Zoom;Zoom
-ZZ_Automatic_Percent;70
-ZZ_AutomaticLanguage_Percent;73
+ZZ_Automatic_Percent;69
+ZZ_AutomaticLanguage_Percent;72

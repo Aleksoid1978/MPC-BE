@@ -14,8 +14,8 @@
  bit1;бит1
  bit2;бит2
  bit3;бит3
- bps;бпс
  Bps;Бпс
+ bps;бпс
  Byte1;Байт1
  Byte2;Байт2
  Byte3;Байт3
@@ -49,8 +49,8 @@
  frame3;кадър3
  GB;ГБ
  Gb;Гб
- Gbps;Гб/сек
  GBps;ГБ/сек
+ Gbps;Гб/сек
  GHz;ГХц
  GiB;ГиБ
  GibiByte1;ГибиБайт1
@@ -91,8 +91,8 @@
  KiloByte3;КилоБайт1
  MB;МБ
  Mb;Мб
- Mbps;Мб/сек
  MBps;МБ/сек
+ Mbps;Мб/сек
  MebiBit1;МебиБит1
  MebiBit2;МебиБит2
  MebiBit3;МебиБит3
@@ -163,6 +163,7 @@ About;За
 About_Hint;За_Подсказване
 AC3_Metadata;
 Accompaniment;Съпровод
+acmod;
 Active_DisplayAspectRatio;
 Active_Height;
 Active_Width;
@@ -178,9 +179,9 @@ AdID;
 ADM: Show ChannelFormats;
 ADM: Show TrackUIDs;
 AdmProfile;
-Advanced;Разширен
-Advanced mode;Разширен режим
 Advanced mode -->;
+Advanced mode;Разширен режим
+Advanced;Разширен
 Album;Албум
 Album_ReplayGain_Gain;Албум_УсилващоПовторение_Усилване
 Album_ReplayGain_Peak;Албум_УсилващоПовторение_Връх
@@ -200,11 +201,12 @@ ArtDirector;ХудожественДиректор
 AspectRatio;Съотношение
 AssistantDirector;АсистентДиректор
 AssociatedVideo_FrameRate;
-at;от
 At least one file;Най-малко един файл
+at;от
 Attachments;
-Audio;Аудио
 Audio stream(s);Аудио поток(ци)
+Audio;Аудио
+Audio_Channels_Total;
 Audio_Codec_List;Аудио_Кодек_Списък
 Audio_Format_List;
 Audio_Format_WithHint_List;
@@ -246,6 +248,7 @@ BitRate_Nominal;Нормален_БитРейт
 Bits-(Pixel*Frame);Битове-(Пиксел*Кадър)
 BitstreamLevel;
 Bring All to Front;
+bsid;
 BufferSize;
 Cancel;Откажи
 CaptionServiceName;
@@ -261,8 +264,8 @@ ChannelMode;
 ChannelPositions;КаналПозиции
 ChannelPositions_Original;
 Chapter(s);Дял(ове)
-Chapters;Дялове
 Chapters stream(s);Дялове поток(ци)
+Chapters;Дялове
 Chapters_Codec_List;Дялове_Кодек_Списък
 Chapters_No;Дялове_Но
 Chapters_Pos_Begin;
@@ -270,9 +273,9 @@ Chapters_Pos_End;
 ChaptersCount;ДяловеБрой
 CharacterSet;
 CheckNewVersion;ПровериНоваВерсия
-Choose custom;Избери потребителски
 Choose custom sheet;Избери потребителски формуляр
 Choose custom text;Избери потребителски текст
+Choose custom;Избери потребителски
 Choose export format;Избери формат за експортиране
 Choose file(s);Избери файл(ове)
 Choose filename;Избери име на файл
@@ -282,14 +285,15 @@ Chroma;Хрома
 ChromaSubsampling;ХромаПодСамплинг
 Classifier;
 ClearList;
-Close;Затвори
 Close all before open;Затвори всичко преди да отвориш
+Close;Затвори
 CloseAll;
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
 CloseFile;
 CloseWindow;
+cmixlev;
 Codec;Кодек
 Codec_Description;Кодек_Описание
 Codec_Info;Кодек_Инфо
@@ -319,8 +323,12 @@ ColorTheme;
 ColorTheme_Dark;
 ColorTheme_Light;
 ColorTheme_System;
+colour_description_present;
+colour_description_present_Source;
 colour_primaries;цветови_основи
+colour_primaries_Source;
 colour_range;
+colour_range_Source;
 Comment;Коментар
 CommissionedBy;ПоръчанОт
 Compare;
@@ -359,6 +367,7 @@ Cover_Description;Калъфка_Описание
 Cover_Mime;Калъфка_Майм
 Cover_Type;Калъфка_Тип
 CoverData;
+CreatedOn;
 Cropped;Умалена
 Custom;Потребителски
 CustomDownmixTargets;
@@ -367,8 +376,8 @@ DarkMode;
 Date;Дата
 Debug;Дебъг
 Decimal point;Децимална точка
-Default;
 Default translation;
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 DefaultView;
@@ -380,6 +389,10 @@ Delete;Премахни
 Description;Описание
 Details;
 dialnorm;
+dialnorm_Average;
+dialnorm_Count;
+dialnorm_Maximum;
+dialnorm_Minimum;
 DialogueCorrected;
 DialogueEnhancement;
 DialogueNormalization;
@@ -428,6 +441,8 @@ ElementCount;
 EMail;Имейл
 Enable FFmpeg plugin;
 Encoded_Application;Енкодирана_Апликация
+Encoded_Application_Name;
+Encoded_Application_Version;
 Encoded_Date;Дата_Енкодиране
 Encoded_Hardware;
 Encoded_Library;Библиотека_Енкодиране
@@ -462,8 +477,8 @@ Feature_FilesCompare;
 Feature_More;
 Feature_SelectView;
 Field;
-File;Файл
 File size;Големина файл
+File;Файл
 File_Append;ФайлДобавка
 File_Created_Date;ФайлДатаСъздаване
 File_Created_Date_Local;ФайлДатаСъздаванеЛокално
@@ -481,10 +496,10 @@ FirstDisplay_Type;
 FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
-Folder;Папка
 Folder (R);Папка (Ч)
 Folder (R)_Hint;Папка (Ч)_Подсказване
 Folder (Recursively);Папка (Рекурсивна)
+Folder;Папка
 Folder_Hint;Папка_Подсказване
 FolderName;ПапкаИме
 Forced;
@@ -769,8 +784,8 @@ HTML;HTML
 ID;ИД
 IdentClockStart;
 IFrameInterval;
-Image;Изображение
 Image stream(s);Изображение Поток(ци)
+Image;Изображение
 Image_Codec_List;Изображение_Кодек_Списък
 ImageCount;ИзображениеБрой
 ImmersiveStereo;
@@ -1001,12 +1016,12 @@ Language_yue;
 Language_za;
 Language_zh;
 Language_zh-cmn;
-Language_zh-cn;
 Language_zh-CN;
+Language_zh-cn;
 Language_zh-Hans;
 Language_zh-Hant;
-Language_zh-tw;
 Language_zh-TW;
+Language_zh-tw;
 Language_zh-yue;
 Language_zu;
 LanguageChanges;
@@ -1016,6 +1031,7 @@ LCCN;ЛССН
 LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
+lfeon;
 Library;Библиотека
 Lifetime_Subscribe_Button;
 Lightness;Осветеност
@@ -1068,6 +1084,7 @@ MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;мартица_коефициент
+matrix_coefficients_Source;
 Matrix_Format;
 MaxCLL;
 MaxFALL;
@@ -1079,8 +1096,8 @@ MD5_Unencoded;
 MediaInfo_About;Медиа Инфо_За
 MediaInfo_About_About;
 MediaInfo_WebSite;
-Menu;Меню
 Menu stream(s);Меню поток(ци)
+Menu;Меню
 Menu_Codec_List;Меню_Кодек_Списък
 Menu_Hint;Меню_Подсказване
 Menu_No;Меню_Но
@@ -1151,13 +1168,15 @@ Other;Други
 OtherIdentifier;
 OtherIdentifierType;
 OtherViews;
-Output;Изходящ
 Output format;Изходящ Формат
+Output;Изходящ
 OverallBitRate;ОбщаБитСкорост
 OverallBitRate_Maximum;ОбщаБитСкорост_Максимум
 OverallBitRate_Minimum;ОбщаБитСкорост_Минимум
 OverallBitRate_Mode;ОбщаБитСкорост_Режим
 OverallBitRate_Nominal;ОбщаБитСкорост_Номинал
+OverallBitRate_Precision_Max;
+OverallBitRate_Precision_Min;
 PackageName;
 PackFormat;
 Part;Част
@@ -1227,6 +1246,7 @@ Renew;
 ReplayGain_Gain;УсилващоПовторение_Усилване
 ReplayGain_Peak;УсилващоПовторение_Усилване_Връх
 Report;
+ReportBy;
 Resolution;Резолюция
 RestoreLifetimeSubscription;
 Retry;
@@ -1270,17 +1290,17 @@ Set;Нагласи
 Set_Count;Нагласа_Брой
 Setup;Настрой
 Sharpness;Яснота
-Sheet;Формуляр
 Sheet (Complete);Формуляр (Цялостен)
-Shell extension;Шел екстенция
+Sheet;Формуляр
 Shell extension, folder;Шел екстенция, папка
 Shell extension, separate instance;
+Shell extension;Шел екстенция
 Shell InfoTip;Шел ИнфоИнфо
 ShimName;
 ShimVersion;
-Show;
 Show menu;Показ меню
 Show toolbar;Показ инструментибар
+Show;
 ShowAll;
 ShowMore;
 SignalGroup;
@@ -1297,6 +1317,7 @@ Source_StreamSize;
 Source_StreamSize_Encoded;
 SpokenSubtitles;
 Standard;Стандарт
+Stored_Height;
 StoreMethod_InterleavedFields;
 StoreMethod_SeparatedFields;
 StoreMethod_SeparatedFields_1;
@@ -1340,6 +1361,7 @@ Supported formats;Поддържани формати
 Supported?;Поддържан?
 SupportUs;
 SupportUs2;
+surmixlev;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Резюме
@@ -1351,11 +1373,11 @@ Technician;Техник
 TermsOfUse;УсловияНаПолзване
 TertiaryAudioLanguage;
 TestContinuousFileNames;
-Text;Текст
 Text - Custom;Текст - Потребителски
 Text (HTML);Текст (HTML)
 Text stream(s);Текст поток(ци)
 Text streams;Текст потоци
+Text;Текст
 Text_Codec_List;Текст_Кодек_Списък
 Text_Format_List;
 Text_Format_WithHint_List;
@@ -1395,11 +1417,12 @@ TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;трансфер_характеристики
+transfer_characteristics_Source;
 Translate_Reports;
 Translator;Преводач
 Transport;
-Tree;Дърво
 Tree & Text;Дърво и Текст
+Tree;Дърво
 Trim_Center;
 Trim_Height;
 Trim_Surround;
@@ -1444,8 +1467,8 @@ UniversalAdID_Value;
 Unknown;Незнаен
 Url;ЮРЛ
 Value;
-Video;Видео
 Video stream(s);Видео поток(ци)
+Video;Видео
 Video_Codec_List;Видео_Кодек_Списък
 Video_Delay;Видео_Забавяне
 Video_Format_List;
@@ -1486,5 +1509,5 @@ Yes;Да
 Your system;Вашата система
 Your translation;
 Zoom;
-ZZ_Automatic_Percent;59
-ZZ_AutomaticLanguage_Percent;65
+ZZ_Automatic_Percent;58
+ZZ_AutomaticLanguage_Percent;64

@@ -14,8 +14,8 @@
  bit1; 位
  bit2; 位
  bit3; 位
- bps; b/s
  Bps; B/s
+ bps; b/s
  Byte1; 字节
  Byte2; 字节
  Byte3; 字节
@@ -49,8 +49,8 @@
  frame3; 帧
  GB; GB
  Gb; Gb
- Gbps; Gb/s
  GBps; GB/s
+ Gbps; Gb/s
  GHz; GHz
  GiB; GiB
  GibiByte1; GibiBytes
@@ -91,8 +91,8 @@
  KiloByte3; KiloBytes
  MB; MB
  Mb; Mb
- Mbps; Mb/s
  MBps; MebiBytes
+ Mbps; Mb/s
  MebiBit1; MebiBit
  MebiBit2; MebiBits
  MebiBit3; MebiBits
@@ -163,6 +163,7 @@ About;关于
 About_Hint;联系作者和检查更新
 AC3_Metadata;
 Accompaniment;伴奏
+acmod;
 Active_DisplayAspectRatio;
 Active_Height;
 Active_Width;
@@ -178,9 +179,9 @@ AdID;广告 ID 标识符
 ADM: Show ChannelFormats;ADM: 显示 ChannelFormat
 ADM: Show TrackUIDs;ADM: 显示 TrackUID
 AdmProfile;ADM 配置 (Profile)
-Advanced;高级
-Advanced mode;高级模式
 Advanced mode -->;
+Advanced mode;高级模式
+Advanced;高级
 Album;专辑
 Album_ReplayGain_Gain;专辑播放增益
 Album_ReplayGain_Peak;专辑播放增益峰值
@@ -200,11 +201,12 @@ ArtDirector;艺术指导
 AspectRatio;宽高比
 AssistantDirector;副导演
 AssociatedVideo_FrameRate;关联视频帧率
-at;@
 At least one file;(至少要打开一个文件)
+at;@
 Attachments;
-Audio;音频
 Audio stream(s);音频流
+Audio;音频
+Audio_Channels_Total;
 Audio_Codec_List;音频解码器
 Audio_Format_List;
 Audio_Format_WithHint_List;
@@ -246,6 +248,7 @@ BitRate_Nominal;额定码率
 Bits-(Pixel*Frame);数据密度 [码率/(像素*帧率)]
 BitstreamLevel;
 Bring All to Front;前置全部窗口
+bsid;
 BufferSize;缓冲大小
 Cancel;取消
 CaptionServiceName;字幕服务名称
@@ -261,8 +264,8 @@ ChannelMode;声道模式
 ChannelPositions;声道位置
 ChannelPositions_Original;
 Chapter(s);章节数
-Chapters;章节
 Chapters stream(s);章节流
+Chapters;章节
 Chapters_Codec_List;章节解码器
 Chapters_No;无章节
 Chapters_Pos_Begin;
@@ -270,9 +273,9 @@ Chapters_Pos_End;
 ChaptersCount;章节流总数
 CharacterSet;
 CheckNewVersion;检查新版本
-Choose custom;自定义
 Choose custom sheet;选择自定义表格
 Choose custom text;选择自定义文字
+Choose custom;自定义
 Choose export format;选择输出格式
 Choose file(s);选择文件
 Choose filename;选择文件名
@@ -282,14 +285,15 @@ Chroma;色度
 ChromaSubsampling;色度抽样
 Classifier;内容类别
 ClearList;清除列表
-Close;关闭
 Close all before open;打开新文件前关闭其他文件
+Close;关闭
 CloseAll;
 ClosedCaptionsLanguage;隐藏式字幕语言
 ClosedCaptionsPresent;含有隐藏式字幕
 ClosedCaptionsType;隐藏式字幕类型
 CloseFile;
 CloseWindow;关闭窗口
+cmixlev;
 Codec;编解码器
 Codec_Description;编解码器说明
 Codec_Info;编解码器详情
@@ -319,8 +323,12 @@ ColorTheme;主题
 ColorTheme_Dark;深色
 ColorTheme_Light;浅色
 ColorTheme_System;用系统设置
+colour_description_present;
+colour_description_present_Source;
 colour_primaries;色彩原色
+colour_primaries_Source;
 colour_range;色彩范围
+colour_range_Source;
 Comment;注释
 CommissionedBy;委托人
 Compare;
@@ -359,6 +367,7 @@ Cover_Description;封面说明
 Cover_Mime;封面 MIME
 Cover_Type;封面类型
 CoverData;
+CreatedOn;
 Cropped;裁剪信息
 Custom;自定义
 CustomDownmixTargets;自定义缩混目标
@@ -367,8 +376,8 @@ DarkMode;深色模式
 Date;日期
 Debug;调试
 Decimal point;小数点
-Default;
 Default translation;
+Default;
 Default_Setting;系统默认
 DefaultTargetDeviceConfig;默认目标设备配置
 DefaultView;
@@ -380,6 +389,10 @@ Delete;删除
 Description;说明
 Details;
 dialnorm;对白归一化
+dialnorm_Average;
+dialnorm_Count;
+dialnorm_Maximum;
+dialnorm_Minimum;
 DialogueCorrected;对白校正
 DialogueEnhancement;对白增强
 DialogueNormalization;对白归一化
@@ -428,6 +441,8 @@ ElementCount;元素总数
 EMail;电子邮件
 Enable FFmpeg plugin;
 Encoded_Application;编码程序
+Encoded_Application_Name;
+Encoded_Application_Version;
 Encoded_Date;编码日期
 Encoded_Hardware;
 Encoded_Library;编码函数库
@@ -462,8 +477,8 @@ Feature_FilesCompare;
 Feature_More;
 Feature_SelectView;
 Field;
-File;文件
 File size;文件大小
+File;文件
 File_Append;接在现有文件后面 (警告: 参数相同时要小心)
 File_Created_Date;文件创建日期
 File_Created_Date_Local;文件创建日期 (本地)
@@ -481,10 +496,10 @@ FirstDisplay_Type;第一个事件的类型
 FirstFrameOfAction;动作的第一帧
 FlatPanelTv;平板电视
 FlowID;Flow ID
-Folder;文件夹
 Folder (R);文件夹 (R)
 Folder (R)_Hint;选择一个文件夹 (包含所有子文件夹)
 Folder (Recursively);文件夹 (包含子文件夹)
+Folder;文件夹
 Folder_Hint;选择文件夹
 FolderName;文件夹名称
 Forced;
@@ -769,8 +784,8 @@ HTML;网页
 ID;ID
 IdentClockStart;报时画面起始点
 IFrameInterval;I 帧间隔
-Image;图像
 Image stream(s);图像流
+Image;图像
 Image_Codec_List;图像解码器
 ImageCount;图像流总数
 ImmersiveStereo;沉浸式立体声
@@ -1001,12 +1016,12 @@ Language_yue;
 Language_za;壮语 (Zhuang)
 Language_zh;中文 (Chinese)
 Language_zh-cmn;
-Language_zh-cn;简体中文 (Chinese, China)
 Language_zh-CN;
+Language_zh-cn;简体中文 (Chinese, China)
 Language_zh-Hans;
 Language_zh-Hant;
-Language_zh-tw;繁体中文 (Chinese, Taiwan)
 Language_zh-TW;
+Language_zh-tw;繁体中文 (Chinese, Taiwan)
 Language_zh-yue;
 Language_zu;祖鲁语 (Zulu)
 LanguageChanges;
@@ -1016,6 +1031,7 @@ LCCN;LCCN
 LegacyStreamDisplay;
 LfeAttenuationKnown;LFE 衰减是否已知
 LfeMixGain;LFE 混音增益
+lfeon;
 Library;混流函数库
 Lifetime_Subscribe_Button;终身订阅价格 %PRICE%
 Lightness;亮度
@@ -1068,6 +1084,7 @@ MasteringDisplay_Luminance;制片显示器亮度
 Matrix_Channel(s);矩阵编码, 声道数
 Matrix_ChannelPositions;矩阵编码, 声道位置
 matrix_coefficients;矩阵系数
+matrix_coefficients_Source;
 Matrix_Format;矩阵编码, 格式
 MaxCLL;最大内容亮度 (CLL)
 MaxFALL;最大帧平均亮度 (FALL)
@@ -1079,8 +1096,8 @@ MD5_Unencoded;
 MediaInfo_About;使用 MediaInfo 可以轻松读取音视频文件的编码和标签信息。\r\n本软件按 BSD 授权协议开源，用户可以免费使用，开发者也可以自由地学习、修改、重新发布本软件。（Mac App Store 图形界面除外）
 MediaInfo_About_About;MediaInfo v%MI_VERSION%，内置 MediaInfoLib v%MIL_VERSION%
 MediaInfo_WebSite;
-Menu;菜单
 Menu stream(s);菜单流
+Menu;菜单
 Menu_Codec_List;菜单解码器
 Menu_Hint;更多选择
 Menu_No;无菜单
@@ -1151,13 +1168,15 @@ Other;其他
 OtherIdentifier;其他标识符
 OtherIdentifierType;其他标识符类型
 OtherViews;
-Output;输出
 Output format;输出格式
+Output;输出
 OverallBitRate;总体码率
 OverallBitRate_Maximum;最高总体码率
 OverallBitRate_Minimum;最低总体码率
 OverallBitRate_Mode;总体码率模式
 OverallBitRate_Nominal;额定总体码率
+OverallBitRate_Precision_Max;
+OverallBitRate_Precision_Min;
 PackageName;包名
 PackFormat;包格式
 Part;分段
@@ -1227,6 +1246,7 @@ Renew;续订
 ReplayGain_Gain;播放增益
 ReplayGain_Peak;播放增益峰值
 Report;报告
+ReportBy;
 Resolution;分辨率
 RestoreLifetimeSubscription;恢复终身订阅
 Retry;
@@ -1270,17 +1290,17 @@ Set;集合
 Set_Count;集合数目
 Setup;设置
 Sharpness;锐利度
-Sheet;表格
 Sheet (Complete);表格 (完整)
-Shell extension;文件资源管理器右键菜单 (为多媒体文件的右键菜单添加 MediaInfo 选项)
+Sheet;表格
 Shell extension, folder;添加到文件夹右键菜单
 Shell extension, separate instance;
+Shell extension;文件资源管理器右键菜单 (为多媒体文件的右键菜单添加 MediaInfo 选项)
 Shell InfoTip;文件资源管理器工具提示 (将鼠标移到文件图标上会显示相关信息)
 ShimName;Shim 名称
 ShimVersion;Shim 版本
-Show;
 Show menu;显示菜单
 Show toolbar;显示工具栏
+Show;
 ShowAll;全部显示
 ShowMore;
 SignalGroup;信号组
@@ -1297,6 +1317,7 @@ Source_StreamSize;源, 流大小
 Source_StreamSize_Encoded;源, 编码后流大小
 SpokenSubtitles;语音字幕
 Standard;标准
+Stored_Height;
 StoreMethod_InterleavedFields;交错场
 StoreMethod_SeparatedFields;单独场
 StoreMethod_SeparatedFields_1;单独场（每分块 1 场）
@@ -1340,6 +1361,7 @@ Supported formats;支持格式
 Supported?;是否支持
 SupportUs;请支持我们。不仅可以解锁深色主题，未来还有更多功能。
 SupportUs2;
+surmixlev;
 SurroundAttenuationKnown;环绕衰减是否已知
 SwitchGroup;切换组
 Synopsis;系统摘要
@@ -1351,11 +1373,11 @@ Technician;技术员
 TermsOfUse;使用条款
 TertiaryAudioLanguage;第三音频语言
 TestContinuousFileNames;
-Text;文本
 Text - Custom;文本 - 自定义
 Text (HTML);文本 (网页)
 Text stream(s);字幕流
 Text streams;字幕流
+Text;文本
 Text_Codec_List;字幕解码器
 Text_Format_List;
 Text_Format_WithHint_List;
@@ -1395,11 +1417,12 @@ TrackFormat;轨道格式
 TrackIndex;轨道编号
 TrackUID;轨道 UID
 transfer_characteristics;传输特性
+transfer_characteristics_Source;
 Translate_Reports;翻译报告
 Translator;翻译
 Transport;传输
-Tree;树状图
 Tree & Text;树状图和文本
+Tree;树状图
 Trim_Center;Center trim
 Trim_Height;Height trim
 Trim_Surround;Surround trim
@@ -1444,8 +1467,8 @@ UniversalAdID_Value;通用广告 ID 值
 Unknown;未知
 Url;网址
 Value;
-Video;视频
 Video stream(s);视频流
+Video;视频
 Video_Codec_List;视频解码器
 Video_Delay;相对视频的延迟
 Video_Format_List;
@@ -1486,5 +1509,5 @@ Yes;是
 Your system;您的系统
 Your translation;
 Zoom;缩放
-ZZ_Automatic_Percent;90
-ZZ_AutomaticLanguage_Percent;91
+ZZ_Automatic_Percent;89
+ZZ_AutomaticLanguage_Percent;89

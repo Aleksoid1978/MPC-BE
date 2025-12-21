@@ -150,7 +150,10 @@ void File_Eia708::Streams_Finish()
 bool File_Eia708::Synchronize()
 {
     if (IsSub && cc_type!=3)
+    {
+        Buffer_Offset=Buffer_Size;
         return false; //Waiting for sync from underlying layer
+    }
 
     if (!Status[IsAccepted])
         Accept("EIA-708");

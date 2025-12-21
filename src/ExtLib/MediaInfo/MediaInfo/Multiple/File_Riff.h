@@ -237,7 +237,7 @@ private :
     void AVI__hdlr_strl_strf ();
     void AVI__hdlr_strl_strf_auds ();
     void AVI__hdlr_strl_strf_auds_Mpega();
-    void AVI__hdlr_strl_strf_auds_Aac();
+    void AVI__hdlr_strl_strf_auds_Aac(bool IsHEAACWAVEFORMAT=false);
     void AVI__hdlr_strl_strf_auds_Vorbis();
     void AVI__hdlr_strl_strf_auds_Vorbis2();
     void AVI__hdlr_strl_strf_auds_ExtensibleWave(int16u BitsPerSample);

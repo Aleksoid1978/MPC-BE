@@ -14,8 +14,8 @@
  bit1; bit
  bit2; bita
  bit3; bita
- bps; b/s
  Bps; B/s
+ bps; b/s
  Byte1; bajt
  Byte2; bajta
  Byte3; bajta
@@ -49,8 +49,8 @@
  frame3; sličice
  GB; GB
  Gb; Gb
- Gbps; Gb/s
  GBps; GB/s
+ Gbps; Gb/s
  GHz; GHz
  GiB; GiB
  GibiByte1; GibiBytes
@@ -91,8 +91,8 @@
  KiloByte3; KiloBytes
  MB; MB
  Mb; Mb
- Mbps; Mb/s
  MBps; MebiBytes
+ Mbps; Mb/s
  MebiBit1; MebiBit
  MebiBit2; MebiBits
  MebiBit3; MebiBits
@@ -163,6 +163,7 @@ About;O programu...
 About_Hint;Kontakt i pronalaženje posljednje inačice
 AC3_Metadata;
 Accompaniment;Pratnja
+acmod;
 Active_DisplayAspectRatio;
 Active_Height;
 Active_Width;
@@ -178,9 +179,9 @@ AdID;
 ADM: Show ChannelFormats;
 ADM: Show TrackUIDs;
 AdmProfile;
-Advanced;Prošireno
-Advanced mode;Prošireni način
 Advanced mode -->;
+Advanced mode;Prošireni način
+Advanced;Prošireno
 Album;Album
 Album_ReplayGain_Gain;Pojačavanje izvedbe albuma
 Album_ReplayGain_Peak;Vrhunac pojačanog zvuka izvedbe albuma
@@ -200,11 +201,12 @@ ArtDirector;Umjetnički ravnatelj
 AspectRatio;Omjer stranica slike
 AssistantDirector;Pomoćnik ravnatelja
 AssociatedVideo_FrameRate;
-at;pri
 At least one file;(Morate otvoriti bar jednu datoteku)
+at;pri
 Attachments;
-Audio;Audio
 Audio stream(s);Tokovi zvuka
+Audio;Audio
+Audio_Channels_Total;
 Audio_Codec_List;Kôdeki zvuka
 Audio_Format_List;
 Audio_Format_WithHint_List;
@@ -246,6 +248,7 @@ BitRate_Nominal;Nominalni protok podataka
 Bits-(Pixel*Frame);Bita/(piksela*sličica)
 BitstreamLevel;
 Bring All to Front;Postavi sve naprijed
+bsid;
 BufferSize;
 Cancel;Poništiti
 CaptionServiceName;
@@ -261,8 +264,8 @@ ChannelMode;
 ChannelPositions;Položaj kanala
 ChannelPositions_Original;
 Chapter(s);Poglavlja
-Chapters;Poglavlja
 Chapters stream(s);Tokovi poglavlja
+Chapters;Poglavlja
 Chapters_Codec_List;Kôdeki poglavlja
 Chapters_No;Bez poglavlja
 Chapters_Pos_Begin;
@@ -270,9 +273,9 @@ Chapters_Pos_End;
 ChaptersCount;Broj tokova poglavlja
 CharacterSet;
 CheckNewVersion;Provjeriti dostupnost nove inačice
-Choose custom;Izbor po želji zadanih stavki
 Choose custom sheet;Odaberite tabelu
 Choose custom text;Odaberite tekst
+Choose custom;Izbor po želji zadanih stavki
 Choose export format;Odaberite izvozni oblik datoteka
 Choose file(s);Odaberite datoteke za otvoriti
 Choose filename;Odaberite naziv datoteke
@@ -282,14 +285,15 @@ Chroma;Kromatizam
 ChromaSubsampling;
 Classifier;
 ClearList;
-Close;Zatvoriti
 Close all before open;Prije otvaranja sve ostale zatvoriti
+Close;Zatvoriti
 CloseAll;
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
 CloseFile;
 CloseWindow;Zatvori prozor
+cmixlev;
 Codec;Kôdek
 Codec_Description;Opis kôdeka
 Codec_Info;Pojedinosti o kôdeku
@@ -319,8 +323,12 @@ ColorTheme;
 ColorTheme_Dark;
 ColorTheme_Light;
 ColorTheme_System;
+colour_description_present;
+colour_description_present_Source;
 colour_primaries;
+colour_primaries_Source;
 colour_range;
+colour_range_Source;
 Comment;Komentar
 CommissionedBy;Prema nalogu
 Compare;
@@ -359,6 +367,7 @@ Cover_Description;Opis omota
 Cover_Mime;MIME omota
 Cover_Type;Vrsta omota
 CoverData;
+CreatedOn;
 Cropped;Omjer reza
 Custom;Vlastito
 CustomDownmixTargets;
@@ -367,8 +376,8 @@ DarkMode;
 Date;Nadnevak
 Debug;Uklanjanje pogreški
 Decimal point;Decimalna točka
-Default;
 Default translation;
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 DefaultView;
@@ -380,6 +389,10 @@ Delete;Izbrisati
 Description;Opis
 Details;
 dialnorm;
+dialnorm_Average;
+dialnorm_Count;
+dialnorm_Maximum;
+dialnorm_Minimum;
 DialogueCorrected;
 DialogueEnhancement;
 DialogueNormalization;
@@ -428,6 +441,8 @@ ElementCount;
 EMail;E-pošta
 Enable FFmpeg plugin;
 Encoded_Application;Kodirajući program
+Encoded_Application_Name;
+Encoded_Application_Version;
 Encoded_Date;Nadnevak kodiranja
 Encoded_Hardware;
 Encoded_Library;Kodirano pomoću knjižnice
@@ -462,8 +477,8 @@ Feature_FilesCompare;
 Feature_More;
 Feature_SelectView;
 Field;
-File;Datoteka
 File size;Veličina datoteke
+File;Datoteka
 File_Append;Dodati u postojeću datoteku (Pozor: Pripazite na istovjetne parametere!)
 File_Created_Date;Nadnevak stvaranja datoteke
 File_Created_Date_Local;Nadnevak nastanka datoteke (mjesni)
@@ -481,10 +496,10 @@ FirstDisplay_Type;
 FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
-Folder;Mapa
 Folder (R);Mapa (R)
 Folder (R)_Hint;Odaberite mapu za promatranje (rekurzivno sa svim mapama)
 Folder (Recursively);Mapa (rekurzivno)
+Folder;Mapa
 Folder_Hint;Odaberite mapu za promatranje
 FolderName;Naziv mape
 Forced;
@@ -769,8 +784,8 @@ HTML;HTML
 ID;ID
 IdentClockStart;
 IFrameInterval;
-Image;Slika
 Image stream(s);Tokovi slike
+Image;Slika
 Image_Codec_List;Slikovni kôdeki
 ImageCount;Broj slikovnih tokova
 ImmersiveStereo;
@@ -1001,12 +1016,12 @@ Language_yue;
 Language_za;Zhuang
 Language_zh;Kineski
 Language_zh-cmn;
-Language_zh-cn;Kineski (Kina)
 Language_zh-CN;
+Language_zh-cn;Kineski (Kina)
 Language_zh-Hans;
 Language_zh-Hant;
-Language_zh-tw;Kineski (Taiwan)
 Language_zh-TW;
+Language_zh-tw;Kineski (Taiwan)
 Language_zh-yue;
 Language_zu;Zulu
 LanguageChanges;
@@ -1016,6 +1031,7 @@ LCCN;LCCN
 LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
+lfeon;
 Library;Knjižnica multipleksera
 Lifetime_Subscribe_Button;
 Lightness;Svjetlina
@@ -1068,6 +1084,7 @@ MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;
+matrix_coefficients_Source;
 Matrix_Format;
 MaxCLL;
 MaxFALL;
@@ -1079,8 +1096,8 @@ MD5_Unencoded;
 MediaInfo_About;Pruža vrlo podrobne informacije\r\no multimedijalnim datotekama:\r\nMatroska, OGG (uključujući OGM)\r\nMPEG1 (uključujući VCD)\r\nMPEG2 (uključujući DVD i SVCD)\r\nMPEG4 (uključujući Itunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (uključujući WMV, WMA)\r\nMicrosoft RIFF (uključujući AVI, WAV)\r\nSamo zvukovnim oblicima (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
 MediaInfo_WebSite;
-Menu;Izbornik
 Menu stream(s);Izbornik - tokovi
+Menu;Izbornik
 Menu_Codec_List;Izbornik - kôdeksi
 Menu_Hint;Dodatne mogućnosti
 Menu_No;Bez izbornika
@@ -1151,13 +1168,15 @@ Other;Ostalo
 OtherIdentifier;
 OtherIdentifierType;
 OtherViews;
-Output;Izlaz
 Output format;Izlazni oblik
+Output;Izlaz
 OverallBitRate;Ukupni protok podataka
 OverallBitRate_Maximum;Maksimum ukupnog protoka podataka
 OverallBitRate_Minimum;Minimum ukupnog protoka podataka
 OverallBitRate_Mode;Način ukupnog protoka podataka
 OverallBitRate_Nominal;Nominalni ukupni protok podataka
+OverallBitRate_Precision_Max;
+OverallBitRate_Precision_Min;
 PackageName;
 PackFormat;
 Part;Dio
@@ -1227,6 +1246,7 @@ Renew;
 ReplayGain_Gain;Pojačavanje zvuka izvedbe
 ReplayGain_Peak;Vrhunac pojačanog zvuka izvedbe
 Report;
+ReportBy;
 Resolution;Razlučivost
 RestoreLifetimeSubscription;
 Retry;
@@ -1270,17 +1290,17 @@ Set;Medijalni sklop
 Set_Count;Broj u medijalnom sklopu
 Setup;Postavljanje
 Sharpness;Oštrost
-Sheet;Tablica
 Sheet (Complete);Tablica (potpuna)
-Shell extension;Proširenje ljuske sustava (desnim klikom u Pregledniku će se pojaviti mogućnosti Media Info)
+Sheet;Tablica
 Shell extension, folder;Za mape također
 Shell extension, separate instance;
+Shell extension;Proširenje ljuske sustava (desnim klikom u Pregledniku će se pojaviti mogućnosti Media Info)
 Shell InfoTip;Info-naznaka (prelaskom miša preko neke datoteke u Pregledniku će se prikazati informacije o njoj)
 ShimName;
 ShimVersion;
-Show;
 Show menu;Prikazati izbornik
 Show toolbar;Prikazati alatnu traku
+Show;
 ShowAll;Prikaži sve
 ShowMore;
 SignalGroup;
@@ -1297,6 +1317,7 @@ Source_StreamSize;
 Source_StreamSize_Encoded;
 SpokenSubtitles;
 Standard;Standardno
+Stored_Height;
 StoreMethod_InterleavedFields;
 StoreMethod_SeparatedFields;
 StoreMethod_SeparatedFields_1;
@@ -1340,6 +1361,7 @@ Supported formats;Podržavani oblici datoteka
 Supported?;Podržavano?
 SupportUs;
 SupportUs2;
+surmixlev;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;Sažetak
@@ -1351,11 +1373,11 @@ Technician;Tehničar
 TermsOfUse;Uvjeti korištenja
 TertiaryAudioLanguage;
 TestContinuousFileNames;
-Text;Tekst
 Text - Custom;Vlastiti tekst
 Text (HTML);Tekst (HTML)
 Text stream(s);Tokovi teksta
 Text streams;Tokovi teksta
+Text;Tekst
 Text_Codec_List;Kôdeki teksta
 Text_Format_List;
 Text_Format_WithHint_List;
@@ -1395,11 +1417,12 @@ TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;
+transfer_characteristics_Source;
 Translate_Reports;
 Translator;Prevoditelj
 Transport;
-Tree;Stablo
 Tree & Text;Stablo i tekst
+Tree;Stablo
 Trim_Center;
 Trim_Height;
 Trim_Surround;
@@ -1444,8 +1467,8 @@ UniversalAdID_Value;
 Unknown;Nepoznato
 Url;URL
 Value;
-Video;Video
 Video stream(s);Video tok(-ovi)
+Video;Video
 Video_Codec_List;Video-kôdeki
 Video_Delay;Zaostajanje prikaza video-slike
 Video_Format_List;
@@ -1486,5 +1509,5 @@ Yes;Da
 Your system;Informacije o Vašem sustavu
 Your translation;
 Zoom;Zumiraj
-ZZ_Automatic_Percent;61
-ZZ_AutomaticLanguage_Percent;65
+ZZ_Automatic_Percent;60
+ZZ_AutomaticLanguage_Percent;64

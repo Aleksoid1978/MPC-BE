@@ -14,8 +14,8 @@
  bit1; bit
  bit2; bits
  bit3; bits
- bps; b/s
  Bps; B/s
+ bps; b/s
  Byte1; Byte
  Byte2; Bytes
  Byte3; Bytes
@@ -49,8 +49,8 @@
  frame3; 影格
  GB; GB
  Gb; Gb
- Gbps; Gb/s
  GBps; GB/s
+ Gbps; Gb/s
  GHz; GHz
  GiB; GiB
  GibiByte1; GibiBytes
@@ -91,8 +91,8 @@
  KiloByte3; KiloBytes
  MB; MB
  Mb; Mb
- Mbps; Mb/s
  MBps; MebiBytes
+ Mbps; Mb/s
  MebiBit1; MebiBit
  MebiBit2; MebiBits
  MebiBit3; MebiBits
@@ -163,6 +163,7 @@ About;關於
 About_Hint;如何聯絡作者以及尋找最新版
 AC3_Metadata;
 Accompaniment;伴奏
+acmod;
 Active_DisplayAspectRatio;
 Active_Height;
 Active_Width;
@@ -178,9 +179,9 @@ AdID;
 ADM: Show ChannelFormats;
 ADM: Show TrackUIDs;
 AdmProfile;
-Advanced;進階
-Advanced mode;進階模式
 Advanced mode -->;
+Advanced mode;進階模式
+Advanced;進階
 Album;專輯
 Album_ReplayGain_Gain;專輯播放增益
 Album_ReplayGain_Peak;專輯播放增益尖峰值
@@ -200,11 +201,12 @@ ArtDirector;藝術指導
 AspectRatio;長寬比例
 AssistantDirector;副導演
 AssociatedVideo_FrameRate;
-at;於
 At least one file;(您最少要開啟一個檔案)
+at;於
 Attachments;
-Audio;音訊
 Audio stream(s);音訊串流
+Audio;音訊
+Audio_Channels_Total;
 Audio_Codec_List;音訊編解碼器
 Audio_Format_List;
 Audio_Format_WithHint_List;
@@ -246,6 +248,7 @@ BitRate_Nominal;正常流量
 Bits-(Pixel*Frame);位元/(像素*影格)
 BitstreamLevel;
 Bring All to Front;將此程式所有視窗移至最前
+bsid;
 BufferSize;
 Cancel;取消
 CaptionServiceName;
@@ -261,8 +264,8 @@ ChannelMode;
 ChannelPositions;聲道位置
 ChannelPositions_Original;
 Chapter(s);章節
-Chapters;章節
 Chapters stream(s);章節串流
+Chapters;章節
 Chapters_Codec_List;章節編解碼器
 Chapters_No;無章節
 Chapters_Pos_Begin;
@@ -270,9 +273,9 @@ Chapters_Pos_End;
 ChaptersCount;章節串流數
 CharacterSet;
 CheckNewVersion;檢查新版本
-Choose custom;選擇自訂
 Choose custom sheet;選擇你要的自訂表格
 Choose custom text;選擇你要的自訂文字
+Choose custom;選擇自訂
 Choose export format;選擇你要的輸出格式
 Choose file(s);選擇你要開啟的檔案
 Choose filename;選擇你要的檔名
@@ -282,14 +285,15 @@ Chroma;彩度
 ChromaSubsampling;
 Classifier;
 ClearList;
-Close;關閉
 Close all before open;開啟前關閉其它檔案
+Close;關閉
 CloseAll;
 ClosedCaptionsLanguage;
 ClosedCaptionsPresent;
 ClosedCaptionsType;
 CloseFile;
 CloseWindow;關閉視窗
+cmixlev;
 Codec;編解碼器
 Codec_Description;編解碼器描述
 Codec_Info;編解碼器詳細資訊
@@ -319,8 +323,12 @@ ColorTheme;
 ColorTheme_Dark;
 ColorTheme_Light;
 ColorTheme_System;
+colour_description_present;
+colour_description_present_Source;
 colour_primaries;色彩原色
+colour_primaries_Source;
 colour_range;
+colour_range_Source;
 Comment;註釋
 CommissionedBy;委託
 Compare;
@@ -359,6 +367,7 @@ Cover_Description;封面描述
 Cover_Mime;封面 MIME
 Cover_Type;封面類型
 CoverData;
+CreatedOn;
 Cropped;裁切維度
 Custom;自訂
 CustomDownmixTargets;
@@ -367,8 +376,8 @@ DarkMode;
 Date;日期
 Debug;偵錯
 Decimal point;小數點
-Default;
 Default translation;
+Default;
 Default_Setting;
 DefaultTargetDeviceConfig;
 DefaultView;
@@ -380,6 +389,10 @@ Delete;刪除
 Description;敘述
 Details;
 dialnorm;
+dialnorm_Average;
+dialnorm_Count;
+dialnorm_Maximum;
+dialnorm_Minimum;
 DialogueCorrected;
 DialogueEnhancement;
 DialogueNormalization;
@@ -428,6 +441,8 @@ ElementCount;
 EMail;電子信箱
 Enable FFmpeg plugin;
 Encoded_Application;使用編碼程式
+Encoded_Application_Name;
+Encoded_Application_Version;
 Encoded_Date;編碼日期
 Encoded_Hardware;
 Encoded_Library;編碼函式庫
@@ -462,8 +477,8 @@ Feature_FilesCompare;
 Feature_More;
 Feature_SelectView;
 Field;
-File;檔案
 File size;檔案大小
+File;檔案
 File_Append;接在現存的檔案之後 (注意: 同參數時要小心)
 File_Created_Date;建立日期
 File_Created_Date_Local;建立日期 (本地時間)
@@ -481,10 +496,10 @@ FirstDisplay_Type;
 FirstFrameOfAction;
 FlatPanelTv;
 FlowID;
-Folder;資料夾
 Folder (R);資料夾 (R)
 Folder (R)_Hint;選擇要檢視的資料夾 (遞迴所有資料夾)
 Folder (Recursively);資料夾 (遞迴)
+Folder;資料夾
 Folder_Hint;選擇要檢視的資料夾
 FolderName;資料夾
 Forced;
@@ -769,8 +784,8 @@ HTML;網頁
 ID;識別字
 IdentClockStart;
 IFrameInterval;
-Image;圖片
 Image stream(s);圖片串流
+Image;圖片
 Image_Codec_List;圖片編解碼器
 ImageCount;圖片串流數
 ImmersiveStereo;
@@ -1001,12 +1016,12 @@ Language_yue;
 Language_za;壯語 (Zhuang)
 Language_zh;華語 (Chinese)
 Language_zh-cmn;
-Language_zh-cn;華語 (中國) (Chinese, China)
 Language_zh-CN;
+Language_zh-cn;華語 (中國) (Chinese, China)
 Language_zh-Hans;
 Language_zh-Hant;
-Language_zh-tw;華語 (台灣) (Chinese, Taiwan)
 Language_zh-TW;
+Language_zh-tw;華語 (台灣) (Chinese, Taiwan)
 Language_zh-yue;
 Language_zu;祖魯語 (Zulu)
 LanguageChanges;
@@ -1016,6 +1031,7 @@ LCCN;LCCN
 LegacyStreamDisplay;
 LfeAttenuationKnown;
 LfeMixGain;
+lfeon;
 Library;合成函式庫
 Lifetime_Subscribe_Button;
 Lightness;亮度
@@ -1068,6 +1084,7 @@ MasteringDisplay_Luminance;
 Matrix_Channel(s);
 Matrix_ChannelPositions;
 matrix_coefficients;矩陣係數
+matrix_coefficients_Source;
 Matrix_Format;
 MaxCLL;
 MaxFALL;
@@ -1079,8 +1096,8 @@ MD5_Unencoded;
 MediaInfo_About;支援非常詳盡的多媒體檔案資訊:\r\nMatroska, OGG (包含 OGM)\r\nMPEG-1 (包含 VCD)\r\nMPEG-2 (包含 DVD, SVCD)\r\nMPEG-4 (包含 iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (包含 WMV, WMA)\r\nMicrosoft RIFF (包含 AVI, WAV)\r\n純聲音格式 (AC3, DTS, AAC, AU, AIFF...)
 MediaInfo_About_About;
 MediaInfo_WebSite;
-Menu;選單
 Menu stream(s);選單串流
+Menu;選單
 Menu_Codec_List;選單編解碼器
 Menu_Hint;更多可能
 Menu_No;無選單
@@ -1151,13 +1168,15 @@ Other;其它
 OtherIdentifier;
 OtherIdentifierType;
 OtherViews;
-Output;輸出
 Output format;輸出格式
+Output;輸出
 OverallBitRate;整體流量
 OverallBitRate_Maximum;最大整體流量
 OverallBitRate_Minimum;最小整體流量
 OverallBitRate_Mode;整體流量模式
 OverallBitRate_Nominal;正常整體流量
+OverallBitRate_Precision_Max;
+OverallBitRate_Precision_Min;
 PackageName;
 PackFormat;
 Part;部分
@@ -1227,6 +1246,7 @@ Renew;
 ReplayGain_Gain;播放增益
 ReplayGain_Peak;播放增益尖峰值
 Report;
+ReportBy;
 Resolution;顏色深度
 RestoreLifetimeSubscription;
 Retry;
@@ -1270,17 +1290,17 @@ Set;集合
 Set_Count;集合數
 Setup;設定
 Sharpness;銳利度
-Sheet;表格
 Sheet (Complete);表格 (完整)
-Shell extension;快顯功能表 (在檔案總管裡, 按右鍵會出現 MediaInfo 的選項)
+Sheet;表格
 Shell extension, folder;也對資料夾使用
 Shell extension, separate instance;
+Shell extension;快顯功能表 (在檔案總管裡, 按右鍵會出現 MediaInfo 的選項)
 Shell InfoTip;資訊提示 (在檔案總管裡, 將滑鼠移到檔案上會顯示相關訊息)
 ShimName;
 ShimVersion;
-Show;
 Show menu;顯示選單
 Show toolbar;顯示工具列
+Show;
 ShowAll;顯示全部
 ShowMore;
 SignalGroup;
@@ -1297,6 +1317,7 @@ Source_StreamSize;
 Source_StreamSize_Encoded;
 SpokenSubtitles;
 Standard;標準
+Stored_Height;
 StoreMethod_InterleavedFields;
 StoreMethod_SeparatedFields;
 StoreMethod_SeparatedFields_1;
@@ -1340,6 +1361,7 @@ Supported formats;支援格式
 Supported?;是否支援?
 SupportUs;
 SupportUs2;
+surmixlev;
 SurroundAttenuationKnown;
 SwitchGroup;
 Synopsis;摘要
@@ -1351,11 +1373,11 @@ Technician;技師
 TermsOfUse;使用條款
 TertiaryAudioLanguage;
 TestContinuousFileNames;
-Text;文字
 Text - Custom;文字 - 自訂
 Text (HTML);文字 (網頁)
 Text stream(s);字幕串流
 Text streams;字幕串流
+Text;文字
 Text_Codec_List;字幕編解碼器
 Text_Format_List;
 Text_Format_WithHint_List;
@@ -1395,11 +1417,12 @@ TrackFormat;
 TrackIndex;
 TrackUID;
 transfer_characteristics;傳輸特性
+transfer_characteristics_Source;
 Translate_Reports;
 Translator;翻譯
 Transport;
-Tree;樹狀圖
 Tree & Text;樹狀圖與文字
+Tree;樹狀圖
 Trim_Center;
 Trim_Height;
 Trim_Surround;
@@ -1444,8 +1467,8 @@ UniversalAdID_Value;
 Unknown;未知
 Url;相關網址
 Value;
-Video;視訊
 Video stream(s);視訊串流
+Video;視訊
 Video_Codec_List;視訊編解碼器
 Video_Delay;視訊延遲
 Video_Format_List;
@@ -1486,5 +1509,5 @@ Yes;是
 Your system;您的系統
 Your translation;
 Zoom;縮放
-ZZ_Automatic_Percent;61
-ZZ_AutomaticLanguage_Percent;65
+ZZ_Automatic_Percent;60
+ZZ_AutomaticLanguage_Percent;64

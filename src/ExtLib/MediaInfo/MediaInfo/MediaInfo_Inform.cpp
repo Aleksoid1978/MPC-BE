@@ -187,6 +187,16 @@ Ztring MediaInfo_Internal::Inform()
             {
                 Result+="  <timecode_stream";
                 Result+=TimeCode_Dump.second.Attributes_First;
+                if (TimeCode_Dump.second.Attributes_First.find(" frame_rate=\"")==string::npos && Count_Get(Stream_Video)==1)
+                {
+                    auto FrameRate=Get(Stream_Video, 0, Video_FrameRate);
+                    if (!FrameRate.empty())
+                    {
+                        Result += " frame_rate=\"";
+                        Result += XML_Encode(FrameRate).To_UTF8();
+                        Result += '"';
+                    }
+                }
                 Result+=" frame_count=\""+std::to_string(TimeCode_Dump.second.FrameCount)+'\"';
                 Result+=TimeCode_Dump.second.Attributes_Last;
                 if (TimeCode_Dump.second.List.empty())
