@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PPageFileInfoClip.h"
+#include <wmsdkidl.h>
 
 
 // CPPageFileInfoClip dialog
@@ -37,6 +38,7 @@ CPPageFileInfoClip::CPPageFileInfoClip(const CStringW& fn, IFilterGraph* pFG)
 	, m_location_str(ResStr(IDS_AG_NONE))
 	, m_album(ResStr(IDS_AG_NONE))
 {
+	HRESULT hr = E_NOT_SET;
 	auto pFrame = AfxGetMainFrame();
 
 	BeginEnumFilters(pFG, pEF, pBF) {
@@ -85,6 +87,29 @@ CPPageFileInfoClip::CPPageFileInfoClip(const CStringW& fn, IFilterGraph* pFG)
 				}
 				m_descText.Replace(L";", L"\r\n");
 				bstr.Empty();
+			}
+		}
+		else if (CComQIPtr<IWMHeaderInfo> pWMHI = pBF.p) {
+			WORD streamNum = 0;
+			WMT_ATTR_DATATYPE type;
+			WORD length;
+			std::vector<BYTE> value;
+
+			hr = pWMHI->GetAttributeByName(&streamNum, L"Title", &type, nullptr, &length);
+			if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length) {
+				value.resize(length);
+				hr = pWMHI->GetAttributeByName(&streamNum, L"Title", &type, value.data(), &length);
+				if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length) {
+					m_clip.SetString((LPCWSTR)value.data(), length / sizeof(wchar_t));
+				}
+			}
+			hr = pWMHI->GetAttributeByName(&streamNum, L"Author", &type, nullptr, &length);
+			if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length) {
+				value.resize(length);
+				hr = pWMHI->GetAttributeByName(&streamNum, L"Author", &type, value.data(), &length);
+				if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length) {
+					m_author.SetString((LPCWSTR)value.data(), length / sizeof(wchar_t));
+				}
 			}
 		}
 	}
