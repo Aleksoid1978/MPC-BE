@@ -26,6 +26,7 @@
 #include "FileDialogs.h"
 #include "Misc.h"
 #include "WicUtils.h"
+#include <wmsdkidl.h>
 
 struct mime_info_t {
 	const char* mime;
@@ -74,9 +75,10 @@ CPPageFileInfoRes::CPPageFileInfoRes(const CStringW& fn, IFilterGraph* pFG, CDPI
 		m_fn = m_fn.Mid(i + 1);
 	}
 
+	HRESULT hr = S_OK;
+
 	BeginEnumFilters(pFG, pEF, pBF) {
-		if (CComQIPtr<IDSMResourceBag> pRB = pBF.p)
-		if (pRB && pRB->ResGetCount() > 0) {
+		if (CComQIPtr<IDSMResourceBag> pRB = pBF.p) {
 			for (DWORD i = 0; i < pRB->ResGetCount(); i++) {
 				CComBSTR name, desc, mime;
 				BYTE* pData = nullptr;
@@ -93,6 +95,36 @@ CPPageFileInfoRes::CPPageFileInfoRes(const CStringW& fn, IFilterGraph* pFG, CDPI
 				}
 			}
 		}
+		else if (CComQIPtr<IWMHeaderInfo> pWMHI = pBF.p) {
+			WORD streamNum = 0;
+			WMT_ATTR_DATATYPE type;
+			WORD length;
+
+			hr = pWMHI->GetAttributeByName(&streamNum, L"WM/Picture", &type, nullptr, &length);
+			if (SUCCEEDED(hr) && type == WMT_TYPE_BINARY && length > sizeof(WM_PICTURE)) {
+				std::vector<BYTE> value(length);
+				hr = pWMHI->GetAttributeByName(&streamNum, L"WM/Picture", &type, value.data(), &length);
+				if (SUCCEEDED(hr)) {
+					WM_PICTURE* wmpicture = (WM_PICTURE*)value.data();
+					CDSMResource r;
+					switch (wmpicture->bPictureType) {
+					default:
+					case 0: r.name = "Other";       break;
+					case 1:
+					case 2: r.name = "Icon";        break;
+					case 3: r.name = "Front cover"; break;
+					case 4: r.name = "Back cover";  break;
+					case 7: r.name = "Lead artist"; break;
+					case 8: r.name = "Artist";      break;
+					}
+					r.mime = wmpicture->pwszMIMEType;
+					r.desc = wmpicture->pwszDescription;
+					r.data.resize(wmpicture->dwDataLen);
+					memcpy(r.data.data(), wmpicture->pbData, wmpicture->dwDataLen);
+					m_resources.emplace_back(r);
+				}
+			}
+		}
 	}
 	EndEnumFilters;
 }
@@ -102,6 +134,11 @@ CPPageFileInfoRes::~CPPageFileInfoRes()
 	if (m_hIcon) {
 		DestroyIcon(m_hIcon);
 	}
+}
+
+UINT CPPageFileInfoRes::GetResourceCount()
+{
+	return (UINT)m_resources.size();
 }
 
 void CPPageFileInfoRes::DoDataExchange(CDataExchange* pDX)

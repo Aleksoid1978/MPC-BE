@@ -19773,29 +19773,56 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 		if (s.nAudioWindowMode == 1) {
 			// load image from DSMResource to show in preview & logo;
 			BeginEnumFilters(m_pGB, pEF, pBF) {
-				if (CComQIPtr<IDSMResourceBag> pRB = pBF.p)
-					if (pRB && CheckMainFilter(pBF) && pRB->ResGetCount() > 0) {
-						for (DWORD i = 0; i < pRB->ResGetCount() && bLoadRes == false; i++) {
-							CComBSTR name, desc, mime;
-							BYTE* pData = nullptr;
-							DWORD len = 0;
-							if (SUCCEEDED(pRB->ResGet(i, &name, &desc, &mime, &pData, &len, nullptr))) {
-								CString mimeStr(mime);
-								mimeStr.TrimLeft();
+				if (!CheckMainFilter(pBF)) {
+					continue;
+				}
 
-								if (StartsWith(mimeStr, L"image/")) {
-									hr = WicLoadImage(&m_pMainBitmap, true, pData, len);
-									if (SUCCEEDED(hr)) {
-										bLoadRes = true;
-									}
-									DLogIf(FAILED(hr), L"Loading image '%s' (%s) failed with error %s",
-										name, mime, HR2Str(hr));
+				if (CComQIPtr<IDSMResourceBag> pRB = pBF.p) {
+					for (DWORD i = 0; i < pRB->ResGetCount() && !bLoadRes; i++) {
+						CComBSTR name, desc, mime;
+						BYTE* pData = nullptr;
+						DWORD len = 0;
+						if (SUCCEEDED(pRB->ResGet(i, &name, &desc, &mime, &pData, &len, nullptr))) {
+							CString mimeStr(mime);
+							mimeStr.TrimLeft();
+
+							if (StartsWith(mimeStr, L"image/")) {
+								hr = WicLoadImage(&m_pMainBitmap, true, pData, len);
+								if (SUCCEEDED(hr)) {
+									bLoadRes = true;
 								}
-
-								CoTaskMemFree(pData);
+								DLogIf(FAILED(hr), L"Loading image '%s' (%s) failed with error %s",
+									name, mime, HR2Str(hr));
 							}
+
+							CoTaskMemFree(pData);
 						}
 					}
+				}
+				else if (CComQIPtr<IWMHeaderInfo> pWMHI = pBF.p) {
+					WORD streamNum = 0;
+					WMT_ATTR_DATATYPE type;
+					WORD length;
+
+					hr = pWMHI->GetAttributeByName(&streamNum, L"WM/Picture", &type, nullptr, &length);
+					if (SUCCEEDED(hr) && type == WMT_TYPE_BINARY && length > sizeof(WM_PICTURE)) {
+						std::vector<BYTE> value(length);
+						hr = pWMHI->GetAttributeByName(&streamNum, L"WM/Picture", &type, value.data(), &length);
+						if (SUCCEEDED(hr)) {
+							WM_PICTURE* wmpicture = (WM_PICTURE*)value.data();
+							hr = WicLoadImage(&m_pMainBitmap, true, wmpicture->pbData, wmpicture->dwDataLen);
+							if (SUCCEEDED(hr)) {
+								bLoadRes = true;
+							}
+							DLogIf(FAILED(hr), L"Loading image 'WM/Picture' (%s) failed with error %s",
+								wmpicture->pwszMIMEType, HR2Str(hr));
+						}
+					}
+				}
+
+				if (bLoadRes) {
+					break;
+				}
 			}
 			EndEnumFilters;
 

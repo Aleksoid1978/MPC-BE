@@ -45,14 +45,9 @@ CPPageFileInfoSheet::CPPageFileInfoSheet(const std::list<CStringW>& files, CMain
 		AddPage(&m_details);
 		AddPage(&m_clip);
 
-		BeginEnumFilters(pMainFrame->m_pGB, pEF, pBF) {
-			if (CComQIPtr<IDSMResourceBag> pRB = pBF.p)
-				if (pRB && pRB->ResGetCount() > 0) {
-					AddPage(&m_res);
-					break;
-				}
+		if (m_res.GetResourceCount()) {
+			AddPage(&m_res);
 		}
-		EndEnumFilters;
 	}
 
 	if (!::PathIsURLW(files.front())) {

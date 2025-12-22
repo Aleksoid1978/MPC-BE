@@ -50,6 +50,8 @@ public:
 	CPPageFileInfoRes(const CStringW& fn, IFilterGraph* pFG, CDPI* pSheetDpi);
 	virtual ~CPPageFileInfoRes();
 
+	UINT GetResourceCount();
+
 	enum { IDD = IDD_FILEPROPRES };
 
 protected:
