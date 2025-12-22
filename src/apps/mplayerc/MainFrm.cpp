@@ -12706,10 +12706,10 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 						std::vector<BYTE> value;
 
 						HRESULT hr = pWMHI->GetAttributeByName(&streamNum, L"Title", &type, nullptr, &length);
-						if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length > 2) {
+						if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length > sizeof(wchar_t)) {
 							value.resize(length);
 							hr = pWMHI->GetAttributeByName(&streamNum, L"Title", &type, value.data(), &length);
-							if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length > 2) {
+							if (SUCCEEDED(hr)) {
 								m_SessionInfo.Title.SetString((LPCWSTR)value.data(), length / sizeof(wchar_t));
 							}
 						}
@@ -13454,19 +13454,19 @@ void CMainFrame::OpenSetupInfoBar()
 					std::vector<BYTE> value;
 
 					hr = pWMHI->GetAttributeByName(&streamNum, L"Title", &type, nullptr, &length);
-					if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length > 2) {
+					if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length > sizeof(wchar_t)) {
 						value.resize(length);
 						hr = pWMHI->GetAttributeByName(&streamNum, L"Title", &type, value.data(), &length);
-						if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length > 2) {
+						if (SUCCEEDED(hr)) {
 							CStringW str((LPCWSTR)value.data(), length / sizeof(wchar_t));
 							m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_TITLE), str);
 						}
 					}
 					hr = pWMHI->GetAttributeByName(&streamNum, L"Author", &type, nullptr, &length);
-					if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length > 2) {
+					if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length > sizeof(wchar_t)) {
 						value.resize(length);
 						hr = pWMHI->GetAttributeByName(&streamNum, L"Author", &type, value.data(), &length);
-						if (SUCCEEDED(hr) && type == WMT_TYPE_STRING && length > 2) {
+						if (SUCCEEDED(hr)) {
 							CStringW str((LPCWSTR)value.data(), length / sizeof(wchar_t));
 							m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_AUTHOR), str);
 							
