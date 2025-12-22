@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2024 see Authors.txt
+ * (C) 2012-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,6 +22,7 @@
 #include "ID3Tag.h"
 #include "DSUtil.h"
 #include "DSMPropertyBag.h"
+#include "ID3V2PictureType.h"
 
 //
 // ID3Tag class
@@ -139,30 +140,6 @@ static void ReadLang(CGolombBuffer &gb, DWORD &size)
 	size -= 3;
 }
 
-static LPCWSTR picture_types[] = {
-	L"Other",
-	L"32x32 pixels(file icon)",
-	L"Other file icon",
-	L"Cover (front)",
-	L"Cover (back)",
-	L"Leaflet page",
-	L"Media (lable side of CD)",
-	L"Lead artist(lead performer)",
-	L"Artist(performer)",
-	L"Conductor",
-	L"Band(Orchestra)",
-	L"Composer",
-	L"Lyricist(text writer)",
-	L"Recording Location",
-	L"During recording",
-	L"During performance",
-	L"Movie(video) screen capture",
-	L"A bright coloured fish",
-	L"Illustration",
-	L"Band(artist) logo",
-	L"Publisher(Studio) logo"
-};
-
 pID3TagItem CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size)
 {
 	BYTE encoding = (BYTE)gbData.BitRead(8);
@@ -183,10 +160,7 @@ pID3TagItem CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size
 
 		BYTE pict_type = (BYTE)gbData.BitRead(8);
 		size--;
-		CString pictStr(L"cover");
-		if (pict_type < std::size(picture_types)) {
-			pictStr = picture_types[pict_type];
-		}
+		CString pictStr = ID3v2PictureTypeToStr(pict_type);
 
 		CString Desc = ReadField(gbData, size, encoding);
 		UNREFERENCED_PARAMETER(Desc);

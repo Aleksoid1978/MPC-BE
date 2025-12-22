@@ -27,6 +27,7 @@
 #include "Misc.h"
 #include "WicUtils.h"
 #include <wmsdkidl.h>
+#include "DSUtil/ID3V2PictureType.h"
 
 struct mime_info_t {
 	const char* mime;
@@ -107,16 +108,7 @@ CPPageFileInfoRes::CPPageFileInfoRes(const CStringW& fn, IFilterGraph* pFG, CDPI
 				if (SUCCEEDED(hr)) {
 					WM_PICTURE* wmpicture = (WM_PICTURE*)value.data();
 					CDSMResource r;
-					switch (wmpicture->bPictureType) {
-					default:
-					case 0: r.name = "Other";       break;
-					case 1:
-					case 2: r.name = "Icon";        break;
-					case 3: r.name = "Front cover"; break;
-					case 4: r.name = "Back cover";  break;
-					case 7: r.name = "Lead artist"; break;
-					case 8: r.name = "Artist";      break;
-					}
+					r.name = ID3v2PictureTypeToStr(wmpicture->bPictureType);
 					r.mime = wmpicture->pwszMIMEType;
 					r.desc = wmpicture->pwszDescription;
 					r.data.resize(wmpicture->dwDataLen);
