@@ -3095,10 +3095,10 @@ END
 STRINGTABLE
 BEGIN
     IDS_PROPSHEET_NAME      "Name"
-    IDS_PROPSHEET_MIME      "MIME type"
-    IDS_PROPSHEET_DESC      "Description"
-    IDS_PROPSHEET_FILE_IMAGE "%hs image"
-    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_PROPSHEET_MIME      "MIME-Type"
+    IDS_PROPSHEET_DESC      "Beschreibung"
+    IDS_PROPSHEET_FILE_IMAGE "%hs Bild"
+    IDS_PROPSHEET_FILE_FONT "%hs Schriftart"
     IDS_AUDIOWINDOW_NONE    "Fenstergröße nicht ändern"
     IDS_AUDIOWINDOW_COVER   "Album-Cover/Titelbilder anzeigen"
     IDS_AUDIOWINDOW_HIDE    "Videobereich ausblenden"
