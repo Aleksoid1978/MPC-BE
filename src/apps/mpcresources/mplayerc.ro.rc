@@ -1739,7 +1739,7 @@ BEGIN
     END
     POPUP "&Redare"
     BEGIN
-        MENUITEM "R&edă/Pauzează (Întrerupe)",            ID_PLAY_PLAYPAUSE
+        MENUITEM "R&edă/Pune pe pauză (Întrerupe)",            ID_PLAY_PLAYPAUSE
         MENUITEM "&Oprește",                 ID_PLAY_STOP
         MENUITEM "Pas de cad&ru",            ID_PLAY_FRAMESTEP
         MENUITEM "&Mergi la...",             ID_PLAY_GOTO
@@ -1812,7 +1812,7 @@ BEGIN
             MENUITEM "I&eșire",                  ID_FILE_EXIT
         END
         MENUITEM SEPARATOR
-        MENUITEM "&Redă/Pauzează (Întrerupe)",                 ID_PLAY_PLAYPAUSE
+        MENUITEM "&Redă/Pune pe pauză (Întrerupe)",                 ID_PLAY_PLAYPAUSE
         MENUITEM "&Oprește",                       ID_PLAY_STOP
         POPUP "&Repetă"
         BEGIN
@@ -2007,7 +2007,7 @@ BEGIN
         END
         POPUP "&Redare"
         BEGIN
-            MENUITEM "R&edă/Pauzează (Întrerupe)",            ID_PLAY_PLAYPAUSE
+            MENUITEM "R&edă/Pune pe pauză (Întrerupe)",            ID_PLAY_PLAYPAUSE
             MENUITEM "&Oprește",                 ID_PLAY_STOP
             MENUITEM "Pas de cad&ru",            ID_PLAY_FRAMESTEP
             MENUITEM "&Mergi la...",             ID_PLAY_GOTO
@@ -2142,8 +2142,8 @@ BEGIN
         MENUITEM "Intră în repaus",                    ID_AFTERPLAYBACK_STANDBY
         MENUITEM "Intră în hibernare",                   ID_AFTERPLAYBACK_HIBERNATE
         MENUITEM "Închide calculatorul",                    ID_AFTERPLAYBACK_SHUTDOWN
-        MENUITEM "Închide sesiunea",                     ID_AFTERPLAYBACK_LOGOFF
-        MENUITEM "Blochează desktop-ul",                        ID_AFTERPLAYBACK_LOCK
+        MENUITEM "Deloghează-te (Fă log off)",                     ID_AFTERPLAYBACK_LOGOFF
+        MENUITEM "Blochează calculatorul",                        ID_AFTERPLAYBACK_LOCK
         MENUITEM "Nu face nimic",                  ID_AFTERPLAYBACK_DONOTHING
         MENUITEM "------ Întotdeauna -----",    ID_AFTERPLAYBACK_EVERYTIME
         MENUITEM "Închide programul",                        ID_AFTERPLAYBACK_EXIT
@@ -2628,9 +2628,9 @@ BEGIN
     IDS_PPAGE_OUTPUT_SURF_2D "Suprafețe 2D"
     IDS_PPAGE_OUTPUT_SURF_3D "Suprafețe 3D (recomandat)"
     IDS_DOWNLOAD_SUBS       "Descarcă subtitrări"
-    IDS_CM_INPUT_AUTO       "Detectare automată"
+    IDS_CM_INPUT_AUTO       "Detectează automat"
     IDS_CM_AMBIENTLIGHT_BRIGHT "Luminos (2.2 Gamma)"
-    IDS_CM_AMBIENTLIGHT_DIM "Lumină fadă (2.35 Gamma)"
+    IDS_CM_AMBIENTLIGHT_DIM "Lumină slabă (2.35 Gamma)"
     IDS_CM_AMBIENTLIGHT_DARK "Întunecat (2.4 Gamma)"
     IDS_CM_INTENT_PERCEPTUAL "Perceptual"
     IDS_CM_INTENT_RELATIVECM "Colorimetrică relativă"
@@ -2688,7 +2688,7 @@ END
 STRINGTABLE
 BEGIN
     ID_PLAY_PLAY            "Redă\nRedă"
-    ID_PLAY_PAUSE           "Pauzează (Întrerupe)\nPauzează (Întrerupe)"
+    ID_PLAY_PAUSE           "Pune pe pauză (Întrerupe)\nPune pe pauză (Întrerupe)"
     ID_PLAY_STOP            "Oprește\nOprește"
     ID_PLAY_FRAMESTEP       "Pas\nPas"
     ID_PLAY_DECRATE         "Micșorează viteza\nMicșorează viteza"
@@ -2721,7 +2721,7 @@ BEGIN
     IDS_FAVORITES_ORGANIZE  "&Organizează favoritele..."
     IDS_CONTROLS_CLOSING    "Se închide..."
     IDS_CONTROLS_PLAYING    "Se redă"
-    IDS_CONTROLS_PAUSED     "Pus pe pauză (Întrerupt/Pauzat)"
+    IDS_CONTROLS_PAUSED     "Pus pe pauză (Întrerupt)"
 END
 
 STRINGTABLE
@@ -2855,7 +2855,7 @@ BEGIN
     IDS_AG_SAVE_SUBTITLE    "Salvează subtitrarea"
     IDS_AG_PROPERTIES       "Proprietăți"
     IDS_AG_EXIT             "Ieșire"
-    IDS_AG_PLAYPAUSE        "Redă/Pauzează (Întrerupe)"
+    IDS_AG_PLAYPAUSE        "Redă/Pune pe pauză (Întrerupe)"
     IDS_AG_PLAY             "Redă"
     IDS_AG_STOP             "Oprește"
     IDS_AG_FRAMESTEP        "Deplasează cu un cadru"
@@ -3203,7 +3203,7 @@ BEGIN
     IDS_MPC_MINIDUMP_FAIL   "Nu s-a putut crea fișierul de depanare „%s” (eroare %d)"
     IDS_MAINFRM_DIR_TITLE   "Selectează directorul"
     IDS_MAINFRM_DIR_CHECK   "Include subdirectoarele"
-    IDS_AG_PAUSE            "Pauzează (Întrerupe)"
+    IDS_AG_PAUSE            "Pune pe pauză (Întrerupe)"
     IDS_AG_TOGGLE_CAPTION   "Comută subtitrările și meniul"
     IDS_AG_TOGGLE_SEEKER    "Comută căutătorul"
     IDS_AG_TOGGLE_CONTROLS  "Comută controalele (Comută comenzile)"
@@ -3755,8 +3755,8 @@ BEGIN
     IDS_AFTERPLAYBACK_STANDBY "După redare: intră în repaus"
     IDS_AFTERPLAYBACK_HIBERNATE "După redare: intră în hibernare"
     IDS_AFTERPLAYBACK_SHUTDOWN "După redare: închide calculatorul"
-    IDS_AFTERPLAYBACK_LOGOFF "După redare: închide sesiunea (deloghează-te/log off)"
-    IDS_AFTERPLAYBACK_LOCK  "După redare: blochează desktop-ul"
+    IDS_AFTERPLAYBACK_LOGOFF "După redare: deloghează-te (fă log off)"
+    IDS_AFTERPLAYBACK_LOCK  "După redare: blochează calculatorul"
     IDS_AFTERPLAYBACK_EXIT  "După redare: închide întotdeauna programul"
     IDS_AFTERPLAYBACK_DONOTHING "După redare: nu face nimic"
     IDS_AFTERPLAYBACK_NEXT  "După redare: se redă următorul fișier din dosar (din folder)"
