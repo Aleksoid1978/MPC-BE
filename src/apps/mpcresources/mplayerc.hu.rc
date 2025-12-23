@@ -3094,11 +3094,11 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PROPSHEET_NAME      "Name"
-    IDS_PROPSHEET_MIME      "MIME type"
-    IDS_PROPSHEET_DESC      "Description"
-    IDS_PROPSHEET_FILE_IMAGE "%hs image"
-    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_PROPSHEET_NAME      "Név"
+    IDS_PROPSHEET_MIME      "MIME típus"
+    IDS_PROPSHEET_DESC      "Leírás"
+    IDS_PROPSHEET_FILE_IMAGE "%hs kép"
+    IDS_PROPSHEET_FILE_FONT "%hs betűtípus"
     IDS_AUDIOWINDOW_NONE    "ne változtassa meg az ablak méretét"
     IDS_AUDIOWINDOW_COVER   "lemezborító/borítóképek megjelenítése"
     IDS_AUDIOWINDOW_HIDE    "a képterület elrejtése"
