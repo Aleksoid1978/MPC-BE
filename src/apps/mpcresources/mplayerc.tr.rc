@@ -3094,11 +3094,11 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PROPSHEET_NAME      "Name"
-    IDS_PROPSHEET_MIME      "MIME type"
-    IDS_PROPSHEET_DESC      "Description"
-    IDS_PROPSHEET_FILE_IMAGE "%hs image"
-    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_PROPSHEET_NAME      "Ad"
+    IDS_PROPSHEET_MIME      "MIME türü"
+    IDS_PROPSHEET_DESC      "Açıklama"
+    IDS_PROPSHEET_FILE_IMAGE "%hs resim"
+    IDS_PROPSHEET_FILE_FONT "%hs yazı tipi"
     IDS_AUDIOWINDOW_NONE    "pencere boyutunu değiştirme."
     IDS_AUDIOWINDOW_COVER   "albüm kapak resmini göster."
     IDS_AUDIOWINDOW_HIDE    "video alanını gizle."
