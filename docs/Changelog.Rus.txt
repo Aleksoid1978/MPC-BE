@@ -45,7 +45,8 @@ YouTube
 Обновлены библиотеки:
 	ffmpeg n8.1-dev-1585-gb934dd1d4b;
 	Little-CMS git-lcms2.18rc_1-6-g23994d7;
-	MediaInfo git-v25.10-15-g4590c320d.
+	MediaInfo git-v25.10-15-g4590c320d;
+	nanosvg git-5cefd98.
 
 
 1.8.8 - 2025-10-26
