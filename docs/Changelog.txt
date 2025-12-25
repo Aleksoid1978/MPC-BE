@@ -33,6 +33,7 @@ Added retrieval of metadata from the "WM ASF Reader" filter.
 Installer
 Compiling the installer requires InnoSetup 6.5.2 or later.
 Added support for system themes (dark or light). Inno Setup 6.6.0 or later is required for build.
+Updated MPC Video Renderer 0.9.19.
 
 Updated Bulgarian translation (by jekovcar).
 Updated Chinese (Traditional) and Dutch translation (by beter).
