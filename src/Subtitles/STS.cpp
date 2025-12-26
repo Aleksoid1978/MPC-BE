@@ -280,7 +280,7 @@ static void WebVTT2SSA(CStringW& str, CStringW& cueTags, WebVTTcolorMap clrMap)
 {
 	std::vector<WebVTTcolorData> styleStack;
 	auto applyStyle = [&styleStack, &str](std::wstring clr, std::wstring bg, int endTag, bool restoring = false) {
-		std::wstring tags = L"";
+		std::wstring tags;
 		WebVTTcolorData previous;
 		bool applied = false;
 		if (styleStack.size() > 0 && !restoring) {
@@ -310,7 +310,7 @@ static void WebVTT2SSA(CStringW& str, CStringW& cueTags, WebVTTcolorMap clrMap)
 		}
 	};
 
-	std::wstring clr = L"", bg = L"";
+	std::wstring clr, bg;
 	if (clrMap.count(L"::cue")) { //default cue style
 		WebVTTcolorData colorData = clrMap[L"::cue"];
 		clr = colorData.color;
@@ -319,9 +319,11 @@ static void WebVTT2SSA(CStringW& str, CStringW& cueTags, WebVTTcolorMap clrMap)
 	}
 
 	int tagPos = str.Find(L"<");
-	while (tagPos != std::wstring::npos) {
+	while (tagPos >= 0) {
 		int endTag = str.Find(L">", tagPos);
-		if (endTag == std::wstring::npos) break;
+		if (endTag < 0) {
+			break;
+		}
 		CStringW inner = str.Mid(tagPos + 1, endTag - tagPos - 1);
 		if (inner.Find(L"/") == 0) { //close tag
 			if (styleStack.size() > 0) {//should always be true, unless poorly matched close tags in source
@@ -337,15 +339,15 @@ static void WebVTT2SSA(CStringW& str, CStringW& cueTags, WebVTTcolorMap clrMap)
 				if (endTag + 1 != str.GetLength()) {
 					str = str.Left(endTag + 1) + L"{\\r}" + str.Mid(endTag + 1);
 				}
-				clr = L"";
-				bg = L"";
+				clr.clear();
+				bg.clear();
 			}
 			tagPos = str.Find(L"<", endTag);
 			continue;
 		}
 
 		int dotPos = inner.Find(L".");
-		if (dotPos == std::wstring::npos) {//it's a simple tag, so we can apply a single style to it, if it exists
+		if (dotPos < 0) {//it's a simple tag, so we can apply a single style to it, if it exists
 			if (clrMap.count(inner.GetString())) {
 				WebVTTcolorData colorData = clrMap[inner.GetString()];
 				clr = colorData.color;
@@ -482,7 +484,7 @@ static bool OpenVTT(CTextFile* file, CSimpleTextSubtitle& ret) {
 	CStringW start, end, cueTags;
 
 	auto parseStyle = [&file, &cueColors](CStringW& buff) {
-		CStringW styleStr = L"";
+		CStringW styleStr;
 		while (file->ReadString(buff)) {
 			if (buff.Find(L"-->") != -1) { //not allowed in style block, so we drop out to cue parsing below
 				FastTrimRight(buff);
@@ -510,7 +512,7 @@ static bool OpenVTT(CTextFile* file, CSimpleTextSubtitle& ret) {
 				std::wregex clrPat(LR"(^\s*)" + attr + LR"(\s*:\s*#?([a-zA-Z0-9]*)\s*;)"); //e.g., 0xffffff or white
 				std::wregex rgbPat(LR"(^\s*)" + attr + LR"(\s*:\s*rgb\s*\(\s*([0-9]+)\s*,\s*([0-9]+)\s*,\s*([0-9]+)\s*\)\s*;)");
 				std::wsmatch match;
-				std::wstring clrStr = L"";
+				std::wstring clrStr;
 				if (std::regex_search(styles, match, clrPat)) {
 					clrStr = match[1];
 				}
@@ -572,7 +574,7 @@ static bool OpenVTT(CTextFile* file, CSimpleTextSubtitle& ret) {
 		}
 
 		int len = buff.GetLength();
-		cueTags = L"";
+		cueTags.Empty();
 		int c = swscanf_s(buff, L"%s --> %s %[^\n]s", start.GetBuffer(len), len, end.GetBuffer(len), len, cueTags.GetBuffer(len), len);
 		start.ReleaseBuffer();
 		end.ReleaseBuffer();

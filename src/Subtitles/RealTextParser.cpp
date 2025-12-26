@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -272,7 +272,7 @@ bool CRealTextParser::ExtractString(std::wstring& p_rszLine, std::wstring& p_rsz
 {
 	if (p_rszLine.empty() || p_rszLine.at(0) == '<') {
 		if (m_bTryToIgnoreErrors) {
-			p_rszString = L"";
+			p_rszString.clear();
 			return true;
 		} else {
 			return false;
@@ -414,7 +414,7 @@ int CRealTextParser::GetTimecode(const std::wstring& p_crszTimecode)
 				iMultiplier *= 60;
 			}
 
-			szCurrentPart = L"";
+			szCurrentPart.clear();
 		} else {
 			szCurrentPart = p_crszTimecode.substr(i, 1) + szCurrentPart;
 		}
