@@ -292,7 +292,6 @@ BOOL CHistoryDlg::PreTranslateMessage(MSG* pMsg)
 {
 	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN) {
 		if (pMsg->hwnd == m_list.GetSafeHwnd() && m_list.GetSelectedCount() > 0) {
-			CStringW paths;
 
 			if (POSITION pos = m_list.GetFirstSelectedItemPosition()) {
 				auto item  = m_list.GetNextSelectedItem(pos);
