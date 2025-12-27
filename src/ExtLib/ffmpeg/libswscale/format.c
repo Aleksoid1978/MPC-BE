@@ -896,19 +896,45 @@ int ff_sws_decode_pixfmt(SwsOpList *ops, enum AVPixelFormat fmt)
     SwsReadWriteOp rw_op;
     SwsSwizzleOp swizzle;
     SwsPackOp unpack;
+    SwsComps comps = {0};
     int shift;
 
     RET(fmt_analyze(fmt, &rw_op, &unpack, &swizzle, &shift,
                     &pixel_type, &raw_type));
 
+    swizzle = swizzle_inv(swizzle);
+
+    /* Set baseline pixel content flags */
+    const int integer = ff_sws_pixel_type_is_int(raw_type);
+    const int swapped = (desc->flags & AV_PIX_FMT_FLAG_BE) != NATIVE_ENDIAN_FLAG;
+    for (int i = 0; i < rw_op.elems; i++) {
+        comps.flags[i] = (integer ? SWS_COMP_EXACT   : 0) |
+                         (swapped ? SWS_COMP_SWAPPED : 0);
+    }
+
+    /* Generate value range information for simple unpacked formats */
+    if (integer && !unpack.pattern[0]) {
+        /* YA formats have desc->comp[] in the order {Y, A} instead of the
+         * canonical order {Y, U, V, A} */
+        const int is_ya = desc->nb_components == 2;
+        for (int c = 0; c < desc->nb_components; c++) {
+            const int bits   = desc->comp[c].depth + shift;
+            const int idx    = swizzle.in[is_ya ? 3 * c : c];
+            comps.min[idx]   = Q0;
+            if (bits < 32) /* FIXME: AVRational is limited to INT_MAX */
+                comps.max[idx] = Q((1ULL << bits) - 1);
+        }
+    }
+
     /* TODO: handle subsampled or semipacked input formats */
     RET(ff_sws_op_list_append(ops, &(SwsOp) {
-        .op   = SWS_OP_READ,
-        .type = raw_type,
-        .rw   = rw_op,
+        .op    = SWS_OP_READ,
+        .type  = raw_type,
+        .rw    = rw_op,
+        .comps = comps,
     }));
 
-    if ((desc->flags & AV_PIX_FMT_FLAG_BE) != NATIVE_ENDIAN_FLAG) {
+    if (swapped) {
         RET(ff_sws_op_list_append(ops, &(SwsOp) {
             .op   = SWS_OP_SWAP_BYTES,
             .type = raw_type,
@@ -932,14 +958,16 @@ int ff_sws_decode_pixfmt(SwsOpList *ops, enum AVPixelFormat fmt)
     RET(ff_sws_op_list_append(ops, &(SwsOp) {
         .op      = SWS_OP_SWIZZLE,
         .type    = pixel_type,
-        .swizzle = swizzle_inv(swizzle),
+        .swizzle = swizzle,
     }));
 
-    RET(ff_sws_op_list_append(ops, &(SwsOp) {
-        .op   = SWS_OP_RSHIFT,
-        .type = pixel_type,
-        .c.u  = shift,
-    }));
+    if (shift) {
+        RET(ff_sws_op_list_append(ops, &(SwsOp) {
+            .op   = SWS_OP_RSHIFT,
+            .type = pixel_type,
+            .c.u  = shift,
+        }));
+    }
 
     RET(ff_sws_op_list_append(ops, &(SwsOp) {
         .op   = SWS_OP_CLEAR,
@@ -962,11 +990,13 @@ int ff_sws_encode_pixfmt(SwsOpList *ops, enum AVPixelFormat fmt)
     RET(fmt_analyze(fmt, &rw_op, &pack, &swizzle, &shift,
                     &pixel_type, &raw_type));
 
-    RET(ff_sws_op_list_append(ops, &(SwsOp) {
-        .op   = SWS_OP_LSHIFT,
-        .type = pixel_type,
-        .c.u  = shift,
-    }));
+    if (shift) {
+        RET(ff_sws_op_list_append(ops, &(SwsOp) {
+            .op   = SWS_OP_LSHIFT,
+            .type = pixel_type,
+            .c.u  = shift,
+        }));
+    }
 
     if (rw_op.elems > desc->nb_components) {
         /* Format writes unused alpha channel, clear it explicitly for sanity */

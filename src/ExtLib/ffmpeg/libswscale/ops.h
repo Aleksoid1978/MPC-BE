@@ -43,34 +43,37 @@ bool ff_sws_pixel_type_is_int(SwsPixelType type) av_const;
 typedef enum SwsOpType {
     SWS_OP_INVALID = 0,
 
-    /* Input/output handling */
+    /* Defined for all types; but implemented for integers only */
     SWS_OP_READ,            /* gather raw pixels from planes */
     SWS_OP_WRITE,           /* write raw pixels to planes */
     SWS_OP_SWAP_BYTES,      /* swap byte order (for differing endianness) */
+    SWS_OP_SWIZZLE,         /* rearrange channel order, or duplicate channels */
+
+    /* Bit manipulation operations. Defined for integers only. */
     SWS_OP_UNPACK,          /* split tightly packed data into components */
     SWS_OP_PACK,            /* compress components into tightly packed data */
-
-    /* Pixel manipulation */
-    SWS_OP_CLEAR,           /* clear pixel values */
     SWS_OP_LSHIFT,          /* logical left shift of raw pixel values by (u8) */
     SWS_OP_RSHIFT,          /* right shift of raw pixel values by (u8) */
-    SWS_OP_SWIZZLE,         /* rearrange channel order, or duplicate channels */
-    SWS_OP_CONVERT,         /* convert (cast) between formats */
-    SWS_OP_DITHER,          /* add dithering noise */
 
-    /* Arithmetic operations */
-    SWS_OP_LINEAR,          /* generalized linear affine transform */
-    SWS_OP_SCALE,           /* multiplication by scalar (q) */
+    /* Generic arithmetic. Defined and implemented for all types */
+    SWS_OP_CLEAR,           /* clear pixel values */
+    SWS_OP_CONVERT,         /* convert (cast) between formats */
     SWS_OP_MIN,             /* numeric minimum (q4) */
     SWS_OP_MAX,             /* numeric maximum (q4) */
+    SWS_OP_SCALE,           /* multiplication by scalar (q) */
+
+    /* Floating-point only arithmetic operations. */
+    SWS_OP_LINEAR,          /* generalized linear affine transform */
+    SWS_OP_DITHER,          /* add dithering noise */
 
     SWS_OP_TYPE_NB,
 } SwsOpType;
 
 enum SwsCompFlags {
     SWS_COMP_GARBAGE = 1 << 0, /* contents are undefined / garbage data */
-    SWS_COMP_EXACT   = 1 << 1, /* value is an in-range, exact, integer */
+    SWS_COMP_EXACT   = 1 << 1, /* value is an exact integer */
     SWS_COMP_ZERO    = 1 << 2, /* known to be a constant zero */
+    SWS_COMP_SWAPPED = 1 << 3, /* byte order is swapped */
 };
 
 typedef union SwsConst {
@@ -107,6 +110,10 @@ typedef struct SwsReadWriteOp {
 } SwsReadWriteOp;
 
 typedef struct SwsPackOp {
+    /**
+     * Packed bits are assumed to be LSB-aligned within the underlying
+     * integer type; i.e. (msb) 0 ... X Y Z W (lsb).
+     */
     uint8_t pattern[4]; /* bit depth pattern, from MSB to LSB */
 } SwsPackOp;
 
@@ -189,7 +196,20 @@ typedef struct SwsOp {
         SwsConst        c;
     };
 
-    /* For use internal use inside ff_sws_*() functions */
+    /**
+     * Metadata about the operation's input/output components.
+     *
+     * For SWS_OP_READ, this is informative; and lets the optimizer know
+     * additional information about the value range and/or pixel data to expect.
+     * The default value of {0} is safe to pass in the case that no additional
+     * information is known.
+     *
+     * For every other operation, this metadata is discarded and regenerated
+     * automatically by `ff_sws_op_list_update_comps()`.
+     *
+     * Note that backends may rely on the presence and accuracy of this
+     * metadata for all operations, during ff_sws_ops_compile().
+     */
     SwsComps comps;
 } SwsOp;
 
@@ -210,8 +230,8 @@ typedef struct SwsOpList {
     SwsOp *ops;
     int num_ops;
 
-    /* Metadata associated with this operation list */
-    SwsFormat src, dst; /* if set; may inform the optimizer about e.g value ranges */
+    /* Purely informative metadata associated with this operation list */
+    SwsFormat src, dst;
 } SwsOpList;
 
 SwsOpList *ff_sws_op_list_alloc(void);
