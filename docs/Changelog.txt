@@ -47,7 +47,8 @@ Updated libraries:
 	ffmpeg n8.1-dev-1644-g0dfaed77a6;
 	Little-CMS git-lcms2.18rc_1-6-g23994d7;
 	MediaInfo git-v25.10-15-g4590c320d;
-	nanosvg git-5cefd98.
+	nanosvg git-5cefd98;
+	vvdec v3.1.0.
 
 
 1.8.8 - 2025-10-26
