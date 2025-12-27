@@ -29,9 +29,7 @@
 #define ENABLE_VIRTUALCLONEDRIVE 1
 #define ENABLE_WIN8VIRTUALDISK 1
 
-CDiskImage::CDiskImage()
-{
-}
+CDiskImage::CDiskImage() = default;
 
 CDiskImage::~CDiskImage()
 {

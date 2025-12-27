@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2025 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -139,7 +139,7 @@ public:
 		BYTE	_2_bit_pixel_code		= 0;
 		CAtlList<DVB_OBJECT> objects;
 
-		DVB_REGION() {}
+		DVB_REGION() = default;
 
 		DVB_REGION(const CDVBSub::DVB_REGION& region)
 			: id(region.id)

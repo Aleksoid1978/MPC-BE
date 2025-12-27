@@ -107,9 +107,7 @@ struct pgc_t {
 // CIfoFile
 //
 
-CIfoFile::CIfoFile()
-{
-}
+CIfoFile::CIfoFile() = default;
 
 bool CIfoFile::OpenIFO(LPCWSTR fn, ULONG nProgNum /*= 0*/)
 {

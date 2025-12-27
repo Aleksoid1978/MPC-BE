@@ -262,9 +262,7 @@ static const std::map<GUID, LPCSTR> dxvaguids = {
 };
 #undef ADDENTRY
 
-CMediaTypeEx::CMediaTypeEx()
-{
-}
+CMediaTypeEx::CMediaTypeEx() = default;
 
 CString CMediaTypeEx::ToString(IPin* pPin)
 {

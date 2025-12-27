@@ -28,9 +28,7 @@
 
 extern LCID ISO6392ToLcid(LPCSTR code);
 
-CHdmvClipInfo::CHdmvClipInfo()
-{
-}
+CHdmvClipInfo::CHdmvClipInfo() = default;
 
 CHdmvClipInfo::~CHdmvClipInfo()
 {
