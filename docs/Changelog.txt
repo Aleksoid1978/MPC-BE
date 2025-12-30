@@ -1,6 +1,6 @@
 ﻿This file includes only a short list of the changes between Media Player Classic - BE's versions.
 
-1.8.8.x dev
+1.8.9 - 2025-12-30
 =============================
 AudioSplitter
 Added support for multiple embedded images in FLAC files.
