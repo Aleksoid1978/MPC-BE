@@ -2,6 +2,7 @@
 
 1.8.9.x dev
 =============================
+Updated Japanese translation (by tsubasanouta).
 
 
 1.8.9 - 2025-12-30

@@ -3094,11 +3094,11 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PROPSHEET_NAME      "Name"
-    IDS_PROPSHEET_MIME      "MIME type"
-    IDS_PROPSHEET_DESC      "Description"
-    IDS_PROPSHEET_FILE_IMAGE "%hs image"
-    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_PROPSHEET_NAME      "名前"
+    IDS_PROPSHEET_MIME      "MIME タイプ"
+    IDS_PROPSHEET_DESC      "説明"
+    IDS_PROPSHEET_FILE_IMAGE "%hs 画像"
+    IDS_PROPSHEET_FILE_FONT "%hs フォント"
     IDS_AUDIOWINDOW_NONE    "ウィンドウ サイズを変更しない"
     IDS_AUDIOWINDOW_COVER   "アルバムの アート/カバー 画像を表示する"
     IDS_AUDIOWINDOW_HIDE    "映像領域を隠す"
