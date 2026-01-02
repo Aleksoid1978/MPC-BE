@@ -1,7 +1,7 @@
 ﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"O programu"
 7		"MPC-BE"
-8		"Copyright © 2002-2025, vidi Authors.txt"
+8		"Copyright © 2002-2026, vidi Authors.txt"
 10		"Verzija :"
 11		"MPC-BE Prevoditelj :"
 12		"FFmpeg Prevoditelj :"

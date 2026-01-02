@@ -1,7 +1,7 @@
 ﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Névjegy"
 7		"MPC-BE"
-8		"Szerzői jog © 2002-2025 lásd Authors.txt fájl"
+8		"Szerzői jog © 2002-2026 lásd Authors.txt fájl"
 10		"Verzió :"
 11		"MPC-BE Fordítóprogram :"
 12		"FFmpeg Fordítóprogram :"

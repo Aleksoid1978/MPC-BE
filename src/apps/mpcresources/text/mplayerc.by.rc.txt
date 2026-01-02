@@ -1,7 +1,7 @@
 ﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Пра праграму"
 7		"MPC-BE"
-8		"Copyright © 2002-2025 глядзiце файл Authors.txt"
+8		"Copyright © 2002-2026 глядзiце файл Authors.txt"
 10		"Version :"
 11		"Кампiлятар MPC-BE :"
 12		"Кампiлятар FFmpeg :"
