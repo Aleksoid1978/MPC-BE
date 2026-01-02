@@ -3094,11 +3094,11 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PROPSHEET_NAME      "Name"
-    IDS_PROPSHEET_MIME      "MIME type"
-    IDS_PROPSHEET_DESC      "Description"
-    IDS_PROPSHEET_FILE_IMAGE "%hs image"
-    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_PROPSHEET_NAME      "名稱"
+    IDS_PROPSHEET_MIME      "MIME 類型"
+    IDS_PROPSHEET_DESC      "描述"
+    IDS_PROPSHEET_FILE_IMAGE "%hs 圖片"
+    IDS_PROPSHEET_FILE_FONT "%hs 字型"
     IDS_AUDIOWINDOW_NONE    "不變更視窗大小"
     IDS_AUDIOWINDOW_COVER   "顯示專輯封面圖片"
     IDS_AUDIOWINDOW_HIDE    "隱藏影格部份"

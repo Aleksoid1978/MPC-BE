@@ -3,6 +3,7 @@
 1.8.9.x dev
 =============================
 Updated Japanese translation (by tsubasanouta).
+Updated Chinese (Traditional) and Dutch translation (by beter).
 
 
 1.8.9 - 2025-12-30

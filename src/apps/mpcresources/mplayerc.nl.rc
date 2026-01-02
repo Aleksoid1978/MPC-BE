@@ -3094,11 +3094,11 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PROPSHEET_NAME      "Name"
-    IDS_PROPSHEET_MIME      "MIME type"
-    IDS_PROPSHEET_DESC      "Description"
-    IDS_PROPSHEET_FILE_IMAGE "%hs image"
-    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_PROPSHEET_NAME      "Naam"
+    IDS_PROPSHEET_MIME      "MIME-type"
+    IDS_PROPSHEET_DESC      "Beschrijving"
+    IDS_PROPSHEET_FILE_IMAGE "%hs afbeelding"
+    IDS_PROPSHEET_FILE_FONT "%hs lettertype"
     IDS_AUDIOWINDOW_NONE    "Venstergrootte niet veranderen"
     IDS_AUDIOWINDOW_COVER   "albumhoezen/coverafbeeldingen tonen"
     IDS_AUDIOWINDOW_HIDE    "Videogebied verbergen"
