@@ -1,7 +1,7 @@
 #ifndef ISPP_INVOKED
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -47,7 +47,7 @@
 #define MPC_VERSION_MINOR       8
 #define MPC_VERSION_PATCH       9
 
-#define MPC_VERSION_STATUS      1
+#define MPC_VERSION_STATUS      0
 // MPC_VERSION_STATUS: 0 - dev; 1 - stable
 
 #define MPC_YEAR_COMMENTS       "2002-2025"
