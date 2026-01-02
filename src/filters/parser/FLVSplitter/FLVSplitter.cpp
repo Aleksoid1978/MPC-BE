@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -902,6 +902,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 					case FLV_VIDEO_VP6A:  // VP6 with alpha
 						m_pFile->BitRead(24);
+						[[fallthrough]];
 					case FLV_VIDEO_VP6: { // VP6
 						int w, h, arx, ary;
 #ifdef NOVIDEOTWEAK

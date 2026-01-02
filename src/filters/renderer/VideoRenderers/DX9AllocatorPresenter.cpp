@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -547,12 +547,14 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 			m_SurfaceFmt = D3DFMT_A16B16G16R16F;
 			break;
 		}
+		[[fallthrough]];
 	case D3DFMT_A2R10G10B10: {
 		bool b10bitSupport = SUCCEEDED(m_pD3D9Ex->CheckDeviceFormat(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_FILTER, D3DRTYPE_TEXTURE, D3DFMT_A2R10G10B10));
 		if (b10bitSupport) {
 			m_SurfaceFmt = D3DFMT_A2R10G10B10;
 			break;
 		}
+		[[fallthrough]];
 	}
 	default:
 		m_SurfaceFmt = D3DFMT_X8R8G8B8;

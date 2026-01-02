@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -671,6 +671,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									break;
 								}
 							}
+							[[fallthrough]];
 						case AP4_MPEG2_AAC_AUDIO_MAIN_OTI:
 						case AP4_MPEG2_AAC_AUDIO_LC_OTI:
 						case AP4_MPEG2_AAC_AUDIO_SSRP_OTI:

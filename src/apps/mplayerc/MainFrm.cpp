@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -3208,6 +3208,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 				}
 				// No break here. Need to check and reset m_fFrameSteppingActive.
 				// This is necessary in cases where the video ends earlier than other tracks.
+				[[fallthrough]];
 			case EC_STEP_COMPLETE:
 				if (m_bFrameSteppingActive) {
 					m_nStepForwardCount++;
@@ -9323,6 +9324,7 @@ void CMainFrame::OnPlayColor(UINT nID)
 
 		case ID_COLOR_BRIGHTNESS_INC:
 			brightness += 2;
+			[[fallthrough]];
 		case ID_COLOR_BRIGHTNESS_DEC:
 			brightness -= 1;
 			SetColorControl(ProcAmp_Brightness, brightness, contrast, hue, saturation);
@@ -9336,6 +9338,7 @@ void CMainFrame::OnPlayColor(UINT nID)
 
 		case ID_COLOR_CONTRAST_INC:
 			contrast += 2;
+			[[fallthrough]];
 		case ID_COLOR_CONTRAST_DEC:
 			contrast -= 1;
 			SetColorControl(ProcAmp_Contrast, brightness, contrast, hue, saturation);
@@ -9349,6 +9352,7 @@ void CMainFrame::OnPlayColor(UINT nID)
 
 		case ID_COLOR_HUE_INC:
 			hue += 2;
+			[[fallthrough]];
 		case ID_COLOR_HUE_DEC:
 			hue -= 1;
 			SetColorControl(ProcAmp_Hue, brightness, contrast, hue, saturation);
@@ -9362,6 +9366,7 @@ void CMainFrame::OnPlayColor(UINT nID)
 
 		case ID_COLOR_SATURATION_INC:
 			saturation += 2;
+			[[fallthrough]];
 		case ID_COLOR_SATURATION_DEC:
 			saturation -= 1;
 			SetColorControl(ProcAmp_Saturation, brightness, contrast, hue, saturation);

@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2025 see Authors.txt
+ * (C) 2016-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -70,8 +70,10 @@ void fill_u32(void* dst, uint32_t c, size_t count)
 	switch (n - o) {
 	case 3:
 		((uint32_t*)dst)[o + 2] = c;
+		[[fallthrough]];
 	case 2:
 		((uint32_t*)dst)[o + 1] = c;
+		[[fallthrough]];
 	case 1:
 		((uint32_t*)dst)[o + 0] = c;
 	}

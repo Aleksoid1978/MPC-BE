@@ -758,6 +758,7 @@ const RGBCoeffs* CFormatConverter::getRGBCoeffs(int width, int height)
             break;
         default:
             DLog(L"CFormatConverter()::getRGBCoeffs(): Unknown color space: %d - defaulting to BT709", colorspace);
+            [[fallthrough]];
         case AVCOL_SPC_BT709:
             Kr = 0.2126;
             Kg = 0.7152;
