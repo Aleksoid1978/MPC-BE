@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2025 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -334,7 +334,6 @@ void CFormatConverter::SetConvertFunc()
 		if (m_FProps.pftype == PFType_NV12) {
 			m_pConvertFn = &CFormatConverter::plane_copy_sse2;
 			m_RequiredAlignment = 0;
-			break;
 		}
 		else if (m_FProps.pftype == PFType_YUV420) {
 			m_pConvertFn = &CFormatConverter::convert_yuv420_nv12;
@@ -343,12 +342,13 @@ void CFormatConverter::SetConvertFunc()
 		else if (m_FProps.pftype == PFType_P01x) {
 			m_pConvertFn = &CFormatConverter::convert_p010_nv12_sse2;
 		}
-	case PixFmt_YV12:
-		if (m_FProps.pftype == PFType_YUV420Px) {
+		else if (m_FProps.pftype == PFType_YUV420Px) {
 			m_pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
 			m_RequiredAlignment = 32;
 		}
-		else if (m_FProps.pftype == PFType_NV12) {
+		break;
+	case PixFmt_YV12:
+		if (m_FProps.pftype == PFType_NV12) {
 			m_pConvertFn = &CFormatConverter::convert_nv12_yv12;
 			m_RequiredAlignment = 32;
 		}
@@ -358,6 +358,10 @@ void CFormatConverter::SetConvertFunc()
 			m_RequiredAlignment = 0;
 		}
 #endif
+		else if (m_FProps.pftype == PFType_YUV420Px) {
+			m_pConvertFn = &CFormatConverter::convert_yuv_yv_nv12_dither_le;
+			m_RequiredAlignment = 32;
+		}
 		break;
 	case PixFmt_YUY2:
 		if (m_FProps.avpixfmt == AV_PIX_FMT_YUYV422) {
