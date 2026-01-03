@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1525,7 +1525,9 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 						if (pmt->majortype == MEDIATYPE_Audio && pPinIn == nullptr) {
 							// Add infinite Pin Tee Filter
 							CComPtr<IBaseFilter> pInfPinTee;
-							pInfPinTee.CoCreateInstance(CLSID_InfTee);
+							if (FAILED(pInfPinTee.CoCreateInstance(CLSID_InfTee))) {
+								break;
+							}
 							AddFilter(pInfPinTee, L"Infinite Pin Tee");
 
 							hr = ConnectFilterDirect(pPin, pInfPinTee, nullptr);
@@ -3039,7 +3041,7 @@ STDMETHODIMP CFGManagerDVD::AddSourceFilter(LPCWSTR lpcwstrFileName, LPCWSTR lpc
 	pDVDC->SetOption(DVD_HMSF_TimeCodeEvents, TRUE);
 
 	if (clsid == CLSID_DVDNavigator) {
-		CResetDVD(CString(buff));
+		CResetDVD resetDVD(buff);
 	}
 
 	*ppFilter = pBF.Detach();

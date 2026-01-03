@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -64,9 +64,9 @@ struct CAlphaMask final : std::unique_ptr<BYTE[]> {
 		for (auto it = alphaMaskPool.begin(); it != alphaMaskPool.end(); ++it) {
 			auto& am = *it;
 			if (am.m_size >= size) {
-				auto ret = std::shared_ptr<CAlphaMask>(DNew CAlphaMask(std::move(am)), alpha_mask_deleter(alphaMaskPool));
+				auto ptr = std::shared_ptr<CAlphaMask>(DNew CAlphaMask(std::move(am)), alpha_mask_deleter(alphaMaskPool));
 				alphaMaskPool.erase(it);
-				return std::move(ret);
+				return ptr;
 			}
 		}
 		return std::shared_ptr<CAlphaMask>(DNew CAlphaMask(size), alpha_mask_deleter(alphaMaskPool));
