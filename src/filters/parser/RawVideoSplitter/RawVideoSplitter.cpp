@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -261,6 +261,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					default:
 						y4m_interl = 'p';
 						DLog(L"YUV4MPEG2: incorrect interlace flag, output as progressive");
+						[[fallthrough]];
 					case 'p': // progressive
 						interlFlags = 0;
 						break;

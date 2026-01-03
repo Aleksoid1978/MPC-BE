@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1393,10 +1393,10 @@ bool CBaseSplitterFileEx::Read(avchdr& h, std::vector<BYTE>& pData, CMediaType* 
 			switch (nalu_type) {
 				case NALU_TYPE_SUBSET_SPS:
 					subset_sps = true;
+					sps_present++;
+					break;
 				case NALU_TYPE_SPS:
-					if (nalu_type == NALU_TYPE_SPS) {
-						sps = true;
-					}
+					sps = true;
 					sps_present++;
 					break;
 				case NALU_TYPE_PPS:

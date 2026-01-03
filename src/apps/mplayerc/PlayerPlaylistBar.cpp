@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1131,6 +1131,7 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 						m_pMainFrame->PostMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
 						return TRUE;
 					}
+					break;
 				case VK_DELETE:
 				case VK_APPS: // "Menu key"
 					break;
