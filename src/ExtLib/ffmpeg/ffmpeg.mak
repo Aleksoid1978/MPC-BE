@@ -577,7 +577,6 @@ SRCS_LC_B = \
 	libavcodec/wmalosslessdec.c \
 	libavcodec/wmaprodec.c \
 	libavcodec/wmavoice.c \
-	libavcodec/wmv2.c \
 	libavcodec/wmv2data.c \
 	libavcodec/wmv2dec.c \
 	libavcodec/wmv2dsp.c \

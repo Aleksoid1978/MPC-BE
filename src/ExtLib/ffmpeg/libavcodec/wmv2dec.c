@@ -18,6 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/avassert.h"
 #include "libavutil/mem_internal.h"
 
 #include "avcodec.h"
@@ -31,6 +32,7 @@
 #include "msmpeg4.h"
 #include "msmpeg4_vc1_data.h"
 #include "msmpeg4dec.h"
+#include "qpeldsp.h"
 #include "simple_idct.h"
 #include "wmv2.h"
 #include "wmv2data.h"
@@ -38,8 +40,10 @@
 
 typedef struct WMV2DecContext {
     MSMP4DecContext ms;
-    WMV2Context common;
     IntraX8Context x8;
+
+    qpel_mc_func put_mspel_pixels_tab[8];
+
     int j_type_bit;
     int j_type;
     int abt_flag;
@@ -51,10 +55,218 @@ typedef struct WMV2DecContext {
     int cbp_table_index;
     int top_left_mv_flag;
     int per_mb_rl_bit;
-    int skip_type;
+    int hshift;
 
     DECLARE_ALIGNED(32, int16_t, abt_block2)[6][64];
 } WMV2DecContext;
+
+static void wmv2_mspel8_h_lowpass(uint8_t *dst, const uint8_t *src,
+                                  int dstStride, int srcStride, int h)
+{
+    const uint8_t *cm = ff_crop_tab + MAX_NEG_CROP;
+
+    for (int i = 0; i < h; i++) {
+        dst[0] = cm[(9 * (src[0] + src[1]) - (src[-1] + src[2]) + 8) >> 4];
+        dst[1] = cm[(9 * (src[1] + src[2]) - (src[0]  + src[3]) + 8) >> 4];
+        dst[2] = cm[(9 * (src[2] + src[3]) - (src[1]  + src[4]) + 8) >> 4];
+        dst[3] = cm[(9 * (src[3] + src[4]) - (src[2]  + src[5]) + 8) >> 4];
+        dst[4] = cm[(9 * (src[4] + src[5]) - (src[3]  + src[6]) + 8) >> 4];
+        dst[5] = cm[(9 * (src[5] + src[6]) - (src[4]  + src[7]) + 8) >> 4];
+        dst[6] = cm[(9 * (src[6] + src[7]) - (src[5]  + src[8]) + 8) >> 4];
+        dst[7] = cm[(9 * (src[7] + src[8]) - (src[6]  + src[9]) + 8) >> 4];
+        dst   += dstStride;
+        src   += srcStride;
+    }
+}
+
+static void wmv2_mspel8_v_lowpass(uint8_t *dst, const uint8_t *src,
+                                  int dstStride, int srcStride, int w)
+{
+    const uint8_t *cm = ff_crop_tab + MAX_NEG_CROP;
+
+    for (int i = 0; i < w; i++) {
+        const int src_1 = src[-srcStride];
+        const int src0  = src[0];
+        const int src1  = src[srcStride];
+        const int src2  = src[2 * srcStride];
+        const int src3  = src[3 * srcStride];
+        const int src4  = src[4 * srcStride];
+        const int src5  = src[5 * srcStride];
+        const int src6  = src[6 * srcStride];
+        const int src7  = src[7 * srcStride];
+        const int src8  = src[8 * srcStride];
+        const int src9  = src[9 * srcStride];
+        dst[0 * dstStride] = cm[(9 * (src0 + src1) - (src_1 + src2) + 8) >> 4];
+        dst[1 * dstStride] = cm[(9 * (src1 + src2) - (src0  + src3) + 8) >> 4];
+        dst[2 * dstStride] = cm[(9 * (src2 + src3) - (src1  + src4) + 8) >> 4];
+        dst[3 * dstStride] = cm[(9 * (src3 + src4) - (src2  + src5) + 8) >> 4];
+        dst[4 * dstStride] = cm[(9 * (src4 + src5) - (src3  + src6) + 8) >> 4];
+        dst[5 * dstStride] = cm[(9 * (src5 + src6) - (src4  + src7) + 8) >> 4];
+        dst[6 * dstStride] = cm[(9 * (src6 + src7) - (src5  + src8) + 8) >> 4];
+        dst[7 * dstStride] = cm[(9 * (src7 + src8) - (src6  + src9) + 8) >> 4];
+        src++;
+        dst++;
+    }
+}
+
+static void put_mspel8_mc10_c(uint8_t *dst, const uint8_t *src, ptrdiff_t stride)
+{
+    uint8_t half[64];
+
+    wmv2_mspel8_h_lowpass(half, src, 8, stride, 8);
+    ff_put_pixels8_l2_8(dst, src, half, stride, stride, 8, 8);
+}
+
+static void put_mspel8_mc20_c(uint8_t *dst, const uint8_t *src, ptrdiff_t stride)
+{
+    wmv2_mspel8_h_lowpass(dst, src, stride, stride, 8);
+}
+
+static void put_mspel8_mc30_c(uint8_t *dst, const uint8_t *src, ptrdiff_t stride)
+{
+    uint8_t half[64];
+
+    wmv2_mspel8_h_lowpass(half, src, 8, stride, 8);
+    ff_put_pixels8_l2_8(dst, src + 1, half, stride, stride, 8, 8);
+}
+
+static void put_mspel8_mc02_c(uint8_t *dst, const uint8_t *src, ptrdiff_t stride)
+{
+    wmv2_mspel8_v_lowpass(dst, src, stride, stride, 8);
+}
+
+static void put_mspel8_mc12_c(uint8_t *dst, const uint8_t *src, ptrdiff_t stride)
+{
+    uint8_t halfH[88];
+    uint8_t halfV[64];
+    uint8_t halfHV[64];
+
+    wmv2_mspel8_h_lowpass(halfH, src - stride, 8, stride, 11);
+    wmv2_mspel8_v_lowpass(halfV, src, 8, stride, 8);
+    wmv2_mspel8_v_lowpass(halfHV, halfH + 8, 8, 8, 8);
+    ff_put_pixels8_l2_8(dst, halfV, halfHV, stride, 8, 8, 8);
+}
+
+static void put_mspel8_mc32_c(uint8_t *dst, const uint8_t *src, ptrdiff_t stride)
+{
+    uint8_t halfH[88];
+    uint8_t halfV[64];
+    uint8_t halfHV[64];
+
+    wmv2_mspel8_h_lowpass(halfH, src - stride, 8, stride, 11);
+    wmv2_mspel8_v_lowpass(halfV, src + 1, 8, stride, 8);
+    wmv2_mspel8_v_lowpass(halfHV, halfH + 8, 8, 8, 8);
+    ff_put_pixels8_l2_8(dst, halfV, halfHV, stride, 8, 8, 8);
+}
+
+static void put_mspel8_mc22_c(uint8_t *dst, const uint8_t *src, ptrdiff_t stride)
+{
+    uint8_t halfH[88];
+
+    wmv2_mspel8_h_lowpass(halfH, src - stride, 8, stride, 11);
+    wmv2_mspel8_v_lowpass(dst, halfH + 8, stride, 8, 8);
+}
+
+static av_cold void wmv2_mspel_init(WMV2DecContext *w)
+{
+    w->put_mspel_pixels_tab[0] = ff_put_pixels8x8_c;
+    w->put_mspel_pixels_tab[1] = put_mspel8_mc10_c;
+    w->put_mspel_pixels_tab[2] = put_mspel8_mc20_c;
+    w->put_mspel_pixels_tab[3] = put_mspel8_mc30_c;
+    w->put_mspel_pixels_tab[4] = put_mspel8_mc02_c;
+    w->put_mspel_pixels_tab[5] = put_mspel8_mc12_c;
+    w->put_mspel_pixels_tab[6] = put_mspel8_mc22_c;
+    w->put_mspel_pixels_tab[7] = put_mspel8_mc32_c;
+}
+
+void ff_mspel_motion(MPVContext *const s, uint8_t *dest_y,
+                     uint8_t *dest_cb, uint8_t *dest_cr,
+                     uint8_t *const *ref_picture,
+                     const op_pixels_func (*pix_op)[4],
+                     int motion_x, int motion_y, int h)
+{
+    WMV2DecContext *const w = (WMV2DecContext *) s;
+    const uint8_t *ptr;
+    int dxy, mx, my, src_x, src_y, v_edge_pos;
+    ptrdiff_t offset, linesize, uvlinesize;
+    int emu = 0;
+
+    dxy   = ((motion_y & 1) << 1) | (motion_x & 1);
+    dxy   = 2 * dxy + w->hshift;
+    src_x = s->mb_x * 16 + (motion_x >> 1);
+    src_y = s->mb_y * 16 + (motion_y >> 1);
+
+    /* WARNING: do no forget half pels */
+    v_edge_pos = s->v_edge_pos;
+    src_x      = av_clip(src_x, -16, s->width);
+    src_y      = av_clip(src_y, -16, s->height);
+
+    if (src_x <= -16 || src_x >= s->width)
+        dxy &= ~3;
+    if (src_y <= -16 || src_y >= s->height)
+        dxy &= ~4;
+
+    linesize   = s->linesize;
+    uvlinesize = s->uvlinesize;
+    ptr        = ref_picture[0] + (src_y * linesize) + src_x;
+
+    if (src_x < 1 || src_y < 1 || src_x + 17 >= s->h_edge_pos ||
+        src_y + h + 1 >= v_edge_pos) {
+        s->vdsp.emulated_edge_mc(s->sc.edge_emu_buffer, ptr - 1 - s->linesize,
+                                 s->linesize, s->linesize, 19, 19,
+                                 src_x - 1, src_y - 1,
+                                 s->h_edge_pos, s->v_edge_pos);
+        ptr = s->sc.edge_emu_buffer + 1 + s->linesize;
+        emu = 1;
+    }
+
+    w->put_mspel_pixels_tab[dxy](dest_y,                    ptr,                    linesize);
+    w->put_mspel_pixels_tab[dxy](dest_y     + 8,            ptr     + 8,            linesize);
+    w->put_mspel_pixels_tab[dxy](dest_y     + 8 * linesize, ptr     + 8 * linesize, linesize);
+    w->put_mspel_pixels_tab[dxy](dest_y + 8 + 8 * linesize, ptr + 8 + 8 * linesize, linesize);
+
+    if (s->avctx->flags & AV_CODEC_FLAG_GRAY)
+        return;
+
+    dxy = 0;
+    if ((motion_x & 3) != 0)
+        dxy |= 1;
+    if ((motion_y & 3) != 0)
+        dxy |= 2;
+    mx = motion_x >> 2;
+    my = motion_y >> 2;
+
+    src_x = s->mb_x * 8 + mx;
+    src_y = s->mb_y * 8 + my;
+    src_x = av_clip(src_x, -8, s->width >> 1);
+    if (src_x == (s->width >> 1))
+        dxy &= ~1;
+    src_y = av_clip(src_y, -8, s->height >> 1);
+    if (src_y == (s->height >> 1))
+        dxy &= ~2;
+    offset = (src_y * uvlinesize) + src_x;
+    ptr    = ref_picture[1] + offset;
+    if (emu) {
+        s->vdsp.emulated_edge_mc(s->sc.edge_emu_buffer, ptr,
+                                 s->uvlinesize, s->uvlinesize,
+                                 9, 9,
+                                 src_x, src_y,
+                                 s->h_edge_pos >> 1, s->v_edge_pos >> 1);
+        ptr = s->sc.edge_emu_buffer;
+    }
+    pix_op[1][dxy](dest_cb, ptr, uvlinesize, h >> 1);
+
+    ptr = ref_picture[2] + offset;
+    if (emu) {
+        s->vdsp.emulated_edge_mc(s->sc.edge_emu_buffer, ptr,
+                                 s->uvlinesize, s->uvlinesize,
+                                 9, 9,
+                                 src_x, src_y,
+                                 s->h_edge_pos >> 1, s->v_edge_pos >> 1);
+        ptr = s->sc.edge_emu_buffer;
+    }
+    pix_op[1][dxy](dest_cr, ptr, uvlinesize, h >> 1);
+}
 
 static void wmv2_add_block(WMV2DecContext *w, int16_t blocks1[][64],
                            uint8_t *dst, int stride, int n)
@@ -65,7 +277,7 @@ static void wmv2_add_block(WMV2DecContext *w, int16_t blocks1[][64],
         int16_t *block1 = blocks1[n];
         switch (w->abt_type_table[n]) {
         case 0:
-            w->common.wdsp.idct_add(dst, stride, block1);
+            h->c.idsp.idct_add(dst, stride, block1);
             break;
         case 1:
             ff_simple_idct84_add(dst, stride, block1);
@@ -78,7 +290,7 @@ static void wmv2_add_block(WMV2DecContext *w, int16_t blocks1[][64],
             h->c.bdsp.clear_block(w->abt_block2[n]);
             break;
         default:
-            av_log(h->c.avctx, AV_LOG_ERROR, "internal error in WMV2 abt\n");
+            av_unreachable("abt_type_table is read via decode012");
         }
     }
 }
@@ -106,8 +318,8 @@ static int parse_mb_skip(WMV2DecContext *w)
     int coded_mb_count = 0;
     uint32_t *const mb_type = h->c.cur_pic.mb_type;
 
-    w->skip_type = get_bits(&h->gb, 2);
-    switch (w->skip_type) {
+    int skip_type = get_bits(&h->gb, 2);
+    switch (skip_type) {
     case SKIP_TYPE_NONE:
         for (int mb_y = 0; mb_y < h->c.mb_height; mb_y++)
             for (int mb_x = 0; mb_x < h->c.mb_width; mb_x++)
@@ -164,17 +376,17 @@ static int parse_mb_skip(WMV2DecContext *w)
     return 0;
 }
 
-static int decode_ext_header(WMV2DecContext *w)
+static av_cold int decode_ext_header(AVCodecContext *avctx, WMV2DecContext *w)
 {
     H263DecContext *const h = &w->ms.h;
     GetBitContext gb;
     int fps;
     int code;
 
-    if (h->c.avctx->extradata_size < 4)
+    if (avctx->extradata_size < 4)
         return AVERROR_INVALIDDATA;
 
-    init_get_bits(&gb, h->c.avctx->extradata, 32);
+    init_get_bits(&gb, avctx->extradata, 32);
 
     fps                 = get_bits(&gb, 5);
     w->ms.bit_rate      = get_bits(&gb, 11) * 1024;
@@ -191,8 +403,8 @@ static int decode_ext_header(WMV2DecContext *w)
 
     h->slice_height = h->c.mb_height / code;
 
-    if (h->c.avctx->debug & FF_DEBUG_PICT_INFO)
-        av_log(h->c.avctx, AV_LOG_DEBUG,
+    if (avctx->debug & FF_DEBUG_PICT_INFO)
+        av_log(avctx, AV_LOG_DEBUG,
                "fps:%d, br:%d, qpbit:%d, abt_flag:%d, j_type_bit:%d, "
                "tl_mv_flag:%d, mbrl_bit:%d, code:%d, loop_filter:%d, "
                "slices:%d\n",
@@ -352,9 +564,9 @@ static inline void wmv2_decode_motion(WMV2DecContext *w, int *mx_ptr, int *my_pt
     ff_msmpeg4_decode_motion(&w->ms, mx_ptr, my_ptr);
 
     if ((((*mx_ptr) | (*my_ptr)) & 1) && h->c.mspel)
-        w->common.hshift = get_bits1(&h->gb);
+        w->hshift = get_bits1(&h->gb);
     else
-        w->common.hshift = 0;
+        w->hshift = 0;
 }
 
 static int16_t *wmv2_pred_motion(WMV2DecContext *w, int *px, int *py)
@@ -466,7 +678,7 @@ static int wmv2_decode_mb(H263DecContext *const h)
             h->c.mv[0][0][0] = 0;
             h->c.mv[0][0][1] = 0;
             h->c.mb_skipped  = 1;
-            w->common.hshift      = 0;
+            w->hshift        = 0;
             return 0;
         }
         if (get_bits_left(&h->gb) <= 0)
@@ -570,7 +782,7 @@ static av_cold int wmv2_decode_init(AVCodecContext *avctx)
     MpegEncContext *const s = &h->c;
     int ret;
 
-    s->private_ctx = &w->common;
+    wmv2_mspel_init(w);
 
     if ((ret = ff_msmpeg4_decode_init(avctx)) < 0)
         return ret;
@@ -578,9 +790,7 @@ static av_cold int wmv2_decode_init(AVCodecContext *avctx)
     h->decode_header = wmv2_decode_picture_header;
     h->decode_mb = wmv2_decode_mb;
 
-    ff_wmv2_common_init(s);
-
-    decode_ext_header(w);
+    decode_ext_header(avctx, w);
 
     return ff_intrax8_common_init(avctx, &w->x8, h->block[0],
                                   s->mb_width, s->mb_height);

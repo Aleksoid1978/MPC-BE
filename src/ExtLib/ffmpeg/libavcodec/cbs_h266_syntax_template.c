@@ -2011,6 +2011,12 @@ static int FUNC(pps) (CodedBitstreamContext *ctx, RWContext *rw,
                         slice_top_left_ctu_y[i] = ctu_y;
                     } else {
                         uint16_t slice_height_in_ctus;
+                        int num_uniform_slices;
+
+                        if (i + current->pps_num_exp_slices_in_tile[i] >
+                            current->pps_num_slices_in_pic_minus1 + 1)
+                            return AVERROR_INVALIDDATA;
+
                         for (j = 0; j < current->pps_num_exp_slices_in_tile[i];
                              j++) {
                             ues(pps_exp_slice_height_in_ctus_minus1[i][j], 0,
@@ -2031,6 +2037,13 @@ static int FUNC(pps) (CodedBitstreamContext *ctx, RWContext *rw,
                         uniform_slice_height = 1 +
                             (j == 0 ? current->row_height_val[tile_y] - 1:
                             current->pps_exp_slice_height_in_ctus_minus1[i][j-1]);
+
+                        num_uniform_slices = (remaining_height_in_ctbs_y + uniform_slice_height - 1)
+                                           / uniform_slice_height;
+                        if (i + current->pps_num_exp_slices_in_tile[i] + num_uniform_slices >
+                            current->pps_num_slices_in_pic_minus1 + 1)
+                            return AVERROR_INVALIDDATA;
+
                         while (remaining_height_in_ctbs_y > uniform_slice_height) {
                             current->slice_height_in_ctus[i + j] =
                                                           uniform_slice_height;
@@ -3247,6 +3260,12 @@ static int FUNC(slice_header) (CodedBitstreamContext *ctx, RWContext *rw,
                 current->num_ref_idx_active[i] =
                     FFMIN(ref_pic_lists->rpl_ref_list[i].num_ref_entries,
                         pps->pps_num_ref_idx_default_active_minus1[i] + 1);
+            }
+
+            if (current->num_ref_idx_active[i] <= 0) {
+                av_log(ctx->log_ctx, AV_LOG_ERROR,
+                       "Inter slice but no reference pictures available for RPL%d.\n", i);
+                return AVERROR_INVALIDDATA;
             }
         } else {
             current->num_ref_idx_active[i] = 0;
