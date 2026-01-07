@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2024 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,6 +34,7 @@
 #include "WavPackFile.h"
 #include "WAVFile.h"
 #include "Wave64File.h"
+#include "RF64File.h"
 
 //
 // CAudioFile
@@ -78,6 +79,9 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* pFile)
 	}
 	else if (memcmp(data, w64_guid_riff, 16) == 0 &&  memcmp(data+24, w64_guid_wave, 16) == 0) {
 		pAudioFile = DNew CWave64File();
+	}
+	else if (memcmp(data, RF64_startbytes, sizeof(RF64_startbytes)) == 0) {
+		pAudioFile = DNew CRF64File();
 	}
 	else if (memcmp(data, chk_DTSHDHDR, 8) == 0) {
 		pAudioFile = DNew CDTSHDFile();
