@@ -549,22 +549,16 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 				len = std::size(buff);
 				if (ERROR_SUCCESS == key.QueryStringValue(L"Source Filter", buff, &len)) {
-					fl.Insert(LookupFilterRegistry(GUIDFromCString(buff), m_override), 5);
+					GUID clsid = GUIDFromCString(buff);
+					if (clsid == CLSID_URLReader) {
+						fl.Insert(LookupFilterRegistry(clsid, m_override, MERIT64_DO_NOT_USE), 5);
+					} else {
+						fl.Insert(LookupFilterRegistry(clsid, m_override), 5);
+					}
 				}
 			}
-
-			BOOL bIsBlocked = FALSE;
-			for (const auto& pFGF : m_override) {
-				if (pFGF->GetCLSID() == CLSID_URLReader && pFGF->GetMerit() == MERIT64_DO_NOT_USE) {
-					bIsBlocked = TRUE;
-					break;
-				}
-			}
-
-			if (!bIsBlocked) {
-				fl.Insert(DNew CFGFilterRegistry(CLSID_URLReader), 6);
-			}
-		} else {
+		}
+		else {
 			// check bytes
 
 			CRegKey key;
