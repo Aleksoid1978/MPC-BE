@@ -2067,6 +2067,7 @@ CFGManagerCustom::CFGManagerCustom(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
 		pFGF->m_chkbytes.emplace_back(L"0,4,,52494646,8,4,,57415645"); // 'RIFF....WAVE'
 		pFGF->m_chkbytes.emplace_back(L"0,16,,726966662E91CF11A5D628DB04C10000,24,16,,77617665F3ACD3118CD100C04F8EDB8A"); // Wave64
+		pFGF->m_chkbytes.emplace_back(L"0,16,,52463634FFFFFFFF5741564564733634"); // RF64
 		m_source.emplace_back(pFGF);
 	}
 

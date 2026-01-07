@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2024 see Authors.txt
+ * (C) 2013-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -62,6 +62,7 @@ STDAPI DllRegisterServer()
 		L"0,9,,2321414D522D57420A",        // '#!AMR-WB\n'
 		L"0,4,,52494646,8,4,,57415645",    // 'RIFF....WAVE'
 		L"0,16,,726966662E91CF11A5D628DB04C10000,24,16,,77617665F3ACD3118CD100C04F8EDB8A", // Wave64
+		L"0,16,,52463634FFFFFFFF5741564564733634", // RF64
 		L"0,3,,494433",                    // 'ID3' for APE/TTA/WAVPACK
 		L"0,12,,445344201C00000000000000", // 'DSD ...'
 		L"0,4,,46524D38,12,4,,44534420",   // 'FRM8........DSD '
