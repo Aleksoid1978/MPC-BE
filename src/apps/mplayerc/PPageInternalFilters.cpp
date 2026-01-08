@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -60,7 +60,7 @@ static filter_t s_source_filters[] = {
 	{L"Std input",					SOURCE_FILTER, SRC_STDINPUT,		0},
 	{L"TAK",						SOURCE_FILTER, SRC_TAK,				0},
 	{L"TTA",						SOURCE_FILTER, SRC_TTA,				0},
-	{L"WAV/Wave64",					SOURCE_FILTER, SRC_WAV,				0},
+	{L"WAV/Wave64/RF64",			SOURCE_FILTER, SRC_WAV,				0},
 	{L"WavPack",					SOURCE_FILTER, SRC_WAVPACK,			0},
 	{L"UDP/HTTP",					SOURCE_FILTER, SRC_UDP,				0},
 	{L"DVR Video",					SOURCE_FILTER, SRC_DVR,				0},
