@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2025 see Authors.txt
+ * (C) 2020-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -60,7 +60,7 @@ private:
 
 	SOCKET             m_UdpSocket  = INVALID_SOCKET;
 	WSAEVENT           m_WSAEvent   = nullptr;
-	sockaddr_in        m_addr;
+	sockaddr_in        m_addr       = {};
 
 	CHTTPAsync         m_HTTPAsync;
 

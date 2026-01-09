@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -97,8 +97,9 @@ class CBaseStream
 protected:
 	CCritSec m_cSharedState;
 
-	REFERENCE_TIME m_AvgTimePerFrame;
-	REFERENCE_TIME m_rtSampleTime, m_rtPosition;
+	REFERENCE_TIME m_AvgTimePerFrame = 0;
+	REFERENCE_TIME m_rtSampleTime = 0;
+	REFERENCE_TIME m_rtPosition = 0;
 
 	BOOL m_bDiscontinuity = FALSE;
 	BOOL m_bFlushing = FALSE;

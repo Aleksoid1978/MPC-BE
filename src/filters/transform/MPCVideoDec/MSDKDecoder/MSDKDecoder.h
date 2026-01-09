@@ -112,7 +112,7 @@ private:
   int                  m_nOutputQueuePosition = 0;
 
   std::deque<MVCGOP>    m_GOPs;
-  MediaSideData3DOffset m_PrevOffset;
+  MediaSideData3DOffset m_PrevOffset = {};
 
   CMPCVideoDecFilter   *m_pFilter;
 
