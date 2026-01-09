@@ -41,7 +41,7 @@ uint32_t BitNum(uint32_t v, uint32_t b)
 	return CountBits(v & (b - 1));
 }
 
-void fill_u32(void* dst, uint32_t c, const size_t count)
+void fill_u32(void* dst, const uint32_t c, const size_t count)
 {
 #ifndef _WIN64
 	__asm {
@@ -73,12 +73,12 @@ void fill_u32(void* dst, uint32_t c, const size_t count)
 #endif
 }
 
-void memset_u32(void* dst, uint32_t c, size_t nbytes)
+void memset_u32(void* dst, const uint32_t c, const size_t nbytes)
 {
 	fill_u32(dst, c, nbytes / 4);
 }
 
-void memset_u16(void* dst, uint16_t c, size_t nbytes)
+void memset_u16(void* dst, const uint16_t c, const size_t nbytes)
 {
 	memset_u32(dst, c << 16 | c, nbytes);
 
