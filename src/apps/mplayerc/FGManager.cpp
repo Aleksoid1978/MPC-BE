@@ -543,19 +543,28 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 				if (ERROR_SUCCESS == exts.Open(key, L"Extensions", KEY_READ)) {
 					len = std::size(buff);
 					if (ERROR_SUCCESS == exts.QueryStringValue(ext, buff, &len)) {
-						fl.Insert(LookupFilterRegistry(GUIDFromCString(buff), m_override), 4);
+						GUID clsid = GUIDFromCString(buff);
+						fl.Insert(LookupFilterRegistry(clsid, m_override), 4);
 					}
 				}
 
 				len = std::size(buff);
 				if (ERROR_SUCCESS == key.QueryStringValue(L"Source Filter", buff, &len)) {
 					GUID clsid = GUIDFromCString(buff);
-					if (clsid == CLSID_URLReader) {
-						fl.Insert(LookupFilterRegistry(clsid, m_override, MERIT64_DO_NOT_USE), 5);
-					} else {
-						fl.Insert(LookupFilterRegistry(clsid, m_override), 5);
-					}
+					fl.Insert(LookupFilterRegistry(clsid, m_override), 5);
 				}
+			}
+
+			// add 'File Source (URL)' if it hasn't been blocked
+			BOOL bIsBlocked = FALSE;
+			for (const auto& pFGF : m_override) {
+				if (pFGF->GetCLSID() == CLSID_URLReader && pFGF->GetMerit() == MERIT64_DO_NOT_USE) {
+					bIsBlocked = TRUE;
+					break;
+				}
+			}
+			if (!bIsBlocked) {
+				fl.Insert(DNew CFGFilterRegistry(CLSID_URLReader), 6);
 			}
 		}
 		else {
