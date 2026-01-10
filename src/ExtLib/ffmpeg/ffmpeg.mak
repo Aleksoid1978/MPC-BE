@@ -947,6 +947,7 @@ SRCS_ASM_LF =
 
 SRCS_ASM_LU = \
 	libavutil/x86/cpuid.asm \
+	libavutil/x86/crc.asm \
 	libavutil/x86/emms.asm \
 	libavutil/x86/fixed_dsp.asm \
 	libavutil/x86/float_dsp.asm \

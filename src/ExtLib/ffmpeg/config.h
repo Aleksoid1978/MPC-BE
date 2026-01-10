@@ -19,7 +19,7 @@
 	#define HAVE_FMA4 1
 	#define HAVE_AVX2 1
 	#define HAVE_AESNI 1
-	#define HAVE_CLMUL 0
+	#define HAVE_CLMUL 1
 	#define HAVE_AVX512 1
 
 	#define HAVE_AVX512ICL 1
@@ -39,7 +39,7 @@
 	#define HAVE_FMA4_EXTERNAL 1
 	#define HAVE_AVX2_EXTERNAL 1
 	#define HAVE_AESNI_EXTERNAL 1
-	#define HAVE_CLMUL_EXTERNAL 0
+	#define HAVE_CLMUL_EXTERNAL 1
 	#define HAVE_AVX512_EXTERNAL 1
 	#define HAVE_AVX512ICL_EXTERNAL 0
 
