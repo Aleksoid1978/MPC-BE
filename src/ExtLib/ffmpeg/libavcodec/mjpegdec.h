@@ -36,6 +36,7 @@
 
 #include "avcodec.h"
 #include "blockdsp.h"
+#include "bytestream.h"
 #include "exif.h"
 #include "get_bits.h"
 #include "hpeldsp.h"
@@ -56,6 +57,7 @@ typedef struct MJpegDecodeContext {
     AVClass *class;
     AVCodecContext *avctx;
     GetBitContext gb;
+    GetByteContext gB;
     int buf_size;
 
     int start_code; /* current start code */
@@ -125,7 +127,6 @@ typedef struct MJpegDecodeContext {
     int restart_interval;
     int restart_count;
 
-    int buggy_avid;
     int cs_itu601;
     int interlace_polarity;
     int multiscope;
