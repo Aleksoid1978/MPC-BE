@@ -1127,7 +1127,7 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 				case VK_END:
 				case VK_PRIOR:
 				case VK_NEXT:
-					if (GetKeyState(VK_CONTROL) < 0) {
+					if (GetKeyState(VK_CONTROL) < 0 || m_list.GetItemCount() == 1) {
 						m_pMainFrame->PostMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
 						return TRUE;
 					}
