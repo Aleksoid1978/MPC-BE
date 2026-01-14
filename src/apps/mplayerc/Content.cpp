@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2025 see Authors.txt
+ * (C) 2016-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -64,27 +64,27 @@ namespace Content {
 		const CString ext = GetFileExt(path).MakeLower();
 
 		if (ext == L".m3u" || ext == L".m3u8") {
-			ct = L"audio/x-mpegurl";
+			ct = kM3UPlaylistType;
 		} else if (ext == L".pls") {
-			ct = L"audio/x-scpls";
+			ct = kPLSPlaylistType;
 		} else if (ext == L".xspf") {
-			ct = L"application/xspf+xml";
+			ct = kXSPFPlaylistType;
 		} else if (ext == L".asx") {
-			ct = L"video/x-ms-asf";
+			ct = kASXPlaylistType;
 		} else if (ext == L".ram") {
-			ct = L"audio/x-pn-realaudio";
+			ct = kRealAudioType;
 		} else if (ext == L".qtl") {
-			ct = L"application/x-quicktimeplayer";
+			ct = kQTPlayerType;
 		} else if (ext == L".wpl") {
-			ct = L"application/vnd.ms-wpl";
+			ct = kWPLPlaylistType;
 		} else if (ext == L".mpcpl") {
-			ct = L"application/x-mpc-playlist";
+			ct = kMPCPlaylistType;
 		} else if (ext == L".bdmv") {
-			ct = L"application/x-bdmv-playlist";
+			ct = kBDMVPlaylistType;
 		} else if (ext == L".cue") {
-			ct = L"application/x-cue-metadata";
+			ct = kCUEPlaylistType;
 		} else if (ext == L".swf") {
-			ct = L"application/x-shockwave-flash";
+			ct = kFLASHType;
 		}
 	}
 
@@ -203,24 +203,24 @@ namespace Content {
 
 					if ((content.body.GetLength() >= 3 && wcsncmp(content.body, L".ra", 3) == 0)
 							|| (content.body.GetLength() >= 4 && wcsncmp(content.body, L".RMF", 4) == 0)) {
-						content.ct = L"audio/x-pn-realaudio";
+						content.ct = kRealAudioType;
 					}
 					if (content.body.GetLength() >= 4 && GETU32((LPCWSTR)content.body) == 0x75b22630) {
-						content.ct = L"video/x-ms-wmv";
+						content.ct = kASFVideoType;
 					}
 					if (content.body.GetLength() >= 8 && wcsncmp((LPCWSTR)content.body + 4, L"moov", 4) == 0) {
-						content.ct = L"video/quicktime";
+						content.ct = kQTVideoType;
 					}
 					if (StartsWith(content.body, L"#EXTM3U") && content.body.Find(L"#EXT-X-MEDIA-SEQUENCE") > 7) {
-						content.ct = L"application/http-live-streaming";
+						content.ct = kM3ULivePlaylistType;
 					}
 					if (content.body.Find(L"#EXT-X-STREAM-INF:") >= 0) {
-						content.ct = L"application/http-live-streaming-m3u";
+						content.ct = kM3ULivePlaylistType;
 					}
 					if ((content.ct.Find(L"text/plain") == 0
 							|| content.ct.Find(L"application/vnd.apple.mpegurl") == 0
 							|| content.ct.Find(L"audio/mpegurl") == 0) && StartsWith(content.body, L"#EXTM3U")) {
-						content.ct = L"audio/x-mpegurl";
+						content.ct = kM3UPlaylistType;
 					}
 				}
 			}
@@ -375,11 +375,11 @@ namespace Content {
 		if (::PathIsURLW(realPath) && urlParser.Parse(realPath)) {
 			auto schemeName = urlParser.GetSchemeName();
 			if (_wcsicmp(schemeName, L"pnm") == 0) {
-				return L"audio/x-pn-realaudio";
+				return kRealAudioType;
 			}
 
 			if (_wcsicmp(schemeName, L"mms") == 0) {
-				return L"video/x-ms-asf";
+				return kASXPlaylistType;
 			}
 
 			if (Connect(fn)) {
@@ -388,7 +388,7 @@ namespace Content {
 				GetContent(fn, Content);
 
 				if (redir
-						&& (Content.ct == L"audio/x-scpls" || Content.ct == L"application/xspf+xml")) {
+						&& (Content.ct == kPLSPlaylistType || Content.ct == kXSPFPlaylistType)) {
 					GetRedirectData(Content);
 				}
 
@@ -402,19 +402,19 @@ namespace Content {
 		if (redir && !ct.IsEmpty()) {
 			int playlist_type = PLAYLIST_NONE;
 
-			if (ct == L"audio/x-scpls") {
+			if (ct == kPLSPlaylistType) {
 				playlist_type = PLAYLIST_PLS;
-			} else if (ct == L"application/xspf+xml") {
+			} else if (ct == kXSPFPlaylistType) {
 				playlist_type = PLAYLIST_XSPF;
 				/*
-			} else if (ct == L"video/x-ms-asf") {
+			} else if (ct == kASXPlaylistType) {
 				playlist_type = PLAYLIST_ASX;
 				*/
-			} else if (ct == L"audio/x-pn-realaudio") {
+			} else if (ct == kRealAudioType) {
 				playlist_type = PLAYLIST_RAM;
-			} else if (ct == L"application/x-quicktimeplayer") {
+			} else if (ct == kQTPlayerType) {
 				playlist_type = PLAYLIST_QTL;
-			} else if (ct == L"application/vnd.ms-wpl") {
+			} else if (ct == kWPLPlaylistType) {
 				playlist_type = PLAYLIST_WPL;
 			} else if (std::regex_match(ct.GetString(), html_mime_regex) && body.GetLength() < 4 * KILOBYTE) {
 				playlist_type = PLAYLIST_HTML_META_REFRESH;

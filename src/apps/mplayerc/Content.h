@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2023 see Authors.txt
+ * (C) 2016-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,12 +20,28 @@
 
 #pragma once
 
-#include <afxadv.h>
-
-// TODO: make function
-#define CorrectAceStream(path) if (StartsWith(path, L"acestream://")) { path.Format(AfxGetAppSettings().strAceStreamAddress, path.Mid(12)); }
+inline void CorrectAceStream(CStringW& path) {
+	if (StartsWith(path, L"acestream://")) {
+		path.Format(AfxGetAppSettings().strAceStreamAddress, path.Mid(12));
+	}
+}
 
 namespace Content {
+	constexpr static auto kMPCPlaylistType     = L"application/x-mpc-playlist";
+	constexpr static auto kM3UPlaylistType     = L"audio/x-mpegurl";
+	constexpr static auto kM3ULivePlaylistType = L"application/http-live-streaming-m3u";
+	constexpr static auto kCUEPlaylistType     = L"application/x-cue-metadata";
+	constexpr static auto kASXPlaylistType     = L"video/x-ms-asf";
+	constexpr static auto kBDMVPlaylistType    = L"application/x-bdmv-playlist";
+	constexpr static auto kFLASHType           = L"application/x-shockwave-flash";
+	constexpr static auto kWPLPlaylistType     = L"application/vnd.ms-wpl";
+	constexpr static auto kQTPlayerType        = L"application/x-quicktimeplayer";
+	constexpr static auto kQTVideoType         = L"video/quicktime";
+	constexpr static auto kRealAudioType       = L"audio/x-pn-realaudio";
+	constexpr static auto kPLSPlaylistType     = L"audio/x-scpls";
+	constexpr static auto kXSPFPlaylistType    = L"application/xspf+xml";
+	constexpr static auto kASFVideoType        = L"video/x-ms-wmv";
+
 	namespace Online {
 		const bool CheckConnect(const CString& fn);
 		void Clear();

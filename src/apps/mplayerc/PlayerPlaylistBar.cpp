@@ -1448,19 +1448,19 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 			m_pMainFrame->MakeDVDLabel(fn, empty, &label);
 			curPlayList.GetTail().m_label = label;
 			return;
-		} else if (ct == L"application/x-mpc-playlist") {
+		} else if (ct == Content::kMPCPlaylistType) {
 			if (ParseMPCPlayList(fn)) {
 				return;
 			}
-		} else if (ct == L"audio/x-mpegurl" || ct == L"application/http-live-streaming-m3u") {
+		} else if (ct == Content::kM3UPlaylistType || ct == Content::kM3ULivePlaylistType) {
 			if (ParseM3UPlayList(fn)) {
 				return;
 			}
-		} else if (ct == L"application/x-cue-metadata") {
+		} else if (ct == Content::kCUEPlaylistType) {
 			if (ParseCUEPlayList(fn)) {
 				return;
 			}
-		} else if (ct == L"video/x-ms-asf") {
+		} else if (ct == Content::kASXPlaylistType) {
 			if (ParseASXPlayList(fn)) {
 				return;
 			}
@@ -1886,7 +1886,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 			Content::Online::Clear(fn);
 			std::list<CString> redir;
 			const auto ct = Content::GetType(fn, &redir);
-			if (ct == L"audio/x-mpegurl" || ct == L"application/http-live-streaming-m3u") {
+			if (ct == Content::kM3UPlaylistType || ct == Content::kM3ULivePlaylistType) {
 				bNeedParse = ParseM3UPlayList(fn);
 			}
 		}
