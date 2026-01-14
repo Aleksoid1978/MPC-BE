@@ -1460,6 +1460,10 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 			if (ParseCUEPlayList(fn)) {
 				return;
 			}
+		} else if (ct == L"video/x-ms-asf") {
+			if (ParseASXPlayList(fn)) {
+				return;
+			}
 		}
 	}
 
@@ -1985,6 +1989,86 @@ bool CPlayerPlaylistBar::ParseCUEPlayList(CString fn)
 			pli.m_fi = fi;
 
 			curPlayList.Append(pli, AfxGetAppSettings().bPlaylistDetermineDuration);
+		}
+	}
+
+	return (curPlayList.GetCount() > c);
+}
+
+bool CPlayerPlaylistBar::ParseASXPlayList(CString fn)
+{
+	Content::Online::Disconnect(fn);
+
+	CWebTextFile f(CP_UTF8, CP_ACP, false, 3 * MEGABYTE);
+	if (!f.Open(fn)) {
+		return false;
+	}
+
+	CStringW base;
+	if (f.GetRedirectURL().GetLength()) {
+		base = f.GetRedirectURL();
+	} else {
+		base = fn;
+	}
+
+	if (fn.Find(L"://") > 0) {
+		base.Truncate(base.ReverseFind('/'));
+	} else {
+		RemoveFileSpec(base);
+	}
+
+	INT_PTR c = curPlayList.GetCount();
+
+	CStringW str;
+	CStringW allContents;
+	while (f.ReadString(str)) {
+		FastTrim(str);
+		if (str.IsEmpty() || (allContents.IsEmpty() && !StartsWith(str, L"<ASX"))) {
+			continue;
+		}
+
+		allContents.Append(str);
+	}
+
+	if (!allContents.IsEmpty()) {
+		auto bPlaylistDetermineDuration = AfxGetAppSettings().bPlaylistDetermineDuration;
+
+		const std::wregex entryRegex(L"<Entry>(.+?)</Entry>", std::regex_constants::icase);
+		const std::wregex titleRegex(L"<title>(.+?)</title>", std::regex_constants::icase);
+		const std::wregex refRegex(L"<REF HREF[ \\t]*=[ \\t]*\"([^\"\\n]+)\"", std::regex_constants::icase);
+
+		auto getMatch = [](const wchar_t* str, const std::wregex& regex) -> CStringW {
+			std::wcmatch match;
+			if (std::regex_search(str, match, regex) && match.size() == 2) {
+				CStringW entry(match[1].first, match[1].length());
+				return entry;
+			}
+
+			return {};
+		};
+
+		std::wcmatch match;
+		auto start = allContents.GetString();
+		while (std::regex_search(start, match, entryRegex) && match.size() == 2) {
+			start = match[0].second;
+
+			CStringW entry(match[1].first, match[1].length());
+			if (!entry.IsEmpty()) {
+				auto path = getMatch(entry.GetString(), refRegex);
+				if (!path.IsEmpty()) {
+					path = MakePath(CombinePath(base, path));
+					if (!fn.CompareNoCase(path)) {
+						continue;
+					}
+
+					auto title = getMatch(entry.GetString(), titleRegex);
+
+					CPlaylistItem pli;
+					pli.m_fi = path;
+					pli.m_label = title;
+					curPlayList.Append(pli, bPlaylistDetermineDuration);
+				}
+			}
 		}
 	}
 

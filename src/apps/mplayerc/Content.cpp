@@ -406,8 +406,10 @@ namespace Content {
 				playlist_type = PLAYLIST_PLS;
 			} else if (ct == L"application/xspf+xml") {
 				playlist_type = PLAYLIST_XSPF;
+				/*
 			} else if (ct == L"video/x-ms-asf") {
 				playlist_type = PLAYLIST_ASX;
+				*/
 			} else if (ct == L"audio/x-pn-realaudio") {
 				playlist_type = PLAYLIST_RAM;
 			} else if (ct == L"application/x-quicktimeplayer") {

@@ -138,6 +138,7 @@ private:
 
 	bool ParseM3UPlayList(CString fn);
 	bool ParseCUEPlayList(CString fn);
+	bool ParseASXPlayList(CString fn);
 
 	void SetupList();
 	void UpdateList();
