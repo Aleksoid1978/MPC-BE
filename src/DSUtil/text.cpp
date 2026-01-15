@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -44,6 +44,16 @@ UINT CodePageToCharSet(const UINT codePage)
 	CHARSETINFO cs = {};
 	::TranslateCharsetInfo((DWORD*)(DWORD_PTR)codePage, &cs, TCI_SRCCODEPAGE);
 	return cs.ciCharset;
+}
+
+UINT GetSystemCodePage()
+{
+	UINT value = CP_ACP;
+	[[maybe_unused]] int ret = GetLocaleInfoW(GetSystemDefaultLCID(),
+		LOCALE_IDEFAULTANSICODEPAGE | LOCALE_RETURN_NUMBER,
+		(LPWSTR)&value, sizeof(value) / sizeof(WCHAR));
+	ASSERT(ret > 0);
+	return value;
 }
 
 CStringA UrlEncode(const CStringA& str_in, const bool bArg/* = false*/)

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -136,6 +136,10 @@ ImplodeEsc(const std::list<T>& sl, const SEP sep, const SEP esc = '\\')
 
 extern UINT CharSetToCodePage(const UINT charSet);
 extern UINT CodePageToCharSet(const UINT codePage);
+
+// Returns the current Windows ANSI code page (ACP) identifier for the operating system.
+// However, unlike GetACP(), it is not affected by the activeCodePage setting in the application manifest.
+extern UINT GetSystemCodePage();
 
 extern CStringA UrlEncode(const CStringA& str_in, const bool bArg = false);
 extern CStringA UrlDecode(const CStringA& str_in);
