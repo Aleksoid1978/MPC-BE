@@ -141,6 +141,8 @@ extern UINT CodePageToCharSet(const UINT codePage);
 // However, unlike GetACP(), it is not affected by the activeCodePage setting in the application manifest.
 extern UINT GetSystemCodePage();
 
+inline UINT ExpandCodePage(const UINT codePage) { return (codePage == CP_ACP) ? GetSystemCodePage() : codePage; }
+
 extern CStringA UrlEncode(const CStringA& str_in, const bool bArg = false);
 extern CStringA UrlDecode(const CStringA& str_in);
 
