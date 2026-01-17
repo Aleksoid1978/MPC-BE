@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,6 +19,8 @@
  *
  */
 
-#define WIN32_LEAN_AND_MEAN					// Exclude rarely-used stuff from Windows headers
+#ifndef WIN32_LEAN_AND_MEAN
+	#define WIN32_LEAN_AND_MEAN				// Exclude rarely-used stuff from Windows headers
+#endif
 #define VC_EXTRALEAN						// Exclude rarely-used stuff from Windows headers
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS	// some CString constructors will be explicit
