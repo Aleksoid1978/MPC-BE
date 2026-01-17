@@ -2814,7 +2814,7 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 
 	if (CComQIPtr<IExFilterConfig> pEFC = pBF) {
 		pEFC->Flt_SetBool("stereodownmix", s.bAudioMixer && s.nAudioMixerLayout == SPK_STEREO && s.bAudioStereoFromDecoder);
-		pEFC->Flt_SetInt("codePage", s.iSubtitleDefaultCodePage);
+		pEFC->Flt_SetInt("codePage", ExpandCodePage(s.iSubtitleDefaultCodePage));
 	}
 
 	if (CComQIPtr<IAudioSwitcherFilter> pASF = pBF) {

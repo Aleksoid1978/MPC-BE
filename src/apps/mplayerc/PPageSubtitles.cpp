@@ -86,7 +86,7 @@ BOOL CPPageSubtitles::OnInitDialog()
 	m_szAutoloadPaths              = s.strSubtitlePaths;
 
 	CStringW str;
-	str.Format(ResStr(IDS_SUBTITLES_SYSTEM_CODEPAGE), GetACP());
+	str.Format(ResStr(IDS_SUBTITLES_SYSTEM_CODEPAGE), GetSystemCodePage());
 	AddStringData(m_cbDefaultEncoding, str, CP_ACP);
 
 	CPINFOEX cpinfoex;

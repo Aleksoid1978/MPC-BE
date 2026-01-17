@@ -16463,7 +16463,7 @@ bool CMainFrame::LoadSubtitle(const CExtraFileItem& subItem, ISubStream **actual
 
 		if (!pSubStream) {
 			std::unique_ptr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&m_csSubLock));
-			if (pRTS->Open(fname, s.iSubtitleDefaultCodePage, s.bSubtitleAutoDetectCodePage, subItem.GetTitle(), videoName) && pRTS->GetStreamCount() > 0) {
+			if (pRTS->Open(fname, ExpandCodePage(s.iSubtitleDefaultCodePage), s.bSubtitleAutoDetectCodePage, subItem.GetTitle(), videoName) && pRTS->GetStreamCount() > 0) {
 				pSubStream = pRTS.release();
 			}
 		}
