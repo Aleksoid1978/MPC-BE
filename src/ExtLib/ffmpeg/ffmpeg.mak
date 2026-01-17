@@ -37,7 +37,7 @@ CFLAGS = -I. -I.. -Icompat/atomics/win32 -Icompat/windows \
 	   -I$(ZLIB_DIR) -I$(SPEEX_DIR) -I$(SOXR_DIR) -I$(DAV1_DIR) -I$(FFNVCODEC_DIR) -I$(UAVS3D_DIR) -I$(VVDEC_DIR) \
 	   -DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
 	   -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DOPJ_STATIC \
-	   -D_WIN32_WINNT=0x0601 -DWINVER=0x0601 \
+	   -D_WIN32_WINNT=0x0601 -DWINVER=0x0601 -DWIN32_LEAN_AND_MEAN \
 	   -fomit-frame-pointer -std=c17 \
 	   -fno-common -fno-ident -mthreads -Wno-discarded-qualifiers
 NASMFLAGS = -I. -Pconfig.asm

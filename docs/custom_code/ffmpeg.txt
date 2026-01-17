@@ -1,8 +1,6 @@
 ﻿The following files have MPC-BE specific custom code (compared to ffmpeg):
 
-* compat/atomics/win32/stdatomic.h
 * compat/w32dlfcn.h
-* compat/w32pthreads.h
 
 * libavcodec/aacsbr_template.c
 * libavcodec/allcodecs.c
