@@ -12,7 +12,7 @@ Updated Japanese translation (by tsubasanouta).
 Updated Chinese (Traditional) and Dutch translation (by beter).
 
 Updated libraries:
-	ffmpeg n8.1-dev-1777-g6f2d23a009.
+	ffmpeg n8.1-dev-1843-gc3d3377fe1.
 
 
 1.8.9 - 2025-12-30

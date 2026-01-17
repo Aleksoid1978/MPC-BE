@@ -218,34 +218,6 @@ static void png_put_interlaced_row(uint8_t *dst, int width,
     }
 }
 
-void ff_add_png_paeth_prediction(uint8_t *dst, uint8_t *src, uint8_t *top,
-                                 int w, int bpp)
-{
-    int i;
-    for (i = 0; i < w; i++) {
-        int a, b, c, p, pa, pb, pc;
-
-        a = dst[i - bpp];
-        b = top[i];
-        c = top[i - bpp];
-
-        p  = b - c;
-        pc = a - c;
-
-        pa = abs(p);
-        pb = abs(pc);
-        pc = abs(p + pc);
-
-        if (pa <= pb && pa <= pc)
-            p = a;
-        else if (pb <= pc)
-            p = b;
-        else
-            p = c;
-        dst[i] = p + src[i];
-    }
-}
-
 #define UNROLL1(bpp, op)                                                      \
     {                                                                         \
         r = dst[0];                                                           \
@@ -285,7 +257,7 @@ void ff_add_png_paeth_prediction(uint8_t *dst, uint8_t *src, uint8_t *top,
 
 /* NOTE: 'dst' can be equal to 'last' */
 void ff_png_filter_row(PNGDSPContext *dsp, uint8_t *dst, int filter_type,
-                       uint8_t *src, uint8_t *last, int size, int bpp)
+                       const uint8_t *src, const uint8_t *last, int size, int bpp)
 {
     int i, p, r, g, b, a;
 
@@ -299,7 +271,7 @@ void ff_png_filter_row(PNGDSPContext *dsp, uint8_t *dst, int filter_type,
         if (bpp == 4) {
             p = *(int *)dst;
             for (; i < size; i += bpp) {
-                unsigned s = *(int *)(src + i);
+                unsigned s = *(const int *)(src + i);
                 p = ((s & 0x7f7f7f7f) + (p & 0x7f7f7f7f)) ^ ((s ^ p) & 0x80808080);
                 *(int *)(dst + i) = p;
             }
@@ -334,7 +306,7 @@ void ff_png_filter_row(PNGDSPContext *dsp, uint8_t *dst, int filter_type,
                 i = w;
             }
         }
-        ff_add_png_paeth_prediction(dst + i, src + i, last + i, size - i, bpp);
+        ff_png_add_paeth_prediction(dst + i, src + i, last + i, size - i, bpp);
         break;
     }
 }
