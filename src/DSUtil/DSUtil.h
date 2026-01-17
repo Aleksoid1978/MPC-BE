@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -49,8 +49,6 @@ extern IBaseFilter*		GetDownStreamFilter(IBaseFilter* pBF, IPin* pInputPin = nul
 extern IPin*			GetDownStreamPin(IBaseFilter* pBF, IPin* pInputPin = nullptr);
 extern IPin*			GetFirstPin(IBaseFilter* pBF, PIN_DIRECTION dir = PINDIR_INPUT);
 extern IPin*			GetFirstDisconnectedPin(IBaseFilter* pBF, PIN_DIRECTION dir);
-extern void				NukeDownstream(IBaseFilter* pBF, IFilterGraph* pFG);
-extern void				NukeDownstream(IPin* pPin, IFilterGraph* pFG);
 extern IBaseFilter*		FindFilter(LPCWSTR clsid, IFilterGraph* pFG);
 extern IBaseFilter*		FindFilter(const CLSID& clsid, IFilterGraph* pFG);
 extern IPin*			FindPin(IBaseFilter* pBF, PIN_DIRECTION direction, const AM_MEDIA_TYPE* pRequestedMT);
