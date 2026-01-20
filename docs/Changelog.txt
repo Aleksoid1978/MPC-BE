@@ -6,7 +6,9 @@ AudioSplitter
 Added support for the RF64 format.
 
 Player
-The "File Source (URL)" filter will only be used if it is added to the list of External Filters.
+The HTTP read strategy has been changed.
+If the playlist contains one entry, more key combinations can be used to control the player (jump through chapters, adjust volume).
+Improved support for reading ASX playlists.
 
 Updated Japanese translation (by tsubasanouta).
 Updated Chinese (Traditional) and Dutch translation (by beter).
