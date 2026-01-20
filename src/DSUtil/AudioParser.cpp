@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2025 see Authors.txt
+ * (C) 2011-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1831,11 +1831,11 @@ namespace AC4 {
 		if (channel_mode_code == 0) {   // Mono 0b0
 			return CH_MODE_MONO;
 		}
-		channel_mode_code = (channel_mode_code << 1) | bits.BitRead(1);
+		channel_mode_code = (channel_mode_code << 1) | (int)bits.BitRead(1);
 		if (channel_mode_code == 2) {   // Stereo  0b10
 			return CH_MODE_STEREO;
 		}
-		channel_mode_code = (channel_mode_code << 2) | bits.BitRead(2);
+		channel_mode_code = (channel_mode_code << 2) | (int)bits.BitRead(2);
 		switch (channel_mode_code) {
 		case 12:                    // 3.0 0b1100
 			return CH_MODE_3_0;
@@ -1844,7 +1844,7 @@ namespace AC4 {
 		case 14:                    // 5.1 0b1110
 			return CH_MODE_5_1;
 		}
-		channel_mode_code = (channel_mode_code << 3) | bits.BitRead(3);
+		channel_mode_code = (channel_mode_code << 3) | (int)bits.BitRead(3);
 		switch (channel_mode_code) {
 		case 120:                   // 0b1111000
 			if (presentationVersion == 2) { // IMS (all content)
@@ -1870,14 +1870,14 @@ namespace AC4 {
 		case 125:                   // 7.1: 3/2/2.1 0b1111101
 			return CH_MODE_71_322;
 		}
-		channel_mode_code = (channel_mode_code << 1) | bits.BitRead(1);
+		channel_mode_code = (channel_mode_code << 1) | (int)bits.BitRead(1);
 		switch (channel_mode_code) {
 		case 252:                   // 7.0.4 0b11111100
 			return CH_MODE_7_0_4;
 		case 253:                   // 7.1.4 0b11111101
 			return CH_MODE_7_1_4;
 		}
-		channel_mode_code = (channel_mode_code << 1) | bits.BitRead(1);
+		channel_mode_code = (channel_mode_code << 1) | (int)bits.BitRead(1);
 		switch (channel_mode_code) {
 		case 508:                   // 9.0.4 0b111111100
 			return CH_MODE_9_0_4;
@@ -1999,7 +1999,7 @@ namespace AC4 {
 	{
 		substream_bitrate_indicator = bits.BitRead(3);
 		if ((substream_bitrate_indicator & 0x1) == 1) { // bitrate_indicator
-			substream_bitrate_indicator = (substream_bitrate_indicator << 2) + bits.BitRead(2);
+			substream_bitrate_indicator = (substream_bitrate_indicator << 2) + (int)bits.BitRead(2);
 		}
 		return SUCCESS;
 	}
