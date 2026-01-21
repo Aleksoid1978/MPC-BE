@@ -235,7 +235,7 @@ BEGIN
     CONTROL         "<a>https://github.com/Aleksoid1978/MPC-BE</a>",IDC_GITHUB_LINK,
                     "SysLink",WS_TABSTOP,30,126,200,8
     LTEXT           "Acest program este gratuit și lansat sub licența GNU General Public License.",IDC_STATIC,30,138,200,18
-    LTEXT           "Între anii 2023-2025 traducătorul este Andrei-Valentin Miloiu.  În trecut, au tradus Daniel Alămiță şi lordkag.",IDC_STATIC,30,161,200,18
+    LTEXT           "Între anii 2023-2026 traducătorul este Andrei-Valentin Miloiu.  În trecut, au tradus Daniel Alămiță şi lordkag.",IDC_STATIC,30,161,200,18
     DEFPUSHBUTTON   "OK",IDOK,185,183,50,14,WS_GROUP
 END
 
@@ -415,7 +415,7 @@ BEGIN
     CONTROL         "Muzică",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,241,47,9
     CONTROL         "DVD",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,61,229,47,9
     CONTROL         "CD Audio",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,61,241,47,9
-    GROUPBOX        "Meniul contextual pentru Explorator (Explorer)",IDC_STATIC,117,217,118,24
+    GROUPBOX        "Meniul contextual pentru Explorator (pentru Explorer)",IDC_STATIC,117,217,118,24
     CONTROL         "Directoare",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,122,229,50,9
     CONTROL         "Fișier(e)",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,176,229,55,9
 END
@@ -2753,7 +2753,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_CONTROLS_STOPPED    "Oprit"
-    IDS_CONTROLS_BUFFERING  "Se încarcă din memoria tampon (Se bufferizează/Se tamponează)... (%d%%)"
+    IDS_CONTROLS_BUFFERING  "Se preîncarcă din memoria tampon (Se bufferizează/Se tamponează)... (%d%%)"
     IDS_CONTROLS_CAPTURING  "Se capturează..."
     IDS_CONTROLS_OPENING    "Se deschide..."
     IDS_CONTROLS_CLOSED     "Închis"
@@ -3075,7 +3075,7 @@ BEGIN
     IDS_AG_FRAMES           "Cadre"
     IDS_AG_BUFFERS          "Buffere (Tampoane)"
     IDS_MAINFRM_9           "Volumul: %02d/%02d, Titlul: %02d/%02d, Capitolul: %02d/%02d"
-    IDS_MAINFRM_10          "Unghi: %02d/%02d, %dx%d %dHz %d:%d"
+    IDS_MAINFRM_10          "Unghiul: %02d/%02d, %dx%d %dHz %d:%d"
     IDS_MAINFRM_11          "%s, %s %dHz %dbiți %d %s"
 END
 
@@ -3109,7 +3109,7 @@ BEGIN
     IDS_AG_TITLE            "Titlul %d"
     IDS_MAINFRM_16          "DVD: Eroare neașteptată"
     IDS_MAINFRM_17          "DVD: Eroare de protecție la copiere"
-    IDS_MAINFRM_18          "DVD: Discul DVD 1.x e nevalid"
+    IDS_MAINFRM_18          "DVD: Discul DVD 1.x e invalid"
     IDS_MAINFRM_19          "DVD: Regiunea discului e nevalidă"
     IDS_MAINFRM_20          "DVD: Nivelul parental e scăzut"
     IDS_MAINFRM_21          "DVD: Eroare de protecţie de macroviziune"
@@ -3129,7 +3129,7 @@ BEGIN
     IDS_ADDTOPLS_FROMDIR_SIMILAR "fișiere similare din dosar (din folder)"
     IDS_ADDTOPLS_FROMDIR_ALL "toate fișierele dintr-un dosar (folder)"
     IDS_EXCLUSIVE_FS_WARNING  "Această opțiune a fost proiectată pentru a evita ruperea. Cu toate acestea, va împiedica de asemenea MPC-BE să afișeze meniul contextual și orice căsuță de dialog în timpul redării.\n\nCa să ieși din modul ecran complet Direct3D și să oprești redarea, trebuie să apeși: Ctrl + C.\n\nEști sigur(ă) că dorești să activezi această opțiune?"
-    IDS_MAINFRM_139         "Întârzierea subtitrărilor: %ld ms"
+    IDS_MAINFRM_139         "Întârzierea subtitrărilor: %ld (de) ms"
     IDS_AG_TITLE2           "Titlul: %02d/%02d"
     IDS_THUMB_ROWNUMBER     "Rânduri:"
     IDS_THUMB_COLNUMBER     "Coloane:"
@@ -3147,10 +3147,10 @@ BEGIN
     IDS_AG_PANSCAN          "Panoramare și scanare (PnS)"
     IDS_AG_ASPECT_RATIO     "Raportul de aspect (AR-ul/RA-ul)"
     IDS_MAINFRM_37          ", Total: %d, Pierdute: %d"
-    IDS_MAINFRM_38          ", Mărime: %I64dKB"
-    IDS_MAINFRM_39          ", Mărime: %I64dMB"
-    IDS_MAINFRM_40          ", Liberă: %I64dKB"
-    IDS_MAINFRM_41          ", Liberă: %I64dMB"
+    IDS_MAINFRM_38          ", Mărime: %I64d (de) KB"
+    IDS_MAINFRM_39          ", Mărime: %I64d (de) MB"
+    IDS_MAINFRM_40          ", Liberă: %I64d (de) KB"
+    IDS_MAINFRM_41          ", Liberă: %I64d (de) MB"
     IDS_MAINFRM_42          ", Preîncărcări pentru V/A (Video/Audio) libere: %03d/%03d"
     IDS_AG_ERROR            "Eroare"
     IDS_SUBTITLE_STREAM_OFF "Subtitrări: Oprite"
@@ -3179,7 +3179,7 @@ STRINGTABLE
 BEGIN
     IDS_MAINFRM_68          "Raportul de aspect: %d:%d"
     IDS_MAINFRM_69          "Raportul de aspect: Implicit"
-    IDS_MAINFRM_70          "Întârzierea audio: %I64dms"
+    IDS_MAINFRM_70          "Întârzierea audio: %I64d (de) ms"
     IDS_AG_CHAPTER          "Capitolul %d"
     IDS_MAINFRM_73          "Nu se poate încărca shaderul (nuanțatorul): "
     IDS_AG_SHADER           "nuanțator (shader): "
@@ -3259,7 +3259,7 @@ BEGIN
     IDS_MAINFRM_135         "EROARE CRITICĂ: !!! Trebuie închis forțat firul de execuție deschizător !!!"
     IDS_MAINFRM_136         "Ecran complet exclusiv pentru MPC-BE"
     IDS_MAINFRM_137         "Formatul e necunoscut"
-    IDS_MAINFRM_138         "Decalajul subtitrărilor: %ld ms"
+    IDS_MAINFRM_138         "Decalajul subtitrărilor: %ld (de) ms"
     IDS_VOLUME_GAIN_INC     "Crește puterea volumului"
     IDS_VOLUME_GAIN_DEC     "Scade puterea volumului"
     IDS_VOLUME_GAIN_OFF     "Oprește puterea volumului"
@@ -3372,7 +3372,7 @@ BEGIN
     IDS_MPADEC_STEREO       "Stereo"
     IDS_MPADEC_SPDIF        "Trece prin (S/PDIF, HDMI)"
     IDS_MPADEC_AC3ENCODE    "Codifică în AC-3"
-    IDS_MPADEC_AV_SYNC      "Corecție pentru A/V Sync"
+    IDS_MPADEC_AV_SYNC      "Corecție pentru sinronizarea audio-video (A/V Sync)"
     IDS_MPADEC_STATUS       "Stare"
     IDS_MPADEC_NOTACTIVE    "Decodorul nu este activ."
 END
@@ -3454,7 +3454,7 @@ BEGIN
     IDS_ARS_SOUND_DEVICE    "Dispozitivul de sunet:"
     IDS_ARS_RELEASE_DEVICE_IDLE "Eliberează dispozitivul când este inactiv"
     IDS_ARS_CROSSFEED       "Activează alimentarea încrucișată stereo (pentru căști)"
-    IDS_ARS_DEVICE_PERIOD   "Tamponul (Bufferul) dispozitivului:"
+    IDS_ARS_DEVICE_PERIOD   "Memoria tampon a dispozitivului (Bufferul dispozitivului):"
     IDS_ARS_ALT_CHECK_FORMAT "Verificare alternativă a formatului suportat"
     IDS_ARS_STATUS          "Stare"
     IDS_ARS_DEVICE          "Dispozitiv:"
@@ -3851,8 +3851,8 @@ END
 STRINGTABLE
 BEGIN
     IDS_THUMB_IMAGE_QUALITY "Calitate"
-    IDS_THUMB_QUALITY       "Calitate (%):"
-    IDS_THUMB_THUMBNAILS    "Dispunere"
+    IDS_THUMB_QUALITY       "Calitatea (%):"
+    IDS_THUMB_THUMBNAILS    "Dispunerea"
     IDS_THUMB_PIXELS        "Pixeli:"
     IDS_THUMB_LEVEL         "Comprimare (1-9):"
     IDS_SNAPSHOT_SUBTITLES  "Incluzând subtitrările"
