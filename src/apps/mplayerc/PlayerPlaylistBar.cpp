@@ -306,10 +306,10 @@ static void StringToExistDirPaths(const CStringW& curentdir, const CStringW& str
 	int pos = 0;
 	do {
 		CStringW s = str.Tokenize(L";", pos);
-		if (s.GetLength() == 0) {
+		if (s.IsEmpty()) {
 			continue;
 		}
-		AddExistDirPaths(curentdir, str, existDirs);
+		AddExistDirPaths(curentdir, s, existDirs);
 	} while (pos > 0);
 }
 
