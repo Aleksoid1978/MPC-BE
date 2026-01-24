@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2025 see Authors.txt
+ * (C) 2011-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -84,6 +84,10 @@ void CleanPath(CStringW& path);
 bool CFileGetStatus(LPCWSTR lpszFileName, CFileStatus& status);
 
 CStringW GetDriveLabel(WCHAR drive);
+
+// Converts a relative directory path to an existing absolute directory path and appends it to the set.
+// The '*' wildcard character is allowed in the last folder.
+void AddExistDirPaths(const CStringW& curentdir, const CStringW& str, std::vector<CStringW>& existDirs);
 
 /////
 

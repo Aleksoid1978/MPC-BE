@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2025 see Authors.txt
+ * (C) 2011-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -402,6 +402,52 @@ CStringW GetDriveLabel(WCHAR drive)
 	}
 
 	return label;
+}
+
+// Converts a relative directory path to an existing absolute directory path and appends it to the set.
+// The '*' wildcard character is allowed in the last folder.
+void AddExistDirPaths(const CStringW& curentdir, const CStringW& str, std::vector<CStringW>& existDirs)
+{
+	int bs = str.ReverseFind('\\');
+	int a = str.Find('*');
+	if (a >= 0 && a < bs) {
+		return; // the asterisk can only be in the last folder
+	}
+
+	CStringW path = GetCombineFilePath(curentdir, str);
+
+	if (::PathIsRootW(path) && ::PathFileExistsW(path)) {
+		existDirs.emplace_back(path);
+		return;
+	}
+
+	WIN32_FIND_DATAW fd = { 0 };
+	HANDLE hFind = FindFirstFileW(path, &fd);
+	if (hFind == INVALID_HANDLE_VALUE) {
+		return;
+	}
+	else {
+		CStringW parentdir = GetFullCannonFilePath(path + L"\\..");
+		AddSlash(parentdir);
+
+		do {
+			if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && wcscmp(fd.cFileName, L".") && wcscmp(fd.cFileName, L"..")) {
+				CString folder = parentdir + fd.cFileName + '\\';
+
+				size_t index = 0;
+				size_t count = existDirs.size();
+				for (; index < count; index++) {
+					if (folder.CompareNoCase(existDirs[index]) == 0) {
+						break;
+					}
+				}
+				if (index == count) {
+					existDirs.emplace_back(folder);
+				}
+			}
+		} while (FindNextFileW(hFind, &fd));
+		FindClose(hFind);
+	}
 }
 
 /////

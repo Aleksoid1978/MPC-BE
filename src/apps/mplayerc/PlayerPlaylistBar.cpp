@@ -301,7 +301,7 @@ static bool FindFileInList(std::list<T>& sl, const CString& fn)
 	return false;
 }
 
-static void StringToPaths(const CStringW& curentdir, const CStringW& str, std::vector<CStringW>& paths)
+static void StringToExistDirPaths(const CStringW& curentdir, const CStringW& str, std::vector<CStringW>& existDirs)
 {
 	int pos = 0;
 	do {
@@ -309,45 +309,7 @@ static void StringToPaths(const CStringW& curentdir, const CStringW& str, std::v
 		if (s.GetLength() == 0) {
 			continue;
 		}
-		int bs = s.ReverseFind('\\');
-		int a = s.Find('*');
-		if (a >= 0 && a < bs) {
-			continue; // the asterisk can only be in the last folder
-		}
-
-		CStringW path = GetCombineFilePath(curentdir, s);
-
-		if (::PathIsRootW(path) && ::PathFileExistsW(path)) {
-			paths.emplace_back(path);
-			continue;
-		}
-
-		WIN32_FIND_DATAW fd = { 0 };
-		HANDLE hFind = FindFirstFileW(path, &fd);
-		if (hFind == INVALID_HANDLE_VALUE) {
-			continue;
-		} else {
-			CStringW parentdir = GetFullCannonFilePath(path + L"\\..");
-			AddSlash(parentdir);
-
-			do {
-				if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && wcscmp(fd.cFileName, L".") && wcscmp(fd.cFileName, L"..")) {
-					CString folder = parentdir + fd.cFileName + '\\';
-
-					size_t index = 0;
-					size_t count = paths.size();
-					for (; index < count; index++) {
-						if (folder.CompareNoCase(paths[index]) == 0) {
-							break;
-						}
-					}
-					if (index == count) {
-						paths.emplace_back(folder);
-					}
-				}
-			} while (FindNextFileW(hFind, &fd));
-			FindClose(hFind);
-		}
+		AddExistDirPaths(curentdir, str, existDirs);
 	} while (pos > 0);
 }
 
@@ -376,7 +338,7 @@ void CPlaylistItem::AutoLoadFiles()
 
 	if (s.fAutoloadAudio) {
 		std::vector<CStringW> paths;
-		StringToPaths(curdir, s.strAudioPaths, paths);
+		StringToExistDirPaths(curdir, s.strAudioPaths, paths);
 
 		for (const auto& apa : s.slAudioPathsAddons) {
 			paths.emplace_back(apa);
@@ -425,7 +387,7 @@ void CPlaylistItem::AutoLoadFiles()
 
 	if (s.IsISRAutoLoadEnabled()) {
 		std::vector<CStringW> paths;
-		StringToPaths(curdir, s.strSubtitlePaths, paths);
+		StringToExistDirPaths(curdir, s.strSubtitlePaths, paths);
 
 		for (const auto& spa : s.slSubtitlePathsAddons) {
 			paths.emplace_back(spa);
