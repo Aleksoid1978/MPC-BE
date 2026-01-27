@@ -6,6 +6,7 @@ MPC-BE – универсальный проигрыватель аудио и �
 
 ## Системные требования:
 * Процессор с поддержкой SSE2
+* Видеокарта с поддержкой DirectX9.0c (PS 3.0)
 * Windows 7, 8, 8.1, 10, 11 32-bit/64-bit
 
 ---
@@ -15,6 +16,7 @@ MPC-BE is based on the original Guliverkli project and "Media Player Classic Hom
 
 ## System requirements:
 * An SSE2 capable CPU
+* Video card supporting DirectX9.0c (PS 3.0)
 * Windows 7, 8, 8.1, 10, 11 32-bit/64-bit
 
 ## Downloads
