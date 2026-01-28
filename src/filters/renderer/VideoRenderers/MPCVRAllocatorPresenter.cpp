@@ -1,5 +1,5 @@
 /*
- * (C) 2019-2024 see Authors.txt
+ * (C) 2019-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -395,7 +395,10 @@ BYTE* WriteChunk(BYTE* dst, const uint32_t code, const int32_t size, BYTE* data)
 STDMETHODIMP CMPCVRAllocatorPresenter::AddPixelShader(int target, LPCWSTR name, LPCSTR profile, LPCSTR sourceCode)
 {
 	int iProfile = 0;
-	if (!strcmp(profile, "ps_2_0") || !strcmp(profile, "ps_2_a") || !strcmp(profile, "ps_2_b") || !strcmp(profile, "ps_3_0")) {
+	if (strcmp(profile, "ps_3_0") == 0
+			|| strcmp(profile, "ps_2_0") == 0
+			|| strcmp(profile, "ps_2_a") == 0
+			|| strcmp(profile, "ps_2_b") == 0) {
 		iProfile = 3;
 	}
 	else if (!strcmp(profile, "ps_4_0")) {

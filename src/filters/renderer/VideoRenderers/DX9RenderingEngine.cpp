@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -143,12 +143,7 @@ void CDX9RenderingEngine::InitRenderingEngine()
 	ZeroMemory(&m_Caps, sizeof(m_Caps));
 	m_pDevice9Ex->GetDeviceCaps(&m_Caps);
 
-	// Define the shader profile.
-	if (m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0)) {
-		m_ShaderProfile = "ps_3_0";
-	} else {
-		m_ShaderProfile = nullptr;
-	}
+	DLogIf(m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0), L"WARNING: Pixel shaders 3.0 not supported!");
 
 	// Initialize the pixel shader compiler
 	m_pPSC.reset(DNew CPixelShaderCompiler(m_pDevice9Ex, true));
@@ -1649,7 +1644,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	ShaderMacros[i++] = { "DITHER_ENABLED", m_bDither ? "1" : "0" };
 
 	CString ErrorMessage;
-	hr = m_pPSC->CompileShader(srcdata, "main", m_ShaderProfile, 0, ShaderMacros, &m_pFinalPixelShader, &ErrorMessage);
+	hr = m_pPSC->CompileShader(srcdata, "main", "ps_3_0", 0, ShaderMacros, &m_pFinalPixelShader, &ErrorMessage);
 	if (FAILED(hr)) {
 		DLog(L"CDX9RenderingEngine::InitFinalPass() : shader compilation failed\n%s", ErrorMessage.GetString());
 		ASSERT(0);
@@ -2178,16 +2173,16 @@ HRESULT CDX9RenderingEngine::AddCustomPixelShader(int target, LPCSTR sourceCode,
 		return E_INVALIDARG;
 	}
 
-	CExternalPixelShader Shader;
-	Shader.m_SourceCode = sourceCode;
-	Shader.m_Profile = m_ShaderProfile;
-
-	if (Shader.m_Profile.Compare(profile) < 0) {
-		// shader is not supported by hardware
-		return E_FAIL;
+	if (strcmp(profile, "ps_3_0") != 0
+			&& strcmp(profile, "ps_2_0") != 0
+			&& strcmp(profile, "ps_2_a") != 0
+			&& strcmp(profile, "ps_2_b") != 0) {
+		return E_INVALIDARG;
 	}
 
-	CComPtr<IDirect3DPixelShader9> pPixelShader;
+	CExternalPixelShader Shader;
+	Shader.m_SourceCode = sourceCode;
+	Shader.m_Profile = "ps_3_0";
 
 	HRESULT hr = Shader.Compile(m_pPSC.get());
 	if (FAILED(hr)) {

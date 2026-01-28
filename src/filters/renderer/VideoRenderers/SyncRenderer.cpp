@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2226,11 +2226,7 @@ STDMETHODIMP CSyncAP::CreateRenderer(IUnknown** ppRenderer)
 	}
 
 	// Define the shader profile.
-	if (m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0)) {
-		m_ShaderProfile = "ps_3_0";
-	} else {
-		m_ShaderProfile = nullptr;
-	}
+	DLogIf(m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0), L"WARNING: Pixel shaders 3.0 not supported!");
 
 	hr = m_pD3DManager->ResetDevice(m_pDevice9Ex, m_nResetToken);
 	if (FAILED(hr)) {

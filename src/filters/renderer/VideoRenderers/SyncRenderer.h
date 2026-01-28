@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -121,7 +121,6 @@ namespace GothSync
 		CD3D9Font m_Font3D;
 
 		// Shaders
-		LPCSTR m_ShaderProfile;
 		std::unique_ptr<CPixelShaderCompiler> m_pPSC;
 		std::list<CExternalPixelShader>	m_pPixelShaders;
 		std::list<CExternalPixelShader>	m_pPixelShadersScreenSpace;

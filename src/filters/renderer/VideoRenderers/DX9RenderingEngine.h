@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -131,7 +131,6 @@ namespace DSObjects
 		HRESULT InitCorrectionPass(const AM_MEDIA_TYPE& mt);
 
 		D3DCAPS9					m_Caps = {};
-		LPCSTR						m_ShaderProfile = nullptr; // for shader compiler
 
 #if DXVA2VP
 		CComPtr<IDirectXVideoProcessorService> m_pDXVA2_VPService;
