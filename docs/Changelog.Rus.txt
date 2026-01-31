@@ -16,7 +16,7 @@ AudioSplitter
 
 Обновлены библиотеки:
 	dav1d 1.5.3-6-g04b69f9;
-	ffmpeg n8.1-dev-1911-gff63d4865b.
+	ffmpeg n8.1-dev-1983-g50bcc96a75.
 
 
 1.8.9 - 2025-12-30

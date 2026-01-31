@@ -24,7 +24,6 @@
 SECTION_RODATA
 
 factor_p1_n1: dw 1, -1, 1, -1, 1, -1, 1, -1,
-factor_n1_p1: dw -1, 1, -1, 1, -1, 1, -1, 1,
 factor_p11_n4: dw 11, -4, 11, -4, 11, -4, 11, -4,
 factor_p5_p4: dw 5, 4, 5, 4, 5, 4, 5, 4,
 pd_4: times 4 dd 4
@@ -37,20 +36,20 @@ SECTION .text
 
 %macro CFHD_HORIZ_FILTER 1
 %if %1 == 1023
-cglobal cfhd_horiz_filter_clip10, 5, 6, 8 + 4 * ARCH_X86_64, output, low, high, width, x, temp
+cglobal cfhd_horiz_filter_clip10, 5, 6, 8 + 3 * ARCH_X86_64, output, low, high, width, x, temp
     shl        widthd, 1
 %define ostrideq widthq
 %define lwidthq  widthq
 %define hwidthq  widthq
 %elif %1 == 4095
-cglobal cfhd_horiz_filter_clip12, 5, 6, 8 + 4 * ARCH_X86_64, output, low, high, width, x, temp
+cglobal cfhd_horiz_filter_clip12, 5, 6, 8 + 3 * ARCH_X86_64, output, low, high, width, x, temp
     shl        widthd, 1
 %define ostrideq widthq
 %define lwidthq  widthq
 %define hwidthq  widthq
 %else
 %if ARCH_X86_64
-cglobal cfhd_horiz_filter, 8, 11, 12, output, ostride, low, lwidth, high, hwidth, width, height, x, y, temp
+cglobal cfhd_horiz_filter, 8, 11, 11, output, ostride, low, lwidth, high, hwidth, width, height, x, y, temp
     shl  ostrided, 1
     shl   lwidthd, 1
     shl   hwidthd, 1
@@ -80,9 +79,8 @@ cglobal cfhd_horiz_filter, 7, 7, 8, output, x, low, y, high, temp, width, height
 
 %if ARCH_X86_64
     mova       m8, [factor_p1_n1]
-    mova       m9, [factor_n1_p1]
-    mova      m10, [pw_1]
-    mova      m11, [pd_4]
+    mova       m9, [pw_1]
+    mova      m10, [pd_4]
 %endif
 
 %if %1 == 0
@@ -144,29 +142,23 @@ cglobal cfhd_horiz_filter, 7, 7, 8, output, x, low, y, high, temp, width, height
     punpcklwd      m4, m1
     punpckhwd      m5, m1
 
-    mova           m6, m4
-    mova           m7, m5
-
 %if ARCH_X86_64
     pmaddwd        m4, m8
     pmaddwd        m5, m8
-    pmaddwd        m6, m9
-    pmaddwd        m7, m9
 
-    paddd          m4, m11
-    paddd          m5, m11
-    paddd          m6, m11
-    paddd          m7, m11
+    psubd          m6, m10, m4
+    psubd          m7, m10, m5
+    paddd          m4, m10
+    paddd          m5, m10
 %else
+    mova           m2, [pd_4]
     pmaddwd        m4, [factor_p1_n1]
     pmaddwd        m5, [factor_p1_n1]
-    pmaddwd        m6, [factor_n1_p1]
-    pmaddwd        m7, [factor_n1_p1]
 
-    paddd          m4, [pd_4]
-    paddd          m5, [pd_4]
-    paddd          m6, [pd_4]
-    paddd          m7, [pd_4]
+    psubd          m6, m2, m4
+    psubd          m7, m2, m5
+    paddd          m4, m2
+    paddd          m5, m2
 %endif
 
     psrad          m4, 3
@@ -185,8 +177,8 @@ cglobal cfhd_horiz_filter, 7, 7, 8, output, x, low, y, high, temp, width, height
     mova           m3, m0
 
 %if ARCH_X86_64
-    pmaddwd        m2, m10
-    pmaddwd        m0, m10
+    pmaddwd        m2, m9
+    pmaddwd        m0, m9
     pmaddwd        m1, m8
     pmaddwd        m3, m8
 %else
@@ -304,7 +296,7 @@ CFHD_HORIZ_FILTER 4095
 
 INIT_XMM sse2
 %if ARCH_X86_64
-cglobal cfhd_vert_filter, 8, 11, 14, output, ostride, low, lwidth, high, hwidth, width, height, x, y, pos
+cglobal cfhd_vert_filter, 8, 11, 13, output, ostride, low, lwidth, high, hwidth, width, height, x, y, pos
     shl        ostrided, 1
     shl         lwidthd, 1
     shl         hwidthd, 1
@@ -313,11 +305,10 @@ cglobal cfhd_vert_filter, 8, 11, 14, output, ostride, low, lwidth, high, hwidth,
     dec   heightd
 
     mova       m8, [factor_p1_n1]
-    mova       m9, [factor_n1_p1]
-    mova      m10, [pw_1]
-    mova      m11, [pd_4]
-    mova      m12, [factor_p11_n4]
-    mova      m13, [factor_p5_p4]
+    mova       m9, [pw_1]
+    mova      m10, [pd_4]
+    mova      m11, [factor_p11_n4]
+    mova      m12, [factor_p5_p4]
 %else
 cglobal cfhd_vert_filter, 7, 7, 8, output, x, low, y, high, pos, width, height
     shl        xd, 1
@@ -353,8 +344,8 @@ cglobal cfhd_vert_filter, 7, 7, 8, output, x, low, y, high, pos, width, height
     punpckhwd  m2, m1
 
 %if ARCH_X86_64
-    pmaddwd    m0, m12
-    pmaddwd    m2, m12
+    pmaddwd    m0, m11
+    pmaddwd    m2, m11
 %else
     pmaddwd    m0, [factor_p11_n4]
     pmaddwd    m2, [factor_p11_n4]
@@ -407,8 +398,8 @@ cglobal cfhd_vert_filter, 7, 7, 8, output, x, low, y, high, pos, width, height
     punpckhwd  m2, m1
 
 %if ARCH_X86_64
-    pmaddwd    m0, m13
-    pmaddwd    m2, m13
+    pmaddwd    m0, m12
+    pmaddwd    m2, m12
 %else
     pmaddwd    m0, [factor_p5_p4]
     pmaddwd    m2, [factor_p5_p4]
@@ -471,29 +462,23 @@ cglobal cfhd_vert_filter, 7, 7, 8, output, x, low, y, high, pos, width, height
     punpcklwd  m4, m1
     punpckhwd  m5, m1
 
-    mova       m6, m4
-    mova       m7, m5
-
 %if ARCH_X86_64
     pmaddwd    m4, m8
     pmaddwd    m5, m8
-    pmaddwd    m6, m9
-    pmaddwd    m7, m9
 
-    paddd      m4, m11
-    paddd      m5, m11
-    paddd      m6, m11
-    paddd      m7, m11
+    psubd      m6, m10, m4
+    psubd      m7, m10, m5
+    paddd      m4, m10
+    paddd      m5, m10
 %else
+    mova       m2, [pd_4]
     pmaddwd    m4, [factor_p1_n1]
     pmaddwd    m5, [factor_p1_n1]
-    pmaddwd    m6, [factor_n1_p1]
-    pmaddwd    m7, [factor_n1_p1]
 
-    paddd      m4, [pd_4]
-    paddd      m5, [pd_4]
-    paddd      m6, [pd_4]
-    paddd      m7, [pd_4]
+    psubd      m6, m2, m4
+    psubd      m7, m2, m5
+    paddd      m4, m2
+    paddd      m5, m2
 %endif
 
     psrad      m4, 3
@@ -517,8 +502,8 @@ cglobal cfhd_vert_filter, 7, 7, 8, output, x, low, y, high, pos, width, height
     mova       m3, m2
 
 %if ARCH_X86_64
-    pmaddwd    m0, m10
-    pmaddwd    m2, m10
+    pmaddwd    m0, m9
+    pmaddwd    m2, m9
     pmaddwd    m1, m8
     pmaddwd    m3, m8
 %else
@@ -565,8 +550,8 @@ cglobal cfhd_vert_filter, 7, 7, 8, output, x, low, y, high, pos, width, height
     punpckhwd  m2, m1
 
 %if ARCH_X86_64
-    pmaddwd    m0, m13
-    pmaddwd    m2, m13
+    pmaddwd    m0, m12
+    pmaddwd    m2, m12
 %else
     pmaddwd    m0, [factor_p5_p4]
     pmaddwd    m2, [factor_p5_p4]
@@ -586,8 +571,8 @@ cglobal cfhd_vert_filter, 7, 7, 8, output, x, low, y, high, pos, width, height
     psubd      m2, m3
 
 %if ARCH_X86_64
-    paddd      m0, m11
-    paddd      m2, m11
+    paddd      m0, m10
+    paddd      m2, m10
 %else
     paddd      m0, [pd_4]
     paddd      m2, [pd_4]
@@ -633,8 +618,8 @@ cglobal cfhd_vert_filter, 7, 7, 8, output, x, low, y, high, pos, width, height
     punpckhwd  m2, m1
 
 %if ARCH_X86_64
-    pmaddwd    m0, m12
-    pmaddwd    m2, m12
+    pmaddwd    m0, m11
+    pmaddwd    m2, m11
 %else
     pmaddwd    m0, [factor_p11_n4]
     pmaddwd    m2, [factor_p11_n4]
@@ -654,8 +639,8 @@ cglobal cfhd_vert_filter, 7, 7, 8, output, x, low, y, high, pos, width, height
     paddd      m2, m3
 
 %if ARCH_X86_64
-    paddd      m0, m11
-    paddd      m2, m11
+    paddd      m0, m10
+    paddd      m2, m10
 %else
     paddd      m0, [pd_4]
     paddd      m2, [pd_4]

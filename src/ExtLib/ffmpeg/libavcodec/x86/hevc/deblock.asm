@@ -257,8 +257,7 @@ INIT_XMM sse2
 %macro MASKED_COPY 2
     pand             %2, m11 ; and mask
     pandn           m10, m11, %1; and -mask
-    por              %2, m10
-    mova             %1, %2
+    por              %1, %2, m10
 %endmacro
 
 ; in: %2 clobbered
@@ -267,8 +266,7 @@ INIT_XMM sse2
 %macro MASKED_COPY2 3
     pand             %2, %3 ; and mask
     pandn            %3, %1; and -mask
-    por              %2, %3
-    mova             %1, %2
+    por              %1, %2, %3
 %endmacro
 
 ALIGN 16
@@ -335,8 +333,8 @@ ALIGN 16
 
     ;compare
     pcmpgtw         m15, m13, m14
-    movmskps        r13, m15 ;filtering mask 0d0 + 0d3 < beta0 (bit 2 or 3) , 1d0 + 1d3 < beta1 (bit 0 or 1)
-    test            r13, r13
+    movmskps        r10, m15 ;filtering mask 0d0 + 0d3 < beta0 (bit 2 or 3) , 1d0 + 1d3 < beta1 (bit 0 or 1)
+    test           r10d, r10d
     je              .bypassluma
 
     ;weak / strong decision compare to beta_2
@@ -347,45 +345,41 @@ ALIGN 16
     ;end weak / strong decision
 
     ; weak filter nd_p/q calculation
-    pshufd           m8, m10, 0x31
-    psrld            m8, 16
+    psrlq            m8, m10, 48
     paddw            m8, m10
-    movd            r7d, m8
-    pshufd           m8, m8, 0x4E
-    movd            r8d, m8
+    pshufd           m8, m8, 0x8
+    movq            r7q, m8
 
-    pshufd           m8, m11, 0x31
-    psrld            m8, 16
+    psrlq            m8, m11, 48
     paddw            m8, m11
-    movd            r9d, m8
-    pshufd           m8, m8, 0x4E
-    movd           r10d, m8
+    pshufd           m8, m8, 0x8
+    movq            r8q, m8
     ; end calc for weak filter
 
     ; filtering mask
-    mov             r11, r13
-    shr             r11, 3
-    movd            m15, r11d
-    and             r13, 1
-    movd            m11, r13d
+    mov              r9, r10
+    shr             r9d, 3
+    movd            m15, r9d
+    and            r10d, 1
+    movd            m11, r10d
     shufps          m11, m15, 0
-    shl             r11, 1
-    or              r13, r11
+    shl             r9d, 1
+    or             r10d, r9d
 
     pcmpeqd         m11, [pd_1]; filtering mask
 
     ;decide between strong and weak filtering
     ;tc25 calculations
-    mov            r11d, [tcq];
+    mov             r9d, [tcq];
 %if %1 > 8
-    shl             r11, %1 - 8
+    shl             r9d, %1 - 8
 %endif
-    movd             m8, r11d; tc0
+    movd             m8, r9d; tc0
     mov             r3d, [tcq+4];
 %if %1 > 8
-    shl              r3, %1 - 8
+    shl             r3d, %1 - 8
 %endif
-    add            r11d, r3d; tc0 + tc1
+    add             r9d, r3d; tc0 + tc1
     jz             .bypassluma
     movd             m9, r3d; tc1
     punpcklwd        m8, m8
@@ -410,8 +404,8 @@ ALIGN 16
 
     psraw           m13, 3; beta >> 3
     pcmpgtw         m13, m12;
-    movmskps        r11, m13;
-    and             r6, r11; strong mask , beta_2 and beta_3 comparisons
+    movmskps        r9d, m13;
+    and             r6d, r9d; strong mask , beta_2 and beta_3 comparisons
     ;----beta_3 comparison end-----
     ;----tc25 comparison---
     psubw           m12, m3, m4;      p0 - q0
@@ -421,24 +415,24 @@ ALIGN 16
     pshuflw         m12, m12, 0xf0 ;0b11110000;
 
     pcmpgtw          m8, m12; tc25 comparisons
-    movmskps        r11, m8;
-    and             r6, r11; strong mask, beta_2, beta_3 and tc25 comparisons
+    movmskps        r9d, m8;
+    and             r6d, r9d; strong mask, beta_2, beta_3 and tc25 comparisons
     ;----tc25 comparison end---
-    mov             r11, r6;
-    shr             r11, 1;
-    and             r6, r11; strong mask, bits 2 and 0
+    mov             r9d, r6d;
+    shr             r9d, 1;
+    and             r6d, r9d; strong mask, bits 2 and 0
 
     pmullw          m14, m9, [pw_m2]; -tc * 2
     paddw            m9, m9
 
     and             r6, 5; 0b101
-    mov             r11, r6; strong mask
+    mov             r9d, r6d; strong mask
     shr             r6, 2;
     movd            m12, r6d; store to xmm for mask generation
     shl             r6, 1
-    and             r11, 1
-    movd            m10, r11d; store to xmm for mask generation
-    or              r6, r11; final strong mask, bits 1 and 0
+    and             r9d, 1
+    movd            m10, r9d; store to xmm for mask generation
+    or              r6d, r9d; final strong mask, bits 1 and 0
     jz      .weakfilter
 
     shufps          m10, m12, 0
@@ -524,21 +518,21 @@ ALIGN 16
 
 .weakfilter:
     not             r6; strong mask -> weak mask
-    and             r6, r13; final weak filtering mask, bits 0 and 1
+    and             r6d, r10d; final weak filtering mask, bits 0 and 1
     jz             .store
 
     ; weak filtering mask
-    mov             r11, r6
-    shr             r11, 1
-    movd            m12, r11d
+    mov              r9, r6
+    shr             r9d, 1
+    movd            m12, r9d
     and             r6, 1
     movd            m11, r6d
     shufps          m11, m12, 0
     pcmpeqd         m11, [pd_1]; filtering mask
 
-    mov             r13, betaq
-    shr             r13, 1;
-    add             betaq, r13
+    mov            r10d, betad
+    shr            r10d, 1;
+    add           betad, r10d
     shr             betaq, 3; ((beta + (beta >> 1)) >> 3))
 
     psubw           m12, m4, m3 ; q0 - p0
@@ -607,11 +601,9 @@ ALIGN 16
     movd            m10, betad
     SPLATW          m10, m10, 0
 
-    movd            m13, r7d; 1dp0 + 1dp3
-    movd             m8, r8d; 0dp0 + 0dp3
-    punpcklwd        m8, m8
+    movq            m13, r7q; 1dp0 + 1dp3, 0dp0 + 0dp3
     punpcklwd       m13, m13
-    shufps          m13, m8, 0;
+    pshufd          m13, m13, 10100000b
     pcmpgtw          m8, m10, m13
     pand             m8, m11
     ;end beta calculations
@@ -625,11 +617,10 @@ ALIGN 16
     pminsw           m8, m9; av_clip(deltaq1, -tc/2, tc/2)
     paddw            m8, m5; q1'
 
-    movd            m13, r9d;
-    movd            m15, r10d;
-    punpcklwd       m15, m15
+    movq            m13, r8q;
     punpcklwd       m13, m13
-    shufps          m13, m15, 0; dq0 + dq3
+    movhlps         m15, m13
+    pshufd          m13, m13, 10100000b
 
     pcmpgtw         m10, m13; compare to ((beta+(beta>>1))>>3)
     pand            m10, m11
@@ -744,7 +735,7 @@ LOOP_FILTER_CHROMA
 ; void ff_hevc_v_loop_filter_luma(uint8_t *_pix, ptrdiff_t _stride, int beta,
 ;                                 int32_t *tc, uint8_t *_no_p, uint8_t *_no_q);
 ;-----------------------------------------------------------------------------
-cglobal hevc_v_loop_filter_luma_8, 4, 14, 16, pix, stride, beta, tc, pix0, src3stride
+cglobal hevc_v_loop_filter_luma_8, 4, 11, 16, pix, stride, beta, tc, pix0, src3stride
     sub            pixq, 4
     lea           pix0q, [3 * r1]
     mov     src3strideq, pixq
@@ -756,7 +747,7 @@ cglobal hevc_v_loop_filter_luma_8, 4, 14, 16, pix, stride, beta, tc, pix0, src3s
 .bypassluma:
     RET
 
-cglobal hevc_v_loop_filter_luma_10, 4, 14, 16, pix, stride, beta, tc, pix0, src3stride
+cglobal hevc_v_loop_filter_luma_10, 4, 11, 16, pix, stride, beta, tc, pix0, src3stride
     sub            pixq, 8
     lea           pix0q, [3 * strideq]
     mov     src3strideq, pixq
@@ -768,7 +759,7 @@ cglobal hevc_v_loop_filter_luma_10, 4, 14, 16, pix, stride, beta, tc, pix0, src3
 .bypassluma:
     RET
 
-cglobal hevc_v_loop_filter_luma_12, 4, 14, 16, pix, stride, beta, tc, pix0, src3stride
+cglobal hevc_v_loop_filter_luma_12, 4, 11, 16, pix, stride, beta, tc, pix0, src3stride
     sub            pixq, 8
     lea           pix0q, [3 * strideq]
     mov     src3strideq, pixq
@@ -784,7 +775,7 @@ cglobal hevc_v_loop_filter_luma_12, 4, 14, 16, pix, stride, beta, tc, pix0, src3
 ; void ff_hevc_h_loop_filter_luma(uint8_t *_pix, ptrdiff_t _stride, int beta,
 ;                                 int32_t *tc, uint8_t *_no_p, uint8_t *_no_q);
 ;-----------------------------------------------------------------------------
-cglobal hevc_h_loop_filter_luma_8, 4, 14, 16, pix, stride, beta, tc, pix0, src3stride
+cglobal hevc_h_loop_filter_luma_8, 4, 11, 16, pix, stride, beta, tc, pix0, src3stride
     lea     src3strideq, [3 * strideq]
     mov           pix0q, pixq
     sub           pix0q, src3strideq
@@ -820,7 +811,7 @@ cglobal hevc_h_loop_filter_luma_8, 4, 14, 16, pix, stride, beta, tc, pix0, src3s
 .bypassluma:
     RET
 
-cglobal hevc_h_loop_filter_luma_10, 4, 14, 16, pix, stride, beta, tc, pix0, src3stride
+cglobal hevc_h_loop_filter_luma_10, 4, 11, 16, pix, stride, beta, tc, pix0, src3stride
     lea                  src3strideq, [3 * strideq]
     mov                        pix0q, pixq
     sub                        pix0q, src3strideq
@@ -851,7 +842,7 @@ cglobal hevc_h_loop_filter_luma_10, 4, 14, 16, pix, stride, beta, tc, pix0, src3
 .bypassluma:
     RET
 
-cglobal hevc_h_loop_filter_luma_12, 4, 14, 16, pix, stride, beta, tc, pix0, src3stride
+cglobal hevc_h_loop_filter_luma_12, 4, 11, 16, pix, stride, beta, tc, pix0, src3stride
     lea                  src3strideq, [3 * strideq]
     mov                        pix0q, pixq
     sub                        pix0q, src3strideq

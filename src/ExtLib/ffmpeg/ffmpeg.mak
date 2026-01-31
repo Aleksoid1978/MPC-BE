@@ -930,6 +930,7 @@ SRCS_ASM_LC = \
 	\
 	libavcodec/x86/hevc/add_res.asm \
 	libavcodec/x86/hevc/deblock.asm \
+	libavcodec/x86/hevc/dequant.asm \
 	libavcodec/x86/hevc/idct.asm \
 	libavcodec/x86/hevc/mc.asm \
 	libavcodec/x86/hevc/sao.asm \
