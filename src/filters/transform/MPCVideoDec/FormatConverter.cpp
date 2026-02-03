@@ -35,8 +35,8 @@ extern "C" {
 }
 #pragma warning(pop)
 
-SW_OUT_FMT s_sw_formats[] = {
-	//name         biCompression       subtype               bpp                          av_pix_fmt   chroma_w chroma_h actual_bpp luma_bits
+const SW_OUT_FMT s_sw_formats[] = {
+	//name         biCompression       subtype             bpp codedbytes planes          av_pix_fmt   chroma_w chroma_h actual_bpp luma_bits
 	// YUV 8 bit
 	{L"NV12",      FCC('NV12'),      &MEDIASUBTYPE_NV12,      12, 1, 2, {1,2},   {1,1},   AV_PIX_FMT_NV12,        1, 1, 12,  8}, // PixFmt_NV12
 	{L"YV12",      FCC('YV12'),      &MEDIASUBTYPE_YV12,      12, 1, 3, {1,2,2}, {1,2,2}, AV_PIX_FMT_YUV420P,     1, 1, 12,  8}, // PixFmt_YV12

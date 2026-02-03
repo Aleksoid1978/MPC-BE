@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2025 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -54,7 +54,7 @@ struct SW_OUT_FMT {
 	const int					luma_bits;
 };
 
-extern SW_OUT_FMT s_sw_formats[];
+extern const SW_OUT_FMT s_sw_formats[];
 
 const SW_OUT_FMT* GetSWOF(int pixfmt);
 LPCWSTR GetChromaSubsamplingStr(enum AVPixelFormat av_pix_fmt);
