@@ -50,7 +50,7 @@ HRESULT CFormatConverter::plane_copy_sse2(CONV_FUNC_PARAMS)
 {
     const SW_OUT_FMT& desc = s_sw_formats[m_out_pixfmt];
 
-    const int widthBytes = width * desc.codedbytes;
+    const int widthBytes = width * desc.packsize;
     const int planes = std::max(desc.planes, 1);
 
     ptrdiff_t line, plane;

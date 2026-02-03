@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2546,8 +2546,8 @@ static const VIDEO_OUTPUT_FORMATS DXVA_P010 = { &MEDIASUBTYPE_P010, FCC('dxva'),
 static const VIDEO_OUTPUT_FORMATS DXVA_P016 = { &MEDIASUBTYPE_P016, FCC('dxva'), 24, 2 };
 // 422 8/10/12 bit
 static const VIDEO_OUTPUT_FORMATS DXVA_YUY2 = { &MEDIASUBTYPE_YUY2, FCC('dxva'), 16, 2 };
-static const VIDEO_OUTPUT_FORMATS DXVA_Y210 = { &MEDIASUBTYPE_Y210, FCC('dxva'), 32, 2 };
-static const VIDEO_OUTPUT_FORMATS DXVA_Y216 = { &MEDIASUBTYPE_Y216, FCC('dxva'), 32, 2 };
+static const VIDEO_OUTPUT_FORMATS DXVA_Y210 = { &MEDIASUBTYPE_Y210, FCC('dxva'), 32, 4 };
+static const VIDEO_OUTPUT_FORMATS DXVA_Y216 = { &MEDIASUBTYPE_Y216, FCC('dxva'), 32, 4 };
 // 444 8/10/12 bit
 static const VIDEO_OUTPUT_FORMATS DXVA_AYUV = { &MEDIASUBTYPE_AYUV, FCC('dxva'), 32, 4 };
 static const VIDEO_OUTPUT_FORMATS DXVA_Y410 = { &MEDIASUBTYPE_Y410, FCC('dxva'), 32, 4 };
@@ -2681,7 +2681,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 		for (int i = 0; i < nSwCount; i++) {
 			const SW_OUT_FMT* swof = GetSWOF(nSwIndex[i]);
 			m_VideoOutputFormats.emplace_back(
-				VIDEO_OUTPUT_FORMATS{ swof->subtype, swof->biCompression, (UINT)swof->bpp, (UINT)swof->codedbytes }
+				VIDEO_OUTPUT_FORMATS{ swof->subtype, swof->biCompression, (WORD)swof->bpp, (WORD)swof->packsize }
 			);
 		}
 	}

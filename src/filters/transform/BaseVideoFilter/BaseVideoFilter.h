@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,8 +27,8 @@
 struct VIDEO_OUTPUT_FORMATS {
 	const GUID* subtype;
 	DWORD       biCompression;
-	UINT        biBitCount;
-	UINT        packsize;
+	WORD        biBitCount;
+	WORD        packsize;
 
 	bool operator == (const struct VIDEO_OUTPUT_FORMATS& fmt) const {
 		return (subtype == fmt.subtype

@@ -43,7 +43,7 @@ struct SW_OUT_FMT {
 	const DWORD					biCompression;
 	const GUID*					subtype;
 	const int					bpp;
-	const int					codedbytes;
+	const int					packsize;
 	const int					planes;
 	const int					planeHeight[4];
 	const int					planeWidth[4];

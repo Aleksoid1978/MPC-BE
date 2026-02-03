@@ -36,7 +36,7 @@ extern "C" {
 #pragma warning(pop)
 
 const SW_OUT_FMT s_sw_formats[] = {
-	//name         biCompression       subtype             bpp codedbytes planes          av_pix_fmt   chroma_w chroma_h actual_bpp luma_bits
+	//name         biCompression       subtype             bpp packsize planes            av_pix_fmt   chroma_w chroma_h actual_bpp luma_bits
 	// YUV 8 bit
 	{L"NV12",      FCC('NV12'),      &MEDIASUBTYPE_NV12,      12, 1, 2, {1,2},   {1,1},   AV_PIX_FMT_NV12,        1, 1, 12,  8}, // PixFmt_NV12
 	{L"YV12",      FCC('YV12'),      &MEDIASUBTYPE_YV12,      12, 1, 3, {1,2,2}, {1,2,2}, AV_PIX_FMT_YUV420P,     1, 1, 12,  8}, // PixFmt_YV12
@@ -531,7 +531,7 @@ bool CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 
 	uint8_t*  dstArray[4]       = { nullptr };
 	ptrdiff_t dstStrideArray[4] = { 0 };
-	ptrdiff_t byteStride        = outStride * swof.codedbytes;
+	ptrdiff_t byteStride        = outStride * swof.packsize;
 
 	dstArray[0] = out;
 	dstStrideArray[0] = byteStride;
@@ -551,9 +551,9 @@ bool CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		int line = 0;
 
 		// Copy first plane
-		const size_t widthBytes        = m_FProps.width * swof.codedbytes;
-		const ptrdiff_t srcStrideBytes = outStride * swof.codedbytes;
-		const ptrdiff_t dstStrideBytes = m_dstStride * swof.codedbytes;
+		const size_t widthBytes        = m_FProps.width * swof.packsize;
+		const ptrdiff_t srcStrideBytes = outStride * swof.packsize;
+		const ptrdiff_t dstStrideBytes = m_dstStride * swof.packsize;
 		for (line = 0; line < m_FProps.height; ++line) {
 			memcpy(dst, out, widthBytes);
 			out += srcStrideBytes;
