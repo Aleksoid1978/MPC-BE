@@ -45,8 +45,8 @@ struct SW_OUT_FMT {
 	const int					bpp;
 	const int					packsize;
 	const int					planes;
-	const int					planeHeight[4];
 	const int					planeWidth[4];
+	const int					planeHeight[4];
 	const enum AVPixelFormat	av_pix_fmt;
 	const uint8_t				chroma_w;
 	const uint8_t				chroma_h;
