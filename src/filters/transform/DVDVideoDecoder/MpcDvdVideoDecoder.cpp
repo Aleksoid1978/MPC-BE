@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -460,13 +460,13 @@ HRESULT CMpeg2DecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop,
 	return __super::NewSegment(tStart, tStop, dRate);
 }
 
-static VIDEO_OUTPUT_FORMATS DefaultFormats[] = {
-	{&MEDIASUBTYPE_NV12, FCC('NV12'), 12, 1},
-	{&MEDIASUBTYPE_YV12, FCC('YV12'), 12, 1},
-	{&MEDIASUBTYPE_YUY2, FCC('YUY2'), 16, 2},
+static VIDEO_OUTPUT_FORMAT DefaultFormats[] = {
+	{&MEDIASUBTYPE_NV12, FCC('NV12'), 12},
+	{&MEDIASUBTYPE_YV12, FCC('YV12'), 12},
+	{&MEDIASUBTYPE_YUY2, FCC('YUY2'), 16},
 };
 
-void CMpeg2DecFilter::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
+void CMpeg2DecFilter::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMAT** ppFormats)
 {
 	nNumber    = std::size(DefaultFormats);
 	*ppFormats = DefaultFormats;

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -326,8 +326,8 @@ HRESULT CBaseVideoFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_
 
 HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 {
-	VIDEO_OUTPUT_FORMATS* fmts;
-	int                   nFormatCount;
+	VIDEO_OUTPUT_FORMAT* fmts;
+	int                  nFormatCount;
 
 	if (m_pInput->IsConnected() == FALSE) {
 		return E_UNEXPECTED;

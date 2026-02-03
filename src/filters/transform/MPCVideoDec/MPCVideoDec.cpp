@@ -2539,19 +2539,19 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
 	return S_OK;
 }
 
-static const VIDEO_OUTPUT_FORMATS DXVA_NV12 = { &MEDIASUBTYPE_NV12, FCC('dxva'), 12, 1 };
-static const VIDEO_OUTPUT_FORMATS DXVA_P010 = { &MEDIASUBTYPE_P010, FCC('dxva'), 24, 2 };
+static const VIDEO_OUTPUT_FORMAT DXVA_NV12 = { &MEDIASUBTYPE_NV12, FCC('dxva'), 12 };
+static const VIDEO_OUTPUT_FORMAT DXVA_P010 = { &MEDIASUBTYPE_P010, FCC('dxva'), 24 };
 
 // 420 12 bit
-static const VIDEO_OUTPUT_FORMATS DXVA_P016 = { &MEDIASUBTYPE_P016, FCC('dxva'), 24, 2 };
+static const VIDEO_OUTPUT_FORMAT DXVA_P016 = { &MEDIASUBTYPE_P016, FCC('dxva'), 24 };
 // 422 8/10/12 bit
-static const VIDEO_OUTPUT_FORMATS DXVA_YUY2 = { &MEDIASUBTYPE_YUY2, FCC('dxva'), 16, 2 };
-static const VIDEO_OUTPUT_FORMATS DXVA_Y210 = { &MEDIASUBTYPE_Y210, FCC('dxva'), 32, 4 };
-static const VIDEO_OUTPUT_FORMATS DXVA_Y216 = { &MEDIASUBTYPE_Y216, FCC('dxva'), 32, 4 };
+static const VIDEO_OUTPUT_FORMAT DXVA_YUY2 = { &MEDIASUBTYPE_YUY2, FCC('dxva'), 16 };
+static const VIDEO_OUTPUT_FORMAT DXVA_Y210 = { &MEDIASUBTYPE_Y210, FCC('dxva'), 32 };
+static const VIDEO_OUTPUT_FORMAT DXVA_Y216 = { &MEDIASUBTYPE_Y216, FCC('dxva'), 32 };
 // 444 8/10/12 bit
-static const VIDEO_OUTPUT_FORMATS DXVA_AYUV = { &MEDIASUBTYPE_AYUV, FCC('dxva'), 32, 4 };
-static const VIDEO_OUTPUT_FORMATS DXVA_Y410 = { &MEDIASUBTYPE_Y410, FCC('dxva'), 32, 4 };
-static const VIDEO_OUTPUT_FORMATS DXVA_Y416 = { &MEDIASUBTYPE_Y416, FCC('dxva'), 64, 8 };
+static const VIDEO_OUTPUT_FORMAT DXVA_AYUV = { &MEDIASUBTYPE_AYUV, FCC('dxva'), 32 };
+static const VIDEO_OUTPUT_FORMAT DXVA_Y410 = { &MEDIASUBTYPE_Y410, FCC('dxva'), 32 };
+static const VIDEO_OUTPUT_FORMAT DXVA_Y416 = { &MEDIASUBTYPE_Y416, FCC('dxva'), 64 };
 
 void CMPCVideoDecFilter::BuildOutputFormat()
 {
@@ -2681,14 +2681,14 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 		for (int i = 0; i < nSwCount; i++) {
 			const SW_OUT_FMT* swof = GetSWOF(nSwIndex[i]);
 			m_VideoOutputFormats.emplace_back(
-				VIDEO_OUTPUT_FORMATS{ swof->subtype, swof->biCompression, (WORD)swof->bpp, (WORD)swof->packsize }
+				VIDEO_OUTPUT_FORMAT{ swof->subtype, swof->biCompression, (WORD)swof->bpp }
 			);
 		}
 	}
 	ASSERT(OutputCount == m_VideoOutputFormats.size());
 }
 
-void CMPCVideoDecFilter::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
+void CMPCVideoDecFilter::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMAT** ppFormats)
 {
 	nNumber    = m_VideoOutputFormats.size();
 	*ppFormats = m_VideoOutputFormats.size() ? m_VideoOutputFormats.data() : nullptr;
@@ -4025,7 +4025,7 @@ HRESULT CMPCVideoDecFilter::ChangeOutputMediaFormat(int nType)
 			}
 		} else {
 			int nNumber;
-			VIDEO_OUTPUT_FORMATS* pFormats;
+			VIDEO_OUTPUT_FORMAT* pFormats;
 			GetOutputFormats(nNumber, &pFormats);
 			for (int i = 0; i < nNumber * 2; i++) {
 				CMediaType mt;

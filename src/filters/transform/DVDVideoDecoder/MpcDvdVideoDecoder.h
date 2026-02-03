@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -102,7 +102,7 @@ protected:
 	virtual void GetOutputSize(int& w, int& h, int& arx, int& ary) override;
 	virtual HRESULT Transform(IMediaSample* pIn) override;
 	virtual bool IsVideoInterlaced() override { return IsInterlacedEnabled(); }
-	virtual void GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats) override;
+	virtual void GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMAT** ppFormats) override;
 
 public:
 	CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr);
