@@ -25,7 +25,10 @@ AP4_ElstAtom::AP4_ElstAtom(AP4_Size size, AP4_ByteStream& stream) :
     AP4_UI32 edit_start_index = 0;
     AP4_UI64 empty_duration = 0;
     AP4_UI32 entry_count;
-    stream.ReadUI32(entry_count);
+    if (stream.ReadUI32(entry_count) != AP4_SUCCESS || entry_count > 100000) {
+        return;
+    }
+
     m_Entries.EnsureCapacity(entry_count);
     for (AP4_UI32 i = 0; i < entry_count; i++) {
         AP4_UI64 segment_duration = 0;

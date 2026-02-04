@@ -1,6 +1,6 @@
 /*****************************************************************
 |
-|    AP4 - trak Atoms 
+|    AP4 - trak Atoms
 |
 |    Copyright 2002 Gilles Boccon-Gibod
 |
@@ -51,7 +51,7 @@ class AP4_TrakAtom : public AP4_ContainerAtom
      AP4_TrakAtom(AP4_SampleTable* sample_table,
                   AP4_Atom::Type   hdlr_type,
                   const char*      hdlr_name,
-                  AP4_UI32         track_id, 
+                  AP4_UI32         track_id,
                   AP4_UI64         creation_time,
                   AP4_UI64         modification_time,
                   AP4_UI64         track_duration,
@@ -65,11 +65,11 @@ class AP4_TrakAtom : public AP4_ContainerAtom
                  AP4_ByteStream&  stream,
                  AP4_AtomFactory& atom_factory);
     AP4_Result AdjustChunkOffsets(AP4_Offset offset);
-    AP4_UI32   GetId() { 
-        return m_TkhdAtom->GetTrackId(); 
+    AP4_UI32   GetId() {
+        return m_TkhdAtom ? m_TkhdAtom->GetTrackId() : 0;
     }
     AP4_Result SetId(AP4_UI32 track_id) {
-        return m_TkhdAtom->SetTrackId(track_id);
+        return m_TkhdAtom ? m_TkhdAtom->SetTrackId(track_id) : AP4_FAILURE;
     }
     AP4_UI64   GetDuration();
     AP4_Result SetDuration(AP4_UI64 duration);
