@@ -1,6 +1,6 @@
 /*****************************************************************
 |
-|    AP4 - dref Atoms 
+|    AP4 - dref Atoms
 |
 |    Copyright 2002 Gilles Boccon-Gibod
 |
@@ -55,6 +55,10 @@ AP4_DrefAtom::AP4_DrefAtom(AP4_Size         size,
                            AP4_AtomFactory& atom_factory) :
     AP4_ContainerAtom(AP4_ATOM_TYPE_DREF, size, true, stream)
 {
+    if (size <= (AP4_FULL_ATOM_HEADER_SIZE + 4)) {
+        return;
+    }
+
     // read the number of entries
     AP4_UI32 entry_count;
     stream.ReadUI32(entry_count);
@@ -62,8 +66,8 @@ AP4_DrefAtom::AP4_DrefAtom(AP4_Size         size,
     // read children
     AP4_Size bytes_available = size-AP4_FULL_ATOM_HEADER_SIZE-4;
     while (entry_count--) {
-        AP4_Atom* atom; 
-        while (AP4_SUCCEEDED(atom_factory.CreateAtomFromStream(stream, 
+        AP4_Atom* atom;
+        while (AP4_SUCCEEDED(atom_factory.CreateAtomFromStream(stream,
                                                                bytes_available,
                                                                atom,
                                                                this))) {

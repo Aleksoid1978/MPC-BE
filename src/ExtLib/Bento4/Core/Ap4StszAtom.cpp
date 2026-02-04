@@ -1,6 +1,6 @@
 /*****************************************************************
 |
-|    AP4 - stsz Atoms 
+|    AP4 - stsz Atoms
 |
 |    Copyright 2002 Gilles Boccon-Gibod
 |
@@ -53,11 +53,21 @@ AP4_StszAtom::AP4_StszAtom(AP4_Size size, AP4_ByteStream& stream) :
     stream.ReadUI32(m_SampleCount);
 
     unsigned long sample_count = m_SampleCount;
+    m_SampleCount = 0;
     if (m_SampleSize == 0) { // means that the samples have different sizes
         while (sample_count--) {
             AP4_UI32 entry_size;
             if (stream.ReadUI32(entry_size) == AP4_SUCCESS) {
-                m_Entries.Append(entry_size);
+                AP4_Offset offset;
+                if (stream.Tell(offset) == AP4_SUCCESS) {
+                    AP4_Size size;
+                    if (stream.GetSize(size) == AP4_SUCCESS) {
+                        if ((offset + entry_size) <= size) {
+                            m_Entries.Append(entry_size);
+                            m_SampleCount++;
+                        }
+                    }
+                }
             }
         }
     }
@@ -103,7 +113,7 @@ AP4_StszAtom::GetSampleCount()
 |       AP4_StszAtom::GetSampleSize
 +---------------------------------------------------------------------*/
 AP4_Result
-AP4_StszAtom::GetSampleSize(AP4_Ordinal sample_start, 
+AP4_StszAtom::GetSampleSize(AP4_Ordinal sample_start,
                             AP4_Ordinal sample_end,
                             AP4_Size&   sample_size)
 {
@@ -123,7 +133,7 @@ AP4_StszAtom::GetSampleSize(AP4_Ordinal sample_start,
         // compute the additional offset inside the chunk
         for (unsigned int i = sample_start; i < sample_end; i++) {
             AP4_Size size;
-            AP4_Result result = GetSampleSize(i, size); 
+            AP4_Result result = GetSampleSize(i, size);
             if (AP4_FAILED(result)) return result;
             sample_size += size;
         }
@@ -171,7 +181,7 @@ AP4_StszAtom::SetSampleSize(AP4_Ordinal sample, AP4_Size sample_size)
 /*----------------------------------------------------------------------
 |       AP4_StszAtom::AddEntry
 +---------------------------------------------------------------------*/
-AP4_Result 
+AP4_Result
 AP4_StszAtom::AddEntry(AP4_UI32 size)
 {
     m_Entries.Append(size);

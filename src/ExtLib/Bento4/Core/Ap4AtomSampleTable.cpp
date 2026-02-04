@@ -127,6 +127,9 @@ AP4_AtomSampleTable::GetSample(AP4_Ordinal index,
     if (m_StcoAtom == NULL && m_Co64Atom == NULL) {
         return AP4_ERROR_INVALID_FORMAT;
     }
+    if (m_StscAtom == NULL || m_StszAtom == NULL || m_SttsAtom == NULL) {
+        return AP4_ERROR_INVALID_FORMAT;
+    }
 
     // MP4 uses 1-based indexes internally, so adjust by one
     index++;
