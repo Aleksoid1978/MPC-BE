@@ -1080,7 +1080,36 @@ HRESULT CFGManager::ConnectInternal(IPin* pPinOut, IPin* pPinIn, bool bContinueR
 
 			CComPtr<IBaseFilter> pBF;
 			std::list<CComQIPtr<IUnknown, &IID_IUnknown>> pUnks;
-			if (FAILED(pFGF->Create(&pBF, pUnks))) {
+			hr = pFGF->Create(&pBF, pUnks);
+			if (FAILED(hr)) {
+				// Check if selected video renderer fails to load
+				CLSID filter = pFGF->GetCLSID();
+				if (IsVideoRenderer(filter)) {
+					if (filter == CLSID_EVRAllocatorPresenter) {
+						if (IDYES == AfxMessageBox(
+								L"The Enhanced Video Renderer (custom presenter) has failed to load.\n\n"
+								"This problem is often caused by a bug in the graphics driver. "
+								"Or you may be using a generic driver which has limited capabilities.\n\n"
+								"Do you want to change settings to use Enhanced Video Renderer?\n"
+								"(player restart required)", MB_ICONEXCLAMATION | MB_YESNO, 0)) {
+							GetRenderersSettings().iVideoRenderer = VIDRNDT_EVR;
+						}
+					}
+					else if (filter != CLSID_EnhancedVideoRenderer) {
+						CString msg;
+						msg.Format(
+							L"The selected '%s' has failed to load.\n\n"
+							"Do you want to change settings to use\n"
+							"Enhanced Video Renderer (custom presenter) ?\n"
+							"(player restart required)",
+							pFGF->GetName()
+						);
+						if (IDYES == AfxMessageBox(msg, MB_ICONEXCLAMATION | MB_YESNO, 0)) {
+							GetRenderersSettings().iVideoRenderer = VIDRNDT_EVR_CP;
+						}
+					}
+					return E_ABORT;
+				}
 				continue;
 			}
 
