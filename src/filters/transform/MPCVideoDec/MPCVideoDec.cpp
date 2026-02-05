@@ -2539,17 +2539,17 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
 	return S_OK;
 }
 // 420 8/10/12 bit
-static const VFormatDesc DXVA_NV12 = GetVFormatDXVA(VFormat_NV12);
-static const VFormatDesc DXVA_P010 = GetVFormatDXVA(VFormat_P010);
-static const VFormatDesc DXVA_P016 = GetVFormatDXVA(VFormat_P016);
+static constexpr VFormatDesc DXVA_NV12 = GetVFormatDXVA(VFormat_NV12);
+static constexpr VFormatDesc DXVA_P010 = GetVFormatDXVA(VFormat_P010);
+static constexpr VFormatDesc DXVA_P016 = GetVFormatDXVA(VFormat_P016);
 // 422 8/10/12 bit
-static const VFormatDesc DXVA_YUY2 = GetVFormatDXVA(VFormat_YUY2);
-static const VFormatDesc DXVA_Y210 = GetVFormatDXVA(VFormat_Y210);
-static const VFormatDesc DXVA_Y216 = GetVFormatDXVA(VFormat_Y216);
+static constexpr VFormatDesc DXVA_YUY2 = GetVFormatDXVA(VFormat_YUY2);
+static constexpr VFormatDesc DXVA_Y210 = GetVFormatDXVA(VFormat_Y210);
+static constexpr VFormatDesc DXVA_Y216 = GetVFormatDXVA(VFormat_Y216);
 // 444 8/10/12 bit
-static const VFormatDesc DXVA_AYUV = GetVFormatDXVA(VFormat_AYUV);
-static const VFormatDesc DXVA_Y410 = GetVFormatDXVA(VFormat_Y410);
-static const VFormatDesc DXVA_Y416 = GetVFormatDXVA(VFormat_Y416);
+static constexpr VFormatDesc DXVA_AYUV = GetVFormatDXVA(VFormat_AYUV);
+static constexpr VFormatDesc DXVA_Y410 = GetVFormatDXVA(VFormat_Y410);
+static constexpr VFormatDesc DXVA_Y416 = GetVFormatDXVA(VFormat_Y416);
 
 void CMPCVideoDecFilter::BuildOutputFormat()
 {
