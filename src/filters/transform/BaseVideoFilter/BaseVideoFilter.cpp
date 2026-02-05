@@ -27,6 +27,8 @@
 #include "DSUtil/DSUtil.h"
 #include <moreuuids.h>
 
+#include "VideoFormats.h"
+
 //
 // CBaseVideoFilter
 //
@@ -326,7 +328,7 @@ HRESULT CBaseVideoFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_
 
 HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 {
-	VIDEO_OUTPUT_FORMAT* fmts;
+	VFormatDesc* fmts;
 	int                  nFormatCount;
 
 	if (m_pInput->IsConnected() == FALSE) {
@@ -371,8 +373,8 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	bihOut.biWidth       = w;
 	bihOut.biHeight      = h;
 	bihOut.biPlanes      = 1; // this value must be set to 1
-	bihOut.biBitCount    = fmts[iPosition].biBitCount;
-	bihOut.biCompression = fmts[iPosition].biCompression;
+	bihOut.biBitCount    = fmts[iPosition].GetBihBitCount();
+	bihOut.biCompression = fmts[iPosition].fourcc;
 	bihOut.biSizeImage   = DIBSIZE(bihOut);
 
 	pmt->formattype = FORMAT_VideoInfo2;

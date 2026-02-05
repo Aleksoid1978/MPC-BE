@@ -125,7 +125,7 @@ private:
 	CComPtr<ID3D11Texture2D>				m_pStagingD3D11Texture2D;
 
 	// === common variables
-	std::vector<VIDEO_OUTPUT_FORMAT>		m_VideoOutputFormats;
+	std::vector<VFormatDesc>				m_VideoOutputFormats;
 	std::unique_ptr<CDXVA2Decoder>			m_pDXVADecoder;
 	GUID									m_DXVADecoderGUID = GUID_NULL;
 	D3DFORMAT								m_DXVASurfaceFormat = D3DFMT_UNKNOWN;
@@ -214,7 +214,7 @@ private:
 	void			CleanupFFmpeg();
 	int				FindCodec(const CMediaType* mtIn, BOOL bForced = FALSE);
 	void			AllocExtradata(const CMediaType* mt);
-	void			GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMAT** ppFormats) override;
+	void			GetOutputFormats(int& nNumber, VFormatDesc** ppFormats) override;
 	void			DetectVideoCard(HWND hWnd);
 	void			BuildOutputFormat();
 

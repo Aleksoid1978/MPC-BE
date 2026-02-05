@@ -110,17 +110,17 @@ HRESULT CFormatConverter::plane_copy_direct_nv12_sse4(CONV_FUNC_PARAMS)
 
 HRESULT CFormatConverter::plane_copy_direct_sse4(CONV_FUNC_PARAMS)
 {
-    const SW_OUT_FMT& desc = s_sw_formats[m_out_pixfmt];
+    const SW_OUT_FMT& swof = s_sw_formats[m_out_pixfmt];
 
-    const int widthBytes = width * desc.packsize;
-    const int planes = std::max(desc.planes, 1);
+    const int widthBytes = width * swof.desc.packsize;
+    const int planes = std::max(swof.desc.planes, 1);
 
     ptrdiff_t line, plane;
 
     for (plane = 0; plane < planes; plane++)
     {
-        const int planeWidth = widthBytes / desc.planeWidth[plane];
-        const int planeHeight = height / desc.planeHeight[plane];
+        const int planeWidth = widthBytes / swof.planeWidth[plane];
+        const int planeHeight = height / swof.planeHeight[plane];
         const ptrdiff_t srcPlaneStride = srcStride[plane];
         const ptrdiff_t dstPlaneStride = dstStride[plane];
         const uint8_t *const srcBuf = src[plane];

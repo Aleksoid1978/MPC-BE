@@ -460,13 +460,13 @@ HRESULT CMpeg2DecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop,
 	return __super::NewSegment(tStart, tStop, dRate);
 }
 
-static VIDEO_OUTPUT_FORMAT DefaultFormats[] = {
-	{&MEDIASUBTYPE_NV12, FCC('NV12'), 12},
-	{&MEDIASUBTYPE_YV12, FCC('YV12'), 12},
-	{&MEDIASUBTYPE_YUY2, FCC('YUY2'), 16},
+static VFormatDesc DefaultFormats[] = {
+	VFormat_NV12,
+	VFormat_YV12,
+	VFormat_YUY2,
 };
 
-void CMpeg2DecFilter::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMAT** ppFormats)
+void CMpeg2DecFilter::GetOutputFormats(int& nNumber, VFormatDesc** ppFormats)
 {
 	nNumber    = std::size(DefaultFormats);
 	*ppFormats = DefaultFormats;

@@ -102,7 +102,7 @@ protected:
 	virtual void GetOutputSize(int& w, int& h, int& arx, int& ary) override;
 	virtual HRESULT Transform(IMediaSample* pIn) override;
 	virtual bool IsVideoInterlaced() override { return IsInterlacedEnabled(); }
-	virtual void GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMAT** ppFormats) override;
+	virtual void GetOutputFormats(int& nNumber, VFormatDesc** ppFormats) override;
 
 public:
 	CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr);

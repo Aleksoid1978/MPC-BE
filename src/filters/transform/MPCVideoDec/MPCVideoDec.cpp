@@ -1203,7 +1203,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	profile.ReadInt(OPT_SECTION_VideoDec, OPT_SwRGBLevels, m_nSwRGBLevels);
 	for (int i = 0; i < PixFmt_count; i++) {
 		CString optname = OPT_SW_prefix;
-		optname += GetSWOF(i)->name;
+		optname += GetSWOF(i)->desc.name;
 		profile.ReadBool(OPT_SECTION_VideoDec, optname, m_fPixFmts[i]);
 	}
 #endif
@@ -2538,20 +2538,18 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
 
 	return S_OK;
 }
-
-static const VIDEO_OUTPUT_FORMAT DXVA_NV12 = { &MEDIASUBTYPE_NV12, FCC('dxva'), 12 };
-static const VIDEO_OUTPUT_FORMAT DXVA_P010 = { &MEDIASUBTYPE_P010, FCC('dxva'), 24 };
-
-// 420 12 bit
-static const VIDEO_OUTPUT_FORMAT DXVA_P016 = { &MEDIASUBTYPE_P016, FCC('dxva'), 24 };
+// 420 8/10/12 bit
+static const VFormatDesc DXVA_NV12 = GetVFormatDXVA(VFormat_NV12);
+static const VFormatDesc DXVA_P010 = GetVFormatDXVA(VFormat_P010);
+static const VFormatDesc DXVA_P016 = GetVFormatDXVA(VFormat_P016);
 // 422 8/10/12 bit
-static const VIDEO_OUTPUT_FORMAT DXVA_YUY2 = { &MEDIASUBTYPE_YUY2, FCC('dxva'), 16 };
-static const VIDEO_OUTPUT_FORMAT DXVA_Y210 = { &MEDIASUBTYPE_Y210, FCC('dxva'), 32 };
-static const VIDEO_OUTPUT_FORMAT DXVA_Y216 = { &MEDIASUBTYPE_Y216, FCC('dxva'), 32 };
+static const VFormatDesc DXVA_YUY2 = GetVFormatDXVA(VFormat_YUY2);
+static const VFormatDesc DXVA_Y210 = GetVFormatDXVA(VFormat_Y210);
+static const VFormatDesc DXVA_Y216 = GetVFormatDXVA(VFormat_Y216);
 // 444 8/10/12 bit
-static const VIDEO_OUTPUT_FORMAT DXVA_AYUV = { &MEDIASUBTYPE_AYUV, FCC('dxva'), 32 };
-static const VIDEO_OUTPUT_FORMAT DXVA_Y410 = { &MEDIASUBTYPE_Y410, FCC('dxva'), 32 };
-static const VIDEO_OUTPUT_FORMAT DXVA_Y416 = { &MEDIASUBTYPE_Y416, FCC('dxva'), 64 };
+static const VFormatDesc DXVA_AYUV = GetVFormatDXVA(VFormat_AYUV);
+static const VFormatDesc DXVA_Y410 = GetVFormatDXVA(VFormat_Y410);
+static const VFormatDesc DXVA_Y416 = GetVFormatDXVA(VFormat_Y416);
 
 void CMPCVideoDecFilter::BuildOutputFormat()
 {
@@ -2680,15 +2678,13 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 	if (m_bUseFFmpeg) {
 		for (int i = 0; i < nSwCount; i++) {
 			const SW_OUT_FMT* swof = GetSWOF(nSwIndex[i]);
-			m_VideoOutputFormats.emplace_back(
-				VIDEO_OUTPUT_FORMAT{ swof->subtype, swof->biCompression, (WORD)swof->bpp }
-			);
+			m_VideoOutputFormats.emplace_back(swof->desc);
 		}
 	}
 	ASSERT(OutputCount == m_VideoOutputFormats.size());
 }
 
-void CMPCVideoDecFilter::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMAT** ppFormats)
+void CMPCVideoDecFilter::GetOutputFormats(int& nNumber, VFormatDesc** ppFormats)
 {
 	nNumber    = m_VideoOutputFormats.size();
 	*ppFormats = m_VideoOutputFormats.size() ? m_VideoOutputFormats.data() : nullptr;
@@ -4025,7 +4021,7 @@ HRESULT CMPCVideoDecFilter::ChangeOutputMediaFormat(int nType)
 			}
 		} else {
 			int nNumber;
-			VIDEO_OUTPUT_FORMAT* pFormats;
+			VFormatDesc* pFormats;
 			GetOutputFormats(nNumber, &pFormats);
 			for (int i = 0; i < nNumber * 2; i++) {
 				CMediaType mt;
@@ -4641,7 +4637,7 @@ STDMETHODIMP CMPCVideoDecFilter::SaveSettings()
 	profile.WriteInt(OPT_SECTION_VideoDec, OPT_SwRGBLevels, m_nSwRGBLevels);
 	for (int i = 0; i < PixFmt_count; i++) {
 		CString optname = OPT_SW_prefix;
-		optname += GetSWOF(i)->name;
+		optname += GetSWOF(i)->desc.name;
 		profile.WriteBool(OPT_SECTION_VideoDec, optname, m_fPixFmts[i]);
 	}
 #endif
@@ -4969,7 +4965,7 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 				case HwType::NVDEC:         infostr = L"NVDEC: ";           break;
 			}
 			if (const SW_OUT_FMT* swof = GetSWOF(m_FormatConverter.GetOutPixFormat())) {
-				infostr.AppendFormat(L"%s (%d-bit %s)", swof->name, swof->luma_bits, GetChromaSubsamplingStr(swof->av_pix_fmt));
+				infostr.AppendFormat(L"%s (%d-bit %s)", swof->desc.name, swof->desc.cdepth, GetChromaSubsamplingStr(swof->av_pix_fmt));
 			}
 			break;
 		case INFO_GraphicsAdapter:

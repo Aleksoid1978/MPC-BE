@@ -36,31 +36,33 @@ extern "C" {
 #pragma warning(pop)
 
 const SW_OUT_FMT s_sw_formats[] = {
-	//name         biCompression       subtype             bpp packsize planes            av_pix_fmt   chroma_w chroma_h actual_bpp luma_bits
+	//name             bpp planeWidth planeHeight  av_pix_fmt   chroma_w chroma_h
 	// YUV 8 bit
-	{L"NV12",      FCC('NV12'),      &MEDIASUBTYPE_NV12,      12, 1, 2, {1,1},   {1,2},   AV_PIX_FMT_NV12,        1, 1, 12,  8}, // PixFmt_NV12
-	{L"YV12",      FCC('YV12'),      &MEDIASUBTYPE_YV12,      12, 1, 3, {1,2,2}, {1,2,2}, AV_PIX_FMT_YUV420P,     1, 1, 12,  8}, // PixFmt_YV12
-	{L"YUY2",      FCC('YUY2'),      &MEDIASUBTYPE_YUY2,      16, 2, 0, {1},     {1},     AV_PIX_FMT_YUYV422,     1, 0, 16,  8}, // PixFmt_YUY2
-	{L"YV16",      FCC('YV16'),      &MEDIASUBTYPE_YV16,      16, 1, 3, {1,2,2}, {1,1,1}, AV_PIX_FMT_YUV422P,     1, 0, 16,  8}, // PixFmt_YV16
-	{L"AYUV",      FCC('AYUV'),      &MEDIASUBTYPE_AYUV,      32, 4, 0, {1},     {1},     AV_PIX_FMT_YUV444P,     0, 0, 24,  8}, // PixFmt_AYUV
-	{L"YV24",      FCC('YV24'),      &MEDIASUBTYPE_YV24,      24, 1, 3, {1,1,1}, {1,1,1}, AV_PIX_FMT_YUV444P,     0, 0, 24,  8}, // PixFmt_YV24
+	{ VFormat_NV12,      12, {1,1},   {1,2},   AV_PIX_FMT_NV12,        1, 1 }, // PixFmt_NV12
+	{ VFormat_YV12,      12, {1,2,2}, {1,2,2}, AV_PIX_FMT_YUV420P,     1, 1 }, // PixFmt_YV12
+	{ VFormat_YUY2,      16, {1},     {1},     AV_PIX_FMT_YUYV422,     1, 0 }, // PixFmt_YUY2
+	{ VFormat_YV16,      16, {1,2,2}, {1,1,1}, AV_PIX_FMT_YUV422P,     1, 0 }, // PixFmt_YV16
+	{ VFormat_AYUV,      32, {1},     {1},     AV_PIX_FMT_YUV444P,     0, 0 }, // PixFmt_AYUV
+	{ VFormat_YV24,      24, {1,1,1}, {1,1,1}, AV_PIX_FMT_YUV444P,     0, 0 }, // PixFmt_YV24
 	// YUV 10 bit
-	{L"P010",      FCC('P010'),      &MEDIASUBTYPE_P010,      24, 2, 2, {1,1},   {1,2},   AV_PIX_FMT_YUV420P16LE, 1, 1, 15, 10}, // PixFmt_P010
-	{L"P210",      FCC('P210'),      &MEDIASUBTYPE_P210,      32, 2, 2, {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 1, 0, 20, 10}, // PixFmt_P210
-	{L"Y410",      FCC('Y410'),      &MEDIASUBTYPE_Y410,      32, 4, 0, {1},     {1},     AV_PIX_FMT_YUV444P10LE, 0, 0, 30, 10}, // PixFmt_Y410
+	{ VFormat_P010,      24, {1,1},   {1,2},   AV_PIX_FMT_YUV420P16LE, 1, 1 }, // PixFmt_P010
+	{ VFormat_P210,      32, {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 1, 0 }, // PixFmt_P210
+	{ VFormat_Y410,      32, {1},     {1},     AV_PIX_FMT_YUV444P10LE, 0, 0 }, // PixFmt_Y410
 	// YUV 16 bit
-	{L"P016",      FCC('P016'),      &MEDIASUBTYPE_P016,      24, 2, 2, {1,1},   {1,2},   AV_PIX_FMT_YUV420P16LE, 1, 1, 24, 16}, // PixFmt_P016
-	{L"P216",      FCC('P216'),      &MEDIASUBTYPE_P216,      32, 2, 2, {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 1, 0, 32, 16}, // PixFmt_P216
-	{L"Y416",      FCC('Y416'),      &MEDIASUBTYPE_Y416,      64, 8, 0, {1},     {1},     AV_PIX_FMT_YUV444P16LE, 0, 0, 48, 16}, // PixFmt_Y416
-	{L"YUV444P16", FOURCC_YUV444P16, &MEDIASUBTYPE_YUV444P16, 48, 2, 3, {1,1,1}, {1,1,1}, AV_PIX_FMT_YUV444P16LE, 0, 0, 48, 16}, // PixFmt_YUV444P16
+	{ VFormat_P016,      24, {1,1},   {1,2},   AV_PIX_FMT_YUV420P16LE, 1, 1 }, // PixFmt_P016
+	{ VFormat_P216,      32, {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 1, 0 }, // PixFmt_P216
+	{ VFormat_Y416,      64, {1},     {1},     AV_PIX_FMT_YUV444P16LE, 0, 0 }, // PixFmt_Y416
+	{ VFormat_YUV444P16, 48, {1,1,1}, {1,1,1}, AV_PIX_FMT_YUV444P16LE, 0, 0 }, // PixFmt_YUV444P16
 	// RGB
-	{L"RGB32",     BI_RGB,           &MEDIASUBTYPE_RGB32,     32, 4, 0, {1},     {1},     AV_PIX_FMT_BGRA,        0, 0, 24,  8}, // PixFmt_RGB32
-	{L"RGB48",     FOURCC_RGB48,     &MEDIASUBTYPE_RGB48,     48, 6, 0, {1},     {1},     AV_PIX_FMT_RGB48LE,     0, 0, 48, 16}, // PixFmt_RGB48
+	{ VFormat_RGB32,     32, {1},     {1},     AV_PIX_FMT_BGRA,        0, 0 }, // PixFmt_RGB32
+	{ VFormat_RGB48,     48, {1},     {1},     AV_PIX_FMT_RGB48LE,     0, 0 }, // PixFmt_RGB48
 	// PS:
 	// AV_PIX_FMT_YUV444P not equal to AYUV, but is used as an intermediate format.
 	// AV_PIX_FMT_YUV420P16LE not equal to P010, but is used as an intermediate format.
 	// AV_PIX_FMT_YUV422P16LE not equal to P210, but is used as an intermediate format.
 };
+
+static_assert(std::size(s_sw_formats) == PixFmt_count);
 
 const SW_OUT_FMT* GetSWOF(int pixfmt)
 {
@@ -103,7 +105,7 @@ int GetLumaBits(AVPixelFormat av_pix_fmt)
 MPCPixelFormat GetPixFormat(GUID& subtype)
 {
 	for (int i = 0; i < PixFmt_count; i++) {
-		if (*s_sw_formats[i].subtype == subtype) {
+		if (*s_sw_formats[i].desc.subtype == subtype) {
 			return (MPCPixelFormat)i;
 		}
 	}
@@ -125,7 +127,7 @@ MPCPixelFormat GetPixFormat(AVPixelFormat av_pix_fmt)
 MPCPixelFormat GetPixFormat(DWORD biCompression)
 {
 	for (int i = 0; i < PixFmt_count; i++) {
-		if (s_sw_formats[i].biCompression == biCompression) {
+		if (s_sw_formats[i].desc.fourcc == biCompression) {
 			return (MPCPixelFormat)i;
 		}
 	}
@@ -531,11 +533,11 @@ bool CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 
 	uint8_t*  dstArray[4]       = { nullptr };
 	ptrdiff_t dstStrideArray[4] = { 0 };
-	ptrdiff_t byteStride        = outStride * swof.packsize;
+	ptrdiff_t byteStride        = outStride * swof.desc.packsize;
 
 	dstArray[0] = out;
 	dstStrideArray[0] = byteStride;
-	for (int i = 1; i < swof.planes; ++i) {
+	for (int i = 1; i < swof.desc.planes; ++i) {
 		dstArray[i] = dstArray[i - 1] + dstStrideArray[i - 1] * (m_planeHeight / swof.planeHeight[i - 1]);
 		dstStrideArray[i] = byteStride / swof.planeWidth[i];
 	}
@@ -551,9 +553,9 @@ bool CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		int line = 0;
 
 		// Copy first plane
-		const size_t widthBytes        = m_FProps.width * swof.packsize;
-		const ptrdiff_t srcStrideBytes = outStride * swof.packsize;
-		const ptrdiff_t dstStrideBytes = m_dstStride * swof.packsize;
+		const size_t widthBytes        = m_FProps.width * swof.desc.packsize;
+		const ptrdiff_t srcStrideBytes = outStride * swof.desc.packsize;
+		const ptrdiff_t dstStrideBytes = m_dstStride * swof.desc.packsize;
 		for (line = 0; line < m_FProps.height; ++line) {
 			memcpy(dst, out, widthBytes);
 			out += srcStrideBytes;
@@ -561,7 +563,7 @@ bool CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		}
 		dst += (m_planeHeight - m_FProps.height) * dstStrideBytes;
 
-		for (int plane = 1; plane < swof.planes; ++plane) {
+		for (int plane = 1; plane < swof.desc.planes; ++plane) {
 			const size_t planeWidth        = widthBytes      / swof.planeWidth[plane];
 			const int activePlaneHeight    = m_FProps.height / swof.planeHeight[plane];
 			const int totalPlaneHeight     = m_planeHeight   / swof.planeHeight[plane];
