@@ -22,14 +22,22 @@
 
 #include <moreuuids.h>
 
+enum ColorModel_t {
+	Cm_None,
+	Cm_RGB,
+	Cm_YUV420,
+	Cm_YUV422,
+	Cm_YUV444,
+};
+
 struct VFormatDesc {
-	const wchar_t*  name;
-	const GUID*     subtype;
-	DWORD           fourcc;
-	const int       packsize;
-	const int       planes;
-	const int       subsampling;
-	const int       cdepth;
+	const wchar_t*     name;
+	const GUID*        subtype;
+	DWORD              fourcc;
+	const ColorModel_t cmodel;
+	const int          packsize;
+	const int          planes;
+	const int          cdepth;
 
 	bool operator == (const struct VFormatDesc& fmt) const {
 		return (subtype == fmt.subtype && fourcc == fmt.fourcc);
@@ -38,11 +46,11 @@ struct VFormatDesc {
 	WORD GetBihBitCount() const { 
 		WORD bitCount = packsize * 8;
 		if (planes > 1) {
-			if (subsampling == 420) {
+			if (cmodel == Cm_YUV420) {
 				bitCount += packsize * 4;
-			} else if (subsampling == 422) {
+			} else if (cmodel == Cm_YUV422) {
 				bitCount *= 2;
-			} else if (subsampling == 444) {
+			} else if (cmodel == Cm_YUV444 || cmodel == Cm_RGB) {
 				bitCount *= 3;
 			}
 		}
@@ -56,27 +64,29 @@ constexpr VFormatDesc GetVFormatDXVA(VFormatDesc vfdesc)
 	return vfdesc;
 }
 
-constexpr VFormatDesc VFormat_YV12      = { L"YV12",      &MEDIASUBTYPE_YV12,      FCC('YV12'),                1, 3, 420,  8 };
-constexpr VFormatDesc VFormat_YV16      = { L"YV16",      &MEDIASUBTYPE_YV16,      FCC('YV16'),                1, 3, 422,  8 };
-constexpr VFormatDesc VFormat_YV24      = { L"YV24",      &MEDIASUBTYPE_YV24,      FCC('YV24'),                1, 3, 444,  8 };
+constexpr VFormatDesc VFormat_None      = { L"unknown",   &MEDIASUBTYPE_NULL,       0xFFFFFFFF,                Cm_None,   0, 0,  0 };
 
-constexpr VFormatDesc VFormat_IYUV      = { L"IYUV",      &MEDIASUBTYPE_IYUV,      FCC('IYUV'),                1, 3, 420,  8 };
-constexpr VFormatDesc VFormat_YUV444P16 = { L"YUV444P16", &MEDIASUBTYPE_YUV444P16, MAKEFOURCC('Y','3',0,16),   2, 3, 444, 16 };
+constexpr VFormatDesc VFormat_YV12      = { L"YV12",      &MEDIASUBTYPE_YV12,      FCC('YV12'),                Cm_YUV420, 1, 3,  8 };
+constexpr VFormatDesc VFormat_YV16      = { L"YV16",      &MEDIASUBTYPE_YV16,      FCC('YV16'),                Cm_YUV422, 1, 3,  8 };
+constexpr VFormatDesc VFormat_YV24      = { L"YV24",      &MEDIASUBTYPE_YV24,      FCC('YV24'),                Cm_YUV444, 1, 3,  8 };
 
-constexpr VFormatDesc VFormat_NV12      = { L"NV12",      &MEDIASUBTYPE_NV12,      FCC('NV12'),                1, 2, 420,  8 };
-constexpr VFormatDesc VFormat_P010      = { L"P010",      &MEDIASUBTYPE_P010,      FCC('P010'),                2, 2, 420, 10 };
-constexpr VFormatDesc VFormat_P016      = { L"P016",      &MEDIASUBTYPE_P016,      FCC('P016'),                2, 2, 420, 16 };
-constexpr VFormatDesc VFormat_P210      = { L"P210",      &MEDIASUBTYPE_P210,      FCC('P210'),                2, 2, 422, 10 };
-constexpr VFormatDesc VFormat_P216      = { L"P216",      &MEDIASUBTYPE_P216,      FCC('P216'),                2, 2, 422, 16 };
+constexpr VFormatDesc VFormat_IYUV      = { L"IYUV",      &MEDIASUBTYPE_IYUV,      FCC('IYUV'),                Cm_YUV420, 1, 3,  8 };
+constexpr VFormatDesc VFormat_YUV444P16 = { L"YUV444P16", &MEDIASUBTYPE_YUV444P16, MAKEFOURCC('Y','3',0,16),   Cm_YUV444, 2, 3, 16 };
 
-constexpr VFormatDesc VFormat_YUY2      = { L"YUY2",      &MEDIASUBTYPE_YUY2,      FCC('YUY2'),                2, 1, 422,  8 };
-constexpr VFormatDesc VFormat_Y210      = { L"Y210",      &MEDIASUBTYPE_Y210,      FCC('Y210'),                4, 1, 422, 10 };
-constexpr VFormatDesc VFormat_Y216      = { L"Y216",      &MEDIASUBTYPE_Y216,      FCC('Y216'),                4, 1, 422, 16 };
-constexpr VFormatDesc VFormat_AYUV      = { L"AYUV",      &MEDIASUBTYPE_AYUV,      FCC('AYUV'),                4, 1, 444,  8 };
-constexpr VFormatDesc VFormat_Y410      = { L"Y410",      &MEDIASUBTYPE_Y410,      FCC('Y410'),                4, 1, 444, 10 };
-constexpr VFormatDesc VFormat_Y416      = { L"Y416",      &MEDIASUBTYPE_Y416,      FCC('Y416'),                8, 1, 444, 16 };
+constexpr VFormatDesc VFormat_NV12      = { L"NV12",      &MEDIASUBTYPE_NV12,      FCC('NV12'),                Cm_YUV420, 1, 2,  8 };
+constexpr VFormatDesc VFormat_P010      = { L"P010",      &MEDIASUBTYPE_P010,      FCC('P010'),                Cm_YUV420, 2, 2, 10 };
+constexpr VFormatDesc VFormat_P016      = { L"P016",      &MEDIASUBTYPE_P016,      FCC('P016'),                Cm_YUV420, 2, 2, 16 };
+constexpr VFormatDesc VFormat_P210      = { L"P210",      &MEDIASUBTYPE_P210,      FCC('P210'),                Cm_YUV422, 2, 2, 10 };
+constexpr VFormatDesc VFormat_P216      = { L"P216",      &MEDIASUBTYPE_P216,      FCC('P216'),                Cm_YUV422, 2, 2, 16 };
 
-constexpr VFormatDesc VFormat_RGB24     = { L"RGB24",     &MEDIASUBTYPE_RGB24,     BI_RGB,                     3, 1, 444,  8 };
-constexpr VFormatDesc VFormat_RGB32     = { L"RGB32",     &MEDIASUBTYPE_RGB32,     BI_RGB,                     4, 1, 444,  8 };
-constexpr VFormatDesc VFormat_ARGB32    = { L"ARGB32",    &MEDIASUBTYPE_ARGB32,    BI_RGB,                     4, 1, 444,  8 };
-constexpr VFormatDesc VFormat_RGB48     = { L"RGB48",     &MEDIASUBTYPE_RGB48,     MAKEFOURCC('R','G','B',48), 6, 1, 444, 16 };
+constexpr VFormatDesc VFormat_YUY2      = { L"YUY2",      &MEDIASUBTYPE_YUY2,      FCC('YUY2'),                Cm_YUV422, 2, 1,  8 };
+constexpr VFormatDesc VFormat_Y210      = { L"Y210",      &MEDIASUBTYPE_Y210,      FCC('Y210'),                Cm_YUV422, 4, 1, 10 };
+constexpr VFormatDesc VFormat_Y216      = { L"Y216",      &MEDIASUBTYPE_Y216,      FCC('Y216'),                Cm_YUV422, 4, 1, 16 };
+constexpr VFormatDesc VFormat_AYUV      = { L"AYUV",      &MEDIASUBTYPE_AYUV,      FCC('AYUV'),                Cm_YUV444, 4, 1,  8 };
+constexpr VFormatDesc VFormat_Y410      = { L"Y410",      &MEDIASUBTYPE_Y410,      FCC('Y410'),                Cm_YUV444, 4, 1, 10 };
+constexpr VFormatDesc VFormat_Y416      = { L"Y416",      &MEDIASUBTYPE_Y416,      FCC('Y416'),                Cm_YUV444, 8, 1, 16 };
+
+constexpr VFormatDesc VFormat_RGB24     = { L"RGB24",     &MEDIASUBTYPE_RGB24,     BI_RGB,                     Cm_RGB,    3, 1,  8 };
+constexpr VFormatDesc VFormat_RGB32     = { L"RGB32",     &MEDIASUBTYPE_RGB32,     BI_RGB,                     Cm_RGB,    4, 1,  8 };
+constexpr VFormatDesc VFormat_ARGB32    = { L"ARGB32",    &MEDIASUBTYPE_ARGB32,    BI_RGB,                     Cm_RGB,    4, 1,  8 };
+constexpr VFormatDesc VFormat_RGB48     = { L"RGB48",     &MEDIASUBTYPE_RGB48,     MAKEFOURCC('R','G','B',48), Cm_RGB,    6, 1, 16 };
