@@ -1153,7 +1153,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 		for (int i = 0; i < PixFmt_count; i++) {
 			CString optname = OPT_SW_prefix;
-			optname += GetSWOF(i)->name;
+			optname += GetSWOF(i)->desc.name;
 			if (ERROR_SUCCESS == key.QueryDWORDValue(optname, dw)) {
 				m_fPixFmts[i] = !!dw;
 			}
@@ -4606,7 +4606,7 @@ STDMETHODIMP CMPCVideoDecFilter::SaveSettings()
 
 		for (int i = 0; i < PixFmt_count; i++) {
 			CString optname = OPT_SW_prefix;
-			optname += GetSWOF(i)->name;
+			optname += GetSWOF(i)->desc.name;
 			key.SetDWORDValue(optname, m_fPixFmts[i]);
 		}
 		key.SetDWORDValue(OPT_SwConvertToRGB, m_bSwConvertToRGB);
