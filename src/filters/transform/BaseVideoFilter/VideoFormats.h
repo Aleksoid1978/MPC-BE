@@ -56,6 +56,10 @@ struct VFormatDesc {
 		}
 		return bitCount;
 	}
+
+	int GetWidthBytes(int width) const {
+		return (width * packsize + 3) & ~3;
+	}
 };
 
 constexpr VFormatDesc GetVFormatDXVA(VFormatDesc vfdesc)
