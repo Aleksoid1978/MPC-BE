@@ -5,6 +5,9 @@
 AudioSplitter
 Added support for the RF64 format.
 
+MP4Splitter
+Improved handling of corrupted files.
+
 Player
 The HTTP read strategy has been changed.
 If the playlist contains one entry, more key combinations can be used to control the player (jump through chapters, adjust volume).
