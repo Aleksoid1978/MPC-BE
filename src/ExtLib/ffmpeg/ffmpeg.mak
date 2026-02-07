@@ -588,6 +588,7 @@ SRCS_LC_B = \
 	libavcodec/opus/dec.c \
 	libavcodec/opus/dec_celt.c \
 	libavcodec/opus/dsp.c \
+	libavcodec/opus/frame_duration_tab.c \
 	libavcodec/opus/parse.c \
 	libavcodec/opus/parser.c \
 	libavcodec/opus/pvq.c \
