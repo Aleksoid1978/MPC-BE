@@ -399,6 +399,9 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('MPNG'):
 					mt.subtype = MEDIASUBTYPE_PNG;
 					break;
+				case FCC('y408'):
+					mt.subtype = MEDIASUBTYPE_LAV_RAWVIDEO;
+					break;
 				case FCC('DXSB'):
 				case FCC('DXSA'):
 					label = L"XSub";
