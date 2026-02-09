@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -396,6 +396,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					case FCC('MPNG'):
 						mt.subtype = MEDIASUBTYPE_PNG;
 						mt.SetTemporalCompression(FALSE);
+						break;
+					case FCC('y408'):
+						mt.subtype = MEDIASUBTYPE_LAV_RAWVIDEO;
 						break;
 					default:
 						mt.subtype = FOURCCMap(pvih->bmiHeader.biCompression);
