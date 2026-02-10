@@ -188,6 +188,11 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         return AP4_ERROR_INVALID_FORMAT;
     }
 
+    if (size == 0) {
+        stream.Seek(start);
+        return AP4_ERROR_INVALID_FORMAT;
+    }
+
     // create the atom
     switch (type) {
         case AP4_ATOM_TYPE_MOOV:
