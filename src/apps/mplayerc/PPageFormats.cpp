@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,7 +23,6 @@
 #include "Misc.h"
 #include "DSUtil/FileHandle.h"
 #include "DSUtil/SysVersion.h"
-#include <psapi.h>
 #include <HighDPI.h>
 #include "PPageFormats.h"
 #include "SvgHelper.h"

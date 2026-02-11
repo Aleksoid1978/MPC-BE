@@ -27,7 +27,6 @@
 #include "MainFrm.h"
 #include "Misc.h"
 #include <winternl.h>
-#include <psapi.h>
 #include "Ifo.h"
 #include "MultiMonitor.h"
 #include "DSUtil/SysVersion.h"
@@ -631,7 +630,7 @@ typedef struct _SECTION_BASIC_INFORMATION {
 NTSTATUS(STDMETHODCALLTYPE* Real_NtMapViewOfSection)(HANDLE, HANDLE, PVOID, ULONG_PTR, SIZE_T, PLARGE_INTEGER, PSIZE_T, SECTION_INHERIT, ULONG, ULONG) = nullptr;
 NTSTATUS(STDMETHODCALLTYPE* Real_NtUnmapViewOfSection)(HANDLE, PVOID) = nullptr;
 NTSTATUS(STDMETHODCALLTYPE* Real_NtQuerySection)(HANDLE, SECTION_INFORMATION_CLASS, PVOID, SIZE_T, PSIZE_T) = nullptr;
-DWORD(STDMETHODCALLTYPE* Real_GetMappedFileNameW)(HANDLE, LPVOID, LPWSTR, DWORD) = nullptr;
+DWORD(STDMETHODCALLTYPE* Real_K32GetMappedFileNameW)(HANDLE, LPVOID, LPWSTR, DWORD) = nullptr;
 
 NTSTATUS STDMETHODCALLTYPE Mine_NtMapViewOfSection(HANDLE SectionHandle, HANDLE ProcessHandle, PVOID* BaseAddress, ULONG_PTR ZeroBits, SIZE_T CommitSize,
 	PLARGE_INTEGER SectionOffset, PSIZE_T ViewSize, SECTION_INHERIT InheritDisposition, ULONG AllocationType, ULONG Win32Protect)
@@ -658,8 +657,7 @@ NTSTATUS STDMETHODCALLTYPE Mine_NtMapViewOfSection(HANDLE SectionHandle, HANDLE 
 
 	// Get the actual filename if possible
 	wchar_t fileName[MAX_PATH];
-	// ToDo: switch to PSAPI_VERSION=2 and directly use K32GetMappedFileNameW ?
-	if (Real_GetMappedFileNameW(ProcessHandle, *BaseAddress, fileName, _countof(fileName)) == 0)
+	if (Real_K32GetMappedFileNameW(ProcessHandle, *BaseAddress, fileName, std::size(fileName)) == 0)
 		return ret;
 
 	if (IsBlockedModule(fileName)) {
@@ -882,12 +880,12 @@ BOOL CMPlayerCApp::InitInstance()
 			DetourAttach(&(PVOID&)Real_NtQueryInformationProcess, (PVOID)Mine_NtQueryInformationProcess);
 		}
 
-		Real_NtMapViewOfSection   = (decltype(Real_NtMapViewOfSection))GetProcAddress(hNTDLL, "NtMapViewOfSection");
-		Real_NtUnmapViewOfSection = (decltype(Real_NtUnmapViewOfSection))GetProcAddress(hNTDLL, "NtUnmapViewOfSection");
-		Real_NtQuerySection       = (decltype(Real_NtQuerySection))GetProcAddress(hNTDLL, "NtQuerySection");
-		Real_GetMappedFileNameW   = (decltype(Real_GetMappedFileNameW))GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "K32GetMappedFileNameW");
+		Real_NtMapViewOfSection    = (decltype(Real_NtMapViewOfSection))GetProcAddress(hNTDLL, "NtMapViewOfSection");
+		Real_NtUnmapViewOfSection  = (decltype(Real_NtUnmapViewOfSection))GetProcAddress(hNTDLL, "NtUnmapViewOfSection");
+		Real_NtQuerySection        = (decltype(Real_NtQuerySection))GetProcAddress(hNTDLL, "NtQuerySection");
+		Real_K32GetMappedFileNameW = (decltype(Real_K32GetMappedFileNameW))GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "K32GetMappedFileNameW");
 
-		if (Real_NtMapViewOfSection && Real_NtUnmapViewOfSection && Real_NtQuerySection && Real_GetMappedFileNameW) {
+		if (Real_NtMapViewOfSection && Real_NtUnmapViewOfSection && Real_NtQuerySection && Real_K32GetMappedFileNameW) {
 			DetourAttach(&(PVOID&)Real_NtMapViewOfSection, (PVOID)Mine_NtMapViewOfSection);
 		}
 	}
