@@ -2827,15 +2827,20 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 {
 	CAutoLock cAutoLock(this);
 
-	HRESULT hr;
+	CLSID clsid = GetCLSID(pBF);
 
-	if (FAILED(hr = __super::AddFilter(pBF, pName))) {
+	if (clsid == CLSID_AVIDec/* || clsid == CLSID_ACMWrapper*/) {
+		AfxGetMyApp()->HookModuleLoading();
+	}
+
+	HRESULT hr = __super::AddFilter(pBF, pName);
+	if (FAILED(hr)) {
 		return hr;
 	}
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	if (GetCLSID(pBF) == CLSID_DMOWrapperFilter) {
+	if (clsid == CLSID_DMOWrapperFilter) {
 		if (CComQIPtr<IPropertyBag> pPB = pBF) {
 			CComVariant var(true);
 			pPB->Write(CComBSTR(L"_HIRESOUTPUT"), &var);

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -50,6 +50,8 @@ class CMPlayerCApp : public CModApp
 {
 private:
 	ATL::CMutex m_mutexOneInstance;
+
+	HMODULE m_hNTDLL = nullptr;
 
 	std::list<CString> m_cmdln;
 	void PreProcessCommandLine();
@@ -101,7 +103,8 @@ public:
 	void			ExportSettings();
 	bool			GetAppSavePath(CString& path);
 
-public:
+	void HookModuleLoading();
+	
 	virtual BOOL InitInstance();
 	virtual int ExitInstance();
 

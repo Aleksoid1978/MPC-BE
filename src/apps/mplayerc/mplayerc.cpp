@@ -176,6 +176,10 @@ CMPlayerCApp::CMPlayerCApp()
 
 CMPlayerCApp::~CMPlayerCApp()
 {
+	if (m_hNTDLL) {
+		FreeLibrary(m_hNTDLL);
+	}
+
 	// Wait for any pending I/O operations to be canceled
 	while (WAIT_IO_COMPLETION == SleepEx(0, TRUE));
 }
@@ -668,7 +672,6 @@ NTSTATUS STDMETHODCALLTYPE Mine_NtMapViewOfSection(HANDLE SectionHandle, HANDLE 
 	return ret;
 }
 
-
 LONG WINAPI Mine_ChangeDisplaySettingsEx(LONG ret, DWORD dwFlags, LPVOID lParam)
 {
 	if (dwFlags & CDS_VIDEOPARAMETERS) {
@@ -807,6 +810,26 @@ MMRESULT WINAPI Mine_mixerSetControlDetails(HMIXEROBJ hmxobj, LPMIXERCONTROLDETA
 	return Real_mixerSetControlDetails(hmxobj, pmxcd, fdwDetails);
 }
 
+void CMPlayerCApp::HookModuleLoading()
+{
+	if (m_hNTDLL && !Real_NtMapViewOfSection) {
+		Real_NtQueryInformationProcess = (decltype(Real_NtQueryInformationProcess))GetProcAddress(m_hNTDLL, "NtQueryInformationProcess");
+
+		if (Real_NtQueryInformationProcess) {
+			DetourAttach(&(PVOID&)Real_NtQueryInformationProcess, (PVOID)Mine_NtQueryInformationProcess);
+		}
+
+		Real_NtMapViewOfSection = (decltype(Real_NtMapViewOfSection))GetProcAddress(m_hNTDLL, "NtMapViewOfSection");
+		Real_NtUnmapViewOfSection = (decltype(Real_NtUnmapViewOfSection))GetProcAddress(m_hNTDLL, "NtUnmapViewOfSection");
+		Real_NtQuerySection = (decltype(Real_NtQuerySection))GetProcAddress(m_hNTDLL, "NtQuerySection");
+		Real_K32GetMappedFileNameW = (decltype(Real_K32GetMappedFileNameW))GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "K32GetMappedFileNameW");
+
+		if (Real_NtMapViewOfSection && Real_NtUnmapViewOfSection && Real_NtQuerySection && Real_K32GetMappedFileNameW) {
+			DetourAttach(&(PVOID&)Real_NtMapViewOfSection, (PVOID)Mine_NtMapViewOfSection);
+		}
+	}
+}
+
 static BOOL SetHeapOptions()
 {
 	HMODULE hLib = LoadLibraryW(L"kernel32.dll");
@@ -860,12 +883,12 @@ BOOL CMPlayerCApp::InitInstance()
 	DetourAttach(&(PVOID&)Real_mixerSetControlDetails, (PVOID)Mine_mixerSetControlDetails);
 	DetourAttach(&(PVOID&)Real_DeviceIoControl, (PVOID)Mine_DeviceIoControl);
 
-	HMODULE hNTDLL = LoadLibraryW(L"ntdll.dll");
+	m_hNTDLL = LoadLibraryW(L"ntdll.dll");
 
 #if 0
 #ifndef _DEBUG // Disable NtQueryInformationProcess in debug (prevent VS debugger to stop on crash address)
-	if (hNTDLL) {
-		Real_NtQueryInformationProcess = (decltype(Real_NtQueryInformationProcess))GetProcAddress (hNTDLL, "NtQueryInformationProcess");
+	if (m_hNTDLL) {
+		Real_NtQueryInformationProcess = (decltype(Real_NtQueryInformationProcess))GetProcAddress (m_hNTDLL, "NtQueryInformationProcess");
 
 		if (Real_NtQueryInformationProcess) {
 			DetourAttach(&(PVOID&)Real_NtQueryInformationProcess, (PVOID)Mine_NtQueryInformationProcess);
@@ -873,22 +896,7 @@ BOOL CMPlayerCApp::InitInstance()
 	}
 #endif
 #endif
-	if (hNTDLL) {
-		Real_NtQueryInformationProcess = (decltype(Real_NtQueryInformationProcess))GetProcAddress(hNTDLL, "NtQueryInformationProcess");
 
-		if (Real_NtQueryInformationProcess) {
-			DetourAttach(&(PVOID&)Real_NtQueryInformationProcess, (PVOID)Mine_NtQueryInformationProcess);
-		}
-
-		Real_NtMapViewOfSection    = (decltype(Real_NtMapViewOfSection))GetProcAddress(hNTDLL, "NtMapViewOfSection");
-		Real_NtUnmapViewOfSection  = (decltype(Real_NtUnmapViewOfSection))GetProcAddress(hNTDLL, "NtUnmapViewOfSection");
-		Real_NtQuerySection        = (decltype(Real_NtQuerySection))GetProcAddress(hNTDLL, "NtQuerySection");
-		Real_K32GetMappedFileNameW = (decltype(Real_K32GetMappedFileNameW))GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "K32GetMappedFileNameW");
-
-		if (Real_NtMapViewOfSection && Real_NtUnmapViewOfSection && Real_NtQuerySection && Real_K32GetMappedFileNameW) {
-			DetourAttach(&(PVOID&)Real_NtMapViewOfSection, (PVOID)Mine_NtMapViewOfSection);
-		}
-	}
 
 	CFilterMapper2::Init();
 
@@ -1189,9 +1197,9 @@ BOOL CMPlayerCApp::InitInstance()
 	pFrame->SetFocus();
 
 	// set HIGH I/O Priority for better playback perfomance
-	if (hNTDLL) {
+	if (m_hNTDLL) {
 		typedef NTSTATUS (WINAPI *FUNC_NTSETINFORMATIONPROCESS)(HANDLE, ULONG, PVOID, ULONG);
-		FUNC_NTSETINFORMATIONPROCESS NtSetInformationProcess = (FUNC_NTSETINFORMATIONPROCESS)GetProcAddress(hNTDLL, "NtSetInformationProcess");
+		FUNC_NTSETINFORMATIONPROCESS NtSetInformationProcess = (FUNC_NTSETINFORMATIONPROCESS)GetProcAddress(m_hNTDLL, "NtSetInformationProcess");
 
 		if (NtSetInformationProcess && SetPrivilege(SE_INC_BASE_PRIORITY_NAME)) {
 			ULONG IoPriority = 3;
@@ -1199,9 +1207,6 @@ BOOL CMPlayerCApp::InitInstance()
 			NTSTATUS NtStatus = NtSetInformationProcess(GetCurrentProcess(), ProcessIoPriority, &IoPriority, sizeof(ULONG));
 			DLog(L"Set I/O Priority - %d", NtStatus);
 		}
-
-		FreeLibrary(hNTDLL);
-		hNTDLL = nullptr;
 	}
 
 	m_mutexOneInstance.Release();
