@@ -1,5 +1,5 @@
 /*
- * (C) 2020 see Authors.txt
+ * (C) 2020-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,10 +21,6 @@
 #include "stdafx.h"
 #include <cassert>
 #include "PixelUtils_AviSynth.h"
-
-#ifndef __SSE2__
-#define __SSE2__ 0
-#endif
 
 // https://github.com/AviSynth/AviSynthPlus/blob/master/avs_core/include/avisynth.h
 // commit e2c86d843a4350dee6b830d4e7e4c7607b6b4a2c on 2020-06-15
@@ -455,7 +451,6 @@ void convert_yv12_to_yuy2_progressive_isse(const BYTE* srcY, const BYTE* srcU, c
 }
 #endif
 
-#ifdef __SSE2__
 //75% of the first argument and 25% of the second one.
 static AVS_FORCEINLINE __m128i convert_yv12_to_yuy2_merge_chroma_sse2(const __m128i &line75p, const __m128i &line25p, const __m128i &one) {
   __m128i avg_chroma_lo = _mm_avg_epu8(line75p, line25p);
@@ -646,7 +641,6 @@ void convert_yv12_to_yuy2_progressive_sse2(const BYTE* srcY, const BYTE* srcU, c
     srcV += src_pitch_uv;
   }
 }
-#endif
 
 // end code from AviSynthPlus/avs_core/convert/intel/convert_yv12_sse.cpp
 
@@ -655,15 +649,12 @@ void convert_yv12_to_yuy2_progressive_sse2(const BYTE* srcY, const BYTE* srcU, c
 
 void convert_yuv420p_to_yuy2(const BYTE* srcY, const BYTE* srcU, const BYTE* srcV, int src_width, int src_pitch_y, int src_pitch_uv, BYTE *dstp, int dst_pitch, int height, bool interlaced)
 {
-	const bool bPtrsAligned = IsPtrAligned(srcY, 16) && IsPtrAligned(srcU, 16) && IsPtrAligned(srcV, 16);
+	const bool bPtrsAligned = IsPtrAligned(srcY, 16) && IsPtrAligned(dstp, 16);
 
 	if (interlaced) {
-#if __SSE2__
 		if (bPtrsAligned) {
 			convert_yv12_to_yuy2_interlaced_sse2(srcY, srcU, srcV, src_width, src_pitch_y, src_pitch_uv, dstp, dst_pitch, height);
-		} else
-#endif
-		{
+		} else {
 #ifdef X86_32
 			convert_yv12_to_yuy2_interlaced_isse(srcY, srcU, srcV, src_width, src_pitch_y, src_pitch_uv, dstp, dst_pitch, height);
 #else
@@ -671,12 +662,9 @@ void convert_yuv420p_to_yuy2(const BYTE* srcY, const BYTE* srcU, const BYTE* src
 #endif
 		}
 	} else {
-#if __SSE2__
 		if (bPtrsAligned) {
 			convert_yv12_to_yuy2_progressive_sse2(srcY, srcU, srcV, src_width, src_pitch_y, src_pitch_uv, dstp, dst_pitch, height);
-		} else
-#endif
-		{
+		} else {
 #ifdef X86_32
 			convert_yv12_to_yuy2_progressive_isse(srcY, srcU, srcV, src_width, src_pitch_y, src_pitch_uv, dstp, dst_pitch, height);
 #else
