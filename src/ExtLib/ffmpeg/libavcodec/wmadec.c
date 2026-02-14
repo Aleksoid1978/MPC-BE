@@ -140,7 +140,7 @@ static av_cold int wma_decode_init(AVCodecContext *avctx)
 
     avctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
 
-    avctx->internal->skip_samples = s->frame_len * 2;
+    avctx->delay = s->frame_len * 2;
 
     return 0;
 }
@@ -1023,7 +1023,6 @@ const FFCodec ff_wmav1_decoder = {
     FF_CODEC_DECODE_CB(wma_decode_superframe),
     .flush          = flush,
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
-    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_FLTP),
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };
 #endif
@@ -1039,7 +1038,6 @@ const FFCodec ff_wmav2_decoder = {
     FF_CODEC_DECODE_CB(wma_decode_superframe),
     .flush          = flush,
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY,
-    CODEC_SAMPLEFMTS(AV_SAMPLE_FMT_FLTP),
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };
 #endif
