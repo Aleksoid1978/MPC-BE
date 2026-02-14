@@ -144,7 +144,6 @@
     <ClInclude Include="MSDKDecoder\growarray.h" />
     <ClInclude Include="MSDKDecoder\MSDKDecoder.h" />
     <ClInclude Include="pixconv\pixconv_internal.h" />
-    <ClInclude Include="pixconv\pixconv_sse2_templates.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>

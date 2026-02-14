@@ -125,9 +125,6 @@
     <ClInclude Include="MSDKDecoder\MSDKDecoder.h">
       <Filter>MSDKDecoder</Filter>
     </ClInclude>
-    <ClInclude Include="pixconv\pixconv_sse2_templates.h">
-      <Filter>pixconv</Filter>
-    </ClInclude>
     <ClInclude Include="pixconv\pixconv_internal.h">
       <Filter>pixconv</Filter>
     </ClInclude>
