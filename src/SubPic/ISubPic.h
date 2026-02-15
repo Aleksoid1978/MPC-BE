@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,9 +37,13 @@ inline bool g_bForcedSubtitle = false;
 
 #pragma pack(push, 1)
 struct SubPicDesc {
-	int type = 0;
-	int w = 0, h = 0, bpp = 0, pitch = 0, pitchUV = 0;
-	BYTE* bits = nullptr;
+	int type    = 0;
+	int w       = 0;
+	int h       = 0;
+	int bpp     = 0;
+	int pitch   = 0;
+	int pitchUV = 0;
+	BYTE* bits  = nullptr;
 	BYTE* bitsU = nullptr;
 	BYTE* bitsV = nullptr;
 	RECT vidrect{}; // video rectangle

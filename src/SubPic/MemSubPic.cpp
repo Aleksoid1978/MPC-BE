@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,6 +31,9 @@
 CMemSubPic::CMemSubPic(SubPicDesc& spd)
 	: m_spd(spd)
 {
+	ASSERT(m_spd.type == 0 && m_spd.bpp == 32);
+	ASSERT(!m_spd.pitchUV && !m_spd.bitsU && !m_spd.bitsV);
+
 	m_maxsize.SetSize(spd.w, spd.h);
 	m_rcDirty.SetRect(0, 0, spd.w, spd.h);
 }
