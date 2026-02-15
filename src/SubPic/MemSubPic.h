@@ -23,6 +23,29 @@
 
 #include "SubPicImpl.h"
 
+enum {
+	MSP_RGB32 = 0,
+	MSP_RGB24,
+	MSP_RGB16,
+	MSP_RGB15,
+	MSP_YUY2,
+	MSP_YV12,
+	MSP_IYUV,
+	MSP_AYUV,
+	MSP_RGBA,        //pre-multiplied alpha. Use A*g + RGB to mix
+	MSP_RGBA_F,      //pre-multiplied alpha. Use (0xff-A)*g + RGB to mix
+	MSP_AYUV_PLANAR, //AYUV in planar form
+	MSP_XY_AUYV,
+	MSP_P010,
+	MSP_P016,
+	MSP_NV12,
+	MSP_NV21,
+	MSP_P210, // 4:2:2 10 bits
+	MSP_P216, // 4:2:2 16 bits
+	MSP_YV16, // 4:2:2 8 bits
+	MSP_YV24  // 4:4:4 8 bits
+};
+
 // CMemSubPic
 
 // only RGB32 is supported
@@ -49,15 +72,15 @@ public:
 
 // CMemSubPicAllocator
 
+// only RGB32 is supported
 class CMemSubPicAllocator : public CSubPicAllocatorImpl
 {
 protected:
-	const int m_type;
 	CSize m_maxsize;
 
 	// CSubPicAllocatorImpl
 	bool Alloc(bool fStatic, ISubPic** ppSubPic) override;
 
 public:
-	CMemSubPicAllocator(int type, SIZE maxsize);
+	CMemSubPicAllocator(SIZE maxsize);
 };

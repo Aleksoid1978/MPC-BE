@@ -31,7 +31,7 @@
 CMemSubPic::CMemSubPic(SubPicDesc& spd)
 	: m_spd(spd)
 {
-	ASSERT(m_spd.type == 0 && m_spd.bpp == 32);
+	ASSERT(m_spd.type == MSP_RGB32 && m_spd.bpp == 32);
 	ASSERT(!m_spd.pitchUV && !m_spd.bitsU && !m_spd.bitsV);
 
 	m_maxsize.SetSize(spd.w, spd.h);
@@ -77,7 +77,7 @@ STDMETHODIMP CMemSubPic::CopyTo(ISubPic* pSubPic)
 		return E_FAIL;
 	}
 
-	ASSERT(src.bpp == 32 && dst.bpp == 32);
+	ASSERT(dst.type == MSP_RGB32 && dst.bpp == 32);
 
 	const UINT copyW_bytes = m_rcDirty.Width() * 4;
 	UINT copyH = m_rcDirty.Height();
@@ -99,8 +99,6 @@ STDMETHODIMP CMemSubPic::ClearDirtyRect()
 	if (m_rcDirty.IsRectEmpty()) {
 		return S_FALSE;
 	}
-
-	ASSERT(m_spd.bpp == 32);
 
 	BYTE* ptr = m_spd.bits + m_spd.pitch * m_rcDirty.top + m_rcDirty.left * 4;
 	const UINT dirtyW = m_rcDirty.Width();
@@ -139,6 +137,8 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	const SubPicDesc& src = m_spd;
 	SubPicDesc dst = *pTarget;
 
+	ASSERT(dst.type == MSP_RGB32 && dst.bpp == 32);
+
 	if (src.type != dst.type) {
 		return E_INVALIDARG;
 	}
@@ -154,8 +154,6 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	if (rs.Width() != rd.Width() || rs.Height() != abs(rd.Height())) {
 		return E_INVALIDARG;
 	}
-
-	ASSERT(src.bpp == 32 && dst.bpp == 32);
 
 	const int w = rs.Width();
 	const int h = rs.Height();
@@ -197,9 +195,8 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 // CMemSubPicAllocator
 //
 
-CMemSubPicAllocator::CMemSubPicAllocator(int type, SIZE maxsize)
+CMemSubPicAllocator::CMemSubPicAllocator(SIZE maxsize)
 	: CSubPicAllocatorImpl(maxsize, false)
-	, m_type(type)
 	, m_maxsize(maxsize)
 {
 }
@@ -217,7 +214,7 @@ bool CMemSubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 	spd.h     = m_maxsize.cy;
 	spd.bpp   = 32;
 	spd.pitch = spd.w * 4;
-	spd.type  = m_type;
+	spd.type  = MSP_RGB32;
 	spd.bits  = new(std::nothrow) BYTE[spd.pitch * spd.h];
 	if (!spd.bits) {
 		return false;
