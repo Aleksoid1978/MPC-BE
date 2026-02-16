@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2024 see Authors.txt
+ * (C) 2020-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,16 +25,16 @@
 
 #include "pixconv/yuv420_nv12_unscaled.h"
 
-void CopyPlane(const UINT h, BYTE* dst, UINT dst_pitch, const BYTE* src, UINT src_pitch)
+void CopyPlane(const UINT lines, BYTE* dst, UINT dst_pitch, const BYTE* src, UINT src_pitch)
 {
 	if (dst_pitch == src_pitch) {
-		memcpy(dst, src, dst_pitch * h);
+		memcpy(dst, src, dst_pitch * lines);
 		return;
 	}
 
 	const UINT linesize = std::min(src_pitch, dst_pitch);
 
-	for (UINT y = 0; y < h; ++y) {
+	for (UINT y = 0; y < lines; ++y) {
 		memcpy(dst, src, linesize);
 		src += src_pitch;
 		dst += dst_pitch;
