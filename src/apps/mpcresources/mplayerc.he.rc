@@ -1097,7 +1097,7 @@ BEGIN
     EDITTEXT        IDC_EDIT2,64,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "Default",IDC_BUTTON1,158,17,56,14
-    CONTROL         "Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist",IDC_CHECK7,
+    CONTROL         "Disable 'search in folder' on 'Previous/Next' when playlist has only one item",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,280,18
     CONTROL         "Prevent from MINIMIZE when Fullscreen on non default monitor",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9

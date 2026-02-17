@@ -347,7 +347,7 @@ END
 BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 5		"Jump distances (small, medium, large in ms)"
 9		"Default"
-10		"Don't use 'search in folder' on commands 'Skip back/forward' when only one item in playlist"
+10		"Disable 'search in folder' on 'Previous/Next' when playlist has only one item"
 12		"Prevent from MINIMIZE when Fullscreen on non default monitor"
 14		"Auto-hide the pointer during playback in windowed mode"
 16		"Show zero hours in status bar and OSD"
