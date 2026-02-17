@@ -347,7 +347,7 @@ END
 BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 5		"ジャンプ間隔 (小、中、大: ミリ秒単位)"
 9		"既定"
-10		"プレイリスト登録が 1 項目の時は「フォルダー内検索」の「前へ/次へ」を使用しない"
+10		"プレイリスト登録が 1 項目の時は「前へ/次へ」での「フォルダー内検索」を無効にする"
 12		"既定のモニター以外では全画面表示で 最小化 を禁止する"
 14		"ウィンドウ モードで再生中にポインターを自動で隠す"
 16		"ステータス バーと OSD にゼロ時間を表示する"
@@ -2123,3 +2123,4 @@ STRING ID_SHOW_MILLISECONDS		"ミリ秒を表示"
 STRING ID_VOLUME_MUTE		"ミュート\nミュート"
 STRING ID_VOLUME_MUTE_DISABLED		"音声なし\n音声なし"
 STRING ID_VOLUME_MUTE_OFF		"ミュート解除\nミュート解除"
+
