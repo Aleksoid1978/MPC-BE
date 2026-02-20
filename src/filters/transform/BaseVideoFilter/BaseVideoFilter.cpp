@@ -328,14 +328,14 @@ HRESULT CBaseVideoFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_
 
 HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 {
-	VFormatDesc* fmts;
+	VFormatDesc* vfmts;
 	int                  nFormatCount;
 
 	if (m_pInput->IsConnected() == FALSE) {
 		return E_UNEXPECTED;
 	}
 
-	GetOutputFormats(nFormatCount, &fmts);
+	GetOutputFormats(nFormatCount, &vfmts);
 	if (iPosition < 0) {
 		return E_INVALIDARG;
 	}
@@ -343,8 +343,10 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 		return VFW_S_NO_MORE_ITEMS;
 	}
 
+	const auto& vfmt = vfmts[iPosition];
+
 	pmt->majortype = MEDIATYPE_Video;
-	pmt->subtype   = *fmts[iPosition].subtype;
+	pmt->subtype   = *vfmt.subtype;
 
 	int w = m_win;
 	int h = m_hin;
@@ -371,10 +373,10 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	BITMAPINFOHEADER bihOut = { 0 };
 	bihOut.biSize        = sizeof(bihOut);
 	bihOut.biWidth       = w;
-	bihOut.biHeight      = h;
+	bihOut.biHeight      = vfmt.fourcc == BI_RGB ? -h : h; // top-down bitmap
 	bihOut.biPlanes      = 1; // this value must be set to 1
-	bihOut.biBitCount    = fmts[iPosition].GetBihBitCount();
-	bihOut.biCompression = fmts[iPosition].fourcc;
+	bihOut.biBitCount    = vfmt.GetBihBitCount();
+	bihOut.biCompression = vfmt.fourcc;
 	bihOut.biSizeImage   = DIBSIZE(bihOut);
 
 	pmt->formattype = FORMAT_VideoInfo2;
