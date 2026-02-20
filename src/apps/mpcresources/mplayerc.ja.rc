@@ -1097,7 +1097,7 @@ BEGIN
     EDITTEXT        IDC_EDIT2,64,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "既定",IDC_BUTTON1,158,17,56,14
-    CONTROL         "プレイリスト登録が 1 項目の時は「フォルダー内検索」の「前へ/次へ」を使用しない",IDC_CHECK7,
+    CONTROL         "プレイリストが 1 項目のみの場合、「前へ/次へ」での「フォルダー内検索」を無効にする",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,280,18
     CONTROL         "既定のモニター以外では全画面表示で 最小化 を禁止する",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
