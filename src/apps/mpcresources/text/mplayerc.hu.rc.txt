@@ -347,7 +347,7 @@ END
 BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 5		"Ugrás távolságok (kicsi, közepes, nagy, tizedmásodpercben)"
 9		"Alapértelmezett"
-10		"Ne használja a 'keresés a mappában' parancsot az 'Ugrás vissza/előre' parancsokra, ha csak egy elem van a lejátszási listában"
+10		"A 'keresés a mappában' letiltása az 'Előző/Következő' gombnál, amikor a lejátszási listában csak egy elem van"
 12		"Megakadályozza a Kis méretet, amikor a Teljes képernyő nem az alap monitoron van"
 14		"A mutató automatikus elrejtése ablakos lejátszás közben"
 16		"Nulla óra megjelenítése az állapotsorban és az OSD-n"

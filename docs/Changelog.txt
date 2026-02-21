@@ -16,6 +16,7 @@ Improved support for reading ASX playlists.
 Updated Japanese translation (by tsubasanouta).
 Updated Chinese (Traditional) and Dutch translation (by beter).
 Updated Romanian translation (by Andrei Miloiu).
+Updated Hungarian translation (by mickey).
 
 Updated libraries:
 	1.5.3-6-g04b69f9
