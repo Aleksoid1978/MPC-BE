@@ -631,7 +631,7 @@ static int cfhd_decode(AVCodecContext *avctx, AVFrame *pic,
         } else
             av_log(avctx, AV_LOG_DEBUG,  "Unknown tag %i data %x\n", tag, data);
 
-        if (tag == BitstreamMarker && data == 0xf0f &&
+        if (tag == BitstreamMarker && data == CoefficientSegment &&
             s->coded_format != AV_PIX_FMT_NONE) {
             int lowpass_height = s->plane[s->channel_num].band[0][0].height;
             int lowpass_width  = s->plane[s->channel_num].band[0][0].width;
@@ -698,10 +698,15 @@ static int cfhd_decode(AVCodecContext *avctx, AVFrame *pic,
 
         if (s->subband_num_actual == 255)
             goto finish;
+
+        if (tag == BitstreamMarker && data == CoefficientSegment || tag == BandHeader || tag == BandSecondPass || s->peak.level)
+            if (s->transform_type != s->a_transform_type)
+                return AVERROR_PATCHWELCOME;
+
         coeff_data = s->plane[s->channel_num].subband[s->subband_num_actual];
 
         /* Lowpass coefficients */
-        if (tag == BitstreamMarker && data == 0xf0f) {
+        if (tag == BitstreamMarker && data == CoefficientSegment) {
             int lowpass_height, lowpass_width, lowpass_a_height, lowpass_a_width;
 
             if (!s->a_width || !s->a_height) {
