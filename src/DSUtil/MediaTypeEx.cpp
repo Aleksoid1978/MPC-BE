@@ -878,7 +878,7 @@ void CMediaTypeEx::Dump(std::list<CString>& sl)
 	if (fmtsize < cbFormat) { // extra and unknown data
 		sl.emplace_back(L"");
 
-		ULONG extrasize = cbFormat - fmtsize;
+		ULONG extrasize = std::min<ULONG>(cbFormat - fmtsize, 16 * KILOBYTE);
 		str.Format(L"Extradata: %u", extrasize);
 		sl.emplace_back(str);
 		for (ULONG i = 0, j = (extrasize + 15) & ~15; i < j; i += 16) {
