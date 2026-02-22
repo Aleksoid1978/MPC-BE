@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2024 see Authors.txt
+ * (C) 2013-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -57,31 +57,4 @@ public:
 private:
 	static Update_Status CheckNewVersion();
 	static UINT RunCheckForUpdateThread(LPVOID pParam);
-};
-
-class UpdateCheckerDlg : public CDialog
-{
-	DECLARE_DYNAMIC(UpdateCheckerDlg)
-
-public:
-	UpdateCheckerDlg(Update_Status updateStatus, Version UpdateVersion, LPCWSTR UpdateURL);
-	~UpdateCheckerDlg() = default;
-
-	enum { IDD = IDD_UPDATE_DIALOG };
-
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);
-	afx_msg virtual BOOL OnInitDialog();
-	afx_msg virtual void OnOK();
-
-	DECLARE_MESSAGE_MAP()
-
-private:
-	Update_Status m_updateStatus;
-	CString m_text;
-	CStatic m_icon;
-	CButton m_okButton;
-	CButton m_cancelButton;
-
-	CString m_latestURL;
 };

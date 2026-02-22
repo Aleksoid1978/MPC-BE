@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2024 see Authors.txt
+ * (C) 2013-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -95,97 +95,54 @@ Update_Status UpdateChecker::CheckNewVersion()
 UINT UpdateChecker::RunCheckForUpdateThread(LPVOID pParam)
 {
 	bool autocheck = !!pParam;
-	Update_Status updatestatus = CheckNewVersion();
+	Update_Status updateStatus = CheckNewVersion();
 
-	if (!autocheck || updatestatus == UPDATER_NEW_VERSION_IS_AVAILABLE) {
-		UpdateCheckerDlg dlg(updatestatus, m_UpdateVersion, m_UpdateURL);
-		dlg.DoModal();
+	if (!autocheck || updateStatus == UPDATER_NEW_VERSION_IS_AVAILABLE) {
+		CStringW text;
+		UINT nType = MB_OK;
+
+		switch (updateStatus) {
+		case UPDATER_ERROR_CONNECT:
+			text.LoadString(IDS_UPDATE_ERROR_CONNECT);
+			nType = MB_OK | MB_ICONHAND;
+			break;
+		case UPDATER_ERROR_DATA:
+			text.LoadString(IDS_UPDATE_ERROR_DATA);
+			nType = MB_OK | MB_ICONHAND;
+			break;
+		case UPDATER_NO_NEW_VERSION:
+			text.Format(IDS_USING_NEWER_VERSION, MPC_VERSION_WSTR);
+			nType = MB_OK | MB_ICONINFORMATION;
+			break;
+		case UPDATER_NEW_VERSION_IS_AVAILABLE: {
+			CStringW versionStr;
+			versionStr.Format(L"%u.%u.%u", m_UpdateVersion.major, m_UpdateVersion.minor, m_UpdateVersion.patch);
+			if (m_UpdateVersion.revision) {
+				versionStr.AppendFormat(L".%u", m_UpdateVersion.revision);
+			}
+			text.Format(IDS_NEW_UPDATE_AVAILABLE, versionStr);
+			nType = MB_YESNO | MB_ICONQUESTION;
+			break;
+		}
+		default:
+			ASSERT(0);
+		}
+
+		if (updateStatus == UPDATER_NEW_VERSION_IS_AVAILABLE) {
+			if (IDYES == AfxMessageBox(text, nType)) {
+				ShellExecuteW(nullptr, L"open", m_UpdateURL, nullptr, nullptr, SW_SHOWDEFAULT);
+			}
+		}
+		else {
+			AfxMessageBox(text, nType);
+		}
 	}
 
-	if (autocheck && updatestatus >= UPDATER_NO_NEW_VERSION) {
+	if (autocheck && updateStatus >= UPDATER_NO_NEW_VERSION) {
 		AfxGetAppSettings().tUpdaterLastCheck = time(nullptr);
 	}
 
 	bUpdating = false;
 
 	return 0;
-}
-
-// UpdateCheckerDlg
-
-IMPLEMENT_DYNAMIC(UpdateCheckerDlg, CDialog)
-
-UpdateCheckerDlg::UpdateCheckerDlg(Update_Status updateStatus, Version UpdateVersion, LPCWSTR UpdateURL)
-	: CDialog(UpdateCheckerDlg::IDD), m_updateStatus(updateStatus)
-{
-	CString VersionStr;
-
-	switch (updateStatus) {
-	case UPDATER_ERROR_CONNECT:
-		m_text.LoadString(IDS_UPDATE_ERROR_CONNECT);
-		break;
-	case UPDATER_ERROR_DATA:
-		m_text.LoadString(IDS_UPDATE_ERROR_DATA);
-		break;
-	case UPDATER_NO_NEW_VERSION:
-		VersionStr.SetString(MPC_VERSION_WSTR);
-		m_text.Format(IDS_USING_NEWER_VERSION, VersionStr);
-		break;
-	case UPDATER_NEW_VERSION_IS_AVAILABLE:
-		VersionStr.Format(L"%u.%u.%u", UpdateVersion.major, UpdateVersion.minor, UpdateVersion.patch);
-		if (UpdateVersion.revision) {
-			VersionStr.AppendFormat(L".%u", UpdateVersion.revision);
-		}
-		m_text.Format(IDS_NEW_UPDATE_AVAILABLE, VersionStr);
-		m_latestURL = UpdateURL;
-		break;
-
-	default:
-		ASSERT(0);
-	}
-}
-
-void UpdateCheckerDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialog::DoDataExchange(pDX);
-
-	DDX_Text(pDX, IDC_UPDATE_DLG_TEXT, m_text);
-	DDX_Control(pDX, IDC_UPDATE_ICON, m_icon);
-	DDX_Control(pDX, IDOK, m_okButton);
-	DDX_Control(pDX, IDCANCEL, m_cancelButton);
-}
-
-BEGIN_MESSAGE_MAP(UpdateCheckerDlg, CDialog)
-END_MESSAGE_MAP()
-
-BOOL UpdateCheckerDlg::OnInitDialog()
-{
-	__super::OnInitDialog();
-
-	switch (m_updateStatus) {
-	case UPDATER_NEW_VERSION_IS_AVAILABLE:
-		m_icon.SetIcon(LoadIconW(nullptr, IDI_QUESTION));
-		break;
-	case UPDATER_NO_NEW_VERSION:
-	case UPDATER_ERROR_CONNECT:
-	case UPDATER_ERROR_DATA:
-		m_icon.SetIcon(LoadIconW(nullptr, (m_updateStatus == UPDATER_NO_NEW_VERSION) ? IDI_INFORMATION : IDI_WARNING));
-		m_okButton.ShowWindow(SW_HIDE);
-		m_cancelButton.SetWindowTextW(ResStr(IDS_UPDATE_CLOSE));
-		m_cancelButton.SetFocus();
-		break;
-	default:
-		ASSERT(0);
-	}
-
-	return TRUE;
-}
-
-void UpdateCheckerDlg::OnOK()
-{
-	if (m_updateStatus == UPDATER_NEW_VERSION_IS_AVAILABLE) {
-		ShellExecuteW(nullptr, L"open", m_latestURL, nullptr, nullptr, SW_SHOWDEFAULT);
-	}
-
-	__super::OnOK();
 }
