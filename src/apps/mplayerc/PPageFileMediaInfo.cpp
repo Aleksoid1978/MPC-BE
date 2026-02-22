@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2025 see Authors.txt
+ * (C) 2012-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,7 +27,7 @@ static String mi_get_lang_file()
 {
 	HINSTANCE mpcres = LoadLibraryW(CMPlayerCApp::GetSatelliteDll(AfxGetAppSettings().iLanguage));
 
-	String str = L"  Config_Text_ColumnSize;30";
+	String str;
 	if (mpcres) {
 		HRSRC hRes = FindResourceW(mpcres, MAKEINTRESOURCEW(IDB_MEDIAINFO_LANGUAGE), L"FILE");
 
@@ -36,20 +36,10 @@ static String mi_get_lang_file()
 			if (lRes) {
 				LPCSTR lpMultiByteStr = (LPCSTR)LockResource(lRes);
 
-				BOOL acp = FALSE;
-				int dstlen = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, lpMultiByteStr, -1, nullptr, 0);
-				if (!dstlen) {
-					acp = TRUE;
-					dstlen = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpMultiByteStr, -1, nullptr, 0);
-				}
-
-				if (dstlen) {
-					WCHAR* wstr = new(std::nothrow) WCHAR[dstlen];
-					if (wstr) {
-						MultiByteToWideChar(acp ? CP_ACP : CP_UTF8, MB_ERR_INVALID_CHARS, lpMultiByteStr, -1, wstr, dstlen);
-						str = wstr;
-						delete [] wstr;
-					}
+				int len = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, lpMultiByteStr, -1, nullptr, 0);
+				if (len) {
+					str.resize(len-1);
+					MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, lpMultiByteStr, -1, str.data(), len);
 				}
 			}
 			FreeLibrary(mpcres);
