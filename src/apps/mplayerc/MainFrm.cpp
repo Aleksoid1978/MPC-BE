@@ -12089,7 +12089,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 			m_pGB = pFGManager;
 
 			if (m_pGB) {
-				pFGManager->SetUserAgent(s.strUserAgent);
+				pFGManager->SetUserAgent(http::userAgent);
 
 				if (bUseSmartSeek) {
 					// build graph for preview
@@ -12097,7 +12097,7 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 					m_pGB_preview = pFGManager_preview;
 
 					if (m_pGB_preview) {
-						pFGManager_preview->SetUserAgent(s.strUserAgent);
+						pFGManager_preview->SetUserAgent(http::userAgent);
 					}
 				}
 			}
@@ -12301,8 +12301,13 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	CString youtubeUrl;
 	CString youtubeErrorMessage;
 
+	http::userAgent = s.strUserAgent;
+
 	if (!m_youtubeUrllist.empty()) {
 		youtubeUrl = pOFD->fi.GetPath();
+		if (!m_youtubeFields.userAgent.IsEmpty()) {
+			http::userAgent = m_youtubeFields.userAgent;
+		}
 		Content::Online::Disconnect(youtubeUrl);
 
 		pOFD->fi.Clear();
@@ -12417,6 +12422,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 					);
 					if (ok && m_pGB->ShouldOperationContinue() == S_OK) {
 						youtubeUrl = url;
+						if (!m_youtubeFields.userAgent.IsEmpty()) {
+							http::userAgent = m_youtubeFields.userAgent;
+						}
 						Content::Online::Disconnect(url);
 
 						*pOFD = OFD;
@@ -13474,7 +13482,7 @@ void CMainFrame::OpenSetupInfoBar()
 						if (SUCCEEDED(hr)) {
 							CStringW str((LPCWSTR)value.data(), length / sizeof(wchar_t));
 							m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_AUTHOR), str);
-							
+
 						}
 					}
 				}
@@ -14637,6 +14645,7 @@ void CMainFrame::CloseMediaPrivate()
 	m_pparray.clear();
 	m_ssarray.clear();
 
+	http::userAgent = s.strUserAgent;
 	Content::Online::Clear();
 
 	if (m_pMC) {

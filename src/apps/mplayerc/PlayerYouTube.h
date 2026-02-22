@@ -152,6 +152,7 @@ namespace Youtube
 		SYSTEMTIME     dtime    = { 0 };
 		REFERENCE_TIME duration = 0;
 		CString        thumbnailUrl;
+		CString        userAgent;
 		std::vector<Chapters> chaptersList;
 
 		void Empty() {
@@ -162,6 +163,7 @@ namespace Youtube
 			dtime = { 0 };
 			duration = 0;
 			thumbnailUrl.Empty();
+			userAgent.Empty();
 			chaptersList.clear();
 		}
 	};

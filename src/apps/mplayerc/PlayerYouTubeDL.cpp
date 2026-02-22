@@ -285,6 +285,12 @@ namespace YoutubeDL
 									bVideoOnly = true;
 								}
 							}
+
+							if (y_fields.userAgent.IsEmpty()) {
+								if (auto http_headers = GetJsonObject(format, "http_headers")) {
+									getJsonValue(*http_headers, "User-Agent", y_fields.userAgent);
+								}
+							}
 						}
 					}
 
