@@ -2756,6 +2756,7 @@ CFGManagerCustom::CFGManagerCustom(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 			m_transform.emplace_back(DNew CFGFilterRegistry(CLSID_AssFilterModAutoLoad, MERIT64_DO_NOT_USE));
 			break;
 		case SUBRNDT_VSFILTER:
+			m_transform.emplace_back(DNew CFGFilterRegistry(CLSID_VSFilter, MERIT64_PREFERRED));
 			m_transform.emplace_back(DNew CFGFilterRegistry(CLSID_VSFilter_autoloading, MERIT64_ABOVE_DSHOW));
 			m_transform.emplace_back(DNew CFGFilterRegistry(CLSID_XySubFilter, MERIT64_DO_NOT_USE));
 			m_transform.emplace_back(DNew CFGFilterRegistry(CLSID_XySubFilter_AutoLoader, MERIT64_DO_NOT_USE));
@@ -2768,7 +2769,8 @@ CFGManagerCustom::CFGManagerCustom(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 			m_transform.emplace_back(DNew CFGFilterRegistry(CLSID_AssFilterMod, MERIT64_DO_NOT_USE));
 			m_transform.emplace_back(DNew CFGFilterRegistry(CLSID_AssFilterModAutoLoad, MERIT64_DO_NOT_USE));
 			if (VRwithSR) {
-				m_transform.emplace_back(DNew CFGFilterRegistry(CLSID_XySubFilter_AutoLoader, MERIT64_ABOVE_DSHOW));
+				m_transform.emplace_back(DNew CFGFilterRegistry(CLSID_XySubFilter, MERIT64_PREFERRED));
+				m_transform.emplace_back(DNew CFGFilterRegistry(CLSID_XySubFilter, MERIT64_ABOVE_DSHOW));
 			} else {
 				// Prevent XySubFilter from connecting while renderer is not compatible
 				m_transform.emplace_back(DNew CFGFilterRegistry(CLSID_XySubFilter, MERIT64_DO_NOT_USE));
