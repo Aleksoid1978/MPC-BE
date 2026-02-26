@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,8 +32,6 @@
 #include "FileItem.h"
 
 constexpr auto EXTENDED_PATH_PREFIX = LR"(\\?\)";
-
-#define ENABLE_ASSFILTERMOD 0
 
 // flags for CAppSettings::nCS
 #define CS_NONE			0
@@ -129,7 +127,7 @@ enum {
 	SUBRNDT_ISR,
 	SUBRNDT_VSFILTER,
 	SUBRNDT_XYSUBFILTER,
-	SUBRNDT_ASSFILTERMOD
+	//SUBRNDT_ASSFILTERMOD not used
 };
 
 enum : int {

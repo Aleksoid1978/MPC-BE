@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2443,11 +2443,7 @@ bool CAppSettings::IsISRSelect() const
 
 bool CAppSettings::IsISRAutoLoadEnabled() const
 {
-#if ENABLE_ASSFILTERMOD
-	return (iSubtitleRenderer == SUBRNDT_ISR || iSubtitleRenderer == SUBRNDT_ASSFILTERMOD) && IsISRSelect(); // hmmm
-#else
 	return iSubtitleRenderer == SUBRNDT_ISR && IsISRSelect();
-#endif
 }
 
 void CAppSettings::SavePlaylistTabSetting()

@@ -16367,9 +16367,6 @@ void CMainFrame::AddTextPassThruFilter()
 				if (clsid != __uuidof(CNullTextRenderer)
 						&& clsid != GUIDFromCString(L"{04FE9017-F873-410E-871E-AB91661A4EF7}") // ffdshow video decoder
 						&& clsid != GUIDFromCString(L"{DBF9000E-F08C-4858-B769-C914A0FBB1D7}") // ffdshow subtitles filter
-#if ENABLE_ASSFILTERMOD
-						&& clsid != CLSID_AssFilterMod
-#endif
 				) {
 					continue;
 				}
