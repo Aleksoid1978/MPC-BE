@@ -139,7 +139,7 @@ typedef struct SwsConvertOp {
 typedef struct SwsDitherOp {
     AVRational *matrix; /* tightly packed dither matrix (refstruct) */
     int size_log2; /* size (in bits) of the dither matrix */
-    uint8_t y_offset[4]; /* row offset for each component */
+    int8_t y_offset[4]; /* row offset for each component, or -1 for ignored */
 } SwsDitherOp;
 
 typedef struct SwsLinearOp {
@@ -223,6 +223,9 @@ typedef struct SwsOpList {
     SwsOp *ops;
     int num_ops;
 
+    /* Purely informative metadata associated with this operation list */
+    SwsFormat src, dst;
+
     /* Input/output plane pointer swizzle mask */
     SwsSwizzleOp order_src, order_dst;
 
@@ -236,9 +239,6 @@ typedef struct SwsOpList {
      * information is known.
      */
     SwsComps comps_src;
-
-    /* Purely informative metadata associated with this operation list */
-    SwsFormat src, dst;
 } SwsOpList;
 
 SwsOpList *ff_sws_op_list_alloc(void);
@@ -271,7 +271,8 @@ void ff_sws_op_list_remove_at(SwsOpList *ops, int index, int count);
 /**
  * Print out the contents of an operation list.
  */
-void ff_sws_op_list_print(void *log_ctx, int log_level, const SwsOpList *ops);
+void ff_sws_op_list_print(void *log_ctx, int log_level, int log_level_extra,
+                          const SwsOpList *ops);
 
 /**
  * Infer + propagate known information about components. Called automatically
@@ -296,7 +297,7 @@ enum SwsOpCompileFlags {
  *
  * Note: `ops` may be modified by this function.
  */
-int ff_sws_compile_pass(SwsGraph *graph, SwsOpList *ops, int flags, SwsFormat dst,
-                        SwsPass *input, SwsPass **output);
+int ff_sws_compile_pass(SwsGraph *graph, SwsOpList *ops, int flags,
+                        const SwsFormat *dst, SwsPass *input, SwsPass **output);
 
 #endif

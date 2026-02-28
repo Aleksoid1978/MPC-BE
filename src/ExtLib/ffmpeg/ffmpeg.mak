@@ -172,6 +172,7 @@ SRCS_LC = \
 	libavcodec/cbs.c \
 	libavcodec/cbs_av1.c \
 	libavcodec/cbs_bsf.c \
+	libavcodec/cbs_h266.c \
 	libavcodec/cbs_h2645.c \
 	libavcodec/cbs_sei.c \
 	libavcodec/cbs_vp9.c \
@@ -422,6 +423,7 @@ SRCS_LC = \
 	libavcodec/aac/aacdec_lpd.c \
 	libavcodec/aac/aacdec_tab.c \
 	libavcodec/aac/aacdec_usac.c \
+	libavcodec/aac/aacdec_usac_mps212.c \
 	\
 	libavcodec/hevc/cabac.c \
 	libavcodec/hevc/data.c \

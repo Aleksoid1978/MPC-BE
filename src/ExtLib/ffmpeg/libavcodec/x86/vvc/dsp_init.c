@@ -23,6 +23,7 @@
 
 #include "config.h"
 
+#include "libavutil/attributes.h"
 #include "libavutil/cpu.h"
 #include "libavutil/x86/cpu.h"
 #include "libavcodec/vvc/dec.h"
@@ -34,16 +35,6 @@
 
 #define bf(fn, bd,  opt) fn##_##bd##_##opt
 #define BF(fn, bpc, opt) fn##_##bpc##bpc_##opt
-
-#define AVG_BPC_PROTOTYPES(bpc, opt)                                                                 \
-void BF(ff_vvc_avg, bpc, opt)(uint8_t *dst, ptrdiff_t dst_stride,                                    \
-    const int16_t *src0, const int16_t *src1, intptr_t width, intptr_t height, intptr_t pixel_max);  \
-void BF(ff_vvc_w_avg, bpc, opt)(uint8_t *dst, ptrdiff_t dst_stride,                                  \
-    const int16_t *src0, const int16_t *src1, intptr_t width, intptr_t height,                       \
-    intptr_t denom, intptr_t w0, intptr_t w1,  intptr_t o0, intptr_t o1, intptr_t pixel_max);
-
-AVG_BPC_PROTOTYPES( 8, avx2)
-AVG_BPC_PROTOTYPES(16, avx2)
 
 #define DMVR_PROTOTYPES(bd, opt)                                                                    \
 void ff_vvc_dmvr_##bd##_##opt(int16_t *dst, const uint8_t *src, ptrdiff_t src_stride,               \
@@ -170,24 +161,6 @@ FW_PUT_AVX2(12)
 FW_PUT_16BPC_AVX2(10)
 FW_PUT_16BPC_AVX2(12)
 
-#define AVG_FUNCS(bpc, bd, opt)                                                                     \
-static void bf(vvc_avg, bd, opt)(uint8_t *dst, ptrdiff_t dst_stride,                                \
-    const int16_t *src0, const int16_t *src1, int width, int height)                                \
-{                                                                                                   \
-    BF(ff_vvc_avg, bpc, opt)(dst, dst_stride, src0, src1, width, height, (1 << bd)  - 1);           \
-}                                                                                                   \
-static void bf(vvc_w_avg, bd, opt)(uint8_t *dst, ptrdiff_t dst_stride,                              \
-    const int16_t *src0, const int16_t *src1, int width, int height,                                \
-    int denom, int w0, int w1, int o0, int o1)                                                      \
-{                                                                                                   \
-    BF(ff_vvc_w_avg, bpc, opt)(dst, dst_stride, src0, src1, width, height,                          \
-        denom, w0, w1, o0, o1, (1 << bd)  - 1);                                                     \
-}
-
-AVG_FUNCS(8,  8,  avx2)
-AVG_FUNCS(16, 10, avx2)
-AVG_FUNCS(16, 12, avx2)
-
 #define ALF_FUNCS(bpc, bd, opt)                                                                                          \
 static void bf(vvc_alf_filter_luma, bd, opt)(uint8_t *dst, ptrdiff_t dst_stride, const uint8_t *src, ptrdiff_t src_stride, \
     int width, int height, const int16_t *filter, const int16_t *clip, const int vb_pos)                                 \
@@ -254,8 +227,13 @@ SAO_FILTER_FUNCS(12, avx2)
 } while (0)
 
 #define AVG_INIT(bd, opt) do {                                       \
-    c->inter.avg    = bf(vvc_avg, bd, opt);                          \
-    c->inter.w_avg  = bf(vvc_w_avg, bd, opt);                        \
+void bf(ff_vvc_avg, bd, opt)(uint8_t *dst, ptrdiff_t dst_stride,     \
+    const int16_t *src0, const int16_t *src1, int width, int height);\
+void bf(ff_vvc_w_avg, bd, opt)(uint8_t *dst, ptrdiff_t dst_stride,   \
+    const int16_t *src0, const int16_t *src1, int width, int height, \
+    int denom, int w0, int w1, int o);                               \
+    c->inter.avg    = bf(ff_vvc_avg, bd, opt);                       \
+    c->inter.w_avg  = bf(ff_vvc_w_avg, bd, opt);                     \
 } while (0)
 
 #define DMVR_INIT(bd) do {                                           \
@@ -344,7 +322,7 @@ int ff_vvc_sad_avx2(const int16_t *src0, const int16_t *src1, int dx, int dy, in
 
 #endif // ARCH_X86_64
 
-void ff_vvc_dsp_init_x86(VVCDSPContext *const c, const int bd)
+av_cold void ff_vvc_dsp_init_x86(VVCDSPContext *const c, const int bd)
 {
 #if ARCH_X86_64
     const int cpu_flags = av_get_cpu_flags();

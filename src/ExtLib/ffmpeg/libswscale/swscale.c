@@ -31,9 +31,13 @@
 #include "libavutil/mem.h"
 #include "libavutil/mem_internal.h"
 #include "libavutil/pixdesc.h"
+#include "libavutil/hwcontext.h"
 #include "config.h"
 #include "swscale_internal.h"
 #include "swscale.h"
+#if CONFIG_VULKAN
+#include "vulkan/ops.h"
+#endif
 
 DECLARE_ALIGNED(8, const uint8_t, ff_dither_8x8_128)[9][8] = {
     {  36, 68,  60, 92,  34, 66,  58, 90, },
@@ -1317,34 +1321,6 @@ int sws_receive_slice(SwsContext *sws, unsigned int slice_start,
                           dst, c->frame_dst->linesize, slice_start, slice_height);
 }
 
-static void get_frame_pointers(const AVFrame *frame, uint8_t *data[4],
-                               int linesize[4], int field)
-{
-    for (int i = 0; i < 4; i++) {
-        data[i]     = frame->data[i];
-        linesize[i] = frame->linesize[i];
-    }
-
-    if (!(frame->flags & AV_FRAME_FLAG_INTERLACED)) {
-        av_assert1(!field);
-        return;
-    }
-
-    if (field == FIELD_BOTTOM) {
-        /* Odd rows, offset by one line */
-        const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(frame->format);
-        for (int i = 0; i < 4; i++) {
-            data[i] += linesize[i];
-            if (desc->flags & AV_PIX_FMT_FLAG_PAL)
-                break;
-        }
-    }
-
-    /* Take only every second line */
-    for (int i = 0; i < 4; i++)
-        linesize[i] <<= 1;
-}
-
 /* Subset of av_frame_ref() that only references (video) data buffers */
 static int frame_ref(AVFrame *dst, const AVFrame *src)
 {
@@ -1409,12 +1385,7 @@ int sws_scale_frame(SwsContext *sws, AVFrame *dst, const AVFrame *src)
 
         for (int field = 0; field < 2; field++) {
             SwsGraph *graph = c->graph[field];
-            uint8_t *dst_data[4], *src_data[4];
-            int dst_linesize[4], src_linesize[4];
-            get_frame_pointers(dst, dst_data, dst_linesize, field);
-            get_frame_pointers(src, src_data, src_linesize, field);
-            ff_sws_graph_run(graph, dst_data, dst_linesize,
-                          (const uint8_t **) src_data, src_linesize);
+            ff_sws_graph_run(graph, dst, src);
             if (!graph->dst.interlaced)
                 break;
         }
@@ -1448,6 +1419,35 @@ int sws_frame_setup(SwsContext *ctx, const AVFrame *dst, const AVFrame *src)
         return AVERROR(EINVAL);
     if ((ret = validate_params(ctx)) < 0)
         return ret;
+
+    /* For now, if a single frame has a context, then both need a context */
+    if (!!src->hw_frames_ctx != !!dst->hw_frames_ctx) {
+        return AVERROR(ENOTSUP);
+    } else if (!!src->hw_frames_ctx) {
+        /* Both hardware frames must already be allocated */
+        if (!src->data[0] || !dst->data[0])
+            return AVERROR(EINVAL);
+
+        AVHWFramesContext *src_hwfc, *dst_hwfc;
+        src_hwfc = (AVHWFramesContext *)src->hw_frames_ctx->data;
+        dst_hwfc = (AVHWFramesContext *)dst->hw_frames_ctx->data;
+
+        /* Both frames must live on the same device */
+        if (src_hwfc->device_ref->data != dst_hwfc->device_ref->data)
+            return AVERROR(EINVAL);
+
+        /* Only Vulkan devices are supported */
+        AVHWDeviceContext *dev_ctx;
+        dev_ctx = (AVHWDeviceContext *)src_hwfc->device_ref->data;
+        if (dev_ctx->type != AV_HWDEVICE_TYPE_VULKAN)
+            return AVERROR(ENOTSUP);
+
+#if CONFIG_VULKAN
+        ret = ff_sws_vk_init(ctx, src_hwfc->device_ref);
+        if (ret < 0)
+            return ret;
+#endif
+    }
 
     for (int field = 0; field < 2; field++) {
         SwsFormat src_fmt = ff_fmt_from_frame(src, field);
