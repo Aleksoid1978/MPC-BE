@@ -63,6 +63,7 @@
 // These identifiers are not from the specification, they are just made up and can be anything.
 #define FLV_VIDEO_AV1     20 // AV1
 #define FLV_VIDEO_VP9     21 // VP9
+#define FLV_VIDEO_VVC     22 // VVC
 
 #define AMF_END_OF_OBJECT			0x09
 
@@ -71,7 +72,7 @@
 #define KEYFRAMES_BYTEOFFSET_TAG	L"filepositions"
 
 #define IsValidTag(TagType)			(TagType == FLV_AUDIODATA || TagType == FLV_VIDEODATA || TagType == FLV_SCRIPTDATA)
-#define IsAVCCodec(VideoTag)		(!VideoTag.ExHeader && (VideoTag.CodecID == FLV_VIDEO_AVC || VideoTag.CodecID == FLV_VIDEO_HM91 || VideoTag.CodecID == FLV_VIDEO_HM10 || VideoTag.CodecID == FLV_VIDEO_HEVC))
+#define IsAVCCodec(VideoTag)		(!VideoTag.ExHeader && (VideoTag.CodecID == FLV_VIDEO_AVC || VideoTag.CodecID == FLV_VIDEO_HM91 || VideoTag.CodecID == FLV_VIDEO_HM10 || VideoTag.CodecID == FLV_VIDEO_HEVC || VideoTag.CodecID == FLV_VIDEO_VVC))
 
 #define ValidateTag(t)				(t.DataSize || t.PreviousTagSize)
 
@@ -387,9 +388,10 @@ bool CFLVSplitterFilter::ReadTag(VideoTag& vt)
 			case FCC('hvc1'): vt.CodecID = FLV_VIDEO_HEVC; break;
 			case FCC('av01'): vt.CodecID = FLV_VIDEO_AV1;  break;
 			case FCC('vp09'): vt.CodecID = FLV_VIDEO_VP9;  break;
+			case FCC('vvc1'): vt.CodecID = FLV_VIDEO_VVC;  break;
 		}
 
-		if (vt.CodecID == FLV_VIDEO_HEVC && vt.AVCPacketType == PacketType::CodedFrames) {
+		if ((vt.CodecID == FLV_VIDEO_HEVC || vt.CodecID == FLV_VIDEO_VVC) && vt.AVCPacketType == PacketType::CodedFrames) {
 			vt.tsOffset = (UINT32)m_pFile->BitRead(24);
 			vt.tsOffset = (vt.tsOffset + 0xff800000) ^ 0xff800000;
 		}
@@ -1289,6 +1291,48 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						fTypeFlagsVideo = true;
 						break;
 					}
+					case FLV_VIDEO_VVC:
+						{
+							if (dataSize < 4 || vt.AVCPacketType != PacketType::SequenceStart) {
+								fTypeFlagsVideo = true;
+								break;
+							}
+
+							UINT32 headerSize = dataSize - 4;
+							std::unique_ptr<BYTE[]> headerData;
+
+							if (headerSize) {
+								headerData = std::make_unique<BYTE[]>(headerSize);
+								m_pFile->ByteRead(headerData.get(), headerSize);
+							}
+
+							if (vWidth && vHeight) {
+								if (headerSize) {
+									vih = reinterpret_cast<VIDEOINFOHEADER*>(mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + headerSize));
+									bih = &vih->bmiHeader;
+								}
+
+								bih->biSize = sizeof(vih->bmiHeader);
+								bih->biWidth = vWidth;
+								bih->biHeight = vHeight;
+								bih->biPlanes = 1;
+								bih->biBitCount = 24;
+								bih->biSizeImage = DIBSIZE(*bih);
+
+								if (headerSize) {
+									auto extra = reinterpret_cast<BYTE*>(vih + 1);
+									memcpy(extra, headerData.get(), headerSize);
+								}
+
+								mt.subtype = FOURCCMap(bih->biCompression = FCC('VVC1'));
+								name += L" VVC1";
+
+								break;
+							}
+
+							fTypeFlagsVideo = true;
+							break;
+						}
 					default:
 						fTypeFlagsVideo = true;
 				}
@@ -1579,7 +1623,7 @@ bool CFLVSplitterFilter::DemuxLoop()
 					}
 
 					t.TimeStamp += vt.tsOffset;
-				} else if (vt.CodecID == FLV_VIDEO_HEVC && vt.AVCPacketType == PacketType::CodedFrames) {
+				} else if ((vt.CodecID == FLV_VIDEO_HEVC || vt.CodecID == FLV_VIDEO_VVC) && vt.AVCPacketType == PacketType::CodedFrames) {
 					t.TimeStamp += vt.tsOffset;
 				}
 			}
