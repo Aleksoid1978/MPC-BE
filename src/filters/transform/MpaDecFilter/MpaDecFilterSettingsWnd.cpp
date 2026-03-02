@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -126,7 +126,7 @@ bool CMpaDecSettingsWnd::OnActivate()
 	m_drc_check.SetCheck(m_drc);
 	p.y += h25;
 
-	m_spdif_group.Create(ResStr(IDS_MPADEC_SPDIF), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(ScaleX(230), h20 + h20 * 4)), this, (UINT)IDC_STATIC);
+	m_spdif_group.Create(ResStr(IDS_MPADEC_SPDIF), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(ScaleX(236), h20 + h20 * 4)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 	m_spdif_ac3_check.Create(L"AC-3", dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(ScaleX(50), m_fontheight)), this, IDC_PP_CHECK_SPDIF_AC3);
 	m_spdif_dts_check.Create(L"DTS", dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(ScaleX(110), 0), CSize(ScaleX(50), m_fontheight)), this, IDC_PP_CHECK_SPDIF_DTS);
@@ -148,7 +148,7 @@ bool CMpaDecSettingsWnd::OnActivate()
 
 	////////// Status //////////
 	p.y += h20;
-	m_grpStatus.Create(ResStr(IDS_MPADEC_STATUS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(ScaleX(230), h25 + m_fontheight * 4 + m_fontheight / 2)), this, (UINT)IDC_STATIC);
+	m_grpStatus.Create(ResStr(IDS_MPADEC_STATUS), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(ScaleX(236), h25 + m_fontheight * 4 + m_fontheight / 2)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 	m_edtStatus.Create(WS_CHILD | WS_VISIBLE /*| WS_BORDER*/ | ES_READONLY | ES_MULTILINE, CRect(p, CSize(ScaleX(220), m_fontheight * 4 + m_fontheight / 2)), this, 0);
 
