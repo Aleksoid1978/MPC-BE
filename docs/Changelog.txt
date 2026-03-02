@@ -5,13 +5,41 @@
 AudioSplitter
 Added support for the RF64 format.
 
+AviSplitter
+Added support for 'y408' video.
+
+FLVSplitter
+Added support for VVC video.
+
 MP4Splitter
 Improved handling of corrupted files.
+
+MatroskaSplitter
+Expanded support for V_UNCOMPRESSED video codecs.
+
+MpcDvdVideoDecoder
+Fixed conversion to YUY2.
+
+MPC Video Decoder
+RGB32 format will be output as a top-down bitmap by default.
+
+MPC Video Converter
+Added support for AYUV video format.
+
+Subtitles
+Added the ability to open the properties of an external subtitle renderer in the "Subtitles" settings panel.
+Fixed external subtitle connections for VSFilter.
+
+YouTube
+Improved support for yt-dlp.
 
 Player
 The HTTP read strategy has been changed.
 If the playlist contains one entry, more key combinations can be used to control the player (jump through chapters, adjust volume).
 Improved support for reading ASX playlists.
+Added blocking of problematic DLLs when the "AVI Decompressor" filter is loaded into the DirectShow graph.
+The translation of the MediaInfo report for Chinese, Korean and Japanese has been removed.
+Various interface fixes.
 
 Updated Japanese translation (by tsubasanouta).
 Updated Chinese (Traditional) and Dutch translation (by beter).
