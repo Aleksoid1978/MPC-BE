@@ -99,15 +99,6 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 
 	const LanguageResource& lr = CMPlayerCApp::languageResources[AfxGetAppSettings().iLanguage];
 
-	switch (lr.resourceID) {
-	case ID_LANGUAGE_KOREAN:
-	case ID_LANGUAGE_CHINESE_SIMPLIFIED:
-	case ID_LANGUAGE_CHINESE_TRADITIONAL:
-	case ID_LANGUAGE_JAPANESE: 
-		wcscpy_s(lf.lfFaceName, LF_FACESIZE, L"Malgun Gothic");
-		break;
-	}
-
 	BOOL success = lf.lfFaceName[0] && IsFontInstalled(lf.lfFaceName) && m_font.CreateFontIndirectW(&lf);
 
 	if (!success) {
