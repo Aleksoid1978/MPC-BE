@@ -97,17 +97,13 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 	lf.lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
 	lf.lfHeight = -m_pSheetDpi->ScaleY(12);
 
-	const LanguageResource& lr = CMPlayerCApp::languageResources[AfxGetAppSettings().iLanguage];
-
-	BOOL success = lf.lfFaceName[0] && IsFontInstalled(lf.lfFaceName) && m_font.CreateFontIndirectW(&lf);
-
-	if (!success) {
-		UINT i = 0;
-		do {
-			wcscpy_s(lf.lfFaceName, LF_FACESIZE, MonospaceFonts[i]);
-			success = IsFontInstalled(MonospaceFonts[i]) && m_font.CreateFontIndirectW(&lf);
-			i++;
-		} while (!success && i < std::size(MonospaceFonts));
+	for(const auto& fontname : MonospaceFonts) {
+		if (IsFontInstalled(fontname)) {
+			wcscpy_s(lf.lfFaceName, LF_FACESIZE, fontname);
+			if (m_font.CreateFontIndirectW(&lf)) {
+				break;
+			}
+		}
 	}
 
 	m_edMediainfo.SetFont(&m_font);
