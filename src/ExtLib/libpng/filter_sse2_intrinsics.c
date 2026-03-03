@@ -1,11 +1,9 @@
-
 /* filter_sse2_intrinsics.c - SSE2 optimized filter functions
  *
+ * Copyright (c) 2018 Cosmin Truta
  * Copyright (c) 2016-2017 Glenn Randers-Pehrson
  * Written by Mike Klein and Matt Sarett
  * Derived from arm/filter_neon_intrinsics.c
- *
- * Last changed in libpng 1.6.31 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -28,50 +26,45 @@
  * whichever of a, b, or c is closest to p=a+b-c.
  */
 
-static __m128i load4(const void* p) {
-   return _mm_cvtsi32_si128(*(const int*)p);
+static __m128i
+load4(const void *p)
+{
+   int tmp;
+   memcpy(&tmp, p, sizeof(tmp));
+   return _mm_cvtsi32_si128(tmp);
 }
 
-static void store4(void* p, __m128i v) {
-   *(int*)p = _mm_cvtsi128_si32(v);
+static void
+store4(void *p, __m128i v)
+{
+   int tmp = _mm_cvtsi128_si32(v);
+   memcpy(p, &tmp, sizeof(int));
 }
 
-static __m128i load3(const void* p) {
-   /* We'll load 2 bytes, then 1 byte,
-    * then mask them together, and finally load into SSE.
-    */
-   const png_uint_16* p01 = (png_const_uint_16p)p;
-   const png_byte*    p2  = (const png_byte*)(p01+1);
-
-   png_uint_32 v012 = (png_uint_32)(*p01)
-                    | (png_uint_32)(*p2) << 16;
-   return load4(&v012);
+static __m128i
+load3(const void *p)
+{
+   png_uint_32 tmp = 0;
+   memcpy(&tmp, p, 3);
+   return _mm_cvtsi32_si128(tmp);
 }
 
-static void store3(void* p, __m128i v) {
-   /* We'll pull from SSE as a 32-bit int, then write
-    * its bottom two bytes, then its third byte.
-    */
-   png_uint_32 v012;
-   png_uint_16* p01;
-   png_byte*    p2;
-
-   store4(&v012, v);
-
-   p01 = (png_uint_16p)p;
-   p2  = (png_byte*)(p01+1);
-   *p01 = (png_uint_16)v012;
-   *p2  = (png_byte)(v012 >> 16);
+static void
+store3(void *p, __m128i v)
+{
+   int tmp = _mm_cvtsi128_si32(v);
+   memcpy(p, &tmp, 3);
 }
 
-void png_read_filter_row_sub3_sse2(png_row_infop row_info, png_bytep row,
-   png_const_bytep prev)
+void
+png_read_filter_row_sub3_sse2(png_row_infop row_info, png_bytep row,
+    png_const_bytep prev)
 {
    /* The Sub filter predicts each pixel as the previous pixel, a.
     * There is no pixel to the left of the first pixel.  It's encoded directly.
     * That works with our main loop if we just say that left pixel was zero.
     */
-   png_size_t rb;
+   size_t rb;
 
    __m128i a, d = _mm_setzero_si128();
 
@@ -97,14 +90,15 @@ void png_read_filter_row_sub3_sse2(png_row_infop row_info, png_bytep row,
    PNG_UNUSED(prev)
 }
 
-void png_read_filter_row_sub4_sse2(png_row_infop row_info, png_bytep row,
-   png_const_bytep prev)
+void
+png_read_filter_row_sub4_sse2(png_row_infop row_info, png_bytep row,
+    png_const_bytep prev)
 {
    /* The Sub filter predicts each pixel as the previous pixel, a.
     * There is no pixel to the left of the first pixel.  It's encoded directly.
     * That works with our main loop if we just say that left pixel was zero.
     */
-   png_size_t rb;
+   size_t rb;
 
    __m128i a, d = _mm_setzero_si128();
 
@@ -122,8 +116,9 @@ void png_read_filter_row_sub4_sse2(png_row_infop row_info, png_bytep row,
    PNG_UNUSED(prev)
 }
 
-void png_read_filter_row_avg3_sse2(png_row_infop row_info, png_bytep row,
-   png_const_bytep prev)
+void
+png_read_filter_row_avg3_sse2(png_row_infop row_info, png_bytep row,
+    png_const_bytep prev)
 {
    /* The Avg filter predicts each pixel as the (truncated) average of a and b.
     * There's no pixel to the left of the first pixel.  Luckily, it's
@@ -131,11 +126,11 @@ void png_read_filter_row_avg3_sse2(png_row_infop row_info, png_bytep row,
     * perfectly with our loop if we make sure a starts at zero.
     */
 
-   png_size_t rb;
+   size_t rb;
 
    const __m128i zero = _mm_setzero_si128();
 
-   __m128i    b;
+   __m128i b;
    __m128i a, d = zero;
 
    png_debug(1, "in png_read_filter_row_avg3_sse2");
@@ -177,17 +172,18 @@ void png_read_filter_row_avg3_sse2(png_row_infop row_info, png_bytep row,
    }
 }
 
-void png_read_filter_row_avg4_sse2(png_row_infop row_info, png_bytep row,
-   png_const_bytep prev)
+void
+png_read_filter_row_avg4_sse2(png_row_infop row_info, png_bytep row,
+    png_const_bytep prev)
 {
    /* The Avg filter predicts each pixel as the (truncated) average of a and b.
     * There's no pixel to the left of the first pixel.  Luckily, it's
     * predicted to be half of the pixel above it.  So again, this works
     * perfectly with our loop if we make sure a starts at zero.
     */
-   png_size_t rb;
+   size_t rb;
    const __m128i zero = _mm_setzero_si128();
-   __m128i    b;
+   __m128i b;
    __m128i a, d = zero;
 
    png_debug(1, "in png_read_filter_row_avg4_sse2");
@@ -214,7 +210,9 @@ void png_read_filter_row_avg4_sse2(png_row_infop row_info, png_bytep row,
 }
 
 /* Returns |x| for 16-bit lanes. */
-static __m128i abs_i16(__m128i x) {
+static __m128i
+abs_i16(__m128i x)
+{
 #if PNG_INTEL_SSE_IMPLEMENTATION >= 2
    return _mm_abs_epi16(x);
 #else
@@ -233,7 +231,9 @@ static __m128i abs_i16(__m128i x) {
 }
 
 /* Bytewise c ? t : e. */
-static __m128i if_then_else(__m128i c, __m128i t, __m128i e) {
+static __m128i
+if_then_else(__m128i c, __m128i t, __m128i e)
+{
 #if PNG_INTEL_SSE_IMPLEMENTATION >= 3
    return _mm_blendv_epi8(e,t,c);
 #else
@@ -241,8 +241,9 @@ static __m128i if_then_else(__m128i c, __m128i t, __m128i e) {
 #endif
 }
 
-void png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_bytep row,
-   png_const_bytep prev)
+void
+png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_bytep row,
+    png_const_bytep prev)
 {
    /* Paeth tries to predict pixel d using the pixel to the left of it, a,
     * and two pixels from the previous row, b and c:
@@ -257,7 +258,7 @@ void png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_bytep row,
     * Here we zero b and d, which become c and a respectively at the start of
     * the loop.
     */
-   png_size_t rb;
+   size_t rb;
    const __m128i zero = _mm_setzero_si128();
    __m128i c, b = zero,
            a, d = zero;
@@ -274,7 +275,7 @@ void png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_bytep row,
       a = d; d = _mm_unpacklo_epi8(load4(row ), zero);
 
       /* (p-a) == (a+b-c - a) == (b-c) */
-   
+
       pa = _mm_sub_epi16(b,c);
 
       /* (p-b) == (a+b-c - b) == (a-c) */
@@ -340,8 +341,9 @@ void png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_bytep row,
    }
 }
 
-void png_read_filter_row_paeth4_sse2(png_row_infop row_info, png_bytep row,
-   png_const_bytep prev)
+void
+png_read_filter_row_paeth4_sse2(png_row_infop row_info, png_bytep row,
+    png_const_bytep prev)
 {
    /* Paeth tries to predict pixel d using the pixel to the left of it, a,
     * and two pixels from the previous row, b and c:
@@ -356,7 +358,7 @@ void png_read_filter_row_paeth4_sse2(png_row_infop row_info, png_bytep row,
     * Here we zero b and d, which become c and a respectively at the start of
     * the loop.
     */
-   png_size_t rb;
+   size_t rb;
    const __m128i zero = _mm_setzero_si128();
    __m128i pa,pb,pc,smallest,nearest;
    __m128i c, b = zero,
