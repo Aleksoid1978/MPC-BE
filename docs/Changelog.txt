@@ -47,8 +47,9 @@ Updated Romanian translation (by Andrei Miloiu).
 Updated Hungarian translation (by mickey).
 
 Updated libraries:
-	1.5.3-6-g04b69f9
-	ffmpeg n8.1-dev-2448-gf570fa787a.
+	dav1d 1.5.3-6-g04b69f9
+	ffmpeg n8.1-dev-2448-gf570fa787a;
+	zlib 1.3.2.
 
 
 1.8.9 - 2025-12-30
