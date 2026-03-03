@@ -3180,7 +3180,16 @@ cmsBool ParseCube(cmsIT8* cube, cmsStage** Shaper, cmsStage** CLUT, char title[]
 
             if (lut_size > 0) {
 
-                int nodes = lut_size * lut_size * lut_size;
+                int nodes;
+                
+                /**
+                * Professional LUT generation tools (e.g., Nobe LutBake) list 65×65×65 as their highest supported size.                
+                */
+                if (lut_size > 65)
+                    return SynError(cube, "LUT size '%d' is over maximum of 65", lut_size);
+
+                nodes = lut_size * lut_size * lut_size;
+
 
                 cmsFloat32Number* lut_table = (cmsFloat32Number*) _cmsMalloc(cube->ContextID, nodes * 3 * sizeof(cmsFloat32Number));
                 if (lut_table == NULL) return FALSE;
@@ -3251,13 +3260,17 @@ cmsHPROFILE CMSEXPORT cmsCreateDeviceLinkFromCubeFileTHR(cmsContext ContextID, c
 
     // Populates the pipeline
     if (Shaper != NULL) {
-        if (!cmsPipelineInsertStage(Pipeline, cmsAT_BEGIN, Shaper))
+        if (!cmsPipelineInsertStage(Pipeline, cmsAT_BEGIN, Shaper)) {
+            cmsStageFree(Shaper);
             goto Done;
+        }
     }
 
     if (CLUT != NULL) {
-        if (!cmsPipelineInsertStage(Pipeline, cmsAT_END, CLUT))
+        if (!cmsPipelineInsertStage(Pipeline, cmsAT_END, CLUT)) {
+            cmsStageFree(CLUT);
             goto Done;
+        }
     }
 
     // Propagate the description. We put no copyright because we know

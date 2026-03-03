@@ -23,7 +23,7 @@
 //
 //---------------------------------------------------------------------------------
 //
-// Version 2.18rc1
+// Version 2.19a1
 //
 
 #ifndef _lcms2_H
@@ -87,7 +87,7 @@ extern "C" {
 #endif
 
 // Version/release
-#define LCMS_VERSION        2180
+#define LCMS_VERSION        2190
 
 // I will give the chance of redefining basic types for compilers that are not fully C99 compliant
 #ifndef CMS_BASIC_TYPES_ALREADY_DEFINED
@@ -504,7 +504,13 @@ typedef enum {
     cmsSigLinkClass                         = 0x6C696E6B,  // 'link'
     cmsSigAbstractClass                     = 0x61627374,  // 'abst'
     cmsSigColorSpaceClass                   = 0x73706163,  // 'spac'
-    cmsSigNamedColorClass                   = 0x6e6d636c   // 'nmcl'
+    cmsSigNamedColorClass                   = 0x6e6d636c,  // 'nmcl'
+
+                                                            // iccMAX only
+    cmsSigColorEncodingSpaceClass           = 0x63656E63,  // 'cenc' 
+    cmsSigMultiplexIdentificationClass      = 0x6D696420,  // 'mid '
+    cmsSigMultiplexLinkClass                = 0x6d6c6e6b,  // 'mlnk'
+    cmsSigMultiplexVisualizationClass       = 0x6d766973   // 'mvis'    
 
 } cmsProfileClassSignature;
 
@@ -1502,6 +1508,7 @@ CMSAPI cmsHPROFILE       CMSEXPORT cmsCreateProfilePlaceholder(cmsContext Contex
 CMSAPI cmsContext        CMSEXPORT cmsGetProfileContextID(cmsHPROFILE hProfile);
 CMSAPI cmsInt32Number    CMSEXPORT cmsGetTagCount(cmsHPROFILE hProfile);
 CMSAPI cmsTagSignature   CMSEXPORT cmsGetTagSignature(cmsHPROFILE hProfile, cmsUInt32Number n);
+CMSAPI cmsBool           CMSEXPORT cmsGetTagOffsetAndSize(cmsHPROFILE hProfile, cmsUInt32Number n, cmsUInt32Number* offset, cmsUInt32Number* size);
 CMSAPI cmsBool           CMSEXPORT cmsIsTag(cmsHPROFILE hProfile, cmsTagSignature sig);
 
 // Read and write pre-formatted data

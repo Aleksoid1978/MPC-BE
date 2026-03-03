@@ -1,6 +1,9 @@
 -----------------------
 2.18 Maintenance release
 -----------------------
+Add an extra check for completeness only.
+Fix a signed integer overflow which could trigger a FPE_INTOVF
+Fix Microsoft'2 MHC2 private tag
 Added projects for XCode 26 & Visual Studio 2026
 Added documentation for PCS illuminants and chromatic adaptation
 Check for a possible out-of-bounds in softproofing transforms when using cmsCreateExtendedTransform
@@ -28,7 +31,6 @@ meson: Bump minimum Meson version to 0.52 for visibility:hidden
 meson: Disable unused fs import
 Add a guard against a wrong use of flags
 Fix for #469 heap buffer overflow on convert_utf16_to_utf32()
-
 
 -----------------------
 2.17 Maintenance release
