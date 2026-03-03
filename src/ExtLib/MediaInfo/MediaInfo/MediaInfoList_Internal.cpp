@@ -367,6 +367,7 @@ void MediaInfoList_Internal::Close(size_t FilePos)
         Info.erase(Info.begin()+FilePos);
     }
 
+    ToParse = {};
     ToParse_AlreadyDone=0;
     ToParse_Total=0;
 }

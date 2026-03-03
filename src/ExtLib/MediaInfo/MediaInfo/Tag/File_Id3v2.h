@@ -150,6 +150,7 @@ private :
     void WPAY()   {W___();}
     void WPUB()   {W___();}
     void WXXX();
+    void XOLY();
     void BUF()    {Skip_XX(Element_Size, "Data");}
     void CNT()    {Skip_XX(Element_Size, "Data");}
     void COM()    {COMM();}

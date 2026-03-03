@@ -926,6 +926,7 @@ Language_lv;Łotewski
 Language_mg;
 Language_mh;
 Language_mi;
+Language_mis;
 Language_mk;Macedoński
 Language_ml;
 Language_mn;Mongolski
@@ -1002,6 +1003,7 @@ Language_tw;
 Language_ty;Tahitański
 Language_ug;
 Language_uk;Ukraiński
+Language_und;
 Language_ur;
 Language_uz;Uzbecki
 Language_ve;
@@ -1024,6 +1026,7 @@ Language_zh-TW;
 Language_zh-tw;Chiński (Tajwan)
 Language_zh-yue;
 Language_zu;Zuluski
+Language_zxx;
 LanguageChanges;
 Languages;
 LawRating;Nisko oceniany

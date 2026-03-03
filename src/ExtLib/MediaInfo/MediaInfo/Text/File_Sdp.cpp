@@ -90,51 +90,67 @@ void File_Sdp::Streams_Finish()
 //---------------------------------------------------------------------------
 bool File_Sdp::Synchronize()
 {
-    //Synchronizing
-    while (Buffer_Offset+2<Buffer_Size)
-    {
-        while (Buffer_Offset+2<Buffer_Size)
-        {
-            if (Buffer[Buffer_Offset  ]==0x51
-             && Buffer[Buffer_Offset+1]==0x15)
-                break; //while()
-
-            Buffer_Offset++;
-        }
-
-        if (IsSub)
-            break; // Found one file with unknown bytes at the end of the stream, so removing this integrity test for the moment
-
-        if (Buffer_Offset+2<Buffer_Size) //Testing if size is coherant
-        {
-            if (Buffer_Offset+Buffer[Buffer_Offset+2]==Buffer_Size)
+    auto Buffer_Current = Buffer_Offset;
+    auto i = 0;
+    const auto Count = IsSub ? 0 : 4; // Found one file with unknown bytes at the end of the stream, so removing this integrity test for the moment
+    while (i <= Count) {
+        if (Buffer_Current > Buffer_Size || Buffer_Size - Buffer_Current <= 2) {
+            if (i
+             && ((IsSub && Buffer_Current == Buffer_Size)
+              || (File_Offset + Buffer_Offset < File_Size && File_Offset + Buffer_Size == File_Size))) {
                 break;
-
-            if (Buffer_Offset+Buffer[Buffer_Offset+2]+3>Buffer_Size)
-                return false; //Wait for more data
-
-            if (Buffer[Buffer_Offset+Buffer[Buffer_Offset+2]  ]==0x51
-             && Buffer[Buffer_Offset+Buffer[Buffer_Offset+2]+1]==0x15)
-                break; //while()
-
-            Buffer_Offset++;
+            }
+            return false; // Wait for more data
         }
+        auto Identifier = BigEndian2int16u(Buffer + Buffer_Current);
+        auto Length = BigEndian2int8u(Buffer + Buffer_Current + 2);
+        if (Identifier != 0x5115 || Length < 9) {
+            i = 0;
+            Buffer_Current = ++Buffer_Offset;
+            continue;
+        }
+        Buffer_Current += Length;
+        ++i;
     }
 
-    //Must have enough buffer for having header
-    if (Buffer_Offset+2>=Buffer_Size)
-        return false;
-
     //Synched is OK
-    if (!Status[IsAccepted])
+    if (!Status[IsAccepted]) {
+        Accept();
+    }
+    return true;
+
+    //Synchronizing
+    for (; Buffer_Size - Buffer_Offset > 1; Buffer_Offset++)
     {
-        //For the moment, we accept only if the file is in sync, the test is not strict enough
-        if (Buffer_Offset)
-        {
-            Reject();
-            return false;
+        auto Identifier = BigEndian2int16u(Buffer + Buffer_Offset);
+        if (Identifier != 0x5115) {
+            continue;
         }
 
+        // Testing if size is coherent
+        if (IsSub) {
+            break; // Found one file with unknown bytes at the end of the stream, so removing this integrity test for the moment
+        }
+        if (Buffer_Size - Buffer_Offset <= 2) {
+            return false; // Wait for more data
+        }
+        int8u Length = Buffer[Buffer_Offset + 2];
+        if (Length < 9) {
+            continue;
+        }
+        if (Buffer_Size - Buffer_Offset <= (size_t)Length + 1) {
+            return false; // Wait for more data
+        }
+        auto Identifier2 = BigEndian2int16u(Buffer + Buffer_Offset + Length);
+        if (Identifier2 != 0x5115) {
+            continue;
+        }
+
+        break;
+    }
+
+    //Synched is OK
+    if (!Status[IsAccepted]) {
         Accept();
     }
     return true;

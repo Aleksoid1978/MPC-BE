@@ -926,6 +926,7 @@ Language_lv;Latvian
 Language_mg;Malagasy
 Language_mh;Marshallese
 Language_mi;Maori
+Language_mis;
 Language_mk;Macedonian
 Language_ml;Malayalam
 Language_mn;Mongolian
@@ -1002,6 +1003,7 @@ Language_tw;Twi
 Language_ty;Tahitian
 Language_ug;Uighur
 Language_uk;Ukrainska
+Language_und;
 Language_ur;Urdu
 Language_uz;Uzbek
 Language_ve;Venda
@@ -1024,6 +1026,7 @@ Language_zh-TW;
 Language_zh-tw;Kinesiska (Taiwan)
 Language_zh-yue;
 Language_zu;Zulu
+Language_zxx;
 LanguageChanges;
 Languages;
 LawRating;Åldersgräns

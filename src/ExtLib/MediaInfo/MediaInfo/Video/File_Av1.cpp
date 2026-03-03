@@ -321,7 +321,7 @@ void File_Av1::sequence_header()
     //Parsing
     int32u max_frame_width_minus_1, max_frame_height_minus_1;
     int8u seq_profile, seq_level_idx[33]{}, operating_points_cnt_minus_1, buffer_delay_length_minus_1, frame_width_bits_minus_1, frame_height_bits_minus_1, seq_force_screen_content_tools, BitDepth, color_primaries, transfer_characteristics, matrix_coefficients, chroma_sample_position;
-    bool reduced_still_picture_header, seq_tier[33], timing_info_present_flag, decoder_model_info_present_flag, seq_choose_screen_content_tools, mono_chrome, color_range, color_description_present_flag, subsampling_x, subsampling_y;
+    bool reduced_still_picture_header, seq_tier[33], timing_info_present_flag, decoder_model_info_present_flag, seq_choose_screen_content_tools, mono_chrome, color_range, color_description_present_flag, subsampling_x, subsampling_y, film_grain_params_present;
     BS_Begin();
     Get_S1 ( 3, seq_profile,                                    "seq_profile"); Param_Info1(Av1_seq_profile(seq_profile));
     Skip_SB(                                                    "still_picture");
@@ -481,7 +481,7 @@ void File_Av1::sequence_header()
         }
         Skip_SB(                                                "separate_uv_delta_q");
     Element_End0();
-    Skip_SB(                                                    "film_grain_params_present");
+    Get_SB (film_grain_params_present,                          "film_grain_params_present");
     Mark_1();
     if (Data_BS_Remain()<8)
         while (Data_BS_Remain())
@@ -513,6 +513,8 @@ void File_Av1::sequence_header()
             }
             if (mono_chrome ||  !(color_primaries==1 && transfer_characteristics==13 && matrix_coefficients==0))
                 Fill(Stream_Video, 0, Video_colour_range, Avc_video_full_range[color_range]);
+            if (film_grain_params_present)
+                Fill(Stream_Video, 0, Video_Format_Settings, "Film Grain Synthesis");
 
             sequence_header_Parsed=true;
         }

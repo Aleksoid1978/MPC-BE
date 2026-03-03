@@ -256,7 +256,7 @@ void File_ChannelSplitting::Read_Buffer_Init()
 void File_ChannelSplitting::Read_Buffer_Continue()
 {
     //Handling of multiple frames in one block
-    if (Buffer_Size==0)
+    if (Buffer_Size==0 && Status[IsAccepted])
     {
         Read_Buffer_Continue_Parse();
         return;

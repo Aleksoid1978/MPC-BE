@@ -108,6 +108,7 @@ File_Gxf_TimeCode::~File_Gxf_TimeCode()
 void File_Gxf_TimeCode::Streams_Fill()
 {
     Stream_Prepare(Stream_Other);
+    Fill(Stream_Other, 0, Other_Format, Format);
     Fill(Stream_Other, 0, Other_TimeCode_FirstFrame, TimeCode_FirstFrame);
     if (IsTimeCodeTrack)
         return;
@@ -380,7 +381,7 @@ void File_Gxf_TimeCode::Read_Buffer_Continue()
                         auto& TimeCode_Dump = (*Config->TimeCode_Dumps)[id];
                         if (TimeCode_Dump.List.empty())
                         {
-                            TimeCode_Dump.Attributes_First += " id=\"" + id + "\" format=\"matroska_blockadditional\"";
+                            TimeCode_Dump.Attributes_First += " id=\"" + id + "\" format=\"SMPTE ST12-1\"";
                             TimeCode_Dump.FramesMax = 99;
                         }
                         auto Frames = Frames_Tens * 10 + Frames_Units;

@@ -926,6 +926,7 @@ Language_lv;Lets
 Language_mg;Malagasy
 Language_mh;Marshallees
 Language_mi;Maori
+Language_mis;
 Language_mk;Macedonisch
 Language_ml;Malayalam
 Language_mn;Mongools
@@ -1002,6 +1003,7 @@ Language_tw;Twi
 Language_ty;Tahitiaans
 Language_ug;Oejgoers
 Language_uk;Oekraïens
+Language_und;
 Language_ur;Urdu
 Language_uz;Oezbeeks
 Language_ve;Venda
@@ -1024,6 +1026,7 @@ Language_zh-TW;
 Language_zh-tw;Chinees (Taiwan)
 Language_zh-yue;
 Language_zu;Zoeloe
+Language_zxx;
 LanguageChanges;
 Languages;
 LawRating;Wettelijke rating

@@ -865,7 +865,7 @@ Language_eu;Baskisch
 Language_fa;Persisch
 Language_ff;Fulah
 Language_fi;Finnisch
-Language_fil;
+Language_fil;Pilipino
 Language_fj;Fidschianisch
 Language_fo;Färöisch
 Language_fr;Französisch
@@ -926,6 +926,7 @@ Language_lv;Lettisch
 Language_mg;Madagassisch
 Language_mh;Marshallese
 Language_mi;Maorisch
+Language_mis;Einzelne andere Sprachen
 Language_mk;Mazedonisch
 Language_ml;Malajalam
 Language_mn;Mongolisch
@@ -976,7 +977,7 @@ Language_si;Singhalesisch
 Language_sk;Slowakisch
 Language_sl;Slowenisch
 Language_sm;Samoanisch
-Language_smi;
+Language_smi;Saamisch
 Language_sn;Shona
 Language_so;Somalisch
 Language_sq;Albanisch
@@ -1002,6 +1003,7 @@ Language_tw;Twi
 Language_ty;Tahitianisch
 Language_ug;Uigurisch
 Language_uk;Ukrainisch
+Language_und;Nicht zu entscheiden
 Language_ur;Urdu
 Language_uz;Usbekisch
 Language_ve;Venda
@@ -1024,6 +1026,7 @@ Language_zh-TW;
 Language_zh-tw;Chinesisch (Taiwan
 Language_zh-yue;
 Language_zu;Zulu
+Language_zxx;Kein linguistischer Inhalt
 LanguageChanges;
 Languages;
 LawRating;Altersfreigabe

@@ -926,6 +926,7 @@ Language_lv;lett
 Language_mg; 
 Language_mh; 
 Language_mi;maori 
+Language_mis;
 Language_mk;macedón
 Language_ml;malajziai
 Language_mn;mongol
@@ -1002,6 +1003,7 @@ Language_tw; 
 Language_ty;tahiti
 Language_ug;vigér
 Language_uk;ukrán
+Language_und;
 Language_ur;urdu
 Language_uz;üzbég
 Language_ve; 
@@ -1024,6 +1026,7 @@ Language_zh-TW;
 Language_zh-tw;
 Language_zh-yue;
 Language_zu;zulu
+Language_zxx;
 LanguageChanges;
 Languages;
 LawRating;Korhatár

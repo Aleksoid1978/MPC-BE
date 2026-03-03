@@ -926,6 +926,7 @@ Language_lv;Език_лв
 Language_mg;Език_мг
 Language_mh;Език_мх
 Language_mi;Език_ми
+Language_mis;
 Language_mk;Език_мк
 Language_ml;Език_мл
 Language_mn;Език_мн
@@ -1002,6 +1003,7 @@ Language_tw;
 Language_ty;
 Language_ug;
 Language_uk;
+Language_und;
 Language_ur;
 Language_uz;
 Language_ve;
@@ -1024,6 +1026,7 @@ Language_zh-TW;
 Language_zh-tw;
 Language_zh-yue;
 Language_zu;
+Language_zxx;
 LanguageChanges;
 Languages;
 LawRating;НисъкРейтинг

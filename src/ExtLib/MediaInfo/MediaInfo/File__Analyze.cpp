@@ -44,6 +44,8 @@ using namespace tinyxml2;
     #define memcpy_Unaligned_Unaligned std::memcpy
     #define memcpy_Unaligned_Unaligned_Once1024 std::memcpy
 #endif //MEDIAINFO_SSE2_YES
+#define FMT_UNICODE 0
+#include "ThirdParty/fmt/format.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -247,7 +249,7 @@ static_assert(sizeof(Conformance_Type_String) / sizeof(Conformance_Type_String[0
 
 //---------------------------------------------------------------------------
 #if MEDIAINFO_CONFORMANCE
-string BuildConformanceName(const string& ParserName, const char* Prefix, const char* Suffix)
+string File__Analyze::BuildConformanceName(const string& ParserName, const char* Prefix, const char* Suffix)
 {
     string Result;
     if (!Prefix) {
@@ -387,6 +389,7 @@ void conformance::Streams_Finish_Conformance()
                 }
             }
             string Extra;
+            bool RemoveOneValueCharacter = false;
             if (!ConformanceError.FramePoss.empty())
             {
                 string Frames, Times, Offsets;
@@ -492,8 +495,15 @@ void conformance::Streams_Finish_Conformance()
                     Offsets.pop_back();
                 }
                 if (Frames_HasContent + Times_HasContent + Offsets_HasContent) {
-                    Extra = ' ';
-                    Extra += '(';
+                    if (ConformanceError.Value.back() == ')') {
+                        RemoveOneValueCharacter = true;
+                        Extra = ',';
+                        Extra += ' ';
+                    }
+                    else {
+                        Extra = ' ';
+                        Extra += '(';
+                    }
                     if (Frames == "conf") {
                         Extra += Frames;
                     }
@@ -522,7 +532,11 @@ void conformance::Streams_Finish_Conformance()
                     Extra += ')';
                 }
             }
-            A->Fill(StreamKind_Last, StreamPos_Last, (Conformance_String + ConformanceError.Field).c_str(), ConformanceError.Value + Extra);
+            auto Value = ConformanceError.Value;
+            if (RemoveOneValueCharacter)
+                Value.pop_back();
+            Value += Extra;
+            A->Fill(StreamKind_Last, StreamPos_Last, (Conformance_String + ConformanceError.Field).c_str(), Value);
         }
         Conformance_Total.clear();
     }
@@ -2804,7 +2818,7 @@ void File__Analyze::Header_Fill_Size(int64u Size)
                 Name += ' ';
             }
             Name += "GeneralCompliance";
-            Fill_Conformance(Name.c_str(), "Element size " + to_string(Size - Element_Offset) + " is more than maximal permitted size " + to_string(Element[Element_Level - 2].Next - (File_Offset + Buffer_Offset + Element_Offset)));
+            Fill_Conformance(Name.c_str(), "Element size is more than maximal permitted size (actual " + to_string(Size - Element_Offset) + ", expected " + to_string(Element[Element_Level - 2].Next - (File_Offset + Buffer_Offset + Element_Offset)) + ")");
         }
 
         Element[Element_Level-1].Next=Element[Element_Level-2].Next;
@@ -4473,6 +4487,30 @@ string File__Analyze::CreateElementName()
 
 //---------------------------------------------------------------------------
 #if MEDIAINFO_CONFORMANCE
+static string to_string_with_percent(int64u num, int64u den, bool no_ratio = false)
+{
+    auto Value = fmt::format("{}", num);
+    if (!no_ratio) {
+        auto Percent = (double)num / den;
+        if (Percent >= 1) {
+            Value += ' ' + string(16, '9') + '%';
+            Value[Value.size() - 15] = '.';
+        }
+        else {
+            Percent *= 100;
+            string ActualPercent;
+            for (auto i = 0; ; i++) {
+                ActualPercent = fmt::format("{:.{}f}", Percent, i);
+                if ((ActualPercent.front() == '0' && (ActualPercent.size() > 1 && ActualPercent[1] == '.' && ActualPercent.find_first_not_of('0', 2) != string::npos)) // Not 0.0...
+                    || (ActualPercent.front() != '0' && (ActualPercent.size() <= 2 || ActualPercent[2] == '.'))) {
+                    Value += ' ' + ActualPercent + '%';
+                    break;
+                }
+            }
+        }
+    }
+    return Value;
+}
 void File__Analyze::IsTruncated(int64u ExpectedSize, bool MoreThan, const char* Prefix)
 {
     if (IsSub) {
@@ -4484,12 +4522,40 @@ void File__Analyze::IsTruncated(int64u ExpectedSize, bool MoreThan, const char* 
     Frame_Count_NotParsedIncluded = (int64u)-1;
     Fill(Stream_General, 0, "IsTruncated", "Yes", Unlimited, true, true);
     Fill_SetOptions(Stream_General, 0, "IsTruncated", "N NT");
-    Fill_Conformance(BuildConformanceName(ParserName, Prefix, "GeneralCompliance").c_str(), "File size " + std::to_string(File_Size) + " is less than expected size " + (ExpectedSize == (int64u)-1 ? std::string() : ((MoreThan ? "at least " : "") + std::to_string(ExpectedSize))));
+    Fill_Conformance(BuildConformanceName(ParserName, Prefix, "GeneralCompliance").c_str(), "File size is less than expected size (actual " + to_string_with_percent(File_Size, ExpectedSize, ExpectedSize == (int64u)-1 || MoreThan) + (ExpectedSize == (int64u)-1 ? std::string() : (", expected " + ((MoreThan ? ">=" : "") + fmt::format("{}", ExpectedSize)))) + ')');
     Merge_Conformance();
     Frame_Count = Frame_Count_Save;
     Frame_Count_NotParsedIncluded = Frame_Count_NotParsedIncluded_Save;
 }
 
+#endif //MEDIAINFO_CONFORMANCE
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_CONFORMANCE
+void File__Analyze::DurationIssue(int64u ActualDuration, int64u ExpectedDuration, bool MoreThan, const char* Prefix)
+{
+    auto ExpectedDuration_Min = ExpectedDuration;
+    auto ExpectedDurationI = ((int64u)(ExpectedDuration / 1000)) * 1000;
+    float64 Multiplier;
+    if (ExpectedDuration - ExpectedDurationI == 0) { // If precision is second only, we tolerate +/- 1s
+        ExpectedDuration_Min -= 1000;
+        Multiplier = 1000;
+    }
+    else {
+        ExpectedDuration_Min += 1;
+        Multiplier = 1;
+    }
+    if (ActualDuration < ExpectedDuration_Min) {
+        auto ActualTC = TimeCode((double)ActualDuration / 1000, 999, TimeCode::Timed()).ToString();
+        auto ForPercentage = to_string_with_percent(ActualDuration, ExpectedDuration, false);
+        auto ForPercentage_CutPos = ForPercentage.find(' ');
+        if (ForPercentage_CutPos != string::npos) {
+            ActualTC += ForPercentage.substr(ForPercentage_CutPos);
+        }
+        auto ExpectedTC = TimeCode((double)ExpectedDuration / 1000, (Multiplier - 1) ? 0 : 999, TimeCode::Timed()).ToString();
+        Fill_Conformance(BuildConformanceName(ParserName, Prefix ? Prefix : "", "Duration").c_str(), "Duration is less than expected duration (actual " + ActualTC + ", expected " + ExpectedTC + ')');
+    }
+}
 #endif //MEDIAINFO_CONFORMANCE
 
 //---------------------------------------------------------------------------
@@ -4514,10 +4580,27 @@ void File__Analyze::RanOutOfData(const char* Prefix)
 
 //---------------------------------------------------------------------------
 #if MEDIAINFO_CONFORMANCE
-void File__Analyze::SynchLost(const char* Prefix)
+void File__Analyze::SynchLost(const char* Prefix, int64u CountOfBytes, bool AreZero)
 {
     Synched=false;
-    Fill_Conformance(BuildConformanceName(ParserName, Prefix, "GeneralCompliance").c_str(), "Bitstream synchronisation is lost");
+    const auto Name = BuildConformanceName(ParserName, Prefix, "GeneralCompliance");
+    string Content = "Bitstream synchronisation is lost";
+    auto Type = conformance_type::Conformance_Error;
+    if (CountOfBytes) {
+        if (AreZero) {
+            Content += ", zeroed bytes";
+            if (File_Offset + Buffer_Offset + CountOfBytes >= File_Size) {
+                Content += " at the end";
+                Type = Conformance_Information;
+            }
+        }
+        Content += " (count " + to_string_with_percent(CountOfBytes, File_Size) + ")";
+    }
+    File_Offset-=CountOfBytes;
+    Fill_Conformance(Name.c_str(), Content, {}, Type);
+    Trusted_IsNot("Synchronisation lost");
+    File_Offset+=CountOfBytes;
+    Merge_Conformance();
 }
 
 #endif //MEDIAINFO_CONFORMANCE

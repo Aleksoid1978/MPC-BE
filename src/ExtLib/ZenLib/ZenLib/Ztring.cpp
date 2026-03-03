@@ -49,6 +49,13 @@
 using namespace std;
 //---------------------------------------------------------------------------
 
+//MSVC2005 : "deprecated" warning (replacement functions are not in MinGW32 or Borland!)
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+    #pragma warning(disable : 4996)
+#endif
+
+//---------------------------------------------------------------------------
+
 namespace ZenLib
 {
 

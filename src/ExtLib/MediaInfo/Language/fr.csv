@@ -817,213 +817,216 @@ Known parameters;Paramètres connus
 Label;Étiquette
 Language;Langue
 Language_aa;Afar
-Language_ab;Abkhazian
-Language_ae;Avestan
+Language_ab;Abkhaze
+Language_ae;Avestique
 Language_af;Afrikaans
 Language_ak;Akan
-Language_am;Amharic
-Language_an;Aragonese
-Language_ar;Arabic
-Language_as;Assamese
-Language_av;Avaric
+Language_am;Amharique
+Language_an;Aragonais
+Language_ar;Arabe
+Language_as;Assamais
+Language_av;Avar
 Language_ay;Aymara
-Language_az;Azerbaijani
-Language_ba;Bashkir
-Language_be;Belarusian
-Language_bg;Bulgarian
+Language_az;Azéri
+Language_ba;Bachkir
+Language_be;Biélorusse
+Language_bg;Bulgare
 Language_bh;Bihari
-Language_bi;Bislama
+Language_bi;Bichlamar
 Language_bm;Bambara
 Language_bn;Bengali
-Language_bo;Tibetan
+Language_bo;Tibétain
 Language_br;Breton
-Language_bs;Bosnian
+Language_bs;Bosniaque
 Language_ca;Catalan
-Language_ce;Chechen
+Language_ce;Tchétchène
 Language_ch;Chamorro
 Language_cmn;Mandarin
-Language_co;Corsican
+Language_co;Corse
 Language_cr;Cree
-Language_cs;Czech
+Language_cs;Tchèque
 Language_cu;Slave
-Language_cv;Chuvash
-Language_cy;Welsh
-Language_da;Danish
-Language_de;German
-Language_dv;Divehi
+Language_cv;Tchouvache
+Language_cy;Gallois
+Language_da;Danois
+Language_de;Allemand
+Language_dv;Maldivien
 Language_dz;Dzongkha
-Language_ee;Ewe
-Language_el;Greek
-Language_en;English
-Language_en-gb;English (Great Britain)
-Language_en-us;English (United States)
-Language_eo;Esperanto
-Language_es;Spanish
-Language_es-419;Spanish (Latin America)
-Language_et;Estonian
+Language_ee;Éwé
+Language_el;Grec
+Language_en;Anglais
+Language_en-gb;Anglais (Royaume-Uni)
+Language_en-us;Anglais (États-Unis)
+Language_eo;Espéranto
+Language_es;Espagnol
+Language_es-419;
+Language_et;Estonien
 Language_eu;Basque
-Language_fa;Persian
-Language_ff;Fulah
-Language_fi;Finnish
+Language_fa;Persan
+Language_ff;Peul
+Language_fi;Finnois
 Language_fil;Filipino
-Language_fj;Fijian
-Language_fo;Faroese
-Language_fr;French
-Language_fy;Frisian
-Language_ga;Irish
-Language_gd;Gaelic
-Language_gl;Galician
+Language_fj;Fidjien
+Language_fo;Féroïen
+Language_fr;Français
+Language_fy;Frison
+Language_ga;Irlandais
+Language_gd;Gaélique
+Language_gl;Galicien
 Language_gn;Guarani
-Language_gu;Gujarati
+Language_gu;Goudjrati
 Language_gv;Manx
-Language_ha;Hausa
-Language_he;Hebrew
+Language_ha;Haoussa
+Language_he;Hébreu
 Language_hi;Hindi
-Language_ho;Hiri Motu
-Language_hr;Croatian
-Language_ht;Haitian
-Language_hu;Hungarian
-Language_hy;Armenian
-Language_hy-az;Armenian (Azerbaijani)
+Language_ho;Hiri motu
+Language_hr;Croate
+Language_ht;Haïtien
+Language_hu;Hongrois
+Language_hy;Arménien
+Language_hy-az;
 Language_hz;Herero
-Language_ia;Auxiliary Language Association
-Language_id;Indonesian
+Language_ia;Interlingua (Langue Auxiliaire Internationale)
+Language_id;Indonésien
 Language_ie;Interlingue
 Language_ig;Igbo
-Language_ii;Sichuan Yi
+Language_ii;Yi de Sichuan
 Language_ik;Inupiaq
-Language_Info;Language info
+Language_Info;Langage, plus d'info
 Language_io;Ido
-Language_is;Icelandic
-Language_it;Italian
+Language_is;Islandais
+Language_it;Italien
 Language_iu;Inuktitut
-Language_ja;Japanese
-Language_jv;Javanese
-Language_ka;Georgian
+Language_ja;Japonais
+Language_jv;Javanais
+Language_ka;Géorgien
 Language_kg;Kongo
 Language_ki;Kikuyu
 Language_kj;Kuanyama
 Language_kk;Kazakh
-Language_kl;Kalaallisut
+Language_kl;Groenlandais
 Language_km;Khmer
 Language_kn;Kannada
-Language_ko;Korean
-Language_kr;Kanuri
+Language_ko;Coréen
+Language_kr;Kanouri
 Language_ks;Kashmiri
-Language_ku;Kurdish
+Language_ku;Kurde
 Language_kv;Komi
-Language_kw;Cornish
-Language_ky;Kirghiz
+Language_kw;Cornique
+Language_ky;Kirghize
 Language_la;Latin
-Language_lb;Luxembourgish
+Language_lb;Luxembourgeois
 Language_lg;Ganda
-Language_li;Limburgish
+Language_li;Limbourgeois
 Language_ln;Lingala
 Language_lo;Lao
-Language_lt;Lithuanian
-Language_lu;Luba-Katanga
-Language_lv;Latvian
-Language_mg;Malagasy
-Language_mh;Marshallese
+Language_lt;Lituanien
+Language_lu;Luba-katanga
+Language_lv;Letton
+Language_mg;Malgache
+Language_mh;Marshall
 Language_mi;Maori
-Language_mk;Macedonian
+Language_mis;Langues non codées
+Language_mk;Macédonien
 Language_ml;Malayalam
-Language_mn;Mongolian
-Language_mn-cn;Mongolian (China)
-Language_mo;Moldavian
-Language_More;Language, more info
-Language_mr;Marathi
-Language_ms;Malay
-Language_ms-bn;Malay (Brunei)
-Language_mt;Maltese
-Language_mul;Multiple languages
-Language_my;Burmese
-Language_na;Nauru
-Language_nb;Norwegian Bokmal
-Language_nd;Ndebele
-Language_ne;Nepali
+Language_mn;Mongol
+Language_mn-cn;
+Language_mo;Moldave
+Language_More;Langue, plus d'info
+Language_mr;Marathe
+Language_ms;Malais
+Language_ms-bn;Malais (Brunéi)
+Language_mt;Maltais
+Language_mul;Langues multiples
+Language_my;Birman
+Language_na;Nauruan
+Language_nb;Norwegian bokmål
+Language_nd;Ndébélé du Nord
+Language_ne;Népalais
 Language_ng;Ndonga
-Language_nl;Dutch
-Language_nl-be;Flemish
-Language_nn;Norwegian Nynorsk
-Language_no;Norwegian
-Language_nr;Ndebele
+Language_nl;Néerlandais
+Language_nl-be;
+Language_nn;Norvégien Bokmål
+Language_no;Norvégien
+Language_nr;Ndébélé du Sud
 Language_nv;Navaho
 Language_ny;Nyanja
 Language_oc;Occitan
 Language_oj;Ojibwa
-Language_om;Oromo
+Language_om;Galla
 Language_or;Oriya
-Language_os;Ossetic
-Language_pa;Panjabi
+Language_os;Ossète
+Language_pa;Panjâbî
 Language_pi;Pali
-Language_pl;Polish
-Language_ps;Pushto
-Language_pt;Portuguese
-Language_pt-br;Portuguese (Brazil)
+Language_pl;Polonais
+Language_ps;Pachto
+Language_pt;Portugais
+Language_pt-br;Portugais (Brésil)
 Language_qu;Quechua
-Language_rm;Raeto-Romance
+Language_rm;Rhéto-roman
 Language_rn;Rundi
-Language_ro;Romanian
-Language_ru;Russian
-Language_rw;Kinyarwanda
+Language_ro;Roumain
+Language_ru;Russe
+Language_rw;Rwanda
 Language_sa;Sanskrit
-Language_sc;Sardinian
+Language_sc;Sarde
 Language_sd;Sindhi
-Language_se;Northern Sami
+Language_se;Sami du Nord
 Language_sg;Sango
-Language_si;Sinhala
-Language_sk;Slovak
-Language_sl;Slovenian
+Language_si;Singhalais
+Language_sk;Slovaque
+Language_sl;Slovène
 Language_sm;Samoan
-Language_smi;Sami
+Language_smi;Sames
 Language_sn;Shona
 Language_so;Somali
-Language_sq;Albanian
-Language_sr;Serbian
+Language_sq;Albanais
+Language_sr;Serbe
 Language_ss;Swati
-Language_st;Sotho
-Language_su;Sundanese
-Language_sv;Swedish
+Language_st;Sotho du Sud
+Language_su;Soundanais
+Language_sv;Suédois
 Language_sw;Swahili
-Language_ta;Tamil
-Language_te;Telugu
-Language_tg;Tajik
-Language_th;Thai
-Language_ti;Tigrinya
-Language_tk;Turkmen
+Language_ta;Tamoul
+Language_te;Télougou
+Language_tg;Tadjik
+Language_th;Thaï
+Language_ti;Tigrigna
+Language_tk;Turkmène
 Language_tl;Tagalog
 Language_tn;Tswana
-Language_to;Tonga
-Language_tr;Turkish
+Language_to;Tongan
+Language_tr;Turc
 Language_ts;Tsonga
 Language_tt;Tatar
 Language_tw;Twi
-Language_ty;Tahitian
-Language_ug;Uighur
-Language_uk;Ukrainian
-Language_ur;Urdu
-Language_uz;Uzbek
+Language_ty;Tahitien
+Language_ug;Ouïgour
+Language_uk;Ukrainien
+Language_und;Indéterminée
+Language_ur;Ourdou
+Language_uz;Ouszbek
 Language_ve;Venda
-Language_vi;Vietnamese
-Language_vo;Volapuk
-Language_wa;Walloon
+Language_vi;Vietnamien
+Language_vo;Volapük
+Language_wa;Wallon
 Language_wo;Wolof
 Language_xh;Xhosa
 Language_yi;Yiddish
 Language_yo;Yoruba
-Language_yue;Cantonese
+Language_yue;Cantonais
 Language_za;Zhuang
-Language_zh;Chinese
+Language_zh;Chinois
 Language_zh-cmn;Mandarin
-Language_zh-CN;Chinese (China)
-Language_zh-cn;Chinese (China)
-Language_zh-Hans;Chinese (Simplified)
-Language_zh-Hant;Chinese (Traditional)
-Language_zh-TW;Chinese (Taiwan)
-Language_zh-tw;Chinese (Taiwan)
-Language_zh-yue;Cantonese
-Language_zu;Zulu
+Language_zh-CN;Chinois (Chine)
+Language_zh-cn;Chinois (Chine)
+Language_zh-Hans;Chinois (simplifié)
+Language_zh-Hant;Chinois (traditionnel)
+Language_zh-TW;Chinois (Taiwan)
+Language_zh-tw;Chinois (Taiwan)
+Language_zh-yue;Cantonais
+Language_zu;Zoulou
+Language_zxx;Pas de contenu linguistique ou non applicable
 LanguageChanges;Les changements prendront effet au redémarrage de l'application
 Languages;
 LawRating;Classé

@@ -45,6 +45,10 @@ private :
     //Buffer - Demux
     bool Demux_UnpacketizeContainer_Test();
 
+    //Buffer - Global
+    void Read_Buffer_Unsynched();
+    void Read_Buffer_Continue();
+
     //Buffer - Per element
     void Header_Parse();
     void Data_Parse();
@@ -93,6 +97,7 @@ private :
     bool   copyright;
     bool   original_home;
     bool   VBR_Frames_IsCbr;
+    bool   LastSync_Offset_AreNotZero;
     size_t MpegPsPattern_Count;
 
     //Helpers

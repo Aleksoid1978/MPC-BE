@@ -415,6 +415,7 @@ namespace Elements
     const int64u Segment_Tags_Tag_Targets_TagEditionUID=0x23C9;
     const int64u Segment_Tags_Tag_Targets_TagChapterUID=0x23C4;
     const int64u Segment_Tags_Tag_Targets_TagAttachmentUID=0x23C6;
+    const int64u Segment_Tags_Tag_Targets_TagBlockAddIDValue=0x23C7;
     const int64u Segment_Tags_Tag_SimpleTag=0x27C8;
     const int64u Segment_Tags_Tag_SimpleTag_TagName=0x5A3;
     const int64u Segment_Tags_Tag_SimpleTag_TagLanguage=0x47A;
@@ -783,6 +784,8 @@ File_Mk::~File_Mk()
 //---------------------------------------------------------------------------
 void File_Mk::Streams_Finish()
 {
+    Segment_Tags_Tag_Targets_Remap();
+
     if (Duration!=0 && TimecodeScale!=0)
         Fill(Stream_General, 0, General_Duration, Duration*int64u_float64(TimecodeScale)/1000000.0, 0);
 
@@ -791,7 +794,7 @@ void File_Mk::Streams_Finish()
 
     //Tags (General)
     for (tags::iterator Item=Segment_Tags_Tag_Items.begin(); Item!=Segment_Tags_Tag_Items.end(); ++Item)
-        if (!Item->first || Item->first == (int64u)-1)
+        if (!Item->first.TagTrackUID)
         {
             for (tagspertrack::iterator Tag=Item->second.begin(); Tag!=Item->second.end(); ++Tag)
                 if ((Tag->first!=__T("Encoded_Library") || Retrieve(Stream_General, 0, "Encoded_Library")!=Tag->second) // Avoid repetition if Info block is same as tags
@@ -804,6 +807,12 @@ void File_Mk::Streams_Finish()
     {
         StreamKind_Last=Temp->second.StreamKind;
         StreamPos_Last=Temp->second.StreamPos;
+        if (StreamKind_Last==Stream_Max)
+        {
+            Stream_Prepare(Stream_Other);
+            Temp->second.StreamKind=StreamKind_Last;
+            Temp->second.StreamPos=StreamPos_Last;
+        }
         float64 FrameRate_FromTags = 0.0;
         bool HasStats=false;
 
@@ -814,7 +823,7 @@ void File_Mk::Streams_Finish()
             for (std::map<std::string, Ztring>::iterator Info=Temp->second.Infos.begin(); Info!=Temp->second.Infos.end(); ++Info)
                 Fill(StreamKind_Last, StreamPos_Last, Info->first.c_str(), Info->second);
 
-            tags::iterator Item=Segment_Tags_Tag_Items.find(Temp->second.TrackUID);
+            tags::iterator Item = Segment_Tags_Tag_Items.find({ Temp->second.TrackUID, {} });
             if (Item != Segment_Tags_Tag_Items.end())
             {
                 //Statistic Tags
@@ -1043,7 +1052,7 @@ void File_Mk::Streams_Finish()
                             }
                         }
                     }
-                    if ((Tag->first!=__T("Language") || Retrieve(StreamKind_Last, StreamPos_Last, "Language").empty())) // Prioritize Tracks block over tags
+                    if (Tag->first!=__T("BPS") && (Tag->first!=__T("Language") || Retrieve(StreamKind_Last, StreamPos_Last, "Language").empty())) // Prioritize Tracks block over tags
                         Fill(StreamKind_Last, StreamPos_Last, Tag->first.To_UTF8().c_str(), Tag->second);
                 }
             }
@@ -1298,21 +1307,6 @@ void File_Mk::Streams_Finish()
             if (Temp->second.StreamKind==Stream_Video && !Codec_Temp.empty())
                 Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Codec), Codec_Temp, true);
 
-            //BlockAdditions
-            for (auto Add=Temp->second.BlockAdditions.begin(); Add!=Temp->second.BlockAdditions.end(); ++Add)
-            {
-                auto StreamKind_Last_Sav=StreamKind_Last;
-                auto StreamPos_Last_Sav=StreamPos_Last;
-                Merge(*Add->second);
-                if (StreamKind_Last!=StreamKind_Last_Sav || StreamPos_Last!=StreamPos_Last_Sav)
-                {
-                    Fill(StreamKind_Last, StreamPos_Last, Other_ID, to_string(Temp->first)+"-Add-"+to_string(Add->first));
-                    Fill(StreamKind_Last, StreamPos_Last, Other_MuxingMode, "BlockAddition");
-                    StreamKind_Last=StreamKind_Last_Sav;
-                    StreamPos_Last=StreamPos_Last_Sav;
-                }
-            }
-
             //Format specific
             #if defined(MEDIAINFO_DVDIF_YES)
                 if (StreamKind_Last==Stream_Video && Retrieve(Stream_Video, StreamPos_Last, Video_Format)==__T("DV"))
@@ -1381,10 +1375,33 @@ void File_Mk::Streams_Finish()
                 Fill(Stream_Video, StreamPos_Last, Video_Height_Offset, Temp->second.PixelCropTop, 10, true);
             }
         }
-        for (auto BlockAddition : Temp->second.BlockAdditions)
+
+        //BlockAdditions
+        for (auto Add=Temp->second.BlockAdditions.begin(); Add!=Temp->second.BlockAdditions.end(); ++Add)
         {
-            Finish(BlockAddition.second);
-            Merge(*BlockAddition.second, StreamKind_Last, 0, StreamPos_Last);
+            auto StreamKind_Last_Sav=StreamKind_Last;
+            auto StreamPos_Last_Sav=StreamPos_Last;
+            Finish(Add->second.Parser);
+            Merge(*Add->second.Parser);
+            if (StreamKind_Last!=StreamKind_Last_Sav || StreamPos_Last!=StreamPos_Last_Sav)
+            {
+                Fill(StreamKind_Last, StreamPos_Last, Other_ID, to_string(Temp->first)+"-Add-"+to_string(Add->first));
+                Fill(StreamKind_Last, StreamPos_Last, Other_MuxingMode, "BlockAddition");
+
+                //Tags (BlockID)
+                for (tags::iterator Item = Segment_Tags_Tag_Items.begin(); Item != Segment_Tags_Tag_Items.end(); ++Item)
+                    if (Item->first.TagTrackUID == Temp->second.TrackUID && Item->first.TagBlockAddIDValue == Add->first)
+                    {
+                        for (tagspertrack::iterator Tag = Item->second.begin(); Tag != Item->second.end(); ++Tag)
+                            if ((Tag->first != __T("Encoded_Library") || Retrieve(Stream_General, 0, "Encoded_Library") != Tag->second) // Avoid repetition if Info block is same as tags
+                                && (Tag->first != __T("Encoded_Date") || Retrieve(StreamKind_Last, StreamPos_Last, "Encoded_Date") != Tag->second)
+                                && (Tag->first != __T("Title") || Retrieve(StreamKind_Last, StreamPos_Last, "Title") != Tag->second))
+                                Fill(StreamKind_Last, StreamPos_Last, Tag->first == __T("Title") ? "TimeCode_Source" : Tag->first.To_UTF8().c_str(), Tag->second);
+                    }
+
+                StreamKind_Last=StreamKind_Last_Sav;
+                StreamPos_Last=StreamPos_Last_Sav;
+            }
         }
 
         if (Temp->second.FrameRate!=0 && Retrieve(Stream_Video, StreamPos_Last, Video_FrameRate).empty())
@@ -2147,6 +2164,7 @@ void File_Mk::Data_Parse()
                     ATO2(Segment_Tags_Tag_Targets_TagEditionUID, "TagEditionUID")
                     ATO2(Segment_Tags_Tag_Targets_TagChapterUID, "TagChapterUID")
                     ATO2(Segment_Tags_Tag_Targets_TagAttachmentUID, "TagAttachmentUID")
+                    ATO2(Segment_Tags_Tag_Targets_TagBlockAddIDValue, "TagBlockAddIDValue")
                     ATOM_END_MK
                 LIS2(Segment_Tags_Tag_SimpleTag, "SimpleTag")
                     ATOM_BEGIN
@@ -2591,7 +2609,12 @@ void File_Mk::Segment_Attachments_AttachedFile_FileData()
     Element_Name("FileData");
 
     //Parsing
-    if (Element_TotalSize_Get()<=16*1024*1024) //TODO: option for setting the acceptable maximum size of the attachment
+    auto Size=Element_TotalSize_Get();
+    if (Size>16*1024*1024) //TODO: option for setting the acceptable maximum size of the attachment
+    {
+        Skip_XX(Size,                                           "(Data)");
+        return;
+    }
     {
         if (!Element_IsComplete_Get())
         {
@@ -3059,7 +3082,7 @@ void File_Mk::Segment_Cluster_BlockGroup_BlockAdditions_BlockMore_BlockAdditiona
     auto Parser=BlockAdditions.find(BlockAddIDValue);
     if (Parser!=BlockAdditions.end())
     {
-        Open_Buffer_Continue(Parser->second);
+        Open_Buffer_Continue(Parser->second.Parser);
         return;
     }
 
@@ -3288,26 +3311,17 @@ void File_Mk::Segment_SeekHead_Seek_SeekPosition()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tags()
 {
-    Segment_Tag_SimpleTag_TagNames.clear();
 }
 
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tags_Tag()
 {
     //Previous tags
-    tags::iterator Items0 = Segment_Tags_Tag_Items.find((int64u)-1);
-    if (Items0 != Segment_Tags_Tag_Items.end())
-    {
-        tagspertrack &Items = Segment_Tags_Tag_Items[0]; // Creates it if not yet present, else take the previous one
-
-        //Change the key of the current tag
-        for (tagspertrack::iterator Item=Items0->second.begin(); Item!=Items0->second.end(); ++Item)
-            Items[Item->first] = Item->second;
-        Segment_Tags_Tag_Items.erase(Items0);
-    }
+    Segment_Tags_Tag_Targets_Remap();
 
     //Init
-    Segment_Tags_Tag_Targets_TagTrackUID_Value=0; // Default is all tracks
+    Segment_Tags_Tag_Target_Value = { (int64u)-1, (int64u)-1 };
+    Segment_Tags_Tag_SimpleTag_TagString_Value.clear();
 }
 
 //---------------------------------------------------------------------------
@@ -3322,6 +3336,12 @@ void File_Mk::Segment_Tags_Tag_SimpleTag_TagLanguage()
 }
 
 //---------------------------------------------------------------------------
+void File_Mk::Segment_Tags_Tag_SimpleTag()
+{
+    Segment_Tag_SimpleTag_TagNames.resize(Element_Level - 4); //4 is the first level of a tag main element
+}
+
+//---------------------------------------------------------------------------
 void File_Mk::Segment_Tags_Tag_SimpleTag_TagName()
 {
     //Parsing
@@ -3329,23 +3349,31 @@ void File_Mk::Segment_Tags_Tag_SimpleTag_TagName()
 
     Segment_Tag_SimpleTag_TagNames.resize(Element_Level-5); //5 is the first level of a tag
     Segment_Tag_SimpleTag_TagNames.push_back(TagName);
+    Segment_Tags_Tag_SimpleTag_Assign();
 }
 
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tags_Tag_SimpleTag_TagString()
 {
     //Parsing
-    Ztring TagString;
-    TagString=UTF8_Get();
+    Segment_Tags_Tag_SimpleTag_TagString_Value=UTF8_Get();
+    Segment_Tags_Tag_SimpleTag_Assign();
+}
 
-    if (Segment_Tag_SimpleTag_TagNames.empty())
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Tags_Tag_SimpleTag_Assign()
+{
+    if (Segment_Tag_SimpleTag_TagNames.empty() || Segment_Tags_Tag_SimpleTag_TagString_Value.empty())
         return;
+    auto TagString=std::move(Segment_Tags_Tag_SimpleTag_TagString_Value);
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("AERMS_OF_USE")) Segment_Tag_SimpleTag_TagNames[0]=__T("TermsOfUse"); //Typo in the source file
-    if (Segment_Tag_SimpleTag_TagNames[0]==__T("BITSPS")) return; //Useless
-    if (Segment_Tag_SimpleTag_TagNames[0]==__T("COMPATIBLE_BRANDS")) return; //QuickTime techinical info, useless
+    if (Segment_Tag_SimpleTag_TagNames[0]==__T("ARTIST")) Segment_Tag_SimpleTag_TagNames[0]=__T("Performer");
+    if (Segment_Tag_SimpleTag_TagNames[0]==__T("BITSPS")) Segment_Tag_SimpleTag_TagNames[0].clear(); //Useless
+    if (Segment_Tag_SimpleTag_TagNames[0]==__T("COMPATIBLE_BRANDS")) Segment_Tag_SimpleTag_TagNames[0].clear(); //QuickTime techinical info, useless
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("CONTENT_TYPE")) Segment_Tag_SimpleTag_TagNames[0]=__T("ContentType");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("COPYRIGHT")) Segment_Tag_SimpleTag_TagNames[0]=__T("Copyright");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("CREATION_TIME")) {Segment_Tag_SimpleTag_TagNames[0]=__T("Encoded_Date"); TagString+=__T(" UTC");}
+    if (Segment_Tag_SimpleTag_TagNames[0]==__T("DATE")) Segment_Tag_SimpleTag_TagNames[0]=__T("Recorded_Date");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("DATE_DIGITIZED")) {Segment_Tag_SimpleTag_TagNames[0]=__T("Mastered_Date"); TagString+=__T(" UTC");}
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("DATE_ENCODED")) Segment_Tag_SimpleTag_TagNames[0]=__T("Encoded_Date");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("DATE_RECORDED")) Segment_Tag_SimpleTag_TagNames[0]=__T("Recorded_Date");
@@ -3356,28 +3384,35 @@ void File_Mk::Segment_Tags_Tag_SimpleTag_TagString()
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("ENCODED_BY")) Segment_Tag_SimpleTag_TagNames[0]=__T("EncodedBy");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("ENCODER")) Segment_Tag_SimpleTag_TagNames[0]=__T("Encoded_Library");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("ENCODER_SETTINGS")) Segment_Tag_SimpleTag_TagNames[0]=__T("Encoded_Library_Settings");
-    if (Segment_Tag_SimpleTag_TagNames[0]==__T("FPS")) return; //Useless
+    if (Segment_Tag_SimpleTag_TagNames[0]==__T("FPS")) Segment_Tag_SimpleTag_TagNames[0].clear(); //Useless
+    if (Segment_Tag_SimpleTag_TagNames[0]==__T("GENRE")) Segment_Tag_SimpleTag_TagNames[0]=__T("Genre");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("HANDLER_NAME"))
     {
         if (TagString.find(__T("Handler"))!=std::string::npos || TagString.find(__T("handler"))!=std::string::npos || TagString.find(__T("vide"))!=std::string::npos || TagString.find(__T("soun"))!=std::string::npos)
-            return; //This is not a Title
-        Segment_Tag_SimpleTag_TagNames[0]=__T("Title");
+            Segment_Tag_SimpleTag_TagNames[0].clear(); //This is not a Title
+        else 
+            Segment_Tag_SimpleTag_TagNames[0]=__T("Title");
     }
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("LANGUAGE")) Segment_Tag_SimpleTag_TagNames[0]=__T("Language");
-    if (Segment_Tag_SimpleTag_TagNames[0]==__T("MAJOR_BRAND")) return; //QuickTime techinical info, useless
-    if (Segment_Tag_SimpleTag_TagNames[0]==__T("MINOR_VERSION")) return; //QuickTime techinical info, useless
+    if (Segment_Tag_SimpleTag_TagNames[0]==__T("MAJOR_BRAND")) Segment_Tag_SimpleTag_TagNames[0].clear(); //QuickTime techinical info, useless
+    if (Segment_Tag_SimpleTag_TagNames[0]==__T("MINOR_VERSION")) Segment_Tag_SimpleTag_TagNames[0].clear(); //QuickTime techinical info, useless
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("PART_NUMBER")) Segment_Tag_SimpleTag_TagNames[0]=__T("Track/Position");
+    if (Segment_Tag_SimpleTag_TagNames[0]==__T("PURL")) Segment_Tag_SimpleTag_TagNames[0]=__T("Podcast_Url");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("ORIGINAL_MEDIA_TYPE")) Segment_Tag_SimpleTag_TagNames[0]=__T("OriginalSourceForm");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("SAMPLE") && Segment_Tag_SimpleTag_TagNames.size()==2 && Segment_Tag_SimpleTag_TagNames[1]==__T("PART_NUMBER")) return; //Useless
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("SAMPLE") && Segment_Tag_SimpleTag_TagNames.size()==2 && Segment_Tag_SimpleTag_TagNames[1]==__T("TITLE")) {Segment_Tag_SimpleTag_TagNames.resize(1); Segment_Tag_SimpleTag_TagNames[0]=__T("Title_More");}
-    if (Segment_Tag_SimpleTag_TagNames[0]==__T("STEREO_MODE")) return; //Useless
+    if (Segment_Tag_SimpleTag_TagNames[0]==__T("STEREO_MODE")) Segment_Tag_SimpleTag_TagNames[0].clear(); //Useless
+    if (Segment_Tag_SimpleTag_TagNames[0]==__T("SYNOPSIS")) Segment_Tag_SimpleTag_TagNames[0]=__T("Synopsis");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("TERMS_OF_USE")) Segment_Tag_SimpleTag_TagNames[0]=__T("TermsOfUse");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("TIMECODE"))
     {
         if (TagString.find(__T("Handler"))!=std::string::npos || TagString.find(__T("handler"))!=std::string::npos || TagString.find(__T("vide"))!=std::string::npos || TagString.find(__T("soun"))!=std::string::npos)
-            return; //This is not a Title
-        Segment_Tag_SimpleTag_TagNames[0]=__T("TimeCode_FirstFrame");
-        Segment_Tags_Tag_Items[Segment_Tags_Tag_Targets_TagTrackUID_Value]["TimeCode_Source"]="Matroska tags";
+            Segment_Tag_SimpleTag_TagNames[0].clear(); //This is not a Title
+        else
+        {
+            Segment_Tag_SimpleTag_TagNames[0]=__T("TimeCode_FirstFrame");
+            Segment_Tags_Tag_Items[Segment_Tags_Tag_Target_Value]["TimeCode_Source"]="Matroska tags";
+        }
     }
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("TITLE")) Segment_Tag_SimpleTag_TagNames[0]=__T("Title");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("TOTAL_PARTS")) Segment_Tag_SimpleTag_TagNames[0]=__T("Track/Position_Total");
@@ -3397,27 +3432,46 @@ void File_Mk::Segment_Tags_Tag_SimpleTag_TagString()
             TagName+=__T('/');
     }
 
-    Segment_Tags_Tag_Items[Segment_Tags_Tag_Targets_TagTrackUID_Value][TagName]=TagString;
+    if (!TagName.empty())
+        Segment_Tags_Tag_Items[Segment_Tags_Tag_Target_Value][TagName]=TagString;
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Tags_Tag_Targets()
+{
+    Segment_Tags_Tag_Target_Value = {};
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Tags_Tag_Targets_Remap()
+{
+    if (Segment_Tags_Tag_Target_Value == tagid{ (int64u)-1, (int64u)-1 })
+        return;
+
+    tags::iterator Items0 = Segment_Tags_Tag_Items.find({ (int64u)-1, (int64u)-1 });
+    if (Items0 == Segment_Tags_Tag_Items.end())
+        return;
+
+    tagspertrack& Items = Segment_Tags_Tag_Items[Segment_Tags_Tag_Target_Value]; // Creates it if not yet present, else take the previous one
+
+    //Change the key of the current tag
+    for (tagspertrack::iterator Item = Items0->second.begin(); Item != Items0->second.end(); ++Item)
+        Items[Item->first] = Item->second;
+    Segment_Tags_Tag_Items.erase(Items0);
 }
 
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tags_Tag_Targets_TagTrackUID()
 {
     //Parsing
-    Segment_Tags_Tag_Targets_TagTrackUID_Value=UInteger_Get();
+    Segment_Tags_Tag_Target_Value.TagTrackUID=UInteger_Get();
+}
 
-    FILLING_BEGIN();
-        tags::iterator Items0 = Segment_Tags_Tag_Items.find((int64u)-1);
-        if (Items0 != Segment_Tags_Tag_Items.end())
-        {
-            tagspertrack &Items = Segment_Tags_Tag_Items[Segment_Tags_Tag_Targets_TagTrackUID_Value]; // Creates it if not yet present, else take the previous one
-
-            //Change the key of the current tag
-            for (tagspertrack::iterator Item=Items0->second.begin(); Item!=Items0->second.end(); ++Item)
-                Items[Item->first] = Item->second;
-            Segment_Tags_Tag_Items.erase(Items0);
-        }
-    FILLING_END();
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Tags_Tag_Targets_TagBlockAddIDValue()
+{
+    //Parsing
+    Segment_Tags_Tag_Target_Value.TagBlockAddIDValue=UInteger_Get();
 }
 
 //---------------------------------------------------------------------------
@@ -3635,8 +3689,9 @@ void File_Mk::Segment_Tracks_TrackEntry_BlockAdditionMapping_Manage()
             auto Temp=new File_Gxf_TimeCode();
             Temp->IsBigEndian=true;
             Temp->IsTimeCodeTrack=true;
+            Temp->Format="SMPTE ST 12-1";
             #if MEDIAINFO_ADVANCED
-            Temp->id=std::to_string(TrackNumber)+'-'+std::to_string(BlockAddIDValue);
+            Temp->id=std::to_string(TrackNumber)+"-Add-"+std::to_string(BlockAddIDValue);
             #endif //MEDIAINFO_ADVANCED
             Parser=Temp;
             }
@@ -3650,7 +3705,7 @@ void File_Mk::Segment_Tracks_TrackEntry_BlockAdditionMapping_Manage()
     {
         Open_Buffer_Init(Parser);
         stream& streamItem=Stream[TrackNumber];
-        streamItem.BlockAdditions[BlockAddIDValue]=Parser;
+        streamItem.BlockAdditions[BlockAddIDValue].Parser=Parser;
     }
 }
 
@@ -4122,6 +4177,12 @@ void File_Mk::Segment_Tracks_TrackEntry_TrackNumber()
             return; //First element has the priority
         Fill(StreamKind_Last, StreamPos_Last, General_ID, TrackNumber);
         stream& streamItem = Stream[TrackNumber];
+        auto Previous=Stream.find((int64u)-1);
+        if (Previous!=Stream.end())
+        {
+            streamItem=Previous->second;
+            Stream.erase(Previous);
+        }
         if (StreamKind_Last!=Stream_Max)
         {
             streamItem.StreamKind=StreamKind_Last;

@@ -926,6 +926,7 @@ Language_lv;Lettone
 Language_mg;Malagasy
 Language_mh;Marshallese
 Language_mi;Maori
+Language_mis;
 Language_mk;Macedone
 Language_ml;Malayalam
 Language_mn;Mongolo
@@ -1002,6 +1003,7 @@ Language_tw;Twi
 Language_ty;Tahitian
 Language_ug;Uighur
 Language_uk;Ucraino
+Language_und;
 Language_ur;Urdu
 Language_uz;Usbeco
 Language_ve;Venda
@@ -1024,6 +1026,7 @@ Language_zh-TW;Cinese (Taiwan)
 Language_zh-tw;Cinese (Taiwan)
 Language_zh-yue;Cantonese
 Language_zu;Zulu
+Language_zxx;
 LanguageChanges;
 Languages;Lingue
 LawRating;Classificazione legale

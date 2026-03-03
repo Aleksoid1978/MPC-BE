@@ -231,6 +231,7 @@ namespace Elements
     const int32u WPUB=0x57505542;
     const int32u WXXX=0x57585858;
     const int32u XRVA=0x58525641;
+    const int32u XOLY=0x584F4C59;
     const int32u BUF=0x425546;
     const int32u CNT=0x434E56;
     const int32u COM=0x434F4D;
@@ -709,6 +710,7 @@ void File_Id3v2::Data_Parse()
         CASE_INFO(WPAY,                                         "Payment");
         CASE_INFO(WPUB,                                         "Publishers official webpage");
         CASE_INFO(WXXX,                                         "User defined URL link frame");
+        CASE_INFO(XOLY,                                         "Olympus");
         CASE_INFO(XRVA,                                         "Relative volume adjustment (2)");
         CASE_INFO(BUF,                                          "Recommended buffer size");
         CASE_INFO(CNT,                                          "Play counter");
@@ -1154,6 +1156,33 @@ void File_Id3v2::WXXX()
     if (Element_Values(0).empty())
         Element_Values(0)=__T("URL");
     Fill_Name();
+}
+
+//---------------------------------------------------------------------------
+void File_Id3v2::XOLY()
+{
+    string Model;
+    Skip_C4(                                                    "Format?");
+    Skip_L2(                                                    "(Unknown)");
+    Skip_L2(                                                    "(Unknown)");
+    Skip_L2(                                                    "(Unknown)");
+    Skip_L2(                                                    "(Unknown)");
+    Get_String(16, Model,                                       "Model");
+    Skip_L2(                                                    "(Unknown)");
+    Skip_L2(                                                    "(Unknown)");
+    Skip_L2(                                                    "(Unknown)");
+    Skip_L2(                                                    "(Unknown)");
+    Skip_L2(                                                    "(Unknown)");
+    Skip_String(12,                                             "Start time");
+    Skip_String(12,                                             "End time");
+    Skip_String( 6,                                             "Duration");
+    Skip_XX(Element_Size-Element_Offset,                        "(Unknown)");
+
+    FILLING_BEGIN();
+        Fill(Stream_General, 0, General_Encoded_Hardware_CompanyName, "Olympus");
+        Fill(Stream_General, 0, General_Encoded_Hardware_Model, Model);
+        Fill(Stream_Audio, 0, Audio_Duration, "10000");
+    FILLING_END();
 }
 
 //***************************************************************************

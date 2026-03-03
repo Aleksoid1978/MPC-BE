@@ -9003,7 +9003,8 @@ void File_Mxf::SDTISystemMetadataPack() //SMPTE 385M + 326M
                     }
                     TimeCode_Dump.Attributes_Last+=" fp=\"0\" bgf=\"0\" bg=\"0\"";
                 }
-                TimeCode CurrentTC(Hours_Tens*10+Hours_Units, Minutes_Tens*10+Minutes_Units, Seconds_Tens*10+Seconds_Units, Frames_Tens*10+Frames_Units, TimeCode_Dump.FramesMax, TimeCode::DropFrame(DropFrame).FPS1001(CPR_1_1001));
+                auto FramesMax=FrameRate?(FrameRate-1):99;
+                TimeCode CurrentTC(Hours_Tens*10+Hours_Units, Minutes_Tens*10+Minutes_Units, Seconds_Tens*10+Seconds_Units, Frames_Tens*10+Frames_Units, FramesMax, TimeCode::DropFrame(DropFrame).FPS1001(CPR_1_1001));
                 TimeCode_Dump.List+="    <tc v=\""+CurrentTC.ToString()+'\"';
                 if (FieldPhaseBgf0)
                     TimeCode_Dump.List+=" fp=\"1\"";

@@ -926,6 +926,7 @@ Language_lv;Letoniea
 Language_mg;Malagasiera
 Language_mh;Marshallera
 Language_mi;Maoriera
+Language_mis;
 Language_mk;Mazedoniera
 Language_ml;Malayalamera
 Language_mn;Mongoliera
@@ -1002,6 +1003,7 @@ Language_tw;Twiera
 Language_ty;Tahitiera
 Language_ug;Uighurrera
 Language_uk;Ukrainiera
+Language_und;
 Language_ur;Urduera
 Language_uz;Uzbekera
 Language_ve;Vendaera
@@ -1024,6 +1026,7 @@ Language_zh-TW;
 Language_zh-tw;Txinera (Taiwan)
 Language_zh-yue;
 Language_zu;Zuluera
+Language_zxx;
 LanguageChanges;
 Languages;
 LawRating;Lege maila

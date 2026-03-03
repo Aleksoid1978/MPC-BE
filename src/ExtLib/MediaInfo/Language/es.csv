@@ -926,6 +926,7 @@ Language_lv;Letón
 Language_mg;Malgache
 Language_mh;Marshallese
 Language_mi;Maorí
+Language_mis;
 Language_mk;Macedonio
 Language_ml;Malayalam
 Language_mn;Mongol
@@ -1002,6 +1003,7 @@ Language_tw;Twi
 Language_ty;Tahitiano
 Language_ug;Uighur
 Language_uk;Ucraniano
+Language_und;
 Language_ur;Urdú
 Language_uz;Uzbeko
 Language_ve;Venda
@@ -1024,6 +1026,7 @@ Language_zh-TW;
 Language_zh-tw;Chino (Taiwan)
 Language_zh-yue;
 Language_zu;Zulú
+Language_zxx;
 LanguageChanges;
 Languages;
 LawRating;Ley de calificación
@@ -1509,5 +1512,5 @@ Yes;Sí
 Your system;Tu sistema
 Your translation;
 Zoom;Zoom
-ZZ_Automatic_Percent;63
+ZZ_Automatic_Percent;62
 ZZ_AutomaticLanguage_Percent;72
