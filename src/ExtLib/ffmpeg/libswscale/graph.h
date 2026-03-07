@@ -42,15 +42,17 @@ typedef struct SwsGraph SwsGraph;
  * Output `h` lines of filtered data. `out` and `in` point to the
  * start of the image buffer for this pass.
  */
-typedef void (*sws_filter_run_t)(const AVFrame *out, const AVFrame *in,
+typedef void (*sws_filter_run_t)(const SwsFrame *out, const SwsFrame *in,
                                  int y, int h, const SwsPass *pass);
 
 /**
  * Represents an allocated output buffer for a filter pass.
  */
 typedef struct SwsPassBuffer {
+    SwsFrame frame;
+
     int width, height; /* dimensions of this buffer */
-    AVFrame *frame;
+    AVFrame *avframe;  /* backing storage for `frame` */
 } SwsPassBuffer;
 
 /**
@@ -86,7 +88,7 @@ struct SwsPass {
     /**
      * Called once from the main thread before running the filter. Optional.
      */
-    void (*setup)(const AVFrame *out, const AVFrame *in, const SwsPass *pass);
+    void (*setup)(const SwsFrame *out, const SwsFrame *in, const SwsPass *pass);
 
     /**
      * Optional private state and associated free() function.
@@ -124,19 +126,13 @@ typedef struct SwsGraph {
     int field;
 
     /**
-     * Temporary storage to hold individual fields of the input frames.
-     * No actual ownership over the data.
-     */
-    AVFrame *field_tmp[2];
-
-    /**
      * Temporary execution state inside ff_sws_graph_run(); used to pass
      * data to worker threads.
      */
     struct {
         const SwsPass *pass; /* current filter pass */
-        const AVFrame *input; /* current filter pass input/output */
-        const AVFrame *output;
+        const SwsFrame *input; /* current filter pass input/output */
+        const SwsFrame *output;
     } exec;
 } SwsGraph;
 
@@ -158,11 +154,13 @@ int ff_sws_graph_create(SwsContext *ctx, const SwsFormat *dst, const SwsFormat *
  * @param align  Minimum slice alignment for this pass, or 0 for no threading.
  * @param priv   Private state for the filter run function.
  * @param run    Filter function to run.
- * @return The newly created pass, or NULL on error.
+ * @param out_pass The newly added pass will be written here on success.
+ * @return 0 or a negative error code
  */
-SwsPass *ff_sws_graph_add_pass(SwsGraph *graph, enum AVPixelFormat fmt,
-                               int width, int height, SwsPass *input,
-                               int align, void *priv, sws_filter_run_t run);
+int ff_sws_graph_add_pass(SwsGraph *graph, enum AVPixelFormat fmt,
+                          int width, int height, SwsPass *input,
+                          int align, void *priv, sws_filter_run_t run,
+                          SwsPass **out_pass);
 
 /**
  * Uninitialize any state associate with this filter graph and free it.

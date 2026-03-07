@@ -69,45 +69,44 @@ INIT_YMM avx2
     paddw                         %4, [src1q + (%5 + 1) * SRC_STRIDE + SRC_PS]
     paddsw                        %1, %4                                         ; src0[x] + src1[x] + bdof_offset
     pmulhrsw                      %1, m11
-    CLIPW                         %1, m9, m10
 %endmacro
 
-%macro SAVE_8BPC 2 ; dst, src
-    packuswb                   m%2, m%2
-    vpermq                     m%2, m%2, q0020
-
-    cmp                         wd, 16
-    je                       %%w16
-    movq                        %1, xm%2
-    jmp                     %%wend
-%%w16:
-    movu                        %1, xm%2
-%%wend:
-%endmacro
-
-%macro SAVE_16BPC 2 ; dst, src
-    cmp                         wd, 16
-    je                       %%w16
-    movu                        %1, xm%2
-    jmp                     %%wend
-%%w16:
-    movu                        %1, m%2
-%%wend:
-%endmacro
-
-%macro SAVE 2 ; dst, src
+%macro SAVE 2-3 ""; dst, src, jump target
     cmp                 pixel_maxd, (1 << 8) - 1
     jne               %%save_16bpc
-    SAVE_8BPC                   %1, %2
+
+    packuswb                   m%2, m%2
+
+    cmp                         wd, 16
+    je                       %%w16_8
+    movq                        %1, xm%2
+%ifnidn %3, ""
+    jmp                         %3
+%else
     jmp                      %%end
+%endif
+
 %%save_16bpc:
-    SAVE_16BPC                   %1, %2
+    CLIPW                      m%2, m9, m10
+    cmp                         wd, 16
+    jne                       %%w8_16
+    movu                        %1, m%2
+%ifnidn %3, ""
+    jmp                         %3
+%else
+    jmp                      %%end
+%endif
+
+%%w16_8:
+    vpermq                     m%2, m%2, q0020
+%%w8_16:
+    movu                        %1, xm%2
 %%end:
 %endmacro
 
 ; [rsp + even * mmsize] are gradient_h[0] - gradient_h[1]
 ; [rsp +  odd * mmsize] are gradient_v[0] - gradient_v[1]
-%macro APPLY_BDOF_MIN_BLOCK 4 ; block_num, vx, vy, bd
+%macro APPLY_BDOF_MIN_BLOCK 3-4 ""; block_num, vx, vy, jump target
     pxor                          m9, m9
 
     movd                        xm10, pixel_maxd
@@ -127,7 +126,7 @@ INIT_YMM avx2
     SAVE                        [dstq + 2 * dsq], 6
 
     APPLY_BDOF_MIN_BLOCK_LINE    m6, %2, %3, m7, (%1) * 4 + 3
-    SAVE                        [dstq + ds3q], 6
+    SAVE                        [dstq + ds3q], 6, %4
 %endmacro
 
 %macro SUM_MIN_BLOCK_W16 4 ; src/dst, shuffle, perm, tmp
@@ -230,14 +229,20 @@ INIT_YMM avx2
     pshufhw                      m6, m6, q2301
     paddw                        m8, m6, m11                ; 4 x (4sgx2, 4sgy2, 4sgxdi, 4sgydi)
 
-%if (%1) == 0 || (%2)
-    ; pad for top and bottom
+%if (%1) == 0
+    ; pad for top and directly output to m12, m13
+    paddw                      m12, m8,  m8
+    paddw                      m13, m10, m10
+%else
+%if (%2)
+    ; pad for bottom
     paddw                       m8, m8
     paddw                      m10, m10
 %endif
 
     paddw                      m12, m8
     paddw                      m13, m10
+%endif
 %endmacro
 
 
@@ -321,41 +326,59 @@ INIT_YMM avx2
     movu                    m3, [src1q + 0 * SRC_STRIDE + SRC_PS]
     movu                    m4, [src1q + 1 * SRC_STRIDE + SRC_PS]
 
-    pxor                   m12, m12
-    pxor                   m13, m13
-
     BDOF_PROF_GRAD           0, 0
 %endif
 
+    BDOF_PROF_GRAD  %1 * 4 + 1, 0
+    BDOF_PROF_GRAD  %1 * 4 + 2, 0
+
+%if (%2)
+    BDOF_PROF_GRAD  %1 * 4 + 3, %2
+    BDOF_VX_VY              12, 13
+%if UNIX64
+    APPLY_BDOF_MIN_BLOCK    %1, m12, m13
+%else
+    APPLY_BDOF_MIN_BLOCK    %1, m12, m13, .end
+%endif
+
+%else
     mova                   m14, m12
     mova                   m15, m13
 
     pxor                   m12, m12
     pxor                   m13, m13
-    BDOF_PROF_GRAD  %1 * 4 + 1, 0
-    BDOF_PROF_GRAD  %1 * 4 + 2, 0
-    paddw                  m14, m12
-    paddw                  m15, m13
-
-    pxor                   m12, m12
-    pxor                   m13, m13
-    BDOF_PROF_GRAD  %1 * 4 + 3, %2
-%if (%2) == 0
+    BDOF_PROF_GRAD  %1 * 4 + 3, 0
     BDOF_PROF_GRAD  %1 * 4 + 4, 0
-%endif
     paddw                  m14, m12
     paddw                  m15, m13
 
     BDOF_VX_VY              14, 15
-    APPLY_BDOF_MIN_BLOCK    %1, m14, m15, bd
+    APPLY_BDOF_MIN_BLOCK    %1, m14, m15
     lea                   dstq, [dstq + 4 * dsq]
+%endif
 %endmacro
 
-;void ff_vvc_apply_bdof_%1(uint8_t *dst, const ptrdiff_t dst_stride, int16_t *src0, int16_t *src1,
-;    const int w, const int h, const int int pixel_max)
-%macro BDOF_AVX2 0
-cglobal vvc_apply_bdof, 7, 9, 16, BDOF_STACK_SIZE*32, dst, ds, src0, src1, w, h, pixel_max, ds3, tmp0
+%macro BDOF_WRAPPER 2 ; bpp, is_nonadjacent
+;void ff_vvc_apply_bdof_%1(uint8_t *dst, const ptrdiff_t dst_stride, const int16_t *src0,
+;                          const int16_t *src1, const int w, const int h)
+cglobal vvc_apply_bdof_%1
+    ; r6 is not used for parameter passing and is volatile both on UNIX64
+    ; and Win64, so it can be freely used
+    mov                    r6d, (1<<%1)-1
+%if %2
+    jmp        vvc_apply_bdof_ %+ cpuname
+%endif
+%endmacro
 
+%macro VVC_OF_AVX2 0
+    BDOF_WRAPPER 12, 1
+    BDOF_WRAPPER  8, 1
+    BDOF_WRAPPER 10, 0
+
+vvc_apply_bdof_ %+ cpuname:
+; the prologue on Win64 is big (10 xmm regs need saving), so use PROLOGUE
+; to avoid duplicating it.
+PROLOGUE 6, 9, 16, BDOF_STACK_SIZE*32, dst, ds, src0, src1, w, h, pixel_max, ds3, tmp0
     lea                   ds3q, [dsq * 3]
     sub                  src0q, SRC_STRIDE + SRC_PS
     sub                  src1q, SRC_STRIDE + SRC_PS
@@ -365,7 +388,11 @@ cglobal vvc_apply_bdof, 7, 9, 16, BDOF_STACK_SIZE*32, dst, ds, src0, src1, w, h,
     cmp                     hd, 16
     je                    .h16
     BDOF_MINI_BLOCKS         1, 1
+%if UNIX64
+    RET
+%else
     jmp                   .end
+%endif
 
 .h16:
     BDOF_MINI_BLOCKS         1, 0
@@ -374,10 +401,6 @@ cglobal vvc_apply_bdof, 7, 9, 16, BDOF_STACK_SIZE*32, dst, ds, src0, src1, w, h,
 
 .end:
     RET
-%endmacro
-
-%macro VVC_OF_AVX2 0
-    BDOF_AVX2
 %endmacro
 
 VVC_OF_AVX2

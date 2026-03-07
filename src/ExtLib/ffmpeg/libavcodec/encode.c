@@ -236,7 +236,7 @@ int ff_encode_encode_cb(AVCodecContext *avctx, AVPacket *avpkt,
     int ret;
 
     ret = codec->cb.encode(avctx, avpkt, frame, got_packet);
-    emms_c();
+    ff_assert1_fpu();
     av_assert0(ret <= 0);
 
     if (!ret && *got_packet) {

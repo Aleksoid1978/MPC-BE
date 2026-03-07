@@ -41,12 +41,10 @@ PARAM_SHUFFE 2
 PARAM_SHUFFE 3
 
 CLASSIFY_SHUFFE: times 2    db 2, 3, 0, 1, 6, 7, 4, 5, 10, 11, 8, 9, 14, 15, 12, 13
-TRANSPOSE_PERMUTE:          dd 0, 1, 4, 5, 2, 3, 6, 7
 ARG_VAR_SHUFFE: times 2     db 0, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4
 
 cextern pd_64
 dd448: times 8             dd 512 - 64
-dd2:  times 8              dd 2
 dw3:  times 8              dd 3
 dw5:  times 8              dd 5
 dd15: times 8              dd 15
@@ -60,15 +58,17 @@ SECTION .text
 
 ;%1-%3 out
 ;%4 clip or filter
-%macro LOAD_LUMA_PARAMS_W16 4
-    lea                 offsetq, [3 * xq]                       ;xq * ALF_NUM_COEFF_LUMA / ALF_BLOCK_SIZE
-    movu                    m%1, [%4q + 2 * offsetq + 0 * 32]   ; 2 * for sizeof(int16_t)
-    movu                    m%2, [%4q + 2 * offsetq + 1 * 32]
-    movu                    m%3, [%4q + 2 * offsetq + 2 * 32]
+%macro LOAD_LUMA_PARAMS 4
+    movu                    m%1, [%4q + 0 * mmsize]
+    movu                    m%2, [%4q + 1 * mmsize]
+    movu                    m%3, [%4q + 2 * mmsize]
+    ; we process mmsize/(2*ALF_BLOCK_SIZE) alf blocks,
+    ; consuming ALF_NUM_COEFF_LUMA int16_t coeffs per alf block
+    add                     %4q, 3 * mmsize
 %endmacro
 
 %macro LOAD_LUMA_PARAMS_W16 6
-    LOAD_LUMA_PARAMS_W16    %1, %2, %3, %4
+    LOAD_LUMA_PARAMS        %1, %2, %3, %4
     ;m%1 = 03 02 01 00
     ;m%2 = 07 06 05 04
     ;m%3 = 11 10 09 08
@@ -85,18 +85,32 @@ SECTION .text
     vpermpd                 m%3, m%3, 10000111b         ;11 08 05 02
 %endmacro
 
+%macro LOAD_LUMA_PARAMS_W8 5
+    LOAD_LUMA_PARAMS       %2, %3, %5, %4
+    ;m%2 = 01 00
+    ;m%3 = 03 02
+    ;m%5 = 05 04
+
+    shufpd                  m%1, m%2, m%3, 10b          ;03 00
+    shufpd                  m%2, m%2, m%5, 01b          ;04 01
+    shufpd                  m%3, m%3, m%5, 10b          ;05 02
+%endmacro
+
 ; %1-%3 out
 ; %4    clip or filter
 ; %5-%6 tmp
 %macro LOAD_LUMA_PARAMS 6
+%if mmsize == 32
     LOAD_LUMA_PARAMS_W16 %1, %2, %3, %4, %5, %6
+%else
+    LOAD_LUMA_PARAMS_W8  %1, %2, %3, %4, %5
+%endif
 %endmacro
 
 %macro LOAD_CHROMA_PARAMS 4
     ; LOAD_CHROMA_PARAMS_W %+ WIDTH %1, %2, %3, %4
-    movq                   xm%1, [%3q]
+    vpbroadcastq            m%1, [%3q]
     movd                   xm%2, [%3q + 8]
-    vpbroadcastq            m%1, xm%1
     vpbroadcastq            m%2, xm%2
 %endmacro
 
@@ -174,68 +188,62 @@ SECTION .text
     neg      src_strideq
 
 %if LUMA
-    cmp          vb_posq, 0
+    cmp          vb_posd, 0
     je       %%vb_bottom
-    cmp          vb_posq, 4
+    cmp          vb_posd, 4
     jne         %%vb_end
-%else
-    cmp          vb_posq, 2
-    jne         %%vb_end
-    cmp               %1, 2
-    jge      %%vb_bottom
-%endif
-
 %%vb_above:
-    ; above
+    ; above: vb_pos == 4
     ; p1 = (y + i == vb_pos - 1) ? p0 : p1;
     ; p2 = (y + i == vb_pos - 1) ? p0 : p2;
     ; p3 = (y + i >= vb_pos - 2) ? p1 : p3;
     ; p4 = (y + i >= vb_pos - 2) ? p2 : p4;
     ; p5 = (y + i >= vb_pos - 3) ? p3 : p5;
     ; p6 = (y + i >= vb_pos - 3) ? p4 : p6;
-    dec          vb_posq
-    cmp          vb_posq, %1
+    cmp               %1, 3
     cmove            s1q, srcq
     cmove            s2q, srcq
 
-    dec          vb_posq
-    cmp          vb_posq, %1
-    cmovbe           s3q, s1q
-    cmovbe           s4q, s2q
+    cmp               %1, 1
+    cmova            s3q, s1q
+    cmova            s4q, s2q
 
-    dec          vb_posq
-%if LUMA
-    cmp          vb_posq, %1
-    cmovbe           s5q, s3q
-    cmovbe           s6q, s4q
-%endif
-    add          vb_posq, 3
+    cmovae           s5q, s3q
+    cmovae           s6q, s4q
     jmp         %%vb_end
 
 %%vb_bottom:
-    ; bottom
+    ; bottom: vb_pos == 0
     ; p1 = (y + i == vb_pos    ) ? p0 : p1;
     ; p2 = (y + i == vb_pos    ) ? p0 : p2;
     ; p3 = (y + i <= vb_pos + 1) ? p1 : p3;
     ; p4 = (y + i <= vb_pos + 1) ? p2 : p4;
     ; p5 = (y + i <= vb_pos + 2) ? p3 : p5;
     ; p6 = (y + i <= vb_pos + 2) ? p4 : p6;
-    cmp          vb_posq, %1
+    cmp               %1, 0
     cmove            s1q, srcq
     cmove            s2q, srcq
 
-    inc          vb_posq
-    cmp          vb_posq, %1
-    cmovae           s3q, s1q
-    cmovae           s4q, s2q
+    cmp               %1, 2
+    cmovb            s3q, s1q
+    cmovb            s4q, s2q
 
-    inc          vb_posq
-%if LUMA
-    cmp          vb_posq, %1
-    cmovae           s5q, s3q
-    cmovae           s6q, s4q
+    cmovbe           s5q, s3q
+    cmovbe           s6q, s4q
+%else ; chroma
+    cmp          vb_posd, 2
+    jne         %%vb_end
+    cmp               %1, 2
+    jge      %%vb_bottom
+%%vb_above:
+    cmp               %1, 1
+%%vb_bottom:
+    cmove            s1q, srcq
+    cmove            s2q, srcq
+
+    mov              s3q, s1q
+    mov              s4q, s2q
 %endif
-    sub          vb_posq, 2
 %%vb_end:
 %endmacro
 
@@ -253,18 +261,18 @@ SECTION .text
     je      %%near_below
     jmp          %%no_vb
     %%near_above:
-        cmp      vb_posq, 4
+        cmp      vb_posd, 4
         je     %%near_vb
         jmp      %%no_vb
     %%near_below:
-        cmp      vb_posq, 0
+        cmp      vb_posd, 0
         je     %%near_vb
 %else
     cmp               %1, 0
     je           %%no_vb
     cmp               %1, 3
     je           %%no_vb
-    cmp          vb_posq, 2
+    cmp          vb_posd, 2
     je         %%near_vb
 %endif
 %%no_vb:
@@ -354,13 +362,8 @@ SECTION .text
     cmp %3, 8
     jl .w4
     STORE_PIXELS_W8 %1, %2
-    cmp %3, 12
-    %if ps == 2
-        vpermq      m%2,  m%2, q0302
-    %else
-        vpermq      m%2,  m%2, q0101
-    %endif
-    jl .end
+    je .end
+    vextracti128    xm%2, m%2, 1
     STORE_PIXELS_W4 %1, %2, 8
     jmp .end
 .w4:
@@ -368,120 +371,147 @@ SECTION .text
 .end:
 %endmacro
 
-; STORE_PIXELS(dst, src, width)
-%macro STORE_PIXELS 3
-    %if ps == 1
-        packuswb    m%2, m%2
-        vpermq      m%2, m%2, 0x8
-    %endif
-
+; STORE_PIXELS(dst, src, width, tmp reg)
+%macro STORE_PIXELS 4
     %ifidn %3, 16
+        %if ps == 1
+            vextracti128 xm%4, m%2, 1
+            packuswb     xm%2, xm%4
+        %endif
         STORE_PIXELS_W16  %1, %2
     %else
         %if LUMA
+            %if ps == 1
+                packuswb     xm%2, xm%2
+            %endif
             STORE_PIXELS_W8   %1, %2
         %else
+            %if ps == 1
+                packuswb      m%2, m%2
+            %endif
             STORE_PIXELS_W8LE %1, %2, %3
         %endif
     %endif
 %endmacro
 
-%macro FILTER_16x4 1
+%macro FILTER_16x4 2
 %if LUMA
     push clipq
-    push strideq
-    %define s1q clipq
-    %define s2q strideq
-%else
-    %define s1q s5q
-    %define s2q s6q
+    %define s6q clipq
 %endif
 
-    %define s3q pixel_maxq
-    %define s4q offsetq
-    push xq
-
-    xor               xq, xq
+    xor               xd, xd
 %%filter_16x4_loop:
     LOAD_PIXELS       m2, [srcq]   ;p0
 
-    FILTER_VB         xq
+    FILTER_VB         xd
 
     ; sum += curr
     paddsw             m0, m2
 
+%if ps != 1
     ; clip to pixel
     CLIPW             m0, m14, m15
+%endif
 
-    STORE_PIXELS    dstq, 0, %1
+    STORE_PIXELS    dstq, 0, %1, 2
 
     lea             srcq, [srcq + src_strideq]
     lea             dstq, [dstq + dst_strideq]
-    inc               xq
-    cmp               xq, 4
+    inc               xd
+    cmp               xd, 4
     jl %%filter_16x4_loop
 
+%ifnidn %2, 0
     mov               xq, src_strideq
     neg               xq
-    lea             srcq, [srcq + xq * 4]
+    lea             srcq, [srcq + xq * 4 + %2]
     mov               xq, dst_strideq
     neg               xq
-    lea             dstq, [dstq + xq * 4]
-
-    pop xq
+    lea             dstq, [dstq + xq * 4 + %2]
+%endif
 
 %if LUMA
-    pop strideq
     pop clipq
 %endif
 %endmacro
 
-; FILTER(bpc, luma/chroma)
-%macro ALF_FILTER 2
-%xdefine BPC   %1
+; FILTER(bd, luma/chroma, bd of implementation to use)
+%macro ALF_FILTER 3
 %ifidn %2, luma
     %xdefine LUMA 1
 %else
     %xdefine LUMA 0
 %endif
+%assign ps (%1+7) / 8 ; pixel size
 
 ; ******************************
-; void vvc_alf_filter_%2_%1bpc_avx2(uint8_t *dst, ptrdiff_t dst_stride,
-;      const uint8_t *src, ptrdiff_t src_stride, const ptrdiff_t width, cosnt ptr_diff_t height,
-;      const int16_t *filter, const int16_t *clip, ptrdiff_t stride, ptrdiff_t vb_pos, ptrdiff_t pixel_max);
+; void ff_vvc_alf_filter_%2_%1_avx2(uint8_t *dst, ptrdiff_t dst_stride,
+;      const uint8_t *src, ptrdiff_t src_stride, int width, int height,
+;      const int16_t *filter, const int16_t *clip, int vb_pos);
 ; ******************************
-cglobal vvc_alf_filter_%2_%1bpc, 11, 15, 16, 0-0x30, dst, dst_stride, src, src_stride, width, height, filter, clip, stride, vb_pos, pixel_max, \
-    offset, x, s5, s6
-%define ps (%1 / 8) ; pixel size
-    movd            xm15, pixel_maxd
-    vpbroadcastw     m15, xm15
+cglobal vvc_alf_filter_%2_%1
+%if !LUMA
+; chroma does not use registers m5 and m8. Swap them to reduce the amount
+; of nonvolatile registers on Win64. It also reduces codesize generally
+; as encodings with high registers (m8-m15) take more bytes.
+    %if ps != 1
+        SWAP 5,15
+        SWAP 8,14
+    %else
+        SWAP 5,12
+        SWAP 8,13
+    %endif
+%elif WIN64 && (ps != 1)
+; Swap m5 and m15, so that the register for the maximum pixel value
+; ends up in a volatile register
+    SWAP 5,15
+%endif
+%if ps != 1
+  ; create pw_pixelmax for clipping
+  pcmpeqw         m15, m15
+  psrlw           m15, 16 - %1
+%endif
+
+%if %1 != %3
+    jmp vvc_alf_filter_%2_%3_prologue
+%else
+vvc_alf_filter_%2_%1_prologue:
+    PROLOGUE 9, 14+LUMA, 12+2*(ps!=1)+2*LUMA, dst, dst_stride, src, src_stride, width, height, filter, clip, vb_pos, \
+    x, s1, s2, s3, s4, s5
+%if ps != 1
     pxor             m14, m14
+%endif
 
 .loop:
     push            srcq
     push            dstq
     push          widthq
-    xor               xq, xq
 
     .loop_w:
-        cmp       widthq, 16
+        cmp       widthd, 16
         jl   .loop_w_end
 
         LOAD_PARAMS
-        FILTER_16x4   16
+        FILTER_16x4   16, 16 * ps
 
-        add         srcq, 16 * ps
-        add         dstq, 16 * ps
-        add           xq, 16
-        sub       widthq, 16
+        sub       widthd, 16
         jmp      .loop_w
 
 .loop_w_end:
-    cmp           widthq, 0
+    cmp           widthd, 0
     je            .w_end
 
+%if LUMA
+SAVE_MM_PERMUTATION
+INIT_XMM cpuname
+LOAD_MM_PERMUTATION
+%endif
     LOAD_PARAMS
-    FILTER_16x4  widthq
+    FILTER_16x4  widthd, 0
+%if LUMA
+INIT_YMM cpuname
+%endif
 
 .w_end:
 
@@ -491,19 +521,17 @@ cglobal vvc_alf_filter_%2_%1bpc, 11, 15, 16, 0-0x30, dst, dst_stride, src, src_s
     lea             srcq, [srcq + 4 * src_strideq]
     lea             dstq, [dstq + 4 * dst_strideq]
 
-    lea          filterq, [filterq + 2 * strideq]
-    lea            clipq, [clipq   + 2 * strideq]
-
-    sub          vb_posq, 4
-    sub          heightq, 4
+    sub          vb_posd, 4
+    sub          heightd, 4
     jg             .loop
     RET
+%endif
 %endmacro
 
-; FILTER(bpc)
-%macro ALF_FILTER 1
-    ALF_FILTER  %1, luma
-    ALF_FILTER  %1, chroma
+; FILTER(bd, bd of implementation to use)
+%macro ALF_FILTER 2
+    ALF_FILTER  %1, luma,   %2
+    ALF_FILTER  %1, chroma, %2
 %endmacro
 
 %define ALF_GRADIENT_BORDER 2
@@ -566,8 +594,7 @@ cglobal vvc_alf_classify_grad_%1bpc, 6, 14, 16, gradient_sum, src, src_stride, w
         pblendw           m0, m1, m6, 0x55
         paddw             m0, m0                       ; c
 
-        movu              m1, [CLASSIFY_SHUFFE]
-        pshufb            m1, m0, m1                   ; d
+        pshufb            m1, m0, [CLASSIFY_SHUFFE]    ; d
 
         paddw             m9, m14                      ; n + s
         psubw             m9, m0                       ; (n + s) - c
@@ -613,23 +640,23 @@ cglobal vvc_alf_classify_grad_%1bpc, 6, 14, 16, gradient_sum, src, src_stride, w
 
 ; SAVE_CLASSIFY_PARAM_W16(dest, src)
 %macro SAVE_CLASSIFY_PARAM_W16 2
+    vpermq                  m%2, m%2, 11011000b
     lea                   tempq, [%1q + xq]
     movu                [tempq], xm%2
-    vperm2i128              m%2, m%2, m%2, 1
+    vextracti128           xm%2, m%2, 1
     movu       [tempq + widthq], xm%2
 %endmacro
 
 ; SAVE_CLASSIFY_PARAM_W8
 %macro SAVE_CLASSIFY_PARAM_W8 2
     movq                   [%1], xm%2
-    vperm2i128              m%2, m%2, m%2, 1
-    movq          [%1 + widthq], xm%2
+    movhps        [%1 + widthq], xm%2
 %endmacro
 
 ; SAVE_CLASSIFY_PARAM_W4
 %macro SAVE_CLASSIFY_PARAM_W4 2
     movd                   [%1], xm%2
-    vperm2i128              m%2, m%2, m%2, 1
+    punpckhqdq             xm%2, xm%2
     movd          [%1 + widthq], xm%2
 %endmacro
 
@@ -639,10 +666,9 @@ cglobal vvc_alf_classify_grad_%1bpc, 6, 14, 16, gradient_sum, src, src_stride, w
     cmp                     wd, 8
     jl %%w4
     SAVE_CLASSIFY_PARAM_W8 tempq, %2
-    vpermq                 m%2, m%2, 00010011b
-    add                  tempq, 8
-    cmp                     wd, 8
     je                   %%end
+    vextracti128          xm%2, m%2, 1
+    add                  tempq, 8
 %%w4:
     SAVE_CLASSIFY_PARAM_W4 tempq, %2
 %%end:
@@ -655,16 +681,15 @@ cglobal vvc_alf_classify_grad_%1bpc, 6, 14, 16, gradient_sum, src, src_stride, w
     movu              m1, [gradq + sum_strideq]
     movu              m2, [gradq + 2 * sum_strideq]
 
-    pcmpeqb          m11, m11
     movd            xm13, yd
-    vpbroadcastd     m13, xm13
     movd            xm12, vb_posd
-    vpbroadcastd     m12, xm12
-    pcmpeqd          m13, m12       ; y == vb_pos
-    pandn            m13, m11       ; y != vb_pos
+    pcmpeqb         xm11, xm11
+    pcmpeqd         xm13, xm12      ; y == vb_pos
+    pxor            xm13, xm11      ; y != vb_pos
+    vpbroadcastd     m13, xm13
 
     vpbroadcastd     m14, [dw3]
-    pblendvb         m14, m14, [dd2], m13    ; ac
+    paddd            m14, m13       ; ac = (y != vb_pos) ? 2 : 3
 
     pblendvb          m3, m15, [gradq + sum_stride3q], m13
 
@@ -740,7 +765,6 @@ cglobal vvc_alf_classify_grad_%1bpc, 6, 14, 16, gradient_sum, src, src_stride, w
     paddd            m11, m7, m7
     paddd            m11, m4
     paddd            m10, m11
-    vpermq           m10, m10, 11011000b
     SAVE_CLASSIFY_PARAM transpose_idx, 10
 
     psrlq            m10, m8, 32
@@ -760,12 +784,18 @@ cglobal vvc_alf_classify_grad_%1bpc, 6, 14, 16, gradient_sum, src, src_stride, w
     pblendvb          m2, m5, m8, m1     ; hvd1
     pblendvb          m3, m6, m9, m1     ; hvd0
 
+%if ps != 1  ; high bit depth
     movd             xm5, bit_depthd
     vpbroadcastd      m5, xm5
+%endif
 
     ;*class_idx = arg_var[av_clip_uintp2(sum_hv * ac >> (BIT_DEPTH - 1), 4)];
     pmulld            m0, m14            ; sum_hv * ac
+%if ps != 1
     vpsrlvd           m0, m0, m5
+%else
+    psrld             m0, 8
+%endif
     pminsd            m0, [dd15]
     movu              m6, [ARG_VAR_SHUFFE]
     pshufb            m6, m0             ; class_idx
@@ -791,7 +821,6 @@ cglobal vvc_alf_classify_grad_%1bpc, 6, 14, 16, gradient_sum, src, src_stride, w
     pandn             m1, m7
     paddd             m1, m1             ; dir1 << 1
     paddd             m6, m1             ; class_idx
-    vpermq            m6, m6, 11011000b
 
     SAVE_CLASSIFY_PARAM class_idx, 6
 %endmacro
@@ -818,7 +847,9 @@ ALF_CLASSIFY_GRAD %1
 cglobal vvc_alf_classify_%1bpc, 7, 15, 16, class_idx, transpose_idx, gradient_sum, width, height, vb_pos, bit_depth, \
     x, y, grad, sum_stride, sum_stride3, temp, w
 
-    sub       bit_depthq, 1
+%if ps != 1
+    sub       bit_depthd, 1
+%endif
 
     ; now we can use gradient to get class idx and transpose idx
     lea      sum_strideq, [widthd + ALF_GRADIENT_BORDER * 2]
@@ -868,9 +899,10 @@ cglobal vvc_alf_classify_%1bpc, 7, 15, 16, class_idx, transpose_idx, gradient_su
 %if ARCH_X86_64
 %if HAVE_AVX2_EXTERNAL
 INIT_YMM avx2
-ALF_FILTER   16
-ALF_FILTER   8
+ALF_FILTER   12, 10
+ALF_FILTER   10, 10
 ALF_CLASSIFY 16
+ALF_FILTER   8,  8
 ALF_CLASSIFY 8
 %endif
 %endif
