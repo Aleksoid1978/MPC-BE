@@ -1061,6 +1061,29 @@ bool ExtractDim(const AM_MEDIA_TYPE* pmt, int& w, int& h, int& arx, int& ary)
 	return true;
 }
 
+UINT GetExColorInfo(const AM_MEDIA_TYPE* pmt)
+{
+	if (pmt) {
+		VIDEOINFOHEADER2* pVIH2 = nullptr;
+
+		if (pmt->formattype == FORMAT_VideoInfo2) {
+			pVIH2 = (VIDEOINFOHEADER2*)pmt->pbFormat;
+		}
+		else if (pmt->formattype == FORMAT_MPEG2_VIDEO) {
+			pVIH2 = &((MPEG2VIDEOINFO*)pmt->pbFormat)->hdr;
+		}
+		else if (pmt->formattype == FORMAT_DiracVideoInfo) {
+			pVIH2 = &((DIRACINFOHEADER*)pmt->pbFormat)->hdr;
+		}
+
+		if (pVIH2 && (pVIH2->dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT))) {
+			return pVIH2->dwControlFlags;
+		}
+	}
+
+	return 0;
+}
+
 bool MakeMPEG2MediaType(CMediaType& mt, BYTE* seqhdr, DWORD len, int w, int h)
 {
 	mt = CMediaType();

@@ -66,11 +66,13 @@ extern bool				HasMediaType(IFilterGraph *pFilterGraph, const GUID &mediaType);
 extern void				ExtractMediaTypes(IPin* pPin, std::vector<GUID>& types);
 extern void				ExtractMediaTypes(IPin* pPin, std::list<PinType>& types);
 extern void				ExtractMediaTypes(IPin* pPin, std::list<CMediaType>& mts);
+
 const BITMAPINFOHEADER*	GetBitmapInfoHeader(const AM_MEDIA_TYPE* pmt);
 extern bool				ExtractBIH(const AM_MEDIA_TYPE* pmt, BITMAPINFOHEADER* bih);
 extern bool				ExtractBIH(IMediaSample* pMS, BITMAPINFOHEADER* bih);
 extern bool				ExtractAvgTimePerFrame(const AM_MEDIA_TYPE* pmt, REFERENCE_TIME& rtAvgTimePerFrame);
 extern bool				ExtractDim(const AM_MEDIA_TYPE* pmt, int& w, int& h, int& arx, int& ary);
+UINT					GetExColorInfo(const AM_MEDIA_TYPE* pmt); // returns DXVA2_ExtendedFormat if present, otherwise 0
 
 extern CLSID			GetCLSID(IBaseFilter* pBF);
 extern CLSID			GetCLSID(IPin* pPin);
