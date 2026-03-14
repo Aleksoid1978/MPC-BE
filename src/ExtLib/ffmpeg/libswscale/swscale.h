@@ -93,22 +93,21 @@ typedef enum SwsAlphaBlend {
     SWS_ALPHA_BLEND_MAX_ENUM = 0x7FFFFFFF, /* force size to 32 bits, not a valid blend mode */
 } SwsAlphaBlend;
 
-typedef enum SwsFlags {
-    /**
-     * Scaler selection options. Only one may be active at a time.
-     */
-    SWS_FAST_BILINEAR = 1 <<  0, ///< fast bilinear filtering
-    SWS_BILINEAR      = 1 <<  1, ///< bilinear filtering
-    SWS_BICUBIC       = 1 <<  2, ///< 2-tap cubic B-spline
-    SWS_X             = 1 <<  3, ///< experimental
-    SWS_POINT         = 1 <<  4, ///< nearest neighbor
-    SWS_AREA          = 1 <<  5, ///< area averaging
-    SWS_BICUBLIN      = 1 <<  6, ///< bicubic luma, bilinear chroma
-    SWS_GAUSS         = 1 <<  7, ///< gaussian approximation
-    SWS_SINC          = 1 <<  8, ///< unwindowed sinc
-    SWS_LANCZOS       = 1 <<  9, ///< 3-tap sinc/sinc
-    SWS_SPLINE        = 1 << 10, ///< cubic Keys spline
+typedef enum SwsScaler {
+    SWS_SCALE_AUTO = 0,
+    SWS_SCALE_BILINEAR, ///< bilinear filtering
+    SWS_SCALE_BICUBIC,  ///< 2-tap cubic BC-spline
+    SWS_SCALE_POINT,    ///< nearest neighbor (point sampling)
+    SWS_SCALE_AREA,     ///< area averaging
+    SWS_SCALE_GAUSSIAN, ///< 2-tap gaussian approximation
+    SWS_SCALE_SINC,     ///< unwindowed sinc
+    SWS_SCALE_LANCZOS,  ///< 3-tap sinc/sinc
+    SWS_SCALE_SPLINE,   ///< unwindowned natural cubic spline
+    SWS_SCALE_NB,       ///< not part of the ABI
+    SWS_SCALE_MAX_ENUM = 0x7FFFFFFF, ///< force size to 32 bits, not a valid filter type
+} SwsScaler;
 
+typedef enum SwsFlags {
     /**
      * Return an error on underspecified conversions. Without this flag,
      * unspecified fields are defaulted to sensible values.
@@ -169,6 +168,22 @@ typedef enum SwsFlags {
      */
     SWS_DIRECT_BGR      = 1 << 15, ///< This flag has no effect
     SWS_ERROR_DIFFUSION = 1 << 23, ///< Set `SwsContext.dither` instead
+
+    /**
+     * Scaler selection options. Only one may be active at a time.
+     * Deprecated in favor of `SwsContext.scaler`.
+     */
+    SWS_FAST_BILINEAR = 1 <<  0, ///< fast bilinear filtering
+    SWS_BILINEAR      = 1 <<  1, ///< bilinear filtering
+    SWS_BICUBIC       = 1 <<  2, ///< 2-tap cubic B-spline
+    SWS_X             = 1 <<  3, ///< experimental
+    SWS_POINT         = 1 <<  4, ///< nearest neighbor
+    SWS_AREA          = 1 <<  5, ///< area averaging
+    SWS_BICUBLIN      = 1 <<  6, ///< bicubic luma, bilinear chroma
+    SWS_GAUSS         = 1 <<  7, ///< gaussian approximation
+    SWS_SINC          = 1 <<  8, ///< unwindowed sinc
+    SWS_LANCZOS       = 1 <<  9, ///< 3-tap sinc/sinc
+    SWS_SPLINE        = 1 << 10, ///< unwindowed natural cubic spline
 } SwsFlags;
 
 typedef enum SwsIntent {
@@ -204,7 +219,8 @@ typedef struct SwsContext {
     /**
      * Extra parameters for fine-tuning certain scalers.
      */
-    double scaler_params[2];
+#define SWS_NUM_SCALER_PARAMS 2
+    double scaler_params[SWS_NUM_SCALER_PARAMS];
 
     /**
      * How many threads to use for processing, or 0 for automatic selection.
@@ -247,6 +263,22 @@ typedef struct SwsContext {
      * Desired ICC intent for color space conversions.
      */
     int intent;
+
+    /**
+     * Scaling filter. If set to something other than SWS_SCALE_AUTO, this will
+     * override the filter implied by `SwsContext.flags`.
+     *
+     * Note: Does not affect the legacy (stateful) API.
+     */
+    SwsScaler scaler;
+
+    /**
+     * Scaler used specifically for up/downsampling subsampled (chroma) planes.
+     * If set to something other than SWS_SCALE_AUTO, this will override the
+     * filter implied by `SwsContext.scaler`. Otherwise, the same filter
+     * will be used for both main scaling and chroma subsampling.
+     */
+    SwsScaler scaler_sub;
 
     /* Remember to add new fields to graph.c:opts_equal() */
 } SwsContext;

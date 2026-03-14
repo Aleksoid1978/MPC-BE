@@ -54,16 +54,11 @@ typedef struct SwsOpExec {
     /* Subsampling factors for each plane */
     uint8_t in_sub_y[4], out_sub_y[4];
     uint8_t in_sub_x[4], out_sub_x[4];
-
-    /* Pointers back to the original SwsFrame */
-    const SwsFrame *in_frame;
-    const SwsFrame *out_frame;
 } SwsOpExec;
 
 static_assert(sizeof(SwsOpExec) == 24 * sizeof(void *) +
                                    6  * sizeof(int32_t) +
-                                   16 * sizeof(uint8_t) +
-                                   2  * sizeof(void *),
+                                   16 * sizeof(uint8_t),
               "SwsOpExec layout mismatch");
 
 /**
@@ -78,17 +73,33 @@ typedef void (*SwsOpFunc)(const SwsOpExec *exec, const void *priv,
     void NAME(const SwsOpExec *, const void *, int, int, int, int)
 
 typedef struct SwsCompiledOp {
-    SwsOpFunc func;
+    /* Function to execute */
+    union {
+        SwsOpFunc func;
+        SwsPassFunc func_opaque;
+    };
 
+    /**
+     * If `opaque` is true, then `func_opaque`, `priv` and `free` are directly
+     * forwarded as `SwsPass.run`, `SwsPass.priv` and `SwsPass.free`
+     * respectively.
+     */
+    bool opaque;
+
+    /* Execution parameters for all functions */
     int slice_align; /* slice height alignment */
+    int cpu_flags;   /* active set of CPU flags (informative) */
+
+    /* Execution parameters for non-opaque functions only */
     int block_size;  /* number of pixels processed per iteration */
     int over_read;   /* implementation over-reads input by this many bytes */
     int over_write;  /* implementation over-writes output by this many bytes */
-    int cpu_flags;   /* active set of CPU flags (informative) */
 
     /* Arbitrary private data */
     void *priv;
     void (*free)(void *priv);
 } SwsCompiledOp;
+
+void ff_sws_compiled_op_unref(SwsCompiledOp *comp);
 
 #endif /* SWSCALE_OPS_DISPATCH_H */

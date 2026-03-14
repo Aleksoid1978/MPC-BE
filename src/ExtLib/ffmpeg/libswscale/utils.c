@@ -87,10 +87,8 @@ static SwsContext *alloc_set_opts(int srcW, int srcH, enum AVPixelFormat srcForm
     sws->src_format = srcFormat;
     sws->dst_format = dstFormat;
 
-    if (param) {
-        sws->scaler_params[0] = param[0];
-        sws->scaler_params[1] = param[1];
-    }
+    for (int i = 0; param && i < SWS_NUM_SCALER_PARAMS; i++)
+        sws->scaler_params[i] = param[i];
 
     return sws;
 }
@@ -198,9 +196,9 @@ static const ScaleAlgorithm scale_algorithms[] = {
 static av_cold int initFilter(int16_t **outFilter, int32_t **filterPos,
                               int *outFilterSize, int xInc, int srcW,
                               int dstW, int filterAlign, int one,
-                              int flags, int cpu_flags,
+                              int scaler, int flags, int cpu_flags,
                               SwsVector *srcFilter, SwsVector *dstFilter,
-                              double param[2], int srcPos, int dstPos)
+                              double param[SWS_NUM_SCALER_PARAMS], int srcPos, int dstPos)
 {
     int i;
     int filterSize;
@@ -227,7 +225,7 @@ static av_cold int initFilter(int16_t **outFilter, int32_t **filterPos,
             filter[i * filterSize] = fone;
             (*filterPos)[i]        = i;
         }
-    } else if (flags & SWS_POINT) { // lame looking point sampling mode
+    } else if (scaler == SWS_POINT) { // lame looking point sampling mode
         int i;
         int64_t xDstInSrc;
         filterSize = 1;
@@ -242,8 +240,8 @@ static av_cold int initFilter(int16_t **outFilter, int32_t **filterPos,
             filter[i]       = fone;
             xDstInSrc      += xInc;
         }
-    } else if ((xInc <= (1 << 16) && (flags & SWS_AREA)) ||
-               (flags & SWS_FAST_BILINEAR)) { // bilinear upscale
+    } else if ((xInc <= (1 << 16) && (scaler == SWS_AREA)) ||
+               (scaler == SWS_FAST_BILINEAR)) { // bilinear upscale
         int i;
         int64_t xDstInSrc;
         filterSize = 2;
@@ -271,12 +269,12 @@ static av_cold int initFilter(int16_t **outFilter, int32_t **filterPos,
         int sizeFactor = -1;
 
         for (i = 0; i < FF_ARRAY_ELEMS(scale_algorithms); i++) {
-            if (flags & scale_algorithms[i].flag && scale_algorithms[i].size_factor > 0) {
+            if (scaler == scale_algorithms[i].flag && scale_algorithms[i].size_factor > 0) {
                 sizeFactor = scale_algorithms[i].size_factor;
                 break;
             }
         }
-        if (flags & SWS_LANCZOS)
+        if (scaler == SWS_LANCZOS)
             sizeFactor = param[0] != SWS_PARAM_DEFAULT ? ceil(2 * param[0]) : 6;
         av_assert0(sizeFactor > 0);
 
@@ -310,7 +308,7 @@ static av_cold int initFilter(int16_t **outFilter, int32_t **filterPos,
                     d = d * dstW / srcW;
                 floatd = d * (1.0 / (1 << 30));
 
-                if (flags & SWS_BICUBIC) {
+                if (scaler == SWS_BICUBIC) {
                     int64_t B = (param[0] != SWS_PARAM_DEFAULT ? param[0] :   0) * (1 << 24);
                     int64_t C = (param[1] != SWS_PARAM_DEFAULT ? param[1] : 0.6) * (1 << 24);
 
@@ -331,7 +329,7 @@ static av_cold int initFilter(int16_t **outFilter, int32_t **filterPos,
                                       (8 * B + 24 * C) * (1 << 30);
                     }
                     coeff /= (1LL<<54)/fone;
-                } else if (flags & SWS_X) {
+                } else if (scaler == SWS_X) {
                     double A = param[0] != SWS_PARAM_DEFAULT ? param[0] : 1.0;
                     double c;
 
@@ -344,7 +342,7 @@ static av_cold int initFilter(int16_t **outFilter, int32_t **filterPos,
                     else
                         c = pow(c, A);
                     coeff = (c * 0.5 + 0.5) * fone;
-                } else if (flags & SWS_AREA) {
+                } else if (scaler == SWS_AREA) {
                     int64_t d2 = d - (1 << 29);
                     if (d2 * xInc < -(1LL << (29 + 16)))
                         coeff = 1.0 * (1LL << (30 + 16));
@@ -353,23 +351,23 @@ static av_cold int initFilter(int16_t **outFilter, int32_t **filterPos,
                     else
                         coeff = 0.0;
                     coeff *= fone >> (30 + 16);
-                } else if (flags & SWS_GAUSS) {
+                } else if (scaler == SWS_GAUSS) {
                     double p = param[0] != SWS_PARAM_DEFAULT ? param[0] : 3.0;
                     coeff = exp2(-p * floatd * floatd) * fone;
-                } else if (flags & SWS_SINC) {
+                } else if (scaler == SWS_SINC) {
                     coeff = (d ? sin(floatd * M_PI) / (floatd * M_PI) : 1.0) * fone;
-                } else if (flags & SWS_LANCZOS) {
+                } else if (scaler == SWS_LANCZOS) {
                     double p = param[0] != SWS_PARAM_DEFAULT ? param[0] : 3.0;
                     coeff = (d ? sin(floatd * M_PI) * sin(floatd * M_PI / p) /
                              (floatd * floatd * M_PI * M_PI / p) : 1.0) * fone;
                     if (floatd > p)
                         coeff = 0;
-                } else if (flags & SWS_BILINEAR) {
+                } else if (scaler == SWS_BILINEAR) {
                     coeff = (1 << 30) - d;
                     if (coeff < 0)
                         coeff = 0;
                     coeff *= fone >> 30;
-                } else if (flags & SWS_SPLINE) {
+                } else if (scaler == SWS_SPLINE) {
                     double p = -2.196152422706632;
                     coeff = getSplineCoeff(1.0, 0.0, p, -p - 1.0, floatd) * fone;
                 } else {
@@ -1119,6 +1117,22 @@ static enum AVPixelFormat alphaless_fmt(enum AVPixelFormat fmt)
     }
 }
 
+static int scaler_flag(SwsScaler scaler, int fallback)
+{
+    switch (scaler) {
+    case SWS_SCALE_BILINEAR: return SWS_BILINEAR; break;
+    case SWS_SCALE_BICUBIC:  return SWS_BICUBIC;  break;
+    case SWS_SCALE_POINT:    return SWS_POINT;    break;
+    case SWS_SCALE_AREA:     return SWS_AREA;     break;
+    case SWS_SCALE_GAUSSIAN: return SWS_GAUSS;    break;
+    case SWS_SCALE_SINC:     return SWS_SINC;     break;
+    case SWS_SCALE_LANCZOS:  return SWS_LANCZOS;  break;
+    case SWS_SCALE_SPLINE:   return SWS_SPLINE;   break;
+    default:
+        return fallback;
+    }
+}
+
 av_cold int ff_sws_init_single_context(SwsContext *sws, SwsFilter *srcFilter,
                                        SwsFilter *dstFilter)
 {
@@ -1193,17 +1207,31 @@ av_cold int ff_sws_init_single_context(SwsContext *sws, SwsFilter *srcFilter,
     /* provide a default scaler if not set by caller */
     if (!i) {
         if (dstW < srcW && dstH < srcH)
-            flags |= SWS_BICUBIC;
+            i = SWS_BICUBIC;
         else if (dstW > srcW && dstH > srcH)
-            flags |= SWS_BICUBIC;
+            i = SWS_BICUBIC;
         else
-            flags |= SWS_BICUBIC;
+            i = SWS_BICUBIC;
+        flags |= i;
         sws->flags = flags;
     } else if (i & (i - 1)) {
         av_log(c, AV_LOG_ERROR,
                "Exactly one scaler algorithm must be chosen, got %X\n", i);
         return AVERROR(EINVAL);
     }
+
+    if (i == SWS_FAST_BILINEAR) {
+        if (srcW < 8 || dstW <= 8) {
+            i = SWS_BILINEAR;
+            flags ^= SWS_FAST_BILINEAR | i;
+            sws->flags = flags;
+        }
+    }
+
+    SwsScaler scaler_sub = sws->scaler_sub ? sws->scaler_sub : sws->scaler;
+    int lum_scaler = scaler_flag(sws->scaler, i == SWS_BICUBLIN ? SWS_BICUBIC  : i);
+    int chr_scaler = scaler_flag(scaler_sub,  i == SWS_BICUBLIN ? SWS_BILINEAR : i);
+
     /* sanity check */
     if (srcW < 1 || srcH < 1 || dstW < 1 || dstH < 1) {
         /* FIXME check if these are enough and try to lower them after
@@ -1211,12 +1239,6 @@ av_cold int ff_sws_init_single_context(SwsContext *sws, SwsFilter *srcFilter,
         av_log(c, AV_LOG_ERROR, "%dx%d -> %dx%d is invalid scaling dimension\n",
                srcW, srcH, dstW, dstH);
         return AVERROR(EINVAL);
-    }
-    if (flags & SWS_FAST_BILINEAR) {
-        if (srcW < 8 || dstW <= 8) {
-            flags ^= SWS_FAST_BILINEAR | SWS_BILINEAR;
-            sws->flags = flags;
-        }
     }
 
     if (!dstFilter)
@@ -1693,7 +1715,7 @@ av_cold int ff_sws_init_single_context(SwsContext *sws, SwsFilter *srcFilter,
             if ((ret = initFilter(&c->hLumFilter, &c->hLumFilterPos,
                            &c->hLumFilterSize, c->lumXInc,
                            srcW, dstW, filterAlign, 1 << 14,
-                           (flags & SWS_BICUBLIN) ? (flags | SWS_BICUBIC) : flags,
+                           lum_scaler, flags,
                            cpu_flags, srcFilter->lumH, dstFilter->lumH,
                            sws->scaler_params,
                            get_local_pos(c, 0, 0, 0),
@@ -1704,7 +1726,7 @@ av_cold int ff_sws_init_single_context(SwsContext *sws, SwsFilter *srcFilter,
             if ((ret = initFilter(&c->hChrFilter, &c->hChrFilterPos,
                            &c->hChrFilterSize, c->chrXInc,
                            c->chrSrcW, c->chrDstW, filterAlign, 1 << 14,
-                           (flags & SWS_BICUBLIN) ? (flags | SWS_BILINEAR) : flags,
+                           chr_scaler, flags,
                            cpu_flags, srcFilter->chrH, dstFilter->chrH,
                            sws->scaler_params,
                            get_local_pos(c, c->chrSrcHSubSample, sws->src_h_chr_pos, 0),
@@ -1723,7 +1745,7 @@ av_cold int ff_sws_init_single_context(SwsContext *sws, SwsFilter *srcFilter,
 
         ret = initFilter(&c->vLumFilter, &c->vLumFilterPos, &c->vLumFilterSize,
                        c->lumYInc, srcH, dstH, filterAlign, (1 << 12),
-                       (flags & SWS_BICUBLIN) ? (flags | SWS_BICUBIC) : flags,
+                       lum_scaler, flags,
                        cpu_flags, srcFilter->lumV, dstFilter->lumV,
                        sws->scaler_params,
                        get_local_pos(c, 0, 0, 1),
@@ -1734,7 +1756,7 @@ av_cold int ff_sws_init_single_context(SwsContext *sws, SwsFilter *srcFilter,
         if ((ret = initFilter(&c->vChrFilter, &c->vChrFilterPos, &c->vChrFilterSize,
                        c->chrYInc, c->chrSrcH, c->chrDstH,
                        filterAlign, (1 << 12),
-                       (flags & SWS_BICUBLIN) ? (flags | SWS_BILINEAR) : flags,
+                       chr_scaler, flags,
                        cpu_flags, srcFilter->chrV, dstFilter->chrV,
                        sws->scaler_params,
                        get_local_pos(c, c->chrSrcVSubSample, sws->src_v_chr_pos, 1),
@@ -2272,11 +2294,6 @@ void sws_freeContext(SwsContext *sws)
     for (i = 0; i < FF_ARRAY_ELEMS(c->graph); i++)
         ff_sws_graph_free(&c->graph[i]);
 
-    if (!c->is_legacy_init) {
-        av_free(c);
-        return;
-    }
-
     for (i = 0; i < c->nb_slice_ctx; i++)
         sws_freeContext(c->slice_ctx[i]);
     av_freep(&c->slice_ctx);
@@ -2380,8 +2397,8 @@ SwsContext *sws_getCachedContext(SwsContext *prev, int srcW,
                  prev->dst_h            == dstH      &&
                  prev->dst_format       == dstFormat &&
                  prev->flags            == flags     &&
-                 prev->scaler_params[0] == param[0]  &&
-                 prev->scaler_params[1] == param[1])) {
+                 !memcmp(prev->scaler_params, param,
+                         sizeof(prev->scaler_params)))) {
         return prev;
     }
 
@@ -2402,8 +2419,8 @@ SwsContext *sws_getCachedContext(SwsContext *prev, int srcW,
     sws->dst_h            = dstH;
     sws->dst_format       = dstFormat;
     sws->flags            = flags;
-    sws->scaler_params[0] = param[0];
-    sws->scaler_params[1] = param[1];
+    for (int i = 0; i < SWS_NUM_SCALER_PARAMS; i++)
+        sws->scaler_params[i] = param[i];
 
     if (sws_init_context(sws, srcFilter, dstFilter) < 0)
         sws_free_context(&sws);

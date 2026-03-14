@@ -30,6 +30,7 @@
 #include "h2645_parse.h"
 #include "h264.h"
 #include "lcevc.h"
+#include "lcevc_parse.h"
 #include "startcode.h"
 #include "vc1_common.h"
 #include "vvc.h"
@@ -268,22 +269,6 @@ static int extract_extradata_h2645(AVBSFContext *ctx, AVPacket *pkt,
     return 0;
 }
 
-static inline uint64_t get_mb(GetBitContext *s) {
-    int more, i = 0;
-    uint64_t mb = 0;
-
-    do {
-        int byte = get_bits(s, 8);
-        unsigned bits = byte & 0x7f;
-        more = byte & 0x80;
-        mb = (mb << 7) | bits;
-        if (++i == 10)
-            break;
-    } while (more);
-
-    return mb;
-}
-
 /**
  * Rewrite the NALu stripping the unneeded blocks.
  * Given that length fields coded inside the NALu are not aware of any emulation_3bytes
@@ -304,7 +289,8 @@ static int write_lcevc_nalu(AVBSFContext *ctx, PutByteContext *pbc, const H2645N
 
     while (bytestream2_get_bytes_left(&gbc) > 1) {
         GetBitContext gb;
-        int payload_size_type, payload_type, payload_size;
+        int payload_size_type, payload_type;
+        uint64_t payload_size;
         int block_size, raw_block_size, block_end;
 
         init_get_bits8(&gb, gbc.buffer, bytestream2_get_bytes_left(&gbc));
@@ -316,6 +302,9 @@ static int write_lcevc_nalu(AVBSFContext *ctx, PutByteContext *pbc, const H2645N
             return AVERROR_PATCHWELCOME;
         if (payload_size_type == 7)
             payload_size = get_mb(&gb);
+
+        if (payload_size > INT_MAX - (get_bits_count(&gb) >> 3))
+            return AVERROR_INVALIDDATA;
 
         block_size = raw_block_size = payload_size + (get_bits_count(&gb) >> 3);
         if (block_size >= bytestream2_get_bytes_left(&gbc))
@@ -407,14 +396,10 @@ static int extract_extradata_lcevc(AVBSFContext *ctx, AVPacket *pkt,
             return AVERROR(ENOMEM);
         }
 
-        *data = extradata;
-        *size = 0;
-
         bytestream2_init_writer(&pb_extradata, extradata, extradata_size);
         if (s->remove)
             bytestream2_init_writer(&pb_filtered_data, filtered_buf->data, filtered_size);
 
-        filtered_size = 0;
         for (i = 0; i < s->h2645_pkt.nb_nals; i++) {
             H2645NAL *nal = &s->h2645_pkt.nals[i];
             if (val_in_array(extradata_nal_types, nb_extradata_nal_types,
@@ -422,33 +407,34 @@ static int extract_extradata_lcevc(AVBSFContext *ctx, AVPacket *pkt,
                 bytestream2_put_be24(&pb_extradata, 1); //startcode
                 ret = write_lcevc_nalu(ctx, &pb_extradata, nal, 0);
                 if (ret < 0) {
-                    av_freep(data);
+                    av_freep(&extradata);
                     av_buffer_unref(&filtered_buf);
                     return ret;
                 }
-                *size += ret;
                 if (s->remove) {
                     bytestream2_put_be24(&pb_filtered_data, 1); //startcode
                     ret = write_lcevc_nalu(ctx, &pb_filtered_data, nal, 1);
                     if (ret < 0) {
-                        av_freep(data);
+                        av_freep(&extradata);
                         av_buffer_unref(&filtered_buf);
                         return ret;
                     }
-                    filtered_size += ret;
                 }
             } else if (s->remove) {
                 bytestream2_put_be24(&pb_filtered_data, 1); //startcode
                 bytestream2_put_bufferu(&pb_filtered_data, nal->raw_data, nal->raw_size);
-                filtered_size += nal->raw_size;
             }
         }
+        *data = extradata;
+        *size = bytestream2_tell_p(&pb_extradata);
+        av_assert0(*size <= extradata_size);
 
         if (s->remove) {
+            av_assert0(bytestream2_tell_p(&pb_filtered_data) <= filtered_size);
             av_buffer_unref(&pkt->buf);
             pkt->buf  = filtered_buf;
             pkt->data = filtered_buf->data;
-            pkt->size = filtered_size;
+            pkt->size = bytestream2_tell_p(&pb_filtered_data);
         }
     }
 
