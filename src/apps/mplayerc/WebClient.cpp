@@ -709,22 +709,17 @@ bool CWebClientSocket::OnVariables(CStringA& hdr, CStringA& body, CStringA& mime
 			if (IsVideoRenderer(pBF)) {
 				BeginEnumPins(pBF, pEP, pPin) {
 					CMediaType mt;
-					if (SUCCEEDED(pPin->ConnectionMediaType(&mt))) {
-						if (mt.majortype == MEDIATYPE_Video && (mt.formattype == FORMAT_VideoInfo2 || mt.formattype == FORMAT_MPEG2_VIDEO) && mt.pbFormat) {
-							const auto vih2 = (VIDEOINFOHEADER2*)mt.pbFormat;
-							HDR = L"Unknown";
-							if (vih2->dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT)) {
-								DXVA2_ExtendedFormat exfmt;
-								exfmt.value = vih2->dwControlFlags;
-								switch (exfmt.VideoTransferFunction) {
-									case MFVideoTransFunc_2084: HDR = L"HDR";      break;
-									case MFVideoTransFunc_HLG:  HDR = L"HDR(HLG)"; break;
-									default:                    HDR = L"SDR";      break;
-								}
+					if (SUCCEEDED(pPin->ConnectionMediaType(&mt)) && mt.majortype == MEDIATYPE_Video && mt.pbFormat) {
+						DXVA2_ExtendedFormat exfmt;
+						exfmt.value = GetExColorInfo(&mt);
+						if (exfmt.value) {
+							switch (exfmt.VideoTransferFunction) {
+							case MFVideoTransFunc_2084: HDR = L"HDR";      break;
+							case MFVideoTransFunc_HLG:  HDR = L"HDR(HLG)"; break;
+							default:                    HDR = L"SDR";      break;
 							}
-
-							break;
 						}
+						break;
 					}
 				}
 				EndEnumPins;

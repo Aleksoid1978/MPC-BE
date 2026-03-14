@@ -920,26 +920,14 @@ REFERENCE_TIME HMSF2RT(DVD_HMSF_TIMECODE hmsf, double fps)
 
 const BITMAPINFOHEADER* GetBitmapInfoHeader(const AM_MEDIA_TYPE* pmt)
 {
-	if (pmt) {
-		if (pmt->formattype == FORMAT_VideoInfo2) {
+	if (pmt && pmt->pbFormat) {
+		if (pmt->formattype == FORMAT_VideoInfo2 || pmt->formattype == FORMAT_MPEG2_VIDEO || pmt->formattype == FORMAT_DiracVideoInfo) {
 			VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)pmt->pbFormat;
 			return &vih2->bmiHeader;
 		}
-		else if (pmt->formattype == FORMAT_VideoInfo) {
+		else if (pmt->formattype == FORMAT_VideoInfo || pmt->formattype == FORMAT_MPEGVideo) {
 			VIDEOINFOHEADER* vih = (VIDEOINFOHEADER*)pmt->pbFormat;
 			return &vih->bmiHeader;
-		}
-		else if (pmt->formattype == FORMAT_MPEGVideo) {
-			MPEG1VIDEOINFO* m1vi = (MPEG1VIDEOINFO*)pmt->pbFormat;
-			return &m1vi->hdr.bmiHeader;
-		}
-		else if (pmt->formattype == FORMAT_MPEG2_VIDEO) {
-			MPEG2VIDEOINFO* m2vi = (MPEG2VIDEOINFO*)pmt->pbFormat;
-			return &m2vi->hdr.bmiHeader;
-		}
-		else if (pmt->formattype == FORMAT_DiracVideoInfo) {
-			DIRACINFOHEADER* dih = (DIRACINFOHEADER*)pmt->pbFormat;
-			return &dih->hdr.bmiHeader;
 		}
 	}
 
@@ -1066,18 +1054,12 @@ UINT GetExColorInfo(const AM_MEDIA_TYPE* pmt)
 	if (pmt) {
 		VIDEOINFOHEADER2* pVIH2 = nullptr;
 
-		if (pmt->formattype == FORMAT_VideoInfo2) {
+		if (pmt->formattype == FORMAT_VideoInfo2 || pmt->formattype == FORMAT_MPEG2_VIDEO || pmt->formattype == FORMAT_DiracVideoInfo) {
 			pVIH2 = (VIDEOINFOHEADER2*)pmt->pbFormat;
-		}
-		else if (pmt->formattype == FORMAT_MPEG2_VIDEO) {
-			pVIH2 = &((MPEG2VIDEOINFO*)pmt->pbFormat)->hdr;
-		}
-		else if (pmt->formattype == FORMAT_DiracVideoInfo) {
-			pVIH2 = &((DIRACINFOHEADER*)pmt->pbFormat)->hdr;
-		}
 
-		if (pVIH2 && (pVIH2->dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT))) {
-			return pVIH2->dwControlFlags;
+			if (pVIH2 && (pVIH2->dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT))) {
+				return pVIH2->dwControlFlags;
+			}
 		}
 	}
 

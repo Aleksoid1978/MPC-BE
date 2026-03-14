@@ -2336,25 +2336,15 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
 		BITMAPINFOHEADER* pBMI = nullptr;
 		bool bInterlacedFieldPerSample = false;
 		m_inputDxvaExtFormat.value = 0;
-		if (pmt->formattype == FORMAT_VideoInfo) {
+		if (pmt->formattype == FORMAT_VideoInfo || pmt->formattype == FORMAT_MPEGVideo) {
 			VIDEOINFOHEADER* vih = (VIDEOINFOHEADER*)pmt->pbFormat;
 			pBMI = &vih->bmiHeader;
-		} else if (pmt->formattype == FORMAT_VideoInfo2) {
+		} else if (pmt->formattype == FORMAT_VideoInfo2 || pmt->formattype == FORMAT_MPEG2Video || pmt->formattype == FORMAT_DiracVideoInfo) {
 			VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)pmt->pbFormat;
 			pBMI = &vih2->bmiHeader;
 			bInterlacedFieldPerSample = vih2->dwInterlaceFlags & AMINTERLACE_IsInterlaced && vih2->dwInterlaceFlags & AMINTERLACE_1FieldPerSample;
 			if (vih2->dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT)) {
 				m_inputDxvaExtFormat.value = vih2->dwControlFlags & 0xFFFFFF00;
-			}
-		} else if (pmt->formattype == FORMAT_MPEGVideo) {
-			MPEG1VIDEOINFO* mpgv = (MPEG1VIDEOINFO*)pmt->pbFormat;
-			pBMI = &mpgv->hdr.bmiHeader;
-		} else if (pmt->formattype == FORMAT_MPEG2Video) {
-			VIDEOINFOHEADER2& vih2 = ((MPEG2VIDEOINFO*)pmt->pbFormat)->hdr;
-			pBMI = &vih2.bmiHeader;
-			bInterlacedFieldPerSample = vih2.dwInterlaceFlags & AMINTERLACE_IsInterlaced && vih2.dwInterlaceFlags & AMINTERLACE_1FieldPerSample;
-			if (vih2.dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT)) {
-				m_inputDxvaExtFormat.value = vih2.dwControlFlags & 0xFFFFFF00;
 			}
 		} else {
 			return VFW_E_INVALIDMEDIATYPE;

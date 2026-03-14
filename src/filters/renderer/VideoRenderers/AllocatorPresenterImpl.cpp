@@ -1,5 +1,5 @@
 /*
- * (C) 2022-2023 see Authors.txt
+ * (C) 2022-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -336,7 +336,7 @@ STDMETHODIMP CAllocatorPresenterImpl::GetString(LPCSTR field, LPWSTR* value, int
 		if (m_inputMediaType.IsValid() && m_inputMediaType.formattype == FORMAT_VideoInfo2) {
 			const VIDEOINFOHEADER2* pVIH2 = (VIDEOINFOHEADER2*)m_inputMediaType.pbFormat;
 
-			if (pVIH2->dwControlFlags & AMCONTROL_COLORINFO_PRESENT) {
+			if (pVIH2->dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT)) {
 				const DXVA2_ExtendedFormat& flags = (DXVA2_ExtendedFormat&)pVIH2->dwControlFlags;
 
 				ret = (flags.NominalRange == DXVA2_NominalRange_Normal) ? L"PC." : L"TV.";
