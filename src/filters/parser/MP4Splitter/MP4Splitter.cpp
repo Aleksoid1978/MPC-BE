@@ -2002,10 +2002,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			if (AP4_Track::TYPE_VIDEO == track->GetType() && videoSize == CSize(0, 0)) {
 				for (int i = 0, j = mts.size(); i < j; ++i) {
-					BITMAPINFOHEADER bih;
-					if (ExtractBIH(&mts[i], &bih)) {
-						videoSize.cx = bih.biWidth;
-						videoSize.cy = abs(bih.biHeight);
+					if (auto pBIH = GetBitmapInfoHeader(&mts[i])) {
+						videoSize.cx = pBIH->biWidth;
+						videoSize.cy = abs(pBIH->biHeight);
 						break;
 					}
 				}

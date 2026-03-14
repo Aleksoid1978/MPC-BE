@@ -231,9 +231,8 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 					if (SUCCEEDED(hr = m_pOutput->GetDeliveryBuffer(&pOut, nullptr, nullptr, 0))) {
 						AM_MEDIA_TYPE* pmt;
 						if (SUCCEEDED(pOut->GetMediaType(&pmt)) && pmt) {
-							BITMAPINFOHEADER bihOut;
-							if (ExtractBIH(pmt, &bihOut)) {
-								DLog(L"CBaseVideoFilter::ReconnectOutput() : new MediaType from IMediaSample negotiated, actual width: %d, requested: %ld", width, bihOut.biWidth);
+							if (auto pBIH = GetBitmapInfoHeader(pmt)) {
+								DLog(L"CBaseVideoFilter::ReconnectOutput() : new MediaType from IMediaSample negotiated, actual width: %d, requested: %ld", width, pBIH->biWidth);
 							}
 
 							CMediaType mt2 = *pmt;
@@ -307,11 +306,13 @@ HRESULT CBaseVideoFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_
 		return E_UNEXPECTED;
 	}
 
-	BITMAPINFOHEADER bih;
-	ExtractBIH(&m_pOutput->CurrentMediaType(), &bih);
+	auto pBIH = GetBitmapInfoHeader(&m_pOutput->CurrentMediaType());
+	if (!pBIH) {
+		return E_UNEXPECTED;
+	}
 
 	pProperties->cBuffers	= m_cBuffers;
-	pProperties->cbBuffer	= bih.biSizeImage;
+	pProperties->cbBuffer	= pBIH->biSizeImage;
 	pProperties->cbAlign	= 1;
 	pProperties->cbPrefix	= 0;
 

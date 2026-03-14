@@ -937,8 +937,8 @@ const BITMAPINFOHEADER* GetBitmapInfoHeader(const AM_MEDIA_TYPE* pmt)
 bool ExtractBIH(const AM_MEDIA_TYPE* pmt, BITMAPINFOHEADER* bih)
 {
 	if (pmt && bih) {
-		if (const BITMAPINFOHEADER* pmtbih = GetBitmapInfoHeader(pmt)) {
-			memcpy(bih, pmtbih, sizeof(BITMAPINFOHEADER));
+		if (auto pBIH = GetBitmapInfoHeader(pmt)) {
+			memcpy(bih, pBIH, sizeof(BITMAPINFOHEADER));
 			return true;
 		} else {
 			memset(bih, 0, sizeof(*bih));

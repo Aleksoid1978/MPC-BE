@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,9 +40,9 @@ HRESULT CDeinterlacerFilter::CheckConnect(PIN_DIRECTION dir, IPin* pPin)
 
 HRESULT CDeinterlacerFilter::CheckInputType(const CMediaType* mtIn)
 {
-	BITMAPINFOHEADER bih;
+	auto pBIH = GetBitmapInfoHeader(mtIn);
 
-	if (!ExtractBIH(mtIn, &bih) /*|| bih.biHeight <= 0*/ || bih.biHeight <= 288) {
+	if (!pBIH || pBIH->biHeight <= 288) {
 		return E_FAIL;
 	}
 
@@ -129,11 +129,13 @@ HRESULT CDeinterlacerFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCAT
 		return E_UNEXPECTED;
 	}
 
-	BITMAPINFOHEADER bih;
-	ExtractBIH(&m_pOutput->CurrentMediaType(), &bih);
+	auto pBIH = GetBitmapInfoHeader(&m_pOutput->CurrentMediaType());
+	if (!pBIH) {
+		return E_UNEXPECTED;
+	}
 
 	pProperties->cBuffers = 1;
-	pProperties->cbBuffer = bih.biSizeImage;
+	pProperties->cbBuffer = pBIH->biSizeImage;
 	pProperties->cbAlign = 1;
 	pProperties->cbPrefix = 0;
 

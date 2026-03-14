@@ -2374,13 +2374,13 @@ void CDX9AllocatorPresenter::OnChangeInput(CComPtr<IPin> pPin)
 		if (StartsWith(subtypestr, L"MEDIASUBTYPE_")) {
 			m_strInputFmt = subtypestr.Mid(13);
 		} else {
-			BITMAPINFOHEADER bih;
-			if (ExtractBIH(&input_mt, &bih)) {
+			if (auto pBIH = GetBitmapInfoHeader(&input_mt)) {
+				auto pbiComp = (char*)&pBIH->biCompression;
 				m_strInputFmt.Format(L"%C%C%C%C",
-					((char*)&bih.biCompression)[0],
-					((char*)&bih.biCompression)[1],
-					((char*)&bih.biCompression)[2],
-					((char*)&bih.biCompression)[3]);
+					pbiComp[0],
+					pbiComp[1],
+					pbiComp[2],
+					pbiComp[3]);
 			}
 		}
 
