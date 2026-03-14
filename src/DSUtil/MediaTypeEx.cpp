@@ -642,7 +642,7 @@ void CMediaTypeEx::Dump(std::list<CString>& sl)
 
 		sl.emplace_back(L"");
 
-		if (formattype == FORMAT_VideoInfo2 || formattype == FORMAT_MPEG2_VIDEO) {
+		if (formattype == FORMAT_VideoInfo2 || formattype == FORMAT_MPEG2_VIDEO || formattype == FORMAT_DiracVideoInfo) {
 			VIDEOINFOHEADER2& vih2 = *(VIDEOINFOHEADER2*)pbFormat;
 			bih = &vih2.bmiHeader;
 
