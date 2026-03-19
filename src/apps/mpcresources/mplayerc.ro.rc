@@ -2551,7 +2551,7 @@ BEGIN
     IDD_PPAGEFORMATS        "Player::Formate"
     IDD_PPAGEACCELTBL       "Player::Taste"
     IDD_PPAGEMOUSE          "Player::Mouse"
-    IDD_PPAGELOGO           "Player::Logo"
+    IDD_PPAGELOGO           "Player::Siglă (Logo)"
     IDD_PPAGEINTERFACE      "Player::Interfață"
     IDD_PPAGEOSD            "Player::OSD (On Screen Diplay / Afișare pe ecran)"
     IDD_PPAGEWINDOWSIZE     "Player::Dimensiunea ferestrei"
@@ -3527,7 +3527,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_LOGO_AUTHOR         "Autor necunoscut. Dacă ai făcut acest logo, contactează-ne!"
+    IDS_LOGO_AUTHOR         "Autor necunoscut. Dacă ai făcut acest logo (această siglă), contactează-ne!"
     IDS_NO_MORE_MEDIA       "Nu mai există fișiere media în dosarul (folderul) actual."
     IDS_FIRST_IN_FOLDER     "Acum este încărcat primul fișier din dosar (din folder)."
     IDS_LAST_IN_FOLDER      "Acum este încărcat ultimul fișier din dosar (din folder)."
