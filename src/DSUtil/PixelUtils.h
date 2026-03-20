@@ -22,10 +22,10 @@
 
 extern void CopyPlane(const UINT lines, BYTE* dst, UINT dst_pitch, const BYTE* src, int src_pitch);
 
-extern void CopyI420toNV12(UINT w, UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch);
-extern void CopyI420toYV12(UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch);
+extern void CopyYUV420PtoNV12(UINT w, UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch);
+extern void CopyYUV420PtoYV12(UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch);
 
-extern void ConvertI420toYUY2(UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch, const bool bInterlaced);
+extern void ConvertYUV420PtoYUY2(UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch, const bool bInterlaced);
 
 extern void BlendPlane(BYTE* dst, BYTE* src, UINT w, UINT h, UINT dstpitch, UINT srcpitch);
 extern void BobPlane(BYTE* dst, BYTE* src, UINT w, UINT h, UINT dstpitch, UINT srcpitch, bool topfield);

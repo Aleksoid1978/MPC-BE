@@ -41,7 +41,7 @@ void CopyPlane(const UINT lines, BYTE* dst, UINT dst_pitch, const BYTE* src, int
 	}
 }
 
-void CopyI420toNV12(UINT w, UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch)
+void CopyYUV420PtoNV12(UINT w, UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch)
 {
 	if (!(dst_pitch % 32) && !(src_pitch % 16)) {
 		const ptrdiff_t srcStride[3] = { src_pitch, src_pitch / 2, src_pitch / 2 };
@@ -74,7 +74,7 @@ void CopyI420toNV12(UINT w, UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const
 	}
 }
 
-void CopyI420toYV12(UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch)
+void CopyYUV420PtoYV12(UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch)
 {
 	CopyPlane(h, dst, dst_pitch, src[0], src_pitch); // Y
 
@@ -88,7 +88,7 @@ void CopyI420toYV12(UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3],
 	CopyPlane(h, dst, dst_pitch, src[1], src_pitch); // U
 }
 
-void ConvertI420toYUY2(UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch, const bool bInterlaced)
+void ConvertYUV420PtoYUY2(UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch, const bool bInterlaced)
 {
 	const int src_pitch_uv = src_pitch / 2;
 

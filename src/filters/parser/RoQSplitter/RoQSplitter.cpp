@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -590,12 +590,10 @@ HRESULT CRoQVideoDecoder::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	BITMAPINFOHEADER bih;
 	ExtractBIH(&m_pInput->CurrentMediaType(), &bih);
 
-	int w = bih.biWidth, h = bih.biHeight;
-
-	// TODO: decode picture into m_pI420
+	const int w = bih.biWidth;
+	const int h = bih.biHeight;
 
 	roq_chunk* rc = (roq_chunk*)pDataIn;
-
 	pDataIn += sizeof(roq_chunk);
 
 	if(rc->id == RoQ_QUAD_CODEBOOK)
@@ -723,13 +721,13 @@ HRESULT CRoQVideoDecoder::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
 
 	if (bihOut.biCompression == FCC('NV12')) {
-		CopyI420toNV12(w, h, pDataOut, bihOut.biWidth, src, w);
+		CopyYUV420PtoNV12(w, h, pDataOut, bihOut.biWidth, src, w);
 	}
 	else if (bihOut.biCompression == FCC('YV12')) {
-		CopyI420toYV12(h, pDataOut, bihOut.biWidth, src, w);
+		CopyYUV420PtoYV12(h, pDataOut, bihOut.biWidth, src, w);
 	}
 	else if (bihOut.biCompression == FCC('YUY2')) {
-		ConvertI420toYUY2(h, pDataOut, bihOut.biWidth * 2, src, w, false);
+		ConvertYUV420PtoYUY2(h, pDataOut, bihOut.biWidth * 2, src, w, false);
 	}
 
 	pOut->SetTime(&rtStart, &rtStop);

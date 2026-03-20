@@ -809,14 +809,14 @@ HRESULT CMpeg2DecFilter::DeliverToRenderer()
 	ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
 
 	if (bihOut.biCompression == FCC('NV12')) {
-		CopyI420toNV12(m_fb.w, m_fb.h, pDataOut, bihOut.biWidth, buf, m_fb.pitch);
+		CopyYUV420PtoNV12(m_fb.w, m_fb.h, pDataOut, bihOut.biWidth, buf, m_fb.pitch);
 	}
 	else if (bihOut.biCompression == FCC('YV12')) {
-		CopyI420toYV12(m_fb.h, pDataOut, bihOut.biWidth, buf, m_fb.pitch);
+		CopyYUV420PtoYV12(m_fb.h, pDataOut, bihOut.biWidth, buf, m_fb.pitch);
 	}
 	else if(bihOut.biCompression == FCC('YUY2')) {
-		bool interlaced = !(m_fb.flags & PIC_FLAG_PROGRESSIVE_FRAME);
-		ConvertI420toYUY2(m_fb.h, pDataOut, bihOut.biWidth * 2, buf, m_fb.pitch, interlaced);
+		const bool interlaced = !(m_fb.flags & PIC_FLAG_PROGRESSIVE_FRAME);
+		ConvertYUV420PtoYUY2(m_fb.h, pDataOut, bihOut.biWidth * 2, buf, m_fb.pitch, interlaced);
 	}
 
 	if (CMpeg2DecInputPin* pPin = dynamic_cast<CMpeg2DecInputPin*>(m_pInput)) {
