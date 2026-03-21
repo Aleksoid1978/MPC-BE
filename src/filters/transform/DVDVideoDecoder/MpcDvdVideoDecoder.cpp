@@ -796,27 +796,28 @@ HRESULT CMpeg2DecFilter::DeliverToRenderer()
 	BYTE** buf = &m_fb.buf[0];
 
 	if (m_pSubpicInput->HasAnythingToRender(m_fb.rtStart)) {
-		CopyPlane(m_fb.h,   m_fb.buf[3], m_fb.pitch,   m_fb.buf[0], m_fb.pitch);
-		CopyPlane(m_fb.h/2, m_fb.buf[4], m_fb.pitch/2, m_fb.buf[1], m_fb.pitch/2);
-		CopyPlane(m_fb.h/2, m_fb.buf[5], m_fb.pitch/2, m_fb.buf[2], m_fb.pitch/2);
+		CopyPlane(m_fb.h,   m_fb.buf2[0], m_fb.pitch,   m_fb.buf[0], m_fb.pitch);
+		CopyPlane(m_fb.h/2, m_fb.buf2[1], m_fb.pitch/2, m_fb.buf[1], m_fb.pitch/2);
+		CopyPlane(m_fb.h/2, m_fb.buf2[2], m_fb.pitch/2, m_fb.buf[2], m_fb.pitch/2);
 
-		buf = &m_fb.buf[3];
+		buf = &m_fb.buf2[0];
 
 		m_pSubpicInput->RenderSubpics(m_fb.rtStart, buf, m_fb.pitch, m_fb.h);
 	}
 
-	BITMAPINFOHEADER bihOut;
-	ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
+	auto pBihOut = GetBitmapInfoHeader(&m_pOutput->CurrentMediaType());
 
-	if (bihOut.biCompression == FCC('NV12')) {
-		CopyYUV420PtoNV12(m_fb.w, m_fb.h, pDataOut, bihOut.biWidth, buf, m_fb.pitch);
-	}
-	else if (bihOut.biCompression == FCC('YV12')) {
-		CopyYUV420PtoYV12(m_fb.h, pDataOut, bihOut.biWidth, buf, m_fb.pitch);
-	}
-	else if(bihOut.biCompression == FCC('YUY2')) {
+	switch (pBihOut->biCompression) {
+	case FCC('NV12'):
+		CopyYUV420PtoNV12(m_fb.w, m_fb.h, pDataOut, pBihOut->biWidth, buf, m_fb.pitch);
+		break;
+	case FCC('YV12'):
+		CopyYUV420PSwapUV(m_fb.h, pDataOut, pBihOut->biWidth, buf, m_fb.pitch);
+		break;
+	case FCC('YUY2'):
 		const bool interlaced = !(m_fb.flags & PIC_FLAG_PROGRESSIVE_FRAME);
-		ConvertYUV420PtoYUY2(m_fb.h, pDataOut, bihOut.biWidth * 2, buf, m_fb.pitch, interlaced);
+		ConvertYUV420PtoYUY2(m_fb.h, pDataOut, pBihOut->biWidth * 2, buf, m_fb.pitch, interlaced);
+		break;
 	}
 
 	if (CMpeg2DecInputPin* pPin = dynamic_cast<CMpeg2DecInputPin*>(m_pInput)) {

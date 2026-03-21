@@ -22,8 +22,9 @@
 
 extern void CopyPlane(const UINT lines, BYTE* dst, UINT dst_pitch, const BYTE* src, int src_pitch);
 
+extern void CopyYUV420P(UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch);
+extern void CopyYUV420PSwapUV(UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch);
 extern void CopyYUV420PtoNV12(UINT w, UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch);
-extern void CopyYUV420PtoYV12(UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch);
 
 extern void ConvertYUV420PtoYUY2(UINT h, BYTE* dst, UINT dst_pitch, const BYTE* const src[3], UINT src_pitch, const bool bInterlaced);
 

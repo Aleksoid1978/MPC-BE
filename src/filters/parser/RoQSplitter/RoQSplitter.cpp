@@ -717,17 +717,18 @@ HRESULT CRoQVideoDecoder::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 	const BYTE* const src[3] = { m_y[1], m_u[1], m_v[1] };
 
-	BITMAPINFOHEADER bihOut;
-	ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
+	auto pBihOut =GetBitmapInfoHeader(&m_pOutput->CurrentMediaType());
 
-	if (bihOut.biCompression == FCC('NV12')) {
-		CopyYUV420PtoNV12(w, h, pDataOut, bihOut.biWidth, src, w);
-	}
-	else if (bihOut.biCompression == FCC('YV12')) {
-		CopyYUV420PtoYV12(h, pDataOut, bihOut.biWidth, src, w);
-	}
-	else if (bihOut.biCompression == FCC('YUY2')) {
-		ConvertYUV420PtoYUY2(h, pDataOut, bihOut.biWidth * 2, src, w, false);
+	switch(pBihOut->biCompression) {
+	case FCC('NV12'):
+		CopyYUV420PtoNV12(w, h, pDataOut, pBihOut->biWidth, src, w);
+		break;
+	case FCC('YV12'):
+		CopyYUV420PSwapUV(h, pDataOut, pBihOut->biWidth, src, w);
+		break;
+	case FCC('YUY2'):
+		ConvertYUV420PtoYUY2(h, pDataOut, pBihOut->biWidth * 2, src, w, false);
+		break;
 	}
 
 	pOut->SetTime(&rtStart, &rtStop);
