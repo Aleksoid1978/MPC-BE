@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -64,9 +64,9 @@ CRoQVideoDecoder : public CTransformFilter
 {
 	REFERENCE_TIME m_rtStart = 0;
 
-	BYTE* m_y[2] = { 0 };
-	BYTE* m_u[2] = { 0 };
-	BYTE* m_v[2] = { 0 };
+	BYTE* m_y[2] = {};
+	BYTE* m_u[2] = {};
+	BYTE* m_v[2] = {};
 	int m_pitch = 0;
 
 	#pragma pack(push, 1)
