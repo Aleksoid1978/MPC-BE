@@ -141,10 +141,6 @@ int ff_sws_graph_add_pass(SwsGraph *graph, enum AVPixelFormat fmt,
         goto fail;
     }
 
-    ret = pass_alloc_output(input);
-    if (ret < 0)
-        goto fail;
-
     if (!align) {
         pass->slice_h = pass->height;
         pass->num_slices = 1;
@@ -702,8 +698,10 @@ static int adapt_colors(SwsGraph *graph, SwsFormat src, SwsFormat dst,
         SwsFormat tmp = src;
         tmp.format = fmt_in;
         ret = add_convert_pass(graph, &src, &tmp, input, &input);
-        if (ret < 0)
+        if (ret < 0) {
+            ff_sws_lut3d_free(&lut);
             return ret;
+        }
     }
 
     ret = ff_sws_lut3d_generate(lut, fmt_in, fmt_out, &map);
@@ -794,6 +792,13 @@ int ff_sws_graph_create(SwsContext *ctx, const SwsFormat *dst, const SwsFormat *
     ret = init_passes(graph);
     if (ret < 0)
         goto error;
+
+    /* Resolve output buffers for all intermediate passes */
+    for (int i = 0; i < graph->num_passes; i++) {
+        ret = pass_alloc_output(graph->passes[i]->input);
+        if (ret < 0)
+            goto error;
+    }
 
     *out_graph = graph;
     return 0;

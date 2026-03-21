@@ -181,6 +181,7 @@ static int extract_extradata_h2645(AVBSFContext *ctx, AVPacket *pkt,
     int extradata_size = 0, filtered_size = 0;
     const int *extradata_nal_types;
     size_t nb_extradata_nal_types;
+    int filtered_nb_nals = 0;
     int i, has_sps = 0, has_vps = 0, ret = 0;
 
     if (ctx->par_in->codec_id == AV_CODEC_ID_VVC) {
@@ -202,7 +203,7 @@ static int extract_extradata_h2645(AVBSFContext *ctx, AVPacket *pkt,
     for (i = 0; i < s->h2645_pkt.nb_nals; i++) {
         H2645NAL *nal = &s->h2645_pkt.nals[i];
         if (val_in_array(extradata_nal_types, nb_extradata_nal_types, nal->type)) {
-            extradata_size += nal->raw_size + 3;
+            extradata_size += nal->raw_size + 4;
             if (ctx->par_in->codec_id == AV_CODEC_ID_VVC) {
                 if (nal->type == VVC_SPS_NUT) has_sps = 1;
                 if (nal->type == VVC_VPS_NUT) has_vps = 1;
@@ -213,7 +214,8 @@ static int extract_extradata_h2645(AVBSFContext *ctx, AVPacket *pkt,
                 if (nal->type == H264_NAL_SPS) has_sps = 1;
             }
         } else if (s->remove) {
-            filtered_size += nal->raw_size + 3;
+            filtered_size += nal->raw_size + 3 +
+                             ff_h2645_unit_requires_zero_byte(ctx->par_in->codec_id, nal->type, filtered_nb_nals++);
         }
     }
 
@@ -246,13 +248,16 @@ static int extract_extradata_h2645(AVBSFContext *ctx, AVPacket *pkt,
         if (s->remove)
             bytestream2_init_writer(&pb_filtered_data, filtered_buf->data, filtered_size);
 
+        filtered_nb_nals = 0;
         for (i = 0; i < s->h2645_pkt.nb_nals; i++) {
             H2645NAL *nal = &s->h2645_pkt.nals[i];
             if (val_in_array(extradata_nal_types, nb_extradata_nal_types,
                              nal->type)) {
-                bytestream2_put_be24u(&pb_extradata, 1); //startcode
+                bytestream2_put_be32u(&pb_extradata, 1); //startcode
                 bytestream2_put_bufferu(&pb_extradata, nal->raw_data, nal->raw_size);
             } else if (s->remove) {
+                if (ff_h2645_unit_requires_zero_byte(ctx->par_in->codec_id, nal->type, filtered_nb_nals++))
+                    bytestream2_put_byteu(&pb_filtered_data, 0); // zero_byte
                 bytestream2_put_be24u(&pb_filtered_data, 1); // startcode
                 bytestream2_put_bufferu(&pb_filtered_data, nal->raw_data, nal->raw_size);
             }
@@ -359,6 +364,7 @@ static int extract_extradata_lcevc(AVBSFContext *ctx, AVPacket *pkt,
     PutByteContext pb_extradata;
     int extradata_size = 0, filtered_size = 0;
     size_t nb_extradata_nal_types = FF_ARRAY_ELEMS(extradata_nal_types);
+    int extradata_nb_nals = 0, filtered_nb_nals = 0;
     int i, ret = 0;
 
     ret = ff_h2645_packet_split(&s->h2645_pkt, pkt->data, pkt->size,
@@ -369,12 +375,15 @@ static int extract_extradata_lcevc(AVBSFContext *ctx, AVPacket *pkt,
     for (i = 0; i < s->h2645_pkt.nb_nals; i++) {
         H2645NAL *nal = &s->h2645_pkt.nals[i];
         if (val_in_array(extradata_nal_types, nb_extradata_nal_types, nal->type)) {
-            bytestream2_init_writer(&pb_extradata, NULL, 0);
-            // dummy pass to find sc, gc or ai
+            // dummy pass to find sc, gc or ai. A dummy pointer is used to prevent
+            // UB in PutByteContext. Nothing will be written.
+            bytestream2_init_writer(&pb_extradata, nal->data, 0);
             if (!write_lcevc_nalu(ctx, &pb_extradata, nal, 0))
-                extradata_size += nal->raw_size + 3;
+                extradata_size += nal->raw_size + 3 +
+                    ff_h2645_unit_requires_zero_byte(ctx->par_in->codec_id, nal->type, extradata_nb_nals++);
         }
-        filtered_size += nal->raw_size + 3;
+        filtered_size += nal->raw_size + 3 +
+            ff_h2645_unit_requires_zero_byte(ctx->par_in->codec_id, nal->type, filtered_nb_nals++);
     }
 
     if (extradata_size) {
@@ -383,11 +392,9 @@ static int extract_extradata_lcevc(AVBSFContext *ctx, AVPacket *pkt,
         uint8_t *extradata;
 
         if (s->remove) {
-            filtered_buf = av_buffer_alloc(filtered_size + AV_INPUT_BUFFER_PADDING_SIZE);
-            if (!filtered_buf) {
-                return AVERROR(ENOMEM);
-            }
-            memset(filtered_buf->data + filtered_size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
+            ret = av_buffer_realloc(&filtered_buf, filtered_size + AV_INPUT_BUFFER_PADDING_SIZE);
+            if (ret < 0)
+                return ret;
         }
 
         extradata = av_malloc(extradata_size + AV_INPUT_BUFFER_PADDING_SIZE);
@@ -400,11 +407,14 @@ static int extract_extradata_lcevc(AVBSFContext *ctx, AVPacket *pkt,
         if (s->remove)
             bytestream2_init_writer(&pb_filtered_data, filtered_buf->data, filtered_size);
 
+        extradata_nb_nals = filtered_nb_nals = 0;
         for (i = 0; i < s->h2645_pkt.nb_nals; i++) {
             H2645NAL *nal = &s->h2645_pkt.nals[i];
             if (val_in_array(extradata_nal_types, nb_extradata_nal_types,
                              nal->type)) {
-                bytestream2_put_be24(&pb_extradata, 1); //startcode
+                if (ff_h2645_unit_requires_zero_byte(ctx->par_in->codec_id, nal->type, extradata_nb_nals++))
+                    bytestream2_put_byteu(&pb_extradata, 0); // zero_byte
+                bytestream2_put_be24u(&pb_extradata, 1); //startcode
                 ret = write_lcevc_nalu(ctx, &pb_extradata, nal, 0);
                 if (ret < 0) {
                     av_freep(&extradata);
@@ -412,7 +422,9 @@ static int extract_extradata_lcevc(AVBSFContext *ctx, AVPacket *pkt,
                     return ret;
                 }
                 if (s->remove) {
-                    bytestream2_put_be24(&pb_filtered_data, 1); //startcode
+                    if (ff_h2645_unit_requires_zero_byte(ctx->par_in->codec_id, nal->type, filtered_nb_nals++))
+                        bytestream2_put_byteu(&pb_filtered_data, 0); // zero_byte
+                    bytestream2_put_be24u(&pb_filtered_data, 1); //startcode
                     ret = write_lcevc_nalu(ctx, &pb_filtered_data, nal, 1);
                     if (ret < 0) {
                         av_freep(&extradata);
@@ -421,21 +433,39 @@ static int extract_extradata_lcevc(AVBSFContext *ctx, AVPacket *pkt,
                     }
                 }
             } else if (s->remove) {
-                bytestream2_put_be24(&pb_filtered_data, 1); //startcode
+                if (ff_h2645_unit_requires_zero_byte(ctx->par_in->codec_id, nal->type, filtered_nb_nals++))
+                    bytestream2_put_byteu(&pb_filtered_data, 0); // zero_byte
+                bytestream2_put_be24u(&pb_filtered_data, 1); //startcode
                 bytestream2_put_bufferu(&pb_filtered_data, nal->raw_data, nal->raw_size);
             }
         }
-        *data = extradata;
-        *size = bytestream2_tell_p(&pb_extradata);
-        av_assert0(*size <= extradata_size);
+        av_assert0(bytestream2_tell_p(&pb_extradata) <= extradata_size);
+        extradata_size = bytestream2_tell_p(&pb_extradata);
+        ret = av_reallocp(&extradata, extradata_size + AV_INPUT_BUFFER_PADDING_SIZE);
+        if (ret < 0) {
+            av_buffer_unref(&filtered_buf);
+            return ret;
+        }
+        memset(extradata + extradata_size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 
         if (s->remove) {
             av_assert0(bytestream2_tell_p(&pb_filtered_data) <= filtered_size);
+            filtered_size = bytestream2_tell_p(&pb_filtered_data);
+            ret = av_buffer_realloc(&filtered_buf, filtered_size + AV_INPUT_BUFFER_PADDING_SIZE);
+            if (ret < 0) {
+                av_buffer_unref(&filtered_buf);
+                av_freep(&extradata);
+                return ret;
+            }
+            memset(filtered_buf->data + filtered_size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
             av_buffer_unref(&pkt->buf);
             pkt->buf  = filtered_buf;
             pkt->data = filtered_buf->data;
-            pkt->size = bytestream2_tell_p(&pb_filtered_data);
+            pkt->size = filtered_size;
         }
+
+        *data = extradata;
+        *size = extradata_size;
     }
 
     return 0;
