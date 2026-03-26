@@ -593,8 +593,9 @@ struct blocked_module_t {
 // list of modules that can cause crashes or other unwanted behavior
 static const blocked_module_t moduleblocklist[] = {
 #if WIN64
-	{L"\\ff_vfw.dll", 11},   // ffdshow vfw codec
-	{L"\\lvcod64.dll", 12},  // Logitech Video (I420) codec
+	{L"\\ff_vfw.dll",   11}, // ffdshow vfw codec
+	{L"\\lvcod64.dll",  12}, // Logitech Video (I420) codec
+	{L"\\mlc.dll",       8}, // MLC lossless codec
 #else
 	{L"\\pvljpg20.dll", 13}, // PICVideo Lossles JPEG Codec
 #endif
