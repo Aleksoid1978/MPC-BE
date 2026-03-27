@@ -603,22 +603,21 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"吸附对齐至桌面边缘"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 30
 5		"YouTube"
-6		"使用内置网页分析器"
-7		"首选视频格式:"
-10		"60 fps"
-11		"HDR"
-12		"首选音频格式:"
-14		"首选音轨语言:"
-16		"加载播放列表"
-18		"youtube-dl, yt-dlp"
-19		"可执行的文件:"
-21		"最大视频高度:"
-23		"选择最大帧率或比特率"
-24		"AceStream 链接:"
-26		"MatriX (TorrServer) 链接:"
-29		"用户代理:"
+6		"首选视频格式:"
+9		"60 fps"
+10		"HDR"
+11		"首选音频格式:"
+13		"首选音轨语言:"
+15		"加载播放列表"
+17		"youtube-dl, yt-dlp"
+18		"可执行的文件:"
+20		"最大视频高度:"
+22		"选择最大帧率或比特率"
+23		"AceStream 链接:"
+25		"MatriX (TorrServer) 链接:"
+28		"用户代理:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

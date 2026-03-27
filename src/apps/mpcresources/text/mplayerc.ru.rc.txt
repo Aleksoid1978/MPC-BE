@@ -603,22 +603,21 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Прилипать к границам экрана"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 30
 5		"YouTube"
-6		"Использовать встроенный парсер веб-страниц"
-7		"Предпочитаемый формат видео:"
-10		"60 fps"
-11		"HDR"
-12		"Предпочитаемый формат аудио:"
-14		"Предпочитаемый язык аудиодорожки:"
-16		"Загружать плейлист"
-18		"youtube-dl, yt-dlp"
-19		"Исполняемый файл:"
-21		"Максимальная высота видео:"
-23		"Выбрать максимальную частоту кадров или битрейт"
-24		"AceStream address:"
-26		"MatriX (TorrServer) address:"
-29		"User agent:"
+6		"Предпочитаемый формат видео:"
+9		"60 fps"
+10		"HDR"
+11		"Предпочитаемый формат аудио:"
+13		"Предпочитаемый язык аудиодорожки:"
+15		"Загружать плейлист"
+17		"youtube-dl, yt-dlp"
+18		"Исполняемый файл:"
+20		"Максимальная высота видео:"
+22		"Выбрать максимальную частоту кадров или битрейт"
+23		"AceStream address:"
+25		"MatriX (TorrServer) address:"
+28		"User agent:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

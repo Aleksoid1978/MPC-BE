@@ -796,7 +796,7 @@ void CAppSettings::ResetSettings()
 
 	strLastOpenFilterDir.Empty();
 
-	bYoutubePageParser   = true;
+	bYoutubePageParser   = false;
 	YoutubeFormat.vfmt   = Youtube::y_webm_vp9;
 	YoutubeFormat.res    = 720;
 	YoutubeFormat.fps60  = false;
@@ -1488,7 +1488,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR, strLastOpenFilterDir);
 
 	// OnlineServices
-	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_PAGEPARSER, bYoutubePageParser);
+	//profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_PAGEPARSER, bYoutubePageParser);
 	str.Empty();
 	if (profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_VIDEOFORMAT, str)) {
 		YoutubeFormat.vfmt =
@@ -2006,7 +2006,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR, strLastOpenFilterDir);
 
 	// OnlineServices
-	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_PAGEPARSER, bYoutubePageParser);
+	//profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_PAGEPARSER, bYoutubePageParser);
 	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_VIDEOFORMAT,
 		(YoutubeFormat.vfmt == Youtube::y_webm_vp9) ? L"VP9"
 		: (YoutubeFormat.vfmt == Youtube::y_mp4_av1) ? L"AV1"

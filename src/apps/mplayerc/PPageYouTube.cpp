@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2025 see Authors.txt
+ * (C) 2012-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,7 +40,6 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
-	DDX_Control(pDX, IDC_CHECK2, m_chkPageParser);
 	DDX_Control(pDX, IDC_COMBO1, m_cbVideoFormat);
 	DDX_Control(pDX, IDC_COMBO2, m_cbResolution);
 	DDX_Control(pDX, IDC_CHECK3, m_chk60fps);
@@ -58,7 +57,6 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CPPageYoutube, CPPageBase)
-	ON_COMMAND(IDC_CHECK2, OnCheckPageParser)
 	ON_COMMAND(IDC_CHECK3, OnCheck60fps)
 	ON_COMMAND(IDC_CHECK6, OnCheckYDLEnable)
 END_MESSAGE_MAP()
@@ -73,8 +71,6 @@ BOOL CPPageYoutube::OnInitDialog()
 	CorrectCWndWidth(&m_chkYDLEnable);
 
 	const CAppSettings& s = AfxGetAppSettings();
-
-	m_chkPageParser.SetCheck(s.bYoutubePageParser);
 
 	m_cbVideoFormat.AddString(L"MP4-H.264");
 	m_cbVideoFormat.AddString(L"WebM-VP9");
@@ -146,7 +142,6 @@ BOOL CPPageYoutube::OnInitDialog()
 	CorrectCWndWidth(GetDlgItem(IDC_CHECK2));
 
 	OnCheck60fps();
-	OnCheckPageParser();
 
 	m_chkYDLEnable.SetCheck(s.bYDLEnable ? BST_CHECKED : BST_UNCHECKED);
 
@@ -196,7 +191,6 @@ BOOL CPPageYoutube::OnApply()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.bYoutubePageParser	= !!m_chkPageParser.GetCheck();
 	s.YoutubeFormat.vfmt	= m_cbVideoFormat.GetCurSel();
 	s.YoutubeFormat.res		= GetCurItemData(m_cbResolution);
 	s.YoutubeFormat.fps60	= !!m_chk60fps.GetCheck();
@@ -234,26 +228,6 @@ BOOL CPPageYoutube::OnApply()
 	return __super::OnApply();
 }
 
-void CPPageYoutube::OnCheckPageParser()
-{
-	const BOOL bEnable = m_chkPageParser.GetCheck();
-	GetDlgItem(IDC_STATIC2)->EnableWindow(bEnable);
-	m_cbVideoFormat.EnableWindow(bEnable);
-	m_cbResolution.EnableWindow(bEnable);
-	m_chk60fps.EnableWindow(bEnable);
-	m_chkHdr.EnableWindow(bEnable);
-
-	if (bEnable) {
-		OnCheck60fps();
-	}
-	GetDlgItem(IDC_STATIC3)->EnableWindow(bEnable);
-	m_cbAudioFormat.EnableWindow(bEnable);
-	GetDlgItem(IDC_STATIC4)->EnableWindow(bEnable);
-	m_cbAudioLang.EnableWindow(bEnable);
-
-	SetModified();
-}
-
 void CPPageYoutube::OnCheck60fps()
 {
 	if (m_chk60fps.GetCheck()) {
@@ -268,13 +242,24 @@ void CPPageYoutube::OnCheck60fps()
 
 void CPPageYoutube::OnCheckYDLEnable()
 {
-	if (m_chkYDLEnable.GetCheck()) {
-		m_cbYDLMaxHeight.EnableWindow(TRUE);
-		m_chkYDLMaximumQuality.EnableWindow(TRUE);
-	} else {
-		m_cbYDLMaxHeight.EnableWindow(FALSE);
-		m_chkYDLMaximumQuality.EnableWindow(FALSE);
+	const BOOL bEnable = m_chkYDLEnable.GetCheck();
+
+	GetDlgItem(IDC_STATIC2)->EnableWindow(bEnable);
+	m_cbVideoFormat.EnableWindow(bEnable);
+	m_cbResolution.EnableWindow(bEnable);
+	m_chk60fps.EnableWindow(bEnable);
+	m_chkHdr.EnableWindow(bEnable);
+
+	if (bEnable) {
+		OnCheck60fps();
 	}
+	GetDlgItem(IDC_STATIC3)->EnableWindow(bEnable);
+	m_cbAudioFormat.EnableWindow(bEnable);
+	GetDlgItem(IDC_STATIC4)->EnableWindow(bEnable);
+	m_cbAudioLang.EnableWindow(bEnable);
+
+	m_cbYDLMaxHeight.EnableWindow(bEnable);
+	m_chkYDLMaximumQuality.EnableWindow(bEnable);
 
 	SetModified();
 }

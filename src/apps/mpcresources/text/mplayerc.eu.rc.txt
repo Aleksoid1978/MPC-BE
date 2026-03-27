@@ -603,22 +603,21 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Snap to desktop edges"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 31
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 30
 5		"YouTube"
-6		"Erabili barnebildutako web orrialde aztertzailea"
-7		"Preferred video format:"
-10		"60 fs-ko"
-11		"HDR"
-12		"Preferred audio format:"
-14		"Preferred audio track language:"
-16		"Gertatu irakur-zerrenda"
-18		"youtube-dl, yt-dlp"
-19		"Executable file:"
-21		"Max video height:"
-23		"Select max fps or bitrate"
-24		"AceStream address:"
-26		"MatriX (TorrServer) address:"
-29		"User agent:"
+6		"Preferred video format:"
+9		"60 fs-ko"
+10		"HDR"
+11		"Preferred audio format:"
+13		"Preferred audio track language:"
+15		"Gertatu irakur-zerrenda"
+17		"youtube-dl, yt-dlp"
+18		"Executable file:"
+20		"Max video height:"
+22		"Select max fps or bitrate"
+23		"AceStream address:"
+25		"MatriX (TorrServer) address:"
+28		"User agent:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

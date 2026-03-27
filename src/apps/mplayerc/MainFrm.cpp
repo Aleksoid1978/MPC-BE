@@ -12338,6 +12338,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		m_PlaybackInfo.RenderedPath = pOFD->fi.GetPath();
 		m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
 	}
+	/*
 	else if (s.bYoutubePageParser && pOFD->auds.empty()) {
 		auto url = pOFD->fi.GetPath();
 		bool ok = Youtube::CheckURL(url);
@@ -12366,6 +12367,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 		}
 	}
+	*/
 
 	if (s.bYDLEnable
 			&& m_pGB->ShouldOperationContinue() == S_OK
