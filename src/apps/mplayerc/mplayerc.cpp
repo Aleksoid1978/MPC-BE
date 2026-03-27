@@ -596,6 +596,7 @@ static const blocked_module_t moduleblocklist[] = {
 	{L"\\ff_vfw.dll",   11}, // ffdshow vfw codec
 	{L"\\lvcod64.dll",  12}, // Logitech Video (I420) codec
 	{L"\\mlc.dll",       8}, // MLC lossless codec
+	{L"\\pxc0.dll",      9}, // Proxy Codec64
 #else
 	{L"\\pvljpg20.dll", 13}, // PICVideo Lossles JPEG Codec
 #endif
