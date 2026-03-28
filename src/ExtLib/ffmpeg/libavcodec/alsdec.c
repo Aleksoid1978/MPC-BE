@@ -1548,8 +1548,12 @@ static int read_diff_float_data(ALSDecContext *ctx, unsigned int ra_frame) {
                     return AVERROR_INVALIDDATA;
                 }
 
+                j = 0;
                 for (i = 0; i < frame_length; ++i) {
-                    ctx->raw_mantissa[c][i] = AV_RB32(larray);
+                    if (ctx->raw_samples[c][i] == 0) {
+                        ctx->raw_mantissa[c][i] = AV_RB32(larray + j);
+                        j += 4;
+                    }
                 }
             }
         }
@@ -1560,7 +1564,7 @@ static int read_diff_float_data(ALSDecContext *ctx, unsigned int ra_frame) {
                 if (ctx->raw_samples[c][i] != 0) {
                     //The following logic is taken from Table 14.45 and 14.46 from the ISO spec
                     if (av_cmp_sf_ieee754(acf[c], FLOAT_1)) {
-                        nbits[i] = 23 - av_log2(abs(ctx->raw_samples[c][i]));
+                        nbits[i] = 23 - av_log2(FFABSU(ctx->raw_samples[c][i]));
                     } else {
                         nbits[i] = 23;
                     }

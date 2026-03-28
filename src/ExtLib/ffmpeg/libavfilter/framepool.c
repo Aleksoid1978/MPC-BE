@@ -49,11 +49,10 @@ struct FFFramePool {
 
 };
 
-FFFramePool *ff_frame_pool_video_init(AVBufferRef* (*alloc)(size_t size),
-                                      int width,
-                                      int height,
-                                      enum AVPixelFormat format,
-                                      int align)
+av_cold FFFramePool *ff_frame_pool_video_init(AVBufferRef* (*alloc)(size_t size),
+                                              int width, int height,
+                                              enum AVPixelFormat format,
+                                              int align)
 {
     int i, ret;
     FFFramePool *pool;
@@ -74,18 +73,16 @@ FFFramePool *ff_frame_pool_video_init(AVBufferRef* (*alloc)(size_t size),
         goto fail;
     }
 
-    if (!pool->linesize[0]) {
-        ret = av_image_fill_linesizes(pool->linesize, pool->format,
-                                      FFALIGN(pool->width, align));
-        if (ret < 0) {
-            goto fail;
-        }
+    ret = av_image_fill_linesizes(pool->linesize, pool->format,
+                                    FFALIGN(pool->width, align));
+    if (ret < 0) {
+        goto fail;
+    }
 
-        for (i = 0; i < 4 && pool->linesize[i]; i++) {
-            pool->linesize[i] = FFALIGN(pool->linesize[i], pool->align);
-            if ((pool->linesize[i] & (pool->align - 1)))
-                goto fail;
-        }
+    for (i = 0; i < 4 && pool->linesize[i]; i++) {
+        pool->linesize[i] = FFALIGN(pool->linesize[i], pool->align);
+        if ((pool->linesize[i] & (pool->align - 1)))
+            goto fail;
     }
 
     for (i = 0; i < 4; i++)
@@ -112,11 +109,10 @@ fail:
     return NULL;
 }
 
-FFFramePool *ff_frame_pool_audio_init(AVBufferRef* (*alloc)(size_t size),
-                                      int channels,
-                                      int nb_samples,
-                                      enum AVSampleFormat format,
-                                      int align)
+av_cold FFFramePool *ff_frame_pool_audio_init(AVBufferRef* (*alloc)(size_t size),
+                                              int channels, int nb_samples,
+                                              enum AVSampleFormat format,
+                                              int align)
 {
     int ret, planar;
     FFFramePool *pool;
@@ -271,7 +267,7 @@ AVFrame *ff_frame_pool_get(FFFramePool *pool)
 
         break;
     default:
-        av_assert0(0);
+        av_unreachable("only audio and video frame pools exist");
     }
 
     return frame;
@@ -280,11 +276,11 @@ fail:
     return NULL;
 }
 
-void ff_frame_pool_uninit(FFFramePool **pool)
+av_cold void ff_frame_pool_uninit(FFFramePool **pool)
 {
     int i;
 
-    if (!pool || !*pool)
+    if (!*pool)
         return;
 
     for (i = 0; i < 4; i++) {
