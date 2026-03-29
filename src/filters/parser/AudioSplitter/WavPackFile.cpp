@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2024 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -182,13 +182,23 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 					pFile->ByteRead((BYTE*)&chmask, 4);
 					break;
 				case 4:
-					pFile->Seek(pFile->GetPos() + 1);
-					pFile->ByteRead((BYTE*)&chan + 1, 1);
+					pFile->Skip(1);
+					{
+						BYTE tmp;
+						pFile->ByteRead(&tmp, 1);
+						chan |= (tmp & 0x0F) << 8;
+						chan += 1;
+					}
 					pFile->ByteRead((BYTE*)&chmask, 3);
 					break;
 				case 5:
-					pFile->Seek(pFile->GetPos() + 1);
-					pFile->ByteRead((BYTE*)&chan + 1, 1);
+					pFile->Skip(1);
+					{
+						BYTE tmp;
+						pFile->ByteRead(&tmp, 1);
+						chan |= (tmp & 0x0F) << 8;
+						chan += 1;
+					}
 					pFile->ByteRead((BYTE*)&chmask, 4);
 					break;
 				default:
