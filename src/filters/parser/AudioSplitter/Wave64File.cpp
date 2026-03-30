@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2023 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -94,6 +94,7 @@ HRESULT CWave64File::Open(CBaseSplitterFile* pFile)
 			m_startpos	= m_pFile->GetPos();
 			m_length	= std::min(Chunk64.size, m_pFile->GetLength() - m_startpos);
 		}
+#ifdef _DEBUG
 		else if (memcmp(Chunk64.guid, w64_guid_list, 16) != 0
 				&& memcmp(Chunk64.guid, w64_guid_fact, 16) != 0
 				&& memcmp(Chunk64.guid, w64_guid_levl, 16) != 0
@@ -102,8 +103,8 @@ HRESULT CWave64File::Open(CBaseSplitterFile* pFile)
 				&& memcmp(Chunk64.guid, w64_guid_marker, 16) != 0
 				&& memcmp(Chunk64.guid, w64_guid_summarylist, 16) != 0) {
 			DLog(L"CWave64File::Open() : bad or unknown chunk guid.");
-			return E_FAIL;
 		}
+#endif
 
 		m_pFile->Seek((pos + Chunk64.size + 7) & ~7i64);
 	}
