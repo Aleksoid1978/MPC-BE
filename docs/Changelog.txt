@@ -4,6 +4,8 @@
 =============================
 AudioSplitter
 Added support for the RF64 format.
+Fixed reading of channel layout for some WavPack files.
+Added support for ID3 tags for Wave64 files. Unknown Wave64 chunks are now ignored.
 
 AviSplitter
 Added support for 'y408' video.
@@ -20,8 +22,12 @@ Expanded support for V_UNCOMPRESSED video codecs.
 MpcDvdVideoDecoder
 Fixed conversion to YUY2.
 
+RoQVideoDecoder
+Output in NV12 and YV12 formats is allowed. Full range is used.
+
 MPC Video Decoder
 RGB32 format will be output as a top-down bitmap by default.
+Added support for the "IID_MediaSideDataDOVIMetadataV2" interface.
 
 MPC Video Converter
 Added support for AYUV video format.
@@ -32,6 +38,7 @@ Fixed external subtitle connections for VSFilter.
 
 YouTube
 Improved support for yt-dlp.
+The built-in YouTube parser is no longer used.
 
 Player
 The HTTP read strategy has been changed.
