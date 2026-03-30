@@ -102,7 +102,8 @@ HRESULT CWave64File::Open(CBaseSplitterFile* pFile)
 				&& memcmp(Chunk64.guid, w64_guid_bext, 16) != 0
 				&& memcmp(Chunk64.guid, w64_guid_marker, 16) != 0
 				&& memcmp(Chunk64.guid, w64_guid_summarylist, 16) != 0) {
-			DLog(L"CWave64File::Open() : bad or unknown chunk guid.");
+			CStringW guidstr = CStringFromGUID(*(GUID*)&Chunk64.guid);
+			DLog(L"CWave64File::Open() : bad or unknown chunk guid - %s", guidstr);
 		}
 #endif
 
