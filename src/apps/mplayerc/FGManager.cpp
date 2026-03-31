@@ -2816,18 +2816,13 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 {
 	CAutoLock cAutoLock(this);
 
-	CLSID clsid = GetCLSID(pBF);
-
-	if (clsid == CLSID_AVIDec/* || clsid == CLSID_ACMWrapper*/) {
-		AfxGetMyApp()->HookModuleLoading();
-	}
-
 	HRESULT hr = __super::AddFilter(pBF, pName);
 	if (FAILED(hr)) {
 		return hr;
 	}
 
 	CAppSettings& s = AfxGetAppSettings();
+	CLSID clsid = GetCLSID(pBF);
 
 	if (clsid == CLSID_DMOWrapperFilter) {
 		if (CComQIPtr<IPropertyBag> pPB = pBF) {

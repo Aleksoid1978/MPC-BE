@@ -898,7 +898,7 @@ BOOL CMPlayerCApp::InitInstance()
 	}
 #endif
 #endif
-
+	HookModuleLoading();
 
 	CFilterMapper2::Init();
 
