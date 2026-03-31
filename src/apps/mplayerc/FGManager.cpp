@@ -2727,6 +2727,11 @@ CFGManagerCustom::CFGManagerCustom(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	// mainconcept color space converter
 	m_transform.emplace_back(DNew CFGFilterRegistry(GUIDFromCString(L"{272D77A0-A852-4851-ADA4-9091FEAD4C86}"), MERIT64_DO_NOT_USE));
 
+#ifndef _WIN64
+	// PICVideo Lossless JPEG Decompressor (pvljpg20.dll) since causes a crash
+	m_transform.emplace_back(DNew CFGFilterRegistry(GUIDFromCString(L"{BA310CC1-470D-11D3-962F-00500471FDDC}"), MERIT64_DO_NOT_USE));
+#endif
+
 	// Accusoft PICVideo M-JPEG Codec 2.1 since causes a DEP crash
 	m_transform.emplace_back(DNew CFGFilterRegistry(GUIDFromCString(L"{4C4CD9E1-F876-11D2-962F-00500471FDDC}"), MERIT64_DO_NOT_USE));
 
