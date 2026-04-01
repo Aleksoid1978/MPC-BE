@@ -103,8 +103,6 @@ public:
 	void			ExportSettings();
 	bool			GetAppSavePath(CString& path);
 
-	void HookModuleLoading();
-	
 	virtual BOOL InitInstance();
 	virtual int ExitInstance();
 

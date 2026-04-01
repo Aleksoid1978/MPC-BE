@@ -2742,6 +2742,16 @@ CFGManagerCustom::CFGManagerCustom(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	m_transform.emplace_back(DNew CFGFilterRegistry(CLSID_VideoRendererDefault, MERIT64_DO_NOT_USE));
 	m_transform.emplace_back(DNew CFGFilterRegistry(CLSID_VideoRenderer, MERIT64_DO_NOT_USE));
 
+	// We are blocking the AVI Decompressor filter because some VFW codecs cause modern applications to crash.
+	// Problematic 64-bit VFW codecs:
+	// - ffdshow vfw codec (ff_vfw.dll)
+	// - Logitech Video (I420) codec (lvcod64.dll)
+	// - MLC lossless codec (mlc.dl)
+	// - Proxy Codec64 (pxc0.dll)
+	// Problematic 32-bit VFW codecs:
+	// - PICVideo Lossles JPEG Codec (pvljpg20.dll)
+	m_transform.emplace_back(DNew CFGFilterRegistry(CLSID_AVIDec, MERIT64_DO_NOT_USE));
+
 	// Subtitle renderers
 
 	bool VRwithSR =

@@ -585,95 +585,6 @@ NTSTATUS WINAPI Mine_NtQueryInformationProcess(HANDLE ProcessHandle, PROCESSINFO
 	return nRet;
 }
 
-struct blocked_module_t {
-	const wchar_t* name;
-	size_t name_len;
-};
-
-// list of modules that can cause crashes or other unwanted behavior
-static const blocked_module_t moduleblocklist[] = {
-#if WIN64
-	{L"\\ff_vfw.dll",   11}, // ffdshow vfw codec
-	{L"\\lvcod64.dll",  12}, // Logitech Video (I420) codec
-	{L"\\mlc.dll",       8}, // MLC lossless codec
-	{L"\\pxc0.dll",      9}, // Proxy Codec64
-#else
-	{L"\\pvljpg20.dll", 13}, // PICVideo Lossles JPEG Codec
-#endif
-};
-
-bool IsBlockedModule(wchar_t* modulename)
-{
-	size_t mod_name_len = wcslen(modulename);
-
-	for (const auto& b : moduleblocklist) {
-		if (mod_name_len > b.name_len) {
-			wchar_t* dll_ptr = modulename + mod_name_len - b.name_len;
-			if (_wcsicmp(dll_ptr, b.name) == 0) {
-				DLog(L"Blocked module load: %s", modulename);
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-#define STATUS_UNSUCCESSFUL ((NTSTATUS)0xC0000001L)
-
-typedef enum _SECTION_INHERIT { ViewShare = 1, ViewUnmap = 2 } SECTION_INHERIT;
-
-typedef enum _SECTION_INFORMATION_CLASS {
-	SectionBasicInformation = 0,
-	SectionImageInformation
-} SECTION_INFORMATION_CLASS;
-
-typedef struct _SECTION_BASIC_INFORMATION {
-	PVOID BaseAddress;
-	ULONG Attributes;
-	LARGE_INTEGER Size;
-} SECTION_BASIC_INFORMATION;
-
-NTSTATUS(STDMETHODCALLTYPE* Real_NtMapViewOfSection)(HANDLE, HANDLE, PVOID, ULONG_PTR, SIZE_T, PLARGE_INTEGER, PSIZE_T, SECTION_INHERIT, ULONG, ULONG) = nullptr;
-NTSTATUS(STDMETHODCALLTYPE* Real_NtUnmapViewOfSection)(HANDLE, PVOID) = nullptr;
-NTSTATUS(STDMETHODCALLTYPE* Real_NtQuerySection)(HANDLE, SECTION_INFORMATION_CLASS, PVOID, SIZE_T, PSIZE_T) = nullptr;
-DWORD(STDMETHODCALLTYPE* Real_K32GetMappedFileNameW)(HANDLE, LPVOID, LPWSTR, DWORD) = nullptr;
-
-NTSTATUS STDMETHODCALLTYPE Mine_NtMapViewOfSection(HANDLE SectionHandle, HANDLE ProcessHandle, PVOID* BaseAddress, ULONG_PTR ZeroBits, SIZE_T CommitSize,
-	PLARGE_INTEGER SectionOffset, PSIZE_T ViewSize, SECTION_INHERIT InheritDisposition, ULONG AllocationType, ULONG Win32Protect)
-{
-	NTSTATUS ret = Real_NtMapViewOfSection(SectionHandle, ProcessHandle, BaseAddress, ZeroBits, CommitSize, SectionOffset, ViewSize, InheritDisposition, AllocationType, Win32Protect);
-
-	// Verify map and process
-	if (ret < 0 || ProcessHandle != GetCurrentProcess())
-		return ret;
-
-	// Fetch section information
-	SIZE_T wrote = 0;
-	SECTION_BASIC_INFORMATION section_information;
-	if (Real_NtQuerySection(SectionHandle, SectionBasicInformation, &section_information, sizeof(section_information), &wrote) < 0)
-		return ret;
-
-	// Verify fetch was successful
-	if (wrote != sizeof(section_information))
-		return ret;
-
-	// We're not interested in non-image maps
-	if (!(section_information.Attributes & SEC_IMAGE))
-		return ret;
-
-	// Get the actual filename if possible
-	wchar_t fileName[MAX_PATH];
-	if (Real_K32GetMappedFileNameW(ProcessHandle, *BaseAddress, fileName, std::size(fileName)) == 0)
-		return ret;
-
-	if (IsBlockedModule(fileName)) {
-		Real_NtUnmapViewOfSection(ProcessHandle, BaseAddress);
-		ret = STATUS_UNSUCCESSFUL;
-	}
-
-	return ret;
-}
-
 LONG WINAPI Mine_ChangeDisplaySettingsEx(LONG ret, DWORD dwFlags, LPVOID lParam)
 {
 	if (dwFlags & CDS_VIDEOPARAMETERS) {
@@ -812,26 +723,6 @@ MMRESULT WINAPI Mine_mixerSetControlDetails(HMIXEROBJ hmxobj, LPMIXERCONTROLDETA
 	return Real_mixerSetControlDetails(hmxobj, pmxcd, fdwDetails);
 }
 
-void CMPlayerCApp::HookModuleLoading()
-{
-	if (m_hNTDLL && !Real_NtMapViewOfSection) {
-		Real_NtQueryInformationProcess = (decltype(Real_NtQueryInformationProcess))GetProcAddress(m_hNTDLL, "NtQueryInformationProcess");
-
-		if (Real_NtQueryInformationProcess) {
-			DetourAttach(&(PVOID&)Real_NtQueryInformationProcess, (PVOID)Mine_NtQueryInformationProcess);
-		}
-
-		Real_NtMapViewOfSection = (decltype(Real_NtMapViewOfSection))GetProcAddress(m_hNTDLL, "NtMapViewOfSection");
-		Real_NtUnmapViewOfSection = (decltype(Real_NtUnmapViewOfSection))GetProcAddress(m_hNTDLL, "NtUnmapViewOfSection");
-		Real_NtQuerySection = (decltype(Real_NtQuerySection))GetProcAddress(m_hNTDLL, "NtQuerySection");
-		Real_K32GetMappedFileNameW = (decltype(Real_K32GetMappedFileNameW))GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "K32GetMappedFileNameW");
-
-		if (Real_NtMapViewOfSection && Real_NtUnmapViewOfSection && Real_NtQuerySection && Real_K32GetMappedFileNameW) {
-			DetourAttach(&(PVOID&)Real_NtMapViewOfSection, (PVOID)Mine_NtMapViewOfSection);
-		}
-	}
-}
-
 static BOOL SetHeapOptions()
 {
 	HMODULE hLib = LoadLibraryW(L"kernel32.dll");
@@ -898,7 +789,6 @@ BOOL CMPlayerCApp::InitInstance()
 	}
 #endif
 #endif
-	HookModuleLoading();
 
 	CFilterMapper2::Init();
 
