@@ -44,8 +44,9 @@ Player
 The HTTP read strategy has been changed.
 If the playlist contains one entry, more key combinations can be used to control the player (jump through chapters, adjust volume).
 Improved support for reading ASX playlists.
-Added blocking of problematic DLLs when the "AVI Decompressor" filter is loaded into the DirectShow graph.
 The translation of the MediaInfo report for Chinese, Korean and Japanese has been removed.
+Added blocking of 32-bit filter "PICVideo Lossless JPEG Decompressor" (pvljpg20.dll), because it crashes.
+Added blocking of the system filter "AVI Decompressor", which will eliminate the crash of VFW codecs.
 Various interface fixes.
 
 Installer
