@@ -48,6 +48,9 @@ Added blocking of problematic DLLs when the "AVI Decompressor" filter is loaded 
 The translation of the MediaInfo report for Chinese, Korean and Japanese has been removed.
 Various interface fixes.
 
+Installer
+Updated MPC Video Renderer 0.10.1.
+
 Updated Japanese translation (by tsubasanouta).
 Updated Chinese (Traditional) and Dutch translation (by beter).
 Updated Romanian translation (by Andrei Miloiu).
