@@ -72,9 +72,9 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	const CAppSettings& s = AfxGetAppSettings();
 
-	m_cbVideoFormat.AddString(L"MP4-H.264");
-	m_cbVideoFormat.AddString(L"WebM-VP9");
-	m_cbVideoFormat.AddString(L"MP4-AV1");
+	m_cbVideoFormat.AddString(L"H.264");
+	m_cbVideoFormat.AddString(L"VP9");
+	m_cbVideoFormat.AddString(L"AV1");
 	m_cbVideoFormat.SetCurSel(s.YoutubeFormat.vfmt);
 
 	static std::vector<int> resolutions;
