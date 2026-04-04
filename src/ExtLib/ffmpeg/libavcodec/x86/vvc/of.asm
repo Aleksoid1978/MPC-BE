@@ -129,18 +129,26 @@ INIT_YMM avx2
     SAVE                        [dstq + ds3q], 6, %4
 %endmacro
 
-%macro SUM_MIN_BLOCK_W16 4 ; src/dst, shuffle, perm, tmp
+%macro SUM_MIN_BLOCK_W16 4-5 ; src/dst, shuffle, perm, tmp, [dst]
     pshufb  %4, %1, %2
     vpermd  %4, %3, %4
+%if %0 == 4
     paddw   %1, %4
+%else
+    paddw   %5, %1, %4
+%endif
 %endmacro
 
-%macro SUM_MIN_BLOCK_W8 3 ; src/dst, shuffle, tmp
-    pshufb  %3, %1, %2
-    paddw   %1, %3
+%macro SUM_MIN_BLOCK_W8 3-4 ; src/dst, shuffle, tmp, [dst]
+    pshufb  xm%3, xm%1, xm%2
+%if %0 == 3
+    paddw   xm%1, xm%3
+%else
+    paddw   xm%4, xm%1, xm%3
+%endif
 %endmacro
 
-%macro BDOF_PROF_GRAD 2 ; line_no, last_line
+%macro BDOF_PROF_GRAD 2-3 0 ; line_no, last_line, assign (instead of add) to dst regs
 %assign i0 (%1 + 0) % 3
 %assign j0 (%1 + 1) % 3
 %assign k0 (%1 + 2) % 3
@@ -197,11 +205,15 @@ INIT_YMM avx2
     cmp                         wd, 16
 
     je                       %%w16
-    SUM_MIN_BLOCK_W8            m6, t0, m11
-    SUM_MIN_BLOCK_W8            m7, t0, m11
-    SUM_MIN_BLOCK_W8            m8, t0, m11
-    SUM_MIN_BLOCK_W8            m9, t0, m11
-    SUM_MIN_BLOCK_W8           m10, t0, m11
+    SUM_MIN_BLOCK_W8             6, i0, i1
+    SUM_MIN_BLOCK_W8             7, i0, i1
+    SUM_MIN_BLOCK_W8             8, i0, i1
+    SUM_MIN_BLOCK_W8             9, i0, i1
+%if (%3)
+    SUM_MIN_BLOCK_W8            10, i0, i1, 13
+%else
+    SUM_MIN_BLOCK_W8            10, i0, i1
+%endif
     jmp                     %%wend
 
 %%w16:
@@ -210,7 +222,11 @@ INIT_YMM avx2
     SUM_MIN_BLOCK_W16           m7, t0, t1, m11
     SUM_MIN_BLOCK_W16           m8, t0, t1, m11
     SUM_MIN_BLOCK_W16           m9, t0, t1, m11
+%if (%3)
+    SUM_MIN_BLOCK_W16          m10, t0, t1, m11, m13
+%else
     SUM_MIN_BLOCK_W16          m10, t0, t1, m11
+%endif
 
 %%wend:
     vpblendd                    m11, m8, m7, 10101010b
@@ -227,13 +243,17 @@ INIT_YMM avx2
     vpblendw                     m6, m8, m6, 01010101b
     pshuflw                      m6, m6, q2301
     pshufhw                      m6, m6, q2301
+%if (%3)
+    paddw                       m12, m6, m11                ; 4 x (4sgx2, 4sgy2, 4sgxdi, 4sgydi)
+%else
     paddw                        m8, m6, m11                ; 4 x (4sgx2, 4sgy2, 4sgxdi, 4sgydi)
+%endif
 
 %if (%1) == 0
     ; pad for top and directly output to m12, m13
     paddw                      m12, m8,  m8
     paddw                      m13, m10, m10
-%else
+%elifn (%3)
 %if (%2)
     ; pad for bottom
     paddw                       m8, m8
@@ -246,61 +266,38 @@ INIT_YMM avx2
 %endmacro
 
 
-%macro LOG2 5 ; log_sum, src, cmp, shift, tmp
-    pcmpgtw               %5, %2, %3
-    pandd                 %5, %4
-    paddw                 %1, %5
-
-    psrlw                 %2, %5
-    psrlw                 %4, 1
-    psrlw                 %3, %4
-%endmacro
-
-%macro LOG2 3 ; dst, src, offset
-    pextrw              tmp0d, xm%2,  %3
-    bsr                 tmp0d, tmp0d
-%if %3 != 0
-    pinsrw               xm%1, tmp0d, %3
-%else
-    movd                 xm%1, tmp0d
-%endif
-%endmacro
-
-%macro LOG2 2 ; dst, src
-    LOG2                 %1, %2, 0
-    LOG2                 %1, %2, 1
-    LOG2                 %1, %2, 2
-    LOG2                 %1, %2, 3
-    LOG2                 %1, %2, 4
-    LOG2                 %1, %2, 5
-    LOG2                 %1, %2, 6
-    LOG2                 %1, %2, 7
+%macro LOG2 3 ; dst, src, tmp
+    cvtdq2ps             %1, %2
+    ; The exponent contains log2 biased by 127 unless the value is zero.
+    ; dst is only used as shift count where the value to be shifted is
+    ; always zero if src is zero, so avoid using saturated subtraction.
+    pcmpeqd              %3, %3
+    psrld                %3, 25        ; pd_127
+    psrld                %1, 23        ; floating point exponent
+    psubd                %1, %3
 %endmacro
 
 ; %1: 4 (sgx2, sgy2, sgxdi, gydi)
 ; %2: 4 (4sgxgy)
 %macro BDOF_VX_VY 2       ;
-    pshufd                  m6, m%1, q0032
-    punpckldq              m%1, m6
+    pshufd                 m%1, m%1, q3120
     vextracti128           xm7, m%1, 1
 
-    punpcklqdq              m8, m%1, m7             ; 4 (sgx2, sgy2)
-    punpckhqdq              m9, m%1, m7             ; 4 (sgxdi, sgydi)
-    LOG2                    10, 8                   ; 4 (log2(sgx2), log2(sgy2))
+    punpcklqdq             xm8, xm%1, xm7           ; 4 (sgx2, sgy2)
+    punpckhqdq             xm9, xm%1, xm7           ; 4 (sgxdi, sgydi)
 
     ; Promote to dword since vpsrlvw is AVX-512 only
-    pmovsxwd                m8, xm8
+    pmovzxwd                m8, xm8
     pmovsxwd                m9, xm9
-    pmovsxwd               m10, xm10
+    LOG2                   m10, m8, m7              ; 4 (log2(sgx2), log2(sgy2))
 
-    pslld                   m9, 2                   ; 4 (log2(sgx2) << 2, log2(sgy2) << 2)
+    pslld                   m9, 2                   ; 4 (sgxdi, sgydi)
 
-    psignd                 m11, m9, m8
-    vpsravd                m11, m11, m10
+    vpsravd                m11, m9, m10
     CLIPD                  m11, [pd_m15], [pd_15]   ; 4 (vx, junk)
 
     pshuflw                m%1, m11, q0000
-    pshufhw                m%1, m%1, q0000          ; 4 (2junk, 2vx)
+    pshufhw                m%1, m%1, q0000          ; 4 (4vx)
 
     psllq                   m6, m%2, 32
     paddw                  m%2, m6
@@ -309,7 +306,6 @@ INIT_YMM avx2
     psrad                  m%2, 1
     psubd                   m9, m%2                 ; 4 (junk, (sgydi << 2) - (vx * sgxgy >> 1))
 
-    psignd                  m9, m8
     vpsravd                m%2, m9, m10
     CLIPD                  m%2, [pd_m15], [pd_15]   ; 4 (junk, vy)
 
@@ -329,8 +325,10 @@ INIT_YMM avx2
     BDOF_PROF_GRAD           0, 0
 %endif
 
+%if (%1) != 1
     BDOF_PROF_GRAD  %1 * 4 + 1, 0
     BDOF_PROF_GRAD  %1 * 4 + 2, 0
+%endif
 
 %if (%2)
     BDOF_PROF_GRAD  %1 * 4 + 3, %2
@@ -345,9 +343,7 @@ INIT_YMM avx2
     mova                   m14, m12
     mova                   m15, m13
 
-    pxor                   m12, m12
-    pxor                   m13, m13
-    BDOF_PROF_GRAD  %1 * 4 + 3, 0
+    BDOF_PROF_GRAD  %1 * 4 + 3, 0, 1
     BDOF_PROF_GRAD  %1 * 4 + 4, 0
     paddw                  m14, m12
     paddw                  m15, m13
@@ -384,6 +380,9 @@ PROLOGUE 6, 9, 16, BDOF_STACK_SIZE*32, dst, ds, src0, src1, w, h, pixel_max, ds3
     sub                  src1q, SRC_STRIDE + SRC_PS
 
     BDOF_MINI_BLOCKS         0, 0
+
+    BDOF_PROF_GRAD  1 * 4 + 1, 0
+    BDOF_PROF_GRAD  1 * 4 + 2, 0
 
     cmp                     hd, 16
     je                    .h16

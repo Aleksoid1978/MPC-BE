@@ -25,7 +25,10 @@
 #include <stdbool.h>
 #include <stdalign.h>
 
+#include "libavutil/bprint.h"
+
 #include "graph.h"
+#include "filters.h"
 
 typedef enum SwsPixelType {
     SWS_PIXEL_NONE = 0,
@@ -52,19 +55,23 @@ typedef enum SwsOpType {
     /* Bit manipulation operations. Defined for integers only. */
     SWS_OP_UNPACK,          /* split tightly packed data into components */
     SWS_OP_PACK,            /* compress components into tightly packed data */
-    SWS_OP_LSHIFT,          /* logical left shift of raw pixel values by (u8) */
-    SWS_OP_RSHIFT,          /* right shift of raw pixel values by (u8) */
+    SWS_OP_LSHIFT,          /* logical left shift of raw pixel values */
+    SWS_OP_RSHIFT,          /* right shift of raw pixel values */
 
     /* Generic arithmetic. Defined and implemented for all types */
     SWS_OP_CLEAR,           /* clear pixel values */
     SWS_OP_CONVERT,         /* convert (cast) between formats */
-    SWS_OP_MIN,             /* numeric minimum (q4) */
-    SWS_OP_MAX,             /* numeric maximum (q4) */
-    SWS_OP_SCALE,           /* multiplication by scalar (q) */
+    SWS_OP_MIN,             /* numeric minimum */
+    SWS_OP_MAX,             /* numeric maximum */
+    SWS_OP_SCALE,           /* multiplication by scalar */
 
     /* Floating-point only arithmetic operations. */
     SWS_OP_LINEAR,          /* generalized linear affine transform */
     SWS_OP_DITHER,          /* add dithering noise */
+
+    /* Filtering operations. Always output floating point. */
+    SWS_OP_FILTER_H,        /* horizontal filtering */
+    SWS_OP_FILTER_V,        /* vertical filtering */
 
     SWS_OP_TYPE_NB,
 } SwsOpType;
@@ -78,15 +85,7 @@ typedef enum SwsCompFlags {
     SWS_COMP_SWAPPED = 1 << 3, /* byte order is swapped */
 } SwsCompFlags;
 
-typedef union SwsConst {
-    /* Generic constant value */
-    AVRational q4[4];
-    AVRational q;
-    unsigned u;
-} SwsConst;
-
-static_assert(sizeof(SwsConst) == sizeof(AVRational) * 4,
-              "First field of SwsConst should span the entire union");
+#define SWS_OP_NEEDED(op, idx) (!((op)->comps.flags[idx] & SWS_COMP_GARBAGE))
 
 typedef struct SwsComps {
     SwsCompFlags flags[4]; /* knowledge about (output) component contents */
@@ -98,17 +97,27 @@ typedef struct SwsComps {
 } SwsComps;
 
 typedef struct SwsReadWriteOp {
+    /**
+     * Examples:
+     *   rgba      = 4x u8 packed
+     *   yuv444p   = 3x u8
+     *   rgb565    = 1x u16   <- use SWS_OP_UNPACK to unpack
+     *   monow     = 1x u8 (frac 3)
+     *   rgb4      = 1x u8 (frac 1)
+     */
     uint8_t elems; /* number of elements (of type `op.type`) to read/write */
     uint8_t frac;  /* fractional pixel step factor (log2) */
     bool packed;   /* read multiple elements from a single plane */
 
-    /** Examples:
-     *    rgba      = 4x u8 packed
-     *    yuv444p   = 3x u8
-     *    rgb565    = 1x u16   <- use SWS_OP_UNPACK to unpack
-     *    monow     = 1x u8 (frac 3)
-     *    rgb4      = 1x u8 (frac 1)
+    /**
+     * Filter kernel to apply to each plane while sampling. Currently, only
+     * one shared filter kernel is supported for all planes. (Optional)
+     *
+     * Note: As with SWS_OP_FILTER_*, if a filter kernel is in use, the read
+     * operation will always output floating point values.
      */
+    SwsOpType filter;         /* some value of SWS_OP_FILTER_* */
+    SwsFilterWeights *kernel; /* (refstruct) */
 } SwsReadWriteOp;
 
 typedef struct SwsPackOp {
@@ -133,13 +142,30 @@ typedef struct SwsSwizzleOp {
 
 #define SWS_SWIZZLE(X,Y,Z,W) ((SwsSwizzleOp) { .in = {X, Y, Z, W} })
 
+typedef struct SwsShiftOp {
+    uint8_t amount; /* number of bits to shift */
+} SwsShiftOp;
+
+typedef struct SwsClearOp {
+    AVRational value[4]; /* value to set, or {0, 0} for no-op */
+} SwsClearOp;
+
 typedef struct SwsConvertOp {
     SwsPixelType to; /* type of pixel to convert to */
     bool expand; /* if true, integers are expanded to the full range */
 } SwsConvertOp;
 
+typedef struct SwsClampOp {
+    AVRational limit[4]; /* per-component min/max value */
+} SwsClampOp;
+
+typedef struct SwsScaleOp {
+    AVRational factor; /* scalar multiplication factor */
+} SwsScaleOp;
+
 typedef struct SwsDitherOp {
     AVRational *matrix; /* tightly packed dither matrix (refstruct) */
+    AVRational min, max; /* minimum/maximum value in `matrix` */
     int size_log2; /* size (in bits) of the dither matrix */
     int8_t y_offset[4]; /* row offset for each component, or -1 for ignored */
 } SwsDitherOp;
@@ -185,6 +211,10 @@ enum {
 /* Helper function to compute the correct mask */
 uint32_t ff_sws_linear_mask(SwsLinearOp);
 
+typedef struct SwsFilterOp {
+    SwsFilterWeights *kernel; /* filter kernel (refstruct) */
+} SwsFilterOp;
+
 typedef struct SwsOp {
     SwsOpType op;      /* operation to perform */
     SwsPixelType type; /* pixel type to operate on */
@@ -193,9 +223,13 @@ typedef struct SwsOp {
         SwsReadWriteOp  rw;
         SwsPackOp       pack;
         SwsSwizzleOp    swizzle;
+        SwsShiftOp      shift;
+        SwsClearOp      clear;
         SwsConvertOp    convert;
+        SwsClampOp      clamp;
+        SwsScaleOp      scale;
         SwsDitherOp     dither;
-        SwsConst        c;
+        SwsFilterOp     filter;
     };
 
     /**
@@ -207,6 +241,11 @@ typedef struct SwsOp {
      */
     SwsComps comps;
 } SwsOp;
+
+/**
+ * Describe an operation in human-readable form.
+ */
+void ff_sws_op_desc(AVBPrint *bp, const SwsOp *op);
 
 /**
  * Frees any allocations associated with an SwsOp and sets it to {0}.
@@ -228,13 +267,13 @@ typedef struct SwsOpList {
     /* Metadata associated with this operation list */
     SwsFormat src, dst;
 
-    /* Input/output plane pointer swizzle mask */
-    SwsSwizzleOp order_src, order_dst;
+    /* Input/output plane indices */
+    uint8_t plane_src[4], plane_dst[4];
 
     /**
      * Source component metadata associated with pixel values from each
      * corresponding component (in plane/memory order, i.e. not affected by
-     * `order_src`). Lets the optimizer know additional information about
+     * `plane_src`). Lets the optimizer know additional information about
      * the value range and/or pixel data to expect.
      *
      * The default value of {0} is safe to pass in the case that no additional
@@ -318,5 +357,37 @@ enum SwsOpCompileFlags {
  */
 int ff_sws_compile_pass(SwsGraph *graph, SwsOpList **ops, int flags,
                         SwsPass *input, SwsPass **output);
+
+/**
+ * Helper function to enumerate over all possible (optimized) operation lists,
+ * under the current set of options in `ctx`, and run the given callback on
+ * each list.
+ *
+ * @param src_fmt If set (not AV_PIX_FMT_NONE), constrain the source format
+ * @param dst_fmt If set (not AV_PIX_FMT_NONE), constrain the destination format
+ * @return 0 on success, the return value if cb() < 0, or a negative error code
+ *
+ * @note `ops` belongs to ff_sws_enum_op_lists(), but may be mutated by `cb`.
+ * @see ff_sws_enum_ops()
+ */
+int ff_sws_enum_op_lists(SwsContext *ctx, void *opaque,
+                         enum AVPixelFormat src_fmt, enum AVPixelFormat dst_fmt,
+                         int (*cb)(SwsContext *ctx, void *opaque, SwsOpList *ops));
+
+/**
+ * Helper function to enumerate over all possible operations, under the current
+ * set of options in `ctx`, and run the given callback on each operation.
+ *
+ * @param src_fmt If set (not AV_PIX_FMT_NONE), constrain the source format
+ * @param dst_fmt If set (not AV_PIX_FMT_NONE), constrain the destination format
+ * @return 0 on success, the return value if cb() < 0, or a negative error code
+ *
+ * @note May contain duplicates. `op` belongs to ff_sws_enum_ops(), but may be
+ *       mutated by `cb`.
+ * @see ff_sws_num_op_lists()
+ */
+int ff_sws_enum_ops(SwsContext *ctx, void *opaque,
+                    enum AVPixelFormat src_fmt, enum AVPixelFormat dst_fmt,
+                    int (*cb)(SwsContext *ctx, void *opaque, SwsOp *op));
 
 #endif

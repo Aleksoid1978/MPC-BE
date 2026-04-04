@@ -1638,7 +1638,7 @@ static int read_diff_float_data(ALSDecContext *ctx, unsigned int ra_frame) {
                 tmp_32 = (sign << 31) | ((e + EXP_BIAS) << 23) | (mantissa);
                 ctx->raw_samples[c][i] = tmp_32;
             } else {
-                ctx->raw_samples[c][i] = raw_mantissa[c][i] & 0x007fffffUL;
+                ctx->raw_samples[c][i] = raw_mantissa[c][i];
             }
         }
         align_get_bits(gb);
@@ -1794,7 +1794,9 @@ static int read_frame_data(ALSDecContext *ctx, unsigned int ra_frame)
     }
 
     if (sconf->floating) {
-        read_diff_float_data(ctx, ra_frame);
+        ret = read_diff_float_data(ctx, ra_frame);
+        if (ret < 0)
+            return ret;
     }
 
     if (get_bits_left(gb) < 0) {
