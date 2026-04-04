@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Despre"
 7		"MPC-BE"
 8		"Drepturi de autor © 2002-2026 - vezi fișierul Authors.txt"
@@ -1455,7 +1455,7 @@ STRING IDS_DESC_EVR		"Randor video cu suport pentru decodare (decodificare) hard
 STRING IDS_DESC_EVR_CP		"La fel ca EVR, dar cu modul Alocator-Prezentator (Allocator-Presenter) pentru subtitrare și postprocesare."
 STRING IDS_DESC_EVR_SYNC		"La fel ca EVR (CP), dar oferă mai multe opțiuni pentru a sincroniza rata de cadre video cu rata de reîmprospătare a afișajului pentru a elimina cadrele video sărite sau duplicate."
 STRING IDS_DESC_HAALI_VR		"Arată ca VMR-9, dar folosește un redimensionator bicubic adevărat."
-STRING IDS_DESC_MADVR		"Randor de înaltă calitate, necesită un GPU care acceptă D3D9 sau o versiune ulterioară."
+STRING IDS_DESC_MADVR		"Randor de calitate ridicată, necesită un GPU (o placă video/grafică) ce suportă D3D9 sau o versiune mai nouă."
 STRING IDS_DESC_MPC_VR		"Randor video cu suport pentru Direct3D 11."
 STRING IDS_DESC_NULLVR_ANY		"Se conectează la orice mediu de tip video și mostrele video nu vor fi trimise niciunde. Folosește-l atunci când nu ai nevoie de afișarea video și vrei să salvezi procesorul de la o muncă inutilă."
 STRING IDS_DESC_NULLVR_UNCOMP		"La fel ca randorul normal Null, dar acesta se va conecta doar la tipurile necomprimate."
