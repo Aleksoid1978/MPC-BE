@@ -80,7 +80,7 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* pFile)
 	else if (memcmp(data, w64_guid_riff, 16) == 0 &&  memcmp(data+24, w64_guid_wave, 16) == 0) {
 		pAudioFile = DNew CWave64File();
 	}
-	else if (memcmp(data, RF64_startbytes, sizeof(RF64_startbytes)) == 0) {
+	else if (*id == FCC('RF64') && GETU32(data+8) == FCC('WAVE') && GETU32(data+12) == FCC('ds64')) {
 		pAudioFile = DNew CRF64File();
 	}
 	else if (memcmp(data, chk_DTSHDHDR, 8) == 0) {

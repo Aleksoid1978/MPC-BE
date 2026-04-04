@@ -48,7 +48,9 @@ HRESULT CRF64File::Open(CBaseSplitterFile* pFile)
 	m_pFile->Seek(0);
 	BYTE data[48];
 	if (m_pFile->ByteRead(data, sizeof(data)) != S_OK
-			|| memcmp(data, RF64_startbytes, sizeof(RF64_startbytes)) != 0) {
+			|| GETU32(data) != FCC('RF64')
+			|| GETU32(data+8) != FCC('WAVE')
+			|| GETU32(data+12) != FCC('ds64')) {
 		return E_FAIL;
 	}
 
