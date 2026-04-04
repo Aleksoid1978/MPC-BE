@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -126,12 +126,6 @@
 // ÎnlineServices
 #define IDS_R_ONLINESERVICES				L"OnlineServices"
 #define IDS_R_YOUTUBECACHE					L"OnlineServices\\YoutubeCache"
-#define IDS_RS_YOUTUBE_PAGEPARSER			L"YoutubePageParser"
-#define IDS_RS_YOUTUBE_VIDEOFORMAT			L"YoutubeVideoFormat"
-#define IDS_RS_YOUTUBE_RESOLUTION			L"YoutubeResolution"
-#define IDS_RS_YOUTUBE_60FPS				L"Youtube60fps"
-#define IDS_RS_YOUTUBE_HDR					L"YoutubeHDR"
-#define IDS_RS_YOUTUBE_AUDIOFORMAT			L"YoutubeAudioFormat"
 #define IDS_RS_YOUTUBE_AUDIOLANGUAGE		L"YoutubeAudioLanguage"
 #define IDS_RS_YOUTUBE_LOAD_PLAYLIST		L"YoutubeLoadPlaylist"
 #define IDS_RS_YDL_ENABLE					L"YDLEnable"

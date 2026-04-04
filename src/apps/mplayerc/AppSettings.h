@@ -837,14 +837,6 @@ public:
 	CString			strLastOpenFilterDir;
 
 	// youtube
-	bool			bYoutubePageParser;
-	struct {
-		int		vfmt;
-		int		res;
-		bool	fps60;
-		bool	hdr;
-		int		afmt;
-	} YoutubeFormat;
 	CStringW		strYoutubeAudioLang;
 	bool			bYoutubeLoadPlaylist;
 	int				iYoutubeTagSelected = 0; // not saved

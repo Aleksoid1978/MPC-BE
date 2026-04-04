@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2025 see Authors.txt
+ * (C) 2012-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -539,10 +539,16 @@ namespace Youtube
 		funcLAST
 	};
 
+	static struct {
+		int  vfmt  = y_webm_vp9;
+		int  res   = 720;
+		bool fps60 = false;
+		bool hdr   = false;
+		int  afmt  = y_webm_opus;
+	} YoutubeFormat;
 
 	const YoutubeUrllistItem* SelectVideoStream(YoutubeUrllist& youtubeUrllist)
 	{
-		const CAppSettings& s = AfxGetAppSettings();
 		const YoutubeUrllistItem* final_item = nullptr;
 
 		for (;;) {
@@ -569,13 +575,13 @@ namespace Youtube
 			}
 
 			size_t k = 0;
-			if (s.YoutubeFormat.vfmt == y_mp4_avc) {
+			if (YoutubeFormat.vfmt == y_mp4_avc) {
 				k = (k_mp4 >= 0) ? k_mp4 : (k_webm >= 0) ? k_webm : 0;
 			}
-			else if (s.YoutubeFormat.vfmt == y_webm_vp9) {
+			else if (YoutubeFormat.vfmt == y_webm_vp9) {
 				k = (k_webm >= 0) ? k_webm : (k_mp4 >= 0) ? k_mp4 : 0;
 			}
-			else if (s.YoutubeFormat.vfmt == y_mp4_av1) {
+			else if (YoutubeFormat.vfmt == y_mp4_av1) {
 				k = (k_av1 >= 0) ? k_av1 : (k_webm >= 0) ? k_webm : 0;
 			}
 			final_item = &youtubeUrllist[k];
@@ -585,17 +591,17 @@ namespace Youtube
 
 				if (final_item->profile->format == profile->format) {
 					if (profile->quality == final_item->profile->quality) {
-						if (profile->fps60 != s.YoutubeFormat.fps60) {
+						if (profile->fps60 != YoutubeFormat.fps60) {
 							// same resolution as that of the previous, but not suitable fps
 							continue;
 						}
-						if (profile->hdr != s.YoutubeFormat.hdr) {
+						if (profile->hdr != YoutubeFormat.hdr) {
 							// same resolution as that of the previous, but not suitable HDR
 							continue;
 						}
 					}
 
-					if (profile->quality < final_item->profile->quality && final_item->profile->quality <= s.YoutubeFormat.res) {
+					if (profile->quality < final_item->profile->quality && final_item->profile->quality <= YoutubeFormat.res) {
 						break;
 					}
 
@@ -624,7 +630,6 @@ namespace Youtube
 
 	const YoutubeUrllistItem* SelectAudioStream(YoutubeUrllist& youtubeAudioUrllist)
 	{
-		const CAppSettings& s = AfxGetAppSettings();
 		const YoutubeUrllistItem* final_item = nullptr;
 
 		for (;;) {
@@ -647,10 +652,10 @@ namespace Youtube
 			}
 
 			size_t k = 0;
-			if (s.YoutubeFormat.afmt == y_mp4_aac) {
+			if (YoutubeFormat.afmt == y_mp4_aac) {
 				k = (k_aac >= 0) ? k_aac : (k_opus >= 0) ? k_opus : 0;
 			}
-			else if (s.YoutubeFormat.afmt == y_webm_opus) {
+			else if (YoutubeFormat.afmt == y_webm_opus) {
 				k = (k_opus >= 0) ? k_opus : (k_aac >= 0) ? k_aac : 0;
 			}
 			final_item = &youtubeAudioUrllist[k];
@@ -1402,7 +1407,7 @@ namespace Youtube
 		CStringW final_audio_url;
 		auto final_audio_url_format = y_mp4_aac;
 
-		if (s.YoutubeFormat.res == 0) { // audio only
+		if (YoutubeFormat.res == 0) { // audio only
 			final_item = SelectAudioStream(youtubeAudioUrllist);
 			if (final_item) {
 				DLog(L"Youtube::Parse_URL() : output audio format - %s, \"%s\"", final_item->title, final_item->url);
@@ -1942,8 +1947,8 @@ namespace Youtube
 
 		if (youtubeAudioUrllist.size()) {
 			for (const auto& item : youtubeAudioUrllist) {
-				if (s.YoutubeFormat.afmt == y_mp4_aac && item.profile->format == y_mp4_aac
-						|| s.YoutubeFormat.afmt == y_webm_opus && item.profile->format == y_webm_opus) {
+				if (YoutubeFormat.afmt == y_mp4_aac && item.profile->format == y_mp4_aac
+						|| YoutubeFormat.afmt == y_webm_opus && item.profile->format == y_webm_opus) {
 					audio_item = &item;
 					if (vprofile->type != y_video || vprofile->quality > 360) {
 						break;
