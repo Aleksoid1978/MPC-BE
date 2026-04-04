@@ -1,11 +1,12 @@
 BIN_DIR       = ../../../_bin
-ZLIB_DIR      = ../zlib
 SPEEX_DIR     = ../speex
 SOXR_DIR      = ../soxr
-DAV1_DIR      = ../dav1d
 FFNVCODEC_DIR = ../nv-codec-headers/include
 UAVS3D_DIR    = ../uavs3d/source/decoder
 VVDEC_DIR     = ../vvdec/vvdec/include
+ZLIB_DIR      = ../zlib
+DAV1D_DIR     = ../dav1d
+FDKAAC_DIR    = ../fdk-aac
 
 ifeq ($(64BIT),yes)
 	PLATFORM = x64
@@ -34,12 +35,12 @@ ARSCRIPT           = $(OBJ_DIR)script.ar
 # Compiler and NASM flags
 CFLAGS = -I. -I.. -Icompat/atomics/win32 -Icompat/windows \
 	   -Ilibavcodec \
-	   -I$(ZLIB_DIR) -I$(SOXR_DIR) -I$(DAV1_DIR) -I$(FFNVCODEC_DIR) -I$(UAVS3D_DIR) -I$(VVDEC_DIR) \
 	   -DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
 	   -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DOPJ_STATIC \
 	   -D_WIN32_WINNT=0x0601 -DWINVER=0x0601 -DWIN32_LEAN_AND_MEAN \
 	   -fomit-frame-pointer -std=c17 \
 	   -fno-common -fno-ident -mthreads -Wno-discarded-qualifiers
+
 NASMFLAGS = -I. -Pconfig.asm
 
 ifeq ($(64BIT),yes)
@@ -54,6 +55,8 @@ else
 	OPTFLAGS    = -m32 -march=i686 -msse -msse2 -mfpmath=sse -mstackrealign
 	NASMFLAGS  += -f win32 -DWIN32=1 -DARCH_X86_32=1 -DARCH_X86_64=0 -DPREFIX
 endif
+
+OPTFLAGS += -MMD -Wno-deprecated-declarations -Wno-pointer-to-int-cast
 
 ifeq ($(DEBUG),yes)
 	CFLAGS     += -DDEBUG -D_DEBUG -g -Og
@@ -1001,13 +1004,29 @@ OBJS_LS = \
 	$(SRCS_ASM_LS:%.asm=$(OBJ_DIR)%.o)
 
 # Commands
+$(OBJ_DIR)libavcodec/%.o: libavcodec/%.c
+	@echo $<
+	@$(GCC_PREFIX)gcc -c $(CFLAGS) -I$(SPEEX_DIR) -I$(VVDEC_DIR) -I$(UAVS3D_DIR) -I$(FFNVCODEC_DIR) $(OPTFLAGS) -o $@ $<
+
+$(OBJ_DIR)libavfilter/%.o: libavfilter/%.c
+	@echo $<
+	@$(GCC_PREFIX)gcc -c $(CFLAGS) $(OPTFLAGS) -o $@ $<
+
+$(OBJ_DIR)libavutil/%.o: libavutil/%.c
+	@echo $<
+	@$(GCC_PREFIX)gcc -c $(CFLAGS) -I$(FFNVCODEC_DIR) $(OPTFLAGS) -o $@ $<
+
+$(OBJ_DIR)libswresample/%.o: libswresample/%.c
+	@echo $<
+	@$(GCC_PREFIX)gcc -c $(CFLAGS) -I$(SOXR_DIR) $(OPTFLAGS) -o $@ $<
+
 $(OBJ_DIR)libswscale/%.o: libswscale/%.c
 	@echo $<
-	@$(GCC_PREFIX)gcc -c $(CFLAGS) $(OPTFLAGS) -MMD -Wno-deprecated-declarations -Wno-pointer-to-int-cast -o $@ $<
-
-$(OBJ_DIR)%.o: %.c
+	@$(GCC_PREFIX)gcc -c $(CFLAGS) $(OPTFLAGS) -o $@ $<
+	
+$(OBJ_DIR)config.o: config.c
 	@echo $<
-	@$(GCC_PREFIX)gcc -c $(CFLAGS) -I$(SPEEX_DIR) $(OPTFLAGS) -MMD -Wno-deprecated-declarations -Wno-pointer-to-int-cast -o $@ $<
+	@$(GCC_PREFIX)gcc -c $(CFLAGS) $(OPTFLAGS) -o $@ $<	
 
 $(OBJ_DIR)%.o: %.asm
 	@echo $<
