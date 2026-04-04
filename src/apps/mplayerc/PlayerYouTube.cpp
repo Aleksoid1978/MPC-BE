@@ -547,6 +547,8 @@ namespace Youtube
 		int  afmt  = y_webm_opus;
 	} YoutubeFormat;
 
+	static CStringW strYoutubeAudioLang = L"en";
+
 	const YoutubeUrllistItem* SelectVideoStream(YoutubeUrllist& youtubeUrllist)
 	{
 		const YoutubeUrllistItem* final_item = nullptr;
@@ -732,8 +734,6 @@ namespace Youtube
 			}
 		}
 
-		const auto& s = AfxGetAppSettings();
-
 		urlData data;
 		if (!URLReadData(url.GetString(), data)) {
 			return false;
@@ -881,8 +881,8 @@ namespace Youtube
 
 				auto it = defaultAudioLang.GetLength() ? audioLangs.find(defaultAudioLang) : audioLangs.begin();
 
-				if (s.strYoutubeAudioLang.GetLength() && s.strYoutubeAudioLang != kDefaultAudioLanguage) {
-					CStringA lang = WStrToUTF8(s.strYoutubeAudioLang.GetString());
+				if (strYoutubeAudioLang.GetLength() && strYoutubeAudioLang != kDefaultAudioLanguage) {
+					CStringA lang = WStrToUTF8(strYoutubeAudioLang.GetString());
 					auto it2 = audioLangs.find(lang);
 					if (it2 == audioLangs.end() && lang.GetLength() == 2) {
 						// check en-US, de-DE, fr-FR, es-US, es-419, zh-Hans and other
@@ -1942,7 +1942,6 @@ namespace Youtube
 
 	const YoutubeUrllistItem* GetAudioUrl(const YoutubeProfile* vprofile, const YoutubeUrllist& youtubeAudioUrllist)
 	{
-		const CAppSettings& s = AfxGetAppSettings();
 		const YoutubeUrllistItem* audio_item = nullptr;
 
 		if (youtubeAudioUrllist.size()) {

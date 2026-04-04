@@ -6145,7 +6145,7 @@ void CMainFrame::OnFileSaveAs()
 
 	if (SUCCEEDED(hr)) {
 		save_dlg.SetFFmpegPath(ffmpegpath);
-		save_dlg.SetLangDefault(CStringA(s.strYoutubeAudioLang));
+		save_dlg.SetLangDefault(CStringA(s.strYdlAudioLang));
 		save_dlg.DoModal();
 	}
 
@@ -12417,7 +12417,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 						s.iYdlMaxHeight,
 						s.bYdlHighFps,
 						s.bYdlHighBitrate,
-						CStringA(s.strYoutubeAudioLang),
+						CStringA(s.strYdlAudioLang),
 						m_youtubeFields,
 						m_youtubeUrllist,
 						m_youtubeAudioUrllist,

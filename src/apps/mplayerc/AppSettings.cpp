@@ -796,7 +796,6 @@ void CAppSettings::ResetSettings()
 
 	strLastOpenFilterDir.Empty();
 
-	strYoutubeAudioLang  = CPPageYoutube::GetDefaultLanguageCode();
 	bYoutubeLoadPlaylist = false;
 
 	bYdlEnable      = false;
@@ -807,6 +806,7 @@ void CAppSettings::ResetSettings()
 	bYdlHighFps     = false;
 	bYdlHDR         = false;
 	bYdlHighBitrate = false;
+	strYdlAudioLang = CPPageYoutube::GetDefaultLanguageCode();
 
 	strAceStreamAddress = L"http://127.0.0.1:6878/ace/getstream?id=%s";
 	strTorrServerAddress = L"http://127.0.0.1:8090/stream/fname?link=%s&index=1&m3u";
@@ -1483,8 +1483,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR, strLastOpenFilterDir);
 
 	// OnlineServices
-	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_AUDIOLANGUAGE, strYoutubeAudioLang);
-	strYoutubeAudioLang.Trim();
 	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
 
 	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YDL_ENABLE, bYdlEnable);
@@ -1506,6 +1504,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YDL_HIGHFPS, bYdlHighFps);
 	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YDL_HDR, bYdlHDR);
 	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YDL_HIGHBITRATE, bYdlHighBitrate);
+	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_YDL_AUDIOLANGUAGE, strYdlAudioLang);
+	strYdlAudioLang.Trim();
 
 	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_ACESTREAM_ADDRESS, strAceStreamAddress);
 	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_TORRSERVER_ADDRESS, strTorrServerAddress);
@@ -1994,7 +1994,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR, strLastOpenFilterDir);
 
 	// OnlineServices
-	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_AUDIOLANGUAGE, strYoutubeAudioLang);
 	profile.WriteBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
 
 	profile.WriteBool  (IDS_R_ONLINESERVICES, IDS_RS_YDL_ENABLE,      bYdlEnable);
@@ -2010,6 +2009,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool  (IDS_R_ONLINESERVICES, IDS_RS_YDL_HIGHFPS,     bYdlHighFps);
 	profile.WriteBool  (IDS_R_ONLINESERVICES, IDS_RS_YDL_HDR,         bYdlHDR);
 	profile.WriteBool  (IDS_R_ONLINESERVICES, IDS_RS_YDL_HIGHBITRATE, bYdlHighBitrate);
+	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_YDL_AUDIOLANGUAGE, strYdlAudioLang);
 
 	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_ACESTREAM_ADDRESS, strAceStreamAddress);
 	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_TORRSERVER_ADDRESS, strTorrServerAddress);

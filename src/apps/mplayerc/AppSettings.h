@@ -837,7 +837,6 @@ public:
 	CString			strLastOpenFilterDir;
 
 	// youtube
-	CStringW		strYoutubeAudioLang;
 	bool			bYoutubeLoadPlaylist;
 	int				iYoutubeTagSelected = 0; // not saved
 	std::map<CString, CString> youtubeSignatureCache;
@@ -850,6 +849,7 @@ public:
 	bool			bYdlHighFps;
 	bool			bYdlHDR;
 	bool			bYdlHighBitrate;
+	CStringW		strYdlAudioLang;
 
 	CStringW		strAceStreamAddress;
 	CStringW		strTorrServerAddress;
