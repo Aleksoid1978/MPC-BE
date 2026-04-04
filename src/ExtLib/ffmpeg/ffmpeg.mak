@@ -34,7 +34,7 @@ ARSCRIPT           = $(OBJ_DIR)script.ar
 # Compiler and NASM flags
 CFLAGS = -I. -I.. -Icompat/atomics/win32 -Icompat/windows \
 	   -Ilibavcodec \
-	   -I$(ZLIB_DIR) -I$(SPEEX_DIR) -I$(SOXR_DIR) -I$(DAV1_DIR) -I$(FFNVCODEC_DIR) -I$(UAVS3D_DIR) -I$(VVDEC_DIR) \
+	   -I$(ZLIB_DIR) -I$(SOXR_DIR) -I$(DAV1_DIR) -I$(FFNVCODEC_DIR) -I$(UAVS3D_DIR) -I$(VVDEC_DIR) \
 	   -DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
 	   -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DOPJ_STATIC \
 	   -D_WIN32_WINNT=0x0601 -DWINVER=0x0601 -DWIN32_LEAN_AND_MEAN \
@@ -1001,9 +1001,13 @@ OBJS_LS = \
 	$(SRCS_ASM_LS:%.asm=$(OBJ_DIR)%.o)
 
 # Commands
-$(OBJ_DIR)%.o: %.c
+$(OBJ_DIR)libswscale/%.o: libswscale/%.c
 	@echo $<
 	@$(GCC_PREFIX)gcc -c $(CFLAGS) $(OPTFLAGS) -MMD -Wno-deprecated-declarations -Wno-pointer-to-int-cast -o $@ $<
+
+$(OBJ_DIR)%.o: %.c
+	@echo $<
+	@$(GCC_PREFIX)gcc -c $(CFLAGS) -I$(SPEEX_DIR) $(OPTFLAGS) -MMD -Wno-deprecated-declarations -Wno-pointer-to-int-cast -o $@ $<
 
 $(OBJ_DIR)%.o: %.asm
 	@echo $<
