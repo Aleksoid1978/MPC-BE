@@ -22,8 +22,6 @@
 
 #include "WAVFile.h"
 
-const uint8_t RF64_startbytes[16] = {'R', 'F', '6', '4', 0xFF, 0xFF, 0xFF, 0xFF, 'W', 'A', 'V', 'E', 'd', 's', '6', '4'};
-
 class CRF64File : public CWAVFile
 {
 public:
