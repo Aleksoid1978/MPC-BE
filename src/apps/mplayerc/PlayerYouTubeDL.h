@@ -22,13 +22,32 @@
 
 #include "PlayerYouTube.h"
 
-namespace YoutubeDL
+namespace YT_DLP
 {
+	enum yt_vcodec_type {
+		vcodec_unknoun = -1,
+		vcodec_h264 = 0,
+		vcodec_vp9,
+		vcodec_av1,
+	};
+	enum yt_acodec_type {
+		acodec_unknoun = -1,
+		acodec_aac = 0,
+		acodec_opus,
+	};
+	enum yt_protocol_type {
+		protocol_unknoun = -1,
+		protocol_http = 0,
+		protocol_dash,
+		protocol_hls,
+	};
+
 	bool Parse_URL(
 		const CStringW& url,        // input parameter
 		const CStringW& ydlExePath, // input parameter
-		const int maxHeightOptions, // input parameter
-		const bool bMaximumQuality, // input parameter
+		const int  iMaxHeight,      // input parameter
+		const bool bHighFps,        // input parameter
+		const bool bHighBitrate,    // input parameter
 		CStringA lang,              // input parameter
 		Youtube::YoutubeFields& y_fields,
 		Youtube::YoutubeUrllist& youtubeUrllist,

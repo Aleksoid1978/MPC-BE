@@ -29,18 +29,17 @@ class CPPageYoutube : public CPPageBase
 	DECLARE_DYNAMIC(CPPageYoutube)
 
 private:
-	CComboBox m_cbVideoFormat;
-	CComboBox m_cbResolution;
-	CButton m_chk60fps;
-	CButton m_chkHdr;
-	CComboBox m_cbAudioFormat;
-	CComboBox m_cbAudioLang;
-	CButton m_chkLoadPlaylist;
-
 	CButton   m_chkYDLEnable;
 	CComboBox m_cbYDLExePath;
-	CComboBox m_cbYDLMaxHeight;
-	CButton   m_chkYDLMaximumQuality;
+
+	CComboBox m_cbVideoCodec;
+	CComboBox m_cbMaxHeight;
+	CButton   m_chkHighFps;
+	CButton   m_chkHdr;
+	CComboBox m_cbAudioCodec;
+	CComboBox m_cbAudioLang;
+	CButton   m_chkLoadPlaylist;
+	CButton   m_chkHighBitrate;
 
 	CEdit m_edAceStreamAddress;
 	CEdit m_edTorrServerAddress;

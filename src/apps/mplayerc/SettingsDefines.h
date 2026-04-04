@@ -136,8 +136,12 @@
 #define IDS_RS_YOUTUBE_LOAD_PLAYLIST		L"YoutubeLoadPlaylist"
 #define IDS_RS_YDL_ENABLE					L"YDLEnable"
 #define IDS_RS_YDL_EXEPATH					L"YDLExePath"
+#define IDS_RS_YDL_VCODEC					L"YDLVideoCodec"
+#define IDS_RS_YDL_ACODEC					L"YDLAudioCodec"
 #define IDS_RS_YDL_MAXHEIGHT				L"YDLMaxHeight"
-#define IDS_RS_YDL_MAXIMUM_QUALITY			L"YDLMaximumQuality"
+#define IDS_RS_YDL_HIGHFPS					L"YDLHighFps"
+#define IDS_RS_YDL_HDR						L"YDLHDR"
+#define IDS_RS_YDL_HIGHBITRATE				L"YDLHighBitrate"
 #define IDS_RS_ACESTREAM_ADDRESS			L"AceStreamAddress"
 #define IDS_RS_TORRSERVER_ADDRESS			L"TorrServerAddress"
 

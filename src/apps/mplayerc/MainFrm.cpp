@@ -12369,7 +12369,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	}
 	*/
 
-	if (s.bYDLEnable
+	if (s.bYdlEnable
 			&& m_pGB->ShouldOperationContinue() == S_OK
 			&& youtubeUrl.IsEmpty()
 			&& pOFD->auds.empty()
@@ -12407,15 +12407,16 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				if (bIsHtml) {
 					m_bYoutubeOpening = true;
 					CString ytdl_mesage;
-					ytdl_mesage.Format(ResStr(IDS_CALLING_YOUTUBEDL), GetFileName(s.strYDLExePath));
+					ytdl_mesage.Format(ResStr(IDS_CALLING_YOUTUBEDL), GetFileName(s.strYdlExePath));
 					SetStatusMessage(ytdl_mesage);
 
 					OpenFileData OFD;
-					ok = YoutubeDL::Parse_URL(
+					ok = YT_DLP::Parse_URL(
+						s.strYdlExePath,
 						url,
-						s.strYDLExePath,
-						s.iYDLMaxHeight,
-						s.bYDLMaximumQuality,
+						s.iYdlMaxHeight,
+						s.bYdlHighFps,
+						s.bYdlHighBitrate,
 						CStringA(s.strYoutubeAudioLang),
 						m_youtubeFields,
 						m_youtubeUrllist,
@@ -14636,7 +14637,7 @@ void CMainFrame::CloseMediaPrivate()
 		m_youtubeAudioUrllist.clear();
 		s.iYoutubeTagSelected = 0;
 
-		YoutubeDL::Clear();
+		YT_DLP::Clear();
 	}
 	m_youtubeThumbnailData.clear();
 	m_bYoutubeOpened = false;

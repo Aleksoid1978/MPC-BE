@@ -850,10 +850,14 @@ public:
 	int				iYoutubeTagSelected = 0; // not saved
 	std::map<CString, CString> youtubeSignatureCache;
 
-	bool			bYDLEnable;
-	CStringW		strYDLExePath;
-	int				iYDLMaxHeight;
-	bool			bYDLMaximumQuality;
+	bool			bYdlEnable;
+	CStringW		strYdlExePath;
+	int				iYdlVcodec;
+	int				iYdlAcodec;
+	int				iYdlMaxHeight;
+	bool			bYdlHighFps;
+	bool			bYdlHDR;
+	bool			bYdlHighBitrate;
 
 	CStringW		strAceStreamAddress;
 	CStringW		strTorrServerAddress;

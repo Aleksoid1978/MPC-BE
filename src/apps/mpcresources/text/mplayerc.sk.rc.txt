@@ -603,21 +603,19 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Prichytiť k okrajom pracovnej plochy"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 30
-5		"YouTube"
-6		"Preferovaný formát videa:"
-9		"60 obr/s"
-10		"HDR"
-11		"Preferovaný formát zvuku:"
-13		"Preferovaný jazyk zvukovej stopy:"
-15		"Načítať zoznam skladieb"
-17		"youtube-dl, yt-dlp"
-18		"Spustiteľný súbor:"
-20		"Maximálna výška videa:"
-22		"Vybrať max. obr/s alebo bitovú rýchlosť"
-23		"Adresa AceStreamu:"
-25		"Adresa MatriXu (TorrServer):"
-28		"Webprehliadač:"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
+5		"Preferovaný formát videa:"
+8		"50/60 fps"
+9		"HDR"
+10		"Preferovaný formát zvuku:"
+12		"Preferovaný jazyk zvukovej stopy:"
+14		"Načítať zoznam skladieb"
+16		"youtube-dl, yt-dlp"
+17		"Spustiteľný súbor:"
+19		"Select max bitrate"
+20		"Adresa AceStreamu:"
+22		"Adresa MatriXu (TorrServer):"
+25		"Webprehliadač:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

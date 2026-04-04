@@ -27,15 +27,16 @@
 
 #define bufsize (2ul * KILOBYTE)
 
-namespace YoutubeDL
+namespace YT_DLP
 {
 	std::vector<std::unique_ptr<Youtube::YoutubeProfile>> YoutubeProfiles;
 
 	bool Parse_URL(
-		const CStringW& url,        // input parameter
 		const CStringW& ydlExePath, // input parameter
-		const int maxHeightOptions, // input parameter
-		const bool bMaximumQuality, // input parameter
+		const CStringW& url,        // input parameter
+		const int  iMaxHeight,      // input parameter
+		const bool bHighFps,        // input parameter
+		const bool bHighBitrate,    // input parameter
 		CStringA lang,              // input parameter
 		Youtube::YoutubeFields& y_fields,
 		Youtube::YoutubeUrllist& youtubeUrllist,
@@ -274,7 +275,7 @@ namespace YoutubeDL
 
 							youtubeUrllist.emplace_back(item);
 
-							if (height > maxHeightOptions) {
+							if (height > iMaxHeight) {
 								continue;
 							}
 							if ((height > vid_height)
@@ -501,9 +502,10 @@ namespace YoutubeDL
 							if (bVideoOnly && !bestAudioUrl.IsEmpty()) {
 								pOFD->auds.emplace_back(CStringW(bestAudioUrl));
 							}
-						} else if (bMaximumQuality) {
-							float maxVideotbr = 0.0f;
-							int maxVideofps = 0;
+						} else if (bHighFps || bHighBitrate) {
+							int   normalVideoFps = 0;
+							int   hightVideoFps = 0;
+							float maxVideoTbr = 0.0f;
 
 							for (const auto& format : formats->GetArray()) {
 								CStringA protocol;
@@ -518,22 +520,33 @@ namespace YoutubeDL
 
 								int height = 0;
 								if (getJsonValue(format, "height", height) && height == vid_height) {
-									float tbr = .0f;
-									getJsonValue(format, "tbr", tbr);
-
 									int fps = 0;
 									getJsonValue(format, "fps", fps);
-
-									bool bMaxQuality = false;
-									if (fps > maxVideofps
-											|| (fps == maxVideofps && tbr > maxVideotbr)) {
-										bMaxQuality = true;
+									if (fps > 30) {
+										if (fps > hightVideoFps) {
+											hightVideoFps = fps;
+										}
+										if (!bHighFps) {
+											continue;
+										}
+									}
+									else if (fps > normalVideoFps) {
+										normalVideoFps = fps;
 									}
 
-									maxVideotbr = std::max(maxVideotbr, tbr);
-									maxVideofps = std::max(maxVideofps, fps);
+									bool bMaxTbr = false;
+									if (bHighBitrate) {
+										float tbr = .0f;
+										getJsonValue(format, "tbr", tbr);
+										if (tbr > maxVideoTbr) {
+											maxVideoTbr = tbr;
+										}
+										bMaxTbr = (tbr > 0 && tbr == maxVideoTbr);
+									}
 
-									if (bMaxQuality) {
+									bool ok = bHighFps && hightVideoFps;
+
+									if (bMaxTbr) {
 										CStringA acodec;
 										getJsonValue(format, "acodec", acodec);
 

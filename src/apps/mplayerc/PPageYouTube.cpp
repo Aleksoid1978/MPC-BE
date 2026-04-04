@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include "PPageYoutube.h"
-#include "PlayerYouTube.h"
+#include "PlayerYouTubeDL.h"
 #include "DSUtil/Filehandle.h"
 #include "DSUtil/HTTPAsync.h"
 
@@ -40,17 +40,18 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
-	DDX_Control(pDX, IDC_COMBO1, m_cbVideoFormat);
-	DDX_Control(pDX, IDC_COMBO2, m_cbResolution);
-	DDX_Control(pDX, IDC_CHECK3, m_chk60fps);
-	DDX_Control(pDX, IDC_CHECK4, m_chkHdr);
-	DDX_Control(pDX, IDC_COMBO3, m_cbAudioFormat);
-	DDX_Control(pDX, IDC_COMBO4, m_cbAudioLang);
-	DDX_Control(pDX, IDC_CHECK1, m_chkLoadPlaylist);
 	DDX_Control(pDX, IDC_CHECK6, m_chkYDLEnable);
 	DDX_Control(pDX, IDC_COMBO5, m_cbYDLExePath);
-	DDX_Control(pDX, IDC_COMBO6, m_cbYDLMaxHeight);
-	DDX_Control(pDX, IDC_CHECK5, m_chkYDLMaximumQuality);
+
+	DDX_Control(pDX, IDC_COMBO1, m_cbVideoCodec);
+	DDX_Control(pDX, IDC_COMBO2, m_cbMaxHeight);
+	DDX_Control(pDX, IDC_CHECK3, m_chkHighFps);
+	DDX_Control(pDX, IDC_CHECK4, m_chkHdr);
+	DDX_Control(pDX, IDC_COMBO3, m_cbAudioCodec);
+	DDX_Control(pDX, IDC_COMBO4, m_cbAudioLang);
+	DDX_Control(pDX, IDC_CHECK1, m_chkLoadPlaylist);
+
+	DDX_Control(pDX, IDC_CHECK5, m_chkHighBitrate);
 	DDX_Control(pDX, IDC_EDIT1,  m_edAceStreamAddress);
 	DDX_Control(pDX, IDC_EDIT2,  m_edTorrServerAddress);
 	DDX_Control(pDX, IDC_EDIT3,  m_edUserAgent);
@@ -72,37 +73,27 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	const CAppSettings& s = AfxGetAppSettings();
 
-	m_cbVideoFormat.AddString(L"H.264");
-	m_cbVideoFormat.AddString(L"VP9");
-	m_cbVideoFormat.AddString(L"AV1");
-	m_cbVideoFormat.SetCurSel(s.YoutubeFormat.vfmt);
+	m_cbVideoCodec.AddString(L"H.264");
+	m_cbVideoCodec.AddString(L"VP9");
+	m_cbVideoCodec.AddString(L"AV1");
+	m_cbVideoCodec.SetCurSel(s.iYdlVcodec);
 
-	static std::vector<int> resolutions;
-	if (resolutions.empty()) {
-		resolutions.reserve(std::size(Youtube::YProfiles));
-		for (const auto& profile : Youtube::YProfiles) {
-			resolutions.emplace_back(profile.quality);
+	for (const auto& h : s_CommonVideoHeights) {
+		if (h == 0) {
+			continue; // TODO use ResStr(IDS_AUDIO_ONLY)
 		}
-		// sort
-		std::sort(resolutions.begin(), resolutions.end(), std::greater<int>());
-		// deduplicate
-		resolutions.erase(std::unique(resolutions.begin(), resolutions.end()), resolutions.end());
-	}
-	for (const auto& res : resolutions) {
 		CString str;
-		str.Format(L"%dp", res);
-		AddStringData(m_cbResolution, str, res);
+		str.Format(L"%d", h);
+		AddStringData(m_cbMaxHeight, str, h);
 	}
-	AddStringData(m_cbResolution, ResStr(IDS_AUDIO_ONLY), 0);
+	SelectByItemData(m_cbMaxHeight, s.iYdlMaxHeight);
 
-	SelectByItemData(m_cbResolution, s.YoutubeFormat.res);
+	m_chkHighFps.SetCheck(s.bYdlHighFps ? BST_CHECKED : BST_UNCHECKED);
+	m_chkHdr.SetCheck(s.bYdlHDR ? BST_CHECKED : BST_UNCHECKED);
 
-	m_chk60fps.SetCheck(s.YoutubeFormat.fps60 ? BST_CHECKED : BST_UNCHECKED);
-	m_chkHdr.SetCheck(s.YoutubeFormat.hdr ? BST_CHECKED : BST_UNCHECKED);
-
-	m_cbAudioFormat.AddString(L"AAC");
-	m_cbAudioFormat.AddString(L"Opus");
-	m_cbAudioFormat.SetCurSel(s.YoutubeFormat.afmt - Youtube::y_mp4_aac);
+	m_cbAudioCodec.AddString(L"AAC");
+	m_cbAudioCodec.AddString(L"Opus");
+	m_cbAudioCodec.SetCurSel(s.iYdlAcodec);
 
 	static std::vector<CStringW> langNames;
 	if (langNames.empty()) {
@@ -121,7 +112,7 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	bool was_added = false;
 	m_cbAudioLang.AddString(ResStr(IDS_YOUTUBE_DEFAULT_AUDIO_LANG));
-	if (s.strYoutubeAudioLang.CompareNoCase(Youtube::kDefaultAudioLanguage) == 0) {
+	if (s.strYoutubeAudioLang.CompareNoCase(L"default") == 0) {
 		was_added = true;
 		m_cbAudioLang.SetCurSel(0);
 	}
@@ -143,7 +134,7 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	OnCheck60fps();
 
-	m_chkYDLEnable.SetCheck(s.bYDLEnable ? BST_CHECKED : BST_UNCHECKED);
+	m_chkYDLEnable.SetCheck(s.bYdlEnable ? BST_CHECKED : BST_UNCHECKED);
 
 	was_added = false;
 	LPCWSTR ydl_filenames[] = {
@@ -153,26 +144,16 @@ BOOL CPPageYoutube::OnInitDialog()
 	};
 	for (auto& ydl_filename : ydl_filenames) {
 		m_cbYDLExePath.AddString(ydl_filename);
-		if (s.strYDLExePath.CompareNoCase(ydl_filename) == 0) {
+		if (s.strYdlExePath.CompareNoCase(ydl_filename) == 0) {
 			was_added = true;
 		}
 	}
 	if (!was_added) {
-		m_cbYDLExePath.AddString(s.strYDLExePath);
+		m_cbYDLExePath.AddString(s.strYdlExePath);
 	}
-	m_cbYDLExePath.SelectString(0, s.strYDLExePath);
+	m_cbYDLExePath.SelectString(0, s.strYdlExePath);
 
-	for (const auto& h : s_CommonVideoHeights) {
-		if (h == 0) {
-			continue; // TODO
-		}
-		CString str;
-		str.Format(L"%d", h);
-		AddStringData(m_cbYDLMaxHeight, str, h);
-	}
-	SelectByItemData(m_cbYDLMaxHeight, s.iYDLMaxHeight);
-
-	m_chkYDLMaximumQuality.SetCheck(s.bYDLMaximumQuality ? BST_CHECKED : BST_UNCHECKED);
+	m_chkHighBitrate.SetCheck(s.bYdlHighBitrate ? BST_CHECKED : BST_UNCHECKED);
 
 	m_edAceStreamAddress.SetWindowTextW(s.strAceStreamAddress);
 	m_edTorrServerAddress.SetWindowTextW(s.strTorrServerAddress);
@@ -191,24 +172,24 @@ BOOL CPPageYoutube::OnApply()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.YoutubeFormat.vfmt	= m_cbVideoFormat.GetCurSel();
-	s.YoutubeFormat.res		= GetCurItemData(m_cbResolution);
-	s.YoutubeFormat.fps60	= !!m_chk60fps.GetCheck();
-	s.YoutubeFormat.hdr		= !!m_chkHdr.GetCheck();
-	s.YoutubeFormat.afmt	= m_cbAudioFormat.GetCurSel() + Youtube::y_mp4_aac;
+	s.bYdlEnable = !!m_chkYDLEnable.GetCheck();
+	m_cbYDLExePath.GetWindowTextW(s.strYdlExePath);
+
+	s.iYdlVcodec            = m_cbVideoCodec.GetCurSel();
+	s.iYdlMaxHeight         = GetCurItemData(m_cbMaxHeight);
+	s.bYdlHighFps           = !!m_chkHighFps.GetCheck();
+	s.bYdlHDR               = !!m_chkHdr.GetCheck();
+	s.iYdlAcodec            = m_cbAudioCodec.GetCurSel();
 	if (m_cbAudioLang.GetCurSel() >= 0) {
-		s.strYoutubeAudioLang = m_cbAudioLang.GetCurSel() == 0 ? Youtube::kDefaultAudioLanguage : m_langcodes[m_cbAudioLang.GetCurSel() - 1];
+		s.strYoutubeAudioLang = m_cbAudioLang.GetCurSel() == 0 ? L"default" : m_langcodes[m_cbAudioLang.GetCurSel() - 1];
 	} else {
 		s.strYoutubeAudioLang.Empty();
 	}
+	s.bYdlHighBitrate = !!m_chkHighBitrate.GetCheck();
 
 	s.bYoutubeLoadPlaylist	= !!m_chkLoadPlaylist.GetCheck();
 
-	s.bYDLEnable = !!m_chkYDLEnable.GetCheck();
-	m_cbYDLExePath.GetWindowTextW(s.strYDLExePath);
-	CleanPath(s.strYDLExePath);
-	s.iYDLMaxHeight = GetCurItemData(m_cbYDLMaxHeight);
-	s.bYDLMaximumQuality = !!m_chkYDLMaximumQuality.GetCheck();
+	CleanPath(s.strYdlExePath);
 
 	CString str;
 	m_edAceStreamAddress.GetWindowTextW(str);
@@ -230,7 +211,7 @@ BOOL CPPageYoutube::OnApply()
 
 void CPPageYoutube::OnCheck60fps()
 {
-	if (m_chk60fps.GetCheck()) {
+	if (m_chkHighFps.GetCheck()) {
 		m_chkHdr.EnableWindow(TRUE);
 	} else {
 		m_chkHdr.SetCheck(BST_UNCHECKED);
@@ -245,21 +226,20 @@ void CPPageYoutube::OnCheckYDLEnable()
 	const BOOL bEnable = m_chkYDLEnable.GetCheck();
 
 	GetDlgItem(IDC_STATIC2)->EnableWindow(bEnable);
-	m_cbVideoFormat.EnableWindow(bEnable);
-	m_cbResolution.EnableWindow(bEnable);
-	m_chk60fps.EnableWindow(bEnable);
+	m_cbVideoCodec.EnableWindow(bEnable);
+	m_cbMaxHeight.EnableWindow(bEnable);
+	m_chkHighFps.EnableWindow(bEnable);
 	m_chkHdr.EnableWindow(bEnable);
 
 	if (bEnable) {
 		OnCheck60fps();
 	}
 	GetDlgItem(IDC_STATIC3)->EnableWindow(bEnable);
-	m_cbAudioFormat.EnableWindow(bEnable);
+	m_cbAudioCodec.EnableWindow(bEnable);
 	GetDlgItem(IDC_STATIC4)->EnableWindow(bEnable);
 	m_cbAudioLang.EnableWindow(bEnable);
 
-	m_cbYDLMaxHeight.EnableWindow(bEnable);
-	m_chkYDLMaximumQuality.EnableWindow(bEnable);
+	m_chkHighBitrate.EnableWindow(bEnable);
 
 	SetModified();
 }

@@ -603,21 +603,19 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Ajustar a los bordes del escritorio"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 30
-5		"YouTube"
-6		"Formato de video preferido:"
-9		"60 fps"
-10		"HDR"
-11		"Formato de audio preferido:"
-13		"Idioma preferido de pista de audio:"
-15		"Cargar Lista de Reproducción"
-17		"youtube-dl, yt-dlp"
-18		"Archivo ejecutable:"
-20		"Altura máxima de video:"
-22		"Seleccionar fps o tasa de bits máxima"
-23		"Dirección AceStream:"
-25		"Dirección MatriX (TorrServer):"
-28		"Agente de usuario:"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
+5		"Formato de video preferido:"
+8		"50/60 fps"
+9		"HDR"
+10		"Formato de audio preferido:"
+12		"Idioma preferido de pista de audio:"
+14		"Cargar Lista de Reproducción"
+16		"youtube-dl, yt-dlp"
+17		"Archivo ejecutable:"
+19		"Select max bitrate"
+20		"Dirección AceStream:"
+22		"Dirección MatriX (TorrServer):"
+25		"Agente de usuario:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

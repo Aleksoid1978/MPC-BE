@@ -603,21 +603,19 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"الربط بحواف سطح المكتب"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 30
-5		"YouTube"
-6		"تنسيق الفيديو المفضل:"
-9		"60 إطار/ثانية"
-10		"HDR"
-11		"تنسيق الصوت المفضل:"
-13		"اللغة المفضلة لمسار الصوت:"
-15		"تحميل قائمة التشغيل"
-17		"youtube-dl, yt-dlp"
-18		"الملف التنفيذي:"
-20		"الحد الأقصى لارتفاع الفيديو:"
-22		"حدد أقصى معدل إطارات أو معدل بت"
-23		"عنوان AceStream:"
-25		"عنوان MatriX (TorrServer):"
-28		"وكيل المستخدم:"
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
+5		"تنسيق الفيديو المفضل:"
+8		"50/60 fps"
+9		"HDR"
+10		"تنسيق الصوت المفضل:"
+12		"اللغة المفضلة لمسار الصوت:"
+14		"تحميل قائمة التشغيل"
+16		"youtube-dl, yt-dlp"
+17		"الملف التنفيذي:"
+19		"Select max bitrate"
+20		"عنوان AceStream:"
+22		"عنوان MatriX (TorrServer):"
+25		"وكيل المستخدم:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
