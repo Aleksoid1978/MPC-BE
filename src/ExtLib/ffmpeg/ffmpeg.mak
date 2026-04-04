@@ -4,9 +4,6 @@ SOXR_DIR      = ../soxr
 FFNVCODEC_DIR = ../nv-codec-headers/include
 UAVS3D_DIR    = ../uavs3d/source/decoder
 VVDEC_DIR     = ../vvdec/vvdec/include
-ZLIB_DIR      = ../zlib
-DAV1D_DIR     = ../dav1d
-FDKAAC_DIR    = ../fdk-aac
 
 ifeq ($(64BIT),yes)
 	PLATFORM = x64
