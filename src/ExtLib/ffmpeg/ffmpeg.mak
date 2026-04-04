@@ -30,8 +30,7 @@ TARGET_LIB         = $(TARGET_LIB_DIR)/ffmpeg.lib
 ARSCRIPT           = $(OBJ_DIR)script.ar
 
 # Compiler and NASM flags
-CFLAGS = -I. -I.. -Icompat/atomics/win32 -Icompat/windows \
-	   -Ilibavcodec \
+CFLAGS = -I. -Icompat/atomics/win32 -Icompat/windows \
 	   -DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
 	   -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DOPJ_STATIC \
 	   -D_WIN32_WINNT=0x0601 -DWINVER=0x0601 -DWIN32_LEAN_AND_MEAN \
@@ -1003,7 +1002,7 @@ OBJS_LS = \
 # Commands
 $(OBJ_DIR)libavcodec/%.o: libavcodec/%.c
 	@echo $<
-	@$(GCC_PREFIX)gcc -c $(CFLAGS) -I$(SPEEX_DIR) -I$(VVDEC_DIR) -I$(UAVS3D_DIR) -I$(FFNVCODEC_DIR) $(OPTFLAGS) -o $@ $<
+	@$(GCC_PREFIX)gcc -c $(CFLAGS) -I.. -Ilibavcodec -I$(SPEEX_DIR) -I$(VVDEC_DIR) -I$(UAVS3D_DIR) -I$(FFNVCODEC_DIR) $(OPTFLAGS) -o $@ $<
 
 $(OBJ_DIR)libavfilter/%.o: libavfilter/%.c
 	@echo $<
