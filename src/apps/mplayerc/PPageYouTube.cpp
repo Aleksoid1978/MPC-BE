@@ -112,14 +112,14 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	bool was_added = false;
 	m_cbAudioLang.AddString(ResStr(IDS_YOUTUBE_DEFAULT_AUDIO_LANG));
-	if (s.strYoutubeAudioLang.CompareNoCase(L"default") == 0) {
+	if (s.strYdlAudioLang.CompareNoCase(L"default") == 0) {
 		was_added = true;
 		m_cbAudioLang.SetCurSel(0);
 	}
 
 	for (size_t i = 0; i < std::size(m_langcodes); i++) {
 		m_cbAudioLang.AddString(langNames[i].GetString());
-		if (!was_added && s.strYoutubeAudioLang.CompareNoCase(m_langcodes[i]) == 0) {
+		if (!was_added && s.strYdlAudioLang.CompareNoCase(m_langcodes[i]) == 0) {
 			was_added = true;
 			m_cbAudioLang.SetCurSel(i + 1);
 		}
@@ -181,9 +181,9 @@ BOOL CPPageYoutube::OnApply()
 	s.bYdlHDR               = !!m_chkHdr.GetCheck();
 	s.iYdlAcodec            = m_cbAudioCodec.GetCurSel();
 	if (m_cbAudioLang.GetCurSel() >= 0) {
-		s.strYoutubeAudioLang = m_cbAudioLang.GetCurSel() == 0 ? L"default" : m_langcodes[m_cbAudioLang.GetCurSel() - 1];
+		s.strYdlAudioLang = m_cbAudioLang.GetCurSel() == 0 ? L"default" : m_langcodes[m_cbAudioLang.GetCurSel() - 1];
 	} else {
-		s.strYoutubeAudioLang.Empty();
+		s.strYdlAudioLang.Empty();
 	}
 	s.bYdlHighBitrate = !!m_chkHighBitrate.GetCheck();
 
