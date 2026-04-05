@@ -822,8 +822,6 @@ void CAppSettings::ResetSettings()
 
 	bPasteClipboardURL = false;
 
-	youtubeSignatureCache.clear();
-
 	ZeroMemory(HistoryColWidths, sizeof(HistoryColWidths));
 
 	nCmdVolume = 0;
@@ -1521,14 +1519,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_PASTECLIPBOARDURL, bPasteClipboardURL);
 
-	std::vector<CStringW> valuenames;
-	profile.EnumValueNames(IDS_R_YOUTUBECACHE, valuenames);
-	for (const auto& name : valuenames) {
-		CString value;
-		profile.ReadString(IDS_R_YOUTUBECACHE, name, value);
-		youtubeSignatureCache[name] = value;
-	}
-
 	// Dialogs
 
 	// Option window
@@ -2027,10 +2017,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt64(IDS_R_UPDATER, IDS_RS_UPDATER_LAST_CHECK, tUpdaterLastCheck);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_PASTECLIPBOARDURL, bPasteClipboardURL);
-
-	for (const auto& [name, value] : youtubeSignatureCache) {
-		profile.WriteString(IDS_R_YOUTUBECACHE, name, value);
-	}
 
 	// Dialogs
 

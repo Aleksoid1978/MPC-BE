@@ -549,6 +549,8 @@ namespace Youtube
 
 	static CStringW strYoutubeAudioLang = L"en";
 
+	static std::map<CString, CString> youtubeSignatureCache;
+
 	const YoutubeUrllistItem* SelectVideoStream(YoutubeUrllist& youtubeUrllist)
 	{
 		const YoutubeUrllistItem* final_item = nullptr;
@@ -992,7 +994,6 @@ namespace Youtube
 
 						const auto JSPlayerId = RegExpParse(JSUrl.GetString(), LR"(/s/player/([a-zA-Z0-9_-]{8,})/player)");
 
-						auto& youtubeSignatureCache = AfxGetAppSettings().youtubeSignatureCache;
 						const auto& it = youtubeSignatureCache.find(JSPlayerId);
 						if (it != youtubeSignatureCache.cend() && !it->second.IsEmpty()) {
 							rapidjson::GenericDocument<rapidjson::UTF16<>> d;
