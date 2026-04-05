@@ -940,7 +940,7 @@ BEGIN
     CONTROL         "youtube-dl, yt-dlp",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,4,74,10
     LTEXT           "Fișierul executabil:",IDC_STATIC,10,17,104,8
     COMBOBOX        IDC_COMBO5,116,15,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Select max bitrate",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,108,276,10
+    CONTROL         "Selectează rata de biți maximă",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,108,276,10
     LTEXT           "Adresa AceStream:",IDC_STATIC,10,143,77,8
     EDITTEXT        IDC_EDIT1,91,141,195,13,ES_AUTOHSCROLL
     LTEXT           "Adresa MatriX (TorrServer):",IDC_STATIC,10,160,103,8
@@ -1178,7 +1178,7 @@ BEGIN
     CONTROL         "VSync (Sincronizare verticală)",IDC_VSYNC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,14,121,10
     CONTROL         "Sincronizare verticală/VSync internă",IDC_VSYNC_INTERNAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,26,127,10
     CONTROL         "Activează corecția timpului cadrelor",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,170,10
-    CONTROL         "Golește memoria GPU înainte de VSync",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,14,140,10
+    CONTROL         "Golește memoria GPU-ului înainte de VSync",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,14,140,10
     CONTROL         "Golește memoria GPU-ului după Present",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,142,10
     CONTROL         "Așteaptă golirea memoriei",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,38,100,10
     GROUPBOX        "Setări de sincronizare pentru randorul video îmbunătățit EVR Sync",IDC_STATIC2,5,67,286,117
@@ -1260,7 +1260,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,79,285,9
     CONTROL         "Folosește modul de resincronizare a subtitrărilor (Subresync)",IDC_CHECK_SUBRESYNC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,91,285,9
     GROUPBOX        "",IDC_STATIC,4,103,286,47
-    LTEXT           "Pagina de codificare implicită:",IDC_STATIC,10,108,120,8
+    LTEXT           "Pagina de codificare/codare implicită:",IDC_STATIC,10,108,120,8
     COMBOBOX        IDC_COMBO3,10,120,277,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Detectează în mod automat pagina de codificare",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,135,178,10
 END
@@ -2462,7 +2462,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_SUBTITLES_SYSTEM_CODEPAGE "Pagina de codificare a sistemului - %u"
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "Pagina de codificare (de codare) a sistemului - %u"
     IDS_FRAME_HALF          "Jumătate din mărime"
     IDS_FRAME_NORMAL        "Mărime normală"
     IDS_FRAME_DOUBLE        "Mărime dublă"
@@ -2815,7 +2815,7 @@ BEGIN
     IDS_APPLY               "Se aplică"
     IDS_CLEAR               "Goleşte"
     IDS_CANCEL              "Anulează"
-    IDS_TEXTFILE_ENC        "Codare:"
+    IDS_TEXTFILE_ENC        "Codare (Codificare):"
     IDS_SAVE_FILE           "Se salvează fișierul"
     IDS_VOLUME_OSD_MUTE     "Volumul: %d%% [Mut]"
     IDS_COPY_TO_CLIPBOARD   "Copiază în clipboard"
@@ -3073,7 +3073,7 @@ BEGIN
     IDS_AG_BUFFERS          "Buffere (Tampoane)"
     IDS_MAINFRM_9           "Volumul: %02d/%02d, Titlul: %02d/%02d, Capitolul: %02d/%02d"
     IDS_MAINFRM_10          "Unghiul: %02d/%02d, %dx%d %dHz %d:%d"
-    IDS_MAINFRM_11          "%s, %s %dHz %dbiți %d %s"
+    IDS_MAINFRM_11          "%s, %s %d (de) Hz %d (de) biți %d %s"
 END
 
 STRINGTABLE
@@ -3274,9 +3274,9 @@ STRINGTABLE
 BEGIN
     IDS_DESC_NULLVR_ANY     "Se conectează la orice mediu de tip video și mostrele video nu vor fi trimise niciunde. Folosește-l atunci când nu ai nevoie de afișarea video și vrei să salvezi procesorul de la o muncă inutilă."
     IDS_DESC_NULLVR_UNCOMP  "La fel ca randorul normal Null, dar acesta se va conecta doar la tipurile necomprimate."
-    IDS_DESC_EVR            "Randor video cu suport pentru decodare hardware."
+    IDS_DESC_EVR            "Randor video cu suport pentru decodare (decodificare) hardware."
     IDS_DESC_EVR_CP         "La fel ca EVR, dar cu modul Alocator-Prezentator (Allocator-Presenter) pentru subtitrare și postprocesare."
-    IDS_DESC_MADVR          "Randor de înaltă calitate, necesită un GPU care acceptă D3D9 sau o versiune ulterioară."
+    IDS_DESC_MADVR          "Randor de calitate ridicată, necesită un GPU (o placă video/grafică) ce suportă D3D9 sau o versiune mai nouă."
     IDS_DESC_EVR_SYNC       "La fel ca EVR (CP), dar oferă mai multe opțiuni pentru a sincroniza rata de cadre video cu rata de reîmprospătare a afișajului pentru a elimina cadrele video sărite sau duplicate."
     IDS_DESC_MPC_VR         "Randor video cu suport pentru Direct3D 11."
 END
@@ -3378,7 +3378,7 @@ STRINGTABLE
 BEGIN
     IDS_VDF_SETTINGS        "Setări pentru video (Setări pentru videoclipuri)"
     IDS_VDF_AUTO            "Auto(mat)"
-    IDS_VDF_THREADNUMBER    "Numărul firelor de decodare"
+    IDS_VDF_THREADNUMBER    "Numărul firelor de decodare (de decodificare)"
     IDS_VDF_SKIPBFRAMES     "Sari peste cadrele B"
 END
 
@@ -3532,7 +3532,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_UNIT_TIME_H         "h"
+    IDS_UNIT_TIME_H         "h (o)"
     IDS_UNIT_TIME_M         "m"
     IDS_UNIT_TIME_S         "s"
     IDS_UNIT_SIZE_KB        "KB (KO)"

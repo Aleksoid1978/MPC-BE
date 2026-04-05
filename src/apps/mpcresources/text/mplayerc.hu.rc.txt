@@ -612,7 +612,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
 14		"Lejátszási lista betöltése"
 16		"youtube-dl, yt-dlp"
 17		"Futtatható fájl:"
-19		"Select max bitrate"
+19		"Válassza ki a maximális bitrátát"
 20		"AceStream cím:"
 22		"MatriX (TorrServer) cím:"
 25		"Hálózati kliens:"

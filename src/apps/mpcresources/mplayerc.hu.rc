@@ -940,7 +940,7 @@ BEGIN
     CONTROL         "youtube-dl, yt-dlp",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,4,74,10
     LTEXT           "Futtatható fájl:",IDC_STATIC,10,17,104,8
     COMBOBOX        IDC_COMBO5,116,15,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Select max bitrate",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,108,276,10
+    CONTROL         "Válassza ki a maximális bitrátát",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,108,276,10
     LTEXT           "AceStream cím:",IDC_STATIC,10,143,77,8
     EDITTEXT        IDC_EDIT1,91,141,195,13,ES_AUTOHSCROLL
     LTEXT           "MatriX (TorrServer) cím:",IDC_STATIC,10,160,103,8
