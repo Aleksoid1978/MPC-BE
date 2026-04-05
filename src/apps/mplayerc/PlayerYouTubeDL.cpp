@@ -31,6 +31,30 @@ namespace YT_DLP
 {
 	std::vector<std::unique_ptr<Youtube::YoutubeProfile>> YoutubeProfiles;
 
+	bool IsVideoFormat(const rapidjson::Value& format)
+	{
+		CStringA value_str;
+		if (getJsonValue(format, "vcodec", value_str) && value_str != "none") {
+			return true;
+		}
+		if (getJsonValue(format, "video_ext", value_str) || value_str != "none") {
+			return true;
+		}
+		return false;
+	}
+
+	bool FormatHasAudio(const rapidjson::Value& format)
+	{
+		CStringA value_str;
+		if (getJsonValue(format, "acodec", value_str) && value_str != "none") {
+			return true;
+		}
+		if (getJsonValue(format, "audio_ext", value_str) && value_str == "none") {
+			return true;
+		}
+		return false;
+	}
+
 	bool Parse_URL(
 		const CStringW& ydlExePath, // input parameter
 		const CStringW& url,        // input parameter
@@ -159,13 +183,13 @@ namespace YT_DLP
 			return false;
 		}
 
-		rapidjson::Document d;
+		rapidjson::Document doc;
 		const int k = buf_out.Find("\n{\"", 64); // check presence of second JSON root element and ignore it
-		if (!d.Parse(buf_out.GetString(), k > 0 ? k : buf_out.GetLength()).HasParseError()) {
+		if (!doc.Parse(buf_out.GetString(), k > 0 ? k : buf_out.GetLength()).HasParseError()) {
 			bool bIsYoutube = Youtube::CheckURL(url);
 			int iTag = 1;
 
-			if (auto formats = GetJsonArray(d, "formats")) {
+			if (auto formats = GetJsonArray(doc, "formats")) {
 				int vid_height = 0;
 				bool bVideoOnly = false;
 
@@ -178,7 +202,7 @@ namespace YT_DLP
 				std::map<CStringA, audio_info_t> audioUrls;
 
 				CStringA bestUrl;
-				getJsonValue(d, "url", bestUrl);
+				getJsonValue(doc, "url", bestUrl);
 
 				auto GetAndCheckProtocol = [](const auto& json, CStringA& protocol) {
 					if (!getJsonValue(json, "protocol", protocol)
@@ -190,7 +214,7 @@ namespace YT_DLP
 				};
 
 				CStringA liveStatus;
-				getJsonValue(d, "live_status", liveStatus);
+				getJsonValue(doc, "live_status", liveStatus);
 				bool bIsLive = liveStatus == "is_live";
 
 				for (const auto& format : formats->GetArray()) {
@@ -316,17 +340,11 @@ namespace YT_DLP
 						if (!getJsonValue(format, "url", url)) {
 							continue;
 						}
-						CStringA vcodec;
-						if (!getJsonValue(format, "vcodec", vcodec) || vcodec != "none") {
-							if (!getJsonValue(format, "video_ext", vcodec) || vcodec == "none") {
-								continue;
-							}
+						if (IsVideoFormat(format)) {
+							continue;
 						}
-						CStringA acodec;
-						if (!getJsonValue(format, "acodec", acodec) || acodec == "none") {
-							if (!getJsonValue(format, "audio_ext", acodec) || acodec == "none") {
-								continue;
-							}
+						if (!FormatHasAudio(format)) {
+							continue;
 						}
 						CStringA format_id;
 						if (getJsonValue(format, "format_id", format_id) && EndsWith(format_id, "-drc")) {
@@ -357,11 +375,8 @@ namespace YT_DLP
 					if (!getJsonValue(format, "url", url)) {
 						continue;
 					}
-					CStringA vcodec;
-					if (!getJsonValue(format, "vcodec", vcodec) || vcodec != "none") {
-						if (!getJsonValue(format, "video_ext", vcodec) || vcodec == "none") {
-							continue;
-						}
+					if (IsVideoFormat(format)) {
+						continue;
 					}
 					CStringA acodec;
 					if (!getJsonValue(format, "acodec", acodec) || acodec == "none") {
@@ -565,22 +580,22 @@ namespace YT_DLP
 						}
 					}
 
-					if (getJsonValue(d, "title", y_fields.title)) {
+					if (getJsonValue(doc, "title", y_fields.title)) {
 						CStringA ext;
-						if (getJsonValue(d, "ext", ext)) {
+						if (getJsonValue(doc, "ext", ext)) {
 							y_fields.fname.Format(L"%s.%hs", y_fields.title.GetString(), ext.GetString());
 						}
 					}
 
-					getJsonValue(d, "uploader", y_fields.author);
+					getJsonValue(doc, "uploader", y_fields.author);
 
-					getJsonValue(d, "description", y_fields.content);
+					getJsonValue(doc, "description", y_fields.content);
 					if (y_fields.content.Find('\n') && y_fields.content.Find(L"\r\n") == -1) {
 						y_fields.content.Replace(L"\n", L"\r\n");
 					}
 
 					CStringA upload_date;
-					if (getJsonValue(d, "upload_date", upload_date)) {
+					if (getJsonValue(doc, "upload_date", upload_date)) {
 						WORD y, m, d;
 						if (sscanf_s(upload_date.GetString(), "%04hu%02hu%02hu", &y, &m, &d) == 3) {
 							y_fields.dtime.wYear = y;
@@ -638,7 +653,7 @@ namespace YT_DLP
 					}
 
 					// subtitles
-					if (auto requested_subtitles = GetJsonObject(d, "requested_subtitles")) {
+					if (auto requested_subtitles = GetJsonObject(doc, "requested_subtitles")) {
 						for (const auto& subtitle : requested_subtitles->GetObj()) {
 							CStringW sub_url;
 							CStringW sub_name;
@@ -653,7 +668,7 @@ namespace YT_DLP
 					}
 
 					// chapters
-					if (auto chapters = GetJsonArray(d, "chapters")) {
+					if (auto chapters = GetJsonArray(doc, "chapters")) {
 						for (const auto& chapter : chapters->GetArray()) {
 							float start_time = 0.0f;
 							CString title;
@@ -665,7 +680,7 @@ namespace YT_DLP
 
 					if (bIsYoutube && !youtubeAudioUrllist.empty()) {
 						// thumbnails
-						if (auto thumbnails = GetJsonArray(d, "thumbnails")) {
+						if (auto thumbnails = GetJsonArray(doc, "thumbnails")) {
 							CStringA thumbnailUrl;
 							int maxHeight = 0;
 							for (const auto& elem : thumbnails->GetArray()) {
