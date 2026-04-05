@@ -161,6 +161,11 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	OnCheckYDLEnable();
 
+	// TODO
+	m_cbVideoCodec.EnableWindow(FALSE);
+	m_chkHighFps.EnableWindow(FALSE);
+	m_cbAudioCodec.EnableWindow(FALSE);
+
 	UpdateData(FALSE);
 
 	return TRUE;

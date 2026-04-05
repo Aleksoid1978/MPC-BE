@@ -521,9 +521,7 @@ namespace YT_DLP
 						if (bVideoOnly && !bestAudioUrl.IsEmpty()) {
 							pOFD->auds.emplace_back(CStringW(bestAudioUrl));
 						}
-					} else if (bHighFps || bHighBitrate) {
-						int   normalVideoFps = 0;
-						int   hightVideoFps = 0;
+					} else if (bHighBitrate) {
 						float maxVideoTbr = 0.0f;
 
 						for (const auto& format : formats->GetArray()) {
@@ -539,20 +537,6 @@ namespace YT_DLP
 
 							int height = 0;
 							if (getJsonValue(format, "height", height) && height == vid_height) {
-								int fps = 0;
-								getJsonValue(format, "fps", fps);
-								if (fps > 30) {
-									if (fps > hightVideoFps) {
-										hightVideoFps = fps;
-									}
-									if (!bHighFps) {
-										continue;
-									}
-								}
-								else if (fps > normalVideoFps) {
-									normalVideoFps = fps;
-								}
-
 								bool bMaxTbr = false;
 								if (bHighBitrate) {
 									float tbr = .0f;
@@ -562,8 +546,6 @@ namespace YT_DLP
 									}
 									bMaxTbr = (tbr > 0 && tbr == maxVideoTbr);
 								}
-
-								bool ok = bHighFps && hightVideoFps;
 
 								if (bMaxTbr) {
 									CStringA acodec;
