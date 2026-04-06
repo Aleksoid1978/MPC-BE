@@ -610,7 +610,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
 10		"Tercih edilen ses biçimi:"
 12		"Tercih edilen ses parçası dili:"
 14		"Oynatma listesi yükle"
-16		"youtube-dl, yt-dlp"
+16		"yt-dlp"
 17		"Çalıştırılabilir dosya:"
 19		"Maksimum bit hızını seç"
 20		"AceStream adresi:"

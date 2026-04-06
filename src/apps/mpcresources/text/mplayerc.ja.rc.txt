@@ -610,7 +610,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
 10		"お好みの音声形式:"
 12		"お好みの音声トラック言語:"
 14		"プレイリストを読み込む"
-16		"youtube-dl, yt-dlp"
+16		"yt-dlp"
 17		"実行可能ファイル:"
 19		"Select max bitrate"
 20		"AceStream アドレス:"

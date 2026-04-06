@@ -610,7 +610,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
 10		"선호하는 오디오 형식 :"
 12		"선호하는 오디오 트랙 언어 :"
 14		"재생 목록 열기"
-16		"youtube-dl, yt-dlp"
+16		"yt-dlp"
 17		"실행 파일 :"
 19		"Select max bitrate"
 20		"AceStream 주소 :"

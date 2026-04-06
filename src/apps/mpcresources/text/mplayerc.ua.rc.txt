@@ -610,7 +610,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
 10		"Preferred audio format:"
 12		"Віддавати перевагу мові аудіодоріжки:"
 14		"Завантажити список відтворення"
-16		"youtube-dl, yt-dlp"
+16		"yt-dlp"
 17		"Виконуваний файл:"
 19		"Select max bitrate"
 20		"Адреса AceStream:"

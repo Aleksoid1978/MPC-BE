@@ -610,7 +610,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
 10		"Voorkeursaudioformaat:"
 12		"Voorkeurstaal audiospoor:"
 14		"Afspeellijst laden"
-16		"youtube-dl, yt-dlp"
+16		"yt-dlp"
 17		"Executable:"
 19		"Select max bitrate"
 20		"Adres AceStream:"

@@ -610,7 +610,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
 10		"Bevorzugtes Audioformat:"
 12		"Bevorzugte Sprache der Audiospur:"
 14		"Wiedergabeliste laden"
-16		"youtube-dl, yt-dlp"
+16		"yt-dlp"
 17		"Ausführungsdatei:"
 19		"Maximale Bitrate auswählen"
 20		"AceStream Adresse:"

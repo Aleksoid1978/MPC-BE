@@ -610,7 +610,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
 10		"Formatul audio preferat:"
 12		"Limba preferată pentru pistă:"
 14		"Încarcă lista de redare (playlist-ul)"
-16		"youtube-dl, yt-dlp"
+16		"yt-dlp"
 17		"Fișierul executabil:"
 19		"Selectează rata de biți maximă"
 20		"Adresa AceStream:"

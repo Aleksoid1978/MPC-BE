@@ -610,7 +610,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
 10		"Preferred audio format:"
 12		"Prednostni jezik zvočnega zapisa:"
 14		"Naloži seznam predvajanja"
-16		"youtube-dl, yt-dlp"
+16		"yt-dlp"
 17		"Izvršljiva datoteka:"
 19		"Select max bitrate"
 20		"AceStream naslov:"

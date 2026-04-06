@@ -141,7 +141,6 @@ BOOL CPPageYoutube::OnInitDialog()
 	LPCWSTR ydl_filenames[] = {
 			L"yt-dlp.exe",
 			L"yt-dlp_min.exe",
-			L"youtube-dl.exe"
 	};
 	for (auto& ydl_filename : ydl_filenames) {
 		m_cbYDLExePath.AddString(ydl_filename);

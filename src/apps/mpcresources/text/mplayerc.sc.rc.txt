@@ -610,7 +610,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
 10		"首选音频格式:"
 12		"首选音轨语言:"
 14		"加载播放列表"
-16		"youtube-dl, yt-dlp"
+16		"yt-dlp"
 17		"可执行的文件:"
 19		"Select max bitrate"
 20		"AceStream 链接:"
