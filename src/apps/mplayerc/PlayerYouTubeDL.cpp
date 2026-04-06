@@ -31,59 +31,8 @@ namespace YT_DLP
 {
 	std::vector<std::unique_ptr<Youtube::YoutubeProfile>> YoutubeProfiles;
 
-	static bool IsVideoFormat(const rapidjson::Value& format)
+	static bool RunYtDlp(const CStringW& ydl_path, const CStringW& url, CStringA& buf_out)
 	{
-		CStringA value_str;
-		if (getJsonValue(format, "vcodec", value_str) && value_str != "none") {
-			return true;
-		}
-		if (getJsonValue(format, "video_ext", value_str) && value_str != "none") {
-			return true;
-		}
-		return false;
-	}
-
-	static bool FormatHasAudio(const rapidjson::Value& format)
-	{
-		CStringA value_str;
-		if (getJsonValue(format, "acodec", value_str) && value_str != "none") {
-			return true;
-		}
-		if (getJsonValue(format, "audio_ext", value_str) && value_str == "none") {
-			return true;
-		}
-		return false;
-	}
-
-	bool Parse_URL(
-		const CStringW& url,        // input parameter
-		Youtube::YoutubeFields& y_fields,
-		Youtube::YoutubeUrllist& youtubeUrllist,
-		Youtube::YoutubeUrllist& youtubeAudioUrllist,
-		OpenFileData* pOFD
-	)
-	{
-		y_fields.Empty();
-		YoutubeProfiles.clear();
-		pOFD->Clear();
-
-		// get a copy of the settings
-
-		CAppSettings& s = AfxGetAppSettings();
-
-		const CStringW ydl_path = GetFullExePath(s.strYdlExePath, true);
-		if (ydl_path.IsEmpty()) {
-			return false;
-		}
-		const CStringW ydl_fname = GetFileName(ydl_path);
-
-		const int  iMaxHeight   = s.iYdlMaxHeight;
-		const bool bHighFps     = s.bYdlHighFps;
-		const bool bHighBitrate = s.bYdlHighBitrate;
-		CStringA lang(s.strYdlAudioLang);
-
-		// run yt-dlp.exe
-
 		HANDLE hStdout_r, hStdout_w;
 		HANDLE hStderr_r, hStderr_w;
 
@@ -123,7 +72,6 @@ namespace YT_DLP
 			return false;
 		}
 
-		CStringA buf_out;
 		CStringA buf_err;
 
 		std::thread stdout_thread;
@@ -174,11 +122,70 @@ namespace YT_DLP
 
 		if (exitcode) {
 			if (buf_err.Find("Unsupported URL:") == -1) {
+				const CStringW ydl_fname = GetFileName(ydl_path);
 				MessageBoxW(AfxGetApp()->GetMainWnd()->m_hWnd, CStringW(buf_err), ydl_fname, MB_ICONERROR | MB_OK);
 			}
 			return false;
 		}
-		if (buf_out.IsEmpty()) {
+
+		return true;
+	}
+
+	static bool IsVideoFormat(const rapidjson::Value& format)
+	{
+		CStringA value_str;
+		if (getJsonValue(format, "vcodec", value_str) && value_str != "none") {
+			return true;
+		}
+		if (getJsonValue(format, "video_ext", value_str) && value_str != "none") {
+			return true;
+		}
+		return false;
+	}
+
+	static bool FormatHasAudio(const rapidjson::Value& format)
+	{
+		CStringA value_str;
+		if (getJsonValue(format, "acodec", value_str) && value_str != "none") {
+			return true;
+		}
+		if (getJsonValue(format, "audio_ext", value_str) && value_str == "none") {
+			return true;
+		}
+		return false;
+	}
+
+	bool Parse_URL(
+		const CStringW& url,        // input parameter
+		Youtube::YoutubeFields& y_fields,
+		Youtube::YoutubeUrllist& youtubeUrllist,
+		Youtube::YoutubeUrllist& youtubeAudioUrllist,
+		OpenFileData* pOFD
+	)
+	{
+		y_fields.Empty();
+		YoutubeProfiles.clear();
+		pOFD->Clear();
+
+		// get a copy of the settings
+
+		CAppSettings& s = AfxGetAppSettings();
+
+		const CStringW ydl_path = GetFullExePath(s.strYdlExePath, true);
+		if (ydl_path.IsEmpty()) {
+			return false;
+		}
+
+		const int  iMaxHeight   = s.iYdlMaxHeight;
+		const bool bHighFps     = s.bYdlHighFps;
+		const bool bHighBitrate = s.bYdlHighBitrate;
+		CStringA lang(s.strYdlAudioLang);
+
+		// run yt-dlp.exe
+
+		CStringA buf_out;
+		bool ok = RunYtDlp(ydl_path, url, buf_out);
+		if (!ok || buf_out.IsEmpty()) {
 			return false;
 		}
 
