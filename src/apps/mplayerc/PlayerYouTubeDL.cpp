@@ -56,12 +56,7 @@ namespace YT_DLP
 	}
 
 	bool Parse_URL(
-		const CStringW& ydlExePath, // input parameter
 		const CStringW& url,        // input parameter
-		const int  iMaxHeight,      // input parameter
-		const bool bHighFps,        // input parameter
-		const bool bHighBitrate,    // input parameter
-		CStringA lang,              // input parameter
 		Youtube::YoutubeFields& y_fields,
 		Youtube::YoutubeUrllist& youtubeUrllist,
 		Youtube::YoutubeUrllist& youtubeAudioUrllist,
@@ -72,12 +67,22 @@ namespace YT_DLP
 		YoutubeProfiles.clear();
 		pOFD->Clear();
 
-		const CStringW ydl_path = GetFullExePath(ydlExePath, true);
-		const CStringW ydl_fname = GetFileName(ydlExePath);
+		// get a copy of the settings
 
+		CAppSettings& s = AfxGetAppSettings();
+
+		const CStringW ydl_path = GetFullExePath(s.strYdlExePath, true);
 		if (ydl_path.IsEmpty()) {
 			return false;
 		}
+		const CStringW ydl_fname = GetFileName(ydl_path);
+
+		const int  iMaxHeight   = s.iYdlMaxHeight;
+		const bool bHighFps     = s.bYdlHighFps;
+		const bool bHighBitrate = s.bYdlHighBitrate;
+		CStringA lang(s.strYdlAudioLang);
+
+		// run yt-dlp.exe
 
 		HANDLE hStdout_r, hStdout_w;
 		HANDLE hStderr_r, hStderr_w;
@@ -176,6 +181,8 @@ namespace YT_DLP
 		if (buf_out.IsEmpty()) {
 			return false;
 		}
+
+		// processing a JSON file
 
 		rapidjson::Document doc;
 		const int k = buf_out.Find("\n{\"", 64); // check presence of second JSON root element and ignore it

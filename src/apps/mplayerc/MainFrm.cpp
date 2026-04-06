@@ -12412,12 +12412,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 					OpenFileData OFD;
 					ok = YT_DLP::Parse_URL(
-						s.strYdlExePath,
 						url,
-						s.iYdlMaxHeight,
-						s.bYdlHighFps,
-						s.bYdlHighBitrate,
-						CStringA(s.strYdlAudioLang),
 						m_youtubeFields,
 						m_youtubeUrllist,
 						m_youtubeAudioUrllist,

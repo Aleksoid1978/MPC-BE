@@ -44,11 +44,6 @@ namespace YT_DLP
 
 	bool Parse_URL(
 		const CStringW& url,        // input parameter
-		const CStringW& ydlExePath, // input parameter
-		const int  iMaxHeight,      // input parameter
-		const bool bHighFps,        // input parameter
-		const bool bHighBitrate,    // input parameter
-		CStringA lang,              // input parameter
 		Youtube::YoutubeFields& y_fields,
 		Youtube::YoutubeUrllist& youtubeUrllist,
 		Youtube::YoutubeUrllist& youtubeAudioUrllist,
