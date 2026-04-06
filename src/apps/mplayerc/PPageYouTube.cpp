@@ -69,6 +69,7 @@ BOOL CPPageYoutube::OnInitDialog()
 	__super::OnInitDialog();
 
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
+	m_chkYDLEnable.SetWindowTextW(L"yt-dlp. IN DEVELOPMENT, use MPC-BE 1.8.9.136 or older"); // TODO
 	CorrectCWndWidth(&m_chkYDLEnable);
 
 	const CAppSettings& s = AfxGetAppSettings();
