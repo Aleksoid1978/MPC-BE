@@ -193,186 +193,154 @@ namespace YT_DLP
 
 		rapidjson::Document doc;
 		const int k = buf_out.Find("\n{\"", 64); // check presence of second JSON root element and ignore it
-		if (!doc.Parse(buf_out.GetString(), k > 0 ? k : buf_out.GetLength()).HasParseError()) {
-			bool bIsYoutube = Youtube::CheckURL(url);
-			int iTag = 1;
+		if (doc.Parse(buf_out.GetString(), k > 0 ? k : buf_out.GetLength()).HasParseError()) {
+			return false;
+		}
 
-			if (auto formats = GetJsonArray(doc, "formats")) {
-				int vid_height = 0;
-				bool bVideoOnly = false;
+		bool bIsYoutube = Youtube::CheckURL(url);
+		int iTag = 1;
 
-				float aud_bitrate = 0.0f;
-				CStringA bestAudioUrl;
-				struct audio_info_t {
-					float tbr = 0;
-					CStringA url;
-				};
-				std::map<CStringA, audio_info_t> audioUrls;
+		if (auto formats = GetJsonArray(doc, "formats")) {
+			int vid_height = 0;
+			bool bVideoOnly = false;
 
-				CStringA bestUrl;
-				getJsonValue(doc, "url", bestUrl);
+			float aud_bitrate = 0.0f;
+			CStringA bestAudioUrl;
+			struct audio_info_t {
+				float tbr = 0;
+				CStringA url;
+			};
+			std::map<CStringA, audio_info_t> audioUrls;
 
-				auto GetAndCheckProtocol = [](const auto& json, CStringA& protocol) {
-					if (!getJsonValue(json, "protocol", protocol)
-							|| (!StartsWith(protocol, "http") && !EndsWith(protocol, "m3u8") && !EndsWith(protocol, "m3u8_native"))) {
-						return false;
-					}
+			CStringA bestUrl;
+			getJsonValue(doc, "url", bestUrl);
 
-					return true;
-				};
+			auto GetAndCheckProtocol = [](const auto& json, CStringA& protocol) {
+				if (!getJsonValue(json, "protocol", protocol)
+						|| (!StartsWith(protocol, "http") && !EndsWith(protocol, "m3u8") && !EndsWith(protocol, "m3u8_native"))) {
+					return false;
+				}
 
-				CStringA liveStatus;
-				getJsonValue(doc, "live_status", liveStatus);
-				bool bIsLive = liveStatus == "is_live";
+				return true;
+			};
 
-				for (const auto& format : formats->GetArray()) {
-					CStringA protocol;
-					if (!GetAndCheckProtocol(format, protocol)) {
+			CStringA liveStatus;
+			getJsonValue(doc, "live_status", liveStatus);
+			bool bIsLive = liveStatus == "is_live";
+
+			for (const auto& format : formats->GetArray()) {
+				CStringA protocol;
+				if (!GetAndCheckProtocol(format, protocol)) {
+					continue;
+				}
+				CStringA url;
+				if (!getJsonValue(format, "url", url)) {
+					continue;
+				}
+				CStringA vcodec;
+				if (!getJsonValue(format, "vcodec", vcodec) || vcodec == "none") {
+					CStringA video_ext;
+					if (!getJsonValue(format, "video_ext", video_ext) || video_ext == "none") {
 						continue;
 					}
-					CStringA url;
-					if (!getJsonValue(format, "url", url)) {
-						continue;
-					}
-					CStringA vcodec;
-					if (!getJsonValue(format, "vcodec", vcodec) || vcodec == "none") {
-						CStringA video_ext;
-						if (!getJsonValue(format, "video_ext", video_ext) || video_ext == "none") {
-							continue;
-						}
-					}
+				}
 
-					int height = 0;
-					if (getJsonValue(format, "height", height)) {
-						CStringA acodec;
-						getJsonValue(format, "acodec", acodec);
+				int height = 0;
+				if (getJsonValue(format, "height", height)) {
+					CStringA acodec;
+					getJsonValue(format, "acodec", acodec);
 
-						Youtube::YoutubeUrllistItem item = {};
-						item.url = url;
+					Youtube::YoutubeUrllistItem item = {};
+					item.url = url;
 
-						CStringA format_id = {};
-						int itag = {};
-						if (bIsYoutube && getJsonValue(format, "format_id", format_id) && StrToInt32(format_id.GetString(), itag)) {
-							if (auto profile = Youtube::GetProfile(itag)) {
-								item.profile = profile;
-							}
-						}
-
-						CString ext;
-						getJsonValue(format, "ext", ext);
-						CString fmt;
-						getJsonValue(format, "format", fmt);
-
-						if (!item.profile) {
-							auto profilePtr = std::make_unique<Youtube::YoutubeProfile>();
-							auto profile = profilePtr.get();
-							YoutubeProfiles.emplace_back(std::move(profilePtr));
-
-							profile->format = Youtube::yformat::y_mp4_other;
-							if (EndsWith(protocol, "m3u8") || EndsWith(protocol, "m3u8_native")) {
-								/*
-								if (bIsLive && acodec == "none") {
-									continue;
-								}
-								*/
-								profile->format = Youtube::yformat::y_stream;
-							} else if (ext == L"mp4") {
-								if (StartsWith(vcodec, "avc1")) {
-									profile->format = Youtube::yformat::y_mp4_avc;
-								} else if (StartsWith(vcodec, "av01")) {
-									profile->format = Youtube::yformat::y_mp4_av1;
-								} else {
-									profile->format = Youtube::yformat::y_mp4_other;
-								}
-							} else if (ext == L"webm") {
-								profile->format = Youtube::yformat::y_webm_vp9;
-							}
-							profile->type = acodec == "none" ? Youtube::ytype::y_video : Youtube::ytype::y_media;
-							profile->ext = ext;
-							profile->quality = height;
-							profile->iTag = iTag++;
-
+					CStringA format_id = {};
+					int itag = {};
+					if (bIsYoutube && getJsonValue(format, "format_id", format_id) && StrToInt32(format_id.GetString(), itag)) {
+						if (auto profile = Youtube::GetProfile(itag)) {
 							item.profile = profile;
 						}
+					}
 
-						if (!ext.IsEmpty()) {
-							item.title = ext.MakeUpper();
-							if (!vcodec.IsEmpty()) {
-								item.title.AppendFormat(L"(%hs)", vcodec.GetString());
+					CString ext;
+					getJsonValue(format, "ext", ext);
+					CString fmt;
+					getJsonValue(format, "format", fmt);
+
+					if (!item.profile) {
+						auto profilePtr = std::make_unique<Youtube::YoutubeProfile>();
+						auto profile = profilePtr.get();
+						YoutubeProfiles.emplace_back(std::move(profilePtr));
+
+						profile->format = Youtube::yformat::y_mp4_other;
+						if (EndsWith(protocol, "m3u8") || EndsWith(protocol, "m3u8_native")) {
+							/*
+							if (bIsLive && acodec == "none") {
+								continue;
 							}
-						}
-						if (!fmt.IsEmpty()) {
-							if (item.title.IsEmpty()) {
-								item.title = fmt;
+							*/
+							profile->format = Youtube::yformat::y_stream;
+						} else if (ext == L"mp4") {
+							if (StartsWith(vcodec, "avc1")) {
+								profile->format = Youtube::yformat::y_mp4_avc;
+							} else if (StartsWith(vcodec, "av01")) {
+								profile->format = Youtube::yformat::y_mp4_av1;
 							} else {
-								item.title.AppendFormat(L" - %s", fmt.GetString());
+								profile->format = Youtube::yformat::y_mp4_other;
 							}
+						} else if (ext == L"webm") {
+							profile->format = Youtube::yformat::y_webm_vp9;
 						}
+						profile->type = acodec == "none" ? Youtube::ytype::y_video : Youtube::ytype::y_media;
+						profile->ext = ext;
+						profile->quality = height;
+						profile->iTag = iTag++;
 
-						youtubeUrllist.emplace_back(item);
+						item.profile = profile;
+					}
 
-						if (height > iMaxHeight) {
-							continue;
+					if (!ext.IsEmpty()) {
+						item.title = ext.MakeUpper();
+						if (!vcodec.IsEmpty()) {
+							item.title.AppendFormat(L"(%hs)", vcodec.GetString());
 						}
-						if ((height > vid_height)
-								|| (height == vid_height && StartsWith(protocol, "http"))) {
-							vid_height = height;
-							bestUrl = url;
-							bVideoOnly = false;
-
-							if (acodec == "none") {
-								bVideoOnly = true;
-							}
+					}
+					if (!fmt.IsEmpty()) {
+						if (item.title.IsEmpty()) {
+							item.title = fmt;
+						} else {
+							item.title.AppendFormat(L" - %s", fmt.GetString());
 						}
+					}
 
-						if (y_fields.userAgent.IsEmpty()) {
-							if (auto http_headers = GetJsonObject(format, "http_headers")) {
-								getJsonValue(*http_headers, "User-Agent", y_fields.userAgent);
-							}
+					youtubeUrllist.emplace_back(item);
+
+					if (height > iMaxHeight) {
+						continue;
+					}
+					if ((height > vid_height)
+							|| (height == vid_height && StartsWith(protocol, "http"))) {
+						vid_height = height;
+						bestUrl = url;
+						bVideoOnly = false;
+
+						if (acodec == "none") {
+							bVideoOnly = true;
+						}
+					}
+
+					if (y_fields.userAgent.IsEmpty()) {
+						if (auto http_headers = GetJsonObject(format, "http_headers")) {
+							getJsonValue(*http_headers, "User-Agent", y_fields.userAgent);
 						}
 					}
 				}
+			}
 
-				// Find default/preference audio language.
-				// yt-dlp can mark several languages as preferred, we choose the one with the highest "language_preference".
-				CStringA defaultLanguage = lang;
-				if (bIsYoutube) {
-					int defaultLanguagePreference = -1;
-
-					for (const auto& format : formats->GetArray()) {
-						CStringA protocol;
-						if (!GetAndCheckProtocol(format, protocol)) {
-							continue;
-						}
-						CStringA url;
-						if (!getJsonValue(format, "url", url)) {
-							continue;
-						}
-						if (IsVideoFormat(format)) {
-							continue;
-						}
-						if (!FormatHasAudio(format)) {
-							continue;
-						}
-						CStringA format_id;
-						if (getJsonValue(format, "format_id", format_id) && EndsWith(format_id, "-drc")) {
-							continue;
-						}
-
-						CStringA language;
-						if (getJsonValue(format, "language", language)) {
-							int language_preference = 0;
-							if (getJsonValue(format, "language_preference", language_preference)
-									&& language_preference > 0
-									&& language_preference > defaultLanguagePreference) {
-								defaultLanguage = language;
-								defaultLanguagePreference = language_preference;
-							}
-						}
-					}
-				}
-
-				std::map<CStringA, Youtube::YoutubeUrllist> youtubeAudioUrllistWithLanguages;
+			// Find default/preference audio language.
+			// yt-dlp can mark several languages as preferred, we choose the one with the highest "language_preference".
+			CStringA defaultLanguage = lang;
+			if (bIsYoutube) {
+				int defaultLanguagePreference = -1;
 
 				for (const auto& format : formats->GetArray()) {
 					CStringA protocol;
@@ -386,305 +354,339 @@ namespace YT_DLP
 					if (IsVideoFormat(format)) {
 						continue;
 					}
-					CStringA acodec;
-					if (!getJsonValue(format, "acodec", acodec) || acodec == "none") {
-						if (!getJsonValue(format, "audio_ext", acodec) || acodec == "none") {
-							continue;
-						}
+					if (!FormatHasAudio(format)) {
+						continue;
 					}
 					CStringA format_id;
 					if (getJsonValue(format, "format_id", format_id) && EndsWith(format_id, "-drc")) {
 						continue;
 					}
 
-					CString ext;
-					getJsonValue(format, "ext", ext);
-					CString fmt;
-					getJsonValue(format, "format", fmt);
-					float tbr = -1.f;
-					getJsonValue(format, "tbr", tbr);
+					CStringA language;
+					if (getJsonValue(format, "language", language)) {
+						int language_preference = 0;
+						if (getJsonValue(format, "language_preference", language_preference)
+								&& language_preference > 0
+								&& language_preference > defaultLanguagePreference) {
+							defaultLanguage = language;
+							defaultLanguagePreference = language_preference;
+						}
+					}
+				}
+			}
 
-					int itag = {};
-					if (bIsYoutube && !format_id.IsEmpty() && StrToInt32(format_id.GetString(), itag)) {
-						if (auto audioprofile = Youtube::GetAudioProfile(itag)) {
-							Youtube::YoutubeUrllistItem item;
-							item.profile = audioprofile;
-							item.url = url;
+			std::map<CStringA, Youtube::YoutubeUrllist> youtubeAudioUrllistWithLanguages;
 
-							if (!ext.IsEmpty()) {
-								item.title = ext.MakeUpper();
-								if (!acodec.IsEmpty()) {
-									item.title.AppendFormat(L"(%hs)", acodec.GetString());
-								}
-							}
-							if (!fmt.IsEmpty()) {
-								if (item.title.IsEmpty()) {
-									item.title = fmt;
-								} else {
-									item.title.AppendFormat(L" - %s", fmt.GetString());
-								}
-							}
+			for (const auto& format : formats->GetArray()) {
+				CStringA protocol;
+				if (!GetAndCheckProtocol(format, protocol)) {
+					continue;
+				}
+				CStringA url;
+				if (!getJsonValue(format, "url", url)) {
+					continue;
+				}
+				if (IsVideoFormat(format)) {
+					continue;
+				}
+				CStringA acodec;
+				if (!getJsonValue(format, "acodec", acodec) || acodec == "none") {
+					if (!getJsonValue(format, "audio_ext", acodec) || acodec == "none") {
+						continue;
+					}
+				}
+				CStringA format_id;
+				if (getJsonValue(format, "format_id", format_id) && EndsWith(format_id, "-drc")) {
+					continue;
+				}
 
-							if (tbr > 0.f) {
-								item.title.AppendFormat(L" %dkbit/s", lround(tbr));
-							} else {
-								item.title.AppendFormat(L" %dkbit/s", audioprofile->quality);
-							}
+				CString ext;
+				getJsonValue(format, "ext", ext);
+				CString fmt;
+				getJsonValue(format, "format", fmt);
+				float tbr = -1.f;
+				getJsonValue(format, "tbr", tbr);
 
-							CStringA language;
-							if (getJsonValue(format, "language", language)) {
-								youtubeAudioUrllistWithLanguages[language].emplace_back(item);
-							} else {
-								youtubeAudioUrllist.emplace_back(item);
+				int itag = {};
+				if (bIsYoutube && !format_id.IsEmpty() && StrToInt32(format_id.GetString(), itag)) {
+					if (auto audioprofile = Youtube::GetAudioProfile(itag)) {
+						Youtube::YoutubeUrllistItem item;
+						item.profile = audioprofile;
+						item.url = url;
+
+						if (!ext.IsEmpty()) {
+							item.title = ext.MakeUpper();
+							if (!acodec.IsEmpty()) {
+								item.title.AppendFormat(L"(%hs)", acodec.GetString());
 							}
 						}
-					} else {
-						if (tbr > 0.f) {
-							if (aud_bitrate == 0.0f
-									|| (vid_height > 360 && tbr > aud_bitrate)
-									|| (vid_height <= 360 && tbr < aud_bitrate)
-									|| (tbr == aud_bitrate && StartsWith(protocol, "http"))) {
-								aud_bitrate = tbr;
-								bestAudioUrl = url;
+						if (!fmt.IsEmpty()) {
+							if (item.title.IsEmpty()) {
+								item.title = fmt;
+							} else {
+								item.title.AppendFormat(L" - %s", fmt.GetString());
 							}
-						} else if (bestAudioUrl.IsEmpty()) {
-							bestAudioUrl = url;
+						}
+
+						if (tbr > 0.f) {
+							item.title.AppendFormat(L" %dkbit/s", lround(tbr));
+						} else {
+							item.title.AppendFormat(L" %dkbit/s", audioprofile->quality);
 						}
 
 						CStringA language;
 						if (getJsonValue(format, "language", language)) {
-							const auto it = audioUrls.find(language);
-							if (it == audioUrls.cend() || tbr > (*it).second.tbr) {
-								audioUrls[language] = { tbr, url };
-								if (bIsYoutube) {
-									int language_preference = 0;
-									if (getJsonValue(format, "language_preference", language_preference) && language_preference > 0) {
-										audioUrls[CStringA(Youtube::kDefaultAudioLanguage)] = { tbr, url };
-									}
+							youtubeAudioUrllistWithLanguages[language].emplace_back(item);
+						} else {
+							youtubeAudioUrllist.emplace_back(item);
+						}
+					}
+				} else {
+					if (tbr > 0.f) {
+						if (aud_bitrate == 0.0f
+								|| (vid_height > 360 && tbr > aud_bitrate)
+								|| (vid_height <= 360 && tbr < aud_bitrate)
+								|| (tbr == aud_bitrate && StartsWith(protocol, "http"))) {
+							aud_bitrate = tbr;
+							bestAudioUrl = url;
+						}
+					} else if (bestAudioUrl.IsEmpty()) {
+						bestAudioUrl = url;
+					}
+
+					CStringA language;
+					if (getJsonValue(format, "language", language)) {
+						const auto it = audioUrls.find(language);
+						if (it == audioUrls.cend() || tbr > (*it).second.tbr) {
+							audioUrls[language] = { tbr, url };
+							if (bIsYoutube) {
+								int language_preference = 0;
+								if (getJsonValue(format, "language_preference", language_preference) && language_preference > 0) {
+									audioUrls[CStringA(Youtube::kDefaultAudioLanguage)] = { tbr, url };
 								}
 							}
 						}
 					}
 				}
+			}
 
-				if (!bestUrl.IsEmpty()) {
-					if (bIsYoutube) {
-						if (!youtubeAudioUrllistWithLanguages.empty()) {
-							if (lang == Youtube::kDefaultAudioLanguage) {
-								lang = defaultLanguage;
-							}
+			if (!bestUrl.IsEmpty()) {
+				if (bIsYoutube) {
+					if (!youtubeAudioUrllistWithLanguages.empty()) {
+						if (lang == Youtube::kDefaultAudioLanguage) {
+							lang = defaultLanguage;
+						}
 
-							auto it = youtubeAudioUrllistWithLanguages.find(lang);
+						auto it = youtubeAudioUrllistWithLanguages.find(lang);
+						if (it == youtubeAudioUrllistWithLanguages.end()) {
+							lang.AppendChar('-');
+							it = std::find_if(youtubeAudioUrllistWithLanguages.begin(), youtubeAudioUrllistWithLanguages.end(), [&lang](const auto& pair) {
+								return StartsWith(pair.first, lang);
+							});
 							if (it == youtubeAudioUrllistWithLanguages.end()) {
-								lang.AppendChar('-');
-								it = std::find_if(youtubeAudioUrllistWithLanguages.begin(), youtubeAudioUrllistWithLanguages.end(), [&lang](const auto& pair) {
-									return StartsWith(pair.first, lang);
-								});
+								if (lang != defaultLanguage) {
+									it = youtubeAudioUrllistWithLanguages.find(defaultLanguage);
+								}
+
 								if (it == youtubeAudioUrllistWithLanguages.end()) {
-									if (lang != defaultLanguage) {
-										it = youtubeAudioUrllistWithLanguages.find(defaultLanguage);
-									}
-
+									it = std::find_if(youtubeAudioUrllistWithLanguages.begin(), youtubeAudioUrllistWithLanguages.end(), [](const auto& pair) {
+										return pair.first == "en-US" || pair.first == "en";
+									});
 									if (it == youtubeAudioUrllistWithLanguages.end()) {
-										it = std::find_if(youtubeAudioUrllistWithLanguages.begin(), youtubeAudioUrllistWithLanguages.end(), [](const auto& pair) {
-											return pair.first == "en-US" || pair.first == "en";
-										});
-										if (it == youtubeAudioUrllistWithLanguages.end()) {
-											it = youtubeAudioUrllistWithLanguages.begin();
-										}
+										it = youtubeAudioUrllistWithLanguages.begin();
 									}
 								}
 							}
-
-							for (const auto& item : it->second) {
-								youtubeAudioUrllist.emplace_back(item);
-							}
 						}
 
-						// For YouTube, we will select the quality/codec depending on the settings of the built-in parser.
-						std::sort(youtubeUrllist.begin(), youtubeUrllist.end(), Youtube::CompareUrllistItem);
-						std::sort(youtubeAudioUrllist.begin(), youtubeAudioUrllist.end(), Youtube::CompareUrllistItem);
-
-						if (auto final_item = Youtube::SelectVideoStream(youtubeUrllist)) {
-							bestUrl = final_item->url;
-							bVideoOnly = final_item->profile->type == Youtube::y_video;
-						}
-						if (auto final_item = Youtube::SelectAudioStream(youtubeAudioUrllist)) {
-							bestAudioUrl = final_item->url;
-						}
-
-						for (const auto& item : youtubeAudioUrllist) {
-							switch (item.profile->format) {
-								case Youtube::y_mp4_aac:
-								case Youtube::y_webm_opus:
-								case Youtube::y_mp4_ac3:
-								case Youtube::y_mp4_eac3:
-								case Youtube::y_mp4_dtse:
-									youtubeUrllist.emplace_back(item);
-									break;
-							}
-						}
-
-						pOFD->fi = CStringW(bestUrl);
-						if (bVideoOnly && !bestAudioUrl.IsEmpty()) {
-							pOFD->auds.emplace_back(CStringW(bestAudioUrl));
-						}
-					} else if (bHighBitrate) {
-						float maxVideoTbr = 0.0f;
-
-						for (const auto& format : formats->GetArray()) {
-							CStringA protocol;
-							if (!GetAndCheckProtocol(format, protocol)) {
-								continue;
-							}
-
-							CStringA url;
-							if (!getJsonValue(format, "url", url)) {
-								continue;
-							}
-
-							int height = 0;
-							if (getJsonValue(format, "height", height) && height == vid_height) {
-								bool bMaxTbr = false;
-								if (bHighBitrate) {
-									float tbr = .0f;
-									getJsonValue(format, "tbr", tbr);
-									if (tbr > maxVideoTbr) {
-										maxVideoTbr = tbr;
-									}
-									bMaxTbr = (tbr > 0 && tbr == maxVideoTbr);
-								}
-
-								if (bMaxTbr) {
-									CStringA acodec;
-									getJsonValue(format, "acodec", acodec);
-
-									if (bIsLive && acodec == "none" && (EndsWith(protocol, "m3u8") || EndsWith(protocol, "m3u8_native"))) {
-										continue;
-									}
-
-									bVideoOnly = acodec == "none";
-									bestUrl = url;
-								}
-							}
-						}
-					}
-
-					if (getJsonValue(doc, "title", y_fields.title)) {
-						CStringA ext;
-						if (getJsonValue(doc, "ext", ext)) {
-							y_fields.fname.Format(L"%s.%hs", y_fields.title.GetString(), ext.GetString());
-						}
-					}
-
-					getJsonValue(doc, "uploader", y_fields.author);
-
-					getJsonValue(doc, "description", y_fields.content);
-					if (y_fields.content.Find('\n') && y_fields.content.Find(L"\r\n") == -1) {
-						y_fields.content.Replace(L"\n", L"\r\n");
-					}
-
-					CStringA upload_date;
-					if (getJsonValue(doc, "upload_date", upload_date)) {
-						WORD y, m, d;
-						if (sscanf_s(upload_date.GetString(), "%04hu%02hu%02hu", &y, &m, &d) == 3) {
-							y_fields.dtime.wYear = y;
-							y_fields.dtime.wMonth = m;
-							y_fields.dtime.wDay = d;
-						}
-					}
-
-					if (!bIsYoutube) {
-						pOFD->fi = CStringW(bestUrl);
-						if (bVideoOnly) {
-							if (audioUrls.size() > 1) {
-								auto select = audioUrls.begin();
-
-								if (auto it = audioUrls.find(lang); it != audioUrls.end()) {
-									select = it;
-								} else if (auto it = audioUrls.find("en"); it != audioUrls.end()) {
-									select = it;
-								}
-
-								pOFD->auds.emplace_back(CStringW(select->second.url), CStringW(select->first), select->first);
-							} else if (bestAudioUrl.GetLength()) {
-								pOFD->auds.emplace_back(CStringW(bestAudioUrl));
-							}
-						}
-
-						if (!bestAudioUrl.IsEmpty()) {
-							auto profilePtr = std::make_unique<Youtube::YoutubeProfile>();
-							auto profile = profilePtr.get();
-							YoutubeProfiles.emplace_back(std::move(profilePtr));
-
-							profile->type = Youtube::ytype::y_audio;
-
-							Youtube::YoutubeUrllistItem item;
-							item.profile = profile;
-							item.url = CString(bestAudioUrl);
+						for (const auto& item : it->second) {
 							youtubeAudioUrllist.emplace_back(item);
 						}
+					}
 
-						if (!youtubeUrllist.empty()) {
-							std::sort(youtubeUrllist.begin(), youtubeUrllist.end(), [](const Youtube::YoutubeUrllistItem& a, const Youtube::YoutubeUrllistItem& b) {
-								if (a.profile->format != b.profile->format) {
-									return (a.profile->format < b.profile->format);
-								}
-								if (a.profile->ext != b.profile->ext) {
-									return (a.profile->ext < b.profile->ext);
-								}
-								if (a.profile->quality != b.profile->quality) {
-									return (a.profile->quality > b.profile->quality);
-								}
+					// For YouTube, we will select the quality/codec depending on the settings of the built-in parser.
+					std::sort(youtubeUrllist.begin(), youtubeUrllist.end(), Youtube::CompareUrllistItem);
+					std::sort(youtubeAudioUrllist.begin(), youtubeAudioUrllist.end(), Youtube::CompareUrllistItem);
 
-								return false;
-							});
+					if (auto final_item = Youtube::SelectVideoStream(youtubeUrllist)) {
+						bestUrl = final_item->url;
+						bVideoOnly = final_item->profile->type == Youtube::y_video;
+					}
+					if (auto final_item = Youtube::SelectAudioStream(youtubeAudioUrllist)) {
+						bestAudioUrl = final_item->url;
+					}
+
+					for (const auto& item : youtubeAudioUrllist) {
+						switch (item.profile->format) {
+							case Youtube::y_mp4_aac:
+							case Youtube::y_webm_opus:
+							case Youtube::y_mp4_ac3:
+							case Youtube::y_mp4_eac3:
+							case Youtube::y_mp4_dtse:
+								youtubeUrllist.emplace_back(item);
+								break;
 						}
 					}
 
-					// subtitles
-					if (auto requested_subtitles = GetJsonObject(doc, "requested_subtitles")) {
-						for (const auto& subtitle : requested_subtitles->GetObj()) {
-							CStringW sub_url;
-							CStringW sub_name;
-							getJsonValue(subtitle.value, "url", sub_url);
-							getJsonValue(subtitle.value, "name", sub_name);
-							CStringA sub_lang = subtitle.name.GetString();
+					pOFD->fi = CStringW(bestUrl);
+					if (bVideoOnly && !bestAudioUrl.IsEmpty()) {
+						pOFD->auds.emplace_back(CStringW(bestAudioUrl));
+					}
+				} else if (bHighBitrate) {
+					float maxVideoTbr = 0.0f;
 
-							if (sub_url.GetLength() && sub_lang.GetLength()) {
-								pOFD->subs.emplace_back(sub_url, sub_name, sub_lang);
+					for (const auto& format : formats->GetArray()) {
+						CStringA protocol;
+						if (!GetAndCheckProtocol(format, protocol)) {
+							continue;
+						}
+
+						CStringA url;
+						if (!getJsonValue(format, "url", url)) {
+							continue;
+						}
+
+						int height = 0;
+						if (getJsonValue(format, "height", height) && height == vid_height) {
+							bool bMaxTbr = false;
+							if (bHighBitrate) {
+								float tbr = .0f;
+								getJsonValue(format, "tbr", tbr);
+								if (tbr > maxVideoTbr) {
+									maxVideoTbr = tbr;
+								}
+								bMaxTbr = (tbr > 0 && tbr == maxVideoTbr);
+							}
+
+							if (bMaxTbr) {
+								CStringA acodec;
+								getJsonValue(format, "acodec", acodec);
+
+								if (bIsLive && acodec == "none" && (EndsWith(protocol, "m3u8") || EndsWith(protocol, "m3u8_native"))) {
+									continue;
+								}
+
+								bVideoOnly = acodec == "none";
+								bestUrl = url;
 							}
 						}
 					}
+				}
 
-					// chapters
-					if (auto chapters = GetJsonArray(doc, "chapters")) {
-						for (const auto& chapter : chapters->GetArray()) {
-							float start_time = 0.0f;
-							CString title;
-							if (getJsonValue(chapter, "title", title) && getJsonValue(chapter, "start_time", start_time)) {
-								y_fields.chaptersList.emplace_back(title, REFERENCE_TIME(start_time * UNITS));
+				if (getJsonValue(doc, "title", y_fields.title)) {
+					CStringA ext;
+					if (getJsonValue(doc, "ext", ext)) {
+						y_fields.fname.Format(L"%s.%hs", y_fields.title.GetString(), ext.GetString());
+					}
+				}
+
+				getJsonValue(doc, "uploader", y_fields.author);
+
+				getJsonValue(doc, "description", y_fields.content);
+				if (y_fields.content.Find('\n') && y_fields.content.Find(L"\r\n") == -1) {
+					y_fields.content.Replace(L"\n", L"\r\n");
+				}
+
+				CStringA upload_date;
+				if (getJsonValue(doc, "upload_date", upload_date)) {
+					WORD y, m, d;
+					if (sscanf_s(upload_date.GetString(), "%04hu%02hu%02hu", &y, &m, &d) == 3) {
+						y_fields.dtime.wYear = y;
+						y_fields.dtime.wMonth = m;
+						y_fields.dtime.wDay = d;
+					}
+				}
+
+				if (!bIsYoutube) {
+					pOFD->fi = CStringW(bestUrl);
+					if (bVideoOnly) {
+						if (audioUrls.size() > 1) {
+							auto select = audioUrls.begin();
+
+							if (auto it = audioUrls.find(lang); it != audioUrls.end()) {
+								select = it;
+							} else if (auto it = audioUrls.find("en"); it != audioUrls.end()) {
+								select = it;
 							}
+
+							pOFD->auds.emplace_back(CStringW(select->second.url), CStringW(select->first), select->first);
+						} else if (bestAudioUrl.GetLength()) {
+							pOFD->auds.emplace_back(CStringW(bestAudioUrl));
 						}
 					}
 
-					if (bIsYoutube && !youtubeAudioUrllist.empty()) {
-						// thumbnails
-						if (auto thumbnails = GetJsonArray(doc, "thumbnails")) {
-							CStringA thumbnailUrl;
-							int maxHeight = 0;
-							for (const auto& elem : thumbnails->GetArray()) {
-								int height = 0;
-								if (getJsonValue(elem, "height", height) && height > maxHeight) {
-									if (getJsonValue(elem, "url", thumbnailUrl)) {
-										maxHeight = height;
-									}
+					if (!bestAudioUrl.IsEmpty()) {
+						auto profilePtr = std::make_unique<Youtube::YoutubeProfile>();
+						auto profile = profilePtr.get();
+						YoutubeProfiles.emplace_back(std::move(profilePtr));
+
+						profile->type = Youtube::ytype::y_audio;
+
+						Youtube::YoutubeUrllistItem item;
+						item.profile = profile;
+						item.url = CString(bestAudioUrl);
+						youtubeAudioUrllist.emplace_back(item);
+					}
+
+					if (!youtubeUrllist.empty()) {
+						std::sort(youtubeUrllist.begin(), youtubeUrllist.end(), [](const Youtube::YoutubeUrllistItem& a, const Youtube::YoutubeUrllistItem& b) {
+							if (a.profile->format != b.profile->format) {
+								return (a.profile->format < b.profile->format);
+							}
+							if (a.profile->ext != b.profile->ext) {
+								return (a.profile->ext < b.profile->ext);
+							}
+							if (a.profile->quality != b.profile->quality) {
+								return (a.profile->quality > b.profile->quality);
+							}
+
+							return false;
+						});
+					}
+				}
+
+				// subtitles
+				if (auto requested_subtitles = GetJsonObject(doc, "requested_subtitles")) {
+					for (const auto& subtitle : requested_subtitles->GetObj()) {
+						CStringW sub_url;
+						CStringW sub_name;
+						getJsonValue(subtitle.value, "url", sub_url);
+						getJsonValue(subtitle.value, "name", sub_name);
+						CStringA sub_lang = subtitle.name.GetString();
+
+						if (sub_url.GetLength() && sub_lang.GetLength()) {
+							pOFD->subs.emplace_back(sub_url, sub_name, sub_lang);
+						}
+					}
+				}
+
+				// chapters
+				if (auto chapters = GetJsonArray(doc, "chapters")) {
+					for (const auto& chapter : chapters->GetArray()) {
+						float start_time = 0.0f;
+						CString title;
+						if (getJsonValue(chapter, "title", title) && getJsonValue(chapter, "start_time", start_time)) {
+							y_fields.chaptersList.emplace_back(title, REFERENCE_TIME(start_time * UNITS));
+						}
+					}
+				}
+
+				if (bIsYoutube && !youtubeAudioUrllist.empty()) {
+					// thumbnails
+					if (auto thumbnails = GetJsonArray(doc, "thumbnails")) {
+						CStringA thumbnailUrl;
+						int maxHeight = 0;
+						for (const auto& elem : thumbnails->GetArray()) {
+							int height = 0;
+							if (getJsonValue(elem, "height", height) && height > maxHeight) {
+								if (getJsonValue(elem, "url", thumbnailUrl)) {
+									maxHeight = height;
 								}
 							}
+						}
 
-							if (!thumbnailUrl.IsEmpty()) {
-								y_fields.thumbnailUrl = thumbnailUrl;
-							}
+						if (!thumbnailUrl.IsEmpty()) {
+							y_fields.thumbnailUrl = thumbnailUrl;
 						}
 					}
 				}
