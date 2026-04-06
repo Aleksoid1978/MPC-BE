@@ -31,19 +31,19 @@ namespace YT_DLP
 {
 	std::vector<std::unique_ptr<Youtube::YoutubeProfile>> YoutubeProfiles;
 
-	bool IsVideoFormat(const rapidjson::Value& format)
+	static bool IsVideoFormat(const rapidjson::Value& format)
 	{
 		CStringA value_str;
 		if (getJsonValue(format, "vcodec", value_str) && value_str != "none") {
 			return true;
 		}
-		if (getJsonValue(format, "video_ext", value_str) || value_str != "none") {
+		if (getJsonValue(format, "video_ext", value_str) && value_str != "none") {
 			return true;
 		}
 		return false;
 	}
 
-	bool FormatHasAudio(const rapidjson::Value& format)
+	static bool FormatHasAudio(const rapidjson::Value& format)
 	{
 		CStringA value_str;
 		if (getJsonValue(format, "acodec", value_str) && value_str != "none") {
