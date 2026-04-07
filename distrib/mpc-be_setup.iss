@@ -70,6 +70,7 @@
 #endif
 #define mpcvr_desc     = "MPC Video Renderer 0.10.1"
 #define mpcscriptsrc_desc = "MPC Script Source 0.2.17"
+#define mpcimagesrc_desc = "MPC Image Source 0.3.4"
 
 [Setup]
 #ifdef Win32Build
@@ -215,6 +216,7 @@ Name: "mpcbeshellext"; Description: "{cm:comp_mpcbeshellext}";  Types: custom;  
 Name: "intel_msdk";    Description: "{cm:comp_intel_msdk}";     Types: custom;         Flags: disablenouninstallwarning;
 Name: "mpcvr";         Description: "{#mpcvr_desc}";            Types: default custom; Flags: disablenouninstallwarning;
 Name: "mpcscriptsrc";  Description: "{#mpcscriptsrc_desc}";     Types: custom;         Flags: disablenouninstallwarning;
+Name: "mpcimagesrc";   Description: "{#mpcimagesrc_desc}";      Types: custom;         Flags: disablenouninstallwarning;
 
 [Tasks]
 Name: desktopicon;              Description: {cm:CreateDesktopIcon};     GroupDescription: {cm:AdditionalIcons}
@@ -252,10 +254,13 @@ Source: "{#VisualElementsManifest}";       DestDir: "{app}";                    
 Source: "MPC_components\IntelMediaSDK\libmfxsw32.dll"; DestDir: "{app}"; Flags: ignoreversion; Components: intel_msdk;
 Source: "MPC_components\MpcVideoRenderer\MpcVideoRenderer.ax"; DestDir: "{app}\Filters"; Flags: regserver; Components: mpcvr;
 Source: "MPC_components\MpcScriptSource\MpcScriptSource.ax"; DestDir: "{app}\Filters"; Flags: regserver; Components: mpcscriptsrc;
+Source: "MPC_components\MpcImageSource\MpcImageSource.ax"; DestDir: "{app}\Filters"; Flags: regserver; Components: mpcimagesrc;
+
 #else
 Source: "MPC_components\IntelMediaSDK\libmfxsw64.dll"; DestDir: "{app}"; Flags: ignoreversion; Components: intel_msdk;
 Source: "MPC_components\MpcVideoRenderer\MpcVideoRenderer64.ax"; DestDir: "{app}\Filters"; Flags: regserver; Components: mpcvr;
 Source: "MPC_components\MpcScriptSource\MpcScriptSource64.ax"; DestDir: "{app}\Filters"; Flags: regserver; Components: mpcscriptsrc;
+Source: "MPC_components\MpcImageSource\MpcImageSource64.ax"; DestDir: "{app}\Filters"; Flags: regserver; Components: mpcimagesrc;
 #endif
 
 [Icons]
