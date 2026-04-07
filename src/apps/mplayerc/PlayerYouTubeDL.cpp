@@ -149,7 +149,7 @@ namespace YT_DLP
 		if (getJsonValue(format, "acodec", value_str) && value_str != "none") {
 			return true;
 		}
-		if (getJsonValue(format, "audio_ext", value_str) && value_str == "none") {
+		if (getJsonValue(format, "audio_ext", value_str) && value_str != "none") {
 			return true;
 		}
 		return false;
