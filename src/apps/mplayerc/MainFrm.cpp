@@ -12379,11 +12379,14 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		const auto ext = GetFileExt(url).MakeLower();
 
 		bool ok = (ext != L".m3u" && ext != L".m3u8");
+/*
 		if (ok) {
 			ok = Content::Online::CheckConnect(url);
 		}
+*/
 
 		if (ok) {
+/*
 			CString online_hdr;
 			Content::Online::GetHeader(url, online_hdr);
 			if (!online_hdr.IsEmpty()) {
@@ -12405,6 +12408,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				}
 
 				if (bIsHtml) {
+*/			{	{
 					m_bYoutubeOpening = true;
 					CString ytdl_mesage;
 					ytdl_mesage.Format(ResStr(IDS_CALLING_YOUTUBEDL), GetFileName(s.strYdlExePath));
@@ -12490,10 +12494,12 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 		HRESULT hr = S_OK;
 
+/*
 		if (!Content::Online::CheckConnect(fn)) {
 			DLog(L"CMainFrame::OpenFile: Connection failed to %s", fn);
 			hr = VFW_E_NOT_FOUND;
 		}
+*/
 		CString online_hdr;
 		Content::Online::GetHeader(fn, online_hdr);
 		if (online_hdr.Find(L"StreamBuffRe") == -1) {
