@@ -1215,6 +1215,24 @@ void sws_frame_end(SwsContext *sws)
     c->src_ranges.nb_ranges = 0;
 }
 
+static int frame_alloc_buffers(SwsContext *sws, AVFrame *frame)
+{
+    SwsInternal *c = sws_internal(sws);
+    FFFramePool *pool = &c->frame_pool;
+
+    av_assert0(!frame->hw_frames_ctx);
+    const int nb_planes = av_pix_fmt_count_planes(frame->format);
+    for (int i = 0; i < nb_planes; i++) {
+        frame->linesize[i] = pool->linesize[i];
+        frame->buf[i] = av_buffer_pool_get(pool->pools[i]);
+        if (!frame->buf[i])
+            return AVERROR(ENOMEM);
+        frame->data[i] = frame->buf[i]->data;
+    }
+
+    return 0;
+}
+
 int sws_frame_start(SwsContext *sws, AVFrame *dst, const AVFrame *src)
 {
     SwsInternal *c = sws_internal(sws);
@@ -1348,7 +1366,7 @@ static int frame_ref(AVFrame *dst, const AVFrame *src)
 
 int sws_scale_frame(SwsContext *sws, AVFrame *dst, const AVFrame *src)
 {
-    int ret;
+    int ret, allocated = 0;
     SwsInternal *c = sws_internal(sws);
     if (!src || !dst)
         return AVERROR(EINVAL);
@@ -1390,15 +1408,19 @@ int sws_scale_frame(SwsContext *sws, AVFrame *dst, const AVFrame *src)
     if (src->buf[0] && top->noop && (!bot || bot->noop))
         return frame_ref(dst, src);
 
-    ret = av_frame_get_buffer(dst, 0);
+    ret = frame_alloc_buffers(sws, dst);
     if (ret < 0)
         return ret;
+    allocated = 1;
 
 process_frame:
     for (int field = 0; field < (bot ? 2 : 1); field++) {
         ret = ff_sws_graph_run(c->graph[field], dst, src);
-        if (ret < 0)
+        if (ret < 0) {
+            if (allocated)
+                av_frame_unref(dst);
             return ret;
+        }
     }
 
     return 0;
@@ -1459,6 +1481,7 @@ int sws_frame_setup(SwsContext *ctx, const AVFrame *dst, const AVFrame *src)
 #endif
     }
 
+    int dst_width = dst->width;
     for (int field = 0; field < 2; field++) {
         SwsFormat src_fmt = ff_fmt_from_frame(src, field);
         SwsFormat dst_fmt = ff_fmt_from_frame(dst, field);
@@ -1484,10 +1507,18 @@ int sws_frame_setup(SwsContext *ctx, const AVFrame *dst, const AVFrame *src)
             goto fail;
         }
 
-        if (s->graph[field]->incomplete && ctx->flags & SWS_STRICT) {
+        const SwsGraph *graph = s->graph[field];
+        if (graph->incomplete && ctx->flags & SWS_STRICT) {
             err_msg = "Incomplete scaling graph";
             ret = AVERROR(EINVAL);
             goto fail;
+        }
+
+        if (!graph->noop) {
+            av_assert0(graph->num_passes);
+            const SwsPass *last_pass = graph->passes[graph->num_passes - 1];
+            const int aligned_w = ff_sws_pass_aligned_width(last_pass, dst->width);
+            dst_width = FFMAX(dst_width, aligned_w);
         }
 
         if (!src_fmt.interlaced) {
@@ -1510,6 +1541,13 @@ int sws_frame_setup(SwsContext *ctx, const AVFrame *dst, const AVFrame *src)
             ff_sws_graph_free(&s->graph[i]);
 
         return ret;
+    }
+
+    if (!dst->hw_frames_ctx) {
+        ret = ff_frame_pool_video_reinit(&s->frame_pool, dst_width, dst->height,
+                                         dst->format, av_cpu_max_align());
+        if (ret < 0)
+            return ret;
     }
 
     return 0;
