@@ -605,14 +605,14 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
 5		"首选视频格式:"
-8		"50/60 fps"
+8		"50帧/60帧"
 9		"HDR"
 10		"首选音频格式:"
 12		"首选音轨语言:"
 14		"加载播放列表"
 16		"yt-dlp"
 17		"可执行的文件:"
-19		"Select max bitrate"
+19		"选择最大码率"
 20		"AceStream 链接:"
 22		"MatriX (TorrServer) 链接:"
 25		"用户代理:"
