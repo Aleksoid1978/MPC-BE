@@ -1,5 +1,5 @@
 /*
- * (C) 2008-2017 see Authors.txt
+ * (C) 2008-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -64,6 +64,7 @@ public:
 	CHScrollListBox m_listBox;
 	CString		m_txtCommand;
 	CComboBox	m_cbCommand;
+	CString		m_txtHWnd;
 	afx_msg		void OnBnClickedButtonSendcommand();
 	void		SendData(MPCAPI_COMMAND nCmd, LPCWSTR strCommand);
 };

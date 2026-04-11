@@ -8,8 +8,7 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
-
+#include "afxres.h"
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -100,6 +99,8 @@ BEGIN
     EDITTEXT        IDC_EDIT2,154,41,287,14,ES_AUTOHSCROLL
     PUSHBUTTON      "Send command",IDC_BUTTON_SENDCOMMAND,457,39,57,18
     COMBOBOX        IDC_COMBO1,7,42,132,158,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    RTEXT           "HWnd handle:",IDC_STATIC,386,69,54,8
+    EDITTEXT        IDC_EDIT3,457,67,57,14,ES_AUTOHSCROLL | ES_READONLY
 END
 
 

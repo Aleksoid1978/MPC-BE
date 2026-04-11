@@ -1,5 +1,5 @@
 /*
- * (C) 2008-2017 see Authors.txt
+ * (C) 2008-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -187,6 +187,7 @@ void CRegisterCopyDataDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LOGLIST, m_listBox);
 	DDX_Text(pDX, IDC_EDIT2, m_txtCommand);
 	DDX_Control(pDX, IDC_COMBO1, m_cbCommand);
+	DDX_Text(pDX, IDC_EDIT3, m_txtHWnd);
 }
 
 BEGIN_MESSAGE_MAP(CRegisterCopyDataDlg, CDialog)
@@ -273,6 +274,8 @@ BOOL CRegisterCopyDataDlg::OnInitDialog()
 			AddStringData(m_cbCommand, cmdinfo.desc, cmdinfo.id);
 		}
 	}
+
+	m_txtHWnd.Format(L"%u", (unsigned)(size_t)GetSafeHwnd());
 
 	UpdateData(FALSE);
 
