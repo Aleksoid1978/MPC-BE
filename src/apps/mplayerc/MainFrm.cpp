@@ -18475,16 +18475,23 @@ void CMainFrame::SendAPICommand(MPCAPI_COMMAND nCommand, LPCWSTR fmt, ...)
 	const CAppSettings& s = AfxGetAppSettings();
 
 	if (s.hMasterWnd) {
-		WCHAR buff[800] = {};
-
 		va_list args;
 		va_start(args, fmt);
-		vswprintf_s(buff, std::size(buff), fmt, args);
+
+		auto bufferSize = _vscwprintf(fmt, args);
+		if (bufferSize < 0) {
+			return;
+		}
+
+		bufferSize++;
+		auto buff = std::make_unique<wchar_t[]>(bufferSize);
+
+		vswprintf_s(buff.get(), bufferSize, fmt, args);
 
 		COPYDATASTRUCT CDS;
-		CDS.cbData = (wcslen (buff) + 1) * sizeof(WCHAR);
+		CDS.cbData = (wcslen(buff.get()) + 1) * sizeof(wchar_t);
 		CDS.dwData = nCommand;
-		CDS.lpData = (LPVOID)buff;
+		CDS.lpData = reinterpret_cast<LPVOID>(buff.get());
 
 		::SendMessageW(s.hMasterWnd, WM_COPYDATA, (WPARAM)GetSafeHwnd(), (LPARAM)&CDS);
 
