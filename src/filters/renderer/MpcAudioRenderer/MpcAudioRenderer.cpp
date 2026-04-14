@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2025 see Authors.txt
+ * (C) 2009-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -536,12 +536,17 @@ HRESULT CMpcAudioRenderer::SetMediaType(const CMediaType *pmt)
 
 	DLog(L"CMpcAudioRenderer::SetMediaType()");
 
+	if (!pwf->nBlockAlign || !pwf->wBitsPerSample) {
+		DLog(L"CMpcAudioRenderer::SetMediaType() : Invalid input format");
+		return VFW_E_TYPE_NOT_ACCEPTED;
+	}
+
 	HRESULT hr = S_OK;
 
 	if (!m_pAudioClient) {
 		hr = CreateAudioClient();
 		if (FAILED(hr)) {
-			DLog(L"CMpcAudioRenderer::SetMediaType() - audio client initialization error");
+			DLog(L"CMpcAudioRenderer::SetMediaType() : Audio client initialization error");
 			return VFW_E_CANNOT_CONNECT;
 		}
 	}
