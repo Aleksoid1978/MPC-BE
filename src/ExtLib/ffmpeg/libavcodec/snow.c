@@ -20,6 +20,7 @@
 
 #include <assert.h>
 
+#include "libavutil/avassert.h"
 #include "libavutil/log.h"
 #include "libavutil/mem.h"
 #include "libavutil/thread.h"
@@ -114,27 +115,33 @@ static av_cold void init_qpel(SnowContext *const s)
     s->put_snow_qpel_pixels_tab[3][15] = put_snow_qpel2_mc33_8_c;
 }
 
-void ff_snow_inner_add_yblock(const uint8_t *obmc, const int obmc_stride, uint8_t * * block, int b_w, int b_h,
-                              int src_x, int src_y, int src_stride, slice_buffer * sb, int add, uint8_t * dst8){
+void ff_snow_inner_add_yblock_c(const uint8_t *obmc, const int obmc_stride, uint8_t **block, int b_w, int b_h,
+                                int src_x, int src_stride, IDWTELEM *const *lines, int add, uint8_t *dst8)
+{
     int y, x;
-    IDWTELEM * dst;
+
+    av_assume(add); // add == 0 is currently unused
+
     for(y=0; y<b_h; y++){
         //FIXME ugly misuse of obmc_stride
         const uint8_t *obmc1= obmc + y*obmc_stride;
         const uint8_t *obmc2= obmc1+ (obmc_stride>>1);
         const uint8_t *obmc3= obmc1+ obmc_stride*(obmc_stride>>1);
         const uint8_t *obmc4= obmc3+ (obmc_stride>>1);
-        dst = slice_buffer_get_line(sb, src_y + y);
+        IDWTELEM *dst = lines[y];
+        av_assert2(dst);
+
         for(x=0; x<b_w; x++){
             int v=   obmc1[x] * block[3][x + y*src_stride]
                     +obmc2[x] * block[2][x + y*src_stride]
                     +obmc3[x] * block[1][x + y*src_stride]
                     +obmc4[x] * block[0][x + y*src_stride];
 
-            v <<= 8 - LOG2_OBMC_MAX;
-            if(FRAC_BITS != 8){
-                v >>= 8 - FRAC_BITS;
-            }
+#if FRAC_BITS > LOG2_OBMC_MAX
+            v <<= FRAC_BITS - LOG2_OBMC_MAX;
+#elif FRAC_BITS < LOG2_OBMC_MAX
+            v >>= LOG2_OBMC_MAX - FRAC_BITS;
+#endif
             if(add){
                 v += dst[x + src_x];
                 v = (v + (1<<(FRAC_BITS-1))) >> FRAC_BITS;

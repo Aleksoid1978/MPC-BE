@@ -18,6 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
@@ -1541,12 +1542,13 @@ int ff_decode_frame_props_from_pkt(const AVCodecContext *avctx,
                                    AVFrame *frame, const AVPacket *pkt)
 {
     static const SideDataMap sd[] = {
-        { AV_PKT_DATA_A53_CC,                     AV_FRAME_DATA_A53_CC },
-        { AV_PKT_DATA_AFD,                        AV_FRAME_DATA_AFD },
-        { AV_PKT_DATA_DYNAMIC_HDR10_PLUS,         AV_FRAME_DATA_DYNAMIC_HDR_PLUS },
-        { AV_PKT_DATA_S12M_TIMECODE,              AV_FRAME_DATA_S12M_TIMECODE },
-        { AV_PKT_DATA_SKIP_SAMPLES,               AV_FRAME_DATA_SKIP_SAMPLES },
-        { AV_PKT_DATA_LCEVC,                      AV_FRAME_DATA_LCEVC },
+        { AV_PKT_DATA_A53_CC,                      AV_FRAME_DATA_A53_CC },
+        { AV_PKT_DATA_AFD,                         AV_FRAME_DATA_AFD },
+        { AV_PKT_DATA_DYNAMIC_HDR10_PLUS,          AV_FRAME_DATA_DYNAMIC_HDR_PLUS },
+        { AV_PKT_DATA_DYNAMIC_HDR_SMPTE_2094_APP5, AV_FRAME_DATA_DYNAMIC_HDR_SMPTE_2094_APP5 },
+        { AV_PKT_DATA_S12M_TIMECODE,               AV_FRAME_DATA_S12M_TIMECODE },
+        { AV_PKT_DATA_SKIP_SAMPLES,                AV_FRAME_DATA_SKIP_SAMPLES },
+        { AV_PKT_DATA_LCEVC,                       AV_FRAME_DATA_LCEVC },
         { AV_PKT_DATA_NB }
     };
 
@@ -1555,22 +1557,24 @@ int ff_decode_frame_props_from_pkt(const AVCodecContext *avctx,
     frame->pts          = pkt->pts;
     frame->duration     = pkt->duration;
 
-    ret = side_data_map(frame, pkt->side_data, pkt->side_data_elems, ff_sd_global_map);
-    if (ret < 0)
-        return ret;
+    if (pkt->side_data_elems) {
+        ret = side_data_map(frame, pkt->side_data, pkt->side_data_elems, ff_sd_global_map);
+        if (ret < 0)
+            return ret;
 
-    ret = side_data_map(frame, pkt->side_data, pkt->side_data_elems, sd);
-    if (ret < 0)
-        return ret;
+        ret = side_data_map(frame, pkt->side_data, pkt->side_data_elems, sd);
+        if (ret < 0)
+            return ret;
 
-    add_metadata_from_side_data(pkt, frame);
+        add_metadata_from_side_data(pkt, frame);
+    }
 
     if (pkt->flags & AV_PKT_FLAG_DISCARD) {
         frame->flags |= AV_FRAME_FLAG_DISCARD;
     }
 
     if (avctx->flags & AV_CODEC_FLAG_COPY_OPAQUE) {
-        int ret = av_buffer_replace(&frame->opaque_ref, pkt->opaque_ref);
+        ret = av_buffer_replace(&frame->opaque_ref, pkt->opaque_ref);
         if (ret < 0)
             return ret;
         frame->opaque = pkt->opaque;
@@ -1626,11 +1630,11 @@ int ff_decode_frame_props(AVCodecContext *avctx, AVFrame *frame)
     AVCodecInternal    *avci = avctx->internal;
     DecodeContext        *dc = decode_ctx(avci);
 
-    dc->lcevc.frame = dc->lcevc.ctx && avctx->codec_type == AVMEDIA_TYPE_VIDEO &&
+    dc->lcevc.frame = dc->lcevc.ctx &&
                       av_frame_get_side_data(frame, AV_FRAME_DATA_LCEVC);
 
     if (dc->lcevc.frame) {
-        int ret = ff_lcevc_parse_frame(dc->lcevc.ctx, frame, &dc->lcevc.format,
+        ret = ff_lcevc_parse_frame(dc->lcevc.ctx, frame, &dc->lcevc.format,
                                        &dc->lcevc.width, &dc->lcevc.height, avctx);
         if (ret < 0 && (avctx->err_recognition & AV_EF_EXPLODE))
             return ret;
@@ -1676,8 +1680,10 @@ static void decode_data_free(AVRefStructOpaque unused, void *obj)
 {
     FrameDecodeData *fdd = obj;
 
-    if (fdd->post_process_opaque_free)
-        fdd->post_process_opaque_free(fdd->post_process_opaque);
+    if (CONFIG_LIBLCEVC_DEC)
+        av_refstruct_unref(&fdd->post_process_opaque);
+    else
+        av_assert1(!fdd->post_process_opaque);
 
     if (fdd->hwaccel_priv_free)
         fdd->hwaccel_priv_free(fdd->hwaccel_priv);
@@ -1701,7 +1707,7 @@ int ff_attach_decode_data(AVCodecContext *avctx, AVFrame *frame)
     DecodeContext        *dc = decode_ctx(avci);
 
     if (!dc->lcevc.frame) {
-        dc->lcevc.frame = dc->lcevc.ctx && avctx->codec_type == AVMEDIA_TYPE_VIDEO &&
+        dc->lcevc.frame = dc->lcevc.ctx &&
                           av_frame_get_side_data(frame, AV_FRAME_DATA_LCEVC);
 
         if (dc->lcevc.frame) {
@@ -1726,15 +1732,9 @@ int ff_attach_decode_data(AVCodecContext *avctx, AVFrame *frame)
             return 0;
         }
 
-        frame_ctx = av_mallocz(sizeof(*frame_ctx));
+        frame_ctx = av_refstruct_pool_get(dc->lcevc.ctx->frame_pool);
         if (!frame_ctx)
             return AVERROR(ENOMEM);
-
-        frame_ctx->frame = av_frame_alloc();
-        if (!frame_ctx->frame) {
-            av_free(frame_ctx);
-            return AVERROR(ENOMEM);
-        }
 
         frame_ctx->lcevc = av_refstruct_ref(dc->lcevc.ctx);
         frame_ctx->frame->width  = dc->lcevc.width;
@@ -1747,14 +1747,13 @@ int ff_attach_decode_data(AVCodecContext *avctx, AVFrame *frame)
 
         ret = avctx->get_buffer2(avctx, frame_ctx->frame, 0);
         if (ret < 0) {
-            ff_lcevc_unref(frame_ctx);
+            av_refstruct_unref(&frame_ctx);
             return ret;
         }
 
         validate_avframe_allocation(avctx, frame_ctx->frame);
 
         fdd->post_process_opaque = frame_ctx;
-        fdd->post_process_opaque_free = ff_lcevc_unref;
         fdd->post_process = ff_lcevc_process;
     }
     dc->lcevc.frame = 0;
@@ -1838,7 +1837,6 @@ fail:
 
 static int reget_buffer_internal(AVCodecContext *avctx, AVFrame *frame, int flags)
 {
-    AVFrame *tmp;
     int ret;
 
     av_assert0(avctx->codec_type == AVMEDIA_TYPE_VIDEO);
@@ -1860,22 +1858,37 @@ static int reget_buffer_internal(AVCodecContext *avctx, AVFrame *frame, int flag
     if ((flags & FF_REGET_BUFFER_FLAG_READONLY) || av_frame_is_writable(frame))
         return ff_decode_frame_props(avctx, frame);
 
-    tmp = av_frame_alloc();
-    if (!tmp)
-        return AVERROR(ENOMEM);
+    uint8_t *data[AV_VIDEO_MAX_PLANES];
+    AVBufferRef *buf[AV_VIDEO_MAX_PLANES];
+    int linesize[AV_VIDEO_MAX_PLANES];
 
-    av_frame_move_ref(tmp, frame);
+    static_assert(AV_VIDEO_MAX_PLANES <= FF_ARRAY_ELEMS(frame->data) &&
+                  AV_VIDEO_MAX_PLANES <= FF_ARRAY_ELEMS(frame->buf)  &&
+                  AV_VIDEO_MAX_PLANES <= FF_ARRAY_ELEMS(frame->linesize),
+                  "Copying code needs to be adjusted");
+    static_assert(sizeof(frame->linesize[0]) == sizeof(linesize[0]),
+                  "linesize needs to be switched to ptrdiff_t");
+
+    for (int i = 0; i < AV_VIDEO_MAX_PLANES; ++i) {
+        data[i]       = frame->data[i];
+        linesize[i]   = frame->linesize[i];
+        buf[i]        = frame->buf[i];
+        frame->buf[i] = NULL;
+    }
+    av_assert1(!frame->buf[AV_VIDEO_MAX_PLANES] && !frame->extended_buf);
+
+    av_frame_unref(frame);
 
     ret = ff_get_buffer(avctx, frame, AV_GET_BUFFER_FLAG_REF);
-    if (ret < 0) {
-        av_frame_free(&tmp);
-        return ret;
+    if (ret >= 0) {
+        av_image_copy2(frame->data, frame->linesize,
+                       data, linesize,
+                       frame->format, frame->width, frame->height);
     }
+    for (int i = 0; i < AV_VIDEO_MAX_PLANES; ++i)
+        av_buffer_unref(&buf[i]);
 
-    av_frame_copy(frame, tmp);
-    av_frame_free(&tmp);
-
-    return 0;
+    return ret;
 }
 
 int ff_reget_buffer(AVCodecContext *avctx, AVFrame *frame, int flags)

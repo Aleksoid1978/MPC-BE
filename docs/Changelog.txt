@@ -64,7 +64,7 @@ Updated Chinese (Simplified) translation (by wushantao).
 
 Updated libraries:
 	dav1d 1.5.3-6-g04b69f9;
-	ffmpeg n8.2-dev-644-geaadd05232;
+	ffmpeg n8.2-dev-759-gfcffc0e1c5;
 	libpng git-v1.6.55-9-g7d52a8087;
 	Little-CMS git-lcms2.18-26-gf739cda;
 	MediaInfo git-v26.01-2-gd94a5679a;

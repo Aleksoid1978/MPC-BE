@@ -657,7 +657,6 @@ SRCS_LC_B = \
 	libavcodec/x86/rv34dsp_init.c \
 	libavcodec/x86/rv40dsp_init.c \
 	libavcodec/x86/sbrdsp_init.c \
-	libavcodec/x86/snowdsp.c \
 	libavcodec/x86/synth_filter_init.c \
 	libavcodec/x86/takdsp_init.c \
 	libavcodec/x86/ttadsp_init.c \

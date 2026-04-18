@@ -45,7 +45,7 @@
 #define FRAC_BITS 4
 #define MAX_REF_FRAMES 8
 
-#define LOG2_OBMC_MAX 8
+#define LOG2_OBMC_MAX 6
 #define OBMC_MAX (1<<(LOG2_OBMC_MAX))
 typedef struct BlockNode{
     int16_t mx;                 ///< Motion vector component X, see mv_scale
@@ -313,7 +313,7 @@ static av_always_inline void add_yblock(SnowContext *s, int sliced, slice_buffer
         ff_snow_pred_block(s, block[3], tmp, src_stride, src_x, src_y, b_w, b_h, rb, plane_index, w, h);
     }
     if(sliced){
-        s->dwt.inner_add_yblock(obmc, obmc_stride, block, b_w, b_h, src_x,src_y, src_stride, sb, add, dst8);
+        s->dwt.inner_add_yblock(obmc, obmc_stride, block, b_w, b_h, src_x, src_stride, sb->line + src_y, add, dst8);
     }else{
         for(y=0; y<b_h; y++){
             //FIXME ugly misuse of obmc_stride
