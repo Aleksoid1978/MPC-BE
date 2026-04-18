@@ -448,7 +448,7 @@ namespace Youtube
 #if !USE_GOOGLE_API
 			bool bParse = false;
 			urlData data;
-			if (URLPostData(videoId.GetString(), data)) {
+			if (URLPostDataForLive(videoId.GetString(), data)) {
 				rapidjson::Document player_response_jsonDocument;
 				player_response_jsonDocument.Parse(data.data());
 
