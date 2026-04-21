@@ -61,6 +61,7 @@ Updated Hungarian translation (by mickey).
 Updated Turkish translation (by cmhrky).
 Updated German translation (by Klaus1189).
 Updated Chinese (Simplified) translation (by wushantao).
+Updated Italian translation (by mapi68).
 
 Updated libraries:
 	dav1d 1.5.3-6-g04b69f9;

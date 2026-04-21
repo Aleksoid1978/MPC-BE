@@ -443,7 +443,7 @@ BEGIN
     CONTROL         "Abilita menu scuro",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,59,147,9,WS_EX_TRANSPARENT
     CONTROL         "Usa effetto Sfocatura dietro (Windows 10 e versioni successive)",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,265,9,WS_EX_TRANSPARENT
-    CONTROL         "Abilita titolo scuro (Windows 10 and above)",IDC_CHECK5,
+    CONTROL         "Abilita titolo scuro (Windows 10 e superiori)",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,9,WS_EX_TRANSPARENT
     GROUPBOX        "",IDC_STATIC,7,112,282,91
     CONTROL         "Usa descrizione comando sul tempo:",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,121,152,9
@@ -459,7 +459,7 @@ BEGIN
     LTEXT           "Dimensione carattere playlist:",IDC_STATIC,13,187,110,8
     EDITTEXT        IDC_EDIT2,127,185,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,187,10,8
-    LTEXT           "Controls size:",IDC_STATIC8,14,96,99,8
+    LTEXT           "Dimensione controlli:",IDC_STATIC8,14,96,99,8
     COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,95,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Usa funzionalità barra delle applicazioni di Windows 7 (e versioni successive).",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,206,270,11
@@ -940,7 +940,7 @@ BEGIN
     CONTROL         "yt-dlp",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,4,74,10
     LTEXT           "File eseguibile:",IDC_STATIC,10,17,104,8
     COMBOBOX        IDC_COMBO5,116,15,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Select max bitrate",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,108,276,10
+    CONTROL         "Seleziona bitrate massimo",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,108,276,10
     LTEXT           "Indirizzo AceStream:",IDC_STATIC,10,143,77,8
     EDITTEXT        IDC_EDIT1,91,141,195,13,ES_AUTOHSCROLL
     LTEXT           "Indirizzo MatriX (TorrServer):",IDC_STATIC,10,160,103,8
@@ -1059,7 +1059,7 @@ IDD_PPAGECOLOR DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Controlli del colore (per EVR, madVR and MPC VR)",IDC_STATIC,5,5,286,80
+    GROUPBOX        "Controlli del colore (per EVR, madVR e MPC VR)",IDC_STATIC,5,5,286,80
     LTEXT           "Luminosità",IDC_STATIC,10,19,55,8
     LTEXT           "Contrasto",IDC_STATIC,10,35,55,8
     LTEXT           "Tonalità",IDC_STATIC,10,51,55,8
