@@ -203,7 +203,7 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 END
 
 BEGIN DIALOGEX IDD_PPAGECOLOR LINES 28
-5		"Controlli del colore (per EVR, madVR and MPC VR)"
+5		"Controlli del colore (per EVR, madVR e MPC VR)"
 6		"Luminosità"
 7		"Contrasto"
 8		"Tonalità"
@@ -312,7 +312,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 17		"B:"
 21		"Abilita menu scuro"
 22		"Usa effetto Sfocatura dietro (Windows 10 e versioni successive)"
-24		"Abilita titolo scuro (Windows 10 and above)"
+24		"Abilita titolo scuro (Windows 10 e superiori)"
 27		"Usa descrizione comando sul tempo:"
 29		"Usa anteprima nella ricerca"
 30		"Dimensioni relative alla larghezza dello schermo:"
@@ -320,7 +320,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 35		"Usa marcatore capitoli"
 36		"Usa flybar"
 37		"Dimensione carattere playlist:"
-40		"Controls size:"
+40		"Dimensione controlli:"
 42		"Usa funzionalità barra delle applicazioni di Windows 7 (e versioni successive)."
 END
 
@@ -612,7 +612,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
 14		"Carica playlist"
 16		"yt-dlp"
 17		"File eseguibile:"
-19		"Select max bitrate"
+19		"Seleziona bitrate massimo"
 20		"Indirizzo AceStream:"
 22		"Indirizzo MatriX (TorrServer):"
 25		"User agent:"
