@@ -3946,12 +3946,16 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 		m_wndView.MapWindowPoints(this, &vid_rect);
 
 		CPoint vp = point - vid_rect.TopLeft();
-		ULONG pulButtonIndex;
+		ULONG ulButtonIndex;
+
+		HRESULT hr = m_pDVDI->GetButtonAtPosition(vp, &ulButtonIndex);
+		if (SUCCEEDED(hr)) {
+			m_pDVDC->SelectButton(ulButtonIndex);
+		}
 
 		if (!m_bHideCursor) {
-			SetCursor(LoadCursorW(nullptr, SUCCEEDED(m_pDVDI->GetButtonAtPosition(vp, &pulButtonIndex)) ? IDC_HAND : IDC_ARROW));
+			SetCursor(LoadCursorW(nullptr, SUCCEEDED(hr) ? IDC_HAND : IDC_ARROW));
 		}
-		m_pDVDC->SelectAtPosition(vp);
 	}
 
 	if (m_lastMouseMove != point) {
