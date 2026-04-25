@@ -1,5 +1,5 @@
 ;******************************************************************************
-;* MMX/SSE2-optimized functions for the VP3 decoder
+;* SSE2-optimized functions for the VP3 decoder
 ;* Copyright (c) 2007 Aurelien Jacobs <aurel@gnuage.org>
 ;*
 ;* This file is part of FFmpeg.
@@ -21,7 +21,7 @@
 
 %include "libavutil/x86/x86util.asm"
 
-; MMX-optimized functions cribbed from the original VP3 source code.
+; ASM-optimized functions cribbed from the original VP3 source code.
 
 SECTION_RODATA
 
@@ -34,7 +34,6 @@ vp3_idct_data: times 8 dw 64277
                times 8 dw 12785
 
 cextern pb_80
-cextern pb_FE
 
 cextern pw_4
 cextern pw_8
@@ -155,40 +154,35 @@ cglobal vp3_h_loop_filter, 3, 4, 6
     RET
 
 %macro PAVGB_NO_RND 0
-    mova   m4, m0
-    mova   m5, m2
-    pand   m4, m1
-    pand   m5, m3
-    pxor   m1, m0
-    pxor   m3, m2
-    pand   m1, m6
-    pand   m3, m6
-    psrlq  m1, 1
-    psrlq  m3, 1
-    paddb  m4, m1
-    paddb  m5, m3
+    pxor          m0, m4
+    pxor          m1, m4
+    pavgb         m0, m1
+    pxor          m0, m4
 %endmacro
 
-INIT_MMX mmx
-cglobal put_vp_no_rnd_pixels8_l2, 5, 6, 0, dst, src1, src2, stride, h, stride3
-    mova   m6, [pb_FE]
+INIT_XMM sse2
+; void ff_vp3_put_no_rnd_pixels8_l2_sse2(uint8_t *dst, const uint8_t *a,
+;                                        const uint8_t *b, ptrdiff_t stride,
+;                                        int h)
+cglobal vp3_put_no_rnd_pixels8_l2, 5, 6, 5, dst, src1, src2, stride, h, stride3
     lea    stride3q,[strideq+strideq*2]
+    pcmpeqb       m4, m4
 .loop:
-    mova   m0, [src1q]
-    mova   m1, [src2q]
-    mova   m2, [src1q+strideq]
-    mova   m3, [src2q+strideq]
+    movq          m0, [src1q]
+    movq          m1, [src2q]
+    movhps        m0, [src1q+strideq]
+    movhps        m1, [src2q+strideq]
     PAVGB_NO_RND
-    mova   [dstq], m4
-    mova   [dstq+strideq], m5
+    movq      [dstq], m0
+    movhps [dstq+strideq], m0
 
-    mova   m0, [src1q+strideq*2]
-    mova   m1, [src2q+strideq*2]
-    mova   m2, [src1q+stride3q]
-    mova   m3, [src2q+stride3q]
+    movq          m0, [src1q+strideq*2]
+    movq          m1, [src2q+strideq*2]
+    movhps        m0, [src1q+stride3q]
+    movhps        m1, [src2q+stride3q]
     PAVGB_NO_RND
-    mova   [dstq+strideq*2], m4
-    mova   [dstq+stride3q],  m5
+    movq   [dstq+strideq*2], m0
+    movhps [dstq+stride3q],  m0
 
     lea    src1q, [src1q+strideq*4]
     lea    src2q, [src2q+strideq*4]
@@ -197,17 +191,26 @@ cglobal put_vp_no_rnd_pixels8_l2, 5, 6, 0, dst, src1, src2, stride, h, stride3
     jnz .loop
     RET
 
-%macro VP3_1D_IDCT_SSE2 0
+%macro VP3_1D_IDCT_SSE2 1
+%ifn %1
     movdqa        m2, I(3)      ; xmm2 = i3
+%else
+    SWAP           0, 2, 3, 1
+    SWAP           7, 5
+%endif
     movdqa        m6, C(3)      ; xmm6 = c3
     movdqa        m4, m2        ; xmm4 = i3
+%ifn %1
     movdqa        m7, I(5)      ; xmm7 = i5
+%endif
     pmulhw        m4, m6        ; xmm4 = c3 * i3 - i3
     movdqa        m1, C(5)      ; xmm1 = c5
     pmulhw        m6, m7        ; xmm6 = c3 * i5 - i5
     movdqa        m5, m1        ; xmm5 = c5
     pmulhw        m1, m2        ; xmm1 = c5 * i3 - i3
+%ifn %1
     movdqa        m3, I(1)      ; xmm3 = i1
+%endif
     pmulhw        m5, m7        ; xmm5 = c5 * i5 - i5
     movdqa        m0, C(1)      ; xmm0 = c1
     paddw         m4, m2        ; xmm4 = c3 * i3
@@ -301,153 +304,139 @@ cglobal put_vp_no_rnd_pixels8_l2, 5, 6, 0, dst, src1, src2, stride, h, stride3
     SHIFT(m0)                   ; xmm0 = op0
 %endmacro
 
-%macro PUT_BLOCK 8
-    movdqa      O(0), m%1
-    movdqa      O(1), m%2
-    movdqa      O(2), m%3
-    movdqa      O(3), m%4
-    movdqa      O(4), m%5
-    movdqa      O(5), m%6
-    movdqa      O(6), m%7
-    movdqa      O(7), m%8
+%macro PUT_BLOCK 1-*
+    %rep %0
+        mova    O(%1), m%1
+        %rotate 1
+    %endrep
 %endmacro
 
-%macro VP3_IDCT 1
-%define I(x) [%1+16*x]
-%define O(x) [%1+16*x]
+%macro VP3_IDCT 0
+%define I(x) [blockq+16*x]
+%define O(x) [blockq+16*x]
 %define C(x) [vp3_idct_data+16*(x-1)]
 %define SHIFT(x)
 %define ADD(x)
-        VP3_1D_IDCT_SSE2
+        VP3_1D_IDCT_SSE2 0
 %if ARCH_X86_64
         TRANSPOSE8x8W 0, 1, 2, 3, 4, 5, 6, 7, 8
 %else
-        TRANSPOSE8x8W 0, 1, 2, 3, 4, 5, 6, 7, [%1], [%1+16]
+        TRANSPOSE8x8W 0, 1, 2, 3, 4, 5, 6, 7, [blockq], [blockq+16]
 %endif
-        PUT_BLOCK 0, 1, 2, 3, 4, 5, 6, 7
+        PUT_BLOCK 0, 2, 4, 6, 7
 
 %define SHIFT(x) psraw  x, 4
 %define ADD(x)   paddsw x, [pw_8]
-        VP3_1D_IDCT_SSE2
-        PUT_BLOCK 0, 1, 2, 3, 4, 5, 6, 7
-%endmacro
-
-%macro vp3_idct_funcs 0
-cglobal vp3_idct_put, 3, 4, 9
-    VP3_IDCT      r2
-
-    mova          m4, [pb_80]
-    lea           r3, [r1*3]
-%assign %%i 0
-%rep 16/mmsize
-    mova          m0, [r2+mmsize*0+%%i]
-    mova          m1, [r2+mmsize*2+%%i]
-    mova          m2, [r2+mmsize*4+%%i]
-    mova          m3, [r2+mmsize*6+%%i]
-    packsswb      m0, [r2+mmsize*1+%%i]
-    packsswb      m1, [r2+mmsize*3+%%i]
-    packsswb      m2, [r2+mmsize*5+%%i]
-    packsswb      m3, [r2+mmsize*7+%%i]
-    paddb         m0, m4
-    paddb         m1, m4
-    paddb         m2, m4
-    paddb         m3, m4
-    movq   [r0     ], m0
-    movhps [r0+r1  ], m0
-    movq   [r0+r1*2], m1
-    movhps [r0+r3  ], m1
-%if %%i == 0
-    lea           r0, [r0+r1*4]
-%endif
-    movq   [r0     ], m2
-    movhps [r0+r1  ], m2
-    movq   [r0+r1*2], m3
-    movhps [r0+r3  ], m3
-%assign %%i %%i+8
-%endrep
-
-    pxor          m0, m0
-%assign %%offset 0
-%rep 128/mmsize
-    mova [r2+%%offset], m0
-%assign %%offset %%offset+mmsize
-%endrep
-    RET
-
-cglobal vp3_idct_add, 3, 4, 9
-    VP3_IDCT      r2
-
-    lea           r3, [r1*3]
-    pxor          m4, m4
-%assign %%i 0
-%rep 2
-    movq          m0, [r0]
-    movq          m1, [r0+r1]
-    movq          m2, [r0+r1*2]
-    movq          m3, [r0+r3]
-    punpcklbw     m0, m4
-    punpcklbw     m1, m4
-    punpcklbw     m2, m4
-    punpcklbw     m3, m4
-    paddsw        m0, [r2+ 0+%%i]
-    paddsw        m1, [r2+16+%%i]
-    paddsw        m2, [r2+32+%%i]
-    paddsw        m3, [r2+48+%%i]
-    packuswb      m0, m1
-    packuswb      m2, m3
-    movq   [r0     ], m0
-    movhps [r0+r1  ], m0
-    movq   [r0+r1*2], m2
-    movhps [r0+r3  ], m2
-%if %%i == 0
-    lea           r0, [r0+r1*4]
-%endif
-%assign %%i %%i+64
-%endrep
-%assign %%i 0
-%rep 128/mmsize
-    mova    [r2+%%i], m4
-%assign %%i %%i+mmsize
-%endrep
-    RET
+        VP3_1D_IDCT_SSE2 1
 %endmacro
 
 INIT_XMM sse2
-vp3_idct_funcs
+; void ff_vp3_idct_put_sse2(uint8_t *dest, ptrdiff_t stride, int16_t *block)
+cglobal vp3_idct_put, 3, 4, 9, dst, s, block, s3
+    VP3_IDCT
+
+    lea          s3q, [sq*3]
+    packsswb      m0, m1
+    mova          m1, [pb_80]
+    packsswb      m2, m3
+    packsswb      m4, m5
+    packsswb      m6, m7
+    paddb         m0, m1
+    paddb         m2, m1
+    paddb         m4, m1
+    paddb         m6, m1
+    movq   [dstq   ], m0
+    movhps [dstq+sq], m0
+    movq [dstq+sq*2], m2
+    movhps [dstq+s3q], m2
+    lea         dstq, [dstq+sq*4]
+    movq   [dstq   ], m4
+    movhps [dstq+sq], m4
+    movq [dstq+sq*2], m6
+    movhps [dstq+s3q], m6
+
+    pxor          m0, m0
+%assign offset 0
+%rep 128/mmsize
+    mova [blockq+offset], m0
+%assign offset offset+mmsize
+%endrep
+    RET
+
+%macro IDCT_ADD 9
+    movq          %1, [dstq]
+    movq          %2, [dstq+sq]
+    movq          %3, [dstq+sq*2]
+    movq          %4, [dstq+s3q]
+    punpcklbw     %1, %5
+    punpcklbw     %2, %5
+    punpcklbw     %3, %5
+    punpcklbw     %4, %5
+    paddsw        %1, %6
+    paddsw        %2, %7
+    paddsw        %3, %8
+    paddsw        %4, %9
+    packuswb      %1, %2
+    packuswb      %3, %4
+    movq   [dstq   ], %1
+    movhps [dstq+sq], %1
+    movq [dstq+sq*2], %3
+    movhps [dstq+s3q], %3
+%endmacro
+
+; void ff_vp3_idct_add_sse2(uint8_t *dest, ptrdiff_t stride, int16_t *block)
+cglobal vp3_idct_add, 3, 4, 9, dst, s, block, s3
+    VP3_IDCT
+    PUT_BLOCK 3, 4, 5, 6, 7
+
+    lea          s3q, [sq*3]
+    pxor          m3, m3
+    IDCT_ADD m4, m5, m6, m7, m3, m0, m1, m2, [blockq+48]
+    lea         dstq, [dstq+sq*4]
+    IDCT_ADD m4, m5, m6, m7, m3, [blockq+64], [blockq+80], [blockq+96], [blockq+112]
+
+%assign i 0
+%rep 128/mmsize
+    mova  [blockq+i], m3
+%assign i i+mmsize
+%endrep
+    RET
 
 %macro DC_ADD 0
-    movq          m2, [r0     ]
-    movq          m3, [r0+r1  ]
+    movq          m2, [dstq     ]
+    movq          m3, [dstq+sq  ]
     paddusb       m2, m0
-    movq          m4, [r0+r1*2]
+    movq          m4, [dstq+sq*2]
     paddusb       m3, m0
-    movq          m5, [r0+r2  ]
+    movq          m5, [dstq+s3q ]
     paddusb       m4, m0
     paddusb       m5, m0
     psubusb       m2, m1
     psubusb       m3, m1
-    movq   [r0     ], m2
+    movq [dstq     ], m2
     psubusb       m4, m1
-    movq   [r0+r1  ], m3
+    movq [dstq+sq  ], m3
     psubusb       m5, m1
-    movq   [r0+r1*2], m4
-    movq   [r0+r2  ], m5
+    movq [dstq+sq*2], m4
+    movq [dstq+s3q ], m5
 %endmacro
 
-INIT_MMX mmxext
-cglobal vp3_idct_dc_add, 3, 4
-    movsx         r3, word [r2]
-    mov    word [r2], 0
-    lea           r2, [r1*3]
-    add           r3, 15
-    sar           r3, 5
-    movd          m0, r3d
-    pshufw        m0, m0, 0x0
+INIT_XMM sse2
+; void ff_vp3_idct_dc_add_sse2(uint8_t *dest, ptrdiff_t stride, int16_t *block)
+cglobal vp3_idct_dc_add, 3, 4, 6, dst, s, block, dc
+    movsx        dcd, word [blockq]
+    mov word [blockq], 0
+%define s3q blockq
+    lea          s3q, [sq*3]
+    add          dcd, 15
+    sar          dcd, 5
+    movd          m0, dcd
+    SPLATW        m0, m0
     pxor          m1, m1
     psubw         m1, m0
     packuswb      m0, m0
     packuswb      m1, m1
     DC_ADD
-    lea           r0, [r0+r1*4]
+    lea         dstq, [dstq+sq*4]
     DC_ADD
     RET
