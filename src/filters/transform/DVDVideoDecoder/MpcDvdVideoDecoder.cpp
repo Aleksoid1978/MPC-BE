@@ -57,9 +57,6 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	// Extended video types of DVD Navigator filter
 	{&MEDIATYPE_Video,              &MEDIASUBTYPE_MPEG2_VIDEO},
 	{&MEDIATYPE_MPEG2_PES,          &MEDIASUBTYPE_MPEG2_VIDEO},
-	// Video CD?
-	//{&MEDIATYPE_Video,              &MEDIASUBTYPE_MPEG1Packet},
-	//{&MEDIATYPE_Video,              &MEDIASUBTYPE_MPEG1Payload},
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
@@ -1385,9 +1382,6 @@ HRESULT CSubpicInputPin::CheckMediaType(const CMediaType* mtIn)
 {
 	return (// Base subpicture type of DVD Navigator filter
 			mtIn->majortype == MEDIATYPE_DVD_ENCRYPTED_PACK && mtIn->subtype == MEDIASUBTYPE_DVD_SUBPICTURE)
-			// Video CD?
-			|| (mtIn->majortype == MEDIATYPE_Video
-				&& (mtIn->subtype == MEDIASUBTYPE_CVD_SUBPICTURE || mtIn->subtype == MEDIASUBTYPE_SVCD_SUBPICTURE))
 		   ? S_OK
 		   : VFW_E_TYPE_NOT_ACCEPTED;
 }
@@ -1459,11 +1453,6 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 		return S_FALSE;
 	}
 
-	if (m_mt.subtype == MEDIASUBTYPE_SVCD_SUBPICTURE) {
-		pDataIn += 4;
-		len -= 4;
-	}
-
 	if (len <= 0) {
 		return S_FALSE;
 	}
@@ -1492,10 +1481,6 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 
 		if (m_mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE) {
 			p.reset(DNew dvdspu());
-		} else if (m_mt.subtype == MEDIASUBTYPE_CVD_SUBPICTURE) {
-			p.reset(DNew cvdspu());
-		} else if (m_mt.subtype == MEDIASUBTYPE_SVCD_SUBPICTURE) {
-			p.reset(DNew svcdspu());
 		} else {
 			return E_FAIL;
 		}
@@ -1900,217 +1885,6 @@ void CSubpicInputPin::dvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h
 
 		if (!fAligned) {
 			GetNibble(p, offset, nField, fAligned);    // align to byte
-		}
-
-		pt.x = rc.left;
-		pt.y++;
-		nField = 1 - nField;
-	}
-}
-
-// CSubpicInputPin::cvdspu
-
-bool CSubpicInputPin::cvdspu::Parse()
-{
-	BYTE* p = data();
-
-	WORD packetsize = (p[0] << 8) | p[1];
-	WORD datasize = (p[2] << 8) | p[3];
-
-	if (packetsize > size() || datasize > packetsize) {
-		return false;
-	}
-
-	p = data() + datasize;
-
-	for (int i = datasize, j = packetsize-4; i <= j; i += 4, p += 4) {
-		switch (p[0]) {
-			case 0x0c:
-				break;
-			case 0x04:
-				m_rtStop = m_rtStart + 10000i64 * ((p[1] << 16) | (p[2] << 8) | p[3]) / 90;
-				break;
-			case 0x17:
-				m_sphli.StartX = ((p[1] & 0x0f) << 6) + (p[2] >> 2);
-				m_sphli.StartY = ((p[2] & 0x03) << 8) + p[3];
-				break;
-			case 0x1f:
-				m_sphli.StopX = ((p[1] & 0x0f) << 6) + (p[2] >> 2);
-				m_sphli.StopY = ((p[2] & 0x03) << 8) + p[3];
-				break;
-			case 0x24:
-			case 0x25:
-			case 0x26:
-			case 0x27:
-				m_sppal[0][p[0] - 0x24].Y = p[1];
-				m_sppal[0][p[0] - 0x24].U = p[2];
-				m_sppal[0][p[0] - 0x24].V = p[3];
-				break;
-			case 0x2c:
-			case 0x2d:
-			case 0x2e:
-			case 0x2f:
-				m_sppal[1][p[0] - 0x2c].Y = p[1];
-				m_sppal[1][p[0] - 0x2c].U = p[2];
-				m_sppal[1][p[0] - 0x2c].V = p[3];
-				break;
-			case 0x37:
-				m_sppal[0][3].Reserved = p[2] >> 4;
-				m_sppal[0][2].Reserved = p[2] & 0xf;
-				m_sppal[0][1].Reserved = p[3] >> 4;
-				m_sppal[0][0].Reserved = p[3] & 0xf;
-				break;
-			case 0x3f:
-				m_sppal[1][3].Reserved = p[2] >> 4;
-				m_sppal[1][2].Reserved = p[2] & 0xf;
-				m_sppal[1][1].Reserved = p[3] >> 4;
-				m_sppal[1][0].Reserved = p[3] & 0xf;
-				break;
-			case 0x47:
-				m_offset[0] = (p[2] << 8) | p[3];
-				break;
-			case 0x4f:
-				m_offset[1] = (p[2] << 8) | p[3];
-				break;
-			default:
-				break;
-		}
-	}
-
-	return true;
-}
-
-void CSubpicInputPin::cvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h, AM_DVD_YUV* sppal, bool fsppal)
-{
-	BYTE* p = data();
-	uint32_t offset[2] = {m_offset[0], m_offset[1]};
-
-	CRect rcclip(0, 0, w, h);
-
-	/* FIXME: startx/y looks to be wrong in the sample I tested
-	CPoint pt(m_sphli.StartX, m_sphli.StartY);
-	CRect rc(pt, CPoint(m_sphli.StopX, m_sphli.StopY));
-	*/
-
-	CSize size(m_sphli.StopX - m_sphli.StartX, m_sphli.StopY - m_sphli.StartY);
-	CPoint pt((rcclip.Width() - size.cx) / 2, (rcclip.Height() * 3 - size.cy * 1) / 4);
-	CRect rc(pt, size);
-
-	int nField = 0;
-	int fAligned = 1;
-
-	const uint32_t end[2] = {offset[1], (p[2] << 8) | p[3]};
-
-	while ((nField == 0 && offset[0] < end[0]) || (nField == 1 && offset[1] < end[1])) {
-		BYTE code = GetNibble(p, offset, nField, fAligned);
-
-		if (code >= 0x4) {
-			DrawPixels(yuv, w, pt, code >> 2, m_sppal[0][code & 3], rcclip);
-			pt.x += code >> 2;
-			continue;
-		}
-
-		code = GetNibble(p, offset, nField, fAligned);
-		DrawPixels(yuv, w, pt, rc.right - pt.x, m_sppal[0][code & 3], rcclip);
-
-		if (!fAligned) {
-			GetNibble(p, offset, nField, fAligned);    // align to byte
-		}
-
-		pt.x = rc.left;
-		pt.y++;
-		nField = 1 - nField;
-	}
-}
-
-// CSubpicInputPin::svcdspu
-
-bool CSubpicInputPin::svcdspu::Parse()
-{
-	BYTE* p = data();
-	const BYTE* p0 = p;
-
-	if (size() < 2) {
-		return false;
-	}
-
-	WORD packetsize = (p[0] << 8) | p[1];
-	p += 2;
-
-	if (packetsize > size()) {
-		return false;
-	}
-
-	bool duration = !!(*p++ & 0x04);
-
-	p++; // unknown
-
-	if (duration) {
-		m_rtStop = m_rtStart + 10000i64 * ((p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3]) / 90;
-		p += 4;
-	}
-
-	m_sphli.StartX = m_sphli.StopX = (p[0] << 8) | p[1];
-	p += 2;
-	m_sphli.StartY = m_sphli.StopY = (p[0] << 8) | p[1];
-	p += 2;
-	m_sphli.StopX += (p[0] << 8) | p[1];
-	p += 2;
-	m_sphli.StopY += (p[0] << 8) | p[1];
-	p += 2;
-
-	for (int i = 0; i < 4; i++) {
-		m_sppal[i].Y = *p++;
-		m_sppal[i].U = *p++;
-		m_sppal[i].V = *p++;
-		m_sppal[i].Reserved = *p++ >> 4;
-	}
-
-	if (*p++&0xc0) {
-		p += 4;    // duration of the shift operation should be here, but it is untested
-	}
-
-	m_offset[1] = (p[0] << 8) | p[1];
-	p += 2;
-
-	m_offset[0] = p - p0;
-	m_offset[1] += m_offset[0];
-
-	return true;
-}
-
-void CSubpicInputPin::svcdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h, AM_DVD_YUV* sppal, bool fsppal)
-{
-	BYTE* p = data();
-	uint32_t offset[2] = {m_offset[0], m_offset[1]};
-
-	CRect rcclip(0, 0, w, h);
-
-	/* FIXME: startx/y looks to be wrong in the sample I tested (yes, this one too!)
-	CPoint pt(m_sphli.StartX, m_sphli.StartY);
-	CRect rc(pt, CPoint(m_sphli.StopX, m_sphli.StopY));
-	*/
-
-	CSize size(m_sphli.StopX - m_sphli.StartX, m_sphli.StopY - m_sphli.StartY);
-	CPoint pt((rcclip.Width() - size.cx) / 2, (rcclip.Height() * 3 - size.cy * 1) / 4);
-	CRect rc(pt, size);
-
-	int nField = 0;
-	int n = 3;
-
-	const uint32_t end[2] = {offset[1], (p[2] << 8) | p[3]};
-
-	while ((nField == 0 && offset[0] < end[0]) || (nField == 1 && offset[1] < end[1])) {
-		BYTE code = GetHalfNibble(p, offset, nField, n);
-		BYTE repeat = 1 + (code == 0 ? GetHalfNibble(p, offset, nField, n) : 0);
-
-		DrawPixels(yuv, w, pt, repeat, m_sppal[code & 3], rcclip);
-		if ((pt.x += repeat) < rc.right) {
-			continue;
-		}
-
-		while (n != 3) {
-			GetHalfNibble(p, offset, nField, n);    // align to byte
 		}
 
 		pt.x = rc.left;

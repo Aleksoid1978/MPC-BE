@@ -244,28 +244,6 @@ class CSubpicInputPin : public CMpeg2DecInputPin
 		void Render(REFERENCE_TIME rt, BYTE** p, int w, int h, AM_DVD_YUV* sppal, bool fsppal) override;
 	};
 
-	class cvdspu : public spu
-	{
-	public:
-		AM_DVD_YUV m_sppal[2][4];
-		cvdspu() {
-			memset(m_sppal, 0, sizeof(m_sppal));
-		}
-		bool Parse() override;
-		void Render(REFERENCE_TIME rt, BYTE** p, int w, int h, AM_DVD_YUV* sppal, bool fsppal) override;
-	};
-
-	class svcdspu : public spu
-	{
-	public:
-		AM_DVD_YUV m_sppal[4];
-		svcdspu() {
-			memset(m_sppal, 0, sizeof(m_sppal));
-		}
-		bool Parse() override;
-		void Render(REFERENCE_TIME rt, BYTE** p, int w, int h, AM_DVD_YUV* sppal, bool fsppal) override;
-	};
-
 	std::list<std::unique_ptr<spu>> m_sps;
 
 protected:
