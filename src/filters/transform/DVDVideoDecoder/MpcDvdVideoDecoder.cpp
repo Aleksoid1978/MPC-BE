@@ -1632,15 +1632,16 @@ static __inline BYTE GetHalfNibble(const BYTE* p, uint32_t* offset, const int& n
 	return ret;
 }
 
-static __inline void DrawPixel(BYTE** yuv, CPoint pt, int pitch, AM_DVD_YUV& c)
+static __inline void DrawPixel(BYTE** yuv, CPoint pt, int pitch, const AM_DVD_YUV& c)
 {
 	if (c.Reserved == 0) {
 		return;
 	}
+	int contrast = c.Reserved;
 
 	BYTE* p = &yuv[0][pt.y * pitch + pt.x];
-	//*p = (*p*(15-contrast) + sppal[color].Y*contrast)>>4;
-	*p -= (*p - c.Y) * c.Reserved >> 4;
+	//*p = (*p*(15-contrast) + c.Y*contrast)>>4;
+	*p -= (*p - c.Y) * contrast >> 4;
 
 	if (pt.y&1) {
 		return;    // since U/V is half res there is no need to overwrite the same line again
@@ -1653,19 +1654,19 @@ static __inline void DrawPixel(BYTE** yuv, CPoint pt, int pitch, AM_DVD_YUV& c)
 	// U/V is exchanged? wierd but looks true when comparing the outputted colors from other decoders
 
 	p = &yuv[1][pt.y * pitch + pt.x];
-	//*p = (BYTE)(((((int)*p-0x80)*(15-contrast) + ((int)sppal[color].V-0x80)*contrast) >> 4) + 0x80);
-	*p -= (*p - c.V) * c.Reserved >> 4;
+	//*p = (BYTE)(((((int)*p-0x80)*(15-contrast) + ((int)c.V-0x80)*contrast) >> 4) + 0x80);
+	*p -= (*p - c.V) * contrast >> 4;
 
 	p = &yuv[2][pt.y * pitch + pt.x];
-	//*p = (BYTE)(((((int)*p-0x80)*(15-contrast) + ((int)sppal[color].U-0x80)*contrast) >> 4) + 0x80);
-	*p -= (*p - c.U) * c.Reserved >> 4;
+	//*p = (BYTE)(((((int)*p-0x80)*(15-contrast) + ((int)c.U-0x80)*contrast) >> 4) + 0x80);
+	*p -= (*p - c.U) * contrast >> 4;
 
 	// Neighter of the blending formulas are accurate (">>4" should be "/15").
 	// Even though the second one is a bit worse, since we are scaling the difference only,
 	// the error is still not noticable.
 }
 
-static __inline void DrawPixels(BYTE** yuv, int pitch, CPoint pt, int len, AM_DVD_YUV& c, CRect& rc)
+static __inline void DrawPixels(BYTE** yuv, int pitch, CPoint pt, int len, const AM_DVD_YUV& c, const CRect& rc)
 {
 	if (pt.y < rc.top || pt.y >= rc.bottom) {
 		return;
