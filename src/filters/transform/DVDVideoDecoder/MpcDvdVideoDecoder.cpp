@@ -1400,7 +1400,7 @@ bool CSubpicInputPin::HasAnythingToRender(REFERENCE_TIME rt)
 	CAutoLock cAutoLock(&m_csReceive);
 
 	for (const auto& sp : m_dvdspus) {
-		if (sp->m_rtStart <= rt && rt < sp->m_rtStop && (/*sp->m_psphli ||*/ sp->m_fForced || m_spon)) {
+		if (sp->m_rtStart <= rt && rt < sp->m_rtStop && (sp->m_fForced || m_spon)) {
 			return true;
 		}
 	}
@@ -1458,10 +1458,6 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 		return S_FALSE;
 	}
 
-	if (len <= 0) {
-		return S_FALSE;
-	}
-
 	CAutoLock cAutoLock(&m_csReceive);
 
 	REFERENCE_TIME rtStart = 0, rtStop = 0;
@@ -1481,13 +1477,7 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 			}
 		}
 
-		std::unique_ptr<dvdspu> p;
-
-		if (m_mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE) {
-			p.reset(DNew dvdspu());
-		} else {
-			return E_FAIL;
-		}
+		auto p = std::make_unique<dvdspu>();
 
 		p->m_rtStart = rtStart;
 		p->m_rtStop = _I64_MAX;
@@ -1501,7 +1491,7 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 		m_dvdspus.back()->Parse();
 	}
 
-	return S_FALSE;
+	return S_OK;
 }
 
 STDMETHODIMP CSubpicInputPin::EndFlush()
@@ -1566,6 +1556,8 @@ STDMETHODIMP CSubpicInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceDat
 
 			AM_PROPERTY_COMPOSIT_ON* pCompositOn = (AM_PROPERTY_COMPOSIT_ON*)pPropertyData;
 			m_spon = *pCompositOn;
+
+			DLog(L"DVD Composit Event");
 		}
 		break;
 		default:
@@ -1600,7 +1592,7 @@ STDMETHODIMP CSubpicInputPin::QuerySupported(REFGUID PropSet, ULONG Id, ULONG* p
 
 // CSubpicInputPin::spu
 
-static __inline BYTE GetNibble(const BYTE* p, uint32_t* offset, const int& nField, int& fAligned)
+static BYTE GetNibble(const BYTE* p, uint32_t* offset, const int& nField, int& fAligned)
 {
 	BYTE ret = (p[offset[nField]] >> (fAligned << 2)) & 0x0f;
 	offset[nField] += 1 - fAligned;
@@ -1608,7 +1600,7 @@ static __inline BYTE GetNibble(const BYTE* p, uint32_t* offset, const int& nFiel
 	return ret;
 }
 
-static __inline BYTE GetHalfNibble(const BYTE* p, uint32_t* offset, const int& nField, int& n)
+static BYTE GetHalfNibble(const BYTE* p, uint32_t* offset, const int& nField, int& n)
 {
 	BYTE ret = (p[offset[nField]] >> (n << 1)) & 0x03;
 	if (!n) {
@@ -1618,7 +1610,7 @@ static __inline BYTE GetHalfNibble(const BYTE* p, uint32_t* offset, const int& n
 	return ret;
 }
 
-static __inline void DrawPixel(BYTE** yuv, CPoint pt, int pitch, const AM_DVD_YUV& c)
+static void DrawPixel(BYTE** yuv, CPoint pt, int pitch, const AM_DVD_YUV& c)
 {
 	if (c.Reserved == 0) {
 		return;
@@ -1652,7 +1644,7 @@ static __inline void DrawPixel(BYTE** yuv, CPoint pt, int pitch, const AM_DVD_YU
 	// the error is still not noticable.
 }
 
-static __inline void DrawPixels(BYTE** yuv, int pitch, CPoint pt, int len, const AM_DVD_YUV& c, const CRect& rc)
+static void DrawPixels(BYTE** yuv, int pitch, CPoint pt, int len, const AM_DVD_YUV& c, const CRect& rc)
 {
 	if (pt.y < rc.top || pt.y >= rc.bottom) {
 		return;
@@ -1845,6 +1837,10 @@ void CSubpicInputPin::dvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h
 	pal[2].Reserved = sphli.ColCon.emph1con;
 	pal[3] = sppal[fsppal ? sphli.ColCon.emph2col : 3];
 	pal[3].Reserved = sphli.ColCon.emph2con;
+
+	if (pal[0].Reserved == 0 && pal[1].Reserved == 0 && pal[2].Reserved == 0 && pal[3].Reserved == 0) {
+		return;
+	}
 
 	int nField = 0;
 	int fAligned = 1;
