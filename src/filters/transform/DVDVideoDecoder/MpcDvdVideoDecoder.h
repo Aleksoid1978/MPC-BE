@@ -216,9 +216,9 @@ class CSubpicInputPin : public CMpeg2DecInputPin
 	AM_PROPERTY_COMPOSIT_ON m_spon = TRUE;
 	AM_DVD_YUV m_sppal[16];
 	bool m_fsppal = false;
-	std::unique_ptr<AM_PROPERTY_SPHLI> m_sphli; // temp
+	std::unique_ptr<AM_PROPERTY_SPHLI> m_sphli; // from AM_PROPERTY_DVDSUBPIC_HLI
 
-	class spu : public std::vector<BYTE>
+	class dvdspu final
 	{
 	public:
 		bool m_fForced = false;
@@ -226,25 +226,22 @@ class CSubpicInputPin : public CMpeg2DecInputPin
 		REFERENCE_TIME m_rtStop = 0;
 		uint32_t m_offset[2] = {};
 		AM_PROPERTY_SPHLI m_sphli = {}; // parsed
-		std::unique_ptr<AM_PROPERTY_SPHLI> m_psphli; // for the menu (optional)
-		virtual ~spu() {}
-		virtual bool Parse() PURE;
-		virtual void Render(REFERENCE_TIME rt, BYTE** p, int w, int h, AM_DVD_YUV* sppal, bool fsppal) PURE;
-	};
 
-	class dvdspu : public spu
-	{
-	public:
 		struct offset_t {
-			REFERENCE_TIME rt;
-			AM_PROPERTY_SPHLI sphli;
+			REFERENCE_TIME rt = 0;
+			AM_PROPERTY_SPHLI sphli = {};
 		};
 		std::list<offset_t> m_offsets;
-		bool Parse() override;
-		void Render(REFERENCE_TIME rt, BYTE** p, int w, int h, AM_DVD_YUV* sppal, bool fsppal) override;
+
+		std::vector<BYTE> m_data;
+
+		dvdspu() = default;
+		~dvdspu() = default;
+		bool Parse();
+		void Render(REFERENCE_TIME rt, BYTE** p, int w, int h, AM_DVD_YUV* sppal, bool fsppal, const AM_PROPERTY_SPHLI* psphli);
 	};
 
-	std::list<std::unique_ptr<spu>> m_sps;
+	std::list<std::unique_ptr<dvdspu>> m_dvdspus;
 
 protected:
 	HRESULT Transform(IMediaSample* pSample) override;

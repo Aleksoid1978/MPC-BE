@@ -1399,7 +1399,7 @@ bool CSubpicInputPin::HasAnythingToRender(REFERENCE_TIME rt)
 
 	CAutoLock cAutoLock(&m_csReceive);
 
-	for (const auto& sp : m_sps) {
+	for (const auto& sp : m_dvdspus) {
 		if (sp->m_rtStart <= rt && rt < sp->m_rtStop && (/*sp->m_psphli ||*/ sp->m_fForced || m_spon)) {
 			return true;
 		}
@@ -1413,18 +1413,23 @@ void CSubpicInputPin::RenderSubpics(REFERENCE_TIME rt, BYTE** yuv, int w, int h)
 	CAutoLock cAutoLock(&m_csReceive);
 
 	// remove no longer needed things first
-	for (auto it = m_sps.begin(); it != m_sps.end();) {
+	for (auto it = m_dvdspus.begin(); it != m_dvdspus.end();) {
 		if ((*it)->m_rtStop <= rt) {
-			it = m_sps.erase(it);
+			it = m_dvdspus.erase(it);
 		} else {
 			++it;
 		}
 	}
 
-	for (const auto& sp : m_sps) {
+	for (const auto& sp : m_dvdspus) {
 		if (sp->m_rtStart <= rt && rt < sp->m_rtStop
-				&& (m_spon || (sp->m_fForced && ((static_cast<CMpeg2DecFilter*>(m_pFilter))->IsForcedSubtitlesEnabled()) || sp->m_psphli))) {
-			sp->Render(rt, yuv, w, h, m_sppal, m_fsppal);
+				&& (m_spon || (sp->m_fForced && (static_cast<CMpeg2DecFilter*>(m_pFilter))->IsForcedSubtitlesEnabled()))) {
+
+			sp->Render(rt, yuv, w, h, m_sppal, m_fsppal, nullptr);
+
+			if (m_sphli && sp->m_rtStart <= PTS2RT(m_sphli->StartPTM) && PTS2RT(m_sphli->StartPTM) < sp->m_rtStop) {
+				sp->Render(rt, yuv, w, h, m_sppal, m_fsppal, m_sphli.get());
+			}
 		}
 	}
 }
@@ -1463,13 +1468,12 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 	hr = pSample->GetTime(&rtStart, &rtStop);
 
 	if (FAILED(hr)) {
-		if (m_sps.size()) {
-			auto& sp = m_sps.back();
-			sp->resize(sp->size() + len);
-			memcpy(sp->data() + sp->size() - len, pDataIn, len);
+		if (m_dvdspus.size()) {
+			auto& sp = m_dvdspus.back();
+			sp->m_data.insert(sp->m_data.end(), pDataIn, pDataIn + len);
 		}
 	} else {
-		for (auto it = m_sps.rbegin(); it != m_sps.rend(); ++it) {
+		for (auto it = m_dvdspus.rbegin(); it != m_dvdspus.rend(); ++it) {
 			auto& sp = *it;
 			if (sp->m_rtStop == _I64_MAX) {
 				sp->m_rtStop = rtStart;
@@ -1477,7 +1481,7 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 			}
 		}
 
-		std::unique_ptr<spu> p;
+		std::unique_ptr<dvdspu> p;
 
 		if (m_mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE) {
 			p.reset(DNew dvdspu());
@@ -1488,18 +1492,13 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 		p->m_rtStart = rtStart;
 		p->m_rtStop = _I64_MAX;
 
-		p->resize(len);
-		memcpy(p->data(), pDataIn, len);
+		p->m_data.assign(pDataIn, pDataIn + len);
 
-		if (m_sphli && p->m_rtStart == PTS2RT(m_sphli->StartPTM)) {
-			p->m_psphli = std::move(m_sphli);
-		}
-
-		m_sps.emplace_back(std::move(p));
+		m_dvdspus.emplace_back(std::move(p));
 	}
 
-	if (m_sps.size()) {
-		m_sps.back()->Parse();
+	if (m_dvdspus.size()) {
+		m_dvdspus.back()->Parse();
 	}
 
 	return S_FALSE;
@@ -1508,7 +1507,7 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 STDMETHODIMP CSubpicInputPin::EndFlush()
 {
 	CAutoLock cAutoLock(&m_csReceive);
-	m_sps.clear();
+	m_dvdspus.clear();
 	return S_OK;
 }
 
@@ -1549,29 +1548,16 @@ STDMETHODIMP CSubpicInputPin::Set(REFGUID PropSet, ULONG Id, LPVOID pInstanceDat
 			AM_PROPERTY_SPHLI* pSPHLI = (AM_PROPERTY_SPHLI*)pPropertyData;
 
 			if (pSPHLI->HLISS) {
-				for (const auto& sp : m_sps) {
-					if (sp->m_rtStart <= PTS2RT(pSPHLI->StartPTM) && PTS2RT(pSPHLI->StartPTM) < sp->m_rtStop
-							&& !IsSPHLIEqual(pSPHLI, sp->m_psphli.get())) {
-						bRefresh = true;
-						sp->m_psphli.reset(DNew AM_PROPERTY_SPHLI(*pSPHLI));
-					}
-				}
-
-				if (!bRefresh && !IsSPHLIEqual(pSPHLI, m_sphli.get())) {
-					// save it for later, a subpic might be late for this hli
+				if (!m_sphli || !IsSPHLIEqual(pSPHLI, m_sphli.get())) {
+					bRefresh = true;
 					m_sphli.reset(DNew AM_PROPERTY_SPHLI(*pSPHLI));
-				}
 
-				if (bRefresh) {
 					DLog(L"DVD HLI Event: %20I64d -> %20I64d, (%u,%u) - (%u,%u)",
-							PTS2RT(pSPHLI->StartPTM), PTS2RT(pSPHLI->EndPTM),
-							pSPHLI->StartX, pSPHLI->StartY, pSPHLI->StopX, pSPHLI->StopY);
+						 PTS2RT(pSPHLI->StartPTM), PTS2RT(pSPHLI->EndPTM),
+						 pSPHLI->StartX, pSPHLI->StartY, pSPHLI->StopX, pSPHLI->StopY);
 				}
 			} else {
 				m_sphli.reset();
-				for (const auto& sp : m_sps) {
-					sp->m_psphli.reset();
-				}
 			}
 		}
 		break;
@@ -1705,12 +1691,12 @@ bool CSubpicInputPin::dvdspu::Parse()
 {
 	m_offsets.clear();
 
-	BYTE* p = data();
+	auto p = m_data.data();
 
 	WORD packetsize = (p[0] << 8) | p[1];
 	WORD datasize = (p[2] << 8) | p[3];
 
-	if (packetsize > size() || datasize > packetsize) {
+	if (packetsize > m_data.size() || datasize > packetsize) {
 		return false;
 	}
 
@@ -1826,9 +1812,9 @@ bool CSubpicInputPin::dvdspu::Parse()
 	return true;
 }
 
-void CSubpicInputPin::dvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h, AM_DVD_YUV* sppal, bool fsppal)
+void CSubpicInputPin::dvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h, AM_DVD_YUV* sppal, bool fsppal, const AM_PROPERTY_SPHLI* psphli)
 {
-	BYTE* p = data();
+	auto p = m_data.data();
 	uint32_t offset[2] = {m_offset[0], m_offset[1]};
 
 	AM_PROPERTY_SPHLI sphli = m_sphli;
@@ -1838,9 +1824,9 @@ void CSubpicInputPin::dvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h
 	CRect rcclip(0, 0, w, h);
 	rcclip &= rc;
 
-	if (m_psphli) {
-		rcclip &= CRect(m_psphli->StartX, m_psphli->StartY, m_psphli->StopX, m_psphli->StopY);
-		sphli = *m_psphli;
+	if (psphli) {
+		rcclip &= CRect(psphli->StartX, psphli->StartY, psphli->StopX, psphli->StopY);
+		sphli = *psphli;
 	} else if (m_offsets.size() > 1) {
 		for (const auto& o : m_offsets) {
 			if (rt >= o.rt) {
