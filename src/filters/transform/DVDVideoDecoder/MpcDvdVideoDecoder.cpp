@@ -1491,7 +1491,7 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 		m_dvdspus.back()->Parse();
 	}
 
-	return S_OK;
+	return S_FALSE;
 }
 
 STDMETHODIMP CSubpicInputPin::EndFlush()
