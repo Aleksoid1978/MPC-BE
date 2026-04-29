@@ -1425,11 +1425,9 @@ void CSubpicInputPin::RenderSubpics(REFERENCE_TIME rt, BYTE** yuv, int w, int h)
 		if (sp->m_rtStart <= rt && rt < sp->m_rtStop
 				&& (m_spon || (sp->m_fForced && (static_cast<CMpeg2DecFilter*>(m_pFilter))->IsForcedSubtitlesEnabled()))) {
 
-			sp->Render(rt,
-					   yuv,
-					   w, h,
-					   m_sppal, m_fsppal,
-					   (m_sphli && sp->m_rtStart <= PTS2RT(m_sphli->StartPTM) && PTS2RT(m_sphli->StartPTM) < sp->m_rtStop) ? m_sphli.get() : nullptr);
+			const AM_PROPERTY_SPHLI* psphli = (m_sphli && sp->m_rtStart <= PTS2RT(m_sphli->StartPTM) && PTS2RT(m_sphli->StartPTM) < sp->m_rtStop) ? m_sphli.get() : nullptr;
+
+			sp->Render(rt, yuv, w, h, m_sppal, m_fsppal, psphli);
 		}
 	}
 }
