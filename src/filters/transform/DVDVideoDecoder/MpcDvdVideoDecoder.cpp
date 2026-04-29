@@ -985,7 +985,7 @@ bool CMpeg2DecFilter::IsNeedDeliverToRenderer() const
 bool CMpeg2DecFilter::IsInterlaced() const
 {
 	if (m_dec && m_fInterlaced
-			&& !(m_dec->m_info.m_sequence->flags & SEQ_FLAG_PROGRESSIVE_SEQUENCE || m_fFilm)) {
+			&& !((m_dec->m_info.m_sequence && m_dec->m_info.m_sequence->flags & SEQ_FLAG_PROGRESSIVE_SEQUENCE) || m_fFilm)) {
 		return true;
 	}
 
