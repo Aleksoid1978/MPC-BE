@@ -1425,11 +1425,11 @@ void CSubpicInputPin::RenderSubpics(REFERENCE_TIME rt, BYTE** yuv, int w, int h)
 		if (sp->m_rtStart <= rt && rt < sp->m_rtStop
 				&& (m_spon || (sp->m_fForced && (static_cast<CMpeg2DecFilter*>(m_pFilter))->IsForcedSubtitlesEnabled()))) {
 
-			sp->Render(rt, yuv, w, h, m_sppal, m_fsppal, nullptr);
-
-			if (m_sphli && sp->m_rtStart <= PTS2RT(m_sphli->StartPTM) && PTS2RT(m_sphli->StartPTM) < sp->m_rtStop) {
-				sp->Render(rt, yuv, w, h, m_sppal, m_fsppal, m_sphli.get());
-			}
+			sp->Render(rt,
+					   yuv,
+					   w, h,
+					   m_sppal, m_fsppal,
+					   (m_sphli && sp->m_rtStart <= PTS2RT(m_sphli->StartPTM) && PTS2RT(m_sphli->StartPTM) < sp->m_rtStop) ? m_sphli.get() : nullptr);
 		}
 	}
 }
@@ -1590,93 +1590,6 @@ STDMETHODIMP CSubpicInputPin::QuerySupported(REFGUID PropSet, ULONG Id, ULONG* p
 	return S_OK;
 }
 
-// CSubpicInputPin::spu
-
-static BYTE GetNibble(const BYTE* p, uint32_t* offset, const int& nField, int& fAligned)
-{
-	BYTE ret = (p[offset[nField]] >> (fAligned << 2)) & 0x0f;
-	offset[nField] += 1 - fAligned;
-	fAligned = !fAligned;
-	return ret;
-}
-
-static BYTE GetHalfNibble(const BYTE* p, uint32_t* offset, const int& nField, int& n)
-{
-	BYTE ret = (p[offset[nField]] >> (n << 1)) & 0x03;
-	if (!n) {
-		offset[nField]++;
-	}
-	n = (n - 1 + 4) & 3;
-	return ret;
-}
-
-static void DrawPixel(BYTE** yuv, CPoint pt, int pitch, const AM_DVD_YUV& c)
-{
-	if (c.Reserved == 0) {
-		return;
-	}
-	int contrast = c.Reserved;
-
-	BYTE* p = &yuv[0][pt.y * pitch + pt.x];
-	//*p = (*p*(15-contrast) + c.Y*contrast)>>4;
-	*p -= (*p - c.Y) * contrast >> 4;
-
-	if (pt.y&1) {
-		return;    // since U/V is half res there is no need to overwrite the same line again
-	}
-
-	pt.x = (pt.x + 1) / 2;
-	pt.y = (pt.y /*+ 1*/) / 2; // only paint the upper field always, don't round it
-	pitch /= 2;
-
-	// U/V is exchanged? wierd but looks true when comparing the outputted colors from other decoders
-
-	p = &yuv[1][pt.y * pitch + pt.x];
-	//*p = (BYTE)(((((int)*p-0x80)*(15-contrast) + ((int)c.V-0x80)*contrast) >> 4) + 0x80);
-	*p -= (*p - c.V) * contrast >> 4;
-
-	p = &yuv[2][pt.y * pitch + pt.x];
-	//*p = (BYTE)(((((int)*p-0x80)*(15-contrast) + ((int)c.U-0x80)*contrast) >> 4) + 0x80);
-	*p -= (*p - c.U) * contrast >> 4;
-
-	// Neighter of the blending formulas are accurate (">>4" should be "/15").
-	// Even though the second one is a bit worse, since we are scaling the difference only,
-	// the error is still not noticable.
-}
-
-static void DrawPixels(BYTE** yuv, int pitch, CPoint pt, int len, const AM_DVD_YUV& c, const CRect& rc)
-{
-	if (pt.y < rc.top || pt.y >= rc.bottom) {
-		return;
-	}
-	if (pt.x < rc.left) {
-		len -= rc.left - pt.x;
-		pt.x = rc.left;
-	}
-	if (pt.x + len > rc.right) {
-		len = rc.right - pt.x;
-	}
-	if (len <= 0 || pt.x >= rc.right) {
-		return;
-	}
-
-	if (c.Reserved == 0) {
-		if (rc.IsRectEmpty()) {
-			return;
-		}
-
-		if (pt.y < rc.top || pt.y >= rc.bottom
-				|| pt.x + len < rc.left || pt.x >= rc.right) {
-			return;
-		}
-	}
-
-	while (len-- > 0) {
-		DrawPixel(yuv, pt, pitch, c);
-		pt.x++;
-	}
-}
-
 // CSubpicInputPin::dvdspu
 
 bool CSubpicInputPin::dvdspu::Parse()
@@ -1804,29 +1717,94 @@ bool CSubpicInputPin::dvdspu::Parse()
 	return true;
 }
 
+static BYTE GetNibble(const BYTE* p, uint32_t* offset, const int& nField, int& fAligned)
+{
+	BYTE ret = (p[offset[nField]] >> (fAligned << 2)) & 0x0f;
+	offset[nField] += 1 - fAligned;
+	fAligned = !fAligned;
+	return ret;
+}
+
+static void DrawPixel(BYTE** yuv, CPoint pt, int pitch, AM_DVD_YUV c)
+{
+	if (c.Reserved == 0) {
+		return;
+	}
+	int contrast = c.Reserved;
+
+	BYTE* p = &yuv[0][pt.y * pitch + pt.x];
+	//*p = (*p*(15-contrast) + c.Y*contrast)>>4;
+	*p -= (*p - c.Y) * contrast >> 4;
+
+	if (pt.y & 1) {
+		return;    // since U/V is half res there is no need to overwrite the same line again
+	}
+
+	pt.x = (pt.x + 1) / 2;
+	pt.y = (pt.y /*+ 1*/) / 2; // only paint the upper field always, don't round it
+	pitch /= 2;
+
+	// U/V is exchanged? wierd but looks true when comparing the outputted colors from other decoders
+
+	p = &yuv[1][pt.y * pitch + pt.x];
+	//*p = (BYTE)(((((int)*p-0x80)*(15-contrast) + ((int)c.V-0x80)*contrast) >> 4) + 0x80);
+	*p -= (*p - c.V) * contrast >> 4;
+
+	p = &yuv[2][pt.y * pitch + pt.x];
+	//*p = (BYTE)(((((int)*p-0x80)*(15-contrast) + ((int)c.U-0x80)*contrast) >> 4) + 0x80);
+	*p -= (*p - c.U) * contrast >> 4;
+
+	// Neighter of the blending formulas are accurate (">>4" should be "/15").
+	// Even though the second one is a bit worse, since we are scaling the difference only,
+	// the error is still not noticable.
+}
+
+template<typename Func>
+static void DrawPixels(BYTE** yuv, int pitch, CPoint pt, int len, const CRect& rc, uint32_t code, const Func& ColorFunc)
+{
+	if (pt.y < rc.top || pt.y >= rc.bottom) {
+		return;
+	}
+	if (pt.x < rc.left) {
+		len -= rc.left - pt.x;
+		pt.x = rc.left;
+	}
+	if (pt.x + len > rc.right) {
+		len = rc.right - pt.x;
+	}
+	if (len <= 0 || pt.x >= rc.right) {
+		return;
+	}
+
+	while (len-- > 0) {
+		DrawPixel(yuv, pt, pitch, ColorFunc(pt, code));
+		pt.x++;
+	}
+}
+
 void CSubpicInputPin::dvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h, AM_DVD_YUV* sppal, bool fsppal, const AM_PROPERTY_SPHLI* psphli)
 {
+	auto getSphli = [&]() -> const AM_PROPERTY_SPHLI& {
+		if (m_offsets.size() > 1) {
+			for (const auto& o : m_offsets) {
+				if (rt >= o.rt) {
+					return o.sphli;
+				}
+			}
+		}
+
+		return m_sphli;
+	};
+
 	auto p = m_data.data();
 	uint32_t offset[2] = {m_offset[0], m_offset[1]};
 
-	AM_PROPERTY_SPHLI sphli = m_sphli;
+	auto& sphli = getSphli();
 	CPoint pt(sphli.StartX, sphli.StartY);
 	CRect rc(pt, CPoint(sphli.StopX, sphli.StopY));
 
 	CRect rcclip(0, 0, w, h);
 	rcclip &= rc;
-
-	if (psphli) {
-		rcclip &= CRect(psphli->StartX, psphli->StartY, psphli->StopX, psphli->StopY);
-		sphli = *psphli;
-	} else if (m_offsets.size() > 1) {
-		for (const auto& o : m_offsets) {
-			if (rt >= o.rt) {
-				sphli = o.sphli;
-				break;
-			}
-		}
-	}
 
 	AM_DVD_YUV pal[4];
 	pal[0] = sppal[fsppal ? sphli.ColCon.backcol : 0];
@@ -1838,8 +1816,20 @@ void CSubpicInputPin::dvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h
 	pal[3] = sppal[fsppal ? sphli.ColCon.emph2col : 3];
 	pal[3].Reserved = sphli.ColCon.emph2con;
 
-	if (pal[0].Reserved == 0 && pal[1].Reserved == 0 && pal[2].Reserved == 0 && pal[3].Reserved == 0) {
-		return;
+	CRect rcSphli;
+	AM_DVD_YUV palSphli[4]{};
+	if (psphli) {
+		rcSphli = rcclip;
+		rcSphli &= CRect(psphli->StartX, psphli->StartY, psphli->StopX, psphli->StopY);
+
+		palSphli[0] = sppal[fsppal ? psphli->ColCon.backcol : 0];
+		palSphli[0].Reserved = psphli->ColCon.backcon;
+		palSphli[1] = sppal[fsppal ? psphli->ColCon.patcol : 1];
+		palSphli[1].Reserved = psphli->ColCon.patcon;
+		palSphli[2] = sppal[fsppal ? psphli->ColCon.emph1col : 2];
+		palSphli[2].Reserved = psphli->ColCon.emph1con;
+		palSphli[3] = sppal[fsppal ? psphli->ColCon.emph2col : 3];
+		palSphli[3].Reserved = psphli->ColCon.emph2con;
 	}
 
 	int nField = 0;
@@ -1851,6 +1841,13 @@ void CSubpicInputPin::dvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h
 		end[1] = offset[0];
 	}
 
+	auto ColorFunc = [&](CPoint pt, uint32_t code) {
+		if (psphli && rcSphli.PtInRect(pt)) {
+			return palSphli[code];
+		}
+		return pal[code];
+	};
+
 	while ((nField == 0 && offset[0] < end[0]) || (nField == 1 && offset[1] < end[1])) {
 		uint32_t code;
 
@@ -1858,13 +1855,14 @@ void CSubpicInputPin::dvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h
 				|| (code = (code << 4) | GetNibble(p, offset, nField, fAligned)) >= 0x10
 				|| (code = (code << 4) | GetNibble(p, offset, nField, fAligned)) >= 0x40
 				|| (code = (code << 4) | GetNibble(p, offset, nField, fAligned)) >= 0x100) {
-			DrawPixels(yuv, w, pt, code >> 2, pal[code&3], rcclip);
-			if ((pt.x += code >> 2) < rc.right) {
+			auto len = code >> 2;
+			DrawPixels(yuv, w, pt, len, rcclip, code & 3, ColorFunc);
+			if ((pt.x += len) < rc.right) {
 				continue;
 			}
 		}
 
-		DrawPixels(yuv, w, pt, rc.right - pt.x, pal[code&3], rcclip);
+		DrawPixels(yuv, w, pt, rc.right - pt.x, rcclip, code & 3, ColorFunc);
 
 		if (!fAligned) {
 			GetNibble(p, offset, nField, fAligned);    // align to byte
