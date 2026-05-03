@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2025 see Authors.txt
+ * (C) 2009-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -228,8 +228,10 @@ private:
 	bool CopyWaveFormat(const WAVEFORMATEX *pSrcWaveFormatEx, WAVEFORMATEX **ppDestWaveFormatEx);
 
 	bool    IsBitstream(const WAVEFORMATEX *pWaveFormatEx) const;
+	bool    CreateSupportedFormatList();
 	HRESULT SelectFormat(const WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex);
-	void    CreateFormat(WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSample, WORD nChannels, DWORD dwChannelMask, DWORD nSamplesPerSec, WORD wValidBitsPerSample = 0);
+	void    CreateFormat(WAVEFORMATEXTENSIBLE& wfex,
+						 WORD wBitsPerSample, WORD nChannels, DWORD dwChannelMask, DWORD nSamplesPerSec, WORD wValidBitsPerSample = 0) const;
 
 	HRESULT StartAudioClient();
 
@@ -303,7 +305,8 @@ private:
 	std::vector<WORD>   m_nChannelsList;
 	std::vector<DWORD>  m_dwChannelMaskList;
 
-	BOOL                m_bReal32bitSupport;
+	bool                m_bReal32bitSupport;
+	bool                m_bReal32bitSupportChecked;
 
 	struct AudioParams {
 		WORD  wBitsPerSample;
