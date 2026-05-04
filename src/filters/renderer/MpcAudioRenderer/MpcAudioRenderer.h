@@ -32,6 +32,8 @@
 #include "DSUtil/Packet.h"
 #include <ExtLib/libbs2b/bs2bclass.h>
 
+#include <optional>
+
 #define MpcAudioRendererName L"MPC Audio Renderer"
 
 // if you get a compilation error on AUDCLNT_E_BUFFER_SIZE_NOT_ALIGNED,
@@ -305,8 +307,7 @@ private:
 	std::vector<WORD>   m_nChannelsList;
 	std::vector<DWORD>  m_dwChannelMaskList;
 
-	bool                m_bReal32bitSupport;
-	bool                m_bReal32bitSupportChecked;
+	std::optional<bool> m_bReal32bitSupport;
 
 	struct AudioParams {
 		WORD  wBitsPerSample;

@@ -213,8 +213,6 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_bNeedReinitializeFull(FALSE)
 	, m_FlushEvent(TRUE)
 	, m_bFlushing(FALSE)
-	, m_bReal32bitSupport(false)
-	, m_bReal32bitSupportChecked(false)
 	, m_bs2b_active(false)
 	, m_bDVDPlayback(FALSE)
 	, m_fLowLatencyMS(0.f)
@@ -1857,8 +1855,8 @@ HRESULT CMpcAudioRenderer::InitAudioClient()
 	} else {
 		DLog(L"CMpcAudioRenderer::InitAudioClient() - success");
 
-		if (!m_bReal32bitSupportChecked) {
-			m_bReal32bitSupportChecked = true;
+		if (!m_bReal32bitSupport.has_value()) {
+			m_bReal32bitSupport = false;
 
 			WAVEFORMATEXTENSIBLE wfex;
 			for (const auto samplerate : { 44100ul, 48000ul }) {
@@ -2621,7 +2619,7 @@ bool CMpcAudioRenderer::CreateSupportedFormatList()
 		DLog(L"    List of supported output formats:");
 		DLog(L"        BitsPerSample:");
 		for (const auto bitdepth : m_wBitsPerSampleList) {
-			if (bitdepth == 32 && !m_bReal32bitSupport) {
+			if (bitdepth == 32 && !m_bReal32bitSupport.value_or(false)) {
 				DLog(L"            24 padded to 32");
 			} else {
 				DLog(L"            %d", bitdepth);
@@ -2776,7 +2774,7 @@ void CMpcAudioRenderer::CreateFormat(WAVEFORMATEXTENSIBLE& wfex,
 	wfex.Samples.wValidBitsPerSample     = wValidBitsPerSample ? wValidBitsPerSample : wBitsPerSample;
 	if (wfex.Samples.wValidBitsPerSample == 32
 			&& !wValidBitsPerSample
-			&& !m_bReal32bitSupport) {
+			&& !m_bReal32bitSupport.value_or(false)) {
 		wfex.Samples.wValidBitsPerSample = 24;
 	}
 }
@@ -2844,8 +2842,7 @@ HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = 
 		m_dwChannelMaskList.clear();
 		m_AudioParamsList.clear();
 
-		m_bReal32bitSupport = false;
-		m_bReal32bitSupportChecked = false;
+		m_bReal32bitSupport.reset();
 	}
 	SAFE_DELETE_ARRAY(m_pWaveFormatExOutput);
 
