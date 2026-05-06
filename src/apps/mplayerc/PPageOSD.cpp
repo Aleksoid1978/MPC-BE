@@ -1,5 +1,5 @@
 /*
- * (C) 2025 see Authors.txt
+ * (C) 2025-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,13 +22,13 @@
 #include "MainFrm.h"
 #include "PPageOSD.h"
 
-int CALLBACK EnumFontProc(ENUMLOGFONT FAR* lf, NEWTEXTMETRIC FAR* tm, int FontType, LPARAM dwData)
+static int CALLBACK EnumFontProc(ENUMLOGFONT FAR* lf, NEWTEXTMETRIC FAR* tm, DWORD FontType, LPARAM dwData)
 {
 	std::vector<CString>* fontnames = (std::vector<CString>*)dwData;
 
 	if (FontType == TRUETYPE_FONTTYPE) {
-		if (fontnames->empty() || fontnames->back().Compare(lf->elfFullName) != 0) {
-			fontnames->emplace_back(lf->elfFullName);
+		if (fontnames->empty() || fontnames->back().Compare(lf->elfLogFont.lfFaceName) != 0) {
+			fontnames->emplace_back(lf->elfLogFont.lfFaceName);
 		}
 	}
 
