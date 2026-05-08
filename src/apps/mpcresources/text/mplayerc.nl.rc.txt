@@ -612,7 +612,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
 14		"Afspeellijst laden"
 16		"yt-dlp"
 17		"Executable:"
-19		"Select max bitrate"
+19		"Maximale bitrate selecteren"
 20		"Adres AceStream:"
 22		"Adres MatriX (TorrServer):"
 25		"Useragent:"

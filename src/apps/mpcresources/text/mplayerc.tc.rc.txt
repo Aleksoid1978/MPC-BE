@@ -612,7 +612,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
 14		"載入播放清單"
 16		"yt-dlp"
 17		"執行檔："
-19		"Select max bitrate"
+19		"選擇最高位元率"
 20		"AceStream 位址："
 22		"MatriX (TorrServer) 位址："
 25		"使用者代理字串︰"
