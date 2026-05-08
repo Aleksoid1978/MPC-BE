@@ -73,7 +73,7 @@ IDD_CAPTURE_DLG DIALOGEX 0, 0, 132, 293
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "비디오",IDC_STATIC1,5,5,117,57
+    GROUPBOX        "영상",IDC_STATIC1,5,5,117,57
     COMBOBOX        IDC_COMBO4,10,15,65,116,CBS_DROPDOWNLIST | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_EDIT3,77,15,40,13,ES_RIGHT | ES_AUTOHSCROLL | WS_DISABLED
     COMBOBOX        IDC_COMBO1,10,30,40,89,CBS_DROPDOWNLIST | CBS_SORT | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
@@ -83,7 +83,7 @@ BEGIN
     EDITTEXT        IDC_EDIT2,46,45,34,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | WS_DISABLED,68,45,12,13
     PUSHBUTTON      "설정",IDC_BUTTON1,82,45,35,13
-    GROUPBOX        "오디오",IDC_STATIC,6,64,116,42
+    GROUPBOX        "음향",IDC_STATIC,6,64,116,42
     COMBOBOX        IDC_COMBO3,10,74,65,116,CBS_DROPDOWNLIST | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO2,77,74,40,89,CBS_DROPDOWNLIST | CBS_SORT | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO6,10,89,107,118,CBS_DROPDOWNLIST | CBS_SORT | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
@@ -106,7 +106,7 @@ BEGIN
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,236,110,1
     EDITTEXT        IDC_EDIT4,10,239,91,13,ES_AUTOHSCROLL | ES_READONLY
     PUSHBUTTON      "...",IDC_BUTTON3,103,239,14,13
-    CONTROL         "오디오를 WAV로",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,272,65,9
+    CONTROL         "음향을 WAV로",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,272,65,9
     PUSHBUTTON      "녹화",IDC_BUTTON2,75,270,45,13,WS_DISABLED | WS_GROUP
     COMBOBOX        IDC_COMBO14,10,254,107,18,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
 END
@@ -115,12 +115,12 @@ IDD_PPAGEAUDIO DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "오디오 렌더러",IDC_STATIC,5,5,285,46
+    GROUPBOX        "음향 렌더러",IDC_STATIC,5,5,285,46
     COMBOBOX        IDC_AUDRND_COMBO,10,15,212,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "속성",IDC_BUTTON1,226,14,60,14
     COMBOBOX        IDC_COMBO1,10,33,212,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "이중 출력",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,226,35,60,10
-    GROUPBOX        "오디오",IDC_STATIC,5,53,285,46
+    GROUPBOX        "음향",IDC_STATIC,5,53,285,46
     CTEXT           "음량",IDC_STATIC,42,60,55,8
     RTEXT           "최소",IDC_STATIC,7,80,20,8
     CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | TBS_TOOLTIPS | WS_TABSTOP | 0x400,28,72,85,19
@@ -129,11 +129,11 @@ BEGIN
     RTEXT           "좌",IDC_STATIC,144,80,30,8
     CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,176,79,85,19
     LTEXT           "우",IDC_STATIC,262,80,27,8
-    GROUPBOX        "오디오 열기 설정",IDC_STATIC,5,102,285,51
-    CONTROL         "오디오 파일을 자동으로 열기",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,113,276,9
+    GROUPBOX        "음향 열기 설정",IDC_STATIC,5,102,285,51
+    CONTROL         "음향 파일을 자동으로 열기",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,113,276,9
     EDITTEXT        IDC_EDIT4,10,124,222,13,ES_AUTOHSCROLL
     PUSHBUTTON      "초기화",IDC_BUTTON2,235,124,50,13
-    CONTROL         "외부 오디오 파일 우선",IDC_CHECK3,
+    CONTROL         "외부 음향 파일 우선",IDC_CHECK3,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,140,273,9
 END
 
@@ -171,7 +171,7 @@ BEGIN
     CONTROL         "Int24",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,52,218,32,9
     CONTROL         "Int32",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,94,218,32,9
     CONTROL         "Float",IDC_CHECK12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,137,218,32,9
-    CONTROL         "오디오 시간 조절(밀리초) :",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,240,115,9
+    CONTROL         "음향 시간 조절(밀리초) :",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,240,115,9
     EDITTEXT        IDC_EDIT2,129,238,46,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,174,238,12,13
     PUSHBUTTON      "소형 스테레오 스피커",IDC_BUTTON2,188,210,103,14
@@ -234,7 +234,7 @@ BEGIN
                     "SysLink",WS_TABSTOP,30,114,200,8
     CONTROL         "<a>https://github.com/Aleksoid1978/MPC-BE</a>",IDC_GITHUB_LINK,
                     "SysLink",WS_TABSTOP,30,126,200,8
-    LTEXT           "이 프로그램은 프리웨어이며 GNU GPL 라이선스로 배포됩니다.",IDC_STATIC,30,138,200,18
+    LTEXT           "이 앱은 프리웨어이며 GNU GPL 라이선스로 배포됩니다.",IDC_STATIC,30,138,200,18
     LTEXT           "한글화 : Hack茶ん <https://blog.naver.com/jhacker>",IDC_STATIC,30,161,200,18
     DEFPUSHBUTTON   "확인",IDOK,185,183,50,14,WS_GROUP
 END
@@ -315,7 +315,7 @@ BEGIN
     PUSHBUTTON      "...",IDC_BUTTON1,273,41,13,13
     GROUPBOX        "DVD 내비게이터 언어 설정",IDC_STATIC,5,62,286,74
     CONTROL         "메뉴",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,74,65,8
-    CONTROL         "오디오",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON,10,86,65,8
+    CONTROL         "음향",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON,10,86,65,8
     CONTROL         "자막",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,10,98,65,8
     LISTBOX         IDC_LIST1,79,74,208,66,WS_VSCROLL | WS_GROUP | WS_TABSTOP
     GROUPBOX        "추가 설정",IDC_STATIC,5,140,286,37
@@ -346,11 +346,11 @@ BEGIN
     CONTROL         "기본 선호 트랙",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,8,120,9
     LTEXT           "자막 언어",IDC_STATIC,142,23,44,8
     EDITTEXT        IDC_EDIT2,190,21,94,13,ES_AUTOHSCROLL
-    LTEXT           "오디오 언어",IDC_STATIC,142,39,44,8
+    LTEXT           "음향 언어",IDC_STATIC,142,39,44,8
     EDITTEXT        IDC_EDIT3,190,37,94,13,ES_AUTOHSCROLL
     LTEXT           "(예 : eng kor jap)",IDC_STATIC,147,53,132,8
     GROUPBOX        "열기 설정",IDC_STATIC,5,124,286,79
-    LTEXT           "오디오 파일을 열 때,",IDC_STATIC,10,137,99,8
+    LTEXT           "음향 파일을 열 때,",IDC_STATIC,10,137,99,8
     COMBOBOX        IDC_COMBO4,113,134,172,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "재생 목록에 추가 :",IDC_STATIC,10,153,139,8
     COMBOBOX        IDC_COMBO5,150,150,135,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -391,7 +391,7 @@ BEGIN
     CONTROL         "대기열 지연 시, 일부 서브픽처 삭제 허용",IDC_CHECK_ALLOW_DROPPING_SUBPIC,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,93,277,9
     GROUPBOX        "경고",IDC_STATIC,5,108,286,43
-    LTEXT           "만약 비디오카드 설정에서 위치 설정 및 전체 화면 위신호 제거를 설정했다면 자막이 표현이 올바르지 않을 수도 있습니다.",IDC_STATIC,10,120,267,27
+    LTEXT           "만약 영상카드 설정에서 위치 설정 및 전체 화면 위신호 제거를 설정했다면 자막이 표현이 올바르지 않을 수도 있습니다.",IDC_STATIC,10,120,267,27
 END
 
 IDD_PPAGEFORMATS DIALOGEX 0, 0, 296, 264
@@ -404,17 +404,17 @@ BEGIN
     PUSHBUTTON      "기본값",IDC_BUTTON2,179,168,54,14
     PUSHBUTTON      "설정",IDC_BUTTON_EXT_SET,237,168,49,14
     GROUPBOX        "연결",IDC_STATIC,5,189,286,26
-    PUSHBUTTON      "비디오(&V)",IDC_BUTTON4,10,198,40,14
-    PUSHBUTTON      "오디오(&U)",IDC_BUTTON3,52,198,40,14
+    PUSHBUTTON      "영상(&V)",IDC_BUTTON4,10,198,40,14
+    PUSHBUTTON      "음향(&U)",IDC_BUTTON3,52,198,40,14
     PUSHBUTTON      "수정(&M)",IDC_BUTTON5,42,198,63,14,NOT WS_VISIBLE
     PUSHBUTTON      "모두(&L)",IDC_BUTTON1,108,198,40,14
     PUSHBUTTON      "없음(&N)",IDC_BUTTON6,150,198,40,14
     CONTROL         "아이콘 사용",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,200,201,70,9
     GROUPBOX        "자동 실행(윈도XP 전용)",IDC_STATIC1,5,217,108,37
-    CONTROL         "비디오",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,229,47,9
+    CONTROL         "영상",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,229,47,9
     CONTROL         "음악",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,241,47,9
     CONTROL         "DVD",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,61,229,47,9
-    CONTROL         "오디오 CD",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,61,241,47,9
+    CONTROL         "음향 CD",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,61,241,47,9
     GROUPBOX        "탐색기 메뉴",IDC_STATIC,117,217,118,24
     CONTROL         "디렉터리",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,122,229,50,9
     CONTROL         "파일",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,176,229,55,9
@@ -500,14 +500,14 @@ BEGIN
     CONTROL         "기본 창 크기",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,16,106,10
     CONTROL         "마지막 창 크기 기억",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,30,127,10
     CONTROL         "지정된 창 크기 설정",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,10,44,118,10
-    CONTROL         "지정된 비디오 영역 설정",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,10,58,118,10
+    CONTROL         "지정된 영상 영역 설정",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,10,58,118,10
     EDITTEXT        IDC_EDIT1,133,43,28,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
     CTEXT           "×",IDC_STATIC,162,45,8,8
     EDITTEXT        IDC_EDIT2,172,43,28,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "현재 크기",IDC_BUTTON1,204,42,64,14
     GROUPBOX        "재생을 시작한 후",IDC_STATIC,5,76,286,68
     CONTROL         "변경 없음",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,87,64,10
-    CONTROL         "비디오 크기로 조정",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON,10,101,115,10
+    CONTROL         "영상 크기로 조정",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON,10,101,115,10
     CONTROL         "화면에 창 맞추기",IDC_RADIO7,"Button",BS_AUTORADIOBUTTON,10,116,123,10
     COMBOBOX        IDC_COMBO1,133,99,43,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
     EDITTEXT        IDC_EDIT3,133,115,32,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
@@ -555,7 +555,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,72,51,151,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
     LTEXT           "미디어 길이 :",IDC_STATIC,10,66,60,8
     EDITTEXT        IDC_EDIT2,72,66,151,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
-    LTEXT           "비디오 크기 :",IDC_STATIC,10,81,60,8
+    LTEXT           "영상 크기 :",IDC_STATIC,10,81,60,8
     EDITTEXT        IDC_EDIT5,72,81,151,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
     LTEXT           "작성일 :",IDC_STATIC,10,96,60,8
     EDITTEXT        IDC_EDIT6,72,96,151,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
@@ -780,7 +780,7 @@ BEGIN
     LTEXT           "하",IDC_STATIC,223,38,26,8
     EDITTEXT        IDC_EDIT10,253,35,30,14,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN9,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,271,35,12,14
-    CONTROL         "비디오 프레임에 따라 자막 위치를 지정",IDC_CHECK_RELATIVETO,
+    CONTROL         "영상 프레임에 따라 자막 위치를 지정",IDC_CHECK_RELATIVETO,
                     "Button",BS_AUTO3STATE | WS_TABSTOP,119,53,170,9
     GROUPBOX        "색깔 && 투명도",IDC_STATIC,114,69,177,120
     LTEXT           "100%",IDC_STATIC,270,81,20,8
@@ -812,7 +812,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,208,10
     LTEXT           "두 번 클릭",IDC_STATIC,10,49,60,8
     COMBOBOX        IDC_COMBO2,70,47,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "비디오 영역으로 창 이동",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,65,133,10
+    CONTROL         "영상 영역으로 창 이동",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,65,133,10
     LTEXT           "우 클릭",IDC_STATIC,10,87,60,8
     COMBOBOX        IDC_COMBO3,70,84,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,5,103,286,105
@@ -833,9 +833,9 @@ BEGIN
     PUSHBUTTON      "마트로스카 분배기\n설정",IDC_BUTTON6,220,111,70,30,BS_MULTILINE
     PUSHBUTTON      "CDDA 리더\n설정",IDC_BUTTON8,220,146,70,30,BS_MULTILINE
     PUSHBUTTON      "VTS(IFO) 리더\n설정",IDC_BUTTON7,220,181,70,30,BS_MULTILINE
-    PUSHBUTTON      "비디오 디코더\n설정",IDC_BUTTON2,220,41,70,30,BS_MULTILINE
+    PUSHBUTTON      "영상 디코더\n설정",IDC_BUTTON2,220,41,70,30,BS_MULTILINE
     PUSHBUTTON      "MPEG-2/DVD\n디코더\n설정",IDC_BUTTON3,220,76,70,30,BS_MULTILINE
-    PUSHBUTTON      "오디오 디코더\n설정",IDC_BUTTON4,220,41,70,30,BS_MULTILINE
+    PUSHBUTTON      "음향 디코더\n설정",IDC_BUTTON4,220,41,70,30,BS_MULTILINE
     LTEXT           "버퍼 길이 :",IDC_STATIC1,221,216,69,8
     EDITTEXT        IDC_EDIT1,221,228,29,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,239,228,11,13
@@ -886,7 +886,7 @@ IDD_PPAGEVIDEO DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "비디오 렌더러",IDC_STATIC,5,5,285,29
+    GROUPBOX        "영상 렌더러",IDC_STATIC,5,5,285,29
     COMBOBOX        IDC_VIDRND_COMBO,10,15,213,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "속성",IDC_BUTTON1,226,14,60,14
     GROUPBOX        "EVR-CP 및 EVR 싱크 설정",IDC_STATIC,5,37,285,137
@@ -907,10 +907,10 @@ BEGIN
     COMBOBOX        IDC_COMBO7,188,156,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "출력 범위 :",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "MPC 비디오 렌더러 정보",IDC_STATIC,5,177,285,27
+    GROUPBOX        "MPC 영상 렌더러 정보",IDC_STATIC,5,177,285,27
     CONTROL         "추가 창에서 전체 화면 전용(실험)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
-    GROUPBOX        "비디오 프레임",IDC_STATIC,5,208,210,53
+    GROUPBOX        "영상 프레임",IDC_STATIC,5,208,210,53
     LTEXT           "기본 모드 :",IDC_STATIC,10,220,74,8
     COMBOBOX        IDC_COMBO8,88,218,124,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "살짝 확대하면 크기 조정 안 함",IDC_CHECK7,
@@ -926,14 +926,14 @@ IDD_PPAGEYOUTUBE DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "선호하는 비디오 형식 :",IDC_STATIC2,10,33,120,8
+    LTEXT           "선호하는 영상 형식 :",IDC_STATIC2,10,33,120,8
     COMBOBOX        IDC_COMBO1,10,43,52,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO2,66,43,50,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "50/60 fps",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,120,45,48,10
     CONTROL         "HDR",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,172,45,30,10
-    LTEXT           "선호하는 오디오 형식 :",IDC_STATIC3,10,58,120,8
+    LTEXT           "선호하는 음향 형식 :",IDC_STATIC3,10,58,120,8
     COMBOBOX        IDC_COMBO3,10,68,52,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "선호하는 오디오 트랙 언어 :",IDC_STATIC4,10,82,140,8
+    LTEXT           "선호하는 음향 트랙 언어 :",IDC_STATIC4,10,82,140,8
     COMBOBOX        IDC_COMBO4,10,93,130,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "재생 목록 열기",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,123,130,10
     GROUPBOX        "",IDC_STATIC,6,5,285,131
@@ -1155,8 +1155,8 @@ BEGIN
     CONTROL         "아날로그",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,91,17,55,8
     CONTROL         "디지털",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,150,17,55,8
     GROUPBOX        "아날로그 설정",IDC_STATIC,5,33,286,59,WS_GROUP
-    LTEXT           "비디오",IDC_STATIC1,10,47,70,8
-    LTEXT           "오디오",IDC_STATIC2,10,63,70,8
+    LTEXT           "영상",IDC_STATIC1,10,47,70,8
+    LTEXT           "음향",IDC_STATIC2,10,63,70,8
     LTEXT           "국가",IDC_STATIC3,10,78,70,8
     COMBOBOX        IDC_COMBO1,84,45,202,30,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO2,84,60,202,30,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
@@ -1182,7 +1182,7 @@ BEGIN
     CONTROL         "표시 후, GPU 플러시",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,142,10
     CONTROL         "플러시 대기",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,38,100,10
     GROUPBOX        "EVR 동기화 설정",IDC_STATIC2,5,67,286,117
-    CONTROL         "비디오에서 디스플레이로 싱크",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,142,8
+    CONTROL         "영상에서 디스플레이로 싱크",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,142,8
     CONTROL         "최근린 수직 동기화 적용",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,274,8
     LTEXT           "주사율 조정 :",IDC_STATIC5,20,93,85,8
     EDITTEXT        IDC_CYCLEDELTA,109,91,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
@@ -1709,7 +1709,7 @@ BEGIN
             END
             MENUITEM "기본값으로 초기화", ID_VIEW_RESET_DEFAULT
         END
-        MENUITEM "비디오 프레임(&V)",                    ID_SUBMENU_VIDEOFRAME
+        MENUITEM "영상 프레임(&V)",                    ID_SUBMENU_VIDEOFRAME
         MENUITEM "화면 크기/위치 조절",                      ID_SUBMENU_PANSCAN
         POPUP "스테레오 3D 모드"
         BEGIN
@@ -1728,7 +1728,7 @@ BEGIN
             MENUITEM "사용 안 함",                        ID_ONTOP_NEVER
             MENUITEM "사용",                          ID_ONTOP_ALWAYS
             MENUITEM "재생 중일 때만 사용",                  ID_ONTOP_WHILEPLAYING
-            MENUITEM "비디오 재생 중에만 사용",         ID_ONTOP_WHILEPLAYINGVIDEO
+            MENUITEM "영상 재생 중에만 사용",         ID_ONTOP_WHILEPLAYINGVIDEO
         END
         MENUITEM "옵션(&O)...",                   ID_VIEW_OPTIONS
     END
@@ -1754,7 +1754,7 @@ BEGIN
         MENUITEM "필터(&F)",                    ID_SUBMENU_FILTERS
         MENUITEM "셰이더(&H)",                     ID_SUBMENU_SHADERS
         MENUITEM SEPARATOR
-        MENUITEM "오디오(&A)",                      ID_SUBMENU_AUDIOLANG
+        MENUITEM "음향(&A)",                      ID_SUBMENU_AUDIOLANG
         MENUITEM "자막(&B)",                  ID_SUBMENU_SUBTITLELANG
         MENUITEM "Static",                      ID_SUBMENU_VIDEOSTREAM
         MENUITEM SEPARATOR
@@ -1828,7 +1828,7 @@ BEGIN
             MENUITEM "자동 맞춤",      ID_VIEW_ZOOM_AUTOFIT
         END
         MENUITEM SEPARATOR
-        MENUITEM "비디오 프레임(&V)",                    ID_SUBMENU_VIDEOFRAME
+        MENUITEM "영상 프레임(&V)",                    ID_SUBMENU_VIDEOFRAME
         MENUITEM "화면 크기/위치 조절",                      ID_SUBMENU_PANSCAN
         MENUITEM SEPARATOR
         MENUITEM "탐색(&N)",                   ID_SUBMENU_NAVIGATE
@@ -1837,7 +1837,7 @@ BEGIN
         MENUITEM "필터(&F)",                    ID_SUBMENU_FILTERS
         MENUITEM "셰이더(&H)",                     ID_SUBMENU_SHADERS
         MENUITEM SEPARATOR
-        MENUITEM "오디오(&A)",                      ID_SUBMENU_AUDIOLANG
+        MENUITEM "음향(&A)",                      ID_SUBMENU_AUDIOLANG
         MENUITEM "자막(&B)",                  ID_SUBMENU_SUBTITLELANG
         MENUITEM "Static",                      ID_SUBMENU_VIDEOSTREAM
         MENUITEM SEPARATOR
@@ -1856,7 +1856,7 @@ BEGIN
                 MENUITEM "사용 안 함",                        ID_ONTOP_NEVER
                 MENUITEM "사용",                          ID_ONTOP_ALWAYS
                 MENUITEM "재생 중일 때만 사용",                  ID_ONTOP_WHILEPLAYING
-                MENUITEM "비디오 재생 중에만 사용",         ID_ONTOP_WHILEPLAYINGVIDEO
+                MENUITEM "영상 재생 중에만 사용",         ID_ONTOP_WHILEPLAYINGVIDEO
             END
             MENUITEM SEPARATOR
             MENUITEM "제목 표시줄&&메뉴",                   ID_VIEW_CAPTIONMENU
@@ -1978,7 +1978,7 @@ BEGIN
                 END
                 MENUITEM "기본값으로 초기화", ID_VIEW_RESET_DEFAULT
             END
-            MENUITEM "비디오 프레임(&V)",                    ID_SUBMENU_VIDEOFRAME
+            MENUITEM "영상 프레임(&V)",                    ID_SUBMENU_VIDEOFRAME
             MENUITEM "화면 크기/위치 조절",                      ID_SUBMENU_PANSCAN
             POPUP "스테레오 3D 모드"
             BEGIN
@@ -1997,7 +1997,7 @@ BEGIN
                 MENUITEM "사용 안 함",                        ID_ONTOP_NEVER
                 MENUITEM "사용",                          ID_ONTOP_ALWAYS
                 MENUITEM "재생 중일 때만 사용",                  ID_ONTOP_WHILEPLAYING
-                MENUITEM "비디오 재생 중에만 사용",         ID_ONTOP_WHILEPLAYINGVIDEO
+                MENUITEM "영상 재생 중에만 사용",         ID_ONTOP_WHILEPLAYINGVIDEO
             END
             MENUITEM "옵션(&O)...",                   ID_VIEW_OPTIONS
         END
@@ -2034,7 +2034,7 @@ BEGIN
         MENUITEM "필터(&F)",                    ID_SUBMENU_FILTERS
         MENUITEM "셰이더(&H)",                     ID_SUBMENU_SHADERS
         MENUITEM SEPARATOR
-        MENUITEM "오디오(&A)",                      ID_SUBMENU_AUDIOLANG
+        MENUITEM "음향(&A)",                      ID_SUBMENU_AUDIOLANG
         MENUITEM "자막(&B)",                  ID_SUBMENU_SUBTITLELANG
         MENUITEM "Static",                      ID_SUBMENU_VIDEOSTREAM
         MENUITEM SEPARATOR
@@ -2162,7 +2162,7 @@ BEGIN
         MENUITEM "타이틀 메뉴",                 ID_NAVIGATE_TITLEMENU
         MENUITEM "루트 메뉴(&R)",                  ID_NAVIGATE_ROOTMENU
         MENUITEM "자막 메뉴(&S)",              ID_NAVIGATE_SUBPICTUREMENU
-        MENUITEM "오디오 메뉴(&A)",                 ID_NAVIGATE_AUDIOMENU
+        MENUITEM "음향 메뉴(&A)",                 ID_NAVIGATE_AUDIOMENU
         MENUITEM "앵글 메뉴(&G)",                 ID_NAVIGATE_ANGLEMENU
         MENUITEM "챕터 메뉴(&C)",               ID_NAVIGATE_CHAPTERMENU
     END
@@ -2340,16 +2340,16 @@ END
 STRINGTABLE
 BEGIN
     IDS_INFOBAR_LOCATION    "위치"
-    IDS_INFOBAR_VIDEO       "비디오"
-    IDS_INFOBAR_AUDIO       "오디오"
+    IDS_INFOBAR_VIDEO       "영상"
+    IDS_INFOBAR_AUDIO       "음향"
     IDS_INFOBAR_SUBTITLES   "자막"
     IDS_CONTROLS_COMPLETING "완료중..."
-    IDS_AUTOPLAY_PLAYVIDEO  "비디오 재생"
+    IDS_AUTOPLAY_PLAYVIDEO  "영상 재생"
     IDS_AUTOPLAY_PLAYMUSIC  "음악 재생"
-    IDS_AUTOPLAY_PLAYAUDIOCD "오디오 CD 재생"
+    IDS_AUTOPLAY_PLAYAUDIOCD "음향 CD 재생"
     IDS_AUTOPLAY_PLAYDVDMOVIE "DVD 재생"
     IDS_PROPSHEET_PROPERTIES "속성"
-    IDS_GRAPHBUILDER_AUDIOSWITCHER "오디오 스위처"
+    IDS_GRAPHBUILDER_AUDIOSWITCHER "음향 스위처"
     IDS_SUBTITLES_DEFAULT_STYLE "기본 스타일(&D)"
     IDS_SUBTITLES_FORCED    "강제만(&F)"
     IDS_FAVFILES            "파일"
@@ -2453,10 +2453,10 @@ BEGIN
     IDS_PLAYLOOPMODE_AB_MARK_A "구간 반복 : 시작 지점 지정"
     IDS_PLAYLOOPMODE_AB_MARK_B "구간 반복 : 끝 지점 지정"
     IDS_ADDTOPLAYLISTROMCLIPBOARD "클립보드에서 재생 목록에 추가"
-    IDS_MOVEWINDOWBYVIDEO_ONOFF "비디오 영역별로 창 이동 : 켬/끔"
-    IDS_MOVEWINDOWBYVIDEO_ON "비디오 영역별로 창 이동 : 켬"
-    IDS_MOVEWINDOWBYVIDEO_OFF "비디오 영역별로 창 이동 : 끔"
-    IDS_AUDIO_FILTER_PRESET_1 "위스퍼 및 폭발음이 포함된 오디오인 경우"
+    IDS_MOVEWINDOWBYVIDEO_ONOFF "영상 영역별로 창 이동 : 켬/끔"
+    IDS_MOVEWINDOWBYVIDEO_ON "영상 영역별로 창 이동 : 켬"
+    IDS_MOVEWINDOWBYVIDEO_OFF "영상 영역별로 창 이동 : 끔"
+    IDS_AUDIO_FILTER_PRESET_1 "위스퍼 및 폭발음이 포함된 음향인 경우"
 END
 
 STRINGTABLE
@@ -2552,19 +2552,19 @@ BEGIN
     IDD_PPAGEWINDOWSIZE     "재생기::창 크기"
     IDD_PPAGEWEBSERVER      "재생기::웹 인터페이스"
     IDD_PPAGEPLAYBACK       "재생"
-    IDD_PPAGEDVD            "재생::DVD 비디오"
+    IDD_PPAGEDVD            "재생::DVD 영상"
 END
 
 STRINGTABLE
 BEGIN
     IDD_PPAGECAPTURE        "재생::캡처 장치"
     IDD_PPAGEYOUTUBE        "재생::온라인 미디어 서비스"
-    IDD_PPAGEVIDEO          "비디오"
-    IDD_PPAGECOLOR          "비디오::색 보정"
-    IDD_PPAGESYNC           "비디오::프레임 동기화"
-    IDD_PPAGEFULLSCREEN     "비디오::전체 화면"
-    IDD_PPAGEAUDIO          "오디오"
-    IDD_PPAGESOUNDPROCESSING "오디오::음향 처리"
+    IDD_PPAGEVIDEO          "영상"
+    IDD_PPAGECOLOR          "영상::색 보정"
+    IDD_PPAGESYNC           "영상::프레임 동기화"
+    IDD_PPAGEFULLSCREEN     "영상::전체 화면"
+    IDD_PPAGEAUDIO          "음향"
+    IDD_PPAGESOUNDPROCESSING "음향::음향 처리"
     IDD_PPAGESUBTITLES      "자막"
     IDD_PPAGESUBRENDERING   "자막::생성"
     IDD_PPAGESUBSTYLE       "자막::형태"
@@ -2599,20 +2599,20 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_REGULARSURF         "재생할 비디오 표면을 기본 오프스크린으로 위치시킵니다."
+    IDC_REGULARSURF         "재생할 영상 표면을 기본 오프스크린으로 위치시킵니다."
     IDC_DX9RESIZER_COMBO    "그래픽카드에서 픽셀셰이더 2.0을 지원하지 않으면 단순 쌍선형이 자동으로 선택됩니다."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_PPAGE_OUTPUT_MPCVR  "MPC 비디오 렌더러"
-    IDS_PPAGE_OUTPUT_EVR    "향상된 비디오 렌더러"
-    IDS_PPAGE_OUTPUT_EVR_CUSTOM "향상된 비디오 렌더러(맞춤 프레젠터)"
-    IDS_PPAGE_OUTPUT_DXR    "Haali 비디오 렌더러"
+    IDS_PPAGE_OUTPUT_MPCVR  "MPC 영상 렌더러"
+    IDS_PPAGE_OUTPUT_EVR    "향상된 영상 렌더러"
+    IDS_PPAGE_OUTPUT_EVR_CUSTOM "향상된 영상 렌더러(맞춤 프레젠터)"
+    IDS_PPAGE_OUTPUT_DXR    "Haali 영상 렌더러"
     IDS_PPAGE_OUTPUT_NULL_ANY "Null(전부)"
     IDS_PPAGE_OUTPUT_NULL_UNCOMP "Null(무압축)"
     IDS_PPAGE_OUTPUT_MADVR  "madVR"
-    IDS_PPAGE_OUTPUT_SYNC   "비디오 렌더러 동기화"
+    IDS_PPAGE_OUTPUT_SYNC   "영상 렌더러 동기화"
     IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "선택한 렌더러는 설치되어 있지 않습니다."
     IDS_REND_NOT_AVAILABLE  "**사용 불가**"
 END
@@ -2647,7 +2647,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_SRC_CDDA            "오디오 CD 재생"
+    IDS_SRC_CDDA            "음향 CD 재생"
     IDS_SRC_AVI             "인터리브가 아닌 파일. 정상적으로 출력되지 않을 수 있습니다."
     IDS_SRC_VTS             "VTS_xx_0.ifo 파일에 속해있는 VTS_xx_x.vob 파일을 불러옵니다."
 END
@@ -2668,7 +2668,7 @@ STRINGTABLE
 BEGIN
     IDS_SRC_MPA             "MP3 및 AAC를 위한 소스 필터"
     IDS_TRA_DVD_VIDEO       "libmpeg2 기반"
-    IDS_TRA_PS2AUD          "PSS파일의 오디오 스트림을 디코딩합니다."
+    IDS_TRA_PS2AUD          "PSS파일의 음향 스트림을 디코딩합니다."
     IDS_TRA_FFMPEG          "FFmpeg 코덱 기반, http://ffmpeg.org/"
     IDS_TRA_INTEL_MSDK      "인텔 미디어 SDK 기반, 외부 라이브러리 필요(libmfxsw32.dll/libmfxsw64.dll)"
 END
@@ -2676,7 +2676,7 @@ END
 STRINGTABLE
 BEGIN
     IDC_CHECK_RELATIVETO    "기본 상태가 다른 스타일을 상속합니다."
-    IDC_CHECK_ALLOW_DROPPING_SUBPIC  "이 옵션을 비활성화하면 자막이 깜박이지 않지만, 비디오 렌더러가 일부 비디오 프레임을 건너뛸 수 있습니다."
+    IDC_CHECK_ALLOW_DROPPING_SUBPIC  "이 옵션을 비활성화하면 자막이 깜박이지 않지만, 영상 렌더러가 일부 영상 프레임을 건너뛸 수 있습니다."
     IDC_CHECK_SPCANIMWITHBUFFER  "서브픽처 버퍼가 0보다 클 때 자막 애니메이션을 허용합니다. 이 옵션을 선택하면 CPU 사용률이 증가할 수 있습니다. 자막이 깜박이거나 비정상적으로 출력되면 이 옵션을 해제하십시오."
     IDC_BUTTON_EXT_SET      "이 버튼을 클릭하면 파일 형식 그룹이 MPC-BE 파일에 연결됩니다. 새로 추가된 확장자는 보통 회색으로 표시되므로 이 대화 상자를 닫기 전에 확인하십시오."
 END
@@ -2695,7 +2695,7 @@ STRINGTABLE
 BEGIN
     ID_VOLUME_MUTE          "음소거\n음소거"
     ID_VOLUME_MUTE_OFF      "음소거 해제\n음소거 해제"
-    ID_VOLUME_MUTE_DISABLED "오디오 없음\n오디오 없음"
+    ID_VOLUME_MUTE_DISABLED "음향 없음\n음향 없음"
 END
 
 STRINGTABLE
@@ -2711,7 +2711,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_AUDIO            "오디오(&A)"
+    IDS_AG_AUDIO            "음향(&A)"
     IDS_AG_ZOOM             "확대/축소"
     IDS_FAVORITES_ADD       "즐겨찾기에 추가(&A)..."
     IDS_FAVORITES_ORGANIZE  "즐겨찾기 편집(&O)..."
@@ -2787,15 +2787,15 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_MEDIAFILES       "미디어 파일(모든 형식)"
-    IDS_AG_VIDEOFILES       "비디오 파일(모든 형식)"
-    IDS_AG_AUDIOFILES       "오디오 파일(모든 형식)"
+    IDS_AG_VIDEOFILES       "영상 파일(모든 형식)"
+    IDS_AG_AUDIOFILES       "음향 파일(모든 형식)"
     IDS_AG_ALLFILES         "모든 파일"
 END
 
 STRINGTABLE
 BEGIN
     IDS_AG_SUBTITLEFILES    "자막 파일"
-    IDS_AG_AUDIO_FILE       "오디오 파일"
+    IDS_AG_AUDIO_FILE       "음향 파일"
     IDS_AG_PLAYLIST_FILE    "재생 목록"
     IDS_AG_OTHER            "기타"
     IDS_PIXELSHADERCOMPILER_0  "D3DX9_xx.DLL을 불러올 수 없습니다, 픽셀셰이더를 사용할 수 없습니다."
@@ -2810,7 +2810,7 @@ STRINGTABLE
 BEGIN
     IDS_TIME_TOOLTIP_ABOVE  "탐색 표시줄 위에"
     IDS_TIME_TOOLTIP_BELOW  "탐색 표시줄 아래에"
-    IDS_VIDEO_STREAM        "비디오 : %s"
+    IDS_VIDEO_STREAM        "영상 : %s"
     IDS_APPLY               "적용"
     IDS_CLEAR               "지우기"
     IDS_CANCEL              "취소"
@@ -2868,8 +2868,8 @@ BEGIN
     IDS_OSD_RS_VSYNC_OFFSET "수직 동기화 편차 : %d"
     IDS_OSD_SPEED           "속도 : %sx"
     IDS_OSD_THUMBS_SAVED    "썸네일이 성공적으로 저장되었습니다."
-    IDS_MENU_VIDEO_STREAM   "비디오 스트림(&T)"
-    IDS_MENU_VIDEO_ANGLE    "비디오 앵글(&L)"
+    IDS_MENU_VIDEO_STREAM   "영상 스트림(&T)"
+    IDS_MENU_VIDEO_ANGLE    "영상 앵글(&L)"
     IDS_RESET_SETTINGS      "설정 초기화"
     IDS_RESET_SETTINGS_WARNING  "MPC-BE 초기 설정으로 복원하시겠습니까?\n현재 설정들은 모두 지워집니다!"
     IDS_RESET_SETTINGS_MUTEX  "초기 설정이 복원될 수 있도록 모든 MPC-BE 재생기를 종료해 주십시오."
@@ -2883,12 +2883,12 @@ END
 STRINGTABLE
 BEGIN
     IDS_AG_STEP             "한 프레임씩 재생"
-    IDS_AG_LOAD_AUDIO       "오디오 열기..."
+    IDS_AG_LOAD_AUDIO       "음향 열기..."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_MENU_AUDIOLANG   "메뉴 오디오 언어"
+    IDS_AG_MENU_AUDIOLANG   "메뉴 음향 언어"
     IDS_AG_MENU_SUBTITLELANG "메뉴 자막 언어"
     IDS_AG_MENU_JUMPTO      "메뉴 이동..."
     IDS_AG_MENU_AFTERPLAYBACK "재생 끝나고 메뉴"
@@ -2903,8 +2903,8 @@ STRINGTABLE
 BEGIN
     IDS_AG_DECREASE_RATE    "속도 감소"
     IDS_AG_RESET_RATE       "초기화"
-    IDS_AG_AUDIODELAY_PLUS  "오디오 0.01초 느리게"
-    IDS_AG_AUDIODELAY_MINUS "오디오 0.01초 빠르게"
+    IDS_AG_AUDIODELAY_PLUS  "음향 0.01초 느리게"
+    IDS_AG_AUDIODELAY_MINUS "음향 0.01초 빠르게"
     IDS_AG_JUMP_FORWARD_1   "앞으로 이동(조금)"
     IDS_AG_JUMP_BACKWARD_1  "뒤로 이동(조금)"
     IDS_AG_JUMP_FORWARD_2   "앞으로 이동(중간)"
@@ -2940,9 +2940,9 @@ BEGIN
     IDS_AG_FULLSCREEN       "전체 화면"
     IDS_AG_FULLSCREEN_2     "전체 화면(해상도 변경)"
     IDS_AG_ZOOM_AUTO_FIT    "자동 맞춤 확대"
-    IDS_AG_VIDFRM_HALF      "비디오폼 : 1/2"
-    IDS_AG_VIDFRM_NORMAL    "비디오폼 : 기본"
-    IDS_AG_VIDFRM_DOUBLE    "비디오폼 : 2배"
+    IDS_AG_VIDFRM_HALF      "영상폼 : 1/2"
+    IDS_AG_VIDFRM_NORMAL    "영상폼 : 기본"
+    IDS_AG_VIDFRM_DOUBLE    "영상폼 : 2배"
     IDS_AG_ALWAYS_ON_TOP    "항상 위에 유지"
     IDS_AG_PNS_INC_SIZE     "팬&&스캔 - 크기 확대"
     IDS_AG_PNS_INC_WIDTH    "팬&&스캔 - 폭 확대"
@@ -2976,7 +2976,7 @@ BEGIN
     IDS_AG_DVD_TITLEMENU    "DVD 타이틀 메뉴"
     IDS_AG_DVD_ROOTMENU     "DVD 루트 메뉴"
     IDS_AG_DVD_SUBPICTUREMENU "DVD 자막 메뉴"
-    IDS_AG_DVD_AUDIOMENU    "DVD 오디오 메뉴"
+    IDS_AG_DVD_AUDIOMENU    "DVD 음향 메뉴"
 END
 
 STRINGTABLE
@@ -2995,8 +2995,8 @@ BEGIN
     IDS_AG_MENU_PLAYER_L    "재생기 메뉴(길게)"
     IDS_AG_MENU_FILTERS     "필터 메뉴"
     IDS_AG_OPTIONS          "옵션"
-    IDS_AG_NEXT_AUDIO       "다음 오디오"
-    IDS_AG_PREV_AUDIO       "이전 오디오"
+    IDS_AG_NEXT_AUDIO       "다음 음향"
+    IDS_AG_PREV_AUDIO       "이전 음향"
 END
 
 STRINGTABLE
@@ -3005,8 +3005,8 @@ BEGIN
     IDS_AG_PREV_SUBTITLE    "이전 자막"
     IDS_AG_SUBTITLE_ONOFF   "자막 표시/표시 안 함"
     IDS_AG_SUBTITLE_RELOAD  "자막 다시 불러오기"
-    IDS_AG_NEXT_VIDEO       "다음 비디오/DVD 앵글"
-    IDS_AG_PREV_VIDEO       "이전 비디오/DVD 앵글"
+    IDS_AG_NEXT_VIDEO       "다음 영상/DVD 앵글"
+    IDS_AG_PREV_VIDEO       "이전 영상/DVD 앵글"
     IDS_REPEAT_FOREVER      "무한 반복"
     IDS_REPEAT_FOREVER_OFF  "무한 반복 : 끔"
     IDS_REPEAT_FOREVER_ON   "무한 반복 : 켬"
@@ -3027,7 +3027,7 @@ BEGIN
     IDS_MPLAYERC_102        "자막 왼쪽으로"
     IDS_MPLAYERC_103        "자막 오른쪽으로"
     IDS_AG_DISPLAY_STATS    "디스플레이 상태"
-    IDS_AG_AUDIODELAY_ONOFF "오디오 지연 켬/끔"
+    IDS_AG_AUDIODELAY_ONOFF "음향 지연 켬/끔"
     IDS_AG_AUTOSAVE_DISPLAY "표시된 이미지 저장(자동)"
     IDS_AG_OPEN_ISO         "ISO 이미지 열기"
     IDS_AG_OPEN_DIR         "디렉터리 열기"
@@ -3096,7 +3096,7 @@ BEGIN
     IDS_PROPSHEET_FILE_FONT "%hs font"
     IDS_AUDIOWINDOW_NONE    "창 크기 변경 안 함"
     IDS_AUDIOWINDOW_COVER   "앨범 아트/표지 사진 표시"
-    IDS_AUDIOWINDOW_HIDE    "비디오 영역 숨기기"
+    IDS_AUDIOWINDOW_HIDE    "영상 영역 숨기기"
     IDS_ADDTOPLS_FROMDIR_NONE "안 함"
 END
 
@@ -3115,9 +3115,9 @@ BEGIN
     IDS_AG_OPEN_DISC        "디스크 꺼내기"
     IDS_AG_FILTERS          "필터"
     IDS_AG_SUBTITLES        "자막"
-    IDS_AG_AUDIOLANG        "오디오 언어"
+    IDS_AG_AUDIOLANG        "음향 언어"
     IDS_AG_SUBTITLELANG     "자막 언어"
-    IDS_AG_VIDEO_ANGLE      "비디오 앵글"
+    IDS_AG_VIDEO_ANGLE      "영상 앵글"
 END
 
 STRINGTABLE
@@ -3139,7 +3139,7 @@ BEGIN
     IDS_AG_JUMP_TO          "이동..."
     IDS_AG_FAVORITES        "즐겨찾기"
     IDS_AG_SHADERS          "셰이더(H)"
-    IDS_AG_VIDEO_FRAME      "비디오 프레임"
+    IDS_AG_VIDEO_FRAME      "영상 프레임"
     IDS_AG_PANSCAN          "크기/위치"
     IDS_AG_ASPECT_RATIO     "화면 비율"
     IDS_MAINFRM_37          ", 총 : %d, 실패 : %d"
@@ -3161,12 +3161,12 @@ BEGIN
     IDS_MAINFRM_51          "현재 이미지 얻기 실패, hr = %08x"
     IDS_MAINFRM_53          "파일을 만들 수 없음"
     IDS_MAINFRM_54          "썸네일을 만들 수 없음"
-    IDS_MAINFRM_55          "비디오 프레임 사이즈 얻기 실패"
+    IDS_MAINFRM_55          "영상 프레임 사이즈 얻기 실패"
     IDS_MAINFRM_56          "메모리 부족!"
     IDS_MAINFRM_57          "사용할 수 없는 이미지 포맷, %d bpp dibs 썸네일을 만들 수 없음."
     IDS_MAINFRM_58          "파일 크기 : %s(%s 바이트)\\N"
     IDS_MAINFRM_59          "{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}파일 이름 : %s\\N%s해상도 : %dx%d %s\\N기간 : %02d:%02d:%02d"
-    IDS_MAINFRM_60          "자막을 보기 위해서는 다음 비디오 렌더러로 변경한 후 파일을 다시 열어야 합니다.\n"
+    IDS_MAINFRM_60          "자막을 보기 위해서는 다음 영상 렌더러로 변경한 후 파일을 다시 열어야 합니다.\n"
     IDS_MAINFRM_61          "- 다이렉트쇼 : EVR-CP, EVR Sync, Haali, madVR or MPC VR.\n"
     IDS_MAINFRM_64          "- 쇼크웨이브 : n/a\n"
 END
@@ -3175,7 +3175,7 @@ STRINGTABLE
 BEGIN
     IDS_MAINFRM_68          "화면비 : %d:%d"
     IDS_MAINFRM_69          "화면비 : 기본값"
-    IDS_MAINFRM_70          "오디오 지연 : %I64dms"
+    IDS_MAINFRM_70          "음향 지연 : %I64dms"
     IDS_AG_CHAPTER          "챕터 %d"
     IDS_MAINFRM_73          "셰이더를 불러올 수 없음 : "
     IDS_AG_SHADER           "셰이더 : "
@@ -3218,7 +3218,7 @@ BEGIN
     IDS_MAINFRM_93          "DVD 디렉터리를 찾을 수 없음"
     IDS_MAINFRM_94          "DVD 내비게이터 필터를 만들 수 없음"
     IDS_AG_FAILED           "실패"
-    IDS_MAINFRM_96          "비디오 캡처 필터를 만들 수 없음"
+    IDS_MAINFRM_96          "영상 캡처 필터를 만들 수 없음"
     IDS_MAINFRM_98          "캡처 필터가 없음"
     IDS_MAINFRM_99          "캡처 그래프 생성 객체를 생성할 수 없음"
     IDS_MAINFRM_100         "경고 : vidcap 캡처를 위한 IAMStreamConfig 인터페이스가 없음"
@@ -3265,19 +3265,19 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_BLOCK_EXTERNAL_VR   "%s을(를) 외부 필터로 추가할 수 없습니다.\n비디오 설정 페이지에서 원하는 비디오 렌더러를 선택해야 합니다."
+    IDS_BLOCK_EXTERNAL_VR   "%s을(를) 외부 필터로 추가할 수 없습니다.\n영상 설정 페이지에서 원하는 영상 렌더러를 선택해야 합니다."
     IDS_DESC_HAALI_VR       "VMR-9과 다름없지만, 고등 차수 보간을 사용합니다."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_NULLVR_ANY     "모든 비디오 형식의 샘플을 출력하지 않습니다. 비디오를 출력하지 않으면서 CPU가 작동하도록 할 때 사용합니다."
+    IDS_DESC_NULLVR_ANY     "모든 영상 형식의 샘플을 출력하지 않습니다. 영상을 출력하지 않으면서 CPU가 작동하도록 할 때 사용합니다."
     IDS_DESC_NULLVR_UNCOMP  "렌더라이저가 정상 상태인 경우, 연결 상태에 따라 아무런 제한도 없습니다."
-    IDS_DESC_EVR            "하드웨어 디코딩을 지원하는 비디오 렌더러입니다."
+    IDS_DESC_EVR            "하드웨어 디코딩을 지원하는 영상 렌더러입니다."
     IDS_DESC_EVR_CP         "EVR과 다름없지만, 자막 및 후처리를 위해 할당자-발표자를 사용합니다."
     IDS_DESC_MADVR          "고품질 렌더러, D3D9 이상을 지원하는 GPU 필요."
-    IDS_DESC_EVR_SYNC       "EVR(CP)와 다름없지만, 스킵되거나 중복된 영상 프레임을 제거하기 위한 디스플레이 주사율과 비디오 프레임율을 동기화해주는 여러 옵션 제공"
-    IDS_DESC_MPC_VR         "Direct3D 11을 지원하는 비디오 렌더러입니다."
+    IDS_DESC_EVR_SYNC       "EVR(CP)와 다름없지만, 스킵되거나 중복된 영상 프레임을 제거하기 위한 디스플레이 주사율과 영상 프레임율을 동기화해주는 여러 옵션 제공"
+    IDS_DESC_MPC_VR         "Direct3D 11을 지원하는 영상 렌더러입니다."
 END
 
 STRINGTABLE
@@ -3285,19 +3285,19 @@ BEGIN
     IDS_CMD_USAGE           "사용법 : mpc-be.exe ""경로명"" [스위치]"
     IDS_CMD_PATHNAME        """경로명""\t불러올 파일이나 디렉터리.(와일드 카드\n사용 가능)"
     IDS_CMD_HELP            "/help /h /?\t명령입력 스위치 옵션을 출력"
-    IDS_CMD_DUB             "/dub ""더빙파일""\t추가적인 오디오 파일"
+    IDS_CMD_DUB             "/dub ""더빙파일""\t추가적인 음향 파일"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_DUBDELAY        "/dubdelay ""파일""\tXXms 지연된 추가적인 오디오 파일(\n파일이 다음을 포함 ""...DELAY XXms..."")"
+    IDS_CMD_DUBDELAY        "/dubdelay ""파일""\tXXms 지연된 추가적인 음향 파일(\n파일이 다음을 포함 ""...DELAY XXms..."")"
     IDS_CMD_D3DFS           "/d3dfs\tD3D 전체 화면 모드에서 생성"
     IDS_CMD_SUB             "/sub ""자막 파일""\t추가적인 자막 파일"
     IDS_CMD_FILTER          "/filter ""필터 파일""\tDLL파일에서 다이렉트쇼 필터를 불러옴(와일드카드사용 가능)"
     IDS_CMD_DVD             "/dvd\tdvd재생모드, ""경로 이름"" 을 지정했을 때, DVD 폴더를 의미함(옵션)"
     IDS_CMD_DVDPOS1         "/dvdpos T#C\t타이틀 T, 챕터 C에서 재생 시작"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\t타이틀 T, 위치 hh:mm:ss에서 재생 시작"
-    IDS_CMD_CD              "/cd\t오디오 CD 또는 (S)VCD의 모든 트랙을 불러옴,\n""경로 이름"" 을 지정했을 때 드라이브를 의미함(옵션)"
+    IDS_CMD_CD              "/cd\t음향 CD 또는 (S)VCD의 모든 트랙을 불러옴,\n""경로 이름"" 을 지정했을 때 드라이브를 의미함(옵션)"
     IDS_CMD_OPEN            "/open\t파일을 열지만, 재생을 시작하지는 않음"
     IDS_CMD_PLAY            "/play\t파일을 열고 재생을 시작함"
     IDS_CMD_CLOSE           "/close\t재생이 끝나면 재생기 종료(/play 스위치를 같이 써야 함)"
@@ -3311,8 +3311,8 @@ END
 STRINGTABLE
 BEGIN
     IDS_CMD_RANDOMIZE       "/randomize\t재생 목록 무작위화"
-    IDS_CMD_REGVID          "/regvid\t비디오 파일 확장명을 MPC-BE로 연결"
-    IDS_CMD_REGAUD          "/regaud\t오디오 파일 확장명을 MPC-BE로 연결"
+    IDS_CMD_REGVID          "/regvid\t영상 파일 확장명을 MPC-BE로 연결"
+    IDS_CMD_REGAUD          "/regaud\t음향 파일 확장명을 MPC-BE로 연결"
     IDS_CMD_REGPL           "/regpl\t재생 목록 파일을 MPC-BE로 연결"
     IDS_CMD_REGALL          "/regall\t지원가능한 모든 파일을 MPC-BE로 연결"
     IDS_CMD_UNREGALL        "/unregall\t모든 연결 해제"
@@ -3320,7 +3320,7 @@ BEGIN
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\t위치 hh:mm:ss에서 재생 시작"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\t지정한 가로(w), 세로(h) 크기로 고정"
     IDS_CMD_MONITOR         "/monitor N\tN번 모니터에서 시작(N은 1 이상이어야 함)"
-    IDS_CMD_AUDIORENDERER   "/audiorender “”이름“”\t오디오 렌더러 사용 시작, 여기서 “‘이름’”은 오디오 렌더러의 이름\n(“”음향“” 설정 참조)"
+    IDS_CMD_AUDIORENDERER   "/audiorender “”이름“”\t음향 렌더러 사용 시작, 여기서 “‘이름’”은 음향 렌더러의 이름\n(“”음향“” 설정 참조)"
     IDS_CMD_VOLUME          "/volume N\tSet Volume, where N is a range from 0 to 100"
     IDS_CMD_CLIPBOARD       "/clipboard\tOpen 클립보드에서 경로/링크 열기"
     IDS_CMD_DEVICE          "/device\t기본 영상 장치 열기"
@@ -3351,7 +3351,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_MPEGSPLITTER_SUB_FORCING "모든 자막 강제로 열기"
-    IDS_MPEGSPLITTER_LANG_ORDER "오디오 언어 순서 :"
+    IDS_MPEGSPLITTER_LANG_ORDER "음향 언어 순서 :"
     IDS_MPEGSPLITTER_SUB_ORDER "자막 언어 순서 :"
     IDS_MPEGSPLITTER_TRUEHD_OUTPUT "트루 HD + AC-3 스트림 출력"
     IDS_MPEGSPLITTER_SUB_EMPTY_PIN "빈 자막 핀 출력"
@@ -3375,9 +3375,9 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_VDF_SETTINGS        "비디오 설정"
+    IDS_VDF_SETTINGS        "영상 설정"
     IDS_VDF_AUTO            "자동"
-    IDS_VDF_THREADNUMBER    "디코딩 스레드 개수(코어 개수)"
+    IDS_VDF_THREADNUMBER    "디코딩 스레드 수"
     IDS_VDF_SKIPBFRAMES     "B-프레임 건너뛰기"
 END
 
@@ -3405,7 +3405,7 @@ BEGIN
     IDS_VDF_COLOR_OUTPUT_FORMATS "출력 형식 "
     IDS_VDF_COLOR_PRESET    "사전 설정 :"
     IDS_VDF_COLOR_STANDARD  "표준 :"
-    IDS_VDF_COLOR_CONVERT_TO_RGB "Convert to RGB"
+    IDS_VDF_COLOR_CONVERT_TO_RGB "RGB로 변환"
     IDS_VDF_COLOR_RGB_LEVELS "RGB 출력 레벨 :"
 END
 
@@ -3416,10 +3416,10 @@ BEGIN
     IDS_VDF_STATUS_FRAMESIZE "프레임 크기 :"
     IDS_VDF_STATUS_OUTPUT   "출력 형식 :"
     IDS_VDF_STATUS_ADAPTER  "그래픽 어댑터 :"
-    IDS_VDF_TT_AR           "체크 - 스트림으로부터 AR 사용됩니다.\n체크 해제 - 컨테이너의 AR이 사용됩니다.\n미정 - 컨테이너 AR이 있는 파일에는 스트림의 AR이 사용되지 않습니다(권장)."
+    IDS_VDF_TT_AR           "체크 - 스트림에서 AR을 사용합니다.\n체크 해제 - 컨테이너의 AR이 사용됩니다.\n미정 - 스트림의 AR은 컨테이너 AR이 있는 파일에는 사용되지 않습니다.(권장)"
     IDS_VDF_TT_PRESET       "속도와 품질 간의 관계를 바꾼다."
-    IDS_VDF_TT_STANDARD     "이 설정은 필터가 YCbCr ↔ RGB 변환을 할 때만 사용합니다."
-    IDS_VDF_TT_RGB_LEVELS   "이 설정은 필터가 YCbCr → RGB 변환을 할 때만 사용합니다."
+    IDS_VDF_TT_STANDARD     "이 설정은 필터가 YCbCr ↔ RGB 변환을 수행할 때만 사용됩니다."
+    IDS_VDF_TT_RGB_LEVELS   "이 설정은 필터가 YCbCr을 RGB로 변환할 때만 사용됩니다."
 END
 
 STRINGTABLE
@@ -3466,14 +3466,14 @@ BEGIN
     IDS_ARS_CHANNELS        "채널 :"
     IDS_ARS_WASAPI_METHOD   "WASAPI 메소드 :"
     IDS_ARS_DUMMY_CHANNELS  "업믹스 시, 채널 채우지 않음"
-    IDS_ARS_TIP_BITEXACT_OUTPUT  "가능한 경우 오디오는 원래 형식으로 전송됩니다.\n그렇지 않으면 시스템 설정에 지정된 형식이 사용됩니다."
+    IDS_ARS_TIP_BITEXACT_OUTPUT  "가능한 경우 음향는 원래 형식으로 전송됩니다.\n그렇지 않으면 시스템 설정에 지정된 형식이 사용됩니다."
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "렌더러는 일부 검사를 건너뛰고 장치 초기화를 시도합니다."
 END
 
 STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "내장 폰트 불러옴"
-    IDS_MKVSPLT_CALC_DURATION "비디오 데이터를 기반으로 기간 계산"
+    IDS_MKVSPLT_CALC_DURATION "영상 데이터를 기반으로 기간 계산"
     IDS_MKVSPLT_REINDEX     "필요한 경우, 다시 색인화"
 END
 
@@ -3500,17 +3500,17 @@ BEGIN
     IDS_AG_ZOOM_100         "100% 확대"
     IDS_AG_ZOOM_200         "200% 확대"
     IDS_AG_NEXT_AR_PRESET   "다음 AR 사전 설정"
-    IDS_AG_VIDFRM_STRETCH   "비디오폼 : 늘리기"
-    IDS_AG_VIDFRM_INSIDE    "비디오폼 : 안쪽"
-    IDS_AG_VIDFRM_OUTSIDE   "비디오폼 : 바깥쪽"
+    IDS_AG_VIDFRM_STRETCH   "영상폼 : 늘리기"
+    IDS_AG_VIDFRM_INSIDE    "영상폼 : 안쪽"
+    IDS_AG_VIDFRM_OUTSIDE   "영상폼 : 바깥쪽"
     IDS_AG_PNS_RESET        "팬&&스캔 - 초기화"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_VIDFRM_ZOOM1     "비디오폼 : 확대 1"
-    IDS_AG_VIDFRM_ZOOM2     "비디오폼 : 확대 2"
-    IDS_AG_VIDFRM_SWITCHZOOM "비디오폼 : 확대 전환"
+    IDS_AG_VIDFRM_ZOOM1     "영상폼 : 확대 1"
+    IDS_AG_VIDFRM_ZOOM2     "영상폼 : 확대 2"
+    IDS_AG_VIDFRM_SWITCHZOOM "영상폼 : 확대 전환"
     IDS_ENABLE_ALL_FILTERS  "모든 필터 사용(&E)"
 END
 
@@ -3582,10 +3582,10 @@ BEGIN
     IDS_ZOOM1               "확대 1"
     IDS_ZOOM2               "확대 2"
     IDS_TOUCH_WINDOW_FROM_OUTSIDE "바깥쪽 윈도 창에서"
-    IDS_AUDIO_STREAM        "오디오  %u/%u: %s"
+    IDS_AUDIO_STREAM        "음향  %u/%u: %s"
     IDS_AG_REOPEN           "파일 다시열기"
     IDS_PROPERTIESFOR       "'%s'에 대한 속성"
-    IDS_AUDIO_ONLY          "오디오만"
+    IDS_AUDIO_ONLY          "음향만"
 END
 
 STRINGTABLE
@@ -3593,9 +3593,9 @@ BEGIN
     IDS_MFMT_AVI            "AVI"
     IDS_MFMT_MPEG           "MPEG"
     IDS_MFMT_MPEGTS         "MPEG-TS"
-    IDS_MFMT_DVDVIDEO       "DVD 비디오"
+    IDS_MFMT_DVDVIDEO       "DVD 영상"
     IDS_MFMT_MKV            "마트로스카"
-    IDS_MFMT_WEBM           "WebM 비디오"
+    IDS_MFMT_WEBM           "WebM 영상"
     IDS_MFMT_MP4            "MP4"
 END
 
@@ -3604,11 +3604,11 @@ BEGIN
     IDS_MFMT_MOV            "퀵타임 무비"
     IDS_MFMT_3GP            "3GP"
     IDS_MFMT_3G2            "3G2"
-    IDS_MFMT_FLV            "플래시 비디오"
+    IDS_MFMT_FLV            "플래시 영상"
     IDS_MFMT_OGM            "오그 미디어"
     IDS_MFMT_RM             "리얼 미디어"
-    IDS_MFMT_WMV            "윈도 미디어 비디오"
-    IDS_MFMT_BINK           "Smacker/Bink 비디오"
+    IDS_MFMT_WMV            "윈도 미디어 영상"
+    IDS_MFMT_BINK           "Smacker/Bink 영상"
     IDS_MFMT_FLIC           "FLIC 애니메이션"
     IDS_MFMT_ROQ            "이드소프트 게임 영상"
     IDS_MFMT_DSM            "다이렉트쇼 미디어"
@@ -3618,7 +3618,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_MFMT_OTHER          "그 외"
-    IDS_MFMT_OTHER_AUDIO    "그 외 오디오"
+    IDS_MFMT_OTHER_AUDIO    "그 외 음향"
     IDS_MFMT_SWF            "쇼크웨이브 플래시"
     IDS_MFMT_AVISYNTH       "AviSynth 스크립트"
     IDS_MFMT_VAPOURSYNTH    "VapourSynth 스크립트"
@@ -3627,15 +3627,15 @@ END
 STRINGTABLE
 BEGIN
     IDS_MFMT_WAV            "WAV"
-    IDS_MFMT_WMA            "윈도 미디어 오디오"
+    IDS_MFMT_WMA            "윈도 미디어 음향"
     IDS_MFMT_WAVPACK        "WavPack"
     IDS_MFMT_OPUS           "오푸스"
     IDS_MFMT_SPEEX          "스픽스"
-    IDS_MFMT_MLP            "MLP 오디오"
-    IDS_MFMT_DVDAUDIO       "DVD 오디오"
+    IDS_MFMT_MLP            "MLP 음향"
+    IDS_MFMT_DVDAUDIO       "DVD 음향"
     IDS_MFMT_DSD            "DSD"
     IDS_MFMT_DTS            "DTS/DTS-HD"
-    IDS_MFMT_WEBA           "WebM 오디오"
+    IDS_MFMT_WEBA           "WebM 음향"
 END
 
 STRINGTABLE
@@ -3648,21 +3648,21 @@ END
 STRINGTABLE
 BEGIN
     IDS_MFMT_AMR            "AMR"
-    IDS_MFMT_APE            "몽키스 오디오"
+    IDS_MFMT_APE            "몽키스 음향"
     IDS_MFMT_AU             "AU/SND"
-    IDS_MFMT_CDA            "오디오 CD 트랙"
+    IDS_MFMT_CDA            "음향 CD 트랙"
     IDS_MFMT_FLAC           "FLAC"
-    IDS_MFMT_M4A            "MPEG-4 오디오"
+    IDS_MFMT_M4A            "MPEG-4 음향"
     IDS_MFMT_MIDI           "MIDI"
-    IDS_MFMT_MKA            "마트로스카 오디오"
+    IDS_MFMT_MKA            "마트로스카 음향"
     IDS_MFMT_MP3            "MP3"
-    IDS_MFMT_MPA            "MPEG 오디오"
+    IDS_MFMT_MPA            "MPEG 음향"
     IDS_MFMT_MPC            "뮤즈팩"
     IDS_MFMT_OFR            "OptimFROG"
     IDS_MFMT_OGG            "오그 보비스"
-    IDS_MFMT_RA             "리얼 오디오"
+    IDS_MFMT_RA             "리얼 음향"
     IDS_MFMT_TAK            "TAK"
-    IDS_MFMT_TTA            "트루 오디오"
+    IDS_MFMT_TTA            "트루 음향"
 END
 
 STRINGTABLE
@@ -3678,10 +3678,10 @@ BEGIN
     IDS_OSD_RS_VSYNC_OFF    "수직 동기화 : 끔"
     IDS_OSD_RS_INTERNAL_VSYNC_ON "내장 수직 동기화 : 켬"
     IDS_OSD_RS_INTERNAL_VSYNC_OFF "내장 수직 동기화 : 끔"
-    IDS_OSD_RS_SYNC_TO_DISPLAY_ON "비디오를 디스플레이에 싱크 : 켬"
-    IDS_OSD_RS_SYNC_TO_DISPLAY_OFF "비디오를 디스플레이에 싱크 : 끔"
-    IDS_OSD_RS_SYNC_TO_VIDEO_ON "디스플레이를 비디오에 싱크 : 켬"
-    IDS_OSD_RS_SYNC_TO_VIDEO_OFF "디스플레이를 비디오에 싱크 : 끔"
+    IDS_OSD_RS_SYNC_TO_DISPLAY_ON "영상을 디스플레이에 싱크 : 켬"
+    IDS_OSD_RS_SYNC_TO_DISPLAY_OFF "영상을 디스플레이에 싱크 : 끔"
+    IDS_OSD_RS_SYNC_TO_VIDEO_ON "디스플레이를 영상에 싱크 : 켬"
+    IDS_OSD_RS_SYNC_TO_VIDEO_OFF "디스플레이를 영상에 싱크 : 끔"
     IDS_OSD_RS_PRESENT_NEAREST_ON "근린 수직 동기화 출력 : 켬"
     IDS_OSD_RS_PRESENT_NEAREST_OFF "근린 수직 동기화 출력 : 끔"
     IDS_OSD_RS_COLOR_MANAGEMENT_ON "색 관리 : 켬"
@@ -3771,9 +3771,9 @@ BEGIN
     IDS_GOTO_ERROR_PARSING_TIME "시간을 파싱하는데 오류가 발생했습니다!"
     IDS_GOTO_ERROR_PARSING_TEXT "텍스트를 파싱하는데 오류가 발생했습니다!"
     IDS_GOTO_ERROR_PARSING_FPS "프레임 레이트를 파싱하는데 오류가 발생했습니다!"
-    IDS_FRAME_STEP_ERROR_RENDERER  "프레임 단위 이동에 문제가 있으면, 다른 비디오 렌더러를 사용해보세요."
+    IDS_FRAME_STEP_ERROR_RENDERER  "프레임 단위 이동에 문제가 있으면, 다른 영상 렌더러를 사용해보세요."
     IDS_SCREENSHOT_ERROR_SHOCKWAVE  "'이미지 저장'과 '썸네일 저장'은 쇼크웨이브 파일에 대해서는 동작하지 않습니다."
-    IDS_SCREENSHOT_ERROR_OVERLAY  "'이미지 저장'과 '썸네일 저장'은 비디오 렌더러가 오버레이 믹서로 설정되어있을 때는 작동하지 않습니다.\n'출력' 옵션에서 비디오 렌더러를 변경한 후에 파일을 다시 여십시오."
+    IDS_SCREENSHOT_ERROR_OVERLAY  "'이미지 저장'과 '썸네일 저장'은 영상 렌더러가 오버레이 믹서로 설정되어있을 때는 작동하지 않습니다.\n'출력' 옵션에서 영상 렌더러를 변경한 후에 파일을 다시 여십시오."
     IDS_SUBDL_DLG_CONNECT_ERROR  "온라인 자막 디비 접속 불가."
 END
 
@@ -3782,15 +3782,15 @@ BEGIN
     IDS_DVD_NAV_SOME_PINS_ERROR  "DVD 탐색 필터 몇몇 핀 렌더 실패"
     IDS_DVD_INTERFACES_ERROR  "DVD 재생 인터페이스 문의 실패"
     IDS_CAPTURE_LIVE        "라이브"
-    IDS_CAPTURE_ERROR_VID_FILTER "비디오 캡처 필터를 그래프에 더하지 못했습니다"
-    IDS_CAPTURE_ERROR_AUD_FILTER "오디오 캡처 필터를 그래프에 추가하지 못했습니다."
+    IDS_CAPTURE_ERROR_VID_FILTER "영상 캡처 필터를 그래프에 더하지 못했습니다"
+    IDS_CAPTURE_ERROR_AUD_FILTER "음향 캡처 필터를 그래프에 추가하지 못했습니다."
     IDS_CAPTURE_ERROR_DEVICE "캡처 장치를 열지 못했습니다."
     IDS_INVALID_PARAMS_ERROR "엑세스할 수 없습니다. 매개 변수가 틀립니다."
     IDS_FILTERS_SOURCE      "소스 필터"
-    IDS_FILTERS_VIDEO       "비디오 디코더"
-    IDS_FILTERS_AUDIO       "오디오 디코더"
+    IDS_FILTERS_VIDEO       "영상 디코더"
+    IDS_FILTERS_AUDIO       "음향 디코더"
     IDS_GOTO_ERROR_INVALID_TIME  "입력된 시간이 파일 재생 시간보다 깁니다."
-    IDS_SCREENSHOT_ERROR_MADVR  "'이미지 저장'과 '썸네일 저장'은 madVR 비디오 렌더와 호환되지 않습니다.\nMPC-BE의 출력 옵션에서 비디오 렌더러를 바꾼후 다시 파일을 여세요."
+    IDS_SCREENSHOT_ERROR_MADVR  "'이미지 저장'과 '썸네일 저장'은 madVR 영상 렌더와 호환되지 않습니다.\nMPC-BE의 출력 옵션에서 영상 렌더러를 바꾼후 다시 파일을 여세요."
     IDS_SUBDL_DLG_FILENAME_COL "파일"
     IDS_SUBDL_DLG_LANGUAGE_COL "언어"
     IDS_SUBDL_DLG_FORMAT_COL "포맷"
@@ -3799,18 +3799,18 @@ END
 STRINGTABLE
 BEGIN
     IDS_CAPTURE_ERROR       "캡처 에러"
-    IDS_CAPTURE_ERROR_VIDEO "비디오"
-    IDS_CAPTURE_ERROR_AUDIO "오디오"
+    IDS_CAPTURE_ERROR_VIDEO "영상"
+    IDS_CAPTURE_ERROR_AUDIO "음향"
     IDS_CAPTURE_ERROR_ADD_BUFFER  "%s 버퍼 필터를 그래프에 추가할 수 없습니다."
     IDS_CAPTURE_ERROR_CONNECT_BUFF  "%s 버퍼 필터를 그래프에 연결할 수 없습니다."
     IDS_CAPTURE_ERROR_ADD_ENCODER  "%s 인코더 필터를 그래프에 추가할 수 없습니다."
     IDS_CAPTURE_ERROR_CONNECT_ENC  "%s 인코더 필터를 그래프에 연결할 수 없습니다."
     IDS_CAPTURE_ERROR_COMPRESSION  "%s 인코더 필터에서 압축형식을 설정할 수 없습니다."
     IDS_CAPTURE_ERROR_MULTIPLEXER  "%s 스트림을 멀티플렉서 필터에 연결할 수 없습니다."
-    IDS_CAPTURE_ERROR_VID_CAPT_PIN "비디오 캡처 핀을 찾을 수 없습니다."
-    IDS_CAPTURE_ERROR_AUD_CAPT_PIN "오디오 캡처 핀을 찾을 수 없습니다."
+    IDS_CAPTURE_ERROR_VID_CAPT_PIN "영상 캡처 핀을 찾을 수 없습니다."
+    IDS_CAPTURE_ERROR_AUD_CAPT_PIN "음향 캡처 핀을 찾을 수 없습니다."
     IDS_CAPTURE_ERROR_OUT_FILE "출력파일을 초기화하는데 에러가 발생했습니다."
-    IDS_CAPTURE_ERROR_AUD_OUT_FILE "오디오 출력 파일을 초기화하는데 에러가 발생했습니다."
+    IDS_CAPTURE_ERROR_AUD_OUT_FILE "음향 출력 파일을 초기화하는데 에러가 발생했습니다."
     IDS_SUBRESYNC_TIME_FORMAT  "올바른 시간 형식은 다음과 같음 : [-]hh:mm:ss.ms(예 : 01 :23 :45.678)."
     IDS_EXTERNAL_FILTERS_ERROR_MT "이 형식은 이미 목록에 있습니다!"
     IDS_WEBSERVER_ERROR_TEST  "설정들을 테스트해 보려면 설정들을 적용해야 합니다."
