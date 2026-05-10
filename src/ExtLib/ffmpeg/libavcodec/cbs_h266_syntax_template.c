@@ -2819,7 +2819,7 @@ static int FUNC(picture_header) (CodedBitstreamContext *ctx, RWContext *rw,
                    0, FFMIN(6, ctb_log2_size_y) - min_cb_log2_size_y);
                 ue(ph_max_mtt_hierarchy_depth_intra_slice_chroma,
                    0, 2 * (ctb_log2_size_y - min_cb_log2_size_y));
-                if (sps->sps_max_mtt_hierarchy_depth_intra_slice_chroma != 0) {
+                if (current->ph_max_mtt_hierarchy_depth_intra_slice_chroma != 0) {
                     unsigned int min_qt_log2_size_intra_c =
                         current->ph_log2_diff_min_qt_min_cb_intra_slice_chroma +
                         min_cb_log2_size_y;
@@ -3145,7 +3145,7 @@ static int FUNC(slice_header) (CodedBitstreamContext *ctx, RWContext *rw,
 
     if (!pps->pps_rect_slice_flag &&
         pps->num_tiles_in_pic - current->sh_slice_address > 1)
-        ue(sh_num_tiles_in_slice_minus1, 0, pps->num_tiles_in_pic - 1);
+        ue(sh_num_tiles_in_slice_minus1, 0, pps->num_tiles_in_pic - 1 - current->sh_slice_address);
     else
         infer(sh_num_tiles_in_slice_minus1, 0);
 

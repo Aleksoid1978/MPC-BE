@@ -1043,7 +1043,7 @@ static int hls_slice_header(SliceHeader *sh, const HEVCContext *s, GetBitContext
 
             if ((pps->weighted_pred_flag   && sh->slice_type == HEVC_SLICE_P) ||
                 (pps->weighted_bipred_flag && sh->slice_type == HEVC_SLICE_B)) {
-                int ret = pred_weight_table(sh, s->avctx, sps, gb);
+                ret = pred_weight_table(sh, s->avctx, sps, gb);
                 if (ret < 0)
                     return ret;
             }
@@ -2956,7 +2956,7 @@ static int hls_slice_data_wpp(HEVCContext *s, const H2645NAL *nal)
     int *ret;
     int64_t offset;
     int64_t startheader, cmpt = 0;
-    int i, j, res = 0;
+    int j, res = 0;
 
     if (s->sh.slice_ctb_addr_rs + s->sh.num_entry_point_offsets * sps->ctb_width >= sps->ctb_width * sps->ctb_height) {
         av_log(s->avctx, AV_LOG_ERROR, "WPP ctb addresses are wrong (%d %d %d %d)\n",
@@ -2998,7 +2998,7 @@ static int hls_slice_data_wpp(HEVCContext *s, const H2645NAL *nal)
         }
     }
 
-    for (i = 1; i < s->sh.num_entry_point_offsets; i++) {
+    for (int i = 1; i < s->sh.num_entry_point_offsets; i++) {
         offset += (s->sh.entry_point_offset[i - 1] - cmpt);
         for (j = 0, cmpt = 0, startheader = offset
              + s->sh.entry_point_offset[i]; j < nal->skipped_bytes; j++) {
@@ -3025,7 +3025,7 @@ static int hls_slice_data_wpp(HEVCContext *s, const H2645NAL *nal)
 
     s->data = data;
 
-    for (i = 1; i < s->nb_local_ctx; i++) {
+    for (unsigned i = 1; i < s->nb_local_ctx; i++) {
         s->local_ctx[i].first_qp_group = 1;
         s->local_ctx[i].qp_y = s->local_ctx[0].qp_y;
     }
@@ -3042,7 +3042,7 @@ static int hls_slice_data_wpp(HEVCContext *s, const H2645NAL *nal)
     if (pps->entropy_coding_sync_enabled_flag)
         s->avctx->execute2(s->avctx, hls_decode_entry_wpp, s->local_ctx, ret, s->sh.num_entry_point_offsets + 1);
 
-    for (i = 0; i <= s->sh.num_entry_point_offsets; i++)
+    for (int i = 0; i <= s->sh.num_entry_point_offsets; i++)
         res += ret[i];
 
     av_free(ret);
@@ -3228,6 +3228,7 @@ static int find_finish_setup_nal(const HEVCContext *s)
         case HEVC_NAL_RASL_R:
             if (!get_bits1(&gb)) // first_slice_segment_in_pic_flag
                 continue;
+            av_fallthrough;
         case HEVC_NAL_VPS:
         case HEVC_NAL_SPS:
         case HEVC_NAL_PPS:
@@ -3725,7 +3726,7 @@ static void decode_reset_recovery_point(HEVCContext *s)
 
 static int decode_nal_units(HEVCContext *s, const uint8_t *buf, int length)
 {
-    int i, ret = 0;
+    int ret = 0;
     int eos_at_start = 1;
     int flags = (H2645_FLAG_IS_NALFF * !!s->is_nalff) | H2645_FLAG_SMALL_PADDING;
 
@@ -3751,7 +3752,7 @@ static int decode_nal_units(HEVCContext *s, const uint8_t *buf, int length)
         return ret;
     }
 
-    for (i = 0; i < s->pkt.nb_nals; i++) {
+    for (int i = 0; i < s->pkt.nb_nals; i++) {
         if (s->pkt.nals[i].type == HEVC_NAL_EOB_NUT ||
             s->pkt.nals[i].type == HEVC_NAL_EOS_NUT) {
             if (eos_at_start) {
@@ -3799,7 +3800,7 @@ static int decode_nal_units(HEVCContext *s, const uint8_t *buf, int length)
     }
 
     /* decode the NAL units */
-    for (i = 0; i < s->pkt.nb_nals; i++) {
+    for (int i = 0; i < s->pkt.nb_nals; i++) {
         H2645NAL *nal = &s->pkt.nals[i];
 
         if (s->avctx->skip_frame >= AVDISCARD_ALL ||

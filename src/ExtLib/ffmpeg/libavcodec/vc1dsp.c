@@ -196,7 +196,7 @@ static av_always_inline int vc1_filter_line(uint8_t *src, ptrdiff_t stride, int 
  * @param pq block quantizer
  * @see 8.6
  */
-static inline void vc1_loop_filter(uint8_t *src, int step, ptrdiff_t stride,
+static inline void vc1_loop_filter(uint8_t *src, ptrdiff_t step, ptrdiff_t stride,
                                    int len, int pq)
 {
     int i;
@@ -547,7 +547,7 @@ static void vc1_inv_trans_4x4_c(uint8_t *dest, ptrdiff_t stride, int16_t *block)
 /* Filter in case of 2 filters */
 #define VC1_MSPEL_FILTER_16B(DIR, TYPE)                                       \
 static av_always_inline int vc1_mspel_ ## DIR ## _filter_16bits(const TYPE *src, \
-                                                                int stride,   \
+                                                                ptrdiff_t stride, \
                                                                 int mode)     \
 {                                                                             \
     switch(mode) {                                                            \
@@ -570,7 +570,7 @@ VC1_MSPEL_FILTER_16B(ver, uint8_t)
 VC1_MSPEL_FILTER_16B(hor, int16_t)
 
 /* Filter used to interpolate fractional pel values */
-static av_always_inline int vc1_mspel_filter(const uint8_t *src, int stride,
+static av_always_inline int vc1_mspel_filter(const uint8_t *src, ptrdiff_t stride,
                                              int mode, int r)
 {
     switch (mode) {

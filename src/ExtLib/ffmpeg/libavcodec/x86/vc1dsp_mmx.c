@@ -336,7 +336,7 @@ typedef void (*vc1_mspel_mc_filter_8bits)(uint8_t *dst, const uint8_t *src, x86_
  * @param  rnd     Rounding bias.
  */
 #define VC1_MSPEL_MC(OP, INSTR)\
-static void OP ## vc1_mspel_mc(uint8_t *dst, const uint8_t *src, int stride,\
+static void OP ## vc1_mspel_mc(uint8_t *dst, const uint8_t *src, ptrdiff_t stride,\
                                int hmode, int vmode, int rnd)\
 {\
     static const vc1_mspel_mc_filter_ver_16bits vc1_put_shift_ver_16bits[] =\

@@ -63,40 +63,6 @@ static const CodedBitstreamType *const cbs_type_table[] = {
 #endif
 };
 
-const enum AVCodecID CBS_FUNC(all_codec_ids)[] = {
-#if CBS_APV
-    AV_CODEC_ID_APV,
-#endif
-#if CBS_AV1
-    AV_CODEC_ID_AV1,
-#endif
-#if CBS_H264
-    AV_CODEC_ID_H264,
-#endif
-#if CBS_H265
-    AV_CODEC_ID_H265,
-#endif
-#if CBS_H266
-    AV_CODEC_ID_H266,
-#endif
-#if CBS_LCEVC
-    AV_CODEC_ID_LCEVC,
-#endif
-#if CBS_JPEG
-    AV_CODEC_ID_MJPEG,
-#endif
-#if CBS_MPEG2
-    AV_CODEC_ID_MPEG2VIDEO,
-#endif
-#if CBS_VP8
-    AV_CODEC_ID_VP8,
-#endif
-#if CBS_VP9
-    AV_CODEC_ID_VP9,
-#endif
-    AV_CODEC_ID_NONE
-};
-
 av_cold int CBS_FUNC(init)(CodedBitstreamContext **ctx_ptr,
                         enum AVCodecID codec_id, void *log_ctx)
 {

@@ -60,6 +60,13 @@ typedef struct CBSBSFContext {
 } CBSBSFContext;
 
 /**
+ * Table of all supported codec IDs.
+ *
+ * Terminated by AV_CODEC_ID_NONE.
+ */
+extern const enum AVCodecID ff_cbs_all_codec_ids[];
+
+/**
  * Initialise generic CBS BSF setup.
  *
  * Creates the input and output CBS instances, and applies the filter to

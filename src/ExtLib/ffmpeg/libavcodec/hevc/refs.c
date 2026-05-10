@@ -162,7 +162,10 @@ static HEVCFrame *alloc_frame(HEVCContext *s, HEVCLayerContext *l)
         if (ret < 0)
             goto fail;
 
-        frame->rpl = av_refstruct_allocz(s->pkt.nb_nals * sizeof(*frame->rpl));
+        size_t rpl_bytes;
+        if (av_size_mult(s->pkt.nb_nals, sizeof(*frame->rpl), &rpl_bytes) < 0)
+            goto fail;
+        frame->rpl = av_refstruct_allocz(rpl_bytes);
         if (!frame->rpl)
             goto fail;
         frame->nb_rpl_elems = s->pkt.nb_nals;
@@ -463,20 +466,20 @@ static void mark_ref(HEVCFrame *frame, int flag)
 static HEVCFrame *generate_missing_ref(HEVCContext *s, HEVCLayerContext *l, int poc)
 {
     HEVCFrame *frame;
-    int i, y;
 
     frame = alloc_frame(s, l);
     if (!frame)
         return NULL;
 
     if (!s->avctx->hwaccel) {
+        int nb_planes = l->sps->chroma_format_idc ? 3 : 1;
         if (!l->sps->pixel_shift) {
-            for (i = 0; frame->f->data[i]; i++)
+            for (int i = 0; i < nb_planes; i++)
                 memset(frame->f->data[i], 1 << (l->sps->bit_depth - 1),
                        frame->f->linesize[i] * AV_CEIL_RSHIFT(l->sps->height, l->sps->vshift[i]));
         } else {
-            for (i = 0; frame->f->data[i]; i++)
-                for (y = 0; y < (l->sps->height >> l->sps->vshift[i]); y++) {
+            for (int i = 0; i < nb_planes; i++)
+                for (int y = 0; y < (l->sps->height >> l->sps->vshift[i]); y++) {
                     uint8_t *dst = frame->f->data[i] + y * frame->f->linesize[i];
                     AV_WN16(dst, 1 << (l->sps->bit_depth - 1));
                     av_memcpy_backptr(dst + 2, 2, 2*(l->sps->width >> l->sps->hshift[i]) - 2);
