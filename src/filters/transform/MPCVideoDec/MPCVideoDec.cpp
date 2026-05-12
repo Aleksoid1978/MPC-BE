@@ -4200,7 +4200,7 @@ void CMPCVideoDecFilter::SetDXVAState()
 		auto cuda_fns = cuda_hwctx->internal->cuda_dl;
 
 		char name[256] = {};
-		auto cuStatus = cuda_fns->cuDeviceGetName(name, 256, 0);
+		auto cuStatus = cuda_fns->cuDeviceGetName(name, 256, cuda_hwctx->internal->cuda_device);
 		if (cuStatus == CUDA_SUCCESS) {
 			const auto deviceName = UTF8ToWStr(name);
 			if (!StartsWith(m_strDeviceDescription, deviceName.GetString())) {
