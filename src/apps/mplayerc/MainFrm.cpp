@@ -12458,6 +12458,10 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		m_PlaybackInfo.FileName = GetFileName(pOFD->fi);
 	}
 	else if (youtubeUrl.IsEmpty()) {
+		CPlaylistItem pli;
+		if (m_wndPlaylistBar.GetCur(pli) && pli.m_fi.Valid() && pli.m_label.GetLength()) {
+			m_PlaybackInfo.FileName = pli.m_label;
+		}
 		m_PlaybackInfo.bUpdateTitle = true;
 	}
 
