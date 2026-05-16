@@ -426,6 +426,9 @@ void CHdmvSub::ParsePalette(CGolombBuffer* pGBuffer, USHORT nSize)
 
 	ASSERT((nSize - 2) % sizeof(HDMV_PALETTE) == 0);
 	int nNbEntry = (nSize - 2) / sizeof(HDMV_PALETTE);
+	if (nNbEntry > 256) {
+		return;
+	}
 	HDMV_PALETTE* pPalette = (HDMV_PALETTE*)pGBuffer->GetBufferPos();
 
 	SAFE_DELETE_ARRAY(m_CLUT[palette_id].Palette);
