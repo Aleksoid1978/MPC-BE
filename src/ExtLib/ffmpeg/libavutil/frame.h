@@ -268,6 +268,30 @@ enum AVFrameSideDataType {
      * volume transform as specified in the SMPTE 2094-50 standard.
      */
     AV_FRAME_DATA_DYNAMIC_HDR_SMPTE_2094_APP5,
+
+    /**
+     * IAMF Mix Gain Parameter Data associated with the audio frame. This metadata
+     * is in the form of the AVIAMFParamDefinition struct and contains information
+     * defined in sections 3.6.1 and 3.8.1 of the Immersive Audio Model and
+     * Formats standard.
+     */
+    AV_FRAME_DATA_IAMF_MIX_GAIN_PARAM,
+
+    /**
+    * IAMF Demixing Info Parameter Data associated with the audio frame. This
+    * metadata is in the form of the AVIAMFParamDefinition struct and contains
+    * information defined in sections 3.6.1 and 3.8.2 of the Immersive Audio Model
+    * and Formats standard.
+    */
+    AV_FRAME_DATA_IAMF_DEMIXING_INFO_PARAM,
+
+    /**
+    * IAMF Recon Gain Info Parameter Data associated with the audio frame. This
+    * metadata is in the form of the AVIAMFParamDefinition struct and contains
+    * information defined in sections 3.6.1 and 3.8.3 of the Immersive Audio Model
+    * and Formats standard.
+    */
+    AV_FRAME_DATA_IAMF_RECON_GAIN_INFO_PARAM,
 };
 
 enum AVActiveFormatDescription {

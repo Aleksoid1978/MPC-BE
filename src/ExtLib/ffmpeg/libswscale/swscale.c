@@ -1504,7 +1504,16 @@ int sws_frame_setup(SwsContext *ctx, const AVFrame *dst, const AVFrame *src)
             goto fail;
         }
 
-        ret = ff_sws_graph_reinit(ctx, &dst_fmt, &src_fmt, field, &s->graph[field]);
+        if (!s->graph[field]) {
+            s->graph[field] = ff_sws_graph_alloc();
+            if (!s->graph[field]) {
+                err_msg = "Failed allocating scaling graph";
+                ret = AVERROR(ENOMEM);
+                goto fail;
+            }
+        }
+
+        ret = ff_sws_graph_reinit(s->graph[field], ctx, &dst_fmt, &src_fmt, field);
         if (ret < 0) {
             err_msg = "Failed initializing scaling graph";
             goto fail;

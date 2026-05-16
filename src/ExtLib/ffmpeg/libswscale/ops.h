@@ -373,17 +373,6 @@ enum SwsOpCompileFlags {
 };
 
 /**
- * Resolves an operation list to a graph pass. The first and last operations
- * must be a read/write respectively. `flags` is a list of SwsOpCompileFlags.
- *
- * Takes over ownership of `ops` and sets it to NULL, even on failure.
- *
- * Note: `ops` may be modified by this function.
- */
-int ff_sws_compile_pass(SwsGraph *graph, SwsOpList **ops, int flags,
-                        SwsPass *input, SwsPass **output);
-
-/**
  * Helper function to enumerate over all possible (optimized) operation lists,
  * under the current set of options in `ctx`, and run the given callback on
  * each list.

@@ -1551,4 +1551,123 @@ int ff_sws_encode_colors(SwsContext *ctx, SwsPixelType type,
     });
 }
 
+static SwsScaler get_scaler_fallback(SwsContext *ctx)
+{
+    if (ctx->scaler != SWS_SCALE_AUTO)
+        return ctx->scaler;
+
+    /* Backwards compatibility with legacy flags API */
+    if (ctx->flags & SWS_BILINEAR) {
+        return SWS_SCALE_BILINEAR;
+    } else if (ctx->flags & (SWS_BICUBIC | SWS_BICUBLIN)) {
+        return SWS_SCALE_BICUBIC;
+    } else if (ctx->flags & SWS_POINT) {
+        return SWS_SCALE_POINT;
+    } else if (ctx->flags & SWS_AREA) {
+        return SWS_SCALE_AREA;
+    } else if (ctx->flags & SWS_GAUSS) {
+        return SWS_SCALE_GAUSSIAN;
+    } else if (ctx->flags & SWS_SINC) {
+        return SWS_SCALE_SINC;
+    } else if (ctx->flags & SWS_LANCZOS) {
+        return SWS_SCALE_LANCZOS;
+    } else if (ctx->flags & SWS_SPLINE) {
+        return SWS_SCALE_SPLINE;
+    } else {
+        return SWS_SCALE_AUTO;
+    }
+}
+
+static int add_filter(SwsContext *ctx, SwsPixelType type, SwsOpList *ops,
+                      SwsOpType filter, int src_size, int dst_size)
+{
+    if (src_size == dst_size)
+        return 0; /* no-op */
+
+    SwsFilterParams params = {
+        .scaler   = get_scaler_fallback(ctx),
+        .src_size = src_size,
+        .dst_size = dst_size,
+    };
+
+    for (int i = 0; i < SWS_NUM_SCALER_PARAMS; i++)
+        params.scaler_params[i] = ctx->scaler_params[i];
+
+    SwsFilterWeights *kernel;
+    int ret = ff_sws_filter_generate(ctx, &params, &kernel);
+    if (ret == AVERROR(ENOTSUP)) {
+        /* Filter size exceeds limit; cascade with geometric mean size */
+        int mean = sqrt((int64_t) src_size * dst_size);
+        if (mean == src_size || mean == dst_size)
+            return AVERROR_BUG; /* sanity, prevent infinite loop */
+        ret = add_filter(ctx, type, ops, filter, src_size, mean);
+        if (ret < 0)
+            return ret;
+        return add_filter(ctx, type, ops, filter, mean, dst_size);
+    } else if (ret < 0) {
+        return ret;
+    }
+
+    return ff_sws_op_list_append(ops, &(SwsOp) {
+        .type = type,
+        .op   = filter,
+        .filter.kernel = kernel,
+    });
+}
+
+int ff_sws_add_filters(SwsContext *ctx, SwsPixelType type, SwsOpList *ops,
+                       const SwsFormat *src, const SwsFormat *dst)
+{
+    /**
+     * Always perform horizontal scaling first, since it's much more likely to
+     * benefit from small integer optimizations; we should maybe flip the order
+     * here if we're downscaling the vertical resolution by a lot, though.
+     */
+    int ret = add_filter(ctx, type, ops, SWS_OP_FILTER_H, src->width, dst->width);
+    if (ret < 0)
+        return ret;
+
+    return add_filter(ctx, type, ops, SWS_OP_FILTER_V, src->height, dst->height);
+}
+
+int ff_sws_op_list_generate(SwsContext *ctx, const SwsFormat *src,
+                            const SwsFormat *dst, SwsOpList **out_ops,
+                            bool *incomplete)
+{
+    /* The new code does not yet support alpha blending */
+    if (src->desc->flags & AV_PIX_FMT_FLAG_ALPHA &&
+        ctx->alpha_blend != SWS_ALPHA_BLEND_NONE)
+        return AVERROR(ENOTSUP);
+
+    SwsOpList *ops = ff_sws_op_list_alloc();
+    if (!ops)
+        return AVERROR(ENOMEM);
+    ops->src = *src;
+    ops->dst = *dst;
+
+    const SwsPixelType type = SWS_PIXEL_F32;
+    int ret = ff_sws_decode_pixfmt(ops, src->format);
+    if (ret < 0)
+        goto fail;
+    ret = ff_sws_decode_colors(ctx, type, ops, src, incomplete);
+    if (ret < 0)
+        goto fail;
+    ret = ff_sws_add_filters(ctx, type, ops, src, dst);
+    if (ret < 0)
+        goto fail;
+    ret = ff_sws_encode_colors(ctx, type, ops, src, dst, incomplete);
+    if (ret < 0)
+        goto fail;
+    ret = ff_sws_encode_pixfmt(ops, dst->format);
+    if (ret < 0)
+        goto fail;
+
+    *out_ops = ops;
+    return 0;
+
+fail:
+    ff_sws_op_list_free(&ops);
+    return ret;
+}
+
 #endif /* CONFIG_UNSTABLE */

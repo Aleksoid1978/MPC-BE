@@ -179,6 +179,23 @@ int ff_sws_encode_colors(SwsContext *ctx, SwsPixelType type, SwsOpList *ops,
                          bool *incomplete);
 
 /**
+ * Append a set of operations for scaling pixels to a different resolution.
+ *
+ * Returns 0 on success, or a negative error code on failure.
+ */
+int ff_sws_add_filters(SwsContext *ctx, SwsPixelType type, SwsOpList *ops,
+                       const SwsFormat *src, const SwsFormat *dst);
+
+/**
+ * Generate an SwsOpList defining a conversion from `src` to `dst`.
+ *
+ * Returns 0 on success, or a negative error code on failure.
+ */
+int ff_sws_op_list_generate(SwsContext *ctx, const SwsFormat *src,
+                            const SwsFormat *dst, SwsOpList **out_ops,
+                            bool *incomplete);
+
+/**
  * Represents a view into a single field of frame data.
  *
  * Ostensibly, this is a (non-compatible) subset of AVFrame, however, the

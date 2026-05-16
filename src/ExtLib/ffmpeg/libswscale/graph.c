@@ -37,6 +37,7 @@
 #include "swscale_internal.h"
 #include "graph.h"
 #include "ops.h"
+#include "ops_dispatch.h"
 
 int ff_sws_pass_aligned_width(const SwsPass *pass, int width)
 {
@@ -570,118 +571,19 @@ static int add_legacy_sws_pass(SwsGraph *graph, const SwsFormat *src,
  *********************************/
 
 #if CONFIG_UNSTABLE
-static SwsScaler get_scaler_fallback(SwsContext *ctx)
-{
-    if (ctx->scaler != SWS_SCALE_AUTO)
-        return ctx->scaler;
-
-    /* Backwards compatibility with legacy flags API */
-    if (ctx->flags & SWS_BILINEAR) {
-        return SWS_SCALE_BILINEAR;
-    } else if (ctx->flags & (SWS_BICUBIC | SWS_BICUBLIN)) {
-        return SWS_SCALE_BICUBIC;
-    } else if (ctx->flags & SWS_POINT) {
-        return SWS_SCALE_POINT;
-    } else if (ctx->flags & SWS_AREA) {
-        return SWS_SCALE_AREA;
-    } else if (ctx->flags & SWS_GAUSS) {
-        return SWS_SCALE_GAUSSIAN;
-    } else if (ctx->flags & SWS_SINC) {
-        return SWS_SCALE_SINC;
-    } else if (ctx->flags & SWS_LANCZOS) {
-        return SWS_SCALE_LANCZOS;
-    } else if (ctx->flags & SWS_SPLINE) {
-        return SWS_SCALE_SPLINE;
-    } else {
-        return SWS_SCALE_AUTO;
-    }
-}
-
-static int add_filter(SwsContext *ctx, SwsPixelType type, SwsOpList *ops,
-                      SwsOpType filter, int src_size, int dst_size)
-{
-    if (src_size == dst_size)
-        return 0; /* no-op */
-
-    SwsFilterParams params = {
-        .scaler   = get_scaler_fallback(ctx),
-        .src_size = src_size,
-        .dst_size = dst_size,
-    };
-
-    for (int i = 0; i < SWS_NUM_SCALER_PARAMS; i++)
-        params.scaler_params[i] = ctx->scaler_params[i];
-
-    SwsFilterWeights *kernel;
-    int ret = ff_sws_filter_generate(ctx, &params, &kernel);
-    if (ret == AVERROR(ENOTSUP)) {
-        /* Filter size exceeds limit; cascade with geometric mean size */
-        int mean = sqrt((int64_t) src_size * dst_size);
-        if (mean == src_size || mean == dst_size)
-            return AVERROR_BUG; /* sanity, prevent infinite loop */
-        ret = add_filter(ctx, type, ops, filter, src_size, mean);
-        if (ret < 0)
-            return ret;
-        return add_filter(ctx, type, ops, filter, mean, dst_size);
-    } else if (ret < 0) {
-        return ret;
-    }
-
-    return ff_sws_op_list_append(ops, &(SwsOp) {
-        .type = type,
-        .op   = filter,
-        .filter.kernel = kernel,
-    });
-}
-
 static int add_convert_pass(SwsGraph *graph, const SwsFormat *src,
                             const SwsFormat *dst, SwsPass *input,
                             SwsPass **output)
 {
-    const SwsPixelType type = SWS_PIXEL_F32;
-
     SwsContext *ctx = graph->ctx;
-    SwsOpList *ops = NULL;
     int ret = AVERROR(ENOTSUP);
 
     /* Mark the entire new ops infrastructure as experimental for now */
     if (!(ctx->flags & SWS_UNSTABLE))
         goto fail;
 
-    /* The new code does not yet support alpha blending */
-    if (src->desc->flags & AV_PIX_FMT_FLAG_ALPHA &&
-        ctx->alpha_blend != SWS_ALPHA_BLEND_NONE)
-        goto fail;
-
-    ops = ff_sws_op_list_alloc();
-    if (!ops)
-        return AVERROR(ENOMEM);
-    ops->src = *src;
-    ops->dst = *dst;
-
-    ret = ff_sws_decode_pixfmt(ops, src->format);
-    if (ret < 0)
-        goto fail;
-    ret = ff_sws_decode_colors(ctx, type, ops, src, &graph->incomplete);
-    if (ret < 0)
-        goto fail;
-
-    /**
-     * Always perform horizontal scaling first, since it's much more likely to
-     * benefit from small integer optimizations; we should maybe flip the order
-     * here if we're downscaling the vertical resolution by a lot, though.
-     */
-    ret = add_filter(ctx, type, ops, SWS_OP_FILTER_H, src->width, dst->width);
-    if (ret < 0)
-        goto fail;
-    ret = add_filter(ctx, type, ops, SWS_OP_FILTER_V, src->height, dst->height);
-    if (ret < 0)
-        goto fail;
-
-    ret = ff_sws_encode_colors(ctx, type, ops, src, dst, &graph->incomplete);
-    if (ret < 0)
-        goto fail;
-    ret = ff_sws_encode_pixfmt(ops, dst->format);
+    SwsOpList *ops;
+    ret = ff_sws_op_list_generate(ctx, src, dst, &ops, &graph->incomplete);
     if (ret < 0)
         goto fail;
 
@@ -691,7 +593,7 @@ static int add_convert_pass(SwsGraph *graph, const SwsFormat *src,
     av_log(ctx, AV_LOG_DEBUG, "Unoptimized operation list:\n");
     ff_sws_op_list_print(ctx, AV_LOG_DEBUG, AV_LOG_TRACE, ops);
 
-    ret = ff_sws_compile_pass(graph, &ops, SWS_OP_FLAG_OPTIMIZE, input, output);
+    ret = ff_sws_compile_pass(graph, NULL, &ops, SWS_OP_FLAG_OPTIMIZE, input, output);
     if (ret < 0)
         goto fail;
 
@@ -699,7 +601,6 @@ static int add_convert_pass(SwsGraph *graph, const SwsFormat *src,
     /* fall through */
 
 fail:
-    ff_sws_op_list_free(&ops);
     if (ret == AVERROR(ENOTSUP))
         return add_legacy_sws_pass(graph, src, dst, input, output);
     return ret;
@@ -845,13 +746,30 @@ static void sws_graph_worker(void *priv, int jobnr, int threadnr, int nb_jobs,
     pass->run(graph->exec.output, graph->exec.input, slice_y, slice_h, pass);
 }
 
-int ff_sws_graph_create(SwsContext *ctx, const SwsFormat *dst, const SwsFormat *src,
-                        int field, SwsGraph **out_graph)
+SwsGraph *ff_sws_graph_alloc(void)
+{
+    return av_mallocz(sizeof(SwsGraph));
+}
+
+static void graph_uninit(SwsGraph *graph)
+{
+    avpriv_slicethread_free(&graph->slicethread);
+
+    for (int i = 0; i < graph->num_passes; i++)
+        pass_free(graph->passes[i]);
+    av_free(graph->passes);
+
+    memset(graph, 0, sizeof(*graph));
+}
+
+int ff_sws_graph_init(SwsGraph *graph, SwsContext *ctx, const SwsFormat *dst,
+                      const SwsFormat *src, int field)
 {
     int ret;
-    SwsGraph *graph = av_mallocz(sizeof(*graph));
-    if (!graph)
-        return AVERROR(ENOMEM);
+    if (graph->ctx) {
+        av_log(ctx, AV_LOG_ERROR, "Graph is already initialized\n");
+        return AVERROR(EINVAL);
+    }
 
     graph->ctx = ctx;
     graph->src = *src;
@@ -885,12 +803,28 @@ int ff_sws_graph_create(SwsContext *ctx, const SwsFormat *dst, const SwsFormat *
             goto error;
     }
 
-    *out_graph = graph;
     return 0;
 
 error:
-    ff_sws_graph_free(&graph);
+    graph_uninit(graph);
     return ret;
+}
+
+int ff_sws_graph_create(SwsContext *ctx, const SwsFormat *dst, const SwsFormat *src,
+                        int field, SwsGraph **out_graph)
+{
+    SwsGraph *graph = ff_sws_graph_alloc();
+    if (!graph)
+        return AVERROR(ENOMEM);
+
+    int ret = ff_sws_graph_init(graph, ctx, dst, src, field);
+    if (ret < 0) {
+        ff_sws_graph_free(&graph);
+        return ret;
+    }
+
+    *out_graph = graph;
+    return 0;
 }
 
 void ff_sws_graph_rollback(SwsGraph *graph, int since_idx)
@@ -906,12 +840,7 @@ void ff_sws_graph_free(SwsGraph **pgraph)
     if (!graph)
         return;
 
-    avpriv_slicethread_free(&graph->slicethread);
-
-    for (int i = 0; i < graph->num_passes; i++)
-        pass_free(graph->passes[i]);
-    av_free(graph->passes);
-
+    graph_uninit(graph);
     av_free(graph);
     *pgraph = NULL;
 }
@@ -935,20 +864,18 @@ static int opts_equal(const SwsContext *c1, const SwsContext *c2)
 
 }
 
-int ff_sws_graph_reinit(SwsContext *ctx, const SwsFormat *dst, const SwsFormat *src,
-                        int field, SwsGraph **out_graph)
+int ff_sws_graph_reinit(SwsGraph *graph, SwsContext *ctx, const SwsFormat *dst,
+                        const SwsFormat *src, int field)
 {
-    SwsGraph *graph = *out_graph;
-    if (graph && ff_fmt_equal(&graph->src, src) &&
-                 ff_fmt_equal(&graph->dst, dst) &&
-                 opts_equal(ctx, &graph->opts_copy))
+    if (ff_fmt_equal(&graph->src, src) && ff_fmt_equal(&graph->dst, dst) &&
+        opts_equal(ctx, &graph->opts_copy))
     {
         ff_sws_graph_update_metadata(graph, &src->color);
         return 0;
     }
 
-    ff_sws_graph_free(out_graph);
-    return ff_sws_graph_create(ctx, dst, src, field, out_graph);
+    graph_uninit(graph);
+    return ff_sws_graph_init(graph, ctx, dst, src, field);
 }
 
 void ff_sws_graph_update_metadata(SwsGraph *graph, const SwsColor *color)

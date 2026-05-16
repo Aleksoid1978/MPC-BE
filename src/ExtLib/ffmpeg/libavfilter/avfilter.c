@@ -760,6 +760,7 @@ AVFilterContext *ff_filter_alloc(const AVFilter *filter, const char *inst_name)
 err:
     if (preinited)
         fi->uninit(ret);
+    av_freep(&ret->name);
     av_freep(&ret->inputs);
     av_freep(&ret->input_pads);
     ret->nb_inputs = 0;

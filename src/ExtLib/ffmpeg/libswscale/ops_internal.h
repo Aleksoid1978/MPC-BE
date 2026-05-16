@@ -52,43 +52,6 @@ static inline void ff_sws_pack_op_decode(const SwsOp *op, uint64_t mask[4], int 
     }
 }
 
-typedef struct SwsOpBackend {
-    const char *name; /* Descriptive name for this backend */
-
-    /**
-     * Compile an operation list to an implementation chain. May modify `ops`
-     * freely; the original list will be freed automatically by the caller.
-     *
-     * Returns 0 or a negative error code.
-     */
-    int (*compile)(SwsContext *ctx, SwsOpList *ops, SwsCompiledOp *out);
-
-    /**
-     * If NONE, backend only supports software frames.
-     * Otherwise, frame hardware format must match hw_format for the backend
-     * to be used.
-     */
-    enum AVPixelFormat hw_format;
-} SwsOpBackend;
-
-/* List of all backends, terminated by NULL */
-extern const SwsOpBackend *const ff_sws_op_backends[];
-
-/**
- * Attempt to compile a list of operations using a specific backend.
- *
- * Returns 0 on success, or a negative error code on failure.
- */
-int ff_sws_ops_compile_backend(SwsContext *ctx, const SwsOpBackend *backend,
-                               const SwsOpList *ops, SwsCompiledOp *out);
-
-/**
- * Compile a list of operations using the best available backend.
- *
- * Returns 0 on success, or a negative error code on failure.
- */
-int ff_sws_ops_compile(SwsContext *ctx, const SwsOpList *ops, SwsCompiledOp *out);
-
 /**
  * "Solve" an op list into a fixed shuffle mask, with an optional ability to
  * also directly clear the output value (for e.g. rgb24 -> rgb0). This can

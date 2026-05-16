@@ -127,4 +127,52 @@ typedef struct SwsCompiledOp {
 
 void ff_sws_compiled_op_unref(SwsCompiledOp *comp);
 
+typedef struct SwsOpBackend {
+    const char *name; /* Descriptive name for this backend */
+
+    /**
+     * Compile an operation list to an implementation chain. May modify `ops`
+     * freely; the original list will be freed automatically by the caller.
+     *
+     * Returns 0 or a negative error code.
+     */
+    int (*compile)(SwsContext *ctx, SwsOpList *ops, SwsCompiledOp *out);
+
+    /**
+     * If NONE, backend only supports software frames.
+     * Otherwise, frame hardware format must match hw_format for the backend
+     * to be used.
+     */
+    enum AVPixelFormat hw_format;
+} SwsOpBackend;
+
+/* List of all backends, terminated by NULL */
+extern const SwsOpBackend *const ff_sws_op_backends[];
+
+/**
+ * Attempt to compile a list of operations using a specific backend, or
+ * the best available backend if `backend` is NULL.
+ *
+ * Returns 0 on success, or a negative error code on failure.
+ */
+int ff_sws_ops_compile(SwsContext *ctx, const SwsOpBackend *backend,
+                       const SwsOpList *ops, SwsCompiledOp *out);
+
+/**
+ * Resolves an operation list to a graph pass. The first and last operations
+ * must be a read/write respectively.
+ *
+ * @param backend Force the use of a specific backend (Optional)
+ * @param ops Operations to compile. Ownership passes to this function, and
+ *            will be set to NULL, even on failure.
+ * @param flags Set of SwsOpCompileFlags
+ * @param input The input for the compiled passes. (Optional)
+ * @param output The resulting final output pass will be stored here. If NULL,
+ *               no output passes are created, and any compiled functions are
+ *               instead immediately freed.
+ */
+int ff_sws_compile_pass(SwsGraph *graph, const SwsOpBackend *backend,
+                        SwsOpList **ops, int flags, SwsPass *input,
+                        SwsPass **output);
+
 #endif /* SWSCALE_OPS_DISPATCH_H */
