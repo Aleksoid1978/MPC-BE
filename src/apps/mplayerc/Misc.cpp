@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2025 see Authors.txt
+ * (C) 2016-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -357,7 +357,7 @@ CStringW GetDragQueryFileName(HDROP hDrop, UINT iFile)
 	return fname;
 }
 
-bool LongPathsEnabled()
+static bool LongPathsEnabled()
 {
 	bool bLongPathsEnabled = false;
 
@@ -377,11 +377,9 @@ bool LongPathsEnabled()
 
 void ConvertLongPath(CStringW& path)
 {
-	if (StartsWith(path, L"\\\\?\\")) {
-		static const bool bLongPathsEnabled = LongPathsEnabled();
-		if (bLongPathsEnabled) {
-			path = path.Mid(4);
-		}
+	static const bool bLongPathsEnabled = LongPathsEnabled();
+	if (bLongPathsEnabled && StartsWith(path, L"\\\\?\\") && !StartsWith(path, L"\\\\?\\UNC\\")) {
+		path = path.Mid(4);
 	}
 }
 
