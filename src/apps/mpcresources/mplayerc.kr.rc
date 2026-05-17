@@ -3361,14 +3361,14 @@ END
 STRINGTABLE
 BEGIN
     IDS_MPADEC_SAMPLE_FMT   "출력 샘플 형식 :"
-    IDS_MPADEC_DRC          "AC-3와 E-AC-3를 위한 DRC 적용 "
+    IDS_MPADEC_DRC          "AC-3 및 E-AC-3를 위한 DRC 적용 "
     IDS_MPADEC_MIXER        "믹서"
     IDS_MPADEC_MIX_SPEAKERS "출력 스피커 :"
     IDS_MPADEC_MONO         "모노"
     IDS_MPADEC_STEREO       "스테레오"
     IDS_MPADEC_SPDIF        "출력(S/PDIF, HDMI)"
     IDS_MPADEC_AC3ENCODE    "AC-3로 인코딩"
-    IDS_MPADEC_AV_SYNC      "A/V 동기화 수정"
+    IDS_MPADEC_AV_SYNC      "A/V 동기화 보정"
     IDS_MPADEC_STATUS       "상태"
     IDS_MPADEC_NOTACTIVE    "디코더가 활성화되지 않음."
 END
@@ -3391,7 +3391,7 @@ BEGIN
     IDS_VDF_DXVACOMPATIBILITY "DXVA(H.264) 호환성 검사"
     IDS_VDF_DXVA_FULLCHECK  "전체 검사"
     IDS_VDF_DXVA_SKIP_LEVELCHECK "레벨 검사 건너뛰기"
-    IDS_VDF_DXVA_SKIP_REFCHECK "레퍼런스 프레임 검사 건너뛰기"
+    IDS_VDF_DXVA_SKIP_REFCHECK "참조 프레임 검사 건너뛰기"
     IDS_VDF_DXVA_SKIP_ALLCHECK "모든 검사 건너뛰기"
     IDS_VDF_DXVA_SD         "SD 영상에서 DXVA 사용 안 함"
 END
@@ -3424,8 +3424,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_MPEG2_INTERLACE_FLAG "출력 미디어 형식에 인터레이스 설정"
-    IDS_MPEG2_FORCED_SUBS   "항상 자막을 출력"
+    IDS_MPEG2_INTERLACE_FLAG "출력 미디어 유형에 인터레이스 플래그 설정"
+    IDS_MPEG2_FORCED_SUBS   "강제 자막을 항상 표시"
     IDS_MPEG2_DEINTERLACING "인터레이싱 제거"
 END
 
@@ -3433,7 +3433,7 @@ STRINGTABLE
 BEGIN
     IDS_MPEG2_BRIGHTNESS    "밝기"
     IDS_MPEG2_RESET         "초기화"
-    IDS_MPEG2_NOTE1         "알림 : 비평면 출력 형식, Bob 인터레이스 제거 또는 색 속성을 변경하면 성능이 저하될 수 있습니다. 필요하면 ""자동"" 인터레이스 삭제는 ""블렌드"" 로 바뀝니다."
+    IDS_MPEG2_NOTE1         "참고 : 비평면 출력 형식, Bob 인터레이스 제거 또는 색 속성을 변경하면 성능이 저하될 수 있습니다. 필요하면 ""자동"" 인터레이스 제거는 ""블렌드"" 로 바뀝니다."
     IDS_MPEG2_CONTRAST      "명암"
     IDS_MPEG2_HUE           "색조"
     IDS_MPEG2_SATURATION    "채도"
