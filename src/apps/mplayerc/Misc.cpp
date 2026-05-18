@@ -378,7 +378,7 @@ static bool LongPathsEnabled()
 void ConvertLongPath(CStringW& path)
 {
 	static const bool bLongPathsEnabled = LongPathsEnabled();
-	if (bLongPathsEnabled && StartsWith(path, L"\\\\?\\") && !StartsWith(path, L"\\\\?\\UNC\\")) {
+	if (bLongPathsEnabled && StartsWith(path, L"\\\\?\\") && !StartsWith(path, L"UNC\\", 4)) {
 		path = path.Mid(4);
 	}
 }
