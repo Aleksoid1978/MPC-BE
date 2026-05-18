@@ -1476,7 +1476,7 @@ namespace
 				__m128i d1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(dst));
 				__m128i d2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(dst + 16));
 				__m128i d3 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(dst + 32));
-				__m128i d4 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(dst + 64));
+				__m128i d4 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(dst + 48));
 
 				auto c_r_low = _mm256_castsi256_si128(c_r);
 				auto c_g_low = _mm256_castsi256_si128(c_g);
