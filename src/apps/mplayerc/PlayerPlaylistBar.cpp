@@ -70,6 +70,32 @@ static CStringW MakePath(CStringW path)
 	return c;
 }
 
+static void GetLabelFromURL(CStringW url, CStringW& outputLabel)
+{
+	int k = url.Find('#');
+	if (k >= 0) {
+		url.Truncate(k); // remove #fragment
+	}
+	k = url.Find('/', url.Find(L"://") + 3);
+	if (k < 0 || k + 1 == url.GetLength() || url[k + 1] == '?') {
+		outputLabel = url;
+	} else {
+		k = url.Find('?');
+		if (k >= 0) {
+			url.Truncate(k); // remove ?query
+		}
+		url.TrimRight('/');
+		k = url.ReverseFind('/');
+		if (k >= 0) {
+			url.Delete(0, k + 1);
+		}
+		if (url.GetLength()) {
+			Unescape(url);
+			outputLabel = url;
+		}
+	}
+}
+
 struct CUETrack {
 	REFERENCE_TIME m_rt = _I64_MIN;
 	UINT m_trackNum = 0;
@@ -266,7 +292,9 @@ CString CPlaylistItem::GetLabel(int i) const
 		}
 		if (m_fi.Valid()) {
 			if (::PathIsURLW(m_fi)) {
-				return m_fi.GetPath();
+				CStringW label = m_fi.GetPath();
+				GetLabelFromURL(m_fi, label);
+				return label;
 			} else {
 				return GetFileName(m_fi);
 			}
@@ -286,7 +314,7 @@ CString CPlaylistItem::GetLabel(int i) const
 		}
 	}
 
-	return CString();
+	return {};
 }
 
 template<class T>
@@ -1196,30 +1224,7 @@ void CPlayerPlaylistBar::AddItem(std::list<CString>& fns, CSubtitleItemList* sub
 
 	if (pli.m_label.IsEmpty()) {
 		if (::PathIsURLW(pli.m_fi)) {
-			CStringW label = pli.m_fi;
-			int k = label.Find('#');
-			if (k >= 0) {
-				label.Truncate(k); // remove #fragment
-			}
-			k = label.Find('/', label.Find(L"://") + 3);
-			if (k < 0 || k + 1 == label.GetLength() || label[k+1] == '?') {
-				pli.m_label = label;
-			}
-			else {
-				k = label.Find('?');
-				if (k >= 0) {
-					label.Truncate(k); // remove ?query
-				}
-				label.TrimRight('/');
-				k = label.ReverseFind('/');
-				if (k >= 0) {
-					label.Delete(0, k + 1);
-				}
-				if (label.GetLength()) {
-					Unescape(label);
-					pli.m_label = label;
-				}
-			}
+			GetLabelFromURL(pli.m_fi, pli.m_label);
 		}
 		else {
 			pli.m_label = GetFileName(pli.m_fi);
