@@ -12735,8 +12735,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 			if (m_SessionInfo.Title.IsEmpty()) {
 				CPlaylistItem pli;
-				if (m_wndPlaylistBar.GetCur(pli) && pli.m_fi.Valid() && pli.m_label.GetLength() && !pli.m_autolabel) {
-					m_SessionInfo.Title = pli.m_label;
+				if (m_wndPlaylistBar.GetCur(pli)) {
+					m_SessionInfo.Title = pli.GetLabel(0);
 				}
 			}
 
