@@ -18,6 +18,7 @@ Improved handling of corrupted files.
 
 MatroskaSplitter
 Expanded support for V_UNCOMPRESSED video codecs.
+Fixed support for frame rotation (ProjectionPoseRoll).
 
 MpcDvdVideoDecoder
 Fixed conversion to YUY2.

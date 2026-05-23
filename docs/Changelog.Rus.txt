@@ -18,6 +18,7 @@ MP4Splitter
 
 MatroskaSplitter
 Расширена поддержка видеокодеков V_UNCOMPRESSED.
+Исправлена поддержка поворота кадра (ProjectionPoseRoll).
 
 MpcDvdVideoDecoder
 Исправлено преобразование в YUY2.
