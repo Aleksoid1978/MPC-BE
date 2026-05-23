@@ -40,7 +40,6 @@
 
 av_unused av_cold static int pcm_encode_init(AVCodecContext *avctx)
 {
-    avctx->frame_size = 0;
 #if !CONFIG_HARDCODED_TABLES
     switch (avctx->codec->id) {
 #if CONFIG_PCM_ALAW_ENCODER

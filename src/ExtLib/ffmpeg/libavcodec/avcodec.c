@@ -354,6 +354,14 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
         if (!avctx->bit_rate)
             avctx->bit_rate = get_bit_rate(avctx);
 
+
+        if (avctx->codec_type == AVMEDIA_TYPE_AUDIO &&
+            !avctx->frame_size && (avctx->flags2 & AV_CODEC_FLAG2_FIXED_FRAME_SIZE)) {
+            av_log(avctx, AV_LOG_ERROR, "Fixed frame size requested but no frame_size value set\n");
+            ret = AVERROR(EINVAL);
+            goto free_and_end;
+        }
+
         avci->skip_samples = avctx->delay;
 
         /* validate channel layout from the decoder */

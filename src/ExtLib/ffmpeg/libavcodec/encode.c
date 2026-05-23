@@ -155,6 +155,8 @@ static int encode_make_refcounted(AVCodecContext *avctx, AVPacket *avpkt)
  */
 static int pad_last_frame(AVCodecContext *s, AVFrame *frame, const AVFrame *src, int out_samples)
 {
+    AVFrameSideData *sd;
+    int discard_padding;
     int ret;
 
     frame->format         = src->format;
@@ -178,6 +180,17 @@ static int pad_last_frame(AVCodecContext *s, AVFrame *frame, const AVFrame *src,
                                       frame->nb_samples - src->nb_samples,
                                       s->ch_layout.nb_channels, s->sample_fmt)) < 0)
         goto fail;
+
+    discard_padding = frame->nb_samples - src->nb_samples;
+    av_assert1(discard_padding > 0);
+    sd = av_frame_new_side_data(frame, AV_FRAME_DATA_SKIP_SAMPLES, 10);
+    if (!sd) {
+        ret = AVERROR(ENOMEM);
+        goto fail;
+    }
+    AV_WL32A(sd->data, 0);
+    AV_WL32A(sd->data + 4, discard_padding);
+    AV_WL16A(sd->data + 8, 0);
 
     return 0;
 
@@ -261,6 +274,20 @@ int ff_encode_encode_cb(AVCodecContext *avctx, AVPacket *avpkt,
                 else if (avctx->codec->type == AVMEDIA_TYPE_AUDIO) {
                     avpkt->duration = ff_samples_to_time_base(avctx,
                                                               frame->nb_samples);
+                }
+                if (avctx->codec->type == AVMEDIA_TYPE_AUDIO) {
+                    AVFrameSideData *sd = av_frame_get_side_data(frame, AV_FRAME_DATA_SKIP_SAMPLES);
+                    if (sd && sd->size >= 10) {
+                        uint8_t *skip_samples = av_packet_new_side_data(avpkt, AV_PKT_DATA_SKIP_SAMPLES, 10);
+                        if (!skip_samples) {
+                            ret = AVERROR(ENOMEM);
+                            goto unref;
+                        }
+                        AV_WL32A(skip_samples + 0, AV_RL32(sd->data + 0));
+                        AV_WL32A(skip_samples + 4, AV_RL32(sd->data + 4));
+                        AV_WB8  (skip_samples + 8, AV_RB8 (sd->data + 8));
+                        AV_WB8  (skip_samples + 9, AV_RB8 (sd->data + 9));
+                    }
                 }
             }
 
@@ -439,7 +466,7 @@ static int encode_send_frame_internal(AVCodecContext *avctx, const AVFrame *src)
             avctx->audio_service_type = *(enum AVAudioServiceType*)sd->data;
 
         /* check for valid frame size */
-        if (!(avctx->codec->capabilities & AV_CODEC_CAP_VARIABLE_FRAME_SIZE)) {
+        if (avctx->frame_size) {
             /* if we already got an undersized frame, that must have been the last */
             if (ec->last_audio_frame) {
                 av_log(avctx, AV_LOG_ERROR, "frame_size (%d) was not respected for a non-last frame\n", avctx->frame_size);
@@ -451,7 +478,8 @@ static int encode_send_frame_internal(AVCodecContext *avctx, const AVFrame *src)
             }
             if (src->nb_samples < avctx->frame_size) {
                 ec->last_audio_frame = 1;
-                if (!(avctx->codec->capabilities & AV_CODEC_CAP_SMALL_LAST_FRAME)) {
+                if (!(avctx->codec->capabilities & AV_CODEC_CAP_SMALL_LAST_FRAME) ||
+                    (avctx->flags2 & AV_CODEC_FLAG2_FIXED_FRAME_SIZE)) {
                     int pad_samples = avci->pad_samples ? avci->pad_samples : avctx->frame_size;
                     int out_samples = (src->nb_samples + pad_samples - 1) / pad_samples * pad_samples;
 
