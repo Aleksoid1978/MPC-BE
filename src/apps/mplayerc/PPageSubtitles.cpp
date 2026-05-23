@@ -238,7 +238,7 @@ void CPPageSubtitles::OnSubRendPropClick()
 
 	CComPtr<IBaseFilter> pBF;
 	if (SUCCEEDED(pBF.CoCreateInstance(clsid))) {
-		CComQIPtr<ISpecifyPropertyPages> pSPP = pBF;
+		CComQIPtr<ISpecifyPropertyPages> pSPP = pBF.p;
 		if (pSPP) {
 			CComPropertySheet ps(ResStr(IDS_PROPSHEET_PROPERTIES), this);
 			ps.AddPages(pSPP);

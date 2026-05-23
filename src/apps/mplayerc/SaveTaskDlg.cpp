@@ -1,5 +1,5 @@
 /*
- * (C) 2023-2025 see Authors.txt
+ * (C) 2023-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -392,7 +392,7 @@ void CSaveTaskDlg::SaveHTTP(const int iSubLangDefault)
 		const CStringW format =
 			(finalext == L"m4a")                       ? L"mp4" :
 			(finalext == L"mka" || finalext == L"mkv") ? L"matroska" :
-			finalext;
+			finalext.GetString();
 
 		CStringW strArgs = L"-y";
 		CStringW mapping;

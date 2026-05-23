@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2025 see Authors.txt
+ * (C) 2012-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -157,7 +157,7 @@ void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* pAPETag)
 						}
 
 						if (!CoverMime.IsEmpty()) {
-							pRB->ResAppend(key, !desc.IsEmpty() ? desc : L"cover", CoverMime, (BYTE*)tagValue.data(), (DWORD)tagValue.size(), 0);
+							pRB->ResAppend(key, desc.GetLength() ? desc.GetString() : L"cover", CoverMime, (BYTE*)tagValue.data(), (DWORD)tagValue.size(), 0);
 						}
 					}
 				}

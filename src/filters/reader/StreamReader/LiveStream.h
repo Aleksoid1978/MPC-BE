@@ -144,7 +144,7 @@ public:
 	GUID GetSubtype() const { return m_subtype; }
 	protocol GetProtocol() const { return m_protocol; }
 
-	CStringW CLiveStream::GetTitle() const;
+	CStringW GetTitle() const;
 	CStringW GetDescription() const { return m_icydata.description; }
 	CStringW GetUrl() const { return m_icydata.stationUrl; }
 };
