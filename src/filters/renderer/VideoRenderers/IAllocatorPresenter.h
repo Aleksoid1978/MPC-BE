@@ -37,7 +37,11 @@ enum {
 	SUBPIC_STEREO_NONE = 0,
 	SUBPIC_STEREO_SIDEBYSIDE,
 	SUBPIC_STEREO_TOPANDBOTTOM,
+	SUBPIC_STEREO_FRAMEPACKING,
 };
+
+constexpr int FRAMEPACKING_TOTAL_LINES = 2205; // HDMI 1.4a Frame Packing total lines (1920x1080 reference: 1080 + 45 + 1080)
+constexpr int FRAMEPACKING_GAP_LINES   = 45;   // active space gap between the two eyes
 
 enum {
 	STEREO3D_AsIs = 0,

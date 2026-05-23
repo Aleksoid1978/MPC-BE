@@ -137,6 +137,7 @@ enum : int {
 	STEREO3D_ROWINTERLEAVED_2X,
 	STEREO3D_HALFOVERUNDER,
 	STEREO3D_OVERUNDER,
+	STEREO3D_FRAMEPACKING,
 };
 
 // Enumeration for MCE remote control (careful : add 0x010000 for all keys!)

@@ -1721,6 +1721,7 @@ BEGIN
             MENUITEM "Rând intercalat (2x / de două ori)",        ID_STEREO3D_ROW_INTERLEAVED_2X
             MENUITEM "Jumătate peste partea de deasupra / de dedesubt",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "Peste partea de de deasupra / de dedesubt",                   ID_STEREO3D_OVERUNDER
+            MENUITEM "Frame Packing",                   ID_STEREO3D_FRAMEPACKING
             MENUITEM SEPARATOR
             MENUITEM "Schimbă la stânga / la dreapta",             ID_STEREO3D_SWAP_LEFTRIGHT
         END
@@ -1900,6 +1901,7 @@ BEGIN
             MENUITEM "Rând intercalat (2x / de două ori)",        ID_STEREO3D_ROW_INTERLEAVED_2X
             MENUITEM "Jumătate peste partea de deasupra / de dedesubt",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "Peste partea de de deasupra / de dedesubt",                   ID_STEREO3D_OVERUNDER
+            MENUITEM "Frame Packing",                   ID_STEREO3D_FRAMEPACKING
             MENUITEM SEPARATOR
             MENUITEM "Schimbă stânga / dreapta",             ID_STEREO3D_SWAP_LEFTRIGHT
         END
@@ -1989,6 +1991,7 @@ BEGIN
                 MENUITEM "Rând intercalat (2x / de două ori)",        ID_STEREO3D_ROW_INTERLEAVED_2X
                 MENUITEM "Jumătate peste partea de deasupra / de dedesubt",              ID_STEREO3D_HALFOVERUNDER
                 MENUITEM "Peste partea de de deasupra / de dedesubt",                   ID_STEREO3D_OVERUNDER
+                MENUITEM "Frame Packing",                   ID_STEREO3D_FRAMEPACKING
                 MENUITEM SEPARATOR
                 MENUITEM "Schimbă stânga / dreapta",             ID_STEREO3D_SWAP_LEFTRIGHT
             END
@@ -2067,6 +2070,7 @@ BEGIN
             MENUITEM "Rând intercalat (2x / de două ori)",        ID_STEREO3D_ROW_INTERLEAVED_2X
             MENUITEM "Jumătate peste partea de deasupra / de dedesubt",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "Peste partea de de deasupra / de dedesubt",                   ID_STEREO3D_OVERUNDER
+            MENUITEM "Frame Packing",                   ID_STEREO3D_FRAMEPACKING
             MENUITEM SEPARATOR
             MENUITEM "Schimbă stânga / dreapta",             ID_STEREO3D_SWAP_LEFTRIGHT
         END

@@ -1719,6 +1719,7 @@ BEGIN
             MENUITEM "متشابك سطري (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
             MENUITEM "نصف OverUnder",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "OverUnder",                   ID_STEREO3D_OVERUNDER
+            MENUITEM "Frame Packing",                   ID_STEREO3D_FRAMEPACKING
             MENUITEM SEPARATOR
             MENUITEM "تبديل اليسار/اليمين",             ID_STEREO3D_SWAP_LEFTRIGHT
         END
@@ -1899,6 +1900,7 @@ BEGIN
             MENUITEM "سطر متشابك (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
             MENUITEM "نصف علوي/سفلي (Half OverUnder)",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "علوي/سفلي (OverUnder)",                   ID_STEREO3D_OVERUNDER
+            MENUITEM "Frame Packing",                   ID_STEREO3D_FRAMEPACKING
             MENUITEM SEPARATOR
             MENUITEM "مبادلة اليسار/اليمين",             ID_STEREO3D_SWAP_LEFTRIGHT
         END
@@ -1988,6 +1990,7 @@ BEGIN
                 MENUITEM "سطر متشابك (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
                 MENUITEM "نصف علوي/سفلي (Half OverUnder)",              ID_STEREO3D_HALFOVERUNDER
                 MENUITEM "علوي/سفلي (OverUnder)",                   ID_STEREO3D_OVERUNDER
+                MENUITEM "Frame Packing",                   ID_STEREO3D_FRAMEPACKING
                 MENUITEM SEPARATOR
                 MENUITEM "مبادلة اليسار/اليمين",             ID_STEREO3D_SWAP_LEFTRIGHT
             END
@@ -2066,6 +2069,7 @@ BEGIN
             MENUITEM "سطر متشابك (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
             MENUITEM "نصف علوي/سفلي (Half OverUnder)",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "علوي/سفلي (OverUnder)",                   ID_STEREO3D_OVERUNDER
+            MENUITEM "Frame Packing",                   ID_STEREO3D_FRAMEPACKING
             MENUITEM SEPARATOR
             MENUITEM "مبادلة اليسار/اليمين",             ID_STEREO3D_SWAP_LEFTRIGHT
         END

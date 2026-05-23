@@ -360,12 +360,17 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	m_arxout = m_arxin;
 	m_aryout = m_aryin;
 
-	if (m_bMVC_Output_TopBottom) {
+	if (m_bMVC_Output_TopBottom || m_bMVC_Output_FramePacking) {
 		h *= 2;
 		m_hout *= 2;
 
 		ary *= 2;
 		m_aryout *= 2;
+
+		if (m_bMVC_Output_FramePacking) {
+			h      += MVC_FRAMEPACKING_GAP_LINES;
+			m_hout += MVC_FRAMEPACKING_GAP_LINES;
+		}
 
 		ReduceDim(arx, ary);
 		ReduceDim(m_arxout, m_aryout);
@@ -419,9 +424,13 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 			vih->rcSource.right  = std::clamp(vih->rcSource.right , 0L, (LONG)m_win);
 			vih->rcSource.bottom = std::clamp(vih->rcSource.bottom, 0L, (LONG)m_hin);
 
-			if (m_bMVC_Output_TopBottom) {
+			if (m_bMVC_Output_TopBottom || m_bMVC_Output_FramePacking) {
 				vih->rcSource.bottom *= 2;
 				vih->rcTarget.bottom *= 2;
+				if (m_bMVC_Output_FramePacking) {
+					vih->rcSource.bottom += MVC_FRAMEPACKING_GAP_LINES;
+					vih->rcTarget.bottom += MVC_FRAMEPACKING_GAP_LINES;
+				}
 			}
 		} else {
 			vih->rcSource.right  = vih->rcTarget.right  = m_win;

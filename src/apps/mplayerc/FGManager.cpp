@@ -121,6 +121,7 @@ public:
 				case STEREO3D_ROWINTERLEAVED_2X: iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
 				case STEREO3D_HALFOVERUNDER:     iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
 				case STEREO3D_OVERUNDER:         iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
+				case STEREO3D_FRAMEPACKING:      iMvcOutputMode = MVC_OUTPUT_FramePacking;  break;
 			}
 			const int mvc_mode_value = (iMvcOutputMode << 16) | (s.bStereo3DSwapLR ? 1 : 0);
 

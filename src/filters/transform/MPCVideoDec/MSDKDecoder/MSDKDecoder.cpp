@@ -580,7 +580,12 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
   }
 
   const int width  = pBaseView->surface.Info.CropW;
-  const int height = m_iOutputMode == MVC_OUTPUT_TopBottom ? pBaseView->surface.Info.CropH * 2 : pBaseView->surface.Info.CropH;
+  int height       = pBaseView->surface.Info.CropH;
+  if (m_iOutputMode == MVC_OUTPUT_TopBottom) {
+    height = height * 2;
+  } else if (m_iOutputMode == MVC_OUTPUT_FramePacking) {
+    height = height * 2 + MVC_FRAMEPACKING_GAP_LINES;
+  }
 
   CSize aspect(width, height);
   ReduceDim(aspect);
@@ -649,7 +654,7 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
 
       CopyEverySecondLineSSE2(dst, srcBase, srcExtra, linesize, height / 4);
     }
-    else if (m_iOutputMode == MVC_OUTPUT_TopBottom) {
+    else if (m_iOutputMode == MVC_OUTPUT_TopBottom || m_iOutputMode == MVC_OUTPUT_FramePacking) {
       if (!m_pFrame->data[0] && av_frame_get_buffer(m_pFrame, 64) < 0) {
         hr = E_POINTER;
         goto error;
@@ -660,23 +665,33 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
         swapLR = !swapLR;
       }
 
+      const int eyeH    = pBaseView->surface.Info.CropH;            // height of one eye
+      const int gapH    = (m_iOutputMode == MVC_OUTPUT_FramePacking) ? MVC_FRAMEPACKING_GAP_LINES : 0;
+      const ptrdiff_t pitch = pBaseView->surface.Data.PitchLow;
+
       // luminance
       uint8_t* dst = m_pFrame->data[0];
       uint8_t* srcBase = swapLR ? pExtraView->surface.Data.Y : pBaseView->surface.Data.Y;
       uint8_t* srcExtra = swapLR ? pBaseView->surface.Data.Y : pExtraView->surface.Data.Y;
 
-      ptrdiff_t planesize = pBaseView->surface.Data.PitchLow * height / 2;
-      PIXCONV_MEMCPY_ALIGNED(dst, srcBase, planesize);
-      PIXCONV_MEMCPY_ALIGNED(dst + planesize, srcExtra, planesize);
+      const ptrdiff_t eyePlaneY = pitch * eyeH;
+      PIXCONV_MEMCPY_ALIGNED(dst, srcBase, eyePlaneY);
+      if (gapH) {
+        memset(dst + eyePlaneY, 0, pitch * gapH);
+      }
+      PIXCONV_MEMCPY_ALIGNED(dst + eyePlaneY + pitch * gapH, srcExtra, eyePlaneY);
 
       // color
       dst  = m_pFrame->data[1];
       srcBase  = swapLR ? pExtraView->surface.Data.UV : pBaseView->surface.Data.UV;
       srcExtra = swapLR ? pBaseView->surface.Data.UV : pExtraView->surface.Data.UV;
 
-      planesize /= 2;
-      PIXCONV_MEMCPY_ALIGNED(dst, srcBase, planesize);
-      PIXCONV_MEMCPY_ALIGNED(dst + planesize, srcExtra, planesize);
+      const ptrdiff_t eyePlaneUV = pitch * eyeH / 2;
+      PIXCONV_MEMCPY_ALIGNED(dst, srcBase, eyePlaneUV);
+      if (gapH) {
+        memset(dst + eyePlaneUV, 128, pitch * (gapH / 2));
+      }
+      PIXCONV_MEMCPY_ALIGNED(dst + eyePlaneUV + pitch * (gapH / 2), srcExtra, eyePlaneUV);
     }
     else {
       allocateFrame(true);

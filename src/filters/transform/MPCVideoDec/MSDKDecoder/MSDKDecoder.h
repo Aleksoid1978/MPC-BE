@@ -48,7 +48,8 @@ enum {
   MVC_OUTPUT_Auto = 0,
   MVC_OUTPUT_Mono,          // force mono frame (left)
   MVC_OUTPUT_HalfTopBottom, // convert to stereoscopic half height anamorphic video
-  MVC_OUTPUT_TopBottom      // convert to two images packed vertically
+  MVC_OUTPUT_TopBottom,     // convert to two images packed vertically
+  MVC_OUTPUT_FramePacking   // HDMI 1.4a Frame Packing: two images packed vertically with 45-line active space gap between them
 };
 
 class CMPCVideoDecFilter;

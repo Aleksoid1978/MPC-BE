@@ -2168,6 +2168,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
 		}
 
 		m_bMVC_Output_TopBottom = FALSE;
+		m_bMVC_Output_FramePacking = FALSE;
 		if (pmt->subtype == MEDIASUBTYPE_AMVC || pmt->subtype == MEDIASUBTYPE_MVC1) {
 			if (!m_pMSDKDecoder) {
 				m_pMSDKDecoder = std::make_unique<CMSDKDecoder>(this);
@@ -2179,7 +2180,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
 			}
 
 			if (m_pMSDKDecoder) {
-				m_bMVC_Output_TopBottom = m_iMvcOutputMode == MVC_OUTPUT_TopBottom;
+				m_bMVC_Output_TopBottom    = m_iMvcOutputMode == MVC_OUTPUT_TopBottom;
+				m_bMVC_Output_FramePacking = m_iMvcOutputMode == MVC_OUTPUT_FramePacking;
 				m_pMSDKDecoder->SetOutputMode(m_iMvcOutputMode, m_bMvcSwapLR);
 				return S_OK;
 			}
@@ -5183,7 +5185,7 @@ STDMETHODIMP CMPCVideoDecFilter::Flt_SetInt(LPCSTR field, int value)
 		int nMode = value >> 16;
 		bool bSwapLR = (value & 1);
 
-		if (nMode < 0 || nMode > MVC_OUTPUT_TopBottom) {
+		if (nMode < 0 || nMode > MVC_OUTPUT_FramePacking) {
 			return E_INVALIDARG;
 		}
 		m_iMvcOutputMode = nMode;

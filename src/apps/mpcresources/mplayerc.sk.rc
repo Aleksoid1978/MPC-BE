@@ -1721,6 +1721,7 @@ BEGIN
             MENUITEM "Prekladaný riadok (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
             MENUITEM "Polovica pod úrovňou",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "Pod úrovňou",                   ID_STEREO3D_OVERUNDER
+            MENUITEM "Frame Packing",                   ID_STEREO3D_FRAMEPACKING
             MENUITEM SEPARATOR
             MENUITEM "Vymeniť vľavo/vpravo",             ID_STEREO3D_SWAP_LEFTRIGHT
         END
@@ -1901,6 +1902,7 @@ BEGIN
             MENUITEM "Prekladaný riadok (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
             MENUITEM "Polovica pod úrovňou",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "Pod úrovňou",                   ID_STEREO3D_OVERUNDER
+            MENUITEM "Frame Packing",                   ID_STEREO3D_FRAMEPACKING
             MENUITEM SEPARATOR
             MENUITEM "Vymeniť vľavo/vpravo",             ID_STEREO3D_SWAP_LEFTRIGHT
         END
@@ -1990,6 +1992,7 @@ BEGIN
                 MENUITEM "Prekladaný riadok (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
                 MENUITEM "Polovica pod úrovňou",              ID_STEREO3D_HALFOVERUNDER
                 MENUITEM "Pod úrovňou",                   ID_STEREO3D_OVERUNDER
+                MENUITEM "Frame Packing",                   ID_STEREO3D_FRAMEPACKING
                 MENUITEM SEPARATOR
                 MENUITEM "Vymeniť vľavo/vpravo",             ID_STEREO3D_SWAP_LEFTRIGHT
             END
@@ -2068,6 +2071,7 @@ BEGIN
             MENUITEM "Prekladaný riadok (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
             MENUITEM "Polovica pod úrovňou",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "Pod úrovňou",                   ID_STEREO3D_OVERUNDER
+            MENUITEM "Frame Packing",                   ID_STEREO3D_FRAMEPACKING
             MENUITEM SEPARATOR
             MENUITEM "Vymeniť vľavo/vpravo",             ID_STEREO3D_SWAP_LEFTRIGHT
         END

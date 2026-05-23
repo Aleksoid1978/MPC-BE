@@ -25,6 +25,8 @@
 #include <dxva2api.h>
 #include "VideoFormats.h"
 
+constexpr int MVC_FRAMEPACKING_GAP_LINES = 45; // HDMI 1.4a Frame Packing active space (gap between the two eyes), in source lines
+
 enum DECODER_MODE {
 	MODE_NONE = 0,
 	MODE_SOFTWARE,
@@ -52,6 +54,7 @@ protected:
 	DXVA2_ExtendedFormat m_dxvaExtFormat = {};
 
 	BOOL m_bMVC_Output_TopBottom = FALSE;
+	BOOL m_bMVC_Output_FramePacking = FALSE;
 	bool m_bSendMediaType = false;
 
 	long m_cBuffers;

@@ -108,16 +108,30 @@ HRESULT CAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, const C
 				rcWindow.left += rcWindow.Width() / 2;
 				rcVideo.left += rcVideo.Width() / 2;
 
-			} else if (m_Stereo3DSets.iMode == SUBPIC_STEREO_TOPANDBOTTOM || m_Stereo3DSets.iTransform == STEREO3D_HalfOverUnder_to_Interlace) {
+			} else if (m_Stereo3DSets.iMode == SUBPIC_STEREO_TOPANDBOTTOM || m_Stereo3DSets.iMode == SUBPIC_STEREO_FRAMEPACKING || m_Stereo3DSets.iTransform == STEREO3D_HalfOverUnder_to_Interlace) {
 				CRect rcTempWindow(windowRect);
-				rcTempWindow.bottom -= rcTempWindow.Height() / 2;
 				CRect rcTempVideo(videoRect);
-				rcTempVideo.bottom -= rcTempVideo.Height() / 2;
 
-				AlphaBlt(rcTempWindow, rcTempVideo, pSubPic, nullptr, -xOffsetInPixels, FALSE);
+				if (m_Stereo3DSets.iMode == SUBPIC_STEREO_FRAMEPACKING) {
+					const int halfWin = MulDiv(rcTempWindow.Height(), FRAMEPACKING_TOTAL_LINES - FRAMEPACKING_GAP_LINES, FRAMEPACKING_TOTAL_LINES * 2);
+					const int halfVid = MulDiv(rcTempVideo.Height(),  FRAMEPACKING_TOTAL_LINES - FRAMEPACKING_GAP_LINES, FRAMEPACKING_TOTAL_LINES * 2);
 
-				rcWindow.top += rcWindow.Height() / 2;
-				rcVideo.top += rcVideo.Height() / 2;
+					rcTempWindow.bottom = rcTempWindow.top + halfWin;
+					rcTempVideo.bottom  = rcTempVideo.top  + halfVid;
+
+					AlphaBlt(rcTempWindow, rcTempVideo, pSubPic, nullptr, -xOffsetInPixels, FALSE);
+
+					rcWindow.top = rcWindow.bottom - halfWin;
+					rcVideo.top  = rcVideo.bottom  - halfVid;
+				} else {
+					rcTempWindow.bottom -= rcTempWindow.Height() / 2;
+					rcTempVideo.bottom -= rcTempVideo.Height() / 2;
+
+					AlphaBlt(rcTempWindow, rcTempVideo, pSubPic, nullptr, -xOffsetInPixels, FALSE);
+
+					rcWindow.top += rcWindow.Height() / 2;
+					rcVideo.top += rcVideo.Height() / 2;
+				}
 
 			}
 

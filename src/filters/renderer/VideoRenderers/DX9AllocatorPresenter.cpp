@@ -1392,15 +1392,26 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 
 			rcDst.left += rcDst.Width() / 2;
 			rcTemp.OffsetRect(xOffsetInPixels * 2, 0);
-		} else if (m_Stereo3DSets.iMode == SUBPIC_STEREO_TOPANDBOTTOM || m_Stereo3DSets.iTransform == STEREO3D_HalfOverUnder_to_Interlace) {
+		} else if (m_Stereo3DSets.iMode == SUBPIC_STEREO_TOPANDBOTTOM || m_Stereo3DSets.iMode == SUBPIC_STEREO_FRAMEPACKING || m_Stereo3DSets.iTransform == STEREO3D_HalfOverUnder_to_Interlace) {
 			CRect rcTemp(rcDst);
-			rcTemp.bottom -= rcTemp.Height() / 2;
-			rcTemp.OffsetRect(-xOffsetInPixels, 0);
+			if (m_Stereo3DSets.iMode == SUBPIC_STEREO_FRAMEPACKING) {
+				const int halfH = MulDiv(rcTemp.Height(), FRAMEPACKING_TOTAL_LINES - FRAMEPACKING_GAP_LINES, FRAMEPACKING_TOTAL_LINES * 2);
+				rcTemp.bottom = rcTemp.top + halfH;
+				rcTemp.OffsetRect(-xOffsetInPixels, 0);
 
-			AlphaBlt(rSrcPri, rcTemp, m_pAlphaBitmapTexture);
+				AlphaBlt(rSrcPri, rcTemp, m_pAlphaBitmapTexture);
 
-			rcDst.top += rcDst.Height() / 2;
-			rcTemp.OffsetRect(xOffsetInPixels * 2, 0);
+				rcDst.top = rcDst.bottom - halfH;
+				rcTemp.OffsetRect(xOffsetInPixels * 2, 0);
+			} else {
+				rcTemp.bottom -= rcTemp.Height() / 2;
+				rcTemp.OffsetRect(-xOffsetInPixels, 0);
+
+				AlphaBlt(rSrcPri, rcTemp, m_pAlphaBitmapTexture);
+
+				rcDst.top += rcDst.Height() / 2;
+				rcTemp.OffsetRect(xOffsetInPixels * 2, 0);
+			}
 		}
 
 		AlphaBlt(rSrcPri, rcDst, m_pAlphaBitmapTexture);

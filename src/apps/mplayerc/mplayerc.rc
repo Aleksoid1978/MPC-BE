@@ -9,7 +9,8 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
+#include "afxres.h"
+
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -1718,6 +1719,7 @@ BEGIN
             MENUITEM "Row Interleaved (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
             MENUITEM "Half OverUnder",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "OverUnder",                   ID_STEREO3D_OVERUNDER
+            MENUITEM "Frame Packing",               ID_STEREO3D_FRAMEPACKING
             MENUITEM SEPARATOR
             MENUITEM "Swap Left/Right",             ID_STEREO3D_SWAP_LEFTRIGHT
         END
@@ -1898,6 +1900,7 @@ BEGIN
             MENUITEM "Row Interleaved (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
             MENUITEM "Half OverUnder",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "OverUnder",                   ID_STEREO3D_OVERUNDER
+            MENUITEM "Frame Packing",               ID_STEREO3D_FRAMEPACKING
             MENUITEM SEPARATOR
             MENUITEM "Swap Left/Right",             ID_STEREO3D_SWAP_LEFTRIGHT
         END
@@ -1987,6 +1990,7 @@ BEGIN
                 MENUITEM "Row Interleaved (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
                 MENUITEM "Half OverUnder",              ID_STEREO3D_HALFOVERUNDER
                 MENUITEM "OverUnder",                   ID_STEREO3D_OVERUNDER
+                MENUITEM "Frame Packing",               ID_STEREO3D_FRAMEPACKING
                 MENUITEM SEPARATOR
                 MENUITEM "Swap Left/Right",             ID_STEREO3D_SWAP_LEFTRIGHT
             END
@@ -2065,6 +2069,7 @@ BEGIN
             MENUITEM "Row Interleaved (2x)",        ID_STEREO3D_ROW_INTERLEAVED_2X
             MENUITEM "Half OverUnder",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "OverUnder",                   ID_STEREO3D_OVERUNDER
+            MENUITEM "Frame Packing",               ID_STEREO3D_FRAMEPACKING
             MENUITEM SEPARATOR
             MENUITEM "Swap Left/Right",             ID_STEREO3D_SWAP_LEFTRIGHT
         END
@@ -3936,6 +3941,7 @@ BEGIN
     IDS_SUBTITLES_STEREO_DONTUSE "Don't use"
     IDS_SUBTITLES_STEREO_SIDEBYSIDE "Side by Side"
     IDS_SUBTITLES_STEREO_TOPANDBOTTOM "Top and Bottom"
+    IDS_SUBTITLES_STEREO_FRAMEPACKING "Frame Packing"
     IDS_SUB_POS_UP          "Subtitle shift positions up"
     IDS_SUB_POS_DOWN        "Subtitle shift positions down"
     IDS_SUB_POS_LEFT        "Subtitle shift positions left"
