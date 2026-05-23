@@ -189,6 +189,8 @@ public:
 	STDMETHODIMP_(BOOL)           GetCrossFeed() override;
 	STDMETHODIMP                  SetDummyChannels(BOOL bValue) override;
 	STDMETHODIMP_(BOOL)           GetDummyChannels() override;
+	STDMETHODIMP                  SetPauseWhiteNoise(BOOL bValue) override;
+	STDMETHODIMP_(BOOL)           GetPauseWhiteNoise() override;
 	STDMETHODIMP_(float)          GetLowLatencyMS() override;
 
 	// CMpcAudioRenderer
@@ -243,6 +245,7 @@ private:
 	HRESULT RenderWasapiBuffer();
 	void    CheckBufferStatus();
 	void    WasapiFlush();
+	void    FillPauseWhiteNoise(BYTE* pData, UINT32 nBytes);
 
 	// WASAPI variables
 	HMODULE            m_hAvrtLib;
@@ -268,6 +271,8 @@ private:
 	BOOL               m_bReleaseDeviceIdle;
 	BOOL               m_bUseCrossFeed;
 	BOOL               m_bDummyChannels;
+	BOOL               m_bPauseWhiteNoise;
+	uint32_t           m_nWhiteNoiseSeed;
 	FILTER_STATE       m_filterState;
 	float              m_fLowLatencyMS;
 

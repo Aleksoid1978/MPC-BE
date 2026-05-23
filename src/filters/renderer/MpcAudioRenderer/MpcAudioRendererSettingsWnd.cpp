@@ -97,6 +97,8 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	p.y += h20;
 	m_cbDummyChannels.Create(ResStr(IDS_ARS_DUMMY_CHANNELS), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_DUMMY_CHANNELS);
 	p.y += h20;
+	m_cbPauseWhiteNoise.Create(ResStr(IDS_ARS_PAUSE_WHITE_NOISE), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_PAUSE_WHITE_NOISE);
+	p.y += h20;
 	p.x += ScaleX(240);
 	m_btnReset.Create(ResStr(IDS_FILTER_RESET_SETTINGS), dwStyle | BS_MULTILINE, CRect(p, CSize(ScaleX(80), ScaleX(32))), this, IDC_PP_RESET);
 
@@ -139,6 +141,7 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 		m_cbReleaseDeviceIdle.SetCheck(m_pMAR->GetReleaseDeviceIdle());
 		m_cbUseCrossFeed.SetCheck(m_pMAR->GetCrossFeed());
 		m_cbDummyChannels.SetCheck(m_pMAR->GetDummyChannels());
+		m_cbPauseWhiteNoise.SetCheck(m_pMAR->GetPauseWhiteNoise());
 	}
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
@@ -175,6 +178,7 @@ bool CMpcAudioRendererSettingsWnd::OnApply()
 		m_pMAR->SetReleaseDeviceIdle(m_cbReleaseDeviceIdle.GetCheck());
 		m_pMAR->SetCrossFeed(m_cbUseCrossFeed.GetCheck());
 		m_pMAR->SetDummyChannels(m_cbDummyChannels.GetCheck());
+		m_pMAR->SetPauseWhiteNoise(m_cbPauseWhiteNoise.GetCheck());
 		int idx = m_cbSoundDevice.GetCurSel();
 		if (idx >= 0) {
 			m_pMAR->SetDeviceId(m_deviceList[idx].deviceId, m_deviceList[idx].deviceName);
@@ -218,6 +222,7 @@ void CMpcAudioRendererSettingsWnd::OnBnClickedReset()
 	m_cbReleaseDeviceIdle.SetCheck(BST_CHECKED);
 	m_cbUseCrossFeed.SetCheck(BST_UNCHECKED);
 	m_cbDummyChannels.SetCheck(BST_UNCHECKED);
+	m_cbPauseWhiteNoise.SetCheck(BST_UNCHECKED);
 
 	OnClickedWasapiMode();
 }

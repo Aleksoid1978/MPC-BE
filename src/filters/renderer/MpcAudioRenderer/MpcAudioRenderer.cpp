@@ -47,6 +47,7 @@
 #define OPT_ReleaseDeviceIdle       L"ReleaseDeviceIdle"
 #define OPT_UseCrossFeed            L"CrossFeed"
 #define OPT_DummyChannels           L"DummyChannels"
+#define OPT_PauseWhiteNoise         L"PauseWhiteNoise"
 // TODO: rename option values
 
 // set to 1(or more) to enable more detail debug log
@@ -209,6 +210,8 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_nSampleOffset(0)
 	, m_bUseCrossFeed(FALSE)
 	, m_bDummyChannels(FALSE)
+	, m_bPauseWhiteNoise(FALSE)
+	, m_nWhiteNoiseSeed(12345u)
 	, m_bNeedReinitialize(FALSE)
 	, m_bNeedReinitializeFull(FALSE)
 	, m_FlushEvent(TRUE)
@@ -263,6 +266,9 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_DummyChannels, dw)) {
 			m_bDummyChannels = !!dw;
 		}
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_PauseWhiteNoise, dw)) {
+			m_bPauseWhiteNoise = !!dw;
+		}
 	}
 #else
 	CProfile& profile = AfxGetProfile();
@@ -277,6 +283,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	profile.ReadInt(OPT_SECTION_AudRend, OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
 	profile.ReadInt(OPT_SECTION_AudRend, OPT_UseCrossFeed, m_bUseCrossFeed);
 	profile.ReadInt(OPT_SECTION_AudRend, OPT_DummyChannels, m_bDummyChannels);
+	profile.ReadInt(OPT_SECTION_AudRend, OPT_PauseWhiteNoise, m_bPauseWhiteNoise);
 #endif
 
 	if (m_DeviceMode != MODE_WASAPI_EXCLUSIVE) {
@@ -693,7 +700,22 @@ DWORD CMpcAudioRenderer::RenderThread()
 					ResetEvent(m_hResumeEvent);
 					SetEvent(m_hWaitPauseEvent);
 
-					const DWORD resultResume = WaitForMultipleObjects(std::size(resumeHandles), resumeHandles, FALSE, INFINITE);
+					DWORD resultResume;
+					for (;;) {
+						if (m_bPauseWhiteNoise && !m_bIsBitstream && m_pRenderClient) {
+							RenderWasapiBuffer();
+							DWORD waitMs = (m_pWaveFormatExOutput && m_nFramesInBuffer)
+								? (m_nFramesInBuffer * 500u / m_pWaveFormatExOutput->nSamplesPerSec)
+								: 20u;
+							if (waitMs < 10u) waitMs = 10u;
+							resultResume = WaitForMultipleObjects(std::size(resumeHandles), resumeHandles, FALSE, waitMs);
+						} else {
+							resultResume = WaitForMultipleObjects(std::size(resumeHandles), resumeHandles, FALSE, INFINITE);
+						}
+						if (resultResume != WAIT_TIMEOUT) {
+							break;
+						}
+					}
 					switch (resultResume) {
 						case WAIT_OBJECT_0: // exit event
 							DLog(L"CMpcAudioRenderer::RenderThread() - exit events");
@@ -1115,6 +1137,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 		key.SetDWORDValue(OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
 		key.SetDWORDValue(OPT_UseCrossFeed, m_bUseCrossFeed);
 		key.SetDWORDValue(OPT_DummyChannels, m_bDummyChannels);
+		key.SetDWORDValue(OPT_PauseWhiteNoise, m_bPauseWhiteNoise);
 	}
 #else
 	CProfile& profile = AfxGetProfile();
@@ -1129,6 +1152,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 	profile.WriteInt(OPT_SECTION_AudRend, OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
 	profile.WriteInt(OPT_SECTION_AudRend, OPT_UseCrossFeed, m_bUseCrossFeed);
 	profile.WriteInt(OPT_SECTION_AudRend, OPT_DummyChannels, m_bDummyChannels);
+	profile.WriteInt(OPT_SECTION_AudRend, OPT_PauseWhiteNoise, m_bPauseWhiteNoise);
 #endif
 
 	return S_OK;
@@ -1377,6 +1401,19 @@ STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetDummyChannels()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_bDummyChannels;
+}
+
+STDMETHODIMP CMpcAudioRenderer::SetPauseWhiteNoise(BOOL bValue)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	m_bPauseWhiteNoise = bValue;
+	return S_OK;
+}
+
+STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetPauseWhiteNoise()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_bPauseWhiteNoise;
 }
 
 STDMETHODIMP_(float) CMpcAudioRenderer::GetLowLatencyMS()
@@ -2881,6 +2918,88 @@ HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = 
 	return hr;
 }
 
+void CMpcAudioRenderer::FillPauseWhiteNoise(BYTE* pData, UINT32 nBytes)
+{
+	if (!pData || nBytes == 0 || !m_pWaveFormatExOutput) {
+		return;
+	}
+
+	bool bFloat = false;
+	const WORD wBits = m_pWaveFormatExOutput->wBitsPerSample;
+	if (IsWaveFormatExtensible(m_pWaveFormatExOutput)) {
+		bFloat = (reinterpret_cast<const WAVEFORMATEXTENSIBLE*>(m_pWaveFormatExOutput)->SubFormat == MEDIASUBTYPE_IEEE_FLOAT);
+	} else {
+		bFloat = (m_pWaveFormatExOutput->wFormatTag == WAVE_FORMAT_IEEE_FLOAT);
+	}
+
+	if (bFloat) {
+		if (wBits == 32) {
+			auto* p = reinterpret_cast<float*>(pData);
+			const UINT32 n = nBytes / sizeof(float);
+			for (UINT32 i = 0; i < n; i++) {
+				m_nWhiteNoiseSeed = m_nWhiteNoiseSeed * 1664525u + 1013904223u;
+				// Scale to ~-80 dBFS (amplitude 0.0001)
+				p[i] = static_cast<float>(static_cast<int32_t>(m_nWhiteNoiseSeed)) * (1.0f / 2147483648.0f) * 0.0001f;
+			}
+		} else { // 64-bit double
+			auto* p = reinterpret_cast<double*>(pData);
+			const UINT32 n = nBytes / sizeof(double);
+			for (UINT32 i = 0; i < n; i++) {
+				m_nWhiteNoiseSeed = m_nWhiteNoiseSeed * 1664525u + 1013904223u;
+				p[i] = static_cast<double>(static_cast<int32_t>(m_nWhiteNoiseSeed)) * (1.0 / 2147483648.0) * 0.0001;
+			}
+		}
+	} else {
+		switch (wBits) {
+		case 8: {
+			// 8-bit PCM is unsigned with silence at 128
+			const UINT32 n = nBytes;
+			for (UINT32 i = 0; i < n; i++) {
+				m_nWhiteNoiseSeed = m_nWhiteNoiseSeed * 1664525u + 1013904223u;
+				pData[i] = (m_nWhiteNoiseSeed >> 31) ? 129 : 127;
+			}
+			break;
+		}
+		case 16: {
+			auto* p = reinterpret_cast<int16_t*>(pData);
+			const UINT32 n = nBytes / sizeof(int16_t);
+			for (UINT32 i = 0; i < n; i++) {
+				m_nWhiteNoiseSeed = m_nWhiteNoiseSeed * 1664525u + 1013904223u;
+				p[i] = (m_nWhiteNoiseSeed >> 31) ? 1 : -1;
+			}
+			break;
+		}
+		case 24: {
+			// True 24-bit: 3 bytes per sample, little-endian 2's complement
+			const UINT32 n = nBytes / 3;
+			for (UINT32 i = 0; i < n; i++) {
+				m_nWhiteNoiseSeed = m_nWhiteNoiseSeed * 1664525u + 1013904223u;
+				BYTE* s = pData + i * 3;
+				if (m_nWhiteNoiseSeed >> 31) {
+					s[0] = 0x01; s[1] = 0x00; s[2] = 0x00;
+				} else {
+					s[0] = 0xFF; s[1] = 0xFF; s[2] = 0xFF;
+				}
+			}
+			break;
+		}
+		case 32: {
+			// Covers both pure 32-bit PCM and 24-bit-in-32-bit-container
+			auto* p = reinterpret_cast<int32_t*>(pData);
+			const UINT32 n = nBytes / sizeof(int32_t);
+			for (UINT32 i = 0; i < n; i++) {
+				m_nWhiteNoiseSeed = m_nWhiteNoiseSeed * 1664525u + 1013904223u;
+				p[i] = (m_nWhiteNoiseSeed >> 31) ? 1 : -1;
+			}
+			break;
+		}
+		default:
+			memset(pData, 0, nBytes);
+			break;
+		}
+	}
+}
+
 HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 {
 	CheckPointer(m_pRenderClient, S_OK);
@@ -2927,7 +3046,14 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 			DLog(L"CMpcAudioRenderer::RenderWasapiBuffer() - flushing");
 		}
 #endif
-		dwFlags = AUDCLNT_BUFFERFLAGS_SILENT;
+		if (pData && numFramesAvailable > 0
+				&& m_bPauseWhiteNoise && !m_bIsBitstream
+				&& m_filterState == State_Paused
+				&& m_lVolume > DSBVOLUME_MIN) {
+			FillPauseWhiteNoise(pData, nAvailableBytes);
+		} else {
+			dwFlags = AUDCLNT_BUFFERFLAGS_SILENT;
+		}
 
 		if (m_bIsAudioClientStarted && !nWasapiQueueSize && m_filterState == State_Running && !bFlushing) {
 			const auto duration = SamplesToTime(numFramesAvailable, m_pWaveFormatExOutput);
@@ -3150,7 +3276,7 @@ static VOID CALLBACK TimerCallbackFunc(PVOID lpParameter, BOOLEAN TimerOrWaitFir
 
 void CMpcAudioRenderer::StartReleaseTimer()
 {
-	if (m_bReleaseDeviceIdle && !m_hReleaseTimerHandle) {
+	if (m_bReleaseDeviceIdle && !m_bPauseWhiteNoise && !m_hReleaseTimerHandle) {
 		std::ignore = CreateTimerQueueTimer(&m_hReleaseTimerHandle,
 											nullptr,
 											TimerCallbackFunc,
