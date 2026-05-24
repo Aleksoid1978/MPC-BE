@@ -701,7 +701,7 @@ DWORD CMpcAudioRenderer::RenderThread()
 
 					DWORD resultResume;
 					for (;;) {
-						if (m_bPauseWhiteNoise && !m_bIsBitstream && m_pRenderClient) {
+						if (m_bPauseWhiteNoise && !m_bIsBitstream && !m_bReleaseDeviceIdle && m_pRenderClient) {
 							RenderWasapiBuffer();
 							DWORD waitMs = (m_pWaveFormatExOutput && m_nFramesInBuffer)
 								? (m_nFramesInBuffer * 500u / m_pWaveFormatExOutput->nSamplesPerSec)
@@ -3046,7 +3046,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 		}
 #endif
 		if (pData && numFramesAvailable > 0
-				&& m_bPauseWhiteNoise && !m_bIsBitstream
+				&& m_bPauseWhiteNoise && !m_bIsBitstream && !m_bReleaseDeviceIdle
 				&& m_filterState == State_Paused
 				&& m_lVolume > DSBVOLUME_MIN) {
 			FillPauseWhiteNoise(pData, nAvailableBytes);

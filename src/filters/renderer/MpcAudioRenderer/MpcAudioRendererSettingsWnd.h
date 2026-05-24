@@ -84,6 +84,8 @@ public:
 
 	afx_msg void OnClickedWasapiMode();
 	afx_msg void OnClickedBitExact();
+	afx_msg void OnClickedFreeDeviceInactive();
+	afx_msg void OnClickedPauseWhiteNoice();
 	afx_msg void OnBnClickedReset();
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult);
 };

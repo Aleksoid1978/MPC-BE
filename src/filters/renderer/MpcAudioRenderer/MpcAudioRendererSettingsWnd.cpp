@@ -155,6 +155,9 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 
 	OnClickedWasapiMode();
 
+	OnClickedFreeDeviceInactive();
+	OnClickedPauseWhiteNoice();
+
 	EnableToolTips(TRUE);
 
 	return true;
@@ -192,6 +195,8 @@ bool CMpcAudioRendererSettingsWnd::OnApply()
 BEGIN_MESSAGE_MAP(CMpcAudioRendererSettingsWnd, CInternalPropertyPageWnd)
 	ON_CBN_SELCHANGE(IDC_PP_WASAPI_MODE, OnClickedWasapiMode)
 	ON_BN_CLICKED(IDC_PP_USE_BITEXACT_OUTPUT, OnClickedBitExact)
+	ON_BN_CLICKED(IDC_PP_FREE_DEVICE_INACTIVE, OnClickedFreeDeviceInactive)
+	ON_BN_CLICKED(IDC_PP_PAUSE_WHITE_NOISE, OnClickedPauseWhiteNoice)
 	ON_BN_CLICKED(IDC_PP_RESET, OnBnClickedReset)
 	ON_NOTIFY_EX(TTN_NEEDTEXTW, 0, OnToolTipNotify)
 END_MESSAGE_MAP()
@@ -210,6 +215,16 @@ void CMpcAudioRendererSettingsWnd::OnClickedBitExact()
 	m_cbAltCheckFormat.EnableWindow(m_cbUseBitExactOutput.GetCheck() && m_cbUseBitExactOutput.IsWindowEnabled());
 }
 
+void CMpcAudioRendererSettingsWnd::OnClickedFreeDeviceInactive()
+{
+	m_cbPauseWhiteNoise.EnableWindow(!m_cbReleaseDeviceIdle.GetCheck());
+}
+
+void CMpcAudioRendererSettingsWnd::OnClickedPauseWhiteNoice()
+{
+	m_cbReleaseDeviceIdle.EnableWindow(!m_cbPauseWhiteNoise.GetCheck());
+}
+
 void CMpcAudioRendererSettingsWnd::OnBnClickedReset()
 {
 	m_cbWasapiMode.SetCurSel(MODE_WASAPI_SHARED);
@@ -225,6 +240,9 @@ void CMpcAudioRendererSettingsWnd::OnBnClickedReset()
 	m_cbPauseWhiteNoise.SetCheck(BST_UNCHECKED);
 
 	OnClickedWasapiMode();
+
+	OnClickedFreeDeviceInactive();
+	OnClickedPauseWhiteNoice();
 }
 
 BOOL CMpcAudioRendererSettingsWnd::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRESULT * pResult)

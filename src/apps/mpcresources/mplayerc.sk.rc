@@ -3470,6 +3470,7 @@ BEGIN
     IDS_ARS_DUMMY_CHANNELS  "Nevypĺňať kanály pri miešaní"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "Ak je to možné, zvuk sa odošle v pôvodnom formáte.\nV opačnom prípade sa použije formát určený v systémových nastaveniach."
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "Vykresľovací modul sa pokúsi inicializovať zariadenie a preskočí niektoré kontroly."
+    IDS_ARS_PAUSE_WHITE_NOISE   "Keep audio device active when paused (inaudible noise)"
 END
 
 STRINGTABLE

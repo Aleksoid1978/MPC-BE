@@ -3470,6 +3470,7 @@ BEGIN
     IDS_ARS_DUMMY_CHANNELS  "Bij het upmixen geen kanalen vullen"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "Indien mogelijk wordt de audio in het oorspronkelijke formaat verzonden.\nAnders wordt het opgegeven formaat in de systeeminstellingen gebruikt."
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "De renderer zal het apparaat zonder enkele controles proberen te initialiseren."
+    IDS_ARS_PAUSE_WHITE_NOISE   "Keep audio device active when paused (inaudible noise)"
 END
 
 STRINGTABLE

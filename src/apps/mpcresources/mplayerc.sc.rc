@@ -3468,6 +3468,7 @@ BEGIN
     IDS_ARS_DUMMY_CHANNELS  "上混时不要填充声道"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "如果可能的话，音频将以其原始格式发送。\n否则，将使用系统设置中指定的格式"
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "渲染器将尝试跳过一些检查来初始化设备"
+    IDS_ARS_PAUSE_WHITE_NOISE   "Keep audio device active when paused (inaudible noise)"
 END
 
 STRINGTABLE

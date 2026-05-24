@@ -3470,6 +3470,7 @@ BEGIN
     IDS_ARS_DUMMY_CHANNELS  "No llena los canales al mezclar"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "Si es posible, el audio se enviará en su formato original.\nDe lo contrario, se usará el formato especificado en la configuración del sistema."
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "El renderizador intentará inicializar el dispositivo omitiendo algunas comprobaciones."
+    IDS_ARS_PAUSE_WHITE_NOISE   "Keep audio device active when paused (inaudible noise)"
 END
 
 STRINGTABLE

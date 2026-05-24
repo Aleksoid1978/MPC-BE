@@ -3468,6 +3468,7 @@ BEGIN
     IDS_ARS_DUMMY_CHANNELS  "عدم ملء القنوات أثناء الخلط"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "إذا أمكن، سيتم إرسال الصوت بتنسيقه الأصلي.\nوإلا، سيتم استخدام التنسيق المحدد في إعدادات النظام."
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "سيحاول محرك التقديم تهيئة الجهاز مع تخطي بعض الفحوصات."
+    IDS_ARS_PAUSE_WHITE_NOISE   "Keep audio device active when paused (inaudible noise)"
 END
 
 STRINGTABLE

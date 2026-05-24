@@ -3468,6 +3468,7 @@ BEGIN
     IDS_ARS_DUMMY_CHANNELS  "Don't fill channels when upmixing"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "If possible, the audio will be sent out in its original format.\nOtherwise, the format specified in the system settings will be used."
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "The renderer will try to initialize the device skipping some checks."
+    IDS_ARS_PAUSE_WHITE_NOISE   "Keep audio device active when paused (inaudible noise)"
 END
 
 STRINGTABLE
