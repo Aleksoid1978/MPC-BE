@@ -199,7 +199,6 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_bReleaseDeviceIdle(TRUE)
 	, m_filterState(State_Stopped)
 	, m_hRendererNeedMoreData(nullptr)
-	, m_CurrentPacket(nullptr)
 	, m_rtStartTime(0)
 	, m_rtNextRenderedSampleTime(0)
 	, m_rtLastReceivedSampleTimeEnd(0)
@@ -3067,14 +3066,29 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 		UINT32 nWritenBytes = 0;
 
 		do {
-			if (!m_CurrentPacket) {
-				m_nSampleOffset = 0;
+			for (;;) {
+				if (m_CurrentPacket && m_CurrentPacket->empty()) {
+					m_CurrentPacket.reset();
+				}
 
-				size_t count;
-				m_WasapiQueue.RemoveSafe(m_CurrentPacket, count);
-				if (!m_CurrentPacket) {
+				if (m_CurrentPacket) {
 					break;
 				}
+
+				if (!m_CurrentPacket) {
+					m_nSampleOffset = 0;
+
+					size_t count;
+					m_WasapiQueue.RemoveSafe(m_CurrentPacket, count);
+
+					if (!m_CurrentPacket) {
+						break;
+					}
+				}
+			}
+
+			if (!m_CurrentPacket) {
+				break;
 			}
 
 			if (!m_nSampleOffset) {
