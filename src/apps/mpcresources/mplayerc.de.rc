@@ -3470,7 +3470,7 @@ BEGIN
     IDS_ARS_DUMMY_CHANNELS  "Beim Upmixen keine Kanäle füllen"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "Wenn möglich, wird das Audio im Originalformat gesendet.\nAndernfalls wird das in den Systemeinstellungen angegebene Format verwendet."
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "Der Renderer versucht, das Gerät zu initialisieren und überspringt dabei einige Prüfungen."
-    IDS_ARS_PAUSE_WHITE_NOISE   "Keep audio device active when paused (inaudible noise)"
+    IDS_ARS_PAUSE_WHITE_NOISE   "Audiogerät bei Pause aktiv halten (unhörbares Rauschen)"
 END
 
 STRINGTABLE
