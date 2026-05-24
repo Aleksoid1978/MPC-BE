@@ -47,6 +47,7 @@ private :
 	CButton		m_cbReleaseDeviceIdle;
 	CButton		m_cbUseCrossFeed;
 	CButton		m_cbDummyChannels;
+	CButton		m_cbPauseWhiteNoise;
 	CButton		m_btnReset;
 
 	CStatic		m_txtSoundDevice;
@@ -63,6 +64,7 @@ private :
 		IDC_PP_FREE_DEVICE_INACTIVE,
 		IDC_PP_USE_CROSSFEED,
 		IDC_PP_DUMMY_CHANNELS,
+		IDC_PP_PAUSE_WHITE_NOISE,
 		IDC_PP_RESET,
 	};
 
@@ -76,7 +78,7 @@ public:
 	bool OnApply();
 
 	static LPCWSTR GetWindowTitle() { return MAKEINTRESOURCEW(IDS_FILTER_SETTINGS_CAPTION); }
-	static CSize GetWindowSize() { return CSize(340, 211); }
+	static CSize GetWindowSize() { return CSize(340, 231); }
 
 	DECLARE_MESSAGE_MAP()
 

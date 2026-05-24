@@ -73,5 +73,7 @@ public IUnknown {
 	STDMETHOD_(BOOL, GetCrossFeed()) PURE;
 	STDMETHOD(SetDummyChannels(BOOL bValue)) PURE;
 	STDMETHOD_(BOOL, GetDummyChannels()) PURE;
+	STDMETHOD(SetPauseWhiteNoise(BOOL bValue)) PURE;
+	STDMETHOD_(BOOL, GetPauseWhiteNoise()) PURE;
 	STDMETHOD_(float, GetLowLatencyMS()) PURE;
 };
