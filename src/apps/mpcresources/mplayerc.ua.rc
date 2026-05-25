@@ -3470,7 +3470,7 @@ BEGIN
     IDS_ARS_DUMMY_CHANNELS  "Don't fill channels when upmixing"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "Якщо можливо, аудіо буде передане в оригінальному форматі.\nВ іншому випадку, буде використаний формат, вказаний в системних налаштуваннях."
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "Рендерер спробує ініціалізувати пристрій пропускаючи деякі перевірки."
-    IDS_ARS_PAUSE_WHITE_NOISE   "Keep audio device active when paused (inaudible noise)"
+    IDS_ARS_PAUSE_KEEP_ACTIVE   "Keep audio device active when paused (inaudible noise)"
 END
 
 STRINGTABLE

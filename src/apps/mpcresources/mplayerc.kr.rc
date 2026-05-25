@@ -3468,7 +3468,7 @@ BEGIN
     IDS_ARS_DUMMY_CHANNELS  "업믹스 시, 채널 채우지 않음"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "가능한 경우 음향는 원래 형식으로 전송됩니다.\n그렇지 않으면 시스템 설정에 지정된 형식이 사용됩니다."
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "렌더러는 일부 검사를 건너뛰고 장치 초기화를 시도합니다."
-    IDS_ARS_PAUSE_WHITE_NOISE   "Keep audio device active when paused (inaudible noise)"
+    IDS_ARS_PAUSE_KEEP_ACTIVE   "Keep audio device active when paused (inaudible noise)"
 END
 
 STRINGTABLE

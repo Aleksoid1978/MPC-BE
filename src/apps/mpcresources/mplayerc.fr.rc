@@ -3470,7 +3470,7 @@ BEGIN
     IDS_ARS_DUMMY_CHANNELS  "Ne pas remplir les canaux lors du mixage"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "Si possible, l'audio sera envoyé dans son format d'origine.\nSinon, le format spécifié dans les paramètres système sera utilisé."
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "Le moteur de rendu tentera d'initialiser le périphérique en ignorant certaines vérifications."
-    IDS_ARS_PAUSE_WHITE_NOISE   "Keep audio device active when paused (inaudible noise)"
+    IDS_ARS_PAUSE_KEEP_ACTIVE   "Keep audio device active when paused (inaudible noise)"
 END
 
 STRINGTABLE
