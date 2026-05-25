@@ -3468,7 +3468,7 @@ BEGIN
     IDS_ARS_DUMMY_CHANNELS  "アップミックス時にチャンネルを埋めない"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "可能であれば、音声は元の形式で送信されます。\nそれ以外の場合は、システム設定で指定された形式が使用されます。"
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "レンダラーは、いくつかの確認をスキップしてデバイスを初期化しようとします。"
-    IDS_ARS_PAUSE_WHITE_NOISE   "Keep audio device active when paused (inaudible noise)"
+    IDS_ARS_PAUSE_WHITE_NOISE   "一時停止中オーディオ デバイスを維持 (不可聴ノイズ)"
 END
 
 STRINGTABLE
