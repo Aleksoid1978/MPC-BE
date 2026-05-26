@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -84,7 +84,6 @@
 
 #define USE_MEDIAINFO_STATIC
 #include <MediaInfo/MediaInfo.h>
-using namespace MediaInfoLib;
 
 #include <filesystem>
 

@@ -14313,7 +14313,7 @@ bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 			}
 
 			// Get FPS
-			MediaInfo MI;
+			MediaInfoLib::MediaInfo MI;
 			MI.Option(L"ParseSpeed", L"0");
 			if (MI.Open(mi_fn.GetString())) {
 				for (int i = 0; i < 2; i++) {

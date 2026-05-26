@@ -176,7 +176,7 @@ void CPPageFileMediaInfo::OnComboFileChange()
 	auto it = m_files.cbegin();
 	std::advance(it, m_fileindex);
 
-	MediaInfo MI;
+	MediaInfoLib::MediaInfo MI;
 
 	MI.Option(L"ParseSpeed", L"0.5");
 	MI.Option(L"Language", mi_get_lang_file());
