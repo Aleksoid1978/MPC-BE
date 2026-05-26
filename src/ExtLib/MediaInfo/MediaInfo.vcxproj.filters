@@ -72,14 +72,23 @@
     <Filter Include="Source Files\Video">
       <UniqueIdentifier>{498a148f-4e5b-4f2b-836e-01a085ab7b08}</UniqueIdentifier>
     </Filter>
+    <Filter Include="extra\base64">
+      <UniqueIdentifier>{941fbea4-d8d1-4933-b68b-940477efca99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="extra\fmt">
+      <UniqueIdentifier>{f4c5dc21-b758-4cf0-95fe-4bc5c5203a41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="extra\md5">
+      <UniqueIdentifier>{4192396c-2b08-479b-ac35-d702649c5033}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="extra\tfsxml">
+      <UniqueIdentifier>{f1f6cdbe-d7cd-4986-b276-0aa8985b66af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="extra\tinyxml2">
+      <UniqueIdentifier>{c4a17b30-0b06-4f2f-9fdd-fdf8e787a6d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ThirdParty\base64\base64.h">
-      <Filter>extra</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\tinyxml2\tinyxml2.h">
-      <Filter>extra</Filter>
-    </ClInclude>
     <ClInclude Include="MediaInfo\File__Analyse_Automatic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -455,9 +464,6 @@
     <ClInclude Include="MediaInfo\Image\File_Tga.h">
       <Filter>Header Files\Image</Filter>
     </ClInclude>
-    <ClInclude Include="MediaInfo\Export\Export_reVTMD.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MediaInfo\Multiple\File_SequenceInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -595,9 +601,6 @@
     </ClInclude>
     <ClInclude Include="MediaInfo\Video\File_Aic.h">
       <Filter>Header Files\Video</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\md5\md5.h">
-      <Filter>extra</Filter>
     </ClInclude>
     <ClInclude Include="MediaInfo\Text\File_SubRip.h">
       <Filter>Header Files\Text</Filter>
@@ -743,9 +746,6 @@
     <ClInclude Include="MediaInfo\Audio\File_Adm.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="ThirdParty\tfsxml\tfsxml.h">
-      <Filter>extra</Filter>
-    </ClInclude>
     <ClInclude Include="MediaInfo\Audio\File_DolbyAudioMetadata.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
@@ -815,20 +815,32 @@
     <ClInclude Include="MediaInfo\Image\File_GainMap.h">
       <Filter>Header Files\Image</Filter>
     </ClInclude>
+    <ClInclude Include="ThirdParty\base64\base64.h">
+      <Filter>extra\base64</Filter>
+    </ClInclude>
     <ClInclude Include="ThirdParty\fmt\base.h">
-      <Filter>extra</Filter>
+      <Filter>extra\fmt</Filter>
     </ClInclude>
     <ClInclude Include="ThirdParty\fmt\format.h">
-      <Filter>extra</Filter>
+      <Filter>extra\fmt</Filter>
     </ClInclude>
     <ClInclude Include="ThirdParty\fmt\format-inl.h">
-      <Filter>extra</Filter>
+      <Filter>extra\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\md5\md5.h">
+      <Filter>extra\md5</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\tfsxml\tfsxml.h">
+      <Filter>extra\tfsxml</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\tinyxml2\tinyxml2.h">
+      <Filter>extra\tinyxml2</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Export\Export_reVTMD.h">
+      <Filter>Header Files\Export</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
-      <Filter>extra</Filter>
-    </ClCompile>
     <ClCompile Include="MediaInfo\File__Analyze.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1216,9 +1228,6 @@
     <ClCompile Include="MediaInfo\Multiple\File_Ism.cpp">
       <Filter>Source Files\Multiple</Filter>
     </ClCompile>
-    <ClCompile Include="MediaInfo\Export\Export_reVTMD.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MediaInfo\Multiple\File_SequenceInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1362,9 +1371,6 @@
     </ClCompile>
     <ClCompile Include="MediaInfo\Video\File_Aic.cpp">
       <Filter>Source Files\Video</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\md5\md5.c">
-      <Filter>extra</Filter>
     </ClCompile>
     <ClCompile Include="MediaInfo\Text\File_SubRip.cpp">
       <Filter>Source Files\Text</Filter>
@@ -1510,9 +1516,6 @@
     <ClCompile Include="MediaInfo\Audio\File_Adm.cpp">
       <Filter>Source Files\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="ThirdParty\tfsxml\tfsxml.c">
-      <Filter>extra</Filter>
-    </ClCompile>
     <ClCompile Include="MediaInfo\Audio\File_DolbyAudioMetadata.cpp">
       <Filter>Source Files\Audio</Filter>
     </ClCompile>
@@ -1578,6 +1581,18 @@
     </ClCompile>
     <ClCompile Include="MediaInfo\Image\File_GainMap.cpp">
       <Filter>Source Files\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\md5\md5.c">
+      <Filter>extra\md5</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\tfsxml\tfsxml.c">
+      <Filter>extra\tfsxml</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
+      <Filter>extra\tinyxml2</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Export\Export_reVTMD.cpp">
+      <Filter>Source Files\Export</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
