@@ -1594,5 +1594,8 @@
     <ClCompile Include="MediaInfo\Export\Export_reVTMD.cpp">
       <Filter>Source Files\Export</Filter>
     </ClCompile>
+    <ClCompile Include="ThirdParty\fmt\format.cc">
+      <Filter>extra\fmt</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
